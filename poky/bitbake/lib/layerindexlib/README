@@ -1,0 +1,28 @@
+The layerindexlib module is designed to permit programs to work directly
+with layer index information.  (See layers.openembedded.org...)
+
+The layerindexlib module includes a plugin interface that is used to extend
+the basic functionality.  There are two primary plugins available: restapi
+and cooker.
+
+The restapi plugin works with a web based REST Api compatible with the
+layerindex-web project, as well as the ability to store and retried a
+the information for one or more files on the disk.
+
+The cooker plugin works by reading the information from the current build
+project and processing it as if it were a layer index.
+
+
+TODO:
+
+__init__.py:
+Implement local on-disk caching (using the rest api store/load)
+Implement layer index style query operations on a combined index
+
+common.py:
+Stop network access if BB_NO_NETWORK or allowed hosts is restricted
+
+cooker.py:
+Cooker - Implement recipe parsing
+
+

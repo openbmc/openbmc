@@ -1,0 +1,24 @@
+From 0825db94fc91fa2150c0e649e92cc8dcc44f4b38 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 4 Apr 2018 14:09:45 +0300
+Subject: [PATCH] Fix out of tree builds
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ include/nls.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/nls.h b/include/nls.h
+index 1166b7b..f5abe05 100644
+--- a/include/nls.h
++++ b/include/nls.h
+@@ -6,7 +6,7 @@
+ #define PROCPS_NG_NLS_H
+ 
+ /* programs issuing textdomain() need PACKAGE string */
+-#include "../config.h"
++#include "config.h"
+ 
+ /* programs issuing bindtextdomain() also need LOCALEDIR string */
+ #ifndef LOCALEDIR

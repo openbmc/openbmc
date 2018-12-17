@@ -1,0 +1,27 @@
+From 3d9cae15c69c0b3260a024ad5d6802a8d85515a2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 12 Jun 2018 19:18:24 -0700
+Subject: [PATCH 2/2] Remove unused include for execinfo.h
+
+Fixes build on musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ providers/qedr/qelr_verbs.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/providers/qedr/qelr_verbs.c b/providers/qedr/qelr_verbs.c
+index e3b01f28..2ee1c832 100644
+--- a/providers/qedr/qelr_verbs.c
++++ b/providers/qedr/qelr_verbs.c
+@@ -54,7 +54,6 @@
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
+-#include <execinfo.h>
+ 
+ #define QELR_SQE_ELEMENT_SIZE	(sizeof(struct rdma_sq_sge))
+ #define QELR_RQE_ELEMENT_SIZE	(sizeof(struct rdma_rq_sge))
+-- 
+2.17.1
+

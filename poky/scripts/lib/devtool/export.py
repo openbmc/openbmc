@@ -84,7 +84,7 @@ def export(args, config, basepath, workspace):
 
     # if all workspace is excluded, quit
     if not len(set(workspace.keys()).difference(set(args.exclude))):
-        logger.warn('All recipes in workspace excluded, nothing to export')
+        logger.warning('All recipes in workspace excluded, nothing to export')
         return 0
 
     exported = []

@@ -1,4 +1,4 @@
-From e48f1e18f5ea41656f0ba10fe61d69d2604b0064 Mon Sep 17 00:00:00 2001
+From 3fea5e83803f4cfef21b2e06e37a6ba56f2bb914 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 3 Jan 2018 17:02:01 +0200
 Subject: [PATCH] giscanner: add a --lib-dirs-envvar option
@@ -19,7 +19,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  3 files changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/giscanner/ccompiler.py b/giscanner/ccompiler.py
-index 29de0ee..928eae8 100644
+index c003828..8a8ba2b 100644
 --- a/giscanner/ccompiler.py
 +++ b/giscanner/ccompiler.py
 @@ -109,7 +109,7 @@ class CCompiler(object):
@@ -32,19 +32,19 @@ index 29de0ee..928eae8 100644
          # is being built in the current directory.
  
 @@ -119,7 +119,7 @@ class CCompiler(object):
-         if self.check_is_msvc():
+         if os.name == 'nt':
              runtime_path_envvar = ['LIB', 'PATH']
          else:
--            runtime_path_envvar = ['LD_LIBRARY_PATH']
-+            runtime_path_envvar = ['LD_LIBRARY_PATH'] if not lib_dirs_envvar else [lib_dirs_envvar]
+-            runtime_path_envvar = ['LD_LIBRARY_PATH', 'DYLD_FALLBACK_LIBRARY_PATH']
++            runtime_path_envvar = ['LD_LIBRARY_PATH', 'DYLD_FALLBACK_LIBRARY_PATH'] if not lib_dirs_envvar else [lib_dirs_envvar]
              # Search the current directory first
              # (This flag is not supported nor needed for Visual C++)
              args.append('-L.')
 diff --git a/giscanner/dumper.py b/giscanner/dumper.py
-index 7f77bd2..db96df6 100644
+index 2c668f5..2e515a0 100644
 --- a/giscanner/dumper.py
 +++ b/giscanner/dumper.py
-@@ -259,7 +259,8 @@ class DumpCompiler(object):
+@@ -249,7 +249,8 @@ class DumpCompiler(object):
                                                     libtool,
                                                     self._options.libraries,
                                                     self._options.extra_libraries,
@@ -55,10 +55,10 @@ index 7f77bd2..db96df6 100644
  
          else:
 diff --git a/giscanner/scannermain.py b/giscanner/scannermain.py
-index 38a45c1..b603850 100755
+index 5cb793e..87227e2 100644
 --- a/giscanner/scannermain.py
 +++ b/giscanner/scannermain.py
-@@ -130,6 +130,9 @@ def _get_option_parser():
+@@ -132,6 +132,9 @@ def _get_option_parser():
      parser.add_option("", "--use-ldd-wrapper",
                        action="store", dest="ldd_wrapper", default=None,
                        help="wrapper to use instead of ldd (useful when cross-compiling)")
@@ -68,6 +68,3 @@ index 38a45c1..b603850 100755
      parser.add_option("", "--program-arg",
                        action="append", dest="program_args", default=[],
                        help="extra arguments to program")
--- 
-2.15.1
-

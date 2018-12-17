@@ -1,0 +1,75 @@
+From caeccb7bec45f65bc89efa8195b3853368328361 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Mon, 17 Sep 2018 12:49:36 +0800
+Subject: [PATCH] syslog-ng: fix segment fault during service start on arm64
+
+service start failed since segment fault on arch arm64,
+syslog-ng have a submodule ivykis, from ivykis V0.42,
+it use pthread_atfork, but for arm64, this symbol is
+not included by libpthread, so cause segment fault.
+
+refer systemd, replace pthread_atfork with __register_atfork
+to fix this problem.
+
+I have create an issue, and this proposal to upstream.
+https://github.com/buytenh/ivykis/issues/15
+
+Upstream-Status: Pending
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ lib/ivykis/src/pthr.h | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/lib/ivykis/src/pthr.h b/lib/ivykis/src/pthr.h
+index a41eaf3..72c5190 100644
+--- a/lib/ivykis/src/pthr.h
++++ b/lib/ivykis/src/pthr.h
+@@ -24,6 +24,16 @@
+ #include <pthread.h>
+ #include <signal.h>
+ 
++#ifdef __GLIBC__
++/* We use glibc __register_atfork() + __dso_handle directly here, as they are not included in the glibc
++ * headers. __register_atfork() is mostly equivalent to pthread_atfork(), but doesn't require us to link against
++ * libpthread, as it is part of glibc anyway. */
++extern int __register_atfork(void (*prepare) (void), void (*parent) (void), void (*child) (void), void * __dso_handle);
++extern void* __dso_handle __attribute__ ((__weak__));
++#else
++#define __register_atfork(prepare,parent,child,dso) pthread_atfork(prepare,parent,child)
++#endif
++
+ #ifdef HAVE_PRAGMA_WEAK
+ #pragma weak pthread_create
+ #endif
+@@ -36,16 +46,7 @@ static inline int pthreads_available(void)
+ 
+ #ifdef HAVE_PRAGMA_WEAK
+ 
+-/*
+- * On Linux, pthread_atfork() is defined in libpthread_nonshared.a,
+- * a static library, and we want to avoid "#pragma weak" for that
+- * symbol because that causes it to be undefined even if you link
+- * libpthread_nonshared.a in explicitly.
+- */
+-#ifndef HAVE_LIBPTHREAD_NONSHARED
+-#pragma weak pthread_atfork
+-#endif
+-
++#pragma weak __register_atfork
+ #pragma weak pthread_create
+ #pragma weak pthread_detach
+ #pragma weak pthread_getspecific
+@@ -73,8 +74,7 @@ static inline int
+ pthr_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void))
+ {
+ 	if (pthreads_available())
+-		return pthread_atfork(prepare, parent, child);
+-
++		return __register_atfork(prepare, parent, child, __dso_handle);
+ 	return ENOSYS;
+ }
+ 
+-- 
+2.7.4
+

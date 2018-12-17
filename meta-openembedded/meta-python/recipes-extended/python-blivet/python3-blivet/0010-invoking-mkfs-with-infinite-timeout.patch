@@ -1,0 +1,31 @@
+From 42d8e57c748951098534bf7f52c4ebc790ef66e9 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 16 Jun 2017 15:43:00 +0800
+Subject: [PATCH 10/11] invoking mkfs with infinite timeout
+
+This large timeout is needed when running on machines with
+lots of disks, or with slow disks.
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ blivet/tasks/fsmkfs.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/blivet/tasks/fsmkfs.py b/blivet/tasks/fsmkfs.py
+index ad166aa..7bf5075 100644
+--- a/blivet/tasks/fsmkfs.py
++++ b/blivet/tasks/fsmkfs.py
+@@ -170,7 +170,7 @@ class FSMkfs(task.BasicApplication, FSMkfsTask):
+         options = options or []
+         cmd = self._mkfs_command(options, label, set_uuid)
+         try:
+-            ret = util.run_program(cmd)
++            ret = util.run_program(cmd, timeout=-1)
+         except OSError as e:
+             raise FSError(e)
+ 
+-- 
+2.7.4
+

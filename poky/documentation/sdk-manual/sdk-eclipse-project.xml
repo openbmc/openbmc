@@ -57,12 +57,12 @@
                     <ulink url='&YOCTO_DOCS_REF_URL;#hardware-build-system-term'>build host</ulink>
                     can use the Yocto Project.
                     See the
-                    "<ulink url='&YOCTO_DOCS_DEV_URL;#setting-up-the-development-host-to-use-the-yocto-project'>Preparing a Build Host</ulink>"
+                    "<ulink url='&YOCTO_DOCS_DEV_URL;#dev-preparing-the-build-host'>Preparing the Build Host</ulink>"
                     section in the Yocto Project Development Tasks Manual for
                     information on how to set up your build host.
                     <note>
                         Be sure you install the "xterm" package, which is a
-                        <ulink url='&YOCTO_DOCS_REF_URL;#required-packages-for-the-host-development-system'>graphical and Eclipse plug-in extra</ulink>
+                        <ulink url='&YOCTO_DOCS_REF_URL;#required-packages-for-the-build-host'>graphical and Eclipse plug-in extra</ulink>
                         needed by Eclipse.
                     </note>
                     </para></listitem>

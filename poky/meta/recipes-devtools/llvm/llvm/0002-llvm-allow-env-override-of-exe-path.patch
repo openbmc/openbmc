@@ -1,4 +1,4 @@
-From 2f8ea767afdaa440c6368040630e1b3ea6a0977a Mon Sep 17 00:00:00 2001
+From aeccf16eaccdd80e4d5ecaa51673ce4b2bac1130 Mon Sep 17 00:00:00 2001
 From: Martin Kelly <mkelly@xevo.com>
 Date: Fri, 19 May 2017 00:22:57 -0700
 Subject: [PATCH 2/2] llvm: allow env override of exe path
@@ -8,16 +8,19 @@ return the libraries, include directories, etc. from inside the sysroot rather
 than from the native sysroot. Thus provide an env override for calling
 llvm-config from a target sysroot.
 
+To let it work in multilib environment, we need to provide a knob to supply
+multilib dirname as well
+
+Upstream-Status: Inappropriate [OE-Specific]
+
 Signed-off-by: Martin Kelly <mkelly@xevo.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
-Upstream-Status: Pending
-
- tools/llvm-config/llvm-config.cpp | 7 +++++++
- 1 file changed, 7 insertions(+)
+ tools/llvm-config/llvm-config.cpp | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
 diff --git a/tools/llvm-config/llvm-config.cpp b/tools/llvm-config/llvm-config.cpp
-index 08b096afb05..d8d7742744e 100644
+index 08b096afb05..360cc5abf4e 100644
 --- a/tools/llvm-config/llvm-config.cpp
 +++ b/tools/llvm-config/llvm-config.cpp
 @@ -225,6 +225,13 @@ Typical components:\n\
@@ -34,6 +37,36 @@ index 08b096afb05..d8d7742744e 100644
    // This just needs to be some symbol in the binary; C++ doesn't
    // allow taking the address of ::main however.
    void *P = (void *)(intptr_t)GetExecutablePath;
+@@ -306,12 +313,20 @@ int main(int argc, char **argv) {
+   std::string ActivePrefix, ActiveBinDir, ActiveIncludeDir, ActiveLibDir,
+               ActiveCMakeDir;
+   std::string ActiveIncludeOption;
++  // Hack for Yocto: we need to override the multilib path when we are using
++  // llvm-config from within a target sysroot.
++  std::string Multilibdir = std::getenv("YOCTO_ALTERNATE_MULTILIB_NAME");
++  if (Multilibdir.empty()) {
++    Multilibdir = "/lib" LLVM_LIBDIR_SUFFIX;
++  }
++
+   if (IsInDevelopmentTree) {
+     ActiveIncludeDir = std::string(LLVM_SRC_ROOT) + "/include";
+     ActivePrefix = CurrentExecPrefix;
+ 
+     // CMake organizes the products differently than a normal prefix style
+     // layout.
++
+     switch (DevelopmentTreeLayout) {
+     case CMakeStyle:
+       ActiveBinDir = ActiveObjRoot + "/bin";
+@@ -336,7 +351,7 @@ int main(int argc, char **argv) {
+     SmallString<256> path(StringRef(LLVM_TOOLS_INSTALL_DIR));
+     sys::fs::make_absolute(ActivePrefix, path);
+     ActiveBinDir = path.str();
+-    ActiveLibDir = ActivePrefix + "/lib" + LLVM_LIBDIR_SUFFIX;
++    ActiveLibDir = ActivePrefix + Multilibdir;
+     ActiveCMakeDir = ActiveLibDir + "/cmake/llvm";
+     ActiveIncludeOption = "-I" + ActiveIncludeDir;
+   }
 -- 
-2.16.1
+2.18.0
 

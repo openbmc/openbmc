@@ -1,0 +1,25 @@
+From 65b9a47c07be4611b4fbbcafff1993186bcb0537 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 12 Jun 2018 19:15:52 -0700
+Subject: [PATCH 1/2] include endian.h for htole32 and friends
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ providers/hns/hns_roce_u.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/providers/hns/hns_roce_u.h b/providers/hns/hns_roce_u.h
+index bd66c6e7..b07424db 100644
+--- a/providers/hns/hns_roce_u.h
++++ b/providers/hns/hns_roce_u.h
+@@ -34,6 +34,7 @@
+ #define _HNS_ROCE_U_H
+ 
+ #include <stddef.h>
++#include <endian.h>
+ #include <util/compiler.h>
+ 
+ #include <infiniband/driver.h>
+-- 
+2.17.1
+

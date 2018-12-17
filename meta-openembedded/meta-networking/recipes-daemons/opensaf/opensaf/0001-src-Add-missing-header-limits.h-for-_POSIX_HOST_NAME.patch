@@ -1,4 +1,4 @@
-From 6442b57a855e273aa5a3d93e8596783cea128073 Mon Sep 17 00:00:00 2001
+From 7fb393c66df33110fef0cbabac7d304f12eb82e4 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 15 Sep 2017 09:39:40 -0700
 Subject: [PATCH] src: Add missing header limits.h for _POSIX_HOST_NAME_MAX
@@ -7,6 +7,7 @@ Use _GNU_SOURCE instead of libc internal __USE_GNU
 Do not use the deprecated headers under include/sys
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  src/base/os_defs.h        | 5 +++--
  src/mds/mds_dt_tcp.c      | 1 -
@@ -18,7 +19,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  7 files changed, 6 insertions(+), 8 deletions(-)
 
 diff --git a/src/base/os_defs.h b/src/base/os_defs.h
-index 50a9bf5fc..af6842863 100644
+index a570c43..3559b19 100644
 --- a/src/base/os_defs.h
 +++ b/src/base/os_defs.h
 @@ -47,17 +47,18 @@
@@ -43,7 +44,7 @@ index 50a9bf5fc..af6842863 100644
  #include <pthread.h>
  
 diff --git a/src/mds/mds_dt_tcp.c b/src/mds/mds_dt_tcp.c
-index 1407eb1ab..a87c22faa 100644
+index 1407eb1..a87c22f 100644
 --- a/src/mds/mds_dt_tcp.c
 +++ b/src/mds/mds_dt_tcp.c
 @@ -27,7 +27,6 @@
@@ -55,7 +56,7 @@ index 1407eb1ab..a87c22faa 100644
  #include <sys/types.h>
  #include <unistd.h>
 diff --git a/src/mds/mds_dt_tcp_disc.h b/src/mds/mds_dt_tcp_disc.h
-index a6249d73e..574f52681 100644
+index a6249d7..574f526 100644
 --- a/src/mds/mds_dt_tcp_disc.h
 +++ b/src/mds/mds_dt_tcp_disc.h
 @@ -24,7 +24,7 @@
@@ -68,7 +69,7 @@ index a6249d73e..574f52681 100644
  /*  mds_indentifire + mds_version   + msg_type + scope_type + server_type +
     server_instance_lower + server_instance_upper + sub_ref_val + sub_ref_val  +
 diff --git a/src/mds/mds_dt_tipc.c b/src/mds/mds_dt_tipc.c
-index 37745e7f0..9b3255567 100644
+index 7714175..a0ed3b6 100644
 --- a/src/mds/mds_dt_tipc.c
 +++ b/src/mds/mds_dt_tipc.c
 @@ -35,7 +35,6 @@
@@ -80,7 +81,7 @@ index 37745e7f0..9b3255567 100644
  #include <sys/types.h>
  #include <unistd.h>
 diff --git a/src/mds/mds_dt_tipc.h b/src/mds/mds_dt_tipc.h
-index e73a11b09..401d208c2 100644
+index e73a11b..401d208 100644
 --- a/src/mds/mds_dt_tipc.h
 +++ b/src/mds/mds_dt_tipc.h
 @@ -32,7 +32,7 @@
@@ -93,7 +94,7 @@ index e73a11b09..401d208c2 100644
  #include <errno.h>
  #include <fcntl.h>
 diff --git a/src/mds/mds_dt_trans.c b/src/mds/mds_dt_trans.c
-index 6f621e04e..5aacbd33e 100644
+index 6f621e0..5aacbd3 100644
 --- a/src/mds/mds_dt_trans.c
 +++ b/src/mds/mds_dt_trans.c
 @@ -26,7 +26,6 @@
@@ -105,7 +106,7 @@ index 6f621e04e..5aacbd33e 100644
  
  #define MDS_PROT_TCP 0xA0
 diff --git a/src/ntf/ntfd/NtfLogger.cc b/src/ntf/ntfd/NtfLogger.cc
-index 84014b578..31b1ccc6c 100644
+index fd17c58..1120008 100644
 --- a/src/ntf/ntfd/NtfLogger.cc
 +++ b/src/ntf/ntfd/NtfLogger.cc
 @@ -20,7 +20,7 @@
@@ -117,6 +118,3 @@ index 84014b578..31b1ccc6c 100644
  
  #include "base/osaf_utility.h"
  #include <saAis.h>
--- 
-2.14.1
-

@@ -1,0 +1,31 @@
+From 4476e846a1e64dde17df2e2370c803ce695514f9 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 6 Aug 2018 17:18:27 +0800
+Subject: [PATCH] remove dmraid dependency check
+
+OE does not support dmraid, remove it from dependency check
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ blivet/tasks/availability.py | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/blivet/tasks/availability.py b/blivet/tasks/availability.py
+index 9a87cfd..843cf6a 100644
+--- a/blivet/tasks/availability.py
++++ b/blivet/tasks/availability.py
+@@ -316,8 +316,7 @@ BLOCKDEV_DM_ALL_MODES = (blockdev.DMTechMode.CREATE_ACTIVATE |
+                          blockdev.DMTechMode.QUERY)
+ BLOCKDEV_DM = BlockDevTechInfo(plugin_name="dm",
+                                check_fn=blockdev.dm_is_tech_avail,
+-                               technologies={blockdev.DMTech.MAP: BLOCKDEV_DM_ALL_MODES,
+-                                             blockdev.DMTech.RAID: BLOCKDEV_DM_ALL_MODES})
++                               technologies={blockdev.DMTech.MAP: BLOCKDEV_DM_ALL_MODES})
+ BLOCKDEV_DM_TECH = BlockDevMethod(BLOCKDEV_DM)
+ 
+ # libblockdev loop plugin required technologies and modes
+-- 
+2.7.4
+

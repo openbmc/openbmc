@@ -20,12 +20,6 @@ export INFODIR = "${infodir}"
 
 EXTRA_OEMAKE = "-e MAKEFLAGS="
 
-# Additional flags. For uclibc we add -DNOARROWKEYS which stops ckermit
-# trying to look inside the stdio headers.
-CKERMIT_ADDITIONAL = ""
-CKERMIT_ADDITIONAL_libc-uclibc = "-DNOARROWKEYS"
-CKERMIT_ADDITIONAL_libc-musl = "-DNOARROWKEYS"
-
 TARGET_CC_ARCH += "${LDFLAGS}"
 
 do_compile () {
@@ -49,7 +43,7 @@ do_compile () {
         -DNORESEND -DNOAUTODL -DNOSTREAMING -DNOHINTS -DNOCKXYZ -DNOLEARN \
         -DNOMKDIR -DNOPERMS -DNOCKTIMERS -DNOCKREGEX -DNOREALPATH \
         -DCK_SMALL -DNOLOGDIAL -DNORENAME -DNOWHATAMI \
-        ${CKERMIT_ADDITIONAL}"
+        -DNOARROWKEYS"
 }
 
 do_install () {

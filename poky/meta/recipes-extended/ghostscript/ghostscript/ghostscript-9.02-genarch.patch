@@ -1,22 +1,28 @@
-Import patch from windriver linux for cross compilation, and split patches
-into oe way under different directories such as i586, powerpc etc according 
-to Richard's opinion.
+From 94850954b88440df6c41d2dd133c422ffc84d9aa Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 29 Mar 2018 16:12:48 +0800
+Subject: [PATCH 07/10] not generate objarch.h at compile time
+
+Import patch from windriver linux for cross compilation, and split
+patches into oe way under different directories such as i586, powerpc etc
+according to Richard's opinion.
 
 Upstream-Status: Pending
 
 Signed-off-by: Kang Kai <kai.kang@windriver.com>
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 
-# Author: Chi Xu <chi.xu@windriver.com>
-# Date: Feb 26 2010
-# Summary: Generate arch.h for ppc32
-#
+Rebase to 9.23
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ base/lib.mak | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Index: ghostscript-9.21/base/lib.mak
-===================================================================
---- ghostscript-9.21.orig/base/lib.mak
-+++ ghostscript-9.21/base/lib.mak
-@@ -73,8 +73,8 @@ arch_h=$(GLGEN)arch.h
+diff --git a/base/lib.mak b/base/lib.mak
+index 0036d1e..302877e 100644
+--- a/base/lib.mak
++++ b/base/lib.mak
+@@ -87,8 +87,8 @@ arch_h=$(GLGEN)arch.h
  stdpre_h=$(GLSRC)stdpre.h
  stdint__h=$(GLSRC)stdint_.h $(std_h)
  
@@ -27,3 +33,6 @@ Index: ghostscript-9.21/base/lib.mak
  
  # Platform interfaces
  
+-- 
+1.8.3.1
+

@@ -1,0 +1,41 @@
+From bddbfa499df16b108f2d892ee48d65617523c33d Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 9 Aug 2018 11:00:39 +0800
+Subject: [PATCH] add `-Z y' and `-y' to lvm.pvcreate
+
+While reinstall a crypt fs, it occasionally failed
+[snip]
+|gi.overrides.BlockDev.LVMError: Process reported exit code 5:
+WARNING: atari signature detected on /dev/mapper/luks-0e5f891c
+-7701-48bc-a41e-8d626b6ef953 at offset 466. Wipe it? [y/n]:
+[snip]
+
+Add `-Z y' and `-y' to lvm.pvcreate
+
+Upstream-Status: Submitted [https://github.com/storaged-project/blivet/pull/714]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ blivet/formats/lvmpv.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/blivet/formats/lvmpv.py b/blivet/formats/lvmpv.py
+index 260cc0b..4bbb46f 100644
+--- a/blivet/formats/lvmpv.py
++++ b/blivet/formats/lvmpv.py
+@@ -120,9 +120,9 @@ class LVMPhysicalVolume(DeviceFormat):
+         log_method_call(self, device=self.device,
+                         type=self.type, status=self.status)
+ 
+-        # Consider use of -Z|--zero
+-        # -f|--force or -y|--yes may be required
+-        blockdev.lvm.pvcreate(self.device, data_alignment=self.data_alignment)
++        ea_zero = blockdev.ExtraArg.new("-Z", "y")
++        ea_yes = blockdev.ExtraArg.new("-y", "")
++        blockdev.lvm.pvcreate(self.device, data_alignment=self.data_alignment, extra=[ea_zero, ea_yes])
+ 
+     def _destroy(self, **kwargs):
+         log_method_call(self, device=self.device,
+-- 
+2.7.4
+

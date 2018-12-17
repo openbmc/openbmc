@@ -1,4 +1,4 @@
-From 94e7e4969bc84c945dfea12d67a1e10f61973948 Mon Sep 17 00:00:00 2001
+From a3631df3d6743113e1cd63579925e15bcce85868 Mon Sep 17 00:00:00 2001
 From: Wenlin Kang <wenlin.kang@windriver.com>
 Date: Wed, 24 May 2017 16:45:34 +0800
 Subject: [PATCH 2/4] configure: fix a cc check issue.
@@ -8,6 +8,7 @@ $myperl -V:cc | $myperl -n -e 'print if (s/^\s*cc=.([-=\w\s\/]+).;\s*/$1/);'
 can't get corretly the cc's value.
 
 Signed-off-by: Wenlin Kang <wenlin.kang@windriver.com>
+
 ---
  configure.d/config_project_perl_python | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
@@ -25,6 +26,3 @@ index 475c843..22d2ad3 100644
          changequote([, ])
          if test "x$PERLCC" != "x" ; then
              AC_MSG_RESULT([$PERLCC])
--- 
-1.9.1
-

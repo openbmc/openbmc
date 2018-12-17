@@ -10,3 +10,11 @@ SRC_URI[md5sum] = "d6b665b335a6360e000976e770da7691"
 SRC_URI[sha256sum] = "3c05e05aebcbfcc044d9e8c2d4646cd8359be39a3f0ba8ce4e72a9094bee704f"
 
 inherit autotools pkgconfig
+
+do_install_append() {
+    # The GLib dependency was removed in libmms 0.6.3, but the
+    # "Requires" was not removed from the pkg-config file.  Since we
+    # don't have (and don't want) the RDEPENDS on GLib, we should
+    # remove the "Requires" line.
+    sed -i '/^Requires: glib-2\.0$/d' ${D}${libdir}/pkgconfig/libmms.pc
+}

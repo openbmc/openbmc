@@ -1,0 +1,87 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Wed, 2 Jul 2014 12:49:53 -0500
+Subject: [PATCH] RH: Remove the property blacklist exception builtin
+
+Multipath set the default property blacklist exceptions to
+(ID_SCSI_VPD|ID_WWN).  This has the effect of blacklisting some internal
+devices.  These devices may never have multiple paths, but it is nice
+to be able to set multipath up on them all the same.  This patch simply
+removes the default, and makes it so that if no property
+blacklist_exception is given, then devices aren't failed for not matching
+it.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/blacklist.c   | 15 ++++++---------
+ multipath/multipath.conf.5 | 14 ++++++++------
+ 2 files changed, 14 insertions(+), 15 deletions(-)
+
+diff --git a/libmultipath/blacklist.c b/libmultipath/blacklist.c
+index ee396e2..19d4697 100644
+--- a/libmultipath/blacklist.c
++++ b/libmultipath/blacklist.c
+@@ -181,12 +181,6 @@ setup_default_blist (struct config * conf)
+ 	if (store_ble(conf->blist_devnode, str, ORIGIN_DEFAULT))
+ 		return 1;
+ 
+-	str = STRDUP("(SCSI_IDENT_|ID_WWN)");
+-	if (!str)
+-		return 1;
+-	if (store_ble(conf->elist_property, str, ORIGIN_DEFAULT))
+-		return 1;
+-
+ 	vector_foreach_slot (conf->hwtable, hwe, i) {
+ 		if (hwe->bl_product) {
+ 			if (_blacklist_device(conf->blist_device, hwe->vendor,
+@@ -390,9 +384,12 @@ filter_property(struct config * conf, struct udev_device * udev)
+ 	 * This is the inverse of the 'normal' matching;
+ 	 * the environment variable _has_ to match.
+ 	 */
+-	log_filter(devname, NULL, NULL, NULL, NULL,
+-		   MATCH_PROPERTY_BLIST_MISSING);
+-	return MATCH_PROPERTY_BLIST_MISSING;
++	if (VECTOR_SIZE(conf->elist_property)) {
++		log_filter(devname, NULL, NULL, NULL, NULL,
++			   MATCH_PROPERTY_BLIST_MISSING);
++		return MATCH_PROPERTY_BLIST_MISSING;
++	}
++	return 0;
+ }
+ 
+ void
+diff --git a/multipath/multipath.conf.5 b/multipath/multipath.conf.5
+index 30d8598..c45da9f 100644
+--- a/multipath/multipath.conf.5
++++ b/multipath/multipath.conf.5
+@@ -1179,10 +1179,6 @@ The \fIWorld Wide Identification\fR of a device.
+ .TP
+ .B property
+ Regular expression of the udev property to be whitelisted.
+-.RS
+-.TP
+-The default is: \fB(SCSI_IDENT_|ID_WWN)\fR
+-.RE
+ .TP
+ .B device
+ Subsection for the device description. This subsection recognizes the
+@@ -1193,8 +1189,14 @@ keywords. For a full description of these keywords please see the \fIdevices\fR
+ section description.
+ .LP
+ The \fIproperty\fR whitelist handling is different from the usual
+-handling in the sense that the device \fIhas\fR to have a udev property that
+-matches the whitelist, otherwise the device will be blacklisted. In these cases the message \fIblacklisted, udev property missing\fR will be displayed.
++handling in the sense that if the propery whitelist is set, the device
++\fIhas\fR to have a udev property that matches the whitelist, otherwise the
++device will be blacklisted. In these cases the message \fIblacklisted, udev
++property missing\fR will be displayed. For example settting the
++property blacklist_exception to \fB(SCSI_IDENT_|ID_WWN)\fR will blacklist
++all devices that have no udev property whose name regex matches either
++\fBSCSI_IDENT_\fR or \fBID_WWN\fR. This works to exclude most
++non-multipathable devices.
+ .
+ .
+ .\" ----------------------------------------------------------------------------
+-- 
+2.7.4
+

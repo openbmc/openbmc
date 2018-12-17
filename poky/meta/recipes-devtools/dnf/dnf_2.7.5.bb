@@ -72,3 +72,4 @@ SYSTEMD_SERVICE_${PN} = "dnf-makecache.service dnf-makecache.timer \
                          dnf-automatic-install.service dnf-automatic-install.timer \
                          dnf-automatic-notifyonly.service dnf-automatic-notifyonly.timer \
 "
+SYSTEMD_AUTO_ENABLE ?= "disable"

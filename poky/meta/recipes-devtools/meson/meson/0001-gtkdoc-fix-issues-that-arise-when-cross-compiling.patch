@@ -1,7 +1,7 @@
-From c5692cac9c555664281377a82bf8b1e46934f437 Mon Sep 17 00:00:00 2001
+From 3ac4e58c5494bd7e603a325b5b5c2b8075849fee Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 4 Aug 2017 16:16:41 +0300
-Subject: [PATCH 1/3] gtkdoc: fix issues that arise when cross-compiling
+Subject: [PATCH] gtkdoc: fix issues that arise when cross-compiling
 
 Specifically:
 1) Make it possible to specify a wrapper for executing binaries
@@ -21,10 +21,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  2 files changed, 22 insertions(+), 5 deletions(-)
 
 diff --git a/mesonbuild/modules/gnome.py b/mesonbuild/modules/gnome.py
-index 56765a5..4f7fe30 100644
+index cb69641..727eb6a 100644
 --- a/mesonbuild/modules/gnome.py
 +++ b/mesonbuild/modules/gnome.py
-@@ -769,6 +769,10 @@ This will become a hard error in the future.''')
+@@ -792,6 +792,10 @@ This will become a hard error in the future.''')
                  '--mode=' + mode]
          if namespace:
              args.append('--namespace=' + namespace)
@@ -35,53 +35,28 @@ index 56765a5..4f7fe30 100644
          args += self._unpack_args('--htmlargs=', 'html_args', kwargs)
          args += self._unpack_args('--scanargs=', 'scan_args', kwargs)
          args += self._unpack_args('--scanobjsargs=', 'scanobjs_args', kwargs)
-@@ -796,14 +800,22 @@ This will become a hard error in the future.''')
-                 raise MesonException(
-                     'Gir include dirs should be include_directories().')
-         cflags.update(get_include_args(inc_dirs))
-+
-+        cross_c_args = " ".join(state.environment.cross_info.config["properties"].get('c_args', ""))
-+        cross_link_args = " ".join(state.environment.cross_info.config["properties"].get('c_link_args', ""))
-+
-         if cflags:
--            args += ['--cflags=%s' % ' '.join(cflags)]
-+            args += ['--cflags=%s %s' % (cross_c_args,' '.join(cflags))]
-         if ldflags:
--            args += ['--ldflags=%s' % ' '.join(ldflags)]
-+            args += ['--ldflags=%s %s' % (cross_link_args, ' '.join(ldflags))]
-         compiler = state.environment.coredata.compilers.get('c')
--        if compiler:
-+        cross_compiler = state.environment.coredata.cross_compilers.get('c')
-+        if compiler and not state.environment.is_cross_build():
-             args += ['--cc=%s' % ' '.join(compiler.get_exelist())]
-             args += ['--ld=%s' % ' '.join(compiler.get_linker_exelist())]
-+        elif cross_compiler and state.environment.is_cross_build():
-+            args += ['--cc=%s' % ' '.join(cross_compiler.get_exelist())]
-+            args += ['--ld=%s' % ' '.join(cross_compiler.get_linker_exelist())]
- 
-         return args
- 
 diff --git a/mesonbuild/scripts/gtkdochelper.py b/mesonbuild/scripts/gtkdochelper.py
-index 4406b28..b846827 100644
+index 948dc5a..9c5bd19 100644
 --- a/mesonbuild/scripts/gtkdochelper.py
 +++ b/mesonbuild/scripts/gtkdochelper.py
-@@ -44,13 +44,14 @@ parser.add_argument('--ignore-headers', dest='ignore_headers', default='')
+@@ -45,6 +45,7 @@ parser.add_argument('--ignore-headers', dest='ignore_headers', default='')
  parser.add_argument('--namespace', dest='namespace', default='')
  parser.add_argument('--mode', dest='mode', default='')
  parser.add_argument('--installdir', dest='install_dir')
 +parser.add_argument('--gtkdoc-exe-wrapper', dest='gtkdoc_exe_wrapper')
  
- def gtkdoc_run_check(cmd, cwd):
-     # Put stderr into stdout since we want to print it out anyway.
+ def gtkdoc_run_check(cmd, cwd, library_paths=None):
+     if library_paths is None:
+@@ -64,7 +65,7 @@ def gtkdoc_run_check(cmd, cwd, library_paths=None):
      # This preserves the order of messages.
-     p, out = Popen_safe(cmd, cwd=cwd, stderr=subprocess.STDOUT)[0:2]
+     p, out = Popen_safe(cmd, cwd=cwd, env=env, stderr=subprocess.STDOUT)[0:2]
      if p.returncode != 0:
 -        err_msg = ["{!r} failed with status {:d}".format(cmd[0], p.returncode)]
 +        err_msg = ["{!r} failed with status {:d}".format(cmd, p.returncode)]
          if out:
              err_msg.append(out)
          raise MesonException('\n'.join(err_msg))
-@@ -58,7 +59,7 @@ def gtkdoc_run_check(cmd, cwd):
+@@ -74,7 +75,7 @@ def gtkdoc_run_check(cmd, cwd, library_paths=None):
  def build_gtkdoc(source_root, build_root, doc_subdir, src_subdirs,
                   main_file, module,
                   html_args, scan_args, fixxref_args, mkdb_args,
@@ -90,7 +65,7 @@ index 4406b28..b846827 100644
                   html_assets, content_files, ignore_headers, namespace,
                   expand_content_files, mode):
      print("Building documentation for %s" % module)
-@@ -111,6 +112,9 @@ def build_gtkdoc(source_root, build_root, doc_subdir, src_subdirs,
+@@ -135,6 +136,9 @@ def build_gtkdoc(source_root, build_root, doc_subdir, src_subdirs,
      if gobject_typesfile:
          scanobjs_cmd = ['gtkdoc-scangobj'] + scanobjs_args + ['--types=' + gobject_typesfile,
                                                                '--module=' + module,
@@ -99,8 +74,8 @@ index 4406b28..b846827 100644
 +                                                              '--ld=' + ld,
                                                                '--cflags=' + cflags,
                                                                '--ldflags=' + ldflags,
-                                                               '--ld=' + ld]
-@@ -207,6 +211,7 @@ def run(args):
+                                                               '--cc=' + cc,
+@@ -238,6 +242,7 @@ def run(args):
          mkdbargs,
          options.gobject_typesfile,
          scanobjsargs,
@@ -108,6 +83,3 @@ index 4406b28..b846827 100644
          options.ld,
          options.cc,
          options.ldflags,
--- 
-2.15.0
-

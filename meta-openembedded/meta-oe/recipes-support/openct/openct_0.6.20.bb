@@ -88,7 +88,3 @@ do_install () {
     touch ${D}${localstatedir}/run/openct/status
     chmod 644 ${D}${localstatedir}/run/openct/status
 }
-
-pkg_postinst_${PN} () {
-    ln -sf ctapi/libopenctapi.so ${libdir}/libopenctapi.so
-}

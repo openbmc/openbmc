@@ -1,5 +1,5 @@
 SUMMARY = "A Python Mocking and Patching Library for Testing"
-LICENSE = "Apache-2.0"
+LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=de9dfbf780446b18aab11f00baaf5b7e"
 
 SRC_URI[md5sum] = "0febfafd14330c9dcaa40de2d82d40ad"

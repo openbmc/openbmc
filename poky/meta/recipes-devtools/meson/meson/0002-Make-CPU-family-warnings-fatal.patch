@@ -1,0 +1,36 @@
+From 2e8553fc01e62ebc4faa240bf20984a8a0ac7387 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Tue, 3 Jul 2018 13:59:09 +0100
+Subject: [PATCH] Make CPU family warnings fatal
+
+Upstream-Status: Inappropriate [OE specific]
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+---
+ mesonbuild/environment.py | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/mesonbuild/environment.py b/mesonbuild/environment.py
+index d29a77f..267acf9 100644
+--- a/mesonbuild/environment.py
++++ b/mesonbuild/environment.py
+@@ -239,9 +239,7 @@ def detect_cpu_family(compilers):
+         return 'x86_64'
+ 
+     if trial not in known_cpu_families:
+-        mlog.warning('Unknown CPU family {!r}, please report this at '
+-                     'https://github.com/mesonbuild/meson/issues/new with the'
+-                     'output of `uname -a` and `cat /proc/cpuinfo`'.format(trial))
++        raise EnvironmentException('Unknown CPU family %s, see https://wiki.yoctoproject.org/wiki/Meson/UnknownCPU for directions.' % trial)
+ 
+     return trial
+ 
+@@ -1014,7 +1012,7 @@ class CrossBuildInfo:
+                     raise EnvironmentException('Malformed value in cross file variable %s.' % entry)
+ 
+                 if entry == 'cpu_family' and res not in known_cpu_families:
+-                    mlog.warning('Unknown CPU family %s, please report this at https://github.com/mesonbuild/meson/issues/new' % value)
++                    raise EnvironmentException('Unknown CPU family %s, see https://wiki.yoctoproject.org/wiki/Meson/UnknownCPU for directions.' % value)
+ 
+                 if self.ok_type(res):
+                     self.config[s][entry] = res

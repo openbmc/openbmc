@@ -1,0 +1,48 @@
+#!/bin/sh
+
+nfsrootfs_enabled() {
+	if [ ${bootparam_root} != "/dev/nfs" ] || [ -z ${bootparam_nfsroot} ]; then
+		return 1
+	fi
+	return 0
+}
+
+nfsrootfs_run() {
+	local nfs_opts
+	local location
+	local flags
+	local server_ip
+
+	nfs_opts=""
+	if [ "${bootparam_nfsroot#*,}" != "${bootparam_nfsroot}" ]; then
+		nfs_opts="-o ${bootparam_nfsroot#*,}"
+	fi
+
+	location="${bootparam_nfsroot%%,*}"
+	if [ "${location#*:}" = "${location}" ]; then
+		# server-ip not given. Get server ip from ip option
+		server_ip=""
+		if [ "${bootparam_ip#*:}" != "${bootparam_ip}" ]; then
+			server_ip=$(echo "$bootparam_ip" | cut -d: -f2)
+		fi
+
+		if [ -z "$server_ip" ]; then
+			fatal "Server IP is not set. Update ip or nfsroot options."
+		fi
+		location=${server_ip}:${location}
+	fi
+
+	flags="-o nolock"
+	if [ -n "$bootparam_ro" ] && ! echo "$bootparam_rootflags" | grep -w -q "ro"; then
+		if [  -n "$bootparam_rootflags" ]; then
+			bootparam_rootflags="$bootparam_rootflags,"
+		fi
+		bootparam_rootflags="${bootparam_rootflags}ro"
+	fi
+	if [ -n "$bootparam_rootflags" ]; then
+		flags="$flags -o $bootparam_rootflags"
+	fi
+
+	mount -t nfs ${flags} ${nfs_opts} ${location} ${ROOTFS_DIR}
+}
+

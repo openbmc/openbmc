@@ -14,6 +14,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=07384b3aa2e0d39afca0d6c40286f545"
 DEPENDS = "freetype libpng jpeg zlib tiff"
 
 SRC_URI = "git://github.com/libgd/libgd.git;branch=GD-2.2 \
+           file://0001-annotate.c-gdft.c-Replace-strncpy-with-memccpy-to-fi.patch \
+           file://CVE-2018-1000222.patch \
           "
 
 SRCREV = "8255231b68889597d04d451a72438ab92a405aba"

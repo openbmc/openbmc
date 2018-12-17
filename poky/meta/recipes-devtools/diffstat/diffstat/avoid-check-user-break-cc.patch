@@ -1,0 +1,32 @@
+From 1046593aacb74ff888a0d68c0ff89b20c4bc9ed4 Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Tue, 15 May 2018 17:17:01 +0800
+Subject: [PATCH] diffstat: fix wrong evaluation of CC
+
+Upstream-Status: Inappropriate [oe specific]
+
+m4 function CF_CC_ENV_FLAGS checks whether variable CC contains options '-I', '-U'
+and '-D'. It is not suitable for oe that option such as '-D_FORTIFY_SOURCE=2' may
+be included in CC. And then CC will be wrongly filtered.
+
+So comment out CF_CC_ENV_FLAGS from function CF_PROG_CC.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+---
+ aclocal.m4 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/aclocal.m4 b/aclocal.m4
+index 9281aa8..dd57b7a 100644
+--- a/aclocal.m4
++++ b/aclocal.m4
+@@ -1239,7 +1239,7 @@ CF_GCC_VERSION
+ CF_ACVERSION_CHECK(2.52,
+ 	[AC_PROG_CC_STDC],
+ 	[CF_ANSI_CC_REQD])
+-CF_CC_ENV_FLAGS
++dnl CF_CC_ENV_FLAGS
+ ])dnl
+ dnl ---------------------------------------------------------------------------
+ dnl CF_PROG_GROFF version: 3 updated: 2018/01/07 13:16:19

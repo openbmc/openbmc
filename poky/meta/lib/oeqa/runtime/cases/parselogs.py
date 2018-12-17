@@ -49,6 +49,10 @@ common_errors = [
     "error: couldn\'t mount because of unsupported optional features",
     "GPT: Use GNU Parted to correct GPT errors",
     "Cannot set xattr user.Librepo.DownloadInProgress",
+    "Failed to read /var/lib/nfs/statd/state: Success",
+    "error retry time-out =",
+    "logind: cannot setup systemd-logind helper (-61), using legacy fallback",
+    "Error changing net interface name 'eth0' to "
     ]
 
 video_related = [
@@ -120,15 +124,6 @@ ignore_errors = {
         'dmi: Firmware registration failed.',
         'irq: type mismatch, failed to map hwirq-27 for /intc',
         ] + common_errors,
-    'emenlow' : [
-        '[Firmware Bug]: ACPI: No _BQC method, cannot determine initial brightness',
-        '(EE) Failed to load module "psb"',
-        '(EE) Failed to load module psb',
-        '(EE) Failed to load module "psbdrv"',
-        '(EE) Failed to load module psbdrv',
-        '(EE) open /dev/fb0: No such file or directory',
-        '(EE) AIGLX: reverting to software rendering',
-        ] + x86_common,
     'intel-core2-32' : [
         'ACPI: No _BQC method, cannot determine initial brightness',
         '[Firmware Bug]: ACPI: No _BQC method, cannot determine initial brightness',
@@ -156,7 +151,6 @@ ignore_errors = {
         'Bluetooth: hci0: Failed to send firmware data (-38)',
         'atkbd serio0: Failed to enable keyboard on isa0060/serio0',
         ] + x86_common,
-    'crownbay' : x86_common,
     'genericx86' : x86_common,
     'genericx86-64' : [
         'Direct firmware load for i915',
@@ -168,10 +162,6 @@ ignore_errors = {
         ] + x86_common,
     'edgerouter' : [
         'Fatal server error:',
-        ] + common_errors,
-    'jasperforest' : [
-        'Activated service \'org.bluez\' failed:',
-        'Unable to find NFC netlink family',
         ] + common_errors,
 }
 
@@ -323,7 +313,7 @@ class ParseLogsTest(OERuntimeTestCase):
                 pass
 
             if result is not None:
-                results[log.replace('target_logs/','')] = {}
+                results[log] = {}
                 rez = result.splitlines()
 
                 for xrez in rez:
@@ -333,7 +323,7 @@ class ParseLogsTest(OERuntimeTestCase):
                         grep_output = check_output(cmd).decode('utf-8')
                     except:
                         pass
-                    results[log.replace('target_logs/','')][xrez]=grep_output
+                    results[log][xrez]=grep_output
 
         return results
 

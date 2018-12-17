@@ -11,7 +11,6 @@ from oeqa.utils.commands import bitbake, runqemu, get_bb_var
 class GenericEFITest(OESelftestTestCase):
     """EFI booting test class"""
 
-    buffer = True
     cmd_common = "runqemu nographic serial wic ovmf"
     efi_provider = "systemd-boot"
     image = "core-image-minimal"

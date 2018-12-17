@@ -1,4 +1,4 @@
-From 90916f96262fa7b27a0a99788c69f9fd6df11000 Mon Sep 17 00:00:00 2001
+From 2b0436f9a07773fae8c74df902d7024e8bfc3512 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 24 Nov 2015 16:46:27 +0200
 Subject: [PATCH] introspection.m4: prefix pkgconfig paths with
@@ -10,12 +10,13 @@ is later supplied to g-ir-scanner.
 
 Upstream-Status: Pending [review on oe-core list]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
- common/m4/introspection.m4 | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ common/m4/introspection.m4 | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/common/m4/introspection.m4 b/common/m4/introspection.m4
-index 162be57..217a6ae 100644
+index 162be57..933f979 100644
 --- a/common/m4/introspection.m4
 +++ b/common/m4/introspection.m4
 @@ -54,14 +54,14 @@ m4_define([_GOBJECT_INTROSPECTION_CHECK_INTERNAL],
@@ -37,6 +38,3 @@ index 162be57..217a6ae 100644
         INTROSPECTION_INIT="extern void gst_init(gint*,gchar**); gst_init(NULL,NULL);"
      fi
      AC_SUBST(INTROSPECTION_SCANNER)
--- 
-2.6.2
-

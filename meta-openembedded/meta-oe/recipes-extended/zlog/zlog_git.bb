@@ -14,7 +14,7 @@ S = "${WORKDIR}/git"
 
 inherit pkgconfig
 
-EXTRA_OEMAKE = "CC='${CC}' LD='${LD}'"
+EXTRA_OEMAKE = "CC='${CC}' LD='${LD}' LIBRARY_PATH=${baselib}"
 
 do_install() {
     oe_runmake install PREFIX=${D}${exec_prefix} INSTALL=install

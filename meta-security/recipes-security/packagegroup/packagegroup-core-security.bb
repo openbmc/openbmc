@@ -12,6 +12,7 @@ PACKAGES = "\
     packagegroup-security-ids  \
     packagegroup-security-mac  \
     ${@bb.utils.contains("MACHINE_FEATURES", "tpm", "packagegroup-security-tpm", "",d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "ptest", "packagegroup-security-ptest", "", d)} \
     "
 
 RDEPENDS_packagegroup-core-security = "\
@@ -20,6 +21,7 @@ RDEPENDS_packagegroup-core-security = "\
     packagegroup-security-ids  \
     packagegroup-security-mac  \
     ${@bb.utils.contains("MACHINE_FEATURES", "tpm", "packagegroup-security-tpm", "",d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "ptest", "packagegroup-security-ptest", "", d)} \
     "
 
 SUMMARY_packagegroup-security-utils = "Security utilities"
@@ -27,7 +29,11 @@ RDEPENDS_packagegroup-security-utils = "\
     checksec \
     nmap \
     pinentry \
-    scapy \
+    python-scapy \
+    ding-libs \
+    xmlsec1 \
+    keyutils \
+    libseccomp \
     ${@bb.utils.contains("DISTRO_FEATURES", "pax", "pax-utils", "",d)} \
     "
 
@@ -52,13 +58,28 @@ RDEPENDS_packagegroup-security-hardening = " \
 SUMMARY_packagegroup-security-ids = "Security Intrusion Detection systems"
 RDEPENDS_packagegroup-security-ids = " \
     tripwire \
-    samhain-client \
+    samhain-standalone \
     suricata \
     "
 
 SUMMARY_packagegroup-security-mac = "Security Mandatory Access Control systems"
 RDEPENDS_packagegroup-security-mac = " \
     ${@bb.utils.contains("DISTRO_FEATURES", "tomoyo", "ccs-tools", "",d)} \
-    ${@bb.utils.contains("DISTRO_FEATURES", "apparmor", "", "",d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "apparmor", "apparmor", "",d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "smack", "smack", "",d)} \
+    "
+
+SUMMARY_packagegroup-security-ptest = "Security packages with ptests"
+RDEPENDS_packagegroup-security-ptest = " \
+    samhain-standalone-ptest \
+    xmlsec1-ptest \
+    keyutils-ptest \
+    libseccomp-ptest \
+    python-scapy-ptest \
+    suricata-ptest \
+    tripwire-ptest \
+    python3-fail2ban-ptest \
+    ${@bb.utils.contains("DISTRO_FEATURES", "apparmor", "apparmor-ptest", "",d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "smack", "smack-ptest", "",d)} \
+    ptest-runner \
     "

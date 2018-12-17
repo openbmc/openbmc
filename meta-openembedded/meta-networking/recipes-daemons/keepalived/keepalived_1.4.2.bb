@@ -16,7 +16,7 @@ SRC_URI[sha256sum] = "4e2d7cc01a6ee29a3955f5c622d47704ba7d9dd758189f15e9def016a2
 
 DEPENDS = "libnfnetlink openssl"
 
-inherit autotools pkgconfig systemd update-rc.d
+inherit autotools pkgconfig systemd
 
 PACKAGECONFIG ??= "libnl snmp \
     ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)} \
@@ -40,9 +40,6 @@ do_install_append() {
 }
 
 FILES_${PN} += "${datadir}/snmp/mibs/KEEPALIVED-MIB.txt"
-
-INITSCRIPT_NAME = "keepalived"
-INITSCRIPT_PARAMS = "remove"
 
 SYSTEMD_SERVICE_${PN} = "keepalived.service"
 SYSTEMD_AUTO_ENABLE ?= "disable"

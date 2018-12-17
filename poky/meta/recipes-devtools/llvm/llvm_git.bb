@@ -19,14 +19,13 @@ PROVIDES += "llvm${PV}"
 LLVM_RELEASE = "${PV}"
 LLVM_DIR = "llvm${LLVM_RELEASE}"
 
-SRCREV = "089d4c0c490687db6c75f1d074e99c4d42936a50"
+SRCREV = "5136df4d089a086b70d452160ad5451861269498"
 PV = "6.0"
 BRANCH = "release_60"
-PATCH_VERSION = "0"
+PATCH_VERSION = "1"
 SRC_URI = "git://github.com/llvm-mirror/llvm.git;branch=${BRANCH};protocol=http \
            file://0001-llvm-TargetLibraryInfo-Undefine-libc-functions-if-th.patch \
            file://0002-llvm-allow-env-override-of-exe-path.patch \
-           file://0001-Disable-generating-a-native-llvm-config.patch \
           "
 UPSTREAM_CHECK_COMMITS = "1"
 S = "${WORKDIR}/git"
@@ -45,14 +44,13 @@ def get_llvm_arch(bb, d, arch_var):
     else:
         raise bb.parse.SkipRecipe("Cannot map '%s' to a supported LLVM architecture" % a)
 
-def get_llvm_target_arch(bb, d):
-    return get_llvm_arch(bb, d, 'TARGET_ARCH')
+def get_llvm_host_arch(bb, d):
+    return get_llvm_arch(bb, d, 'HOST_ARCH')
+
 #
 # Default to build all OE-Core supported target arches (user overridable).
 #
-LLVM_TARGETS ?= "${@get_llvm_target_arch(bb, d)}"
-LLVM_TARGETS_prepend_x86 = "AMDGPU;"
-LLVM_TARGETS_prepend_x86-64 = "AMDGPU;"
+LLVM_TARGETS ?= "AMDGPU;${@get_llvm_host_arch(bb, d)}"
 
 ARM_INSTRUCTION_SET_armv5 = "arm"
 ARM_INSTRUCTION_SET_armv4t = "arm"
@@ -65,17 +63,19 @@ EXTRA_OECMAKE += "-DLLVM_ENABLE_ASSERTIONS=OFF \
                   -DLLVM_ENABLE_FFI=ON \
                   -DFFI_INCLUDE_DIR=$(pkg-config --variable=includedir libffi) \
                   -DLLVM_OPTIMIZED_TABLEGEN=ON \
-                  -DLLVM_TARGETS_TO_BUILD="${LLVM_TARGETS}" \
+                  -DLLVM_TARGETS_TO_BUILD='${LLVM_TARGETS}' \
                   -G Ninja"
 
 EXTRA_OECMAKE_append_class-target = "\
                   -DCMAKE_CROSSCOMPILING:BOOL=ON \
                   -DLLVM_TABLEGEN=${STAGING_BINDIR_NATIVE}/llvm-tblgen${PV} \
+                  -DLLVM_CONFIG_PATH=${STAGING_BINDIR_NATIVE}/llvm-config${PV} \
                  "
 
 EXTRA_OECMAKE_append_class-nativesdk = "\
                   -DCMAKE_CROSSCOMPILING:BOOL=ON \
                   -DLLVM_TABLEGEN=${STAGING_BINDIR_NATIVE}/llvm-tblgen${PV} \
+                  -DLLVM_CONFIG_PATH=${STAGING_BINDIR_NATIVE}/llvm-config${PV} \
                  "
 
 do_configure_prepend() {

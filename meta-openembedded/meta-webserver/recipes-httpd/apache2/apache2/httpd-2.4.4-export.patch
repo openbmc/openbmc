@@ -1,19 +1,27 @@
+From a5627edbcc88cd50caaa42ca051ac7ed3d870172 Mon Sep 17 00:00:00 2001
+From: Paul Eggleton <paul.eggleton@linux.intel.com>
+Date: Tue, 17 Jul 2012 11:27:39 +0100
+Subject: [PATCH] apache2: add from OE-Classic, update to version 2.4.2 and fix
 
 There is no need to "suck in" the apr/apr-util symbols when using
 a shared libapr{,util}, it just bloats the symbol table; so don't.
 
-Upstream-HEAD: needed
-Upstream-2.0: omit
 Upstream-Status: Pending
 
 Note: EXPORT_DIRS change is conditional on using shared apr
 
---- httpd-2.4.4/server/Makefile.in.export
-+++ httpd-2.4.4/server/Makefile.in
-@@ -57,9 +57,6 @@ export_files:
- 	( for dir in $(EXPORT_DIRS); do \
+---
+ server/Makefile.in | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/server/Makefile.in b/server/Makefile.in
+index cb11684..0d48924 100644
+--- a/server/Makefile.in
++++ b/server/Makefile.in
+@@ -60,9 +60,6 @@ export_files:
  	      ls $$dir/*.h ; \
  	  done; \
+ 	  echo "$(top_srcdir)/server/mpm_fdqueue.h"; \
 -	  for dir in $(EXPORT_DIRS_APR); do \
 -	      ls $$dir/ap[ru].h $$dir/ap[ru]_*.h 2>/dev/null; \
 -	  done; \

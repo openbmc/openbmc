@@ -10,30 +10,26 @@ Upstream-status: Unknown
  setup.py | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/setup.py b/setup.py
-index 3407c82..15ed7cd 100644
---- a/setup.py
-+++ b/setup.py
-@@ -127,7 +127,7 @@ class _M2CryptoBuildExt(build_ext.build_ext):
-                 self.openssl = os.path.join(self.openssl, 'OpenSSL')
-         else:
-             self.libraries = ['ssl', 'crypto']
--            self.openssl = '/usr'
-+            self.openssl = os.environ.get( "STAGING_DIR" )
+Index: M2Crypto-0.30.1/setup.py
+===================================================================
+--- M2Crypto-0.30.1.orig/setup.py
++++ M2Crypto-0.30.1/setup.py
+@@ -130,6 +130,7 @@ class _M2CryptoBuildExt(build_ext.build_
+         self.set_undefined_options('build', ('bundledlls', 'bundledlls'))
  
-     def finalize_options(self):
-         '''Overloaded build_ext implementation to append custom openssl
-@@ -143,8 +143,8 @@ class _M2CryptoBuildExt(build_ext.build_ext):
-         if _openssl and os.path.isdir(_openssl):
-             self.openssl = _openssl
+         self.libraries = ['ssl', 'crypto']
++        self.openssl = os.environ.get( "STAGING_DIR" )
+         if sys.platform == 'win32':
+             self.libraries = ['ssleay32', 'libeay32']
+             if self.openssl and openssl_version(self.openssl, 0x10100000, True):
+@@ -150,8 +151,8 @@ class _M2CryptoBuildExt(build_ext.build_
  
--        self.include_dirs.append(os.path.join(self.openssl, 'include'))
--        openssl_library_dir = os.path.join(self.openssl, 'lib')
-+        self.include_dirs.append(os.environ.get( "STAGING_INCDIR" ))
-+        openssl_library_dir = os.environ.get( "STAGING_LIBDIR" )
+         if self.openssl is not None:
+             log.debug('self.openssl = %s', self.openssl)
+-            openssl_library_dir = os.path.join(self.openssl, 'lib')
+-            openssl_include_dir = os.path.join(self.openssl, 'include')
++            openssl_library_dir = os.environ.get( "STAGING_LIBDIR" )
++            openssl_include_dir = os.environ.get( "STAGING_INCDIR" )
  
-         if platform.system() == "Linux":
-             if _multiarch:  # on Fedora/RHEL it is an empty string
--- 
-2.7.4
-
+             self.library_dirs.append(openssl_library_dir)
+             self.include_dirs.append(openssl_include_dir)

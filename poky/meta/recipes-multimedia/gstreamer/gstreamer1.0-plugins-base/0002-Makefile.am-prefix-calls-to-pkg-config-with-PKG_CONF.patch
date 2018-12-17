@@ -1,16 +1,18 @@
-From 990b653c7b6de1937ec759019982d6c5f15770f7 Mon Sep 17 00:00:00 2001
+From 9601fc0cd6751a1affdc8717217b95931db31d7f Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
-Date: Mon, 26 Oct 2015 16:38:18 +0200
-Subject: [PATCH 2/4] Makefile.am: prefix calls to pkg-config with
+Date: Thu, 5 Apr 2018 10:26:25 +0800
+Subject: [PATCH] Makefile.am: prefix calls to pkg-config with
  PKG_CONFIG_SYSROOT_DIR
 
 Upstream-Status: Pending [review on oe-core maillist]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+
 ---
  gst-libs/gst/allocators/Makefile.am |  4 ++--
  gst-libs/gst/app/Makefile.am        |  4 ++--
  gst-libs/gst/audio/Makefile.am      | 12 ++++++------
- gst-libs/gst/fft/Makefile.am        |  4 ++--
+ gst-libs/gst/gl/Makefile.am         |  8 ++++----
  gst-libs/gst/pbutils/Makefile.am    | 12 ++++++------
  gst-libs/gst/riff/Makefile.am       |  8 ++++----
  gst-libs/gst/rtp/Makefile.am        |  8 ++++----
@@ -18,13 +20,13 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  gst-libs/gst/sdp/Makefile.am        |  4 ++--
  gst-libs/gst/tag/Makefile.am        |  8 ++++----
  gst-libs/gst/video/Makefile.am      |  8 ++++----
- 11 files changed, 38 insertions(+), 38 deletions(-)
+ 11 files changed, 40 insertions(+), 40 deletions(-)
 
-Index: gst-plugins-base-1.12.3/gst-libs/gst/allocators/Makefile.am
-===================================================================
---- gst-plugins-base-1.12.3.orig/gst-libs/gst/allocators/Makefile.am
-+++ gst-plugins-base-1.12.3/gst-libs/gst/allocators/Makefile.am
-@@ -36,7 +36,7 @@ GstAllocators-@GST_API_VERSION@.gir: $(I
+diff --git a/gst-libs/gst/allocators/Makefile.am b/gst-libs/gst/allocators/Makefile.am
+index 1ecc950..d6417ac 100644
+--- a/gst-libs/gst/allocators/Makefile.am
++++ b/gst-libs/gst/allocators/Makefile.am
+@@ -39,7 +39,7 @@ GstAllocators-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstallocators-@
  		--c-include "gst/allocators/allocators.h" \
  		-I$(top_srcdir)/gst-libs \
  		-I$(top_builddir)/gst-libs \
@@ -33,7 +35,7 @@ Index: gst-plugins-base-1.12.3/gst-libs/gst/allocators/Makefile.am
  		--library=libgstallocators-@GST_API_VERSION@.la \
  		--include=Gst-@GST_API_VERSION@ \
  		--libtool="$(LIBTOOL)" \
-@@ -60,7 +60,7 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=
+@@ -63,7 +63,7 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
  		$(INTROSPECTION_COMPILER) \
  		--includedir=$(srcdir) \
  		--includedir=$(builddir) \
@@ -42,11 +44,11 @@ Index: gst-plugins-base-1.12.3/gst-libs/gst/allocators/Makefile.am
  		$(INTROSPECTION_COMPILER_OPTS) $< -o $(@F)
  
  CLEANFILES = $(BUILT_GIRSOURCES) $(typelibs_DATA)
-Index: gst-plugins-base-1.12.3/gst-libs/gst/app/Makefile.am
-===================================================================
---- gst-plugins-base-1.12.3.orig/gst-libs/gst/app/Makefile.am
-+++ gst-plugins-base-1.12.3/gst-libs/gst/app/Makefile.am
-@@ -48,8 +48,8 @@ GstApp-@GST_API_VERSION@.gir: $(INTROSPE
+diff --git a/gst-libs/gst/app/Makefile.am b/gst-libs/gst/app/Makefile.am
+index 5bfd606..6441674 100644
+--- a/gst-libs/gst/app/Makefile.am
++++ b/gst-libs/gst/app/Makefile.am
+@@ -51,8 +51,8 @@ GstApp-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstapp-@GST_API_VERSIO
  		--c-include "gst/app/app.h" \
  		-I$(top_srcdir)/gst-libs \
  		-I$(top_builddir)/gst-libs \
@@ -57,11 +59,11 @@ Index: gst-plugins-base-1.12.3/gst-libs/gst/app/Makefile.am
  		--library=libgstapp-@GST_API_VERSION@.la \
  		--include=Gst-@GST_API_VERSION@ \
  		--include=GstBase-@GST_API_VERSION@ \
-Index: gst-plugins-base-1.12.3/gst-libs/gst/audio/Makefile.am
-===================================================================
---- gst-plugins-base-1.12.3.orig/gst-libs/gst/audio/Makefile.am
-+++ gst-plugins-base-1.12.3/gst-libs/gst/audio/Makefile.am
-@@ -167,12 +167,12 @@ GstAudio-@GST_API_VERSION@.gir: $(INTROS
+diff --git a/gst-libs/gst/audio/Makefile.am b/gst-libs/gst/audio/Makefile.am
+index 7fb65f2..5379f79 100644
+--- a/gst-libs/gst/audio/Makefile.am
++++ b/gst-libs/gst/audio/Makefile.am
+@@ -174,12 +174,12 @@ GstAudio-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstaudio-@GST_API_VE
  		-I$(top_srcdir)/gst-libs \
  		-I$(top_builddir)/gst-libs \
  		--c-include "gst/audio/audio.h" \
@@ -78,7 +80,7 @@ Index: gst-plugins-base-1.12.3/gst-libs/gst/audio/Makefile.am
  		--library-path="$(top_builddir)/gst-libs/gst/tag/" \
  		--include=Gst-@GST_API_VERSION@ \
  		--include=GstBase-@GST_API_VERSION@ \
-@@ -201,8 +201,8 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=
+@@ -208,8 +208,8 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
  		--includedir=$(srcdir) \
  		--includedir=$(builddir) \
  		--includedir="$(top_builddir)/gst-libs/gst/tag/" \
@@ -89,33 +91,38 @@ Index: gst-plugins-base-1.12.3/gst-libs/gst/audio/Makefile.am
  		$(INTROSPECTION_COMPILER_OPTS) $< -o $(@F)
  
  CLEANFILES += $(BUILT_GIRSOURCES) $(typelibs_DATA)
-Index: gst-plugins-base-1.12.3/gst-libs/gst/fft/Makefile.am
-===================================================================
---- gst-plugins-base-1.12.3.orig/gst-libs/gst/fft/Makefile.am
-+++ gst-plugins-base-1.12.3/gst-libs/gst/fft/Makefile.am
-@@ -63,7 +63,7 @@ GstFft-@GST_API_VERSION@.gir: $(INTROSPE
- 		--c-include "gst/fft/fft.h" \
- 		-I$(top_srcdir)/gst-libs \
- 		-I$(top_builddir)/gst-libs \
+diff --git a/gst-libs/gst/gl/Makefile.am b/gst-libs/gst/gl/Makefile.am
+index 3276d7f..0cdfe26 100644
+--- a/gst-libs/gst/gl/Makefile.am
++++ b/gst-libs/gst/gl/Makefile.am
+@@ -186,9 +186,9 @@ GstGL-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstgl-@GST_API_VERSION@
+ 		$(GST_PLUGINS_BASE_CFLAGS) \
+ 		$(GL_CFLAGS) \
+ 		--add-include-path="$(top_builddir)/gst-libs/gst/video/" \
 -		--add-include-path=`PKG_CONFIG_PATH="$(GST_PKG_CONFIG_PATH)" $(PKG_CONFIG) --variable=girdir gstreamer-@GST_API_VERSION@` \
+-		--add-include-path=`PKG_CONFIG_PATH="$(GST_PKG_CONFIG_PATH)" $(PKG_CONFIG) --variable=girdir gstreamer-base-@GST_API_VERSION@` \
+ 		--library-path="$(top_builddir)/gst-libs/gst/video/" \
 +		--add-include-path=$(PKG_CONFIG_SYSROOT_DIR)`PKG_CONFIG_PATH="$(GST_PKG_CONFIG_PATH)" $(PKG_CONFIG) --variable=girdir gstreamer-@GST_API_VERSION@` \
- 		--library=libgstfft-@GST_API_VERSION@.la \
++		--add-include-path=$(PKG_CONFIG_SYSROOT_DIR)`PKG_CONFIG_PATH="$(GST_PKG_CONFIG_PATH)" $(PKG_CONFIG) --variable=girdir gstreamer-base-@GST_API_VERSION@` \
+ 		--library=libgstgl-@GST_API_VERSION@.la \
  		--include=Gst-@GST_API_VERSION@ \
- 		--libtool="$(LIBTOOL)" \
-@@ -87,7 +87,7 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=
- 		$(INTROSPECTION_COMPILER) \
+ 		--include=GstBase-@GST_API_VERSION@ \
+@@ -218,8 +218,8 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
  		--includedir=$(srcdir) \
  		--includedir=$(builddir) \
+ 		--includedir="$(top_builddir)/gst-libs/gst/video/" \
 -		--includedir=`PKG_CONFIG_PATH="$(GST_PKG_CONFIG_PATH)" $(PKG_CONFIG) --variable=girdir gstreamer-@GST_API_VERSION@` \
+-		--includedir=`PKG_CONFIG_PATH="$(GST_PKG_CONFIG_PATH)" $(PKG_CONFIG) --variable=girdir gstreamer-base-@GST_API_VERSION@` \
 +		--includedir=$(PKG_CONFIG_SYSROOT_DIR)`PKG_CONFIG_PATH="$(GST_PKG_CONFIG_PATH)" $(PKG_CONFIG) --variable=girdir gstreamer-@GST_API_VERSION@` \
++		--includedir=$(PKG_CONFIG_SYSROOT_DIR)`PKG_CONFIG_PATH="$(GST_PKG_CONFIG_PATH)" $(PKG_CONFIG) --variable=girdir gstreamer-base-@GST_API_VERSION@` \
  		$(INTROSPECTION_COMPILER_OPTS) $< -o $(@F)
  
  CLEANFILES = $(BUILT_GIRSOURCES) $(typelibs_DATA)
-Index: gst-plugins-base-1.12.3/gst-libs/gst/pbutils/Makefile.am
-===================================================================
---- gst-plugins-base-1.12.3.orig/gst-libs/gst/pbutils/Makefile.am
-+++ gst-plugins-base-1.12.3/gst-libs/gst/pbutils/Makefile.am
-@@ -85,14 +85,14 @@ GstPbutils-@GST_API_VERSION@.gir: $(INTR
+diff --git a/gst-libs/gst/pbutils/Makefile.am b/gst-libs/gst/pbutils/Makefile.am
+index 35a6e44..49d6894 100644
+--- a/gst-libs/gst/pbutils/Makefile.am
++++ b/gst-libs/gst/pbutils/Makefile.am
+@@ -88,14 +88,14 @@ GstPbutils-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstpbutils-@GST_AP
  		--c-include "gst/pbutils/pbutils.h" \
  		-I$(top_srcdir)/gst-libs \
  		-I$(top_builddir)/gst-libs \
@@ -134,7 +141,7 @@ Index: gst-plugins-base-1.12.3/gst-libs/gst/pbutils/Makefile.am
  		--library-path="$(top_builddir)/gst-libs/gst/tag/" \
  		--library-path="$(top_builddir)/gst-libs/gst/video/" \
  		--library-path="$(top_builddir)/gst-libs/gst/audio/" \
-@@ -125,8 +125,8 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=
+@@ -128,8 +128,8 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
  		$(INTROSPECTION_COMPILER) \
  		--includedir=$(srcdir) \
  		--includedir=$(builddir) \
@@ -145,11 +152,11 @@ Index: gst-plugins-base-1.12.3/gst-libs/gst/pbutils/Makefile.am
  		--includedir="$(top_builddir)/gst-libs/gst/tag/" \
  		--includedir="$(top_builddir)/gst-libs/gst/video/" \
  		--includedir="$(top_builddir)/gst-libs/gst/audio/" \
-Index: gst-plugins-base-1.12.3/gst-libs/gst/riff/Makefile.am
-===================================================================
---- gst-plugins-base-1.12.3.orig/gst-libs/gst/riff/Makefile.am
-+++ gst-plugins-base-1.12.3/gst-libs/gst/riff/Makefile.am
-@@ -42,8 +42,8 @@ libgstriff_@GST_API_VERSION@_la_LDFLAGS
+diff --git a/gst-libs/gst/riff/Makefile.am b/gst-libs/gst/riff/Makefile.am
+index e66ef4f..c8c588a 100644
+--- a/gst-libs/gst/riff/Makefile.am
++++ b/gst-libs/gst/riff/Makefile.am
+@@ -43,8 +43,8 @@ libgstriff_@GST_API_VERSION@_la_LDFLAGS = $(GST_LIB_LDFLAGS) $(GST_ALL_LDFLAGS)
  #		--c-include "gst/riff/riff.h" \
  #		--add-include-path=$(builddir)/../tag \
  #		--add-include-path=$(builddir)/../audio \
@@ -160,7 +167,7 @@ Index: gst-plugins-base-1.12.3/gst-libs/gst/riff/Makefile.am
  #		--library=libgstriff-@GST_API_VERSION@.la \
  #		--include=GstAudio-@GST_API_VERSION@ \
  #		--include=GstTag-@GST_API_VERSION@ \
-@@ -74,8 +74,8 @@ libgstriff_@GST_API_VERSION@_la_LDFLAGS
+@@ -75,8 +75,8 @@ libgstriff_@GST_API_VERSION@_la_LDFLAGS = $(GST_LIB_LDFLAGS) $(GST_ALL_LDFLAGS)
  #		--includedir=$(builddir) \
  #		--includedir=$(builddir)/../tag \
  #		--includedir=$(builddir)/../audio \
@@ -171,11 +178,11 @@ Index: gst-plugins-base-1.12.3/gst-libs/gst/riff/Makefile.am
  #		$(INTROSPECTION_COMPILER_OPTS) $< -o $(@F)
  #
  #CLEANFILES = $(BUILT_GIRSOURCES) $(typelibs_DATA)
-Index: gst-plugins-base-1.12.3/gst-libs/gst/rtp/Makefile.am
-===================================================================
---- gst-plugins-base-1.12.3.orig/gst-libs/gst/rtp/Makefile.am
-+++ gst-plugins-base-1.12.3/gst-libs/gst/rtp/Makefile.am
-@@ -61,8 +61,8 @@ GstRtp-@GST_API_VERSION@.gir: $(INTROSPE
+diff --git a/gst-libs/gst/rtp/Makefile.am b/gst-libs/gst/rtp/Makefile.am
+index 77ebeeb..9aee788 100644
+--- a/gst-libs/gst/rtp/Makefile.am
++++ b/gst-libs/gst/rtp/Makefile.am
+@@ -64,8 +64,8 @@ GstRtp-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstrtp-@GST_API_VERSIO
  		--c-include "gst/rtp/rtp.h" \
  		-I$(top_builddir)/gst-libs \
  		-I$(top_srcdir)/gst-libs \
@@ -186,7 +193,7 @@ Index: gst-plugins-base-1.12.3/gst-libs/gst/rtp/Makefile.am
  		--library=libgstrtp-@GST_API_VERSION@.la \
  		--include=Gst-@GST_API_VERSION@ \
  		--include=GstBase-@GST_API_VERSION@ \
-@@ -89,8 +89,8 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=
+@@ -92,8 +92,8 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
  		$(INTROSPECTION_COMPILER) \
  		--includedir=$(srcdir) \
  		--includedir=$(builddir) \
@@ -197,11 +204,11 @@ Index: gst-plugins-base-1.12.3/gst-libs/gst/rtp/Makefile.am
  		$(INTROSPECTION_COMPILER_OPTS) $< -o $(@F)
  
  CLEANFILES += $(BUILT_GIRSOURCES) $(typelibs_DATA)
-Index: gst-plugins-base-1.12.3/gst-libs/gst/rtsp/Makefile.am
-===================================================================
---- gst-plugins-base-1.12.3.orig/gst-libs/gst/rtsp/Makefile.am
-+++ gst-plugins-base-1.12.3/gst-libs/gst/rtsp/Makefile.am
-@@ -68,7 +68,7 @@ GstRtsp-@GST_API_VERSION@.gir: $(INTROSP
+diff --git a/gst-libs/gst/rtsp/Makefile.am b/gst-libs/gst/rtsp/Makefile.am
+index db9d0fd..79027cb 100644
+--- a/gst-libs/gst/rtsp/Makefile.am
++++ b/gst-libs/gst/rtsp/Makefile.am
+@@ -71,7 +71,7 @@ GstRtsp-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstrtsp-@GST_API_VERS
  		-I$(top_builddir)/gst-libs \
  		-I$(top_srcdir)/gst-libs \
  		--add-include-path=$(builddir)/../sdp \
@@ -210,7 +217,7 @@ Index: gst-plugins-base-1.12.3/gst-libs/gst/rtsp/Makefile.am
  		--library=libgstrtsp-@GST_API_VERSION@.la \
  		--include=Gio-2.0 \
  		--include=Gst-@GST_API_VERSION@ \
-@@ -98,7 +98,7 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=
+@@ -101,7 +101,7 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
  		--includedir=$(srcdir) \
  		--includedir=$(builddir) \
  		--includedir=$(builddir)/../sdp \
@@ -219,11 +226,11 @@ Index: gst-plugins-base-1.12.3/gst-libs/gst/rtsp/Makefile.am
  		$(INTROSPECTION_COMPILER_OPTS) $< -o $(@F)
  
  CLEANFILES += $(BUILT_GIRSOURCES) $(typelibs_DATA)
-Index: gst-plugins-base-1.12.3/gst-libs/gst/sdp/Makefile.am
-===================================================================
---- gst-plugins-base-1.12.3.orig/gst-libs/gst/sdp/Makefile.am
-+++ gst-plugins-base-1.12.3/gst-libs/gst/sdp/Makefile.am
-@@ -30,7 +30,7 @@ GstSdp-@GST_API_VERSION@.gir: $(INTROSPE
+diff --git a/gst-libs/gst/sdp/Makefile.am b/gst-libs/gst/sdp/Makefile.am
+index 6e05cc7..c7cf514 100644
+--- a/gst-libs/gst/sdp/Makefile.am
++++ b/gst-libs/gst/sdp/Makefile.am
+@@ -31,7 +31,7 @@ GstSdp-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstsdp-@GST_API_VERSIO
  		--warn-all \
  		--c-include "gst/sdp/sdp.h" \
  		-I$(top_srcdir)/gst-libs \
@@ -232,7 +239,7 @@ Index: gst-plugins-base-1.12.3/gst-libs/gst/sdp/Makefile.am
  		--library=libgstsdp-@GST_API_VERSION@.la \
  		--include=Gst-@GST_API_VERSION@ \
  		--libtool="$(LIBTOOL)" \
-@@ -54,7 +54,7 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=
+@@ -55,7 +55,7 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
  		$(INTROSPECTION_COMPILER) \
  		--includedir=$(srcdir) \
  		--includedir=$(builddir) \
@@ -241,11 +248,11 @@ Index: gst-plugins-base-1.12.3/gst-libs/gst/sdp/Makefile.am
  		$(INTROSPECTION_COMPILER_OPTS) $< -o $(@F)
  
  CLEANFILES = $(BUILT_GIRSOURCES) $(typelibs_DATA)
-Index: gst-plugins-base-1.12.3/gst-libs/gst/tag/Makefile.am
-===================================================================
---- gst-plugins-base-1.12.3.orig/gst-libs/gst/tag/Makefile.am
-+++ gst-plugins-base-1.12.3/gst-libs/gst/tag/Makefile.am
-@@ -59,8 +59,8 @@ GstTag-@GST_API_VERSION@.gir: $(INTROSPE
+diff --git a/gst-libs/gst/tag/Makefile.am b/gst-libs/gst/tag/Makefile.am
+index c86515b..363e6d2 100644
+--- a/gst-libs/gst/tag/Makefile.am
++++ b/gst-libs/gst/tag/Makefile.am
+@@ -61,8 +61,8 @@ GstTag-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgsttag-@GST_API_VERSIO
  		--c-include "gst/tag/tag.h" \
  		-I$(top_srcdir)/gst-libs \
  		-I$(top_builddir)/gst-libs \
@@ -256,7 +263,7 @@ Index: gst-plugins-base-1.12.3/gst-libs/gst/tag/Makefile.am
  		--library=libgsttag-@GST_API_VERSION@.la \
  		--include=Gst-@GST_API_VERSION@ \
  		--include=GstBase-@GST_API_VERSION@ \
-@@ -87,8 +87,8 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=
+@@ -89,8 +89,8 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
  		$(INTROSPECTION_COMPILER) \
  		--includedir=$(srcdir) \
  		--includedir=$(builddir) \
@@ -267,11 +274,11 @@ Index: gst-plugins-base-1.12.3/gst-libs/gst/tag/Makefile.am
  		$(INTROSPECTION_COMPILER_OPTS) $< -o $(@F)
  
  CLEANFILES += $(BUILT_GIRSOURCES) $(typelibs_DATA)
-Index: gst-plugins-base-1.12.3/gst-libs/gst/video/Makefile.am
-===================================================================
---- gst-plugins-base-1.12.3.orig/gst-libs/gst/video/Makefile.am
-+++ gst-plugins-base-1.12.3/gst-libs/gst/video/Makefile.am
-@@ -116,8 +116,8 @@ GstVideo-@GST_API_VERSION@.gir: $(INTROS
+diff --git a/gst-libs/gst/video/Makefile.am b/gst-libs/gst/video/Makefile.am
+index 0f8455f..8c9955c 100644
+--- a/gst-libs/gst/video/Makefile.am
++++ b/gst-libs/gst/video/Makefile.am
+@@ -119,8 +119,8 @@ GstVideo-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstvideo-@GST_API_VE
  		--c-include "gst/video/video.h" \
  		-I$(top_srcdir)/gst-libs \
  		-I$(top_builddir)/gst-libs \
@@ -282,7 +289,7 @@ Index: gst-plugins-base-1.12.3/gst-libs/gst/video/Makefile.am
  		--library=libgstvideo-@GST_API_VERSION@.la \
  		--include=Gst-@GST_API_VERSION@ \
  		--include=GstBase-@GST_API_VERSION@ \
-@@ -144,8 +144,8 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=
+@@ -147,8 +147,8 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
  		$(INTROSPECTION_COMPILER) \
  		--includedir=$(srcdir) \
  		--includedir=$(builddir) \

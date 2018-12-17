@@ -5,9 +5,9 @@ HOMEPAGE = "http://rtmpdump.mplayerhq.hu/"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
-DEPENDS = "openssl zlib"
+DEPENDS = "openssl10 zlib"
 
-SRCREV = "3121324046e4ca1934e7e28293fc8326475d5053"
+SRCREV = "fa8646daeb19dfd12c181f7d19de708d623704c0"
 SRC_URI = " \
     git://git.ffmpeg.org/rtmpdump \
     file://fix-racing-build-issue.patch"

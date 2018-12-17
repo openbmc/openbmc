@@ -22,6 +22,7 @@ and returns an instance of the class.
 #   * Too many instance attributes (R0902)
 # pylint: disable=R0902
 
+import errno
 import os
 import struct
 import array
@@ -189,9 +190,9 @@ def _lseek(file_obj, offset, whence):
     except OSError as err:
         # The 'lseek' system call returns the ENXIO if there is no data or
         # hole starting from the specified offset.
-        if err.errno == os.errno.ENXIO:
+        if err.errno == errno.ENXIO:
             return -1
-        elif err.errno == os.errno.EINVAL:
+        elif err.errno == errno.EINVAL:
             raise ErrorNotSupp("the kernel or file-system does not support "
                                "\"SEEK_HOLE\" and \"SEEK_DATA\"")
         else:
@@ -394,12 +395,12 @@ class FilemapFiemap(_FilemapBase):
         except IOError as err:
             # Note, the FIEMAP ioctl is supported by the Linux kernel starting
             # from version 2.6.28 (year 2008).
-            if err.errno == os.errno.EOPNOTSUPP:
+            if err.errno == errno.EOPNOTSUPP:
                 errstr = "FilemapFiemap: the FIEMAP ioctl is not supported " \
                          "by the file-system"
                 self._log.debug(errstr)
                 raise ErrorNotSupp(errstr)
-            if err.errno == os.errno.ENOTTY:
+            if err.errno == errno.ENOTTY:
                 errstr = "FilemapFiemap: the FIEMAP ioctl is not supported " \
                          "by the kernel"
                 self._log.debug(errstr)

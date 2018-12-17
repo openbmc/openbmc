@@ -1,0 +1,26 @@
+From bb8c370aaaf25b1fe1fbf984e73177018026cb91 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 21 Jun 2018 19:51:02 -0700
+Subject: [PATCH] Include dirent.h for ino_t
+
+Fixes
+error: unknown type name 'ino_t'; did you mean 'int'?
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
+ tests/hugetests.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/hugetests.h b/tests/hugetests.h
+index 8b1d8d9..056042c 100644
+--- a/tests/hugetests.h
++++ b/tests/hugetests.h
+@@ -22,6 +22,7 @@
+ 
+ #include <errno.h>
+ #include <string.h>
++#include <dirent.h>
+ 
+ #include "libhugetlbfs_privutils.h"
+ #include "libhugetlbfs_testprobes.h"

@@ -16,9 +16,6 @@ SECTION = "libs/multimedia"
 # The src/pulsecore/filter/ directory contains code under the 3-clause BSD
 # license.
 #
-# src/utils/qpaeq is licensed under AGPL. qpaeq is not installed by this
-# recipe, however, which is why AGPL is not mentioned in LICENSE.
-#
 # People who distribute PulseAudio binaries need to also consider that there
 # are some dependencies to GPL libraries. LGPL code that depends on GPL
 # libraries probably becomes effectively GPL-licensed (at compile-time? or at
@@ -47,16 +44,14 @@ SECTION = "libs/multimedia"
 # section 3, and therefore libdbus's GPL license doesn't affect PulseAudio.
 LICENSE = "LGPLv2.1+ & MIT & BSD-3-Clause"
 
-LIC_FILES_CHKSUM = "file://LICENSE;md5=a848e8d03f04976778eab2348b59ed2b \
+LIC_FILES_CHKSUM = "file://LICENSE;md5=0e5cd938de1a7a53ea5adac38cc10c39 \
                     file://GPL;md5=4325afd396febcb659c36b49533135d4 \
                     file://LGPL;md5=2d5025d4aa3495befef8f17206a5b0a1 \
-                    file://AGPL;md5=73f1eb20517c55bf9493b7dd6e480788 \
                     file://src/modules/echo-cancel/adrian-license.txt;md5=abbab006a561fbffccedf1c3531f34ab \
                     file://src/pulsecore/filter/LICENSE.WEBKIT;md5=49defbaffddf8c51faf606ff7fc3b1f7 \
                     file://src/pulsecore/resampler.h;beginline=4;endline=21;md5=09794012ae16912c0270f3280cc8ff84 \
                     file://src/modules/reserve.h;beginline=6;endline=28;md5=0e23094760367d51b6609750e9b31fbb \
                     file://src/pulsecore/rtkit.h;beginline=6;endline=29;md5=3f00ff966716ae0817c31576d1473528 \
-                    file://src/utils/qpaeq;beginline=2;endline=16;md5=7f62515a4762f0c3fc3d4201858bb964 \
                     file://src/modules/echo-cancel/adrian-aec.h;beginline=3;endline=12;md5=d3ed4fad1c073f8b06f37495dc5d1026 \
                     file://src/pulsecore/filter/biquad.h;beginline=1;endline=4;md5=6d46d1365206528a20137355924233c1 \
 "
@@ -93,10 +88,6 @@ EXTRA_OECONF += "--without-soxr"
 # ddbd713293 without explaining why it was not made a PACKAGECONFIG item
 # instead. Oh well, let's keep it disabled until someone expresses some
 # interest in having it enabled.
-#
-# One nice thing about disabling this is that it also prevents qpaeq from
-# being installed, so we avoid adding AGPL to the list of licenses (nothing
-# else in PulseAudio is licensed under AGPL).
 EXTRA_OECONF += "--without-fftw"
 
 # The "adrian" echo canceller implementation has a non-standard license
@@ -105,6 +96,10 @@ EXTRA_OECONF += "--without-fftw"
 # hassle to add the license to OE-Core's set of licenses. The canceller isn't
 # very good anyway, better alternatives exist (such as the webrtc canceller).
 EXTRA_OECONF += "--disable-adrian-aec"
+
+# FIXME: The gsettings module is temporarily disabled, because adding support
+# for it is a bit complicated.
+EXTRA_OECONF += "--disable-gsettings"
 
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', '${BLUEZ}', '', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'zeroconf', 'avahi', '', d)} \

@@ -1,0 +1,28 @@
+From 98082f81da1b49876081ff1ab340e952755f985a Mon Sep 17 00:00:00 2001
+From: OBATA Akio <obache@users.noreply.github.com>
+Date: Fri, 11 May 2018 18:36:26 +0900
+Subject: [PATCH] configure.ac: fix condition for suppliment snprintf
+ implementation
+
+$sasl_cv_snprintf means requremnt of suppliment snprintf
+implementation, not existence of system snprintf implementation,
+
+Upstream-Status: Submitted [https://github.com/cyrusimap/cyrus-sasl/pull/512]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index ac59f14..9804e98 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1264,7 +1264,7 @@ SNPRINTFOBJS=""
+ LTSNPRINTFOBJS=""
+ AC_CHECK_FUNC(snprintf, [AC_DEFINE(HAVE_SNPRINTF,[],[Does the system have snprintf()?])], [sasl_cv_snprintf=yes])
+ AC_CHECK_FUNC(vsnprintf, [AC_DEFINE(HAVE_VSNPRINTF,[],[Does the system have vsnprintf()?])], [sasl_cv_snprintf=yes])
+-if test $sasl_cv_snprintf = no; then
++if test $sasl_cv_snprintf = yes; then
+        AC_LIBOBJ(snprintf)
+        SNPRINTFOBJS="snprintf.o"
+        LTSNPRINTFOBJS="snprintf.lo"

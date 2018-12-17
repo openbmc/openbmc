@@ -58,7 +58,9 @@ do_configure_prepend() {
 OE_LT_RPATH_ALLOW=":${libdir}/purple-2:"
 OE_LT_RPATH_ALLOW[export]="1"
 
-PACKAGES =+ "libpurple-dbg libpurple-dev libpurple libgnt-dbg libgnt libgnt-dev finch-dbg finch finch-dev ${PN}-data"
+PACKAGES =+ "libpurple-dev libpurple libgnt libgnt-dev finch finch-dev ${PN}-data"
+
+RPROVIDES_${PN}-dbg += "libpurple-dbg libgnt-dbg finch-dbg"
 
 LEAD_SONAME = "libpurple.so.0"
 FILES_libpurple     = "${libdir}/libpurple*.so.* ${libdir}/purple-2 ${bindir}/purple-* ${sysconfdir}/gconf/schemas/purple* ${datadir}/purple/ca-certs"
@@ -69,15 +71,10 @@ FILES_libpurple-dev = "${libdir}/libpurple*.la \
                        ${libdir}/purple-2/liboscar.so \
                        ${libdir}/purple-2/libymsg.so \
                        ${datadir}/aclocal"
-FILES_libpurple-dbg += "${libdir}/.debug/libpurple* \
-                        ${libdir}/purple-2/.debug"
 FILES_libgnt         = "${libdir}/libgnt.so.* ${libdir}/gnt/*.so"
 FILES_libgnt-dev     = "${libdir}/gnt/*.la"
-FILES_libgnt-dbg     = "${libdir}/gnt/.debug"
 FILES_finch          = "${bindir}/finch"
 FILES_finch-dev      = "${libdir}/finch/*.la"
-FILES_finch-dbg      = "${bindir}/.debug/finch \
-                        ${libdir}/finch/.debug"
 
 FILES_${PN} = "${bindir} ${datadir}/${PN} ${libdir}/${PN}/*.so \
            ${datadir}/applications"

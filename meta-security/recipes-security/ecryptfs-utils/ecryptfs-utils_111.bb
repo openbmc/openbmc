@@ -29,6 +29,7 @@ EXTRA_OECONF = "\
     --libdir=${base_libdir} \
     --disable-pywrap \
     --disable-nls \
+    --with-pamdir=${base_libdir}/security \
     "
 
 PACKAGECONFIG ??= "nss \
@@ -43,12 +44,16 @@ do_configure_prepend() {
     export NSS_LIBS="-L${STAGING_BASELIBDIR} -lssl3 -lsmime3 -lnss3 -lsoftokn3 -lnssutil3"
     export KEYUTILS_CFLAGS="-I${STAGING_INCDIR}"
     export KEYUTILS_LIBS="-L${STAGING_LIBDIR} -lkeyutils"
+    sed -i -e "s;rootsbindir=\"/sbin\";rootsbindir=\"\${base_sbindir}\";g" ${S}/configure.ac
 }
 
 do_install_append() {
     chmod 4755 ${D}${base_sbindir}/mount.ecryptfs_private
-    mkdir -p ${D}/${libdir}
-    mv ${D}/${base_libdir}/pkgconfig ${D}/${libdir}
+    # ${base_libdir} is identical to ${libdir} when usrmerge enabled
+    if ! ${@bb.utils.contains('DISTRO_FEATURES','usrmerge','true','false',d)}; then
+        mkdir -p ${D}/${libdir}
+        mv ${D}/${base_libdir}/pkgconfig ${D}/${libdir}
+    fi
     sed -i -e 's:-I${STAGING_INCDIR}::' \
            -e 's:-L${STAGING_LIBDIR}::' ${D}/${libdir}/pkgconfig/libecryptfs.pc
     sed -i -e "s: ${base_sbindir}/cryptsetup: ${sbindir}/cryptsetup:" ${D}${bindir}/ecryptfs-setup-swap

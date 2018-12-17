@@ -1,0 +1,88 @@
+From 62784e8b6df8ff3a907c1f816154808bea9d7064 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 25 Sep 2018 14:38:14 +0800
+Subject: [PATCH] support openssl 1.1.x
+
+Long time no maintain from upstream since 2013
+(git://git.umip.org/umip/umip.git), backport a
+fix from openSUSE
+
+Upstream-Status: Backport [openSUSE]
+http://ftp.gwdg.de/pub/opensuse/source/distribution/leap/15.0/repo/oss/src/mipv6d-2.0.2.umip.0.4-lp150.1.2.src.rpm
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ src/keygen.c | 12 ++++++++++++
+ src/mh.c     | 17 ++++++++++++++++-
+ 2 files changed, 28 insertions(+), 1 deletion(-)
+
+diff --git a/src/keygen.c b/src/keygen.c
+index e434a38..b902644 100644
+--- a/src/keygen.c
++++ b/src/keygen.c
+@@ -172,6 +172,7 @@ static void build_kgen_token(struct in6_addr *addr, uint8_t *nonce,
+ 	uint8_t tmp[20];
+ #ifdef HAVE_LIBCRYPTO
+ 	unsigned int len = 20;
++#if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER < 0x1010006fL
+ 	HMAC_CTX ctx;
+ 
+ 	HMAC_CTX_init(&ctx);
+@@ -182,6 +183,17 @@ static void build_kgen_token(struct in6_addr *addr, uint8_t *nonce,
+ 	HMAC_Final(&ctx, tmp, &len);
+ 	HMAC_CTX_cleanup(&ctx);
+ #else
++	HMAC_CTX *ctx;
++	ctx = HMAC_CTX_new();
++	HMAC_Init_ex(ctx, key_cn, sizeof(key_cn), EVP_sha1(), NULL);
++	HMAC_Update(ctx, (unsigned char *)addr, sizeof(*addr));
++	HMAC_Update(ctx, nonce, NONCE_LENGTH);
++	HMAC_Update(ctx, &id, sizeof(id));
++	HMAC_Final(ctx, tmp, &len);
++	HMAC_CTX_free(ctx);
++#endif // End of defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER < 0x1010006fL
++
++#else
+ 	HMAC_SHA1_CTX ctx;
+ 
+ 	HMAC_SHA1_init(&ctx, key_cn, sizeof(key_cn));
+diff --git a/src/mh.c b/src/mh.c
+index cba9a33..212eb5a 100644
+--- a/src/mh.c
++++ b/src/mh.c
+@@ -518,9 +518,10 @@ static int calculate_auth_data(const struct iovec *iov, int iovlen,
+ 
+ #ifdef HAVE_LIBCRYPTO
+ 	unsigned int len = HMAC_SHA1_HASH_LEN;
+-	HMAC_CTX ctx;
+ 	const EVP_MD *evp_md = EVP_sha1();
+ 
++#if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER < 0x1010006fL
++	HMAC_CTX ctx;
+ 	HMAC_CTX_init(&ctx);
+ 	HMAC_Init_ex(&ctx, key, HMAC_SHA1_KEY_SIZE, evp_md, NULL);
+ 
+@@ -532,6 +533,20 @@ static int calculate_auth_data(const struct iovec *iov, int iovlen,
+ 	HMAC_Final(&ctx, buf, &len);
+ 	HMAC_CTX_cleanup(&ctx);
+ #else
++	HMAC_CTX *ctx;
++	ctx = HMAC_CTX_new();
++	HMAC_Init_ex(ctx, key, HMAC_SHA1_KEY_SIZE, evp_md, NULL);
++
++	HMAC_Update(ctx, (uint8_t *)coa, sizeof(*coa));
++	HMAC_Update(ctx, (uint8_t *)cn, sizeof(*coa));
++	for (i = 0; i < iovlen; i++) {
++		HMAC_Update(ctx, (uint8_t *)iov[i].iov_base, iov[i].iov_len);
++	}
++	HMAC_Final(ctx, buf, &len);
++	HMAC_CTX_free(ctx);
++#endif
++
++#else
+ 	HMAC_SHA1_CTX ctx;
+ 
+ 	HMAC_SHA1_init(&ctx, key, HMAC_SHA1_KEY_SIZE);
+-- 
+2.7.4
+

@@ -1,0 +1,55 @@
+From 61fbdddb660c5944ac23b820754a7c4cf4eee097 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 8 Jun 2018 19:29:03 -0700
+Subject: [PATCH] tests: Include entcode.c into test sources to provide
+ definitions of functions e.g. ec_ilog()
+
+Fixes link errors in tests
+| /usr/src/debug/celt051/0.5.1.3+gitAUTOINC+5555aae843-r0/git/tests/../libcelt/rangedec.c:202: undefined reference to `ec_ilog'
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/cwrs32-test.c  | 1 +
+ tests/ectest.c       | 2 +-
+ tests/laplace-test.c | 1 +
+ 3 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/tests/cwrs32-test.c b/tests/cwrs32-test.c
+index 3a95df2..a159ab3 100644
+--- a/tests/cwrs32-test.c
++++ b/tests/cwrs32-test.c
+@@ -8,6 +8,7 @@
+ #include "rangeenc.c"
+ #include "rangedec.c"
+ #include "cwrs.c"
++#include "entcode.c"
+ #include <string.h>
+ #define NMAX (10)
+ #define MMAX (9)
+diff --git a/tests/ectest.c b/tests/ectest.c
+index aa35453..94eb9a3 100644
+--- a/tests/ectest.c
++++ b/tests/ectest.c
+@@ -5,7 +5,7 @@
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <math.h>
+-#include "entcode.h"
++#include "entcode.c"
+ #include "entenc.c"
+ #include "entdec.c"
+ #include "rangeenc.c"
+diff --git a/tests/laplace-test.c b/tests/laplace-test.c
+index 3f98ab3..8e1fb4e 100644
+--- a/tests/laplace-test.c
++++ b/tests/laplace-test.c
+@@ -6,6 +6,7 @@
+ #include <stdlib.h>
+ #include "laplace.c"
+ #include "stack_alloc.h"
++#include "entcode.c"
+ #include "entenc.c"
+ #include "entdec.c"
+ #include "rangeenc.c"

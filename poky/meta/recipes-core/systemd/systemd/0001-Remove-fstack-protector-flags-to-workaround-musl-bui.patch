@@ -1,6 +1,6 @@
-From e361f6b4aefae57efff7e457df8db4d1067bec23 Mon Sep 17 00:00:00 2001
+From 9e3816bcaa36e1a11647ca0cf4f8044449c77fe0 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
-Date: Wed, 28 Feb 2018 21:50:23 -0800
+Date: Mon, 2 Jul 2018 15:28:22 +0800
 Subject: [PATCH] Remove fstack-protector flags to workaround musl build
 
 Remove fstack-protector and fstack-protector-strong flags to fix
@@ -8,7 +8,7 @@ the following build failure for qemux86 and qemuppc with musl.
 
   undefined reference to `__stack_chk_fail_local'
 
-Upstream-Status: Inappropriate [OE Specific]
+Upstream-Status: Inappropriate [musl Specific]
 
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
 ---
@@ -16,18 +16,18 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  1 file changed, 2 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index 7610ab12b..591b9cbab 100644
+index f432ea072..a734a295c 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -329,8 +329,6 @@ foreach arg : ['-Wextra',
-                '-fdiagnostics-show-option',
-                '-fno-strict-aliasing',
-                '-fvisibility=hidden',
--               '-fstack-protector',
--               '-fstack-protector-strong',
-                '--param=ssp-buffer-size=4',
-               ]
-         if cc.has_argument(arg)
+@@ -333,8 +333,6 @@ possible_cc_flags = [
+         '-fdiagnostics-show-option',
+         '-fno-strict-aliasing',
+         '-fvisibility=hidden',
+-        '-fstack-protector',
+-        '-fstack-protector-strong',
+         '--param=ssp-buffer-size=4',
+ ]
+ 
 -- 
-2.13.0
+2.11.0
 

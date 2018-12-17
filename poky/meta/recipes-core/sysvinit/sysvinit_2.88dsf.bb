@@ -15,6 +15,7 @@ SRC_URI = "${SAVANNAH_GNU_MIRROR}/sysvinit/sysvinit-${PV}.tar.bz2 \
            file://pidof-add-m-option.patch \
            file://0001-This-fixes-an-issue-that-clang-reports-about-mutlipl.patch \
            file://realpath.patch \
+           file://0001-include-sys-sysmacros.h-for-major-minor-defines-in-g.patch \
            file://rcS-default \
            file://rc \
            file://rcS \
@@ -29,7 +30,7 @@ S = "${WORKDIR}/sysvinit-${PV}"
 B = "${S}/src"
 
 inherit update-alternatives distro_features_check
-DEPENDS_append = " update-rc.d-native base-passwd"
+DEPENDS_append = " update-rc.d-native base-passwd virtual/crypt"
 
 REQUIRED_DISTRO_FEATURES = "sysvinit"
 

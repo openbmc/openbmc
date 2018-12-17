@@ -1,0 +1,23 @@
+include <sys/sysmacros.h> for major/minor defintions
+
+Fixes
+
+| ../blktool-4.orig/blktool.c: In function 'detect_dev_class':
+| ../blktool-4.orig/blktool.c:295:10: warning: implicit declaration of function 'major' [-Wimplicit-function-declaration]
+|   switch (major(st_rdev)) {
+|           ^~~~~
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Index: blktool-4.orig/blktool.c
+===================================================================
+--- blktool-4.orig.orig/blktool.c
++++ blktool-4.orig/blktool.c
+@@ -27,6 +27,7 @@
+ #include <linux/cdrom.h>
+ #include <linux/major.h>
+ #include <scsi/scsi.h>
++#include <sys/sysmacros.h>
+ 
+ #include "blktool.h"
+ 

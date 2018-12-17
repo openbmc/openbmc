@@ -1,0 +1,64 @@
+lib and include path is hardcoded for use_libbind 
+
+use libdir and includedir vars
+
+Upstream-Status: Pending
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: dhcp-4.4.1/configure.ac+lt
+===================================================================
+--- dhcp-4.4.1.orig/configure.ac+lt
++++ dhcp-4.4.1/configure.ac+lt
+@@ -801,22 +801,22 @@ no)
+ 	if test ! -d "$use_libbind"; then
+ 		AC_MSG_ERROR([Cannot find bind directory at $use_libbind])
+ 	fi
+-	if test ! -d "$use_libbind/include" -o \
+-	        ! -f "$use_libbind/include/isc/buffer.h"
++	if test ! -d "$use_libbind/$includedir" -o \
++	        ! -f "$use_libbind/$includedir/isc/buffer.h"
+ 	then
+-		AC_MSG_ERROR([Cannot find bind includes at $use_libbind/include])
++		AC_MSG_ERROR([Cannot find bind includes at $use_libbind/$includedir])
+ 	fi
+-	if test	! -d "$use_libbind/lib" -o \
+-	        \( ! -f "$use_libbind/lib/libisc.a" -a \
+-		   ! -f	"$use_libbind/lib/libisc.la" \)
++	if test	! -d "$use_libbind/$libdir" -o \
++	        \( ! -f "$use_libbind/$libdir/libisc.a" -a \
++		   ! -f	"$use_libbind/$libdir/libisc.la" \)
+ 	then
+-		AC_MSG_ERROR([Cannot find bind libraries at $use_libbind/lib])
++		AC_MSG_ERROR([Cannot find bind libraries at $use_libbind/$libdir])
+ 	fi
+ 	BINDDIR="$use_libbind"
+-	BINDLIBIRSDIR="$BINDDIR/lib"
+-	BINDLIBDNSDIR="$BINDDIR/lib"
+-	BINDLIBISCCFGDIR="$BINDDIR/lib"
+-	BINDLIBISCDIR="$BINDDIR/lib"	
++	BINDLIBIRSDIR="$BINDDIR/$libdir"
++	BINDLIBDNSDIR="$BINDDIR/$libdir"
++	BINDLIBISCCFGDIR="$BINDDIR/$libdir"
++	BINDLIBISCDIR="$BINDDIR/$libdir"
+ 	DISTCHECK_LIBBIND_CONFIGURE_FLAG="--with-libbind=$use_libbind"
+ 	;;
+ esac
+@@ -856,14 +856,14 @@ AC_ARG_ENABLE(libtool,
+ 
+ if test "$use_libbind" != "no"; then
+ 	if test "$want_libtool" = "yes" -a \
+-	        ! -f "$use_libbind/lib/libisc.la"
++	        ! -f "$use_libbind/$libdir/libisc.la"
+ 	then
+-		AC_MSG_ERROR([Cannot find dynamic libraries at $use_libbind/lib])
++		AC_MSG_ERROR([Cannot find dynamic libraries at $use_libbind/$libdir])
+ 	fi
+ 	if test "$want_libtool" = "no" -a \
+-	        ! -f "$use_libbind/lib/libisc.a"
++	        ! -f "$use_libbind/$libdir/libisc.a"
+ 	then
+-		AC_MSG_ERROR([Cannot find static libraries at $use_libbind/lib])
++		AC_MSG_ERROR([Cannot find static libraries at $use_libbind/$libdir])
+ 	fi
+ fi
+ 

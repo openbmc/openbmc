@@ -1,0 +1,14 @@
+[Unit]
+Description=Xscreensaver service
+PartOf=xserver-nodm.service
+After=xserver-nodm.service
+
+[Service]
+ExecStart=/usr/bin/xscreensaver
+Environment="DISPLAY=:0"
+User=xuser
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target

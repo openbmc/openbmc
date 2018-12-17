@@ -15,11 +15,13 @@
 # It is an error for the target not to exist.
 # If 'what' doesn't exist then an empty value is returned
 #
-def siteinfo_data(d):
+def siteinfo_data_for_machine(arch, os, d):
     archinfo = {
         "allarch": "endian-little bit-32", # bogus, but better than special-casing the checks below for allarch
         "aarch64": "endian-little bit-64 arm-common arm-64",
         "aarch64_be": "endian-big bit-64 arm-common arm-64",
+        "arc": "endian-little bit-32 arc-common",
+        "arceb": "endian-big bit-32 arc-common",
         "arm": "endian-little bit-32 arm-common arm-32",
         "armeb": "endian-big bit-32 arm-common arm-32",
         "avr32": "endian-big bit-32 avr32-common",
@@ -30,6 +32,8 @@ def siteinfo_data(d):
         "i586": "endian-little bit-32 ix86-common",
         "i686": "endian-little bit-32 ix86-common",
         "ia64": "endian-little bit-64",
+        "lm32": "endian-big bit-32",
+        "m68k": "endian-big bit-32",
         "microblaze": "endian-big bit-32 microblaze-common",
         "microblazeeb": "endian-big bit-32 microblaze-common",
         "microblazeel": "endian-little bit-32 microblaze-common",
@@ -128,15 +132,13 @@ def siteinfo_data(d):
         locs = { "archinfo" : archinfo, "osinfo" : osinfo, "targetinfo" : targetinfo, "d" : d}
         archinfo, osinfo, targetinfo = bb.utils.better_eval(call, locs)
 
-    hostarch = d.getVar("HOST_ARCH")
-    hostos = d.getVar("HOST_OS")
-    target = "%s-%s" % (hostarch, hostos)
+    target = "%s-%s" % (arch, os)
 
     sitedata = []
-    if hostarch in archinfo:
-        sitedata.extend(archinfo[hostarch].split())
-    if hostos in osinfo:
-        sitedata.extend(osinfo[hostos].split())
+    if arch in archinfo:
+        sitedata.extend(archinfo[arch].split())
+    if os in osinfo:
+        sitedata.extend(osinfo[os].split())
     if target in targetinfo:
         sitedata.extend(targetinfo[target].split())
     sitedata.append(target)
@@ -144,6 +146,9 @@ def siteinfo_data(d):
 
     bb.debug(1, "SITE files %s" % sitedata);
     return sitedata
+
+def siteinfo_data(d):
+    return siteinfo_data_for_machine(d.getVar("HOST_ARCH"), d.getVar("HOST_OS"), d)
 
 python () {
     sitedata = set(siteinfo_data(d))

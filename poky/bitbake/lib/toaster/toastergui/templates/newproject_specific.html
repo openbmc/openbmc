@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load projecttags %}
+{% load humanize %}
+
+{% block title %} Create a new project - Toaster {% endblock %}
+
+{% block pagecontent %}
+<div class="row">
+  <div class="col-md-12">
+    <div class="page-header">
+          <h1>Create a new project</h1>
+        </div>
+    {% if alert %}
+      <div class="alert alert-danger" role="alert">{{alert}}</div>
+    {% endif %}
+
+        <form method="POST"  action="{%url "newproject_specific" project_pk %}">{% csrf_token %}
+          <div class="form-group" id="validate-project-name">
+            <label class="control-label">Project name <span class="text-muted">(required)</span></label>
+            <input type="text" class="form-control" required id="new-project-name" name="display_projectname" value="{{projectname}}" disabled>
+          </div>
+          <p class="help-block text-danger" style="display: none;" id="hint-error-project-name">A project with this name exists. Project names must be unique.</p>
+        <input type="hidden" name="ptype" value="build" />
+        <input type="hidden" name="projectname" value="{{projectname}}" />
+
+        {% if releases.count > 0 %}
+				<div class="release form-group">
+            {% if releases.count > 1 %}
+              <label class="control-label">
+                Release
+                <span class="glyphicon glyphicon-question-sign get-help" title="The version of the build system you want to use"></span>
+              </label>
+              <select name="projectversion" id="projectversion" class="form-control">
+                {% for release in releases %}
+                    <option value="{{release.id}}"
+                        {%if defaultbranch == release.name %}
+                            selected
+                        {%endif%}
+                     >{{release.description}}</option>
+                {% endfor %}
+              </select>
+              <div class="row">
+                <div class="col-md-4">
+                {% for release in releases %}
+                  <div class="helptext" id="description-{{release.id}}" style="display: none">
+                    <span class="help-block">{{release.helptext|safe}}</span>
+                  </div>
+                {% endfor %}
+            {% else %}
+              <input type="hidden" name="projectversion" value="{{releases.0.id}}"/>
+            {% endif %}
+                </div>
+              </div>
+            </fieldset>
+        {% endif %}
+            <div class="top-air">
+              <input type="submit" id="create-project-button" class="btn btn-primary btn-lg" value="Create project"/>
+              <span class="help-inline" style="vertical-align:middle;">To create a project, you need to specify the release</span>
+            </div>
+
+        </form>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // hide the new project button, name is preset
+            $("#new-project-button").hide();
+
+            // enable submit button when all required fields are populated
+            $("input#new-project-name").on('input', function() {
+                if ($("input#new-project-name").val().length > 0 ){
+                    $('.btn-primary').removeAttr('disabled');
+                    $(".help-inline").css('visibility','hidden');
+                }
+                else {
+                    $('.btn-primary').attr('disabled', 'disabled');
+                    $(".help-inline").css('visibility','visible');
+                }
+            });
+
+            // show relevant help text for the selected release
+            var selected_release = $('select').val();
+            $("#description-" + selected_release).show();
+
+            $('select').change(function(){
+                var new_release = $('select').val();
+                $(".helptext").hide();
+                $('#description-' + new_release).fadeIn();
+            });
+
+        });
+    </script>
+
+{% endblock %}

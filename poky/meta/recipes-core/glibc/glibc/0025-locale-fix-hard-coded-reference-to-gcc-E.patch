@@ -1,7 +1,7 @@
-From 56dab024751941c07eb479f47ef6682e2168c86a Mon Sep 17 00:00:00 2001
+From 6c6aecba19b3e7947100623532a41b6f16734ace Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?J=C3=A9r=C3=A9my=20Rosen?= <jeremy.rosen@smile.fr>
 Date: Mon, 22 Aug 2016 16:09:25 +0200
-Subject: [PATCH 25/27] locale: fix hard-coded reference to gcc -E
+Subject: [PATCH] locale: fix hard-coded reference to gcc -E
 
 When new version of compilers are published, they may not be compatible with
 older versions of software. This is particularly common when software is built
@@ -33,6 +33,3 @@ index 30d3f2f195..e97653017c 100644
  
  
  sub cstrlen {
--- 
-2.16.1
-

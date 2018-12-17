@@ -1,7 +1,7 @@
-From 5f145621b4780cfd6a5632fcc97c45f572938efc Mon Sep 17 00:00:00 2001
+From 04af15322f677db42ecc2acc465334a04de9a871 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Mon, 5 Sep 2016 22:25:44 +0100
-Subject: [PATCH 5/5] Use native pkg-config when looking for gtk-doc.
+Subject: [PATCH] Use native pkg-config when looking for gtk-doc.
 
 Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@intel.com>
@@ -10,10 +10,10 @@ Signed-off-by: Ross Burton <ross.burton@intel.com>
  gtk-doc.m4 | 7 ++++++-
  1 file changed, 6 insertions(+), 1 deletion(-)
 
-Index: gtk-doc-1.27/gtk-doc.m4
-===================================================================
---- gtk-doc-1.27.orig/gtk-doc.m4
-+++ gtk-doc-1.27/gtk-doc.m4
+diff --git a/gtk-doc.m4 b/gtk-doc.m4
+index 2d12f01..e5afc3f 100644
+--- a/buildsystems/autotools/gtk-doc.m4
++++ b/buildsystems/autotools/gtk-doc.m4
 @@ -25,7 +25,7 @@
  # Macro appear in them. The GNU General Public License (GPL) does govern
  # all other use of the material that constitutes the Autoconf Macro.

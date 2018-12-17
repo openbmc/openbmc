@@ -20,7 +20,7 @@ SRC_URI = "http://v6web.litech.org/radvd/dist/radvd-${PV}.tar.gz \
            file://volatiles.03_radvd \
            file://radvd.default"
 
-inherit autotools update-rc.d useradd pkgconfig systemd
+inherit autotools useradd pkgconfig systemd
 
 SYSTEMD_SERVICE_${PN} = "radvd.service"
 SYSTEMD_AUTO_ENABLE = "disable"
@@ -36,7 +36,7 @@ do_install_append () {
     sed -i 's!/var/!${localstatedir}/!g' ${D}${sysconfdir}/init.d/radvd
     sed -i 's!^PATH=.*!PATH=${base_sbindir}:${base_bindir}:${sbindir}:${bindir}!' ${D}${sysconfdir}/init.d/radvd
 
-    install -m 0644 ${WORKDIR}/volatiles.03_radvd ${D}${sysconfdir}/default/volatiles/volatiles.03_radvd
+    install -m 0644 ${WORKDIR}/volatiles.03_radvd ${D}${sysconfdir}/default/volatiles/03_radvd
 
     # Install systemd service files
     install -d ${D}${systemd_unitdir}/system
@@ -53,9 +53,6 @@ do_install_append () {
         install -m 0644 ${S}/$i ${D}${docdir}/radvd; \
     done
 }
-
-INITSCRIPT_NAME = "radvd"
-INITSCRIPT_PARAMS = "defaults 20 80"
 
 USERADD_PACKAGES = "${PN}"
 USERADD_PARAM_${PN} = "--system --home ${localstatedir}/run/radvd/ -M -g nogroup radvd"

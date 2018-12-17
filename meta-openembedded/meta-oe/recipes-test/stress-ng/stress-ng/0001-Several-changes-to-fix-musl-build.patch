@@ -1,10 +1,12 @@
-From 784dcd09d3f266e271d007f4fd257e85036872ca Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?An=C3=ADbal=20Lim=C3=B3n?= <anibal.limon@linaro.org>
-Date: Tue, 17 Oct 2017 10:13:20 -0500
+From 9bcb4e170f01dbe0a9e7bf6b899c5d9b5283d4c6 Mon Sep 17 00:00:00 2001
+From: Randy MacLeod <Randy.MacLeod@windriver.com>
+Date: Sun, 11 Nov 2018 23:00:53 -0500
 Subject: [PATCH] Several changes to fix musl build
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+
+Rebased patch for:
 
 stress-{context, stackmmap}.c: Set tests to non-implemented because uses
 swapcontext, musl provide the definition but not the implementation due
@@ -19,20 +21,19 @@ cache.c: Define GLOB_ONLYDIR not available on MUSL.
 
 Signed-off-by: Aníbal Limón <anibal.limon@linaro.org>
 Signed-off-by: Tim Orling <timothy.t.orling@linux.intel.com>
+Signed-off-by: Randy MacLeod <Randy.MacLeod@windriver.com>
 
 Upstream-status: Pending
-
 ---
  cache.c            |  4 ++++
  stress-madvise.c   |  1 +
- stress-malloc.c    |  2 +-
  stress-pty.c       | 18 ------------------
  stress-resources.c |  1 -
  stress-stackmmap.c |  2 +-
- 6 files changed, 7 insertions(+), 21 deletions(-)
+ 5 files changed, 6 insertions(+), 20 deletions(-)
 
 diff --git a/cache.c b/cache.c
-index fbf7674..936c1ff 100644
+index e8a0f791..4c7bb486 100644
 --- a/cache.c
 +++ b/cache.c
 @@ -28,6 +28,10 @@ typedef struct {
@@ -47,10 +48,10 @@ index fbf7674..936c1ff 100644
  #define SYS_CPU_PREFIX               "/sys/devices/system/cpu"
  #define GLOB_PATTERN SYS_CPU_PREFIX  "/cpu[0-9]*"
 diff --git a/stress-madvise.c b/stress-madvise.c
-index 9e71e11..ddf8d2d 100644
+index b2e3497f..77e43a91 100644
 --- a/stress-madvise.c
 +++ b/stress-madvise.c
-@@ -147,6 +147,7 @@ static int stress_random_advise(const args_t *args)
+@@ -146,6 +146,7 @@ static int stress_random_advise(const args_t *args)
  #if defined(MADV_SOFT_OFFLINE)
  	if (advise == MADV_SOFT_OFFLINE) {
  		static int soft_offline_count;
@@ -58,21 +59,8 @@ index 9e71e11..ddf8d2d 100644
  
  		/* ..and minimize number of soft offline pages */
  		if ((soft_offline_count >= NUM_SOFT_OFFLINE_MAX) ||
-diff --git a/stress-malloc.c b/stress-malloc.c
-index a46b8c6..427827a 100644
---- a/stress-malloc.c
-+++ b/stress-malloc.c
-@@ -99,7 +99,7 @@ int stress_malloc(const args_t *args)
- 			malloc_max = MIN_MALLOC_MAX;
- 	}
- 
--#if defined(__GNUC__) && defined(__linux__)
-+#if defined(__GNUC__) && defined(__linux__) && defined(M_MMAP_THRESHOLD)
- 	if (get_setting("malloc-threshold", &malloc_threshold))
- 		(void)mallopt(M_MMAP_THRESHOLD, (int)malloc_threshold);
- #endif
 diff --git a/stress-pty.c b/stress-pty.c
-index 1bd1fbd..b1fe573 100644
+index 4dd88ab9..c79a7021 100644
 --- a/stress-pty.c
 +++ b/stress-pty.c
 @@ -26,7 +26,6 @@
@@ -83,7 +71,7 @@ index 1bd1fbd..b1fe573 100644
  #include <termios.h>
  
  typedef struct {
-@@ -108,7 +107,6 @@ int stress_pty(const args_t *args)
+@@ -111,7 +110,6 @@ static int stress_pty(const args_t *args)
  		 */
  		for (i = 0; i < n; i++) {
  			struct termios ios;
@@ -91,7 +79,7 @@ index 1bd1fbd..b1fe573 100644
  			struct winsize ws;
  			int arg;
  
-@@ -130,22 +128,6 @@ int stress_pty(const args_t *args)
+@@ -133,22 +131,6 @@ static int stress_pty(const args_t *args)
  			if (ioctl(ptys[i].slave, TCSETSF, &ios) < 0)
  				pr_fail_err("ioctl TCSETSF on slave pty");
  #endif
@@ -115,10 +103,10 @@ index 1bd1fbd..b1fe573 100644
  			if (ioctl(ptys[i].slave, TIOCGLCKTRMIOS, &ios) < 0)
  				pr_fail_err("ioctl TIOCGLCKTRMIOS on slave pty");
 diff --git a/stress-resources.c b/stress-resources.c
-index 958c99a..af79abd 100644
+index f3dcfb38..86f9a5ba 100644
 --- a/stress-resources.c
 +++ b/stress-resources.c
-@@ -31,7 +31,6 @@
+@@ -28,7 +28,6 @@
  #include <sys/inotify.h>
  #endif
  #if defined(__linux__)
@@ -127,7 +115,7 @@ index 958c99a..af79abd 100644
  #endif
  #if defined(HAVE_LIB_PTHREAD) && defined(__linux__)
 diff --git a/stress-stackmmap.c b/stress-stackmmap.c
-index 9c83a69..2984f09 100644
+index c2f4c31d..54308777 100644
 --- a/stress-stackmmap.c
 +++ b/stress-stackmmap.c
 @@ -24,7 +24,7 @@
@@ -139,3 +127,6 @@ index 9c83a69..2984f09 100644
  
  #include <ucontext.h>
  
+-- 
+2.17.0
+

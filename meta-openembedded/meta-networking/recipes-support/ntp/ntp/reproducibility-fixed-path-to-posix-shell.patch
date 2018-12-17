@@ -1,0 +1,15 @@
+--- ntp-4.2.8p12.original/sntp/libopts/m4/libopts.m4	2018-11-12 17:54:57.747220846 +1300
++++ ntp-4.2.8p12/sntp/libopts/m4/libopts.m4	2018-11-12 18:00:50.626211641 +1300
+@@ -114,12 +114,6 @@
+   AC_PROG_SED
+   [while :
+   do
+-      POSIX_SHELL=`which bash`
+-      test -x "$POSIX_SHELL" && break
+-      POSIX_SHELL=`which dash`
+-      test -x "$POSIX_SHELL" && break
+-      POSIX_SHELL=/usr/xpg4/bin/sh
+-      test -x "$POSIX_SHELL" && break
+       POSIX_SHELL=`/bin/sh -c '
+           exec 2>/dev/null
+           if ! true ; then exit 1 ; fi

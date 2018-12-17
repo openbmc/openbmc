@@ -180,3 +180,26 @@ class ToolchainOptions(OESelftestTestCase):
 
         bitbake('gcc-runtime libgfortran')
 
+class SourceMirroring(OESelftestTestCase):
+    # Can we download everything from the Yocto Sources Mirror over http only
+    def test_yocto_source_mirror(self):
+        self.write_config("""
+BB_ALLOWED_NETWORKS = "downloads.yoctoproject.org"
+MIRRORS = ""
+DL_DIR = "${TMPDIR}/test_downloads"
+PREMIRRORS = "\\
+    bzr://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \\n \\
+    cvs://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \\n \\
+    git://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \\n \\
+    gitsm://.*/.* http://downloads.yoctoproject.org/mirror/sources/ \\n \\
+    hg://.*/.*    http://downloads.yoctoproject.org/mirror/sources/ \\n \\
+    osc://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \\n \\
+    p4://.*/.*    http://downloads.yoctoproject.org/mirror/sources/ \\n \\
+    svn://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \\n \\
+    ftp://.*/.*      http://downloads.yoctoproject.org/mirror/sources/ \\n \\
+    http://.*/.*     http://downloads.yoctoproject.org/mirror/sources/ \\n \\
+    https://.*/.*    http://downloads.yoctoproject.org/mirror/sources/ \\n"
+""")
+
+        bitbake("world --runall fetch")
+

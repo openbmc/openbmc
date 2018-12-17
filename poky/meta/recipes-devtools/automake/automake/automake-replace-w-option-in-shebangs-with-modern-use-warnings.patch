@@ -1,4 +1,4 @@
-From 41e06b7a354774913dcd2e32a35440e407843357 Mon Sep 17 00:00:00 2001
+From 081385f4d4bba367afad3bff1fa034f5263305e6 Mon Sep 17 00:00:00 2001
 From: Serhii Popovych <spopovyc@cisco.com>
 Date: Wed, 10 Feb 2016 17:07:32 +0000
 Subject: [PATCH] perl: Replace -w option in shebangs with modern "use
@@ -15,24 +15,24 @@ line and add "use warnings" statement.
 
 Upstream-Status: Pending
 Signed-off-by: Serhii Popovych <spopovyc@cisco.com>
----
- bin/aclocal.in     | 3 ++-
- bin/automake.in    | 3 ++-
- t/wrap/aclocal.in  | 3 ++-
- t/wrap/automake.in | 3 ++-
- 4 files changed, 8 insertions(+), 4 deletions(-)
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
 
-Index: automake-1.15.1/bin/aclocal.in
-===================================================================
---- automake-1.15.1.orig/bin/aclocal.in
-+++ automake-1.15.1/bin/aclocal.in
+---
+ bin/aclocal.in  | 3 ++-
+ bin/automake.in | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/bin/aclocal.in b/bin/aclocal.in
+index b3715d9..461d453 100644
+--- a/bin/aclocal.in
++++ b/bin/aclocal.in
 @@ -1,4 +1,4 @@
 -#!@PERL@ -w
 +#!@PERL@
  # -*- perl -*-
  # @configure_input@
  
-@@ -33,6 +33,7 @@ BEGIN
+@@ -32,6 +32,7 @@ BEGIN
  }
  
  use strict;
@@ -40,17 +40,17 @@ Index: automake-1.15.1/bin/aclocal.in
  
  use Automake::Config;
  use Automake::General;
-Index: automake-1.15.1/bin/automake.in
-===================================================================
---- automake-1.15.1.orig/bin/automake.in
-+++ automake-1.15.1/bin/automake.in
+diff --git a/bin/automake.in b/bin/automake.in
+index 8377d20..3a66965 100644
+--- a/bin/automake.in
++++ b/bin/automake.in
 @@ -1,4 +1,4 @@
 -#!@PERL@ -w
 +#!@PERL@
  # -*- perl -*-
  # @configure_input@
  
-@@ -28,6 +28,7 @@ eval 'case $# in 0) exec @PERL@ -S "$0";
+@@ -28,6 +28,7 @@ eval 'case $# in 0) exec @PERL@ -S "$0";; *) exec @PERL@ -S "$0" "$@";; esac'
  package Automake;
  
  use strict;
@@ -58,39 +58,3 @@ Index: automake-1.15.1/bin/automake.in
  
  BEGIN
  {
-Index: automake-1.15.1/t/wrap/aclocal.in
-===================================================================
---- automake-1.15.1.orig/t/wrap/aclocal.in
-+++ automake-1.15.1/t/wrap/aclocal.in
-@@ -1,4 +1,4 @@
--#!@PERL@ -w
-+#!@PERL@
- # @configure_input@
- 
- # Copyright (C) 2012-2017 Free Software Foundation, Inc.
-@@ -19,6 +19,7 @@
- BEGIN
- {
-   use strict;
-+  use warnings;
-   @Aclocal::perl_libdirs = ('@abs_top_srcdir@/lib');
-   unshift @Aclocal::perl_libdirs, '@abs_top_builddir@/lib'
-     if '@srcdir@' ne '.';
-Index: automake-1.15.1/t/wrap/automake.in
-===================================================================
---- automake-1.15.1.orig/t/wrap/automake.in
-+++ automake-1.15.1/t/wrap/automake.in
-@@ -1,4 +1,4 @@
--#!@PERL@ -w
-+#!@PERL@
- # @configure_input@
- 
- # Copyright (C) 2012-2017 Free Software Foundation, Inc.
-@@ -19,6 +19,7 @@
- BEGIN
- {
-   use strict;
-+  use warnings;
-   @Automake::perl_libdirs = ('@abs_top_srcdir@/lib');
-   unshift @Automake::perl_libdirs, '@abs_top_builddir@/lib'
-     if '@srcdir@' ne '.';

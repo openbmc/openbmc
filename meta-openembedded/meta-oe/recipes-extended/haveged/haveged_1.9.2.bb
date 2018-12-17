@@ -12,6 +12,8 @@ SRC_URI = "http://www.issihosts.com/haveged/haveged-${PV}.tar.gz \
 SRC_URI[md5sum] = "fb1d8b3dcbb9d06b30eccd8aa500fd31"
 SRC_URI[sha256sum] = "f77d9adbdf421b61601fa29faa9ce3b479d910f73c66b9e364ba8642ccbfbe70"
 
+UPSTREAM_CHECK_URI = "http://www.issihosts.com/haveged/downloads.html"
+
 inherit autotools update-rc.d systemd
 
 EXTRA_OECONF = "\

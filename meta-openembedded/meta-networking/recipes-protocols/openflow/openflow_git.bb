@@ -6,4 +6,5 @@ PV = "1.0+git${SRCPV}"
 SRC_URI += "\
            file://0001-Check-and-use-strlcpy-from-libc-before-defining-own.patch \
            file://0002-lib-netdev-Adjust-header-include-sequence.patch \
+           file://0001-generate-not-static-get_dh-functions.patch \
            "

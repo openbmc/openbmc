@@ -1,0 +1,80 @@
+libxslt-1.1.32: Fix handling of RVTs returned from nested EXSLT functions
+
+[No upstream tracking] -- https://bugzilla.gnome.org/show_bug.cgi?id=792580
+
+Set the context variable to NULL when evaluating EXSLT functions.
+Fixes potential use-after-free errors or memory leaks.
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/libxslt/commit/8bd32f7753ac253a54279a0b6a88d15a57076bb0]
+bug: 792580
+Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
+
+diff --git a/libexslt/functions.c b/libexslt/functions.c
+index dc794e3..8511cb0 100644
+--- a/libexslt/functions.c
++++ b/libexslt/functions.c
+@@ -280,6 +280,7 @@ exsltFuncFunctionFunction (xmlXPathParserContextPtr ctxt, int nargs) {
+     exsltFuncFunctionData *func;
+     xmlNodePtr paramNode, oldInsert, fake;
+     int oldBase;
++    void *oldCtxtVar;
+     xsltStackElemPtr params = NULL, param;
+     xsltTransformContextPtr tctxt = xsltXPathGetTransformContext(ctxt);
+     int i, notSet;
+@@ -418,11 +419,14 @@ exsltFuncFunctionFunction (xmlXPathParserContextPtr ctxt, int nargs) {
+     fake = xmlNewDocNode(tctxt->output, NULL,
+ 			 (const xmlChar *)"fake", NULL);
+     oldInsert = tctxt->insert;
++    oldCtxtVar = tctxt->contextVariable;
+     tctxt->insert = fake;
++    tctxt->contextVariable = NULL;
+     xsltApplyOneTemplate (tctxt, tctxt->node,
+ 			  func->content, NULL, NULL);
+     xsltLocalVariablePop(tctxt, tctxt->varsBase, -2);
+     tctxt->insert = oldInsert;
++    tctxt->contextVariable = oldCtxtVar;
+     tctxt->varsBase = oldBase;	/* restore original scope */
+     if (params != NULL)
+ 	xsltFreeStackElemList(params);
+diff --git a/tests/docs/bug-209.xml b/tests/docs/bug-209.xml
+new file mode 100644
+index 0000000..69d62f2
+--- /dev/null
++++ b/tests/docs/bug-209.xml
+@@ -0,0 +1 @@
++<doc/>
+diff --git a/tests/general/bug-209.out b/tests/general/bug-209.out
+new file mode 100644
+index 0000000..e829790
+--- /dev/null
++++ b/tests/general/bug-209.out
+@@ -0,0 +1,2 @@
++<?xml version="1.0"?>
++<result/>
+diff --git a/tests/general/bug-209.xsl b/tests/general/bug-209.xsl
+new file mode 100644
+index 0000000..fe69ac6
+--- /dev/null
++++ b/tests/general/bug-209.xsl
+@@ -0,0 +1,21 @@
++<xsl:stylesheet
++    version="1.0"
++    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
++    xmlns:func="http://exslt.org/functions"
++    extension-element-prefixes="func">
++
++    <xsl:template match="/">
++        <xsl:variable name="v" select="func:a()" />
++        <xsl:copy-of select="$v"/>
++    </xsl:template>
++
++    <func:function name="func:a">
++        <func:result select="func:b()" />
++    </func:function>
++
++    <func:function name="func:b">
++        <func:result>
++            <result/>
++        </func:result>
++    </func:function>
++</xsl:stylesheet>

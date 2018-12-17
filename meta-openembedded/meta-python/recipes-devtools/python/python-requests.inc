@@ -1,10 +1,16 @@
 DESCRIPTION = "Python HTTP for Humans."
 HOMEPAGE = "http://python-requests.org"
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=979d6a23b143e13ea0e5e3aa81248820"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=bfbeafb85a2cee261510d65d5ec19156"
 
-SRC_URI[md5sum] = "081412b2ef79bdc48229891af13f4d82"
-SRC_URI[sha256sum] = "9c443e7324ba5b85070c4a818ade28bfabedf16ea10206da1132edaa6dda237e"
+FILESEXTRAPATHS_prepend := "${THISDIR}/python-requests:"
+
+SRC_URI += "file://0001-Strip-Authorization-header-whenever-root-URL-changes.patch \
+            file://0002-Rework-authorization-stripping-logic-as-discussed.patch \
+            "
+
+SRC_URI[md5sum] = "6c1a31afec9d614e2e71a91ee6ca2878"
+SRC_URI[sha256sum] = "ec22d826a36ed72a7358ff3fe56cbd4ba69dd7a6718ffd450ff0e9df7a47ce6a"
 
 inherit pypi
 

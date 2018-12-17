@@ -1,7 +1,7 @@
-From 12a0b8d81e1fda6ba98abdce8d6f09f9555ebcf5 Mon Sep 17 00:00:00 2001
+From d6e12d52f9cef7f5e6315003ceaa236f6cc7723b Mon Sep 17 00:00:00 2001
 From: Andre McCurdy <amccurdy@gmail.com>
 Date: Sat, 30 Apr 2016 15:29:06 -0700
-Subject: [PATCH 07/10] use <asm/sgidefs.h>
+Subject: [PATCH 07/11] use <asm/sgidefs.h>
 
 Build fix for MIPS with musl libc
 
@@ -19,7 +19,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/gdb/mips-linux-nat.c b/gdb/mips-linux-nat.c
-index f2df1b9907..d24664cb56 100644
+index 68a7587af2..2b77221372 100644
 --- a/gdb/mips-linux-nat.c
 +++ b/gdb/mips-linux-nat.c
 @@ -31,7 +31,7 @@
@@ -32,5 +32,5 @@ index f2df1b9907..d24664cb56 100644
  #include <asm/ptrace.h>
  #include "inf-ptrace.h"
 -- 
-2.13.1
+2.18.0
 

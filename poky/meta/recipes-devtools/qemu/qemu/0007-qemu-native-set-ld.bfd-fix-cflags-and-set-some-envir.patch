@@ -1,4 +1,4 @@
-From 4b21a8db60c32f93df56e6111bb926c91680d6f2 Mon Sep 17 00:00:00 2001
+From 2d29d52b6f755758cfca6af0bcfd78091e16a7bc Mon Sep 17 00:00:00 2001
 From: Stephen Arnold <sarnold@vctlabs.com>
 Date: Sun, 12 Jun 2016 18:09:56 -0700
 Subject: [PATCH] qemu-native: set ld.bfd, fix cflags, and set some environment
@@ -9,10 +9,10 @@ Upstream-Status: Pending
  1 file changed, 4 deletions(-)
 
 diff --git a/configure b/configure
-index c30fd45..b5312f4 100755
+index 69e05fb6c0..12fc3d8bdc 100755
 --- a/configure
 +++ b/configure
-@@ -5115,10 +5115,6 @@ fi
+@@ -5413,10 +5413,6 @@ write_c_skeleton
  if test "$gcov" = "yes" ; then
    CFLAGS="-fprofile-arcs -ftest-coverage -g $CFLAGS"
    LDFLAGS="-fprofile-arcs -ftest-coverage $LDFLAGS"
@@ -22,4 +22,4 @@ index c30fd45..b5312f4 100755
 -  CFLAGS="-O2 $CFLAGS"
  fi
  
- ##########################################
+ if test "$have_asan" = "yes"; then

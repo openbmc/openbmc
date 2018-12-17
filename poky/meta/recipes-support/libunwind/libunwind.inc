@@ -14,8 +14,6 @@ PACKAGECONFIG[latexdocs] = "--enable-documentation, --disable-documentation, lat
 EXTRA_OECONF_arm = "--enable-debug-frame"
 EXTRA_OECONF_aarch64 = "--enable-debug-frame"
 
-SECURITY_LDFLAGS_append_libc-musl = " -lssp_nonshared -lssp"
-
 do_install_append () {
 	oe_multilib_header libunwind.h
 }

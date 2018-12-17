@@ -21,10 +21,10 @@ FILES_${PN} += "${libdir}/gtk-2.0/*/engines/*.so"
 FILES_gtk3-xfce-engine += "${libdir}/gtk-3.0/*/theming-engines/*.so"
 FILES_${PN}-themes += "${datadir}/themes"
 
-FILES_${PN}-dbg += "${libdir}/gtk-3.0/*/theming-engines/.debug \
-                    ${libdir}/gtk-2.0/*/engines/.debug"
-FILES_${PN}-dev += "${libdir}/gtk-2.0/*/engines/*.la \
-                    ${libdir}/gtk-3.0/*/theming-engines/*.la"
+FILES_${PN}-dev += " \
+    ${libdir}/gtk-2.0/*/engines/*.la \
+    ${libdir}/gtk-3.0/*/theming-engines/*.la \
+"
 
 RDEPENDS_${PN} += "${PN}-themes"
 RDEPENDS_gtk3-xfce-engine += "${PN}-themes"

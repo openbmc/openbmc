@@ -1,0 +1,29 @@
+From 3294266c6a875c5009065c1ae5d0b86200c4147c Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Sun, 29 Apr 2018 00:52:31 +0200
+Subject: [PATCH 6/6] vmcore-dmesg: fix warning
+
+ # define __bitwise
+
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+---
+ vmcore-dmesg/vmcore-dmesg.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/vmcore-dmesg/vmcore-dmesg.c b/vmcore-dmesg/vmcore-dmesg.c
+index e340ef4..91e4789 100644
+--- a/vmcore-dmesg/vmcore-dmesg.c
++++ b/vmcore-dmesg/vmcore-dmesg.c
+@@ -2,6 +2,9 @@
+ #define _GNU_SOURCE
+ #define _LARGEFILE_SOURCE 1
+ #define _FILE_OFFSET_BITS 64
++#ifdef __KLIBC__
++#include <sys/types.h>
++#endif
+ #include <endian.h>
+ #include <byteswap.h>
+ #include <stdio.h>
+-- 
+2.7.4
+

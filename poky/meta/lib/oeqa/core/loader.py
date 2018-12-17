@@ -44,6 +44,8 @@ def _built_modules_dict(modules):
         # Assumption: package and module names do not contain upper case
         # characters, whereas class names do
         m = re.match(r'^(\w+)(?:\.(\w[^.]*)(?:\.([^.]+))?)?$', module, flags=re.ASCII)
+        if not m:
+            continue
 
         module_name, class_name, test_name = m.groups()
 

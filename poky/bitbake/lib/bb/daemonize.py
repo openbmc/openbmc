@@ -16,6 +16,10 @@ def createDaemon(function, logfile):
     background as a daemon, returning control to the caller.
     """
 
+    # Ensure stdout/stderror are flushed before forking to avoid duplicate output
+    sys.stdout.flush()
+    sys.stderr.flush()
+
     try:
         # Fork a child process so the parent can exit.  This returns control to
         # the command-line or shell.  It also guarantees that the child will not
@@ -49,8 +53,8 @@ def createDaemon(function, logfile):
             # exit() or _exit()?
             # _exit is like exit(), but it doesn't call any functions registered
             # with atexit (and on_exit) or any registered signal handlers.  It also
-            # closes any open file descriptors.  Using exit() may cause all stdio
-            # streams to be flushed twice and any temporary files may be unexpectedly
+            # closes any open file descriptors, but doesn't flush any buffered output.
+            # Using exit() may cause all any temporary files to be unexpectedly
             # removed.  It's therefore recommended that child branches of a fork()
             # and the parent branch(es) of a daemon use _exit().
             os._exit(0)
@@ -61,17 +65,19 @@ def createDaemon(function, logfile):
     # The second child.
 
     # Replace standard fds with our own
-    si = open('/dev/null', 'r')
-    os.dup2(si.fileno(), sys.stdin.fileno())
+    with open('/dev/null', 'r') as si:
+        os.dup2(si.fileno(), sys.stdin.fileno())
 
     try:
         so = open(logfile, 'a+')
-        se = so
         os.dup2(so.fileno(), sys.stdout.fileno())
-        os.dup2(se.fileno(), sys.stderr.fileno())
+        os.dup2(so.fileno(), sys.stderr.fileno())
     except io.UnsupportedOperation:
         sys.stdout = open(logfile, 'a+')
-        sys.stderr = sys.stdout
+
+    # Have stdout and stderr be the same so log output matches chronologically
+    # and there aren't two seperate buffers
+    sys.stderr = sys.stdout
 
     try:
         function()
@@ -79,4 +85,9 @@ def createDaemon(function, logfile):
         traceback.print_exc()
     finally:
         bb.event.print_ui_queue()
+        # os._exit() doesn't flush open files like os.exit() does. Manually flush
+        # stdout and stderr so that any logging output will be seen, particularly
+        # exception tracebacks.
+        sys.stdout.flush()
+        sys.stderr.flush()
         os._exit(0)

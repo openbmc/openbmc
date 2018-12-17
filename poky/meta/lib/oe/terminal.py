@@ -112,7 +112,7 @@ class Screen(Terminal):
             bb.event.fire(bb.event.LogExecTTY(msg, "screen -r %s" % s_id,
                                               0.5, 10), d)
         else:
-            logger.warn(msg)
+            logger.warning(msg)
 
 class TmuxRunning(Terminal):
     """Open a new pane in the current running tmux window"""
@@ -168,7 +168,7 @@ class Tmux(Terminal):
         if d:
             bb.event.fire(bb.event.LogExecTTY(msg, attach_cmd, 0.5, 10), d)
         else:
-            logger.warn(msg)
+            logger.warning(msg)
 
 class Custom(Terminal):
     command = 'false' # This is a placeholder
@@ -180,7 +180,7 @@ class Custom(Terminal):
             if not '{command}' in self.command:
                 self.command += ' {command}'
             Terminal.__init__(self, sh_cmd, title, env, d)
-            logger.warn('Custom terminal was started.')
+            logger.warning('Custom terminal was started.')
         else:
             logger.debug(1, 'No custom terminal (OE_TERMINAL_CUSTOMCMD) set')
             raise UnsupportedTerminal('OE_TERMINAL_CUSTOMCMD not set')

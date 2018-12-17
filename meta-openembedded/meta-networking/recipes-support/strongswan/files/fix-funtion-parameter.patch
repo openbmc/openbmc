@@ -3,7 +3,7 @@ From: "Roy.Li" <rongqing.li@windriver.com>
 Date: Tue, 4 Mar 2014 14:38:42 +0800
 Subject: [PATCH] fix the function parameter
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
 Original openssl_diffie_hellman_create has three parameters, but
 it is reassigned a function pointer which has one parameter, and

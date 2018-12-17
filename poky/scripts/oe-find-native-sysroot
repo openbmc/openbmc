@@ -110,6 +110,4 @@ pseudo="$OECORE_NATIVE_SYSROOT/usr/bin/pseudo"
 if [ -e "$pseudo" ]; then
     echo "PSEUDO=$pseudo"
     PSEUDO="$pseudo"
-else
-    echo "PSEUDO $pseudo is not found."
 fi

@@ -20,11 +20,6 @@
 # SOFTWARE.
 #
 
-# Setup environment
-for env_setup_script in `ls $1/environment-setup-*`; do
-	. $env_setup_script
-done
-
 # ICECC_PATH will have been found icecc-env.sh
 if [ -z "$ICECC_PATH" ]; then
     exit 0

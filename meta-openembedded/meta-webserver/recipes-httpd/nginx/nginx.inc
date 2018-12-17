@@ -9,7 +9,7 @@ LICENSE = "BSD-2-Clause"
 
 SECTION = "net"
 
-DEPENDS = "libpcre zlib openssl"
+DEPENDS = "libpcre zlib"
 
 SRC_URI = " \
     http://nginx.org/download/nginx-${PV}.tar.gz \
@@ -34,7 +34,10 @@ NGINX_USER   ?= "www"
 EXTRA_OECONF = ""
 DISABLE_STATIC = ""
 
+PACKAGECONFIG ??= "ssl"
+
 PACKAGECONFIG[http2] = "--with-http_v2_module,,"
+PACKAGECONFIG[ssl] = "--with-http_ssl_module,,openssl"
 
 do_configure () {
     if [ "${SITEINFO_BITS}" = "64" ]; then
@@ -71,7 +74,7 @@ do_configure () {
     --http-scgi-temp-path=/run/nginx/scgi_temp \
     --pid-path=/run/nginx/nginx.pid \
     --prefix=${prefix} \
-    --with-http_ssl_module \
+    --with-threads \
     --with-http_gzip_static_module \
     ${EXTRA_OECONF} ${PACKAGECONFIG_CONFARGS}
 }

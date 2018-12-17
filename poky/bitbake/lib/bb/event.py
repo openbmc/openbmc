@@ -141,6 +141,9 @@ def print_ui_queue():
     logger = logging.getLogger("BitBake")
     if not _uiready:
         from bb.msg import BBLogFormatter
+        # Flush any existing buffered content
+        sys.stdout.flush()
+        sys.stderr.flush()
         stdout = logging.StreamHandler(sys.stdout)
         stderr = logging.StreamHandler(sys.stderr)
         formatter = BBLogFormatter("%(levelname)s: %(message)s")
@@ -395,7 +398,7 @@ class RecipeEvent(Event):
         Event.__init__(self)
 
 class RecipePreFinalise(RecipeEvent):
-    """ Recipe Parsing Complete but not yet finialised"""
+    """ Recipe Parsing Complete but not yet finalised"""
 
 class RecipeTaskPreProcess(RecipeEvent):
     """

@@ -1,0 +1,49 @@
+From 25302469b6ceb2fa10ac68c07da25c6068ffd218 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 7 Nov 2018 01:16:59 -0800
+Subject: [PATCH] Fix build with vc4 driver
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ SubtitleRenderer.cpp | 7 ++++++-
+ SubtitleRenderer.h   | 1 +
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/SubtitleRenderer.cpp b/SubtitleRenderer.cpp
+index 540162f..fcfc708 100644
+--- a/SubtitleRenderer.cpp
++++ b/SubtitleRenderer.cpp
+@@ -36,6 +36,11 @@
+ #include <algorithm>
+ 
+ #include "bcm_host.h"
++typedef struct {
++  DISPMANX_ELEMENT_HANDLE_T element;
++  int width;
++  int height;
++} EGL_DISPMANX_WINDOW_T;
+ 
+ class BoxRenderer {
+   VGPath path_;
+@@ -618,4 +623,4 @@ void SubtitleRenderer::set_rect(int x1, int y1, int x2, int y2) BOOST_NOEXCEPT
+     float font_size = height*font_size_;
+     ENFORCE(!FT_Set_Pixel_Sizes(ft_face_, 0, font_size));
+     ENFORCE(!FT_Set_Pixel_Sizes(ft_face_italic_, 0, font_size));
+-}
+\ No newline at end of file
++}
+diff --git a/SubtitleRenderer.h b/SubtitleRenderer.h
+index 3f60798..ebac9a1 100644
+--- a/SubtitleRenderer.h
++++ b/SubtitleRenderer.h
+@@ -26,6 +26,7 @@
+ // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ // DEALINGS IN THE SOFTWARE.
+ 
++#include <interface/vmcs_host/vc_dispmanx.h>
+ #include <EGL/egl.h>
+ #include <VG/openvg.h>
+ #include <ft2build.h>
+-- 
+2.19.1
+

@@ -141,7 +141,7 @@ class KernelModuleRecipeHandler(RecipeHandler):
                 warnmsg = 'Unable to find means of passing kernel path into install makefile - if kernel path is hardcoded you will need to patch the makefile'
             if warnmsg:
                 warnmsg += '. Note that the variable KERNEL_SRC will be passed in as the kernel source path.'
-                logger.warn(warnmsg)
+                logger.warning(warnmsg)
                 lines_after.append('# %s' % warnmsg)
 
             return True

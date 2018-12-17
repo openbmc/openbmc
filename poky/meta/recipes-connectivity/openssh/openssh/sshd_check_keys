@@ -56,35 +56,23 @@ while true ; do
     esac
 done
 
-# parse location of keys
-HOST_KEY_RSA=$(grep ^HostKey "${sshd_config}" | grep _rsa_ | tail -1 | awk ' { print $2 } ')
-[ -z "${HOST_KEY_RSA}" ] && HOST_KEY_RSA=$(grep HostKey "${sshd_config}" | grep _rsa_ | tail -1 | awk ' { print $2 } ')
-[ -z "${HOST_KEY_RSA}" ] && HOST_KEY_RSA=$SYSCONFDIR/ssh_host_rsa_key
-HOST_KEY_DSA=$(grep ^HostKey "${sshd_config}" | grep _dsa_ | tail -1 | awk ' { print $2 } ')
-[ -z "${HOST_KEY_DSA}" ] && HOST_KEY_DSA=$(grep HostKey "${sshd_config}" | grep _dsa_ | tail -1 | awk ' { print $2 } ')
-[ -z "${HOST_KEY_DSA}" ] && HOST_KEY_DSA=$SYSCONFDIR/ssh_host_dsa_key
-HOST_KEY_ECDSA=$(grep ^HostKey "${sshd_config}" | grep _ecdsa_ | tail -1 | awk ' { print $2 } ')
-[ -z "${HOST_KEY_ECDSA}" ] && HOST_KEY_ECDSA=$(grep HostKey "${sshd_config}" | grep _ecdsa_ | tail -1 | awk ' { print $2 } ')
-[ -z "${HOST_KEY_ECDSA}" ] && HOST_KEY_ECDSA=$SYSCONFDIR/ssh_host_ecdsa_key
-HOST_KEY_ED25519=$(grep ^HostKey "${sshd_config}" | grep _ed25519_ | tail -1 | awk ' { print $2 } ')
-[ -z "${HOST_KEY_ED25519}" ] && HOST_KEY_ED25519=$(grep HostKey "${sshd_config}" | grep _ed25519_ | tail -1 | awk ' { print $2 } ')
-[ -z "${HOST_KEY_ED25519}" ] && HOST_KEY_ED25519=$SYSCONFDIR/ssh_host_ed25519_key
+HOST_KEYS=$(sed -n 's/^[ \t]*HostKey[ \t]\+\(.*\)/\1/p' "${sshd_config}")
+[ -z "${HOST_KEYS}" ] && HOST_KEYS="$SYSCONFDIR/ssh_host_rsa_key $SYSCONFDIR/ssh_host_ecdsa_key $SYSCONFDIR/ssh_host_ed25519_key"
 
-# create keys if necessary
-if [ ! -f $HOST_KEY_RSA ]; then
-    echo "  generating ssh RSA key..."
-    generate_key $HOST_KEY_RSA rsa
-fi
-if [ ! -f $HOST_KEY_ECDSA ]; then
-    echo "  generating ssh ECDSA key..."
-    generate_key $HOST_KEY_ECDSA ecdsa
-fi
-if [ ! -f $HOST_KEY_DSA ]; then
-    echo "  generating ssh DSA key..."
-    generate_key $HOST_KEY_DSA dsa
-fi
-if [ ! -f $HOST_KEY_ED25519 ]; then
-    echo "  generating ssh ED25519 key..."
-    generate_key $HOST_KEY_ED25519 ed25519
-fi
-
+for key in ${HOST_KEYS} ; do
+    [ -f $key ] && continue
+    case $key in
+    *_rsa_key)
+        echo "  generating ssh RSA host key..."
+        generate_key $key rsa
+        ;;
+    *_ecdsa_key)
+        echo "  generating ssh ECDSA host key..."
+        generate_key $key ecdsa
+        ;;
+    *_ed25519_key)
+        echo "  generating ssh ED25519 host key..."
+        generate_key $key ed25519
+        ;;
+    esac
+done

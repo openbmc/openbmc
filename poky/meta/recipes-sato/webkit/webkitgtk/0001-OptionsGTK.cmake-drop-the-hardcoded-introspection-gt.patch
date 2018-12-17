@@ -1,4 +1,4 @@
-From 48648570e449cf7f84a26dc03c1e3f620fa69757 Mon Sep 17 00:00:00 2001
+From bed4cf4aaa6aad4172ec9942e9039fb8e1ef68a4 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 29 Feb 2016 18:13:39 +0200
 Subject: [PATCH] OptionsGTK.cmake: drop the hardcoded introspection/gtkdoc
@@ -11,16 +11,17 @@ through the use of qemu target emulation.
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 
 Upstream-Status: Pending
+
 ---
  Source/cmake/OptionsGTK.cmake | 6 ------
  1 file changed, 6 deletions(-)
 
-Index: webkitgtk-2.12.1/Source/cmake/OptionsGTK.cmake
-===================================================================
---- webkitgtk-2.12.1.orig/Source/cmake/OptionsGTK.cmake
-+++ webkitgtk-2.12.1/Source/cmake/OptionsGTK.cmake
-@@ -424,12 +424,6 @@ if (USE_LIBHYPHEN)
-     endif ()
+diff --git a/Source/cmake/OptionsGTK.cmake b/Source/cmake/OptionsGTK.cmake
+index 661b40e..404441b 100644
+--- a/Source/cmake/OptionsGTK.cmake
++++ b/Source/cmake/OptionsGTK.cmake
+@@ -352,12 +352,6 @@ if (ENABLED_COMPILER_SANITIZERS)
+     set(ENABLE_INTROSPECTION OFF)
  endif ()
  
 -# Override the cached variables, gtk-doc and gobject-introspection do not really work when cross-building.

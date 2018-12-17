@@ -1,0 +1,82 @@
+From 9516fc4260f701c6d9db0c341bb36480362e1747 Mon Sep 17 00:00:00 2001
+From: Otavio Salvador <otavio@ossystems.com.br>
+Date: Thu, 5 Jul 2018 10:26:48 -0300
+Subject: [PATCH 4/5] Fail silently if system Qt installation is broken
+Organization: O.S. Systems Software LTDA.
+
+Fixes a regression in behaviour from 2.8.10 to 2.8.11 resulting in the
+following error if the system Qt installation is broken:
+
+CMake Error at Modules/FindQt4.cmake:1028 (set_property):
+  set_property could not find TARGET Qt4::QtCore.  Perhaps it has not yet
+  been created.
+Call Stack (most recent call first):
+  Tests/RunCMake/CMakeLists.txt:79 (find_package)
+
+Upstream-Status: Pending
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+
+The patch was slightly adapted in order to match cmake 3.2.2:
+Another set_property was introduced which had to be included
+within the if(QT_QTCORE_FOUND) statement.
+
+Signed-off-by: Moritz Blume <moritz.blume@bmw-carit.de>
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+---
+ Modules/FindQt4.cmake | 39 ++++++++++++++++++++-------------------
+ 1 file changed, 20 insertions(+), 19 deletions(-)
+
+diff --git a/Modules/FindQt4.cmake b/Modules/FindQt4.cmake
+index 7ad981879..8b6f43cda 100644
+--- a/Modules/FindQt4.cmake
++++ b/Modules/FindQt4.cmake
+@@ -987,25 +987,26 @@ if (QT_QMAKE_EXECUTABLE AND
+     endif()
+   endmacro()
+ 
+-
+-  # Set QT_xyz_LIBRARY variable and add
+-  # library include path to QT_INCLUDES
+-  _QT4_ADJUST_LIB_VARS(QtCore)
+-  set_property(TARGET Qt4::QtCore APPEND PROPERTY
+-    INTERFACE_INCLUDE_DIRECTORIES
+-      "${QT_MKSPECS_DIR}/default"
+-      ${QT_INCLUDE_DIR}
+-  )
+-  set_property(TARGET Qt4::QtCore APPEND PROPERTY
+-    INTERFACE_COMPILE_DEFINITIONS
+-      $<$<NOT:$<CONFIG:Debug>>:QT_NO_DEBUG>
+-  )
+-  set_property(TARGET Qt4::QtCore PROPERTY
+-    INTERFACE_QT_MAJOR_VERSION 4
+-  )
+-  set_property(TARGET Qt4::QtCore APPEND PROPERTY
+-    COMPATIBLE_INTERFACE_STRING QT_MAJOR_VERSION
+-  )
++  if(QT_QTCORE_FOUND)
++    # Set QT_xyz_LIBRARY variable and add
++    # library include path to QT_INCLUDES
++    _QT4_ADJUST_LIB_VARS(QtCore)
++    set_property(TARGET Qt4::QtCore APPEND PROPERTY
++      INTERFACE_INCLUDE_DIRECTORIES
++        "${QT_MKSPECS_DIR}/default"
++        ${QT_INCLUDE_DIR}
++    )
++    set_property(TARGET Qt4::QtCore APPEND PROPERTY
++      INTERFACE_COMPILE_DEFINITIONS
++        $<$<NOT:$<CONFIG:Debug>>:QT_NO_DEBUG>
++    )
++    set_property(TARGET Qt4::QtCore PROPERTY
++      INTERFACE_QT_MAJOR_VERSION 4
++    )
++    set_property(TARGET Qt4::QtCore APPEND PROPERTY
++      COMPATIBLE_INTERFACE_STRING QT_MAJOR_VERSION
++    )
++  endif()
+ 
+   foreach(QT_MODULE ${QT_MODULES})
+     _QT4_ADJUST_LIB_VARS(${QT_MODULE})
+-- 
+2.18.0
+

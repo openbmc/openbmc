@@ -1,8 +1,8 @@
-From 8ce9fbab2990609bdace457e146160334e931c89 Mon Sep 17 00:00:00 2001
+From 792693bb90768cfde4898e8dd31ee1b5de803d2f Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 8 Jun 2017 17:08:09 +0300
-Subject: [PATCH 14/15] build/pack.c: remove static local variables from
- buildHost() and getBuildTime()
+Subject: [PATCH] build/pack.c: remove static local variables from buildHost()
+ and getBuildTime()
 
 Their use is causing difficult to diagnoze data races when building multiple
 packages in parallel, and is a bad idea in general, as it also makes it more
@@ -20,7 +20,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  3 files changed, 74 insertions(+), 72 deletions(-)
 
 diff --git a/build/build.c b/build/build.c
-index 81152e53e..6001f9e52 100644
+index 13c3df2..b154f08 100644
 --- a/build/build.c
 +++ b/build/build.c
 @@ -6,6 +6,8 @@
@@ -99,7 +99,7 @@ index 81152e53e..6001f9e52 100644
  	if (((what & RPMBUILD_PACKAGESOURCE) && !test) &&
 -	    (rc = packageSources(spec, &cookie)))
 +	    (rc = packageSources(spec, &cookie, buildTime, host)))
- 		return rc;
+ 		goto exit;
  
  	if (((what & RPMBUILD_PACKAGEBINARY) && !test) &&
 -	    (rc = packageBinaries(spec, cookie, (didBuild == 0))))
@@ -116,7 +116,7 @@ index 81152e53e..6001f9e52 100644
      spec->rootDir = NULL;
      if (rc != RPMRC_OK && rpmlogGetNrecs() > 0) {
 diff --git a/build/pack.c b/build/pack.c
-index df15876ff..17a4b0905 100644
+index df15876..17a4b09 100644
 --- a/build/pack.c
 +++ b/build/pack.c
 @@ -6,8 +6,6 @@
@@ -305,7 +305,7 @@ index df15876ff..17a4b0905 100644
  	/* Do check SRPM package if enabled */
  	if (rc == RPMRC_OK && pkgcheck[0] != ' ') {
 diff --git a/build/rpmbuild_internal.h b/build/rpmbuild_internal.h
-index 439b7d3b5..07e8338ad 100644
+index 439b7d3..07e8338 100644
 --- a/build/rpmbuild_internal.h
 +++ b/build/rpmbuild_internal.h
 @@ -427,19 +427,23 @@ rpmRC processSourceFiles(rpmSpec spec, rpmBuildPkgFlags pkgFlags);
@@ -334,6 +334,3 @@ index 439b7d3b5..07e8338ad 100644
  
  RPM_GNUC_INTERNAL
  int addLangTag(rpmSpec spec, Header h, rpmTagVal tag,
--- 
-2.14.2
-

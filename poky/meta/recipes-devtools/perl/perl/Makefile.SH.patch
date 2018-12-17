@@ -12,10 +12,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  Makefile.SH | 147 ++++++++++++++++++++++++++++--------------------------------
  1 file changed, 68 insertions(+), 79 deletions(-)
 
-Index: perl-5.24.1/Makefile.SH
+Index: perl-5.24.4/Makefile.SH
 ===================================================================
---- perl-5.24.1.orig/Makefile.SH
-+++ perl-5.24.1/Makefile.SH
+--- perl-5.24.4.orig/Makefile.SH
++++ perl-5.24.4/Makefile.SH
 @@ -48,10 +48,10 @@ case "$useshrplib" in
  true)
  	# Prefix all runs of 'miniperl' and 'perl' with
@@ -271,9 +271,9 @@ Index: perl-5.24.1/Makefile.SH
  	$(MINIPERL) autodoc.pl
  
  pod/perlmodlib.pod: $(MINIPERL_EXE) pod/perlmodlib.PL MANIFEST
-@@ -1089,7 +1099,7 @@ pod/perl5241delta.pod: pod/perldelta.pod
- 	$(RMS) pod/perl5241delta.pod
- 	$(LNS) perldelta.pod pod/perl5241delta.pod
+@@ -1089,7 +1099,7 @@ pod/perl5244delta.pod: pod/perldelta.pod
+ 	$(RMS) pod/perl5244delta.pod
+ 	$(LNS) perldelta.pod pod/perl5244delta.pod
  
 -extra.pods: $(MINIPERL_EXE)
 +extra.pods:

@@ -15,6 +15,7 @@ SRC_URI = "git://github.com/linux-wpan/lowpan-tools \
            file://0001-src-iz.c-Undef-dprintf-before-redefining.patch \
            file://0001-Remove-newline-from-format-line.patch \
            file://0001-coordinator-Fix-strncpy-range-warning.patch \
+           file://0001-Fix-potential-string-truncation-in-strncpy.patch \
            "
 SRCREV = "1c2d8674cc6f4b1166a066e8822e295c105ae7a2"
 

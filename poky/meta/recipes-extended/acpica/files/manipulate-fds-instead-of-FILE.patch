@@ -1,4 +1,4 @@
-From 69171c22f3872ecb4c1ab27985e93ca44084595e Mon Sep 17 00:00:00 2001
+From 540d80469e6a7dce6baf7214df90e86daffc5175 Mon Sep 17 00:00:00 2001
 From: Fan Xin <fan.xin@jp.fujitsu.com>
 Date: Mon, 5 Jun 2017 13:26:38 +0900
 Subject: [PATCH] aslfiles.c: manipulate fds instead of FILE
@@ -16,18 +16,20 @@ Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
 Rebase on acpica 20170303
 
 Signed-off-by: Fan Xin <fan.xin@jp.fujitsu.com>
----
- acpica-unix2-20170303/source/compiler/aslfiles.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/acpica-unix2-20170303/source/compiler/aslfiles.c b/acpica-unix2-20170303/source/compiler/aslfiles.c
-index 809090c..97898b1 100644
---- a/acpica-unix2-20170303/source/compiler/aslfiles.c
-+++ b/acpica-unix2-20170303/source/compiler/aslfiles.c
-@@ -44,6 +44,10 @@
+---
+ source/compiler/aslfiles.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/source/compiler/aslfiles.c b/source/compiler/aslfiles.c
+index 82865db..cc072dc 100644
+--- a/source/compiler/aslfiles.c
++++ b/source/compiler/aslfiles.c
+@@ -43,6 +43,11 @@
+ 
  #include "aslcompiler.h"
  #include "acapps.h"
- #include "dtcompiler.h"
++#include "dtcompiler.h"
 +#include <sys/types.h>
 +#include <sys/stat.h>
 +#include <fcntl.h>
@@ -35,7 +37,7 @@ index 809090c..97898b1 100644
  
  #define _COMPONENT          ACPI_COMPILER
          ACPI_MODULE_NAME    ("aslfiles")
-@@ -607,6 +611,8 @@ FlOpenMiscOutputFiles (
+@@ -606,6 +611,8 @@ FlOpenMiscOutputFiles (
  
      if (Gbl_DebugFlag)
      {
@@ -44,7 +46,7 @@ index 809090c..97898b1 100644
          Filename = FlGenerateFilename (FilenamePrefix, FILE_SUFFIX_DEBUG);
          if (!Filename)
          {
-@@ -618,10 +624,10 @@ FlOpenMiscOutputFiles (
+@@ -617,10 +624,10 @@ FlOpenMiscOutputFiles (
          /* Open the debug file as STDERR, text mode */
  
          Gbl_Files[ASL_FILE_DEBUG_OUTPUT].Filename = Filename;
@@ -58,7 +60,7 @@ index 809090c..97898b1 100644
          {
              /*
               * A problem with freopen is that on error, we no longer
-@@ -635,6 +641,8 @@ FlOpenMiscOutputFiles (
+@@ -634,6 +641,8 @@ FlOpenMiscOutputFiles (
              exit (1);
          }
  
@@ -67,6 +69,3 @@ index 809090c..97898b1 100644
          AslCompilerSignon (ASL_FILE_DEBUG_OUTPUT);
          AslCompilerFileHeader (ASL_FILE_DEBUG_OUTPUT);
      }
--- 
-1.9.1
-

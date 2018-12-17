@@ -14,6 +14,8 @@ SRC_URI = "${KERNELORG_MIRROR}/software/utils/i2c-tools/${BP}.tar.gz \
 SRC_URI[md5sum] = "d92a288d70f306d3895e3a7e9c14c9aa"
 SRC_URI[sha256sum] = "5b60daf6f011de0acb61de57dba62f2054bb39f19961d67e0c91610f071ca403"
 
+inherit update-alternatives
+
 EXTRA_OEMAKE = "bindir=${bindir} sbindir=${sbindir} \
                 incdir=${includedir} libdir=${libdir} \
                 mandir=${mandir} \
@@ -34,3 +36,10 @@ RDEPENDS_${PN}-misc = "${PN} perl perl-module-posix \
                        perl-module-constant perl-module-file-basename \
                        perl-module-fcntl perl-module-strict perl-module-vars \
                       "
+
+ALTERNATIVE_PRIORITY = "100"
+ALTERNATIVE_${PN} = "i2cdetect i2cdump i2cget i2cset"
+ALTERNATIVE_LINK_NAME[i2cdetect] = "${sbindir}/i2cdetect"
+ALTERNATIVE_LINK_NAME[i2cdump] = "${sbindir}/i2cdump"
+ALTERNATIVE_LINK_NAME[i2cget] = "${sbindir}/i2cget"
+ALTERNATIVE_LINK_NAME[i2cset] = "${sbindir}/i2cset"

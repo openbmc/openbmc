@@ -67,6 +67,18 @@ function layerBtnsInit() {
       });
   });
 
+  $("td .set-default-recipe-btn").unbind('click');
+  $("td .set-default-recipe-btn").click(function(e){
+    e.preventDefault();
+    var recipe = $(this).data('recipe-name');
+
+    libtoaster.setDefaultImage(null, recipe,
+      function(){
+        /* Success */
+        window.location.replace(libtoaster.ctx.projectSpecificPageUrl);
+      });
+  });
+
 
   $(".customise-btn").unbind('click');
   $(".customise-btn").click(function(e){

@@ -187,7 +187,7 @@
                 <emphasis>Set Up the Build Environment:</emphasis>
                 Be sure you are set up to use BitBake in a shell.
                 See the
-                "<ulink url='&YOCTO_DOCS_DEV_URL;#setting-up-the-development-host-to-use-the-yocto-project'>Preparing the Build Host</ulink>"
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#dev-preparing-the-build-host'>Preparing the Build Host</ulink>"
                 section in the Yocto Project Development Tasks Manual for information
                 on how to get a build host ready that is either a native
                 Linux machine or a machine that uses CROPS.
@@ -1012,7 +1012,7 @@
                 to Support Development Using the Yocto
                 Project</emphasis>:
                 See the
-                "<ulink url='&YOCTO_DOCS_DEV_URL;#setting-up-the-development-host-to-use-the-yocto-project'>Preparing the Build Host</ulink>"
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#dev-preparing-the-build-host'>Preparing the Build Host</ulink>"
                 section in the Yocto Project Development Tasks
                 Manual for options on how to get a system ready
                 to use the Yocto Project.

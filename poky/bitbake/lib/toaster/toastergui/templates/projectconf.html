@@ -1,4 +1,4 @@
-{% extends "baseprojectpage.html" %}
+{% extends project_specific|yesno:"baseprojectspecificpage.html,baseprojectpage.html" %}
 {% load projecttags %}
 {% load humanize %}
 
@@ -438,8 +438,11 @@ function onEditPageUpdate(data) {
         var_context='m';
       }
     }
+    if (configvars_sorted[i][0].startsWith("INTERNAL_")) {
+        var_context='m';
+    }
     if (var_context == undefined) {
-      orightml += '<dt><span id="config_var_entry_'+configvars_sorted[i][2]+'" class="js-config-var-name"></span><span class="glyphicon glyphicon-trash js-icon-trash-config_var" id="config_var_trash_'+configvars_sorted[i][2]+'" x-data="'+configvars_sorted[i][2]+'"></span> </dt>'
+        orightml += '<dt><span id="config_var_entry_'+configvars_sorted[i][2]+'" class="js-config-var-name"></span><span class="glyphicon glyphicon-trash js-icon-trash-config_var" id="config_var_trash_'+configvars_sorted[i][2]+'" x-data="'+configvars_sorted[i][2]+'"></span> </dt>'
         orightml += '<dd class="variable-list">'
         orightml += '    <span class="lead" id="config_var_value_'+configvars_sorted[i][2]+'"></span>'
         orightml += '    <span class="glyphicon glyphicon-edit js-icon-pencil-config_var" x-data="'+configvars_sorted[i][2]+'"></span>'

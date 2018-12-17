@@ -9,6 +9,7 @@ HOMEPAGE = "http://www.gnu.org/software/libc/index.html"
 # http://lists.openembedded.org/pipermail/openembedded-core/2015-January/100679.html
 ARM_INSTRUCTION_SET_armv4 = "arm"
 ARM_INSTRUCTION_SET_armv5 = "arm"
+ARM_INSTRUCTION_SET_armv6 = "arm"
 
 deltask do_fetch
 deltask do_unpack

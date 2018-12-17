@@ -1,7 +1,7 @@
-DESCRIPTION = "Python binding to the Networking and Cryptography (NaCl) library"
-HOMEPAGE = "https://github.com/pyca/pynacl"
+DESCRIPTION = "A fast, pure Python library for parsing and serializing ASN.1 structures"
+HOMEPAGE = "https://github.com/wbond/asn1crypto"
 SECTION = "devel/python"
-LICENSE = "Apache-2.0"
+LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=52010cd3c7d7bd965b55721ef4d93ec2"
 
 PYPI_PACKAGE = "asn1crypto"

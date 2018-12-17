@@ -1,7 +1,7 @@
-From d8c49e6a15ab28f4ca94e03b2a53ed8df63346cd Mon Sep 17 00:00:00 2001
+From 9beadcdfca9198548f06bf18f3f26e1d11542e53 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Wed, 26 Apr 2017 03:49:45 -0400
-Subject: [PATCH 2/3] configure.ac: remove prog test of xmlto and asciidoc
+Date: Tue, 31 Jul 2018 16:53:04 +0800
+Subject: [PATCH 2/4] configure.ac: remove prog test of xmlto and asciidoc
 
 The prog of xmlto and asciidoc were used to generate documents,
 and since the doc module has already been disabled, so we should
@@ -15,12 +15,12 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 18 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index ccefe50..ed48c88 100644
+index feafc28..aceccf4 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -68,24 +68,6 @@ if test -z "$PYTHON3"; then
-     exit 1
- fi
+@@ -56,24 +56,6 @@ IT_PROG_INTLTOOL([0.35.0])
+ 
+ dnl ****** END ****************************************
  
 -AC_PATH_PROG([ASCIIDOC], [asciidoc], [no])
 -[if test "$ASCIIDOC" = "no"]
@@ -44,5 +44,5 @@ index ccefe50..ed48c88 100644
  AS_HELP_STRING([--with-bugzilla],[use Bugzilla plugin (default is YES)]),
  LIBREPORT_PARSE_WITH([bugzilla]))
 -- 
-2.8.1
+2.7.4
 

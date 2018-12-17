@@ -79,6 +79,7 @@ def _collect_hardlink(hardlink_dict, file):
     return hardlink_dict
 
 def _process_hardlink(hardlink_dict, compress_mode, shell_cmds, decompress=False):
+    import subprocess
     for target in hardlink_dict:
         if decompress:
             compress_format = _get_compress_format(target, shell_cmds.keys())
@@ -87,7 +88,7 @@ def _process_hardlink(hardlink_dict, compress_mode, shell_cmds, decompress=False
         else:
             cmd = "%s -f %s" % (shell_cmds[compress_mode], target)
             bb.note('compress hardlink %s' % target)
-        (retval, output) = oe.utils.getstatusoutput(cmd)
+        (retval, output) = subprocess.getstatusoutput(cmd)
         if retval:
             bb.warn("de/compress file failed %s (cmd was %s)%s" % (retval, cmd, ":\n%s" % output if output else ""))
             return
@@ -176,7 +177,7 @@ def compress_doc(topdir, compress_mode, compress_cmds):
                 # Normal file
                 elif os.path.isfile(file):
                     cmd = "%s %s" % (compress_cmds[compress_mode], file)
-                    (retval, output) = oe.utils.getstatusoutput(cmd)
+                    (retval, output) = subprocess.getstatusoutput(cmd)
                     if retval:
                         bb.warn("compress failed %s (cmd was %s)%s" % (retval, cmd, ":\n%s" % output if output else ""))
                         continue
@@ -206,7 +207,7 @@ def decompress_doc(topdir, compress_mode, decompress_cmds):
                 # Normal file
                 elif os.path.isfile(file):
                     cmd = "%s %s" % (decompress_cmds[compress_format], file)
-                    (retval, output) = oe.utils.getstatusoutput(cmd)
+                    (retval, output) = subprocess.getstatusoutput(cmd)
                     if retval:
                         bb.warn("decompress failed %s (cmd was %s)%s" % (retval, cmd, ":\n%s" % output if output else ""))
                         continue

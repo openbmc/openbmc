@@ -1,0 +1,32 @@
+From fa76d8646bb2b9b514728eeef41afed7c43a36f2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 11 Sep 2018 18:18:33 -0700
+Subject: [PATCH] Check for clang before using -isystem
+
+When cross compiling with clang, the internal C++ headers are not found
+when adding sysroot to -isystem, that is redundant anyway because it
+will look for headers insider --sysroot path with same quality as it
+would do with -isystem otherwise
+
+Upstream-Status: Submitted [https://github.com/opencv/opencv/pull/12504]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ cmake/OpenCVUtils.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cmake/OpenCVUtils.cmake b/cmake/OpenCVUtils.cmake
+index fae91c165f..60c20192dc 100644
+--- a/cmake/OpenCVUtils.cmake
++++ b/cmake/OpenCVUtils.cmake
+@@ -259,7 +259,7 @@ function(ocv_include_directories)
+     ocv_is_opencv_directory(__is_opencv_dir "${dir}")
+     if(__is_opencv_dir)
+       list(APPEND __add_before "${dir}")
+-    elseif(CV_GCC AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "6.0" AND
++    elseif(((CV_GCC AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "6.0") OR CV_CLANG) AND
+            dir MATCHES "/usr/include$")
+       # workaround for GCC 6.x bug
+     else()
+-- 
+2.18.0
+

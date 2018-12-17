@@ -1,5 +1,7 @@
 require libtool-${PV}.inc
 
+SRC_URI += "file://multilib.patch"
+
 RDEPENDS_${PN} += "bash"
 
 #
@@ -26,3 +28,7 @@ do_install_append () {
             -e "s@${HOSTTOOLS_DIR}/@@g" \
             -i ${D}${bindir}/libtool
 }
+
+inherit multilib_script
+
+MULTILIB_SCRIPTS = "${PN}:${bindir}/libtool"

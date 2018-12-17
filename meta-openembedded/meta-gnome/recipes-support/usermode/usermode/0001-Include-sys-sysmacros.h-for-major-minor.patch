@@ -1,0 +1,25 @@
+From 75539659396b18110d5a52a8a32845254b4d8eca Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 11 Aug 2018 18:25:47 -0700
+Subject: [PATCH] Include sys/sysmacros.h for major/minor
+
+usermount.c:238: undefined reference to `major'
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ usermount.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/usermount.c b/usermount.c
+index 4107027..21ef77f 100644
+--- a/usermount.c
++++ b/usermount.c
+@@ -40,6 +40,7 @@
+ #include <sys/stat.h>
+ #include <sys/time.h>
+ #include <sys/types.h>
++#include <sys/sysmacros.h>
+ #include <errno.h>
+ #include <glob.h>
+ #include <libintl.h>

@@ -1,0 +1,142 @@
+Description: Debian forbids calls to external websites.
+
+Author: Gianfranco Costamagna <locutus@debian.org>
+Origin: Debian
+Forwarded: not-needed
+Reviewed-By: Gianfranco Costamagna <locutusofborg@debian.org>
+Last-Update: 2015-11-25
+
+Index: casablanca/Release/tests/functional/http/client/CMakeLists.txt
+===================================================================
+--- casablanca.orig/Release/tests/functional/http/client/CMakeLists.txt
++++ casablanca/Release/tests/functional/http/client/CMakeLists.txt
+@@ -12,7 +12,6 @@
+   multiple_requests.cpp
+   oauth1_tests.cpp
+   oauth2_tests.cpp
+-  outside_tests.cpp
+   pipeline_stage_tests.cpp
+   progress_handler_tests.cpp
+   proxy_tests.cpp
+Index: casablanca/Release/tests/functional/http/client/authentication_tests.cpp
+===================================================================
+--- casablanca.orig/Release/tests/functional/http/client/authentication_tests.cpp
++++ casablanca/Release/tests/functional/http/client/authentication_tests.cpp
+@@ -663,15 +663,19 @@
+     VERIFY_ARE_EQUAL(return_code, response.status_code());
+ }
+ 
++/*
+ TEST(auth_no_data)
+ {
+     auth_test_impl(false);
+ }
++*/
+ 
++/*
+ TEST(unsuccessful_auth_with_basic_cred)
+ {
+     auth_test_impl(true);
+ }
++*/
+ 
+ TEST_FIXTURE(uri_address, set_user_options_asio_http)
+ {
+@@ -692,7 +696,7 @@
+     auto response = client.request(methods::GET).get();
+     VERIFY_ARE_EQUAL(200, response.status_code());
+ }
+-
++/*
+ TEST_FIXTURE(uri_address, set_user_options_asio_https)
+ {
+     handle_timeout([]
+@@ -714,7 +718,7 @@
+         VERIFY_IS_FALSE(v.empty());
+     });
+ }
+-
++*/
+ #endif
+ 
+ } // SUITE(authentication_tests)
+Index: casablanca/Release/tests/functional/websockets/client/authentication_tests.cpp
+===================================================================
+--- casablanca.orig/Release/tests/functional/websockets/client/authentication_tests.cpp
++++ casablanca/Release/tests/functional/websockets/client/authentication_tests.cpp
+@@ -86,7 +86,7 @@
+     }
+     return false;
+ }
+-
++/*
+ TEST(ssl_test)
+ {
+     websocket_client client;
+@@ -122,7 +122,7 @@
+         throw;
+     }
+ }
+-
++*/
+ // These tests are specific to our websocketpp based implementation.
+ #if !defined(__cplusplus_winrt)
+ 
+@@ -153,14 +153,15 @@
+         throw;
+     }
+ }
+-
++/*
+ // Test specifically for server SignalR team hit interesting cases with.
+ TEST(sni_with_older_server_test)
+ {
+     websocket_client client;
+     sni_test_impl(client);
+ }
+-
++*/
++/*
+ // WinRT doesn't expose option for disabling.
+ // No stable server is available to reliably test this.
+ // The configuration below relies on a timeout in the success case.
+@@ -188,7 +189,8 @@
+         throw;
+     }
+ }
+-
++*/
++/*
+ // Winrt doesn't allow explicitly setting server host for SNI.
+ TEST(sni_explicit_hostname)
+ {
+@@ -199,7 +201,7 @@
+     websocket_client client(config);
+     sni_test_impl(client);
+ }
+-
++*/
+ void handshake_error_test_impl(const ::utility::string_t &host)
+ {
+     websocket_client client;
+Index: casablanca/Release/tests/functional/http/client/connections_and_errors.cpp
+===================================================================
+--- casablanca.orig/Release/tests/functional/http/client/connections_and_errors.cpp
++++ casablanca/Release/tests/functional/http/client/connections_and_errors.cpp
+@@ -415,6 +415,7 @@
+ }
+ #endif
+ 
++/*
+ // Try to connect to a server on a closed port and cancel the operation.
+ TEST_FIXTURE(uri_address, cancel_bad_port)
+ {
+@@ -446,7 +447,7 @@
+ 
+     VERIFY_THROWS_HTTP_ERROR_CODE(t.get(), std::errc::operation_canceled);
+ }
+-
++*/
+ } // SUITE(connections_and_errors)
+ 
+ }}}}

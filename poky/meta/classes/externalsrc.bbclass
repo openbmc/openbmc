@@ -77,6 +77,9 @@ python () {
             # Dummy value because the default function can't be called with blank SRC_URI
             d.setVar('SRCPV', '999')
 
+        if d.getVar('CONFIGUREOPT_DEPTRACK') == '--disable-dependency-tracking':
+            d.setVar('CONFIGUREOPT_DEPTRACK', '')
+
         tasks = filter(lambda k: d.getVarFlag(k, "task"), d.keys())
 
         for task in tasks:

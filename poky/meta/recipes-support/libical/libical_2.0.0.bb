@@ -17,3 +17,10 @@ SRC_URI[sha256sum] = "654c11f759c19237be39f6ad401d917e5a05f36f1736385ed958e60cf2
 UPSTREAM_CHECK_URI = "https://github.com/libical/libical/releases"
 
 inherit cmake pkgconfig
+
+do_install_append_class-target () {
+    # Remove build host references
+    sed -i \
+       -e 's,${STAGING_LIBDIR},${libdir},g' \
+       ${D}${libdir}/cmake/LibIcal/LibIcalTargets-noconfig.cmake
+}

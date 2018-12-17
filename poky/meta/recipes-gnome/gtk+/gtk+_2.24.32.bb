@@ -10,7 +10,8 @@ SRC_URI = "http://ftp.gnome.org/pub/gnome/sources/gtk+/2.24/gtk+-${PV}.tar.xz \
            file://toggle-font.diff;striplevel=0 \
            file://doc-fixes.patch \
            file://strict-prototypes.patch \
-	  "
+           file://0001-Do-not-look-into-HOME-when-looking-for-gtk-modules.patch \
+           "
 
 SRC_URI[md5sum] = "d5742aa42275203a499b59b4c382a784"
 SRC_URI[sha256sum] = "b6c8a93ddda5eabe3bfee1eb39636c9a03d2a56c7b62828b359bf197943c582e"

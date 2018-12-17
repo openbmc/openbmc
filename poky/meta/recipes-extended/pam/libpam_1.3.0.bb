@@ -32,7 +32,7 @@ SRC_URI_append_libc-musl = " file://0001-Add-support-for-defining-missing-funcit
                              file://include_paths_header.patch \
                            "
 
-DEPENDS = "bison-native flex flex-native cracklib libxml2-native"
+DEPENDS = "bison-native flex flex-native cracklib libxml2-native virtual/crypt"
 
 EXTRA_OECONF = "--with-db-uniquename=_pam \
                 --includedir=${includedir}/security \

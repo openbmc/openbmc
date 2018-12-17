@@ -1,4 +1,4 @@
-From 0a69a26c9f7487daca900db87cd1195857a4603f Mon Sep 17 00:00:00 2001
+From c9c6d2414651dbf163dc4963c3c3d6f5cacef898 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 15 Aug 2017 17:10:57 +0800
 Subject: [PATCH 1/7] dso link change
@@ -35,10 +35,10 @@ index 2b1c0dc..9305b84 100644
  endif
  libebl = ../libebl/libebl.a
 diff --git a/tests/Makefile.am b/tests/Makefile.am
-index 3735084..528615d 100644
+index b45ecdc..dd256fb 100644
 --- a/tests/Makefile.am
 +++ b/tests/Makefile.am
-@@ -400,7 +400,7 @@ libdw = ../libdw/libdw.a -lz $(zip_LIBS) $(libelf) $(libebl) -ldl
+@@ -436,7 +436,7 @@ libdw = ../libdw/libdw.a -lz $(zip_LIBS) $(libelf) $(libebl) -ldl
  libelf = ../libelf/libelf.a -lz
  libasm = ../libasm/libasm.a
  else
@@ -48,5 +48,5 @@ index 3735084..528615d 100644
  libasm = ../libasm/libasm.so
  endif
 -- 
-1.8.3.1
+2.7.4
 

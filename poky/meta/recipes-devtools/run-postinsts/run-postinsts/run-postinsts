@@ -6,7 +6,8 @@
 #
 
 # The following script will run all the scriptlets found in #SYSCONFDIR#/deb-postinsts,
-# #SYSCONFDIR#/ipk-postinsts or #SYSCONFDIR#/rpm-postinsts.
+# #SYSCONFDIR#/ipk-postinsts or #SYSCONFDIR#/rpm-postinsts or the package manager in
+# case available.
 
 # the order of this list is important, do not change!
 backend_list="rpm deb ipk"
@@ -14,27 +15,29 @@ backend_list="rpm deb ipk"
 pm_installed=false
 
 for pm in $backend_list; do
-	pi_dir="#SYSCONFDIR#/$pm-postinsts"
-
-	if [ ! -d $pi_dir ]; then
-		continue
-	fi
-
 	# found the package manager, it has postinsts
 	case $pm in
 		"deb")
 			if [ -s "#LOCALSTATEDIR#/lib/dpkg/status" ]; then
 				pm_installed=true
+				break
 			fi
 			;;
 
 		"ipk")
 			if [ -s "#LOCALSTATEDIR#/lib/opkg/status" ]; then
 				pm_installed=true
+				break
 			fi
 			;;
 	esac
-	break
+
+	pi_dir="#SYSCONFDIR#/$pm-postinsts"
+
+	# found postinsts directory
+	if [ -d $pi_dir ]; then
+		break
+	fi
 done
 
 remove_rcsd_link () {
@@ -43,7 +46,7 @@ remove_rcsd_link () {
 	fi
 }
 
-if ! [ -d $pi_dir ]; then
+if ! [ -d $pi_dir ] && ! $pm_installed; then
 	remove_rcsd_link
 	exit 0
 fi

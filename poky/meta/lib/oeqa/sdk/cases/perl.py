@@ -1,8 +1,4 @@
-import os
-import shutil
 import unittest
-
-from oeqa.core.utils.path import remove_safe
 from oeqa.sdk.case import OESDKTestCase
 
 class PerlTest(OESDKTestCase):
@@ -12,17 +8,10 @@ class PerlTest(OESDKTestCase):
                 self.tc.hasHostPackage("perl-native")):
             raise unittest.SkipTest("No perl package in the SDK")
 
-        for f in ['test.pl']:
-            shutil.copyfile(os.path.join(self.tc.files_dir, f),
-                    os.path.join(self.tc.sdk_dir, f))
-        self.testfile = os.path.join(self.tc.sdk_dir, "test.pl")
-
-    def test_perl_exists(self):
-        self._run('which perl')
-
-    def test_perl_works(self):
-        self._run('perl %s' % self.testfile)
-
-    @classmethod
-    def tearDownClass(self):
-        remove_safe(self.testfile)
+    def test_perl(self):
+        try:
+            cmd = "perl -e '$_=\"Uryyb, jbeyq\"; tr/a-zA-Z/n-za-mN-ZA-M/;print'"
+            output = self._run(cmd)
+            self.assertEqual(output, "Hello, world")
+        except subprocess.CalledProcessError as e:
+            self.fail("Unexpected exit %d (output %s)" % (e.returncode, e.output))

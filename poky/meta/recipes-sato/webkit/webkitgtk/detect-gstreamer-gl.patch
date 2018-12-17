@@ -1,0 +1,20 @@
+From: Alberto Garcia <berto@igalia.com>
+Subject: Disable USE_GSTREAMER_GL is the package is not found
+Forwarded: no
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: webkitgtk/Source/cmake/GStreamerChecks.cmake
+===================================================================
+--- webkitgtk.orig/Source/cmake/GStreamerChecks.cmake
++++ webkitgtk/Source/cmake/GStreamerChecks.cmake
+@@ -43,7 +43,8 @@ if (ENABLE_VIDEO OR ENABLE_WEB_AUDIO)
+             message(FATAL_ERROR "GStreamer 1.10 is needed for USE_GSTREAMER_GL.")
+         else ()
+             if (NOT PC_GSTREAMER_GL_FOUND)
+-                message(FATAL_ERROR "GStreamerGL is needed for USE_GSTREAMER_GL.")
++                set(USE_GSTREAMER_GL OFF)
++                message(STATUS "GStreamerGL is needed for USE_GSTREAMER_GL.")
+             endif ()
+         endif ()
+     endif ()

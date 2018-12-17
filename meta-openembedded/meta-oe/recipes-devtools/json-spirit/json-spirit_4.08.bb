@@ -9,6 +9,8 @@ PRIORITY = "optional"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=278ef6183dec4aae1524fccc4b0113c9"
 
+DEPENDS = "boost"
+
 SRC_URI = "file://json_spirit_v${PV}.zip \
            file://0001-Adjust-the-cmake-files.patch \
            file://0001-Link-to-libatomic.patch \
@@ -16,10 +18,6 @@ SRC_URI = "file://json_spirit_v${PV}.zip \
 
 S = "${WORKDIR}/json_spirit_v${PV}"
 
-DEPENDS = "boost"
-
 inherit cmake
-
-FILES_${PN}-dev += "${datadir}/cmake/Modules/FindLibJsonSpirit.cmake"
 
 BBCLASSEXTEND = "nativesdk"

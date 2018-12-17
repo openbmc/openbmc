@@ -1,40 +1,47 @@
-From ccd166b73eaae4dd1e1785c63ceb9b303568ed46 Mon Sep 17 00:00:00 2001
-From: Khem Raj <raj.khem@gmail.com>
-Date: Tue, 21 Mar 2017 11:30:49 -0700
+From 3da48ec13a44b71ca51adbc803b42c1b29a43f57 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Tue, 24 Jul 2018 14:03:51 +0800
 Subject: [PATCH] bundle own base64 encode/decode functions
 
 Not all libc implementations provide it.
 as an aside libresolv is no longer needed
 
+Upstream-Status: Pending
+
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Update to version 1.190-2
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
  Makefile |   4 +-
  base64.c | 313 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- netcat.c |   2 +
+ netcat.c |   3 +
  socks.c  |   3 +
- 4 files changed, 320 insertions(+), 2 deletions(-)
+ 4 files changed, 321 insertions(+), 2 deletions(-)
  create mode 100644 base64.c
 
-Index: netcat-openbsd-1.105/Makefile
-===================================================================
---- netcat-openbsd-1.105.orig/Makefile
-+++ netcat-openbsd-1.105/Makefile
-@@ -1,9 +1,9 @@
- #       $OpenBSD: Makefile,v 1.6 2001/09/02 18:45:41 jakob Exp $
+diff --git a/Makefile b/Makefile
+index 8247cfd..b8d8547 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,10 +1,10 @@
+ #	$OpenBSD: Makefile,v 1.7 2015/09/11 21:07:01 beck Exp $
  
  PROG=	nc
 -SRCS=	netcat.c atomicio.c socks.c
 +SRCS=	netcat.c atomicio.c socks.c base64.c
  
--LIBS=  `pkg-config --libs libbsd` -lresolv
-+LIBS=  `pkg-config --libs libbsd`
+ PKG_CONFIG ?= pkg-config
+-LIBS=  `$(PKG_CONFIG) --libs libbsd` -lresolv
++LIBS=  `$(PKG_CONFIG) --libs libbsd`
  OBJS=  $(SRCS:.c=.o)
  CFLAGS=  -g -O2
  LDFLAGS=  -Wl,--no-add-needed
-Index: netcat-openbsd-1.105/base64.c
-===================================================================
+diff --git a/base64.c b/base64.c
+new file mode 100644
+index 0000000..b0ee6c2
 --- /dev/null
-+++ netcat-openbsd-1.105/base64.c
++++ b/base64.c
 @@ -0,0 +1,313 @@
 +/*
 + * Copyright (c) 1996-1999 by Internet Software Consortium.
@@ -349,31 +356,34 @@ Index: netcat-openbsd-1.105/base64.c
 +
 +	return (tarindex);
 +}
-Index: netcat-openbsd-1.105/netcat.c
-===================================================================
---- netcat-openbsd-1.105.orig/netcat.c
-+++ netcat-openbsd-1.105/netcat.c
-@@ -169,6 +169,9 @@ static int connect_with_timeout(int fd,
-         socklen_t salen, int ctimeout);
+diff --git a/netcat.c b/netcat.c
+index a0fb51b..9c4ed23 100644
+--- a/netcat.c
++++ b/netcat.c
+@@ -240,6 +240,9 @@ static int connect_with_timeout(int fd, const struct sockaddr *sa,
+ 
  static void quit();
  
-+int	b64_ntop(u_char const *src, size_t srclength, char *target, size_t targsize);
-+int	b64_pton(char const *src, u_char *target, size_t targsize);
++int    b64_ntop(u_char const *src, size_t srclength, char *target, size_t targsize);
++int    b64_pton(char const *src, u_char *target, size_t targsize);
 +
  int
  main(int argc, char *argv[])
  {
-Index: netcat-openbsd-1.105/socks.c
-===================================================================
---- netcat-openbsd-1.105.orig/socks.c
-+++ netcat-openbsd-1.105/socks.c
+diff --git a/socks.c b/socks.c
+index 9068f39..c576f6b 100644
+--- a/socks.c
++++ b/socks.c
 @@ -53,6 +53,9 @@
  #define SOCKS_DOMAIN	3
  #define SOCKS_IPV6	4
  
-+int	b64_ntop(u_char const *src, size_t srclength, char *target, size_t targsize);
-+int	b64_pton(char const *src, u_char *target, size_t targsize);
++int    b64_ntop(u_char const *src, size_t srclength, char *target, size_t targsize);
++int    b64_pton(char const *src, u_char *target, size_t targsize);
 +
  int	remote_connect(const char *, const char *, struct addrinfo);
  int	socks_connect(const char *, const char *, struct addrinfo,
  	    const char *, const char *, struct addrinfo, int,
+-- 
+2.7.4
+

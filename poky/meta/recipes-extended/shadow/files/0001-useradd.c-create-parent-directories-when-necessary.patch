@@ -1,17 +1,17 @@
-Upstream-Status: Inappropriate [OE specific]
+Subject: [PATCH] useradd.c: create parent directories when necessary
 
-Subject: useradd.c: create parent directories when necessary
+Upstream-Status: Inappropriate [OE specific]
 
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
 ---
- src/useradd.c |   72 +++++++++++++++++++++++++++++++++++++++------------------
- 1 file changed, 49 insertions(+), 23 deletions(-)
+ src/useradd.c | 82 +++++++++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 54 insertions(+), 28 deletions(-)
 
 diff --git a/src/useradd.c b/src/useradd.c
-index 4bd969d..cb5dd6c 100644
+index 7214e72..3aaf45c 100644
 --- a/src/useradd.c
 +++ b/src/useradd.c
-@@ -1896,6 +1896,35 @@ static void usr_update (void)
+@@ -2021,6 +2021,35 @@ static void usr_update (void)
  }
  
  /*
@@ -47,63 +47,68 @@ index 4bd969d..cb5dd6c 100644
   * create_home - create the user's home directory
   *
   *	create_home() creates the user's home directory if it does not
-@@ -1910,39 +1939,36 @@ static void create_home (void)
+@@ -2038,42 +2067,39 @@ static void create_home (void)
  			fail_exit (E_HOMEDIR);
  		}
  #endif
 -		/* XXX - create missing parent directories.  --marekm */
--		if (mkdir (user_home, 0) != 0) {
+-		if (mkdir (prefix_user_home, 0) != 0) {
 -			fprintf (stderr,
 -			         _("%s: cannot create directory %s\n"),
--			         Prog, user_home);
--#ifdef WITH_AUDIT
+-			         Prog, prefix_user_home);
++		mkdir_p(user_home);
++	}
++	if (access (prefix_user_home, F_OK) != 0) {
+ #ifdef WITH_AUDIT
 -			audit_logger (AUDIT_ADD_USER, Prog,
 -			              "adding home directory",
 -			              user_name, (unsigned int) user_id,
 -			              SHADOW_AUDIT_FAILURE);
--#endif
--			fail_exit (E_HOMEDIR);
--		}
--		chown (user_home, user_id, user_gid);
--		chmod (user_home,
--		       0777 & ~getdef_num ("UMASK", GETDEF_DEFAULT_UMASK));
--#ifdef WITH_ATTR
--		attr_copy_file (def_template, user_home, NULL, NULL);
--#endif
--		home_added = true;
-+		mkdir_p(user_home);
-+	}
-+	if (access (user_home, F_OK) != 0) {
- #ifdef WITH_AUDIT
- 		audit_logger (AUDIT_ADD_USER, Prog,
- 		              "adding home directory",
- 		              user_name, (unsigned int) user_id,
--		              SHADOW_AUDIT_SUCCESS);
-+		              SHADOW_AUDIT_FAILURE);
++		audit_logger (AUDIT_ADD_USER, Prog,
++			      "adding home directory",
++			      user_name, (unsigned int) user_id,
++			      SHADOW_AUDIT_FAILURE);
  #endif
--#ifdef WITH_SELINUX
--		/* Reset SELinux to create files with default contexts */
--		if (reset_selinux_file_context () != 0) {
 -			fail_exit (E_HOMEDIR);
 -		}
+-		(void) chown (prefix_user_home, user_id, user_gid);
+-		chmod (prefix_user_home,
+-		       0777 & ~getdef_num ("UMASK", GETDEF_DEFAULT_UMASK));
 +		fail_exit (E_HOMEDIR);
 +	}
-+	chown (user_home, user_id, user_gid);
-+	chmod (user_home,
++	(void) chown (prefix_user_home, user_id, user_gid);
++	chmod (prefix_user_home,
 +	       0777 & ~getdef_num ("UMASK", GETDEF_DEFAULT_UMASK));
-+#ifdef WITH_ATTR
+ #ifdef WITH_ATTR
+-	               attr_copy_file (def_template, user_home, NULL, NULL);
 +	attr_copy_file (def_template, user_home, NULL, NULL);
-+#endif
+ #endif
+-		home_added = true;
 +	home_added = true;
-+#ifdef WITH_AUDIT
+ #ifdef WITH_AUDIT
+-		audit_logger (AUDIT_ADD_USER, Prog,
+-		              "adding home directory",
+-		              user_name, (unsigned int) user_id,
+-		              SHADOW_AUDIT_SUCCESS);
 +	audit_logger (AUDIT_ADD_USER, Prog,
 +		      "adding home directory",
 +		      user_name, (unsigned int) user_id,
 +		      SHADOW_AUDIT_SUCCESS);
  #endif
-+#ifdef WITH_SELINUX
+ #ifdef WITH_SELINUX
+-		/* Reset SELinux to create files with default contexts */
+-		if (reset_selinux_file_context () != 0) {
+-			fprintf (stderr,
+-			         _("%s: cannot reset SELinux file creation context\n"),
+-			         Prog);
+-			fail_exit (E_HOMEDIR);
+-		}
+-#endif
 +	/* Reset SELinux to create files with default contexts */
 +	if (reset_selinux_file_context () != 0) {
++		fprintf (stderr,
++			 _("%s: cannot reset SELinux file creation context\n"),
++			 Prog);
 +		fail_exit (E_HOMEDIR);
  	}
 +#endif
@@ -111,5 +116,5 @@ index 4bd969d..cb5dd6c 100644
  
  /*
 -- 
-1.7.9.5
+2.11.0
 

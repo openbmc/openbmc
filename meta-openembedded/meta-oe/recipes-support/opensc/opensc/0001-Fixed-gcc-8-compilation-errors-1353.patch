@@ -1,0 +1,73 @@
+From 87857d5cae7db94fdd776904886392b1e86053bd Mon Sep 17 00:00:00 2001
+From: Florian Bezdeka <1119693+fbezdeka@users.noreply.github.com>
+Date: Fri, 18 May 2018 18:54:56 +0200
+Subject: [PATCH] Fixed gcc 8 compilation errors (#1353)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The following errors occured during a compilation using gcc 8:
+
+In function »gids_create_file.constprop«,
+    inserted by »gids_save_certificate.isra.8« beicard-gids.c:1548:7:
+card-gids.c:465:2: Error: »strncpy« output may be truncated copying 8 bytes from a string of length 8 [-Werror=stringop-truncation]
+  strncpy(record->filename, filename, 8);
+  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+pkcs15-oberthur.c: In function »sc_pkcs15emu_oberthur_add_prvkey«:
+pkcs15-oberthur.c:741:5: Error: »strncpy« output may be truncated copying 254 bytes from a string of length 254 [-Werror=stringop-truncation]
+     strncpy(kobj.label, objs[ii]->label, sizeof(kobj.label) - 1);
+     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Upstream-Status: Backport [https://github.com/OpenSC/OpenSC/pull/1353]
+Signed-off-by Khem Raj <raj.khem@gmail.com>
+---
+ src/libopensc/card-gids.c       | 3 ++-
+ src/libopensc/pkcs15-oberthur.c | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/libopensc/card-gids.c b/src/libopensc/card-gids.c
+index fc5d2a7..ac3e579 100644
+--- a/src/libopensc/card-gids.c
++++ b/src/libopensc/card-gids.c
+@@ -33,6 +33,7 @@ Some features are undocumented like the format used to store certificates. They
+ 
+ #include <stdlib.h>
+ #include <string.h>
++#include "../common/compat_strlcpy.h"
+ 
+ #ifdef ENABLE_OPENSSL
+ /* openssl only needed for card administration */
+@@ -462,7 +463,7 @@ static int gids_create_file(sc_card_t *card, char* directory, char* filename) {
+ 	memset(masterfilebuffer + offset, 0, sizeof(gids_mf_record_t));
+ 	record = (gids_mf_record_t*) (masterfilebuffer + offset);
+ 	strncpy(record->directory, directory, 8);
+-	strncpy(record->filename, filename, 8);
++	strlcpy(record->filename, filename, sizeof(record->filename));
+ 	record->fileIdentifier = fileIdentifier;
+ 	record->dataObjectIdentifier = dataObjectIdentifier;
+ 
+diff --git a/src/libopensc/pkcs15-oberthur.c b/src/libopensc/pkcs15-oberthur.c
+index 4f841ed..3415be7 100644
+--- a/src/libopensc/pkcs15-oberthur.c
++++ b/src/libopensc/pkcs15-oberthur.c
+@@ -29,6 +29,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <stdio.h>
++#include "../common/compat_strlcpy.h"
+ 
+ #include "pkcs15.h"
+ #include "log.h"
+@@ -738,7 +739,7 @@ sc_pkcs15emu_oberthur_add_prvkey(struct sc_pkcs15_card *p15card,
+ 			unsigned int id = path.value[path.len - 2] * 0x100 + path.value[path.len - 1];
+ 
+ 			if (id == ccont.id_cert)   {
+-				strncpy(kobj.label, objs[ii]->label, sizeof(kobj.label) - 1);
++				strlcpy(kobj.label, objs[ii]->label, sizeof(kobj.label));
+ 				break;
+ 			}
+ 		}
+-- 
+2.18.0
+

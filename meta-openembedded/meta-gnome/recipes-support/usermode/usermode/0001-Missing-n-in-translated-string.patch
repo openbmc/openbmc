@@ -1,0 +1,28 @@
+From 7cbc6441cd06e0c0bb51ac37c8f22b0fd51f12f2 Mon Sep 17 00:00:00 2001
+From: Jiri Kucera <jkucera@redhat.com>
+Date: Wed, 11 Apr 2018 17:13:44 +0200
+Subject: [PATCH] Missing \n in translated string
+
+Upstream-Status: Backport
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ po/tr.po | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/po/tr.po b/po/tr.po
+index 84e5021..a28e947 100644
+--- a/po/tr.po
++++ b/po/tr.po
+@@ -408,7 +408,7 @@ msgstr "Grafik pencere açılamadı ve uçbirim denetimi bulunamadı.\n"
+ #: ../../po/../userpasswd.c:37
+ #, c-format
+ msgid "Unexpected command-line arguments\n"
+-msgstr "Beklenmeyen komut satırı argümanları"
++msgstr "Beklenmeyen komut satırı argümanları\n"
+ 
+ #: ../../po/../userinfo.c:411
+ #, c-format
+-- 
+2.7.4
+

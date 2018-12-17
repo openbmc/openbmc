@@ -1,4 +1,4 @@
-From e57ad47fc8549353ca80c23b9b4f38f31fde13e5 Mon Sep 17 00:00:00 2001
+From b4ec05953f78af26bcd7de45a5bbc5f138d023da Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 15 Aug 2017 17:27:30 +0800
 Subject: [PATCH 6/7] Fix build on aarch64/musl
@@ -57,5 +57,5 @@ index efcabaf..062bb9e 100644
  # include <sys/ptrace.h>
  /* Deal with old glibc defining user_pt_regs instead of user_regs_struct.  */
 -- 
-1.8.3.1
+2.7.4
 

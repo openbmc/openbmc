@@ -1,0 +1,38 @@
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/sysprof/merge_requests/5]
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From bc7e3e27c28d0bab8bea72f2314191532b2e7840 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Fri, 7 Sep 2018 01:30:09 +0100
+Subject: [PATCH] capture: use size of void* instead of glibc-specific
+ __WORDSIZE
+
+__WORDSIZE is glibc-specific so sp-capture-types.h doesn't work with musl.
+---
+ lib/capture/sp-capture-types.h | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/lib/capture/sp-capture-types.h b/lib/capture/sp-capture-types.h
+index 48fcfb8..1d6cd1d 100644
+--- a/lib/capture/sp-capture-types.h
++++ b/lib/capture/sp-capture-types.h
+@@ -32,12 +32,14 @@ G_BEGIN_DECLS
+ #define SP_CAPTURE_MAGIC (GUINT32_TO_LE(0xFDCA975E))
+ #define SP_CAPTURE_ALIGN (sizeof(SpCaptureAddress))
+ 
+-#if __WORDSIZE == 64
++#if GLIB_SIZEOF_VOID_P == 8
+ # define SP_CAPTURE_JITMAP_MARK    G_GUINT64_CONSTANT(0xE000000000000000)
+ # define SP_CAPTURE_ADDRESS_FORMAT "0x%016lx"
+-#else
++#elif GLIB_SIZEOF_VOID_P == 4
+ # define SP_CAPTURE_JITMAP_MARK    G_GUINT64_CONSTANT(0xE0000000)
+ # define SP_CAPTURE_ADDRESS_FORMAT "0x%016llx"
++#else
++#error Unknown GLIB_SIZEOF_VOID_P
+ #endif
+ 
+ #define SP_CAPTURE_CURRENT_TIME   (sp_clock_get_current_time())
+-- 
+2.11.0
+

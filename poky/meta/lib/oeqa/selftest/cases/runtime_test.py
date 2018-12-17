@@ -122,6 +122,7 @@ class TestImage(OESelftestTestCase):
             self.skipTest('core-image-full-cmdline not buildable for poky-tiny')
 
         features = 'INHERIT += "testimage"\n'
+        features += 'IMAGE_INSTALL_append = " libssl"\n'
         features += 'TEST_SUITES = "ping ssh selftest"\n'
         self.write_config(features)
 
@@ -135,7 +136,7 @@ class TestImage(OESelftestTestCase):
         Summary: Check package feeds functionality for dnf
         Expected: 1. Check that remote package feeds can be accessed
         Product: oe-core
-        Author: Alexander Kanavin <alexander.kanavin@intel.com>
+        Author: Alexander Kanavin <alex.kanavin@gmail.com>
         """
         if get_bb_var('DISTRO') == 'poky-tiny':
             self.skipTest('core-image-full-cmdline not buildable for poky-tiny')
@@ -233,7 +234,7 @@ class Postinst(OESelftestTestCase):
         Expected:       The scriptlet failure is properly reported.
                         The file that is created after the error in the scriptlet is not present.
         Product: oe-core
-        Author: Alexander Kanavin <alexander.kanavin@intel.com>
+        Author: Alexander Kanavin <alex.kanavin@gmail.com>
         """
 
         import oe.path
@@ -251,8 +252,8 @@ class Postinst(OESelftestTestCase):
                 features = 'CORE_IMAGE_EXTRA_INSTALL = "postinst-rootfs-failing"\n'
                 features += 'PACKAGE_CLASSES = "%s"\n' % classes
                 self.write_config(features)
-                bb_result = bitbake('core-image-minimal')
-                self.assertGreaterEqual(bb_result.output.find("Intentionally failing postinstall scriptlets of ['postinst-rootfs-failing'] to defer them to first boot is deprecated."), 0,
+                bb_result = bitbake('core-image-minimal', ignore_status=True)
+                self.assertGreaterEqual(bb_result.output.find("Postinstall scriptlets of ['postinst-rootfs-failing'] have failed."), 0,
                     "Warning about a failed scriptlet not found in bitbake output: %s" %(bb_result.output))
 
                 self.assertTrue(os.path.isfile(os.path.join(hosttestdir, "rootfs-before-failure")),

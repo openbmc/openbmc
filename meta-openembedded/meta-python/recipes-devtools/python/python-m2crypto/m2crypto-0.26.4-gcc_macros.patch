@@ -1,16 +1,22 @@
 Imported from Fedora
 
---- M2Crypto/SWIG/_m2crypto.i	2017-09-26 11:26:33.000000000 +0200
-+++ M2Crypto-0.26.4/SWIG/_m2crypto.i	2017-09-26 21:04:14.080330741 +0200
-@@ -7,6 +7,7 @@
-  * Copyright (c) 2009-2010 Heikki Toivonen. All rights reserved.
+Index: M2Crypto-0.30.1/SWIG/_m2crypto.i
+===================================================================
+--- M2Crypto-0.30.1.orig/SWIG/_m2crypto.i
++++ M2Crypto-0.30.1/SWIG/_m2crypto.i
+@@ -8,6 +8,11 @@
   *
   */
-+%import "gcc_macros.h"
  
++%import "gcc_macros.h"
++
++%ignore WCHAR_MAX;
++%ignore WCHAR_MIN;
++
  %module(threads=1) m2crypto
  /* We really don't need threadblock (PyGILState_Ensure() etc.) anywhere.
-@@ -15,11 +16,6 @@
+    Disable threadallow as well, only enable it for operations likely to
+@@ -15,11 +20,6 @@
  %nothreadblock;
  %nothreadallow;
  
@@ -20,5 +26,10 @@ Imported from Fedora
 -#endif
 -
  %{
- #if __GNUC__ < 5
- #pragma GCC diagnostic ignored "-Wunused-label"
+ #ifdef _WIN32
+ #define _WINSOCKAPI_
+@@ -95,4 +95,3 @@ static PyObject *x509_store_verify_cb_fu
+ %constant int encrypt = 1;
+ %constant int decrypt = 0;
+ #endif
+-  

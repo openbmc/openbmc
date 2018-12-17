@@ -3,6 +3,11 @@ From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 3 Sep 2018 11:12:27 -0700
 Subject: [PATCH] gen_def
 
+This is partial port because half of this patch is already present in our
+patches
+
+Upstream-Status: Backport [https://github.com/apache/serf/commit/8f07c9626106873a594fd07e7c257e9080d8660b]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  SConstruct | 2 ++
  1 file changed, 2 insertions(+)

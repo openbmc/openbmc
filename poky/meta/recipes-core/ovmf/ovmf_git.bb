@@ -43,7 +43,7 @@ PARALLEL_MAKE = ""
 
 S = "${WORKDIR}/git"
 
-DEPENDS_class-native="util-linux-native iasl-native ossp-uuid-native qemu-native"
+DEPENDS_class-native="util-linux-native iasl-native qemu-native"
 
 DEPENDS_class-target="ovmf-native"
 

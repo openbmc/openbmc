@@ -14,7 +14,7 @@ diff --git a/lib/rpm.c b/lib/rpm.c
 index 920e145..58140bf 100644
 --- a/lib/rpm.c
 +++ b/lib/rpm.c
-@@ -188,7 +188,7 @@ sr_rpm_package_sort(struct sr_rpm_package *packages)
+@@ -191,7 +191,7 @@ sr_rpm_package_sort(struct sr_rpm_package *packages)
      }
  
      /* Sort the array. */

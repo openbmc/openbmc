@@ -12,7 +12,7 @@ PACKAGE_WRITE_DEPS += "qemu-native gdk-pixbuf-native"
 
 pixbufcache_common() {
 if [ "x$D" != "x" ]; then
-	$INTERCEPT_DIR/postinst_intercept update_pixbuf_cache ${PKG} mlprefix=${MLPREFIX} libdir=${libdir} \
+	$INTERCEPT_DIR/postinst_intercept update_pixbuf_cache ${PKG} mlprefix=${MLPREFIX} binprefix=${MLPREFIX} libdir=${libdir} \
 		bindir=${bindir} base_libdir=${base_libdir}
 else
 

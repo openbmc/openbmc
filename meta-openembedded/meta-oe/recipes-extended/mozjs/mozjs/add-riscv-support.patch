@@ -1,0 +1,70 @@
+Add RISC-V support
+
+Upstream-Status: Submitted [https://bugzilla.mozilla.org/show_bug.cgi?id=1318905]
+
+Signed-off-by: Ricardo Salveti <ricardo@foundries.io>
+
+diff --git a/build/autoconf/config.guess b/build/autoconf/config.guess
+index d5d667d..1277a86 100755
+--- a/build/autoconf/config.guess
++++ b/build/autoconf/config.guess
+@@ -1029,6 +1029,9 @@ EOF
+     ppcle:Linux:*:*)
+ 	echo powerpcle-unknown-linux-${LIBC}
+ 	exit ;;
++    riscv32:Linux:*:* | riscv64:Linux:*:*)
++	echo ${UNAME_MACHINE}-unknown-linux-${LIBC}
++	exit ;;
+     s390:Linux:*:* | s390x:Linux:*:*)
+ 	echo ${UNAME_MACHINE}-ibm-linux-${LIBC}
+ 	exit ;;
+diff --git a/build/moz.configure/init.configure b/build/moz.configure/init.configure
+index 6fe6591..56e6730 100644
+--- a/build/moz.configure/init.configure
++++ b/build/moz.configure/init.configure
+@@ -362,6 +362,9 @@ def split_triplet(triplet):
+     elif cpu.startswith('aarch64'):
+         canonical_cpu = 'aarch64'
+         endianness = 'little'
++    elif cpu in ('riscv32', 'riscv64'):
++        canonical_cpu = cpu
++        endianness = 'little'
+     else:
+         die('Unknown CPU type: %s' % cpu)
+ 
+diff --git a/mfbt/double-conversion/utils.h b/mfbt/double-conversion/utils.h
+index 15dd4bf..4f37218 100644
+--- a/mfbt/double-conversion/utils.h
++++ b/mfbt/double-conversion/utils.h
+@@ -60,7 +60,8 @@
+     defined(__sparc__) || defined(__sparc) || defined(__s390__) || \
+     defined(__SH4__) || defined(__alpha__) || \
+     defined(_MIPS_ARCH_MIPS32R2) || \
+-    defined(__AARCH64EL__) || defined(__aarch64__)
++    defined(__AARCH64EL__) || defined(__aarch64__) || \
++    defined(__riscv)
+ #define DOUBLE_CONVERSION_CORRECT_DOUBLE_OPERATIONS 1
+ #elif defined(_M_IX86) || defined(__i386__) || defined(__i386)
+ #if defined(_WIN32)
+diff --git a/python/mozbuild/mozbuild/configure/constants.py b/python/mozbuild/mozbuild/configure/constants.py
+index dfc7cf8..4f8d666 100644
+--- a/python/mozbuild/mozbuild/configure/constants.py
++++ b/python/mozbuild/mozbuild/configure/constants.py
+@@ -48,6 +48,8 @@ CPU_bitness = {
+     'mips64': 64,
+     'ppc': 32,
+     'ppc64': 64,
++    'riscv32': 32,
++    'riscv64': 64,
+     's390': 32,
+     's390x': 64,
+     'sparc': 32,
+@@ -79,6 +81,8 @@ CPU_preprocessor_checks = OrderedDict((
+     ('s390', '__s390__'),
+     ('ppc64', '__powerpc64__'),
+     ('ppc', '__powerpc__'),
++    ('riscv32', '__riscv && __SIZEOF_POINTER__ == 4'),
++    ('riscv64', '__riscv && __SIZEOF_POINTER__ == 8'),
+     ('Alpha', '__alpha__'),
+     ('hppa', '__hppa__'),
+     ('sparc64', '__sparc__ && __arch64__'),

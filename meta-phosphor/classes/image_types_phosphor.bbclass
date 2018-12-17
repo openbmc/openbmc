@@ -9,7 +9,7 @@ inherit image_version
 # The reference BMC software update implementation.
 
 # Image composition
-FLASH_KERNEL_IMAGE ?= "fitImage-${INITRAMFS_IMAGE}-${MACHINE}.bin"
+FLASH_KERNEL_IMAGE ?= "fitImage-${INITRAMFS_IMAGE}-${MACHINE}-${MACHINE}"
 FLASH_KERNEL_IMAGE_df-obmc-ubi-fs ?= "fitImage-${MACHINE}.bin"
 
 IMAGE_BASETYPE ?= "squashfs-xz"

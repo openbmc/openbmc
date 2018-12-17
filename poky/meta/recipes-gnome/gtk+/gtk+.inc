@@ -90,6 +90,10 @@ do_install () {
 	install -m 0644 ${S}/gtk/gtkfilesystemmodel.h    ${D}${includedir}/gtk-2.0/gtk/
 
 	mv ${D}${bindir}/gtk-update-icon-cache ${D}${bindir}/gtk-update-icon-cache-2.0
+
+    # duplicate gtk-query-immodules for post install script update_gtk_immodules_cache
+    mkdir -p ${D}${libexecdir}
+    ln ${D}${bindir}/gtk-query-immodules-2.0 ${D}${libexecdir}/${MLPREFIX}gtk-query-immodules-2.0
 }
 
 SYSROOT_PREPROCESS_FUNCS += "gtk_sysroot_preprocess"

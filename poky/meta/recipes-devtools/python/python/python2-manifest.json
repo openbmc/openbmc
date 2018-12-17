@@ -1,18 +1,18 @@
 {
     "tests": {
-        "summary": "Python test suite",
+        "summary": "Python test suite", 
         "rdepends": [
-            "core",
+            "core", 
             "modules"
-        ],
+        ], 
         "files": [
-            "${libdir}/python2.7/*/test",
-            "${libdir}/python2.7/*/tests",
-            "${libdir}/python2.7/idlelib/idle_test/",
+            "${libdir}/python2.7/*/test", 
+            "${libdir}/python2.7/*/tests", 
+            "${libdir}/python2.7/idlelib/idle_test/", 
             "${libdir}/python2.7/test"
-        ],
+        ], 
         "cached": []
-    },
+    }, 
     "2to3": {
         "summary": "Python automated Python 2 to 3 code translator", 
         "rdepends": [
@@ -881,10 +881,12 @@
     "sqlite3": {
         "summary": "Python Sqlite3 database support", 
         "rdepends": [
-            "core"
+            "core", 
+            "datetime"
         ], 
         "files": [
-            "${libdir}/python2.7/lib-dynload/_sqlite3.so"
+            "${libdir}/python2.7/lib-dynload/_sqlite3.so", 
+            "${libdir}/python2.7/sqlite3"
         ]
     }, 
     "stringold": {

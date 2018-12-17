@@ -20,23 +20,19 @@
             <input type="text" class="form-control" required id="new-project-name" name="projectname">
           </div>
           <p class="help-block text-danger" style="display: none;" id="hint-error-project-name">A project with this name exists. Project names must be unique.</p>
-<!--
-            <fieldset>
-                <label class="project-form">Project type</label>
-                    <label class="project-form radio"><input type="radio" name="ptype" value="analysis" checked/> Analysis Project</label>
 
+                <label class="project-form">Project type:</label>
                 {% if releases.count > 0 %}
-                    <label class="project-form radio"><input type="radio" name="ptype" value="build" checked /> Build Project</label>
+                    <label class="project-form radio" style="padding-left: 35px;"><input id='type-new'    type="radio" name="ptype" value="new"/> New project</label>
                 {% endif %}
-              </fieldset> -->
-        <input type="hidden" name="ptype" value="build" />
+                    <label class="project-form radio" style="padding-left: 35px;"><input id='type-import' type="radio" name="ptype" value="import"/> Import command line project</label>
 
         {% if releases.count > 0 %}
-				<div class="release form-group">
+          <div class="release form-group">
             {% if releases.count > 1 %}
               <label class="control-label">
                 Release
-                <span class="glyphicon glyphicon-question-sign get-help" title="The version of the build system you want to use"></span>
+                <span class="glyphicon glyphicon-question-sign get-help" title="The version of the build system you want to use for this project"></span>
               </label>
               <select name="projectversion" id="projectversion" class="form-control">
                 {% for release in releases %}
@@ -59,28 +55,26 @@
             {% else %}
               <input type="hidden" name="projectversion" value="{{releases.0.id}}"/>
             {% endif %}
-                </div>
+
+              <input type="checkbox" class="checkbox-mergeattr" name="mergeattr" value="mergeattr">  Merged Toaster settings (Command line user compatibility)
+              <span class="glyphicon glyphicon-question-sign get-help" title="Place the Toaster settings into the standard 'local.conf' and 'bblayers.conf' instead of 'toaster_bblayers.conf' and 'toaster.conf'"></span>
+
+           </div>
         {% endif %}
+
+            <div class="build-import form-group" id="import-project">
+              <label class="control-label">Import existing project directory
+                <span class="glyphicon glyphicon-question-sign get-help" title="Enter a path to an existing build directory, import the existing settings, and create a Toaster Project for it."></span>
+              </label>
+              <input style="width: 33%;"type="text" class="form-control" required id="import-project-dir" name="importdir">
+            </div>
+
             <div class="top-air">
               <input type="submit" id="create-project-button" class="btn btn-primary btn-lg" value="Create project"/>
               <span class="help-inline" style="vertical-align:middle;">To create a project, you need to enter a project name</span>
             </div>
 
         </form>
-        <!--
-        <div class="col-md-5 well">
-                <span class="help-block">
-                 <h4>Toaster project types</h4>
-                 <p>With a <strong>build project</strong> you configure and run your builds from Toaster.</p>
-                 <p>With an <strong>analysis project</strong>, the builds are configured and run by another tool
-                 (something like Buildbot or Jenkins), and the project only collects the information about the
-                 builds (packages, recipes, dependencies, logs, etc). </p>
-                 <p>You can read more on <a href="#">how to set up an analysis project</a>
-                 in the Toaster manual.</p>
-                 <h4>Release</h4>
-                 <p>If you create a <strong>build project</strong>, you will need to select a <strong>release</strong>,
-                 which is the version of the build system you want to use to run your builds.</p>
-             </div> -->
       </div>
     </div>
 
@@ -89,6 +83,7 @@
             // hide the new project button
             $("#new-project-button").hide();
             $('.btn-primary').attr('disabled', 'disabled');
+            $('#type-new').attr('checked', 'checked');
 
             // enable submit button when all required fields are populated
             $("input#new-project-name").on('input', function() {
@@ -118,20 +113,24 @@
                  $(".btn-primary"));
 
 
-/*			// Hide the project release when you select an analysis project
+			// Hide the project release when you select an analysis project
 			function projectType() {
-				if ($("input[type='radio']:checked").val() == 'build') {
+				if ($("input[type='radio']:checked").val() == 'new') {
+					$('.build-import').fadeOut();
 					$('.release').fadeIn();
+                    $('#import-project-dir').removeAttr('required');
 				}
 				else {
 					$('.release').fadeOut();
+					$('.build-import').fadeIn();
+                    $('#import-project-dir').attr('required', 'required');
 				}
 			}
 			projectType();
 
 			$('input:radio').change(function(){
 				projectType();
-			}); */
+			});
         });
     </script>
 

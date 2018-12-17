@@ -1,0 +1,27 @@
+From 72812894cfd9454d70e4b0753531e46580416771 Mon Sep 17 00:00:00 2001
+From: dgod <dgod.osa@gmail.com>
+Date: Mon, 21 Mar 2016 19:25:25 +0800
+Subject: [PATCH] fix css under gtk 3.20
+
+Upstream-Status: Applied [1]
+
+[1] https://git.lxde.org/gitweb/?p=lxde/lxdm.git;a=patch;h=72812894cfd9454d70e4b0753531e46580416771
+---
+ data/themes/Industrial/gtk.css | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/data/themes/Industrial/gtk.css b/data/themes/Industrial/gtk.css
+index 179f0d6..f8e6432 100644
+--- a/data/themes/Industrial/gtk.css
++++ b/data/themes/Industrial/gtk.css
+@@ -17,6 +17,7 @@
+ 	color: #000000;
+ }
+ 
++#bottom_pane label,
+ #bottom_pane GtkLabel {
+ 	font: Sans 12;
+ 	color: #9E9D9B;
+-- 
+2.14.4
+

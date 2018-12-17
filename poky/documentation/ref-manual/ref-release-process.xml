@@ -189,7 +189,7 @@
                     Running <filename>oe-selftest</filename> requires
                     host packages beyond the "Essential" grouping.
                     See the
-                    "<link linkend='required-packages-for-the-host-development-system'>Required Packages for the Host Development System</link>"
+                    "<link linkend='required-packages-for-the-build-host'>Required Packages for the Build Host</link>"
                     section for more information.
                 </note>
                 </para></listitem>

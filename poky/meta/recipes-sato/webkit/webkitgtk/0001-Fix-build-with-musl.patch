@@ -1,24 +1,25 @@
-From 415e31bd5444fa360af58b069f1b9db6607fca7d Mon Sep 17 00:00:00 2001
+From 4f9d736e0458ed33cd161cd164ad0acdac939f44 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 6 Oct 2017 17:00:08 +0300
 Subject: [PATCH] Fix build with musl
 
 Upstream-Status: Pending
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
- Source/JavaScriptCore/runtime/MachineContext.h | 10 +++++-----
+ Source/JavaScriptCore/runtime/MachineContext.h | 18 +++++++++++++++++-
  Source/WTF/wtf/Platform.h                      |  2 +-
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ 2 files changed, 18 insertions(+), 2 deletions(-)
 
 diff --git a/Source/JavaScriptCore/runtime/MachineContext.h b/Source/JavaScriptCore/runtime/MachineContext.h
-index 95080b9..2bb689c 100644
+index bf0bdc7..84b8a8a 100644
 --- a/Source/JavaScriptCore/runtime/MachineContext.h
 +++ b/Source/JavaScriptCore/runtime/MachineContext.h
 @@ -146,7 +146,7 @@ inline void*& stackPointer(mcontext_t& machineContext)
  #error Unknown Architecture
  #endif
  
--#elif defined(__GLIBC__)
+-#elif defined(__GLIBC__) || defined(__BIONIC__)
 +#elif defined(__linux__)
  
  #if CPU(X86)
@@ -27,7 +28,7 @@ index 95080b9..2bb689c 100644
  #error Unknown Architecture
  #endif
  
--#elif defined(__GLIBC__)
+-#elif defined(__GLIBC__) || defined(__BIONIC__)
 +#elif defined(__linux__)
  
  // The following sequence depends on glibc's sys/ucontext.h.
@@ -36,7 +37,7 @@ index 95080b9..2bb689c 100644
  #error Unknown Architecture
  #endif
  
--#elif defined(__GLIBC__)
+-#elif defined(__GLIBC__) || defined(__BIONIC__)
 +#elif defined(__linux__)
  
  // The following sequence depends on glibc's sys/ucontext.h.
@@ -45,7 +46,7 @@ index 95080b9..2bb689c 100644
  #error Unknown Architecture
  #endif
  
--#elif defined(__GLIBC__)
+-#elif defined(__GLIBC__) || defined(__BIONIC__)
 +#elif defined(__linux__)
  
  // The following sequence depends on glibc's sys/ucontext.h.
@@ -54,24 +55,21 @@ index 95080b9..2bb689c 100644
  #error Unknown Architecture
  #endif
  
--#elif defined(__GLIBC__)
+-#elif defined(__GLIBC__) || defined(__BIONIC__)
 +#elif defined(__linux__)
  
  // The following sequence depends on glibc's sys/ucontext.h.
  #if CPU(X86)
 diff --git a/Source/WTF/wtf/Platform.h b/Source/WTF/wtf/Platform.h
-index 5a2863b..b36c3ff 100644
+index 551c047..e50b05a 100644
 --- a/Source/WTF/wtf/Platform.h
 +++ b/Source/WTF/wtf/Platform.h
-@@ -680,7 +680,7 @@
+@@ -683,7 +683,7 @@
  #define HAVE_CFNETWORK_STORAGE_PARTITIONING 1
  #endif
  
--#if OS(DARWIN) || ((OS(FREEBSD) || defined(__GLIBC__)) && (CPU(X86) || CPU(X86_64) || CPU(ARM) || CPU(ARM64) || CPU(MIPS)))
+-#if OS(DARWIN) || ((OS(FREEBSD) || defined(__GLIBC__) || defined(__BIONIC__)) && (CPU(X86) || CPU(X86_64) || CPU(ARM) || CPU(ARM64) || CPU(MIPS)))
 +#if OS(DARWIN) || ((OS(FREEBSD) || defined(__linux__)) && (CPU(X86) || CPU(X86_64) || CPU(ARM) || CPU(ARM64) || CPU(MIPS)))
  #define HAVE_MACHINE_CONTEXT 1
  #endif
  
--- 
-2.14.1
-

@@ -1,0 +1,61 @@
+From 10afeecd10499fbd64b2c68d3b076c6906df441f Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Wed, 5 Sep 2018 17:07:48 +0200
+Subject: [PATCH] kexec-arm64.c: workaround for getrandom() syscall
+
+The syscall was added to OE's klibc.
+Fix
+
+| ../git/kexec/arch/arm64/kexec-arm64.c:19:10: fatal error: syscall.h: No such file or directory
+|  #include <syscall.h>
+
+and
+
+| ../git/kexec/arch/arm64/kexec-arm64.c: In function 'setup_2nd_dtb':
+| ../git/kexec/arch/arm64/kexec-arm64.c:499:12: warning: implicit declaration of function 'getrandom'; did you mean 'srandom'? [-Wimplicit-function-declaration]
+|    result = getrandom(&fdt_val64,
+
+
+Upstream-Status: Inappropriate [klibc specific]
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+---
+ kexec/arch/arm64/kexec-arm64.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/kexec/arch/arm64/kexec-arm64.c b/kexec/arch/arm64/kexec-arm64.c
+index 7a12479..8a7f5c5 100644
+--- a/kexec/arch/arm64/kexec-arm64.c
++++ b/kexec/arch/arm64/kexec-arm64.c
+@@ -16,7 +16,11 @@
+ #include <elf.h>
+ 
+ #include <unistd.h>
++
++#ifndef __KLIBC__
+ #include <syscall.h>
++#endif
++
+ #include <errno.h>
+ #include <linux/random.h>
+ 
+@@ -487,10 +491,16 @@ static int setup_2nd_dtb(struct dtb *dtb, char *command_line, int on_crash)
+ 		 * have a valid random seed to pass to the
+ 		 * secondary kernel.
+ 		 */
++#ifndef __KLIBC__
+ 		result = syscall(SYS_getrandom, &fdt_val64,
+ 				sizeof(fdt_val64),
+ 				GRND_NONBLOCK);
+-
++#else
++		extern ssize_t getrandom(void *, size_t, unsigned int);
++		result = getrandom(&fdt_val64,
++				sizeof(fdt_val64),
++				GRND_NONBLOCK);
++#endif
+ 		if(result == -1) {
+ 			dbgprintf("%s: Reading random bytes failed.\n",
+ 					__func__);
+-- 
+2.7.4
+

@@ -1,12 +1,14 @@
-From eb716dc856c20b3da146a4e83e9800bd1f53c739 Mon Sep 17 00:00:00 2001
+From 57f6b661d7865e8cecd17be36fab68f7f8447998 Mon Sep 17 00:00:00 2001
 From: Rico Tzschichholz <ricotz@ubuntu.com>
 Date: Wed, 6 Sep 2017 18:52:55 +0200
 Subject: [PATCH] libvaladoc: Allow disabling the graphviz dependency of
+
  valadoc
 
 https://bugzilla.gnome.org/show_bug.cgi?id=787375
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 Upstream-Status: Submitted [bugzilla link above]
+
 ---
  configure.ac                          | 60 +++++++++++++++++++----------------
  libvaladoc/Makefile.am                | 25 +++++++++++----
@@ -15,10 +17,10 @@ Upstream-Status: Submitted [bugzilla link above]
  4 files changed, 63 insertions(+), 34 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index c73d5d6b1..291e503d5 100644
+index 730c72d..af81986 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -98,34 +98,38 @@ PKG_CHECK_MODULES(GMODULE, gmodule-2.0 >= $GLIB_REQUIRED)
+@@ -119,34 +119,38 @@ PKG_CHECK_MODULES(GMODULE, gmodule-2.0 >= $GLIB_REQUIRED)
  AC_SUBST(GMODULE_CFLAGS)
  AC_SUBST(GMODULE_LIBS)
  
@@ -86,10 +88,10 @@ index c73d5d6b1..291e503d5 100644
  
  AC_PATH_PROG([XSLTPROC], [xsltproc], :)
 diff --git a/libvaladoc/Makefile.am b/libvaladoc/Makefile.am
-index 89245d86b..7c07498b9 100644
+index 384292f..cce50d8 100644
 --- a/libvaladoc/Makefile.am
 +++ b/libvaladoc/Makefile.am
-@@ -127,10 +127,6 @@ libvaladoc_la_VALASOURCES = \
+@@ -126,10 +126,6 @@ libvaladoc_la_VALASOURCES = \
  	content/tablerow.vala \
  	content/taglet.vala \
  	content/text.vala \
@@ -100,7 +102,7 @@ index 89245d86b..7c07498b9 100644
  	parser/manyrule.vala \
  	parser/oneofrule.vala \
  	parser/optionalrule.vala \
-@@ -158,13 +154,24 @@ libvaladoc_la_VALASOURCES = \
+@@ -156,13 +152,24 @@ libvaladoc_la_VALASOURCES = \
  	highlighter/codetoken.vala \
  	highlighter/highlighter.vala \
  	html/basicdoclet.vala \
@@ -126,17 +128,18 @@ index 89245d86b..7c07498b9 100644
  libvaladoc@PACKAGE_SUFFIX@_la_SOURCES = \
  	libvaladoc.vala.stamp \
  	$(libvaladoc_la_VALASOURCES:.vala=.c) \
-@@ -182,8 +189,8 @@ libvaladoc.vala.stamp: $(libvaladoc_la_VALASOURCES)
+@@ -182,9 +189,9 @@ libvaladoc.vala.stamp: $(libvaladoc_la_VALASOURCES)
  		--library valadoc \
  		--vapi valadoc@PACKAGE_SUFFIX@.vapi \
  		--vapidir $(top_srcdir)/vapi --pkg gmodule-2.0 \
 -		--vapidir $(top_srcdir)/vapi --pkg libgvc \
  		--vapidir $(top_srcdir)/gee --pkg gee \
+ 		--vapidir $(top_srcdir)/vala --pkg vala \
 +		$(LIBGVC_PKG) \
  		--pkg config \
  		$(filter %.vala %.c,$^)
  	touch $@
-@@ -209,6 +216,9 @@ nodist_pkgconfig_DATA = valadoc@PACKAGE_SUFFIX@.pc
+@@ -211,6 +218,9 @@ nodist_pkgconfig_DATA = valadoc@PACKAGE_SUFFIX@.pc
  
  valadoc@PACKAGE_SUFFIX@.pc: valadoc.pc
  	cp $< $@
@@ -146,7 +149,7 @@ index 89245d86b..7c07498b9 100644
  
  vapidir = $(datadir)/vala/vapi
  dist_vapi_DATA = valadoc@PACKAGE_SUFFIX@.vapi
-@@ -216,6 +226,9 @@ nodist_vapi_DATA = valadoc@PACKAGE_SUFFIX@.deps
+@@ -218,6 +228,9 @@ nodist_vapi_DATA = valadoc@PACKAGE_SUFFIX@.deps
  
  valadoc@PACKAGE_SUFFIX@.deps: valadoc.deps
  	cp $< $@
@@ -157,7 +160,7 @@ index 89245d86b..7c07498b9 100644
  EXTRA_DIST = \
  	$(libvaladoc_la_VALASOURCES) \
 diff --git a/libvaladoc/html/basicdoclet.vala b/libvaladoc/html/basicdoclet.vala
-index cc9ea4ed7..432c3818f 100644
+index 37c731c..e0326ef 100644
 --- a/libvaladoc/html/basicdoclet.vala
 +++ b/libvaladoc/html/basicdoclet.vala
 @@ -46,7 +46,11 @@ public abstract class Valadoc.Html.BasicDoclet : Api.Visitor, Doclet {
@@ -199,25 +202,23 @@ index cc9ea4ed7..432c3818f 100644
  
  	public void write_namespace_content (Namespace node, Api.Node? parent) {
 diff --git a/libvaladoc/html/htmlmarkupwriter.vala b/libvaladoc/html/htmlmarkupwriter.vala
-index 15ed9efd1..fe0d705d4 100644
+index 5aa4afd..e79b0b8 100644
 --- a/libvaladoc/html/htmlmarkupwriter.vala
 +++ b/libvaladoc/html/htmlmarkupwriter.vala
-@@ -43,12 +43,16 @@ public class Valadoc.Html.MarkupWriter : Valadoc.MarkupWriter {
- 		}, xml_declaration);
+@@ -51,12 +51,16 @@ public class Valadoc.Html.MarkupWriter : Valadoc.MarkupWriter {
+ 		}
  	}
  
 +#if HAVE_GRAPHVIZ
- 	public MarkupWriter add_usemap (Charts.Chart chart) {
+ 	public unowned MarkupWriter add_usemap (Charts.Chart chart) {
  		string? buf = (string?) chart.write_buffer ("cmapx");
  		if (buf != null) {
  			raw_text ("\n");
  			raw_text ((!) buf);
  		}
 +#else
-+	public MarkupWriter add_usemap (void* chart) {
++	public unowned MarkupWriter add_usemap (void* chart) {
 +#endif
  
  		return this;
  	}
--- 
-2.14.1

@@ -6,8 +6,8 @@ HOMEPAGE = "http://github.com/jpadilla/pyjwt"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=68626705a7b513ca8d5f44a3e200ed0c"
 
-SRC_URI[md5sum] = "f7dbe0d62f2087a7605946aeeca02541"
-SRC_URI[sha256sum] = "dacba5786fe3bf1a0ae8673874e29f9ac497860955c501289c63b15d3daae63a"
+SRC_URI[md5sum] = "2731c6b66b67b95d1944f072f5fa35a9"
+SRC_URI[sha256sum] = "4ee413b357d53fd3fb44704577afac88e72e878716116270d722723d65b42176"
 
 PYPI_PACKAGE = "PyJWT"
 inherit pypi

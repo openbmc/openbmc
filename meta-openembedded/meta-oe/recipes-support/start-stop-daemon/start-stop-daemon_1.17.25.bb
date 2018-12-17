@@ -9,6 +9,7 @@ RCONFLICTS_${PN} = "dpkg"
 SRC_URI = " \
     ${DEBIAN_MIRROR}/main/d/dpkg/dpkg_${PV}.tar.xz \
     file://0001-dpkg-start-stop-daemon-Accept-SIG-prefixed-signal-na.patch \
+    file://0001-Add-linux-musleabi-to-ostable.patch \
 "
 
 SRC_URI[md5sum] = "e48fcfdb2162e77d72c2a83432d537ca"

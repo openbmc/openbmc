@@ -22,13 +22,15 @@ def get_package_manager(d, root_path):
         pm = OpkgPM(d,
                     root_path,
                     d.getVar("IPKGCONF_TARGET"),
-                    d.getVar("ALL_MULTILIB_PACKAGE_ARCHS"))
+                    d.getVar("ALL_MULTILIB_PACKAGE_ARCHS"),
+                    filterbydependencies=False)
 
     elif pkg_class == "deb":
         pm = DpkgPM(d,
                     root_path,
                     d.getVar('PACKAGE_ARCHS'),
-                    d.getVar('DPKG_ARCH'))
+                    d.getVar('DPKG_ARCH'),
+                    filterbydependencies=False)
 
     pm.write_index()
     pm.update()

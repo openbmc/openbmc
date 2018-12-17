@@ -7,7 +7,7 @@
 <title>Customizing the Extensible SDK</title>
 
 <para>
-    This appendix presents customizations you can apply to the extensible SDK.
+    This appendix describes customizations you can apply to the extensible SDK.
 </para>
 
 <section id='sdk-configuring-the-extensible-sdk'>
@@ -186,7 +186,13 @@
         You can change the displayed title for the SDK installer by setting
         the
         <ulink url='&YOCTO_DOCS_REF_URL;#var-SDK_TITLE'><filename>SDK_TITLE</filename></ulink>
-        variable.
+        variable and then rebuilding the the SDK installer.
+        For information on how to build an SDK installer, see the
+        "<link linkend='sdk-building-an-sdk-installer'>Building an SDK Installer</link>"
+        section.
+    </para>
+
+    <para>
         By default, this title is derived from
         <ulink url='&YOCTO_DOCS_REF_URL;#var-DISTRO_NAME'><filename>DISTRO_NAME</filename></ulink>
         when it is set.
@@ -198,11 +204,28 @@
 
     <para>
         The
-        <ulink url='&YOCTO_DOCS_REF_URL;#ref-classes-populate-sdk-*'><filename>populate_sdk_ext</filename></ulink>
+        <ulink url='&YOCTO_DOCS_REF_URL;#ref-classes-populate-sdk-*'><filename>populate_sdk_base</filename></ulink>
         class defines the default value of the <filename>SDK_TITLE</filename>
         variable as follows:
         <literallayout class='monospaced'>
-     SDK_TITLE_task-populate-sdk-ext = "${@d.getVar('DISTRO_NAME') or d.getVar('DISTRO')} Extensible SDK"
+     SDK_TITLE ??= "${@d.getVar('DISTRO_NAME') or d.getVar('DISTRO')} SDK"
+        </literallayout>
+    </para>
+
+    <para>
+        While several ways exist to change this variable, an efficient method
+        is to set the variable in your distribution's configuration file.
+        Doing so creates an SDK installer title that applies across your
+        distribution.
+        As an example, assume you have your own layer for your distribution
+        named "meta-mydistro" and you are using the same type of file
+        hierarchy as does the default "poky" distribution.
+        If so, you could update the <filename>SDK_TITLE</filename> variable
+        in the
+        <filename>~/meta-mydistro/conf/distro/mydistro.conf</filename> file
+        using the following form:
+        <literallayout class='monospaced'>
+     SDK_TITLE = "<replaceable>your_title</replaceable>"
         </literallayout>
     </para>
 </section>
@@ -262,6 +285,51 @@
         See the
         "<link linkend='sdk-applying-updates-to-an-installed-extensible-sdk'>Applying Updates to an Installed Extensible SDK</link>"
         section for further information.
+    </para>
+</section>
+
+<section id='sdk-changing-the-default-sdk-installation-directory'>
+    <title>Changing the Default SDK Installation Directory</title>
+
+    <para>
+        When you build the installer for the Extensible SDK, the default
+        installation directory for the SDK is based on the
+        <ulink url='&YOCTO_DOCS_REF_URL;#var-DISTRO'><filename>DISTRO</filename></ulink>
+        and
+        <ulink url='&YOCTO_DOCS_REF_URL;#var-SDKEXTPATH'><filename>SDKEXTPATH</filename></ulink>
+        variables from within the
+        <ulink url='&YOCTO_DOCS_REF_URL;#ref-classes-populate-sdk-*'><filename>populate_sdk_base</filename></ulink>
+        class as follows:
+        <literallayout class='monospaced'>
+     SDKEXTPATH ??= "~/${@d.getVar('DISTRO')}_sdk"
+        </literallayout>
+        You can change this default installation directory by specifically
+        setting the <filename>SDKEXTPATH</filename> variable.
+    </para>
+
+    <para>
+        While a number of ways exist through which you can set this variable,
+        the method that makes the most sense is to set the variable in your
+        distribution's configuration file.
+        Doing so creates an SDK installer default directory that applies
+        across your distribution.
+        As an example, assume you have your own layer for your distribution
+        named "meta-mydistro" and you are using the same type of file
+        hierarchy as does the default "poky" distribution.
+        If so, you could update the <filename>SDKEXTPATH</filename> variable
+        in the
+        <filename>~/meta-mydistro/conf/distro/mydistro.conf</filename> file
+        using the following form:
+        <literallayout class='monospaced'>
+     SDKEXTPATH = "<replaceable>some_path_for_your_installed_sdk</replaceable>"
+        </literallayout>
+    </para>
+
+    <para>
+        After building your installer, running it prompts the user for
+        acceptance of the
+        <replaceable>some_path_for_your_installed_sdk</replaceable> directory
+        as the default location to install the Extensible SDK.
     </para>
 </section>
 

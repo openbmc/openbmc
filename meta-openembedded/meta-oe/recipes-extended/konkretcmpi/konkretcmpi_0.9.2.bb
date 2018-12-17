@@ -30,9 +30,10 @@ do_install_append() {
     rm -rf ${D}${datadir}
 }
 
-PACKAGES =+ "${PN}-python ${PN}-python-dbg"
+PACKAGES =+ "${PN}-python"
+
+RPROVIDES_${PN}-dbg += "${PN}-python-dbg"
 
 FILES_${PN}-python = "${libdir}/python2.7/site-packages/konkretmof.py* ${libdir}/python2.7/site-packages/_konkretmof.so"
-FILES_${PN}-python-dbg = "${libdir}/python2.7/site-packages/.debug/*"
 
 BBCLASSEXTEND = "native"

@@ -1,0 +1,31 @@
+From 58d51d941d3f4dfa38be18282d3e285d76d9020d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 13 Aug 2018 15:46:53 -0700
+Subject: [PATCH] Check for libegl using pkg-config
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ wscript | 1 +
+ 1 file changed, 1 insertion(+)
+
+Index: git/wscript
+===================================================================
+--- git.orig/wscript
++++ git/wscript
+@@ -160,14 +160,9 @@ def configure_raspberrypi_device(conf, p
+ 		conf.env['PLATFORM_USELIBS'] += ["X11"]
+ 	elif platform == "fb":
+ 		conf.env['PLATFORM_SOURCE'] = ['src/platform_fb_raspberrypi.cpp']
+-	conf.check_cxx(mandatory = 1, lib = ['GLESv2', 'EGL', 'bcm_host'], uselib_store = 'EGL')
++	conf.check_cfg(package='egl', args='--libs --cflags')
+ 	import os
+ 	sysroot = conf.options.sysroot + conf.options.prefix
+-        std_include_path = os.path.join(sysroot, 'include')
+-	vcos_pthread_path = os.path.join(sysroot, 'include/interface/vcos/pthreads')
+-	vcms_host_path = os.path.join(sysroot, 'include/interface/vmcs_host/linux')
+-	if not conf.check_cxx(mandatory = 0, header_name = ['vcos_platform_types.h', 'EGL/egl.h', 'bcm_host.h'], includes = [vcos_pthread_path, vcms_host_path, std_include_path], uselib_store = 'EGL'):
+-		conf.fatal('Check if --prefix and --sysroot are set correctly.')
+ 	conf.env['WITH_APIS'] = []
+ 	if check_gles2(conf):
+ 		conf.env['WITH_APIS'] += ['GLES1', 'GLES2']

@@ -1,0 +1,43 @@
+From 61e741654cc2eb167bca212a3bb2ba8f3ba280c1 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <Mingli.Yu@windriver.com>
+Date: Fri, 24 Aug 2018 12:04:03 +0800
+Subject: [PATCH] test-gatt: Fix hung issue
+
+The below test hangs infinitely
+$ unit/test-gatt -p  /robustness/unkown-request -d
+/robustness/unkown-request - init
+/robustness/unkown-request - setup
+/robustness/unkown-request - setup complete
+/robustness/unkown-request - run
+  GATT: < 02 17 00                                         ...
+  bt_gatt_server:MTU exchange complete, with MTU: 23
+  GATT: > 03 00 02                                         ...
+  PDU: = 03 00 02                                         ...
+  GATT: < bf 00
+
+Actually, the /robustness/unkown-request test does
+no action.
+
+Upstream-Status: Submitted [https://marc.info/?l=linux-bluetooth&m=153508881804635&w=2]
+
+Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
+---
+ unit/test-gatt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index c7e28f8..b57373b 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -4463,7 +4463,7 @@ int main(int argc, char *argv[])
+ 			test_server, service_db_1, NULL,
+ 			raw_pdu(0x03, 0x00, 0x02),
+ 			raw_pdu(0xbf, 0x00),
+-			raw_pdu(0x01, 0xbf, 0x00, 0x00, 0x06));
++			raw_pdu());
+ 
+ 	define_test_server("/robustness/unkown-command",
+ 			test_server, service_db_1, NULL,
+-- 
+2.7.4
+

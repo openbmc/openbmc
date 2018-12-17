@@ -1,0 +1,43 @@
+From 423c3f6f41fe04f4512e2a97a130f072d53dd4cf Mon Sep 17 00:00:00 2001
+From: OpenEmbedded <oe.patch@oe>
+Date: Wed, 11 Apr 2018 22:51:05 +0200
+Subject: [PATCH] x86-linux-setup.c: replace vfscanf() with vsscanf()
+
+klibc lacks vfscanf()
+
+Upstream-Status: Inappropriate [klibc specific]
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+
+---
+ kexec/arch/i386/x86-linux-setup.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/kexec/arch/i386/x86-linux-setup.c b/kexec/arch/i386/x86-linux-setup.c
+index 7850083..e190356 100644
+--- a/kexec/arch/i386/x86-linux-setup.c
++++ b/kexec/arch/i386/x86-linux-setup.c
+@@ -200,6 +200,8 @@ static int file_scanf(const char *dir, const char *file, const char *scanf_line,
+ 	FILE *fp;
+ 	int retno;
+ 	char filename[PATH_MAX];
++	long line_size = MAX_LINE;
++	char *line;
+ 
+ 	snprintf(filename, PATH_MAX, "%s/%s", dir, file);
+ 	filename[PATH_MAX-1] = 0;
+@@ -210,7 +212,14 @@ static int file_scanf(const char *dir, const char *file, const char *scanf_line,
+ 	}
+ 
+ 	va_start(argptr, scanf_line);
+-	retno = vfscanf(fp, scanf_line, argptr);
++
++	line = xmalloc(sizeof(line) * line_size);
++	while(fgets(line, sizeof(line), fp) != NULL ) {
++		line_size += MAX_LINE;
++		line = xrealloc(line,line_size);
++	}
++	retno = vsscanf(line, scanf_line, argptr);
++
+ 	va_end(argptr);
+ 
+ 	fclose(fp);

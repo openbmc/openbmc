@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Wed, 9 May 2018 14:32:59 -0500
+Subject: [PATCH] multipath.conf.5: clarify property whitelist handling
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ multipath/multipath.conf.5 | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/multipath/multipath.conf.5 b/multipath/multipath.conf.5
+index f689795..96d1b66 100644
+--- a/multipath/multipath.conf.5
++++ b/multipath/multipath.conf.5
+@@ -1181,10 +1181,9 @@ and
+ keywords. For a full description of these keywords please see the \fIdevices\fR
+ section description.
+ .LP
+-The \fIproperty\fR blacklist and whitelist handling is different from the usual
+-handling in the sense that the whitelist \fIhas\fR to be set, otherwise the
+-device will be blacklisted. In these cases the message \fIblacklisted, udev
+-property missing\fR will be displayed.
++The \fIproperty\fR whitelist handling is different from the usual
++handling in the sense that the device \fIhas\fR to have a udev property that
++matches the whitelist, otherwise the device will be blacklisted. In these cases the message \fIblacklisted, udev property missing\fR will be displayed.
+ .
+ .
+ .\" ----------------------------------------------------------------------------
+-- 
+2.7.4
+

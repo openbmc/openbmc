@@ -11,10 +11,7 @@ SRC_URI = "git://github.com/zeromq/cppzmq.git"
 
 S = "${WORKDIR}/git"
 
-do_install () {
-        install -d ${D}/usr/include
-        install -m 0755 ${S}/zmq.hpp ${D}/usr/include/
-}
+inherit cmake
 
 PACKAGES = "${PN}-dev"
 

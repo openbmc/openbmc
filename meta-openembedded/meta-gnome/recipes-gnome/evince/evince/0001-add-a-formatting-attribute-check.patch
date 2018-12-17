@@ -1,0 +1,34 @@
+From ef170dda7fbab53682c9bc287dec93fa86130bc9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 9 Sep 2018 21:49:59 -0700
+Subject: [PATCH] add a formatting attribute check
+
+Tell Clang that parameter is a printf style format using the
+attribute flag
+
+This helps in avoiding below warnings seen with clang
+
+unarr.c:106:22: error: format string is not a string literal
+[-Werror,-Wformat-nonliteral]
+|     vfprintf(stderr, msg, args);
+|                      ^~~
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ cut-n-paste/unarr/common/unarr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cut-n-paste/unarr/common/unarr.c b/cut-n-paste/unarr/common/unarr.c
+index 97ec92a..9e6e3ad 100644
+--- a/cut-n-paste/unarr/common/unarr.c
++++ b/cut-n-paste/unarr/common/unarr.c
+@@ -92,7 +92,7 @@ size_t ar_get_global_comment(ar_archive *ar, void *buffer, size_t count)
+     return ar->get_comment(ar, buffer, count);
+ }
+ 
+-void ar_log(const char *prefix, const char *file, int line, const char *msg, ...)
++void __attribute__((__format__ (__printf__, 4, 0))) ar_log(const char *prefix, const char *file, int line, const char *msg, ...)
+ {
+     va_list args;
+     va_start(args, msg);

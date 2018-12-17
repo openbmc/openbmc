@@ -1,0 +1,20 @@
+Minic GNU basename() API for non-glibc library e.g. musl
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: poppler-0.64.0/utils/pdfsig.cc
+===================================================================
+--- poppler-0.64.0.orig/utils/pdfsig.cc
++++ poppler-0.64.0/utils/pdfsig.cc
+@@ -35,6 +35,10 @@
+ #include "Win32Console.h"
+ #include "numberofcharacters.h"
+ 
++#if !defined(__GLIBC__)
++#define basename(src) (strrchr(src,'/') ? strrchr(src,'/')+1 : src)
++#endif
++
+ static const char * getReadableSigState(SignatureValidationStatus sig_vs)
+ {
+   switch(sig_vs) {

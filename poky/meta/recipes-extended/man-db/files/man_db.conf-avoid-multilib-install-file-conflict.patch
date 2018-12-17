@@ -1,0 +1,16 @@
+The first line of man_db.conf will be replaced by package name. And it causes
+multilib install file conflict. Remove the line to avoid the issue.
+
+Upstream-Status: Pending
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+diff --git a/src/man_db.conf.in b/src/man_db.conf.in
+index bc8bb7e..04cfb31 100644
+--- a/src/man_db.conf.in
++++ b/src/man_db.conf.in
+@@ -1,4 +1,3 @@
+-# @config_file_basename@
+ #
+ # This file is used by the man-db package to configure the man and cat paths.
+ # It is also used to provide a manpath for those without one by examining

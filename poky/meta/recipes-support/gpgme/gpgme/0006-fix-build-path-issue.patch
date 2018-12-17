@@ -1,7 +1,7 @@
-From 180a5669e4a13a550b1b0dcef1689b6c0470fe54 Mon Sep 17 00:00:00 2001
+From 4f83750ce402b65d16cc09f8a0274a7ec76fc634 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Wed, 31 Jan 2018 11:01:09 +0800
-Subject: [PATCH] fix build path issue
+Subject: [PATCH 6/7] fix build path issue
 
 Get the "--root" directory supplied to the "install" command,
 and use it as a prefix to strip off the purported filename
@@ -33,5 +33,5 @@ index ce4f0a5..5a468f1 100644
  	done
  
 -- 
-1.8.3.1
+2.7.4
 

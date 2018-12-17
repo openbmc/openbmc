@@ -1,0 +1,21 @@
+@CUPS_SERVERBIN@ is ${libdir} related that causes multilib install file
+conflict. Remove @CUPS_SERVERBIN@ from the comment line of cups-files.conf to
+avoid the conflict.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+diff --git a/conf/cups-files.conf.in b/conf/cups-files.conf.in
+index 4a78ba6..03c6582 100644
+--- a/conf/cups-files.conf.in
++++ b/conf/cups-files.conf.in
+@@ -73,7 +73,7 @@ PageLog @CUPS_LOGDIR@/page_log
+ #RequestRoot @CUPS_REQUESTS@
+ 
+ # Location of helper programs...
+-#ServerBin @CUPS_SERVERBIN@
++#ServerBin
+ 
+ # SSL/TLS keychain for the scheduler...
+ #ServerKeychain @CUPS_SERVERKEYCHAIN@

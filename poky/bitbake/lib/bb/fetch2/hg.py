@@ -80,7 +80,7 @@ class Hg(FetchMethod):
         ud.fullmirror = os.path.join(d.getVar("DL_DIR"), mirrortarball)
         ud.mirrortarballs = [mirrortarball]
 
-        hgdir = d.getVar("HGDIR") or (d.getVar("DL_DIR") + "/hg/")
+        hgdir = d.getVar("HGDIR") or (d.getVar("DL_DIR") + "/hg")
         ud.pkgdir = os.path.join(hgdir, hgsrcname)
         ud.moddir = os.path.join(ud.pkgdir, ud.module)
         ud.localfile = ud.moddir

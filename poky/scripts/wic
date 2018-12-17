@@ -362,6 +362,8 @@ def wic_init_parser_create(subparser):
                            "bitbake variables")
     subparser.add_argument("-D", "--debug", dest="debug", action="store_true",
                       default=False, help="output debug information")
+    subparser.add_argument("-i", "--imager", dest="imager",
+                      default="direct", help="the wic imager plugin")
     return
 
 

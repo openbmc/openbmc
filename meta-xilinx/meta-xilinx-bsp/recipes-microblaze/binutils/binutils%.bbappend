@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_append_microblaze := "${THISDIR}/binutils-2.30:"
+FILESEXTRAPATHS_append_microblaze := "${THISDIR}/binutils-2.31:"
 SRC_URI_append_microblaze = " \
 		file://0001-MicroBlaze-Add-wdc.ext.clear-and-wdc.ext.flush-insns.patch \
 		file://0002-MicroBlaze-add-mlittle-endian-and-mbig-endian-flags.patch \

@@ -5,7 +5,11 @@
   >
   Customise
 </button>
-<button class="btn btn-default btn-block layer-add-{{data.layer_version.pk}} layerbtn" data-layer='{ "id": {{data.layer_version.pk}}, "name":  "{{data.layer_version.layer.name}}", "layerdetailurl": "{%url 'layerdetails' extra.pid data.layer_version.pk%}"}' data-directive="add"
+<button class="btn btn-default btn-block layer-add-{{data.layer_version.pk}} layerbtn"
+    data-layer='{ "id": {{data.layer_version.pk}}, "name":  "{{data.layer_version.layer.name}}",
+      "layerdetailurl": "{%url 'layerdetails' extra.pid data.layer_version.pk%}",
+      "xhrLayerUrl": "{% url "xhr_layer" extra.pid data.layer_version.pk %}"}'
+    data-directive="add"
     {% if data.layer_version.pk in extra.current_layers %}
     style="display:none;"
     {% endif %}

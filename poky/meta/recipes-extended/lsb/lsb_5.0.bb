@@ -34,7 +34,7 @@ S = "${WORKDIR}/lsb-release-1.4"
 CLEANBROKEN = "1"
 
 do_install() {
-	oe_runmake install prefix=${D}${base_prefix} mandir=${D}${datadir}/man/ DESTDIR=${D}
+	oe_runmake install prefix=${D}${root_prefix} mandir=${D}${datadir}/man/ DESTDIR=${D}
 
 	# these two dirs are needed by package lsb-dist-checker
 	mkdir -p ${D}${sysconfdir}/opt
@@ -99,7 +99,9 @@ do_install_append() {
        fi
 
        if [ "${TARGET_ARCH}" = "x86_64" ]; then
-               if [ "${base_libdir}" != "${base_prefix}/lib64" ]; then
+       	       # don't symlink if usrmerge is in DISTRO_FEATURES as it manages the symlink
+               if ${@bb.utils.contains('DISTRO_FEATURES','usrmerge','false','true',d)} && \
+	       	  [ "${base_libdir}" != "${base_prefix}/lib64" ]; then
                    lnr ${D}${base_libdir} ${D}${base_prefix}/lib64
                fi
 	       cd ${D}${base_libdir}

@@ -1,0 +1,48 @@
+From 5c32c38bf19b24f0aadd78012d17ff5caa82151e Mon Sep 17 00:00:00 2001
+From: Matt Madison <matt@madison.systems>
+Date: Sat, 17 Feb 2018 05:24:20 -0800
+Subject: [PATCH] allow GOTOOLDIR to be overridden in the environment
+
+to allow for split host/target build roots
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Matt Madison <matt@madison.systems>
+
+---
+ src/cmd/dist/build.go          | 4 +++-
+ src/cmd/go/internal/cfg/cfg.go | 7 +++++--
+ 2 files changed, 8 insertions(+), 3 deletions(-)
+
+Index: go/src/cmd/dist/build.go
+===================================================================
+--- go.orig/src/cmd/dist/build.go
++++ go/src/cmd/dist/build.go
+@@ -228,7 +228,9 @@ func xinit() {
+ 	workdir = xworkdir()
+ 	xatexit(rmworkdir)
+ 
+-	tooldir = pathf("%s/pkg/tool/%s_%s", goroot, gohostos, gohostarch)
++	if tooldir = os.Getenv("GOTOOLDIR"); tooldir == "" {
++		tooldir = pathf("%s/pkg/tool/%s_%s", goroot, gohostos, gohostarch)
++	}
+ }
+ 
+ // compilerEnv returns a map from "goos/goarch" to the
+Index: go/src/cmd/go/internal/cfg/cfg.go
+===================================================================
+--- go.orig/src/cmd/go/internal/cfg/cfg.go
++++ go/src/cmd/go/internal/cfg/cfg.go
+@@ -116,7 +116,11 @@ func init() {
+ 		// variables. This matches the initialization of ToolDir in
+ 		// go/build, except for using GOROOT rather than
+ 		// runtime.GOROOT.
+-		build.ToolDir = filepath.Join(GOROOT, "pkg/tool/"+runtime.GOOS+"_"+runtime.GOARCH)
++		if s := os.Getenv("GOTOOLDIR"); s != "" {
++			build.ToolDir = filepath.Clean(s)
++		} else {
++			build.ToolDir = filepath.Join(GOROOT, "pkg/tool/"+runtime.GOOS+"_"+runtime.GOARCH)
++		}
+ 	}
+ }
+ 

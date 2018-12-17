@@ -1,4 +1,4 @@
-From bb7ed11950101798aae82f7fda8b3dcb05f755c5 Mon Sep 17 00:00:00 2001
+From dbc88349b9eed4268db951df2c3a8387f75a32e7 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 15 Aug 2017 17:24:06 +0800
 Subject: [PATCH 4/7] Disable the test to convert euc-jp
@@ -40,5 +40,5 @@ index a503646..299f1eb 100644
  }]])],
          [am_cv_func_iconv_works=yes],
 -- 
-1.8.3.1
+2.7.4
 

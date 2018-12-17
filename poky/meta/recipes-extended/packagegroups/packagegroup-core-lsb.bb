@@ -76,7 +76,7 @@ RDEPENDS_packagegroup-core-sys-extended = "\
     screen \
     setserial \
     sysstat \
-    udev-extraconf \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '', 'udev-extraconf', d)} \
     unzip \
     watchdog \
     wget \
@@ -136,6 +136,7 @@ RDEPENDS_packagegroup-core-lsb-core = "\
     bc \
     binutils \
     binutils-symlinks \
+    bzip2 \
     coreutils \
     cpio \
     cronie \
@@ -158,7 +159,6 @@ RDEPENDS_packagegroup-core-lsb-core = "\
     make \
     man \
     man-pages \
-    mktemp \
     msmtp \
     patch \
     procps \
@@ -220,7 +220,7 @@ RDEPENDS_packagegroup-core-lsb-desktop = "\
     liberation-fonts \
     gtk+ \
     atk \
-    libasound \
+    alsa-lib \
 "
 
 RDEPENDS_packagegroup-core-lsb-runtime-add = "\

@@ -1,0 +1,26 @@
+From 82486f7e1ee2aa07a5c12cb357834993aa8c1d20 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 8 Jun 2018 20:19:13 -0700
+Subject: [PATCH] neigh.c: Do not include net/if_packet.h
+
+This header is glibc specific
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libibverbs/neigh.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/libibverbs/neigh.c b/libibverbs/neigh.c
+index 21177db0..cfc593a0 100644
+--- a/libibverbs/neigh.c
++++ b/libibverbs/neigh.c
+@@ -2,7 +2,6 @@
+  */
+ 
+ #include "config.h"
+-#include <net/if_packet.h>
+ #include <linux/netlink.h>
+ #include <linux/rtnetlink.h>
+ #include <endian.h>

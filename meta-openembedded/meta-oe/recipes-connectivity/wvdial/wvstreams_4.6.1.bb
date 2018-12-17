@@ -21,6 +21,8 @@ SRC_URI = "http://${BPN}.googlecode.com/files/${BP}.tar.gz \
            file://0005-check-for-libexecinfo-during-configure.patch \
            file://0001-build-fix-parallel-make.patch \
            file://0002-wvrules.mk-Use-_DEFAULT_SOURCE.patch \
+           file://openssl-buildfix.patch \
+           file://0001-Forward-port-to-OpenSSL-1.1.x.patch \
            "
 
 SRC_URI[md5sum] = "2760dac31a43d452a19a3147bfde571c"
@@ -34,23 +36,21 @@ LDFLAGS_append = " -Wl,-rpath-link,${CROSS_DIR}/${TARGET_SYS}/lib"
 
 EXTRA_OECONF = " --without-tcl --without-qt --without-pam --without-valgrind"
 
-PACKAGES_prepend = "libuniconf libuniconf-dbg "
-PACKAGES_prepend = "uniconfd uniconfd-dbg "
-PACKAGES_prepend = "libwvstreams-base libwvstreams-base-dbg "
-PACKAGES_prepend = "libwvstreams-extras libwvstreams-extras-dbg "
+PACKAGES_prepend = "libuniconf "
+PACKAGES_prepend = "uniconfd "
+PACKAGES_prepend = "libwvstreams-base "
+PACKAGES_prepend = "libwvstreams-extras "
 PACKAGES_prepend = "${PN}-valgrind "
 
+RPROVIDES_${PN}-dbg += "libuniconf-dbg uniconfd-dbg libwvstreams-base-dbg libwvstreams-extras-dbg"
+
 FILES_libuniconf     = "${libdir}/libuniconf.so.*"
-FILES_libuniconf-dbg = "${libdir}/.debug/libuniconf.so.*"
 
 FILES_uniconfd     = "${sbindir}/uniconfd ${sysconfdir}/uniconf.conf ${localstatedir}/uniconf"
-FILES_uniconfd-dbg = "${sbindir}/.debug/uniconfd"
 
 FILES_libwvstreams-base     = "${libdir}/libwvutils.so.*"
-FILES_libwvstreams-base-dbg = "${libdir}/.debug/libwvutils.so.*"
 
 FILES_libwvstreams-extras     = "${libdir}/libwvbase.so.* ${libdir}/libwvstreams.so.*"
-FILES_libwvstreams-extras-dbg = "${libdir}/.debug/libwvbase.so.* ${libdir}/.debug/libwvstreams.so.*"
 
 FILES_${PN}-valgrind = "${libdir}/valgrind/wvstreams.supp"
 RDEPENDS_${PN} += "perl"

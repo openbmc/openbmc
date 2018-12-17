@@ -1,0 +1,89 @@
+#! /bin/sh
+
+# Based on the Debian initscript for mosquitto
+
+### BEGIN INIT INFO
+# Provides:         mosquitto
+# Required-Start:   $remote_fs $syslog
+# Required-Stop:    $remote_fs $syslog
+# Default-Start:    2 3 4 5
+# Default-Stop:     0 1 6
+# Short-Description:    mosquitto MQTT message broker
+# Description: 
+#  This is a message broker that supports version 3.1/3.1.1 of the MQ Telemetry
+#  Transport (MQTT) protocol.
+#  
+#  MQTT provides a method of carrying out messaging using a publish/subscribe
+#  model. It is lightweight, both in terms of bandwidth usage and ease of
+#  implementation. This makes it particularly useful at the edge of the network
+#  where a sensor or other simple device may be implemented using an arduino for
+#  example.
+### END INIT INFO
+
+set -e
+
+PIDFILE=@LOCALSTATEDIR@/run/mosquitto.pid
+DAEMON=@SBINDIR@/mosquitto
+
+# start and stop the mosquitto MQTT message broker
+
+test -x ${DAEMON} || exit 0
+
+umask 022
+
+. @SYSCONFDIR@/init.d/functions
+
+export PATH="${PATH:+$PATH:}@SBINDIR@:@BASE_SBINDIR@"
+
+case "$1" in
+    start)
+        echo "Starting Mosquitto message broker" "mosquitto"
+        if start-stop-daemon --start --quiet --oknodo --background  --make-pidfile --pidfile ${PIDFILE} --exec ${DAEMON} ; then
+            exit 0
+        else
+            exit 1
+        fi
+        ;;
+    stop)
+        echo "Stopping Mosquitto message broker" "mosquitto"
+        if start-stop-daemon --stop --quiet --oknodo --pidfile ${PIDFILE}; then
+            rm -f ${PIDFILE}
+            exit 0
+        else
+            exit 1
+        fi
+        ;;
+
+
+    reload|force-reload)
+        if [ -f ${PIDFILE} ] ; then
+            echo "Reloading configuration for mosquitto"
+            pid=`cat ${PIDFILE}`
+            kill -HUP $pid
+        else
+            echo "mosquitto does not seem to be running"
+        fi
+        ;;
+
+    restart)
+        echo "Restarting Mosquitto message broker" "mosquitto"
+        if start-stop-daemon --stop --quiet --oknodo --retry 30 --pidfile ${PIDFILE}; then
+            rm -f ${PIDFILE}
+        fi
+        if start-stop-daemon --start --quiet --oknodo --background --make-pidfile --pidfile ${PIDFILE} --exec ${DAEMON} -- -c @SYSCONFDIR@/mosquitto/mosquitto.conf ; then
+            exit 0
+        else
+            exit 1
+        fi
+        ;;
+
+    status)
+        status ${DAEMON} && exit 0 || exit $?
+        ;;
+
+    *)
+        echo "Usage: $0 {start|stop|reload|force-reload|restart|status}"
+        exit 1
+esac
+
+exit 0

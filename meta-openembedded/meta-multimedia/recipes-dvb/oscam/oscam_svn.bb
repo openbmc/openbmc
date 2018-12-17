@@ -4,12 +4,12 @@ HOMEPAGE = "http://www.streamboard.tv/oscam/"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
-DEPENDS = "libusb1 openssl pcsc-lite"
+DEPENDS = "libusb1 openssl10 pcsc-lite"
 
 SRC_URI = "svn://www.streamboard.tv/svn/oscam;module=trunk;protocol=http \
-    file://respect-cflags.patch \
-"
-SRCREV = "9164"
+           file://0001-include-sys-sysmacros.h-for-major-minor-definitions.patch \
+           "
+SRCREV = "11431"
 PV = "1.10+${SRCPV}"
 
 S = "${WORKDIR}/trunk"

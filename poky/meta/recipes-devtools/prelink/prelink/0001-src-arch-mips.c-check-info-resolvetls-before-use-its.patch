@@ -1,0 +1,51 @@
+From 2136969e3e196b9cf7f4788340efa4b1d9b39565 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Thu, 11 Oct 2018 10:05:52 +0800
+Subject: [PATCH] src/arch-mips.c: check info->resolvetls before use its member
+
+The info->resolvetls might be NULL according to src/prelink.c:
+[snip]
+ /* Dynamic linker does not depend on any other library,
+    all symbols resolve to themselves with the exception
+    of SHN_UNDEF symbols which resolve to 0.  */
+if (info->symtab[r_sym].st_shndx == SHN_UNDEF)
+  {
+    info->resolveent = NULL;
+    info->resolvetls = NULL;
+[snip]
+
+So we must check it before use its members, otherwise, there might be
+Segmentation fault error.
+
+Fixed:
+MACHINE = "qemumips"
+IMAGE_INSTALL_append = " qemu"
+$ bitbake core-image-minimal
+[snip]
+| /path/to/qemumips-poky-linux/core-image-minimal/1.0-r0/temp/run.prelink_image.1000: line 111:  1010 Segmentation fault      (core dumped)
+[snip]
+
+Upstream-Status: Submitted [https://lists.yoctoproject.org/pipermail/yocto/2018-October/042812.html]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ src/arch-mips.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/arch-mips.c b/src/arch-mips.c
+index ccb1834..02c608f 100644
+--- a/src/arch-mips.c
++++ b/src/arch-mips.c
+@@ -567,7 +567,8 @@ mips_prelink_reloc (struct prelink_info *info, GElf_Addr r_offset,
+       if (dso->ehdr.e_type == ET_EXEC)
+ 	{
+ 	  value = info->resolve (info, r_sym, r_type);
+-	  value += info->resolvetls->offset - TLS_TP_OFFSET;
++	  if (info->resolvetls != NULL)
++	    value += info->resolvetls->offset - TLS_TP_OFFSET;
+ 	  if (r_type == R_MIPS_TLS_TPREL32)
+ 	    mips_prelink_32bit_reloc (dso, rela, value);
+ 	  else
+-- 
+2.7.4
+

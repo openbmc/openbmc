@@ -1,6 +1,6 @@
 require xorg-driver-common.inc
 
-DEPENDS += "inputproto kbproto "
+DEPENDS += "xorgproto"
 
 python add_xorg_abi_depends() {
     _add_xorg_abi_depends(d, "input")

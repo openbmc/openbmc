@@ -1,0 +1,36 @@
+From c1700f867f876ee33c130a8e28b688e2b1d89663 Mon Sep 17 00:00:00 2001
+From: Anuj Mittal <anuj.mittal@intel.com>
+Date: Wed, 11 Apr 2018 17:14:55 +0800
+Subject: [PATCH] Prevent host contamination
+
+Remove reference to host $(libdir) from .la files.
+
+Upstream-Status: Inappropriate [cross-compile specific]
+
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+---
+ gst-libs/ext/Makefile.am | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gst-libs/ext/Makefile.am b/gst-libs/ext/Makefile.am
+index 6cdc048..a19d255 100644
+--- a/gst-libs/ext/Makefile.am
++++ b/gst-libs/ext/Makefile.am
+@@ -49,7 +49,7 @@ echo "  GEN      $1.la" && \
+  echo "library_names=''" && \
+  echo "old_library='$1.a'" && \
+  echo "inherited_linker_flags=''" && \
+- echo "dependency_libs=' -L$(libdir) $(if $2,$(foreach dep,$2,$(abs_builddir)/$(dep).la)) $(call find_library_la,$3 $(LIBM),$(LDFLAGS)) '" && \
++ echo "dependency_libs=' -L $(if $2,$(foreach dep,$2,$(abs_builddir)/$(dep).la)) $(call find_library_la,$3 $(LIBM),$(LDFLAGS)) '" && \
+  echo "weak_library_names=''" &&  \
+  echo "current=" && \
+  echo "age=" && \
+@@ -58,7 +58,7 @@ echo "  GEN      $1.la" && \
+  echo "shouldnotlink=no" && \
+  echo "dlopen=''" && \
+  echo "dlpreopen=''" && \
+- echo "libdir='$(libdir)'") > $1.la
++ echo "libdir=''") > $1.la
+ endef
+ 
+ libavutil.la:

@@ -1,0 +1,289 @@
+From 21eb59fbd071ebffb8495232766824944fb521a0 Mon Sep 17 00:00:00 2001
+From: Alex Kiernan <alex.kiernan@gmail.com>
+Date: Wed, 7 Nov 2018 21:19:53 +0000
+Subject: [PATCH] Move exports before symbol definition
+
+Based on 7966020 ("src: Fix exporting symbols with clang"), when
+EXPORT_SYMBOL is located after function definition, clang won't properly
+export the function, resulting in a library with no symbols when built with
+clang.
+
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+---
+ src/flowtable.c | 54 +++++++++++++++++++++++++++---------------------------
+ 1 file changed, 27 insertions(+), 27 deletions(-)
+
+diff --git a/src/flowtable.c b/src/flowtable.c
+index c1ddae4..d7434e3 100644
+--- a/src/flowtable.c
++++ b/src/flowtable.c
+@@ -34,12 +34,13 @@ struct nftnl_flowtable {
+ 	uint32_t		flags;
+ };
+ 
++EXPORT_SYMBOL(nftnl_flowtable_alloc);
+ struct nftnl_flowtable *nftnl_flowtable_alloc(void)
+ {
+ 	return calloc(1, sizeof(struct nftnl_flowtable));
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_alloc);
+ 
++EXPORT_SYMBOL(nftnl_flowtable_free);
+ void nftnl_flowtable_free(const struct nftnl_flowtable *c)
+ {
+ 	int i;
+@@ -56,14 +57,14 @@ void nftnl_flowtable_free(const struct nftnl_flowtable *c)
+ 	}
+ 	xfree(c);
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_free);
+ 
++EXPORT_SYMBOL(nftnl_flowtable_is_set);
+ bool nftnl_flowtable_is_set(const struct nftnl_flowtable *c, uint16_t attr)
+ {
+ 	return c->flags & (1 << attr);
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_is_set);
+ 
++EXPORT_SYMBOL(nftnl_flowtable_unset);
+ void nftnl_flowtable_unset(struct nftnl_flowtable *c, uint16_t attr)
+ {
+ 	int i;
+@@ -96,7 +97,6 @@ void nftnl_flowtable_unset(struct nftnl_flowtable *c, uint16_t attr)
+ 
+ 	c->flags &= ~(1 << attr);
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_unset);
+ 
+ static uint32_t nftnl_flowtable_validate[NFTNL_FLOWTABLE_MAX + 1] = {
+ 	[NFTNL_FLOWTABLE_HOOKNUM]	= sizeof(uint32_t),
+@@ -105,6 +105,7 @@ static uint32_t nftnl_flowtable_validate[NFTNL_FLOWTABLE_MAX + 1] = {
+ 	[NFTNL_FLOWTABLE_FLAGS]		= sizeof(uint32_t),
+ };
+ 
++EXPORT_SYMBOL(nftnl_flowtable_set_data);
+ int nftnl_flowtable_set_data(struct nftnl_flowtable *c, uint16_t attr,
+ 			     const void *data, uint32_t data_len)
+ {
+@@ -170,32 +171,32 @@ int nftnl_flowtable_set_data(struct nftnl_flowtable *c, uint16_t attr,
+ 	c->flags |= (1 << attr);
+ 	return 0;
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_set_data);
+ 
++EXPORT_SYMBOL(nftnl_flowtable_set);
+ void nftnl_flowtable_set(struct nftnl_flowtable *c, uint16_t attr, const void *data)
+ {
+ 	nftnl_flowtable_set_data(c, attr, data, nftnl_flowtable_validate[attr]);
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_set);
+ 
++EXPORT_SYMBOL(nftnl_flowtable_set_u32);
+ void nftnl_flowtable_set_u32(struct nftnl_flowtable *c, uint16_t attr, uint32_t data)
+ {
+ 	nftnl_flowtable_set_data(c, attr, &data, sizeof(uint32_t));
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_set_u32);
+ 
++EXPORT_SYMBOL(nftnl_flowtable_set_s32);
+ void nftnl_flowtable_set_s32(struct nftnl_flowtable *c, uint16_t attr, int32_t data)
+ {
+ 	nftnl_flowtable_set_data(c, attr, &data, sizeof(int32_t));
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_set_s32);
+ 
++EXPORT_SYMBOL(nftnl_flowtable_set_str);
+ int nftnl_flowtable_set_str(struct nftnl_flowtable *c, uint16_t attr, const char *str)
+ {
+ 	return nftnl_flowtable_set_data(c, attr, str, strlen(str) + 1);
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_set_str);
+ 
++EXPORT_SYMBOL(nftnl_flowtable_get_data);
+ const void *nftnl_flowtable_get_data(const struct nftnl_flowtable *c,
+ 				     uint16_t attr, uint32_t *data_len)
+ {
+@@ -229,21 +230,21 @@ const void *nftnl_flowtable_get_data(const struct nftnl_flowtable *c,
+ 	}
+ 	return NULL;
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_get_data);
+ 
++EXPORT_SYMBOL(nftnl_flowtable_get);
+ const void *nftnl_flowtable_get(const struct nftnl_flowtable *c, uint16_t attr)
+ {
+ 	uint32_t data_len;
+ 	return nftnl_flowtable_get_data(c, attr, &data_len);
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_get);
+ 
++EXPORT_SYMBOL(nftnl_flowtable_get_str);
+ const char *nftnl_flowtable_get_str(const struct nftnl_flowtable *c, uint16_t attr)
+ {
+ 	return nftnl_flowtable_get(c, attr);
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_get_str);
+ 
++EXPORT_SYMBOL(nftnl_flowtable_get_u32);
+ uint32_t nftnl_flowtable_get_u32(const struct nftnl_flowtable *c, uint16_t attr)
+ {
+ 	uint32_t data_len;
+@@ -253,8 +254,8 @@ uint32_t nftnl_flowtable_get_u32(const struct nftnl_flowtable *c, uint16_t attr)
+ 
+ 	return val ? *val : 0;
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_get_u32);
+ 
++EXPORT_SYMBOL(nftnl_flowtable_get_s32);
+ int32_t nftnl_flowtable_get_s32(const struct nftnl_flowtable *c, uint16_t attr)
+ {
+ 	uint32_t data_len;
+@@ -264,8 +265,8 @@ int32_t nftnl_flowtable_get_s32(const struct nftnl_flowtable *c, uint16_t attr)
+ 
+ 	return val ? *val : 0;
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_get_s32);
+ 
++EXPORT_SYMBOL(nftnl_flowtable_nlmsg_build_payload);
+ void nftnl_flowtable_nlmsg_build_payload(struct nlmsghdr *nlh,
+ 					 const struct nftnl_flowtable *c)
+ {
+@@ -301,7 +302,6 @@ void nftnl_flowtable_nlmsg_build_payload(struct nlmsghdr *nlh,
+ 	if (c->flags & (1 << NFTNL_FLOWTABLE_SIZE))
+ 		mnl_attr_put_u32(nlh, NFTA_FLOWTABLE_SIZE, htonl(c->size));
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_nlmsg_build_payload);
+ 
+ static int nftnl_flowtable_parse_attr_cb(const struct nlattr *attr, void *data)
+ {
+@@ -412,6 +412,7 @@ static int nftnl_flowtable_parse_hook(struct nlattr *attr, struct nftnl_flowtabl
+ 	return 0;
+ }
+ 
++EXPORT_SYMBOL(nftnl_flowtable_nlmsg_parse);
+ int nftnl_flowtable_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_flowtable *c)
+ {
+ 	struct nlattr *tb[NFTA_FLOWTABLE_MAX + 1] = {};
+@@ -460,7 +461,6 @@ int nftnl_flowtable_nlmsg_parse(const struct nlmsghdr *nlh, struct nftnl_flowtab
+ 
+ 	return ret;
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_nlmsg_parse);
+ 
+ static const char *nftnl_hooknum2str(int family, int hooknum)
+ {
+@@ -612,20 +612,20 @@ static int nftnl_flowtable_do_parse(struct nftnl_flowtable *c,
+ 	return ret;
+ }
+ 
++EXPORT_SYMBOL(nftnl_flowtable_parse);
+ int nftnl_flowtable_parse(struct nftnl_flowtable *c, enum nftnl_parse_type type,
+ 			  const char *data, struct nftnl_parse_err *err)
+ {
+ 	return nftnl_flowtable_do_parse(c, type, data, err, NFTNL_PARSE_BUFFER);
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_parse);
+ 
++EXPORT_SYMBOL(nftnl_flowtable_parse_file);
+ int nftnl_flowtable_parse_file(struct nftnl_flowtable *c,
+ 			       enum nftnl_parse_type type,
+ 			       FILE *fp, struct nftnl_parse_err *err)
+ {
+ 	return nftnl_flowtable_do_parse(c, type, fp, err, NFTNL_PARSE_FILE);
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_parse_file);
+ 
+ static int nftnl_flowtable_export(char *buf, size_t size,
+ 				  const struct nftnl_flowtable *c, int type)
+@@ -720,6 +720,7 @@ static int nftnl_flowtable_cmd_snprintf(char *buf, size_t size,
+ 	return offset;
+ }
+ 
++EXPORT_SYMBOL(nftnl_flowtable_snprintf);
+ int nftnl_flowtable_snprintf(char *buf, size_t size, const struct nftnl_flowtable *c,
+ 			 uint32_t type, uint32_t flags)
+ {
+@@ -729,7 +730,6 @@ int nftnl_flowtable_snprintf(char *buf, size_t size, const struct nftnl_flowtabl
+ 	return nftnl_flowtable_cmd_snprintf(buf, size, c, nftnl_flag2cmd(flags),
+ 					    type, flags);
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_snprintf);
+ 
+ static int nftnl_flowtable_do_snprintf(char *buf, size_t size, const void *c,
+ 				   uint32_t cmd, uint32_t type, uint32_t flags)
+@@ -737,18 +737,19 @@ static int nftnl_flowtable_do_snprintf(char *buf, size_t size, const void *c,
+ 	return nftnl_flowtable_snprintf(buf, size, c, type, flags);
+ }
+ 
++EXPORT_SYMBOL(nftnl_flowtable_fprintf);
+ int nftnl_flowtable_fprintf(FILE *fp, const struct nftnl_flowtable *c,
+ 			    uint32_t type, uint32_t flags)
+ {
+ 	return nftnl_fprintf(fp, c, NFTNL_CMD_UNSPEC, type, flags,
+ 			   nftnl_flowtable_do_snprintf);
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_fprintf);
+ 
+ struct nftnl_flowtable_list {
+ 	struct list_head list;
+ };
+ 
++EXPORT_SYMBOL(nftnl_flowtable_list_alloc);
+ struct nftnl_flowtable_list *nftnl_flowtable_list_alloc(void)
+ {
+ 	struct nftnl_flowtable_list *list;
+@@ -761,8 +762,8 @@ struct nftnl_flowtable_list *nftnl_flowtable_list_alloc(void)
+ 
+ 	return list;
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_list_alloc);
+ 
++EXPORT_SYMBOL(nftnl_flowtable_list_free);
+ void nftnl_flowtable_list_free(struct nftnl_flowtable_list *list)
+ {
+ 	struct nftnl_flowtable *s, *tmp;
+@@ -773,34 +774,34 @@ void nftnl_flowtable_list_free(struct nftnl_flowtable_list *list)
+ 	}
+ 	xfree(list);
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_list_free);
+ 
++EXPORT_SYMBOL(nftnl_flowtable_list_is_empty);
+ int nftnl_flowtable_list_is_empty(const struct nftnl_flowtable_list *list)
+ {
+ 	return list_empty(&list->list);
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_list_is_empty);
+ 
++EXPORT_SYMBOL(nftnl_flowtable_list_add);
+ void nftnl_flowtable_list_add(struct nftnl_flowtable *s,
+ 			      struct nftnl_flowtable_list *list)
+ {
+ 	list_add(&s->head, &list->list);
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_list_add);
+ 
++EXPORT_SYMBOL(nftnl_flowtable_list_add_tail);
+ void nftnl_flowtable_list_add_tail(struct nftnl_flowtable *s,
+ 				   struct nftnl_flowtable_list *list)
+ {
+ 	list_add_tail(&s->head, &list->list);
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_list_add_tail);
+ 
++EXPORT_SYMBOL(nftnl_flowtable_list_del);
+ void nftnl_flowtable_list_del(struct nftnl_flowtable *s)
+ {
+ 	list_del(&s->head);
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_list_del);
+ 
++EXPORT_SYMBOL(nftnl_flowtable_list_foreach);
+ int nftnl_flowtable_list_foreach(struct nftnl_flowtable_list *flowtable_list,
+ 				 int (*cb)(struct nftnl_flowtable *t, void *data), void *data)
+ {
+@@ -814,4 +815,3 @@ int nftnl_flowtable_list_foreach(struct nftnl_flowtable_list *flowtable_list,
+ 	}
+ 	return 0;
+ }
+-EXPORT_SYMBOL(nftnl_flowtable_list_foreach);

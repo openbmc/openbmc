@@ -1,0 +1,41 @@
+From a55ab8a07770296bf6a622df14f2f0445be16327 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 19 Aug 2018 15:58:49 -0700
+Subject: [PATCH] Include sys/sysmacros.h for major/minor macros in glibc 2.25+
+
+sys/sysmacros.h was included though sys/types.h until 2.28
+glibc release removed it therefore it must be included
+explicitly now.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ dlm_controld/action.c | 2 ++
+ libdlm/libdlm.c       | 1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/dlm_controld/action.c b/dlm_controld/action.c
+index 84637f1..2b8ad6c 100644
+--- a/dlm_controld/action.c
++++ b/dlm_controld/action.c
+@@ -8,6 +8,8 @@
+ 
+ #include "dlm_daemon.h"
+ 
++#include <sys/sysmacros.h>
++
+ #include <corosync/corotypes.h>
+ #include <corosync/cmap.h>
+ 
+diff --git a/libdlm/libdlm.c b/libdlm/libdlm.c
+index a9e6195..499eb6a 100644
+--- a/libdlm/libdlm.c
++++ b/libdlm/libdlm.c
+@@ -14,6 +14,7 @@
+ #include <sys/ioctl.h>
+ #include <sys/param.h>
+ #include <sys/stat.h>
++#include <sys/sysmacros.h>
+ #include <stdint.h>
+ #include <stdlib.h>
+ #include <inttypes.h>

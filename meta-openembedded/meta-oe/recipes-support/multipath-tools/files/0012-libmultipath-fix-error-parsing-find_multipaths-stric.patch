@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martin Wilck <mwilck@suse.com>
+Date: Tue, 15 May 2018 14:32:44 +0200
+Subject: [PATCH] libmultipath: fix error parsing "find_multipaths strict"
+
+If "find_multipaths strict" is set in multipath.conf, the error message
+"illegal value for find_multipaths: strict" is printed. This causes no
+functional problem, as "strict" happens to be the default, fallback
+value. It should be fixed nonetheless. FIND_MULTIPATHS_STRICT, having
+the highest numeric value, must be last in the enum.
+
+Fixes: c36f2f42 "libmultipath: change find_multipaths option to multi-value"
+Signed-off-by: Martin Wilck <mwilck@suse.com>
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/structs.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libmultipath/structs.h b/libmultipath/structs.h
+index eb6a178..e424b15 100644
+--- a/libmultipath/structs.h
++++ b/libmultipath/structs.h
+@@ -122,9 +122,9 @@ enum find_multipaths_states {
+ 	FIND_MULTIPATHS_UNDEF = YNU_UNDEF,
+ 	FIND_MULTIPATHS_OFF = YNU_NO,
+ 	FIND_MULTIPATHS_ON = _FIND_MULTIPATHS_F,
+-	FIND_MULTIPATHS_STRICT = _FIND_MULTIPATHS_F|_FIND_MULTIPATHS_N,
+ 	FIND_MULTIPATHS_GREEDY = _FIND_MULTIPATHS_I,
+ 	FIND_MULTIPATHS_SMART = _FIND_MULTIPATHS_F|_FIND_MULTIPATHS_I,
++	FIND_MULTIPATHS_STRICT = _FIND_MULTIPATHS_F|_FIND_MULTIPATHS_N,
+ 	__FIND_MULTIPATHS_LAST,
+ };
+ 
+-- 
+2.7.4
+

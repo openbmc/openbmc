@@ -377,11 +377,12 @@ class BitBakeServer(object):
         if os.path.exists(sockname):
             os.unlink(sockname)
 
+        # Place the log in the builddirectory alongside the lock file
+        logfile = os.path.join(os.path.dirname(self.bitbake_lock.name), "bitbake-cookerdaemon.log")
+
         self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         # AF_UNIX has path length issues so chdir here to workaround
         cwd = os.getcwd()
-        logfile = os.path.join(cwd, "bitbake-cookerdaemon.log")
-
         try:
             os.chdir(os.path.dirname(sockname))
             self.sock.bind(os.path.basename(sockname))
@@ -394,11 +395,16 @@ class BitBakeServer(object):
         bb.daemonize.createDaemon(self._startServer, logfile)
         self.sock.close()
         self.bitbake_lock.close()
+        os.close(self.readypipein)
 
         ready = ConnectionReader(self.readypipe)
         r = ready.poll(30)
         if r:
-            r = ready.get()
+            try:
+                r = ready.get()
+            except EOFError:
+                # Trap the child exitting/closing the pipe and error out
+                r = None
         if not r or r != "ready":
             ready.close()
             bb.error("Unable to start bitbake server")
@@ -424,7 +430,6 @@ class BitBakeServer(object):
                         bb.error("Server log for this session (%s):\n%s" % (logfile, "".join(lines)))
             raise SystemExit(1)
         ready.close()
-        os.close(self.readypipein)
 
     def _startServer(self):
         print(self.start_log_format % (os.getpid(), datetime.datetime.now().strftime(self.start_log_datetime_format)))
@@ -432,15 +437,11 @@ class BitBakeServer(object):
 
         server = ProcessServer(self.bitbake_lock, self.sock, self.sockname)
         self.configuration.setServerRegIdleCallback(server.register_idle_function)
+        os.close(self.readypipe)
         writer = ConnectionWriter(self.readypipein)
-        try:
-            self.cooker = bb.cooker.BBCooker(self.configuration, self.featureset)
-            writer.send("ready")
-        except:
-            writer.send("fail")
-            raise
-        finally:
-            os.close(self.readypipein)
+        self.cooker = bb.cooker.BBCooker(self.configuration, self.featureset)
+        writer.send("ready")
+        writer.close()
         server.cooker = self.cooker
         server.server_timeout = self.configuration.server_timeout
         server.xmlrpcinterface = self.configuration.xmlrpcinterface
@@ -455,15 +456,15 @@ def connectProcessServer(sockname, featureset):
     # AF_UNIX has path length issues so chdir here to workaround
     cwd = os.getcwd()
 
-    readfd = writefd = readfd1 = writefd1 = readfd2 = writefd2 = None
-    eq = command_chan_recv = command_chan = None
-
     try:
         try:
             os.chdir(os.path.dirname(sockname))
             sock.connect(os.path.basename(sockname))
         finally:
             os.chdir(cwd)
+
+        readfd = writefd = readfd1 = writefd1 = readfd2 = writefd2 = None
+        eq = command_chan_recv = command_chan = None
 
         # Send an fd for the remote to write events to
         readfd, writefd = os.pipe()

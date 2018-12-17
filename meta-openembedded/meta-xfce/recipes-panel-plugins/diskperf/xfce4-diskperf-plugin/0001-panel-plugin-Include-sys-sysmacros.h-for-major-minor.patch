@@ -1,0 +1,30 @@
+From c35a8cb24e8adafb11cbc261de37d97244e55927 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 11 Aug 2018 10:08:27 -0700
+Subject: [PATCH] panel-plugin: Include sys/sysmacros.h for major/minor
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+glibc 2.28+ needs it
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Cc: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ panel-plugin/devperf.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/panel-plugin/devperf.c b/panel-plugin/devperf.c
+index 175fd44..cb2e88a 100644
+--- a/panel-plugin/devperf.c
++++ b/panel-plugin/devperf.c
+@@ -34,6 +34,7 @@
+ #include <errno.h>
+ #include <sys/time.h>
+ /* for major() and minor() */
++#include <sys/sysmacros.h>
+ #define _BSD_SOURCE
+ #include <sys/types.h>
+ 

@@ -8,7 +8,10 @@ if [ $# -lt 2 ]; then
     exit 1
 fi
 
+# e.g. /var/volatile/lib
 spec=$1
+
+# e.g. /var/lib
 mountpoint=$2
 
 if [ $# -gt 2 ]; then
@@ -20,15 +23,34 @@ fi
 [ -n "$options" ] && options=",$options"
 
 mkdir -p "${spec%/*}"
+
 if [ -d "$mountpoint" ]; then
-    if [ ! -d "$spec" ]; then
+
+    if [ -d "$spec" ]; then
+        specdir_existed=yes
+    else
+        specdir_existed=no
         mkdir "$spec"
-        cp -pPR "$mountpoint"/. "$spec/"
+    fi
+
+    # Fast version of calculating `dirname ${spec}`/.`basename ${spec}`-work
+    overlay_workdir="${spec%/*}/.${spec##*/}-work"
+    mkdir "${overlay_workdir}"
+
+    # Try to mount using overlay, which is must faster than copying files.
+    # If that fails, fall back to slower copy.
+    if ! mount -t overlay overlay -olowerdir="$mountpoint",upperdir="$spec",workdir="$overlay_workdir" "$mountpoint" > /dev/null 2>&1; then
+
+        if [ "$specdir_existed" != "yes" ]; then
+            cp -pPR "$mountpoint"/. "$spec/"
+        fi
+
+        mount -o "bind$options" "$spec" "$mountpoint"
     fi
 elif [ -f "$mountpoint" ]; then
     if [ ! -f "$spec" ]; then
         cp -pP "$mountpoint" "$spec"
     fi
-fi
 
-mount -o "bind$options" "$spec" "$mountpoint"
+    mount -o "bind$options" "$spec" "$mountpoint"
+fi

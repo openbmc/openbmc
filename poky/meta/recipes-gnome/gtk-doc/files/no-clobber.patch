@@ -1,3 +1,8 @@
+From 8bc4c1f169f89bc5531da5b7e892b8f20e0f9a18 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Wed, 21 Mar 2018 14:47:29 +0000
+Subject: [PATCH] gtk-doc: don't regenerate gtk-doc in do_install
+
 In out-of-tree builds gtk-doc's setup-build target copies all the content from $srcdir to $builddir.
 
 However, if some of this content is regenerated at configure time this can happen:
@@ -16,12 +21,20 @@ files which don't already exist.
 Upstream-Status: Submitted [https://bugzilla.gnome.org/show_bug.cgi?id=794571]
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 
-diff --git a/gtk-doc.make b/gtk-doc.make
-index f87eaab..246f3c0 100644
---- a/gtk-doc.make
-+++ b/gtk-doc.make
-@@ -113,3 +113,3 @@ setup-build.stamp:
+---
+ buildsystems/autotools/gtk-doc.make | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/buildsystems/autotools/gtk-doc.make b/buildsystems/autotools/gtk-doc.make
+index 7d9a27f..8cb336d 100644
+--- a/buildsystems/autotools/gtk-doc.make
++++ b/buildsystems/autotools/gtk-doc.make
+@@ -111,7 +111,7 @@ setup-build.stamp:
+ 	      destdir=`dirname $(abs_builddir)/$$file`; \
+ 	      test -d "$$destdir" || mkdir -p "$$destdir"; \
  	      test -f $(abs_srcdir)/$$file && \
 -	        cp -pf $(abs_srcdir)/$$file $(abs_builddir)/$$file || true; \
 +	        cp -pn $(abs_srcdir)/$$file $(abs_builddir)/$$file || true; \
  	    done; \
+ 	  fi; \
+ 	fi

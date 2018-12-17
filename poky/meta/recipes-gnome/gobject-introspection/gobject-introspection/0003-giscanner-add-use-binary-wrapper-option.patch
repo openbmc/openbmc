@@ -1,7 +1,7 @@
-From 704b888d0abfb01067352c40156f49f655691c7c Mon Sep 17 00:00:00 2001
+From 46dbe963aa6435591c87e788cdb54bc0daeac42e Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 19 Oct 2015 18:26:40 +0300
-Subject: [PATCH 3/5] giscanner: add --use-binary-wrapper option
+Subject: [PATCH] giscanner: add --use-binary-wrapper option
 
 With this option, giscanner will use a wrapper executable to run
 binaries it's producing, instead of running them directly. This
@@ -10,15 +10,16 @@ but they can be run using for example QEMU emulation.
 
 Upstream-Status: Pending [review on oe-core list]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  giscanner/scannermain.py | 14 ++++++++++++++
  1 file changed, 14 insertions(+)
 
 diff --git a/giscanner/scannermain.py b/giscanner/scannermain.py
-index 633496f..d684cd0 100755
+index ccb14e9..061def0 100644
 --- a/giscanner/scannermain.py
 +++ b/giscanner/scannermain.py
-@@ -124,6 +124,9 @@ def _get_option_parser():
+@@ -126,6 +126,9 @@ def _get_option_parser():
      parser.add_option("", "--program",
                        action="store", dest="program", default=None,
                        help="program to execute")
@@ -28,7 +29,7 @@ index 633496f..d684cd0 100755
      parser.add_option("", "--program-arg",
                        action="append", dest="program_args", default=[],
                        help="extra arguments to program")
-@@ -419,6 +422,17 @@ def create_binary(transformer, options, args):
+@@ -418,6 +421,17 @@ def create_binary(transformer, options, args):
                                                gdump_parser.get_error_quark_functions())
  
      shlibs = resolve_shlibs(options, binary, options.libraries)
@@ -46,6 +47,3 @@ index 633496f..d684cd0 100755
      gdump_parser.set_introspection_binary(binary)
      gdump_parser.parse()
      return shlibs
--- 
-2.7.0
-

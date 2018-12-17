@@ -1,7 +1,7 @@
-From 30f7a694cc4568ecb24f77c83a6123ed3f4075fa Mon Sep 17 00:00:00 2001
+From 45d828356efc140a1492befb1e6dc59a9f4e16b5 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Wed, 31 Jan 2018 10:44:19 +0800
-Subject: [PATCH] gpgme/lang/python: gpg-error-config should not be used
+Subject: [PATCH 2/7] gpgme/lang/python: gpg-error-config should not be used
 
 gpg-error-config was modified by OE to always return an error.
 So we want to find an alternative way to retrieve whatever it
@@ -19,7 +19,7 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 1 insertion(+), 9 deletions(-)
 
 diff --git a/lang/python/setup.py.in b/lang/python/setup.py.in
-index f9dda20..9f5d61f 100755
+index 2595073..60b5257 100755
 --- a/lang/python/setup.py.in
 +++ b/lang/python/setup.py.in
 @@ -26,7 +26,6 @@ import shutil
@@ -30,7 +30,7 @@ index f9dda20..9f5d61f 100755
  gpgme_config_flags = ["--thread=pthread"]
  gpgme_config = ["gpgme-config"] + gpgme_config_flags
  gpgme_h = ""
-@@ -174,14 +173,7 @@ class BuildExtFirstHack(build):
+@@ -157,14 +156,7 @@ class BuildExtFirstHack(build):
  
      def _generate_errors_i(self):
  
@@ -47,5 +47,5 @@ index f9dda20..9f5d61f 100755
          filter_re = re.compile(r'GPG_ERR_[^ ]* =')
          rewrite_re = re.compile(r' *(.*) = .*')
 -- 
-1.8.3.1
+2.7.4
 

@@ -1,0 +1,37 @@
+Description: Fix FTBFS with OpenSSL 1.1 by honouring OPENSSL_NO_MD2
+Author: Adrian Bunk <bunk@debian.org>
+Bug-Debian: https://bugs.debian.org/859543
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: openhpi-3.8.0/plugins/ipmidirect/ipmi_auth.cpp
+===================================================================
+--- openhpi-3.8.0.orig/plugins/ipmidirect/ipmi_auth.cpp
++++ openhpi-3.8.0/plugins/ipmidirect/ipmi_auth.cpp
+@@ -21,6 +21,7 @@
+ #include "ipmi_auth.h"
+ #include <string.h>
+ #include <errno.h>
++#include <openssl/opensslconf.h>
+ 
+ 
+ cIpmiAuth *
+@@ -32,7 +33,7 @@ IpmiAuthFactory( tIpmiAuthType type )
+             return new cIpmiAuthNone;
+ 
+        case eIpmiAuthTypeMd2:
+-#ifdef HAVE_OPENSSL_MD2_H
++#if defined(HAVE_OPENSSL_MD2_H) && !defined(OPENSSL_NO_MD2)
+             return new cIpmiAuthMd2;
+ #else
+             break;
+@@ -78,7 +79,7 @@ cIpmiAuthNone::Check( cIpmiAuthSg /*d*/[
+ }
+ 
+ 
+-#ifdef HAVE_OPENSSL_MD2_H
++#if defined(HAVE_OPENSSL_MD2_H) && !defined(OPENSSL_NO_MD2)
+ #include <openssl/md2.h>
+ 
+ 

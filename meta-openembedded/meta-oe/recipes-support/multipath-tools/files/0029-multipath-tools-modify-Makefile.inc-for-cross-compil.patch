@@ -1,0 +1,49 @@
+From 8bdd4481d822b6625d8bf719431ca74ed1b5e021 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Mon, 16 Jul 2018 15:56:37 +0800
+Subject: [PATCH] multipath-tools: modify Makefile.inc for cross-compilation
+
+Do not look for systemd info on the host, and allow us to pass in CFLAGS
+using the OPTFLAGS variable.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+Update for version 0.5.0-144-g770e6d0
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Update for version 0.7.1
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+update for version 0.7.7
+
+remove change about CFLAGS part, since patch 0024 already have similar function.
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ Makefile.inc | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/Makefile.inc b/Makefile.inc
+index 57a1835..0c403c7 100644
+--- a/Makefile.inc
++++ b/Makefile.inc
+@@ -38,12 +38,6 @@ ifndef RUN
+ 	endif
+ endif
+ 
+-ifndef SYSTEMD
+-	ifeq ($(shell systemctl --version > /dev/null 2>&1 && echo 1), 1)
+-		SYSTEMD = $(shell systemctl --version 2> /dev/null |  sed -n 's/systemd \([0-9]*\)/\1/p')
+-	endif
+-endif
+-
+ ifndef SYSTEMDPATH
+ 	SYSTEMDPATH=usr/lib
+ endif
+-- 
+2.7.4
+

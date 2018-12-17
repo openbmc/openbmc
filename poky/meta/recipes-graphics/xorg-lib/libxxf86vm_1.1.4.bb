@@ -10,7 +10,7 @@ require xorg-lib-common.inc
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=fa0b9c462d8f2f13eba26492d42ea63d"
 
-DEPENDS += "libxext xf86vidmodeproto"
+DEPENDS += "libxext xorgproto"
 
 PE = "1"
 

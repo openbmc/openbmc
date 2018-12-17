@@ -19,12 +19,9 @@ inherit autotools gettext
 
 EXTRA_OECONF += "PERL=${USRBINPATH}/perl"
 
-LDFLAGS += "-fuse-ld=gold"
-LDFLAGS_remove_riscv64 = "-fuse-ld=gold"
-
-TOOLCHAIN = "gcc"
-
 USE_NLS = "yes"
+
+EXTRA_OECONF += "--disable-rpath"
 
 do_configure_prepend() {
     cp ${STAGING_DATADIR_NATIVE}/gettext/gettext.h ${S}/include

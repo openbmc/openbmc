@@ -1,0 +1,14 @@
+#!/bin/sh
+
+if [ -z "$OECORE_NATIVE_SYSROOT" ]; then
+    echo "OECORE_NATIVE_SYSROOT not set; are you in a Yocto SDK environment?" >&2
+fi
+
+# If these are set to a cross-compile path, meson will get confused and try to
+# use them as native tools. Unset them to prevent this, as all the cross-compile
+# config is already in meson.cross.
+unset CC CXX CPP LD AR NM STRIP
+
+exec "$OECORE_NATIVE_SYSROOT/usr/bin/meson.real" \
+     --cross-file "$OECORE_NATIVE_SYSROOT/usr/share/meson/meson.cross" \
+     "$@"

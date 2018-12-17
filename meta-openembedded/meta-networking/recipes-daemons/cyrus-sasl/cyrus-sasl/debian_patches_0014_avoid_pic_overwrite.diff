@@ -1,27 +1,28 @@
-Author: Fabian Fagerholm <fabbe@debian.org>
+From 1a5f3004e9081eab6263a29cd5be792f06441e36 Mon Sep 17 00:00:00 2001
+From: Fabian Fagerholm <fabbe@debian.org>
+Date: Wed, 24 Jul 2013 11:38:25 -0400
+Subject: [PATCH] cyrus-sasl: Add patches from Debian to fix linking
+
 Description: This patch makes sure the non-PIC version of libsasldb.a, which
 is created out of non-PIC objects, is not going to overwrite the PIC version,
 which is created out of PIC objects. The PIC version is placed in .libs, and
 the non-PIC version in the current directory.  This ensures that both non-PIC
 and PIC versions are available in the correct locations.
+
+---
+ lib/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/Makefile.am b/lib/Makefile.am
+index a158ca3..3137e19 100644
 --- a/lib/Makefile.am
 +++ b/lib/Makefile.am
-@@ -78,7 +78,7 @@ endif
+@@ -99,7 +99,7 @@ endif
  
  libsasl2.a: libsasl2.la $(SASL_STATIC_OBJS)
  	@echo adding static plugins and dependencies
 -	$(AR) cru .libs/$@ $(SASL_STATIC_OBJS)
 +	$(AR) cru $@ $(SASL_STATIC_OBJS)
- 	@for i in ./libsasl2.la ../sasldb/libsasldb.la ../plugins/lib*.la; do \
+ 	@for i in ./libsasl2.la ../common/libplugin_common.la ../sasldb/libsasldb.la ../plugins/lib*.la; do \
  	if test ! -f $$i; then continue; fi; . $$i; \
  	for j in $$dependency_libs foo; do \
---- a/sasldb/Makefile.am
-+++ b/sasldb/Makefile.am
-@@ -63,6 +63,6 @@ libsasldb_a_SOURCES =
- EXTRA_libsasldb_a_SOURCES =
- 
- libsasldb.a: libsasldb.la $(SASL_DB_BACKEND_STATIC)
--	$(AR) cru .libs/$@ $(SASL_DB_BACKEND_STATIC)
-+	$(AR) cru $@ $(SASL_DB_BACKEND_STATIC)
- 
- 

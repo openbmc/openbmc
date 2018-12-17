@@ -596,15 +596,6 @@
         </para>
     </section>
 
-    <section id='ref-tasks-rm_work_all'>
-        <title><filename>do_rm_work_all</filename></title>
-
-        <para>
-            Top-level task for removing work files after the build system has
-            finished with them.
-        </para>
-    </section>
-
     <section id='ref-tasks-unpack'>
         <title><filename>do_unpack</filename></title>
 
@@ -895,7 +886,7 @@
             Boots an image and performs runtime tests within the image
             immediately after it has been built.
             This task is enabled when you set
-            <link linkend='var-TEST_IMAGE'><filename>TEST_IMAGE</filename></link>
+            <link linkend='var-TESTIMAGE_AUTO'><filename>TESTIMAGE_AUTO</filename></link>
             equal to "1".
         </para>
 

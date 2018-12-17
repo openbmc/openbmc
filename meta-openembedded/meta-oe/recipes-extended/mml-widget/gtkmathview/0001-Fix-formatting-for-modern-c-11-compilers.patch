@@ -1,0 +1,31 @@
+From 90411a7f5e0e9582e79f0a8ccc1e2f158615e451 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 19 May 2018 23:18:11 -0700
+Subject: [PATCH] Fix formatting for modern c++11 compilers
+
+Fixes
+error: invalid suffix on literal; C++11 requires a space between literal and identifier [-Wreserved-user-defined-literal]
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/backend/svg/SVG_RenderingContext.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/backend/svg/SVG_RenderingContext.cc b/src/backend/svg/SVG_RenderingContext.cc
+index 55d6097..0d50702 100644
+--- a/src/backend/svg/SVG_RenderingContext.cc
++++ b/src/backend/svg/SVG_RenderingContext.cc
+@@ -68,7 +68,7 @@ void
+ SVG_RenderingContext::documentStart(const BoundingBox& bbox)
+ {
+   beginDocument(bbox);
+-  metadata("Created by "PACKAGE" version "VERSION);
++  metadata("Created by " PACKAGE " version " VERSION);
+ }
+ 
+ void
+-- 
+2.17.0
+

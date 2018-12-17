@@ -1,0 +1,44 @@
+From 9708dc74d9f49488d669e070982f6224a888d61a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 12 Sep 2018 17:08:58 -0700
+Subject: [PATCH] include linux/stddef.h in swab.h uapi header
+
+swab.h uses __always_inline without including the header where it is
+defined, this is exposed by musl based distributions where this macro is
+not defined by system C library headers unlike glibc where it is defined
+in sys/cdefs.h and that header gets pulled in indirectly via
+
+features.h -> sys/cdefs.h
+
+and features.h gets pulled in a lot of headers. Therefore it may work in
+cases where features.h is includes but not otherwise.
+
+Adding linux/stddef.h here ensures that __always_inline is always
+defined independent of which C library is used in userspace
+
+Upstream-Status: Submitted [https://lkml.org/lkml/2018/9/13/78]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Cc: Philippe Ombredanne <pombredanne@nexb.com>
+Cc: Kate Stewart <kstewart@linuxfoundation.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+---
+ include/uapi/linux/swab.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/uapi/linux/swab.h b/include/uapi/linux/swab.h
+index 23cd84868cc3..acddbe50a20d 100644
+--- a/include/uapi/linux/swab.h
++++ b/include/uapi/linux/swab.h
+@@ -3,6 +3,7 @@
+ #define _UAPI_LINUX_SWAB_H
+ 
+ #include <linux/types.h>
++#include <linux/stddef.h>
+ #include <linux/compiler.h>
+ #include <asm/swab.h>
+ 
+-- 
+2.19.0
+

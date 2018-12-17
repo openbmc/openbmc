@@ -1,0 +1,294 @@
+[
+    {
+        "test": {
+            "@alias": "crops-default.crops-default.sdkext_eSDK_devtool_build_make",
+            "author": [
+                {
+                    "email": "francisco.j.pedraza.gonzalez@intel.com",
+                    "name": "francisco.j.pedraza.gonzalez@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "IMPORTANT NOTE: The firsts 5 steps refer to configuration of the environment to run the rest of the steps. These only apply for CROPS-eSDK.    \n\n\n\n",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": " Initiate your Crops-esdk environment as it says in wiki https://github.com/crops/docker-win-mac-docs/wiki   \n\n",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "Create the following tree of files  <crops-esdk-workdir-workspace>/sdkext/files/myapp <crops-esdk-workdir-workspace>/sdkext/files/myapp_cmake   \n\n\n",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": " Create the following files withing the myapp directory  myapp.c and the Makefile. Write the following inside of each file: \n---------------------------------------- \nMakefile should contain  \n\nall: myapp  \n\nmyapp: myapp.o \n\t$(CC) $(LDFLAGS) $< -o $@  \n\nmyapp.o: myapp.c  \n\t$(CC) $(CFLAGS) -c $< -o $@ \n\nclean: \n\trm -rf myapp.o myapp  \n\n-----------------------------  \nmyapp.c  shold contain  \n\n\n#include <stdio.h>    \n\nint \nmain(int argc, char *argv[]) \n{ \n\tprintf(\"Hello world\\n\"); \n \n\treturn 0; \n} \n------------------------------------  \n\n",
+                    "expected_results": "be sure that the indentations on the makefile are tabs not spaces.  \n\n"
+                },
+                "5": {
+                    "action": " Create the following files within the myapp_cmake directory CMakeLists.txt and myapp.c. Write the following inside each file:  \n\n------------------------------------ \nCMakeLists.txt should contain:  \n\ncmake_minimum_required (VERSION 2.6) \nproject (myapp) \n# The version number. \nset (myapp_VERSION_MAJOR 1) \nset (myapp_VERSION_MINOR 0)  \n\n# add the executable \nadd_executable (myapp myapp.c)  \n\ninstall(TARGETS myapp \nRUNTIME DESTINATION bin)  \n\n------------------------------------------ \nmyapp.c should contain:  \n\n#include <stdio.h>     \n\nint  \nmain(int argc, char *argv[])  \n{ \n\tprintf(\"Hello world\\n\");  \n\n\treturn 0; \n} \n-------------------------------------------------  \n\n",
+                    "expected_results": "Be sure that the indentations on CMakeLists.txt is tabs not spaces."
+                },
+                "6": {
+                    "action": " source environment-setup-i586-poky-linux  \n\n",
+                    "expected_results": "This should output a message that says SDK environment now set up; additionally you may now run devtool to perform development tasks etc etc ...   \n\n"
+                },
+                "7": {
+                    "action": " run command which devtool  \n\n",
+                    "expected_results": "this should output the directory of the devtool script and it should be within the sdk workdir you are working in.  \n\n  "
+                },
+                "8": {
+                    "action": "devtool add myapp <directory>(this is myapp dir)    \n\n\n",
+                    "expected_results": "The directory you should input is the myapp directory. This should automatically create the recipe myapp.bb under <crops-esdk-workdir-workspace>/recipes/myapp/myapp.bb"
+                },
+                "9": {
+                    "action": " devtool build myapp  \n\n",
+                    "expected_results": "This should compile an image"
+                },
+                "10": {
+                    "action": " devtool reset myapp  ",
+                    "expected_results": "This cleans sysroot of the myapp recipe, but it leaves the source tree intact. meaning it does not erase."
+                }
+            },
+            "summary": "sdkext_eSDK_devtool_build_make"
+        }
+    },
+    {
+        "test": {
+            "@alias": "crops-default.crops-default.sdkext_devtool_build_esdk_package",
+            "author": [
+                {
+                    "email": "francisco.j.pedraza.gonzalez@intel.com",
+                    "name": "francisco.j.pedraza.gonzalez@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "IMPORTANT NOTE: The firsts 5 steps refer to configuration of the environment to run the rest of the steps. These only apply for CROPS-eSDK.    \n\n\n\n",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": " Initiate your Crops-esdk environment as it says in wiki https://github.com/crops/docker-win-mac-docs/wiki   \n\n",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": " Create the following tree of files    <crops-esdk-workdir-workspace>/sdkext/files/myapp/ \n <crops-esdk-workdir-workspace>/sdkext/files/myapp_cmake  \n\n",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": " Create the following files withing the myapp directory  myapp.c and the Makefile. Write the following inside of each file: \n---------------------------------------- \nMakefile should contain  \n\nall: myapp  \n\nmyapp: myapp.o \n\t$(CC) $(LDFLAGS) $< -o $@ \n\nmyapp.o: myapp.c  \n\t$(CC) $(CFLAGS) -c $< -o $@ \n\nclean: \n\trm -rf myapp.o myapp  \n\n-----------------------------  \nmyapp.c  shold contain  \n\n#include <stdio.h>   \n\nint \nmain(int argc, char *argv[]) \n{ \n\tprintf(\"Hello world\\n\"); \n \n\treturn 0; \n} \n------------------------------------  \n\n",
+                    "expected_results": "be sure that the indentations on the makefile are tabs not spaces.  \n\n"
+                },
+                "5": {
+                    "action": " Create the following files within the myapp_cmake directory CMakeLists.txt and myapp.c. Write the following inside each file:  \n\n------------------------------------ \nCMakeLists.txt should contain:  \n\ncmake_minimum_required (VERSION 2.6) \nproject (myapp) \n# The version number. \nset (myapp_VERSION_MAJOR 1) \nset (myapp_VERSION_MINOR 0)  \n\n# add the executable \nadd_executable (myapp myapp.c)  \n\ninstall(TARGETS myapp \nRUNTIME DESTINATION bin)  \n\n------------------------------------------ \nmyapp.c should contain:  \n\n#include<stdio.h>     \n\nint  \nmain(int argc, char *argv[])  \n{ \n\tprintf(\"Hello world\\n\");  \n\n\treturn 0; \n} \n-------------------------------------------------  \n\n",
+                    "expected_results": "Be sure that the indentations on CMakeLists.txt is tabs not spaces.  \n\n"
+                },
+                "6": {
+                    "action": " source environment-setup-i586-poky-linux  \n\n",
+                    "expected_results": "This should output a message that says SDK environment now set up; additionally you may now run devtool to perform development tasks etc etc ...  \n\n"
+                },
+                "7": {
+                    "action": " run command which devtool  \n\n",
+                    "expected_results": " this should output the directory of the devtool script and it should be within the sdk workdir you are working in.  \n\n"
+                },
+                "8": {
+                    "action": " devtool add myapp <directory>  (this is myapp dir)  \n\n",
+                    "expected_results": " The directory you should input is the myapp directory. This should automatically create the recipe myapp.bb under <crops-esdk-workdir-workspace>/recipes/myapp/myapp.bb  \n\n"
+                },
+                "9": {
+                    "action": " devtool package myapp  \n\n",
+                    "expected_results": " you should expect a package creation of myapp and it should be under the  /tmp/deploy/  \n\n"
+                },
+                "10": {
+                    "action": " devtool reset myapp  ",
+                    "expected_results": "This cleans sysroot of the myapp recipe, but it leaves the source tree intact. meaning it does not erase.\n</package_format>"
+                }
+            },
+            "summary": "sdkext_devtool_build_esdk_package"
+        }
+    },
+    {
+        "test": {
+            "@alias": "crops-default.crops-default.sdkext_devtool_build_cmake",
+            "author": [
+                {
+                    "email": "francisco.j.pedraza.gonzalez@intel.com",
+                    "name": "francisco.j.pedraza.gonzalez@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "IMPORTANT NOTE: The firsts 5 steps refer to configuration of the environment to run the rest of the steps. These only apply for CROPS-eSDK.    \n\n\n\n",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": " Initiate your Crops-esdk environment as it says in wiki https://github.com/crops/docker-win-mac-docs/wiki   \n\n",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": " Create the following tree of files    <crops-esdk-workdir-workspace>/sdkext/files/myapp \n <crops-esdk-workdir-workspace>/sdkext/files/myapp_cmake  \n\n",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": " Create the following files withing the myapp directory  myapp.c and the Makefile. Write the following inside of each file: \n---------------------------------------- \nMakefile should contain  \n\nall: myapp  \n\nmyapp: myapp.o \n\t$(CC) $(LDFLAGS) $< -o $@ \n\nmyapp.o: myapp.c  \n\t$(CC) $(CFLAGS) -c $< -o $@ \n\nclean: \n\trm -rf myapp.o myapp  \n\n-----------------------------  \nmyapp.c  shold contain  \n\n#include <stdio.h>   \n\nint \nmain(int argc, char *argv[]) \n{ \n\tprintf(\"Hello world\\n\"); \n \n\treturn 0; \n} \n------------------------------------  \n\n",
+                    "expected_results": "be sure that the indentations on the makefile are tabs not spaces.   \n\n"
+                },
+                "5": {
+                    "action": " Create the following files within the myapp_cmake directory CMakeLists.txt and myapp.c. Write the following inside each file:  \n\n------------------------------------ \nCMakeLists.txt should contain:  \n\ncmake_minimum_required (VERSION 2.6) \nproject (myapp) \n# The version number. \nset (myapp_VERSION_MAJOR 1) \nset (myapp_VERSION_MINOR 0)  \n\n# add the executable \nadd_executable (myapp myapp.c)  \n\ninstall(TARGETS myapp \nRUNTIME DESTINATION bin)  \n\n------------------------------------------ \nmyapp.c should contain:  \n\n#include    \n\nint  \nmain(int argc, char *argv[])  \n{ \n\tprintf(\"Hello world\\n\");  \n\n\treturn 0; \n} \n-------------------------------------------------  \n\n",
+                    "expected_results": "Be sure that the indentations on CMakeLists.txt is tabs not spaces.  \n\n"
+                },
+                "6": {
+                    "action": " source environment-setup-i586-poky-linux  \n\n",
+                    "expected_results": "This should output a message that says SDK environment now set up; additionally you may now run devtool to perform development tasks etc etc ...  \n\n"
+                },
+                "7": {
+                    "action": " run command which devtool  \n\n",
+                    "expected_results": "this should output the directory of the devtool script and it should be within the sdk workdir you are working in.  \n\n"
+                },
+                "8": {
+                    "action": " devtool add myapp <directory>   (this is myapp_cmake dir)  \n\n",
+                    "expected_results": "The directory you should input is the myapp_cmake directory. This should automatically create the recipe myapp.bb under <crops-esdk-workdir-workspace>/recipes/myapp/myapp.bb  \n\n"
+                },
+                "9": {
+                    "action": " devtool build myapp  \n\n",
+                    "expected_results": "This should compile an image  \n\n"
+                },
+                "10": {
+                    "action": " devtool reset myapp  ",
+                    "expected_results": "This cleans sysroot of the myapp recipe, but it leaves the source tree intact. meaning it does not erase.  "
+                }
+            },
+            "summary": "sdkext_devtool_build_cmake"
+        }
+    },
+    {
+        "test": {
+            "@alias": "crops-default.crops-default.sdkext_extend_autotools_recipe_creation",
+            "author": [
+                {
+                    "email": "francisco.j.pedraza.gonzalez@intel.com",
+                    "name": "francisco.j.pedraza.gonzalez@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "IMPORTANT NOTE: The firsts 2 steps refer to configuration of the environment to run the rest of the steps. These only apply for CROPS-eSDK.    \n\n\n\n",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "Initiate your Crops-esdk environment as it says in wiki https://github.com/crops/docker-win-mac-docs/wiki   \n\n",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": " source environment-setup-i586-poky-linux  \n\n",
+                    "expected_results": " This should output a message that says SDK environment now set up; additionally you may now run devtool to perform development tasks etc etc ...   \n\n"
+                },
+                "4": {
+                    "action": "run command which devtool  \n\n",
+                    "expected_results": "this should output the directory of the devtool script and it should be within the sdk workdir you are working in.   \n\n"
+                },
+                "5": {
+                    "action": "devtool sdk-install -s libxml2  \n\n",
+                    "expected_results": "this should install libxml2   \n\n"
+                },
+                "6": {
+                    "action": "devtool add librdfa  https://github.com/rdfa/librdfa  \n\n",
+                    "expected_results": "This should automatically create the recipe librdfa.bb under /recipes/librdfa/librdfa.bb   \n\n"
+                },
+                "7": {
+                    "action": "devtool build librdfa  \n\n",
+                    "expected_results": "This should compile   \n\n"
+                },
+                "8": {
+                    "action": "devtool reset librdfa  ",
+                    "expected_results": "This cleans sysroot of the librdfa recipe, but it leaves the source tree intact. meaning it does not erase."
+                }
+            },
+            "summary": "sdkext_extend_autotools_recipe_creation"
+        }
+    },
+    {
+        "test": {
+            "@alias": "crops-default.crops-default.sdkext_devtool_kernelmodule",
+            "author": [
+                {
+                    "email": "francisco.j.pedraza.gonzalez@intel.com",
+                    "name": "francisco.j.pedraza.gonzalez@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "IMPORTANT NOTE: The firsts 2 steps refer to configuration of the environment to run the rest of the steps. These only apply for CROPS-eSDK.    \n\n\n",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": " Initiate your Crops-esdk environment as it says in wiki https://github.com/crops/docker-win-mac-docs/wiki   \n\n",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "source environment-setup-i586-poky-linux   \n\n",
+                    "expected_results": "This should output a message that says SDK environment now set up; additionally you may now run devtool to perform development tasks etc etc ...   \n \n"
+                },
+                "4": {
+                    "action": "run command which devtool  \n\n",
+                    "expected_results": "this should output the directory of the devtool script and it should be within the sdk workdir you are working in.   \n\n"
+                },
+                "5": {
+                    "action": "devtool add v4l2loopback-driver  https://github.com/umlaeute/v4l2loopback.git   \n\n",
+                    "expected_results": "This should automatically create the recipe v4l2loopback-driver.bb under <crops-esdk-workdir-workspace>/recipes/v4l2loopback-driver/v4l2loopback-driver.bb "
+                },
+                "6": {
+                    "action": "devtool build v4l2loopback-driver   \n\n",
+                    "expected_results": "This should compile an image   \n\n"
+                },
+                "7": {
+                    "action": "devtool reset v4l2loopback-driver   ",
+                    "expected_results": "This cleans sysroot of the v4l2loopback-driver recipe, but it leaves the source tree intact. meaning it does not erase."
+                }
+            },
+            "summary": "sdkext_devtool_kernelmodule"
+        }
+    },
+    {
+        "test": {
+            "@alias": "crops-default.crops-default.sdkext_recipes_for_nodejs",
+            "author": [
+                {
+                    "email": "francisco.j.pedraza.gonzalez@intel.com",
+                    "name": "francisco.j.pedraza.gonzalez@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "IMPORTANT NOTE: The firsts 2 steps refer to configuration of the environment to run the rest of the steps. These only apply for CROPS-eSDK.    \n\n\nlets say variable npm = npm://registry.npmjs.org;name=winston;version=2.2.0   \n\n",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "Initiate your Crops-esdk environment as it says in wiki https://github.com/crops/docker-win-mac-docs/wiki   \n\n",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "source environment-setup-i586-poky-linux   \n\n",
+                    "expected_results": "This should output a message that says SDK environment now set up; additionally you may now run devtool to perform development tasks etc etc ...   \n\n"
+                },
+                "4": {
+                    "action": "run command which devtool   \n\n",
+                    "expected_results": "this should output the directory of the devtool script and it should be within the sdk workdir you are working in.  \n\n"
+                },
+                "5": {
+                    "action": " 4a) git clone git://git.openembedded.org/meta-openembedded in  layers/build  directory   \n \n4b) Add meta-openembedded/meta-oe in bblayer.conf as mentioned below: ${SDKBASEMETAPATH}/layers/build/meta-openembedded/meta-oe \\   \n\n4c) devtool add \"npm://registry.npmjs.org;name=npm;version=2.2.0\"   \n\n",
+                    "expected_results": " This should automatically create the recipe npm.bb under /recipes/npm/npm.bb  \n\n"
+                },
+                "6": {
+                    "action": "devtool build npm   \n\n",
+                    "expected_results": "This should compile an image  \n\n"
+                },
+                "7": {
+                    "action": " devtool reset npm",
+                    "expected_results": "This cleans sysroot of the npm recipe, but it leaves the source tree intact. meaning it does not erase."
+                }
+            },
+            "summary": "sdkext_recipes_for_nodejs"
+        }
+    }
+]

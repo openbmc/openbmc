@@ -1,0 +1,272 @@
+From 758e7463c104f71b810c8588166747eeab6148d7 Mon Sep 17 00:00:00 2001
+From: Christian Heimes <christian@python.org>
+Date: Sat, 10 Sep 2016 22:43:48 +0200
+Subject: [PATCH 1/4] Issue 28043: SSLContext has improved default settings
+
+The options OP_NO_COMPRESSION, OP_CIPHER_SERVER_PREFERENCE, OP_SINGLE_DH_USE, OP_SINGLE_ECDH_USE, OP_NO_SSLv2 (except for PROTOCOL_SSLv2), and OP_NO_SSLv3 (except for PROTOCOL_SSLv3) are set by default. The initial cipher suite list contains only HIGH ciphers, no NULL ciphers and MD5 ciphers (except for PROTOCOL_SSLv2).
+
+Upstream-Status: Backport
+[https://github.com/python/cpython/commit/358cfd426ccc0fcd6a7940d306602138e76420ae]
+
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+---
+ Doc/library/ssl.rst  |  9 ++++++-
+ Lib/ssl.py           | 30 +++++----------------
+ Lib/test/test_ssl.py | 62 +++++++++++++++++++++++---------------------
+ Modules/_ssl.c       | 31 ++++++++++++++++++++++
+ 4 files changed, 78 insertions(+), 54 deletions(-)
+
+diff --git a/Doc/library/ssl.rst b/Doc/library/ssl.rst
+index a2f008346b..14f2d68217 100644
+--- a/Doc/library/ssl.rst
++++ b/Doc/library/ssl.rst
+@@ -1151,7 +1151,14 @@ to speed up repeated connections from the same clients.
+ 
+    .. versionchanged:: 3.5.3
+ 
+-      :data:`PROTOCOL_TLS` is the default value.
++      The context is created with secure default values. The options
++      :data:`OP_NO_COMPRESSION`, :data:`OP_CIPHER_SERVER_PREFERENCE`,
++      :data:`OP_SINGLE_DH_USE`, :data:`OP_SINGLE_ECDH_USE`,
++      :data:`OP_NO_SSLv2` (except for :data:`PROTOCOL_SSLv2`),
++      and :data:`OP_NO_SSLv3` (except for :data:`PROTOCOL_SSLv3`) are
++      set by default. The initial cipher suite list contains only ``HIGH``
++      ciphers, no ``NULL`` ciphers and no ``MD5`` ciphers (except for
++      :data:`PROTOCOL_SSLv2`).
+ 
+ 
+ :class:`SSLContext` objects have the following methods and attributes:
+diff --git a/Lib/ssl.py b/Lib/ssl.py
+index e1913904f3..4d302a78fa 100644
+--- a/Lib/ssl.py
++++ b/Lib/ssl.py
+@@ -446,32 +446,16 @@ def create_default_context(purpose=Purpose.SERVER_AUTH, *, cafile=None,
+     if not isinstance(purpose, _ASN1Object):
+         raise TypeError(purpose)
+ 
++    # SSLContext sets OP_NO_SSLv2, OP_NO_SSLv3, OP_NO_COMPRESSION,
++    # OP_CIPHER_SERVER_PREFERENCE, OP_SINGLE_DH_USE and OP_SINGLE_ECDH_USE
++    # by default.
+     context = SSLContext(PROTOCOL_TLS)
+ 
+-    # SSLv2 considered harmful.
+-    context.options |= OP_NO_SSLv2
+-
+-    # SSLv3 has problematic security and is only required for really old
+-    # clients such as IE6 on Windows XP
+-    context.options |= OP_NO_SSLv3
+-
+-    # disable compression to prevent CRIME attacks (OpenSSL 1.0+)
+-    context.options |= getattr(_ssl, "OP_NO_COMPRESSION", 0)
+-
+     if purpose == Purpose.SERVER_AUTH:
+         # verify certs and host name in client mode
+         context.verify_mode = CERT_REQUIRED
+         context.check_hostname = True
+     elif purpose == Purpose.CLIENT_AUTH:
+-        # Prefer the server's ciphers by default so that we get stronger
+-        # encryption
+-        context.options |= getattr(_ssl, "OP_CIPHER_SERVER_PREFERENCE", 0)
+-
+-        # Use single use keys in order to improve forward secrecy
+-        context.options |= getattr(_ssl, "OP_SINGLE_DH_USE", 0)
+-        context.options |= getattr(_ssl, "OP_SINGLE_ECDH_USE", 0)
+-
+-        # disallow ciphers with known vulnerabilities
+         context.set_ciphers(_RESTRICTED_SERVER_CIPHERS)
+ 
+     if cafile or capath or cadata:
+@@ -497,12 +481,10 @@ def _create_unverified_context(protocol=PROTOCOL_TLS, *, cert_reqs=None,
+     if not isinstance(purpose, _ASN1Object):
+         raise TypeError(purpose)
+ 
++    # SSLContext sets OP_NO_SSLv2, OP_NO_SSLv3, OP_NO_COMPRESSION,
++    # OP_CIPHER_SERVER_PREFERENCE, OP_SINGLE_DH_USE and OP_SINGLE_ECDH_USE
++    # by default.
+     context = SSLContext(protocol)
+-    # SSLv2 considered harmful.
+-    context.options |= OP_NO_SSLv2
+-    # SSLv3 has problematic security and is only required for really old
+-    # clients such as IE6 on Windows XP
+-    context.options |= OP_NO_SSLv3
+ 
+     if cert_reqs is not None:
+         context.verify_mode = cert_reqs
+diff --git a/Lib/test/test_ssl.py b/Lib/test/test_ssl.py
+index ffb7314f57..f91af7bd05 100644
+--- a/Lib/test/test_ssl.py
++++ b/Lib/test/test_ssl.py
+@@ -73,6 +73,12 @@ NULLBYTECERT = data_file("nullbytecert.pem")
+ DHFILE = data_file("dh1024.pem")
+ BYTES_DHFILE = os.fsencode(DHFILE)
+ 
++# Not defined in all versions of OpenSSL
++OP_NO_COMPRESSION = getattr(ssl, "OP_NO_COMPRESSION", 0)
++OP_SINGLE_DH_USE = getattr(ssl, "OP_SINGLE_DH_USE", 0)
++OP_SINGLE_ECDH_USE = getattr(ssl, "OP_SINGLE_ECDH_USE", 0)
++OP_CIPHER_SERVER_PREFERENCE = getattr(ssl, "OP_CIPHER_SERVER_PREFERENCE", 0)
++
+ 
+ def handle_error(prefix):
+     exc_format = ' '.join(traceback.format_exception(*sys.exc_info()))
+@@ -839,8 +845,9 @@ class ContextTests(unittest.TestCase):
+         ctx = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+         # OP_ALL | OP_NO_SSLv2 | OP_NO_SSLv3 is the default value
+         default = (ssl.OP_ALL | ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3)
+-        if not IS_LIBRESSL and ssl.OPENSSL_VERSION_INFO >= (1, 1, 0):
+-            default |= ssl.OP_NO_COMPRESSION
++        # SSLContext also enables these by default
++        default |= (OP_NO_COMPRESSION | OP_CIPHER_SERVER_PREFERENCE |
++                    OP_SINGLE_DH_USE | OP_SINGLE_ECDH_USE)
+         self.assertEqual(default, ctx.options)
+         ctx.options |= ssl.OP_NO_TLSv1
+         self.assertEqual(default | ssl.OP_NO_TLSv1, ctx.options)
+@@ -1205,16 +1212,29 @@ class ContextTests(unittest.TestCase):
+             stats["x509"] += 1
+             self.assertEqual(ctx.cert_store_stats(), stats)
+ 
++    def _assert_context_options(self, ctx):
++        self.assertEqual(ctx.options & ssl.OP_NO_SSLv2, ssl.OP_NO_SSLv2)
++        if OP_NO_COMPRESSION != 0:
++            self.assertEqual(ctx.options & OP_NO_COMPRESSION,
++                             OP_NO_COMPRESSION)
++        if OP_SINGLE_DH_USE != 0:
++            self.assertEqual(ctx.options & OP_SINGLE_DH_USE,
++                             OP_SINGLE_DH_USE)
++        if OP_SINGLE_ECDH_USE != 0:
++            self.assertEqual(ctx.options & OP_SINGLE_ECDH_USE,
++                             OP_SINGLE_ECDH_USE)
++        if OP_CIPHER_SERVER_PREFERENCE != 0:
++            self.assertEqual(ctx.options & OP_CIPHER_SERVER_PREFERENCE,
++                             OP_CIPHER_SERVER_PREFERENCE)
++
+     def test_create_default_context(self):
+         ctx = ssl.create_default_context()
++
+         self.assertEqual(ctx.protocol, ssl.PROTOCOL_SSLv23)
+         self.assertEqual(ctx.verify_mode, ssl.CERT_REQUIRED)
+         self.assertTrue(ctx.check_hostname)
+-        self.assertEqual(ctx.options & ssl.OP_NO_SSLv2, ssl.OP_NO_SSLv2)
+-        self.assertEqual(
+-            ctx.options & getattr(ssl, "OP_NO_COMPRESSION", 0),
+-            getattr(ssl, "OP_NO_COMPRESSION", 0),
+-        )
++        self._assert_context_options(ctx)
++
+ 
+         with open(SIGNING_CA) as f:
+             cadata = f.read()
+@@ -1222,40 +1242,24 @@ class ContextTests(unittest.TestCase):
+                                          cadata=cadata)
+         self.assertEqual(ctx.protocol, ssl.PROTOCOL_SSLv23)
+         self.assertEqual(ctx.verify_mode, ssl.CERT_REQUIRED)
+-        self.assertEqual(ctx.options & ssl.OP_NO_SSLv2, ssl.OP_NO_SSLv2)
+-        self.assertEqual(
+-            ctx.options & getattr(ssl, "OP_NO_COMPRESSION", 0),
+-            getattr(ssl, "OP_NO_COMPRESSION", 0),
+-        )
++        self._assert_context_options(ctx)
+ 
+         ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+         self.assertEqual(ctx.protocol, ssl.PROTOCOL_SSLv23)
+         self.assertEqual(ctx.verify_mode, ssl.CERT_NONE)
+-        self.assertEqual(ctx.options & ssl.OP_NO_SSLv2, ssl.OP_NO_SSLv2)
+-        self.assertEqual(
+-            ctx.options & getattr(ssl, "OP_NO_COMPRESSION", 0),
+-            getattr(ssl, "OP_NO_COMPRESSION", 0),
+-        )
+-        self.assertEqual(
+-            ctx.options & getattr(ssl, "OP_SINGLE_DH_USE", 0),
+-            getattr(ssl, "OP_SINGLE_DH_USE", 0),
+-        )
+-        self.assertEqual(
+-            ctx.options & getattr(ssl, "OP_SINGLE_ECDH_USE", 0),
+-            getattr(ssl, "OP_SINGLE_ECDH_USE", 0),
+-        )
++        self._assert_context_options(ctx)
+ 
+     def test__create_stdlib_context(self):
+         ctx = ssl._create_stdlib_context()
+         self.assertEqual(ctx.protocol, ssl.PROTOCOL_SSLv23)
+         self.assertEqual(ctx.verify_mode, ssl.CERT_NONE)
+         self.assertFalse(ctx.check_hostname)
+-        self.assertEqual(ctx.options & ssl.OP_NO_SSLv2, ssl.OP_NO_SSLv2)
++        self._assert_context_options(ctx)
+ 
+         ctx = ssl._create_stdlib_context(ssl.PROTOCOL_TLSv1)
+         self.assertEqual(ctx.protocol, ssl.PROTOCOL_TLSv1)
+         self.assertEqual(ctx.verify_mode, ssl.CERT_NONE)
+-        self.assertEqual(ctx.options & ssl.OP_NO_SSLv2, ssl.OP_NO_SSLv2)
++        self._assert_context_options(ctx)
+ 
+         ctx = ssl._create_stdlib_context(ssl.PROTOCOL_TLSv1,
+                                          cert_reqs=ssl.CERT_REQUIRED,
+@@ -1263,12 +1267,12 @@ class ContextTests(unittest.TestCase):
+         self.assertEqual(ctx.protocol, ssl.PROTOCOL_TLSv1)
+         self.assertEqual(ctx.verify_mode, ssl.CERT_REQUIRED)
+         self.assertTrue(ctx.check_hostname)
+-        self.assertEqual(ctx.options & ssl.OP_NO_SSLv2, ssl.OP_NO_SSLv2)
++        self._assert_context_options(ctx)
+ 
+         ctx = ssl._create_stdlib_context(purpose=ssl.Purpose.CLIENT_AUTH)
+         self.assertEqual(ctx.protocol, ssl.PROTOCOL_SSLv23)
+         self.assertEqual(ctx.verify_mode, ssl.CERT_NONE)
+-        self.assertEqual(ctx.options & ssl.OP_NO_SSLv2, ssl.OP_NO_SSLv2)
++        self._assert_context_options(ctx)
+ 
+     def test_check_hostname(self):
+         ctx = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+diff --git a/Modules/_ssl.c b/Modules/_ssl.c
+index 86482677ae..0d5c121d2c 100644
+--- a/Modules/_ssl.c
++++ b/Modules/_ssl.c
+@@ -2330,6 +2330,7 @@ _ssl__SSLContext_impl(PyTypeObject *type, int proto_version)
+     PySSLContext *self;
+     long options;
+     SSL_CTX *ctx = NULL;
++    int result;
+ #if defined(SSL_MODE_RELEASE_BUFFERS)
+     unsigned long libver;
+ #endif
+@@ -2393,8 +2394,38 @@ _ssl__SSLContext_impl(PyTypeObject *type, int proto_version)
+         options |= SSL_OP_NO_SSLv2;
+     if (proto_version != PY_SSL_VERSION_SSL3)
+         options |= SSL_OP_NO_SSLv3;
++    /* Minimal security flags for server and client side context.
++     * Client sockets ignore server-side parameters. */
++#ifdef SSL_OP_NO_COMPRESSION
++    options |= SSL_OP_NO_COMPRESSION;
++#endif
++#ifdef SSL_OP_CIPHER_SERVER_PREFERENCE
++    options |= SSL_OP_CIPHER_SERVER_PREFERENCE;
++#endif
++#ifdef SSL_OP_SINGLE_DH_USE
++    options |= SSL_OP_SINGLE_DH_USE;
++#endif
++#ifdef SSL_OP_SINGLE_ECDH_USE
++    options |= SSL_OP_SINGLE_ECDH_USE;
++#endif
+     SSL_CTX_set_options(self->ctx, options);
+ 
++    /* A bare minimum cipher list without completly broken cipher suites.
++     * It's far from perfect but gives users a better head start. */
++    if (proto_version != PY_SSL_VERSION_SSL2) {
++        result = SSL_CTX_set_cipher_list(ctx, "HIGH:!aNULL:!eNULL:!MD5");
++    } else {
++        /* SSLv2 needs MD5 */
++        result = SSL_CTX_set_cipher_list(ctx, "HIGH:!aNULL:!eNULL");
++    }
++    if (result == 0) {
++        Py_DECREF(self);
++        ERR_clear_error();
++        PyErr_SetString(PySSLErrorObject,
++                        "No cipher can be selected.");
++        return NULL;
++    }
++
+ #if defined(SSL_MODE_RELEASE_BUFFERS)
+     /* Set SSL_MODE_RELEASE_BUFFERS. This potentially greatly reduces memory
+        usage for no cost at all. However, don't do this for OpenSSL versions
+-- 
+2.17.1
+

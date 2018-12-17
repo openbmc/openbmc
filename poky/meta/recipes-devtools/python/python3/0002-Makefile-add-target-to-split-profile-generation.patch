@@ -1,0 +1,40 @@
+From 98586d6dc598e40b8b821b0dde57599e188a7ca4 Mon Sep 17 00:00:00 2001
+From: Anuj Mittal <anuj.mittal@intel.com>
+Date: Tue, 7 Aug 2018 16:43:17 +0800
+Subject: [PATCH 2/2] Makefile: add target to split profile generation
+
+We don't want to have profile task invoked from here and want to use
+qemu-user instead. Split the profile-opt task so qemu can be invoked
+once binaries have been built with instrumentation and then we can go
+ahead and build again using the profile data generated.
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+---
+ Makefile.pre.in | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile.pre.in b/Makefile.pre.in
+index 84bc3ff..017a2c4 100644
+--- a/Makefile.pre.in
++++ b/Makefile.pre.in
+@@ -469,13 +469,12 @@ profile-opt:
+ 	$(MAKE) profile-removal
+ 	$(MAKE) build_all_generate_profile
+ 	$(MAKE) profile-removal
+-	@echo "Running code to generate profile data (this can take a while):"
+-	$(MAKE) run_profile_task
+-	$(MAKE) build_all_merge_profile
++
++clean_and_use_profile:
+ 	@echo "Rebuilding with profile guided optimizations:"
+ 	$(MAKE) clean
+ 	$(MAKE) build_all_use_profile
+ 	$(MAKE) profile-removal
+ 
+ build_all_generate_profile:
+ 	$(MAKE) @DEF_MAKE_RULE@ CFLAGS_NODIST="$(CFLAGS) $(EXTRA_CFLAGS) $(PGO_PROF_GEN_FLAG) @LTOFLAGS@" LDFLAGS="$(LDFLAGS) $(PGO_PROF_GEN_FLAG) @LTOFLAGS@" LIBS="$(LIBS)"
+-- 
+2.17.1
+

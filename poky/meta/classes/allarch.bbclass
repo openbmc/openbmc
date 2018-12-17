@@ -2,7 +2,18 @@
 # This class is used for architecture independent recipes/data files (usually scripts)
 #
 
-PACKAGE_ARCH = "all"
+python allarch_package_arch_handler () {
+    if bb.data.inherits_class("native", d) or bb.data.inherits_class("nativesdk", d) \
+        or bb.data.inherits_class("crosssdk", d):
+        return
+
+    variants = d.getVar("MULTILIB_VARIANTS")
+    if not variants:
+        d.setVar("PACKAGE_ARCH", "all" )
+}
+
+addhandler allarch_package_arch_handler
+allarch_package_arch_handler[eventmask] = "bb.event.RecipePreFinalise"
 
 python () {
     # Allow this class to be included but overridden - only set
@@ -45,6 +56,7 @@ python () {
         # These multilib values shouldn't change allarch packages so exclude them
         d.appendVarFlag("emit_pkgdata", "vardepsexclude", " MULTILIB_VARIANTS")
         d.appendVarFlag("write_specfile", "vardepsexclude", " MULTILIBS")
+        d.appendVarFlag("do_package", "vardepsexclude", " package_do_shlibs")
     elif bb.data.inherits_class('packagegroup', d) and not bb.data.inherits_class('nativesdk', d):
         bb.error("Please ensure recipe %s sets PACKAGE_ARCH before inherit packagegroup" % d.getVar("FILE"))
 }

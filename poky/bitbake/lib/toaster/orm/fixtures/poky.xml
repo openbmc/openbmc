@@ -26,9 +26,9 @@
     <field type="CharField" name="dirpath">bitbake</field>
   </object>
   <object model="orm.bitbakeversion" pk="4">
-    <field type="CharField" name="name">rocko</field>
+    <field type="CharField" name="name">thud</field>
     <field type="CharField" name="giturl">git://git.yoctoproject.org/poky</field>
-    <field type="CharField" name="branch">rocko</field>
+    <field type="CharField" name="branch">thud</field>
     <field type="CharField" name="dirpath">bitbake</field>
   </object>
 
@@ -57,10 +57,10 @@
   </object>
   <object model="orm.release" pk="4">
     <field type="CharField" name="name">rocko</field>
-    <field type="CharField" name="description">Yocto Project 2.4 "Rocko"</field>
+    <field type="CharField" name="description">Yocto Project 2.6 "Thud"</field>
     <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">1</field>
-    <field type="CharField" name="branch_name">rocko</field>
-    <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href="http://git.yoctoproject.org/cgit/cgit.cgi/poky/log/?h=rocko"&gt;Yocto Project Rocko branch&lt;/a&gt;.</field>
+    <field type="CharField" name="branch_name">thud</field>
+    <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href="http://git.yoctoproject.org/cgit/cgit.cgi/poky/log/?h=thud"&gt;Yocto Project Thud branch&lt;/a&gt;.</field>
   </object>
 
   <!-- Default project layers for each release -->

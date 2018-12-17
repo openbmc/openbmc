@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Mon, 7 May 2018 17:16:05 -0500
+Subject: [PATCH] libmultipath: print correct default for delay_*_checks
+
+These options default to "no", so they should display that when the
+config is printed.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/dict.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/libmultipath/dict.c b/libmultipath/dict.c
+index 4040611..3e7c5d6 100644
+--- a/libmultipath/dict.c
++++ b/libmultipath/dict.c
+@@ -1115,7 +1115,8 @@ print_off_int_undef(char * buff, int len, long v)
+ }
+ 
+ declare_def_handler(delay_watch_checks, set_off_int_undef)
+-declare_def_snprint(delay_watch_checks, print_off_int_undef)
++declare_def_snprint_defint(delay_watch_checks, print_off_int_undef,
++			   DEFAULT_DELAY_CHECKS)
+ declare_ovr_handler(delay_watch_checks, set_off_int_undef)
+ declare_ovr_snprint(delay_watch_checks, print_off_int_undef)
+ declare_hw_handler(delay_watch_checks, set_off_int_undef)
+@@ -1123,7 +1124,8 @@ declare_hw_snprint(delay_watch_checks, print_off_int_undef)
+ declare_mp_handler(delay_watch_checks, set_off_int_undef)
+ declare_mp_snprint(delay_watch_checks, print_off_int_undef)
+ declare_def_handler(delay_wait_checks, set_off_int_undef)
+-declare_def_snprint(delay_wait_checks, print_off_int_undef)
++declare_def_snprint_defint(delay_wait_checks, print_off_int_undef,
++			   DEFAULT_DELAY_CHECKS)
+ declare_ovr_handler(delay_wait_checks, set_off_int_undef)
+ declare_ovr_snprint(delay_wait_checks, print_off_int_undef)
+ declare_hw_handler(delay_wait_checks, set_off_int_undef)
+-- 
+2.7.4
+

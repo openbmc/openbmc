@@ -1,0 +1,27 @@
+From 2bc5c6367a7f70ca5bff177ec95bcad3b1c2b66b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 6 Sep 2018 18:15:10 -0700
+Subject: [PATCH] Do not poke at build host's /etc/os-release
+
+During cross compile we are interested in target distro and not host
+distro therefore do not check for it.
+
+Upstream-Status: Inappropriate [Cross compile specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: openhpi-3.8.0/configure.ac
+===================================================================
+--- openhpi-3.8.0.orig/configure.ac
++++ openhpi-3.8.0/configure.ac
+@@ -194,7 +194,6 @@ AC_SUBST(JSON_C_LIB)
+ AC_SUBST(JSON_C_INCLUDE)
+ AC_CHECK_LIB([rabbitmq],[amqp_new_connection],[RABBITMQ_LIB=-lrabbitmq],[RABBITMQ_LIB=])
+ AC_SUBST(RABBITMQ_LIB)
+-AC_CHECK_FILE([/etc/os-release],[DISTRO=`grep "^ID=" /etc/os-release | awk -F"\"" '{ print $2 }'`])
+ 
+ AC_CHECK_HEADERS([amqp.h],[have_rabbitmq=yes],[have_rabbitmq=no])
+ 

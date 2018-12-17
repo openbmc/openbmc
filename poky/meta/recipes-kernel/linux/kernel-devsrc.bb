@@ -25,62 +25,214 @@ do_unpack[noexec] = "1"
 do_patch[noexec] = "1"
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
-do_populate_sysroot[noexec] = "1"
+deltask do_populate_sysroot
 
 S = "${STAGING_KERNEL_DIR}"
 B = "${STAGING_KERNEL_BUILDDIR}"
 
-KERNEL_VERSION = "${@get_kernelversion_headers('${S}')}"
-
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
+KERNEL_BUILD_ROOT="/lib/modules/"
+
 do_install() {
-        kerneldir=${D}${KERNEL_SRC_PATH}
-        install -d $kerneldir
+    kerneldir=${D}${KERNEL_BUILD_ROOT}${KERNEL_VERSION}
+    install -d $kerneldir
 
-        #
-        # Copy the staging dir source (and module build support) into the devsrc structure.
-        # We can keep this copy simple and take everything, since a we'll clean up any build
-        # artifacts afterwards, and the extra i/o is not significant
-        #
-        cd ${B}
-        find . -type d -name '.git*' -prune -o -path '.debug' -prune -o -type f -print0 | cpio --null -pdlu $kerneldir
-        cd ${S}
-	find . -type d -name '.git*' -prune -o -type d -name '.kernel-meta' -prune -o -type f -print0 | cpio --null -pdlu $kerneldir
+    # create the directory structure
+    rm -f $kerneldir/build
+    rm -f $kerneldir/source
+    mkdir -p $kerneldir/build
 
-        # Explicitly set KBUILD_OUTPUT to ensure that the image directory is cleaned and not
-        # The main build artifacts. We clean the directory to avoid QA errors on mismatched
-        # architecture (since scripts and helpers are native format).
-        KBUILD_OUTPUT="$kerneldir"
-        oe_runmake -C $kerneldir CC="${KERNEL_CC}" LD="${KERNEL_LD}" clean _mrproper_scripts
-        # make clean generates an absolute path symlink called "source"
-        # in $kerneldir points to $kerneldir, which doesn't make any
-        # sense, so remove it.
-        if [ -L $kerneldir/source ]; then
-            bbnote "Removing $kerneldir/source symlink"
-            rm -f $kerneldir/source
-        fi
+    # for compatibility with some older variants of this package, we
+    # create  a /usr/src/kernel symlink to /lib/modules/<version>/source
+    mkdir -p ${D}/usr/src
+    (
+	cd ${D}/usr/src
+	ln -s ${KERNEL_BUILD_ROOT}${KERNEL_VERSION}/source kernel
+    )
 
-        # As of Linux kernel version 3.0.1, the clean target removes
-        # arch/powerpc/lib/crtsavres.o which is present in
-        # KBUILD_LDFLAGS_MODULE, making it required to build external modules.
-        if [ ${ARCH} = "powerpc" ]; then
-                mkdir -p $kerneldir/arch/powerpc/lib/
-                cp ${B}/arch/powerpc/lib/crtsavres.o $kerneldir/arch/powerpc/lib/crtsavres.o
-        fi
+    # for on target purposes, we unify build and source
+    (
+	cd $kerneldir
+	ln -s build source
+    )
 
-        # Remove fixdep/objtool as they won't be target binaries
-        for i in fixdep objtool; do
-                if [ -e $kerneldir/tools/objtool/$i ]; then
-                        rm -rf $kerneldir/tools/objtool/$i
-                fi
-        done
+    # first copy everything
+    (
+	cd ${S}
+	cp --parents $(find  -type f -name "Makefile*" -o -name "Kconfig*") $kerneldir/build
+	cp --parents $(find  -type f -name "Build" -o -name "Build.include") $kerneldir/build
+    )
 
-        chown -R root:root ${D}
+    # then drop all but the needed Makefiles/Kconfig files
+    rm -rf $kerneldir/build/Documentation
+    rm -rf $kerneldir/build/scripts
+    rm -rf $kerneldir/build/include
+
+    # now copy in parts from the build that we'll need later
+    (
+	cd ${B}
+
+	cp Module.symvers $kerneldir/build
+	cp System.map* $kerneldir/build
+	if [ -s Module.markers ]; then
+	    cp Module.markers $kerneldir/build
+	fi
+
+	cp .config $kerneldir/build
+
+	# This scripts copy blow up QA, so for now, we require a more
+	# complex 'make scripts' to restore these, versus copying them
+	# here. Left as a reference to indicate that we know the scripts must
+	# be dealt with.
+	# cp -a scripts $kerneldir/build
+
+        if [ -d arch/${ARCH}/scripts ]; then
+	    cp -a arch/${ARCH}/scripts $kerneldir/build/arch/${ARCH}
+	fi
+	if [ -f arch/${ARCH}/*lds ]; then
+	    cp -a arch/${ARCH}/*lds $kerneldir/build/arch/${ARCH}
+	fi
+
+	rm -f $kerneldir/build/scripts/*.o
+	rm -f $kerneldir/build/scripts/*/*.o
+
+	if [ "${ARCH}" = "powerpc" ]; then
+	    if [ -e arch/powerpc/lib/crtsavres.S ] ||
+		   [ -e arch/powerpc/lib/crtsavres.o ]; then
+		cp -a --parents arch/powerpc/lib/crtsavres.[So] $kerneldir/build/
+	    fi
+	fi
+
+	if [ "${ARCH}" = "arm64" ]; then
+	    cp -a --parents arch/arm64/kernel/vdso/vdso.lds $kerneldir/build/
+	fi
+
+	cp -a include $kerneldir/build/include
+    )
+
+    # now grab the chunks from the source tree that we need
+    (
+	cd ${S}
+
+	cp -a scripts $kerneldir/build
+
+	# if our build dir had objtool, it will also be rebuilt on target, so
+	# we copy what is required for that build
+	if [ -f ${B}/tools/objtool/objtool ]; then
+	    # these are a few files associated with objtool, since we'll need to
+	    # rebuild it
+	    cp -a --parents tools/build/Build.include $kerneldir/build/
+	    cp -a --parents tools/build/Build $kerneldir/build/
+	    cp -a --parents tools/build/fixdep.c $kerneldir/build/
+	    cp -a --parents tools/scripts/utilities.mak $kerneldir/build/
+
+	    # extra files, just in case
+	    cp -a --parents tools/objtool/* $kerneldir/build/
+	    cp -a --parents tools/lib/str_error_r.c $kerneldir/build/
+	    cp -a --parents tools/lib/string.c $kerneldir/build/
+	    cp -a --parents tools/lib/subcmd/* $kerneldir/build/
+
+	    cp -a --parents tools/include/* $kerneldir/build/
+	fi
+
+	if [ "${ARCH}" = "arm64" ]; then
+	    # arch/arm64/include/asm/xen references arch/arm
+	    cp -a --parents arch/arm/include/asm/xen $kerneldir/build/
+	    # arch/arm64/include/asm/opcodes.h references arch/arm
+	    cp -a --parents arch/arm/include/asm/opcodes.h $kerneldir/build/
+
+            cp -a --parents arch/arm64/kernel/vdso/gettimeofday.S $kerneldir/build/
+            cp -a --parents arch/arm64/kernel/vdso/sigreturn.S $kerneldir/build/
+            cp -a --parents arch/arm64/kernel/vdso/note.S $kerneldir/build/
+            cp -a --parents arch/arm64/kernel/vdso/gen_vdso_offsets.sh $kerneldir/build/
+
+            cp -a --parents arch/arm64/kernel/module.lds $kerneldir/build/
+	fi
+
+	# include the machine specific headers for ARM variants, if available.
+	if [ "${ARCH}" = "arm" ]; then
+	    cp -a --parents arch/${ARCH}/mach-*/include $kerneldir/build/
+
+	    # include a few files for 'make prepare'
+	    cp -a --parents arch/arm/tools/gen-mach-types $kerneldir/build/
+	    cp -a --parents arch/arm/tools/mach-types $kerneldir/build/
+	    cp -a --parents arch/arm/tools/syscall* $kerneldir/build/
+
+            cp -a --parents arch/arm/kernel/module.lds $kerneldir/build/
+	fi
+
+	if [ -d arch/${ARCH}/include ]; then
+	    cp -a --parents arch/${ARCH}/include $kerneldir/build/
+	fi
+
+	cp -a include $kerneldir/build
+
+	cp -a --parents tools/include/tools/le_byteshift.h $kerneldir/build/
+	cp -a --parents tools/include/tools/be_byteshift.h $kerneldir/build/
+
+	# required for generate missing syscalls prepare phase
+	cp -a --parents arch/x86/entry/syscalls/syscall_32.tbl $kerneldir/build
+
+	if [ "${ARCH}" = "x86" ]; then
+	    # files for 'make prepare' to succeed with kernel-devel
+	    cp -a --parents arch/x86/entry/syscalls/syscall_32.tbl $kerneldir/build/
+	    cp -a --parents arch/x86/entry/syscalls/syscalltbl.sh $kerneldir/build/
+	    cp -a --parents arch/x86/entry/syscalls/syscallhdr.sh $kerneldir/build/
+	    cp -a --parents arch/x86/entry/syscalls/syscall_64.tbl $kerneldir/build/
+	    cp -a --parents arch/x86/tools/relocs_32.c $kerneldir/build/
+	    cp -a --parents arch/x86/tools/relocs_64.c $kerneldir/build/
+	    cp -a --parents arch/x86/tools/relocs.c $kerneldir/build/
+	    cp -a --parents arch/x86/tools/relocs_common.c $kerneldir/build/
+	    cp -a --parents arch/x86/tools/relocs.h $kerneldir/build/
+	    cp -a --parents arch/x86/purgatory/purgatory.c $kerneldir/build/
+
+	    # 4.18 + have unified the purgatory files, so we ignore any errors if
+	    # these files are not present
+	    cp -a --parents arch/x86/purgatory/sha256.h $kerneldir/build/ 2>/dev/null || :
+	    cp -a --parents arch/x86/purgatory/sha256.c $kerneldir/build/ 2>/dev/null || :
+
+	    cp -a --parents arch/x86/purgatory/stack.S $kerneldir/build/
+	    cp -a --parents arch/x86/purgatory/string.c $kerneldir/build/
+	    cp -a --parents arch/x86/purgatory/setup-x86_64.S $kerneldir/build/
+	    cp -a --parents arch/x86/purgatory/entry64.S $kerneldir/build/
+	    cp -a --parents arch/x86/boot/string.h $kerneldir/build/
+	    cp -a --parents arch/x86/boot/string.c $kerneldir/build/
+	    cp -a --parents arch/x86/boot/ctype.h $kerneldir/build/
+	fi
+
+	if [ "${ARCH}" = "mips" ]; then
+	    cp -a --parents arch/mips/Kbuild.platforms $kerneldir/build/
+	    cp --parents $(find	 -type f -name "Platform") $kerneldir/build
+	    cp --parents arch/mips/boot/tools/relocs* $kerneldir/build
+	    cp -a --parents arch/mips/kernel/asm-offsets.c $kerneldir/build
+	    cp -a --parents kernel/time/timeconst.bc $kerneldir/build
+	    cp -a --parents kernel/bounds.c $kerneldir/build
+	    cp -a --parents Kbuild $kerneldir/build
+	fi
+
+        # required to build scripts/selinux/genheaders/genheaders
+        cp -a --parents security/selinux/include/* $kerneldir/build/
+    )
+
+    # Make sure the Makefile and version.h have a matching timestamp so that
+    # external modules can be built
+    touch -r $kerneldir/build/Makefile $kerneldir/build/include/generated/uapi/linux/version.h
+
+    # Copy .config to include/config/auto.conf so "make prepare" is unnecessary.
+    cp $kerneldir/build/.config $kerneldir/build/include/config/auto.conf
+
+    chown -R root:root ${D}
 }
+
 # Ensure we don't race against "make scripts" during cpio
 do_install[lockfiles] = "${TMPDIR}/kernel-scripts.lock"
 
-PACKAGES = "kernel-devsrc"
-FILES_${PN} = "${KERNEL_SRC_PATH}"
-RDEPENDS_${PN} = "bc"
+FILES_${PN} = "${KERNEL_BUILD_ROOT} ${KERNEL_SRC_PATH}"
+FILES_${PN}-dbg += "${KERNEL_BUILD_ROOT}*/build/scripts/*/.debug/*"
+
+RDEPENDS_${PN} = "bc python flex bison ${TCLIBC}-utils"
+# 4.15+ needs these next two RDEPENDS
+RDEPENDS_${PN} += "openssl-dev util-linux"
+# and x86 needs a bit more for 4.15+
+RDEPENDS_${PN} += "${@bb.utils.contains('ARCH', 'x86', 'elfutils', '', d)}"

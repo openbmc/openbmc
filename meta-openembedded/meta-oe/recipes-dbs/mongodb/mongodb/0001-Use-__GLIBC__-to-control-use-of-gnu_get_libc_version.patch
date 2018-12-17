@@ -9,34 +9,25 @@ Upstream-Status: Pending
  src/mongo/util/processinfo_linux.cpp | 6 ++++--
  1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/src/mongo/util/processinfo_linux.cpp b/src/mongo/util/processinfo_linux.cpp
-index 910015215e..bf8c1ffd15 100644
---- a/src/mongo/util/processinfo_linux.cpp
-+++ b/src/mongo/util/processinfo_linux.cpp
-@@ -40,7 +40,7 @@
- #include <sys/mman.h>
- #include <sys/utsname.h>
+Index: git/src/mongo/util/processinfo_linux.cpp
+===================================================================
+--- git.orig/src/mongo/util/processinfo_linux.cpp
++++ git/src/mongo/util/processinfo_linux.cpp
+@@ -44,10 +44,10 @@
  #include <unistd.h>
--#ifdef __UCLIBC__
-+#ifndef __GLIBC__
- #include <features.h>
- #else
+ #ifdef __BIONIC__
+ #include <android/api-level.h>
+-#elif __UCLIBC__
+-#include <features.h>
+-#else
++#elif defined(__GLIBC__) && !defined(__UCLIBC__)
  #include <gnu/libc-version.h>
-@@ -451,11 +451,13 @@ double ProcessInfo::getSystemMemoryPressurePercentage() {
- }
++#else
++#include <features.h>
+ #endif
  
- void ProcessInfo::getExtraInfo(BSONObjBuilder& info) {
-+#if defined(__GLIBC__)
-     LinuxProc p(_pid);
-     if (p._maj_flt <= std::numeric_limits<long long>::max())
-         info.appendNumber("page_faults", static_cast<long long>(p._maj_flt));
-     else
-         info.appendNumber("page_faults", static_cast<double>(p._maj_flt));
-+#endif
- }
- 
- /**
-@@ -491,7 +493,7 @@ void ProcessInfo::SystemInfo::collectSystemInfo() {
+ #include <boost/filesystem.hpp>
+@@ -503,7 +503,7 @@ void ProcessInfo::SystemInfo::collectSys
      stringstream ss;
      ss << "uClibc-" << __UCLIBC_MAJOR__ << "." << __UCLIBC_MINOR__ << "." << __UCLIBC_SUBLEVEL__;
      bExtra.append("libcVersion", ss.str());
@@ -45,6 +36,3 @@ index 910015215e..bf8c1ffd15 100644
      bExtra.append("libcVersion", gnu_get_libc_version());
  #endif
      if (!verSig.empty())
--- 
-2.14.1
-

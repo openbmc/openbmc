@@ -1,0 +1,110 @@
+Author: Philipp Kern <pkern@debian.org>
+Subject: Fix openssl1.1 support in data_mgmt
+Date: Tue, 31 Jan 2017 22:40:10 +0100
+
+Upstream-Status: Backport
+tpm-tools_1.3.9.1-0.1.debian.tar
+
+Signed-off-by: Armin kuster <akuster808@gmail.com>
+
+---
+ src/data_mgmt/data_import.c |   60 ++++++++++++++++++++++++++++----------------
+ 1 file changed, 39 insertions(+), 21 deletions(-)
+
+--- a/src/data_mgmt/data_import.c
++++ b/src/data_mgmt/data_import.c
+@@ -372,7 +372,7 @@ readX509Cert( const char  *a_pszFile,
+ 		goto out;
+ 	}
+ 
+-	if ( EVP_PKEY_type( pKey->type ) != EVP_PKEY_RSA ) {
++	if ( EVP_PKEY_base_id( pKey ) != EVP_PKEY_RSA ) {
+ 		logError( TOKEN_RSA_KEY_ERROR );
+ 
+ 		X509_free( pX509 );
+@@ -691,8 +691,13 @@ createRsaPubKeyObject( RSA
+ 
+ 	int  rc = -1;
+ 
+-	int  nLen = BN_num_bytes( a_pRsa->n );
+-	int  eLen = BN_num_bytes( a_pRsa->e );
++	const BIGNUM *bn;
++	const BIGNUM *be;
++
++	RSA_get0_key( a_pRsa, &bn, &be, NULL );
++
++	int  nLen = BN_num_bytes( bn );
++	int  eLen = BN_num_bytes( be );
+ 
+ 	CK_RV  rv;
+ 
+@@ -732,8 +737,8 @@ createRsaPubKeyObject( RSA
+ 	}
+ 
+ 	// Get binary representations of the RSA key information
+-	BN_bn2bin( a_pRsa->n, n );
+-	BN_bn2bin( a_pRsa->e, e );
++	BN_bn2bin( bn, n );
++	BN_bn2bin( be, e );
+ 
+ 	// Create the RSA public key object
+ 	rv = createObject( a_hSession, tAttr, ulAttrCount, a_hObject );
+@@ -760,14 +765,27 @@ createRsaPrivKeyObject( RSA
+ 
+ 	int  rc = -1;
+ 
+-	int  nLen = BN_num_bytes( a_pRsa->n );
+-	int  eLen = BN_num_bytes( a_pRsa->e );
+-	int  dLen = BN_num_bytes( a_pRsa->d );
+-	int  pLen = BN_num_bytes( a_pRsa->p );
+-	int  qLen = BN_num_bytes( a_pRsa->q );
+-	int  dmp1Len = BN_num_bytes( a_pRsa->dmp1 );
+-	int  dmq1Len = BN_num_bytes( a_pRsa->dmq1 );
+-	int  iqmpLen = BN_num_bytes( a_pRsa->iqmp );
++	const BIGNUM *bn;
++	const BIGNUM *be;
++	const BIGNUM *bd;
++	const BIGNUM *bp;
++	const BIGNUM *bq;
++	const BIGNUM *bdmp1;
++	const BIGNUM *bdmq1;
++	const BIGNUM *biqmp;
++
++	RSA_get0_key( a_pRsa, &bn, &be, &bd);
++	RSA_get0_factors( a_pRsa, &bp, &bq);
++	RSA_get0_crt_params( a_pRsa, &bdmp1, &bdmq1, &biqmp );
++
++	int  nLen = BN_num_bytes( bn );
++	int  eLen = BN_num_bytes( be );
++	int  dLen = BN_num_bytes( bd );
++	int  pLen = BN_num_bytes( bp );
++	int  qLen = BN_num_bytes( bq );
++	int  dmp1Len = BN_num_bytes( bdmp1 );
++	int  dmq1Len = BN_num_bytes( bdmq1 );
++	int  iqmpLen = BN_num_bytes( biqmp );
+ 
+ 	CK_RV  rv;
+ 
+@@ -821,14 +839,14 @@ createRsaPrivKeyObject( RSA
+ 	}
+ 
+ 	// Get binary representations of the RSA key information
+-	BN_bn2bin( a_pRsa->n, n );
+-	BN_bn2bin( a_pRsa->e, e );
+-	BN_bn2bin( a_pRsa->d, d );
+-	BN_bn2bin( a_pRsa->p, p );
+-	BN_bn2bin( a_pRsa->q, q );
+-	BN_bn2bin( a_pRsa->dmp1, dmp1 );
+-	BN_bn2bin( a_pRsa->dmq1, dmq1 );
+-	BN_bn2bin( a_pRsa->iqmp, iqmp );
++	BN_bn2bin( bn, n );
++	BN_bn2bin( be, e );
++	BN_bn2bin( bd, d );
++	BN_bn2bin( bp, p );
++	BN_bn2bin( bq, q );
++	BN_bn2bin( bdmp1, dmp1 );
++	BN_bn2bin( bdmq1, dmq1 );
++	BN_bn2bin( biqmp, iqmp );
+ 
+ 	// Create the RSA private key object
+ 	rv = createObject( a_hSession, tAttr, ulAttrCount, a_hObject );

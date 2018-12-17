@@ -1,0 +1,18 @@
+Upstream-Status: Pending
+Update to build with openssl 1.1.x
+
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: git/src/cmds/tpm_extendpcr.c
+===================================================================
+--- git.orig/src/cmds/tpm_extendpcr.c
++++ git/src/cmds/tpm_extendpcr.c
+@@ -136,7 +136,7 @@ int main(int argc, char **argv)
+ 
+ 		unsigned char msg[EVP_MAX_MD_SIZE];
+ 		unsigned int msglen;
+-		EVP_MD_CTX ctx;
++		EVP_MD_CTX *ctx = EVP_MD_CTX_new();
+ 		EVP_DigestInit(&ctx, EVP_sha1());
+ 		while ((lineLen = BIO_read(bin, line, sizeof(line))) > 0)
+ 			EVP_DigestUpdate(&ctx, line, lineLen);

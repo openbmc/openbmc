@@ -1,0 +1,36 @@
+From 9e0368af471af3a36e0eb526453f892598120065 Mon Sep 17 00:00:00 2001
+From: Otavio Salvador <otavio@ossystems.com.br>
+Date: Wed, 6 Jun 2018 09:50:35 -0300
+Subject: [PATCH 5/6] dri: i965: Add missing time.h include
+Organization: O.S. Systems Software LTDA.
+
+This fixes a build error when using musl:
+
+,----
+| In file included from .../src/mesa/drivers/dri/i965/intel_upload.c:33:0:
+| .../src/mesa/drivers/dri/i965/brw_bufmgr.h:132:4: error: unknown type name 'time_t'
+|     time_t free_time;
+|     ^~~~~~
+`----
+
+Upstream-Status: Backport [3c288da5eec81ee58b85927df18d9194ead8f5c2]
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+---
+ src/mesa/drivers/dri/i965/brw_bufmgr.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/mesa/drivers/dri/i965/brw_bufmgr.h b/src/mesa/drivers/dri/i965/brw_bufmgr.h
+index 68f5e0c2c8..5b60a23763 100644
+--- a/src/mesa/drivers/dri/i965/brw_bufmgr.h
++++ b/src/mesa/drivers/dri/i965/brw_bufmgr.h
+@@ -37,6 +37,7 @@
+ #include <stdbool.h>
+ #include <stdint.h>
+ #include <stdio.h>
++#include <time.h>
+ #include "util/u_atomic.h"
+ #include "util/list.h"
+ 
+-- 
+2.18.0
+

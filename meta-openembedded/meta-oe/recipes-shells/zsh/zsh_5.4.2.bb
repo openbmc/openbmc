@@ -49,6 +49,7 @@ do_configure () {
 
 do_install_append () {
     rm -fr ${D}/usr/share
+    rmdir --ignore-fail-on-non-empty ${D}/usr
 }
 
 pkg_postinst_${PN} () {

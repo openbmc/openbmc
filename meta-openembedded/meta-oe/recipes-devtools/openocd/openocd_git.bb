@@ -9,17 +9,14 @@ SRC_URI = " \
     git://repo.or.cz/r/git2cl.git;protocol=http;destsuffix=tools/git2cl;name=git2cl \
     git://repo.or.cz/r/jimtcl.git;protocol=http;destsuffix=git/jimtcl;name=jimtcl \
     git://repo.or.cz/r/libjaylink.git;protocol=http;destsuffix=git/src/jtag/drivers/libjaylink;name=libjaylink \
-    file://0001-Add-fallthrough-comments.patch \
-    file://0002-Workaround-new-warnings-generated-by-GCC-7.patch \
-    file://0003-armv7a-Add-missing-break-to-fix-fallthrough-warning.patch \
-    file://0004-Fix-overflow-warning.patch \
-    file://0005-command-Move-the-fall-through-comment-to-right-scope.patch \
+    file://0001-Fix-libusb-1.0.22-deprecated-libusb_set_debug-with-l.patch \
 "
+
 SRCREV_FORMAT = "openocd"
-SRCREV_openocd = "1025be363e2bf42f1613083223a2322cc3a9bd4c"
+SRCREV_openocd = "cdf1e826eb23c29de1019ce64125f644f01b0afe"
 SRCREV_git2cl = "8373c9f74993e218a08819cbcdbab3f3564bbeba"
 SRCREV_jimtcl = "a9bf5975fd0f89974d689a2d9ebd0873c8d64787"
-SRCREV_libjaylink = "699b7001d34a79c8e7064503dde1bede786fd7f0"
+SRCREV_libjaylink = "8645845c1abebd004e991ba9a7f808f4fd0c608b"
 
 PV = "0.10+gitr${SRCPV}"
 S = "${WORKDIR}/git"

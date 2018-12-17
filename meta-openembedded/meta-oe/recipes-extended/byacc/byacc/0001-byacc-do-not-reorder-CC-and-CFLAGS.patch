@@ -9,28 +9,29 @@ Delete all these stuff so that we could have all options we need.
 Upstream-Status: Inappropriate [OE Specific]
 
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+
 ---
  aclocal.m4 |   1 -
- configure  | 119 -------------------------------------------------------------
- 2 files changed, 120 deletions(-)
+ configure  | 140 -------------------------------------------------------------
+ 2 files changed, 141 deletions(-)
 
 diff --git a/aclocal.m4 b/aclocal.m4
-index 917a848..62ef241 100644
+index 0d14f26..0cefa08 100644
 --- a/aclocal.m4
 +++ b/aclocal.m4
-@@ -1021,7 +1021,6 @@ CF_GCC_VERSION
+@@ -1038,7 +1038,6 @@ CF_GCC_VERSION
  CF_ACVERSION_CHECK(2.52,
  	[AC_PROG_CC_STDC],
  	[CF_ANSI_CC_REQD])
 -CF_CC_ENV_FLAGS
  ])dnl
  dnl ---------------------------------------------------------------------------
- dnl CF_PROG_GROFF version: 2 updated: 2015/07/04 11:16:27
+ dnl CF_PROG_GROFF version: 3 updated: 2018/01/07 13:16:19
 diff --git a/configure b/configure
-index 9707e50..4f0497c 100755
+index d27ae31..077c648 100755
 --- a/configure
 +++ b/configure
-@@ -1946,125 +1946,6 @@ esac
+@@ -1946,146 +1946,6 @@ esac
  # This should have been defined by AC_PROG_CC
  : ${CC:=cc}
  
@@ -43,8 +44,9 @@ index 9707e50..4f0497c 100755
 -	{ echo "$as_me:1955: WARNING: your environment misuses the CC variable to hold CFLAGS/CPPFLAGS options" >&5
 -echo "$as_me: WARNING: your environment misuses the CC variable to hold CFLAGS/CPPFLAGS options" >&2;}
 -	# humor him...
--	cf_flags=`echo "$CC" | sed -e 's/^.*[ 	]\(-[^ 	]\)/\1/'`
--	CC=`echo "$CC " | sed -e 's/[ 	]-[^ 	].*$//' -e 's/[ 	]*$//'`
+-	cf_prog=`echo "$CC" | sed -e 's/	/ /g' -e 's/[ ]* / /g' -e 's/[ ]*[ ]-[^ ].*//'`
+-	cf_flags=`echo "$CC" | ${AWK:-awk} -v prog="$cf_prog" '{ printf("%s", substr($0,1+length(prog))); }'`
+-	CC="$cf_prog"
 -	for cf_arg in $cf_flags
 -	do
 -		case "x$cf_arg" in
@@ -55,7 +57,7 @@ index 9707e50..4f0497c 100755
 -cf_new_cppflags=
 -cf_new_extra_cppflags=
 -
--for cf_add_cflags in $cf_flags
+-for cf_add_cflags in $cf_arg
 -do
 -case $cf_fix_cppflags in
 -(no)
@@ -70,10 +72,16 @@ index 9707e50..4f0497c 100755
 -				&& cf_fix_cppflags=yes
 -
 -			if test $cf_fix_cppflags = yes ; then
--				cf_new_extra_cppflags="$cf_new_extra_cppflags $cf_add_cflags"
+-
+-	test -n "$cf_new_extra_cppflags" && cf_new_extra_cppflags="$cf_new_extra_cppflags "
+-	cf_new_extra_cppflags="${cf_new_extra_cppflags}$cf_add_cflags"
+-
 -				continue
 -			elif test "${cf_tst_cflags}" = "\"'" ; then
--				cf_new_extra_cppflags="$cf_new_extra_cppflags $cf_add_cflags"
+-
+-	test -n "$cf_new_extra_cppflags" && cf_new_extra_cppflags="$cf_new_extra_cppflags "
+-	cf_new_extra_cppflags="${cf_new_extra_cppflags}$cf_add_cflags"
+-
 -				continue
 -			fi
 -			;;
@@ -92,17 +100,25 @@ index 9707e50..4f0497c 100755
 -
 -				;;
 -			esac
--			cf_new_cppflags="$cf_new_cppflags $cf_add_cflags"
+-
+-	test -n "$cf_new_cppflags" && cf_new_cppflags="$cf_new_cppflags "
+-	cf_new_cppflags="${cf_new_cppflags}$cf_add_cflags"
+-
 -			;;
 -		esac
 -		;;
 -	(*)
--		cf_new_cflags="$cf_new_cflags $cf_add_cflags"
+-
+-	test -n "$cf_new_cflags" && cf_new_cflags="$cf_new_cflags "
+-	cf_new_cflags="${cf_new_cflags}$cf_add_cflags"
+-
 -		;;
 -	esac
 -	;;
 -(yes)
--	cf_new_extra_cppflags="$cf_new_extra_cppflags $cf_add_cflags"
+-
+-	test -n "$cf_new_extra_cppflags" && cf_new_extra_cppflags="$cf_new_extra_cppflags "
+-	cf_new_extra_cppflags="${cf_new_extra_cppflags}$cf_add_cflags"
 -
 -	cf_tst_cflags=`echo ${cf_add_cflags} |sed -e 's/^[^"]*"'\''//'`
 -
@@ -115,17 +131,23 @@ index 9707e50..4f0497c 100755
 -
 -if test -n "$cf_new_cflags" ; then
 -
--	CFLAGS="$CFLAGS $cf_new_cflags"
+-	test -n "$CFLAGS" && CFLAGS="$CFLAGS "
+-	CFLAGS="${CFLAGS}$cf_new_cflags"
+-
 -fi
 -
 -if test -n "$cf_new_cppflags" ; then
 -
--	CPPFLAGS="$CPPFLAGS $cf_new_cppflags"
+-	test -n "$CPPFLAGS" && CPPFLAGS="$CPPFLAGS "
+-	CPPFLAGS="${CPPFLAGS}$cf_new_cppflags"
+-
 -fi
 -
 -if test -n "$cf_new_extra_cppflags" ; then
 -
--	EXTRA_CPPFLAGS="$cf_new_extra_cppflags $EXTRA_CPPFLAGS"
+-	test -n "$EXTRA_CPPFLAGS" && EXTRA_CPPFLAGS="$EXTRA_CPPFLAGS "
+-	EXTRA_CPPFLAGS="${EXTRA_CPPFLAGS}$cf_new_extra_cppflags"
+-
 -fi
 -
 -			;;
@@ -136,26 +158,26 @@ index 9707e50..4f0497c 100755
 -	done
 -	test -n "$verbose" && echo "	resulting CC: '$CC'" 1>&6
 -
--echo "${as_me:-configure}:2051: testing resulting CC: '$CC' ..." 1>&5
+-echo "${as_me:-configure}:2072: testing resulting CC: '$CC' ..." 1>&5
 -
 -	test -n "$verbose" && echo "	resulting CFLAGS: '$CFLAGS'" 1>&6
 -
--echo "${as_me:-configure}:2055: testing resulting CFLAGS: '$CFLAGS' ..." 1>&5
+-echo "${as_me:-configure}:2076: testing resulting CFLAGS: '$CFLAGS' ..." 1>&5
 -
 -	test -n "$verbose" && echo "	resulting CPPFLAGS: '$CPPFLAGS'" 1>&6
 -
--echo "${as_me:-configure}:2059: testing resulting CPPFLAGS: '$CPPFLAGS' ..." 1>&5
+-echo "${as_me:-configure}:2080: testing resulting CPPFLAGS: '$CPPFLAGS' ..." 1>&5
 -
 -	;;
 -(*)
--	echo "$as_me:2063: result: ok" >&5
+-	echo "$as_me:2084: result: ok" >&5
 -echo "${ECHO_T}ok" >&6
 -	;;
 -esac
 -
- echo "$as_me:2068: checking whether ${MAKE-make} sets \${MAKE}" >&5
+ echo "$as_me:2089: checking whether ${MAKE-make} sets \${MAKE}" >&5
  echo $ECHO_N "checking whether ${MAKE-make} sets \${MAKE}... $ECHO_C" >&6
  set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y,./+-,__p_,'`
 -- 
-2.8.3
+2.7.4
 

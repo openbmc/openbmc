@@ -61,4 +61,4 @@ ALTERNATIVE_PRIORITY = "100"
 ALTERNATIVE_${PN} = "unzip"
 ALTERNATIVE_LINK_NAME[unzip] = "${bindir}/unzip"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

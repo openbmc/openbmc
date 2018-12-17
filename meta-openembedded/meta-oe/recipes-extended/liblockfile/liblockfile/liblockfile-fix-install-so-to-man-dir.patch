@@ -1,0 +1,33 @@
+From 363eb1aaeca914c7d36a2cdaf1417e4f87af4c22 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Thu, 19 Jul 2018 01:12:47 -0700
+Subject: [PATCH] Makefile.in: define dotlockfile.1 installed to man
+
+Explicitly define dotlockfile.1 installed to man
+dir to avoid nfslock.so.0.1 is installed into man
+directory
+
+Upstream-Status: Pending
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 0f1b506..6e53179 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -71,7 +71,7 @@ install_common:
+ 		else \
+ 		  install -g root -m 755 dotlockfile $(bindir); \
+ 		fi
+-		install -m 644 *.1 $(mandir)/man1
++		install -m 644 dotlockfile.1 $(mandir)/man1
+ 		install -m 644 *.3 $(mandir)/man3
+ 
+ install_nfslib:	nfslib
+-- 
+2.17.1
+

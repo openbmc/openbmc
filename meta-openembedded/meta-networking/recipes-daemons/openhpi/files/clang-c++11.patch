@@ -1,3 +1,7 @@
+Support build with Clang
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Index: openhpi-3.6.1/plugins/dynamic_simulator/new_sim.cpp
 ===================================================================
 --- openhpi-3.6.1.orig/plugins/dynamic_simulator/new_sim.cpp
@@ -1273,16 +1277,3 @@ Index: openhpi-3.6.1/plugins/ipmidirect/ipmi.cpp
  
  static SaErrorT
  IpmiResetWatchdog(void *hnd,
-Index: openhpi-3.6.1/plugins/ipmidirect/ipmi_auth.h
-===================================================================
---- openhpi-3.6.1.orig/plugins/ipmidirect/ipmi_auth.h
-+++ openhpi-3.6.1/plugins/ipmidirect/ipmi_auth.h
-@@ -32,7 +32,7 @@ class cIpmiAuthSg
- {
- public:
-   void *data; /* NULL to terminate. */
--  int   len;
-+  unsigned int   len;
- };
- 
- 

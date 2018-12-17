@@ -136,10 +136,13 @@ h3 {
             {% else %}
               {% set result_style = "color: orange" %}
             {%endif %}
+            {% if measurement.reldiff|abs > 2 %}
+              {% set result_style = result_style + "; font-weight: bold" %}
+            {% endif %}
             <td>{{ measurement.description }}</td>
             <td style="font-weight: bold">{{ measurement.value.mean }}</td>
             <td style="{{ result_style }}">{{ measurement.absdiff_str }}</td>
-            <td style="{{ result_style }}">{{ measurement.reldiff }}</td>
+            <td style="{{ result_style }}">{{ measurement.reldiff_str }}</td>
           </tr>
         {% endfor %}
       {% else %}
@@ -167,7 +170,7 @@ h3 {
             {% else %}
             <span style="color: orange">
             {% endif %}
-            {{ measurement.absdiff_str }} ({{measurement.reldiff}})
+            {{ measurement.absdiff_str }} ({{measurement.reldiff_str}})
             </span></span>
           </div>
           {# Table for trendchart and the statistics #}

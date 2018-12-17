@@ -1,0 +1,23 @@
+From ef743c9c3c7452ae904a5c343ee2b759ab3a87cb Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Lo=C3=AFc=20Minier?= <loic.minier@ubuntu.com>
+Date: Wed, 7 Sep 2016 12:58:47 +0300
+Subject: [PATCH] Use linux/capability.h on linux systems too
+
+Upstream-Status: Inappropriate
+---
+ include/private/android_filesystem_config.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/private/android_filesystem_config.h b/include/private/android_filesystem_config.h
+index 2f528b95c8..3e0b00928e 100644
+--- a/include/private/android_filesystem_config.h
++++ b/include/private/android_filesystem_config.h
+@@ -27,7 +27,7 @@
+ #include <sys/types.h>
+ #include <stdint.h>
+ 
+-#ifdef HAVE_ANDROID_OS
++#if defined(HAVE_ANDROID_OS) || defined(__linux__)
+ #include <linux/capability.h>
+ #else
+ #include "android_filesystem_capability.h"

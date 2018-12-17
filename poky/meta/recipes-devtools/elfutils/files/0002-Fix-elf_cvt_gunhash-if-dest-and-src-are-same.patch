@@ -1,4 +1,4 @@
-From e98670f7c7b4c73fb65534949716fd8d043960d5 Mon Sep 17 00:00:00 2001
+From 9fd4bb05d3f2b7eaf9fe441bee26d3b1878d7cc7 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 15 Aug 2017 17:13:59 +0800
 Subject: [PATCH 2/7] Fix elf_cvt_gunhash if dest and src are same.
@@ -38,5 +38,5 @@ index 6faf113..04d9ca1 100644
    /* Now the 64 bit words.  */
    Elf64_Xword *dest64 = (Elf64_Xword *) &dest32[4];
 -- 
-1.8.3.1
+2.7.4
 

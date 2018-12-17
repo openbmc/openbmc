@@ -23,7 +23,7 @@ RPMROOTFSDEPENDS = "rpm-native:do_populate_sysroot \
 do_rootfs[depends] += "${RPMROOTFSDEPENDS}"
 do_populate_sdk[depends] += "${RPMROOTFSDEPENDS}"
 
-do_rootfs[recrdeptask] += "do_package_write_rpm"
+do_rootfs[recrdeptask] += "do_package_write_rpm do_package_qa"
 do_rootfs[vardeps] += "PACKAGE_FEED_URIS"
 
 python () {

@@ -36,7 +36,7 @@ check_privsep_dir() {
 }
 
 check_config() {
-	/usr/sbin/sshd -t $SSHD_OPTS || exit 1
+    /usr/sbin/sshd $SSHD_OPTS -t || exit 1
 }
 
 export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
@@ -48,19 +48,19 @@ case "$1" in
 	@LIBEXECDIR@/sshd_check_keys
 	check_privsep_dir
 	start-stop-daemon -S -p $PIDFILE -x /usr/sbin/sshd -- $SSHD_OPTS
-        echo "done."
+	echo "done."
 	;;
   stop)
-        echo -n "Stopping OpenBSD Secure Shell server: sshd"
+	echo -n "Stopping OpenBSD Secure Shell server: sshd"
 	start-stop-daemon -K -p $PIDFILE -x /usr/sbin/sshd
-        echo "."
+	echo "."
 	;;
 
   reload|force-reload)
 	check_for_no_start
 	@LIBEXECDIR@/sshd_check_keys
 	check_config
-        echo -n "Reloading OpenBSD Secure Shell server's configuration"
+	echo -n "Reloading OpenBSD Secure Shell server's configuration"
 	start-stop-daemon -K -p $PIDFILE -s 1 -x /usr/sbin/sshd
 	echo "."
 	;;
@@ -68,7 +68,7 @@ case "$1" in
   restart)
 	@LIBEXECDIR@/sshd_check_keys
 	check_config
-        echo -n "Restarting OpenBSD Secure Shell server: sshd"
+	echo -n "Restarting OpenBSD Secure Shell server: sshd"
 	start-stop-daemon -K -p $PIDFILE --oknodo -x /usr/sbin/sshd
 	check_for_no_start
 	check_privsep_dir

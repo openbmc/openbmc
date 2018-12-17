@@ -1,0 +1,41 @@
+From b909805b4fc1b72e0ce299afb4abc02720ee81da Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Wed, 12 Sep 2018 14:24:35 +0800
+Subject: [PATCH] mmap15: mips64 return EINVAL
+
+In mips64 kernel, system check the addr that passed to mmap:
+
+    if (TASK_SIZE - len < addr)
+        return -EINVAL;
+
+Link: https://github.com/torvalds/linux/blob/master/arch/mips/mm/mmap.c#L71
+
+Upstream-Status: Submitted [https://github.com/linux-test-project/ltp/pull/394]
+
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+---
+ testcases/kernel/syscalls/mmap/mmap15.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/testcases/kernel/syscalls/mmap/mmap15.c b/testcases/kernel/syscalls/mmap/mmap15.c
+index eff27d6..a10b5c7 100644
+--- a/testcases/kernel/syscalls/mmap/mmap15.c
++++ b/testcases/kernel/syscalls/mmap/mmap15.c
+@@ -81,9 +81,14 @@ int main(int ac, char **av)
+ 		}
+ 
+ 		if (errno != ENOMEM) {
++#ifdef __mips__
++			tst_resm(TPASS | TERRNO, "mmap into high region "
++                                 "failed as expected");                        
++#else
+ 			tst_resm(TFAIL | TERRNO, "mmap into high region "
+ 				 "failed unexpectedly - expect "
+ 				 "errno=ENOMEM, got");
++#endif
+ 		} else {
+ 			tst_resm(TPASS | TERRNO, "mmap into high region "
+ 				 "failed as expected");
+-- 
+2.7.4
+

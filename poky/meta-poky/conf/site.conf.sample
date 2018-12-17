@@ -24,7 +24,9 @@ SCONF_VERSION = "1"
 #or
 #ALL_PROXY ?= "https://proxy.example.com:8080"
 # If you wish to use certain hosts without the proxy, specify them in NO_PROXY.
-# See the script for details on syntax.
+# See the script for details on syntax. The script oe-git-proxy uses some tools
+# that may not be included on HOSTTOOLS, thus  add them manually through
+# HOSTTOOLS += "getent seq"
 
 # Uncomment this to use a shared download directory
 #DL_DIR = "/some/shared/download/directory/"

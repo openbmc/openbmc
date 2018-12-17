@@ -164,10 +164,11 @@ python multilib_virtclass_handler_global () {
     if variant:
         return
 
+    non_ml_recipes = d.getVar('NON_MULTILIB_RECIPES').split()
+
     if bb.data.inherits_class('kernel', e.data) or \
             bb.data.inherits_class('module-base', e.data) or \
-            (bb.data.inherits_class('allarch', e.data) and\
-             not bb.data.inherits_class('packagegroup', e.data)):
+            d.getVar('BPN') in non_ml_recipes:
             variants = (e.data.getVar("MULTILIB_VARIANTS") or "").split()
 
             import oe.classextend

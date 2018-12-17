@@ -1,0 +1,35 @@
+From c2291fe28dc5682f81804941512431642975cf21 Mon Sep 17 00:00:00 2001
+From: Pascal Bach <pascal.bach@siemens.com>
+Date: Mon, 29 Oct 2018 18:17:32 +0100
+Subject: [PATCH] Simplify ncurses finding module
+
+CMake will automatically look in the right locations, there is no need to
+re-implement the logic with a for loop and NO_DEFAULT_PATH.
+
+It is already done like this to file the headers.
+
+Upstream-Status: Submitted [https://github.com/libyui/libyui-ncurses/pull/73]
+Signed-off-by: Pascal Bach <pascal.bach@siemens.com>
+---
+ cmake/Modules/FindCurses6.cmake | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/cmake/Modules/FindCurses6.cmake b/cmake/Modules/FindCurses6.cmake
+index 0bf02c3..e298d5d 100644
+--- a/cmake/Modules/FindCurses6.cmake
++++ b/cmake/Modules/FindCurses6.cmake
+@@ -5,11 +5,9 @@
+ #  CURSES6_LIBRARIES - The libraries needed to use Curses6
+ #  CURSES6_DEFINITIONS - Compiler switches required for using Curses6
+ 
+-FOREACH(path ${CMAKE_LIBRARY_PATH} /usr/${LIB_DIR})
+-  FIND_LIBRARY(CURSES6_NCURSESW_LIBRARY NAMES ncursesw PATHS ${path}/ncurses6 ${path} NO_DEFAULT_PATH)
+-  FIND_LIBRARY(CURSES6_PANELW_LIBRARY NAMES panelw PATHS ${path}/ncurses6 ${path} NO_DEFAULT_PATH)
+-  FIND_LIBRARY(CURSES6_TINFO_LIBRARY NAMES tinfo PATHS ${path}/ncurses6 ${path} NO_DEFAULT_PATH)
+-ENDFOREACH()
++FIND_LIBRARY(CURSES6_NCURSESW_LIBRARY NAMES ncursesw PATH_SUFFIXES ncurses6)
++FIND_LIBRARY(CURSES6_PANELW_LIBRARY NAMES panelw PATH_SUFFIXES ncurses6)
++FIND_LIBRARY(CURSES6_TINFO_LIBRARY NAMES tinfo PATH_SUFFIXES ncurses6)
+ 
+ SET(CURSES6_LIBRARIES ${CURSES6_NCURSESW_LIBRARY} ${CURSES6_PANELW_LIBRARY})
+ # tinfo is optional (in 12.1 is not there)

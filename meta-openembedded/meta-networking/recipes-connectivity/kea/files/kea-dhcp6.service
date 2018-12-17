@@ -1,0 +1,13 @@
+[Unit]
+Description=Kea DHCPv6 Server
+Wants=network-online.target
+After=network-online.target
+After=time-sync.target
+
+[Service]
+ExecStartPre=@BASE_BINDIR@/mkdir -p @LOCALSTATEDIR@/run/kea/
+ExecStartPre=@BASE_BINDIR@/mkdir -p @LOCALSTATEDIR@/kea
+ExecStart=@SBINDIR@/kea-dhcp6 -c @SYSCONFDIR@/kea/kea-dhcp6.conf
+
+[Install]
+WantedBy=multi-user.target

@@ -21,6 +21,7 @@ class CmdError(bb.BBHandledException):
 
 def runcmd(args, dir = None):
     import pipes
+    import subprocess
 
     if dir:
         olddir = os.path.abspath(os.curdir)
@@ -33,7 +34,7 @@ def runcmd(args, dir = None):
         args = [ pipes.quote(str(arg)) for arg in args ]
         cmd = " ".join(args)
         # print("cmd: %s" % cmd)
-        (exitstatus, output) = oe.utils.getstatusoutput(cmd)
+        (exitstatus, output) = subprocess.getstatusoutput(cmd)
         if exitstatus != 0:
             raise CmdError(cmd, exitstatus >> 8, output)
         if " fuzz " in output:

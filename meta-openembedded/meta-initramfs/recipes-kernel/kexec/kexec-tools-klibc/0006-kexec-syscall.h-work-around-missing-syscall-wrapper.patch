@@ -1,0 +1,71 @@
+From 45a80fe7d247898d83edfeabe32b9de80a50a6be Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Fri, 31 Aug 2018 11:33:51 +0200
+Subject: [PATCH] kexec-syscall.h: work around missing syscall() wrapper
+
+Fix
+
+ kexec-syscall.h: In function 'kexec_load':
+ kexec-syscall.h:80:16: warning: implicit declaration of function 'syscall'
+
+Upstream-Status: Inappropriate [klibc specific]
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+
+---
+ kexec/kexec-syscall.h | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/kexec/kexec-syscall.h b/kexec/kexec-syscall.h
+index 33638c2..204007d 100644
+--- a/kexec/kexec-syscall.h
++++ b/kexec/kexec-syscall.h
+@@ -74,11 +74,16 @@
+ 
+ struct kexec_segment;
+ 
++#ifndef __KLIBC__
+ static inline long kexec_load(void *entry, unsigned long nr_segments,
+ 			struct kexec_segment *segments, unsigned long flags)
+ {
+ 	return (long) syscall(__NR_kexec_load, entry, nr_segments, segments, flags);
+ }
++#else
++extern long kexec_load(void *entry, unsigned long nr_segments,
++			struct kexec_segment *segments, unsigned long flags);
++#endif
+ 
+ static inline int is_kexec_file_load_implemented(void) {
+ 	if (__NR_kexec_file_load != 0xffffffff)
+@@ -86,6 +91,21 @@ static inline int is_kexec_file_load_implemented(void) {
+ 	return 0;
+ }
+ 
++#ifdef __KLIBC__
++/* Stub provided by klibc only for the following archs */
++#if defined (__x86_64__) || defined (__powerpc_64__) || defined (__s390x__)
++extern long kexec_file_load(int kernel_fd, int initrd_fd,
++			unsigned long cmdline_len, const char *cmdline_ptr,
++			unsigned long flags);
++#else
++static inline long kexec_file_load(int kernel_fd, int initrd_fd,
++			unsigned long cmdline_len, const char *cmdline_ptr,
++			unsigned long flags)
++{
++	return -1;
++}
++#endif
++#else
+ static inline long kexec_file_load(int kernel_fd, int initrd_fd,
+ 			unsigned long cmdline_len, const char *cmdline_ptr,
+ 			unsigned long flags)
+@@ -93,6 +113,7 @@ static inline long kexec_file_load(int kernel_fd, int initrd_fd,
+ 	return (long) syscall(__NR_kexec_file_load, kernel_fd, initrd_fd,
+ 				cmdline_len, cmdline_ptr, flags);
+ }
++#endif
+ 
+ #define KEXEC_ON_CRASH		0x00000001
+ #define KEXEC_PRESERVE_CONTEXT	0x00000002
+-- 
+2.7.4
+

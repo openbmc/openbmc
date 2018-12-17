@@ -1,0 +1,26 @@
+From 81f36e7174097a1f1f3e7f94a97574b2ec68577f Mon Sep 17 00:00:00 2001
+From: "James E. King, III" <jim.king@simplivity.com>
+Date: Thu, 29 Sep 2016 15:04:09 -0400
+Subject: [PATCH] THRIFT-3878: fix interop with newer OpenSSL libraries
+
+---
+ lib/cpp/src/thrift/transport/TSSLSocket.cpp | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/lib/cpp/src/thrift/transport/TSSLSocket.cpp b/lib/cpp/src/thrift/transport/TSSLSocket.cpp
+index 3da9e45..0a3a124 100644
+--- a/lib/cpp/src/thrift/transport/TSSLSocket.cpp
++++ b/lib/cpp/src/thrift/transport/TSSLSocket.cpp
+@@ -97,7 +97,12 @@ void initializeOpenSSL() {
+   SSL_library_init();
+   SSL_load_error_strings();
+   // static locking
++  // newer versions of OpenSSL changed CRYPTO_num_locks - see THRIFT-3878
++#ifdef CRYPTO_num_locks
++  mutexes = boost::shared_array<Mutex>(new Mutex[CRYPTO_num_locks()]);
++#else
+   mutexes = boost::shared_array<Mutex>(new Mutex[ ::CRYPTO_num_locks()]);
++#endif
+   if (mutexes == NULL) {
+     throw TTransportException(TTransportException::INTERNAL_ERROR,
+                               "initializeOpenSSL() failed, "

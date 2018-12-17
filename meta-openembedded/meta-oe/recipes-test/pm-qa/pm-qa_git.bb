@@ -63,3 +63,6 @@ do_install () {
     done
 }
 RDEPENDS_${PN} +="bash"
+
+# http://errors.yoctoproject.org/Errors/Details/186956/
+EXCLUDE_FROM_WORLD_libc-musl = "1"

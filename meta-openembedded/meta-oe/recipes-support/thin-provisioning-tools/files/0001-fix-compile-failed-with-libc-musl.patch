@@ -1,0 +1,42 @@
+From fcbcf9c494cca166106ae4cb03c1dd135ee4f25c Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 1 Aug 2018 09:34:00 +0800
+Subject: [PATCH] fix compile failed with libc musl
+
+There is a failure while compiling with libc musl:
+[snip]
+|./block-cache/io_engine.h:18:17: error: expected
+unqualified-id before numeric constant
+|  unsigned const PAGE_SIZE = 4096;
+[snip]
+
+The musl defeines macro PAGE_SIZE, undef it conditionally
+could fix the issue.
+
+http://musl.openwall.narkive.com/tO8vrHdP/why-musl-define-page-size
+
+Upstream-Status: Submitted [git://github.com/jthornber/thin-provisioning-tools]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ block-cache/io_engine.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/block-cache/io_engine.h b/block-cache/io_engine.h
+index 1704251..e36b932 100644
+--- a/block-cache/io_engine.h
++++ b/block-cache/io_engine.h
+@@ -12,6 +12,10 @@
+ 
+ //----------------------------------------------------------------
+ 
++// Musl defines
++#ifdef PAGE_SIZE
++#undef PAGE_SIZE
++#endif
+ namespace bcache {
+ 	using sector_t = uint64_t;
+ 
+-- 
+2.7.4
+

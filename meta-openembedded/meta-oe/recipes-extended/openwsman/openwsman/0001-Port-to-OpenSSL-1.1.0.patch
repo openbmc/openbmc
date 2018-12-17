@@ -1,0 +1,162 @@
+From f78643d2388dd0697f83f17880403253a0596d83 Mon Sep 17 00:00:00 2001
+From: Vitezslav Crhonek <vcrhonek@redhat.com>
+Date: Wed, 5 Sep 2018 11:23:46 -0700
+Subject: [PATCH 1/2] Port to OpenSSL 1.1.0
+
+Upstream-Status: Submitted [https://github.com/Openwsman/openwsman/pull/99]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/lib/wsman-curl-client-transport.c |  6 +++-
+ src/server/shttpd/io_ssl.c            | 17 ----------
+ src/server/shttpd/shttpd.c            | 20 ++++--------
+ src/server/shttpd/ssl.h               | 46 ---------------------------
+ 4 files changed, 12 insertions(+), 77 deletions(-)
+
+diff --git a/src/lib/wsman-curl-client-transport.c b/src/lib/wsman-curl-client-transport.c
+index cd7f517a..e64ad097 100644
+--- a/src/lib/wsman-curl-client-transport.c
++++ b/src/lib/wsman-curl-client-transport.c
+@@ -241,12 +241,16 @@ write_handler( void *ptr, size_t size, size_t nmemb, void *data)
+ static int ssl_certificate_thumbprint_verify_callback(X509_STORE_CTX *ctx, void *arg)
+ {
+ 	unsigned char *thumbprint = (unsigned char *)arg;
+-	X509 *cert = ctx->cert;
+ 	EVP_MD                                  *tempDigest;
+ 
+ 	unsigned char   tempFingerprint[EVP_MAX_MD_SIZE];
+ 	unsigned int      tempFingerprintLen;
+ 	tempDigest = (EVP_MD*)EVP_sha1( );
++
++	X509 *cert = X509_STORE_CTX_get_current_cert(ctx);
++	if(!cert)
++		return 0;
++
+ 	if ( X509_digest(cert, tempDigest, tempFingerprint, &tempFingerprintLen ) <= 0)
+ 		return 0;
+ 	if(!memcmp(tempFingerprint, thumbprint, tempFingerprintLen))
+diff --git a/src/server/shttpd/io_ssl.c b/src/server/shttpd/io_ssl.c
+index 6de0db2a..7ac669e4 100644
+--- a/src/server/shttpd/io_ssl.c
++++ b/src/server/shttpd/io_ssl.c
+@@ -11,23 +11,6 @@
+ #include "defs.h"
+ 
+ #if !defined(NO_SSL)
+-struct ssl_func	ssl_sw[] = {
+-	{"SSL_free",			{0}},
+-	{"SSL_accept",			{0}},
+-	{"SSL_connect",			{0}},
+-	{"SSL_read",			{0}},
+-	{"SSL_write",			{0}},
+-	{"SSL_get_error",		{0}},
+-	{"SSL_set_fd",			{0}},
+-	{"SSL_new",			{0}},
+-	{"SSL_CTX_new",			{0}},
+-	{"SSLv23_server_method",	{0}},
+-	{"SSL_library_init",		{0}},
+-	{"SSL_CTX_use_PrivateKey_file",	{0}},
+-	{"SSL_CTX_use_certificate_file",{0}},
+-	{NULL,				{0}}
+-};
+-
+ void
+ _shttpd_ssl_handshake(struct stream *stream)
+ {
+diff --git a/src/server/shttpd/shttpd.c b/src/server/shttpd/shttpd.c
+index 5876392e..4c1dbf32 100644
+--- a/src/server/shttpd/shttpd.c
++++ b/src/server/shttpd/shttpd.c
+@@ -1476,20 +1476,14 @@ set_ssl(struct shttpd_ctx *ctx, const char *pem)
+ 	int		retval = FALSE;
+ 	EC_KEY*		key;
+ 
+-	/* Load SSL library dynamically */
+-	if ((lib = dlopen(SSL_LIB, RTLD_LAZY)) == NULL) {
+-		_shttpd_elog(E_LOG, NULL, "set_ssl: cannot load %s", SSL_LIB);
+-		return (FALSE);
+-	}
+-
+-	for (fp = ssl_sw; fp->name != NULL; fp++)
+-		if ((fp->ptr.v_void = dlsym(lib, fp->name)) == NULL) {
+-			_shttpd_elog(E_LOG, NULL,"set_ssl: cannot find %s", fp->name);
+-			return (FALSE);
+-		}
+-
+ 	/* Initialize SSL crap */
++	debug("Initialize SSL");
++	SSL_load_error_strings();
++	#if OPENSSL_VERSION_NUMBER < 0x10100000L
+ 	SSL_library_init();
++	#else
++	OPENSSL_init_ssl(0, NULL);
++	#endif
+ 
+ 	if ((CTX = SSL_CTX_new(SSLv23_server_method())) == NULL)
+ 		_shttpd_elog(E_LOG, NULL, "SSL_CTX_new error");
+@@ -1532,7 +1526,7 @@ set_ssl(struct shttpd_ctx *ctx, const char *pem)
+ 			if (strncasecmp(protocols[idx].name, ssl_disabled_protocols, blank_ptr-ssl_disabled_protocols) == 0) {
+ 				//_shttpd_elog(E_LOG, NULL, "SSL: disable %s protocol", protocols[idx].name);
+ 				debug("SSL: disable %s protocol", protocols[idx].name);
+-				SSL_CTX_ctrl(CTX, SSL_CTRL_OPTIONS, protocols[idx].opt, NULL);
++				SSL_CTX_set_options(CTX, protocols[idx].opt);
+ 				break;
+ 			}
+ 		}
+diff --git a/src/server/shttpd/ssl.h b/src/server/shttpd/ssl.h
+index a863f2c7..8dad0109 100644
+--- a/src/server/shttpd/ssl.h
++++ b/src/server/shttpd/ssl.h
+@@ -12,50 +12,4 @@
+ 
+ #include <openssl/ssl.h>
+ 
+-#else
+-
+-/*
+- * Snatched from OpenSSL includes. I put the prototypes here to be independent
+- * from the OpenSSL source installation. Having this, shttpd + SSL can be
+- * built on any system with binary SSL libraries installed.
+- */
+-
+-typedef struct ssl_st SSL;
+-typedef struct ssl_method_st SSL_METHOD;
+-typedef struct ssl_ctx_st SSL_CTX;
+-
+-#define	SSL_ERROR_WANT_READ	2
+-#define	SSL_ERROR_WANT_WRITE	3
+-#define	SSL_ERROR_SYSCALL	5
+-#define	SSL_FILETYPE_PEM	1
+-
+ #endif
+-
+-/*
+- * Dynamically loaded SSL functionality
+- */
+-struct ssl_func {
+-	const char	*name;		/* SSL function name	*/
+-	union variant	ptr;		/* Function pointer	*/
+-};
+-
+-extern struct ssl_func	ssl_sw[];
+-
+-#define	FUNC(x)	ssl_sw[x].ptr.v_func
+-
+-#define	SSL_free(x)	(* (void (*)(SSL *)) FUNC(0))(x)
+-#define	SSL_accept(x)	(* (int (*)(SSL *)) FUNC(1))(x)
+-#define	SSL_connect(x)	(* (int (*)(SSL *)) FUNC(2))(x)
+-#define	SSL_read(x,y,z)	(* (int (*)(SSL *, void *, int)) FUNC(3))((x),(y),(z))
+-#define	SSL_write(x,y,z) \
+-	(* (int (*)(SSL *, const void *,int)) FUNC(4))((x), (y), (z))
+-#define	SSL_get_error(x,y)(* (int (*)(SSL *, int)) FUNC(5))((x), (y))
+-#define	SSL_set_fd(x,y)	(* (int (*)(SSL *, int)) FUNC(6))((x), (y))
+-#define	SSL_new(x)	(* (SSL * (*)(SSL_CTX *)) FUNC(7))(x)
+-#define	SSL_CTX_new(x)	(* (SSL_CTX * (*)(SSL_METHOD *)) FUNC(8))(x)
+-#define	SSLv23_server_method()	(* (SSL_METHOD * (*)(void)) FUNC(9))()
+-#define	SSL_library_init() (* (int (*)(void)) FUNC(10))()
+-#define	SSL_CTX_use_PrivateKey_file(x,y,z)	(* (int (*)(SSL_CTX *, \
+-		const char *, int)) FUNC(11))((x), (y), (z))
+-#define	SSL_CTX_use_certificate_file(x,y,z)	(* (int (*)(SSL_CTX *, \
+-		const char *, int)) FUNC(12))((x), (y), (z))
+-- 
+2.18.0
+

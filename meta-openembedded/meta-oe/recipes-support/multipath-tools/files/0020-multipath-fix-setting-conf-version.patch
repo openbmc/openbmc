@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Fri, 8 Jun 2018 17:23:07 -0500
+Subject: [PATCH] multipath: fix setting conf->version
+
+Commit d3b71498 stopped multipath from setting conf->version. Instead,
+it was always being set to 0.0.0. Multipathd was still setting this
+correctly.
+
+Fixes: d3b71498 "multipath: fix rcu thread cancellation hang"
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/devmapper.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/libmultipath/devmapper.c b/libmultipath/devmapper.c
+index f2befad..8136d15 100644
+--- a/libmultipath/devmapper.c
++++ b/libmultipath/devmapper.c
+@@ -245,13 +245,13 @@ void libmp_dm_init(void)
+ 	int verbosity;
+ 	unsigned int version[3];
+ 
++	if (dm_prereq(version))
++		exit(1);
+ 	conf = get_multipath_config();
+ 	verbosity = conf->verbosity;
+-	memcpy(version, conf->version, sizeof(version));
++	memcpy(conf->version, version, sizeof(version));
+ 	put_multipath_config(conf);
+ 	dm_init(verbosity);
+-	if (dm_prereq(version))
+-		exit(1);
+ 	dm_udev_set_sync_support(libmp_dm_udev_sync);
+ }
+ 
+-- 
+2.7.4
+

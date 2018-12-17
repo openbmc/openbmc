@@ -26,7 +26,7 @@ FILES_${PN} += "${datadir}/themes/Sato/index.theme"
 
 do_install() {
 	# This is the set of machine features that the script has markers for
-	FEATURES="phone"
+	FEATURES="acpi apm phone"
 	SCRIPT="${S}/sedder"
 	rm -f $SCRIPT
 	touch $SCRIPT

@@ -246,7 +246,7 @@ def action_init(conf, args):
                         # traditional behavior from "git archive" (preserved
                         # here) it to choose the first one. This might not be
                         # intended, so at least warn about it.
-                        logger.warn("%s: initial revision '%s' not unique, picking result of rev-parse = %s" %
+                        logger.warning("%s: initial revision '%s' not unique, picking result of rev-parse = %s" %
                                     (name, initialrev, refs[0]))
                         initialrev = rev
                 except:

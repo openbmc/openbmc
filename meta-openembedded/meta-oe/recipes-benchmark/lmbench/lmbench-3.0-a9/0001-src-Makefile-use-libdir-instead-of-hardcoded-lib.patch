@@ -1,0 +1,34 @@
+From ea683a0dbaa30a0bf101adb09a1a2531c7112c62 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <Mingli.Yu@windriver.com>
+Date: Mon, 27 Aug 2018 11:02:45 +0800
+Subject: [PATCH] src/Makefile: use libdir instead of hardcoded /lib
+
+use libdir instead of hardcoded /lib
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
+---
+ src/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index 4678d54..b73ddb6 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -141,10 +141,10 @@ install-target:
+ 	if [ ! -d $(BASE) ]; then mkdir $(BASE); fi
+ 	if [ ! -d $(BASE)/bin ]; then mkdir $(BASE)/bin; fi
+ 	if [ ! -d $(BASE)/include ]; then mkdir $(BASE)/include; fi
+-	if [ ! -d $(BASE)/lib ]; then mkdir $(BASE)/lib; fi
++	if [ ! -d $(DESTDIR)$(libdir) ]; then mkdir $(DESTDIR)$(libdir); fi
+ 	cp $(EXES) $(BASE)/bin
+ 	cp $(INCS) $(BASE)/include
+-	cp $O/lmbench.a $(BASE)/lib/libmbench.a
++	cp $O/lmbench.a $(DESTDIR)$(libdir)/libmbench.a
+ 	cd ../doc; env MAKEFLAGS="$(MAKEFLAGS)" make CC="${CC}" OS="${OS}" BASE="$(BASE)" install
+ 
+ 
+-- 
+2.7.4
+

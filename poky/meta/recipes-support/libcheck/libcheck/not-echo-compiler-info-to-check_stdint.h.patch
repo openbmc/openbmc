@@ -1,0 +1,19 @@
+Do not echo compiler info in a comment line to check_stdint.h which causes
+multilib install file conflict.
+
+Upstream-Status: Pending
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+diff --git a/m4/ax_create_stdint_h.m4 b/m4/ax_create_stdint_h.m4
+index 33a21f8..eacc37a 100644
+--- a/m4/ax_create_stdint_h.m4
++++ b/m4/ax_create_stdint_h.m4
+@@ -272,7 +272,6 @@ echo "#ifndef" $_ac_stdint_h >$ac_stdint
+ echo "#define" $_ac_stdint_h "1" >>$ac_stdint
+ echo "#ifndef" _GENERATED_STDINT_H >>$ac_stdint
+ echo "#define" _GENERATED_STDINT_H '"'$PACKAGE $VERSION'"' >>$ac_stdint
+-echo "/* generated $ac_cv_stdint_message */" >>$ac_stdint
+ if test "_$ac_cv_header_stdint_t" != "_" ; then
+ echo "#define _STDINT_HAVE_STDINT_H" "1" >>$ac_stdint
+ echo "#include <stdint.h>" >>$ac_stdint

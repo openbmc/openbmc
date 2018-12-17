@@ -1,8 +1,8 @@
-From af3054b3856379d353a779801678f330e1b58c9a Mon Sep 17 00:00:00 2001
-Message-Id: <af3054b3856379d353a779801678f330e1b58c9a.1490183611.git.panand@redhat.com>
+From 38fad3e5ab3b45c56810abd35fa11a72fa10b8f1 Mon Sep 17 00:00:00 2001
 From: Pratyush Anand <panand@redhat.com>
 Date: Wed, 22 Mar 2017 17:02:38 +0530
-Subject: [PATCH] bits/siginfo-consts.h: enum definition for TRAP_HWBKPT is missing
+Subject: [PATCH] bits/siginfo-consts.h: enum definition for TRAP_HWBKPT is
+ missing
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -29,7 +29,7 @@ Upstream-Status: Submitted [https://sourceware.org/bugzilla/show_bug.cgi?id=2128
  2 files changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/bits/siginfo-consts.h b/bits/siginfo-consts.h
-index a58ac4b..8448fac 100644
+index 7464c1882b..298314527a 100644
 --- a/bits/siginfo-consts.h
 +++ b/bits/siginfo-consts.h
 @@ -106,8 +106,12 @@ enum
@@ -47,10 +47,10 @@ index a58ac4b..8448fac 100644
  # endif
  
 diff --git a/sysdeps/unix/sysv/linux/bits/siginfo-consts.h b/sysdeps/unix/sysv/linux/bits/siginfo-consts.h
-index 525840c..57a9edb 100644
+index 193bd9c471..3fe852bc5f 100644
 --- a/sysdeps/unix/sysv/linux/bits/siginfo-consts.h
 +++ b/sysdeps/unix/sysv/linux/bits/siginfo-consts.h
-@@ -137,8 +137,12 @@ enum
+@@ -141,8 +141,12 @@ enum
  {
    TRAP_BRKPT = 1,		/* Process breakpoint.  */
  #  define TRAP_BRKPT	TRAP_BRKPT
@@ -64,6 +64,3 @@ index 525840c..57a9edb 100644
  };
  # endif
  
--- 
-2.7.4
-

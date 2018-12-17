@@ -1,85 +1,39 @@
-SUMMARY = "Device Trees for BSPs"
-DESCRIPTION = "Device Tree generation and packaging for BSP Device Trees."
+SUMMARY = "Xilinx BSP device trees"
+DESCRIPTION = "Xilinx BSP device trees from within layer."
 SECTION = "bsp"
 
+# the device trees from within the layer are licensed as MIT, kernel includes are GPL
 LICENSE = "MIT & GPLv2"
 LIC_FILES_CHKSUM = " \
 		file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302 \
 		file://${COMMON_LICENSE_DIR}/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6 \
 		"
 
-inherit deploy kernel-arch
+inherit devicetree
 
 PROVIDES = "virtual/dtb"
 
-INHIBIT_DEFAULT_DEPS = "1"
-DEPENDS += "dtc-native"
+# common zynq include
+SRC_URI_append_zynq = " file://zynq-7000-qspi-dummy.dtsi"
 
-COMPATIBLE_MACHINE ?= "^$"
+# device tree sources for the various machines
+COMPATIBLE_MACHINE_picozed-zynq7 = ".*"
+SRC_URI_append_picozed-zynq7 = " file://picozed-zynq7.dts"
 
-PACKAGE_ARCH = "${MACHINE_ARCH}"
+COMPATIBLE_MACHINE_qemu-zynq7 = ".*"
+SRC_URI_append_qemu-zynq7 = " file://qemu-zynq7.dts"
 
-FILES_${PN} = "/boot/devicetree/*.dtb /boot/devicetree/*.dtbo"
-
-S = "${WORKDIR}"
-B = "${WORKDIR}/build"
-
-SYSROOT_DIRS += "/boot/devicetree"
-
-# By default provide the current kernel arch's boot/dts and boot/dts/include.
-KERNEL_DTS_INCLUDE ??= " \
-		${STAGING_KERNEL_DIR}/arch/${ARCH}/boot/dts \
-		${STAGING_KERNEL_DIR}/arch/${ARCH}/boot/dts/include \
-		"
-# For arm64/zynqmp the xilinx specific includes are subdired under a vendor directory.
-KERNEL_DTS_INCLUDE_append_zynqmp = " \
-		${STAGING_KERNEL_DIR}/arch/${ARCH}/boot/dts/xilinx \
+COMPATIBLE_MACHINE_zybo-linux-bd-zynq7 = ".*"
+SRC_URI_append_zybo-linux-bd-zynq7 = " \
+		file://zybo-linux-bd-zynq7.dts \
+		file://pcw.dtsi \
+		file://pl.dtsi \
 		"
 
-DTS_FILES_PATH ?= "${S}"
-DTS_INCLUDE ?= "${DTS_FILES_PATH} ${KERNEL_DTS_INCLUDE}"
-
-DT_PADDING_SIZE ?= "0x3000"
-DEVICETREE_FLAGS ?= " \
-		-R 8 -p ${DT_PADDING_SIZE} -b 0 \
-		${@' '.join(['-i %s' % i for i in d.getVar('DTS_INCLUDE', True).split()])} \
-               "
-DEVICETREE_OFLAGS ?= "-@ -H epapr"
-DEVICETREE_PP_FLAGS ?= " \
-		-nostdinc -Ulinux -x assembler-with-cpp \
-		${@' '.join(['-I%s' % i for i in d.getVar('DTS_INCLUDE', True).split()])} \
+COMPATIBLE_MACHINE_kc705-microblazeel = ".*"
+SRC_URI_append_kc705-microblazeel = " \
+		file://kc705-microblazeel.dts \
+		file://pl.dtsi \
+		file://system-conf.dtsi \
 		"
-
-python () {
-    # auto add dependency on kernel tree
-    if d.getVar("KERNEL_DTS_INCLUDE") != "":
-        d.appendVarFlag("do_compile", "depends", " virtual/kernel:do_configure")
-}
-
-do_compile() {
-	for DTS_FILE in ${DTS_FILES_PATH}/*.dts; do
-		DTS_NAME=`basename -s .dts ${DTS_FILE}`
-		${BUILD_CPP} ${DEVICETREE_PP_FLAGS} -o `basename ${DTS_FILE}`.pp ${DTS_FILE}
-
-		# for now use the existance of the '/plugin/' tag to detect overlays
-		if grep -qse "/plugin/;" `basename ${DTS_FILE}`.pp; then
-			dtc ${DEVICETREE_OFLAGS} -I dts -O dtb ${DEVICETREE_FLAGS} -o ${DTS_NAME}.dtbo `basename ${DTS_FILE}`.pp
-		else
-			dtc -I dts -O dtb ${DEVICETREE_FLAGS} -o ${DTS_NAME}.dtb `basename ${DTS_FILE}`.pp
-		fi
-	done
-}
-
-do_install() {
-	for DTB_FILE in `ls *.dtb *.dtbo`; do
-		install -Dm 0644 ${B}/${DTB_FILE} ${D}/boot/devicetree/${DTB_FILE}
-	done
-}
-
-do_deploy() {
-	for DTB_FILE in `ls *.dtb *.dtbo`; do
-		install -Dm 0644 ${B}/${DTB_FILE} ${DEPLOYDIR}/${DTB_FILE}
-	done
-}
-addtask deploy before do_build after do_install
 

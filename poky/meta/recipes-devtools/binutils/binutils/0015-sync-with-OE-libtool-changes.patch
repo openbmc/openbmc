@@ -1,4 +1,4 @@
-From 298804f430939d6cc94b09732ee93e64c5e6be18 Mon Sep 17 00:00:00 2001
+From f9e26bd29b5f017ea1307b51b5036063bff78600 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Mon, 6 Mar 2017 23:33:27 -0800
 Subject: [PATCH 15/15] sync with OE libtool changes
@@ -85,5 +85,5 @@ index 11ee684ccc..3b19ac1532 100644
  	elif test -n "$runpath_var"; then
  	  case "$finalize_perm_rpath " in
 -- 
-2.16.1
+2.18.0
 

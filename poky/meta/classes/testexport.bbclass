@@ -131,6 +131,11 @@ def copy_needed_files(d, tc):
     shutil.copy2(image_manifest, os.path.join(test_data_path, 'manifest'))
     shutil.copy2(tdname, os.path.join(test_data_path, 'testdata.json'))
 
+    for subdir, dirs, files in os.walk(export_path):
+        for dir in dirs:
+            if dir == '__pycache__':
+                shutil.rmtree(os.path.join(subdir, dir))
+
     # Create tar file for common parts of testexport
     create_tarball(d, "testexport.tar.gz", d.getVar("TEST_EXPORT_DIR"))
 

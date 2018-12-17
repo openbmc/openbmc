@@ -1,10 +1,10 @@
 DESCRIPTION = "A collection of tools for internationalizing Python applications"
 HOMEPAGE = "http://babel.edgewall.org/"
 LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=e6eeaabc92cfc2d03f53e789324d7292"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=eebdc057dc12abcc2d6c4453628bfcd4"
 
-SRC_URI[md5sum] = "152a6b17fe4110b95675aceb9af9fab2"
-SRC_URI[sha256sum] = "8ce4cb6fdd4393edd323227cba3a077bceb2a6ce5201c902c65e730046f41f14"
+SRC_URI[md5sum] = "c384ac03026e8fe6f9b90f55201f1bff"
+SRC_URI[sha256sum] = "8cba50f48c529ca3fa18cf81fa9403be176d374ac4d60738b839122dfaaa3d23"
 
 PYPI_PACKAGE = "Babel"
 

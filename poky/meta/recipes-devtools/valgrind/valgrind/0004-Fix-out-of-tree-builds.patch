@@ -1,7 +1,7 @@
-From 739421e253e6eba3eb6438651822f80fa9c0502a Mon Sep 17 00:00:00 2001
-From: Alexander Kanavin <alex.kanavin@gmail.com>
-Date: Tue, 15 Dec 2015 15:31:50 +0200
-Subject: [PATCH 1/2] Fix out of tree builds.
+From 8f916dcb395fe5a2429f2867ba4daf8ef3af073a Mon Sep 17 00:00:00 2001
+From: Randy MacLeod <Randy.MacLeod@windriver.com>
+Date: Tue, 16 Oct 2018 21:01:04 -0400
+Subject: [PATCH] Fix out of tree builds.
 
 The paths to these files need to be fully specified in
 the out of tree build case. glibc-2.X.supp is a generated file so the full path
@@ -9,18 +9,21 @@ is deliberately not specified in that case.
 
 RP 2013/03/23
 
-Upstream-Status: Pending
-Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+Patch refreshed for valgrind-3.14.0.
 
+Upstream-Status: Pending
+
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+Signed-off-by: Randy MacLeod <Randy.MacLeod@windriver.com>
 ---
- configure.ac | 68 ++++++++++++++++++++++++++++++------------------------------
+ configure.ac | 68 ++++++++++++++++++++++++++--------------------------
  1 file changed, 34 insertions(+), 34 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 3874296fde0b..7a5ba2c8557e 100644
+index c18ae5f2a..99667ce57 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -373,50 +373,50 @@ case "${host_os}" in
+@@ -392,50 +392,50 @@ case "${host_os}" in
  	     9.*)
  		  AC_MSG_RESULT([Darwin 9.x (${kernel}) / Mac OS X 10.5 Leopard])
  		  AC_DEFINE([DARWIN_VERS], DARWIN_10_5, [Darwin / Mac OS X version])
@@ -85,16 +88,18 @@ index 3874296fde0b..7a5ba2c8557e 100644
 +		  DEFAULT_SUPP="$srcdir/darwin16.supp ${DEFAULT_SUPP}"
 +		  DEFAULT_SUPP="$srcdir/darwin10-drd.supp ${DEFAULT_SUPP}"
  		  ;;
-              *) 
- 		  AC_MSG_RESULT([unsupported (${kernel})])
-@@ -428,13 +428,13 @@ case "${host_os}" in
-      solaris2.11*)
-         AC_MSG_RESULT([ok (${host_os})])
-         VGCONF_OS="solaris"
--        DEFAULT_SUPP="solaris11.supp ${DEFAULT_SUPP}"
-+        DEFAULT_SUPP="$srcdir/solaris11.supp ${DEFAULT_SUPP}"
+ 	     17.*)
+ 		  AC_MSG_RESULT([Darwin 17.x (${kernel}) / macOS 10.13 High Sierra])
+@@ -460,7 +460,7 @@ case "${host_os}" in
+                  DEFAULT_SUPP="solaris12.supp ${DEFAULT_SUPP}"
+                  ;;
+              *)
+-                 DEFAULT_SUPP="solaris11.supp ${DEFAULT_SUPP}"
++                 DEFAULT_SUPP="$srcdir/solaris11.supp ${DEFAULT_SUPP}"
+                  ;;
+ 	esac
          ;;
- 
+@@ -468,7 +468,7 @@ case "${host_os}" in
       solaris2.12*)
          AC_MSG_RESULT([ok (${host_os})])
          VGCONF_OS="solaris"
@@ -103,7 +108,7 @@ index 3874296fde0b..7a5ba2c8557e 100644
          ;;
  
       *) 
-@@ -982,29 +982,29 @@ AC_MSG_CHECKING([the glibc version])
+@@ -1051,29 +1051,29 @@ AC_MSG_CHECKING([the glibc version])
  case "${GLIBC_VERSION}" in
       2.2)
  	AC_MSG_RESULT(${GLIBC_VERSION} family)
@@ -143,7 +148,7 @@ index 3874296fde0b..7a5ba2c8557e 100644
  	;;
       2.*)
  	AC_MSG_RESULT(${GLIBC_VERSION} family)
-@@ -1013,8 +1013,8 @@ case "${GLIBC_VERSION}" in
+@@ -1082,8 +1082,8 @@ case "${GLIBC_VERSION}" in
  	AC_DEFINE([GLIBC_MANDATORY_INDEX_AND_STRLEN_REDIRECT], 1,
  		  [Define to 1 if index() and strlen() have been optimized heavily (x86 glibc >= 2.12)])
  	DEFAULT_SUPP="glibc-2.X.supp ${DEFAULT_SUPP}"
@@ -154,7 +159,7 @@ index 3874296fde0b..7a5ba2c8557e 100644
  	;;
       darwin)
  	AC_MSG_RESULT(Darwin)
-@@ -1024,7 +1024,7 @@ case "${GLIBC_VERSION}" in
+@@ -1093,7 +1093,7 @@ case "${GLIBC_VERSION}" in
       bionic)
  	AC_MSG_RESULT(Bionic)
  	AC_DEFINE([BIONIC_LIBC], 1, [Define to 1 if you're using Bionic])
@@ -163,7 +168,7 @@ index 3874296fde0b..7a5ba2c8557e 100644
  	;;
       solaris)
  	AC_MSG_RESULT(Solaris)
-@@ -1051,11 +1051,11 @@ if test "$VGCONF_OS" != "solaris"; then
+@@ -1120,11 +1120,11 @@ if test "$VGCONF_OS" != "solaris"; then
      # attempt to detect whether such libraries are installed on the
      # build machine (or even if any X facilities are present); just
      # add the suppressions antidisirregardless.
@@ -179,5 +184,5 @@ index 3874296fde0b..7a5ba2c8557e 100644
  
  
 -- 
-2.13.2.3.g44cd85c14
+2.17.0
 

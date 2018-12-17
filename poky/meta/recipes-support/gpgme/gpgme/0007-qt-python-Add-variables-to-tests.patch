@@ -1,7 +1,7 @@
-From f47e8c6f9e461803468a64581d3640d873352eaa Mon Sep 17 00:00:00 2001
+From d3087348348b4a7fcfb05bf2a75b4a63453e1c77 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Thu, 1 Feb 2018 10:14:30 +0800
-Subject: [PATCH] qt/python: Add variables to tests
+Subject: [PATCH 7/7] qt/python: Add variables to tests
 
 * configure.ac, lang/python/Makefile.am:
   New variable to `lang/python', set to `lang/python' if RUN_LANG_PYTHON_TESTS
@@ -19,10 +19,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  3 files changed, 21 insertions(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
-index 608c376..fad7467 100644
+index 7485cdf..4aa216d 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -536,6 +536,17 @@ AC_ARG_ENABLE(g13-test,
+@@ -535,6 +535,17 @@ AC_ARG_ENABLE(g13-test,
           run_g13_test=$enableval)
  AM_CONDITIONAL(RUN_G13_TESTS, test "$run_g13_test" = "yes")
  
@@ -41,7 +41,7 @@ index 608c376..fad7467 100644
  # Checks for header files.
  AC_CHECK_HEADERS_ONCE([locale.h sys/select.h sys/uio.h argp.h
 diff --git a/lang/python/Makefile.am b/lang/python/Makefile.am
-index 8d74cbd..43b5d1e 100644
+index 5a468f1..43b9788 100644
 --- a/lang/python/Makefile.am
 +++ b/lang/python/Makefile.am
 @@ -24,7 +24,10 @@ EXTRA_DIST = \
@@ -74,5 +74,5 @@ index ab85960..a244ede 100644
  
  EXTRA_DIST = README
 -- 
-1.8.3.1
+2.7.4
 

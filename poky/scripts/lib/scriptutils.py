@@ -15,16 +15,17 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import sys
-import os
-import logging
-import glob
 import argparse
-import subprocess
-import tempfile
-import shutil
+import glob
+import logging
+import os
 import random
+import shlex
+import shutil
 import string
+import subprocess
+import sys
+import tempfile
 
 def logger_create(name, stream=None):
     logger = logging.getLogger(name)
@@ -214,15 +215,14 @@ def fetch_url(tinfoil, srcuri, srcrev, destdir, logger, preserve_tmp=False, mirr
 
 def run_editor(fn, logger=None):
     if isinstance(fn, str):
-        params = '"%s"' % fn
+        files = [fn]
     else:
-        params = ''
-        for fnitem in fn:
-            params += ' "%s"' % fnitem
+        files = fn
 
     editor = os.getenv('VISUAL', os.getenv('EDITOR', 'vi'))
     try:
-        return subprocess.check_call('%s %s' % (editor, params), shell=True)
+        #print(shlex.split(editor) + files)
+        return subprocess.check_call(shlex.split(editor) + files)
     except subprocess.CalledProcessError as exc:
         logger.error("Execution of '%s' failed: %s" % (editor, exc))
         return 1

@@ -1,0 +1,21 @@
+From 3a788e9168c9b9eac66c4fa479413f4a95c61be4 Mon Sep 17 00:00:00 2001
+From: Florent Revest <revestflo@gmail.com>
+Date: Mon, 30 Oct 2017 21:05:46 +0100
+Subject: [PATCH] adb: Allow adbd to be ran as root
+
+---
+ adb/adb.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/adb/adb.c b/adb/adb.c
+index 027edd9359..e0f7ecde45 100644
+--- a/adb/adb.c
++++ b/adb/adb.c
+@@ -1271,6 +1271,7 @@ static int should_drop_privileges() {
+     int secure = 0;
+     char value[PROPERTY_VALUE_MAX];
+ 
++    return 0;
+    /* run adbd in secure mode if ro.secure is set and
+     ** we are not in the emulator
+     */

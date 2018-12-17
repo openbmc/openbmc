@@ -103,8 +103,15 @@ class DepExplorer(Gtk.Window):
         self.pkg_treeview.get_selection().connect("changed", self.on_cursor_changed)
         column = Gtk.TreeViewColumn("Package", Gtk.CellRendererText(), text=COL_PKG_NAME)
         self.pkg_treeview.append_column(column)
-        pane.add1(scrolled)
         scrolled.add(self.pkg_treeview)
+
+        self.search_entry = Gtk.SearchEntry.new()
+        self.pkg_treeview.set_search_entry(self.search_entry)
+
+        left_panel = Gtk.VPaned()
+        left_panel.add(self.search_entry)
+        left_panel.add(scrolled)
+        pane.add1(left_panel)
 
         box = Gtk.VBox(homogeneous=True, spacing=4)
 
@@ -129,6 +136,7 @@ class DepExplorer(Gtk.Window):
         pane.add2(box)
 
         self.show_all()
+        self.search_entry.grab_focus()
 
     def on_package_activated(self, treeview, path, column, data_col):
         model = treeview.get_model()

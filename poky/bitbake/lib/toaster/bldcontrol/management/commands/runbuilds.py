@@ -49,7 +49,7 @@ class Command(BaseCommand):
                 # we could not find a BEC; postpone the BR
                 br.state = BuildRequest.REQ_QUEUED
                 br.save()
-                logger.debug("runbuilds: No build env")
+                logger.debug("runbuilds: No build env (%s)" % e)
                 return
 
             logger.info("runbuilds: starting build %s, environment %s" %

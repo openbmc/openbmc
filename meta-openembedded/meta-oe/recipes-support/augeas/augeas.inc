@@ -31,3 +31,5 @@ do_install_append() {
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[libselinux] = "--with-selinux,--without-selinux,libselinux"
+
+EXTRA_AUTORECONF += "-I ${S}/gnulib/m4"

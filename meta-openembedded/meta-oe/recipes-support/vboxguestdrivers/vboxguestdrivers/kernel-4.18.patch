@@ -1,0 +1,33 @@
+Description: Fix build failure with new kernel 4.18
+Author: Gianfranco Costamagna <locutusofborg@debian.org>
+
+Upstream-Status:Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Index: vbox_module/vboxsf/utils.c
+===================================================================
+--- vbox_module.orig/vboxsf/utils.c
++++ vbox_module/vboxsf/utils.c
+@@ -50,7 +50,11 @@ static void sf_timespec_from_ftime(RTTIM
+     RTTimeSpecSetNano(ts, t);
+ }
+ #else /* >= 2.6.0 */
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 18, 0)
+ static void sf_ftime_from_timespec(struct timespec *tv, RTTIMESPEC *ts)
++#else
++static void sf_ftime_from_timespec(struct timespec64 *tv, RTTIMESPEC *ts)
++#endif
+ {
+     int64_t t = RTTimeSpecGetNano(ts);
+     int64_t nsec;
+@@ -60,7 +64,11 @@ static void sf_ftime_from_timespec(struc
+     tv->tv_nsec = nsec;
+ }
+ 
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 18, 0)
+ static void sf_timespec_from_ftime(RTTIMESPEC *ts, struct timespec *tv)
++#else
++static void sf_timespec_from_ftime(RTTIMESPEC *ts, struct timespec64 *tv)
++#endif
+ {
+     int64_t t = (int64_t)tv->tv_nsec + (int64_t)tv->tv_sec * 1000000000;
+     RTTimeSpecSetNano(ts, t);

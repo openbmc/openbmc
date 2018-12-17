@@ -1,0 +1,34 @@
+From 7f57b2cd145d67c20beb02d5495b502f7af012cd Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 8 May 2017 03:54:12 -0400
+Subject: [PATCH 08/11] use oe variable to replace hardcoded dir
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ setup.py | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 7edab2c..9be3187 100644
+--- a/setup.py
++++ b/setup.py
+@@ -61,10 +61,10 @@ class blivet_sdist(sdist):
+ 
+ 
+ data_files = [
+-    ('/etc/dbus-1/system.d', ['dbus/blivet.conf']),
+-    ('/usr/share/dbus-1/system-services', ['dbus/com.redhat.Blivet1.service']),
+-    ('/usr/libexec', ['dbus/blivetd']),
+-    ('/usr/lib/systemd/system', ['dbus/blivet.service'])
++    (os.environ.get('sysconfdir')+'/dbus-1/system.d', ['dbus/blivet.conf']),
++    (os.environ.get('datadir')+'/dbus-1/system-services', ['dbus/com.redhat.Blivet1.service']),
++    (os.environ.get('libexecdir'), ['dbus/blivetd']),
++    (os.environ.get('systemd_system_unitdir'), ['dbus/blivet.service'])
+ ]
+ 
+ 
+-- 
+2.7.4
+

@@ -1,0 +1,71 @@
+From 3e5a0cb440c788e2383e40ab23ac1cf01d96961b Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Tue, 24 Jul 2018 01:30:25 -0700
+Subject: [PATCH] src/tcp.c: fix jump-misses-init error
+
+Fix below jump-misses-init error
+
+| In file included from ../../git/src/tcp.c:51:
+| ../../git/src/tcp.c: In function 'relpTcpConnect':
+| ../../git/src/relp.h:220:3: error: jump skips variable initialization [-Werror=jump-misses-init]
+|    goto finalize_it;  \
+|    ^~~~
+| ../../git/src/tcp.c:1951:3: note: in expansion of macro 'ABORT_FINALIZE'
+|    ABORT_FINALIZE(RELP_RET_IO_ERR);
+|    ^~~~~~~~~~~~~~
+| ../../git/src/tcp.c:2005:1: note: label 'finalize_it' defined here
+|  finalize_it:
+|  ^~~~~~~~~~~
+| ../../git/src/tcp.c:1991:6: note: 'r' declared here
+|   int r = getsockopt(pThis->sock, SOL_SOCKET, SO_ERROR, &so_error, &len);
+|       ^
+| In file included from ../../git/src/tcp.c:51:
+| ../../git/src/relp.h:220:3: error: jump skips variable initialization [-Werror=jump-misses-init]
+|    goto finalize_it;  \
+|    ^~~~
+| ../../git/src/tcp.c:1951:3: note: in expansion of macro 'ABORT_FINALIZE'
+|    ABORT_FINALIZE(RELP_RET_IO_ERR);
+|    ^~~~~~~~~~~~~~
+| ../../git/src/tcp.c:2005:1: note: label 'finalize_it' defined here
+|  finalize_it:
+|  ^~~~~~~~~~~
+| ../../git/src/tcp.c:1989:12: note: 'len' declared here
+|   socklen_t len = sizeof so_error;
+|             ^~~
+
+Upstream-Status: Submitted[https://github.com/rsyslog/librelp/pull/117]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ src/tcp.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/src/tcp.c b/src/tcp.c
+index f35eb84..fb34dc7 100644
+--- a/src/tcp.c
++++ b/src/tcp.c
+@@ -1936,6 +1936,9 @@ relpTcpConnect(relpTcp_t *const pThis,
+ 	struct addrinfo hints;
+ 	struct addrinfo *reslocal = NULL;
+ 	struct pollfd pfd;
++	int so_error;
++	socklen_t len = sizeof so_error;
++	int r;
+ 
+ 	ENTER_RELPFUNC;
+ 	RELPOBJ_assert(pThis, Tcp);
+@@ -1985,10 +1988,8 @@ relpTcpConnect(relpTcp_t *const pThis,
+ 		ABORT_FINALIZE(RELP_RET_TIMED_OUT);
+ 	}
+ 
+-	int so_error;
+-	socklen_t len = sizeof so_error;
+ 
+-	int r = getsockopt(pThis->sock, SOL_SOCKET, SO_ERROR, &so_error, &len);
++	r = getsockopt(pThis->sock, SOL_SOCKET, SO_ERROR, &so_error, &len);
+ 	if (r == -1 || so_error != 0) {
+ 		pThis->pEngine->dbgprint("socket has an error %d\n", so_error);
+ 		ABORT_FINALIZE(RELP_RET_IO_ERR);
+-- 
+2.17.1
+

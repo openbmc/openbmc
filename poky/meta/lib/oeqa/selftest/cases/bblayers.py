@@ -2,7 +2,7 @@ import os
 import re
 
 import oeqa.utils.ftools as ftools
-from oeqa.utils.commands import runCmd, get_bb_var
+from oeqa.utils.commands import runCmd, get_bb_var, get_bb_vars
 
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.core.decorator.oeid import OETestID
@@ -84,6 +84,31 @@ class BitbakeLayers(OESelftestTestCase):
         result = runCmd('bitbake-layers show-recipes -i nonexistentclass', ignore_status=True)
         self.assertNotEqual(result.status, 0, 'bitbake-layers show-recipes -i nonexistentclass should have failed')
         self.assertIn('ERROR:', result.output)
+
+    def test_bitbakelayers_createlayer(self):
+        priority = 10
+        layername = 'test-bitbakelayer-layercreate'
+        layerpath = os.path.join(self.builddir, layername)
+        self.assertFalse(os.path.exists(layerpath), '%s should not exist at this point in time' % layerpath)
+        result = runCmd('bitbake-layers create-layer --priority=%d %s' % (priority, layerpath))
+        self.track_for_cleanup(layerpath)
+        result = runCmd('bitbake-layers add-layer %s' % layerpath)
+        self.add_command_to_tearDown('bitbake-layers remove-layer %s' % layerpath)
+        result = runCmd('bitbake-layers show-layers')
+        find_in_contents = re.search(re.escape(layername) + r'\s+' + re.escape(layerpath) + r'\s+' + re.escape(str(priority)), result.output)
+        self.assertTrue(find_in_contents, "%s not found in layers\n%s" % (layername, result.output))
+
+        layervars = ['BBFILE_PRIORITY', 'BBFILE_PATTERN', 'LAYERDEPENDS', 'LAYERSERIES_COMPAT']
+        bb_vars = get_bb_vars(['BBFILE_COLLECTIONS'] + ['%s_%s' % (v, layername) for v in layervars])
+
+        for v in layervars:
+            varname = '%s_%s' % (v, layername)
+            self.assertIsNotNone(bb_vars[varname], "%s not found" % varname)
+
+        find_in_contents = re.search(r'(^|\s)' + re.escape(layername) + r'($|\s)', bb_vars['BBFILE_COLLECTIONS'])
+        self.assertTrue(find_in_contents, "%s not in BBFILE_COLLECTIONS" % layername)
+
+        self.assertEqual(bb_vars['BBFILE_PRIORITY_%s' % layername], str(priority), 'BBFILE_PRIORITY_%s != %d' % (layername, priority))
 
     def get_recipe_basename(self, recipe):
         recipe_file = ""

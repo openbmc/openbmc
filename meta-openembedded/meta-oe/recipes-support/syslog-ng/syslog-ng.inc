@@ -13,14 +13,17 @@ LICENSE = "GPLv2 & LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=24c0c5cb2c83d9f2ab725481e4df5240"
 
 # util-linux added to get libuuid
-DEPENDS = "libpcre flex eventlog glib-2.0 openssl util-linux"
+DEPENDS = "libpcre flex glib-2.0 openssl util-linux"
 
 SRC_URI = "https://github.com/balabit/syslog-ng/releases/download/${BP}/${BP}.tar.gz \
-           file://syslog-ng.conf \
+           file://syslog-ng.conf.systemd \
+           file://syslog-ng.conf.sysvinit \
            file://initscript \
            file://volatiles.03_syslog-ng \
            file://configure.ac-add-option-enable-thread-tls-to-manage-.patch \
 "
+
+UPSTREAM_CHECK_URI = "https://github.com/balabit/syslog-ng/releases"
 
 inherit autotools gettext systemd pkgconfig update-rc.d
 
@@ -67,15 +70,8 @@ do_configure_prepend() {
 	cd $olddir
 }
 
-do_install_prepend() {
-    sed -i -e 's,@SBINDIR@,${sbindir},g' ${S}/contrib/systemd/*.service
-    sed -i -e 's,@LOCALSTATEDIR@,${localstatedir},g' ${S}/contrib/systemd/*.service
-    sed -i -e 's,@BASEBINDIR@,${base_bindir},g' ${S}/contrib/systemd/*.service
-}
-
 do_install_append() {
     install -d ${D}/${sysconfdir}/${BPN}
-    install ${WORKDIR}/syslog-ng.conf ${D}${sysconfdir}/${BPN}/${BPN}.conf
     install -d ${D}/${sysconfdir}/init.d
     install -m 755 ${WORKDIR}/initscript ${D}/${sysconfdir}/init.d/syslog
     install -d ${D}/${sysconfdir}/default/volatiles/
@@ -83,16 +79,43 @@ do_install_append() {
     install -d ${D}/${localstatedir}/lib/${BPN}
     # Remove /var/run as it is created on startup
     rm -rf ${D}${localstatedir}/run
+
+    # support for systemd
+    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+        install ${WORKDIR}/syslog-ng.conf.systemd ${D}${sysconfdir}/${BPN}/${BPN}.conf
+
+        install -d ${D}${systemd_unitdir}/system/
+        install -m 0644 ${S}/contrib/systemd/${BPN}@.service ${D}${systemd_unitdir}/system/${BPN}@.service
+        install -m 0644 ${S}/contrib/systemd/${BPN}@default ${D}${sysconfdir}/default/${BPN}@default
+
+        sed -i -e 's,@SBINDIR@,${sbindir},g' ${D}${systemd_unitdir}/system/${BPN}@.service ${D}${sysconfdir}/default/${BPN}@default
+        sed -i -e 's,@LOCALSTATEDIR@,${localstatedir},g' ${D}${systemd_unitdir}/system/${BPN}@.service ${D}${sysconfdir}/default/${BPN}@default
+        sed -i -e 's,@BASEBINDIR@,${base_bindir},g' ${D}${systemd_unitdir}/system/${BPN}@.service ${D}${sysconfdir}/default/${BPN}@default
+
+        install -d ${D}${systemd_unitdir}/system/multi-user.target.wants
+        ln -sf ../${BPN}@.service ${D}${systemd_unitdir}/system/multi-user.target.wants/${BPN}@default.service
+    else
+        install ${WORKDIR}/syslog-ng.conf.sysvinit ${D}${sysconfdir}/${BPN}/${BPN}.conf
+    fi
 }
 
-FILES_${PN} += "${datadir}/include/scl/ ${datadir}/xsd ${datadir}/tools"
-RDEPENDS_${PN} += "gawk"
+FILES_${PN} += "${datadir}/include/scl/ ${datadir}/xsd ${datadir}/tools ${systemd_unitdir}/system/multi-user.target.wants/*"
+RDEPENDS_${PN} += "gawk ${@bb.utils.contains('PACKAGECONFIG','json','${PN}-jconf','',d)}"
+
+FILES_${PN}-jconf += " \
+${datadir}/${BPN}/include/scl/cim \
+${datadir}/${BPN}/include/scl/elasticsearch \
+${datadir}/${BPN}/include/scl/ewmm \
+${datadir}/${BPN}/include/scl/graylog2 \
+${datadir}/${BPN}/include/scl/loggly \
+${datadir}/${BPN}/include/scl/logmatic \
+"
 
 # This overcomes the syslog-ng rdepends on syslog-ng-dev QA Error
-PACKAGES =+ "${PN}-libs ${PN}-libs-dev ${PN}-libs-dbg"
+PACKAGES =+ "${PN}-jconf ${PN}-libs ${PN}-libs-dev"
+RPROVIDES_${PN}-dbg += "${PN}-libs-dbg"
 FILES_${PN}-libs = "${libdir}/${BPN}/*.so ${libdir}/libsyslog-ng-*.so*"
 FILES_${PN}-libs-dev = "${libdir}/${BPN}/lib*.la"
-FILES_${PN}-libs-dbg = "${libdir}/${BPN}/.debug"
 FILES_${PN}-staticdev += "${libdir}/${BPN}/libtest/*.a"
 INSANE_SKIP_${PN}-libs = "dev-so"
 RDEPENDS_${PN} += "${PN}-libs"
@@ -108,7 +131,7 @@ RCONFLICTS_${PN} = "busybox-syslog sysklogd rsyslog"
 RPROVIDES_${PN} += "${PN}-systemd"
 RREPLACES_${PN} += "${PN}-systemd"
 RCONFLICTS_${PN} += "${PN}-systemd"
-SYSTEMD_SERVICE_${PN} = "${BPN}.service"
+SYSTEMD_SERVICE_${PN} = "${BPN}@.service"
 
 INITSCRIPT_NAME = "syslog"
 INITSCRIPT_PARAMS = "start 20 2 3 4 5 . stop 90 0 1 6 ."

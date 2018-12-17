@@ -45,7 +45,7 @@ class ActionPlugin(LayerPlugin):
             notadded, _ = bb.utils.edit_bblayers_conf(bblayers_conf, layerdirs, None)
             if not (args.force or notadded):
                 try:
-                    self.tinfoil.parseRecipes()
+                    self.tinfoil.run_command('parseConfiguration')
                 except bb.tinfoil.TinfoilUIException:
                     # Restore the back up copy of bblayers.conf
                     shutil.copy2(backup, bblayers_conf)

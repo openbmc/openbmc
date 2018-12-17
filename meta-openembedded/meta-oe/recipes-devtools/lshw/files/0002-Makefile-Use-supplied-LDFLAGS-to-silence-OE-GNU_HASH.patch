@@ -1,0 +1,34 @@
+From 75667f8a0ae4f1689ff03eb1768b1ee8cdfbf00d Mon Sep 17 00:00:00 2001
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Date: Wed, 6 Jun 2018 12:49:30 +0200
+Subject: [PATCH 2/2] Makefile: Use supplied LDFLAGS to silence OE GNU_HASH QA
+ warning
+
+Fix OpenEmbedded/Yocto QA warning:
+
+    ERROR: lshw-02.16-r1 do_package_qa: QA Issue: No GNU_HASH in the elf binary: 'build/tmp/work/cortexa5hf-neon-poky-linux-gnueabi/lshw/02.16-r1/packages-split/lshw/usr/sbin/lshw' [ldflags]
+    ERROR: lshw-02.16-r1 do_package_qa: QA run found fatal errors. Please consider fixing them.
+    ERROR: lshw-02.16-r1 do_package_qa: Function failed: do_package_qa
+
+Upstream-Status: Submitted
+Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+---
+ src/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index 654b786dd899..a441ba2bb666 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -25,7 +25,7 @@ CXXFLAGS=-g -Wall -g $(INCLUDES) $(DEFINES) $(RPM_OPT_FLAGS)
+ ifeq ($(SQLITE), 1)
+ 	CXXFLAGS+= -DSQLITE $(shell pkg-config --cflags sqlite3)
+ endif
+-LDFLAGS=-L./core/ -g
++LDFLAGS+=-L./core/ -g
+ ifneq ($(shell $(LD) --help 2| grep -- --as-needed), )
+ 	LDFLAGS+= -Wl,--as-needed
+ endif
+-- 
+2.7.4
+

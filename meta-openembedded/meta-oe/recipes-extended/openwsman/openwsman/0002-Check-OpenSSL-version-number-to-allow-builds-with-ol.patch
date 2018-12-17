@@ -1,0 +1,48 @@
+From 75669b077bd54bedbc086c60cbe137e7f4c685b5 Mon Sep 17 00:00:00 2001
+From: Vitezslav Crhonek <vcrhonek@redhat.com>
+Date: Mon, 24 Apr 2017 11:28:39 +0200
+Subject: [PATCH 2/2] Check OpenSSL version number to allow builds with older
+ version
+
+Upstream-Status: Submitted [https://github.com/Openwsman/openwsman/pull/99]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/lib/wsman-curl-client-transport.c | 4 ++++
+ src/server/shttpd/shttpd.c            | 4 ++++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/src/lib/wsman-curl-client-transport.c b/src/lib/wsman-curl-client-transport.c
+index e64ad097..4fc047e8 100644
+--- a/src/lib/wsman-curl-client-transport.c
++++ b/src/lib/wsman-curl-client-transport.c
+@@ -247,7 +247,11 @@ static int ssl_certificate_thumbprint_verify_callback(X509_STORE_CTX *ctx, void
+ 	unsigned int      tempFingerprintLen;
+ 	tempDigest = (EVP_MD*)EVP_sha1( );
+ 
++	#if OPENSSL_VERSION_NUMBER < 0x10100000L
++	X509 *cert = ctx->cert;
++	#else
+ 	X509 *cert = X509_STORE_CTX_get_current_cert(ctx);
++	#endif
+ 	if(!cert)
+ 		return 0;
+ 
+diff --git a/src/server/shttpd/shttpd.c b/src/server/shttpd/shttpd.c
+index 4c1dbf32..161720c8 100644
+--- a/src/server/shttpd/shttpd.c
++++ b/src/server/shttpd/shttpd.c
+@@ -1526,7 +1526,11 @@ set_ssl(struct shttpd_ctx *ctx, const char *pem)
+ 			if (strncasecmp(protocols[idx].name, ssl_disabled_protocols, blank_ptr-ssl_disabled_protocols) == 0) {
+ 				//_shttpd_elog(E_LOG, NULL, "SSL: disable %s protocol", protocols[idx].name);
+ 				debug("SSL: disable %s protocol", protocols[idx].name);
++				#if OPENSSL_VERSION_NUMBER < 0x10100000L
++				SSL_CTX_ctrl(CTX, SSL_CTRL_OPTIONS, protocols[idx].opt, NULL);
++				#else
+ 				SSL_CTX_set_options(CTX, protocols[idx].opt);
++				#endif
+ 				break;
+ 			}
+ 		}
+-- 
+2.18.0
+

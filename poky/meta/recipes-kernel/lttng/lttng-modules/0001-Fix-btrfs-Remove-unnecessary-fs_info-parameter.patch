@@ -1,0 +1,116 @@
+From 51ab0b1da29354375a19f865abcd233dd2178295 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 18 Jun 2018 14:53:19 -0400
+Subject: [PATCH] Fix: btrfs: Remove unnecessary fs_info parameter
+
+See upstream commit:
+
+  commit 3dca5c942dac60164e6a6e89172f25b86af07ce7
+  Author: Qu Wenruo <wqu@suse.com>
+  Date:   Thu Apr 26 14:24:25 2018 +0800
+
+    btrfs: trace: Remove unnecessary fs_info parameter for btrfs__reserve_extent event class
+
+    fs_info can be extracted from btrfs_block_group_cache, and all
+    btrfs_block_group_cache is created by btrfs_create_block_group_cache()
+    with fs_info initialized, no need to worry about NULL pointer
+    dereference.
+
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Upstream-Status: Backport
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ instrumentation/events/lttng-module/btrfs.h | 54 ++++++++++++++++++++++++++++-
+ 1 file changed, 53 insertions(+), 1 deletion(-)
+
+diff --git a/instrumentation/events/lttng-module/btrfs.h b/instrumentation/events/lttng-module/btrfs.h
+index 75cc73b..fd1b6b8 100644
+--- a/instrumentation/events/lttng-module/btrfs.h
++++ b/instrumentation/events/lttng-module/btrfs.h
+@@ -1658,8 +1658,57 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(btrfs__reserved_extent,  btrfs_reserved_extent_f
+ 
+ #endif /* #else #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0)) */
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,14,0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,18,0))
++LTTNG_TRACEPOINT_EVENT_MAP(find_free_extent,
++
++	btrfs_find_free_extent,
++
++	TP_PROTO(const struct btrfs_fs_info *info, u64 num_bytes, u64 empty_size,
++		 u64 data),
++
++	TP_ARGS(info, num_bytes, empty_size, data),
++
++	TP_FIELDS(
++		ctf_array(u8, fsid, info->fsid, BTRFS_UUID_SIZE)
++		ctf_integer(u64, num_bytes, num_bytes)
++		ctf_integer(u64, empty_size, empty_size)
++		ctf_integer(u64, data, data)
++	)
++)
++
++LTTNG_TRACEPOINT_EVENT_CLASS(btrfs__reserve_extent,
++
++	TP_PROTO(const struct btrfs_block_group_cache *block_group, u64 start,
++		 u64 len),
++
++	TP_ARGS(block_group, start, len),
++
++	TP_FIELDS(
++		ctf_array(u8, fsid, block_group->fs_info->fsid, BTRFS_UUID_SIZE)
++		ctf_integer(u64, bg_objectid, block_group->key.objectid)
++		ctf_integer(u64, flags, block_group->flags)
++		ctf_integer(u64, start, start)
++		ctf_integer(u64, len, len)
++	)
++)
++
++LTTNG_TRACEPOINT_EVENT_INSTANCE(btrfs__reserve_extent, btrfs_reserve_extent,
++
++	TP_PROTO(const struct btrfs_block_group_cache *block_group, u64 start,
++		 u64 len),
++
++	TP_ARGS(block_group, start, len)
++)
++
++LTTNG_TRACEPOINT_EVENT_INSTANCE(btrfs__reserve_extent, btrfs_reserve_extent_cluster,
++
++	TP_PROTO(const struct btrfs_block_group_cache *block_group, u64 start,
++		 u64 len),
++
++	TP_ARGS(block_group, start, len)
++)
+ 
++#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4,14,0))
+ LTTNG_TRACEPOINT_EVENT_MAP(find_free_extent,
+ 
+ 	btrfs_find_free_extent,
+@@ -1670,6 +1719,7 @@ LTTNG_TRACEPOINT_EVENT_MAP(find_free_extent,
+ 	TP_ARGS(info, num_bytes, empty_size, data),
+ 
+ 	TP_FIELDS(
++		ctf_array(u8, fsid, info->fsid, BTRFS_UUID_SIZE)
+ 		ctf_integer(u64, num_bytes, num_bytes)
+ 		ctf_integer(u64, empty_size, empty_size)
+ 		ctf_integer(u64, data, data)
+@@ -1685,6 +1735,7 @@ LTTNG_TRACEPOINT_EVENT_CLASS(btrfs__reserve_extent,
+ 	TP_ARGS(info, block_group, start, len),
+ 
+ 	TP_FIELDS(
++		ctf_array(u8, fsid, info->fsid, BTRFS_UUID_SIZE)
+ 		ctf_integer(u64, bg_objectid, block_group->key.objectid)
+ 		ctf_integer(u64, flags, block_group->flags)
+ 		ctf_integer(u64, start, start)
+@@ -1722,6 +1773,7 @@ LTTNG_TRACEPOINT_EVENT_MAP(find_free_extent,
+ 	TP_ARGS(info, num_bytes, empty_size, data),
+ 
+ 	TP_FIELDS(
++		ctf_array(u8, fsid, info->fsid, BTRFS_UUID_SIZE)
+ 		ctf_integer(u64, num_bytes, num_bytes)
+ 		ctf_integer(u64, empty_size, empty_size)
+ 		ctf_integer(u64, data, data)
+-- 
+2.13.3
+

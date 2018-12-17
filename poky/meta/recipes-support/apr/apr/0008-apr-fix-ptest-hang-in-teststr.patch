@@ -1,0 +1,32 @@
+From 036f90748247417dbfa714b1b912ca7dd4053f04 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Mon, 23 Jul 2018 14:12:35 +0800
+Subject: [PATCH] apr: fix ptest hang in teststr
+
+ptest hang in teststr since turns into a non-terminating loop,
+fix by below backported patch.
+
+Upstream-Status: Backport[https://github.com/apache/apr/commit/
+         2e8fbff4ecf82d0decf6baf774c209948f2f4998?diff=unified]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ test/teststr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/teststr.c b/test/teststr.c
+index d9a5054..951a830 100644
+--- a/test/teststr.c
++++ b/test/teststr.c
+@@ -307,7 +307,7 @@ static void overflow_strfsize(abts_case *tc, void *data)
+     for (; off < 999999999; off += 999) {
+         apr_strfsize(off, buf);
+     }
+-    for (off = 1; off < LONG_MAX && off > 0; off *= 2) {
++    for (off = LONG_MAX; off > 1; off /= 2) {
+         apr_strfsize(off, buf);
+         apr_strfsize(off + 1, buf);
+         apr_strfsize(off - 1, buf);
+-- 
+2.7.4
+

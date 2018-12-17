@@ -1,0 +1,37 @@
+From 8b06d56d26eee289fec22b9b72ab4c7cc3d6c482 Mon Sep 17 00:00:00 2001
+From: Dimitri John Ledkov <xnox@ubuntu.com>
+Date: Fri, 28 Sep 2018 16:34:16 +0100
+Subject: [PATCH 3/4] bpo-34834: Fix test_ssl.test_options to account for
+ OP_ENABLE_MIDDLEBOX_COMPAT.
+
+Signed-off-by: Dimitri John Ledkov <xnox@ubuntu.com>
+
+https://bugs.python.org/issue34834
+
+Patch taken from Ubuntu.
+Upstream-Status: Submitted [https://github.com/python/cpython/pull/9624]
+
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+---
+ Lib/test/test_ssl.py | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/Lib/test/test_ssl.py b/Lib/test/test_ssl.py
+index 7a14053cee..efc906a5ba 100644
+--- a/Lib/test/test_ssl.py
++++ b/Lib/test/test_ssl.py
+@@ -777,6 +777,11 @@ class ContextTests(unittest.TestCase):
+         default = (ssl.OP_ALL | ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3)
+         if not IS_LIBRESSL and ssl.OPENSSL_VERSION_INFO >= (1, 1, 0):
+             default |= ssl.OP_NO_COMPRESSION
++        if not IS_LIBRESSL and ssl.OPENSSL_VERSION_INFO >= (1, 1, 1):
++            # define MIDDLEBOX constant, as python2.7 does not know about it
++            # but it is used by default.
++            OP_ENABLE_MIDDLEBOX_COMPAT = 1048576L
++            default |= OP_ENABLE_MIDDLEBOX_COMPAT
+         self.assertEqual(default, ctx.options)
+         ctx.options |= ssl.OP_NO_TLSv1
+         self.assertEqual(default | ssl.OP_NO_TLSv1, ctx.options)
+-- 
+2.17.1
+

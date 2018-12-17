@@ -1,0 +1,40 @@
+From 75646a2d2df14fdbc4a01e222a779afac94861d1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 14 Jun 2018 20:11:08 -0700
+Subject: [PATCH] Replace ntp_adjtime with adjtimex.
+
+ntp_adjtime in glibc is an alias to adjtimex and
+musl does not provide ntp_adjtime at all
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ htpdate.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/htpdate.c b/htpdate.c
+index 4171efe..ff0bf8d 100644
+--- a/htpdate.c
++++ b/htpdate.c
+@@ -391,7 +391,7 @@ static int htpdate_adjtimex( double drift ) {
+ 
+ 	/* Read current kernel frequency */
+ 	tmx.modes = 0;
+-	ntp_adjtime(&tmx);
++	adjtimex(&tmx);
+ 
+ 	/* Calculate new frequency */
+ 	freq = (long)(65536e6 * drift);
+@@ -406,7 +406,7 @@ static int htpdate_adjtimex( double drift ) {
+ 
+ 	/* Become root */
+ 	swuid(0);
+-	return( ntp_adjtime(&tmx) );
++	return( adjtimex(&tmx) );
+ 
+ }
+ 
+-- 
+2.17.1
+

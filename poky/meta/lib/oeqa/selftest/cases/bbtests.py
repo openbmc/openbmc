@@ -15,16 +15,26 @@ class BitbakeTests(OESelftestTestCase):
                 return l
 
     @OETestID(789)
+    # Test bitbake can run from the <builddir>/conf directory
     def test_run_bitbake_from_dir_1(self):
         os.chdir(os.path.join(self.builddir, 'conf'))
         self.assertEqual(bitbake('-e').status, 0, msg = "bitbake couldn't run from \"conf\" dir")
 
     @OETestID(790)
+    # Test bitbake can run from the <builddir>'s parent directory
     def test_run_bitbake_from_dir_2(self):
         my_env = os.environ.copy()
         my_env['BBPATH'] = my_env['BUILDDIR']
         os.chdir(os.path.dirname(os.environ['BUILDDIR']))
-        self.assertEqual(bitbake('-e', env=my_env).status, 0, msg = "bitbake couldn't run from builddir")
+        self.assertEqual(bitbake('-e', env=my_env).status, 0, msg = "bitbake couldn't run from builddir's parent directory")
+
+    # Test bitbake can run from some other random system location (we use /tmp/)
+    def test_run_bitbake_from_dir_3(self):
+        my_env = os.environ.copy()
+        my_env['BBPATH'] = my_env['BUILDDIR']
+        os.chdir("/tmp/")
+        self.assertEqual(bitbake('-e', env=my_env).status, 0, msg = "bitbake couldn't run from /tmp/")
+
 
     @OETestID(806)
     def test_event_handler(self):

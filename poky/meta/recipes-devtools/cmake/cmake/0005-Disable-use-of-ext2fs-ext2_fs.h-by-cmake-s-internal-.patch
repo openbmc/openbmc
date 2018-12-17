@@ -1,0 +1,40 @@
+From 0df8d46d14c371f21c327966a553c4c187a8acfe Mon Sep 17 00:00:00 2001
+From: Otavio Salvador <otavio@ossystems.com.br>
+Date: Thu, 5 Jul 2018 10:28:04 -0300
+Subject: [PATCH 5/5] Disable use of ext2fs/ext2_fs.h by cmake's internal
+ libarchive copy
+Organization: O.S. Systems Software LTDA.
+
+We don't want to add a dependency on e2fsprogs-native for cmake-native,
+and we don't use CPack so just disable this functionality.
+
+Upstream-Status: Inappropriate [config]
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+---
+ Utilities/cmlibarchive/CMakeLists.txt | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/Utilities/cmlibarchive/CMakeLists.txt b/Utilities/cmlibarchive/CMakeLists.txt
+index 206f3c6a5..642fb0dd9 100644
+--- a/Utilities/cmlibarchive/CMakeLists.txt
++++ b/Utilities/cmlibarchive/CMakeLists.txt
+@@ -400,12 +400,8 @@ LA_CHECK_INCLUDE_FILE("copyfile.h" HAVE_COPYFILE_H)
+ LA_CHECK_INCLUDE_FILE("direct.h" HAVE_DIRECT_H)
+ LA_CHECK_INCLUDE_FILE("dlfcn.h" HAVE_DLFCN_H)
+ LA_CHECK_INCLUDE_FILE("errno.h" HAVE_ERRNO_H)
+-LA_CHECK_INCLUDE_FILE("ext2fs/ext2_fs.h" HAVE_EXT2FS_EXT2_FS_H)
+-
+-CHECK_C_SOURCE_COMPILES("#include <sys/ioctl.h>
+-#include <ext2fs/ext2_fs.h>
+-int main(void) { return EXT2_IOC_GETFLAGS; }" HAVE_WORKING_EXT2_IOC_GETFLAGS)
+-
++SET(HAVE_EXT2FS_EXT2_FS_H 0)
++SET(HAVE_WORKING_EXT2_IOC_GETFLAGS 0)
+ LA_CHECK_INCLUDE_FILE("fcntl.h" HAVE_FCNTL_H)
+ LA_CHECK_INCLUDE_FILE("grp.h" HAVE_GRP_H)
+ LA_CHECK_INCLUDE_FILE("inttypes.h" HAVE_INTTYPES_H)
+-- 
+2.18.0
+

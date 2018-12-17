@@ -1,0 +1,71 @@
+From 29c7a529d3bb0c1e20239f885e74c5036f1a908c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 6 Aug 2018 15:38:58 -0700
+Subject: [PATCH] include sys/sysmacros.h for major/minor defines in glibc
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+---
+ src/bootlogd.c |   3 +++
+ src/bootlogd.o | Bin 58448 -> 60376 bytes
+ src/dowall.c   |   3 +++
+ src/shutdown.c |   4 +++-
+ 4 files changed, 9 insertions(+), 1 deletion(-)
+
+Index: sysvinit-2.88dsf/src/bootlogd.c
+===================================================================
+--- sysvinit-2.88dsf.orig/src/bootlogd.c
++++ sysvinit-2.88dsf/src/bootlogd.c
+@@ -53,6 +53,9 @@
+ #ifdef __linux__
+ #include <sys/mount.h>
+ #endif
++#ifdef __GLIBC__
++#include <sys/sysmacros.h>
++#endif
+ 
+ char *Version = "@(#) bootlogd 2.86 03-Jun-2004 miquels@cistron.nl";
+ 
+Index: sysvinit-2.88dsf/src/dowall.c
+===================================================================
+--- sysvinit-2.88dsf.orig/src/dowall.c
++++ sysvinit-2.88dsf/src/dowall.c
+@@ -37,6 +37,9 @@
+ #include <signal.h>
+ #include <setjmp.h>
+ #include <paths.h>
++#ifdef __GLIBC__
++#include <sys/sysmacros.h>
++#endif
+ 
+ #ifndef _PATH_DEV
+ # define _PATH_DEV	"/dev/"
+Index: sysvinit-2.88dsf/src/shutdown.c
+===================================================================
+--- sysvinit-2.88dsf.orig/src/shutdown.c
++++ sysvinit-2.88dsf/src/shutdown.c
+@@ -57,7 +57,9 @@
+ #include "reboot.h"
+ #include "initreq.h"
+ #include "init.h"
+-
++#ifdef __GLIBC__
++#include <sys/sysmacros.h>
++#endif
+ 
+ char *Version = "@(#) shutdown 2.86-1 31-Jul-2004 miquels@cistron.nl";
+ 
+Index: sysvinit-2.88dsf/src/mountpoint.c
+===================================================================
+--- sysvinit-2.88dsf.orig/src/mountpoint.c
++++ sysvinit-2.88dsf/src/mountpoint.c
+@@ -32,6 +32,9 @@
+ #include <stdarg.h>
+ #include <getopt.h>
+ #include <stdio.h>
++#ifdef __GLIBC__
++#include <sys/sysmacros.h>
++#endif
+ 
+ int dostat(char *path, struct stat *st, int do_lstat, int quiet)
+ {

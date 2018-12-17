@@ -6,9 +6,7 @@ IMAGE_INSTALL = "\
     packagegroup-base \
     packagegroup-core-boot \
     packagegroup-core-security \
-    os-release \
-    ${@bb.utils.contains("DISTRO_FEATURES", "x11", "packagegroup-xfce-base", "", d)} \
-    ${CORE_IMAGE_EXTRA_INSTALL}"
+    os-release" 
 
 IMAGE_LINGUAS ?= " "
 

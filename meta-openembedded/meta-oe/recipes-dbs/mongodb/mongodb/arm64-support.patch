@@ -7,7 +7,7 @@ Index: git/SConstruct
 ===================================================================
 --- git.orig/SConstruct
 +++ git/SConstruct
-@@ -990,6 +990,7 @@ elif endian == "big":
+@@ -1055,6 +1055,7 @@ elif endian == "big":
  processor_macros = {
      'arm'     : { 'endian': 'little', 'defines': ('__arm__',) },
      'aarch64' : { 'endian': 'little', 'defines': ('__arm64__', '__aarch64__')},
@@ -19,7 +19,7 @@ Index: git/src/third_party/IntelRDFPMathLib20U1/SConscript
 ===================================================================
 --- git.orig/src/third_party/IntelRDFPMathLib20U1/SConscript
 +++ git/src/third_party/IntelRDFPMathLib20U1/SConscript
-@@ -301,7 +301,7 @@ if processor == 'i386':
+@@ -308,7 +308,7 @@ if processor == 'i386':
  elif processor == 'arm':
      cpp_defines['IA32'] = '1'
      cpp_defines['ia32'] = '1'
@@ -32,7 +32,7 @@ Index: git/src/third_party/wiredtiger/SConscript
 ===================================================================
 --- git.orig/src/third_party/wiredtiger/SConscript
 +++ git/src/third_party/wiredtiger/SConscript
-@@ -139,7 +139,7 @@ condition_map = {
+@@ -151,7 +151,7 @@ condition_map = {
      'POSIX_HOST'   : not env.TargetOSIs('windows'),
      'WINDOWS_HOST' : env.TargetOSIs('windows'),
  

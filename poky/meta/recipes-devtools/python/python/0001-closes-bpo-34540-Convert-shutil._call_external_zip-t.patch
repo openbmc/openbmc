@@ -5,9 +5,7 @@ Subject: [PATCH] closes bpo-34540: Convert shutil._call_external_zip to use
  subprocess rather than distutils.spawn. (GH-8985)
 
 Upstream-Status: Backport
-
-Fix CVE-2018-1000802
-
+CVE: CVE-2018-1000802
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
 ---
  Lib/shutil.py                                            | 16 ++++++++++------

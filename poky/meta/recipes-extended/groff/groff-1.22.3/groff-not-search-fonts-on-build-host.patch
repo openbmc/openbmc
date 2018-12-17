@@ -1,0 +1,20 @@
+groff searchs fonts which are provided by ghostscript on build host.
+It causes non-determinism issue. So not search font dirs on host.
+
+Upstream-Status: Inappropriate [cross build specific]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+diff --git a/font/devpdf/Foundry.in b/font/devpdf/Foundry.in
+index a6e968f..8094642 100644
+--- a/font/devpdf/Foundry.in
++++ b/font/devpdf/Foundry.in
+@@ -65,7 +65,7 @@ ZD|Y||||Dingbats!d050000l.pfb
+ #======================================================================
+ 
+ #Foundry|Name|Searchpath
+-foundry|U|(gs):/usr/share/fonts/type1/gsfonts :/opt/local/share/fonts/urw-fonts # the URW fonts delivered with ghostscript (may be different)
++foundry|U|(gs) # the URW fonts delivered with ghostscript (may be different)
+ #Define Flags for afmtodit
+ 
+ r=-i 0 -m

@@ -1,2 +1,2 @@
 #!/bin/sh
-make -C tests -k runtest-TESTS
+make -B -C tests -k test-suite.log

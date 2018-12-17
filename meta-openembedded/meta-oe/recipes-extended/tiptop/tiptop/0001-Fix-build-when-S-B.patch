@@ -1,0 +1,28 @@
+From ad907b1aff217fe3b431ae052025ba8ba6cacc01 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 20 Jun 2018 23:14:58 -0700
+Subject: [PATCH] Fix build when S != B
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/Makefile.in b/src/Makefile.in
+index 4392c06..2c5cae4 100644
+--- a/src/Makefile.in
++++ b/src/Makefile.in
+@@ -69,7 +69,7 @@ install:
+ 	$(INSTALL) -d $(DESTDIR)$(bindir)
+ 	$(INSTALL) -m 0755 tiptop $(DESTDIR)$(bindir)
+ 	$(INSTALL) -d $(DESTDIR)$(man1dir)
+-	$(INSTALL) -m 0644 tiptop.1 $(DESTDIR)$(man1dir)
++	$(INSTALL) -m 0644 $(srcdir)/tiptop.1 $(DESTDIR)$(man1dir)
+ 	ln $(DESTDIR)$(bindir)/tiptop $(DESTDIR)$(bindir)/ptiptop
+ 	ln $(DESTDIR)$(man1dir)/tiptop.1 $(DESTDIR)$(man1dir)/ptiptop.1
+ 
+-- 
+2.17.1
+

@@ -1,0 +1,26 @@
+From a372fe467495a674ad6244b67e83dfbfa8455f51 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 11 Aug 2018 13:54:32 -0700
+Subject: [PATCH] include sys/sysmacros.h for major/minor definitions
+
+csctapi/ifd_db2com.c:27: undefined reference to `minor'
+collect2: error: ld returned 1 exit status
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ globals.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/globals.h b/globals.h
+index bd12244..9e10225 100644
+--- a/globals.h
++++ b/globals.h
+@@ -36,6 +36,7 @@
+ #include <termios.h>
+ #include <inttypes.h>
+ #include <sys/utsname.h>
++#include <sys/sysmacros.h>
+ 
+ /*
+  * The following hack is taken from Linux: include/linux/kconfig.h

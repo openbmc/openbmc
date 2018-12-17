@@ -1,6 +1,0 @@
-require qemu-xilinx.inc
-
-XILINX_RELEASE_VERSION = "v2018.1"
-XILINX_QEMU_VERSION ?= "v2.11.0"
-BRANCH ?= "master"
-SRCREV ?= "1d5516986ea296d91a599ac23252e302a4003914"

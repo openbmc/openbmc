@@ -1,0 +1,64 @@
+From 2650bb3bd3644784359be373252b0436873ca8cb Mon Sep 17 00:00:00 2001
+From: Pascal Bach <pascal.bach@siemens.com>
+Date: Fri, 28 Sep 2018 16:44:37 +0200
+Subject: [PATCH] Make resulting cmake config relocatable
+
+This change avoids hardcoded install prefix in the p8-platform-config.cmake.
+Especially important when doing cross compilation with Yocto for example.
+
+Upstream-Status: Submitted [https://github.com/Pulse-Eight/platform/pull/38]
+
+---
+ CMakeLists.txt              |  4 ----
+ p8-platform-config.cmake.in | 13 +++++++++----
+ 2 files changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7144b0b..f2db66e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -22,10 +22,6 @@ if(WIN32)
+                    src/windows/os-threads.cpp)
+ endif()
+ 
+-set(p8-platform_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include/p8-platform")
+-IF(WIN32)
+-  LIST(APPEND p8-platform_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include/p8-platform/windows")
+-ENDIF(WIN32)
+ set(p8-platform_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
+ 
+ if(NOT ${CORE_SYSTEM_NAME} STREQUAL "")
+diff --git a/p8-platform-config.cmake.in b/p8-platform-config.cmake.in
+index 47f30f1..b08e96c 100644
+--- a/p8-platform-config.cmake.in
++++ b/p8-platform-config.cmake.in
+@@ -9,17 +9,22 @@
+ #  p8-platform_LIBRARY_DIRS - directories in which the libraries are situated
+ #
+ # propagate these properties from one build system to the other
++get_filename_component(_p8-platform_rootdir ${CMAKE_CURRENT_LIST_DIR}/../ ABSOLUTE)
++
+ set (p8-platform_VERSION "@p8-platform_VERSION_MAJOR@.@p8-platform_VERSION_MINOR@")
+-set (p8-platform_INCLUDE_DIRS @p8-platform_INCLUDE_DIRS@ @CMAKE_INSTALL_PREFIX@/include)
+-set (p8-platform_LIBRARY_DIRS "@CMAKE_LIBRARY_OUTPUT_DIRECTORY@")
++set (p8-platform_INCLUDE_DIRS "${_p8-platform_rootdir}/include" "${_p8-platform_rootdir}/include/p8-platform")
++if(WIN32)
++  list(APPEND p8-platform_INCLUDE_DIRS "${_p8-platform_rootdir}/include/p8-platform/windows")
++endif(WIN32)
++set (p8-platform_LIBRARY_DIRS "${_p8-platform_rootdir}")
+ set (p8-platform_LINKER_FLAGS "@p8-platform_LINKER_FLAGS@")
+ set (p8-platform_CONFIG_VARS "@p8-platform_CONFIG_VARS@")
+ 
+ # libraries come from the build tree where this file was generated
+ if(WIN32)
+-  set (p8-platform_LIBRARY "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/p8-platform.lib")
++  set (p8-platform_LIBRARY "${_p8-platform_rootdir}/p8-platform.lib")
+ else(WIN32)
+-  set (p8-platform_LIBRARY "-L@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@ -lp8-platform")
++  set (p8-platform_LIBRARY "-L${_p8-platform_rootdir} -lp8-platform")
+ endif(WIN32)
+ set (p8-platform_LIBRARIES ${p8-platform_LIBRARY} "@p8-platform_LIBRARIES@")
+ mark_as_advanced (p8-platform_LIBRARY)
+-- 
+2.11.0
+

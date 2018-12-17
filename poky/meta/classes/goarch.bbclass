@@ -33,9 +33,13 @@ COMPATIBLE_HOST_linux-muslx32 = "null"
 COMPATIBLE_HOST_powerpc = "null"
 COMPATIBLE_HOST_powerpc64 = "null"
 COMPATIBLE_HOST_mipsarchn32 = "null"
-ARM_INSTRUCTION_SET = "arm"
+
+ARM_INSTRUCTION_SET_armv4 = "arm"
+ARM_INSTRUCTION_SET_armv5 = "arm"
+ARM_INSTRUCTION_SET_armv6 = "arm"
+
 TUNE_CCARGS_remove = "-march=mips32r2"
-SECURITY_CFLAGS_mips = "${SECURITY_NOPIE_CFLAGS}"
+SECURITY_CFLAGS_mipsarch = "${SECURITY_NOPIE_CFLAGS}"
 SECURITY_NOPIE_CFLAGS ??= ""
 
 def go_map_arch(a, d):

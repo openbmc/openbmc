@@ -4,7 +4,7 @@ rexec, rlogin, rlogind, rsh, rshd, syslog, syslogd, talk, \
 talkd, telnet, telnetd, tftp, tftpd, and uucpd."
 HOMEPAGE = "http://www.gnu.org/software/inetutils"
 SECTION = "net"
-DEPENDS = "ncurses netbase readline"
+DEPENDS = "ncurses netbase readline virtual/crypt"
 
 LICENSE = "GPLv3"
 

@@ -1,0 +1,49 @@
+From d314f26e024aaf15bf4ab22ceb98501148d0eac8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 7 May 2018 19:53:33 -0700
+Subject: [PATCH] Replace strncpy with memcpy
+
+gcc8 detects that strncpy is overwiritng the null terminating character
+the source strings are already initialized to 0 so memcpy would do the same
+job
+
+Fixes
+rn2903.c:153:5: error: 'strncpy' output may be truncated copying 16 bytes from a string of length 511 [-Werror=stringop-truncation]
+     strncpy(dev->hardware_eui, dev->resp_data, RN2903_MAX_HEX_EUI64);
+     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/ecezo/ecezo.c   | 2 +-
+ src/rn2903/rn2903.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/ecezo/ecezo.c b/src/ecezo/ecezo.c
+index 6a195fc1..56c6dab3 100644
+--- a/src/ecezo/ecezo.c
++++ b/src/ecezo/ecezo.c
+@@ -488,7 +488,7 @@ int ecezo_send_command(const ecezo_context dev, char *cmd, char *buffer,
+     // our write buffer
+     char writeBuffer[ECEZO_MAX_BUFFER_LEN];
+ 
+-    strncpy(writeBuffer, cmd, ECEZO_MAX_BUFFER_LEN);
++    memcpy(writeBuffer, cmd, ECEZO_MAX_BUFFER_LEN-1);
+     writeBuffer[ECEZO_MAX_BUFFER_LEN - 1] = 0;
+ 
+     int writelen = strlen(writeBuffer);
+diff --git a/src/rn2903/rn2903.c b/src/rn2903/rn2903.c
+index f30a33ae..01a011da 100644
+--- a/src/rn2903/rn2903.c
++++ b/src/rn2903/rn2903.c
+@@ -150,7 +150,7 @@ static rn2903_context _rn2903_postinit(rn2903_context dev,
+         rn2903_close(dev);
+         return NULL;
+     }
+-    strncpy(dev->hardware_eui, dev->resp_data, RN2903_MAX_HEX_EUI64);
++    memcpy(dev->hardware_eui, dev->resp_data, RN2903_MAX_HEX_EUI64);
+ 
+     return dev;
+ }
+-- 
+2.17.0
+

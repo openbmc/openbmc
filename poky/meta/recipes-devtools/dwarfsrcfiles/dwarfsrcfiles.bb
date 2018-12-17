@@ -1,4 +1,4 @@
-SUMMARY = "A small utility for printing debig source file locations embedded in binaries"
+SUMMARY = "A small utility for printing debug source file locations embedded in binaries"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://../dwarfsrcfiles.c;md5=31483894e453a77acbb67847565f1b5c;beginline=1;endline=8"
 

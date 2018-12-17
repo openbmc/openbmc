@@ -5,10 +5,6 @@ Introduction
 -------------------------
 
 This layer is intended to be the home of python modules for OpenEmbedded.
-Modules in this layer need to be independent of openembedded-core and
-meta-openembedded/meta-oe. Because of this, modules required by 'gateone'
-and 'anki' are not included and remain in:
-        meta-openembedded/meta-oe/recipes-devtools/python.
 
 Dependencies
 -------------------------
@@ -17,12 +13,12 @@ The meta-python layer depends on:
 
 	URI: git://git.openembedded.org/openembedded-core
 	layers: meta
-	branch: master
+	branch: thud
 	revision: HEAD
 
 	URI: git://git.openembedded.org/meta-openembedded
 	layers: meta-oe
-	branch: master
+	branch: thud
 	revision: HEAD
 
 Please follow the recommended setup procedures of your OE distribution.
@@ -39,15 +35,13 @@ comments and patch review. It is subscriber only, so please register
 before posting.
 
 Send pull requests to openembedded-devel@lists.openembedded.org with
-'[meta-python]' in the subject.
+'[meta-python][thud]' in the subject.
 
 When sending single patches, please use something like: 
-'git send-email -M -1 --to=openembedded-devel@lists.openembedded.org --subject-prefix=meta-python][PATCH'
+'git send-email -M -1 --to=openembedded-devel@lists.openembedded.org --subject-prefix=meta-python][thud][PATCH'
 
 Maintenance
 -------------------------
 
-Layer Maintainers:
-        Tim "moto-timo" Orling <TicoTimo@gmail.com>
-        Derek Straka <derek@asterius.io>
+Thud Maintainers: Armin Kuster <akuster808@gmail.com>
 

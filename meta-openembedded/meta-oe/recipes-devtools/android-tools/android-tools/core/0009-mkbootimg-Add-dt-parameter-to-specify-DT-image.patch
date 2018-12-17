@@ -1,0 +1,110 @@
+From dd195778a9930b7967b21a3b8eb390b70253dbad Mon Sep 17 00:00:00 2001
+From: David Ng <dave@codeaurora.org>
+Date: Fri, 27 Jul 2012 17:15:03 -0700
+Subject: [PATCH] mkbootimg: Add --dt parameter to specify DT image
+
+New optional --dt parameter to specify a kernel device
+tree image.
+
+Upstream-Status: Inappropriate
+---
+ mkbootimg/bootimg.h   |  7 +++++--
+ mkbootimg/mkbootimg.c | 21 +++++++++++++++++++++
+ 2 files changed, 26 insertions(+), 2 deletions(-)
+
+diff --git a/mkbootimg/bootimg.h b/mkbootimg/bootimg.h
+index 9171d85a7b..308c537d6b 100644
+--- a/mkbootimg/bootimg.h
++++ b/mkbootimg/bootimg.h
+@@ -41,8 +41,8 @@ struct boot_img_hdr
+ 
+     unsigned tags_addr;    /* physical addr for kernel tags */
+     unsigned page_size;    /* flash page size we assume */
+-    unsigned unused[2];    /* future expansion: should be 0 */
+-
++    unsigned dt_size;      /* device tree in bytes */
++    unsigned unused;       /* future expansion: should be 0 */
+     unsigned char name[BOOT_NAME_SIZE]; /* asciiz product name */
+ 
+     unsigned char cmdline[BOOT_ARGS_SIZE];
+@@ -64,10 +64,13 @@ struct boot_img_hdr
+ ** +-----------------+
+ ** | second stage    | o pages
+ ** +-----------------+
++** | device tree     | p pages
++** +-----------------+
+ **
+ ** n = (kernel_size + page_size - 1) / page_size
+ ** m = (ramdisk_size + page_size - 1) / page_size
+ ** o = (second_size + page_size - 1) / page_size
++** p = (dt_size + page_size - 1) / page_size
+ **
+ ** 0. all entities are page_size aligned in flash
+ ** 1. kernel and ramdisk are required (size != 0)
+diff --git a/mkbootimg/mkbootimg.c b/mkbootimg/mkbootimg.c
+index fc92b4dc30..658052cdf2 100644
+--- a/mkbootimg/mkbootimg.c
++++ b/mkbootimg/mkbootimg.c
+@@ -65,6 +65,7 @@ int usage(void)
+             "       [ --board <boardname> ]\n"
+             "       [ --base <address> ]\n"
+             "       [ --pagesize <pagesize> ]\n"
++            "       [ --dt <filename> ]\n"
+             "       -o|--output <filename>\n"
+             );
+     return 1;
+@@ -105,6 +106,8 @@ int main(int argc, char **argv)
+     char *cmdline = "";
+     char *bootimg = 0;
+     char *board = "";
++    char *dt_fn = 0;
++    void *dt_data = 0;
+     unsigned pagesize = 2048;
+     int fd;
+     SHA_CTX ctx;
+@@ -158,6 +161,8 @@ int main(int argc, char **argv)
+                 fprintf(stderr,"error: unsupported page size %d\n", pagesize);
+                 return -1;
+             }
++        } else if(!strcmp(arg, "--dt")) {
++            dt_fn = val;
+         } else {
+             return usage();
+         }
+@@ -232,6 +237,14 @@ int main(int argc, char **argv)
+         }
+     }
+ 
++    if(dt_fn) {
++        dt_data = load_file(dt_fn, &hdr.dt_size);
++        if (dt_data == 0) {
++            fprintf(stderr,"error: could not load device tree image '%s'\n", dt_fn);
++            return 1;
++        }
++    }
++
+     /* put a hash of the contents in the header so boot images can be
+      * differentiated based on their first 2k.
+      */
+@@ -242,6 +255,10 @@ int main(int argc, char **argv)
+     SHA_update(&ctx, &hdr.ramdisk_size, sizeof(hdr.ramdisk_size));
+     SHA_update(&ctx, second_data, hdr.second_size);
+     SHA_update(&ctx, &hdr.second_size, sizeof(hdr.second_size));
++    if(dt_data) {
++        SHA_update(&ctx, dt_data, hdr.dt_size);
++        SHA_update(&ctx, &hdr.dt_size, sizeof(hdr.dt_size));
++    }
+     sha = SHA_final(&ctx);
+     memcpy(hdr.id, sha,
+            SHA_DIGEST_SIZE > sizeof(hdr.id) ? sizeof(hdr.id) : SHA_DIGEST_SIZE);
+@@ -266,6 +283,10 @@ int main(int argc, char **argv)
+         if(write_padding(fd, pagesize, hdr.second_size)) goto fail;
+     }
+ 
++    if(dt_data) {
++        if(write(fd, dt_data, hdr.dt_size) != (ssize_t) hdr.dt_size) goto fail;
++        if(write_padding(fd, pagesize, hdr.dt_size)) goto fail;
++    }
+     return 0;
+ 
+ fail:

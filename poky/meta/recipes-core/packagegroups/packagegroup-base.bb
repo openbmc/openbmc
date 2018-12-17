@@ -289,7 +289,7 @@ RRECOMMENDS_packagegroup-base-ipsec = "\
 #
 SUMMARY_packagegroup-base-wifi = "WiFi support"
 RDEPENDS_packagegroup-base-wifi = "\
-    ${VIRTUAL-RUNTIME_wireless-tools} \
+    iw \
     wpa-supplicant"
 
 RRECOMMENDS_packagegroup-base-wifi = "\

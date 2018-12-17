@@ -1,0 +1,26 @@
+From 5c8c3b04d73304679340f893636e87691992053b Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross@burtonini.com>
+Date: Mon, 23 Jul 2018 14:21:03 +0100
+Subject: [PATCH] Add install
+
+Add a simple install rule so that we always install the binaries that were built.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+---
+ Makefile | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 17fc5c9..e0c2784 100644
+--- a/Makefile
++++ b/Makefile
+@@ -231,3 +231,7 @@ rpm:
+ 	@$(RPMBUILD) -ta --define 'current yes' $(RPMTMP)/iputils.tar.bz2
+ 	@rm -f $(RPMTMP)/iputils.tar.bz2
+ 
++install:
++	for t in $(TARGETS); do \
++		install -D $$t $(DESTDIR)$(bindir)/$$t; \
++	done

@@ -59,7 +59,7 @@ class Signing(OESelftestTestCase):
         Expected:    Images can be created from signed packages
         Product:     oe-core
         Author:      Daniel Istrate <daniel.alexandrux.istrate@intel.com>
-        Author:      Alexander Kanavin <alexander.kanavin@intel.com>
+        Author:      Alexander Kanavin <alex.kanavin@gmail.com>
         AutomatedBy: Daniel Istrate <daniel.alexandrux.istrate@intel.com>
         """
         import oe.packagedata

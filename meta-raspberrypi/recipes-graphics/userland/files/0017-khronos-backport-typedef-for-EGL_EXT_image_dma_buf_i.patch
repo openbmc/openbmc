@@ -1,0 +1,38 @@
+From 8efd81e96bdd3be68063a6fd32be4755225e93b2 Mon Sep 17 00:00:00 2001
+From: Hugo Hromic <hhromic@gmail.com>
+Date: Sun, 13 May 2018 10:49:04 +0100
+Subject: [PATCH 17/18] khronos: backport typedef for
+ EGL_EXT_image_dma_buf_import
+
+The `gstreamer1.0-plugins-base` package version `1.14` uses `EGL_EXT_image_dma_buf_import`, which
+expects the `EGLuint64KHR` typedef that is present in recent versions of Khronos.
+However, the older version included in userland does not provide it.
+
+This patch backports the missing typedef from recent Khronos into userland.
+See: <https://www.khronos.org/registry/EGL/api/EGL/eglext.h>
+
+Submitted to userland in <https://github.com/raspberrypi/userland/pull/467>
+
+Upstream-Status: Submitted
+---
+ interface/khronos/include/EGL/eglext.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/interface/khronos/include/EGL/eglext.h b/interface/khronos/include/EGL/eglext.h
+index d7e5ba7..dcc90ce 100755
+--- a/interface/khronos/include/EGL/eglext.h
++++ b/interface/khronos/include/EGL/eglext.h
+@@ -190,6 +190,10 @@ typedef EGLBoolean (EGLAPIENTRYP PFNEGLSIGNALSYNCKHRPROC) (EGLDisplay dpy, EGLSy
+ typedef EGLBoolean (EGLAPIENTRYP PFNEGLGETSYNCATTRIBKHRPROC) (EGLDisplay dpy, EGLSyncKHR sync, EGLint attribute, EGLint *value);
+ #endif
+ 
++#ifndef EGL_KHR_uint64_typedef
++#define EGL_KHR_uint64_typedef 1
++typedef khronos_uint64_t EGLuint64KHR;
++#endif /* EGL_KHR_uint64_typedef */
+ 
+ #ifndef EGL_WL_bind_wayland_display
+ #define EGL_WL_bind_wayland_display 1
+-- 
+2.19.1
+

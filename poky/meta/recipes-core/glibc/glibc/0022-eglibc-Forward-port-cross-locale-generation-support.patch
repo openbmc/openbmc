@@ -1,24 +1,24 @@
-From e019fe6a2b410db6043e21803f497b5cbdd90a83 Mon Sep 17 00:00:00 2001
+From 4bb23fbb07984b93fd14f353fd9325d927b0cd98 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:33:49 +0000
-Subject: [PATCH 22/27] eglibc: Forward port cross locale generation support
+Subject: [PATCH] eglibc: Forward port cross locale generation support
 
 Upstream-Status: Pending
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- locale/Makefile               |  3 ++-
- locale/catnames.c             | 48 +++++++++++++++++++++++++++++++++++
+ locale/Makefile               |  3 +-
+ locale/catnames.c             | 48 ++++++++++++++++++++++++++++
  locale/localeinfo.h           |  2 +-
- locale/programs/charmap-dir.c |  6 +++++
- locale/programs/ld-collate.c  | 17 ++++++-------
- locale/programs/ld-ctype.c    | 27 ++++++++++----------
- locale/programs/ld-time.c     | 31 +++++++++++++++--------
+ locale/programs/charmap-dir.c |  6 ++++
+ locale/programs/ld-collate.c  | 17 +++++-----
+ locale/programs/ld-ctype.c    | 27 ++++++++--------
+ locale/programs/ld-time.c     | 31 ++++++++++++------
  locale/programs/linereader.c  |  2 +-
- locale/programs/localedef.c   |  8 ++++++
- locale/programs/locfile.c     |  5 +++-
- locale/programs/locfile.h     | 59 +++++++++++++++++++++++++++++++++++++++++--
- locale/setlocale.c            | 30 ----------------------
+ locale/programs/localedef.c   |  8 +++++
+ locale/programs/locfile.c     |  5 ++-
+ locale/programs/locfile.h     | 59 +++++++++++++++++++++++++++++++++--
+ locale/setlocale.c            | 30 ------------------
  12 files changed, 169 insertions(+), 69 deletions(-)
  create mode 100644 locale/catnames.c
 
@@ -91,7 +91,7 @@ index 0000000000..9fad357db1
 +    [LC_ALL] = sizeof ("LC_ALL") - 1
 +  };
 diff --git a/locale/localeinfo.h b/locale/localeinfo.h
-index 68822a6319..fa36123776 100644
+index 537bc35149..73ba20d695 100644
 --- a/locale/localeinfo.h
 +++ b/locale/localeinfo.h
 @@ -224,7 +224,7 @@ __libc_tsd_define (extern, locale_t, LOCALE)
@@ -561,6 +561,3 @@ index e4de907e1f..b5d8f5c17d 100644
  #ifdef NL_CURRENT_INDIRECT
  # define WEAK_POSTLOAD(postload) weak_extern (postload)
  #else
--- 
-2.16.1
-

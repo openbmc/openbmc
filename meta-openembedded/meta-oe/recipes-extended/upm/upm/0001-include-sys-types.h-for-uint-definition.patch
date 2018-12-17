@@ -1,0 +1,33 @@
+From 48a580bd402cf6a3ee9e42013653219bfeb3caf6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 21 Jun 2018 18:39:16 -0700
+Subject: [PATCH] include sys/types.h for uint definition
+
+uint is defined in sys/types.h, therefore this
+header needs to be included, it gets exposed with
+musl where this header is not getting included indirectly
+as it is happening when building on glibc
+
+Fixes build errors on musl e.g.
+upm/src/kx122/kx122.hpp:456:31: error: 'uint' has not been declared
+|        void setBufferThreshold(uint samples);
+|                                ^~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted [https://github.com/intel-iot-devkit/upm/pull/656]
+ src/kx122/kx122.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/kx122/kx122.h b/src/kx122/kx122.h
+index 1622ed50..56e5215e 100644
+--- a/src/kx122/kx122.h
++++ b/src/kx122/kx122.h
+@@ -31,6 +31,7 @@ extern "C"{
+ #include <assert.h>
+ #include <unistd.h>
+ #include <math.h>
++#include <sys/types.h>
+ 
+ #include <mraa/i2c.h>
+ #include <mraa/spi.h>

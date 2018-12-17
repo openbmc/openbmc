@@ -1,0 +1,28 @@
+From 646a78262b18e19721cd41ee515215221dd241b6 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 12 Jul 2018 18:12:42 +0800
+Subject: [PATCH 3/5] workaround  autoconf 2.13 detection failed
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ build/moz.configure/old.configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/build/moz.configure/old.configure b/build/moz.configure/old.configure
+index b32c3f7..ece47f4 100644
+--- a/build/moz.configure/old.configure
++++ b/build/moz.configure/old.configure
+@@ -31,7 +31,7 @@ def autoconf(mozconfig, autoconf):
+     autoconf = autoconf[0] if autoconf else None
+ 
+     for ac in (mozconfig_autoconf, autoconf, 'autoconf-2.13', 'autoconf2.13',
+-               'autoconf213'):
++               'autoconf213', 'autoconf'):
+         if ac:
+             autoconf = find_program(ac)
+             if autoconf:
+-- 
+2.7.4
+

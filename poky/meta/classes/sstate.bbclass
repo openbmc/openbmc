@@ -25,14 +25,21 @@ PV[vardepvalue] = "${PV}"
 SSTATE_EXTRAPATH[vardepvalue] = ""
 
 # For multilib rpm the allarch packagegroup files can overwrite (in theory they're identical)
-SSTATE_DUPWHITELIST = "${DEPLOY_DIR_IMAGE}/ ${DEPLOY_DIR}/licenses/ ${DEPLOY_DIR_RPM}/noarch/"
+SSTATE_DUPWHITELIST = "${DEPLOY_DIR}/licenses/"
 # Avoid docbook/sgml catalog warnings for now
 SSTATE_DUPWHITELIST += "${STAGING_ETCDIR_NATIVE}/sgml ${STAGING_DATADIR_NATIVE}/sgml"
 # sdk-provides-dummy-nativesdk and nativesdk-buildtools-perl-dummy overlap for different SDKMACHINE
 SSTATE_DUPWHITELIST += "${DEPLOY_DIR_RPM}/sdk_provides_dummy_nativesdk/ ${DEPLOY_DIR_IPK}/sdk-provides-dummy-nativesdk/"
 SSTATE_DUPWHITELIST += "${DEPLOY_DIR_RPM}/buildtools_dummy_nativesdk/ ${DEPLOY_DIR_IPK}/buildtools-dummy-nativesdk/"
+# target-sdk-provides-dummy overlaps that allarch is disabled when multilib is used
+SSTATE_DUPWHITELIST += "${COMPONENTS_DIR}/sdk-provides-dummy-target/ ${DEPLOY_DIR_RPM}/sdk_provides_dummy_target/ ${DEPLOY_DIR_IPK}/sdk-provides-dummy-target/"
 # Archive the sources for many architectures in one deploy folder
 SSTATE_DUPWHITELIST += "${DEPLOY_DIR_SRC}"
+# ovmf/grub-efi/systemd-boot/intel-microcode multilib recipes can generate identical overlapping files
+SSTATE_DUPWHITELIST += "${DEPLOY_DIR_IMAGE}/ovmf"
+SSTATE_DUPWHITELIST += "${DEPLOY_DIR_IMAGE}/grub-efi"
+SSTATE_DUPWHITELIST += "${DEPLOY_DIR_IMAGE}/systemd-boot"
+SSTATE_DUPWHITELIST += "${DEPLOY_DIR_IMAGE}/microcode"
 
 SSTATE_SCAN_FILES ?= "*.la *-config *_config postinst-*"
 SSTATE_SCAN_CMD ??= 'find ${SSTATE_BUILDDIR} \( -name "${@"\" -o -name \"".join(d.getVar("SSTATE_SCAN_FILES").split())}" \) -type f'
@@ -59,7 +66,6 @@ SSTATEPREINSTFUNCS = ""
 SSTATEPOSTUNPACKFUNCS = "sstate_hardcode_path_unpack"
 SSTATEPOSTINSTFUNCS = ""
 EXTRA_STAGING_FIXMES ?= "HOSTTOOLS_DIR"
-SSTATECLEANFUNCS = ""
 
 # Check whether sstate exists for tasks that support sstate and are in the
 # locked signatures file.
@@ -301,7 +307,7 @@ def sstate_installpkg(ss, d):
     sstatepkg = d.getVar('SSTATE_PKG') + '_' + ss['task'] + ".tgz"
 
     if not os.path.exists(sstatepkg):
-        pstaging_fetch(sstatefetch, sstatepkg, d)
+        pstaging_fetch(sstatefetch, d)
 
     if not os.path.isfile(sstatepkg):
         bb.note("Staging package %s does not exist" % sstatepkg)
@@ -408,7 +414,7 @@ python sstate_hardcode_path_unpack () {
         bb.note("Replacing fixme paths in sstate package: %s" % (sstate_hardcode_cmd))
         subprocess.check_call(sstate_hardcode_cmd, shell=True)
 
-        # Need to remove this or we'd copy it into the target directory and may 
+        # Need to remove this or we'd copy it into the target directory and may
         # conflict with another writer
         os.remove(fixmefn)
 }
@@ -506,10 +512,6 @@ def sstate_clean(ss, d):
         if rm_stamp in stfile or rm_setscene in stfile or \
                 stfile.endswith(rm_nohash):
             oe.path.remove(stfile)
-
-    # Removes the users/groups created by the package
-    for cleanfunc in (d.getVar('SSTATECLEANFUNCS') or '').split():
-        bb.build.exec_func(cleanfunc, d)
 
 sstate_clean[vardepsexclude] = "SSTATE_MANFILEPREFIX"
 
@@ -640,7 +642,7 @@ def sstate_package(ss, d):
 
     return
 
-def pstaging_fetch(sstatefetch, sstatepkg, d):
+def pstaging_fetch(sstatefetch, d):
     import bb.fetch2
 
     # Only try and fetch if the user has configured a mirror
@@ -720,17 +722,24 @@ sstate_task_postfunc[dirs] = "${WORKDIR}"
 #
 sstate_create_package () {
 	TFILE=`mktemp ${SSTATE_PKG}.XXXXXXXX`
+
+        # Use pigz if available
+        OPT="-czS"
+        if [ -x "$(command -v pigz)" ]; then
+            OPT="-I pigz -cS"
+        fi
+
 	# Need to handle empty directories
 	if [ "$(ls -A)" ]; then
 		set +e
-		tar -czf $TFILE *
+		tar $OPT -f $TFILE *
 		ret=$?
 		if [ $ret -ne 0 ] && [ $ret -ne 1 ]; then
 			exit 1
 		fi
 		set -e
 	else
-		tar -cz --file=$TFILE --files-from=/dev/null
+		tar $OPT --file=$TFILE --files-from=/dev/null
 	fi
 	chmod 0664 $TFILE
 	mv -f $TFILE ${SSTATE_PKG}
@@ -890,6 +899,18 @@ def sstate_checkhashes(sq_fn, sq_task, sq_hash, sq_hashfn, d, siginfo=False):
             evdata['found'].append( (sq_fn[task], sq_task[task], sq_hash[task], sstatefile ) )
         bb.event.fire(bb.event.MetadataEvent("MissedSstate", evdata), d)
 
+    # Print some summary statistics about the current task completion and how much sstate
+    # reuse there was. Avoid divide by zero errors.
+    total = len(sq_fn)
+    currentcount = d.getVar("BB_SETSCENE_STAMPCURRENT_COUNT") or 0
+    complete = 0
+    if currentcount:
+        complete = (len(ret) + currentcount) / (total + currentcount) * 100
+    match = 0
+    if total:
+        match = len(ret) / total * 100
+    bb.plain("Sstate summary: Wanted %d Found %d Missed %d Current %d (%d%% match, %d%% complete)" % (total, len(ret), len(missed), currentcount, match, complete))
+
     if hasattr(bb.parse.siggen, "checkhashes"):
         bb.parse.siggen.checkhashes(missed, ret, sq_fn, sq_task, sq_hash, sq_hashfn, d)
 
@@ -902,6 +923,7 @@ def setscene_depvalid(task, taskdependees, notneeded, d, log=None):
     # task is included in taskdependees too
     # Return - False - We need this dependency
     #        - True - We can skip this dependency
+    import re
 
     def logit(msg, log):
         if log is not None:
@@ -956,11 +978,24 @@ def setscene_depvalid(task, taskdependees, notneeded, d, log=None):
 
         # Consider sysroot depending on sysroot tasks
         if taskdependees[task][1] == 'do_populate_sysroot' and taskdependees[dep][1] == 'do_populate_sysroot':
-            # base-passwd/shadow-sysroot don't need their dependencies
-            if taskdependees[dep][0].endswith(("base-passwd", "shadow-sysroot")):
-                continue
-            # Nothing need depend on libc-initial/gcc-cross-initial
-            if "-initial" in taskdependees[task][0]:
+            # Allow excluding certain recursive dependencies. If a recipe needs it should add a
+            # specific dependency itself, rather than relying on one of its dependees to pull
+            # them in.
+            # See also http://lists.openembedded.org/pipermail/openembedded-core/2018-January/146324.html
+            not_needed = False
+            excludedeps = d.getVar('_SSTATE_EXCLUDEDEPS_SYSROOT')
+            if excludedeps is None:
+                # Cache the regular expressions for speed
+                excludedeps = []
+                for excl in (d.getVar('SSTATE_EXCLUDEDEPS_SYSROOT') or "").split():
+                    excludedeps.append((re.compile(excl.split('->', 1)[0]), re.compile(excl.split('->', 1)[1])))
+                d.setVar('_SSTATE_EXCLUDEDEPS_SYSROOT', excludedeps)
+            for excl in excludedeps:
+                if excl[0].match(taskdependees[dep][0]):
+                    if excl[1].match(taskdependees[task][0]):
+                        not_needed = True
+                        break
+            if not_needed:
                 continue
             # For meta-extsdk-toolchain we want all sysroot dependencies
             if taskdependees[dep][0] == 'meta-extsdk-toolchain':
@@ -1007,7 +1042,7 @@ python sstate_eventhandler() {
         bb.siggen.dump_this_task(sstatepkg + '_' + taskname + ".tgz" ".siginfo", d)
 }
 
-SSTATE_PRUNE_OBSOLETEWORKDIR = "1"
+SSTATE_PRUNE_OBSOLETEWORKDIR ?= "1"
 
 # Event handler which removes manifests and stamps file for
 # recipes which are no longer reachable in a build where they
@@ -1027,6 +1062,16 @@ python sstate_eventhandler2() {
         with open(preservestampfile, 'r') as f:
             preservestamps = f.readlines()
     seen = []
+
+    # The machine index contains all the stamps this machine has ever seen in this build directory.
+    # We should only remove things which this machine once accessed but no longer does.
+    machineindex = set()
+    bb.utils.mkdirhier(d.expand("${SSTATE_MANIFESTS}"))
+    mi = d.expand("${SSTATE_MANIFESTS}/index-machine-${MACHINE}")
+    if os.path.exists(mi):
+        with open(mi, "r") as f:
+            machineindex = set(line.strip() for line in f.readlines())
+
     for a in sorted(list(set(d.getVar("SSTATE_ARCHS").split()))):
         toremove = []
         i = d.expand("${SSTATE_MANIFESTS}/index-" + a)
@@ -1036,7 +1081,7 @@ python sstate_eventhandler2() {
             lines = f.readlines()
             for l in lines:
                 (stamp, manifest, workdir) = l.split()
-                if stamp not in stamps and stamp not in preservestamps:
+                if stamp not in stamps and stamp not in preservestamps and stamp in machineindex:
                     toremove.append(l)
                     if stamp not in seen:
                         bb.debug(2, "Stamp %s is not reachable, removing related manifests" % stamp)
@@ -1065,6 +1110,11 @@ python sstate_eventhandler2() {
         with open(i, "w") as f:
             for l in lines:
                 f.write(l)
+    machineindex |= set(stamps)
+    with open(mi, "w") as f:
+        for l in machineindex:
+            f.write(l + "\n")
+
     if preservestamps:
         os.remove(preservestampfile)
 }

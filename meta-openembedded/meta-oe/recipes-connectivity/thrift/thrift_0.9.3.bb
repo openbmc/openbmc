@@ -12,6 +12,9 @@ SRC_URI = "http://mirror.switch.ch/mirror/apache/dist/thrift/${PV}/${BPN}-${PV}.
            file://0001-Forcibly-disable-check-for-Qt5.patch \
            file://0001-THRIFT-3828-In-cmake-avoid-use-of-both-quoted-paths-.patch \
            file://0002-THRIFT-3831-in-test-cpp-explicitly-use-signed-char.patch \
+           file://0004-THRIFT-3207-enable-build-with-OpenSSL-1.1.0-series.patch \
+           file://0005-THRIFT-3878-Compile-error-in-TSSLSocket.cpp-with-new.patch \
+           file://0006-THRIFT-3736-C++-library-build-fails-if-OpenSSL-does-.patch \
 "
 
 SRC_URI[md5sum] = "88d667a8ae870d5adeca8cb7d6795442"

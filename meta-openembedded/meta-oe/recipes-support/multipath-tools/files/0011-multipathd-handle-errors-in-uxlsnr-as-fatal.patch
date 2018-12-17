@@ -1,0 +1,57 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martin Wilck <mwilck@suse.com>
+Date: Wed, 21 Mar 2018 10:34:19 +0100
+Subject: [PATCH] multipathd: handle errors in uxlsnr as fatal
+
+The ppoll() calls of the uxlsnr thread are vital for proper functioning of
+multipathd. If the uxlsnr thread can't open the socket or fails to call ppoll()
+for other reasons, quit the daemon. If we don't do that, multipathd may
+hang in a state where it can't be terminated any more, because the uxlsnr
+thread is responsible for handling all signals. This happens e.g. if
+systemd's multipathd.socket is running in and multipathd is started from
+outside systemd.
+
+24f2844 "multipathd: fix signal blocking logic" has made this problem more
+severe. Before that patch, the signals weren't actually blocked in any thread.
+That's not to say 24f2844 was wrong. I still think it's correct, we just
+need this one on top.
+
+Signed-off-by: Martin Wilck <mwilck@suse.com>
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ multipathd/uxlsnr.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/multipathd/uxlsnr.c b/multipathd/uxlsnr.c
+index cdafd82..6f66666 100644
+--- a/multipathd/uxlsnr.c
++++ b/multipathd/uxlsnr.c
+@@ -178,7 +178,7 @@ void * uxsock_listen(uxsock_trigger_fn uxsock_trigger, void * trigger_data)
+ 
+ 	if (ux_sock == -1) {
+ 		condlog(1, "could not create uxsock: %d", errno);
+-		return NULL;
++		exit_daemon();
+ 	}
+ 
+ 	pthread_cleanup_push(uxsock_cleanup, (void *)ux_sock);
+@@ -187,7 +187,7 @@ void * uxsock_listen(uxsock_trigger_fn uxsock_trigger, void * trigger_data)
+ 	polls = (struct pollfd *)MALLOC((MIN_POLLS + 1) * sizeof(struct pollfd));
+ 	if (!polls) {
+ 		condlog(0, "uxsock: failed to allocate poll fds");
+-		return NULL;
++		exit_daemon();
+ 	}
+ 	sigfillset(&mask);
+ 	sigdelset(&mask, SIGINT);
+@@ -249,6 +249,7 @@ void * uxsock_listen(uxsock_trigger_fn uxsock_trigger, void * trigger_data)
+ 
+ 			/* something went badly wrong! */
+ 			condlog(0, "uxsock: poll failed with %d", errno);
++			exit_daemon();
+ 			break;
+ 		}
+ 
+-- 
+2.7.4
+

@@ -1,0 +1,29 @@
+diff -ru openldap-2.4.46.orig/build/mkversion openldap-2.4.46/build/mkversion
+--- openldap-2.4.46.orig/build/mkversion	2018-10-25 18:46:10.383750480 +1300
++++ openldap-2.4.46/build/mkversion	2018-10-25 18:46:33.156232586 +1300
+@@ -50,7 +50,15 @@
+ fi
+ 
+ APPLICATION=$1
+-WHOWHERE="$USER@`uname -n`:`pwd`"
++if [ -n "${SOURCE_DATE_EPOCH}" ]; then
++   WHOWHERE="openldap"
++   DATE=$(date -d@$SOURCE_DATE_EPOCH +' %b %d %Y ')
++   TIME=$(date -d@$SOURCE_DATE_EPOCH +' %H:%M:%S ')
++else
++   WHOWHERE="$USER@$(uname -n):$(pwd)"
++   DATE='" __DATE__ "'
++   TIME='" __TIME__ "'
++fi
+ 
+ cat << __EOF__
+ /* This work is part of OpenLDAP Software <http://www.openldap.org/>.
+@@ -72,7 +80,7 @@
+ "COPYING RESTRICTIONS APPLY\n";
+ 
+ $static $const char $SYMBOL[] =
+-"@(#) \$$PACKAGE: $APPLICATION $VERSION (" __DATE__ " " __TIME__ ") \$\n"
++"@(#) \$$PACKAGE: $APPLICATION $VERSION ($DATE $TIME) \$\n"
+ "\t$WHOWHERE\n";
+ 
+ __EOF__

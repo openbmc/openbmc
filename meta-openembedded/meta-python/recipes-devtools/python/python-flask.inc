@@ -4,10 +4,10 @@ Flask is a microframework for Python based on Werkzeug, Jinja 2 and good \
 intentions. And before you ask: It’s BSD licensed!"
 HOMEPAGE = "https://github.com/mitsuhiko/flask/"
 LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=19866b76b054ab30c270c0eb9d7e43d7"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=c011883ac26229b8ba3084f55c7664c6"
 
-SRC_URI[md5sum] = "97278dfdafda98ba7902e890b0289177"
-SRC_URI[sha256sum] = "49f44461237b69ecd901cc7ce66feea0319b9158743dd27a2899962ab214dac1"
+SRC_URI[md5sum] = "824f0f20aae1f44c9c7dc4054adb7969"
+SRC_URI[sha256sum] = "2271c0070dbcb5275fad4a82e29f23ab92682dc45f9dfbc22c02ba9b9322ce48"
 
 CLEANBROKEN = "1"
 

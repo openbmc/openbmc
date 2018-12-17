@@ -1,0 +1,69 @@
+From 2ef124e235a47dd4742813cf80e11a89cf4f02f8 Mon Sep 17 00:00:00 2001
+From: Andrew Jeffery <andrew@aj.id.au>
+Date: Thu, 3 May 2018 12:35:31 +0930
+Subject: [PATCH] ptrace: Abstract over user_regs_struct name, which differs on
+ ARM32
+
+Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
+---
+ src/ptrace.cc |  6 +++---
+ src/ptrace.h  | 10 ++++++++--
+ 2 files changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/src/ptrace.cc b/src/ptrace.cc
+index 485f58e4d82e..610fabb3b8e8 100644
+--- a/src/ptrace.cc
++++ b/src/ptrace.cc
+@@ -122,8 +122,8 @@ void PtraceInterrupt(pid_t pid) {
+   DoWait(pid);
+ }
+ 
+-struct user_regs_struct PtraceGetRegs(pid_t pid) {
+-  struct user_regs_struct regs;
++user_regs_struct PtraceGetRegs(pid_t pid) {
++  user_regs_struct regs;
+   if (ptrace(PTRACE_GETREGS, pid, 0, &regs)) {
+     std::ostringstream ss;
+     ss << "Failed to PTRACE_GETREGS: " << strerror(errno);
+@@ -132,7 +132,7 @@ struct user_regs_struct PtraceGetRegs(pid_t pid) {
+   return regs;
+ }
+ 
+-void PtraceSetRegs(pid_t pid, struct user_regs_struct regs) {
++void PtraceSetRegs(pid_t pid, user_regs_struct regs) {
+   if (ptrace(PTRACE_SETREGS, pid, 0, &regs)) {
+     std::ostringstream ss;
+     ss << "Failed to PTRACE_SETREGS: " << strerror(errno);
+diff --git a/src/ptrace.h b/src/ptrace.h
+index 7083be1c4dfd..d6af8bf9f83a 100644
+--- a/src/ptrace.h
++++ b/src/ptrace.h
+@@ -23,6 +23,12 @@
+ 
+ #include "./config.h"
+ 
++#if defined(__arm__)
++typedef struct user_regs user_regs_struct;
++#else
++typedef struct user_regs_struct user_regs_struct;
++#endif
++
+ namespace pyflame {
+ 
+ int DoWait(pid_t pid, int options = 0);
+@@ -39,10 +45,10 @@ void PtraceSeize(pid_t pid);
+ void PtraceInterrupt(pid_t pid);
+ 
+ // get regs from a process
+-struct user_regs_struct PtraceGetRegs(pid_t pid);
++user_regs_struct PtraceGetRegs(pid_t pid);
+ 
+ // set regs in a process
+-void PtraceSetRegs(pid_t pid, struct user_regs_struct regs);
++void PtraceSetRegs(pid_t pid, user_regs_struct regs);
+ 
+ // poke a long word into an address
+ void PtracePoke(pid_t pid, unsigned long addr, long data);
+-- 
+2.14.1
+

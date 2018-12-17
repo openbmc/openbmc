@@ -15,11 +15,11 @@ Signed-off-by: Meng Li <Meng.Li@windriver.com>
  create_tpm_key.c |    3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/create_tpm_key.c b/create_tpm_key.c
-index 7b94d62..f30af90 100644
---- a/create_tpm_key.c
-+++ b/create_tpm_key.c
-@@ -148,7 +148,8 @@ int main(int argc, char **argv)
+Index: git/src/create_tpm_key.c
+===================================================================
+--- git.orig/src/create_tpm_key.c
++++ git/src/create_tpm_key.c
+@@ -155,7 +155,8 @@ int main(int argc, char **argv)
  	ASN1_OCTET_STRING *blob_str;
  	unsigned char	*blob_asn1 = NULL;
  	int		asn1_len;
@@ -29,6 +29,3 @@ index 7b94d62..f30af90 100644
  	int		option_index, auth = 0, popup = 0, wrap = 0;
  	int		wellknownkey = 0;
  	UINT32		enc_scheme = TSS_ES_RSAESPKCSV15;
--- 
-1.7.9.5
-

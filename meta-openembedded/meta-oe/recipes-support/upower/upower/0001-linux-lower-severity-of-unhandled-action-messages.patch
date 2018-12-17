@@ -1,0 +1,31 @@
+From f64b6ce8054b47e5bdcc8c4c7965534b388e6151 Mon Sep 17 00:00:00 2001
+From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Date: Fri, 6 Apr 2018 11:26:54 -0700
+Subject: [PATCH] linux: lower severity of "unhandled action" messages
+
+Newer kernels emit bind/unbind uevents that are not of interest to
+powerd. To avoid littering logs with scary messages, let's lower their
+severity to "debug".
+
+https://bugs.freedesktop.org/show_bug.cgi?id=106019
+
+Upstream-Status: Backport
+---
+ src/linux/up-backend.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/linux/up-backend.c b/src/linux/up-backend.c
+index e668dc8..b8021e7 100644
+--- a/src/linux/up-backend.c
++++ b/src/linux/up-backend.c
+@@ -273,7 +273,7 @@ up_backend_uevent_signal_handler_cb (GUdevClient *client, const gchar *action,
+ 		g_debug ("SYSFS change %s", g_udev_device_get_sysfs_path (device));
+ 		up_backend_device_changed (backend, device);
+ 	} else {
+-		g_warning ("unhandled action '%s' on %s", action, g_udev_device_get_sysfs_path (device));
++		g_debug ("unhandled action '%s' on %s", action, g_udev_device_get_sysfs_path (device));
+ 	}
+ }
+ 
+-- 
+2.17.0.484.g0c8726318c-goog

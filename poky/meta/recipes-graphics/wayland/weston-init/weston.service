@@ -4,6 +4,7 @@ RequiresMountsFor=/run
 
 [Service]
 User=root
+PAMName=login
 EnvironmentFile=-/etc/default/weston
 ExecStart=/usr/bin/weston-start -v -e -- $OPTARGS
 

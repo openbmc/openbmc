@@ -1,0 +1,34 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Tue, 5 Jun 2018 15:31:55 -0500
+Subject: [PATCH] multipath: don't check timestamps without a path
+
+If a path was blacklisted, pathvec could exist but have no path in it.
+print_cmd_valid wasn't checking this before calling
+find_multipaths_check_timeout(). This was causing it to dereference a
+NULL pointer in these cases.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ multipath/main.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/multipath/main.c b/multipath/main.c
+index c69e996..3f0a6aa 100644
+--- a/multipath/main.c
++++ b/multipath/main.c
+@@ -482,10 +482,8 @@ static int print_cmd_valid(int k, const vector pathvec,
+ 			pp, pp->find_multipaths_timeout, &until);
+ 		if (wait != FIND_MULTIPATHS_WAITING)
+ 			k = 1;
+-	} else if (pathvec != NULL) {
+-		pp = VECTOR_SLOT(pathvec, 0);
++	} else if (pathvec != NULL && (pp = VECTOR_SLOT(pathvec, 0)))
+ 		wait = find_multipaths_check_timeout(pp, 0, &until);
+-	}
+ 	if (wait == FIND_MULTIPATHS_WAITING)
+ 		printf("FIND_MULTIPATHS_WAIT_UNTIL=\"%ld.%06ld\"\n",
+ 			       until.tv_sec, until.tv_nsec/1000);
+-- 
+2.7.4
+

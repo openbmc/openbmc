@@ -8,11 +8,11 @@ Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
  src/client/linux/handler/exception_handler.cc | 17 +++++++++++++++++
  1 file changed, 17 insertions(+)
 
-diff --git a/src/client/linux/handler/exception_handler.cc b/src/client/linux/handler/exception_handler.cc
-index cca023f..f3e460c 100644
---- a/src/client/linux/handler/exception_handler.cc
-+++ b/src/client/linux/handler/exception_handler.cc
-@@ -495,7 +495,19 @@ bool ExceptionHandler::SimulateSignalDelivery(int sig) {
+Index: git/src/client/linux/handler/exception_handler.cc
+===================================================================
+--- git.orig/src/client/linux/handler/exception_handler.cc
++++ git/src/client/linux/handler/exception_handler.cc
+@@ -495,7 +495,19 @@ bool ExceptionHandler::SimulateSignalDel
    siginfo.si_code = SI_USER;
    siginfo.si_pid = getpid();
    ucontext_t context;
@@ -42,11 +42,8 @@ index cca023f..f3e460c 100644
      return false;
 +#else
 +  // Extreme hack - see comments above.
-+  memset (&context.context, 0, sizeof(&context.context));
++  memset (&context.context, 0, sizeof(context.context));
 +#endif
  
  #if defined(__i386__)
    // In CPUFillFromUContext in minidumpwriter.cc the stack pointer is retrieved
--- 
-1.9.1
-

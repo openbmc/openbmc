@@ -1,0 +1,14 @@
+Upstream-Status: Pending [from debian]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+--- elfutils-0.165.orig/tests/run-strip-strmerge.sh
++++ elfutils-0.165/tests/run-strip-strmerge.sh
+@@ -30,7 +30,7 @@ remerged=remerged.elf
+ tempfiles $merged $stripped $debugfile $remerged
+ 
+ echo elflint $input
+-testrun ${abs_top_builddir}/src/elflint --gnu $input
++testrun_on_self_skip ${abs_top_builddir}/src/elflint --gnu $input
+ echo elfstrmerge
+ testrun ${abs_top_builddir}/tests/elfstrmerge -o $merged $input
+ echo elflint $merged

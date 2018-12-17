@@ -1,9 +1,10 @@
-From 953cff93c85d3cfd5cbcac56e14443dc5f6e5fbd Mon Sep 17 00:00:00 2001
+From 5bd05ad8569880985ddf6d4c06ed927d388c297f Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 19 Oct 2016 01:57:16 +0000
 Subject: [PATCH] ignore constant-logical-operand warning with clang
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  src/dmi/dmicheck/dmicheck.c            | 3 +++
  src/lib/src/fwts_acpi_tables.c         | 5 +++++
@@ -11,10 +12,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  3 files changed, 13 insertions(+)
 
 diff --git a/src/dmi/dmicheck/dmicheck.c b/src/dmi/dmicheck/dmicheck.c
-index ecd98223..7fca4a64 100644
+index 3cca9db9..60fb758f 100644
 --- a/src/dmi/dmicheck/dmicheck.c
 +++ b/src/dmi/dmicheck/dmicheck.c
-@@ -209,6 +209,8 @@ static const char *uuid_patterns[] = {
+@@ -211,6 +211,8 @@ static const char *uuid_patterns[] = {
  	"0A0A0A0A-0A0A-0A0A-0A0A-0A0A0A0A0A0A",
  	NULL,
  };
@@ -23,19 +24,19 @@ index ecd98223..7fca4a64 100644
  
  static const fwts_chassis_type_map fwts_dmi_chassis_type[] = {
  	{ "Invalid",		FWTS_SMBIOS_CHASSIS_INVALID },
-@@ -245,6 +247,7 @@ static const fwts_chassis_type_map fwts_dmi_chassis_type[] = {
- 	{ "Convertible",	FWTS_SMBIOS_CHASSIS_CONVERTIBLE },
- 	{ "Detachable",		FWTS_SMBIOS_CHASSIS_DETACHABLE },
+@@ -251,6 +253,7 @@ static const fwts_chassis_type_map fwts_dmi_chassis_type[] = {
+ 	{ "Mini PC",		FWTS_SMBIOS_CHASSIS_MINI_PC },
+ 	{ "Stick PC",		FWTS_SMBIOS_CHASSIS_STICK_PC },
  };
 +#pragma clang diagnostic pop
  
  /* Remapping table from buggy version numbers to correct values */
  static const fwts_dmi_version dmi_versions[] = {
 diff --git a/src/lib/src/fwts_acpi_tables.c b/src/lib/src/fwts_acpi_tables.c
-index 30b4060e..d5339bf7 100644
+index c7ba59be..bdd224aa 100644
 --- a/src/lib/src/fwts_acpi_tables.c
 +++ b/src/lib/src/fwts_acpi_tables.c
-@@ -394,10 +394,14 @@ static int fwts_acpi_handle_fadt(
+@@ -393,10 +393,14 @@ static int fwts_acpi_handle_fadt(
  	/* Determine FACS addr and load it.
  	 * Will ignore the missing FACS in the hardware-reduced mode.
  	 */
@@ -50,7 +51,7 @@ index 30b4060e..d5339bf7 100644
  	if (result != FWTS_OK) {
  		if ((result == FWTS_NULL_POINTER) &&
  				fwts_acpi_is_reduced_hardware(fadt)) {
-@@ -416,6 +420,7 @@ static int fwts_acpi_handle_fadt(
+@@ -415,6 +419,7 @@ static int fwts_acpi_handle_fadt(
  		return FWTS_ERROR;
  	}
  	return FWTS_OK;
@@ -59,7 +60,7 @@ index 30b4060e..d5339bf7 100644
  
  /*
 diff --git a/src/uefi/uefirtauthvar/uefirtauthvar.c b/src/uefi/uefirtauthvar/uefirtauthvar.c
-index cdfd7aa3..001e8cc8 100644
+index c2031741..7a33d19d 100644
 --- a/src/uefi/uefirtauthvar/uefirtauthvar.c
 +++ b/src/uefi/uefirtauthvar/uefirtauthvar.c
 @@ -142,6 +142,9 @@ static int uefirtauthvar_deinit(fwts_framework *fw)

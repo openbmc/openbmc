@@ -1296,7 +1296,7 @@
                     <para>It is worth noting that the term "package" can,
                     in general, have subtle meanings.
                     For example, the packages referred to in the
-                    "<ulink url='&YOCTO_DOCS_REF_URL;#required-packages-for-the-host-development-system'>Required Packages for the Host Development System</ulink>"
+                    "<ulink url='&YOCTO_DOCS_REF_URL;#required-packages-for-the-build-host'>Required Packages for the Build Host</ulink>"
                     section in the Yocto Project Reference Manual are compiled
                     binaries that, when installed, add functionality to your
                     Linux distribution.</para>

@@ -90,7 +90,7 @@ class NpmRecipeHandler(RecipeHandler):
             runenv = dict(os.environ, PATH=d.getVar('PATH'))
             bb.process.run('npm shrinkwrap', cwd=srctree, stderr=subprocess.STDOUT, env=runenv, shell=True)
         except bb.process.ExecutionError as e:
-            logger.warn('npm shrinkwrap failed:\n%s' % e.stdout)
+            logger.warning('npm shrinkwrap failed:\n%s' % e.stdout)
             return
 
         tmpfile = os.path.join(localfilesdir, 'npm-shrinkwrap.json')
@@ -107,12 +107,12 @@ class NpmRecipeHandler(RecipeHandler):
                            cwd=srctree, stderr=subprocess.STDOUT, env=runenv, shell=True)
         relockbin = os.path.join(NpmRecipeHandler.lockdownpath, 'node_modules', 'lockdown', 'relock.js')
         if not os.path.exists(relockbin):
-            logger.warn('Could not find relock.js within lockdown directory; skipping lockdown')
+            logger.warning('Could not find relock.js within lockdown directory; skipping lockdown')
             return
         try:
             bb.process.run('node %s' % relockbin, cwd=srctree, stderr=subprocess.STDOUT, env=runenv, shell=True)
         except bb.process.ExecutionError as e:
-            logger.warn('lockdown-relock failed:\n%s' % e.stdout)
+            logger.warning('lockdown-relock failed:\n%s' % e.stdout)
             return
 
         tmpfile = os.path.join(localfilesdir, 'lockdown.json')

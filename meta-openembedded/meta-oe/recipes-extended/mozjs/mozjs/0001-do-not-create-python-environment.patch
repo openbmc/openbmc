@@ -1,0 +1,91 @@
+From 5028d1cd669c179ed49061316d04c8e8862a5bd8 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 12 Jul 2018 15:04:47 +0800
+Subject: [PATCH 1/5] do not create python environment
+
+Use oe's python environment rather than create one of host
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ build/moz.configure/init.configure | 18 ------------------
+ configure.py                       | 10 +++++++++-
+ js/src/old-configure               |  4 ++--
+ 3 files changed, 11 insertions(+), 21 deletions(-)
+
+diff --git a/build/moz.configure/init.configure b/build/moz.configure/init.configure
+index 2123beb..6fe6591 100644
+--- a/build/moz.configure/init.configure
++++ b/build/moz.configure/init.configure
+@@ -179,24 +179,6 @@ def virtualenv_python(env_python, build_env, mozconfig, help):
+     else:
+         python = sys.executable
+ 
+-    if not manager.up_to_date(python):
+-        log.info('Creating Python environment')
+-        manager.build(python)
+-
+-    python = normsep(manager.python_path)
+-
+-    if python != normsep(sys.executable):
+-        log.info('Reexecuting in the virtualenv')
+-        if env_python:
+-            del os.environ['PYTHON']
+-        # One would prefer to use os.execl, but that's completely borked on
+-        # Windows.
+-        sys.exit(subprocess.call([python] + sys.argv))
+-
+-    # We are now in the virtualenv
+-    if not distutils.sysconfig.get_python_lib():
+-        die('Could not determine python site packages directory')
+-
+     return python
+ 
+ set_config('PYTHON', virtualenv_python)
+diff --git a/configure.py b/configure.py
+index f7392d0..45323a5 100644
+--- a/configure.py
++++ b/configure.py
+@@ -12,7 +12,15 @@ import textwrap
+ 
+ 
+ base_dir = os.path.abspath(os.path.dirname(__file__))
+-sys.path.insert(0, os.path.join(base_dir, 'python', 'mozbuild'))
++sys.path.insert(0, os.path.join(base_dir, 'config'))
++def get_immediate_subdirectories(a_dir):
++    return [name for name in os.listdir(a_dir)
++            if os.path.isdir(os.path.join(a_dir, name))]
++for s in ["python", "testing/mozbase"]:
++    sub_dir = os.path.join(base_dir, s)
++    for module_dir in get_immediate_subdirectories(sub_dir):
++        sys.path.insert(0, os.path.join(sub_dir, module_dir))
++
+ from mozbuild.configure import ConfigureSandbox
+ from mozbuild.util import (
+     indented_repr,
+diff --git a/js/src/old-configure b/js/src/old-configure
+index ee4527b..75b00e1 100644
+--- a/js/src/old-configure
++++ b/js/src/old-configure
+@@ -10512,7 +10512,7 @@ if test "$MOZ_BUILD_APP" != js -o -n "$JS_STANDALONE"; then
+     ;;
+   esac
+ 
+-  eval $dumpenv $PYTHON $_topsrcdir/build/subconfigure.py --prepare "$srcdir" "$moz_config_dir" "$_CONFIG_SHELL" $ac_configure_args 
++  eval $dumpenv PYTHONPATH=$_topsrcdir/python/mozbuild/ $PYTHON $_topsrcdir/build/subconfigure.py --prepare "$srcdir" "$moz_config_dir" "$_CONFIG_SHELL" $ac_configure_args
+ 
+   done
+ 
+@@ -10931,7 +10931,7 @@ if test "$JS_STANDALONE"; then
+   
+ if test "$no_recursion" != yes; then
+   trap '' EXIT
+-  if ! $PYTHON $_topsrcdir/build/subconfigure.py --list subconfigures --skip skip_subconfigures; then
++  if ! PYTHONPATH=$_topsrcdir/python/mozbuild/ $PYTHON $_topsrcdir/build/subconfigure.py --list subconfigures --skip skip_subconfigures; then
+       exit 1
+   fi
+ fi
+-- 
+2.7.4
+

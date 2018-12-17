@@ -3,5 +3,4 @@
 # to yocto 2.5 or later which will pull in the latest dropbear code.
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 SRC_URI += "file://dropbearkey.service \
-	    file://0001-dropbear-Add-c-command-option-to-force-a-specific-co.patch \
-	    file://0001-Only-load-dropbear-default-host-keys-if-a-key-is-not.patch"
+            file://localoptions.h"

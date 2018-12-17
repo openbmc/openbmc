@@ -70,7 +70,7 @@ sysroot_stage_all() {
 python sysroot_strip () {
     inhibit_sysroot = d.getVar('INHIBIT_SYSROOT_STRIP')
     if inhibit_sysroot and oe.types.boolean(inhibit_sysroot):
-        return 0
+        return
 
     dstdir = d.getVar('SYSROOT_DESTDIR')
     pn = d.getVar('PN')
@@ -79,7 +79,7 @@ python sysroot_strip () {
     qa_already_stripped = 'already-stripped' in (d.getVar('INSANE_SKIP_' + pn) or "").split()
     strip_cmd = d.getVar("STRIP")
 
-    oe.package.strip_execs(pn, dstdir, strip_cmd, libdir, base_libdir,
+    oe.package.strip_execs(pn, dstdir, strip_cmd, libdir, base_libdir, d,
                            qa_already_stripped=qa_already_stripped)
 }
 
@@ -256,7 +256,7 @@ python extend_recipe_sysroot() {
     workdir = d.getVar("WORKDIR")
     #bb.warn(str(taskdepdata))
     pn = d.getVar("PN")
-
+    mc = d.getVar("BB_CURRENT_MC")
     stagingdir = d.getVar("STAGING_DIR")
     sharedmanifests = d.getVar("COMPONENTS_DIR") + "/manifests"
     recipesysroot = d.getVar("RECIPE_SYSROOT")
@@ -294,12 +294,14 @@ python extend_recipe_sysroot() {
     start = set([start])
 
     sstatetasks = d.getVar("SSTATETASKS").split()
+    # Add recipe specific tasks referenced by setscene_depvalid()
+    sstatetasks.append("do_stash_locale")
 
     def print_dep_tree(deptree):
         data = ""
         for dep in deptree:
             deps = "    " + "\n    ".join(deptree[dep][3]) + "\n"
-            data = "%s:\n  %s\n  %s\n%s  %s\n  %s\n" % (deptree[dep][0], deptree[dep][1], deptree[dep][2], deps, deptree[dep][4], deptree[dep][5])
+            data = data + "%s:\n  %s\n  %s\n%s  %s\n  %s\n" % (deptree[dep][0], deptree[dep][1], deptree[dep][2], deps, deptree[dep][4], deptree[dep][5])
         return data
 
     #bb.note("Full dep tree is:\n%s" % print_dep_tree(taskdepdata))
@@ -443,7 +445,13 @@ python extend_recipe_sysroot() {
 
     msg_exists = []
     msg_adding = []
+
     for dep in configuredeps:
+        if mc != 'default':
+            # We should not care about other multiconfigs
+            depmc = dep.split(':')[1]
+            if depmc != mc:
+                continue
         c = setscenedeps[dep][0]
         if c not in installed:
             continue

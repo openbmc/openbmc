@@ -9,6 +9,7 @@ DEPENDS = " tcp-wrappers libtirpc rpcbind"
 SRC_URI = "http://http.debian.net/debian/pool/main/n/${BPN}/${BPN}_${PV}.orig.tar.gz;name=archive \
            http://http.debian.net/debian/pool/main/n/${BPN}/${BPN}_${PV}-8.diff.gz;name=patch8 \
            file://rpc.rusersd-Makefile-fix-parallel-build-issue.patch \
+           file://0001-Link-with-libtirpc.patch \
 "
 
 SRC_URI[archive.md5sum] = "dc99a80b9fde2ab427c874f88f1c1602"
@@ -18,10 +19,14 @@ SRC_URI[patch8.sha256sum] = "14882dbdda4e37baa84d55b54b46c7e063a20fc9e04d1be1a28
 
 inherit autotools-brokensep
 
+CFLAGS += "-I${STAGING_INCDIR}/tirpc"
+LIBS += "-ltirpc"
+
 do_configure () {
     ./configure --prefix=${prefix}
     echo "LDFLAGS=${LDFLAGS}" >> MCONFIG
     echo "USE_GLIBC=1" >> MCONFIG
+    echo "LIBS=${LIBS}" >> MCONFIG
 }
 
 do_install () {
@@ -68,3 +73,6 @@ FILES_${PN}-dbg = "${prefix}/src/debug \
             ${bindir}/.debug ${sbindir}/.debug"
 
 RDEPENDS_${PN}-server = "tcp-wrappers xinetd rpcbind"
+
+# http://errors.yoctoproject.org/Errors/Details/186962/
+EXCLUDE_FROM_WORLD_libc-musl = "1"

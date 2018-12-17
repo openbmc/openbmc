@@ -5,7 +5,7 @@ LZ77/LZ78-based compressors, and approaches the performance of the PPM family of
 HOMEPAGE = "https://sourceware.org/bzip2/"
 SECTION = "console/utils"
 LICENSE = "bzip2"
-LIC_FILES_CHKSUM = "file://LICENSE;beginline=8;endline=37;md5=40d9d1eb05736d1bfc86cfdd9106e6b2"
+LIC_FILES_CHKSUM = "file://LICENSE;beginline=4;endline=37;md5=39406315f540c69bd05b1531daedd2ae"
 PR = "r5"
 
 SRC_URI = "http://downloads.yoctoproject.org/mirror/sources/${BP}.tar.gz \
@@ -20,6 +20,7 @@ SRC_URI[md5sum] = "00b516f4704d4a7cb50a1d97e6e8e15b"
 SRC_URI[sha256sum] = "a2848f34fcd5d6cf47def00461fcb528a0484d8edef8208d6d2e2909dc61d9cd"
 
 UPSTREAM_CHECK_URI = "https://www.sourceware.org/bzip2/"
+UPSTREAM_VERSION_UNKNOWN = "1"
 
 PACKAGES =+ "libbz2"
 

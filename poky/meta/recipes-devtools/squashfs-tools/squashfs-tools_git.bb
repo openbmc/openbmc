@@ -37,6 +37,8 @@ do_install () {
 	install -m 0755 unsquashfs ${D}${sbindir}/
 }
 
-ARM_INSTRUCTION_SET = "arm"
+ARM_INSTRUCTION_SET_armv4 = "arm"
+ARM_INSTRUCTION_SET_armv5 = "arm"
+ARM_INSTRUCTION_SET_armv6 = "arm"
 
 BBCLASSEXTEND = "native nativesdk"

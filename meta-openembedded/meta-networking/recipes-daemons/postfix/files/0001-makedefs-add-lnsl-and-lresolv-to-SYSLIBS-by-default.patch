@@ -1,0 +1,58 @@
+From 4caa18feb70f8f3d133657c1250a53f4e292bb42 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 12 Oct 2018 12:38:02 +0800
+Subject: [PATCH] makedefs: add -lnsl and -lresolv to SYSLIBS by default
+
+We don't need to check libnsl.so and libresolv.so since the libnsl2 is
+specified in DEPENDS and libresolv.so is from c libarary.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ makedefs | 22 ++--------------------
+ 1 file changed, 2 insertions(+), 20 deletions(-)
+
+diff --git a/makedefs b/makedefs
+index 2683bce..8f1b3f4 100644
+--- a/makedefs
++++ b/makedefs
+@@ -484,16 +484,7 @@ case "$SYSTEM.$RELEASE" in
+ 		    SYSLIBS="$SYSLIBS -ldb"
+ 		    ;;
+ 		esac
+-		for name in nsl resolv $GDBM_LIBS
+-		do
+-		    for lib in $BUILD_SYSROOT_NSL_PATH
+-		    do
+-			test -e $lib/lib$name.a -o -e $lib/lib$name.so && {
+-			    SYSLIBS="$SYSLIBS -l$name"
+-			    break
+-			}
+-		    done
+-		done
++		SYSLIBS="$SYSLIBS -lnsl -lresolv"
+ 		# Kernel 2.4 added IPv6
+ 		case "$RELEASE" in
+ 		2.[0-3].*) CCARGS="$CCARGS -DNO_IPV6";;
+@@ -561,16 +552,7 @@ EOF
+ 		    SYSLIBS="$SYSLIBS -ldb"
+ 		    ;;
+ 		esac
+-		for name in nsl resolv
+-		do
+-		    for lib in $BUILD_SYSROOT_NSL_PATH
+-		    do
+-			test -e $lib/lib$name.a -o -e $lib/lib$name.so && {
+-			    SYSLIBS="$SYSLIBS -l$name"
+-			    break
+-			}
+-		    done
+-		done
++		SYSLIBS="$SYSLIBS -lnsl -lresolv"
+ 		SYSLIBS="$SYSLIBS -ldl"
+ 		: ${SHLIB_SUFFIX=.so}
+ 		: ${SHLIB_CFLAGS=-fPIC}
+-- 
+2.7.4
+

@@ -11,13 +11,13 @@ DEPENDS += "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)} \
     dbus-glib-native \
 "
 
-SRC_URI = " \
-    http://hal.freedesktop.org/releases/${BPN}-${PV}.tar.gz;name=${BPN} \
-    file://optional-depends.patch \
-    file://0001-fix-build-with-newer-glibc-versions.patch \
-    file://udisks-1.0.5-fix-service-file.patch \
-    file://0001-Make-udev-rules-directory-configurable.patch \
-"
+SRC_URI = "http://hal.freedesktop.org/releases/${BPN}-${PV}.tar.gz;name=${BPN} \
+           file://optional-depends.patch \
+           file://0001-fix-build-with-newer-glibc-versions.patch \
+           file://udisks-1.0.5-fix-service-file.patch \
+           file://0001-Make-udev-rules-directory-configurable.patch \
+           file://0001-include-sys-sysmacros.h.patch \
+           "
 
 SRC_URI[udisks.md5sum] = "70d48dcfe523a74cd7c7fbbc2847fcdd"
 SRC_URI[udisks.sha256sum] = "f2ec82eb0ea7e01dc299b5b29b3c18cdf861236ec43dcff66b3552b4b31c6f71"

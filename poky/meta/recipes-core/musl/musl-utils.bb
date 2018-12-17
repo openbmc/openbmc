@@ -13,6 +13,8 @@ PV = "20170421"
 SRCREV = "fb5630138ccabbbc14a19d372096a04e42573c7d"
 SRC_URI = "git://github.com/boltlinux/musl-utils"
 
+UPSTREAM_CHECK_COMMITS = "1"
+
 inherit autotools
 
 S = "${WORKDIR}/git"

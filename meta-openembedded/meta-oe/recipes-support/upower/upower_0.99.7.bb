@@ -4,7 +4,10 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=0de8fbf1d97a140d1d93b9f14dcfbf08"
 
 DEPENDS = "intltool-native libusb1 libgudev glib-2.0 dbus-glib polkit"
 
-SRC_URI = "http://upower.freedesktop.org/releases/${BPN}-${PV}.tar.xz"
+SRC_URI = " \
+    http://upower.freedesktop.org/releases/${BPN}-${PV}.tar.xz \
+    file://0001-linux-lower-severity-of-unhandled-action-messages.patch \
+"
 SRC_URI[md5sum] = "236bb439d9ff1151450b3d8582399532"
 SRC_URI[sha256sum] = "24bcc2f6ab25a2533bac70b587bcb019e591293076920f5b5e04bdedc140a401"
 

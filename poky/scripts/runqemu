@@ -290,7 +290,7 @@ class BaseConfig(object):
     def check_arg_fstype(self, fst):
         """Check and set FSTYPE"""
         if fst not in self.fstypes + self.vmtypes:
-            logger.warn("Maybe unsupported FSTYPE: %s" % fst)
+            logger.warning("Maybe unsupported FSTYPE: %s" % fst)
         if not self.fstype or self.fstype == fst:
             if fst == 'ramfs':
                 fst = 'cpio.gz'
@@ -352,7 +352,7 @@ class BaseConfig(object):
                     self.qemuboot = qb
                     self.qbconfload = True
                 else:
-                    logger.warn("%s doesn't exist" % qb)
+                    logger.warning("%s doesn't exist" % qb)
             else:
                 raise RunQemuError("Can't find FSTYPE from: %s" % p)
 
@@ -672,7 +672,10 @@ class BaseConfig(object):
             logger.info('QB_MEM is not set, use 512M by default')
             self.set('QB_MEM', '-m 512')
 
-        self.kernel_cmdline_script += ' mem=%s' % self.get('QB_MEM').replace('-m','').strip() + 'M'
+        mach = self.get('MACHINE')
+        if not mach.startswith('qemumips'):
+            self.kernel_cmdline_script += ' mem=%s' % self.get('QB_MEM').replace('-m','').strip() + 'M'
+
         self.qemu_opt_script += ' %s' % self.get('QB_MEM')
 
     def check_tcpserial(self):
@@ -692,7 +695,7 @@ class BaseConfig(object):
             if not self.get('QB_AUDIO_DRV'):
                 raise RunQemuError("QB_AUDIO_DRV is NULL, this board doesn't support audio")
             if not self.get('QB_AUDIO_OPT'):
-                logger.warn('QB_AUDIO_OPT is NULL, you may need define it to make audio work')
+                logger.warning('QB_AUDIO_OPT is NULL, you may need define it to make audio work')
             else:
                 self.qemu_opt_script += ' %s' % self.get('QB_AUDIO_OPT')
             os.putenv('QEMU_AUDIO_DRV', self.get('QB_AUDIO_DRV'))
@@ -714,7 +717,7 @@ class BaseConfig(object):
             if self.get('DEPLOY_DIR_IMAGE'):
                 deploy_dir_image = self.get('DEPLOY_DIR_IMAGE')
             else:
-                logger.warn("Can't find qemuboot conf file, DEPLOY_DIR_IMAGE is NULL!")
+                logger.warning("Can't find qemuboot conf file, DEPLOY_DIR_IMAGE is NULL!")
                 return
 
             if self.rootfs and not os.path.exists(self.rootfs):
@@ -1061,9 +1064,9 @@ class BaseConfig(object):
                         # virtio might have been selected explicitly (just use it), or
                         # is used as fallback (then warn about that).
                         if not drive_type.startswith("/dev/vd"):
-                            logger.warn("Unknown QB_DRIVE_TYPE: %s" % drive_type)
-                            logger.warn("Failed to figure out drive type, consider define or fix QB_DRIVE_TYPE")
-                            logger.warn('Trying to use virtio block drive')
+                            logger.warning("Unknown QB_DRIVE_TYPE: %s" % drive_type)
+                            logger.warning("Failed to figure out drive type, consider define or fix QB_DRIVE_TYPE")
+                            logger.warning('Trying to use virtio block drive')
                         vm_drive = '-drive if=virtio,file=%s,format=%s' % (self.rootfs, rootfs_format)
 
                 # All branches above set vm_drive.
@@ -1279,7 +1282,7 @@ class BaseConfig(object):
             self.bitbake_e = subprocess.check_output(cmd, shell=True).decode('utf-8')
         except subprocess.CalledProcessError as err:
             self.bitbake_e = ''
-            logger.warn("Couldn't run 'bitbake -e' to gather environment information:\n%s" % err.output.decode('utf-8'))
+            logger.warning("Couldn't run 'bitbake -e' to gather environment information:\n%s" % err.output.decode('utf-8'))
 
     def validate_combos(self):
         if (self.fstype in self.vmtypes) and self.kernel:

@@ -1,0 +1,34 @@
+From 709dfe457c07aa0275f3da14634cbce5cf1029dc Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Thu, 19 Apr 2018 19:26:53 +0200
+Subject: [PATCH 3/3] powerpc/purgatory: Makefile: remove unknown flags for
+ powerpc
+
+Fix
+
+ powerpc-oe-linux-musl-ld: unrecognised emulation mode: soft-float
+ Supported emulations: elf32ppclinux elf32ppc elf32ppcsim elf32lppclinux
+                       elf32lppc elf32lppcsim elf64ppc elf64lppc
+
+Upstream-Status: Inappropriate [klibc specific]
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+---
+ purgatory/arch/ppc/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/purgatory/arch/ppc/Makefile b/purgatory/arch/ppc/Makefile
+index c85c58a..cd44a16 100644
+--- a/purgatory/arch/ppc/Makefile
++++ b/purgatory/arch/ppc/Makefile
+@@ -7,7 +7,7 @@ ppc_PURGATORY_SRCS += purgatory/arch/ppc/misc.S
+ ppc_PURGATORY_SRCS += purgatory/arch/ppc/purgatory-ppc.c
+ ppc_PURGATORY_SRCS += purgatory/arch/ppc/console-ppc.c
+ 
+-ppc_PURGATORY_EXTRA_CFLAGS += -msoft-float
++#ppc_PURGATORY_EXTRA_CFLAGS += -msoft-float
+ 
+ dist += purgatory/arch/ppc/Makefile $(ppc_PURGATORY_SRCS)		\
+ 	purgatory/arch/ppc/purgatory-ppc.h purgatory/arch/ppc/ppc_asm.h
+-- 
+2.7.4
+

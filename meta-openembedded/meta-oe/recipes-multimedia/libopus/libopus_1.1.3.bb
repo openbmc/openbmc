@@ -50,3 +50,5 @@ python () {
 #| {standard input}:773: Error: selected processor does not support Thumb mode `smull fp,r3,r5,r8'
 #| make[2]: *** [celt/celt.lo] Error 1
 ARM_INSTRUCTION_SET = "arm"
+
+BBCLASSEXTEND = "native nativesdk"

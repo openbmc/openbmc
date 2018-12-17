@@ -1,0 +1,26 @@
+From 59f65235a7a690f50d1686e9977908c053697d8c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 28 Aug 2018 22:59:13 -0700
+Subject: [PATCH] undefine macro before redefining
+
+Fixes
+src/main.c:89:9: error: 'printf' macro redefined [-Werror,-Wmacro-redefined]
+
+Upstream-Stats: Submitted [https://github.com/civetweb/civetweb/pull/649]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/main.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/main.c b/src/main.c
+index bbcb0aec..01191a3c 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -86,6 +86,7 @@
+ 
+ #include "civetweb.h"
+ 
++#undef printf
+ #define printf                                                                 \
+ 	DO_NOT_USE_THIS_FUNCTION__USE_fprintf /* Required for unit testing */
+ 

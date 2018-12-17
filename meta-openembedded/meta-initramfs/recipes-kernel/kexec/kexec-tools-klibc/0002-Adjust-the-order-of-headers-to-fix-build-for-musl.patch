@@ -1,0 +1,29 @@
+From 0976d2d5be1ed44c2324b609c7d16c1e93181c4b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Jul 2017 16:20:08 -0700
+Subject: [PATCH] Adjust the order of headers to fix build for musl
+
+Fixes
+ kexec/ifdown.c:33:16: error: storage size of 'ifc' isn't known
+
+Upstream-Status: Inappropriate [embedded specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
+ kexec/ifdown.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kexec/ifdown.c b/kexec/ifdown.c
+index 9679ad7..82c6141 100644
+--- a/kexec/ifdown.c
++++ b/kexec/ifdown.c
+@@ -16,8 +16,8 @@ char *v_ifdown = "@(#)ifdown.c  1.11  02-Jun-1998  miquels@cistron.nl";
+ #include <sys/socket.h>
+ #include <sys/time.h>
+ 
+-#include <net/if.h>
+ #include <netinet/in.h>
++#include <net/if.h>
+ 
+ /*
+  *  First, we find all shaper devices and down them. Then we

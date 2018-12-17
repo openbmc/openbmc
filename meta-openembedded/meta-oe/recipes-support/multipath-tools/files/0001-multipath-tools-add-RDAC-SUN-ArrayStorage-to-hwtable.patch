@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Xose Vazquez Perez <xose.vazquez@gmail.com>
+Date: Wed, 11 Apr 2018 15:14:13 +0200
+Subject: [PATCH] multipath-tools: add RDAC SUN/ArrayStorage to hwtable
+
+Already in scsi_dh: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/scsi/scsi_dh.c#n70
+
+Cc: NetApp RDAC team <ng-eseries-upstream-maintainers@netapp.com>
+Cc: Christophe Varoqui <christophe.varoqui@opensvc.com>
+Cc: DM ML <dm-devel@redhat.com>
+Signed-off-by: Xose Vazquez Perez <xose.vazquez@gmail.com>
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/hwtable.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/libmultipath/hwtable.c b/libmultipath/hwtable.c
+index 88b4700..827e899 100644
+--- a/libmultipath/hwtable.c
++++ b/libmultipath/hwtable.c
+@@ -890,6 +890,18 @@ static struct hwentry default_hw[] = {
+ 		.no_path_retry = 30,
+ 	},
+ 	{
++		.vendor        = "SUN",
++		.product       = "ArrayStorage",
++		.bl_product    = "Universal Xport",
++		.pgpolicy      = GROUP_BY_PRIO,
++		.checker_name  = RDAC,
++		.features      = "2 pg_init_retries 50",
++		.hwhandler     = "1 rdac",
++		.prio_name     = PRIO_RDAC,
++		.pgfailback    = -FAILBACK_IMMEDIATE,
++		.no_path_retry = 30,
++	},
++	{
+ 		/* ZFS Storage Appliances */
+ 		.vendor        = "SUN",
+ 		.product       = "(Sun Storage|ZFS Storage|COMSTAR)",
+-- 
+2.7.4
+

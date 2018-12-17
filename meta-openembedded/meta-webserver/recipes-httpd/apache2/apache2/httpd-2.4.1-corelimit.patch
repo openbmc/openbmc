@@ -1,15 +1,25 @@
+From 55ebb07cc57854cbfb372c3a688365039b809bc8 Mon Sep 17 00:00:00 2001
+From: Paul Eggleton <paul.eggleton@linux.intel.com>
+Date: Tue, 17 Jul 2012 11:27:39 +0100
+Subject: [PATCH] apache2: add from OE-Classic, update to version 2.4.2 and fix
 
 Bump up the core size limit if CoreDumpDirectory is
 configured.
 
-Upstream-Status: Pending 
+Upstream-Status: Pending
 
 Note: upstreaming was discussed but there are competing desires;
 	there are portability oddities here too.
 
---- httpd-2.4.1/server/core.c.corelimit
-+++ httpd-2.4.1/server/core.c
-@@ -4433,6 +4433,25 @@ static int core_post_config(apr_pool_t *
+---
+ server/core.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/server/core.c b/server/core.c
+index 4af0816..4fd2b9f 100644
+--- a/server/core.c
++++ b/server/core.c
+@@ -4940,6 +4940,25 @@ static int core_post_config(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *pte
      }
      apr_pool_cleanup_register(pconf, NULL, ap_mpm_end_gen_helper,
                                apr_pool_cleanup_null);

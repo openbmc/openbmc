@@ -1,0 +1,44 @@
+From 5bdbfe0a63fed48104b17412854b26ee2275869a Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 22 Aug 2018 16:54:39 +0800
+Subject: [PATCH] remove LOCK_NB to use blocking request
+
+While invoking mtools frequently, the unblocking request
+caused race issue. Here is an example of syslinux
+[snip]
+dd if=/dev/zero of=floppy.img bs=1024 count=144
+losetup /dev/loop1 floppy.img
+mkdosfs /dev/loop1
+syslinux -i /dev/loop1
+|plain floppy: device "/proc/6351/fd/3" busy (Resource temporarily unavailable):
+|Cannot initialize 'S:'
+|Bad target s:/ldlinux.sys
+[snip]
+
+The idea is from:
+https://bugzilla.redhat.com/show_bug.cgi?id=1235016
+https://groups.google.com/a/chromium.org/forum/#!msg/chromium-os-dev/bRPUCFHoBTQ/ZjB8kjjx1vUJ
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ lockdev.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lockdev.h b/lockdev.h
+index 4467bc2..5a135ad 100644
+--- a/lockdev.h
++++ b/lockdev.h
+@@ -43,7 +43,7 @@ int lock_dev(int fd, int mode, struct device *dev)
+ 		return 0;
+ 
+ #if (defined(HAVE_FLOCK) && defined (LOCK_EX) && defined(LOCK_NB))
+-	if (flock(fd, (mode ? LOCK_EX : LOCK_SH)|LOCK_NB) < 0)
++	if (flock(fd, (mode ? LOCK_EX : LOCK_SH)) < 0)
+ #else /* FLOCK */
+ 
+ #if (defined(HAVE_LOCKF) && defined(F_TLOCK))
+-- 
+2.7.4
+

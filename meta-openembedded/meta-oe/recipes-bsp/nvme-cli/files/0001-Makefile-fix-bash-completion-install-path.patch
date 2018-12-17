@@ -1,0 +1,33 @@
+From ef64032b34190079aab591c64a25f7535a977390 Mon Sep 17 00:00:00 2001
+From: Stefan Wiehler <stefan.wiehler@missinglinkelectronics.com>
+Date: Tue, 9 Oct 2018 11:26:34 +0200
+Subject: [PATCH] Makefile: fix bash completion install path
+
+Change path to bash-completion upstream recommendation used by most
+distributions.
+
+Upstream-Status: Accepted
+
+Signed-off-by: Stefan Wiehler <stefan.wiehler@missinglinkelectronics.com>
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index fa587dd..433bc41 100644
+--- a/Makefile
++++ b/Makefile
+@@ -69,8 +69,8 @@ install-bin: default
+ 	$(INSTALL) -m 755 nvme $(DESTDIR)$(SBINDIR)
+ 
+ install-bash-completion:
+-	$(INSTALL) -d $(DESTDIR)$(PREFIX)/share/bash_completion.d
+-	$(INSTALL) -m 644 -T ./completions/bash-nvme-completion.sh $(DESTDIR)$(PREFIX)/share/bash_completion.d/nvme
++	$(INSTALL) -d $(DESTDIR)$(PREFIX)/share/bash-completion/completions
++	$(INSTALL) -m 644 -T ./completions/bash-nvme-completion.sh $(DESTDIR)$(PREFIX)/share/bash-completion/completions/nvme
+ 
+ install: install-bin install-man install-bash-completion
+ 
+-- 
+1.9.1
+

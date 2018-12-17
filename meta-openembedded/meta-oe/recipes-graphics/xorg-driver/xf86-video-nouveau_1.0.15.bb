@@ -6,8 +6,8 @@ SUMMARY = "X.Org X server -- nouveau video driver"
 
 DESCRIPTION = "Open-source X.org graphics driver for NVIDIA graphics"
 
-DEPENDS += "virtual/libx11 libxvmc drm xf86driproto glproto \
-            virtual/libgl xineramaproto libpciaccess"
+DEPENDS += "virtual/libx11 libxvmc drm xorgproto \
+            virtual/libgl libpciaccess"
 RDEPENDS_${PN} += "xserver-xorg-module-exa"
 
 inherit distro_features_check

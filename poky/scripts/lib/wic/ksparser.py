@@ -141,6 +141,7 @@ class KickStart():
                                    'squashfs', 'vfat', 'msdos', 'swap'))
         part.add_argument('--mkfs-extraopts', default='')
         part.add_argument('--label')
+        part.add_argument('--use-label', action='store_true')
         part.add_argument('--no-table', action='store_true')
         part.add_argument('--ondisk', '--ondrive', dest='disk', default='sda')
         part.add_argument("--overhead-factor", type=overheadtype)
@@ -196,9 +197,18 @@ class KickStart():
                         raise KickStartError('%s:%d: %s' % \
                                              (confpath, lineno, err))
                     if line.startswith('part'):
-                        # SquashFS does not support UUID
-                        if parsed.fstype == 'squashfs' and parsed.use_uuid:
-                            err = "%s:%d: SquashFS does not support UUID" \
+                        # SquashFS does not support filesystem UUID
+                        if parsed.fstype == 'squashfs':
+                            if parsed.fsuuid:
+                                err = "%s:%d: SquashFS does not support UUID" \
+                                       % (confpath, lineno)
+                                raise KickStartError(err)
+                            if parsed.label:
+                                err = "%s:%d: SquashFS does not support LABEL" \
+                                       % (confpath, lineno)
+                                raise KickStartError(err)
+                        if parsed.use_label and not parsed.label:
+                            err = "%s:%d: Must set the label with --label" \
                                   % (confpath, lineno)
                             raise KickStartError(err)
                         # using ArgumentParser one cannot easily tell if option

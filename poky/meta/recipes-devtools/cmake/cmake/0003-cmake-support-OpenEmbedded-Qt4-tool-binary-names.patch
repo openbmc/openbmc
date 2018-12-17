@@ -1,0 +1,59 @@
+From c783ceeef485c23e13c3d9f0418719cb0e0b86ee Mon Sep 17 00:00:00 2001
+From: Otavio Salvador <otavio@ossystems.com.br>
+Date: Thu, 12 May 2011 15:36:03 +0000
+Subject: [PATCH 3/5] cmake: support OpenEmbedded Qt4 tool binary names
+Organization: O.S. Systems Software LTDA.
+
+The FindQt4 module looks for Qt4 binaries to be able to gather the
+paths used for compilation and also to be using during other processes
+(translation update, translation binary generating and like) however
+OpenEmbedded has renamed those to allow old QMake to be used in
+parallel with the current one. This patch adds support for the
+OpenEmbedded specific binary names.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+
+The patch was slightly adapted in order to match cmake 3.2.2:
+Instead of find_program, _find_qt4_program is now used.
+
+Signed-off-by: Moritz Blume <moritz.blume@bmw-carit.de>
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+---
+ Modules/FindQt4.cmake | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/Modules/FindQt4.cmake b/Modules/FindQt4.cmake
+index 847a798af..7ad981879 100644
+--- a/Modules/FindQt4.cmake
++++ b/Modules/FindQt4.cmake
+@@ -517,7 +517,7 @@ endfunction()
+ 
+ set(QT4_INSTALLED_VERSION_TOO_OLD FALSE)
+ 
+-set(_QT4_QMAKE_NAMES qmake qmake4 qmake-qt4 qmake-mac)
++set(_QT4_QMAKE_NAMES qmake qmake2 qmake4 qmake-qt4 qmake-mac)
+ _qt4_find_qmake("${_QT4_QMAKE_NAMES}" QT_QMAKE_EXECUTABLE QTVERSION)
+ 
+ if (QT_QMAKE_EXECUTABLE AND
+@@ -1135,12 +1135,12 @@ if (QT_QMAKE_EXECUTABLE AND
+   _find_qt4_program(QT_MOC_EXECUTABLE Qt4::moc moc-qt4 moc4 moc)
+   _find_qt4_program(QT_UIC_EXECUTABLE Qt4::uic uic-qt4 uic4 uic)
+   _find_qt4_program(QT_UIC3_EXECUTABLE Qt4::uic3 uic3)
+-  _find_qt4_program(QT_RCC_EXECUTABLE Qt4::rcc rcc)
+-  _find_qt4_program(QT_DBUSCPP2XML_EXECUTABLE Qt4::qdbuscpp2xml qdbuscpp2xml)
+-  _find_qt4_program(QT_DBUSXML2CPP_EXECUTABLE Qt4::qdbusxml2cpp qdbusxml2cpp)
++  _find_qt4_program(QT_RCC_EXECUTABLE Qt4::rcc rcc4 rcc)
++  _find_qt4_program(QT_DBUSCPP2XML_EXECUTABLE Qt4::qdbuscpp2xml qdbuscpp2xml4 qdbuscpp2xml)
++  _find_qt4_program(QT_DBUSXML2CPP_EXECUTABLE Qt4::qdbusxml2cpp qdbusxml2cpp4 qdbusxml2cpp)
+   _find_qt4_program(QT_LUPDATE_EXECUTABLE Qt4::lupdate lupdate-qt4 lupdate4 lupdate)
+   _find_qt4_program(QT_LRELEASE_EXECUTABLE Qt4::lrelease lrelease-qt4 lrelease4 lrelease)
+-  _find_qt4_program(QT_QCOLLECTIONGENERATOR_EXECUTABLE Qt4::qcollectiongenerator qcollectiongenerator-qt4 qcollectiongenerator)
++  _find_qt4_program(QT_QCOLLECTIONGENERATOR_EXECUTABLE Qt4::qcollectiongenerator qcollectiongenerator-qt4 qcollectiongenerator qcollectiongenerator4)
+   _find_qt4_program(QT_DESIGNER_EXECUTABLE Qt4::designer designer-qt4 designer4 designer)
+   _find_qt4_program(QT_LINGUIST_EXECUTABLE Qt4::linguist linguist-qt4 linguist4 linguist)
+ 
+-- 
+2.18.0
+

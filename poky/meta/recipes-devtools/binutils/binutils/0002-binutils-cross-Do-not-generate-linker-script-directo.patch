@@ -1,4 +1,4 @@
-From 58ddf38fa53abb48b69dd76e398c73451ad1a5eb Mon Sep 17 00:00:00 2001
+From 6e78b1c88c040a742b7af82542ac7eb92eddda3d Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 6 Mar 2017 23:37:05 -0800
 Subject: [PATCH 02/15] binutils-cross: Do not generate linker script
@@ -19,14 +19,14 @@ RP 2017/01/30
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- ld/genscripts.sh | 23 -----------------------
- 1 file changed, 23 deletions(-)
+ ld/genscripts.sh | 25 -------------------------
+ 1 file changed, 25 deletions(-)
 
 diff --git a/ld/genscripts.sh b/ld/genscripts.sh
-index 1f257e99ca..1583b73a2b 100755
+index a5c367aa8f..6cc9eed976 100755
 --- a/ld/genscripts.sh
 +++ b/ld/genscripts.sh
-@@ -189,29 +189,6 @@ append_to_lib_path()
+@@ -189,31 +189,6 @@ append_to_lib_path()
    fi
  }
  
@@ -44,10 +44,12 @@ index 1f257e99ca..1583b73a2b 100755
 -    # because 64bit libraries may be in both places, depending on
 -    # cross-development setup method (e.g.: /usr/s390x-linux/lib64
 -    # vs. /usr/s390-linux/lib64)
--    case "${NATIVE}:${LIBPATH_SUFFIX}:${TOOL_LIB}" in
--      :* | *::* | *:*:*${LIBPATH_SUFFIX}) ;;
--      *) libs="${exec_prefix}/${target_alias}/lib${LIBPATH_SUFFIX}" ;;
--    esac
+-    for libpath_suffix in ${LIBPATH_SUFFIX}; do
+-      case "${NATIVE}:${libpath_suffix}:${TOOL_LIB}" in
+-	:* | *::* | *:*:*${libpath_suffix}) ;;
+-	*) libs="${exec_prefix}/${target_alias}/lib${libpath_suffix}" ;;
+-      esac
+-    done
 -    libs="${exec_prefix}/${TOOL_LIB}/lib ${libs}"
 -  fi
 -  append_to_lib_path ${libs}
@@ -57,5 +59,5 @@ index 1f257e99ca..1583b73a2b 100755
    libs=${NATIVE_LIB_DIRS}
    if [ "x${NATIVE}" = "xyes" ] ; then
 -- 
-2.16.1
+2.18.0
 

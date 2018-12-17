@@ -1,0 +1,16 @@
+--- ntp-4.2.8p12.original/scripts/build/mkver.in	2018-11-12 14:06:49.333020430 +1300
++++ ntp-4.2.8p12/scripts/build/mkver.in	2018-11-12 14:15:04.947480167 +1300
+@@ -15,7 +15,12 @@
+  *) ConfStr="${ConfStr}-@VER_SUFFIX@" ;;
+ esac
+ 
+-ConfStr="$ConfStr `LC_TIME=C TZ=UTC date`"
++if [ -n "$SOURCE_DATE_EPOCH" ]; then
++   ConfStr="$ConfStr `LC_TIME=C TZ=UTC date -d@$SOURCE_DATE_EPOCH 2>/dev/null`" ||
++   ConfStr="$ConfStr `LC_TIME=C TZ=UTC date -r $SOURCE_DATE_EPOCH`"
++else
++   ConfStr="$ConfStr `LC_TIME=C TZ=UTC date`"
++fi
+ 
+ if [ ! -f .version ]; then
+   echo 0 > .version

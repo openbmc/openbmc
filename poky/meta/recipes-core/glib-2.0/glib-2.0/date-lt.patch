@@ -1,0 +1,20 @@
+Update Lithuanian month names in the test suite as glibc changed the translations.
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/glib/merge_requests/373]
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/glib/tests/date.c b/glib/tests/date.c
+index b801ca704..6646c227c 100644
+--- a/glib/tests/date.c
++++ b/glib/tests/date.c
+@@ -365,8 +365,8 @@ test_month_names (void)
+       TEST_DATE ( 1,  4, 2018,      "%Y m. %OB",      "2018 m. balandis");
+       TEST_DATE ( 1,  5, 2018,      "%Y m. %OB",        "2018 m. gegužė");
+       TEST_DATE ( 1,  6, 2018,      "%Y m. %OB",      "2018 m. birželis");
+-      TEST_DATE (17,  7, 2018, "%Y m. %b %e d.",     "2018 m. Lie 17 d.");
+-      TEST_DATE ( 1,  8, 2018,      "%Y m. %Ob",           "2018 m. Rgp");
++      TEST_DATE (17,  7, 2018, "%Y m. %b %e d.",   "2018 m. Liep. 17 d.");
++      TEST_DATE ( 1,  8, 2018,      "%Y m. %Ob",         "2018 m. rugp.");
+     }
+   else
+     g_test_skip ("locale lt_LT not available, skipping Lithuanian month names test");

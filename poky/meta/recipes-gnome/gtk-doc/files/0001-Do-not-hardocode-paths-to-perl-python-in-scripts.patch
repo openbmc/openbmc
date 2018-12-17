@@ -1,7 +1,7 @@
-From 928102874bc2339a1d57c6b178877e0c6002cb3a Mon Sep 17 00:00:00 2001
+From 80e6aff72affa6d92f5abd7ff6353dfc4a7bff38 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 31 Aug 2016 16:44:46 +0300
-Subject: [PATCH 1/3] Do not hardocode paths to perl/python in scripts.
+Subject: [PATCH] Do not hardocode paths to perl/python in scripts.
 
 Doing so when the interpreters are somewhere deep in a sysroot directory
 can reach the shebang line limit, and resulting scripts wouldn't work
@@ -35,7 +35,7 @@ index 8c8e917..f6a25f6 100755
  #
  # gtk-doc - GTK DocBook documentation generator.
 diff --git a/gtkdoc-depscan.in b/gtkdoc-depscan.in
-index 9bfaf30..aadc952 100644
+index 9bfaf30..aadc952 100755
 --- a/gtkdoc-depscan.in
 +++ b/gtkdoc-depscan.in
 @@ -1,4 +1,4 @@
@@ -45,7 +45,7 @@ index 9bfaf30..aadc952 100644
  from __future__ import print_function
  
 diff --git a/gtkdoc-fixxref.in b/gtkdoc-fixxref.in
-index 0ea02d4..bdd443a 100755
+index 44f6bd1..26fbd93 100755
 --- a/gtkdoc-fixxref.in
 +++ b/gtkdoc-fixxref.in
 @@ -1,4 +1,4 @@
@@ -65,7 +65,7 @@ index 42d5731..3a56d56 100755
  #
  # gtk-doc - GTK DocBook documentation generator.
 diff --git a/gtkdoc-mkhtml.in b/gtkdoc-mkhtml.in
-index 0d0a15d..914ff55 100644
+index 0d0a15d..914ff55 100755
 --- a/gtkdoc-mkhtml.in
 +++ b/gtkdoc-mkhtml.in
 @@ -1,4 +1,4 @@
@@ -75,7 +75,7 @@ index 0d0a15d..914ff55 100644
  #
  # gtk-doc - GTK DocBook documentation generator.
 diff --git a/gtkdoc-mkman.in b/gtkdoc-mkman.in
-index c5445cd..65db71a 100644
+index c5445cd..65db71a 100755
 --- a/gtkdoc-mkman.in
 +++ b/gtkdoc-mkman.in
 @@ -1,4 +1,4 @@
@@ -115,7 +115,7 @@ index 954c811..f461504 100755
  #
  # gtk-doc - GTK DocBook documentation generator.
 diff --git a/gtkdoc-scangobj.in b/gtkdoc-scangobj.in
-index 4cbe130..52c2c24 100644
+index 4cbe130..52c2c24 100755
 --- a/gtkdoc-scangobj.in
 +++ b/gtkdoc-scangobj.in
 @@ -1,4 +1,4 @@
@@ -125,18 +125,15 @@ index 4cbe130..52c2c24 100644
  #
  # gtk-doc - GTK DocBook documentation generator.
 diff --git a/tests/tools.sh.in b/tests/tools.sh.in
-index 4d301d0..565fc1e 100644
+index 343844a..9dc6692 100644
 --- a/tests/tools.sh.in
 +++ b/tests/tools.sh.in
-@@ -31,7 +31,7 @@ done
- # TODO: test python 2 and 3 (python3 -mcompileall gtkdoc/*.py)
- for file in gtkdoc-check gtkdoc-depscan gtkdoc-fixxref gtkdoc-mkdb gtkdoc-mkhtml gtkdoc-mkman gtkdoc-mkpdf gtkdoc-rebase gtkdoc-scangobj; do
+@@ -30,7 +30,7 @@ done
+ # TODO: also test the module files
+ for file in gtkdoc-check gtkdoc-depscan gtkdoc-fixxref gtkdoc-mkdb gtkdoc-mkhtml gtkdoc-mkhtml2 gtkdoc-mkman gtkdoc-mkpdf gtkdoc-rebase gtkdoc-scangobj; do
      fullfile=`which $file`
 -    @PYTHON@ -m py_compile $fullfile
 +    python3 -m py_compile $fullfile
      if test $? != 0 ; then failed=`expr $failed + 1`; fi
      tested=`expr $tested + 1`
  done
--- 
-2.14.1
-

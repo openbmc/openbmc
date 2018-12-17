@@ -1,0 +1,28 @@
+From b11109ecc41110c518a98b6ac39611ff86477021 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 23 Oct 2017 12:33:22 -0700
+Subject: [PATCH 15/19] test-hexdecoct.c: Include missing.h for strndupa
+
+Upstream-Status: Inappropriate [musl specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/test/test-hexdecoct.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/test/test-hexdecoct.c b/src/test/test-hexdecoct.c
+index da9f3008b..7ff2dfe0c 100644
+--- a/src/test/test-hexdecoct.c
++++ b/src/test/test-hexdecoct.c
+@@ -6,6 +6,7 @@
+ #include "hexdecoct.h"
+ #include "macro.h"
+ #include "string-util.h"
++#include "missing.h"
+ 
+ static void test_hexchar(void) {
+         assert_se(hexchar(0xa) == 'a');
+-- 
+2.11.0
+

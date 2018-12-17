@@ -1,0 +1,40 @@
+From 2b6bdb860ef53975c7e866f393b61d253c00754d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Mon, 22 Jan 2018 15:52:09 +0100
+Subject: [PATCH] Fix build after update of xfconf
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+xfconf stopped using dbus-glib so required flags must be included here
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ src/Makefile.am | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 36a31dc..3dd56bc 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -30,6 +30,7 @@ ristretto_CFLAGS = \
+ 	$(GIO_UNIX_CFLAGS) \
+ 	$(LIBEXIF_CFLAGS) \
+ 	$(XFCONF_CFLAGS) \
++	$(DBUS_GLIB_CFLAGS) \
+ 	$(EXO_CFLAGS) \
+ 	$(CAIRO_CFLAGS) \
+ 	$(LIBXFCE4UTIL_CFLAGS) \
+@@ -48,6 +49,7 @@ ristretto_LDADD = \
+ 	$(GIO_UNIX_LIBS) \
+ 	$(LIBEXIF_LIBS) \
+ 	$(XFCONF_LIBS) \
++	$(DBUS_GLIB_LIBS) \
+ 	$(EXO_LIBS) \
+ 	$(CAIRO_LIBS) \
+ 	$(LIBXFCE4UTIL_LIBS) \
+-- 
+2.14.3
+

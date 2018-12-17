@@ -1,0 +1,79 @@
+From 5746b68ba9dda87586b3ac88fe84031cbc0015f7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 11 May 2018 12:20:03 -0700
+Subject: [PATCH] Link with libtirpc
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ configure                 | 2 +-
+ rpc.rusersd/rusers_proc.c | 7 +------
+ rpc.rusersd/rusersd.c     | 6 +-----
+ rup/rup.c                 | 2 +-
+ 4 files changed, 4 insertions(+), 13 deletions(-)
+
+diff --git a/configure b/configure
+index 85f6ca6..2d2d4b7 100755
+--- a/configure
++++ b/configure
+@@ -147,7 +147,7 @@ else
+ fi
+ 
+ LDFLAGS=
+-LIBS=
++LIBS="-ltirpc"
+ 
+ rm -f __conftest*
+ 
+diff --git a/rpc.rusersd/rusers_proc.c b/rpc.rusersd/rusers_proc.c
+index 9ae6306..f9e237c 100644
+--- a/rpc.rusersd/rusers_proc.c
++++ b/rpc.rusersd/rusers_proc.c
+@@ -57,12 +57,7 @@ char rp_rcsid[] =
+ 	#define RUT_TIME ut_time
+ #endif
+ 
+-/* Glibc strikes again */
+-#ifdef __GLIBC__
+-	#include <rpcsvc/rusers.h>
+-#else
+-	#include "rusers.h"
+-#endif 
++#include "rusers.h"
+ 
+ void rusers_service(struct svc_req *rqstp, SVCXPRT *transp);
+ 
+diff --git a/rpc.rusersd/rusersd.c b/rpc.rusersd/rusersd.c
+index 762be9b..dd355ac 100644
+--- a/rpc.rusersd/rusersd.c
++++ b/rpc.rusersd/rusersd.c
+@@ -38,11 +38,7 @@ char rusersd_rcsid[] =
+ #include <rpc/pmap_clnt.h>
+ #include <unistd.h>
+ #include <grp.h>
+-#ifdef __GLIBC__
+-	#include <rpcsvc/rusers.h>
+-#else
+-	#include "rusers.h"
+-#endif
++#include "rusers.h"
+ 
+ #include "../version.h"
+ 
+diff --git a/rup/rup.c b/rup/rup.c
+index e5669ff..887f89d 100644
+--- a/rup/rup.c
++++ b/rup/rup.c
+@@ -48,7 +48,7 @@ char rcsid[] = "$Id: rup.c,v 1.8 2000/07/22 19:51:40 dholland Exp $";
+ 
+ #undef FSHIFT			/* Use protocol's shift and scale values */
+ #undef FSCALE
+-#include <rpcsvc/rstat.h>
++#include "rstat.h"
+ 
+ #include "../version.h"
+ 
+-- 
+2.17.0
+

@@ -1,4 +1,4 @@
-From 622d66634eb2e509d4126f5bdcab26de367241a1 Mon Sep 17 00:00:00 2001
+From ca25d55cef8398bad508c2b2be29aea5aa3c4d26 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:39:01 +0000
 Subject: [PATCH 08/15] don't let the distro compiler point to the wrong
@@ -31,5 +31,5 @@ index ed1b334c36..d4ffd8b57b 100644
  	if test -n "${target_header_dir}"; then \
  		${mkinstalldirs} $(DESTDIR)$(libdir)/$(MULTIOSDIR); \
 -- 
-2.16.1
+2.18.0
 

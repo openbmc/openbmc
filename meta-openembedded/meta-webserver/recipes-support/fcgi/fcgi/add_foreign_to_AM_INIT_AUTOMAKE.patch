@@ -10,8 +10,8 @@ Signed-off-by: Yang Haibo <b40869@freescale.com>
  dnl     to configure the system for the local environment.
  
 -AC_INIT
--AM_INIT_AUTOMAKE(fcgi, 2.4.0)
-+AC_INIT([fcgi], [2.4.0])
+-AM_INIT_AUTOMAKE(fcgi, 2.4.1-SNAP-0910052249)
++AC_INIT([fcgi], [2.4.1-SNAP-0910052249])
 +AM_INIT_AUTOMAKE([foreign])
  
  AM_CONFIG_HEADER(fcgi_config.h)

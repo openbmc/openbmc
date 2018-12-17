@@ -7,7 +7,13 @@ INC_PR = "r1"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=f257cc14f81685691652a3d3e1b5d754"
 
-SRC_URI = "http://www.python.org/ftp/python/${PV}/Python-${PV}.tar.xz"
+SRC_URI = "http://www.python.org/ftp/python/${PV}/Python-${PV}.tar.xz \
+           file://0001-bpo-33570-TLS-1.3-ciphers-for-OpenSSL-1.1.1-GH-6976-.patch \
+           file://0002-bpo-34818-Add-missing-closing-wrapper-in-test_tls1_3.patch \
+           file://0003-bpo-34834-Fix-test_ssl.test_options-to-account-for-O.patch \
+           file://0004-bpo-34836-fix-test_default_ecdh_curve-needs-no-tlsv1.patch \
+           file://0001-bpo-33354-Fix-test_ssl-when-a-filename-cannot-be-enc.patch \
+           "
 
 SRC_URI[md5sum] = "a80ae3cc478460b922242f43a1b4094d"
 SRC_URI[sha256sum] = "22d9b1ac5b26135ad2b8c2901a9413537e08749a753356ee913c84dbd2df5574"
@@ -32,6 +38,12 @@ EXTRA_OECONF = "\
   ac_cv_header_bluetooth_bluetooth_h=no ac_cv_header_bluetooth_h=no \
   ${PYTHONLSBOPTS} \
 "
+
+do_configure_prepend() {
+	libdirleaf="$(echo ${libdir} | sed -e 's:${prefix}/::')"
+	sed -i -e "s:SEDMELIBLEAF:${libdirleaf}:g" \
+		${S}/configure.ac
+}
 
 do_install_append () {
 	sed -i -e 's:${HOSTTOOLS_DIR}/install:install:g' \

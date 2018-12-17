@@ -1,0 +1,204 @@
+From 9815bd97561c778ee0bc0c17f245e88e66570111 Mon Sep 17 00:00:00 2001
+From: sandra <sandra@138bc75d-0d04-0410-961f-82ee72b054a4>
+Date: Wed, 1 Nov 2017 02:14:19 +0000
+Subject: [PATCH] 2017-10-31  Sandra Loosemore  <sandra@codesourcery.com>
+
+	gcc/
+	* configure.ac (--enable-libssp): New.
+	(gcc_cv_libc_provides_ssp): Check for explicit setting before
+	trying to determine target-specific default.  Adjust indentation.
+	* configure: Regenerated.
+	* doc/install.texi (Configuration): Expand --disable-libssp
+	documentation.
+
+
+git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/trunk@254288 138bc75d-0d04-0410-961f-82ee72b054a4
+---
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Backport [https://patchwork.ozlabs.org/patch/823049/]
+
+ gcc/ChangeLog        |  9 +++++++++
+ gcc/configure        | 26 +++++++++++++++++++++++---
+ gcc/configure.ac     | 24 ++++++++++++++++++++----
+ gcc/doc/install.texi |  3 ++-
+ 4 files changed, 54 insertions(+), 8 deletions(-)
+
+Index: gcc-7.3.0/gcc/configure.ac
+===================================================================
+--- gcc-7.3.0.orig/gcc/configure.ac
++++ gcc-7.3.0/gcc/configure.ac
+@@ -5719,10 +5719,25 @@ if test x$gcc_cv_solaris_crts = xyes; th
+   	    [Define if the system-provided CRTs are present on Solaris.])
+ fi
+ 
++AC_ARG_ENABLE(libssp,
++[AS_HELP_STRING([--enable-libssp], [enable linking against libssp])],
++[case "${enableval}" in
++  yes|no)
++    ;;
++  *)
++    AC_MSG_ERROR([unknown libssp setting $enableval])
++    ;;
++esac], [])
++
+ # Test for stack protector support in target C library.
+ AC_CACHE_CHECK(__stack_chk_fail in target C library,
+-      gcc_cv_libc_provides_ssp,
+-      [gcc_cv_libc_provides_ssp=no
++  gcc_cv_libc_provides_ssp,
++  [gcc_cv_libc_provides_ssp=no
++  if test "x$enable_libssp" = "xno"; then
++    gcc_cv_libc_provides_ssp=yes
++  elif test "x$enable_libssp" = "xyes"; then
++    gcc_cv_libc_provides_ssp=no
++  else
+     case "$target" in
+        *-*-musl*)
+ 	 # All versions of musl provide stack protector
+@@ -5759,8 +5774,9 @@ AC_CACHE_CHECK(__stack_chk_fail in targe
+ 	 AC_CHECK_FUNC(__stack_chk_fail,[gcc_cv_libc_provides_ssp=yes],
+            [echo "no __stack_chk_fail on this target"])
+         ;;
+-  *) gcc_cv_libc_provides_ssp=no ;;
+-    esac])
++       *) gcc_cv_libc_provides_ssp=no ;;
++    esac
++  fi])
+ 
+ if test x$gcc_cv_libc_provides_ssp = xyes; then
+   AC_DEFINE(TARGET_LIBC_PROVIDES_SSP, 1,
+Index: gcc-7.3.0/gcc/doc/install.texi
+===================================================================
+--- gcc-7.3.0.orig/gcc/doc/install.texi
++++ gcc-7.3.0/gcc/doc/install.texi
+@@ -1658,7 +1658,8 @@ not be built.
+ 
+ @item --disable-libssp
+ Specify that the run-time libraries for stack smashing protection
+-should not be built.
++should not be built or linked against.  On many targets library support
++is provided by the C library instead.
+ 
+ @item --disable-libquadmath
+ Specify that the GCC quad-precision math library should not be built.
+Index: gcc-7.3.0/gcc/configure
+===================================================================
+--- gcc-7.3.0.orig/gcc/configure
++++ gcc-7.3.0/gcc/configure
+@@ -940,6 +940,7 @@ enable_fix_cortex_a53_843419
+ with_glibc_version
+ enable_gnu_unique_object
+ enable_linker_build_id
++enable_libssp
+ enable_default_ssp
+ with_long_double_128
+ with_gc
+@@ -1679,6 +1680,7 @@ Optional Features:
+                           extension on glibc systems
+   --enable-linker-build-id
+                           compiler will always pass --build-id to linker
++  --enable-libssp         enable linking against libssp
+   --enable-default-ssp    enable Stack Smashing Protection as default
+   --enable-maintainer-mode
+                           enable make rules and dependencies not useful (and
+@@ -18450,7 +18452,7 @@ else
+   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
+   lt_status=$lt_dlunknown
+   cat > conftest.$ac_ext <<_LT_EOF
+-#line 18436 "configure"
++#line 18455 "configure"
+ #include "confdefs.h"
+ 
+ #if HAVE_DLFCN_H
+@@ -18556,7 +18558,7 @@ else
+   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
+   lt_status=$lt_dlunknown
+   cat > conftest.$ac_ext <<_LT_EOF
+-#line 18542 "configure"
++#line 18561 "configure"
+ #include "confdefs.h"
+ 
+ #if HAVE_DLFCN_H
+@@ -25234,6 +25236,7 @@ $as_echo "#define HAVE_AS_SPARC5_VIS4 1"
+ 
+ fi
+ 
++
+     { $as_echo "$as_me:${as_lineno-$LINENO}: checking assembler for SPARC6 instructions" >&5
+ $as_echo_n "checking assembler for SPARC6 instructions... " >&6; }
+ if test "${gcc_cv_as_sparc_sparc6+set}" = set; then :
+@@ -25270,6 +25273,7 @@ $as_echo "#define HAVE_AS_SPARC6 1" >>co
+ 
+ fi
+ 
++
+     { $as_echo "$as_me:${as_lineno-$LINENO}: checking assembler for LEON instructions" >&5
+ $as_echo_n "checking assembler for LEON instructions... " >&6; }
+ if test "${gcc_cv_as_sparc_leon+set}" = set; then :
+@@ -28947,6 +28951,18 @@ $as_echo "#define HAVE_SOLARIS_CRTS 1" >
+ 
+ fi
+ 
++# Check whether --enable-libssp was given.
++if test "${enable_libssp+set}" = set; then :
++  enableval=$enable_libssp; case "${enableval}" in
++  yes|no)
++    ;;
++  *)
++    as_fn_error "unknown libssp setting $enableval" "$LINENO" 5
++    ;;
++esac
++fi
++
++
+ # Test for stack protector support in target C library.
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking __stack_chk_fail in target C library" >&5
+ $as_echo_n "checking __stack_chk_fail in target C library... " >&6; }
+@@ -28954,6 +28970,11 @@ if test "${gcc_cv_libc_provides_ssp+set}
+   $as_echo_n "(cached) " >&6
+ else
+   gcc_cv_libc_provides_ssp=no
++  if test "x$enable_libssp" = "xno"; then
++    gcc_cv_libc_provides_ssp=yes
++  elif test "x$enable_libssp" = "xyes"; then
++    gcc_cv_libc_provides_ssp=no
++  else
+     case "$target" in
+        *-*-musl*)
+ 	 # All versions of musl provide stack protector
+@@ -29001,8 +29022,9 @@ else
+ fi
+ 
+         ;;
+-  *) gcc_cv_libc_provides_ssp=no ;;
++       *) gcc_cv_libc_provides_ssp=no ;;
+     esac
++  fi
+ fi
+ { $as_echo "$as_me:${as_lineno-$LINENO}: result: $gcc_cv_libc_provides_ssp" >&5
+ $as_echo "$gcc_cv_libc_provides_ssp" >&6; }
+@@ -29037,18 +29059,15 @@ fi
+ 
+ 
+ # Test for <sys/sdt.h> on the target.
+-
+-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking sys/sdt.h in the target C library" >&5
+-$as_echo_n "checking sys/sdt.h in the target C library... " >&6; }
+-have_sys_sdt_h=no
++#GCC_TARGET_TEMPLATE([HAVE_SYS_SDT_H])
++#AC_MSG_CHECKING(sys/sdt.h in the target C library)
++#have_sys_sdt_h=no
+ #if test -f $target_header_dir/sys/sdt.h; then
+ #  have_sys_sdt_h=yes
+-#
+-#$as_echo "#define HAVE_SYS_SDT_H 1" >>confdefs.h
+-#
++#  AC_DEFINE(HAVE_SYS_SDT_H, 1,
++#            [Define if your target C library provides sys/sdt.h])
+ #fi
+-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $have_sys_sdt_h" >&5
+-$as_echo "$have_sys_sdt_h" >&6; }
++#AC_MSG_RESULT($have_sys_sdt_h)
+ 
+ # Check if TFmode long double should be used by default or not.
+ # Some glibc targets used DFmode long double, but with glibc 2.4

@@ -1,0 +1,40 @@
+From a4ed38e95cbe07f02028249b8b315565a5ac1e43 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 5 May 2018 22:32:45 -0700
+Subject: [PATCH] nautilus: drop gnome-desktop thumbnail API with new
+ gdk-pixbuf
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+If gdk-pixbuf >= 2.36.5 is available, its scaling API can do what we
+want, so we don’t need to use the deprecated gnome-desktop one.
+
+Also fixes compile errors seen on master
+nautilus-properties-window.c:5101: undefined reference to `gnome_desktop_thumbnail_scale_down_pixbuf'
+
+Upstream-Status: Backport
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/nautilus-properties-window.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/nautilus-properties-window.c b/src/nautilus-properties-window.c
+index dea8b0f..fad9bd1 100644
+--- a/src/nautilus-properties-window.c
++++ b/src/nautilus-properties-window.c
+@@ -5098,10 +5098,11 @@ update_preview_callback (GtkFileChooser *icon_chooser,
+ 			scale = (double)gdk_pixbuf_get_height (pixbuf) /
+ 				gdk_pixbuf_get_width (pixbuf);
+ 
+-			scaled_pixbuf = gnome_desktop_thumbnail_scale_down_pixbuf
++			scaled_pixbuf = gdk_pixbuf_scale_simple
+ 				(pixbuf,
+ 				 PREVIEW_IMAGE_WIDTH,
+-				 scale * PREVIEW_IMAGE_WIDTH);
++				 scale * PREVIEW_IMAGE_WIDTH,
++				 GDK_INTERP_HYPER);
+ 			g_object_unref (pixbuf);
+ 			pixbuf = scaled_pixbuf;
+ 		}

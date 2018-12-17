@@ -1,7 +1,7 @@
-From 8e9bf962a45a82f1c2eb5858e29fa89a3a60b564 Mon Sep 17 00:00:00 2001
+From 2279e30be5796e9b185545543ea54fe68633cbdd Mon Sep 17 00:00:00 2001
 From: Alexey Firago <alexey_firago@mentor.com>
 Date: Mon, 30 Oct 2017 23:24:49 +0300
-Subject: [PATCH 1/4] CMakeLists.txt: Fix libraries installation for Linux
+Subject: [PATCH] CMakeLists.txt: Fix libraries installation for Linux
 
 * Set libs versions as in Makefile
 
@@ -9,21 +9,19 @@ Signed-off-by: Alexey Firago <alexey_firago@mentor.com>
 
 %% original patch: 0001-CMakeLists.txt-Fix-libraries-installation-for-Linux.patch
 ---
- CMakeLists.txt                        | 55 +++++++++++++++++++++++++++++++++++
- CMakeLists.txt => CMakeLists.txt.orig |  0
- 2 files changed, 55 insertions(+)
- copy CMakeLists.txt => CMakeLists.txt.orig (100%)
+ CMakeLists.txt | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 59 insertions(+)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index b1a49df..13e64ac 100644
+index a59fd818e3..5066f44a32 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -30,6 +30,15 @@ set(PACKAGE_TARNAME   "${PACKAGE_NAME}-${PACKAGE_VERSION}")
  set(PACKAGE_BUGREPORT "https://github.com/grpc/grpc/issues/")
  project(${PACKAGE_NAME} C CXX)
  
-+set (CORE_VERSION_MAJOR "4")
-+set (CORE_VERSION "4.0.0")
++set (CORE_VERSION_MAJOR "6")
++set (CORE_VERSION "6.0.0")
 +
 +set (CPP_VERSION_MAJOR "1")
 +set (CPP_VERSION "${PACKAGE_VERSION}")
@@ -31,10 +29,21 @@ index b1a49df..13e64ac 100644
 +set (CSHARP_VERSION_MAJOR "1")
 +set (CSHARP_VERSION "${PACKAGE_VERSION}")
 +
- set(gRPC_INSTALL_BINDIR "${CMAKE_INSTALL_PREFIX}/bin" CACHE PATH "Installation directory for executables")
- set(gRPC_INSTALL_LIBDIR "${CMAKE_INSTALL_PREFIX}/lib" CACHE PATH "Installation directory for libraries")
- set(gRPC_INSTALL_INCLUDEDIR "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH "Installation directory for headers")
-@@ -841,6 +850,10 @@ if(WIN32 AND MSVC)
+ set(gRPC_INSTALL_BINDIR "bin" CACHE STRING "Installation directory for executables")
+ set(gRPC_INSTALL_LIBDIR "lib" CACHE STRING "Installation directory for libraries")
+ set(gRPC_INSTALL_INCLUDEDIR "include" CACHE STRING "Installation directory for headers")
+@@ -702,6 +711,10 @@ if(WIN32 AND MSVC)
+   endif()
+ endif()
+ 
++if(_gRPC_PLATFORM_LINUX)
++  set_property(TARGET address_sorting PROPERTY VERSION ${CORE_VERSION})
++  set_property(TARGET address_sorting PROPERTY SOVERSION ${CORE_VERSION_MAJOR})
++endif()
+ 
+ target_include_directories(address_sorting
+   PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+@@ -825,6 +838,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -45,7 +54,7 @@ index b1a49df..13e64ac 100644
  
  target_include_directories(gpr
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -1221,6 +1234,10 @@ if(WIN32 AND MSVC)
+@@ -1259,6 +1276,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -56,7 +65,7 @@ index b1a49df..13e64ac 100644
  
  target_include_directories(grpc
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -1535,6 +1552,10 @@ if(WIN32 AND MSVC)
+@@ -1633,6 +1654,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -67,7 +76,7 @@ index b1a49df..13e64ac 100644
  
  target_include_directories(grpc_cronet
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -2377,6 +2398,10 @@ if(WIN32 AND MSVC)
+@@ -2575,6 +2600,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -78,7 +87,7 @@ index b1a49df..13e64ac 100644
  
  target_include_directories(grpc_unsecure
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -2592,6 +2617,10 @@ if(WIN32 AND MSVC)
+@@ -2791,6 +2820,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -89,7 +98,7 @@ index b1a49df..13e64ac 100644
  
  target_include_directories(grpc++
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -3078,6 +3107,10 @@ if(WIN32 AND MSVC)
+@@ -3357,6 +3390,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -100,7 +109,7 @@ index b1a49df..13e64ac 100644
  
  target_include_directories(grpc++_cronet
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -3282,6 +3315,11 @@ protobuf_generate_grpc_cpp(
+@@ -3630,6 +3667,11 @@ protobuf_generate_grpc_cpp(
    src/proto/grpc/status/status.proto
  )
  
@@ -112,7 +121,7 @@ index b1a49df..13e64ac 100644
  target_include_directories(grpc++_error_details
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
-@@ -3408,6 +3446,11 @@ protobuf_generate_grpc_cpp(
+@@ -3762,6 +3804,11 @@ protobuf_generate_grpc_cpp(
    src/proto/grpc/reflection/v1alpha/reflection.proto
  )
  
@@ -124,7 +133,7 @@ index b1a49df..13e64ac 100644
  target_include_directories(grpc++_reflection
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
-@@ -3827,6 +3870,10 @@ if(WIN32 AND MSVC)
+@@ -4265,6 +4312,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -135,7 +144,7 @@ index b1a49df..13e64ac 100644
  
  target_include_directories(grpc++_unsecure
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -4140,6 +4187,10 @@ if(WIN32 AND MSVC)
+@@ -4649,6 +4700,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -146,7 +155,7 @@ index b1a49df..13e64ac 100644
  
  target_include_directories(grpc_plugin_support
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -4649,6 +4700,10 @@ if(WIN32 AND MSVC)
+@@ -5184,6 +5239,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -157,10 +166,6 @@ index b1a49df..13e64ac 100644
  
  target_include_directories(grpc_csharp_ext
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-diff --git a/CMakeLists.txt b/CMakeLists.txt.orig
-similarity index 100%
-copy from CMakeLists.txt
-copy to CMakeLists.txt.orig
 -- 
-2.16.1
+2.17.1
 

@@ -1,11 +1,12 @@
-From 3a9d1e5ee0aae56fafec0beba2014c19e4ff310c Mon Sep 17 00:00:00 2001
+From ca0fb17e268c176ac89df081b1efa4a42989f014 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 23 Mar 2016 17:07:28 +0200
-Subject: [PATCH 1/5] Revert an incomplete upstream attempt at cross-compile
+Subject: [PATCH] Revert an incomplete upstream attempt at cross-compile
  support
 
 Upstream-Status: Pending
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  common.mk                | 4 ----
  giscanner/gdumpparser.py | 6 ------
@@ -29,10 +30,10 @@ index b778f7a..e26c637 100644
  
  INTROSPECTION_COMPILER_ARGS = \
 diff --git a/giscanner/gdumpparser.py b/giscanner/gdumpparser.py
-index 1134f33..9bdc2bc 100644
+index cd9d94d..b41772c 100644
 --- a/giscanner/gdumpparser.py
 +++ b/giscanner/gdumpparser.py
-@@ -162,12 +162,6 @@ blob containing data gleaned from GObject's primitive introspection."""
+@@ -161,12 +161,6 @@ blob containing data gleaned from GObject's primitive introspection."""
          out_path = os.path.join(self._binary.tmpdir, 'dump.xml')
  
          args = []
@@ -45,6 +46,3 @@ index 1134f33..9bdc2bc 100644
          args.extend(self._binary.args)
          args.append('--introspect-dump=%s,%s' % (in_path, out_path))
  
--- 
-2.7.0
-

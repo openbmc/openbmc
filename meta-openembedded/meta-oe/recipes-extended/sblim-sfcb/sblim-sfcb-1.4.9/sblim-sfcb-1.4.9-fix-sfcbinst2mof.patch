@@ -1,0 +1,31 @@
+From ad6ca4f392bf549239b1ed3b2b372070eb127e7f Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Wed, 11 Jul 2018 11:06:04 +0800
+Subject: [PATCH] Makefile.am: fix sfcbinst2mof_DEPENDENCIES
+
+Fixed build with automake 1.16.1:
+/path/to/i586-poky-linux/8.1.0/ld: cannot find -lsfcBrokerCore
+collect2: error: ld returned 1 exit status
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile.am b/Makefile.am
+index 34ac319..47deed7 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -360,6 +360,7 @@ sfcbproc_SOURCES=sfcbproc.c
+ 
+ sfcbinst2mof_SOURCES=sfcbinst2mof.c
+ sfcbinst2mof_LDADD = -lsfcFileRepository -lsfcBrokerCore
++sfcbinst2mof_DEPENDENCIES = libsfcBrokerCore.la libsfcFileRepository.la
+ 
+ sfcbtrace_SOURCES=sfcbtrace.c
+ sfcbtrace_LDADD = -lsfcBrokerCore
+-- 
+2.7.4
+

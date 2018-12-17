@@ -1,0 +1,43 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Xose Vazquez Perez <xose.vazquez@gmail.com>
+Date: Thu, 12 Apr 2018 18:17:13 +0200
+Subject: [PATCH] multipath-tools: remove emacs autoconfig of kpartx/gpt.h
+
+Cc: Christophe Varoqui <christophe.varoqui@opensvc.com>
+Cc: DM ML <dm-devel@redhat.com>
+Signed-off-by: Xose Vazquez Perez <xose.vazquez@gmail.com>
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ kpartx/gpt.h | 19 -------------------
+ 1 file changed, 19 deletions(-)
+
+diff --git a/kpartx/gpt.h b/kpartx/gpt.h
+index 66ce8f1..7bb54b7 100644
+--- a/kpartx/gpt.h
++++ b/kpartx/gpt.h
+@@ -109,22 +109,3 @@ int read_gpt_pt (int fd, struct slice all, struct slice *sp, int ns);
+ 
+ 
+ #endif
+-
+-/*
+- * Overrides for Emacs so that we follow Linus's tabbing style.
+- * Emacs will notice this stuff at the end of the file and automatically
+- * adjust the settings for this buffer only.  This must remain at the end
+- * of the file.
+- * ---------------------------------------------------------------------------
+- * Local variables:
+- * c-indent-level: 4
+- * c-brace-imaginary-offset: 0
+- * c-brace-offset: -4
+- * c-argdecl-indent: 4
+- * c-label-offset: -4
+- * c-continued-statement-offset: 4
+- * c-continued-brace-offset: 0
+- * indent-tabs-mode: nil
+- * tab-width: 8
+- * End:
+- */
+-- 
+2.7.4
+

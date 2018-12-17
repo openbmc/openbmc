@@ -1,0 +1,29 @@
+From 0fb9d6bc25e903f7831a38468845ea143fb5afd5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 11 Aug 2018 18:49:03 -0700
+Subject: [PATCH] f2fs-tools: Use srcdir prefix to denote include path
+
+This helps builds when builddir != srcdir
+
+Upstream-Status: Submitted [https://lkml.org/lkml/2018/8/12/1]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tools/sg_write_buffer/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/sg_write_buffer/Makefile.am b/tools/sg_write_buffer/Makefile.am
+index 922c328..19c438d 100644
+--- a/tools/sg_write_buffer/Makefile.am
++++ b/tools/sg_write_buffer/Makefile.am
+@@ -1,7 +1,7 @@
+ ## Makefile.am
+ 
+ if LINUX
+-AM_CPPFLAGS = -I./include
++AM_CPPFLAGS = -I$(srcdir)/include
+ AM_CFLAGS = -Wall
+ sbin_PROGRAMS = sg_write_buffer
+ sg_write_buffer_SOURCES = sg_write_buffer.c \
+-- 
+2.18.0
+

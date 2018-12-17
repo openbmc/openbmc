@@ -8,6 +8,7 @@ LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://DISCLAIMER;md5=071bd69cb78b18888ea5e3da5c3127fa"
 PR ="r10"
 
+DEPENDS += "libnsl2"
 
 PACKAGES = "${PN}-dbg libwrap libwrap-doc libwrap-dev libwrap-staticdev ${PN} ${PN}-doc"
 FILES_libwrap = "${base_libdir}/lib*${SOLIBS}"
@@ -67,7 +68,6 @@ EXTRA_OEMAKE = "'CC=${CC}' \
                 'KILL_OPT=-DKILL_IP_OPTIONS' \
                 'UMASK=-DDAEMON_UMASK=022' \
                 'NETGROUP=${EXTRA_OEMAKE_NETGROUP}' \
-                'LIBS=-lnsl' \
                 'ARFLAGS=rv' \
                 'AUX_OBJ=weak_symbols.o' \
                 'TLI=' \

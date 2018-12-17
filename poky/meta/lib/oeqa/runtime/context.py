@@ -112,12 +112,9 @@ class OERuntimeTestContextExecutor(OETestContextExecutor):
             # XXX: Don't base your targets on this code it will be refactored
             # in the near future.
             # Custom target module loading
-            try:
-                target_modules_path = kwargs.get('target_modules_path', '')
-                controller = OERuntimeTestContextExecutor.getControllerModule(target_type, target_modules_path)
-                target = controller(logger, target_ip, server_ip, **kwargs)
-            except ImportError as e:
-                raise TypeError("Failed to import %s from available controller modules" % target_type)
+            target_modules_path = kwargs.get('target_modules_path', '')
+            controller = OERuntimeTestContextExecutor.getControllerModule(target_type, target_modules_path)
+            target = controller(logger, target_ip, server_ip, **kwargs)
 
         return target
 
@@ -173,10 +170,7 @@ class OERuntimeTestContextExecutor(OETestContextExecutor):
     def _loadControllerFromModule(target, modulename):
         obj = None
         # import module, allowing it to raise import exception
-        try:
-            module = __import__(modulename, globals(), locals(), [target])
-        except Exception as e:
-            return obj
+        module = __import__(modulename, globals(), locals(), [target])
         # look for target class in the module, catching any exceptions as it
         # is valid that a module may not have the target class.
         try:

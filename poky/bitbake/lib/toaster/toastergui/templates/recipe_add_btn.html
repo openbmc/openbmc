@@ -1,0 +1,23 @@
+<a data-recipe-name="{{data.name}}" class="btn btn-default btn-block layer-exists-{{data.layer_version.pk}} set-default-recipe-btn" style="margin-top: 5px;
+  {% if data.layer_version.pk not in extra.current_layers %}
+    display:none;
+  {% endif %}"
+ >
+  Set recipe
+</a>
+<a class="btn btn-default btn-block layerbtn layer-add-{{data.layer_version.pk}}"
+  data-layer='{
+  "id": {{data.layer_version.pk}},
+  "name":  "{{data.layer_version.layer.name}}",
+  "layerdetailurl": "{%url "layerdetails" extra.pid data.layer_version.pk%}",
+   "xhrLayerUrl": "{% url "xhr_layer" extra.pid data.layer_version.pk %}"
+   }' data-directive="add"
+    {% if data.layer_version.pk in extra.current_layers %}
+     style="display:none;"
+    {% endif %}
+>
+  <span class="glyphicon glyphicon-plus"></span>
+  Add layer
+  <span class="glyphicon glyphicon-question-sign get-help" title="To set this
+      recipe you must first add the {{data.layer_version.layer.name}} layer to your project"></i>
+</a>

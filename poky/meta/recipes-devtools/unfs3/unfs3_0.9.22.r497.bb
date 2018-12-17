@@ -29,7 +29,8 @@ SRC_URI = "http://downloads.yoctoproject.org/mirror/sources/unfs3-0.9.22.r497.ta
            file://relative_max_socket_path_len.patch \
            file://tcp_no_delay.patch \
            file://0001-daemon.c-Libtirpc-porting-fixes.patch \
-           "
+           file://0001-attr-fix-utime-for-symlink.patch \
+          "
 SRC_URI[md5sum] = "2e43e471c77ade0331901c40b8f8e9a3"
 SRC_URI[sha256sum] = "21009468a9ba07b72ea93780d025a63ab4e55bf8fc3127803c296f0900fe1bac"
 

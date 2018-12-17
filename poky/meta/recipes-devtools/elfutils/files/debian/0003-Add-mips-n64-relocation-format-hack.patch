@@ -1,3 +1,6 @@
+Upstream-Status: Pending [from debian]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
 From 59d4b8c48e5040af7e02b34eb26ea602ec82a38e Mon Sep 17 00:00:00 2001
 From: James Cowgill <james410@cowgill.org.uk>
 Date: Mon, 5 Jan 2015 15:17:02 +0000
@@ -12,9 +15,6 @@ This patch also ensures that strip.c sets the correct value of e_machine
 before manipulating relocations so that these changes take effect.
 
 Signed-off-by: James Cowgill <james410@cowgill.org.uk>
-
-Upstream-Status: Backport [from debian]
-Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  libelf/gelf_getrel.c      | 25 +++++++++++++++++++++++--
  libelf/gelf_getrela.c     | 25 +++++++++++++++++++++++--
@@ -203,7 +203,7 @@ Index: b/src/strip.c
 ===================================================================
 --- a/src/strip.c
 +++ b/src/strip.c
-@@ -532,6 +532,23 @@ handle_elf (int fd, Elf *elf, const char
+@@ -598,6 +598,23 @@ handle_elf (int fd, Elf *elf, const char
        goto fail;
      }
  

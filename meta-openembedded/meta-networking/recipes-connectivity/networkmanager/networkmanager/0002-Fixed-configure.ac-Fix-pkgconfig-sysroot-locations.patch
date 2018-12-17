@@ -1,7 +1,7 @@
 From 583f0448fb7e9aba2b410c06eec6f420b41a6a0c Mon Sep 17 00:00:00 2001
 From: Pablo Saavedra <psaavedra@igalia.com>
 Date: Tue, 13 Mar 2018 17:36:20 +0100
-Subject: [PATCH 7/7] Fixed configure.ac: Fix pkgconfig sysroot locations
+Subject: [PATCH] Fixed configure.ac: Fix pkgconfig sysroot locations
 
 ---
  configure.ac | 2 +-
@@ -11,7 +11,7 @@ diff --git a/configure.ac b/configure.ac
 index 51e5eb6..c9d3e56 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -669,7 +669,7 @@ else
+@@ -572,7 +572,7 @@ if test "$have_jansson" = "yes"; then
  	AC_DEFINE(WITH_JANSSON, 1, [Define if JANSSON is enabled])
  
  	AC_CHECK_TOOLS(READELF, [eu-readelf readelf])

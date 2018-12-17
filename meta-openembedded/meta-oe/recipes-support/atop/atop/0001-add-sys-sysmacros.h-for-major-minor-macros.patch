@@ -1,0 +1,26 @@
+From 13f3771655f859d5e0332dd65b9c43f572f6359d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 11 Aug 2018 16:02:06 -0700
+Subject: [PATCH] add sys/sysmacros.h for major/minor macros
+
+photosyst.c:1465:19: error: called object 'major' is not a function or function pointer
+     dmp->major  = major(statbuf.st_rdev);
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ photosyst.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/photosyst.c b/photosyst.c
+index 38828ec..caed352 100644
+--- a/photosyst.c
++++ b/photosyst.c
+@@ -152,6 +152,7 @@
+ static const char rcsid[] = "$Id: photosyst.c,v 1.38 2010/11/19 07:40:40 gerlof Exp $";
+ 
+ #include <sys/types.h>
++#include <sys/sysmacros.h>
+ #include <stdio.h>
+ #include <string.h>
+ #include <unistd.h>

@@ -1,0 +1,86 @@
+From 0bc8bc4143a58f91f6d7ce228b6763f377fdf45a Mon Sep 17 00:00:00 2001
+From: Andrew Bartlett <abartlet@samba.org>
+Date: Thu, 12 Jul 2018 12:34:56 +1200
+Subject: [PATCH] ldb: Refuse to build Samba against a newer minor version of
+ ldb
+
+Samba is not compatible with new versions of ldb (except release versions)
+
+Other users would not notice the breakages, but Samba makes many
+more assuptions about the LDB internals than any other package.
+
+(Specifically, LDB 1.2 and 1.4 broke builds against released
+Samba versions)
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=13519
+
+Signed-off-by: Andrew Bartlett <abartlet@samba.org>
+Reviewed-by: Gary Lockyer <gary@catalyst.net.nz>
+(cherry picked from commit 52efa796538ae004ca62ea32fc8c833472991be6)
+---
+ lib/ldb/wscript | 32 ++++++++++++++++++++++----------
+ 1 file changed, 22 insertions(+), 10 deletions(-)
+
+diff --git a/lib/ldb/wscript b/lib/ldb/wscript
+index d94086b..2bb0832 100644
+--- a/lib/ldb/wscript
++++ b/lib/ldb/wscript
+@@ -62,23 +62,33 @@ def configure(conf):
+     conf.env.standalone_ldb = conf.IN_LAUNCH_DIR()
+ 
+     if not conf.env.standalone_ldb:
++        max_ldb_version = [int(x) for x in VERSION.split(".")]
++        max_ldb_version[2] = 999
++        max_ldb_version_dots = "%d.%d.%d" % tuple(max_ldb_version)
++
+         if conf.env.disable_python:
+-            if conf.CHECK_BUNDLED_SYSTEM_PKG('ldb', minversion=VERSION,
+-                                         onlyif='talloc tdb tevent',
+-                                         implied_deps='replace talloc tdb tevent'):
++            if conf.CHECK_BUNDLED_SYSTEM_PKG('ldb',
++                                             minversion=VERSION,
++                                             maxversion=max_ldb_version_dots,
++                                             onlyif='talloc tdb tevent',
++                                             implied_deps='replace talloc tdb tevent'):
+                 conf.define('USING_SYSTEM_LDB', 1)
+         else:
+             using_system_pyldb_util = True
+-            if not conf.CHECK_BUNDLED_SYSTEM_PKG('pyldb-util', minversion=VERSION,
+-                                             onlyif='talloc tdb tevent',
+-                                             implied_deps='replace talloc tdb tevent ldb'):
++            if not conf.CHECK_BUNDLED_SYSTEM_PKG('pyldb-util',
++                                                 minversion=VERSION,
++                                                 maxversion=max_ldb_version_dots,
++                                                 onlyif='talloc tdb tevent',
++                                                 implied_deps='replace talloc tdb tevent ldb'):
+                 using_system_pyldb_util = False
+ 
+             # We need to get a pyldb-util for all the python versions
+             # we are building for
+             if conf.env['EXTRA_PYTHON']:
+                 name = 'pyldb-util' + conf.all_envs['extrapython']['PYTHON_SO_ABI_FLAG']
+-                if not conf.CHECK_BUNDLED_SYSTEM_PKG(name, minversion=VERSION,
++                if not conf.CHECK_BUNDLED_SYSTEM_PKG(name,
++                                                     minversion=VERSION,
++                                                     maxversion=max_ldb_version_dots,
+                                                      onlyif='talloc tdb tevent',
+                                                      implied_deps='replace talloc tdb tevent ldb'):
+                     using_system_pyldb_util = False
+@@ -86,9 +96,11 @@ def configure(conf):
+             if using_system_pyldb_util:
+                 conf.define('USING_SYSTEM_PYLDB_UTIL', 1)
+ 
+-            if conf.CHECK_BUNDLED_SYSTEM_PKG('ldb', minversion=VERSION,
+-                                         onlyif='talloc tdb tevent pyldb-util',
+-                                         implied_deps='replace talloc tdb tevent'):
++            if conf.CHECK_BUNDLED_SYSTEM_PKG('ldb',
++                                             minversion=VERSION,
++                                             maxversion=max_ldb_version_dots,
++                                             onlyif='talloc tdb tevent pyldb-util',
++                                             implied_deps='replace talloc tdb tevent'):
+                 conf.define('USING_SYSTEM_LDB', 1)
+ 
+     if conf.CONFIG_SET('USING_SYSTEM_LDB'):
+-- 
+2.18.0
+

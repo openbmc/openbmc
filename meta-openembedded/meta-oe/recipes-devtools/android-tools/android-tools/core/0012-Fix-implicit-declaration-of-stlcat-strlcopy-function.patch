@@ -1,0 +1,50 @@
+From cd4525d760c6f88c9bf85f7bf488da79cd0d3264 Mon Sep 17 00:00:00 2001
+From: Fathi Boudra <fabo@debian.org>
+Date: Wed, 7 Sep 2016 12:58:47 +0300
+Subject: [PATCH] Fix implicit declaration of stlcat/strlcopy functions
+
+Upstream-Status: Inappropriate
+---
+ adb/adb.c                | 1 +
+ fs_mgr/fs_mgr_fstab.c    | 2 +-
+ include/cutils/sockets.h | 2 +-
+ 3 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/adb/adb.c b/adb/adb.c
+index e0f7ecde45..aaefd9b401 100644
+--- a/adb/adb.c
++++ b/adb/adb.c
+@@ -41,6 +41,7 @@
+ #include <sys/prctl.h>
+ #include <getopt.h>
+ #include <selinux/selinux.h>
++#include <grp.h>
+ #else
+ #include "usb_vendors.h"
+ #endif
+diff --git a/fs_mgr/fs_mgr_fstab.c b/fs_mgr/fs_mgr_fstab.c
+index edd9591164..9ddb4643b5 100644
+--- a/fs_mgr/fs_mgr_fstab.c
++++ b/fs_mgr/fs_mgr_fstab.c
+@@ -17,7 +17,7 @@
+ #include <ctype.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+-#include <string.h>
++#include <bsd/string.h>
+ #include <sys/mount.h>
+ 
+ #include "fs_mgr_priv.h"
+diff --git a/include/cutils/sockets.h b/include/cutils/sockets.h
+index daf43ec944..d3270c69e7 100644
+--- a/include/cutils/sockets.h
++++ b/include/cutils/sockets.h
+@@ -19,7 +19,7 @@
+ 
+ #include <errno.h>
+ #include <stdlib.h>
+-#include <string.h>
++#include <bsd/string.h>
+ #include <stdbool.h>
+ 
+ #ifdef HAVE_WINSOCK

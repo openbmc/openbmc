@@ -1,7 +1,3 @@
-# Use immediate assingment here to get the original (/usr/lib)
-# instead of the one rewritten by native.bbclass.
-nonstaging_libdir := "${libdir}"
-
 inherit native
 
 SRC_URI_append = " https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz;name=bootstrap;subdir=go1.4"
@@ -20,7 +16,7 @@ do_configure() {
 }
 
 do_compile() {
-	export GOROOT_FINAL="${nonstaging_libdir}/go"
+	export GOROOT_FINAL="${libdir_native}/go"
 	export GOROOT_BOOTSTRAP="${WORKDIR}/go1.4/go"
 
 	cd src

@@ -30,8 +30,14 @@ SRC_URI += "file://rdist-6.1.5-linux.patch \
             file://rdist-6.1.5-makefile-add-ldflags.patch \
 "
 
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/rdist/files/rdist/"
+UPSTREAM_CHECK_REGEX = "/rdist/(?P<pver>\d+(\.\d+)+)"
+
 DEPENDS = "bison-native"
 
 inherit autotools-brokensep
 
 EXTRA_OEMAKE = "BIN_GROUP=root MAN_GROUP=root RDIST_MODE=755 RDISTD_MODE=755 MAN_MODE=644"
+
+# http://errors.yoctoproject.org/Errors/Details/186972/
+EXCLUDE_FROM_WORLD_libc-musl = "1"

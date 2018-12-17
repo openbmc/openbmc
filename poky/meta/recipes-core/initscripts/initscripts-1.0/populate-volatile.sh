@@ -112,7 +112,6 @@ check_requirements() {
 	}
 
 	CFGFILE="$1"
-	[ `basename "${CFGFILE}"` = "${COREDEF}" ] && return 0
 
 	TMP_INTERMED="${TMPROOT}/tmp.$$"
 	TMP_DEFINED="${TMPROOT}/tmpdefined.$$"
@@ -154,8 +153,11 @@ check_requirements() {
 
 apply_cfgfile() {
 	CFGFILE="$1"
+	SKIP_REQUIREMENTS="$2"
 
-	check_requirements "${CFGFILE}" || {
+	[ "${VERBOSE}" != "no" ] && echo "Applying ${CFGFILE}"
+
+	[ "${SKIP_REQUIREMENTS}" == "yes" ] || check_requirements "${CFGFILE}" || {
 		echo "Skipping ${CFGFILE}"
 		return 1
 	}
@@ -231,9 +233,36 @@ then
 	sh ${ROOT_DIR}/etc/volatile.cache
 else
 	rm -f ${ROOT_DIR}/etc/volatile.cache ${ROOT_DIR}/etc/volatile.cache.build
-	for file in `ls -1 "${CFGDIR}" | sort`; do
-		apply_cfgfile "${CFGDIR}/${file}"
+
+	# Apply the core file with out checking requirements. ${TMPROOT} is
+	# needed by check_requirements but is setup by this file, so it must be
+	# processed first and without being checked.
+	[ -e "${CFGDIR}/${COREDEF}" ] && apply_cfgfile "${CFGDIR}/${COREDEF}" "yes"
+
+	# Fast path: check_requirements is slow and most of the time doesn't
+	# find any problems. If there are a lot of config files, it is much
+	# faster to to concatenate them all together and process them once to
+	# avoid the overhead of calling check_requirements repeatedly
+	TMP_FILE="${TMPROOT}/tmp_volatile.$$"
+	rm -f "$TMP_FILE"
+
+	CFGFILES="`ls -1 "${CFGDIR}" | grep -v "^${COREDEF}\$" | sort`"
+	for file in ${CFGFILES}; do
+		cat "${CFGDIR}/${file}" >> "$TMP_FILE"
 	done
+
+	if check_requirements "$TMP_FILE"
+	then
+		apply_cfgfile "$TMP_FILE" "yes"
+	else
+		# Slow path: One or more config files failed requirements.
+		# Process each one individually so the offending one can be
+		# skipped
+		for file in ${CFGFILES}; do
+			apply_cfgfile "${CFGDIR}/${file}"
+		done
+	fi
+	rm "$TMP_FILE"
 
 	[ -e ${ROOT_DIR}/etc/volatile.cache.build ] && sync && mv ${ROOT_DIR}/etc/volatile.cache.build ${ROOT_DIR}/etc/volatile.cache
 fi

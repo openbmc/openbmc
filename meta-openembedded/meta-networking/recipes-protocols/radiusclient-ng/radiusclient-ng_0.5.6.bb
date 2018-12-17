@@ -17,6 +17,8 @@ LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=3e47566c9271b786693d8a08792dbf41"
 
 inherit autotools-brokensep
 
+DEPENDS += "virtual/crypt"
+
 EXTRA_OECONF += "--disable-static"
 
 do_configure_prepend () {

@@ -13,11 +13,19 @@ do_configure_prepend () {
 	rm -f ${STAGING_DATADIR}/aclocal/lt*.m4
 }
 
+#
+# ccache may or may not be INHERITED, we remove references to it so the sstate
+# artefact works on a machine where its not present. libtool-cross isn't used
+# heavily so any performance issue is minor.
+# Find references to LTCC="ccache xxx-gcc" and CC="ccache xxx-gcc"
+#
 do_install () {
 	install -d ${D}${bindir_crossscripts}/
 	install -m 0755 ${HOST_SYS}-libtool ${D}${bindir_crossscripts}/${HOST_SYS}-libtool
 	sed -e 's@^\(predep_objects="\).*@\1"@' \
 	    -e 's@^\(postdep_objects="\).*@\1"@' \
+	    -e 's@^CC="ccache.@CC="@' \
+	    -e 's@^LTCC="ccache.@LTCC="@' \
 	    -i ${D}${bindir_crossscripts}/${HOST_SYS}-libtool
 	sed -i '/^archive_cmds=/s/\-nostdlib//g' ${D}${bindir_crossscripts}/${HOST_SYS}-libtool
 	sed -i '/^archive_expsym_cmds=/s/\-nostdlib//g' ${D}${bindir_crossscripts}/${HOST_SYS}-libtool

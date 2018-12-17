@@ -8,8 +8,8 @@ inherit pypi
 
 PYPI_PACKAGE = "gitdb2"
 
-SRC_URI[md5sum] = "d5217eb94ebd36fcec62b929d1f72b00"
-SRC_URI[sha256sum] = "b60e29d4533e5e25bb50b7678bbc187c8f6bcff1344b4f293b2ba55c85795f09"
+SRC_URI[md5sum] = "6e21f5795a204f7afecb0a72fff66932"
+SRC_URI[sha256sum] = "bb4c85b8a58531c51373c89f92163b92f30f81369605a67cd52d1fc21246c044"
 
 DEPENDS = "${PYTHON_PN}-async ${PYTHON_PN}-setuptools-native ${PYTHON_PN}-smmap"
 

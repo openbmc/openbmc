@@ -92,12 +92,12 @@ UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+\.\d+(\.\d+)*)"
 
 SRC_URI = "git://github.com/xrmx/bootchart.git \
            file://bootchartd_stop.sh \
-           file://0001-Fixed-Missing-default-value-for-BOOTLOG_DEST.patch \
            file://0001-collector-Allocate-space-on-heap-for-chunks.patch \
           "
 
 S = "${WORKDIR}/git"
-SRCREV = "48e0071048564c6af75ab969e842d6dec808da09"
+SRCREV = "331ada031f1d65f6d934d918f896e1c708c64bf7"
+PV .= "+git${SRCPV}"
 
 inherit systemd update-rc.d python3native update-alternatives
 

@@ -1,0 +1,50 @@
+{% extends "base_specific.html" %}
+
+{% load static %}
+{% load projecttags %}
+{% load humanize %}
+
+{% block title %} Welcome to Toaster {% endblock %}
+
+{% block pagecontent %}
+
+  <div class="container">
+   <div class="row">
+    <!-- Empty - no build module -->
+    <div class="page-header top-air">
+     <h1>
+       Configuration {% if status == "cancel" %}Canceled{% else %}Completed{% endif %}! You can now close this window.
+     </h1>
+    </div>
+    <div class="alert alert-info lead">
+     <p>
+     Your project configuration {% if status == "cancel" %}changes have been canceled{% else %}has completed!{% endif %}
+     <br>
+     <br>
+     <ul>
+       <li>
+       The Toaster instance for project configuration has been shut down
+       </li>
+       <li>
+       You can start Toaster independently for advanced project management and analysis:
+         <pre><code>
+         Set up bitbake environment:
+         $ cd {{install_dir}}
+         $ . oe-init-build-env [toaster_server]
+
+         Option 1: Start a local Toaster server, open local browser to "localhost:8000"
+         $ . toaster start webport=8000
+
+         Option 2: Start a shared Toaster server, open any browser to "[host_ip]:8000"
+         $ . toaster start webport=0.0.0.0:8000
+
+         To stop the Toaster server:
+         $ . toaster stop
+         </code></pre>
+       </li>
+     </ul>
+     </p>
+    </div>
+   </div>
+
+{% endblock %}

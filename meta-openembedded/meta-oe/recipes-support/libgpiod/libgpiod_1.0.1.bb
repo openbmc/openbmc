@@ -1,4 +1,0 @@
-require libgpiod.inc
-
-SRC_URI[md5sum] = "2ca0c3eb17d69e367b6f6a109ca86e41"
-SRC_URI[sha256sum] = "972924195367f5fb045c023d65340c4b7dfc8764499516be446553865208dedc"

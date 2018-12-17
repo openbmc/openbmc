@@ -1,0 +1,17 @@
+Undefine UNUSED macros with clang
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Index: mtools-4.0.18/sysincludes.h
+===================================================================
+--- mtools-4.0.18.orig/sysincludes.h
++++ mtools-4.0.18/sysincludes.h
+@@ -101,7 +101,7 @@ typedef void *caddr_t;
+ #if defined __GNUC__ && defined __STDC__
+ /* gcc -traditional doesn't have PACKED, UNUSED and NORETURN */
+ # define PACKED __attribute__ ((packed))
+-# if __GNUC__ == 2 && __GNUC_MINOR__ > 6 || __GNUC__ >= 3
++# if (__GNUC__ == 2 && __GNUC_MINOR__ > 6 || __GNUC__ >= 3) && !defined(__clang__)
+ /* gcc 2.6.3 doesn't have "unused" */		/* mool */
+ #  define UNUSED(x) x __attribute__ ((unused));x
+ #  define UNUSEDP __attribute__ ((unused))

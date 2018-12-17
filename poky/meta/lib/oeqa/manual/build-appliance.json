@@ -1,0 +1,122 @@
+[
+    {
+        "test": {
+            "@alias": "build-appliance.build-appliance.Bitbake_build-appliance-image",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Get poky source code and prepare the build environment",
+                    "expected_results": "bitbake build-appliance-image is successful  "
+                },
+                "2": {
+                    "action": "Set MACHINE to qemux86 and add the following line to conf/local.conf :  SRCREV_pn-build-appliance-image = \"${AUTOREV}\"",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "Run \"bitbake build-appliance-image\" \n \n",
+                    "expected_results": ""
+                }
+            },
+            "summary": "Bitbake_build-appliance-image"
+        }
+    },
+    {
+        "test": {
+            "@alias": "build-appliance.build-appliance.Build_core-image-minimal_with_build-appliance-image",
+            "author": [
+                {
+                    "email": "corneliux.stoicescu@intel.com",
+                    "name": "corneliux.stoicescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Build with AUTOREV or download from Autobuilder an image for Yocto Build Appliance.  ",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "Boot the image under VMWare Player.  ",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "Build qemux86 core-image-minimal using bitbake command line in the build-appliance-image  ",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "Launch the image just built using runqemu.  ",
+                    "expected_results": "core-image-minimal should build and boot. "
+                }
+            },
+            "summary": "Build_core-image-minimal_with_build-appliance-image"
+        }
+    },
+    {
+        "test": {
+            "@alias": "build-appliance.build-appliance.Build_a_image_without_error_(added_recipe)",
+            "author": [
+                {
+                    "email": "sstncr@gmail.com",
+                    "name": "sstncr@gmail.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Launch Build Appliance",
+                    "expected_results": "User could build a image without error and the added package is in the image"
+                },
+                "2": {
+                    "action": "Set \"Machine\" in conf/local.conf, for example, qemuarm",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "Install a new package to the image, for example, acpid. Set the following line in conf/local.conf: IMAGE_INSTALL_append = \" acpid\"",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "Build a image using bitbake command line, for example, bitbake core-image-minimal",
+                    "expected_results": ""
+                },
+                "5": {
+                    "action": "After build finished, launch the image and check if the added package built into image",
+                    "expected_results": ""
+                }
+            },
+            "summary": "Build_a_image_without_error_(added_recipe)."
+        }
+    },
+    {
+        "test": {
+            "@alias": "build-appliance.build-appliance.Create_core-image-sato-sdk_using_build_appliance",
+            "author": [
+                {
+                    "email": "ee.peng.yeoh@intel.com",
+                    "name": "ee.peng.yeoh@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Build with AUTOREV or download from Autobuilder an image for Yocto Build Appliance.  ",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "Boot the image under VMWare Player.  ",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "Build qemux86 core-image-sato-sdk using bitbake command line in the build-appliance-image  ",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "Launch the image just built using runqemu. ",
+                    "expected_results": ""
+                }
+            },
+            "summary": "Create_core-image-sato-sdk_using_build_appliance"
+        }
+    }
+]

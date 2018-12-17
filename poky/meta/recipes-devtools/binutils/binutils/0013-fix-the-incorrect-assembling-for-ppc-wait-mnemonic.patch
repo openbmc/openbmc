@@ -1,4 +1,4 @@
-From 27ec22ca3cd56cfdf060d2e1f414bedce269b322 Mon Sep 17 00:00:00 2001
+From d45455db35db5693c5efe0e1b384295e4c0db998 Mon Sep 17 00:00:00 2001
 From: Zhenhua Luo <zhenhua.luo@nxp.com>
 Date: Sat, 11 Jun 2016 22:08:29 -0500
 Subject: [PATCH 13/15] fix the incorrect assembling for ppc wait mnemonic
@@ -11,10 +11,10 @@ Upstream-Status: Pending
  1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/opcodes/ppc-opc.c b/opcodes/ppc-opc.c
-index bb17f26c2e..dbdd762b4e 100644
+index 4a0fca5f0a..49f72fc35c 100644
 --- a/opcodes/ppc-opc.c
 +++ b/opcodes/ppc-opc.c
-@@ -5338,7 +5338,6 @@ const struct powerpc_opcode powerpc_opcodes[] = {
+@@ -5351,7 +5351,6 @@ const struct powerpc_opcode powerpc_opcodes[] = {
  {"ldepx",	X(31,29),	X_MASK,	  E500MC|PPCA2, 0,		{RT, RA0, RB}},
  
  {"waitasec",	X(31,30),      XRTRARB_MASK, POWER8,	POWER9,		{0}},
@@ -22,7 +22,7 @@ index bb17f26c2e..dbdd762b4e 100644
  
  {"lwepx",	X(31,31),	X_MASK,	  E500MC|PPCA2, 0,		{RT, RA0, RB}},
  
-@@ -5392,7 +5391,7 @@ const struct powerpc_opcode powerpc_opcodes[] = {
+@@ -5405,7 +5404,7 @@ const struct powerpc_opcode powerpc_opcodes[] = {
  
  {"waitrsv",	X(31,62)|(1<<21), 0xffffffff, E500MC|PPCA2, 0,		{0}},
  {"waitimpl",	X(31,62)|(2<<21), 0xffffffff, E500MC|PPCA2, 0,		{0}},
@@ -32,5 +32,5 @@ index bb17f26c2e..dbdd762b4e 100644
  {"dcbstep",	XRT(31,63,0),	XRT_MASK,    E500MC|PPCA2, 0,		{RA0, RB}},
  
 -- 
-2.16.1
+2.18.0
 

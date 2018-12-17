@@ -1,11 +1,3 @@
-LICENSE_append_minized-zynq7 = "\
-    & Firmware-cypress \
-"
-
-LIC_FILES_CHKSUM_append_minized-zynq7 = "\
-    file://LICENCE.cypress;md5=cbc5f665d04f741f1e006d2096236ba7 \
-"
-NO_GENERIC_LICENSE[Firmware-cypress] = "LICENCE.cypress"
 
 SRC_URI_append_minized-zynq7 = " \
        git://github.com/murata-wireless/cyw-fmac-nvram;protocol=git;branch=orga;destsuffix=cyw-fmac-nvram;name=cyw-fmac-nvram \
@@ -28,7 +20,6 @@ do_install_append_minized-zynq7() {
 }
 
 PACKAGES_prepend_minized-zynq7 = "\
-    ${PN}-cypress-license \
     ${PN}-bcm43430a1-hcd \
     ${PN}-mfgtest \
 "
@@ -39,11 +30,6 @@ FILES_${PN}-mfgtest_minized-zynq7 = " \
 
 FILES_${PN}-bcm43430_append_minized-zynq7 = " \
        ${nonarch_base_libdir}/firmware/brcm/ brcmfmac43430-sdio.txt \
-"
-
-# For additional Cypress
-FILES_${PN}-cypress-license = "\
-  ${nonarch_base_libdir}/firmware/LICENCE.cypress \
 "
 
 LICENSE_${PN}-bcm43430a1-hcd = "Firmware-cypress"

@@ -1,6 +1,6 @@
-From c801dcb03d42eb533a9bead0b397d7ce4fc5a6fe Mon Sep 17 00:00:00 2001
-From: Kai Kang <kai.kang@windriver.com>
-Date: Wed, 10 Aug 2016 17:49:50 +0800
+From c10368b397483a2fc7b493c099d8416d902f8cd8 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 31 Jul 2018 14:18:35 +0800
 Subject: [PATCH] allow multi definitions for native
 
 Upstream-Status: Pending
@@ -14,12 +14,13 @@ Add link option '-z muldefs' to fix it.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  Make.rules | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/Make.rules b/Make.rules
-index 88b9aa7..799332f 100644
+index 042585b..257ba45 100644
 --- a/Make.rules
 +++ b/Make.rules
 @@ -20,6 +20,7 @@ include $(TOPDIR)/Make.version
@@ -28,5 +29,8 @@ index 88b9aa7..799332f 100644
  	  -Wl,--version-script=$(MAP) \
 +	  -Wl,-z,muldefs \
  	  -o $@ $^ $(LDLIBS)
+ 	ln -vfs $@ $@.1
  
- %.abixml : %.so
+-- 
+2.7.4
+

@@ -165,6 +165,7 @@ TARFILES = dev-style.css dev-manual.html \
 TARFILES = dev-style.css dev-manual.html figures/buildhistory-web.png \
            figures/dev-title.png figures/buildhistory.png \
            figures/recipe-workflow.png figures/bitbake-build-flow.png \
+           figures/multiconfig_files.png \
            eclipse
 	endif
 
@@ -261,7 +262,7 @@ TARFILES = mega-manual.html mega-style.css \
         figures/image-generation.png figures/key-dev-elements.png\
 	figures/sdk-generation.png figures/recipe-workflow.png \
 	figures/build-workspace-directory.png figures/mega-title.png \
-	figures/toaster-title.png figures/hosted-service.png \
+	figures/toaster-title.png figures/hosted-service.png figures/multiconfig_files.png \
 	figures/simple-configuration.png figures/poky-reference-distribution.png \
 	figures/compatible-layers.png figures/import-layer.png figures/new-project.png \
 	figures/sdk-environment.png figures/sdk-installed-standard-sdk-directory.png \

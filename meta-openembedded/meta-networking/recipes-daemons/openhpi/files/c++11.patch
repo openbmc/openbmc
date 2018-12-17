@@ -1,11 +1,21 @@
-Index: openhpi-3.6.1/configure.ac
-===================================================================
---- openhpi-3.6.1.orig/configure.ac
-+++ openhpi-3.6.1/configure.ac
-@@ -44,6 +44,7 @@ AC_PROG_CPP
- AC_PROG_INSTALL
- AC_PROG_LN_S
+From ed51168dfd6844deeaebf7d5f6c65898aafb6299 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 27 Aug 2017 12:12:04 -0700
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configure.ac b/configure.ac
+index c29a31f..f7fe0f7 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -46,6 +46,7 @@ AC_PROG_LN_S
  AC_PROG_MAKE_SET
+ AC_PROG_AWK
+ AC_PROG_GREP
 +AX_CXX_COMPILE_STDCXX_11([noext],[mandatory])
  
  enabled_non32bit="no"

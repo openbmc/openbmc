@@ -1,0 +1,27 @@
+From e4d5d5224609d7d5c824dd231f5baec868befdfa Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Tue, 4 Sep 2018 23:56:00 +0200
+Subject: [PATCH 1/1] klibc: add getrandom() syscall
+
+needed by latest kexec-tools for qemuarm64 (kashan)
+
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+---
+ usr/klibc/SYSCALLS.def | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/usr/klibc/SYSCALLS.def b/usr/klibc/SYSCALLS.def
+index 6b3bf4c..d4184ba 100644
+--- a/usr/klibc/SYSCALLS.def
++++ b/usr/klibc/SYSCALLS.def
+@@ -274,6 +274,7 @@ int syslog::klogctl(int, char *, int);
+ int sysinfo(struct sysinfo *);
+ long kexec_load(void *, unsigned long, struct kexec_segment *, unsigned long);
+ <x86_64,ppc64,s390x> long kexec_file_load(int, int, unsigned long, const char *, unsigned long);
++ssize_t getrandom(void *, size_t, unsigned int);
+ 
+ /*
+  * Low-level I/O (generally architecture-specific);
+-- 
+2.7.4
+

@@ -1,0 +1,93 @@
+From 39a7d79ee6c548902fbac8b95c934af7e4c69260 Mon Sep 17 00:00:00 2001
+From: Vendula Poncova <vponcova@redhat.com>
+Date: Thu, 2 Aug 2018 15:30:45 +0800
+Subject: [PATCH 1/2] Support asynchronous calls (#58)
+
+Added support for asynchronous calls of methods. A method is called
+synchronously unless its callback parameter is specified. A callback
+is a function f(*args, returned=None, error=None), where args is
+callback_args specified in the method call, returned is a return
+value of the method and error is an exception raised by the method.
+
+Example of an asynchronous call:
+
+def func(x, y, returned=None, error=None):
+  pass
+
+proxy.Method(a, b, callback=func, callback_args=(x, y))
+
+Upstream-Status: Cherry-pick [https://src.fedoraproject.org/cgit/rpms/python-pydbus.git/]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ pydbus/proxy_method.py | 44 ++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 38 insertions(+), 6 deletions(-)
+
+diff --git a/pydbus/proxy_method.py b/pydbus/proxy_method.py
+index 8798edd..4ea4304 100644
+--- a/pydbus/proxy_method.py
++++ b/pydbus/proxy_method.py
+@@ -65,15 +65,34 @@ class ProxyMethod(object):
+ 
+ 		# Python 2 sux
+ 		for kwarg in kwargs:
+-			if kwarg not in ("timeout",):
++			if kwarg not in ("timeout", "callback", "callback_args"):
+ 				raise TypeError(self.__qualname__ + " got an unexpected keyword argument '{}'".format(kwarg))
+ 		timeout = kwargs.get("timeout", None)
++		callback = kwargs.get("callback", None)
++		callback_args = kwargs.get("callback_args", tuple())
++
++		call_args = (
++			instance._bus_name,
++			instance._path,
++			self._iface_name,
++			self.__name__,
++			GLib.Variant(self._sinargs, args),
++			GLib.VariantType.new(self._soutargs),
++			0,
++			timeout_to_glib(timeout),
++			None
++		)
++
++		if callback:
++			call_args += (self._finish_async_call, (callback, callback_args))
++			instance._bus.con.call(*call_args)
++			return None
++		else:
++			ret = instance._bus.con.call_sync(*call_args)
++			return self._unpack_return(ret)
+ 
+-		ret = instance._bus.con.call_sync(
+-			instance._bus_name, instance._path,
+-			self._iface_name, self.__name__, GLib.Variant(self._sinargs, args), GLib.VariantType.new(self._soutargs),
+-			0, timeout_to_glib(timeout), None).unpack()
+-
++	def _unpack_return(self, values):
++		ret = values.unpack()
+ 		if len(self._outargs) == 0:
+ 			return None
+ 		elif len(self._outargs) == 1:
+@@ -81,6 +100,19 @@ class ProxyMethod(object):
+ 		else:
+ 			return ret
+ 
++	def _finish_async_call(self, source, result, user_data):
++		error = None
++		return_args = None
++
++		try:
++			ret = source.call_finish(result)
++			return_args = self._unpack_return(ret)
++		except Exception as err:
++			error = err
++
++		callback, callback_args = user_data
++		callback(*callback_args, returned=return_args, error=error)
++
+ 	def __get__(self, instance, owner):
+ 		if instance is None:
+ 			return self
+-- 
+2.7.4
+

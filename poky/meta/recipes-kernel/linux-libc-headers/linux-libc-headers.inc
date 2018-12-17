@@ -30,7 +30,7 @@ LICENSE = "GPLv2"
 #
 # -- RP
 
-LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
+LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 
 python __anonymous () {
     major = d.getVar("PV").split('.')[0]
@@ -53,12 +53,9 @@ S = "${WORKDIR}/linux-${PV}"
 
 EXTRA_OEMAKE = " HOSTCC="${BUILD_CC}" HOSTCPP="${BUILD_CPP}""
 
-do_configure() {
-	oe_runmake allnoconfig
-}
+do_configure[noexec] = "1"
 
-do_compile () {
-}
+do_compile[noexec] = "1"
 
 do_install() {
 	oe_runmake headers_install INSTALL_HDR_PATH=${D}${exec_prefix}
@@ -92,4 +89,4 @@ RDEPENDS_${PN}-dev = ""
 RRECOMMENDS_${PN}-dbg = "${PN}-dev (= ${EXTENDPKGV})"
 
 INHIBIT_DEFAULT_DEPS = "1"
-DEPENDS += "unifdef-native"
+DEPENDS += "unifdef-native bison-native"

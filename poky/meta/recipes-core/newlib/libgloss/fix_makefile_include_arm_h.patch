@@ -1,0 +1,30 @@
+Upstream-Status: Inappropriate  [OE-Specific]
+
+When trying to build libgloss for an arm target, the build system
+complains about missing some include files:
+
+| fatal error: acle-compiat.h: No such file or directory
+|  #include "acle-compat.h"
+|           ^~~~~~~~~~~~~~~
+| compilation terminated.
+
+These include files come from the newlib source, but since we
+are building libgloss separately from newlib, libgloss is unaware
+of where they are, this patch fixes the INCLUDES so the build system
+can find such files.
+
+Signed-off-by: Alejandro Enedino Hernandez Samaniego <alejandr@xilinx.com>
+
+Index: newlib-3.0.0/libgloss/config/default.mh
+===================================================================
+--- newlib-3.0.0.orig/libgloss/config/default.mh
++++ newlib-3.0.0/libgloss/config/default.mh
+@@ -1,7 +1,7 @@
+ NEWLIB_CFLAGS = `if [ -d ${objroot}/newlib ]; then echo -I${objroot}/newlib/targ-include -I${srcroot}/newlib/libc/include; fi`
+ NEWLIB_LDFLAGS = `if [ -d ${objroot}/newlib ]; then echo -B${objroot}/newlib/ -L${objroot}/newlib/; fi`
+ 
+-INCLUDES = -I. -I$(srcdir)/..
++INCLUDES = -I. -I$(srcdir)/.. -I$(srcdir)/../newlib/libc/machine/arm
+ # Note that when building the library, ${MULTILIB} is not the way multilib
+ # options are passed; they're passed in $(CFLAGS).
+ CFLAGS_FOR_TARGET = -O2 -g ${MULTILIB} ${INCLUDES} ${NEWLIB_CFLAGS}

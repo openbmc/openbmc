@@ -10,7 +10,7 @@ require xorg-lib-common.inc
 LICENSE = "MIT-style"
 LIC_FILES_CHKSUM = "file://COPYING;md5=827da9afab1f727f2a66574629e0f39c"
 
-DEPENDS += "libxext videoproto"
+DEPENDS += "libxext xorgproto"
 
 XORG_PN = "libXv"
 

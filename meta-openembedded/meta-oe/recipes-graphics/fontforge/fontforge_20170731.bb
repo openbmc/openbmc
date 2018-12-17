@@ -45,7 +45,9 @@ EOF
     cd $currdir
 }
 
-PACKAGES =+ "${PN}-python-dbg ${PN}-python"
+PACKAGES =+ "${PN}-python"
+
+RPROVIDES_${PN}-dbg += "${PN}-python-dbg"
 
 FILES_${PN} += " \
     ${datadir}/mime \
@@ -53,7 +55,6 @@ FILES_${PN} += " \
 "
 
 FILES_${PN}-python = "${PYTHON_SITEPACKAGES_DIR} ${datadir}/${PN}/python"
-FILES_${PN}-python-dbg = "${PYTHON_SITEPACKAGES_DIR}/.debug"
 RDEPENDS_${PN}-python = "python"
 
 # for e.g kde's oxygen-fonts

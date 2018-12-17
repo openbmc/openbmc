@@ -1,0 +1,30 @@
+From 9de68ec5af8db2eff352f12da28145fe5e96244d Mon Sep 17 00:00:00 2001
+From: OpenEmbedded <oe.patch@oe>
+Date: Wed, 11 Apr 2018 22:51:05 +0200
+Subject: [PATCH] do not build test
+
+The purpose of this recipe is to build the smallest
+binaries. kexek klibc-static for armv5 is around 86 KiB
+
+Upstream-Status: Inappropriate [embedded specific]
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+
+---
+ Makefile.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index fb01134..440730d 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -173,8 +173,8 @@ PSRCS:=$(foreach s, $(SRCS), $(PACKAGE_NAME)-$(PACKAGE_VERSION)/$(s))
+ PGSRCS:=$(foreach s, $(GENERATED_SRCS), $(PACKAGE_NAME)-$(PACKAGE_VERSION)/$(s))
+ 
+ MAN_PAGES:=$(KEXEC_MANPAGE) $(VMCORE_DMESG_MANPAGE)
+-BINARIES_i386:=$(KEXEC_TEST)
+-BINARIES_x86_64:=$(KEXEC_TEST)
++#BINARIES_i386:=$(KEXEC_TEST)
++#BINARIES_x86_64:=$(KEXEC_TEST)
+ BINARIES:=$(KEXEC) $(VMCORE_DMESG) $(BINARIES_$(ARCH))
+ 
+ UNINSTALL_KDUMP = $(sbindir)/kdump

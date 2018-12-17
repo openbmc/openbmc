@@ -1,0 +1,52 @@
+From 475979cf5c1af978f4e8409666365ec75b3320ea Mon Sep 17 00:00:00 2001
+From: Benjamin Berg <bberg@redhat.com>
+Date: Mon, 21 Aug 2017 10:34:40 +0200
+Subject: [PATCH] Remove -Werror from build
+
+Upstream-Status: Pending
+
+---
+ src/Makefile.am           | 2 +-
+ src/lib/src/Makefile.am   | 2 +-
+ src/utilities/Makefile.am | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 4daa9e8f..873f23eb 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -14,7 +14,7 @@ AM_CPPFLAGS = \
+ 	`pkg-config --silence-errors --cflags json` \
+ 	`pkg-config --silence-errors --cflags json-c` \
+ 	-pthread `pkg-config --cflags glib-2.0 gio-2.0` \
+-	-Wall -Werror -Wextra
++	-Wall -Wextra
+ 
+ bin_PROGRAMS = fwts
+ 
+diff --git a/src/lib/src/Makefile.am b/src/lib/src/Makefile.am
+index fa232451..082403a2 100644
+--- a/src/lib/src/Makefile.am
++++ b/src/lib/src/Makefile.am
+@@ -24,7 +24,7 @@ AM_CPPFLAGS = \
+ 	`pkg-config --silence-errors --cflags json-c`	\
+ 	`pkg-config --cflags glib-2.0 gio-2.0` 		\
+ 	-DDATAROOTDIR=\"$(datarootdir)\"		\
+-	-Wall -Werror -Wextra
++	-Wall -Wextra
+ 
+ pkglib_LTLIBRARIES = libfwts.la
+ 
+diff --git a/src/utilities/Makefile.am b/src/utilities/Makefile.am
+index aa37de55..4d5297cc 100644
+--- a/src/utilities/Makefile.am
++++ b/src/utilities/Makefile.am
+@@ -16,7 +16,7 @@
+ # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ #
+ 
+-AM_CPPFLAGS = -Wall -Werror -Wextra -DDATAROOTDIR=\"$(datarootdir)\" \
++AM_CPPFLAGS = -Wall -Wextra -DDATAROOTDIR=\"$(datarootdir)\" \
+ 	`pkg-config --silence-errors --cflags json` \
+ 	`pkg-config --silence-errors --cflags json-c`
+ 

@@ -1,4 +1,4 @@
-From d88af5aa0312ea18aac791d66661da79b7bcd032 Mon Sep 17 00:00:00 2001
+From 7efe4676747e4e4a056b9bfb4e9424c8354e9996 Mon Sep 17 00:00:00 2001
 From: "Maxin B. John" <maxin.john@intel.com>
 Date: Wed, 21 Dec 2016 15:32:07 +0200
 Subject: [PATCH] inet[6].defn: fix inverted checks for loopback
@@ -35,12 +35,13 @@ Upstream-Status: Inappropriate [OE specific]
 
 Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
 Signed-off-by: Maxin B. John <maxin.john@intel.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 ---
- inet.defn | 148 +++++++++++++++++++++++++++++++-------------------------------
- 1 file changed, 74 insertions(+), 74 deletions(-)
+ inet.defn | 140 +++++++++++++++++++++++++++++++-------------------------------
+ 1 file changed, 70 insertions(+), 70 deletions(-)
 
 diff --git a/inet.defn b/inet.defn
-index 75e6744..b5f5da2 100644
+index 75e6744..23c7756 100644
 --- a/inet.defn
 +++ b/inet.defn
 @@ -6,10 +6,10 @@ method loopback
@@ -48,11 +49,11 @@ index 75e6744..b5f5da2 100644
  
    up
 -    /bin/ip link set dev %iface% up if (!iface_is_lo())
-+    ip link set dev %iface% up if (iface_is_lo())
++    ip link set dev %iface% up if (!iface_is_lo())
  
    down
 -    /bin/ip link set dev %iface% down if (!iface_is_lo())
-+    ip link set dev %iface% down if (iface_is_lo())
++    ip link set dev %iface% down if (!iface_is_lo())
  
  method static
    description
@@ -211,23 +212,20 @@ index 75e6744..b5f5da2 100644
  
  architecture kfreebsd
  
-@@ -211,12 +211,12 @@ method loopback
+@@ -211,11 +211,11 @@ method loopback
      This method may be used to define the IPv4 loopback interface.
  
    up
 -    /sbin/ifconfig %iface% 127.0.0.1 up \
--	if (!iface_is_lo())
 +    ifconfig %iface% 127.0.0.1 up \
-+	if (iface_is_lo())
+ 	if (!iface_is_lo())
  
    down
 -    /sbin/ifconfig %iface% down \
--	if (!iface_is_lo())
 +    ifconfig %iface% down \
-+	if (iface_is_lo())
+ 	if (!iface_is_lo())
  
  method static
-   description
 @@ -238,15 +238,15 @@ method static
      hwaddress cleanup_hwaddress
  
@@ -339,20 +337,6 @@ index 75e6744..b5f5da2 100644
  architecture hurd
  
  method loopback
-@@ -367,11 +367,11 @@ method loopback
- 
-   up
-     inetutils-ifconfig --interface %iface% --address 127.0.0.1 --up \
--	if (!iface_is_lo())
-+	if (iface_is_lo())
- 
-   down
-     inetutils-ifconfig --interface %iface% --down \
--	if (!iface_is_lo())
-+	if (iface_is_lo())
- 
- method static
-   description
 @@ -432,23 +432,23 @@ method dhcp
  
    up
@@ -418,5 +402,5 @@ index 75e6744..b5f5da2 100644
 -    /usr/sbin/avahi-autoipd --kill %iface%
 +    avahi-autoipd --kill %iface%
 -- 
-2.4.0
+2.7.4
 

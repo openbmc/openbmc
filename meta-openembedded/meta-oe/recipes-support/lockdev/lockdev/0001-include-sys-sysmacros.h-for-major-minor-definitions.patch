@@ -1,0 +1,30 @@
+From 2f39dc3d6f920c0826aa74367da1a0a7cc49b0fe Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 11 Aug 2018 15:18:04 -0700
+Subject: [PATCH] include sys/sysmacros.h for major/minor definitions
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+inclusion of <sys/sysmacros.h> by <sys/types.h> is deprecated.
+This means that in a future release, the macros “major”, “minor”, and
+“makedev” will only be available from <sys/sysmacros.h>.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/lockdev.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/lockdev.c b/src/lockdev.c
+index 9a0fca5..3581938 100644
+--- a/src/lockdev.c
++++ b/src/lockdev.c
+@@ -117,6 +117,7 @@
+ #include <sys/stat.h>
+ #include <sys/file.h>
+ #include <sys/types.h>
++#include <sys/sysmacros.h>
+ #include <sys/wait.h>
+ #include "lockdev.h"
+ #include "ttylock.h"

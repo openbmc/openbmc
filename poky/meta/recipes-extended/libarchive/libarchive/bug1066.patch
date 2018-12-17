@@ -1,0 +1,54 @@
+libarchive-3.3.3: Fix bug1066
+
+[No upstream tracking] -- https://github.com/libarchive/libarchive/pull/1066
+
+archive_write_set_format_*.c: fix out of bounds read on empty string () filename
+for guntar, pax and v7tar
+
+There is an out of bounds read flaw in the archive_write_gnutar_header,
+archive_write_pax_header and archive_write_v7tar_header functions which
+could leds to cause a denial of service.
+
+Upstream-Status: Backport [https://github.com/libarchive/libarchive/commit/c246ec5d058a3f70a2d3fb765f92fe9db77b25df]
+Bug: 1066
+Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
+
+diff --git a/libarchive/archive_write_set_format_gnutar.c b/libarchive/archive_write_set_format_gnutar.c
+index 2d858c9..1966c53 100644
+--- a/libarchive/archive_write_set_format_gnutar.c
++++ b/libarchive/archive_write_set_format_gnutar.c
+@@ -339,7 +339,7 @@ archive_write_gnutar_header(struct archive_write *a,
+ 		 * case getting WCS failed. On POSIX, this is a
+ 		 * normal operation.
+ 		 */
+-		if (p != NULL && p[strlen(p) - 1] != '/') {
++		if (p != NULL && p[0] != '\0' && p[strlen(p) - 1] != '/') {
+ 			struct archive_string as;
+ 
+ 			archive_string_init(&as);
+diff --git a/libarchive/archive_write_set_format_pax.c b/libarchive/archive_write_set_format_pax.c
+index 6a301ac..4cfa8ff 100644
+--- a/libarchive/archive_write_set_format_pax.c
++++ b/libarchive/archive_write_set_format_pax.c
+@@ -660,7 +660,7 @@ archive_write_pax_header(struct archive_write *a,
+ 			 * case getting WCS failed. On POSIX, this is a
+ 			 * normal operation.
+ 			 */
+-			if (p != NULL && p[strlen(p) - 1] != '/') {
++			if (p != NULL && p[0] != '\0' && p[strlen(p) - 1] != '/') {
+ 				struct archive_string as;
+ 
+ 				archive_string_init(&as);
+diff --git a/libarchive/archive_write_set_format_v7tar.c b/libarchive/archive_write_set_format_v7tar.c
+index 62b1522..53c0db0 100644
+--- a/libarchive/archive_write_set_format_v7tar.c
++++ b/libarchive/archive_write_set_format_v7tar.c
+@@ -284,7 +284,7 @@ archive_write_v7tar_header(struct archive_write *a, struct archive_entry *entry)
+ 		 * case getting WCS failed. On POSIX, this is a
+ 		 * normal operation.
+ 		 */
+-		if (p != NULL && p[strlen(p) - 1] != '/') {
++		if (p != NULL && p[0] != '\0' && p[strlen(p) - 1] != '/') {
+ 			struct archive_string as;
+ 
+ 			archive_string_init(&as);

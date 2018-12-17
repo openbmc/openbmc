@@ -1,0 +1,46 @@
+From 0c28cf7bfa90f8947833722cddf23d513490c6c3 Mon Sep 17 00:00:00 2001
+From: Anuj Mittal <anuj.mittal@intel.com>
+Date: Wed, 28 Nov 2018 15:08:48 +0800
+Subject: [PATCH] vaapsink: downgrade to marginal
+
+Using vaapisink with default poky configuration results in an
+unresponsive display as of today because DRI2 rendering is currently broken
+in non composited environments [1] and libva doesn't support DRI3 [2].
+
+Downgrade vaapisink to marginal for now so playbin (and in turn gst-play
+and gtk-play examples) use xvimagesink or others out of box.
+
+[1] https://gitlab.freedesktop.org/xorg/xserver/issues/13
+[2] https://github.com/intel/libva/issues/122
+
+Upstream-Status: Pending
+
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+---
+ gst/vaapi/gstvaapi.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/gst/vaapi/gstvaapi.c b/gst/vaapi/gstvaapi.c
+index 9a82454..4d94f2b 100644
+--- a/gst/vaapi/gstvaapi.c
++++ b/gst/vaapi/gstvaapi.c
+@@ -210,7 +210,6 @@ plugin_init (GstPlugin * plugin)
+ {
+   GstVaapiDisplay *display;
+   GArray *decoders;
+-  guint rank;
+ 
+   plugin_add_dependencies (plugin);
+ 
+@@ -235,10 +234,7 @@ plugin_init (GstPlugin * plugin)
+   gst_element_register (plugin, "vaapidecodebin",
+       GST_RANK_PRIMARY + 2, GST_TYPE_VAAPI_DECODE_BIN);
+ 
+-  rank = GST_RANK_PRIMARY;
+-  if (g_getenv ("WAYLAND_DISPLAY"))
+-    rank = GST_RANK_MARGINAL;
+-  gst_element_register (plugin, "vaapisink", rank, GST_TYPE_VAAPISINK);
++  gst_element_register (plugin, "vaapisink", GST_RANK_MARGINAL, GST_TYPE_VAAPISINK);
+ 
+ #if USE_ENCODERS
+   gst_vaapiencode_register (plugin, display);

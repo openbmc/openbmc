@@ -1,0 +1,49 @@
+From 162a0899f1dacd83007c4e82b9034f55610d8c20 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 5 Sep 2018 19:01:51 -0700
+Subject: [PATCH 2/2] Define own resize in NCPad and fix param type of
+ SetLabel()
+
+Explicitly override resize() to avoid conflicts from NCursesWindow
+definition since there is another resize definition as well
+
+Fixes
+src/NCPad.h:164:18: error: 'NCPad::resize' hides overloaded virtual function [-Werror,-Woverloaded-virtual]
+
+NCTablePad.h:132:18: error: 'NCTableTag::SetLabel' hides overloaded virtual function [-Werror,-Woverloaded-virtual]
+
+Upstream-Status: Submitted [https://github.com/libyui/libyui-ncurses/pull/69]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/NCPad.h      | 1 +
+ src/NCTablePad.h | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/NCPad.h b/src/NCPad.h
+index 328c4aa..d8fb324 100644
+--- a/src/NCPad.h
++++ b/src/NCPad.h
+@@ -162,6 +162,7 @@ public:
+     virtual void Destwin( NCursesWindow * dwin );
+ 
+     virtual void resize( wsze nsze );
++    virtual int resize( int lines, int columns ) { return NCursesWindow::resize(lines, columns );}
+     virtual void wRecoded();
+     virtual void setDirty() { dirty = true; }
+ 
+diff --git a/src/NCTablePad.h b/src/NCTablePad.h
+index c450529..3756796 100644
+--- a/src/NCTablePad.h
++++ b/src/NCTablePad.h
+@@ -129,7 +129,7 @@ public:
+ 
+     virtual ~NCTableTag() {}
+ 
+-    virtual void SetLabel( const NCstring & ) { /*NOOP*/; }
++    virtual void SetLabel( const NClabel & ) { /*NOOP*/; }
+ 
+     virtual void DrawAt( NCursesWindow & w, const wrect at,
+ 			 NCTableStyle & tableStyle,
+-- 
+2.18.0
+

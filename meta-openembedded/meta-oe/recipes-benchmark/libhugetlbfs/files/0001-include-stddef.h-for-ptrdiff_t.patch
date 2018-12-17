@@ -1,0 +1,23 @@
+From 351d1de09dd80049b7a2cb02c5750635d0389873 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 21 Jun 2018 19:25:57 -0700
+Subject: [PATCH] include stddef.h for ptrdiff_t
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
+ morecore.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/morecore.c b/morecore.c
+index 6563bbd..0eef782 100644
+--- a/morecore.c
++++ b/morecore.c
+@@ -19,6 +19,7 @@
+ 
+ #define _GNU_SOURCE
+ 
++#include <stddef.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <malloc.h>

@@ -4,47 +4,9 @@ Date: Fri, 15 Dec 2017 10:14:05 -0600
 Subject: [PATCH] gstd:yocto compatibility
 
 ---
- autogen.sh                      | 8 +++++++-
- docs/reference/gstd/Makefile.am | 2 +-
  gstd/Makefile.am                | 2 +-
  3 files changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/autogen.sh b/autogen.sh
-index 66dbd42..793ee2f 100755
---- a/autogen.sh
-+++ b/autogen.sh
-@@ -21,7 +21,11 @@
- # ACLOCAL, AUTOPOINT and/or LIBTOOLIZE to the right versions, or leave them
- # unset and get the defaults
- 
--gtkdocize || exit 1
-+test -n "$srcdir" || srcdir=`dirname "$0"`
-+test -n "$srcdir" || srcdir=.
-+
-+olddir=`pwd`
-+cd "$srcdir"
- 
- autoreconf --verbose --force --install || {
-  echo 'autogen.sh failed';
-@@ -31,3 +35,5 @@ autoreconf --verbose --force --install || {
- echo
- echo "Now run './configure' with your system settings followed by 'make' to compile this module."
- echo
-+
-+cd "$olddir"
-diff --git a/docs/reference/gstd/Makefile.am b/docs/reference/gstd/Makefile.am
-index f860fa1..153a13b 100644
---- a/docs/reference/gstd/Makefile.am
-+++ b/docs/reference/gstd/Makefile.am
-@@ -66,7 +66,7 @@ GTKDOC_LIBS=$(top_builddir)/gstd/libgstd-core.la
- 
- 
- # This includes the standard gtk-doc make rules, copied by gtkdocize.
--include $(top_srcdir)/docs/gtk-doc.make
-+# include $(top_srcdir)/docs/gtk-doc.make
- 
- # Comment this out if you want 'make check' to test you doc status
- # and run some sanity checks
 diff --git a/gstd/Makefile.am b/gstd/Makefile.am
 index 13c551d..11fe202 100644
 --- a/gstd/Makefile.am

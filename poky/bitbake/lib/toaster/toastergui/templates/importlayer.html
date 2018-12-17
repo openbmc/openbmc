@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends project_specific|yesno:"baseprojectspecificpage.html,base.html" %}
 {% load projecttags %}
 {% load humanize %}
 {% load static %}
@@ -6,7 +6,7 @@
 {% block pagecontent %}
 
 <div class="row">
-  {% include "projecttopbar.html" %}
+  {% include project_specific|yesno:"project_specific_topbar.html,projecttopbar.html" %}
   {% if project and project.release %}
   <script src="{% static 'js/layerDepsModal.js' %}"></script>
   <script src="{% static 'js/importlayer.js' %}"></script>

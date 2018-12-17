@@ -1,0 +1,38 @@
+From ae1cf6d0eb1833e46549328a4473222c259723d7 Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Thu, 1 Feb 2018 00:25:00 +0100
+Subject: [PATCH] mtd-utils: common.h: no features.h for klibc builds
+
+Add guard around features.h to fix missing include (here first error):
+
+ ../git/include/common.h:29:10:
+ fatal error: features.h: No such file or directory
+  #include <features.h>
+           ^~~~~~~~~~~~
+ compilation terminated
+
+Upstream-Status: Submitted
+
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+---
+ include/common.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/include/common.h b/include/common.h
+index 642c212..f7c71fe 100644
+--- a/include/common.h
++++ b/include/common.h
+@@ -26,7 +26,10 @@
+ #include <string.h>
+ #include <fcntl.h>
+ #include <errno.h>
++#if defined(__KLIBC__)
++#else
+ #include <features.h>
++#endif
+ #include <inttypes.h>
+ #include <unistd.h>
+ #include <sys/sysmacros.h>
+-- 
+2.7.4
+

@@ -1,4 +1,4 @@
-From b459c55e4968321e5a82272cb39aa69d4054990f Mon Sep 17 00:00:00 2001
+From b0a64db90a24469e36978c748417ebe456b34d59 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 22 Apr 2017 11:54:57 -0700
 Subject: [PATCH] configure: Check for -Wno-error=format-truncation compiler
@@ -14,35 +14,26 @@ client.c:834:23: error: '%s' directive output may be truncated writing up to 102
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---
- configure.ac                |  3 +-
- m4/ax_check_compile_flag.m4 | 74 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 76 insertions(+), 1 deletion(-)
+ configure.ac                |  1 +
+ m4/ax_check_compile_flag.m4 | 74 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 75 insertions(+)
  create mode 100644 m4/ax_check_compile_flag.m4
 
 diff --git a/configure.ac b/configure.ac
-index 8854542..edb8cfb 100644
+index a7eca97d..560eb988 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -4,7 +4,6 @@ AC_INIT([collectd],[m4_esyscmd(./version-gen.sh)])
- AC_CONFIG_SRCDIR(src/target_set.c)
- AC_CONFIG_HEADERS(src/config.h)
- AC_CONFIG_AUX_DIR([libltdl/config])
--
- dnl older automake's default of ARFLAGS=cru is noisy on newer binutils;
- dnl we don't really need the 'u' even in older toolchains.  Then there is
- dnl older libtool, which spelled it AR_FLAGS
-@@ -6688,6 +6687,8 @@ then
-         AM_CFLAGS="$AM_CFLAGS -Werror"
-         AM_CXXFLAGS="$AM_CXXFLAGS -Werror"
+@@ -6794,6 +6794,7 @@ if test "x$enable_werror" != "xno"; then
+   AM_CFLAGS="$AM_CFLAGS -Werror"
+   AM_CXXFLAGS="$AM_CXXFLAGS -Werror"
  fi
 +AX_CHECK_COMPILE_FLAG([-Werror -Werror=format-truncation],[AM_CFLAGS="$AM_CFLAGS -Wno-error=format-truncation" AM_CXXFLAGS="$AM_CXXFLAGS -Wno-error=format-truncation"])
-+
+ 
  AC_SUBST([AM_CFLAGS])
  AC_SUBST([AM_CXXFLAGS])
- 
 diff --git a/m4/ax_check_compile_flag.m4 b/m4/ax_check_compile_flag.m4
 new file mode 100644
-index 0000000..dcabb92
+index 00000000..dcabb92a
 --- /dev/null
 +++ b/m4/ax_check_compile_flag.m4
 @@ -0,0 +1,74 @@
@@ -120,6 +111,3 @@ index 0000000..dcabb92
 +  [m4_default([$3], :)])
 +AS_VAR_POPDEF([CACHEVAR])dnl
 +])dnl AX_CHECK_COMPILE_FLAGS
--- 
-2.13.4
-

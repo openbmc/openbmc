@@ -238,7 +238,7 @@ def appendfile(args):
     if stdout:
         logger.debug('file command output: %s' % stdout.rstrip())
         if ('executable' in stdout and not 'shell script' in stdout) or 'shared object' in stdout:
-            logger.warn('This file looks like it is a binary or otherwise the output of compilation. If it is, you should consider building it properly instead of substituting a binary file directly.')
+            logger.warning('This file looks like it is a binary or otherwise the output of compilation. If it is, you should consider building it properly instead of substituting a binary file directly.')
 
     if args.recipe:
         recipes = {args.targetpath: [args.recipe],}
@@ -275,7 +275,7 @@ def appendfile(args):
     if selectpn:
         logger.debug('Selecting recipe %s for file %s' % (selectpn, args.targetpath))
         if postinst_pns:
-            logger.warn('%s be modified by postinstall scripts for the following recipes:\n  %s\nThis may or may not be an issue depending on what modifications these postinstall scripts make.' % (args.targetpath, '\n  '.join(postinst_pns)))
+            logger.warning('%s be modified by postinstall scripts for the following recipes:\n  %s\nThis may or may not be an issue depending on what modifications these postinstall scripts make.' % (args.targetpath, '\n  '.join(postinst_pns)))
         rd = _parse_recipe(selectpn, tinfoil)
         if not rd:
             # Error message already shown
@@ -286,12 +286,12 @@ def appendfile(args):
             sourcetype, sourcepath = sourcefile.split('://', 1)
             logger.debug('Original source file is %s (%s)' % (sourcepath, sourcetype))
             if sourcetype == 'patch':
-                logger.warn('File %s is added by the patch %s - you may need to remove or replace this patch in order to replace the file.' % (args.targetpath, sourcepath))
+                logger.warning('File %s is added by the patch %s - you may need to remove or replace this patch in order to replace the file.' % (args.targetpath, sourcepath))
                 sourcepath = None
         else:
             logger.debug('Unable to determine source file, proceeding anyway')
         if modpatches:
-            logger.warn('File %s is modified by the following patches:\n  %s' % (args.targetpath, '\n  '.join(modpatches)))
+            logger.warning('File %s is modified by the following patches:\n  %s' % (args.targetpath, '\n  '.join(modpatches)))
 
         if instelements and sourcepath:
             install = None
@@ -343,7 +343,7 @@ def appendsrc(args, files, rd, extralines=None):
             if rd.getVar('S') == rd.getVar('STAGING_KERNEL_DIR'):
                 srcdir = os.path.join(workdir, 'git')
                 if not bb.data.inherits_class('kernel-yocto', rd):
-                    logger.warn('S == STAGING_KERNEL_DIR and non-kernel-yocto, unable to determine path to srcdir, defaulting to ${WORKDIR}/git')
+                    logger.warning('S == STAGING_KERNEL_DIR and non-kernel-yocto, unable to determine path to srcdir, defaulting to ${WORKDIR}/git')
             src_destdir = os.path.join(os.path.relpath(srcdir, workdir), src_destdir)
         src_destdir = os.path.normpath(src_destdir)
 
@@ -357,9 +357,9 @@ def appendsrc(args, files, rd, extralines=None):
         if simple_str in simplified:
             existing = simplified[simple_str]
             if source_uri != existing:
-                logger.warn('{0!r} is already in SRC_URI, with different parameters: {1!r}, not adding'.format(source_uri, existing))
+                logger.warning('{0!r} is already in SRC_URI, with different parameters: {1!r}, not adding'.format(source_uri, existing))
             else:
-                logger.warn('{0!r} is already in SRC_URI, not adding'.format(source_uri))
+                logger.warning('{0!r} is already in SRC_URI, not adding'.format(source_uri))
         else:
             extralines.append('SRC_URI += {0}'.format(source_uri))
         copyfiles[newfile] = srcfile

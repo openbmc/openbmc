@@ -1,0 +1,27 @@
+From 20b639b7364f9953fdacb058f9ba800bcbf029b4 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Thu, 2 Aug 2018 09:40:48 +0800
+Subject: [PATCH] mozjs: fix coredump caused by getenv
+
+Upstream-Status: Submitted [https://bugzilla.mozilla.org/show_bug.cgi?id=1480315]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ mozglue/misc/TimeStamp.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/mozglue/misc/TimeStamp.cpp b/mozglue/misc/TimeStamp.cpp
+index 932b75c..7a4d71b 100644
+--- a/mozglue/misc/TimeStamp.cpp
++++ b/mozglue/misc/TimeStamp.cpp
+@@ -11,6 +11,7 @@
+ #include "mozilla/TimeStamp.h"
+ #include <stdio.h>
+ #include <string.h>
++#include <stdlib.h>
+ 
+ namespace mozilla {
+ 
+-- 
+2.7.4
+

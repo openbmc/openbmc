@@ -7,14 +7,10 @@ LIC_FILES_CHKSUM = " \
     file://${COMMON_LICENSE_DIR}/BSD-2-Clause;md5=8bef8e6712b1be5aa76af1ebde9d6378 \
     file://${COMMON_LICENSE_DIR}/BSD-3-Clause;md5=550794465ba0ec5312d6919e203a55f9 \
 "
-DEPENDS = "libbsd libpcre openssl zlib libcap"
+DEPENDS = "libbsd libpcre zlib libcap"
+DEPENDS_append_class-target = " openssl10"
 
 ANDROID_MIRROR = "android.googlesource.com"
-CORE_REPO = "${ANDROID_MIRROR}/platform/system/core"
-EXTRAS_REPO = "${ANDROID_MIRROR}/platform/system/extras"
-LIBHARDWARE_REPO = "${ANDROID_MIRROR}/platform/hardware/libhardware"
-LIBSELINUX_REPO = "${ANDROID_MIRROR}/platform/external/libselinux"
-BUILD_REPO = "${ANDROID_MIRROR}/platform/build"
 
 # matches with android-5.1.1_r37
 SRCREV_core = "2314b110bdebdbfd2d94c502282f9e57c849897e"
@@ -24,30 +20,35 @@ SRCREV_libselinux = "07e9e1339ad1ba608acfba9dce2d0f474b252feb"
 SRCREV_build = "16e987def3d7d8f7d30805eb95cef69e52a87dbc"
 
 SRC_URI = " \
-    git://${CORE_REPO};name=core;protocol=https;nobranch=1;destsuffix=git/system/core \
-    git://${EXTRAS_REPO};name=extras;protocol=https;nobranch=1;destsuffix=git/system/extras \
-    git://${LIBHARDWARE_REPO};name=libhardware;protocol=https;nobranch=1;destsuffix=git/hardware/libhardware \
-    git://${LIBSELINUX_REPO};name=libselinux;protocol=https;nobranch=1;destsuffix=git/external/libselinux \
-    git://${BUILD_REPO};name=build;protocol=https;nobranch=1;destsuffix=git/build \
-    file://remove-selinux-android.patch \
-    file://use-capability.patch \
-    file://use-local-socket.patch \
-    file://preserve-ownership.patch;patchdir=system/extras \
-    file://mkbootimg-Add-dt-parameter-to-specify-DT-image.patch \
-    file://remove-bionic-android.patch \
-    file://define-shell-command.patch \
-    file://implicit-declaration-function-strlcat-strlcopy.patch \
-    file://fix-big-endian-build.patch \
-    file://0001-add-base64-implementation.patch \
-    file://0002-adb-Musl-fixes.patch \
+    git://${ANDROID_MIRROR}/platform/system/core;name=core;protocol=https;nobranch=1;destsuffix=git/system/core \
+    git://${ANDROID_MIRROR}/platform/system/extras;name=extras;protocol=https;nobranch=1;destsuffix=git/system/extras \
+    git://${ANDROID_MIRROR}/platform/hardware/libhardware;name=libhardware;protocol=https;nobranch=1;destsuffix=git/hardware/libhardware \
+    git://${ANDROID_MIRROR}/platform/external/libselinux;name=libselinux;protocol=https;nobranch=1;destsuffix=git/external/libselinux \
+    git://${ANDROID_MIRROR}/platform/build;name=build;protocol=https;nobranch=1;destsuffix=git/build \
+    file://core/0001-adb-remove-selinux-extensions.patch;patchdir=system/core \
+    file://core/0002-adb-Use-local-sockets-where-appropriate.patch;patchdir=system/core \
+    file://core/0003-adb-define-shell-command.patch;patchdir=system/core \
+    file://core/0004-adb-Fix-build-on-big-endian-systems.patch;patchdir=system/core \
+    file://core/0005-adb-add-base64-implementation.patch;patchdir=system/core \
+    file://core/0006-adb-Musl-fixes.patch;patchdir=system/core \
+    file://core/0007-adb-usb_linux.c-fix-build-with-glibc-2.28.patch;patchdir=system/core \
+    file://core/0008-adb-Allow-adbd-to-be-ran-as-root.patch;patchdir=system/core \
+    file://core/0009-mkbootimg-Add-dt-parameter-to-specify-DT-image.patch;patchdir=system/core \
+    file://core/0010-Use-linux-capability.h-on-linux-systems-too.patch;patchdir=system/core \
+    file://core/0011-Remove-bionic-specific-calls.patch;patchdir=system/core \
+    file://core/0012-Fix-implicit-declaration-of-stlcat-strlcopy-function.patch;patchdir=system/core \
+    file://extras/0001-ext4_utils-remove-selinux-extensions.patch;patchdir=system/extras \
+    file://extras/0002-ext4_utils-add-o-argument-to-preserve-ownership.patch;patchdir=system/extras \
+    file://libselinux/0001-Remove-bionic-specific-calls.patch;patchdir=external/libselinux \
     file://android-tools-adbd.service \
-    file://.gitignore;subdir=git \
+    file://gitignore \
     file://adb.mk;subdir=${BPN} \
     file://adbd.mk;subdir=${BPN} \
     file://ext4_utils.mk;subdir=${BPN} \
     file://fastboot.mk;subdir=${BPN} \
     file://mkbootimg.mk;subdir=${BPN} \
 "
+
 
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/${BPN}"
@@ -71,6 +72,8 @@ TOOLS_class-native = "fastboot ext4_utils mkbootimg"
 TOOLS_class-nativesdk = "fastboot ext4_utils mkbootimg"
 
 do_compile() {
+    cp ${WORKDIR}/gitignore ${S}/.gitignore
+
     # Setting both variables below causing our makefiles to not work with
     # implicit make rules
     unset CFLAGS

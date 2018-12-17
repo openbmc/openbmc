@@ -1,0 +1,36 @@
+From 9107f3bd68aef6ae456a3cad664223b4f3d00131 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Tue, 24 Jul 2018 17:04:39 +0800
+Subject: [PATCH] dlm: fix compile error since xml2-config should not be used
+
+xml2-config is disabled, so change Makefile to use pkgconfig
+to find libxml2.
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ fence/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/fence/Makefile b/fence/Makefile
+index 77bf0fd..cca0b2c 100644
+--- a/fence/Makefile
++++ b/fence/Makefile
+@@ -30,11 +30,11 @@ BIN_CFLAGS += -D_GNU_SOURCE -O2 -ggdb \
+ 	-fdiagnostics-show-option \
+ 
+ BIN_CFLAGS += -fPIE -DPIE
+-BIN_CFLAGS += `xml2-config --cflags`
++BIN_CFLAGS += `pkg-config libxml-2.0 --cflags`
+ BIN_CFLAGS += -I../include
+ 
+ BIN_LDFLAGS += -Wl,-z,now -Wl,-z,relro -pie
+-BIN_LDFLAGS += `xml2-config --libs`
++BIN_LDFLAGS += `pkg-config libxml-2.0 --libs`
+ BIN_LDFLAGS += -ldl
+ 
+ all: $(BIN_TARGET)
+-- 
+2.7.4
+

@@ -1,0 +1,11 @@
+This test data is used to verify the 'cooker' module of the layerindex.
+
+The module consists of a faux project bblayers.conf with four layers defined.
+
+layer1 - openembedded-core
+layer2 - networking-layer
+layer3 - meta-python
+layer4 - openembedded-layer (meta-oe)
+
+Since we do not have a fully populated cooker, we use this to test the
+basic index generation, and not any deep recipe based contents.

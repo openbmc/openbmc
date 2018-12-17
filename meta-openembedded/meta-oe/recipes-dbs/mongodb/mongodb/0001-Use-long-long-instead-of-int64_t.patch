@@ -44,7 +44,7 @@ Index: git/src/mongo/util/procparser.cpp
  
              if (!parseNumberFromString(stringValue, &value).isOK()) {
                  value = 0;
-@@ -426,7 +426,7 @@ Status parseProcDiskStats(const std::vec
+@@ -522,7 +522,7 @@ Status parseProcDiskStats(const std::vec
                            StringData data,
                            BSONObjBuilder* builder) {
      bool foundKeys = false;
@@ -53,7 +53,7 @@ Index: git/src/mongo/util/procparser.cpp
      stats.reserve(kDiskFieldCount);
  
      using string_split_iterator = boost::split_iterator<StringData::const_iterator>;
-@@ -501,7 +501,7 @@ Status parseProcDiskStats(const std::vec
+@@ -597,7 +597,7 @@ Status parseProcDiskStats(const std::vec
  
                  StringData stringValue((*partIt).begin(), (*partIt).end());
  

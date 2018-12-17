@@ -1,20 +1,24 @@
-vim: add knob whether elf.h are checked
+From 38de4bccdb8a861ffdd447f12fdab19d6d852c02 Mon Sep 17 00:00:00 2001
+From: Chong Lu <Chong.Lu@windriver.com>
+Date: Tue, 26 Jun 2018 17:34:15 +0800
+Subject: [PATCH] vim: add knob whether elf.h are checked
 
 Previously, it still was checked when there was no elf library in sysroots directory.
 Add knob to decide whether elf.h are checked or not.
 
-Upstream-status: Pending
+Upstream-Status: Pending
 
 Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
- src/configure.ac |    7 +++++++
+ src/configure.ac | 7 +++++++
  1 file changed, 7 insertions(+)
 
 diff --git a/src/configure.ac b/src/configure.ac
-index d734064..f504fa6 100644
+index 0ee86ad..64736f0 100644
 --- a/src/configure.ac
 +++ b/src/configure.ac
-@@ -2483,11 +2483,18 @@ AC_TRY_COMPILE([#include <stdio.h>], [int x __attribute__((unused));],
+@@ -3192,11 +3192,18 @@ AC_TRY_COMPILE([#include <stdio.h>], [int x __attribute__((unused));],
  	AC_MSG_RESULT(no))
  
  dnl Checks for header files.
@@ -34,5 +38,5 @@ index d734064..f504fa6 100644
  AC_HEADER_DIRENT
  
 -- 
-1.7.9.5
+2.7.4
 

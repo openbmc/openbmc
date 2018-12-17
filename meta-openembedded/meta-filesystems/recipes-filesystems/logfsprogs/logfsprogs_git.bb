@@ -14,6 +14,7 @@ DEPENDS = "zlib"
 SRC_URI = "git://github.com/prasad-joshi/logfsprogs.git \
            file://0001-Add-LDFLAGS-to-linker-cmdline.patch \
            file://0001-btree-Avoid-conflicts-with-libc-namespace-about-setk.patch \
+           file://0001-include-sys-sysmacros.h-for-major-minor-definition.patch \
            "
 SRCREV = "45b72c81ce3c6fa17ca19bafc207ea93e76312f4"
 

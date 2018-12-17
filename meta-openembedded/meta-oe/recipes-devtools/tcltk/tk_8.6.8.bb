@@ -42,22 +42,14 @@ REQUIRED_DISTRO_FEATURES = "x11"
 EXTRA_OECONF = "\
     --enable-threads \
     --with-x \
-    --with-tcl=${STAGING_BINDIR_CROSS} \
+    --with-tcl=${STAGING_BINDIR}/crossscripts \
     --libdir=${libdir} \
 "
-
+export TK_LIBRARY='${libdir}/tk${VER}'
 do_install_append() {
     ln -sf libtk${VER}.so ${D}${libdir}/libtk${VER}.so.0
     oe_libinstall -so libtk${VER} ${D}${libdir}
     ln -sf wish${VER} ${D}${bindir}/wish
-
-    # Even after passing libdir=${libdir} at config, some incorrect dirs are still generated for the multilib build
-    if [ "$libdir" != "/usr/lib" ]; then
-        # Move files to correct library directory
-        mv ${D}/usr/lib/tk${VER}/* ${D}/${libdir}/tk${VER}/
-        # Remove unneeded/incorrect dir ('usr/lib/')
-        rm -rf ${D}/usr/lib
-    fi
 }
 
 PACKAGECONFIG ??= "xft"
@@ -73,7 +65,7 @@ FILES_${PN} += "${libdir}/tk*"
 RDEPENDS_${PN} += "tk-lib"
 RDEPENDS_${PN}_class-native = ""
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"
 
 # Fix the path in sstate
 SSTATE_SCAN_FILES += "*Config.sh"

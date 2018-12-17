@@ -1,0 +1,260 @@
+[
+  {
+    "test": {
+      "@alias": "oe-core.scripts.Use_scripts/pybootchartgui/pybootchartgui.py_to_generate_build_profiles",
+      "author": [
+        {
+          "email": "alexandru.c.georgescu@intel.com",
+          "name": "alexandru.c.georgescu@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Run a build for a recipe (e.g. core-image-minimal)",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Run the profiling script, ../scripts/pybootchartgui/pybootchartgui.py  tmp/buildstats/    \n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Verify the results ",
+          "expected_results": "The scripts generates svg files with the profiling results . "
+        }
+      },
+      "summary": "Use_scripts/pybootchartgui/pybootchartgui.py_to_generate_build_profiles"
+    }
+  },
+  {
+    "test": {
+      "@alias": "oe-core.scripts.Crosstap_script_check",
+      "author": [
+        {
+          "email": "alexandru.c.georgescu@intel.com",
+          "name": "alexandru.c.georgescu@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Create the trace_open.stp script as follows in the host machine:  \n\n\nprobe syscall.open     \n\n{  \n\n\n        printf (\"%s(%d) open (%s)\\n\", execname(), pid(), argstr)  \n\n}  \n\n\n\nif the above failed, then create the below instead.  \n\nprobe syscall.open \n{ \n  printf (\"%s(%d) open\\n\", execname(), pid()) \n\n}  \n \n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Add 'tools-profile' and 'ssh-server-openssh' to EXTRA_IMAGE_FEATURES in local.conf \n\n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Build a core-image-minimal image, build systemtap-native. Start the image under qemu. \n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "Make sure that the ssh service is started on the Qemu machine. \n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "From the host machine poky build_dir, run \"crosstap root@192.168.7.2 trace_open.stp\".",
+          "expected_results": ""
+        },
+        "6": {
+          "action": "In QEMU, try to open some applications, such as open a terminal, input some command,  \n\n",
+          "expected_results": ""
+        },
+        "7": {
+          "action": "Check the host machine, \"crosstap\" has related output. \n\n\n\nNOTE:  Do not build the kernel from shared state(sstate-cache) for this to work.",
+          "expected_results": "The script should successfully connect to the qemu machine and there \nshould be presented a list of services(pid, process name) which run on \nthe qemu machine. "
+        }
+      },
+      "summary": "Crosstap_script_check"
+    }
+  },
+  {
+    "test": {
+      "@alias": "oe-core.scripts.List_all_the_PACKAGECONFIG's_flags",
+      "author": [
+        {
+          "email": "yi.zhao@windriver.com",
+          "name": "yi.zhao@windriver.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": " Download the poky source and setup the environment. ",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Run \"../scripts/contrib/list-packageconfig-flags.py\" ",
+          "expected_results": "In step 2, will list available pkgs which have PACKAGECONFIG flags:  \nPACKAGE NAME (or RECIPE NAME)           PACKAGECONFIG FLAGS  \n==============================================================  \nalsa-tools-1.0.26.1                                         defaultval gtk+  \navahi-ui-0.6.31                                                defaultval python  \nbluez4-4.101                                                alsa defaultval pie  \n"
+        },
+        "3": {
+          "action": "Run \"../scripts/contrib/list-packageconfig-flags.py -f\" ",
+          "expected_results": "In step 3, will list available PACKAGECONFIG flags and all affected pkgs  \nPACKAGECONFIG FLAG       PACKAGE NAMES (or RECIPE NAMES)  \n====================================  \n3g                             connman-1.16  \n        \navahi                        cups-1.6.3  pulseaudio-4.0  \nbeecrypt                   rpm-5.4.9  rpm-native-5.4.9  \n"
+        },
+        "4": {
+          "action": "Run \"../scripts/contrib/list-packageconfig-flags.py -a\" ",
+          "expected_results": "In step 4, will list all pkgs and PACKAGECONFIG information:  \n==================================================  \ngtk+-2.24.18  \n/home/jiahongxu/yocto/poky/meta/recipes-gnome/gtk+/gtk+_2.24.18.bb  \nPACKAGECONFIG x11  \nPACKAGECONFIG[x11] --with-x=yes --with-gdktarget=x11,--with-x=no,${X11DEPENDS}  \nxf86-video-intel-2.21.9  \n/home/jiahongxu/yocto/poky/meta/recipes-graphics/xorg-driver/xf86-video-intel_2.21.9.bb  \nPACKAGECONFIG None  \nPACKAGECONFIG[xvmc] --enable-xvmc,--disable-xvmc,libxvmc  \nPACKAGECONFIG[sna] --enable-sna,--disable-sna  \n"
+        },
+        "5": {
+          "action": "Run \"../scripts/contrib/list-packageconfig-flags.py -p\"   ",
+          "expected_results": "In step 5, will list pkgs with preferred version:  \nPACKAGE NAME (or RECIPE NAME)              PACKAGECONFIG FLAGS  \n===================================================  \nalsa-tools-1.0.26.1                                           defaultval gtk+  \navahi-ui-0.6.31                                                   defaultval python  \nbluez4-4.101                                                       alsa defaultval pie  \nbluez5-5.7                                                            alsa defaultval obex-profiles  \n\n\n\n "
+        }
+      },
+      "summary": "List_all_the_PACKAGECONFIG's_flags"
+    }
+  },
+  {
+    "test": {
+      "@alias": "oe-core.bitbake.Test_bitbake_menuconfig",
+      "author": [
+        {
+          "email": "jose.perez.carranza@intel.com",
+          "name": "jose.perez.carranza@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "clone poky  \n \n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "cd poky   \n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "source oe-init-build-env && cd build    \n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "set below in local.conf   \n\n  \tMACHINE = \"qemux86\"  \n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "bitbake linux-yocto -c kernel_configme -f   \n\n",
+          "expected_results": ""
+        },
+        "6": {
+          "action": "bitbake linux-yocto -c menuconfig   \n\n",
+          "expected_results": ""
+        },
+        "7": {
+          "action": "Once menuconfig launches, use the interface to navigate through the selections and \n   enable option \"64-bit kernel\"  \n\n",
+          "expected_results": ""
+        },
+        "8": {
+          "action": "Save changes and set name of the file as \"test.config\"  ",
+          "expected_results": "Open file:  \n \npoky/build//tmp/work/qemux86-poky-linux/linux-yocto/4.X.X+*/linux-qemux86-standard-build/test.config   \n  \n \n\nand verify that changes are present in the file as follows:   \n \nCONFIG_64BIT=y  \n \nCONFIG_X86_64=y"
+        }
+      },
+      "summary": "Test_bitbake_menuconfig"
+    }
+  },
+  {
+    "test": {
+      "@alias": "oe-core.bitbake.test_bitbake_devshell",
+      "author": [
+        {
+          "email": "jose.perez.carranza@intel.com",
+          "name": "jose.perez.carranza@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "clone poky ",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "cd poky  ",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "source oe-init-build-env && cd build ",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "bitbake matchbox-desktop ",
+          "expected_results": "Package was build correctly "
+        },
+        "5": {
+          "action": "bitbake matchbox-desktop -c devshell ",
+          "expected_results": "A terminal with a shell prompt within the OpenEmbedded build environment is opened "
+        },
+        "6": {
+          "action": "Verify that \"matchbox-desktop\" binary file is not created under\"src\" directory ",
+          "expected_results": ""
+        },
+        "7": {
+          "action": "Run command:./configure && make ",
+          "expected_results": "Verify that \"matchbox-desktop\" binary file was created successfully under \"src/\" directory "
+        },
+        "8": {
+          "action": "Exit fromthe devshell terminal,exit ",
+          "expected_results": "Terminal back to the build directory"
+        }
+      },
+      "summary": "test_bitbake_devshell"
+    }
+  },
+  {
+    "test": {
+      "@alias": "oe-core.bitbake.test_dependency_explorer_is_launched",
+      "author": [
+        {
+          "email": "jose.perez.carranza@intel.com",
+          "name": "jose.perez.carranza@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "clone poky ",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "cd poky ",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "source oe-init-build-env ",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "bitbake -u taskexp -g core-image-full-cmdline    \n\nNOTE: To execute the last command of this test, it's necessary that the machine is executing an X11 server, or if that's not the case (for example, if running the test on a headless server), it is required to enable ssh X11 forwarding on both, the server and the client, and have the X11 server running on the client.    \n\nThe instructions to enable X11 forwarding vary between distributions. But for example, these are the steps to enable it between a server running openSUSE Leap 42.1 and a client with Fedora 24:  \nA. On the server, make sure /home//.ssh/config contains the line:  \n     ForwardX11 yes  \nB. On the server, make sure xauth is installed by running:  \n      which xauth  \nC. On the client, connect to the server, enabling X11 forwarding, for example by using:  \n      ssh -X user@server    \nNOTE 2: depexp was renamed to taskexp on 2.3 M4",
+          "expected_results": "Verify that a \"dependency explorer\" is opened and file \n   dependencies are listed  "
+        }
+      },
+      "summary": "test_dependency_explorer_is_launched"
+    }
+  },
+  {
+    "test": {
+      "@alias": "oe-core.bitbake.test_bitbake_sane_error_for_invalid_layer",
+      "author": [
+        {
+          "email": "jose.perez.carranza@intel.com",
+          "name": "jose.perez.carranza@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "clone poky  \n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "cd poky  \n \n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "source oe-init-build-env && cd build  \n \n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "Add a invalid layer to conf/bblayers.conf  \"<poky dir>/my-invalid-layer\" \n\t\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "bitbake core-image-minimal",
+          "expected_results": "Below error should be displayed:\n\"ERROR: Layer directory  does not exist! Please check BBLAYERS in <poky dir>/<build dir>/conf/bblayers.conf\""
+        }
+      },
+      "summary": "test_bitbake_sane_error_for_invalid_layer"
+    }
+  }
+]

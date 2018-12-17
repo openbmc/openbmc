@@ -7,7 +7,7 @@ HOMEPAGE = "http://www.tcsh.org/"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://Copyright;md5=575cf2715c3bf894e1f79aec1d4eaaf5"
 SECTION = "base"
-DEPENDS = "ncurses gettext-native"
+DEPENDS = "ncurses virtual/crypt gettext-native"
 SRC_URI = " \
     http://ftp.funet.fi/pub/mirrors/ftp.astron.com/pub/tcsh/${BP}.tar.gz \
     file://0001-Enable-system-malloc-on-all-linux.patch \

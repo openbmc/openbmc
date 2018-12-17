@@ -1,4 +1,12 @@
 #!/bin/sh
-cd test
-OPENSSL_ENGINES=../engines BLDTOP=.. SRCTOP=.. perl run_tests.pl
-cd ..
+
+set -e
+
+# Optional arguments are 'list' to lists all tests, or the test name (base name
+# ie test_evp, not 03_test_evp.t).
+
+export TOP=.
+# OPENSSL_ENGINES is relative from the test binaries
+export OPENSSL_ENGINES=../engines
+
+perl ./test/run_tests.pl $*

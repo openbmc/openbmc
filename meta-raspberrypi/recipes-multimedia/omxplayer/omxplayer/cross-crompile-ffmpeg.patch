@@ -1,0 +1,12 @@
+Index: git/Makefile.ffmpeg
+===================================================================
+--- git.orig/Makefile.ffmpeg
++++ git/Makefile.ffmpeg
+@@ -22,6 +22,7 @@ configure:
+ 	CFLAGS="$(CFLAGS) ${INCLUDES}" \
+ 	LDFLAGS="" \
+   ./configure \
++			--enable-cross-compile \
+ 			--ld="${CCLD}" \
+ 			--cc="${CC}" \
+ 			--cxx="${CXX}" \

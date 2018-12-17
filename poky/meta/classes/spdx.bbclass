@@ -202,18 +202,13 @@ def list_files(dir):
     return
 
 def hash_file(file_name):
-    try:
-        with open(file_name, 'rb') as f:
-            data_string = f.read()
-            sha1 = hash_string(data_string)
-            return sha1
-    except:
-        return None
+    from bb.utils import sha1_file
+    return sha1_file(file_name)
 
 def hash_string(data):
     import hashlib
     sha1 = hashlib.sha1()
-    sha1.update(data)
+    sha1.update(data.encode('utf-8'))
     return sha1.hexdigest()
 
 def run_fossology(foss_command, full_spdx):
@@ -226,7 +221,7 @@ def run_fossology(foss_command, full_spdx):
     except subprocess.CalledProcessError as e:
         return None
 
-    foss_output = string.replace(foss_output, '\r', '')
+    foss_output = foss_output.replace('\r', '')
 
     # Package info
     package_info = {}
@@ -289,7 +284,8 @@ def create_spdx_doc(file_info, scanned_files):
 def get_ver_code(dirname):
     chksums = []
     for f_dir, f in list_files(dirname):
-        hash = hash_file(os.path.join(dirname, f_dir, f))
+        path = os.path.join(dirname, f_dir, f)
+        hash = hash_file(path)
         if not hash is None:
             chksums.append(hash)
         else:

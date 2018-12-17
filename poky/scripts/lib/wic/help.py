@@ -866,11 +866,11 @@ DESCRIPTION
        Partitions with a <mountpoint> specified will be automatically mounted.
        This is achieved by wic adding entries to the fstab during image
        generation. In order for a valid fstab to be generated one of the
-       --ondrive, --ondisk or --use-uuid partition options must be used for
-       each partition that specifies a mountpoint.  Note that with --use-uuid
-       and non-root <mountpoint>, including swap, the mount program must
-       understand the PARTUUID syntax.  This currently excludes the busybox
-       versions of these applications.
+       --ondrive, --ondisk, --use-uuid or --use-label partition options must
+       be used for each partition that specifies a mountpoint.  Note that with
+       --use-{uuid,label} and non-root <mountpoint>, including swap, the mount
+       program must understand the PARTUUID or LABEL syntax.  This currently
+       excludes the busybox versions of these applications.
 
 
        The following are supported 'part' options:
@@ -944,6 +944,14 @@ DESCRIPTION
                         to be made on the partition. If the given
                         label is already in use by another filesystem,
                         a new label is created for the partition.
+
+         --use-label: This option is specific to wic. It makes wic to use the
+                      label in /etc/fstab to specify a partition. If the
+                      --use-label and --use-uuid are used at the same time,
+                      we prefer the uuid because it is less likely to cause
+                      name confliction. We don't support using this parameter
+                      on the root partition since it requires an initramfs to
+                      parse this value and we do not currently support that.
 
          --active: Marks the partition as active.
 

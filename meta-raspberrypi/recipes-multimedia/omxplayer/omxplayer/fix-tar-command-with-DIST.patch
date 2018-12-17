@@ -1,3 +1,8 @@
+From 23a97efde2aef171312000f7859ef4c573ce2ada Mon Sep 17 00:00:00 2001
+From: Andrei Gherzan <andrei@gherzan.ro>
+Date: Sun, 19 Jan 2014 20:35:29 +0200
+Subject: [PATCH] omxplayer: Update to remote HEAD
+
 Revert the tar command change introduced in:
 https://github.com/popcornmix/omxplayer/commit/201c77973155861e60492e45d35467b19b69c1c4
 
@@ -8,14 +13,20 @@ Upstream-Status: Pending
 Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
 Signed-off-by: Jonathan Liu <net147@gmail.com>
 
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
 Index: git/Makefile
 ===================================================================
 --- git.orig/Makefile
 +++ git/Makefile
-@@ -71,4 +71,4 @@ dist: omxplayer.bin
- 	cp COPYING $(DIST)/usr/share/doc/
- 	cp README.md $(DIST)/usr/share/doc/README
+@@ -91,7 +91,7 @@ dist: omxplayer.bin omxplayer.1
+ 	cp README.md $(DIST)/usr/share/doc/omxplayer/README
+ 	cp omxplayer.1 $(DIST)/usr/share/man/man1
  	cp -P ffmpeg_compiled/usr/lib/*.so* $(DIST)/usr/lib/omxplayer/
 -	cd $(DIST); tar -czf ../$(DIST).tgz *
 +	tar -czf omxplayer-dist.tar.gz $(DIST)
-\ No newline at end of file
+ 
+ install:
+ 	cp -r $(DIST)/* /

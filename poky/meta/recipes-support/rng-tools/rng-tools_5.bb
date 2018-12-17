@@ -16,13 +16,6 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/gkernel/${BP}.tar.gz \
 SRC_URI[md5sum] = "6726cdc6fae1f5122463f24ae980dd68"
 SRC_URI[sha256sum] = "60a102b6603bbcce2da341470cad42eeaa9564a16b4490e7867026ca11a3078e"
 
-# As the recipe doesn't inherit systemd.bbclass, we need to set this variable
-# manually to avoid unnecessary postinst/preinst generated.
-python () {
-    if not bb.utils.contains('DISTRO_FEATURES', 'sysvinit', True, False, d):
-        d.setVar("INHIBIT_UPDATERCD_BBCLASS", "1")
-}
-
 inherit autotools update-rc.d systemd
 
 PACKAGECONFIG = "libgcrypt"
@@ -50,6 +43,6 @@ do_install_append() {
 }
 
 INITSCRIPT_NAME = "rng-tools"
-INITSCRIPT_PARAMS = "start 30 2 3 4 5 . stop 30 0 6 1 ."
+INITSCRIPT_PARAMS = "start 03 2 3 4 5 . stop 30 0 6 1 ."
 
 SYSTEMD_SERVICE_${PN} = "rngd.service"

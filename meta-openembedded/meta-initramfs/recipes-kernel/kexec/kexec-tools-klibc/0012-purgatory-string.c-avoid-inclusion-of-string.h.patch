@@ -1,0 +1,31 @@
+From 2d2ad16f9328a7cbb3f5b8479ae93eb923a0727f Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Thu, 19 Apr 2018 00:28:14 +0200
+Subject: [PATCH] purgatory/string.c: avoid inclusion of string.h
+
+Fix
+
+ purgatory/string.c:39:5: error: conflicting types for 'memcmp'
+
+Upstream-Status: Inappropriate [klibc specific]
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+
+---
+ purgatory/string.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/purgatory/string.c b/purgatory/string.c
+index f06c460..c5e978a 100644
+--- a/purgatory/string.c
++++ b/purgatory/string.c
+@@ -1,5 +1,7 @@
+ #include <stddef.h>
++#ifndef __KLIBC__
+ #include <string.h>
++#endif
+ 
+ size_t strnlen(const char *s, size_t max)
+ {
+-- 
+2.7.4
+

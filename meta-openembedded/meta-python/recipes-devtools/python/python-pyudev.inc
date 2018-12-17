@@ -15,4 +15,5 @@ RDEPENDS_${PN} = "\
     ${PYTHON_PN}-misc \
     ${PYTHON_PN}-six \
     ${PYTHON_PN}-threading \
+    libudev \
 "

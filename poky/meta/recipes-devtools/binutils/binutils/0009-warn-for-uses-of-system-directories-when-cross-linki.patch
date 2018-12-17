@@ -1,4 +1,4 @@
-From 27e38ee92c24fca86b1c3f6ef156a1892dd06bfd Mon Sep 17 00:00:00 2001
+From a3667059fc0d52d890b505bed0e5050ea3d7002e Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 15 Jan 2016 06:31:09 +0000
 Subject: [PATCH 09/15] warn for uses of system directories when cross linking
@@ -55,7 +55,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  ld/configure    | 16 ++++++++++++++++
  ld/configure.ac | 10 ++++++++++
  ld/ld.h         |  8 ++++++++
- ld/ld.texinfo   | 12 ++++++++++++
+ ld/ld.texi      | 12 ++++++++++++
  ld/ldfile.c     | 17 +++++++++++++++++
  ld/ldlex.h      |  2 ++
  ld/ldmain.c     |  2 ++
@@ -63,10 +63,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  9 files changed, 86 insertions(+)
 
 diff --git a/ld/config.in b/ld/config.in
-index a846743da6..df3cd5fb60 100644
+index d93c9b0830..5da2742bea 100644
 --- a/ld/config.in
 +++ b/ld/config.in
-@@ -27,6 +27,9 @@
+@@ -31,6 +31,9 @@
     language is requested. */
  #undef ENABLE_NLS
  
@@ -77,10 +77,10 @@ index a846743da6..df3cd5fb60 100644
  #undef EXTRA_SHLIB_EXTENSION
  
 diff --git a/ld/configure b/ld/configure
-index db8b998722..489ead5c13 100755
+index 2b291f0da8..facc386563 100755
 --- a/ld/configure
 +++ b/ld/configure
-@@ -789,6 +789,7 @@ with_lib_path
+@@ -826,6 +826,7 @@ with_lib_path
  enable_targets
  enable_64_bit_bfd
  with_sysroot
@@ -88,7 +88,7 @@ index db8b998722..489ead5c13 100755
  enable_gold
  enable_got
  enable_compressed_debug_sections
-@@ -1448,6 +1449,8 @@ Optional Features:
+@@ -1490,6 +1491,8 @@ Optional Features:
    --disable-largefile     omit support for large files
    --enable-targets        alternative target configurations
    --enable-64-bit-bfd     64-bit support (on hosts with narrower word sizes)
@@ -97,7 +97,7 @@ index db8b998722..489ead5c13 100755
    --enable-gold[=ARG]     build gold [ARG={default,yes,no}]
    --enable-got=<type>     GOT handling scheme (target, single, negative,
                            multigot)
-@@ -16315,6 +16318,19 @@ fi
+@@ -16618,6 +16621,19 @@ fi
  
  
  
@@ -118,10 +118,10 @@ index db8b998722..489ead5c13 100755
  if test "${enable_gold+set}" = set; then :
    enableval=$enable_gold; case "${enableval}" in
 diff --git a/ld/configure.ac b/ld/configure.ac
-index bada1b50b0..d074a3820b 100644
+index d10c553650..9f1b57b120 100644
 --- a/ld/configure.ac
 +++ b/ld/configure.ac
-@@ -95,6 +95,16 @@ AC_SUBST(use_sysroot)
+@@ -94,6 +94,16 @@ AC_SUBST(use_sysroot)
  AC_SUBST(TARGET_SYSTEM_ROOT)
  AC_SUBST(TARGET_SYSTEM_ROOT_DEFINE)
  
@@ -157,11 +157,11 @@ index ba914b921e..9df17dab6c 100644
    /* Big or little endian as set on command line.  */
    enum endian_enum endian;
  
-diff --git a/ld/ld.texinfo b/ld/ld.texinfo
-index c89915f1aa..df430837e2 100644
---- a/ld/ld.texinfo
-+++ b/ld/ld.texinfo
-@@ -2498,6 +2498,18 @@ string identifying the original linked file does not change.
+diff --git a/ld/ld.texi b/ld/ld.texi
+index b9fe2324da..43486605e0 100644
+--- a/ld/ld.texi
++++ b/ld/ld.texi
+@@ -2479,6 +2479,18 @@ string identifying the original linked file does not change.
  
  Passing @code{none} for @var{style} disables the setting from any
  @code{--build-id} options earlier on the command line.
@@ -181,7 +181,7 @@ index c89915f1aa..df430837e2 100644
  
  @c man end
 diff --git a/ld/ldfile.c b/ld/ldfile.c
-index 6532a57d96..f943f0b2e5 100644
+index a72ff13526..dc5148f748 100644
 --- a/ld/ldfile.c
 +++ b/ld/ldfile.c
 @@ -116,6 +116,23 @@ ldfile_add_library_path (const char *name, bfd_boolean cmdline)
@@ -209,10 +209,10 @@ index 6532a57d96..f943f0b2e5 100644
  
  /* Try to open a BFD for a lang_input_statement.  */
 diff --git a/ld/ldlex.h b/ld/ldlex.h
-index 140ed1d9da..9965cbc04f 100644
+index 04d6fd5f96..d7df005bb2 100644
 --- a/ld/ldlex.h
 +++ b/ld/ldlex.h
-@@ -147,6 +147,8 @@ enum option_values
+@@ -148,6 +148,8 @@ enum option_values
    OPTION_REQUIRE_DEFINED_SYMBOL,
    OPTION_ORPHAN_HANDLING,
    OPTION_FORCE_GROUP_ALLOCATION,
@@ -222,10 +222,10 @@ index 140ed1d9da..9965cbc04f 100644
  
  /* The initial parser states.  */
 diff --git a/ld/ldmain.c b/ld/ldmain.c
-index c473ed24c3..adae0b4610 100644
+index f31eeb29c3..25f8497888 100644
 --- a/ld/ldmain.c
 +++ b/ld/ldmain.c
-@@ -261,6 +261,8 @@ main (int argc, char **argv)
+@@ -268,6 +268,8 @@ main (int argc, char **argv)
    command_line.warn_mismatch = TRUE;
    command_line.warn_search_mismatch = TRUE;
    command_line.check_section_addresses = -1;
@@ -235,10 +235,10 @@ index c473ed24c3..adae0b4610 100644
    /* We initialize DEMANGLING based on the environment variable
       COLLECT_NO_DEMANGLE.  The gcc collect2 program will demangle the
 diff --git a/ld/lexsup.c b/ld/lexsup.c
-index f2191602d4..bccb3bdeef 100644
+index 86a033a383..4a40d48020 100644
 --- a/ld/lexsup.c
 +++ b/ld/lexsup.c
-@@ -538,6 +538,14 @@ static const struct ld_option ld_options[] =
+@@ -543,6 +543,14 @@ static const struct ld_option ld_options[] =
    { {"orphan-handling", required_argument, NULL, OPTION_ORPHAN_HANDLING},
      '\0', N_("=MODE"), N_("Control how orphan sections are handled."),
      TWO_DASHES },
@@ -253,8 +253,8 @@ index f2191602d4..bccb3bdeef 100644
  };
  
  #define OPTION_COUNT ARRAY_SIZE (ld_options)
-@@ -1568,6 +1576,14 @@ parse_args (unsigned argc, char **argv)
- 	    einfo (_("%P%F: invalid argument to option"
+@@ -1577,6 +1585,14 @@ parse_args (unsigned argc, char **argv)
+ 	    einfo (_("%F%P: invalid argument to option"
  		     " \"--orphan-handling\"\n"));
  	  break;
 +
@@ -269,5 +269,5 @@ index f2191602d4..bccb3bdeef 100644
      }
  
 -- 
-2.16.1
+2.18.0
 

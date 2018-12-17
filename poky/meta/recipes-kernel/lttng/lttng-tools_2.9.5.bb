@@ -30,12 +30,17 @@ PACKAGECONFIG_remove_riscv64 = "lttng-ust"
 SRC_URI = "https://lttng.org/files/lttng-tools/lttng-tools-${PV}.tar.bz2 \
            file://x32.patch \
            file://run-ptest \
+           file://0001-Allow-multiple-attempts-to-connect-to-relayd.patch \
+           file://lttng-sessiond.service \
            "
 
 SRC_URI[md5sum] = "051224eb991aee07f8721ff1877d0b96"
 SRC_URI[sha256sum] = "77839eb6fc6c652125f08acfd9369701c2516eb05cc2084160e7efc7a3fb731c"
 
-inherit autotools ptest pkgconfig useradd python3-dir manpages
+inherit autotools ptest pkgconfig useradd python3-dir manpages systemd
+
+SYSTEMD_SERVICE_${PN} = "lttng-sessiond.service"
+SYSTEMD_AUTO_ENABLE = "disable"
 
 USERADD_PACKAGES = "${PN}"
 GROUPADD_PARAM_${PN} = "tracing"
@@ -50,6 +55,12 @@ FILES_${PN}-dev += "${PYTHON_SITEPACKAGES_DIR}/*.la"
 # Python module needs to keep _lttng.so
 INSANE_SKIP_${PN} = "libexec dev-so"
 INSANE_SKIP_${PN}-dbg = "libexec"
+
+do_install_append () {
+    # install systemd unit file
+    install -d ${D}${systemd_unitdir}/system
+    install -m 0644 ${WORKDIR}/lttng-sessiond.service ${D}${systemd_unitdir}/system
+}
 
 do_install_ptest () {
     for f in Makefile tests/Makefile tests/utils/utils.sh ; do

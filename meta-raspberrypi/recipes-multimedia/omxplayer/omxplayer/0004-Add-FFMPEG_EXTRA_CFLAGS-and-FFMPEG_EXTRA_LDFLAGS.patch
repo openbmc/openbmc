@@ -1,4 +1,4 @@
-From 100982ee1fc1cb571c7453d14f9acd60e67d4765 Mon Sep 17 00:00:00 2001
+From be007b01e7d91f5f83518c0388c16db8dab31d2e Mon Sep 17 00:00:00 2001
 From: Andrei Gherzan <andrei.gherzan@windriver.com>
 Date: Sun, 25 Jan 2015 11:13:51 +0200
 Subject: [PATCH] Add FFMPEG_EXTRA_CFLAGS and FFMPEG_EXTRA_LDFLAGS
@@ -8,16 +8,16 @@ In this way we can inject flags to LD and CC using
 
 Upstream-Status: Inappropriate [embedded specific]
 Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
+
 ---
- Makefile.ffmpeg | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ Makefile.ffmpeg | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 Index: git/Makefile.ffmpeg
 ===================================================================
 --- git.orig/Makefile.ffmpeg
 +++ git/Makefile.ffmpeg
-@@ -1,6 +1,8 @@
- 
+@@ -1,5 +1,7 @@
  CFLAGS=-D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS -DTARGET_POSIX -DTARGET_LINUX -fPIC -DPIC -D_REENTRANT -D_HAVE_SBRK -D_LARGEFILE64_SOURCE -DHAVE_CMAKE_CONFIG -DHAVE_VMCS_CONFIG -D_REENTRANT -DUSE_VCHIQ_ARM -DVCHI_BULK_ALIGN=1 -DVCHI_BULK_GRANULARITY=1 -DEGL_SERVER_DISPMANX -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D__VIDEOCORE4__ -DGRAPHICS_X_VG=1 -U_FORTIFY_SOURCE -Wall -DHAVE_OMXLIB -DUSE_EXTERNAL_FFMPEG  -DHAVE_LIBAVCODEC_AVCODEC_H -DHAVE_LIBAVUTIL_MEM_H -DHAVE_LIBAVUTIL_AVUTIL_H -DHAVE_LIBAVFORMAT_AVFORMAT_H -DHAVE_LIBAVFILTER_AVFILTER_H -DOMX -DOMX_SKIP64BIT
  
 +FFMPEG_EXTRA_CFLAGS?=-mfpu=vfp -mfloat-abi=$(FLOAT) -mno-apcs-stack-check -mstructure-size-boundary=32 -mno-sched-prolog
@@ -25,13 +25,13 @@ Index: git/Makefile.ffmpeg
  WORK=$(PWD)
  
  .PHONY : all
-@@ -21,7 +23,8 @@ configure:
+@@ -20,7 +22,8 @@ configure:
  	CFLAGS="$(CFLAGS) ${INCLUDES}" \
  	LDFLAGS="" \
    ./configure \
--			--extra-cflags="-mfpu=vfp -mfloat-abi=$(FLOAT) -mno-apcs-stack-check -mstructure-size-boundary=32 -mno-sched-prolog" \
+-			--extra-cflags="-mfpu=vfp -mfloat-abi=hard -mno-apcs-stack-check -mstructure-size-boundary=32 -mno-sched-prolog" \
 +			--extra-cflags="$(FFMPEG_EXTRA_CFLAGS)" \
 +			--extra-ldflags="$(FFMPEG_EXTRA_LDFLAGS)" \
- 			--enable-cross-compile \
  			--enable-shared \
  			--disable-static \
+ 			--arch=arm \

@@ -11,7 +11,7 @@ LICENSE = "GPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
                     file://screen.h;endline=26;md5=3971142989289a8198a544220703c2bf"
 
-DEPENDS = "ncurses \
+DEPENDS = "ncurses virtual/crypt \
           ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'libpam', '', d)}"
 RDEPENDS_${PN} = "base-files"
 

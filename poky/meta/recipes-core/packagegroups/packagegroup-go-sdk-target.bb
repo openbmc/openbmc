@@ -7,3 +7,5 @@ RDEPENDS_${PN} = " \
     go-runtime-dev \
     go-runtime-staticdev \
 "
+
+COMPATIBLE_HOST = "^(?!riscv64).*"

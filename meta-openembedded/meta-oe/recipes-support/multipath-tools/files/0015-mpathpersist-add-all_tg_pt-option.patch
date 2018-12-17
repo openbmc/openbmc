@@ -1,0 +1,317 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Thu, 31 May 2018 17:47:11 -0500
+Subject: [PATCH] mpathpersist: add all_tg_pt option
+
+Some arrays, such as the EMC VNX, don't follow the scsi persistent
+reservations spec in making key registrations per I_T NEXUS. Instead,
+the registration is shared by all target ports connected to a given
+host.  This causes mpathpersist to fail whenever it tries to register a
+key, since it will receive a registration conflict on some of the paths.
+
+To deal with this, mpathpersist needs to track the hosts that it has
+done a registration on, and only register once per host. The new
+"all_tg_pt" multipath.conf option is used to set which arrays need this
+feature.  I currently don't know if all EMC VNX arrays handle persistent
+reservations like this, or if it is configurable. A future patch will
+update the VNX built-in config, if this is indeed their default (or
+only) setting.
+
+Multipathd doesn't need to worry about this. It is often the case that
+when a path device comes back, it will still have the keys registered to
+it. Because of this, multipathd uses register-and-ignore, which means
+that it won't cause an error if the registration has already happened
+down a different target port.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmpathpersist/mpath_persist.c | 28 ++++++++++++++++++++++------
+ libmultipath/config.c           |  2 ++
+ libmultipath/config.h           |  2 ++
+ libmultipath/defaults.h         |  1 +
+ libmultipath/dict.c             | 10 ++++++++++
+ libmultipath/propsel.c          | 15 +++++++++++++++
+ libmultipath/propsel.h          |  1 +
+ libmultipath/structs.h          |  7 +++++++
+ multipath/multipath.conf.5      | 11 +++++++++++
+ 9 files changed, 71 insertions(+), 6 deletions(-)
+
+diff --git a/libmpathpersist/mpath_persist.c b/libmpathpersist/mpath_persist.c
+index 907a17c..ca91c55 100644
+--- a/libmpathpersist/mpath_persist.c
++++ b/libmpathpersist/mpath_persist.c
+@@ -335,6 +335,7 @@ int mpath_persistent_reserve_out ( int fd, int rq_servact, int rq_scope,
+ 
+ 	conf = get_multipath_config();
+ 	select_reservation_key(conf, mpp);
++	select_all_tg_pt(conf, mpp);
+ 	put_multipath_config(conf);
+ 
+ 	memcpy(&prkey, paramp->sa_key, 8);
+@@ -456,7 +457,7 @@ int mpath_prout_reg(struct multipath *mpp,int rq_servact, int rq_scope,
+ 	unsigned int rq_type, struct prout_param_descriptor * paramp, int noisy)
+ {
+ 
+-	int i, j;
++	int i, j, k;
+ 	struct pathgroup *pgp = NULL;
+ 	struct path *pp = NULL;
+ 	int rollback = 0;
+@@ -481,11 +482,13 @@ int mpath_prout_reg(struct multipath *mpp,int rq_servact, int rq_scope,
+ 	}
+ 
+ 	struct threadinfo thread[active_pathcount];
++	int hosts[active_pathcount];
+ 
+ 	memset(thread, 0, sizeof(thread));
+ 
+ 	/* init thread parameter */
+ 	for (i =0; i< active_pathcount; i++){
++		hosts[i] = -1;
+ 		thread[i].param.rq_servact = rq_servact;
+ 		thread[i].param.rq_scope = rq_scope;
+ 		thread[i].param.rq_type = rq_type;
+@@ -514,6 +517,17 @@ int mpath_prout_reg(struct multipath *mpp,int rq_servact, int rq_scope,
+ 				condlog (1, "%s: %s path not up. Skip.", mpp->wwid, pp->dev);
+ 				continue;
+ 			}
++			if (mpp->all_tg_pt == ALL_TG_PT_ON &&
++			    pp->sg_id.host_no != -1) {
++				for (k = 0; k < count; k++) {
++					if (pp->sg_id.host_no == hosts[k]) {
++						condlog(3, "%s: %s host %d matches skip.", pp->wwid, pp->dev, pp->sg_id.host_no);
++						break;
++					}
++				}
++				if (k < count)
++					continue;
++			}
+ 			strncpy(thread[count].param.dev, pp->dev,
+ 				FILE_NAME_SIZE - 1);
+ 
+@@ -531,10 +545,12 @@ int mpath_prout_reg(struct multipath *mpp,int rq_servact, int rq_scope,
+ 				condlog (0, "%s: failed to create thread %d", mpp->wwid, rc);
+ 				thread[count].param.status = MPATH_PR_THREAD_ERROR;
+ 			}
++			else
++				hosts[count] = pp->sg_id.host_no;
+ 			count = count + 1;
+ 		}
+ 	}
+-	for( i=0; i < active_pathcount ; i++){
++	for( i=0; i < count ; i++){
+ 		if (thread[i].param.status != MPATH_PR_THREAD_ERROR) {
+ 			rc = pthread_join(thread[i].id, NULL);
+ 			if (rc){
+@@ -557,7 +573,7 @@ int mpath_prout_reg(struct multipath *mpp,int rq_servact, int rq_scope,
+ 	}
+ 	if (rollback && ((rq_servact == MPATH_PROUT_REG_SA) && sa_key != 0 )){
+ 		condlog (3, "%s: ERROR: initiating pr out rollback", mpp->wwid);
+-		for( i=0 ; i < active_pathcount ; i++){
++		for( i=0 ; i < count ; i++){
+ 			if(thread[i].param.status == MPATH_PR_SUCCESS) {
+ 				memcpy(&thread[i].param.paramp->key, &thread[i].param.paramp->sa_key, 8);
+ 				memset(&thread[i].param.paramp->sa_key, 0, 8);
+@@ -571,7 +587,7 @@ int mpath_prout_reg(struct multipath *mpp,int rq_servact, int rq_scope,
+ 			} else
+ 				thread[i].param.status = MPATH_PR_SKIP;
+ 		}
+-		for(i=0; i < active_pathcount ; i++){
++		for(i=0; i < count ; i++){
+ 			if (thread[i].param.status != MPATH_PR_SKIP &&
+ 			    thread[i].param.status != MPATH_PR_THREAD_ERROR) {
+ 				rc = pthread_join(thread[i].id, NULL);
+@@ -720,7 +736,7 @@ int mpath_prout_rel(struct multipath *mpp,int rq_servact, int rq_scope,
+ 		}
+ 	}
+ 	pthread_attr_destroy (&attr);
+-	for (i = 0; i < active_pathcount; i++){
++	for (i = 0; i < count; i++){
+ 		if (thread[i].param.status != MPATH_PR_THREAD_ERROR) {
+ 			rc = pthread_join (thread[i].id, NULL);
+ 			if (rc){
+@@ -729,7 +745,7 @@ int mpath_prout_rel(struct multipath *mpp,int rq_servact, int rq_scope,
+ 		}
+ 	}
+ 
+-	for (i = 0; i < active_pathcount; i++){
++	for (i = 0; i < count; i++){
+ 		/*  check thread status here and return the status */
+ 
+ 		if (thread[i].param.status == MPATH_PR_RESERV_CONFLICT)
+diff --git a/libmultipath/config.c b/libmultipath/config.c
+index 085a3e1..5872927 100644
+--- a/libmultipath/config.c
++++ b/libmultipath/config.c
+@@ -352,6 +352,7 @@ merge_hwe (struct hwentry * dst, struct hwentry * src)
+ 	merge_num(skip_kpartx);
+ 	merge_num(max_sectors_kb);
+ 	merge_num(ghost_delay);
++	merge_num(all_tg_pt);
+ 
+ 	snprintf(id, sizeof(id), "%s/%s", dst->vendor, dst->product);
+ 	reconcile_features_with_options(id, &dst->features,
+@@ -622,6 +623,7 @@ load_config (char * file)
+ 	conf->disable_changed_wwids = DEFAULT_DISABLE_CHANGED_WWIDS;
+ 	conf->remove_retries = 0;
+ 	conf->ghost_delay = DEFAULT_GHOST_DELAY;
++	conf->all_tg_pt = DEFAULT_ALL_TG_PT;
+ 
+ 	/*
+ 	 * preload default hwtable
+diff --git a/libmultipath/config.h b/libmultipath/config.h
+index 6e69a37..1bf708a 100644
+--- a/libmultipath/config.h
++++ b/libmultipath/config.h
+@@ -82,6 +82,7 @@ struct hwentry {
+ 	int skip_kpartx;
+ 	int max_sectors_kb;
+ 	int ghost_delay;
++	int all_tg_pt;
+ 	char * bl_product;
+ };
+ 
+@@ -194,6 +195,7 @@ struct config {
+ 	char * partition_delim;
+ 	char * config_dir;
+ 	int prkey_source;
++	int all_tg_pt;
+ 	struct be64 reservation_key;
+ 
+ 	vector keywords;
+diff --git a/libmultipath/defaults.h b/libmultipath/defaults.h
+index d7b87b4..f076b4b 100644
+--- a/libmultipath/defaults.h
++++ b/libmultipath/defaults.h
+@@ -43,6 +43,7 @@
+ #define DEFAULT_GHOST_DELAY GHOST_DELAY_OFF
+ #define DEFAULT_FIND_MULTIPATHS_TIMEOUT -10
+ #define DEFAULT_UNKNOWN_FIND_MULTIPATHS_TIMEOUT 1
++#define DEFAULT_ALL_TG_PT ALL_TG_PT_OFF
+ 
+ #define DEFAULT_CHECKINT	5
+ #define MAX_CHECKINT(a)		(a << 2)
+diff --git a/libmultipath/dict.c b/libmultipath/dict.c
+index 3e7c5d6..2557b8a 100644
+--- a/libmultipath/dict.c
++++ b/libmultipath/dict.c
+@@ -1178,6 +1178,13 @@ declare_hw_snprint(ghost_delay, print_off_int_undef)
+ declare_mp_handler(ghost_delay, set_off_int_undef)
+ declare_mp_snprint(ghost_delay, print_off_int_undef)
+ 
++declare_def_handler(all_tg_pt, set_yes_no_undef)
++declare_def_snprint_defint(all_tg_pt, print_yes_no_undef, DEFAULT_ALL_TG_PT)
++declare_ovr_handler(all_tg_pt, set_yes_no_undef)
++declare_ovr_snprint(all_tg_pt, print_yes_no_undef)
++declare_hw_handler(all_tg_pt, set_yes_no_undef)
++declare_hw_snprint(all_tg_pt, print_yes_no_undef)
++
+ 
+ static int
+ def_uxsock_timeout_handler(struct config *conf, vector strvec)
+@@ -1509,6 +1516,7 @@ init_keywords(vector keywords)
+ 	install_keyword("prkeys_file", &def_prkeys_file_handler, &snprint_def_prkeys_file);
+ 	install_keyword("log_checker_err", &def_log_checker_err_handler, &snprint_def_log_checker_err);
+ 	install_keyword("reservation_key", &def_reservation_key_handler, &snprint_def_reservation_key);
++	install_keyword("all_tg_pt", &def_all_tg_pt_handler, &snprint_def_all_tg_pt);
+ 	install_keyword("retain_attached_hw_handler", &def_retain_hwhandler_handler, &snprint_def_retain_hwhandler);
+ 	install_keyword("detect_prio", &def_detect_prio_handler, &snprint_def_detect_prio);
+ 	install_keyword("detect_checker", &def_detect_checker_handler, &snprint_def_detect_checker);
+@@ -1618,6 +1626,7 @@ init_keywords(vector keywords)
+ 	install_keyword("skip_kpartx", &hw_skip_kpartx_handler, &snprint_hw_skip_kpartx);
+ 	install_keyword("max_sectors_kb", &hw_max_sectors_kb_handler, &snprint_hw_max_sectors_kb);
+ 	install_keyword("ghost_delay", &hw_ghost_delay_handler, &snprint_hw_ghost_delay);
++	install_keyword("all_tg_pt", &hw_all_tg_pt_handler, &snprint_hw_all_tg_pt);
+ 	install_sublevel_end();
+ 
+ 	install_keyword_root("overrides", &overrides_handler);
+@@ -1654,6 +1663,7 @@ init_keywords(vector keywords)
+ 	install_keyword("skip_kpartx", &ovr_skip_kpartx_handler, &snprint_ovr_skip_kpartx);
+ 	install_keyword("max_sectors_kb", &ovr_max_sectors_kb_handler, &snprint_ovr_max_sectors_kb);
+ 	install_keyword("ghost_delay", &ovr_ghost_delay_handler, &snprint_ovr_ghost_delay);
++	install_keyword("all_tg_pt", &ovr_all_tg_pt_handler, &snprint_ovr_all_tg_pt);
+ 
+ 	install_keyword_root("multipaths", &multipaths_handler);
+ 	install_keyword_multi("multipath", &multipath_handler, NULL);
+diff --git a/libmultipath/propsel.c b/libmultipath/propsel.c
+index 627d366..9ca1355 100644
+--- a/libmultipath/propsel.c
++++ b/libmultipath/propsel.c
+@@ -978,3 +978,18 @@ out:
+ 		pp->dev, pp->find_multipaths_timeout, origin);
+ 	return 0;
+ }
++
++int select_all_tg_pt (struct config *conf, struct multipath * mp)
++{
++	const char *origin;
++
++	mp_set_ovr(all_tg_pt);
++	mp_set_hwe(all_tg_pt);
++	mp_set_conf(all_tg_pt);
++	mp_set_default(all_tg_pt, DEFAULT_ALL_TG_PT);
++out:
++	condlog(3, "%s: all_tg_pt = %s %s", mp->alias,
++		(mp->all_tg_pt == ALL_TG_PT_ON)? "yes" : "no",
++		origin);
++	return 0;
++}
+diff --git a/libmultipath/propsel.h b/libmultipath/propsel.h
+index a022bee..ae99b92 100644
+--- a/libmultipath/propsel.h
++++ b/libmultipath/propsel.h
+@@ -34,3 +34,4 @@ int select_ghost_delay(struct config *conf, struct multipath * mp);
+ void reconcile_features_with_options(const char *id, char **features,
+ 				     int* no_path_retry,
+ 				     int *retain_hwhandler);
++int select_all_tg_pt (struct config *conf, struct multipath * mp);
+diff --git a/libmultipath/structs.h b/libmultipath/structs.h
+index e424b15..0194b1e 100644
+--- a/libmultipath/structs.h
++++ b/libmultipath/structs.h
+@@ -217,6 +217,12 @@ enum prkey_sources {
+ 	PRKEY_SOURCE_FILE,
+ };
+ 
++enum all_tg_pt_states {
++	ALL_TG_PT_UNDEF = YNU_UNDEF,
++	ALL_TG_PT_OFF = YNU_NO,
++	ALL_TG_PT_ON = YNU_YES,
++};
++
+ struct sg_id {
+ 	int host_no;
+ 	int channel;
+@@ -362,6 +368,7 @@ struct multipath {
+ 	int prkey_source;
+ 	struct be64 reservation_key;
+ 	unsigned char prflag;
++	int all_tg_pt;
+ 	struct gen_multipath generic_mp;
+ };
+ 
+diff --git a/multipath/multipath.conf.5 b/multipath/multipath.conf.5
+index 96d1b66..0c1f174 100644
+--- a/multipath/multipath.conf.5
++++ b/multipath/multipath.conf.5
+@@ -743,6 +743,17 @@ The default is: \fB<unset>\fR
+ .
+ .
+ .TP
++.B all_tg_pt
++This must be set to \fByes\fR to successfully use mpathpersist on arrays that
++automatically set and clear registration keys on all target ports from a
++host, instead of per target port per host.
++.RS
++.TP
++The default is: \fBno\fR
++.RE
++.
++.
++.TP
+ .B retain_attached_hw_handler
+ (Obsolete for kernels >= 4.3) If set to
+ .I yes
+-- 
+2.7.4
+

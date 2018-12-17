@@ -1,0 +1,64 @@
+########
+diff --git a/glxgears_check.sh b/glxgears_check.sh
+index 17622b8..c4d3b97 100755
+--- a/glxgears_check.sh
++++ b/glxgears_check.sh
+@@ -31,7 +31,7 @@ else
+ 
+     sleep 6
+ 
+-    XPID=$( ps ax | awk '{print $1, $5}' | grep glxgears | awk '{print $1}')
++    XPID=$( ps | awk '{print $1, $5}' | grep glxgears | awk '{print $1}')
+     if [ ! -z "$XPID" ]; then
+         kill -9 $XPID >/dev/null 2>&1
+         echo "glxgears can run, PASS!"
+diff --git a/x_close.sh b/x_close.sh
+index e287be1..3429f1a 100755
+--- a/x_close.sh
++++ b/x_close.sh
+@@ -22,7 +22,7 @@
+ #
+ function close_proc(){
+ echo "kill process Xorg"
+-XPID=$(  ps ax | awk '{print $1, $5}' | egrep "X$|Xorg$" | awk '{print $1}')
++XPID=$(  ps | awk '{print $1, $6}' | egrep "X$|Xorg$" | awk '{print $1}')
+ if [ ! -z "$XPID" ]; then
+     kill $XPID
+     sleep 4
+diff --git a/x_start.sh b/x_start.sh
+index 9cf6eab..2305796 100755
+--- a/x_start.sh
++++ b/x_start.sh
+@@ -24,7 +24,7 @@
+ X_ERROR=0
+ 
+ #test whether X has started
+-PXID=$(ps ax |awk '{print $1,$5}' |egrep "Xorg$|X$" |grep -v grep | awk '{print $1}')
++PXID=$(ps |awk '{print $1,$6}' |egrep "Xorg$|X$" |grep -v grep | awk '{print $1}')
+ if [ ! -z "$PXID" ]; then
+     echo "[WARNING] Xorg has started!"
+     XORG_STATUS="started"
+@@ -35,9 +35,11 @@ else
+     #start up the x server
+     echo "Start up the X server for test in display $DISPLAY................"
+ 
+-    $XORG_DIR/bin/X >/dev/null 2>&1 &
++    #$XORG_DIR/bin/X >/dev/null 2>&1 &
++    #sleep 8
++    #xterm &
++    /etc/init.d/xserver-nodm start &
+     sleep 8
+-    xterm &
+ fi
+     XLOG_FILE=/var/log/Xorg.0.log
+     [ -f $XORG_DIR/var/log/Xorg.0.log ] && XLOG_FILE=$XORG_DIR/var/log/Xorg.0.log
+@@ -54,7 +56,7 @@ fi
+         X_ERROR=1
+     fi
+ 
+-    XPID=$( ps ax | awk '{print $1, $5}' | egrep "X$|Xorg$" |grep -v grep| awk '{print $1}')
++    XPID=$( ps | awk '{print $1, $6}' | egrep "X$|Xorg$" |grep -v grep| awk '{print $1}')
+     if [ -z "$XPID" ]; then
+         echo "Start up X server FAIL!"
+  echo
+########

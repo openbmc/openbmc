@@ -1,0 +1,23 @@
+From de9345207beb71e4d5b6b40b52cac4ebd2e3858c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 27 Apr 2018 23:23:20 -0700
+Subject: [PATCH] Use cross compiled rpcgen
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ rpcsvc/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: git/rpcsvc/Makefile.am
+===================================================================
+--- git.orig/rpcsvc/Makefile.am
++++ git/rpcsvc/Makefile.am
+@@ -12,5 +12,5 @@ nodist_rpcsvc_HEADERS = klm_prot.h nlm_p
+ 	nfs_prot.h rquota.h sm_inter.h
+ 
+ %.h: %.x
+-	$(top_builddir)/rpcgen/rpcgen -h -o $@ $<
++	rpcgen -h -o $@ $<
+ 

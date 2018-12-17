@@ -25,7 +25,10 @@ FILES_${PN} = "${bindir}/aspell"
 FILES_libpspell = "${libdir}/libpspell.so.*"
 FILES_${PN}-dev += "${bindir}/pspell-config"
 
-ARM_INSTRUCTION_SET = "arm"
+ARM_INSTRUCTION_SET_armv4 = "arm"
+ARM_INSTRUCTION_SET_armv5 = "arm"
+ARM_INSTRUCTION_SET_armv6 = "arm"
+
 inherit autotools-brokensep gettext texinfo binconfig-disabled
 
 BINCONFIG = "${bindir}/pspell-config"

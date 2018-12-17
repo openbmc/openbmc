@@ -342,13 +342,14 @@
 
             <para>
                 When you name an append file, you can use the
-                wildcard character (%) to allow for matching recipe names.
+                "<filename>%</filename>" wildcard character to allow for matching
+                recipe names.
                 For example, suppose you have an append file named
                 as follows:
                 <literallayout class='monospaced'>
      busybox_1.21.%.bbappend
                 </literallayout>
-                That append file would match any <filename>busybox_1.21.x.bb</filename>
+                That append file would match any <filename>busybox_1.21.</filename><replaceable>x</replaceable><filename>.bb</filename>
                 version of the recipe.
                 So, the append file would match the following recipe names:
                 <literallayout class='monospaced'>
@@ -356,6 +357,14 @@
      busybox_1.21.2.bb
      busybox_1.21.3.bb
                 </literallayout>
+                <note><title>Important</title>
+                    The use of the "<filename>%</filename>" character
+                    is limited in that it only works directly in front of the
+                    <filename>.bbappend</filename> portion of the append file's
+                    name.
+                    You cannot use the wildcard character in any other
+                    location of the name.
+                </note>
                 If the <filename>busybox</filename> recipe was updated to
                 <filename>busybox_1.3.0.bb</filename>, the append name would not
                 match.
@@ -722,6 +731,163 @@
      $ bitbake -g -I virtual/kernel -I eglibc foo
                     </literallayout>
                 </para>
+            </section>
+
+            <section id='executing-a-multiple-configuration-build'>
+                <title>Executing a Multiple Configuration Build</title>
+
+                <para>
+                    BitBake is able to build multiple images or packages
+                    using a single command where the different targets
+                    require different configurations (multiple configuration
+                    builds).
+                    Each target, in this scenario, is referred to as a
+                    "multiconfig".
+                </para>
+
+                <para>
+                    To accomplish a multiple configuration build, you must
+                    define each target's configuration separately using
+                    a parallel configuration file in the build directory.
+                    The location for these multiconfig configuration files
+                    is specific.
+                    They must reside in the current build directory in
+                    a sub-directory of <filename>conf</filename> named
+                    <filename>multiconfig</filename>.
+                    Following is an example for two separate targets:
+                    <imagedata fileref="figures/bb_multiconfig_files.png" align="center" width="4in" depth="3in" />
+                </para>
+
+                <para>
+                    The reason for this required file hierarchy
+                    is because the <filename>BBPATH</filename> variable
+                    is not constructed until the layers are parsed.
+                    Consequently, using the configuration file as a
+                    pre-configuration file is not possible unless it is
+                    located in the current working directory.
+                </para>
+
+                <para>
+                    Minimally, each configuration file must define the
+                    machine and the temporary directory BitBake uses
+                    for the build.
+                    Suggested practice dictates that you do not
+                    overlap the temporary directories used during the
+                    builds.
+                </para>
+
+                <para>
+                    Aside from separate configuration files for each
+                    target, you must also enable BitBake to perform multiple
+                    configuration builds.
+                    Enabling is accomplished by setting the
+                    <link linkend='var-BBMULTICONFIG'><filename>BBMULTICONFIG</filename></link>
+                    variable in the <filename>local.conf</filename>
+                    configuration file.
+                    As an example, suppose you had configuration files
+                    for <filename>target1</filename> and
+                    <filename>target2</filename> defined in the build
+                    directory.
+                    The following statement in the
+                    <filename>local.conf</filename> file both enables
+                    BitBake to perform multiple configuration builds and
+                    specifies the two multiconfigs:
+                    <literallayout class='monospaced'>
+     BBMULTICONFIG = "target1 target2"
+                    </literallayout>
+                </para>
+
+                <para>
+                    Once the target configuration files are in place and
+                    BitBake has been enabled to perform multiple configuration
+                    builds, use the following command form to start the
+                    builds:
+                    <literallayout class='monospaced'>
+     $ bitbake [multiconfig:<replaceable>multiconfigname</replaceable>:]<replaceable>target</replaceable> [[[multiconfig:<replaceable>multiconfigname</replaceable>:]<replaceable>target</replaceable>] ... ]
+                    </literallayout>
+                    Here is an example for two multiconfigs:
+                    <filename>target1</filename> and
+                    <filename>target2</filename>:
+                    <literallayout class='monospaced'>
+     $ bitbake multiconfig:target1:<replaceable>target</replaceable> multiconfig:target2:<replaceable>target</replaceable>
+                    </literallayout>
+                </para>
+            </section>
+
+            <section id='bb-enabling-multiple-configuration-build-dependencies'>
+                <title>Enabling Multiple Configuration Build Dependencies</title>
+
+                <para>
+                    Sometimes dependencies can exist between targets
+                    (multiconfigs) in a multiple configuration build.
+                    For example, suppose that in order to build an image
+                    for a particular architecture, the root filesystem of
+                    another build for a different architecture needs to
+                    exist.
+                    In other words, the image for the first multiconfig depends
+                    on the root filesystem of the second multiconfig.
+                    This dependency is essentially that the task in the recipe
+                    that builds one multiconfig is dependent on the
+                    completion of the task in the recipe that builds
+                    another multiconfig.
+                </para>
+
+                <para>
+                    To enable dependencies in a multiple configuration
+                    build, you must declare the dependencies in the recipe
+                    using the following statement form:
+                    <literallayout class='monospaced'>
+     <replaceable>task_or_package</replaceable>[mcdepends] = "multiconfig:<replaceable>from_multiconfig</replaceable>:<replaceable>to_multiconfig</replaceable>:<replaceable>recipe_name</replaceable>:<replaceable>task_on_which_to_depend</replaceable>"
+                    </literallayout>
+                    To better show how to use this statement, consider an
+                    example with two multiconfigs: <filename>target1</filename>
+                    and <filename>target2</filename>:
+                    <literallayout class='monospaced'>
+     <replaceable>image_task</replaceable>[mcdepends] = "multiconfig:target1:target2:<replaceable>image2</replaceable>:<replaceable>rootfs_task</replaceable>"
+                    </literallayout>
+                    In this example, the
+                    <replaceable>from_multiconfig</replaceable> is "target1" and
+                    the <replaceable>to_multiconfig</replaceable> is "target2".
+                    The task on which the image whose recipe contains
+                    <replaceable>image_task</replaceable> depends on the
+                    completion of the <replaceable>rootfs_task</replaceable>
+                    used to build out <replaceable>image2</replaceable>, which
+                    is associated with the "target2" multiconfig.
+               </para>
+
+               <para>
+                   Once you set up this dependency, you can build the
+                   "target1" multiconfig using a BitBake command as follows:
+                   <literallayout class='monospaced'>
+     $ bitbake multiconfig:target1:<replaceable>image1</replaceable>
+                   </literallayout>
+                   This command executes all the tasks needed to create
+                   <replaceable>image1</replaceable> for the "target1"
+                   multiconfig.
+                   Because of the dependency, BitBake also executes through
+                   the <replaceable>rootfs_task</replaceable> for the "target2"
+                   multiconfig build.
+               </para>
+
+               <para>
+                   Having a recipe depend on the root filesystem of another
+                   build might not seem that useful.
+                   Consider this change to the statement in the
+                   <replaceable>image1</replaceable> recipe:
+                   <literallayout class='monospaced'>
+     <replaceable>image_task</replaceable>[mcdepends] = "multiconfig:target1:target2:<replaceable>image2</replaceable>:<replaceable>image_task</replaceable>"
+                   </literallayout>
+                   In this case, BitBake must create
+                   <replaceable>image2</replaceable> for the "target2"
+                   build since the "target1" build depends on it.
+               </para>
+
+               <para>
+                   Because "target1" and "target2" are enabled for multiple
+                   configuration builds and have separate configuration
+                   files, BitBake places the artifacts for each build in the
+                   respective temporary build directories.
+               </para>
             </section>
         </section>
     </section>

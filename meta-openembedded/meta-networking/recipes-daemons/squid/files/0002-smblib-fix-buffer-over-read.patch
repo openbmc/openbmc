@@ -1,0 +1,39 @@
+From a6b1e0fd14311587186e40d09bff5c8c3aada2e4 Mon Sep 17 00:00:00 2001
+From: Amos Jeffries <squid3@treenet.co.nz>
+Date: Sat, 25 Jul 2015 05:53:16 -0700
+Subject: [PATCH] smblib: fix buffer over-read
+
+When parsing SMB LanManager packets with invalid protocol ID and the
+default set of Squid supported protocols. It may access memory outside
+the buffer storing protocol names.
+
+smblib is only used by already deprecated helpers which are deprecated
+due to far more significant NTLM protocol issues. It will also only
+result in packets being rejected later with invalid protocol names. So
+this is a minor bug rather than a vulnerability.
+
+ Detected by Coverity Scan. Issue 1256165
+---
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Backport
+
+ lib/smblib/smblib-util.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/lib/smblib/smblib-util.c b/lib/smblib/smblib-util.c
+index 6139ae2..e722cbb 100644
+--- a/lib/smblib/smblib-util.c
++++ b/lib/smblib/smblib-util.c
+@@ -204,7 +204,11 @@ int SMB_Figure_Protocol(const char *dialects[], int prot_index)
+ {
+     int i;
+ 
+-    if (dialects == SMB_Prots) { /* The jobs is easy, just index into table */
++    // prot_index may be a value outside the table SMB_Types[]
++    // which holds data at offsets 0 to 11
++    int ourType = (prot_index < 0 || prot_index > 11);
++
++    if (ourType && dialects == SMB_Prots) { /* The jobs is easy, just index into table */
+ 
+         return(SMB_Types[prot_index]);
+     } else { /* Search through SMB_Prots looking for a match */

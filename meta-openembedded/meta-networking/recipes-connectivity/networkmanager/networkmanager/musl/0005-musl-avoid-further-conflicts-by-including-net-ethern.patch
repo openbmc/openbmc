@@ -17,10 +17,10 @@ Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
  4 files changed, 8 insertions(+)
 
 diff --git a/src/systemd/src/systemd/sd-dhcp-client.h b/src/systemd/src/systemd/sd-dhcp-client.h
-index 5e46d8d..18a613f 100644
+index e388552..9c4dde8 100644
 --- a/src/systemd/src/systemd/sd-dhcp-client.h
 +++ b/src/systemd/src/systemd/sd-dhcp-client.h
-@@ -21,7 +21,9 @@
+@@ -20,7 +20,9 @@
  ***/
  
  #include <inttypes.h>
@@ -31,10 +31,10 @@ index 5e46d8d..18a613f 100644
  #include <sys/types.h>
  
 diff --git a/src/systemd/src/systemd/sd-dhcp-lease.h b/src/systemd/src/systemd/sd-dhcp-lease.h
-index 7ab99cc..85acdf2 100644
+index 2a60145..19d1814 100644
 --- a/src/systemd/src/systemd/sd-dhcp-lease.h
 +++ b/src/systemd/src/systemd/sd-dhcp-lease.h
-@@ -22,7 +22,9 @@
+@@ -19,7 +19,9 @@
  ***/
  
  #include <inttypes.h>
@@ -45,24 +45,24 @@ index 7ab99cc..85acdf2 100644
  #include <sys/types.h>
  
 diff --git a/src/systemd/src/systemd/sd-dhcp6-client.h b/src/systemd/src/systemd/sd-dhcp6-client.h
-index 7819f0d..35f30ee 100644
+index fa36dca..2d25010 100644
 --- a/src/systemd/src/systemd/sd-dhcp6-client.h
 +++ b/src/systemd/src/systemd/sd-dhcp6-client.h
-@@ -21,7 +21,9 @@
+@@ -20,7 +20,9 @@
  ***/
  
  #include <inttypes.h>
 +#if defined(__GLIBC__)
  #include <net/ethernet.h>
 +#endif
+ #include <stdbool.h>
  #include <sys/types.h>
  
- #include "sd-dhcp6-lease.h"
 diff --git a/src/systemd/src/systemd/sd-ipv4ll.h b/src/systemd/src/systemd/sd-ipv4ll.h
-index 5ba9208..c90eca6 100644
+index 71bd4cf..1c667ba 100644
 --- a/src/systemd/src/systemd/sd-ipv4ll.h
 +++ b/src/systemd/src/systemd/sd-ipv4ll.h
-@@ -20,7 +20,9 @@
+@@ -19,7 +19,9 @@
    along with systemd; If not, see <http://www.gnu.org/licenses/>.
  ***/
  
@@ -73,5 +73,5 @@ index 5ba9208..c90eca6 100644
  
  #include "sd-event.h"
 -- 
-2.14.3
+2.14.5
 

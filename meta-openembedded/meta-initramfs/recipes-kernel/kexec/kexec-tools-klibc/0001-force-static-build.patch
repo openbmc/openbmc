@@ -1,0 +1,25 @@
+From d6af515cfcc8185f423860f80ff28719975b701f Mon Sep 17 00:00:00 2001
+From: OpenEmbedded <oe.patch@oe>
+Date: Wed, 11 Apr 2018 22:51:00 +0200
+Subject: [PATCH] force static build
+
+Upstream-Status: Inappropriate [embedded specific]
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+
+---
+ Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 54c206f..79188d8 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -47,7 +47,7 @@ TARGET_CFLAGS	= @TARGET_CFLAGS@
+ # where necessary.
+ CPPFLAGS	= @CPPFLAGS@ -I$(srcdir)/include -I$(srcdir)/util_lib/include \
+ 			-Iinclude/ $($(ARCH)_CPPFLAGS)
+-CFLAGS		= @CFLAGS@ -fno-strict-aliasing -Wall -Wstrict-prototypes
++CFLAGS		= @CFLAGS@ -static -fno-strict-aliasing -Wall -Wstrict-prototypes
+ PURGATORY_EXTRA_CFLAGS = @PURGATORY_EXTRA_CFLAGS@
+ ASFLAGS		= @ASFLAGS@ $($(ARCH)_ASFLAGS)
+ LDFLAGS		= @LDFLAGS@

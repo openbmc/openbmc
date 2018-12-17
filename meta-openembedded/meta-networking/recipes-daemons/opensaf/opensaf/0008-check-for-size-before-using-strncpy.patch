@@ -1,0 +1,33 @@
+From 29510dd81e3a5e96151afdb0702863cbfd640766 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 22 Jun 2018 18:58:59 -0700
+Subject: [PATCH] check for size before using strncpy
+
+ensures that size is never execeding the string length
+that execPath can hold
+
+Fixes
+error: '__builtin___strncpy_chk' specified size between 18446744071562067968 and 18446744073709551615 exceeds maximum object size 9223372036854775807 [-Werror=stringop-overflow=]
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/imm/immnd/immnd_proc.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/imm/immnd/immnd_proc.c b/src/imm/immnd/immnd_proc.c
+index 015932a..c8f115e 100644
+--- a/src/imm/immnd/immnd_proc.c
++++ b/src/imm/immnd/immnd_proc.c
+@@ -1902,6 +1902,10 @@ static int immnd_forkPbe(IMMND_CB *cb)
+ 		LOG_ER("Pathname too long: %u max is 1023", newLen);
+ 		return -1;
+ 	}
++	if (execDirLen > 1023 || execDirLen < 0) {
++		LOG_ER("Execdir name too long: %u max is 1023", execDirLen);
++		return -1;
++	}
+ 
+ 	strncpy(execPath, cb->mProgName, execDirLen);
+ 	execPath[execDirLen] = 0;

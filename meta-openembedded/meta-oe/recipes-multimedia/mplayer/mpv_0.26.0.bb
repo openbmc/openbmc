@@ -31,6 +31,8 @@ PACKAGECONFIG ??= " \
     libass \
     ${@bb.utils.filter('DISTRO_FEATURES', 'wayland', d)} \
 "
+
+PACKAGECONFIG_remove_aarch64 = "lua"
 PACKAGECONFIG[drm] = "--enable-drm,--disable-drm,libdrm"
 PACKAGECONFIG[gbm] = "--enable-gbm,--disable-gbm,virtual/mesa"
 PACKAGECONFIG[lua] = "--enable-lua,--disable-lua,lua luajit"

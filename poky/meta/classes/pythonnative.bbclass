@@ -1,11 +1,11 @@
 
 inherit python-dir
 
-PYTHON="${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN}"
+PYTHON="${STAGING_BINDIR_NATIVE}/python-native/python"
 # PYTHON_EXECUTABLE is used by cmake
 PYTHON_EXECUTABLE="${PYTHON}"
-EXTRANATIVEPATH += "${PYTHON_PN}-native"
-DEPENDS_append = " ${PYTHON_PN}-native "
+EXTRANATIVEPATH += "python-native"
+DEPENDS_append = " python-native "
 
 # python-config and other scripts are using distutils modules
 # which we patch to access these variables

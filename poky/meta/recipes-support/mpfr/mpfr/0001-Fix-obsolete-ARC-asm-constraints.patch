@@ -1,0 +1,45 @@
+mpfr-longlong.h: Fix obsolete ARC asm constraints
+
+This patch replaces obsolete ARC "J" asm constraint with
+up-to-date "Cal" constraint.
+
+"J" constraint only existed in pre-upstream GCC port for ARC.
+In current upstream port "Cal" constraint is used which leads
+to compile-time error.
+
+Proposed fix is known to work in Buildroot, Crosstool-NG etc.
+
+[1] https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=09cb6a17e71bd40d2fbfaf82a1502fc210e33c87
+
+Signed-off-by: Claudiu Zissulescu <claziss@synopsys.com>
+Signed-off-by: Vlad Zakharov <vzakhar@synopsys.com>
+Signed-off-by: Alexey Brodkin <abrodkin@synopsys.com>
+
+Upstream-Status: Backport [https://gforge.inria.fr/scm/viewvc.php/mpfr?view=revision&revision=13251]
+---
+Index: src/mpfr-longlong.h
+===================================================================
+--- a/src/mpfr-longlong.h	(revision 10963)
++++ b/src/mpfr-longlong.h	(working copy)
+@@ -416,17 +416,17 @@
+ 	   : "=r" (sh),							\
+ 	     "=&r" (sl)							\
+ 	   : "r"  ((USItype) (ah)),					\
+-	     "rIJ" ((USItype) (bh)),					\
++	     "rICal" ((USItype) (bh)),					\
+ 	     "%r" ((USItype) (al)),					\
+-	     "rIJ" ((USItype) (bl)))
++	     "rICal" ((USItype) (bl)))
+ #define sub_ddmmss(sh, sl, ah, al, bh, bl) \
+   __asm__ ("sub.f\t%1, %4, %5\n\tsbc\t%0, %2, %3"			\
+ 	   : "=r" (sh),							\
+ 	     "=&r" (sl)							\
+ 	   : "r" ((USItype) (ah)),					\
+-	     "rIJ" ((USItype) (bh)),					\
++	     "rICal" ((USItype) (bh)),					\
+ 	     "r" ((USItype) (al)),					\
+-	     "rIJ" ((USItype) (bl)))
++	     "rICal" ((USItype) (bl)))
+ #endif
+ 
+ #if defined (__arm__) && (defined (__thumb2__) || !defined (__thumb__)) \

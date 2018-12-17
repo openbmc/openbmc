@@ -215,31 +215,31 @@ to ensure accurate results.")
         ftools.remove_from_file(self.testinc_path, data)
 
     def recipeinc(self, recipe):
-        """Return absolute path of meta-sefltest/recipes-test/<recipe>/test_recipe.inc"""
+        """Return absolute path of meta-selftest/recipes-test/<recipe>/test_recipe.inc"""
         return os.path.join(self.testlayer_path, 'recipes-test', recipe, 'test_recipe.inc')
 
     def write_recipeinc(self, recipe, data):
-        """Write to meta-sefltest/recipes-test/<recipe>/test_recipe.inc"""
+        """Write to meta-selftest/recipes-test/<recipe>/test_recipe.inc"""
         inc_file = self.recipeinc(recipe)
         self.logger.debug("Writing to: %s\n%s\n" % (inc_file, data))
         ftools.write_file(inc_file, data)
         return inc_file
 
     def append_recipeinc(self, recipe, data):
-        """Append data to meta-sefltest/recipes-test/<recipe>/test_recipe.inc"""
+        """Append data to meta-selftest/recipes-test/<recipe>/test_recipe.inc"""
         inc_file = self.recipeinc(recipe)
         self.logger.debug("Appending to: %s\n%s\n" % (inc_file, data))
         ftools.append_file(inc_file, data)
         return inc_file
 
     def remove_recipeinc(self, recipe, data):
-        """Remove data from meta-sefltest/recipes-test/<recipe>/test_recipe.inc"""
+        """Remove data from meta-selftest/recipes-test/<recipe>/test_recipe.inc"""
         inc_file = self.recipeinc(recipe)
         self.logger.debug("Removing from: %s\n%s\n" % (inc_file, data))
         ftools.remove_from_file(inc_file, data)
 
     def delete_recipeinc(self, recipe):
-        """Delete meta-sefltest/recipes-test/<recipe>/test_recipe.inc file"""
+        """Delete meta-selftest/recipes-test/<recipe>/test_recipe.inc file"""
         inc_file = self.recipeinc(recipe)
         self.logger.debug("Deleting file: %s" % inc_file)
         try:

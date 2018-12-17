@@ -8,23 +8,23 @@ as CC has spaces in it, just skip it if one was already passed in.
 
 Signed-off-by: Venture Research <tech@ventureresearch.com>
 
-Update to work with 3.0.x
-Signed-off-by: Armin Kuster <akuster808@gmail.com>
+Update to work with 4.0.8
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 
 ---
  deps/hiredis/Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Index: deps/hiredis/Makefile
-===================================================================
+diff --git a/deps/hiredis/Makefile b/deps/hiredis/Makefile
+index 9a4de836..271c06ba 100644
 --- a/deps/hiredis/Makefile
 +++ b/deps/hiredis/Makefile
-@@ -24,7 +24,7 @@ endef
+@@ -36,7 +36,7 @@ endef
  export REDIS_TEST_CONFIG
  
  # Fallback to gcc when $CC is not in $PATH.
 -CC:=$(shell sh -c 'type $(CC) >/dev/null 2>/dev/null && echo $(CC) || echo gcc')
 +CC?=$(shell sh -c 'type $(CC) >/dev/null 2>/dev/null && echo $(CC) || echo gcc')
+ CXX:=$(shell sh -c 'type $(CXX) >/dev/null 2>/dev/null && echo $(CXX) || echo g++')
  OPTIMIZATION?=-O3
  WARNINGS=-Wall -W -Wstrict-prototypes -Wwrite-strings
- DEBUG?= -g -ggdb

@@ -44,8 +44,12 @@ C = "3"
 """
 
     def setUp(self):
+        self.origdir = os.getcwd()
         self.d = bb.data.init()
         bb.parse.siggen = bb.siggen.init(self.d)
+
+    def tearDown(self):
+        os.chdir(self.origdir)
 
     def parsehelper(self, content, suffix = ".bb"):
 

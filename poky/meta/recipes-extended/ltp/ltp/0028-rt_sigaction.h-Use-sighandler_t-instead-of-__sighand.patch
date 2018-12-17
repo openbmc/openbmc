@@ -11,14 +11,14 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 Upstream-Status: Pending
 ---
- include/lapi/rt_sigaction.h                      | 2 +-
+ include/lapi/rt_sigaction.h                      | 4 ++--
  testcases/kernel/syscalls/rt_sigsuspend/Makefile | 3 +++
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
-Index: git/include/lapi/rt_sigaction.h
-===================================================================
---- git.orig/include/lapi/rt_sigaction.h
-+++ git/include/lapi/rt_sigaction.h
+diff --git a/include/lapi/rt_sigaction.h b/include/lapi/rt_sigaction.h
+index 18236db..15facda 100644
+--- a/include/lapi/rt_sigaction.h
++++ b/include/lapi/rt_sigaction.h
 @@ -36,12 +36,12 @@
  #if defined(__mips__)
  struct kernel_sigaction {
@@ -34,10 +34,10 @@ Index: git/include/lapi/rt_sigaction.h
  	unsigned long sa_flags;
  	void (*sa_restorer) (void);
  	sigset_t sa_mask;
-Index: git/testcases/kernel/syscalls/rt_sigsuspend/Makefile
-===================================================================
---- git.orig/testcases/kernel/syscalls/rt_sigsuspend/Makefile
-+++ git/testcases/kernel/syscalls/rt_sigsuspend/Makefile
+diff --git a/testcases/kernel/syscalls/rt_sigsuspend/Makefile b/testcases/kernel/syscalls/rt_sigsuspend/Makefile
+index 37bc3a9..2ca7f7c 100644
+--- a/testcases/kernel/syscalls/rt_sigsuspend/Makefile
++++ b/testcases/kernel/syscalls/rt_sigsuspend/Makefile
 @@ -19,4 +19,7 @@
  top_srcdir		?= ../../../..
  

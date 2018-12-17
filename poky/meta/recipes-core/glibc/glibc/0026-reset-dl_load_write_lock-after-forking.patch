@@ -1,7 +1,7 @@
-From 847d37d5a34e4bf294de4ba98de3668950e28bc7 Mon Sep 17 00:00:00 2001
+From efb0fca7db742f4195e1771d8ba4c7fba4938819 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 27 Jan 2018 10:05:07 -0800
-Subject: [PATCH 26/27] reset dl_load_write_lock after forking
+Subject: [PATCH] reset dl_load_write_lock after forking
 
 The patch in this Bugzilla entry was requested by a customer:
 
@@ -20,10 +20,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/sysdeps/nptl/fork.c b/sysdeps/nptl/fork.c
-index 846fa49ef2..f87506f398 100644
+index ec56a827eb..0f48933ff1 100644
 --- a/sysdeps/nptl/fork.c
 +++ b/sysdeps/nptl/fork.c
-@@ -194,9 +194,9 @@ __libc_fork (void)
+@@ -130,9 +130,9 @@ __libc_fork (void)
  	  _IO_list_resetlock ();
  	}
  
@@ -33,8 +33,5 @@ index 846fa49ef2..f87506f398 100644
 -
 +      __rtld_lock_initialize (GL(dl_load_write_lock));
        /* Run the handlers registered for the child.  */
-       while (allp != NULL)
- 	{
--- 
-2.16.1
-
+       __run_fork_handlers (atfork_run_child);
+     }

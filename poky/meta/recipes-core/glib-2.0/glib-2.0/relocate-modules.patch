@@ -1,3 +1,8 @@
+From 8326961841f4d16c7239e747de11e3817c35cfd2 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Fri, 11 Mar 2016 15:35:55 +0000
+Subject: [PATCH] glib-2.0: relocate the GIO module directory for native builds
+
 Instead of hard-coding GIO_MODULE_PATH when glib is built, use dladdr() to
 determine where libglib.so is and use that path to calculate GIO_MODULES_DIR.
 
@@ -8,12 +13,13 @@ Signed-off-by: Ross Burton <ross.burton@intel.com>
 
 Port patch to 2.48
 Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+
 ---
  gio/giomodule.c | 12 +++++++++++-
  1 file changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/gio/giomodule.c b/gio/giomodule.c
-index da7c167..cc0bc7c 100644
+index 36c0cef..912e490 100644
 --- a/gio/giomodule.c
 +++ b/gio/giomodule.c
 @@ -40,6 +40,8 @@
@@ -25,7 +31,7 @@ index da7c167..cc0bc7c 100644
  #endif
  #include <glib/gstdio.h>
  
-@@ -1036,7 +1038,15 @@ get_gio_module_dir (void)
+@@ -1099,7 +1101,15 @@ get_gio_module_dir (void)
  #endif
        g_free (install_dir);
  #else
@@ -42,6 +48,3 @@ index da7c167..cc0bc7c 100644
  #endif
      }
  
--- 
-2.1.4
-

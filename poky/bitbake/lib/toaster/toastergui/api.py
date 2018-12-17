@@ -22,7 +22,9 @@ import os
 import re
 import logging
 import json
+import subprocess
 from collections import Counter
+from shutil import copyfile
 
 from orm.models import Project, ProjectTarget, Build, Layer_Version
 from orm.models import LayerVersionDependency, LayerSource, ProjectLayer
@@ -38,6 +40,18 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q, F
 from django.db import Error
 from toastergui.templatetags.projecttags import filtered_filesizeformat
+from django.utils import timezone
+import pytz
+
+# development/debugging support
+verbose = 2
+def _log(msg):
+    if 1 == verbose:
+        print(msg)
+    elif 2 == verbose:
+        f1=open('/tmp/toaster.log', 'a')
+        f1.write("|" + msg + "|\n" )
+        f1.close()
 
 logger = logging.getLogger("toaster")
 
@@ -136,6 +150,130 @@ class XhrBuildRequest(View):
         response.status_code = 500
         return response
 
+
+class XhrProjectUpdate(View):
+
+    def get(self, request, *args, **kwargs):
+        return HttpResponse()
+
+    def post(self, request, *args, **kwargs):
+        """
+          Project Update
+
+          Entry point: /xhr_projectupdate/<project_id>
+          Method: POST
+
+          Args:
+              pid: pid of project to update
+
+          Returns:
+              {"error": "ok"}
+            or
+              {"error": <error message>}
+        """
+
+        project = Project.objects.get(pk=kwargs['pid'])
+        logger.debug("ProjectUpdateCallback:project.pk=%d,project.builddir=%s" % (project.pk,project.builddir))
+
+        if 'do_update' in request.POST:
+
+            # Extract any default image recipe
+            if 'default_image' in request.POST:
+                project.set_variable(Project.PROJECT_SPECIFIC_DEFAULTIMAGE,str(request.POST['default_image']))
+            else:
+                project.set_variable(Project.PROJECT_SPECIFIC_DEFAULTIMAGE,'')
+
+            logger.debug("ProjectUpdateCallback:Chain to the build request")
+
+            # Chain to the build request
+            xhrBuildRequest = XhrBuildRequest()
+            return xhrBuildRequest.post(request, *args, **kwargs)
+
+        logger.warning("ERROR:XhrProjectUpdate")
+        response = HttpResponse()
+        response.status_code = 500
+        return response
+
+class XhrSetDefaultImageUrl(View):
+
+    def get(self, request, *args, **kwargs):
+        return HttpResponse()
+
+    def post(self, request, *args, **kwargs):
+        """
+          Project Update
+
+          Entry point: /xhr_setdefaultimage/<project_id>
+          Method: POST
+
+          Args:
+              pid: pid of project to update default image
+
+          Returns:
+              {"error": "ok"}
+            or
+              {"error": <error message>}
+        """
+
+        project = Project.objects.get(pk=kwargs['pid'])
+        logger.debug("XhrSetDefaultImageUrl:project.pk=%d" % (project.pk))
+
+        # set any default image recipe
+        if 'targets' in request.POST:
+            default_target = str(request.POST['targets'])
+            project.set_variable(Project.PROJECT_SPECIFIC_DEFAULTIMAGE,default_target)
+            logger.debug("XhrSetDefaultImageUrl,project.pk=%d,project.builddir=%s" % (project.pk,project.builddir))
+            return error_response('ok')
+
+        logger.warning("ERROR:XhrSetDefaultImageUrl")
+        response = HttpResponse()
+        response.status_code = 500
+        return response
+
+
+#
+# Layer Management
+#
+# Rules for 'local_source_dir' layers
+#  * Layers must have a unique name in the Layers table
+#  * A 'local_source_dir' layer is supposed to be shared
+#    by all projects that use it, so that it can have the
+#    same logical name
+#  * Each project that uses a layer will have its own
+#    LayerVersion and Project Layer for it
+#  * During the Paroject delete process, when the last
+#    LayerVersion for a 'local_source_dir' layer is deleted
+#    then the Layer record is deleted to remove orphans
+#
+
+def scan_layer_content(layer,layer_version):
+    # if this is a local layer directory, we can immediately scan its content
+    if layer.local_source_dir:
+        try:
+            # recipes-*/*/*.bb
+            cmd = '%s %s' % ('ls', os.path.join(layer.local_source_dir,'recipes-*/*/*.bb'))
+            recipes_list = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,stderr=subprocess.STDOUT).stdout.read()
+            recipes_list = recipes_list.decode("utf-8").strip()
+            if recipes_list and 'No such' not in recipes_list:
+                for recipe in recipes_list.split('\n'):
+                    recipe_path = recipe[recipe.rfind('recipes-'):]
+                    recipe_name = recipe[recipe.rfind('/')+1:].replace('.bb','')
+                    recipe_ver = recipe_name.rfind('_')
+                    if recipe_ver > 0:
+                        recipe_name = recipe_name[0:recipe_ver]
+                    if recipe_name:
+                        ro, created = Recipe.objects.get_or_create(
+                            layer_version=layer_version,
+                            name=recipe_name
+                        )
+                        if created:
+                            ro.file_path = recipe_path
+                            ro.summary = 'Recipe %s from layer %s' % (recipe_name,layer.name)
+                            ro.description = ro.summary
+                        ro.save()
+
+        except Exception as e:
+            logger.warning("ERROR:scan_layer_content: %s" % e)
 
 class XhrLayer(View):
     """ Delete, Get, Add and Update Layer information
@@ -265,6 +403,7 @@ class XhrLayer(View):
             (csv)]
 
         """
+
         try:
             project = Project.objects.get(pk=kwargs['pid'])
 
@@ -285,7 +424,13 @@ class XhrLayer(View):
             if layer_data['name'] in existing_layers:
                 return JsonResponse({"error": "layer-name-exists"})
 
-            layer = Layer.objects.create(name=layer_data['name'])
+            if ('local_source_dir' in layer_data):
+                # Local layer can be shared across projects. They have no 'release'
+                # and are not included in get_all_compatible_layer_versions() above
+                layer,created = Layer.objects.get_or_create(name=layer_data['name'])
+                _log("Local Layer created=%s" % created)
+            else:
+                layer = Layer.objects.create(name=layer_data['name'])
 
             layer_version = Layer_Version.objects.create(
                 layer=layer,
@@ -293,7 +438,7 @@ class XhrLayer(View):
                 layer_source=LayerSource.TYPE_IMPORTED)
 
             # Local layer
-            if ('local_source_dir' in layer_data) and layer.local_source_dir:
+            if ('local_source_dir' in layer_data): ### and layer.local_source_dir:
                 layer.local_source_dir = layer_data['local_source_dir']
             # git layer
             elif 'vcs_url' in layer_data:
@@ -324,6 +469,9 @@ class XhrLayer(View):
                             {'name': layer_dep.layer.name,
                              'layerdetailurl':
                              layer_dep.get_detailspage_url(project.pk)})
+
+            # Scan the layer's content and update components
+            scan_layer_content(layer,layer_version)
 
         except Layer_Version.DoesNotExist:
             return error_response("layer-dep-not-found")
@@ -529,7 +677,13 @@ class XhrCustomRecipe(View):
         recipe_path = os.path.join(layerpath, "recipes", "%s.bb" %
                                    recipe.name)
         with open(recipe_path, "w") as recipef:
-            recipef.write(recipe.generate_recipe_file_contents())
+            content = recipe.generate_recipe_file_contents()
+            if not content:
+                # Delete this incomplete image recipe object
+                recipe.delete()
+                return error_response("recipe-parent-not-exist")
+            else:
+                recipef.write(recipe.generate_recipe_file_contents())
 
         return JsonResponse(
             {"error": "ok",
@@ -1014,7 +1168,23 @@ class XhrProject(View):
                     state=BuildRequest.REQ_INPROGRESS):
                 XhrBuildRequest.cancel_build(br)
 
+            # gather potential orphaned local layers attached to this project
+            project_local_layer_list = []
+            for pl in ProjectLayer.objects.filter(project=project):
+                if pl.layercommit.layer_source == LayerSource.TYPE_IMPORTED:
+                    project_local_layer_list.append(pl.layercommit.layer)
+
+            # deep delete the project and its dependencies
             project.delete()
+
+            # delete any local layers now orphaned
+            _log("LAYER_ORPHAN_CHECK:Check for orphaned layers")
+            for layer in project_local_layer_list:
+                layer_refs = Layer_Version.objects.filter(layer=layer)
+                _log("LAYER_ORPHAN_CHECK:Ref Count for '%s' = %d" % (layer.name,len(layer_refs)))
+                if 0 == len(layer_refs):
+                    _log("LAYER_ORPHAN_CHECK:DELETE orpahned '%s'" % (layer.name))
+                    Layer.objects.filter(pk=layer.id).delete()
 
         except Project.DoesNotExist:
             return error_response("Project %s does not exist" %

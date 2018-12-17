@@ -8,9 +8,9 @@ easier to administer devices."
 HOMEPAGE = "http://www.isc.org/"
 
 LICENSE = "ISC"
-LIC_FILES_CHKSUM = "file://LICENSE;beginline=4;md5=c5c64d696107f84b56fe337d14da1753"
+LIC_FILES_CHKSUM = "file://LICENSE;beginline=4;md5=004a4db50a1e20972e924a8618747c01"
 
-DEPENDS = "openssl"
+DEPENDS = "openssl bind"
 
 SRC_URI = "http://ftp.isc.org/isc/dhcp/${PV}/dhcp-${PV}.tar.gz \
            file://init-relay file://default-relay \
@@ -24,7 +24,7 @@ SRC_URI = "http://ftp.isc.org/isc/dhcp/${PV}/dhcp-${PV}.tar.gz \
 UPSTREAM_CHECK_URI = "ftp://ftp.isc.org/isc/dhcp/"
 UPSTREAM_CHECK_REGEX = "(?P<pver>\d+\.\d+\.(\d+?))/"
 
-inherit autotools systemd useradd update-rc.d
+inherit autotools-brokensep systemd useradd update-rc.d
 
 USERADD_PACKAGES = "${PN}-server"
 USERADD_PARAM_${PN}-server = "--system --no-create-home --home-dir /var/run/${BPN} --shell /bin/false --user-group ${BPN}"
@@ -50,7 +50,14 @@ EXTRA_OECONF = "--with-srv-lease-file=${localstatedir}/lib/dhcp/dhcpd.leases \
                 --with-cli6-lease-file=${localstatedir}/lib/dhcp/dhclient6.leases \
                 --enable-paranoia --disable-static \
                 --with-randomdev=/dev/random \
+                --with-libbind=${STAGING_DIR_HOST} \
+		--enable-libtool \
                "
+
+#Enable shared libs per dhcp README
+do_configure_prepend () {
+	cp configure.ac+lt configure.ac
+}
 
 do_install_append () {
 	install -d ${D}${sysconfdir}/init.d
@@ -95,8 +102,7 @@ PACKAGES += "dhcp-libs dhcp-server dhcp-server-config dhcp-client dhcp-relay dhc
 PACKAGES_remove = "${PN}"
 RDEPENDS_${PN}-dev = ""
 RDEPENDS_${PN}-staticdev = ""
-
-FILES_${PN}-libs = "${libdir}/libdhcpctl.so.0* ${libdir}/libomapi.so.0*"
+FILES_${PN}-libs = "${libdir}/libdhcpctl.so.0* ${libdir}/libomapi.so.0* ${libdir}/libdhcp.so.0*"
 
 FILES_${PN}-server = "${sbindir}/dhcpd ${sysconfdir}/init.d/dhcp-server"
 RRECOMMENDS_${PN}-server = "dhcp-server-config"

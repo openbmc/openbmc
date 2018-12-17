@@ -7,15 +7,17 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=8d4f33bc3add976f7dfae85dab66f03c"
 DEPENDS = "virtual/egl"
 
 SRC_URI = "git://github.com/dv1/eglinfo.git;branch=master \
+           file://waf \
            file://0001-Add-STAGING_INCDIR-to-searchpath-for-egl-headers.patch \
-          "
+           file://0001-Check-for-libegl-using-pkg-config.patch \
+           "
 SRCREV = "4b317648ec6cf39556a9e5d8078f605bc0edd5de"
 
 CVE_PRODUCT = "eglinfo"
 
 S = "${WORKDIR}/git"
 
-inherit waf distro_features_check
+inherit waf distro_features_check pkgconfig
 # depends on virtual/egl
 REQUIRED_DISTRO_FEATURES ?= "opengl"
 
@@ -28,6 +30,9 @@ EXTRA_OECONF = "--platform=${EGLINFO_PLATFORM} \
                 --device=${EGLINFO_DEVICE} \
                 --sysroot ${STAGING_DIR_TARGET}"
 
+do_configure_prepend() {
+	install -D -m 0755 ${WORKDIR}/waf ${S}/waf
+}
 do_install_append() {
 	mv ${D}/${bindir}/eglinfo ${D}/${bindir}/${EGLINFO_BINARY_NAME}
 }

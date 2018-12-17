@@ -1,0 +1,55 @@
+From 19f6bd06af3c7fc0db5f96878aaa68f5589ff13e Mon Sep 17 00:00:00 2001
+From: Pablo Galindo <Pablogsal@gmail.com>
+Date: Thu, 24 May 2018 23:20:44 +0100
+Subject: [PATCH] bpo-33354: Fix test_ssl when a filename cannot be encoded
+ (GH-6613)
+
+Skip test_load_dh_params() of test_ssl when Python filesystem encoding
+cannot encode the provided path.
+
+Upstream-Status: Backport [https://github.com/python/cpython/commit/19f6bd06af3c7fc0db5f96878aaa68f5589ff13e]
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+---
+ Lib/test/test_ssl.py                                     | 9 ++++++++-
+ .../next/Tests/2018-04-26-22-39-17.bpo-33354.g35-44.rst  | 2 ++
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+ create mode 100644 Misc/NEWS.d/next/Tests/2018-04-26-22-39-17.bpo-33354.g35-44.rst
+
+diff --git a/Lib/test/test_ssl.py b/Lib/test/test_ssl.py
+index b59fe73f04..7ced90fdf6 100644
+--- a/Lib/test/test_ssl.py
++++ b/Lib/test/test_ssl.py
+@@ -989,6 +989,13 @@ class ContextTests(unittest.TestCase):
+ 
+ 
+     def test_load_dh_params(self):
++        filename = u'dhpäräm.pem'
++        fs_encoding = sys.getfilesystemencoding()
++        try:
++            filename.encode(fs_encoding)
++        except UnicodeEncodeError:
++            self.skipTest("filename %r cannot be encoded to the filesystem encoding %r" % (filename, fs_encoding))
++
+         ctx = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+         ctx.load_dh_params(DHFILE)
+         if os.name != 'nt':
+@@ -1001,7 +1008,7 @@ class ContextTests(unittest.TestCase):
+         with self.assertRaises(ssl.SSLError) as cm:
+             ctx.load_dh_params(CERTFILE)
+         with support.temp_dir() as d:
+-            fname = os.path.join(d, u'dhpäräm.pem')
++            fname = os.path.join(d, filename)
+             shutil.copy(DHFILE, fname)
+             ctx.load_dh_params(fname)
+ 
+diff --git a/Misc/NEWS.d/next/Tests/2018-04-26-22-39-17.bpo-33354.g35-44.rst b/Misc/NEWS.d/next/Tests/2018-04-26-22-39-17.bpo-33354.g35-44.rst
+new file mode 100644
+index 0000000000..c66cecac32
+--- /dev/null
++++ b/Misc/NEWS.d/next/Tests/2018-04-26-22-39-17.bpo-33354.g35-44.rst
+@@ -0,0 +1,2 @@
++Skip ``test_ssl.test_load_dh_params`` when Python filesystem encoding cannot encode the
++provided path.
+-- 
+2.17.1
+

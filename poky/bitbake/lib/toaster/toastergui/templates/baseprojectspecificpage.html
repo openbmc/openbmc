@@ -1,0 +1,48 @@
+{% extends "base_specific.html" %}
+
+{% load projecttags %}
+{% load humanize %}
+
+{% block title %} {{title}} - {{project.name}} - Toaster {% endblock %}
+
+{% block pagecontent %}
+
+<div class="row">
+  {% include "project_specific_topbar.html" %}
+  <script type="text/javascript">
+$(document).ready(function(){
+    $("#config-nav .nav li a").each(function(){
+      if (window.location.pathname === $(this).attr('href'))
+      $(this).parent().addClass('active');
+      else
+      $(this).parent().removeClass('active');
+      });
+
+    $("#topbar-configuration-tab").addClass("active")
+    });
+  </script>
+
+  <!-- only on config pages -->
+  <div id="config-nav" class="col-md-2">
+    <ul class="nav nav-pills nav-stacked">
+      <li><a class="nav-parent" href="{% url 'project' project.id %}">Configuration</a></li>
+      <li class="nav-header">Compatible metadata</li>
+      <li><a href="{% url 'projectcustomimages' project.id %}">Custom images</a></li>
+      <li><a href="{% url 'projectimagerecipes' project.id %}">Image recipes</a></li>
+      <li><a href="{% url 'projectsoftwarerecipes' project.id %}">Software recipes</a></li>
+      <li><a href="{% url 'projectmachines' project.id %}">Machines</a></li>
+      <li><a href="{% url 'projectlayers' project.id %}">Layers</a></li>
+      <li><a href="{% url 'projectdistros' project.id %}">Distros</a></li>
+      <li class="nav-header">Extra configuration</li>
+      <li><a href="{% url 'projectconf' project.id %}">BitBake variables</a></li>
+
+      <li class="nav-header">Actions</li>
+    </ul>
+  </div>
+  <div class="col-md-10">
+    {% block projectinfomain %}{% endblock %}
+  </div>
+
+</div>
+{% endblock %}
+

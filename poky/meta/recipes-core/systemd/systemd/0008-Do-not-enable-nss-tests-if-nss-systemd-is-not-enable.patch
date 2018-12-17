@@ -1,0 +1,29 @@
+From b6ba596fd1313a162cdc2eb88161dcf24d19ede7 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Thu, 28 Jun 2018 10:10:02 +0800
+Subject: [PATCH 8/9] Do not enable nss tests if nss-systemd is not enabled
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/test/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/test/meson.build b/src/test/meson.build
+index 7da7e3a22..7b7c257ff 100644
+--- a/src/test/meson.build
++++ b/src/test/meson.build
+@@ -645,7 +645,7 @@ tests += [
+         [['src/test/test-nss.c'],
+          [],
+          [libdl],
+-         '', 'manual'],
++         'ENABLE_NSS_SYSTEMD', 'manual'],
+ 
+         [['src/test/test-umount.c',
+           'src/core/mount-setup.c',
+-- 
+2.11.0
+

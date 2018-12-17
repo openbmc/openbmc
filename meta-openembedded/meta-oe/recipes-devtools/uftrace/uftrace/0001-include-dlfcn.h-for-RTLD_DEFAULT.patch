@@ -1,0 +1,39 @@
+From cdf7f2e394fcfb93a61f509ae3388f29540a6b35 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 8 Sep 2018 11:56:13 -0700
+Subject: [PATCH] include dlfcn.h for RTLD_DEFAULT
+
+Fixes
+plthook.c:128:41: error: use of undeclared identifier 'RTLD_DEFAULT'
+
+Upstream-Status: Submitted [https://github.com/namhyung/uftrace/pull/487]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libmcount/plthook.c | 1 +
+ utils/debug.c       | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/libmcount/plthook.c b/libmcount/plthook.c
+index d9d84f0..d54f5e8 100644
+--- a/libmcount/plthook.c
++++ b/libmcount/plthook.c
+@@ -6,6 +6,7 @@
+ #include <sys/mman.h>
+ #include <pthread.h>
+ #include <assert.h>
++#include <dlfcn.h>
+ 
+ /* This should be defined before #include "utils.h" */
+ #define PR_FMT     "mcount"
+diff --git a/utils/debug.c b/utils/debug.c
+index 2134b09..5460def 100644
+--- a/utils/debug.c
++++ b/utils/debug.c
+@@ -13,6 +13,7 @@
+ #include <assert.h>
+ #include <limits.h>
+ #include <inttypes.h>
++#include <dlfcn.h>
+ 
+ #include "utils/utils.h"
+ 

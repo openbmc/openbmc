@@ -51,7 +51,7 @@ class ConfigHandler(object):
 
     def __init__(self, filename):
         self.config_file = filename
-        self.config_obj = configparser.SafeConfigParser()
+        self.config_obj = configparser.ConfigParser()
 
     def get(self, section, option, default=None):
         try:

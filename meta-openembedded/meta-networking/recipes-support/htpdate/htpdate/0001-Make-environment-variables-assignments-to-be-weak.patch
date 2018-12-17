@@ -1,0 +1,31 @@
+From 04603f52d793f964653e6a985944400fe4fa87ee Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 13 Jun 2018 17:50:20 -0700
+Subject: [PATCH] Make environment variables assignments to be weak
+
+So that OE can override them for cross builds
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 1c80c09..884126c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -2,11 +2,11 @@ prefix = $(DESTDIR)/usr
+ bindir = ${prefix}/bin
+ mandir = ${prefix}/share/man
+ 
+-CC = gcc
++CC ?= gcc
+ CFLAGS += -Wall -std=c99 -pedantic -O2
+ 
+-INSTALL = /usr/bin/install -c
+-STRIP = /usr/bin/strip -s
++INSTALL ?= /usr/bin/install -c
++STRIP ?= /usr/bin/strip -s
+ 
+ all: htpdate
+ 

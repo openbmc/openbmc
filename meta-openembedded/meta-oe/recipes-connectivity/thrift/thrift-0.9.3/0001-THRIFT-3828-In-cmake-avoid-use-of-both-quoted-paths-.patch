@@ -1,7 +1,7 @@
-From bc577820ad25795543b31f123e309cdaebc7d6c6 Mon Sep 17 00:00:00 2001
+From b8e254a2f4ba49412e541598c72159869a7770f8 Mon Sep 17 00:00:00 2001
 From: Cody P Schafer <dev@codyps.com>
 Date: Mon, 16 May 2016 15:21:10 -0400
-Subject: [PATCH 1/2] THRIFT-3828 In cmake avoid use of both quoted paths and
+Subject: [PATCH] THRIFT-3828 In cmake avoid use of both quoted paths and
  SYSTEM with include_directories()
 
 This allows us to avoid issues where there are no paths to be added to
@@ -11,6 +11,7 @@ string).
 Specifically, gcc-6 requires that libraries stop passing paths like
 '/usr/include' (or they will get libstdc++ build errors), so these paths
 will be empty more often in the future.
+
 ---
  lib/cpp/CMakeLists.txt      | 8 ++++----
  lib/cpp/test/CMakeLists.txt | 2 +-
@@ -105,6 +106,3 @@ index 2b0c143..5ecae17 100644
  
  #Make sure gen-cpp files can be included
  include_directories("${CMAKE_CURRENT_BINARY_DIR}")
--- 
-2.9.3
-

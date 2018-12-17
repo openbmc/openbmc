@@ -1,16 +1,25 @@
+From da6c24a2a87b8cf9692017e32be25d30c0cc7ef4 Mon Sep 17 00:00:00 2001
+From: Andrei Gherzan <andrei@gherzan.ro>
+Date: Tue, 10 Feb 2015 00:52:18 +0100
+Subject: [PATCH] omxplayer: Bump SRCREV
+
 Force the pkg-config native tool. Strangely ffmpeg prepends cross_prefix
 to the default value which obviously is wrong.
 
 Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
 
+---
+ Makefile.ffmpeg | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
 Index: git/Makefile.ffmpeg
 ===================================================================
 --- git.orig/Makefile.ffmpeg
 +++ git/Makefile.ffmpeg
-@@ -245,7 +245,8 @@ configure:
+@@ -242,7 +242,8 @@ configure:
  			--disable-decoder=idf \
+ 			--disable-decoder=hevc \
  			--enable-decoder=opus \
- 			--cross-prefix=$(HOST)- \
 -			--disable-stripping
 +			--disable-stripping \
 +			--pkg-config=pkg-config

@@ -1,0 +1,43 @@
+From f9625b5f3fd5dac3f3591dbeeb24dc9d6fda790d Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Tue, 27 Feb 2018 12:56:21 +0800
+Subject: [PATCH 9/9] nss-mymachines: Build conditionally when
+ ENABLE_MYHOSTNAME is set
+
+Fixes build failures when building with --disable-myhostname
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ meson.build | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 3bb087fef..73bd70b0b 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1371,12 +1371,15 @@ test_dlopen = executable(
+         link_with : [libbasic],
+         dependencies : [libdl])
+ 
+-foreach tuple : [['myhostname', 'ENABLE_MYHOSTNAME'],
+-                 ['systemd',    'ENABLE_NSS_SYSTEMD'],
+-                 ['mymachines', 'ENABLE_MACHINED'],
+-                 ['resolve',    'ENABLE_RESOLVE']]
++foreach tuple : [['myhostname', 'ENABLE_MYHOSTNAME',  ''],
++                 ['systemd',    'ENABLE_NSS_SYSTEMD', ''],
++                 ['mymachines', 'ENABLE_MACHINED',    'ENABLE_MYHOSTNAME'],
++                 ['resolve',    'ENABLE_RESOLVE',     '']]
+ 
+         condition = tuple[1] == '' or conf.get(tuple[1]) == 1
++        if tuple[2] != '' and condition
++                condition = conf.get(tuple[2]) == 1
++        endif
+         if condition
+                 module = tuple[0]
+ 
+-- 
+2.11.0
+

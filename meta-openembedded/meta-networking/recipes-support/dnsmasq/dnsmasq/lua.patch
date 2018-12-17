@@ -1,7 +1,7 @@
 From be1b3d2d0f1608cba5efee73d6aac5ad0709041b Mon Sep 17 00:00:00 2001
 From: Joe MacDonald <joe_macdonald@mentor.com>
 Date: Tue, 9 Sep 2014 10:24:58 -0400
-Subject: [PATCH] Upstream-status: Inappropriate [OE specific]
+Subject: [PATCH] Upstream-Status: Inappropriate [OE specific]
 
 Signed-off-by: Christopher Larson <chris_larson@mentor.com>
 Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>

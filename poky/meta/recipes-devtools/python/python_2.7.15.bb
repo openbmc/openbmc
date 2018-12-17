@@ -1,6 +1,7 @@
 require python.inc
 
-DEPENDS = "python-native libffi bzip2 gdbm openssl readline sqlite3 zlib"
+DEPENDS = "python-native libffi bzip2 gdbm openssl \
+           readline sqlite3 zlib virtual/crypt"
 
 PR = "${INC_PR}"
 
@@ -153,6 +154,7 @@ py_package_preprocess () {
 	(cd ${PKGD}; python -m py_compile ./${libdir}/python${PYTHON_MAJMIN}/_sysconfigdata.py)
 }
 
+PACKAGES_remove = "${PN}"
 
 # manual dependency additions
 RPROVIDES_${PN}-core = "${PN}"
@@ -178,9 +180,9 @@ FILES_${PN}-man = "${datadir}/man"
 # Nasty but if bdb isn't enabled the package won't be generated
 RDEPENDS_${PN}-modules_remove = "${@bb.utils.contains('PACKAGECONFIG', 'bdb', '', '${PN}-bsddb', d)}"
 
-BBCLASSEXTEND = "nativesdk"
+RDEPENDS_${PN}-dev = ""
 
-RPROVIDES_${PN} += "${PN}-modules"
+BBCLASSEXTEND = "nativesdk"
 
 # We want bytecode precompiled .py files (.pyc's) by default
 # but the user may set it on their own conf
@@ -221,7 +223,6 @@ python(){
                 if value.endswith('.py'):
                     d.appendVar('FILES_' + pypackage, ' ' + value + 'c')
 
-        d.setVar('RDEPENDS_' + pypackage, '')
         for value in python_manifest[key]['rdepends']:
             # Make it work with or without $PN
             if '${PN}' in value:

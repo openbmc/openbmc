@@ -160,11 +160,6 @@ SYSTEMLIBS1 = "${target_libdir}/"
 
 EXTRA_OECONF += "--enable-poison-system-directories"
 
-EXTRA_OECONF += "\
-    --with-mpfr=${STAGING_DIR_HOST}${layout_exec_prefix} \
-    --with-mpc=${STAGING_DIR_HOST}${layout_exec_prefix} \
-"
-
 EXTRA_OECONF_append_libc-baremetal = " --without-headers"
 EXTRA_OECONF_remove_libc-baremetal = "--with-sysroot=/not/exist"
 EXTRA_OECONF_remove_libc-baremetal = "--with-build-sysroot=${STAGING_DIR_TARGET}"

@@ -1,20 +1,19 @@
-# Settings for the GCC(1) cpu-type "corei7":
+# Settings for the GCC(1) cpu-type "nehalem":
 #
-#     Intel Core i7 CPU with 64-bit extensions, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1
-#     and SSE4.2 instruction set support.
+#     Intel Nehalem CPU with 64-bit extensions, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1,
+#     SSE4.2 and POPCNT instruction set support.
 #
 # This tune is recommended for Intel Nehalem and Silvermont (e.g. Bay Trail) CPUs
 # (and beyond).
 #
 DEFAULTTUNE ?= "corei7-64"
 
-# Pull in the previous tune in to pull in PACKAGE_EXTRA_ARCHS
+# Include the previous tune to pull in PACKAGE_EXTRA_ARCHS
 require conf/machine/include/tune-core2.inc
-
 
 # Extra tune features
 TUNEVALID[corei7] = "Enable corei7 specific processor optimizations"
-TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'corei7', ' -march=corei7 -mtune=corei7 -mfpmath=sse -msse4.2', '', d)}"
+TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'corei7', ' -march=nehalem -mtune=generic -mfpmath=sse -msse4.2', '', d)}"
 
 # Extra tune selections
 AVAILTUNES += "corei7-32"

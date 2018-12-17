@@ -54,7 +54,11 @@ def build(args, config, basepath, workspace):
     """Entry point for the devtool 'build' subcommand"""
     workspacepn = check_workspace_recipe(workspace, args.recipename, bbclassextend=True)
 
-    build_tasks = _get_build_tasks(config)
+    if args.clean:
+        # use clean instead of cleansstate to avoid messing things up in eSDK
+        build_tasks = ['do_clean']
+    else:
+        build_tasks = _get_build_tasks(config)
 
     bbappend = workspace[workspacepn]['bbappend']
     if args.disable_parallel_make:
@@ -83,4 +87,5 @@ def register_commands(subparsers, context):
                                          group='working', order=50)
     parser_build.add_argument('recipename', help='Recipe to build')
     parser_build.add_argument('-s', '--disable-parallel-make', action="store_true", help='Disable make parallelism')
+    parser_build.add_argument('-c', '--clean', action='store_true', help='clean up recipe building results')
     parser_build.set_defaults(func=build)

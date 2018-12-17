@@ -1,0 +1,32 @@
+From 1fb68433bde97d571fc781b52c9521b17fbb8df0 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Tue, 24 Jul 2018 17:42:43 +0800
+Subject: [PATCH] dlm: fix package qa error
+
+pass LDFLAG to makefile to fix below error:
+do_package_qa: QA Issue: No GNU_HASH in the elf binary:
+/packages-split/dlm/usr/sbin/dlm_stonith' [ldflags]
+
+Upstream-Status: Inappropriate[oe-specific]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ fence/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fence/Makefile b/fence/Makefile
+index cca0b2c..2b3963c 100644
+--- a/fence/Makefile
++++ b/fence/Makefile
+@@ -33,7 +33,7 @@ BIN_CFLAGS += -fPIE -DPIE
+ BIN_CFLAGS += `pkg-config libxml-2.0 --cflags`
+ BIN_CFLAGS += -I../include
+ 
+-BIN_LDFLAGS += -Wl,-z,now -Wl,-z,relro -pie
++BIN_LDFLAGS += $(LDFLAGS) -Wl,-z,now -Wl,-z,relro -pie
+ BIN_LDFLAGS += `pkg-config libxml-2.0 --libs`
+ BIN_LDFLAGS += -ldl
+ 
+-- 
+2.7.4
+

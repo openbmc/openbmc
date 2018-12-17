@@ -1,4 +1,4 @@
-From 3c2f4ff583a156a7ed2fa0cc002a413c391d063d Mon Sep 17 00:00:00 2001
+From 8eeb1b15608ce1a9a1f0d5417938fd6da4504406 Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Thu, 21 Jul 2016 18:06:21 +0800
 Subject: [PATCH] makedumpfile: replace hardcode CFLAGS
@@ -13,12 +13,13 @@ Subject: [PATCH] makedumpfile: replace hardcode CFLAGS
 Upstream-Status: Inappropriate[oe specific]
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+
 ---
  Makefile | 46 +++++++++++++++++++++++-----------------------
  1 file changed, 23 insertions(+), 23 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 7dde3e4..c5286ac 100644
+index 612b9d0..f6d6265 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -8,13 +8,6 @@ ifeq ($(strip $CC),)
@@ -80,9 +81,9 @@ index 7dde3e4..c5286ac 100644
 +		-DRELEASE_DATE='"$(DATE)"'
 +
  SRC_BASE = makedumpfile.c makedumpfile.h diskdump_mod.h sadump_mod.h sadump_info.h
- SRC_PART = print_info.c dwarf_info.c elf_info.c erase_info.c sadump_info.c cache.c
+ SRC_PART = print_info.c dwarf_info.c elf_info.c erase_info.c sadump_info.c cache.c tools.c
  OBJ_PART=$(patsubst %.c,%.o,$(SRC_PART))
-@@ -54,17 +54,17 @@ OBJ_ARCH=$(patsubst %.c,%.o,$(SRC_ARCH))
+@@ -53,17 +53,17 @@ OBJ_ARCH=$(patsubst %.c,%.o,$(SRC_ARCH))
  
  LIBS = -ldw -lbz2 -lebl -ldl -lelf -lz
  ifneq ($(LINKTYPE), dynamic)
@@ -103,7 +104,7 @@ index 7dde3e4..c5286ac 100644
  endif
  
  LIBS := -lpthread $(LIBS)
-@@ -72,14 +72,14 @@ LIBS := -lpthread $(LIBS)
+@@ -71,14 +71,14 @@ LIBS := -lpthread $(LIBS)
  all: makedumpfile
  
  $(OBJ_PART): $(SRC_PART)
@@ -120,7 +121,7 @@ index 7dde3e4..c5286ac 100644
  	echo .TH MAKEDUMPFILE 8 \"$(DATE)\" \"makedumpfile v$(VERSION)\" \"Linux System Administrator\'s Manual\" > temp.8
  	grep -v "^.TH MAKEDUMPFILE 8" $(VPATH)makedumpfile.8 >> temp.8
  	mv temp.8 makedumpfile.8
-@@ -90,7 +90,7 @@ makedumpfile: $(SRC_BASE) $(OBJ_PART) $(OBJ_ARCH)
+@@ -89,7 +89,7 @@ makedumpfile: $(SRC_BASE) $(OBJ_PART) $(OBJ_ARCH)
  	gzip -c ./makedumpfile.conf.5 > ./makedumpfile.conf.5.gz
  
  eppic_makedumpfile.so: extension_eppic.c
@@ -129,6 +130,3 @@ index 7dde3e4..c5286ac 100644
  
  clean:
  	rm -f $(OBJ) $(OBJ_PART) $(OBJ_ARCH) makedumpfile makedumpfile.8.gz makedumpfile.conf.5.gz
--- 
-2.8.1
-

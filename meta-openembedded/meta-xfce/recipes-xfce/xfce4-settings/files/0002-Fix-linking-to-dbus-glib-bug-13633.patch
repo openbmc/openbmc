@@ -1,0 +1,41 @@
+From b6e46e6a84e45f7bd954687be703987825a54c1e Mon Sep 17 00:00:00 2001
+From: Eric Koegel <eric.koegel@gmail.com>
+Date: Sun, 11 Jun 2017 11:38:26 +0300
+Subject: [PATCH] Fix linking to dbus-glib (bug #13633)
+
+With xfconf moving to GDBus nothing provides the libs for dbus-glib
+that xfce4-settings requires. This patch adds the libs back in until
+settings can be ported to GDBus.
+
+Signed-off-by: Sean Davis <smd.seandavis@gmail.com>
+
+Upstream-Status: Backport
+---
+ xfce4-settings-editor/Makefile.am | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/xfce4-settings-editor/Makefile.am b/xfce4-settings-editor/Makefile.am
+index 5964366..c2c7c4b 100644
+--- a/xfce4-settings-editor/Makefile.am
++++ b/xfce4-settings-editor/Makefile.am
+@@ -28,6 +28,7 @@ xfce4_settings_editor_CFLAGS = \
+ 	$(LIBXFCE4UTIL_CFLAGS) \
+ 	$(LIBXFCE4UI_CFLAGS) \
+ 	$(XFCONF_CFLAGS) \
++	$(DBUS_GLIB_CFLAGS) \
+ 	$(PLATFORM_CFLAGS)
+ 
+ xfce4_settings_editor_LDFLAGS = \
+@@ -39,7 +40,8 @@ xfce4_settings_editor_LDADD = \
+ 	$(DBUS_GLIB_LIBS) \
+ 	$(LIBXFCE4UTIL_LIBS) \
+ 	$(LIBXFCE4UI_LIBS) \
+-	$(XFCONF_LIBS)
++	$(XFCONF_LIBS) \
++	$(DBUS_GLIB_LIBS)
+ 
+ desktopdir = $(datadir)/applications
+ desktop_in_files = xfce4-settings-editor.desktop.in
+-- 
+2.14.3
+

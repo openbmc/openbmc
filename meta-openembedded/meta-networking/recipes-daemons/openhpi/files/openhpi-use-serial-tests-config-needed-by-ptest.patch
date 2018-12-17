@@ -1,4 +1,4 @@
-From 36fbaa27e7299f63c1324b0ad22b970e9365d6a7 Mon Sep 17 00:00:00 2001
+From 5e0ae172586f5aeb270a8f9b012dd3e36536a2a9 Mon Sep 17 00:00:00 2001
 From: Jackie Huang <jackie.huang@windriver.com>
 Date: Wed, 24 Dec 2014 10:54:59 +0800
 Subject: [PATCH] openhpi: use serial-tests config needed by ptest
@@ -9,17 +9,18 @@ serial-tests is required to generate those targets.
 Upstream-Status: Inappropriate [default automake behavior incompatible with ptest]
 
 Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
----
- configure.ac |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Index: openhpi-3.6.1/configure.ac
-===================================================================
---- openhpi-3.6.1.orig/configure.ac
-+++ openhpi-3.6.1/configure.ac
-@@ -7,7 +7,7 @@ dnl   various hacks by Sean Dague <http:
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 89d8104..c29a31f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -7,7 +7,7 @@ dnl   various hacks by Sean Dague <http://dague.net/sean> 4/23/03
  AC_PREREQ(2.57)
- AC_INIT(openhpi, 3.6.1)
+ AC_INIT(openhpi, 3.8.0)
  AC_CONFIG_SRCDIR(openhpi.spec.in)
 -AM_INIT_AUTOMAKE([1.8])
 +AM_INIT_AUTOMAKE([1.8 serial-tests])

@@ -19,7 +19,7 @@ mklibs_optimize_image_doit() {
 		echo $i
 	done > ${WORKDIR}/mklibs/executables.list
 
-	dynamic_loader=$(linuxloader)
+	dynamic_loader=${@get_linuxloader(d)}
 
 	mklibs -v \
 		--ldlib ${dynamic_loader} \

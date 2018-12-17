@@ -1,7 +1,7 @@
-From 2bafdbd7067794c6a24e5e85608c0ec4638c5667 Mon Sep 17 00:00:00 2001
+From a237553ccd15276462be2023057a017fa8ee5d7c Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 31 Dec 2015 14:35:35 -0800
-Subject: [PATCH 04/27] nativesdk-glibc: Allow 64 bit atomics for x86
+Subject: [PATCH] nativesdk-glibc: Allow 64 bit atomics for x86
 
 The fix consist of allowing 64bit atomic ops for x86.
 This should be safe for i586 and newer CPUs.
@@ -29,6 +29,3 @@ index 272da5dd8f..409c759f14 100644
  #define USE_ATOMIC_COMPILER_BUILTINS 0
  #define ATOMIC_EXCHANGE_USES_CAS 0
  
--- 
-2.16.1
-

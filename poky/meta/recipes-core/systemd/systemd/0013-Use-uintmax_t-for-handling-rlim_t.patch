@@ -1,0 +1,90 @@
+From a0ac0cfd90af6431c64d1b276f422a2092d569b3 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Mon, 2 Jul 2018 13:44:21 +0800
+Subject: [PATCH 13/19] Use uintmax_t for handling rlim_t
+
+PRIu{32,64} is not right format to represent rlim_t type
+therefore use %ju and typecast the rlim_t variables to
+uintmax_t.
+
+Fixes portablility errors like
+
+execute.c:3446:36: error: format '%lu' expects argument of type 'long unsigned int', but argument 5 has type 'rlim_t {aka long long unsigned int}' [-Werror=format=]
+|                          fprintf(f, "%s%s: " RLIM_FMT "\n",
+|                                     ^~~~~~~~
+|                                  prefix, rlimit_to_string(i), c->rlimit[i]->rlim_max);
+|                                                               ~~~~~~~~~~~~~~~~~~~~~~
+
+Upstream-Status: Denied [https://github.com/systemd/systemd/pull/7199]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/basic/format-util.h | 8 --------
+ src/basic/rlimit-util.c | 8 ++++----
+ src/core/execute.c      | 8 ++++----
+ 3 files changed, 8 insertions(+), 16 deletions(-)
+
+diff --git a/src/basic/format-util.h b/src/basic/format-util.h
+index 160550cd6..61245d1e3 100644
+--- a/src/basic/format-util.h
++++ b/src/basic/format-util.h
+@@ -43,14 +43,6 @@
+ #  define PRI_TIMEX "li"
+ #endif
+ 
+-#if SIZEOF_RLIM_T == 8
+-#  define RLIM_FMT "%" PRIu64
+-#elif SIZEOF_RLIM_T == 4
+-#  define RLIM_FMT "%" PRIu32
+-#else
+-#  error Unknown rlim_t size
+-#endif
+-
+ #if SIZEOF_DEV_T == 8
+ #  define DEV_FMT "%" PRIu64
+ #elif SIZEOF_DEV_T == 4
+diff --git a/src/basic/rlimit-util.c b/src/basic/rlimit-util.c
+index be1ba615e..e328ce499 100644
+--- a/src/basic/rlimit-util.c
++++ b/src/basic/rlimit-util.c
+@@ -299,13 +299,13 @@ int rlimit_format(const struct rlimit *rl, char **ret) {
+         if (rl->rlim_cur >= RLIM_INFINITY && rl->rlim_max >= RLIM_INFINITY)
+                 s = strdup("infinity");
+         else if (rl->rlim_cur >= RLIM_INFINITY)
+-                (void) asprintf(&s, "infinity:" RLIM_FMT, rl->rlim_max);
++                (void) asprintf(&s, "infinity:%ju", (uintmax_t)rl->rlim_max);
+         else if (rl->rlim_max >= RLIM_INFINITY)
+-                (void) asprintf(&s, RLIM_FMT ":infinity", rl->rlim_cur);
++                (void) asprintf(&s, "%ju:infinity", (uintmax_t)rl->rlim_cur);
+         else if (rl->rlim_cur == rl->rlim_max)
+-                (void) asprintf(&s, RLIM_FMT, rl->rlim_cur);
++                (void) asprintf(&s, "%ju", (uintmax_t)rl->rlim_cur);
+         else
+-                (void) asprintf(&s, RLIM_FMT ":" RLIM_FMT, rl->rlim_cur, rl->rlim_max);
++                (void) asprintf(&s, "%ju:%ju", (uintmax_t)rl->rlim_cur, (uintmax_t)rl->rlim_max);
+ 
+         if (!s)
+                 return -ENOMEM;
+diff --git a/src/core/execute.c b/src/core/execute.c
+index 8ac69d1a0..efedf3842 100644
+--- a/src/core/execute.c
++++ b/src/core/execute.c
+@@ -3976,10 +3976,10 @@ void exec_context_dump(const ExecContext *c, FILE* f, const char *prefix) {
+ 
+         for (i = 0; i < RLIM_NLIMITS; i++)
+                 if (c->rlimit[i]) {
+-                        fprintf(f, "Limit%s%s: " RLIM_FMT "\n",
+-                                prefix, rlimit_to_string(i), c->rlimit[i]->rlim_max);
+-                        fprintf(f, "Limit%s%sSoft: " RLIM_FMT "\n",
+-                                prefix, rlimit_to_string(i), c->rlimit[i]->rlim_cur);
++                        fprintf(f, "Limit%s%s: %ju\n",
++                                prefix, rlimit_to_string(i), (uintmax_t)c->rlimit[i]->rlim_max);
++                        fprintf(f, "Limit%s%sSoft: %ju\n",
++                                prefix, rlimit_to_string(i), (uintmax_t)c->rlimit[i]->rlim_cur);
+                 }
+ 
+         if (c->ioprio_set) {
+-- 
+2.11.0
+

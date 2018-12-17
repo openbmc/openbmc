@@ -20,10 +20,9 @@ class SDKBuildProject(BuildProject):
         BuildProject.__init__(self, uri, foldername, tmpdir=testpath, dl_dir=dl_dir)
 
     def download_archive(self):
-
         self._download_archive()
 
-        cmd = 'tar xf %s%s -C %s' % (self.targetdir, self.archive, self.targetdir)
+        cmd = 'tar xf %s -C %s' % (os.path.join(self.targetdir, self.archive), self.targetdir)
         subprocess.check_output(cmd, shell=True)
 
         #Change targetdir to project folder
@@ -42,4 +41,9 @@ class SDKBuildProject(BuildProject):
 
     def _run(self, cmd):
         self.log("Running . %s; " % self.sdkenv + cmd)
-        return subprocess.call(". %s; " % self.sdkenv + cmd, shell=True)
+        try:
+            output = subprocess.check_output(". %s; " % self.sdkenv + cmd, shell=True, stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError as exc:
+            print(exc.output.decode('utf-8'))
+            return exc.returncode
+        return 0

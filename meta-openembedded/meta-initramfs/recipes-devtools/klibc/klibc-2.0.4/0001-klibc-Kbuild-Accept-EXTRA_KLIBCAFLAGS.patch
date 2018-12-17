@@ -1,0 +1,28 @@
+From cdc6edc2cfcd0ce88d6e66654d605dad303b1a75 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 11 Sep 2018 17:03:36 -0700
+Subject: [PATCH] klibc/Kbuild: Accept EXTRA_KLIBCAFLAGS
+
+For passing additional assembler flags
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ usr/klibc/Kbuild | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/usr/klibc/Kbuild b/usr/klibc/Kbuild
+index 98caf2e9..b34521e0 100644
+--- a/usr/klibc/Kbuild
++++ b/usr/klibc/Kbuild
+@@ -168,7 +168,8 @@ $(SOHASH): $(SOLIB) $(SOLIB).hash
+ targets += interp.o
+ 
+ quiet_cmd_interp = BUILD   $@
+-      cmd_interp = $(KLIBCCC) $(klibccflags) -D__ASSEMBLY__     \
++      cmd_interp = $(KLIBCCC) $(klibccflags) $(EXTRA_KLIBCAFLAGS) \
++                             -D__ASSEMBLY__     \
+                              -DLIBDIR=\"$(SHLIBDIR)\"         \
+ 			     -DSOHASH=\"$(SOLIBHASH)\" \
+ 			     -c -o $@ $<

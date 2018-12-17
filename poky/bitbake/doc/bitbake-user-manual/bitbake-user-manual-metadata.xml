@@ -342,7 +342,7 @@
 
             <para>
                 When you use this syntax, BitBake expects one or more strings.
-                Surrounding spaces are removed as well.
+                Surrounding spaces and spacing are preserved.
                 Here is an example:
                 <literallayout class='monospaced'>
      FOO = "123 456 789 123456 123 456 123 456"
@@ -352,8 +352,9 @@
      FOO2_remove = "abc def"
                 </literallayout>
                 The variable <filename>FOO</filename> becomes
-                "789 123456" and <filename>FOO2</filename> becomes
-                "ghi abcdef".
+                "&nbsp;&nbsp;789 123456&nbsp;&nbsp;&nbsp;&nbsp;"
+                and <filename>FOO2</filename> becomes
+                "&nbsp;&nbsp;ghi abcdef&nbsp;&nbsp;&nbsp;&nbsp;".
             </para>
 
             <para>
@@ -1929,6 +1930,38 @@
                         not careful.
                     </note>
                     </para></listitem>
+                <listitem><para><emphasis><filename>[number_threads]</filename>:</emphasis>
+                    Limits tasks to a specific number of simultaneous threads
+                    during execution.
+                    This varflag is useful when your build host has a large number
+                    of cores but certain tasks need to be rate-limited due to various
+                    kinds of resource constraints (e.g. to avoid network throttling).
+                    <filename>number_threads</filename> works similarly to the
+                    <link linkend='var-BB_NUMBER_THREADS'><filename>BB_NUMBER_THREADS</filename></link>
+                    variable but is task-specific.</para>
+
+                    <para>Set the value globally.
+                    For example, the following makes sure the
+                    <filename>do_fetch</filename> task uses no more than two
+                    simultaneous execution threads:
+                    <literallayout class='monospaced'>
+     do_fetch[number_threads] = "2"
+                    </literallayout>
+                    <note><title>Warnings</title>
+                        <itemizedlist>
+                            <listitem><para>
+                                Setting the varflag in individual recipes rather
+                                than globally can result in unpredictable behavior.
+                                </para></listitem>
+                            <listitem><para>
+                                Setting the varflag to a value greater than the
+                                value used in the <filename>BB_NUMBER_THREADS</filename>
+                                variable causes <filename>number_threads</filename>
+                                to have no effect.
+                                </para></listitem>
+                        </itemizedlist>
+                    </note>
+                    </para></listitem>
                 <listitem><para><emphasis><filename>[postfuncs]</filename>:</emphasis>
                     List of functions to call after the completion of the task.
                     </para></listitem>
@@ -2719,4 +2752,30 @@
             </itemizedlist>
         </para>
     </section>
+
+    <section id='wildcard-support-in-variables'>
+        <title>Wildcard Support in Variables</title>
+
+        <para>
+            Support for wildcard use in variables varies depending on the
+            context in which it is used.
+            For example, some variables and file names allow limited use of
+            wildcards through the "<filename>%</filename>" and
+            "<filename>*</filename>" characters.
+            Other variables or names support Python's
+            <ulink url='https://docs.python.org/3/library/glob.html'><filename>glob</filename></ulink>
+            syntax,
+            <ulink url='https://docs.python.org/3/library/fnmatch.html#module-fnmatch'><filename>fnmatch</filename></ulink>
+            syntax, or
+            <ulink url='https://docs.python.org/3/library/re.html#re'><filename>Regular Expression (re)</filename></ulink>
+            syntax.
+        </para>
+
+        <para>
+            For variables that have wildcard suport, the
+            documentation describes which form of wildcard, its
+            use, and its limitations.
+        </para>
+    </section>
+
 </chapter>

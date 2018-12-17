@@ -1,0 +1,37 @@
+From 0e1f3856a7e1511fb64d99646c54ddf3897cd444 Mon Sep 17 00:00:00 2001
+From: Dimitri John Ledkov <xnox@ubuntu.com>
+Date: Fri, 28 Sep 2018 14:15:52 +0100
+Subject: [PATCH 2/4] bpo-34818: Add missing closing() wrapper in test_tls1_3.
+
+Python 2.7 socket classes do not implement context manager protocol,
+hence closing() is required around it. Resolves testcase error
+traceback.
+
+Signed-off-by: Dimitri John Ledkov <xnox@ubuntu.com>
+
+https://bugs.python.org/issue34818
+
+Patch taken from Ubuntu.
+
+Upstream-Status: Submitted [https://github.com/python/cpython/pull/9622]
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+---
+ Lib/test/test_ssl.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Lib/test/test_ssl.py b/Lib/test/test_ssl.py
+index f51572e319..7a14053cee 100644
+--- a/Lib/test/test_ssl.py
++++ b/Lib/test/test_ssl.py
+@@ -2817,7 +2817,7 @@ else:
+                 ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1 | ssl.OP_NO_TLSv1_2
+             )
+             with ThreadedEchoServer(context=context) as server:
+-                with context.wrap_socket(socket.socket()) as s:
++                with closing(context.wrap_socket(socket.socket())) as s:
+                     s.connect((HOST, server.port))
+                     self.assertIn(s.cipher()[0], [
+                         'TLS_AES_256_GCM_SHA384',
+-- 
+2.17.1
+

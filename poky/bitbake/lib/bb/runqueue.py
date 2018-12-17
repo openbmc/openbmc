@@ -94,13 +94,13 @@ class RunQueueStats:
         self.active = self.active - 1
         self.failed = self.failed + 1
 
-    def taskCompleted(self, number = 1):
-        self.active = self.active - number
-        self.completed = self.completed + number
+    def taskCompleted(self):
+        self.active = self.active - 1
+        self.completed = self.completed + 1
 
-    def taskSkipped(self, number = 1):
-        self.active = self.active + number
-        self.skipped = self.skipped + number
+    def taskSkipped(self):
+        self.active = self.active + 1
+        self.skipped = self.skipped + 1
 
     def taskActive(self):
         self.active = self.active + 1
@@ -134,6 +134,7 @@ class RunQueueScheduler(object):
         self.prio_map = [self.rqdata.runtaskentries.keys()]
 
         self.buildable = []
+        self.skip_maxthread = {}
         self.stamps = {}
         for tid in self.rqdata.runtaskentries:
             (mc, fn, taskname, taskfn) = split_tid_mcfn(tid)
@@ -150,8 +151,25 @@ class RunQueueScheduler(object):
         self.buildable = [x for x in self.buildable if x not in self.rq.runq_running]
         if not self.buildable:
             return None
+
+        # Filter out tasks that have a max number of threads that have been exceeded
+        skip_buildable = {}
+        for running in self.rq.runq_running.difference(self.rq.runq_complete):
+            rtaskname = taskname_from_tid(running)
+            if rtaskname not in self.skip_maxthread:
+                self.skip_maxthread[rtaskname] = self.rq.cfgData.getVarFlag(rtaskname, "number_threads")
+            if not self.skip_maxthread[rtaskname]:
+                continue
+            if rtaskname in skip_buildable:
+                skip_buildable[rtaskname] += 1
+            else:
+                skip_buildable[rtaskname] = 1
+
         if len(self.buildable) == 1:
             tid = self.buildable[0]
+            taskname = taskname_from_tid(tid)
+            if taskname in skip_buildable and skip_buildable[taskname] >= int(self.skip_maxthread[taskname]):
+                return None
             stamp = self.stamps[tid]
             if stamp not in self.rq.build_stamps.values():
                 return tid
@@ -164,6 +182,9 @@ class RunQueueScheduler(object):
         best = None
         bestprio = None
         for tid in self.buildable:
+            taskname = taskname_from_tid(tid)
+            if taskname in skip_buildable and skip_buildable[taskname] >= int(self.skip_maxthread[taskname]):
+                continue
             prio = self.rev_prio_map[tid]
             if bestprio is None or bestprio > prio:
                 stamp = self.stamps[tid]
@@ -178,7 +199,7 @@ class RunQueueScheduler(object):
         """
         Return the id of the task we should build next
         """
-        if self.rq.stats.active < self.rq.number_tasks:
+        if self.rq.can_start_task():
             return self.next_buildable_task()
 
     def newbuildable(self, task):
@@ -581,6 +602,19 @@ class RunQueueData:
                     if t in taskData[mc].taskentries:
                         depends.add(t)
 
+        def add_mc_dependencies(mc, tid):
+            mcdeps = taskData[mc].get_mcdepends()
+            for dep in mcdeps:
+                mcdependency = dep.split(':')
+                pn = mcdependency[3]
+                frommc = mcdependency[1]
+                mcdep = mcdependency[2]
+                deptask = mcdependency[4]
+                if mc == frommc:
+                    fn = taskData[mcdep].build_targets[pn][0]
+                    newdep = '%s:%s' % (fn,deptask)
+                    taskData[mc].taskentries[tid].tdepends.append(newdep)
+
         for mc in taskData:
             for tid in taskData[mc].taskentries:
 
@@ -597,12 +631,16 @@ class RunQueueData:
                 if fn in taskData[mc].failed_fns:
                     continue
 
+                # We add multiconfig dependencies before processing internal task deps (tdepends)
+                if 'mcdepends' in task_deps and taskname in task_deps['mcdepends']:
+                    add_mc_dependencies(mc, tid)
+
                 # Resolve task internal dependencies
                 #
                 # e.g. addtask before X after Y
                 for t in taskData[mc].taskentries[tid].tdepends:
-                    (_, depfn, deptaskname, _) = split_tid_mcfn(t)
-                    depends.add(build_tid(mc, depfn, deptaskname))
+                    (depmc, depfn, deptaskname, _) = split_tid_mcfn(t)
+                    depends.add(build_tid(depmc, depfn, deptaskname))
 
                 # Resolve 'deptask' dependencies
                 #
@@ -1032,7 +1070,7 @@ class RunQueueData:
                     msg += "\n%s has unique rprovides:\n  %s" % (provfn, "\n  ".join(rprovide_results[provfn] - commonrprovs))
 
                 if self.warn_multi_bb:
-                    logger.warning(msg)
+                    logger.verbnote(msg)
                 else:
                     logger.error(msg)
 
@@ -1040,7 +1078,7 @@ class RunQueueData:
 
         # Create a whitelist usable by the stamp checks
         self.stampfnwhitelist = {}
-        for mc in self.taskData: 
+        for mc in self.taskData:
             self.stampfnwhitelist[mc] = []
             for entry in self.stampwhitelist.split():
                 if entry not in self.taskData[mc].build_targets:
@@ -1072,7 +1110,7 @@ class RunQueueData:
                     bb.debug(1, "Task %s is marked nostamp, cannot invalidate this task" % taskname)
             else:
                 logger.verbose("Invalidate task %s, %s", taskname, fn)
-                bb.parse.siggen.invalidate_task(taskname, self.dataCaches[mc], fn)
+                bb.parse.siggen.invalidate_task(taskname, self.dataCaches[mc], taskfn)
 
         self.init_progress_reporter.next_stage()
 
@@ -1717,6 +1755,10 @@ class RunQueueExecute:
         valid = bb.utils.better_eval(call, locs)
         return valid
 
+    def can_start_task(self):
+        can_start = self.stats.active < self.number_tasks
+        return can_start
+
 class RunQueueExecuteDummy(RunQueueExecute):
     def __init__(self, rq):
         self.rq = rq
@@ -1790,13 +1832,14 @@ class RunQueueExecuteTasks(RunQueueExecute):
             bb.build.del_stamp(taskname, self.rqdata.dataCaches[mc], taskfn)
             self.rq.scenequeue_covered.remove(tid)
 
-        toremove = covered_remove
+        toremove = covered_remove | self.rq.scenequeue_notcovered
         for task in toremove:
             logger.debug(1, 'Not skipping task %s due to setsceneverify', task)
         while toremove:
             covered_remove = []
             for task in toremove:
-                removecoveredtask(task)
+                if task in self.rq.scenequeue_covered:
+                    removecoveredtask(task)
                 for deptask in self.rqdata.runtaskentries[task].depends:
                     if deptask not in self.rq.scenequeue_covered:
                         continue
@@ -1866,14 +1909,13 @@ class RunQueueExecuteTasks(RunQueueExecute):
                 continue
             if revdep in self.runq_buildable:
                 continue
-            alldeps = 1
+            alldeps = True
             for dep in self.rqdata.runtaskentries[revdep].depends:
                 if dep not in self.runq_complete:
-                    alldeps = 0
-            if alldeps == 1:
+                    alldeps = False
+                    break
+            if alldeps:
                 self.setbuildable(revdep)
-                fn = fn_from_tid(revdep)
-                taskname = taskname_from_tid(revdep)
                 logger.debug(1, "Marking task %s as buildable", revdep)
 
     def task_complete(self, task):
@@ -1897,8 +1939,8 @@ class RunQueueExecuteTasks(RunQueueExecute):
         self.setbuildable(task)
         bb.event.fire(runQueueTaskSkipped(task, self.stats, self.rq, reason), self.cfgData)
         self.task_completeoutright(task)
-        self.stats.taskCompleted()
         self.stats.taskSkipped()
+        self.stats.taskCompleted()
 
     def execute(self):
         """
@@ -2008,7 +2050,7 @@ class RunQueueExecuteTasks(RunQueueExecute):
             self.build_stamps2.append(self.build_stamps[task])
             self.runq_running.add(task)
             self.stats.taskActive()
-            if self.stats.active < self.number_tasks:
+            if self.can_start_task():
                 return True
 
         if self.stats.active > 0:
@@ -2063,6 +2105,7 @@ class RunQueueExecuteScenequeue(RunQueueExecute):
         # If we don't have any setscene functions, skip this step
         if len(self.rqdata.runq_setscene_tids) == 0:
             rq.scenequeue_covered = set()
+            rq.scenequeue_notcovered = set()
             rq.state = runQueueRunInit
             return
 
@@ -2278,9 +2321,14 @@ class RunQueueExecuteScenequeue(RunQueueExecute):
                 sq_hash.append(self.rqdata.runtaskentries[tid].hash)
                 sq_taskname.append(taskname)
                 sq_task.append(tid)
+
+            self.cooker.data.setVar("BB_SETSCENE_STAMPCURRENT_COUNT", len(stamppresent))
+
             call = self.rq.hashvalidate + "(sq_fn, sq_task, sq_hash, sq_hashfn, d)"
             locs = { "sq_fn" : sq_fn, "sq_task" : sq_taskname, "sq_hash" : sq_hash, "sq_hashfn" : sq_hashfn, "d" : self.cooker.data }
             valid = bb.utils.better_eval(call, locs)
+
+            self.cooker.data.delVar("BB_SETSCENE_STAMPCURRENT_COUNT")
 
             valid_new = stamppresent
             for v in valid:
@@ -2343,8 +2391,8 @@ class RunQueueExecuteScenequeue(RunQueueExecute):
     def task_failoutright(self, task):
         self.runq_running.add(task)
         self.runq_buildable.add(task)
-        self.stats.taskCompleted()
         self.stats.taskSkipped()
+        self.stats.taskCompleted()
         self.scenequeue_notcovered.add(task)
         self.scenequeue_updatecounters(task, True)
 
@@ -2352,8 +2400,8 @@ class RunQueueExecuteScenequeue(RunQueueExecute):
         self.runq_running.add(task)
         self.runq_buildable.add(task)
         self.task_completeoutright(task)
-        self.stats.taskCompleted()
         self.stats.taskSkipped()
+        self.stats.taskCompleted()
 
     def execute(self):
         """
@@ -2363,7 +2411,7 @@ class RunQueueExecuteScenequeue(RunQueueExecute):
         self.rq.read_workers()
 
         task = None
-        if self.stats.active < self.number_tasks:
+        if self.can_start_task():
             # Find the next setscene to run
             for nexttask in self.rqdata.runq_setscene_tids:
                 if nexttask in self.runq_buildable and nexttask not in self.runq_running and self.stamps[nexttask] not in self.build_stamps.values():
@@ -2422,7 +2470,7 @@ class RunQueueExecuteScenequeue(RunQueueExecute):
             self.build_stamps2.append(self.build_stamps[task])
             self.runq_running.add(task)
             self.stats.taskActive()
-            if self.stats.active < self.number_tasks:
+            if self.can_start_task():
                 return True
 
         if self.stats.active > 0:

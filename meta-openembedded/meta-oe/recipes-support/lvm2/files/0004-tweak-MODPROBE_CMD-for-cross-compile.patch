@@ -1,6 +1,6 @@
-From 0012ea63f6070a5d41fa380970f9c30b953237d2 Mon Sep 17 00:00:00 2001
-From: Dengke Du <dengke.du@windriver.com>
-Date: Tue, 25 Oct 2016 11:59:40 +0000
+From 3bba45890985b877b823836e78a1c8ac3c878856 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 31 Jul 2018 15:04:29 +0800
 Subject: [PATCH 4/4] tweak MODPROBE_CMD for cross compile
 
 Lvm uses variable MODPROBE_CMD at runtime, so build time detection of modprobe
@@ -16,23 +16,23 @@ filter=["r|/loop1$|","r|/loop2$|","r|/loop3$|","r|/loop4$|","r|/loop5$|","r|/loo
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
-Signed-off-by: Dengke Du <dengke.du@windriver.com>
 ---
- configure.in | 1 -
- 1 file changed, 1 deletion(-)
+ configure.ac | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/configure.in b/configure.in
-index cc77aab..a3579f2 100644
---- a/configure.in
-+++ b/configure.in
-@@ -1853,7 +1853,6 @@ if test "$UDEV_SYNC" = yes; then
+diff --git a/configure.ac b/configure.ac
+index e427708..aa374ea 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1791,8 +1791,6 @@ if test "$BUILD_DMFILEMAPD" = yes; then
  fi
  
  ################################################################################
--AC_PATH_TOOL(MODPROBE_CMD, modprobe)
- 
+-AC_PATH_TOOL(MODPROBE_CMD, modprobe, [], [$PATH_SBIN])
+-
  if test -n "$MODPROBE_CMD"; then
  	AC_DEFINE_UNQUOTED([MODPROBE_CMD], ["$MODPROBE_CMD"], [The path to 'modprobe', if available.])
+ fi
 -- 
-2.9.3
+2.7.4
 

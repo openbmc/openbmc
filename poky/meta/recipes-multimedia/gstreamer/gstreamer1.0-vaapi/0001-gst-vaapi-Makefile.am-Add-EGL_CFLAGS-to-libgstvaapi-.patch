@@ -1,0 +1,33 @@
+From 5403a89e6a7ac72a23e0221075c0c19b5f85a021 Mon Sep 17 00:00:00 2001
+From: Fabio Berton <fabio.berton@ossystems.com.br>
+Date: Wed, 13 Jun 2018 09:09:25 -0300
+Subject: [PATCH] gst/vaapi/Makefile.am: Add EGL_CFLAGS to libgstvaapi CFLAGS
+Organization: O.S. Systems Software LTDA.
+
+We need this to pass correctly EGL CFLAGS when building with EGL support.
+
+Upstream-Status: Pending
+
+Signed-off-by: Fabio Berton <fabio.berton@ossystems.com.br>
+---
+ gst/vaapi/Makefile.am | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/gst/vaapi/Makefile.am b/gst/vaapi/Makefile.am
+index b299ac98..d6cab71f 100644
+--- a/gst/vaapi/Makefile.am
++++ b/gst/vaapi/Makefile.am
+@@ -24,6 +24,10 @@ libgstvaapi_LIBS += $(top_builddir)/gst-libs/gst/vaapi/libgstvaapi-glx.la
+ endif
+ 
+ if USE_EGL
++libgstvaapi_CFLAGS += \
++	$(EGL_CFLAGS)	\
++	$(NULL)
++
+ libgstvaapi_LIBS += $(top_builddir)/gst-libs/gst/vaapi/libgstvaapi-egl.la
+ endif
+ 
+-- 
+2.17.1
+

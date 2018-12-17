@@ -1,7 +1,7 @@
-From 93aae34ee70b8d50b31a19a65d6ac8290cb148ae Mon Sep 17 00:00:00 2001
+From 60baf9ebf30bed0e2ee3c7c5a74d5b6d50035862 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 30 Jan 2018 15:28:49 +0800
-Subject: [PATCH 2/4] Correctly install python modules
+Subject: [PATCH 3/7] Correctly install python modules
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
@@ -29,5 +29,5 @@ index 8d74cbd..ce4f0a5 100644
  	done
  
 -- 
-1.8.3.1
+2.7.4
 

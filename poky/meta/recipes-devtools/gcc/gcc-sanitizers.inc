@@ -94,6 +94,7 @@ FILES_liblsan += "${libdir}/liblsan.so.*"
 FILES_liblsan-dev += "\
     ${libdir}/liblsan.so \
     ${libdir}/liblsan.la \
+    ${libdir}/liblsan_preinit.o \
 "
 FILES_liblsan-staticdev += "${libdir}/liblsan.a"
 

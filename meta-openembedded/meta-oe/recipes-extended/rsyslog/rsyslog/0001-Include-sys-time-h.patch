@@ -1,6 +1,6 @@
-From 9739095de6ae5f844354756ae968f5f8864eb3e3 Mon Sep 17 00:00:00 2001
+From 7baf35b88d742032a2dc456c396843e17e866f8e Mon Sep 17 00:00:00 2001
 From: Ming Liu <peter.x.liu@external.atlascopco.com>
-Date: Sun, 26 Feb 2017 14:10:21 +0100
+Date: Wed, 27 Jun 2018 14:04:57 +0800
 Subject: [PATCH] Include sys/time.h
 
 struct timeval is defined in sys/time.h with a musl libc.
@@ -8,13 +8,13 @@ struct timeval is defined in sys/time.h with a musl libc.
 Upstream-Status: Inappropriate [musl libc specific]
 
 Signed-off-by: Ming Liu <peter.x.liu@external.atlascopco.com>
-
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
  tests/msleep.c | 4 ----
  1 file changed, 4 deletions(-)
 
 diff --git a/tests/msleep.c b/tests/msleep.c
-index 26a8206..ca818be 100644
+index 98dbece..96f6950 100644
 --- a/tests/msleep.c
 +++ b/tests/msleep.c
 @@ -26,11 +26,7 @@
@@ -26,6 +26,7 @@ index 26a8206..ca818be 100644
 -#else
 -#include <time.h>
 -#endif
- 
- int main(int argc, char *argv[])
- {
+ #if defined(HAVE_SYS_SELECT_H)
+ #include <sys/select.h>
+ #endif
+2.7.4

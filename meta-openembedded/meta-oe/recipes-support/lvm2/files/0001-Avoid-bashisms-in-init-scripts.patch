@@ -17,17 +17,17 @@ Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
  scripts/lvm2_monitoring_init_rhel4            | 4 ++--
  8 files changed, 17 insertions(+), 17 deletions(-)
 
-diff --git a/scripts/blk_availability_init_red_hat.in b/scripts/blk_availability_init_red_hat.in
-index a84ffe7..6b855b7 100644
---- a/scripts/blk_availability_init_red_hat.in
-+++ b/scripts/blk_availability_init_red_hat.in
+Index: LVM2.2.02.177/scripts/blk_availability_init_red_hat.in
+===================================================================
+--- LVM2.2.02.177.orig/scripts/blk_availability_init_red_hat.in
++++ LVM2.2.02.177/scripts/blk_availability_init_red_hat.in
 @@ -1,4 +1,4 @@
 -#!/bin/bash
 +#!/bin/sh
  #
- # Copyright (C) 2012 Red Hat, Inc. All rights reserved.
+ # Copyright (C) 2012-2017 Red Hat, Inc. All rights reserved.
  #
-@@ -53,6 +53,6 @@ case "$1" in
+@@ -51,6 +51,6 @@ case "$1" in
    status)
  	;;
    *)
@@ -35,10 +35,10 @@ index a84ffe7..6b855b7 100644
 +	echo "Usage: $0 {start|stop|status}"
  	;;
  esac
-diff --git a/scripts/clvmd_init_red_hat.in b/scripts/clvmd_init_red_hat.in
-index d7f3392..abc8011 100644
---- a/scripts/clvmd_init_red_hat.in
-+++ b/scripts/clvmd_init_red_hat.in
+Index: LVM2.2.02.177/scripts/clvmd_init_red_hat.in
+===================================================================
+--- LVM2.2.02.177.orig/scripts/clvmd_init_red_hat.in
++++ LVM2.2.02.177/scripts/clvmd_init_red_hat.in
 @@ -1,4 +1,4 @@
 -#!/bin/bash
 +#!/bin/sh
@@ -63,17 +63,17 @@ index d7f3392..abc8011 100644
  	rtrn=2
  	;;
  esac
-diff --git a/scripts/cmirrord_init_red_hat.in b/scripts/cmirrord_init_red_hat.in
-index d4b7e37..d442cbc 100755
---- a/scripts/cmirrord_init_red_hat.in
-+++ b/scripts/cmirrord_init_red_hat.in
+Index: LVM2.2.02.177/scripts/cmirrord_init_red_hat.in
+===================================================================
+--- LVM2.2.02.177.orig/scripts/cmirrord_init_red_hat.in
++++ LVM2.2.02.177/scripts/cmirrord_init_red_hat.in
 @@ -1,4 +1,4 @@
 -#!/bin/bash
 +#!/bin/sh
  #
  # chkconfig: - 22 78
  # description: Starts and stops cmirrord
-@@ -101,7 +101,7 @@ case "$1" in
+@@ -103,7 +103,7 @@ case "$1" in
  		;;
  
  	*)
@@ -82,15 +82,15 @@ index d4b7e37..d442cbc 100755
  		;;
  esac
  
-diff --git a/scripts/lvm2_cluster_activation_red_hat.sh.in b/scripts/lvm2_cluster_activation_red_hat.sh.in
-index abea026..d8cba2e 100644
---- a/scripts/lvm2_cluster_activation_red_hat.sh.in
-+++ b/scripts/lvm2_cluster_activation_red_hat.sh.in
+Index: LVM2.2.02.177/scripts/lvm2_cluster_activation_red_hat.sh.in
+===================================================================
+--- LVM2.2.02.177.orig/scripts/lvm2_cluster_activation_red_hat.sh.in
++++ LVM2.2.02.177/scripts/lvm2_cluster_activation_red_hat.sh.in
 @@ -1,4 +1,4 @@
 -#!/bin/bash
 +#!/bin/sh
  
- sbindir=@sbindir@
+ sbindir="@SBINDIR@"
  
 @@ -54,7 +54,7 @@ case "$1" in
  	rtrn=$?
@@ -101,15 +101,34 @@ index abea026..d8cba2e 100644
  	rtrn=3
  	;;
  esac
-diff --git a/scripts/lvm2_lvmetad_init_red_hat.in b/scripts/lvm2_lvmetad_init_red_hat.in
-index b2f5d50..96269a9 100644
---- a/scripts/lvm2_lvmetad_init_red_hat.in
-+++ b/scripts/lvm2_lvmetad_init_red_hat.in
+Index: LVM2.2.02.177/scripts/lvm2_lvmetad_init_red_hat.in
+===================================================================
+--- LVM2.2.02.177.orig/scripts/lvm2_lvmetad_init_red_hat.in
++++ LVM2.2.02.177/scripts/lvm2_lvmetad_init_red_hat.in
 @@ -1,4 +1,4 @@
 -#!/bin/bash
 +#!/bin/sh
  #
- # Copyright (C) 2012 Red Hat, Inc. All rights reserved.
+ # Copyright (C) 2012-2017 Red Hat, Inc. All rights reserved.
+ #
+@@ -103,7 +103,7 @@ case "$1" in
+ 	;;
+ 
+   *)
+-	echo $"Usage: $0 {start|stop|force-stop|restart|condrestart|try-restart|status}"
++	echo "Usage: $0 {start|stop|force-stop|restart|condrestart|try-restart|status}"
+ 	;;
+ esac
+ 
+Index: LVM2.2.02.177/scripts/lvm2_lvmpolld_init_red_hat.in
+===================================================================
+--- LVM2.2.02.177.orig/scripts/lvm2_lvmpolld_init_red_hat.in
++++ LVM2.2.02.177/scripts/lvm2_lvmpolld_init_red_hat.in
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ #
+ # Copyright (C) 2015 Red Hat, Inc. All rights reserved.
  #
 @@ -105,7 +105,7 @@ case "$1" in
  	;;
@@ -120,36 +139,17 @@ index b2f5d50..96269a9 100644
  	;;
  esac
  
-diff --git a/scripts/lvm2_lvmpolld_init_red_hat.in b/scripts/lvm2_lvmpolld_init_red_hat.in
-index c521955..cdbaece 100644
---- a/scripts/lvm2_lvmpolld_init_red_hat.in
-+++ b/scripts/lvm2_lvmpolld_init_red_hat.in
-@@ -1,4 +1,4 @@
--#!/bin/bash
-+#!/bin/sh
- #
- # Copyright (C) 2015 Red Hat, Inc. All rights reserved.
- #
-@@ -107,7 +107,7 @@ case "$1" in
- 	;;
- 
-   *)
--	echo $"Usage: $0 {start|stop|force-stop|restart|condrestart|try-restart|status}"
-+	echo "Usage: $0 {start|stop|force-stop|restart|condrestart|try-restart|status}"
- 	;;
- esac
- 
-diff --git a/scripts/lvm2_monitoring_init_red_hat.in b/scripts/lvm2_monitoring_init_red_hat.in
-index de7ff0d..9ff6bb7 100644
---- a/scripts/lvm2_monitoring_init_red_hat.in
-+++ b/scripts/lvm2_monitoring_init_red_hat.in
+Index: LVM2.2.02.177/scripts/lvm2_monitoring_init_red_hat.in
+===================================================================
+--- LVM2.2.02.177.orig/scripts/lvm2_monitoring_init_red_hat.in
++++ LVM2.2.02.177/scripts/lvm2_monitoring_init_red_hat.in
 @@ -1,4 +1,4 @@
 -#!/bin/bash
 +#!/bin/sh
  #
  # Copyright (C) 2007-2009 Red Hat, Inc. All rights reserved.
  #
-@@ -128,7 +128,7 @@ case "$1" in
+@@ -127,7 +127,7 @@ case "$1" in
  	;;
  
    *)
@@ -158,10 +158,10 @@ index de7ff0d..9ff6bb7 100644
  	;;
  esac
  
-diff --git a/scripts/lvm2_monitoring_init_rhel4 b/scripts/lvm2_monitoring_init_rhel4
-index 8eb06c5..2e8d0f7 100644
---- a/scripts/lvm2_monitoring_init_rhel4
-+++ b/scripts/lvm2_monitoring_init_rhel4
+Index: LVM2.2.02.177/scripts/lvm2_monitoring_init_rhel4
+===================================================================
+--- LVM2.2.02.177.orig/scripts/lvm2_monitoring_init_rhel4
++++ LVM2.2.02.177/scripts/lvm2_monitoring_init_rhel4
 @@ -1,4 +1,4 @@
 -#!/bin/bash
 +#!/bin/sh
@@ -177,6 +177,3 @@ index 8eb06c5..2e8d0f7 100644
  	;;
  esac
  
--- 
-2.12.0
-

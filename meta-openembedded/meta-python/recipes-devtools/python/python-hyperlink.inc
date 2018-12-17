@@ -3,8 +3,8 @@ HOMEPAGE = "https://github.com/python-hyper/hyperlink"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=3893d4ed05dcc823f8ed685a9ea19bcb"
 
-SRC_URI[md5sum] = "eaccb9845b559817e838846669cbc68a"
-SRC_URI[sha256sum] = "bc4ffdbde9bdad204d507bd8f554f16bba82dd356f6130cb16f41422909c33bc"
+SRC_URI[sha256sum] = "f01b4ff744f14bc5d0a22a6b9f1525ab7d6312cb0ff967f59414bbac52f0a306"
+SRC_URI[md5sum] = "f41a96779b324d824864696a94b24823"
 
 inherit pypi
 

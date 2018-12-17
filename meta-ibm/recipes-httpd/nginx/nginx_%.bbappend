@@ -10,7 +10,7 @@ SRC_URI += " \
     "
 
 RDEPENDS_${PN} += " \
-        openssl \
+        openssl-bin \
         ${VIRTUAL-RUNTIME_base-utils} \
         "
 

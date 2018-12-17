@@ -18,6 +18,7 @@ SRC_URI = " \
     file://0005-Fix-PTK-rekeying-to-generate-a-new-ANonce.patch \
     file://0006-TDLS-Reject-TPK-TK-reconfiguration.patch \
     file://0007-FT-Do-not-allow-multiple-Reassociation-Response-fram.patch \
+    file://hostapd-CVE-2018-14526.patch \
 "
 
 SRC_URI[md5sum] = "eaa56dce9bd8f1d195eb62596eab34c7"

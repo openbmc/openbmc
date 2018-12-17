@@ -1,4 +1,4 @@
-DEPENDS = "virtual/${TARGET_PREFIX}go go-native"
+DEPENDS = "virtual/${TUNE_PKGARCH}-go go-native"
 DEPENDS_class-nativesdk = "virtual/${TARGET_PREFIX}go-crosssdk"
 PROVIDES = "virtual/${TARGET_PREFIX}go-runtime"
 

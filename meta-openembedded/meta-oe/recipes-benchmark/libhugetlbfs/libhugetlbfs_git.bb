@@ -3,14 +3,14 @@ HOMEPAGE = "https://github.com/libhugetlbfs/libhugetlbfs"
 LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://LGPL-2.1;md5=2d5025d4aa3495befef8f17206a5b0a1"
 
-DEPENDS = "sysfsutils perl"
-RDEPENDS_${PN} += "bash perl python python-io python-lang python-subprocess python-resource ${PN}-perl"
+DEPENDS = "sysfsutils"
+RDEPENDS_${PN} += "bash python python-io python-lang python-subprocess python-resource"
 RDEPENDS_${PN}-tests += "bash"
 
-PV = "2.20"
+PV = "2.21"
 PE = "1"
 
-SRCREV = "e44180072b796c0e28e53c4d01ef6279caaa2a99"
+SRCREV = "73d06e69108f231696e9c5c44f4b42690fc5d752"
 SRC_URI = " \
     git://github.com/libhugetlbfs/libhugetlbfs.git;protocol=https \
     file://skip-checking-LIB32-and-LIB64-if-they-point-to-the-s.patch \
@@ -18,8 +18,15 @@ SRC_URI = " \
     file://tests-Makefile-install-static-4G-edge-testcases.patch \
     file://0001-run_test.py-not-use-hard-coded-path-.-obj-hugeadm.patch \
     file://libhugetlbfs-elf_i386-avoid-search-host-library-path.patch \
-    file://Force-text-segment-alignment-to-0x08000000-for-i386-.patch \
+    file://0001-include-stddef.h-for-ptrdiff_t.patch \
+    file://0002-Mark-glibc-specific-code-so.patch \
+    file://0003-alloc.c-Avoid-sysconf-_SC_LEVEL2_CACHE_LINESIZE-on-l.patch \
+    file://0004-shm.c-Mark-glibc-specific-changes-so.patch \
+    file://0005-Include-dirent.h-for-ino_t.patch \
+    file://0006-include-limits.h-for-PATH_MAX.patch \
 "
+
+UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+(\.\d+)+)"
 
 S = "${WORKDIR}/git"
 
@@ -43,14 +50,6 @@ do_configure() {
     if [ "${@bb.utils.filter('DISTRO_FEATURES', 'ld-is-gold', d)}" ]; then
       sed -i 's/CUSTOM_LDSCRIPTS = yes/CUSTOM_LDSCRIPTS = no/'  Makefile
     fi
-
-    # fixup perl module directory hardcoded to perl5
-    sed -i 's/perl5/perl/g'  Makefile
-
-    # fixup to install perl module under $(LIBDIR)/perl/${@get_perl_version(d)}/TLBC
-    # to avoid below error
-    # Can't locate TLBC/OpCollect.pm in @INC
-    sed -i '/^PMDIR/ s:perl:perl/${@get_perl_version(d)}:g' Makefile
 }
 
 do_install() {
@@ -61,11 +60,10 @@ do_install() {
 }
 
 
-PACKAGES =+ "${PN}-perl ${PN}-tests "
+PACKAGES =+ "${PN}-tests "
 FILES_${PN} += "${libdir}/*.so"
 FILES_${PN}-dev = "${includedir}"
 FILES_${PN}-dbg += "${libdir}/libhugetlbfs/tests/obj32/.debug ${libdir}/libhugetlbfs/tests/obj64/.debug"
-FILES_${PN}-perl = "${libdir}/perl"
 FILES_${PN}-tests += "${libdir}/libhugetlbfs/tests"
 
 INSANE_SKIP_${PN} = "dev-so"

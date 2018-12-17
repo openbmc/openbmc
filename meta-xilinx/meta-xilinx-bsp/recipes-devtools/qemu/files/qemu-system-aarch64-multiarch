@@ -1,32 +1,54 @@
-#!/bin/bash
+#!/usr/bin/env python3
 
-BINPATH=$(dirname $0)
-MACHINE_PATH=$(mktemp -d)
+# Xilinx QEMU wrapper to launch both PMU and APU instances (multiarch)
+import os
+import subprocess
+import sys
+import tempfile
+import shutil
 
-APU_ARGS=
-PMU_ARGS=
+binpath = os.path.dirname(os.path.abspath(__file__))
+mach_path = tempfile.mkdtemp()
 
-while [ ! -z "$1" ]; do
-	if [ "$1" = "-pmu-args" ]; then
-		PMU_ARGS+=" $2"
-		shift
-	else
-		APU_ARGS+=" $1"
-	fi
-	shift
-done
 
-PMU_ROM=$(last=; for i in $PMU_ARGS; do if [ "$last" = "-kernel" ]; then echo "$i"; break; fi; last=$i; done)
-if [ ! -e $PMU_ROM ]; then
-	echo "------"
-	echo "Error: Missing PMU ROM - $PMU_ROM"
-	echo "    See 'meta-xilinx/README.qemu.md' for more information on accquiring the PMU ROM."
-	echo "------"
-	exit 255
-fi
+# Separate PMU and APU arguments
+APU_args = sys.argv[1:]
+PMU_args = APU_args[APU_args.index('-pmu-args')+1]
+APU_args.remove('-pmu-args')
+APU_args.remove(PMU_args)
+PMU_args = PMU_args.split()
 
-# start the PMU instance
-$BINPATH/qemu-system-microblazeel $PMU_ARGS -machine-path $MACHINE_PATH &
-# start the APU instance
-$BINPATH/qemu-system-aarch64 $APU_ARGS -machine-path $MACHINE_PATH
+PMU_rom = PMU_args[PMU_args.index('-kernel')+1]
+error_msg = None
 
+if os.path.exists(PMU_rom):
+
+    # We need to switch tcp serial arguments (if they exist, e.g. qemurunner) to get the output correctly
+    tcp_serial_ports = [i for i, s in enumerate(APU_args) if 'tcp:127.0.0.1:' in s]
+
+    # We can only switch these if there are exactly two, otherwise we can't assume what is being executed so we leave it as is
+    if len(tcp_serial_ports) == 2:
+        APU_args[tcp_serial_ports[0]],APU_args[tcp_serial_ports[1]] = APU_args[tcp_serial_ports[1]],APU_args[tcp_serial_ports[0]]
+
+    pmu_cmd =  binpath + '/qemu-system-microblazeel ' + ' '.join(PMU_args) + ' -machine-path ' + mach_path
+    apu_cmd =  binpath + '/qemu-system-aarch64 ' + ' '.join(APU_args) + ' -machine-path ' + mach_path
+
+    # Debug prints
+    print('\nPMU instance cmd: %s\n' % pmu_cmd)
+    print('APU instance cmd: %s\n' % apu_cmd)
+
+
+    # Invoke QEMU pmu instance
+    process_pmu = subprocess.Popen(pmu_cmd, shell=True, stderr=subprocess.PIPE)
+
+    # Invoke QEMU APU instance
+    process_apu = subprocess.Popen(apu_cmd, shell=True, stderr=subprocess.PIPE)
+    if process_apu.wait():
+        error_msg = '\nQEMU APU instance failed:\n%s' % process_apu.stderr.read().decode()
+
+else:
+    error_msg = '\nError: Missing PMU ROM: %s' % PMU_rom
+    error_msg += '\nSee "meta-xilinx/README.qemu.md" for more information on accquiring the PMU ROM.\n'
+
+shutil.rmtree(mach_path)
+sys.exit(error_msg)

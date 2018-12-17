@@ -10,9 +10,9 @@ inherit autotools pkgconfig update-alternatives
 DEPENDS = "zlib lzo e2fsprogs util-linux"
 RDEPENDS_mtd-utils-tests += "bash"
 
-PV = "2.0.1+${SRCPV}"
+PV = "2.0.2+${SRCPV}"
 
-SRCREV = "9c6173559f95e939e66efb2ec3193d6f3618cf69"
+SRCREV = "bc63d36e39f389c8c17f6a8e9db47f2acc884659"
 SRC_URI = "git://git.infradead.org/mtd-utils.git \
            file://add-exclusion-to-mkfs-jffs2-git-2.patch \
            file://0001-Revert-Return-correct-error-number-in-ubi_get_vol_in.patch \

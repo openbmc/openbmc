@@ -1,0 +1,50 @@
+From acc2c08082795802011e3c5f8626d63210021489 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Wed, 28 Feb 2018 21:36:32 -0800
+Subject: [PATCH 09/19] add missing FTW_ macros for musl
+
+This is to avoid build failures like below for musl.
+
+  locale-util.c:296:24: error: 'FTW_STOP' undeclared
+
+Upstream-Status: Inappropriate [musl specific]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/basic/missing.h | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/src/basic/missing.h b/src/basic/missing.h
+index 02397f1b6..6dc750eba 100644
+--- a/src/basic/missing.h
++++ b/src/basic/missing.h
+@@ -189,6 +189,26 @@ struct sockaddr_vm {
+ #define BTRFS_QGROUP_LEVEL_SHIFT 48
+ #endif
+ 
++#ifndef FTW_ACTIONRETVAL
++#define FTW_ACTIONRETVAL 16
++#endif
++
++#ifndef FTW_CONTINUE
++#define FTW_CONTINUE 0
++#endif
++
++#ifndef FTW_STOP
++#define FTW_STOP 1
++#endif
++
++#ifndef FTW_SKIP_SUBTREE
++#define FTW_SKIP_SUBTREE 2
++#endif
++
++#ifndef FTW_SKIP_SIBLINGS
++#define FTW_SKIP_SIBLINGS 3
++#endif
++
+ #if ! HAVE_LINUX_BTRFS_H
+ #define BTRFS_IOC_QGROUP_ASSIGN _IOW(BTRFS_IOCTL_MAGIC, 41, \
+                                struct btrfs_ioctl_qgroup_assign_args)
+-- 
+2.11.0
+

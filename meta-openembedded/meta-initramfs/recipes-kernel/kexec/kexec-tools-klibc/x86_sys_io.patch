@@ -1,0 +1,36 @@
+From a992ee014efacdc98d5658be9930dcab0eaadfd7 Mon Sep 17 00:00:00 2001
+From: OpenEmbedded <oe.patch@oe>
+Date: Wed, 11 Apr 2018 22:51:04 +0200
+Subject: [PATCH] i386: replace with our io.h
+
+Upstream-Status: Inappropriate [klibc specific]
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+
+---
+ purgatory/arch/i386/pic.c | 2 +-
+ purgatory/arch/i386/vga.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/purgatory/arch/i386/pic.c b/purgatory/arch/i386/pic.c
+index c23c459..c5f7046 100644
+--- a/purgatory/arch/i386/pic.c
++++ b/purgatory/arch/i386/pic.c
+@@ -16,7 +16,7 @@
+  * along with this program; if not, write to the Free Software
+  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  */
+-#include <sys/io.h>
++#include "include/arch/io.h"
+ #include <purgatory.h>
+ #include "purgatory-x86.h"
+ 
+diff --git a/purgatory/arch/i386/vga.c b/purgatory/arch/i386/vga.c
+index e65976c..d079d96 100644
+--- a/purgatory/arch/i386/vga.c
++++ b/purgatory/arch/i386/vga.c
+@@ -1,4 +1,4 @@
+-#include <sys/io.h>
++#include "include/arch/io.h"
+ #include <purgatory.h>
+ #include "purgatory-x86.h"
+ 

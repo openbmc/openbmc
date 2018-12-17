@@ -1,15 +1,23 @@
-Musl does not have _r versions of getent() and getpwent() APIs
+From 02e0b14d8fa025a5db410d60a7c0dfebd536aaeb Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 6 Nov 2016 23:40:54 -0800
+Subject: [PATCH] Musl does not have _r versions of getent() and getpwent()
+ APIs
 
 Taken from gentoo
 http://data.gpo.zugaina.org/musl/net-fs/samba/files/samba-4.3.9-remove-getpwent_r.patch
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
-Index: samba-4.4.5/source4/torture/local/nss_tests.c
-===================================================================
---- samba-4.4.5.orig/source4/torture/local/nss_tests.c
-+++ samba-4.4.5/source4/torture/local/nss_tests.c
-@@ -247,7 +247,6 @@ static bool test_getgrnam_r(struct tortu
+---
+ source4/torture/local/nss_tests.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/source4/torture/local/nss_tests.c b/source4/torture/local/nss_tests.c
+index 2cd6122..04f13c6 100644
+--- a/source4/torture/local/nss_tests.c
++++ b/source4/torture/local/nss_tests.c
+@@ -247,7 +247,6 @@ static bool test_getgrnam_r(struct torture_context *tctx,
  	return true;
  }
  
@@ -17,7 +25,7 @@ Index: samba-4.4.5/source4/torture/local/nss_tests.c
  static bool test_getgrgid(struct torture_context *tctx,
  			  gid_t gid,
  			  struct group *grp_p)
-@@ -333,6 +332,7 @@ static bool test_enum_passwd(struct tort
+@@ -333,6 +332,7 @@ static bool test_enum_passwd(struct torture_context *tctx,
  	return true;
  }
  
@@ -25,7 +33,7 @@ Index: samba-4.4.5/source4/torture/local/nss_tests.c
  static bool test_enum_r_passwd(struct torture_context *tctx,
  			       struct passwd **pwd_array_p,
  			       size_t *num_pwd_p)
-@@ -381,6 +381,7 @@ static bool test_enum_r_passwd(struct to
+@@ -381,6 +381,7 @@ static bool test_enum_r_passwd(struct torture_context *tctx,
  
  	return true;
  }
@@ -33,7 +41,7 @@ Index: samba-4.4.5/source4/torture/local/nss_tests.c
  
  static bool torture_assert_passwd_equal(struct torture_context *tctx,
  					const struct passwd *p1,
-@@ -432,7 +433,7 @@ static bool test_passwd_r(struct torture
+@@ -432,7 +433,7 @@ static bool test_passwd_r(struct torture_context *tctx)
  	struct passwd *pwd, pwd1, pwd2;
  	size_t num_pwd;
  
@@ -42,7 +50,7 @@ Index: samba-4.4.5/source4/torture/local/nss_tests.c
  						"failed to enumerate passwd");
  
  	for (i=0; i < num_pwd; i++) {
-@@ -460,7 +461,7 @@ static bool test_passwd_r_cross(struct t
+@@ -460,7 +461,7 @@ static bool test_passwd_r_cross(struct torture_context *tctx)
  	struct passwd *pwd, pwd1, pwd2, pwd3, pwd4;
  	size_t num_pwd;
  
@@ -51,7 +59,7 @@ Index: samba-4.4.5/source4/torture/local/nss_tests.c
  						"failed to enumerate passwd");
  
  	for (i=0; i < num_pwd; i++) {
-@@ -531,6 +532,7 @@ static bool test_enum_group(struct tortu
+@@ -531,6 +532,7 @@ static bool test_enum_group(struct torture_context *tctx,
  	return true;
  }
  
@@ -59,7 +67,7 @@ Index: samba-4.4.5/source4/torture/local/nss_tests.c
  static bool test_enum_r_group(struct torture_context *tctx,
  			      struct group **grp_array_p,
  			      size_t *num_grp_p)
-@@ -579,6 +581,7 @@ static bool test_enum_r_group(struct tor
+@@ -579,6 +581,7 @@ static bool test_enum_r_group(struct torture_context *tctx,
  
  	return true;
  }
@@ -67,7 +75,7 @@ Index: samba-4.4.5/source4/torture/local/nss_tests.c
  
  static bool torture_assert_group_equal(struct torture_context *tctx,
  				       const struct group *g1,
-@@ -635,7 +638,7 @@ static bool test_group_r(struct torture_
+@@ -635,7 +638,7 @@ static bool test_group_r(struct torture_context *tctx)
  	struct group *grp, grp1, grp2;
  	size_t num_grp;
  
@@ -76,7 +84,7 @@ Index: samba-4.4.5/source4/torture/local/nss_tests.c
  					       "failed to enumerate group");
  
  	for (i=0; i < num_grp; i++) {
-@@ -663,7 +666,7 @@ static bool test_group_r_cross(struct to
+@@ -663,7 +666,7 @@ static bool test_group_r_cross(struct torture_context *tctx)
  	struct group *grp, grp1, grp2, grp3, grp4;
  	size_t num_grp;
  

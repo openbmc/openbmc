@@ -18,6 +18,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/rpcbind/rpcbind-${PV}.tar.bz2 \
            file://0001-rpcbind-pair-all-svc_getargs-calls-with-svc_freeargs.patch \
            file://pmapproc_dump-Fixed-typo-in-memory-leak-patch.patch \
            file://rpcbproc_callit_com-Stop-freeing-a-static-pointer.patch \
+           file://rpcbind_add_option_to_fix_port_number.patch \
           "
 SRC_URI[md5sum] = "cf10cd41ed8228fc54c316191c1f07fe"
 SRC_URI[sha256sum] = "074a9a530dc7c11e0d905aa59bcb0847c009313f02e98d3d798aa9568f414c66"

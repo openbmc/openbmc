@@ -35,6 +35,8 @@ from toastergui.tablefilter import TableFilterActionToggle
 from toastergui.tablefilter import TableFilterActionDateRange
 from toastergui.tablefilter import TableFilterActionDay
 
+import os
+
 class ProjectFilters(object):
     @staticmethod
     def in_project(project_layers):
@@ -339,6 +341,8 @@ class RecipesTable(ToasterTable):
             'filter_name' : "in_current_project",
             'static_data_name' : "add-del-layers",
             'static_data_template' : '{% include "recipe_btn.html" %}'}
+    if '1' == os.environ.get('TOASTER_PROJECTSPECIFIC'):
+            build_col['static_data_template'] = '{% include "recipe_add_btn.html" %}'
 
     def get_context_data(self, **kwargs):
         project = Project.objects.get(pk=kwargs['pid'])
@@ -1611,14 +1615,12 @@ class DistrosTable(ToasterTable):
                         hidden=True,
                         field_name="layer_version__get_vcs_reference")
 
-        wrtemplate_file_template = '''<code>conf/machine/{{data.name}}.conf</code>
-        <a href="{{data.get_vcs_machine_file_link_url}}" target="_blank"><span class="glyphicon glyphicon-new-window"></i></a>'''
-
+        distro_file_template = '''<code>conf/distro/{{data.name}}.conf</code>
+        {% if 'None' not in data.get_vcs_distro_file_link_url %}<a href="{{data.get_vcs_distro_file_link_url}}" target="_blank"><span class="glyphicon glyphicon-new-window"></i></a>{% endif %}'''
         self.add_column(title="Distro file",
                         hidden=True,
                         static_data_name="templatefile",
-                        static_data_template=wrtemplate_file_template)
-
+                        static_data_template=distro_file_template)
 
         self.add_column(title="Select",
                         help_text="Sets the selected distro to the project",

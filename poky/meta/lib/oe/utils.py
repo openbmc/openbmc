@@ -1,4 +1,6 @@
 import subprocess
+import multiprocessing
+import traceback
 
 def read_file(filename):
     try:
@@ -22,6 +24,13 @@ def conditional(variable, checkvalue, truevalue, falsevalue, d):
         return truevalue
     else:
         return falsevalue
+
+def vartrue(var, iftrue, iffalse, d):
+    import oe.types
+    if oe.types.boolean(d.getVar(var)):
+        return iftrue
+    else:
+        return iffalse
 
 def less_or_equal(variable, checkvalue, truevalue, falsevalue, d):
     if float(d.getVar(variable)) <= float(checkvalue):
@@ -246,38 +255,73 @@ def execute_pre_post_process(d, cmds):
             bb.note("Executing %s ..." % cmd)
             bb.build.exec_func(cmd, d)
 
-def multiprocess_exec(commands, function):
-    import signal
-    import multiprocessing
+# For each item in items, call the function 'target' with item as the first 
+# argument, extraargs as the other arguments and handle any exceptions in the
+# parent thread
+def multiprocess_launch(target, items, d, extraargs=None):
 
-    if not commands:
-        return []
+    class ProcessLaunch(multiprocessing.Process):
+        def __init__(self, *args, **kwargs):
+            multiprocessing.Process.__init__(self, *args, **kwargs)
+            self._pconn, self._cconn = multiprocessing.Pipe()
+            self._exception = None
+            self._result = None
 
-    def init_worker():
-        signal.signal(signal.SIGINT, signal.SIG_IGN)
+        def run(self):
+            try:
+                ret = self._target(*self._args, **self._kwargs)
+                self._cconn.send((None, ret))
+            except Exception as e:
+                tb = traceback.format_exc()
+                self._cconn.send((e, tb))
 
-    fails = []
+        def update(self):
+            if self._pconn.poll():
+                (e, tb) = self._pconn.recv()
+                if e is not None:
+                    self._exception = (e, tb)
+                else:
+                    self._result = tb
 
-    def failures(res):
-        fails.append(res)
+        @property
+        def exception(self):
+            self.update()
+            return self._exception
 
-    nproc = min(multiprocessing.cpu_count(), len(commands))
-    pool = bb.utils.multiprocessingpool(nproc, init_worker)
+        @property
+        def result(self):
+            self.update()
+            return self._result
 
-    try:
-        mapresult = pool.map_async(function, commands, error_callback=failures)
-
-        pool.close()
-        pool.join()
-        results = mapresult.get()
-    except KeyboardInterrupt:
-        pool.terminate()
-        pool.join()
-        raise
-
-    if fails:
-        raise fails[0]
-
+    max_process = int(d.getVar("BB_NUMBER_THREADS") or os.cpu_count() or 1)
+    launched = []
+    errors = []
+    results = []
+    items = list(items)
+    while (items and not errors) or launched:
+        if not errors and items and len(launched) < max_process:
+            args = (items.pop(),)
+            if extraargs is not None:
+                args = args + extraargs
+            p = ProcessLaunch(target=target, args=args)
+            p.start()
+            launched.append(p)
+        for q in launched:
+            # The finished processes are joined when calling is_alive()
+            if not q.is_alive():
+                if q.exception:
+                    errors.append(q.exception)
+                if q.result:
+                    results.append(q.result)
+                launched.remove(q)
+    # Paranoia doesn't hurt
+    for p in launched:
+        p.join()
+    if errors:
+        msg = ""
+        for (e, tb) in errors:
+            msg = msg + str(e) + ": " + str(tb) + "\n"
+        bb.fatal("Fatal errors occurred in subprocesses:\n%s" % msg)
     return results
 
 def squashspaces(string):
@@ -304,10 +348,19 @@ def format_pkg_list(pkg_dict, ret_format=None):
         for pkg in sorted(pkg_dict):
             output.append(pkg)
 
-    return '\n'.join(output)
+    output_str = '\n'.join(output)
 
-def host_gcc_version(d):
+    if output_str:
+        # make sure last line is newline terminated
+        output_str += '\n'
+
+    return output_str
+
+def host_gcc_version(d, taskcontextonly=False):
     import re, subprocess
+
+    if taskcontextonly and d.getVar('BB_WORKERCONTEXT') != '1':
+        return
 
     compiler = d.getVar("BUILD_CC")
     try:
@@ -327,9 +380,18 @@ def host_gcc_version(d):
 
 def get_multilib_datastore(variant, d):
     localdata = bb.data.createCopy(d)
-    overrides = localdata.getVar("OVERRIDES", False) + ":virtclass-multilib-" + variant
-    localdata.setVar("OVERRIDES", overrides)
-    localdata.setVar("MLPREFIX", variant + "-")
+    if variant:
+        overrides = localdata.getVar("OVERRIDES", False) + ":virtclass-multilib-" + variant
+        localdata.setVar("OVERRIDES", overrides)
+        localdata.setVar("MLPREFIX", variant + "-")
+    else:
+        origdefault = localdata.getVar("DEFAULTTUNE_MULTILIB_ORIGINAL")
+        if origdefault:
+            localdata.setVar("DEFAULTTUNE", origdefault)
+        overrides = localdata.getVar("OVERRIDES", False).split(":")
+        overrides = ":".join([x for x in overrides if not x.startswith("virtclass-multilib-")])
+        localdata.setVar("OVERRIDES", overrides)
+        localdata.setVar("MLPREFIX", "")
     return localdata
 
 #
@@ -419,3 +481,4 @@ class ImageQAFailed(bb.build.FuncFailed):
             msg = msg + ' (%s)' % self.description
 
         return msg
+

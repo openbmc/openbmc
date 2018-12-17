@@ -1,0 +1,18 @@
+The mobile-broadband-provider-info.pc file is installed into a non-arch directory
+yet contains libdir which can vary depending on which multilib is configured.
+The .pc file does not require libdir so remove this to fix multilib builds.
+
+Upstream-Status: Backport [8109fcd3c7299fae859fb891ff416927581a9955]
+Signed-off-by: Zhixiong Chi <zhixiong.chi@windriver.com>
+
+Index: git/mobile-broadband-provider-info.pc.in
+===================================================================
+--- git.orig/mobile-broadband-provider-info.pc.in	2018-08-07 13:09:31.811364063 +0800
++++ git/mobile-broadband-provider-info.pc.in	2018-08-10 17:49:25.645288320 +0800
+@@ -1,6 +1,5 @@
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+-libdir=@libdir@
+ datarootdir = @datarootdir@
+ pkgdatadir=${datarootdir}/@PACKAGE@
+ includedir=@includedir@

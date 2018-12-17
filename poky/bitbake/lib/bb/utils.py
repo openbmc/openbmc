@@ -497,7 +497,11 @@ def lockfile(name, shared=False, retry=True, block=False):
                 if statinfo.st_ino == statinfo2.st_ino:
                     return lf
             lf.close()
-        except Exception:
+        except OSError as e:
+            if e.errno == errno.EACCES:
+                logger.error("Unable to acquire lock '%s', %s",
+                             e.strerror, name)
+                sys.exit(1)
             try:
                 lf.close()
             except Exception:
@@ -906,6 +910,23 @@ def copyfile(src, dest, newmtime = None, sstat = None):
         newmtime = sstat[stat.ST_MTIME]
     return newmtime
 
+def break_hardlinks(src, sstat = None):
+    """
+    Ensures src is the only hardlink to this file.  Other hardlinks,
+    if any, are not affected (other than in their st_nlink value, of
+    course).  Returns true on success and false on failure.
+
+    """
+    try:
+        if not sstat:
+            sstat = os.lstat(src)
+    except Exception as e:
+        logger.warning("break_hardlinks: stat of %s failed (%s)" % (src, e))
+        return False
+    if sstat[stat.ST_NLINK] == 1:
+        return True
+    return copyfile(src, src, sstat=sstat)
+
 def which(path, item, direction = 0, history = False, executable=False):
     """
     Locate `item` in the list of paths `path` (colon separated string like $PATH).
@@ -1290,7 +1311,7 @@ def edit_metadata_file(meta_file, variables, varfunc):
     return updated
 
 
-def edit_bblayers_conf(bblayers_conf, add, remove):
+def edit_bblayers_conf(bblayers_conf, add, remove, edit_cb=None):
     """Edit bblayers.conf, adding and/or removing layers
     Parameters:
         bblayers_conf: path to bblayers.conf file to edit
@@ -1298,6 +1319,8 @@ def edit_bblayers_conf(bblayers_conf, add, remove):
             list to add nothing
         remove: layer path (or list of layer paths) to remove; None or
             empty list to remove nothing
+        edit_cb: optional callback function that will be called after
+            processing adds/removes once per existing entry.
     Returns a tuple:
         notadded: list of layers specified to be added but weren't
             (because they were already in the list)
@@ -1360,6 +1383,17 @@ def edit_bblayers_conf(bblayers_conf, add, remove):
                     updated = True
                     bblayers.append(addlayer)
             del addlayers[:]
+
+        if edit_cb:
+            newlist = []
+            for layer in bblayers:
+                res = edit_cb(layer, canonicalise_path(layer))
+                if res != layer:
+                    newlist.append(res)
+                    updated = True
+                else:
+                    newlist.append(layer)
+            bblayers = newlist
 
         if updated:
             if op == '+=' and not bblayers:

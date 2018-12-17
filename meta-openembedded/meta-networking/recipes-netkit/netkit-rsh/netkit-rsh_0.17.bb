@@ -2,7 +2,7 @@ DESCRIPTION = "netkit-rsh includes the rsh daemon and client."
 SECTION = "net"
 HOMEPAGE="ftp://ftp.uk.linux.org/pub/linux/Networking/netkit"
 LICENSE = "BSD-4-Clause"
-DEPENDS = "xinetd libgcrypt"
+DEPENDS = "xinetd libgcrypt virtual/crypt"
 
 LIC_FILES_CHKSUM = "file://rsh/rsh.c;endline=32;md5=487b3c637bdc181d32b2a8543d41b606"
 
@@ -100,3 +100,6 @@ RPROVIDES_${PN}-server = "rshd"
 
 RDEPENDS_${PN}-server = "xinetd"
 RDEPENDS_${PN}-server += "tcp-wrappers"
+
+# http://errors.yoctoproject.org/Errors/Details/186963/
+EXCLUDE_FROM_WORLD_libc-musl = "1"

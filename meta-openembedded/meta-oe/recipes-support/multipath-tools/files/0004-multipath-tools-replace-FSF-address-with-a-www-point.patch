@@ -1,0 +1,191 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Xose Vazquez Perez <xose.vazquez@gmail.com>
+Date: Fri, 11 May 2018 15:42:43 +0200
+Subject: [PATCH] multipath-tools: replace FSF address with a www pointer
+
+Less prone to future modifications, new FSF licences
+point exactly to this url: <http://www.gnu.org/licenses/>.
+And sending a smail to FSF is outdated.
+
+First clean up was done in 5619a39c433ac3d10a88079593cec1aa6472cbeb
+
+Cc: Martin Wilck <mwilck@suse.com>
+Cc: Benjamin Marzinski <bmarzins@redhat.com>
+Cc: Christophe Varoqui <christophe.varoqui@opensvc.com>
+Cc: DM ML <dm-devel@redhat.com>
+Signed-off-by: Xose Vazquez Perez <xose.vazquez@gmail.com>
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/dm-generic.c   | 4 +---
+ libmultipath/dm-generic.h   | 4 +---
+ libmultipath/foreign.c      | 4 +---
+ libmultipath/foreign.h      | 4 +---
+ libmultipath/foreign/nvme.c | 4 +---
+ libmultipath/generic.c      | 4 +---
+ libmultipath/generic.h      | 4 +---
+ tests/dmevents.c            | 2 +-
+ tests/parser.c              | 2 +-
+ tests/uevent.c              | 2 +-
+ tests/util.c                | 2 +-
+ 11 files changed, 11 insertions(+), 25 deletions(-)
+
+diff --git a/libmultipath/dm-generic.c b/libmultipath/dm-generic.c
+index bdc9ca0..d752991 100644
+--- a/libmultipath/dm-generic.c
++++ b/libmultipath/dm-generic.c
+@@ -12,9 +12,7 @@
+   GNU General Public License for more details.
+ 
+   You should have received a copy of the GNU General Public License
+-  along with this program; if not, write to the Free Software
+-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+-  USA.
++  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #include <stdint.h>
+diff --git a/libmultipath/dm-generic.h b/libmultipath/dm-generic.h
+index 5d59724..986429f 100644
+--- a/libmultipath/dm-generic.h
++++ b/libmultipath/dm-generic.h
+@@ -12,9 +12,7 @@
+   GNU General Public License for more details.
+ 
+   You should have received a copy of the GNU General Public License
+-  along with this program; if not, write to the Free Software
+-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+-  USA.
++  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  */
+ #ifndef _DM_GENERIC_H
+ #define _DM_GENERIC_H
+diff --git a/libmultipath/foreign.c b/libmultipath/foreign.c
+index 7217184..80b399b 100644
+--- a/libmultipath/foreign.c
++++ b/libmultipath/foreign.c
+@@ -12,9 +12,7 @@
+   GNU General Public License for more details.
+ 
+   You should have received a copy of the GNU General Public License
+-  along with this program; if not, write to the Free Software
+-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+-  USA.
++  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+ 
+ #include <sys/sysmacros.h>
+diff --git a/libmultipath/foreign.h b/libmultipath/foreign.h
+index 973f368..697f12f 100644
+--- a/libmultipath/foreign.h
++++ b/libmultipath/foreign.h
+@@ -12,9 +12,7 @@
+   GNU General Public License for more details.
+ 
+   You should have received a copy of the GNU General Public License
+-  along with this program; if not, write to the Free Software
+-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+-  USA.
++  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+ #ifndef _FOREIGN_H
+ #define _FOREIGN_H
+diff --git a/libmultipath/foreign/nvme.c b/libmultipath/foreign/nvme.c
+index 235f75d..280b6bd 100644
+--- a/libmultipath/foreign/nvme.c
++++ b/libmultipath/foreign/nvme.c
+@@ -12,9 +12,7 @@
+   GNU General Public License for more details.
+ 
+   You should have received a copy of the GNU General Public License
+-  along with this program; if not, write to the Free Software
+-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+-  USA.
++  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+ 
+ #include <sys/sysmacros.h>
+diff --git a/libmultipath/generic.c b/libmultipath/generic.c
+index 6f7a2cd..0d1e632 100644
+--- a/libmultipath/generic.c
++++ b/libmultipath/generic.c
+@@ -12,9 +12,7 @@
+   GNU General Public License for more details.
+ 
+   You should have received a copy of the GNU General Public License
+-  along with this program; if not, write to the Free Software
+-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+-  USA.
++  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ 
+diff --git a/libmultipath/generic.h b/libmultipath/generic.h
+index 7f7fe66..6346ffe 100644
+--- a/libmultipath/generic.h
++++ b/libmultipath/generic.h
+@@ -12,9 +12,7 @@
+   GNU General Public License for more details.
+ 
+   You should have received a copy of the GNU General Public License
+-  along with this program; if not, write to the Free Software
+-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+-  USA.
++  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  */
+ #ifndef _GENERIC_H
+ #define _GENERIC_H
+diff --git a/tests/dmevents.c b/tests/dmevents.c
+index bba51dc..3399c81 100644
+--- a/tests/dmevents.c
++++ b/tests/dmevents.c
+@@ -12,7 +12,7 @@
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+- * along with this program; if not, write to the Free Software
++ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  *
+  */
+ 
+diff --git a/tests/parser.c b/tests/parser.c
+index a7e7598..29859da 100644
+--- a/tests/parser.c
++++ b/tests/parser.c
+@@ -12,7 +12,7 @@
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+- * along with this program; if not, write to the Free Software
++ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  *
+  */
+ 
+diff --git a/tests/uevent.c b/tests/uevent.c
+index acfcb14..b0d0bfd 100644
+--- a/tests/uevent.c
++++ b/tests/uevent.c
+@@ -12,7 +12,7 @@
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+- * along with this program; if not, write to the Free Software
++ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  *
+  */
+ 
+diff --git a/tests/util.c b/tests/util.c
+index 113b134..839effd 100644
+--- a/tests/util.c
++++ b/tests/util.c
+@@ -12,7 +12,7 @@
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+- * along with this program; if not, write to the Free Software
++ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  *
+  */
+ 
+-- 
+2.7.4
+

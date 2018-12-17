@@ -84,7 +84,7 @@ mount -t sysfs sysfs /sys
 # populate bootparam environment
 for p in `cat /proc/cmdline`; do
 	opt=`echo $p | cut -d'=' -f1`
-	opt=`echo $opt | tr '.-' '__'`
+	opt=`echo $opt | sed -e 'y/.-/__/'`
 	if [ "`echo $p | cut -d'=' -f1`" = "$p" ]; then
 		eval "bootparam_${opt}=true"
 	else

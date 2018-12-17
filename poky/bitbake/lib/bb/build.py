@@ -41,8 +41,6 @@ from bb import data, event, utils
 bblogger = logging.getLogger('BitBake')
 logger = logging.getLogger('BitBake.Build')
 
-NULL = open(os.devnull, 'r+')
-
 __mtime_cache = {}
 
 def cached_mtime_noerror(f):
@@ -533,7 +531,6 @@ def _exec_task(fn, task, d, quieterr):
                 self.triggered = True
 
     # Handle logfiles
-    si = open('/dev/null', 'r')
     try:
         bb.utils.mkdirhier(os.path.dirname(logfn))
         logfile = open(logfn, 'w')
@@ -547,7 +544,8 @@ def _exec_task(fn, task, d, quieterr):
     ose = [os.dup(sys.stderr.fileno()), sys.stderr.fileno()]
 
     # Replace those fds with our own
-    os.dup2(si.fileno(), osi[1])
+    with open('/dev/null', 'r') as si:
+        os.dup2(si.fileno(), osi[1])
     os.dup2(logfile.fileno(), oso[1])
     os.dup2(logfile.fileno(), ose[1])
 
@@ -608,7 +606,6 @@ def _exec_task(fn, task, d, quieterr):
         os.close(osi[0])
         os.close(oso[0])
         os.close(ose[0])
-        si.close()
 
         logfile.close()
         if os.path.exists(logfn) and os.path.getsize(logfn) == 0:
@@ -803,6 +800,7 @@ def add_tasks(tasklist, d):
             if name in flags:
                 deptask = d.expand(flags[name])
                 task_deps[name][task] = deptask
+        getTask('mcdepends')
         getTask('depends')
         getTask('rdepends')
         getTask('deptask')

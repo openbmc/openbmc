@@ -1,0 +1,24 @@
+Fixes:
+http://errors.yoctoproject.org/Errors/Details/185896/
+
+TOPDIR/tmp-glibc/work/core2-64-oe-linux/sg3-utils/1.42-r0/recipe-sysroot-native/usr/bin/x86_64-oe-linux/../../libexec/x86_64-oe-linux/gcc/x86_64-oe-linux/8.2.0/ld: sg_map26.o: in function `nd_match_scandir_select':
+/usr/src/debug/sg3-utils/1.42-r0/sg3_utils-1.42/src/sg_map26.c:359: undefined reference to `major'
+TOPDIR/tmp-glibc/work/core2-64-oe-linux/sg3-utils/1.42-r0/recipe-sysroot-native/usr/bin/x86_64-oe-linux/../../libexec/x86_64-oe-linux/gcc/x86_64-oe-linux/8.2.0/ld: /usr/src/debug/sg3-utils/1.42-r0/sg3_utils-1.42/src/sg_map26.c:361: undefined reference to `minor'
+TOPDIR/tmp-glibc/work/core2-64-oe-linux/sg3-utils/1.42-r0/recipe-sysroot-native/usr/bin/x86_64-oe-linux/../../libexec/x86_64-oe-linux/gcc/x86_64-oe-linux/8.2.0/ld: sg_map26.o: in function `nt_typ_from_filename':
+/usr/src/debug/sg3-utils/1.42-r0/sg3_utils-1.42/src/sg_map26.c:218: undefined reference to `major'
+TOPDIR/tmp-glibc/work/core2-64-oe-linux/sg3-utils/1.42-r0/recipe-sysroot-native/usr/bin/x86_64-oe-linux/../../libexec/x86_64-oe-linux/gcc/x86_64-oe-linux/8.2.0/ld: /usr/src/debug/sg3-utils/1.42-r0/sg3_utils-1.42/src/sg_map26.c:219: undefined reference to `minor'
+collect2: error: ld returned 1 exit status
+Makefile:806: recipe for target 'sg_map26' failed
+
+Upstream-Status: Pending
+
+--- sg3_utils-1.42.orig/src/sg_map26.c	2018-08-09 11:53:26.907493996 +0000
++++ sg3_utils-1.42/src/sg_map26.c	2018-08-09 11:51:56.713490763 +0000
+@@ -33,6 +33,7 @@
+ #include <sys/ioctl.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
++#include <sys/sysmacros.h>
+ #include <linux/major.h>
+ 
+ #ifdef HAVE_CONFIG_H

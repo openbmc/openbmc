@@ -1,0 +1,194 @@
+From 8d65d70b54d1d306a0a0b00e036bc8ddd39d8ec1 Mon Sep 17 00:00:00 2001
+From: "przemyslaw.skibinski@percona.com" <przemyslaw.skibinski@percona.com>
+Date: Fri, 20 Apr 2018 13:28:05 -0700
+Subject: [PATCH] Fix GitHub issue #3716: gcc-8 warnings
+
+Summary:
+Fix the following gcc-8 warnings:
+- conflicting C language linkage declaration [-Werror]
+- writing to an object with no trivial copy-assignment [-Werror=class-memaccess]
+- array subscript -1 is below array bounds [-Werror=array-bounds]
+
+Solves https://github.com/facebook/rocksdb/issues/3716
+Closes https://github.com/facebook/rocksdb/pull/3736
+
+Differential Revision: D7684161
+
+Pulled By: yiwu-arbug
+
+fbshipit-source-id: 47c0423d26b74add251f1d3595211eee1e41e54a
+---
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Backport [https://github.com/facebook/rocksdb/commit/dee95a1afc6c63515e7d94dec33acdb79638b6d7.patch]
+
+ db/c.cc                   | 77 ++++++++++++++-------------------------
+ memtable/inlineskiplist.h | 12 +++---
+ 2 files changed, 33 insertions(+), 56 deletions(-)
+
+diff --git a/db/c.cc b/db/c.cc
+index 064103ed4..0d485d096 100644
+--- a/db/c.cc
++++ b/db/c.cc
+@@ -1388,23 +1388,24 @@ void rocksdb_writebatch_put_log_data(
+   b->rep.PutLogData(Slice(blob, len));
+ }
+ 
++class H : public WriteBatch::Handler {
++ public:
++  void* state_;
++  void (*put_)(void*, const char* k, size_t klen, const char* v, size_t vlen);
++  void (*deleted_)(void*, const char* k, size_t klen);
++  virtual void Put(const Slice& key, const Slice& value) override {
++    (*put_)(state_, key.data(), key.size(), value.data(), value.size());
++  }
++  virtual void Delete(const Slice& key) override {
++    (*deleted_)(state_, key.data(), key.size());
++  }
++};
++
+ void rocksdb_writebatch_iterate(
+     rocksdb_writebatch_t* b,
+     void* state,
+     void (*put)(void*, const char* k, size_t klen, const char* v, size_t vlen),
+     void (*deleted)(void*, const char* k, size_t klen)) {
+-  class H : public WriteBatch::Handler {
+-   public:
+-    void* state_;
+-    void (*put_)(void*, const char* k, size_t klen, const char* v, size_t vlen);
+-    void (*deleted_)(void*, const char* k, size_t klen);
+-    virtual void Put(const Slice& key, const Slice& value) override {
+-      (*put_)(state_, key.data(), key.size(), value.data(), value.size());
+-    }
+-    virtual void Delete(const Slice& key) override {
+-      (*deleted_)(state_, key.data(), key.size());
+-    }
+-  };
+   H handler;
+   handler.state_ = state;
+   handler.put_ = put;
+@@ -1649,18 +1650,6 @@ void rocksdb_writebatch_wi_iterate(
+     void* state,
+     void (*put)(void*, const char* k, size_t klen, const char* v, size_t vlen),
+     void (*deleted)(void*, const char* k, size_t klen)) {
+-  class H : public WriteBatch::Handler {
+-   public:
+-    void* state_;
+-    void (*put_)(void*, const char* k, size_t klen, const char* v, size_t vlen);
+-    void (*deleted_)(void*, const char* k, size_t klen);
+-    virtual void Put(const Slice& key, const Slice& value) override {
+-      (*put_)(state_, key.data(), key.size(), value.data(), value.size());
+-    }
+-    virtual void Delete(const Slice& key) override {
+-      (*deleted_)(state_, key.data(), key.size());
+-    }
+-  };
+   H handler;
+   handler.state_ = state;
+   handler.put_ = put;
+@@ -3109,20 +3098,21 @@ void rocksdb_slicetransform_destroy(rocksdb_slicetransform_t* st) {
+   delete st;
+ }
+ 
++struct Wrapper : public rocksdb_slicetransform_t {
++  const SliceTransform* rep_;
++  ~Wrapper() { delete rep_; }
++  const char* Name() const override { return rep_->Name(); }
++  Slice Transform(const Slice& src) const override {
++    return rep_->Transform(src);
++  }
++  bool InDomain(const Slice& src) const override {
++    return rep_->InDomain(src);
++  }
++  bool InRange(const Slice& src) const override { return rep_->InRange(src); }
++  static void DoNothing(void*) { }
++};
++
+ rocksdb_slicetransform_t* rocksdb_slicetransform_create_fixed_prefix(size_t prefixLen) {
+-  struct Wrapper : public rocksdb_slicetransform_t {
+-    const SliceTransform* rep_;
+-    ~Wrapper() { delete rep_; }
+-    const char* Name() const override { return rep_->Name(); }
+-    Slice Transform(const Slice& src) const override {
+-      return rep_->Transform(src);
+-    }
+-    bool InDomain(const Slice& src) const override {
+-      return rep_->InDomain(src);
+-    }
+-    bool InRange(const Slice& src) const override { return rep_->InRange(src); }
+-    static void DoNothing(void*) { }
+-  };
+   Wrapper* wrapper = new Wrapper;
+   wrapper->rep_ = rocksdb::NewFixedPrefixTransform(prefixLen);
+   wrapper->state_ = nullptr;
+@@ -3131,19 +3121,6 @@ rocksdb_slicetransform_t* rocksdb_slicetransform_create_fixed_prefix(size_t pref
+ }
+ 
+ rocksdb_slicetransform_t* rocksdb_slicetransform_create_noop() {
+-  struct Wrapper : public rocksdb_slicetransform_t {
+-    const SliceTransform* rep_;
+-    ~Wrapper() { delete rep_; }
+-    const char* Name() const override { return rep_->Name(); }
+-    Slice Transform(const Slice& src) const override {
+-      return rep_->Transform(src);
+-    }
+-    bool InDomain(const Slice& src) const override {
+-      return rep_->InDomain(src);
+-    }
+-    bool InRange(const Slice& src) const override { return rep_->InRange(src); }
+-    static void DoNothing(void*) { }
+-  };
+   Wrapper* wrapper = new Wrapper;
+   wrapper->rep_ = rocksdb::NewNoopTransform();
+   wrapper->state_ = nullptr;
+diff --git a/memtable/inlineskiplist.h b/memtable/inlineskiplist.h
+index 702a7336d..eadda1dc1 100644
+--- a/memtable/inlineskiplist.h
++++ b/memtable/inlineskiplist.h
+@@ -280,7 +280,7 @@ struct InlineSkipList<Comparator>::Node {
+   // next_[0].  This is used for passing data from AllocateKey to Insert.
+   void StashHeight(const int height) {
+     assert(sizeof(int) <= sizeof(next_[0]));
+-    memcpy(&next_[0], &height, sizeof(int));
++    memcpy(static_cast<void*>(&next_[0]), &height, sizeof(int));
+   }
+ 
+   // Retrieves the value passed to StashHeight.  Undefined after a call
+@@ -300,30 +300,30 @@ struct InlineSkipList<Comparator>::Node {
+     assert(n >= 0);
+     // Use an 'acquire load' so that we observe a fully initialized
+     // version of the returned Node.
+-    return (next_[-n].load(std::memory_order_acquire));
++    return ((&next_[0] - n)->load(std::memory_order_acquire));
+   }
+ 
+   void SetNext(int n, Node* x) {
+     assert(n >= 0);
+     // Use a 'release store' so that anybody who reads through this
+     // pointer observes a fully initialized version of the inserted node.
+-    next_[-n].store(x, std::memory_order_release);
++    (&next_[0] - n)->store(x, std::memory_order_release);
+   }
+ 
+   bool CASNext(int n, Node* expected, Node* x) {
+     assert(n >= 0);
+-    return next_[-n].compare_exchange_strong(expected, x);
++    return (&next_[0] - n)->compare_exchange_strong(expected, x);
+   }
+ 
+   // No-barrier variants that can be safely used in a few locations.
+   Node* NoBarrier_Next(int n) {
+     assert(n >= 0);
+-    return next_[-n].load(std::memory_order_relaxed);
++    return (&next_[0] - n)->load(std::memory_order_relaxed);
+   }
+ 
+   void NoBarrier_SetNext(int n, Node* x) {
+     assert(n >= 0);
+-    next_[-n].store(x, std::memory_order_relaxed);
++    (&next_[0] - n)->store(x, std::memory_order_relaxed);
+   }
+ 
+   // Insert node after prev on specific level.
+-- 
+2.17.0
+

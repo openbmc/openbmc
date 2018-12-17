@@ -343,30 +343,31 @@ def runAnonFuncs(d):
 
 def finalize(fn, d, variant = None):
     saved_handlers = bb.event.get_handlers().copy()
+    try:
+        for var in d.getVar('__BBHANDLERS', False) or []:
+            # try to add the handler
+            handlerfn = d.getVarFlag(var, "filename", False)
+            if not handlerfn:
+                bb.fatal("Undefined event handler function '%s'" % var)
+            handlerln = int(d.getVarFlag(var, "lineno", False))
+            bb.event.register(var, d.getVar(var, False), (d.getVarFlag(var, "eventmask") or "").split(), handlerfn, handlerln)
 
-    for var in d.getVar('__BBHANDLERS', False) or []:
-        # try to add the handler
-        handlerfn = d.getVarFlag(var, "filename", False)
-        if not handlerfn:
-            bb.fatal("Undefined event handler function '%s'" % var)
-        handlerln = int(d.getVarFlag(var, "lineno", False))
-        bb.event.register(var, d.getVar(var, False), (d.getVarFlag(var, "eventmask") or "").split(), handlerfn, handlerln)
+        bb.event.fire(bb.event.RecipePreFinalise(fn), d)
 
-    bb.event.fire(bb.event.RecipePreFinalise(fn), d)
+        bb.data.expandKeys(d)
+        runAnonFuncs(d)
 
-    bb.data.expandKeys(d)
-    runAnonFuncs(d)
+        tasklist = d.getVar('__BBTASKS', False) or []
+        bb.event.fire(bb.event.RecipeTaskPreProcess(fn, list(tasklist)), d)
+        bb.build.add_tasks(tasklist, d)
 
-    tasklist = d.getVar('__BBTASKS', False) or []
-    bb.event.fire(bb.event.RecipeTaskPreProcess(fn, list(tasklist)), d)
-    bb.build.add_tasks(tasklist, d)
+        bb.parse.siggen.finalise(fn, d, variant)
 
-    bb.parse.siggen.finalise(fn, d, variant)
+        d.setVar('BBINCLUDED', bb.parse.get_file_depends(d))
 
-    d.setVar('BBINCLUDED', bb.parse.get_file_depends(d))
-
-    bb.event.fire(bb.event.RecipeParsed(fn), d)
-    bb.event.set_handlers(saved_handlers)
+        bb.event.fire(bb.event.RecipeParsed(fn), d)
+    finally:
+        bb.event.set_handlers(saved_handlers)
 
 def _create_variants(datastores, names, function, onlyfinalise):
     def create_variant(name, orig_d, arg = None):

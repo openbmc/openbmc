@@ -14,6 +14,31 @@ RDEPENDS_${PN} += " \
     perl-module-filehandle \
     perl-module-getopt-std \
     perl-module-digest-sha \
+    perl-module-constant \
+    perl-module-cwd \
+    perl-module-errno \
+    perl-module-file-basename \
+    perl-module-file-find \
+    perl-module-file-path \
+    perl-module-file-spec \
+    perl-module-file-spec-functions \
+    perl-module-file-spec-unix \
+    perl-module-file-temp \
+    perl-module-getopt-long \
+    perl-module-list-util \
+    perl-module-mro \
+    perl-module-overload \
+    perl-module-overloading \
+    perl-module-overload-numbers \
+    perl-module-parent \
+    perl-module-pod-usage \
+    perl-module-posix \
+    perl-module-re \
+    perl-module-safe \
+    perl-module-scalar-util \
+    perl-module-term-cap \
+    perl-module-text-parsewords \
+    perl-module-tie-hash \
 "
 
 SRC_URI = "http://downloads.sourceforge.net/ltp/${BP}.tar.gz"

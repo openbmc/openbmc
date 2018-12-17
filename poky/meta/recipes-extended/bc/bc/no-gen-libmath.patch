@@ -1,0 +1,24 @@
+These rules are not cross-friendly so delete them and we'll generate the file offline.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/bc/Makefile.am b/bc/Makefile.am
+index d9d412e..f244241 100644
+--- a/bc/Makefile.am
++++ b/bc/Makefile.am
+@@ -31,14 +31,6 @@ global.o: libmath.h
+ 
+ fbcOBJ = main.o bc.o scan.o execute.o load.o storage.o util.o warranty.o
+ 
+-libmath.h: libmath.b $(fbcOBJ) $(LIBBC)
+-	echo '{0}' > libmath.h
+-	$(MAKE) global.o
+-	$(LINK) -o fbc $(fbcOBJ) global.o $(LIBBC) $(LIBL) $(READLINELIB) $(LIBS)
+-	./fbc -c $(srcdir)/libmath.b </dev/null >libmath.h
+-	$(srcdir)/fix-libmath_h
+-	rm -f ./fbc ./global.o
+-
+ sbcOBJ = main.o sbc.o scan.o execute.o global.o load.o storage.o util.o \
+          warranty.o
+ sbc.o: sbc.c

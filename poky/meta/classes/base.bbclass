@@ -128,6 +128,12 @@ def setup_hosttools_dir(dest, toolsvar, d, fatal=True):
                 os.symlink(srctool, desttool)
             else:
                 notfound.append(tool)
+    # Force "python" -> "python2"
+    desttool = os.path.join(dest, "python")
+    if not os.path.exists(desttool):
+        srctool = "python2"
+        os.symlink(srctool, desttool)
+
     if notfound and fatal:
         bb.fatal("The following required tools (as specified by HOSTTOOLS) appear to be unavailable in PATH, please install them in order to proceed:\n  %s" % " ".join(notfound))
 
@@ -152,7 +158,7 @@ python base_do_fetch() {
 addtask unpack after do_fetch
 do_unpack[dirs] = "${WORKDIR}"
 
-do_unpack[cleandirs] = "${@d.getVar('S') if d.getVar('S') != d.getVar('WORKDIR') else os.path.join('${S}', 'patches')}"
+do_unpack[cleandirs] = "${@d.getVar('S') if os.path.normpath(d.getVar('S')) != os.path.normpath(d.getVar('WORKDIR')) else os.path.join('${S}', 'patches')}"
 
 python base_do_unpack() {
     src_uri = (d.getVar('SRC_URI') or "").split()
@@ -522,19 +528,18 @@ python () {
             incompatwl = []
             for lic in bad_licenses:
                 spdx_license = return_spdx(d, lic)
-                for w in ["LGPLv2_WHITELIST_", "WHITELIST_"]:
-                    whitelist.extend((d.getVar(w + lic) or "").split())
-                    if spdx_license:
-                        whitelist.extend((d.getVar(w + spdx_license) or "").split())
-                    '''
-                    We need to track what we are whitelisting and why. If pn is
-                    incompatible we need to be able to note that the image that
-                    is created may infact contain incompatible licenses despite
-                    INCOMPATIBLE_LICENSE being set.
-                    '''
-                    incompatwl.extend((d.getVar(w + lic) or "").split())
-                    if spdx_license:
-                        incompatwl.extend((d.getVar(w + spdx_license) or "").split())
+                whitelist.extend((d.getVar("WHITELIST_" + lic) or "").split())
+                if spdx_license:
+                    whitelist.extend((d.getVar("WHITELIST_" + spdx_license) or "").split())
+                '''
+                We need to track what we are whitelisting and why. If pn is
+                incompatible we need to be able to note that the image that
+                is created may infact contain incompatible licenses despite
+                INCOMPATIBLE_LICENSE being set.
+                '''
+                incompatwl.extend((d.getVar("WHITELIST_" + lic) or "").split())
+                if spdx_license:
+                    incompatwl.extend((d.getVar("WHITELIST_" + spdx_license) or "").split())
 
             if not pn in whitelist:
                 pkgs = d.getVar('PACKAGES').split()
@@ -624,7 +629,7 @@ python () {
         elif path.endswith('.zip') or path.endswith('.jar'):
             d.appendVarFlag('do_unpack', 'depends', ' unzip-native:do_populate_sysroot')
 
-        # file is needed by rpm2cpio.sh
+        # Some rpm files may be compressed internally using xz (for example, rpms from Fedora)
         elif path.endswith('.rpm'):
             d.appendVarFlag('do_unpack', 'depends', ' xz-native:do_populate_sysroot')
 

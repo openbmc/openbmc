@@ -22,5 +22,5 @@ do_install_append () {
     rm -rf ${D}${docdir}/${BPN}
 }
 
-FILES_${PN} += "${libdir}/engines/pkcs11.so"
-FILES_${PN}-dev += "${libdir}/engines/libpkcs11${SOLIBSDEV}"
+FILES_${PN} += "${libdir}/engines*/pkcs11.so"
+FILES_${PN}-dev += "${libdir}/engines*/libpkcs11${SOLIBSDEV}"

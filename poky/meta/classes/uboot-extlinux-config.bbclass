@@ -58,7 +58,7 @@
 #
 # The kernel has an internal default console, which you can override with
 # a console=...some_tty...
-UBOOT_EXTLINUX_CONSOLE ??= "console=${console}"
+UBOOT_EXTLINUX_CONSOLE ??= "console=${console},${baudrate}"
 UBOOT_EXTLINUX_LABELS ??= "linux"
 UBOOT_EXTLINUX_FDT ??= ""
 UBOOT_EXTLINUX_FDTDIR ??= "../"

@@ -13,10 +13,10 @@ include/libisns/util.h:114:12: fatal error: sys/endian.h: No such file or direct
  #  include <sys/endian.h>
             ^~~~~~~~~~~~~~
 
-Signed-off-by: Khem Raj <raj.khem@gmail.com>
----
 Upstream-Status: Submitted
 
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
  include/libisns/util.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

@@ -1,19 +1,33 @@
-Add LDFLAGS variable to Makefile, make sure the extra linker flags can be passed.
+From 8aff1e965ec17262f3a5b376f7eb3e053d81905c Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Tue, 24 Jul 2018 18:18:05 +0800
+Subject: [PATCH] Add LDFLAGS variable to Makefile, make sure the extra linker
+ flags can be passed.
 
 Upstream-Status: Pending
 
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 
+Update to version 1.29
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
 diff --git a/Makefile b/Makefile
-index 461c021..8bc9cde 100644
+index f29bbae..81beb5a 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -86,7 +86,7 @@ libs:
  		make -C libipvs
  
- ipvsadm:	$(OBJS) libs
+ ipvsadm:       $(OBJS) libs
 -		$(CC) $(CFLAGS) -o $@ $(OBJS) $(STATIC_LIBS) $(LIBS)
 +		$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(STATIC_LIBS) $(LIBS)
  
  install:        all
  		if [ ! -d $(SBIN) ]; then $(MKDIR) -p $(SBIN); fi
+-- 
+2.7.4
+

@@ -20,6 +20,7 @@ SRC_URI = "http://downloads.yoctoproject.org/mirror/sources/DirectFB-${PV}.tar.g
            file://union-sigval.patch \
            file://use-PTHREAD_MUTEX_RECURSIVE.patch \
            file://fix-client-gfx_state-initialisation.patch \
+           file://fix-tslib-version-check.patch \
           "
 
 S = "${WORKDIR}/DirectFB-${PV}"

@@ -2,15 +2,16 @@ DESCRIPTION = "This project enables PWM on the GPIO pins you request of a Raspbe
 HOMEPAGE = "https://github.com/sarfata/pi-blaster/"
 SECTION = "devel/libs"
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://README.md;beginline=225;endline=252;md5=a012868ef5f83b9f257af253d7cb07a3"
+LIC_FILES_CHKSUM = "file://README.md;beginline=244;endline=268;md5=86d10e4bcf4b4014d306dde7c1d2a80d"
 
 SRC_URI = "git://github.com/sarfata/pi-blaster \
            file://remove-initscript-lsb-dependency.patch \
-"
+           file://0001-pi-blaster-Include-sys-sysmacros.h-for-makedev.patch \
+           "
 
 S = "${WORKDIR}/git"
 
-SRCREV = "1035ad7dffb270c40eec1bb3a654171a755fba98"
+SRCREV = "e981aa5d7624c75a4d4afcddcbd235f25e32ffe4"
 
 inherit update-rc.d autotools
 

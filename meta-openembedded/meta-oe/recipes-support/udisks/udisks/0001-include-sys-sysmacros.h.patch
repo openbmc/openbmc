@@ -1,0 +1,77 @@
+From 64f051963d6cdeebd19f9e7f0a7e584a1f7acc60 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 11 Aug 2018 19:12:57 -0700
+Subject: [PATCH] include sys/sysmacros.h
+
+fixes build with glibc 2.28+
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/daemon.c          | 1 +
+ src/device.c          | 1 +
+ src/mount-monitor.c   | 1 +
+ tools/udisks.c        | 1 +
+ tools/umount-udisks.c | 1 +
+ 5 files changed, 5 insertions(+)
+
+diff --git a/src/daemon.c b/src/daemon.c
+index 14e952f..2c61cfb 100644
+--- a/src/daemon.c
++++ b/src/daemon.c
+@@ -39,6 +39,7 @@
+ #include <errno.h>
+ #include <string.h>
+ #include <sys/types.h>
++#include <sys/sysmacros.h>
+ #include <sys/stat.h>
+ #include <sys/time.h>
+ #include <sys/resource.h>
+diff --git a/src/device.c b/src/device.c
+index d73f9d6..5911d78 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -29,6 +29,7 @@
+ #include <errno.h>
+ #include <string.h>
+ #include <sys/types.h>
++#include <sys/sysmacros.h>
+ #include <sys/wait.h>
+ #include <sys/stat.h>
+ #include <sys/time.h>
+diff --git a/src/mount-monitor.c b/src/mount-monitor.c
+index 573a69c..ccf3365 100644
+--- a/src/mount-monitor.c
++++ b/src/mount-monitor.c
+@@ -28,6 +28,7 @@
+ #include <errno.h>
+ #include <string.h>
+ #include <sys/types.h>
++#include <sys/sysmacros.h>
+ #include <sys/stat.h>
+ #include <mntent.h>
+ 
+diff --git a/tools/udisks.c b/tools/udisks.c
+index d30159b..f24a30a 100644
+--- a/tools/udisks.c
++++ b/tools/udisks.c
+@@ -29,6 +29,7 @@
+ #include <errno.h>
+ #include <string.h>
+ #include <sys/types.h>
++#include <sys/sysmacros.h>
+ #include <sys/stat.h>
+ #include <sys/wait.h>
+ #include <fcntl.h>
+diff --git a/tools/umount-udisks.c b/tools/umount-udisks.c
+index 2813fe0..5cf6b4d 100644
+--- a/tools/umount-udisks.c
++++ b/tools/umount-udisks.c
+@@ -29,6 +29,7 @@
+ #include <errno.h>
+ #include <string.h>
+ #include <sys/types.h>
++#include <sys/sysmacros.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
+ #include <pwd.h>

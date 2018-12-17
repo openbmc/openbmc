@@ -19,9 +19,7 @@ Co-authored-by: Christian Heimes <christian@python.org>
 https://bugs.python.org/issue34623
 
 Upstream-Status: Backport
-
-Fix CVE-2018-14647
-
+CVE: CVE-2018-14647
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
 ---
  Include/pyexpat.h                                                  | 4 +++-

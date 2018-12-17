@@ -1,0 +1,36 @@
+From 9825fcbab5c4ddd867432f9922bebfbec7b78af0 Mon Sep 17 00:00:00 2001
+From: Mark Dufour <m.dufour@kopano.com>
+Date: Tue, 14 Feb 2017 10:34:37 +0100
+Subject: [PATCH] [Coverity] fix issue reported for SWIG_Python_FixMethods
+
+Fix Coverity issue reported for SWIG_Python_FixMethods:
+
+"buffer_size: Calling strncpy with a source string whose length
+(10 chars) is greater than or equal to the size argument (10)
+will fail to null-terminate buff."
+
+The issue is only reported for the "swig_ptr: " line, but for
+consistency we replace both occurrences of strncpy with memcpy.
+---
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Backport [https://github.com/swig/swig/pull/898]
+
+ Lib/python/pyinit.swg | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+Index: swig-3.0.12/Lib/python/pyinit.swg
+===================================================================
+--- swig-3.0.12.orig/Lib/python/pyinit.swg
++++ swig-3.0.12/Lib/python/pyinit.swg
+@@ -306,9 +306,9 @@ SWIG_Python_FixMethods(PyMethodDef *meth
+ 	  char *ndoc = (char*)malloc(ldoc + lptr + 10);
+ 	  if (ndoc) {
+ 	    char *buff = ndoc;
+-	    strncpy(buff, methods[i].ml_doc, ldoc);
++	    memcpy(buff, methods[i].ml_doc, ldoc);
+ 	    buff += ldoc;
+-	    strncpy(buff, "swig_ptr: ", 10);
++	    memcpy(buff, "swig_ptr: ", 10);
+ 	    buff += 10;
+ 	    SWIG_PackVoidPtr(buff, ptr, ty->name, lptr);
+ 	    methods[i].ml_doc = ndoc;

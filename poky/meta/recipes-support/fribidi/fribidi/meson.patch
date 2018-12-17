@@ -1,0 +1,44 @@
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From f5feb6c599adb52f24656f8589868039b0d14272 Mon Sep 17 00:00:00 2001
+From: Heiko Becker <heirecka@exherbo.org>
+Date: Fri, 7 Sep 2018 20:57:11 +0200
+Subject: [PATCH] Build generator executables natively
+
+They are run during the build and not installed in the end. Without
+this one gets the following error from meson: "ERROR: Can not use
+target gen-unicode-version as a generator because it is cross-built
+and no exe wrapper is defined. You might want to set it to native
+instead."
+
+Closes #87.
+
+---
+ gen.tab/meson.build | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/gen.tab/meson.build b/gen.tab/meson.build
+index 6006d98..8c21e98 100644
+--- a/gen.tab/meson.build
++++ b/gen.tab/meson.build
+@@ -33,7 +33,8 @@ gen_unicode_version = executable('gen-unicode-version',
+   'gen-unicode-version.c',
+   include_directories: incs,
+   c_args: native_args,
+-  install: false)
++  install: false,
++  native: true)
+ 
+ fribidi_unicode_version_h = custom_target('fribidi-unicode-version.h',
+   input: files('unidata/ReadMe.txt', 'unidata/BidiMirroring.txt'),
+@@ -67,7 +68,8 @@ foreach tab : tabs
+     gen_prog_src, 'packtab.c',
+     include_directories: incs,
+     c_args: native_args,
+-    install: false)
++    install: false,
++    native: true)
+ 
+   tab_inc_file = custom_target(gen_prog_name,
+     input: gen_prog_inputs,

@@ -1,0 +1,41 @@
+From 6515f3e7656d97d40a6a1cf4eb3ada193a698309 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 12 Sep 2018 23:18:12 +0800
+Subject: [PATCH] Allow saslauthd to be built outside of source tree while
+ configuring with `--enable-ldapdb'
+
+[snip]
+| powerpc-wrs-linux-gcc [snip] -I../common
+|../../git/saslauthd/lak.c:58:10: fatal error: crypto-compat.h:
+No such file or directory
+[snip]
+
+The crypto-compat.h locates in git/common/, it should be                                                                                                                           |
+`-I../../git/common'
+
+Remove useless `-I$(top_srcdir)/../include' which was incorrectly
+added by commit `faae590 cleanup misc INCLUDES for different build paths'
+
+Upstream-Status: Submitted [https://github.com/cyrusimap/cyrus-sasl]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ saslauthd/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/saslauthd/Makefile.am b/saslauthd/Makefile.am
+index d7244be..864b29b 100644
+--- a/saslauthd/Makefile.am
++++ b/saslauthd/Makefile.am
+@@ -34,7 +34,7 @@ saslcache_SOURCES = saslcache.c
+ 
+ EXTRA_DIST	= saslauthd.8 saslauthd.mdoc include \
+ 		  getnameinfo.c getaddrinfo.c LDAP_SASLAUTHD
+-AM_CPPFLAGS	= -I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_srcdir)/../include -I$(top_builddir)/common
++AM_CPPFLAGS	= -I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir)/common -I$(top_srcdir)/common
+ DEFS            = @DEFS@ -DSASLAUTHD_CONF_FILE_DEFAULT=\"@sysconfdir@/saslauthd.conf\" -I. -I$(srcdir) -I..
+ 
+ 
+-- 
+2.7.4
+

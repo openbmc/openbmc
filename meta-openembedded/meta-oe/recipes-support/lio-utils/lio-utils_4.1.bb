@@ -60,3 +60,7 @@ RDEPENDS_${PN} += "python-stringold python-subprocess python-shell \
     bash"
 
 FILES_${PN} += "${sbindir}/* /etc/init.d/* /etc/target/*"
+
+# http://errors.yoctoproject.org/Errors/Details/184712/
+# python-native/python: can't open file 'setup.py': [Errno 2] No such file or directory
+CLEANBROKEN = "1"

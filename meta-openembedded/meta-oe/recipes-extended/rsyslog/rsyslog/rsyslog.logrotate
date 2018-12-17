@@ -9,7 +9,7 @@
         delaycompress
         compress
         postrotate
-		/bin/kill -HUP `cat /var/run/rsyslogd.pid 2> /dev/null` 2> /dev/null || true
+		@BINDIR@/pkill -HUP rsyslogd 2> /dev/null || true
         endscript
 }
 
@@ -34,6 +34,6 @@
         delaycompress
         sharedscripts
         postrotate
-		/bin/kill -HUP `cat /var/run/rsyslogd.pid 2> /dev/null` 2> /dev/null || true
+		@BINDIR@/pkill -HUP rsyslogd 2> /dev/null || true
         endscript
 }

@@ -1,0 +1,92 @@
+From a89f2ba8496994c8b5e28a89202df15d64c648f9 Mon Sep 17 00:00:00 2001
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Date: Wed, 6 Jun 2018 12:47:02 +0200
+Subject: [PATCH] sysfs: Fix basename() build with musl
+
+musl provides only standard basename() which accepts non-const string.
+This fixes build error with musl C library:
+
+    | sysfs.cc: In function 'std::__cxx11::string sysfs_getbustype(const string&)':
+    | sysfs.cc:102:21: error: 'basename' was not declared in this scope
+    |        "/devices/" + basename(path.c_str());
+    |                      ^~~~~~~~
+
+Upstream-Status: Submitted
+Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+---
+ src/core/dasd.cc  | 3 ++-
+ src/core/sysfs.cc | 9 +++++----
+ 2 files changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/src/core/dasd.cc b/src/core/dasd.cc
+index 626b8a872b0f..b27844215cc4 100644
+--- a/src/core/dasd.cc
++++ b/src/core/dasd.cc
+@@ -2,6 +2,7 @@
+ #include "osutils.h"
+ #include "dasd.h"
+ #include <glob.h>
++#include <libgen.h>
+ #include <string.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+@@ -42,7 +43,7 @@ bool scan_dasd(hwNode & n)
+   {
+     for(dev_num=0;dev_num<devices.gl_pathc;dev_num++)
+     {
+-      dev_name = basename(devices.gl_pathv[dev_num]);
++      dev_name = basename(const_cast<char *>(devices.gl_pathv[dev_num]));
+       for (std::vector<std::string>::iterator it = sysfs_attribs.begin(); it != sysfs_attribs.end(); ++it)
+       {
+         std::string attrib_fname = std::string(SYSFS_PREFIX) + dev_name + "/device/" + *it;
+diff --git a/src/core/sysfs.cc b/src/core/sysfs.cc
+index acc9d0056d5e..c56bab7b3b9f 100644
+--- a/src/core/sysfs.cc
++++ b/src/core/sysfs.cc
+@@ -7,6 +7,7 @@
+ #include "version.h"
+ #include "sysfs.h"
+ #include "osutils.h"
++#include <libgen.h>
+ #include <limits.h>
+ #include <unistd.h>
+ #include <stdlib.h>
+@@ -99,7 +100,7 @@ static string sysfs_getbustype(const string & path)
+   {
+     devname =
+       string(fs.path + "/bus/") + string(namelist[i]->d_name) +
+-      "/devices/" + basename(path.c_str());
++      "/devices/" + basename(const_cast<char *>(path.c_str()));
+ 
+     if (samefile(devname, path))
+       return string(namelist[i]->d_name);
+@@ -139,7 +140,7 @@ static string sysfstobusinfo(const string & path)
+ 
+   if (bustype == "virtio")
+   {
+-    string name = basename(path.c_str());
++    string name = basename(const_cast<char *>(path.c_str()));
+     if (name.compare(0, 6, "virtio") == 0)
+       return "virtio@" + name.substr(6);
+     else
+@@ -207,7 +208,7 @@ string entry::driver() const
+   string driverlink = This->devpath + "/driver";
+   if (!exists(driverlink))
+     return "";
+-  return basename(readlink(driverlink).c_str());
++  return basename(const_cast<char *>(readlink(driverlink).c_str()));
+ }
+ 
+ 
+@@ -288,7 +289,7 @@ string entry::name_in_class(const string & classname) const
+ 
+ string entry::name() const
+ {
+-  return basename(This->devpath.c_str());
++  return basename(const_cast<char *>(This->devpath.c_str()));
+ }
+ 
+ 
+-- 
+2.7.4
+

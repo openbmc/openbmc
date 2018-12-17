@@ -1603,14 +1603,14 @@ class BuildInfoHelper(object):
         mockevent.lineno = -1
         self.store_log_event(mockevent)
 
-    def store_log_event(self, event):
+    def store_log_event(self, event,cli_backlog=True):
         self._ensure_build()
 
         if event.levelno < formatter.WARNING:
             return
 
         # early return for CLI builds
-        if self.brbe is None:
+        if cli_backlog and self.brbe is None:
             if not 'backlog' in self.internal_state:
                 self.internal_state['backlog'] = []
             self.internal_state['backlog'].append(event)
@@ -1622,7 +1622,7 @@ class BuildInfoHelper(object):
                 tempevent = self.internal_state['backlog'].pop()
                 logger.debug(1, "buildinfohelper: Saving stored event %s "
                              % tempevent)
-                self.store_log_event(tempevent)
+                self.store_log_event(tempevent,cli_backlog)
             else:
                 logger.info("buildinfohelper: All events saved")
                 del self.internal_state['backlog']
@@ -1987,7 +1987,8 @@ class BuildInfoHelper(object):
         if 'backlog' in self.internal_state:
             # we save missed events in the database for the current build
             tempevent = self.internal_state['backlog'].pop()
-            self.store_log_event(tempevent)
+            # Do not skip command line build events
+            self.store_log_event(tempevent,False)
 
         if not connection.features.autocommits_when_autocommit_is_off:
             transaction.set_autocommit(True)

@@ -1,0 +1,37 @@
+From e6bd7a1bcfbd3e54efc81fbd7d60d915f9af0632 Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Tue, 17 Apr 2018 11:35:14 +0200
+Subject: [PATCH] kexec.c: add guard around ENOTSUP
+
+Fix
+
+ kexec.c: In function 'main':
+ kexec.c:1515:11: error: 'ENOTSUP' undeclared
+
+Upstream-Status: Inappropriate [klibc specific]
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+
+---
+ kexec/kexec.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/kexec/kexec.c b/kexec/kexec.c
+index 313d9fe..b5a8a1e 100644
+--- a/kexec/kexec.c
++++ b/kexec/kexec.c
+@@ -1501,6 +1501,7 @@ int main(int argc, char *argv[])
+ 					 */
+ 				case -EINVAL:
+ 				case -ENOEXEC:
++#ifndef __KLIBC__
+ 					 /*
+ 					  * ENOTSUP can be unsupported image
+ 					  * type or unsupported PE signature
+@@ -1513,6 +1514,7 @@ int main(int argc, char *argv[])
+ 					  * kernel bug
+ 					  */
+ 				case -ENOTSUP:
++#endif
+ 					do_kexec_file_syscall = 0;
+ 					break;
+ 			}

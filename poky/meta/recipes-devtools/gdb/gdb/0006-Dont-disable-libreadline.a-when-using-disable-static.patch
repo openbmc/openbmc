@@ -1,7 +1,7 @@
-From 5c92ebd5e117e4cf118c984171e0703dfcfb8cd8 Mon Sep 17 00:00:00 2001
+From 5fdd42acaa965be7c420a3f2ba12b77ea503c59b Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 30 Apr 2016 15:25:03 -0700
-Subject: [PATCH 06/10] Dont disable libreadline.a when using --disable-static
+Subject: [PATCH 06/11] Dont disable libreadline.a when using --disable-static
 
 If gdb is configured with --disable-static then this is dutifully passed to
 readline which then disables libreadline.a, which causes a problem when gdb
@@ -19,7 +19,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/Makefile.def b/Makefile.def
-index 0d13f037d0..8bcd86e13f 100644
+index 75063b6d12..c27bbe4d28 100644
 --- a/Makefile.def
 +++ b/Makefile.def
 @@ -105,7 +105,8 @@ host_modules= { module= libiconv;
@@ -33,7 +33,7 @@ index 0d13f037d0..8bcd86e13f 100644
  host_modules= { module= sim; };
  host_modules= { module= texinfo; no_install= true; };
 diff --git a/Makefile.in b/Makefile.in
-index 3acb83b8de..e348907128 100644
+index 7814fe745f..3b0dc7cbb0 100644
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -25470,7 +25470,7 @@ configure-readline:
@@ -46,5 +46,5 @@ index 3acb83b8de..e348907128 100644
  @endif readline
  
 -- 
-2.13.1
+2.18.0
 

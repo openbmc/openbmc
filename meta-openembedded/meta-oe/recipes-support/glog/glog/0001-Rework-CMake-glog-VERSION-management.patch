@@ -1,0 +1,71 @@
+From 4ea11e0d7c0575316a6ccc07a931164ca29c3d2f Mon Sep 17 00:00:00 2001
+From: Corentin Le Molgat <corentinl@google.com>
+Date: Mon, 29 Jan 2018 14:59:08 +0100
+Subject: [PATCH] Rework CMake glog VERSION management.
+
+- Use of Project version properties instead of custom variables
+- fix missmatch between VERSION (build version) and SOVERSION (API version)
+src: https://cmake.org/cmake/help/latest/prop_tgt/VERSION.html#prop_tgt:VERSION
+
+Upstream-Status: Backport [https://github.com/google/glog/commit/6b6e38a7d53fe01f42ce34384cf4ba4c50e8cb65]
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ CMakeLists.txt | 23 ++++++++---------------
+ 1 file changed, 8 insertions(+), 15 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7415eab..fb4e408 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -8,23 +8,16 @@ if (POLICY CMP0063)
+   cmake_policy (SET CMP0063 NEW)
+ endif (POLICY CMP0063)
+ 
+-project (google-glog)
++project(glog VERSION 0.3.5 LANGUAGES C CXX)
+ 
+ enable_testing ()
+ 
+-set (GLOG_MAJOR_VERSION 0)
+-set (GLOG_MINOR_VERSION 3)
+-set (GLOG_PATCH_VERSION 5)
+-
+-set (GLOG_VERSION
+-  ${GLOG_MAJOR_VERSION}.${GLOG_MINOR_VERSION}.${GLOG_PATCH_VERSION})
+-
+ set (CPACK_PACKAGE_NAME glog)
+ set (CPACK_PACKAGE_DESCRIPTION_SUMMARY "")
+-set (CPACK_PACKAGE_VERSION_MAJOR ${GLOG_MAJOR_VERSION})
+-set (CPACK_PACKAGE_VERSION_MINOR ${GLOG_MINOR_VERSION})
+-set (CPACK_PACKAGE_VERSION_PATCH ${GLOG_PATCH_VERSION})
+-set (CPACK_PACKAGE_VERSION ${GLOG_VERSION})
++set (CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
++set (CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
++set (CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
++set (CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+ 
+ option (WITH_GFLAGS "Use gflags" ON)
+ option (WITH_THREADS "Enable multithreading support" ON)
+@@ -406,8 +399,8 @@ if (gflags_FOUND)
+   endif (NOT BUILD_SHARED_LIBS)
+ endif (gflags_FOUND)
+ 
+-set_target_properties (glog PROPERTIES VERSION ${GLOG_MAJOR_VERSION})
+-set_target_properties (glog PROPERTIES SOVERSION ${GLOG_VERSION})
++set_target_properties (glog PROPERTIES VERSION ${PROJECT_VERSION})
++set_target_properties (glog PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
+ 
+ if (WIN32)
+   target_compile_definitions (glog PUBLIC GLOG_NO_ABBREVIATED_SEVERITIES)
+@@ -570,7 +563,7 @@ configure_package_config_file (glog-config.cmake.in
+   NO_CHECK_REQUIRED_COMPONENTS_MACRO)
+ 
+ write_basic_package_version_file (glog-config-version.cmake VERSION
+-  ${GLOG_VERSION} COMPATIBILITY SameMajorVersion)
++  ${PROJECT_VERSION} COMPATIBILITY SameMajorVersion)
+ 
+ export (TARGETS glog NAMESPACE glog:: FILE glog-targets.cmake)
+ export (PACKAGE glog)
+-- 
+2.17.1
+

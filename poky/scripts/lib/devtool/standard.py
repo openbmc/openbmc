@@ -66,7 +66,7 @@ def add(args, config, basepath, workspace):
             args.srctree = args.recipename
             args.recipename = None
         elif os.path.isdir(args.recipename):
-            logger.warn('Ambiguous argument "%s" - assuming you mean it to be the recipe name' % args.recipename)
+            logger.warning('Ambiguous argument "%s" - assuming you mean it to be the recipe name' % args.recipename)
 
     if not args.fetchuri:
         if args.srcrev:
@@ -82,7 +82,7 @@ def add(args, config, basepath, workspace):
         if args.fetchuri:
             raise DevtoolError('URI specified as positional argument as well as -f/--fetch')
         else:
-            logger.warn('-f/--fetch option is deprecated - you can now simply specify the URL to fetch as a positional argument instead')
+            logger.warning('-f/--fetch option is deprecated - you can now simply specify the URL to fetch as a positional argument instead')
             args.fetchuri = args.fetch
 
     if args.recipename:
@@ -217,7 +217,7 @@ def add(args, config, basepath, workspace):
             raise DevtoolError('Command \'%s\' did not create any recipe file:\n%s' % (e.command, e.stdout))
         attic_recipe = os.path.join(config.workspace_path, 'attic', recipename, os.path.basename(recipefile))
         if os.path.exists(attic_recipe):
-            logger.warn('A modified recipe from a previous invocation exists in %s - you may wish to move this over the top of the new recipe if you had changes in it that you want to continue with' % attic_recipe)
+            logger.warning('A modified recipe from a previous invocation exists in %s - you may wish to move this over the top of the new recipe if you had changes in it that you want to continue with' % attic_recipe)
     finally:
         if tmpsrcdir and os.path.exists(tmpsrcdir):
             shutil.rmtree(tmpsrcdir)
@@ -295,7 +295,7 @@ def add(args, config, basepath, workspace):
                     with open(layerconf_file, 'a') as f:
                         f.write('%s = "%s"\n' % (preferred_provider, recipe_name))
                 else:
-                    logger.warn('Set \'%s\' in order to use the recipe' % preferred_provider)
+                    logger.warning('Set \'%s\' in order to use the recipe' % preferred_provider)
                 break
 
         _add_md5(config, recipename, appendfile)
@@ -704,7 +704,7 @@ def _check_preserve(config, recipename):
                     if splitline[2] != md5:
                         bb.utils.mkdirhier(preservepath)
                         preservefile = os.path.basename(removefile)
-                        logger.warn('File %s modified since it was written, preserving in %s' % (preservefile, preservepath))
+                        logger.warning('File %s modified since it was written, preserving in %s' % (preservefile, preservepath))
                         shutil.move(removefile, os.path.join(preservepath, preservefile))
                     else:
                         os.remove(removefile)
@@ -795,7 +795,7 @@ def modify(args, config, basepath, workspace):
                 if branchname.startswith(override_branch_prefix):
                     branches.append(branchname)
             if branches:
-                logger.warn('SRC_URI is conditionally overridden in this recipe, thus several %s* branches have been created, one for each override that makes changes to SRC_URI. It is recommended that you make changes to the %s branch first, then checkout and rebase each %s* branch and update any unique patches there (duplicates on those branches will be ignored by devtool finish/update-recipe)' % (override_branch_prefix, args.branch, override_branch_prefix))
+                logger.warning('SRC_URI is conditionally overridden in this recipe, thus several %s* branches have been created, one for each override that makes changes to SRC_URI. It is recommended that you make changes to the %s branch first, then checkout and rebase each %s* branch and update any unique patches there (duplicates on those branches will be ignored by devtool finish/update-recipe)' % (override_branch_prefix, args.branch, override_branch_prefix))
             branches.insert(0, args.branch)
             seen_patches = []
             for branch in branches:
@@ -1720,7 +1720,7 @@ def update_recipe(args, config, basepath, workspace):
         if updated:
             rf = rd.getVar('FILE')
             if rf.startswith(config.workspace_path):
-                logger.warn('Recipe file %s has been updated but is inside the workspace - you will need to move it (and any associated files next to it) out to the desired layer before using "devtool reset" in order to keep any changes' % rf)
+                logger.warning('Recipe file %s has been updated but is inside the workspace - you will need to move it (and any associated files next to it) out to the desired layer before using "devtool reset" in order to keep any changes' % rf)
     finally:
         tinfoil.shutdown()
 
@@ -1803,7 +1803,7 @@ def _reset(recipes, no_clean, config, basepath, workspace):
             if os.path.exists(origdir):
                 for root, dirs, files in os.walk(origdir):
                     for fn in files:
-                        logger.warn('Preserving %s in %s' % (fn, preservepath))
+                        logger.warning('Preserving %s in %s' % (fn, preservepath))
                         _move_file(os.path.join(origdir, fn),
                                    os.path.join(preservepath, fn))
                     for dn in dirs:

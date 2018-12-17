@@ -1,0 +1,30 @@
+From 92e63699ea83074298971b0251f002562be4dbd3 Mon Sep 17 00:00:00 2001
+From: Alistair Francis <alistair.francis@wdc.com>
+Date: Mon, 10 Sep 2018 13:23:37 -0700
+Subject: [PATCH 2/3] pmempool: Remove unused __USE_UNIX98 define
+
+Remove the unused __USE_UNIX98 to fix musl build failures.
+
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Upstream-Status: Pending
+---
+ src/tools/pmempool/info.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/src/tools/pmempool/info.c b/src/tools/pmempool/info.c
+index b4010bf35..7b890a123 100644
+--- a/src/tools/pmempool/info.c
++++ b/src/tools/pmempool/info.c
+@@ -45,9 +45,6 @@
+ #include <inttypes.h>
+ #include <assert.h>
+ #include <sys/param.h>
+-#ifndef __FreeBSD__
+-#define __USE_UNIX98
+-#endif
+ #include <unistd.h>
+ #include <sys/mman.h>
+ 
+-- 
+2.17.1
+

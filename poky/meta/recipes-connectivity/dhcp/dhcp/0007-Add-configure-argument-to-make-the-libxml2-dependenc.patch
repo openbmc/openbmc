@@ -15,13 +15,13 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  configure.ac | 11 +++++++++++
  1 file changed, 11 insertions(+)
 
-diff --git a/configure.ac b/configure.ac
-index 44fb57e..8e9f509 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -611,6 +611,17 @@ AC_CHECK_FUNCS(strlcat)
- # For HP/UX we need -lipv6 for if_nametoindex, perhaps others.
- AC_SEARCH_LIBS(if_nametoindex, [ipv6])
+Index: dhcp-4.4.1/configure.ac
+===================================================================
+--- dhcp-4.4.1.orig/configure.ac
++++ dhcp-4.4.1/configure.ac
+@@ -642,6 +642,17 @@ if test "$have_nanosleep" = "rt"; then
+ 	LIBS="-lrt $LIBS"
+ fi
  
 +AC_ARG_WITH(libxml2,
 +	AS_HELP_STRING([--with-libxml2], [link against libxml2. this is needed if bind was built with xml2 support enabled]),
@@ -37,6 +37,26 @@ index 44fb57e..8e9f509 100644
  # check for /dev/random (declares HAVE_DEV_RANDOM)
  AC_MSG_CHECKING(for random device)
  AC_ARG_WITH(randomdev,
--- 
-1.8.3.1
-
+Index: dhcp-4.4.1/configure.ac+lt
+===================================================================
+--- dhcp-4.4.1.orig/configure.ac+lt
++++ dhcp-4.4.1/configure.ac+lt
+@@ -909,6 +909,18 @@ elif test "$want_libtool" = "yes" -a "$u
+ fi
+ AM_CONDITIONAL(INSTALL_BIND, test "$want_install_bind" = "yes")
+ 
++AC_ARG_WITH(libxml2,
++	AS_HELP_STRING([--with-libxml2], [link against libxml2. this is needed if bind was built with xml2 support enabled]),
++	with_libxml2="$withval", with_libxml2="no")
++
++if test x$with_libxml2 != xno; then
++	AC_SEARCH_LIBS(xmlTextWriterStartElement, [xml2],,
++		[if test x$with_libxml2 != xauto; then
++			AC_MSG_FAILURE([*** Cannot find xmlTextWriterStartElement with -lxml2 and libxml2 was requested])
++		fi])
++fi
++
++
+ # OpenLDAP support.
+ AC_ARG_WITH(ldap,
+     AS_HELP_STRING([--with-ldap],[enable OpenLDAP support in dhcpd (default is no)]),

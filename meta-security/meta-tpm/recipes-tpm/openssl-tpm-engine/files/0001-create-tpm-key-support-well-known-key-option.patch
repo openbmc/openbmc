@@ -8,20 +8,20 @@ Add "-z" option to select well known password in create_tpm_key tool.
 
 Signed-off-by: Junxian.Xiao <Junxian.Xiao@windriver.com>
 
-diff --git a/create_tpm_key.c b/create_tpm_key.c
-index fee917f..7b94d62 100644
---- a/create_tpm_key.c
-+++ b/create_tpm_key.c
-@@ -46,6 +46,8 @@
- #include <trousers/tss.h>
- #include <trousers/trousers.h>
+Index: git/src/create_tpm_key.c
+===================================================================
+--- git.orig/src/create_tpm_key.c
++++ git/src/create_tpm_key.c
+@@ -48,6 +48,8 @@
+ 
+ #include "ssl_compat.h"
  
 +#define TPM_WELL_KNOWN_KEY_LEN 20   /*well know key length is 20 bytes zero*/
 +
  #define print_error(a,b) \
  	fprintf(stderr, "%s:%d %s result: 0x%x (%s)\n", __FILE__, __LINE__, \
  		a, b, Trspi_Error_String(b))
-@@ -70,6 +72,7 @@ usage(char *argv0)
+@@ -72,6 +74,7 @@ usage(char *argv0)
  		"\t\t-e|--enc-scheme  encryption scheme to use [PKCSV15] or OAEP\n"
  		"\t\t-q|--sig-scheme  signature scheme to use [DER] or SHA1\n"
  		"\t\t-s|--key-size    key size in bits [2048]\n"
@@ -29,7 +29,7 @@ index fee917f..7b94d62 100644
  		"\t\t-a|--auth        require a password for the key [NO]\n"
  		"\t\t-p|--popup       use TSS GUI popup dialogs to get the password "
  		"for the\n\t\t\t\t key [NO] (implies --auth)\n"
-@@ -147,6 +150,7 @@ int main(int argc, char **argv)
+@@ -154,6 +157,7 @@ int main(int argc, char **argv)
  	int		asn1_len;
  	char		*filename, c, *openssl_key = NULL;
  	int		option_index, auth = 0, popup = 0, wrap = 0;
@@ -37,7 +37,7 @@ index fee917f..7b94d62 100644
  	UINT32		enc_scheme = TSS_ES_RSAESPKCSV15;
  	UINT32		sig_scheme = TSS_SS_RSASSAPKCS1V15_DER;
  	UINT32		key_size = 2048;
-@@ -154,12 +158,15 @@ int main(int argc, char **argv)
+@@ -161,12 +165,15 @@ int main(int argc, char **argv)
  
  	while (1) {
  		option_index = 0;
@@ -54,7 +54,7 @@ index fee917f..7b94d62 100644
  			case 'a':
  				initFlags |= TSS_KEY_AUTHORIZATION;
  				auth = 1;
-@@ -293,6 +300,8 @@ int main(int argc, char **argv)
+@@ -300,6 +307,8 @@ int main(int argc, char **argv)
  
  	if (srk_authusage) {
  		char *authdata = calloc(1, 128);
@@ -63,7 +63,7 @@ index fee917f..7b94d62 100644
  
  		if (!authdata) {
  			fprintf(stderr, "malloc failed.\n");
-@@ -309,17 +318,26 @@ int main(int argc, char **argv)
+@@ -316,17 +325,26 @@ int main(int argc, char **argv)
  			exit(result);
  		}
  

@@ -31,6 +31,8 @@ SRC_URI = "${GNU_MIRROR}/mtools/mtools-${PV}.tar.bz2 \
            file://mtools-makeinfo.patch \
            file://no-x11.gplv3.patch \
            file://0001-Continue-even-if-fs-size-is-not-divisible-by-sectors.patch \
+           file://0001-remove-LOCK_NB-to-use-blocking-request.patch \
+           file://clang_UNUSED.patch \
            "
 
 SRC_URI_append_class-native = " file://disable-hardcoded-configs.patch"

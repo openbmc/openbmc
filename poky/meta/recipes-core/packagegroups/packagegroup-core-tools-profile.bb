@@ -18,7 +18,6 @@ PROFILE_TOOLS_SYSTEMD = "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'sys
 
 RRECOMMENDS_${PN} = "\
     ${PERF} \
-    trace-cmd \
     blktrace \
     ${PROFILE_TOOLS_X} \
     ${PROFILE_TOOLS_SYSTEMD} \
@@ -34,6 +33,7 @@ PERF_libc-musl = ""
 SYSTEMTAP = "systemtap"
 SYSTEMTAP_libc-musl = ""
 SYSTEMTAP_nios2 = ""
+SYSTEMTAP_riscv64 = ""
 
 # lttng-ust uses sched_getcpu() which is not there on for some platforms.
 LTTNGUST = "lttng-ust"
@@ -45,6 +45,7 @@ LTTNGTOOLS_libc-musl = ""
 LTTNGTOOLS_riscv64 = ""
 
 LTTNGMODULES = "lttng-modules"
+LTTNGMODULES_riscv64 = ""
 
 BABELTRACE = "babeltrace"
 
@@ -54,12 +55,15 @@ VALGRIND = "valgrind"
 VALGRIND_libc-musl = ""
 VALGRIND_mipsarch = ""
 VALGRIND_nios2 = ""
+VALGRIND_arc = ""
 VALGRIND_armv4 = ""
 VALGRIND_armv5 = ""
 VALGRIND_armv6 = ""
 VALGRIND_armeb = ""
 VALGRIND_aarch64 = ""
+VALGRIND_riscv64 = ""
 VALGRIND_linux-gnux32 = ""
+VALGRIND_linux-gnun32 = ""
 
 RDEPENDS_${PN} = "\
     ${PROFILETOOLS} \

@@ -5,43 +5,28 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 INHIBIT_DEFAULT_DEPS = "1"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
+python () {
+    # The device trees must be populated in the deploy directory to correctly
+    # detect them and their names. This means that this recipe needs to depend
+    # on those deployables just like the image recipe does.
+    deploydeps = ["virtual/kernel"]
+    for i in (d.getVar("MACHINE_ESSENTIAL_EXTRA_RDEPENDS") or "").split():
+        if i != d.getVar("BPN"):
+            deploydeps.append(i)
+    for i in (d.getVar("EXTRA_IMAGEDEPENDS") or "").split():
+        if i != d.getVar("BPN"):
+            deploydeps.append(i)
+
+    # add as DEPENDS since the targets might not have do_deploy tasks
+    if len(deploydeps) != 0:
+        d.appendVar("DEPENDS", " " + " ".join(deploydeps))
+}
+
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE_zynq = ".*"
 COMPATIBLE_MACHINE_zynqmp = ".*"
 
-inherit deploy
-
-def bootfiles_bitstream(d):
-    expectedfiles = [("bitstream", True)]
-    expectedexts = [(".bit", True), (".bin", False)]
-    # search for bitstream paths, use the renamed file. First matching is used
-    for f in (d.getVar("IMAGE_BOOT_FILES") or "").split():
-        sf, rf = f, f
-        if ';' in f:
-            sf, rf = f.split(';')
-
-        # skip boot.bin and u-boot.bin, it is not a bitstream
-        skip = ["boot.bin", "u-boot.bin"]
-        if sf in skip or rf in skip:
-            continue
-
-        for e, t in expectedfiles:
-            if sf == e or rf == e:
-                return rf, t
-        for e, t in expectedexts:
-            if sf.endswith(e) or rf.endswith(e):
-                return rf, t
-    return "", False
-
-def bootfiles_dtb_filepath(d):
-    if d.getVar("IMAGE_BOOT_FILES"):
-        dtbs = d.getVar("IMAGE_BOOT_FILES").split(" ")
-        # IMAGE_BOOT_FILES has extra renaming info in the format '<source>;<target>'
-        dtbs = [f.split(";")[0] for f in dtbs]
-        dtbs = [f for f in dtbs if f.endswith(".dtb")]
-        if len(dtbs) != 0:
-            return dtbs[0]
-    return ""
+inherit deploy image-wic-utils
 
 def uboot_boot_cmd(d):
     if d.getVar("KERNEL_IMAGETYPE") in ["uImage", "fitImage"]:
@@ -61,7 +46,7 @@ def uenv_populate(d):
     env["kernel_image"] = d.getVar("KERNEL_IMAGETYPE")
     env["kernel_load_address"] = d.getVar("KERNEL_LOAD_ADDRESS")
 
-    env["devicetree_image"] = bootfiles_dtb_filepath(d)
+    env["devicetree_image"] = boot_files_dtb_filepath(d)
     env["devicetree_load_address"] = d.getVar("DEVICETREE_LOAD_ADDRESS")
 
     env["bootargs"] = d.getVar("KERNEL_BOOTARGS")
@@ -73,7 +58,7 @@ def uenv_populate(d):
     # default uenvcmd does not load bitstream
     env["uenvcmd"] = "run bootkernel"
 
-    bitstream, bitstreamtype = bootfiles_bitstream(d)
+    bitstream, bitstreamtype = boot_files_bitstream(d)
     if bitstream:
         env["bitstream_image"] = bitstream
         env["bitstream_load_address"] = "0x100000"

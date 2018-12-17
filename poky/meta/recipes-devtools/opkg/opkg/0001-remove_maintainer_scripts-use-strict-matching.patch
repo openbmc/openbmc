@@ -1,0 +1,56 @@
+From 55c4ad666e76281bdd0db55fa6f4ab2744fea7e4 Mon Sep 17 00:00:00 2001
+From: Alejandro del Castillo <alejandro.delcastillo@ni.com>
+Date: Tue, 4 Sep 2018 18:06:00 -0500
+Subject: [PATCH] remove_maintainer_scripts: use strict matching
+
+The function is using a glob to select which metadata files needs to be
+deleted during package removal, on the info_dir. However, the glob may
+match metadata files from packages with similar names. For example,
+during removal of package glibc-binary-localedata-de-at, the current
+logic was also removing the metadata for
+glibc-binary-localedata-de-at.iso-8859-1. Add check for an exact match
+before deletion.
+
+Fixes bugzilla: 12905
+
+Upstream-Status: Submitted [https://groups.google.com/forum/#!topic/opkg-devel/Fr40Yt0NBno]
+Signed-off-by: Alejandro del Castillo <alejandro.delcastillo@ni.com>
+---
+ libopkg/opkg_remove.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/libopkg/opkg_remove.c b/libopkg/opkg_remove.c
+index 82125fa..3936628 100644
+--- a/libopkg/opkg_remove.c
++++ b/libopkg/opkg_remove.c
+@@ -137,7 +137,7 @@ void remove_maintainer_scripts(pkg_t * pkg)
+ {
+     unsigned int i;
+     int err;
+-    char *globpattern;
++    char *globpattern, *filename, *lastdot;
+     glob_t globbuf;
+ 
+     if (opkg_config->noaction)
+@@ -151,8 +151,16 @@ void remove_maintainer_scripts(pkg_t * pkg)
+         return;
+ 
+     for (i = 0; i < globbuf.gl_pathc; i++) {
+-        opkg_msg(INFO, "Deleting %s.\n", globbuf.gl_pathv[i]);
+-        unlink(globbuf.gl_pathv[i]);
++        filename = xstrdup(basename(globbuf.gl_pathv[i]));
++        lastdot = strrchr(filename, '.');
++        *lastdot = '\0';
++        // Only delete files that match the package name (the glob may match files
++        // with similar names)
++        if (!strcmp(filename, pkg->name)) {
++            opkg_msg(INFO, "Deleting %s.\n", globbuf.gl_pathv[i]);
++            unlink(globbuf.gl_pathv[i]);
++        }
++        free(filename);
+     }
+     globfree(&globbuf);
+ }
+-- 
+2.18.0
+

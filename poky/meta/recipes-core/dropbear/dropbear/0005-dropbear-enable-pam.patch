@@ -3,7 +3,7 @@ From: Jussi Kukkonen <jussi.kukkonen@intel.com>
 Date: Wed, 2 Dec 2015 11:36:02 +0200
 Subject: Enable pam
 
-We need modify file option.h besides enabling pam in
+We need modify file default_options.h besides enabling pam in
 configure if we want dropbear to support pam.
 
 Upstream-Status: Pending
@@ -11,26 +11,32 @@ Upstream-Status: Pending
 Signed-off-by: Xiaofeng Yan <xiaofeng.yan@windriver.com>
 Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
 ---
- options.h | 4 ++--
+ default_options.h | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/options.h b/options.h
-index 94261f6..90bfe2f 100644
---- a/options.h
-+++ b/options.h
-@@ -208,10 +208,10 @@ If you test it please contact the Dropbear author */
+diff --git a/default_options.h b/default_options.h
+index 3b75eb8..8617cd0 100644
+--- a/default_options.h
++++ b/default_options.h
+@@ -179,7 +179,7 @@ group1 in Dropbear server too */
  
- /* This requires crypt() */
- #ifdef HAVE_CRYPT
--#define ENABLE_SVR_PASSWORD_AUTH
-+/*#define ENABLE_SVR_PASSWORD_AUTH*/
- #endif
- /* PAM requires ./configure --enable-pam */
--/*#define ENABLE_SVR_PAM_AUTH */
-+#define ENABLE_SVR_PAM_AUTH
- #define ENABLE_SVR_PUBKEY_AUTH
+ /* Authentication Types - at least one required.
+    RFC Draft requires pubkey auth, and recommends password */
+-#define DROPBEAR_SVR_PASSWORD_AUTH 1
++#define DROPBEAR_SVR_PASSWORD_AUTH 0
  
- /* Whether to take public key options in 
+ /* Note: PAM auth is quite simple and only works for PAM modules which just do
+  * a simple "Login: " "Password: " (you can edit the strings in svr-authpam.c).
+@@ -187,7 +187,7 @@ group1 in Dropbear server too */
+  * but there's an interface via a PAM module. It won't work for more complex
+  * PAM challenge/response.
+  * You can't enable both PASSWORD and PAM. */
+-#define DROPBEAR_SVR_PAM_AUTH 0
++#define DROPBEAR_SVR_PAM_AUTH 1
+ 
+ /* ~/.ssh/authorized_keys authentication */
+ #define DROPBEAR_SVR_PUBKEY_AUTH 1
+ 
 -- 
 2.1.4
 

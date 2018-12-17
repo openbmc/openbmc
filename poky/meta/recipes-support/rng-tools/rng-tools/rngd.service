@@ -1,5 +1,8 @@
 [Unit]
 Description=Hardware RNG Entropy Gatherer Daemon
+DefaultDependencies=no
+After=systemd-udev-settle.service
+Before=sysinit.target
 
 [Service]
 ExecStart=@SBINDIR@/rngd -f -r /dev/urandom

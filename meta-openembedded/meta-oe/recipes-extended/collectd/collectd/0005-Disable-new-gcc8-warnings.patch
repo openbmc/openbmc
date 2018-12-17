@@ -1,0 +1,65 @@
+From d65e48b68076d5b304e6d865967003ae1fea0e6c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 9 May 2018 21:45:38 -0700
+Subject: [PATCH] Disable new gcc8 warnings
+
+GCC seems to be not able to detect the checks for size are
+already in place
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted [https://github.com/collectd/collectd/pull/2768]
+ src/libcollectdclient/network_parse.c | 7 +++++++
+ src/write_sensu.c                     | 7 +++++++
+ 2 files changed, 14 insertions(+)
+
+diff --git a/src/libcollectdclient/network_parse.c b/src/libcollectdclient/network_parse.c
+index 2365ab0a..79e6ed96 100644
+--- a/src/libcollectdclient/network_parse.c
++++ b/src/libcollectdclient/network_parse.c
+@@ -163,6 +163,11 @@ static int parse_int(void *payload, size_t payload_size, uint64_t *out) {
+   return 0;
+ }
+ 
++#pragma GCC diagnostic push
++#if __GNUC__ == 8
++#pragma GCC diagnostic ignored "-Wstringop-truncation"
++#endif
++
+ static int parse_string(void *payload, size_t payload_size, char *out,
+                         size_t out_size) {
+   char *in = payload;
+@@ -175,6 +180,8 @@ static int parse_string(void *payload, size_t payload_size, char *out,
+   return 0;
+ }
+ 
++#pragma GCC diagnostic pop
++
+ static int parse_identifier(uint16_t type, void *payload, size_t payload_size,
+                             lcc_value_list_t *state) {
+   char buf[LCC_NAME_LEN];
+diff --git a/src/write_sensu.c b/src/write_sensu.c
+index ce23e654..63e1f599 100644
+--- a/src/write_sensu.c
++++ b/src/write_sensu.c
+@@ -569,6 +569,11 @@ static char *sensu_value_to_json(struct sensu_host const *host, /* {{{ */
+   return ret_str;
+ } /* }}} char *sensu_value_to_json */
+ 
++#pragma GCC diagnostic push
++#if __GNUC__ == 8
++#pragma GCC diagnostic ignored "-Wstringop-overflow"
++#pragma GCC diagnostic ignored "-Wstringop-truncation"
++#endif
+ /*
+  * Uses replace_str2() implementation from
+  * http://creativeandcritical.net/str-replace-c/
+@@ -631,6 +636,8 @@ static char *replace_str(const char *str, const char *old, /* {{{ */
+   return ret;
+ } /* }}} char *replace_str */
+ 
++#pragma GCC diagnostic pop
++
+ static char *replace_json_reserved(const char *message) /* {{{ */
+ {
+   char *msg = replace_str(message, "\\", "\\\\");

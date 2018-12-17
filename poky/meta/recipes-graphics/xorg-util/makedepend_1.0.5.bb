@@ -10,7 +10,7 @@ directives would be used in a compilation. Any #include, directives \
 can reference files having other #include directives, and parsing will \
 occur in these files as well."
 
-DEPENDS = "xproto util-macros"
+DEPENDS = "xorgproto util-macros"
 PE = "1"
 
 BBCLASSEXTEND = "native"

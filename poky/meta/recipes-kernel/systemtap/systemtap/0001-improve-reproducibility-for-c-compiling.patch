@@ -1,0 +1,31 @@
+From 6288ba5df0a8c73ef842b609081449ac4de86123 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 18 Jul 2018 16:58:33 +0800
+Subject: [PATCH] improve reproducibility for c++ compiling
+
+Use relative dir to include header string_ref to
+strip build path prefix in c++ object file
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ stringtable.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/stringtable.h b/stringtable.h
+index 5fc42e7..6fd8a1e 100644
+--- a/stringtable.h
++++ b/stringtable.h
+@@ -19,7 +19,7 @@
+ 
+ #if defined(HAVE_BOOST_UTILITY_STRING_REF_HPP)
+ #include <boost/version.hpp>
+-#include <boost/utility/string_ref.hpp> //header with string_ref
++#include "@RELATIVE_STAGING_INCDIR@/boost/utility/string_ref.hpp" //header with string_ref
+ 
+ // XXX: experimental tunables
+ #define INTERNED_STRING_FIND_MEMMEM 1 /* perf stat indicates a very slight benefit */
+-- 
+2.7.4
+

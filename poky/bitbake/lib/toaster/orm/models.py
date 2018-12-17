@@ -121,8 +121,15 @@ class ToasterSetting(models.Model):
 
 
 class ProjectManager(models.Manager):
-    def create_project(self, name, release):
-        if release is not None:
+    def create_project(self, name, release, existing_project=None):
+        if existing_project and (release is not None):
+            prj = existing_project
+            prj.bitbake_version = release.bitbake_version
+            prj.release = release
+            # Delete the previous ProjectLayer mappings
+            for pl in ProjectLayer.objects.filter(project=prj):
+                pl.delete()
+        elif release is not None:
             prj = self.model(name=name,
                              bitbake_version=release.bitbake_version,
                              release=release)
@@ -130,15 +137,14 @@ class ProjectManager(models.Manager):
             prj = self.model(name=name,
                              bitbake_version=None,
                              release=None)
-
         prj.save()
 
         for defaultconf in ToasterSetting.objects.filter(
                 name__startswith="DEFCONF_"):
             name = defaultconf.name[8:]
-            ProjectVariable.objects.create(project=prj,
-                                           name=name,
-                                           value=defaultconf.value)
+            pv,create = ProjectVariable.objects.get_or_create(project=prj,name=name)
+            pv.value = defaultconf.value
+            pv.save()
 
         if release is None:
             return prj
@@ -196,6 +202,11 @@ class Project(models.Model):
     # hard links to possibly missing models
     user_id = models.IntegerField(null=True)
     objects = ProjectManager()
+
+    # build directory override (e.g. imported)
+    builddir = models.TextField()
+    # merge the Toaster configure attributes directly into the standard conf files
+    merged_attr = models.BooleanField(default=False)
 
     # set to True for the project which is the default container
     # for builds initiated by the command line etc.
@@ -305,6 +316,15 @@ class Project(models.Model):
             return layer_versions
 
 
+    def get_default_image_recipe(self):
+        try:
+            return self.projectvariable_set.get(name="DEFAULT_IMAGE").value
+        except (ProjectVariable.DoesNotExist,IndexError):
+            return None;
+
+    def get_is_new(self):
+        return self.get_variable(Project.PROJECT_SPECIFIC_ISNEW)
+
     def get_available_machines(self):
         """ Returns QuerySet of all Machines which are provided by the
         Layers currently added to the Project """
@@ -352,6 +372,32 @@ class Project(models.Model):
             layer_version__in=self.get_all_compatible_layer_versions()).exclude(name__exact='')
 
         return queryset
+
+    # Project Specific status management
+    PROJECT_SPECIFIC_STATUS = 'INTERNAL_PROJECT_SPECIFIC_STATUS'
+    PROJECT_SPECIFIC_CALLBACK = 'INTERNAL_PROJECT_SPECIFIC_CALLBACK'
+    PROJECT_SPECIFIC_ISNEW = 'INTERNAL_PROJECT_SPECIFIC_ISNEW'
+    PROJECT_SPECIFIC_DEFAULTIMAGE = 'PROJECT_SPECIFIC_DEFAULTIMAGE'
+    PROJECT_SPECIFIC_NONE = ''
+    PROJECT_SPECIFIC_NEW = '1'
+    PROJECT_SPECIFIC_EDIT = '2'
+    PROJECT_SPECIFIC_CLONING = '3'
+    PROJECT_SPECIFIC_CLONING_SUCCESS = '4'
+    PROJECT_SPECIFIC_CLONING_FAIL = '5'
+
+    def get_variable(self,variable,default_value = ''):
+        try:
+            return self.projectvariable_set.get(name=variable).value
+        except (ProjectVariable.DoesNotExist,IndexError):
+            return default_value
+
+    def set_variable(self,variable,value):
+        pv,create = ProjectVariable.objects.get_or_create(project = self, name = variable)
+        pv.value = value
+        pv.save()
+
+    def get_default_image(self):
+        return self.get_variable(Project.PROJECT_SPECIFIC_DEFAULTIMAGE)
 
     def schedule_build(self):
 
@@ -458,6 +504,9 @@ class Build(models.Model):
 
     # number of repos cloned so far for this build (default off)
     repos_cloned = models.IntegerField(default=1)
+
+    # Hint on current progress item
+    progress_item = models.CharField(max_length=40)
 
     @staticmethod
     def get_recent(project=None):
@@ -1701,8 +1750,8 @@ class CustomImageRecipe(Recipe):
         if base_recipe_path:
             base_recipe = open(base_recipe_path, 'r').read()
         else:
-            raise IOError("Based on recipe file not found: %s" %
-                          base_recipe_path)
+            # Pass back None to trigger error message to user
+            return None
 
         # Add a special case for when the recipe we have based a custom image
         # recipe on requires another recipe.
@@ -1828,7 +1877,7 @@ class Distro(models.Model):
     description = models.CharField(max_length=255)
 
     def get_vcs_distro_file_link_url(self):
-        path = self.name+'.conf'
+        path = 'conf/distro/%s.conf' % self.name
         return self.layer_version.get_vcs_file_link_url(path)
 
     def __unicode__(self):

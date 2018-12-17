@@ -1,7 +1,7 @@
-From 03873af286f1dab1062f598d6deb774ce513421d Mon Sep 17 00:00:00 2001
+From a6159c9486745664a5f116ee9cc45837021b7624 Mon Sep 17 00:00:00 2001
 From: Mark Hatle <mark.hatle@windriver.com>
 Date: Thu, 18 Aug 2016 14:07:58 -0500
-Subject: [PATCH 24/27] elf/dl-deps.c: Make _dl_build_local_scope breadth first
+Subject: [PATCH] elf/dl-deps.c: Make _dl_build_local_scope breadth first
 
 According to the ELF specification:
 
@@ -24,10 +24,10 @@ Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
  1 file changed, 10 insertions(+), 4 deletions(-)
 
 diff --git a/elf/dl-deps.c b/elf/dl-deps.c
-index c975fcffd7..6ee58c74e0 100644
+index 9d9b1ba7f2..8414028c58 100644
 --- a/elf/dl-deps.c
 +++ b/elf/dl-deps.c
-@@ -72,13 +72,19 @@ _dl_build_local_scope (struct link_map **list, struct link_map *map)
+@@ -73,13 +73,19 @@ _dl_build_local_scope (struct link_map **list, struct link_map *map)
  {
    struct link_map **p = list;
    struct link_map **q;
@@ -51,6 +51,3 @@ index c975fcffd7..6ee58c74e0 100644
    return p - list;
  }
  
--- 
-2.16.1
-

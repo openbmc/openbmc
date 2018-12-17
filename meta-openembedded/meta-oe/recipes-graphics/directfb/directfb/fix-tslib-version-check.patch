@@ -1,0 +1,38 @@
+fix tslib version check in configure.in
+
+The patch makes sure that the old as well as the new tslib pkg-config
+metadata file naming style is handled correctly.
+
+tslib 0.0 to 1.0 created only a tslib-<VERSION>.pc pkg-config metadata
+file.
+
+With tslib 1.1 the tslib-<VERSION>.pc phase out was started.
+Additionally, the pkg-config metadata file tslib.pc was added.
+
+Since tslib 1.6 the tslib-<VERSION>.pc metadata file is deprecated.
+Now, there is only a tslib.pc.
+
+Upstream-Status: Inappropriate [no upstream]
+Signed-off-by: Ben Guan <ben.guan@cn.bosch.com>
+Signed-off-by: Mark Jonas <mark.jonas@de.bosch.com>
+
+diff -Nru DirectFB-1.7.7.orig/configure.in DirectFB-1.7.7/configure.in
+--- DirectFB-1.7.7.orig/configure.in	2015-02-10 01:16:46.000000000 +0800
++++ DirectFB-1.7.7/configure.in	2018-06-06 17:19:18.472143103 +0800
+@@ -2459,10 +2459,13 @@
+ 
+ enable_tslib=no
+ if test "$checkfor_tslib" = "yes"; then
+-  PKG_CHECK_MODULES([TSLIB], [tslib-1.0 >= 1.0.0], [enable_tslib=yes], [enable_tslib=no])
++  PKG_CHECK_MODULES([TSLIB], [tslib >= 1.1], [enable_tslib=yes], [enable_tslib=no])
+   if test "$enable_tslib" = "no"; then
+-     PKG_CHECK_MODULES([TSLIB], [tslib-0.0], [enable_tslib=yes], [enable_tslib=no
+-       AC_MSG_WARN([*** no tslib -- tslib driver will not be built.])])
++    PKG_CHECK_MODULES([TSLIB], [tslib-1.0 >= 1.0], [enable_tslib=yes], [enable_tslib=no])
++    if test "$enable_tslib" = "no"; then
++      PKG_CHECK_MODULES([TSLIB], [tslib-0.0], [enable_tslib=yes], [enable_tslib=no
++        AC_MSG_WARN([*** no tslib -- tslib driver will not be built.])])
++    fi
+   fi
+ fi
+ 

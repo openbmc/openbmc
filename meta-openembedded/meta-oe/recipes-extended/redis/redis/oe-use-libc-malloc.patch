@@ -11,15 +11,15 @@ jemalloc wasn't building correctly.
 
 Signed-off-by: Venture Research <tech@ventureresearch.com>
 
-Update to work with 3.0.x
-Signed-off-by: Armin Kuster <akuster808@gmail.com>
+Update to work with 4.0.8
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 
 ---
  src/Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Index: src/Makefile
-===================================================================
+diff --git a/src/Makefile b/src/Makefile
+index 86e0b3fe..a810180b 100644
 --- a/src/Makefile
 +++ b/src/Makefile
 @@ -13,7 +13,8 @@
@@ -29,6 +29,6 @@ Index: src/Makefile
 -uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
 +# use fake uname option to force use of generic libc
 +uname_S := "USE_LIBC_MALLOC"
+ uname_M := $(shell sh -c 'uname -m 2>/dev/null || echo not')
  OPTIMIZATION?=-O2
  DEPENDENCY_TARGETS=hiredis linenoise lua
- 

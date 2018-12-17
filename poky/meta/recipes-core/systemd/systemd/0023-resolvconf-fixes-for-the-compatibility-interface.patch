@@ -1,0 +1,58 @@
+systemd-239: fixes for the compatibility interface
+
+[No upstream tracking] -- https://github.com/systemd/systemd/issues/9423
+
+resolvconf-compat: use compat_main() when called as `resolvconf`,
+since the interface is closer to that of `systemd-resolve`.
+
+Use a heap allocated string to set arg_ifname, since a stack allocated
+one would be lost after the function returns. (This last one broke the
+case where an interface name was suffixed with a dot, such as in
+`resolvconf -a tap0.dhcp`.)
+
+Tested:
+  $ build/resolvconf -a nonexistent.abc </etc/resolv.conf
+  Unknown interface 'nonexistent': No such device
+
+Upstream-Status: Backport [https://github.com/systemd/systemd/commit/5a01b3f35d7b6182c78b6973db8d99bdabd4f9c3]
+bug: 9423
+Signed-off-by: Simon Ausserlechner <simon.ausserlechner@siemens.com>
+
+diff --git a/src/resolve/resolvconf-compat.c b/src/resolve/resolvconf-compat.c
+index d7e68003e..072345894 100644
+--- a/src/resolve/resolvconf-compat.c
++++ b/src/resolve/resolvconf-compat.c
+@@ -53,6 +53,8 @@ static int parse_nameserver(const char *string) {
+ 
+                 if (strv_push(&arg_set_dns, word) < 0)
+                         return log_oom();
++
++                word = NULL;
+         }
+ 
+         return 0;
+@@ -202,7 +204,7 @@ int resolvconf_parse_argv(int argc, char *argv[]) {
+ 
+         dot = strchr(argv[optind], '.');
+         if (dot) {
+-                iface = strndupa(argv[optind], dot - argv[optind]);
++                iface = strndup(argv[optind], dot - argv[optind]);
+                 log_debug("Ignoring protocol specifier '%s'.", dot + 1);
+         } else
+                 iface = argv[optind];
+diff --git a/src/resolve/resolvectl.c b/src/resolve/resolvectl.c
+index e96c13fea..e9e395e3e 100644
+--- a/src/resolve/resolvectl.c
++++ b/src/resolve/resolvectl.c
+@@ -3092,7 +3092,7 @@ int main(int argc, char **argv) {
+                 goto finish;
+         }
+ 
+-        if (streq(program_invocation_short_name, "systemd-resolve"))
++        if (STR_IN_SET(program_invocation_short_name, "systemd-resolve", "resolvconf"))
+                 r = compat_main(argc, argv, bus);
+         else
+                 r = native_main(argc, argv, bus);
+-- 
+2.11.0
+

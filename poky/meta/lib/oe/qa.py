@@ -158,7 +158,8 @@ def elf_machine_to_string(machine):
             0x2A: "SuperH",
             0x32: "IA-64",
             0x3E: "x86-64",
-            0xB7: "AArch64"
+            0xB7: "AArch64",
+            0xF7: "BPF"
         }[machine]
     except:
         return "Unknown (%s)" % repr(machine)

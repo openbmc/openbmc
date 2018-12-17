@@ -1,0 +1,133 @@
+Fixed:
+| file.c: In function 'generic_make_pathname':
+| file.c:48:13: error: 'PATH_MAX' undeclared (first use in this function); did you mean 'RAND_MAX'?
+|   if (size > PATH_MAX)
+|              ^~~~~~~~
+[snip]
+
+Upstream-Status: Pending [https://git.alpinelinux.org/cgit/aports/tree/main/nfs-utils/limits.patch?id=f6734a77d3caee73325f8cc1f77d1b5117a75096]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ support/export/export.c          | 1 +
+ support/export/xtab.c            | 1 +
+ support/misc/file.c              | 1 +
+ support/nfs/xcommon.c            | 1 +
+ support/nsm/file.c               | 1 +
+ utils/blkmapd/device-discovery.c | 1 +
+ utils/gssd/krb5_util.c           | 1 +
+ utils/mountd/cache.c             | 1 +
+ utils/mountd/mountd.c            | 1 +
+ utils/mountd/rmtab.c             | 1 +
+ 10 files changed, 10 insertions(+)
+
+diff --git a/support/export/export.c b/support/export/export.c
+--- a/support/export/export.c
++++ b/support/export/export.c
+@@ -17,6 +17,7 @@
+ #include <stdlib.h>
+ #include <dirent.h>
+ #include <errno.h>
++#include <limits.h>
+ #include "xmalloc.h"
+ #include "nfslib.h"
+ #include "exportfs.h"
+diff --git a/support/export/xtab.c b/support/export/xtab.c
+--- a/support/export/xtab.c
++++ b/support/export/xtab.c
+@@ -18,6 +18,7 @@
+ #include <sys/stat.h>
+ #include <errno.h>
+ #include <libgen.h>
++#include <limits.h>
+ 
+ #include "nfslib.h"
+ #include "exportfs.h"
+diff --git a/support/misc/file.c b/support/misc/file.c
+--- a/support/misc/file.c
++++ b/support/misc/file.c
+@@ -27,6 +27,7 @@
+ #include <dirent.h>
+ #include <stdlib.h>
+ #include <stdbool.h>
++#include <limits.h>
+ 
+ #include "xlog.h"
+ #include "misc.h"
+diff --git a/support/nfs/xcommon.c b/support/nfs/xcommon.c
+--- a/support/nfs/xcommon.c
++++ b/support/nfs/xcommon.c
+@@ -16,6 +16,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <limits.h>
+ 
+ #include "xcommon.h"
+ #include "nls.h"	/* _() */
+diff --git a/support/nsm/file.c b/support/nsm/file.c
+--- a/support/nsm/file.c
++++ b/support/nsm/file.c
+@@ -85,6 +85,7 @@
+ #include <fcntl.h>
+ #include <dirent.h>
+ #include <grp.h>
++#include <limits.h>
+ 
+ #include "xlog.h"
+ #include "nsm.h"
+diff --git a/utils/blkmapd/device-discovery.c b/utils/blkmapd/device-discovery.c
+--- a/utils/blkmapd/device-discovery.c
++++ b/utils/blkmapd/device-discovery.c
+@@ -49,6 +49,7 @@
+ #include <unistd.h>
+ #include <libgen.h>
+ #include <errno.h>
++#include <limits.h>
+ #include <libdevmapper.h>
+ 
+ #ifdef HAVE_CONFIG_H
+diff --git a/utils/gssd/krb5_util.c b/utils/gssd/krb5_util.c
+--- a/utils/gssd/krb5_util.c
++++ b/utils/gssd/krb5_util.c
+@@ -120,6 +120,7 @@
+ #endif
+ #include <krb5.h>
+ #include <rpc/auth_gss.h>
++#include <limits.h>
+ 
+ #include "gssd.h"
+ #include "err_util.h"
+diff --git a/utils/mountd/cache.c b/utils/mountd/cache.c
+--- a/utils/mountd/cache.c
++++ b/utils/mountd/cache.c
+@@ -26,6 +26,7 @@
+ #include <pwd.h>
+ #include <grp.h>
+ #include <mntent.h>
++#include <limits.h>
+ #include "misc.h"
+ #include "nfslib.h"
+ #include "exportfs.h"
+diff --git a/utils/mountd/mountd.c b/utils/mountd/mountd.c
+--- a/utils/mountd/mountd.c
++++ b/utils/mountd/mountd.c
+@@ -22,6 +22,7 @@
+ #include <fcntl.h>
+ #include <sys/resource.h>
+ #include <sys/wait.h>
++#include <limits.h>
+ 
+ #include "conffile.h"
+ #include "xmalloc.h"
+diff --git a/utils/mountd/rmtab.c b/utils/mountd/rmtab.c
+--- a/utils/mountd/rmtab.c
++++ b/utils/mountd/rmtab.c
+@@ -16,6 +16,7 @@
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
+ #include <netdb.h>
++#include <limits.h>
+ 
+ #include "misc.h"
+ #include "exportfs.h"

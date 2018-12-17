@@ -1,4 +1,4 @@
-From 47379747e34f952d31af028c672940ca7859ae3c Mon Sep 17 00:00:00 2001
+From c1c980a95d85bcaf8802524d6148783522b300d7 Mon Sep 17 00:00:00 2001
 From: Yulong Pei <Yulong.pei@windriver.com>
 Date: Wed, 21 Jul 2010 22:33:43 +0800
 Subject: [PATCH] change finding path of nss and nspr
@@ -7,66 +7,61 @@ Upstream-Status: Pending
 
 Signed-off-by: Yulong Pei <Yulong.pei@windriver.com>
 Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
-
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 ---
- configure.ac | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ configure.ac | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 3278200..6edec7d 100644
+index 951b3eb..1fdeb0f 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -644,7 +644,7 @@ if test "z$NSS_FOUND" = "zno" ; then
+@@ -866,10 +866,10 @@ MOZILLA_MIN_VERSION="1.4"
+ NSS_CRYPTO_LIB="$XMLSEC_PACKAGE-nss"
+ NSPR_PACKAGE=mozilla-nspr
+ NSS_PACKAGE=mozilla-nss
+-NSPR_INCLUDE_MARKER="nspr/nspr.h"
++NSPR_INCLUDE_MARKER="nspr.h"
+ NSPR_LIB_MARKER="libnspr4$shrext"
+ NSPR_LIBS_LIST="-lnspr4 -lplds4 -lplc4"
+-NSS_INCLUDE_MARKER="nss/nss.h"
++NSS_INCLUDE_MARKER="nss3/nss.h"
+ NSS_LIB_MARKER="libnss3$shrext"
+ NSS_LIBS_LIST="-lnss3 -lsmime3"
  
-     if test "z$with_nspr" != "z" ; then
- 	NSPR_PREFIX="$with_nspr"
--	NSPR_CFLAGS="-I$with_nspr/include -I$with_nspr/include/nspr"
-+	NSPR_CFLAGS="-I$with_nspr/usr/include -I$with_nspr/usr/include/nspr4"
- 	if test "z$with_gnu_ld" = "zyes" ; then
- 	    NSPR_LIBS="-Wl,-rpath-link -Wl,$with_nspr/lib -L$with_nspr/lib $NSPR_LIBS_LIST"
- 	else
-@@ -652,7 +652,7 @@ if test "z$NSS_FOUND" = "zno" ; then
- 	fi
- 	NSPR_INCLUDES_FOUND="yes"
- 	NSPR_LIBS_FOUND="yes"
--	NSPR_PRINIT_H="$with_nspr/include/prinit.h"
-+	NSPR_PRINIT_H="$with_nspr/usr/include/nspr4/prinit.h"
+@@ -898,24 +898,24 @@ fi
+ dnl Priority 1: User specifies the path to installation
+ if test "z$NSPR_FOUND" = "zno" -a "z$with_nspr" != "z" -a "z$with_nspr" != "zyes" ; then
+     AC_MSG_CHECKING(for nspr library installation in "$with_nspr" folder)
+-    if test -f "$with_nspr/include/$NSPR_INCLUDE_MARKER" -a -f "$with_nspr/lib/$NSPR_LIB_MARKER" ; then
+-        NSPR_INCLUDE_PATH="$with_nspr/include"
+-        NSPR_LIB_PATH="$with_nspr/lib"
++    if test -f "$with_nspr/usr/include/$NSPR_INCLUDE_MARKER" -a -f "$with_nspr/${libdir}/$NSPR_LIB_MARKER" ; then
++        NSPR_INCLUDE_PATH="$with_nspr/usr/include"
++        NSPR_LIB_PATH="$with_nspr/${libdir}"
+         NSPR_FOUND="yes"
+         AC_MSG_RESULT([yes])
      else
- 	for dir in $ac_nss_inc_dir ; do
-     	    if test -f $dir/nspr/prinit.h ; then
-@@ -690,7 +690,7 @@ if test "z$NSS_FOUND" = "zno" ; then
- 	OLD_CPPFLAGS=$CPPFLAGS
- 	CPPFLAGS="$NSPR_CFLAGS"
- 	AC_EGREP_CPP(yes,[
--    	    #include <prinit.h>
-+	    #include <nspr4/prinit.h>
-             #if PR_VMAJOR >= 4
-                yes
-             #endif
-@@ -715,7 +715,7 @@ if test "z$NSS_FOUND" = "zno" ; then
-     NSS_NSS_H=""
+-        AC_MSG_ERROR([not found: "$with_nspr/include/$NSPR_INCLUDE_MARKER" and/or "$with_nspr/lib/$NSPR_LIB_MARKER" files don't exist), typo?])
++        AC_MSG_ERROR([not found: "$with_nspr/usr/include/$NSPR_INCLUDE_MARKER" and/or "$with_nspr/${libdir}/$NSPR_LIB_MARKER" files don't exist), typo?])
+     fi
+ fi
+ if test "z$NSS_FOUND" = "zno" -a "z$with_nss" != "z" -a "z$with_nss" != "zyes" ; then
+     AC_MSG_CHECKING(for nss library installation in "$with_nss" folder)
+-    if test -f "$with_nss/include/$NSS_INCLUDE_MARKER" -a -f "$with_nss/lib/$NSS_LIB_MARKER" ; then
+-        NSS_INCLUDE_PATH="$with_nss/include"
+-        NSS_LIB_PATH="$with_nss/lib"
++    if test -f "$with_nss/usr/include/$NSS_INCLUDE_MARKER" -a -f "$with_nss/${libdir}/$NSS_LIB_MARKER" ; then
++        NSS_INCLUDE_PATH="$with_nss/usr/include/nss3"
++        NSS_LIB_PATH="$with_nss/${libdir}"
+         NSS_FOUND="yes"
+         AC_MSG_RESULT([yes])
+     else
+-        AC_MSG_ERROR([not found: "$with_nss/include/$NSS_INCLUDE_MARKER" and/or "$with_nss/lib/$NSS_LIB_MARKER" files don't exist), typo?])
++        AC_MSG_ERROR([not found: "$with_nss/usr/include/$NSS_INCLUDE_MARKER" and/or "$with_nss/${libdir}/$NSS_LIB_MARKER" files don't exist), typo?])
+     fi
+ fi
  
-     if test "z$with_nss" != "z" ; then
--	NSS_CFLAGS="$NSS_CFLAGS -I$with_nss/include -I$with_nss/include/nss"
-+	NSS_CFLAGS="$NSS_CFLAGS -I$with_nss/usr/include -I$with_nss/usr/include/nss3 -I$with_nspr/usr/include/nspr4"
- 	if test "z$with_gnu_ld" = "zyes" ; then
- 	    NSS_LIBS="$NSS_LIBS -Wl,-rpath-link -Wl,$with_nss/lib -L$with_nss/lib $NSS_LIBS_LIST"
-         else
-@@ -723,7 +723,7 @@ if test "z$NSS_FOUND" = "zno" ; then
-         fi
- 	NSS_INCLUDES_FOUND="yes"
- 	NSS_LIBS_FOUND="yes"
--	NSS_NSS_H="$with_nss/include/nss.h"
-+	NSS_NSS_H="$with_nss/usr/include/nss3/nss.h"
-     else
- 	for dir in $ac_nss_inc_dir ; do
- 	    if test -f $dir/nss/nss.h ; then
-@@ -761,7 +761,7 @@ if test "z$NSS_FOUND" = "zno" ; then
-        OLD_CPPFLAGS=$CPPFLAGS
-        CPPFLAGS="$NSPR_CFLAGS $NSS_CFLAGS"
-        AC_EGREP_CPP(yes,[
--          #include <nss.h>
-+	  #include <nss3/nss.h>
-           #if NSS_VMAJOR >= 3 && NSS_VMINOR >= 2
-              yes
-           #endif
+-- 
+2.7.4
+

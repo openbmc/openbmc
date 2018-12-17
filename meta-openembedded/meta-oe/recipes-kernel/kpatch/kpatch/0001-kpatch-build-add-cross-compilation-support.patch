@@ -1,4 +1,4 @@
-From a9a80a1f4df65892a0269295ce8a64b06f2ff61d Mon Sep 17 00:00:00 2001
+From 70de3fecbc551907c4fd504cfff385c73be8db75 Mon Sep 17 00:00:00 2001
 From: Ruslan Bilovol <rbilovol@cisco.com>
 Date: Tue, 19 Dec 2017 15:59:04 +0200
 Subject: [PATCH] kpatch-build: add cross-compilation support
@@ -17,16 +17,17 @@ possible to pass multy-component strings like
 Upstream-Status: Pending
 
 Signed-off-by: Ruslan Bilovol <rbilovol@cisco.com>
+
 ---
  kpatch-build/kpatch-build | 13 +++++++++++--
  kpatch-build/kpatch-gcc   |  4 ++--
  2 files changed, 13 insertions(+), 4 deletions(-)
 
 diff --git a/kpatch-build/kpatch-build b/kpatch-build/kpatch-build
-index 166ecbd..af24cc4 100755
+index a76913f..4a011aa 100755
 --- a/kpatch-build/kpatch-build
 +++ b/kpatch-build/kpatch-build
-@@ -195,7 +195,7 @@ gcc_version_check() {
+@@ -197,7 +197,7 @@ gcc_version_check() {
  	# gcc --version varies between distributions therefore extract version
  	# by compiling a test file and compare it to vmlinux's version.
  	echo 'void main(void) {}' > "$c"
@@ -35,7 +36,7 @@ index 166ecbd..af24cc4 100755
  	gccver="$(gcc_version_from_file "$o")"
  	kgccver="$(gcc_version_from_file "$VMLINUX")"
  	rm -f "$c" "$o"
-@@ -381,12 +381,14 @@ usage() {
+@@ -392,12 +392,14 @@ usage() {
  	echo "		-d, --debug        Enable 'xtrace' and keep scratch files" >&2
  	echo "		                   in <CACHEDIR>/tmp" >&2
  	echo "		                   (can be specified multiple times)" >&2
@@ -51,7 +52,7 @@ index 166ecbd..af24cc4 100755
  
  eval set -- "$options"
  
-@@ -444,6 +446,10 @@ while [[ $# -gt 0 ]]; do
+@@ -455,6 +457,10 @@ while [[ $# -gt 0 ]]; do
  			echo "DEBUG mode enabled"
  		fi
  		;;
@@ -62,7 +63,7 @@ index 166ecbd..af24cc4 100755
  	--skip-cleanup)
  		echo "Skipping cleanup"
  		SKIPCLEANUP=1
-@@ -691,6 +697,8 @@ if [[ $DEBUG -ge 4 ]]; then
+@@ -710,6 +716,8 @@ if [[ $DEBUG -ge 4 ]]; then
  	export KPATCH_GCC_DEBUG=1
  fi
  
@@ -70,8 +71,8 @@ index 166ecbd..af24cc4 100755
 +
  echo "Building original kernel"
  ./scripts/setlocalversion --save-scmversion || die
- make mrproper 2>&1 | logger || die
-@@ -840,6 +848,7 @@ cd "$TEMPDIR/patch" || die
+ unset KPATCH_GCC_TEMPDIR
+@@ -874,6 +882,7 @@ cd "$TEMPDIR/patch" || die
  KPATCH_BUILD="$SRCDIR" KPATCH_NAME="$MODNAME" \
  KBUILD_EXTRA_SYMBOLS="$KBUILD_EXTRA_SYMBOLS" \
  KPATCH_LDFLAGS="$KPATCH_LDFLAGS" \
@@ -80,7 +81,7 @@ index 166ecbd..af24cc4 100755
  
  if ! "$KPATCH_MODULE"; then
 diff --git a/kpatch-build/kpatch-gcc b/kpatch-build/kpatch-gcc
-index 6ba133c..3937948 100755
+index 2d56da1..59a4255 100755
 --- a/kpatch-build/kpatch-gcc
 +++ b/kpatch-build/kpatch-gcc
 @@ -8,7 +8,7 @@ TOOLCHAINCMD="$1"
@@ -92,12 +93,9 @@ index 6ba133c..3937948 100755
  fi
  
  declare -a args=("$@")
-@@ -80,4 +80,4 @@ elif [[ "$TOOLCHAINCMD" = "ld" ]] ; then
+@@ -82,4 +82,4 @@ elif [[ "$TOOLCHAINCMD" = "ld" ]] ; then
  	done
  fi
  
 -exec "$TOOLCHAINCMD" "${args[@]}"
 +exec ${KPATCH_CROSS_COMPILE}${TOOLCHAINCMD} "${args[@]}"
--- 
-1.9.1
-

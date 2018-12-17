@@ -12,11 +12,3 @@ DEPENDS += "intltool-native"
 
 FILES_${PN} += "${datadir}/icons/* ${datadir}/applications/* ${libdir}/xfce4/modules/*.so*"
 FILES_${PN}-doc += "${datadir}/xfce4/doc"
-
-FILES_${PN}-dev += "${libdir}/xfce4/*/*.la"
-FILES_${PN}-dev += "${libdir}/xfce4/*/*/*.la"
-FILES_${PN}-staticdev += "${libdir}/xfce4/*/*.a"
-FILES_${PN}-staticdev += "${libdir}/xfce4/*/*/*.a"
-FILES_${PN}-dbg += "${libdir}/xfce4/*/.debug"
-FILES_${PN}-dbg += "${libdir}/xfce4/*/*/.debug"
-

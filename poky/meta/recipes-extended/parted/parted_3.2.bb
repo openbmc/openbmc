@@ -48,3 +48,9 @@ do_install_ptest() {
 }
 
 RDEPENDS_${PN}-ptest = "bash coreutils perl util-linux-losetup python3"
+
+inherit update-alternatives
+
+ALTERNATIVE_PRIORITY = "100"
+ALTERNATIVE_${PN} = "partprobe"
+ALTERNATIVE_LINK_NAME[partprobe] = "${sbindir}/partprobe"

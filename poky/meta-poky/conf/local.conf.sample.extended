@@ -32,7 +32,7 @@
 #DISTRO_FEATURES_LIBC = "ipv6 libc-backtrace libc-big-macros libc-bsd libc-cxx-tests libc-catgets libc-charsets libc-crypt \
 #               libc-crypt-ufc libc-db-aliases libc-envz libc-fcvt libc-fmtmsg libc-fstab libc-ftraverse \
 #               libc-getlogin libc-idn libc-inet libc-inet-anl libc-libm libc-locales libc-locale-code \
-#               libc-memusage libc-nis libc-nsswitch libc-rcmd libc-rtld-debug libc-spawn libc-streams libc-sunrpc \
+#               libc-memusage libc-nsswitch libc-rcmd libc-rtld-debug libc-spawn libc-streams \
 #               libc-utmp libc-utmpx libc-wordexp libc-posix-clang-wchar libc-posix-regexp libc-posix-regexp-glibc \
 #               libc-posix-wchar-io"
 
@@ -59,6 +59,11 @@
 # NOTE: If removing en_US.UTF-8 you will also need to uncomment, and set
 # appropriate value for IMAGE_LINGUAS.
 # WARNING: this may break localisation!
+# WARNING: some recipes expect certain localizations to be enabled, e.g.
+# bash-ptest: fr-fr, de-de
+# glib-2.0-ptest: tr-tr, lt-lt, ja-jp.euc-jp, fa-ir, ru-ru, de-de, hr-hr, el-gr, fr-fr, es-es, en-gb
+# if you remove some of these and enable ptest, you'll get QA warning like:
+# ERROR: glib-2.0-1_2.58.0-r0 do_package_qa: QA Issue: glib-2.0-ptest rdepends on locale-base-de-de, but it isn't a build dependency? [build-deps]
 #GLIBC_GENERATE_LOCALES = "en_GB.UTF-8 en_US.UTF-8"
 #IMAGE_LINGUAS ?= "en-gb"
 

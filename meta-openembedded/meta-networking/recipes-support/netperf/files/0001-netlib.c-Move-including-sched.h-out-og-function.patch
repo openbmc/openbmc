@@ -1,0 +1,50 @@
+From 51a092ebb36dcc6180ceb93a9777258e826d9990 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 26 Sep 2018 18:11:10 -0700
+Subject: [PATCH] netlib.c: Move including sched.h out og function
+
+The shutdown_control() has this code where system headers are being
+included inside function body and this results in compile errors on musl
+especially when sched.h is included because sched.h defines a macro
+which defines a static function. This means it ends up being a static
+function inside another function and compiler calls it out
+
+In function 'bind_to_specific_processor':
+|
+/mnt/a/yoe/build/tmp/work/i586-yoe-linux-musl/netperf/2.7.0+git999-r0/recipe-sysroot/usr/include/sched.h:102:1:
+error: invalid storage class for function '__CPU_AND_S'
+|  __CPU_op_func_S(AND, &)
+|  ^~~~~~~~~~~~~~~
+
+Moving the definition out of function definition fixes the problem
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/netlib.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/netlib.c b/src/netlib.c
+index 9258424..60b032d 100644
+--- a/src/netlib.c
++++ b/src/netlib.c
+@@ -2262,6 +2262,10 @@ shutdown_control()
+ 
+ }
+ 
++#if HAVE_SCHED_SETAFFINITY
++#include <sched.h>
++#endif
++
+ /*
+   bind_to_specific_processor will bind the calling process to the
+   processor in "processor"  It has lots of ugly ifdefs to deal with
+@@ -2308,7 +2312,6 @@ bind_to_specific_processor(int processor_affinity, int use_cpu_map)
+      value will not tell you if you are bound vs unbound. */
+   bindprocessor(BINDPROCESS,getpid(),(cpu_t)mapped_affinity);
+ #elif HAVE_SCHED_SETAFFINITY
+-#include <sched.h>
+   /* in theory this should cover systems with more CPUs than bits in a
+      long, without having to specify __USE_GNU.  we "cheat" by taking
+      defines from /usr/include/bits/sched.h, which we ass-u-me is

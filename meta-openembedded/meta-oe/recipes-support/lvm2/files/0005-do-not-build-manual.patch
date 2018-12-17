@@ -1,6 +1,6 @@
-From d8bb25e34d6533ba78eaae697771ee499a66706f Mon Sep 17 00:00:00 2001
+From 51d661ff33bb254d7b335a9c87acf5c6e7a94192 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Wed, 2 Aug 2017 03:41:37 -0400
+Date: Tue, 31 Jul 2018 15:08:34 +0800
 Subject: [PATCH] do not build manual
 
 On some host (ubuntu 1404), build manual failed.
@@ -15,24 +15,33 @@ Upstream-Status: Pending
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- Makefile.in  | 4 ++--
- configure.in | 1 -
- 2 files changed, 2 insertions(+), 3 deletions(-)
+ Makefile.in  | 6 +++---
+ configure.ac | 1 -
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/Makefile.in b/Makefile.in
-index 31d428d..24f89a2 100644
+index e2f5a84..acf31e5 100644
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -18,7 +18,7 @@ top_builddir = @top_builddir@
  abs_top_builddir = @abs_top_builddir@
  abs_top_srcdir = @abs_top_srcdir@
  
--SUBDIRS = conf daemons include lib libdaemon libdm man scripts tools
-+SUBDIRS = conf daemons include lib libdaemon libdm scripts tools
+-SUBDIRS = conf daemons include lib libdaemon libdm man scripts device_mapper tools
++SUBDIRS = conf daemons include lib libdaemon libdm scripts device_mapper tools
  
  ifeq ("@UDEV_RULES@", "yes")
    SUBDIRS += udev
-@@ -69,7 +69,7 @@ liblvm.device-mapper: include.device-mapper
+@@ -41,7 +41,7 @@ ifeq ($(MAKECMDGOALS),clean)
+ endif
+ # FIXME Should use intermediate Makefiles here!
+ ifeq ($(MAKECMDGOALS),distclean)
+-  SUBDIRS = conf include man test scripts \
++  SUBDIRS = conf include test scripts \
+     libdaemon lib tools daemons libdm \
+     udev po liblvm python device_mapper
+ tools.distclean: test.distclean
+@@ -71,7 +71,7 @@ liblvm.device-mapper: include.device-mapper
  daemons.device-mapper: libdm.device-mapper
  tools.device-mapper: libdm.device-mapper
  scripts.device-mapper: include.device-mapper
@@ -41,11 +50,11 @@ index 31d428d..24f89a2 100644
  
  ifeq ("@INTL@", "yes")
  lib.pofile: include.pofile
-diff --git a/configure.in b/configure.in
-index 1dc8819..108ace4 100644
---- a/configure.in
-+++ b/configure.in
-@@ -2213,7 +2213,6 @@ libdm/Makefile
+diff --git a/configure.ac b/configure.ac
+index aa374ea..5a92cba 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2124,7 +2124,6 @@ libdm/Makefile
  libdm/libdevmapper.pc
  liblvm/Makefile
  liblvm/liblvm2app.pc
@@ -54,5 +63,5 @@ index 1dc8819..108ace4 100644
  python/Makefile
  python/setup.py
 -- 
-2.8.1
+2.7.4
 

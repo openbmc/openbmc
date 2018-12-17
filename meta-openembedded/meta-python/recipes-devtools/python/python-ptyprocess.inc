@@ -6,8 +6,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=cfdcd51fa7d5808da4e74346ee394490"
 
 SRCNAME = "ptyprocess"
 
-SRC_URI[md5sum] = "d3b8febae1b8c53b054bd818d0bb8665"
-SRC_URI[sha256sum] = "e64193f0047ad603b71f202332ab5527c5e52aa7c8b609704fc28c0dc20c4365"
+SRC_URI[md5sum] = "37402d69f3b50913d4d483587bffad8f"
+SRC_URI[sha256sum] = "923f299cc5ad920c68f2bc0bc98b75b9f838b93b599941a6b63ddbc2476394c0"
 
 UPSTREAM_CHECK_URI = "https://pypi.python.org/pypi/ptyprocess"
 

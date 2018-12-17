@@ -1,0 +1,29 @@
+From f2df1db11f3a9580774300e703b6f53dbcdb28ef Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 8 Jun 2018 20:17:57 -0700
+Subject: [PATCH] S_IFSOCK is defined in both glibc/musl
+
+Fixes
+
+preload.c:1183:46: error: '__S_IFSOCK' undeclared (first use in this function); did you mean 'S_IFSOCK'?
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ librdmacm/preload.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/librdmacm/preload.c b/librdmacm/preload.c
+index 0f2aa250..d46beb1b 100644
+--- a/librdmacm/preload.c
++++ b/librdmacm/preload.c
+@@ -1180,7 +1180,7 @@ int __fxstat(int ver, int socket, struct stat *buf)
+ 	if (fd_get(socket, &fd) == fd_rsocket) {
+ 		ret = real.fxstat(ver, socket, buf);
+ 		if (!ret)
+-			buf->st_mode = (buf->st_mode & ~S_IFMT) | __S_IFSOCK;
++			buf->st_mode = (buf->st_mode & ~S_IFMT) | S_IFSOCK;
+ 	} else {
+ 		ret = real.fxstat(ver, fd, buf);
+ 	}

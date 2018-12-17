@@ -23,7 +23,11 @@ do_install_append() {
 	    s,^libdir=\'${base_libdir}\'$,libdir=\'${libdir}\',
 }
 
-inherit ptest
+inherit ptest update-alternatives
+
+ALTERNATIVE_PRIORITY = "100"
+ALTERNATIVE_${PN} = "setfattr"
+ALTERNATIVE_TARGET[setfattr] = "${bindir}/setfattr"
 
 do_install_ptest() {
 	tar -c --exclude=ext test/ | ( cd ${D}${PTEST_PATH} && tar -xf - )

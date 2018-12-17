@@ -1,25 +1,23 @@
-From 14937d9247330065359ca0fb648c28dfa5c3b224 Mon Sep 17 00:00:00 2001
-From: Huang Qiyu <huangqy.fnst@cn.fujitsu.com>
-Date: Tue, 13 Dec 2016 18:16:41 +0900
-Subject: [PATCH] ghostscript-9.15-parallel-make
+From 84bb692d6b047c09266de154f404af9817fa04aa Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Thu, 29 Mar 2018 15:59:05 +0800
+Subject: [PATCH 01/10] contrib.mak: fix for parallel build
 
-From 767bdf8a412b0cce2b734998e9b7e55abeaf932c Mon Sep 17 00:00:00 2001
-From: Huang Qiyu <huangqy.fnst@cn.fujitsu.com>
-Date: Tue, 13 Dec 2016 17:55:54 +0900
-Subject: [PATCH] Robert Yang <liezhi.yang@windriver.com> Date: Fri, 30 Jan
-2015 00:40:22 -0800  Subject: [PATCH] contrib.mak: fix for parallel build
-
-Signed-off-by: Huang Qiyu <huangqy.fnst@cn.fujitsu.com>
 Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+
+Rebase to 9.23
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  contrib/contrib.mak | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/contrib/contrib.mak b/contrib/contrib.mak
-index 55415b3..0b6b5ae 100644
+index f5a2fa4..4999752 100644
 --- a/contrib/contrib.mak
 +++ b/contrib/contrib.mak
-@@ -1099,6 +1099,7 @@ $(DEVOBJ)dviprlib.$(OBJ) : $(JAPSRC)dviprlib.c $(JAPSRC)dviprlib.h \
+@@ -1067,6 +1067,7 @@ $(DEVOBJ)dviprlib.$(OBJ) : $(JAPSRC)dviprlib.c $(JAPSRC)dviprlib.h \
  	$(DEVCC) $(O_)$@ $(C_) $(JAPSRC)dviprlib.c
  
  extra-dmprt-install: install-libdata
@@ -27,7 +25,7 @@ index 55415b3..0b6b5ae 100644
  	$(INSTALL_DATA) $(JAPSRC)dmp_init.ps $(DESTDIR)$(gsdatadir)$(D)lib || exit 1
  	$(INSTALL_DATA) $(JAPSRC)dmp_site.ps $(DESTDIR)$(gsdatadir)$(D)lib || exit 1
  	$(INSTALL_DATA) $(JAPSRC)escp_24.src $(DESTDIR)$(gsdatadir)$(D)lib || exit 1
-@@ -1267,6 +1268,7 @@ $(DEVOBJ)gdevalps.$(OBJ) : $(JAPSRC)gdevalps.c $(PDEVH) \
+@@ -1235,6 +1236,7 @@ $(DEVOBJ)gdevalps.$(OBJ) : $(JAPSRC)gdevalps.c $(PDEVH) \
  ### ----------------- Additional .upp files ---------------- ###
  
  extra-upp-install: install-libdata
@@ -36,5 +34,5 @@ index 55415b3..0b6b5ae 100644
  	    $(INSTALL_DATA) $$f $(DESTDIR)$(gsdatadir)$(D)lib || exit 1; \
  	done
 -- 
-2.7.4
+1.8.3.1
 

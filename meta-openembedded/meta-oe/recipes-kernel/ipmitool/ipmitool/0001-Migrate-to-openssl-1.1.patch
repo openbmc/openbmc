@@ -1,0 +1,152 @@
+From c9dcb6afef9c343d070aaff208d11a997a45a105 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 5 Sep 2018 22:19:38 -0700
+Subject: [PATCH] Migrate to openssl 1.1
+
+Upstream-Status: Backport [https://sourceforge.net/p/ipmitool/source/ci/1664902525a1c3771b4d8b3ccab7ea1ba6b2bdd1/]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/plugins/lanplus/lanplus_crypt_impl.c | 50 ++++++++++++++----------
+ 1 file changed, 29 insertions(+), 21 deletions(-)
+
+diff --git a/src/plugins/lanplus/lanplus_crypt_impl.c b/src/plugins/lanplus/lanplus_crypt_impl.c
+index d5fac37..9652a5e 100644
+--- a/src/plugins/lanplus/lanplus_crypt_impl.c
++++ b/src/plugins/lanplus/lanplus_crypt_impl.c
+@@ -164,11 +164,7 @@ lanplus_encrypt_aes_cbc_128(const uint8_t * iv,
+ 							uint8_t       * output,
+ 							uint32_t        * bytes_written)
+ {
+-	EVP_CIPHER_CTX ctx;
+-	EVP_CIPHER_CTX_init(&ctx);
+-	EVP_EncryptInit_ex(&ctx, EVP_aes_128_cbc(), NULL, key, iv);
+-	EVP_CIPHER_CTX_set_padding(&ctx, 0);
+-	
++	EVP_CIPHER_CTX *ctx = NULL;
+ 
+ 	*bytes_written = 0;
+ 
+@@ -182,6 +178,14 @@ lanplus_encrypt_aes_cbc_128(const uint8_t * iv,
+ 		printbuf(input, input_length, "encrypting this data");
+ 	}
+ 
++	ctx = EVP_CIPHER_CTX_new();
++	if (ctx == NULL) {
++		lprintf(LOG_DEBUG, "ERROR: EVP_CIPHER_CTX_new() failed");
++		return;
++	}
++	EVP_CIPHER_CTX_init(ctx);
++	EVP_EncryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, key, iv);
++	EVP_CIPHER_CTX_set_padding(ctx, 0);
+ 
+ 	/*
+ 	 * The default implementation adds a whole block of padding if the input
+@@ -191,28 +195,28 @@ lanplus_encrypt_aes_cbc_128(const uint8_t * iv,
+ 	assert((input_length % IPMI_CRYPT_AES_CBC_128_BLOCK_SIZE) == 0);
+ 
+ 
+-	if(!EVP_EncryptUpdate(&ctx, output, (int *)bytes_written, input, input_length))
++	if(!EVP_EncryptUpdate(ctx, output, (int *)bytes_written, input, input_length))
+ 	{
+ 		/* Error */
+ 		*bytes_written = 0;
+-		return;
+ 	}
+ 	else
+ 	{
+ 		uint32_t tmplen;
+ 
+-		if(!EVP_EncryptFinal_ex(&ctx, output + *bytes_written, (int *)&tmplen))
++		if(!EVP_EncryptFinal_ex(ctx, output + *bytes_written, (int *)&tmplen))
+ 		{
++			/* Error */
+ 			*bytes_written = 0;
+-			return; /* Error */
+ 		}
+ 		else
+ 		{
+ 			/* Success */
+ 			*bytes_written += tmplen;
+-			EVP_CIPHER_CTX_cleanup(&ctx);
+ 		}
+ 	}
++	/* performs cleanup and free */
++	EVP_CIPHER_CTX_free(ctx);
+ }
+ 
+ 
+@@ -239,11 +243,7 @@ lanplus_decrypt_aes_cbc_128(const uint8_t * iv,
+ 							uint8_t       * output,
+ 							uint32_t        * bytes_written)
+ {
+-	EVP_CIPHER_CTX ctx;
+-	EVP_CIPHER_CTX_init(&ctx);
+-	EVP_DecryptInit_ex(&ctx, EVP_aes_128_cbc(), NULL, key, iv);
+-	EVP_CIPHER_CTX_set_padding(&ctx, 0);
+-
++	EVP_CIPHER_CTX *ctx = NULL;
+ 
+ 	if (verbose >= 5)
+ 	{
+@@ -252,12 +252,20 @@ lanplus_decrypt_aes_cbc_128(const uint8_t * iv,
+ 		printbuf(input, input_length, "decrypting this data");
+ 	}
+ 
+-
+ 	*bytes_written = 0;
+ 
+ 	if (input_length == 0)
+ 		return;
+ 
++	ctx = EVP_CIPHER_CTX_new();
++	if (ctx == NULL) {
++		lprintf(LOG_DEBUG, "ERROR: EVP_CIPHER_CTX_new() failed");
++		return;
++	}
++	EVP_CIPHER_CTX_init(ctx);
++	EVP_DecryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, key, iv);
++	EVP_CIPHER_CTX_set_padding(ctx, 0);
++
+ 	/*
+ 	 * The default implementation adds a whole block of padding if the input
+ 	 * data is perfectly aligned.  We would like to keep that from happening.
+@@ -266,33 +274,33 @@ lanplus_decrypt_aes_cbc_128(const uint8_t * iv,
+ 	assert((input_length % IPMI_CRYPT_AES_CBC_128_BLOCK_SIZE) == 0);
+ 
+ 
+-	if (!EVP_DecryptUpdate(&ctx, output, (int *)bytes_written, input, input_length))
++	if (!EVP_DecryptUpdate(ctx, output, (int *)bytes_written, input, input_length))
+ 	{
+ 		/* Error */
+ 		lprintf(LOG_DEBUG, "ERROR: decrypt update failed");
+ 		*bytes_written = 0;
+-		return;
+ 	}
+ 	else
+ 	{
+ 		uint32_t tmplen;
+ 
+-		if (!EVP_DecryptFinal_ex(&ctx, output + *bytes_written, (int *)&tmplen))
++		if (!EVP_DecryptFinal_ex(ctx, output + *bytes_written, (int *)&tmplen))
+ 		{
++			/* Error */
+ 			char buffer[1000];
+ 			ERR_error_string(ERR_get_error(), buffer);
+ 			lprintf(LOG_DEBUG, "the ERR error %s", buffer);
+ 			lprintf(LOG_DEBUG, "ERROR: decrypt final failed");
+ 			*bytes_written = 0;
+-			return; /* Error */
+ 		}
+ 		else
+ 		{
+ 			/* Success */
+ 			*bytes_written += tmplen;
+-			EVP_CIPHER_CTX_cleanup(&ctx);
+ 		}
+ 	}
++	/* performs cleanup and free */
++	EVP_CIPHER_CTX_free(ctx);
+ 
+ 	if (verbose >= 5)
+ 	{

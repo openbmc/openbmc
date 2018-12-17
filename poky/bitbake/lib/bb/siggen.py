@@ -110,42 +110,13 @@ class SignatureGeneratorBasic(SignatureGenerator):
         ignore_mismatch = ((d.getVar("BB_HASH_IGNORE_MISMATCH") or '') == '1')
         tasklist, gendeps, lookupcache = bb.data.generate_dependencies(d)
 
-        taskdeps = {}
-        basehash = {}
+        taskdeps, basehash = bb.data.generate_dependency_hash(tasklist, gendeps, lookupcache, self.basewhitelist, fn)
 
         for task in tasklist:
-            data = lookupcache[task]
-
-            if data is None:
-                bb.error("Task %s from %s seems to be empty?!" % (task, fn))
-                data = ''
-
-            gendeps[task] -= self.basewhitelist
-            newdeps = gendeps[task]
-            seen = set()
-            while newdeps:
-                nextdeps = newdeps
-                seen |= nextdeps
-                newdeps = set()
-                for dep in nextdeps:
-                    if dep in self.basewhitelist:
-                        continue
-                    gendeps[dep] -= self.basewhitelist
-                    newdeps |= gendeps[dep]
-                newdeps -= seen
-
-            alldeps = sorted(seen)
-            for dep in alldeps:
-                data = data + dep
-                var = lookupcache[dep]
-                if var is not None:
-                    data = data + str(var)
-            datahash = hashlib.md5(data.encode("utf-8")).hexdigest()
             k = fn + "." + task
-            if not ignore_mismatch and k in self.basehash and self.basehash[k] != datahash:
-                bb.error("When reparsing %s, the basehash value changed from %s to %s. The metadata is not deterministic and this needs to be fixed." % (k, self.basehash[k], datahash))
-            self.basehash[k] = datahash
-            taskdeps[task] = alldeps
+            if not ignore_mismatch and k in self.basehash and self.basehash[k] != basehash[k]:
+                bb.error("When reparsing %s, the basehash value changed from %s to %s. The metadata is not deterministic and this needs to be fixed." % (k, self.basehash[k], basehash[k]))
+            self.basehash[k] = basehash[k]
 
         self.taskdeps[fn] = taskdeps
         self.gendeps[fn] = gendeps
@@ -193,19 +164,28 @@ class SignatureGeneratorBasic(SignatureGenerator):
         return taint
 
     def get_taskhash(self, fn, task, deps, dataCache):
+
+        mc = ''
+        if fn.startswith('multiconfig:'):
+            mc = fn.split(':')[1]
         k = fn + "." + task
+
         data = dataCache.basetaskhash[k]
         self.basehash[k] = data
         self.runtaskdeps[k] = []
         self.file_checksum_values[k] = []
         recipename = dataCache.pkg_fn[fn]
-
         for dep in sorted(deps, key=clean_basepath):
-            depname = dataCache.pkg_fn[self.pkgnameextract.search(dep).group('fn')]
+            pkgname = self.pkgnameextract.search(dep).group('fn')
+            if mc:
+                depmc = pkgname.split(':')[1]
+                if mc != depmc:
+                    continue
+            depname = dataCache.pkg_fn[pkgname]
             if not self.rundep_check(fn, recipename, task, dep, depname, dataCache):
                 continue
             if dep not in self.taskhash:
-                bb.fatal("%s is not in taskhash, caller isn't calling in dependency order?", dep)
+                bb.fatal("%s is not in taskhash, caller isn't calling in dependency order?" % dep)
             data = data + self.taskhash[dep]
             self.runtaskdeps[k].append(dep)
 
@@ -347,7 +327,7 @@ class SignatureGeneratorBasicHash(SignatureGeneratorBasic):
 
     def stampcleanmask(self, stampbase, fn, taskname, extrainfo):
         return self.stampfile(stampbase, fn, taskname, extrainfo, clean=True)
-        
+
     def invalidate_task(self, task, d, fn):
         bb.note("Tainting hash to force rebuild of task %s, %s" % (fn, task))
         bb.build.write_taint(task, d, fn)
@@ -362,10 +342,10 @@ def dump_this_task(outfile, d):
 def init_colors(enable_color):
     """Initialise colour dict for passing to compare_sigfiles()"""
     # First set up the colours
-    colors = {'color_title':   '\033[1;37;40m',
-              'color_default': '\033[0;37;40m',
-              'color_add':     '\033[1;32;40m',
-              'color_remove':  '\033[1;31;40m',
+    colors = {'color_title':   '\033[1m',
+              'color_default': '\033[0m',
+              'color_add':     '\033[0;32m',
+              'color_remove':  '\033[0;31m',
              }
     # Leave all keys present but clear the values
     if not enable_color:
@@ -636,7 +616,7 @@ def compare_sigfiles(a, b, recursecb=None, color=False, collapsed=False):
                         if collapsed:
                             output.extend(recout)
                         else:
-                            # If a dependent hash changed, might as well print the line above and then defer to the changes in 
+                            # If a dependent hash changed, might as well print the line above and then defer to the changes in
                             # that hash since in all likelyhood, they're the same changes this task also saw.
                             output = [output[-1]] + recout
 

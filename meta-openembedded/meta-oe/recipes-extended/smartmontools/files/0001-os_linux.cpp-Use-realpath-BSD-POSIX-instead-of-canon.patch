@@ -1,0 +1,28 @@
+From f28aa188e5b0ea85369febe657b8807b8025038b Mon Sep 17 00:00:00 2001
+From: chrfranke <authors@smartmontools.org>
+Date: Wed, 8 Nov 2017 06:15:50 +0000
+Subject: [PATCH] os_linux.cpp: Use 'realpath()' (BSD, POSIX) instead of
+ 'canonicalize_file_name()' (GNU extension). This fixes build on systems with
+ musl libc (#921).
+
+git-svn-id: http://svn.code.sf.net/p/smartmontools/code/trunk@4603 4ea69e1a-61f1-4043-bf83-b5c94c648137
+
+Upstream-Status: Backport [https://www.smartmontools.org/ticket/921]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ os_linux.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/os_linux.cpp b/os_linux.cpp
+index 134d5bc..935f9c7 100644
+--- a/os_linux.cpp
++++ b/os_linux.cpp
+@@ -3176,7 +3176,7 @@ static bool is_hpsa(const char * name)
+ {
+   char path[128];
+   snprintf(path, sizeof(path), "/sys/block/%s/device", name);
+-  char * syshostpath = canonicalize_file_name(path);
++  char * syshostpath = realpath(name, (char *)0);
+   if (!syshostpath)
+     return false;
+ 

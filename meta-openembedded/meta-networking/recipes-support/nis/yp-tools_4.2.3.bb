@@ -20,7 +20,7 @@ SRC_URI = "git://github.com/thkukuk/yp-tools \
 
 S = "${WORKDIR}/git"
 
-DEPENDS = "libtirpc libnsl2"
+DEPENDS = "libtirpc libnsl2 virtual/crypt"
 
 inherit autotools systemd
 SYSTEMD_SERVICE_${PN} = "domainname.service"

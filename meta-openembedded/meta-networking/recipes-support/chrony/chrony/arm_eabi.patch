@@ -1,4 +1,7 @@
-    chrony: fix build failure for arma9
+From 9ca48a6fef1da1bb0dd67ab94256c7e240da1834 Mon Sep 17 00:00:00 2001
+From: Joe Slater <jslater@windriver.com>
+Date: Thu, 9 Mar 2017 10:58:06 -0800
+Subject: [PATCH]     chrony: fix build failure for arma9
 
     Eliminate references to syscalls not available
     for ARM_EABI.  Also add a dependency on libseccomp
@@ -16,9 +19,15 @@
 
     Signed-off-by: Robert Joslyn <robert.joslyn@redrectangle.org>
 
+---
+ sys_linux.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
+
+diff --git a/sys_linux.c b/sys_linux.c
+index f4b532d..d05fa24 100644
 --- a/sys_linux.c
 +++ b/sys_linux.c
-@@ -465,14 +465,14 @@ SYS_Linux_EnableSystemCallFilter(int lev
+@@ -482,14 +482,14 @@ SYS_Linux_EnableSystemCallFilter(int level)
    const int syscalls[] = {
      /* Clock */
      SCMP_SYS(adjtimex), SCMP_SYS(clock_gettime), SCMP_SYS(gettimeofday),
@@ -36,8 +45,8 @@
      SCMP_SYS(mprotect), SCMP_SYS(mremap), SCMP_SYS(munmap), SCMP_SYS(shmdt),
      /* Filesystem */
      SCMP_SYS(access), SCMP_SYS(chmod), SCMP_SYS(chown), SCMP_SYS(chown32),
-@@ -483,14 +483,21 @@
-     SCMP_SYS(bind), SCMP_SYS(connect), SCMP_SYS(getsockname),
+@@ -500,14 +500,21 @@ SYS_Linux_EnableSystemCallFilter(int level)
+     SCMP_SYS(bind), SCMP_SYS(connect), SCMP_SYS(getsockname), SCMP_SYS(getsockopt),
      SCMP_SYS(recvfrom), SCMP_SYS(recvmmsg), SCMP_SYS(recvmsg),
      SCMP_SYS(sendmmsg), SCMP_SYS(sendmsg), SCMP_SYS(sendto),
 -    /* TODO: check socketcall arguments */

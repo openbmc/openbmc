@@ -1,7 +1,7 @@
-From 0e96d9f23b2b166e7444e7c8e0a6d4b83c2eccd7 Mon Sep 17 00:00:00 2001
+From 41bce1de2fd2a0f79c266f245ae3e3720ccaf46a Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Wed, 26 Apr 2017 03:51:03 -0400
-Subject: [PATCH 3/3] without build plugins
+Subject: [PATCH 3/4] without build plugins
 
 Upstream-Status:  Inappropriate workaround
 
@@ -22,5 +22,5 @@ index c15928c..bac02b1 100644
 -SUBDIRS = include lib plugins report-python cli client-python workflows $(sub_dirs)
 +SUBDIRS = include lib report-python cli client-python workflows $(sub_dirs)
 -- 
-2.8.1
+2.7.4
 

@@ -43,13 +43,9 @@ class Perforce(FetchMethod):
         provided by the env, use it.  If P4PORT is specified by the recipe, use
         its values, which may override the settings in P4CONFIG.
         """
-        ud.basecmd = d.getVar('FETCHCMD_p4')
-        if not ud.basecmd:
-            ud.basecmd = "/usr/bin/env p4"
+        ud.basecmd = d.getVar("FETCHCMD_p4") or "/usr/bin/env p4"
 
-        ud.dldir = d.getVar('P4DIR')
-        if not ud.dldir:
-            ud.dldir = '%s/%s' % (d.getVar('DL_DIR'), 'p4')
+        ud.dldir = d.getVar("P4DIR") or (d.getVar("DL_DIR") + "/p4")
 
         path = ud.url.split('://')[1]
         path = path.split(';')[0]

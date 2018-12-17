@@ -9,7 +9,7 @@ SECTION = "console/network"
 LICENSE = "BSD & MPL-1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4202a0a62910cf94f7af8a3436a2a2dd"
 
-DEPENDS = "openssl10"
+DEPENDS = "openssl"
 
 SRC_URI = "http://snapshot.debian.org/archive/debian/20160728T043443Z/pool/main/h/heirloom-mailx/heirloom-mailx_12.5.orig.tar.gz;name=archive \
            file://0001-Don-t-reuse-weak-symbol-optopt-to-fix-FTBFS-on-mips.patch \
@@ -21,6 +21,7 @@ SRC_URI = "http://snapshot.debian.org/archive/debian/20160728T043443Z/pool/main/
            file://0014-globname-Invoke-wordexp-with-WRDE_NOCMD.patch \
            file://0015-usr-sbin-sendmail.patch \
            file://explicitly.disable.krb5.support.patch \
+           file://0001-support-openssl-1.1.x.patch \
           "
 
 SRC_URI[archive.md5sum] = "29a6033ef1412824d02eb9d9213cb1f2"

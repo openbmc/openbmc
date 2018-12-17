@@ -1,0 +1,153 @@
+From 848e711d719a6d987bc7d14183e1c7b1f1c91c56 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Fri, 29 Jun 2018 17:10:29 +0800
+Subject: [PATCH 08/19] don't fail if GLOB_BRACE and GLOB_ALTDIRFUNC is not
+ defined
+
+If the standard library doesn't provide brace
+expansion users just won't get it.
+
+Dont use GNU GLOB extentions on non-glibc systems
+
+Conditionalize use of GLOB_ALTDIRFUNC
+
+Upstream-Status: Inappropriate [musl specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/basic/glob-util.c     | 13 +++++++++++--
+ src/test/test-glob-util.c | 15 +++++++++++++++
+ src/tmpfiles/tmpfiles.c   | 10 ++++++++++
+ 3 files changed, 36 insertions(+), 2 deletions(-)
+
+diff --git a/src/basic/glob-util.c b/src/basic/glob-util.c
+index 9fac676f2..8adb9559e 100644
+--- a/src/basic/glob-util.c
++++ b/src/basic/glob-util.c
+@@ -10,6 +10,11 @@
+ #include "macro.h"
+ #include "path-util.h"
+ #include "strv.h"
++/* Don't fail if the standard library
++ * doesn't provide brace expansion */
++#ifndef GLOB_BRACE
++#define GLOB_BRACE 0
++#endif
+ 
+ static void closedir_wrapper(void* v) {
+         (void) closedir(v);
+@@ -18,6 +23,7 @@ static void closedir_wrapper(void* v) {
+ int safe_glob(const char *path, int flags, glob_t *pglob) {
+         int k;
+ 
++#ifdef GLOB_ALTDIRFUNC
+         /* We want to set GLOB_ALTDIRFUNC ourselves, don't allow it to be set. */
+         assert(!(flags & GLOB_ALTDIRFUNC));
+ 
+@@ -31,10 +37,13 @@ int safe_glob(const char *path, int flags, glob_t *pglob) {
+                 pglob->gl_lstat = lstat;
+         if (!pglob->gl_stat)
+                 pglob->gl_stat = stat;
+-
++#endif
+         errno = 0;
++#ifdef GLOB_ALTDIRFUNC
+         k = glob(path, flags | GLOB_ALTDIRFUNC, NULL, pglob);
+-
++#else
++        k = glob(path, flags, NULL, pglob);
++#endif
+         if (k == GLOB_NOMATCH)
+                 return -ENOENT;
+         if (k == GLOB_NOSPACE)
+diff --git a/src/test/test-glob-util.c b/src/test/test-glob-util.c
+index d78d6223c..f5943b26d 100644
+--- a/src/test/test-glob-util.c
++++ b/src/test/test-glob-util.c
+@@ -12,6 +12,11 @@
+ #include "glob-util.h"
+ #include "macro.h"
+ #include "rm-rf.h"
++/* Don't fail if the standard library
++ * doesn't provide brace expansion */
++#ifndef GLOB_BRACE
++#define GLOB_BRACE 0
++#endif
+ 
+ static void test_glob_exists(void) {
+         char name[] = "/tmp/test-glob_exists.XXXXXX";
+@@ -40,11 +45,13 @@ static void test_glob_no_dot(void) {
+         const char *fn;
+ 
+         _cleanup_globfree_ glob_t g = {
++#ifdef GLOB_ALTDIRFUNC
+                 .gl_closedir = closedir_wrapper,
+                 .gl_readdir = (struct dirent *(*)(void *)) readdir_no_dot,
+                 .gl_opendir = (void *(*)(const char *)) opendir,
+                 .gl_lstat = lstat,
+                 .gl_stat = stat,
++#endif
+         };
+ 
+         int r;
+@@ -52,11 +59,19 @@ static void test_glob_no_dot(void) {
+         assert_se(mkdtemp(template));
+ 
+         fn = strjoina(template, "/*");
++#ifdef GLOB_ALTDIRFUNC
+         r = glob(fn, GLOB_NOSORT|GLOB_BRACE|GLOB_ALTDIRFUNC, NULL, &g);
++#else
++        r = glob(fn, GLOB_NOSORT|GLOB_BRACE, NULL, &g);
++#endif
+         assert_se(r == GLOB_NOMATCH);
+ 
+         fn = strjoina(template, "/.*");
++#ifdef GLOB_ALTDIRFUNC
+         r = glob(fn, GLOB_NOSORT|GLOB_BRACE|GLOB_ALTDIRFUNC, NULL, &g);
++#else
++        r = glob(fn, GLOB_NOSORT|GLOB_BRACE, NULL, &g);
++#endif
+         assert_se(r == GLOB_NOMATCH);
+ 
+         (void) rm_rf(template, REMOVE_ROOT|REMOVE_PHYSICAL);
+diff --git a/src/tmpfiles/tmpfiles.c b/src/tmpfiles/tmpfiles.c
+index 927de35f3..5f0283da5 100644
+--- a/src/tmpfiles/tmpfiles.c
++++ b/src/tmpfiles/tmpfiles.c
+@@ -60,6 +60,12 @@
+ #include "user-util.h"
+ #include "util.h"
+ 
++/* Don't fail if the standard library
++ * doesn't provide brace expansion */
++#ifndef GLOB_BRACE
++#define GLOB_BRACE 0
++#endif
++
+ /* This reads all files listed in /etc/tmpfiles.d/?*.conf and creates
+  * them in the file system. This is intended to be used to create
+  * properly owned directories beneath /tmp, /var/tmp, /run, which are
+@@ -1345,7 +1351,9 @@ finish:
+ 
+ static int glob_item(Item *i, action_t action) {
+         _cleanup_globfree_ glob_t g = {
++#ifdef GLOB_ALTDIRFUNC
+                 .gl_opendir = (void *(*)(const char *)) opendir_nomod,
++#endif
+         };
+         int r = 0, k;
+         char **fn;
+@@ -1365,7 +1373,9 @@ static int glob_item(Item *i, action_t action) {
+ 
+ static int glob_item_recursively(Item *i, fdaction_t action) {
+         _cleanup_globfree_ glob_t g = {
++#ifdef GLOB_ALTDIRFUNC
+                 .gl_opendir = (void *(*)(const char *)) opendir_nomod,
++#endif
+         };
+         int r = 0, k;
+         char **fn;
+-- 
+2.11.0
+

@@ -9,6 +9,10 @@ COMPATIBLE_HOST = "(i.86|x86_64|aarch64|arm|powerpc|powerpc64).*-linux"
 
 EXTRA_OEMAKE = "-e MAKEFLAGS="
 
+# The upstream buildsystem uses 'docdir' as the path where it puts AUTHORS,
+# README, etc, but we don't want those in the root of our docdir.
+docdir .= "/${BPN}"
+
 do_install() {
 	oe_runmake DESTDIR="${D}" install
 }

@@ -1,0 +1,32 @@
+From 6a6b705ff5cba960c54bdb4d4bcdaa3b00a854a2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 11 Aug 2018 10:24:24 -0700
+Subject: [PATCH] pi-blaster: Include sys/sysmacros.h for makedev()
+
+In glibc 2.28+ this header is not included indirectly anymore
+
+fixes
+
+ld: pi-blaster.o: in function `mbox_open':
+pi-blaster.c:(.text+0x28): undefined reference to `makedev'
+collect2: error: ld returned 1 exit status
+
+Upstream-Status: Submitted [https://github.com/sarfata/pi-blaster/pull/100]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ pi-blaster.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/pi-blaster.c b/pi-blaster.c
+index 6cfd010..fc4e686 100644
+--- a/pi-blaster.c
++++ b/pi-blaster.c
+@@ -41,6 +41,7 @@ static char VERSION[] = "SNAPSHOT";
+ #include <sys/time.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
++#include <sys/sysmacros.h>
+ #include <fcntl.h>
+ #include <sys/mman.h>
+ #include "mailbox.h"

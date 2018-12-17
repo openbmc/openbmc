@@ -58,7 +58,7 @@ PACKAGE_DEPENDS += "rpm-native dwarfsrcfiles-native"
 
 # If your postinstall can execute at rootfs creation time rather than on
 # target but depends on a native/cross tool in order to execute, you need to
-# list that tool in PACKAGE_WRITE_DEPENDS. Target package dependencies belong
+# list that tool in PACKAGE_WRITE_DEPS. Target package dependencies belong
 # in the package dependencies as normal, this is just for native/cross support
 # tools at rootfs build time.
 PACKAGE_WRITE_DEPS ??= ""
@@ -345,8 +345,16 @@ def parse_debugsources_from_dwarfsrcfiles_output(dwarfsrcfiles_output):
     return debugfiles.keys()
 
 def append_source_info(file, sourcefile, d, fatal=True):
-    cmd = "'dwarfsrcfiles' '%s'" % (file)
-    (retval, output) = oe.utils.getstatusoutput(cmd)
+    import subprocess
+
+    cmd = ["dwarfsrcfiles", file]
+    try:
+        output = subprocess.check_output(cmd, universal_newlines=True, stderr=subprocess.STDOUT)
+        retval = 0
+    except subprocess.CalledProcessError as exc:
+        output = exc.output
+        retval = exc.returncode
+
     # 255 means a specific file wasn't fully parsed to get the debug file list, which is not a fatal failure
     if retval != 0 and retval != 255:
         msg = "dwarfsrcfiles failed with exit code %s (cmd was %s)%s" % (retval, cmd, ":\n%s" % output if output else "")
@@ -359,10 +367,12 @@ def append_source_info(file, sourcefile, d, fatal=True):
     # of rpm's debugedit, which was writing them out that way, and the code elsewhere
     # is still assuming that.
     debuglistoutput = '\0'.join(debugsources) + '\0'
+    lf = bb.utils.lockfile(sourcefile + ".lock")
     open(sourcefile, 'a').write(debuglistoutput)
+    bb.utils.unlockfile(lf)
 
 
-def splitdebuginfo(file, debugfile, debugsrcdir, sourcefile, d):
+def splitdebuginfo(file, dvar, debugdir, debuglibdir, debugappend, debugsrcdir, sourcefile, d):
     # Function to split a single file into two components, one is the stripped
     # target system binary, the other contains any debugging information. The
     # two files are linked to reference each other.
@@ -370,6 +380,16 @@ def splitdebuginfo(file, debugfile, debugsrcdir, sourcefile, d):
     # sourcefile is also generated containing a list of debugsources
 
     import stat
+    import subprocess
+
+    src = file[len(dvar):]
+    dest = debuglibdir + os.path.dirname(src) + debugdir + "/" + os.path.basename(src) + debugappend
+    debugfile = dvar + dest
+
+    # Split the file...
+    bb.utils.mkdirhier(os.path.dirname(debugfile))
+    #bb.note("Split %s -> %s" % (file, debugfile))
+    # Only store off the hard link reference if we successfully split!
 
     dvar = d.getVar('PKGD')
     objcopy = d.getVar("OBJCOPY")
@@ -390,16 +410,10 @@ def splitdebuginfo(file, debugfile, debugsrcdir, sourcefile, d):
 
     bb.utils.mkdirhier(os.path.dirname(debugfile))
 
-    cmd = "'%s' --only-keep-debug '%s' '%s'" % (objcopy, file, debugfile)
-    (retval, output) = oe.utils.getstatusoutput(cmd)
-    if retval:
-        bb.fatal("objcopy failed with exit code %s (cmd was %s)%s" % (retval, cmd, ":\n%s" % output if output else ""))
+    subprocess.check_output([objcopy, '--only-keep-debug', file, debugfile], stderr=subprocess.STDOUT)
 
     # Set the debuglink to have the view of the file path on the target
-    cmd = "'%s' --add-gnu-debuglink='%s' '%s'" % (objcopy, debugfile, file)
-    (retval, output) = oe.utils.getstatusoutput(cmd)
-    if retval:
-        bb.fatal("objcopy failed with exit code %s (cmd was %s)%s" % (retval, cmd, ":\n%s" % output if output else ""))
+    subprocess.check_output([objcopy, '--add-gnu-debuglink', debugfile, file], stderr=subprocess.STDOUT)
 
     if newmode:
         os.chmod(file, origmode)
@@ -411,6 +425,7 @@ def copydebugsources(debugsrcdir, d):
     # and copied to the destination here.
 
     import stat
+    import subprocess
 
     sourcefile = d.expand("${WORKDIR}/debugsources.list")
     if debugsrcdir and os.path.isfile(sourcefile):
@@ -447,23 +462,20 @@ def copydebugsources(debugsrcdir, d):
         processdebugsrc += "(cd '%s' ; cpio -pd0mlL --no-preserve-owner '%s%s' 2>/dev/null)"
 
         cmd = processdebugsrc % (sourcefile, workbasedir, localsrc_prefix, workparentdir, dvar, debugsrcdir)
-        (retval, output) = oe.utils.getstatusoutput(cmd)
-        # Can "fail" if internal headers/transient sources are attempted
-        #if retval:
-        #    bb.fatal("debug source copy failed with exit code %s (cmd was %s)" % (retval, cmd))
+        try:
+            subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError:
+            # Can "fail" if internal headers/transient sources are attempted
+            pass
 
         # cpio seems to have a bug with -lL together and symbolic links are just copied, not dereferenced.
         # Work around this by manually finding and copying any symbolic links that made it through.
         cmd = "find %s%s -type l -print0 -delete | sed s#%s%s/##g | (cd '%s' ; cpio -pd0mL --no-preserve-owner '%s%s' 2>/dev/null)" % (dvar, debugsrcdir, dvar, debugsrcdir, workparentdir, dvar, debugsrcdir)
-        (retval, output) = oe.utils.getstatusoutput(cmd)
-        if retval:
-            bb.fatal("debugsrc symlink fixup failed with exit code %s (cmd was %s)" % (retval, cmd))
+        subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
 
         # The copy by cpio may have resulted in some empty directories!  Remove these
         cmd = "find %s%s -empty -type d -delete" % (dvar, debugsrcdir)
-        (retval, output) = oe.utils.getstatusoutput(cmd)
-        if retval:
-            bb.fatal("empty directory removal failed with exit code %s (cmd was %s)%s" % (retval, cmd, ":\n%s" % output if output else ""))
+        subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
 
         # Also remove debugsrcdir if its empty
         for p in nosuchdir[::-1]:
@@ -482,7 +494,8 @@ def get_package_mapping (pkg, basepkg, d):
 
     if key in data:
         # Have to avoid undoing the write_extra_pkgs(global_variants...)
-        if bb.data.inherits_class('allarch', d) and data[key] == basepkg:
+        if bb.data.inherits_class('allarch', d) and not d.getVar('MULTILIB_VARIANTS') \
+            and data[key] == basepkg:
             return pkg
         return data[key]
 
@@ -624,16 +637,16 @@ python package_do_split_locales() {
 }
 
 python perform_packagecopy () {
+    import subprocess
+
     dest = d.getVar('D')
     dvar = d.getVar('PKGD')
 
     # Start by package population by taking a copy of the installed
     # files to operate on
     # Preserve sparse files and hard links
-    cmd = 'tar -cf - -C %s -p . | tar -xf - -C %s' % (dest, dvar)
-    (retval, output) = oe.utils.getstatusoutput(cmd)
-    if retval:
-        bb.fatal("file copy failed with exit code %s (cmd was %s)%s" % (retval, cmd, ":\n%s" % output if output else ""))
+    cmd = 'tar -cf - -C %s -p -S . | tar -xf - -C %s' % (dest, dvar)
+    subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
 
     # replace RPATHs for the nativesdk binaries, to make them relocatable
     if bb.data.inherits_class('nativesdk', d) or bb.data.inherits_class('cross-canadian', d):
@@ -762,7 +775,11 @@ python fixup_perms () {
         bbpath = d.getVar('BBPATH')
         fs_perms_tables = d.getVar('FILESYSTEM_PERMS_TABLES') or ""
         for conf_file in fs_perms_tables.split():
-            str += " %s" % bb.utils.which(bbpath, conf_file)
+            confpath = bb.utils.which(bbpath, conf_file)
+            if confpath:
+                str += " %s" % bb.utils.which(bbpath, conf_file)
+            else:
+                bb.warn("cannot find %s specified in FILESYSTEM_PERMS_TABLES" % conf_file)
         return str
 
 
@@ -880,6 +897,7 @@ python fixup_perms () {
 
 python split_and_strip_files () {
     import stat, errno
+    import subprocess
 
     dvar = d.getVar('PKGD')
     pn = d.getVar('PN')
@@ -916,43 +934,6 @@ python split_and_strip_files () {
     sourcefile = d.expand("${WORKDIR}/debugsources.list")
     bb.utils.remove(sourcefile)
 
-    # Return type (bits):
-    # 0 - not elf
-    # 1 - ELF
-    # 2 - stripped
-    # 4 - executable
-    # 8 - shared library
-    # 16 - kernel module
-    def isELF(path):
-        type = 0
-        ret, result = oe.utils.getstatusoutput("file -b '%s'" % path)
-
-        if ret:
-            msg = "split_and_strip_files: 'file %s' failed" % path
-            package_qa_handle_error("split-strip", msg, d)
-            return type
-
-        # Not stripped
-        if "ELF" in result:
-            type |= 1
-            if "not stripped" not in result:
-                type |= 2
-            if "executable" in result:
-                type |= 4
-            if "shared" in result:
-                type |= 8
-        return type
-
-    def isStaticLib(path):
-        if path.endswith('.a') and not os.path.islink(path):
-            with open(path, 'rb') as fh:
-                # The magic must include the first slash to avoid
-                # matching golang static libraries
-                magic = b'!<arch>\x0a/'
-                start = fh.read(len(magic))
-                return start == magic
-        return False
-
     #
     # First lets figure out all of the files we may have to process ... do this only once!
     #
@@ -966,13 +947,15 @@ python split_and_strip_files () {
     skipfiles = (d.getVar("INHIBIT_PACKAGE_STRIP_FILES") or "").split()
     if (d.getVar('INHIBIT_PACKAGE_STRIP') != '1' or \
             d.getVar('INHIBIT_PACKAGE_DEBUG_SPLIT') != '1'):
+        checkelf = {}
+        checkelflinks = {}
         for root, dirs, files in cpath.walk(dvar):
             for f in files:
                 file = os.path.join(root, f)
                 if file.endswith(".ko") and file.find("/lib/modules/") != -1:
                     kernmods.append(file)
                     continue
-                if isStaticLib(file):
+                if oe.package.is_static_lib(file):
                     staticlibs.append(file)
                     continue
 
@@ -999,59 +982,63 @@ python split_and_strip_files () {
                 # Check its an executable
                 if (s[stat.ST_MODE] & stat.S_IXUSR) or (s[stat.ST_MODE] & stat.S_IXGRP) or (s[stat.ST_MODE] & stat.S_IXOTH) \
                         or ((file.startswith(libdir) or file.startswith(baselibdir)) and (".so" in f or ".node" in f)):
-                    # If it's a symlink, and points to an ELF file, we capture the readlink target
+
                     if cpath.islink(file):
-                        target = os.readlink(file)
-                        if isELF(ltarget):
-                            #bb.note("Sym: %s (%d)" % (ltarget, isELF(ltarget)))
-                            symlinks[file] = target
+                        checkelflinks[file] = ltarget
                         continue
+                    # Use a reference of device ID and inode number to identify files
+                    file_reference = "%d_%d" % (s.st_dev, s.st_ino)
+                    checkelf[file] = (file, file_reference)
 
-                    # It's a file (or hardlink), not a link
-                    # ...but is it ELF, and is it already stripped?
-                    elf_file = isELF(file)
-                    if elf_file & 1:
-                        if elf_file & 2:
-                            if 'already-stripped' in (d.getVar('INSANE_SKIP_' + pn) or "").split():
-                                bb.note("Skipping file %s from %s for already-stripped QA test" % (file[len(dvar):], pn))
-                            else:
-                                msg = "File '%s' from %s was already stripped, this will prevent future debugging!" % (file[len(dvar):], pn)
-                                package_qa_handle_error("already-stripped", msg, d)
-                            continue
+        results = oe.utils.multiprocess_launch(oe.package.is_elf, checkelflinks.values(), d)
+        results_map = {}
+        for (ltarget, elf_file) in results:
+            results_map[ltarget] = elf_file
+        for file in checkelflinks:
+            ltarget = checkelflinks[file]
+            # If it's a symlink, and points to an ELF file, we capture the readlink target
+            if results_map[ltarget]:
+                target = os.readlink(file)
+                #bb.note("Sym: %s (%d)" % (ltarget, results_map[ltarget]))
+                symlinks[file] = target
 
-                        # At this point we have an unstripped elf file. We need to:
-                        #  a) Make sure any file we strip is not hardlinked to anything else outside this tree
-                        #  b) Only strip any hardlinked file once (no races)
-                        #  c) Track any hardlinks between files so that we can reconstruct matching debug file hardlinks
+        results = oe.utils.multiprocess_launch(oe.package.is_elf, checkelf.keys(), d)
+        for (file, elf_file) in results:
+            # It's a file (or hardlink), not a link
+            # ...but is it ELF, and is it already stripped?
+            if elf_file & 1:
+                if elf_file & 2:
+                    if 'already-stripped' in (d.getVar('INSANE_SKIP_' + pn) or "").split():
+                        bb.note("Skipping file %s from %s for already-stripped QA test" % (file[len(dvar):], pn))
+                    else:
+                        msg = "File '%s' from %s was already stripped, this will prevent future debugging!" % (file[len(dvar):], pn)
+                        package_qa_handle_error("already-stripped", msg, d)
+                    continue
 
-                        # Use a reference of device ID and inode number to identify files
-                        file_reference = "%d_%d" % (s.st_dev, s.st_ino)
-                        if file_reference in inodes:
-                            os.unlink(file)
-                            os.link(inodes[file_reference][0], file)
-                            inodes[file_reference].append(file)
-                        else:
-                            inodes[file_reference] = [file]
-                            # break hardlink
-                            bb.utils.copyfile(file, file)
-                            elffiles[file] = elf_file
-                        # Modified the file so clear the cache
-                        cpath.updatecache(file)
+                # At this point we have an unstripped elf file. We need to:
+                #  a) Make sure any file we strip is not hardlinked to anything else outside this tree
+                #  b) Only strip any hardlinked file once (no races)
+                #  c) Track any hardlinks between files so that we can reconstruct matching debug file hardlinks
+
+                # Use a reference of device ID and inode number to identify files
+                file_reference = checkelf[file][1]
+                if file_reference in inodes:
+                    os.unlink(file)
+                    os.link(inodes[file_reference][0], file)
+                    inodes[file_reference].append(file)
+                else:
+                    inodes[file_reference] = [file]
+                    # break hardlink
+                    bb.utils.break_hardlinks(file)
+                    elffiles[file] = elf_file
+                # Modified the file so clear the cache
+                cpath.updatecache(file)
 
     #
     # First lets process debug splitting
     #
     if (d.getVar('INHIBIT_PACKAGE_DEBUG_SPLIT') != '1'):
-        for file in elffiles:
-            src = file[len(dvar):]
-            dest = debuglibdir + os.path.dirname(src) + debugdir + "/" + os.path.basename(src) + debugappend
-            fpath = dvar + dest
-
-            # Split the file...
-            bb.utils.mkdirhier(os.path.dirname(fpath))
-            #bb.note("Split %s -> %s" % (file, fpath))
-            # Only store off the hard link reference if we successfully split!
-            splitdebuginfo(file, fpath, debugsrcdir, sourcefile, d)
+        oe.utils.multiprocess_launch(splitdebuginfo, list(elffiles), d, extraargs=(dvar, debugdir, debuglibdir, debugappend, debugsrcdir, sourcefile, d))
 
         if debugsrcdir and not targetos.startswith("mingw"):
             for file in staticlibs:
@@ -1061,15 +1048,18 @@ python split_and_strip_files () {
         for ref in inodes:
             if len(inodes[ref]) == 1:
                 continue
+
+            target = inodes[ref][0][len(dvar):]
             for file in inodes[ref][1:]:
                 src = file[len(dvar):]
-                dest = debuglibdir + os.path.dirname(src) + debugdir + "/" + os.path.basename(src) + debugappend
+                dest = debuglibdir + os.path.dirname(src) + debugdir + "/" + os.path.basename(target) + debugappend
                 fpath = dvar + dest
-                target = inodes[ref][0][len(dvar):]
                 ftarget = dvar + debuglibdir + os.path.dirname(target) + debugdir + "/" + os.path.basename(target) + debugappend
                 bb.utils.mkdirhier(os.path.dirname(fpath))
-                #bb.note("Link %s -> %s" % (fpath, ftarget))
-                os.link(ftarget, fpath)
+                # Only one hardlink of separated debug info file in each directory
+                if not os.access(fpath, os.R_OK):
+                    #bb.note("Link %s -> %s" % (fpath, ftarget))
+                    os.link(ftarget, fpath)
 
         # Create symlinks for all cases we were able to split symbols
         for file in symlinks:
@@ -1118,7 +1108,7 @@ python split_and_strip_files () {
         for f in kernmods:
             sfiles.append((f, 16, strip))
 
-        oe.utils.multiprocess_exec(sfiles, oe.package.runstrip)
+        oe.utils.multiprocess_launch(oe.package.runstrip, sfiles, d)
 
     #
     # End of strip
@@ -1151,21 +1141,22 @@ python populate_packages () {
 
     # Sanity check PACKAGES for duplicates
     # Sanity should be moved to sanity.bbclass once we have the infrastructure
-    package_list = []
+    package_dict = {}
 
-    for pkg in packages.split():
-        if pkg in package_list:
+    for i, pkg in enumerate(packages.split()):
+        if pkg in package_dict:
             msg = "%s is listed in PACKAGES multiple times, this leads to packaging errors." % pkg
             package_qa_handle_error("packages-list", msg, d)
         # If debug-with-srcpkg mode is enabled then the src package will have
         # priority over dbg package when assigning the files.
         # This allows src package to include source files and remove them from dbg.
         elif split_source_package and pkg.endswith("-src"):
-            package_list.insert(0, pkg)
-        elif autodebug and pkg.endswith("-dbg") and not split_source_package:
-            package_list.insert(0, pkg)
+            package_dict[pkg] = (10, i)
+        elif autodebug and pkg.endswith("-dbg"):
+            package_dict[pkg] = (30, i)
         else:
-            package_list.append(pkg)
+            package_dict[pkg] = (50, i)
+    package_list = sorted(package_dict.keys(), key=package_dict.get)
     d.setVar('PACKAGES', ' '.join(package_list))
     pkgdest = d.getVar('PKGDEST')
 
@@ -1411,9 +1402,6 @@ fi
     pkgdest = d.getVar('PKGDEST')
     pkgdatadir = d.getVar('PKGDESTWORK')
 
-    # Take shared lock since we're only reading, not writing
-    lf = bb.utils.lockfile(d.expand("${PACKAGELOCK}"), True)
-
     data_file = pkgdatadir + d.expand("/${PN}" )
     f = open(data_file, 'w')
     f.write("PACKAGES: %s\n" % packages)
@@ -1426,7 +1414,8 @@ fi
     if bb.data.inherits_class('kernel', d) or bb.data.inherits_class('module-base', d):
         write_extra_pkgs(variants, pn, packages, pkgdatadir)
 
-    if (bb.data.inherits_class('allarch', d) and not bb.data.inherits_class('packagegroup', d)):
+    if bb.data.inherits_class('allarch', d) and not variants \
+        and not bb.data.inherits_class('packagegroup', d):
         write_extra_pkgs(global_variants, pn, packages, pkgdatadir)
 
     workdir = d.getVar('WORKDIR')
@@ -1515,10 +1504,10 @@ fi
     if bb.data.inherits_class('kernel', d) or bb.data.inherits_class('module-base', d):
         write_extra_runtime_pkgs(variants, packages, pkgdatadir)
 
-    if bb.data.inherits_class('allarch', d) and not bb.data.inherits_class('packagegroup', d):
+    if bb.data.inherits_class('allarch', d) and not variants \
+        and not bb.data.inherits_class('packagegroup', d):
         write_extra_runtime_pkgs(global_variants, packages, pkgdatadir)
 
-    bb.utils.unlockfile(lf)
 }
 emit_pkgdata[dirs] = "${PKGDESTWORK}/runtime ${PKGDESTWORK}/runtime-reverse ${PKGDESTWORK}/runtime-rprovides"
 
@@ -1558,7 +1547,7 @@ python package_do_filedeps() {
         for files in chunks(pkgfiles[pkg], 100):
             pkglist.append((pkg, files, rpmdeps, pkgdest))
 
-    processed = oe.utils.multiprocess_exec( pkglist, oe.package.filedeprunner)
+    processed = oe.utils.multiprocess_launch(oe.package.filedeprunner, pkglist, d)
 
     provides_files = {}
     requires_files = {}
@@ -1574,12 +1563,12 @@ python package_do_filedeps() {
         for file in provides:
             provides_files[pkg].append(file)
             key = "FILERPROVIDES_" + file + "_" + pkg
-            d.setVar(key, " ".join(provides[file]))
+            d.appendVar(key, " " + " ".join(provides[file]))
 
         for file in requires:
             requires_files[pkg].append(file)
             key = "FILERDEPENDS_" + file + "_" + pkg
-            d.setVar(key, " ".join(requires[file]))
+            d.appendVar(key, " " + " ".join(requires[file]))
 
     for pkg in requires_files:
         d.setVar("FILERDEPENDSFLIST_" + pkg, " ".join(requires_files[pkg]))
@@ -1592,7 +1581,7 @@ SHLIBSWORKDIR = "${PKGDESTWORK}/${MLPREFIX}shlibs2"
 
 python package_do_shlibs() {
     import re, pipes
-    import subprocess as sub
+    import subprocess
 
     exclude_shlibs = d.getVar('EXCLUDE_FROM_SHLIBS', False)
     if exclude_shlibs:
@@ -1603,6 +1592,18 @@ python package_do_shlibs() {
     libdir_re = re.compile(".*/%s$" % d.getVar('baselib'))
 
     packages = d.getVar('PACKAGES')
+
+    shlib_pkgs = []
+    exclusion_list = d.getVar("EXCLUDE_PACKAGES_FROM_SHLIBS")
+    if exclusion_list:
+        for pkg in packages.split():
+            if pkg not in exclusion_list.split():
+                shlib_pkgs.append(pkg)
+            else:
+                bb.note("not generating shlibs for %s" % pkg)
+    else:
+        shlib_pkgs = packages.split()
+
     targetos = d.getVar('TARGET_OS')
 
     workdir = d.getVar('WORKDIR')
@@ -1617,28 +1618,28 @@ python package_do_shlibs() {
 
     shlibswork_dir = d.getVar('SHLIBSWORKDIR')
 
-    # Take shared lock since we're only reading, not writing
-    lf = bb.utils.lockfile(d.expand("${PACKAGELOCK}"), True)
-
-    def linux_so(file, needed, sonames, renames, pkgver):
+    def linux_so(file, pkg, pkgver, d):
         needs_ldconfig = False
+        needed = set()
+        sonames = set()
+        renames = []
         ldir = os.path.dirname(file).replace(pkgdest + "/" + pkg, '')
         cmd = d.getVar('OBJDUMP') + " -p " + pipes.quote(file) + " 2>/dev/null"
         fd = os.popen(cmd)
         lines = fd.readlines()
         fd.close()
-        rpath = []
+        rpath = tuple()
         for l in lines:
             m = re.match("\s+RPATH\s+([^\s]*)", l)
             if m:
                 rpaths = m.group(1).replace("$ORIGIN", ldir).split(":")
-                rpath = list(map(os.path.normpath, rpaths))
+                rpath = tuple(map(os.path.normpath, rpaths))
         for l in lines:
             m = re.match("\s+NEEDED\s+([^\s]*)", l)
             if m:
                 dep = m.group(1)
-                if dep not in needed[pkg]:
-                    needed[pkg].append((dep, file, rpath))
+                if dep not in needed:
+                    needed.add((dep, file, rpath))
             m = re.match("\s+SONAME\s+([^\s]*)", l)
             if m:
                 this_soname = m.group(1)
@@ -1646,12 +1647,12 @@ python package_do_shlibs() {
                 if not prov in sonames:
                     # if library is private (only used by package) then do not build shlib for it
                     if not private_libs or this_soname not in private_libs:
-                        sonames.append(prov)
+                        sonames.add(prov)
                 if libdir_re.match(os.path.dirname(file)):
                     needs_ldconfig = True
                 if snap_symlinks and (os.path.basename(file) != this_soname):
                     renames.append((file, os.path.join(os.path.dirname(file), this_soname)))
-        return needs_ldconfig
+        return (needs_ldconfig, needed, sonames, renames)
 
     def darwin_so(file, needed, sonames, renames, pkgver):
         if not os.path.exists(file):
@@ -1679,10 +1680,10 @@ python package_do_shlibs() {
             for combo in combos:
                 if not combo in sonames:
                     prov = (combo, ldir, pkgver)
-                    sonames.append(prov)
+                    sonames.add(prov)
         if file.endswith('.dylib') or file.endswith('.so'):
             rpath = []
-            p = sub.Popen([d.expand("${HOST_PREFIX}otool"), '-l', file],stdout=sub.PIPE,stderr=sub.PIPE)
+            p = subprocess.Popen([d.expand("${HOST_PREFIX}otool"), '-l', file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             out, err = p.communicate()
             # If returned successfully, process stdout for results
             if p.returncode == 0:
@@ -1691,7 +1692,7 @@ python package_do_shlibs() {
                     if l.startswith('path '):
                         rpath.append(l.split()[1])
 
-        p = sub.Popen([d.expand("${HOST_PREFIX}otool"), '-L', file],stdout=sub.PIPE,stderr=sub.PIPE)
+        p = subprocess.Popen([d.expand("${HOST_PREFIX}otool"), '-L', file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = p.communicate()
         # If returned successfully, process stdout for results
         if p.returncode == 0:
@@ -1703,7 +1704,7 @@ python package_do_shlibs() {
                     continue
                 name = os.path.basename(l.split()[0]).rsplit(".", 1)[0]
                 if name and name not in needed[pkg]:
-                     needed[pkg].append((name, file, []))
+                     needed[pkg].add((name, file, tuple()))
 
     def mingw_dll(file, needed, sonames, renames, pkgver):
         if not os.path.exists(file):
@@ -1711,18 +1712,18 @@ python package_do_shlibs() {
 
         if file.endswith(".dll"):
             # assume all dlls are shared objects provided by the package
-            sonames.append((os.path.basename(file), os.path.dirname(file).replace(pkgdest + "/" + pkg, ''), pkgver))
+            sonames.add((os.path.basename(file), os.path.dirname(file).replace(pkgdest + "/" + pkg, ''), pkgver))
 
         if (file.endswith(".dll") or file.endswith(".exe")):
             # use objdump to search for "DLL Name: .*\.dll"
-            p = sub.Popen([d.expand("${HOST_PREFIX}objdump"), "-p", file], stdout = sub.PIPE, stderr= sub.PIPE)
+            p = subprocess.Popen([d.expand("${HOST_PREFIX}objdump"), "-p", file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             out, err = p.communicate()
             # process the output, grabbing all .dll names
             if p.returncode == 0:
                 for m in re.finditer("DLL Name: (.*?\.dll)$", out.decode(), re.MULTILINE | re.IGNORECASE):
                     dllname = m.group(1)
                     if dllname:
-                        needed[pkg].append((dllname, file, []))
+                        needed[pkg].add((dllname, file, tuple()))
 
     if d.getVar('PACKAGE_SNAP_LIB_SYMLINKS') == "1":
         snap_symlinks = True
@@ -1732,9 +1733,13 @@ python package_do_shlibs() {
     use_ldconfig = bb.utils.contains('DISTRO_FEATURES', 'ldconfig', True, False, d)
 
     needed = {}
-    shlib_provider = oe.package.read_shlib_providers(d)
 
-    for pkg in packages.split():
+    # Take shared lock since we're only reading, not writing
+    lf = bb.utils.lockfile(d.expand("${PACKAGELOCK}"), True)
+    shlib_provider = oe.package.read_shlib_providers(d)
+    bb.utils.unlockfile(lf)
+
+    for pkg in shlib_pkgs:
         private_libs = d.getVar('PRIVATE_LIBS_' + pkg) or d.getVar('PRIVATE_LIBS') or ""
         private_libs = private_libs.split()
         needs_ldconfig = False
@@ -1746,9 +1751,10 @@ python package_do_shlibs() {
         if not pkgver:
             pkgver = ver
 
-        needed[pkg] = []
-        sonames = list()
-        renames = list()
+        needed[pkg] = set()
+        sonames = set()
+        renames = []
+        linuxlist = []
         for file in pkgfiles[pkg]:
                 soname = None
                 if cpath.islink(file):
@@ -1758,8 +1764,17 @@ python package_do_shlibs() {
                 elif targetos.startswith("mingw"):
                     mingw_dll(file, needed, sonames, renames, pkgver)
                 elif os.access(file, os.X_OK) or lib_re.match(file):
-                    ldconfig = linux_so(file, needed, sonames, renames, pkgver)
-                    needs_ldconfig = needs_ldconfig or ldconfig
+                    linuxlist.append(file)
+
+        if linuxlist:
+            results = oe.utils.multiprocess_launch(linux_so, linuxlist, d, extraargs=(pkg, pkgver, d))
+            for r in results:
+                ldconfig = r[0]
+                needed[pkg] |= r[1]
+                sonames |= r[2]
+                renames.extend(r[3])
+                needs_ldconfig = needs_ldconfig or ldconfig
+
         for (old, new) in renames:
             bb.note("Renaming %s to %s" % (old, new))
             os.rename(old, new)
@@ -1788,8 +1803,6 @@ python package_do_shlibs() {
             d.setVar('pkg_postinst_%s' % pkg, postinst)
         bb.debug(1, 'LIBNAMES: pkg %s sonames %s' % (pkg, sonames))
 
-    bb.utils.unlockfile(lf)
-
     assumed_libs = d.getVar('ASSUME_SHLIBS')
     if assumed_libs:
         libdir = d.getVar("libdir")
@@ -1806,7 +1819,7 @@ python package_do_shlibs() {
 
     libsearchpath = [d.getVar('libdir'), d.getVar('base_libdir')]
 
-    for pkg in packages.split():
+    for pkg in shlib_pkgs:
         bb.debug(2, "calculating shlib requirements for %s" % pkg)
 
         private_libs = d.getVar('PRIVATE_LIBS_' + pkg) or d.getVar('PRIVATE_LIBS') or ""
@@ -1827,7 +1840,7 @@ python package_do_shlibs() {
                 for k in shlib_provider[n[0]].keys():
                     shlib_provider_path.append(k)
                 match = None
-                for p in n[2] + shlib_provider_path + libsearchpath:
+                for p in list(n[2]) + shlib_provider_path + libsearchpath:
                     if p in shlib_provider[n[0]]:
                         match = p
                         break
@@ -1902,9 +1915,6 @@ python package_do_pkgconfig () {
                             if hdr == 'Requires':
                                 pkgconfig_needed[pkg] += exp.replace(',', ' ').split()
 
-    # Take shared lock since we're only reading, not writing
-    lf = bb.utils.lockfile(d.expand("${PACKAGELOCK}"), True)
-
     for pkg in packages.split():
         pkgs_file = os.path.join(shlibswork_dir, pkg + ".pclist")
         if pkgconfig_provided[pkg] != []:
@@ -1912,6 +1922,9 @@ python package_do_pkgconfig () {
             for p in pkgconfig_provided[pkg]:
                 f.write('%s\n' % p)
             f.close()
+
+    # Take shared lock since we're only reading, not writing
+    lf = bb.utils.lockfile(d.expand("${PACKAGELOCK}"), True)
 
     # Go from least to most specific since the last one found wins
     for dir in reversed(shlibs_dirs):
@@ -1927,6 +1940,8 @@ python package_do_pkgconfig () {
                 pkgconfig_provided[pkg] = []
                 for l in lines:
                     pkgconfig_provided[pkg].append(l.rstrip())
+
+    bb.utils.unlockfile(lf)
 
     for pkg in packages.split():
         deps = []
@@ -1945,8 +1960,6 @@ python package_do_pkgconfig () {
             for dep in deps:
                 fd.write(dep + '\n')
             fd.close()
-
-    bb.utils.unlockfile(lf)
 }
 
 def read_libdep_files(d):

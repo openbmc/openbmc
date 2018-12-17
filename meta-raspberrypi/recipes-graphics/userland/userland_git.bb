@@ -5,20 +5,18 @@ vcos, openmaxil, vchiq_arm, bcm_host, WFC, OpenVG."
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENCE;md5=0448d6488ef8cc380632b1569ee6d196"
 
-PROVIDES = "virtual/libgles2 \
-            virtual/egl"
+PROVIDES += "${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", "", "virtual/libgles2 virtual/egl", d)}"
 
-RPROVIDES_${PN} += "libgles2 egl libegl"
-
+RPROVIDES_${PN} += "${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", "", "libgles2 egl libegl libegl1 libgl1 libglesv2-2", d)}"
 COMPATIBLE_MACHINE = "^rpi$"
 
 SRCBRANCH = "master"
 SRCFORK = "raspberrypi"
-SRCREV = "11389772c79685442e0ab8aa9be8ad0e32703f68"
+SRCREV = "d574b51a60a075baefe863670466ee24e6c4256e"
 
 # Use the date of the above commit as the package version. Update this when
 # SRCREV is changed.
-PV = "20180219"
+PV = "20181120"
 
 SRC_URI = "\
     git://github.com/${SRCFORK}/userland.git;protocol=git;branch=${SRCBRANCH} \
@@ -38,6 +36,8 @@ SRC_URI = "\
     file://0014-GLES2-gl2ext.h-Define-GL_R8_EXT-and-GL_RG8_EXT.patch \
     file://0015-EGL-glplatform.h-define-EGL_CAST.patch \
     file://0016-Allow-multiple-wayland-compositor-state-data-per-pro.patch \
+    file://0017-khronos-backport-typedef-for-EGL_EXT_image_dma_buf_i.patch \
+    file://0018-Add-EGL_IMG_context_priority-related-defines.patch \
 "
 S = "${WORKDIR}/git"
 
@@ -64,6 +64,14 @@ do_install_append () {
 		sed -i 's/include "vcos_futex_mutex.h"/include "pthreads\/vcos_futex_mutex.h"/g' ${f}
 		sed -i 's/include "vcos_platform_types.h"/include "pthreads\/vcos_platform_types.h"/g' ${f}
 	done
+	if [ "${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", "1", "0", d)}" = "1" ]; then
+		rm -rf ${D}${libdir}/libEGL*
+		rm -rf ${D}${libdir}/libGLES*
+		rm -rf ${D}${libdir}/libwayland-*
+		rm -rf ${D}${libdir}/pkgconfig/egl.pc ${D}${libdir}/pkgconfig/glesv2.pc \
+			${D}${libdir}/pkgconfig/wayland-egl.pc
+		rm -rf ${D}${includedir}/EGL ${D}${includedir}/GLES* ${D}${includedir}/KHR
+	fi
 }
 
 # Shared libs from userland package  build aren't versioned, so we need
@@ -83,3 +91,4 @@ FILES_${PN}-dbg += "${libdir}/plugins/.debug"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 RDEPENDS_${PN} += "bash"
+RDEPENDS_${PN} += "${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", "libegl1", "", d)}"

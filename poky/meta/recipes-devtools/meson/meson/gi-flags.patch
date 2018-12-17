@@ -1,0 +1,35 @@
+Pass the correct cflags/ldflags to the gobject-introspection tools.
+
+Upstream-Status: Submitted [https://github.com/mesonbuild/meson/pull/4261]
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/mesonbuild/modules/gnome.py b/mesonbuild/modules/gnome.py
+index cb69641e..bb4449a0 100644
+--- a/mesonbuild/modules/gnome.py
++++ b/mesonbuild/modules/gnome.py
+@@ -579,7 +579,10 @@ class GnomeModule(ExtensionModule):
+         external_ldflags += list(dep_external_ldflags)
+         scan_command += ['--cflags-begin']
+         scan_command += cflags
+-        scan_command += state.environment.coredata.get_external_args(lang)
++        if state.environment.is_cross_build():
++            scan_command += state.environment.cross_info.config["properties"].get(lang + '_args', "")
++        else:
++            scan_command += state.environment.coredata.get_external_args(lang)
+         scan_command += ['--cflags-end']
+         # need to put our output directory first as we need to use the
+         # generated libraries instead of any possibly installed system/prefix
+@@ -614,7 +614,12 @@ class GnomeModule(ExtensionModule):
+                 scan_command.append('-L' + d)
+             scan_command += ['--library', libname]
+ 
+-        for link_arg in state.environment.coredata.get_external_link_args(lang):
++        if state.environment.is_cross_build():
++            link_args = state.environment.cross_info.config["properties"].get(lang + '_link_args', "")
++        else:
++            link_args = state.environment.coredata.get_external_link_args(lang)
++
++        for link_arg in link_args:
+             if link_arg.startswith('-L'):
+                 scan_command.append(link_arg)
+         scan_command += list(external_ldflags)

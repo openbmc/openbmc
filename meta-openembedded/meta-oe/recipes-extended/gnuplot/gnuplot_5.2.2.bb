@@ -60,10 +60,12 @@ do_install_append_class-target() {
     install -m 0644 ${WORKDIR}/gnuplot.png ${D}${datadir}/pixmaps/
 }
 
-PACKAGES =+ "${PN}-x11-dbg ${PN}-x11"
+PACKAGES =+ "${PN}-x11"
+
+RPROVIDES_${PN}-dbg += "${PN}-x11-dbg"
+
 DESCRIPTION_${PN}-x11 = "X11 display terminal for Gnuplot."
 SECTION_${PN}-x11 = "x11/scientific"
 FILES_${PN}-x11 = "${libexecdir} ${datadir}/applications ${datadir}/pixmaps ${libdir}/X11 "
 
 FILES_${PN} += "${datadir}/texmf"
-FILES_${PN}-x11-dbg += "${libexecdir}/gnuplot/*/.debug"

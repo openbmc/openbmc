@@ -27,6 +27,8 @@ SRC_URI[sha256sum] = "115c3deae7f181778fd0e0ffaa2dad1bf1fe2f5677cf2e0e348cdb7a1c
 
 EXTRA_OEMAKE = "'CFLAGS=${CFLAGS} -Wall' \
     NO_ARLIB=1 \
+    BINDIR=${base_bindir} \
+    SBINDIR=${base_sbindir} \
     LIBDIR=${base_libdir} \
     USRLIBDIR=${base_libdir} \
     BUILDFOR=${SITEINFO_BITS}-bit \

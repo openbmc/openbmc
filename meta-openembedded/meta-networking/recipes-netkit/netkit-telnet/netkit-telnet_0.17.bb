@@ -5,13 +5,17 @@ DEPENDS = "ncurses"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://telnet/telnet.cc;beginline=2;endline=3;md5=780868e7b566313e70cb701560ca95ef"
 
-SRC_URI = "ftp://ftp.uk.linux.org/pub/linux/Networking/netkit/${BP}.tar.gz \
+SRC_URI = "http://ftp.linux.org.uk/pub/linux/Networking/netkit/${BP}.tar.gz \
            file://To-aviod-buffer-overflow-in-telnet.patch \
            file://Warning-fix-in-the-step-of-install.patch \
            file://telnet-xinetd \
            file://cross-compile.patch \
            file://0001-telnet-telnetd-Fix-print-format-strings.patch \
+           file://0001-telnet-telnetd-Fix-deadlock-on-cleanup.patch \
            "
+
+UPSTREAM_CHECK_URI = "${DEBIAN_MIRROR}/main/n/netkit-telnet/"
+UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)\.orig\.tar"
 
 EXTRA_OEMAKE = "INSTALLROOT=${D} SBINDIR=${sbindir} DAEMONMODE=755 \
     MANMODE=644 MANDIR=${mandir}"
@@ -46,16 +50,16 @@ do_install () {
     install -p -m644 ${WORKDIR}/telnet-xinetd ${D}/etc/xinetd.d/telnet
 }
 
-pkg_postinst_${PN} () {
-#!/bin/sh
-    update-alternatives --install ${bindir}/telnet telnet telnet.${PN} 100
-}
+inherit update-alternatives
 
-pkg_prerm_${PN} () {
-#!/bin/sh
-    update-alternatives --remove telnet telnet.${PN} 100
-}
+ALTERNATIVE_PRIORITY = "100"
+ALTERNATIVE_${PN} = "telnet"
+ALTERNATIVE_LINK_NAME[telnet] = "${bindir}/telnet"
+ALTERNATIVE_TARGET[telnet] = "${bindir}/telnet.${PN}"
 
 SRC_URI[md5sum] = "d6beabaaf53fe6e382c42ce3faa05a36"
 SRC_URI[sha256sum] = "9c80d5c7838361a328fb6b60016d503def9ce53ad3c589f3b08ff71a2bb88e00"
 FILES_${PN} += "${sbindir}/in.* ${libdir}/* ${sysconfdir}/xinetd.d/*"
+
+# http://errors.yoctoproject.org/Errors/Details/186954/
+EXCLUDE_FROM_WORLD_libc-musl = "1"

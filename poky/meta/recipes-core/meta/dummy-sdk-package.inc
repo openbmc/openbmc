@@ -1,6 +1,8 @@
 SUMMARY = "Dummy packages which handle excluding packages from the sdk, e.g. ensuring perl is excluded from buildtools"
 LICENSE = "MIT"
 
+PACKAGE_ARCH = "all"
+
 inherit allarch
 
 python() {

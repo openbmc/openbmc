@@ -1,4 +1,7 @@
-Subject: [PATCH 6/6] dropbear configuration file
+From e3a5db1b6d3f6382a15b2266458c26c645a10f18 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <Mingli.Yu@windriver.com>
+Date: Thu, 6 Sep 2018 15:54:00 +0800
+Subject: [PATCH] dropbear configuration file
 
 dropbear: Change the path ("/etc/pam.d/sshd" as default) to find a pam configuration file \
 to "/etc/pam.d/dropbear for dropbear when enabling pam supporting"
@@ -7,12 +10,17 @@ Upstream-Status: Inappropriate [configuration]
 
 Signed-off-by: Maxin B. John <maxin.john@enea.com>
 Signed-off-by: Xiaofeng Yan <xiaofeng.yan@windriver.com>
+Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
 ---
-diff -Naur dropbear-2013.60-orig/svr-authpam.c dropbear-2013.60/svr-authpam.c
---- dropbear-2013.60-orig/svr-authpam.c	2013-10-16 16:34:53.000000000 +0200
-+++ dropbear-2013.60/svr-authpam.c	2013-10-21 17:04:04.969416055 +0200
-@@ -211,7 +211,7 @@
- 	userData.passwd = password;
+ svr-authpam.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/svr-authpam.c b/svr-authpam.c
+index d201bc9..165ec5c 100644
+--- a/svr-authpam.c
++++ b/svr-authpam.c
+@@ -223,7 +223,7 @@ void svr_auth_pam(int valid_user) {
+ 	}
  
  	/* Init pam */
 -	if ((rc = pam_start("sshd", NULL, &pamConv, &pamHandlep)) != PAM_SUCCESS) {
@@ -20,3 +28,6 @@ diff -Naur dropbear-2013.60-orig/svr-authpam.c dropbear-2013.60/svr-authpam.c
  		dropbear_log(LOG_WARNING, "pam_start() failed, rc=%d, %s", 
  				rc, pam_strerror(pamHandlep, rc));
  		goto cleanup;
+-- 
+2.7.4
+

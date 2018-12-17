@@ -43,10 +43,6 @@ do_install() {
     rm -rf ${D}/dev
 }
 
-pkg_postinst_${PN}() {
-    # make sure running on the target
-    if [ x"$D" != "x" ]; then
-        exit 1
-    fi
+pkg_postinst_ontarget_${PN}() {
     /bin/mknod -m 0622 /dev/grsec c 1 13
 }

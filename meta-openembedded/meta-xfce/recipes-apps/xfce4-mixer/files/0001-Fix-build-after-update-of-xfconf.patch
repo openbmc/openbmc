@@ -1,0 +1,61 @@
+From 6ecaeced291f935a9d41e9bc33411358c95a5e91 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Mon, 22 Jan 2018 15:35:08 +0100
+Subject: [PATCH] Fix build after update of xfconf
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+xfconf stopped using dbus-glib so required flags must be included here
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ panel-plugin/Makefile.am | 2 ++
+ xfce4-mixer/Makefile.am  | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/panel-plugin/Makefile.am b/panel-plugin/Makefile.am
+index a494682..b094472 100644
+--- a/panel-plugin/Makefile.am
++++ b/panel-plugin/Makefile.am
+@@ -27,6 +27,7 @@ libmixer_la_CFLAGS =							\
+ 	$(LIBXFCE4UI_CFLAGS)						\
+ 	$(LIBXFCE4PANEL_CFLAGS)						\
+ 	$(XFCONF_CFLAGS)						\
++	$(DBUS_GLIB_CFLAGS)						\
+ 	$(GST_PLUGINS_BASE_CFLAGS)					\
+ 	$(KEYBINDER_CFLAGS)
+ 
+@@ -48,6 +49,7 @@ libmixer_la_LIBADD =							\
+ 	$(LIBXFCE4UI_LIBS)						\
+ 	$(LIBXFCE4PANEL_LIBS)						\
+ 	$(XFCONF_LIBS)							\
++	$(DBUS_GLIB_LIBS)						\
+ 	$(GST_PLUGINS_BASE_LIBS)					\
+ 	-lgstaudio-0.10							\
+ 	-lgstinterfaces-0.10						\
+diff --git a/xfce4-mixer/Makefile.am b/xfce4-mixer/Makefile.am
+index 4af69e9..e076fc8 100644
+--- a/xfce4-mixer/Makefile.am
++++ b/xfce4-mixer/Makefile.am
+@@ -32,6 +32,7 @@ xfce4_mixer_CFLAGS = 							\
+ 	$(UNIQUE_CFLAGS)						\
+ 	$(LIBXFCE4UTIL_CFLAGS)						\
+ 	$(LIBXFCE4UI_CFLAGS)						\
++	$(DBUS_GLIB_CFLAGS)						\
+ 	$(XFCONF_CFLAGS)						\
+ 	$(GST_PLUGINS_BASE_CFLAGS)
+ 
+@@ -46,6 +47,7 @@ xfce4_mixer_LDFLAGS = 							\
+ 	$(UNIQUE_LIBS)							\
+ 	$(LIBXFCE4UTIL_LIBS)						\
+ 	$(LIBXFCE4UI_LIBS)						\
++	$(DBUS_GLIB_LIBS)						\
+ 	$(XFCONF_LIBS)							\
+ 	$(GST_PLUGINS_BASE_LIBS)					\
+ 	-lgstaudio-0.10							\
+-- 
+2.14.3
+

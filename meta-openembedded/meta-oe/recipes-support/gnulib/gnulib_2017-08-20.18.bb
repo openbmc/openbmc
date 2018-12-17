@@ -14,6 +14,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=56a22a6e5bcce45e2c8ac184f81412b5"
 SRCREV = "b23000de1e47c7d580e0e220966dd1ee42a5e5bc"
 
 SRC_URI = "git://git.sv.gnu.org/gnulib;protocol=git \
+           file://CVE-2018-17942.patch \
 "
 
 S = "${WORKDIR}/git"
@@ -22,6 +23,8 @@ do_install () {
     cd ${S}
     git checkout master
     git clone ${S} ${D}/${datadir}/gnulib
+    cd ${D}/${datadir}/gnulib
+    git am ${WORKDIR}/CVE-2018-17942.patch
 }
 
 do_patch[noexec] = "1"
@@ -32,5 +35,6 @@ do_packagedata[noexec] = "1"
 deltask package_write_ipk
 deltask package_write_deb
 deltask package_write_rpm
+deltask do_deploy_archives 
 
 BBCLASSEXTEND = "native"

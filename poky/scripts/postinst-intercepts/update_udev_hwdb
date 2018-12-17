@@ -1,0 +1,6 @@
+#!/bin/sh
+
+set -e
+
+PSEUDO_UNLOAD=1 ${binprefix}qemuwrapper -L $D $D${libexecdir}/${binprefix}udevadm hwdb --update --root $D
+chown root:root $D${sysconfdir}/udev/hwdb.bin

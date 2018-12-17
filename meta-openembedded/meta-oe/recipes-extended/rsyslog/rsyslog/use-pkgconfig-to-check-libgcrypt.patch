@@ -3,7 +3,7 @@ From: Roy Li <rongqing.li@windriver.com>
 Date: Wed, 18 Jun 2014 13:46:52 +0800
 Subject: [PATCH] use pkgconfig to check libgcrypt
 
-Upstream-status: Inappropriate [configuration]
+Upstream-Status: Inappropriate [configuration]
 
 libgcrypt does no longer provide libgcrypt-config, and provide
 *.pc, so we should use pkgconfig to check

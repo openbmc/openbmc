@@ -37,7 +37,7 @@ import bb.utils
 
 logger = logging.getLogger("BitBake.Cache")
 
-__cache_version__ = "151"
+__cache_version__ = "152"
 
 def getCacheFile(path, filename, data_hash):
     return os.path.join(path, filename + "." + data_hash)

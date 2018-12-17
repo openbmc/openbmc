@@ -1,19 +1,20 @@
-From 0a2877400a086e9d6ddd32a80462b7a931921dc2 Mon Sep 17 00:00:00 2001
+From 82a4f60ab24dff121f5f9d3bbcd9a8a28bb7caef Mon Sep 17 00:00:00 2001
 From: Chunrong Guo <B40290@freescale.com>
 Date: Sun, 8 Sep 2013 23:21:49 -0500
-Subject: [PATCH] libhugetlbfs: avoid search host library path for cross 
+Subject: [PATCH] libhugetlbfs: avoid search host library path for cross
  compilation
 
 Upstream-Status: Inappropriate [oe-core specific]
 
 Signed-off-by: Chunrong Guo <B40290@freescale.com>
+
 ---
- ldscripts/elf32ppclinux.xB   |    2 +-
- ldscripts/elf32ppclinux.xBDT |    2 +-
- ldscripts/elf64ppc.xB        |    2 +-
- ldscripts/elf64ppc.xBDT      |    2 +-
- ldscripts/elf_x86_64.xB      |    2 +-
- ldscripts/elf_x86_64.xBDT    |    2 +-
+ ldscripts/elf32ppclinux.xB   | 2 +-
+ ldscripts/elf32ppclinux.xBDT | 2 +-
+ ldscripts/elf64ppc.xB        | 2 +-
+ ldscripts/elf64ppc.xBDT      | 2 +-
+ ldscripts/elf_x86_64.xB      | 2 +-
+ ldscripts/elf_x86_64.xBDT    | 2 +-
  6 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/ldscripts/elf32ppclinux.xB b/ldscripts/elf32ppclinux.xB
@@ -94,6 +95,3 @@ index 1855202..c62d245 100644
  INPUT(-lhugetlbfs);
  /* Do we need any of these for elf?
     __DYNAMIC = 0;    */
--- 
-1.7.9.7
-

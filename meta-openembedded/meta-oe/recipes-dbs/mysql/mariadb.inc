@@ -18,9 +18,10 @@ SRC_URI = "https://downloads.mariadb.org/f/${BP}/source/${BP}.tar.gz \
            file://change-cc-to-cc-version.patch \
            file://0001-disable-ucontext-on-musl.patch \
           "
+SRC_URI[md5sum] = "6375d577e9539b839f44d857e70f82b9"
+SRC_URI[sha256sum] = "56a365af71b8a9ec8bfee0801e2dec95011da8ee7507986ca329be11296411db"
 
-SRC_URI[md5sum] = "3cec4afc06b468687ef576c90148d10d"
-SRC_URI[sha256sum] = "c3269ce20b45b177239fd1e3d6d9428a94131711f12758ebf5f65222278bb110"
+UPSTREAM_CHECK_URI = "https://github.com/MariaDB/server/releases"
 
 S = "${WORKDIR}/mariadb-${PV}"
 
@@ -161,12 +162,14 @@ do_install() {
 }
 
 PACKAGES = "${PN}-dbg ${PN} \
-    libmysqlclient-r libmysqlclient-r-dev libmysqlclient-r-staticdev libmysqlclient-r-dbg \
-    libmysqlclient libmysqlclient-dev libmysqlclient-staticdev libmysqlclient-dbg \
+    libmysqlclient-r libmysqlclient-r-dev libmysqlclient-r-staticdev \
+    libmysqlclient libmysqlclient-dev libmysqlclient-staticdev \
     libmysqld libmysqld-dev ${PN}-client ${PN}-server ${PN}-setupdb ${PN}-leftovers"
 CONFFILES_${PN}-server += "${sysconfdir}/my.cnf ${sysconfdir}/my.cnf.d/server.cnf"
 CONFFILES_${PN}-client += "${sysconfdir}/my.cnf.d/mysql-clients.cnf"
 CONFFILES_libmysqlclient += "${sysconfdir}/my.cnf.d/client.cnf"
+
+RPROVIDES_${PN}-dbg += "libmysqlclient-r-dbg libmysqlclient-dbg"
 
 FILES_${PN} = " "
 RDEPENDS_${PN} = "${PN}-client ${PN}-server"
@@ -200,8 +203,6 @@ FILES_libmysqlclient-dev = " \
     ${bindir}/mysql_config"
 FILES_libmysqlclient-staticdev = "\
     ${libdir}/*.a"
-FILES_libmysqlclient-dbg = "${libdir}/plugin/.debug/ \
-    ${datadir}/mysql-test/lib/My/SafeProcess/.debug/my_safe_process"
 
 # Avoid warnings about ha_xtradb.so.0.0.0 and ha_innodb_plugin.so.0.0.0
 # which are intentionally non-PIC on 32-bit x86 (see e.g.
@@ -212,7 +213,6 @@ FILES_libmysqlclient-r = "${libdir}/libmysqlclient_r.so.*"
 FILES_libmysqlclient-r-dev = "\
     ${libdir}/libmysqlclient_r.so"
 FILES_libmysqlclient-r-staticdev = "${libdir}/libmysqlclient_r.a"
-FILES_libmysqlclient-r-dbg = "${libdir}/plugin/.debuglibmysqlclient_r.so.*"
 
 FILES_libmysqld = "\
     ${libdir}/libmysqld.so.*"

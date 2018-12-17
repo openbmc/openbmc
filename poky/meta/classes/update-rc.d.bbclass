@@ -39,9 +39,9 @@ PACKAGE_WRITE_DEPS += "update-rc.d-native"
 updatercd_postinst() {
 if ${@use_updatercd(d)} && type update-rc.d >/dev/null 2>/dev/null; then
 	if [ -n "$D" ]; then
-		OPT="-r $D"
+		OPT="-f -r $D"
 	else
-		OPT="-s"
+		OPT="-f -s"
 	fi
 	update-rc.d $OPT ${INITSCRIPT_NAME} ${INITSCRIPT_PARAMS}
 fi

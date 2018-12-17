@@ -4,9 +4,18 @@ Upstream-Status:Inappropriate [configuration]
 
 Signed-off-by: Xiaofeng Yan <xiaofeng.yan@windriver.com>
 
---- a/configure.ac	2011-03-04 02:26:20.000000000 +0800
-+++ b/configure.ac.new	2011-07-18 10:14:12.516818852 +0800
-@@ -350,10 +350,10 @@
+Upstream-Status: Inappropriate [oe specific]
+Rebase to 0.115
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 36df239..8b3e1b1 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -471,10 +471,10 @@ elif test x$with_os_type = xfreebsd -o x$with_os_type = xnetbsd; then
      PAM_FILE_INCLUDE_PASSWORD=system
      PAM_FILE_INCLUDE_SESSION=system
  else
@@ -21,3 +30,6 @@ Signed-off-by: Xiaofeng Yan <xiaofeng.yan@windriver.com>
  fi
  
  AC_SUBST(PAM_FILE_INCLUDE_AUTH)
+-- 
+2.7.4
+

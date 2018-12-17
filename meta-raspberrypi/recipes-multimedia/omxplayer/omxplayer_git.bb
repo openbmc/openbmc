@@ -7,10 +7,11 @@ SECTION = "console/utils"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
-DEPENDS = "libpcre libav virtual/egl boost freetype dbus openssl libssh libomxil coreutils-native curl-native"
+DEPENDS = "libpcre libav virtual/egl boost freetype dbus openssl libssh libomxil coreutils-native curl-native userland"
+
 PR = "r4"
 
-SRCREV_default = "b8ff59dccd9307f10dad71bec2525a95bd6c603b"
+SRCREV_default = "b4bbef8fac5e8c2ddafa895f98456ba715b39c6b"
 
 # omxplayer builds its own copy of ffmpeg from source instead of using the
 # system's ffmpeg library. This isn't ideal but it's ok for now. We do however
@@ -18,12 +19,11 @@ SRCREV_default = "b8ff59dccd9307f10dad71bec2525a95bd6c603b"
 # fetching the latest commit on a release branch (which is what the checkout job
 # in Makefile.ffmpeg in the omxplayer source tree does).
 #
-# This SRCREV corresponds to the v3.1.10 release of ffmpeg.
-SRCREV_ffmpeg = "afa34cb36edca0ff809b7e58474bbce12271ecba"
+# This SRCREV corresponds to the v4.0.3 release of ffmpeg.
+SRCREV_ffmpeg = "fcbd117df3077bad495e99e20f01cf93737bce76"
 
 SRC_URI = "git://github.com/popcornmix/omxplayer.git;protocol=git;branch=master \
-           git://source.ffmpeg.org/ffmpeg;branch=release/3.1;protocol=git;depth=1;name=ffmpeg;destsuffix=git/ffmpeg \
-           file://0001-Remove-Makefile.include-which-includes-hardcoded.patch \
+           git://github.com/FFmpeg/FFmpeg;branch=release/4.0;protocol=git;depth=1;name=ffmpeg;destsuffix=git/ffmpeg \
            file://0002-Libraries-and-headers-from-ffmpeg-are-installed-in-u.patch \
            file://0003-Remove-strip-step-in-Makefile.patch \
            file://0004-Add-FFMPEG_EXTRA_CFLAGS-and-FFMPEG_EXTRA_LDFLAGS.patch \
@@ -31,12 +31,23 @@ SRC_URI = "git://github.com/popcornmix/omxplayer.git;protocol=git;branch=master 
            file://use-native-pkg-config.patch \
            file://0005-Don-t-require-internet-connection-during-build.patch \
            file://0006-Prevent-ffmpeg-configure-compile-race-condition.patch \
+           file://0001-Specify-cc-cxx-and-ld-variables-from-environment.patch \
+           file://cross-crompile-ffmpeg.patch \
            "
+
+SRC_URI_append = "${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", " file://0001-Fix-build-with-vc4-driver.patch ", "", d)}"
+
 S = "${WORKDIR}/git"
 
-COMPATIBLE_MACHINE ?= "null"
-COMPATIBLE_MACHINE_rpi_aarch64 = "null"
-COMPATIBLE_MACHINE_rpi = "(.*)"
+COMPATIBLE_MACHINE = "^rpi$"
+
+def cpu(d):
+    for arg in (d.getVar('TUNE_CCARGS') or '').split():
+        if arg.startswith('-mcpu='):
+            return arg[6:]
+    return 'generic'
+
+export CPU = "${@cpu(d)}"
 
 inherit autotools-brokensep pkgconfig
 
@@ -55,11 +66,13 @@ export FFMPEG_EXTRA_CFLAGS  = "${TUNE_CCARGS} ${TOOLCHAIN_OPTIONS}"
 export FFMPEG_EXTRA_LDFLAGS  = "${TUNE_CCARGS} ${TOOLCHAIN_OPTIONS}"
 
 # Needed in top Makefile
+
 export LDFLAGS = "-L${S}/ffmpeg_compiled/usr/lib \
                   -L${STAGING_DIR_HOST}/lib \
                   -L${STAGING_DIR_HOST}/usr/lib \
                  "
-export INCLUDES = "-isystem${STAGING_DIR_HOST}/usr/include/interface/vcos/pthreads \
+export INCLUDES = "${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", " -D__GBM__", "", d)} \
+                   -isystem${STAGING_DIR_HOST}/usr/include/interface/vcos/pthreads \
                    -isystem${STAGING_DIR_HOST}/usr/include/freetype2 \
                    -isystem${STAGING_DIR_HOST}/usr/include/interface/vmcs_host/linux \
                    -isystem${STAGING_DIR_HOST}/usr/include/dbus-1.0 \
@@ -90,4 +103,4 @@ FILES_${PN} = "${bindir}/omxplayer* \
 
 FILES_${PN}-dev += "${libdir}/omxplayer/*.so"
 
-RDEPENDS_${PN} += "bash procps"
+RDEPENDS_${PN} += "bash procps userland"

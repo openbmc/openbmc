@@ -1,0 +1,46 @@
+From 9ff04d7acc700387e3837f8ab11a41efea5ee8b0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 21 Jun 2018 19:44:26 -0700
+Subject: [PATCH] alloc.c: Avoid sysconf(_SC_LEVEL2_CACHE_LINESIZE) on linux
+
+musl does not have it
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
+ alloc.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/alloc.c b/alloc.c
+index bce9464..cf7eb40 100644
+--- a/alloc.c
++++ b/alloc.c
+@@ -245,6 +245,19 @@ void free_huge_pages(void *ptr)
+ 	__free_huge_pages(ptr, 1);
+ }
+ 
++static size_t get_cacheline_size() {
++#if defined(__linux__)
++	FILE * fp = fopen("/sys/devices/system/cpu/cpu0/cache/index0/coherency_line_size", "r");
++	unsigned int line_size = 0;
++	if (fp) {
++		fscanf(fp, "%d", &line_size);
++		fclose(fp);
++	}
++	return line_size;
++#else
++	return sysconf(_SC_LEVEL2_CACHE_LINESIZE);
++#endif
++}
+ /*
+  * Offset the buffer using bytes wasted due to alignment to avoid using the
+  * same cache lines for the start of every buffer returned by
+@@ -261,7 +274,7 @@ void *cachecolor(void *buf, size_t len, size_t color_bytes)
+ 
+ 	/* Lookup our cacheline size once */
+ 	if (cacheline_size == 0) {
+-		cacheline_size = sysconf(_SC_LEVEL2_CACHE_LINESIZE);
++		cacheline_size = get_cacheline_size();
+ 		linemod = time(NULL);
+ 	}
+ 

@@ -1,0 +1,23 @@
+From 07260295e031e845e38ba874fa6ab500790c4aaf Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 2 May 2018 16:48:47 +0300
+Subject: [PATCH] Do not add library path to avoid host contamination
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ src/modules/Makefile.am | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/modules/Makefile.am b/src/modules/Makefile.am
+index e61f4e0..01c15bd 100644
+--- a/src/modules/Makefile.am
++++ b/src/modules/Makefile.am
+@@ -11,7 +11,6 @@ AM_CPPFLAGS = \
+ # tell libtool we compile module not library
+ AM_LDFLAGS = \
+ 	-no-undefined -module -avoid-version -shared -export-dynamic \
+-	-L$(libdir) \
+ 	$(GIO_LIBS)
+ 
+ # the module should be linked only with libfm, not libfm-gtk or whatever

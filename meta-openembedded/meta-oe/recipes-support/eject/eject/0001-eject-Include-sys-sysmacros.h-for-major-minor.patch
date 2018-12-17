@@ -1,0 +1,27 @@
+From 433ffb21119a0f39e882dd3fea4742e64aadcc40 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 11 Aug 2018 09:56:40 -0700
+Subject: [PATCH] eject: Include sys/sysmacros.h for major/minor
+
+Fixes
+arm-bec-linux-gnueabi/gcc/arm-bec-linux-gnueabi/8.2.0/ld: eject.o: in function `GetMajorMinor':
+/usr/src/debug/eject/2.1.5-r1/eject-2.1.5/../../../../../../../workspace/sources/eject/eject.c:866: undefined reference to `major'
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ eject.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/eject.c b/eject.c
+index 47e09fe..b171218 100644
+--- a/eject.c
++++ b/eject.c
+@@ -54,6 +54,7 @@
+ #include <sys/wait.h>
+ #include <sys/mtio.h>
+ #include <sys/mount.h>
++#include <sys/sysmacros.h>
+ 
+ #if defined(__linux__)
+ #include <linux/version.h>

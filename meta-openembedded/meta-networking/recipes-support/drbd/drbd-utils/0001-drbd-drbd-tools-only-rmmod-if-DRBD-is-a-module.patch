@@ -1,0 +1,43 @@
+Subject: drbd-tools: only rmmod if DRBD is a module
+
+Account for the case if the DRBD drive is built into
+the kernel. Otherwise, errors, like the following,
+will occur:
+
+root@localhost:~# /etc/init.d/drbd stop
+    Stopping all DRBD resources: ERROR: Module drbd 
+    does not exist in /proc/modules
+
+Upstream-Status: Submitted [https://github.com/LINBIT/drbd-utils/pull/2]
+
+Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
+
+[ refresh to 8.4.4: squash Aws' and Jason's patches ]
+Signed-off-by: Michel Thebeau <michel.thebeau@windriver.com>
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+
+---
+ scripts/drbd | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/drbd b/scripts/drbd
+index 20bf628..de589dc 100755
+--- a/scripts/drbd
++++ b/scripts/drbd
+@@ -241,7 +241,9 @@ case "$1" in
+ 		if [ -d /sys/module/drbd/holders ]; then
+ 			(cd /sys/module/drbd/holders; for tr in *; do [ -d ${tr} ] && ${RMMOD} ${tr}; done)
+ 		fi
+-		$RMMOD drbd && break
++		if [ ! -z "$(cat /proc/modules | grep -w drbd)" ]; then
++			$RMMOD drbd && break
++		fi
+ 	    fi
+ 	done
+ 	run_hook stop
+-- 
+1.9.1
+

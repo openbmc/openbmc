@@ -1,0 +1,158 @@
+From 04e8a611e958f0da1ccac61acae3a6f1a5168b20 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 13 Jul 2018 18:08:14 +0800
+Subject: [PATCH] support musl
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ memory/jemalloc/src/src/pages.c              | 1 -
+ memory/mozjemalloc/jemalloc.c                | 7 +++----
+ mozglue/misc/TimeStamp_darwin.cpp            | 1 -
+ mozglue/misc/TimeStamp_posix.cpp             | 1 -
+ nsprpub/pr/src/misc/prsystem.c               | 1 -
+ python/psutil/psutil/_psutil_bsd.c           | 1 -
+ python/psutil/psutil/_psutil_osx.c           | 1 -
+ python/psutil/psutil/arch/bsd/process_info.c | 1 -
+ python/psutil/psutil/arch/osx/process_info.c | 1 -
+ 9 files changed, 3 insertions(+), 12 deletions(-)
+
+diff --git a/memory/jemalloc/src/src/pages.c b/memory/jemalloc/src/src/pages.c
+index 647952a..7b964c8 100644
+--- a/memory/jemalloc/src/src/pages.c
++++ b/memory/jemalloc/src/src/pages.c
+@@ -2,7 +2,6 @@
+ #include "jemalloc/internal/jemalloc_internal.h"
+ 
+ #ifdef JEMALLOC_SYSCTL_VM_OVERCOMMIT
+-#include <sys/sysctl.h>
+ #endif
+ 
+ /******************************************************************************/
+diff --git a/memory/mozjemalloc/jemalloc.c b/memory/mozjemalloc/jemalloc.c
+index 5d4d83a..c618de9 100644
+--- a/memory/mozjemalloc/jemalloc.c
++++ b/memory/mozjemalloc/jemalloc.c
+@@ -332,7 +332,6 @@ __FBSDID("$FreeBSD: head/lib/libc/stdlib/malloc.c 180599 2008-07-18 19:35:44Z ja
+ #include <sys/time.h>
+ #include <sys/types.h>
+ #if !defined(MOZ_MEMORY_SOLARIS) && !defined(MOZ_MEMORY_ANDROID)
+-#include <sys/sysctl.h>
+ #endif
+ #include <sys/uio.h>
+ #ifndef MOZ_MEMORY
+@@ -674,7 +673,7 @@ static bool malloc_initialized = false;
+ #elif defined(MOZ_MEMORY_DARWIN)
+ static malloc_mutex_t init_lock = {OS_SPINLOCK_INIT};
+ #elif defined(MOZ_MEMORY_LINUX) && !defined(MOZ_MEMORY_ANDROID)
+-static malloc_mutex_t init_lock = PTHREAD_ADAPTIVE_MUTEX_INITIALIZER_NP;
++static malloc_mutex_t init_lock = PTHREAD_MUTEX_INITIALIZER;
+ #elif defined(MOZ_MEMORY)
+ static malloc_mutex_t init_lock = PTHREAD_MUTEX_INITIALIZER;
+ #else
+@@ -1644,7 +1643,7 @@ malloc_mutex_init(malloc_mutex_t *mutex)
+ 	pthread_mutexattr_t attr;
+ 	if (pthread_mutexattr_init(&attr) != 0)
+ 		return (true);
+-	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ADAPTIVE_NP);
++	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_STALLED);
+ 	if (pthread_mutex_init(mutex, &attr) != 0) {
+ 		pthread_mutexattr_destroy(&attr);
+ 		return (true);
+@@ -1709,7 +1708,7 @@ malloc_spin_init(malloc_spinlock_t *lock)
+ 	pthread_mutexattr_t attr;
+ 	if (pthread_mutexattr_init(&attr) != 0)
+ 		return (true);
+-	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ADAPTIVE_NP);
++	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_STALLED);
+ 	if (pthread_mutex_init(lock, &attr) != 0) {
+ 		pthread_mutexattr_destroy(&attr);
+ 		return (true);
+diff --git a/mozglue/misc/TimeStamp_darwin.cpp b/mozglue/misc/TimeStamp_darwin.cpp
+index f30bc98..3998c9c 100644
+--- a/mozglue/misc/TimeStamp_darwin.cpp
++++ b/mozglue/misc/TimeStamp_darwin.cpp
+@@ -18,7 +18,6 @@
+ 
+ #include <mach/mach_time.h>
+ #include <sys/time.h>
+-#include <sys/sysctl.h>
+ #include <time.h>
+ #include <unistd.h>
+ 
+diff --git a/mozglue/misc/TimeStamp_posix.cpp b/mozglue/misc/TimeStamp_posix.cpp
+index 05dedde..d9e30f2 100644
+--- a/mozglue/misc/TimeStamp_posix.cpp
++++ b/mozglue/misc/TimeStamp_posix.cpp
+@@ -21,7 +21,6 @@
+ #if defined(__DragonFly__) || defined(__FreeBSD__) \
+     || defined(__NetBSD__) || defined(__OpenBSD__)
+ #include <sys/param.h>
+-#include <sys/sysctl.h>
+ #endif
+ 
+ #if defined(__DragonFly__) || defined(__FreeBSD__)
+diff --git a/nsprpub/pr/src/misc/prsystem.c b/nsprpub/pr/src/misc/prsystem.c
+index eba85fb..54b57bb 100644
+--- a/nsprpub/pr/src/misc/prsystem.c
++++ b/nsprpub/pr/src/misc/prsystem.c
+@@ -27,7 +27,6 @@
+     || defined(OPENBSD) || defined(DRAGONFLY) || defined(DARWIN)
+ #define _PR_HAVE_SYSCTL
+ #include <sys/param.h>
+-#include <sys/sysctl.h>
+ #endif
+ 
+ #if defined(DARWIN)
+diff --git a/python/psutil/psutil/_psutil_bsd.c b/python/psutil/psutil/_psutil_bsd.c
+index 7b6e561..0a91262 100644
+--- a/python/psutil/psutil/_psutil_bsd.c
++++ b/python/psutil/psutil/_psutil_bsd.c
+@@ -16,7 +16,6 @@
+ #include <fcntl.h>
+ #include <paths.h>
+ #include <sys/types.h>
+-#include <sys/sysctl.h>
+ #include <sys/param.h>
+ #include <sys/user.h>
+ #include <sys/proc.h>
+diff --git a/python/psutil/psutil/_psutil_osx.c b/python/psutil/psutil/_psutil_osx.c
+index 3ebf8ff..b3910ba 100644
+--- a/python/psutil/psutil/_psutil_osx.c
++++ b/python/psutil/psutil/_psutil_osx.c
+@@ -13,7 +13,6 @@
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <utmpx.h>
+-#include <sys/sysctl.h>
+ #include <sys/vmmeter.h>
+ #include <libproc.h>
+ #include <sys/proc_info.h>
+diff --git a/python/psutil/psutil/arch/bsd/process_info.c b/python/psutil/psutil/arch/bsd/process_info.c
+index 4d73924..46f288d 100644
+--- a/python/psutil/psutil/arch/bsd/process_info.c
++++ b/python/psutil/psutil/arch/bsd/process_info.c
+@@ -15,7 +15,6 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <sys/types.h>
+-#include <sys/sysctl.h>
+ #include <sys/param.h>
+ #include <sys/user.h>
+ #include <sys/proc.h>
+diff --git a/python/psutil/psutil/arch/osx/process_info.c b/python/psutil/psutil/arch/osx/process_info.c
+index b6dd5bb..62a838f 100644
+--- a/python/psutil/psutil/arch/osx/process_info.c
++++ b/python/psutil/psutil/arch/osx/process_info.c
+@@ -16,7 +16,6 @@
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <signal.h>
+-#include <sys/sysctl.h>
+ #include <libproc.h>
+ 
+ #include "process_info.h"
+-- 
+2.7.4
+

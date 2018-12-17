@@ -13,7 +13,7 @@ RDEPENDS_${PN} = "\
     ${LIBC_DEPENDENCIES} \
     "
 
-RRECOMMENDS_${PN} = "\
+RRECOMMENDS_${PN}_mingw32 = "\
     libssp \
     libssp-dev \
     "

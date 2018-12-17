@@ -1,0 +1,76 @@
+From ae7178a78aba2e5766b70191617113487fd7ad0b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 16 Apr 2018 18:29:17 -0700
+Subject: [PATCH] Fix string overflow in snprintf
+
+Fixes errors like
+error: '%s' dir
+ective output may be truncated writing up to 255 bytes into a region of size 32 [-Werror=forma
+t-truncation=]
+   snprintf(reinterpret_cast<char *>(Healthy.key), sizeof(Healthy.key), "%s",
+                                                                        ^~~~
+            hlth_str);
+            ~~~~~~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
+ src/log/logd/lgs_util.cc           | 4 ++--
+ src/rde/rded/rde_amf.cc            | 2 +-
+ src/smf/smfd/SmfUpgradeCampaign.cc | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/log/logd/lgs_util.cc b/src/log/logd/lgs_util.cc
+index ac93d5a..cce80f3 100644
+--- a/src/log/logd/lgs_util.cc
++++ b/src/log/logd/lgs_util.cc
+@@ -200,12 +200,12 @@ char *lgs_get_time(time_t *time_in) {
+ 
+   stringSize = 5 * sizeof(char);
+   snprintf(srcString, (size_t)stringSize, "%d",
+-           (timeStampData->tm_year + START_YEAR));
++           (timeStampData->tm_year + START_YEAR) & 0x4dU);
+ 
+   strncpy(timeStampString, srcString, stringSize);
+ 
+   stringSize = 3 * sizeof(char);
+-  snprintf(srcString, (size_t)stringSize, "%02d", (timeStampData->tm_mon + 1));
++  snprintf(srcString, (size_t)stringSize, "%02d", (timeStampData->tm_mon + 1) & 0x2dU);
+ 
+   strncat(timeStampString, srcString, stringSize);
+ 
+diff --git a/src/rde/rded/rde_amf.cc b/src/rde/rded/rde_amf.cc
+index 81e521e..d53cc48 100644
+--- a/src/rde/rded/rde_amf.cc
++++ b/src/rde/rded/rde_amf.cc
+@@ -102,7 +102,7 @@ static uint32_t rde_amf_healthcheck_start(RDE_AMF_CB *rde_amf_cb) {
+   SaAmfHealthcheckKeyT Healthy;
+   SaNameT SaCompName;
+   char *phlth_ptr;
+-  char hlth_str[256];
++  char hlth_str[32];
+ 
+   TRACE_ENTER();
+ 
+diff --git a/src/smf/smfd/SmfUpgradeCampaign.cc b/src/smf/smfd/SmfUpgradeCampaign.cc
+index 45cdce8..6761bcf 100644
+--- a/src/smf/smfd/SmfUpgradeCampaign.cc
++++ b/src/smf/smfd/SmfUpgradeCampaign.cc
+@@ -447,7 +447,7 @@ SaAisErrorT SmfUpgradeCampaign::tooManyRestarts(bool *o_result) {
+   TRACE_ENTER();
+   SaAisErrorT rc = SA_AIS_OK;
+   SaImmAttrValuesT_2 **attributes;
+-  int curCnt = 0;
++  short int curCnt = 0;
+ 
+   /* Read the SmfCampRestartInfo object smfCampRestartCnt attr */
+   std::string obj = "smfRestartInfo=info," +
+@@ -473,7 +473,7 @@ SaAisErrorT SmfUpgradeCampaign::tooManyRestarts(bool *o_result) {
+     attrsmfCampRestartCnt.setName("smfCampRestartCnt");
+     attrsmfCampRestartCnt.setType("SA_IMM_ATTR_SAUINT32T");
+     char buf[5];
+-    snprintf(buf, 4, "%d", curCnt);
++    snprintf(buf, 4, "%hd", curCnt);
+     attrsmfCampRestartCnt.addValue(buf);
+     imoCampRestartInfo.addValue(attrsmfCampRestartCnt);
+ 

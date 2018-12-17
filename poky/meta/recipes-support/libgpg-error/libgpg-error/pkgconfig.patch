@@ -1,15 +1,26 @@
-
-#
-# Patch managed by http://www.mn-logistik.de/unsupported/pxa250/patcher
-#
+From ec309e20b5a27d42a5fb915c328d61e924ab5f19 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 29 Mar 2018 15:12:17 +0800
+Subject: [PATCH] support pkgconfig
 
 Upstream-Status: Pending
 
-Index: libgpg-error-1.17/configure.ac
-===================================================================
---- libgpg-error-1.17.orig/configure.ac
-+++ libgpg-error-1.17/configure.ac
-@@ -529,6 +529,7 @@ AC_CONFIG_FILES([src/Makefile tests/Make
+Rebase to 1.28
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac        |  1 +
+ src/Makefile.am     |  4 ++-
+ src/gpg-error.m4    | 71 +++--------------------------------------------------
+ src/gpg-error.pc.in | 11 +++++++++
+ 4 files changed, 18 insertions(+), 69 deletions(-)
+ create mode 100644 src/gpg-error.pc.in
+
+diff --git a/configure.ac b/configure.ac
+index aca9300..f7794e9 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -621,6 +621,7 @@ AC_CONFIG_FILES([src/Makefile tests/Makefile])
  AC_CONFIG_FILES([lang/Makefile lang/cl/Makefile lang/cl/gpg-error.asd])
  AC_CONFIG_FILES([src/versioninfo.rc src/gpg-error.w32-manifest])
  AC_CONFIG_FILES([src/gpg-error-config], [chmod +x src/gpg-error-config])
@@ -17,33 +28,33 @@ Index: libgpg-error-1.17/configure.ac
  
  AC_OUTPUT
  
-Index: libgpg-error-1.17/src/Makefile.am
-===================================================================
---- libgpg-error-1.17.orig/src/Makefile.am
-+++ libgpg-error-1.17/src/Makefile.am
-@@ -75,6 +75,8 @@ nodist_include_HEADERS = gpg-error.h
- bin_SCRIPTS = gpg-error-config
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 268c2ab..95f8459 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -87,6 +87,8 @@ bin_SCRIPTS = gpg-error-config
+ nodist_bin_SCRIPTS = gpgrt-config
  m4datadir = $(datadir)/aclocal
- m4data_DATA = gpg-error.m4
+ m4data_DATA = gpg-error.m4 gpgrt.m4
 +pkgconfigdir = $(libdir)/pkgconfig
 +pkgconfig_DATA = gpg-error.pc
  
  EXTRA_DIST = mkstrtable.awk err-sources.h.in err-codes.h.in \
  	mkerrnos.awk errnos.in README \
-@@ -82,7 +84,7 @@ EXTRA_DIST = mkstrtable.awk err-sources.
+@@ -94,7 +96,7 @@ EXTRA_DIST = mkstrtable.awk err-sources.h.in err-codes.h.in \
  	mkheader.c gpg-error.h.in mkw32errmap.c w32-add.h w32ce-add.h \
- 	err-sources.h err-codes.h gpg-error-config.in gpg-error.m4 \
+ 	err-sources.h err-codes.h gpg-error-config.in gpg-error.m4 gpgrt.m4 \
  	gpg-error.vers gpg-error.def.in \
 -        versioninfo.rc.in gpg-error.w32-manifest.in \
 +        versioninfo.rc.in gpg-error.w32-manifest.in gpg-error.pc \
  	$(lock_obj_pub)
  
  BUILT_SOURCES = err-sources.h err-codes.h code-to-errno.h code-from-errno.h \
-Index: libgpg-error-1.17/src/gpg-error.m4
-===================================================================
---- libgpg-error-1.17.orig/src/gpg-error.m4
-+++ libgpg-error-1.17/src/gpg-error.m4
-@@ -26,73 +26,13 @@ dnl is added to the gpg_config_script_wa
+diff --git a/src/gpg-error.m4 b/src/gpg-error.m4
+index 60c88d8..2ef7e3e 100644
+--- a/src/gpg-error.m4
++++ b/src/gpg-error.m4
+@@ -26,73 +26,13 @@ dnl is added to the gpg_config_script_warn variable.
  dnl
  AC_DEFUN([AM_PATH_GPG_ERROR],
  [ AC_REQUIRE([AC_CANONICAL_HOST])
@@ -132,10 +143,11 @@ Index: libgpg-error-1.17/src/gpg-error.m4
      ifelse([$3], , :, [$3])
    fi
    AC_SUBST(GPG_ERROR_CFLAGS)
-Index: libgpg-error-1.17/src/gpg-error.pc.in
-===================================================================
+diff --git a/src/gpg-error.pc.in b/src/gpg-error.pc.in
+new file mode 100644
+index 0000000..bc0b174
 --- /dev/null
-+++ libgpg-error-1.17/src/gpg-error.pc.in
++++ b/src/gpg-error.pc.in
 @@ -0,0 +1,11 @@
 +prefix=@prefix@
 +exec_prefix=@exec_prefix@
@@ -148,3 +160,6 @@ Index: libgpg-error-1.17/src/gpg-error.pc.in
 +Version: @VERSION@
 +Libs: -L${libdir} -lgpg-error
 +Cflags: -I${includedir}
+-- 
+1.8.3.1
+

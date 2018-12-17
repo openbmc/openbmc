@@ -1,0 +1,60 @@
+From 0651f228cef01a6c3e4758a991cace1cd7721031 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Mon, 24 Sep 2012 09:57:46 +0200
+Subject: [PATCH] windowmenu: do not display desktop icon when no window is
+ active
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+* desktop icon is of no use
+* desktop icon confuses when using showdesktop plugin
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ plugins/windowmenu/windowmenu.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/plugins/windowmenu/windowmenu.c b/plugins/windowmenu/windowmenu.c
+index f47e993e..061d6544 100644
+--- a/plugins/windowmenu/windowmenu.c
++++ b/plugins/windowmenu/windowmenu.c
+@@ -251,7 +251,7 @@ window_menu_plugin_init (WindowMenuPlugin *plugin)
+   g_signal_connect (G_OBJECT (plugin->button), "toggled",
+       G_CALLBACK (window_menu_plugin_menu), plugin);
+ 
+-  plugin->icon = gtk_image_new_from_icon_name ("user-desktop", GTK_ICON_SIZE_BUTTON);
++  plugin->icon = gtk_image_new_from_icon_name (NULL, GTK_ICON_SIZE_BUTTON);
+   gtk_container_add (GTK_CONTAINER (plugin->button), plugin->icon);
+   gtk_widget_show (plugin->icon);
+ }
+@@ -640,7 +640,7 @@ window_menu_plugin_active_window_changed (WnckScreen       *screen,
+           /* skip 'fake' windows */
+           type = wnck_window_get_window_type (window);
+           if (type == WNCK_WINDOW_DESKTOP || type == WNCK_WINDOW_DOCK)
+-            goto show_desktop_icon;
++            goto show_no_icon;
+ 
+           /* get the window icon and set the tooltip */
+           gtk_widget_set_tooltip_text (GTK_WIDGET (icon),
+@@ -660,12 +660,12 @@ window_menu_plugin_active_window_changed (WnckScreen       *screen,
+         }
+       else
+         {
+-          show_desktop_icon:
++          show_no_icon:
+ 
+           /* desktop is shown right now */
+-          gtk_image_set_from_icon_name (GTK_IMAGE (icon), "user-desktop", icon_size);
++          gtk_image_set_from_icon_name (GTK_IMAGE (icon), NULL, icon_size);
+           gtk_image_set_pixel_size (GTK_IMAGE (icon), icon_size);
+-          gtk_widget_set_tooltip_text (GTK_WIDGET (icon), _("Desktop"));
++          gtk_widget_set_tooltip_text (GTK_WIDGET (icon), _("No Windows"));
+         }
+     }
+ }
+-- 
+2.14.3
+

@@ -77,6 +77,7 @@ python buildhistory_emit_pkghistory() {
 
     import re
     import json
+    import shlex
     import errno
 
     pkghistdir = d.getVar('BUILDHISTORY_DIR_PACKAGE')
@@ -244,7 +245,7 @@ python buildhistory_emit_pkghistory() {
                 key = item[0]
                 if key.endswith('_' + pkg):
                     key = key[:-len(pkg)-1]
-                pkgdata[key] = item[1]
+                pkgdata[key] = item[1].encode('latin-1').decode('unicode_escape')
 
         pkge = pkgdata.get('PKGE', '0')
         pkgv = pkgdata['PKGV']
@@ -287,7 +288,7 @@ python buildhistory_emit_pkghistory() {
         dictval = json.loads(val)
         filelist = list(dictval.keys())
         filelist.sort()
-        pkginfo.filelist = " ".join(filelist)
+        pkginfo.filelist = " ".join([shlex.quote(x) for x in filelist])
 
         pkginfo.size = int(pkgdata['PKGSIZE'])
 

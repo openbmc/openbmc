@@ -279,10 +279,14 @@ def lookup_recipe(args):
                 parse_pkgdatafile(pkgdatafile)
             continue
         pkgdatafile = os.path.join(args.pkgdata_dir, 'runtime-reverse', pkg)
-        if not os.path.exists(pkgdatafile):
-            logger.error("The following packages could not be found: %s" % pkg)
-            sys.exit(1)
-        parse_pkgdatafile(pkgdatafile)
+        if os.path.exists(pkgdatafile):
+            parse_pkgdatafile(pkgdatafile)
+        else:
+            if args.carryon:
+                print("The following packages could not be found: %s" % pkg)
+            else:
+                logger.error("The following packages could not be found: %s" % pkg)
+                sys.exit(1)
 
 def package_info(args):
     def parse_pkgdatafile(pkgdatafile):
@@ -558,6 +562,7 @@ def main():
                                           help='Find recipe producing one or more packages',
                                           description='Looks up the specified runtime package(s) to see which recipe they were produced by')
     parser_lookup_recipe.add_argument('pkg', nargs='+', help='Runtime package name to look up')
+    parser_lookup_recipe.add_argument('-c', '--continue', dest="carryon", help='Continue looking up recipes even if we can not find one', action='store_true')
     parser_lookup_recipe.set_defaults(func=lookup_recipe)
 
     parser_package_info = subparsers.add_parser('package-info',

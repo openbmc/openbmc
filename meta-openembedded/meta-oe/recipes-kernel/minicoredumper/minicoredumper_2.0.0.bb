@@ -9,7 +9,7 @@ DEPENDS = "elfutils dbus dbus-glib-native glib-2.0 dbus-glib util-linux json-c"
 
 inherit autotools pkgconfig systemd update-rc.d
 
-SRCREV = "cdc1faf1212a51e89b477468876e229223fceb9a"
+SRCREV = "1c0d5960b0bb4bac7566e6afe8bc9705399cc76b"
 
 PR .= "+git${SRCPV}"
 
@@ -17,7 +17,6 @@ SRC_URI = "git://git.linuxfoundation.org/diamon/minicoredumper.git;protocol=http
            file://minicoredumper.service \
            file://minicoredumper.init \
            file://0001-minicoredumper-Initialize-pointer-to-config-struct-t.patch \
-           file://0001-fix-compile-error-on-arch-x32.patch \
            "
 
 S = "${WORKDIR}/git"
@@ -43,3 +42,6 @@ do_install_append() {
     sed -i -e s:/usr/bin/minicoredumper:${sbindir}/minicoredumper:g ${D}${sysconfdir}/init.d/minicoredumper
     sed -i -e s:/usr/bin/minicoredumper:${sbindir}/minicoredumper:g ${D}${systemd_system_unitdir}/minicoredumper.service
 }
+
+# http://errors.yoctoproject.org/Errors/Details/186966/
+EXCLUDE_FROM_WORLD_libc-musl = "1"

@@ -169,7 +169,14 @@ def main():
         td['bbvars'] = get_bb_vars()
         logger.info('Getting initial signatures ...')
         td['builddir'] = builddir
-        td['sigs'], td['tunetasks'] = get_signatures(td['builddir'])
+        try:
+            td['sigs'], td['tunetasks'] = get_signatures(td['builddir'])
+        except RuntimeError as e:
+            logger.info(str(e))
+            results[layer['name']] = None
+            results_status[layer['name']] = 'FAIL (Generating world signatures)'
+            layers_tested = layers_tested + 1
+            continue
         td['machines'] = args.machines
 
         if not add_layer(bblayersconf, layer, dep_layers, logger):

@@ -12,6 +12,7 @@ SRC_URI = "git://git.kernel.org/pub/scm/libs/klibc/klibc.git \
            file://klibc-linux-libc-dev.patch \
            file://staging.patch \
            file://klcc-consider-sysroot.patch \
+           file://klcc-cross-accept-clang-options.patch \
            file://0001-dash-Specify-format-string-in-fmtstr.patch \
            file://0001-Define-in_-structs-for-non-glibc-system-libs.patch \
            file://0001-include-linux-sysinfo.h-directly.patch \
@@ -20,14 +21,16 @@ SRC_URI = "git://git.kernel.org/pub/scm/libs/klibc/klibc.git \
            file://0001-Kbuild.klibc-Use-print-libgcc-file-name-instead-of-p.patch \
            file://0001-Kbuild.klibc-Add-path-to-compiler-headers-via-isyste.patch \
            file://0001-arm-Do-not-set-a-fallback-march-and-mtune.patch \
-"
+           file://0001-klibc_2.0.4-add-kexec_file_load-syscall.patch \
+           file://0001-klibc-add-getrandom-syscall.patch \
+           file://0001-klibc-Kbuild-Accept-EXTRA_KLIBCAFLAGS.patch \
+           "
 
 ARMPATCHES ?= ""
 
 ARMPATCHES_arm = "file://klibc-config-eabi.patch \
                   file://armv4-fix-v4bx.patch \
                  "
-
 
 S = "${WORKDIR}/git"
 
@@ -44,6 +47,8 @@ EXTRA_OEMAKE = "'KLIBCARCH=${KLIBC_ARCH}' \
                 'KLIBCOPTFLAGS=${TUNE_CCARGS} -Os' \
                  V=1 \
                 "
+EXTRA_OEMAKE += "'EXTRA_KLIBCAFLAGS=${SECURITY_CFLAGS} -Wa,--noexecstack' \
+                 'EXTRA_KLIBCLDFLAGS=${SECURITY_LDFLAGS} -z noexecstack'"
 
 export FIX_ARMV4_EABI_BX = "${FIX_V4BX}"
 KLIBCTHUMB = "${@['CONFIG_KLIBC_THUMB=n', 'CONFIG_KLIBC_THUMB=y'][(d.getVar('ARM_INSTRUCTION_SET') == 'thumb')]}"
@@ -70,5 +75,7 @@ KLIBC_ARCH_powerpc = "ppc"
 KLIBC_ARCH_powerpc64 = "ppc64"
 THIS_LIBKLIBC = "libklibc (= ${PV}-${PR})"
 
-SECURITY_CFLAGS = "-fno-PIE -no-pie"
-SECURITY_LDFLAGS = "-no-pie"
+GCCPIE ?= ""
+SECURITY_LDFLAGS = "${@'-z relro -z now -pie' if '${GCCPIE}' else ''}"
+SECURITY_LDFLAGS_mips = ""
+SECURITY_LDFLAGS_mips64 = ""

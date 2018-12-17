@@ -1,0 +1,549 @@
+From 5ea9fa9d345005f2f53b1b598edb85f5f24ca9da Mon Sep 17 00:00:00 2001
+From: Alex Kiernan <alex.kiernan@gmail.com>
+Date: Wed, 7 Nov 2018 19:41:54 +0000
+Subject: [PATCH] avoid naming local function as one of printf family
+
+Fixes build issues with clang
+error: no member named '__builtin___snprintf_chk' in 'struct expr_ops'
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+---
+ include/expr_ops.h      | 2 +-
+ include/obj.h           | 2 +-
+ src/expr.c              | 4 ++--
+ src/expr/bitwise.c      | 2 +-
+ src/expr/byteorder.c    | 2 +-
+ src/expr/cmp.c          | 2 +-
+ src/expr/connlimit.c    | 2 +-
+ src/expr/counter.c      | 2 +-
+ src/expr/ct.c           | 2 +-
+ src/expr/dup.c          | 2 +-
+ src/expr/dynset.c       | 2 +-
+ src/expr/exthdr.c       | 2 +-
+ src/expr/fib.c          | 2 +-
+ src/expr/flow_offload.c | 2 +-
+ src/expr/fwd.c          | 2 +-
+ src/expr/hash.c         | 2 +-
+ src/expr/immediate.c    | 2 +-
+ src/expr/limit.c        | 2 +-
+ src/expr/log.c          | 2 +-
+ src/expr/lookup.c       | 2 +-
+ src/expr/masq.c         | 2 +-
+ src/expr/match.c        | 2 +-
+ src/expr/meta.c         | 2 +-
+ src/expr/nat.c          | 2 +-
+ src/expr/numgen.c       | 2 +-
+ src/expr/objref.c       | 2 +-
+ src/expr/payload.c      | 2 +-
+ src/expr/queue.c        | 2 +-
+ src/expr/quota.c        | 2 +-
+ src/expr/range.c        | 2 +-
+ src/expr/redir.c        | 2 +-
+ src/expr/reject.c       | 2 +-
+ src/expr/rt.c           | 2 +-
+ src/expr/socket.c       | 2 +-
+ src/expr/target.c       | 2 +-
+ src/obj/counter.c       | 2 +-
+ src/obj/ct_helper.c     | 2 +-
+ src/obj/limit.c         | 2 +-
+ src/obj/quota.c         | 2 +-
+ src/object.c            | 4 ++--
+ 40 files changed, 42 insertions(+), 42 deletions(-)
+
+diff --git a/include/expr_ops.h b/include/expr_ops.h
+index e639390..c4fe050 100644
+--- a/include/expr_ops.h
++++ b/include/expr_ops.h
+@@ -18,7 +18,7 @@ struct expr_ops {
+ 	const void *(*get)(const struct nftnl_expr *e, uint16_t type, uint32_t *data_len);
+ 	int 	(*parse)(struct nftnl_expr *e, struct nlattr *attr);
+ 	void	(*build)(struct nlmsghdr *nlh, const struct nftnl_expr *e);
+-	int	(*snprintf)(char *buf, size_t len, uint32_t type, uint32_t flags, const struct nftnl_expr *e);
++	int	(*snprintf_)(char *buf, size_t len, uint32_t type, uint32_t flags, const struct nftnl_expr *e);
+ 	int	(*json_parse)(struct nftnl_expr *e, json_t *data,
+ 			      struct nftnl_parse_err *err);
+ };
+diff --git a/include/obj.h b/include/obj.h
+index 4a728c8..4c20bd1 100644
+--- a/include/obj.h
++++ b/include/obj.h
+@@ -55,7 +55,7 @@ struct obj_ops {
+ 	const void *(*get)(const struct nftnl_obj *e, uint16_t type, uint32_t *data_len);
+ 	int	(*parse)(struct nftnl_obj *e, struct nlattr *attr);
+ 	void	(*build)(struct nlmsghdr *nlh, const struct nftnl_obj *e);
+-	int	(*snprintf)(char *buf, size_t len, uint32_t type, uint32_t flags, const struct nftnl_obj *e);
++	int	(*snprintf_)(char *buf, size_t len, uint32_t type, uint32_t flags, const struct nftnl_obj *e);
+ 	int	(*json_parse)(struct nftnl_obj *e, json_t *data,
+ 			      struct nftnl_parse_err *err);
+ };
+diff --git a/src/expr.c b/src/expr.c
+index 62565e0..2489c30 100644
+--- a/src/expr.c
++++ b/src/expr.c
+@@ -285,10 +285,10 @@ int nftnl_expr_snprintf(char *buf, size_t size, const struct nftnl_expr *expr,
+ 	if (size)
+ 		buf[0] = '\0';
+ 
+-	if (!expr->ops->snprintf)
++	if (!expr->ops->snprintf_)
+ 		return 0;
+ 
+-	ret = expr->ops->snprintf(buf + offset, remain, type, flags, expr);
++	ret = expr->ops->snprintf_(buf + offset, remain, type, flags, expr);
+ 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
+ 
+ 	return offset;
+diff --git a/src/expr/bitwise.c b/src/expr/bitwise.c
+index a89734b..f8360b1 100644
+--- a/src/expr/bitwise.c
++++ b/src/expr/bitwise.c
+@@ -299,6 +299,6 @@ struct expr_ops expr_ops_bitwise = {
+ 	.get		= nftnl_expr_bitwise_get,
+ 	.parse		= nftnl_expr_bitwise_parse,
+ 	.build		= nftnl_expr_bitwise_build,
+-	.snprintf	= nftnl_expr_bitwise_snprintf,
++	.snprintf_	= nftnl_expr_bitwise_snprintf,
+ 	.json_parse	= nftnl_expr_bitwise_json_parse,
+ };
+diff --git a/src/expr/byteorder.c b/src/expr/byteorder.c
+index 47c04cf..61f733f 100644
+--- a/src/expr/byteorder.c
++++ b/src/expr/byteorder.c
+@@ -314,6 +314,6 @@ struct expr_ops expr_ops_byteorder = {
+ 	.get		= nftnl_expr_byteorder_get,
+ 	.parse		= nftnl_expr_byteorder_parse,
+ 	.build		= nftnl_expr_byteorder_build,
+-	.snprintf	= nftnl_expr_byteorder_snprintf,
++	.snprintf_	= nftnl_expr_byteorder_snprintf,
+ 	.json_parse	= nftnl_expr_byteorder_json_parse,
+ };
+diff --git a/src/expr/cmp.c b/src/expr/cmp.c
+index b26d0eb..522c7be 100644
+--- a/src/expr/cmp.c
++++ b/src/expr/cmp.c
+@@ -284,6 +284,6 @@ struct expr_ops expr_ops_cmp = {
+ 	.get		= nftnl_expr_cmp_get,
+ 	.parse		= nftnl_expr_cmp_parse,
+ 	.build		= nftnl_expr_cmp_build,
+-	.snprintf	= nftnl_expr_cmp_snprintf,
++	.snprintf_	= nftnl_expr_cmp_snprintf,
+ 	.json_parse	= nftnl_expr_cmp_json_parse,
+ };
+diff --git a/src/expr/connlimit.c b/src/expr/connlimit.c
+index 60965b5..4e41866 100644
+--- a/src/expr/connlimit.c
++++ b/src/expr/connlimit.c
+@@ -202,6 +202,6 @@ struct expr_ops expr_ops_connlimit = {
+ 	.get		= nftnl_expr_connlimit_get,
+ 	.parse		= nftnl_expr_connlimit_parse,
+ 	.build		= nftnl_expr_connlimit_build,
+-	.snprintf	= nftnl_expr_connlimit_snprintf,
++	.snprintf_	= nftnl_expr_connlimit_snprintf,
+ 	.json_parse	= nftnl_expr_connlimit_json_parse,
+ };
+diff --git a/src/expr/counter.c b/src/expr/counter.c
+index 21901e8..9fd7655 100644
+--- a/src/expr/counter.c
++++ b/src/expr/counter.c
+@@ -200,6 +200,6 @@ struct expr_ops expr_ops_counter = {
+ 	.get		= nftnl_expr_counter_get,
+ 	.parse		= nftnl_expr_counter_parse,
+ 	.build		= nftnl_expr_counter_build,
+-	.snprintf	= nftnl_expr_counter_snprintf,
++	.snprintf_	= nftnl_expr_counter_snprintf,
+ 	.json_parse	= nftnl_expr_counter_json_parse,
+ };
+diff --git a/src/expr/ct.c b/src/expr/ct.c
+index 39e9be6..b363f7c 100644
+--- a/src/expr/ct.c
++++ b/src/expr/ct.c
+@@ -357,6 +357,6 @@ struct expr_ops expr_ops_ct = {
+ 	.get		= nftnl_expr_ct_get,
+ 	.parse		= nftnl_expr_ct_parse,
+ 	.build		= nftnl_expr_ct_build,
+-	.snprintf	= nftnl_expr_ct_snprintf,
++	.snprintf_	= nftnl_expr_ct_snprintf,
+ 	.json_parse	= nftnl_expr_ct_json_parse,
+ };
+diff --git a/src/expr/dup.c b/src/expr/dup.c
+index ed8e620..8d603e3 100644
+--- a/src/expr/dup.c
++++ b/src/expr/dup.c
+@@ -206,6 +206,6 @@ struct expr_ops expr_ops_dup = {
+ 	.get		= nftnl_expr_dup_get,
+ 	.parse		= nftnl_expr_dup_parse,
+ 	.build		= nftnl_expr_dup_build,
+-	.snprintf	= nftnl_expr_dup_snprintf,
++	.snprintf_	= nftnl_expr_dup_snprintf,
+ 	.json_parse	= nftnl_expr_dup_json_parse,
+ };
+diff --git a/src/expr/dynset.c b/src/expr/dynset.c
+index 160d0e1..a43f4da 100644
+--- a/src/expr/dynset.c
++++ b/src/expr/dynset.c
+@@ -368,6 +368,6 @@ struct expr_ops expr_ops_dynset = {
+ 	.get		= nftnl_expr_dynset_get,
+ 	.parse		= nftnl_expr_dynset_parse,
+ 	.build		= nftnl_expr_dynset_build,
+-	.snprintf	= nftnl_expr_dynset_snprintf,
++	.snprintf_	= nftnl_expr_dynset_snprintf,
+ 	.json_parse	= nftnl_expr_dynset_json_parse,
+ };
+diff --git a/src/expr/exthdr.c b/src/expr/exthdr.c
+index 75cafbc..89ea7f5 100644
+--- a/src/expr/exthdr.c
++++ b/src/expr/exthdr.c
+@@ -385,6 +385,6 @@ struct expr_ops expr_ops_exthdr = {
+ 	.get		= nftnl_expr_exthdr_get,
+ 	.parse		= nftnl_expr_exthdr_parse,
+ 	.build		= nftnl_expr_exthdr_build,
+-	.snprintf	= nftnl_expr_exthdr_snprintf,
++	.snprintf_	= nftnl_expr_exthdr_snprintf,
+ 	.json_parse	= nftnl_expr_exthdr_json_parse,
+ };
+diff --git a/src/expr/fib.c b/src/expr/fib.c
+index b922b26..ece4645 100644
+--- a/src/expr/fib.c
++++ b/src/expr/fib.c
+@@ -274,6 +274,6 @@ struct expr_ops expr_ops_fib = {
+ 	.get		= nftnl_expr_fib_get,
+ 	.parse		= nftnl_expr_fib_parse,
+ 	.build		= nftnl_expr_fib_build,
+-	.snprintf	= nftnl_expr_fib_snprintf,
++	.snprintf_	= nftnl_expr_fib_snprintf,
+ 	.json_parse	= nftnl_expr_fib_json_parse,
+ };
+diff --git a/src/expr/flow_offload.c b/src/expr/flow_offload.c
+index a2001c9..9cdbc21 100644
+--- a/src/expr/flow_offload.c
++++ b/src/expr/flow_offload.c
+@@ -179,6 +179,6 @@ struct expr_ops expr_ops_flow = {
+ 	.get		= nftnl_expr_flow_get,
+ 	.parse		= nftnl_expr_flow_parse,
+ 	.build		= nftnl_expr_flow_build,
+-	.snprintf	= nftnl_expr_flow_snprintf,
++	.snprintf_	= nftnl_expr_flow_snprintf,
+ 	.json_parse	= nftnl_expr_flow_json_parse,
+ };
+diff --git a/src/expr/fwd.c b/src/expr/fwd.c
+index 9021606..7178f43 100644
+--- a/src/expr/fwd.c
++++ b/src/expr/fwd.c
+@@ -233,6 +233,6 @@ struct expr_ops expr_ops_fwd = {
+ 	.get		= nftnl_expr_fwd_get,
+ 	.parse		= nftnl_expr_fwd_parse,
+ 	.build		= nftnl_expr_fwd_build,
+-	.snprintf	= nftnl_expr_fwd_snprintf,
++	.snprintf_	= nftnl_expr_fwd_snprintf,
+ 	.json_parse	= nftnl_expr_fwd_json_parse,
+ };
+diff --git a/src/expr/hash.c b/src/expr/hash.c
+index 415537e..186c5b0 100644
+--- a/src/expr/hash.c
++++ b/src/expr/hash.c
+@@ -383,6 +383,6 @@ struct expr_ops expr_ops_hash = {
+ 	.get		= nftnl_expr_hash_get,
+ 	.parse		= nftnl_expr_hash_parse,
+ 	.build		= nftnl_expr_hash_build,
+-	.snprintf	= nftnl_expr_hash_snprintf,
++	.snprintf_	= nftnl_expr_hash_snprintf,
+ 	.json_parse	= nftnl_expr_hash_json_parse,
+ };
+diff --git a/src/expr/immediate.c b/src/expr/immediate.c
+index b0570bd..91ccbdc 100644
+--- a/src/expr/immediate.c
++++ b/src/expr/immediate.c
+@@ -316,6 +316,6 @@ struct expr_ops expr_ops_immediate = {
+ 	.get		= nftnl_expr_immediate_get,
+ 	.parse		= nftnl_expr_immediate_parse,
+ 	.build		= nftnl_expr_immediate_build,
+-	.snprintf	= nftnl_expr_immediate_snprintf,
++	.snprintf_	= nftnl_expr_immediate_snprintf,
+ 	.json_parse	= nftnl_expr_immediate_json_parse,
+ };
+diff --git a/src/expr/limit.c b/src/expr/limit.c
+index 856ab18..e71fc2f 100644
+--- a/src/expr/limit.c
++++ b/src/expr/limit.c
+@@ -285,6 +285,6 @@ struct expr_ops expr_ops_limit = {
+ 	.get		= nftnl_expr_limit_get,
+ 	.parse		= nftnl_expr_limit_parse,
+ 	.build		= nftnl_expr_limit_build,
+-	.snprintf	= nftnl_expr_limit_snprintf,
++	.snprintf_	= nftnl_expr_limit_snprintf,
+ 	.json_parse	= nftnl_expr_limit_json_parse,
+ };
+diff --git a/src/expr/log.c b/src/expr/log.c
+index 86d9651..5769c1c 100644
+--- a/src/expr/log.c
++++ b/src/expr/log.c
+@@ -353,6 +353,6 @@ struct expr_ops expr_ops_log = {
+ 	.get		= nftnl_expr_log_get,
+ 	.parse		= nftnl_expr_log_parse,
+ 	.build		= nftnl_expr_log_build,
+-	.snprintf	= nftnl_expr_log_snprintf,
++	.snprintf_	= nftnl_expr_log_snprintf,
+ 	.json_parse	= nftnl_expr_log_json_parse,
+ };
+diff --git a/src/expr/lookup.c b/src/expr/lookup.c
+index 5fcb81f..b2f0dd6 100644
+--- a/src/expr/lookup.c
++++ b/src/expr/lookup.c
+@@ -292,6 +292,6 @@ struct expr_ops expr_ops_lookup = {
+ 	.get		= nftnl_expr_lookup_get,
+ 	.parse		= nftnl_expr_lookup_parse,
+ 	.build		= nftnl_expr_lookup_build,
+-	.snprintf	= nftnl_expr_lookup_snprintf,
++	.snprintf_	= nftnl_expr_lookup_snprintf,
+ 	.json_parse	= nftnl_expr_lookup_json_parse,
+ };
+diff --git a/src/expr/masq.c b/src/expr/masq.c
+index 7c235d3..adec325 100644
+--- a/src/expr/masq.c
++++ b/src/expr/masq.c
+@@ -228,6 +228,6 @@ struct expr_ops expr_ops_masq = {
+ 	.get		= nftnl_expr_masq_get,
+ 	.parse		= nftnl_expr_masq_parse,
+ 	.build		= nftnl_expr_masq_build,
+-	.snprintf	= nftnl_expr_masq_snprintf,
++	.snprintf_	= nftnl_expr_masq_snprintf,
+ 	.json_parse	= nftnl_expr_masq_json_parse,
+ };
+diff --git a/src/expr/match.c b/src/expr/match.c
+index dd09e1e..f0d8868 100644
+--- a/src/expr/match.c
++++ b/src/expr/match.c
+@@ -249,6 +249,6 @@ struct expr_ops expr_ops_match = {
+ 	.get		= nftnl_expr_match_get,
+ 	.parse		= nftnl_expr_match_parse,
+ 	.build		= nftnl_expr_match_build,
+-	.snprintf	= nftnl_expr_match_snprintf,
++	.snprintf_	= nftnl_expr_match_snprintf,
+ 	.json_parse 	= nftnl_expr_match_json_parse,
+ };
+diff --git a/src/expr/meta.c b/src/expr/meta.c
+index de82105..91f1ebb 100644
+--- a/src/expr/meta.c
++++ b/src/expr/meta.c
+@@ -291,6 +291,6 @@ struct expr_ops expr_ops_meta = {
+ 	.get		= nftnl_expr_meta_get,
+ 	.parse		= nftnl_expr_meta_parse,
+ 	.build		= nftnl_expr_meta_build,
+-	.snprintf	= nftnl_expr_meta_snprintf,
++	.snprintf_	= nftnl_expr_meta_snprintf,
+ 	.json_parse 	= nftnl_expr_meta_json_parse,
+ };
+diff --git a/src/expr/nat.c b/src/expr/nat.c
+index 9271303..427c282 100644
+--- a/src/expr/nat.c
++++ b/src/expr/nat.c
+@@ -384,6 +384,6 @@ struct expr_ops expr_ops_nat = {
+ 	.get		= nftnl_expr_nat_get,
+ 	.parse		= nftnl_expr_nat_parse,
+ 	.build		= nftnl_expr_nat_build,
+-	.snprintf	= nftnl_expr_nat_snprintf,
++	.snprintf_	= nftnl_expr_nat_snprintf,
+ 	.json_parse	= nftnl_expr_nat_json_parse,
+ };
+diff --git a/src/expr/numgen.c b/src/expr/numgen.c
+index 5336fde..8e0479a 100644
+--- a/src/expr/numgen.c
++++ b/src/expr/numgen.c
+@@ -313,6 +313,6 @@ struct expr_ops expr_ops_ng = {
+ 	.get		= nftnl_expr_ng_get,
+ 	.parse		= nftnl_expr_ng_parse,
+ 	.build		= nftnl_expr_ng_build,
+-	.snprintf	= nftnl_expr_ng_snprintf,
++	.snprintf_	= nftnl_expr_ng_snprintf,
+ 	.json_parse	= nftnl_expr_ng_json_parse,
+ };
+diff --git a/src/expr/objref.c b/src/expr/objref.c
+index 64ee863..4504488 100644
+--- a/src/expr/objref.c
++++ b/src/expr/objref.c
+@@ -278,6 +278,6 @@ struct expr_ops expr_ops_objref = {
+ 	.get		= nftnl_expr_objref_get,
+ 	.parse		= nftnl_expr_objref_parse,
+ 	.build		= nftnl_expr_objref_build,
+-	.snprintf	= nftnl_expr_objref_snprintf,
++	.snprintf_	= nftnl_expr_objref_snprintf,
+ 	.json_parse	= nftnl_expr_objref_json_parse,
+ };
+diff --git a/src/expr/payload.c b/src/expr/payload.c
+index 91e1587..894ac08 100644
+--- a/src/expr/payload.c
++++ b/src/expr/payload.c
+@@ -348,6 +348,6 @@ struct expr_ops expr_ops_payload = {
+ 	.get		= nftnl_expr_payload_get,
+ 	.parse		= nftnl_expr_payload_parse,
+ 	.build		= nftnl_expr_payload_build,
+-	.snprintf	= nftnl_expr_payload_snprintf,
++	.snprintf_	= nftnl_expr_payload_snprintf,
+ 	.json_parse	= nftnl_expr_payload_json_parse,
+ };
+diff --git a/src/expr/queue.c b/src/expr/queue.c
+index a392a27..ee26c10 100644
+--- a/src/expr/queue.c
++++ b/src/expr/queue.c
+@@ -275,6 +275,6 @@ struct expr_ops expr_ops_queue = {
+ 	.get		= nftnl_expr_queue_get,
+ 	.parse		= nftnl_expr_queue_parse,
+ 	.build		= nftnl_expr_queue_build,
+-	.snprintf	= nftnl_expr_queue_snprintf,
++	.snprintf_	= nftnl_expr_queue_snprintf,
+ 	.json_parse	= nftnl_expr_queue_json_parse,
+ };
+diff --git a/src/expr/quota.c b/src/expr/quota.c
+index 667e6e1..ff5d182 100644
+--- a/src/expr/quota.c
++++ b/src/expr/quota.c
+@@ -203,6 +203,6 @@ struct expr_ops expr_ops_quota = {
+ 	.get		= nftnl_expr_quota_get,
+ 	.parse		= nftnl_expr_quota_parse,
+ 	.build		= nftnl_expr_quota_build,
+-	.snprintf	= nftnl_expr_quota_snprintf,
++	.snprintf_	= nftnl_expr_quota_snprintf,
+ 	.json_parse	= nftnl_expr_quota_json_parse,
+ };
+diff --git a/src/expr/range.c b/src/expr/range.c
+index b2789ff..8910f8a 100644
+--- a/src/expr/range.c
++++ b/src/expr/range.c
+@@ -283,6 +283,6 @@ struct expr_ops expr_ops_range = {
+ 	.get		= nftnl_expr_range_get,
+ 	.parse		= nftnl_expr_range_parse,
+ 	.build		= nftnl_expr_range_build,
+-	.snprintf	= nftnl_expr_range_snprintf,
++	.snprintf_	= nftnl_expr_range_snprintf,
+ 	.json_parse	= nftnl_expr_range_json_parse,
+ };
+diff --git a/src/expr/redir.c b/src/expr/redir.c
+index b2aa345..41b77ab 100644
+--- a/src/expr/redir.c
++++ b/src/expr/redir.c
+@@ -242,6 +242,6 @@ struct expr_ops expr_ops_redir = {
+ 	.get		= nftnl_expr_redir_get,
+ 	.parse		= nftnl_expr_redir_parse,
+ 	.build		= nftnl_expr_redir_build,
+-	.snprintf	= nftnl_expr_redir_snprintf,
++	.snprintf_	= nftnl_expr_redir_snprintf,
+ 	.json_parse	= nftnl_expr_redir_json_parse,
+ };
+diff --git a/src/expr/reject.c b/src/expr/reject.c
+index 11d8b20..b10e729 100644
+--- a/src/expr/reject.c
++++ b/src/expr/reject.c
+@@ -200,6 +200,6 @@ struct expr_ops expr_ops_reject = {
+ 	.get		= nftnl_expr_reject_get,
+ 	.parse		= nftnl_expr_reject_parse,
+ 	.build		= nftnl_expr_reject_build,
+-	.snprintf	= nftnl_expr_reject_snprintf,
++	.snprintf_	= nftnl_expr_reject_snprintf,
+ 	.json_parse	= nftnl_expr_reject_json_parse,
+ };
+diff --git a/src/expr/rt.c b/src/expr/rt.c
+index c3c92c7..688a042 100644
+--- a/src/expr/rt.c
++++ b/src/expr/rt.c
+@@ -235,6 +235,6 @@ struct expr_ops expr_ops_rt = {
+ 	.get		= nftnl_expr_rt_get,
+ 	.parse		= nftnl_expr_rt_parse,
+ 	.build		= nftnl_expr_rt_build,
+-	.snprintf	= nftnl_expr_rt_snprintf,
++	.snprintf_	= nftnl_expr_rt_snprintf,
+ 	.json_parse	= nftnl_expr_rt_json_parse,
+ };
+diff --git a/src/expr/socket.c b/src/expr/socket.c
+index db160a1..4c50011 100644
+--- a/src/expr/socket.c
++++ b/src/expr/socket.c
+@@ -204,5 +204,5 @@ struct expr_ops expr_ops_socket = {
+ 	.get		= nftnl_expr_socket_get,
+ 	.parse		= nftnl_expr_socket_parse,
+ 	.build		= nftnl_expr_socket_build,
+-	.snprintf	= nftnl_expr_socket_snprintf,
++	.snprintf_	= nftnl_expr_socket_snprintf,
+ };
+diff --git a/src/expr/target.c b/src/expr/target.c
+index ed4bf7d..2ef4078 100644
+--- a/src/expr/target.c
++++ b/src/expr/target.c
+@@ -249,6 +249,6 @@ struct expr_ops expr_ops_target = {
+ 	.get		= nftnl_expr_target_get,
+ 	.parse		= nftnl_expr_target_parse,
+ 	.build		= nftnl_expr_target_build,
+-	.snprintf	= nftnl_expr_target_snprintf,
++	.snprintf_	= nftnl_expr_target_snprintf,
+ 	.json_parse	= nftnl_expr_target_json_parse,
+ };
+diff --git a/src/obj/counter.c b/src/obj/counter.c
+index 332bb2b..edeb7be 100644
+--- a/src/obj/counter.c
++++ b/src/obj/counter.c
+@@ -182,6 +182,6 @@ struct obj_ops obj_ops_counter = {
+ 	.get		= nftnl_obj_counter_get,
+ 	.parse		= nftnl_obj_counter_parse,
+ 	.build		= nftnl_obj_counter_build,
+-	.snprintf	= nftnl_obj_counter_snprintf,
++	.snprintf_	= nftnl_obj_counter_snprintf,
+ 	.json_parse	= nftnl_obj_counter_json_parse,
+ };
+diff --git a/src/obj/ct_helper.c b/src/obj/ct_helper.c
+index 62569fe..69757ff 100644
+--- a/src/obj/ct_helper.c
++++ b/src/obj/ct_helper.c
+@@ -208,6 +208,6 @@ struct obj_ops obj_ops_ct_helper = {
+ 	.get		= nftnl_obj_ct_helper_get,
+ 	.parse		= nftnl_obj_ct_helper_parse,
+ 	.build		= nftnl_obj_ct_helper_build,
+-	.snprintf	= nftnl_obj_ct_helper_snprintf,
++	.snprintf_	= nftnl_obj_ct_helper_snprintf,
+ 	.json_parse	= nftnl_obj_quota_json_parse,
+ };
+diff --git a/src/obj/limit.c b/src/obj/limit.c
+index 7f8bcf7..25018b6 100644
+--- a/src/obj/limit.c
++++ b/src/obj/limit.c
+@@ -236,6 +236,6 @@ struct obj_ops obj_ops_limit = {
+ 	.get		= nftnl_obj_limit_get,
+ 	.parse		= nftnl_obj_limit_parse,
+ 	.build		= nftnl_obj_limit_build,
+-	.snprintf	= nftnl_obj_limit_snprintf,
++	.snprintf_	= nftnl_obj_limit_snprintf,
+ 	.json_parse	= nftnl_obj_limit_json_parse,
+ };
+diff --git a/src/obj/quota.c b/src/obj/quota.c
+index 6d36784..ecaa8b1 100644
+--- a/src/obj/quota.c
++++ b/src/obj/quota.c
+@@ -203,6 +203,6 @@ struct obj_ops obj_ops_quota = {
+ 	.get		= nftnl_obj_quota_get,
+ 	.parse		= nftnl_obj_quota_parse,
+ 	.build		= nftnl_obj_quota_build,
+-	.snprintf	= nftnl_obj_quota_snprintf,
++	.snprintf_	= nftnl_obj_quota_snprintf,
+ 	.json_parse	= nftnl_obj_quota_json_parse,
+ };
+diff --git a/src/object.c b/src/object.c
+index d8278f3..9654b7b 100644
+--- a/src/object.c
++++ b/src/object.c
+@@ -429,7 +429,7 @@ static int nftnl_obj_export(char *buf, size_t size,
+ 		nftnl_buf_u64(&b, type, obj->handle, HANDLE);
+ 
+ 	if (obj->ops)
+-		ret = obj->ops->snprintf(buf + b.len, size - b.len, type,
++		ret = obj->ops->snprintf_(buf + b.len, size - b.len, type,
+ 					 flags, obj);
+ 
+ 	b.len += ret;
+@@ -450,7 +450,7 @@ static int nftnl_obj_snprintf_dflt(char *buf, size_t size,
+ 	SNPRINTF_BUFFER_SIZE(ret, remain, offset);
+ 
+ 	if (obj->ops) {
+-		ret = obj->ops->snprintf(buf + offset, offset, type, flags,
++		ret = obj->ops->snprintf_(buf + offset, offset, type, flags,
+ 					 obj);
+ 		SNPRINTF_BUFFER_SIZE(ret, remain, offset);
+ 	}

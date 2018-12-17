@@ -3,7 +3,7 @@ DESCRIPTION = "GMP is a free library for arbitrary precision arithmetic, operati
 HOMEPAGE = "http://gmplib.org/"
 SECTION = "devel"
 
-inherit autotools texinfo
+inherit autotools texinfo multilib_header
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[readline] = "--with-readline=yes,--with-readline=no,readline"

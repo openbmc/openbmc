@@ -8,7 +8,7 @@ ExecStartPre=/bin/mkdir -p /var/log/tinyproxy
 ExecStartPre=/bin/chown -R nobody.tinyproxy /var/log/tinyproxy
 ExecStartPre=/bin/mkdir -p /var/run/tinyproxy
 ExecStartPre=/bin/chown -R nobody.tinyproxy /var/run/tinyproxy
-ExecStart=/usr/sbin/tinyproxy -d
+ExecStart=/usr/bin/tinyproxy -d
 
 [Install]
 WantedBy=multi-user.target

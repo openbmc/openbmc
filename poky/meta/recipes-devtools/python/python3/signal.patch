@@ -1,0 +1,56 @@
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From 4315389df3c4e8c1f94a18ab11a4b234762132b1 Mon Sep 17 00:00:00 2001
+From: Antoine Pitrou <pitrou@free.fr>
+Date: Mon, 23 Apr 2018 22:22:49 +0200
+Subject: [PATCH] [3.6] bpo-33329: Fix multiprocessing regression on newer
+ glibcs (GH-6575) (GH-6582)
+
+Starting with glibc 2.27.9000-xxx, sigaddset() can return EINVAL for some
+reserved signal numbers between 1 and NSIG.  The `range(1, NSIG)` idiom
+is commonly used to select all signals for blocking with `pthread_sigmask`.
+So we ignore the sigaddset() return value until we expose sigfillset()
+to provide a better idiom.
+(cherry picked from commit 25038ecfb665bef641abf8cb61afff7505b0e008)
+---
+ .../next/Library/2018-04-23-13-21-39.bpo-33329.lQ-Eod.rst  |  1 +
+ Modules/signalmodule.c                                     | 14 ++++++++------
+ 2 files changed, 9 insertions(+), 6 deletions(-)
+ create mode 100644 Misc/NEWS.d/next/Library/2018-04-23-13-21-39.bpo-33329.lQ-Eod.rst
+
+diff --git a/Modules/signalmodule.c b/Modules/signalmodule.c
+index e0d06b434d..138e74e8a9 100644
+--- a/Modules/signalmodule.c
++++ b/Modules/signalmodule.c
+@@ -744,7 +744,6 @@ iterable_to_sigset(PyObject *iterable, sigset_t *mask)
+     int result = -1;
+     PyObject *iterator, *item;
+     long signum;
+-    int err;
+ 
+     sigemptyset(mask);
+ 
+@@ -766,11 +765,14 @@ iterable_to_sigset(PyObject *iterable, sigset_t *mask)
+         Py_DECREF(item);
+         if (signum == -1 && PyErr_Occurred())
+             goto error;
+-        if (0 < signum && signum < NSIG)
+-            err = sigaddset(mask, (int)signum);
+-        else
+-            err = 1;
+-        if (err) {
++        if (0 < signum && signum < NSIG) {
++            /* bpo-33329: ignore sigaddset() return value as it can fail
++             * for some reserved signals, but we want the `range(1, NSIG)`
++             * idiom to allow selecting all valid signals.
++             */
++            (void) sigaddset(mask, (int)signum);
++        }
++        else {
+             PyErr_Format(PyExc_ValueError,
+                          "signal number %ld out of range", signum);
+             goto error;
+-- 
+2.11.0
+

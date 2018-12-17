@@ -5,7 +5,7 @@ events and executes requested commands if they occur. "
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=208668fa9004709ba22c2b748140956c"
 
-DEPENDS += "libxkbfile"
+DEPENDS += "libxkbfile bison-native"
 
 BBCLASSEXTEND = "native"
 

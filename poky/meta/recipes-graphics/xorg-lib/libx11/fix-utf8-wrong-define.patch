@@ -1,19 +1,31 @@
-Upstream-Status: Pending
+From 046703373055c7029c19d171e415ff3caaa87372 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Mon, 10 Sep 2018 09:16:33 +0800
+Subject: [PATCH] Disable unicode
 
 Signed-off-by: Xiaofeng Yan <xiaofeng.yan@windriver.com>
 
-#
-# Patch managed by http://www.holgerschurig.de/patcher.html
-#
+Update patch to version 1.6.6
 
---- libX11-X11R7.0-1.0.0/include/X11/Xlib.h~fix-utf8-wrong-define
-+++ libX11-X11R7.0-1.0.0/include/X11/Xlib.h
-@@ -103,7 +103,7 @@
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+Upstream-Status: Pending
+---
+ include/X11/Xlib.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/X11/Xlib.h b/include/X11/Xlib.h
+index 84403f7..56be654 100644
+--- a/include/X11/Xlib.h
++++ b/include/X11/Xlib.h
+@@ -67,7 +67,7 @@ _Xmblen(
  
  /* API mentioning "UTF8" or "utf8" is an XFree86 extension, introduced in
     November 2000. Its presence is indicated through the following macro. */
 -#define X_HAVE_UTF8_STRING 1
 +#undef X_HAVE_UTF8_STRING
  
- typedef char *XPointer;
- 
+ /* The Xlib structs are full of implicit padding to properly align members.
+    We can't clean that up without breaking ABI, so tell clang not to bother
+-- 
+2.7.4
+

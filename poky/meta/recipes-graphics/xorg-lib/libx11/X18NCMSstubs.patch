@@ -1,0 +1,536 @@
+From 62005ad019d6afb81da100b3113292a16472d241 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Mon, 10 Sep 2018 09:08:27 +0800
+Subject: [PATCH] Stub out x18n
+
+Update patch to version 1.6.6
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+Upstream-Status: Inappropriate [configuration]
+---
+ src/Makefile.am    |   5 +-
+ src/X18NCMSstubs.c | 426 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/imConv.c       |   5 +-
+ src/locking.c      |   4 +
+ 4 files changed, 438 insertions(+), 2 deletions(-)
+ create mode 100644 src/X18NCMSstubs.c
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index f8c476d..cdbcbbd 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -336,13 +336,16 @@ if THRSTUBS
+ libX11_la_SOURCES+=UIThrStubs.c
+ endif
+ 
++libX11_la_SOURCES+=X18NCMSstubs.c
++
+ x11datadir = @X11_DATADIR@
+ x11data_DATA = XErrorDB
+ 
+ EXTRA_DIST = \
+ 	$(x11data_DATA) \
+ 	os2Stubs.c \
+-	UIThrStubs.c 
++	UIThrStubs.c \
++	X18NCMSstubs.c
+ 
+ libX11_xcb_la_SOURCES = x11_xcb.c Xxcbint.h
+ libX11_xcb_la_LDFLAGS = -version-number 1:0:0 -no-undefined
+diff --git a/src/X18NCMSstubs.c b/src/X18NCMSstubs.c
+new file mode 100644
+index 0000000..429cb31
+--- /dev/null
++++ b/src/X18NCMSstubs.c
+@@ -0,0 +1,426 @@
++ /* - Provides stubs and dummy funcs needed when Xcms and XLocale stuff removed
++ *
++ * Copyright © 2003 Matthew Allum
++ *
++ * Permission to use, copy, modify, distribute, and sell this software and its
++ * documentation for any purpose is hereby granted without fee, provided that
++ * the above copyright notice appear in all copies and that both that
++ * copyright notice and this permission notice appear in supporting
++ * documentation, and that the name of Matthew Allum not be used in
++ * advertising or publicity pertaining to distribution of the software without
++ * specific, written prior permission.  Keith Packard and Compaq makes no
++ * representations about the suitability of this software for any purpose.  It
++ * is provided "as is" without express or implied warranty.
++ *
++ * MATTHEW ALLUM DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS 
++ * SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, 
++ * IN NO EVENT SHALL KEITH PACKARD BE LIABLE FOR ANY SPECIAL, INDIRECT OR
++ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE,
++ * DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
++ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
++ * PERFORMANCE OF THIS SOFTWARE.
++ */
++
++#include <stdlib.h>
++#include "Xlibint.h"
++#include "Xlcint.h"
++#include <X11/Xlocale.h>
++#include <X11/Xos.h>
++#ifdef WIN32
++#undef close
++#endif
++#include <X11/Xutil.h>
++#include "XlcPubI.h"
++
++#include "Xcmsint.h" 		/* for XcmsCCC type  */
++#include "XlcPubI.h"            /* for XLCd type */
++#include "config.h"
++
++#if ! XLOCALE
++
++Bool
++XSupportsLocale()
++{
++  return False; 		
++}
++
++char *
++XSetLocaleModifiers(
++    const char *modifiers)
++{
++  return NULL;
++}
++
++XLCd
++_XOpenLC(
++    char *name)
++{
++  return NULL;
++}
++
++XLCd
++_XlcCurrentLC()
++{
++  return NULL;
++}
++
++void
++_XlcVaToArgList(
++    va_list var,
++    int count,
++    XlcArgList *args_ret)
++{
++  return;
++}
++
++void
++_XlcCountVaList(
++    va_list var,
++    int *count_ret)
++{
++  return;
++}
++
++void
++_XCloseLC(
++    XLCd lcd)
++{
++  return;
++}
++
++int
++_XlcConvert(
++    XlcConv conv,
++    XPointer *from,
++    int *from_left,
++    XPointer *to,
++    int *to_left,
++    XPointer *args,
++    int num_args)
++{
++  return 0;
++}
++
++/* XIM Stubs */
++
++XPointer
++_XimGetLocaleCode ( _Xconst char* encoding_name )
++{
++  return NULL;
++}
++
++int
++_XimGetCharCode (
++    XPointer            ucs_conv,
++    KeySym              keysym,
++    unsigned char*      buf,
++    int                 nbytes)
++{
++  return 0;
++}
++
++/* Xrm Stubs */
++
++XrmMethods
++_XrmInitParseInfo(
++    XPointer *state)
++{
++    return (XrmMethods) NULL;
++}
++
++/* Xwc Stubs */
++
++int
++XwcTextExtents(
++    XFontSet            font_set,
++    _Xconst wchar_t    *text,
++    int                 text_len,
++    XRectangle         *overall_ink_extents,
++    XRectangle         *overall_logical_extents)
++{
++  return 0;
++}
++
++void 
++XwcDrawString(Display *display,
++	      Drawable d,
++	      XFontSet font_set,
++	      GC gc,
++	      int x, int y,
++	      _Xconst wchar_t *string,
++	      int num_wchars)
++{
++  ;
++}
++
++void
++XwcDrawText(
++    Display            *dpy,
++    Drawable            d,
++    GC                  gc,
++    int                 x,
++    int                 y,
++    XwcTextItem        *text_items,
++    int                 nitems)
++{
++  ;
++}
++
++void
++XwcDrawImageString(
++    Display            *dpy,
++    Drawable            d,
++    XFontSet            font_set,
++    GC                  gc,
++    int                 x,
++    int                 y,
++    _Xconst wchar_t    *text,
++    int                 text_len)
++{
++  ;
++}
++
++int
++XwcTextEscapement(
++    XFontSet            font_set,
++    _Xconst wchar_t    *text,
++    int                 text_len)
++{
++  return 0;
++}
++
++Status
++XwcTextPerCharExtents(
++    XFontSet            font_set,
++    _Xconst wchar_t    *text,
++    int                 text_len,
++    XRectangle         *ink_extents_buffer,
++    XRectangle         *logical_extents_buffer,
++    int                 buffer_size,
++    int                *num_chars,
++    XRectangle         *max_ink_extents,
++    XRectangle         *max_logical_extents)
++{
++  return(XcmsFailure);
++}
++
++int
++XwcTextPropertyToTextList(
++    Display *dpy,
++    const XTextProperty *text_prop,
++    wchar_t ***list_ret,
++    int *count_ret)
++{
++  return 0;
++}
++
++int
++XwcTextListToTextProperty(
++    Display *dpy,
++    wchar_t **list,
++    int count,
++    XICCEncodingStyle style,
++    XTextProperty *text_prop)
++{
++  return 0;
++}
++
++void
++XwcFreeStringList(wchar_t **list)
++{
++  return;
++}
++
++
++void XmbSetWMProperties (        /* Actually from mbWMProps.c */
++    Display *dpy,
++    Window w,
++    _Xconst char *windowName,
++    _Xconst char *iconName,
++    char **argv,
++    int argc,
++    XSizeHints *sizeHints,
++    XWMHints *wmHints,
++    XClassHint *classHints)
++{
++  return;
++}
++
++int
++XmbTextPropertyToTextList(
++    Display *dpy,
++    const XTextProperty *text_prop,
++    char ***list_ret,
++    int *count_ret)
++{
++  return XLocaleNotSupported;
++}
++
++int
++XmbTextListToTextProperty(
++    Display *dpy,
++    char **list,
++    int count,
++    XICCEncodingStyle style,
++    XTextProperty *text_prop)
++{
++  return XLocaleNotSupported;
++}
++
++int
++XmbTextExtents(
++    XFontSet        font_set,
++    _Xconst char   *text,
++    int             text_len,
++    XRectangle     *overall_ink_extents,
++    XRectangle     *overall_logical_extents)
++{
++  return 0;
++}
++
++void
++XmbDrawText(
++    Display            *dpy,
++    Drawable            d,
++    GC                  gc,
++    int                 x,
++    int                 y,
++    XmbTextItem        *text_items,
++    int                 nitems)
++{
++  ;
++}
++
++void
++XmbDrawString(
++    Display            *dpy,
++    Drawable            d,
++    XFontSet            font_set,
++    GC                  gc,
++    int                 x,
++    int                 y,
++    _Xconst char       *text,
++    int                 text_len)
++{
++  ;
++}
++
++void
++XmbDrawImageString(
++    Display            *dpy,
++    Drawable            d,
++    XFontSet            font_set,
++    GC                  gc,
++    int                 x,
++    int                 y,
++    _Xconst char       *text,
++    int                 text_len)
++{
++  ;
++}
++
++int
++XmbTextEscapement(
++    XFontSet        font_set,
++    _Xconst char   *text,
++    int             text_len)
++{
++  return 0;
++}
++
++Status
++XmbTextPerCharExtents(
++    XFontSet        font_set,
++    _Xconst char   *text,
++    int             text_len,
++    XRectangle     *ink_extents_buffer,
++    XRectangle     *logical_extents_buffer,
++    int             buffer_size,
++    int            *num_chars,
++    XRectangle     *max_ink_extents,
++    XRectangle     *max_logical_extents)
++{
++  return 0;
++}
++
++unsigned int
++KeySymToUcs4(KeySym keysym)
++{
++  return 0;
++}
++
++#endif 
++
++#if ! XCMS
++
++XcmsCCC 
++XcmsCCCOfColormap(dpy, cmap)
++    Display *dpy;
++    Colormap cmap;
++{
++  return NULL;
++}
++
++Status
++_XcmsResolveColorString (
++    XcmsCCC ccc,
++    const char **color_string,
++    XcmsColor *pColor_exact_return,
++    XcmsColorFormat result_format)
++{
++  return(XcmsFailure);
++}
++
++void
++_XcmsUnresolveColor(
++    XcmsCCC ccc,
++    XcmsColor *pColor)
++{
++  return;
++}
++
++void
++_XUnresolveColor(
++    XcmsCCC ccc,
++    XColor *pXColor)
++{
++  return;
++}
++
++XcmsCmapRec *
++_XcmsAddCmapRec(dpy, cmap, windowID, visual)
++    Display *dpy;
++    Colormap cmap;
++    Window windowID;
++    Visual *visual;
++{
++  return NULL;
++}
++
++void
++_XcmsRGB_to_XColor(
++    XcmsColor *pColors,
++    XColor *pXColors,
++    unsigned int nColors)
++{
++  return;
++}
++
++XcmsCmapRec *
++_XcmsCopyCmapRecAndFree(
++    Display *dpy,
++    Colormap src_cmap,
++    Colormap copy_cmap)
++{
++  return NULL;
++}
++
++void
++_XcmsDeleteCmapRec(
++    Display *dpy,
++    Colormap cmap)
++{
++  return;
++}
++
++#endif
+diff --git a/src/imConv.c b/src/imConv.c
+index c3c1974..04ecc81 100644
+--- a/src/imConv.c
++++ b/src/imConv.c
+@@ -80,6 +80,7 @@ static const struct SubstRec SubstTable[] = {
+  * from UCS char to specified charset char.
+  * This converter is needed for _XimGetCharCode subroutine.
+  */
++#ifdef XLOCALE
+ XPointer
+ _XimGetLocaleCode (
+     _Xconst char*	encoding_name)
+@@ -93,7 +94,7 @@ _XimGetLocaleCode (
+     }
+     return cvt;
+ }
+-
++#endif
+ /*
+  * Returns the locale dependent representation of a keysym.
+  * The locale's encoding is passed in form of pointer to UCS convertor.
+@@ -105,6 +105,7 @@ _XimGetLocaleCode (
+  * locale
+  */
+ /*ARGSUSED*/
++#ifdef XLOCALE
+ int
+ _XimGetCharCode (
+     XPointer            ucs_conv,
+@@ -133,6 +134,7 @@ _XimGetCharCode (
+         buf[count]= '\0';
+     return count;
+ }
++#endif
+
+ #ifdef XKB
+ static int lookup_string(
+diff --git a/src/locking.c b/src/locking.c
+index 9f4fe06..e6967ee 100644
+--- a/src/locking.c
++++ b/src/locking.c
+@@ -65,7 +65,9 @@ in this Software without prior written authorization from The Open Group.
+ #define NUM_FREE_CVLS 4
+ 
+ /* in lcWrap.c */
++#ifdef XLOCALE
+ extern LockInfoPtr _Xi18n_lock;
++#endif
+ 
+ #ifdef WIN32
+ static DWORD _X_TlsIndex = (DWORD)-1;
+@@ -597,9 +599,11 @@ Status XInitThreads(void)
+     _Xglobal_lock = &global_lock;
+     xmutex_init(_Xglobal_lock->lock);
+     xmutex_set_name(_Xglobal_lock->lock, "Xlib global");
++#ifdef XLOCALE
+     _Xi18n_lock = &i18n_lock;
+     xmutex_init(_Xi18n_lock->lock);
+     xmutex_set_name(_Xi18n_lock->lock, "Xlib i18n");
++#endif
+     _XLockMutex_fn = _XLockMutex;
+     _XUnlockMutex_fn = _XUnlockMutex;
+     _XCreateMutex_fn = _XCreateMutex;
+-- 
+2.7.4
+

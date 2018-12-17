@@ -29,10 +29,13 @@ inherit image
         # like CONVERSION_DEPENDS_bz2="somedep"
         result = bitbake('-e emptytest')
 
+        dep = None
         for line in result.output.split('\n'):
             if line.startswith('CONVERSION_DEPENDS_bz2'):
                 dep = line.split('=')[1].strip('"')
                 break
+
+        self.assertIsNotNone(dep, "CONVERSION_DEPENDS_bz2 dependency not found in bitbake -e output")
 
         # Now get the dependency task list and check for the expected task
         # dependency

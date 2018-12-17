@@ -33,7 +33,7 @@ python patch_task_patch_prefunc() {
     if (testsrcdir + os.sep).startswith(workdir + os.sep):
         # Double-check that either workdir or S or some directory in-between is a git repository
         found = False
-        while testsrcdir != '/':
+        while testsrcdir != workdir:
             if os.path.exists(os.path.join(testsrcdir, '.git')):
                 found = True
                 break

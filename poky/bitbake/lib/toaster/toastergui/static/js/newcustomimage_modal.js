@@ -25,6 +25,8 @@ function newCustomImageModalInit(){
   var duplicateNameMsg = "An image with this name already exists. Image names must be unique.";
   var duplicateImageInProjectMsg = "An image with this name already exists in this project."
   var invalidBaseRecipeIdMsg = "Please select an image to customise.";
+  var missingParentRecipe = "The parent recipe file was not found. Cancel this action, build any target (like 'quilt-native') to force all new layers to clone, and try again";
+  var unknownError = "Unexpected error: ";
 
   // set button to "submit" state and enable text entry so user can
   // enter the custom recipe name
@@ -62,6 +64,7 @@ function newCustomImageModalInit(){
     if (nameInput.val().length > 0) {
       libtoaster.createCustomRecipe(nameInput.val(), baseRecipeId,
       function(ret) {
+        showSubmitState();
         if (ret.error !== "ok") {
           console.warn(ret.error);
           if (ret.error === "invalid-name") {
@@ -73,6 +76,10 @@ function newCustomImageModalInit(){
           } else if (ret.error === "image-already-exists") {
             showNameError(duplicateImageInProjectMsg);
             return;
+          } else if (ret.error === "recipe-parent-not-exist") {
+            showNameError(missingParentRecipe);
+          } else {
+            showNameError(unknownError + ret.error);
           }
         } else {
           imgCustomModal.modal('hide');

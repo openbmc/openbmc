@@ -1,0 +1,19 @@
+meta-clang passes this option to compiler defaults
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: git/klcc/klcc.in
+===================================================================
+--- git.orig/klcc/klcc.in
++++ git/klcc/klcc.in
+@@ -207,6 +207,9 @@ while ( defined($a = shift(@ARGV)) ) {
+     } elsif ( $a =~ /^--([sysroot=])(.*)$/ ) {
+ 	# Override gcc encoded sysroot
+ 	push(@ccopt, $a);
++    } elsif ( $a eq '-no-integrated-as' ) {
++	# Allow clang options
++	push(@ccopt, $a);
+     } else {
+ 	die "$0: unknown option: $a\n";
+     }

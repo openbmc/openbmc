@@ -51,4 +51,4 @@ do_compile_prepend() {
 
 FILES_whiptail = "${bindir}/whiptail"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

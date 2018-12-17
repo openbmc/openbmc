@@ -10,7 +10,7 @@ LICENSE = "MIT"
 
 PE = "1"
 
-DEPENDS += "libxrandr xproto"
+DEPENDS += "libxrandr xorgproto"
 
 SRC_URI += "file://diet-x11.patch"
 

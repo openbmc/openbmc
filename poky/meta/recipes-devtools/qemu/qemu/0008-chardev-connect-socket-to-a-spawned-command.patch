@@ -1,4 +1,4 @@
-From 55c9510311b7481a0c8f3f71b3ce130cc25563f9 Mon Sep 17 00:00:00 2001
+From 20a09bb18907e67565c54fc505a741cbbef53f7f Mon Sep 17 00:00:00 2001
 From: Alistair Francis <alistair.francis@xilinx.com>
 Date: Thu, 21 Dec 2017 11:35:16 -0800
 Subject: [PATCH] chardev: connect socket to a spawned command
@@ -45,16 +45,16 @@ Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
 ---
- chardev/char-socket.c | 99 +++++++++++++++++++++++++++++++++++++++++++++++++++
- chardev/char.c        |  3 ++
- qapi/char.json        |  5 +++
- 3 files changed, 107 insertions(+)
+ chardev/char-socket.c | 102 ++++++++++++++++++++++++++++++++++++++++++
+ chardev/char.c        |   3 ++
+ qapi/char.json        |   5 +++
+ 3 files changed, 110 insertions(+)
 
 diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 53eda8e..6c63555 100644
+index 159e69c3b1..84778cf31a 100644
 --- a/chardev/char-socket.c
 +++ b/chardev/char-socket.c
-@@ -852,6 +852,68 @@ static gboolean socket_reconnect_timeout(gpointer opaque)
+@@ -934,6 +934,68 @@ static gboolean socket_reconnect_timeout(gpointer opaque)
      return false;
  }
  
@@ -123,7 +123,7 @@ index 53eda8e..6c63555 100644
  static void qmp_chardev_open_socket(Chardev *chr,
                                      ChardevBackend *backend,
                                      bool *be_opened,
-@@ -859,6 +921,9 @@ static void qmp_chardev_open_socket(Chardev *chr,
+@@ -941,6 +1003,9 @@ static void qmp_chardev_open_socket(Chardev *chr,
  {
      SocketChardev *s = SOCKET_CHARDEV(chr);
      ChardevSocket *sock = backend->u.socket.data;
@@ -133,24 +133,24 @@ index 53eda8e..6c63555 100644
      bool do_nodelay     = sock->has_nodelay ? sock->nodelay : false;
      bool is_listen      = sock->has_server  ? sock->server  : true;
      bool is_telnet      = sock->has_telnet  ? sock->telnet  : false;
-@@ -925,7 +990,14 @@ static void qmp_chardev_open_socket(Chardev *chr,
-     } else if (reconnect > 0) {
+@@ -1008,6 +1073,14 @@ static void qmp_chardev_open_socket(Chardev *chr,
          s->reconnect_time = reconnect;
      }
+ 
 +#ifndef _WIN32
 +    if (cmd) {
 +        chardev_open_socket_cmd(chr, cmd, errp);
- 
++
 +        /* everything ready (or failed permanently) before we return */
 +        *be_opened = true;
 +    } else
 +#endif
-     if (s->reconnect_time) {
-         sioc = qio_channel_socket_new();
-         tcp_chr_set_client_ioc_name(chr, sioc);
-@@ -985,10 +1057,26 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
-     const char *host = qemu_opt_get(opts, "host");
+     /* If reconnect_time is set, will do that in chr_machine_done. */
+     if (!s->reconnect_time) {
+         if (s->is_listen) {
+@@ -1065,9 +1138,26 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
      const char *port = qemu_opt_get(opts, "port");
+     const char *fd = qemu_opt_get(opts, "fd");
      const char *tls_creds = qemu_opt_get(opts, "tls-creds");
 +#ifndef _WIN32
 +    const char *cmd = qemu_opt_get(opts, "cmd");
@@ -158,7 +158,6 @@ index 53eda8e..6c63555 100644
      SocketAddressLegacy *addr;
      ChardevSocket *sock;
  
-     backend->type = CHARDEV_BACKEND_KIND_SOCKET;
 +#ifndef _WIN32
 +    if (cmd) {
 +        /*
@@ -172,17 +171,18 @@ index 53eda8e..6c63555 100644
 +        }
 +    } else
 +#endif
-     if (!path) {
-         if (!host) {
-             error_setg(errp, "chardev: socket: no host given");
-@@ -1021,13 +1109,24 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
-     sock->has_reconnect = true;
++
+     if ((!!path + !!fd + !!host) != 1) {
+         error_setg(errp,
+                    "Exactly one of 'path', 'fd' or 'host' required");
+@@ -1112,12 +1202,24 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
      sock->reconnect = reconnect;
      sock->tls_creds = g_strdup(tls_creds);
+ 
 +#ifndef _WIN32
 +    sock->cmd = g_strdup(cmd);
 +#endif
- 
++ 
      addr = g_new0(SocketAddressLegacy, 1);
 +#ifndef _WIN32
 +    if (path || cmd) {
@@ -197,25 +197,25 @@ index 53eda8e..6c63555 100644
 +#else
          q_unix->path = g_strdup(path);
 +#endif
-     } else {
+     } else if (host) {
          addr->type = SOCKET_ADDRESS_LEGACY_KIND_INET;
          addr->u.inet.data = g_new(InetSocketAddress, 1);
 diff --git a/chardev/char.c b/chardev/char.c
-index 2ae4f46..5d52cd5 100644
+index 76d866e6fe..9747d51d7c 100644
 --- a/chardev/char.c
 +++ b/chardev/char.c
-@@ -793,6 +793,9 @@ QemuOptsList qemu_chardev_opts = {
+@@ -792,6 +792,9 @@ QemuOptsList qemu_chardev_opts = {
+         },{
              .name = "path",
              .type = QEMU_OPT_STRING,
-         },{
++        },{
 +            .name = "cmd",
 +            .type = QEMU_OPT_STRING,
-+        },{
+         },{
              .name = "host",
              .type = QEMU_OPT_STRING,
-         },{
 diff --git a/qapi/char.json b/qapi/char.json
-index ae19dcd..6de0f29 100644
+index ae19dcd1ed..6de0f29bcd 100644
 --- a/qapi/char.json
 +++ b/qapi/char.json
 @@ -241,6 +241,10 @@

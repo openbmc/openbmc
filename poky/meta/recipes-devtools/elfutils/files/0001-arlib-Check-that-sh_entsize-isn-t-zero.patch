@@ -1,0 +1,36 @@
+From b518841fbc1431d7c5baa016e35f10fb647b5958 Mon Sep 17 00:00:00 2001
+From: Mark Wielaard <mark@klomp.org>
+Date: Thu, 18 Oct 2018 19:01:52 +0200
+Subject: [PATCH] arlib: Check that sh_entsize isn't zero.
+
+A bogus ELF file could have sh_entsize as zero. Don't divide by zero,
+but just assume there are no symbols in the section.
+
+https://sourceware.org/bugzilla/show_bug.cgi?id=23786
+
+Signed-off-by: Mark Wielaard <mark@klomp.org>
+
+CVE: CVE-2018-18521
+Upstream-Status: Backport [http://sourceware.org/git/elfutils.git]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ src/arlib.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/arlib.c b/src/arlib.c
+index 778e087..a6521e3 100644
+--- a/src/arlib.c
++++ b/src/arlib.c
+@@ -252,6 +252,9 @@ arlib_add_symbols (Elf *elf, const char *arfname, const char *membername,
+       if (data == NULL)
+ 	continue;
+ 
++      if (shdr->sh_entsize == 0)
++	continue;
++
+       int nsyms = shdr->sh_size / shdr->sh_entsize;
+       for (int ndx = shdr->sh_info; ndx < nsyms; ++ndx)
+ 	{
+-- 
+2.7.4
+

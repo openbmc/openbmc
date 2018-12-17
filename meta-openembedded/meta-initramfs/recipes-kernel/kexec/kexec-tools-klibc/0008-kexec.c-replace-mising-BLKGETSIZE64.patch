@@ -1,0 +1,32 @@
+From 12c7b09c3152f2b3475d081691a26bd1a5633256 Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Tue, 17 Apr 2018 11:38:42 +0200
+Subject: [PATCH] kexec.c: replace missing BLKGETSIZE64
+
+Fix
+
+ kexec.c: In function 'slurp_file_generic':
+ kexec.c:564:19: error: 'BLKGETSIZE64' undeclared
+
+Upstream-Status: Inappropriate [klibc specific]
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+
+---
+ kexec/kexec.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/kexec/kexec.c b/kexec/kexec.c
+index b5a8a1e..7842f8b 100644
+--- a/kexec/kexec.c
++++ b/kexec/kexec.c
+@@ -54,6 +54,10 @@
+ #define KEXEC_LOADED_PATH "/sys/kernel/kexec_loaded"
+ #define KEXEC_CRASH_LOADED_PATH "/sys/kernel/kexec_crash_loaded"
+ 
++#ifndef BLKGETSIZE64
++#define BLKGETSIZE64	_IOR(0x12,114,size_t)
++#endif
++
+ unsigned long long mem_min = 0;
+ unsigned long long mem_max = ULONG_MAX;
+ static unsigned long kexec_flags = 0;

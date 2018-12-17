@@ -1,0 +1,87 @@
+From bc4ff7e37ce120c257e52a81fe3475499dfd2573 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Tue, 24 Jul 2018 10:10:24 +0800
+Subject: [PATCH] libldb: fix config error
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ wscript | 58 +++++++++++++++++++++++++++++-----------------------------
+ 1 file changed, 29 insertions(+), 29 deletions(-)
+
+diff --git a/wscript b/wscript
+index b0af7b6..8ad9f96 100644
+--- a/wscript
++++ b/wscript
+@@ -115,40 +115,40 @@ def configure(conf):
+                                              onlyif='talloc tdb tevent pyldb-util',
+                                              implied_deps='replace talloc tdb tevent'):
+                 conf.define('USING_SYSTEM_LDB', 1)
++    if not Options.options.without_ldb_lmdb:
++        if not conf.CHECK_CODE('return !(sizeof(size_t) >= 8)',
++                               "HAVE_64_BIT_SIZE_T_FOR_LMDB",
++                               execute=True,
++                               msg='Checking for a 64-bit host to '
++                               'support lmdb'):
++            Logs.warn("--without-ldb-lmdb implied as this "
++                      "host is not 64-bit")
++
++            if not conf.env.standalone_ldb and \
++               not Options.options.without_ad_dc and \
++               conf.CONFIG_GET('ENABLE_SELFTEST'):
++                Logs.warn("NOTE: Some AD DC parts of selftest will fail")
+ 
+-    if not conf.CHECK_CODE('return !(sizeof(size_t) >= 8)',
+-                           "HAVE_64_BIT_SIZE_T_FOR_LMDB",
+-                           execute=True,
+-                           msg='Checking for a 64-bit host to '
+-                           'support lmdb'):
+-        Logs.warn("--without-ldb-lmdb implied as this "
+-                  "host is not 64-bit")
+-
+-        if not conf.env.standalone_ldb and \
+-           not Options.options.without_ad_dc and \
+-           conf.CONFIG_GET('ENABLE_SELFTEST'):
+-            Logs.warn("NOTE: Some AD DC parts of selftest will fail")
+-
+-        conf.env.REQUIRE_LMDB = False
+-    else:
+-        if conf.env.standalone_ldb:
+-            if Options.options.without_ldb_lmdb:
+-                conf.env.REQUIRE_LMDB = False
+-            else:
+-                conf.env.REQUIRE_LMDB = True
+-        elif Options.options.without_ad_dc:
+             conf.env.REQUIRE_LMDB = False
+         else:
+-            if Options.options.without_ldb_lmdb:
+-                if not Options.options.without_ad_dc and \
+-                   conf.CONFIG_GET('ENABLE_SELFTEST'):
+-                    raise Utils.WafError('--without-ldb-lmdb conflicts '
+-                                         'with --enable-selftest while '
+-                                         'building the AD DC')
+-
++            if conf.env.standalone_ldb:
++                if Options.options.without_ldb_lmdb:
++                    conf.env.REQUIRE_LMDB = False
++                else:
++                    conf.env.REQUIRE_LMDB = True
++            elif Options.options.without_ad_dc:
+                 conf.env.REQUIRE_LMDB = False
+             else:
+-                conf.env.REQUIRE_LMDB = True
++                if Options.options.without_ldb_lmdb:
++                    if not Options.options.without_ad_dc and \
++                       conf.CONFIG_GET('ENABLE_SELFTEST'):
++                        raise Utils.WafError('--without-ldb-lmdb conflicts '
++                                             'with --enable-selftest while '
++                                             'building the AD DC')
++
++                    conf.env.REQUIRE_LMDB = False
++                else:
++                    conf.env.REQUIRE_LMDB = True
+ 
+ 
+     if conf.CONFIG_SET('USING_SYSTEM_LDB'):
+-- 
+2.7.4
+

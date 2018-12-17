@@ -35,8 +35,6 @@ CMDLINE_append += ' ${@oe.utils.conditional("DISABLE_RPI_BOOT_LOGO", "1", "logo.
 CMDLINE_DEBUG ?= ""
 CMDLINE_append = " ${CMDLINE_DEBUG}"
 
-KERNEL_INITRAMFS ?= '${@oe.utils.conditional("INITRAMFS_IMAGE_BUNDLE", "1", "1", "", d)}'
-
 KERNEL_MODULE_AUTOLOAD += "${@bb.utils.contains("MACHINE_FEATURES", "pitft28r", "stmpe-ts", "", d)}"
 
 # A LOADADDR is needed when building a uImage format kernel. This value is not
@@ -101,7 +99,7 @@ do_configure_prepend() {
     # Localversion
     kernel_configure_variable LOCALVERSION "\"\""
 
-    if [ ! -z "${KERNEL_INITRAMFS}" ]; then
+    if [ "${INITRAMFS_IMAGE_BUNDLE}" = "1" ]; then
         kernel_configure_variable OVERLAY_FS y
         kernel_configure_variable SQUASHFS y
         kernel_configure_variable UBIFS_FS y
@@ -109,7 +107,7 @@ do_configure_prepend() {
 
     # Activate the configuration options for VC4
     VC4GRAPHICS="${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", "1", "0", d)}"
-    if [ ${VC4GRAPHICS} = "1" ]; then
+    if [ "${VC4GRAPHICS}" = "1" ]; then
         kernel_configure_variable I2C_BCM2835 y
         kernel_configure_variable DRM y
         kernel_configure_variable DRM_FBDEV_EMULATION y

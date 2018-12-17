@@ -275,7 +275,8 @@ var libtoaster = (function () {
 
   function _addRmLayer(layerObj, add, doneCb){
     if (layerObj.xhrLayerUrl === undefined){
-      throw("xhrLayerUrl is undefined")
+      alert("ERROR: missing xhrLayerUrl object. Please file a bug.");
+      return;
     }
 
     if (add === true) {
@@ -465,6 +466,108 @@ var libtoaster = (function () {
     $.cookie('toaster-notification', JSON.stringify(data), { path: '/'});
   }
 
+  /* _updateProject:
+   * url: xhrProjectUpdateUrl or null for current project
+   * onsuccess: callback for successful execution
+   * onfail: callback for failed execution
+   */
+  function _updateProject (url, targets, default_image, onsuccess, onfail) {
+
+    if (!url)
+      url = libtoaster.ctx.xhrProjectUpdateUrl;
+
+    /* Flatten the array of targets into a space spearated list */
+    if (targets instanceof Array){
+      targets = targets.reduce(function(prevV, nextV){
+        return prev + ' ' + next;
+      });
+    }
+
+    $.ajax( {
+        type: "POST",
+        url: url,
+        data: { 'do_update' : 'True' , 'targets' : targets , 'default_image' : default_image , },
+        headers: { 'X-CSRFToken' : $.cookie('csrftoken')},
+        success: function (_data) {
+          if (_data.error !== "ok") {
+            console.warn(_data.error);
+          } else {
+            if (onsuccess !== undefined) onsuccess(_data);
+          }
+        },
+        error: function (_data) {
+          console.warn("Call failed");
+          console.warn(_data);
+          if (onfail) onfail(data);
+    } });
+  }
+
+  /* _cancelProject:
+   * url: xhrProjectUpdateUrl or null for current project
+   * onsuccess: callback for successful execution
+   * onfail: callback for failed execution
+   */
+  function _cancelProject (url, onsuccess, onfail) {
+
+    if (!url)
+      url = libtoaster.ctx.xhrProjectCancelUrl;
+
+    $.ajax( {
+        type: "POST",
+        url: url,
+        data: { 'do_cancel' : 'True'  },
+        headers: { 'X-CSRFToken' : $.cookie('csrftoken')},
+        success: function (_data) {
+          if (_data.error !== "ok") {
+            console.warn(_data.error);
+          } else {
+            if (onsuccess !== undefined) onsuccess(_data);
+          }
+        },
+        error: function (_data) {
+          console.warn("Call failed");
+          console.warn(_data);
+          if (onfail) onfail(data);
+    } });
+  }
+
+  /* _setDefaultImage:
+   * url: xhrSetDefaultImageUrl or null for current project
+   * targets: an array or space separated list of targets to set as default
+   * onsuccess: callback for successful execution
+   * onfail: callback for failed execution
+   */
+  function _setDefaultImage (url, targets, onsuccess, onfail) {
+
+    if (!url)
+      url = libtoaster.ctx.xhrSetDefaultImageUrl;
+
+    /* Flatten the array of targets into a space spearated list */
+    if (targets instanceof Array){
+      targets = targets.reduce(function(prevV, nextV){
+        return prev + ' ' + next;
+      });
+    }
+
+    $.ajax( {
+        type: "POST",
+        url: url,
+        data: { 'targets' : targets },
+        headers: { 'X-CSRFToken' : $.cookie('csrftoken')},
+        success: function (_data) {
+          if (_data.error !== "ok") {
+            console.warn(_data.error);
+          } else {
+            if (onsuccess !== undefined) onsuccess(_data);
+          }
+        },
+        error: function (_data) {
+          console.warn("Call failed");
+          console.warn(_data);
+          if (onfail) onfail(data);
+    } });
+  }
+
   return {
     enableAjaxLoadingTimer: _enableAjaxLoadingTimer,
     disableAjaxLoadingTimer: _disableAjaxLoadingTimer,
@@ -485,6 +588,9 @@ var libtoaster = (function () {
     createCustomRecipe: _createCustomRecipe,
     makeProjectNameValidation: _makeProjectNameValidation,
     setNotification: _setNotification,
+    updateProject : _updateProject,
+    cancelProject : _cancelProject,
+    setDefaultImage : _setDefaultImage,
   };
 })();
 

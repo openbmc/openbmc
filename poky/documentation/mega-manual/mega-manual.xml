@@ -76,14 +76,14 @@
                 <revremark>Released with the Yocto Project 2.5 Release.</revremark>
             </revision>
             <revision>
-                <revnumber>2.5.1</revnumber>
-                <date>September 2018</date>
-                <revremark>The initial document released with the Yocto Project 2.5.1 Release.</revremark>
+                <revnumber>2.6</revnumber>
+                <date>November 2018</date>
+                <revremark>Released with the Yocto Project 2.6 Release.</revremark>
             </revision>
             <revision>
-                <revnumber>2.5.2</revnumber>
+                <revnumber>2.6.1</revnumber>
                 <date>&REL_MONTH_YEAR;</date>
-                <revremark>The initial document released with the Yocto Project 2.5.2 Release.</revremark>
+                <revremark>Released with the Yocto Project 2.6.1 Release.</revremark>
             </revision>
        </revhistory>
 

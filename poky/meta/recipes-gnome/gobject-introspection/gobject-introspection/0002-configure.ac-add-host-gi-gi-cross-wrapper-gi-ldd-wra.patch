@@ -1,8 +1,8 @@
-From b1503fe2693d602b3e24e4b832dc0934960d5d22 Mon Sep 17 00:00:00 2001
+From a28cc8413b68bec5b4cf2ee5f37b40a8965490a5 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 19 Oct 2015 18:29:21 +0300
-Subject: [PATCH 2/5] configure.ac: add host-gi, gi-cross-wrapper,
- gi-ldd-wrapper and introspection-data options
+Subject: [PATCH] configure.ac: add host-gi, gi-cross-wrapper, gi-ldd-wrapper
+ and introspection-data options
 
 With the first option, gobject-introspection tools (g-ir-doc-tool and g-ir-scanner)
 that are already installed in the host system will be used for building the source tree.
@@ -25,6 +25,7 @@ These options are useful when cross-compiling for a different target architectur
 
 Upstream-Status: Pending [review on oe-core list]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  Makefile.am       |  2 ++
  common.mk         | 39 +++++++++++++++++++++++++++++++++++++++
@@ -32,10 +33,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  tests/Makefile.am |  5 ++++-
  4 files changed, 87 insertions(+), 1 deletion(-)
 
-Index: gobject-introspection-1.52.1/Makefile.am
-===================================================================
---- gobject-introspection-1.52.1.orig/Makefile.am
-+++ gobject-introspection-1.52.1/Makefile.am
+diff --git a/Makefile.am b/Makefile.am
+index 44ed115..2a1fa56 100644
+--- a/Makefile.am
++++ b/Makefile.am
 @@ -21,7 +21,9 @@ include Makefile-cmph.am
  include Makefile-girepository.am
  include Makefile-giscanner.am
@@ -44,12 +45,12 @@ Index: gobject-introspection-1.52.1/Makefile.am
  include Makefile-gir.am
 +endif
  include Makefile-tools.am
- include Makefile-msvcproj.am
  
-Index: gobject-introspection-1.52.1/common.mk
-===================================================================
---- gobject-introspection-1.52.1.orig/common.mk
-+++ gobject-introspection-1.52.1/common.mk
+ ## Process this file with automake to produce Makefile.in
+diff --git a/common.mk b/common.mk
+index e26c637..9f3a65f 100644
+--- a/common.mk
++++ b/common.mk
 @@ -6,6 +6,15 @@
  # module itself.
  #
@@ -130,11 +131,11 @@ Index: gobject-introspection-1.52.1/common.mk
  
  INTROSPECTION_DOCTOOL_ARGS = \
      --add-include-path=$(srcdir) \
-Index: gobject-introspection-1.52.1/configure.ac
-===================================================================
---- gobject-introspection-1.52.1.orig/configure.ac
-+++ gobject-introspection-1.52.1/configure.ac
-@@ -366,6 +366,48 @@ dnl
+diff --git a/configure.ac b/configure.ac
+index d48e6c3..ed5f8a2 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -367,6 +367,48 @@ dnl
  AM_CONDITIONAL(MSVC_BASE_NO_TOOLSET_SET, [test x$MSVC_BASE_TOOLSET = x])
  AM_CONDITIONAL(MSVC_NO_TOOLSET_SET, [test x$MSVC_TOOLSET = x])
  
@@ -183,10 +184,10 @@ Index: gobject-introspection-1.52.1/configure.ac
  AC_CONFIG_FILES([
  Makefile
  tests/Makefile
-Index: gobject-introspection-1.52.1/tests/Makefile.am
-===================================================================
---- gobject-introspection-1.52.1.orig/tests/Makefile.am
-+++ gobject-introspection-1.52.1/tests/Makefile.am
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 4bdb9c3..10b0f27 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
 @@ -1,6 +1,9 @@
  include $(top_srcdir)/common.mk
  

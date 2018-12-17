@@ -257,6 +257,8 @@ python package_do_split_gconvs () {
                 "mipsisa32r6el":  " --uint32-align=4 --little-endian ", \
                 "mips64el":" --uint32-align=4 --little-endian ", \
                 "mipsisa64r6el":" --uint32-align=4 --little-endian ", \
+                "riscv64": " --uint32-align=4 --little-endian ", \
+                "riscv32": " --uint32-align=4 --little-endian ", \
                 "i586":    " --uint32-align=4 --little-endian ", \
                 "i686":    " --uint32-align=4 --little-endian ", \
                 "x86_64":  " --uint32-align=4 --little-endian "  }

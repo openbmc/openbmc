@@ -1,0 +1,1093 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Fri, 1 Jun 2018 16:30:44 -0500
+Subject: [PATCH] libmultipath: remove rbd code
+
+The Ceph tean has asked to drop support for multipathed rbd, since it
+was running into data corruption issues. There was never an upstream
+Ceph release based on it, and because of the corruption, there should be
+no users of this code. This patch simply reverts all the rbd code from
+multipath.
+
+Cc: Michael Christie <mchristi@redhat.com>
+Cc: Jason Dillaman <dillaman@redhat.com>
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/checkers.c              |  22 --
+ libmultipath/checkers.h              |   6 -
+ libmultipath/checkers/Makefile       |   7 -
+ libmultipath/checkers/cciss_tur.c    |   5 -
+ libmultipath/checkers/directio.c     |   5 -
+ libmultipath/checkers/emc_clariion.c |   5 -
+ libmultipath/checkers/hp_sw.c        |   5 -
+ libmultipath/checkers/rbd.c          | 653 -----------------------------------
+ libmultipath/checkers/rdac.c         |   5 -
+ libmultipath/checkers/readsector0.c  |   5 -
+ libmultipath/checkers/tur.c          |   5 -
+ libmultipath/discovery.c             |  70 ----
+ libmultipath/hwtable.c               |  12 -
+ multipath/multipath.conf.5           |   3 -
+ multipathd/main.c                    |  11 -
+ 15 files changed, 819 deletions(-)
+ delete mode 100644 libmultipath/checkers/rbd.c
+
+diff --git a/libmultipath/checkers.c b/libmultipath/checkers.c
+index 08cdfc3..0bacc86 100644
+--- a/libmultipath/checkers.c
++++ b/libmultipath/checkers.c
+@@ -141,13 +141,6 @@ struct checker * add_checker (char *multipath_dir, char * name)
+ 	if (!c->free)
+ 		goto out;
+ 
+-	c->repair = (void (*)(struct checker *)) dlsym(c->handle,
+-						       "libcheck_repair");
+-	errstr = dlerror();
+-	if (errstr != NULL)
+-		condlog(0, "A dynamic linking error occurred: (%s)", errstr);
+-	if (!c->repair)
+-		goto out;
+ done:
+ 	c->fd = -1;
+ 	c->sync = 1;
+@@ -222,20 +215,6 @@ void checker_put (struct checker * dst)
+ 	free_checker(src);
+ }
+ 
+-void checker_repair (struct checker * c)
+-{
+-	if (!checker_selected(c))
+-		return;
+-
+-	c->message[0] = '\0';
+-	if (c->disable) {
+-		MSG(c, "checker disabled");
+-		return;
+-	}
+-	if (c->repair)
+-		c->repair(c);
+-}
+-
+ int checker_check (struct checker * c, int path_state)
+ {
+ 	int r;
+@@ -310,7 +289,6 @@ void checker_get (char *multipath_dir, struct checker * dst, char * name)
+ 	dst->sync = src->sync;
+ 	strncpy(dst->name, src->name, CHECKER_NAME_LEN);
+ 	strncpy(dst->message, src->message, CHECKER_MSG_LEN);
+-	dst->repair = src->repair;
+ 	dst->check = src->check;
+ 	dst->init = src->init;
+ 	dst->free = src->free;
+diff --git a/libmultipath/checkers.h b/libmultipath/checkers.h
+index 52154ca..7b18a1a 100644
+--- a/libmultipath/checkers.h
++++ b/libmultipath/checkers.h
+@@ -86,7 +86,6 @@ enum path_check_state {
+ #define READSECTOR0  "readsector0"
+ #define CCISS_TUR    "cciss_tur"
+ #define NONE         "none"
+-#define RBD          "rbd"
+ 
+ #define ASYNC_TIMEOUT_SEC	30
+ 
+@@ -113,9 +112,6 @@ struct checker {
+ 						multipath-wide. Use MALLOC if
+ 						you want to stuff data in. */
+ 	int (*check)(struct checker *);
+-	void (*repair)(struct checker *);    /* called if check returns
+-						PATH_DOWN to bring path into
+-						usable state */
+ 	int (*init)(struct checker *);       /* to allocate the context */
+ 	void (*free)(struct checker *);      /* to free the context */
+ };
+@@ -136,7 +132,6 @@ void checker_set_async (struct checker *);
+ void checker_set_fd (struct checker *, int);
+ void checker_enable (struct checker *);
+ void checker_disable (struct checker *);
+-void checker_repair (struct checker *);
+ int checker_check (struct checker *, int);
+ int checker_selected (struct checker *);
+ char * checker_name (struct checker *);
+@@ -148,6 +143,5 @@ void checker_get (char *, struct checker *, char *);
+ int libcheck_check(struct checker *);
+ int libcheck_init(struct checker *);
+ void libcheck_free(struct checker *);
+-void libcheck_repair(struct checker *);
+ 
+ #endif /* _CHECKERS_H */
+diff --git a/libmultipath/checkers/Makefile b/libmultipath/checkers/Makefile
+index 87c15bd..02caea6 100644
+--- a/libmultipath/checkers/Makefile
++++ b/libmultipath/checkers/Makefile
+@@ -15,15 +15,8 @@ LIBS= \
+ 	libcheckhp_sw.so \
+ 	libcheckrdac.so
+ 
+-ifneq ($(call check_file,/usr/include/rados/librados.h),0)
+-LIBS += libcheckrbd.so
+-endif
+-
+ all: $(LIBS)
+ 
+-libcheckrbd.so: rbd.o
+-	$(CC) $(LDFLAGS) $(SHARED_FLAGS) -o $@ $^ -lrados -ludev
+-
+ libcheckdirectio.so: libsg.o directio.o
+ 	$(CC) $(LDFLAGS) $(SHARED_FLAGS) -o $@ $^ -laio
+ 
+diff --git a/libmultipath/checkers/cciss_tur.c b/libmultipath/checkers/cciss_tur.c
+index 436470c..1cab201 100644
+--- a/libmultipath/checkers/cciss_tur.c
++++ b/libmultipath/checkers/cciss_tur.c
+@@ -59,11 +59,6 @@ void libcheck_free (struct checker * c)
+ 	return;
+ }
+ 
+-void libcheck_repair (struct checker * c)
+-{
+-	return;
+-}
+-
+ int libcheck_check(struct checker * c)
+ {
+ 	int rc;
+diff --git a/libmultipath/checkers/directio.c b/libmultipath/checkers/directio.c
+index ce60e4c..a80848d 100644
+--- a/libmultipath/checkers/directio.c
++++ b/libmultipath/checkers/directio.c
+@@ -118,11 +118,6 @@ void libcheck_free (struct checker * c)
+ 	free(ct);
+ }
+ 
+-void libcheck_repair (struct checker * c)
+-{
+-	return;
+-}
+-
+ static int
+ check_state(int fd, struct directio_context *ct, int sync, int timeout_secs)
+ {
+diff --git a/libmultipath/checkers/emc_clariion.c b/libmultipath/checkers/emc_clariion.c
+index 9c1ffed..9115b1b 100644
+--- a/libmultipath/checkers/emc_clariion.c
++++ b/libmultipath/checkers/emc_clariion.c
+@@ -90,11 +90,6 @@ void libcheck_free (struct checker * c)
+ 	free(c->context);
+ }
+ 
+-void libcheck_repair (struct checker * c)
+-{
+-	return;
+-}
+-
+ int libcheck_check (struct checker * c)
+ {
+ 	unsigned char sense_buffer[128] = { 0, };
+diff --git a/libmultipath/checkers/hp_sw.c b/libmultipath/checkers/hp_sw.c
+index cee9aab..0ad34a6 100644
+--- a/libmultipath/checkers/hp_sw.c
++++ b/libmultipath/checkers/hp_sw.c
+@@ -45,11 +45,6 @@ void libcheck_free (struct checker * c)
+ 	return;
+ }
+ 
+-void libcheck_repair (struct checker * c)
+-{
+-	return;
+-}
+-
+ static int
+ do_inq(int sg_fd, int cmddt, int evpd, unsigned int pg_op,
+        void *resp, int mx_resp_len, int noisy, unsigned int timeout)
+diff --git a/libmultipath/checkers/rbd.c b/libmultipath/checkers/rbd.c
+deleted file mode 100644
+index 4ff54f4..0000000
+--- a/libmultipath/checkers/rbd.c
++++ /dev/null
+@@ -1,653 +0,0 @@
+-/*
+- * Copyright (c) 2016 Red Hat
+- * Copyright (c) 2004 Christophe Varoqui
+- *
+- * Code based off of tur.c and ceph's krbd.cc
+- */
+-#define _GNU_SOURCE
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <string.h>
+-#include <unistd.h>
+-#include <fcntl.h>
+-#include <errno.h>
+-#include <pthread.h>
+-#include <libudev.h>
+-#include <ifaddrs.h>
+-#include <sys/types.h>
+-#include <sys/stat.h>
+-#include <sys/ioctl.h>
+-#include <sys/time.h>
+-#include <sys/wait.h>
+-#include <urcu.h>
+-
+-#include "rados/librados.h"
+-
+-#include "structs.h"
+-#include "checkers.h"
+-
+-#include "../libmultipath/debug.h"
+-#include "../libmultipath/util.h"
+-#include "../libmultipath/time-util.h"
+-#include "../libmultipath/util.h"
+-
+-struct rbd_checker_context;
+-typedef int (thread_fn)(struct rbd_checker_context *ct, char *msg);
+-
+-#define RBD_MSG(msg, fmt, args...) snprintf(msg, CHECKER_MSG_LEN, fmt, ##args);
+-
+-#define RBD_FEATURE_EXCLUSIVE_LOCK	(1 << 2)
+-
+-struct rbd_checker_context {
+-	int rbd_bus_id;
+-	char *client_addr;
+-	char *config_info;
+-	char *snap;
+-	char *pool;
+-	char *image;
+-	char *username;
+-	int remapped;
+-	int blacklisted;
+-	unsigned lock_on_read:1;
+-
+-	rados_t cluster;
+-
+-	int state;
+-	int running;
+-	time_t time;
+-	thread_fn *fn;
+-	pthread_t thread;
+-	pthread_mutex_t lock;
+-	pthread_cond_t active;
+-	pthread_spinlock_t hldr_lock;
+-	int holders;
+-	char message[CHECKER_MSG_LEN];
+-};
+-
+-int libcheck_init(struct checker * c)
+-{
+-	struct rbd_checker_context *ct;
+-	struct udev_device *block_dev;
+-	struct udev_device *bus_dev;
+-	struct udev *udev;
+-	struct stat sb;
+-	const char *block_name, *addr, *config_info, *features_str;
+-	const char *image, *pool, *snap, *username;
+-	uint64_t features = 0;
+-	char sysfs_path[PATH_SIZE];
+-	int ret;
+-
+-	ct = malloc(sizeof(struct rbd_checker_context));
+-	if (!ct)
+-		return 1;
+-	memset(ct, 0, sizeof(struct rbd_checker_context));
+-	ct->holders = 1;
+-	pthread_cond_init_mono(&ct->active);
+-	pthread_mutex_init(&ct->lock, NULL);
+-	pthread_spin_init(&ct->hldr_lock, PTHREAD_PROCESS_PRIVATE);
+-	c->context = ct;
+-
+-	/*
+-	 * The rbd block layer sysfs device is not linked to the rbd bus
+-	 * device that we interact with, so figure that out now.
+-	 */
+-	if (fstat(c->fd, &sb) != 0)
+-		goto free_ct;
+-
+-	udev = udev_new();
+-	if (!udev)
+-		goto free_ct;
+-
+-	block_dev = udev_device_new_from_devnum(udev, 'b', sb.st_rdev);
+-	if (!block_dev)
+-		goto free_udev;
+-
+-	block_name  = udev_device_get_sysname(block_dev);
+-	ret = sscanf(block_name, "rbd%d", &ct->rbd_bus_id);
+-
+-	udev_device_unref(block_dev);
+-	if (ret != 1)
+-		goto free_udev;
+-
+-	snprintf(sysfs_path, sizeof(sysfs_path), "/sys/bus/rbd/devices/%d",
+-		 ct->rbd_bus_id);
+-	bus_dev = udev_device_new_from_syspath(udev, sysfs_path);
+-	if (!bus_dev)
+-		goto free_udev;
+-
+-	addr = udev_device_get_sysattr_value(bus_dev, "client_addr");
+-	if (!addr) {
+-		condlog(0, "rbd%d: Could not find client_addr in rbd sysfs. "
+-			"Try updating kernel", ct->rbd_bus_id);
+-		goto free_dev;
+-	}
+-
+-	ct->client_addr = strdup(addr);
+-	if (!ct->client_addr)
+-		goto free_dev;
+-
+-	features_str = udev_device_get_sysattr_value(bus_dev, "features");
+-	if (!features_str)
+-		goto free_addr;
+-	features = strtoll(features_str, NULL, 16);
+-	if (!(features & RBD_FEATURE_EXCLUSIVE_LOCK)) {
+-		condlog(3, "rbd%d: Exclusive lock not set.", ct->rbd_bus_id);
+-		goto free_addr;
+-	}
+-
+-	config_info = udev_device_get_sysattr_value(bus_dev, "config_info");
+-	if (!config_info)
+-		goto free_addr;
+-
+-	if (!strstr(config_info, "noshare")) {
+-		condlog(3, "rbd%d: Only nonshared clients supported.",
+-			ct->rbd_bus_id);
+-		goto free_addr;
+-	}
+-
+-	if (strstr(config_info, "lock_on_read"))
+-		ct->lock_on_read = 1;
+-
+-	ct->config_info = strdup(config_info);
+-	if (!ct->config_info)
+-		goto free_addr;
+-
+-	username = strstr(config_info, "name=");
+-	if (username) {
+-		char *end;
+-		int len;
+-
+-		username += 5;
+-		end = strchr(username, ',');
+-		if (!end)
+-			goto free_info;
+-		len = end - username;
+-
+-		ct->username = malloc(len + 1);
+-		if (!ct->username)
+-			goto free_info;
+-		strncpy(ct->username, username, len);
+-		ct->username[len] = '\0';
+-	}
+-
+-	image = udev_device_get_sysattr_value(bus_dev, "name");
+-	if (!image)
+-		goto free_username;
+-
+-	ct->image = strdup(image);
+-	if (!ct->image)
+-		goto free_username;
+-
+-	pool = udev_device_get_sysattr_value(bus_dev, "pool");
+-	if (!pool)
+-		goto free_image;
+-
+-	ct->pool = strdup(pool);
+-	if (!ct->pool)
+-		goto free_image;
+-
+-	snap = udev_device_get_sysattr_value(bus_dev, "current_snap");
+-	if (!snap)
+-		goto free_pool;
+-
+-	if (strcmp("-", snap)) {
+-		ct->snap = strdup(snap);
+-		if (!ct->snap)
+-			goto free_pool;
+-	}
+-
+-	if (rados_create(&ct->cluster, NULL) < 0) {
+-		condlog(0, "rbd%d: Could not create rados cluster",
+-			ct->rbd_bus_id);
+-		goto free_snap;
+-	}
+-
+-	if (rados_conf_read_file(ct->cluster, NULL) < 0) {
+-		condlog(0, "rbd%d: Could not read rados conf", ct->rbd_bus_id);
+-		goto shutdown_rados;
+-	}
+-
+-	ret = rados_connect(ct->cluster);
+-	if (ret < 0) {
+-		condlog(0, "rbd%d: Could not connect to rados cluster",
+-			ct->rbd_bus_id);
+-		goto shutdown_rados;
+-	}
+-
+-	udev_device_unref(bus_dev);
+-	udev_unref(udev);
+-
+-	condlog(3, "rbd%d checker init %s %s/%s@%s %s", ct->rbd_bus_id,
+-		ct->client_addr, ct->pool, ct->image, ct->snap ? ct->snap : "-",
+-		ct->username ? ct->username : "none");
+-	return 0;
+-
+-shutdown_rados:
+-	rados_shutdown(ct->cluster);
+-free_snap:
+-	if (ct->snap)
+-		free(ct->snap);
+-free_pool:
+-	free(ct->pool);
+-free_image:
+-	free(ct->image);
+-free_username:
+-	if (ct->username)
+-		free(ct->username);
+-free_info:
+-	free(ct->config_info);
+-free_addr:
+-	free(ct->client_addr);
+-free_dev:
+-	udev_device_unref(bus_dev);
+-free_udev:
+-	udev_unref(udev);
+-free_ct:
+-	free(ct);
+-	return 1;
+-}
+-
+-static void cleanup_context(struct rbd_checker_context *ct)
+-{
+-	pthread_mutex_destroy(&ct->lock);
+-	pthread_cond_destroy(&ct->active);
+-	pthread_spin_destroy(&ct->hldr_lock);
+-
+-	rados_shutdown(ct->cluster);
+-
+-	if (ct->username)
+-		free(ct->username);
+-	if (ct->snap)
+-		free(ct->snap);
+-	free(ct->pool);
+-	free(ct->image);
+-	free(ct->config_info);
+-	free(ct->client_addr);
+-	free(ct);
+-}
+-
+-void libcheck_free(struct checker * c)
+-{
+-	if (c->context) {
+-		struct rbd_checker_context *ct = c->context;
+-		int holders;
+-		pthread_t thread;
+-
+-		pthread_spin_lock(&ct->hldr_lock);
+-		ct->holders--;
+-		holders = ct->holders;
+-		thread = ct->thread;
+-		pthread_spin_unlock(&ct->hldr_lock);
+-		if (holders)
+-			pthread_cancel(thread);
+-		else
+-			cleanup_context(ct);
+-		c->context = NULL;
+-	}
+-}
+-
+-static int rbd_is_blacklisted(struct rbd_checker_context *ct, char *msg)
+-{
+-	char *addr_tok, *start, *save;
+-	const char *cmd[2];
+-	char *blklist, *stat;
+-	size_t blklist_len, stat_len;
+-	int ret;
+-	char *end;
+-
+-	cmd[0] = "{\"prefix\": \"osd blacklist ls\"}";
+-	cmd[1] = NULL;
+-
+-	ret = rados_mon_command(ct->cluster, (const char **)cmd, 1, "", 0,
+-				&blklist, &blklist_len, &stat, &stat_len);
+-	if (ret < 0) {
+-		RBD_MSG(msg, "checker failed: mon command failed %d", ret);
+-		return ret;
+-	}
+-
+-	if (!blklist || !blklist_len)
+-		goto free_bufs;
+-
+-	/*
+-	 * parse list of addrs with the format
+-	 * ipv4:port/nonce date time\n
+-	 * or
+-	 * [ipv6]:port/nonce date time\n
+-	 */
+-	ret = 0;
+-	for (start = blklist; ; start = NULL) {
+-		addr_tok = strtok_r(start, "\n", &save);
+-		if (!addr_tok || !strlen(addr_tok))
+-			break;
+-
+-		end = strchr(addr_tok, ' ');
+-		if (!end) {
+-			RBD_MSG(msg, "checker failed: invalid blacklist %s",
+-				 addr_tok);
+-			break;
+-		}
+-		*end = '\0';
+-
+-		if (!strcmp(addr_tok, ct->client_addr)) {
+-			ct->blacklisted = 1;
+-			RBD_MSG(msg, "%s is blacklisted", ct->client_addr);
+-			ret = 1;
+-			break;
+-		}
+-	}
+-
+-free_bufs:
+-	rados_buffer_free(blklist);
+-	rados_buffer_free(stat);
+-	return ret;
+-}
+-
+-static int rbd_check(struct rbd_checker_context *ct, char *msg)
+-{
+-	if (ct->blacklisted || rbd_is_blacklisted(ct, msg) == 1)
+-		return PATH_DOWN;
+-
+-	RBD_MSG(msg, "checker reports path is up");
+-	/*
+-	 * Path may have issues, but the ceph cluster is at least
+-	 * accepting IO, so we can attempt to do IO.
+-	 *
+-	 * TODO: in future versions, we can run other tests to
+-	 * verify OSDs and networks.
+-	 */
+-	return PATH_UP;
+-}
+-
+-static int sysfs_write_rbd_bus(const char *which, const char *buf,
+-			       size_t buf_len)
+-{
+-	char sysfs_path[PATH_SIZE];
+-	int fd;
+-	int r;
+-
+-	/* we require newer kernels so single_major should always be there */
+-	snprintf(sysfs_path, sizeof(sysfs_path),
+-		 "/sys/bus/rbd/%s_single_major", which);
+-	fd = open(sysfs_path, O_WRONLY);
+-	if (fd < 0)
+-		return -errno;
+-
+-	r = safe_write(fd, buf, buf_len);
+-	close(fd);
+-	return r;
+-}
+-
+-static int rbd_remap(struct rbd_checker_context *ct)
+-{
+-	char *argv[11];
+-	pid_t pid;
+-	int ret = 0, i = 0;
+-	int status;
+-
+-	pid = fork();
+-	switch (pid) {
+-	case 0:
+-		argv[i++] = "rbd";
+-		argv[i++] = "map";
+-		if (ct->lock_on_read)
+-			argv[i++] = "-o noshare,lock_on_read";
+-		else
+-			argv[i++] = "-o noshare";
+-		if (ct->username) {
+-			argv[i++] = "--id";
+-			argv[i++] = ct->username;
+-		}
+-		argv[i++] = "--pool";
+-		argv[i++] = ct->pool;
+-		if (ct->snap) {
+-			argv[i++] = "--snap";
+-			argv[i++] = ct->snap;
+-		}
+-		argv[i++] = ct->image;
+-		argv[i] = NULL;
+-
+-		ret = execvp(argv[0], argv);
+-		condlog(0, "rbd%d: Error executing rbd: %s", ct->rbd_bus_id,
+-			strerror(errno));
+-		exit(-1);
+-	case -1:
+-		condlog(0, "rbd%d: fork failed: %s", ct->rbd_bus_id,
+-			strerror(errno));
+-		return -1;
+-	default:
+-		ret = -1;
+-		wait(&status);
+-		if (WIFEXITED(status)) {
+-			status = WEXITSTATUS(status);
+-			if (status == 0)
+-				ret = 0;
+-			else
+-				condlog(0, "rbd%d: failed with %d",
+-					ct->rbd_bus_id, status);
+-		}
+-	}
+-
+-	return ret;
+-}
+-
+-static int sysfs_write_rbd_remove(const char *buf, int buf_len)
+-{
+-	return sysfs_write_rbd_bus("remove", buf, buf_len);
+-}
+-
+-static int rbd_rm_blacklist(struct rbd_checker_context *ct)
+-{
+-	const char *cmd[2];
+-	char *stat, *cmd_str;
+-	size_t stat_len;
+-	int ret;
+-
+-	ret = asprintf(&cmd_str, "{\"prefix\": \"osd blacklist\", \"blacklistop\": \"rm\", \"addr\": \"%s\"}",
+-		       ct->client_addr);
+-	if (ret == -1)
+-		return -ENOMEM;
+-
+-	cmd[0] = cmd_str;
+-	cmd[1] = NULL;
+-
+-	ret = rados_mon_command(ct->cluster, (const char **)cmd, 1, "", 0,
+-				NULL, NULL, &stat, &stat_len);
+-	if (ret < 0) {
+-		condlog(1, "rbd%d: repair failed to remove blacklist for %s %d",
+-			ct->rbd_bus_id, ct->client_addr, ret);
+-		goto free_cmd;
+-	}
+-
+-	condlog(1, "rbd%d: repair rm blacklist for %s",
+-	       ct->rbd_bus_id, ct->client_addr);
+-	free(stat);
+-free_cmd:
+-	free(cmd_str);
+-	return ret;
+-}
+-
+-static int rbd_repair(struct rbd_checker_context *ct, char *msg)
+-{
+-	char del[17];
+-	int ret;
+-
+-	if (!ct->blacklisted)
+-		return PATH_UP;
+-
+-	if (!ct->remapped) {
+-		ret = rbd_remap(ct);
+-		if (ret) {
+-			RBD_MSG(msg, "repair failed to remap. Err %d", ret);
+-			return PATH_DOWN;
+-		}
+-	}
+-	ct->remapped = 1;
+-
+-	snprintf(del, sizeof(del), "%d force", ct->rbd_bus_id);
+-	ret = sysfs_write_rbd_remove(del, strlen(del) + 1);
+-	if (ret) {
+-		RBD_MSG(msg, "repair failed to clean up. Err %d", ret);
+-		return PATH_DOWN;
+-	}
+-
+-	ret = rbd_rm_blacklist(ct);
+-	if (ret) {
+-		RBD_MSG(msg, "repair could not remove blacklist entry. Err %d",
+-			ret);
+-		return PATH_DOWN;
+-	}
+-
+-	ct->remapped = 0;
+-	ct->blacklisted = 0;
+-
+-	RBD_MSG(msg, "has been repaired");
+-	return PATH_UP;
+-}
+-
+-#define rbd_thread_cleanup_push(ct) pthread_cleanup_push(cleanup_func, ct)
+-#define rbd_thread_cleanup_pop(ct) pthread_cleanup_pop(1)
+-
+-static void cleanup_func(void *data)
+-{
+-	int holders;
+-	struct rbd_checker_context *ct = data;
+-	pthread_spin_lock(&ct->hldr_lock);
+-	ct->holders--;
+-	holders = ct->holders;
+-	ct->thread = 0;
+-	pthread_spin_unlock(&ct->hldr_lock);
+-	if (!holders)
+-		cleanup_context(ct);
+-	rcu_unregister_thread();
+-}
+-
+-static void *rbd_thread(void *ctx)
+-{
+-	struct rbd_checker_context *ct = ctx;
+-	int state;
+-
+-	/* This thread can be canceled, so setup clean up */
+-	rbd_thread_cleanup_push(ct)
+-	rcu_register_thread();
+-	condlog(3, "rbd%d: thread starting up", ct->rbd_bus_id);
+-
+-	ct->message[0] = '\0';
+-
+-	/* checker start up */
+-	pthread_mutex_lock(&ct->lock);
+-	ct->state = PATH_PENDING;
+-	pthread_mutex_unlock(&ct->lock);
+-
+-	state = ct->fn(ct, ct->message);
+-
+-	/* checker done */
+-	pthread_mutex_lock(&ct->lock);
+-	ct->state = state;
+-	pthread_cond_signal(&ct->active);
+-	pthread_mutex_unlock(&ct->lock);
+-
+-	condlog(3, "rbd%d: thead finished, state %s", ct->rbd_bus_id,
+-		checker_state_name(state));
+-	rbd_thread_cleanup_pop(ct);
+-	return ((void *)0);
+-}
+-
+-static void rbd_timeout(struct timespec *tsp)
+-{
+-	clock_gettime(CLOCK_MONOTONIC, tsp);
+-	tsp->tv_nsec += 1000 * 1000; /* 1 millisecond */
+-	normalize_timespec(tsp);
+-}
+-
+-static int rbd_exec_fn(struct checker *c, thread_fn *fn)
+-{
+-	struct rbd_checker_context *ct = c->context;
+-	struct timespec tsp;
+-	pthread_attr_t attr;
+-	int rbd_status, r;
+-
+-	if (c->sync)
+-		return fn(ct, c->message);
+-	/*
+-	 * Async mode
+-	 */
+-	r = pthread_mutex_lock(&ct->lock);
+-	if (r != 0) {
+-		condlog(2, "rbd%d: mutex lock failed with %d", ct->rbd_bus_id,
+-			r);
+-		MSG(c, "rbd%d: thread failed to initialize", ct->rbd_bus_id);
+-		return PATH_WILD;
+-	}
+-
+-	if (ct->running) {
+-		/* Check if checker is still running */
+-		if (ct->thread) {
+-			condlog(3, "rbd%d: thread not finished",
+-				ct->rbd_bus_id);
+-			rbd_status = PATH_PENDING;
+-		} else {
+-			/* checker done */
+-			ct->running = 0;
+-			rbd_status = ct->state;
+-			strncpy(c->message, ct->message, CHECKER_MSG_LEN);
+-			c->message[CHECKER_MSG_LEN - 1] = '\0';
+-		}
+-		pthread_mutex_unlock(&ct->lock);
+-	} else {
+-		/* Start new checker */
+-		ct->state = PATH_UNCHECKED;
+-		ct->fn = fn;
+-		pthread_spin_lock(&ct->hldr_lock);
+-		ct->holders++;
+-		pthread_spin_unlock(&ct->hldr_lock);
+-		setup_thread_attr(&attr, 32 * 1024, 1);
+-		r = pthread_create(&ct->thread, &attr, rbd_thread, ct);
+-		if (r) {
+-			pthread_mutex_unlock(&ct->lock);
+-			ct->thread = 0;
+-			ct->holders--;
+-			condlog(3, "rbd%d failed to start rbd thread, using sync mode",
+-				ct->rbd_bus_id);
+-			return fn(ct, c->message);
+-		}
+-		pthread_attr_destroy(&attr);
+-		rbd_timeout(&tsp);
+-		r = pthread_cond_timedwait(&ct->active, &ct->lock, &tsp);
+-		rbd_status = ct->state;
+-		strncpy(c->message, ct->message,CHECKER_MSG_LEN);
+-		c->message[CHECKER_MSG_LEN -1] = '\0';
+-		pthread_mutex_unlock(&ct->lock);
+-
+-		if (ct->thread &&
+-		    (rbd_status == PATH_PENDING || rbd_status == PATH_UNCHECKED)) {
+-			condlog(3, "rbd%d: thread still running",
+-				ct->rbd_bus_id);
+-			ct->running = 1;
+-			rbd_status = PATH_PENDING;
+-		}
+-	}
+-
+-	return rbd_status;
+-}
+-
+-void libcheck_repair(struct checker * c)
+-{
+-	struct rbd_checker_context *ct = c->context;
+-
+-	if (!ct || !ct->blacklisted)
+-		return;
+-	rbd_exec_fn(c, rbd_repair);
+-}
+-
+-int libcheck_check(struct checker * c)
+-{
+-	struct rbd_checker_context *ct = c->context;
+-
+-	if (!ct)
+-		return PATH_UNCHECKED;
+-
+-	if (ct->blacklisted)
+-		return PATH_DOWN;
+-
+-	return rbd_exec_fn(c, rbd_check);
+-}
+diff --git a/libmultipath/checkers/rdac.c b/libmultipath/checkers/rdac.c
+index a643a4a..5104e4e 100644
+--- a/libmultipath/checkers/rdac.c
++++ b/libmultipath/checkers/rdac.c
+@@ -139,11 +139,6 @@ void libcheck_free (struct checker * c)
+ 	return;
+ }
+ 
+-void libcheck_repair (struct checker * c)
+-{
+-	return;
+-}
+-
+ static int
+ do_inq(int sg_fd, unsigned int pg_op, void *resp, int mx_resp_len,
+        unsigned int timeout)
+diff --git a/libmultipath/checkers/readsector0.c b/libmultipath/checkers/readsector0.c
+index 8fccb46..1c2a868 100644
+--- a/libmultipath/checkers/readsector0.c
++++ b/libmultipath/checkers/readsector0.c
+@@ -23,11 +23,6 @@ void libcheck_free (struct checker * c)
+ 	return;
+ }
+ 
+-void libcheck_repair (struct checker * c)
+-{
+-	return;
+-}
+-
+ int libcheck_check (struct checker * c)
+ {
+ 	unsigned char buf[4096];
+diff --git a/libmultipath/checkers/tur.c b/libmultipath/checkers/tur.c
+index eb3348d..bf8486d 100644
+--- a/libmultipath/checkers/tur.c
++++ b/libmultipath/checkers/tur.c
+@@ -112,11 +112,6 @@ void libcheck_free (struct checker * c)
+ 	return;
+ }
+ 
+-void libcheck_repair (struct checker * c)
+-{
+-	return;
+-}
+-
+ #define TUR_MSG(fmt, args...)					\
+ 	do {							\
+ 		char msg[CHECKER_MSG_LEN];			\
+diff --git a/libmultipath/discovery.c b/libmultipath/discovery.c
+index 1ef1dfa..18ad0e2 100644
+--- a/libmultipath/discovery.c
++++ b/libmultipath/discovery.c
+@@ -1246,21 +1246,6 @@ nvme_sysfs_pathinfo (struct path * pp, vector hwtable)
+ }
+ 
+ static int
+-rbd_sysfs_pathinfo (struct path * pp, vector hwtable)
+-{
+-	sprintf(pp->vendor_id, "Ceph");
+-	sprintf(pp->product_id, "RBD");
+-
+-	condlog(3, "%s: vendor = %s product = %s", pp->dev, pp->vendor_id,
+-		pp->product_id);
+-	/*
+-	 * set the hwe configlet pointer
+-	 */
+-	pp->hwe = find_hwe(hwtable, pp->vendor_id, pp->product_id, NULL);
+-	return 0;
+-}
+-
+-static int
+ ccw_sysfs_pathinfo (struct path * pp, vector hwtable)
+ {
+ 	struct udev_device *parent;
+@@ -1486,8 +1471,6 @@ sysfs_pathinfo(struct path * pp, vector hwtable)
+ 		pp->bus = SYSFS_BUS_CCW;
+ 	if (!strncmp(pp->dev,"sd", 2))
+ 		pp->bus = SYSFS_BUS_SCSI;
+-	if (!strncmp(pp->dev,"rbd", 3))
+-		pp->bus = SYSFS_BUS_RBD;
+ 	if (!strncmp(pp->dev,"nvme", 4))
+ 		pp->bus = SYSFS_BUS_NVME;
+ 
+@@ -1502,9 +1485,6 @@ sysfs_pathinfo(struct path * pp, vector hwtable)
+ 	} else if (pp->bus == SYSFS_BUS_CCISS) {
+ 		if (cciss_sysfs_pathinfo(pp, hwtable))
+ 			return 1;
+-	} else if (pp->bus == SYSFS_BUS_RBD) {
+-		if (rbd_sysfs_pathinfo(pp, hwtable))
+-			return 1;
+ 	} else if (pp->bus == SYSFS_BUS_NVME) {
+ 		if (nvme_sysfs_pathinfo(pp, hwtable))
+ 			return 1;
+@@ -1753,53 +1733,6 @@ get_udev_uid(struct path * pp, char *uid_attribute, struct udev_device *udev)
+ }
+ 
+ static int
+-get_rbd_uid(struct path * pp)
+-{
+-	struct udev_device *rbd_bus_dev;
+-	int ret, rbd_bus_id;
+-	const char *pool, *image, *snap;
+-	char sysfs_path[PATH_SIZE];
+-	uint64_t snap_id, max_snap_id = -3;
+-
+-	ret = sscanf(pp->dev, "rbd%d", &rbd_bus_id);
+-	if (ret != 1)
+-		return -EINVAL;
+-
+-	snprintf(sysfs_path, sizeof(sysfs_path), "/sys/bus/rbd/devices/%d",
+-		 rbd_bus_id);
+-	rbd_bus_dev = udev_device_new_from_syspath(udev, sysfs_path);
+-	if (!rbd_bus_dev)
+-		return -ENODEV;
+-
+-	ret = -EINVAL;
+-	pool = udev_device_get_sysattr_value(rbd_bus_dev, "pool_id");
+-	if (!pool)
+-		goto free_dev;
+-
+-	image = udev_device_get_sysattr_value(rbd_bus_dev, "image_id");
+-	if (!image)
+-		goto free_dev;
+-
+-	snap = udev_device_get_sysattr_value(rbd_bus_dev, "snap_id");
+-	if (!snap)
+-		goto free_dev;
+-	snap_id = strtoull(snap, NULL, 19);
+-	if (snap_id >= max_snap_id)
+-		ret = snprintf(pp->wwid, WWID_SIZE, "%s-%s", pool, image);
+-	else
+-		ret = snprintf(pp->wwid, WWID_SIZE, "%s-%s-%s", pool,
+-			       image, snap);
+-	if (ret >= WWID_SIZE) {
+-		condlog(0, "%s: wwid overflow", pp->dev);
+-		ret = -EOVERFLOW;
+-	}
+-
+-free_dev:
+-	udev_device_unref(rbd_bus_dev);
+-	return ret;
+-}
+-
+-static int
+ get_vpd_uid(struct path * pp)
+ {
+ 	struct udev_device *parent = pp->udev;
+@@ -1876,9 +1809,6 @@ get_uid (struct path * pp, int path_state, struct udev_device *udev)
+ 		} else
+ 			len = strlen(pp->wwid);
+ 		origin = "callout";
+-	} else if (pp->bus == SYSFS_BUS_RBD) {
+-		len = get_rbd_uid(pp);
+-		origin = "sysfs";
+ 	} else {
+ 
+ 		if (udev && pp->uid_attribute) {
+diff --git a/libmultipath/hwtable.c b/libmultipath/hwtable.c
+index 148f0ba..d529bae 100644
+--- a/libmultipath/hwtable.c
++++ b/libmultipath/hwtable.c
+@@ -1000,18 +1000,6 @@ static struct hwentry default_hw[] = {
+ 		.prio_name     = PRIO_ALUA,
+ 	},
+ 	/*
+-	 * Red Hat
+-	 *
+-	 * Maintainer: Mike Christie
+-	 * Mail: mchristi@redhat.com
+-	 */
+-	{
+-		.vendor        = "Ceph",
+-		.product       = "RBD",
+-		.checker_name  = RBD,
+-		.deferred_remove = DEFERRED_REMOVE_ON,
+-	},
+-	/*
+ 	 * Kove
+ 	 */
+ 	{
+diff --git a/multipath/multipath.conf.5 b/multipath/multipath.conf.5
+index 0c1f174..31f4585 100644
+--- a/multipath/multipath.conf.5
++++ b/multipath/multipath.conf.5
+@@ -482,9 +482,6 @@ Check the path state for HP/COMPAQ Smart Array(CCISS) controllers.
+ .I none
+ Do not check the device, fallback to use the values retrieved from sysfs
+ .TP
+-.I rbd
+-Check if the path is in the Ceph blacklist and remap the path if it is.
+-.TP
+ The default is: \fBtur\fR
+ .RE
+ .
+diff --git a/multipathd/main.c b/multipathd/main.c
+index 0db88ee..d40c416 100644
+--- a/multipathd/main.c
++++ b/multipathd/main.c
+@@ -1783,15 +1783,6 @@ int update_path_groups(struct multipath *mpp, struct vectors *vecs, int refresh)
+ 	return 0;
+ }
+ 
+-void repair_path(struct path * pp)
+-{
+-	if (pp->state != PATH_DOWN)
+-		return;
+-
+-	checker_repair(&pp->checker);
+-	LOG_MSG(1, checker_message(&pp->checker));
+-}
+-
+ /*
+  * Returns '1' if the path has been checked, '-1' if it was blacklisted
+  * and '0' otherwise
+@@ -1972,7 +1963,6 @@ check_path (struct vectors * vecs, struct path * pp, int ticks)
+ 			pp->mpp->failback_tick = 0;
+ 
+ 			pp->mpp->stat_path_failures++;
+-			repair_path(pp);
+ 			return 1;
+ 		}
+ 
+@@ -2071,7 +2061,6 @@ check_path (struct vectors * vecs, struct path * pp, int ticks)
+ 	}
+ 
+ 	pp->state = newstate;
+-	repair_path(pp);
+ 
+ 	if (pp->mpp->wait_for_udev)
+ 		return 1;
+-- 
+2.7.4
+

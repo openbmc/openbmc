@@ -1,11 +1,21 @@
---- links-2.1pre20/configure.in.orig	2005-12-21 15:23:49.000000000 +0000
-+++ links-2.1pre20/configure.in	2005-12-21 15:23:59.000000000 +0000
-@@ -18,7 +18,7 @@
+From c00668541f68c17a5e453a4dcc2a86022b20af87 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Mon, 30 Jul 2012 23:52:49 +0200
+
+---
+ configure.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.in b/configure.in
+index 7c15b6b..9896631 100644
+--- a/configure.in
++++ b/configure.in
+@@ -23,7 +23,7 @@ AM_CONFIG_HEADER(config.h)
  dnl Checks for programs.
  AC_PROG_CC
  
--#AC_PROG_CXX
+-dnl AC_PROG_CXX
 +AC_PROG_CXX
- #AC_PROG_AWK
- #AM_PROG_LEX
- #AC_PROG_YACC
+ dnl AC_PROG_AWK
+ dnl AM_PROG_LEX
+ dnl AC_PROG_YACC

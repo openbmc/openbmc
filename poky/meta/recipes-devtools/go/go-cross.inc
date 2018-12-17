@@ -1,9 +1,9 @@
 inherit cross
 
-PROVIDES = "virtual/${TARGET_PREFIX}go"
+PROVIDES = "virtual/${TUNE_PKGARCH}-go"
 DEPENDS = "go-native"
 
-PN = "go-cross-${TARGET_ARCH}"
+PN = "go-cross-${TUNE_PKGARCH}"
 
 export GOHOSTOS = "${BUILD_GOOS}"
 export GOHOSTARCH = "${BUILD_GOARCH}"

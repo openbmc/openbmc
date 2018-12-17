@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Xose Vazquez Perez <xose.vazquez@gmail.com>
+Date: Sun, 13 May 2018 00:39:41 +0200
+Subject: [PATCH] multipath-tools: add +x to doc-preclean.pl and split-man.pl
+
+It is not strictly necessary, but it helps identify bin files.
+
+Cc: Christophe Varoqui <christophe.varoqui@opensvc.com>
+Cc: DM ML <dm-devel@redhat.com>
+Signed-off-by: Xose Vazquez Perez <xose.vazquez@gmail.com>
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libdmmp/docs/doc-preclean.pl | 0
+ libdmmp/docs/split-man.pl    | 0
+ 2 files changed, 0 insertions(+), 0 deletions(-)
+ mode change 100644 => 100755 libdmmp/docs/doc-preclean.pl
+ mode change 100644 => 100755 libdmmp/docs/split-man.pl
+
+diff --git a/libdmmp/docs/doc-preclean.pl b/libdmmp/docs/doc-preclean.pl
+old mode 100644
+new mode 100755
+diff --git a/libdmmp/docs/split-man.pl b/libdmmp/docs/split-man.pl
+old mode 100644
+new mode 100755
+-- 
+2.7.4
+

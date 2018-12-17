@@ -1,17 +1,20 @@
-From 862b807076d57f2f58ed9d572ddac8bb402774a2 Mon Sep 17 00:00:00 2001
-From: Khem Raj <raj.khem@gmail.com>
-Date: Sat, 10 Jun 2017 01:01:10 -0700
-Subject: [PATCH 2/6] context APIs are not available on musl
+From bd4e926e7e14747b3cd4d7b2a1bd5410b22f3ea2 Mon Sep 17 00:00:00 2001
+From: Randy MacLeod <Randy.MacLeod@windriver.com>
+Date: Tue, 16 Oct 2018 21:27:46 -0400
+Subject: [PATCH] context APIs are not available on musl
 
 Upstream-Status: Pending
 
+Updated patch for valgrind-3.14
+
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Randy MacLeod <Randy.MacLeod@windriver.com>
 ---
  memcheck/tests/linux/stack_changes.c | 7 ++++++-
  1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/memcheck/tests/linux/stack_changes.c b/memcheck/tests/linux/stack_changes.c
-index a978fc2..ffb49c6 100644
+index 7f97b90a5..a26cb4ae6 100644
 --- a/memcheck/tests/linux/stack_changes.c
 +++ b/memcheck/tests/linux/stack_changes.c
 @@ -10,6 +10,7 @@
@@ -19,7 +22,7 @@ index a978fc2..ffb49c6 100644
  // checks that Valgrind notices their stack changes properly.
  
 +#ifdef __GLIBC__
- typedef  struct ucontext  mycontext;
+ typedef  ucontext_t  mycontext;
  
  mycontext ctx1, ctx2, oldc;
 @@ -51,9 +52,11 @@ int init_context(mycontext *uc)
@@ -45,5 +48,5 @@ index a978fc2..ffb49c6 100644
      return 0;
  }
 -- 
-2.13.1
+2.17.0
 

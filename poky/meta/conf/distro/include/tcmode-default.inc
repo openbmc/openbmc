@@ -22,13 +22,14 @@ PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}libc-initial = "${TCLIBC}-initial"
 PREFERRED_PROVIDER_virtual/nativesdk-${SDK_PREFIX}libc-initial ?= "nativesdk-glibc-initial"
 PREFERRED_PROVIDER_virtual/gettext ??= "gettext"
 
-GCCVERSION ?= "7.%"
+GCCVERSION ?= "8.%"
 SDKGCCVERSION ?= "${GCCVERSION}"
-BINUVERSION ?= "2.30%"
-GDBVERSION ?= "8.0%"
-GLIBCVERSION ?= "2.27%"
-LINUXLIBCVERSION ?= "4.15%"
-QEMUVERSION ?= "2.11%"
+BINUVERSION ?= "2.31%"
+GDBVERSION ?= "8.2%"
+GLIBCVERSION ?= "2.28%"
+LINUXLIBCVERSION ?= "4.18%"
+QEMUVERSION ?= "3.0%"
+GOVERSION ?= "1.11%"
 
 PREFERRED_VERSION_gcc ?= "${GCCVERSION}"
 PREFERRED_VERSION_gcc-cross-${TARGET_ARCH} ?= "${GCCVERSION}"
@@ -65,14 +66,10 @@ PREFERRED_VERSION_glibc-initial            ?= "${GLIBCVERSION}"
 PREFERRED_VERSION_nativesdk-glibc-initial  ?= "${GLIBCVERSION}"
 PREFERRED_VERSION_cross-localedef-native   ?= "${GLIBCVERSION}"
 
-
 PREFERRED_VERSION_qemu ?= "${QEMUVERSION}"
 PREFERRED_VERSION_qemu-native ?= "${QEMUVERSION}"
 PREFERRED_VERSION_nativesdk-qemu ?= "${QEMUVERSION}"
-# Setup suitable toolchain flags
-require conf/distro/include/as-needed.inc
 
-GOVERSION ?= "1.9%"
 PREFERRED_VERSION_virtual/${TARGET_PREFIX}go ?= "${GOVERSION}"
 PREFERRED_VERSION_go-cross-${TARGET_ARCH} ?= "${GOVERSION}"
 PREFERRED_VERSION_go-crosssdk-${SDK_ARCH} ?= "${GOVERSION}"

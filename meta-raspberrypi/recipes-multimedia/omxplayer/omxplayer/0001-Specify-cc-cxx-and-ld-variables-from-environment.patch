@@ -1,0 +1,42 @@
+From 9b4b7f8726171e97f12c587d50e54bab0dc42da5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 12 Sep 2018 22:18:07 -0700
+Subject: [PATCH] Specify --cc, --cxx and --ld variables from environment
+
+This helps in compiling with non-gcc compilers
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile.ffmpeg | 22 ++++++++++++++--------
+ 1 file changed, 14 insertions(+), 8 deletions(-)
+
+Index: git/Makefile.ffmpeg
+===================================================================
+--- git.orig/Makefile.ffmpeg
++++ git/Makefile.ffmpeg
+@@ -22,12 +22,15 @@ configure:
+ 	CFLAGS="$(CFLAGS) ${INCLUDES}" \
+ 	LDFLAGS="" \
+   ./configure \
++			--ld="${CCLD}" \
++			--cc="${CC}" \
++			--cxx="${CXX}" \
+ 			--extra-cflags="$(FFMPEG_EXTRA_CFLAGS)" \
+ 			--extra-ldflags="$(FFMPEG_EXTRA_LDFLAGS)" \
+ 			--enable-shared \
+ 			--disable-static \
+ 			--arch=arm \
+-			--cpu=arm1176jzf-s \
++			--cpu=$(CPU) \
+ 			--target-os=linux \
+ 			--disable-hwaccels \
+ 			--enable-parsers \
+@@ -42,7 +45,7 @@ configure:
+ 			--enable-gpl \
+ 			--enable-version3 \
+ 			--enable-protocols \
+-			--enable-libsmbclient \
++			--disable-libsmbclient \
+ 			--enable-libssh \
+ 			--enable-nonfree \
+ 			--enable-openssl \

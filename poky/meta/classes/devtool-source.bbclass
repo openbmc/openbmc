@@ -90,10 +90,22 @@ python devtool_post_unpack() {
                         fname in files])
         return ret
 
+    is_kernel_yocto = bb.data.inherits_class('kernel-yocto', d)
     # Move local source files into separate subdir
     recipe_patches = [os.path.basename(patch) for patch in
                         oe.recipeutils.get_recipe_patches(d)]
     local_files = oe.recipeutils.get_recipe_local_files(d)
+
+    if is_kernel_yocto:
+        for key in local_files.copy():
+            if key.endswith('scc'):
+                sccfile = open(local_files[key], 'r')
+                for l in sccfile:
+                    line = l.split()
+                    if line and line[0] in ('kconf', 'patch'):
+                        local_files[line[-1]] = os.path.join(os.path.dirname(local_files[key]), line[-1])
+                        shutil.copy2(os.path.join(os.path.dirname(local_files[key]), line[-1]), workdir)
+                sccfile.close()
 
     # Ignore local files with subdir={BP}
     srcabspath = os.path.abspath(srcsubdir)
@@ -171,14 +183,14 @@ python devtool_post_patch() {
 
     extra_overrides = d.getVar('DEVTOOL_EXTRA_OVERRIDES')
     if extra_overrides:
-        extra_override_list = extra_overrides.split(':')
+        extra_overrides = set(extra_overrides.split(':'))
         devbranch = d.getVar('DEVTOOL_DEVBRANCH')
         default_overrides = d.getVar('OVERRIDES').split(':')
         no_overrides = []
         # First, we may have some overrides that are referred to in the recipe set in
         # our configuration, so we need to make a branch that excludes those
         for override in default_overrides:
-            if override not in extra_override_list:
+            if override not in extra_overrides:
                 no_overrides.append(override)
         if default_overrides != no_overrides:
             # Some overrides are active in the current configuration, so
@@ -196,7 +208,7 @@ python devtool_post_patch() {
         else:
             bb.process.run('git checkout %s -b devtool-no-overrides' % devbranch, cwd=srcsubdir)
 
-        for override in extra_override_list:
+        for override in extra_overrides:
             localdata = bb.data.createCopy(d)
             if override in default_overrides:
                 bb.process.run('git branch devtool-override-%s %s' % (override, devbranch), cwd=srcsubdir)

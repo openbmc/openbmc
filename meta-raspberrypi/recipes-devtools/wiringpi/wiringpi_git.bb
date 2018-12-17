@@ -4,8 +4,10 @@ SECTION = "devel/libs"
 LICENSE = "LGPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING.LESSER;md5=e6a600fd5e1d9cbde2d983680233ad02"
 
-# tag 2.44
-SRCREV = "96344ff7125182989f98d3be8d111952a8f74e15"
+DEPENDS += "virtual/crypt"
+
+# tag 2.46
+SRCREV = "8d188fa0e00bb8c6ff6eddd07bf92857e9bd533a"
 
 S = "${WORKDIR}/git"
 

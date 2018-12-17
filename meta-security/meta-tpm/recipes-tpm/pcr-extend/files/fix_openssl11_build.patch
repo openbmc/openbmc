@@ -1,0 +1,45 @@
+Enable building with openssl 1.1
+
+Upstream-Status: Pending
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: git/src/pcr-extend.c
+===================================================================
+--- git.orig/src/pcr-extend.c
++++ git/src/pcr-extend.c
+@@ -118,7 +118,7 @@ dump_buf (FILE *file, char *buf, size_t
+ static unsigned char*
+ sha1_file (FILE *file, unsigned int *hash_len)
+ {
+-    EVP_MD_CTX ctx = { 0 };
++    EVP_MD_CTX *ctx = EVP_MD_CTX_new();
+     unsigned char *buf = NULL, *hash = NULL;
+     size_t num_read = 0;
+ 
+@@ -127,7 +127,7 @@ sha1_file (FILE *file, unsigned int *has
+         perror ("malloc:\n");
+         goto sha1_fail;
+     }
+-    if (EVP_DigestInit (&ctx, EVP_sha1 ()) == 0) {
++    if (EVP_DigestInit (ctx, EVP_sha1 ()) == 0) {
+         ERR_print_errors_fp (stderr);
+         goto sha1_fail;
+     }
+@@ -135,7 +135,7 @@ sha1_file (FILE *file, unsigned int *has
+         num_read = fread (buf, 1, BUF_SIZE, file);
+         if (num_read <= 0)
+             break;
+-        if (EVP_DigestUpdate (&ctx, buf, num_read) == 0) {
++        if (EVP_DigestUpdate (ctx, buf, num_read) == 0) {
+             ERR_print_errors_fp (stderr);
+             goto sha1_fail;
+         }
+@@ -149,7 +149,7 @@ sha1_file (FILE *file, unsigned int *has
+         perror ("calloc of hash buffer:\n");
+         goto sha1_fail;
+     }
+-    if (EVP_DigestFinal (&ctx, hash, hash_len) == 0) {
++    if (EVP_DigestFinal (ctx, hash, hash_len) == 0) {
+         ERR_print_errors_fp (stderr);
+         goto sha1_fail;
+     }

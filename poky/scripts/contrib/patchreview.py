@@ -132,8 +132,8 @@ def analyse(results, want_blame=False, verbose=True):
             need_blame = True
             if verbose:
                 print("Missing Signed-off-by tag (%s)" % patch)
-        # TODO: disable this for now as too much fails
-        if False and r.malformed_sob:
+
+        if r.malformed_sob:
             need_blame = True
             if verbose:
                 print("Malformed Signed-off-by '%s' (%s)" % (r.malformed_sob, patch))
@@ -203,7 +203,7 @@ if __name__ == "__main__":
 
     if args.directory:
         os.chdir(args.directory)
-    patches = subprocess.check_output(("git", "ls-files", "*.patch", "*.diff")).decode("utf-8").split()
+    patches = subprocess.check_output(("git", "ls-files", "recipes-*/**/*.patch", "recipes-*/**/*.diff")).decode("utf-8").split()
     results = patchreview(patches)
     analyse(results, want_blame=args.blame, verbose=args.verbose)
     if args.histogram:

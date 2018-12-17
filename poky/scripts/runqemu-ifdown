@@ -51,6 +51,16 @@ fi
 
 $TUNCTL -d $TAP
 
+IFCONFIG=`which ip 2> /dev/null`
+if [ "x$IFCONFIG" = "x" ]; then
+	# better than nothing...
+	IFCONFIG=/sbin/ip
+fi
+if [ -x "$IFCONFIG" ]; then
+	if `$IFCONFIG link show $TAP > /dev/null 2>&1`; then
+		$IFCONFIG link del $TAP
+	fi
+fi
 # cleanup the remaining iptables rules
 IPTABLES=`which iptables 2> /dev/null`
 if [ "x$IPTABLES" = "x" ]; then

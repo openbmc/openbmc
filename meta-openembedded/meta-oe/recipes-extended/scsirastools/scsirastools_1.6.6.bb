@@ -33,16 +33,14 @@ INITSCRIPT_PARAMS_${PN}-diskmon = "defaults 80 20"
 INITSCRIPT_NAME_${PN}-raidmon = "sgraid"
 INITSCRIPT_PARAMS_${PN}-raidmon = "defaults 80 20"
 
-PACKAGES =+ "${PN}-diskmon ${PN}-diskmon-dbg"
-PACKAGES =+ "${PN}-raidmon ${PN}-raidmon-dbg"
+PACKAGES =+ "${PN}-diskmon"
+PACKAGES =+ "${PN}-raidmon"
 
-FILES_${PN}-dbg += "/usr/share/scsirastools/.debug"
+RPROVIDES_${PN}-dbg += "${PN}-diskmon-dbg ${PN}-raidmon-dbg"
 
 FILES_${PN}-diskmon = "${sbindir}/sgdiskmon ${sysconfdir}/init.d/sgdisk"
-FILES_${PN}-diskmon-dbg = "${sbindir}/.debug/sgdiskmon"
 
 FILES_${PN}-raidmon = "${sbindir}/sgraidmon ${sysconfdir}/init.d/sgraid"
-FILES_${PN}-raidmon-dbg = "${sbindir}/.debug/sgraidmon"
 
 RDEPENDS_${PN} += "bash"
 RDEPENDS_${PN}-diskmon += "${PN}"

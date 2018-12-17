@@ -1,3 +1,8 @@
+From d4f64b78419139eda3c0e1c6ee116bb5f70ea67c Mon Sep 17 00:00:00 2001
+From: Nitin A Kamble <nitin.a.kamble@intel.com>
+Date: Wed, 2 May 2012 18:05:19 -0700
+Subject: [PATCH] libtasn1: fix build with automake 1.12
+
 Upstream-Status: Pending
 
 This patch fixes following issue with automake 1.12
@@ -9,12 +14,16 @@ This patch fixes following issue with automake 1.12
 Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
 2012/05/03
 
-Index: libidn-1.33/configure.ac
-===================================================================
---- libidn-1.33.orig/configure.ac
-+++ libidn-1.33/configure.ac
-@@ -33,6 +33,10 @@ AC_SUBST(LT_CURRENT, 17)
- AC_SUBST(LT_REVISION, 16)
+---
+ configure.ac | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 8297649..7b9626e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -33,6 +33,10 @@ AC_SUBST(LT_CURRENT, 18)
+ AC_SUBST(LT_REVISION, 0)
  AC_SUBST(LT_AGE, 6)
  
 +# automake 1.12 seems to require this, but automake 1.11 doesn't recognize it

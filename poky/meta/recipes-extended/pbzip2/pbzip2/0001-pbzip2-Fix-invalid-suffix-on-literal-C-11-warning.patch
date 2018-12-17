@@ -1,0 +1,73 @@
+From de4a948d356c9befb88c796168e97eb05b9a3385 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 23 Apr 2018 22:54:42 -0700
+Subject: [PATCH] pbzip2: Fix invalid suffix on literal C++11 warning
+
+Fixes -Wreserved-user-defined-literal] errors.
+Also reported in launchpad here https://bugs.launchpad.net/pbzip2/+bug/1746369
+
+Upstream-Status: Submitted [https://launchpadlibrarian.net/355230152/pbzip2.patch]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ pbzip2.cpp | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/pbzip2.cpp b/pbzip2.cpp
+index 66ca978..4287ea7 100644
+--- a/pbzip2.cpp
++++ b/pbzip2.cpp
+@@ -1220,7 +1220,7 @@ int producer_decompress(int hInfile, OFF_T fileSize, queue *fifo)
+ 			// give warning to user if block is larger than 250 million bytes
+ 			if (fileData->bufSize > 250000000)
+ 			{
+-				fprintf(stderr, "pbzip2:  *WARNING: Compressed block size is large [%"PRIuMAX" bytes].\n",
++				fprintf(stderr, "pbzip2:  *WARNING: Compressed block size is large [%" PRIuMAX " bytes].\n",
+ 						(uintmax_t) fileData->bufSize);
+ 				fprintf(stderr, "          If program aborts, use regular BZIP2 to decompress.\n");
+ 			}
+@@ -1829,7 +1829,7 @@ void *fileWriter(void *outname)
+ 	
+ 	if (QuietMode != 1)
+ 	{
+-		fprintf(stderr, "    Output Size: %"PRIuMAX" bytes\n", (uintmax_t)CompressedSize);
++		fprintf(stderr, "    Output Size: %" PRIuMAX " bytes\n", (uintmax_t)CompressedSize);
+ 	}
+ 
+ 	#ifdef PBZIP_DEBUG
+@@ -2072,7 +2072,7 @@ int directcompress(int hInfile, OFF_T fileSize, int blockSize, const char *OutFi
+ 		close(hOutfile);
+ 	if (QuietMode != 1)
+ 	{
+-		fprintf(stderr, "    Output Size: %"PRIuMAX" bytes\n", (uintmax_t)CompressedSize);
++		fprintf(stderr, "    Output Size: %" PRIuMAX " bytes\n", (uintmax_t)CompressedSize);
+ 	}
+ 
+ 	syncSetProducerDone(1); // Not really needed for direct version
+@@ -2794,7 +2794,7 @@ void outputBufferInit(size_t size)
+ 	// unlikely to get here since more likely exception will be thrown
+ 	if (OutputBuffer.size() != size)
+ 	{
+-		fprintf(stderr, "pbzip2: *ERROR: Could not initialize (OutputBuffer); size=%"PRIuMAX"!  Aborting...\n", (uintmax_t)size);
++		fprintf(stderr, "pbzip2: *ERROR: Could not initialize (OutputBuffer); size=%" PRIuMAX "!  Aborting...\n", (uintmax_t)size);
+ 		safe_mutex_unlock(OutMutex);
+ 		exit(1);
+ 	}
+@@ -4102,7 +4102,7 @@ int main(int argc, char* argv[])
+ 			if (decompress == 1)
+ 				fprintf(stderr, " BWT Block Size: %c00k\n", BWTblockSizeChar);
+ 			if (hasInFile)
+-				fprintf(stderr, "     Input Size: %"PRIuMAX" bytes\n", (uintmax_t)InFileSize);
++				fprintf(stderr, "     Input Size: %" PRIuMAX " bytes\n", (uintmax_t)InFileSize);
+ 		}
+ 
+ 		if (decompress == 1)
+@@ -4224,7 +4224,7 @@ int main(int argc, char* argv[])
+ 			{
+ 				NumBufferedBlocksMax = numCPU;
+ 				if (QuietMode != 1)
+-					fprintf(stderr, "*Warning* Max memory limit increased to %"PRIuMAX" MB to support %d CPUs\n", (uintmax_t)((NumBufferedBlocksMax + (numCPU * 2)) * blockSize)/1000000, numCPU);
++					fprintf(stderr, "*Warning* Max memory limit increased to %" PRIuMAX " MB to support %d CPUs\n", (uintmax_t)((NumBufferedBlocksMax + (numCPU * 2)) * blockSize)/1000000, numCPU);
+ 			}
+ 			else
+ 			{

@@ -27,7 +27,7 @@ logger = scriptutils.logger_create('verify_homepage')
 def wgetHomepage(pn, homepage):
     result = subprocess.call('wget ' + '-q -T 5 -t 1 --spider ' + homepage, shell = True)
     if result:
-        logger.warn("%s: failed to verify HOMEPAGE: %s " % (pn, homepage))
+        logger.warning("%s: failed to verify HOMEPAGE: %s " % (pn, homepage))
         return 1
     else:
         return 0

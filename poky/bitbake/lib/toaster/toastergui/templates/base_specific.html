@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+{% load static %}
+{% load projecttags %}
+{% load project_url_tag %}
+<html lang="en">
+  <head>
+    <title>
+      {% block title %} Toaster {% endblock %}
+    </title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" type="text/css"/>
+    <!--link rel="stylesheet" href="{% static 'css/bootstrap-theme.css' %}" type="text/css"/-->
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}" type='text/css'/>
+    <link rel="stylesheet" href="{% static 'css/default.css' %}" type='text/css'/>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <script src="{% static 'js/jquery-2.0.3.min.js' %}">
+    </script>
+    <script src="{% static 'js/jquery.cookie.js' %}">
+    </script>
+    <script src="{% static 'js/bootstrap.min.js' %}">
+    </script>
+    <script src="{% static 'js/typeahead.jquery.js' %}">
+    </script>
+    <script src="{% static 'js/jsrender.min.js' %}">
+    </script>
+    <script src="{% static 'js/highlight.pack.js' %}">
+    </script>
+    <script src="{% static 'js/libtoaster.js' %}">
+    </script>
+    {% if DEBUG %}
+    <script>
+      libtoaster.debug = true;
+    </script>
+    {% endif %}
+    <script>
+      /* Set JsRender delimiters (mrb_section.html) different than Django's */
+      $.views.settings.delimiters("<%", "%>");
+
+      /* This table allows Django substitutions to be passed to libtoaster.js */
+      libtoaster.ctx = {
+        jsUrl : "{% static 'js/' %}",
+        htmlUrl : "{% static 'html/' %}",
+        projectsUrl : "{% url 'all-projects' %}",
+        projectsTypeAheadUrl: {% url 'xhr_projectstypeahead' as prjurl%}{{prjurl|json}},
+        {% if project.id %}
+        landingSpecificURL : "{% url 'landing_specific' project.id %}",
+        landingSpecificCancelURL : "{% url 'landing_specific_cancel' project.id %}",
+        projectId : {{project.id}},
+        projectPageUrl : {% url 'project' project.id as purl %}{{purl|json}},
+        projectSpecificPageUrl : {% url 'project_specific' project.id as purl %}{{purl|json}},
+        xhrProjectUrl : {% url 'xhr_project' project.id as pxurl %}{{pxurl|json}},
+        projectName : {{project.name|json}},
+        recipesTypeAheadUrl: {% url 'xhr_recipestypeahead' project.id as paturl%}{{paturl|json}},
+        layersTypeAheadUrl: {% url 'xhr_layerstypeahead' project.id as paturl%}{{paturl|json}},
+        machinesTypeAheadUrl: {% url 'xhr_machinestypeahead' project.id as paturl%}{{paturl|json}},
+        distrosTypeAheadUrl: {% url 'xhr_distrostypeahead' project.id as paturl%}{{paturl|json}},
+        projectBuildsUrl: {% url 'projectbuilds' project.id as pburl %}{{pburl|json}},
+        xhrCustomRecipeUrl : "{% url 'xhr_customrecipe' %}",
+        projectId : {{project.id}},
+        xhrBuildRequestUrl: "{% url 'xhr_buildrequest' project.id %}",
+        mostRecentBuildsUrl: "{% url 'most_recent_builds' %}?project_id={{project.id}}",
+        xhrProjectUpdateUrl: "{% url 'xhr_projectupdate' project.id %}",
+        xhrProjectCancelUrl: "{% url 'landing_specific_cancel' project.id %}",
+        xhrSetDefaultImageUrl: "{% url 'xhr_setdefaultimage' project.id %}",
+        {% else %}
+        mostRecentBuildsUrl: "{% url 'most_recent_builds' %}",
+        projectId : undefined,
+        projectPageUrl : undefined,
+        projectName : undefined,
+        {% endif %}
+      };
+    </script>
+    {% block extraheadcontent %}
+    {% endblock %}
+  </head>
+
+  <body>
+
+    {% csrf_token %}
+    <div id="loading-notification" class="alert alert-warning lead text-center" style="display:none">
+      Loading <i class="fa-pulse icon-spinner"></i>
+    </div>
+
+    <div id="change-notification" class="alert alert-info alert-dismissible change-notification" style="display:none">
+      <button type="button" class="close" id="hide-alert" data-toggle="alert">&times;</button>
+      <span id="change-notification-msg"></span>
+    </div>
+
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#global-nav" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <div class="toaster-navbar-brand">
+          	{% if project_specific %}
+              <img class="logo" src="{% static 'img/logo.png' %}" class="" alt="Yocto Project logo"/>
+              Toaster
+          	{% else %}
+            <a href="/">
+            </a>
+            <a href="/">
+              <img class="logo" src="{% static 'img/logo.png' %}" class="" alt="Yocto Project logo"/>
+            </a>
+            <a class="brand" href="/">Toaster</a>
+            {% endif %}
+            {% if DEBUG %}
+            <span class="glyphicon glyphicon-info-sign" title="<strong>Toaster version information</strong>" data-content="<dl><dt>Git branch</dt><dd>{{TOASTER_BRANCH}}</dd><dt>Git revision</dt><dd>{{TOASTER_REVISION}}</dd></dl>"></i>
+            {% endif %}
+          </div>
+        </div>
+        <div class="collapse navbar-collapse" id="global-nav">
+            <ul class="nav navbar-nav">
+            <h3> Project Configuration Page </h3>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      {% block pagecontent %}
+      {% endblock %}
+    </div>
+  </body>
+</html>

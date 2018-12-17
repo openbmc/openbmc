@@ -1,0 +1,39 @@
+From 86df4200c9c33d999df0e8cc3c9771f17a297ec4 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Wed, 13 Sep 2017 15:01:54 +0200
+Subject: [PATCH] configure.ac: make tools support optional
+
+* add --enable-tools option
+* XIPH_PATH_OGG macro is provided by libogg so we cannot call
+  it without the libogg dependency
+
+Upstream-Status: Pending
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ configure.ac | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index d4b1a3f..7d6b2dc 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -68,8 +68,14 @@ AC_MSG_RESULT($has_alloca)
+ 
+ AC_CHECK_HEADERS(sys/soundcard.h sys/audioio.h)
+ 
+-XIPH_PATH_OGG([tools="tools"], [tools=""])
++AC_ARG_ENABLE(tools, [  --enable-tools          Compile ogg tools],
++[if test "$enableval" = yes; then
++  [tools="tools"]
++else
++  [tools=""]
++fi],
+ AC_SUBST(tools)
++)
+ 
+ AC_CHECK_LIB(m, sin)
+ 
+-- 
+2.14.1
+

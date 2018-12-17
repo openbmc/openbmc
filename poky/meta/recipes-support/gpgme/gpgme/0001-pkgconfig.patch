@@ -1,7 +1,7 @@
-From 265faf8fe0acaca2043a248a4df02b0868ffa6de Mon Sep 17 00:00:00 2001
+From c452ba58dd2f99d6e624421697417cc018f9a67a Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
-Date: Wed, 16 Aug 2017 02:00:08 -0400
-Subject: [PATCH 1/4] pkgconfig
+Date: Fri, 29 Jun 2018 14:35:41 +0800
+Subject: [PATCH 1/7] pkgconfig
 
 Update gpgme to use pkgconfig instead of -config files since its
 simpler and less error prone when cross compiling.
@@ -11,7 +11,7 @@ RP 2015/4/17
 
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
-Rebase to 1.9.0
+Rebase to 1.11.1
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
@@ -25,10 +25,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  create mode 100644 src/gpgme.pc.in
 
 diff --git a/configure.ac b/configure.ac
-index 6ea4bcd..2a0d528 100644
+index 2a35404..7485cdf 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -887,6 +887,7 @@ AC_CONFIG_FILES(Makefile src/Makefile
+@@ -886,6 +886,7 @@ AC_CONFIG_FILES(Makefile src/Makefile
                  src/versioninfo.rc
                  src/gpgme.h)
  AC_CONFIG_FILES(src/gpgme-config, chmod +x src/gpgme-config)
@@ -37,7 +37,7 @@ index 6ea4bcd..2a0d528 100644
  AC_CONFIG_FILES(lang/cpp/src/GpgmeppConfig-w32.cmake.in)
  AC_CONFIG_FILES(lang/cpp/src/GpgmeppConfig.cmake.in)
 diff --git a/src/Makefile.am b/src/Makefile.am
-index ce6f1d4..5f38fee 100644
+index 0a196e0..cecaf8f 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
 @@ -19,12 +19,14 @@
@@ -54,7 +54,7 @@ index ce6f1d4..5f38fee 100644
 +pkgconfigdir = $(libdir)/pkgconfig
 +pkgconfig_DATA = gpgme.pc gpgme-pthread.pc
  
- bin_PROGRAMS = gpgme-tool
+ bin_PROGRAMS = gpgme-tool gpgme-json
  
 diff --git a/src/gpgme-pthread.pc.in b/src/gpgme-pthread.pc.in
 new file mode 100644
@@ -299,5 +299,5 @@ index 0000000..b69539f
 +Requires: libassuan gpg-error
 \ No newline at end of file
 -- 
-1.8.3.1
+2.7.4
 

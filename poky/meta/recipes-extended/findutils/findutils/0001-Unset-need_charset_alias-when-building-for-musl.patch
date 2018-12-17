@@ -1,4 +1,4 @@
-From b9565dc2fe0c4f7daaec91b7e83bc7313dee2f4a Mon Sep 17 00:00:00 2001
+From 86db2a5f3b7ef8113e5384b4e02d2b299c87a047 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 13 Apr 2015 17:02:13 -0700
 Subject: [PATCH] Unset need_charset_alias when building for musl
@@ -11,15 +11,16 @@ coreutils
 Upstream-Status: Pending
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
- lib/gnulib.mk | 2 +-
+ gl/lib/Makefile.am | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Index: findutils-4.5.14/gl/lib/Makefile.am
-===================================================================
---- findutils-4.5.14.orig/gl/lib/Makefile.am
-+++ findutils-4.5.14/gl/lib/Makefile.am
-@@ -1220,7 +1220,7 @@ install-exec-localcharset: all-local
+diff --git a/gl/lib/Makefile.am b/gl/lib/Makefile.am
+index a9e2fe4..1c6ea9c 100644
+--- a/gl/lib/Makefile.am
++++ b/gl/lib/Makefile.am
+@@ -1234,7 +1234,7 @@ install-exec-localcharset: all-local
  	  case '$(host_os)' in \
  	    darwin[56]*) \
  	      need_charset_alias=true ;; \

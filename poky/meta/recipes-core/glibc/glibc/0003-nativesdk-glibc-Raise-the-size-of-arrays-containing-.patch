@@ -1,8 +1,7 @@
-From 695e1cbff6ee6db3435c33e55311c67adf44476d Mon Sep 17 00:00:00 2001
+From 055dd46b793168fb08e44913153010b088011ba2 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:51:38 +0000
-Subject: [PATCH 03/27] nativesdk-glibc: Raise the size of arrays containing dl
- paths
+Subject: [PATCH] nativesdk-glibc: Raise the size of arrays containing dl paths
 
 This patch puts the dynamic loader path in the binaries, SYSTEM_DIRS strings
 and lengths as well as ld.so.cache path in the dynamic loader to specific
@@ -41,10 +40,10 @@ index 6ee5153ff9..37a5f701fa 100644
  _dl_cache_libcmp (const char *p1, const char *p2)
  {
 diff --git a/elf/dl-load.c b/elf/dl-load.c
-index 62e3eee478..6ddba73650 100644
+index 74e2e5e962..8f19186e1c 100644
 --- a/elf/dl-load.c
 +++ b/elf/dl-load.c
-@@ -109,8 +109,8 @@ static size_t max_capstrlen attribute_relro;
+@@ -110,8 +110,8 @@ static size_t max_capstrlen attribute_relro;
     gen-trusted-dirs.awk.  */
  #include "trusted-dirs.h"
  
@@ -81,10 +80,10 @@ index fbdd814edf..9f4d8d69b1 100644
     a platform.  */
  static int
 diff --git a/elf/rtld.c b/elf/rtld.c
-index 453f56eb15..08e0c4c94b 100644
+index 1b0c74739f..a70a62d31e 100644
 --- a/elf/rtld.c
 +++ b/elf/rtld.c
-@@ -128,6 +128,7 @@ dso_name_valid_for_suid (const char *p)
+@@ -130,6 +130,7 @@ dso_name_valid_for_suid (const char *p)
      }
    return *p != '\0';
  }
@@ -92,7 +91,7 @@ index 453f56eb15..08e0c4c94b 100644
  
  /* LD_AUDIT variable contents.  Must be processed before the
     audit_list below.  */
-@@ -1000,12 +1001,12 @@ of this helper program; chances are you did not intend to run this program.\n\
+@@ -1001,12 +1002,12 @@ of this helper program; chances are you did not intend to run this program.\n\
    --list                list all dependencies and how they are resolved\n\
    --verify              verify that given object really is a dynamically linked\n\
  			object we can handle\n\
@@ -108,7 +107,7 @@ index 453f56eb15..08e0c4c94b 100644
        ++_dl_skip_args;
        --_dl_argc;
 diff --git a/iconv/gconv_conf.c b/iconv/gconv_conf.c
-index d6cf9d2a3e..9fcf970144 100644
+index f173cde71b..5c3205026f 100644
 --- a/iconv/gconv_conf.c
 +++ b/iconv/gconv_conf.c
 @@ -36,7 +36,7 @@
@@ -135,6 +134,3 @@ index cf43f1cf3b..7f07adde53 100644
  #ifndef add_system_dir
  # define add_system_dir(dir) add_dir (dir)
  #endif
--- 
-2.16.1
-

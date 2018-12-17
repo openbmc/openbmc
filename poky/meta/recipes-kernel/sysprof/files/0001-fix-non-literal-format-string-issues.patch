@@ -1,0 +1,34 @@
+From de13d1f908335cc882c447e4d7c4360b9e5da190 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 6 Sep 2018 17:49:44 -0700
+Subject: [PATCH] fix non-literal format string issues
+
+clang errors out when using -Werror=format-nonliteral
+since the definition of g_strdup_vprintf() from glib-2.0
+is using va_list and clangs still warns where as
+gcc doesn't do that for va_list arguments
+
+Fixes
+src/sp-window.c:96:27: error: format string is not a string literal [-Werror,-Wformat-nonliteral]
+|   str = g_strdup_vprintf (format, args);
+|                           ^~~~~~
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/sysprof/merge_requests/6]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/sp-window.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/sp-window.c b/src/sp-window.c
+index 4dfac2d..aff4779 100644
+--- a/src/sp-window.c
++++ b/src/sp-window.c
+@@ -80,7 +80,7 @@ static guint signals [N_SIGNALS];
+ static void sp_window_set_profiler (SpWindow   *self,
+                                     SpProfiler *profiler);
+ 
+-static void
++static G_GNUC_PRINTF(3, 4) void
+ sp_window_notify_user (SpWindow       *self,
+                        GtkMessageType  message_type,
+                        const gchar    *format,

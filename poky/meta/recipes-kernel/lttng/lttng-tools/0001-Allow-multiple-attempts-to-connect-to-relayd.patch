@@ -1,0 +1,43 @@
+From 70eff899104b86bae02862927c76caaef5de5d3c Mon Sep 17 00:00:00 2001
+From: Mikael Beckius <mikael.beckius@windriver.com>
+Date: Thu, 7 May 2015 16:14:25 +0200
+Subject: [PATCH] Allow multiple attempts to connect to relayd.
+
+It is unclear why a session needs to be made
+unusable after a failure to connect to relayd
+since a check for a relayd connection is
+always made before a session can be configured.
+
+The behaviour was introduced in:
+d9078d0c000d04d49c599a72c1a725026b636ec0
+
+Signed-off-by: Mikael Beckius <mikael.beckius@windriver.com>
+[ The context has moved, adjust the hunk accordingly ]
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+Upstream-Status: Pending
+---
+ src/bin/lttng-sessiond/cmd.c |    8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/src/bin/lttng-sessiond/cmd.c b/src/bin/lttng-sessiond/cmd.c
+index 73b4ce3..36f62ee 100644
+--- a/src/bin/lttng-sessiond/cmd.c
++++ b/src/bin/lttng-sessiond/cmd.c
+@@ -689,14 +689,6 @@ close_sock:
+ 	free(rsock);
+ 
+ error:
+-	if (ret != LTTNG_OK) {
+-		/*
+-		 * The consumer output for this session should not be used anymore
+-		 * since the relayd connection failed thus making any tracing or/and
+-		 * streaming not usable.
+-		 */
+-		consumer->enabled = 0;
+-	}
+ 	return ret;
+ }
+ 
+-- 
+1.7.9.5
+

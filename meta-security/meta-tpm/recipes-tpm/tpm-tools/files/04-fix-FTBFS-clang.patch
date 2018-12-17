@@ -1,0 +1,56 @@
+Title: Fix FTBFS with clang due to uninitialized values
+Date: 2015-06-28
+Author: Alexander <sanek23994@gmail.com>
+Bug-Debian: http://bugs.debian.org/753063
+
+Upstream-Status: Backport
+tpm-tools_1.3.9.1-0.1.debian.tar
+
+Signed-off-by: Armin kuster <akuster808@gmail.com>
+
+--- tpm-tools-1.3.8/src/tpm_mgmt/tpm_present.c	2012-05-17 21:49:58.000000000 +0400
++++ tpm-tools-1.3.8-my/src/tpm_mgmt/tpm_present.c	2014-06-29 01:01:11.502081468 +0400
+@@ -165,7 +165,7 @@
+ 
+ 	TSS_BOOL bCmd, bHwd;
+ 	BOOL bRc;
+-	TSS_HPOLICY hTpmPolicy;
++	TSS_HPOLICY hTpmPolicy = 0;
+ 	char *pwd = NULL;
+ 	int pswd_len;
+ 	char rsp[5];
+--- tpm-tools-1.3.8/src/tpm_mgmt/tpm_takeownership.c	2010-09-30 21:28:09.000000000 +0400
++++ tpm-tools-1.3.8-my/src/tpm_mgmt/tpm_takeownership.c	2014-06-29 01:01:51.069373655 +0400
+@@ -67,7 +67,7 @@
+ 	char *szSrkPasswd = NULL;
+ 	int tpm_len, srk_len;
+ 	TSS_HTPM hTpm;
+-	TSS_HKEY hSrk;
++	TSS_HKEY hSrk = 0;
+ 	TSS_FLAG fSrkAttrs;
+ 	TSS_HPOLICY hTpmPolicy, hSrkPolicy;
+ 	int iRc = -1;
+--- tpm-tools-1.3.8/src/tpm_mgmt/tpm_nvwrite.c	2011-08-17 16:20:35.000000000 +0400
++++ tpm-tools-1.3.8-my/src/tpm_mgmt/tpm_nvwrite.c	2014-06-29 01:02:45.836397172 +0400
+@@ -220,7 +220,7 @@
+ 		close(fd);
+ 		fd = -1;
+ 	} else if (fillvalue >= 0) {
+-		if (length < 0) {
++		if (length == 0) {
+ 			logError(_("Requiring size parameter.\n"));
+ 			return -1;
+ 		}
+--- tpm-tools-1.3.8/src/data_mgmt/data_protect.c	2012-05-17 21:49:58.000000000 +0400
++++ tpm-tools-1.3.8-my/src/data_mgmt/data_protect.c	2014-06-29 01:03:49.863254459 +0400
+@@ -432,8 +432,8 @@
+ 
+ 	char *pszPin = NULL;
+ 
+-	CK_RV              rv;
+-	CK_SESSION_HANDLE  hSession;
++	CK_RV              rv = 0;
++	CK_SESSION_HANDLE  hSession = 0;
+ 	CK_OBJECT_HANDLE   hObject;
+ 	CK_MECHANISM       tMechanism = { CKM_AES_ECB, NULL, 0 };
+ 

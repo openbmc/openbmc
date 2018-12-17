@@ -14,6 +14,9 @@ function projectTopBarInit(ctx) {
   var newBuildTargetBuildBtn = $("#build-button");
   var selectedTarget;
 
+  var updateProjectBtn = $("#update-project-button");
+  var cancelProjectBtn = $("#cancel-project-button");
+
   /* Project name change functionality */
   projectNameFormToggle.click(function(e){
     e.preventDefault();
@@ -87,6 +90,25 @@ function projectTopBarInit(ctx) {
       function(){
         window.location.replace(libtoaster.ctx.projectBuildsUrl);
     }, null);
+  });
+
+  updateProjectBtn.click(function (e) {
+    e.preventDefault();
+
+    selectedTarget = { name: "_PROJECT_PREPARE_" };
+
+    /* Save current default build image, fire off the build */
+    libtoaster.updateProject(null, selectedTarget.name, newBuildTargetInput.val().trim(),
+      function(){
+        window.location.replace(libtoaster.ctx.projectSpecificPageUrl);
+    }, null);
+  });
+
+  cancelProjectBtn.click(function (e) {
+    e.preventDefault();
+
+    /* redirect to 'done/canceled' landing page */
+    window.location.replace(libtoaster.ctx.landingSpecificCancelURL);
   });
 
   /* Call makeProjectNameValidation function */

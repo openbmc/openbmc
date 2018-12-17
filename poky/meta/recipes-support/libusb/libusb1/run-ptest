@@ -1,0 +1,29 @@
+#!/bin/sh
+
+echo
+echo "---------------------------- libusb1 tests ---------------------------"
+echo
+
+./stress | { \
+while read -r str
+do
+	echo "$str"
+	if [ "${str#*Starting test run:}" != "$str" ]
+	then
+		name="${str#Starting test run: }"
+		name="${name%...}"
+	else
+		case "$str" in
+			"Success (0)")
+				echo "PASS: $name"
+			;;
+			"Failure (1)" | "Error (2)")
+				echo "FAIL: $name"
+			;;
+			"Skip (3)")
+				echo "SKIP: $name"
+			;;
+		esac
+	fi
+done
+}

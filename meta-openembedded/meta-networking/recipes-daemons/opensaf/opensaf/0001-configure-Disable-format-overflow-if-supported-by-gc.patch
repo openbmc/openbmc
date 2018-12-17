@@ -1,20 +1,21 @@
-From ab00d6f5793b2d850f975bcb6d5d0aa6d7a9eaa4 Mon Sep 17 00:00:00 2001
+From c2668f7f2ea82a61115b7cae56ed081b41ff5153 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 22 Apr 2017 12:34:37 -0700
 Subject: [PATCH] configure: Disable format-overflow if supported by gcc
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
- Makefile.am                 |  6 ++--
- configure.ac                |  2 ++
- m4/ax_check_compile_flag.m4 | 74 +++++++++++++++++++++++++++++++++++++++++++++
+ Makefile.am                 |  6 +--
+ configure.ac                |  2 +
+ m4/ax_check_compile_flag.m4 | 74 +++++++++++++++++++++++++++++++++++++
  3 files changed, 79 insertions(+), 3 deletions(-)
  create mode 100644 m4/ax_check_compile_flag.m4
 
-Index: opensaf-5.18.02/Makefile.am
-===================================================================
---- opensaf-5.18.02.orig/Makefile.am
-+++ opensaf-5.18.02/Makefile.am
+diff --git a/Makefile.am b/Makefile.am
+index b3d6553..5607fc2 100644
+--- a/Makefile.am
++++ b/Makefile.am
 @@ -52,10 +52,10 @@ AM_CPPFLAGS = \
  	-pthread \
  	-D_GNU_SOURCE -DINTERNAL_VERSION_ID='"@INTERNAL_VERSION_ID@"' \
@@ -29,11 +30,11 @@ Index: opensaf-5.18.02/Makefile.am
  
  if ENABLE_GCOV
  AM_CFLAGS += --coverage
-Index: opensaf-5.18.02/configure.ac
-===================================================================
---- opensaf-5.18.02.orig/configure.ac
-+++ opensaf-5.18.02/configure.ac
-@@ -593,6 +593,8 @@ if test -z "$OSAF_HARDEN_FLAGS"; then
+diff --git a/configure.ac b/configure.ac
+index 5b86730..47d1002 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -600,6 +600,8 @@ if test -z "$OSAF_HARDEN_FLAGS"; then
  fi
  AC_SUBST(OSAF_HARDEN_FLAGS)
  
@@ -42,10 +43,11 @@ Index: opensaf-5.18.02/configure.ac
  #############################################
  # List the output Makefiles
  #############################################
-Index: opensaf-5.18.02/m4/ax_check_compile_flag.m4
-===================================================================
+diff --git a/m4/ax_check_compile_flag.m4 b/m4/ax_check_compile_flag.m4
+new file mode 100644
+index 0000000..dcabb92
 --- /dev/null
-+++ opensaf-5.18.02/m4/ax_check_compile_flag.m4
++++ b/m4/ax_check_compile_flag.m4
 @@ -0,0 +1,74 @@
 +# ===========================================================================
 +#  https://www.gnu.org/software/autoconf-archive/ax_check_compile_flag.html

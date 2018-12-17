@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends project_specific|yesno:"baseprojectspecificpage.html,base.html" %}
 {% load projecttags %}
 {% load humanize %}
 {% load static %}
@@ -8,7 +8,7 @@
 
 <div class="row">
 
-  {% include "projecttopbar.html" %}
+  {% include project_specific|yesno:"project_specific_topbar.html,projecttopbar.html" %}
 
   <div class="col-md-12">
     {% url table_name project.id as xhr_table_url %}

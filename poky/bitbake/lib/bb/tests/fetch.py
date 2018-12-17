@@ -402,6 +402,12 @@ class MirrorUriTest(FetcherTest):
             : "git://somewhere.org/somedir/mtd-utils.git;tag=1234567890123456789012345678901234567890;protocol=http", 
         ("git://git.invalid.infradead.org/foo/mtd-utils.git;tag=1234567890123456789012345678901234567890", "git://.*/.*", "git://somewhere.org/somedir/MIRRORNAME;protocol=http") 
             : "git://somewhere.org/somedir/git.invalid.infradead.org.foo.mtd-utils.git;tag=1234567890123456789012345678901234567890;protocol=http", 
+        ("http://somewhere.org/somedir1/somedir2/somefile_1.2.3.tar.gz", "http://.*/.*", "http://somewhere2.org")
+            : "http://somewhere2.org/somefile_1.2.3.tar.gz",
+        ("http://somewhere.org/somedir1/somedir2/somefile_1.2.3.tar.gz", "http://.*/.*", "http://somewhere2.org/")
+            : "http://somewhere2.org/somefile_1.2.3.tar.gz",
+        ("git://someserver.org/bitbake;tag=1234567890123456789012345678901234567890;branch=master", "git://someserver.org/bitbake;branch=master", "git://git.openembedded.org/bitbake;protocol=http")
+            : "git://git.openembedded.org/bitbake;tag=1234567890123456789012345678901234567890;branch=master;protocol=http",
 
         #Renaming files doesn't work
         #("http://somewhere.org/somedir1/somefile_1.2.3.tar.gz", "http://somewhere.org/somedir1/somefile_1.2.3.tar.gz", "http://somewhere2.org/somedir3/somefile_2.3.4.tar.gz") : "http://somewhere2.org/somedir3/somefile_2.3.4.tar.gz"
@@ -456,6 +462,124 @@ class MirrorUriTest(FetcherTest):
         self.assertEqual(uris, ['http://AAAA/A/A/A/bitbake/bitbake-1.0.tar.gz',
                                 'https://BBBB/B/B/B/bitbake/bitbake-1.0.tar.gz',
                                 'http://AAAA/A/A/A/B/B/bitbake/bitbake-1.0.tar.gz'])
+
+
+class GitDownloadDirectoryNamingTest(FetcherTest):
+    def setUp(self):
+        super(GitDownloadDirectoryNamingTest, self).setUp()
+        self.recipe_url = "git://git.openembedded.org/bitbake"
+        self.recipe_dir = "git.openembedded.org.bitbake"
+        self.mirror_url = "git://github.com/openembedded/bitbake.git"
+        self.mirror_dir = "github.com.openembedded.bitbake.git"
+
+        self.d.setVar('SRCREV', '82ea737a0b42a8b53e11c9cde141e9e9c0bd8c40')
+
+    def setup_mirror_rewrite(self):
+        self.d.setVar("PREMIRRORS", self.recipe_url + " " + self.mirror_url + " \n")
+
+    @skipIfNoNetwork()
+    def test_that_directory_is_named_after_recipe_url_when_no_mirroring_is_used(self):
+        self.setup_mirror_rewrite()
+        fetcher = bb.fetch.Fetch([self.recipe_url], self.d)
+
+        fetcher.download()
+
+        dir = os.listdir(self.dldir + "/git2")
+        self.assertIn(self.recipe_dir, dir)
+
+    @skipIfNoNetwork()
+    def test_that_directory_exists_for_mirrored_url_and_recipe_url_when_mirroring_is_used(self):
+        self.setup_mirror_rewrite()
+        fetcher = bb.fetch.Fetch([self.recipe_url], self.d)
+
+        fetcher.download()
+
+        dir = os.listdir(self.dldir + "/git2")
+        self.assertIn(self.mirror_dir, dir)
+        self.assertIn(self.recipe_dir, dir)
+
+    @skipIfNoNetwork()
+    def test_that_recipe_directory_and_mirrored_directory_exists_when_mirroring_is_used_and_the_mirrored_directory_already_exists(self):
+        self.setup_mirror_rewrite()
+        fetcher = bb.fetch.Fetch([self.mirror_url], self.d)
+        fetcher.download()
+        fetcher = bb.fetch.Fetch([self.recipe_url], self.d)
+
+        fetcher.download()
+
+        dir = os.listdir(self.dldir + "/git2")
+        self.assertIn(self.mirror_dir, dir)
+        self.assertIn(self.recipe_dir, dir)
+
+
+class TarballNamingTest(FetcherTest):
+    def setUp(self):
+        super(TarballNamingTest, self).setUp()
+        self.recipe_url = "git://git.openembedded.org/bitbake"
+        self.recipe_tarball = "git2_git.openembedded.org.bitbake.tar.gz"
+        self.mirror_url = "git://github.com/openembedded/bitbake.git"
+        self.mirror_tarball = "git2_github.com.openembedded.bitbake.git.tar.gz"
+
+        self.d.setVar('BB_GENERATE_MIRROR_TARBALLS', '1')
+        self.d.setVar('SRCREV', '82ea737a0b42a8b53e11c9cde141e9e9c0bd8c40')
+
+    def setup_mirror_rewrite(self):
+        self.d.setVar("PREMIRRORS", self.recipe_url + " " + self.mirror_url + " \n")
+
+    @skipIfNoNetwork()
+    def test_that_the_recipe_tarball_is_created_when_no_mirroring_is_used(self):
+        fetcher = bb.fetch.Fetch([self.recipe_url], self.d)
+
+        fetcher.download()
+
+        dir = os.listdir(self.dldir)
+        self.assertIn(self.recipe_tarball, dir)
+
+    @skipIfNoNetwork()
+    def test_that_the_mirror_tarball_is_created_when_mirroring_is_used(self):
+        self.setup_mirror_rewrite()
+        fetcher = bb.fetch.Fetch([self.recipe_url], self.d)
+
+        fetcher.download()
+
+        dir = os.listdir(self.dldir)
+        self.assertIn(self.mirror_tarball, dir)
+
+
+class GitShallowTarballNamingTest(FetcherTest):
+    def setUp(self):
+        super(GitShallowTarballNamingTest, self).setUp()
+        self.recipe_url = "git://git.openembedded.org/bitbake"
+        self.recipe_tarball = "gitshallow_git.openembedded.org.bitbake_82ea737-1_master.tar.gz"
+        self.mirror_url = "git://github.com/openembedded/bitbake.git"
+        self.mirror_tarball = "gitshallow_github.com.openembedded.bitbake.git_82ea737-1_master.tar.gz"
+
+        self.d.setVar('BB_GIT_SHALLOW', '1')
+        self.d.setVar('BB_GENERATE_SHALLOW_TARBALLS', '1')
+        self.d.setVar('SRCREV', '82ea737a0b42a8b53e11c9cde141e9e9c0bd8c40')
+
+    def setup_mirror_rewrite(self):
+        self.d.setVar("PREMIRRORS", self.recipe_url + " " + self.mirror_url + " \n")
+
+    @skipIfNoNetwork()
+    def test_that_the_tarball_is_named_after_recipe_url_when_no_mirroring_is_used(self):
+        fetcher = bb.fetch.Fetch([self.recipe_url], self.d)
+
+        fetcher.download()
+
+        dir = os.listdir(self.dldir)
+        self.assertIn(self.recipe_tarball, dir)
+
+    @skipIfNoNetwork()
+    def test_that_the_mirror_tarball_is_created_when_mirroring_is_used(self):
+        self.setup_mirror_rewrite()
+        fetcher = bb.fetch.Fetch([self.recipe_url], self.d)
+
+        fetcher.download()
+
+        dir = os.listdir(self.dldir)
+        self.assertIn(self.mirror_tarball, dir)
+
 
 class FetcherLocalTest(FetcherTest):
     def setUp(self):
@@ -745,27 +869,27 @@ class FetcherNetworkTest(FetcherTest):
         self.assertRaises(bb.fetch.ParameterError, self.gitfetcher, url, url)
 
     @skipIfNoNetwork()
-    def test_gitfetch_premirror(self):
-        url1 = "git://git.openembedded.org/bitbake"
-        url2 = "git://someserver.org/bitbake"
+    def test_gitfetch_finds_local_tarball_for_mirrored_url_when_previous_downloaded_by_the_recipe_url(self):
+        recipeurl = "git://git.openembedded.org/bitbake"
+        mirrorurl = "git://someserver.org/bitbake"
         self.d.setVar("PREMIRRORS", "git://someserver.org/bitbake git://git.openembedded.org/bitbake \n")
-        self.gitfetcher(url1, url2)
+        self.gitfetcher(recipeurl, mirrorurl)
 
     @skipIfNoNetwork()
-    def test_gitfetch_premirror2(self):
-        url1 = url2 = "git://someserver.org/bitbake"
+    def test_gitfetch_finds_local_tarball_when_previous_downloaded_from_a_premirror(self):
+        recipeurl = "git://someserver.org/bitbake"
         self.d.setVar("PREMIRRORS", "git://someserver.org/bitbake git://git.openembedded.org/bitbake \n")
-        self.gitfetcher(url1, url2)
+        self.gitfetcher(recipeurl, recipeurl)
 
     @skipIfNoNetwork()
-    def test_gitfetch_premirror3(self):
+    def test_gitfetch_finds_local_repository_when_premirror_rewrites_the_recipe_url(self):
         realurl = "git://git.openembedded.org/bitbake"
-        dummyurl = "git://someserver.org/bitbake"
+        recipeurl = "git://someserver.org/bitbake"
         self.sourcedir = self.unpackdir.replace("unpacked", "sourcemirror.git")
         os.chdir(self.tempdir)
         bb.process.run("git clone %s %s 2> /dev/null" % (realurl, self.sourcedir), shell=True)
-        self.d.setVar("PREMIRRORS", "%s git://%s;protocol=file \n" % (dummyurl, self.sourcedir))
-        self.gitfetcher(dummyurl, dummyurl)
+        self.d.setVar("PREMIRRORS", "%s git://%s;protocol=file \n" % (recipeurl, self.sourcedir))
+        self.gitfetcher(recipeurl, recipeurl)
 
     @skipIfNoNetwork()
     def test_git_submodule(self):
@@ -832,7 +956,7 @@ class URLHandle(unittest.TestCase):
     # decodeurl and we need to handle them
     decodedata = datatable.copy()
     decodedata.update({
-       "http://somesite.net;someparam=1": ('http', 'somesite.net', '', '', '', {'someparam': '1'}),
+       "http://somesite.net;someparam=1": ('http', 'somesite.net', '/', '', '', {'someparam': '1'}),
     })
 
     def test_decodeurl(self):
@@ -861,12 +985,12 @@ class FetchLatestVersionTest(FetcherTest):
         ("dtc", "git://git.qemu.org/dtc.git", "65cc4d2748a2c2e6f27f1cf39e07a5dbabd80ebf", "")
             : "1.4.0",
         # combination version pattern
-        ("sysprof", "git://gitlab.gnome.org/GNOME/sysprof;protocol=https", "cd44ee6644c3641507fb53b8a2a69137f2971219", "")
+        ("sysprof", "git://gitlab.gnome.org/GNOME/sysprof.git;protocol=https", "cd44ee6644c3641507fb53b8a2a69137f2971219", "")
             : "1.2.0",
         ("u-boot-mkimage", "git://git.denx.de/u-boot.git;branch=master;protocol=git", "62c175fbb8a0f9a926c88294ea9f7e88eb898f6c", "")
             : "2014.01",
         # version pattern "yyyymmdd"
-        ("mobile-broadband-provider-info", "git://gitlab.gnome.org/GNOME/mobile-broadband-provider-info;protocol=https", "4ed19e11c2975105b71b956440acdb25d46a347d", "")
+        ("mobile-broadband-provider-info", "git://gitlab.gnome.org/GNOME/mobile-broadband-provider-info.git;protocol=https", "4ed19e11c2975105b71b956440acdb25d46a347d", "")
             : "20120614",
         # packages with a valid UPSTREAM_CHECK_GITTAGREGEX
         ("xf86-video-omap", "git://anongit.freedesktop.org/xorg/driver/xf86-video-omap", "ae0394e687f1a77e966cf72f895da91840dffb8f", "(?P<pver>(\d+\.(\d\.?)*))")
@@ -1338,6 +1462,9 @@ class GitShallowTest(FetcherTest):
         smdir = os.path.join(self.tempdir, 'gitsubmodule')
         bb.utils.mkdirhier(smdir)
         self.git('init', cwd=smdir)
+        # Make this look like it was cloned from a remote...
+        self.git('config --add remote.origin.url "%s"' % smdir, cwd=smdir)
+        self.git('config --add remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"', cwd=smdir)
         self.add_empty_file('asub', cwd=smdir)
 
         self.git('submodule init', cwd=self.srcdir)
@@ -1571,3 +1698,29 @@ class GitShallowTest(FetcherTest):
         self.assertNotEqual(orig_revs, revs)
         self.assertRefs(['master', 'origin/master'])
         self.assertRevCount(orig_revs - 1758)
+
+    def test_that_unpack_throws_an_error_when_the_git_clone_nor_shallow_tarball_exist(self):
+        self.add_empty_file('a')
+        fetcher, ud = self.fetch()
+        bb.utils.remove(self.gitdir, recurse=True)
+        bb.utils.remove(self.dldir, recurse=True)
+
+        with self.assertRaises(bb.fetch2.UnpackError) as context:
+            fetcher.unpack(self.d.getVar('WORKDIR'))
+
+        self.assertIn("No up to date source found", context.exception.msg)
+        self.assertIn("clone directory not available or not up to date", context.exception.msg)
+
+    @skipIfNoNetwork()
+    def test_that_unpack_does_work_when_using_git_shallow_tarball_but_tarball_is_not_available(self):
+        self.d.setVar('SRCREV', 'e5939ff608b95cdd4d0ab0e1935781ab9a276ac0')
+        self.d.setVar('BB_GIT_SHALLOW', '1')
+        self.d.setVar('BB_GENERATE_SHALLOW_TARBALLS', '1')
+        fetcher = bb.fetch.Fetch(["git://git.yoctoproject.org/fstests"], self.d)
+        fetcher.download()
+
+        bb.utils.remove(self.dldir + "/*.tar.gz")
+        fetcher.unpack(self.unpackdir)
+
+        dir = os.listdir(self.unpackdir + "/git/")
+        self.assertIn("fstests.doap", dir)

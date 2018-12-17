@@ -1,4 +1,4 @@
-From 7dfbd6889d868a09d695dd2736104848c1a9c9c3 Mon Sep 17 00:00:00 2001
+From 9af90cfc35ff1fe78755578861473039836c467a Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 31 Mar 2017 11:42:03 -0700
 Subject: [PATCH 14/15] Detect 64-bit MIPS targets
@@ -46,5 +46,5 @@ index 8aef22a318..7030026ffa 100644
   targ_obj=mips
   targ_machine=EM_MIPS
 -- 
-2.16.1
+2.18.0
 

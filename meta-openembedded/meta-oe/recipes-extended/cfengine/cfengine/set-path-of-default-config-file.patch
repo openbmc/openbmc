@@ -1,23 +1,38 @@
+From dc270040cb3beb5ca42f864813145c8a68594bad Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Mon, 18 Jul 2016 09:06:06 +0800
+Subject: [PATCH] cfengine: add recipe and base policy
+
 Upstream-Status: Inappropriate [configuration]
 
 Set the path of default configure file.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
 ---
+ misc/init.d/cfengine3.in | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
+
 diff --git a/misc/init.d/cfengine3.in b/misc/init.d/cfengine3.in
-index d6ae26f..1dee283 100644
+index c584817..12f5803 100644
 --- a/misc/init.d/cfengine3.in
 +++ b/misc/init.d/cfengine3.in
-@@ -101,11 +101,7 @@ if [ -z "$LOCKDIR" ]; then
+@@ -101,14 +101,10 @@ if [ -z "$LOCKDIR" ]; then
  fi
  
  # default control file
 -if [ "$DEBIAN" = "1" ]; then
 -    DEFAULT=/etc/default/cfengine3
+-    INIT_FUNCTIONS=/lib/lsb/init-functions
+-    if [ -e "$INIT_FUNCTIONS" ]; then
+-        . "$INIT_FUNCTIONS"
+-    fi
 -else
 -    DEFAULT=/etc/sysconfig/cfengine3
--fi
 +DEFAULT=/etc/default/cfengine3
++INIT_FUNCTIONS=/lib/lsb/init-functions
++if [ -e "$INIT_FUNCTIONS" ]; then
++    . "$INIT_FUNCTIONS"
+ fi
  
  if [ -f $DEFAULT ]; then
-     . $DEFAULT

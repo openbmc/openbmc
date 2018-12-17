@@ -1,0 +1,28 @@
+From 3838757d29590cc1ef99c97f7268377322fc17e9 Mon Sep 17 00:00:00 2001
+From: Anuj Mittal <anuj.mittal@intel.com>
+Date: Fri, 6 Apr 2018 12:04:00 +0800
+Subject: [PATCH] meson.build: enable introspection for cross-compile
+
+It works fine in OE-core and doesn't need to be disabled. Let the user decide
+if it should be disabled or not.
+
+Upstream-Status: Pending
+
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+---
+ atk/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/atk/meson.build b/atk/meson.build
+index 7b5a683..855e28f 100644
+--- a/atk/meson.build
++++ b/atk/meson.build
+@@ -139,7 +139,7 @@ libatk_dep = declare_dependency(link_with: libatk,
+ 
+ disable_introspection = get_option('disable_introspection')
+ 
+-if not meson.is_cross_build() and not disable_introspection
++if not disable_introspection
+   gnome.generate_gir(libatk,
+                      sources: atk_sources + atk_headers + [ atk_enum_h ] + [ atk_version_h ],
+                      namespace: 'Atk',

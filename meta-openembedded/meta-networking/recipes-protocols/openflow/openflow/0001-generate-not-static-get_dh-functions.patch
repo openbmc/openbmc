@@ -1,0 +1,33 @@
+From 0fe6770b617af7e400abc6f8652c1417d4c3575e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 8 Sep 2018 22:49:15 -0700
+Subject: [PATCH] generate not static get_dh* functions
+
+Fixes build with OpenSSL 1.1.x
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/automake.mk | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/lib/automake.mk b/lib/automake.mk
+index bfbeb94..b53909a 100644
+--- a/lib/automake.mk
++++ b/lib/automake.mk
+@@ -113,8 +113,9 @@ lib/dhparams.c: lib/dh1024.pem lib/dh2048.pem lib/dh4096.pem
+ 	(echo '#include "lib/dhparams.h"' &&				\
+ 	 openssl dhparam -C -in $(srcdir)/lib/dh1024.pem -noout &&	\
+ 	 openssl dhparam -C -in $(srcdir)/lib/dh2048.pem -noout &&	\
+-	 openssl dhparam -C -in $(srcdir)/lib/dh4096.pem -noout)	\
+-	| sed 's/\(get_dh[0-9]*\)()/\1(void)/' > lib/dhparams.c.tmp
++	 openssl dhparam -C -in $(srcdir)/lib/dh4096.pem -noout) | 	\
++	 sed -e 's/\(get_dh[0-9]*\)()/\1(void)/' 			\
++	     -e 's/static DH \*get_dh/DH \*get_dh/' > lib/dhparams.c.tmp
+ 	mv lib/dhparams.c.tmp lib/dhparams.c
+ endif
+ 
+-- 
+2.18.0
+

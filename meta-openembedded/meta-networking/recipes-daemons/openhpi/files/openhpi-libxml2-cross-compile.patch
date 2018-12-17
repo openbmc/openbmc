@@ -1,4 +1,7 @@
-Fix libxml2 for cross-compiling
+From afe545e77f9d841b7777d859e7e8108492fece96 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Wed, 26 Apr 2017 16:22:00 +0800
+Subject: [PATCH] Fix libxml2 for cross-compiling
 
 Use proper XML2_INCLUDE path when cross-compiling
 
@@ -6,16 +9,20 @@ Upstream-Status: Pending
 
 Signed-of-by: Aws Ismail <aws.ismail@windriver.com>
 
-Index: openhpi-3.6.1/configure.ac
-===================================================================
---- openhpi-3.6.1.orig/configure.ac
-+++ openhpi-3.6.1/configure.ac
-@@ -177,7 +177,7 @@ AC_CHECK_HEADERS([openssl/md2.h openssl/
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 6242cbf..4fb6b69 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -179,7 +179,7 @@ AC_CHECK_HEADERS([openssl/md2.h openssl/md5.h openssl/bio.h openssl/ssl.h openss
  
  dnl xml is used for XML-based communication in ilo2_ribcl and oa_soap
  AC_CHECK_LIB([xml2],[xmlParseMemory],[XML2_LIB=-lxml2],[XML2_LIB=])
--AC_CHECK_HEADERS([libxml2/libxml/xmlexports.h],[XML2_INCLUDE="-I/usr/include/libxml2"],[XML2_INCLUDE])
-+AC_CHECK_HEADERS([libxml2/libxml/xmlexports.h],[XML2_INCLUDE="$XML2_INCLUDE"],[XML2_INCLUDE])
+-AC_CHECK_HEADERS([libxml2/libxml/xmlexports.h],[XML2_INCLUDE="-I/usr/include/libxml2"],[XML2_INCLUDE=])
++AC_CHECK_HEADERS([libxml2/libxml/xmlexports.h],[XML2_INCLUDE="$XML2_INCLUDE"],[XML2_INCLUDE=])
  AC_SUBST(XML2_LIB)
  AC_SUBST(XML2_INCLUDE)
  

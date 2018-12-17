@@ -1,7 +1,7 @@
-From 9ce61f97b7758794f06894e934fbb256ff62163e Mon Sep 17 00:00:00 2001
+From b0209f282716bed2c230c7b496fbcc7af503d0cc Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 02:27:55 +0000
-Subject: [PATCH 02/10] make man install relative to DESTDIR
+Subject: [PATCH 02/11] make man install relative to DESTDIR
 
 Upstream-Status: Pending
 
@@ -11,7 +11,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/sim/common/Makefile.in b/sim/common/Makefile.in
-index 3944956b5d..aa355e8347 100644
+index 227e4cfbc2..8c3457e0bd 100644
 --- a/sim/common/Makefile.in
 +++ b/sim/common/Makefile.in
 @@ -35,7 +35,7 @@ tooldir = $(libdir)/$(target_alias)
@@ -24,5 +24,5 @@ index 3944956b5d..aa355e8347 100644
  includedir = @includedir@
  
 -- 
-2.13.1
+2.18.0
 

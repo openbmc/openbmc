@@ -1,3 +1,8 @@
+From 0becb4843a40910d5ec9aa11969d4905a22037cf Mon Sep 17 00:00:00 2001
+From: "Roy.Li" <rongqing.li@windriver.com>
+Date: Fri, 16 Jan 2015 14:14:01 +0800
+Subject: [PATCH] net-snmp: fix "libtool --finish"
+
 LIB_LDCONFIG_CMD failed since it is using a host dir $(libdir)
 which is /usr/lib64 does not exist on host when compile 64bit
 image.
@@ -9,12 +14,16 @@ rpm-postinst for each recipe while do_package, in package.bbclass.
 Upstream-Status: Inappropriate [cross compile specific]
 
 Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+
 ---
-Index: net-snmp-5.7.3/Makefile.top
-===================================================================
---- net-snmp-5.7.3.orig/Makefile.top
-+++ net-snmp-5.7.3/Makefile.top
-@@ -87,7 +87,7 @@ LIBREVISION = 3
+ Makefile.top | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.top b/Makefile.top
+index 5d4f9bc..d0ed31c 100644
+--- a/Makefile.top
++++ b/Makefile.top
+@@ -89,7 +89,7 @@ LIBREVISION = 0
  LIB_LD_CMD      = $(LIBTOOL) --mode=link $(LINKCC) $(CFLAGS) -rpath $(libdir) -version-info $(LIBCURRENT):$(LIBREVISION):$(LIBAGE) -o
  LIB_EXTENSION   = la
  LIB_VERSION     =

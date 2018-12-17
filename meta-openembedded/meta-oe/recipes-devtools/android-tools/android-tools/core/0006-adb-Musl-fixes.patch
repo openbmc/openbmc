@@ -1,0 +1,131 @@
+From 62d957a1271c88ec08d67984fbe31601f0bd41a9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 15 Sep 2017 15:50:57 -0700
+Subject: [PATCH] adb: Musl fixes
+
+__nonnull is gcc specific
+include sys/types.h for size_t
+Do not redefine close() and lseek()
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ adb/adb.h                    |  2 ++
+ adb/disable_verity_service.c | 13 ++++++++-----
+ adb/framebuffer_service.c    |  7 ++++---
+ adb/sysdeps.h                | 12 ++++++------
+ 4 files changed, 20 insertions(+), 14 deletions(-)
+
+diff --git a/adb/adb.h b/adb/adb.h
+index 44e5981bdc..bcdc49f63c 100644
+--- a/adb/adb.h
++++ b/adb/adb.h
+@@ -18,7 +18,9 @@
+ #define __ADB_H
+ 
+ #include <limits.h>
++#include <sys/types.h>
+ 
++#include "fdevent.h"
+ #include "adb_trace.h"
+ #include "transport.h"  /* readx(), writex() */
+ 
+diff --git a/adb/disable_verity_service.c b/adb/disable_verity_service.c
+index ed3da52108..29fa3d65a9 100644
+--- a/adb/disable_verity_service.c
++++ b/adb/disable_verity_service.c
+@@ -14,25 +14,28 @@
+  * limitations under the License.
+  */
+ 
+-#include "sysdeps.h"
+ 
+ #define  TRACE_TAG  TRACE_ADB
+ #include "adb.h"
++#include "sysdeps.h"
++#include "cutils/properties.h"
++#include "ext4_sb.h"
++#include <fs_mgr.h>
+ 
+ #include <stdio.h>
+ #include <stdarg.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
+ #include <inttypes.h>
++#include <unistd.h>
++#include <errno.h>
++#include <stdbool.h>
+ 
+-#include "cutils/properties.h"
+-#include "ext4_sb.h"
+-#include <fs_mgr.h>
+ 
+ #define FSTAB_PREFIX "/fstab."
+ struct fstab *fstab;
+ 
+-__attribute__((__format__(printf, 2, 3))) __nonnull((2))
++__attribute__((__format__(printf, 2, 3))) __attribute__((nonnull((2))))
+ static void write_console(int fd, const char* format, ...)
+ {
+     char buffer[256];
+diff --git a/adb/framebuffer_service.c b/adb/framebuffer_service.c
+index 8cbe8403cc..8f0ccfb7aa 100644
+--- a/adb/framebuffer_service.c
++++ b/adb/framebuffer_service.c
+@@ -14,6 +14,10 @@
+  * limitations under the License.
+  */
+ 
++#include "fdevent.h"
++#include "adb.h"
++#include "sysdeps.h"
++
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <unistd.h>
+@@ -23,9 +27,6 @@
+ #include <sys/types.h>
+ #include <sys/wait.h>
+ 
+-#include "fdevent.h"
+-#include "adb.h"
+-
+ #include <linux/fb.h>
+ #include <sys/ioctl.h>
+ #include <sys/mman.h>
+diff --git a/adb/sysdeps.h b/adb/sysdeps.h
+index cc1f839e9f..ea39ac39cc 100644
+--- a/adb/sysdeps.h
++++ b/adb/sysdeps.h
+@@ -123,8 +123,8 @@ static __inline__ int  unix_close(int fd)
+ {
+     return close(fd);
+ }
+-#undef   close
+-#define  close   ____xxx_close
++//#undef   close
++//#define  close   ____xxx_close
+ 
+ static __inline__  int  unix_read(int  fd, void*  buf, size_t  len)
+ {
+@@ -369,8 +369,8 @@ static __inline__ int  adb_close(int fd)
+ {
+     return close(fd);
+ }
+-#undef   close
+-#define  close   ____xxx_close
++//#undef   close
++//#define  close   ____xxx_close
+ 
+ 
+ static __inline__  int  adb_read(int  fd, void*  buf, size_t  len)
+@@ -392,8 +392,8 @@ static __inline__ int   adb_lseek(int  fd, int  pos, int  where)
+ {
+     return lseek(fd, pos, where);
+ }
+-#undef   lseek
+-#define  lseek   ___xxx_lseek
++//#undef   lseek
++//#define  lseek   ___xxx_lseek
+ 
+ static __inline__  int    adb_unlink(const char*  path)
+ {

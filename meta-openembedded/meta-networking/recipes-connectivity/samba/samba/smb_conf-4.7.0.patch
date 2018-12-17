@@ -1,4 +1,7 @@
-samba: correct log files location
+From f99b6a8617df6a46f41fb68ffafb2608dbb6681e Mon Sep 17 00:00:00 2001
+From: Joe Slater <joe.slater@windriver.com>
+Date: Wed, 8 Nov 2017 11:58:05 -0800
+Subject: [PATCH] samba: correct log files location
 
 We use /var/log/samba.
 
@@ -6,9 +9,15 @@ Upstream-Status: Pending
 
 Signed-off-by: Joe Slater <joe.slater@windriver.com>
 
---- a/packaging/RHEL/setup/smb.conf
-+++ b/packaging/RHEL/setup/smb.conf
-@@ -63,7 +63,7 @@
+---
+ examples/smb.conf.default | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/examples/smb.conf.default b/examples/smb.conf.default
+index 2f20720..44c1aa8 100644
+--- a/examples/smb.conf.default
++++ b/examples/smb.conf.default
+@@ -52,7 +52,7 @@
  
  # this tells Samba to use a separate log file for each machine
  # that connects

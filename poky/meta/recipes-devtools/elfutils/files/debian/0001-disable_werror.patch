@@ -1,0 +1,35 @@
+From 5d45565e71ddab3d7848077b61eb0ca73c0bcbcc Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 29 Jun 2018 16:01:14 +0800
+Subject: [PATCH] disable -Werror as it tends to break with new gcc versions
+
+Bug-Debian: https://bugs.debian.org/886004
+Last-Update: 2018-01-01
+
+Signed-off-by: Helmut Grohne <helmut@subdivi.de>
+
+Upstream-Status: Pending [from debian]
+mdisable_werror.patc and rebase to 0.172
+
+http://ftp.de.debian.org/debian/pool/main/e/elfutils/elfutils_0.170-0.5.debian.tar.xz
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ config/eu.am | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/config/eu.am b/config/eu.am
+index c2cc349..99b368e 100644
+--- a/config/eu.am
++++ b/config/eu.am
+@@ -73,7 +73,6 @@ AM_CFLAGS = -std=gnu99 -Wall -Wshadow -Wformat=2 \
+ 	    -Wold-style-definition -Wstrict-prototypes \
+ 	    $(LOGICAL_OP_WARNING) $(DUPLICATED_COND_WARNING) \
+ 	    $(NULL_DEREFERENCE_WARNING) $(IMPLICIT_FALLTHROUGH_WARNING) \
+-	    $(if $($(*F)_no_Werror),,-Werror) \
+ 	    $(if $($(*F)_no_Wunused),,-Wunused -Wextra) \
+ 	    $(if $($(*F)_no_Wstack_usage),,$(STACK_USAGE_WARNING)) \
+ 	    $(if $($(*F)_no_Wpacked_not_aligned),-Wno-packed-not-aligned,) \
+-- 
+2.7.4
+

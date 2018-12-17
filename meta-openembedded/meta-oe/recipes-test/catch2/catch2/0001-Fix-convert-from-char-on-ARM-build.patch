@@ -1,0 +1,46 @@
+From 5729874fa5059c39aa97cfa08fddf107b7a65c9e Mon Sep 17 00:00:00 2001
+From: Miguel Gaio <mgaio35@gmail.com>
+Date: Wed, 3 Oct 2018 10:22:16 +0200
+Subject: [PATCH] Fix convert from char on ARM build
+
+Some platforms set the signedness of char to unsigned (eg. ARM).
+Convert from char should not assume the signedness of char.
+
+Fix build issue with -Werror,-Wtautological-unsigned-zero-compare flags.
+
+Signed-off-by: Miguel Gaio <mgaio35@gmail.com>
+
+Upstream-Status: Accepted [Commit f1faaa9c107113692301ad8bb56084460ef1a2ff]
+
+Signed-off-by: Bartosz Golaszewski <bgolaszewski@baylibre.com>
+---
+ include/internal/catch_tostring.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/include/internal/catch_tostring.cpp b/include/internal/catch_tostring.cpp
+index 4e0c027d..8cbabbf2 100644
+--- a/include/internal/catch_tostring.cpp
++++ b/include/internal/catch_tostring.cpp
+@@ -205,7 +205,7 @@ std::string StringMaker<bool>::convert(bool b) {
+     return b ? "true" : "false";
+ }
+ 
+-std::string StringMaker<char>::convert(char value) {
++std::string StringMaker<signed char>::convert(signed char value) {
+     if (value == '\r') {
+         return "'\\r'";
+     } else if (value == '\f') {
+@@ -222,8 +222,8 @@ std::string StringMaker<char>::convert(char value) {
+         return chstr;
+     }
+ }
+-std::string StringMaker<signed char>::convert(signed char c) {
+-    return ::Catch::Detail::stringify(static_cast<char>(c));
++std::string StringMaker<char>::convert(char c) {
++    return ::Catch::Detail::stringify(static_cast<signed char>(c));
+ }
+ std::string StringMaker<unsigned char>::convert(unsigned char c) {
+     return ::Catch::Detail::stringify(static_cast<char>(c));
+-- 
+2.19.1
+

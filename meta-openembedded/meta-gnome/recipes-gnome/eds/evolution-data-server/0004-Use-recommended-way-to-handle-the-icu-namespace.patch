@@ -1,0 +1,46 @@
+From 698a0e104dcbe4b630df848fd4af7c59f76cdc37 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 5 May 2018 17:46:52 -0700
+Subject: [PATCH] Use recommended way to handle the icu namespace
+
+Fixes build with icu >= 61
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/libedataserver/e-alphabet-index-private.cpp | 2 ++
+ src/libedataserver/e-transliterator-private.cpp | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/src/libedataserver/e-alphabet-index-private.cpp b/src/libedataserver/e-alphabet-index-private.cpp
+index d3e44f4..ddffd99 100644
+--- a/src/libedataserver/e-alphabet-index-private.cpp
++++ b/src/libedataserver/e-alphabet-index-private.cpp
+@@ -33,9 +33,11 @@
+ 
+ /* ICU headers */
+ #include <unicode/alphaindex.h>
++#include <unicode/ustring.h>
+ 
+ using icu::AlphabeticIndex;
+ using icu::Locale;
++using U_ICU_NAMESPACE::UnicodeString;
+ 
+ struct _EAlphabetIndex {
+ 	AlphabeticIndex *priv;
+diff --git a/src/libedataserver/e-transliterator-private.cpp b/src/libedataserver/e-transliterator-private.cpp
+index bb15593..573446f 100644
+--- a/src/libedataserver/e-transliterator-private.cpp
++++ b/src/libedataserver/e-transliterator-private.cpp
+@@ -33,8 +33,10 @@
+ 
+ /* ICU headers */
+ #include <unicode/translit.h>
++#include <unicode/ustring.h>
+ 
+ using icu::Transliterator;
++using U_ICU_NAMESPACE::UnicodeString;
+ 
+ struct _ETransliterator {
+ 	Transliterator *priv;

@@ -1,4 +1,4 @@
-DISABLE_STATIC = " --disable-static"
+DISABLE_STATIC ?= " --disable-static"
 
 # qemu aborts on unrecognised option
 DISABLE_STATIC_pn-qemu = ""
@@ -36,6 +36,7 @@ DISABLE_STATIC_pn-libusb1-native = ""
 EXTRA_OECONF_append = "${DISABLE_STATIC}"
 
 EXTRA_OECMAKE_append_pn-libical = " -DSHARED_ONLY=True"
+EXTRA_OECMAKE_append_pn-libjpeg-turbo = " -DENABLE_STATIC=False"
 
 EXCONFIG_ARGS_append_pn-ncurses = " --without-normal"
 EXCONFIG_ARGS_append_pn-ncurses-native = " --without-normal"

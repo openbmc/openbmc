@@ -9,20 +9,20 @@ use "env TPM_SRK_PW=#WELLKNOWN#" to set well known password.
 
 Signed-off-by: Junxian.Xiao <Junxian.Xiao@windriver.com>
 
-diff --git a/e_tpm.c b/e_tpm.c
-index f3e8bcf..7dcb75a 100644
---- a/e_tpm.c
-+++ b/e_tpm.c
+Index: git/src/e_tpm.c
+===================================================================
+--- git.orig/src/e_tpm.c
++++ git/src/e_tpm.c
 @@ -38,6 +38,8 @@
- 
  #include "e_tpm.h"
+ #include "ssl_compat.h"
  
 +#define TPM_WELL_KNOWN_KEY_LEN 20   /*well know key length is 20 bytes zero*/
 +
  //#define DLOPEN_TSPI
  
  #ifndef OPENSSL_NO_HW
-@@ -248,6 +250,10 @@ int tpm_load_srk(UI_METHOD *ui, void *cb_data)
+@@ -262,6 +264,10 @@ int tpm_load_srk(UI_METHOD *ui, void *cb
  	TSS_RESULT result;
  	UINT32 authusage;
  	BYTE *auth;
@@ -33,7 +33,7 @@ index f3e8bcf..7dcb75a 100644
  
  	if (hSRK != NULL_HKEY) {
  		DBGFN("SRK is already loaded.");
-@@ -299,18 +305,36 @@ int tpm_load_srk(UI_METHOD *ui, void *cb_data)
+@@ -313,18 +319,36 @@ int tpm_load_srk(UI_METHOD *ui, void *cb
  		return 0;
  	}
  

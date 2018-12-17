@@ -1,4 +1,4 @@
-From dd6dbf6af396519380f48c0ef1ce6cf4dd77f6d7 Mon Sep 17 00:00:00 2001
+From 4d7ea681932556ad881f6841de90d0bfff56f8d7 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 15 Aug 2017 17:25:16 +0800
 Subject: [PATCH 5/7] fix a stack-usage warning
@@ -18,10 +18,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/backends/ppc_initreg.c b/backends/ppc_initreg.c
-index 69d623b..de41dec 100644
+index 3e4432f..59c2d97 100644
 --- a/backends/ppc_initreg.c
 +++ b/backends/ppc_initreg.c
-@@ -93,7 +93,7 @@ ppc_set_initial_registers_tid (pid_t tid __attribute__ ((unused)),
+@@ -94,7 +94,7 @@ ppc_set_initial_registers_tid (pid_t tid __attribute__ ((unused)),
  	return false;
      }
    const size_t gprs = sizeof (user_regs.r.gpr) / sizeof (*user_regs.r.gpr);
@@ -31,5 +31,5 @@ index 69d623b..de41dec 100644
      dwarf_regs[gpr] = user_regs.r.gpr[gpr];
    if (! setfunc (0, gprs, dwarf_regs, arg))
 -- 
-1.8.3.1
+2.7.4
 

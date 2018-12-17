@@ -5,11 +5,12 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b2beded7103a3d8a442a2a0391d607b0"
 SRC_URI = "git://anongit.freedesktop.org/piglit \
            file://0001-cmake-install-bash-completions-in-the-right-place.patch \
            file://0001-tests-Use-FE_UPWARD-only-if-its-defined-in-fenv.h.patch \
+           file://0001-cmake-use-proper-WAYLAND_INCLUDE_DIRS-variable.patch \
            "
 UPSTREAM_CHECK_COMMITS = "1"
 
-# From 2018-02-26
-SRCREV = "4ce0887e2f7f848d2be2e435a2d0f3c80e44ea3b"
+# From 2018-08-13
+SRCREV = "57859e15dc8ba4034348b04d0b72f213b74d6347"
 # (when PV goes above 1.0 remove the trailing r)
 PV = "1.0+gitr${SRCPV}"
 
@@ -17,7 +18,7 @@ S = "${WORKDIR}/git"
 
 DEPENDS = "libpng virtual/libx11 libxkbcommon libxrender waffle virtual/libgl libglu python3-mako-native python3-numpy-native python3-six-native virtual/egl"
 
-inherit cmake python3native distro_features_check bash-completion
+inherit cmake pkgconfig python3native distro_features_check bash-completion
 # depends on virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
 

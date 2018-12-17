@@ -7,7 +7,7 @@ This patch is taken from
 ftp://ftp.debian.org/debian/pool/main/b/blktool/blktool_4-7.debian.tar.xz
 
 Upstream-Status: Inappropriate [upstream is dead]
-Signed-off-by: Alexander Kanavin <alexander.kanavin@linux.intel.com>
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 
 ---
  util.c | 2 +-

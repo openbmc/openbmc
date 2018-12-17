@@ -6,11 +6,13 @@ LIC_FILES_CHKSUM = "file://LICENSE.Apache;md5=3b83ef96387f14655fc854ddc3c6bd57 \
                     file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://LICENSE.leveldb;md5=fb04ff57a14f308f2eed4a9b87d45837"
 
-SRCREV = "8969445642039566214d650cc6614849e7dd5e17"
-SRCBRANCH = "5.12.fb"
-PV = "5.12.2"
+SRCREV = "c60df9d9e7629fe208a9b848293a5599f83d5e77"
+SRCBRANCH = "5.13.fb"
+PV = "5.13.1"
 
-SRC_URI = "git://github.com/facebook/${BPN}.git;branch=${SRCBRANCH}"
+SRC_URI = "git://github.com/facebook/${BPN}.git;branch=${SRCBRANCH} \
+           file://0001-Fix-GitHub-issue-3716-gcc-8-warnings.patch \
+          "
 
 S = "${WORKDIR}/git"
 
@@ -28,5 +30,3 @@ EXTRA_OECMAKE = "\
     -DWITH_TESTS=OFF \
     -DWITH_TOOLS=OFF \
 "
-
-FILES_${PN}-dev += "${libdir}/cmake"

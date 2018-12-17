@@ -11,24 +11,20 @@ DEPENDS = "openssl flex-native bison-native open-isns util-linux"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=393a5ca445f6965873eca0259a17f833"
 
-SRCREV ?= "24580adc4c174bbc5dde3ae7594a46d57635e906"
+SRCREV ?= "bd79e4ed1004a6035d2538a308c5930890421a22"
 
 SRC_URI = "git://github.com/open-iscsi/open-iscsi \
-    file://initd.debian \
-    file://99_iscsi-initiator-utils \
-    file://iscsi-initiator \
-    file://iscsi-initiator.service \
-    file://iscsi-initiator-targets.service \
-    file://set_initiatorname \
-    file://0001-libopeniscsiusr-Include-limit.h-for-PATH_MAX.patch \
-    file://0002-libopeniscsiusr-Add-CFLAGS-to-linker-cmdline.patch \
-    file://0001-qedi.c-Removed-unused-linux-ethtool.h.patch \
-    file://0002-idbm.c-Include-fcnl.h-for-O_RDWR-and-O_CREAT-definit.patch \
-    file://0003-bnx2x.c-Reorder-the-includes-to-avoid-duplicate-defi.patch \
-    file://0004-fwparam_ppc.c-Do-not-use-__compar_fn_t.patch \
-"
+           file://initd.debian \
+           file://99_iscsi-initiator-utils \
+           file://iscsi-initiator \
+           file://iscsi-initiator.service \
+           file://iscsi-initiator-targets.service \
+           file://set_initiatorname \
+           "
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
+
+PV .= "+git${SRCPV}"
 
 inherit update-rc.d systemd autotools
 

@@ -1,0 +1,222 @@
+[
+  {
+    "test": {
+      "@alias": "bsps-qemu.bsps-tools.qemu_can_be_started_with_KVM_enabled",
+      "author": [
+        {
+          "email": "alexandru.c.georgescu@intel.com",
+          "name": "alexandru.c.georgescu@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Build a kernel with KVM enabled  \n\nIn Local.conf add  \n\nQEMU_USE_KVM = \"${@ 'intel-corei7-64 intel-core2-32 qemux86 qemux86-64' if os.access('/dev/kvm', os.R_OK|os.W_OK) else '' }\"  \n\n ",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Start qemu with option \"kvm\" with runqemu \n    a. If you start qemu with kvm failed, maybe it is because host not install kvm and vhost_net module. Follow below link to install them. \n    b. vhost_test refer:  https://wiki.yoctoproject.org/wiki/Running_an_x86_Yocto_Linux_image_under_QEMU_KVM \n    c. kvm refer: https://wiki.yoctoproject.org/wiki/How_to_enable_KVM_for_Poky_qemu",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Check if qemu starts up and if kvm_intel module is used",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "If kvm_intel module is not used when starting qemu, it will show 0 in \"Used by\" column when you run \"lsmod | grep kvm_intel\" ",
+          "expected_results": "KVM enabled with qemu \nExecute \"lsmod | grep kvm_intel\" from your host twice, before and after you \nstart the qemu with kvm option. Before start, the number should be 0, \nafter start, the number should bigger than 0."
+        }
+      },
+      "summary": "qemu_can_be_started_with_KVM_enabled"
+    }
+  },
+  {
+    "test": {
+      "@alias": "bsps-qemu.bsps-tools.Post-installation_logging",
+      "author": [
+        {
+          "email": "yi.zhao@windriver.com",
+          "name": "yi.zhao@windriver.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Download the poky source and set environment \n",
+          "expected_results": "The /var/log/postinstall.log should exist in the first boot. The content of this log is like below:  \n\nRunning postinst /etc/rpm-postinsts/man... \nList directory to check the output log \nbin \nboot \ndev \netc \nhome \nlib \nlost+found \nmedia \nmnt \nproc \nrun \nsbin \nsys \ntmp \nusr \nvar \nList nonexist directory to check the stderr redirection log \nls: /nonexist: No such file or directory "
+        },
+        "2": {
+          "action": "Add the following lines to a .bb file. For expample, meta/recipes-connectivity/openssh/openssh_6.2p2.bb:   \n\npkg_postinst_ontarget_${PN} () {  \n       #!/bin/sh -e  \n       if [ x\"$D\" = \"x\" ]; then  \n       echo \"List directory to check the output log\"  \n       ls /  \n       echo \"List nonexist directory to check the stderr redirection log\"  \n       ls /nonexist  \n       else  \n       exit 1  \n       fi  \n}  \n\nMake sure the feature \"debug-tweaks\" is added in conf/local.conf \n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Add ssh-server-openssh to EXTRA_IMAGE_FEATURES in local.conf \n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "Build core-image-minimal \n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "Boot up the image and check the /var/log/postinstall.log  ",
+          "expected_results": ""
+        }
+      },
+      "summary": "Post-installation_logging"
+    }
+  },
+  {
+    "test": {
+      "@alias": "bsps-qemu.bsps-tools.Add_user_with_cleartext_type_password_during_filesystem_construction",
+      "author": [
+        {
+          "email": "ke.zou@windriver.com",
+          "name": "ke.zou@windriver.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Download the poky source and set the environment  \n\n",
+          "expected_results": "No error during image building procedure. \n"
+        },
+        "2": {
+          "action": "Add the following lines in conf/local.conf  \n\nINHERIT += \"extrausers\"  \n\nEXTRA_USERS_PARAMS = \"\\ \nuseradd -s /bin/sh -P 'tester3' tester3;\\ \n\"  \n\nThe above settings do the following things: \na. Add a user tester3 with cleartext password 'tester3' ",
+          "expected_results": "Image can boot up \n"
+        },
+        "3": {
+          "action": "Build the image\n ",
+          "expected_results": "Login with user name \"tester3\" and password \"tester3\" "
+        }
+      },
+      "summary": "Add_user_with_cleartext_type_password_during_filesystem_construction"
+    }
+  },
+  {
+    "test": {
+      "@alias": "bsps-qemu.bsps-tools.rpm_-__install_dependency_package",
+      "author": [
+        {
+          "email": "alexandru.c.georgescu@intel.com",
+          "name": "alexandru.c.georgescu@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Get a not previously installed RPM package or build one on local machine, which should have run-time dependency.For example, \"mc\" (Midnight Commander, which is a visual file manager) should depend on \"ncurses-terminfo\".   \n\n$ bitbake mc  \n\n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Copy the package into a system folder (for example /home/root/rpm_packages).  \n\n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Run \"rpm -ivh package_name\" and check the output, for example \"rpm -ivh mc.rpm*\" should report the dependency on \"ncurses-terminfo\".\n\n\n\n",
+          "expected_results": "3 . rpm command should report message when some RPM installation depends on other packages."
+        }
+      },
+      "summary": "rpm_-__install_dependency_package"
+    }
+  },
+  {
+    "test": {
+      "@alias": "bsps-qemu.bsps-tools.Check_rpm_install/removal_log_file_size(auto)",
+      "author": [
+        {
+          "email": "alexandru.c.georgescu@intel.com",
+          "name": "alexandru.c.georgescu@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Get some rpm or other kind of installation packages.  \n\n",
+          "expected_results": "Steps 1- 4 (more than 2.3) \nEach file will occupy around 10MB, and there should be some method to keep rpm log in a small size. (the size of the db of RPMs must not be taking so much space)  \nStep 5 (less than or equal to 2.3)\nThe size on /var/lib/rpm/ must keep around 30MB"
+        },
+        "2": {
+          "action": "After system is up, check the size of log file named as \"log.xxxxxx\" on  /var/lib/rpm/log  \n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "After several install/removal of packages, with either of the install/removal commands   (rpm/smart/zypper/dnf install/removal), check again the size of log file.  \n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "For packages installation, there will be some database files under /var/lib/rpm/, named as \"__db.xxx\" and there will be some log files   \nunder /var/lib/rpm/log, named as \"\"log.xxxxxx\"\".   \n\nNote: You will only see the log.xxxx on /var/lib/rpm/log mentioned above if the poky version is minor than 2.3.For poky 2.3 or major versions this has been modified and the package RPM4 does not show the logs.xxxx. if major, follow the next step.  \n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "Repeat steps (1 and 3)  and check the size of /var/lib/rpm/  \n\nMore info: https://bugzilla.yoctoproject.org/show_bug.cgi?id=9259",
+          "expected_results": ""
+        }
+      },
+      "summary": "Check_rpm_install/removal_log_file_size"
+    }
+  },
+  {
+    "test": {
+      "@alias": "bsps-qemu.bsps-runtime.only_one_connmand_in_background(auto)",
+      "author": [
+        {
+          "email": "alexandru.c.georgescu@intel.com",
+          "name": "alexandru.c.georgescu@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Boot system",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Run \"ps aux |grep connmand\" or \"ps -ef | grep connmand\" or \"ps | grep connmand\"",
+          "expected_results": "Connmand (connection manager, used to manage internet connections)  should be shown as an active process \n\n"
+        },
+        "3": {
+          "action": "Run command \"connmand\" to try to launch to a second connmand process",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "Check, with \"ps\" connmand  if a second connmand can be generated ",
+          "expected_results": "There should be only one connmand process instance in background ."
+        }
+      },
+      "summary": "only_one_connmand_in_background"
+    }
+  },
+  {
+    "test": {
+      "@alias": "bsps-qemu.bsps-runtime.X_server_can_start_up_with_runlevel_5_boot",
+      "author": [
+        {
+          "email": "alexandru.c.georgescu@intel.com",
+          "name": "alexandru.c.georgescu@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "boot up system with default runlevel  \n\n",
+          "expected_results": "X server can start up well and desktop display has no problem .  \n\n"
+        },
+        "2": {
+          "action": "type runlevel at command prompt",
+          "expected_results": "Output:N 5"
+        }
+      },
+      "summary": "X_server_can_start_up_with_runlevel_5_boot"
+    }
+  },
+  {
+    "test": {
+      "@alias": "bsps-qemu.bsps-runtime.check_bash_in_image",
+      "author": [
+        {
+          "email": "alexandru.c.georgescu@intel.com",
+          "name": "alexandru.c.georgescu@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "After system is up, check if bash command exists with command \"which bash\"",
+          "expected_results": "bash command should exist in image giving something as below  \"/bin/bash\""
+        }
+      },
+      "summary": "check_bash_in_image"
+    }
+  }
+]

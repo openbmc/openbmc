@@ -5,11 +5,11 @@ DEPENDS = "glib-2.0 zlib pixman"
 RDEPENDS_${PN}_class-target += "bash"
 
 require qemu-targets.inc
-inherit autotools pkgconfig bluetooth
+inherit pkgconfig bluetooth
 BBCLASSEXTEND = "native nativesdk"
 
 # QEMU_TARGETS is overridable variable
-QEMU_TARGETS ?= "arm aarch64 i386 mips mipsel mips64 mips64el ppc sh4 x86_64"
+QEMU_TARGETS ?= "arm aarch64 i386 mips mipsel mips64 mips64el ppc riscv32 riscv64 sh4 x86_64"
 
 EXTRA_OECONF = " \
     --prefix=${prefix} \
@@ -27,6 +27,7 @@ EXTRA_OECONF = " \
     --disable-werror \
     --target-list=${@get_qemu_target_list(d)} \
     --extra-cflags='${CFLAGS}' \
+    ${PACKAGECONFIG_CONFARGS} \
     "
 EXTRA_OECONF_append_class-native = " --python=python2.7"
 
@@ -36,27 +37,23 @@ LDFLAGS_append_class-native = " -fuse-ld=bfd"
 
 export LIBTOOL="${HOST_SYS}-libtool"
 
+B = "${WORKDIR}/build"
+
 do_configure_prepend_class-native() {
 	# Append build host pkg-config paths for native target since the host may provide sdl
 	BHOST_PKGCONFIG_PATH=$(PATH=/usr/bin:/bin pkg-config --variable pc_path pkg-config || echo "")
 	if [ ! -z "$BHOST_PKGCONFIG_PATH" ]; then
 		export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$BHOST_PKGCONFIG_PATH
 	fi
-
-	# Alter target makefiles to accept CFLAGS set via env
-	sed -i -r \
-		-e 's/^(C|OP_C|HELPER_C)FLAGS=/\1FLAGS+=/' \
-		"${S}"/Makefile "${S}"/Makefile.target
 }
 
 do_configure() {
     ${S}/configure ${EXTRA_OECONF}
-    test ! -e ${S}/target-i386/beginend_funcs.sh || chmod a+x ${S}/target-i386/beginend_funcs.sh
 }
 
 do_install () {
-	export STRIP="true"
-	autotools_do_install
+	export STRIP=""
+	oe_runmake 'DESTDIR=${D}' install
 }
 
 # The following fragment will create a wrapper for qemu-mips user emulation
@@ -74,10 +71,9 @@ do_install_append() {
 # END of qemu-mips workaround
 
 PACKAGECONFIG ??= " \
-	fdt sdl \
-	fdt sdl kvm \
-	${@bb.utils.filter('DISTRO_FEATURES', 'alsa xen', d)} \
-	"
+    fdt sdl kvm \
+    ${@bb.utils.filter('DISTRO_FEATURES', 'alsa xen', d)} \
+"
 PACKAGECONFIG_class-native ??= "fdt alsa kvm"
 PACKAGECONFIG_class-nativesdk ??= "fdt sdl kvm"
 
@@ -88,7 +84,7 @@ PACKAGECONFIG_class-native_remove = "${@'kvm' if not os.path.exists('/usr/includ
 PACKAGECONFIG_remove_darwin = "kvm"
 PACKAGECONFIG_remove_mingw32 = "kvm"
 
-PACKAGECONFIG[sdl] = "--enable-sdl,--disable-sdl,libsdl"
+PACKAGECONFIG[sdl] = "--enable-sdl --with-sdlabi=2.0,--disable-sdl,libsdl2"
 PACKAGECONFIG[virtfs] = "--enable-virtfs --enable-attr,--disable-virtfs,libcap attr,"
 PACKAGECONFIG[aio] = "--enable-linux-aio,--disable-linux-aio,libaio,"
 PACKAGECONFIG[xfs] = "--enable-xfsctl,--disable-xfsctl,xfsprogs,"
@@ -115,5 +111,10 @@ PACKAGECONFIG[bzip2] = "--enable-bzip2,--disable-bzip2,bzip2"
 PACKAGECONFIG[bluez] = "--enable-bluez,--disable-bluez,${BLUEZ}"
 PACKAGECONFIG[libiscsi] = "--enable-libiscsi,--disable-libiscsi"
 PACKAGECONFIG[kvm] = "--enable-kvm,--disable-kvm"
+PACKAGECONFIG[virglrenderer] = "--enable-virglrenderer,--disable-virglrenderer,virglrenderer"
+# spice will be in meta-networking layer
+PACKAGECONFIG[spice] = "--enable-spice,--disable-spice,spice"
+# usbredir will be in meta-networking layer
+PACKAGECONFIG[usb-redir] = "--enable-usb-redir,--disable-usb-redir,usbredir"
 
 INSANE_SKIP_${PN} = "arch"

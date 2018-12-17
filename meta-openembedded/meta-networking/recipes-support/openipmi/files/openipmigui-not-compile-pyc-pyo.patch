@@ -1,0 +1,26 @@
+openipmi load swig/python/.libs/_OpenIPMI.so to create .pyc and .pyo files.
+It fails when multilib is enable:
+
+| ImportError: .../lib32-openipmi/2.0.25-r0/OpenIPMI-2.0.25/swig/python/.libs/_OpenIPMI.so: wrong ELF class: ELFCLASS32
+
+Don't compile and install .pyc and .pyo files to fix the failure.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+diff --git a/swig/python/openipmigui/Makefile.am b/swig/python/openipmigui/Makefile.am
+index 570e7b9..88258bf 100644
+--- a/swig/python/openipmigui/Makefile.am
++++ b/swig/python/openipmigui/Makefile.am
+@@ -34,9 +34,9 @@ localcopy:
+ 		fi \
+ 	done
+ 
+-all-local: localcopy $(PYC_FILES) $(PYO_FILES)
++all-local: localcopy
+ 
+-install-exec-local: $(EXTRA_DIST) $(PYC_FILES) $(PYO_FILES)
++install-exec-local: $(EXTRA_DIST)
+ 	$(INSTALL) -d $(DESTDIR)$(PYTHON_INSTALL_DIR)/openipmigui
+ 	$(INSTALL_DATA) $^ $(DESTDIR)$(PYTHON_INSTALL_DIR)/openipmigui
+ 

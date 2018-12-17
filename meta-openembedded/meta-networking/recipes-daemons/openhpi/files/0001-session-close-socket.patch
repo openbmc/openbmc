@@ -1,0 +1,37 @@
+From b8bc6bfdb5e7fb5b46d3a830e04632939bee6b98 Mon Sep 17 00:00:00 2001
+From: Catalin Enache <catalin.enache@windriver.com>
+Date: Fri, 9 Feb 2018 16:35:11 +0200
+Subject: [PATCH] saHpiSessionClose: close socket
+
+saHpiSessionClose leaks file descriptors
+
+Upstream issue: https://github.com/open-hpi/openhpi/issues/1918
+
+Upstream-Status: Pending
+
+Signed-off-by: Catalin Enache <catalin.enache@windriver.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ baselib/session.cpp | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/baselib/session.cpp b/baselib/session.cpp
+index c5edfc8..4ece1b7 100644
+--- a/baselib/session.cpp
++++ b/baselib/session.cpp
+@@ -126,6 +126,12 @@ cSession::cSession()
+ 
+ cSession::~cSession()
+ {
++	cClientStreamSock * sock;
++	gpointer ptr = wrap_g_static_private_get( &m_sockets );
++	if ( ptr ) {
++	    sock = reinterpret_cast<cClientStreamSock *>(ptr);
++	    sock->Close();
++	}
+     wrap_g_static_private_free( &m_sockets );
+ }
+ 
+-- 
+2.10.2
+

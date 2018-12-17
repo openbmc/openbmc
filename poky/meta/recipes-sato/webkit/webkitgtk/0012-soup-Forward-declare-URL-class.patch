@@ -1,0 +1,31 @@
+From 59f6903ad96f3213f248b672d5fd526cc0d666ce Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 20 May 2018 14:28:27 -0700
+Subject: [PATCH] soup: Forward declare URL class
+
+This helps getting away with compiler errors seen with clang
+
+/mnt/a/oe/workspace/sources/webkitgtk/Source/WebCore/platform/network/soup/SoupNetworkSession.h:68:62:
+error: unknown type name 'URL'
+    static std::optional<ResourceError> checkTLSErrors(const URL&,
+GTlsCertificate*, GTlsCertificateFlags);
+                                                             ^
+Upstream-Status: Backport [https://trac.webkit.org/changeset/231876/webkit]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Source/WebCore/platform/network/soup/SoupNetworkSession.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Source/WebCore/platform/network/soup/SoupNetworkSession.h b/Source/WebCore/platform/network/soup/SoupNetworkSession.h
+index 03bd72ba..7ca8792d 100644
+--- a/Source/WebCore/platform/network/soup/SoupNetworkSession.h
++++ b/Source/WebCore/platform/network/soup/SoupNetworkSession.h
+@@ -43,6 +43,7 @@ namespace WebCore {
+ 
+ class CertificateInfo;
+ class ResourceError;
++class URL;
+ struct SoupNetworkProxySettings;
+ 
+ class SoupNetworkSession {

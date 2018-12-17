@@ -1,0 +1,14 @@
+[Unit]
+Description=Lightweight UPnP IGD daemon
+Documentation=man:miniupnpd(8)
+After=network.target
+
+[Service]
+Type=forking
+ExecStartPre=/etc/miniupnpd/iptables_init.sh
+ExecStart=/usr/sbin/miniupnpd -f /etc/miniupnpd/miniupnpd.conf
+ExecStopPost=/etc/miniupnpd/iptables_removeall.sh
+PIDFile=/run/miniupnpd.pid
+
+[Install]
+WantedBy=network.target

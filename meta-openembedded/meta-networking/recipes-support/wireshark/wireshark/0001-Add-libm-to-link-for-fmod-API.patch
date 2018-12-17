@@ -1,0 +1,29 @@
+From 1a6a5d2bcb1adec9ba138c2ebee7bbc994620aff Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 12 Jun 2018 23:23:44 -0700
+Subject: [PATCH] Add libm to link for fmod() API
+
+fixes
+ld: CMakeFiles/tshark.dir/ui/cli/tap-comparestat.c.o: undefined reference to symbol 'fmod@@GLIBC_2.2.5'
+| /mnt/a/oe/build/tmp/work/core2-64-bec-linux/wireshark/1_2.6.1-r0/recipe-sysroot/lib/libm.so.6: error adding symbols: DSO missing from command line
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7950e85..acee140 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -2494,6 +2494,7 @@ if(BUILD_tshark)
+ 		${LIBEPAN_LIBS}
+ 		${APPLE_CORE_FOUNDATION_LIBRARY}
+ 		${APPLE_SYSTEM_CONFIGURATION_LIBRARY}
++		m
+ 	)
+ 	set(tshark_FILES
+ 		capture_opts.c
+-- 
+2.17.1
+

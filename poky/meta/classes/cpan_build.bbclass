@@ -30,7 +30,7 @@ cpan_build_do_configure () {
 }
 
 cpan_build_do_compile () {
-        perl Build verbose=1
+        perl Build --perl "${bindir}/perl" verbose=1
 }
 
 cpan_build_do_install () {

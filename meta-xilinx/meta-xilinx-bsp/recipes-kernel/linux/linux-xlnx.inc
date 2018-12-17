@@ -23,6 +23,8 @@ do_kernel_metadata_prepend () {
 	[ -n "${KBUILD_DEFCONFIG}" ] && [ -e ${WORKDIR}/defconfig ] && rm ${WORKDIR}/defconfig
 }
 
+inherit kernel-simpleimage
+
 # Default to be only compatible with specific machines or soc families
 COMPATIBLE_MACHINE ?= "^$"
 COMPATIBLE_MACHINE_zynq = ".*"
@@ -42,4 +44,7 @@ SRC_URI_append = " file://xilinx-kmeta;type=kmeta;name=xilinx-kmeta;destsuffix=x
 # MicroBlaze BSP fragments
 KERNEL_FEATURES_append_kc705-microblazeel = " bsp/kc705-microblazeel/kc705-microblazeel.scc"
 
-KERNEL_FEATURES_zynqmp += "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' bsp/xilinx/xen.scc', '', d)}"
+KERNEL_FEATURES_append_zynqmp = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' bsp/xilinx/xen.scc', '', d)}"
+
+KERNEL_FEATURES_append_zynqmp = "${@bb.utils.contains('IMAGE_FEATURES', 'fpga-manager', ' features/overlay/overlay.scc', '', d)}"
+

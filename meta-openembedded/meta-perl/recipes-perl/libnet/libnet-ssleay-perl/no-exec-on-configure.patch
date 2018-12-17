@@ -1,0 +1,33 @@
+--- a/inc/Module/Install/PRIVATE/Net/SSLeay.pm	2018-08-27 14:56:24.788544991 +0200
++++ b/inc/Module/Install/PRIVATE/Net/SSLeay.pm	2018-08-27 15:00:12.847266331 +0200
+@@ -24,20 +24,7 @@
+     $self->requires_external_cc;
+ 
+     my $prefix = $self->find_openssl_prefix;
+-    my $exec   = $self->find_openssl_exec($prefix);
+-
+-    unless (-x $exec) {
+-        print <<EOM;
+-*** Could not find OpenSSL
+-    If it's already installed, please set the OPENSSL_PREFIX environment
+-    variable accordingly. If it isn't installed yet, get the latest version
+-    from http://www.openssl.org/.
+-EOM
+-        exit 0; # according http://wiki.cpantesters.org/wiki/CPANAuthorNotes this is best-practice when "missing library"
+-    }
+-
+-    $self->check_openssl_version($prefix, $exec);
+-    my $opts = $self->ssleay_get_build_opts($prefix, $exec);
++    my $opts = $self->ssleay_get_build_opts($prefix);
+ 
+     $self->makemaker_args(
+         CCCDLFLAGS => $opts->{cccdlflags},
+@@ -58,7 +45,7 @@
+ }
+ 
+ sub ssleay_get_build_opts {
+-    my ($self, $prefix, $exec) = @_;
++    my ($self, $prefix) = @_;
+ 
+     my $opts = {
+         lib_links  => [],

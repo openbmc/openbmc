@@ -86,7 +86,7 @@ function mrbSectionInit(ctx){
           if (buildFinished(build)) {
             // a build finished: reload the whole page so that the build
             // shows up in the builds table
-            window.location.reload();
+            window.location.reload(true);
           }
           else if (stateChanged(build)) {
             // update the whole template
@@ -110,6 +110,8 @@ function mrbSectionInit(ctx){
             // update the clone progress text
             selector = '#repos-cloned-percentage-' + build.id;
             $(selector).html(build.repos_cloned_percentage);
+            selector = '#repos-cloned-progressitem-' + build.id;
+            $(selector).html('('+build.progress_item+')');
 
             // update the recipe progress bar
             selector = '#repos-cloned-percentage-bar-' + build.id;

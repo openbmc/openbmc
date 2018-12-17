@@ -11,7 +11,7 @@ Index: Python-2.7.14/configure.ac
  
 +AC_SUBST(LIB)
 +AC_MSG_CHECKING(LIB)
-+LIB=`basename ${libdir}`
++LIB="SEDMELIBLEAF"
 +AC_MSG_RESULT($LIB)
  
  AC_SUBST(LIBRARY)

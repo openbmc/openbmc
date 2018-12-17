@@ -25,3 +25,7 @@ SRC_URI[sha256sum] = "bc897f1ab6f5b4989f85548799aaeb84fde67bbba18e40341bfe1d7885
 do_compile_prepend() {
     sed -e 's/@VERSION@/${PV}/g' setup.py.in > setup.py
 }
+
+# http://errors.yoctoproject.org/Errors/Details/184713/
+# python-native/python: can't open file 'setup.py': [Errno 2] No such file or directory
+CLEANBROKEN = "1"

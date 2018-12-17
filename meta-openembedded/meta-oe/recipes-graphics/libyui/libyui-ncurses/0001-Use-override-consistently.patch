@@ -1,0 +1,147 @@
+From 0acfb67f99fd8d6af323311fee8c08116295b148 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 5 Sep 2018 18:21:19 -0700
+Subject: [PATCH 1/2] Use override consistently
+
+Make clang++ happy
+error: 'setApplicationTitle' overrides a member function but is not marked 'override' [-Werror,-Winconsistent-missing-over ride]
+
+Upstream-Status: Submitted [https://github.com/libyui/libyui-ncurses/pull/69]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/NCApplication.h | 46 ++++++++++++++++++++++-----------------------
+ 1 file changed, 23 insertions(+), 23 deletions(-)
+
+diff --git a/src/NCApplication.h b/src/NCApplication.h
+index e24c3eb..09e4708 100644
+--- a/src/NCApplication.h
++++ b/src/NCApplication.h
+@@ -60,7 +60,7 @@ public:
+      * Reimplemented from YApplication.
+      **/
+     virtual void setLanguage( const std::string & language,
+-			      const std::string & encoding = std::string() );
++			      const std::string & encoding = std::string() ) override;
+ 
+     /**
+      * Open a directory selection box and prompt the user for an existing
+@@ -77,7 +77,7 @@ public:
+      * Implemented from YApplication.
+      **/
+     virtual std::string askForExistingDirectory( const std::string & startDir,
+-					    const std::string & headline );
++					    const std::string & headline ) override;
+ 
+     /**
+      * Open a file selection box and prompt the user for an existing file.
+@@ -97,7 +97,7 @@ public:
+      **/
+     virtual std::string askForExistingFile( const std::string & startWith,
+ 				       const std::string & filter,
+-				       const std::string & headline );
++				       const std::string & headline ) override;
+ 
+     /**
+      * Open a file selection box and prompt the user for a file to save data
+@@ -119,28 +119,28 @@ public:
+      **/
+     virtual std::string askForSaveFileName( const std::string & startWith,
+ 				       const std::string & filter,
+-				       const std::string & headline );
++				       const std::string & headline ) override;
+ 
+     /**
+      * Beep.
+      *
+      * Reimplemented from YApplication.
+      **/
+-    virtual void beep();
++    virtual void beep() override;
+ 
+     /**
+      * Redraw the screen.
+      *
+      * Reimplemented from YApplication.
+      **/
+-    virtual void redrawScreen();
++    virtual void redrawScreen() override;
+ 
+     /**
+      * Initialize the (text) console keyboard.
+      *
+      * Reimplemented from YApplication.
+      **/
+-    virtual void initConsoleKeyboard();
++    virtual void initConsoleKeyboard() override;
+ 
+     /**
+      * Set the (text) console font according to the current encoding etc.
+@@ -152,7 +152,7 @@ public:
+ 				 const std::string & font,
+ 				 const std::string & screen_map,
+ 				 const std::string & unicode_map,
+-				 const std::string & language );
++				 const std::string & language ) override;
+ 
+     /**
+      * Run a shell command (typically an interactive program using NCurses)
+@@ -165,7 +165,7 @@ public:
+      *
+      * Reimplemented from YApplication.
+      **/
+-    virtual int runInTerminal( const std::string & command );
++    virtual int runInTerminal( const std::string & command ) override;
+ 
+ 
+     /// @{
+@@ -183,33 +183,33 @@ public:
+     //
+     // All implemented from YApplication.
+ 
+-    virtual int	 displayWidth();
+-    virtual int	 displayHeight();
+-    virtual int	 displayDepth();
+-    virtual long displayColors();
++    virtual int	 displayWidth() override;
++    virtual int	 displayHeight() override;
++    virtual int	 displayDepth() override;
++    virtual long displayColors() override;
+ 
+-    virtual int	 defaultWidth();
+-    virtual int	 defaultHeight();
++    virtual int	 defaultWidth() override;
++    virtual int	 defaultHeight() override;
+ 
+-    virtual bool isTextMode()			{ return true; }
++    virtual bool isTextMode() override			{ return true; }
+ 
+-    virtual bool hasImageSupport()		{ return false; }
++    virtual bool hasImageSupport() override 		{ return false; }
+ 
+-    virtual bool hasIconSupport()		{ return false; }
++    virtual bool hasIconSupport() override		{ return false; }
+ 
+-    virtual bool hasAnimationSupport()		{ return false; }
++    virtual bool hasAnimationSupport()	override	{ return false; }
+ 
+-    virtual bool hasFullUtf8Support();
+-    virtual bool richTextSupportsTable()	{ return false; }
++    virtual bool hasFullUtf8Support() override;
++    virtual bool richTextSupportsTable() override	{ return false; }
+ 
+-    virtual bool leftHandedMouse()		{ return false; }
++    virtual bool leftHandedMouse() override		{ return false; }
+     
+     /**
+      * Set the application title
+      *
+      * Reimplemented from YApplication.
+      **/
+-    virtual void setApplicationTitle(const std::string& title);
++    virtual void setApplicationTitle(const std::string& title) override;
+ };
+ 
+ 
+-- 
+2.18.0
+

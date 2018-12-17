@@ -98,9 +98,12 @@ python () {
 
         # There is a corner case with "gcc-source-${PV}" recipes, they don't have
         # the "do_configure" task, so we need to use "do_preconfigure"
-        if pn.startswith("gcc-source-"):
+        def hasTask(task):
+            return bool(d.getVarFlag(task, "task", False)) and not bool(d.getVarFlag(task, "noexec", False))
+
+        if hasTask("do_preconfigure"):
             d.appendVarFlag('do_ar_configured', 'depends', ' %s:do_preconfigure' % pn)
-        else:
+        elif hasTask("do_configure"):
             d.appendVarFlag('do_ar_configured', 'depends', ' %s:do_configure' % pn)
         d.appendVarFlag('do_deploy_archives', 'depends', ' %s:do_ar_configured' % pn)
 
@@ -243,21 +246,26 @@ python do_ar_configured() {
         # do_configure, we archive the already configured ${S} to
         # instead of.
         elif pn != 'libtool-native':
+            def runTask(task):
+                prefuncs = d.getVarFlag(task, 'prefuncs') or ''
+                for func in prefuncs.split():
+                    if func != "sysroot_cleansstate":
+                        bb.build.exec_func(func, d)
+                bb.build.exec_func(task, d)
+                postfuncs = d.getVarFlag(task, 'postfuncs') or ''
+                for func in postfuncs.split():
+                    if func != 'do_qa_configure':
+                        bb.build.exec_func(func, d)
+
             # Change the WORKDIR to make do_configure run in another dir.
             d.setVar('WORKDIR', d.getVar('ARCHIVER_WORKDIR'))
-            if bb.data.inherits_class('kernel-yocto', d):
-                bb.build.exec_func('do_kernel_configme', d)
-            if bb.data.inherits_class('cmake', d):
-                bb.build.exec_func('do_generate_toolchain_file', d)
-            prefuncs = d.getVarFlag('do_configure', 'prefuncs')
-            for func in (prefuncs or '').split():
-                if func != "sysroot_cleansstate":
-                    bb.build.exec_func(func, d)
-            bb.build.exec_func('do_configure', d)
-            postfuncs = d.getVarFlag('do_configure', 'postfuncs')
-            for func in (postfuncs or '').split():
-                if func != "do_qa_configure":
-                    bb.build.exec_func(func, d)
+
+            preceeds = bb.build.preceedtask('do_configure', False, d)
+            for task in preceeds:
+                if task != 'do_patch' and task != 'do_prepare_recipe_sysroot':
+                    runTask(task)
+            runTask('do_configure')
+
         srcdir = d.getVar('S')
         builddir = d.getVar('B')
         if srcdir != builddir:

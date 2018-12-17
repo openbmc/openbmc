@@ -25,6 +25,8 @@ SRC_URI = "http://ftp.netbsd.org/pub/NetBSD/misc/ipsec-tools/0.8/ipsec-tools-${P
            file://0001-Fix-header-issues-found-with-musl-libc.patch \
            file://0002-cfparse-clear-memory-equal-to-size-of-array.patch \
            file://fix-CVE-2016-10396.patch \
+           file://0001-Disable-gcc8-specific-warnings.patch \
+           file://0001-ipsec-tools-add-openssl-1.1-support.patch \
            "
 SRC_URI[md5sum] = "d53ec14a0a3ece64e09e5e34b3350b41"
 SRC_URI[sha256sum] = "8eb6b38716e2f3a8a72f1f549c9444c2bc28d52c9536792690564c74fe722f2d"

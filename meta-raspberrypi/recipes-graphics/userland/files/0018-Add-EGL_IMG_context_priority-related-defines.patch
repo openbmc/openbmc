@@ -1,0 +1,35 @@
+From 9cfea4761ba68776fd9bfac671b74c7174f99029 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 15 Jul 2018 00:48:38 -0700
+Subject: [PATCH 18/18] Add EGL_IMG_context_priority related defines
+
+These defines are needed for compiling weston 4.x
+taken from Khronos headers
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ interface/khronos/include/EGL/eglext.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/interface/khronos/include/EGL/eglext.h b/interface/khronos/include/EGL/eglext.h
+index dcc90ce..6842bf9 100755
+--- a/interface/khronos/include/EGL/eglext.h
++++ b/interface/khronos/include/EGL/eglext.h
+@@ -93,6 +93,14 @@ typedef EGLImageKHR (EGLAPIENTRYP PFNEGLCREATEIMAGEKHRPROC) (EGLDisplay dpy, EGL
+ typedef EGLBoolean (EGLAPIENTRYP PFNEGLDESTROYIMAGEKHRPROC) (EGLDisplay dpy, EGLImageKHR image);
+ #endif
+ 
++#ifndef EGL_IMG_context_priority
++#define EGL_IMG_context_priority 1
++#define EGL_CONTEXT_PRIORITY_LEVEL_IMG		0x3102
++#define EGL_CONTEXT_PRIORITY_HIGH_IMG		0x3101
++#define EGL_CONTEXT_PRIORITY_MEDIUM_IMG		0x3102
++#define EGL_CONTEXT_PRIORITY_LOW_IMG		0x3103
++#endif /* EGL_IMG_context_priority */
++
+ #ifndef EGL_KHR_vg_parent_image
+ #define EGL_KHR_vg_parent_image 1
+ #define EGL_VG_PARENT_IMAGE_KHR			0x30BA	/* eglCreateImageKHR target */
+-- 
+2.19.1
+

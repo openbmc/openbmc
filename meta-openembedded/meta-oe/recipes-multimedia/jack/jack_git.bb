@@ -14,7 +14,9 @@ LIC_FILES_CHKSUM = " \
 
 DEPENDS = "libsamplerate0 libsndfile1 readline"
 
-SRC_URI = "git://github.com/jackaudio/jack2.git"
+SRC_URI = "git://github.com/jackaudio/jack2.git \
+           file://0001-Python-3.7-fixes-2126.patch \
+           "
 SRCREV = "c1647819eed6d11f94b21981d9c869629299f357"
 PV = "1.9.12"
 S = "${WORKDIR}/git"

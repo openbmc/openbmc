@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+if [ -x $D${libexecdir}/${binprefix}gtk-query-immodules-2.0 ]; then
+    PSEUDO_UNLOAD=1 ${binprefix}qemuwrapper -L $D $D${libexecdir}/${binprefix}gtk-query-immodules-2.0 \
+        > $D${libdir}/gtk-2.0/2.10.0/immodules.cache &&
+        sed -i -e "s:$D::" $D${libdir}/gtk-2.0/2.10.0/immodules.cache
+        chown root:root $D${libdir}/gtk-2.0/2.10.0/immodules.cache
+fi
+if [ -x $D${libexecdir}/${binprefix}gtk-query-immodules-3.0 ]; then
+    PSEUDO_UNLOAD=1 ${binprefix}qemuwrapper -L $D $D${libexecdir}/${binprefix}gtk-query-immodules-3.0 \
+        > $D${libdir}/gtk-3.0/3.0.0/immodules.cache &&
+        sed -i -e "s:$D::" $D${libdir}/gtk-3.0/3.0.0/immodules.cache
+        chown root:root $D${libdir}/gtk-3.0/3.0.0/immodules.cache
+fi

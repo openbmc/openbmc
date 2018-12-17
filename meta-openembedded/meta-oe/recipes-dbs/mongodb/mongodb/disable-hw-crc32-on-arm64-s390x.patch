@@ -5,7 +5,7 @@ Index: git/src/third_party/wiredtiger/SConscript
 ===================================================================
 --- git.orig/src/third_party/wiredtiger/SConscript
 +++ git/src/third_party/wiredtiger/SConscript
-@@ -169,7 +169,9 @@ if useSnappy:
+@@ -181,7 +181,9 @@ if useSnappy:
  # If not available at runtime, we fall back to software in some cases.
  #
  # On zSeries we may disable because SLES 11 kernel doe not support the instructions.
@@ -32,7 +32,7 @@ Index: git/src/third_party/wiredtiger/src/checksum/zseries/crc32-s390x.c
 ===================================================================
 --- git.orig/src/third_party/wiredtiger/src/checksum/zseries/crc32-s390x.c
 +++ git/src/third_party/wiredtiger/src/checksum/zseries/crc32-s390x.c
-@@ -78,6 +78,7 @@ unsigned int __wt_crc32c_le(unsigned int
+@@ -77,6 +77,7 @@ unsigned int __wt_crc32c_le(unsigned int
  		return crc;                                                 \
  	}
  
@@ -40,7 +40,7 @@ Index: git/src/third_party/wiredtiger/src/checksum/zseries/crc32-s390x.c
  /* Main CRC-32 functions */
  DEFINE_CRC32_VX(__wt_crc32c_le_vx, __wt_crc32c_le_vgfm_16, __wt_crc32c_le)
  
-@@ -90,6 +91,7 @@ __wt_checksum_hw(const void *chunk, size
+@@ -89,6 +90,7 @@ __wt_checksum_hw(const void *chunk, size
  {
  	return (~__wt_crc32c_le_vx(0xffffffff, chunk, len));
  }

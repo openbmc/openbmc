@@ -1,0 +1,141 @@
+From 3ed26be2091436296933ed2146f7269c791c7bfe Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@lge.com>
+Date: Fri, 1 Jun 2018 08:41:07 +0000
+Subject: [PATCH] Revert "linux-user: fix mmap/munmap/mprotect/mremap/shmat"
+
+Causes qemu-i386 to hang during gobject-introspection in webkitgtk build
+when musl is used on qemux86 - the same issue as
+0010-linux-user-Fix-webkitgtk-hangs-on-32-bit-x86-target.patch
+was fixing in 2.11.0 release, but with this patch the fix no longer worked
+as discussed here:
+http://lists.openembedded.org/pipermail/openembedded-core/2018-May/150302.html
+http://lists.openembedded.org/pipermail/openembedded-core/2018-June/151382.html
+
+This reverts commit ebf9a3630c911d0cfc9c20f7cafe9ba4f88cf583.
+
+Upstream-Status: Pending
+---
+ include/exec/cpu-all.h  |  6 +-----
+ include/exec/cpu_ldst.h | 16 +++++++++-------
+ linux-user/mmap.c       | 17 ++++-------------
+ linux-user/syscall.c    |  5 +----
+ 4 files changed, 15 insertions(+), 29 deletions(-)
+
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index f4fa94e966..0b141683f0 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -159,12 +159,8 @@ extern unsigned long guest_base;
+ extern int have_guest_base;
+ extern unsigned long reserved_va;
+ 
+-#if HOST_LONG_BITS <= TARGET_VIRT_ADDR_SPACE_BITS
+-#define GUEST_ADDR_MAX (~0ul)
+-#else
+-#define GUEST_ADDR_MAX (reserved_va ? reserved_va - 1 : \
++#define GUEST_ADDR_MAX (reserved_va ? reserved_va : \
+                                     (1ul << TARGET_VIRT_ADDR_SPACE_BITS) - 1)
+-#endif
+ #else
+ 
+ #include "exec/hwaddr.h"
+diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
+index 5de8c8a5af..191f2e962a 100644
+--- a/include/exec/cpu_ldst.h
++++ b/include/exec/cpu_ldst.h
+@@ -51,13 +51,15 @@
+ /* All direct uses of g2h and h2g need to go away for usermode softmmu.  */
+ #define g2h(x) ((void *)((unsigned long)(target_ulong)(x) + guest_base))
+ 
+-#define guest_addr_valid(x) ((x) <= GUEST_ADDR_MAX)
+-#define h2g_valid(x) guest_addr_valid((unsigned long)(x) - guest_base)
+-
+-static inline int guest_range_valid(unsigned long start, unsigned long len)
+-{
+-    return len - 1 <= GUEST_ADDR_MAX && start <= GUEST_ADDR_MAX - len + 1;
+-}
++#if HOST_LONG_BITS <= TARGET_VIRT_ADDR_SPACE_BITS
++#define h2g_valid(x) 1
++#else
++#define h2g_valid(x) ({ \
++    unsigned long __guest = (unsigned long)(x) - guest_base; \
++    (__guest < (1ul << TARGET_VIRT_ADDR_SPACE_BITS)) && \
++    (!reserved_va || (__guest < reserved_va)); \
++})
++#endif
+ 
+ #define h2g_nocheck(x) ({ \
+     unsigned long __ret = (unsigned long)(x) - guest_base; \
+diff --git a/linux-user/mmap.c b/linux-user/mmap.c
+index 9168a2051c..de85669aab 100644
+--- a/linux-user/mmap.c
++++ b/linux-user/mmap.c
+@@ -80,7 +80,7 @@ int target_mprotect(abi_ulong start, abi_ulong len, int prot)
+         return -TARGET_EINVAL;
+     len = TARGET_PAGE_ALIGN(len);
+     end = start + len;
+-    if (!guest_range_valid(start, len)) {
++    if (end < start) {
+         return -TARGET_ENOMEM;
+     }
+     prot &= PROT_READ | PROT_WRITE | PROT_EXEC;
+@@ -482,8 +482,8 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
+ 	 * It can fail only on 64-bit host with 32-bit target.
+ 	 * On any other target/host host mmap() handles this error correctly.
+ 	 */
+-        if (!guest_range_valid(start, len)) {
+-            errno = ENOMEM;
++        if ((unsigned long)start + len - 1 > (abi_ulong) -1) {
++            errno = EINVAL;
+             goto fail;
+         }
+ 
+@@ -623,10 +623,8 @@ int target_munmap(abi_ulong start, abi_ulong len)
+     if (start & ~TARGET_PAGE_MASK)
+         return -TARGET_EINVAL;
+     len = TARGET_PAGE_ALIGN(len);
+-    if (len == 0 || !guest_range_valid(start, len)) {
++    if (len == 0)
+         return -TARGET_EINVAL;
+-    }
+-
+     mmap_lock();
+     end = start + len;
+     real_start = start & qemu_host_page_mask;
+@@ -681,13 +679,6 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
+     int prot;
+     void *host_addr;
+ 
+-    if (!guest_range_valid(old_addr, old_size) ||
+-        ((flags & MREMAP_FIXED) &&
+-         !guest_range_valid(new_addr, new_size))) {
+-        errno = ENOMEM;
+-        return -1;
+-    }
+-
+     mmap_lock();
+ 
+     if (flags & MREMAP_FIXED) {
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 643b8833de..271f215147 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -4919,9 +4919,6 @@ static inline abi_ulong do_shmat(CPUArchState *cpu_env,
+             return -TARGET_EINVAL;
+         }
+     }
+-    if (!guest_range_valid(shmaddr, shm_info.shm_segsz)) {
+-        return -TARGET_EINVAL;
+-    }
+ 
+     mmap_lock();
+ 
+@@ -7497,7 +7494,7 @@ static int open_self_maps(void *cpu_env, int fd)
+         }
+         if (h2g_valid(min)) {
+             int flags = page_get_flags(h2g(min));
+-            max = h2g_valid(max - 1) ? max : (uintptr_t)g2h(GUEST_ADDR_MAX) + 1;
++            max = h2g_valid(max - 1) ? max : (uintptr_t)g2h(GUEST_ADDR_MAX);
+             if (page_check_range(h2g(min), max - min, flags) == -1) {
+                 continue;
+             }

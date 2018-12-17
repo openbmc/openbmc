@@ -12,6 +12,8 @@ PV .= "+git${SRCPV}"
 SRC_URI = "git://pagure.io/netcf.git;protocol=https \
 "
 
+UPSTREAM_CHECK_GITTAGREGEX = "release-(?P<pver>(\d+(\.\d+)+))"
+
 DEPENDS += "augeas libnl libxslt libxml2 gnulib"
 
 S = "${WORKDIR}/git"

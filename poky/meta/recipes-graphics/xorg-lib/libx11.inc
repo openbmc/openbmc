@@ -6,8 +6,6 @@ basic functions of the window system."
 
 require xorg-lib-common.inc
 
-inherit siteinfo
-
 FILESEXTRAPATHS =. "${FILE_DIRNAME}/libx11:"
 
 PE = "1"
@@ -18,8 +16,8 @@ XORG_PN = "libX11"
 LICENSE = "MIT & MIT-style & BSD"
 LIC_FILES_CHKSUM = "file://COPYING;md5=172255dee66bb0151435b2d5d709fcf7"
 
-DEPENDS += "xproto xextproto xtrans libxcb kbproto inputproto"
-DEPENDS += "xproto-native"
+DEPENDS += "xorgproto xtrans libxcb"
+DEPENDS += "xorgproto-native"
 
 EXTRA_OECONF += "--with-keysymdefdir=${STAGING_INCDIR}/X11/ --disable-xf86bigfont"
 EXTRA_OEMAKE += 'CWARNFLAGS=""'

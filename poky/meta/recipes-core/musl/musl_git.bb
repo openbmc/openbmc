@@ -2,10 +2,11 @@
 # Released under the MIT license (see COPYING.MIT for the terms)
 
 require musl.inc
+inherit linuxloader
 
-SRCREV = "55df09bfccbfe21fc9dd7d8f94550c0ff25ace04"
+SRCREV = "c50985d5c8e316c5c464f352e79eeebfed1121a9"
 
-PV = "1.1.19+git${SRCPV}"
+PV = "1.1.20+git${SRCPV}"
 
 # mirror is at git://github.com/kraj/musl.git
 
@@ -22,7 +23,9 @@ DEPENDS = "virtual/${TARGET_PREFIX}binutils \
            libgcc-initial \
            linux-libc-headers \
            bsd-headers \
+           libssp-nonshared \
           "
+GLIBC_LDSO = "${@get_glibc_loader(d)}"
 
 export CROSS_COMPILE="${TARGET_PREFIX}"
 
@@ -59,13 +62,27 @@ do_install() {
 	install -d ${D}${bindir}
 	rm -f ${D}${bindir}/ldd
 	lnr ${D}${libdir}/libc.so ${D}${bindir}/ldd
+	lnr ${D}${libdir}/libc.so ${D}${GLIBC_LDSO}
 	for l in crypt dl m pthread resolv rt util xnet
 	do
 		ln -sf libc.so ${D}${libdir}/lib$l.so
 	done
+	for i in libc.so.6 libcrypt.so.1 libdl.so.2 libm.so.6 libpthread.so.0 libresolv.so.2 librt.so.1 libutil.so.1; do
+		ln -sf libc.so ${D}${libdir}/$i
+	done
 }
 
-RDEPENDS_${PN}-dev += "linux-libc-headers-dev bsd-headers-dev"
+PACKAGES =+ "${PN}-glibc-compat"
+
+FILES_${PN}-glibc-compat += "\
+                ${libdir}/libc.so.6 ${libdir}/libcrypt.so.1 \
+                ${libdir}/libdl.so.2 ${libdir}/libm.so.6 \
+                ${libdir}/libpthread.so.0 ${libdir}/libresolv.so.2 \
+                ${libdir}/librt.so.1 ${libdir}/libutil.so.1 \
+                ${GLIBC_LDSO} \
+                "
+
+RDEPENDS_${PN}-dev += "linux-libc-headers-dev bsd-headers-dev libssp-nonshared-staticdev"
 RPROVIDES_${PN}-dev += "libc-dev virtual-libc-dev"
 RPROVIDES_${PN} += "ldd libsegfault rtld(GNU_HASH)"
 

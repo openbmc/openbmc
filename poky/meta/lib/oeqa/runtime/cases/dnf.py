@@ -55,7 +55,7 @@ class DnfRepoTest(DnfTest):
     @classmethod
     def setUpClass(cls):
         cls.repo_server = HTTPService(os.path.join(cls.tc.td['WORKDIR'], 'oe-testimage-repo'),
-                                      cls.tc.target.server_ip)
+                                      cls.tc.target.server_ip, logger=cls.tc.logger)
         cls.repo_server.start()
 
     @classmethod
@@ -67,7 +67,8 @@ class DnfRepoTest(DnfTest):
         deploy_url = 'http://%s:%s/' %(self.target.server_ip, self.repo_server.port)
         cmdlinerepoopts = ["--repofrompath=oe-testimage-repo-%s,%s%s" %(arch, deploy_url, arch) for arch in pkgarchs]
 
-        self.dnf(" ".join(cmdlinerepoopts) + " --nogpgcheck " + command)
+        output = self.dnf(" ".join(cmdlinerepoopts) + " --nogpgcheck " + command)
+        return output
 
     @OETestDepends(['dnf.DnfBasicTest.test_dnf_help'])
     @OETestID(1744)
@@ -88,6 +89,9 @@ class DnfRepoTest(DnfTest):
     @OETestDepends(['dnf.DnfRepoTest.test_dnf_makecache'])
     @OETestID(1740)
     def test_dnf_install(self):
+        output = self.dnf_with_repo('list run-postinsts-dev')
+        if 'Installed Packages' in output:
+            self.dnf_with_repo('remove -y run-postinsts-dev')
         self.dnf_with_repo('install -y run-postinsts-dev')
 
     @OETestDepends(['dnf.DnfRepoTest.test_dnf_install'])
@@ -120,4 +124,44 @@ class DnfRepoTest(DnfTest):
     def test_dnf_reinstall(self):
         self.dnf_with_repo('reinstall -y run-postinsts-dev')
 
+    @OETestDepends(['dnf.DnfRepoTest.test_dnf_makecache'])
+    @OETestID(1771)
+    def test_dnf_installroot(self):
+        rootpath = '/home/root/chroot/test'
+        #Copy necessary files to avoid errors with not yet installed tools on
+        #installroot directory.
+        self.target.run('mkdir -p %s/etc' % rootpath, 1500)
+        self.target.run('mkdir -p %s/bin %s/sbin %s/usr/bin %s/usr/sbin' % (rootpath, rootpath, rootpath, rootpath), 1500)
+        self.target.run('mkdir -p %s/dev' % rootpath, 1500)
+        #Handle different architectures lib dirs
+        self.target.run('mkdir -p %s/lib' % rootpath, 1500)
+        self.target.run('mkdir -p %s/libx32' % rootpath, 1500)
+        self.target.run('mkdir -p %s/lib64' % rootpath, 1500)
+        self.target.run('cp /lib/libtinfo.so.5 %s/lib' % rootpath, 1500)
+        self.target.run('cp /libx32/libtinfo.so.5 %s/libx32' % rootpath, 1500)
+        self.target.run('cp /lib64/libtinfo.so.5 %s/lib64' % rootpath, 1500)
+        self.target.run('cp -r /etc/rpm %s/etc' % rootpath, 1500)
+        self.target.run('cp -r /etc/dnf %s/etc' % rootpath, 1500)
+        self.target.run('cp /bin/sh %s/bin' % rootpath, 1500)
+        self.target.run('mount -o bind /dev %s/dev/' % rootpath, 1500)
+        self.dnf_with_repo('install --installroot=%s -v -y --rpmverbosity=debug busybox run-postinsts' % rootpath)
+        status, output = self.target.run('test -e %s/var/cache/dnf' % rootpath, 1500)
+        self.assertEqual(0, status, output)
+        status, output = self.target.run('test -e %s/bin/busybox' % rootpath, 1500)
+        self.assertEqual(0, status, output)
 
+    @OETestDepends(['dnf.DnfRepoTest.test_dnf_makecache'])
+    @OETestID(1772)
+    def test_dnf_exclude(self):
+        excludepkg = 'curl-dev'
+        self.dnf_with_repo('install -y curl*')
+        self.dnf('list %s' % excludepkg, 0)
+        #Avoid remove dependencies to skip some errors on different archs and images
+        self.dnf_with_repo('remove --setopt=clean_requirements_on_remove=0 -y curl*')
+        #check curl-dev is not installed adter removing all curl occurrences
+        status, output = self.target.run('dnf list --installed | grep %s'% excludepkg, 1500)
+        self.assertEqual(1, status, "%s was not removed,  is listed as installed"%excludepkg)
+        self.dnf_with_repo('install -y --exclude=%s --exclude=curl-staticdev curl*' % excludepkg)
+        #check curl-dev is not installed after being excluded
+        status, output = self.target.run('dnf list --installed | grep %s'% excludepkg , 1500)
+        self.assertEqual(1, status, "%s was not excluded, is listed as installed"%excludepkg)

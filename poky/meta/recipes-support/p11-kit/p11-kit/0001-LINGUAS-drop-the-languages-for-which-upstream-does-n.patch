@@ -1,4 +1,4 @@
-From c3aa4aae5e9f4adafd9e10d9466f1bc481e0aae6 Mon Sep 17 00:00:00 2001
+From c6bb4b99af39daa3221c3bdc0686987ae0f31693 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 31 Jan 2018 16:47:44 +0200
 Subject: [PATCH] LINGUAS: drop the languages for which upstream does not
@@ -9,24 +9,21 @@ Upstream has been notified: https://github.com/p11-glue/p11-kit/issues/127
 
 Upstream-Status: Inappropriate [missing upstream distribution files]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  po/LINGUAS | 2 --
  1 file changed, 2 deletions(-)
 
 diff --git a/po/LINGUAS b/po/LINGUAS
-index 1fc4d53..e9cc5a7 100644
+index 767a806c2e20..6ab48001c409 100644
 --- a/po/LINGUAS
 +++ b/po/LINGUAS
-@@ -11,9 +11,7 @@ cy
+@@ -12,8 +12,6 @@ cy
  da
  de
  el
 -en@boldquot
- en_GB
 -en@quot
+ en_GB
  eo
  es
- es_CL
--- 
-2.15.1
-

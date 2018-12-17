@@ -6,8 +6,7 @@ inherit packagegroup
 
 COMPATIBLE_MACHINE = "^rpi$"
 
-OMXPLAYER_rpi = "omxplayer"
-OMXPLAYER_rpi_aarch64 = ""
+OMXPLAYER  = "${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', '', 'omxplayer', d)}"
 
 RDEPENDS_${PN} = "\
     ${OMXPLAYER} \

@@ -2,7 +2,7 @@ SUMMARY = "Lightweight secure web server"
 HOMEPAGE = "http://www.hiawatha-webserver.org"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=751419260aa954499f7abaabaa882bbe"
-DEPENDS = "libxml2 libxslt"
+DEPENDS = "libxml2 libxslt virtual/crypt"
 
 SECTION = "net"
 
@@ -23,7 +23,7 @@ inherit cmake update-rc.d systemd
 EXTRA_OECMAKE = " -DENABLE_IPV6=OFF \
                   -DENABLE_CACHE=OFF \
                   -DENABLE_DEBUG=OFF \
-                  -DENABLE_SSL=OFF \
+                  -DENABLE_TLS=OFF \
                   -DENABLE_TOOLKIT=OFF \
                   -DENABLE_CHROOT=OFF \
                   -DENABLE_XSLT=ON \

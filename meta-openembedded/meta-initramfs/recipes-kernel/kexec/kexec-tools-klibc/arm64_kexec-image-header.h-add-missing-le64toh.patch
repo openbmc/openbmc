@@ -1,0 +1,40 @@
+From af7d06a753a4c377b7ffe587da67a6ba56048bea Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Thu, 19 Apr 2018 10:47:17 +0200
+Subject: [PATCH 2/2] kexec/arm64: image-header.h: add macro for le64toh
+
+Fix
+
+ kexec-arm64.c:(.text+0x370): undefined reference to `le64toh'
+ kexec-arm64.c:(.text+0x380): undefined reference to `le64toh'
+
+Upstream-Status: Inappropriate [klibc specific]
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+
+---
+ kexec/arch/arm64/image-header.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/kexec/arch/arm64/image-header.h b/kexec/arch/arm64/image-header.h
+index 158d411..10ed2d6 100644
+--- a/kexec/arch/arm64/image-header.h
++++ b/kexec/arch/arm64/image-header.h
+@@ -8,6 +8,15 @@
+ #include <endian.h>
+ #include <stdint.h>
+ 
++#ifdef __KLIBC__
++#if __BYTE_ORDER == __LITTLE_ENDIAN
++#define le64toh(x) (x)
++#endif
++#if __BYTE_ORDER == __BIG_ENDIAN
++#define le64toh(x) __bswap_64(x)
++#endif
++#endif
++
+ /**
+  * struct arm64_image_header - arm64 kernel image header.
+  *
+-- 
+2.7.4
+

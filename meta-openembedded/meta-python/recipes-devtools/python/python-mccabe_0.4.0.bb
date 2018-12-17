@@ -16,3 +16,5 @@ RDEPENDS_${PN} += " \
     python-prettytable \
     python-cmd2 \
     python-pyparsing"
+
+BBCLASSEXTEND = "native nativesdk"

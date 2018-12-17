@@ -1,0 +1,21 @@
+From f9417c864183a0f6d0e90f66f5254a63b04a041a Mon Sep 17 00:00:00 2001
+From: Denis 'GNUtoo' Carikli <GNUtoo@no-log.org>
+Date: Wed, 17 Oct 2012 20:51:51 +0200
+
+---
+ configure.in | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/configure.in b/configure.in
+index c42bd0c..71a4825 100644
+--- a/configure.in
++++ b/configure.in
+@@ -44,6 +44,8 @@ AC_CANONICAL_HOST
+ dnl Setup for automake
+ AM_INIT_AUTOMAKE(SDL_net, $VERSION)
+ 
++dnl got macros
++AC_CONFIG_MACRO_DIR([acinclude])
+ dnl Check for tools
+ AC_PROG_LIBTOOL
+ AC_PROG_CC

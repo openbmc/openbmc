@@ -39,7 +39,6 @@ python populate_packages_prepend() {
     do_split_packages(d, theme_dir, '(.*)', theme_name, '${PN} theme for %s', extra_depends='', allow_dirs=True)
 }
 
-RDEPENDS_${PN} += "${PN}-core ${PN}-config ${PN}-theme-clearlooks"
 FILES_${PN}-core = "${bindir}/openbox ${bindir}/openbox-session ${libdir}/*${SOLIBS}"
 
 FILES_${PN}-lxde += "${datadir}/lxde/ \
@@ -54,3 +53,5 @@ FILES_${PN}-gnome += " \
 "
 
 FILES_${PN}-config += "${sysconfdir}"
+
+RDEPENDS_${PN} += "${PN}-core ${PN}-config ${PN}-theme-clearlooks python pyxdg"

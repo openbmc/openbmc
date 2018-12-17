@@ -7,25 +7,40 @@ Subject: [PATCH] syslog-ng.service: the syslog-ng service can not start
 Upstream-Status: pending
 
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
+Updated-by: Andrej Valek <andrej.valek@siemens.com>
 ---
  contrib/systemd/syslog-ng.service | 5 ++---
  1 file changed, 2 insertion(+), 3 deletions(-)
 
-diff --git a/contrib/systemd/syslog-ng.service b/contrib/systemd/syslog-ng.service
-index fc16f8d..8e09deb 100644
---- a/contrib/systemd/syslog-ng.service
-+++ b/contrib/systemd/syslog-ng.service
-@@ -4,8 +4,8 @@ Description=System Logger Daemon
- 
- [Service]
+diff --git a/contrib/systemd/syslog-ng@.service b/contrib/systemd/syslog-ng@.service
+index a28640e..93aec94 100644
+--- a/contrib/systemd/syslog-ng@.service
++++ b/contrib/systemd/syslog-ng@.service
+@@ -7,8 +7,8 @@ Conflicts=emergency.service emergency.target
  Type=notify
--ExecStart=/usr/sbin/syslog-ng -F $SYSLOGNG_OPTS
+ EnvironmentFile=-/etc/default/syslog-ng@%i
+ EnvironmentFile=-/etc/sysconfig/syslog-ng@%i
+-ExecStart=/usr/sbin/syslog-ng -F $OTHER_OPTIONS --cfgfile $CONFIG_FILE --control $CONTROL_FILE --persist-file $PERSIST_FILE --pidfile $PID_FILE
 -ExecReload=/bin/kill -HUP $MAINPID
-+ExecStart=@SBINDIR@/syslog-ng -F $SYSLOGNG_OPTS -p @LOCALSTATEDIR@/run/syslogd.pid
++ExecStart=@SBINDIR@/syslog-ng -F $OTHER_OPTIONS --cfgfile $CONFIG_FILE --control $CONTROL_FILE --persist-file $PERSIST_FILE --pidfile $PID_FILE
 +ExecReload=@BASEBINDIR@/kill -HUP $MAINPID
- EnvironmentFile=-/etc/default/syslog-ng
- EnvironmentFile=-/etc/sysconfig/syslog-ng
  StandardOutput=journal
+ StandardError=journal
+ Restart=on-failure
+diff --git a/contrib/systemd/syslog-ng@default b/contrib/systemd/syslog-ng@default
+index 02da288..3a8215d 100644
+--- a/contrib/systemd/syslog-ng@default
++++ b/contrib/systemd/syslog-ng@default
+@@ -1,5 +1,5 @@
+-CONFIG_FILE=/etc/syslog-ng.conf
+-PERSIST_FILE=/var/lib/syslog-ng/syslog-ng.persist
+-CONTROL_FILE=/var/lib/syslog-ng/syslog-ng.ctl
+-PID_FILE=/var/run/syslog-ng.pid
++CONFIG_FILE=/etc/syslog-ng/syslog-ng.conf
++PERSIST_FILE=@LOCALSTATEDIR@/lib/syslog-ng/syslog-ng.persist
++CONTROL_FILE=@LOCALSTATEDIR@/lib/syslog-ng/syslog-ng.ctl
++PID_FILE=@LOCALSTATEDIR@/run/syslog-ng.pid
+ OTHER_OPTIONS="--enable-core"
+
 -- 
 1.8.4.2
-

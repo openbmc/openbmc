@@ -1,0 +1,51 @@
+From ab1436927b47badcd219a5f075dfc848020e061d Mon Sep 17 00:00:00 2001
+From: Mike Crowe <mac@mcrowe.com>
+Date: Thu, 4 Oct 2018 17:54:19 +0100
+Subject: [opkg-utils PATCH] opkg-build: Add support for explicit use of pigz
+To: opkg-devel@googlegroups.com,
+    yocto@yoctoproject.org
+
+oe-core has stopped[1] installing pigz as gzip. This means that in
+order to persuade opkg-build to use pigz it must be specified
+explicitly. Let's teach opkg-build to deal with being passed pigz as a
+compressor.
+
+We can't combine the check for whether -T is required with the one for
+gzip because opkg-build needs to call $compressor and gzip separately
+to construct the package.
+
+[1] http://lists.openembedded.org/pipermail/openembedded-commits/2018-February/218767.html
+
+Upstream-Status: Submitted [opkg-devel@googlegroups.com https://groups.google.com/forum/#!topic/opkg-devel/E0WVOhjK61w]
+Signed-off-by: Mike Crowe <mac@mcrowe.com>
+---
+ opkg-build | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/opkg-build b/opkg-build
+index 93a7956..f8403ea 100755
+--- a/opkg-build
++++ b/opkg-build
+@@ -170,7 +170,7 @@ fi
+ 
+ compressor_ext() {
+     case $1 in
+-	gzip)
++	gzip|pigz)
+ 	    echo gz
+ 	    ;;
+ 	bzip2)
+@@ -232,6 +232,10 @@ if [ $compressor = "gzip" ] ; then
+ 	compressorargs=$zipargs
+ elif [ $compressor = "xz" ] ; then
+ 	compressorargs="--threads 0"
++elif [ $compressor = "pigz" ] ; then
++	if $compressor --help 2>&1 | grep -- "-T" > /dev/null; then
++		compressorargs="-9nT"
++	fi
+ fi
+ 
+ tsortargs=
+-- 
+2.11.0
+

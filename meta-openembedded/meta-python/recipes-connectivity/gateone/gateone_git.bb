@@ -16,9 +16,7 @@ S = "${WORKDIR}/git"
 
 inherit setuptools python-dir systemd update-rc.d
 
-DISTUTILS_INSTALL_ARGS = "--root=${D} \
-    --prefix=${prefix} \
-    --install-lib=${PYTHON_SITEPACKAGES_DIR} \
+DISTUTILS_INSTALL_ARGS += " \
     --install-data=${PYTHON_SITEPACKAGES_DIR} \
     --install-scripts=${bindir} \
     --skip_init_scripts"

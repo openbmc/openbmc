@@ -12,16 +12,19 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
 Upstream-Status: Pending
 
+Rebase to 0.115
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
  configure.ac                                          | 2 +-
  src/polkitbackend/polkitbackendinteractiveauthority.c | 6 +++++-
- src/polkitbackend/polkitbackendjsauthority.c          | 5 ++---
- 3 files changed, 8 insertions(+), 5 deletions(-)
+ src/polkitbackend/polkitbackendjsauthority.cpp        | 2 ++
+ 3 files changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 07982d1..21590b2 100644
+index 8b3e1b1..1c392df 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -158,7 +158,7 @@ AC_CHECK_LIB(expat,XML_ParserCreate,[EXPAT_LIBS="-lexpat"],
+@@ -99,7 +99,7 @@ AC_CHECK_LIB(expat,XML_ParserCreate,[EXPAT_LIBS="-lexpat"],
  	     [AC_MSG_ERROR([Can't find expat library. Please install expat.])])
  AC_SUBST(EXPAT_LIBS)
  
@@ -31,10 +34,10 @@ index 07982d1..21590b2 100644
  if test "x$GCC" = "xyes"; then
    LDFLAGS="-Wl,--as-needed $LDFLAGS"
 diff --git a/src/polkitbackend/polkitbackendinteractiveauthority.c b/src/polkitbackend/polkitbackendinteractiveauthority.c
-index 7019356..cf39d77 100644
+index cb6fdab..de3f752 100644
 --- a/src/polkitbackend/polkitbackendinteractiveauthority.c
 +++ b/src/polkitbackend/polkitbackendinteractiveauthority.c
-@@ -2213,7 +2213,7 @@ get_users_in_group (PolkitIdentity                    *group,
+@@ -2224,7 +2224,7 @@ get_users_in_group (PolkitIdentity                    *group,
   out:
    return ret;
  }
@@ -43,7 +46,7 @@ index 7019356..cf39d77 100644
  static GList *
  get_users_in_net_group (PolkitIdentity                    *group,
                          gboolean                           include_root)
-@@ -2270,6 +2270,8 @@ get_users_in_net_group (PolkitIdentity                    *group,
+@@ -2285,6 +2285,8 @@ get_users_in_net_group (PolkitIdentity                    *group,
    return ret;
  }
  
@@ -52,7 +55,7 @@ index 7019356..cf39d77 100644
  /* ---------------------------------------------------------------------------------------------------- */
  
  static void
-@@ -2355,10 +2357,12 @@ authentication_agent_initiate_challenge (AuthenticationAgent         *agent,
+@@ -2369,10 +2371,12 @@ authentication_agent_initiate_challenge (AuthenticationAgent         *agent,
          {
            user_identities = g_list_concat (user_identities, get_users_in_group (identity, FALSE));
          }
@@ -65,43 +68,26 @@ index 7019356..cf39d77 100644
        else
          {
            g_warning ("Unsupported identity");
-diff --git a/src/polkitbackend/polkitbackendjsauthority.c b/src/polkitbackend/polkitbackendjsauthority.c
-index 097dcc5..e59b3f7 100644
---- a/src/polkitbackend/polkitbackendjsauthority.c
-+++ b/src/polkitbackend/polkitbackendjsauthority.c
-@@ -1498,7 +1498,6 @@ js_polkit_spawn (JSContext  *cx,
- 
- /* ---------------------------------------------------------------------------------------------------- */
- 
--
- static JSBool
- js_polkit_user_is_in_netgroup (JSContext  *cx,
-                                unsigned    argc,
-@@ -1518,6 +1517,7 @@ js_polkit_user_is_in_netgroup (JSContext  *cx,
-   user = JS_EncodeString (cx, user_str);
-   netgroup = JS_EncodeString (cx, netgroup_str);
+diff --git a/src/polkitbackend/polkitbackendjsauthority.cpp b/src/polkitbackend/polkitbackendjsauthority.cpp
+index 517f3c6..6042dd2 100644
+--- a/src/polkitbackend/polkitbackendjsauthority.cpp
++++ b/src/polkitbackend/polkitbackendjsauthority.cpp
+@@ -1502,6 +1502,7 @@ js_polkit_user_is_in_netgroup (JSContext  *cx,
+   user = JS_EncodeString (cx, args[0].toString());
+   netgroup = JS_EncodeString (cx, args[1].toString());
  
 +#if defined HAVE_INNETGR
    if (innetgr (netgroup,
                 NULL,  /* host */
                 user,
-@@ -1525,6 +1525,7 @@ js_polkit_user_is_in_netgroup (JSContext  *cx,
+@@ -1509,6 +1510,7 @@ js_polkit_user_is_in_netgroup (JSContext  *cx,
      {
-       is_in_netgroup =  JS_TRUE;
+       is_in_netgroup =  true;
      }
 +#endif
  
    JS_free (cx, netgroup);
    JS_free (cx, user);
-@@ -1536,8 +1537,6 @@ js_polkit_user_is_in_netgroup (JSContext  *cx,
-   return ret;
- }
- 
--
--
- /* ---------------------------------------------------------------------------------------------------- */
- 
- typedef struct
 -- 
-2.7.0
+2.7.4
 

@@ -1,0 +1,39 @@
+Upstream-Status: Submitted [https://github.com/brianhsu/xfce4-hotcorner-plugin/pull/8]
+
+The library install path may be ${CMAKE_INSTALL_PREFIX}/lib64 rather
+than fixed ${CMAKE_INSTALL_PREFIX}/lib. Provide a variable to make it
+could override by cmake command line.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ CMakeLists.txt | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e193787..84cb52d 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -10,8 +10,9 @@ include(GNUInstallDirs)
+ 
+ PKG_CHECK_MODULES(GTK REQUIRED libxfce4panel-1.0 libxfce4ui-1 libwnck-3.0)
+ 
+-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
++set(BASE_LIB_PATH "lib" CACHE STRING "base library install path")
++set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${BASE_LIB_PATH})
++set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${BASE_LIB_PATH})
+ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+  
+ INCLUDE_DIRECTORIES(${GTK_INCLUDE_DIRS})
+@@ -28,7 +29,7 @@ ADD_LIBRARY(hotcorner SHARED src/hotcorner.c src/util.c)
+  
+ TARGET_LINK_LIBRARIES(hotcorner ${GTK_LIBRARIES})
+ 
+-INSTALL(TARGETS hotcorner  LIBRARY DESTINATION lib/xfce4/panel/plugins/)
++INSTALL(TARGETS hotcorner  LIBRARY DESTINATION ${BASE_LIB_PATH}/xfce4/panel/plugins/)
+ INSTALL(FILES hotcorner.desktop DESTINATION share/xfce4/panel/plugins/)
+ GETTEXT_CREATE_TRANSLATIONS(po/xfce4-hotcorner-plugin.pot ALL po/zh_TW.po)
+ 
+-- 
+2.11.0
+

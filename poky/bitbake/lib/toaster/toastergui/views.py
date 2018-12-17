@@ -25,6 +25,7 @@ import re
 from django.db.models import F, Q, Sum
 from django.db import IntegrityError
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils.http import urlencode
 from orm.models import Build, Target, Task, Layer, Layer_Version, Recipe
 from orm.models import LogMessage, Variable, Package_Dependency, Package
 from orm.models import Task_Dependency, Package_File
@@ -51,6 +52,7 @@ logger = logging.getLogger("toaster")
 
 # Project creation and managed build enable
 project_enable = ('1' == os.environ.get('TOASTER_BUILDSERVER'))
+is_project_specific = ('1' == os.environ.get('TOASTER_PROJECTSPECIFIC'))
 
 class MimeTypeFinder(object):
     # setting this to False enables additional non-standard mimetypes
@@ -70,6 +72,7 @@ class MimeTypeFinder(object):
 # single point to add global values into the context before rendering
 def toaster_render(request, page, context):
     context['project_enable'] = project_enable
+    context['project_specific'] = is_project_specific
     return render(request, page, context)
 
 
@@ -1395,6 +1398,86 @@ if True:
             mandatory_fields = ['projectname', 'ptype']
             try:
                 ptype = request.POST.get('ptype')
+                if ptype == "import":
+                    mandatory_fields.append('importdir')
+                else:
+                    mandatory_fields.append('projectversion')
+                # make sure we have values for all mandatory_fields
+                missing = [field for field in mandatory_fields if len(request.POST.get(field, '')) == 0]
+                if missing:
+                    # set alert for missing fields
+                    raise BadParameterException("Fields missing: %s" % ", ".join(missing))
+
+                if not request.user.is_authenticated():
+                    user = authenticate(username = request.POST.get('username', '_anonuser'), password = 'nopass')
+                    if user is None:
+                        user = User.objects.create_user(username = request.POST.get('username', '_anonuser'), email = request.POST.get('email', ''), password = "nopass")
+
+                        user = authenticate(username = user.username, password = 'nopass')
+                    login(request, user)
+
+                #  save the project
+                if ptype == "import":
+                    if not os.path.isdir('%s/conf' % request.POST['importdir']):
+                        raise BadParameterException("Bad path or missing 'conf' directory (%s)" % request.POST['importdir'])
+                    from django.core import management
+                    management.call_command('buildimport', '--command=import', '--name=%s' % request.POST['projectname'], '--path=%s' % request.POST['importdir'], interactive=False)
+                    prj = Project.objects.get(name = request.POST['projectname'])
+                    prj.merged_attr = True
+                    prj.save()
+                else:
+                    release = Release.objects.get(pk = request.POST.get('projectversion', None ))
+                    prj = Project.objects.create_project(name = request.POST['projectname'], release = release)
+                    prj.user_id = request.user.pk
+                    if 'mergeattr' == request.POST.get('mergeattr', ''):
+                        prj.merged_attr = True
+                    prj.save()
+
+                return redirect(reverse(project, args=(prj.pk,)) + "?notify=new-project")
+
+            except (IntegrityError, BadParameterException) as e:
+                # fill in page with previously submitted values
+                for field in mandatory_fields:
+                    context.__setitem__(field, request.POST.get(field, "-- missing"))
+                if isinstance(e, IntegrityError) and "username" in str(e):
+                    context['alert'] = "Your chosen username is already used"
+                else:
+                    context['alert'] = str(e)
+                return toaster_render(request, template, context)
+
+        raise Exception("Invalid HTTP method for this page")
+
+    # new project
+    def newproject_specific(request, pid):
+        if not project_enable:
+            return redirect( landing )
+
+        project = Project.objects.get(pk=pid)
+        template = "newproject_specific.html"
+        context = {
+            'email': request.user.email if request.user.is_authenticated() else '',
+            'username': request.user.username if request.user.is_authenticated() else '',
+            'releases': Release.objects.order_by("description"),
+            'projectname': project.name,
+            'project_pk': project.pk,
+        }
+
+        # WORKAROUND: if we already know release, redirect 'newproject_specific' to 'project_specific'
+        if '1' == project.get_variable('INTERNAL_PROJECT_SPECIFIC_SKIPRELEASE'):
+            return redirect(reverse(project_specific, args=(project.pk,)))
+
+        try:
+            context['defaultbranch'] = ToasterSetting.objects.get(name = "DEFAULT_RELEASE").value
+        except ToasterSetting.DoesNotExist:
+            pass
+
+        if request.method == "GET":
+            # render new project page
+            return toaster_render(request, template, context)
+        elif request.method == "POST":
+            mandatory_fields = ['projectname', 'ptype']
+            try:
+                ptype = request.POST.get('ptype')
                 if ptype == "build":
                     mandatory_fields.append('projectversion')
                 # make sure we have values for all mandatory_fields
@@ -1417,10 +1500,10 @@ if True:
                 else:
                     release = Release.objects.get(pk = request.POST.get('projectversion', None ))
 
-                prj = Project.objects.create_project(name = request.POST['projectname'], release = release)
+                prj = Project.objects.create_project(name = request.POST['projectname'], release = release, existing_project = project)
                 prj.user_id = request.user.pk
                 prj.save()
-                return redirect(reverse(project, args=(prj.pk,)) + "?notify=new-project")
+                return redirect(reverse(project_specific, args=(prj.pk,)) + "?notify=new-project")
 
             except (IntegrityError, BadParameterException) as e:
                 # fill in page with previously submitted values
@@ -1437,8 +1520,86 @@ if True:
     # Shows the edit project page
     def project(request, pid):
         project = Project.objects.get(pk=pid)
+
+        if '1' == os.environ.get('TOASTER_PROJECTSPECIFIC'):
+            if request.GET:
+                #Example:request.GET=<QueryDict: {'setMachine': ['qemuarm']}>
+                params = urlencode(request.GET).replace('%5B%27','').replace('%27%5D','')
+                return redirect("%s?%s" % (reverse(project_specific, args=(project.pk,)),params))
+            else:
+                return redirect(reverse(project_specific, args=(project.pk,)))
         context = {"project": project}
         return toaster_render(request, "project.html", context)
+
+    # Shows the edit project-specific page
+    def project_specific(request, pid):
+        project = Project.objects.get(pk=pid)
+
+        # Are we refreshing from a successful project specific update clone?
+        if Project.PROJECT_SPECIFIC_CLONING_SUCCESS == project.get_variable(Project.PROJECT_SPECIFIC_STATUS):
+            return redirect(reverse(landing_specific,args=(project.pk,)))
+
+        context = {
+            "project": project,
+            "is_new" : project.get_variable(Project.PROJECT_SPECIFIC_ISNEW),
+            "default_image_recipe" : project.get_variable(Project.PROJECT_SPECIFIC_DEFAULTIMAGE),
+            "mru" : Build.objects.all().filter(project=project,outcome=Build.IN_PROGRESS),
+            }
+        if project.build_set.filter(outcome=Build.IN_PROGRESS).count() > 0:
+            context['build_in_progress_none_completed'] = True
+        else:
+            context['build_in_progress_none_completed'] = False
+        return toaster_render(request, "project.html", context)
+
+    # perform the final actions for the project specific page
+    def project_specific_finalize(cmnd, pid):
+        project = Project.objects.get(pk=pid)
+        callback = project.get_variable(Project.PROJECT_SPECIFIC_CALLBACK)
+        if "update" == cmnd:
+            # Delete all '_PROJECT_PREPARE_' builds
+            for b in Build.objects.all().filter(project=project):
+                delete_build = False
+                for t in b.target_set.all():
+                    if '_PROJECT_PREPARE_' == t.target:
+                        delete_build = True
+                if delete_build:
+                    from django.core import management
+                    management.call_command('builddelete', str(b.id), interactive=False)
+            # perform callback at this last moment if defined, in case Toaster gets shutdown next
+            default_target = project.get_variable(Project.PROJECT_SPECIFIC_DEFAULTIMAGE)
+            if callback:
+                callback = callback.replace("<IMAGE>",default_target)
+        if "cancel" == cmnd:
+            if callback:
+                callback = callback.replace("<IMAGE>","none")
+                callback = callback.replace("--update","--cancel")
+        # perform callback at this last moment if defined, in case this Toaster gets shutdown next
+        ret = ''
+        if callback:
+            ret = os.system('bash -c "%s"' % callback)
+            project.set_variable(Project.PROJECT_SPECIFIC_CALLBACK,'')
+        # Delete the temp project specific variables
+        project.set_variable(Project.PROJECT_SPECIFIC_ISNEW,'')
+        project.set_variable(Project.PROJECT_SPECIFIC_STATUS,Project.PROJECT_SPECIFIC_NONE)
+        # WORKAROUND: Release this workaround flag
+        project.set_variable('INTERNAL_PROJECT_SPECIFIC_SKIPRELEASE','')
+
+    # Shows the final landing page for project specific update
+    def landing_specific(request, pid):
+        project_specific_finalize("update", pid)
+        context = {
+            "install_dir": os.environ['TOASTER_DIR'],
+        }
+        return toaster_render(request, "landing_specific.html", context)
+
+    # Shows the related landing-specific page
+    def landing_specific_cancel(request, pid):
+        project_specific_finalize("cancel", pid)
+        context = {
+            "install_dir": os.environ['TOASTER_DIR'],
+            "status": "cancel",
+        }
+        return toaster_render(request, "landing_specific.html", context)
 
     def jsunittests(request):
         """ Provides a page for the js unit tests """

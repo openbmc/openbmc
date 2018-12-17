@@ -1,0 +1,43 @@
+From 9302b72e5e69512aaa7106197b00c55baeb35b3c Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 17 Nov 2017 09:46:00 +0800
+Subject: [PATCH 7/9] rules: watch metadata changes in ide devices
+
+Formatting IDE storage does not trigger "change" uevents. As a result
+clients using udev API don't get any updates afterwards and get outdated
+information about the device.
+...
+root@qemux86-64:~# mkfs.ext4 -F /dev/hda1
+Creating filesystem with 262144 4k blocks and 65536 inodes
+Filesystem UUID: 98791eb2-2bf3-47ad-b4d8-4cf7e914eee2
+
+root@qemux86-64:~# ls /dev/disk/by-uuid/98791eb2-2bf3-47ad-b4d8-4cf7e914eee2
+ls: cannot access '/dev/disk/by-uuid/98791eb2-2bf3-47ad-b4d8-4cf7e914eee2': No such file or directory
+...
+Include hd* in a match for watch option assignment.
+
+Upstream-Status: Denied
+
+qemu by default emulates IDE and the linux-yocto kernel(s) use
+CONFIG_IDE instead of the more modern libsata, so disks appear as
+/dev/hd*. A similar patch rejected by upstream because CONFIG_IDE
+is deprecated.
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ rules/60-block.rules | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/rules/60-block.rules b/rules/60-block.rules
+index 343fc06f8..b5237dac4 100644
+--- a/rules/60-block.rules
++++ b/rules/60-block.rules
+@@ -8,4 +8,4 @@ ACTION=="add", SUBSYSTEM=="module", KERNEL=="block", ATTR{parameters/events_dfl_
+ ACTION=="change", SUBSYSTEM=="scsi", ENV{DEVTYPE}=="scsi_device", TEST=="block", ATTR{block/*/uevent}="change"
+ 
+ # watch metadata changes, caused by tools closing the device node which was opened for writing
+-ACTION!="remove", SUBSYSTEM=="block", KERNEL=="loop*|nvme*|sd*|vd*|xvd*|pmem*|mmcblk*", OPTIONS+="watch"
++ACTION!="remove", SUBSYSTEM=="block", KERNEL=="loop*|nvme*|sd*|vd*|xvd*|pmem*|mmcblk*|hd*", OPTIONS+="watch"
+-- 
+2.11.0
+

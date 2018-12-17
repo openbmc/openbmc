@@ -1,0 +1,152 @@
+From b15e9610b4ab52c381e712241d50dea96d50d873 Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Wed, 2 May 2018 23:14:19 +0200
+Subject: [PATCH 14/14] add if_nameindex from musl
+
+Taken from musl, minimal changes.
+klibc lacks struct and func
+
+Fix
+
+ ifdown.o: In function `ifdown':
+ ifdown.c (.text+0x30): undefined reference to `if_nameindex'
+
+While there add klibc-specific guard and include sys/types.h
+to fix :
+
+ /kexec/if_nameindex.c:2:
+ /usr/lib/klibc/include/linux/types.h:22:0:
+ warning: "__bitwise" redefined
+ #define __bitwise __bitwise__
+
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+---
+ kexec/Makefile       |  2 +-
+ kexec/if_nameindex.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ kexec/if_nameindex.h | 15 ++++++++++++
+ kexec/ifdown.c       |  3 +++
+ 4 files changed, 83 insertions(+), 1 deletion(-)
+ create mode 100644 kexec/if_nameindex.c
+ create mode 100644 kexec/if_nameindex.h
+
+diff --git a/kexec/Makefile b/kexec/Makefile
+index 4db84d8..fb7520b 100644
+--- a/kexec/Makefile
++++ b/kexec/Makefile
+@@ -11,7 +11,7 @@ KEXEC_SRCS = $(KEXEC_SRCS_base)
+ KEXEC_GENERATED_SRCS =
+ 
+ KEXEC_SRCS_base += kexec/kexec.c
+-KEXEC_SRCS_base += kexec/ifdown.c
++KEXEC_SRCS_base += kexec/if_nameindex kexec/ifdown.c
+ KEXEC_SRCS_base += kexec/kexec-elf.c
+ KEXEC_SRCS_base += kexec/kexec-elf-exec.c
+ KEXEC_SRCS_base += kexec/kexec-elf-core.c
+diff --git a/kexec/if_nameindex.c b/kexec/if_nameindex.c
+new file mode 100644
+index 0000000..e586e41
+--- /dev/null
++++ b/kexec/if_nameindex.c
+@@ -0,0 +1,64 @@
++#define _GNU_SOURCE
++#ifdef __KLIBC__
++#include <sys/types.h>
++#endif
++#include <netinet/in.h>
++#include <net/if.h>
++#include <stdlib.h>
++#include <sys/socket.h>
++#include <sys/ioctl.h>
++#include <errno.h>
++#include <sys/syscall.h>
++#include <stdio.h>
++#ifdef __KLIBC__
++#include "if_nameindex.h"
++#endif
++
++static void *do_nameindex(int s, size_t n)
++{
++	size_t i, len, k;
++	struct ifconf conf;
++	struct if_nameindex *idx;
++
++	idx = malloc(n * (sizeof(struct if_nameindex)+sizeof(struct ifreq)));
++	if (!idx) return 0;
++
++	conf.ifc_buf = (void *)&idx[n];
++	conf.ifc_len = len = n * sizeof(struct ifreq);
++	if (ioctl(s, SIOCGIFCONF, &conf) < 0) {
++		free(idx);
++		return 0;
++	}
++	if (conf.ifc_len == len) {
++		free(idx);
++		return (void *)-1;
++	}
++
++	n = conf.ifc_len / sizeof(struct ifreq);
++	for (i=k=0; i<n; i++) {
++		if (ioctl(s, SIOCGIFINDEX, &conf.ifc_req[i]) < 0) {
++			k++;
++			continue;
++		}
++		idx[i-k].if_index = conf.ifc_req[i].ifr_ifindex;
++		idx[i-k].if_name = conf.ifc_req[i].ifr_name;
++	}
++	idx[i-k].if_name = 0;
++	idx[i-k].if_index = 0;
++
++	return idx;
++}
++
++struct if_nameindex *if_nameindex()
++{
++	size_t n;
++	void *p = 0;
++	int s = socket(AF_UNIX, SOCK_DGRAM, 0);
++	if (s>=0) {
++		for (n=0; (p=do_nameindex(s, n)) == (void *)-1; n++);
++/*		__syscall(SYS_close, s); */
++		close(s);
++	}
++	errno = ENOBUFS;
++	return p;
++}
+diff --git a/kexec/if_nameindex.h b/kexec/if_nameindex.h
+new file mode 100644
+index 0000000..1725fbd
+--- /dev/null
++++ b/kexec/if_nameindex.h
+@@ -0,0 +1,15 @@
++#ifndef _NET_IF__NAMEINDEX_H
++#define _NET_IF_NAMEINDEX_H
++
++struct if_nameindex
++{
++    unsigned int if_index;
++    char *if_name;
++};
++
++unsigned int if_nametoindex (const char *);
++char *if_indextoname (unsigned int, char *);
++struct if_nameindex *if_nameindex (void);
++void if_freenameindex (struct if_nameindex *);
++
++#endif
+diff --git a/kexec/ifdown.c b/kexec/ifdown.c
+index 82c6141..cc3ca9f 100644
+--- a/kexec/ifdown.c
++++ b/kexec/ifdown.c
+@@ -18,6 +18,9 @@ char *v_ifdown = "@(#)ifdown.c  1.11  02-Jun-1998  miquels@cistron.nl";
+ 
+ #include <netinet/in.h>
+ #include <net/if.h>
++#ifdef __KLIBC__
++#include "if_nameindex.h"
++#endif
+ 
+ /*
+  *  First, we find all shaper devices and down them. Then we
+-- 
+2.7.4
+

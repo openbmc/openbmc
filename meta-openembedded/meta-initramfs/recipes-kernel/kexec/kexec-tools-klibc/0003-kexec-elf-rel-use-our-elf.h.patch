@@ -1,0 +1,92 @@
+From 7f91875d65778154709e4fa0ccb23f3b2a98b0dc Mon Sep 17 00:00:00 2001
+From: OpenEmbedded <oe.patch@oe>
+Date: Wed, 11 Apr 2018 22:51:00 +0200
+Subject: [PATCH] kexec-elf-rel: use our elf.h
+
+Fix:
+
+ kexec-elf-rel.c: In function 'elf_rel_load':
+ kexec-elf-rel.c:386:39: error: 'STT_NOTYPE' undeclared
+
+and similar.
+
+Upstream-Status: Inappropriate [klibc specific]
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+
+---
+ kexec/arch/arm/kexec-elf-rel-arm.c       | 2 +-
+ kexec/arch/i386/kexec-elf-rel-x86.c      | 2 +-
+ kexec/arch/ppc/kexec-elf-rel-ppc.c       | 2 +-
+ kexec/arch/ppc64/kexec-elf-rel-ppc64.c   | 2 +-
+ kexec/arch/x86_64/kexec-elf-rel-x86_64.c | 2 +-
+ kexec/kexec-elf-rel.c                    | 2 +-
+ 6 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/kexec/arch/arm/kexec-elf-rel-arm.c b/kexec/arch/arm/kexec-elf-rel-arm.c
+index a939cf4..2551dc0 100644
+--- a/kexec/arch/arm/kexec-elf-rel-arm.c
++++ b/kexec/arch/arm/kexec-elf-rel-arm.c
+@@ -1,5 +1,5 @@
+ #include <stdio.h>
+-#include <elf.h>
++#include "../../../include/elf.h"
+ #include "../../kexec.h"
+ #include "../../kexec-elf.h"
+ 
+diff --git a/kexec/arch/i386/kexec-elf-rel-x86.c b/kexec/arch/i386/kexec-elf-rel-x86.c
+index 55a214e..e7583d1 100644
+--- a/kexec/arch/i386/kexec-elf-rel-x86.c
++++ b/kexec/arch/i386/kexec-elf-rel-x86.c
+@@ -1,5 +1,5 @@
+ #include <stdio.h>
+-#include <elf.h>
++#include "../../../include/elf.h"
+ #include "../../kexec.h"
+ #include "../../kexec-elf.h"
+ 
+diff --git a/kexec/arch/ppc/kexec-elf-rel-ppc.c b/kexec/arch/ppc/kexec-elf-rel-ppc.c
+index 1acbd86..a60c66c 100644
+--- a/kexec/arch/ppc/kexec-elf-rel-ppc.c
++++ b/kexec/arch/ppc/kexec-elf-rel-ppc.c
+@@ -1,5 +1,5 @@
+ #include <stdio.h>
+-#include <elf.h>
++#include "../../../include/elf.h"
+ #include "../../kexec.h"
+ #include "../../kexec-elf.h"
+ 
+diff --git a/kexec/arch/ppc64/kexec-elf-rel-ppc64.c b/kexec/arch/ppc64/kexec-elf-rel-ppc64.c
+index 5f8e3f2..765bf6e 100644
+--- a/kexec/arch/ppc64/kexec-elf-rel-ppc64.c
++++ b/kexec/arch/ppc64/kexec-elf-rel-ppc64.c
+@@ -1,5 +1,5 @@
+ #include <stdio.h>
+-#include <elf.h>
++#include "../../../include/elf.h"
+ #include <string.h>
+ #include "../../kexec.h"
+ #include "../../kexec-elf.h"
+diff --git a/kexec/arch/x86_64/kexec-elf-rel-x86_64.c b/kexec/arch/x86_64/kexec-elf-rel-x86_64.c
+index 7fdde73..cd5d729 100644
+--- a/kexec/arch/x86_64/kexec-elf-rel-x86_64.c
++++ b/kexec/arch/x86_64/kexec-elf-rel-x86_64.c
+@@ -1,5 +1,5 @@
+ #include <stdio.h>
+-#include <elf.h>
++#include "../../../include/elf.h"
+ #include "../../kexec.h"
+ #include "../../kexec-elf.h"
+ 
+diff --git a/kexec/kexec-elf-rel.c b/kexec/kexec-elf-rel.c
+index 9a6e63d..a856636 100644
+--- a/kexec/kexec-elf-rel.c
++++ b/kexec/kexec-elf-rel.c
+@@ -4,7 +4,7 @@
+ #include <stdio.h>
+ #include <errno.h>
+ #include <stdlib.h>
+-#include "elf.h"
++#include "../include/elf.h"
+ #include <boot/elf_boot.h>
+ #include "kexec.h"
+ #include "kexec-elf.h"

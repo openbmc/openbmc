@@ -1,0 +1,89 @@
+From 865651d2496a90f7ae8e7cc19a2e54b6f17a8ad5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 3 Aug 2018 09:42:06 -0700
+Subject: [PATCH] localedef --add-to-archive uses a hard-coded locale path
+
+it doesn't exist in normal use, and there's no way to pass an
+alternative filename.
+
+Add a fallback of $LOCALEARCHIVE from the environment, and allow
+creation of new locale archives that are not the system archive.
+
+Upstream-Status: Inappropriate (OE-specific)
+
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ locale/programs/locarchive.c | 37 ++++++++++++++++++++++++++----------
+ 1 file changed, 27 insertions(+), 10 deletions(-)
+
+diff --git a/locale/programs/locarchive.c b/locale/programs/locarchive.c
+index ca332a345f..91f62da662 100644
+--- a/locale/programs/locarchive.c
++++ b/locale/programs/locarchive.c
+@@ -340,12 +340,24 @@ enlarge_archive (struct locarhandle *ah, const struct locarhead *head)
+   struct namehashent *oldnamehashtab;
+   struct locarhandle new_ah;
+   size_t prefix_len = output_prefix ? strlen (output_prefix) : 0;
+-  char archivefname[prefix_len + sizeof (ARCHIVE_NAME)];
+-  char fname[prefix_len + sizeof (ARCHIVE_NAME) + sizeof (".XXXXXX") - 1];
++  char *archivefname;
++  char *fname;
++  char *envarchive = getenv("LOCALEARCHIVE");
+ 
+-  if (output_prefix)
+-    memcpy (archivefname, output_prefix, prefix_len);
+-  strcpy (archivefname + prefix_len, ARCHIVE_NAME);
++  if (envarchive != NULL) 
++    {
++      archivefname = xmalloc(strlen(envarchive) + 1);
++      fname = xmalloc(strlen(envarchive) + sizeof (".XXXXXX"));
++      strcpy (archivefname, envarchive);
++    }
++  else
++    {
++      archivefname = xmalloc(prefix_len + sizeof (ARCHIVE_NAME));
++      fname = xmalloc(prefix_len + sizeof (ARCHIVE_NAME) + sizeof (".XXXXXX") - 1);
++      if (output_prefix)
++        memcpy (archivefname, output_prefix, prefix_len);
++      strcpy (archivefname + prefix_len, ARCHIVE_NAME);
++    }
+   strcpy (stpcpy (fname, archivefname), ".XXXXXX");
+ 
+   /* Not all of the old file has to be mapped.  Change this now this
+@@ -551,6 +563,8 @@ enlarge_archive (struct locarhandle *ah, const struct locarhead *head)
+ 
+   /* Add the information for the new one.  */
+   *ah = new_ah;
++  free(archivefname);
++  free(fname);
+ }
+ 
+ 
+@@ -569,10 +583,13 @@ open_archive (struct locarhandle *ah, bool readonly)
+   /* If ah has a non-NULL fname open that otherwise open the default.  */
+   if (archivefname == NULL)
+     {
+-      archivefname = default_fname;
+-      if (output_prefix)
+-        memcpy (default_fname, output_prefix, prefix_len);
+-      strcpy (default_fname + prefix_len, ARCHIVE_NAME);
++      archivefname = getenv("LOCALEARCHIVE");
++      if (archivefname == NULL) {
++              archivefname = default_fname;
++              if (output_prefix)
++                memcpy (default_fname, output_prefix, prefix_len);
++              strcpy (default_fname + prefix_len, ARCHIVE_NAME);
++      }
+     }
+ 
+   while (1)
+@@ -585,7 +602,7 @@ open_archive (struct locarhandle *ah, bool readonly)
+ 	     the default locale archive we ignore the failure and
+ 	     list an empty archive, otherwise we print an error
+ 	     and exit.  */
+-	  if (errno == ENOENT && archivefname == default_fname)
++	  if (errno == ENOENT)
+ 	    {
+ 	      if (readonly)
+ 		{

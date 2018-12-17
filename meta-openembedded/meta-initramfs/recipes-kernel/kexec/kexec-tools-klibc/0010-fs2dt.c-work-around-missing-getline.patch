@@ -1,0 +1,47 @@
+From edefda702d906d472ee7a675f6b506d5cfca7ac8 Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Tue, 17 Apr 2018 13:48:25 +0200
+Subject: [PATCH] fs2dt.c: work around missing getline()
+
+This simple case can be rewrtten with fgets()
+
+Fix
+
+ fs2dt.c: In function 'dt_copy_old_root_param':
+ fs2dt.c:541:6: warning: implicit declaration of function 'getline'
+
+Upstream-Status: Inappropriate [klibc specific]
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+
+---
+ kexec/fs2dt.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/kexec/fs2dt.c b/kexec/fs2dt.c
+index 07a5e2f..d635636 100644
+--- a/kexec/fs2dt.c
++++ b/kexec/fs2dt.c
+@@ -531,6 +531,9 @@ static void dt_copy_old_root_param(void)
+ 	char *last_cmdline = NULL;
+ 	char *p, *old_param;
+ 	size_t len = 0;
++#ifdef __KLIBC__
++	char buf[512];
++#endif
+ 
+ 	strcpy(filename, pathname);
+ 	strcat(filename, "bootargs");
+@@ -538,8 +541,13 @@ static void dt_copy_old_root_param(void)
+ 	if (!fp)
+ 		return;
+ 
++#ifndef __KLIBC__
+ 	if (getline(&last_cmdline, &len, fp) == -1)
+ 		die("unable to read %s\n", filename);
++#else
++	last_cmdline = fgets(buf, 200, fp);
++	last_cmdline[strlen(last_cmdline) - 1] = '\0';
++#endif
+ 
+ 	p = strstr(last_cmdline, "root=");
+ 	if (p) {

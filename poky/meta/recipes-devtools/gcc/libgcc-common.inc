@@ -47,8 +47,13 @@ do_install () {
 do_install_append_libc-baremetal () {
 	rmdir ${D}${base_libdir}
 }
+do_install_append_libc-newlib () {
+	rmdir ${D}${base_libdir}
+}
 
+# No rpm package is actually created but -dev depends on it, avoid dnf error
 RDEPENDS_${PN}-dev_libc-baremetal = ""
+RDEPENDS_${PN}-dev_libc-newlib = ""
 
 BBCLASSEXTEND = "nativesdk"
 

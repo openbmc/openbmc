@@ -16,7 +16,7 @@ SRC_URI[sha256sum] = "723dd073f80e9969639eb577d2af4b540fc29716b6eafdac488d8f5aed
 
 EXTRA_OEMAKE = "-e MAKEFLAGS="
 
-TARGET_CC_ARCH += "${CFLAGS} ${LDFLAGS}"
+TARGET_CC_ARCH += "${LDFLAGS}"
 do_compile() {
     oe_runmake
 }

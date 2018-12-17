@@ -47,6 +47,51 @@ class Dot(object):
         if len(sys.argv) != 3 and len(sys.argv) < 5:
             print('ERROR: Not enough args, see --help for usage')
 
+    @staticmethod
+    def insert_dep_chain(chain, rdeps, alldeps):
+        """
+        insert elements to chain from rdeps, according to alldeps
+        """
+        # chain should at least contain one element
+        if len(chain) == 0:
+            raise
+
+        inserted_elements = []
+        for rdep in rdeps:
+            if rdep in chain:
+                continue
+            else:
+                for i in range(0, len(chain)-1):
+                    if chain[i] in alldeps[rdep] and rdep in alldeps[chain[i+1]]:
+                        chain.insert(i+1, rdep)
+                        inserted_elements.append(rdep)
+                        break
+                if chain[-1] in alldeps[rdep] and rdep not in chain:
+                    chain.append(rdep)
+                    inserted_elements.append(rdep)
+        return inserted_elements
+
+    @staticmethod
+    def print_dep_chains(key, rdeps, alldeps):
+        rlist = rdeps.copy()
+        chain = []
+        removed_rdeps = [] # hold rdeps removed from rlist
+
+        chain.append(key)
+        while (len(rlist) != 0):
+            # insert chain from rlist
+            inserted_elements = Dot.insert_dep_chain(chain, rlist, alldeps)
+            if not inserted_elements:
+                if chain[-1] in rlist:
+                    rlist.remove(chain[-1])
+                    removed_rdeps.append(chain[-1])
+                chain.pop()
+                continue
+            else:
+                # insert chain from removed_rdeps
+                Dot.insert_dep_chain(chain, removed_rdeps, alldeps)
+                print(' -> '.join(list(reversed(chain))))
+
     def main(self):
         #print(self.args.dotfile[0])
         # The format is {key: depends}
@@ -109,6 +154,7 @@ class Dot(object):
                 if self.args.key in v and not k in reverse_deps:
                     reverse_deps.append(k)
             print('Because: %s' % ' '.join(reverse_deps))
+            Dot.print_dep_chains(self.args.key, reverse_deps, depends)
 
 if __name__ == "__main__":
     try:

@@ -22,11 +22,11 @@ Signed-off-by: Meng Li <Meng.Li@windriver.com>
  e_tpm_err.c |   4 ++
  3 files changed, 164 insertions(+), 1 deletion(-)
 
-diff --git a/e_tpm.c b/e_tpm.c
-index 7dcb75a..11bf74b 100644
---- a/e_tpm.c
-+++ b/e_tpm.c
-@@ -245,6 +245,118 @@ void ENGINE_load_tpm(void)
+Index: git/src/e_tpm.c
+===================================================================
+--- git.orig/src/e_tpm.c
++++ git/src/e_tpm.c
+@@ -259,6 +259,118 @@ void ENGINE_load_tpm(void)
  	ERR_clear_error();
  }
  
@@ -145,7 +145,7 @@ index 7dcb75a..11bf74b 100644
  int tpm_load_srk(UI_METHOD *ui, void *cb_data)
  {
  	TSS_RESULT result;
-@@ -305,8 +417,50 @@ int tpm_load_srk(UI_METHOD *ui, void *cb_data)
+@@ -319,8 +431,50 @@ int tpm_load_srk(UI_METHOD *ui, void *cb
  		return 0;
  	}
  
@@ -197,7 +197,7 @@ index 7dcb75a..11bf74b 100644
  		if (0 == strcmp(srkPasswd, "#WELLKNOWN#")) {
  			memset(auth, 0, TPM_WELL_KNOWN_KEY_LEN);
  			secretMode = TSS_SECRET_MODE_SHA1;
-@@ -319,6 +473,7 @@ int tpm_load_srk(UI_METHOD *ui, void *cb_data)
+@@ -333,6 +487,7 @@ int tpm_load_srk(UI_METHOD *ui, void *cb
  			authlen = strlen(auth);
  		}
  	}
@@ -205,11 +205,11 @@ index 7dcb75a..11bf74b 100644
  	else {
  		if (!tpm_engine_get_auth(ui, (char *)auth, 128,
  				"SRK authorization: ", cb_data)) {
-diff --git a/e_tpm.h b/e_tpm.h
-index 6316e0b..56ff202 100644
---- a/e_tpm.h
-+++ b/e_tpm.h
-@@ -66,6 +66,8 @@ void ERR_TSS_error(int function, int reason, char *file, int line);
+Index: git/src/e_tpm.h
+===================================================================
+--- git.orig/src/e_tpm.h
++++ git/src/e_tpm.h
+@@ -66,6 +66,8 @@ void ERR_TSS_error(int function, int rea
  #define TPM_F_TPM_FILL_RSA_OBJECT		116
  #define TPM_F_TPM_ENGINE_GET_AUTH		117
  #define TPM_F_TPM_CREATE_SRK_POLICY		118
@@ -218,7 +218,7 @@ index 6316e0b..56ff202 100644
  
  /* Reason codes. */
  #define TPM_R_ALREADY_LOADED			100
-@@ -96,6 +98,8 @@ void ERR_TSS_error(int function, int reason, char *file, int line);
+@@ -96,6 +98,8 @@ void ERR_TSS_error(int function, int rea
  #define TPM_R_ID_INVALID			125
  #define TPM_R_UI_METHOD_FAILED			126
  #define TPM_R_UNKNOWN_SECRET_MODE		127
@@ -227,11 +227,11 @@ index 6316e0b..56ff202 100644
  
  /* structure pointed to by the RSA object's app_data pointer */
  struct rsa_app_data
-diff --git a/e_tpm_err.c b/e_tpm_err.c
-index 25a5d0f..439e267 100644
---- a/e_tpm_err.c
-+++ b/e_tpm_err.c
-@@ -235,6 +235,8 @@ static ERR_STRING_DATA TPM_str_functs[] = {
+Index: git/src/e_tpm_err.c
+===================================================================
+--- git.orig/src/e_tpm_err.c
++++ git/src/e_tpm_err.c
+@@ -234,6 +234,8 @@ static ERR_STRING_DATA TPM_str_functs[]
  	{ERR_PACK(0, TPM_F_TPM_BIND_FN, 0), "TPM_BIND_FN"},
  	{ERR_PACK(0, TPM_F_TPM_FILL_RSA_OBJECT, 0), "TPM_FILL_RSA_OBJECT"},
  	{ERR_PACK(0, TPM_F_TPM_ENGINE_GET_AUTH, 0), "TPM_ENGINE_GET_AUTH"},
@@ -240,7 +240,7 @@ index 25a5d0f..439e267 100644
  	{0, NULL}
  };
  
-@@ -265,6 +267,8 @@ static ERR_STRING_DATA TPM_str_reasons[] = {
+@@ -264,6 +266,8 @@ static ERR_STRING_DATA TPM_str_reasons[]
  	{TPM_R_FILE_READ_FAILED, "failed reading the key file"},
  	{TPM_R_ID_INVALID, "engine id doesn't match"},
  	{TPM_R_UI_METHOD_FAILED, "ui function failed"},
@@ -249,6 +249,3 @@ index 25a5d0f..439e267 100644
  	{0, NULL}
  };
  
--- 
-2.9.3
-

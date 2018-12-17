@@ -1,0 +1,26 @@
+From 72564b04151b61fa8d954bbb43afc58108ee50ec Mon Sep 17 00:00:00 2001
+From: Thomas Nagy <tnagy@waf.io>
+Date: Mon, 12 Mar 2018 20:42:55 +0100
+Subject: [PATCH] Python 3.7 fixes #2126
+
+Upstream-Status: Backport
+[https://gitlab.com/ita1024/waf/commit/facdc0b173d933073832c768ec1917c553cb369c]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ waflib/Node.py | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/waflib/Node.py b/waflib/Node.py
+index fb3cd273..405a6fec 100644
+--- a/waflib/Node.py
++++ b/waflib/Node.py
+@@ -537,8 +537,6 @@ class Node(object):
+ 					if maxdepth:
+ 						for k in node.ant_iter(accept=accept, maxdepth=maxdepth - 1, pats=npats, dir=dir, src=src, remove=remove):
+ 							yield k
+-		raise StopIteration
+-
+ 	def ant_glob(self, *k, **kw):
+ 		"""
+ 		This method is used for finding files across folders. It behaves like ant patterns:

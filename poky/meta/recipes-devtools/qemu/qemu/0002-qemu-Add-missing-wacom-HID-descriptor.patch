@@ -1,4 +1,4 @@
-From a42726e017605ed3ca2b3fc2b1cc8d01ccf34730 Mon Sep 17 00:00:00 2001
+From 41603f745caaecdc7c9d760fb7d2df01ccc60128 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Thu, 27 Nov 2014 14:04:29 +0000
 Subject: [PATCH] qemu: Add missing wacom HID descriptor
@@ -14,11 +14,11 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 Upstream-Status: Submitted
 2014/11/27
 ---
- hw/usb/dev-wacom.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ hw/usb/dev-wacom.c | 94 +++++++++++++++++++++++++++++++++++++++++++++-
  1 file changed, 93 insertions(+), 1 deletion(-)
 
 diff --git a/hw/usb/dev-wacom.c b/hw/usb/dev-wacom.c
-index bf70013..2f6e129 100644
+index bf70013059..2f6e129732 100644
 --- a/hw/usb/dev-wacom.c
 +++ b/hw/usb/dev-wacom.c
 @@ -72,6 +72,89 @@ static const USBDescStrings desc_strings = {

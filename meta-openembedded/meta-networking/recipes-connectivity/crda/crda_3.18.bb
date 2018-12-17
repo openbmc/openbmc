@@ -4,7 +4,10 @@ SECTION = "net"
 LICENSE = "copyleft-next-0.3.0"
 LIC_FILES_CHKSUM = "file://copyleft-next-0.3.0;md5=8743a2c359037d4d329a31e79eabeffe"
 
-DEPENDS = "python-m2crypto-native python-typing-native python-native libgcrypt libnl openssl"
+DEPENDS = "python-m2crypto-native python-typing-native python-native libnl \
+           ${@oe.utils.conditional("DEFAULT_CRYPT", "gcrypt", "libgcrypt", "", d)} \
+           ${@oe.utils.conditional("DEFAULT_CRYPT", "openssl", "openssl10", "", d)} \
+          "
 
 SRC_URI = "https://www.kernel.org/pub/software/network/${BPN}/${BP}.tar.xz \
            file://do-not-run-ldconfig-if-destdir-is-set.patch \
@@ -18,10 +21,15 @@ SRC_URI = "https://www.kernel.org/pub/software/network/${BPN}/${BP}.tar.xz \
 SRC_URI[md5sum] = "0431fef3067bf503dfb464069f06163a"
 SRC_URI[sha256sum] = "43fcb9679f8b75ed87ad10944a506292def13e4afb194afa7aa921b01e8ecdbf"
 
-inherit python-dir pythonnative
+inherit python-dir pythonnative siteinfo
+
+# "gcrypt" or "openssl"
+DEFAULT_CRYPT ??= "gcrypt"
+
 # Recursive make problem
-EXTRA_OEMAKE = "MAKEFLAGS= DESTDIR=${D} LIBDIR=${libdir}/crda LDLIBREG='-Wl,-rpath,${libdir}/crda -lreg'"
-EXTRA_OEMAKE_append = " USE_OPENSSL=1"
+EXTRA_OEMAKE = "MAKEFLAGS= DESTDIR=${D} LIBDIR=${libdir}/crda LDLIBREG='-Wl,-rpath,${libdir}/crda -lreg' \
+                UDEV_RULE_DIR=${nonarch_libdir}/udev/rules.d/"
+EXTRA_OEMAKE_append = " ${@oe.utils.conditional("DEFAULT_CRYPT", "openssl", "USE_OPENSSL=1", "", d)}"
 TARGET_BITS = "${SITEINFO_BITS}"
 export TARGET_BITS
 

@@ -5,32 +5,52 @@ Subject: [PATCH] Install python modules to correct library dir.
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+Add OE's CFLAGS which contains `-fdebug-prefix-map' options to
+setup.py
+
+Supply "--root" directory to the "install" command, and use
+it as a prefix to strip off the purported filename encoded
+in bytecode files. (It strips build path prefix from .pyc files)
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- python/Makefile.am | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ python/Makefile.am | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/python/Makefile.am b/python/Makefile.am
-index a254480f9..efe9f3c01 100644
+index a254480..578602f 100644
 --- a/python/Makefile.am
 +++ b/python/Makefile.am
-@@ -47,7 +47,7 @@ install-exec-local:
+@@ -8,6 +8,10 @@ AUTOMAKE_OPTIONS = subdir-objects
+ AM_CPPFLAGS = -I$(srcdir)/../includes
+ AM_CPPFLAGS += -I$(abs_builddir)/../includes/sys
+ 
++# Add OE's CFLAGS which contains `-fdebug-prefix-map' options to
++# fix build path issue
++AM_CPPFLAGS += $(CFLAGS)
++
+ # Any script in the following variable will get byte-compiled at
+ # install time.
+ pkglibexecpython_PYTHON =
+@@ -47,7 +51,7 @@ install-exec-local:
  if HAVE_PYTHON2_PROBES
  	(cd $(srcdir); CFLAGS="$(AM_CPPFLAGS)" $(PYTHON) setup.py build \
           --build-base $(shell readlink -f $(builddir))/py2build \
 -	 install --prefix $(DESTDIR)$(prefix) \
-+	 install --prefix $(DESTDIR)$(prefix) --install-lib=$(DESTDIR)${pythondir} \
++	 install --root $(DESTDIR) --prefix $(prefix) --prefix $(prefix) --install-lib=${pythondir} \
  	 --single-version-externally-managed \
  	 --record $(shell readlink -f $(builddir))/py2build/install_files.txt \
           --verbose)
-@@ -55,7 +55,7 @@ endif
+@@ -55,7 +59,7 @@ endif
  if HAVE_PYTHON3_PROBES
  	(cd $(srcdir); CFLAGS="$(AM_CPPFLAGS)" $(PYTHON3) setup.py build \
           --build-base $(shell readlink -f $(builddir))/py3build \
 -	 install --prefix $(DESTDIR)$(prefix) \
-+	 install --prefix $(DESTDIR)$(prefix) --install-lib=$(DESTDIR)${python3dir} \
++	 install --root $(DESTDIR) --prefix $(prefix) --install-lib=${python3dir} \
  	 --single-version-externally-managed \
  	 --record $(shell readlink -f $(builddir))/py3build/install_files.txt \
           --verbose)
 -- 
-2.11.0
+2.7.4
 

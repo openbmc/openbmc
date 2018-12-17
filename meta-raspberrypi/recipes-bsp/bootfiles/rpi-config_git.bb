@@ -23,7 +23,6 @@ PITFT28r="${@bb.utils.contains("MACHINE_FEATURES", "pitft28r", "1", "0", d)}"
 PITFT35r="${@bb.utils.contains("MACHINE_FEATURES", "pitft35r", "1", "0", d)}"
 
 VC4GRAPHICS="${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", "1", "0", d)}"
-VC4DTBO_raspberrypi3-64 ?= "vc4-fkms-v3d"
 VC4DTBO ?= "vc4-kms-v3d"
 
 inherit deploy nopackages
@@ -159,7 +158,7 @@ do_deploy() {
     # VC4 Graphics support
     if [ "${VC4GRAPHICS}" = "1" ]; then
         echo "# Enable VC4 Graphics" >> ${DEPLOYDIR}/bcm2835-bootfiles/config.txt
-        echo "dtoverlay=${VC4DTBO},${VC4_CMA_SIZE}" >> ${DEPLOYDIR}/bcm2835-bootfiles/config.txt
+        echo "dtoverlay=${VC4DTBO}" >> ${DEPLOYDIR}/bcm2835-bootfiles/config.txt
     fi
 
     # Waveshare "C" 1024x600 7" Rev2.1 IPS capacitive touch (http://www.waveshare.com/7inch-HDMI-LCD-C.htm)

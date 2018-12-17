@@ -28,8 +28,5 @@ FILES_${PN} += "${datadir}/dbus-1/services \
 "
 
 FILES_${PN}-dev += "${libdir}/tumbler-1/plugins/*.la \
-                    ${libdir}/tumbler-1/plugins/cache/*.la"
-FILES_${PN}-dbg += "${libdir}/tumbler-1/.debug \
-                    ${libdir}/tumbler-1/plugins/.debug \
-                    ${libdir}/tumbler-1/plugins/cache/.debug \
+                    ${libdir}/tumbler-1/plugins/cache/*.la \
 "

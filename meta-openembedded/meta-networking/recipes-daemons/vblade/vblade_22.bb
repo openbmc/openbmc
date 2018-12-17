@@ -16,6 +16,8 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/aoetools/${BP}.tar.gz \
 SRC_URI[md5sum] = "510d98ba0f231284a5fbe2da11cb2d6e"
 SRC_URI[sha256sum] = "a990378f273f10eb431e42954a871aed52714035bbab28c54cef600c458356bb"
 
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/aoetools/files/vblade/"
+
 inherit autotools-brokensep update-rc.d systemd
 
 do_install() {

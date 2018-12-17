@@ -19,6 +19,8 @@ acpaths = "-I ./m4"
 
 inherit ptest
 
+RDEPENDS_${PN}-ptest += "make"
+
 do_install_ptest() {
 	t=${D}${PTEST_PATH}
 	install -D ${S}/build-aux/test-driver $t/build-aux/test-driver

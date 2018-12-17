@@ -1,4 +1,4 @@
-From 760ccbb2fb046621a2aeaecabb2b1ef9aa280cf1 Mon Sep 17 00:00:00 2001
+From 94a9e2241ea27e75babbfdeb38043b13049e23b0 Mon Sep 17 00:00:00 2001
 From: Yulong Pei <Yulong.pei@windriver.com>
 Date: Thu, 1 Sep 2011 01:03:14 +0800
 Subject: [PATCH] replace lynx to curl in apachectl script
@@ -6,14 +6,15 @@ Subject: [PATCH] replace lynx to curl in apachectl script
 Upstream-Status: Inappropriate [configuration]
 
 Signed-off-by: Yulong Pei <Yulong.pei@windriver.com>
----
- support/apachectl.in |   14 ++++++++++----
- 1 files changed, 10 insertions(+), 4 deletions(-)
 
-Index: httpd-2.4.29/support/apachectl.in
-===================================================================
---- httpd-2.4.29.orig/support/apachectl.in
-+++ httpd-2.4.29/support/apachectl.in
+---
+ support/apachectl.in | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/support/apachectl.in b/support/apachectl.in
+index 3281c2e..6ab4ba5 100644
+--- a/support/apachectl.in
++++ b/support/apachectl.in
 @@ -52,11 +52,11 @@ fi
  # a command that outputs a formatted text version of the HTML at the
  # url given on the command line.  Designed for lynx, however other

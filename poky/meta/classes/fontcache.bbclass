@@ -17,7 +17,7 @@ FONTCONFIG_CACHE_PARAMS ?= "-v"
 FONTCONFIG_CACHE_ENV ?= "FC_DEBUG=1"
 fontcache_common() {
 if [ -n "$D" ] ; then
-	$INTERCEPT_DIR/postinst_intercept update_font_cache ${PKG} mlprefix=${MLPREFIX} \
+	$INTERCEPT_DIR/postinst_intercept update_font_cache ${PKG} mlprefix=${MLPREFIX} binprefix=${MLPREFIX} \
 		'bindir="${bindir}"' \
 		'libdir="${libdir}"' \
 		'base_libdir="${base_libdir}"' \

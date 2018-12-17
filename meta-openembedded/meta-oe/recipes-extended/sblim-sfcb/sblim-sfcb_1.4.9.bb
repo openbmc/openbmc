@@ -25,6 +25,7 @@ SRC_URI = "http://downloads.sourceforge.net/sblim/${BP}.tar.bz2 \
            file://sblim-sfcb-1.4.9-fix-ftbfs.patch \
            file://0001-include-stdint.h-system-header-for-UINT16_MAX.patch \
            file://0001-Replace-need-for-error.h-when-it-does-not-exist.patch \
+           file://sblim-sfcb-1.4.9-fix-sfcbinst2mof.patch \
 "
 
 SRC_URI[md5sum] = "28021cdabc73690a94f4f9d57254ce30"
@@ -67,14 +68,8 @@ do_install() {
 }
 
 pkg_postinst_${PN} () {
-    OPTS=""
-
     if [ x"$D" != "x" ]; then
-        OPTS="--root=$D"
-        if type systemctl >/dev/null 2>/dev/null; then
-                systemctl $OPTS ${SYSTEMD_AUTO_ENABLE} ${SYSTEMD_SERVICE}
-        fi
-        exit 1
+        $INTERCEPT_DIR/postinst_intercept delay_to_first_boot ${PKG} mlprefix=${MLPREFIX}
     fi
 
     ${datadir}/sfcb/genSslCert.sh ${sysconfdir}/sfcb

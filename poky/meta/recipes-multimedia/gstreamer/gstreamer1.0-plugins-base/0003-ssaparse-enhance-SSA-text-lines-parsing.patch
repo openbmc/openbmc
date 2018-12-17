@@ -1,7 +1,7 @@
-From be6163cfa3a255493f9d75bad9541cbfe1723fee Mon Sep 17 00:00:00 2001
+From 918c96b24d10f61b7455b4cef3bab490849d0d77 Mon Sep 17 00:00:00 2001
 From: Mingke Wang <mingke.wang@freescale.com>
 Date: Thu, 19 Mar 2015 14:17:10 +0800
-Subject: [PATCH 3/4] ssaparse: enhance SSA text lines parsing.
+Subject: [PATCH] ssaparse: enhance SSA text lines parsing.
 
 some parser will pass in the original ssa text line which starts with "Dialog:"
 and there's are maybe multiple Dialog lines in one input buffer.
@@ -10,13 +10,18 @@ Upstream-Status: Submitted [https://bugzilla.gnome.org/show_bug.cgi?id=747496]
 
 Signed-off-by: Mingke Wang <mingke.wang@freescale.com>
 
+---
+ gst/subparse/gstssaparse.c | 150 ++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 134 insertions(+), 16 deletions(-)
+ mode change 100644 => 100755 gst/subparse/gstssaparse.c
+
 diff --git a/gst/subparse/gstssaparse.c b/gst/subparse/gstssaparse.c
 old mode 100644
 new mode 100755
-index 06ecef9..0ab5dce
+index c849c08..4b9636c
 --- a/gst/subparse/gstssaparse.c
 +++ b/gst/subparse/gstssaparse.c
-@@ -260,6 +260,7 @@ gst_ssa_parse_remove_override_codes (GstSsaParse * parse, gchar * txt)
+@@ -262,6 +262,7 @@ gst_ssa_parse_remove_override_codes (GstSsaParse * parse, gchar * txt)
   * gst_ssa_parse_push_line:
   * @parse: caller element
   * @txt: text to push
@@ -24,7 +29,7 @@ index 06ecef9..0ab5dce
   * @start: timestamp for the buffer
   * @duration: duration for the buffer
   *
-@@ -269,27 +270,133 @@ gst_ssa_parse_remove_override_codes (GstSsaParse * parse, gchar * txt)
+@@ -271,27 +272,133 @@ gst_ssa_parse_remove_override_codes (GstSsaParse * parse, gchar * txt)
   * Returns: result of the push of the created buffer
   */
  static GstFlowReturn
@@ -169,7 +174,7 @@ index 06ecef9..0ab5dce
    GST_LOG_OBJECT (parse, "Text : %s", t);
  
    if (gst_ssa_parse_remove_override_codes (parse, t)) {
-@@ -307,13 +414,22 @@ gst_ssa_parse_push_line (GstSsaParse * parse, gchar * txt,
+@@ -309,13 +416,22 @@ gst_ssa_parse_push_line (GstSsaParse * parse, gchar * txt,
    gst_buffer_fill (buf, 0, escaped, len + 1);
    gst_buffer_set_size (buf, len);
    g_free (escaped);
@@ -196,7 +201,7 @@ index 06ecef9..0ab5dce
  
    ret = gst_pad_push (parse->srcpad, buf);
  
-@@ -333,6 +449,7 @@ gst_ssa_parse_chain (GstPad * sinkpad, GstObject * parent, GstBuffer * buf)
+@@ -335,6 +451,7 @@ gst_ssa_parse_chain (GstPad * sinkpad, GstObject * parent, GstBuffer * buf)
    GstClockTime ts;
    gchar *txt;
    GstMapInfo map;
@@ -204,7 +209,7 @@ index 06ecef9..0ab5dce
  
    if (G_UNLIKELY (!parse->framed))
      goto not_framed;
-@@ -350,13 +467,14 @@ gst_ssa_parse_chain (GstPad * sinkpad, GstObject * parent, GstBuffer * buf)
+@@ -352,13 +469,14 @@ gst_ssa_parse_chain (GstPad * sinkpad, GstObject * parent, GstBuffer * buf)
    /* make double-sure it's 0-terminated and all */
    gst_buffer_map (buf, &map, GST_MAP_READ);
    txt = g_strndup ((gchar *) map.data, map.size);
@@ -220,6 +225,3 @@ index 06ecef9..0ab5dce
  
    if (ret != GST_FLOW_OK && GST_CLOCK_TIME_IS_VALID (ts)) {
      GstSegment segment;
--- 
-1.7.9.5
-

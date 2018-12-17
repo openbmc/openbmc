@@ -33,7 +33,7 @@ prelink_image () {
 	fi
 	cat ${STAGING_DIR_TARGET}${sysconfdir}/ld.so.conf >> $ldsoconf
 
-	dynamic_loader=$(linuxloader)
+	dynamic_loader=${@get_linuxloader(d)}
 
 	# prelink!
 	if [ "${BUILD_REPRODUCIBLE_BINARIES}" = "1" ]; then

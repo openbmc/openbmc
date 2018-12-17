@@ -1,4 +1,4 @@
-{% extends "baseprojectpage.html" %}
+{% extends project_specific|yesno:"baseprojectspecificpage.html,baseprojectpage.html" %}
 
 {% load projecttags %}
 {% load humanize %}
@@ -18,7 +18,7 @@
     try {
       projectPageInit(ctx);
     } catch (e) {
-      document.write("Sorry, An error has occurred loading this page");
+      document.write("Sorry, An error has occurred loading this page (project):"+e);
       console.warn(e);
     }
   });
@@ -93,6 +93,7 @@
       </form>
     </div>
 
+	{% if not project_specific %}
     <div class="well well-transparent">
       <h3>Most built recipes</h3>
 
@@ -105,6 +106,7 @@
       </ul>
       <button class="btn btn-primary" id="freq-build-btn" disabled="disabled">Build selected recipes</button>
     </div>
+    {% endif %}
 
     <div class="well well-transparent">
       <h3>Project release</h3>
@@ -157,5 +159,6 @@
       <ul class="list-unstyled lead" id="layers-in-project-list">
       </ul>
   </div>
+
 </div>
 {% endblock %}

@@ -1,7 +1,7 @@
 From 57239fda56b68a8f3e413f7b6af5290ba0d86636 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 Date: Thu, 22 Mar 2018 18:18:06 +0100
-Subject: [PATCH 2/4] musl: dlopen is included so LD_LIBS="" instead of
+Subject: [PATCH] musl: dlopen is included so LD_LIBS="" instead of
  LD_LIBS="none required"
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -22,7 +22,7 @@ diff --git a/configure.ac b/configure.ac
 index 487a266..96ae4f7 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -305,6 +305,7 @@ dnl
+@@ -235,6 +235,7 @@ dnl
  dnl Checks for libdl - on certain platforms its part of libc
  dnl
  AC_SEARCH_LIBS([dlopen], [dl dld], [], [ac_cv_search_dlopen=])

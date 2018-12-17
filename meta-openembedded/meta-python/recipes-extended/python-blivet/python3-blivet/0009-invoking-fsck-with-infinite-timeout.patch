@@ -1,0 +1,31 @@
+From c757666f42f543baeed5df61269798c085665d9b Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 1 Jun 2017 16:05:27 +0800
+Subject: [PATCH 09/11] invoking fsck with infinite timeout
+
+This large timeout is needed when running on machines with
+lots of disks, or with slow disks.
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ blivet/tasks/fsck.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/blivet/tasks/fsck.py b/blivet/tasks/fsck.py
+index 5274f13..6e074c4 100644
+--- a/blivet/tasks/fsck.py
++++ b/blivet/tasks/fsck.py
+@@ -77,7 +77,7 @@ class FSCK(task.BasicApplication, fstask.FSTask):
+             raise FSError("\n".join(error_msgs))
+ 
+         try:
+-            rc = util.run_program(self._fsck_command)
++            rc = util.run_program(self._fsck_command, timeout=-1)
+         except OSError as e:
+             raise FSError("filesystem check failed: %s" % e)
+ 
+-- 
+2.7.4
+

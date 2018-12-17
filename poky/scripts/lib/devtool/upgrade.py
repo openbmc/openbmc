@@ -264,7 +264,7 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, srcbranch, branch, kee
     if no_patch:
         patches = oe.recipeutils.get_recipe_patches(crd)
         if patches:
-            logger.warn('By user choice, the following patches will NOT be applied to the new source tree:\n  %s' % '\n  '.join([os.path.basename(patch) for patch in patches]))
+            logger.warning('By user choice, the following patches will NOT be applied to the new source tree:\n  %s' % '\n  '.join([os.path.basename(patch) for patch in patches]))
     else:
         __run('git checkout devtool-patched -b %s' % branch)
         skiptag = False
@@ -273,9 +273,9 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, srcbranch, branch, kee
         except bb.process.ExecutionError as e:
             skiptag = True
             if 'conflict' in e.stdout:
-                logger.warn('Command \'%s\' failed:\n%s\n\nYou will need to resolve conflicts in order to complete the upgrade.' % (e.command, e.stdout.rstrip()))
+                logger.warning('Command \'%s\' failed:\n%s\n\nYou will need to resolve conflicts in order to complete the upgrade.' % (e.command, e.stdout.rstrip()))
             else:
-                logger.warn('Command \'%s\' failed:\n%s' % (e.command, e.stdout))
+                logger.warning('Command \'%s\' failed:\n%s' % (e.command, e.stdout))
         if not skiptag:
             if uri.startswith('git://'):
                 suffix = 'new'
@@ -420,7 +420,10 @@ def _create_new_recipe(newpv, md5, sha256, srcrev, srcbranch, srcsubdir_old, src
                 logger.info('Source subdirectory has changed, updating S value')
 
     if license_diff:
-        newlicchksum = " ".join(["file://{};md5={}".format(l["path"], l["actual_md5"]) + (";beginline={}".format(l["beginline"]) if l["beginline"] else "") + (";endline={}".format(l["endline"]) if l["endline"] else "") for l in new_licenses])
+        newlicchksum = " ".join(["file://{}".format(l['path']) +
+                                 (";beginline={}".format(l['beginline']) if l['beginline'] else "") +
+                                 (";endline={}".format(l['endline']) if l['endline'] else "") +
+                                 (";md5={}".format(l['actual_md5'])) for l in new_licenses])
         newvalues["LIC_FILES_CHKSUM"] = newlicchksum
         _add_license_diff_to_recipe(fullpath, license_diff)
 

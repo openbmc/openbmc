@@ -24,12 +24,15 @@ inherit autotools pkgconfig upstream-version-is-even
 FILES_${PN} += "${datadir}/${BPN}-${SHRT_VER}/vapi ${libdir}/${BPN}-${SHRT_VER}/"
 FILES_${PN}-doc += "${datadir}/devhelp"
 
+# .gir files from gobject-introspection are installed to ${libdir} when multilib is enabled
+GIRDIR_OPT = "${@'--girdir=${STAGING_LIBDIR}/gir-1.0' if d.getVar('MULTILIBS') else ''}"
+
 do_configure_prepend_class-target() {
         # Write out a vapigen wrapper that will be provided by pkg-config file installed in target sysroot
         # The wrapper will call a native vapigen
         cat > ${B}/vapigen-wrapper << EOF
 #!/bin/sh
-vapigen-${SHRT_VER} "\$@"
+vapigen-${SHRT_VER} ${GIRDIR_OPT} "\$@"
 EOF
         chmod +x ${B}/vapigen-wrapper
 }
@@ -55,3 +58,5 @@ vapigen_sysroot_preprocess() {
            -e "s|vapigen=.*|vapigen=${bindir}/vapigen-wrapper|" \
            ${SYSROOT_DESTDIR}${libdir}/pkgconfig/vapigen-${SHRT_VER}.pc
 }
+
+SSTATE_SCAN_FILES += "vapigen-wrapper"

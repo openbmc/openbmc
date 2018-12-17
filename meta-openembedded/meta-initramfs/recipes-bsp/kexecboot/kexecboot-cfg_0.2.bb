@@ -19,8 +19,14 @@ LABEL=${KEXECBOOT_LABEL}
 # Specify full kernel path on target.
 KERNEL=/boot/${KERNEL_IMAGETYPE}
 #
+# Specify which device tree blob to use
+# DTB=/boot/my-own-dtb
+#
 # Append this tags to the kernel cmdline.
 APPEND=${CMDLINE} ${CMDLINE_DEBUG}
+#
+# Overwrite kernel command line instead of appending to it
+# CMDLINE=console=/dev/tty0 root=/dev/sdb1
 #
 # Specify optional initrd/initramfs.
 # INITRD=/boot/initramfs.cpio.gz

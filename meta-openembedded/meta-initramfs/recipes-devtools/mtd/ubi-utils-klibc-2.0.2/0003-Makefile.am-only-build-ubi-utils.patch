@@ -1,0 +1,34 @@
+From 139d93bc405272a3261d57be26da842e737fe4d0 Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Sun, 28 Jan 2018 23:10:34 +0100
+Subject: [PATCH] Makefile.am: only build ubi-utils
+
+We only target the ubi-utils, static, small.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+---
+ Makefile.am | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 5a6e77c..98715dd 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -34,9 +34,9 @@ EXTRA_DIST += $(GLOBAL_HEADER) $(GLOBAL_EXTRA)
+ 
+ include lib/Makemodule.am
+ include ubi-utils/Makemodule.am
+-include misc-utils/Makemodule.am
+-include nand-utils/Makemodule.am
+-include nor-utils/Makemodule.am
++#include misc-utils/Makemodule.am
++#include nand-utils/Makemodule.am
++#include nor-utils/Makemodule.am
+ 
+ if BUILD_UBIFS
+ include ubifs-utils/Makemodule.am
+-- 
+2.7.4
+

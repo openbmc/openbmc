@@ -18,11 +18,11 @@ for more details
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Upstream-Status: Pending
 
-Index: nss-3.24/nss/coreconf/Werror.mk
+Index: nss-3.37.1/nss/coreconf/Werror.mk
 ===================================================================
---- nss-3.24.orig/nss/coreconf/Werror.mk
-+++ nss-3.24/nss/coreconf/Werror.mk
-@@ -54,7 +54,7 @@ ifndef WARNING_CFLAGS
+--- nss-3.37.1.orig/nss/coreconf/Werror.mk
++++ nss-3.37.1/nss/coreconf/Werror.mk
+@@ -56,7 +56,7 @@ ifndef WARNING_CFLAGS
      ifdef CC_IS_CLANG
        # -Qunused-arguments : clang objects to arguments that it doesn't understand
        #    and fixing this would require rearchitecture

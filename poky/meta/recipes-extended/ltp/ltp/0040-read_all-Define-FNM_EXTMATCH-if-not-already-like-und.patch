@@ -1,0 +1,44 @@
+From 23518508de307790231d16af307291f1b45e903a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20D=C3=ADaz?= <daniel.diaz@linaro.org>
+Date: Tue, 5 Jun 2018 15:36:30 -0500
+Subject: [PATCH] read_all: Define FNM_EXTMATCH if not already (like under
+ musl).
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+With musl, FNM_EXTMATCH is not defined:
+| read_all.c: In function 'read_test':
+| read_all.c:201:41: error: 'FNM_EXTMATCH' undeclared (first use in this function); did you mean 'FNM_NOMATCH'?
+|   if (exclude && !fnmatch(exclude, path, FNM_EXTMATCH)) {
+|                                          ^~~~~~~~~~~~
+|                                          FNM_NOMATCH
+| read_all.c:201:41: note: each undeclared identifier is reported only once for each function it appears in
+| <builtin>: recipe for target 'read_all' failed
+| make[4]: *** [read_all] Error 1
+
+Signed-off-by: Daniel Díaz <daniel.diaz@linaro.org>
+
+Upstream-Status: Pending
+---
+ testcases/kernel/fs/read_all/read_all.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/testcases/kernel/fs/read_all/read_all.c b/testcases/kernel/fs/read_all/read_all.c
+index a8e1611..e9ff47a 100644
+--- a/testcases/kernel/fs/read_all/read_all.c
++++ b/testcases/kernel/fs/read_all/read_all.c
+@@ -59,6 +59,10 @@
+ #define MAX_PATH 4096
+ #define MAX_DISPLAY 40
+ 
++#if !defined(FNM_EXTMATCH)
++#define FNM_EXTMATCH 0
++#endif
++
+ struct queue {
+ 	sem_t sem;
+ 	int front;
+-- 
+2.7.4
+

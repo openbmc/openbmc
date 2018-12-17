@@ -19,11 +19,11 @@ Signed-off-by: Dengke Du <dengke.du@windriver.com>
  tools/lvmcmdline.c | 6 +++---
  2 files changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/lib/log/log.c b/lib/log/log.c
-index c933154..3581084 100644
---- a/lib/log/log.c
-+++ b/lib/log/log.c
-@@ -161,6 +161,7 @@ static void _check_and_replace_standard_log_streams(FILE *old_stream, FILE *new_
+Index: LVM2.2.02.177/lib/log/log.c
+===================================================================
+--- LVM2.2.02.177.orig/lib/log/log.c
++++ LVM2.2.02.177/lib/log/log.c
+@@ -161,6 +161,7 @@ static void _check_and_replace_standard_
   * Close and reopen standard stream on file descriptor fd.
   */
  int reopen_standard_stream(FILE **stream, const char *mode)
@@ -31,7 +31,7 @@ index c933154..3581084 100644
  {
  	int fd, fd_copy, new_fd;
  	const char *name;
-@@ -207,6 +208,11 @@ int reopen_standard_stream(FILE **stream, const char *mode)
+@@ -207,6 +208,11 @@ int reopen_standard_stream(FILE **stream
  	*stream = new_stream;
  	return 1;
  }
@@ -43,11 +43,11 @@ index c933154..3581084 100644
  
  void init_log_fn(lvm2_log_fn_t log_fn)
  {
-diff --git a/tools/lvmcmdline.c b/tools/lvmcmdline.c
-index 9a4deb7..f1f18e6 100644
---- a/tools/lvmcmdline.c
-+++ b/tools/lvmcmdline.c
-@@ -1818,7 +1818,7 @@ static int _check_standard_fds(void)
+Index: LVM2.2.02.177/tools/lvmcmdline.c
+===================================================================
+--- LVM2.2.02.177.orig/tools/lvmcmdline.c
++++ LVM2.2.02.177/tools/lvmcmdline.c
+@@ -3095,7 +3095,7 @@ static int _check_standard_fds(void)
  	int err = is_valid_fd(STDERR_FILENO);
  
  	if (!is_valid_fd(STDIN_FILENO) &&
@@ -56,7 +56,7 @@ index 9a4deb7..f1f18e6 100644
  		if (err)
  			perror("stdin stream open");
  		else
-@@ -1828,7 +1828,7 @@ static int _check_standard_fds(void)
+@@ -3105,7 +3105,7 @@ static int _check_standard_fds(void)
  	}
  
  	if (!is_valid_fd(STDOUT_FILENO) &&
@@ -65,7 +65,7 @@ index 9a4deb7..f1f18e6 100644
  		if (err)
  			perror("stdout stream open");
  		/* else no stdout */
-@@ -1836,7 +1836,7 @@ static int _check_standard_fds(void)
+@@ -3113,7 +3113,7 @@ static int _check_standard_fds(void)
  	}
  
  	if (!is_valid_fd(STDERR_FILENO) &&
@@ -74,6 +74,3 @@ index 9a4deb7..f1f18e6 100644
  		printf("stderr stream open: %s\n",
  		       strerror(errno));
  		return 0;
--- 
-2.12.0
-

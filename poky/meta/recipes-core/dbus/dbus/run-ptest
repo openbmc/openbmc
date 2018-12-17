@@ -12,7 +12,7 @@ output() {
 
 export DBUS_TEST_HOMEDIR=./test
 export XDG_RUNTIME_DIR=./test
-export LD_LIBRARY_PATH=/usr/lib/dbus-test/ptest/test/.libs
+export LD_LIBRARY_PATH=@PTEST_PATH@/test/.libs
 
 files=`ls test/test-*`
 

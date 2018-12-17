@@ -1,0 +1,36 @@
+From 1b5b6f827ac1153a41fc93e78bf34ccdf5720b9b Mon Sep 17 00:00:00 2001
+From: Randy MacLeod <Randy.MacLeod@windriver.com>
+Date: Fri, 19 Oct 2018 10:31:12 -0400
+Subject: [PATCH] Guard against __GLIBC_PREREQ for musl libc
+
+Upstream-Status: Pending
+
+Signed-off-by: Randy MacLeod <Randy.MacLeod@windriver.com>
+---
+ memcheck/tests/linux/sys-statx.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/memcheck/tests/linux/sys-statx.c b/memcheck/tests/linux/sys-statx.c
+index fe9f9ba45..473c2cd7f 100644
+--- a/memcheck/tests/linux/sys-statx.c
++++ b/memcheck/tests/linux/sys-statx.c
+@@ -7,11 +7,16 @@
+ #include <assert.h>
+ #include <string.h>
+ #include <sys/syscall.h>
++
++#if defined(__GLIBC__) && defined(__GLIBC_PREREQ)
+ #if __GLIBC_PREREQ(2,28)
+ /* struct statx provided in sys/stat.h */
+ #else
+ #include <linux/stat.h>
+ #endif
++#else
++#include <linux/stat.h>
++#endif
+ #include <errno.h>
+ 
+ int check_stat2;
+-- 
+2.17.0
+

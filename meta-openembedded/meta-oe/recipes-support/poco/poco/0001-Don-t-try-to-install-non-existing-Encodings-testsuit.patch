@@ -1,0 +1,31 @@
+From fa079dfc5e1d22ea35762bf4c5b09999bdc5e731 Mon Sep 17 00:00:00 2001
+From: Jochen Sprickerhof <git@jochen.sprickerhof.de>
+Date: Wed, 22 Aug 2018 21:42:09 +0200
+Subject: [PATCH] Don't try to install non existing Encodings/testsuite/data
+
+Upstream-Status: Backport [https://github.com/pocoproject/poco/pull/2437]
+---
+ Encodings/testsuite/CMakeLists.txt | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/Encodings/testsuite/CMakeLists.txt b/Encodings/testsuite/CMakeLists.txt
+index 7508e5522..79495ae02 100644
+--- a/Encodings/testsuite/CMakeLists.txt
++++ b/Encodings/testsuite/CMakeLists.txt
+@@ -19,12 +19,9 @@ POCO_SOURCES_AUTO_PLAT( TEST_SRCS WINCE
+ add_executable( ${TESTUNIT} ${TEST_SRCS} )
+ if(ANDROID)
+ 	add_test(NAME ${LIBNAME} WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+-			COMMAND ${CMAKE_COMMAND} -DANDROID_NDK=${ANDROID_NDK} "-DTEST_FILES=${CMAKE_CURRENT_SOURCE_DIR}/data;" -DLIBRARY_DIR=${CMAKE_BINARY_DIR}/lib -DUNITTEST=${CMAKE_BINARY_DIR}/bin/${TESTUNIT} -DTEST_PARAMETER=-all -P ${CMAKE_SOURCE_DIR}/cmake/ExecuteOnAndroid.cmake)
++			COMMAND ${CMAKE_COMMAND} -DANDROID_NDK=${ANDROID_NDK} -DLIBRARY_DIR=${CMAKE_BINARY_DIR}/lib -DUNITTEST=${CMAKE_BINARY_DIR}/bin/Encodings-testrunner -DTEST_PARAMETER=-all -P ${CMAKE_SOURCE_DIR}/cmake/ExecuteOnAndroid.cmake)
+ else()
+ 	add_test(NAME ${LIBNAME} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND ${TESTUNIT} -all)
+-	# The test is run in the build directory. So the test data is copied there too
+-	add_custom_command(TARGET ${TESTUNIT} POST_BUILD
+-				   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}/data )
+ endif()
+ #set_target_properties( ${TESTUNIT} PROPERTIES COMPILE_FLAGS ${RELEASE_CXX_FLAGS} )
+ target_link_libraries( ${TESTUNIT}  PocoEncodings PocoFoundation CppUnit )
+-- 
+2.18.0
+

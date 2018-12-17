@@ -3,7 +3,6 @@ import os
 import glob
 import subprocess
 import shutil
-import multiprocessing
 import re
 import collections
 import bb
@@ -13,6 +12,7 @@ import oe.path
 import string
 from oe.gpg_sign import get_signer
 import hashlib
+import fnmatch
 
 # this can be used by all PM backends to create the index files in parallel
 def create_index(arg):
@@ -84,11 +84,54 @@ def opkg_query(cmd_output):
 
     return output
 
-# Note: this should be bb.fatal in the future.
-def failed_postinsts_warn(pkgs, log_path):
-    bb.warn("""Intentionally failing postinstall scriptlets of %s to defer them to first boot is deprecated. Please place them into pkg_postinst_ontarget_${PN} ().
-If deferring to first boot wasn't the intent, then scriptlet failure may mean an issue in the recipe, or a regression elsewhere.
+def failed_postinsts_abort(pkgs, log_path):
+    bb.fatal("""Postinstall scriptlets of %s have failed. If the intention is to defer them to first boot,
+then please place them into pkg_postinst_ontarget_${PN} ().
+Deferring to first boot via 'exit 1' is no longer supported.
 Details of the failure are in %s.""" %(pkgs, log_path))
+
+def generate_locale_archive(d, rootfs, target_arch, localedir):
+    # Pretty sure we don't need this for locale archive generation but
+    # keeping it to be safe...
+    locale_arch_options = { \
+        "arm": ["--uint32-align=4", "--little-endian"],
+        "armeb": ["--uint32-align=4", "--big-endian"],
+        "aarch64": ["--uint32-align=4", "--little-endian"],
+        "aarch64_be": ["--uint32-align=4", "--big-endian"],
+        "sh4": ["--uint32-align=4", "--big-endian"],
+        "powerpc": ["--uint32-align=4", "--big-endian"],
+        "powerpc64": ["--uint32-align=4", "--big-endian"],
+        "mips": ["--uint32-align=4", "--big-endian"],
+        "mipsisa32r6": ["--uint32-align=4", "--big-endian"],
+        "mips64": ["--uint32-align=4", "--big-endian"],
+        "mipsisa64r6": ["--uint32-align=4", "--big-endian"],
+        "mipsel": ["--uint32-align=4", "--little-endian"],
+        "mipsisa32r6el": ["--uint32-align=4", "--little-endian"],
+        "mips64el": ["--uint32-align=4", "--little-endian"],
+        "mipsisa64r6el": ["--uint32-align=4", "--little-endian"],
+        "riscv64": ["--uint32-align=4", "--little-endian"],
+        "riscv32": ["--uint32-align=4", "--little-endian"],
+        "i586": ["--uint32-align=4", "--little-endian"],
+        "i686": ["--uint32-align=4", "--little-endian"],
+        "x86_64": ["--uint32-align=4", "--little-endian"]
+    }
+    if target_arch in locale_arch_options:
+        arch_options = locale_arch_options[target_arch]
+    else:
+        bb.error("locale_arch_options not found for target_arch=" + target_arch)
+        bb.fatal("unknown arch:" + target_arch + " for locale_arch_options")
+
+    # Need to set this so cross-localedef knows where the archive is
+    env = dict(os.environ)
+    env["LOCALEARCHIVE"] = oe.path.join(localedir, "locale-archive")
+
+    for name in os.listdir(localedir):
+        path = os.path.join(localedir, name)
+        if os.path.isdir(path):
+            cmd = ["cross-localedef", "--verbose"]
+            cmd += arch_options
+            cmd += ["--add-to-archive", path]
+            subprocess.check_output(cmd, env=env, stderr=subprocess.STDOUT)
 
 class Indexer(object, metaclass=ABCMeta):
     def __init__(self, d, deploy_dir):
@@ -177,7 +220,7 @@ class OpkgIndexer(Indexer):
             bb.note("There are no packages in %s!" % self.deploy_dir)
             return
 
-        oe.utils.multiprocess_exec(index_cmds, create_index)
+        oe.utils.multiprocess_launch(create_index, index_cmds, self.d)
 
         if signer:
             feed_sig_type = self.d.getVar('PACKAGE_FEED_GPG_SIGNATURE_TYPE')
@@ -258,7 +301,7 @@ class DpkgIndexer(Indexer):
             bb.note("There are no packages in %s" % self.deploy_dir)
             return
 
-        oe.utils.multiprocess_exec(index_cmds, create_index)
+        oe.utils.multiprocess_launch(create_index, index_cmds, self.d)
         if self.d.getVar('PACKAGE_FEED_SIGN') == '1':
             raise NotImplementedError('Package feed signing not implementd for dpkg')
 
@@ -336,17 +379,24 @@ class PackageManager(object, metaclass=ABCMeta):
 
     def _initialize_intercepts(self):
         bb.note("Initializing intercept dir for %s" % self.target_rootfs)
-        postinst_intercepts_dir = self.d.getVar("POSTINST_INTERCEPTS_DIR")
-        if not postinst_intercepts_dir:
-            postinst_intercepts_dir = self.d.expand("${COREBASE}/scripts/postinst-intercepts")
         # As there might be more than one instance of PackageManager operating at the same time
         # we need to isolate the intercept_scripts directories from each other,
         # hence the ugly hash digest in dir name.
-        self.intercepts_dir = os.path.join(self.d.getVar('WORKDIR'),
-                                      "intercept_scripts-%s" %(hashlib.sha256(self.target_rootfs.encode()).hexdigest()) )
+        self.intercepts_dir = os.path.join(self.d.getVar('WORKDIR'), "intercept_scripts-%s" %
+                                           (hashlib.sha256(self.target_rootfs.encode()).hexdigest()))
 
+        postinst_intercepts = (self.d.getVar("POSTINST_INTERCEPTS") or "").split()
+        if not postinst_intercepts:
+            postinst_intercepts_path = self.d.getVar("POSTINST_INTERCEPTS_PATH")
+            if not postinst_intercepts_path:
+                postinst_intercepts_path = self.d.getVar("POSTINST_INTERCEPTS_DIR") or self.d.expand("${COREBASE}/scripts/postinst-intercepts")
+            postinst_intercepts = oe.path.which_wild('*', postinst_intercepts_path)
+
+        bb.debug(1, 'Collected intercepts:\n%s' % ''.join('  %s\n' % i for i in postinst_intercepts))
         bb.utils.remove(self.intercepts_dir, True)
-        shutil.copytree(postinst_intercepts_dir, self.intercepts_dir)
+        bb.utils.mkdirhier(self.intercepts_dir)
+        for intercept in postinst_intercepts:
+            bb.utils.copyfile(intercept, os.path.join(self.intercepts_dir, os.path.basename(intercept)))
 
     @abstractmethod
     def _handle_intercept_failure(self, failed_script):
@@ -370,7 +420,7 @@ class PackageManager(object, metaclass=ABCMeta):
                 self._handle_intercept_failure(registered_pkgs)
 
 
-    def run_intercepts(self):
+    def run_intercepts(self, populate_sdk=None):
         intercepts_dir = self.intercepts_dir
 
         bb.note("Running intercept scripts:")
@@ -382,7 +432,8 @@ class PackageManager(object, metaclass=ABCMeta):
             if script == "postinst_intercept" or not os.access(script_full, os.X_OK):
                 continue
 
-            if script == "delay_to_first_boot":
+            # we do not want to run any multilib variant of this
+            if script.startswith("delay_to_first_boot"):
                 self._postpone_to_first_boot(script_full)
                 continue
 
@@ -392,9 +443,22 @@ class PackageManager(object, metaclass=ABCMeta):
                 output = subprocess.check_output(script_full, stderr=subprocess.STDOUT)
                 if output: bb.note(output.decode("utf-8"))
             except subprocess.CalledProcessError as e:
-                bb.warn("The postinstall intercept hook '%s' failed, details in %s/log.do_%s" % (script, self.d.getVar('T'), self.d.getVar('BB_CURRENTTASK')))
                 bb.note("Exit code %d. Output:\n%s" % (e.returncode, e.output.decode("utf-8")))
-                self._postpone_to_first_boot(script_full)
+                if populate_sdk == 'host':
+                    bb.warn("The postinstall intercept hook '%s' failed, details in %s/log.do_%s" % (script, self.d.getVar('T'), self.d.getVar('BB_CURRENTTASK')))
+                elif populate_sdk == 'target':
+                    if "qemuwrapper: qemu usermode is not supported" in e.output.decode("utf-8"):
+                        bb.warn("The postinstall intercept hook '%s' could not be executed due to missing qemu usermode support, details in %s/log.do_%s"
+                                % (script, self.d.getVar('T'), self.d.getVar('BB_CURRENTTASK')))
+                    else:
+                        bb.fatal("The postinstall intercept hook '%s' failed, details in %s/log.do_%s" % (script, self.d.getVar('T'), self.d.getVar('BB_CURRENTTASK')))
+                else:
+                    if "qemuwrapper: qemu usermode is not supported" in e.output.decode("utf-8"):
+                        bb.note("The postinstall intercept hook '%s' could not be executed due to missing qemu usermode support, details in %s/log.do_%s"
+                                % (script, self.d.getVar('T'), self.d.getVar('BB_CURRENTTASK')))
+                        self._postpone_to_first_boot(script_full)
+                    else:
+                        bb.fatal("The postinstall intercept hook '%s' failed, details in %s/log.do_%s" % (script, self.d.getVar('T'), self.d.getVar('BB_CURRENTTASK')))
 
     @abstractmethod
     def update(self):
@@ -523,6 +587,13 @@ class PackageManager(object, metaclass=ABCMeta):
                          "'%s' returned %d:\n%s" %
                          (' '.join(cmd), e.returncode, e.output.decode("utf-8")))
 
+        target_arch = self.d.getVar('TARGET_ARCH')
+        localedir = oe.path.join(self.target_rootfs, self.d.getVar("libdir"), "locale")
+        if os.path.exists(localedir) and os.listdir(localedir):
+            generate_locale_archive(self.d, self.target_rootfs, target_arch, localedir)
+            # And now delete the binary locales
+            self.remove(fnmatch.filter(self.list_installed(), "glibc-binary-localedata-*"), False)
+
     def deploy_dir_lock(self):
         if self.deploy_dir is None:
             raise RuntimeError("deploy_dir is not set!")
@@ -559,7 +630,7 @@ class PackageManager(object, metaclass=ABCMeta):
             return res
         return _append(uris, base_paths)
 
-def create_packages_dir(d, rpm_repo_dir, deploydir, taskname, filterbydependencies):
+def create_packages_dir(d, subrepo_dir, deploydir, taskname, filterbydependencies):
     """
     Go through our do_package_write_X dependencies and hardlink the packages we depend
     upon into the repo directory. This prevents us seeing other packages that may
@@ -574,15 +645,13 @@ def create_packages_dir(d, rpm_repo_dir, deploydir, taskname, filterbydependenci
     seendirs = set()
     multilibs = {}
    
-    rpm_subrepo_dir = oe.path.join(rpm_repo_dir, "rpm")
-
-    bb.utils.remove(rpm_subrepo_dir, recurse=True)
-    bb.utils.mkdirhier(rpm_subrepo_dir)
+    bb.utils.remove(subrepo_dir, recurse=True)
+    bb.utils.mkdirhier(subrepo_dir)
 
     # Detect bitbake -b usage
     nodeps = d.getVar("BB_LIMITEDDEPS") or False
     if nodeps or not filterbydependencies:
-        oe.path.symlink(deploydir, rpm_subrepo_dir, True)
+        oe.path.symlink(deploydir, subrepo_dir, True)
         return
 
     start = None
@@ -593,24 +662,24 @@ def create_packages_dir(d, rpm_repo_dir, deploydir, taskname, filterbydependenci
             break
     if start is None:
         bb.fatal("Couldn't find ourself in BB_TASKDEPDATA?")
-    rpmdeps = set()
+    pkgdeps = set()
     start = [start]
     seen = set(start)
-    # Support direct dependencies (do_rootfs -> rpms)
-    # or indirect dependencies within PN (do_populate_sdk_ext -> do_rootfs -> rpms)
+    # Support direct dependencies (do_rootfs -> do_package_write_X)
+    # or indirect dependencies within PN (do_populate_sdk_ext -> do_rootfs -> do_package_write_X)
     while start:
         next = []
         for dep2 in start:
             for dep in taskdepdata[dep2][3]:
                 if taskdepdata[dep][0] != pn:
                     if "do_" + taskname in dep:
-                        rpmdeps.add(dep)
+                        pkgdeps.add(dep)
                 elif dep not in seen:
                     next.append(dep)
                     seen.add(dep)
         start = next
 
-    for dep in rpmdeps:
+    for dep in pkgdeps:
         c = taskdepdata[dep][0]
         manifest, d2 = oe.sstatesig.find_sstate_manifest(c, taskdepdata[dep][2], taskname, d, multilibs)
         if not manifest:
@@ -620,8 +689,12 @@ def create_packages_dir(d, rpm_repo_dir, deploydir, taskname, filterbydependenci
         with open(manifest, "r") as f:
             for l in f:
                 l = l.strip()
-                dest = l.replace(deploydir, "")
-                dest = rpm_subrepo_dir + dest
+                deploydir = os.path.normpath(deploydir)
+                if bb.data.inherits_class('packagefeed-stability', d):
+                    dest = l.replace(deploydir + "-prediff", "")
+                else:
+                    dest = l.replace(deploydir, "")
+                dest = subrepo_dir + dest
                 if l.endswith("/"):
                     if dest not in seendirs:
                         bb.utils.mkdirhier(dest)
@@ -663,12 +736,12 @@ class RpmPM(PackageManager):
             self.primary_arch = self.d.getVar('MACHINE_ARCH')
 
         self.rpm_repo_dir = oe.path.join(self.d.getVar('WORKDIR'), rpm_repo_workdir)
-        create_packages_dir(self.d, self.rpm_repo_dir, d.getVar("DEPLOY_DIR_RPM"), "package_write_rpm", filterbydependencies)
+        create_packages_dir(self.d, oe.path.join(self.rpm_repo_dir, "rpm"), d.getVar("DEPLOY_DIR_RPM"), "package_write_rpm", filterbydependencies)
 
         self.saved_packaging_data = self.d.expand('${T}/saved_packaging_data/%s' % self.task_name)
         if not os.path.exists(self.d.expand('${T}/saved_packaging_data')):
             bb.utils.mkdirhier(self.d.expand('${T}/saved_packaging_data'))
-        self.packaging_data_dirs = ['var/lib/rpm', 'var/lib/dnf', 'var/cache/dnf']
+        self.packaging_data_dirs = ['etc/rpm', 'etc/rpmrc', 'etc/dnf', 'var/lib/rpm', 'var/lib/dnf', 'var/cache/dnf']
         self.solution_manifest = self.d.expand('${T}/saved/%s_solution' %
                                                self.task_name)
         if not os.path.exists(self.d.expand('${T}/saved')):
@@ -697,7 +770,9 @@ class RpmPM(PackageManager):
         rpmrcconfdir = "%s/%s" %(self.target_rootfs, "etc/")
         bb.utils.mkdirhier(platformconfdir)
         open(platformconfdir + "platform", 'w').write("%s-pc-linux" % self.primary_arch)
-        open(rpmrcconfdir + "rpmrc", 'w').write("arch_compat: %s: %s\n" % (self.primary_arch, self.archs if len(self.archs) > 0 else self.primary_arch))
+        with open(rpmrcconfdir + "rpmrc", 'w') as f:
+            f.write("arch_compat: %s: %s\n" % (self.primary_arch, self.archs if len(self.archs) > 0 else self.primary_arch))
+            f.write("buildarch_compat: %s: noarch\n" % self.primary_arch)
 
         open(platformconfdir + "macros", 'w').write("%_transaction_color 7\n")
         if self.d.getVar('RPM_PREFER_ELF_ARCH'):
@@ -789,13 +864,12 @@ class RpmPM(PackageManager):
                 failed_scriptlets_pkgnames[line.split()[-1]] = True
 
         if len(failed_scriptlets_pkgnames) > 0:
-            failed_postinsts_warn(list(failed_scriptlets_pkgnames.keys()), self.d.expand("${T}/log.do_${BB_CURRENTTASK}"))
-        for pkg in failed_scriptlets_pkgnames.keys():
-            self.save_rpmpostinst(pkg)
+            failed_postinsts_abort(list(failed_scriptlets_pkgnames.keys()), self.d.expand("${T}/log.do_${BB_CURRENTTASK}"))
 
     def remove(self, pkgs, with_dependencies = True):
-        if len(pkgs) == 0:
+        if not pkgs:
             return
+
         self._prepare_pkg_transaction()
 
         if with_dependencies:
@@ -832,7 +906,10 @@ class RpmPM(PackageManager):
         for i in self.packaging_data_dirs:
             source_dir = oe.path.join(self.target_rootfs, i)
             target_dir = oe.path.join(self.saved_packaging_data, i)
-            shutil.copytree(source_dir, target_dir, symlinks=True)
+            if os.path.isdir(source_dir):
+                shutil.copytree(source_dir, target_dir, symlinks=True)
+            elif os.path.isfile(source_dir):
+                shutil.copy2(source_dir, target_dir)
 
     def recovery_packaging_data(self):
         # Move the rpmlib back
@@ -842,9 +919,10 @@ class RpmPM(PackageManager):
                 if os.path.exists(target_dir):
                     bb.utils.remove(target_dir, True)
                 source_dir = oe.path.join(self.saved_packaging_data, i)
-                shutil.copytree(source_dir,
-                            target_dir,
-                            symlinks=True)
+                if os.path.isdir(source_dir):
+                    shutil.copytree(source_dir, target_dir, symlinks=True)
+                elif os.path.isfile(source_dir):
+                    shutil.copy2(source_dir, target_dir)
 
     def list_installed(self):
         output = self._invoke_dnf(["repoquery", "--installed", "--queryformat", "Package: %{name} %{arch} %{version} %{name}-%{version}-%{release}.%{arch}.rpm\nDependencies:\n%{requires}\nRecommendations:\n%{recommends}\nDependenciesEndHere:\n"],
@@ -884,7 +962,7 @@ class RpmPM(PackageManager):
         os.environ['RPM_ETCCONFIGDIR'] = self.target_rootfs
 
         dnf_cmd = bb.utils.which(os.getenv('PATH'), "dnf")
-        standard_dnf_args = (["-v", "--rpmverbosity=debug"] if self.d.getVar('ROOTFS_RPM_DEBUG') else []) + ["-y",
+        standard_dnf_args = ["-v", "--rpmverbosity=debug", "-y",
                              "-c", oe.path.join(self.target_rootfs, "etc/dnf/dnf.conf"),
                              "--setopt=reposdir=%s" %(oe.path.join(self.target_rootfs, "etc/yum.repos.d")),
                              "--repofrompath=oe-repo,%s" % (self.rpm_repo_dir),
@@ -896,7 +974,7 @@ class RpmPM(PackageManager):
         try:
             output = subprocess.check_output(cmd,stderr=subprocess.STDOUT).decode("utf-8")
             if print_output:
-                bb.note(output)
+                bb.debug(1, output)
             return output
         except subprocess.CalledProcessError as e:
             if print_output:
@@ -1060,18 +1138,21 @@ class OpkgDpkgPM(PackageManager):
         self.mark_packages("unpacked", registered_pkgs.split())
 
 class OpkgPM(OpkgDpkgPM):
-    def __init__(self, d, target_rootfs, config_file, archs, task_name='target'):
+    def __init__(self, d, target_rootfs, config_file, archs, task_name='target', ipk_repo_workdir="oe-rootfs-repo", filterbydependencies=True, prepare_index=True):
         super(OpkgPM, self).__init__(d, target_rootfs)
 
         self.config_file = config_file
         self.pkg_archs = archs
         self.task_name = task_name
 
-        self.deploy_dir = self.d.getVar("DEPLOY_DIR_IPK")
+        self.deploy_dir = oe.path.join(self.d.getVar('WORKDIR'), ipk_repo_workdir)
         self.deploy_lock_file = os.path.join(self.deploy_dir, "deploy.lock")
         self.opkg_cmd = bb.utils.which(os.getenv('PATH'), "opkg")
         self.opkg_args = "--volatile-cache -f %s -t %s -o %s " % (self.config_file, self.d.expand('${T}/ipktemp/') ,target_rootfs)
         self.opkg_args += self.d.getVar("OPKG_ARGS")
+
+        if prepare_index:
+            create_packages_dir(self.d, self.deploy_dir, d.getVar("DEPLOY_DIR_IPK"), "package_write_ipk", filterbydependencies)
 
         opkg_lib_dir = self.d.getVar('OPKGLIBDIR')
         if opkg_lib_dir[0] == "/":
@@ -1245,7 +1326,11 @@ class OpkgPM(OpkgDpkgPM):
         if not pkgs:
             return
 
-        cmd = "%s %s install %s" % (self.opkg_cmd, self.opkg_args, ' '.join(pkgs))
+        cmd = "%s %s" % (self.opkg_cmd, self.opkg_args)
+        for exclude in (self.d.getVar("PACKAGE_EXCLUDE") or "").split():
+            cmd += " --add-exclude %s" % exclude
+        cmd += " install "
+        cmd += " ".join(pkgs)
 
         os.environ['D'] = self.target_rootfs
         os.environ['OFFLINE_ROOT'] = self.target_rootfs
@@ -1265,13 +1350,16 @@ class OpkgPM(OpkgDpkgPM):
                     bb.warn(line)
                     failed_pkgs.append(line.split(".")[0])
             if failed_pkgs:
-                failed_postinsts_warn(failed_pkgs, self.d.expand("${T}/log.do_${BB_CURRENTTASK}"))
+                failed_postinsts_abort(failed_pkgs, self.d.expand("${T}/log.do_${BB_CURRENTTASK}"))
         except subprocess.CalledProcessError as e:
             (bb.fatal, bb.warn)[attempt_only]("Unable to install packages. "
                                               "Command '%s' returned %d:\n%s" %
                                               (cmd, e.returncode, e.output.decode("utf-8")))
 
     def remove(self, pkgs, with_dependencies=True):
+        if not pkgs:
+            return
+
         if with_dependencies:
             cmd = "%s %s --force-remove --force-removal-of-dependent-packages remove %s" % \
                 (self.opkg_cmd, self.opkg_args, ' '.join(pkgs))
@@ -1437,9 +1525,12 @@ class OpkgPM(OpkgDpkgPM):
         return tmp_dir
 
 class DpkgPM(OpkgDpkgPM):
-    def __init__(self, d, target_rootfs, archs, base_archs, apt_conf_dir=None):
+    def __init__(self, d, target_rootfs, archs, base_archs, apt_conf_dir=None, deb_repo_workdir="oe-rootfs-repo", filterbydependencies=True):
         super(DpkgPM, self).__init__(d, target_rootfs)
-        self.deploy_dir = self.d.getVar('DEPLOY_DIR_DEB')
+        self.deploy_dir = oe.path.join(self.d.getVar('WORKDIR'), deb_repo_workdir)
+
+        create_packages_dir(self.d, self.deploy_dir, d.getVar("DEPLOY_DIR_DEB"), "package_write_deb", filterbydependencies)
+
         if apt_conf_dir is None:
             self.apt_conf_dir = self.d.expand("${APTCONF_TARGET}/apt")
         else:
@@ -1515,7 +1606,6 @@ class DpkgPM(OpkgDpkgPM):
         os.environ['INTERCEPT_DIR'] = self.intercepts_dir
         os.environ['NATIVE_ROOT'] = self.d.getVar('STAGING_DIR_NATIVE')
 
-        failed_pkgs = []
         for pkg_name in installed_pkgs:
             for control_script in control_scripts:
                 p_full = os.path.join(info_dir, pkg_name + control_script.suffix)
@@ -1530,12 +1620,7 @@ class DpkgPM(OpkgDpkgPM):
                         bb.warn("%s for package %s failed with %d:\n%s" %
                                 (control_script.name, pkg_name, e.returncode,
                                     e.output.decode("utf-8")))
-                        failed_postinsts_warn([pkg_name], self.d.expand("${T}/log.do_${BB_CURRENTTASK}"))
-                        failed_pkgs.append(pkg_name)
-                        break
-
-        if len(failed_pkgs):
-            self.mark_packages("unpacked", failed_pkgs)
+                        failed_postinsts_abort([pkg_name], self.d.expand("${T}/log.do_${BB_CURRENTTASK}"))
 
     def update(self):
         os.environ['APT_CONFIG'] = self.apt_conf_file
@@ -1585,6 +1670,9 @@ class DpkgPM(OpkgDpkgPM):
 
 
     def remove(self, pkgs, with_dependencies=True):
+        if not pkgs:
+            return
+
         if with_dependencies:
             os.environ['APT_CONFIG'] = self.apt_conf_file
             cmd = "%s purge %s" % (self.apt_get_cmd, ' '.join(pkgs))

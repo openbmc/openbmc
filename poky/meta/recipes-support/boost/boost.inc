@@ -9,6 +9,7 @@ BOOST_LIBS = "\
 	atomic \
 	chrono \
 	container \
+	contract \
 	date_time \
 	exception \
 	filesystem \
@@ -134,9 +135,8 @@ BJAM_TOOLS   = "--ignore-site-config \
 		'--layout=system' \
 		"
 
-# use PARALLEL_MAKE to speed up the build, but limit it by -j 64, greater parallelism causes bjam to segfault or to ignore -j
-# https://svn.boost.org/trac/boost/ticket/7634
-BOOST_PARALLEL_MAKE = "${@oe.utils.parallel_make_argument(d, '-j%d', limit=64)}"
+# use PARALLEL_MAKE to speed up the build
+BOOST_PARALLEL_MAKE = "${@oe.utils.parallel_make_argument(d, '-j%d')}"
 BJAM_OPTS    = '${BOOST_PARALLEL_MAKE} -d+2 -q \
 		${BJAM_TOOLS} \
 		-sBOOST_BUILD_USER_CONFIG=${WORKDIR}/user-config.jam \

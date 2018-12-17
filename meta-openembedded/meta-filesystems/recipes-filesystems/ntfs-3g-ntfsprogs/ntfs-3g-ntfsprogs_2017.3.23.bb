@@ -13,6 +13,9 @@ S = "${WORKDIR}/ntfs-3g_ntfsprogs-${PV}"
 SRC_URI[md5sum] = "d97474ae1954f772c6d2fa386a6f462c"
 SRC_URI[sha256sum] = "3e5a021d7b761261836dcb305370af299793eedbded731df3d6943802e1262d5"
 
+UPSTREAM_CHECK_URI = "https://www.tuxera.com/community/open-source-ntfs-3g/"
+UPSTREAM_CHECK_REGEX = "ntfs-3g_ntfsprogs-(?P<pver>\d+(\.\d+)+)\.tgz"
+
 inherit autotools pkgconfig
 
 PACKAGECONFIG ??= ""

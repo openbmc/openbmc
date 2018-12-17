@@ -1,0 +1,18 @@
+The xtrans.pc file is installed into a non-arch directory yet contains libdir
+which can vary depending on which multilib is configured. The .pc file does
+not require libdir so remove this to fix multilib builds.
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+Upstream-Status: Pending
+
+Index: xtrans-1.3.5/xtrans.pc.in
+===================================================================
+--- xtrans-1.3.5.orig/xtrans.pc.in
++++ xtrans-1.3.5/xtrans.pc.in
+@@ -1,6 +1,5 @@
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+-libdir=@libdir@
+ includedir=@includedir@
+ 
+ Name: XTrans

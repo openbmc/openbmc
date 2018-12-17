@@ -787,7 +787,7 @@ logging:
       enabled: no
       filename: /var/log/suricata.log
   - syslog:
-      enabled: no
+      enabled: yes
       facility: local5
       format: "[%i] <%d> -- "
 

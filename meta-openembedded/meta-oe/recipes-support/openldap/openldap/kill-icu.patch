@@ -2,7 +2,7 @@ From: Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>
 
 slapd depends on ICU if it was built first.
 
-Upstream-status: inappropiate [embedded specific]
+Upstream-Status: inappropiate [embedded specific]
 ---
  configure.in |    8 --------
  1 file changed, 8 deletions(-)

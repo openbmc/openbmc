@@ -1,0 +1,42 @@
+From f592398b1c659f84168f5c84f63af3b71454b8f5 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 28 Sep 2018 22:59:23 +0800
+Subject: [PATCH] remove configure options from versioninfo
+
+Configure options contains host build paths which breaks
+binary reproducibility.
+
+It is no harm to remove it from version info.
+
+Upstream-Status: Inappropriate [cross compile specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ agent/mibgroup/ucd-snmp/versioninfo.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/agent/mibgroup/ucd-snmp/versioninfo.c b/agent/mibgroup/ucd-snmp/versioninfo.c
+index a5151c1..1160382 100644
+--- a/agent/mibgroup/ucd-snmp/versioninfo.c
++++ b/agent/mibgroup/ucd-snmp/versioninfo.c
+@@ -92,7 +92,7 @@ var_extensible_version(struct variable *vp,
+     static char     errmsg[300];
+     char           *cptr;
+     time_t          curtime;
+-#ifdef NETSNMP_CONFIGURE_OPTIONS
++#if 0
+     static char     config_opts[] = NETSNMP_CONFIGURE_OPTIONS;
+ #endif
+ 
+@@ -126,7 +126,7 @@ var_extensible_version(struct variable *vp,
+         *var_len = strlen(errmsg);
+         return ((u_char *) errmsg);
+     case VERCONFIG:
+-#ifdef NETSNMP_CONFIGURE_OPTIONS
++#if 0
+         *var_len = strlen(config_opts);
+         if (*var_len > 1024)
+             *var_len = 1024;    /* mib imposed restriction */
+-- 
+2.7.4
+

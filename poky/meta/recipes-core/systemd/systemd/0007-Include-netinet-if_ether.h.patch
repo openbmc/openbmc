@@ -1,0 +1,96 @@
+From aab90d0dfa934d33879eaec1a878e93b201d33f1 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Fri, 29 Jun 2018 16:44:43 +0800
+Subject: [PATCH 07/19] Include netinet/if_ether.h
+
+Fixes
+/path/to/systemd/recipe-sysroot/usr/include/netinet/if_ether.h:101:8: error: redefinition of 'struct ethhdr'
+ struct ethhdr {
+        ^~~~~~
+
+Upstream-Status: Inappropriate [musl specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/libsystemd/sd-netlink/netlink-types.c | 1 +
+ src/network/netdev/tuntap.c               | 1 +
+ src/network/networkd-brvlan.c             | 1 +
+ src/udev/net/ethtool-util.c               | 1 +
+ src/udev/net/ethtool-util.h               | 1 +
+ src/udev/udev-builtin-net_setup_link.c    | 1 +
+ 6 files changed, 6 insertions(+)
+
+diff --git a/src/libsystemd/sd-netlink/netlink-types.c b/src/libsystemd/sd-netlink/netlink-types.c
+index c93fe9cb4..2013d06e1 100644
+--- a/src/libsystemd/sd-netlink/netlink-types.c
++++ b/src/libsystemd/sd-netlink/netlink-types.c
+@@ -3,6 +3,7 @@
+ #include <netinet/in.h>
+ #include <stdint.h>
+ #include <sys/socket.h>
++#include <netinet/if_ether.h>
+ #include <linux/netlink.h>
+ #include <linux/rtnetlink.h>
+ #include <linux/genetlink.h>
+diff --git a/src/network/netdev/tuntap.c b/src/network/netdev/tuntap.c
+index 21fb7ab06..0afe5170c 100644
+--- a/src/network/netdev/tuntap.c
++++ b/src/network/netdev/tuntap.c
+@@ -2,6 +2,7 @@
+ 
+ #include <errno.h>
+ #include <fcntl.h>
++#include <netinet/if_ether.h>
+ #include <linux/if_tun.h>
+ #include <net/if.h>
+ #include <netinet/if_ether.h>
+diff --git a/src/network/networkd-brvlan.c b/src/network/networkd-brvlan.c
+index 8e8a618e2..52d523a67 100644
+--- a/src/network/networkd-brvlan.c
++++ b/src/network/networkd-brvlan.c
+@@ -4,6 +4,7 @@
+ ***/
+ 
+ #include <netinet/in.h>
++#include <netinet/if_ether.h>
+ #include <linux/if_bridge.h>
+ #include <stdbool.h>
+ 
+diff --git a/src/udev/net/ethtool-util.c b/src/udev/net/ethtool-util.c
+index 4bb4216ac..5f7383483 100644
+--- a/src/udev/net/ethtool-util.c
++++ b/src/udev/net/ethtool-util.c
+@@ -1,5 +1,6 @@
+ /* SPDX-License-Identifier: LGPL-2.1+ */
+ 
++#include <netinet/if_ether.h>
+ #include <net/if.h>
+ #include <sys/ioctl.h>
+ #include <linux/ethtool.h>
+diff --git a/src/udev/net/ethtool-util.h b/src/udev/net/ethtool-util.h
+index 064bf4d2b..ee0d4fb2a 100644
+--- a/src/udev/net/ethtool-util.h
++++ b/src/udev/net/ethtool-util.h
+@@ -3,6 +3,7 @@
+ 
+ 
+ #include <macro.h>
++#include <netinet/if_ether.h>
+ #include <linux/ethtool.h>
+ 
+ #include "missing.h"
+diff --git a/src/udev/udev-builtin-net_setup_link.c b/src/udev/udev-builtin-net_setup_link.c
+index 8bed6399a..a3a96959b 100644
+--- a/src/udev/udev-builtin-net_setup_link.c
++++ b/src/udev/udev-builtin-net_setup_link.c
+@@ -1,5 +1,6 @@
+ /* SPDX-License-Identifier: LGPL-2.1+ */
+ 
++#include <netinet/if_ether.h>
+ #include "alloc-util.h"
+ #include "link-config.h"
+ #include "log.h"
+-- 
+2.11.0
+

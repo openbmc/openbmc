@@ -449,12 +449,13 @@
     <title><filename>cmake.bbclass</filename></title>
 
     <para>
-        The <filename>cmake</filename> class allows for
-        recipes that need to build software using the CMake build system.
+        The <filename>cmake</filename> class allows for recipes that need to
+        build software using the
+        <ulink url='https://cmake.org/overview/'>CMake</ulink> build system.
         You can use the
         <link linkend='var-EXTRA_OECMAKE'><filename>EXTRA_OECMAKE</filename></link>
-        variable to specify additional configuration options to be passed on
-        the <filename>cmake</filename> command line.
+        variable to specify additional configuration options to be passed
+        using the <filename>cmake</filename> command line.
     </para>
 </section>
 
@@ -642,6 +643,54 @@
         "<ulink url='&YOCTO_DOCS_DEV_URL;#platdev-appdev-devshell'>Using a Development Shell</ulink>" section
         in the Yocto Project Development Tasks Manual for more information about
         using <filename>devshell</filename>.
+    </para>
+</section>
+
+<section id='ref-classes-devupstream'>
+    <title><filename>devupstream.bbclass</filename></title>
+
+    <para>
+        The <filename>devupstream</filename> class uses
+        <link linkend='var-BBCLASSEXTEND'><filename>BBCLASSEXTEND</filename></link>
+        to add a variant of the recipe that fetches from an alternative URI
+        (e.g. Git) instead of a tarball.
+        Following is an example:
+        <literallayout class='monospaced'>
+     BBCLASSEXTEND = "devupstream:target"
+     SRC_URI_class-devupstream = "git://git.example.com/example"
+     SRCREV_class-devupstream = "abcd1234"
+        </literallayout>
+        Adding the above statements to your recipe creates a variant that has
+        <link linkend='var-DEFAULT_PREFERENCE'><filename>DEFAULT_PREFERENCE</filename></link>
+        set to "-1".
+        Consequently, you need to select the variant of the recipe to use it.
+        Any development-specific adjustments can be done by using the
+        <filename>class-devupstream</filename> override.
+        Here is an example:
+        <literallayout class='monospaced'>
+     DEPENDS_append_class-devupstream = " gperf-native"
+
+     do_configure_prepend_class-devupstream() {
+        touch ${S}/README
+     }
+        </literallayout>
+        The class currently only supports creating a development variant of
+        the target recipe, not <filename>native</filename> or
+        <filename>nativesdk</filename> variants.
+    </para>
+
+    <para>
+        The <filename>BBCLASSEXTEND</filename> syntax
+        (i.e. <filename>devupstream:target</filename>) provides support for
+        <filename>native</filename> and <filename>nativesdk</filename>
+        variants.
+        Consequently, this functionality can be added in a future release.
+    </para>
+
+    <para>
+        Support for other version control systems such as Subversion is
+        limited due to BitBake's automatic fetch dependencies (e.g.
+        <filename>subversion-native</filename>).
     </para>
 </section>
 
@@ -1266,28 +1315,35 @@
     <title><filename>image_types.bbclass</filename></title>
 
     <para>
-        The <filename>image_types</filename> class defines all of
-        the standard image output types that you can enable through the
+        The <filename>image_types</filename> class defines all of the
+        standard image output types that you can enable through the
         <link linkend='var-IMAGE_FSTYPES'><filename>IMAGE_FSTYPES</filename></link>
         variable.
-        You can use this class as a reference on how to add support for custom
-        image output types.
+        You can use this class as a reference on how to add support for
+        custom image output types.
     </para>
 
     <para>
-        By default, this class is enabled through the
-        <link linkend='var-IMAGE_CLASSES'><filename>IMAGE_CLASSES</filename></link>
-        variable in
-        <link linkend='ref-classes-image'><filename>image.bbclass</filename></link>.
-        If you define your own image types using a custom BitBake class and
-        then use <filename>IMAGE_CLASSES</filename> to enable it, the custom
-        class must either inherit <filename>image_types</filename> or
-        <filename>image_types</filename> must also appear in
-        <filename>IMAGE_CLASSES</filename>.
+        By default, the
+        <link linkend='ref-classes-image'><filename>image</filename></link>
+        class automatically enables the <filename>image_types</filename> class.
+        The <filename>image</filename> class uses the
+        <filename>IMGCLASSES</filename> variable as follows:
+        <literallayout class='monospaced'>
+     IMGCLASSES = "rootfs_${IMAGE_PKGTYPE} image_types ${IMAGE_CLASSES}"
+     IMGCLASSES += "${@['populate_sdk_base', 'populate_sdk_ext']['linux' in d.getVar("SDK_OS")]}"
+     IMGCLASSES += "${@bb.utils.contains_any('IMAGE_FSTYPES', 'live iso hddimg', 'image-live', '', d)}"
+     IMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'container', 'image-container', '', d)}"
+     IMGCLASSES += "image_types_wic"
+     IMGCLASSES += "rootfs-postcommands"
+     IMGCLASSES += "image-postinst-intercepts"
+     inherit ${IMGCLASSES}
+        </literallayout>
     </para>
 
     <para>
-        This class also handles conversion and compression of images.
+        The <filename>image_types</filename> class also handles conversion and
+        compression of images.
         <note>
             To build a VMware VMDK image, you need to add "wic.vmdk" to
             <filename>IMAGE_FSTYPES</filename>.
@@ -1314,14 +1370,6 @@
         Normally, you do not use this class directly.
         Instead, you add "live" to
         <link linkend='var-IMAGE_FSTYPES'><filename>IMAGE_FSTYPES</filename></link>.
-        You can selectively build just one of these types through the
-        <link linkend='var-NOISO'><filename>NOISO</filename></link>
-        and
-        <link linkend='var-NOHDD'><filename>NOHDD</filename></link> variables.
-        For example, if you were building an ISO image, you would add "live"
-        to <filename>IMAGE_FSTYPES</filename>, set the
-        <filename>NOISO</filename> variable to "0" and the build system would
-        use the <filename>image-live</filename> class to build the ISO image.
     </para>
 </section>
 
@@ -2173,8 +2221,9 @@ This check was removed for YP 2.3 release
 
     <para>
         The <filename>native</filename> class provides common
-        functionality for recipes that wish to build tools to run on the build
-        host (i.e. tools that use the compiler or other tools from the
+        functionality for recipes that build tools to run on the
+        <link linkend='hardware-build-system-term'>build host</link>
+        (i.e. tools that use the compiler or other tools from the
         build host).
     </para>
 
@@ -2182,30 +2231,35 @@ This check was removed for YP 2.3 release
         You can create a recipe that builds tools that run natively on the
         host a couple different ways:
         <itemizedlist>
-            <listitem><para>Create a <replaceable>myrecipe</replaceable><filename>-native.bb</filename>
-                that inherits the <filename>native</filename> class.
+            <listitem><para>
+                Create a
+                <replaceable>myrecipe</replaceable><filename>-native.bb</filename>
+                recipe that inherits the <filename>native</filename> class.
                 If you use this method, you must order the inherit statement
                 in the recipe after all other inherit statements so that the
                 <filename>native</filename> class is inherited last.
+                <note><title>Warning</title>
+                    When creating a recipe this way, the recipe name must
+                    follow this naming convention:
+                    <literallayout class='monospaced'>
+     <replaceable>myrecipe</replaceable>-native.bb
+                    </literallayout>
+                    Not using this naming convention can lead to subtle
+                    problems caused by existing code that depends on that
+                    naming convention.
+                </note>
                 </para></listitem>
-            <listitem><para>Create or modify a target recipe that contains
-                the following:
+            <listitem><para>
+                Create or modify a target recipe that contains the following:
                 <literallayout class='monospaced'>
      <link linkend='var-BBCLASSEXTEND'><filename>BBCLASSEXTEND</filename></link> = "native"
                 </literallayout>
                 Inside the recipe, use <filename>_class-native</filename> and
                 <filename>_class-target</filename> overrides to specify any
                 functionality specific to the respective native or target
-                case.</para></listitem>
+                case.
+                </para></listitem>
         </itemizedlist>
-        <note><title>Warning</title>
-            When creating a recipe, you must follow this naming convention:
-            <literallayout class='monospaced'>
-     native-<replaceable>myrecipe</replaceable>.bb
-            </literallayout>
-            Not doing so can lead to subtle problems because code exists
-            that depends on the naming convention.
-        </note>
     </para>
 
     <para>
@@ -3145,12 +3199,6 @@ This check was removed for YP 2.3 release
         and <filename><link linkend='var-SITEINFO_BITS'>SITEINFO_BITS</link></filename>
         that can be used elsewhere in the metadata.
     </para>
-
-    <para>
-        Because the
-        <link linkend='ref-classes-base'><filename>base</filename></link> class
-        includes the <filename>siteinfo</filename> class, it is always active.
-    </para>
 </section>
 
 <section id='ref-classes-spdx'>
@@ -3502,6 +3550,14 @@ This check was removed for YP 2.3 release
         The classes handle loading the tests and starting the image.
         To use the classes, you need to perform steps to set up the
         environment.
+        <note><title>Tip</title>
+            Best practices include using
+            <link linkend='var-IMAGE_CLASSES'><filename>IMAGE_CLASSES</filename></link>
+            rather than
+            <link linkend='var-INHERIT'><filename>INHERIT</filename></link> to
+            inherit the <filename>testimage</filename> class for automated
+            image testing.
+        </note>
     </para>
 
     <para>
@@ -3519,7 +3575,7 @@ This check was removed for YP 2.3 release
         </literallayout>
         The <filename>testimage-auto</filename> class runs tests on an image
         after the image is constructed (i.e.
-        <link linkend='var-TEST_IMAGE'><filename>TEST_IMAGE</filename></link>
+        <link linkend='var-TESTIMAGE_AUTO'><filename>TESTIMAGE_AUTO</filename></link>
         must be set to "1").
     </para>
 
@@ -3541,6 +3597,14 @@ This check was removed for YP 2.3 release
         <literallayout class='monospaced'>
      $ bitbake -c testsdk image
         </literallayout>
+        <note><title>Tip</title>
+            Best practices include using
+            <link linkend='var-IMAGE_CLASSES'><filename>IMAGE_CLASSES</filename></link>
+            rather than
+            <link linkend='var-INHERIT'><filename>INHERIT</filename></link> to
+            inherit the <filename>testsdk</filename> class for automated
+            SDK testing.
+        </note>
     </para>
 </section>
 

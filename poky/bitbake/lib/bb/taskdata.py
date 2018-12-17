@@ -70,6 +70,8 @@ class TaskData:
 
         self.skiplist = skiplist
 
+        self.mcdepends = []
+
     def add_tasks(self, fn, dataCache):
         """
         Add tasks for a given fn to the database
@@ -87,6 +89,13 @@ class TaskData:
         self.seenfns.append(fn)
 
         self.add_extra_deps(fn, dataCache)
+
+        def add_mcdepends(task):
+            for dep in task_deps['mcdepends'][task].split():
+                if len(dep.split(':')) != 5:
+                    bb.msg.fatal("TaskData", "Error for %s:%s[%s], multiconfig dependency %s does not contain exactly four  ':' characters.\n Task '%s' should be specified in the form 'multiconfig:fromMC:toMC:packagename:task'" % (fn, task, 'mcdepends', dep, 'mcdepends'))
+                if dep not in self.mcdepends:
+                    self.mcdepends.append(dep)
 
         # Common code for dep_name/depends = 'depends'/idepends and 'rdepends'/irdepends
         def handle_deps(task, dep_name, depends, seen):
@@ -110,15 +119,19 @@ class TaskData:
             parentids = []
             for dep in task_deps['parents'][task]:
                 if dep not in task_deps['tasks']:
-                    bb.debug(2, "Not adding dependeny of %s on %s since %s does not exist" % (task, dep, dep))
+                    bb.debug(2, "Not adding dependency of %s on %s since %s does not exist" % (task, dep, dep))
                     continue
                 parentid = "%s:%s" % (fn, dep)
                 parentids.append(parentid)
             self.taskentries[tid].tdepends.extend(parentids)
 
+
             # Touch all intertask dependencies
             handle_deps(task, 'depends', self.taskentries[tid].idepends, self.seen_build_target)
             handle_deps(task, 'rdepends', self.taskentries[tid].irdepends, self.seen_run_target)
+
+            if 'mcdepends' in task_deps and task in task_deps['mcdepends']:
+                add_mcdepends(task)
 
         # Work out build dependencies
         if not fn in self.depids:
@@ -536,6 +549,9 @@ class TaskData:
                 if provider:
                     provmap[name] = provider[0]
         return provmap
+
+    def get_mcdepends(self):
+        return self.mcdepends
 
     def dump_data(self):
         """

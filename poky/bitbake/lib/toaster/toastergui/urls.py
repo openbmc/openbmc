@@ -116,6 +116,11 @@ urlpatterns = [
             tables.ProjectBuildsTable.as_view(template_name="projectbuilds-toastertable.html"),
             name='projectbuilds'),
 
+        url(r'^newproject_specific/(?P<pid>\d+)/$', views.newproject_specific, name='newproject_specific'),
+        url(r'^project_specific/(?P<pid>\d+)/$', views.project_specific, name='project_specific'),
+        url(r'^landing_specific/(?P<pid>\d+)/$', views.landing_specific, name='landing_specific'),
+        url(r'^landing_specific_cancel/(?P<pid>\d+)/$', views.landing_specific_cancel, name='landing_specific_cancel'),
+
         # the import layer is a project-specific functionality;
         url(r'^project/(?P<pid>\d+)/importlayer$', views.importlayer, name='importlayer'),
 
@@ -232,6 +237,14 @@ urlpatterns = [
         url(r'^xhr_buildrequest/project/(?P<pid>\d+)$',
             api.XhrBuildRequest.as_view(),
             name='xhr_buildrequest'),
+
+        url(r'^xhr_projectupdate/project/(?P<pid>\d+)$',
+            api.XhrProjectUpdate.as_view(),
+            name='xhr_projectupdate'),
+
+        url(r'^xhr_setdefaultimage/project/(?P<pid>\d+)$',
+            api.XhrSetDefaultImageUrl.as_view(),
+            name='xhr_setdefaultimage'),
 
         url(r'xhr_project/(?P<project_id>\d+)$',
             api.XhrProject.as_view(),

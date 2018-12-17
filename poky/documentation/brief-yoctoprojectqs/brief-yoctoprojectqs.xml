@@ -37,17 +37,30 @@
             hardware.
             You will use Yocto Project to build a reference embedded OS
             called Poky.
-            <note>
-                The examples in this paper assume you are using a native Linux
-                system running a recent Ubuntu Linux distribution.
-                If the machine you want to use
-                Yocto Project on to build an image is not a native Linux
-                system, you can still perform these steps by using CROss
-                PlatformS (CROPS) and setting up a Poky container.
-                See the
-                <ulink url='&YOCTO_DOCS_DEV_URL;#setting-up-to-use-crops'>Setting Up to Use CROss PlatformS (CROPS)</ulink>"
-                section in the Yocto Project Development Tasks Manual for more
-                information.
+            <note><title>Notes</title>
+                <itemizedlist>
+                    <listitem><para>
+                        The examples in this paper assume you are using a
+                        native Linux system running a recent Ubuntu Linux
+                        distribution.
+                        If the machine you want to use Yocto Project on to
+                        build an image
+                        (<ulink url='&YOCTO_DOCS_REF_URL;#hardware-build-system-term'>build host</ulink>)
+                        is not a native Linux system, you can
+                        still perform these steps by using CROss PlatformS
+                        (CROPS) and setting up a Poky container.
+                        See the
+                        <ulink url='&YOCTO_DOCS_DEV_URL;#setting-up-to-use-crops'>Setting Up to Use CROss PlatformS (CROPS)</ulink>"
+                        section in the Yocto Project Development Tasks Manual for more
+                        information.
+                        </para></listitem>
+                    <listitem><para>
+                        You cannot use a build host that is using the
+                        <ulink url='https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux'>Windows Subsystem for Linux</ulink>
+                        (WSL).
+                        The Yocto Project is not compatible with WSL.
+                        </para></listitem>
+                </itemizedlist>
             </note>
         </para>
 
@@ -75,6 +88,10 @@
                     Linux distributions that support the Yocto Project, see the
                     "<ulink url='&YOCTO_DOCS_REF_URL;#detailed-supported-distros'>Supported Linux Distributions</ulink>"
                     section in the Yocto Project Reference Manual.
+                    For detailed information on preparing your build host, see
+                    the
+                    "<ulink url='&YOCTO_DOCS_DEV_URL;#dev-preparing-the-build-host'>Preparing the Build Host</ulink>"
+                    section in the Yocto Project Development Tasks Manual.
                     </para></listitem>
                 <listitem><para>
                     <itemizedlist>
@@ -110,7 +127,7 @@
             <note>
                 For host package requirements on all supported Linux
                 distributions, see the
-                "<ulink url='&YOCTO_DOCS_REF_URL;#required-packages-for-the-host-development-system'>Required Packages for the Host Development System</ulink>"
+                "<ulink url='&YOCTO_DOCS_REF_URL;#required-packages-for-the-build-host'>Required Packages for the Build Host</ulink>"
                 section in the Yocto Project Reference Manual.
             </note>
             <literallayout class='monospaced'>

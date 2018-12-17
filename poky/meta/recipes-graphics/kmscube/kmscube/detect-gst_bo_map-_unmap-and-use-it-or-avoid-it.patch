@@ -49,9 +49,9 @@ diff --git a/configure.ac b/configure.ac
 index 8397f7b..c7f1f4d 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -65,5 +65,8 @@ if test "x$enable_gbm_modifiers" = xyes; then
- 	AC_DEFINE(HAVE_GBM_MODIFIERS, 1, [Define if you can use GBM properties.])
+@@ -49,5 +49,8 @@ if test "x$HAVE_GST" = "xyes"; then
  fi
+ AM_CONDITIONAL(ENABLE_GST, [test "x$HAVE_GST" = "xyes"])
  
 +AC_CHECK_LIB([gbm], [gbm_bo_map], [HAVE_GBM_BO_MAP=yes], [])
 +AM_CONDITIONAL(ENABLE_GBM_MAP, [test "x$HAVE_GBM_BO_MAP" = "xyes"])
@@ -99,12 +99,12 @@ diff --git a/kmscube.c b/kmscube.c
 index 3a2c4dd..276dc55 100644
 --- a/kmscube.c
 +++ b/kmscube.c
-@@ -142,7 +142,11 @@ int main(int argc, char *argv[])
+@@ -148,7 +148,11 @@ int main(int argc, char *argv[])
  	else if (mode == VIDEO)
- 		egl = init_cube_video(gbm, video);
+ 		egl = init_cube_video(gbm, video, samples);
  	else
 +#if HAVE_GBM_BO_MAP
- 		egl = init_cube_tex(gbm, mode);
+ 		egl = init_cube_tex(gbm, mode, samples);
 +#else
 +		printf("gbm_bo_map() support missing\n");
 +#endif

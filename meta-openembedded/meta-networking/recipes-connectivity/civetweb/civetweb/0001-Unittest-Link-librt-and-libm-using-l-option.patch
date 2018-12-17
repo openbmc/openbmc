@@ -1,0 +1,40 @@
+From 21e9a4bb214648ffd43c66b535fbf096bfcc9f4f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 24 Jun 2018 00:04:37 -0700
+Subject: [PATCH] Unittest: Link librt and libm using -l option
+
+cmake'ry forces full path to .so files when found using
+find_package and since we have proper sysrooted toolchain
+-lm and -lrt is all we need
+
+Upstream-Status: Inappropriate [Cross compile specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ unittest/CMakeLists.txt | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
+
+diff --git a/unittest/CMakeLists.txt b/unittest/CMakeLists.txt
+index c4cdf229..e1b63caf 100644
+--- a/unittest/CMakeLists.txt
++++ b/unittest/CMakeLists.txt
+@@ -57,14 +57,8 @@ elseif (WIN32)
+ else()
+   set(CHECK_LIBRARIES "${CHECK_INSTALL_DIR}/lib/libcheck.a")
+ endif()
+-find_package(LibM)
+-if (LIBM_FOUND)
+-  set(CHECK_LIBRARIES "${CHECK_LIBRARIES};LIBM::LIBM")
+-endif()
+-find_package(LibRt)
+-if (LIBRT_FOUND)
+-  set(CHECK_LIBRARIES "${CHECK_LIBRARIES};LIBRT::LIBRT")
+-endif()
++set(CHECK_LIBRARIES "${CHECK_LIBRARIES};-lm")
++set(CHECK_LIBRARIES "${CHECK_LIBRARIES};-lrt")
+ 
+ # Build the C unit tests
+ add_library(shared-c-unit-tests STATIC shared.c)
+-- 
+2.18.0
+

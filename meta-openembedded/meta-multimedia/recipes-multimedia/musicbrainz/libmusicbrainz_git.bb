@@ -22,10 +22,12 @@ do_configure_prepend() {
     git clean -dfx -e /.pc/ -e /patches/ .
     mkdir build-native
     cd build-native
-    cmake -DCMAKE_C_FLAGS=${BUILD_CFLAGS} \
+    LDFLAGS="${BUILD_LDFLAGS}" \
+          cmake -DCMAKE_C_FLAGS=${BUILD_CFLAGS} \
           -DCMAKE_C_COMPILER=${BUILD_CC} \
           -DCMAKE_CXX_FLAGS=${BUILD_CXXFLAGS} \
           -DCMAKE_CXX_COMPILER=${BUILD_CXX} \
+          -DCMAKE_EXE_LINKER_FLAGS=${BUILD_LDFLAGS} \
           ..
     make make-c-interface
     cd ..

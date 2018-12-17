@@ -1,0 +1,1200 @@
+[
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-tools.rpm_-__install_dependency_package",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Get a not previously installed RPM package or build one on local machine, which should have run-time dependency.For example, \"mc\" (Midnight Commander, which is a visual file manager) should depend on \"ncurses-terminfo\".   \n\n$ bitbake mc  \n\n\n",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "Copy the package into a system folder (for example /home/root/rpm_packages).  \n\n\n",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "Run \"rpm -ivh package_name\" and check the output, for example \"rpm -ivh mc.rpm*\" should report the dependency on \"ncurses-terminfo\".\n\n\n\n",
+                    "expected_results": "3 . rpm command should report message when some RPM installation depends on other packages."
+                }
+            },
+            "summary": "rpm_-__install_dependency_package"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.boot_and_install_from_USB",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "plugin usb which contains live image burned",
+                    "expected_results": "User can choose install system from usb stick onto harddisk from boot menu or command line option \n"
+                },
+                "2": {
+                    "action": "configure device BIOS to firstly boot from USB if necessary",
+                    "expected_results": "Installed system can boot up"
+                },
+                "3": {
+                    "action": "boot the device and select option \"Install\" from boot menu",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "proceed through default install process",
+                    "expected_results": ""
+                },
+                "5": {
+                    "action": "Remove USB, and reboot into new installed system. \nNote:   If installation was successfully completed and received this message \"\"(sdx): Volume was not properly unmounted...Please run fsck.\"\" ignore it because this was whitelisted according to bug 9652.",
+                    "expected_results": ""
+                }
+            },
+            "summary": "boot_and_install_from_USB"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.live_boot_from_USB",
+            "author": [
+                {
+                    "email": "juan.fernandox.ramos.frayle@intel.com",
+                    "name": "juan.fernandox.ramos.frayle@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Plugin usb which contains live image burned.",
+                    "expected_results": "User can choose boot from live image on usb stick from boot menu or command line option"
+                },
+                "2": {
+                    "action": "Configure device BIOS to firstly boot from USB if necessary.",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "Reboot the device and boot from USB stick.",
+                    "expected_results": "Live image can boot up with usb stick"
+                }				
+            },
+            "summary": "live_boot_from_USB"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.boot_from_runlevel_3",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Boot into system and edit /etc/inittab to make sure that system enter at the run level 3 by default, this is done by changing the line   \n\n\nid:5:initdefault  \n\nto  \n\nid:3:initdefault  \n\n",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "Reboot system, and press \"Tab\" to enter \"grub\"",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "Get into the \"kernel\" line with the edit option  \"e\" and add \"psplash=false text\" at the end line.",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "Press \"F10\" or \"ctrl+x\" to boot system",
+                    "expected_results": ""
+                },
+                "5": {
+                    "action": "If system ask you for a login type \"root\"",
+                    "expected_results": "System should boot to run level 3, showing the command prompt."
+                }
+            },
+            "summary": "boot_from_runlevel_3"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.boot_from_runlevel_5",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Boot into system and edit /etc/inittab to make sure that system enter at the run level 5 by default, this is done by changing the line   \n\nid:3:initdefault  \n\nto  \n\nid:5:initdefault  \n\n",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "Reboot system, and press \"Tab\" to enter \"grub\"",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "Get into the \"kernel\" line with the edit option  \"e\" and add \"psplash=false text\" at the end line.",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "Press \"F10\" or \"ctrl+x\" to boot system \nNote: The test is only for sato image.",
+                    "expected_results": "System should boot to runlevel 5 ."
+                }
+            },
+            "summary": "boot_from_runlevel_5"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.shutdown_system",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "boot system",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "launch terminal and run \"shutdown -h now\" or \"poweroff\"",
+                    "expected_results": "System can be shutdown successfully . "
+                }
+            },
+            "summary": "shutdown_system"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.reboot_system",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "boot system",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "launch terminal and run \"reboot\"",
+                    "expected_results": "System can reboot successfully . "
+                }
+            },
+            "summary": "reboot_system"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.switch_among_multi_applications_and_desktop",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "launch several applications(like contacts, file manager, notes, etc)",
+                    "expected_results": "user could switch among multi applications and desktop"
+                },
+                "2": {
+                    "action": "launch terminal",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "switch among multi applications and desktop",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "close applications \nNote: The case is for sato image only. ",
+                    "expected_results": ""
+                }
+            },
+            "summary": "switch_among_multi_applications_and_desktop"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.USB_-_mount",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Boot system \n\n",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "Plug USB stick, it should be mount in  /run/media/sd(x) If X-window system does not start and show USB device, then use the terminal to mount it, following the next steps: \na. Locate the usb stick (usually it is on /dev/sdb) \nb. Create a directory with \"mkdir stick\"  (so you will have such a path as: /home/root/stick). \nc. Run the command  \"mount  /dev/sdb  /home/root/stick\" to mount  USB device on it. \n\n",
+                    "expected_results": "USB device should be mounted in  /run/media/sd(x)  \nor in  /home/root/stick  \n\n"
+                },
+                "3": {
+                    "action": "Then you can access USB stick (/home/root/stick) via Terminal or GUI  and try various commands and actions like \"cp\", \"mv\", \"touch\" and \"rm\".  Type \"dmesg\" command and check for recent mounted devices.",
+                    "expected_results": "Basic commands work properly. The system sends a notification in \"dmesg\" command, showing that the USB stick is accessible and the device is mounted ."
+                }
+            },
+            "summary": "USB_-_mount"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.USB_-_read_files",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "boot system",
+                    "expected_results": "view/copy successfully"
+                },
+                "2": {
+                    "action": "plug usb stick",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "view files in usb by file browser",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "copy some files from usb to local hardware",
+                    "expected_results": ""
+                }
+            },
+            "summary": "USB_-_read_files"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.USB_-_umount",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "boot system",
+                    "expected_results": "usb directory in file browser automatically missed"
+                },
+                "2": {
+                    "action": "plug usb stick",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "view files in usb by file browser \n4.unplug usb",
+                    "expected_results": ""
+                }
+            },
+            "summary": "USB_-_umount"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.USB_-_write_files",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "boot system",
+                    "expected_results": "create/copy successfully"
+                },
+                "2": {
+                    "action": "plug usb stick",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "create files in usb \n4.copy some files from local hardware to usb",
+                    "expected_results": ""
+                }
+            },
+            "summary": "USB_-_write_files"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.ethernet_static_ip_set_in_connman",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Boot the system and check internet connection is on . ",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "Launch connmand-properties (up-right corner on desktop)",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "Choose  Ethernet device and set a valid static ip address for it. \nFor example, in our internal network, we can set as following: \nip address: 10.239.48.xxx \nMask: 255.255.255.0 \nGateway (Broadcast): 10.239.48.255",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "Check the Network configuration with \"ifconfig\"",
+                    "expected_results": "Static IP was set successfully  \n"
+                },
+                "5": {
+                    "action": "ping to another IP adress",
+                    "expected_results": "Ping works correclty\n"
+                }
+            },
+            "summary": "ethernet_static_ip_set_in_connman"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.ethernet_get_IP_in_connman_via_DHCP",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Launch connmand-properties (up-right corner on your desktop). ",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "Check if Ethernet device can work properly with static IP, doing \"ping XXX.XXX.XXX.XXX\", once this is set.",
+                    "expected_results": "Ping executed successfully .  \n\n"
+                },
+                "3": {
+                    "action": "Then choose DHCP method for Ethernet device in connmand-properties.",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "Check with 'ifconfig\" and \"ping\" if Ethernet device get IP address via DHCP.",
+                    "expected_results": "Ethernet device can get dynamic IP address via DHCP in connmand ."
+                }
+            },
+            "summary": "ethernet_get_IP_in_connman_via_DHCP"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-tools.connman_offline_mode_in_connman-gnome",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Launch connman-properties after system booting \n\n",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "choose \"offline mode\" and check the connection of all network interfaces ",
+                    "expected_results": "All connection should be off after clicking \"offline mode\" . "
+                }
+            },
+            "summary": "connman_offline_mode_in_connman-gnome"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.X_server_can_start_up_with_runlevel_5_boot",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "boot up system with default runlevel  \n\n",
+                    "expected_results": "X server can start up well and desktop display has no problem .  \n\n"
+                },
+                "2": {
+                    "action": "type runlevel at command prompt",
+                    "expected_results": "Output:N 5"
+                }
+            },
+            "summary": "X_server_can_start_up_with_runlevel_5_boot"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.standby",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "boot system and launch terminal; check output of \"date\" and launch script \"continue.sh\"",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "echo \"mem\" > /sys/power/state",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "After system go into S3 mode, move mouse or press any key to make it resume (on NUC press power button)",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "Check \"date\" and script \"continue.sh\"",
+                    "expected_results": ""
+                },
+                "5": {
+                    "action": "Check if application can work as normal \ncontinue.sh as below: \n \n#!/bin/sh \n \ni=1 \nwhile [ 0 ] \ndo \n echo $i \n sleep 1 \n i=$((i+1)) \ndone ",
+                    "expected_results": "Screen should resume back and script can run continuously incrementing the i's value from where it was before going to standby state. Date should be the same with the corresponding time increment."
+                }
+            },
+            "summary": "standby"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.check_CPU_utilization_after_standby",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Start up system",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "run \"top\" command and check if there is any process eating CPU time",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "make system into standby and resume it",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "run \"top\" command and check if there is any difference with the data before standby",
+                    "expected_results": "There should be no big difference before/after standby with \"top\" . "
+                }
+            },
+            "summary": "check_CPU_utilization_after_standby"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.Test_if_LAN_device_works_well_after_resume_from_suspend_state",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "boot system and launch terminal",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "echo \"mem\" > /sys/power/state",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "After system go into S3 mode, move mouse or press any key to make it resume",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "check ping status  \n\nNote: This TC apply only for core-image-full-cmd and core-image-lsb .",
+                    "expected_results": "ping should always work before/after standby"
+                }
+            },
+            "summary": "Test_if_LAN_device_works_well_after_resume_from_suspend_state"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.Test_if_usb_hid_device_works_well_after_resume_from_suspend_state",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "boot system and launch terminal",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "echo \"mem\" > /sys/power/state",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "After system go into S3 mode, resume the device by pressing the power button or using HID devices",
+                    "expected_results": "Devices resumes "
+                },
+                "4": {
+                    "action": "check usb mouse and keyboard",
+                    "expected_results": "Usb mouse and keyboard should work"
+                }
+            },
+            "summary": "Test_if_usb_hid_device_works_well_after_resume_from_suspend_state"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-tools.click_terminal_icon_on_X_desktop",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "After system launch and X start up, click terminal icon on desktop",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "Check if only one terminal window launched and no other problem met",
+                    "expected_results": "There should be no problem after launching terminal . "
+                }
+            },
+            "summary": "click_terminal_icon_on_X_desktop"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-tools.Add_multiple_files_in_media_player",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Launch media player",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "Add multiple files(5 files) in media player at same time (ogg or wav)",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "Verify the sound.",
+                    "expected_results": "Media player should be OK with this action, it reproduce files correctly."
+                }
+            },
+            "summary": "Add_multiple_files_in_media_player"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.check_bash_in_image",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "After system is up, check if bash command exists with command \"which bash\"",
+                    "expected_results": "bash command should exist in image giving something as below  \"/bin/bash\""
+                }
+            },
+            "summary": "check_bash_in_image"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.MicroSD_-__mount",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "boot system",
+                    "expected_results": "system notify that MicroSDis accessible"
+                },
+                "2": {
+                    "action": "plug MicroSD card",
+                    "expected_results": ""
+                }
+            },
+            "summary": "MicroSD_-__mount"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.MicroSD_-__read_files",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "boot system",
+                    "expected_results": "view/copy successfully"
+                },
+                "2": {
+                    "action": "plug MicroSD card",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "view files inMicroSD by file browser",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "copy some files fromMicroSD to local hardware",
+                    "expected_results": ""
+                }
+            },
+            "summary": "MicroSD_-__read_files"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.MicroSD_-__umount",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "boot system",
+                    "expected_results": "MicroSD in file browser automatically missed . "
+                },
+                "2": {
+                    "action": "plug MicroSD card",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "view files in MicroSDby file browser",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "unplug MicroSD",
+                    "expected_results": ""
+                }				
+            },
+            "summary": "MicroSD_-__umount"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.MicroSD_-__write_files",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "boot system",
+                    "expected_results": "create/copy successfully"
+                },
+                "2": {
+                    "action": "plug MicroSD card",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "create files in MicroSD",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "copy some files from local hardware to MicroSD",
+                    "expected_results": ""
+                }
+            },
+            "summary": "MicroSD_-__write_files"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-tools.video_-_libva_check_(ogg_video_play)",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "check if libva is installed on system (or libogg)",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "copy sample ogg file to system",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "launch media player can play the ogg file",
+                    "expected_results": "ogg file can be played without problem when libva is used (or libogg) "
+                }
+            },
+            "summary": "video_-_libva_check_(ogg_video_play)"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-tools.media_player_-_unable_to_play_MPEG-1_without_\"commercial\"_flag",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Copy sample MPEG-1 file to a system without the \"commercial\" flag.",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "Launch media player and make sure it cannot play the MPEG-1 file.",
+                    "expected_results": "MPEG-1 file can not be played on images without the \"commercial\" flag. "
+                }
+            },
+            "summary": "media_player_-_unable_to_play_MPEG-1_without_\"commercial\"_flag"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-tools.media_player_-_play_video_(ogv)",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "copy sample ogv file to system",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "launch media player and make sure it can play the ogv file",
+                    "expected_results": "ogv file can be played without problem"
+                }
+            },
+            "summary": "media_player_-_play_video_(ogv)"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-tools.media_player_-_stop/play_button_(ogv)",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "copy sample ogv file to system",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "launch media player can play the ogv file",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "click \"stop\" button to stop playing",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "click \"start\" button to resume playing",
+                    "expected_results": "ogv file can be start/stop without problem"
+                }
+            },
+            "summary": "media_player_-_stop/play_button_(ogv)"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-tools.audio_-_play_(ogg)_with_HDMI",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "copy sample ogg file to system",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "connect system with a monitor with HDMI",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "launch media player and play the ogg file",
+                    "expected_results": "ogg file can be played without problem with HDMI"
+                }
+            },
+            "summary": "audio_-_play_(ogg)_with_HDMI"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-tools.audio_-_play_(wav)_with_HDMI",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "copy sample wav file to system",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "connect system with a monitor with HDMI",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "launch media player and play the wav file",
+                    "expected_results": "wav file can be played without problem, with HDMI"
+                }
+            },
+            "summary": "audio_-_play_(wav)_with_HDMI"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-tools.Graphics_-_ABAT",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Download ABAT test suite from internal git repository, git clone git://tinderbox.sh.intel.com/git/abat",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "Apply following patch to make it work on yocto environment",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "Run \"./abat.sh\" to run ABAT test refer to abat.patch",
+                    "expected_results": "All ABAT test should pass. \nNote : If below 3 fails appears ignore them. \n- start up X server fail.. due is already up \n- module [intel_agp] \n- module [i915]"
+                }
+            },
+            "summary": "Graphics_-_ABAT"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-tools.Graphics_-_x11perf_-_2D",
+            "author": [
+                {
+                    "email": "alexandru.c.georgescu@intel.com",
+                    "name": "alexandru.c.georgescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Run \"x11perf -aa10text\" and \"x11perf -rgb10text\"",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "Get the FPS result and compare it with upstream graphics data on Sandybridge",
+                    "expected_results": "There should not be big regression between Yocto and upstream linux . "
+                }
+            },
+            "summary": "Graphics_-_x11perf_-_2D"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-oe-core.Test_Run_Integrity_-_Check_that_image_is_buildable",
+            "author": [
+                {
+                    "email": "corneliux.stoicescu@intel.com",
+                    "name": "corneliux.stoicescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Check that image can be built using either of the following methods:  \n\n",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "Check that image is built by autobuilder \nPlease check at: https://autobuilder.yocto.io/pub/releases/ \nChoose the target release that you are validating.  \n\n",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "Build image yourself \nPreferred to build an core-image-sato-dev to ease the process of the dependent test cases in this run. \nNote: Please set MACHINE in conf/local.conf ",
+                    "expected_results": "If either method fails, this test case will be failed and dependent test cases will be blocked. "
+                }
+            },
+            "summary": "Test_Run_Integrity_-_Check_that_image_is_buildable"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.Check_if_SATA_disk_can_work_correctly",
+            "author": [
+                {
+                    "email": "yi.zhao@windriver.com",
+                    "name": "yi.zhao@windriver.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Run fdisk command to create partition on SATA disk. ",
+                    "expected_results": "The SATA device can mount, umount, read and write. "
+                },
+                "2": {
+                    "action": "Mount/Umount \n  mke2fs /dev/sda1 \n  mount -t ext2 /dev/sda1 /mnt/disk  \n  umount /mnt/disk",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "Read/Write (filesystem) \n  touch /mnt/disk/test.txt \n  echo abcd > /mnt/disk/test.txt \n  cat /mnt/disk/test.txt",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "Read/Write (raw) \n  dd if=/dev/sda1 of=/tmp/test bs=1k count=1k  \n  This command will read 1MB from /dev/sda1 to /tmp/test",
+                    "expected_results": ""
+                }
+            },
+            "summary": "Check_if_SATA_disk_can_work_correctly"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.Install_and_boot_from_USB-drive_to_HDD-drive",
+            "author": [
+                {
+                    "email": "david.israelx.rodriguez.castellanos@intel.com",
+                    "name": "david.israelx.rodriguez.castellanos@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Get a HDD drive.",
+                    "expected_results": "User can choose install system from USB stick on HDD drive from boot menu or command line option \n"
+                },
+                "2": {
+                    "action": "Plugin USB which contains live image burned (USB1).",
+                    "expected_results": "Installed system can boot up."
+                },
+                "3": {
+                    "action": "Configure device BIOS to firstly boot from USB if necessary",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "Boot the device and select option \"Install\"  from boot menu.",
+                    "expected_results": ""
+                },
+                "5": {
+                    "action": "Make sure that the divice in which image is going to be installed is the HDD drive.",
+                    "expected_results": ""
+                },
+                "6": {
+                    "action": "Proceed through default install process.",
+                    "expected_results": ""
+                },
+                "7": {
+                    "action": "Remove USB1, and reboot into new installed system.",
+                    "expected_results": ""
+                }
+            },
+            "summary": "Install_and_boot_from_USB-drive_to_HDD-drive"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.Install_and_boot_from_USB-drive_to_SD-drive",
+            "author": [
+                {
+                    "email": "david.israelx.rodriguez.castellanos@intel.com",
+                    "name": "david.israelx.rodriguez.castellanos@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Get a SD-drive with enough free space to install an image.",
+                    "expected_results": "User can choose install system from USB stick on SD-drive from boot menu or command line option. \n"
+                },
+                "2": {
+                    "action": "Plugin USB which contains live image burned (USB1).",
+                    "expected_results": "Installed system can boot up."
+                },
+                "3": {
+                    "action": "Configure device BIOS to firstly boot from USB if necessary",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "Boot the device and select option \"Install\"  from boot menu.",
+                    "expected_results": ""
+                },
+                "5": {
+                    "action": "Make sure that the device in which image is going to be installed is the SD-drive.",
+                    "expected_results": ""
+                },
+                "6": {
+                    "action": "Proceed through default install process.",
+                    "expected_results": ""
+                },
+                "7": {
+                    "action": "Remove USB1, and reboot into new installed system.",
+                    "expected_results": ""
+                }
+            },
+            "summary": "Install_and_boot_from_USB-drive_to_SD-drive"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.Test_boot_on_serial_communication_SD",
+            "author": [
+                {
+                    "email": "juan.fernandox.ramos.frayle@intel.com",
+                    "name": "juan.fernandox.ramos.frayle@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "1.- Create a yocto project image in a SD card \nexample \n2 - Configure a connection like shown in the link avobe: \nhttps://wiki.yoctoproject.org/wiki/MinnowMax_board_Serial_video_connection_guide \n3 - Verify the Minow Max board is connected to the host \n4 - Boot the system to desktop \n5 - Open a Terminal and check the IP  \nIn Terminal type $ifconfig\"",
+                    "expected_results": "Verify you can create a live image  \n"
+                }
+            },
+            "summary": "Test_boot_on_serial_communication_SD"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.Test_boot_on_serial_communication_HDD",
+            "author": [
+                {
+                    "email": "juan.fernandox.ramos.frayle@intel.com",
+                    "name": "juan.fernandox.ramos.frayle@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "1 - Create a yocto project image in a HDD \nexample \n2 - Configure a connection like shown in the link avobe: \nhttps://wiki.yoctoproject.org/wiki/MinnowMax_board_Serial_video_connection_guide \n3 - Verify the Minow Max board is connected to the host \n4 - Boot the system to desktop \n5 - Open a Terminal and check the IP  \nIn Terminal type $ifconfig\"> ",
+                    "expected_results": "Verify you can create a live image  \n"
+                }
+            },
+            "summary": "Test_boot_on_serial_communication_HDD"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.Test_boot_on_serial_communication_USB",
+            "author": [
+                {
+                    "email": "juan.fernandox.ramos.frayle@intel.com",
+                    "name": "juan.fernandox.ramos.frayle@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "1.- Create a yocto project image in a USB \nexample <dd if= core-image-sato-sdk.hddimg of =/dev/sdb>",
+                    "expected_results": "Verify you can create a live image  \n"
+                },
+                "2": {
+                    "action": "Configure a connection like shown in the link avobe: \nhttps://wiki.yoctoproject.org/wiki/MinnowMax_board_Serial_video_connection_guide\n\n",
+                    "expected_results": "Video signal is present and not delayed \n"
+                },
+                "3": {
+                    "action": " Verify the Minow Max board is connected to the host",
+                    "expected_results": "Verify the system boot ok and no errors are present \n"
+                },
+                "4": {
+                    "action": " Boot the system to desktop",
+                    "expected_results": " Check that a valid IP is retrieved"
+                },
+                "5": {
+                    "action": " Open a Terminal and check the IP  \nIn Terminal type $ifconfig\" ",
+                    "expected_results": ""
+                }
+            },
+            "summary": "Test_boot_on_serial_communication_USB"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-runtime.Test_Seek_bar_and_volume_control",
+            "author": [
+                {
+                    "email": "juan.fernandox.ramos.frayle@intel.com",
+                    "name": "juan.fernandox.ramos.frayle@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Run media player and load a media file ",
+                    "expected_results": "Media player correctly open audio/video file \n"
+                },
+                "2": {
+                    "action": "Verify that seek and volume control are present ",
+                    "expected_results": "Seek bar and volume control are present \n"
+                },
+                "3": {
+                    "action": "Verify that selecting the speaker icon opens the volume control",
+                    "expected_results": "Volume control bar must appear \n"
+                },
+                "4": {
+                    "action": "Verify you can increase and decrease volume level with the volume control",
+                    "expected_results": "Volume level must be increased and decreased \n"
+                },
+                "5": {
+                    "action": "Observe that slider on the seek bar moves along with the video/audio play",
+                    "expected_results": "Video/audio file can be played and slider moves along with the video/audio play \n"
+                },
+                "6": {
+                    "action": "Verify you can navigate the video with the slider back and forward",
+                    "expected_results": "The slider can move back and forward in the seek bar \n"
+                },
+                "7": {
+                    "action": "Verify that seek and volume control are functional in full screen mode",
+                    "expected_results": "Press the full screen mode icon, seek bar and volume control must work fine \n"
+                },
+                "8": {
+                    "action": "Verify that pressing << or >> while playing a file makes the slide goes slow/backwards or faster",
+                    "expected_results": "Verify << and >> works correctly"
+                }
+            },
+            "summary": "Test_Seek_bar_and_volume_control"
+        }
+    }
+]

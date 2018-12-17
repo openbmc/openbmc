@@ -22,7 +22,7 @@ PARALLEL_MAKE = ""
 
 EXTRA_OEMAKE_class-target = "SOAP=${STAGING_BINDIR_NATIVE}/soapcpp2"
 
-DEPENDS = "openssl zlib flex bison"
+DEPENDS = "openssl zlib flex bison bison-native"
 DEPENDS_append_class-target = " gsoap-native"
 
 do_install_append() {

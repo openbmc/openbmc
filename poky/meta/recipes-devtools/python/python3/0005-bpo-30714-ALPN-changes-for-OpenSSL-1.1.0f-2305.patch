@@ -1,0 +1,68 @@
+From 7b40cb7293cb14e5c7c8ed123efaf9acb33edae2 Mon Sep 17 00:00:00 2001
+From: Christian Heimes <christian@python.org>
+Date: Tue, 15 Aug 2017 10:33:43 +0200
+Subject: [PATCH] bpo-30714: ALPN changes for OpenSSL 1.1.0f (#2305)
+
+OpenSSL 1.1.0 to 1.1.0e aborted the handshake when server and client
+could not agree on a protocol using ALPN. OpenSSL 1.1.0f changed that.
+The most recent version now behaves like OpenSSL 1.0.2 again. The ALPN
+callback can pretend to not been set.
+
+See https://github.com/openssl/openssl/pull/3158 for more details
+
+Signed-off-by: Christian Heimes <christian@python.org>
+
+Upstream-Status: Backport
+[https://github.com/python/cpython/commit/7b40cb7293cb14e5c7c8ed123efaf9acb33edae2]
+
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+---
+ Doc/library/ssl.rst                                          | 5 +++--
+ Lib/test/test_ssl.py                                         | 5 +++--
+ .../next/Tests/2017-07-25-15-27-44.bpo-30715.Sp7bTF.rst      | 2 ++
+ 3 files changed, 8 insertions(+), 4 deletions(-)
+ create mode 100644 Misc/NEWS.d/next/Tests/2017-07-25-15-27-44.bpo-30715.Sp7bTF.rst
+
+diff --git a/Doc/library/ssl.rst b/Doc/library/ssl.rst
+index 729a239a1b..0a09e7e9d4 100644
+--- a/Doc/library/ssl.rst
++++ b/Doc/library/ssl.rst
+@@ -1447,8 +1447,9 @@ to speed up repeated connections from the same clients.
+    This method will raise :exc:`NotImplementedError` if :data:`HAS_ALPN` is
+    False.
+ 
+-   OpenSSL 1.1.0+ will abort the handshake and raise :exc:`SSLError` when
+-   both sides support ALPN but cannot agree on a protocol.
++   OpenSSL 1.1.0 to 1.1.0e will abort the handshake and raise :exc:`SSLError`
++   when both sides support ALPN but cannot agree on a protocol. 1.1.0f+
++   behaves like 1.0.2, :meth:`SSLSocket.selected_alpn_protocol` returns None.
+ 
+    .. versionadded:: 3.5
+ 
+diff --git a/Lib/test/test_ssl.py b/Lib/test/test_ssl.py
+index d960d82065..104b7f377a 100644
+--- a/Lib/test/test_ssl.py
++++ b/Lib/test/test_ssl.py
+@@ -3268,8 +3268,9 @@ if _have_threads:
+                 except ssl.SSLError as e:
+                     stats = e
+ 
+-                if expected is None and IS_OPENSSL_1_1:
+-                    # OpenSSL 1.1.0 raises handshake error
++                if (expected is None and IS_OPENSSL_1_1
++                        and ssl.OPENSSL_VERSION_INFO < (1, 1, 0, 6)):
++                    # OpenSSL 1.1.0 to 1.1.0e raises handshake error
+                     self.assertIsInstance(stats, ssl.SSLError)
+                 else:
+                     msg = "failed trying %s (s) and %s (c).\n" \
+diff --git a/Misc/NEWS.d/next/Tests/2017-07-25-15-27-44.bpo-30715.Sp7bTF.rst b/Misc/NEWS.d/next/Tests/2017-07-25-15-27-44.bpo-30715.Sp7bTF.rst
+new file mode 100644
+index 0000000000..88394e585c
+--- /dev/null
++++ b/Misc/NEWS.d/next/Tests/2017-07-25-15-27-44.bpo-30715.Sp7bTF.rst
+@@ -0,0 +1,2 @@
++Address ALPN callback changes for OpenSSL 1.1.0f. The latest version behaves
++like OpenSSL 1.0.2 and no longer aborts handshake.
+-- 
+2.17.1
+

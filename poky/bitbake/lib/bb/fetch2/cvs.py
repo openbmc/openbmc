@@ -110,7 +110,7 @@ class Cvs(FetchMethod):
         if ud.tag:
             options.append("-r %s" % ud.tag)
 
-        cvsbasecmd = d.getVar("FETCHCMD_cvs")
+        cvsbasecmd = d.getVar("FETCHCMD_cvs") or "/usr/bin/env cvs"
         cvscmd = cvsbasecmd + " '-d" + cvsroot + "' co " + " ".join(options) + " " + ud.module
         cvsupdatecmd = cvsbasecmd + " '-d" + cvsroot + "' update -d -P " + " ".join(options)
 
@@ -121,7 +121,8 @@ class Cvs(FetchMethod):
         # create module directory
         logger.debug(2, "Fetch: checking for module directory")
         pkg = d.getVar('PN')
-        pkgdir = os.path.join(d.getVar('CVSDIR'), pkg)
+        cvsdir = d.getVar("CVSDIR") or (d.getVar("DL_DIR") + "/cvs")
+        pkgdir = os.path.join(cvsdir, pkg)
         moddir = os.path.join(pkgdir, localdir)
         workdir = None
         if os.access(os.path.join(moddir, 'CVS'), os.R_OK):

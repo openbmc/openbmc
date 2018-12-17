@@ -13,7 +13,7 @@ require xorg-lib-common.inc
 LICENSE = "MIT-style"
 LIC_FILES_CHKSUM = "file://COPYING;md5=879ce266785414bd1cbc3bc2f4d9d7c8"
 
-DEPENDS += "xproto virtual/libx11 xextproto"
+DEPENDS += "xorgproto virtual/libx11"
 PROVIDES = "xext"
 
 PE = "1"

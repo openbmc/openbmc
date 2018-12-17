@@ -1,0 +1,191 @@
+From b6c0ef4b8f6e5c089ac7104b3aaba8f1d17b8b82 Mon Sep 17 00:00:00 2001
+From: Olly Betts <olly@survex.com>
+Date: Mon, 11 Jun 2018 15:51:53 +1200
+Subject: [PATCH] [Python] Fix new GCC8 warnings in generated code
+
+Avoid casts between incompatible function types where possible (when
+keyword args are in use, it is not possible to avoid such warnings as
+they are inherent in the design of Python's C API in that particular
+case).  Fixes #1259.
+
+Upstream-Status: Backport
+[https://github.com/swig/swig/commit/7f9883011029674553a2a4b623d459f02b512458]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ Lib/python/pyinit.swg     |  4 ++--
+ Lib/python/pyrun.swg      | 34 ++++++++++++++++++++++++++--------
+ Source/Modules/python.cxx | 26 +++++++++++++-------------
+ 3 files changed, 41 insertions(+), 23 deletions(-)
+
+diff --git a/Lib/python/pyinit.swg b/Lib/python/pyinit.swg
+index 2cc5828..6bf68c1 100644
+--- a/Lib/python/pyinit.swg
++++ b/Lib/python/pyinit.swg
+@@ -368,8 +368,8 @@ SWIG_init(void) {
+     (char *)"this", &SwigPyBuiltin_ThisClosure, NULL, NULL, NULL
+   };
+   static SwigPyGetSet thisown_getset_closure = {
+-    (PyCFunction) SwigPyObject_own,
+-    (PyCFunction) SwigPyObject_own
++    SwigPyObject_own,
++    SwigPyObject_own
+   };
+   static PyGetSetDef thisown_getset_def = {
+     (char *)"thisown", SwigPyBuiltin_GetterClosure, SwigPyBuiltin_SetterClosure, NULL, &thisown_getset_closure
+diff --git a/Lib/python/pyrun.swg b/Lib/python/pyrun.swg
+index ab1237f..3d0b1b3 100644
+--- a/Lib/python/pyrun.swg
++++ b/Lib/python/pyrun.swg
+@@ -465,6 +465,14 @@ SwigPyObject_repr(SwigPyObject *v, PyObject *args)
+   return repr;  
+ }
+ 
++/* We need a version taking two PyObject* parameters so it's a valid
++ * PyCFunction to use in swigobject_methods[]. */
++SWIGRUNTIME PyObject *
++SwigPyObject_repr2(PyObject *v, PyObject *SWIGUNUSEDPARM(args))
++{
++  return SwigPyObject_repr((SwigPyObject*)v);
++}
++
+ SWIGRUNTIME int
+ SwigPyObject_compare(SwigPyObject *v, SwigPyObject *w)
+ {
+@@ -594,11 +602,7 @@ SwigPyObject_append(PyObject* v, PyObject* next)
+ }
+ 
+ SWIGRUNTIME PyObject* 
+-#ifdef METH_NOARGS
+-SwigPyObject_next(PyObject* v)
+-#else
+ SwigPyObject_next(PyObject* v, PyObject *SWIGUNUSEDPARM(args))
+-#endif
+ {
+   SwigPyObject *sobj = (SwigPyObject *) v;
+   if (sobj->next) {    
+@@ -633,6 +637,20 @@ SwigPyObject_acquire(PyObject* v, PyObject *SWIGUNUSEDPARM(args))
+   return SWIG_Py_Void();
+ }
+ 
++#ifdef METH_NOARGS
++static PyObject*
++SwigPyObject_disown2(PyObject* v, PyObject *SWIGUNUSEDPARM(args))
++{
++  return SwigPyObject_disown(v);
++}
++
++static PyObject*
++SwigPyObject_acquire2(PyObject* v, PyObject *SWIGUNUSEDPARM(args))
++{
++  return SwigPyObject_acquire(v);
++}
++#endif
++
+ SWIGINTERN PyObject*
+ SwigPyObject_own(PyObject *v, PyObject *args)
+ {
+@@ -673,12 +691,12 @@ SwigPyObject_own(PyObject *v, PyObject *args)
+ #ifdef METH_O
+ static PyMethodDef
+ swigobject_methods[] = {
+-  {(char *)"disown",  (PyCFunction)SwigPyObject_disown,  METH_NOARGS,  (char *)"releases ownership of the pointer"},
+-  {(char *)"acquire", (PyCFunction)SwigPyObject_acquire, METH_NOARGS,  (char *)"acquires ownership of the pointer"},
++  {(char *)"disown",  (PyCFunction)SwigPyObject_disown2, METH_NOARGS,  (char *)"releases ownership of the pointer"},
++  {(char *)"acquire", (PyCFunction)SwigPyObject_acquire2,METH_NOARGS,  (char *)"acquires ownership of the pointer"},
+   {(char *)"own",     (PyCFunction)SwigPyObject_own,     METH_VARARGS, (char *)"returns/sets ownership of the pointer"},
+   {(char *)"append",  (PyCFunction)SwigPyObject_append,  METH_O,       (char *)"appends another 'this' object"},
+   {(char *)"next",    (PyCFunction)SwigPyObject_next,    METH_NOARGS,  (char *)"returns the next 'this' object"},
+-  {(char *)"__repr__",(PyCFunction)SwigPyObject_repr,    METH_NOARGS,  (char *)"returns object representation"},
++  {(char *)"__repr__",(PyCFunction)SwigPyObject_repr2,   METH_NOARGS,  (char *)"returns object representation"},
+   {0, 0, 0, 0}  
+ };
+ #else
+@@ -689,7 +707,7 @@ swigobject_methods[] = {
+   {(char *)"own",     (PyCFunction)SwigPyObject_own,     METH_VARARGS,  (char *)"returns/sets ownership of the pointer"},
+   {(char *)"append",  (PyCFunction)SwigPyObject_append,  METH_VARARGS,  (char *)"appends another 'this' object"},
+   {(char *)"next",    (PyCFunction)SwigPyObject_next,    METH_VARARGS,  (char *)"returns the next 'this' object"},
+-  {(char *)"__repr__",(PyCFunction)SwigPyObject_repr,   METH_VARARGS,  (char *)"returns object representation"},
++  {(char *)"__repr__",(PyCFunction)SwigPyObject_repr,    METH_VARARGS,  (char *)"returns object representation"},
+   {0, 0, 0, 0}  
+ };
+ #endif
+diff --git a/Source/Modules/python.cxx b/Source/Modules/python.cxx
+index a6801fc..72eaa77 100644
+--- a/Source/Modules/python.cxx
++++ b/Source/Modules/python.cxx
+@@ -1109,7 +1109,7 @@ public:
+    * ------------------------------------------------------------ */
+   int add_pyinstancemethod_new() {
+     String *name = NewString("SWIG_PyInstanceMethod_New");
+-    Printf(methods, "\t { (char *)\"%s\", (PyCFunction)%s, METH_O, NULL},\n", name, name);
++    Printf(methods, "\t { \"%s\", %s, METH_O, NULL},\n", name, name);
+     Delete(name);
+     return 0;
+   }
+@@ -2479,17 +2479,17 @@ public:
+     if (!kw) {
+       if (n && funpack) {
+ 	if (num_required == 0 && num_arguments == 0) {
+-	  Printf(methods, "\t { (char *)\"%s\", (PyCFunction)%s, METH_NOARGS, ", name, function);
++	  Printf(methods, "\t { \"%s\", %s, METH_NOARGS, ", name, function);
+ 	} else if (num_required == 1 && num_arguments == 1) {
+-	  Printf(methods, "\t { (char *)\"%s\", (PyCFunction)%s, METH_O, ", name, function);
++	  Printf(methods, "\t { \"%s\", %s, METH_O, ", name, function);
+ 	} else {
+-	  Printf(methods, "\t { (char *)\"%s\", %s, METH_VARARGS, ", name, function);
++	  Printf(methods, "\t { \"%s\", %s, METH_VARARGS, ", name, function);
+ 	}
+       } else {
+-	Printf(methods, "\t { (char *)\"%s\", %s, METH_VARARGS, ", name, function);
++	Printf(methods, "\t { \"%s\", %s, METH_VARARGS, ", name, function);
+       }
+     } else {
+-      Printf(methods, "\t { (char *)\"%s\", (PyCFunction) %s, METH_VARARGS | METH_KEYWORDS, ", name, function);
++      Printf(methods, "\t { \"%s\", (PyCFunction)%s, METH_VARARGS|METH_KEYWORDS, ", name, function);
+     }
+ 
+     if (!n) {
+@@ -3857,7 +3857,7 @@ public:
+     if (shadow) {
+       if (builtin) {
+ 	String *rname = SwigType_namestr(real_classname);
+-	Printf(builtin_methods, "  { \"__disown__\", (PyCFunction) Swig::Director::swig_pyobj_disown< %s >, METH_NOARGS, \"\" },\n", rname);
++	Printf(builtin_methods, "  { \"__disown__\", Swig::Director::swig_pyobj_disown< %s >, METH_NOARGS, \"\" },\n", rname);
+ 	Delete(rname);
+       } else {
+ 	String *symname = Getattr(n, "sym:name");
+@@ -4694,13 +4694,13 @@ public:
+ 	int argcount = Getattr(n, "python:argcount") ? atoi(Char(Getattr(n, "python:argcount"))) : 2;
+ 	String *ds = have_docstring(n) ? cdocstring(n, AUTODOC_FUNC) : NewString("");
+ 	if (check_kwargs(n)) {
+-	  Printf(builtin_methods, "  { \"%s\", (PyCFunction) %s, METH_VARARGS|METH_KEYWORDS, (char *) \"%s\" },\n", symname, wname, ds);
++	  Printf(builtin_methods, "  { \"%s\", (PyCFunction)%s, METH_VARARGS|METH_KEYWORDS, \"%s\" },\n", symname, wname, ds);
+ 	} else if (argcount == 0) {
+-	  Printf(builtin_methods, "  { \"%s\", (PyCFunction) %s, METH_NOARGS, (char *) \"%s\" },\n", symname, wname, ds);
++	  Printf(builtin_methods, "  { \"%s\", %s, METH_NOARGS, \"%s\" },\n", symname, wname, ds);
+ 	} else if (argcount == 1) {
+-	  Printf(builtin_methods, "  { \"%s\", (PyCFunction) %s, METH_O, (char *) \"%s\" },\n", symname, wname, ds);
++	  Printf(builtin_methods, "  { \"%s\", %s, METH_O, \"%s\" },\n", symname, wname, ds);
+ 	} else {
+-	  Printf(builtin_methods, "  { \"%s\", (PyCFunction) %s, METH_VARARGS, (char *) \"%s\" },\n", symname, wname, ds);
++	  Printf(builtin_methods, "  { \"%s\", %s, METH_VARARGS, \"%s\" },\n", symname, wname, ds);
+ 	}
+ 	Delete(fullname);
+ 	Delete(wname);
+@@ -4801,10 +4801,10 @@ public:
+ 	  Append(pyflags, "METH_VARARGS");
+ 	if (have_docstring(n)) {
+ 	  String *ds = cdocstring(n, AUTODOC_STATICFUNC);
+-	  Printf(builtin_methods, "  { \"%s\", (PyCFunction) %s, %s, (char *) \"%s\" },\n", symname, wname, pyflags, ds);
++	  Printf(builtin_methods, "  { \"%s\", (PyCFunction)%s, %s, \"%s\" },\n", symname, wname, pyflags, ds);
+ 	  Delete(ds);
+ 	} else {
+-	  Printf(builtin_methods, "  { \"%s\", (PyCFunction) %s, %s, \"\" },\n", symname, wname, pyflags);
++	  Printf(builtin_methods, "  { \"%s\", (PyCFunction)%s, %s, \"\" },\n", symname, wname, pyflags);
+ 	}
+ 	Delete(fullname);
+ 	Delete(wname);
+-- 
+2.7.4
+

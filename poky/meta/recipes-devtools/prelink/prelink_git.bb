@@ -9,7 +9,7 @@ and executables, so that far fewer relocations need to be resolved at \
 runtime and thus programs come up faster."
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c93c0550bd3173f4504b2cbd8991e50b"
-SRCREV = "05aeafd053e56356ec8c62f4bb8f7b95bae192f3"
+SRCREV = "a853a5d715d84eec93aa68e8f2df26b7d860f5b2"
 PV = "1.0+git${SRCPV}"
 
 #
@@ -27,11 +27,13 @@ FILES_${PN}-cron = "${sysconfdir}/cron.daily ${sysconfdir}/default"
 
 PACKAGES =+ "${PN}-cron"
 
-SRC_URI = "git://git.yoctoproject.org/prelink-cross.git;branch=cross_prelink \
+SRC_URI = "git://git.yoctoproject.org/prelink-cross.git;branch=cross_prelink_staging \
            file://prelink.conf \
            file://prelink.cron.daily \
            file://prelink.default \
-	   file://macros.prelink"
+           file://macros.prelink \
+           file://0001-src-arch-mips.c-check-info-resolvetls-before-use-its.patch \
+"
 UPSTREAM_CHECK_COMMITS = "1"
 
 TARGET_OS_ORIG := "${TARGET_OS}"

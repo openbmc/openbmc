@@ -14,6 +14,8 @@ SRC_URI = "ftp://ftp.unixodbc.org/pub/unixODBC/unixODBC-${PV}.tar.gz \
 SRC_URI[md5sum] = "a8629fd2953b04b4639d0a9d8a5cf9d1"
 SRC_URI[sha256sum] = "88b637f647c052ecc3861a3baa275c3b503b193b6a49ff8c28b2568656d14d69"
 
+UPSTREAM_CHECK_REGEX = "unixODBC-(?P<pver>\d+(\.\d+)+)\.tar"
+
 inherit autotools-brokensep
 
 S = "${WORKDIR}/unixODBC-${PV}"

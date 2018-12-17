@@ -21,10 +21,8 @@ SRC_URI[sha256sum] = "86e6707a379c7ff5489c218cfaf1e3464b0b95acf7817db0bc5f179e35
 CACHED_CONFIGUREVARS += "scanf_cv_alloc_modifier=ms"
 
 EXTRA_OECONF_class-native = "${SHARED_EXTRA_OECONF} \
-                             --disable-fallocate \
 			     --disable-use-tty-group \
 "
 EXTRA_OECONF_class-nativesdk = "${SHARED_EXTRA_OECONF} \
-                                --disable-fallocate \
 				--disable-use-tty-group \
 "

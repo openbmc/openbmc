@@ -10,7 +10,7 @@ LICENSE = "MIT-style"
 LIC_FILES_CHKSUM = "file://COPYING;md5=bb4f89972c3869f617f61c1a79ad1952 \
                     file://src/XTest.c;beginline=2;endline=32;md5=b1c8c9dff842b4d5b89ca5fa32c40e99"
 
-DEPENDS += "libxext recordproto inputproto libxi"
+DEPENDS += "libxext xorgproto libxi"
 PROVIDES = "xtst"
 PE = "1"
 

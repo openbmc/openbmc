@@ -36,6 +36,5 @@ do_install() {
         rm -f ${S}/espeak-data/phon*
     fi
 
-    cp -prf ${S}/espeak-data/* ${D}${datadir}/espeak-data
-    chown -R root:root ${D}${datadir}/espeak-data
+    cp -R --no-dereference --preserve=mode,links ${S}/espeak-data/* ${D}${datadir}/espeak-data
 }

@@ -1,0 +1,29 @@
+From a88e806f9ce8cc071e81abad688643d53f393176 Mon Sep 17 00:00:00 2001
+From: Alistair Francis <alistair.francis@wdc.com>
+Date: Mon, 10 Sep 2018 14:18:38 -0700
+Subject: [PATCH 3/3] Makefile.inc: Allow extra libs to be specified
+
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Upstream-Status: Pending
+---
+ src/Makefile.inc       | 2 ++
+ src/common.inc         | 2 ++
+ src/tools/Makefile.inc | 1 +
+ 3 files changed, 5 insertions(+)
+
+diff --git a/src/common.inc b/src/common.inc
+index 032cb83ea..2d5c4bedf 100644
+--- a/src/common.inc
++++ b/src/common.inc
+@@ -74,6 +74,8 @@ GCOV_CFLAGS=-fprofile-arcs -ftest-coverage --coverage
+ GCOV_LDFLAGS=-fprofile-arcs -ftest-coverage
+ GCOV_LIBS=-lgcov
+ 
++LIBS += $(EXTRA_LIBS)
++
+ osdep = $(1)_$(shell uname -s | tr "[:upper:]" "[:lower:]")$(2)
+ get_arch = $(shell $(CC) -dumpmachine | awk -F'[/-]' '{print $$1}')
+ 
+-- 
+2.17.1
+

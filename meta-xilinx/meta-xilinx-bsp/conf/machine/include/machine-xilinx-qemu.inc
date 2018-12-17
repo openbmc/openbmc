@@ -8,15 +8,11 @@ def qemu_default_dtb(d):
     if d.getVar("IMAGE_BOOT_FILES", True):
         dtbs = d.getVar("IMAGE_BOOT_FILES", True).split(" ")
         # IMAGE_BOOT_FILES has extra renaming info in the format '<source>;<target>'
+        # Note: Wildcard sources work here only because runqemu expands them at run time
         dtbs = [f.split(";")[0] for f in dtbs]
         dtbs = [f for f in dtbs if f.endswith(".dtb")]
         if len(dtbs) != 0:
             return dtbs[0]
-    if d.getVar("KERNEL_DEVICETREE", True):
-        dtbs = d.getVar("KERNEL_DEVICETREE", True).split(" ")
-        dtbs = [os.path.basename(d) for d in dtbs]
-        if len(dtbs) != 0:
-            return d.getVar("KERNEL_IMAGETYPE", True) + "-" + dtbs[0]
     return ""
 
 def qemu_default_serial(d):

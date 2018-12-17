@@ -1,0 +1,53 @@
+From d8950ad273d79ec516468289adbd427e681dbc66 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Mon, 30 Jul 2018 01:22:56 -0700
+Subject: [PATCH] src/tcp.c: increase the size of szHname
+
+Increase the size of szHname to fix below
+error:
+| ../../git/src/tcp.c: In function 'relpTcpSetRemHost':
+| ../../git/src/tcp.c:352:57: error: '%s' directive output may be truncated writing up to 1024 bytes into a region of size 1011 [-Werror=format-truncation=]
+|      snprintf((char*)szHname, NI_MAXHOST, "[MALICIOUS:IP=%s]", szIP);
+|                                                          ^~    ~~~~
+| In file included from /poky-build/tmp/work/i586-poky-linux/librelp/1.2.16-r0/recipe-sysroot/usr/include/stdio.h:862,
+|                  from ../../git/src/tcp.c:38:
+| /poky-build/tmp/work/i586-poky-linux/librelp/1.2.16-r0/recipe-sysroot/usr/include/bits/stdio2.h:64:10: note: '__builtin___snprintf_chk' output between 16 and 1040 bytes into a destination of size 1025
+|    return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVEL - 1,
+|           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+|         __bos (__s), __fmt, __va_arg_pack ());
+|         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+| cc1: all warnings being treated as errors
+| Makefile:536: recipe for target 'librelp_la-tcp.lo' failed
+
+Upstream-Status: Submitted[https://github.com/rsyslog/librelp/pull/118]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ src/tcp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/tcp.c b/src/tcp.c
+index fb34dc7..2c38b0b 100644
+--- a/src/tcp.c
++++ b/src/tcp.c
+@@ -319,7 +319,7 @@ relpTcpSetRemHost(relpTcp_t *const pThis, struct sockaddr *pAddr)
+ 	relpEngine_t *pEngine;
+ 	int error;
+ 	unsigned char szIP[NI_MAXHOST] = "";
+-	unsigned char szHname[NI_MAXHOST] = "";
++	unsigned char szHname[1045] = "";
+ 	struct addrinfo hints, *res;
+ 	size_t len;
+ 	
+@@ -349,7 +349,7 @@ relpTcpSetRemHost(relpTcp_t *const pThis, struct sockaddr *pAddr)
+ 			if(getaddrinfo((char*)szHname, NULL, &hints, &res) == 0) {
+ 				freeaddrinfo (res);
+ 				/* OK, we know we have evil, so let's indicate this to our caller */
+-				snprintf((char*)szHname, NI_MAXHOST, "[MALICIOUS:IP=%s]", szIP);
++				snprintf((char*)szHname, sizeof(szHname), "[MALICIOUS:IP=%s]", szIP);
+ 				pEngine->dbgprint("Malicious PTR record, IP = \"%s\" HOST = \"%s\"", szIP, szHname);
+ 				iRet = RELP_RET_MALICIOUS_HNAME;
+ 			}
+-- 
+2.17.1
+

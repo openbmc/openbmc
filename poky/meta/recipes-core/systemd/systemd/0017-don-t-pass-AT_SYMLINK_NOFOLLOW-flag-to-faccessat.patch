@@ -1,0 +1,99 @@
+From 91bb4f5c9c11464468e8d3fa4746d98d59997264 Mon Sep 17 00:00:00 2001
+From: Andre McCurdy <armccurdy@gmail.com>
+Date: Tue, 10 Oct 2017 14:33:30 -0700
+Subject: [PATCH 17/19] don't pass AT_SYMLINK_NOFOLLOW flag to faccessat()
+
+Avoid using AT_SYMLINK_NOFOLLOW flag. It doesn't seem like the right
+thing to do and it's not portable (not supported by musl). See:
+
+  http://lists.landley.net/pipermail/toybox-landley.net/2014-September/003610.html
+  http://www.openwall.com/lists/musl/2015/02/05/2
+
+Note that laccess() is never passing AT_EACCESS so a lot of the
+discussion in the links above doesn't apply. Note also that
+(currently) all systemd callers of laccess() pass mode as F_OK, so
+only check for existence of a file, not access permissions.
+Therefore, in this case, the only distiction between faccessat()
+with (flag == 0) and (flag == AT_SYMLINK_NOFOLLOW) is the behaviour
+for broken symlinks; laccess() on a broken symlink will succeed with
+(flag == AT_SYMLINK_NOFOLLOW) and fail (flag == 0).
+
+The laccess() macros was added to systemd some time ago and it's not
+clear if or why it needs to return success for broken symlinks. Maybe
+just historical and not actually necessary or desired behaviour?
+
+Upstream-Status: Inappropriate [musl specific]
+
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+---
+ src/basic/fs-util.h          | 22 +++++++++++++++++++++-
+ src/shared/base-filesystem.c |  6 +++---
+ 2 files changed, 24 insertions(+), 4 deletions(-)
+
+diff --git a/src/basic/fs-util.h b/src/basic/fs-util.h
+index 28566773c..14b864cc5 100644
+--- a/src/basic/fs-util.h
++++ b/src/basic/fs-util.h
+@@ -32,7 +32,27 @@ int fchmod_opath(int fd, mode_t m);
+ 
+ int fd_warn_permissions(const char *path, int fd);
+ 
+-#define laccess(path, mode) faccessat(AT_FDCWD, (path), (mode), AT_SYMLINK_NOFOLLOW)
++/*
++   Avoid using AT_SYMLINK_NOFOLLOW flag. It doesn't seem like the right thing to
++   do and it's not portable (not supported by musl). See:
++
++     http://lists.landley.net/pipermail/toybox-landley.net/2014-September/003610.html
++     http://www.openwall.com/lists/musl/2015/02/05/2
++
++   Note that laccess() is never passing AT_EACCESS so a lot of the discussion in
++   the links above doesn't apply. Note also that (currently) all systemd callers
++   of laccess() pass mode as F_OK, so only check for existence of a file, not
++   access permissions. Therefore, in this case, the only distiction between
++   faccessat() with (flag == 0) and (flag == AT_SYMLINK_NOFOLLOW) is the
++   behaviour for broken symlinks; laccess() on a broken symlink will succeed
++   with (flag == AT_SYMLINK_NOFOLLOW) and fail (flag == 0).
++
++   The laccess() macros was added to systemd some time ago and it's not clear if
++   or why it needs to return success for broken symlinks. Maybe just historical
++   and not actually necessary or desired behaviour?
++*/
++
++#define laccess(path, mode) faccessat(AT_FDCWD, (path), (mode), 0)
+ 
+ int touch_file(const char *path, bool parents, usec_t stamp, uid_t uid, gid_t gid, mode_t mode);
+ int touch(const char *path);
+diff --git a/src/shared/base-filesystem.c b/src/shared/base-filesystem.c
+index 89d7a7d59..34b4ad53a 100644
+--- a/src/shared/base-filesystem.c
++++ b/src/shared/base-filesystem.c
+@@ -53,7 +53,7 @@ int base_filesystem_create(const char *root, uid_t uid, gid_t gid) {
+                 return log_error_errno(errno, "Failed to open root file system: %m");
+ 
+         for (i = 0; i < ELEMENTSOF(table); i ++) {
+-                if (faccessat(fd, table[i].dir, F_OK, AT_SYMLINK_NOFOLLOW) >= 0)
++                if (faccessat(fd, table[i].dir, F_OK, 0) >= 0)
+                         continue;
+ 
+                 if (table[i].target) {
+@@ -61,7 +61,7 @@ int base_filesystem_create(const char *root, uid_t uid, gid_t gid) {
+ 
+                         /* check if one of the targets exists */
+                         NULSTR_FOREACH(s, table[i].target) {
+-                                if (faccessat(fd, s, F_OK, AT_SYMLINK_NOFOLLOW) < 0)
++                                if (faccessat(fd, s, F_OK, 0) < 0)
+                                         continue;
+ 
+                                 /* check if a specific file exists at the target path */
+@@ -72,7 +72,7 @@ int base_filesystem_create(const char *root, uid_t uid, gid_t gid) {
+                                         if (!p)
+                                                 return log_oom();
+ 
+-                                        if (faccessat(fd, p, F_OK, AT_SYMLINK_NOFOLLOW) < 0)
++                                        if (faccessat(fd, p, F_OK, 0) < 0)
+                                                 continue;
+                                 }
+ 
+-- 
+2.11.0
+

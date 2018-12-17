@@ -1,0 +1,40 @@
+From e965e748c7030df0709e63128db2f023540a06ba Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 12 Sep 2015 18:53:31 +0000
+Subject: [PATCH 03/19] comparison_fn_t is glibc specific, use raw signature in
+ function pointer
+
+make it work with musl where comparison_fn_t is not provided
+
+Upstream-Status: Inappropriate [musl specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/basic/util.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/basic/util.h b/src/basic/util.h
+index 40eaf518c..c58392397 100644
+--- a/src/basic/util.h
++++ b/src/basic/util.h
+@@ -77,7 +77,7 @@ void *xbsearch_r(const void *key, const void *base, size_t nmemb, size_t size,
+  * that only if nmemb > 0.
+  */
+ static inline void* bsearch_safe(const void *key, const void *base,
+-                                 size_t nmemb, size_t size, comparison_fn_t compar) {
++                                 size_t nmemb, size_t size, int (*compar)(const void *, const void *)) {
+         if (nmemb <= 0)
+                 return NULL;
+ 
+@@ -89,7 +89,7 @@ static inline void* bsearch_safe(const void *key, const void *base,
+  * Normal qsort requires base to be nonnull. Here were require
+  * that only if nmemb > 0.
+  */
+-static inline void qsort_safe(void *base, size_t nmemb, size_t size, comparison_fn_t compar) {
++static inline void qsort_safe(void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *)) {
+         if (nmemb <= 1)
+                 return;
+ 
+-- 
+2.11.0
+

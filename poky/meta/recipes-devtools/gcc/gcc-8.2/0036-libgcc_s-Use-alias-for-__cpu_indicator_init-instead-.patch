@@ -1,0 +1,86 @@
+From b7faeed60261d7b75f2db3823926de1650ef64bc Mon Sep 17 00:00:00 2001
+From: Szabolcs Nagy <nsz@port70.net>
+Date: Sat, 24 Oct 2015 20:09:53 +0000
+Subject: [PATCH 36/39] libgcc_s: Use alias for __cpu_indicator_init instead of
+ symver
+
+Adapter from
+
+https://gcc.gnu.org/ml/gcc-patches/2015-05/msg00899.html
+
+This fix was debated but hasnt been applied gcc upstream since
+they expect musl to support '@' in symbol versioning which is
+a sun/gnu versioning extention. This patch however avoids the
+need for the '@' symbols at all
+
+libgcc/Changelog:
+
+2015-05-11  Szabolcs Nagy  <szabolcs.nagy@arm.com>
+
+	* config/i386/cpuinfo.c (__cpu_indicator_init_local): Add.
+	(__cpu_indicator_init@GCC_4.8.0, __cpu_model@GCC_4.8.0): Remove.
+
+	* config/i386/t-linux (HOST_LIBGCC2_CFLAGS): Remove -DUSE_ELF_SYMVER.
+
+gcc/Changelog:
+
+2015-05-11  Szabolcs Nagy  <szabolcs.nagy@arm.com>
+
+	* config/i386/i386.c (ix86_expand_builtin): Make __builtin_cpu_init
+	call __cpu_indicator_init_local instead of __cpu_indicator_init.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ gcc/config/i386/i386.c       | 4 ++--
+ libgcc/config/i386/cpuinfo.c | 6 +++---
+ libgcc/config/i386/t-linux   | 2 +-
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/gcc/config/i386/i386.c b/gcc/config/i386/i386.c
+index 6a2141e48db..455fccbdd50 100644
+--- a/gcc/config/i386/i386.c
++++ b/gcc/config/i386/i386.c
+@@ -36490,10 +36490,10 @@ ix86_expand_builtin (tree exp, rtx target, rtx subtarget,
+     {
+     case IX86_BUILTIN_CPU_INIT:
+       {
+-	/* Make it call __cpu_indicator_init in libgcc. */
++	/* Make it call __cpu_indicator_init_local in libgcc.a. */
+ 	tree call_expr, fndecl, type;
+         type = build_function_type_list (integer_type_node, NULL_TREE); 
+-	fndecl = build_fn_decl ("__cpu_indicator_init", type);
++	fndecl = build_fn_decl ("__cpu_indicator_init_local", type);
+ 	call_expr = build_call_expr (fndecl, 0); 
+ 	return expand_expr (call_expr, target, mode, EXPAND_NORMAL);
+       }
+diff --git a/libgcc/config/i386/cpuinfo.c b/libgcc/config/i386/cpuinfo.c
+index 86953db2743..e0476272810 100644
+--- a/libgcc/config/i386/cpuinfo.c
++++ b/libgcc/config/i386/cpuinfo.c
+@@ -482,7 +482,7 @@ __cpu_indicator_init (void)
+   return 0;
+ }
+ 
+-#if defined SHARED && defined USE_ELF_SYMVER
+-__asm__ (".symver __cpu_indicator_init, __cpu_indicator_init@GCC_4.8.0");
+-__asm__ (".symver __cpu_model, __cpu_model@GCC_4.8.0");
++#ifndef SHARED
++int __cpu_indicator_init_local (void)
++  __attribute__ ((weak, alias ("__cpu_indicator_init")));
+ #endif
+diff --git a/libgcc/config/i386/t-linux b/libgcc/config/i386/t-linux
+index 8506a635790..564296f788e 100644
+--- a/libgcc/config/i386/t-linux
++++ b/libgcc/config/i386/t-linux
+@@ -3,5 +3,5 @@
+ # t-slibgcc-elf-ver and t-linux
+ SHLIB_MAPFILES = libgcc-std.ver $(srcdir)/config/i386/libgcc-glibc.ver
+ 
+-HOST_LIBGCC2_CFLAGS += -mlong-double-80 -DUSE_ELF_SYMVER $(CET_FLAGS)
++HOST_LIBGCC2_CFLAGS += -mlong-double-80 $(CET_FLAGS)
+ CRTSTUFF_T_CFLAGS += $(CET_FLAGS)
+-- 
+2.17.0
+

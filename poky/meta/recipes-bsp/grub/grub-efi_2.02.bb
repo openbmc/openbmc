@@ -25,6 +25,9 @@ python __anonymous () {
     elif re.match('aarch64', target):
         grubtarget = 'arm64'
         grubimage = prefix + "bootaa64.efi"
+    elif re.match('arm', target):
+        grubtarget = 'arm'
+        grubimage = prefix + "bootarm.efi"
     else:
         raise bb.parse.SkipRecipe("grub-efi is incompatible with target %s" % target)
     d.setVar("GRUB_TARGET", grubtarget)

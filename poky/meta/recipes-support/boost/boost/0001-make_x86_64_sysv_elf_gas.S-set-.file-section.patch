@@ -1,0 +1,48 @@
+From c99f798407e44c86e9f64f5b1adf3b4d0549eef2 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <Mingli.Yu@windriver.com>
+Date: Fri, 15 Jun 2018 16:21:56 +0800
+Subject: [PATCH] make_x86_64_sysv_elf_gas.S: set .file section
+
+Set .file section explicitly for .S files to avoid
+the linker introduces the host path in symbols for
+object files whose source file is .S
+Otherwise, there is a host path in the symbols as below:
+$ readelf --wide --symbols /my-build/boost/1.67.0-r0/boost_1_67_0/x86_64-poky-linux/boost/bin.v2/libs/context/build/aca09349fdb84d131321425f6c3a38ed/libboost_context.so.1.67.0
+
+42: 0000000000000000 0 FILE LOCAL DEFAULT ABS /my-build/boost/1.67.0-r0/boost_1_67_0/x86_64-poky-linux/boost/bin.v2/libs/context/build/aca09349fdb84d131321425f6c3a38ed/asm/make_x86_64_sysv_elf_gas.o
+
+Upstream-Status: Pending
+
+Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
+---
+ libs/context/src/asm/make_i386_sysv_elf_gas.S   | 1 +
+ libs/context/src/asm/make_x86_64_sysv_elf_gas.S | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/libs/context/src/asm/make_i386_sysv_elf_gas.S b/libs/context/src/asm/make_i386_sysv_elf_gas.S
+index de77e88..b76de26 100644
+--- a/libs/context/src/asm/make_i386_sysv_elf_gas.S
++++ b/libs/context/src/asm/make_i386_sysv_elf_gas.S
+@@ -24,6 +24,7 @@
+  *                                                                                      *
+  ****************************************************************************************/
+ 
++.file "make_i386_sysv_elf_gas.S"
+ .text
+ .globl make_fcontext
+ .align 2
+diff --git a/libs/context/src/asm/make_x86_64_sysv_elf_gas.S b/libs/context/src/asm/make_x86_64_sysv_elf_gas.S
+index 25a0c00..0ef3756 100644
+--- a/libs/context/src/asm/make_x86_64_sysv_elf_gas.S
++++ b/libs/context/src/asm/make_x86_64_sysv_elf_gas.S
+@@ -24,6 +24,7 @@
+  *                                                                                      *
+  ****************************************************************************************/
+ 
++.file "make_x86_64_sysv_elf_gas.S"
+ .text
+ .globl make_fcontext
+ .type make_fcontext,@function
+-- 
+2.7.4
+

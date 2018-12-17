@@ -1,0 +1,273 @@
+--- xscreensaver-5.39.orig/driver/XScreenSaver.ad.in
++++ xscreensaver-5.39/driver/XScreenSaver.ad.in
+@@ -29,7 +29,7 @@
+ ! /* (xrdb prevention kludge: whole file)
+ 
+ *mode:			random
+-*timeout:		0:10:00
++*timeout:		0:15:00
+ *cycle:			0:10:00
+ *lockTimeout:		0:00:00
+ *passwdTimeout:		0:00:30
+@@ -38,7 +38,7 @@
+ *dpmsStandby:		2:00:00
+ *dpmsSuspend:		2:00:00
+ *dpmsOff:		4:00:00
+-*grabDesktopImages:	True
++*grabDesktopImages:	False
+ *grabVideoFrames:	False
+ *chooseRandomImages:	@DEFAULT_IMAGES_P@
+ ! This can be a local directory name, or the URL of an RSS or Atom feed.
+@@ -48,11 +48,11 @@
+ *lock:			False
+ *verbose:		False
+ *timestamp:		True
+-*fade:			True
++*fade:			False
+ *unfade:		False
+ *fadeSeconds:		0:00:03
+ *fadeTicks:		20
+-*splash:		True
++*splash:		False
+ *splashDuration:	0:00:05
+ *visualID:		default
+ *captureStderr: 	True
+@@ -158,236 +158,8 @@
+ ! screen savers interactively.
+ !
+ *programs:								      \
+-				maze -root				    \n\
+-@GL_KLUDGE@ GL: 				superquadrics -root			    \n\
+-				attraction -root			    \n\
+-				blitspin -root				    \n\
+-				greynetic -root				    \n\
+-				helix -root				    \n\
+-				hopalong -root				    \n\
+-				imsmap -root				    \n\
+--				noseguy -root				    \n\
+--				pyro -root				    \n\
+-				qix -root				    \n\
+--				rocks -root				    \n\
+-				rorschach -root				    \n\
+-				decayscreen -root			    \n\
+-				flame -root				    \n\
+-				halo -root				    \n\
+-				slidescreen -root			    \n\
+-				pedal -root				    \n\
+-				bouboule -root				    \n\
+--				braid -root				    \n\
+-				coral -root				    \n\
+-				deco -root				    \n\
+-				drift -root				    \n\
+--				fadeplot -root				    \n\
+-				galaxy -root				    \n\
+-				goop -root				    \n\
+-				grav -root				    \n\
+-				ifs -root				    \n\
+-@GL_KLUDGE@ GL: 				jigsaw -root				    \n\
+-				julia -root				    \n\
+--				kaleidescope -root			    \n\
+-@GL_KLUDGE@ GL: 				moebius -root				    \n\
+-				moire -root				    \n\
+-@GL_KLUDGE@ GL: 				morph3d -root				    \n\
+-				mountain -root				    \n\
+-				munch -root				    \n\
+-				penrose -root				    \n\
+-@GL_KLUDGE@ GL: 				pipes -root				    \n\
+-				rd-bomb -root				    \n\
+-@GL_KLUDGE@ GL: 				rubik -root				    \n\
+--				sierpinski -root			    \n\
+-				slip -root				    \n\
+-@GL_KLUDGE@ GL: 				sproingies -root			    \n\
+-				starfish -root				    \n\
+-				strange -root				    \n\
+-				swirl -root				    \n\
+-				triangle -root				    \n\
+-				xjack -root				    \n\
+-				xlyap -root				    \n\
+-@GL_KLUDGE@ GL: 				atlantis -root				    \n\
+-				bsod -root				    \n\
+-@GL_KLUDGE@ GL: 				bubble3d -root				    \n\
+-@GL_KLUDGE@ GL: 				cage -root				    \n\
+--				crystal -root				    \n\
+-				cynosure -root				    \n\
+-				discrete -root				    \n\
+-				distort -root				    \n\
+-				epicycle -root				    \n\
+-				flow -root				    \n\
+-@GL_KLUDGE@ GL: 				glplanet -root				    \n\
+-				interference -root			    \n\
+-				kumppa -root				    \n\
+-@GL_KLUDGE@ GL: 				lament -root				    \n\
+-				moire2 -root				    \n\
+-@GL_KLUDGE@ GL: 				sonar -root				    \n\
+-@GL_KLUDGE@ GL: 				stairs -root				    \n\
+-				truchet -root				    \n\
+--				vidwhacker -root			    \n\
+-				blaster -root				    \n\
+-				bumps -root				    \n\
+-				ccurve -root				    \n\
+-				compass -root				    \n\
+-				deluxe -root				    \n\
+--				demon -root				    \n\
+-@GLE_KLUDGE@ GL: 				extrusion -root				    \n\
+--				loop -root				    \n\
+-				penetrate -root				    \n\
+-				petri -root				    \n\
+-				phosphor -root				    \n\
+-@GL_KLUDGE@ GL: 				pulsar -root				    \n\
+-				ripples -root				    \n\
+-				shadebobs -root				    \n\
+-@GL_KLUDGE@ GL: 				sierpinski3d -root			    \n\
+-				spotlight -root				    \n\
+-				squiral -root				    \n\
+-				wander -root				    \n\
+--				webcollage -root			    \n\
+-				xflame -root				    \n\
+-				xmatrix -root				    \n\
+-@GL_KLUDGE@ GL: 				gflux -root				    \n\
+--				nerverot -root				    \n\
+-				xrayswarm -root				    \n\
+-				xspirograph -root			    \n\
+-@GL_KLUDGE@ GL: 				circuit -root				    \n\
+-@GL_KLUDGE@ GL: 				dangerball -root			    \n\
+-- GL: 				dnalogo -root				    \n\
+-@GL_KLUDGE@ GL: 				engine -root				    \n\
+-@GL_KLUDGE@ GL: 				flipscreen3d -root			    \n\
+-@GL_KLUDGE@ GL: 				gltext -root				    \n\
+-@GL_KLUDGE@ GL: 				menger -root				    \n\
+-@GL_KLUDGE@ GL: 				molecule -root				    \n\
+-				rotzoomer -root				    \n\
+-				speedmine -root				    \n\
+-@GL_KLUDGE@ GL: 				starwars -root				    \n\
+-@GL_KLUDGE@ GL: 				stonerview -root			    \n\
+-				vermiculate -root			    \n\
+-				whirlwindwarp -root			    \n\
+-				zoom -root				    \n\
+-				anemone -root				    \n\
+-				apollonian -root			    \n\
+-@GL_KLUDGE@ GL: 				boxed -root				    \n\
+-@GL_KLUDGE@ GL: 				cubenetic -root				    \n\
+-@GL_KLUDGE@ GL: 				endgame -root				    \n\
+-				euler2d -root				    \n\
+-				fluidballs -root			    \n\
+-@GL_KLUDGE@ GL: 				flurry -root				    \n\
+-- GL: 				glblur -root				    \n\
+-@GL_KLUDGE@ GL: 				glsnake -root				    \n\
+-				halftone -root				    \n\
+-@GL_KLUDGE@ GL: 				juggler3d -root				    \n\
+-@GL_KLUDGE@ GL: 				lavalite -root				    \n\
+--				polyominoes -root			    \n\
+-@GL_KLUDGE@ GL: 				queens -root				    \n\
+-- GL: 				sballs -root				    \n\
+-@GL_KLUDGE@ GL: 				spheremonics -root			    \n\
+--				thornbird -root				    \n\
+-				twang -root				    \n\
+-- GL: 				antspotlight -root			    \n\
+-				apple2 -root				    \n\
+-@GL_KLUDGE@ GL: 				atunnel -root				    \n\
+-				barcode -root				    \n\
+-@GL_KLUDGE@ GL: 				blinkbox -root				    \n\
+-@GL_KLUDGE@ GL: 				blocktube -root				    \n\
+-@GL_KLUDGE@ GL: 				bouncingcow -root			    \n\
+-				cloudlife -root				    \n\
+-@GL_KLUDGE@ GL: 				cubestorm -root				    \n\
+-				eruption -root				    \n\
+-@GL_KLUDGE@ GL: 				flipflop -root				    \n\
+-@GL_KLUDGE@ GL: 				flyingtoasters -root			    \n\
+-				fontglide -root				    \n\
+-@GL_KLUDGE@ GL: 				gleidescope -root			    \n\
+-@GL_KLUDGE@ GL: 				glknots -root				    \n\
+-@GL_KLUDGE@ GL: 				glmatrix -root				    \n\
+-- GL: 				glslideshow -root			    \n\
+-@GL_KLUDGE@ GL: 				hypertorus -root			    \n\
+-- GL: 				jigglypuff -root			    \n\
+-				metaballs -root				    \n\
+-@GL_KLUDGE@ GL: 				mirrorblob -root			    \n\
+-				piecewise -root				    \n\
+-@GL_KLUDGE@ GL: 				polytopes -root				    \n\
+-				pong -root				    \n\
+-				popsquares -root			    \n\
+-@GL_KLUDGE@ GL: 				surfaces -root				    \n\
+-				xanalogtv -root				    \n\
+-				abstractile -root			    \n\
+-				anemotaxis -root			    \n\
+-- GL: 				antinspect -root			    \n\
+-				fireworkx -root				    \n\
+-				fuzzyflakes -root			    \n\
+-				interaggregate -root			    \n\
+-				intermomentary -root			    \n\
+-				memscroller -root			    \n\
+-@GL_KLUDGE@ GL: 				noof -root				    \n\
+-				pacman -root				    \n\
+-@GL_KLUDGE@ GL: 				pinion -root				    \n\
+-@GL_KLUDGE@ GL: 				polyhedra -root				    \n\
+-- GL: 				providence -root			    \n\
+-				substrate -root				    \n\
+-				wormhole -root				    \n\
+-- GL: 				antmaze -root				    \n\
+-@GL_KLUDGE@ GL: 				boing -root				    \n\
+-				boxfit -root				    \n\
+-@GL_KLUDGE@ GL: 				carousel -root				    \n\
+-				celtic -root				    \n\
+-@GL_KLUDGE@ GL: 				crackberg -root				    \n\
+-@GL_KLUDGE@ GL: 				cube21 -root				    \n\
+-				fiberlamp -root				    \n\
+-@GL_KLUDGE@ GL: 				fliptext -root				    \n\
+-@GL_KLUDGE@ GL: 				glhanoi -root				    \n\
+-@GL_KLUDGE@ GL: 				tangram -root				    \n\
+-@GL_KLUDGE@ GL: 				timetunnel -root			    \n\
+-@GL_KLUDGE@ GL: 				glschool -root				    \n\
+-@GL_KLUDGE@ GL: 				topblock -root				    \n\
+-@GL_KLUDGE@ GL: 				cubicgrid -root				    \n\
+-				cwaves -root				    \n\
+-@GL_KLUDGE@ GL: 				gears -root				    \n\
+-@GL_KLUDGE@ GL: 				glcells -root				    \n\
+-@GL_KLUDGE@ GL: 				lockward -root				    \n\
+-				m6502 -root				    \n\
+-@GL_KLUDGE@ GL: 				moebiusgears -root			    \n\
+-@GL_KLUDGE@ GL: 				voronoi -root				    \n\
+-@GL_KLUDGE@ GL: 				hypnowheel -root			    \n\
+-@GL_KLUDGE@ GL: 				klein -root				    \n\
+--				lcdscrub -root				    \n\
+-@GL_KLUDGE@ GL: 				photopile -root				    \n\
+-@GL_KLUDGE@ GL: 				skytentacles -root			    \n\
+-@GL_KLUDGE@ GL: 				rubikblocks -root			    \n\
+-@GL_KLUDGE@ GL: 				companioncube -root			    \n\
+-@GL_KLUDGE@ GL: 				hilbert -root				    \n\
+-@GL_KLUDGE@ GL: 				tronbit -root				    \n\
+-@GL_KLUDGE@ GL: 				geodesic -root				    \n\
+-				hexadrop -root				    \n\
+-@GL_KLUDGE@ GL: 				kaleidocycle -root			    \n\
+-@GL_KLUDGE@ GL: 				quasicrystal -root			    \n\
+-@GL_KLUDGE@ GL: 				unknownpleasures -root			    \n\
+-				binaryring -root			    \n\
+-@GL_KLUDGE@ GL: 				cityflow -root				    \n\
+-@GL_KLUDGE@ GL: 				geodesicgears -root			    \n\
+-@GL_KLUDGE@ GL: 				projectiveplane -root			    \n\
+-@GL_KLUDGE@ GL: 				romanboy -root				    \n\
+-				tessellimage -root			    \n\
+-@GL_KLUDGE@ GL: 				winduprobot -root			    \n\
+-@GL_KLUDGE@ GL: 				splitflap -root				    \n\
+-@GL_KLUDGE@ GL: 				cubestack -root				    \n\
+-@GL_KLUDGE@ GL: 				cubetwist -root				    \n\
+-@GL_KLUDGE@ GL: 				discoball -root				    \n\
+-@GL_KLUDGE@ GL: 				dymaxionmap -root			    \n\
+-@GL_KLUDGE@ GL: 				energystream -root			    \n\
+-@GL_KLUDGE@ GL: 				hexstrut -root				    \n\
+-@GL_KLUDGE@ GL: 				hydrostat -root				    \n\
+-@GL_KLUDGE@ GL: 				raverhoop -root				    \n\
+-@GL_KLUDGE@ GL: 				splodesic -root				    \n\
+-@GL_KLUDGE@ GL: 				unicrud -root				    \n\
+-@GL_KLUDGE@ GL: 				esper -root				    \n\
+-@GL_KLUDGE@ GL: 				vigilance -root				    \n\
+-@GL_KLUDGE@ GL: 				crumbler -root				    \n\
+-@GL_KLUDGE@ GL: 				maze3d -root				    \n\
+-@GL_KLUDGE@ GL: 				peepers -root				    \n\
+-@GL_KLUDGE@ GL: 				razzledazzle -root			    \n
+-
++-				fontglide -root -program "date +'%F %H:%M %z'"				    \n\
++				gifview --window $XSCREENSAVER_WINDOW /usr/share/logo/bosch-black.gif			    \n
+ 
+ 
+ !=============================================================================

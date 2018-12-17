@@ -19,7 +19,7 @@
         </para>
 
         <para>
-            The following list describes what you can get from this manual:
+            This manual provides the following:
             <itemizedlist>
                 <listitem><para>
                     Procedures that help you get going with the Yocto Project.
@@ -44,7 +44,7 @@
         </para>
 
         <para>
-            This manual will not give you the following:
+            This manual does not provide the following:
             <itemizedlist>
                 <listitem><para>
                     Redundant Step-by-step Instructions:

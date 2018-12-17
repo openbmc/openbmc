@@ -1,7 +1,7 @@
-From 32ecc3f058307060e40af86127cd226248a73c41 Mon Sep 17 00:00:00 2001
+From fd7dcceeee439eb479edbb418bab635343414ee6 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Wed, 16 Aug 2017 02:06:45 -0400
-Subject: [PATCH 3/4] python import
+Subject: [PATCH 4/7] python import
 
 Don't check for output on stderr to know if an import worked, host inputrc and
 sysroot readline can cause warnings on stderr.
@@ -30,5 +30,5 @@ index b990d5b..318b089 100644
  	else
  		AC_MSG_RESULT([no])
 -- 
-1.8.3.1
+2.7.4
 

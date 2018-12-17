@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Fri, 8 Jun 2018 17:12:37 -0500
+Subject: [PATCH] libmultipath: fix detect alua corner case
+
+If retain_attach_hw_handler = no, then the paths tpgs state will never
+be checked, and the multipath device will always select the alua
+handler, if no other handler is selected. the paths tpgs state
+should be checked, regardless of the retain_hwhandler value.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/propsel.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/libmultipath/propsel.c b/libmultipath/propsel.c
+index 62a6893..f626c74 100644
+--- a/libmultipath/propsel.c
++++ b/libmultipath/propsel.c
+@@ -403,9 +403,11 @@ int select_hwhandler(struct config *conf, struct multipath *mp)
+ 	bool all_tpgs = true;
+ 
+ 	dh_state = &handler[2];
++
++	vector_foreach_slot(mp->paths, pp, i)
++		all_tpgs = all_tpgs && (pp->tpgs > 0);
+ 	if (mp->retain_hwhandler != RETAIN_HWHANDLER_OFF) {
+ 		vector_foreach_slot(mp->paths, pp, i) {
+-			all_tpgs = all_tpgs && (pp->tpgs > 0);
+ 			if (get_dh_state(pp, dh_state, sizeof(handler) - 2) > 0
+ 			    && strcmp(dh_state, "detached")) {
+ 				memcpy(handler, "1 ", 2);
+-- 
+2.7.4
+

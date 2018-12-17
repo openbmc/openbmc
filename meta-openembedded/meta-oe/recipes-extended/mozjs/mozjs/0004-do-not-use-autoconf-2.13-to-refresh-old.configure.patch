@@ -1,0 +1,42 @@
+From a46adb74b5ba5e17d676d31d70faca76c1381d15 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 12 Jul 2018 21:25:46 +0800
+Subject: [PATCH 4/5] do not use autoconf 2.13 to refresh old.configure
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ build/moz.configure/old.configure | 2 +-
+ js/src/old-configure              | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/build/moz.configure/old.configure b/build/moz.configure/old.configure
+index ece47f4..a73900f 100644
+--- a/build/moz.configure/old.configure
++++ b/build/moz.configure/old.configure
+@@ -83,7 +83,7 @@ def prepare_configure(old_configure, mozconfig, autoconf, build_env, shell,
+             old_configure = os.path.join(old_configure_dir, 'js', 'src',
+                                          os.path.basename(old_configure))
+ 
+-    refresh = True
++    refresh = False
+     if exists(old_configure):
+         mtime = getmtime(old_configure)
+         aclocal = os.path.join(build_env.topsrcdir, 'build', 'autoconf',
+diff --git a/js/src/old-configure b/js/src/old-configure
+index 75b00e1..8a8ef52 100644
+--- a/js/src/old-configure
++++ b/js/src/old-configure
+@@ -619,7 +619,7 @@ if test -z "$srcdir"; then
+   ac_prog=$0
+   ac_confdir=`echo $ac_prog|sed 's%/[^/][^/]*$%%'`
+   test "x$ac_confdir" = "x$ac_prog" && ac_confdir=.
+-  srcdir=$ac_confdir
++  srcdir="$ac_confdir/../../"
+   if test ! -r $srcdir/$ac_unique_file; then
+     srcdir=..
+   fi
+-- 
+2.7.4
+

@@ -1,0 +1,41 @@
+From 8269f4d86927fbe19e78776a12736680fe9169b6 Mon Sep 17 00:00:00 2001
+From: Adrian Bunk <bunk@stusta.de>
+Date: Mon, 1 Oct 2018 16:53:31 +0300
+Subject: [PATCH] qmi-network: Don't create invalid --wds-start-network when
+ APN is not set
+
+In 1.20.2 the warning for this was turned into an error.
+
+(cherry picked from commit 289d8ad6419895e2e1fba3d78a54a0db65da521d)
+---
+Upstream-Status: Backport
+
+ utils/qmi-network.in | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/utils/qmi-network.in b/utils/qmi-network.in
+index bf7bed9..a9e5299 100755
+--- a/utils/qmi-network.in
++++ b/utils/qmi-network.in
+@@ -334,11 +334,13 @@ start_network ()
+ 
+     setup_data_format
+ 
+-    START_NETWORK_ARGS="apn='$APN'"
+-    if [ -n "$APN_USER" ]; then
+-        START_NETWORK_ARGS="${START_NETWORK_ARGS},username='$APN_USER'"
+-        if [ -n "$APN_PASS" ]; then
+-            START_NETWORK_ARGS="${START_NETWORK_ARGS},password='$APN_PASS'"
++    if [ -n "$APN" ]; then
++        START_NETWORK_ARGS="apn='$APN'"
++        if [ -n "$APN_USER" ]; then
++            START_NETWORK_ARGS="${START_NETWORK_ARGS},username='$APN_USER'"
++            if [ -n "$APN_PASS" ]; then
++                START_NETWORK_ARGS="${START_NETWORK_ARGS},password='$APN_PASS'"
++            fi
+         fi
+     fi
+ 
+-- 
+2.7.4
+

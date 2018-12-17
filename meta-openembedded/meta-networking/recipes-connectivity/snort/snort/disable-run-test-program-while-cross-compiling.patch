@@ -1,0 +1,254 @@
+From dc390837bc7adc205bb955d0922040a7e365d8dd Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Mon, 23 Jul 2018 13:54:07 +0800
+Subject: [PATCH] Disable run test program while cross compiling
+
+fix configure error:
+configure: error: cannot run test program while cross compiling
+
+Upstream-Status:Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ configure.in | 148 +++++------------------------------------------------------
+ 1 file changed, 12 insertions(+), 136 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index 4b3a5db..a6c5498 100644
+--- a/configure.in
++++ b/configure.in
+@@ -284,19 +284,7 @@ AC_CHECK_TYPES([boolean])
+ # In case INADDR_NONE is not defined (like on Solaris)
+ have_inaddr_none="no"
+ AC_MSG_CHECKING([for INADDR_NONE])
+-AC_RUN_IFELSE(
+-[AC_LANG_PROGRAM(
+-[[
+-#include <sys/types.h>
+-#include <netinet/in.h>
+-#include <arpa/inet.h>
+-]],
+-[[
+-	if (inet_addr("10,5,2") == INADDR_NONE);
+-    return 0;
+-]])],
+-[have_inaddr_none="yes"],
+-[have_inaddr_none="no"])
++have_inaddr_none="yes"
+ AC_MSG_RESULT($have_inaddr_none)
+ if test "x$have_inaddr_none" = "xno"; then
+ 	AC_DEFINE([INADDR_NONE],[-1],[For INADDR_NONE definition])
+@@ -429,16 +417,7 @@ if test "x$LPCAP" = "xno"; then
+ fi
+ 
+ AC_MSG_CHECKING([for pcap_lex_destroy])
+-AC_RUN_IFELSE(
+-[AC_LANG_PROGRAM(
+-[[
+-#include <pcap.h>
+-]],
+-[[
+-   pcap_lex_destroy();
+-]])],
+-[have_pcap_lex_destroy="yes"],
+-[have_pcap_lex_destroy="no"])
++have_pcap_lex_destroy="yes"
+ AC_MSG_RESULT($have_pcap_lex_destroy)
+ if test "x$have_pcap_lex_destroy" = "xyes"; then
+     AC_DEFINE([HAVE_PCAP_LEX_DESTROY],[1],[Can cleanup lex buffer stack created by pcap bpf filter])
+@@ -716,17 +695,7 @@ fi
+ AC_CHECK_FUNCS([daq_hup_apply] [daq_acquire_with_meta] [daq_dp_add_dc])
+ 
+ AC_MSG_CHECKING([for daq real addresses])
+-AC_RUN_IFELSE(
+-[AC_LANG_PROGRAM(
+-[[
+-#include <daq.h>
+-]],
+-[[
+-   DAQ_PktHdr_t hdr;
+-   hdr.n_real_dPort = 0;
+-]])],
+-[have_daq_real_addresses="yes"],
+-[have_daq_real_addresses="no"])
++have_daq_real_addresses="no"
+ AC_MSG_RESULT($have_daq_real_addresses)
+ if test "x$have_daq_real_addresses" = "xyes"; then
+     AC_DEFINE([HAVE_DAQ_REAL_ADDRESSES],[1],
+@@ -754,17 +723,7 @@ if test "x$ac_cv_func_daq_dp_add_dc" = "xyes"; then
+ fi
+ 
+ AC_MSG_CHECKING([for daq address space ID])
+-AC_RUN_IFELSE(
+-[AC_LANG_PROGRAM(
+-[[
+-#include <daq.h>
+-]],
+-[[
+-   DAQ_PktHdr_t hdr;
+-   hdr.address_space_id = 0;
+-]])],
+-[have_daq_address_space_id="yes"],
+-[have_daq_address_space_id="no"])
++have_daq_address_space_id="yes"
+ AC_MSG_RESULT($have_daq_address_space_id)
+ if test "x$have_daq_address_space_id" = "xyes"; then
+     AC_DEFINE([HAVE_DAQ_ADDRESS_SPACE_ID],[1],
+@@ -772,17 +731,7 @@ if test "x$have_daq_address_space_id" = "xyes"; then
+ fi
+ 
+ AC_MSG_CHECKING([for daq flow ID])
+-AC_RUN_IFELSE(
+-[AC_LANG_PROGRAM(
+-[[
+-#include <daq.h>
+-]],
+-[[
+-   DAQ_PktHdr_t hdr;
+-   hdr.flow_id = 0;
+-]])],
+-[have_daq_flow_id="yes"],
+-[have_daq_flow_id="no"])
++have_daq_flow_id="yes"
+ AC_MSG_RESULT($have_daq_flow_id)
+ if test "x$have_daq_flow_id" = "xyes"; then
+     AC_DEFINE([HAVE_DAQ_FLOW_ID],[1],
+@@ -790,19 +739,7 @@ if test "x$have_daq_flow_id" = "xyes"; then
+ fi
+ 
+ AC_MSG_CHECKING([for daq extended flow modifiers])
+-AC_RUN_IFELSE(
+-[AC_LANG_PROGRAM(
+-[[
+-#include <daq.h>
+-]],
+-[[
+-   DAQ_ModFlow_t mod;
+-   mod.type = 0;
+-   mod.length = 0;
+-   mod.value = NULL;
+-]])],
+-[have_daq_ext_modflow="yes"],
+-[have_daq_ext_modflow="no"])
++have_daq_ext_modflow="no"
+ AC_MSG_RESULT($have_daq_ext_modflow)
+ if test "x$have_daq_ext_modflow" = "xyes"; then
+     CCONFIGFLAGS="${CCONFIGFLAGS} -DHAVE_DAQ_EXT_MODFLOW"
+@@ -811,19 +748,7 @@ if test "x$have_daq_ext_modflow" = "xyes"; then
+ fi
+ 
+ AC_MSG_CHECKING([for daq query flow])
+-AC_RUN_IFELSE(
+-[AC_LANG_PROGRAM(
+-[[
+-#include <daq.h>
+-]],
+-[[
+-   DAQ_QueryFlow_t mod;
+-   mod.type = 0;
+-   mod.length = 0;
+-   mod.value = NULL;
+-]])],
+-[have_daq_queryflow="yes"],
+-[have_daq_queryflow="no"])
++have_daq_queryflow="no"
+ AC_MSG_RESULT($have_daq_queryflow)
+ if test "x$have_daq_queryflow" = "xyes"; then
+     CCONFIGFLAGS="${CCONFIGFLAGS} -DHAVE_DAQ_QUERYFLOW"
+@@ -832,16 +757,7 @@ if test "x$have_daq_queryflow" = "xyes"; then
+ fi
+ 
+ AC_MSG_CHECKING([for daq data channel flags])
+-AC_RUN_IFELSE(
+-[AC_LANG_PROGRAM(
+-[[
+-#include <daq.h>
+-]],
+-[[
+-   DAQ_Data_Channel_Params_t params;
+-]])],
+-[have_daq_data_channel_flags="yes"],
+-[have_daq_data_channel_flags="no"])
++have_daq_data_channel_flags="no"
+ AC_MSG_RESULT($have_daq_data_channel_flags)
+ if test "x$have_daq_data_channel_flags" = "xyes"; then
+     CCONFIGFLAGS="${CCONFIGFLAGS} -DHAVE_DAQ_DATA_CHANNEL_PARAMS"
+@@ -850,17 +766,7 @@ if test "x$have_daq_data_channel_flags" = "xyes"; then
+ fi
+ 
+ AC_MSG_CHECKING([for separate IP versions on pinhole endpoints])
+-AC_RUN_IFELSE(
+-[AC_LANG_PROGRAM(
+-[[
+-#include <daq.h>
+-]],
+-[[
+-   DAQ_DP_key_t dpKey;
+-   dpKey.src_af = 0;
+-]])],
+-[have_daq_data_channel_separate_ip_versions="yes"],
+-[have_daq_data_channel_separate_ip_versions="no"])
++have_daq_data_channel_separate_ip_versions="no"
+ AC_MSG_RESULT($have_daq_data_channel_separate_ip_versions)
+ if test "x$have_daq_data_channel_separate_ip_versions" = "xyes"; then
+     CCONFIGFLAGS="${CCONFIGFLAGS} -DHAVE_DAQ_DATA_CHANNEL_SEPARATE_IP_VERSIONS"
+@@ -869,17 +775,7 @@ if test "x$have_daq_data_channel_separate_ip_versions" = "xyes"; then
+ fi
+ 
+ AC_MSG_CHECKING([for DAQ_VERDICT_RETRY])
+-AC_RUN_IFELSE(
+-[AC_LANG_PROGRAM(
+-[[
+-#include <daq.h>
+-]],
+-[[
+-   DAQ_Verdict verdict;
+-   verdict = DAQ_VERDICT_RETRY;
+-]])],
+-[have_daq_verdict_retry="yes"],
+-[have_daq_verdict_retry="no"])
++have_daq_verdict_retry="yes"
+ AC_MSG_RESULT($have_daq_verdict_retry)
+ if test "x$have_daq_verdict_retry" = "xyes"; then
+     AC_DEFINE([HAVE_DAQ_VERDICT_RETRY],[1],
+@@ -887,17 +783,7 @@ if test "x$have_daq_verdict_retry" = "xyes"; then
+ fi
+ 
+ AC_MSG_CHECKING([for daq packet trace])
+-AC_RUN_IFELSE(
+-[AC_LANG_PROGRAM(
+-[[
+-#include <daq.h>
+-]],
+-[[
+-   DAQ_PktHdr_t hdr;
+-   hdr.flags = DAQ_PKT_FLAG_TRACE_ENABLED;
+-]])],
+-[have_daq_packet_trace="yes"],
+-[have_daq_packet_trace="no"])
++have_daq_packet_trace="yes"
+ AC_MSG_RESULT($have_daq_packet_trace)
+ if test "x$have_daq_packet_trace" = "xyes"; then
+     AC_DEFINE([HAVE_DAQ_PKT_TRACE],[1],
+@@ -907,17 +793,7 @@ else
+ fi
+ 
+ AC_MSG_CHECKING([for daq verdict reason])
+-AC_RUN_IFELSE(
+-[AC_LANG_PROGRAM(
+-[[
+-#include <daq.h>
+-]],
+-[[
+-   DAQ_ModFlow_t fl;
+-   fl.type = DAQ_MODFLOW_TYPE_VER_REASON;
+-]])],
+-[have_daq_verdict_reason="yes"],
+-[have_daq_verdict_reason="no"])
++have_daq_verdict_reason="yes"
+ AC_MSG_RESULT($have_daq_verdict_reason)
+ if test "x$have_daq_verdict_reason" = "xyes"; then
+     AC_DEFINE([HAVE_DAQ_VERDICT_REASON],[1],
+-- 
+2.7.4
+

@@ -1,4 +1,4 @@
-From 5089be88f670bcadf7db0e778894f900b2c05d7b Mon Sep 17 00:00:00 2001
+From 4c6fd8f5eb9bc7c0d02f1a98ad86e395d4d2ab3b Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:07:33 +0000
 Subject: [PATCH 03/15] configure: widen the regexp for SH architectures
@@ -14,10 +14,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/configure b/configure
-index 2d615a9996..c4ad45c06c 100755
+index 08dd35c3ea..815e74ddb7 100755
 --- a/configure
 +++ b/configure
-@@ -3835,7 +3835,7 @@ case "${target}" in
+@@ -3855,7 +3855,7 @@ case "${target}" in
    nvptx*-*-*)
      noconfigdirs="$noconfigdirs target-libssp target-libstdc++-v3 target-libobjc"
      ;;
@@ -27,10 +27,10 @@ index 2d615a9996..c4ad45c06c 100755
        sh*-*-elf)
           ;;
 diff --git a/gprof/configure b/gprof/configure
-index 1e25102976..6b43bf2b18 100755
+index 447cea7884..a730e20509 100755
 --- a/gprof/configure
 +++ b/gprof/configure
-@@ -5874,6 +5874,11 @@ linux* | k*bsd*-gnu | kopensolaris*-gnu)
+@@ -6162,6 +6162,11 @@ linux* | k*bsd*-gnu | kopensolaris*-gnu)
    lt_cv_deplibs_check_method=pass_all
    ;;
  
@@ -43,5 +43,5 @@ index 1e25102976..6b43bf2b18 100755
    if echo __ELF__ | $CC -E - | $GREP __ELF__ > /dev/null; then
      lt_cv_deplibs_check_method='match_pattern /lib[^/]+(\.so\.[0-9]+\.[0-9]+|_pic\.a)$'
 -- 
-2.16.1
+2.18.0
 

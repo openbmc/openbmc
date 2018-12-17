@@ -4,12 +4,13 @@ SECTION = "devel"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=a6a4ddbb7cd2999f6827ee143f6fcd97"
 
-DEPENDS = "openssl"
+DEPENDS = "openssl virtual/crypt"
 
 SRC_URI = "https://fossies.org/linux/misc/old/imap-${PV}.tar.gz \
            file://quote_cctype.patch \
            file://imap-2007e-shared.patch \
            file://imap-2007f-format-security.patch \
+           file://0001-Support-OpenSSL-1.1.patch \
            "
 
 SRC_URI[md5sum] = "2126fd125ea26b73b20f01fcd5940369"

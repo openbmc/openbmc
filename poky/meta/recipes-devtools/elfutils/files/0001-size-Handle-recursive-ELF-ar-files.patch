@@ -1,0 +1,40 @@
+From 440d34d0ee37964453245895d38d7fc31bcf3d7d Mon Sep 17 00:00:00 2001
+From: Mark Wielaard <mark@klomp.org>
+Date: Thu, 18 Oct 2018 23:15:48 +0200
+Subject: [PATCH] size: Handle recursive ELF ar files.
+
+eu-size didn't handle an ELF ar file that contained an ar file itself
+correctly. handle_ar would recursively call itself but close the ELF
+file before returning. Only close the ELF file at the top-level.
+
+https://sourceware.org/bugzilla/show_bug.cgi?id=23787
+
+Signed-off-by: Mark Wielaard <mark@klomp.org>
+
+CVE: CVE-2018-18520
+Upstream-Status: Backport [http://sourceware.org/git/elfutils.git]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ src/size.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/size.c b/src/size.c
+index 5ff3f2a..f01fd88 100644
+--- a/src/size.c
++++ b/src/size.c
+@@ -374,8 +374,10 @@ handle_ar (int fd, Elf *elf, const char *prefix, const char *fname)
+ 	INTERNAL_ERROR (fname);
+     }
+ 
+-  if (unlikely (elf_end (elf) != 0))
+-    INTERNAL_ERROR (fname);
++  /* Only close ELF handle if this was a "top level" ar file.  */
++  if (prefix == NULL)
++    if (unlikely (elf_end (elf) != 0))
++      INTERNAL_ERROR (fname);
+ 
+   return result;
+ }
+-- 
+2.7.4
+

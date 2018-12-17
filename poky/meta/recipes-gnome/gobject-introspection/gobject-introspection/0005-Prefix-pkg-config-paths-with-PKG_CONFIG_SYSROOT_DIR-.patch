@@ -1,7 +1,7 @@
-From e08b3677dd04d6ec407ba8f74f601b2d51310eff Mon Sep 17 00:00:00 2001
+From a97d060933932e478c03f1de9513b69bc459eefc Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 8 Oct 2015 18:30:35 +0300
-Subject: [PATCH 5/5] Prefix pkg-config paths with PKG_CONFIG_SYSROOT_DIR
+Subject: [PATCH] Prefix pkg-config paths with PKG_CONFIG_SYSROOT_DIR
  environment variable
 
 This environment variable sets the location of sysroot directory in cross-compilation
@@ -9,16 +9,17 @@ environments; if the variable is not set, the prefix will be empty.
 
 Upstream-Status: Pending [review on oe-core list]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  Makefile-gir.am     | 18 +++++++++---------
  m4/introspection.m4 |  8 ++++----
  2 files changed, 13 insertions(+), 13 deletions(-)
 
 diff --git a/Makefile-gir.am b/Makefile-gir.am
-index a09260a..ba6e89e 100644
+index 2cd7358..eaf0afd 100644
 --- a/Makefile-gir.am
 +++ b/Makefile-gir.am
-@@ -55,8 +55,8 @@ else
+@@ -58,8 +58,8 @@ else
  endif
  
  # glib
@@ -29,7 +30,7 @@ index a09260a..ba6e89e 100644
  
  GLIB_LIBRARY=glib-2.0
  
-@@ -92,8 +92,8 @@ GLib-2.0.gir: g-ir-scanner g-ir-compiler$(EXEEXT)
+@@ -95,8 +95,8 @@ GLib-2.0.gir: g-ir-scanner g-ir-compiler$(EXEEXT)
  gir/DBusGLib-1.0.typelib: GObject-2.0.gir
  
  # gobject
@@ -40,7 +41,7 @@ index a09260a..ba6e89e 100644
  
  GOBJECT_LIBRARY=gobject-2.0
  
-@@ -120,8 +120,8 @@ GObject_2_0_gir_FILES = \
+@@ -123,8 +123,8 @@ GObject_2_0_gir_FILES = \
  BUILT_GIRSOURCES += GObject-2.0.gir
  
  # gmodule
@@ -51,7 +52,7 @@ index a09260a..ba6e89e 100644
  
  GMODULE_LIBRARY=gmodule-2.0
  
-@@ -146,13 +146,13 @@ GModule_2_0_gir_FILES = $(GLIB_INCLUDEDIR)/gmodule.h \
+@@ -149,13 +149,13 @@ GModule_2_0_gir_FILES = $(GLIB_INCLUDEDIR)/gmodule.h \
  BUILT_GIRSOURCES += GModule-2.0.gir
  
  # gio
@@ -91,6 +92,3 @@ index d89c3d9..b562266 100644
      fi
      AC_SUBST(INTROSPECTION_SCANNER)
      AC_SUBST(INTROSPECTION_COMPILER)
--- 
-2.7.0
-

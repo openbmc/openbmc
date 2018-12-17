@@ -16,7 +16,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=e9d9259cbbf00945adc25a470c1d3585 \
                     file://usl/LICENSE;md5=9c1387a3c5213aa40671438af3e00793 \
                     "
 
-DEPENDS = "popt flex readline"
+DEPENDS = "popt flex readline rpcsvc-proto-native bison-native"
 
 SRC_URI = "ftp://ftp.openl2tp.org/releases/${BP}/${BP}.tar.gz \
            file://Makefile-modify-CFLAGS-to-aviod-build-error.patch \
@@ -34,12 +34,7 @@ SRC_URI = "ftp://ftp.openl2tp.org/releases/${BP}/${BP}.tar.gz \
            file://openl2tpd-enable-tests.patch \
            file://run-ptest \
            file://fix_linux_4.15_compile.patch \
-           "
-
-SRC_URI_append_libc-musl = "\
-           file://0004-Adjust-for-linux-kernel-headers-assumptions-on-glibc.patch \
            file://0002-user-ipv6-structures.patch \
-           file://0001-l2tp_api.c-include-rpc-clnt.h-for-resultproc_t.patch \
            "
 SRC_URI[md5sum] = "e3d08dedfb9e6a9a1e24f6766f6dadd0"
 SRC_URI[sha256sum] = "1c97704d4b963a87fbc0e741668d4530933991515ae9ab0dffd11b5444f4860f"
@@ -49,10 +44,10 @@ inherit autotools-brokensep pkgconfig systemd ptest
 SYSTEMD_SERVICE_${PN} = "openl2tpd.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
-DEPENDS_append_libc-musl = " libtirpc"
-CPPFLAGS_append_libc-musl = " -I${STAGING_INCDIR}/tirpc"
-CFLAGS_append_libc-musl = " -I${STAGING_INCDIR}/tirpc"
-LDFLAGS_append_libc-musl = " -ltirpc"
+DEPENDS += "libtirpc"
+CPPFLAGS += "-I${STAGING_INCDIR}/tirpc"
+CFLAGS += "-I${STAGING_INCDIR}/tirpc"
+LDFLAGS += "-ltirpc"
 
 PARALLEL_MAKE = ""
 EXTRA_OEMAKE = 'CFLAGS="${CFLAGS} -Wno-unused-but-set-variable" CPPFLAGS="${CPPFLAGS}" OPT_CFLAGS="${CFLAGS}"'

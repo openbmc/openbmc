@@ -1,0 +1,46 @@
+From 13c32916b4baab58d93940d57fea9ff0777f1931 Mon Sep 17 00:00:00 2001
+From: Baruch Siach <baruch@tkos.co.il>
+Date: Tue, 5 Jun 2018 19:21:46 +0300
+Subject: [PATCH] flopen: Add missing <fcntl.h> include
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Commit 993828d84ee (Add flopenat() function from FreeBSD) dropped the
+fcntl.h header. This breaks the build with musl libc:
+
+flopen.c: In function ‘vflopenat’:
+flopen.c:60:14: error: ‘O_CREAT’ undeclared (first use in this function)
+  if (flags & O_CREAT) {
+              ^~~~~~~
+
+Restore the fcntl.h header include to fix the build.
+
+Fixes: commit 993828d84eed0468c6c15b2818e534e6b134b8e4
+Submitted-also-by: parazyd <parazyd@dyne.org>
+Signed-off-by: Baruch Siach <baruch@tkos.co.il>
+Signed-off-by: Guillem Jover <guillem@hadrons.org>
+
+Upstream-Status: Backport
+[https://gitlab.freedesktop.org/libbsd/libbsd/commit/13c32916b4baab58d93940d57fea9ff0777f1931]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ src/flopen.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/flopen.c b/src/flopen.c
+index b9972c9..ff20d07 100644
+--- a/src/flopen.c
++++ b/src/flopen.c
+@@ -32,6 +32,7 @@
+ #include <sys/stat.h>
+ 
+ #include <errno.h>
++#include <fcntl.h>
+ #include <stdarg.h>
+ #include <unistd.h>
+ 
+-- 
+2.7.4
+

@@ -1,0 +1,35 @@
+From 5c16beff9909b28f55f25f48ed7ddbf98d8b1d5c Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Wed, 18 Jul 2018 09:43:55 +0800
+Subject: [PATCH] fix NULL pointer problem
+
+return 0 if distance_table is NULL
+
+Upstream-Status: Pending
+
+read_distance_table() maybe return 0, but distance_table is not set,
+if distance_table is used, and will lead to SEGFAULT
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ distance.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/distance.c b/distance.c
+index 8d472af..6a6e886 100644
+--- a/distance.c
++++ b/distance.c
+@@ -113,6 +113,8 @@ int numa_distance(int a, int b)
+ 		int err = read_distance_table();
+ 		if (err < 0)
+ 			return 0;
++		if(!distance_table)
++			return 0;
+ 	}
+ 	if ((unsigned)a >= distance_numnodes || (unsigned)b >= distance_numnodes)
+ 		return 0;
+-- 
+2.7.4
+

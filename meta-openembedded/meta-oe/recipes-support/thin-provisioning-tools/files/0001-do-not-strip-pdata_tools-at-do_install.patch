@@ -1,6 +1,6 @@
-From e8be402e20cbdfbd8192a171ac9904d9362103bf Mon Sep 17 00:00:00 2001
+From de869ad2cb19d81257a159770ebe27593a71593c Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Wed, 31 Aug 2016 01:35:40 -0400
+Date: Tue, 31 Jul 2018 11:29:51 +0800
 Subject: [PATCH] do not strip pdata_tools at do_install
 
 It caused QA Issue:
@@ -17,11 +17,11 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 1 deletion(-)
 
 diff --git a/Makefile.in b/Makefile.in
-index 4264191..ac22042 100644
+index 02b75dd..df590b4 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -189,7 +189,6 @@ distclean: clean
- install: bin/pdata_tools
+@@ -267,7 +267,6 @@ MANPAGES:=$(patsubst %,man8/%.8,$(TOOLS))
+ install: bin/pdata_tools $(MANPAGES)
  	$(INSTALL_DIR) $(BINDIR)
  	$(INSTALL_PROGRAM) bin/pdata_tools $(BINDIR)
 -	$(STRIP) $(BINDIR)/pdata_tools
@@ -29,5 +29,5 @@ index 4264191..ac22042 100644
  	ln -s -f pdata_tools $(BINDIR)/cache_dump
  	ln -s -f pdata_tools $(BINDIR)/cache_metadata_size
 -- 
-2.8.1
+2.7.4
 

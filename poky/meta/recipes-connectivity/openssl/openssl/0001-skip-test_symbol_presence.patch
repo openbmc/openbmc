@@ -1,0 +1,46 @@
+From a9401b2289656c5a36dd1b0ecebf0d23e291ce70 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 2 Oct 2018 23:58:24 +0800
+Subject: [PATCH] skip test_symbol_presence
+
+We cannot skip `01-test_symbol_presence.t' by configuring option `no-shared'
+as INSTALL told us the shared libraries will not be built.
+
+[INSTALL snip]
+ Notes on shared libraries
+ -------------------------
+
+ For most systems the OpenSSL Configure script knows what is needed to
+ build shared libraries for libcrypto and libssl. On these systems
+ the shared libraries will be created by default. This can be suppressed and
+ only static libraries created by using the "no-shared" option. On systems
+ where OpenSSL does not know how to build shared libraries the "no-shared"
+ option will be forced and only static libraries will be created.
+[INSTALL snip]
+
+Hence directly modification the case to skip it.
+
+Upstream-Status: Inappropriate [OE Specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ test/recipes/01-test_symbol_presence.t | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/test/recipes/01-test_symbol_presence.t b/test/recipes/01-test_symbol_presence.t
+index 7f2a2d7..0b93745 100644
+--- a/test/recipes/01-test_symbol_presence.t
++++ b/test/recipes/01-test_symbol_presence.t
+@@ -14,8 +14,7 @@ use OpenSSL::Test::Utils;
+ 
+ setup("test_symbol_presence");
+ 
+-plan skip_all => "Only useful when building shared libraries"
+-    if disabled("shared");
++plan skip_all => "The case needs debug symbols then we just disable it";
+ 
+ my @libnames = ("crypto", "ssl");
+ my $testcount = scalar @libnames;
+-- 
+2.7.4
+

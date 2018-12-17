@@ -1,0 +1,33 @@
+From 5994023a03634dfc0318976c293e7391fe6aa060 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 24 Aug 2018 12:56:22 -0700
+Subject: [PATCH 1/2] Support deprecated resolver functions
+
+Needed for  musl libc
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/mongo/util/dns_query_posix-impl.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/mongo/util/dns_query_posix-impl.h b/src/mongo/util/dns_query_posix-impl.h
+index d19958010c..bbca3309ed 100644
+--- a/src/mongo/util/dns_query_posix-impl.h
++++ b/src/mongo/util/dns_query_posix-impl.h
+@@ -53,6 +53,12 @@
+ 
+ #include <boost/noncopyable.hpp>
+ 
++#ifndef res_ninit
++#define res_nclose(arg)
++#define res_ninit(arg)    res_init()
++#define res_nsearch(sta, nam, clas, typ, ans, alen)  res_search(nam, clas, typ, ans, alen)
++#endif
++
+ namespace mongo {
+ namespace dns {
+ // The anonymous namespace is safe, in this header, as it is not really a header.  It is only used
+-- 
+2.18.0
+

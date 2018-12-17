@@ -1,0 +1,41 @@
+From 8f47adc3b9085d589e62cb5eb560dd23a703036a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 8 Sep 2018 12:47:49 -0700
+Subject: [PATCH] include iostream for cout
+
+End cout with endl
+
+Fixes
+plugins/dynamic_simulator/thread.cpp:241:3: error: 'cout' was not declared in this scope
+   cout<<"PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP is Defined"
+   ^~~~
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ plugins/dynamic_simulator/thread.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/plugins/dynamic_simulator/thread.cpp b/plugins/dynamic_simulator/thread.cpp
+index b971502..61eaf42 100644
+--- a/plugins/dynamic_simulator/thread.cpp
++++ b/plugins/dynamic_simulator/thread.cpp
+@@ -26,7 +26,7 @@
+  */
+ 
+ #include "thread.h"
+-#include <stdio.h>
++#include <iostream>
+ #include <sys/time.h>
+ #include <errno.h>
+ 
+@@ -238,7 +238,7 @@ cThreadLock::cThreadLock()
+   pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_RECURSIVE );
+   pthread_mutex_init( &m_lock, &attr );
+   pthread_mutexattr_destroy( &attr );
+-  cout<<"PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP is Defined"
++  std::cout<<"PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP is Defined"<<std::endl;
+ }
+ #else
+ static pthread_mutex_t lock_tmpl = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;

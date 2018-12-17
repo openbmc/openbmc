@@ -5,8 +5,8 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=4878a915709225bceab739bdc2a18e8d"
 
 inherit pypi
 
-SRC_URI[md5sum] = "f054437920c895dd14a4509fabafe029"
-SRC_URI[sha256sum] = "c06425302f2cf668f1bba7a0a03f3c1d34d4ebeef2c72003da308b3947c7f749"
+SRC_URI[md5sum] = "45409cbfa3927bdd2f3ee914dd5b1060"
+SRC_URI[sha256sum] = "ffb9ef1de172603304d9d2819af6f5ece76f2e85ec10692a524dd876e72bf277"
 
 RDEPENDS_${PN}_class-target += "\
     ${PYTHON_PN}-datetime \

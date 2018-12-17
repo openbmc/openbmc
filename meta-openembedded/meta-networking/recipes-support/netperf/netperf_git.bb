@@ -8,10 +8,12 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=a0ab17253e7a3f318da85382c7d5d5d6"
 
 PV = "2.7.0+git${SRCPV}"
 
-SRC_URI="git://github.com/HewlettPackard/netperf.git \
-         file://cpu_set.patch \
-         file://vfork.patch \
-         file://init"
+SRC_URI = "git://github.com/HewlettPackard/netperf.git \
+           file://cpu_set.patch \
+           file://vfork.patch \
+           file://init \
+           file://0001-netlib.c-Move-including-sched.h-out-og-function.patch \
+           "
 
 SRCREV = "f482bab49fcedee46fc5b755da127f608325cd13"
 

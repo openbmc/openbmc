@@ -98,7 +98,7 @@ class RecipeHandler(object):
                             break
             except IOError as ioe:
                 if ioe.errno == 2:
-                    logger.warn('unable to find a pkgdata file for package %s' % pkg)
+                    logger.warning('unable to find a pkgdata file for package %s' % pkg)
                 else:
                     raise
 
@@ -437,7 +437,7 @@ def create_recipe(args):
     if scriptutils.is_src_url(source):
         # Warn about github archive URLs
         if re.match('https?://github.com/[^/]+/[^/]+/archive/.+(\.tar\..*|\.zip)$', source):
-            logger.warn('github archive files are not guaranteed to be stable and may be re-generated over time. If the latter occurs, the checksums will likely change and the recipe will fail at do_fetch. It is recommended that you point to an actual commit or tag in the repository instead (using the repository URL in conjunction with the -S/--srcrev option).')
+            logger.warning('github archive files are not guaranteed to be stable and may be re-generated over time. If the latter occurs, the checksums will likely change and the recipe will fail at do_fetch. It is recommended that you point to an actual commit or tag in the repository instead (using the repository URL in conjunction with the -S/--srcrev option).')
         # Fetch a URL
         fetchuri = reformat_git_uri(urldefrag(source)[0])
         if args.binary:

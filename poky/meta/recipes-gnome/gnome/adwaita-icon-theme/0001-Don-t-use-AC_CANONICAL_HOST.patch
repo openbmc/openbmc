@@ -1,7 +1,7 @@
-From 88ed996cc9e2b296cacfdbeece4be28a90bab511 Mon Sep 17 00:00:00 2001
+From 9661951838773251d0a914e897e8a0d95ce027f6 Mon Sep 17 00:00:00 2001
 From: Jussi Kukkonen <jussi.kukkonen@intel.com>
 Date: Tue, 30 May 2017 14:55:49 +0300
-Subject: [PATCH 1/2] Don't use AC_CANONICAL_HOST
+Subject: [PATCH] Don't use AC_CANONICAL_HOST
 
 This won't work when building allarch (and is only used to find out if
 target is windows).
@@ -13,13 +13,13 @@ Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
  configure.ac | 1 -
  1 file changed, 1 deletion(-)
 
-Index: adwaita-icon-theme-3.26.1/configure.ac
-===================================================================
---- adwaita-icon-theme-3.26.1.orig/configure.ac
-+++ adwaita-icon-theme-3.26.1/configure.ac
+diff --git a/configure.ac b/configure.ac
+index fb787dc..5caef0c 100644
+--- a/configure.ac
++++ b/configure.ac
 @@ -3,7 +3,6 @@ AC_PREREQ(2.53)
  
- AC_INIT([adwaita-icon-theme], [3.26.1],
+ AC_INIT([adwaita-icon-theme], [3.28.0],
          [http://bugzilla.gnome.org/enter_bug.cgi?product=adwaita-icon-theme])
 -AC_CANONICAL_HOST
  AC_CONFIG_MACRO_DIR([m4])

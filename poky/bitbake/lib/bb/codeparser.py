@@ -140,7 +140,7 @@ class CodeParserCache(MultiProcessCache):
     # so that an existing cache gets invalidated. Additionally you'll need
     # to increment __cache_version__ in cache.py in order to ensure that old
     # recipe caches don't trigger "Taskhash mismatch" errors.
-    CACHE_VERSION = 9
+    CACHE_VERSION = 10
 
     def __init__(self):
         MultiProcessCache.__init__(self)
@@ -214,7 +214,7 @@ class BufferedLogger(Logger):
         self.buffer = []
 
 class PythonParser():
-    getvars = (".getVar", ".appendVar", ".prependVar")
+    getvars = (".getVar", ".appendVar", ".prependVar", "oe.utils.conditional")
     getvarflags = (".getVarFlag", ".appendVarFlag", ".prependVarFlag")
     containsfuncs = ("bb.utils.contains", "base_contains")
     containsanyfuncs = ("bb.utils.contains_any",  "bb.utils.filter")

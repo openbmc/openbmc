@@ -1,0 +1,30 @@
+From cb59b3af54fb3bbd4d8264fef919810af8d08d16 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Tue, 27 Feb 2018 14:01:30 +0800
+Subject: [PATCH 14/19] fix missing ULONG_LONG_MAX definition in case of musl
+
+Upstream-Status: Inappropriate [musl]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/basic/missing.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/basic/missing.h b/src/basic/missing.h
+index cd1cc109f..144058a1a 100644
+--- a/src/basic/missing.h
++++ b/src/basic/missing.h
+@@ -54,6 +54,10 @@ struct sockaddr_vm {
+ };
+ #endif /* !HAVE_LINUX_VM_SOCKETS_H */
+ 
++#ifndef ULONG_LONG_MAX
++#define ULONG_LONG_MAX ULLONG_MAX
++#endif
++
+ #ifndef RLIMIT_RTTIME
+ #define RLIMIT_RTTIME 15
+ #endif
+-- 
+2.11.0
+

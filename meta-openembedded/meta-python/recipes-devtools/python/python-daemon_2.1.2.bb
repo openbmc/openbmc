@@ -2,7 +2,7 @@ DESCRIPTION = "Library to implement a well-behaved Unix daemon process"
 HOMEPAGE = "https://pagure.io/python-daemon/"
 SECTION = "devel/python"
 
-DEPENDS = "python-docutils"
+DEPENDS += "python-docutils-native"
 RDEPENDS_${PN} = "python-docutils \
                   python-lockfile (>= 0.10) \
                   python-resource \

@@ -9,7 +9,7 @@ emulators for games."
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=abb99ac125f84f424a4278153988e32f"
 
-DEPENDS += "libxext xf86dgaproto"
+DEPENDS += "libxext"
 
 PE = "1"
 

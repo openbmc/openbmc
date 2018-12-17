@@ -10,7 +10,7 @@ def node_pkgname(d):
 
 NPMPN ?= "${@node_pkgname(d)}"
 
-NPM_INSTALLDIR = "${D}${libdir}/node_modules/${NPMPN}"
+NPM_INSTALLDIR = "${libdir}/node/${NPMPN}"
 
 # function maps arch names to npm arch names
 def npm_oe_arch_map(target_arch, d):
@@ -22,7 +22,7 @@ def npm_oe_arch_map(target_arch, d):
     return target_arch
 
 NPM_ARCH ?= "${@npm_oe_arch_map(d.getVar('TARGET_ARCH'), d)}"
-NPM_INSTALL_DEV = "0"
+NPM_INSTALL_DEV ?= "0"
 
 npm_do_compile() {
 	# Copy in any additionally fetched modules
@@ -52,9 +52,10 @@ npm_do_install() {
 	# changing the home directory to the working directory, the .npmrc will
 	# be created in this directory
 	export HOME=${WORKDIR}
-	mkdir -p ${NPM_INSTALLDIR}/
+	mkdir -p ${D}${libdir}/node_modules
 	npm pack .
 	npm install --prefix ${D}${prefix} -g --arch=${NPM_ARCH} --target_arch=${NPM_ARCH} --production --no-registry ${NPMPN}-${PV}.tgz
+	mv ${D}${libdir}/node_modules ${D}${libdir}/node
 	if [ -d ${D}${prefix}/etc ] ; then
 		# This will be empty
 		rmdir ${D}${prefix}/etc
@@ -62,13 +63,13 @@ npm_do_install() {
 }
 
 python populate_packages_prepend () {
-    instdir = d.expand('${D}${libdir}/node_modules/${NPMPN}')
+    instdir = d.expand('${D}${NPM_INSTALLDIR}')
     extrapackages = oe.package.npm_split_package_dirs(instdir)
     pkgnames = extrapackages.keys()
     d.prependVar('PACKAGES', '%s ' % ' '.join(pkgnames))
     for pkgname in pkgnames:
         pkgrelpath, pdata = extrapackages[pkgname]
-        pkgpath = '${libdir}/node_modules/${NPMPN}/' + pkgrelpath
+        pkgpath = '${NPM_INSTALLDIR}/' + pkgrelpath
         # package names can't have underscores but npm packages sometimes use them
         oe_pkg_name = pkgname.replace('_', '-')
         expanded_pkgname = d.expand(oe_pkg_name)
@@ -84,7 +85,7 @@ python populate_packages_prepend () {
 }
 
 FILES_${PN} += " \
-    ${libdir}/node_modules/${NPMPN} \
+    ${NPM_INSTALLDIR} \
 "
 
 EXPORT_FUNCTIONS do_compile do_install

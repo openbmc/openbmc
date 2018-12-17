@@ -1,0 +1,80 @@
+From c51c2c543f3c78b2a68acc61f786f903f2e0fec8 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Sun, 9 Sep 2018 07:28:09 -0400
+Subject: [PATCH] fix compile failure with libc musl
+
+The lack of random_r in musl:
+[snip]
+|main.c:1393:7: warning: implicit declaration of function 'random_r';
+did you mean 'random'? [-Wimplicit-function-declaration]
+|  rv = random_r(&rand_data, &val);
+|       ^~~~~~~~
+|       random
+|main.c:1408:30: error: invalid application of 'sizeof' to incomplete
+type 'struct random_data'
+|  memset(&rand_data, 0, sizeof(rand_data));
+[snip]
+
+s/random_r/random/, s/initstate_r/initstate/ and remove `static struct
+random_data rand_data'
+
+Here is the man of `random_r()':
+[snip]
+The random_r() function is like random(3), except that instead of using
+state information maintained in a global variable
+[snip]
+
+So use random without state information is OK.
+
+Upstream-Status: Submitted [sanlock-devel@lists.fedorahosted.org]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ src/main.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
+
+diff --git a/src/main.c b/src/main.c
+index f60b4d3..602c400 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -84,7 +84,6 @@ static char command[COMMAND_MAX];
+ static int cmd_argc;
+ static char **cmd_argv;
+ static struct thread_pool pool;
+-static struct random_data rand_data;
+ static char rand_state[32];
+ static pthread_mutex_t rand_mutex = PTHREAD_MUTEX_INITIALIZER;
+ static const char *run_dir = NULL;
+@@ -1386,16 +1385,15 @@ int get_rand(int a, int b);
+ 
+ int get_rand(int a, int b)
+ {
+-	int32_t val;
+-	int rv;
++	long int rv;
+ 
+ 	pthread_mutex_lock(&rand_mutex);
+-	rv = random_r(&rand_data, &val);
++	rv = random();
+ 	pthread_mutex_unlock(&rand_mutex);
+ 	if (rv < 0)
+ 		return rv;
+ 
+-	return a + (int) (((float)(b - a + 1)) * val / (RAND_MAX+1.0));
++	return a + (int) (((float)(b - a + 1)) * rv / (RAND_MAX+1.0));
+ }
+ 
+ static void setup_host_name(void)
+@@ -1405,9 +1403,7 @@ static void setup_host_name(void)
+ 	uuid_t uu;
+ 
+ 	memset(rand_state, 0, sizeof(rand_state));
+-	memset(&rand_data, 0, sizeof(rand_data));
+-
+-	initstate_r(time(NULL), rand_state, sizeof(rand_state), &rand_data);
++	initstate(time(NULL), rand_state, sizeof(rand_state));
+ 
+ 	/* use host name from command line */
+ 
+-- 
+2.8.1
+

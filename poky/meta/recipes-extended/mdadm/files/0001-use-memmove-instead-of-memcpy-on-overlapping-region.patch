@@ -1,0 +1,31 @@
+From ab18f04cf89ef4e8521c81c50477e1363b2d333b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 28 Apr 2018 09:46:12 -0700
+Subject: [PATCH] use memmove instead of memcpy on overlapping region
+
+Fixes
+super0.c:526:3: error: 'memcpy' accessing 3936 bytes at offsets 156 and 160 overlaps 3932 bytes at offset 160 [-Werror=restrict]
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ super0.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/super0.c b/super0.c
+index f5b4507..264b598 100644
+--- a/super0.c
++++ b/super0.c
+@@ -523,7 +523,7 @@ static int update_super0(struct supertype *st, struct mdinfo *info,
+ 		 * up 4 bytes before continuing
+ 		 */
+ 		__u32 *sb32 = (__u32*)sb;
+-		memcpy(sb32+MD_SB_GENERIC_CONSTANT_WORDS+7,
++		memmove(sb32+MD_SB_GENERIC_CONSTANT_WORDS+7,
+ 		       sb32+MD_SB_GENERIC_CONSTANT_WORDS+7+1,
+ 		       (MD_SB_WORDS - (MD_SB_GENERIC_CONSTANT_WORDS+7+1))*4);
+ 		if (verbose >= 0)
+-- 
+2.17.0
+

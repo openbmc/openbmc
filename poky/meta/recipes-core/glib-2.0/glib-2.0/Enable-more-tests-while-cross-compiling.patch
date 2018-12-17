@@ -1,7 +1,7 @@
-From d762907d33b81cf7469b5696c87f2188d2050afb Mon Sep 17 00:00:00 2001
+From 4b1a6d247c78125096a6ea5ab3cab8a1f000dc23 Mon Sep 17 00:00:00 2001
 From: Jussi Kukkonen <jussi.kukkonen@intel.com>
 Date: Mon, 9 Nov 2015 11:07:27 +0200
-Subject: [PATCH 06/10] Enable more tests while cross-compiling
+Subject: [PATCH] Enable more tests while cross-compiling
 
 Upstream disables a few tests while cross-compiling because their build requires
 running other built binaries. This usually makes sense but in the cross-compile
@@ -16,10 +16,10 @@ Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
  2 files changed, 11 insertions(+), 7 deletions(-)
 
 diff --git a/gio/tests/Makefile.am b/gio/tests/Makefile.am
-index acc1da4..9176640 100644
+index 1f0bed7..8295deb 100644
 --- a/gio/tests/Makefile.am
 +++ b/gio/tests/Makefile.am
-@@ -516,10 +516,9 @@ test_programs += \
+@@ -550,10 +550,9 @@ test_programs += \
  endif
  
  # -----------------------------------------------------------------------------
@@ -32,7 +32,7 @@ index acc1da4..9176640 100644
  test_programs += resources
  resources_SOURCES = resources.c
  nodist_resources_SOURCES = test_resources.c test_resources2.c test_resources2.h
-@@ -543,7 +542,11 @@ if !ENABLE_INSTALLED_TESTS
+@@ -578,7 +577,11 @@ if !ENABLE_INSTALLED_TESTS
  libresourceplugin_la_LDFLAGS += -rpath /
  endif
  
@@ -44,7 +44,7 @@ index acc1da4..9176640 100644
  
  test-generated.txt: test1.txt
  	$(AM_V_GEN) echo "Generated" > $@ && \
-@@ -564,7 +567,6 @@ test.gresource: test.gresource.xml Makefile $(shell $(glib_compile_resources) --
+@@ -599,7 +602,6 @@ test.gresource: test.gresource.xml Makefile $(shell $(glib_compile_resources) --
  
  EXTRA_DIST += test.gresource.xml test1.txt test2.gresource.xml test2.txt test3.gresource.xml test3.txt test4.gresource.xml
  CLEANFILES += test-generated.txt test_resources.c test_resources2.[ch] plugin_resources.c test.gresource
@@ -53,10 +53,10 @@ index acc1da4..9176640 100644
  BUILT_SOURCES += giotypefuncs.inc
  
 diff --git a/tests/gobject/Makefile.am b/tests/gobject/Makefile.am
-index 656941d..68555ff 100644
+index 0e60987..927d13a 100644
 --- a/tests/gobject/Makefile.am
 +++ b/tests/gobject/Makefile.am
-@@ -48,10 +48,13 @@ if ENABLE_TIMELOOP
+@@ -51,10 +51,13 @@ if ENABLE_TIMELOOP
  installed_test_programs += timeloop-closure
  endif
  
@@ -72,14 +72,9 @@ index 656941d..68555ff 100644
  
  testmarshal.h: stamp-testmarshal.h
  	@true
-@@ -69,7 +72,6 @@ BUILT_SOURCES += testmarshal.h testmarshal.c
- CLEANFILES += stamp-testmarshal.h
+@@ -71,4 +74,3 @@ testmarshal.c: testmarshal.h testmarshal.list $(glib_genmarshal)
+ BUILT_SOURCES += testmarshal.h testmarshal.c
+ CLEANFILES += stamp-testmarshal.h testmarshal.h testmarshal.c
  EXTRA_DIST += testcommon.h testmarshal.list
- BUILT_EXTRA_DIST += testmarshal.h testmarshal.c
 -endif # !CROSS_COMPILING
- 
- dist-hook: $(BUILT_EXTRA_DIST)
- 	files='$(BUILT_EXTRA_DIST)';				\
--- 
-2.14.1
-
+\ No newline at end of file

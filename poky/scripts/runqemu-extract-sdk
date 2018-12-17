@@ -31,9 +31,9 @@ fi
 
 SYSROOT_SETUP_SCRIPT=`which oe-find-native-sysroot 2> /dev/null`
 if [ -z "$SYSROOT_SETUP_SCRIPT" ]; then
-    echo "Error: Unable to find the oe-find-native-sysroot script"
-    echo "Did you forget to source your build system environment setup script?"
-    exit 1
+	echo "Error: Unable to find the oe-find-native-sysroot script"
+	echo "Did you forget to source your build system environment setup script?"
+	exit 1
 fi
 . $SYSROOT_SETUP_SCRIPT meta-ide-support
 PSEUDO_OPTS="-P $OECORE_NATIVE_SYSROOT/usr"
@@ -42,9 +42,9 @@ ROOTFS_TARBALL=$1
 SDK_ROOTFS_DIR=$2
 
 if [ ! -e "$ROOTFS_TARBALL" ]; then
-   	echo "Error: sdk tarball '$ROOTFS_TARBALL' does not exist"
-   	usage
-   	exit 1
+	echo "Error: sdk tarball '$ROOTFS_TARBALL' does not exist"
+	usage
+	exit 1
 fi
 
 # Convert SDK_ROOTFS_DIR to a full pathname
@@ -53,6 +53,9 @@ if [[ ${SDK_ROOTFS_DIR:0:1} != "/" ]]; then
 fi
 
 TAR_OPTS=""
+if [[ "$ROOTFS_TARBALL" =~ tar\.xz$ ]]; then
+	TAR_OPTS="--numeric-owner -xJf"
+fi
 if [[ "$ROOTFS_TARBALL" =~ tar\.bz2$ ]]; then
 	TAR_OPTS="--numeric-owner -xjf"
 fi
@@ -64,7 +67,7 @@ if [[ "$ROOTFS_TARBALL" =~ \.tar$ ]]; then
 fi
 if [ -z "$TAR_OPTS" ]; then
 	echo "Error: Unable to determine sdk tarball format"
-	echo "Accepted types: .tar / .tar.gz / .tar.bz2"
+	echo "Accepted types: .tar / .tar.gz / .tar.bz2 / .tar.xz"
 	exit 1
 fi
 
@@ -81,7 +84,7 @@ debug_image="`echo $ROOTFS_TARBALL | grep '\-dbg\.tar\.'`"
 if [ -e "$pseudo_state_dir" -a -z "$debug_image" ]; then
 	echo "Error: $pseudo_state_dir already exists!"
 	echo "Please delete the rootfs tree and pseudo directory manually"
-        echo "if this is really what you want."
+	echo "if this is really what you want."
 	exit 1
 fi
 

@@ -1,0 +1,39 @@
+From a188ea1ada6b990b72b91266ae02da058dcd9523 Mon Sep 17 00:00:00 2001
+From: Kurt Roeckx <kurt@roeckx.be>
+Date: Fri, 29 Jun 2018 15:49:32 +0800
+Subject: [PATCH] Make readelf -w output debug information on mips
+
+Bug-Debian: http://bugs.debian.org/662041
+Forwarded: not-needed
+
+Upstreams wants a change where this is handled by a hook that needs
+to be filled in by the backend for the arch.
+
+Signed-off-by: Kurt Roeckx <kurt@roeckx.be>
+
+Upstream-Status: Pending [from debian]
+mips_readelf_w.patch and rebase to 0.172
+
+http://ftp.de.debian.org/debian/pool/main/e/elfutils/elfutils_0.170-0.5.debian.tar.xz
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ src/readelf.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/readelf.c b/src/readelf.c
+index f185897..0db197c 100644
+--- a/src/readelf.c
++++ b/src/readelf.c
+@@ -10979,7 +10979,8 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
+       GElf_Shdr shdr_mem;
+       GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+ 
+-      if (shdr != NULL && shdr->sh_type == SHT_PROGBITS)
++      if (shdr != NULL && (
++	 (shdr->sh_type == SHT_PROGBITS) || (shdr->sh_type == SHT_MIPS_DWARF)))
+ 	{
+ 	  static const struct
+ 	  {
+-- 
+2.7.4
+

@@ -1,0 +1,47 @@
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From 235d9c5e8381518b0a8661786e7e0cbdd1bbcd01 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Tue, 12 Jun 2018 13:24:34 +0100
+Subject: [PATCH] ld10k1: define _GNU_SOURCE and use sighandler_t
+
+__sighandler_t is a glibc internal type which doesn't exist in musl.  By using
+AC_USE_SYSTEM_EXTENSIONS to get _GNU_SOURCE defined, both glibc and musl
+then expose sighandler_t.
+
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+Signed-off-by: Takashi Iwai <tiwai@suse.de>
+---
+ ld10k1/configure.ac      | 1 +
+ ld10k1/src/ld10k1_fnc1.c | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/ld10k1/configure.ac b/ld10k1/configure.ac
+index 276b24e..f48ca31 100644
+--- a/ld10k1/configure.ac
++++ b/ld10k1/configure.ac
+@@ -4,6 +4,7 @@ AC_CONFIG_MACRO_DIR([m4])
+ AM_MAINTAINER_MODE([enable])
+ 
+ AC_CONFIG_HEADERS(config.h)
++AC_USE_SYSTEM_EXTENSIONS
+ AC_PROG_CC
+ AC_PROG_LD
+ AC_PROG_INSTALL
+diff --git a/ld10k1/src/ld10k1_fnc1.c b/ld10k1/src/ld10k1_fnc1.c
+index 343584c..ddc43c6 100644
+--- a/ld10k1/src/ld10k1_fnc1.c
++++ b/ld10k1/src/ld10k1_fnc1.c
+@@ -179,7 +179,7 @@ int main_loop(comm_param *param, int audigy, const char *card_id, int tram_size,
+ {
+ 	fd_set active_fd_set/*, read_fd_set*/;
+ 	int i, j, res = 0;
+-	__sighandler_t old_sig_pipe;
++	sighandler_t old_sig_pipe;
+ 
+ 	int main_sock = 0;
+ 	int data_sock = 0;
+-- 
+2.11.0
+

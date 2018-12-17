@@ -1,32 +1,33 @@
-From d8e251ef97869ab2c1c82bd374016f402083997c Mon Sep 17 00:00:00 2001
-From: Jorge Pereira <jpereiran@gmail.com>
-Date: Mon, 7 Dec 2015 16:51:07 -0200
-Subject: [PATCH] Fixing issues related to m4 include path
+From 69cb6d4bb5dd56a48695c0581a7d853e427b0ea3 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Tue, 24 Jul 2018 14:54:41 +0800
+Subject: [PATCH] freeradius: Fixing issues related to m4 include path
 
 Upstream-Status: Submitted [1]
 
 [1]: https://github.com/FreeRADIUS/freeradius-server/pull/1428
 
 Submmited by: Jorge Pereira <jpereiran@gmail.com>
+
+Update to version 3.0.17
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
- src/modules/rlm_example/config.h.in                | 39 ++--------------------
- src/modules/rlm_ldap/configure                     |  2 +-
- src/modules/rlm_pam/config.h.in                    |  3 ++
- src/modules/rlm_perl/config.h.in                   |  3 ++
- src/modules/rlm_perl/configure.ac                  |  2 +-
- src/modules/rlm_radutmp/config.h.in                |  3 ++
- src/modules/rlm_ruby/configure                     |  1 +
- src/modules/rlm_ruby/configure.ac                  |  9 ++---
- src/modules/rlm_smsotp/config.h.in                 |  3 ++
- .../rlm_sql/drivers/rlm_sql_mysql/config.h.in      |  3 ++
- src/modules/rlm_unix/config.h.in                   |  6 ++++
- 11 files changed, 32 insertions(+), 42 deletions(-)
+ src/modules/rlm_example/config.h.in | 35 +++--------------------------------
+ src/modules/rlm_pam/config.h.in     |  3 +++
+ src/modules/rlm_perl/config.h.in    |  3 +++
+ src/modules/rlm_perl/configure.ac   |  2 +-
+ src/modules/rlm_radutmp/config.h.in |  3 +++
+ src/modules/rlm_ruby/configure.ac   |  8 ++++----
+ src/modules/rlm_smsotp/config.h.in  |  3 +++
+ src/modules/rlm_unix/config.h.in    |  3 +++
+ 8 files changed, 23 insertions(+), 37 deletions(-)
 
 diff --git a/src/modules/rlm_example/config.h.in b/src/modules/rlm_example/config.h.in
-index 2a81ef5..f80de9c 100644
+index 2a81ef5..4dbb8f4 100644
 --- a/src/modules/rlm_example/config.h.in
 +++ b/src/modules/rlm_example/config.h.in
-@@ -1,38 +1,5 @@
+@@ -1,37 +1,5 @@
  /* config.h.in.  Generated from configure.ac by autoheader.  */
  
 -/* Define to 1 if you have the <inttypes.h> header file. */
@@ -61,11 +62,10 @@ index 2a81ef5..f80de9c 100644
 -
 -/* Define to 1 if you have the <unistd.h> header file. */
 -#undef HAVE_UNISTD_H
--
+ 
  /* Define to the address where bug reports for this package should be sent. */
  #undef PACKAGE_BUGREPORT
- 
-@@ -45,8 +12,8 @@
+@@ -45,6 +13,9 @@
  /* Define to the one symbol short name of this package. */
  #undef PACKAGE_TARNAME
  
@@ -74,22 +74,7 @@ index 2a81ef5..f80de9c 100644
 +
  /* Define to the version of this package. */
  #undef PACKAGE_VERSION
--
--/* Define to 1 if you have the ANSI C header files. */
--#undef STDC_HEADERS
-diff --git a/src/modules/rlm_ldap/configure b/src/modules/rlm_ldap/configure
-index e0c15d9..cdf96d5 100755
---- a/src/modules/rlm_ldap/configure
-+++ b/src/modules/rlm_ldap/configure
-@@ -3992,7 +3992,7 @@ smart_prefix=
- $as_echo "#define WITH_SASL 1" >>confdefs.h
  
- 	    SASL=sasl.c
--          fi
-+	  fi
- 	fi
- 
- 	targetname=rlm_ldap
 diff --git a/src/modules/rlm_pam/config.h.in b/src/modules/rlm_pam/config.h.in
 index 32ef6ff..1ad20c5 100644
 --- a/src/modules/rlm_pam/config.h.in
@@ -118,7 +103,7 @@ index 989ed53..f80de9c 100644
  /* Define to the version of this package. */
  #undef PACKAGE_VERSION
 diff --git a/src/modules/rlm_perl/configure.ac b/src/modules/rlm_perl/configure.ac
-index 44c5fc9..6b2a043 100644
+index 4b3ff42..69c79cb 100644
 --- a/src/modules/rlm_perl/configure.ac
 +++ b/src/modules/rlm_perl/configure.ac
 @@ -3,7 +3,7 @@ AC_INIT(rlm_perl.c)
@@ -144,23 +129,11 @@ index 9a883cc..750b434 100644
  /* Define to the version of this package. */
  #undef PACKAGE_VERSION
  
-diff --git a/src/modules/rlm_ruby/configure b/src/modules/rlm_ruby/configure
-index 15868ab..c728af2 100755
---- a/src/modules/rlm_ruby/configure
-+++ b/src/modules/rlm_ruby/configure
-@@ -1875,6 +1875,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
- 
- 
- 
-+
- # ===========================================================================
- #    http://www.gnu.org/software/autoconf-archive/ax_compare_version.html
- # ===========================================================================
 diff --git a/src/modules/rlm_ruby/configure.ac b/src/modules/rlm_ruby/configure.ac
-index 9306382..f1c8118 100644
+index 9306382..ae86a14 100644
 --- a/src/modules/rlm_ruby/configure.ac
 +++ b/src/modules/rlm_ruby/configure.ac
-@@ -3,15 +3,16 @@ AC_INIT(rlm_ruby.c)
+@@ -3,15 +3,15 @@ AC_INIT(rlm_ruby.c)
  AC_REVISION($Revision: 1.9 $)
  AC_DEFUN(modname,[rlm_ruby])
  
@@ -174,7 +147,6 @@ index 9306382..f1c8118 100644
 -m4_include([ax_compare_version.m4])
 -m4_include([ax_prog_ruby_version.m4])
 -m4_include([ax_ruby_devel.m4])
-+
 +m4_include([m4/ax_compare_version.m4])
 +m4_include([m4/ax_prog_ruby_version.m4])
 +m4_include([m4/ax_ruby_devel.m4])
@@ -195,33 +167,11 @@ index 5feaf91..9e69f85 100644
  /* Define to the version of this package. */
  #undef PACKAGE_VERSION
  
-diff --git a/src/modules/rlm_sql/drivers/rlm_sql_mysql/config.h.in b/src/modules/rlm_sql/drivers/rlm_sql_mysql/config.h.in
-index e03d1a9..6262c48 100644
---- a/src/modules/rlm_sql/drivers/rlm_sql_mysql/config.h.in
-+++ b/src/modules/rlm_sql/drivers/rlm_sql_mysql/config.h.in
-@@ -18,5 +18,8 @@
- /* Define to the one symbol short name of this package. */
- #undef PACKAGE_TARNAME
- 
-+/* Define to the home page for this package. */
-+#undef PACKAGE_URL
-+
- /* Define to the version of this package. */
- #undef PACKAGE_VERSION
 diff --git a/src/modules/rlm_unix/config.h.in b/src/modules/rlm_unix/config.h.in
-index dcb9aa2..70b4680 100644
+index dcb9aa2..16107b8 100644
 --- a/src/modules/rlm_unix/config.h.in
 +++ b/src/modules/rlm_unix/config.h.in
-@@ -1,5 +1,8 @@
- /* config.h.in.  Generated from configure.ac by autoheader.  */
- 
-+/* Define to 1 if you have the `getpwnam' function. */
-+#undef HAVE_GETPWNAM
-+
- /* Define to 1 if you have the `getspnam' function. */
- #undef HAVE_GETSPNAM
- 
-@@ -54,6 +57,9 @@
+@@ -54,6 +54,9 @@
  /* Define to the one symbol short name of this package. */
  #undef PACKAGE_TARNAME
  
@@ -232,5 +182,5 @@ index dcb9aa2..70b4680 100644
  #undef PACKAGE_VERSION
  
 -- 
-2.3.5
+2.7.4
 

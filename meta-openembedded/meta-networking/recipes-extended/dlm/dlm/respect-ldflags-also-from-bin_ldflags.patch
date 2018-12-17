@@ -1,7 +1,23 @@
-diff -uNr dlm-4.0.2.orig/dlm_controld/Makefile dlm-4.0.2/dlm_controld/Makefile
---- dlm-4.0.2.orig/dlm_controld/Makefile	2017-04-04 10:49:23.661320260 +0200
-+++ dlm-4.0.2/dlm_controld/Makefile	2017-04-04 10:50:36.121326429 +0200
-@@ -55,7 +55,7 @@
+From 34a9182814ae565d6f430f85cfe80c05fa9f2dda Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Tue, 24 Jul 2018 17:55:32 +0800
+Subject: [PATCH] respect-ldflags-also-from-bin_ldflags
+
+Upstream-Status: Inappropriate[oe-specific]
+
+update original patch to version 4.0.7
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ dlm_controld/Makefile | 4 ++--
+ dlm_tool/Makefile     | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/dlm_controld/Makefile b/dlm_controld/Makefile
+index cf556c9..3381730 100644
+--- a/dlm_controld/Makefile
++++ b/dlm_controld/Makefile
+@@ -55,11 +55,11 @@ BIN_CFLAGS += -D_GNU_SOURCE -O2 -ggdb \
  BIN_CFLAGS += -fPIE -DPIE
  BIN_CFLAGS += -I../include -I../libdlm
  
@@ -10,10 +26,16 @@ diff -uNr dlm-4.0.2.orig/dlm_controld/Makefile dlm-4.0.2/dlm_controld/Makefile
  BIN_LDFLAGS += -lpthread -lrt -lcpg -lcmap -lcfg -lquorum
  
  LIB_CFLAGS += $(BIN_CFLAGS)
-diff -uNr dlm-4.0.2.orig/dlm_tool/Makefile dlm-4.0.2/dlm_tool/Makefile
---- dlm-4.0.2.orig/dlm_tool/Makefile	2013-07-31 17:50:26.000000000 +0200
-+++ dlm-4.0.2/dlm_tool/Makefile	2017-04-04 10:50:44.617327153 +0200
-@@ -32,7 +32,7 @@
+-LIB_LDFLAGS += -Wl,-z,relro -pie
++LIB_LDFLAGS += $(LDFLAGS) -Wl,-z,relro -pie
+ 
+ ifeq ($(USE_SD_NOTIFY),yes)
+ 	BIN_CFLAGS += $(shell pkg-config --cflags libsystemd) \
+diff --git a/dlm_tool/Makefile b/dlm_tool/Makefile
+index c16d8f5..a48a26f 100644
+--- a/dlm_tool/Makefile
++++ b/dlm_tool/Makefile
+@@ -32,7 +32,7 @@ BIN_CFLAGS += -D_GNU_SOURCE -O2 -ggdb \
  BIN_CFLAGS += -fPIE -DPIE
  BIN_CFLAGS += -I../include -I../libdlm -I../dlm_controld
  
@@ -22,15 +44,6 @@ diff -uNr dlm-4.0.2.orig/dlm_tool/Makefile dlm-4.0.2/dlm_tool/Makefile
  BIN_LDFLAGS += -L../libdlm -L../dlm_controld
  BIN_LDFLAGS += -lpthread -ldlm -ldlmcontrol
  
-diff -uNr dlm-4.0.2.orig/dlm_controld/Makefile dlm-4.0.2/dlm_controld/Makefile
---- dlm-4.0.2.orig/dlm_controld/Makefile	2017-04-04 11:02:58.578389641 +0200
-+++ dlm-4.0.2/dlm_controld/Makefile	2017-04-04 11:07:55.672414935 +0200
-@@ -59,7 +59,7 @@
- BIN_LDFLAGS += -lpthread -lrt -lcpg -lcmap -lcfg -lquorum
- 
- LIB_CFLAGS += $(BIN_CFLAGS)
--LIB_LDFLAGS += -Wl,-z,relro -pie
-+LIB_LDFLAGS += $(LDFLAGS) -Wl,-z,relro -pie
- 
- ifeq ($(USE_SD_NOTIFY),yes)
- 	BIN_CFLAGS += $(shell pkg-config --cflags libsystemd-daemon) \
+-- 
+2.7.4
+

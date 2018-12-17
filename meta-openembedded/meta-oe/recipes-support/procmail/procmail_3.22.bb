@@ -29,7 +29,7 @@ do_configure() {
     export CFLAGS="${BUILD_CFLAGS}"
     export AR="${BUILD_AR}"
     export AS="${BUILD_AS}"
-    make TARGET_CFLAGS="$TARGET_CFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64" LDFLAGS0="${LDFLAGS}" autoconf.h
+    make TARGET_CFLAGS="$TARGET_CFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64" LDFLAGS0="${BUILD_LDFLAGS}" autoconf.h
 }
 
 do_compile() {

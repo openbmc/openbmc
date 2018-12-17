@@ -18,6 +18,7 @@ SRC_URI = "${APACHE_MIRROR}/apr/${BPN}-${PV}.tar.bz2 \
            file://0005-configure.in-fix-LTFLAGS-to-make-it-work-with-ccache.patch \
            file://0006-apr-fix-off_t-size-doesn-t-match-in-glibc-when-cross.patch \
            file://0007-explicitly-link-libapr-against-phtread-to-make-gold-.patch \
+           file://0008-apr-fix-ptest-hang-in-teststr.patch \
 "
 
 SRC_URI[md5sum] = "12f2a349483ad6f12db49ba01fbfdbfa"

@@ -1,6 +1,8 @@
---- a/configure.ac	2014-08-22 12:22:54.290884351 +0200
-+++ b/configure.ac	2014-08-22 12:23:15.822306295 +0200
-@@ -42,18 +42,6 @@
+Index: git/configure.ac
+===================================================================
+--- git.orig/configure.ac
++++ git/configure.ac
+@@ -42,18 +42,6 @@ case $host in
       ;;		 		     
  esac
  
@@ -19,21 +21,3 @@
  #
  #
  ################################################################
-@@ -71,7 +59,7 @@
- 
- if test $mingw = "no" ; then
-   # add the warnings we don't want to do on mingw
--  $WARNINGS_TO_TEST="$WARNINGS_TO_TEST -Wall -Wstrict-prototypes  -Weffc++"
-+  WARNINGS_TO_TEST="$WARNINGS_TO_TEST -Wall -Wstrict-prototypes  -Weffc++"
- fi
- 
- for option in $WARNINGS_TO_TEST
-@@ -105,7 +93,7 @@
- 
- if test $mingw = "no" ; then
-   # add the warnings we don't want to do on mingw
--  $WARNINGS_TO_TEST="$WARNINGS_TO_TEST  -Weffc++"
-+  WARNINGS_TO_TEST="$WARNINGS_TO_TEST  -Weffc++"
- fi
- 
- for option in $WARNINGS_TO_TEST

@@ -1,0 +1,130 @@
+From d24c2516ae25d0ee180c1020e52114ea32230585 Mon Sep 17 00:00:00 2001
+From: Pascal Bach <pascal.bach@siemens.com>
+Date: Mon, 29 Oct 2018 18:03:43 +0100
+Subject: [PATCH] Use relative install paths for CMake
+
+Files are installed via a special _PREFIX variant of the INSTALL_???_DIR
+variable which is an absolute path.
+
+This not only is redundant if CMAKE_INTALL_PREFIX is set but it even causes
+the resulting Config.cmake to be non relocatable. This means it contains absolute
+paths to the build host. This is a problem for cross compilation in Yocto.
+
+This change gets rid of the absolute path and removes the no longer needed
+_PREFIX variants.
+
+Upstream-Status: Submitted [https://github.com/libyui/libyui/pull/140]
+Signed-off-by: Pascal Bach <pascal.bach@siemens.com>
+---
+ buildtools/LibyuiCommon.cmake | 35 ++++++++++++++---------------------
+ 1 file changed, 14 insertions(+), 21 deletions(-)
+
+diff --git a/buildtools/LibyuiCommon.cmake b/buildtools/LibyuiCommon.cmake
+index e6fbefd..5e2fc0d 100644
+--- a/buildtools/LibyuiCommon.cmake
++++ b/buildtools/LibyuiCommon.cmake
+@@ -258,13 +258,6 @@ MACRO( SET_ENVIRONMENT )	# setup the environment vars
+ 
+   SET( INSTALL_DOC_DIR "${DOC_DIR}" )
+ 
+-  FOREACH( p "DOC" LIB INCLUDE CMAKE PKGCONFIG BUILDTOOLS )
+-    SET( var "INSTALL_${p}_DIR" )
+-    IF( NOT IS_ABSOLUTE "${${var}}" )
+-      SET( ${var}_PREFIX "${YPREFIX}/${${var}}" )
+-    ENDIF( NOT IS_ABSOLUTE "${${var}}" )
+-  ENDFOREACH()
+-
+ ENDMACRO( SET_ENVIRONMENT )
+ 
+ MACRO( SET_SONAME )
+@@ -359,7 +352,7 @@ MACRO( SET_AUTODOCS )		# looks for doxygen, dot and latex and setup autodocs acc
+       IF( INSTALL_DOCS OR DOCS_ONLY )
+         INSTALL(
+           FILES "${CMAKE_BINARY_DIR}/doc/latex/refman.pdf"
+-          DESTINATION "${INSTALL_DOC_DIR_PREFIX}"
++          DESTINATION "${INSTALL_DOC_DIR}"
+         )
+       ENDIF( INSTALL_DOCS OR DOCS_ONLY )
+ 
+@@ -379,7 +372,7 @@ MACRO( SET_AUTODOCS )		# looks for doxygen, dot and latex and setup autodocs acc
+       FOREACH( p css gif html jpg js png tag )
+         INSTALL(
+           DIRECTORY "${CMAKE_BINARY_DIR}/doc/html"
+-          DESTINATION "${INSTALL_DOC_DIR_PREFIX}"
++          DESTINATION "${INSTALL_DOC_DIR}"
+           FILES_MATCHING PATTERN "*.${p}"
+         )
+       ENDFOREACH()
+@@ -638,32 +631,32 @@ MACRO( SET_INSTALL_TARGET )
+ 
+ INSTALL(
+   EXPORT ${PROJECTNAME_UC}LibraryDepends
+-  DESTINATION "${INSTALL_CMAKE_DIR_PREFIX}"
++  DESTINATION "${INSTALL_CMAKE_DIR}"
+   COMPONENT dev
+ )
+ 
+ FOREACH( p Config.cmake ConfigVersion.cmake )
+   INSTALL(
+     FILES "${CMAKE_BINARY_DIR}/${PROJECTNAME_UC}${p}"
+-    DESTINATION "${INSTALL_CMAKE_DIR_PREFIX}"
++    DESTINATION "${INSTALL_CMAKE_DIR}"
+ )
+ ENDFOREACH( p Config.cmake ConfigVersion.cmake )
+ 
+ INSTALL(
+   FILES "${CMAKE_BINARY_DIR}/${PROJECTNAME}.pc"
+-  DESTINATION "${INSTALL_PKGCONFIG_DIR_PREFIX}"
++  DESTINATION "${INSTALL_PKGCONFIG_DIR}"
+ )
+ 
+ IF( NOT PLUGINNAME AND NOT EXTENSIONNAME )
+   INSTALL(
+     DIRECTORY "${BUILDTOOLS_DIR}"
+-    DESTINATION "${INSTALL_BUILDTOOLS_DIR_PREFIX}"
++    DESTINATION "${INSTALL_BUILDTOOLS_DIR}"
+   )
+ ENDIF( NOT PLUGINNAME AND NOT EXTENSIONNAME )
+ 
+ INSTALL(
+   FILES ${BUILDTOOLS_LIST}
+-  DESTINATION "${INSTALL_BUILDTOOLS_DIR_PREFIX}"
++  DESTINATION "${INSTALL_BUILDTOOLS_DIR}"
+ )
+ 
+ ENDMACRO( SET_INSTALL_TARGET )
+@@ -724,9 +717,9 @@ MACRO( PROCESS_SOURCES )
+   INSTALL(
+     TARGETS ${TARGETLIB}
+     EXPORT ${PROJECTNAME_UC}LibraryDepends
+-    LIBRARY DESTINATION "${INSTALL_LIB_DIR_PREFIX}"
+-    ARCHIVE DESTINATION "${INSTALL_LIB_DIR_PREFIX}"
+-    PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR_PREFIX}"
++    LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
++    ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
++    PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}"
+     COMPONENT dev
+   )
+ 
+@@ -746,9 +739,9 @@ MACRO( PROCESS_SOURCES )
+     INSTALL(
+       TARGETS ${TARGETLIB}_static
+       EXPORT ${PROJECTNAME_UC}LibraryDepends
+-      LIBRARY DESTINATION "${INSTALL_LIB_DIR_PREFIX}"
+-      ARCHIVE DESTINATION "${INSTALL_LIB_DIR_PREFIX}"
+-      PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR_PREFIX}"
++      LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
++      ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
++      PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}"
+       COMPONENT dev
+      )
+ 
+@@ -776,7 +769,7 @@ MACRO( PROCESS_EXAMPLES )
+ 
+   INSTALL(
+     FILES ${EXAMPLES_LIST}
+-    DESTINATION "${INSTALL_DOC_DIR_PREFIX}/examples"
++    DESTINATION "${INSTALL_DOC_DIR}/examples"
+   )
+ 
+ ENDMACRO( PROCESS_EXAMPLES )

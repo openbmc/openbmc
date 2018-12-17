@@ -1,0 +1,32 @@
+From 4eed37b1a61458fc8e5251f7cb7c6d64e8e9da8d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 5 Sep 2018 17:48:09 -0700
+Subject: [PATCH] Use curly braces for MAKE variable
+
+Fixes errors with ninja
+| ninja: error: build.ninja:142: bad $-escape (literal $ must be written as $$)
+
+Upstream-Status: Submitted [https://github.com/libyui/libyui/pull/137]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ buildtools/LibyuiCommon.cmake | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/buildtools/LibyuiCommon.cmake b/buildtools/LibyuiCommon.cmake
+index cb93307..e6fbefd 100644
+--- a/buildtools/LibyuiCommon.cmake
++++ b/buildtools/LibyuiCommon.cmake
+@@ -122,8 +122,8 @@ MACRO( SET_BUILD_FLAGS )	# setup compiler-flags depending on CMAKE_BUILD_TYPE
+     ENABLE_TESTING()
+     # add a wrapper "tests" target, the builtin "test" cannot be extended :-(
+     ADD_CUSTOM_TARGET(tests
+-      $(MAKE)
+-      COMMAND $(MAKE) test
++      ${MAKE}
++      COMMAND ${MAKE} test
+     )
+   ENDIF ( ENABLE_TESTS OR ENABLE_CODE_COVERAGE)
+ 
+-- 
+2.18.0
+

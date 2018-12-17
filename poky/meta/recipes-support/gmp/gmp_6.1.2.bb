@@ -25,6 +25,10 @@ EXTRA_OECONF_mipsarchr6_append = " --disable-assembly"
 PACKAGES =+ "libgmpxx"
 FILES_libgmpxx = "${libdir}/libgmpxx${SOLIBS}"
 
+do_install_append() {
+	oe_multilib_header gmp.h
+}
+
 do_install_prepend_class-target() {
         sed -i \
         -e "s|--sysroot=${STAGING_DIR_HOST}||g" \

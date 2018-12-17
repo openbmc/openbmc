@@ -1,0 +1,44 @@
+Ensure that in a cross compile only the target flags are passed to gtk-doc, and
+not the native flags.
+
+Upstream-Status: Submitted [https://github.com/mesonbuild/meson/pull/4261]
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/mesonbuild/modules/gnome.py b/mesonbuild/modules/gnome.py
+index 4af33304..8751f53c 100644
+--- a/mesonbuild/modules/gnome.py
++++ b/mesonbuild/modules/gnome.py
+@@ -851,17 +851,30 @@ This will become a hard error in the future.''')
+             if not isinstance(incd.held_object, (str, build.IncludeDirs)):
+                 raise MesonException(
+                     'Gir include dirs should be include_directories().')
++
+         cflags.update(get_include_args(inc_dirs))
+-        cflags.update(state.environment.coredata.get_external_args('c'))
++        if state.environment.is_cross_build():
++            cflags.update(state.environment.cross_info.config["properties"].get('c_args', ""))
++        else:
++            cflags.update(state.environment.coredata.get_external_args('c'))
++
+         ldflags = OrderedSet()
+         ldflags.update(internal_ldflags)
+-        ldflags.update(state.environment.coredata.get_external_link_args('c'))
++        if state.environment.is_cross_build():
++            ldflags.update(state.environment.cross_info.config["properties"].get('c_link_args', ""))
++        else:
++            ldflags.update(state.environment.coredata.get_external_link_args('c'))
+         ldflags.update(external_ldflags)
++
+         if cflags:
+             args += ['--cflags=%s' % ' '.join(cflags)]
+         if ldflags:
+             args += ['--ldflags=%s' % ' '.join(ldflags)]
+-        compiler = state.environment.coredata.compilers.get('c')
++
++        if state.environment.is_cross_build():
++            compiler = state.environment.coredata.cross_compilers.get('c')
++        else:
++            compiler = state.environment.coredata.compilers.get('c')
+         if compiler:
+             args += ['--cc=%s' % ' '.join(compiler.get_exelist())]
+             args += ['--ld=%s' % ' '.join(compiler.get_linker_exelist())]

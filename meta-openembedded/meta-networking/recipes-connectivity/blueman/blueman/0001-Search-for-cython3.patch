@@ -1,0 +1,31 @@
+From 77db892cdee265e971270c06ca1ffbaeea6449a3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Tue, 26 Jun 2018 00:27:40 +0200
+Subject: [PATCH] Search for cython3
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 727089d1..6b565cdc 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -58,7 +58,7 @@ AC_SUBST([PYGOBJECT_LIBS])
+ 
+ AC_ARG_VAR([CYTHONEXEC], [Cython compiler])
+ if test "x$CYTHONEXEC" = "x"; then
+-   AC_PATH_PROG([CYTHONEXEC],[cython])
++   AC_PATH_PROG([CYTHONEXEC],[cython3])
+ fi
+ AC_SUBST([CYTHONEXEC])
+ AC_MSG_CHECKING([for cython executable])
+-- 
+2.14.3
+

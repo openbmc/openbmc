@@ -18,16 +18,25 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  setup.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Index: grpcio-1.8.4/setup.py
+Index: grpcio-1.14.1/setup.py
 ===================================================================
---- grpcio-1.8.4.orig/setup.py
-+++ grpcio-1.8.4/setup.py
-@@ -115,7 +115,7 @@ if EXTRA_ENV_COMPILE_ARGS is None:
+--- grpcio-1.14.1.orig/setup.py
++++ grpcio-1.14.1/setup.py
+@@ -123,7 +123,7 @@ ENABLE_DOCUMENTATION_BUILD = os.environ.
+ EXTRA_ENV_COMPILE_ARGS = os.environ.get('GRPC_PYTHON_CFLAGS', None)
+ EXTRA_ENV_LINK_ARGS = os.environ.get('GRPC_PYTHON_LDFLAGS', None)
+ if EXTRA_ENV_COMPILE_ARGS is None:
+-  EXTRA_ENV_COMPILE_ARGS = ' -std=c++11'
++  EXTRA_ENV_COMPILE_ARGS = ""
+   if 'win32' in sys.platform and sys.version_info < (3, 5):
+     EXTRA_ENV_COMPILE_ARGS += ' -D_hypot=hypot'
+     # We use define flags here and don't directly add to DEFINE_MACROS below to
+@@ -135,7 +135,7 @@ if EXTRA_ENV_COMPILE_ARGS is None:
      else:
        EXTRA_ENV_COMPILE_ARGS += ' -D_ftime=_ftime64 -D_timeb=__timeb64'
    elif "linux" in sys.platform:
--    EXTRA_ENV_COMPILE_ARGS += ' -std=c++11 -std=gnu99 -fvisibility=hidden -fno-wrapv -fno-exceptions'
+-    EXTRA_ENV_COMPILE_ARGS += ' -std=gnu99 -fvisibility=hidden -fno-wrapv -fno-exceptions'
 +    EXTRA_ENV_COMPILE_ARGS += ' -fvisibility=hidden -fno-wrapv -fno-exceptions'
    elif "darwin" in sys.platform:
      EXTRA_ENV_COMPILE_ARGS += ' -fvisibility=hidden -fno-wrapv -fno-exceptions'
- 
+ EXTRA_ENV_COMPILE_ARGS += ' -DPB_FIELD_16BIT'

@@ -27,7 +27,7 @@ class DnfSelftest(DnfTest):
         Expected: 1. Feeds were correctly set for dnf
                   2. Update recovers packages from host's repo
         Author: Humberto Ibarra <humberto.ibarra.lopez@intel.com>
-        Author: Alexander Kanavin <alexander.kanavin@intel.com>
+        Author: Alexander Kanavin <alex.kanavin@gmail.com>
         """
         # When we created an image, we had to supply fake ip and port
         # for the feeds. Now we can patch the real ones into the config file.

@@ -1,10 +1,8 @@
-SUMMARY = "A behavior-driven development framework, Python style"
-LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=d950439e8ea6ed233e4288f5e1a49c06"
+inherit setuptools
+require python-behave.inc
 
-SRC_URI[md5sum] = "3f05c859a1c45f5ed33e925817ad887d"
-SRC_URI[sha256sum] = "b9662327aa53294c1351b0a9c369093ccec1d21026f050c3bd9b3e5cccf81a86"
-
-RDEPENDS_${PN} += "python-difflib python-setuptools python-pkgutil python-misc python-argparse python-xml python-enum34 python-parse python-parse-type python-six"
-
-inherit pypi setuptools
+RDEPENDS_${PN} += " \
+    ${PYTHON_PN}-argparse \
+    ${PYTHON_PN}-enum34 \
+    ${PYTHON_PN}-traceback2 \
+    "

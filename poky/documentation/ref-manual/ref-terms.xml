@@ -29,11 +29,31 @@
                 information in the similarly-named recipe file.
                 For an example of an append file in use, see the
                 "<ulink url='&YOCTO_DOCS_DEV_URL;#using-bbappend-files'>Using .bbappend Files in Your Layer</ulink>"
-                section in the Yocto Project Development Tasks Manual.
-                <note>
-                    Append files can also use wildcard patterns in their
-                    version numbers so they can be applied to more than one
-                    version of the underlying recipe file.
+                section in the Yocto Project Development Tasks Manual.</para>
+
+                <para>When you name an append file, you can use the
+                "<filename>%</filename>" wildcard character to allow for
+                matching recipe names.
+                For example, suppose you have an append file named as follows:
+                <literallayout class='monospaced'>
+     busybox_1.21.%.bbappend
+                </literallayout>
+                That append file would match any
+                <filename>busybox_1.21.</filename><replaceable>x</replaceable><filename>.bb</filename>
+                version of the recipe.
+                So, the append file would match the following recipe names:
+                <literallayout class='monospaced'>
+     busybox_1.21.1.bb
+     busybox_1.21.2.bb
+     busybox_1.21.3.bb
+                </literallayout>
+                <note><title>Important</title>
+                    The use of the "<filename>%</filename>" character
+                    is limited in that it only works directly in front of the
+                    <filename>.bbappend</filename> portion of the append file's
+                    name.
+                    You cannot use the wildcard character in any other
+                    location of the name.
                 </note>
                 </para></listitem>
             <listitem><para id='bitbake-term'>
@@ -329,7 +349,7 @@
                 <para>It is worth noting that the term "package" can,
                 in general, have subtle meanings.
                 For example, the packages referred to in the
-                "<link linkend='required-packages-for-the-host-development-system'>Required Packages for the Host Development System</link>"
+                "<link linkend='required-packages-for-the-build-host'>Required Packages for the Build Host</link>"
                 section are compiled binaries that, when installed, add
                 functionality to your Linux distribution.</para>
 

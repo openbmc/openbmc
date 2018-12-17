@@ -21,9 +21,9 @@ class LogrotateTest(OERuntimeTestCase):
         self.assertEqual(status, 0, msg = msg)
 
         cmd = ('sed -i "s#wtmp {#wtmp {\\n    olddir $HOME/logrotate_dir#"'
-               ' /etc/logrotate.conf')
+               ' /etc/logrotate.d/wtmp')
         status, output = self.target.run(cmd)
-        msg = ('Could not write to logrotate.conf file. Status and output: '
+        msg = ('Could not write to logrotate.d/wtmp file. Status and output: '
                ' %s and %s' % (status, output))
         self.assertEqual(status, 0, msg = msg)
 

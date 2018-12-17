@@ -2,8 +2,7 @@
 
 set -e
 
-PSEUDO_UNLOAD=1 qemuwrapper -L $D -E LD_LIBRARY_PATH=$D${libdir}:$D${base_libdir} \
-	$D${libexecdir}/${binprefix}gio-querymodules $D${libdir}/gio/modules/
+PSEUDO_UNLOAD=1 ${binprefix}qemuwrapper -L $D $D${libexecdir}/${binprefix}gio-querymodules $D${libdir}/gio/modules/
 
 [ ! -e $D${libdir}/gio/modules/giomodule.cache ] ||
 	chown root:root $D${libdir}/gio/modules/giomodule.cache

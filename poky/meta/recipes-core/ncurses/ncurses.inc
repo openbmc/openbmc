@@ -87,6 +87,7 @@ ncurses_configure() {
 	        --disable-rpath-hack \
 		${EXCONFIG_ARGS} \
 	        --with-manpage-format=normal \
+	        --disable-stripping \
 	        "$@" || return 1
 	cd ..
 }

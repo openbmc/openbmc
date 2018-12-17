@@ -1,20 +1,37 @@
-The git-version-gen script is not included in tarball releases,
-so we need to avoid attempts to call it when running autoreconf.
+From bee0680754730498485e24dd037303318c68916c Mon Sep 17 00:00:00 2001
+From: Andre McCurdy <armccurdy@gmail.com>
+Date: Mon, 18 Jan 2016 13:33:50 -0800
+Subject: [PATCH] strace: remove need for scripts
+
+git-version-gen copyright-year-gen file-date-gen are not included in
+tarball releases, so we need to avoid attempts to call them.
 
 Upstream-Status: Inappropriate [configuration]
 
 Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+
+---
+ configure.ac | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 7004bd3..b2b03c6 100644
+index ad1d00f..96fa205 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -31,7 +31,7 @@
+@@ -32,12 +32,12 @@
  
  AC_PREREQ(2.57)
  AC_INIT([strace],
 -	m4_esyscmd([./git-version-gen .tarball-version]),
 +	m4_esyscmd_s([cat .tarball-version]),
- 	[strace-devel@lists.sourceforge.net],
+ 	[strace-devel@lists.strace.io],
  	[strace],
  	[https://strace.io])
+-m4_define([copyright_year], m4_esyscmd([./copyright-year-gen .year]))
+-m4_define([manpage_date], m4_esyscmd([./file-date-gen strace.1.in]))
++m4_define([copyright_year], m4_esyscmd_s([cat .year]))
++m4_define([manpage_date], m4_esyscmd_s([cat .strace.1.in.date]))
+ AC_COPYRIGHT([Copyright (c) 1999-]copyright_year[ The strace developers.])
+ AC_CONFIG_SRCDIR([strace.c])
+ AC_CONFIG_AUX_DIR([.])

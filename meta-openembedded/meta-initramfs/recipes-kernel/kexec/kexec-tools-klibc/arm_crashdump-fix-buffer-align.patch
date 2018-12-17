@@ -1,0 +1,44 @@
+From 06b0d43c20f7c6200902d4c6db3d33416877f71c Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Sun, 26 Aug 2018 21:40:06 +0200
+Subject: [PATCH 1/1] arm- backport from oe-core
+
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+---
+ kexec/arch/arm/crashdump-arm.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/kexec/arch/arm/crashdump-arm.c b/kexec/arch/arm/crashdump-arm.c
+index 2530b29..af2600d 100644
+--- a/kexec/arch/arm/crashdump-arm.c
++++ b/kexec/arch/arm/crashdump-arm.c
+@@ -240,6 +240,7 @@ int load_crashdump_segments(struct kexec_info *info, char *mod_cmdline)
+ 	void *buf;
+ 	int err;
+ 	int last_ranges;
++	unsigned short align_bit_shift = 20;
+ 
+ 	/*
+ 	 * First fetch all the memory (RAM) ranges that we are going to pass to
+@@ -281,6 +282,7 @@ int load_crashdump_segments(struct kexec_info *info, char *mod_cmdline)
+ 
+ 		/* for support LPAE enabled kernel*/
+ 		elf_info.class = ELFCLASS64;
++		align_bit_shift = 21;
+ 
+ 		err = crash_create_elf64_headers(info, &elf_info,
+ 					 usablemem_rgns.ranges,
+@@ -302,8 +304,9 @@ int load_crashdump_segments(struct kexec_info *info, char *mod_cmdline)
+ 	 * 1MB) so that available memory passed in kernel command line will be
+ 	 * aligned to 1MB. This is because kernel create_mapping() wants memory
+ 	 * regions to be aligned to SECTION_SIZE.
++	 * The SECTION_SIZE of LPAE kernel is '1UL << 21' defined in pgtable-3level.h
+ 	 */
+-	elfcorehdr = add_buffer_phys_virt(info, buf, bufsz, bufsz, 1 << 20,
++	elfcorehdr = add_buffer_phys_virt(info, buf, bufsz, bufsz, 1 << align_bit_shift,
+ 					  crash_kernel_mem.start,
+ 					  crash_kernel_mem.end, -1, 0);
+ 
+-- 
+2.7.4
+

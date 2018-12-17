@@ -1,4 +1,4 @@
-From 10d2a977ee1d469f0bf9059bb2d0b55fd2eecbac Mon Sep 17 00:00:00 2001
+From 7ffa6e3d00e1d8a060f3f4c2bb9a72691af05d79 Mon Sep 17 00:00:00 2001
 From: Andre McCurdy <armccurdy@gmail.com>
 Date: Wed, 20 Jan 2016 13:00:00 -0800
 Subject: [PATCH] make gio_unix_2_0 dependency configurable
@@ -17,16 +17,17 @@ instead of AG_GST_CHECK_FEATURE.
 Upstream-Status: Pending
 
 Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+
 ---
  configure.ac | 7 +++++++
  1 file changed, 7 insertions(+)
 
 diff --git a/configure.ac b/configure.ac
-index 9c52aeb..26cacd6 100644
+index 12807bc..35a0bf3 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -752,9 +752,16 @@ AC_SUBST(FT2_CFLAGS)
- fi dnl of EXT plugins
+@@ -806,9 +806,16 @@ AM_CONDITIONAL(HAVE_PNG, test "x$HAVE_PNG" = "xyes")
+ AM_CONDITIONAL(HAVE_JPEG, test "x$HAVE_JPEG" = "xyes")
  
  dnl *** gio-unix-2.0 for tests/check/pipelines/tcp.c ***
 +AC_ARG_ENABLE([gio_unix_2_0],
@@ -42,6 +43,3 @@ index 9c52aeb..26cacd6 100644
  AM_CONDITIONAL(USE_GIO_UNIX_2_0, test "x$HAVE_GIO_UNIX_2_0" = "xyes")
  
  dnl *** finalize CFLAGS, LDFLAGS, LIBS
--- 
-1.9.1
-

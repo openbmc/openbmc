@@ -1,7 +1,7 @@
-From ef832a115b40861c08df333339b1366da49e5393 Mon Sep 17 00:00:00 2001
+From e1c6540f7984bd48e1e2d80d965fa82c70de3c20 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 17 Apr 2016 12:35:41 -0700
-Subject: [PATCH 9/9] WebKitMacros: Append to -I and not to -isystem
+Subject: [PATCH] WebKitMacros: Append to -I and not to -isystem
 
 gcc-6 has now introduced stdlib.h in libstdc++ for better
 compliance and its including the C library stdlib.h using
@@ -17,6 +17,7 @@ and ends up with compile errors e.g.
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 Upstream-Status: Pending
+
 ---
  Source/JavaScriptCore/shell/CMakeLists.txt | 2 +-
  Source/WebCore/PlatformGTK.cmake           | 6 +++---
@@ -27,32 +28,32 @@ Upstream-Status: Pending
  6 files changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/Source/JavaScriptCore/shell/CMakeLists.txt b/Source/JavaScriptCore/shell/CMakeLists.txt
-index bc37dd31..4e49871f 100644
+index b3c7e0b..88446de 100644
 --- a/Source/JavaScriptCore/shell/CMakeLists.txt
 +++ b/Source/JavaScriptCore/shell/CMakeLists.txt
 @@ -35,7 +35,7 @@ WEBKIT_INCLUDE_CONFIG_FILES_IF_EXISTS()
  WEBKIT_WRAP_SOURCELIST(${JSC_SOURCES})
  WEBKIT_WRAP_SOURCELIST(${TESTAPI_SOURCES})
- include_directories(./ ${JavaScriptCore_INCLUDE_DIRECTORIES})
+ include_directories(./ ${JavaScriptCore_INCLUDE_DIRECTORIES} ${JavaScriptCore_PRIVATE_INCLUDE_DIRECTORIES})
 -include_directories(SYSTEM ${JavaScriptCore_SYSTEM_INCLUDE_DIRECTORIES})
 +include_directories(${JavaScriptCore_SYSTEM_INCLUDE_DIRECTORIES})
  add_executable(jsc ${JSC_SOURCES})
  target_link_libraries(jsc ${JSC_LIBRARIES})
  
 diff --git a/Source/WebCore/PlatformGTK.cmake b/Source/WebCore/PlatformGTK.cmake
-index 73506c74..8eb8b415 100644
+index f7d8d70a..3c27b8bc 100644
 --- a/Source/WebCore/PlatformGTK.cmake
 +++ b/Source/WebCore/PlatformGTK.cmake
-@@ -281,7 +281,7 @@ if (ENABLE_PLUGIN_PROCESS_GTK2)
-         ${GTK2_INCLUDE_DIRS}
-         ${GDK2_INCLUDE_DIRS}
+@@ -157,7 +157,7 @@ if (ENABLE_PLUGIN_PROCESS_GTK2)
+     target_include_directories(WebCorePlatformGTK2 PRIVATE
+         ${WebCore_INCLUDE_DIRECTORIES}
      )
 -    target_include_directories(WebCorePlatformGTK2 SYSTEM PRIVATE
 +    target_include_directories(WebCorePlatformGTK2 PRIVATE
          ${WebCore_SYSTEM_INCLUDE_DIRECTORIES}
-     )
-     target_link_libraries(WebCorePlatformGTK2
-@@ -305,7 +305,7 @@ add_dependencies(WebCorePlatformGTK WebCore)
+         ${GTK2_INCLUDE_DIRS}
+         ${GDK2_INCLUDE_DIRS}
+@@ -183,7 +183,7 @@ add_dependencies(WebCorePlatformGTK WebCore)
  target_include_directories(WebCorePlatformGTK PRIVATE
      ${WebCore_INCLUDE_DIRECTORIES}
  )
@@ -61,7 +62,7 @@ index 73506c74..8eb8b415 100644
      ${WebCore_SYSTEM_INCLUDE_DIRECTORIES}
      ${GTK_INCLUDE_DIRS}
      ${GDK_INCLUDE_DIRS}
-@@ -321,7 +321,7 @@ include_directories(
+@@ -199,7 +199,7 @@ include_directories(
      "${WEBCORE_DIR}/bindings/gobject/"
  )
  
@@ -71,33 +72,33 @@ index 73506c74..8eb8b415 100644
  )
  
 diff --git a/Source/WebKit/PlatformGTK.cmake b/Source/WebKit/PlatformGTK.cmake
-index d83a2e77..401246f4 100644
+index 8c6ebb5..772c243 100644
 --- a/Source/WebKit/PlatformGTK.cmake
 +++ b/Source/WebKit/PlatformGTK.cmake
-@@ -1050,7 +1050,7 @@ if (ENABLE_PLUGIN_PROCESS_GTK2)
+@@ -655,7 +655,7 @@ if (ENABLE_PLUGIN_PROCESS_GTK2)
      target_include_directories(WebKitPluginProcess2 PRIVATE
-         ${WebKit2CommonIncludeDirectories}
+         ${WebKitCommonIncludeDirectories}
      )
 -    target_include_directories(WebKitPluginProcess2 SYSTEM PRIVATE
 +    target_include_directories(WebKitPluginProcess2 PRIVATE
-          ${WebKit2CommonSystemIncludeDirectories}
+          ${WebKitCommonSystemIncludeDirectories}
           ${GTK2_INCLUDE_DIRS}
           ${GDK2_INCLUDE_DIRS}
 diff --git a/Source/cmake/WebKitMacros.cmake b/Source/cmake/WebKitMacros.cmake
-index 7bc89543..d9818fa4 100644
+index a1e7e8f..ce24274 100644
 --- a/Source/cmake/WebKitMacros.cmake
 +++ b/Source/cmake/WebKitMacros.cmake
-@@ -78,7 +78,7 @@ macro(WEBKIT_FRAMEWORK_DECLARE _target)
- endmacro()
- 
- macro(WEBKIT_FRAMEWORK _target)
--    include_directories(SYSTEM ${${_target}_SYSTEM_INCLUDE_DIRECTORIES})
-+    include_directories(${${_target}_SYSTEM_INCLUDE_DIRECTORIES})
-     target_sources(${_target} PRIVATE
-         ${${_target}_HEADERS}
+@@ -134,7 +134,7 @@ macro(WEBKIT_FRAMEWORK _target)
          ${${_target}_SOURCES}
+     )
+     target_include_directories(${_target} PUBLIC "$<BUILD_INTERFACE:${${_target}_INCLUDE_DIRECTORIES}>")
+-    target_include_directories(${_target} SYSTEM PRIVATE "$<BUILD_INTERFACE:${${_target}_SYSTEM_INCLUDE_DIRECTORIES}>")
++    target_include_directories(${_target} PRIVATE "$<BUILD_INTERFACE:${${_target}_SYSTEM_INCLUDE_DIRECTORIES}>")
+     target_include_directories(${_target} PRIVATE "$<BUILD_INTERFACE:${${_target}_PRIVATE_INCLUDE_DIRECTORIES}>")
+     target_link_libraries(${_target} ${${_target}_LIBRARIES})
+     set_target_properties(${_target} PROPERTIES COMPILE_DEFINITIONS "BUILDING_${_target}")
 diff --git a/Tools/MiniBrowser/gtk/CMakeLists.txt b/Tools/MiniBrowser/gtk/CMakeLists.txt
-index e832a86d..ce92c864 100644
+index dc2b61e..0128dca 100644
 --- a/Tools/MiniBrowser/gtk/CMakeLists.txt
 +++ b/Tools/MiniBrowser/gtk/CMakeLists.txt
 @@ -57,7 +57,7 @@ endif ()
@@ -110,11 +111,11 @@ index e832a86d..ce92c864 100644
  target_link_libraries(MiniBrowser ${MiniBrowser_LIBRARIES})
  
 diff --git a/Tools/TestWebKitAPI/PlatformGTK.cmake b/Tools/TestWebKitAPI/PlatformGTK.cmake
-index 1be3dd52..7bdddf37 100644
+index 4aef695..a14b163 100644
 --- a/Tools/TestWebKitAPI/PlatformGTK.cmake
 +++ b/Tools/TestWebKitAPI/PlatformGTK.cmake
 @@ -20,7 +20,7 @@ include_directories(
-     ${WEBKIT2_DIR}/UIProcess/API/gtk
+     ${WEBKIT_DIR}/UIProcess/API/gtk
  )
  
 -include_directories(SYSTEM
@@ -122,6 +123,3 @@ index 1be3dd52..7bdddf37 100644
      ${GDK3_INCLUDE_DIRS}
      ${GLIB_INCLUDE_DIRS}
      ${GTK3_INCLUDE_DIRS}
--- 
-2.14.1
-

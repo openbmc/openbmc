@@ -1,7 +1,7 @@
-From 94225ab4bcc1613531558a632270b5edce779bc9 Mon Sep 17 00:00:00 2001
+From 6ea962e0946da7564a774b08dd3eda28d64e9e56 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 27 Jan 2018 10:08:04 -0800
-Subject: [PATCH 27/27] Acquire ld.so lock before switching to malloc_atfork
+Subject: [PATCH] Acquire ld.so lock before switching to malloc_atfork
 
 The patch is from
   https://sourceware.org/bugzilla/show_bug.cgi?id=4578
@@ -28,11 +28,11 @@ Signed-off-by: Yuanjie Huang <yuanjie.huang@windriver.com>
 Signed-off-by: Zhixiong Chi <zhixiong.chi@windriver.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- sysdeps/nptl/fork.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ sysdeps/nptl/fork.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/sysdeps/nptl/fork.c b/sysdeps/nptl/fork.c
-index f87506f398..225e7b51f8 100644
+index 0f48933ff1..eef3f9669b 100644
 --- a/sysdeps/nptl/fork.c
 +++ b/sysdeps/nptl/fork.c
 @@ -25,6 +25,7 @@
@@ -43,28 +43,23 @@ index f87506f398..225e7b51f8 100644
  #include <stdio-lock.h>
  #include <atomic.h>
  #include <nptl/pthreadP.h>
-@@ -60,6 +61,10 @@ __libc_fork (void)
-      but our current fork implementation is not.  */
+@@ -56,6 +57,9 @@ __libc_fork (void)
    bool multiple_threads = THREAD_GETMEM (THREAD_SELF, header.multiple_threads);
  
+   __run_fork_handlers (atfork_run_prepare);
 +  /* grab ld.so lock BEFORE switching to malloc_atfork */
 +  __rtld_lock_lock_recursive (GL(dl_load_lock));
 +  __rtld_lock_lock_recursive (GL(dl_load_write_lock));
-+
-   /* Run all the registered preparation handlers.  In reverse order.
-      While doing this we build up a list of all the entries.  */
-   struct fork_handler *runp;
-@@ -246,6 +251,10 @@ __libc_fork (void)
  
- 	  allp = allp->next;
- 	}
-+
+   /* If we are not running multiple threads, we do not have to
+      preserve lock state.  If fork runs from a signal handler, only
+@@ -150,6 +154,9 @@ __libc_fork (void)
+ 
+       /* Run the handlers registered for the parent.  */
+       __run_fork_handlers (atfork_run_parent);
 +      /* unlock ld.so last, because we locked it first */
 +      __rtld_lock_unlock_recursive (GL(dl_load_write_lock));
 +      __rtld_lock_unlock_recursive (GL(dl_load_lock));
      }
  
    return pid;
--- 
-2.16.1
-

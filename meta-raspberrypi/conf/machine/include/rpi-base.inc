@@ -15,7 +15,9 @@ XSERVER = " \
     "
 
 RPI_KERNEL_DEVICETREE_OVERLAYS ?= " \
+    overlays/at86rf233.dtbo \
     overlays/dwc2.dtbo \
+    overlays/gpio-key.dtbo \
     overlays/hifiberry-amp.dtbo \
     overlays/hifiberry-dac.dtbo \
     overlays/hifiberry-dacplus.dtbo \
@@ -24,18 +26,17 @@ RPI_KERNEL_DEVICETREE_OVERLAYS ?= " \
     overlays/iqaudio-dac.dtbo \
     overlays/iqaudio-dacplus.dtbo \
     overlays/lirc-rpi.dtbo \
+    overlays/pi3-disable-bt.dtbo \
+    overlays/pi3-miniuart-bt.dtbo \
     overlays/pitft22.dtbo \
     overlays/pitft28-resistive.dtbo \
     overlays/pitft35-resistive.dtbo \
     overlays/pps-gpio.dtbo \
     overlays/rpi-ft5406.dtbo \
     overlays/rpi-poe.dtbo \
-    overlays/w1-gpio.dtbo \
-    overlays/w1-gpio-pullup.dtbo \
-    overlays/pi3-disable-bt.dtbo \
-    overlays/pi3-miniuart-bt.dtbo \
     overlays/vc4-kms-v3d.dtbo \
-    overlays/at86rf233.dtbo \
+    overlays/w1-gpio-pullup.dtbo \
+    overlays/w1-gpio.dtbo \
     "
 
 RPI_KERNEL_DEVICETREE ?= " \
@@ -84,23 +85,18 @@ def make_dtb_boot_files(d):
     imgtyp = d.getVar('KERNEL_IMAGETYPE')
 
     def transform(dtb):
+        base = os.path.basename(dtb)
         if dtb.endswith('dtb'):
             # eg: whatever/bcm2708-rpi-b.dtb has:
-            #     DEPLOYDIR file: ${KERNEL_IMAGETYPE}-bcm2708-rpi-b.dtb
+            #     DEPLOYDIR file: bcm2708-rpi-b.dtb
             #     destination: bcm2708-rpi-b.dtb
-            base = os.path.basename(dtb)
-            src = '{}-{}'.format(imgtyp, base)
-            dst = base
-            return '{};{}'.format(src, dst)
+            return base
         elif dtb.endswith('dtbo'):
             # overlay dtb:
             # eg: overlays/hifiberry-amp.dtbo has:
-            #     DEPLOYDIR file: ${KERNEL_IMAGETYPE}-hifiberry-amp.dtbo
+            #     DEPLOYDIR file: hifiberry-amp.dtbo
             #     destination: overlays/hifiberry-amp.dtbo
-            base = os.path.basename(dtb)
-            src = '{}-{}'.format(imgtyp, base)
-            dst = dtb
-            return '{};{}'.format(src, dtb)
+            return '{};{}'.format(base, dtb)
 
     return ' '.join([transform(dtb) for dtb in alldtbs.split(' ') if dtb])
 

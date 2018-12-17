@@ -1,0 +1,98 @@
+From: Helmut Grohne <helmut@subdivi.de>
+Subject: fix cross compilation
+
+The OH_SET_SIZES macro relies on the usual autoconf sizeof cache variables
+during cross compilation, but it never ensure that they are initialized.
+
+pkg-config must be called with $ac_tool_prefix and PKG_PROG_PKG_CONFIG takes
+care of that. Setting PKG_CONFIG_PATH breaks the pkg-config-cross-wrapper.
+Don't do that.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: openhpi-3.8.0/acinclude.m4
+===================================================================
+--- openhpi-3.8.0.orig/acinclude.m4
++++ openhpi-3.8.0/acinclude.m4
+@@ -22,30 +22,39 @@ AC_DEFUN([OH_SET_SIZES],
+ 
+     if test "x$cross_compiling" != "xno"; then
+         if test "x$OH_SIZEOF_UCHAR" = x; then
++	    AC_CHECK_SIZEOF([unsigned char])
+             OH_SIZEOF_UCHAR=$ac_cv_sizeof_uchar
+         fi
+         if test "x$OH_SIZEOF_USHORT" = x; then
++	    AC_CHECK_SIZEOF([unsigned short])
+             OH_SIZEOF_USHORT=$ac_cv_sizeof_ushort
+         fi
+         if test "x$OH_SIZEOF_UINT" = x; then
++	    AC_CHECK_SIZEOF([unsigned int])
+             OH_SIZEOF_UINT=$ac_cv_sizeof_uint
+         fi
+         if test "x$OH_SIZEOF_CHAR" = x; then
++	    AC_CHECK_SIZEOF([char])
+             OH_SIZEOF_CHAR=$ac_cv_sizeof_char
+         fi
+         if test "x$OH_SIZEOF_SHORT" = x; then
++	    AC_CHECK_SIZEOF([short])
+             OH_SIZEOF_SHORT=$ac_cv_sizeof_short
+         fi
+         if test "x$OH_SIZEOF_INT" = x; then
++	    AC_CHECK_SIZEOF([int])
+             OH_SIZEOF_INT=$ac_cv_sizeof_int
+         fi
+         if test "x$OH_SIZEOF_LLONG" = x; then
++	    AC_CHECK_SIZEOF([long long])
+             OH_SIZEOF_LLONG=$ac_cv_sizeof_longlong
+         fi
+         if test "x$OH_SIZEOF_FLOAT" = x; then
++	    AC_CHECK_SIZEOF([float])
+             OH_SIZEOF_FLOAT=$ac_cv_sizeof_float
+         fi
+         if test "x$OH_SIZEOF_DOUBLE" = x; then
++	    AC_CHECK_SIZEOF([double])
+             OH_SIZEOF_DOUBLE=$ac_cv_sizeof_double
+         fi
+     else
+Index: openhpi-3.8.0/configure.ac
+===================================================================
+--- openhpi-3.8.0.orig/configure.ac
++++ openhpi-3.8.0/configure.ac
+@@ -87,9 +87,9 @@ have_rtas_lib=no
+ 
+ dnl Check for GLIB
+ 
+-AC_CHECK_PROG([found_pkg_config],[pkg-config],[yes])
++PKG_PROG_PKG_CONFIG
+ 
+-if test "x$found_pkg_config" != "xyes"; then
++if test "x$PKG_CONFIG" = "x"; then
+     OH_CHECK_FAIL(pkg-config,pkg-config)
+ fi
+ PKG_CFG_SETPATH
+@@ -105,7 +105,7 @@ GLIB=glib-2.0
+ GTHREAD=gthread-2.0
+ GMODULE=gmodule-2.0
+ 
+-if pkg-config --atleast-version $GLIB_REQUIRED_VERSION $GLIB; then
++if $PKG_CONFIG --atleast-version $GLIB_REQUIRED_VERSION $GLIB; then
+    :
+ else
+    AC_MSG_ERROR([
+@@ -268,12 +268,12 @@ dnl
+ dnl We really need to make ipmi enablement be contigent on OpenIPMI
+ dnl
+ 
+-if PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig pkg-config --atleast-version 1.4.20 OpenIPMI; then
++if $PKG_CONFIG --atleast-version 1.4.20 OpenIPMI; then
+     have_openipmi=yes
+     AC_CHECK_LIB([OpenIPMI], [ipmi_smi_setup_con], [have_openipmi=yes])
+-    OPENIPMI_CFLAGS=`PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig pkg-config --cflags OpenIPMI`
++    OPENIPMI_CFLAGS=`$PKG_CONFIG --cflags OpenIPMI`
+     AC_SUBST(OPENIPMI_CFLAGS)
+-    OPENIPMI_LIBS=`PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig pkg-config --libs OpenIPMI`
++    OPENIPMI_LIBS=`$PKG_CONFIG --libs OpenIPMI`
+     AC_SUBST(OPENIPMI_LIBS)
+ fi
+ 

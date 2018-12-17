@@ -1,0 +1,30 @@
+From 8b9da93ac9a4ea79ae953f80f6fe6e4f080341f2 Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Tue, 17 Apr 2018 10:57:23 +0200
+Subject: [PATCH] kexec-elf-exec.c: replace with our elf.h
+
+Fix
+
+ kexec-elf-exec.c: In function 'elf_exec_load':
+ error: 'EM_AARCH64' undeclared
+
+Upstream-Status: Inappropriate [klibc specific]
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+
+---
+ kexec/kexec-elf-exec.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kexec/kexec-elf-exec.c b/kexec/kexec-elf-exec.c
+index a9329ac..0dd0700 100644
+--- a/kexec/kexec-elf-exec.c
++++ b/kexec/kexec-elf-exec.c
+@@ -4,7 +4,7 @@
+ #include <stdio.h>
+ #include <errno.h>
+ #include <stdlib.h>
+-#include "elf.h"
++#include "../include/elf.h"
+ #include <boot/elf_boot.h>
+ #include "kexec.h"
+ #include "kexec-elf.h"

@@ -24,8 +24,6 @@ SRC_URI = "https://sourceforge.net/projects/openl2tp/files/${BPN}/${PV}/${BPN}-$
            file://0001-read-returns-ssize_t.patch \
            file://0002-Mark-first-element-of-a-string-as-null.patch \
            file://0003-cli-Mark-return-of-strtol-as-long-int.patch \
-           "
-SRC_URI_append_libc-musl = "\
            file://0002-link-with-libtirpc.patch \
            file://0003-musl-fixes.patch \
            "
@@ -36,8 +34,7 @@ SRC_URI[sha256sum] = "d3eab7d6cad5da8ccc9d1e31d5303e27a39622c07bdb8fa3618eea3144
 
 inherit systemd
 
-DEPENDS = "readline ppp ncurses gzip-native"
-DEPENDS_append_libc-musl = " libtirpc"
+DEPENDS = "readline ppp ncurses gzip-native rpcsvc-proto-native libtirpc"
 RDEPENDS_${PN} = "rpcbind"
 
 EXTRA_OEMAKE = "CC='${CC}' AS='${AS}' LD='${LD}' AR='${AR}' NM='${NM}' STRIP='${STRIP}'"
@@ -45,8 +42,7 @@ EXTRA_OEMAKE += "PPPD_VERSION=${PPPD_VERSION} SYS_LIBDIR=${libdir}"
 # enable self tests
 EXTRA_OEMAKE += "IPPOOL_TEST=y"
 
-CPPFLAGS += "${SELECTED_OPTIMIZATION}"
-CPPFLAGS_append_libc-musl = " -I${STAGING_INCDIR}/tirpc"
+CPPFLAGS += "${SELECTED_OPTIMIZATION} -I${STAGING_INCDIR}/tirpc"
 
 SYSTEMD_SERVICE_${PN} = "ippool.service"
 SYSTEMD_AUTO_ENABLE = "disable"

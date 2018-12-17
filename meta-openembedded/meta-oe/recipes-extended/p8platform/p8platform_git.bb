@@ -4,10 +4,11 @@ HOMEPAGE = "http://libcec.pulse-eight.com/"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://src/os.h;md5=752555fa94e82005d45fd201fee5bd33"
 
-PV = "2.1.0"
+PV = "2.1.0.1"
 
-SRC_URI = "git://github.com/Pulse-Eight/platform.git"
-SRCREV = "d7bceb64541cb046421cbcd4c98d91e9bf24822f"
+SRC_URI = "git://github.com/Pulse-Eight/platform.git \
+           file://0001-Make-resulting-cmake-config-relocatable.patch"
+SRCREV = "2d90f98620e25f47702c9e848380c0d93f29462b"
 
 S = "${WORKDIR}/git"
 

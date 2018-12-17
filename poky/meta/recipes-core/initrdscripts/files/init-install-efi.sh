@@ -291,7 +291,7 @@ umount /boot
 
 sync
 
-echo "Remove your installation media, and press ENTER"
+echo "Installation successful. Remove your installation media and press ENTER to reboot."
 
 read enter
 

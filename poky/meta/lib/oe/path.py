@@ -86,7 +86,7 @@ def copytree(src, dst):
     # This way we also preserve hardlinks between files in the tree.
 
     bb.utils.mkdirhier(dst)
-    cmd = "tar --xattrs --xattrs-include='*' -cf - -C %s -p . | tar --xattrs --xattrs-include='*' -xf - -C %s" % (src, dst)
+    cmd = "tar --xattrs --xattrs-include='*' -cf - -S -C %s -p . | tar --xattrs --xattrs-include='*' -xf - -C %s" % (src, dst)
     subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
 
 def copyhardlinktree(src, dst):
@@ -98,7 +98,7 @@ def copyhardlinktree(src, dst):
     if (os.stat(src).st_dev ==  os.stat(dst).st_dev):
         # Need to copy directories only with tar first since cp will error if two 
         # writers try and create a directory at the same time
-        cmd = "cd %s; find . -type d -print | tar --xattrs --xattrs-include='*' -cf - -C %s -p --no-recursion --files-from - | tar --xattrs --xattrs-include='*' -xhf - -C %s" % (src, src, dst)
+        cmd = "cd %s; find . -type d -print | tar --xattrs --xattrs-include='*' -cf - -S -C %s -p --no-recursion --files-from - | tar --xattrs --xattrs-include='*' -xhf - -C %s" % (src, src, dst)
         subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
         source = ''
         if os.path.isdir(src):
@@ -259,3 +259,37 @@ def is_path_parent(possible_parent, *paths):
         if not path_abs.startswith(possible_parent_abs):
             return False
     return True
+
+def which_wild(pathname, path=None, mode=os.F_OK, *, reverse=False, candidates=False):
+    """Search a search path for pathname, supporting wildcards.
+
+    Return all paths in the specific search path matching the wildcard pattern
+    in pathname, returning only the first encountered for each file. If
+    candidates is True, information on all potential candidate paths are
+    included.
+    """
+    paths = (path or os.environ.get('PATH', os.defpath)).split(':')
+    if reverse:
+        paths.reverse()
+
+    seen, files = set(), []
+    for index, element in enumerate(paths):
+        if not os.path.isabs(element):
+            element = os.path.abspath(element)
+
+        candidate = os.path.join(element, pathname)
+        globbed = glob.glob(candidate)
+        if globbed:
+            for found_path in sorted(globbed):
+                if not os.access(found_path, mode):
+                    continue
+                rel = os.path.relpath(found_path, element)
+                if rel not in seen:
+                    seen.add(rel)
+                    if candidates:
+                        files.append((found_path, [os.path.join(p, rel) for p in paths[:index+1]]))
+                    else:
+                        files.append(found_path)
+
+    return files
+

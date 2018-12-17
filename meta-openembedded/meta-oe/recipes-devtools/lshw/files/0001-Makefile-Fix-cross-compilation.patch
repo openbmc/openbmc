@@ -1,0 +1,57 @@
+From 62f9ed95b5d0feab426bff452be793c62a6b795a Mon Sep 17 00:00:00 2001
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Date: Wed, 6 Jun 2018 12:49:21 +0200
+Subject: [PATCH 1/2] Makefile: Fix cross compilation
+
+Allow building on ARMv7 and ARMv8.
+
+Upstream-Status: Submitted
+Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+---
+ src/Makefile      | 2 +-
+ src/core/Makefile | 2 +-
+ src/gui/Makefile  | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index b50586bc9234..654b786dd899 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -18,7 +18,7 @@ export MANDIR
+ export DATADIR
+ export SQLITE
+ 
+-CXX?=c++
++CXX?=$(CROSS_COMPILE)c++
+ INCLUDES=-I./core/
+ DEFINES=-DPREFIX=\"$(PREFIX)\" -DSBINDIR=\"$(SBINDIR)\" -DMANDIR=\"$(MANDIR)\" -DDATADIR=\"$(DATADIR)\"
+ CXXFLAGS=-g -Wall -g $(INCLUDES) $(DEFINES) $(RPM_OPT_FLAGS)
+diff --git a/src/core/Makefile b/src/core/Makefile
+index 5bf5a69cc6a6..2bd1b94c4175 100644
+--- a/src/core/Makefile
++++ b/src/core/Makefile
+@@ -1,6 +1,6 @@
+ PACKAGENAME?=lshw
+ 
+-CXX=c++
++CXX?=$(CROSS_COMPILE)c++
+ INCLUDES=
+ DEFINES=-DPREFIX=\"$(PREFIX)\" -DSBINDIR=\"$(SBINDIR)\" -DMANDIR=\"$(MANDIR)\" -DDATADIR=\"$(DATADIR)\"
+ CXXFLAGS?=-g -Wall $(INCLUDES) $(DEFINES) $(RPM_OPT_FLAGS)
+diff --git a/src/gui/Makefile b/src/gui/Makefile
+index 332ce5704819..b0f925490356 100644
+--- a/src/gui/Makefile
++++ b/src/gui/Makefile
+@@ -1,7 +1,7 @@
+ PACKAGENAME?=lshw
+ 
+-CXX?=c++
+-CC?=cc
++CXX?=$(CROSS_COMPILE)c++
++CC?=$(CROSS_COMPILE)cc
+ STRIP?=strip
+ OBJCOPY?=objcopy
+ 
+-- 
+2.7.4
+

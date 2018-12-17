@@ -11,7 +11,7 @@ SRC_URI = "http://sourceforge.net/projects/pamsshagentauth/files/pam_ssh_agent_a
 SRC_URI[md5sum] = "8dbe90ab3625e545036333e6f51ccf1d"
 SRC_URI[sha256sum] = "3c53d358d6eaed1b211239df017c27c6f9970995d14102ae67bae16d4f47a763"
 
-DEPENDS += "libpam openssl"
+DEPENDS += "libpam openssl10"
 
 inherit distro_features_check
 REQUIRED_DISTRO_FEATURES = "pam"

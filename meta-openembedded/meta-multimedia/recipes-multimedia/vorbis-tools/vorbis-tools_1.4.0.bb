@@ -8,7 +8,7 @@ SECTION = "multimedia"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
-DEPENDS = "libogg libvorbis curl libao"
+DEPENDS = "libogg libvorbis"
 
 SRC_URI = "http://downloads.xiph.org/releases/vorbis/${BP}.tar.gz \
            file://0001-oggenc-Fix-large-alloca-on-bad-AIFF-input.patch \
@@ -20,6 +20,7 @@ SRC_URI[sha256sum] = "a389395baa43f8e5a796c99daf62397e435a7e73531c9f44d9084055a0
 
 inherit autotools pkgconfig gettext
 
-PACKAGECONFIG ??= "flac"
+PACKAGECONFIG ??= "flac ogg123"
 PACKAGECONFIG[flac] = ",--without-flac,flac,libflac"
 PACKAGECONFIG[speex] = ",--without-speex,speex,speex"
+PACKAGECONFIG[ogg123] = "--enable-ogg123,--disable-ogg123,libao curl"

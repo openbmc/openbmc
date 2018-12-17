@@ -1,0 +1,59 @@
+From 2a50366ded329bfb39d387253450c9d5302c3503 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Tue, 14 Aug 2018 12:22:35 +0100
+Subject: [PATCH] as.c: Improve check for input file matching output file.
+
+When the assembler reports that the input and output are the same, report the
+file names involved, in order to help debugging.  Also do not equate two files
+are the same if the have the same inode value but reside on different file
+systems.
+
+Upstream-Status: Backport
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ gas/as.c      | 27 ++++++++++++++++++++-------
+ 2 files changed, 20 insertions(+), 7 deletions(-)
+
+diff --git a/gas/as.c b/gas/as.c
+index b2a908a..3105d06 100644
+--- a/gas/as.c
++++ b/gas/as.c
+@@ -1259,14 +1259,27 @@ main (int argc, char ** argv)
+ 	{
+ 	  struct stat sib;
+ 
+-	  if (stat (argv[i], &sib) == 0)
++	  /* Check that the input file and output file are different.  */
++	  if (stat (argv[i], &sib) == 0
++	      && sib.st_ino == sob.st_ino
++	      /* POSIX emulating systems may support stat() but if the
++		 underlying file system does not support a file serial number
++		 of some kind then they will return 0 for the inode.  So
++		 two files with an inode of 0 may not actually be the same.
++		 On real POSIX systems no ordinary file will ever have an
++		 inode of 0.  */
++	      && sib.st_ino != 0
++	      /* Different files may have the same inode number if they
++		 reside on different devices, so check the st_dev field as
++		 well.  */
++	      && sib.st_dev == sob.st_dev)
+ 	    {
+-	      if (sib.st_ino == sob.st_ino && sib.st_ino != 0)
+-		{
+-		  /* Don't let as_fatal remove the output file!  */
+-		  out_file_name = NULL;
+-		  as_fatal (_("The input and output files must be distinct"));
+-		}
++	      const char *saved_out_file_name = out_file_name;
++
++	      /* Don't let as_fatal remove the output file!  */
++	      out_file_name = NULL;
++	      as_fatal (_("The input '%s' and output '%s' files are the same"),
++			argv[i], saved_out_file_name);
+ 	    }
+ 	}
+     }
+-- 
+2.7.4
+

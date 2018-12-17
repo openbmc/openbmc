@@ -8,11 +8,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  src/third_party/wiredtiger/build_linux/wiredtiger_config.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/third_party/wiredtiger/build_linux/wiredtiger_config.h b/src/third_party/wiredtiger/build_linux/wiredtiger_config.h
-index 1122e1e319..fdfd48687b 100644
---- a/src/third_party/wiredtiger/build_linux/wiredtiger_config.h
-+++ b/src/third_party/wiredtiger/build_linux/wiredtiger_config.h
-@@ -101,7 +101,7 @@
+Index: git/src/third_party/wiredtiger/build_linux/wiredtiger_config.h
+===================================================================
+--- git.orig/src/third_party/wiredtiger/build_linux/wiredtiger_config.h
++++ git/src/third_party/wiredtiger/build_linux/wiredtiger_config.h
+@@ -104,7 +104,7 @@
  #define HAVE_STRING_H 1
  
  /* Define to 1 if you have the `strtouq' function. */
@@ -21,6 +21,3 @@ index 1122e1e319..fdfd48687b 100644
  
  /* Define to 1 if you have the `sync_file_range' function. */
  /* #undef HAVE_SYNC_FILE_RANGE */
--- 
-2.14.1
-

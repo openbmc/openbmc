@@ -1,0 +1,182 @@
+From 2155c1b2cf00e744e280c493eb74bf457dfcc3b1 Mon Sep 17 00:00:00 2001
+From: Randy MacLeod <Randy.MacLeod@windriver.com>
+Date: Sun, 21 Oct 2018 15:09:31 -0400
+Subject: [PATCH] Make local functions static to avoid assembler error
+
+Avoid mips32 x-compiler warnings such as:
+
+| ../../../valgrind-3.14.0/helgrind/tests/annotate_hbefore.c:360:6: warning: no previous prototype for 'do_signal' [-Wmissing-prototypes]
+|  void do_signal ( UWord* w )
+|       ^~~~~~~~~
+
+by making functions and global variables that are file scope be static
+and more importantly also avoid an assembler error:
+
+/tmp/cce22iiw.s: Assembler messages:
+/tmp/cce22iiw.s:446: Error: symbol `exit_0' is already defined
+/tmp/cce22iiw.s:448: Error: symbol `exit' is already defined
+/tmp/cce22iiw.s:915: Error: symbol `exit_0' is already defined
+/tmp/cce22iiw.s:917: Error: symbol `exit' is already defined
+
+Upstream-Status: Pending
+
+Signed-off-by: Randy MacLeod <Randy.MacLeod@windriver.com>
+---
+ helgrind/tests/annotate_hbefore.c | 34 +++++++++++++++----------------
+ 1 file changed, 17 insertions(+), 17 deletions(-)
+
+diff --git a/helgrind/tests/annotate_hbefore.c b/helgrind/tests/annotate_hbefore.c
+index e311714f7..f55514e45 100644
+--- a/helgrind/tests/annotate_hbefore.c
++++ b/helgrind/tests/annotate_hbefore.c
+@@ -24,7 +24,7 @@ typedef  unsigned long int  UWord;
+ 
+ // ppc64
+ /* return 1 if success, 0 if failure */
+-UWord do_acasW ( UWord* addr, UWord expected, UWord nyu )
++static UWord do_acasW ( UWord* addr, UWord expected, UWord nyu )
+ {
+   UWord old, success;
+ 
+@@ -57,7 +57,7 @@ UWord do_acasW ( UWord* addr, UWord expected, UWord nyu )
+ 
+ // ppc32
+ /* return 1 if success, 0 if failure */
+-UWord do_acasW ( UWord* addr, UWord expected, UWord nyu )
++static UWord do_acasW ( UWord* addr, UWord expected, UWord nyu )
+ {
+   UWord old, success;
+ 
+@@ -90,7 +90,7 @@ UWord do_acasW ( UWord* addr, UWord expected, UWord nyu )
+ 
+ // amd64
+ /* return 1 if success, 0 if failure */
+-UWord do_acasW ( UWord* addr, UWord expected, UWord nyu )
++static UWord do_acasW ( UWord* addr, UWord expected, UWord nyu )
+ {
+    UWord block[4] = { (UWord)addr, expected, nyu, 2 };
+    __asm__ __volatile__(
+@@ -113,7 +113,7 @@ UWord do_acasW ( UWord* addr, UWord expected, UWord nyu )
+ 
+ // x86
+ /* return 1 if success, 0 if failure */
+-UWord do_acasW ( UWord* addr, UWord expected, UWord nyu )
++static UWord do_acasW ( UWord* addr, UWord expected, UWord nyu )
+ {
+    UWord block[4] = { (UWord)addr, expected, nyu, 2 };
+    __asm__ __volatile__(
+@@ -138,7 +138,7 @@ UWord do_acasW ( UWord* addr, UWord expected, UWord nyu )
+ 
+ // arm
+ /* return 1 if success, 0 if failure */
+-UWord do_acasW ( UWord* addr, UWord expected, UWord nyu )
++static UWord do_acasW ( UWord* addr, UWord expected, UWord nyu )
+ {
+   UWord old, success;
+   UWord block[2] = { (UWord)addr, nyu };
+@@ -171,7 +171,7 @@ UWord do_acasW ( UWord* addr, UWord expected, UWord nyu )
+ 
+ // arm64
+ /* return 1 if success, 0 if failure */
+-UWord do_acasW ( UWord* addr, UWord expected, UWord nyu )
++static UWord do_acasW ( UWord* addr, UWord expected, UWord nyu )
+ {
+   UWord old, success;
+   UWord block[2] = { (UWord)addr, nyu };
+@@ -204,7 +204,7 @@ UWord do_acasW ( UWord* addr, UWord expected, UWord nyu )
+ 
+ // s390x
+ /* return 1 if success, 0 if failure */
+-UWord do_acasW(UWord* addr, UWord expected, UWord nyu )
++static UWord do_acasW(UWord* addr, UWord expected, UWord nyu )
+ {
+    int cc;
+ 
+@@ -223,7 +223,7 @@ UWord do_acasW(UWord* addr, UWord expected, UWord nyu )
+ 
+ // mips32
+ /* return 1 if success, 0 if failure */
+-UWord do_acasW ( UWord* addr, UWord expected, UWord nyu )
++static UWord do_acasW ( UWord* addr, UWord expected, UWord nyu )
+ {
+   UWord success;
+   UWord block[3] = { (UWord)addr, nyu, expected};
+@@ -256,7 +256,7 @@ UWord do_acasW ( UWord* addr, UWord expected, UWord nyu )
+ 
+ // mips64
+ /* return 1 if success, 0 if failure */
+-UWord do_acasW ( UWord* addr, UWord expected, UWord nyu )
++static UWord do_acasW ( UWord* addr, UWord expected, UWord nyu )
+ {
+   UWord success;
+   UWord block[3] = { (UWord)addr, nyu, expected};
+@@ -287,7 +287,7 @@ UWord do_acasW ( UWord* addr, UWord expected, UWord nyu )
+ 
+ #endif
+ 
+-void atomic_incW ( UWord* w )
++static void atomic_incW ( UWord* w )
+ {
+    while (1) {
+       UWord old = *w;
+@@ -301,7 +301,7 @@ void atomic_incW ( UWord* w )
+ 
+ #define NNN 1000000
+ 
+-void* thread_fn ( void* arg )
++static void* thread_fn ( void* arg )
+ {
+   UWord* w = (UWord*)arg;
+   int i;
+@@ -331,10 +331,10 @@ int main ( void )
+ 
+ #endif
+ 
+-int shared_var = 0;  // is not raced upon
++static int shared_var = 0;  // is not raced upon
+ 
+ 
+-void delayXms ( int i )
++static void delayXms ( int i )
+ {
+    struct timespec ts = { 0, 1 * 1000 * 1000 };
+    // We do the sleep in small pieces to have scheduling
+@@ -348,7 +348,7 @@ void delayXms ( int i )
+    }
+ }
+ 
+-void do_wait ( UWord* w )
++static void do_wait ( UWord* w )
+ {
+   UWord w0 = *w;
+   UWord volatile * wV = w;
+@@ -357,7 +357,7 @@ void do_wait ( UWord* w )
+   ANNOTATE_HAPPENS_AFTER(w);
+ }
+ 
+-void do_signal ( UWord* w )
++static void do_signal ( UWord* w )
+ {
+   ANNOTATE_HAPPENS_BEFORE(w);
+   atomic_incW(w);
+@@ -365,7 +365,7 @@ void do_signal ( UWord* w )
+ 
+ 
+ 
+-void* thread_fn1 ( void* arg )
++static void* thread_fn1 ( void* arg )
+ {
+   UWord* w = (UWord*)arg;
+   delayXms(500);    // ensure t2 gets to its wait first
+@@ -376,7 +376,7 @@ void* thread_fn1 ( void* arg )
+   return NULL;
+ }
+ 
+-void* thread_fn2 ( void* arg )
++static void* thread_fn2 ( void* arg )
+ {
+   UWord* w = (UWord*)arg;
+   do_wait(w);      // wait for h-b edge from first thread
+-- 
+2.17.0
+

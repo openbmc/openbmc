@@ -29,7 +29,7 @@ Index: open-vm-tools/configure.ac
 ===================================================================
 --- open-vm-tools.orig/configure.ac
 +++ open-vm-tools/configure.ac
-@@ -798,6 +798,7 @@ AC_CHECK_FUNCS(
+@@ -892,6 +892,7 @@ AC_CHECK_FUNCS(
  
  AC_CHECK_FUNCS([ecvt])
  AC_CHECK_FUNCS([fcvt])
@@ -37,7 +37,7 @@ Index: open-vm-tools/configure.ac
  
  AC_CHECK_FUNC([mkdtemp], [have_mkdtemp=yes])
  
-@@ -1063,10 +1064,13 @@ AC_PATH_PROG(
+@@ -1076,10 +1077,13 @@ AC_PATH_PROG(
  ###
  
  AC_CHECK_HEADERS([crypt.h])
@@ -133,12 +133,3 @@ Index: open-vm-tools/lib/nicInfo/nicInfoPosix.c
  # include <net/if.h>
  #endif
  #ifndef NO_DNET
-@@ -348,7 +352,7 @@ GuestInfoGetNicInfo(NicInfoV3 *nicInfo)
-  *
-  ******************************************************************************
-  */
--#if defined(__FreeBSD__) || defined(__APPLE__) || defined(USERWORLD)
-+#if defined(NO_DNET) && defined(HAVE_GETIFADDRS)
- 
- char *
- GuestInfoGetPrimaryIP(void)

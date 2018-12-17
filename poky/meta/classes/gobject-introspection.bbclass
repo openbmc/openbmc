@@ -40,4 +40,4 @@ FILES_${PN}_append = " ${libdir}/girepository-*/*.typelib"
     
 # .gir files go to dev package, as they're needed for developing (but not for
 # running) things that depends on introspection.
-FILES_${PN}-dev_append = " ${datadir}/gir-*/*.gir"
+FILES_${PN}-dev_append = " ${datadir}/gir-*/*.gir ${libdir}/gir-*/*.gir"

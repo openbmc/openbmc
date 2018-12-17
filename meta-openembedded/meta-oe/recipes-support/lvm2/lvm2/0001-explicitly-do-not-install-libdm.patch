@@ -1,4 +1,4 @@
-From 0a8e466fcf99622896e070c5133165e4278e8cfb Mon Sep 17 00:00:00 2001
+From 5a3e13ae94318c2bed60f875bb3852c45ce0113c Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Thu, 25 May 2017 05:27:11 -0400
 Subject: [PATCH] explicitly do not install libdm
@@ -9,12 +9,14 @@ explicitly do not do the installation here.
 Upstream-Status: Inappropriate [meta-oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+Signed-off-by: Andrew Bresticker <abrestic@waymo.com>
 ---
  libdm/Makefile.in | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ tools/Makefile.in | 3 ++-
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/libdm/Makefile.in b/libdm/Makefile.in
-index 3c9a4ce..45c91c6 100644
+index 66ec39513..c779c9d86 100644
 --- a/libdm/Makefile.in
 +++ b/libdm/Makefile.in
 @@ -77,9 +77,11 @@ ifeq ("@PKGCONFIG@", "yes")
@@ -23,14 +25,28 @@ index 3c9a4ce..45c91c6 100644
  
 -install: $(INSTALL_TYPE) install_include
 +install:
-+	echo "Do not install device mappler in lvm2"
++	echo "Do not install device mapper in lvm2"
  
 -install_device-mapper: install
 +install_device-mapper:
-+	echo "Do not install device mappler in lvm2"
++	echo "Do not install device mapper in lvm2"
  
  install_include: $(srcdir)/libdevmapper.h
  	$(INSTALL_DATA) -D $< $(includedir)/$(<F)
+diff --git a/tools/Makefile.in b/tools/Makefile.in
+index 103b76732..63ba7fc04 100644
+--- a/tools/Makefile.in
++++ b/tools/Makefile.in
+@@ -267,7 +267,8 @@ install_dmsetup_static: dmsetup.static
+ 	$(Q) $(INSTALL_PROGRAM) -D $< $(staticdir)/$(<F)
+ 	$(Q) $(LN_S) -f $(<F) $(staticdir)/dmstats
+ 
+-install_device-mapper: $(INSTALL_DMSETUP_TARGETS)
++install_device-mapper:
++	echo "Do not install device mapper in lvm2"
+ 
+ install_lvm2: $(INSTALL_LVM_TARGETS)
+ 
 -- 
-2.8.1
+2.19.0.397.gdd90340f6a-goog
 

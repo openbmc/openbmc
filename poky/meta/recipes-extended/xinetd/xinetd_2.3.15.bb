@@ -6,8 +6,7 @@ HOMEPAGE = "https://github.com/xinetd-org/xinetd"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=8ad8615198542444f84d28a6cf226dd8"
 
-DEPENDS = ""
-DEPENDS_append_libc-musl = " libtirpc "
+DEPENDS += "libtirpc"
 PR = "r2"
 
 # Blacklist a bogus tag in upstream check
@@ -42,8 +41,8 @@ EXTRA_OECONF="--disable-nls"
 PACKAGECONFIG ??= "tcp-wrappers"
 PACKAGECONFIG[tcp-wrappers] = "--with-libwrap,,tcp-wrappers"
 
-CFLAGS_append_libc-musl = " -I${STAGING_INCDIR}/tirpc "
-LDFLAGS_append_libc-musl = " -ltirpc "
+CFLAGS += "-I${STAGING_INCDIR}/tirpc"
+LDFLAGS += "-ltirpc"
 
 do_configure() {
 	# Looks like configure.in is broken, so we are skipping

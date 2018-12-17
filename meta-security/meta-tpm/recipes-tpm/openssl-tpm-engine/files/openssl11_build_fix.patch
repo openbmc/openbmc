@@ -1,0 +1,34 @@
+Fix compiling for openssl 1.1
+
+Upstream-Status: Pending
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: git/src/e_tpm.c
+===================================================================
+--- git.orig/src/e_tpm.c
++++ git/src/e_tpm.c
+@@ -265,19 +265,20 @@ static int tpm_decode_base64(unsigned ch
+ 				int *out_len)
+ {
+ 	int total_len, len, ret;
+-	EVP_ENCODE_CTX dctx;
++	EVP_ENCODE_CTX *dctx;
+ 
+-	EVP_DecodeInit(&dctx);
++	dctx = EVP_ENCODE_CTX_new();
++	EVP_DecodeInit(dctx);
+ 
+ 	total_len = 0;
+-	ret = EVP_DecodeUpdate(&dctx, outdata, &len, indata, in_len);
++	ret = EVP_DecodeUpdate(dctx, outdata, &len, indata, in_len);
+ 	if (ret < 0) {
+ 		TSSerr(TPM_F_TPM_DECODE_BASE64, TPM_R_DECODE_BASE64_FAILED);
+ 		return 1;
+ 	}
+ 
+ 	total_len += len;
+-	ret = EVP_DecodeFinal(&dctx, outdata, &len);
++	ret = EVP_DecodeFinal(dctx, outdata, &len);
+ 	if (ret < 0) {
+ 		TSSerr(TPM_F_TPM_DECODE_BASE64, TPM_R_DECODE_BASE64_FAILED);
+ 		return 1;

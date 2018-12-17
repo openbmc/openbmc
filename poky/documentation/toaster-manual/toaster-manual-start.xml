@@ -18,7 +18,7 @@
             Before you can use Toaster, you need to first set up your
             build system to run the Yocto Project.
             To do this, follow the instructions in the
-            "<ulink url='&YOCTO_DOCS_DEV_URL;#setting-up-the-development-host-to-use-the-yocto-project'>Preparing the Build Host</ulink>"
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#dev-preparing-the-build-host'>Preparing the Build Host</ulink>"
             section of the Yocto Project Development Tasks
             Manual.
  	    For Ubuntu/Debian, you might also need to do an additional install

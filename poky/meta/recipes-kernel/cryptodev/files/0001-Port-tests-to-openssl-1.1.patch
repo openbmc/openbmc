@@ -1,0 +1,103 @@
+From 2fe4bdeb8cdd0b0f46d9caed807812855d51ea56 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 28 Mar 2018 20:11:05 +0300
+Subject: [PATCH] Port tests to openssl 1.1
+
+Upstream-Status: Accepted [https://github.com/cryptodev-linux/cryptodev-linux/pull/36]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+---
+ tests/openssl_wrapper.c | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
+
+diff --git a/tests/openssl_wrapper.c b/tests/openssl_wrapper.c
+index 038c58f..dea2496 100644
+--- a/tests/openssl_wrapper.c
++++ b/tests/openssl_wrapper.c
+@@ -4,6 +4,7 @@
+ #include <openssl/aes.h>
+ #include <openssl/evp.h>
+ #include <openssl/hmac.h>
++#include <openssl/opensslv.h>
+ 
+ //#define DEBUG
+ 
+@@ -23,10 +24,17 @@ enum ctx_type {
+ 	ctx_type_md,
+ };
+ 
++#if OPENSSL_VERSION_NUMBER >= 0x10100000L
++union openssl_ctx {
++	HMAC_CTX *hmac;
++	EVP_MD_CTX *md;
++};
++#else
+ union openssl_ctx {
+ 	HMAC_CTX hmac;
+ 	EVP_MD_CTX md;
+ };
++#endif
+ 
+ struct ctx_mapping {
+ 	__u32 ses;
+@@ -63,6 +71,16 @@ static void remove_mapping(__u32 ses)
+ 	switch (mapping->type) {
+ 	case ctx_type_none:
+ 		break;
++#if OPENSSL_VERSION_NUMBER >= 0x10100000L
++	case ctx_type_hmac:
++		dbgp("%s: calling HMAC_CTX_free\n", __func__);
++		HMAC_CTX_free(mapping->ctx.hmac);
++		break;
++	case ctx_type_md:
++		dbgp("%s: calling EVP_MD_CTX_free\n", __func__);
++		EVP_MD_CTX_free(mapping->ctx.md);
++		break;
++#else
+ 	case ctx_type_hmac:
+ 		dbgp("%s: calling HMAC_CTX_cleanup\n", __func__);
+ 		HMAC_CTX_cleanup(&mapping->ctx.hmac);
+@@ -71,6 +89,7 @@ static void remove_mapping(__u32 ses)
+ 		dbgp("%s: calling EVP_MD_CTX_cleanup\n", __func__);
+ 		EVP_MD_CTX_cleanup(&mapping->ctx.md);
+ 		break;
++#endif
+ 	}
+ 	memset(mapping, 0, sizeof(*mapping));
+ }
+@@ -127,10 +146,17 @@ static int openssl_hmac(struct session_op *sess, struct crypt_op *cop)
+ 
+ 		mapping->ses = sess->ses;
+ 		mapping->type = ctx_type_hmac;
++#if OPENSSL_VERSION_NUMBER >= 0x10100000L
++		ctx = mapping->ctx.hmac;
++
++		dbgp("calling HMAC_CTX_new");
++		ctx = HMAC_CTX_new();
++#else
+ 		ctx = &mapping->ctx.hmac;
+ 
+ 		dbgp("calling HMAC_CTX_init");
+ 		HMAC_CTX_init(ctx);
++#endif
+ 		dbgp("calling HMAC_Init_ex");
+ 		if (!HMAC_Init_ex(ctx, sess->mackey, sess->mackeylen,
+ 				sess_to_evp_md(sess), NULL)) {
+@@ -172,10 +198,17 @@ static int openssl_md(struct session_op *sess, struct crypt_op *cop)
+ 
+ 		mapping->ses = sess->ses;
+ 		mapping->type = ctx_type_md;
++#if OPENSSL_VERSION_NUMBER >= 0x10100000L
++		ctx = mapping->ctx.md;
++
++		dbgp("calling EVP_MD_CTX_new");
++		ctx = EVP_MD_CTX_new();
++#else
+ 		ctx = &mapping->ctx.md;
+ 
+ 		dbgp("calling EVP_MD_CTX_init");
+ 		EVP_MD_CTX_init(ctx);
++#endif
+ 		dbgp("calling EVP_DigestInit");
+ 		EVP_DigestInit(ctx, sess_to_evp_md(sess));
+ 	}

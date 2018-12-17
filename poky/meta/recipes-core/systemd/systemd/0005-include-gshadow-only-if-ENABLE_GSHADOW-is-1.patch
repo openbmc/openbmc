@@ -1,0 +1,29 @@
+From a2c4d46944892174930135672508389a04e191f0 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Fri, 29 Jun 2018 13:53:29 +0800
+Subject: [PATCH 05/19] include gshadow only if ENABLE_GSHADOW is 1
+
+Upstream-Status: Inappropriate [musl]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/basic/user-util.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/basic/user-util.h b/src/basic/user-util.h
+index b74f16885..f9c1e29c4 100644
+--- a/src/basic/user-util.h
++++ b/src/basic/user-util.h
+@@ -2,7 +2,9 @@
+ #pragma once
+ 
+ #include <grp.h>
++#if ENABLE_GSHADOW
+ #include <gshadow.h>
++#endif
+ #include <pwd.h>
+ #include <shadow.h>
+ #include <stdbool.h>
+-- 
+2.11.0
+

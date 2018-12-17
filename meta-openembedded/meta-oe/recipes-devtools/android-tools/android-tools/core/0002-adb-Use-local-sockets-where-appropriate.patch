@@ -1,0 +1,70 @@
+From d855f042ca09a358cebe2d3c1d29d512afd7ebb8 Mon Sep 17 00:00:00 2001
+From: Hilko Bengen <bengen@debian.org>
+Date: Wed, 7 Sep 2016 12:58:47 +0300
+Subject: [PATCH] adb: Use local sockets where appropriate
+
+Upstream-Status: Inappropriate
+---
+ adb/adb.c             | 6 +++++-
+ adb/adb_client.c      | 5 +++--
+ adb/transport_local.c | 3 ++-
+ 3 files changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/adb/adb.c b/adb/adb.c
+index 10a1e0da26..027edd9359 100644
+--- a/adb/adb.c
++++ b/adb/adb.c
+@@ -1230,7 +1230,11 @@ int launch_server(int server_port)
+  */
+ void build_local_name(char* target_str, size_t target_size, int server_port)
+ {
+-  snprintf(target_str, target_size, "tcp:%d", server_port);
++  if (gListenAll > 0) {
++    snprintf(target_str, target_size, "tcp:%d", server_port);
++  } else {
++    snprintf(target_str, target_size, "local:%d", server_port);
++  }
+ }
+ 
+ #if !ADB_HOST
+diff --git a/adb/adb_client.c b/adb/adb_client.c
+index eb1720d22c..a383faefe3 100644
+--- a/adb/adb_client.c
++++ b/adb/adb_client.c
+@@ -185,12 +185,12 @@ int _adb_connect(const char *service)
+         strcpy(__adb_error, "service name too long");
+         return -1;
+     }
+-    snprintf(tmp, sizeof tmp, "%04x", len);
++    snprintf(tmp, sizeof tmp, "%d", __adb_server_port);
+ 
+     if (__adb_server_name)
+         fd = socket_network_client(__adb_server_name, __adb_server_port, SOCK_STREAM);
+     else
+-        fd = socket_loopback_client(__adb_server_port, SOCK_STREAM);
++        fd = socket_local_client(tmp, ANDROID_SOCKET_NAMESPACE_ABSTRACT, SOCK_STREAM);
+ 
+     if(fd < 0) {
+         strcpy(__adb_error, "cannot connect to daemon");
+@@ -201,6 +201,7 @@ int _adb_connect(const char *service)
+         return -1;
+     }
+ 
++    snprintf(tmp, sizeof tmp, "%04x", len);
+     if(writex(fd, tmp, 4) || writex(fd, service, len)) {
+         strcpy(__adb_error, "write failure during connection");
+         adb_close(fd);
+diff --git a/adb/transport_local.c b/adb/transport_local.c
+index 948cc15812..71582a8c88 100644
+--- a/adb/transport_local.c
++++ b/adb/transport_local.c
+@@ -121,7 +121,8 @@ int local_connect_arbitrary_ports(int console_port, int adb_port)
+     }
+ #endif
+     if (fd < 0) {
+-        fd = socket_loopback_client(adb_port, SOCK_STREAM);
++        snprintf(buf, sizeof buf, "%d", adb_port);
++        fd = socket_local_client(buf, ANDROID_SOCKET_NAMESPACE_ABSTRACT, SOCK_STREAM);
+     }
+ 
+     if (fd >= 0) {

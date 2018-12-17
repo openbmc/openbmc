@@ -1,0 +1,33 @@
+From 52959e8e01e39139d18f752e97283e45b4b7a426 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Wed, 18 Jul 2018 17:52:34 +0800
+Subject: [PATCH] protobuf: fix configure error
+
+fix below error:
+gnu-configize: 'configure.ac' or 'configure.in' is required
+
+third_party/googletest is git submodule of protobuf. Above error
+caused by missing submodule googletest.
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ configure.ac | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index aec10cf..7fbe57d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -214,7 +214,6 @@ AX_CXX_COMPILE_STDCXX([11], [noext], [mandatory])
+ #   too.
+ export CFLAGS
+ export CXXFLAGS
+-AC_CONFIG_SUBDIRS([third_party/googletest])
+ 
+ AC_CONFIG_FILES([Makefile src/Makefile benchmarks/Makefile conformance/Makefile protobuf.pc protobuf-lite.pc])
+ AC_OUTPUT
+-- 
+2.7.4
+

@@ -1,0 +1,30 @@
+From 33affa9ee97691efb73f439fcdba4adb8625a26a Mon Sep 17 00:00:00 2001
+From: Alistair Francis <alistair.francis@wdc.com>
+Date: Mon, 10 Sep 2018 12:59:48 -0700
+Subject: [PATCH] os_posix: Manually implement secure_getenv() if required
+
+Manually implement the secure_getenv() if we need to, this is required
+if using musl.
+
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Upstream-Status: Pending
+---
+ src/common/os_posix.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/common/os_posix.c b/src/common/os_posix.c
+index 2d70a0a29..fb09b6ce0 100644
+--- a/src/common/os_posix.c
++++ b/src/common/os_posix.c
+@@ -261,7 +261,7 @@ os_setenv(const char *name, const char *value, int overwrite)
+ /*
+  * secure_getenv -- provide GNU secure_getenv for FreeBSD
+  */
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || !HAVE___SECURE_GETENV
+ static char *
+ secure_getenv(const char *name)
+ {
+-- 
+2.17.1
+

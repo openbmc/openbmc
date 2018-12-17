@@ -1,7 +1,10 @@
-From ca25788e2563bad0d554deb9f4300d1e7d062825 Mon Sep 17 00:00:00 2001
-From: Aurelian Zanoschi <aurelian17@gmail.com>
-Date: Mon, 31 Jul 2017 20:25:15 +0300
+From 9a47fd5da546d148886c8890cd48249ebe826948 Mon Sep 17 00:00:00 2001
+From: Daniel Rank <dwrank@gmail.com>
+Date: Wed, 1 Aug 2018 23:32:00 -0700
 Subject: [PATCH] Add initial cross compile support
+
+Upstream-Status: Pending
+Signed-off-by: Daniel Rank <dwrank@gmail.com>
 
 ---
  devLib/Makefile             | 54 +++++++++++++++++++++++++--------------------
@@ -11,8 +14,8 @@ Subject: [PATCH] Add initial cross compile support
  examples/PiGlow/Makefile    |  4 ++--
  examples/q2w/Makefile       |  4 ++--
  gpio/Makefile               | 29 ++++++++++++------------
- wiringPi/Makefile           | 52 ++++++++++++++++++++++++-------------------
- 8 files changed, 120 insertions(+), 89 deletions(-)
+ wiringPi/Makefile           | 46 +++++++++++++++++++++-----------------
+ 8 files changed, 117 insertions(+), 86 deletions(-)
 
 diff --git a/devLib/Makefile b/devLib/Makefile
 index cf665d6..040c03a 100644
@@ -248,7 +251,7 @@ index 8f773bf..14aa6e4 100644
  
  ###############################################################################
 diff --git a/gpio/Makefile b/gpio/Makefile
-index f41a005..22753ee 100644
+index 9ec160d..a294242 100644
 --- a/gpio/Makefile
 +++ b/gpio/Makefile
 @@ -30,13 +30,17 @@ ifneq ($V,1)
@@ -284,8 +287,8 @@ index f41a005..22753ee 100644
 -	$Q chown root.root	$(DESTDIR)$(PREFIX)/bin/gpio
 -	$Q chmod 4755		$(DESTDIR)$(PREFIX)/bin/gpio
 -endif
--	$Q mkdir -p		$(DESTDIR)$(PREFIX)/man/man1
--	$Q cp gpio.1		$(DESTDIR)$(PREFIX)/man/man1
+-	$Q mkdir -p		$(DESTDIR)$(PREFIX)/share/man/man1
+-	$Q cp gpio.1		$(DESTDIR)$(PREFIX)/share/man/man1
 +	$Q install -d $(BIN_DIR)
 +	$Q install -m 4755 -o root -g root gpio $(BIN_DIR)
 +	$Q install -d $(DESTDIR)$(PREFIX)/share/man/man1
@@ -299,14 +302,14 @@ index f41a005..22753ee 100644
  	$Q echo "[UnInstall]"
 -	$Q rm -f $(DESTDIR)$(PREFIX)/bin/gpio
 +	$Q rm -f $(BIN_DIR)/gpio
- 	$Q rm -f $(DESTDIR)$(PREFIX)/man/man1/gpio.1
+ 	$Q rm -f $(DESTDIR)$(PREFIX)/share/man/man1/gpio.1
  
  .PHONY:	depend
 diff --git a/wiringPi/Makefile b/wiringPi/Makefile
-index e1868b9..750d290 100644
+index 287fa58..670a6db 100644
 --- a/wiringPi/Makefile
 +++ b/wiringPi/Makefile
-@@ -25,21 +25,25 @@ VERSION=$(shell cat ../VERSION)
+@@ -25,22 +25,26 @@ VERSION=$(shell cat ../VERSION)
  DESTDIR?=/usr
  PREFIX?=/local
  
@@ -335,11 +338,13 @@ index e1868b9..750d290 100644
 +INCLUDE	?= -I.
  DEFS	= -D_GNU_SOURCE
 -CFLAGS	= $(DEBUG) $(DEFS) -Wformat=2 -Wall -Wextra -Winline $(INCLUDE) -pipe -fPIC
+-#CFLAGS	= $(DEBUG) $(DEFS) -Wformat=2 -Wall -Wextra -Wconversion -Winline $(INCLUDE) -pipe -fPIC
 +CFLAGS	= $(DEBUG) $(DEFS) $(INCLUDE) -Wformat=2 -Wall -Wextra -Winline -pipe -fPIC
++#CFLAGS	= $(DEBUG) $(DEFS) $(INCLUDE) -Wformat=2 -Wall -Wextra -Wconversion -Winline -pipe -fPIC
  
  LIBS    = -lm -lpthread -lrt -lcrypt
  
-@@ -78,17 +82,17 @@ $(STATIC):	$(OBJ)
+@@ -75,17 +79,17 @@ static:
  
  $(DYNAMIC):	$(OBJ)
  	$Q echo "[Link (Dynamic)]"
@@ -360,7 +365,7 @@ index e1868b9..750d290 100644
  
  .PHONY:	tags
  tags:	$(SRC)
-@@ -99,22 +103,22 @@ tags:	$(SRC)
+@@ -96,13 +100,13 @@ tags:	$(SRC)
  .PHONY:	install
  install:	$(DYNAMIC)
  	$Q echo "[Install Headers]"
@@ -378,22 +383,9 @@ index e1868b9..750d290 100644
 +	$Q ln -sf $(DYNAMIC)						$(LIB_DIR)/$(BASE_NAME).so
 +	$Q ln -sf $(DYNAMIC)						$(LIB_DIR)/$(BASE_NAME).so.$(DYN_VERS_MAJ)
  
- .PHONY:	install-static
- install-static:	$(STATIC)
- 	$Q echo "[Install Headers]"
--	$Q install -m 0755 -d						$(DESTDIR)$(PREFIX)/include
--	$Q install -m 0644 $(HEADERS)					$(DESTDIR)$(PREFIX)/include
-+	$Q install -m 0755 -d						$(INCLUDE_DIR)
-+	$Q install -m 0644 $(HEADERS)					$(INCLUDE_DIR)
- 	$Q echo "[Install Static Lib]"
--	$Q install -m 0755 -d						$(DESTDIR)$(PREFIX)/lib
--	$Q install -m 0755 libwiringPi.a					$(DESTDIR)$(PREFIX)/lib
-+	$Q install -m 0755 -d						$(LIB_DIR)
-+	$Q install -m 0755 $(STATIC)					$(LIB_DIR)
- 
  .PHONY:	install-deb
  install-deb:	$(DYNAMIC)
-@@ -129,9 +133,11 @@ install-deb:	$(DYNAMIC)
+@@ -117,9 +121,11 @@ install-deb:	$(DYNAMIC)
  .PHONY:	uninstall
  uninstall:
  	$Q echo "[UnInstall]"

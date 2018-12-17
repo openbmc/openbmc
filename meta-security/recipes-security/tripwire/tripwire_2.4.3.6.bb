@@ -16,11 +16,12 @@ SRC_URI = "\
 	file://twcfg.txt \
 	file://twinstall.sh \
 	file://twpol-yocto.txt \
+	file://run-ptest \
        "
 
 S = "${WORKDIR}/git"
 
-inherit autotools-brokensep update-rc.d
+inherit autotools-brokensep update-rc.d ptest
 
 INITSCRIPT_NAME = "tripwire"
 INITSCRIPT_PARAMS = "start 40 S ."
@@ -58,9 +59,15 @@ do_install () {
     install -m 0644 ${WORKDIR}/tripwire.txt ${D}${docdir}/${BPN}
 }
 
+do_install_ptest_append () {
+	install -d ${D}${PTEST_PATH}/tests
+	cp -a ${S}/src/test-harness/* ${D}${PTEST_PATH}
+}
 
 FILES_${PN} += "${libdir} ${docdir}/${PN}/*"
 FILES_${PN}-dbg += "${sysconfdir}/${PN}/.debug"
 FILES_${PN}-staticdev += "${localstatedir}/lib/${PN}/lib*.a"
+FILES_${PN}-ptest += "${PTEST_PATH}/tests "
 
 RDEPENDS_${PN} += " perl nano msmtp cronie"
+RDEPENDS_${PN}-ptest = " perl lib-perl"

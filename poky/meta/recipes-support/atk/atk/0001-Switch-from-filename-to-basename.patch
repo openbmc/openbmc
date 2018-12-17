@@ -1,0 +1,38 @@
+Upstream-Status: Submitted
+
+From 0330251715fee908f2f162565d4fa1df5030d0c0 Mon Sep 17 00:00:00 2001
+From: Jeremy Puhlman <jpuhlman@mvista.com>
+Date: Thu, 14 Jun 2018 17:21:49 +0000
+Subject: [PATCH] Switch from filename to basename
+
+When atk-enum-types.h is installed in to a system, the user likely has
+no access to the location where the headers were built, especially if
+the software was built in a sysroot environment. If the headers were
+built for a mulitlib environment, the build pathing may be different.
+Subsequently, if two mulitlib variants of atk are installed together the
+headers conflict for no other reason then they were built in two
+different locations. Switching from filename to basename, still should
+provide sufficient information on the providence of the enums, while not
+conflicting for really no good reason.
+
+Signed-off-by: Jeremy Puhlman <jpuhlman@mvista.com>
+---
+ atk/atk-enum-types.h.template | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/atk/atk-enum-types.h.template b/atk/atk-enum-types.h.template
+index 7b4cec4..8321c24 100644
+--- a/atk/atk-enum-types.h.template
++++ b/atk/atk-enum-types.h.template
+@@ -14,7 +14,7 @@ G_BEGIN_DECLS
+ 
+ /*** BEGIN file-production ***/
+ 
+-/* enumerations from "@filename@" */
++/* enumerations from "@basename@" */
+ /*** END file-production ***/
+ 
+ /*** BEGIN value-header ***/
+-- 
+2.14.1.459.g238e487
+

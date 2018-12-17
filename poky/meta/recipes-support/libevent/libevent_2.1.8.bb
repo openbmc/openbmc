@@ -28,11 +28,15 @@ inherit autotools
 # Needed for Debian packaging
 LEAD_SONAME = "libevent-2.1.so"
 
-inherit ptest
+inherit ptest multilib_header
 
 DEPENDS = "zlib"
 
 BBCLASSEXTEND = "native nativesdk"
+
+do_install_append() {
+        oe_multilib_header event2/event-config.h
+}
 
 do_install_ptest() {
 	install -d ${D}${PTEST_PATH}/test

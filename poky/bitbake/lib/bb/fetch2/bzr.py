@@ -41,8 +41,9 @@ class Bzr(FetchMethod):
         init bzr specific variable within url data
         """
         # Create paths to bzr checkouts
+        bzrdir = d.getVar("BZRDIR") or (d.getVar("DL_DIR") + "/bzr")
         relpath = self._strip_leading_slashes(ud.path)
-        ud.pkgdir = os.path.join(d.expand('${BZRDIR}'), ud.host, relpath)
+        ud.pkgdir = os.path.join(bzrdir, ud.host, relpath)
 
         ud.setup_revisions(d)
 
@@ -57,7 +58,7 @@ class Bzr(FetchMethod):
         command is "fetch", "update", "revno"
         """
 
-        basecmd = d.expand('${FETCHCMD_bzr}')
+        basecmd = d.getVar("FETCHCMD_bzr") or "/usr/bin/env bzr"
 
         proto =  ud.parm.get('protocol', 'http')
 

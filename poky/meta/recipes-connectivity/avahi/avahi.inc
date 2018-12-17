@@ -13,15 +13,19 @@ SECTION = "network"
 # major part is under LGPLv2.1+, but several .dtd, .xsl, initscripts and
 # python scripts are under GPLv2+
 LICENSE = "GPLv2+ & LGPLv2.1+"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=2d5025d4aa3495befef8f17206a5b0a1 \
+                    file://avahi-common/address.h;endline=25;md5=b1d1d2cda1c07eb848ea7d6215712d9d \
+                    file://avahi-core/dns.h;endline=23;md5=6fe82590b81aa0ddea5095b548e2fdcb \
+                    file://avahi-daemon/main.c;endline=21;md5=9ee77368c5407af77caaef1b07285969 \
+                    file://avahi-client/client.h;endline=23;md5=f4ac741a25c4f434039ba3e18c8674cf"
+
+SRC_URI = "https://github.com/lathiat/avahi/releases/download/v${PV}/avahi-${PV}.tar.gz"
+
+UPSTREAM_CHECK_URI = "https://github.com/lathiat/avahi/releases/"
+SRC_URI[md5sum] = "d76c59d0882ac6c256d70a2a585362a6"
+SRC_URI[sha256sum] = "57a99b5dfe7fdae794e3d1ee7a62973a368e91e414bd0dfa5d84434de5b14804"
 
 DEPENDS = "expat libcap libdaemon glib-2.0 intltool-native"
-
-SRC_URI = "https://github.com/lathiat/avahi/releases/download/v${PV}/avahi-${PV}.tar.gz \
-          file://00avahi-autoipd \
-          file://99avahi-autoipd \
-          file://initscript.patch \
-          "
-UPSTREAM_CHECK_URI = "https://github.com/lathiat/avahi/releases/"
 
 # For gtk related PACKAGECONFIGs: gtk, gtk3
 AVAHI_GTK ?= ""
@@ -31,18 +35,7 @@ PACKAGECONFIG[dbus] = "--enable-dbus,--disable-dbus,dbus"
 PACKAGECONFIG[gtk] = "--enable-gtk,--disable-gtk,gtk+"
 PACKAGECONFIG[gtk3] = "--enable-gtk3,--disable-gtk3,gtk+3"
 
-USERADD_PACKAGES = "avahi-daemon avahi-autoipd"
-USERADD_PARAM_avahi-daemon = "--system --home /run/avahi-daemon \
-                              --no-create-home --shell /bin/false \
-                              --user-group avahi"
-
-USERADD_PARAM_avahi-autoipd = "--system --home /run/avahi-autoipd \
-                              --no-create-home --shell /bin/false \
-                              --user-group \
-                              -c \"Avahi autoip daemon\" \
-                              avahi-autoipd"
-
-inherit autotools pkgconfig update-rc.d gettext useradd gobject-introspection
+inherit autotools pkgconfig gettext gobject-introspection
 
 EXTRA_OECONF = "--with-avahi-priv-access-group=adm \
              --disable-stack-protector \
@@ -73,49 +66,7 @@ do_compile_prepend() {
     export GIR_EXTRA_LIBS_PATH="${B}/avahi-gobject/.libs:${B}/avahi-common/.libs:${B}/avahi-client/.libs:${B}/avahi-glib/.libs"
 }
 
-PACKAGES =+ "avahi-daemon libavahi-common libavahi-core libavahi-client avahi-dnsconfd libavahi-glib libavahi-ui avahi-autoipd avahi-utils"
-
-# As avahi doesn't put any files into PN, clear the files list to avoid problems
-# if extra libraries appear.
-FILES_${PN} = ""
-FILES_avahi-autoipd = "${sbindir}/avahi-autoipd \
-                       ${sysconfdir}/avahi/avahi-autoipd.action \
-                       ${sysconfdir}/dhcp/*/avahi-autoipd \
-                       ${sysconfdir}/udhcpc.d/00avahi-autoipd \
-                       ${sysconfdir}/udhcpc.d/99avahi-autoipd"
-FILES_libavahi-common = "${libdir}/libavahi-common.so.*"
-FILES_libavahi-core = "${libdir}/libavahi-core.so.* ${libdir}/girepository-1.0/AvahiCore*.typelib"
-FILES_avahi-daemon = "${sbindir}/avahi-daemon \
-                      ${sysconfdir}/avahi/avahi-daemon.conf \
-                      ${sysconfdir}/avahi/hosts \
-                      ${sysconfdir}/avahi/services \
-                      ${sysconfdir}/dbus-1 \
-                      ${sysconfdir}/init.d/avahi-daemon \
-                      ${datadir}/avahi/introspection/*.introspect \
-                      ${datadir}/avahi/avahi-service.dtd \
-                      ${datadir}/avahi/service-types \
-                      ${datadir}/dbus-1/system-services"
-FILES_libavahi-client = "${libdir}/libavahi-client.so.*"
-FILES_libavahi-ui = "${libdir}/libavahi-ui.so.*"
-FILES_avahi-dnsconfd = "${sbindir}/avahi-dnsconfd \
-                        ${sysconfdir}/avahi/avahi-dnsconfd.action \
-                        ${sysconfdir}/init.d/avahi-dnsconfd"
-FILES_libavahi-glib = "${libdir}/libavahi-glib.so.*"
-FILES_libavahi-gobject = "${libdir}/libavahi-gobject.so.*  ${libdir}/girepository-1.0/Avahi*.typelib"
-FILES_avahi-utils = "${bindir}/avahi-*"
-
-RDEPENDS_${PN}-dev = "avahi-daemon (= ${EXTENDPKGV}) libavahi-core (= ${EXTENDPKGV}) libavahi-client (= ${EXTENDPKGV})"
-
-RRECOMMENDS_avahi-daemon_append_libc-glibc = " libnss-mdns"
 RRECOMMENDS_${PN}_append_libc-glibc = " libnss-mdns"
-
-CONFFILES_avahi-daemon = "${sysconfdir}/avahi/avahi-daemon.conf"
-
-INITSCRIPT_PACKAGES = "avahi-daemon avahi-dnsconfd"
-INITSCRIPT_NAME_avahi-daemon = "avahi-daemon"
-INITSCRIPT_PARAMS_avahi-daemon = "defaults 21 19"
-INITSCRIPT_NAME_avahi-dnsconfd = "avahi-dnsconfd"
-INITSCRIPT_PARAMS_avahi-dnsconfd = "defaults 22 19"
 
 do_install() {
 	autotools_do_install
@@ -123,17 +74,4 @@ do_install() {
 	rm -rf ${D}${datadir}/dbus-1/interfaces
 	test -d ${D}${datadir}/dbus-1 && rmdir --ignore-fail-on-non-empty ${D}${datadir}/dbus-1
 	rm -rf ${D}${libdir}/avahi
-
-	install -d ${D}${sysconfdir}/udhcpc.d
-	install ${WORKDIR}/00avahi-autoipd ${D}${sysconfdir}/udhcpc.d
-	install ${WORKDIR}/99avahi-autoipd ${D}${sysconfdir}/udhcpc.d
-}
-
-# At the time the postinst runs, dbus might not be setup so only restart if running 
-# Don't exit early, because update-rc.d needs to run subsequently.
-
-pkg_postinst_avahi-daemon () {
-if [ -z "$D" ]; then
-	killall -q -HUP dbus-daemon || true
-fi
 }

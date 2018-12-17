@@ -1,0 +1,67 @@
+From 9e67b4c94b94493123d38379bd9b3eceae23a6f1 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Fri, 7 Sep 2018 12:21:12 -0400
+Subject: [PATCH] Fix: net: expose sk wmem in sock_exceed_buf_limit tracepoint
+ (4.19)
+
+See upstream commit:
+
+  commit d6f19938eb031ee2158272757db33258153ae59c
+  Author: Yafang Shao <laoar.shao@gmail.com>
+  Date:   Sun Jul 1 23:31:30 2018 +0800
+
+    net: expose sk wmem in sock_exceed_buf_limit tracepoint
+
+    Currently trace_sock_exceed_buf_limit() only show rmem info,
+    but wmem limit may also be hit.
+    So expose wmem info in this tracepoint as well.
+
+    Regarding memcg, I think it is better to introduce a new tracepoint(if
+    that is needed), i.e. trace_memcg_limit_hit other than show memcg info in
+    trace_sock_exceed_buf_limit.
+
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Upstream-Status: Backport
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ instrumentation/events/lttng-module/sock.h | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/instrumentation/events/lttng-module/sock.h b/instrumentation/events/lttng-module/sock.h
+index 5cd02ca..cd0c92b 100644
+--- a/instrumentation/events/lttng-module/sock.h
++++ b/instrumentation/events/lttng-module/sock.h
+@@ -21,7 +21,28 @@ LTTNG_TRACEPOINT_EVENT(sock_rcvqueue_full,
+ 	)
+ )
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,15,0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,19,0))
++
++LTTNG_TRACEPOINT_EVENT(sock_exceed_buf_limit,
++
++	TP_PROTO(struct sock *sk, struct proto *prot, long allocated, int kind),
++
++	TP_ARGS(sk, prot, allocated, kind),
++
++	TP_FIELDS(
++		ctf_string(name, prot->name)
++		ctf_array(long, sysctl_mem, prot->sysctl_mem, 3)
++		ctf_integer(long, allocated, allocated)
++		ctf_integer(int, sysctl_rmem, sk_get_rmem0(sk, prot))
++		ctf_integer(int, rmem_alloc, atomic_read(&sk->sk_rmem_alloc))
++		ctf_integer(int, sysctl_wmem, sk_get_wmem0(sk, prot))
++		ctf_integer(int, wmem_alloc, refcount_read(&sk->sk_wmem_alloc))
++		ctf_integer(int, wmem_queued, sk->sk_wmem_queued)
++		ctf_integer(int, kind, kind)
++	)
++)
++
++#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4,15,0))
+ 
+ LTTNG_TRACEPOINT_EVENT(sock_exceed_buf_limit,
+ 
+-- 
+2.7.4
+

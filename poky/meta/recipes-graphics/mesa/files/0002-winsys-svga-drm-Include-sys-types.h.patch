@@ -1,0 +1,34 @@
+From 7792f228991744a0396b8bf811e281dca86165d3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 16 Aug 2017 18:58:20 -0700
+Subject: [PATCH 2/6] winsys/svga/drm: Include sys/types.h
+Organization: O.S. Systems Software LTDA.
+
+vmw_screen.h uses dev_t which is defines in sys/types.h
+this header is required to be included for getting dev_t
+definition. This issue happens on musl C library, it is hidden
+on glibc since sys/types.h is included through another
+system headers
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Backport [7dfdfbf8c37e52e7b9b09f7d1d434edad3ebc864]
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+---
+ src/gallium/winsys/svga/drm/vmw_screen.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/gallium/winsys/svga/drm/vmw_screen.h b/src/gallium/winsys/svga/drm/vmw_screen.h
+index f21cabb51f..4c972fdaa9 100644
+--- a/src/gallium/winsys/svga/drm/vmw_screen.h
++++ b/src/gallium/winsys/svga/drm/vmw_screen.h
+@@ -41,6 +41,7 @@
+ #include "svga_winsys.h"
+ #include "pipebuffer/pb_buffer_fenced.h"
+ #include <os/os_thread.h>
++#include <sys/types.h>
+ 
+ #define VMW_GMR_POOL_SIZE (16*1024*1024)
+ #define VMW_QUERY_POOL_SIZE (8192)
+-- 
+2.18.0
+

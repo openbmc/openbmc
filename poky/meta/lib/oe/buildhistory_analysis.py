@@ -13,6 +13,7 @@ import os.path
 import difflib
 import git
 import re
+import shlex
 import hashlib
 import collections
 import bb.utils
@@ -31,13 +32,6 @@ ver_monitor_fields = ['PKGE', 'PKGV', 'PKGR']
 monitor_numeric_threshold = 10
 # Image files to monitor (note that image-info.txt is handled separately)
 img_monitor_files = ['installed-package-names.txt', 'files-in-image.txt']
-# Related context fields for reporting (note: PE, PV & PR are always reported for monitored package fields)
-related_fields = {}
-related_fields['RDEPENDS'] = ['DEPENDS']
-related_fields['RRECOMMENDS'] = ['DEPENDS']
-related_fields['FILELIST'] = ['FILES']
-related_fields['files-in-image.txt'] = ['installed-package-names.txt', 'USER_CLASSES', 'IMAGE_CLASSES', 'ROOTFS_POSTPROCESS_COMMAND', 'IMAGE_POSTPROCESS_COMMAND']
-related_fields['installed-package-names.txt'] = ['IMAGE_FEATURES', 'IMAGE_LINGUAS', 'IMAGE_INSTALL', 'BAD_RECOMMENDATIONS', 'NO_RECOMMENDATIONS', 'PACKAGE_EXCLUDE']
 
 colours = {
     'colour_default': '',
@@ -67,7 +61,6 @@ class ChangeRecord:
         self.oldvalue = oldvalue
         self.newvalue = newvalue
         self.monitored = monitored
-        self.related = []
         self.filechanges = None
 
     def __str__(self):
@@ -123,10 +116,13 @@ class ChangeRecord:
                 aitems = pkglist_combine(depvera)
                 bitems = pkglist_combine(depverb)
             else:
-                aitems = self.oldvalue.split()
-                bitems = self.newvalue.split()
                 if self.fieldname == 'FILELIST':
+                    aitems = shlex.split(self.oldvalue)
+                    bitems = shlex.split(self.newvalue)
                     renamed_dirs, aitems, bitems = detect_renamed_dirs(aitems, bitems)
+                else:
+                    aitems = self.oldvalue.split()
+                    bitems = self.newvalue.split()
 
             removed = list(set(aitems) - set(bitems))
             added = list(set(bitems) - set(aitems))
@@ -205,13 +201,6 @@ class ChangeRecord:
                 out = ''
         else:
             out = '{} changed from "{colour_remove}{}{colour_default}" to "{colour_add}{}{colour_default}"'.format(self.fieldname, self.oldvalue, self.newvalue, **colours)
-
-        if self.related:
-            for chg in self.related:
-                if not outer and chg.fieldname in ['PE', 'PV', 'PR']:
-                    continue
-                for line in chg._str_internal(False).splitlines():
-                    out += '\n  * %s' % line
 
         return '%s%s' % (prefix, out) if out else ''
 
@@ -424,9 +413,13 @@ def compare_dict_blobs(path, ablob, bblob, report_all, report_ver):
                     (depvera, depverb) = compare_pkg_lists(astr, bstr)
                     if depvera == depverb:
                         continue
-                alist = astr.split()
+                if key == 'FILELIST':
+                    alist = shlex.split(astr)
+                    blist = shlex.split(bstr)
+                else:
+                    alist = astr.split()
+                    blist = bstr.split()
                 alist.sort()
-                blist = bstr.split()
                 blist.sort()
                 # We don't care about the removal of self-dependencies
                 if pkgname in alist and not pkgname in blist:
@@ -634,17 +627,6 @@ def process_changes(repopath, revision1, revision2='HEAD', report_all=False, rep
             if filename != 'latest' and filename.startswith('latest.'):
                 chg = ChangeRecord(path, filename[7:], d.a_blob.data_stream.read().decode('utf-8'), '', True)
                 changes.append(chg)
-
-    # Link related changes
-    for chg in changes:
-        if chg.monitored:
-            for chg2 in changes:
-                # (Check dirname in the case of fields from recipe info files)
-                if chg.path == chg2.path or os.path.dirname(chg.path) == chg2.path:
-                    if chg2.fieldname in related_fields.get(chg.fieldname, []):
-                        chg.related.append(chg2)
-                    elif chg.path == chg2.path and chg.path.startswith('packages/') and chg2.fieldname in ['PE', 'PV', 'PR']:
-                        chg.related.append(chg2)
 
     # filter out unwanted paths
     if exclude_path:

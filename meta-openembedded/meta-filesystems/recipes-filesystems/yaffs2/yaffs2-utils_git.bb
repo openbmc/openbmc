@@ -5,7 +5,9 @@ SECTION = "base"
 HOMEPAGE = "http://www.yaffs.net"
 
 LICENSE = "GPLv2"
-LIC_FILES_CHKSUM = "file://utils/mkyaffs2image.c;beginline=12;endline=14;md5=5f5464f9b3e981ca574e65b00e438561"
+LIC_FILES_CHKSUM = "file://utils/mkyaffs2image.c;beginline=11;endline=13;md5=5f5464f9b3e981ca574e65b00e438561 \
+                    file://utils/mkyaffsimage.c;beginline=10;endline=12;md5=5f5464f9b3e981ca574e65b00e438561 \
+                    "
 
 PV = "0.0+git${SRCPV}"
 
@@ -17,7 +19,10 @@ SRC_URI = "git://www.aleph1.co.uk/yaffs2;protocol=git;branch=master \
            file://0001-define-loff_t-if-not-already-defined.patch \
            "
 
-SRCREV = "bc76682d93955cfb33051beb503ad9f8a5450578"
+SRCREV = "3439fa4e60dd9799766b2c101f799ed9e565b632"
+
+UPSTREAM_CHECK_COMMITS = "1"
+
 S = "${WORKDIR}/git"
 
 CFLAGS_append = " -I.. -DCONFIG_YAFFS_UTIL -DCONFIG_YAFFS_DEFINES_TYPES"

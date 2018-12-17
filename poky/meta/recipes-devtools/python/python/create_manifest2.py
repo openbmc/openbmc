@@ -137,7 +137,7 @@ for key in old_manifest:
     # Handle special cases, we assume that when they were manually added 
     # to the manifest we knew what we were doing.
     print ('Handling package %s' % key)
-    special_packages=['misc', 'modules', 'dev']
+    special_packages=['misc', 'modules', 'tests', 'dev']
     if key in special_packages or 'staticdev' in key:
         print('Passing %s package directly' % key)
         new_manifest[key]=old_manifest[key]

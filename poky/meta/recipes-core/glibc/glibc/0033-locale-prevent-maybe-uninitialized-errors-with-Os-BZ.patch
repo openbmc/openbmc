@@ -1,0 +1,68 @@
+From cbada1a1b218c1ef61d0eb4363fad7598e6509d6 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Sun, 30 Sep 2018 09:16:48 +0000
+Subject: [PATCH] locale: prevent maybe-uninitialized errors with -Os [BZ
+ #19444]
+
+Fixes following error when building for aarch64 with -Os:
+| In file included from strcoll_l.c:43:
+| strcoll_l.c: In function '__strcoll_l':
+| ../locale/weight.h:31:26: error: 'seq2.back_us' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+|    int_fast32_t i = table[*(*cpp)++];
+|                           ^~~~~~~~~
+| strcoll_l.c:304:18: note: 'seq2.back_us' was declared here
+|    coll_seq seq1, seq2;
+|                   ^~~~
+| In file included from strcoll_l.c:43:
+| ../locale/weight.h:31:26: error: 'seq1.back_us' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+|    int_fast32_t i = table[*(*cpp)++];
+|                           ^~~~~~~~~
+| strcoll_l.c:304:12: note: 'seq1.back_us' was declared here
+|    coll_seq seq1, seq2;
+|             ^~~~
+
+        Partial fix for [BZ #23716]
+        * locale/weight.h: Fix build with -Os.
+
+Work around the issue instead of removing -O like we do with
+SELECTED_OPTIMIZATION
+
+Upstream-Status: Submitted [https://www.sourceware.org/ml/libc-alpha/2018-09/msg00539.html]
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ ChangeLog       | 4 ++++
+ locale/weight.h | 7 +++++++
+ 2 files changed, 11 insertions(+)
+
+diff --git a/ChangeLog b/ChangeLog
+index 216336edc9..84fbbf47ed 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,7 @@
++2018-09-30  Martin Jansa  <Martin.Jansa@gmail.com>
++	Partial fix for [BZ #23716]
++	* locale/weight.h: Fix build with -Os.
++
+ 2018-09-30  Martin Jansa  <Martin.Jansa@gmail.com>
+ 	Partial fix for [BZ #23716]
+ 	* sysdeps/ieee754/soft-fp/s_fdiv.c: Fix build with -O.
+diff --git a/locale/weight.h b/locale/weight.h
+index 6028d3595e..10bcea25e5 100644
+--- a/locale/weight.h
++++ b/locale/weight.h
+@@ -28,7 +28,14 @@ findidx (const int32_t *table,
+ 	 const unsigned char *extra,
+ 	 const unsigned char **cpp, size_t len)
+ {
++  /* With GCC 8 when compiling with -Os the compiler warns that
++     seq1.back_us and seq2.back_us might be used uninitialized.
++     This uninitialized use is impossible for the same reason
++     as described in comments in locale/weightwc.h.  */
++  DIAG_PUSH_NEEDS_COMMENT;
++  DIAG_IGNORE_Os_NEEDS_COMMENT (8, "-Wmaybe-uninitialized");
+   int_fast32_t i = table[*(*cpp)++];
++  DIAG_POP_NEEDS_COMMENT;
+   const unsigned char *cp;
+   const unsigned char *usrc;
+ 

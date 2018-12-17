@@ -1,0 +1,57 @@
+From 91c0a0da2a8932f163d57db5d9d847bed6822502 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 29 Jun 2018 15:59:57 +0800
+Subject: [PATCH] fix gcc7 ftbfs
+
+Upstream-Status: Pending [from debian]
+fix-gcc7-ftbfs.diff and rebase to 0.172
+
+http://ftp.de.debian.org/debian/pool/main/e/elfutils/elfutils_0.170-0.5.debian.tar.xz
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ backends/mips_retval.c   | 1 +
+ backends/parisc_retval.c | 1 +
+ src/ar.c                 | 2 +-
+ 3 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/backends/mips_retval.c b/backends/mips_retval.c
+index 57487bb..e7973a8 100644
+--- a/backends/mips_retval.c
++++ b/backends/mips_retval.c
+@@ -390,6 +390,7 @@ mips_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+         }
+ 
+       /* Fallthrough to handle large types */
++      /* Fall through.  */
+ 
+     case DW_TAG_array_type:
+     large:
+diff --git a/backends/parisc_retval.c b/backends/parisc_retval.c
+index df7ec3a..988e1fe 100644
+--- a/backends/parisc_retval.c
++++ b/backends/parisc_retval.c
+@@ -167,6 +167,7 @@ parisc_return_value_location_ (Dwarf_Die *functypedie, const Dwarf_Op **locp, in
+ 
+ 	/* Else fall through.  */
+       }
++      /* Fall through.  */
+ 
+     case DW_TAG_structure_type:
+     case DW_TAG_class_type:
+diff --git a/src/ar.c b/src/ar.c
+index 818115b..c77e9f4 100644
+--- a/src/ar.c
++++ b/src/ar.c
+@@ -1073,7 +1073,7 @@ do_oper_delete (const char *arfname, char **argv, int argc,
+ static bool
+ no0print (bool ofmt, char *buf, int bufsize, long int val)
+ {
+-  char tmpbuf[bufsize + 1];
++  char tmpbuf[bufsize + 1 + 4];
+   int ret = snprintf (tmpbuf, sizeof (tmpbuf), ofmt ? "%-*lo" : "%-*ld",
+ 		      bufsize, val);
+   if (ret >= (int) sizeof (tmpbuf))
+-- 
+2.7.4
+

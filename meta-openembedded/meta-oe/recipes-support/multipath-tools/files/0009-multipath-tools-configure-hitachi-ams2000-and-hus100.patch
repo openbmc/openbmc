@@ -1,0 +1,56 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Xose Vazquez Perez <xose.vazquez@gmail.com>
+Date: Mon, 14 May 2018 17:30:17 +0200
+Subject: [PATCH] multipath-tools: configure hitachi ams2000 and hus100 as full
+ active arrays
+
+AMS2000 and HUS100 families are active/active arrays.
+
+Based on https://support.hitachivantara.com/download/epcra/df818913.pdf
+and internal hitachi docs.
+
+Cc: Matthias Rudolph <Matthias.Rudolph@hitachivantara.com>
+Cc: Christophe Varoqui <christophe.varoqui@opensvc.com>
+Cc: DM-DEV ML <dm-devel@redhat.com>
+Signed-off-by: Xose Vazquez Perez <xose.vazquez@gmail.com>
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/hwtable.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/libmultipath/hwtable.c b/libmultipath/hwtable.c
+index 2ca6888..148f0ba 100644
+--- a/libmultipath/hwtable.c
++++ b/libmultipath/hwtable.c
+@@ -398,13 +398,13 @@ static struct hwentry default_hw[] = {
+ 	 * Mail : matthias.rudolph@hds.com
+ 	 */
+ 	{
+-		/* USP-V, HUS VM, VSP, VSP G1X00 and VSP GX00 families */
++		/* USP-V, HUS VM, VSP, VSP G1X00 and VSP GX00 families / HP XP */
+ 		.vendor        = "(HITACHI|HP)",
+ 		.product       = "^OPEN-",
+ 		.pgpolicy      = MULTIBUS,
+ 	},
+ 	{
+-		/* AMS 2000 and HUS 100 families */
++		/* AMS other than AMS 2000 */
+ 		.vendor        = "HITACHI",
+ 		.product       = "^DF",
+ 		.no_path_retry = NO_PATH_RETRY_QUEUE,
+@@ -412,6 +412,12 @@ static struct hwentry default_hw[] = {
+ 		.pgfailback    = -FAILBACK_IMMEDIATE,
+ 		.prio_name     = PRIO_HDS,
+ 	},
++	{
++		/* AMS 2000 and HUS 100 families */
++		.vendor        = "HITACHI",
++		.product       = "^DF600F",
++		.pgpolicy      = MULTIBUS,
++	},
+ 	/*
+ 	 * IBM
+ 	 *
+-- 
+2.7.4
+

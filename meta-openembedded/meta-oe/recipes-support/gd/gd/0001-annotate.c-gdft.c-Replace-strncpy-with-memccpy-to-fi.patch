@@ -1,0 +1,46 @@
+From 85c7694a5cf34597909bdd1ca6931b0f99904c2e Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Tue, 19 Jun 2018 00:40:49 -0700
+Subject: [PATCH] annotate.c/gdft.c: Replace strncpy with memccpy to fix
+ -Wstringop-truncation.
+
+Fixed for gcc8:
+git/src/gdft.c:1699:2: error: 'strncpy' output truncated before terminating nul copying as many bytes from a string as its length [-Werror=stringop-truncation]
+
+Upstream-Status: Submitted [https://github.com/libgd/libgd/pull/442]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ src/annotate.c | 2 +-
+ src/gdft.c     | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/annotate.c b/src/annotate.c
+index 00aaf49..17df813 100644
+--- a/src/annotate.c
++++ b/src/annotate.c
+@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
+ 					fprintf(stderr, "Font maximum length is 1024, %d given\n", font_len);
+ 					goto badLine;
+ 				}
+-				strncpy(font, st, font_len);
++				memcpy(font, st, font_len);
+ 			}
+ 		} else if(!strcmp(st, "align")) {
+ 			char *st = strtok(0, " \t\r\n");
+diff --git a/src/gdft.c b/src/gdft.c
+index 9fa8295..81dbe41 100644
+--- a/src/gdft.c
++++ b/src/gdft.c
+@@ -1696,7 +1696,7 @@ static char * font_path(char **fontpath, char *name_list)
+ 		gdFree(path);
+ 		return "could not alloc full list of fonts";
+ 	}
+-	strncpy(fontlist, name_list, name_list_len);
++	memcpy(fontlist, name_list, name_list_len);
+ 	fontlist[name_list_len] = 0;
+ 
+ 	/*
+-- 
+2.10.2
+

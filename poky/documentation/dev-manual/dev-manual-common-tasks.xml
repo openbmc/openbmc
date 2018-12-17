@@ -189,8 +189,8 @@
                                 <ulink url='&YOCTO_WIKI_URL;/wiki/Releases'>Yocto Project</ulink>
                                 releases for which the current version is
                                 compatible.
-                                This variable is a good way to indicate how
-                                up-to-date your particular layer is.
+                                This variable is a good way to indicate if
+                                your particular layer is current.
                                 </para></listitem>
                         </itemizedlist>
                         </para></listitem>
@@ -3237,30 +3237,22 @@
                 post-installation script to be delayed until the first boot.
                 For example, the script might need to be executed on the
                 device itself.
-                To delay script execution until boot time, use the following
-                structure in the post-installation script:
-                <literallayout class='monospaced'>
-     pkg_postinst_<replaceable>PACKAGENAME</replaceable>() {
-     if [ x"$D" = "x" ]; then
-          # Actions to carry out on the device go here
-     else
-          exit 1
-     fi
-     }
-                </literallayout>
+                To delay script execution until boot time, you must explicitly
+                mark post installs to defer to the target.
+                You can use <filename>pkg_postinst_ontarget()</filename> or
+                call
+                <filename>postinst-intercepts defer_to_first_boot</filename>
+                from <filename>pkg_postinst()</filename>.
+                Any failure of a <filename>pkg_postinst()</filename> script
+                (including exit 1) triggers an error during the
+                <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-rootfs'><filename>do_rootfs</filename></ulink>
+                task.
             </para>
 
             <para>
-                The previous example delays execution until the image boots
-                again because the environment variable <filename>D</filename>
-                points to the directory containing the image when
-                the root filesystem is created at build time but is unset
-                when executed on the first boot.
-            </para>
-
-            <para>
-                If you have recipes that use <filename>pkg_postinst</filename>
-                scripts and they require the use of non-standard native
+                If you have recipes that use
+                <filename>pkg_postinst</filename> function
+                and they require the use of non-standard native
                 tools that have dependencies during rootfs construction, you
                 need to use the
                 <ulink url='&YOCTO_DOCS_REF_URL;#var-PACKAGE_WRITE_DEPS'><filename>PACKAGE_WRITE_DEPS</filename></ulink>
@@ -3279,8 +3271,8 @@
                 <filename>pkg_prerm</filename>, and
                 <filename>pkg_postrm</filename>, respectively.
                 These scrips work in exactly the same way as does
-                <filename>pkg_postinst</filename> with the exception that they
-                run at different times.
+                <filename>pkg_postinst</filename> with the exception
+                that they run at different times.
                 Also, because of when they run, they are not applicable to
                 being run at image creation time like
                 <filename>pkg_postinst</filename>.
@@ -4264,7 +4256,7 @@
                         You need to be sure that your development host is
                         set up to use the Yocto Project.
                         For information on how to set up your host, see the
-                        "<link linkend='setting-up-the-development-host-to-use-the-yocto-project'>Preparing the Build Host</link>"
+                        "<link linkend='dev-preparing-the-build-host'>Preparing the Build Host</link>"
                         section.
                         </para></listitem>
                     <listitem><para>
@@ -5321,104 +5313,215 @@
             </para>
         </section>
 
-        <section id='platdev-building-targets-with-multiple-configurations'>
-            <title>Building Targets with Multiple Configurations</title>
+        <section id='dev-building-images-for-multiple-targets-using-multiple-configurations'>
+            <title>Building Images for Multiple Targets Using Multiple Configurations</title>
 
             <para>
-                Bitbake also has functionality that allows you to build
-                multiple targets at the same time, where each target uses
-                a different configuration.
+                You can use a single <filename>bitbake</filename> command
+                to build multiple images or packages for different targets
+                where each image or package requires a different configuration
+                (multiple configuration builds).
+                The builds, in this scenario, are sometimes referred to as
+                "multiconfigs", and this section uses that term throughout.
             </para>
 
             <para>
-                In order to accomplish this, you setup each of the configurations
-                you need to use in parallel by placing the configuration files in
-                your current build directory alongside the usual
-                <filename>local.conf</filename> file.
+                This section describes how to set up for multiple
+                configuration builds and how to account for cross-build
+                dependencies between the multiconfigs.
             </para>
 
-            <para>
-                Follow these guidelines to create an environment that supports
-                multiple configurations:
-                <itemizedlist>
-                    <listitem><para>
-                        <emphasis>Create Configuration Files</emphasis>:
-                        You need to create a single configuration file for each
-                        configuration for which you want to add support.
-                        These files would contain lines such as the following:
-                        <literallayout class='monospaced'>
-     MACHINE = "A"
-                        </literallayout>
-                        The files would contain any other variables that can
-                        be set and built in the same directory.
-                        <note>
-                            You can change the
-                            <ulink url='&YOCTO_DOCS_REF_URL;#var-TMPDIR'><filename>TMPDIR</filename></ulink>
-                            to not conflict.
-                        </note></para>
+            <section id='dev-setting-up-and-running-a-multiple-configuration-build'>
+                <title>Setting Up and Running a Multiple Configuration Build</title>
 
-                        <para>
-                        Furthermore, the configuration file must be located in the
-                        current build directory in a directory named
-                        <filename>multiconfig</filename> under the build's
-                        <filename>conf</filename> directory where
-                        <filename>local.conf</filename> resides.
-                        The reason for this restriction is because the
-                        <filename>BBPATH</filename> variable is not constructed
-                        until the layers are parsed.
-                        Consequently, using the configuration file as a
-                        pre-configuration file is not possible unless it is
-                        located in the current working directory.
-                        </para></listitem>
-                    <listitem><para>
-                        <emphasis>Add the BitBake Multi-Config Variable to you Local Configuration File</emphasis>:
-                        Use the
-                        <filename>BBMULTICONFIG</filename>
-                        variable in your <filename>conf/local.conf</filename>
-                        configuration file to specify each separate configuration.
-                        For example, the following line tells BitBake it should load
-                        <filename>conf/multiconfig/configA.conf</filename>,
-                        <filename>conf/multiconfig/configB.conf</filename>, and
-                        <filename>conf/multiconfig/configC.conf</filename>.
-                        <literallayout class='monospaced'>
-     BBMULTICONFIG = "configA configB configC"
-                        </literallayout>
-                        </para></listitem>
-                    <listitem><para>
-                        <emphasis>Launch BitBake</emphasis>:
-                        Use the following BitBake command form to launch the
-                        build:
-                        <literallayout class='monospaced'>
+                <para>
+                    To accomplish a multiple configuration build, you must
+                    define each target's configuration separately using
+                    a parallel configuration file in the
+                    <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>,
+                    and you must follow a required file hierarchy.
+                    Additionally, you must enable the multiple configuration
+                    builds in your <filename>local.conf</filename> file.
+                </para>
+
+                <para>
+                    Follow these steps to set up and execute multiple
+                    configuration builds:
+                    <itemizedlist>
+                        <listitem><para>
+                            <emphasis>Create Separate Configuration Files</emphasis>:
+                            You need to create a single configuration file for
+                            each build target (each multiconfig).
+                            Minimally, each configuration file must define the
+                            machine and the temporary directory BitBake uses
+                            for the build.
+                            Suggested practice dictates that you do not
+                            overlap the temporary directories
+                            used during the builds.
+                            However, it is possible that you can share the
+                            temporary directory
+                            (<ulink url='&YOCTO_DOCS_REF_URL;#var-TMPDIR'><filename>TMPDIR</filename></ulink>).
+                            For example, consider a scenario with two
+                            different multiconfigs for the same
+                            <ulink url='&YOCTO_DOCS_REF_URL;#var-MACHINE'><filename>MACHINE</filename></ulink>: "qemux86" built for
+                            two distributions such as "poky" and "poky-lsb".
+                            In this case, you might want to use the same
+                            <filename>TMPDIR</filename>.</para>
+
+                            <para>Here is an example showing the minimal
+                            statements needed in a configuration file for
+                            a "qemux86" target whose temporary build directory
+                            is <filename>tmpmultix86</filename>:
+                            <literallayout class='monospaced'>
+     MACHINE="qemux86"
+     TMPDIR="${TOPDIR}/tmpmultix86"
+                            </literallayout></para>
+
+                            <para>The location for these multiconfig
+                            configuration files is specific.
+                            They must reside in the current build directory in
+                            a sub-directory of <filename>conf</filename> named
+                            <filename>multiconfig</filename>.
+                            Following is an example that defines two
+                            configuration files for the "x86" and "arm"
+                            multiconfigs:
+                            <imagedata fileref="figures/multiconfig_files.png" align="center" width="4in" depth="3in" />
+                            </para>
+
+                            <para>The reason for this required file hierarchy
+                            is because the <filename>BBPATH</filename> variable
+                            is not constructed until the layers are parsed.
+                            Consequently, using the configuration file as a
+                            pre-configuration file is not possible unless it is
+                            located in the current working directory.
+                            </para></listitem>
+                        <listitem><para>
+                            <emphasis>Add the BitBake Multi-configuration Variable to the Local Configuration File</emphasis>:
+                            Use the
+                            <ulink url='&YOCTO_DOCS_REF_URL;#var-BBMULTICONFIG'><filename>BBMULTICONFIG</filename></ulink>
+                            variable in your
+                            <filename>conf/local.conf</filename> configuration
+                            file to specify each multiconfig.
+                            Continuing with the example from the previous
+                            figure, the <filename>BBMULTICONFIG</filename>
+                            variable needs to enable two multiconfigs: "x86"
+                            and "arm" by specifying each configuration file:
+                            <literallayout class='monospaced'>
+     BBMULTICONFIG = "x86 arm"
+                            </literallayout>
+                            </para></listitem>
+                        <listitem><para>
+                            <emphasis>Launch BitBake</emphasis>:
+                            Use the following BitBake command form to launch the
+                            multiple configuration build:
+                            <literallayout class='monospaced'>
      $ bitbake [multiconfig:<replaceable>multiconfigname</replaceable>:]<replaceable>target</replaceable> [[[multiconfig:<replaceable>multiconfigname</replaceable>:]<replaceable>target</replaceable>] ... ]
-                        </literallayout>
-                        Following is an example that supports building a minimal
-                        image for configuration A alongside a standard
-                        <filename>core-image-sato</filename>, which takes its
-                        configuration from <filename>local.conf</filename>:
-                        <literallayout class='monospaced'>
-     $ bitbake multiconfig:configA:core-image-minimal core-image-sato
-                        </literallayout>
-                        </para></listitem>
-                </itemizedlist>
-            </para>
-
-            <para>
-                Support for multiple configurations in this current release of
-                the Yocto Project (&DISTRO_NAME; &DISTRO;) has some known issues:
-                <itemizedlist>
-                    <listitem><para>
-                        No inter-multi-configuration dependencies exist.
-                        </para></listitem>
-                    <listitem><para>
-                        Shared State (sstate) optimizations do not exist.
-                        Consequently, if the build uses the same object twice
+                            </literallayout>
+                            For the example in this section, the following
+                            command applies:
+                            <literallayout class='monospaced'>
+     $ bitbake multiconfig:x86:core-image-minimal multiconfig:arm:core-image-sato
+                            </literallayout>
+                            The previous BitBake command builds a
+                            <filename>core-image-minimal</filename> image that
+                            is configured through the
+                            <filename>x86.conf</filename> configuration file
+                            and builds a <filename>core-image-sato</filename>
+                            image that is configured through the
+                            <filename>arm.conf</filename> configuration file.
+                            </para></listitem>
+                    </itemizedlist>
+                    <note>
+                        Support for multiple configuration builds in the
+                        Yocto Project &DISTRO; (&DISTRO_NAME;) Release does
+                        not include Shared State (sstate) optimizations.
+                        Consequently, if a build uses the same object twice
                         in, for example, two different
                         <filename>TMPDIR</filename> directories, the build
-                        will either load from an existing sstate cache at the
-                        start or build the object twice.
-                        </para></listitem>
-                </itemizedlist>
-            </para>
+                        either loads from an existing sstate cache for that
+                        build at the start or builds the object fresh.
+                    </note>
+                </para>
+            </section>
+
+            <section id='dev-enabling-multiple-configuration-build-dependencies'>
+                <title>Enabling Multiple Configuration Build Dependencies</title>
+
+                <para>
+                    Sometimes dependencies can exist between targets
+                    (multiconfigs) in a multiple configuration build.
+                    For example, suppose that in order to build a
+                    <filename>core-image-sato</filename> image for an "x86"
+                    multiconfig, the root filesystem of an "arm"
+                    multiconfig must exist.
+                    This dependency is essentially that the
+                    <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-image'><filename>do_image</filename></ulink>
+                    task in the <filename>core-image-sato</filename> recipe
+                    depends on the completion of the
+                    <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-rootfs'><filename>do_rootfs</filename></ulink>
+                    task of the <filename>core-image-minimal</filename>
+                    recipe.
+                </para>
+
+                <para>
+                    To enable dependencies in a multiple configuration
+                    build, you must declare the dependencies in the recipe
+                    using the following statement form:
+                    <literallayout class='monospaced'>
+     <replaceable>task_or_package</replaceable>[mcdepends] = "multiconfig:<replaceable>from_multiconfig</replaceable>:<replaceable>to_multiconfig</replaceable>:<replaceable>recipe_name</replaceable>:<replaceable>task_on_which_to_depend</replaceable>"
+                    </literallayout>
+                    To better show how to use this statement, consider the
+                    example scenario from the first paragraph of this section.
+                    The following statement needs to be added to the recipe
+                    that builds the <filename>core-image-sato</filename>
+                    image:
+                    <literallayout class='monospaced'>
+     do_image[mcdepends] = "multiconfig:x86:arm:core-image-minimal:do_rootfs"
+                    </literallayout>
+                    In this example, the
+                    <replaceable>from_multiconfig</replaceable> is "x86".
+                    The <replaceable>to_multiconfig</replaceable> is "arm".
+                    The task on which the <filename>do_image</filename> task
+                    in the recipe depends is the <filename>do_rootfs</filename>
+                    task from the <filename>core-image-minimal</filename>
+                    recipe associated with the "arm" multiconfig.
+               </para>
+
+               <para>
+                   Once you set up this dependency, you can build the
+                   "x86" multiconfig using a BitBake command as follows:
+                   <literallayout class='monospaced'>
+     $ bitbake multiconfig:x86:core-image-sato
+                   </literallayout>
+                   This command executes all the tasks needed to create
+                   the <filename>core-image-sato</filename> image for the
+                   "x86" multiconfig.
+                   Because of the dependency, BitBake also executes through
+                   the <filename>do_rootfs</filename> task for the "arm"
+                   multiconfig build.
+               </para>
+
+               <para>
+                   Having a recipe depend on the root filesystem of another
+                   build might not seem that useful.
+                   Consider this change to the statement in the
+                   <filename>core-image-sato</filename> recipe:
+                   <literallayout class='monospaced'>
+     do_image[mcdepends] = "multiconfig:x86:arm:core-image-minimal:do_image"
+                   </literallayout>
+                   In this case, BitBake must create the
+                   <filename>core-image-minimal</filename> image for the
+                   "arm" build since the "x86" build depends on it.
+               </para>
+
+               <para>
+                   Because "x86" and "arm" are enabled for multiple
+                   configuration builds and have separate configuration
+                   files, BitBake places the artifacts for each build in the
+                   respective temporary build directories (i.e.
+                   <ulink url='&YOCTO_DOCS_REF_URL;#var-TMPDIR'><filename>TMPDIR</filename></ulink>).
+               </para>
+            </section>
         </section>
 
         <section id='building-an-initramfs-image'>
@@ -7159,13 +7262,12 @@
                         easier-to-use and more flexible replacements for an
                         existing functionality in OE-Core's
                         <ulink url='&YOCTO_DOCS_REF_URL;#ref-classes-image-live'><filename>image-live</filename></ulink>
-                        class and <filename>mkefidisk.sh</filename> script.
-                        The difference between
-                        Wic and those examples is
-                        that with Wic the
-                        functionality of those scripts is implemented
-                        by a general-purpose partitioning language, which is
-                        based on Redhat kickstart syntax.</para></listitem>
+                        class.
+                        The difference between Wic and those examples is
+                        that with Wic the functionality of those scripts is
+                        implemented by a general-purpose partitioning language,
+                        which is based on Redhat kickstart syntax.
+                        </para></listitem>
                 </itemizedlist>
             </para>
         </section>
@@ -11400,8 +11502,8 @@
                             within a separately started QEMU or any
                             other virtual machine manager.
                             </para></listitem>
-                        <listitem><para><emphasis>"Systemd-bootTarget":</emphasis>
-                            Choose "Systemd-bootTarget" if your hardware is
+                        <listitem><para><emphasis>"SystemdbootTarget":</emphasis>
+                            Choose "SystemdbootTarget" if your hardware is
                             an EFI-based machine with
                             <filename>systemd-boot</filename> as bootloader and
                             <filename>core-image-testmaster</filename>
@@ -11409,10 +11511,10 @@
                             Also, your hardware under test must be in a
                             DHCP-enabled network that gives it the same IP
                             address for each reboot.</para>
-                            <para>If you choose "Systemd-bootTarget", there are
+                            <para>If you choose "SystemdbootTarget", there are
                             additional requirements and considerations.
                             See the
-                            "<link linkend='selecting-systemd-boottarget'>Selecting Systemd-bootTarget</link>"
+                            "<link linkend='selecting-systemdboottarget'>Selecting SystemdbootTarget</link>"
                             section, which follows, for more information.
                             </para></listitem>
                         <listitem><para><emphasis>"BeagleBoneTarget":</emphasis>
@@ -11458,12 +11560,12 @@
                 </para>
             </section>
 
-            <section id='selecting-systemd-boottarget'>
-                <title>Selecting Systemd-bootTarget</title>
+            <section id='selecting-systemdboottarget'>
+                <title>Selecting SystemdbootTarget</title>
 
                 <para>
                     If you did not set <filename>TEST_TARGET</filename> to
-                    "Systemd-bootTarget", then you do not need any information
+                    "SystemdbootTarget", then you do not need any information
                     in this section.
                     You can skip down to the
                     "<link linkend='qemu-image-running-tests'>Running Tests</link>"
@@ -11472,7 +11574,7 @@
 
                 <para>
                     If you did set <filename>TEST_TARGET</filename> to
-                    "Systemd-bootTarget", you also need to perform a one-time
+                    "SystemdbootTarget", you also need to perform a one-time
                     setup of your master image by doing the following:
                     <orderedlist>
                         <listitem><para><emphasis>Set <filename>EFI_PROVIDER</filename>:</emphasis>
@@ -11543,7 +11645,7 @@
 
                 <para>
                     The final thing you need to do when setting
-                    <filename>TEST_TARGET</filename> to "Systemd-bootTarget" is
+                    <filename>TEST_TARGET</filename> to "SystemdbootTarget" is
                     to set up the test image:
                     <orderedlist>
                         <listitem><para><emphasis>Set up your <filename>local.conf</filename> file:</emphasis>
@@ -11552,7 +11654,7 @@
                             <literallayout class='monospaced'>
      IMAGE_FSTYPES += "tar.gz"
      INHERIT += "testimage"
-     TEST_TARGET = "Systemd-bootTarget"
+     TEST_TARGET = "SystemdbootTarget"
      TEST_TARGET_IP = "192.168.2.3"
                             </literallayout>
                             </para></listitem>
@@ -11687,16 +11789,15 @@
                         To run the tests automatically after the
                         OpenEmbedded build system successfully creates an image,
                         first set the
-                        <ulink url='&YOCTO_DOCS_REF_URL;#var-TEST_IMAGE'><filename>TEST_IMAGE</filename></ulink>
+                        <ulink url='&YOCTO_DOCS_REF_URL;#var-TESTIMAGE_AUTO'><filename>TESTIMAGE_AUTO</filename></ulink>
                         variable to "1" in your <filename>local.conf</filename>
                         file in the
                         <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>:
                         <literallayout class='monospaced'>
-     TEST_IMAGE = "1"
+     TESTIMAGE_AUTO = "1"
                         </literallayout>
                         Next, build your image.
-                        If the image successfully builds, the tests will be
-                        run:
+                        If the image successfully builds, the tests run:
                         <literallayout class='monospaced'>
      bitbake core-image-sato
                         </literallayout></para></listitem>
@@ -11969,7 +12070,7 @@
                                     The target controller object used to deploy
                                     and start an image on a particular target
                                     (e.g. QemuTarget, SimpleRemote, and
-                                    Systemd-bootTarget).
+                                    SystemdbootTarget).
                                     Tests usually use the following:
                                     <itemizedlist>
                                         <listitem><para><emphasis><filename>ip</filename>:</emphasis>
@@ -15071,6 +15172,31 @@
                     as well as any modifications to the original source.
                 </para>
             </section>
+        </section>
+
+        <section id='copying-licenses-that-do-not-exist'>
+            <title>Copying Licenses that Do Not Exist</title>
+
+            <para>
+                Some packages, such as the linux-firmware package, have many
+                licenses that are not in any way common.
+                You can avoid adding a lot of these types of common license
+                files, which are only applicable to a specific package, by using
+                the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-NO_GENERIC_LICENSE'><filename>NO_GENERIC_LICENSE</filename></ulink>
+                variable.
+                Using this variable also avoids QA errors when you use a
+                non-common, non-CLOSED license in a recipe.
+            </para>
+
+            <para>
+                The following is an example that uses the
+                <filename>LICENSE.Abilis.txt</filename>
+                file as the license from the fetched source:
+                <literallayout class='monospaced'>
+     NO_GENERIC_LICENSE[Firmware-Abilis] = "LICENSE.Abilis.txt"
+                </literallayout>
+            </para>
         </section>
     </section>
 

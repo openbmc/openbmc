@@ -25,7 +25,7 @@ class StapTest(OERuntimeTestCase):
     def test_stap(self):
         cmds = [
             'cd /usr/src/kernel && make scripts prepare',
-            'cd /lib/modules/`uname -r` && (if [ ! -L build ]; then ln -s /usr/src/kernel build; fi)',
+            'cd /lib/modules/`uname -r` && (if [ ! -e build ]; then ln -s /usr/src/kernel build; fi)',
             'stap --disable-cache -DSTP_NO_VERREL_CHECK /tmp/hello.stp'
             ]
         for cmd in cmds:

@@ -25,7 +25,7 @@
             Before you can do any kernel development, you need to be
             sure your build host is set up to use the Yocto Project.
             For information on how to get set up, see the
-            "<ulink url='&YOCTO_DOCS_DEV_URL;#setting-up-the-development-host-to-use-the-yocto-project'>Preparing the Build Host</ulink>"
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#dev-preparing-the-build-host'>Preparing the Build Host</ulink>"
             section in the Yocto Project Development Tasks Manual.
             Part of preparing the system is creating a local Git
             repository of the

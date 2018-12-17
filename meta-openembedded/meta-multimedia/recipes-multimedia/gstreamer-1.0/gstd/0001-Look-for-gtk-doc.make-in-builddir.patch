@@ -1,0 +1,32 @@
+From a84e9a6e1dca685eda072d58b58556b5b35cb4c8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 10 Sep 2018 21:16:50 -0700
+Subject: [PATCH] Look for gtk-doc.make in builddir
+
+this is evident when S != B because gtkdocize
+generates this file and its actually built into
+build area
+
+Upstream-Status: Submitted [https://github.com/RidgeRun/gstd-1.x/pull/39]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ docs/reference/gstd/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/docs/reference/gstd/Makefile.am b/docs/reference/gstd/Makefile.am
+index f860fa1..62870da 100644
+--- a/docs/reference/gstd/Makefile.am
++++ b/docs/reference/gstd/Makefile.am
+@@ -66,7 +66,7 @@ GTKDOC_LIBS=$(top_builddir)/gstd/libgstd-core.la
+ 
+ 
+ # This includes the standard gtk-doc make rules, copied by gtkdocize.
+-include $(top_srcdir)/docs/gtk-doc.make
++include $(top_builddir)/docs/gtk-doc.make
+ 
+ # Comment this out if you want 'make check' to test you doc status
+ # and run some sanity checks
+-- 
+2.18.0
+

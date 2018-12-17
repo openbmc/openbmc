@@ -1,6 +1,6 @@
 SUMMARY = "Control and monitor storage systems using S.M.A.R.T"
-DESCRIPTION = \
-"The smartmontools package contains two utility programs (smartctl \
+DESCRIPTION = "\
+The smartmontools package contains two utility programs (smartctl \
 and smartd) to control and monitor storage systems using the Self-\
 Monitoring, Analysis and Reporting Technology System (SMART) built \
 into most modern ATA and SCSI hard disks. In many cases, these \
@@ -13,10 +13,11 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/smartmontools/smartmontools-${PV}.tar.gz \
-    file://initd.smartd \
-    file://smartmontools.default \
-    file://smartd.service \
-"
+           file://initd.smartd \
+           file://smartmontools.default \
+           file://smartd.service \
+           file://0001-os_linux.cpp-Use-realpath-BSD-POSIX-instead-of-canon.patch \
+           "
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'libcap-ng selinux', d)}"
 PACKAGECONFIG[libcap-ng] = "--with-libcap-ng=yes,--with-libcap-ng=no,libcap-ng"

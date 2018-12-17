@@ -3619,7 +3619,7 @@ $ runqemu qemux86-64 tmp/deploy/images/qemux86-64/core-image-minimal-qemux86-64.
 
         <para>
             The
-            <link linkend='var-KERNEL_IMAGE_BASE_NAME'><filename>KERNEL_IMAGE_BASE_NAME</filename></link>
+            <filename>KERNEL_IMAGE_BASE_NAME</filename>
             variable no longer uses the
             <link linkend='var-KERNEL_IMAGETYPE'><filename>KERNEL_IMAGETYPE</filename></link>
             variable to create the image's base name.
@@ -5557,8 +5557,9 @@ id=f4d4f99cfbc2396e49c1613a7d237b9e57f06f81'>commit message</ulink>.
                     incompatible with other implementations.
                     </para></listitem>
                 <listitem><para>
-                    By default, the <filename>cmake</filename> class uses
-                    <filename>ninja</filename> instead of
+                    By default, the
+                    <link linkend='ref-classes-cmake'><filename>cmake</filename></link>
+                    class uses <filename>ninja</filename> instead of
                     <filename>make</filename> for building.
                     This improves build performance.
                     If a recipe is broken with <filename>ninja</filename>, then
@@ -5608,7 +5609,11 @@ id=f4d4f99cfbc2396e49c1613a7d237b9e57f06f81'>commit message</ulink>.
                     Any failure of a <filename>pkg_postinst()</filename>
                     script (including <filename>exit 1</filename>)
                     will trigger a warning during
-                    <filename>do_rootfs</filename>.
+                    <filename>do_rootfs</filename>.</para>
+
+                    <para>For more information, see the
+                    "<ulink url='&YOCTO_DOCS_DEV_URL;#new-recipe-post-installation-scripts'>Post-Installation Scripts</ulink>"
+                    section in the Yocto Project Development Tasks Manual.
                     </para></listitem>
                 <listitem><para>
                     The <filename>elf</filename> image type has been removed.
@@ -5673,6 +5678,648 @@ id=f4d4f99cfbc2396e49c1613a7d237b9e57f06f81'>commit message</ulink>.
                     The <filename>TZ</filename> environment variable is set to
                     "UTC" within the build environment in order to fix
                     reproducibility problems in some recipes.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+</section>
+
+<section id='moving-to-the-yocto-project-2.6-release'>
+    <title>Moving to the Yocto Project 2.6 Release</title>
+
+    <para>
+        This section provides migration information for moving to the
+        Yocto Project 2.6 Release from the prior release.
+    </para>
+
+    <section id='migration-2.6-gcc-changes'>
+        <title>GCC 8.2 is Now Used by Default</title>
+
+        <para>
+            The GNU Compiler Collection version 8.2 is now used by default
+            for compilation.
+            For more information on what has changed in the GCC 8.x release,
+            see
+            <ulink url='https://gcc.gnu.org/gcc-8/changes.html'></ulink>.
+        </para>
+
+        <para>
+            If you still need to compile with version 7.x, GCC 7.3 is
+            also provided.
+            You can select this version by setting the
+            and can be selected by setting the
+            <link linkend='var-GCCVERSION'><filename>GCCVERSION</filename></link>
+            variable to "7.%" in your configuration.
+        </para>
+    </section>
+
+    <section id='migration-2.6-removed-recipes'>
+        <title>Removed Recipes</title>
+
+        <para>
+            The following recipes have been removed:
+            <literallayout class='monospaced'>
+     <emphasis><filename>beecrypt</filename>:</emphasis> No longer needed since moving to RPM 4.
+     <emphasis><filename>bigreqsproto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>calibrateproto</filename>:</emphasis> Removed in favor of <filename>xinput</filename>.
+     <emphasis><filename>compositeproto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>damageproto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>dmxproto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>dri2proto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>dri3proto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>eee-acpi-scripts</filename>:</emphasis> Became obsolete.
+     <emphasis><filename>fixesproto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>fontsproto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>fstests</filename>:</emphasis> Became obsolete.
+     <emphasis><filename>gccmakedep</filename>:</emphasis> No longer used.
+     <emphasis><filename>glproto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>gnome-desktop3</filename>:</emphasis> No longer needed.  This recipe has moved to <filename>meta-oe</filename>.
+     <emphasis><filename>icon-naming-utils</filename>:</emphasis> No longer used since the Sato theme was removed in 2016.
+     <emphasis><filename>inputproto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>kbproto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>libusb-compat</filename>:</emphasis> Became obsolete.
+     <emphasis><filename>libuser</filename>:</emphasis> Became obsolete.
+     <emphasis><filename>libnfsidmap</filename>:</emphasis> No longer an external requirement since <filename>nfs-utils</filename> 2.2.1.  <filename>libnfsidmap</filename> is now integrated.
+     <emphasis><filename>libxcalibrate</filename>:</emphasis> No longer needed with <filename>xinput</filename>
+     <emphasis><filename>mktemp</filename>:</emphasis> Became obsolete. The <filename>mktemp</filename> command is provided by both <filename>busybox</filename> and <filename>coreutils</filename>.
+     <emphasis><filename>ossp-uuid</filename>:</emphasis> Is not being maintained and has mostly been replaced by <filename>uuid.h</filename> in <filename>util-linux</filename>.
+     <emphasis><filename>pax-utils</filename>:</emphasis> No longer needed.  Previous QA tests that did use this recipe are now done at build time.
+     <emphasis><filename>pcmciautils</filename>:</emphasis> Became obsolete.
+     <emphasis><filename>pixz</filename>:</emphasis> No longer needed. <filename>xz</filename> now supports multi-threaded compression.
+     <emphasis><filename>presentproto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>randrproto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>recordproto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>renderproto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>resourceproto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>scrnsaverproto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>trace-cmd</filename>:</emphasis> Became obsolete.  <filename>perf</filename> replaced this recipe's functionally.
+     <emphasis><filename>videoproto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>wireless-tools</filename>:</emphasis> Became obsolete.  Superseded by <filename>iw</filename>.
+     <emphasis><filename>xcmiscproto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>xextproto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>xf86dgaproto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>xf86driproto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>xf86miscproto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>xf86-video-omapfb</filename>:</emphasis> Became obsolete.  Use kernel modesetting driver instead.
+     <emphasis><filename>xf86-video-omap</filename>:</emphasis> Became obsolete.  Use kernel modesetting driver instead.
+     <emphasis><filename>xf86vidmodeproto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>xineramaproto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>xproto</filename>:</emphasis> Replaced by <filename>xorgproto</filename>.
+     <emphasis><filename>yasm</filename>:</emphasis> No longer needed since previous usages are now satisfied by <filename>nasm</filename>.
+            </literallayout>
+        </para>
+    </section>
+
+    <section id='migration-2.6-packaging-changes'>
+        <title>Packaging Changes</title>
+
+        <para>
+            The following packaging changes have been made:
+            <itemizedlist>
+                <listitem><para>
+                    <emphasis><filename>cmake</filename>:</emphasis>
+                    <filename>cmake.m4</filename> and
+                    <filename>toolchain</filename> files have been moved to the
+                    main package.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>iptables</filename>:</emphasis>
+                    The <filename>iptables</filename> modules have been split
+                    into separate packages.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>alsa-lib</filename>:</emphasis>
+                    <filename>libasound</filename> is now in the main
+                    <filename>alsa-lib</filename> package instead of
+                    <filename>libasound</filename>.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>glibc</filename>:</emphasis>
+                    <filename>libnss-db</filename> is now in its own package
+                    along with a <filename>/var/db/makedbs.sh</filename>
+                    script to update databases.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>python</filename> and <filename>python3</filename>:</emphasis>
+                    The main package has been removed from the recipe.
+                    You must install specific packages or
+                    <filename>python-modules</filename> /
+                    <filename>python3-modules</filename> for everything.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>systemtap</filename>:</emphasis>
+                    Moved <filename>systemtap-exporter</filename> into its own
+                    package.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='migration-2.6-xorg-protocol-dependencies'>
+        <title>XOrg Protocol dependencies</title>
+
+        <para>
+            The "*proto" upstream repositories have been combined into one
+            "xorgproto" repository.
+            Thus, the corresponding recipes have also been combined into a
+            single <filename>xorgproto</filename> recipe.
+            Any recipes that depend upon the older <filename>*proto</filename>
+            recipes need to be changed to depend on the newer
+            <filename>xorgproto</filename> recipe instead.
+        </para>
+
+        <para>
+            For names of recipes removed because of this repository change,
+            see the
+            <link linkend="migration-2.6-removed-recipes">Removed Recipes</link>
+            section.
+        </para>
+    </section>
+
+    <section id='migration-2.6-distutils-distutils3-fetching-dependencies'>
+        <title><filename>distutils</filename> and <filename>distutils3</filename> Now Prevent Fetching Dependencies During the <filename>do_configure</filename> Task</title>
+
+        <para>
+            Previously, it was possible for Python recipes that inherited
+            the
+            <link linkend='ref-classes-distutils'><filename>distutils</filename></link>
+            and
+            <link linkend='ref-classes-distutils3'><filename>distutils3</filename></link>
+            classes to fetch code during the
+            <link linkend='ref-tasks-configure'><filename>do_configure</filename></link>
+            task to satisfy dependencies mentioned in
+            <filename>setup.py</filename> if those dependencies were not
+            provided in the sysroot (i.e. recipes providing the dependencies
+            were missing from
+            <link linkend='var-DEPENDS'><filename>DEPENDS</filename></link>).
+            <note>
+                This change affects classes beyond just the two mentioned
+                (i.e. <filename>distutils</filename> and
+                <filename>distutils3</filename>).
+                Any recipe that inherits <filename>distutils*</filename>
+                classes are affected.
+                For example, the <filename>setuptools</filename> and
+                <filename>setuptools3</filename> recipes are affected since
+                they inherit the <filename>distutils*</filename> classes.
+            </note>
+        </para>
+
+        <para>
+            Fetching these types of dependencies that are not provided in the
+            sysroot negatively affects the ability to reproduce builds.
+            This type of fetching is now explicitly disabled.
+            Consequently, any missing dependencies in Python recipes that
+            use these classes now result in an error during the
+            <filename>do_configure</filename> task.
+        </para>
+    </section>
+
+    <section id='migration-2.6-linux-yocto-configuration-audit-issues-now-correctly-reported'>
+        <title><filename>linux-yocto</filename> Configuration Audit Issues Now Correctly Reported</title>
+
+        <para>
+            Due to a bug, the kernel configuration audit functionality was
+            not writing out any resulting warnings during the build.
+            This issue is now corrected.
+            You might notice these warnings now if you have a custom kernel
+            configuration with a <filename>linux-yocto</filename> style
+            kernel recipe.
+        </para>
+    </section>
+
+    <section id='migration-2.6-image-kernel-artifact-naming-changes'>
+        <title>Image/Kernel Artifact Naming Changes</title>
+
+        <para>
+            The following changes have been made:
+            <itemizedlist>
+                <listitem><para>
+                    Name variables (e.g.
+                    <link linkend='var-IMAGE_NAME'><filename>IMAGE_NAME</filename></link>)
+                    use a new <filename>IMAGE_VERSION_SUFFIX</filename>
+                    variable instead of
+                    <link linkend='var-DATETIME'><filename>DATETIME</filename></link>.
+                    Using <filename>IMAGE_VERSION_SUFFIX</filename> allows
+                    easier and more direct changes.</para>
+
+                    <para>The <filename>IMAGE_VERSION_SUFFIX</filename>
+                    variable is set in the
+                    <filename>bitbake.conf</filename> configuration file as
+                    follows:
+                    <literallayout class='monospaced'>
+     IMAGE_VERSION_SUFFIX = "-${DATETIME}"
+                    </literallayout>
+                    </para></listitem>
+                <listitem><para>
+                    Several variables have changed names for consistency:
+                    <literallayout class='monospaced'>
+    Old Variable Name               New Variable Name
+    ========================================================
+    KERNEL_IMAGE_BASE_NAME          <link linkend='var-KERNEL_IMAGE_NAME'>KERNEL_IMAGE_NAME</link>
+    KERNEL_IMAGE_SYMLINK_NAME       <link linkend='var-KERNEL_IMAGE_LINK_NAME'>KERNEL_IMAGE_LINK_NAME</link>
+    MODULE_TARBALL_BASE_NAME        <link linkend='var-MODULE_TARBALL_NAME'>MODULE_TARBALL_NAME</link>
+    MODULE_TARBALL_SYMLINK_NAME     <link linkend='var-MODULE_TARBALL_LINK_NAME'>MODULE_TARBALL_LINK_NAME</link>
+    INITRAMFS_BASE_NAME             <link linkend='var-INITRAMFS_NAME'>INITRAMFS_NAME</link>
+                    </literallayout>
+                    </para></listitem>
+                <listitem><para>
+                    The <filename>MODULE_IMAGE_BASE_NAME</filename> variable
+                    has been removed.
+                    The module tarball name is now controlled directly with the
+                    <link linkend='var-MODULE_TARBALL_NAME'><filename>MODULE_TARBALL_NAME</filename></link>
+                    variable.
+                    </para></listitem>
+                <listitem><para>
+                    The
+                    <link linkend='var-KERNEL_DTB_NAME'><filename>KERNEL_DTB_NAME</filename></link>
+                    and
+                    <link linkend='var-KERNEL_DTB_LINK_NAME'><filename>KERNEL_DTB_LINK_NAME</filename></link>
+                    variables have been introduced to control kernel Device
+                    Tree Binary (DTB) artifact names instead of mangling
+                    <filename>KERNEL_IMAGE_*</filename> variables.
+                    </para></listitem>
+                <listitem><para>
+                    The
+                    <link linkend='var-KERNEL_FIT_NAME'><filename>KERNEL_FIT_NAME</filename></link>
+                    and
+                    <link linkend='var-KERNEL_FIT_LINK_NAME'><filename>KERNEL_FIT_LINK_NAME</filename></link>
+                    variables have been introduced to specify the name of
+                    flattened image tree (FIT) kernel images similar to other
+                    deployed artifacts.
+                    </para></listitem>
+                <listitem><para>
+                    The
+                    <link linkend='var-MODULE_TARBALL_NAME'><filename>MODULE_TARBALL_NAME</filename></link>
+                    and
+                    <link linkend='var-MODULE_TARBALL_LINK_NAME'><filename>MODULE_TARBALL_LINK_NAME</filename></link>
+                    variable values no longer include the "module-" prefix or
+                    ".tgz" suffix.
+                    These parts are now hardcoded so that the values are
+                    consistent with other artifact naming variables.
+                    </para></listitem>
+                <listitem><para>
+                    Added the
+                    <link linkend='var-INITRAMFS_LINK_NAME'><filename>INITRAMFS_LINK_NAME</filename></link>
+                    variable so that the symlink can be controlled similarly
+                    to other artifact types.
+                    </para></listitem>
+                <listitem><para>
+                    <link linkend='var-INITRAMFS_NAME'><filename>INITRAMFS_NAME</filename></link>
+                    now uses
+                    "${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
+                    instead of
+                    "${PV}-${PR}-${MACHINE}-${DATETIME}", which
+                    makes it consistent with other variables.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='migration-2.6-serial-console-deprecated'>
+        <title><filename>SERIAL_CONSOLE</filename> Deprecated</title>
+
+        <para>
+            The
+            <link linkend='var-SERIAL_CONSOLE'><filename>SERIAL_CONSOLE</filename></link>
+            variable has been functionally replaced by the
+            <link linkend='var-SERIAL_CONSOLES'><filename>SERIAL_CONSOLES</filename></link>
+            variable for some time.
+            With the Yocto Project 2.6 release,
+            <filename>SERIAL_CONSOLE</filename> has been officially deprecated.
+        </para>
+
+        <para>
+            <filename>SERIAL_CONSOLE</filename> will continue to work as
+            before for the 2.6 release.
+            However, for the sake of future compatibility, it is recommended
+            that you replace all instances of
+            <filename>SERIAL_CONSOLE</filename> with
+            <filename>SERIAL_CONSOLES</filename>.
+            <note>
+                The only difference in usage is that
+                <filename>SERIAL_CONSOLES</filename> expects entries to be
+                separated using semicolons as compared to
+                <filename>SERIAL_CONSOLE</filename>, which expects spaces.
+            </note>
+        </para>
+    </section>
+
+    <section id='migration-2.6-poky-sets-unknown-configure-option-to-qa-error'>
+        <title>Configure Script Reports Unknown Options as Errors</title>
+
+        <para>
+            If the configure script reports an unknown option, this now
+            triggers a QA error instead of a warning.
+            Any recipes that previously got away with specifying such unknown
+            options now need to be fixed.
+        </para>
+    </section>
+
+    <section id='migration-2.6-override-changes'>
+        <title>Override Changes</title>
+
+        <para>
+            The following changes have occurred:
+            <itemizedlist>
+                <listitem><para>
+                    <emphasis>The <filename>virtclass-native</filename> and
+                    <filename>virtclass-nativesdk</filename> Overrides Have
+                    Been Removed:</emphasis>
+                    The <filename>virtclass-native</filename> and
+                    <filename>virtclass-nativesdk</filename> overrides have
+                    been deprecated since 2012 in favor of
+                    <filename>class-native</filename> and
+                    <filename>class-nativesdk</filename>, respectively.
+                    Both <filename>virtclass-native</filename> and
+                    <filename>virtclass-nativesdk</filename> are now dropped.
+                    <note>
+                        The <filename>virtclass-multilib-</filename> overrides
+                        for multilib are still valid.
+                    </note>
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>The <filename>forcevariable</filename>
+                    Override Now Has a Higher Priority Than
+                    <filename>libc</filename> Overrides:</emphasis>
+                    The <filename>forcevariable</filename> override is
+                    documented to be the highest priority override.
+                    However, due to a long-standing quirk of how
+                    <link linkend='var-OVERRIDES'><filename>OVERRIDES</filename></link>
+                    is set, the <filename>libc</filename> overrides (e.g.
+                    <filename>libc-glibc</filename>,
+                    <filename>libc-musl</filename>, and so forth) erroneously
+                    had a higher priority.
+                    This issue is now corrected.</para>
+
+                    <para>It is likely this change will not cause any
+                    problems.
+                    However, it is possible with some unusual configurations
+                    that you might see a change in behavior if you were
+                    relying on the previous behavior.
+                    Be sure to check how you use
+                    <filename>forcevariable</filename> and
+                    <filename>libc-*</filename> overrides in your custom
+                    layers and configuration files to ensure they make sense.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>The <filename>build-${BUILD_OS}</filename>
+                    Override Has Been Removed:</emphasis>
+                    The <filename>build-${BUILD_OS}</filename>, which is
+                    typically <filename>build-linux</filename>, override has
+                    been removed because building on a host operating system
+                    other than a recent version of Linux is neither supported
+                    nor recommended.
+                    Dropping the override avoids giving the impression that
+                    other host operating systems might be supported.
+                    </para></listitem>
+                <listitem><para>
+                    The "_remove" operator now preserves whitespace.
+                    Consequently, when specifying list items to remove, be
+                    aware that leading and trailing whitespace resulting from
+                    the removal is retained.</para>
+
+                    <para>See the
+                    "<ulink url='&YOCTO_DOCS_BB_URL;#removing-override-style-syntax'>Removal (Override Style Syntax)</ulink>"
+                    section in the BitBake User Manual for a detailed example.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='migration-2.6-systemd-configuration-now-split-out-to-system-conf'>
+        <title><filename>systemd</filename> Configuration is Now Split Into <filename>systemd-conf</filename></title>
+
+        <para>
+            The configuration for the <filename>systemd</filename> recipe
+            has been moved into a <filename>system-conf</filename> recipe.
+            Moving this configuration to a separate recipe avoids the
+            <filename>systemd</filename> recipe from becoming machine-specific
+            for cases where machine-specific configurations need to be applied
+            (e.g. for <filename>qemu*</filename> machines).
+        </para>
+
+        <para>
+            Currently, the new recipe packages the following files:
+            <literallayout class='monospaced'>
+     ${sysconfdir}/machine-id
+     ${sysconfdir}/systemd/coredump.conf
+     ${sysconfdir}/systemd/journald.conf
+     ${sysconfdir}/systemd/logind.conf
+     ${sysconfdir}/systemd/system.conf
+     ${sysconfdir}/systemd/user.conf
+            </literallayout>
+            If you previously used bbappend files to append the
+            <filename>systemd</filename> recipe to change any of the
+            listed files, you must do so for the
+            <filename>systemd-conf</filename> recipe instead.
+        </para>
+    </section>
+
+    <section id='migration-2.6-automatic-testing-changes'>
+        <title>Automatic Testing Changes</title>
+
+        <para>
+            This section provides information about automatic testing
+            changes:
+            <itemizedlist>
+                <listitem><para>
+                    <emphasis><filename>TEST_IMAGE</filename> Variable Removed:</emphasis>
+                    Prior to this release, you set the
+                    <filename>TEST_IMAGE</filename> variable to "1" to
+                    enable automatic testing for successfully built images.
+                    The <filename>TEST_IMAGE</filename> variable no longer
+                    exists and has been replaced by the
+                    <link linkend='var-TESTIMAGE_AUTO'><filename>TESTIMAGE_AUTO</filename></link>
+                    variable.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>Inheriting the <filename>testimage</filename> and
+                    <filename>testsdk</filename> Classes:</emphasis>
+                    Best practices now dictate that you use the
+                    <link linkend='var-IMAGE_CLASSES'><filename>IMAGE_CLASSES</filename></link>
+                    variable rather than the
+                    <link linkend='var-INHERIT'><filename>INHERIT</filename></link>
+                    variable when you inherit the
+                    <link linkend='ref-classes-testimage*'><filename>testimage</filename></link>
+                    and
+                    <link linkend='ref-classes-testsdk'><filename>testsdk</filename></link>
+                    classes used for automatic testing.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='migration-2.6-openssl-changes'>
+        <title>OpenSSL Changes</title>
+
+        <para>
+            <ulink url='https://www.openssl.org/'>OpenSSL</ulink> has been
+            upgraded from 1.0 to 1.1.
+            By default, this upgrade could cause problems for recipes that
+            have both versions in their dependency chains.
+            The problem is that both versions cannot be installed together
+            at build time.
+            <note>
+                It is possible to have both versions of the library at runtime.
+            </note>
+        </para>
+    </section>
+
+    <section id='migration-2.6-bitbake-changes'>
+        <title>BitBake Changes</title>
+
+        <para>
+            The server logfile <filename>bitbake-cookerdaemon.log</filename> is
+            now always placed in the
+            <link linkend='build-directory'>Build Directory</link>
+            instead of the current directory.
+        </para>
+    </section>
+
+    <section id='migration-2.6-security-changes'>
+        <title>Security Changes</title>
+
+        <para>
+            The Poky distribution now uses security compiler flags by
+            default.
+            Inclusion of these flags could cause new failures due to stricter
+            checking for various potential security issues in code.
+        </para>
+    </section>
+
+    <section id='migration-2.6-post-installation-changes'>
+        <title>Post Installation Changes</title>
+
+        <para>
+            You must explicitly mark post installs to defer to the target.
+            If you want to explicitly defer a postinstall to first boot on
+            the target rather than at rootfs creation time, use
+            <filename>pkg_postinst_ontarget()</filename> or call
+            <filename>postinst-intercepts defer_to_first_boot</filename> from
+            <filename>pkg_postinst()</filename>.
+            Any failure of a <filename>pkg_postinst()</filename> script
+            (including exit 1) triggers an error during the
+            <link linkend='ref-tasks-rootfs'><filename>do_rootfs</filename></link> task.
+        </para>
+
+        <para>
+            For more information on post-installation behavior, see the
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#new-recipe-post-installation-scripts'>Post-Installation Scripts</ulink>"
+            section in the Yocto Project Development Tasks Manual.
+        </para>
+    </section>
+
+    <section id='migration-2.6-python-3-profile-guided-optimizations'>
+        <title>Python 3 Profile-Guided Optimization</title>
+
+        <para>
+            The <filename>python3</filename> recipe now enables profile-guided
+            optimization.
+            Using this optimization requires a little extra build time in
+            exchange for improved performance on the target at runtime.
+            Additionally, the optimization is only enabled if the current
+            <link linkend='var-MACHINE'><filename>MACHINE</filename></link>
+            has support for user-mode emulation in QEMU (i.e. "qemu-usermode"
+            is in
+            <link linkend='var-MACHINE_FEATURES'><filename>MACHINE_FEATURES</filename></link>,
+            which it is by default).
+        </para>
+
+        <para>
+            If you wish to disable Python profile-guided optimization
+            regardless of the value of
+            <filename>MACHINE_FEATURES</filename>, then ensure that
+            <link linkend='var-PACKAGECONFIG'><filename>PACKAGECONFIG</filename></link>
+            for the <filename>python3</filename> recipe does not contain "pgo".
+            You could accomplish the latter using the following at the
+            configuration level:
+            <literallayout class='monospaced'>
+     PACKAGECONFIG_remove_pn-python3 = "pgo"
+            </literallayout>
+            Alternatively, you can set
+            <filename>PACKAGECONFIG</filename> using an append file for the
+            <filename>python3</filename> recipe.
+        </para>
+    </section>
+
+    <section id='migration-2.6-miscellaneous-changes'>
+        <title>Miscellaneous Changes</title>
+
+        <para>
+            The following miscellaneous changes occurred:
+            <itemizedlist>
+                <listitem><para>
+                    Default to using the Thumb-2 instruction set for armv7a
+                    and above.
+                    If you have any custom recipes that build software that
+                    needs to be built with the ARM instruction set, change the
+                    recipe to set the instruction set as follows:
+                    <literallayout class='monospaced'>
+     ARM_INSTRUCTION_SET = "arm"
+                    </literallayout>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>run-postinsts</filename> no longer uses
+                    <filename>/etc/*-postinsts</filename> for
+                    <filename>dpkg/opkg</filename> in favor of built-in
+                    postinst support.
+                    RPM behavior remains unchanged.
+                    </para></listitem>
+                <listitem><para>
+                    The <filename>NOISO</filename> and
+                    <filename>NOHDD</filename> variables are no longer used.
+                    You now control building <filename>*.iso</filename> and
+                    <filename>*.hddimg</filename> image types directly
+                    by using the
+                    <link linkend='var-IMAGE_FSTYPES'><filename>IMAGE_FSTYPES</filename></link>
+                    variable.
+                    </para></listitem>
+                <listitem><para>
+                    The <filename>scripts/contrib/mkefidisk.sh</filename>
+                    has been removed in favor of Wic.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>kernel-modules</filename> has been removed from
+                    <link linkend='var-RRECOMMENDS'><filename>RRECOMMENDS</filename></link>
+                    for <filename>qemumips</filename> and
+                    <filename>qemumips64</filename> machines.
+                    Removal also impacts the <filename>x86-base.inc</filename>
+                    file.
+                    <note>
+                        <filename>genericx86</filename> and
+                        <filename>genericx86-64</filename> retain
+                        <filename>kernel-modules</filename> as part of the
+                        <filename>RRECOMMENDS</filename> variable setting.
+                    </note>
+                    </para></listitem>
+                <listitem><para>
+                    The <filename>LGPLv2_WHITELIST_GPL-3.0</filename>
+                    variable has been removed.
+                    If you are setting this variable in your configuration,
+                    set or append it to the
+                    <filename>WHITELIST_GPL-3.0</filename> variable instead.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>${ASNEEDED}</filename> is now included in
+                    the
+                    <link linkend='var-TARGET_LDFLAGS'><filename>TARGET_LDFLAGS</filename></link>
+                    variable directly.
+                    The remaining definitions from
+                    <filename>meta/conf/distro/include/as-needed.inc</filename>
+                    have been moved to corresponding recipes.
+                    </para></listitem>
+                <listitem><para>
+                    Support for DSA host keys has been dropped from the
+                    OpenSSH recipes.
+                    If you are still using DSA keys, you must switch over to a
+                    more secure algorithm as recommended by OpenSSH upstream.
+                    </para></listitem>
+                <listitem><para>
+                    The <filename>dhcp</filename> recipe now uses the
+                    <filename>dhcpd6.conf</filename> configuration file in
+                    <filename>dhcpd6.service</filename> for IPv6 DHCP rather
+                    than re-using <filename>dhcpd.conf</filename>, which is
+                    now reserved for IPv4.
                     </para></listitem>
             </itemizedlist>
         </para>

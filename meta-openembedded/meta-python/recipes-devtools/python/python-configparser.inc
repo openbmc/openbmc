@@ -1,4 +1,4 @@
-SUMMARY = "This module provides the ConfigParser class which implements a basic configuration language which provides a structure similar to what’s found in Microsoft Windows INI files."
+SUMMARY = "This module provides the ConfigParser class which implements a basic configuration language which provides a structure similar to what's found in Microsoft Windows INI files."
 SECTION = "devel/python"
 HOMEPAGE = "https://docs.python.org/3/library/configparser.html"
 LICENSE = "MIT"

@@ -1,0 +1,134 @@
+From 1cfee75d9662c3382bb7cb8f1c952333837598ae Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Wed, 18 Apr 2018 02:21:30 +0200
+Subject: [PATCH] crashdump-elf.c: work around for _SC_NPROCESSORS_CONF
+
+klibc sysconf lacks this so the implementation
+of Linus Torvalds was taken (simplified):
+
+https://sourceware.org/ml/libc-alpha/2011-06/msg00079.html
+
+Have fun reding the thread!
+
+Fix
+
+ crashdump-elf.c:117:21: error: '_SC_NPROCESSORS_CONF' undeclared
+
+Upstream-Status: Inappropriate [klibc specific]
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+
+---
+ kexec/crashdump-elf.c | 92 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 92 insertions(+)
+
+diff --git a/kexec/crashdump-elf.c b/kexec/crashdump-elf.c
+index b8bb686..7e6767c 100644
+--- a/kexec/crashdump-elf.c
++++ b/kexec/crashdump-elf.c
+@@ -25,6 +25,94 @@ do {									\
+ } while(0)
+ #endif
+ 
++#ifdef __KLIBC__
++#ifndef KLIBC_SYSFS_CPU_H
++#define KLIBC_SYSFS_CPU_H
++
++
++static int __get_sysfs_cpus(const char *path);
++int __get_nprocs (void);
++int __get_nprocs_conf (void);
++
++
++
++static int __get_sysfs_cpus(const char *path)
++{
++	FILE *file;
++	int nr_cpus = 0;
++	int prev = -1;
++	char *p;
++	char line[10];
++
++
++	file = fopen(path, "r");
++	if (!file)
++		return -1;
++	for (;;) {
++		char sep;
++		int cpu;
++		int n;
++
++		/* int n = fscanf(file, "%u%c", &cpu, &sep); */
++		p = fgets(line, sizeof(line), file);
++		if (p == NULL)
++			return -1;
++		else
++			n = sscanf(line, "%u%c", &cpu, &sep);
++
++		if (n <= 0)
++			break;
++
++		/* EOF == EOLN */
++		if (n == 1)
++			sep = '\n';
++
++		/* Was the previous CPU a range? */
++		if (prev >= 0) {
++			nr_cpus += cpu - prev + 1;
++			prev = -1;
++		} else if (sep == '-')
++			prev = cpu;
++		else
++		nr_cpus++;
++
++		if (sep == '\n')
++			break;
++	}
++	fclose(file);
++	return nr_cpus;
++}
++
++int __get_nprocs ()
++{
++	long ret;
++	static int cached = -1;
++
++	ret = cached;
++	if (ret < 0)
++	{
++		ret = __get_sysfs_cpus("/sys/devices/system/cpu/online");
++		cached = ret;
++	}
++	return ret;
++}
++
++int __get_nprocs_conf ()
++{
++	long ret;
++	static int cached = -1;
++
++	ret = cached;
++	if (ret < 0)
++	{
++		ret = __get_sysfs_cpus("/sys/devices/system/cpu/possible");
++		cached = ret;
++	}
++	return ret;
++}
++#endif
++#endif
++
+ /* Prepares the crash memory headers and stores in supplied buffer. */
+ int FUNC(struct kexec_info *info,
+ 	 struct crash_elf_info *elf_info,
+@@ -46,7 +134,11 @@ int FUNC(struct kexec_info *info,
+ 	if (xen_present())
+ 		nr_cpus = xen_get_nr_phys_cpus();
+ 	else
++#ifndef __KLIBC__
+ 		nr_cpus = sysconf(_SC_NPROCESSORS_CONF);
++#else
++		nr_cpus = __get_nprocs_conf();
++#endif
+ 
+ 	if (nr_cpus < 0) {
+ 		return -1;

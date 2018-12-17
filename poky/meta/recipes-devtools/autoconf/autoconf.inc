@@ -10,24 +10,49 @@ DEPENDS_class-native = "m4-native gnu-config-native"
 DEPENDS_class-nativesdk = "nativesdk-m4 nativesdk-gnu-config"
 RDEPENDS_${PN} = "m4 gnu-config \
 		  perl \
+		  perl-module-bytes \
 		  perl-module-carp \
 		  perl-module-constant \
+		  perl-module-data-dumper \
 		  perl-module-errno \
 		  perl-module-exporter \
 		  perl-module-file-basename \
 		  perl-module-file-compare \
 		  perl-module-file-copy \
+		  perl-module-file-find \
 		  perl-module-file-glob \
 		  perl-module-file-path \
 		  perl-module-file-stat \
-		  perl-module-file-find \
 		  perl-module-getopt-long \
 		  perl-module-io-file \
 		  perl-module-posix \
-		  perl-module-data-dumper \
+		  perl-module-thread-queue \
+		  perl-module-threads \
 		 "
 RDEPENDS_${PN}_class-native = "m4-native gnu-config-native"
-RDEPENDS_${PN}_class-nativesdk = "nativesdk-m4 nativesdk-gnu-config"
+RDEPENDS_${PN}_class-nativesdk = "\
+		  nativesdk-gnu-config \
+		  nativesdk-m4 \
+		  nativesdk-perl \
+		  nativesdk-perl-module-bytes \
+		  nativesdk-perl-module-carp \
+		  nativesdk-perl-module-constant \
+		  nativesdk-perl-module-data-dumper \
+		  nativesdk-perl-module-errno \
+		  nativesdk-perl-module-exporter \
+		  nativesdk-perl-module-file-basename \
+		  nativesdk-perl-module-file-compare \
+		  nativesdk-perl-module-file-copy \
+		  nativesdk-perl-module-file-find \
+		  nativesdk-perl-module-file-glob \
+		  nativesdk-perl-module-file-path \
+		  nativesdk-perl-module-file-stat \
+		  nativesdk-perl-module-getopt-long \
+		  nativesdk-perl-module-io-file \
+		  nativesdk-perl-module-posix \
+		  nativesdk-perl-module-thread-queue \
+		  nativesdk-perl-module-threads \
+                  "
 
 SRC_URI = "${GNU_MIRROR}/autoconf/autoconf-${PV}.tar.gz \
 	   file://program_prefix.patch"

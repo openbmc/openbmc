@@ -1,0 +1,74 @@
+From 2fb531ac753500314336ccd508cb2d53f5e768e5 Mon Sep 17 00:00:00 2001
+From: Till Schneidereit <till@tillschneidereit.net>
+Date: Thu, 1 Oct 2015 12:59:09 +0200
+Subject: Disable MOZ_GLUE_IN_PROGRAM in stand-alone builds on all platforms
+
+Otherwise, build fails not being able to find HashBytes.
+
+Patch ported forward to mozjs52 by Philip Chimento
+<philip.chimento@gmail.com>.
+
+https://bugzilla.mozilla.org/show_bug.cgi?id=1176787
+
+Upstream-Status: Backport
+
+Signed-off-by: Ricardo Salveti <ricardo@foundries.io>
+---
+ js/src/old-configure    | 20 ++++++++++++--------
+ mozglue/build/moz.build |  2 +-
+ 2 files changed, 13 insertions(+), 9 deletions(-)
+
+diff --git a/js/src/old-configure b/js/src/old-configure
+index d7afcff..8a6f142 100644
+--- a/js/src/old-configure
++++ b/js/src/old-configure
+@@ -8546,21 +8546,25 @@ if test -z "$MOZ_ENABLE_WARNINGS_AS_ERRORS"; then
+ fi
+ 
+ 
+-case "${OS_TARGET}" in
+-Android|WINNT|Darwin)
++if test "$JS_STANDALONE"; then
+   MOZ_GLUE_IN_PROGRAM=
+-  ;;
+-*)
+-    MOZ_GLUE_IN_PROGRAM=1
+-  cat >> confdefs.pytmp <<\EOF
++else
++  case "${OS_TARGET}" in
++  Android|WINNT|Darwin)
++    MOZ_GLUE_IN_PROGRAM=
++    ;;
++  *)
++        MOZ_GLUE_IN_PROGRAM=1
++    cat >> confdefs.pytmp <<\EOF
+     (''' MOZ_GLUE_IN_PROGRAM ''', ' 1 ')
+ EOF
+ cat >> confdefs.h <<\EOF
+ #define MOZ_GLUE_IN_PROGRAM 1
+ EOF
+ 
+-  ;;
+-esac
++    ;;
++  esac
++fi
+ 
+ if test "$MOZ_MEMORY"; then
+   if test "x$MOZ_DEBUG" = "x1"; then
+diff --git a/mozglue/build/moz.build b/mozglue/build/moz.build
+index d289747..e3be5a2 100644
+--- a/mozglue/build/moz.build
++++ b/mozglue/build/moz.build
+@@ -6,7 +6,7 @@
+ 
+ # Build mozglue as a shared lib on Windows, OSX and Android.
+ # If this is ever changed, update MOZ_SHARED_MOZGLUE in browser/installer/Makefile.in
+-if CONFIG['OS_TARGET'] in ('WINNT', 'Darwin', 'Android'):
++if CONFIG['OS_TARGET'] in ('WINNT', 'Darwin', 'Android') and not CONFIG['JS_STANDALONE']:
+     SharedLibrary('mozglue')
+ else:
+     Library('mozglue')
+-- 
+2.7.4
+

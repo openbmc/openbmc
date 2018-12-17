@@ -19,11 +19,11 @@ Signed-off-by: Awais Belal <awais_belal@mentor.com>
  configure.ac | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/configure.ac b/configure.ac
-index bfe988a..f0459e6 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -608,7 +608,7 @@ AC_ARG_WITH(libxml2,
+Index: dhcp-4.4.1/configure.ac
+===================================================================
+--- dhcp-4.4.1.orig/configure.ac
++++ dhcp-4.4.1/configure.ac
+@@ -647,7 +647,7 @@ AC_ARG_WITH(libxml2,
  	with_libxml2="$withval", with_libxml2="no")
  
  if test x$with_libxml2 != xno; then
@@ -32,6 +32,3 @@ index bfe988a..f0459e6 100644
  		[if test x$with_libxml2 != xauto; then
  			AC_MSG_FAILURE([*** Cannot find xmlTextWriterStartElement with -lxml2 and libxml2 was requested])
  		fi])
--- 
-2.11.1
-

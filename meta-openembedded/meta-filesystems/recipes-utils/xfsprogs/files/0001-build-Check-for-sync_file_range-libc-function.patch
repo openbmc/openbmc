@@ -1,14 +1,14 @@
-From ae7172194d3fbb563ff8bbe7c02d34f1bd0e5ec9 Mon Sep 17 00:00:00 2001
+From f8a22f16c03e51d3c779b12f37d362faaa0ecf31 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 31 Jan 2018 21:28:53 -0800
 Subject: [PATCH] build: Check for sync_file_range libc function
 
 glibc 2.27 now has sync_file_range()
 
-Signed-off-by: Khem Raj <raj.khem@gmail.com>
----
 Upstream-Status: Pending
 
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
  include/builddefs.in | 1 +
  io/Makefile          | 5 ++++-
  io/io.h              | 2 +-
@@ -16,10 +16,10 @@ Upstream-Status: Pending
  4 files changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/include/builddefs.in b/include/builddefs.in
-index 92d5076..504225a 100644
+index b895949..a388c83 100644
 --- a/include/builddefs.in
 +++ b/include/builddefs.in
-@@ -105,6 +105,7 @@ HAVE_FIEMAP = @have_fiemap@
+@@ -95,6 +95,7 @@ HAVE_FIEMAP = @have_fiemap@
  HAVE_PREADV = @have_preadv@
  HAVE_PWRITEV2 = @have_pwritev2@
  HAVE_COPY_FILE_RANGE = @have_copy_file_range@
@@ -28,10 +28,10 @@ index 92d5076..504225a 100644
  HAVE_SYNCFS = @have_syncfs@
  HAVE_READDIR = @have_readdir@
 diff --git a/io/Makefile b/io/Makefile
-index 6725936..1876e95 100644
+index 00ede48..dd001b0 100644
 --- a/io/Makefile
 +++ b/io/Makefile
-@@ -59,10 +59,13 @@ CFILES += inject.c resblks.c
+@@ -60,10 +60,13 @@ CFILES += inject.c resblks.c
  LCFLAGS += -DHAVE_INJECT -DHAVE_RESBLKS
  endif
  
@@ -47,10 +47,10 @@ index 6725936..1876e95 100644
  ifeq ($(HAVE_SYNC_FILE_RANGE),yes)
  CFILES += sync_file_range.c
 diff --git a/io/io.h b/io/io.h
-index 3862985..79ddc7b 100644
+index e1f3d95..fe2e6a2 100644
 --- a/io/io.h
 +++ b/io/io.h
-@@ -158,7 +158,7 @@ extern void		fiemap_init(void);
+@@ -151,7 +151,7 @@ extern void		fiemap_init(void);
  #define fiemap_init()	do { } while (0)
  #endif
  
@@ -60,23 +60,20 @@ index 3862985..79ddc7b 100644
  #else
  #define copy_range_init()	do { } while (0)
 diff --git a/io/sync_file_range.c b/io/sync_file_range.c
-index 7e4f3e6..aafea01 100644
+index 30bbc93..6c49d73 100644
 --- a/io/sync_file_range.c
 +++ b/io/sync_file_range.c
-@@ -16,6 +16,7 @@
-  * Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+@@ -4,6 +4,7 @@
+  * All Rights Reserved.
   */
  
 +#ifndef HAVE_COPY_FILE_RANGE
  #include "command.h"
  #include "input.h"
  #include "init.h"
-@@ -104,3 +105,5 @@ sync_range_init(void)
+@@ -92,3 +93,5 @@ sync_range_init(void)
  
  	add_command(&sync_range_cmd);
  }
 +
 +#endif
--- 
-2.16.1
-

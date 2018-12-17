@@ -1,6 +1,6 @@
 Fix various issues which cause problems under musl.
 
-Upstream-Status: Submitted
+Upstream-Status: Backport [bd1326ba7d68df38c5ccaafd2403a5fb30bd452b]
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 
 From 630516bcc0233b047f65665c003201ba6e77453d Mon Sep 17 00:00:00 2001
@@ -300,20 +300,14 @@ diff --git a/gweb/gresolv.c b/gweb/gresolv.c
 index 8a51a9f..d55027c 100644
 --- a/gweb/gresolv.c
 +++ b/gweb/gresolv.c
-@@ -23,11 +23,13 @@
- #include <config.h>
- #endif
- 
-+#include <ctype.h>
- #include <errno.h>
- #include <unistd.h>
- #include <stdarg.h>
+@@ -29,6 +29,7 @@
  #include <string.h>
  #include <stdlib.h>
-+#include <stdio.h>
  #include <resolv.h>
++#include <stdio.h>
  #include <sys/types.h>
  #include <sys/socket.h>
+ #include <netdb.h>
 diff --git a/plugins/wifi.c b/plugins/wifi.c
 index 9d56671..148131d 100644
 --- a/plugins/wifi.c

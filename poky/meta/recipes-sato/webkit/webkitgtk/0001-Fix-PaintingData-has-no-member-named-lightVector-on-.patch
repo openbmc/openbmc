@@ -1,0 +1,37 @@
+From a5d4e038268ae23486fecc1966fd2e16a7f40ce8 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 25 Jul 2018 00:23:48 -0700
+Subject: [PATCH] Fix PaintingData' has no member named 'lightVector' on
+ ARM_NEON
+
+* platform/graphics/cpu/arm/filters/FELightingNEON.h:
+(WebCore::FELighting::platformApplyNeon):
+
+Upstream-Status: Submitted
+https://bugs.webkit.org/show_bug.cgi?id=187991
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ Source/WebCore/platform/graphics/cpu/arm/filters/FELightingNEON.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Source/WebCore/platform/graphics/cpu/arm/filters/FELightingNEON.h b/Source/WebCore/platform/graphics/cpu/arm/filters/FELightingNEON.h
+index 42af922..b542a4c 100644
+--- a/Source/WebCore/platform/graphics/cpu/arm/filters/FELightingNEON.h
++++ b/Source/WebCore/platform/graphics/cpu/arm/filters/FELightingNEON.h
+@@ -144,9 +144,9 @@ inline void FELighting::platformApplyNeon(const LightingData& data, const LightS
+             neonData.flags |= FLAG_CONE_EXPONENT_IS_1;
+     } else {
+         ASSERT(m_lightSource->type() == LS_DISTANT);
+-        floatArguments.lightX = paintingData.lightVector.x();
+-        floatArguments.lightY = paintingData.lightVector.y();
+-        floatArguments.lightZ = paintingData.lightVector.z();
++        floatArguments.lightX = paintingData.initialLightingData.lightVector.x();
++        floatArguments.lightY = paintingData.initialLightingData.lightVector.y();
++        floatArguments.lightZ = paintingData.initialLightingData.lightVector.z();
+         floatArguments.padding2 = 1;
+     }
+ 
+-- 
+2.10.2
+

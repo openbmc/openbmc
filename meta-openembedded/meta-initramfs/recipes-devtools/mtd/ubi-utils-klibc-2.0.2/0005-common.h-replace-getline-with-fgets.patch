@@ -1,0 +1,56 @@
+From 2137eb1a6cd0326510bd3b9faf8037d9bf34ca3d Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Wed, 23 May 2018 15:52:34 +0200
+Subject: [PATCH] common.h: replace getline() with fgets
+
+There is an unofficial upstream patch adding a simple getline()
+to libmissing.h. Unfortunately the patch creates issues if the
+toolchain is using glibc (autotools cache?) so for the moment
+keep the old hack and wait for commits upstream.
+
+Fix:
+
+| ubi-utils/ubiformat.o: In function `prompt.constprop.4':
+| ubiformat.c:(.text+0x70): undefined reference to `getline'
+
+Upstream-Status: Inappropriate [klibc specific]
+
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+---
+ include/common.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/include/common.h b/include/common.h
+index a1d59d0..96b0bdb 100644
+--- a/include/common.h
++++ b/include/common.h
+@@ -126,15 +126,26 @@ extern "C" {
+  */
+ static inline bool prompt(const char *msg, bool def)
+ {
++
++#ifndef __KLIBC__
+ 	char *line = NULL;
+ 	size_t len;
++#else
++	char *line;
++	const int sizeof_line = 2;
++	line = malloc(sizeof_line);
++#endif
+ 	bool ret = def;
+ 
+ 	do {
+ 		normsg_cont("%s (%c/%c) ", msg, def ? 'Y' : 'y', def ? 'n' : 'N');
+ 		fflush(stdout);
+ 
++#ifndef __KLIBC__
+ 		while (getline(&line, &len, stdin) == -1) {
++#else
++		while (fgets(line, sizeof_line, stdin) == NULL) {
++#endif
+ 			printf("failed to read prompt; assuming '%s'\n",
+ 				def ? "yes" : "no");
+ 			break;
+-- 
+2.7.4
+

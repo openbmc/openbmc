@@ -11,6 +11,7 @@ Upstream-Status: Inappropriate [disable feature]
 
 Signed-off-by: Scott Garman <scott.a.garman@intel.com>
 Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
 ---
  src/groupadd.c  | 3 +++
  src/groupdel.c  | 3 +++
@@ -22,7 +23,7 @@ Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
  7 files changed, 21 insertions(+)
 
 diff --git a/src/groupadd.c b/src/groupadd.c
-index 39b4ec0..f716f57 100644
+index 63e1c48..a596c49 100644
 --- a/src/groupadd.c
 +++ b/src/groupadd.c
 @@ -34,6 +34,9 @@
@@ -36,7 +37,7 @@ index 39b4ec0..f716f57 100644
  #include <fcntl.h>
  #include <getopt.h>
 diff --git a/src/groupdel.c b/src/groupdel.c
-index da99347..46a679c 100644
+index 70bed01..ababd81 100644
 --- a/src/groupdel.c
 +++ b/src/groupdel.c
 @@ -34,6 +34,9 @@
@@ -50,7 +51,7 @@ index da99347..46a679c 100644
  #include <fcntl.h>
  #include <grp.h>
 diff --git a/src/groupmems.c b/src/groupmems.c
-index e4f107f..95cb073 100644
+index fc91c8b..2842514 100644
 --- a/src/groupmems.c
 +++ b/src/groupmems.c
 @@ -32,6 +32,9 @@
@@ -64,7 +65,7 @@ index e4f107f..95cb073 100644
  #include <getopt.h>
  #include <grp.h>
 diff --git a/src/groupmod.c b/src/groupmod.c
-index d9d3807..6229737 100644
+index 72daf2c..8965f9d 100644
 --- a/src/groupmod.c
 +++ b/src/groupmod.c
 @@ -34,6 +34,9 @@
@@ -78,7 +79,7 @@ index d9d3807..6229737 100644
  #include <fcntl.h>
  #include <getopt.h>
 diff --git a/src/useradd.c b/src/useradd.c
-index e1ebf50..25679d8 100644
+index 3aaf45c..1ab9174 100644
 --- a/src/useradd.c
 +++ b/src/useradd.c
 @@ -34,6 +34,9 @@
@@ -92,7 +93,7 @@ index e1ebf50..25679d8 100644
  #include <ctype.h>
  #include <errno.h>
 diff --git a/src/userdel.c b/src/userdel.c
-index 19b12bc..a083929 100644
+index c8de1d3..24d3ea9 100644
 --- a/src/userdel.c
 +++ b/src/userdel.c
 @@ -34,6 +34,9 @@
@@ -102,11 +103,11 @@ index 19b12bc..a083929 100644
 +/* Disable use of syslog since we're running this command against a sysroot */
 +#undef USE_SYSLOG
 +
+ #include <assert.h>
  #include <errno.h>
  #include <fcntl.h>
- #include <getopt.h>
 diff --git a/src/usermod.c b/src/usermod.c
-index 685b50a..28e5cfc 100644
+index ccfbb99..24fb60d 100644
 --- a/src/usermod.c
 +++ b/src/usermod.c
 @@ -34,6 +34,9 @@
@@ -116,9 +117,9 @@ index 685b50a..28e5cfc 100644
 +/* Disable use of syslog since we're running this command against a sysroot */
 +#undef USE_SYSLOG
 +
+ #include <assert.h>
  #include <ctype.h>
  #include <errno.h>
- #include <fcntl.h>
 -- 
-2.1.0
+2.11.0
 

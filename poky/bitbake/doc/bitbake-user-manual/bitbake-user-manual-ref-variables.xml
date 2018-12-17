@@ -115,7 +115,8 @@
                             is either not set or set to "0".
                             </para></listitem>
                         <listitem><para>
-                            Limited support for wildcard matching against the
+                            Limited support for the "<filename>*</filename>"
+                            wildcard character for matching against the
                             beginning of host names exists.
                             For example, the following setting matches
                             <filename>git.gnu.org</filename>,
@@ -124,6 +125,20 @@
                             <literallayout class='monospaced'>
      BB_ALLOWED_NETWORKS = "*.gnu.org"
                             </literallayout>
+                            <note><title>Important</title>
+                                <para>The use of the "<filename>*</filename>"
+                                character only works at the beginning of
+                                a host name and it must be isolated from
+                                the remainder of the host name.
+                                You cannot use the wildcard character in any
+                                other location of the name or combined with
+                                the front part of the name.</para>
+
+                                <para>For example,
+                                <filename>*.foo.bar</filename> is supported,
+                                while <filename>*aa.foo.bar</filename> is not.
+                                </para>
+                            </note>
                             </para></listitem>
                         <listitem><para>
                             Mirrors not in the host list are skipped and
@@ -646,10 +661,10 @@
             <glossdef>
                 <para>
                     Contains the name of the currently executing task.
-                    The value does not include the "do_" prefix.
+                    The value includes the "do_" prefix.
                     For example, if the currently executing task is
                     <filename>do_config</filename>, the value is
-                    "config".
+                    "do_config".
                 </para>
             </glossdef>
         </glossentry>
@@ -1082,7 +1097,19 @@
 
         <glossentry id='var-BBFILES'><glossterm>BBFILES</glossterm>
             <glossdef>
-                <para>List of recipe files BitBake uses to build software.</para>
+                <para>
+                    A space-separated list of recipe files BitBake uses to
+                    build software.
+                </para>
+
+                <para>
+                    When specifying recipe files, you can pattern match using
+                    Python's
+                    <ulink url='https://docs.python.org/3/library/glob.html'><filename>glob</filename></ulink>
+                    syntax.
+                    For details on the syntax, see the documentation by
+                    following the previous link.
+                </para>
             </glossdef>
         </glossentry>
 
@@ -1166,15 +1193,19 @@
                     match any of the expressions.
                     It is as if BitBake does not see them at all.
                     Consequently, matching files are not parsed or otherwise
-                    used by BitBake.</para>
+                    used by BitBake.
+                </para>
+
                 <para>
                     The values you provide are passed to Python's regular
                     expression compiler.
+                    Consequently, the syntax follows Python's Regular
+                    Expression (re) syntax.
                     The expressions are compared against the full paths to
                     the files.
                     For complete syntax information, see Python's
                     documentation at
-                    <ulink url='http://docs.python.org/release/2.3/lib/re-syntax.html'></ulink>.
+                    <ulink url='http://docs.python.org/3/library/re.html#re'></ulink>.
                 </para>
 
                 <para>
@@ -1201,6 +1232,45 @@
                         slash character to ensure you match just that directory
                         name.
                     </note>
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-BBMULTICONFIG'><glossterm>BBMULTICONFIG</glossterm>
+            <info>
+                BBMULTICONFIG[doc] = "Enables BitBake to perform multiple configuration builds and lists each separate configuration (multiconfig)."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Enables BitBake to perform multiple configuration builds
+                    and lists each separate configuration (multiconfig).
+                    You can use this variable to cause BitBake to build
+                    multiple targets where each target has a separate
+                    configuration.
+                    Define <filename>BBMULTICONFIG</filename> in your
+                    <filename>conf/local.conf</filename> configuration file.
+                </para>
+
+                <para>
+                    As an example, the following line specifies three
+                    multiconfigs, each having a separate configuration file:
+                    <literallayout class='monospaced'>
+     BBMULTIFONFIG = "configA configB configC"
+                    </literallayout>
+                    Each configuration file you use must reside in the
+                    build directory within a directory named
+                    <filename>conf/multiconfig</filename> (e.g.
+                    <replaceable>build_directory</replaceable><filename>/conf/multiconfig/configA.conf</filename>).
+                </para>
+
+                <para>
+                    For information on how to use
+                    <filename>BBMULTICONFIG</filename> in an environment that
+                    supports building targets with multiple configurations,
+                    see the
+                    "<link linkend='executing-a-multiple-configuration-build'>Executing a Multiple Configuration Build</link>"
+                    section.
                 </para>
             </glossdef>
         </glossentry>
@@ -1894,15 +1964,27 @@
                     you want to select, and you should set
                     <link linkend='var-PV'><filename>PV</filename></link>
                     accordingly for precedence.
-                    You can use the "<filename>%</filename>" character as a
-                    wildcard to match any number of characters, which can be
-                    useful when specifying versions that contain long revision
-                    numbers that could potentially change.
+                </para>
+
+                <para>
+                    The <filename>PREFERRED_VERSION</filename> variable
+                    supports limited wildcard use through the
+                    "<filename>%</filename>" character.
+                    You can use the character to match any number of
+                    characters, which can be useful when specifying versions
+                    that contain long revision numbers that potentially change.
                     Here are two examples:
                     <literallayout class='monospaced'>
      PREFERRED_VERSION_python = "2.7.3"
      PREFERRED_VERSION_linux-yocto = "4.12%"
                     </literallayout>
+                    <note><title>Important</title>
+                        The use of the "<filename>%</filename>" character
+                        is limited in that it only works at the end of the
+                        string.
+                        You cannot use the wildcard character in any other
+                        location of the string.
+                    </note>
                 </para>
             </glossdef>
         </glossentry>

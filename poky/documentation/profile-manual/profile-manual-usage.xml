@@ -375,7 +375,9 @@
      EXTRA_IMAGE_FEATURES = "debug-tweaks tools-profile dbg-pkgs"
                 </literallayout>
                 Additionally, in order to generate the type of debuginfo that
-                perf understands, we also need to add the following to local.conf:
+                perf understands, we also need to set
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-PACKAGE_DEBUG_SPLIT_STYLE'><filename>PACKAGE_DEBUG_SPLIT_STYLE</filename></ulink>
+                in the <filename>local.conf</filename> file:
                 <literallayout class='monospaced'>
      PACKAGE_DEBUG_SPLIT_STYLE = 'debug-file-directory'
                 </literallayout>

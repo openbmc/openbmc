@@ -1,0 +1,33 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Xose Vazquez Perez <xose.vazquez@gmail.com>
+Date: Tue, 24 Apr 2018 15:03:40 +0200
+Subject: [PATCH] multipath-tools: remove "c" from __cpluscplus, misspelled
+
+found by cppcheck(http://cppcheck.sf.net/):
+[libmpathcmd/mpath_cmd.h:24]: (error) Invalid number of character '{' when these macros are defined: '__cpluscplus'.
+
+Cc: Benjamin Marzinski <bmarzins@redhat.com>
+Cc: Christophe Varoqui <christophe.varoqui@opensvc.com>
+Cc: DM ML <dm-devel@redhat.com>
+Signed-off-by: Xose Vazquez Perez <xose.vazquez@gmail.com>
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmpathcmd/mpath_cmd.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libmpathcmd/mpath_cmd.h b/libmpathcmd/mpath_cmd.h
+index aaa8da9..df9d938 100644
+--- a/libmpathcmd/mpath_cmd.h
++++ b/libmpathcmd/mpath_cmd.h
+@@ -20,7 +20,7 @@
+ #ifndef LIB_MPATH_CMD_H
+ #define LIB_MPATH_CMD_H
+ 
+-#ifdef __cpluscplus
++#ifdef __cplusplus
+ extern "C" {
+ #endif
+ 
+-- 
+2.7.4
+

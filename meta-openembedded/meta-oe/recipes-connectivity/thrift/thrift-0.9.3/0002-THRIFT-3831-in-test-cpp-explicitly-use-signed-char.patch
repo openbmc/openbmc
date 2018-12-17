@@ -1,7 +1,7 @@
-From f6cad0580e5391c37af7f60adddb71bf1a403dc4 Mon Sep 17 00:00:00 2001
+From 7b05a74432f08ef34d0f8743dd6438ad012e3b5e Mon Sep 17 00:00:00 2001
 From: Cody P Schafer <dev@codyps.com>
 Date: Fri, 9 Sep 2016 15:50:26 -0400
-Subject: [PATCH 2/2] THRIFT-3831 in test/cpp explicitly use `signed char`
+Subject: [PATCH] THRIFT-3831 in test/cpp explicitly use `signed char`
 
 `char`'s signed-ness is implimentation dependent, and in the case where
 `char` was not signed, we previously recieved errors like
@@ -9,15 +9,16 @@ Subject: [PATCH 2/2] THRIFT-3831 in test/cpp explicitly use `signed char`
     thrift/0.9.3-r0/git/test/cpp/src/TestClient.cpp:404:15: error: narrowing conversion of '-127' from 'int' to 'char' inside { } [-Wnarrowing]
 
 (This example from gcc-6 on arm)
+
 ---
  test/cpp/src/TestClient.cpp | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/test/cpp/src/TestClient.cpp b/test/cpp/src/TestClient.cpp
-index e709899..4a961f8 100644
+index 7c425a9..7145ebb 100644
 --- a/test/cpp/src/TestClient.cpp
 +++ b/test/cpp/src/TestClient.cpp
-@@ -383,7 +383,7 @@ int main(int argc, char** argv) {
+@@ -381,7 +381,7 @@ int main(int argc, char** argv) {
       * BINARY TEST
       */
      printf("testBinary([-128..127]) = {");
@@ -26,7 +27,7 @@ index e709899..4a961f8 100644
          = {-128, -127, -126, -125, -124, -123, -122, -121, -120, -119, -118, -117, -116, -115, -114,
             -113, -112, -111, -110, -109, -108, -107, -106, -105, -104, -103, -102, -101, -100, -99,
             -98,  -97,  -96,  -95,  -94,  -93,  -92,  -91,  -90,  -89,  -88,  -87,  -86,  -85,  -84,
-@@ -404,7 +404,7 @@ int main(int argc, char** argv) {
+@@ -402,7 +402,7 @@ int main(int argc, char** argv) {
             127};
      try {
        string bin_result;
@@ -35,6 +36,3 @@ index e709899..4a961f8 100644
        if (bin_result.size() != 256) {
          printf("}\n*** FAILED ***\n");
          printf("invalid length: %lu\n", bin_result.size());
--- 
-2.9.3
-

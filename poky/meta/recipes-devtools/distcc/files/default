@@ -16,9 +16,9 @@ STARTDISTCC="true"
 #
 # ALLOWEDNETS="127.0.0.1"
 
-ALLOWEDNETS="192.168.7.0/24"
+ALLOWEDNETS="127.0.0.1"
 
 #
 # OPTIONS is used for the systemd service file
 #
-OPTIONS="--allow 192.168.7.0/24"
+OPTIONS="--allow 127.0.0.1 --make-me-a-botnet"

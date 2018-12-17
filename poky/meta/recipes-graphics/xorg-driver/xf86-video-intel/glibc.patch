@@ -1,0 +1,25 @@
+Add a missing include needed for glibc 2.28 to avoid:
+
+| ../../git/tools/backlight_helper.c: In function 'main':
+| ../../git/tools/backlight_helper.c:54:34: error: implicit declaration of function 'major' [-Werror=implicit-function-declaration]
+|   if (fd < 0 || fstat(fd, &st) || major(st.st_dev))
+|                                   ^~~~~
+| ../../git/tools/backlight_helper.c:54:34: warning: nested extern declaration of 'major' [-Wnested-externs]
+| cc1: some warnings being treated as errors
+| Makefile:666: recipe for target 'backlight_helper.o' failed
+
+Upstream-Status: Pending
+RP 2018/8/12
+
+Index: git/tools/backlight_helper.c
+===================================================================
+--- git.orig/tools/backlight_helper.c
++++ git/tools/backlight_helper.c
+@@ -8,6 +8,7 @@
+ 
+ #include <sys/types.h>
+ #include <sys/stat.h>
++#include <sys/sysmacros.h>
+ 
+ #if MAJOR_IN_MKDEV
+ #include <sys/mkdev.h>

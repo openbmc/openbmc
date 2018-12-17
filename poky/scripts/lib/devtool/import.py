@@ -81,7 +81,7 @@ def devimport(args, config, basepath, workspace):
                     break
             else:
                 non_importables.append(fn)
-                logger.warn('No recipe to append %s.bbapppend, skipping' % fn)
+                logger.warning('No recipe to append %s.bbapppend, skipping' % fn)
 
         # Extract
         imported = []
@@ -104,9 +104,9 @@ def devimport(args, config, basepath, workspace):
                         try:
                             tar.extract(member, path=config.workspace_path)
                         except PermissionError as pe:
-                            logger.warn(pe)
+                            logger.warning(pe)
                     else:
-                        logger.warn('File already present. Use --overwrite/-o to overwrite it: %s' % member.name)
+                        logger.warning('File already present. Use --overwrite/-o to overwrite it: %s' % member.name)
                         continue
                 else:
                     tar.extract(member, path=config.workspace_path)
@@ -129,7 +129,7 @@ def devimport(args, config, basepath, workspace):
     if imported:
         logger.info('Imported recipes into workspace %s: %s' % (config.workspace_path, ', '.join(imported)))
     else:
-        logger.warn('No recipes imported into the workspace')
+        logger.warning('No recipes imported into the workspace')
 
     return 0
 

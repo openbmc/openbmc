@@ -1,4 +1,4 @@
-From 7672e363468271b4c63ff58770c5aac15ab8f722 Mon Sep 17 00:00:00 2001
+From 74629016e76343a4bf39915c9192b6bf26a57c2d Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 4 Oct 2017 22:30:46 -0700
 Subject: [PATCH] libasm may link with libbz2 if found
@@ -9,15 +9,14 @@ where indirect libraries may be not found by linker
 | /mnt/a/oe/build/tmp/work/riscv64-bec-linux/elfutils/0.170-r0/recipe-sysroot/usr/lib/libbz2.so.1: error adding symbols: DSO missing from command line
 | collect2: error: ld returned 1 exit status
 
+Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
-Upstream-Status: Pending
-
- src/Makefile.am | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ src/Makefile.am | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/Makefile.am b/src/Makefile.am
-index e03bc32..9b7e853 100644
+index 9305b84..9b7e853 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
 @@ -39,11 +39,11 @@ EXTRA_DIST += make-debug-archive.in
@@ -35,5 +34,5 @@ index e03bc32..9b7e853 100644
  libelf = ../libelf/libelf.so
  endif
 -- 
-2.14.2
+2.7.4
 

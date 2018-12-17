@@ -14,11 +14,11 @@ Signed-off-by: Martin Kelly <mkelly@xevo.com>
  configure.ac | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/configure.ac b/configure.ac
-index 3400b86..7d6119e 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -942,7 +942,7 @@ if test "$with_dnet" = "yes"; then
+Index: open-vm-tools/configure.ac
+===================================================================
+--- open-vm-tools.orig/configure.ac
++++ open-vm-tools/configure.ac
+@@ -944,7 +944,7 @@ if test "$with_dnet" = "yes"; then
        AC_VMW_CHECK_LIB([dnet],
                         [DNET],
                         [],
@@ -27,15 +27,12 @@ index 3400b86..7d6119e 100644
                         [],
                         [dnet.h],
                         [intf_open],
-@@ -952,7 +952,7 @@ if test "$with_dnet" = "yes"; then
+@@ -954,7 +954,7 @@ if test "$with_dnet" = "yes"; then
  
     if test $have_dnet = "no"; then
  		AC_MSG_ERROR(
 -		   [dnet-config was not found on your PATH. Please configure without dnet (using --without-dnet) or install dnet - http://libdnet.sourceforge.net])
 +		   [dnet was not found. Please configure without dnet (using --without-dnet) or install dnet - http://libdnet.sourceforge.net])
- 	fi
+    fi
  fi
  
--- 
-2.1.4
-

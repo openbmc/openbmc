@@ -10,8 +10,12 @@ class Command(BaseCommand):
     args    = '<buildID1 buildID2 .....>'
     help    = "Deletes selected build(s)"
 
+    def add_arguments(self, parser):
+        parser.add_argument('buildids', metavar='N', type=int, nargs='+',
+                    help="Build ID's to delete")
+
     def handle(self, *args, **options):
-        for bid in args:
+        for bid in options['buildids']:
             try:
                 b = Build.objects.get(pk = bid)
             except ObjectDoesNotExist:

@@ -5,9 +5,11 @@ SECTION = "net"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://debian/copyright;md5=acc89812938cf9ad6b1debc37cea0253"
 
+inherit manpages
+MAN_PKG = "${PN}"
 
 SRCREV = "42bfbb9beb924672ca86b86e9679ac3d6b87d992"
-SRC_URI = "git://anonscm.debian.org/collab-maint/ifenslave.git"
+SRC_URI = "git://salsa.debian.org/debian/ifenslave.git;protocol=https"
 
 S = "${WORKDIR}/git"
 
@@ -23,5 +25,3 @@ do_install() {
 
 FILES_${PN}-doc_remove = "${mandir}"
 FILES_${PN} += "${mandir}/man8/ifenslave.8"
-
-RDEPENDS_${PN} = "man"

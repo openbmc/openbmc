@@ -1,4 +1,4 @@
-From 97cb9405f281f54d4083f3126d441c8b44eafb89 Mon Sep 17 00:00:00 2001
+From 81d1f8bc102b23bdfa63a01f252f3e4c74ae7da9 Mon Sep 17 00:00:00 2001
 From: Paul Barker <pbarker@toganlabs.com>
 Date: Thu, 7 Sep 2017 19:14:20 +0000
 Subject: [PATCH] Don't require internet connection during build
@@ -11,16 +11,17 @@ The following issues break offline builds:
 
 Signed-off-by: Paul Barker <pbarker@toganlabs.com>
 Upstream-status: Inappropriate
+
 ---
  Makefile        | 6 ++----
  Makefile.ffmpeg | 2 +-
  2 files changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 60501b1..6471f0f 100644
---- a/Makefile
-+++ b/Makefile
-@@ -79,14 +79,12 @@ ffmpeg:
+Index: git/Makefile
+===================================================================
+--- git.orig/Makefile
++++ git/Makefile
+@@ -81,17 +81,14 @@ ffmpeg:
  	make -f Makefile.ffmpeg
  	make -f Makefile.ffmpeg install
  
@@ -36,13 +37,14 @@ index 60501b1..6471f0f 100644
 -	cp omxplayer.1 $(DIST)/usr/share/man/man1
  	cp -P ffmpeg_compiled/usr/lib/*.so* $(DIST)/usr/lib/omxplayer/
 -	tar -czf omxplayer-dist.tar.gz $(DIST)
-\ No newline at end of file
-+	tar -czf omxplayer-dist.tar.gz $(DIST)
-diff --git a/Makefile.ffmpeg b/Makefile.ffmpeg
-index 22d495c..8651724 100644
---- a/Makefile.ffmpeg
-+++ b/Makefile.ffmpeg
-@@ -6,7 +6,7 @@ FFMPEG_EXTRA_CFLAGS?=-mfpu=vfp -mfloat-abi=$(FLOAT) -mno-apcs-stack-check -mstru
+ 
+ install:
+ 	cp -r $(DIST)/* /
+Index: git/Makefile.ffmpeg
+===================================================================
+--- git.orig/Makefile.ffmpeg
++++ git/Makefile.ffmpeg
+@@ -5,7 +5,7 @@ FFMPEG_EXTRA_CFLAGS?=-mfpu=vfp -mfloat-a
  WORK=$(PWD)
  
  .PHONY : all
@@ -51,6 +53,3 @@ index 22d495c..8651724 100644
  
  .PHONY : copy
  copy:
--- 
-2.7.4
-

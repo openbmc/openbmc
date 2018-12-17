@@ -1,0 +1,53 @@
+From 3f4b6319701834182304c4079119780f4ae5b49b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 7 Nov 2018 11:30:44 -0800
+Subject: [PATCH] Do not include net/ethernet.h and linux/if_ether.h
+
+They conflict when used together especially with musl
+removing them still keeps it working so it seems they are redundant
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ shared/n-acd/src/n-acd.c              | 1 -
+ src/platform/wpan/nm-wpan-utils.h     | 2 --
+ src/settings/nm-settings-connection.h | 2 --
+ 3 files changed, 5 deletions(-)
+
+diff --git a/shared/n-acd/src/n-acd.c b/shared/n-acd/src/n-acd.c
+index 9164f95..9538e50 100644
+--- a/shared/n-acd/src/n-acd.c
++++ b/shared/n-acd/src/n-acd.c
+@@ -23,7 +23,6 @@
+ #include <errno.h>
+ #include <limits.h>
+ #include <linux/filter.h>
+-#include <linux/if_ether.h>
+ #include <linux/if_packet.h>
+ #include <net/ethernet.h>
+ #include <netinet/if_ether.h>
+diff --git a/src/platform/wpan/nm-wpan-utils.h b/src/platform/wpan/nm-wpan-utils.h
+index f7d0c03..e1c81f5 100644
+--- a/src/platform/wpan/nm-wpan-utils.h
++++ b/src/platform/wpan/nm-wpan-utils.h
+@@ -20,8 +20,6 @@
+ #ifndef __WPAN_UTILS_H__
+ #define __WPAN_UTILS_H__
+ 
+-#include <net/ethernet.h>
+-
+ #include "nm-dbus-interface.h"
+ #include "platform/nm-netlink.h"
+ 
+diff --git a/src/settings/nm-settings-connection.h b/src/settings/nm-settings-connection.h
+index e796b71..c01fef6 100644
+--- a/src/settings/nm-settings-connection.h
++++ b/src/settings/nm-settings-connection.h
+@@ -22,8 +22,6 @@
+ #ifndef __NETWORKMANAGER_SETTINGS_CONNECTION_H__
+ #define __NETWORKMANAGER_SETTINGS_CONNECTION_H__
+ 
+-#include <net/ethernet.h>
+-
+ #include "nm-dbus-object.h"
+ #include "nm-connection.h"
+ 

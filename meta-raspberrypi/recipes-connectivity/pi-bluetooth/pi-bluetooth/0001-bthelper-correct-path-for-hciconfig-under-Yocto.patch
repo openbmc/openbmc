@@ -1,0 +1,28 @@
+From af91c96951a11f81f5cea88a0010161592c89310 Mon Sep 17 00:00:00 2001
+From: "Peter A. Bigot" <pab@pabigot.com>
+Date: Wed, 14 Nov 2018 09:19:51 -0600
+Subject: [PATCH] bthelper: correct path for hciconfig under Yocto
+
+Upstream-Status: Inapproprate [OE-specific]
+Signed-off-by: Peter A. Bigot <pab@pabigot.com>
+---
+ usr/bin/bthelper | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/usr/bin/bthelper b/usr/bin/bthelper
+index 255fdeb..4e1a1a4 100755
+--- a/usr/bin/bthelper
++++ b/usr/bin/bthelper
+@@ -10,7 +10,7 @@ fi
+ 
+ dev="$1"
+ # Need to bring hci up before looking at MAC as it can be all zeros during init
+-/bin/hciconfig "$dev" up
+-/bin/hciconfig "$dev" |grep -q "BD Address: B8:27:EB:" || exit 0
++/usr/bin/hciconfig "$dev" up
++/usr/bin/hciconfig "$dev" |grep -q "BD Address: B8:27:EB:" || exit 0
+ /usr/bin/hcitool -i "$dev" cmd 0x3f 0x1c 0x01 0x02 0x00 0x01 0x01 > /dev/null
+ 
+-- 
+2.17.1
+

@@ -13,6 +13,7 @@ SRC_URI = "git://github.com/GNOME/gtkmathview.git \
     file://0001-include-cstdio-to-get-printf-definitions.patch \
     file://0002-configure.ac-header-detection-of-hash_map-is-broken-.patch \
     file://0003-gcc-6.0-build-fixes.patch \
+    file://0001-Fix-formatting-for-modern-c-11-compilers.patch \
 "
 
 S = "${WORKDIR}/git"

@@ -1,0 +1,62 @@
+From fb0d391138df48e93c44a2087ea796cca5e229c0 Mon Sep 17 00:00:00 2001
+From: Bruce Merry <bmerry@ska.ac.za>
+Date: Thu, 28 Jun 2018 16:38:42 +0200
+Subject: [PATCH 1/2] Strip Authorization header whenever root URL changes
+
+Previously the header was stripped only if the hostname changed, but in
+an https -> http redirect that can leak the credentials on the wire
+(#4716). Based on with RFC 7235 section 2.2, the header is now stripped
+if the "canonical root URL" (scheme+authority) has changed, by checking
+scheme, hostname and port.
+
+Upstream-Status: Backport
+
+Fix CVE-2018-18074
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ requests/sessions.py   |  4 +++-
+ tests/test_requests.py | 12 +++++++++++-
+ 2 files changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/requests/sessions.py b/requests/sessions.py
+index ba13526..2969d83 100644
+--- a/requests/sessions.py
++++ b/requests/sessions.py
+@@ -242,7 +242,9 @@ class SessionRedirectMixin(object):
+             original_parsed = urlparse(response.request.url)
+             redirect_parsed = urlparse(url)
+ 
+-            if (original_parsed.hostname != redirect_parsed.hostname):
++            if (original_parsed.hostname != redirect_parsed.hostname
++                    or original_parsed.port != redirect_parsed.port
++                    or original_parsed.scheme != redirect_parsed.scheme):
+                 del headers['Authorization']
+ 
+         # .netrc might have more auth for us on our new host.
+diff --git a/tests/test_requests.py b/tests/test_requests.py
+index fcddb1d..e0e801a 100644
+--- a/tests/test_requests.py
++++ b/tests/test_requests.py
+@@ -1575,7 +1575,17 @@ class TestRequests:
+             auth=('user', 'pass'),
+         )
+         assert r.history[0].request.headers['Authorization']
+-        assert not r.request.headers.get('Authorization', '')
++        assert 'Authorization' not in r.request.headers
++
++    def test_auth_is_stripped_on_scheme_redirect(self, httpbin, httpbin_secure, httpbin_ca_bundle):
++        r = requests.get(
++            httpbin_secure('redirect-to'),
++            params={'url': httpbin('get')},
++            auth=('user', 'pass'),
++            verify=httpbin_ca_bundle
++        )
++        assert r.history[0].request.headers['Authorization']
++        assert 'Authorization' not in r.request.headers
+ 
+     def test_auth_is_retained_for_redirect_on_host(self, httpbin):
+         r = requests.get(httpbin('redirect/1'), auth=('user', 'pass'))
+-- 
+2.7.4
+

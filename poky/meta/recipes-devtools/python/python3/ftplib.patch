@@ -1,0 +1,60 @@
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From cabe916dc694997d4892b58986e73a713d5a2f8d Mon Sep 17 00:00:00 2001
+From: "Miss Islington (bot)"
+ <31488909+miss-islington@users.noreply.github.com>
+Date: Thu, 16 Aug 2018 15:38:03 -0400
+Subject: [PATCH] [3.6] bpo-34391: Fix ftplib test for TLS 1.3 (GH-8787)
+ (#8790)
+
+Read from data socket to avoid "[SSL] shutdown while in init" exception
+during shutdown of the dummy server.
+
+Signed-off-by: Christian Heimes <christian@python.org>
+
+
+<!-- issue-number: [bpo-34391](https://www.bugs.python.org/issue34391) -->
+https://bugs.python.org/issue34391
+<!-- /issue-number -->
+(cherry picked from commit 1590c393360df059160145e7475754427bfc6680)
+
+
+Co-authored-by: Christian Heimes <christian@python.org>
+---
+ Lib/test/test_ftplib.py                                         | 5 +++++
+ Misc/NEWS.d/next/Tests/2018-08-16-18-48-47.bpo-34391.ouNfxC.rst | 1 +
+ 2 files changed, 6 insertions(+)
+ create mode 100644 Misc/NEWS.d/next/Tests/2018-08-16-18-48-47.bpo-34391.ouNfxC.rst
+
+diff --git a/Lib/test/test_ftplib.py b/Lib/test/test_ftplib.py
+index 44dd73aeca..4ff2f71afb 100644
+--- a/Lib/test/test_ftplib.py
++++ b/Lib/test/test_ftplib.py
+@@ -876,18 +876,23 @@ class TestTLS_FTPClass(TestCase):
+         # clear text
+         with self.client.transfercmd('list') as sock:
+             self.assertNotIsInstance(sock, ssl.SSLSocket)
++            self.assertEqual(sock.recv(1024), LIST_DATA.encode('ascii'))
+         self.assertEqual(self.client.voidresp(), "226 transfer complete")
+ 
+         # secured, after PROT P
+         self.client.prot_p()
+         with self.client.transfercmd('list') as sock:
+             self.assertIsInstance(sock, ssl.SSLSocket)
++            # consume from SSL socket to finalize handshake and avoid
++            # "SSLError [SSL] shutdown while in init"
++            self.assertEqual(sock.recv(1024), LIST_DATA.encode('ascii'))
+         self.assertEqual(self.client.voidresp(), "226 transfer complete")
+ 
+         # PROT C is issued, the connection must be in cleartext again
+         self.client.prot_c()
+         with self.client.transfercmd('list') as sock:
+             self.assertNotIsInstance(sock, ssl.SSLSocket)
++            self.assertEqual(sock.recv(1024), LIST_DATA.encode('ascii'))
+         self.assertEqual(self.client.voidresp(), "226 transfer complete")
+ 
+     def test_login(self):
+-- 
+2.11.0
+

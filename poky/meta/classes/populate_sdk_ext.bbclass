@@ -200,15 +200,9 @@ python copy_buildsystem () {
         workspace_name = 'orig-workspace'
     else:
         workspace_name = None
-    layers_copied = buildsystem.copy_bitbake_and_layers(baseoutpath + '/layers', workspace_name)
 
-    sdkbblayers = []
-    corebase = os.path.basename(d.getVar('COREBASE'))
-    for layer in layers_copied:
-        if corebase == os.path.basename(layer):
-            conf_bbpath = os.path.join('layers', layer, 'bitbake')
-        else:
-            sdkbblayers.append(layer)
+    corebase, sdkbblayers = buildsystem.copy_bitbake_and_layers(baseoutpath + '/layers', workspace_name)
+    conf_bbpath = os.path.join('layers', corebase, 'bitbake')
 
     for path in os.listdir(baseoutpath + '/layers'):
         relpath = os.path.join('layers', path, oe_init_env_script)
@@ -325,8 +319,9 @@ python copy_buildsystem () {
             f.write('TCLIBCAPPEND = ""\n')
             f.write('DL_DIR = "${TOPDIR}/downloads"\n')
 
-            f.write('INHERIT += "%s"\n' % 'uninative')
-            f.write('UNINATIVE_CHECKSUM[%s] = "%s"\n\n' % (d.getVar('BUILD_ARCH'), uninative_checksum))
+            if bb.data.inherits_class('uninative', d):
+               f.write('INHERIT += "%s"\n' % 'uninative')
+               f.write('UNINATIVE_CHECKSUM[%s] = "%s"\n\n' % (d.getVar('BUILD_ARCH'), uninative_checksum))
             f.write('CONF_VERSION = "%s"\n\n' % d.getVar('CONF_VERSION', False))
 
             # Some classes are not suitable for SDK, remove them from INHERIT
@@ -536,7 +531,8 @@ install_tools() {
 	scripts="devtool recipetool oe-find-native-sysroot runqemu* wic"
 	for script in $scripts; do
 		for scriptfn in `find ${SDK_OUTPUT}/${SDKPATH}/${scriptrelpath} -maxdepth 1 -executable -name "$script"`; do
-			lnr ${scriptfn} ${SDK_OUTPUT}/${SDKPATHNATIVE}${bindir_nativesdk}/`basename $scriptfn`
+			targetscriptfn="${SDK_OUTPUT}/${SDKPATHNATIVE}${bindir_nativesdk}/$(basename $scriptfn)"
+			test -e ${targetscriptfn} || lnr ${scriptfn} ${targetscriptfn}
 		done
 	done
 	# We can't use the same method as above because files in the sysroot won't exist at this point

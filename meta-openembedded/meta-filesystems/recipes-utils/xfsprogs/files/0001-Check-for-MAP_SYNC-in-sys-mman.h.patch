@@ -1,0 +1,52 @@
+From f41ef1f06d428c81fcdef73d896dfc7ceda1809c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 23 Aug 2018 04:59:39 +0000
+Subject: [PATCH] Check for MAP_SYNC in sys/mman.h
+
+Not all arches have wired MAP_SYNC e.g. mips
+which have conflicts with definition, so checking
+a generic file is going to mis-configure xfsprogs
+for such arches.
+
+libc now has added the relevant macros to
+sys/mman.h, and returns the right values for arches
+where its implemented and nothing for others
+unlike asm-generic/mman.h which only checks
+for kernel headers and ignored arches
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ include/linux.h       | 3 +--
+ m4/package_libcdev.m4 | 3 +--
+ 2 files changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/include/linux.h b/include/linux.h
+index 1998941..7e5c9ab 100644
+--- a/include/linux.h
++++ b/include/linux.h
+@@ -331,8 +331,7 @@ fsmap_advance(
+ #define MAP_SYNC 0
+ #define MAP_SHARED_VALIDATE 0
+ #else
+-#include <asm-generic/mman.h>
+-#include <asm-generic/mman-common.h>
++#include <sys/mman.h>
+ #endif /* HAVE_MAP_SYNC */
+ 
+ #endif	/* __XFS_LINUX_H__ */
+diff --git a/m4/package_libcdev.m4 b/m4/package_libcdev.m4
+index 0a6b514..2b47d2f 100644
+--- a/m4/package_libcdev.m4
++++ b/m4/package_libcdev.m4
+@@ -335,8 +335,7 @@ AC_DEFUN([AC_HAVE_STATFS_FLAGS],
+ AC_DEFUN([AC_HAVE_MAP_SYNC],
+   [ AC_MSG_CHECKING([for MAP_SYNC])
+     AC_TRY_COMPILE([
+-#include <asm-generic/mman.h>
+-#include <asm-generic/mman-common.h>
++#include <sys/mman.h>
+     ], [
+         int flags = MAP_SYNC | MAP_SHARED_VALIDATE;
+     ], have_map_sync=yes

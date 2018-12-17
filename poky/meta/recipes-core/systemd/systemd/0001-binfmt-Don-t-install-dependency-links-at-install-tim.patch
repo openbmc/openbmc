@@ -1,0 +1,81 @@
+From 87dd61be2e28e78ce4f9f173794812e6c2d904d1 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Wed, 27 Jun 2018 16:01:22 +0800
+Subject: [PATCH 1/9] binfmt: Don't install dependency links at install time 
+ for the binfmt services
+
+use [Install] blocks so that they get created when the service is enabled
+like a traditional service.
+
+The [Install] blocks were rejected upstream as they don't have a way to
+"enable" it on install without static symlinks which can't be disabled,
+only masked. We however can do that in a postinst.
+
+Upstream-Status: Denied
+
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ units/meson.build                       | 6 ++----
+ units/proc-sys-fs-binfmt_misc.automount | 3 +++
+ units/systemd-binfmt.service.in         | 4 ++++
+ 3 files changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/units/meson.build b/units/meson.build
+index e4ac6ced6..698734e44 100644
+--- a/units/meson.build
++++ b/units/meson.build
+@@ -46,8 +46,7 @@ units = [
+         ['poweroff.target',                     '',
+          'runlevel0.target'],
+         ['printer.target',                      ''],
+-        ['proc-sys-fs-binfmt_misc.automount',   'ENABLE_BINFMT',
+-         'sysinit.target.wants/'],
++        ['proc-sys-fs-binfmt_misc.automount',   'ENABLE_BINFMT'],
+         ['proc-sys-fs-binfmt_misc.mount',       'ENABLE_BINFMT'],
+         ['reboot.target',                       '',
+          'runlevel6.target ctrl-alt-del.target'],
+@@ -130,8 +129,7 @@ in_units = [
+         ['systemd-ask-password-console.service', ''],
+         ['systemd-ask-password-wall.service',    ''],
+         ['systemd-backlight@.service',           'ENABLE_BACKLIGHT'],
+-        ['systemd-binfmt.service',               'ENABLE_BINFMT',
+-         'sysinit.target.wants/'],
++        ['systemd-binfmt.service',               'ENABLE_BINFMT'],
+         ['systemd-coredump@.service',            'ENABLE_COREDUMP'],
+         ['systemd-exit.service',                 ''],
+         ['systemd-firstboot.service',            'ENABLE_FIRSTBOOT',
+diff --git a/units/proc-sys-fs-binfmt_misc.automount b/units/proc-sys-fs-binfmt_misc.automount
+index 30a6bc991..4231f3b70 100644
+--- a/units/proc-sys-fs-binfmt_misc.automount
++++ b/units/proc-sys-fs-binfmt_misc.automount
+@@ -18,3 +18,6 @@ ConditionPathIsReadWrite=/proc/sys/
+ 
+ [Automount]
+ Where=/proc/sys/fs/binfmt_misc
++
++[Install]
++WantedBy=sysinit.target
+diff --git a/units/systemd-binfmt.service.in b/units/systemd-binfmt.service.in
+index e940c7c9a..6be7f5cc9 100644
+--- a/units/systemd-binfmt.service.in
++++ b/units/systemd-binfmt.service.in
+@@ -14,6 +14,7 @@ Documentation=https://www.kernel.org/doc/html/latest/admin-guide/binfmt-misc.htm
+ Documentation=https://www.freedesktop.org/wiki/Software/systemd/APIFileSystems
+ DefaultDependencies=no
+ Conflicts=shutdown.target
++Wants=proc-sys-fs-binfmt_misc.automount
+ After=proc-sys-fs-binfmt_misc.automount
+ Before=sysinit.target shutdown.target
+ ConditionPathIsReadWrite=/proc/sys/
+@@ -28,3 +29,6 @@ Type=oneshot
+ RemainAfterExit=yes
+ ExecStart=@rootlibexecdir@/systemd-binfmt
+ TimeoutSec=90s
++
++[Install]
++WantedBy=sysinit.target
+-- 
+2.11.0
+

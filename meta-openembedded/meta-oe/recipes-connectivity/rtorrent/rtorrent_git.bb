@@ -8,9 +8,10 @@ DEPENDS = "libsigc++-2.0 curl cppunit libtorrent ncurses"
 SRC_URI = "git://github.com/rakshasa/rtorrent \
     file://don-t-run-code-while-configuring-package.patch \
 "
-SRCREV = "226e670decf92e7adaa845a6982aca4f164ea740"
+# v0.9.7
+SRCREV = "327164f9d86aafcd2500a317d485374df32ea622"
 
-PV = "0.9.6+git${SRCPV}"
+PV = "0.9.7+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 

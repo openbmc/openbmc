@@ -1,4 +1,4 @@
-From 4333b2b269d997a719e19f00d044105e17700be2 Mon Sep 17 00:00:00 2001
+From 3cd92c7a885e4997ef6843313298c1d748d6ca39 Mon Sep 17 00:00:00 2001
 From: Alistair Francis <alistair.francis@xilinx.com>
 Date: Wed, 17 Jan 2018 10:51:49 -0800
 Subject: [PATCH] linux-user: Fix webkitgtk hangs on 32-bit x86 target
@@ -18,10 +18,10 @@ Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/linux-user/main.c b/linux-user/main.c
-index 146ee3e..1332b5c 100644
+index 8907a84114..ea42c43610 100644
 --- a/linux-user/main.c
 +++ b/linux-user/main.c
-@@ -78,7 +78,7 @@ do {                                                                    \
+@@ -79,7 +79,7 @@ do {                                                                    \
        (TARGET_LONG_BITS == 32 || defined(TARGET_ABI32))
  /* There are a number of places where we assign reserved_va to a variable
     of type abi_ulong and expect it to fit.  Avoid the last page.  */

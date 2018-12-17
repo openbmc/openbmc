@@ -1,6 +1,18 @@
---- http-2.0.54/server/Makefile.in-old	2005-12-20 13:26:56.000000000 -0500
-+++ http-2.0.54/server/Makefile.in	2005-12-20 13:27:22.000000000 -0500
-@@ -27,7 +27,7 @@
+From aa02bbfd8f16871db5563a95fa94dd170964949f Mon Sep 17 00:00:00 2001
+From: Paul Eggleton <paul.eggleton@linux.intel.com>
+Date: Tue, 17 Jul 2012 11:27:39 +0100
+
+Upstream-Status: Inappropriate [embedded specific]
+
+---
+ server/Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/server/Makefile.in b/server/Makefile.in
+index 1fa3344..cb11684 100644
+--- a/server/Makefile.in
++++ b/server/Makefile.in
+@@ -29,7 +29,7 @@ gen_test_char: $(gen_test_char_OBJECTS)
  	$(LINK) $(EXTRA_LDFLAGS) $(gen_test_char_OBJECTS) $(EXTRA_LIBS)
  
  test_char.h: gen_test_char

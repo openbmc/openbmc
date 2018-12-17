@@ -1,0 +1,31 @@
+From 631d46efff2a6d8970e202ba5422ebedd17a8d2f Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Thu, 19 Jul 2018 01:00:10 -0700
+Subject: [PATCH] Makefile.in: install nfslock.so and nfslock.so.0
+
+* install the missing soname library
+
+Upstream-Status: Pending
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ Makefile.in | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Makefile.in b/Makefile.in
+index 1e4130e..0f1b506 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -77,6 +77,8 @@ install_common:
+ install_nfslib:	nfslib
+ 		install -d -m 755 -g root -p $(nfslockdir)
+ 		install -m 755 nfslock.so.$(NFSVER) $(nfslockdir)
++		ln -sf nfslock.so.$(NFSVER) $(libdir)/nfslock.so
++		ln -sf nfslock.so.$(NFSVER) $(libdir)/nfslock.so.0
+ 		if test "$(DESTDIR)" = ""; then @LDCONFIG@; fi
+ 
+ clean:
+-- 
+2.17.1
+

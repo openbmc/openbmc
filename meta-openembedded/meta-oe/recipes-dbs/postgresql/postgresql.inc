@@ -19,7 +19,7 @@ DESCRIPTION = "\
 "
 HOMEPAGE = "http://www.postgresql.com"
 LICENSE = "BSD"
-DEPENDS = "zlib readline tzcode-native"
+DEPENDS = "libnsl2 zlib readline tzcode-native"
 
 ARM_INSTRUCTION_SET = "arm"
 
@@ -59,7 +59,7 @@ PACKAGECONFIG ??= "${enable_pam} openssl python uuid libxml tcl nls libxml perl"
 PACKAGECONFIG[pam] = "--with-pam,--without-pam,libpam,"
 PACKAGECONFIG[openssl] = "--with-openssl,--without-openssl,openssl,"
 PACKAGECONFIG[python] = "--with-python,--without-python,python,python"
-PACKAGECONFIG[uuid] = "--with-ossp-uuid,--without-ossp-uuid,ossp-uuid,"
+PACKAGECONFIG[uuid] = "--with-uuid=e2fs,--without-uuid,util-linux,"
 PACKAGECONFIG[tcl] = "--with-tcl --with-tclconfig=${STAGING_BINDIR_CROSS},--without-tcl,tcl tcl-native,"
 PACKAGECONFIG[nls] = "--enable-nls,--disable-nls,,"
 PACKAGECONFIG[libxml] = "--with-libxml,--without-libxml,libxml2,libxml2"
@@ -72,21 +72,19 @@ EXTRA_OECONF += "--enable-thread-safety --disable-rpath \
 EXTRA_OECONF_sh4 += "--disable-spinlocks"
 EXTRA_OECONF_aarch64 += "--disable-spinlocks"
 
-PACKAGES_DYNAMIC += "^${PN}-plperl ^${PN}-plperl-dbg \
-    ^${PN}-pltcl ^${PN}-pltcl-dbg \
-    ^${PN}-plpython ^${PN}-plpython-dbg \
+PACKAGES_DYNAMIC += "^${PN}-plperl \
+    ^${PN}-pltcl \
+    ^${PN}-plpython \
 "
 
 python populate_packages_prepend() {
 
-    def fill_more(name, dbg=True):
+    def fill_more(name):
         if name is None or name.strip() == "":
             return
 
         fpack=d.getVar('PACKAGES', False) or ""
         fpack="${PN}-" + name + " " + fpack
-        if dbg:
-            fpack="${PN}-" + name + "-dbg" + " " + fpack
         d.setVar('PACKAGES', fpack)
 
     conf=(d.getVar('PACKAGECONFIG') or "").split()
@@ -202,14 +200,25 @@ do_install_append() {
 }
 
 SSTATE_SCAN_FILES += "Makefile.global"
+SSTATE_SCAN_FILES_remove = "*_config"
 
 PACKAGES =+ "${PN}-client ${PN}-server-dev ${PN}-timezone \
-    libecpg-compat-dbg libecpg-compat libecpg-compat-dev \
-    libecpg-dbg libecpg libecpg-dev libecpg-staticdev libecpg-doc \
-    libpq-dbg libpq libpq-dev libpq-staticdev \
-    libpgtypes-dbg libpgtypes libpgtypes-staticdev libpgtypes-dev \
-    ${PN}-contrib ${PN}-contrib-dbg \
+    libecpg-compat libecpg-compat-dev \
+    libecpg libecpg-dev libecpg-staticdev libecpg-doc \
+    libpq libpq-dev libpq-staticdev \
+    libpgtypes libpgtypes-staticdev libpgtypes-dev \
+    ${PN}-contrib \
 "
+
+RPROVIDES_${PN}-dbg += "libecpg-compat-dbg \
+                        libecpg-dbg \
+                        libpq-dbg \
+                        libpgtypes-dbg \
+                        ${PN}-contrib-dbg \
+                        ${PN}-pltcl-dbg \
+                        ${PN}-plpython-dbg \
+                        ${PN}-plperl-dbg \
+                       "
 
 FILES_${PN} += "${sysconfdir}/init.d/${BPN}-server \
     ${localstatedir}/lib/${BPN}/data ${localstatedir}/lib/${BPN}/backups \
@@ -221,13 +230,6 @@ FILES_${PN} += "${sysconfdir}/init.d/${BPN}-server \
     ${@'${sysconfdir}/pam.d/postgresql' \
        if 'pam' == d.getVar('enable_pam') \
        else ''} \
-"
-
-FILES_${PN}-dbg += " ${libdir}/${BPN}/.debug/dict_snowball.so \
-    ${libdir}/${BPN}/.debug/plpgsql.so \
-    ${libdir}/${BPN}/.debug/euc2004_sjis2004.so \
-    ${libdir}/${BPN}/.debug/libpqwalreceiver.so \
-    ${libdir}/${BPN}/.debug/*_and_*.so \
 "
 
 FILES_${PN}-client = "${bindir}/clusterdb \
@@ -267,7 +269,6 @@ RDEPENDS_${PN} += "${PN}-timezone"
 FILES_${PN}-server-dev = "${includedir}/${BPN}/server"
 
 FILES_libecpg = "${libdir}/libecpg*${SOLIBS}"
-FILES_libecpg-dbg = "${libdir}/.debug/libecpg*"
 FILES_libecpg-dev = "${libdir}/libecpg*${SOLIBSDEV} \
     ${libdir}/libpgtypes*${SOLIBSDEV} \
     ${includedir}/ecpg*.h ${includedir}/${BPN}/ecpg*.h \
@@ -280,7 +281,6 @@ SECTION_libecpg-staticdev = "devel"
 RDEPENDS_libecpg-staticdev = "libecpg-dev (= ${EXTENDPKGV})"
 
 FILES_libpq = "${libdir}/libpq*${SOLIBS}"
-FILES_libpq-dbg = "${libdir}/.debug/libpq* ${libdir}/${BPN}/pgxs/src/test/regress/.debug/*"
 FILES_libpq-dev = "${libdir}/libpq*${SOLIBSDEV} \
     ${includedir} \
 "
@@ -289,10 +289,8 @@ SECTION_libpq-staticdev = "devel"
 RDEPENDS_libpq-staticdev = "libpq-dev (= ${EXTENDPKGV})"
 
 FILES_libecpg-compat = "${libdir}/libecpg_compat*${SOLIBS}"
-FILES_libecpg-compat-dbg = "${libdir}/.debug/libecpg_compat*"
 FILES_libecpg-compat-dev = "${libdir}/libecpg_compat*${SOLIBS}"
 FILES_libpgtypes = "${libdir}/libpgtypes*${SOLIBS}"
-FILES_libpgtypes-dbg = "${libdir}/.debug/libpgtypes*"
 FILES_libpgtypes-staticdev = "${libdir}/libpgtypes*.a"
 FILES_libpgtypes-dev = "${libdir}/libpgtypes*${SOLIBS} ${includedir}/pgtypes*.h"
 
@@ -324,50 +322,18 @@ FILES_${PN}-contrib = " ${bindir}/oid2name ${bindir}/pg_standby \
     ${libdir}/${BPN}/pg_upgrade_support.so ${libdir}/${BPN}/.so \
     ${libdir}/${BPN}/unaccent.so \
 "
-FILES_${PN}-contrib-dbg = " \
-    ${libdir}/${BPN}/.debug/_int.so ${libdir}/${BPN}/.debug/adminpack.so \
-    ${libdir}/${BPN}/.debug/autoinc.so ${libdir}/${BPN}/.debug/auto_explain.so \
-    ${libdir}/${BPN}/.debug/auth_delay.so ${libdir}/${BPN}/.debug/btree_gin.so \
-    ${libdir}/${BPN}/.debug/btree_gist.so ${libdir}/${BPN}/.debug/.so \
-    ${libdir}/${BPN}/.debug/chkpass.so ${libdir}/${BPN}/.debug/citext.so \
-    ${libdir}/${BPN}/.debug/cube.so ${libdir}/${BPN}/.debug/dblink.so \
-    ${libdir}/${BPN}/.debug/dict_int.so ${libdir}/${BPN}/.debug/dict_xsyn.so \
-    ${libdir}/${BPN}/.debug/dummy_seclabel.so \
-    ${libdir}/${BPN}/.debug/earthdistance.so \
-    ${libdir}/${BPN}/.debug/file_fdw.so ${libdir}/${BPN}/.debug/fuzzystrmatch.so \
-    ${libdir}/${BPN}/.debug/hstore.so ${libdir}/${BPN}/.debug/insert_username.so \
-    ${libdir}/${BPN}/.debug/isn.so ${libdir}/${BPN}/.debug/lo.so \
-    ${libdir}/${BPN}/.debug/ltree.so ${libdir}/${BPN}/.debug/moddatetime.so \
-    ${libdir}/${BPN}/.debug/pageinspect.so \
-    ${libdir}/${BPN}/.debug/pg_buffercache.so \
-    ${libdir}/${BPN}/.debug/pg_freespacemap.so \
-    ${libdir}/${BPN}/.debug/pg_trgm.so \
-    ${libdir}/${BPN}/.debug/pgcrypto.so ${libdir}/${BPN}/.debug/pgrowlocks.so \
-    ${libdir}/${BPN}/.debug/pgstattuple.so \
-    ${libdir}/${BPN}/.debug/pg_stat_statements.so \
-    ${libdir}/${BPN}/.debug/refint.so ${libdir}/${BPN}/.debug/seg.so \
-    ${libdir}/${BPN}/.debug/sslinfo.so \
-    ${libdir}/${BPN}/.debug/tablefunc.so \
-    ${libdir}/${BPN}/.debug/test_parser.so ${libdir}/${BPN}/.debug/timetravel.so \
-    ${libdir}/${BPN}/.debug/tsearch2.so ${libdir}/${BPN}/.debug/uuid-ossp.so \
-    ${libdir}/${BPN}/.debug/pgxml.so ${libdir}/${BPN}/.debug/passwordcheck.so \
-    ${libdir}/${BPN}/.debug/pg_upgrade_support.so \
-    ${libdir}/${BPN}/.debug/unaccent.so \
-"
 DESCRIPTION_${PN}-contrib = "The postgresql-contrib package contains \
     contributed packages that are included in the PostgreSQL distribution."
 
 FILES_${PN}-pltcl = "${libdir}/${BPN}/pltcl.so ${bindir}/pltcl_delmod \
     ${binddir}/pltcl_listmod ${bindir}/pltcl_loadmod  \
     ${datadir}/${BPN}/unknown.pltcl"
-FILES_${PN}-pltcl-dbg = "${libdir}/${BPN}/.debug/pltcl.so"
 SUMMARY_${PN}-pltcl = "The Tcl procedural language for PostgreSQL"
 DESCRIPTION_${PN}-pltcl = "PostgreSQL is an advanced Object-Relational \
     database management system.  The postgresql-pltcl package contains the PL/Tcl \
     procedural language for the backend."
 
 FILES_${PN}-plperl = "${libdir}/${BPN}/plperl.so"
-FILES_${PN}-plperl-dbg = "${libdir}/${BPN}/.debug/plperl.so"
 SUMMARY_${PN}-plperl = "The Perl procedural language for PostgreSQL"
 DESCRIPTION_${PN}-plperl = "PostgreSQL is an advanced Object-Relational \
     database management system.  The postgresql-plperl package contains the \
@@ -376,7 +342,6 @@ DESCRIPTION_${PN}-plperl = "PostgreSQL is an advanced Object-Relational \
 # In version 8, it will be plpython.so
 # In version 9, it might be plpython{2,3}.so depending on python2 or 3
 FILES_${PN}-plpython = "${libdir}/${BPN}/plpython*.so"
-FILES_${PN}-plpython-dbg = "${libdir}/${BPN}/.debug/plpython*.so"
 SUMMARY_${PN}-plpython = "The Python procedural language for PostgreSQL"
 DESCRIPTION_${PN}-plpython = "PostgreSQL is an advanced Object-Relational \
     database management system.  The postgresql-plpython package contains \

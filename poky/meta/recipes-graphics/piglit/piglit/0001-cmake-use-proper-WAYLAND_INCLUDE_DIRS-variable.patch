@@ -1,0 +1,32 @@
+From 3bf1beee1ddd19bc536ff2856e04ac269d43daa2 Mon Sep 17 00:00:00 2001
+From: Pascal Bach <pascal.bach@siemens.com>
+Date: Thu, 4 Oct 2018 14:43:17 +0200
+Subject: [PATCH] cmake: use proper WAYLAND_INCLUDE_DIRS variable
+
+WAYLAND_wayland-client_INCLUDEDIR is an internal variable and is not correctly
+set when cross compiling. WAYLAND_INCLUDE_DIRS includes the correct path even
+when cross compiling.
+
+Signed-off-by: Pascal Bach <pascal.bach@siemens.com>
+
+Upstream-Status: Submitted [piglit@lists.freedesktop.org]
+---
+ tests/util/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/util/CMakeLists.txt b/tests/util/CMakeLists.txt
+index a5f080156..a303a9f58 100644
+--- a/tests/util/CMakeLists.txt
++++ b/tests/util/CMakeLists.txt
+@@ -97,7 +97,7 @@ if(PIGLIT_USE_WAFFLE)
+ 			piglit-framework-gl/piglit_wl_framework.c
+ 		)
+ 		list(APPEND UTIL_GL_INCLUDES
+-			${WAYLAND_wayland-client_INCLUDEDIR}
++			${WAYLAND_INCLUDE_DIRS}
+ 		)
+ 	endif()
+ 	if(PIGLIT_HAS_X11)
+-- 
+2.11.0
+

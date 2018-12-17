@@ -1,4 +1,3 @@
-
 def get_minor_dir(v):
     import re
     m = re.match("^([0-9]+)\.([0-9]+)", v)
@@ -12,11 +11,7 @@ def get_real_name(n):
 VERMINOR = "${@get_minor_dir("${PV}")}"
 REALNAME = "${@get_real_name("${BPN}")}"
 
-CLUTTER_SRC_FTP = "${GNOME_MIRROR}/${REALNAME}/${VERMINOR}/${REALNAME}-${PV}.tar.xz;name=archive"
-
-CLUTTER_SRC_GIT = "git://gitlab.gnome.org/GNOME/${REALNAME};protocol=https"
-
-SRC_URI = "${CLUTTER_SRC_FTP}"
+SRC_URI = "${GNOME_MIRROR}/${REALNAME}/${VERMINOR}/${REALNAME}-${PV}.tar.xz;name=archive"
 S = "${WORKDIR}/${REALNAME}-${PV}"
 
 inherit autotools pkgconfig gtk-doc gettext

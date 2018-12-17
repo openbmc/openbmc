@@ -13,38 +13,26 @@ do_populate_sysroot[depends] = ""
 do_install () {
 	install -d ${D}${bindir_crossscripts}/
 
-	echo "#!/bin/sh" > ${D}${bindir_crossscripts}/qemuwrapper
 	qemu_binary=${@qemu_target_binary(d)}
-	qemu_options='${QEMU_OPTIONS}'
-	echo "$qemu_binary $qemu_options \"\$@\"" >> ${D}${bindir_crossscripts}/qemuwrapper
-	fallback_qemu_bin=
-	case $qemu_binary in
-		"qemu-i386")
-			fallback_qemu_bin=qemu-x86_64
-			;;
-		"qemu-x86_64")
-			fallback_qemu_bin=qemu-i386
-			;;
-		*)
-			;;
-	esac
+	qemu_options='${QEMU_OPTIONS} -E LD_LIBRARY_PATH=$D${libdir}:$D${base_libdir}'
 
-	if [ -n "$fallback_qemu_bin" ]; then
+	cat >> ${D}${bindir_crossscripts}/${MLPREFIX}qemuwrapper << EOF
+#!/bin/sh
+set -x
 
-		cat >> ${D}${bindir_crossscripts}/qemuwrapper << EOF
-rc=\$?
-if [ \$rc = 255 ]; then
-	$fallback_qemu_bin "\$@"
-	rc=\$?
+if [ ${@bb.utils.contains('MACHINE_FEATURES', 'qemu-usermode', 'True', 'False', d)} = False ]; then
+        echo "qemuwrapper: qemu usermode is not supported"
 fi
-exit \$rc
+
+
+$qemu_binary $qemu_options "\$@"
 EOF
 
-	fi
-
-	chmod +x ${D}${bindir_crossscripts}/qemuwrapper
+	chmod +x ${D}${bindir_crossscripts}/${MLPREFIX}qemuwrapper
 }
 
 SYSROOT_DIRS += "${bindir_crossscripts}"
 
 INHIBIT_DEFAULT_DEPS = "1"
+
+BBCLASSEXTEND = "nativesdk"

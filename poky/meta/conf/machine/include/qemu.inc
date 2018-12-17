@@ -19,7 +19,7 @@ IMAGE_FSTYPES += "tar.bz2 ext4"
 RDEPENDS_${KERNEL_PACKAGE_NAME}-base = ""
 
 # Use a common kernel recipe for all QEMU machines
-PREFERRED_PROVIDER_virtual/kernel ?= "linux-yocto"
+PREFERRED_PROVIDER_virtual/kernel ??= "linux-yocto"
 
 EXTRA_IMAGEDEPENDS += "qemu-native qemu-helper-native"
 

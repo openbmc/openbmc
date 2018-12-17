@@ -1,0 +1,36 @@
+From ec6000b9f287e62cb0746e26cfa4372c7ea528f4 Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Thu, 19 Apr 2018 23:26:43 +0200
+Subject: [PATCH] sha256.h: avoid inclusion of sys/types.h
+
+Fix
+
+ purgatory/printf.c:2:10: fatal error: limits.h:
+ No such file or directory
+
+Upstream-Status: Inappropriate [klibc specific]
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+
+---
+ util_lib/include/sha256.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/util_lib/include/sha256.h b/util_lib/include/sha256.h
+index 467fb22..40fd3ed 100644
+--- a/util_lib/include/sha256.h
++++ b/util_lib/include/sha256.h
+@@ -1,7 +1,11 @@
+ #ifndef SHA256_H
+ #define SHA256_H
+ 
++#ifndef __KLIBC__
+ #include <sys/types.h>
++#else
++#include <stddef.h>
++#endif
+ #include <stdint.h>
+ 
+ typedef struct
+-- 
+2.7.4
+

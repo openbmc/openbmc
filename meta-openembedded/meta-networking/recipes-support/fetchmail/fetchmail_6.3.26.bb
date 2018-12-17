@@ -7,7 +7,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=fbb509e0303f5ded1cbfc0cc8705f28c"
 
 DEPENDS = "openssl"
 
-SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BPN}-${PV}.tar.xz"
+SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BPN}-${PV}.tar.xz \
+           file://02_remove_SSLv3.patch \
+           "
 SRC_URI[md5sum] = "61b66faad044afa26e142bb1791aa2b3"
 SRC_URI[sha256sum] = "79b4c54cdbaf02c1a9a691d9948fcb1a77a1591a813e904283a8b614b757e850"
 

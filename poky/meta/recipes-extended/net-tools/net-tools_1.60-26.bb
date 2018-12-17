@@ -48,7 +48,16 @@ PARALLEL_MAKE = ""
 # up all previously applied patches in the start
 nettools_do_patch() {
 	cd ${S}
-	quilt pop -a || true
+	# it's important that we only pop the existing patches when they've
+	# been applied, otherwise quilt will climb the directory tree
+	# and reverse out some completely different set of patches
+	if [ -d ${S}/patches ]; then
+		# whilst this is the default directory, doing it like this
+		# defeats the directory climbing that quilt will otherwise
+		# do; note the directory must exist to defeat this, hence
+		# the test inside which we operate
+		QUILT_PATCHES=${S}/patches quilt pop -a
+	fi
 	if [ -d ${S}/.pc-nettools ]; then
 		rm -rf ${S}/.pc
 		mv ${S}/.pc-nettools ${S}/.pc

@@ -15,11 +15,9 @@ SRC_URI = "http://dovecot.org/releases/2.2/dovecot-${PV}.tar.gz \
 SRC_URI[md5sum] = "d61d1e923a22f9062cc9f47696882666"
 SRC_URI[sha256sum] = "e9483d68a7698d701bc06124fcf6e1b1f16380c2986c7ec0cf4e1475b9d0c218"
 
-DEPENDS = "openssl xz zlib bzip2 libcap icu"
-
-DEPENDS_append_libc-musl = " libtirpc"
-CFLAGS_append_libc-musl = " -I${STAGING_INCDIR}/tirpc"
-LDFLAGS_append_libc-musl = " -ltirpc"
+DEPENDS = "openssl xz zlib bzip2 libcap icu libtirpc"
+CFLAGS += "-I${STAGING_INCDIR}/tirpc"
+LDFLAGS += "-ltirpc"
 
 inherit autotools pkgconfig systemd useradd
 

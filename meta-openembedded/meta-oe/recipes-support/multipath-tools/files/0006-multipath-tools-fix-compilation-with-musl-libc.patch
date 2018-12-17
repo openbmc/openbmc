@@ -1,0 +1,58 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Xose Vazquez Perez <xose.vazquez@gmail.com>
+Date: Fri, 11 May 2018 18:39:44 +0200
+Subject: [PATCH] multipath-tools: fix compilation with musl libc
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+In file included from alias.c:15:
+file.h:9:47: error: unknown type name ‘mode_t’; did you mean ‘time_t’?
+ int ensure_directories_exist(const char *str, mode_t dir_mode);
+                                               ^~~~~~
+                                               time_t
+
+sysfs.c: In function ‘sysfs_is_multipathed’:
+sysfs.c:304:15: error: ‘PATH_MAX’ undeclared (first use in this function); did you mean ‘PATH_UP’?
+  char pathbuf[PATH_MAX];
+               ^~~~~~~~
+               PATH_UP
+
+Cc: Martin Wilck <mwilck@suse.com>
+Cc: Christophe Varoqui <christophe.varoqui@opensvc.com>
+Cc: DM ML <dm-devel@redhat.com>
+Signed-off-by: Xose Vazquez Perez <xose.vazquez@gmail.com>
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/file.h  | 2 ++
+ libmultipath/sysfs.c | 1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/libmultipath/file.h b/libmultipath/file.h
+index 29520c7..3c75c90 100644
+--- a/libmultipath/file.h
++++ b/libmultipath/file.h
+@@ -5,6 +5,8 @@
+ #ifndef _FILE_H
+ #define _FILE_H
+ 
++#include <sys/stat.h>
++
+ #define FILE_TIMEOUT 30
+ int ensure_directories_exist(const char *str, mode_t dir_mode);
+ int open_file(const char *file, int *can_write, const char *header);
+diff --git a/libmultipath/sysfs.c b/libmultipath/sysfs.c
+index ee72e6a..16e0a73 100644
+--- a/libmultipath/sysfs.c
++++ b/libmultipath/sysfs.c
+@@ -28,6 +28,7 @@
+ #include <dirent.h>
+ #include <libudev.h>
+ #include <fnmatch.h>
++#include <limits.h>
+ 
+ #include "checkers.h"
+ #include "vector.h"
+-- 
+2.7.4
+

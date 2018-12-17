@@ -1,0 +1,29 @@
+From 61a672e79c8cb1aeeeda4c968997c577ac73a8f3 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 12 May 2017 16:47:12 +0300
+Subject: [PATCH] gstreamer-gl.pc.in: don't append GL_CFLAGS to CFLAGS
+
+Dependencies' include directories should not be added in this way;
+it causes problems when cross-compiling in sysroot environments.
+
+Upstream-Status: Pending
+
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+Signed-off-by: Maxin B. John <maxin.john@intel.com>
+---
+ pkgconfig/gstreamer-gl.pc.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pkgconfig/gstreamer-gl.pc.in b/pkgconfig/gstreamer-gl.pc.in
+index dc672a9..8c290ba 100644
+--- a/pkgconfig/gstreamer-gl.pc.in
++++ b/pkgconfig/gstreamer-gl.pc.in
+@@ -13,4 +13,4 @@ Version: @VERSION@
+ Requires: gstreamer-video-@GST_API_VERSION@ gstreamer-base-@GST_API_VERSION@ gstreamer-@GST_API_VERSION@
+ 
+ Libs: -L${libdir} -lgstgl-@GST_API_VERSION@
+-Cflags: -I${includedir} -I${libdir}/gstreamer-@GST_API_VERSION@/include @GL_CFLAGS@
++Cflags: -I${includedir} -I${libdir}/gstreamer-@GST_API_VERSION@/include
+-- 
+2.7.4
+

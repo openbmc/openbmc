@@ -416,9 +416,11 @@ def print_html_report(data, id_comp, buildstats):
                 samples[-1]['commit_num'] = commit_num
 
             absdiff = samples[-1]['val_cls'](samples[-1]['mean'] - samples[id_comp]['mean'])
+            reldiff = absdiff * 100 / samples[id_comp]['mean']
             new_meas['absdiff'] = absdiff
             new_meas['absdiff_str'] = str(absdiff) if absdiff < 0 else '+' + str(absdiff)
-            new_meas['reldiff'] = "{:+.1f} %".format(absdiff * 100 / samples[id_comp]['mean'])
+            new_meas['reldiff'] = reldiff
+            new_meas['reldiff_str'] = "{:+.1f} %".format(reldiff)
             new_meas['samples'] = samples
             new_meas['value'] = samples[-1]
             new_meas['value_type'] = samples[-1]['val_cls']

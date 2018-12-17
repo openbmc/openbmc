@@ -34,10 +34,10 @@ if type systemctl >/dev/null 2>/dev/null; then
 		systemctl daemon-reload
 	fi
 
-	systemctl $OPTS ${SYSTEMD_AUTO_ENABLE} ${SYSTEMD_SERVICE}
+	systemctl $OPTS ${SYSTEMD_AUTO_ENABLE} ${SYSTEMD_SERVICE_ESCAPED}
 
 	if [ -z "$D" -a "${SYSTEMD_AUTO_ENABLE}" = "enable" ]; then
-		systemctl --no-block restart ${SYSTEMD_SERVICE}
+		systemctl --no-block restart ${SYSTEMD_SERVICE_ESCAPED}
 	fi
 fi
 }
@@ -51,10 +51,10 @@ fi
 
 if type systemctl >/dev/null 2>/dev/null; then
 	if [ -z "$D" ]; then
-		systemctl stop ${SYSTEMD_SERVICE}
+		systemctl stop ${SYSTEMD_SERVICE_ESCAPED}
 	fi
 
-	systemctl $OPTS disable ${SYSTEMD_SERVICE}
+	systemctl $OPTS disable ${SYSTEMD_SERVICE_ESCAPED}
 fi
 }
 
@@ -65,6 +65,7 @@ systemd_populate_packages[vardepsexclude] += "OVERRIDES"
 
 python systemd_populate_packages() {
     import re
+    import shlex
 
     if not bb.utils.contains('DISTRO_FEATURES', 'systemd', True, False, d):
         return
@@ -84,6 +85,9 @@ python systemd_populate_packages() {
 
     def systemd_generate_package_scripts(pkg):
         bb.debug(1, 'adding systemd calls to postinst/postrm for %s' % pkg)
+
+        paths_escaped = ' '.join(shlex.quote(s) for s in d.getVar('SYSTEMD_SERVICE_' + pkg, True).split())
+        d.setVar('SYSTEMD_SERVICE_ESCAPED_' + pkg, paths_escaped)
 
         # Add pkg to the overrides so that it finds the SYSTEMD_SERVICE_pkg
         # variable.
@@ -130,7 +134,7 @@ python systemd_populate_packages() {
                 systemd_add_files_and_parse(pkg_systemd, path, service_base + '@.service', keys)
             for key in keys.split():
                 # recurse all dependencies found in keys ('Also';'Conflicts';..) and add to files
-                cmd = "grep %s %s | sed 's,%s=,,g' | tr ',' '\\n'" % (key, fullpath, key)
+                cmd = "grep %s %s | sed 's,%s=,,g' | tr ',' '\\n'" % (key, shlex.quote(fullpath), key)
                 pipe = os.popen(cmd, 'r')
                 line = pipe.readline()
                 while line:

@@ -35,9 +35,15 @@ do_configure_prepend() {
     rm -f ${S}/src/fcobjshash.h ${S}/src/fcobjshash.gperf
 }
 
+do_install_append_class-target() {
+    # duplicate fc-cache for postinstall script
+    mkdir -p ${D}${libexecdir}
+    ln ${D}${bindir}/fc-cache ${D}${libexecdir}/${MLPREFIX}fc-cache
+}
+
 PACKAGES =+ "fontconfig-utils"
 FILES_${PN} =+ "${datadir}/xml/*"
-FILES_fontconfig-utils = "${bindir}/*"
+FILES_fontconfig-utils = "${bindir}/* ${libexecdir}/*"
 
 # Work around past breakage in debian.bbclass
 RPROVIDES_fontconfig-utils = "libfontconfig-utils"

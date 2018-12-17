@@ -1,0 +1,110 @@
+From 0c9354362bfa5f90fbea8ff8237a1f1f5dba686f Mon Sep 17 00:00:00 2001
+From: Christian Heimes <christian@python.org>
+Date: Wed, 12 Sep 2018 15:20:31 +0800
+Subject: [PATCH] bpo-33570: TLS 1.3 ciphers for OpenSSL 1.1.1 (GH-6976)
+
+Change TLS 1.3 cipher suite settings for compatibility with OpenSSL
+1.1.1-pre6 and newer. OpenSSL 1.1.1 will have TLS 1.3 cipers enabled by
+default.
+
+Also update multissltests and Travis config to test with latest OpenSSL.
+
+Signed-off-by: Christian Heimes <christian@python.org>
+(cherry picked from commit e8eb6cb7920ded66abc5d284319a8539bdc2bae3)
+
+Co-authored-by: Christian Heimes <christian@python.org
+
+Upstream-Status: Backport
+[https://github.com/python/cpython/commit/3e630c541b35c96bfe5619165255e559f577ee71]
+
+Tweaked patch to not take changes for multissltests and Travis config.
+
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+---
+ Lib/test/test_ssl.py | 51 ++++++++++++++++++++++----------------------
+ 1 file changed, 26 insertions(+), 25 deletions(-)
+
+diff --git a/Lib/test/test_ssl.py b/Lib/test/test_ssl.py
+index a2e1d32a62..c484ead5ff 100644
+--- a/Lib/test/test_ssl.py
++++ b/Lib/test/test_ssl.py
+@@ -3024,17 +3024,21 @@ else:
+                     sock.do_handshake()
+                 self.assertEqual(cm.exception.errno, errno.ENOTCONN)
+ 
+-        def test_default_ciphers(self):
+-            context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+-            try:
+-                # Force a set of weak ciphers on our client context
+-                context.set_ciphers("DES")
+-            except ssl.SSLError:
+-                self.skipTest("no DES cipher available")
+-            with ThreadedEchoServer(CERTFILE,
+-                                    ssl_version=ssl.PROTOCOL_SSLv23,
+-                                    chatty=False) as server:
+-                with context.wrap_socket(socket.socket()) as s:
++        def test_no_shared_ciphers(self):
++            server_context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
++            server_context.load_cert_chain(SIGNED_CERTFILE)
++            client_context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
++            client_context.verify_mode = ssl.CERT_REQUIRED
++            client_context.check_hostname = True
++
++            client_context.set_ciphers("AES128")
++            server_context.set_ciphers("AES256")
++            # OpenSSL enables all TLS 1.3 ciphers, enforce TLS 1.2 for test
++            client_context.options |= ssl.OP_NO_TLSv1_3
++            with ThreadedEchoServer(context=server_context) as server:
++                with client_context.wrap_socket(
++                        socket.socket(),
++                        server_hostname="localhost") as s:
+                     with self.assertRaises(OSError):
+                         s.connect((HOST, server.port))
+             self.assertIn("no shared cipher", str(server.conn_errors[0]))
+@@ -3067,9 +3071,9 @@ else:
+                 with context.wrap_socket(socket.socket()) as s:
+                     s.connect((HOST, server.port))
+                     self.assertIn(s.cipher()[0], [
+-                        'TLS13-AES-256-GCM-SHA384',
+-                        'TLS13-CHACHA20-POLY1305-SHA256',
+-                        'TLS13-AES-128-GCM-SHA256',
++                        'TLS_AES_256_GCM_SHA384',
++                        'TLS_CHACHA20_POLY1305_SHA256',
++                        'TLS_AES_128_GCM_SHA256',
+                     ])
+ 
+         @unittest.skipUnless(ssl.HAS_ECDH, "test requires ECDH-enabled OpenSSL")
+@@ -3391,22 +3395,19 @@ else:
+             client_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+             client_context.verify_mode = ssl.CERT_REQUIRED
+             client_context.load_verify_locations(SIGNING_CA)
+-            if ssl.OPENSSL_VERSION_INFO >= (1, 0, 2):
+-                client_context.set_ciphers("AES128:AES256")
+-                server_context.set_ciphers("AES256")
+-                alg1 = "AES256"
+-                alg2 = "AES-256"
+-            else:
+-                client_context.set_ciphers("AES:3DES")
+-                server_context.set_ciphers("3DES")
+-                alg1 = "3DES"
+-                alg2 = "DES-CBC3"
++            client_context.set_ciphers("AES128:AES256")
++            server_context.set_ciphers("AES256")
++            expected_algs = [
++                "AES256", "AES-256",
++                 # TLS 1.3 ciphers are always enabled
++                 "TLS_CHACHA20", "TLS_AES",
++            ]
+ 
+             stats = server_params_test(client_context, server_context)
+             ciphers = stats['server_shared_ciphers'][0]
+             self.assertGreater(len(ciphers), 0)
+             for name, tls_version, bits in ciphers:
+-                if not alg1 in name.split("-") and alg2 not in name:
++                if not any (alg in name for alg in expected_algs):
+                     self.fail(name)
+ 
+         def test_read_write_after_close_raises_valuerror(self):
+-- 
+2.17.1
+

@@ -1,7 +1,7 @@
 inherit kernel-uboot
 
 python __anonymous () {
-    if "uImage" in (d.getVar('KERNEL_IMAGETYPES') or "").split():
+    if "uImage" in d.getVar('KERNEL_IMAGETYPES'):
         depends = d.getVar("DEPENDS")
         depends = "%s u-boot-mkimage-native" % depends
         d.setVar("DEPENDS", depends)

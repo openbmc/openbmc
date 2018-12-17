@@ -30,3 +30,5 @@ do_configure() {
 do_install() {
     oe_runmake prefix=${D}/usr PPPDIR=${D}/etc/ppp/peers install
 }
+# http://errors.yoctoproject.org/Errors/Details/186959/
+EXCLUDE_FROM_WORLD_libc-musl = "1"

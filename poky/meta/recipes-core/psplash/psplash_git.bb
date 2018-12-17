@@ -73,6 +73,8 @@ ALTERNATIVE_LINK_NAME[psplash] = "${bindir}/psplash"
 
 python do_compile () {
     import shutil
+    import subprocess
+    import shlex
 
     # Build a separate executable for each splash image
     workdir = d.getVar('WORKDIR')
@@ -82,8 +84,7 @@ python do_compile () {
     outputfiles = d.getVar('SPLASH_INSTALL').split()
     for localfile, outputfile in zip(localfiles, outputfiles):
         if localfile.endswith(".png"):
-            outp = oe.utils.getstatusoutput('%s %s POKY' % (convertscript, os.path.join(workdir, localfile)))
-            print(outp[1])
+            subprocess.call(shlex.split('%s %s POKY' % (convertscript, os.path.join(workdir, localfile))))
             fbase = os.path.splitext(localfile)[0]
             shutil.copyfile("%s-img.h" % fbase, destfile)
         else:

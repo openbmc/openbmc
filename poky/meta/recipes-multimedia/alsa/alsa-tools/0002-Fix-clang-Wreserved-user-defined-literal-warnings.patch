@@ -1,0 +1,34 @@
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+From a861bdabf02cd9bfb3ec7c0571c563c0fa14adfb Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 24 Apr 2018 12:24:32 -0700
+Subject: [PATCH] us428control: Fix clang -Wreserved-user-defined-literal
+ warnings
+
+| us428control.cc:66:18: error: invalid suffix on literal; C++11 requires a space between literal and identifier [-Wreserved-user-defined-literal]
+|         printf("usage: "PROGNAME" [-v verbosity_level 0..2] [-c card] [-D device] [-u usb-device] [-m mode]\n");
+|                         ^
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Takashi Iwai <tiwai@suse.de>
+---
+ us428control/us428control.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/us428control/us428control.cc b/us428control/us428control.cc
+index e839bf4..8cb3c42 100644
+--- a/us428control/us428control.cc
++++ b/us428control/us428control.cc
+@@ -63,7 +63,7 @@ static void usage(void)
+ {
+ 	printf("Tascam US-428 Control\n");
+ 	printf("version %s\n", VERSION);
+-	printf("usage: "PROGNAME" [-v verbosity_level 0..2] [-c card] [-D device] [-u usb-device] [-m mode]\n");
++	printf("usage: " PROGNAME " [-v verbosity_level 0..2] [-c card] [-D device] [-u usb-device] [-m mode]\n");
+ 	printf("mode is one of (us224, us428, mixxx)\n");
+ }
+ /*
+-- 
+1.7.11.7

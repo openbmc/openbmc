@@ -1,11 +1,27 @@
+From ceba1e03e5b57cdae0b3b2d2c9afebc085c986d8 Mon Sep 17 00:00:00 2001
+From: Qing He <qing.he@intel.com>
+Date: Fri, 27 Aug 2010 10:15:31 +0800
+Subject: [PATCH] libaio: add new recipe
+
 Upstream-Status: Inappropriate [embedded specific]
 
 from openembedded, added by Qing He <qing.he@intel.com>
 
-Index: libaio-0.3.110/src/syscall-m68k.h
-===================================================================
+---
+ src/syscall-m68k.h   |  78 ++++++++++++++++++
+ src/syscall-mips.h   | 223 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/syscall-parisc.h | 146 +++++++++++++++++++++++++++++++++
+ src/syscall.h        |   6 ++
+ 4 files changed, 453 insertions(+)
+ create mode 100644 src/syscall-m68k.h
+ create mode 100644 src/syscall-mips.h
+ create mode 100644 src/syscall-parisc.h
+
+diff --git a/src/syscall-m68k.h b/src/syscall-m68k.h
+new file mode 100644
+index 0000000..f440412
 --- /dev/null
-+++ libaio-0.3.110/src/syscall-m68k.h
++++ b/src/syscall-m68k.h
 @@ -0,0 +1,78 @@
 +#define __NR_io_setup		241
 +#define __NR_io_destroy		242
@@ -85,27 +101,11 @@ Index: libaio-0.3.110/src/syscall-m68k.h
 +return (type) __res; \
 +}
 +
-Index: libaio-0.3.110/src/syscall.h
-===================================================================
---- libaio-0.3.110.orig/src/syscall.h
-+++ libaio-0.3.110/src/syscall.h
-@@ -28,6 +28,12 @@
- #include "syscall-sparc.h"
- #elif defined(__aarch64__)
- #include "syscall-arm64.h"
-+#elif defined(__m68k__)
-+#include "syscall-m68k.h"
-+#elif defined(__hppa__)
-+#include "syscall-parisc.h"
-+#elif defined(__mips__)
-+#include "syscall-mips.h"
- #else
- #warning "using generic syscall method"
- #include "syscall-generic.h"
-Index: libaio-0.3.110/src/syscall-mips.h
-===================================================================
+diff --git a/src/syscall-mips.h b/src/syscall-mips.h
+new file mode 100644
+index 0000000..4142499
 --- /dev/null
-+++ libaio-0.3.110/src/syscall-mips.h
++++ b/src/syscall-mips.h
 @@ -0,0 +1,223 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -330,10 +330,11 @@ Index: libaio-0.3.110/src/syscall-mips.h
 +
 +#endif /* (_MIPS_SIM == _MIPS_SIM_NABI32) || (_MIPS_SIM == _MIPS_SIM_ABI64) */
 +
-Index: libaio-0.3.110/src/syscall-parisc.h
-===================================================================
+diff --git a/src/syscall-parisc.h b/src/syscall-parisc.h
+new file mode 100644
+index 0000000..ff61746
 --- /dev/null
-+++ libaio-0.3.110/src/syscall-parisc.h
++++ b/src/syscall-parisc.h
 @@ -0,0 +1,146 @@
 +/*
 + * Linux system call numbers.
@@ -481,127 +482,20 @@ Index: libaio-0.3.110/src/syscall-parisc.h
 +    return K_INLINE_SYSCALL(sname, 5, arg1, arg2, arg3, arg4, arg5);	\
 +}
 +
-Index: libaio-0.3.110/src/syscall-arm.h
-===================================================================
---- libaio-0.3.110.orig/src/syscall-arm.h
-+++ libaio-0.3.110/src/syscall-arm.h
-@@ -114,3 +114,119 @@ type fname(type1 arg1, type2 arg2, type3
-   return (type) __res_r0;						\
- }
- 
-+/*
-+ *  linux/include/asm-arm/unistd.h
-+ *
-+ *  Copyright (C) 2001-2005 Russell King
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * Please forward _all_ changes to this file to rmk@arm.linux.org.uk,
-+ * no matter what the change is.  Thanks!
-+ */
-+
-+#define __NR_OABI_SYSCALL_BASE	0x900000
-+
-+#if defined(__thumb__) || defined(__ARM_EABI__)
-+#define __NR_SYSCALL_BASE	0
-+#else
-+#define __NR_SYSCALL_BASE	__NR_OABI_SYSCALL_BASE
-+#endif
-+
-+#define __NR_io_setup			(__NR_SYSCALL_BASE+243)
-+#define __NR_io_destroy			(__NR_SYSCALL_BASE+244)
-+#define __NR_io_getevents		(__NR_SYSCALL_BASE+245)
-+#define __NR_io_submit			(__NR_SYSCALL_BASE+246)
-+#define __NR_io_cancel			(__NR_SYSCALL_BASE+247)
-+
-+#define __sys2(x) #x
-+#define __sys1(x) __sys2(x)
-+
-+#if defined(__thumb__) || defined(__ARM_EABI__)
-+#define __SYS_REG(name) register long __sysreg __asm__("r7") = __NR_##name;
-+#define __SYS_REG_LIST(regs...) "r" (__sysreg) , ##regs
-+#define __syscall(name) "swi\t0"
-+#else
-+#define __SYS_REG(name)
-+#define __SYS_REG_LIST(regs...) regs
-+#define __syscall(name) "swi\t" __sys1(__NR_##name) ""
-+#endif
-+
-+#define io_syscall1(type,fname,sname,type1,arg1)			\
-+type fname(type1 arg1) {						\
-+  __SYS_REG(sname)							\
-+  register long __r0 __asm__("r0") = (long)arg1;			\
-+  register long __res_r0 __asm__("r0");					\
-+  __asm__ __volatile__ (						\
-+  __syscall(sname)							\
-+	: "=r" (__res_r0)						\
-+	: __SYS_REG_LIST( "0" (__r0) )					\
-+	: "memory" );							\
-+  return (type) __res_r0;						\
-+}
-+
-+#define io_syscall2(type,fname,sname,type1,arg1,type2,arg2)		\
-+type fname(type1 arg1,type2 arg2) {					\
-+  __SYS_REG(sname)							\
-+  register long __r0 __asm__("r0") = (long)arg1;			\
-+  register long __r1 __asm__("r1") = (long)arg2;			\
-+  register long __res_r0 __asm__("r0");					\
-+  __asm__ __volatile__ (						\
-+  __syscall(sname)							\
-+	: "=r" (__res_r0)						\
-+	: __SYS_REG_LIST( "0" (__r0), "r" (__r1) )			\
-+	: "memory" );							\
-+  return (type) __res_r0;						\
-+}
-+
-+#define io_syscall3(type,fname,sname,type1,arg1,type2,arg2,type3,arg3)	\
-+type fname(type1 arg1,type2 arg2,type3 arg3) {				\
-+  __SYS_REG(sname)							\
-+  register long __r0 __asm__("r0") = (long)arg1;			\
-+  register long __r1 __asm__("r1") = (long)arg2;			\
-+  register long __r2 __asm__("r2") = (long)arg3;			\
-+  register long __res_r0 __asm__("r0");					\
-+  __asm__ __volatile__ (						\
-+  __syscall(sname)							\
-+	: "=r" (__res_r0)						\
-+	: __SYS_REG_LIST( "0" (__r0), "r" (__r1), "r" (__r2) )		\
-+	: "memory" );							\
-+  return (type) __res_r0;						\
-+}
-+
-+#define io_syscall4(type,fname,sname,type1,arg1,type2,arg2,type3,arg3,type4,arg4)\
-+type fname(type1 arg1, type2 arg2, type3 arg3, type4 arg4) {		\
-+  __SYS_REG(sname)							\
-+  register long __r0 __asm__("r0") = (long)arg1;			\
-+  register long __r1 __asm__("r1") = (long)arg2;			\
-+  register long __r2 __asm__("r2") = (long)arg3;			\
-+  register long __r3 __asm__("r3") = (long)arg4;			\
-+  register long __res_r0 __asm__("r0");					\
-+  __asm__ __volatile__ (						\
-+  __syscall(sname)							\
-+	: "=r" (__res_r0)						\
-+	: __SYS_REG_LIST( "0" (__r0), "r" (__r1), "r" (__r2), "r" (__r3) ) \
-+	: "memory" );							\
-+  return (type) __res_r0;						\
-+}
-+
-+#define io_syscall5(type,fname,sname,type1,arg1,type2,arg2,type3,arg3,type4,arg4,type5,arg5)	\
-+type fname(type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5) {\
-+  __SYS_REG(sname)							\
-+  register long __r0 __asm__("r0") = (long)arg1;			\
-+  register long __r1 __asm__("r1") = (long)arg2;			\
-+  register long __r2 __asm__("r2") = (long)arg3;			\
-+  register long __r3 __asm__("r3") = (long)arg4;			\
-+  register long __r4 __asm__("r4") = (long)arg5;			\
-+  register long __res_r0 __asm__("r0");					\
-+  __asm__ __volatile__ (						\
-+  __syscall(sname)							\
-+	: "=r" (__res_r0)						\
-+	: __SYS_REG_LIST( "0" (__r0), "r" (__r1), "r" (__r2),		\
-+			  "r" (__r3), "r" (__r4) )			\
-+	: "memory" );							\
-+  return (type) __res_r0;						\
-+}
-+
+diff --git a/src/syscall.h b/src/syscall.h
+index 9b9e9c1..9ecd3b4 100644
+--- a/src/syscall.h
++++ b/src/syscall.h
+@@ -29,6 +29,12 @@
+ #include "syscall-sparc.h"
+ #elif defined(__aarch64__) || defined(__riscv)
+ #include "syscall-generic.h"
++#elif defined(__m68k__)
++#include "syscall-m68k.h"
++#elif defined(__hppa__)
++#include "syscall-parisc.h"
++#elif defined(__mips__)
++#include "syscall-mips.h"
+ #else
+ #warning "using system call numbers from sys/syscall.h"
+ #endif

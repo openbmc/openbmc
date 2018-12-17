@@ -22,16 +22,21 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), 'lib
 import unittest
 try:
     import bb
+    import layerindexlib
 except RuntimeError as exc:
     sys.exit(str(exc))
 
 tests = ["bb.tests.codeparser",
+         "bb.tests.cooker",
          "bb.tests.cow",
          "bb.tests.data",
          "bb.tests.event",
          "bb.tests.fetch",
          "bb.tests.parse",
-         "bb.tests.utils"]
+         "bb.tests.utils",
+         "layerindexlib.tests.layerindexobj",
+         "layerindexlib.tests.restapi",
+         "layerindexlib.tests.cooker"]
 
 for t in tests:
     t = '.'.join(t.split('.')[:3])

@@ -1,0 +1,32 @@
+From 0a24f03a67425a7b58b3fd40d965c0c9801ae7a1 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Mon, 27 Aug 2018 16:10:55 +0800
+Subject: [PATCH] libjpeg-turbo: fix package_qa error
+
+Fix package qa errors like below:
+libjpeg.so.62.3.0 contains probably-redundant RPATH /usr/lib [useless-rpaths]
+usr/bin/cjpeg contains probably-redundant RPATH /usr/lib
+
+Upstream-Status: Inappropriate[oe-specific]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ CMakeLists.txt | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1719522..682cef1 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -109,8 +109,6 @@ endif()
+ 
+ include(cmakescripts/GNUInstallDirs.cmake)
+ 
+-set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_FULL_LIBDIR})
+-
+ macro(report_directory var)
+   if(CMAKE_INSTALL_${var} STREQUAL CMAKE_INSTALL_FULL_${var})
+     message(STATUS "CMAKE_INSTALL_${var} = ${CMAKE_INSTALL_${var}}")
+-- 
+2.7.4
+

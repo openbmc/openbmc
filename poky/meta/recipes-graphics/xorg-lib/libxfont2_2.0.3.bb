@@ -9,7 +9,7 @@ require xorg-lib-common.inc
 LICENSE = "MIT & MIT-style & BSD"
 LIC_FILES_CHKSUM = "file://COPYING;md5=a46c8040f2f737bcd0c435feb2ab1c2c"
 
-DEPENDS += "freetype xtrans fontsproto libfontenc zlib"
+DEPENDS += "freetype xtrans xorgproto libfontenc zlib"
 
 XORG_PN = "libXfont2"
 

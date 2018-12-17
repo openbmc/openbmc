@@ -53,5 +53,5 @@ python populate_packages_append () {
             postrm += d.getVar('mime_postrm')
             d.setVar('pkg_postrm_%s' % pkg, postrm)
             bb.note("adding shared-mime-info-data dependency to %s" % pkg)
-            d.appendVar('RDEPENDS_' + pkg, " shared-mime-info-data")
+            d.appendVar('RDEPENDS_' + pkg, " " + d.getVar('MLPREFIX')+"shared-mime-info-data")
 }

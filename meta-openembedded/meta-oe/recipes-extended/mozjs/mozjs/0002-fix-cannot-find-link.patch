@@ -1,0 +1,34 @@
+From e6dcee5f8a0f80ce99946b81fa1233611a149fe6 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 12 Jul 2018 18:00:52 +0800
+Subject: [PATCH 2/5] fix cannot find link
+
+..
+|DEBUG: link: Trying 'mips64-wrs-linux-ld --sysroot=tmp-glibc/work/
+mips64-wrs-linux/mozjs/52.8.1-r0/recipe-sysroot '
+|ERROR: Cannot find link
+...
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ build/moz.configure/checks.configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/build/moz.configure/checks.configure b/build/moz.configure/checks.configure
+index 8c2dbc0..83bffc3 100644
+--- a/build/moz.configure/checks.configure
++++ b/build/moz.configure/checks.configure
+@@ -128,7 +128,7 @@ def check_prog(var, progs, what=None, input=None, allow_missing=False,
+ 
+         for prog in value or progs:
+             log.debug('%s: Trying %s', var.lower(), quote(prog))
+-            result = find_program(prog, paths)
++            result = find_program(prog.split()[0], paths)
+             if result:
+                 return result
+ 
+-- 
+2.7.4
+

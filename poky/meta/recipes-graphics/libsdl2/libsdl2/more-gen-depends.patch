@@ -1,0 +1,47 @@
+Many source files include e.g. wayland-protocols.h which should be found in the
+sysroot but SDL wants to build its own headers from the XML definitions.
+
+However the rules to generate those headers are only dependencies of the
+top-level libSDL2.la object so can be built in parallel with the rest of the
+objects, which can lead to interesting errors if the header is parsed by the
+compiler whilst it's being written by another process:
+
+| gen/wayland-client-protocol.h:3: error: unterminated #ifndef
+|  #ifndef WAYLAND_CLIENT_PROTOCOL_H
+
+Solve this by adding more dependencies so the generated files are built before
+the primary objects.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/configure.in b/data/poky-tmp/master/work/corei7-64-poky-linux/libsdl2/2.0.8-r0/SDL2-2.0.8/configure.in
+index 1c7e79338..ba07a4a4e 100644
+--- a/configure.in
++++ b/data/poky-tmp/master/work/corei7-64-poky-linux/libsdl2/2.0.8-r0/SDL2-2.0.8/configure.in
+@@ -4011,7 +4011,7 @@ DEPENDS=`echo $SOURCES | tr ' ' '\n'`
+ for EXT in asm cc m c S; do
+     OBJECTS=`echo "$OBJECTS" | sed 's,[[^ ]]*/\([[^ ]]*\)\.'$EXT',$(objects)/\1.lo,g'`
+     DEPENDS=`echo "$DEPENDS" | sed "s,^\\([[^ ]]*\\)/\\([[^ ]]*\\)\\.$EXT\\$,\\\\
+-\\$(objects)/\\2.lo: \\1/\\2.$EXT\\\\
++\\$(objects)/\\2.lo: \\1/\\2.$EXT \\$(GEN_OBJECTS)\\\\
+ 	\\$(RUN_CMD_CC)\\$(LIBTOOL) --tag=CC --mode=compile \\$(CC) \\$(CFLAGS) \\$(EXTRA_CFLAGS) $DEPENDENCY_TRACKING_OPTIONS -c \\$< -o \\$@,g"`
+ done
+ 
+@@ -4028,14 +4028,14 @@ SDLMAIN_OBJECTS=`echo $SDLMAIN_SOURCES`
+ SDLMAIN_DEPENDS=`echo $SDLMAIN_SOURCES`
+ SDLMAIN_OBJECTS=`echo "$SDLMAIN_OBJECTS" | sed 's,[[^ ]]*/\([[^ ]]*\)\.c,$(objects)/\1.lo,g'`
+ SDLMAIN_DEPENDS=`echo "$SDLMAIN_DEPENDS" | sed "s,\\([[^ ]]*\\)/\\([[^ ]]*\\)\\.c,\\\\
+-\\$(objects)/\\2.lo: \\1/\\2.c\\\\
++\\$(objects)/\\2.lo: \\1/\\2.c \\$(GEN_OBJECTS)\\\\
+ 	\\$(RUN_CMD_CC)\\$(LIBTOOL) --tag=CC --mode=compile \\$(CC) \\$(CFLAGS) \\$(EXTRA_CFLAGS) $DEPENDENCY_TRACKING_OPTIONS -c \\$< -o \\$@,g"`
+ 
+ SDLTEST_OBJECTS=`echo $SDLTEST_SOURCES`
+ SDLTEST_DEPENDS=`echo $SDLTEST_SOURCES`
+ SDLTEST_OBJECTS=`echo "$SDLTEST_OBJECTS" | sed 's,[[^ ]]*/\([[^ ]]*\)\.c,$(objects)/\1.lo,g'`
+ SDLTEST_DEPENDS=`echo "$SDLTEST_DEPENDS" | sed "s,\\([[^ ]]*\\)/\\([[^ ]]*\\)\\.c,\\\\
+-\\$(objects)/\\2.lo: \\1/\\2.c\\\\
++\\$(objects)/\\2.lo: \\1/\\2.c\\\\ \\$(GEN_OBJECTS)\\\\
+ 	\\$(RUN_CMD_CC)\\$(LIBTOOL) --tag=CC --mode=compile \\$(CC) \\$(CFLAGS) \\$(EXTRA_CFLAGS) $DEPENDENCY_TRACKING_OPTIONS -c \\$< -o \\$@,g"`
+ 
+ # Set runtime shared library paths as needed

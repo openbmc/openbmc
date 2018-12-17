@@ -328,15 +328,8 @@ def get_multilib_datastore(variant, d):
 def all_multilib_tune_values(d, var, unique = True, need_split = True, delim = ' '):
     """Return a string of all ${var} in all multilib tune configuration"""
     values = []
-    value = d.getVar(var) or ""
-    if value != "":
-        if need_split:
-            for item in value.split(delim):
-                values.append(item)
-        else:
-            values.append(value)
-    variants = d.getVar("MULTILIB_VARIANTS") or ""
-    for item in variants.split():
+    variants = (d.getVar("MULTILIB_VARIANTS") or "").split() + ['']
+    for item in variants:
         localdata = get_multilib_datastore(item, d)
         # We need WORKDIR to be consistent with the original datastore
         localdata.setVar("WORKDIR", d.getVar("WORKDIR"))
@@ -367,23 +360,10 @@ def all_multilib_tune_list(vars, d):
     values = {}
     for v in vars:
         values[v] = []
-
-    localdata = bb.data.createCopy(d)
-    overrides = localdata.getVar("OVERRIDES", False).split(":")
-    newoverrides = []
-    for o in overrides:
-        if not o.startswith("virtclass-multilib-"):
-            newoverrides.append(o)
-    localdata.setVar("OVERRIDES", ":".join(newoverrides))
-    localdata.setVar("MLPREFIX", "")
-    origdefault = localdata.getVar("DEFAULTTUNE_MULTILIB_ORIGINAL")
-    if origdefault:
-        localdata.setVar("DEFAULTTUNE", origdefault)
     values['ml'] = ['']
-    for v in vars:
-        values[v].append(localdata.getVar(v))
-    variants = d.getVar("MULTILIB_VARIANTS") or ""
-    for item in variants.split():
+
+    variants = (d.getVar("MULTILIB_VARIANTS") or "").split() + ['']
+    for item in variants:
         localdata = get_multilib_datastore(item, d)
         values[v].append(localdata.getVar(v))
         values['ml'].append(item)

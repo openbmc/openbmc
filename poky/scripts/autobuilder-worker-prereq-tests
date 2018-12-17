@@ -1,0 +1,65 @@
+#!/bin/bash
+#
+# Script which can be run on new autobuilder workers to check all needed configuration is present.
+# Designed to be run in a repo where bitbake/oe-core are already present.
+#
+
+#
+# Todo
+# Add testtools/subunit import test
+# Add python3-git test
+# Add pigz test
+# vnc tests/checkvnc?
+# test sendmail works (for QA email notification)
+# test error report submission works
+# test buildistory git repo works?
+#
+
+. ./oe-init-build-env > /dev/null
+if [ "$?" != "0" ]; then
+    exit 1
+fi
+git config --global user.name > /dev/null
+if [ "$?" != "0" ]; then
+    echo "Please set git config --global user.name"
+    exit 1
+fi
+git config --global user.email > /dev/null
+if [ "$?" != "0" ]; then
+    echo "Please set git config --global user.email"
+    exit 1
+fi
+bitbake -p
+if [ "$?" != "0" ]; then
+    echo "Bitbake parsing failed"
+    exit 1
+fi
+
+WATCHES=$(PATH="/sbin:/usr/sbin:$PATH" sysctl fs.inotify.max_user_watches -n)
+if (( $WATCHES < 65000 )); then
+    echo 'Need to increase watches (echo fs.inotify.max_user_watches=65536 | sudo tee -a /etc/sysctl.conf'
+    exit 1
+fi
+mkdir -p tmp/deploy/images/qemux86-64
+pushd tmp/deploy/images/qemux86-64
+if [ ! -e core-image-minimal-qemux86-64.ext4 ]; then
+    wget http://downloads.yoctoproject.org/releases/yocto/yocto-2.5.1/machines/qemu/qemux86-64/core-image-minimal-qemux86-64.ext4
+fi
+if [ ! -e core-image-minimal-qemux86-64.qemuboot.conf ]; then
+    wget http://downloads.yoctoproject.org/releases/yocto/yocto-2.5.1/machines/qemu/qemux86-64/core-image-minimal-qemux86-64.qemuboot.conf
+fi
+if [ ! -e bzImage-qemux86-64.bin ]; then
+    wget http://downloads.yoctoproject.org/releases/yocto/yocto-2.5.1/machines/qemu/qemux86-64/bzImage-qemux86-64.bin
+fi
+popd
+bitbake qemu-helper-native
+runqemu qemux86-64
+if [ "$?" != "0" ]; then
+    echo "Unable to use runqemu"
+    exit 1
+fi
+runqemu qemux86-64 kvm
+if [ "$?" != "0" ]; then
+    echo "Unable to use runqemu with kvm"
+    exit 1
+fi

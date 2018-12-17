@@ -38,7 +38,7 @@ do_install() {
     install -m 0644 ${S}/inc/NE10*.h ${D}${includedir}/
     install -m 0644 ${B}/modules/libNE10.a ${D}${libdir}/
     install -m 0755 ${B}/modules/libNE10.so.* ${D}${libdir}/
-    cp -a ${B}/modules/libNE10.so ${D}${libdir}/
+    cp -d ${B}/modules/libNE10.so ${D}${libdir}/
 }
 
 # ERROR: QA Issue: ELF binary 'ne10/1.2.1-r0/packages-split/ne10/usr/lib/libNE10.so.10' has relocations in .text [textrel]

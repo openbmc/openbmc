@@ -3,6 +3,8 @@ import os
 
 import bb
 import oe.utils
+import subprocess
+import shlex
 
 class LocalSigner(object):
     """Class for handling local (on the build host) signing"""
@@ -23,10 +25,7 @@ class LocalSigner(object):
         if armor:
             cmd += "--armor "
         cmd += keyid
-        status, output = oe.utils.getstatusoutput(cmd)
-        if status:
-            raise bb.build.FuncFailed('Failed to export gpg public key (%s): %s' %
-                                      (keyid, output))
+        subprocess.check_output(shlex.split(cmd), stderr=subprocess.STDOUT)
 
     def sign_rpms(self, files, keyid, passphrase, digest, sign_chunk, fsk=None, fsk_password=None):
         """Sign RPM files"""
@@ -48,13 +47,10 @@ class LocalSigner(object):
 
         # Sign in chunks
         for i in range(0, len(files), sign_chunk):
-            status, output = oe.utils.getstatusoutput(cmd + ' '.join(files[i:i+sign_chunk]))
-            if status:
-                raise bb.build.FuncFailed("Failed to sign RPM packages: %s" % output)
+            subprocess.check_output(shlex.split(cmd + ' '.join(files[i:i+sign_chunk])), stderr=subprocess.STDOUT)
 
     def detach_sign(self, input_file, keyid, passphrase_file, passphrase=None, armor=True):
         """Create a detached signature of a file"""
-        import subprocess
 
         if passphrase_file and passphrase:
             raise Exception("You should use either passphrase_file of passphrase, not both")
@@ -100,7 +96,6 @@ class LocalSigner(object):
 
     def get_gpg_version(self):
         """Return the gpg version as a tuple of ints"""
-        import subprocess
         try:
             ver_str = subprocess.check_output((self.gpg_bin, "--version", "--no-permission-warning")).split()[2].decode("utf-8")
             return tuple([int(i) for i in ver_str.split("-")[0].split('.')])
@@ -114,7 +109,7 @@ class LocalSigner(object):
         if self.gpg_path:
             cmd += "--homedir %s " % self.gpg_path
         cmd += sig_file
-        status, _ = oe.utils.getstatusoutput(cmd)
+        status = subprocess.call(shlex.split(cmd))
         ret = False if status else True
         return ret
 

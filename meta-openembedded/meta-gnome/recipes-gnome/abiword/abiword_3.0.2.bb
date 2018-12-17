@@ -8,7 +8,7 @@ DEPENDS  = " \
     gtk+ \
     gtkmathview \
     wv \
-    libfribidi \
+    fribidi \
     jpeg \
     libpng \
     librsvg \
@@ -24,10 +24,10 @@ RDEPENDS_${PN}_append_libc-glibc = " \
 "
 RCONFLICTS_${PN} = "${PN}-embedded"
 
-SRC_URI = " \
-    http://www.abisource.com/downloads/${BPN}/${PV}/source/${BP}.tar.gz \
-    file://0001-plugins-aiksaurus-Makefile.am-remove-uncomplete-opti.patch \
-"
+SRC_URI = "http://www.abisource.com/downloads/${BPN}/${PV}/source/${BP}.tar.gz \
+           file://0001-plugins-aiksaurus-Makefile.am-remove-uncomplete-opti.patch \
+           file://0001-Bug-13770-Require-C-11-from-now-on.patch \
+           "
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=c5edcc3ccd864b19004d14e9c1c9a26a"
 

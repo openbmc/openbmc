@@ -1,7 +1,7 @@
-From 86744d408b91acdcb086a03d7779fcda152f2ac3 Mon Sep 17 00:00:00 2001
+From 596979ed58109141a7fee680ab95b27296c022b1 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Mon, 8 May 2017 14:39:56 +0800
-Subject: [PATCH 02/13] run_program support timeout
+Subject: [PATCH 02/11] run_program support timeout
 
 Upstream-Status: Pending
 
@@ -11,10 +11,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 39 insertions(+), 29 deletions(-)
 
 diff --git a/blivet/util.py b/blivet/util.py
-index 0cf5188..d4bd9bb 100644
+index 0f2a995..05a253c 100644
 --- a/blivet/util.py
 +++ b/blivet/util.py
-@@ -158,6 +158,30 @@ class Path(str):
+@@ -157,6 +157,30 @@ class Path(str):
      def __hash__(self):
          return self._path.__hash__()
  
@@ -45,7 +45,7 @@ index 0cf5188..d4bd9bb 100644
  
  def _run_program(argv, root='/', stdin=None, env_prune=None, stderr_to_stdout=False, binary_output=False):
      if env_prune is None:
-@@ -180,36 +204,22 @@ def _run_program(argv, root='/', stdin=None, env_prune=None, stderr_to_stdout=Fa
+@@ -179,36 +203,22 @@ def _run_program(argv, root='/', stdin=None, env_prune=None, stderr_to_stdout=Fa
              stderr_dir = subprocess.STDOUT
          else:
              stderr_dir = subprocess.PIPE

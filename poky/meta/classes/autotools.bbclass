@@ -225,7 +225,7 @@ autotools_do_configure() {
 			find ${S} -ignore_readdir_race -name $i -delete
 		done
 
-		bbnote Executing ACLOCAL=\"$ACLOCAL\" autoreconf --verbose --install --force ${EXTRA_AUTORECONF} $acpaths
+		bbnote Executing ACLOCAL=\"$ACLOCAL\" autoreconf -Wcross --verbose --install --force ${EXTRA_AUTORECONF} $acpaths
 		ACLOCAL="$ACLOCAL" autoreconf -Wcross --verbose --install --force ${EXTRA_AUTORECONF} $acpaths || die "autoreconf execution failed."
 		cd $olddir
 	fi
@@ -237,7 +237,7 @@ autotools_do_configure() {
 }
 
 autotools_do_compile() {
-    oe_runmake
+	oe_runmake
 }
 
 autotools_do_install() {

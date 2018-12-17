@@ -1,0 +1,75 @@
+From bb977ca0716ae98f10102c7122fe15bc0ddb5356 Mon Sep 17 00:00:00 2001
+From: "Hongzhi.Song" <hongzhi.song@windriver.com>
+Date: Thu, 20 Sep 2018 21:49:02 -0400
+Subject: [PATCH] sigwaitinfo01: recent glibc calls syscall directly
+
+glibc commit
+  8b0e795aaa44 ("Simplify Linux sig{timed}wait{info} implementations")
+changed sigwaitinfo to call sigtimedwait, which calls rt_sigtimedwait
+syscall directly.
+
+So, an invalid pointer no longer crashes child process and test
+reports failure. Fix it by accepting either crash or EFAULT.
+
+Signed-off-by: Jan Stancek <jstancek@redhat.com>
+
+Upstream-Status: Submitted [https://lists.linux.it/pipermail/ltp/2018-September/009338.html]
+
+Signed-off-by: Hongzhi.Song <hongzhi.song@windriver.com>
+---
+ .../kernel/syscalls/sigwaitinfo/sigwaitinfo01.c    | 30 +++++++++++++++++++---
+ 1 file changed, 26 insertions(+), 4 deletions(-)
+
+diff --git a/testcases/kernel/syscalls/sigwaitinfo/sigwaitinfo01.c b/testcases/kernel/syscalls/sigwaitinfo/sigwaitinfo01.c
+index 95a9436a4..8fa8ac34b 100644
+--- a/testcases/kernel/syscalls/sigwaitinfo/sigwaitinfo01.c
++++ b/testcases/kernel/syscalls/sigwaitinfo/sigwaitinfo01.c
+@@ -371,19 +371,41 @@ void test_bad_address2(swi_func sigwaitinfo, int signo)
+ 		tst_brkm(TBROK | TERRNO, NULL, "fork() failed");
+ 	case 0:
+ 		signal(SIGSEGV, SIG_DFL);
++
++       /*
++        * depending on glibc implementation we should
++        * either crash or get EFAULT
++        */
+ 		TEST(sigwaitinfo((void *)1, NULL, NULL));
+ 
+-		_exit(0);
++       if (TEST_RETURN == -1 && TEST_ERRNO == EFAULT)
++           _exit(0);
++
++       tst_resm(TINFO, "swi_func returned: %ld, errno: %d",
++           TEST_RETURN, TEST_ERRNO);
++       _exit(1);
++
+ 		break;
+ 	default:
+ 		break;
+ 	}
+ 
+ 	SUCCEED_OR_DIE(waitpid, "waitpid failed", pid, &status, 0);
+-	if (WIFSIGNALED(status) && WTERMSIG(status) == SIGSEGV)
++
++   if ((WIFSIGNALED(status) && WTERMSIG(status) == SIGSEGV)
++       || (WIFEXITED(status) && WEXITSTATUS(status) == 0)) {
+ 		tst_resm(TPASS, "Test passed");
+-	else
+-		tst_resm(TFAIL, "Unrecognised child exit code");
++       return;
++   }
++
++   if (WIFEXITED(status)) {
++       tst_resm(TFAIL, "Unrecognised child exit code: %d",
++           WEXITSTATUS(status));
++   }
++   if (WIFSIGNALED(status)) {
++       tst_resm(TFAIL, "Unrecognised child termsig: %d",
++           WTERMSIG(status));
++   }
+ }
+ 
+ void test_bad_address3(swi_func sigwaitinfo, int signo)
+-- 
+2.11.0
+

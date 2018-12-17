@@ -14,8 +14,6 @@ class RunqemuTests(OESelftestTestCase):
 
     image_is_ready = False
     deploy_dir_image = ''
-    # We only want to print runqemu stdout/stderr if there is a test case failure
-    buffer = True
 
     def setUpLocal(self):
         super(RunqemuTests, self).setUpLocal()
@@ -176,14 +174,17 @@ class QemuTest(OESelftestTestCase):
         # when qemu was shutdown by the above shutdown command
         qemu.runner.stop_thread()
         time_track = 0
-        while True:
-            is_alive = qemu.check()
-            if not is_alive:
-                return True
-            if time_track > timeout:
-                return False
-            time.sleep(1)
-            time_track += 1
+        try:
+            while True:
+                is_alive = qemu.check()
+                if not is_alive:
+                    return True
+                if time_track > timeout:
+                    return False
+                time.sleep(1)
+                time_track += 1
+        except SystemExit:
+            return True
 
     def test_qemu_can_shutdown(self):
         self.assertExists(self.qemuboot_conf)
