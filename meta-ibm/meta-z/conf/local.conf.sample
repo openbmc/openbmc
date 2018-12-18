@@ -15,4 +15,3 @@ BB_DISKMON_DIRS = "\
     ABORT,${SSTATE_DIR},100M,1K \
     ABORT,/tmp,10M,1K"
 CONF_VERSION = "1"
-INHERIT += "extrausers"
