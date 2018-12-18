@@ -1,6 +1,5 @@
 [Unit]
 Description=Phosphor IPMI KCS DBus Bridge
-After=phosphor-ipmi-host.service
 
 [Service]
 Restart=always
