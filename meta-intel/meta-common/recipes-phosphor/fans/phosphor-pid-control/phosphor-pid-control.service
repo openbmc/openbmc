@@ -1,0 +1,12 @@
+[Unit]
+Description=Phosphor-Pid-Control Margin-based Fan Control Daemon
+
+[Service]
+Restart=always
+ExecStart={sbindir}/swampd
+RestartSec=5
+StartLimitInterval=0
+Type=simple
+
+[Install]
+WantedBy=basic.target

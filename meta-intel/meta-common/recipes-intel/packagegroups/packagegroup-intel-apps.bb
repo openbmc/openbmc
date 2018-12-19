@@ -32,7 +32,7 @@ RDEPENDS_${PN}-chassis = " \
 
 SUMMARY_${PN}-fans = "Intel Fans"
 RDEPENDS_${PN}-fans = " \
-        obmc-control-fan \
+        phosphor-pid-control \
         "
 
 SUMMARY_${PN}-flash = "Intel Flash"
