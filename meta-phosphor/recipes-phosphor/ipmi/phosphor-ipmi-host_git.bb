@@ -86,8 +86,10 @@ SRC_URI += "file://merge_yamls.py "
 
 HOSTIPMI_PROVIDER_LIBRARY += "libipmi20.so"
 HOSTIPMI_PROVIDER_LIBRARY += "libsysintfcmds.so"
+HOSTIPMI_PROVIDER_LIBRARY += "libusercmds.so"
 
 NETIPMI_PROVIDER_LIBRARY += "libipmi20.so"
+NETIPMI_PROVIDER_LIBRARY += "libusercmds.so"
 
 FILES_${PN}_append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
 FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
