@@ -1,27 +1,33 @@
-From 9a47fd5da546d148886c8890cd48249ebe826948 Mon Sep 17 00:00:00 2001
-From: Daniel Rank <dwrank@gmail.com>
-Date: Wed, 1 Aug 2018 23:32:00 -0700
-Subject: [PATCH] Add initial cross compile support
+From 32f3cad3c41161693659a902062fa0c01c0338ed Mon Sep 17 00:00:00 2001
+From: ErikHH <erik.hoogeveen@outlook.com>
+Date: Thu, 20 Dec 2018 15:33:45 +0100
+Subject: [PATCH 1/1] Add initial cross compile support
 
-Upstream-Status: Pending
-Signed-off-by: Daniel Rank <dwrank@gmail.com>
-
+Signed-off-by: ErikHH <erik.hoogeveen@outlook.com>
 ---
- devLib/Makefile             | 54 +++++++++++++++++++++++++--------------------
- examples/Gertboard/Makefile | 22 +++++++++++-------
- examples/Makefile           | 22 +++++++++++-------
- examples/PiFace/Makefile    | 22 +++++++++++-------
- examples/PiGlow/Makefile    |  4 ++--
- examples/q2w/Makefile       |  4 ++--
- gpio/Makefile               | 29 ++++++++++++------------
- wiringPi/Makefile           | 46 +++++++++++++++++++++-----------------
- 8 files changed, 117 insertions(+), 86 deletions(-)
+ devLib/Makefile             | 55 +++++++++++++++++++++----------------
+ examples/Gertboard/Makefile | 22 +++++++++------
+ examples/Makefile           | 22 +++++++++------
+ examples/PiFace/Makefile    | 22 +++++++++------
+ examples/PiGlow/Makefile    |  4 +--
+ examples/q2w/Makefile       |  4 +--
+ gpio/Makefile               | 29 +++++++++----------
+ wiringPi/Makefile           | 47 +++++++++++++++++--------------
+ 8 files changed, 119 insertions(+), 86 deletions(-)
 
 diff --git a/devLib/Makefile b/devLib/Makefile
-index cf665d6..040c03a 100644
+index cf665d6..d193a9d 100644
 --- a/devLib/Makefile
 +++ b/devLib/Makefile
-@@ -31,15 +31,19 @@ ifneq ($V,1)
+@@ -22,6 +22,7 @@
+ #################################################################################
+ 
+ VERSION=$(shell cat ../VERSION)
++DYN_VERS_MAJ=$(word 1,$(subst ., ,$(VERSION)))
+ DESTDIR?=/usr
+ PREFIX?=/local
+ 
+@@ -31,15 +32,19 @@ ifneq ($V,1)
  Q ?= @
  endif
  
@@ -49,7 +55,7 @@ index cf665d6..040c03a 100644
  
  LIBS    =
  
-@@ -68,16 +72,16 @@ $(STATIC):	$(OBJ)
+@@ -68,16 +73,16 @@ $(STATIC):	$(OBJ)
  
  $(DYNAMIC):	$(OBJ)
  	$Q echo "[Link (Dynamic)]"
@@ -69,7 +75,7 @@ index cf665d6..040c03a 100644
  
  .PHONY:	tags
  tags:	$(SRC)
-@@ -88,22 +92,22 @@ tags:	$(SRC)
+@@ -88,22 +93,22 @@ tags:	$(SRC)
  .PHONY:	install
  install:	$(DYNAMIC)
  	$Q echo "[Install Headers]"
@@ -102,7 +108,7 @@ index cf665d6..040c03a 100644
  
  .PHONY:	install-deb
  install-deb:	$(DYNAMIC)
-@@ -118,9 +122,11 @@ install-deb:	$(DYNAMIC)
+@@ -118,9 +123,11 @@ install-deb:	$(DYNAMIC)
  .PHONY:	uninstall
  uninstall:
  	$Q echo "[UnInstall]"
@@ -306,10 +312,14 @@ index 9ec160d..a294242 100644
  
  .PHONY:	depend
 diff --git a/wiringPi/Makefile b/wiringPi/Makefile
-index 287fa58..670a6db 100644
+index 287fa58..3423d3f 100644
 --- a/wiringPi/Makefile
 +++ b/wiringPi/Makefile
-@@ -25,22 +25,26 @@ VERSION=$(shell cat ../VERSION)
+@@ -22,25 +22,30 @@
+ #################################################################################
+ 
+ VERSION=$(shell cat ../VERSION)
++DYN_VERS_MAJ=$(word 1,$(subst ., ,$(VERSION)))
  DESTDIR?=/usr
  PREFIX?=/local
  
@@ -344,7 +354,7 @@ index 287fa58..670a6db 100644
  
  LIBS    = -lm -lpthread -lrt -lcrypt
  
-@@ -75,17 +79,17 @@ static:
+@@ -75,17 +80,17 @@ static:
  
  $(DYNAMIC):	$(OBJ)
  	$Q echo "[Link (Dynamic)]"
@@ -365,7 +375,7 @@ index 287fa58..670a6db 100644
  
  .PHONY:	tags
  tags:	$(SRC)
-@@ -96,13 +100,13 @@ tags:	$(SRC)
+@@ -96,13 +101,13 @@ tags:	$(SRC)
  .PHONY:	install
  install:	$(DYNAMIC)
  	$Q echo "[Install Headers]"
@@ -385,7 +395,7 @@ index 287fa58..670a6db 100644
  
  .PHONY:	install-deb
  install-deb:	$(DYNAMIC)
-@@ -117,9 +121,11 @@ install-deb:	$(DYNAMIC)
+@@ -117,9 +122,11 @@ install-deb:	$(DYNAMIC)
  .PHONY:	uninstall
  uninstall:
  	$Q echo "[UnInstall]"
@@ -401,5 +411,5 @@ index 287fa58..670a6db 100644
  
  .PHONY:	depend
 -- 
-2.7.4
+2.19.1
 
