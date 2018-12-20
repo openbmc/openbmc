@@ -3,7 +3,7 @@ DESCRIPTION = "The IPMB bridge implements a Dbus compliant interface for \
 implementing IPMB interfaces"
 
 SRC_URI = "git://github.com/openbmc/ipmbbridge.git"
-SRCREV = "a642a9480d348bb6677f4badb635ebf881f3bcd0"
+SRCREV = "932870a4e1081ea1347d6845900e64137037f12f"
 PV = "0.1+git${SRCPV}"
 
 LICENSE = "Apache-2.0"
