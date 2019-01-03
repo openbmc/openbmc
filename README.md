@@ -96,38 +96,31 @@ a new one.
 ## Features of OpenBMC
 
 **Feature List**
-* REST Management
-* IPMI
-* SSH based SOL
-* Power and Cooling Management
-* Event Logs
-* Zeroconf discoverable
-* Sensors
-* Inventory
-* LED Management
-* Host Watchdog
-* Simulation
+* Host management: Power, Cooling, LEDs, Inventory, Events, Watchdog
+* Full IPMI 2.0 Compliance with DCMI
 * Code Update Support for multiple BMC/BIOS images
+* Web-based user interface
+* REST interfaces
+* D-Bus based interfaces
+* SSH based SOL
+* Remote KVM
+* Hardware Simulation
+* Automated Testing
 
 **Features In Progress**
-* Full IPMI 2.0 Compliance with DCMI
+* OpenCompute Redfish Compliance
+* User management
+* Virtual media
 * Verified Boot
-* HTML5 Java Script Web User Interface
-* BMC RAS
 
 **Features Requested but need help**
-* OpenCompute Redfish Compliance
 * OpenBMC performance monitoring
-* cgroup user management and policies
-* Remote KVM
-* Remote USB
-* OpenStack Ironic Integration
-* QEMU enhancements
 
 
 ## Finding out more
-Dive deeper in to OpenBMC by opening the [docs](https://github.com/openbmc/docs)
-repository.
+
+Dive deeper into OpenBMC by opening the
+[docs](https://github.com/openbmc/docs) repository.
 
 ## Contact
 - Mail: openbmc@lists.ozlabs.org [https://lists.ozlabs.org/listinfo/openbmc](https://lists.ozlabs.org/listinfo/openbmc)
