@@ -53,6 +53,7 @@ Including this layer adds the following packages to your `obmc-phosphor-image`:
 * [google-ipmi-sys](https://github.com/openbmc/google-ipmi-sys): OEM IPMI Handler for providing specific information to the host.
 * [phosphor-ipmi-blobs](https://github.com/openbmc/phosphor-ipmi-blobs): OEM IPMI Blobs Handler for providing the framework for specific blob handlers.
 * [phosphor-ipmi-ethstats](https://github.com/openbmc/phosphor-ipmi-ethstats): OEM IPMI Handler for reporting ethernet device statistics from the BMCs ethernet devices.
+* [phosphor-ipmi-flash](https://github.com/openbmc/phosphor-ipmi-flash): OEM IPMI Handler for controlling in-band firmware updates.
 
 III. Customizations
 
