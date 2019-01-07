@@ -8,10 +8,9 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=fa818a259cbed7ce8bc2a22d35a464fc"
 
 inherit autotools pkgconfig
 inherit pythonnative
-inherit obmc-phosphor-dbus-service
 inherit phosphor-networkd-rev
+inherit systemd
 
-DBUS_SERVICE_${PN} += "xyz.openbmc_project.Network.service"
 
 DEPENDS += "systemd"
 DEPENDS += "autoconf-archive-native"
@@ -28,3 +27,12 @@ RDEPENDS_${PN} += "libnl"
 RDEPENDS_${PN} += "libnl-genl"
 
 S = "${WORKDIR}/git"
+
+SERVICE_FILE = "xyz.openbmc_project.Network.service"
+SYSTEMD_PACKAGES = "${PN}"
+SYSTEMD_SERVICE_${PN} += "${SERVICE_FILE}"
+SYSTEMD_DEFAULT_TARGET ?= "obmc-standby.target"
+
+EXTRA_OECONF = " \
+  SYSTEMD_TARGET="${SYSTEMD_DEFAULT_TARGET}" \
+"
