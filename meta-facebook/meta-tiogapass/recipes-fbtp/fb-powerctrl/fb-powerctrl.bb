@@ -1,6 +1,8 @@
 FILESEXTRAPATHS_append := "${THISDIR}/files:"
 
-inherit systemd
+inherit obmc-phosphor-systemd
+LICENSE = "Apache-2.0"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=a8328fd2a610bf4527feedcaa3ae3d14"
 
 S = "${WORKDIR}/"
 
@@ -8,7 +10,8 @@ SRC_URI = "file://setup_gpio.sh \
            file://power-util \
            file://host-gpio.service \
            file://host-poweroff.service \
-           file://host-poweron.service"
+           file://host-poweron.service \
+           file://LICENSE"
 
 DEPENDS = "systemd"
 RDEPENDS_${PN} = "bash"
