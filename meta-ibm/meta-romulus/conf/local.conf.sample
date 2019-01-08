@@ -63,7 +63,7 @@ MACHINE ??= "romulus"
 # Ultimately when creating custom policy, people will likely end up subclassing
 # these defaults.
 #
-DISTRO ?= "openbmc-openpower"
+DISTRO ?= "openbmc-romulus"
 # As an example of a subclass there is a "bleeding" edge policy configuration
 # where many versions are set to the absolute latest code from the upstream 
 # source control systems. This is just mentioned here as an example, its not
