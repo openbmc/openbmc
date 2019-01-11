@@ -144,23 +144,48 @@
             you need to get a copy of the Poky repository on your build
             host.
             Use the following commands to clone the Poky
-            repository and then checkout the &DISTRO_REL_TAG; release:
+            repository.
             <literallayout class='monospaced'>
      $ git clone git://git.yoctoproject.org/poky
      Cloning into 'poky'...
-     remote: Counting objects: 361782, done.
-     remote: Compressing objects: 100% (87100/87100), done.
-     remote: Total 361782 (delta 268619), reused 361439 (delta 268277)
-     Receiving objects: 100% (361782/361782), 131.94 MiB | 6.88 MiB/s, done.
-     Resolving deltas: 100% (268619/268619), done.
+     remote: Counting objects: 428632, done.
+     remote: Compressing objects: 100% (101203/101203), done.
+     remote: Total 428632 (delta 320463), reused 428532 (delta 320363)
+     Receiving objects: 100% (428632/428632), 153.01 MiB | 12.40 MiB/s, done.
+     Resolving deltas: 100% (320463/320463), done.
      Checking connectivity... done.
-     $ git checkout tags/yocto-2.5 -b my-yocto-2.5
+            </literallayout>
+            Move to the <filename>poky</filename> directory and take a look
+            at the tags:
+            <literallayout class='monospaced'>
+     $ cd poky
+     $ git fetch --tags
+     $ git tag
+     1.1_M1.final
+     1.1_M1.rc1
+     1.1_M1.rc2
+     1.1_M2.final
+     1.1_M2.rc1
+        .
+        .
+        .
+     yocto-2.5
+     yocto-2.5.1
+     yocto-2.5.2
+     yocto-2.6
+     yocto_1.5_M5.rc8
+            </literallayout>
+            For this example, check out the branch based on the
+            &DISTRO_REL_TAG; release:
+            <literallayout class='monospaced'>
+     $ git checkout tags/&DISTRO_REL_TAG; -b my-&DISTRO_REL_TAG;
+     Switched to a new branch 'my-&DISTRO_REL_TAG;'
             </literallayout>
             The previous Git checkout command creates a local branch
             named my-&DISTRO_REL_TAG;. The files available to you in that
             branch exactly match the repository's files in the
             "&DISTRO_NAME_NO_CAP;" development branch at the time of the
-            Yocto Project &DISTRO; release.
+            Yocto Project &DISTRO_REL_TAG; release.
         </para>
 
         <para>
@@ -204,12 +229,41 @@
             <orderedlist>
                 <listitem><para>
                     <emphasis>Initialize the Build Environment:</emphasis>
-                    Run the
+                    From within the <filename>poky</filename> directory, run the
                     <ulink url='&YOCTO_DOCS_REF_URL;#structure-core-script'><filename>&OE_INIT_FILE;</filename></ulink>
                     environment setup script to define Yocto Project's
                     build environment on your build host.
                     <literallayout class='monospaced'>
+     $ cd ~/poky
      $ source &OE_INIT_FILE;
+     You had no conf/local.conf file. This configuration file has therefore been
+     created for you with some default values. You may wish to edit it to, for
+     example, select a different MACHINE (target hardware). See conf/local.conf
+     for more information as common configuration options are commented.
+
+     You had no conf/bblayers.conf file. This configuration file has therefore been
+     created for you with some default values. To add additional metadata layers
+     into your configuration please add entries to conf/bblayers.conf.
+
+     The Yocto Project has extensive documentation about OE including a reference
+     manual which can be found at:
+         http://yoctoproject.org/documentation
+
+     For more information about OpenEmbedded see their website:
+         http://www.openembedded.org/
+
+
+     ### Shell environment set up for builds. ###
+
+     You can now run 'bitbake &lt;target&gt;'
+
+     Common targets are:
+         core-image-minimal
+         core-image-sato
+         meta-toolchain
+         meta-ide-support
+
+     You can also run generated qemu images with a command like 'runqemu qemux86'
                     </literallayout>
                     Among other things, the script creates the
                     <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>,
