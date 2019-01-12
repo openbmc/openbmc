@@ -1,0 +1,387 @@
+From 7a74bdc8d1b0b32c35dc83e130f687a52dfda1e8 Mon Sep 17 00:00:00 2001
+From: Jeremy Kerr <jk@ozlabs.org>
+Date: Tue, 13 Oct 2015 09:17:21 +0800
+Subject: [PATCH] plugins: Add a backend for the OpenBMC dbus interface
+
+Signed-off-by: Jeremy Kerr <jk@ozlabs.org>
+
+Includes the following commits from the following authors
+
+plugins/dbus: Split netfn from lun, and ccode from data
+
+Signed-off-by: Jeremy Kerr <jk@ozlabs.org>
+
+plugins/dbus: fix missing semicolon
+
+Reported-by: Chris Austen <austenc@us.ibm.com>
+
+Signed-off-by: Jeremy Kerr <jk@ozlabs.org>
+
+plugins/dbus: Fix ccode response
+
+We need to copy it in from the dbus reply.
+
+Signed-off-by: Jeremy Kerr <jk@ozlabs.org>
+
+plugins/dbus: Use default dbus connection
+
+... so we'll use the system bus if run as UID 0.
+
+Signed-off-by: Jeremy Kerr <jk@ozlabs.org>
+
+if no interface is specified, use the dbus interface by default
+
+This is a patch that should only be on openbmc, not sent upstream
+because the dbus interface is really only an openbmc thing.
+
+Signed-off-by: Vernon Mauery <vernon.mauery@linux.intel.com>
+---
+ configure.ac                 |  19 ++++
+ src/plugins/Makefile.am      |   4 +-
+ src/plugins/dbus/Makefile.am |  41 ++++++++
+ src/plugins/dbus/dbus.c      | 199 +++++++++++++++++++++++++++++++++++
+ src/plugins/ipmi_intf.c      |   6 ++
+ 5 files changed, 267 insertions(+), 2 deletions(-)
+ create mode 100644 src/plugins/dbus/Makefile.am
+ create mode 100644 src/plugins/dbus/dbus.c
+
+diff --git a/configure.ac b/configure.ac
+index f2fe1f3..81cc925 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -60,6 +60,7 @@ xenable_all_options=yes
+ xenable_intf_bmc=no
+ xenable_intf_dummy=no
+ xenable_intf_imb=yes
++xenable_intf_dbus=yes
+ xenable_intf_lipmi=yes
+ xenable_intf_open=yes
+ #xenable_intf_serial=yes
+@@ -222,6 +223,22 @@ if test "x$xenable_intf_usb" = "xyes"; then
+ 	IPMITOOL_INTF_LIB="$IPMITOOL_INTF_LIB usb/libintf_usb.la"
+ fi
+ 
++dnl enable IPMI dbus interface
++AC_ARG_ENABLE([intf-dbus],
++	[AC_HELP_STRING([--enable-intf-dbus],
++			[enable IPMI dbus interface [default=yes]])],
++		[xenable_intf_dbus=$enableval],
++		[xenable_intf_dbus=yes])
++if test "x$xenable_intf_dbus" = "xstatic" || test "x$xenable_intf_dbus" = "xplugin"; then
++   xenable_intf_dbus=yes
++fi
++if test "x$xenable_intf_dbus" = "xyes"; then
++	AC_DEFINE(IPMI_INTF_DBUS, [1], [Define to 1 to enable dbus interface.])
++	AC_SUBST(INTF_DBUS, [dbus])
++	AC_SUBST(INTF_DBUS_LIB, [libintf_dbus.la])
++	IPMITOOL_INTF_LIB="$IPMITOOL_INTF_LIB dbus/libintf_dbus.la"
++fi
++
+ dnl enable IPMIv2.0 RMCP+ LAN interface
+ AC_ARG_ENABLE([intf-lanplus],
+ 	[AC_HELP_STRING([--enable-intf-lanplus],
+@@ -664,6 +681,7 @@ AC_CONFIG_FILES([Makefile
+ 		src/plugins/imb/Makefile
+ 		src/plugins/bmc/Makefile
+ 		src/plugins/usb/Makefile
++		src/plugins/dbus/Makefile
+ 		src/plugins/lipmi/Makefile
+ 		src/plugins/serial/Makefile
+ 		src/plugins/dummy/Makefile])
+@@ -681,6 +699,7 @@ AC_MSG_RESULT([  free    : $xenable_intf_free])
+ AC_MSG_RESULT([  imb     : $xenable_intf_imb])
+ AC_MSG_RESULT([  bmc     : $xenable_intf_bmc])
+ AC_MSG_RESULT([  usb     : $xenable_intf_usb])
++AC_MSG_RESULT([  dbus    : $xenable_intf_dbus])
+ AC_MSG_RESULT([  lipmi   : $xenable_intf_lipmi])
+ AC_MSG_RESULT([  serial  : $xenable_intf_serial])
+ AC_MSG_RESULT([  dummy   : $xenable_intf_dummy])
+diff --git a/src/plugins/Makefile.am b/src/plugins/Makefile.am
+index 7ad8173..c0b0b29 100644
+--- a/src/plugins/Makefile.am
++++ b/src/plugins/Makefile.am
+@@ -32,8 +32,8 @@ MAINTAINERCLEANFILES		= Makefile.in
+ 
+ AM_CPPFLAGS			= -I$(top_srcdir)/include
+ 
+-SUBDIRS				= @INTF_LAN@ @INTF_LANPLUS@ @INTF_OPEN@ @INTF_LIPMI@ @INTF_IMB@ @INTF_BMC@ @INTF_FREE@ @INTF_SERIAL@ @INTF_DUMMY@ @INTF_USB@
+-DIST_SUBDIRS			= lan lanplus open lipmi imb bmc free serial dummy usb
++SUBDIRS				= @INTF_LAN@ @INTF_LANPLUS@ @INTF_OPEN@ @INTF_LIPMI@ @INTF_IMB@ @INTF_BMC@ @INTF_FREE@ @INTF_SERIAL@ @INTF_DUMMY@ @INTF_USB@ @INTF_DBUS@
++DIST_SUBDIRS			= lan lanplus open lipmi imb bmc free serial dummy usb dbus
+ 
+ noinst_LTLIBRARIES		= libintf.la
+ libintf_la_SOURCES		= ipmi_intf.c
+diff --git a/src/plugins/dbus/Makefile.am b/src/plugins/dbus/Makefile.am
+new file mode 100644
+index 0000000..3e92113
+--- /dev/null
++++ b/src/plugins/dbus/Makefile.am
+@@ -0,0 +1,41 @@
++ #
++ # Copyright (c) 2015 IBM Corporation
++ # All rights reserved.
++ #
++ # Redistribution and use in source and binary forms, with or without
++ # modification,are permitted provided that the following conditions are met:
++ #
++ # 1. Redistributions of source code must retain the above copyright notice,
++ #    this list of conditions and the following disclaimer.
++ #
++ # 2. Redistributions in binary form must reproduce the above copyright notice,
++ #    this list of conditions and the following disclaimer in the documentation
++ #    and/or other materials provided with the distribution.
++ #
++ # 3. Neither the name of the copyright holder nor the names of its contributors
++ #    may be used to endorse or promote products derived from this software
++ #    without specific prior written permission.
++ #
++ # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
++ # AND ANY EXPRESS OR IMPLIED WARRANTIES,INCLUDING, BUT NOT LIMITED TO, THE
++ # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ # ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
++ # LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++ # CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
++ # SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
++ # INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
++ # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
++ # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
++ # POSSIBILITY OF SUCH DAMAGE.
++ #
++
++MAINTAINERCLEANFILES	= Makefile.in
++
++INCLUDES		= -I$(top_srcdir)/include
++
++EXTRA_LTLIBRARIES	= libintf_dbus.la
++noinst_LTLIBRARIES	= @INTF_DBUS_LIB@
++libintf_dbus_la_LDFLAGS	= -lsystemd
++libintf_dbus_la_LIBADD	= $(top_builddir)/lib/libipmitool.la
++libintf_dbus_la_SOURCES	= dbus.c
++
+diff --git a/src/plugins/dbus/dbus.c b/src/plugins/dbus/dbus.c
+new file mode 100644
+index 0000000..c20545f
+--- /dev/null
++++ b/src/plugins/dbus/dbus.c
+@@ -0,0 +1,199 @@
++/*
++ * Copyright (c) 2015 IBM Corporation
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * 1. Redistributions of source code must retain the above copyright notice,
++ *    this list of conditions and the following disclaimer.
++ *
++ * 2. Redistributions in binary form must reproduce the above copyright notice,
++ *    this list of conditions and the following disclaimer in the documentation
++ *    and/or other materials provided with the distribution.
++ *
++ * 3. Neither the name of the copyright holder nor the names of its
++ *    contributors may be used to endorse or promote products derived from this
++ *    software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
++ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
++ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
++ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
++ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
++ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
++ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
++ * POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#define _BSD_SOURCE
++
++#include <sys/file.h>
++#include <sys/stat.h>
++#include <sys/types.h>
++#include <fcntl.h>
++#include <errno.h>
++#include <unistd.h>
++#include <stdbool.h>
++
++#include <systemd/sd-bus.h>
++#include <systemd/sd-bus-vtable.h>
++
++#include <ipmitool/log.h>
++#include <ipmitool/ipmi.h>
++#include <ipmitool/ipmi_intf.h>
++
++static sd_bus *bus;
++static uint8_t seq;
++static struct ipmi_rs rsp;
++static bool reply_received;
++
++static const char *bus_name = "org.openbmc.HostIpmi.ipmitool";
++static const char *object_path = "/org/openbmc/HostIpmi/ipmitool";
++static const char *interface = "org.openbmc.HostIpmi";
++
++static struct ipmi_rs *ipmi_dbus_sendrecv(struct ipmi_intf *intf,
++		struct ipmi_rq *req)
++{
++	sd_bus_message *msg;
++	int rc;
++
++	(void)intf;
++
++	rsp.ccode = 0xff;
++
++	rc = sd_bus_message_new_signal(bus, &msg, object_path,
++			interface, "ReceivedMessage");
++	if (rc < 0) {
++		lprintf(LOG_ERR, "%s: failed to create message: %s\n",
++				__func__, strerror(-rc));
++		goto out;
++	}
++
++	rc = sd_bus_message_append(msg, "yyyy",
++			++seq,
++			req->msg.netfn,
++			req->msg.lun,
++			req->msg.cmd);
++	if (rc < 0) {
++		lprintf(LOG_ERR, "%s: failed to init bytes\n", __func__);
++		goto out_free;
++	}
++
++	rc = sd_bus_message_append_array(msg, 'y', req->msg.data,
++			req->msg.data_len);
++	if (rc < 0) {
++		lprintf(LOG_ERR, "%s: failed to init body\n", __func__);
++		goto out_free;
++	}
++
++	rc = sd_bus_send(bus, msg, NULL);
++	if (rc < 0) {
++		lprintf(LOG_ERR, "%s: failed to send dbus message\n",
++				__func__);
++		goto out_free;
++	}
++
++	for (reply_received = false; !reply_received;) {
++		rc = sd_bus_wait(bus, -1);
++		sd_bus_process(bus, NULL);
++	}
++
++out_free:
++	sd_bus_message_unref(msg);
++out:
++	return &rsp;
++}
++
++static int ipmi_dbus_method_send_message(sd_bus_message *msg, void *userdata,
++		sd_bus_error *error)
++{
++	uint8_t recv_seq, recv_netfn, recv_lun, recv_cmd, recv_cc;
++	const void *data;
++	size_t n;
++	int rc;
++
++	(void)userdata;
++	(void)error;
++
++	rc = sd_bus_message_read(msg, "yyyyy", &recv_seq, &recv_netfn,
++			&recv_lun, &recv_cmd, &recv_cc);
++	if (rc < 0) {
++		lprintf(LOG_ERR, "%s: failed to read reply\n", __func__);
++		goto out;
++	}
++
++	rc = sd_bus_message_read_array(msg, 'y', &data, &n);
++	if (rc < 0) {
++		lprintf(LOG_ERR, "%s: failed to read reply data\n", __func__);
++		goto out;
++	}
++
++	if (n > sizeof(rsp.data)) {
++		lprintf(LOG_ERR, "%s: data too long!\n", __func__);
++		goto out;
++	}
++
++	if (recv_seq == seq) {
++		rsp.ccode = recv_cc;
++		rsp.data_len = n;
++		memcpy(rsp.data, data, rsp.data_len);
++		reply_received = true;
++	}
++
++out:
++	sd_bus_reply_method_return(msg, "x", 0);
++	return 0;
++}
++
++static const sd_bus_vtable dbus_vtable[] = {
++	SD_BUS_VTABLE_START(0),
++	SD_BUS_SIGNAL("ReceivedMessage", "yyyyay", 0),
++	SD_BUS_METHOD("sendMessage", "yyyyyay", "x",
++			ipmi_dbus_method_send_message,
++			SD_BUS_VTABLE_UNPRIVILEGED),
++	SD_BUS_VTABLE_END
++};
++
++static int ipmi_dbus_setup(struct ipmi_intf *intf)
++{
++	const char *name;
++	int rc;
++
++	rc = sd_bus_default(&bus);
++	if (rc < 0) {
++		lprintf(LOG_ERR, "Can't connect to session bus: %s\n",
++				strerror(-rc));
++		return -1;
++	}
++
++	sd_bus_add_object_vtable(bus, NULL, object_path, interface,
++			dbus_vtable, NULL);
++
++	sd_bus_request_name(bus, bus_name, SD_BUS_NAME_REPLACE_EXISTING);
++
++	sd_bus_flush(bus);
++	sd_bus_get_unique_name(bus, &name);
++	intf->opened = 1;
++
++	return 0;
++}
++
++static void ipmi_dbus_close(struct ipmi_intf *intf)
++{
++	if (intf->opened)
++		sd_bus_close(bus);
++	intf->opened = 0;
++}
++
++struct ipmi_intf ipmi_dbus_intf = {
++	.name		= "dbus",
++	.desc		= "OpenBMC dbus interface",
++	.setup		= ipmi_dbus_setup,
++	.close		= ipmi_dbus_close,
++	.sendrecv	= ipmi_dbus_sendrecv,
++};
+diff --git a/src/plugins/ipmi_intf.c b/src/plugins/ipmi_intf.c
+index 9225a34..56c2543 100644
+--- a/src/plugins/ipmi_intf.c
++++ b/src/plugins/ipmi_intf.c
+@@ -89,8 +89,14 @@ extern struct ipmi_intf ipmi_dummy_intf;
+ #ifdef IPMI_INTF_USB
+ extern struct ipmi_intf ipmi_usb_intf;
+ #endif
++#ifdef IPMI_INTF_DBUS
++extern struct ipmi_intf ipmi_dbus_intf;
++#endif
+ 
+ struct ipmi_intf * ipmi_intf_table[] = {
++#ifdef IPMI_INTF_DBUS
++	&ipmi_dbus_intf,
++#endif
+ #ifdef IPMI_INTF_OPEN
+ 	&ipmi_open_intf,
+ #endif
+-- 
+2.17.1
+
