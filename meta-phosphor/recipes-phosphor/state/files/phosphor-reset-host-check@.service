@@ -1,7 +1,7 @@
 [Unit]
 Description=Check Host%i status on BMC reset
-Wants=mapper-wait@-xyz-openbmc_project-control-host%i.service
-After=mapper-wait@-xyz-openbmc_project-control-host%i.service
+Wants=phosphor-ipmi-host.service
+After=phosphor-ipmi-host.service
 Wants=obmc-host-reset-running@%i.target
 Before=obmc-host-reset-running@%i.target
 Wants=op-reset-chassis-on@%i.service
