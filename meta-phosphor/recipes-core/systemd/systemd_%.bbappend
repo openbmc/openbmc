@@ -9,6 +9,11 @@ SRC_URI += "file://default.network"
 SRC_URI += "file://0001-sd-bus-Don-t-automatically-add-ObjectManager.patch"
 SRC_URI += "file://0006-core-fix-the-check-if-CONFIG_CGROUP_BPF-is-on.patch"
 
+# Static neighbor support included in v240 so remove when updated
+SRC_URI += "file://0001-networkd-Track-address-configuration.patch"
+SRC_URI += "file://0002-networkd-Use-only-a-generic-CONFIGURING-state.patch"
+SRC_URI += "file://0003-networkd-Static-neighbor-support.patch"
+
 RRECOMMENDS_${PN} += "obmc-targets"
 FILES_${PN} += "${systemd_unitdir}/network/default.network"
 
