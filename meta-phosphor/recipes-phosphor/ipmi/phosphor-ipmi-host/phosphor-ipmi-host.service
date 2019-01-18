@@ -21,6 +21,8 @@ SyslogIdentifier=ipmid
 RuntimeDirectory = ipmi
 RuntimeDirectoryPreserve = yes
 StateDirectory = ipmi
+Type=dbus
+BusName=xyz.openbmc_project.Control.Host
 
 [Install]
 WantedBy={SYSTEMD_DEFAULT_TARGET}
