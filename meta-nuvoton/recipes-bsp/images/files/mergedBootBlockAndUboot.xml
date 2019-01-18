@@ -1,0 +1,35 @@
+<!-- SPDX-License-Identifier: GPL-2.0
+#
+# Nuvoton IGPS: Image Generation And Programming Scripts For Poleg BMC
+#
+# Copyright (C) 2018 Nuvoton Technologies, All Rights Reserved
+#--------------------------------------------------------------------------->
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Bin_Ecc_Map>
+	<!-- BMC mandatory fields -->
+	<ImageProperties>
+		<BinSize>0</BinSize>         <!-- If 0 the binary size will be calculated by the tool -->
+		<PadValue>0xFF</PadValue>	<!-- Byte value to pad the empty areas, default is 0 -->
+	</ImageProperties>
+
+	<BinField>
+		<name>BootBlock</name>         <!-- name of field -->
+		<config>
+			<offset>0</offset>            <!-- offset in the header -->
+			<size format='FileSize'>Poleg_bootblock.bin.full</size>              <!-- size in the header -->
+		</config>
+		<content format='FileContent'>Poleg_bootblock.bin.full</content>  <!-- content the user should fill -->
+	</BinField>
+
+	<BinField>
+		<name>u-boot</name>         <!-- name of field -->
+		<config>
+			<offset format='FileSize' align='0x1000'>Poleg_bootblock.bin.full</offset>            <!-- offset in the header -->
+			<size format='FileSize'>u-boot.bin.full</size>              <!-- size in the header -->
+		</config>
+		<content format='FileContent'>u-boot.bin.full</content>  <!-- content the user should fill -->
+	</BinField>
+
+</Bin_Ecc_Map>
