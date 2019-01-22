@@ -9,6 +9,11 @@ SRC_URI += "file://default.network"
 SRC_URI += "file://0001-sd-bus-Don-t-automatically-add-ObjectManager.patch"
 SRC_URI += "file://0006-core-fix-the-check-if-CONFIG_CGROUP_BPF-is-on.patch"
 
+# Fixes from upstream for openbmc/openbmc#3459
+SRC_URI += "file://0001-timedate-defer-the-property-changed-signal-until-job.patch"
+SRC_URI += "file://0001-timedate-treat-activating-or-inactivating-NTP-client.patch"
+SRC_URI += "file://0002-timedate-refuse-to-set-time-when-previous-request-is.patch"
+
 RRECOMMENDS_${PN} += "obmc-targets"
 FILES_${PN} += "${systemd_unitdir}/network/default.network"
 
