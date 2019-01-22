@@ -1,0 +1,41 @@
+From 84a87726eec88e7b11c8aa633bca006a0c0fc435 Mon Sep 17 00:00:00 2001
+From: Yu Watanabe <watanabe.yu+github@gmail.com>
+Date: Tue, 15 Jan 2019 02:59:48 +0900
+Subject: [PATCH 1/2] timedate: treat 'activating' or 'inactivating' NTP client
+ status as 'active'
+
+When `timedatectl set-time` is called, NTP client may be in
+'activating' or something. For safety, let's treat such states as
+'active'.
+
+This also changes all unit file status except for 'masked' or 'disabled'
+are treated as 'enabled'.
+---
+ src/timedate/timedated.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/timedate/timedated.c b/src/timedate/timedated.c
+index e168889..12308be 100644
+--- a/src/timedate/timedated.c
++++ b/src/timedate/timedated.c
+@@ -160,7 +160,7 @@ static int context_ntp_service_is_active(Context *c) {
+         /* Call context_update_ntp_status() to update UnitStatusInfo before calling this. */
+ 
+         LIST_FOREACH(units, info, c->units)
+-                count += streq_ptr(info->active_state, "active");
++                count += !STRPTR_IN_SET(info->active_state, "inactive", "failed");
+ 
+         return count;
+ }
+@@ -174,7 +174,7 @@ static int context_ntp_service_is_enabled(Context *c) {
+         /* Call context_update_ntp_status() to update UnitStatusInfo before calling this. */
+ 
+         LIST_FOREACH(units, info, c->units)
+-                count += STRPTR_IN_SET(info->unit_file_state, "enabled", "enabled-runtime");
++                count += !STRPTR_IN_SET(info->unit_file_state, "masked", "masked-runtime", "disabled", "bad");
+ 
+         return count;
+ }
+-- 
+2.7.4
+

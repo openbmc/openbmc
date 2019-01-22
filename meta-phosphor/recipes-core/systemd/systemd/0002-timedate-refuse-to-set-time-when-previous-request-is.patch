@@ -1,0 +1,53 @@
+From b4356b5720ae0974f1f8962e26562591dd0be9e9 Mon Sep 17 00:00:00 2001
+From: Yu Watanabe <watanabe.yu+github@gmail.com>
+Date: Tue, 15 Jan 2019 14:51:30 +0900
+Subject: [PATCH 2/2] timedate: refuse to set time when previous request is not
+ finished
+
+If `timedatectl set-time` is invoked right after `timedatectl set-ntp true`,
+then, the NTP service may not be started yet.
+
+Fixes #11420.
+---
+ src/timedate/timedated.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/src/timedate/timedated.c b/src/timedate/timedated.c
+index 12308be..eeb17b6 100644
+--- a/src/timedate/timedated.c
++++ b/src/timedate/timedated.c
+@@ -523,6 +523,10 @@ static int property_get_can_ntp(
+         assert(reply);
+         assert(error);
+ 
++        if (c->slot_job_removed)
++                /* When the previous request is not finished, then assume NTP is enabled. */
++                return sd_bus_message_append(reply, "b", true);
++
+         r = context_update_ntp_status(c, bus, reply);
+         if (r < 0)
+                 return r;
+@@ -548,6 +552,10 @@ static int property_get_ntp(
+         assert(reply);
+         assert(error);
+ 
++        if (c->slot_job_removed)
++                /* When the previous request is not finished, then assume NTP is active. */
++                return sd_bus_message_append(reply, "b", true);
++
+         r = context_update_ntp_status(c, bus, reply);
+         if (r < 0)
+                 return r;
+@@ -735,6 +743,9 @@ static int method_set_time(sd_bus_message *m, void *userdata, sd_bus_error *erro
+         assert(m);
+         assert(c);
+ 
++        if (c->slot_job_removed)
++                return sd_bus_error_set(error, BUS_ERROR_AUTOMATIC_TIME_SYNC_ENABLED, "Previous request is not finished, refusing.");
++
+         r = context_update_ntp_status(c, bus, m);
+         if (r < 0)
+                 return sd_bus_error_set_errnof(error, r, "Failed to update context: %m");
+-- 
+2.7.4
+

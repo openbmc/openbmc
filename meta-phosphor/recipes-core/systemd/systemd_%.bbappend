@@ -14,6 +14,11 @@ SRC_URI += "file://0001-networkd-Track-address-configuration.patch"
 SRC_URI += "file://0002-networkd-Use-only-a-generic-CONFIGURING-state.patch"
 SRC_URI += "file://0003-networkd-Static-neighbor-support.patch"
 
+# Fixes from upstream for openbmc/openbmc#3459
+SRC_URI += "file://0001-timedate-defer-the-property-changed-signal-until-job.patch"
+SRC_URI += "file://0001-timedate-treat-activating-or-inactivating-NTP-client.patch"
+SRC_URI += "file://0002-timedate-refuse-to-set-time-when-previous-request-is.patch"
+
 RRECOMMENDS_${PN} += "obmc-targets"
 FILES_${PN} += "${systemd_unitdir}/network/default.network"
 
