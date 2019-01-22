@@ -1,18 +1,9 @@
+require u-boot-common-nuvoton.inc
+
 SUMMARY = "U-Boot bootloader fw_printenv/setenv utilities"
-LICENSE = "GPLv2+"
-LIC_FILES_CHKSUM = "file://Licenses/README;md5=a2c678cfd4a4d97135585cad908541c6"
-SECTION = "bootloader"
 DEPENDS = "mtd-utils"
 
 PROVIDES += "u-boot-fw-utils"
-
-UBRANCH = "npcm7xx"
-SRC_URI = "git://github.com/Nuvoton-Israel/u-boot.git;branch=${UBRANCH}"
-SRCREV = "196461383f7d043f18cab3bb34dded89fba4712a"
-
-PV .= "+${UBRANCH}+"
-
-S = "${WORKDIR}/git"
 
 INSANE_SKIP_${PN} = "already-stripped"
 
