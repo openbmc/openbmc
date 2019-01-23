@@ -9,3 +9,4 @@ Type=oneshot
 ExecStart=/usr/bin/env max31785-msl -p "${{PATHS}}" -b ${{BUS}} -r ${{REVISION}}
 EnvironmentFile={envfiledir}/obmc/hwmon-max31785/%I.conf
 SyslogIdentifier=max31785-msl
+RemainAfterExit=yes
