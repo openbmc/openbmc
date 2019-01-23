@@ -5,7 +5,7 @@ Before=org.open_power.Software.Host.Updater.service
 
 [Service]
 Type=oneshot
-RemainAfterExit=no
+RemainAfterExit=yes
 ExecStart=/usr/bin/env obmc-flash-bios ubiremount
 SyslogIdentifier=obmc-flash-bios
 
