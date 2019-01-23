@@ -7,6 +7,7 @@ Type=oneshot
 EnvironmentFile={envfiledir}/obmc/sync_inventory_item/%I
 ExecStart=/usr/bin/env sync_inventory_items.py -p ${{PROPERTY}} -s $SYNC_TYPE
 SyslogIdentifier=sync_inventory_items.py
+RemainAfterExit=yes
 
 [Install]
 WantedBy={SYSTEMD_DEFAULT_TARGET}
