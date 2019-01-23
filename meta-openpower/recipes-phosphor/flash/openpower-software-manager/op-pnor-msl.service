@@ -6,6 +6,7 @@ After=obmc-flash-bios-updatesymlinks.service
 Type=oneshot
 ExecStart=/usr/bin/env openpower-pnor-msl
 SyslogIdentifier=openpower-pnor-msl
+RemainAfterExit=yes
 
 [Install]
 WantedBy=obmc-flash-bios-updatesymlinks.service

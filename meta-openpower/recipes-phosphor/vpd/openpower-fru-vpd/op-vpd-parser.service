@@ -10,3 +10,4 @@ Type=oneshot
 EnvironmentFile={envfiledir}/obmc/inventory
 ExecStart=/usr/bin/env openpower-read-vpd --vpd $EEPROM --fru $FRUS --object $PATHS
 SyslogIdentifier=openpower-read-vpd
+RemainAfterExit=yes
