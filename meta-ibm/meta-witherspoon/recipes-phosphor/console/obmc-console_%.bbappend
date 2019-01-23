@@ -1,1 +1,1 @@
-FILESEXTRAPATHS_prepend_witherspoon := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"

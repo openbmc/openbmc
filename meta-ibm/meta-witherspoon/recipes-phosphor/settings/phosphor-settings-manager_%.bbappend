@@ -1,2 +1,2 @@
-FILESEXTRAPATHS_append_witherspoon := ":${THISDIR}/${PN}"
-SRC_URI_append_witherspoon = " file://TPMEnable-default-true.override.yml"
+FILESEXTRAPATHS_append := ":${THISDIR}/${PN}"
+SRC_URI_append = " file://TPMEnable-default-true.override.yml"
