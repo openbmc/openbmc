@@ -11,7 +11,7 @@ SRCREV = "80f6d927c220be0e638a0674a986429825a070aa"
 
 inherit cmake pkgconfig  pythonnative systemd
 
-DBUS_SERVICE_${PN} += "xyz.openbmc_project.Chassis.Control.Power@.service"
+SYSTEMD_SERVICE_${PN} += "xyz.openbmc_project.Chassis.Control.Power@.service"
 
 # Force the standby target to run these services
 SYSD_TGT = "${SYSTEMD_DEFAULT_TARGET}"

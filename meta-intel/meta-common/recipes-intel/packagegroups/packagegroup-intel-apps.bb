@@ -23,10 +23,7 @@ RPROVIDES_${PN}-system += "virtual-obmc-system-mgmt"
 
 SUMMARY_${PN}-chassis = "Intel Chassis"
 RDEPENDS_${PN}-chassis = " \
-        obmc-button-power \
-        obmc-button-reset \
-        obmc-control-chassis \
-        obmc-op-control-power \
+        x86-power-control \
         obmc-host-failure-reboots \
         "
 
