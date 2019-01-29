@@ -1,4 +1,10 @@
 groups:
+    - name: zone0_control_mode
+      description: Thermal control mode for zone 0
+      service: xyz.openbmc_project.Control.Thermal
+      type: /xyz/openbmc_project/control/thermal
+      members:
+          - /0
     - name: air_cooled_zone0_fans
       description: Group of fan inventory objects for air cooled zone 0
       type: /xyz/openbmc_project/inventory
@@ -276,6 +282,14 @@ actions:
           - property
           - factor
           - delta
+    - name: use_alternate_events_on_state
+      description: >
+          Replaces a set of default events with an alternate set of events
+          when all the group properties are at a given state
+      parameters:
+          - property
+          - defevents
+          - altevents
 
 events:
     - name: default_fan_floor_on_service_fail
@@ -427,32 +441,80 @@ events:
                 type: uint64_t
     - name: set_air_cooled_speed_boundaries_based_on_ambient
       groups:
-          - name: zone0_ambient
+          - name: zone0_control_mode
             zone_conditions:
                 - name: air_cooled_chassis
                   zones:
                       - 0
-            interface: xyz.openbmc_project.Sensor.Value
+            interface: xyz.openbmc_project.Control.ThermalMode
             property:
-                name: Value
-                type: int64_t
+                name: Current
+                type: std::string
       matches:
           - name: propertiesChanged
       actions:
-          - name: set_floor_from_average_sensor_value
-            map:
-                value:
-                    - 27000: 3500
-                    - 32000: 4600
-                    - 37000: 5200
-                    - 40000: 5800
-                type: std::map<int64_t, uint64_t>
-          - name: set_ceiling_from_average_sensor_value
-            map:
-                value:
-                    - 25000: 7200
-                    - 27000: 10500
-                type: std::map<int64_t, uint64_t>
+          - name: use_alternate_events_on_state
+            property:
+                value: Custom
+                type: std::string
+            defevents:
+                - name: default_floor_boundary
+                  groups:
+                      - name: zone0_ambient
+                        zone_conditions:
+                            - name: air_cooled_chassis
+                              zones:
+                                  - 0
+                        interface: xyz.openbmc_project.Sensor.Value
+                        property:
+                            name: Value
+                            type: int64_t
+                  matches:
+                      - name: propertiesChanged
+                  actions:
+                      - name: set_floor_from_average_sensor_value
+                        map:
+                            value:
+                                - 27000: 3500
+                                - 32000: 4600
+                                - 37000: 5200
+                                - 40000: 5800
+                            type: std::map<int64_t, uint64_t>
+                      - name: set_ceiling_from_average_sensor_value
+                        map:
+                            value:
+                                - 25000: 7200
+                                - 27000: 10500
+                            type: std::map<int64_t, uint64_t>
+            altevents:
+                - name: alternate_floor_boundary
+                  groups:
+                      - name: zone0_ambient
+                        zone_conditions:
+                            - name: air_cooled_chassis
+                              zones:
+                                  - 0
+                        interface: xyz.openbmc_project.Sensor.Value
+                        property:
+                            name: Value
+                            type: int64_t
+                  matches:
+                      - name: propertiesChanged
+                  actions:
+                      - name: set_floor_from_average_sensor_value
+                        map:
+                            value:
+                                - 27000: 4600
+                                - 32000: 5000
+                                - 37000: 5400
+                                - 40000: 5800
+                            type: std::map<int64_t, uint64_t>
+                      - name: set_ceiling_from_average_sensor_value
+                        map:
+                            value:
+                                - 25000: 7200
+                                - 27000: 10500
+                            type: std::map<int64_t, uint64_t>
     - name: set_water_cooled_speed_boundaries_based_on_ambient
       groups:
           - name: zone0_ambient
