@@ -18,6 +18,7 @@ DEPENDS += "phosphor-logging"
 DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
 DEPENDS += "openpower-dbus-interfaces openpower-dbus-interfaces-native"
 DEPENDS += "sdbus++-native"
+DEPENDS += "virtual/phosphor-ipmi-inventory-sel"
 
 RDEPENDS_${PN} += " \
         sdbusplus \
@@ -29,6 +30,10 @@ RDEPENDS_${PN} += " \
 TARGET_CFLAGS += "-fpic"
 
 HOSTIPMI_PROVIDER_LIBRARY += "liboemhandler.so"
+
+EXTRA_OECONF = " \
+        INVSENSOR_YAML_GEN=${STAGING_DIR_NATIVE}${datadir}/phosphor-ipmi-host/sensor/invsensor.yaml \
+        "
 
 S = "${WORKDIR}/git"
 
