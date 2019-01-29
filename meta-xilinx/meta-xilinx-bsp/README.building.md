@@ -32,6 +32,27 @@ Build the target file system image using `bitbake`:
 Once complete the images for the target machine will be available in the output
 directory `tmp/deploy/images/<machine name>/`.
 
+Using SPL flow to build ZU+
+------------------------------
+
+The pmufw needs a "configuration object" to know what it should do, and it
+expects to receive it at runtime.
+
+With the U-Boot SPL workflow there's no FSBL, and passing a cfg obj to pmufw is
+just not implemented in U-Boot
+
+To work around this problem a small patch has been developed so that
+pm_cfg_obj.c is linked into pmufw and loaded directly, without waiting for it
+from the outside. Find the original patch on the meta-topic layer [1] and the
+patch updated for pmufw 2018.x here [2].
+
+[1]
+https://github.com/topic-embedded-products/meta-topic/blob/master/recipes-bsp/pmu-firmware/pmu-firmware_2017.%25.bbappend
+
+[2]
+https://github.com/lucaceresoli/zynqmp-pmufw-builder/blob/master/0001-Load-XPm_ConfigObject-at-boot.patch
+
+
 Using multiconfig to build ZU+
 ------------------------------
 
@@ -61,6 +82,7 @@ https://www.yoctoproject.org/docs/current/mega-manual/mega-manual.html#dev-build
 Workaround:  
 There is additional workaround required in u-boot-xlnx recipe. Add the below dependency  
 do_compile[mcdepends] = "multiconfig:zcu102:pmu:pmu-firmware:do_deploy"
+
 
 Additional Information
 ----------------------
