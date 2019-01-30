@@ -14,6 +14,7 @@ SYSTEMD_SERVICE_${PN} += " xyz.openbmc_project.adcsensor.service"
 SYSTEMD_SERVICE_${PN} += " xyz.openbmc_project.hwmontempsensor.service"
 SYSTEMD_SERVICE_${PN} += " xyz.openbmc_project.cpusensor.service"
 SYSTEMD_SERVICE_${PN} += " xyz.openbmc_project.exitairsensor.service"
+SYSTEMD_SERVICE_${PN} += " xyz.openbmc_project.ipmbsensor.service"
 
 DEPENDS = "boost nlohmann-json sdbusplus"
 inherit cmake systemd
