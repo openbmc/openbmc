@@ -16,6 +16,10 @@ Q71L_ITEMS += "${@compose_list(d, 'Q71L_TEMPBASE', 'Q71L_TEMPS')}"
 Q71L_ITEMS += "iio-hwmon.conf"
 Q71L_ITEMS += "iio-hwmon-battery.conf"
 
+Q71L_PSUS = "0/psu@59 1/psu@58 2/psu@58 3/psu@59"
+Q71L_PSUBASE = "ahb/apb/i2c@1e78a000/i2c-bus@300/i2c-switch@70/i2c@{0}.conf"
+Q71L_ITEMS += "${@compose_list(d, 'Q71L_PSUBASE', 'Q71L_PSUS')}"
+
 ENVS = "obmc/hwmon/{0}"
 SYSTEMD_ENVIRONMENT_FILE_${PN}_append_quanta-q71l := " ${@compose_list(d, 'ENVS', 'Q71L_ITEMS')}"
 
