@@ -14,3 +14,6 @@ SRCREV = "081de4b15f54cb4482035b7bf5e3fb443e4bc84b"
 S = "${WORKDIR}/git"
 
 inherit cmake
+
+# for multilib
+EXTRA_OECMAKE += "-DOPENJPEG_INSTALL_LIB_DIR=${@d.getVar('baselib').replace('/', '')}"

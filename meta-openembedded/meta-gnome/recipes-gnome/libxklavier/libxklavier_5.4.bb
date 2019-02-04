@@ -13,6 +13,7 @@ RDEPENDS_${PN} += "iso-codes xkbcomp"
 SRC_URI = " \
     http://pkgs.fedoraproject.org/repo/pkgs/${BPN}/${BPN}-${PV}.tar.bz2/13af74dcb6011ecedf1e3ed122bd31fa/${BPN}-${PV}.tar.bz2 \
     file://fix-do_installe-failure.patch \
+    file://0001-xklavier_config_xkb.c-Fix-keyboard-layout-settings-f.patch \
 "
 SRC_URI[md5sum] = "13af74dcb6011ecedf1e3ed122bd31fa"
 SRC_URI[sha256sum] = "17a34194df5cbcd3b7bfd0f561d95d1f723aa1c87fca56bc2c209514460a9320"

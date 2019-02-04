@@ -50,6 +50,7 @@ EXTRA_OECONF = " \
     --with-iptables=${sbindir}/iptables \
     --with-tests \
     --with-nmtui=yes \
+    --with-udev-dir=${nonarch_base_libdir}/udev \
 "
 
 # gobject-introspection related
@@ -108,7 +109,7 @@ FILES_${PN} += " \
     ${nonarch_libdir}/NetworkManager/conf.d \
     ${datadir}/polkit-1 \
     ${datadir}/dbus-1 \
-    ${base_libdir}/udev/* \
+    ${noarch_base_libdir}/udev/* \
     ${systemd_unitdir}/system \
 "
 

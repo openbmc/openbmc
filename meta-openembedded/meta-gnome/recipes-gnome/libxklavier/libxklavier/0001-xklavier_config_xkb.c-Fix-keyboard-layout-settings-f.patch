@@ -1,0 +1,39 @@
+From 1a75ebdde705ab2a4f9459a60ab824d9f770bba4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Wed, 28 Nov 2018 18:03:31 +0100
+Subject: [PATCH] xklavier_config_xkb.c: Fix keyboard layout settings for xfce
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+* Got helping hint at [1]
+* Patch stolen from [2]
+
+[1] https://bugzilla.xfce.org/show_bug.cgi?id=14185
+[2] https://launchpadlibrarian.net/399410035/revert-default-group-change.patch
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ libxklavier/xklavier_config_xkb.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/libxklavier/xklavier_config_xkb.c b/libxklavier/xklavier_config_xkb.c
+index baec569..c823e5b 100644
+--- a/libxklavier/xklavier_config_xkb.c
++++ b/libxklavier/xklavier_config_xkb.c
+@@ -403,10 +403,6 @@ xkl_config_get_keyboard(XklEngine * engine,
+ 			/* Return to normal X error processing */
+ 			xkl_engine_priv(engine, critical_section) = FALSE;
+ 
+-			if (activate)
+-				xkl_config_set_group_by_description(engine,
+-								    preactivation_group_description);
+-
+ 			xkl_debug(160,
+ 				  "Unlinking the temporary xkb file %s\n",
+ 				  xkb_fn);
+-- 
+2.14.5
+
