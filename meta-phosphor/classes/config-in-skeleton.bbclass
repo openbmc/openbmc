@@ -16,8 +16,8 @@ SRC_URI += "${SKELETON_URI};"
 S = "${WORKDIR}/git/configs"
 
 python() {
-	machine = d.getVar('MACHINE', True).capitalize() + '.py'
-	d.setVar('_config_in_skeleton', machine)
+    machine = d.getVar('MACHINE', True).capitalize() + '.py'
+    d.setVar('_config_in_skeleton', machine)
 }
 
 do_make_setup() {
