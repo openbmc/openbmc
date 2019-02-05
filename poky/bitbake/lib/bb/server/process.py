@@ -499,6 +499,7 @@ def connectProcessServer(sockname, featureset):
                 except IOError as e:
                     if e.errno == errno.EWOULDBLOCK:
                         pass
+                    raise
         finally:
             os.chdir(cwd)
 
