@@ -56,7 +56,7 @@
     <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href="http://git.yoctoproject.org/cgit/cgit.cgi/poky/log/"&gt;Yocto Project Master branch&lt;/a&gt;.</field>
   </object>
   <object model="orm.release" pk="4">
-    <field type="CharField" name="name">rocko</field>
+    <field type="CharField" name="name">thud</field>
     <field type="CharField" name="description">Yocto Project 2.6 "Thud"</field>
     <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">1</field>
     <field type="CharField" name="branch_name">thud</field>
@@ -152,7 +152,7 @@
     <field rel="ManyToOneRel" to="orm.layer" name="layer">1</field>
     <field type="IntegerField" name="layer_source">0</field>
     <field rel="ManyToOneRel" to="orm.release" name="release">4</field>
-    <field type="CharField" name="branch">rocko</field>
+    <field type="CharField" name="branch">thud</field>
     <field type="CharField" name="dirpath">meta</field>
   </object>
 
@@ -190,7 +190,7 @@
     <field rel="ManyToOneRel" to="orm.layer" name="layer">2</field>
     <field type="IntegerField" name="layer_source">0</field>
     <field rel="ManyToOneRel" to="orm.release" name="release">4</field>
-    <field type="CharField" name="branch">rocko</field>
+    <field type="CharField" name="branch">thud</field>
     <field type="CharField" name="dirpath">meta-poky</field>
   </object>
 
@@ -228,7 +228,7 @@
     <field rel="ManyToOneRel" to="orm.layer" name="layer">3</field>
     <field type="IntegerField" name="layer_source">0</field>
     <field rel="ManyToOneRel" to="orm.release" name="release">4</field>
-    <field type="CharField" name="branch">rocko</field>
+    <field type="CharField" name="branch">thud</field>
     <field type="CharField" name="dirpath">meta-yocto-bsp</field>
   </object>
 </django-objects>
