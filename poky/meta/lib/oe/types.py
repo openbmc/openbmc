@@ -156,3 +156,27 @@ def path(value, relativeto='', normalize='true', mustexist='false'):
                 raise ValueError("{0}: {1}".format(value, os.strerror(errno.ENOENT)))
 
     return value
+
+def is_x86(arch):
+    """
+    Check whether arch is x86 or x86_64
+    """
+    if arch.startswith('x86_') or re.match('i.*86', arch):
+        return True
+    else:
+        return False
+
+def qemu_use_kvm(kvm, target_arch):
+    """
+    Enable kvm if target_arch == build_arch or both of them are x86 archs.
+    """
+
+    use_kvm = False
+    if kvm and boolean(kvm):
+        build_arch = os.uname()[4]
+        if is_x86(build_arch) and is_x86(target_arch):
+            use_kvm = True
+        elif build_arch == target_arch:
+            use_kvm = True
+    return use_kvm
+

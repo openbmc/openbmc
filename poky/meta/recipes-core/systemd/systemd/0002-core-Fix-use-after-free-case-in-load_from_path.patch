@@ -1,0 +1,43 @@
+From cb67aebd63d9f0077cbf3e769f0b223c5bba20ac Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 16 Dec 2018 20:58:35 -0800
+Subject: [PATCH 2/2] core: Fix use after free case in load_from_path()
+
+ensure that mfree() on filename is called after the logging function
+which uses the string pointed by filename
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted [https://github.com/systemd/systemd/pull/11179]
+ src/core/load-fragment.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/core/load-fragment.c b/src/core/load-fragment.c
+index fc5644f48..da585786e 100644
+--- a/src/core/load-fragment.c
++++ b/src/core/load-fragment.c
+@@ -4531,7 +4531,6 @@ static int load_from_path(Unit *u, const char *path) {
+                                 r = open_follow(&filename, &f, symlink_names, &id);
+                         if (r >= 0)
+                                 break;
+-                        filename = mfree(filename);
+ 
+                         /* ENOENT means that the file is missing or is a dangling symlink.
+                          * ENOTDIR means that one of paths we expect to be is a directory
+@@ -4540,9 +4539,12 @@ static int load_from_path(Unit *u, const char *path) {
+                          */
+                         if (r == -EACCES)
+                                 log_debug_errno(r, "Cannot access \"%s\": %m", filename);
+-                        else if (!IN_SET(r, -ENOENT, -ENOTDIR))
++                        else if (!IN_SET(r, -ENOENT, -ENOTDIR)) {
++                                filename = mfree(filename);
+                                 return r;
++                        }
+ 
++                        filename = mfree(filename);
+                         /* Empty the symlink names for the next run */
+                         set_clear_free(symlink_names);
+                 }
+-- 
+2.20.1
+

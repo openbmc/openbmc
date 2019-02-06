@@ -107,13 +107,9 @@ class QemuTarget(BaseTarget):
         dump_target_cmds = d.getVar("testimage_dump_target")
         dump_host_cmds = d.getVar("testimage_dump_host")
         dump_dir = d.getVar("TESTIMAGE_DUMP_DIR")
-        qemu_use_kvm = d.getVar("QEMU_USE_KVM")
-        if qemu_use_kvm and \
-           (oe.types.boolean(qemu_use_kvm) and "x86" in d.getVar("MACHINE") or \
-            d.getVar("MACHINE") in qemu_use_kvm.split()):
-            use_kvm = True
-        else:
-            use_kvm = False
+        if not dump_dir:
+            dump_dir = os.path.join(d.getVar('LOG_DIR'), 'runtime-hostdump')
+        use_kvm = oe.types.qemu_use_kvm(d.getVar('QEMU_USE_KVM'), d.getVar('TARGET_ARCH'))
 
         # Log QemuRunner log output to a file
         import oe.path
@@ -196,7 +192,7 @@ class QemuTarget(BaseTarget):
         else:
             raise bb.build.FuncFailed("%s - FAILED to re-start qemu - check the task log and the boot log" % self.pn)
 
-    def run_serial(self, command, timeout=5):
+    def run_serial(self, command, timeout=60):
         return self.runner.run_serial(command, timeout=timeout)
 
 

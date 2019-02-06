@@ -20,7 +20,7 @@ python() {
     elif generator == "Ninja":
         d.appendVar("DEPENDS", " ninja-native")
         d.setVar("OECMAKE_GENERATOR_ARGS", "-G Ninja -DCMAKE_MAKE_PROGRAM=ninja")
-        d.setVarFlag("do_compile", "progress", "outof:^\[(\d+)/(\d+)\]\s+")
+        d.setVarFlag("do_compile", "progress", r"outof:^\[(\d+)/(\d+)\]\s+")
     else:
         bb.fatal("Unknown CMake Generator %s" % generator)
 }

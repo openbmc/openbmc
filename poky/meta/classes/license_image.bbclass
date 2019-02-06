@@ -52,8 +52,8 @@ def write_license_files(d, license_manifest, pkg_dic):
                 except oe.license.LicenseError as exc:
                     bb.fatal('%s: %s' % (d.getVar('P'), exc))
             else:
-                pkg_dic[pkg]["LICENSES"] = re.sub('[|&()*]', ' ', pkg_dic[pkg]["LICENSE"])
-                pkg_dic[pkg]["LICENSES"] = re.sub('  *', ' ', pkg_dic[pkg]["LICENSES"])
+                pkg_dic[pkg]["LICENSES"] = re.sub(r'[|&()*]', ' ', pkg_dic[pkg]["LICENSE"])
+                pkg_dic[pkg]["LICENSES"] = re.sub(r'  *', ' ', pkg_dic[pkg]["LICENSES"])
                 pkg_dic[pkg]["LICENSES"] = pkg_dic[pkg]["LICENSES"].split()
 
             if not "IMAGE_MANIFEST" in pkg_dic[pkg]:
@@ -78,7 +78,7 @@ def write_license_files(d, license_manifest, pkg_dic):
             for lic in pkg_dic[pkg]["LICENSES"]:
                 lic_file = os.path.join(d.getVar('LICENSE_DIRECTORY'),
                                         pkg_dic[pkg]["PN"], "generic_%s" % 
-                                        re.sub('\+', '', lic))
+                                        re.sub(r'\+', '', lic))
                 # add explicity avoid of CLOSED license because isn't generic
                 if lic == "CLOSED":
                    continue
@@ -119,14 +119,14 @@ def write_license_files(d, license_manifest, pkg_dic):
                     pkg_license = os.path.join(pkg_license_dir, lic)
                     pkg_rootfs_license = os.path.join(pkg_rootfs_license_dir, lic)
 
-                    if re.match("^generic_.*$", lic):
+                    if re.match(r"^generic_.*$", lic):
                         generic_lic = canonical_license(d,
-                                re.search("^generic_(.*)$", lic).group(1))
+                                re.search(r"^generic_(.*)$", lic).group(1))
 
                         # Do not copy generic license into package if isn't
                         # declared into LICENSES of the package.
-                        if not re.sub('\+$', '', generic_lic) in \
-                                [re.sub('\+', '', lic) for lic in \
+                        if not re.sub(r'\+$', '', generic_lic) in \
+                                [re.sub(r'\+', '', lic) for lic in \
                                  pkg_manifest_licenses]:
                             continue
 

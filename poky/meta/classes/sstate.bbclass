@@ -362,7 +362,10 @@ def sstate_installpkgdir(ss, d):
 
     for plain in ss['plaindirs']:
         workdir = d.getVar('WORKDIR')
+        sharedworkdir = os.path.join(d.getVar('TMPDIR'), "work-shared")
         src = sstateinst + "/" + plain.replace(workdir, '')
+        if sharedworkdir in plain:
+            src = sstateinst + "/" + plain.replace(sharedworkdir, '')
         dest = plain
         bb.utils.mkdirhier(src)
         prepdir(dest)
@@ -620,8 +623,11 @@ def sstate_package(ss, d):
         os.rename(state[1], sstatebuild + state[0])
 
     workdir = d.getVar('WORKDIR')
+    sharedworkdir = os.path.join(d.getVar('TMPDIR'), "work-shared")
     for plain in ss['plaindirs']:
         pdir = plain.replace(workdir, sstatebuild)
+        if sharedworkdir in plain:
+            pdir = plain.replace(sharedworkdir, sstatebuild)
         bb.utils.mkdirhier(plain)
         bb.utils.mkdirhier(pdir)
         os.rename(plain, pdir)

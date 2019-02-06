@@ -67,7 +67,7 @@ python(){
 
     # Read JSON manifest
     import json
-    pythondir = d.getVar('THISDIR',True)
+    pythondir = d.getVar('THISDIR')
     with open(pythondir+'/python/python2-manifest.json') as manifest_file:
         manifest_str =  manifest_file.read()
         json_start = manifest_str.find('# EOC') + 6

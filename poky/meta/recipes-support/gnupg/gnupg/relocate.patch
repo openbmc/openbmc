@@ -1,4 +1,4 @@
-From 1eaf630343cc77d8b5d41d0b0a3551fa193c5fcf Mon Sep 17 00:00:00 2001
+From f9fc214b0bf2f67b515ca8a5333f39c497d1b518 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Wed, 19 Sep 2018 14:44:40 +0100
 Subject: [PATCH] Allow the environment to override where gnupg looks for its

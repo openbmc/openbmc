@@ -1,0 +1,31 @@
+From bfc4183ea995f1c211385d066cdb1fe9ce89f621 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 16 Dec 2018 20:53:38 -0800
+Subject: [PATCH 1/2] sysctl: Don't pass null directive argument to '%s'
+
+value pointer here is always NULL but  subsequent use of that pointer
+with a %s format will always be NULL, printing p instead would be a
+valid string
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted [https://github.com/systemd/systemd/pull/11179]
+ src/sysctl/sysctl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/sysctl/sysctl.c b/src/sysctl/sysctl.c
+index 1cfe51018..c67d79032 100644
+--- a/src/sysctl/sysctl.c
++++ b/src/sysctl/sysctl.c
+@@ -115,7 +115,7 @@ static int parse_file(OrderedHashmap *sysctl_options, const char *path, bool ign
+ 
+                 value = strchr(p, '=');
+                 if (!value) {
+-                        log_error("Line is not an assignment at '%s:%u': %s", path, c, value);
++                        log_error("Line is not an assignment at '%s:%u': %s", path, c, p);
+ 
+                         if (r == 0)
+                                 r = -EINVAL;
+-- 
+2.20.1
+

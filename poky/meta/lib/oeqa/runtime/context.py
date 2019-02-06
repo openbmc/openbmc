@@ -49,7 +49,6 @@ class OERuntimeTestContextExecutor(OETestContextExecutor):
     default_manifest = 'data/manifest'
     default_server_ip = '192.168.7.1'
     default_target_ip = '192.168.7.2'
-    default_host_dumper_dir = '/tmp/oe-saved-tests'
     default_extract_dir = 'packages/extracted'
 
     def register_commands(self, logger, subparsers):
@@ -71,9 +70,7 @@ class OERuntimeTestContextExecutor(OETestContextExecutor):
                 % self.default_server_ip)
 
         runtime_group.add_argument('--host-dumper-dir', action='store',
-                default=self.default_host_dumper_dir,
-                help="Directory where host status is dumped, if tests fails, default: %s" \
-                % self.default_host_dumper_dir)
+                help="Directory where host status is dumped, if tests fails")
 
         runtime_group.add_argument('--packages-manifest', action='store',
                 default=self.default_manifest,
@@ -101,7 +98,7 @@ class OERuntimeTestContextExecutor(OETestContextExecutor):
         if target_type == 'simpleremote':
             target = OESSHTarget(logger, target_ip, server_ip, **kwargs)
         elif target_type == 'qemu':
-            target = OEQemuTarget(logger, target_ip, server_ip, **kwargs)
+            target = OEQemuTarget(logger, server_ip, **kwargs)
         else:
             # XXX: This code uses the old naming convention for controllers and
             # targets, the idea it is to leave just targets as the controller

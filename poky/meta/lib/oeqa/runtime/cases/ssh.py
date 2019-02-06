@@ -1,11 +1,13 @@
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
 from oeqa.core.decorator.oeid import OETestID
+from oeqa.runtime.decorator.package import OEHasPackage
 
 class SSHTest(OERuntimeTestCase):
 
     @OETestID(224)
     @OETestDepends(['ping.PingTest.test_ping'])
+    @OEHasPackage(['dropbear', 'openssh-sshd'])
     def test_ssh(self):
         (status, output) = self.target.run('uname -a')
         self.assertEqual(status, 0, msg='SSH Test failed: %s' % output)

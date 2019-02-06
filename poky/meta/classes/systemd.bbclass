@@ -86,7 +86,7 @@ python systemd_populate_packages() {
     def systemd_generate_package_scripts(pkg):
         bb.debug(1, 'adding systemd calls to postinst/postrm for %s' % pkg)
 
-        paths_escaped = ' '.join(shlex.quote(s) for s in d.getVar('SYSTEMD_SERVICE_' + pkg, True).split())
+        paths_escaped = ' '.join(shlex.quote(s) for s in d.getVar('SYSTEMD_SERVICE_' + pkg).split())
         d.setVar('SYSTEMD_SERVICE_ESCAPED_' + pkg, paths_escaped)
 
         # Add pkg to the overrides so that it finds the SYSTEMD_SERVICE_pkg

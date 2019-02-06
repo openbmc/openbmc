@@ -3,12 +3,12 @@ import os
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
 from oeqa.core.decorator.oeid import OETestID
-from oeqa.core.decorator.data import skipIfNotFeature
+from oeqa.runtime.decorator.package import OEHasPackage
 
 class GccCompileTest(OERuntimeTestCase):
 
     @classmethod
-    def setUpClass(cls):
+    def setUp(cls):
         dst = '/tmp/'
         src = os.path.join(cls.tc.files_dir, 'test.c')
         cls.tc.target.copyTo(src, dst)
@@ -20,14 +20,13 @@ class GccCompileTest(OERuntimeTestCase):
         cls.tc.target.copyTo(src, dst)
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDown(cls):
         files = '/tmp/test.c /tmp/test.o /tmp/test /tmp/testmakefile'
         cls.tc.target.run('rm %s' % files)
 
     @OETestID(203)
-    @skipIfNotFeature('tools-sdk',
-                      'Test requires tools-sdk to be in IMAGE_FEATURES')
     @OETestDepends(['ssh.SSHTest.test_ssh'])
+    @OEHasPackage(['gcc'])
     def test_gcc_compile(self):
         status, output = self.target.run('gcc /tmp/test.c -o /tmp/test -lm')
         msg = 'gcc compile failed, output: %s' % output
@@ -38,9 +37,8 @@ class GccCompileTest(OERuntimeTestCase):
         self.assertEqual(status, 0, msg=msg)
 
     @OETestID(200)
-    @skipIfNotFeature('tools-sdk',
-                      'Test requires tools-sdk to be in IMAGE_FEATURES')
     @OETestDepends(['ssh.SSHTest.test_ssh'])
+    @OEHasPackage(['g++'])
     def test_gpp_compile(self):
         status, output = self.target.run('g++ /tmp/test.c -o /tmp/test -lm')
         msg = 'g++ compile failed, output: %s' % output
@@ -51,9 +49,8 @@ class GccCompileTest(OERuntimeTestCase):
         self.assertEqual(status, 0, msg=msg)
 
     @OETestID(1142)
-    @skipIfNotFeature('tools-sdk',
-                      'Test requires tools-sdk to be in IMAGE_FEATURES')
     @OETestDepends(['ssh.SSHTest.test_ssh'])
+    @OEHasPackage(['g++'])
     def test_gpp2_compile(self):
         status, output = self.target.run('g++ /tmp/test.cpp -o /tmp/test -lm')
         msg = 'g++ compile failed, output: %s' % output
@@ -64,9 +61,9 @@ class GccCompileTest(OERuntimeTestCase):
         self.assertEqual(status, 0, msg=msg)
 
     @OETestID(204)
-    @skipIfNotFeature('tools-sdk',
-                      'Test requires tools-sdk to be in IMAGE_FEATURES')
     @OETestDepends(['ssh.SSHTest.test_ssh'])
+    @OEHasPackage(['gcc'])
+    @OEHasPackage(['make'])
     def test_make(self):
         status, output = self.target.run('cd /tmp; make -f testmakefile')
         msg = 'running make failed, output %s' % output

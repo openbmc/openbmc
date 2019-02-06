@@ -3,6 +3,7 @@ import re
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
 from oeqa.core.decorator.oeid import OETestID
+from oeqa.runtime.decorator.package import OEHasPackage
 
 class DateTest(OERuntimeTestCase):
 
@@ -18,6 +19,7 @@ class DateTest(OERuntimeTestCase):
 
     @OETestID(211)
     @OETestDepends(['ssh.SSHTest.test_ssh'])
+    @OEHasPackage(['coreutils', 'busybox'])
     def test_date(self):
         (status, output) = self.target.run('date +"%Y-%m-%d %T"')
         msg = 'Failed to get initial date, output: %s' % output

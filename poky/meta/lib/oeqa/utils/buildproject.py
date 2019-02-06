@@ -25,9 +25,12 @@ class BuildProject(metaclass=ABCMeta):
             self.fname = foldername
         else:
             self.fname = re.sub(r'\.tar\.bz2$|\.tar\.gz$|\.tar\.xz$', '', self.archive)
+        self.needclean = False
 
     # Download self.archive to self.localarchive
     def _download_archive(self):
+
+        self.needclean = True
         if self.dl_dir and os.path.exists(os.path.join(self.dl_dir, self.archive)):
             shutil.copyfile(os.path.join(self.dl_dir, self.archive), self.localarchive)
             return
@@ -52,5 +55,7 @@ class BuildProject(metaclass=ABCMeta):
         return self._run('cd %s; make install %s' % (self.targetdir, install_args))
 
     def clean(self):
+        if not self.needclean:
+             return
         self._run('rm -rf %s' % self.targetdir)
         subprocess.check_call('rm -f %s' % self.localarchive, shell=True)

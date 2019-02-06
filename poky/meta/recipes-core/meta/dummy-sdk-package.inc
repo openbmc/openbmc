@@ -20,7 +20,7 @@ PR[vardeps] += "DUMMYPROVIDES"
 python populate_packages_prepend() {
     p = d.getVar("PN")
     d.appendVar("RPROVIDES_%s" % p, "${DUMMYPROVIDES}")
-    #d.appendVar("RCONFLICTS_%s" % p, "${DUMMYPROVIDES}")
-    #d.appendVar("RREPLACES_%s" % p, "${DUMMYPROVIDES}")
+    d.appendVar("RCONFLICTS_%s" % p, "${DUMMYPROVIDES}")
+    d.appendVar("RREPLACES_%s" % p, "${DUMMYPROVIDES}")
 }
 

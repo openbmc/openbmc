@@ -1,7 +1,7 @@
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
 from oeqa.core.decorator.oeid import OETestID
-from oeqa.core.decorator.data import skipIfNotFeature
+from oeqa.runtime.decorator.package import OEHasPackage
 
 from oeqa.runtime.utils.targetbuildproject import TargetBuildProject
 
@@ -14,21 +14,19 @@ class BuildLzipTest(OERuntimeTestCase):
         cls.project = TargetBuildProject(cls.tc.target,
                                          uri,
                                          dl_dir = cls.tc.td['DL_DIR'])
-        cls.project.download_archive()
 
     @classmethod
     def tearDownClass(cls):
         cls.project.clean()
 
     @OETestID(206)
-    @skipIfNotFeature('tools-sdk',
-                      'Test requires tools-sdk to be in IMAGE_FEATURES')
     @OETestDepends(['ssh.SSHTest.test_ssh'])
+    @OEHasPackage(['gcc'])
+    @OEHasPackage(['make'])
+    @OEHasPackage(['autoconf'])
     def test_lzip(self):
+        self.project.download_archive()
         self.project.run_configure()
         self.project.run_make()
         self.project.run_install()
 
-    @classmethod
-    def tearDownClass(self):
-        self.project.clean()

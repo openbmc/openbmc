@@ -81,7 +81,7 @@ python(){
 
     # Read JSON manifest
     import json
-    pythondir = d.getVar('THISDIR',True)
+    pythondir = d.getVar('THISDIR')
     with open(pythondir+'/python3/python3-manifest.json') as manifest_file:
         python_manifest=json.load(manifest_file)
 

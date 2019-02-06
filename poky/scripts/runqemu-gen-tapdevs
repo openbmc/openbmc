@@ -22,21 +22,27 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+uid=`id -u`
+gid=`id -g`
+if [ -n "$SUDO_UID" ]; then
+    uid=$SUDO_UID
+fi
+if [ -n "$SUDO_GID" ]; then
+    gid=$SUDO_GID
+fi
+
 usage() {
 	echo "Usage: sudo $0 <uid> <gid> <num> <staging_bindir_native>"
-        echo "Where <uid> is the numeric user id the tap devices will be owned by"
+	echo "Where <uid> is the numeric user id the tap devices will be owned by"
 	echo "Where <gid> is the numeric group id the tap devices will be owned by"
 	echo "<num> is the number of tap devices to create (0 to remove all)"
 	echo "<native-sysroot-basedir> is the path to the build system's native sysroot"
-	echo "e.g. $ bitbake qemu-helper-native"
-	echo "$ sudo $0 1000 1000 4 tmp/sysroots-components/x86_64/qemu-helper-native/usr/bin"
+	echo "For example:"
+	echo "$ bitbake qemu-helper-native"
+	echo "$ sudo $0 $uid $gid 4 tmp/sysroots-components/x86_64/qemu-helper-native/usr/bin"
+	echo ""
 	exit 1
 }
-
-if [ $EUID -ne 0 ]; then
-	echo "Error: This script must be run with root privileges"
-	exit
-fi
 
 if [ $# -ne 4 ]; then
 	echo "Error: Incorrect number of arguments"
@@ -52,6 +58,11 @@ TUNCTL=$STAGING_BINDIR_NATIVE/tunctl
 if [[ ! -x "$TUNCTL" || -d "$TUNCTL" ]]; then
 	echo "Error: $TUNCTL is not an executable"
 	usage
+fi
+
+if [ $EUID -ne 0 ]; then
+	echo "Error: This script must be run with root privileges"
+	exit
 fi
 
 SCRIPT_DIR=`dirname $0`

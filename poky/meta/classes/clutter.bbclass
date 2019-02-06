@@ -1,11 +1,11 @@
 def get_minor_dir(v):
     import re
-    m = re.match("^([0-9]+)\.([0-9]+)", v)
+    m = re.match(r"^([0-9]+)\.([0-9]+)", v)
     return "%s.%s" % (m.group(1), m.group(2))
 
 def get_real_name(n):
     import re
-    m = re.match("^([a-z]+(-[a-z]+)?)(-[0-9]+\.[0-9]+)?", n)
+    m = re.match(r"^([a-z]+(-[a-z]+)?)(-[0-9]+\.[0-9]+)?", n)
     return "%s" % (m.group(1))
 
 VERMINOR = "${@get_minor_dir("${PV}")}"

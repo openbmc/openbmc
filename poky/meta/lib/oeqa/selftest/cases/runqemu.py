@@ -5,6 +5,7 @@
 import re
 import tempfile
 import time
+import oe.types
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import bitbake, runqemu, get_bb_var, runCmd
 from oeqa.core.decorator.oeid import OETestID
@@ -21,6 +22,10 @@ class RunqemuTests(OESelftestTestCase):
         self.machine =  'qemux86-64'
         self.fstypes = "ext4 iso hddimg wic.vmdk wic.qcow2 wic.vdi"
         self.cmd_common = "runqemu nographic"
+
+        kvm = oe.types.qemu_use_kvm(get_bb_var('QEMU_USE_KVM'), 'x86_64')
+        if kvm:
+            self.cmd_common += " kvm"
 
         self.write_config(
 """

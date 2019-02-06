@@ -1,0 +1,30 @@
+Fix compiler error seen with clang, The return value of this
+function is not checked anywhere so in a way its useless but
+still technically correct to return a value here
+
+Fixes
+
+../../bfd/reloc.c:1638:7: error: non-void function '_bfd_clear_contents' should return a value [-Wreturn-type]
+      return;
+      ^
+1 error generated.
+
+It has been fixed in master along with a larger cleanup and fix for relocations
+
+https://sourceware.org/git/gitweb.cgi?p=binutils-gdb.git;a=commit;h=1dc9e2d63e37839ff1768346b2e3f52e338baba5
+
+Upstream-Status: Backport [Fixes differently]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/bfd/reloc.c
++++ b/bfd/reloc.c
+@@ -1629,7 +1629,7 @@ _bfd_clear_contents (reloc_howto_type *h
+     default:
+       abort ();
+     case 0:
+-      return;
++      return 0;
+     case 1:
+       x = bfd_get_8 (input_bfd, location);
+       break;

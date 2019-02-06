@@ -15,10 +15,11 @@ def binutils_branch_version(d):
     return pvsplit[0] + "_" + pvsplit[1]
 
 BINUPV = "${@binutils_branch_version(d)}"
+PV .= ".1"
 
 UPSTREAM_CHECK_GITTAGREGEX = "binutils-(?P<pver>\d+_(\d_?)*)"
 
-SRCREV ?= "4568e49ff799192fea4f66063fe13e2b871ec75a"
+SRCREV ?= "c909e7afdc4710851a53e86ebed8cea3879b26e5"
 BINUTILS_GIT_URI ?= "git://sourceware.org/git/binutils-gdb.git;branch=binutils-${BINUPV}-branch;protocol=git"
 SRC_URI = "\
      ${BINUTILS_GIT_URI} \
@@ -36,11 +37,9 @@ SRC_URI = "\
      file://0014-Detect-64-bit-MIPS-targets.patch \
      file://0015-sync-with-OE-libtool-changes.patch \
      file://0016-add-i386pep-emulation-for-x86_64.patch \
-     file://0017-improve-check-for-input-file-matching-output-file.patch \
-     file://0018-Refactored-location-where-GOT-information-is-collect.patch \
-     file://0019-Improved-robustness.-Return-FALSE-in-case-of-NULL-po.patch \
-     file://0020-Make-sure-global-symbol-is-not-an-indirect-or-warnin.patch \
-     file://0021-PLT-information-was-still-being-generated-when-symbo.patch \
+     file://0022-Handle-ELF-compressed-header-alignment-correctly-by-.patch \
+     file://0023-gold-Get-alignment-of-uncompressed-section-from-ch_a.patch \
+     file://clang-bfd-fix.patch \
      file://CVE-2018-17358.patch \
      file://CVE-2018-17360.patch \
      file://CVE-2018-18309.patch \

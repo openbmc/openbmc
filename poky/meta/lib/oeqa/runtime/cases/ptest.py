@@ -5,6 +5,7 @@ from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
 from oeqa.core.decorator.oeid import OETestID
 from oeqa.core.decorator.data import skipIfNotFeature
+from oeqa.runtime.decorator.package import OEHasPackage
 from oeqa.utils.logparser import Lparser, Result
 
 class PtestRunnerTest(OERuntimeTestCase):
@@ -52,6 +53,7 @@ class PtestRunnerTest(OERuntimeTestCase):
     @OETestID(1600)
     @skipIfNotFeature('ptest', 'Test requires ptest to be in DISTRO_FEATURES')
     @OETestDepends(['ssh.SSHTest.test_ssh'])
+    @OEHasPackage(['ptest-runner'])
     @unittest.expectedFailure
     def test_ptestrunner(self):
         status, output = self.target.run('which ptest-runner', 0)

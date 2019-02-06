@@ -1,21 +1,20 @@
-From 0868761e7d2d75d472090e3ef96f3d2f9ced27f3 Mon Sep 17 00:00:00 2001
-From: Christopher Larson <chris_larson@mentor.com>
-Date: Tue, 13 Dec 2016 10:29:32 -0700
-Subject: [PATCH 5/6] Don't set up arch/instruction-set flags, we do that
- ourselves
+From 3e4eb02eb5951058bc6f8dffbf049eb189df8291 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 18 Dec 2018 15:42:57 +0100
+Subject: [PATCH] Don't set up arch/instruction-set flags, we do that ourselves
 
 Upstream-Status: Inappropriate
 Signed-off-by: Christopher Larson <chris_larson@mentor.com>
-
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 ---
- tools/build/src/tools/gcc.jam | 127 ------------------------------------------
- 1 file changed, 127 deletions(-)
+ tools/build/src/tools/gcc.jam | 128 ----------------------------------
+ 1 file changed, 128 deletions(-)
 
 diff --git a/tools/build/src/tools/gcc.jam b/tools/build/src/tools/gcc.jam
-index e3b1b952..e4fc6c32 100644
+index c57c773f..28618fb1 100644
 --- a/tools/build/src/tools/gcc.jam
 +++ b/tools/build/src/tools/gcc.jam
-@@ -1276,130 +1276,3 @@ local rule cpu-flags ( toolset variable : architecture : instruction-set + :
+@@ -1152,131 +1152,3 @@ local rule cpu-flags ( toolset variable : architecture : instruction-set + :
          <architecture>$(architecture)/<instruction-set>$(instruction-set)
          : $(values) ;
  }
@@ -65,6 +64,7 @@ index e3b1b952..e4fc6c32 100644
 -cpu-flags gcc OPTIONS : x86 : skylake : -march=skylake ;
 -cpu-flags gcc OPTIONS : x86 : skylake-avx512 : -march=skylake-avx512 ;
 -cpu-flags gcc OPTIONS : x86 : cannonlake : -march=skylake-avx512 -mavx512vbmi -mavx512ifma -msha ;
+-cpu-flags gcc OPTIONS : x86 : icelake : -march=icelake ;
 -cpu-flags gcc OPTIONS : x86 : k6 : -march=k6 ;
 -cpu-flags gcc OPTIONS : x86 : k6-2 : -march=k6-2 ;
 -cpu-flags gcc OPTIONS : x86 : k6-3 : -march=k6-3 ;
@@ -146,6 +146,3 @@ index e3b1b952..e4fc6c32 100644
 -cpu-flags gcc OPTIONS : power : rs64a : -mcpu=rs64 ;
 -# AIX variant of RS/6000 & PowerPC
 -toolset.flags gcc AROPTIONS <address-model>64/<target-os>aix : "-X64" ;
--- 
-2.15.1
-

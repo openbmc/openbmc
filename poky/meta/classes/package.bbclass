@@ -368,7 +368,8 @@ def append_source_info(file, sourcefile, d, fatal=True):
     # is still assuming that.
     debuglistoutput = '\0'.join(debugsources) + '\0'
     lf = bb.utils.lockfile(sourcefile + ".lock")
-    open(sourcefile, 'a').write(debuglistoutput)
+    with open(sourcefile, 'a') as sf:
+        sf.write(debuglistoutput)
     bb.utils.unlockfile(lf)
 
 

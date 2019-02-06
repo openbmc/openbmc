@@ -21,7 +21,6 @@ BOOST_LIBS = "\
 	random \
 	regex \
 	serialization \
-	signals \
 	system \
 	timer \
 	test \

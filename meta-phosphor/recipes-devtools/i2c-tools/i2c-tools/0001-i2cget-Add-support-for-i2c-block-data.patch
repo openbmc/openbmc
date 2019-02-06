@@ -1,4 +1,4 @@
-From d0c1fc6394b99ae4306704692910e1e158b56dcc Mon Sep 17 00:00:00 2001
+From b5e7f70c9c43d9a0f819ac2f9942cefca5a79875 Mon Sep 17 00:00:00 2001
 From: Crestez Dan Leonard <leonard.crestez@intel.com>
 Date: Fri, 13 May 2016 21:54:25 +0300
 Subject: [PATCH] i2cget: Add support for i2c block data
@@ -11,22 +11,23 @@ Length is optional and defaults to 32 (maximum).
 The indended use is debugging i2c devices with shell commands.
 
 Signed-off-by: Crestez Dan Leonard <leonard.crestez@intel.com>
+Signed-off-by: Brad Bishop <bradleyb@fuzziesquirrel.com>
 ---
- tools/i2cget.c | 61 ++++++++++++++++++++++++++++++++++++++++++++++++----------
+ tools/i2cget.c | 61 +++++++++++++++++++++++++++++++++++++++++---------
  1 file changed, 51 insertions(+), 10 deletions(-)
 
 diff --git a/tools/i2cget.c b/tools/i2cget.c
-index 2503942..5d8dfe7 100644
+index d2ed56a..83e57f7 100644
 --- a/tools/i2cget.c
 +++ b/tools/i2cget.c
 @@ -41,14 +41,16 @@ static void help(void) __attribute__ ((noreturn));
  static void help(void)
  {
  	fprintf(stderr,
--		"Usage: i2cget [-f] [-y] I2CBUS CHIP-ADDRESS [DATA-ADDRESS [MODE]]\n"
-+		"Usage: i2cget [-f] [-y] I2CBUS CHIP-ADDRESS [DATA-ADDRESS [MODE] [LENGTH]]\n"
+-		"Usage: i2cget [-f] [-y] [-a] I2CBUS CHIP-ADDRESS [DATA-ADDRESS [MODE]]\n"
++		"Usage: i2cget [-f] [-y] [-a] I2CBUS CHIP-ADDRESS [DATA-ADDRESS [MODE] [LENGTH]]\n"
  		"  I2CBUS is an integer or an I2C bus name\n"
- 		"  ADDRESS is an integer (0x03 - 0x77)\n"
+ 		"  ADDRESS is an integer (0x03 - 0x77, or 0x00 - 0x7f if -a is given)\n"
  		"  MODE is one of:\n"
  		"    b (read byte data, default)\n"
  		"    w (read word data)\n"
@@ -84,13 +85,13 @@ index 2503942..5d8dfe7 100644
 @@ -159,6 +171,8 @@ int main(int argc, char *argv[])
  	int pec = 0;
  	int flags = 0;
- 	int force = 0, yes = 0, version = 0;
+ 	int force = 0, yes = 0, version = 0, all_addrs = 0;
 +	int length;
 +	__u8 block_data[I2C_SMBUS_BLOCK_MAX];
  
  	/* handle (optional) flags first */
  	while (1+flags < argc && argv[1+flags][0] == '-') {
-@@ -208,6 +222,7 @@ int main(int argc, char *argv[])
+@@ -209,6 +223,7 @@ int main(int argc, char *argv[])
  		case 'b': size = I2C_SMBUS_BYTE_DATA; break;
  		case 'w': size = I2C_SMBUS_WORD_DATA; break;
  		case 'c': size = I2C_SMBUS_BYTE; break;
@@ -98,7 +99,7 @@ index 2503942..5d8dfe7 100644
  		default:
  			fprintf(stderr, "Error: Invalid mode!\n");
  			help();
-@@ -215,13 +230,27 @@ int main(int argc, char *argv[])
+@@ -216,13 +231,27 @@ int main(int argc, char *argv[])
  		pec = argv[flags+4][1] == 'p';
  	}
  
@@ -127,7 +128,7 @@ index 2503942..5d8dfe7 100644
  		exit(0);
  
  	if (pec && ioctl(file, I2C_PEC, 1) < 0) {
-@@ -243,6 +272,9 @@ int main(int argc, char *argv[])
+@@ -244,6 +273,9 @@ int main(int argc, char *argv[])
  	case I2C_SMBUS_WORD_DATA:
  		res = i2c_smbus_read_word_data(file, daddress);
  		break;
@@ -137,7 +138,7 @@ index 2503942..5d8dfe7 100644
  	default: /* I2C_SMBUS_BYTE_DATA */
  		res = i2c_smbus_read_byte_data(file, daddress);
  	}
-@@ -253,7 +285,16 @@ int main(int argc, char *argv[])
+@@ -254,7 +286,16 @@ int main(int argc, char *argv[])
  		exit(2);
  	}
  
@@ -156,5 +157,5 @@ index 2503942..5d8dfe7 100644
  	exit(0);
  }
 -- 
-2.11.0
+2.20.1
 

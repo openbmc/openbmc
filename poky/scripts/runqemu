@@ -115,9 +115,9 @@ def check_tun():
         raise RunQemuError("TUN control device %s is not writable, please fix (e.g. sudo chmod 666 %s)" % (dev_tun, dev_tun))
 
 def check_libgl(qemu_bin):
-    cmd = 'ldd %s' % qemu_bin
-    logger.debug('Running %s...' % cmd)
-    need_gl = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
+    cmd = ('ldd', qemu_bin)
+    logger.debug('Running %s...' % str(cmd))
+    need_gl = subprocess.check_output(cmd).decode('utf-8')
     if re.search('libGLU', need_gl):
         # We can't run without a libGL.so
         libgl = False
@@ -398,7 +398,7 @@ class BaseConfig(object):
 
         cmd = 'MACHINE=%s bitbake -e' % arg
         logger.info('Running %s...' % cmd)
-        self.bitbake_e = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
+        self.bitbake_e = subprocess.check_output(cmd, shell=True).decode('utf-8')
         # bitbake -e doesn't report invalid MACHINE as an error, so
         # let's check DEPLOY_DIR_IMAGE to make sure that it is a valid
         # MACHINE.
@@ -838,10 +838,7 @@ class BaseConfig(object):
                 self.nfs_server = '192.168.7.1'
 
         # Figure out a new nfs_instance to allow multiple qemus running.
-        # CentOS 7.1's ps doesn't print full command line without "ww"
-        # when invoke by subprocess.Popen().
-        cmd = "ps auxww"
-        ps = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
+        ps = subprocess.check_output(("ps", "auxww")).decode('utf-8')
         pattern = '/bin/unfsd .* -i .*\.pid -e .*/exports([0-9]+) '
         all_instances = re.findall(pattern, ps, re.M)
         if all_instances:
@@ -881,17 +878,17 @@ class BaseConfig(object):
                 if not src:
                     raise RunQemuError("No NFS_DIR is set, and can't find %s or %s to extract" % (src1, src2))
                 logger.info('NFS_DIR not found, extracting %s to %s' % (src, dest))
-                cmd = 'runqemu-extract-sdk %s %s' % (src, dest)
-                logger.info('Running %s...' % cmd)
-                if subprocess.call(cmd, shell=True) != 0:
+                cmd = ('runqemu-extract-sdk', src, dest)
+                logger.info('Running %s...' % str(cmd))
+                if subprocess.call(cmd) != 0:
                     raise RunQemuError('Failed to run %s' % cmd)
                 self.clean_nfs_dir = True
                 self.rootfs = dest
 
         # Start the userspace NFS server
-        cmd = 'runqemu-export-rootfs start %s' % self.rootfs
-        logger.info('Running %s...' % cmd)
-        if subprocess.call(cmd, shell=True) != 0:
+        cmd = ('runqemu-export-rootfs', 'start', self.rootfs)
+        logger.info('Running %s...' % str(cmd))
+        if subprocess.call(cmd) != 0:
             raise RunQemuError('Failed to run %s' % cmd)
 
         self.nfs_running = True
@@ -957,9 +954,9 @@ class BaseConfig(object):
             except FileExistsError:
                 pass
 
-        cmd = '%s link' % ip
-        logger.debug('Running %s...' % cmd)
-        ip_link = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
+        cmd = (ip, 'link')
+        logger.debug('Running %s...' % str(cmd))
+        ip_link = subprocess.check_output(cmd).decode('utf-8')
         # Matches line like: 6: tap0: <foo>
         possibles = re.findall('^[0-9]+: +(tap[0-9]+): <.*', ip_link, re.M)
         tap = ""
@@ -984,8 +981,8 @@ class BaseConfig(object):
             gid = os.getgid()
             uid = os.getuid()
             logger.info("Setting up tap interface under sudo")
-            cmd = 'sudo %s %s %s %s' % (self.qemuifup, uid, gid, self.bindir_native)
-            tap = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8').rstrip('\n')
+            cmd = ('sudo', self.qemuifup, str(uid), str(gid), self.bindir_native)
+            tap = subprocess.check_output(cmd).decode('utf-8').strip()
             lockfile = os.path.join(lockdir, tap)
             self.lock = lockfile + '.lock'
             self.acquire_lock()
@@ -1020,7 +1017,7 @@ class BaseConfig(object):
         if self.get('QB_NET') == 'none':
             return
         if sys.stdin.isatty():
-            self.saved_stty = subprocess.check_output("stty -g", shell=True).decode('utf-8')
+            self.saved_stty = subprocess.check_output(("stty", "-g")).decode('utf-8').strip()
         self.network_device = self.get('QB_NETWORK_DEVICE') or self.network_device
         if self.slirp_enabled:
             self.setup_slirp()
@@ -1134,7 +1131,7 @@ class BaseConfig(object):
         if not qemu_system:
             raise RunQemuError("Failed to boot, QB_SYSTEM_NAME is NULL!")
 
-        qemu_bin = '%s/%s' % (self.bindir_native, qemu_system)
+        qemu_bin = os.path.join(self.bindir_native, qemu_system)
 
         # It is possible to have qemu-native in ASSUME_PROVIDED, and it won't
         # find QEMU in sysroot, it needs to use host's qemu.
@@ -1172,7 +1169,7 @@ class BaseConfig(object):
 
         if self.serialstdio:
             if sys.stdin.isatty():
-                subprocess.check_call("stty intr ^]", shell=True)
+                subprocess.check_call(("stty", "intr", "^]"))
                 logger.info("Interrupt character is '^]'")
 
             first_serial = ""
@@ -1236,20 +1233,19 @@ class BaseConfig(object):
 
         logger.info("Cleaning up")
         if self.cleantap:
-            cmd = 'sudo %s %s %s' % (self.qemuifdown, self.tap, self.bindir_native)
-            logger.debug('Running %s' % cmd)
-            subprocess.check_call(cmd, shell=True)
+            cmd = ('sudo', self.qemuifdown, self.tap, self.bindir_native)
+            logger.debug('Running %s' % str(cmd))
+            subprocess.check_call(cmd)
         self.release_lock()
 
         if self.nfs_running:
             logger.info("Shutting down the userspace NFS server...")
-            cmd = "runqemu-export-rootfs stop %s" % self.rootfs
-            logger.debug('Running %s' % cmd)
-            subprocess.check_call(cmd, shell=True)
+            cmd = ("runqemu-export-rootfs", "stop", self.rootfs)
+            logger.debug('Running %s' % str(cmd))
+            subprocess.check_call(cmd)
 
         if self.saved_stty:
-            cmd = "stty %s" % self.saved_stty
-            subprocess.check_call(cmd, shell=True)
+            subprocess.check_call(("stty", self.saved_stty))
 
         if self.clean_nfs_dir:
             logger.info('Removing %s' % self.rootfs)
@@ -1291,10 +1287,9 @@ class BaseConfig(object):
         if result and os.path.exists(result):
             return result
 
-        cmd = 'bitbake qemu-helper-native -e'
-        logger.info('Running %s...' % cmd)
-        out = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-        out = out.stdout.read().decode('utf-8')
+        cmd = ('bitbake', 'qemu-helper-native', '-e')
+        logger.info('Running %s...' % str(cmd))
+        out = subprocess.check_output(cmd).decode('utf-8')
 
         match = re.search('^STAGING_BINDIR_NATIVE="(.*)"', out, re.M)
         if match:

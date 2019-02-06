@@ -1,0 +1,200 @@
+From 0261ec511ac07177fa488133e0bb3c03860977b3 Mon Sep 17 00:00:00 2001
+From: "H.J. Lu" <hjl.tools@gmail.com>
+Date: Sun, 2 Dec 2018 05:42:36 -0800
+Subject: [PATCH 2/2] gold: Get alignment of uncompressed section from
+ ch_addralign
+
+The ELF compression header has a field (ch_addralign) that is set to
+the alignment of the uncompressed section. This way the section itself
+can have a different alignment than the decompressed section.  Update
+decompress_input_section to get alignment of the decompressed section
+and use it when merging decompressed strings.
+
+	PR binutils/23919
+	* merge.cc (Output_merge_string<Char_type>::do_add_input_section):
+	Get addralign from decompressed_section_contents.
+	* object.cc (build_compressed_section_map): Set info.addralign.
+	(Object::decompressed_section_contents): Add a palign
+	argument and store p->second.addralign in *palign if it isn't
+	NULL.
+	* object.h (Compressed_section_info): Add addralign.
+	(section_is_compressed): Add a palign argument, default it
+	to NULL, store p->second.addralign in *palign if it isn't NULL.
+	(Object::decompressed_section_contents): Likewise.
+	* output.cc (Output_section::add_input_section): Get addralign
+	from section_is_compressed.
+---
+ gold/merge.cc  |  8 +++++---
+ gold/object.cc | 11 +++++++++--
+ gold/object.h  |  8 ++++++--
+ gold/output.cc | 11 ++++++-----
+ 4 files changed, 26 insertions(+), 12 deletions(-)
+
+Upstream-Status: Backport [https://sourceware.org/git/gitweb.cgi?p=binutils-gdb.git;h=5f6c22aee74f17393b82934a5682d985672e011a]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+
+diff --git a/gold/merge.cc b/gold/merge.cc
+index de00ee9ae9..d7de11789f 100644
+--- a/gold/merge.cc
++++ b/gold/merge.cc
+@@ -440,9 +440,11 @@ Output_merge_string<Char_type>::do_add_input_section(Relobj* object,
+ {
+   section_size_type sec_len;
+   bool is_new;
++  uint64_t addralign = this->addralign();
+   const unsigned char* pdata = object->decompressed_section_contents(shndx,
+ 								     &sec_len,
+-								     &is_new);
++								     &is_new,
++								     &addralign);
+ 
+   const Char_type* p = reinterpret_cast<const Char_type*>(pdata);
+   const Char_type* pend = p + sec_len / sizeof(Char_type);
+@@ -494,7 +496,7 @@ Output_merge_string<Char_type>::do_add_input_section(Relobj* object,
+   // aligned, so each string within the section must retain the same
+   // modulo.
+   uintptr_t init_align_modulo = (reinterpret_cast<uintptr_t>(pdata)
+-				 & (this->addralign() - 1));
++				 & (addralign - 1));
+   bool has_misaligned_strings = false;
+ 
+   while (p < pend)
+@@ -503,7 +505,7 @@ Output_merge_string<Char_type>::do_add_input_section(Relobj* object,
+ 
+       // Within merge input section each string must be aligned.
+       if (len != 0
+-	  && ((reinterpret_cast<uintptr_t>(p) & (this->addralign() - 1))
++	  && ((reinterpret_cast<uintptr_t>(p) & (addralign - 1))
+ 	      != init_align_modulo))
+ 	  has_misaligned_strings = true;
+ 
+diff --git a/gold/object.cc b/gold/object.cc
+index 374340fa16..711793e5e4 100644
+--- a/gold/object.cc
++++ b/gold/object.cc
+@@ -751,11 +751,13 @@ build_compressed_section_map(
+ 	      const unsigned char* contents =
+ 		  obj->section_contents(i, &len, false);
+ 	      uint64_t uncompressed_size;
++	      Compressed_section_info info;
+ 	      if (is_zcompressed)
+ 		{
+ 		  // Skip over the ".zdebug" prefix.
+ 		  name += 7;
+ 		  uncompressed_size = get_uncompressed_size(contents, len);
++		  info.addralign = shdr.get_sh_addralign();
+ 		}
+ 	      else
+ 		{
+@@ -763,8 +765,8 @@ build_compressed_section_map(
+ 		  name += 6;
+ 		  elfcpp::Chdr<size, big_endian> chdr(contents);
+ 		  uncompressed_size = chdr.get_ch_size();
++		  info.addralign = chdr.get_ch_addralign();
+ 		}
+-	      Compressed_section_info info;
+ 	      info.size = convert_to_section_size_type(uncompressed_size);
+ 	      info.flag = shdr.get_sh_flags();
+ 	      info.contents = NULL;
+@@ -3060,7 +3062,8 @@ const unsigned char*
+ Object::decompressed_section_contents(
+     unsigned int shndx,
+     section_size_type* plen,
+-    bool* is_new)
++    bool* is_new,
++    uint64_t* palign)
+ {
+   section_size_type buffer_size;
+   const unsigned char* buffer = this->do_section_contents(shndx, &buffer_size,
+@@ -3087,6 +3090,8 @@ Object::decompressed_section_contents(
+     {
+       *plen = uncompressed_size;
+       *is_new = false;
++      if (palign != NULL)
++	*palign = p->second.addralign;
+       return p->second.contents;
+     }
+ 
+@@ -3108,6 +3113,8 @@ Object::decompressed_section_contents(
+   // once in this pass.
+   *plen = uncompressed_size;
+   *is_new = true;
++  if (palign != NULL)
++    *palign = p->second.addralign;
+   return uncompressed_data;
+ }
+ 
+diff --git a/gold/object.h b/gold/object.h
+index 0b786a5471..b99548463d 100644
+--- a/gold/object.h
++++ b/gold/object.h
+@@ -373,6 +373,7 @@ struct Compressed_section_info
+ {
+   section_size_type size;
+   elfcpp::Elf_Xword flag;
++  uint64_t addralign;
+   const unsigned char* contents;
+ };
+ typedef std::map<unsigned int, Compressed_section_info> Compressed_section_map;
+@@ -808,7 +809,8 @@ class Object
+ 
+   bool
+   section_is_compressed(unsigned int shndx,
+-			section_size_type* uncompressed_size) const
++			section_size_type* uncompressed_size,
++			elfcpp::Elf_Xword* palign = NULL) const
+   {
+     if (this->compressed_sections_ == NULL)
+       return false;
+@@ -818,6 +820,8 @@ class Object
+       {
+ 	if (uncompressed_size != NULL)
+ 	  *uncompressed_size = p->second.size;
++	if (palign != NULL)
++	  *palign = p->second.addralign;
+ 	return true;
+       }
+     return false;
+@@ -828,7 +832,7 @@ class Object
+   // by the caller.
+   const unsigned char*
+   decompressed_section_contents(unsigned int shndx, section_size_type* plen,
+-				bool* is_cached);
++				bool* is_cached, uint64_t* palign = NULL);
+ 
+   // Discard any buffers of decompressed sections.  This is done
+   // at the end of the Add_symbols task.
+diff --git a/gold/output.cc b/gold/output.cc
+index 1701db1c99..75ac3bcf97 100644
+--- a/gold/output.cc
++++ b/gold/output.cc
+@@ -2448,7 +2448,13 @@ Output_section::add_input_section(Layout* layout,
+ 				  unsigned int reloc_shndx,
+ 				  bool have_sections_script)
+ {
++  section_size_type input_section_size = shdr.get_sh_size();
++  section_size_type uncompressed_size;
+   elfcpp::Elf_Xword addralign = shdr.get_sh_addralign();
++  if (object->section_is_compressed(shndx, &uncompressed_size,
++				    &addralign))
++    input_section_size = uncompressed_size;
++
+   if ((addralign & (addralign - 1)) != 0)
+     {
+       object->error(_("invalid alignment %lu for section \"%s\""),
+@@ -2498,11 +2504,6 @@ Output_section::add_input_section(Layout* layout,
+ 	}
+     }
+ 
+-  section_size_type input_section_size = shdr.get_sh_size();
+-  section_size_type uncompressed_size;
+-  if (object->section_is_compressed(shndx, &uncompressed_size))
+-    input_section_size = uncompressed_size;
+-
+   off_t offset_in_section;
+ 
+   if (this->has_fixed_layout())
+-- 
+2.20.1
+

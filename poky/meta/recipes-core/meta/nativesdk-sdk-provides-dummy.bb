@@ -4,7 +4,6 @@ DUMMYARCH = "sdk-provides-dummy-${SDKPKGSUFFIX}"
 DUMMYPROVIDES = "\
     /bin/bash \
     /usr/bin/env \
-    /usr/bin/perl \
     pkgconfig \
     libGL.so()(64bit) \
     libGL.so \

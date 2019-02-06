@@ -16,7 +16,7 @@ class OpkgTest(OERuntimeTestCase):
 class OpkgRepoTest(OpkgTest):
 
     @classmethod
-    def setUpClass(cls):
+    def setUp(cls):
         allarchfeed = 'all'
         if cls.tc.td["MULTILIB_VARIANTS"]:
             allarchfeed = cls.tc.td["TUNE_PKGARCH"]
@@ -25,7 +25,7 @@ class OpkgRepoTest(OpkgTest):
         cls.repo_server.start()
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDown(cls):
         cls.repo_server.stop()
 
     def setup_source_config_for_package_install(self):

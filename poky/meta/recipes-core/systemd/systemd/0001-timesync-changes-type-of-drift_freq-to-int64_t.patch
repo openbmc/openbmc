@@ -1,0 +1,49 @@
+Backport patch to fix systemd build failure on x32.
+
+Upstream-Status: Backport [https://github.com/systemd/systemd/commit/75ca162]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+From 75ca1621db4647a4d62d7873cd6715e28fe0f9fa Mon Sep 17 00:00:00 2001
+From: Yu Watanabe <watanabe.yu+github@gmail.com>
+Date: Sat, 23 Jun 2018 09:41:55 +0900
+Subject: [PATCH] timesync: changes type of drift_freq to int64_t
+
+drift_freq is used for storing timex.freq, and is a 64bit integer.
+To support x32 ABI, this changes the type of drift_freq to int64_t.
+
+Fixes #9387.
+---
+ src/timesync/timesyncd-manager.c | 2 +-
+ src/timesync/timesyncd-manager.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/timesync/timesyncd-manager.c b/src/timesync/timesyncd-manager.c
+index 2b731af9e..404a2b189 100644
+--- a/src/timesync/timesyncd-manager.c
++++ b/src/timesync/timesyncd-manager.c
+@@ -604,7 +604,7 @@ static int manager_receive_response(sd_event_source *source, int fd, uint32_t re
+         m->dest_time = *recv_time;
+         m->spike = spike;
+ 
+-        log_debug("interval/delta/delay/jitter/drift " USEC_FMT "s/%+.3fs/%.3fs/%.3fs/%+"PRI_TIMEX"ppm%s",
++        log_debug("interval/delta/delay/jitter/drift " USEC_FMT "s/%+.3fs/%.3fs/%.3fs/%+"PRIi64"ppm%s",
+                   m->poll_interval_usec / USEC_PER_SEC, offset, delay, m->samples_jitter, m->drift_freq / 65536,
+                   spike ? " (ignored)" : "");
+ 
+diff --git a/src/timesync/timesyncd-manager.h b/src/timesync/timesyncd-manager.h
+index d8d97cc1e..18347416d 100644
+--- a/src/timesync/timesyncd-manager.h
++++ b/src/timesync/timesyncd-manager.h
+@@ -79,7 +79,7 @@ struct Manager {
+         /* last change */
+         bool jumped;
+         bool sync;
+-        long drift_freq;
++        int64_t drift_freq;
+ 
+         /* watch for time changes */
+         sd_event_source *event_clock_watch;
+-- 
+2.17.0
+

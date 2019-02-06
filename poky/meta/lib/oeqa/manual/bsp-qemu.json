@@ -10,7 +10,7 @@
       ],
       "execution": {
         "1": {
-          "action": "Build a kernel with KVM enabled  \n\nIn Local.conf add  \n\nQEMU_USE_KVM = \"${@ 'intel-corei7-64 intel-core2-32 qemux86 qemux86-64' if os.access('/dev/kvm', os.R_OK|os.W_OK) else '' }\"  \n\n ",
+          "action": "Build a kernel with KVM enabled  \n\nIn Local.conf add  \n\nQEMU_USE_KVM = \"${@ '1' if os.access('/dev/kvm', os.R_OK|os.W_OK) else '0' }\"  \n\n ",
           "expected_results": ""
         },
         "2": {

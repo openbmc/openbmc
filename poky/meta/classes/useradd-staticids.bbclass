@@ -59,8 +59,8 @@ def update_useradd_static_config(d):
     # Paths are resolved via BBPATH.
     def get_table_list(d, var, default):
         files = []
-        bbpath = d.getVar('BBPATH', True)
-        tables = d.getVar(var, True)
+        bbpath = d.getVar('BBPATH')
+        tables = d.getVar(var)
         if not tables:
             tables = default
         for conf_file in tables.split():

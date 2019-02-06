@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 #
 # Helper script for committing data to git and pushing upstream
 #
@@ -208,6 +208,13 @@ def parse_args(argv):
                         help="Data to commit")
     return parser.parse_args(argv)
 
+def get_nested(d, list_of_keys):
+    try:
+        for k in list_of_keys:
+            d = d[k]
+        return d
+    except KeyError:
+        return ""
 
 def main(argv=None):
     """Script entry point"""
@@ -223,11 +230,11 @@ def main(argv=None):
 
         # Get keywords to be used in tag and branch names and messages
         metadata = metadata_from_bb()
-        keywords = {'hostname': metadata['hostname'],
-                    'branch': metadata['layers']['meta']['branch'],
-                    'commit': metadata['layers']['meta']['commit'],
-                    'commit_count': metadata['layers']['meta']['commit_count'],
-                    'machine': metadata['config']['MACHINE']}
+        keywords = {'hostname': get_nested(metadata, ['hostname']),
+                    'branch': get_nested(metadata, ['layers', 'meta', 'branch']),
+                    'commit': get_nested(metadata, ['layers', 'meta', 'commit']),
+                    'commit_count': get_nested(metadata, ['layers', 'meta', 'commit_count']),
+                    'machine': get_nested(metadata, ['config', 'MACHINE'])}
 
         # Expand strings early in order to avoid getting into inconsistent
         # state (e.g. no tag even if data was committed)

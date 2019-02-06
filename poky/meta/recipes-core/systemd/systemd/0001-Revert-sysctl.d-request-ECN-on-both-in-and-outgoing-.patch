@@ -1,0 +1,36 @@
+From 1e190dfd5bb95036f937ef1dc46f43eb0a146612 Mon Sep 17 00:00:00 2001
+From: Thomas Hindoe Paaboel Andersen <phomes@gmail.com>
+Date: Fri, 17 Aug 2018 21:31:05 +0200
+Subject: [PATCH] Revert "sysctl.d: request ECN on both in and outgoing
+ connections"
+
+Turning on ECN still causes slow or broken network on linux. Our tcp
+is not yet ready for wide spread use of ECN.
+
+This reverts commit 919472741dba6ad0a3f6c2b76d390a02d0e2fdc3.
+
+https://github.com/systemd/systemd/issues/9748
+
+Upstream-Status: Backport
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+---
+ sysctl.d/50-default.conf | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/sysctl.d/50-default.conf b/sysctl.d/50-default.conf
+index b67ae87ca6b7..e263cf06284a 100644
+--- a/sysctl.d/50-default.conf
++++ b/sysctl.d/50-default.conf
+@@ -33,9 +33,6 @@ net.ipv4.conf.all.promote_secondaries = 1
+ # Fair Queue CoDel packet scheduler to fight bufferbloat
+ net.core.default_qdisc = fq_codel
+ 
+-# Request Explicit Congestion Notification (ECN) on both in and outgoing connections
+-net.ipv4.tcp_ecn = 1
+-
+ # Enable hard and soft link protection
+ fs.protected_hardlinks = 1
+ fs.protected_symlinks = 1
+-- 
+2.7.4
+

@@ -5,14 +5,10 @@ LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
 SRC_URI = "${KERNELORG_MIRROR}/software/utils/i2c-tools/${BP}.tar.gz \
-           file://0001-lib-Module.mk-Add-missing-dependencies.patch \
-           file://0001-tools-Module.mk-Add-missing-dependencies.patch \
-           file://0001-i2c-tools-eeprog-Module.mk-Add-missing-dependency.patch \
-           file://remove-i2c-dev.patch \
 "
 
-SRC_URI[md5sum] = "d92a288d70f306d3895e3a7e9c14c9aa"
-SRC_URI[sha256sum] = "5b60daf6f011de0acb61de57dba62f2054bb39f19961d67e0c91610f071ca403"
+SRC_URI[md5sum] = "3536237a6b51fb10caacdc3b8a496237"
+SRC_URI[sha256sum] = "ef8f77afc70e7dbfd1171bfeae87a8a7f10074829370ce8d9ccd585a014e0073"
 
 inherit update-alternatives
 

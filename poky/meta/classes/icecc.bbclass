@@ -38,6 +38,8 @@ BB_HASHBASE_WHITELIST += "ICECC_PARALLEL_MAKE ICECC_DISABLED ICECC_USER_PACKAGE_
 
 ICECC_ENV_EXEC ?= "${STAGING_BINDIR_NATIVE}/icecc-create-env"
 
+HOSTTOOLS_NONFATAL += "icecc patchelf"
+
 # This version can be incremented when changes are made to the environment that
 # invalidate the version on the compile nodes. Changing it will cause a new
 # environment to be created.
@@ -98,9 +100,11 @@ DEPENDS_prepend += "${@icecc_dep_prepend(d)} "
 
 get_cross_kernel_cc[vardepsexclude] += "KERNEL_CC"
 def get_cross_kernel_cc(bb,d):
-    kernel_cc = d.getVar('KERNEL_CC')
+    if not icecc_is_kernel(bb, d):
+        return None
 
     # evaluate the expression by the shell if necessary
+    kernel_cc = d.getVar('KERNEL_CC')
     if '`' in kernel_cc or '$(' in kernel_cc:
         import subprocess
         kernel_cc = subprocess.check_output("echo %s" % kernel_cc, shell=True).decode("utf-8")[:-1]
@@ -112,38 +116,6 @@ def get_cross_kernel_cc(bb,d):
 
 def get_icecc(d):
     return d.getVar('ICECC_PATH') or bb.utils.which(os.getenv("PATH"), "icecc")
-
-def create_path(compilers, bb, d):
-    """
-    Create Symlinks for the icecc in the staging directory
-    """
-    staging = os.path.join(d.expand('${STAGING_BINDIR}'), "ice")
-    if icecc_is_kernel(bb, d):
-        staging += "-kernel"
-
-    #check if the icecc path is set by the user
-    icecc = get_icecc(d)
-
-    # Create the dir if necessary
-    try:
-        os.stat(staging)
-    except:
-        try:
-            os.makedirs(staging)
-        except:
-            pass
-
-    for compiler in compilers:
-        gcc_path = os.path.join(staging, compiler)
-        try:
-            os.stat(gcc_path)
-        except:
-            try:
-                os.symlink(icecc, gcc_path)
-            except:
-                pass
-
-    return staging
 
 def use_icecc(bb,d):
     if d.getVar('ICECC_DISABLED') == "1":
@@ -248,12 +220,11 @@ def icecc_path(bb,d):
         # don't create unnecessary directories when icecc is disabled
         return
 
+    staging = os.path.join(d.expand('${STAGING_BINDIR}'), "ice")
     if icecc_is_kernel(bb, d):
-        return create_path( [get_cross_kernel_cc(bb,d), ], bb, d)
+        staging += "-kernel"
 
-    else:
-        prefix = d.expand('${HOST_PREFIX}')
-        return create_path( [prefix+"gcc", prefix+"g++"], bb, d)
+    return staging
 
 def icecc_get_external_tool(bb, d, tool):
     external_toolchain_bindir = d.expand('${EXTERNAL_TOOLCHAIN}${bindir_cross}')
@@ -303,9 +274,9 @@ def icecc_get_and_check_tool(bb, d, tool):
     # compiler environment package.
     t = icecc_get_tool(bb, d, tool)
     if t:
-        link_path = icecc_get_tool_link(tool, d)
+        link_path = icecc_get_tool_link(t, d)
         if link_path == get_icecc(d):
-            bb.error("%s is a symlink to %s in PATH and this prevents icecc from working" % (t, get_icecc(d)))
+            bb.error("%s is a symlink to %s in PATH and this prevents icecc from working" % (t, link_path))
             return ""
         else:
             return t
@@ -350,6 +321,27 @@ set_icecc_env() {
         return
     fi
 
+    ICECC_BIN="${@get_icecc(d)}"
+    if [ -z "${ICECC_BIN}" ]; then
+        bbwarn "Cannot use icecc: icecc binary not found"
+        return
+    fi
+    if [ -z "$(which patchelf patchelf-uninative)" ]; then
+        bbwarn "Cannot use icecc: patchelf not found"
+        return
+    fi
+
+    # Create symlinks to icecc in the recipe-sysroot directory
+    mkdir -p ${ICE_PATH}
+    if [ -n "${KERNEL_CC}" ]; then
+        compilers="${@get_cross_kernel_cc(bb,d)}"
+    else
+        compilers="${HOST_PREFIX}gcc ${HOST_PREFIX}g++"
+    fi
+    for compiler in $compilers; do
+        ln -sf ${ICECC_BIN} ${ICE_PATH}/$compiler
+    done
+
     ICECC_CC="${@icecc_get_and_check_tool(bb, d, "gcc")}"
     ICECC_CXX="${@icecc_get_and_check_tool(bb, d, "g++")}"
     # cannot use icecc_get_and_check_tool here because it assumes as without target_sys prefix
@@ -387,7 +379,7 @@ set_icecc_env() {
             ${ICECC_ENV_EXEC} ${ICECC_ENV_DEBUG} "${ICECC_CC}" "${ICECC_CXX}" "${ICECC_AS}" "${ICECC_VERSION}"
         then
             touch "${ICECC_VERSION}.done"
-        elif [ ! wait_for_file "${ICECC_VERSION}.done" 30 ]
+        elif ! wait_for_file "${ICECC_VERSION}.done" 30 
         then
             # locking failed so wait for ${ICECC_VERSION}.done to appear
             bbwarn "Timeout waiting for ${ICECC_VERSION}.done"

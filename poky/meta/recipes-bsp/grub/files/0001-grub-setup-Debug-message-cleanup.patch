@@ -1,0 +1,34 @@
+From 4e9d9358e0cda6d01020005eb6343e3b69f7201a Mon Sep 17 00:00:00 2001
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Date: Tue, 3 Jul 2018 18:51:13 +0800
+Subject: [PATCH] grub-setup: Debug message cleanup
+
+Variable "root" is initialized after root device probing and is null in
+current place, so, drop it.
+
+Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+Upstream-Status: Backport [http://git.savannah.gnu.org/cgit/grub.git/commit/?id=4e9d9358e0cda6d01020005eb6343e3b69f7201a]
+
+ util/setup.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/util/setup.c b/util/setup.c
+index 80363075d..9c1e1b7da 100644
+--- a/util/setup.c
++++ b/util/setup.c
+@@ -305,9 +305,8 @@ SETUP (const char *dir,
+   bl.first_block = (struct grub_boot_blocklist *) (core_img
+ 						   + GRUB_DISK_SECTOR_SIZE
+ 						   - sizeof (*bl.block));
+-  grub_util_info ("root is `%s', dest is `%s'", root, dest);
+ 
+-  grub_util_info ("Opening dest");
++  grub_util_info ("Opening dest `%s'", dest);
+   dest_dev = grub_device_open (dest);
+   if (! dest_dev)
+     grub_util_error ("%s", grub_errmsg);
+-- 
+2.17.2 (Apple Git-113)
+

@@ -108,7 +108,7 @@ class QemuTinyRunner(QemuRunner):
 
         return self.is_alive()
 
-    def run_serial(self, command, timeout=5):
+    def run_serial(self, command, timeout=60):
         self.server_socket.sendall(command+'\n')
         data = ''
         status = 0

@@ -12,15 +12,14 @@ from oeqa.utils.qemurunner import QemuRunner
 supported_fstypes = ['ext3', 'ext4', 'cpio.gz', 'wic']
 
 class OEQemuTarget(OESSHTarget):
-    def __init__(self, logger, ip, server_ip, timeout=300, user='root',
+    def __init__(self, logger, server_ip, timeout=300, user='root',
             port=None, machine='', rootfs='', kernel='', kvm=False,
             dump_dir='', dump_host_cmds='', display='', bootlog='',
             tmpdir='', dir_image='', boottime=60, **kwargs):
 
-        super(OEQemuTarget, self).__init__(logger, ip, server_ip, timeout,
+        super(OEQemuTarget, self).__init__(logger, None, server_ip, timeout,
                 user, port)
 
-        self.ip = ip
         self.server_ip = server_ip
         self.machine = machine
         self.rootfs = rootfs

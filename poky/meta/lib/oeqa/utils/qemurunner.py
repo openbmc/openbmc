@@ -345,6 +345,7 @@ class QemuRunner:
             else:
                 self.logger.debug("Couldn't login into serial console"
                             " as root using blank password")
+                self.logger.debug("The output:\n%s" % output)
         except:
             self.logger.debug("Serial console failed while trying to login")
         return True
@@ -420,7 +421,7 @@ class QemuRunner:
                 return True
         return False
 
-    def run_serial(self, command, raw=False, timeout=5):
+    def run_serial(self, command, raw=False, timeout=60):
         # We assume target system have echo to get command status
         if not raw:
             command = "%s; echo $?\n" % command
