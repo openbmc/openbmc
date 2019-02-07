@@ -34,6 +34,7 @@ DEPENDS += "virtual/phosphor-ipmi-inventory-sel"
 DEPENDS += "virtual/phosphor-ipmi-fru-merge-config"
 DEPENDS += "virtual/phosphor-ipmi-sensor-inventory"
 DEPENDS += "virtual/phosphor-ipmi-channel-config"
+DEPENDS += "virtual/phosphor-ipmi-entity-config"
 DEPENDS += "boost"
 DEPENDS += "sdeventplus"
 
@@ -77,6 +78,7 @@ EXTRA_OECONF = " \
         INVSENSOR_YAML_GEN=${STAGING_DIR_NATIVE}${sensor_datadir}/invsensor.yaml \
         FRU_YAML_GEN=${STAGING_DIR_NATIVE}${config_datadir}/fru_config.yaml \
         CHANNEL_YAML_GEN=${STAGING_DIR_NATIVE}${sensor_datadir}/channel.yaml \
+        ENTITY_YAML_GEN=${STAGING_DIR_NATIVE}${sensor_datadir}/entity.yaml \
         POWER_READING_SENSOR=${datadir}/ipmi-providers/power_reading.json\
         "
 

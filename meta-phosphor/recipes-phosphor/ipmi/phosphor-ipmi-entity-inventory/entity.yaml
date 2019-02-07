@@ -1,0 +1,13 @@
+0x01:
+  containerEntityId: 0x1E
+  containerEntityInstance: 0x1
+  isList: "true"
+  isLinked: "false"
+  entityId1: 0x03
+  entityInstance1: 0x1
+  entityId2: 0x04
+  entityInstance2: 0x1
+  entityId3: 0x00
+  entityInstance3: 0x00
+  entityId4: 0x00
+  entityInstance4: 0x00
