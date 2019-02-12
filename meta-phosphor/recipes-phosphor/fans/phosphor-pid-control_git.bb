@@ -27,7 +27,7 @@ DEPENDS += "python-mako-native"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-logging"
 DEPENDS += "libevdev"
-DEPENDS += "libconfig"
+DEPENDS += "nlohmann-json"
 
 # We depend on someone providing their system's configuration.
 DEPENDS += "virtual/phosphor-fans-sensor-inventory"
