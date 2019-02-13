@@ -1157,7 +1157,7 @@
                     </para></listitem>
                 <listitem><para>
                     The build system generates the file system image and a
-                    customized Extensible SDK (eSDSK) for application
+                    customized Extensible SDK (eSDK) for application
                     development in parallel.
                     </para></listitem>
             </orderedlist>

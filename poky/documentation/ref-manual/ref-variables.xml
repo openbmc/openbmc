@@ -6697,10 +6697,10 @@
                     revisioning by appending values to the
                     <filename>INC_PR</filename> variable:
                     <literallayout class='monospaced'>
-recipes-graphics/xorg-font/xorg-font-common.inc:INC_PR = "r2"
-recipes-graphics/xorg-font/encodings_1.0.4.bb:PR = "${INC_PR}.1"
-recipes-graphics/xorg-font/font-util_1.3.0.bb:PR = "${INC_PR}.0"
-recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
+     recipes-graphics/xorg-font/xorg-font-common.inc:INC_PR = "r2"
+     recipes-graphics/xorg-font/encodings_1.0.4.bb:PR = "${INC_PR}.1"
+     recipes-graphics/xorg-font/font-util_1.3.0.bb:PR = "${INC_PR}.0"
+     recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     </literallayout>
                     The first line of the example establishes the baseline
                     revision to be used for all recipes that use the
