@@ -2,3 +2,4 @@ elog:
     - xyz.openbmc_project.Common.Error.InternalFailure
 checkstop:
     - org.open_power.Host.Boot.Error.Checkstop
+    - org.open_power.Host.Boot.Error.WatchdogTimedOut
