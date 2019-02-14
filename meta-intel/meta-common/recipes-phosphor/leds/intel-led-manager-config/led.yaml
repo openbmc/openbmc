@@ -1,0 +1,36 @@
+bmc_booted:
+
+power_on:
+
+status_ok:
+    status_green:
+        Action: 'On'
+    status_amber:
+        Action: 'Off'
+
+status_degraded:
+    status_green:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+    status_amber:
+        Action: 'Off'
+
+status_non_critical:
+    status_green:
+        Action: 'Off'
+    status_amber:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+
+status_critical:
+    status_green:
+        Action: 'Off'
+    status_amber:
+        Action: 'On'
+
+enclosure_identify:
+    identify:
+        Action: 'On'
+

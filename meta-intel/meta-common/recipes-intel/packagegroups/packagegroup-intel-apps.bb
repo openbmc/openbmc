@@ -45,5 +45,6 @@ RDEPENDS_${PN}-system = " \
         bmcweb \
         entity-manager \
         intel-ipmi-oem \
+        dbus-sensors \
         phosphor-webui \
         "
