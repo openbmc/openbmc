@@ -22,7 +22,7 @@ RDEPENDS_${PN} += "libsystemd"
 RDEPENDS_${PN} += "phosphor-logging"
 
 SRC_URI += "git://github.com/openbmc/phosphor-watchdog"
-SRCREV = "5e350795bfc4f100ea00cab34ab9b14bb3106d82"
+SRCREV = "976764158af29113103a9a6acd8911f4f06c6b27"
 S = "${WORKDIR}/git"
 
 # Copies config file having arguments for host watchdog
