@@ -12,7 +12,6 @@ LIC_FILES_CHKSUM = "file://LICENCE;md5=a6a4edad4aed50f39a66d098d74b265b"
 SYSTEMD_SERVICE_${PN} = "xyz.openbmc_project.EntityManager.service \
                          xyz.openbmc_project.FruDevice.service"
 
-PROVIDES += "virtual/phosphor-fans-sensor-inventory"
 DEPENDS = "boost \
            i2c-tools \
            nlohmann-json \

@@ -14,7 +14,7 @@ inherit obmc-phosphor-ipmiprovider-symlink
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/phosphor-pid-control"
-SRCREV = "f72ad441408ffb671c412c9f79795236c0ea5e54"
+SRCREV = "dca2d484ee91ee40fc94509d831ef2c5fa792ca0"
 
 # Each platform will need a service file that starts
 # at an appropriate time per system.  For instance, if
@@ -29,8 +29,6 @@ DEPENDS += "phosphor-logging"
 DEPENDS += "libevdev"
 DEPENDS += "nlohmann-json"
 
-# We depend on someone providing their system's configuration.
-DEPENDS += "virtual/phosphor-fans-sensor-inventory"
 # We depend on this to be built first so we can build our providers.
 DEPENDS += "phosphor-ipmi-host"
 
@@ -43,9 +41,5 @@ FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
 FILES_${PN}_append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
 FILES_${PN}_append = " ${libdir}/net-ipmid/lib*${SOLIBS}"
 FILES_${PN}-dev_append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV} ${libdir}/ipmid-providers/*.la"
-
-EXTRA_OECONF = "SENSOR_YAML_GEN=${STAGING_DIR_NATIVE}${sensor_datadir}/sensor-list.yaml \
-                PID_YAML_GEN=${STAGING_DIR_NATIVE}${sensor_datadir}/pid-list.yaml \
-                ZONE_YAML_GEN=${STAGING_DIR_NATIVE}${sensor_datadir}/zone-info.yaml"
 
 HOSTIPMI_PROVIDER_LIBRARY += "libmanualcmds.so"
