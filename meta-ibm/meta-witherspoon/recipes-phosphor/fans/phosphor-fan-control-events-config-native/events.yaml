@@ -455,7 +455,7 @@ events:
       actions:
           - name: use_alternate_events_on_state
             property:
-                value: Custom
+                value: CUSTOM
                 type: std::string
             defevents:
                 - name: default_floor_boundary
