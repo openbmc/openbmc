@@ -184,7 +184,7 @@ do_deploy() {
     fi
 
     # Append extra config if the user has provided any
-    echo "${RPI_EXTRA_CONFIG}" >> ${DEPLOYDIR}/bcm2835-bootfiles/config.txt
+    printf "${RPI_EXTRA_CONFIG}\n" >> ${DEPLOYDIR}/bcm2835-bootfiles/config.txt
 }
 
 do_deploy_append_raspberrypi3-64() {

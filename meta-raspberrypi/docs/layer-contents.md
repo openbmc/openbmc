@@ -9,7 +9,7 @@
 * raspberrypi3
 * raspberrypi3-64 (64 bit kernel & userspace)
 * raspberrypi-cm (dummy alias for raspberrypi)
-* raspberrypi-cm3 (dummy alias for raspberrypi2)
+* raspberrypi-cm3
 
 Note: The raspberrypi3 machines include support for Raspberry Pi 3B+.
 

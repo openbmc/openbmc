@@ -24,7 +24,7 @@ LIC_FILES_CHKSUM = "\
 NO_GENERIC_LICENSE[Firmware-cypress-rpidistro] = "LICENCE.cypress-rpidistro"
 
 SRC_URI = "git://github.com/RPi-Distro/bluez-firmware"
-SRCREV = "ade2bae1aaaebede09abb8fb546f767a0e4c7804"
+SRCREV = "96eefffcccc725425fd83be5e0704a5c32b79e54"
 PV = "0.0+git${SRCPV}"
 
 S = "${WORKDIR}/git"
