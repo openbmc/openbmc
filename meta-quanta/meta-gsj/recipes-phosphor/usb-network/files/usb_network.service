@@ -1,0 +1,9 @@
+[Unit]
+Description=enable usb network
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c '/usr/sbin/usb_network.sh'
+
+[Install]
+WantedBy=multi-user.target
