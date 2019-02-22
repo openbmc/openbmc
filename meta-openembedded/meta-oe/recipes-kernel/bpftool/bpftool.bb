@@ -14,6 +14,8 @@ EXTRA_OEMAKE = "-C ${S}/tools/bpf/bpftool O=${B} CROSS=${TARGET_PREFIX} CC="${CC
 
 do_configure[depends] += "virtual/kernel:do_shared_workdir"
 
+COMPATIBLE_HOST_libc-musl = 'null'
+
 do_compile() {
     oe_runmake
 }

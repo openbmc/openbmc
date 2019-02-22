@@ -1,0 +1,30 @@
+From d4f73b037d11d20f080e74c05df28853fb833075 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 7 Dec 2018 22:59:47 -0800
+Subject: [PATCH] Do not set Wno-unused-but-set-variable
+
+This is gcc specific warning, not implemented by  pretending to be  gcc
+like compilers e.g. clang.
+
+We will pass this option from recipe
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ m4/compiler_warnings.m4 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/m4/compiler_warnings.m4 b/m4/compiler_warnings.m4
+index f498a28..e65e97f 100644
+--- a/m4/compiler_warnings.m4
++++ b/m4/compiler_warnings.m4
+@@ -11,7 +11,7 @@ if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
+ 		      -Wdeclaration-after-statement -Wstrict-prototypes \
+ 		      -Wno-unused-parameter -Wno-sign-compare \
+ 		      -Wno-deprecated-declarations \
+-		      -Wno-unused-but-set-variable -Wformat-security; do
++		      -Wno-unused -Wformat-security; do
+ 		SAVE_CFLAGS="$CFLAGS"
+ 		CFLAGS="$CFLAGS $option"
+ 		AC_MSG_CHECKING([whether gcc understands $option])

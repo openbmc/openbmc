@@ -1,5 +1,6 @@
 SUMMARY = "Meta-oe ptest packagegroups"
 
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 inherit packagegroup
 
 PROVIDES = "${PACKAGES}"
@@ -21,7 +22,7 @@ PACKAGES = ' \
     packagegroup-meta-oe-test \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "packagegroup-meta-oe-gnome", "", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "packagegroup-meta-oe-graphics", "", d)} \
-    ${@bb.utils.contains("DISTRO_FEATURES", "ptest", "packagegroup-meta-oe-ptest", "", d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "ptest", "packagegroup-meta-oe-ptest-packages", "", d)} \
 '
 
 RDEPENDS_packagegroup-meta-oe = "\
@@ -41,7 +42,7 @@ RDEPENDS_packagegroup-meta-oe = "\
     packagegroup-meta-oe-test \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "packagegroup-meta-oe-gnome", "", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "packagegroup-meta-oe-graphics", "", d)} \
-    ${@bb.utils.contains("DISTRO_FEATURES", "ptest", "packagegroup-meta-oe-ptest", "", d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "ptest", "packagegroup-meta-oe-ptest-packages", "", d)} \
 "
 
 RDEPENDS_packagegroup-meta-oe-benchmarks = "\
@@ -51,6 +52,12 @@ RDEPENDS_packagegroup-meta-oe-benchmarks = "\
     nbench-byte tinymembench \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11 wayland opengl", "glmark2", "", d)} \
 "
+
+RDEPENDS_packagegroup-meta-oe-benchmarks_remove_mipsarch = "libhugetlbfs"
+RDEPENDS_packagegroup-meta-oe-benchmarks_remove_mips64 = "tinymembench"
+RDEPENDS_packagegroup-meta-oe-benchmarks_remove_mips64el = "tinymembench"
+RDEPENDS_packagegroup-meta-oe-benchmarks_remove_riscv64 = "libhugetlbfs"
+RDEPENDS_packagegroup-meta-oe-benchmarks_remove_riscv32 = "libhugetlbfs"
 
 RDEPENDS_packagegroup-meta-oe-connectivity ="\
     gammu hostapd irssi krb5 libev libimobiledevice \
@@ -83,6 +90,11 @@ RDEPENDS_packagegroup-meta-oe-bsp ="\
     efivar flashrom lmsensors lmsensors-config \
     lsscsi nvme-cli pcmciautils pointercal \
     "
+RDEPENDS_packagegroup-meta-oe-bsp_remove_mipsarch = "efivar efibootmgr"
+RDEPENDS_packagegroup-meta-oe-bsp_remove_powerpc = "efivar efibootmgr"
+RDEPENDS_packagegroup-meta-oe-bsp_remove_riscv64 = "efivar efibootmgr"
+RDEPENDS_packagegroup-meta-oe-bsp_remove_riscv32 = "efivar efibootmgr"
+
 RDEPENDS_packagegroup-meta-oe-dbs ="\
     leveldb libdbi mariadb mariadb-native \
     mysql-python postgresql psqlodbc rocksdb soci \
@@ -105,6 +117,14 @@ RDEPENDS_packagegroup-meta-oe-devtools ="\
     xmlrpc-c yajl yasm \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "geany geany-plugins glade tk", "", d)} \
     "
+
+RDEPENDS_packagegroup-meta-oe-devtools_remove_armv5 = "uftrace nodejs"
+RDEPENDS_packagegroup-meta-oe-devtools_remove_mipsarch = "uftrace lshw"
+RDEPENDS_packagegroup-meta-oe-devtools_remove_mips64 = "nodejs"
+RDEPENDS_packagegroup-meta-oe-devtools_remove_mips64el = "nodejs"
+RDEPENDS_packagegroup-meta-oe-devtools_remove_powerpc = "android-tools breakpad uftrace lshw"
+RDEPENDS_packagegroup-meta-oe-devtools_remove_riscv64 = "uftrace lshw"
+RDEPENDS_packagegroup-meta-oe-devtools_remove_riscv32 = "uftrace lshw"
 
 RDEPENDS_packagegroup-meta-oe-extended ="\
     byacc cfengine cfengine-masterfiles cmpi-bindings \
@@ -130,6 +150,11 @@ RDEPENDS_packagegroup-meta-oe-extended ="\
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "pam-ssh-agent-auth openwsman sblim-sfcb ", "", d)} \
     ${@bb.utils.contains("BBPATH", "meta-python", "openlmi-tools", "", d)} \
     "
+RDEPENDS_packagegroup-meta-oe-extended_remove_mipsarch = "upm mraa tiptop"
+RDEPENDS_packagegroup-meta-oe-extended_remove_powerpc = "upm mraa"
+RDEPENDS_packagegroup-meta-oe-extended_remove_riscv64 = "upm mraa tiptop"
+RDEPENDS_packagegroup-meta-oe-extended_remove_riscv32 = "upm mraa tiptop"
+RDEPENDS_packagegroup-meta-oe-extended_remove_libc-musl = "lcdproc"
 
 RDEPENDS_packagegroup-meta-oe-gnome ="\
     atkmm gnome-common gnome-doc-utils-stub gtkmm \
@@ -159,6 +184,10 @@ RDEPENDS_packagegroup-meta-oe-kernel ="\
     agent-proxy bpftool broadcom-bt-firmware cpupower \
     crash ipmitool minicoredumper oprofile \
     "
+RDEPENDS_packagegroup-meta-oe-kernel_remove_libc-musl = "bpftool crash minicoredumper"
+
+RDEPENDS_packagegroup-meta-oe-kernel_remove_mips64 = "crash"
+RDEPENDS_packagegroup-meta-oe-kernel_remove_mips64el = "crash"
 
 RDEPENDS_packagegroup-meta-oe-multimedia ="\
     alsa-oss audiofile cdrkit esound id3lib \
@@ -170,6 +199,7 @@ RDEPENDS_packagegroup-meta-oe-multimedia ="\
     ${@bb.utils.contains("DISTRO_FEATURES", "pulseadio bluez4", "libmikmod", "", d)} \
     ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "libmad faad2 mpv", "", d)} \
     "
+RDEPENDS_packagegroup-meta-oe-multimedia_remove_libc-musl = "alsa-oss"
 
 RDEPENDS_packagegroup-meta-oe-navigation ="\
     geoclue geos libspatialite proj \
@@ -223,6 +253,9 @@ RDEPENDS_packagegroup-meta-oe-support ="\
     ${NE10} \
     "
 
+RDEPENDS_packagegroup-meta-oe-support_remove_arm ="numactl"
+RDEPENDS_packagegroup-meta-oe-support_remove_mipsarch_libc-glibc = "gperftools"
+
 RDEPENDS_packagegroup-meta-oe-support-egl ="\
     freerdp libnice opencv \
     "
@@ -231,23 +264,30 @@ RDEPENDS_packagegroup-meta-oe-test ="\
     catch2 cppunit cunit cxxtest evtest fb-test \
     fwts gtest pm-qa stress-ng testfloat \
     "
+RDEPENDS_packagegroup-meta-oe-test_remove_libc-musl = "pm-qa"
+RDEPENDS_packagegroup-meta-oe-test_remove_arm = "fwts"
+RDEPENDS_packagegroup-meta-oe-test_remove_mipsarch = "fwts"
+RDEPENDS_packagegroup-meta-oe-test_remove_powerpc = "fwts"
+RDEPENDS_packagegroup-meta-oe-test_remove_riscv64 = "fwts"
+RDEPENDS_packagegroup-meta-oe-test_remove_riscv32 = "fwts"
 
-RDEPENDS_packagegroup-meta-oe-ptest = "\
+RDEPENDS_packagegroup-meta-oe-ptest-packages = "\
     zeromq-ptest \
-    libxml-ptest \
-    soci-ptest \
     leveldb-ptest \
     psqlodbc-ptest \
     lua-ptest \
     protobuf-ptest \
-    libdbi-ptest \
     rsyslog-ptest \
     oprofile-ptest \
     libteam-ptest \
     uthash-ptest \
-    mcelog-ptest \
-    openldap-ptest \
     libee-ptest \
-    numactl-ptest \
     poco-ptest \
     "
+RDEPENDS_packagegroup-meta-oe-ptest-packages_append_x86 = "\
+    mcelog-ptest \
+"
+RDEPENDS_packagegroup-meta-oe-ptest-packages_append_x86-64 = "\
+    mcelog-ptest \
+"
+RDEPENDS_packagegroup-meta-oe-ptest-packages_remove_arm = "numactl-ptest"

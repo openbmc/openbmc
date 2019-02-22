@@ -25,7 +25,7 @@ ARM_INSTRUCTION_SET = "arm"
 
 SRC_URI = "http://ftp.postgresql.org/pub/source/v${PV}/${BP}.tar.bz2 \
     file://postgresql.init \
-    file://postgresql-bashprofile \
+    file://postgresql-profile \
     file://postgresql.pam \
     file://postgresql-setup \
     file://postgresql.service \
@@ -155,7 +155,7 @@ usernum = "28"
 groupnum = "28"
 USERADD_PACKAGES = "${PN}"
 USERADD_PARAM_${PN} = "-M -g postgres -o -r -d ${localstatedir}/lib/${BPN} \
-    -s /bin/bash -c 'PostgreSQL Server' -u ${usernum} postgres"
+    -s /bin/sh -c 'PostgreSQL Server' -u ${usernum} postgres"
 GROUPADD_PARAM_${PN} = "-g ${groupnum} -o -r postgres"
 
 INITSCRIPT_PACKAGES = "${PN}"
@@ -182,7 +182,7 @@ do_install_append() {
     install -m 0755 ${WORKDIR}/${BPN}-setup ${D}${bindir}/${BPN}-setup
     install -d -m 700 ${D}${localstatedir}/lib/${BPN}/data
     install -d -m 700 ${D}${localstatedir}/lib/${BPN}/backups
-    install -m 644 ${WORKDIR}/${BPN}-bashprofile ${D}${localstatedir}/lib/${BPN}/.bash_profile
+    install -m 644 ${WORKDIR}/${BPN}-profile ${D}${localstatedir}/lib/${BPN}/.profile
     chown -R postgres:postgres ${D}${localstatedir}/lib/${BPN}
     # multiple server config directory
     install -d -m 700 ${D}${sysconfdir}/default/${BPN}
@@ -222,7 +222,7 @@ RPROVIDES_${PN}-dbg += "libecpg-compat-dbg \
 
 FILES_${PN} += "${sysconfdir}/init.d/${BPN}-server \
     ${localstatedir}/lib/${BPN}/data ${localstatedir}/lib/${BPN}/backups \
-    ${localstatedir}/lib/${BPN}/.bash_profile ${sysconfdir}/default/${BPN} \
+    ${localstatedir}/lib/${BPN}/.profile ${sysconfdir}/default/${BPN} \
     ${libdir}/${BPN}/dict_snowball.so ${libdir}/${BPN}/plpgsql.so \
     ${libdir}/${BPN}/euc2004_sjis2004.so \
     ${libdir}/${BPN}/libpqwalreceiver.so \

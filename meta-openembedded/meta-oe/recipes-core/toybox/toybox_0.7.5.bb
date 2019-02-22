@@ -60,7 +60,7 @@ python do_package_prepend () {
 
     dvar = d.getVar('D')
     pn = d.getVar('PN')
-    target = "/bin/toybox"
+    target = d.expand("${base_bindir}/toybox")
 
     f = open('%s/etc/toybox.links' % (dvar), 'r')
     for alt_link_name in f:

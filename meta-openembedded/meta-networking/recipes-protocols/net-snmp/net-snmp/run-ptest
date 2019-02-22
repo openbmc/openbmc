@@ -1,4 +1,5 @@
 #!/bin/sh
 
-cd testing
+workdir=$(dirname `realpath $0`)
+cd ${workdir}/testing
 ./RUNTESTS

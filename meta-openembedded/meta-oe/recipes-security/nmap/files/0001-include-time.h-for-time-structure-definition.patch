@@ -1,0 +1,78 @@
+From c774f2b129fd5acd5647d92c57a2079ae638a62b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 20 Jan 2019 23:07:39 -0800
+Subject: [PATCH] include time.h for time structure definition
+
+Exposed by musl/clang
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ nmap_error.cc       | 1 +
+ nping/EchoServer.cc | 1 +
+ osscan.cc           | 1 +
+ osscan2.cc          | 1 +
+ service_scan.cc     | 1 +
+ 5 files changed, 5 insertions(+)
+
+diff --git a/nmap_error.cc b/nmap_error.cc
+index 19beafb..ea14e08 100644
+--- a/nmap_error.cc
++++ b/nmap_error.cc
+@@ -135,6 +135,7 @@
+ #include "xml.h"
+ 
+ #include <errno.h>
++#include <time.h>
+ 
+ extern NmapOps o;
+ 
+diff --git a/nping/EchoServer.cc b/nping/EchoServer.cc
+index 70f39b0..40cd4d6 100644
+--- a/nping/EchoServer.cc
++++ b/nping/EchoServer.cc
+@@ -137,6 +137,7 @@
+ #include "NpingOps.h"
+ #include "ProbeMode.h"
+ #include <signal.h>
++#include <time.h>
+ 
+ extern NpingOps o;
+ extern EchoServer es;
+diff --git a/osscan.cc b/osscan.cc
+index f851f60..6ae0c83 100644
+--- a/osscan.cc
++++ b/osscan.cc
+@@ -149,6 +149,7 @@
+ #  include <time.h>
+ # endif
+ #endif
++#include <time.h>
+ 
+ #include <algorithm>
+ #include <list>
+diff --git a/osscan2.cc b/osscan2.cc
+index e341947..887fbd2 100644
+--- a/osscan2.cc
++++ b/osscan2.cc
+@@ -147,6 +147,7 @@
+ 
+ #include <list>
+ #include <math.h>
++#include <time.h>
+ 
+ extern NmapOps o;
+ #ifdef WIN32
+diff --git a/service_scan.cc b/service_scan.cc
+index 9780ae3..e07b940 100644
+--- a/service_scan.cc
++++ b/service_scan.cc
+@@ -145,6 +145,7 @@
+ #include "nmap_tty.h"
+ 
+ #include <errno.h>
++#include <time.h>
+ 
+ #if HAVE_OPENSSL
+ /* OpenSSL 1.0.0 needs _WINSOCKAPI_ to be defined, otherwise it loads

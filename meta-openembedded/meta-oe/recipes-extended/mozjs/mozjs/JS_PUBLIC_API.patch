@@ -1,0 +1,37 @@
+Patch from https://bugzilla.mozilla.org/show_bug.cgi?id=1426865
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Submitted [https://bugzilla.mozilla.org/show_bug.cgi?id=1426865]
+--- a/js/public/TypeDecls.h
++++ b/js/public/TypeDecls.h
+@@ -21,22 +21,23 @@
+ #include <stdint.h>
+ 
+ #include "js-config.h"
++#include "jstypes.h"
+ 
+ struct JSContext;
+-class JSFunction;
++class JS_PUBLIC_API(JSFunction);
+ class JSObject;
+-class JSScript;
+-class JSString;
+-class JSAddonId;
++class JS_PUBLIC_API(JSScript);
++class JS_PUBLIC_API(JSString);
++class JS_PUBLIC_API(JSAddonId);
+ 
+-struct jsid;
++struct JS_PUBLIC_API(jsid);
+ 
+ namespace JS {
+ 
+ typedef unsigned char Latin1Char;
+ 
+-class Symbol;
+-class Value;
++class JS_PUBLIC_API(Symbol);
++class JS_PUBLIC_API(Value);
+ template <typename T> class Handle;
+ template <typename T> class MutableHandle;
+ template <typename T> class Rooted;

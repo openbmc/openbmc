@@ -111,6 +111,7 @@ FILES_${PN} += " \
     ${datadir}/dbus-1 \
     ${noarch_base_libdir}/udev/* \
     ${systemd_unitdir}/system \
+    ${libdir}/pppd \
 "
 
 RRECOMMENDS_${PN} += "iptables \

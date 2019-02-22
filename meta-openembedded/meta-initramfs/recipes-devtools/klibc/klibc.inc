@@ -24,6 +24,7 @@ SRC_URI = "git://git.kernel.org/pub/scm/libs/klibc/klibc.git \
            file://0001-klibc_2.0.4-add-kexec_file_load-syscall.patch \
            file://0001-klibc-add-getrandom-syscall.patch \
            file://0001-klibc-Kbuild-Accept-EXTRA_KLIBCAFLAGS.patch \
+           file://0001-Define-ulocked_-fgets-fread-fwrite-aliases.patch \
            "
 
 ARMPATCHES ?= ""
@@ -69,6 +70,7 @@ KLIBC_ARCH = "${TARGET_ARCH}"
 KLIBC_ARCH_aarch64 = "arm64"
 KLIBC_ARCH_armeb = "arm"
 KLIBC_ARCH_mipsel = "mips"
+KLIBC_ARCH_mips64el = "mips64"
 KLIBC_ARCH_x86 = "i386"
 KLIBC_ARCH_x86-64 = "x86_64"
 KLIBC_ARCH_powerpc = "ppc"
@@ -78,4 +80,6 @@ THIS_LIBKLIBC = "libklibc (= ${PV}-${PR})"
 GCCPIE ?= ""
 SECURITY_LDFLAGS = "${@'-z relro -z now -pie' if '${GCCPIE}' else ''}"
 SECURITY_LDFLAGS_mips = ""
+SECURITY_LDFLAGS_mipsel = ""
 SECURITY_LDFLAGS_mips64 = ""
+SECURITY_LDFLAGS_mips64el = ""

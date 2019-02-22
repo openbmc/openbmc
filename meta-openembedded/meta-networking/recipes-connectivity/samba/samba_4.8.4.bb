@@ -28,6 +28,7 @@ SRC_URI = "${SAMBA_MIRROR}/stable/samba-${PV}.tar.gz \
 SRC_URI_append_libc-musl = " \
            file://samba-pam.patch \
            file://samba-4.3.9-remove-getpwent_r.patch \
+           file://cmocka-uintptr_t.patch \
           "
 
 SRC_URI[md5sum] = "ca5bfbebd8d9eb95506e16594b2bbee2"

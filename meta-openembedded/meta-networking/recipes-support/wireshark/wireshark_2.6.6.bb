@@ -14,8 +14,8 @@ SRC_URI = "https://1.as.dl.wireshark.org/src/all-versions/${BP}.tar.xz \
 
 UPSTREAM_CHECK_URI = "https://1.as.dl.wireshark.org/src"
 
-SRC_URI[md5sum] = "8aa7b8c8ce0b6ce4256a081493819d6f"
-SRC_URI[sha256sum] = "a06b007e6343f148b8b93443b2fcfc9bb3204311cd268565d54d1b71660bc861"
+SRC_URI[md5sum] = "b30ba5b9b48ed2ff91c0ce357d33b46b"
+SRC_URI[sha256sum] = "487933ea075bdbb25d8df06017d9c4f49fc20eb7f6ec80af086718ed5550e863"
 
 PE = "1"
 

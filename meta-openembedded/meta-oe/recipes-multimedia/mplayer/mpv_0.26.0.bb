@@ -25,9 +25,12 @@ SRC_URI[waf.sha256sum] = "01bf2beab2106d1558800c8709bc2c8e496d3da4a2ca343fe091f2
 
 inherit waf pkgconfig pythonnative distro_features_check
 
+LUA ?= "lua"
+LUA_mips64  = ""
+LUA_aarch64  = ""
 # Note: both lua and libass are required to get on-screen-display (controls)
 PACKAGECONFIG ??= " \
-    lua \
+    ${LUA} \
     libass \
     ${@bb.utils.filter('DISTRO_FEATURES', 'wayland', d)} \
 "

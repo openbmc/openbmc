@@ -1,6 +1,6 @@
 SUMMARY = "A collection of powerful tools for manipulating EPROM load files."
 SECTION = "devel"
-LICENSE = "GPLv2"
+LICENSE = "GPLv3+ & LGPLv3+"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=8dfcbf2f0a144b97f0931b6394debea7"
 
 SRC_URI = " \

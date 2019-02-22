@@ -1,0 +1,41 @@
+From ff98a326d5faa585f0e15e51a558cc2c49aa8099 Mon Sep 17 00:00:00 2001
+From: Primoz Fiser <primoz.fiser@norik.com>
+Date: Fri, 23 Nov 2018 08:31:29 +0100
+Subject: [PATCH] Fix build on big endian architectures
+
+Signed-off-by: Primoz Fiser <primoz.fiser@norik.com>
+---
+ Common/DtaEndianFixup.h | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/Common/DtaEndianFixup.h b/Common/DtaEndianFixup.h
+index 58eb3ff..184fce0 100644
+--- a/Common/DtaEndianFixup.h
++++ b/Common/DtaEndianFixup.h
+@@ -31,12 +31,11 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
+ //TODO: add a test on the endianess of the system and define
+ //  empty macros if the system is big endian
+ #pragma once
+-#ifdef __gnu_linux__
+-#include <endian.h>
+-#if __BYTE_ORDER != __LITTLE_ENDIAN
+-#error This code does not support big endian architectures
+-#endif
+-#endif
++#if defined(__BYTE_ORDER__)&&(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
++#define SWAP16(x) x
++#define SWAP32(x) x
++#define SWAP64(x) x
++#else
+ /** change the "endianess" of a 16bit field */
+ #define SWAP16(x) ((uint16_t) ((x & 0x00ff) << 8) | ((x & 0xff00) >> 8))
+ /** change the "endianess" of a 32bit field */
+@@ -47,3 +46,5 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
+ 	((uint64_t) (SWAP32((x & 0x00000000ffffffff)) << 32) | \
+ 	((uint64_t) (SWAP32((x >> 32))) )    \
+ 	)
++
++#endif
+-- 
+2.7.4
+

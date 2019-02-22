@@ -1,0 +1,46 @@
+From 133ab27cdb17ca20ef6b0304cf30621d2bcbe757 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Thu, 31 Jan 2019 21:32:26 -0800
+Subject: [PATCH] src/Makefile: improve reproducibility
+
+Clear all_cflags, all_lflags, compiled_user
+and compiled_sys to avoid introducing build
+info to improve reproducibility as below:
+
+WARNING: vim-8.1.0347-r0 do_package_qa: QA Issue: File /work/core2-64-wrs-linux/vim/8.1.0347-r0/packages-split/vim/usr/bin/vim.vim in package contained reference to tmpdir [buildpaths]
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ src/Makefile | 14 ++++----------
+ 1 file changed, 4 insertions(+), 10 deletions(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index f2fafa4dc..7148d4bd9 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -2845,16 +2845,10 @@ auto/pathdef.c: Makefile auto/config.mk
+ 	-@echo '#include "vim.h"' >> $@
+ 	-@echo 'char_u *default_vim_dir = (char_u *)"$(VIMRCLOC)";' | $(QUOTESED) >> $@
+ 	-@echo 'char_u *default_vimruntime_dir = (char_u *)"$(VIMRUNTIMEDIR)";' | $(QUOTESED) >> $@
+-	-@echo 'char_u *all_cflags = (char_u *)"$(CC) -c -I$(srcdir) $(ALL_CFLAGS)";' | $(QUOTESED) >>  $@
+-	-@echo 'char_u *all_lflags = (char_u *)"$(CC) $(ALL_LIB_DIRS) $(LDFLAGS) -o $(VIMTARGET) $(ALL_LIBS) ";' | $(QUOTESED) >>  $@
+-	-@echo 'char_u *compiled_user = (char_u *)"' | tr -d $(NL) >> $@
+-	-@if test -n "$(COMPILEDBY)"; then \
+-		echo "$(COMPILEDBY)" | tr -d $(NL) >> $@; \
+-		else ((logname) 2>/dev/null || whoami) | tr -d $(NL) >> $@; fi
+-	-@echo '";' >> $@
+-	-@echo 'char_u *compiled_sys = (char_u *)"' | tr -d $(NL) >> $@
+-	-@if test -z "$(COMPILEDBY)"; then hostname | tr -d $(NL) >> $@; fi
+-	-@echo '";' >> $@
++	-@echo 'char_u *all_cflags = (char_u *)"";' | $(QUOTESED) >>  $@
++	-@echo 'char_u *all_lflags = (char_u *)"";' | $(QUOTESED) >>  $@
++	-@echo 'char_u *compiled_user = (char_u *)"";' >> $@
++	-@echo 'char_u *compiled_sys = (char_u *)"";' >> $@
+ 	-@sh $(srcdir)/pathdef.sh
+ 
+ GUI_GTK_RES_INPUTS = \
+-- 
+2.17.1
+

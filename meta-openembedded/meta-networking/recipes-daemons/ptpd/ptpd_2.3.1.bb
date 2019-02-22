@@ -23,6 +23,7 @@ def get_sub(d):
 
 SRC_URI = "http://downloads.sourceforge.net/project/ptpd/ptpd/${@get_sub(d)}/ptpd-${PV}.tar.gz \
            file://ptpd-use-pkgconfig.patch \
+           file://Fixed-100-CPU-using-issue-by-adding-minimum-POSIX-ti.patch \
            file://ptpd.service \
            file://ptpd.conf \
 "

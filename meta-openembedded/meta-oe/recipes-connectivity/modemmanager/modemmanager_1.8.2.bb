@@ -12,6 +12,7 @@ inherit gnomebase gettext systemd vala gobject-introspection bash-completion
 DEPENDS = "glib-2.0 libgudev dbus-glib intltool-native"
 
 SRC_URI = "http://www.freedesktop.org/software/ModemManager/ModemManager-${PV}.tar.xz \
+           file://0001-Do-not-set-Wno-unused-but-set-variable.patch \
            "
 
 SRC_URI[md5sum] = "a49c9f73e46c7b89e5efedda250d22c0"
@@ -33,6 +34,7 @@ PACKAGECONFIG[qmi] = "--with-qmi,--without-qmi,libqmi"
 EXTRA_OECONF = " \
     --with-udev-base-dir=${nonarch_base_libdir}/udev \
 "
+CFLAGS_append_toolchain-gcc = " -Wno-unused-but-set-variable"
 
 FILES_${PN} += " \
     ${datadir}/icons \
