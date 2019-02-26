@@ -62,7 +62,7 @@ def edit_content(json_file_path):
 
 def prepare_data(args):
     # attempt to get the max_log_size from the server's settings
-    max_log_size = getPayloadLimit("http://"+args.server+"/ClientPost/JSON")
+    max_log_size = getPayloadLimit("https://"+args.server+"/ClientPost/JSON")
 
     if not os.path.isfile(args.error_file):
         log.error("No data file found.")
@@ -132,9 +132,9 @@ def send_data(data, args):
     headers={'Content-type': 'application/json', 'User-Agent': "send-error-report/"+version}
 
     if args.json:
-        url = "http://"+args.server+"/ClientPost/JSON/"
+        url = "https://"+args.server+"/ClientPost/JSON/"
     else:
-        url = "http://"+args.server+"/ClientPost/"
+        url = "https://"+args.server+"/ClientPost/"
 
     req = urllib.request.Request(url, data=data, headers=headers)
     try:

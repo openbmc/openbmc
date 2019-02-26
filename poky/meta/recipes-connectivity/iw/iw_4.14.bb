@@ -12,6 +12,7 @@ DEPENDS = "libnl"
 SRC_URI = "http://www.kernel.org/pub/software/network/iw/${BP}.tar.gz \
            file://0001-iw-version.sh-don-t-use-git-describe-for-versioning.patch \
            file://separate-objdir.patch \
+           file://0001-connect-fix-parsing-of-WEP-keys.patch \
 "
 
 SRC_URI[md5sum] = "2067516ca9940fdb8c091ee3250da374"

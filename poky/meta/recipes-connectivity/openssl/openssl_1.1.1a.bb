@@ -34,6 +34,7 @@ do_configure[cleandirs] = "${B}"
 #| ./libcrypto.so: undefined reference to `setcontext'
 #| ./libcrypto.so: undefined reference to `makecontext'
 EXTRA_OECONF_append_libc-musl = " no-async"
+EXTRA_OECONF_append_libc-musl_powerpc64 = " no-asm"
 
 # This prevents openssl from using getrandom() which is not available on older glibc versions
 # (native versions can be built with newer glibc, but then relocated onto a system with older glibc)
@@ -154,6 +155,8 @@ do_install_append_class-nativesdk () {
 	sed 's|/usr/lib/ssl/|/usr/lib/ssl-1.1/|g' -i ${D}${SDKPATHNATIVE}/environment-setup.d/openssl.sh
 }
 
+PTEST_BUILD_HOST_FILES += "configdata.pm"
+PTEST_BUILD_HOST_PATTERN = "perl_version ="
 do_install_ptest () {
 	# Prune the build tree
 	rm -f ${B}/fuzz/*.* ${B}/test/*.*
@@ -201,3 +204,7 @@ RREPLACES_openssl-conf = "openssl10-conf"
 RCONFLICTS_openssl-conf = "openssl10-conf"
 
 BBCLASSEXTEND = "native nativesdk"
+
+inherit multilib_script
+
+MULTILIB_SCRIPTS = "${PN}-bin:${bindir}/c_rehash"

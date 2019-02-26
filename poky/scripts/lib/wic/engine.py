@@ -245,9 +245,16 @@ class Disk:
         self._ptable_format = None
 
         # find parted
-        self.paths = "/bin:/usr/bin:/usr/sbin:/sbin/"
+        # read paths from $PATH environment variable
+        # if it fails, use hardcoded paths
+        pathlist = "/bin:/usr/bin:/usr/sbin:/sbin/"
+        try:
+            self.paths = os.environ['PATH'] + ":" + pathlist
+        except KeyError:
+            self.paths = pathlist
+
         if native_sysroot:
-            for path in self.paths.split(':'):
+            for path in pathlist.split(':'):
                 self.paths = "%s%s:%s" % (native_sysroot, path, self.paths)
 
         self.parted = find_executable("parted", self.paths)
@@ -331,7 +338,7 @@ class Disk:
     def copy(self, src, pnum, path):
         """Copy partition image into wic image."""
         if self.partitions[pnum].fstype.startswith('ext'):
-            cmd = "echo -e 'cd {}\nwrite {} {}' | {} -w {}".\
+            cmd = "printf 'cd {}\nwrite {} {}' | {} -w {}".\
                       format(path, src, os.path.basename(src),
                              self.debugfs, self._get_part_image(pnum))
         else: # fat

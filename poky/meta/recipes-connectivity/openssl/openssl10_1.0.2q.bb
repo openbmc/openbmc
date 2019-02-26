@@ -40,7 +40,7 @@ SRC_URI = "http://www.openssl.org/source/openssl-${PV}.tar.gz \
            file://0001-Fix-build-with-clang-using-external-assembler.patch \
            file://0001-openssl-force-soft-link-to-avoid-rare-race.patch \
            file://0001-allow-manpages-to-be-disabled.patch \
-           file://0001-fix-CVE-2018-0734.patch \
+           file://0001-Fix-BN_LLONG-breakage.patch \
            "
 
 SRC_URI_append_class-target = " \
@@ -52,8 +52,8 @@ SRC_URI_append_class-nativesdk = " \
            file://environment.d-openssl.sh \
            "
 
-SRC_URI[md5sum] = "ac5eb30bf5798aa14b1ae6d0e7da58df"
-SRC_URI[sha256sum] = "50a98e07b1a89eb8f6a99477f262df71c6fa7bef77df4dc83025a2845c827d00"
+SRC_URI[md5sum] = "7563e1ce046cb21948eeb6ba1a0eb71c"
+SRC_URI[sha256sum] = "5744cfcbcec2b1b48629f7354203bc1e5e9b5466998bbccc5b5fcde3b18eb684"
 
 S = "${WORKDIR}/openssl-${PV}"
 
@@ -82,6 +82,7 @@ CCACHE = ""
 
 TERMIO ?= "-DTERMIO"
 TERMIO_libc-musl = "-DTERMIOS"
+EXTRA_OECONF_append_libc-musl_powerpc64 = " no-asm"
 
 CFLAG = "${@oe.utils.conditional('SITEINFO_ENDIANNESS', 'le', '-DL_ENDIAN', '-DB_ENDIAN', d)} \
          ${TERMIO} ${CFLAGS} -Wall"

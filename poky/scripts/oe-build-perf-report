@@ -37,58 +37,18 @@ from buildstats import BuildStats, diff_buildstats, BSVerDiff
 scriptpath.add_oe_lib_path()
 
 from oeqa.utils.git import GitRepo, GitError
+import oeqa.utils.gitarchive as gitarchive
 
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger('oe-build-perf-report')
 
-
-# Container class for tester revisions
-TestedRev = namedtuple('TestedRev', 'commit commit_number tags')
-
-
-def get_test_runs(repo, tag_name, **kwargs):
-    """Get a sorted list of test runs, matching given pattern"""
-    # First, get field names from the tag name pattern
-    field_names = [m.group(1) for m in re.finditer(r'{(\w+)}', tag_name)]
-    undef_fields = [f for f in field_names if f not in kwargs.keys()]
-
-    # Fields for formatting tag name pattern
-    str_fields = dict([(f, '*') for f in field_names])
-    str_fields.update(kwargs)
-
-    # Get a list of all matching tags
-    tag_pattern = tag_name.format(**str_fields)
-    tags = repo.run_cmd(['tag', '-l', tag_pattern]).splitlines()
-    log.debug("Found %d tags matching pattern '%s'", len(tags), tag_pattern)
-
-    # Parse undefined fields from tag names
-    str_fields = dict([(f, r'(?P<{}>[\w\-.()]+)'.format(f)) for f in field_names])
-    str_fields['branch'] = r'(?P<branch>[\w\-.()/]+)'
-    str_fields['commit'] = '(?P<commit>[0-9a-f]{7,40})'
-    str_fields['commit_number'] = '(?P<commit_number>[0-9]{1,7})'
-    str_fields['tag_number'] = '(?P<tag_number>[0-9]{1,5})'
-    # escape parenthesis in fields in order to not messa up the regexp
-    fixed_fields = dict([(k, v.replace('(', r'\(').replace(')', r'\)')) for k, v in kwargs.items()])
-    str_fields.update(fixed_fields)
-    tag_re = re.compile(tag_name.format(**str_fields))
-
-    # Parse fields from tags
-    revs = []
-    for tag in tags:
-        m = tag_re.match(tag)
-        groups = m.groupdict()
-        revs.append([groups[f] for f in undef_fields] + [tag])
-
-    # Return field names and a sorted list of revs
-    return undef_fields, sorted(revs)
-
 def list_test_revs(repo, tag_name, verbosity, **kwargs):
     """Get list of all tested revisions"""
     valid_kwargs = dict([(k, v) for k, v in kwargs.items() if v is not None])
 
-    fields, revs = get_test_runs(repo, tag_name, **valid_kwargs)
+    fields, revs = gitarchive.get_test_runs(log, repo, tag_name, **valid_kwargs)
     ignore_fields = ['tag_number']
     if verbosity < 2:
         extra_fields = ['COMMITS', 'TEST RUNS']
@@ -132,36 +92,6 @@ def list_test_revs(repo, tag_name, verbosity, **kwargs):
         prev_commit = rev[commit_field]
 
     print_table(rows)
-
-def get_test_revs(repo, tag_name, **kwargs):
-    """Get list of all tested revisions"""
-    fields, runs = get_test_runs(repo, tag_name, **kwargs)
-
-    revs = {}
-    commit_i = fields.index('commit')
-    commit_num_i = fields.index('commit_number')
-    for run in runs:
-        commit = run[commit_i]
-        commit_num = run[commit_num_i]
-        tag = run[-1]
-        if not commit in revs:
-            revs[commit] = TestedRev(commit, commit_num, [tag])
-        else:
-            assert commit_num == revs[commit].commit_number, "Commit numbers do not match"
-            revs[commit].tags.append(tag)
-
-    # Return in sorted table
-    revs = sorted(revs.values(), key=attrgetter('commit_number'))
-    log.debug("Found %d tested revisions:\n    %s", len(revs),
-              "\n    ".join(['{} ({})'.format(rev.commit_number, rev.commit) for rev in revs]))
-    return revs
-
-def rev_find(revs, attr, val):
-    """Search from a list of TestedRev"""
-    for i, rev in enumerate(revs):
-        if getattr(rev, attr) == val:
-            return i
-    raise ValueError("Unable to find '{}' value '{}'".format(attr, val))
 
 def is_xml_format(repo, commit):
     """Check if the commit contains xml (or json) data"""
@@ -427,8 +357,8 @@ def print_html_report(data, id_comp, buildstats):
 
             # Compare buildstats
             bs_key = test + '.' + meas
-            rev = metadata['commit_num']['value']
-            comp_rev = metadata['commit_num']['value_old']
+            rev = str(metadata['commit_num']['value'])
+            comp_rev = str(metadata['commit_num']['value_old'])
             if (rev in buildstats and bs_key in buildstats[rev] and
                     comp_rev in buildstats and bs_key in buildstats[comp_rev]):
                 new_meas['buildstats'] = BSSummary(buildstats[comp_rev][bs_key],
@@ -512,10 +442,10 @@ def auto_args(repo, args):
 
         key = split[0]
         val = split[1].strip()
-        if key == 'hostname':
+        if key == 'hostname' and not args.hostname:
             log.debug("Using hostname %s", val)
             args.hostname = val
-        elif key == 'branch':
+        elif key == 'branch' and not args.branch:
             log.debug("Using branch %s", val)
             args.branch = val
 
@@ -541,7 +471,8 @@ Examine build performance test results from a Git repository"""
                        default='{hostname}/{branch}/{machine}/{commit_number}-g{commit}/{tag_number}',
                        help="Tag name (pattern) for finding results")
     group.add_argument('--hostname', '-H')
-    group.add_argument('--branch', '-B', default='master')
+    group.add_argument('--branch', '-B', default='master', help="Branch to find commit in")
+    group.add_argument('--branch2', help="Branch to find comparision revisions in")
     group.add_argument('--machine', default='qemux86')
     group.add_argument('--history-length', default=25, type=int,
                        help="Number of tested revisions to plot in html report")
@@ -577,32 +508,51 @@ def main(argv=None):
     if not args.hostname:
         auto_args(repo, args)
 
-    revs = get_test_revs(repo, args.tag_name, hostname=args.hostname,
-                         branch=args.branch, machine=args.machine)
-    if len(revs) < 2:
-        log.error("%d tester revisions found, unable to generate report",
-                  len(revs))
-        return 1
+    revs = gitarchive.get_test_revs(log, repo, args.tag_name, hostname=args.hostname,
+                                    branch=args.branch, machine=args.machine)
+    if args.branch2:
+        revs2 = gitarchive.get_test_revs(log, repo, args.tag_name, hostname=args.hostname,
+                                         branch=args.branch2, machine=args.machine)
+        if not len(revs2):
+            log.error("No revisions found to compare against")
+            return 1
+        if not len(revs):
+            log.error("No revision to report on found")
+            return 1
+    else:
+        if len(revs) < 2:
+            log.error("Only %d tester revisions found, unable to generate report" % len(revs))
+            return 1
 
     # Pick revisions
     if args.commit:
         if args.commit_number:
             log.warning("Ignoring --commit-number as --commit was specified")
-        index1 = rev_find(revs, 'commit', args.commit)
+        index1 = gitarchive.rev_find(revs, 'commit', args.commit)
     elif args.commit_number:
-        index1 = rev_find(revs, 'commit_number', args.commit_number)
+        index1 = gitarchive.rev_find(revs, 'commit_number', args.commit_number)
     else:
         index1 = len(revs) - 1
+
+    if args.branch2:
+        revs2.append(revs[index1])
+        index1 = len(revs2) - 1
+        revs = revs2
 
     if args.commit2:
         if args.commit_number2:
             log.warning("Ignoring --commit-number2 as --commit2 was specified")
-        index2 = rev_find(revs, 'commit', args.commit2)
+        index2 = gitarchive.rev_find(revs, 'commit', args.commit2)
     elif args.commit_number2:
-        index2 = rev_find(revs, 'commit_number', args.commit_number2)
+        index2 = gitarchive.rev_find(revs, 'commit_number', args.commit_number2)
     else:
         if index1 > 0:
             index2 = index1 - 1
+            # Find the closest matching commit number for comparision
+            # In future we could check the commit is a common ancestor and
+            # continue back if not but this good enough for now
+            while index2 > 0 and revs[index2].commit_number > revs[index1].commit_number:
+                index2 = index2 - 1
         else:
             log.error("Unable to determine the other commit, use "
                       "--commit2 or --commit-number2 to specify it")

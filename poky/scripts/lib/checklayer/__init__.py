@@ -196,38 +196,36 @@ def add_layer_dependencies(bblayersconf, layer, layers, logger):
     if layer_depends is None:
         return False
     else:
-        # Don't add a layer that is already present.
-        added = set()
-        output = check_command('Getting existing layers failed.', 'bitbake-layers show-layers').decode('utf-8')
-        for layer, path, pri in re.findall(r'^(\S+) +([^\n]*?) +(\d+)$', output, re.MULTILINE):
-            added.add(path)
+        add_layers(bblayersconf, layer_depends, logger)
 
-        for layer_depend in layer_depends:
-            name = layer_depend['name']
-            path = layer_depend['path']
+    return True
+
+def add_layers(bblayersconf, layers, logger):
+    # Don't add a layer that is already present.
+    added = set()
+    output = check_command('Getting existing layers failed.', 'bitbake-layers show-layers').decode('utf-8')
+    for layer, path, pri in re.findall(r'^(\S+) +([^\n]*?) +(\d+)$', output, re.MULTILINE):
+        added.add(path)
+
+    with open(bblayersconf, 'a+') as f:
+        for layer in layers:
+            logger.info('Adding layer %s' % layer['name'])
+            name = layer['name']
+            path = layer['path']
             if path in added:
-                continue
+                logger.info('%s is already in %s' % (name, bblayersconf))
             else:
                 added.add(path)
-            logger.info('Adding layer dependency %s' % name)
-            with open(bblayersconf, 'a+') as f:
                 f.write("\nBBLAYERS += \"%s\"\n" % path)
     return True
 
-def add_layer(bblayersconf, layer, layers, logger):
-    logger.info('Adding layer %s' % layer['name'])
-    with open(bblayersconf, 'a+') as f:
-        f.write("\nBBLAYERS += \"%s\"\n" % layer['path'])
-
-    return True
-
-def check_command(error_msg, cmd):
+def check_command(error_msg, cmd, cwd=None):
     '''
     Run a command under a shell, capture stdout and stderr in a single stream,
     throw an error when command returns non-zero exit code. Returns the output.
     '''
 
-    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=cwd)
     output, _ = p.communicate()
     if p.returncode:
         msg = "%s\nCommand: %s\nOutput:\n%s" % (error_msg, cmd, output.decode('utf-8'))
@@ -257,7 +255,7 @@ def get_signatures(builddir, failsafe=False, machine=None):
         os.unlink(sigs_file)
     try:
         check_command('Generating signatures failed. This might be due to some parse error and/or general layer incompatibilities.',
-                      cmd)
+                      cmd, builddir)
     except RuntimeError as ex:
         if failsafe and os.path.exists(sigs_file):
             # Ignore the error here. Most likely some recipes active

@@ -9,8 +9,12 @@ from oeqa.runtime.decorator.package import OEHasPackage
 class LogrotateTest(OERuntimeTestCase):
 
     @classmethod
+    def setUpClass(cls):
+        cls.tc.target.run('cp /etc/logrotate.d/wtmp $HOME/wtmp.oeqabak')
+
+    @classmethod
     def tearDownClass(cls):
-        cls.tc.target.run('rm -rf $HOME/logrotate_dir')
+        cls.tc.target.run('mv -f $HOME/wtmp.oeqabak /etc/logrotate.d/wtmp && rm -rf $HOME/logrotate_dir')
 
     @OETestID(1544)
     @OETestDepends(['ssh.SSHTest.test_ssh'])

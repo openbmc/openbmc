@@ -1,0 +1,50 @@
+Upstream-Status: Submitted
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From 674ab87b8338372338d20e21a350f88b4ff6c7c8 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Fri, 1 Feb 2019 10:59:59 +0000
+Subject: [PATCH] create_inode: fix copying large files
+
+When copying large files into a ext filesystem at mkfs time the copy fails at
+2^31 bytes in.  There are two problems:
+
+copy_file_chunk() passes an offset (off_t, 64-bit typically) to
+ext2fs_file_lseek() which expects a ext2_off_t (typedef to __u32) so the value
+is truncated. Solve by calling ext2fs_file_llseek() which takes a u64 offset
+instead.
+
+try_lseek_copy() rounds the data and hole offsets as found by lseek() to block
+boundaries, but the calculation gets truncated to 32-bits.  Solve by casting the
+32-bit blocksize to off_t to ensure this doesn't happen.
+
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+---
+ misc/create_inode.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/misc/create_inode.c b/misc/create_inode.c
+index 05aa6363..f106dcda 100644
+--- a/misc/create_inode.c
++++ b/misc/create_inode.c
+@@ -438,7 +438,7 @@ static errcode_t copy_file_chunk(ext2_filsys fs, int fd, ext2_file_t e2_file,
+ 				ptr += blen;
+ 				continue;
+ 			}
+-			err = ext2fs_file_lseek(e2_file, off + bpos,
++			err = ext2fs_file_llseek(e2_file, off + bpos,
+ 						EXT2_SEEK_SET, NULL);
+ 			if (err)
+ 				goto fail;
+@@ -481,7 +481,7 @@ static errcode_t try_lseek_copy(ext2_filsys fs, int fd, struct stat *statbuf,
+ 			return EXT2_ET_UNIMPLEMENTED;
+ 
+ 		data_blk = data & ~(fs->blocksize - 1);
+-		hole_blk = (hole + (fs->blocksize - 1)) & ~(fs->blocksize - 1);
++		hole_blk = (hole + (off_t)(fs->blocksize - 1)) & ~(off_t)(fs->blocksize - 1);
+ 		err = copy_file_chunk(fs, fd, e2_file, data_blk, hole_blk, buf,
+ 				      zerobuf);
+ 		if (err)
+-- 
+2.11.0
+

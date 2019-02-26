@@ -22,7 +22,7 @@ import scriptpath
 scriptpath.add_oe_lib_path()
 scriptpath.add_bitbake_lib_path()
 
-from checklayer import LayerType, detect_layers, add_layer, add_layer_dependencies, get_signatures
+from checklayer import LayerType, detect_layers, add_layers, add_layer_dependencies, get_signatures
 from oeqa.utils.commands import get_bb_vars
 
 PROGNAME = 'yocto-check-layer'
@@ -157,7 +157,7 @@ def main():
             layers_tested = layers_tested + 1
             continue
 
-        if any(map(lambda additional_layer: not add_layer(bblayersconf, additional_layer, dep_layers, logger),
+        if any(map(lambda additional_layer: not add_layers(bblayersconf, [additional_layer], logger),
                    additional_layers)):
             logger.info('Skipping %s due to missing additional layers.' % layer['name'])
             results[layer['name']] = None
@@ -179,7 +179,7 @@ def main():
             continue
         td['machines'] = args.machines
 
-        if not add_layer(bblayersconf, layer, dep_layers, logger):
+        if not add_layers(bblayersconf, [layer], logger):
             logger.info('Skipping %s ???.' % layer['name'])
             results[layer['name']] = None
             results_status[layer['name']] = 'SKIPPED (Unknown)'

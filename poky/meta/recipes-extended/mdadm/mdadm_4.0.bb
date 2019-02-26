@@ -24,12 +24,14 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/utils/raid/mdadm/${BPN}-${PV}.tar.xz \
            file://0001-Use-CC-to-check-for-implicit-fallthrough-warning-sup.patch \
            file://0001-use-memmove-instead-of-memcpy-on-overlapping-region.patch \
            file://0001-Disable-gcc8-warnings.patch \
+           file://mdadm.init \
+           file://mdmonitor.service \
            "
 SRC_URI[md5sum] = "2cb4feffea9167ba71b5f346a0c0a40d"
 SRC_URI[sha256sum] = "1d6ae7f24ced3a0fa7b5613b32f4a589bb4881e3946a5a2c3724056254ada3a9"
 
 CFLAGS += "-fno-strict-aliasing"
-inherit autotools-brokensep
+inherit autotools-brokensep systemd
 
 EXTRA_OEMAKE = 'CHECK_RUN_DIR=0 CXFLAGS="${CFLAGS}"'
 # PPC64 and MIPS64 uses long long for u64 in the kernel, but powerpc's asm/types.h
@@ -51,7 +53,17 @@ do_install() {
 	autotools_do_install
 }
 
-inherit ptest
+do_install_append() {
+    install -d ${D}/${sysconfdir}/
+    install -m 644 ${S}/mdadm.conf-example ${D}${sysconfdir}/mdadm.conf
+    install -d ${D}/${systemd_unitdir}/system
+    install -m 644 ${S}/systemd/mdmonitor.service ${D}/${systemd_unitdir}/system
+    install -d ${D}/${sysconfdir}/init.d
+    install -m 755 ${WORKDIR}/mdadm.init    ${D}${sysconfdir}/init.d/mdmonitor
+}
+
+SYSTEMD_SERVICE_${PN} = "mdmonitor.service"
+SYSTEMD_AUTO_ENABLE = "disable"
 
 do_compile_ptest() {
 	oe_runmake test
@@ -67,6 +79,7 @@ do_install_ptest() {
 		install -D -m 755 $prg ${D}${PTEST_PATH}/
 	done
 }
+
 RDEPENDS_${PN}-ptest += "bash"
 RRECOMMENDS_${PN}-ptest += " \
     coreutils \

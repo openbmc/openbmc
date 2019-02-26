@@ -131,8 +131,8 @@ if [ -z "$ALL_PROXY" ]; then
 fi
 
 # Connect directly to hosts in NO_PROXY
-for H in ${NO_PROXY//,/ }; do
-	if match_host $1 $H; then
+for H in "${NO_PROXY//,/ }"; do
+	if match_host $1 "$H"; then
 		exec $SOCAT STDIO $METHOD
 	fi
 done

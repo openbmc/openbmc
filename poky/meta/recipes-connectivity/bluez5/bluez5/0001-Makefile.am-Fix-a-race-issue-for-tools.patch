@@ -1,0 +1,32 @@
+From 048e1844092cb4b3afd23f16fc2cc70dd2e122b7 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Mon, 24 Dec 2018 17:57:14 -0800
+Subject: [PATCH] Makefile.am: Fix a race issue for tools
+
+Fixed:
+cp ../bluez-5.50/tools/hid2hci.rules tools/97-hid2hci.rules
+cp: cannot create regular file tools/97-hid2hci.rules: No such file or directory
+make[1]: *** [tools/97-hid2hci.rules] Error 1
+
+Upstream-Status: Submitted[https://www.spinics.net/lists/linux-bluetooth/msg78361.html]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile.am b/Makefile.am
+index 6d1ff11..35a01f2 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -504,6 +504,7 @@ src/builtin.h: src/genbuiltin $(builtin_sources)
+ 	$(AM_V_GEN)$(srcdir)/src/genbuiltin $(builtin_modules) > $@
+ 
+ tools/%.rules:
++	[ -e tools ] || $(MKDIR_P) tools
+ 	$(AM_V_GEN)cp $(srcdir)/$(subst 97-,,$@) $@
+ 
+ $(lib_libbluetooth_la_OBJECTS): $(local_headers)
+-- 
+2.10.2
+

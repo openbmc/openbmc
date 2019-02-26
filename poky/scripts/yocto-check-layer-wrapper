@@ -30,7 +30,9 @@ cd $base_dir
 
 build_dir=$(mktemp -p $base_dir -d -t build-XXXX)
 
-source oe-init-build-env $build_dir
+this_dir=$(dirname $(readlink -f $0))
+
+source $this_dir/../oe-init-build-env $build_dir
 if [[ $output_log != '' ]]; then
 	yocto-check-layer -o "$output_log" "$*"
 else

@@ -509,6 +509,11 @@ def _extract_source(srctree, keep_temp, devbranch, sync, config, basepath, works
             if not 'flag' in event:
                 if event['op'].startswith(('_append[', '_prepend[')):
                     extra_overrides.append(event['op'].split('[')[1].split(']')[0])
+        # We want to remove duplicate overrides. If a recipe had multiple
+        # SRC_URI_override += values it would cause mulitple instances of
+        # overrides. This doesn't play nicely with things like creating a
+        # branch for every instance of DEVTOOL_EXTRA_OVERRIDES.
+        extra_overrides = list(set(extra_overrides))
         if extra_overrides:
             logger.info('SRC_URI contains some conditional appends/prepends - will create branches to represent these')
 
@@ -769,9 +774,13 @@ def modify(args, config, basepath, workspace):
             check_commits = True
         else:
             if os.path.exists(os.path.join(srctree, '.git')):
-                # Check if it's a tree previously extracted by us
+                # Check if it's a tree previously extracted by us. This is done
+                # by ensuring that devtool-base and args.branch (devtool) exist.
+                # The check_commits logic will cause an exception if either one
+                # of these doesn't exist
                 try:
                     (stdout, _) = bb.process.run('git branch --contains devtool-base', cwd=srctree)
+                    bb.process.run('git rev-parse %s' % args.branch, cwd=srctree)
                 except bb.process.ExecutionError:
                     stdout = ''
                 if stdout:

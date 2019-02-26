@@ -263,7 +263,7 @@ class BuildStats(dict):
         """Aggregate other buildstats into this"""
         if set(self.keys()) != set(buildstats.keys()):
             raise ValueError("Refusing to aggregate buildstats, set of "
-                             "recipes is different")
+                             "recipes is different: %s" % (set(self.keys()) ^ set(buildstats.keys())))
         for pkg, data in buildstats.items():
             self[pkg].aggregate(data)
 

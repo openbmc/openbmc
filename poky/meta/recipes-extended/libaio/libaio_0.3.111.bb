@@ -20,4 +20,4 @@ do_install () {
     oe_runmake install DESTDIR=${D}
 }
 
-BBCLASSEXTEND = "nativesdk"
+BBCLASSEXTEND = "native nativesdk"

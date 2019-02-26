@@ -21,7 +21,7 @@
 #
 
 if [ -z "$ICECC_PATH" ]; then
-    ICECC_PATH=$(which icecc 2> /dev/null)
+    ICECC_PATH=$(which icecc 2> /dev/null || true)
 fi
 
 if [ -n "$ICECC_PATH" ]; then
