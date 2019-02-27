@@ -5,7 +5,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=a6a4edad4aed50f39a66d098d74b265b"
 
 SRC_URI = "git://github.com/openbmc/intel-ipmi-oem"
-SRCREV = "ba335e7173eec90fd5bea9a1f2c0accf967109f3"
+SRCREV = "c49adb702fdd6dbcc8de915c282acc4d75258a49"
 
 S = "${WORKDIR}/git"
 PV = "0.1+git${SRCPV}"
