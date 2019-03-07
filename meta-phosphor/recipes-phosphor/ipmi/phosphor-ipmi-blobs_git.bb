@@ -12,6 +12,7 @@ inherit obmc-phosphor-ipmiprovider-symlink
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "phosphor-ipmi-host"
 DEPENDS += "phosphor-logging"
+DEPENDS += "ipmi-blob-tool"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/phosphor-ipmi-blobs"
