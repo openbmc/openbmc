@@ -5,7 +5,7 @@ After=systemd-udev-settle.service
 Before=sysinit.target
 
 [Service]
-ExecStart=@SBINDIR@/rngd -f -r /dev/urandom
+ExecStart=@SBINDIR@/rngd -f -r /dev/hwrng
 SuccessExitStatus=66
 
 [Install]
