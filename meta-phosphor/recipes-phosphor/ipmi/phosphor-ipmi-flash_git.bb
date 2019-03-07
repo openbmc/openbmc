@@ -13,6 +13,7 @@ DEPENDS += "autoconf-archive-native"
 DEPENDS += "phosphor-ipmi-blobs"
 DEPENDS += "phosphor-logging"
 DEPENDS += "sdbusplus"
+DEPENDS += "ipmi-blob-tool"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/phosphor-ipmi-flash"
