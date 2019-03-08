@@ -5,7 +5,7 @@ After=host-gpio.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/sbin/power-util mb 1 on
+ExecStart=/usr/sbin/power-util mb on
 SyslogIdentifier=power-util
 
 [Install]
