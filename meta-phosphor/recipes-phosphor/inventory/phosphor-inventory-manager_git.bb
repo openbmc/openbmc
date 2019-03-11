@@ -39,3 +39,6 @@ EXTRA_OECONF = " \
         IFACE=${OBMC_INVENTORY_MGR_IFACE} \
         IFACES_PATH=${STAGING_DIR_NATIVE}${yaml_dir} \
         "
+
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[associations] = "--enable-associations, --disable-associations,nlohmann-json,"
