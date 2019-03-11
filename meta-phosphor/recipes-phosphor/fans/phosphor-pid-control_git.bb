@@ -28,6 +28,7 @@ DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-logging"
 DEPENDS += "libevdev"
 DEPENDS += "nlohmann-json"
+DEPENDS += "cli11"
 
 # We depend on this to be built first so we can build our providers.
 DEPENDS += "phosphor-ipmi-host"
