@@ -21,6 +21,7 @@ DEPENDS += " \
         phosphor-dbus-interfaces \
         phosphor-logging \
         gpioplus \
+        cli11 \
         "
 
 
