@@ -1,5 +1,5 @@
 [Unit]
-Description=Witherspoon Power Sequencer Power-on Monitor
+Description=Power Sequencer Power-on Monitor
 Wants=op-power-start@0.service
 After=op-power-start@0.service
 Wants=power-workarounds@0.service
@@ -9,5 +9,5 @@ ConditionPathExists=!/run/openbmc/chassis@0-on
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/env witherspoon-pseq-monitor -a pgood-monitor -i 5000
-SyslogIdentifier=witherspoon-pseq-monitor
+ExecStart=/usr/bin/env pseq-monitor -a pgood-monitor -i 5000
+SyslogIdentifier=pseq-monitor
