@@ -18,7 +18,7 @@ Please submit any patches against the meta-google layer to the OpenBMC gerrit ht
 
 Layer maintainer: Patrick Venture <venture@google.com>
 
-When sending patches, following [OpenBMC guidelines](https://github.com/openbmc/docs/blob/master/CONTRIBUTING.md).
+When sending patches, follow the OpenBMC guidelines.
 
 Table of Contents
 =================
