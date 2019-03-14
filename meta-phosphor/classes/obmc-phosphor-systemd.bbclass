@@ -110,7 +110,9 @@ python() {
         searchpaths = d.getVar('FILESPATH', True)
         path = bb.utils.which(searchpaths, '%s' % unit.name)
         if not os.path.isfile(path):
-            bb.fatal('Did not find unit file "%s"' % unit.name)
+            # Unit does not exist in tree. Allow it to install from repo.
+            # Return False here to indicate it does not exist.
+            return False
 
         parser = systemd_parse_unit(d, path)
         inhibit = listvar_to_list(d, 'INHIBIT_SYSTEMD_RESTART_POLICY_WARNING')
@@ -120,6 +122,7 @@ python() {
                 not parser.has_option('Service', 'Restart'):
             bb.warn('Systemd unit \'%s\' does not '
                 'have a restart policy defined.' % unit.name)
+        return True
 
 
     def add_default_subs(d, file):
@@ -134,7 +137,12 @@ python() {
                 '%s:%s:%s' % (x, d.getVar(x, True), file))
 
 
-    def add_sd_unit(d, unit, pkg):
+    def add_sd_unit(d, unit, pkg, unit_exist):
+        # Do not add unit if it does not exist in tree.
+        # It will be installed from repo.
+        if not unit_exist:
+            return
+
         name = unit.name
         unit_dir = d.getVar('systemd_system_unitdir', True)
         set_append(d, 'SRC_URI', 'file://%s' % name)
@@ -216,8 +224,8 @@ python() {
         svc = [x for x in svc if not x.is_instance]
 
         for unit in tmpl + svc:
-            check_sd_unit(d, unit)
-            add_sd_unit(d, unit, pkg)
+            unit_exist = check_sd_unit(d, unit)
+            add_sd_unit(d, unit, pkg, unit_exist)
             add_sd_user(d, unit.name, pkg)
         for name in listvar_to_list(d, 'SYSTEMD_ENVIRONMENT_FILE_%s' % pkg):
             add_env_file(d, name, pkg)
