@@ -12,4 +12,4 @@ DEPENDS += "autoconf-archive-native"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/ipmi-blob-tool"
-SRCREV = "1681f7ff9fe112a0c3c318d562f4b46489eea02c"
+SRCREV = "a8356420078bb7e7580fe6c42818e20203c7cbfc"
