@@ -13707,7 +13707,7 @@
                             </para></listitem>
                         <listitem><para><emphasis><filename>maxdate</filename> -</emphasis>
                             Apply the patch only if <filename>SRCDATE</filename>
-                            is not later than <filename>mindate</filename>.
+                            is not later than <filename>maxdate</filename>.
                             </para></listitem>
                         <listitem><para><emphasis><filename>minrev</filename> -</emphasis>
                             Apply the patch only if <filename>SRCREV</filename>
