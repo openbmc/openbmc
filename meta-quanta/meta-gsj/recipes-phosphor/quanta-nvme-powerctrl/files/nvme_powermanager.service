@@ -1,0 +1,12 @@
+[Unit]
+Description=SSD NVME Power Manager
+Wants=org.openbmc.records.events.service
+After=org.openbmc.records.events.service nvme_gpio.service xyz.openbmc_project.nvme.manager.service
+
+[Service]
+ExecStart=/usr/bin/nvme_powermanager.sh
+Restart=always
+
+
+[Install]
+WantedBy=obmc-standby.target
