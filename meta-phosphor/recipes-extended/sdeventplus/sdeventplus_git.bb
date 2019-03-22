@@ -10,6 +10,7 @@ inherit autotools pkgconfig
 
 DEPENDS += " \
         autoconf-archive-native \
+        stdplus \
         systemd \
         "
 
