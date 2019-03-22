@@ -6,14 +6,14 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=b1beb00e508e89da1ed2a541934f28c0"
 
 inherit autotools pkgconfig
-inherit obmc-phosphor-dbus-service
+inherit systemd
 
 PV = "1.0+git${SRCPV}"
 
 KCS_DEVICE ?= "ipmi-kcs3"
 
-DBUS_SERVICE_${PN} = "org.openbmc.HostIpmi.service"
-SYSTEMD_SUBSTITUTIONS += "KCS_DEVICE:${KCS_DEVICE}:org.openbmc.HostIpmi.service"
+SYSTEMD_SERVICE_${PN} = " ${PN}@${KCS_DEVICE}.service "
+FILES_${PN} += " ${systemd_system_unitdir}/${PN}@.service "
 
 PROVIDES += "virtual/obmc-host-ipmi-hw"
 RPROVIDES_${PN} += "virtual-obmc-host-ipmi-hw"
@@ -30,7 +30,7 @@ DEPENDS += " \
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/kcsbridge.git"
-SRCREV = "9ce5a9a0ba3fc08bf8f44f0582ea6df5819c09f3"
+SRCREV = "87e8e61c83da593a1cc271ab511313b14a321bfe"
 
 # This is how linux-libc-headers says to include custom uapi headers
 CFLAGS_append = " -I ${STAGING_KERNEL_DIR}/include/uapi"
