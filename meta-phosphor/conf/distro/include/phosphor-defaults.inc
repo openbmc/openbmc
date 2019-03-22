@@ -103,7 +103,6 @@ VIRTUAL-RUNTIME_obmc-dump-manager ?= "phosphor-debug-collector-manager"
 VIRTUAL-RUNTIME_obmc-dump-monitor ?= "phosphor-debug-collector-monitor"
 
 PREFERRED_PROVIDER_virtual/obmc-system-mgmt ?= "obmc-phosphor-sysd"
-PREFERRED_PROVIDER_virtual/obmc-wsgihost ?= "phosphor-gevent"
 
 # phosphor-hwmon-config
 #

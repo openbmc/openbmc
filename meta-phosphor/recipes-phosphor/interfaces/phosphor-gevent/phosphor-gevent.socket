@@ -1,8 +1,0 @@
-[Unit]
-Description=Phosphor Webserver socket
-
-[Socket]
-ListenStream=443
-
-[Install]
-WantedBy=sockets.target
