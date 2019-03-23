@@ -40,21 +40,8 @@ DEPENDS += " \
     sdbus++-native \
 "
 
-RDEPENDS_${PN}-version += " \
-    phosphor-logging \
-    phosphor-dbus-interfaces \
-    sdbusplus \
-"
-RDEPENDS_${PN}-download-mgr += " \
-    phosphor-logging \
-    phosphor-dbus-interfaces \
-    sdbusplus \
-"
 RDEPENDS_${PN}-updater += " \
     bash \
-    phosphor-logging \
-    phosphor-dbus-interfaces \
-    sdbusplus \
     virtual-obmc-image-manager \
 "
 EXTRA_OECONF += " \

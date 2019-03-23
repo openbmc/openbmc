@@ -22,6 +22,7 @@ SRCREV = "e3eeef45a722b57d4c3bb379df165e0bd14993bd"
 
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus"
+DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "phosphor-logging"
 DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "libevdev"

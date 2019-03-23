@@ -28,18 +28,7 @@ DEPENDS += "sdbusplus sdbusplus-native"
 DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "libevdev"
 DEPENDS += "phosphor-logging"
-
-RDEPENDS_${PN}-monitor += " \
-    libsystemd \
-    libevdev \
-    phosphor-logging \
-"
-RDEPENDS_${PN}-presence += " \
-    libsystemd \
-    libevdev \
-    phosphor-logging \
-    sdbusplus \
-"
+DEPENDS += "systemd"
 
 SYSTEMD_SERVICE_${PN}-monitor += "phosphor-gpio-monitor@.service"
 SYSTEMD_SERVICE_${PN}-presence += "phosphor-gpio-presence@.service"

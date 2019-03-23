@@ -23,8 +23,6 @@ DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
 DEPENDS += "phosphor-logging"
 DEPENDS += "libcereal"
 
-RDEPENDS_${PN} += "sdbusplus phosphor-dbus-interfaces"
-
 S = "${WORKDIR}/git"
 SRC_URI += "file://merge_settings.py"
 

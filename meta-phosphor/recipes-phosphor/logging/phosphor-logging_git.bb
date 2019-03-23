@@ -41,14 +41,12 @@ PACKAGE_BEFORE_PN += "${LOGGING_PACKAGES}"
 SYSTEMD_PACKAGES = "${LOGGING_PACKAGES}"
 DBUS_PACKAGES = "${LOGGING_PACKAGES}"
 
-RDEPENDS_${PN}-base += "sdbusplus phosphor-dbus-interfaces"
 FILES_${PN}-base += " \
         ${sbindir}/phosphor-log-manager \
         ${libdir}/libphosphor_logging.so.* \
 "
 DBUS_SERVICE_${PN}-base += "xyz.openbmc_project.Logging.service"
 
-RDEPENDS_phosphor-rsyslog-config += "sdbusplus phosphor-dbus-interfaces"
 DBUS_SERVICE_phosphor-rsyslog-config += "xyz.openbmc_project.Syslog.Config.service"
 FILES_phosphor-rsyslog-config += " \
         ${sbindir}/phosphor-rsyslog-conf \

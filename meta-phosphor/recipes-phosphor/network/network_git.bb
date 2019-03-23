@@ -20,12 +20,6 @@ DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
 DEPENDS += "phosphor-logging"
 DEPENDS += "libnl"
 
-RDEPENDS_${PN} += "libsystemd"
-RDEPENDS_${PN} += "sdbusplus phosphor-dbus-interfaces"
-RDEPENDS_${PN} += "phosphor-logging"
-RDEPENDS_${PN} += "libnl"
-RDEPENDS_${PN} += "libnl-genl"
-
 S = "${WORKDIR}/git"
 
 SERVICE_FILE = "xyz.openbmc_project.Network.service"

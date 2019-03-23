@@ -15,9 +15,8 @@ DEPENDS += "phosphor-logging"
 DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "boost"
 DEPENDS += "nss-pam-ldapd"
+DEPENDS += "systemd"
 PACKAGE_BEFORE_PN = "phosphor-ldap"
-RDEPENDS_${PN} += "libsystemd"
-RDEPENDS_${PN} += "phosphor-logging"
 
 inherit useradd
 

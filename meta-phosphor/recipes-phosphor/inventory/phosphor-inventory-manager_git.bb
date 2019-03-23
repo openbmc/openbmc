@@ -24,11 +24,6 @@ DEPENDS += " \
         autoconf-archive-native \
         libcereal \
         "
-RDEPENDS_${PN} += " \
-        sdbusplus \
-        phosphor-dbus-interfaces \
-        phosphor-logging \
-        "
 
 OBMC_INVENTORY_PATH="${OBMC_DBUS_PATH_ROOT}/inventory"
 OBMC_INVENTORY_MGR_IFACE="${OBMC_DBUS_IFACE_ROOT}.Inventory.Manager"

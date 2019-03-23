@@ -23,7 +23,6 @@ DEPENDS += " \
         autoconf-archive-native \
         systemd \
         "
-RDEPENDS_${PN} += "libsystemd"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/kcsbridge.git;protocol=https"

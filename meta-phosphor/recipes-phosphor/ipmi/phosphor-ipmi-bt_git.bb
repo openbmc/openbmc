@@ -16,7 +16,6 @@ RRECOMMENDS_${PN} += "phosphor-ipmi-host"
 
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "systemd"
-RDEPENDS_${PN} += "libsystemd"
 
 S = "${WORKDIR}/git"
 SRC_URI += "git://github.com/openbmc/btbridge"

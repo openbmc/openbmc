@@ -23,14 +23,10 @@ SYSTEMD_PACKAGES = "${LED_MGR_PACKAGES}"
 DEPENDS += "python-pyyaml-native"
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus sdbusplus-native"
+DEPENDS += "systemd"
 DEPENDS += "phosphor-logging"
 
 DEPENDS += "virtual/${PN}-config-native"
-RDEPENDS_${PN}-ledmanager += "libsystemd"
-RDEPENDS_${PN}-ledmanager += "phosphor-logging"
-
-RDEPENDS_${PN}-faultmonitor += "libsystemd"
-RDEPENDS_${PN}-faultmonitor += "phosphor-logging"
 
 S = "${WORKDIR}/git"
 

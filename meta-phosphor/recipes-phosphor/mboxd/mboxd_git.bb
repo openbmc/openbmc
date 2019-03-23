@@ -11,7 +11,6 @@ inherit obmc-phosphor-systemd
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "systemd"
 DEPENDS += "phosphor-logging"
-RDEPENDS_${PN} += "libsystemd"
 
 S = "${WORKDIR}/git"
 

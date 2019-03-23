@@ -25,7 +25,6 @@ SYSTEMD_SERVICE_${PN} += " \
         mapper-wait@.service \
         mapper-subtree-remove@.service \
         "
-RDEPENDS_libmapper += "libsystemd"
 RDEPENDS_${PN} += " \
         python-argparse \
         python-xml \
@@ -33,8 +32,6 @@ RDEPENDS_${PN} += " \
         python-pygobject \
         pyphosphor-dbus \
         pyphosphor-utils \
-        sdbusplus \
-        phosphor-logging \
         "
 SRC_URI += "git://github.com/openbmc/phosphor-objmgr"
 
