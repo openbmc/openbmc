@@ -20,12 +20,6 @@ DEPENDS += " \
         openpower-dbus-interfaces \
         "
 
-RDEPENDS_${PN} += " \
-        phosphor-logging \
-        phosphor-dbus-interfaces \
-        openpower-dbus-interfaces \
-        "
-
 TEMPLATE = "pcie-poweroff@.service"
 INSTANCE_FORMAT = "pcie-poweroff@{}.service"
 INSTANCES = "${@compose_list(d, 'INSTANCE_FORMAT', 'OBMC_CHASSIS_INSTANCES')}"

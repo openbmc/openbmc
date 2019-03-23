@@ -28,9 +28,6 @@ DEPENDS += " \
 
 RDEPENDS_${PN} += " \
         mtd-utils-ubifs \
-        phosphor-dbus-interfaces \
-        phosphor-logging \
-        sdbusplus \
         virtual-obmc-image-manager \
         "
 

@@ -20,13 +20,6 @@ DEPENDS += "openpower-dbus-interfaces openpower-dbus-interfaces-native"
 DEPENDS += "sdbus++-native"
 DEPENDS += "virtual/phosphor-ipmi-inventory-sel"
 
-RDEPENDS_${PN} += " \
-        sdbusplus \
-        phosphor-logging \
-        openpower-dbus-interfaces \
-        phosphor-dbus-interfaces \
-        "
-
 TARGET_CFLAGS += "-fpic"
 
 HOSTIPMI_PROVIDER_LIBRARY += "liboemhandler.so"

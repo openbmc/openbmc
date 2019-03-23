@@ -17,10 +17,6 @@ DEPENDS += " \
         autoconf-archive-native \
         sdbus++-native \
         "
-RDEPENDS_${PN} += " \
-            phosphor-logging \
-            "
-
 S = "${WORKDIR}/git"
 
 # This provides below 2 applications that are called into in case
