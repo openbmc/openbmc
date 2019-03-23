@@ -23,12 +23,6 @@ DEPENDS += " \
          sdbusplus \
          "
 
-RDEPENDS_${PN} += " \
-         phosphor-logging \
-         phosphor-dbus-interfaces \
-         sdbusplus \
-         "
-
 S = "${WORKDIR}/git"
 
 SRC_URI += "file://policyTable.json"

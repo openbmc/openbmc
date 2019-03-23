@@ -7,8 +7,6 @@ FAN_PACKAGES += " \
 
 PACKAGECONFIG += "cooling-type"
 
-RDEPENDS_phosphor-cooling-type += "libevdev"
-
 TMPL_COOLING = "phosphor-cooling-type@.service"
 INSTFMT_COOLING = "phosphor-cooling-type@{0}.service"
 COOLING_TGT = "${SYSTEMD_DEFAULT_TARGET}"

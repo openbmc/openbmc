@@ -20,12 +20,6 @@ DEPENDS += " \
          sdeventplus \
          "
 
-RDEPENDS_${PN} += " \
-         phosphor-logging \
-         phosphor-dbus-interfaces \
-         sdbusplus \
-         "
-
 CHASSIS_ON_TGT = "obmc-chassis-poweron@0.target"
 SEQ_MONITOR_SVC = "witherspoon-pseq-monitor.service"
 SEQ_MONITOR_FMT = "../${SEQ_MONITOR_SVC}:${CHASSIS_ON_TGT}.wants/${SEQ_MONITOR_SVC}"
