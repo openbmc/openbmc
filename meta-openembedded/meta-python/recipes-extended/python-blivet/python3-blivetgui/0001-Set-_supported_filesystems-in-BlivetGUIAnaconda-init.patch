@@ -1,0 +1,39 @@
+From a7b76f783608033e449ba1e33d040c2b40c01a4d Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Wed, 17 Jan 2018 10:38:18 -0800
+Subject: [PATCH] Set _supported_filesystems in BlivetGUIAnaconda init
+
+BlivetGUIAnaconda subclasses BlivetGUI, but doesn't call the
+parent class's __init__. c4b6e174 added supported_filesystems
+to BlivetGUI and set _supported_filesystems for caching during
+__init__, but this was not also added to BlivetGUIAnaconda, so
+when anything tries to use the supported_filesystems property
+of a BlivetGUIAnaconda instance, it will crash. This is causing
+all attempts to use blivet-gui in anaconda to crash since 2.1.8
+landed in Rawhide.
+
+Upstream-Status: Backport [https://github.com/storaged-project/blivet-gui]
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
+---
+ blivetgui/osinstall.py | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/blivetgui/osinstall.py b/blivetgui/osinstall.py
+index 21806ca..32ff66b 100644
+--- a/blivetgui/osinstall.py
++++ b/blivetgui/osinstall.py
+@@ -94,6 +94,9 @@ class BlivetGUIAnaconda(BlivetGUI):
+         self.builder.set_translation_domain("blivet-gui")
+         self.builder.add_from_file(locate_ui_file("blivet-gui.ui"))
+ 
++        # supported filesystems
++        self._supported_filesystems = []
++
+         # CSS styles
+         css_provider = Gtk.CssProvider()
+         css_provider.load_from_path(locate_css_file("rectangle.css"))
+-- 
+2.20.1
+

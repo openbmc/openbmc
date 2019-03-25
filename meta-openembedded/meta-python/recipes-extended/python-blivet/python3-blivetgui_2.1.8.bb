@@ -10,6 +10,7 @@ B = "${S}"
 
 SRCREV = "a4fd427ee2acc5a8f5fb030bf7816917cee63bd8"
 SRC_URI = "git://github.com/rhinstaller/blivet-gui;branch=master \
+    file://0001-Set-_supported_filesystems-in-BlivetGUIAnaconda-init.patch \
 "
 
 inherit distro_features_check
