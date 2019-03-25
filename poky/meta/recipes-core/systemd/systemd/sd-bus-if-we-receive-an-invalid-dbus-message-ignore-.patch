@@ -1,0 +1,61 @@
+Description: sd-bus: if we receive an invalid dbus message, ignore and
+ proceeed
+ .
+ dbus-daemon might have a slightly different idea of what a valid msg is
+ than us (for example regarding valid msg and field sizes). Let's hence
+ try to proceed if we can and thus drop messages rather than fail the
+ connection if we fail to validate a message.
+ .
+ Hopefully the differences in what is considered valid are not visible
+ for real-life usecases, but are specific to exploit attempts only.
+Author: Lennart Poettering <lennart@poettering.net>
+Forwarded: other,https://github.com/systemd/systemd/pull/11708/
+
+Patch from: systemd_239-7ubuntu10.8
+
+For information see:
+https://usn.ubuntu.com/3891-1/
+https://git.launchpad.net/ubuntu/+source/systemd/commit/?id=f8e75d5634904c8e672658856508c3a02f349adb
+
+CVE: CVE-2019-6454
+Upstream-Status: Backport
+
+Signed-off-by: George McCollister <george.mccollister@gmail.com>
+
+diff --git a/src/libsystemd/sd-bus/bus-socket.c b/src/libsystemd/sd-bus/bus-socket.c
+index 30d6455b6f..441b4a816f 100644
+--- a/src/libsystemd/sd-bus/bus-socket.c
++++ b/src/libsystemd/sd-bus/bus-socket.c
+@@ -1072,7 +1072,7 @@ static int bus_socket_read_message_need(sd_bus *bus, size_t *need) {
+ }
+
+ static int bus_socket_make_message(sd_bus *bus, size_t size) {
+-        sd_bus_message *t;
++        sd_bus_message *t = NULL;
+         void *b;
+         int r;
+
+@@ -1097,7 +1097,9 @@ static int bus_socket_make_message(sd_bus *bus, size_t size) {
+                                     bus->fds, bus->n_fds,
+                                     NULL,
+                                     &t);
+-        if (r < 0) {
++        if (r == -EBADMSG)
++                log_debug_errno(r, "Received invalid message from connection %s, dropping.", strna(bus->description));
++        else if (r < 0) {
+                 free(b);
+                 return r;
+         }
+@@ -1108,7 +1110,8 @@ static int bus_socket_make_message(sd_bus *bus, size_t size) {
+         bus->fds = NULL;
+         bus->n_fds = 0;
+
+-        bus->rqueue[bus->rqueue_size++] = t;
++        if (t)
++                bus->rqueue[bus->rqueue_size++] = t;
+
+         return 1;
+ }
+--
+2.17.1
+

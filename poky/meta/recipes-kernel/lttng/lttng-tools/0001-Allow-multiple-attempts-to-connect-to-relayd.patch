@@ -16,17 +16,17 @@ Signed-off-by: Mikael Beckius <mikael.beckius@windriver.com>
 Signed-off-by: He Zhe <zhe.he@windriver.com>
 Upstream-Status: Pending
 ---
- src/bin/lttng-sessiond/cmd.c |    8 --------
+ src/bin/lttng-sessiond/cmd.c | 8 --------
  1 file changed, 8 deletions(-)
 
 diff --git a/src/bin/lttng-sessiond/cmd.c b/src/bin/lttng-sessiond/cmd.c
-index 73b4ce3..36f62ee 100644
+index cf30b8e..cc41a48 100644
 --- a/src/bin/lttng-sessiond/cmd.c
 +++ b/src/bin/lttng-sessiond/cmd.c
-@@ -689,14 +689,6 @@ close_sock:
- 	free(rsock);
+@@ -945,14 +945,6 @@ static int send_consumer_relayd_socket(enum lttng_domain_type domain,
+ 	 */
  
- error:
+ close_sock:
 -	if (ret != LTTNG_OK) {
 -		/*
 -		 * The consumer output for this session should not be used anymore
@@ -35,9 +35,8 @@ index 73b4ce3..36f62ee 100644
 -		 */
 -		consumer->enabled = 0;
 -	}
- 	return ret;
- }
+ 	(void) relayd_close(rsock);
+ 	free(rsock);
  
 -- 
-1.7.9.5
-
+2.17.1

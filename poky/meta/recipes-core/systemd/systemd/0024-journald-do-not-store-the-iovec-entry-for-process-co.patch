@@ -1,4 +1,4 @@
-From fe19f5a9d0d8b9977e9507a9b66c3cc66744cd38 Mon Sep 17 00:00:00 2001
+From 9cb07e7d82c7c4f28bbaa1478e1387e8ea3d03dd Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
 Date: Wed, 5 Dec 2018 18:38:39 +0100
 Subject: [PATCH] journald: do not store the iovec entry for process
@@ -16,6 +16,10 @@ journal_file_append_entry() returns -E2BIG.
 
 Patch backported from systemd master at
 084eeb865ca63887098e0945fb4e93c852b91b0f.
+
+CVE: CVE-2018-16864
+Upstream-Status: Backport
+Signed-off-by: Marcus Cooper <marcusc@axis.com>
 ---
  src/basic/io-util.c           | 10 ++++++++++
  src/basic/io-util.h           |  2 ++

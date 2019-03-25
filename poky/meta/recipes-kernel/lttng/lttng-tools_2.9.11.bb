@@ -34,8 +34,8 @@ SRC_URI = "https://lttng.org/files/lttng-tools/lttng-tools-${PV}.tar.bz2 \
            file://lttng-sessiond.service \
            "
 
-SRC_URI[md5sum] = "051224eb991aee07f8721ff1877d0b96"
-SRC_URI[sha256sum] = "77839eb6fc6c652125f08acfd9369701c2516eb05cc2084160e7efc7a3fb731c"
+SRC_URI[md5sum] = "f9c2b35810790f5bd802483eb14cb301"
+SRC_URI[sha256sum] = "2c45144acf8dc6fcd655be7370a022e9c03c8b7419af489c9c2e786a335006db"
 
 inherit autotools ptest pkgconfig useradd python3-dir manpages systemd
 
