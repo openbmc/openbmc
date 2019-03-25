@@ -1,7 +1,7 @@
 FILESEXTRAPATHS_prepend_zaius := "${THISDIR}/${PN}:"
 
-ZAIUS_CHIPS = "i2c@1e78a000/i2c-bus@40/ucd90160@64"
-ZAIUS_CHIPS += " i2c@1e78a000/i2c-bus@300/pca9541a@70/i2c-arb/hotswap@54"
+ZAIUS_CHIPS = "bus@1e78a000/i2c-bus@40/ucd90160@64"
+ZAIUS_CHIPS += " bus@1e78a000/i2c-bus@300/pca9541a@70/i2c-arb/hotswap@54"
 ZAIUS_CHIPS += " pwm-tacho-controller@1e786000"
 ZAIUS_ITEMSFMT = "ahb/apb/{0}.conf"
 
