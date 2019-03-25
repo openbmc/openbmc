@@ -3,7 +3,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 EXTRA_OECONF_append_romulus = " --enable-negative-errno-on-fail"
 
 CHIPS = " \
-        i2c@1e78a000/i2c-bus@440/w83773g@4c \
+        bus@1e78a000/i2c-bus@440/w83773g@4c \
         pwm-tacho-controller@1e786000 \
         "
 ITEMSFMT = "ahb/apb/{0}.conf"
