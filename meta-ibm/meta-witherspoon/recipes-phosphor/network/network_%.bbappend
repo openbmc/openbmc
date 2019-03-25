@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/network:"
 SRC_URI += "file://ncsi-netlink.service"
 SYSTEMD_SERVICE_${PN} += "ncsi-netlink.service"
 
