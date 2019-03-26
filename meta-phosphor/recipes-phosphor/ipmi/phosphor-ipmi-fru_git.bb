@@ -23,6 +23,7 @@ DEPENDS += " \
         phosphor-mapper \
         autoconf-archive-native \
         phosphor-logging \
+        cli11 \
         "
 
 RDEPENDS_${PN} += " \
