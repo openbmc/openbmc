@@ -7,7 +7,6 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 inherit flto-automake pkgconfig
-inherit pythonnative
 
 inherit phosphor-pid-control
 inherit obmc-phosphor-ipmiprovider-symlink
@@ -22,8 +21,6 @@ SRCREV = "e3eeef45a722b57d4c3bb379df165e0bd14993bd"
 # sensors then it may be prudent to wait for all of them.
 
 DEPENDS += "autoconf-archive-native"
-DEPENDS += "python-pyyaml-native"
-DEPENDS += "python-mako-native"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-logging"
 DEPENDS += "libevdev"
