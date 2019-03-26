@@ -23,14 +23,13 @@ SRCREV = "e3eeef45a722b57d4c3bb379df165e0bd14993bd"
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-logging"
+DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "libevdev"
 DEPENDS += "nlohmann-json"
 DEPENDS += "cli11"
 
 # We depend on this to be built first so we can build our providers.
 DEPENDS += "phosphor-ipmi-host"
-
-RDEPENDS_${PN} += "sdbusplus phosphor-dbus-interfaces"
 
 FILES_${PN} = "${sbindir}/swampd ${sbindir}/setsensor"
 
