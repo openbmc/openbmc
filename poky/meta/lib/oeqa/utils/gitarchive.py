@@ -80,6 +80,8 @@ def git_commit_data(repo, data_dir, branch, message, exclude, notes, log):
 
         # Create new commit object from the tree
         parent = repo.rev_parse(branch)
+        if not parent:
+            parent = repo.rev_parse("origin/" + branch)
         git_cmd = ['commit-tree', tree, '-m', message]
         if parent:
             git_cmd += ['-p', parent]
@@ -93,8 +95,6 @@ def git_commit_data(repo, data_dir, branch, message, exclude, notes, log):
 
         # Update branch head
         git_cmd = ['update-ref', 'refs/heads/' + branch, commit]
-        if parent:
-            git_cmd.append(parent)
         repo.run_cmd(git_cmd)
 
         # Update current HEAD, if we're on branch 'branch'
