@@ -21,6 +21,7 @@ RDEPENDS_${PN} += "libmapper"
 RDEPENDS_${PN} += "libsystemd"
 RDEPENDS_${PN} += "sdbusplus"
 RDEPENDS_${PN} += "phosphor-dbus-interfaces"
+RDEPENDS_${PN} += "phosphor-mapper"
 
 SRC_URI += "git://github.com/openbmc/phosphor-time-manager"
 SRCREV = "6aca02e07aeb607f7f44a3381216e57c059d6900"
