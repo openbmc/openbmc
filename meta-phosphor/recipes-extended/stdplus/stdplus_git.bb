@@ -6,15 +6,11 @@ PV = "0.1+git${SRCPV}"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
-inherit autotools pkgconfig
+inherit meson pkgconfig
 
-DEPENDS += " \
-        autoconf-archive-native \
-        "
-
-EXTRA_OECONF_append += " \
-        --disable-examples \
-        --disable-tests \
+EXTRA_OEMESON = " \
+        -Dexamples=false \
+        -Dtests=disabled \
         "
 
 SRC_URI += "git://github.com/openbmc/stdplus"
