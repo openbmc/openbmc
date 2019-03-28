@@ -16,7 +16,7 @@ DEPENDS += "sdbusplus-native"
 DEPENDS += "phosphor-logging"
 DEPENDS += "phosphor-dbus-interfaces"
 RDEPENDS_${PN} += "${VIRTUAL-RUNTIME_obmc-settings-mgmt}"
-RDEPENDS_${PN} += "network"
+RDEPENDS_${PN} += "phosphor-network"
 RDEPENDS_${PN} += "phosphor-mapper"
 
 SRC_URI += "git://github.com/openbmc/phosphor-time-manager"

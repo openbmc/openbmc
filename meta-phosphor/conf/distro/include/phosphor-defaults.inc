@@ -119,7 +119,7 @@ VIRTUAL-RUNTIME_obmc-settings-mgmt ?= "phosphor-settings-manager"
 # obmc-network-manager
 #
 # Provide support for managing network
-VIRTUAL-RUNTIME_obmc-network-manager ?= "network"
+VIRTUAL-RUNTIME_obmc-network-manager ?= "phosphor-network"
 
 # Configuration overrides for phosphor-ipmi-fru.
 #
