@@ -14,7 +14,7 @@ PROVIDES += "virtual/obmc-watchdog"
 
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "cli11"
-DEPENDS += "sdbusplus sdbusplus-native"
+DEPENDS += "sdbusplus"
 DEPENDS += "sdeventplus"
 DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "phosphor-logging"
