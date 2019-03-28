@@ -30,8 +30,8 @@ DEPENDS += "virtual/${PN}-config-native"
 
 S = "${WORKDIR}/git"
 
-FILES_${PN}-ledmanager += "${sbindir}/phosphor-ledmanager"
-FILES_${PN}-faultmonitor += "${sbindir}/phosphor-fru-fault-monitor"
+FILES_${PN}-ledmanager += "${bindir}/phosphor-ledmanager"
+FILES_${PN}-faultmonitor += "${bindir}/phosphor-fru-fault-monitor"
 
 DBUS_SERVICE_${PN}-ledmanager += "xyz.openbmc_project.LED.GroupManager.service"
 
