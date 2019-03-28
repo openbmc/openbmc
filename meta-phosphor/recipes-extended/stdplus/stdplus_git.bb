@@ -18,6 +18,6 @@ EXTRA_OECONF_append += " \
         "
 
 SRC_URI += "git://github.com/openbmc/stdplus"
-SRCREV = "15982f6c0a252bc3642efb2df5d3c209e535c4fa"
+SRCREV = "1937ef65b505b1d856c74074d6042bdb336728af"
 
 S = "${WORKDIR}/git"
