@@ -33,6 +33,7 @@ RDEPENDS_${PN}-bmc-state-mgmt = " \
 SUMMARY_${PN}-chassis-state-mgmt = "Chassis state management"
 RDEPENDS_${PN}-chassis-state-mgmt = " \
         ${VIRTUAL-RUNTIME_obmc-chassis-state-manager} \
+        obmc-phosphor-power \
         "
 
 SUMMARY_${PN}-extras = "Extra features"

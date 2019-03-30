@@ -16,11 +16,3 @@ RDEPENDS_${PN} += "\
 	"
 
 SKELETON_DIR = "pytools"
-
-do_install_append() {
-	if [ -f ${S}/obmcutil-completion.sh ]
-	then
-		install -d ${D}${sysconfdir}/profile.d
-		install -m 0644 -D -t ${D}${sysconfdir}/profile.d ${S}/obmcutil-completion.sh
-	fi
-}
