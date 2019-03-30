@@ -53,14 +53,14 @@ RPROVIDES_${PN}-version += " \
     virtual-obmc-image-manager \
 "
 
-FILES_${PN}-version += "${sbindir}/phosphor-version-software-manager ${exec_prefix}/lib/tmpfiles.d/software.conf"
-FILES_${PN}-download-mgr += "${sbindir}/phosphor-download-manager"
+FILES_${PN}-version += "${bindir}/phosphor-version-software-manager ${exec_prefix}/lib/tmpfiles.d/software.conf"
+FILES_${PN}-download-mgr += "${bindir}/phosphor-download-manager"
 FILES_${PN}-updater += " \
-    ${sbindir}/phosphor-image-updater \
-    ${sbindir}/obmc-flash-bmc \
+    ${bindir}/phosphor-image-updater \
+    ${bindir}/obmc-flash-bmc \
     "
 FILES_${PN}-sync += " \
-    ${sbindir}/phosphor-sync-software-manager \
+    ${bindir}/phosphor-sync-software-manager \
     ${sysconfdir}/synclist \
     "
 DBUS_SERVICE_${PN}-version += "xyz.openbmc_project.Software.Version.service"
@@ -76,8 +76,8 @@ SRC_URI += "file://software.conf"
 SRC_URI += "file://obmc-flash-bmc"
 
 do_install_append() {
-    install -d ${D}${sbindir}
-    install -m 0755 ${WORKDIR}/obmc-flash-bmc ${D}${sbindir}/obmc-flash-bmc
+    install -d ${D}${bindir}
+    install -m 0755 ${WORKDIR}/obmc-flash-bmc ${D}${bindir}/obmc-flash-bmc
 
     # /tmp/images is the software image upload directory.
     # It should not be deleted since it is watched by the Image Manager
