@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 S = "${WORKDIR}/git"
 SRC_URI += "git://github.com/openbmc/phosphor-buttons.git"
-SRCREV = "391a21a1bb002a62ce336bfacdd8fdf888b7909a"
+SRCREV = "69101225892575db3d29cb4cfe7683773f1e4f52"
 
 inherit cmake pkgconfig systemd
 
@@ -21,10 +21,10 @@ SYSTEMD_PACKAGES = "${BUTTON_PACKAGES}"
 PACKAGECONFIG[signals] = ",,gpioplus nlohmann-json,"
 PACKAGECONFIG[handler] = ",,,phosphor-state-manager-chassis phosphor-state-manager-host"
 
-FILES_${PN}-signals = "${sbindir}/buttons"
+FILES_${PN}-signals = "${bindir}/buttons"
 SYSTEMD_SERVICE_${PN}-signals = "xyz.openbmc_project.Chassis.Buttons.service"
 
-FILES_${PN}-handler = "${sbindir}/button-handler"
+FILES_${PN}-handler = "${bindir}/button-handler"
 SYSTEMD_SERVICE_${PN}-handler = "phosphor-button-handler.service"
 
 DEPENDS += " \
