@@ -17,11 +17,12 @@ RDEPENDS_${PN} += "iptables"
 
 SRC_URI += "git://github.com/openbmc/phosphor-net-ipmid"
 SRC_URI += "file://ipmi-net-firewall.sh"
-SRCREV = "250bf103ca5162498522a6356e734fef56cecd27"
+SRCREV = "17c17cc7caf2c1121d00eb7863c24762c636499e"
 
 S = "${WORKDIR}/git"
 
 do_install_append() {
+        install -d ${D}${sbindir}
         install -m 0755 ${WORKDIR}/ipmi-net-firewall.sh \
         ${D}${sbindir}/ipmi-net-firewall.sh
 }
