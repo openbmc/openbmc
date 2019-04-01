@@ -22,9 +22,9 @@ SRCREV = "8af90ebcc552e243ae85aa9e9da1a00fbecab56c"
 S = "${WORKDIR}/git"
 
 do_install_append() {
-        install -d ${D}${sbindir}
+        install -d ${D}${bindir}
         install -m 0755 ${WORKDIR}/ipmi-net-firewall.sh \
-        ${D}${sbindir}/ipmi-net-firewall.sh
+        ${D}${bindir}/ipmi-net-firewall.sh
 }
 
 SYSTEMD_SERVICE_${PN} = " \
