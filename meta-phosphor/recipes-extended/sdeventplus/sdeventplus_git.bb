@@ -20,6 +20,6 @@ EXTRA_OECONF_append += " \
         "
 
 SRC_URI += "git://github.com/openbmc/sdeventplus"
-SRCREV = "1e125d974ba0c5c69cbf3eeb52b1a94a34e3e243"
+SRCREV = "8ec59e6242c3c4752033ea69270e4edb2cd4caec"
 
 S = "${WORKDIR}/git"
