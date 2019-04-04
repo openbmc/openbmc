@@ -98,8 +98,6 @@ CORE_IMAGE_EXTRA_INSTALL_append = " bash \
 
 OBMC_IMAGE_EXTRA_INSTALL ?= ""
 
-do_image_complete[depends] += "obmc-phosphor-debug-tarball:do_image_complete"
-
 # The /etc/version file is misleading and not useful.  Remove it.
 # Users should instead rely on /etc/os-release.
 remove_etc_version() {
