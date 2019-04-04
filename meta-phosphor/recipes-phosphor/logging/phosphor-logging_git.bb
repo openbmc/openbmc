@@ -42,18 +42,18 @@ SYSTEMD_PACKAGES = "${LOGGING_PACKAGES}"
 DBUS_PACKAGES = "${LOGGING_PACKAGES}"
 
 FILES_${PN}-base += " \
-        ${sbindir}/phosphor-log-manager \
+        ${bindir}/phosphor-log-manager \
         ${libdir}/libphosphor_logging.so.* \
 "
 DBUS_SERVICE_${PN}-base += "xyz.openbmc_project.Logging.service"
 
 DBUS_SERVICE_phosphor-rsyslog-config += "xyz.openbmc_project.Syslog.Config.service"
 FILES_phosphor-rsyslog-config += " \
-        ${sbindir}/phosphor-rsyslog-conf \
+        ${bindir}/phosphor-rsyslog-conf \
 "
 
 SRC_URI += "git://github.com/openbmc/phosphor-logging"
-SRCREV = "e5e3a9ccd0c3d13f63e9e1a730bd3a8cb66b48dd"
+SRCREV = "e731044c79968eb867368ef9064c34c98c50872f"
 
 S = "${WORKDIR}/git"
 
