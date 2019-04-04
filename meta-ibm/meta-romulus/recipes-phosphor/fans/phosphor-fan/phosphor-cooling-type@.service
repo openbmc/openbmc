@@ -10,4 +10,4 @@ ExecStart=/usr/bin/env phosphor-cooling-type ${{OBJPATH}} ${{AIR}}
 SyslogIdentifier=phosphor-cooling-type
 
 [Install]
-RequiredBy={SYSTEMD_DEFAULT_TARGET}
+RequiredBy=multi-user.target

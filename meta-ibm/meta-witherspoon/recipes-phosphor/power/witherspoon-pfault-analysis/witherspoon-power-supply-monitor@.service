@@ -12,4 +12,4 @@ ExecStart=/usr/bin/env witherspoon-psu-monitor --path=${{DEVPATH}} --instance=${
 SyslogIdentifier=witherspoon-psu-monitor
 
 [Install]
-RequiredBy={SYSTEMD_DEFAULT_TARGET}
+RequiredBy=multi-user.target

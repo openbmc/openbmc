@@ -9,7 +9,7 @@ ENV_FILES = "obmc/sync_inventory_item/{0}"
 SYSTEMD_ENVIRONMENT_FILE_${PN} += "${@compose_list(d, 'ENV_FILES', 'ITEMS')}"
 
 TMPL = "obmc-sync-inventory-item@.service"
-TGT = "${SYSTEMD_DEFAULT_TARGET}"
+TGT = "multi-user.target"
 
 ETH_SVC = "system-chassis-motherboard-bmc-ethernet.service"
 UUID_SVC = "system-chassis-motherboard-uuid.service"

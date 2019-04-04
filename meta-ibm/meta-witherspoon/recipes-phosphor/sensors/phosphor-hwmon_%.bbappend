@@ -34,7 +34,7 @@ SYSTEMD_ENVIRONMENT_FILE_${PN} += "${@compose_list(d, 'ENVS', 'WSPOON_ITEMS')}"
 SYSTEMD_ENVIRONMENT_FILE_${PN} += "${@compose_list(d, 'ENVS', 'WSPOON_OCCITEMS')}"
 
 SYSTEMD_ENVIRONMENT_FILE_max31785-msl += "obmc/hwmon-max31785/wspoon.conf"
-SYSTEMD_LINK_max31785-msl += "../phosphor-max31785-msl@.service:${SYSTEMD_DEFAULT_TARGET}.wants/phosphor-max31785-msl@wspoon.service"
+SYSTEMD_LINK_max31785-msl += "../phosphor-max31785-msl@.service:multi-user.target.wants/phosphor-max31785-msl@wspoon.service"
 
 SYSTEMD_SERVICE_${PN} += "max31785-hwmon-helper@.service"
 
