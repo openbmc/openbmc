@@ -19,7 +19,7 @@ DEPENDS += "systemd"
 
 S = "${WORKDIR}/git"
 SRC_URI += "git://github.com/openbmc/btbridge"
-SRCREV="8fb36a936f9eb6662f0320d3c212995b8d9a7fca"
+SRCREV="bfbc29c9d292a537414d8cf8e4a78ef2ee6f07a3"
 
 # This is how linux-libc-headers says to include custom uapi headers
 CFLAGS_append = " -I ${STAGING_KERNEL_DIR}/include/uapi"
