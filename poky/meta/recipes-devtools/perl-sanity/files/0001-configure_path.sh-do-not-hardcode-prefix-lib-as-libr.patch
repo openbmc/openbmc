@@ -1,0 +1,69 @@
+From 19c1987b455998d2959a5fdf3d1ed911d35e70f2 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 2 Jan 2019 17:55:35 +0100
+Subject: [PATCH] configure_path.sh: do not hardcode $prefix/lib as library
+ path
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+---
+ cnf/configure_args.sh |  2 +-
+ cnf/configure_path.sh | 11 ++++++-----
+ 2 files changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/cnf/configure_args.sh b/cnf/configure_args.sh
+index 29ca4f5..3297fb3 100644
+--- a/cnf/configure_args.sh
++++ b/cnf/configure_args.sh
+@@ -155,7 +155,7 @@ while [ $i -le $# -o -n "$n" ]; do
+ 		help) mode="help" ;;
+ 		regen|regenerate) mode="regen" ;;
+ 		keeplog) defuser "$a" 1 ;;
+-		prefix|html[13]dir|libsdir)	defuser $a "$v" ;;
++		prefix|html[13]dir|libsdir|libdir)	defuser $a "$v" ;;
+ 		man[13]dir|otherlibsdir)	defuser $a "$v" ;;
+ 		siteprefix|sitehtml[13]dir)	defuser $a "$v" ;;
+ 		siteman[13]dir|vendorman[13]dir)defuser $a "$v" ;;
+diff --git a/cnf/configure_path.sh b/cnf/configure_path.sh
+index fe7eac7..bcba8b8 100644
+--- a/cnf/configure_path.sh
++++ b/cnf/configure_path.sh
+@@ -30,6 +30,7 @@ definst() {
+ 	define "$1" "$installpath$v"
+ }
+ 
++define libdir "$prefix/lib"
+ define sharedir "$prefix/share"
+ define html1dir "$sharedir/doc/$perlname/html"
+ define html3dir "$sharedir/doc/$perlname/html"
+@@ -38,16 +39,16 @@ define man1ext "1"
+ define man3dir "$sharedir/man/man3"
+ define man3ext "3"
+ define bin "$prefix/bin"
+-define lib "$prefix/lib"
++define lib "$libdir"
+ define scriptdir "$prefix/bin"
+ define libsdirs ' '
+-defrel privlib "$prefix/lib/$package/$version"
+-defrel archlib "$prefix/lib/$package/$version/$archname"
++defrel privlib "$libdir/$package/$version"
++defrel archlib "$libdir/$package/$version/$archname"
+ define perlpath "$prefix/bin/$perlname"
+ define d_archlib 'define'
+ 
+ define sitebin	"$prefix/bin"
+-defrel sitelib_stem "$prefix/lib/$package/site_perl"
++defrel sitelib_stem "$libdir/$package/site_perl"
+ define sitelib "$sitelib_stem/$version"
+ define sitearch "$sitelib_stem/$version/$archname"
+ define siteprefix "$prefix"
+@@ -145,7 +146,7 @@ vendortest() {
+ }
+ 
+ vendorpath vendorbin "$vendorprefix/bin"
+-vendorpath vendorlib_stem "$vendorprefix/lib/$package/vendor_perl"
++vendorpath vendorlib_stem "$libdir/$package/vendor_perl"
+ vendorpath vendorlib "$vendorlib_stem/$version"
+ vendorpath vendorarch "$vendorlib_stem/$version/$archname"
+ vendorpath vendorscript "$vendorprefix/bin"

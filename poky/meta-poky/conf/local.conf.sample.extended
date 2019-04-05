@@ -290,18 +290,18 @@
 
 # Image level user/group configuration.
 # Inherit extrausers to make the setting of EXTRA_USERS_PARAMS effective.
-#INHERIT += "extrausers"
+#IMAGE_CLASSES += "extrausers"
 # User / group settings
-# The settings are sperated by the ; character.
+# The settings are separated by the ; character.
 # Each setting is actually a command. The supported commands are useradd,
 # groupadd, userdel, groupdel, usermod and groupmod.
 #EXTRA_USERS_PARAMS = "\
-#useradd -p '' tester; \
-#groupadd developers; \
-#userdel nobody; \
-#groupdel video; \
-#groupmod -g 1020 developers; \
-#usermod -s /bin/sh tester; \
+#    useradd -p '' tester; \
+#    groupadd developers; \
+#    userdel nobody; \
+#    groupdel video; \
+#    groupmod -g 1020 developers; \
+#    usermod -s /bin/sh tester; \
 #"
 
 # Various packages dynamically add users and groups to the system at package
@@ -395,5 +395,6 @@
 #
 #DISTRO_FEATURES_append = " systemd"
 #DISTRO_FEATURES_BACKFILL_CONSIDERED += "sysvinit"
+#VIRTUAL-RUNTIME_login_manager = "shadow-base"
 #VIRTUAL-RUNTIME_init_manager = "systemd"
 #VIRTUAL-RUNTIME_initscripts = "systemd-compat-units"

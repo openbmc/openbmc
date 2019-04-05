@@ -1,6 +1,6 @@
 require newlib.inc
 
-PROVIDES += "virtual/libc virtual/${TARGET_PREFIX}libc-for-gcc virtual/libiconv virtual/libintl"
+PROVIDES += "virtual/libc virtual/libiconv virtual/libintl"
 
 do_configure() {
 	${S}/configure ${EXTRA_OECONF}

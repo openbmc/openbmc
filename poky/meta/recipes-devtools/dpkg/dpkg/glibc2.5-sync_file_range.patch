@@ -66,15 +66,18 @@ Upstream-Status: Inappropriate [everyone else builds on newer hosts :-)]
 Signed-off-by: Donn Seeley <donn.seeley@windriver.com>
 Signed-off-by: Lei Liu <lei.liu2@windriver.com>
 
+Update patch context for dpkg 1.19.4.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  src/archives.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/archives.c b/src/archives.c
-index 4b2fc92..a92b795 100644
+index 8476a5c..b05a63f 100644
 --- a/src/archives.c
 +++ b/src/archives.c
-@@ -69,7 +69,7 @@ fd_writeback_init(int fd)
+@@ -68,7 +68,7 @@ fd_writeback_init(int fd)
    /* Ignore the return code as it should be considered equivalent to an
     * asynchronous hint for the kernel, we are doing an fsync() later on
     * anyway. */
@@ -83,14 +86,14 @@ index 4b2fc92..a92b795 100644
    sync_file_range(fd, 0, 0, SYNC_FILE_RANGE_WRITE);
  #elif defined(HAVE_POSIX_FADVISE)
    posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
-@@ -1078,7 +1078,7 @@ tarobject(void *ctx, struct tar_entry *ti)
+@@ -1093,7 +1093,7 @@ tarobject(struct tar_archive *tar, struct tar_entry *ti)
    return 0;
  }
  
 -#if defined(SYNC_FILE_RANGE_WAIT_BEFORE)
 +#if defined(SYNC_FILE_RANGE_WAIT_BEFORE) && __GLIBC_PREREQ(2, 6)
  static void
- tar_writeback_barrier(struct fileinlist *files, struct pkginfo *pkg)
+ tar_writeback_barrier(struct fsys_namenode_list *files, struct pkginfo *pkg)
  {
 -- 
 2.16.2

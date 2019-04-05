@@ -27,7 +27,7 @@ SRC_URI +=  "file://libxt_fix_for_x32.patch \
              file://0001-libXt-util-don-t-link-makestrs-with-target-cflags.patch \
             "
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"
 
 EXTRA_OECONF += "--disable-xkb"
 

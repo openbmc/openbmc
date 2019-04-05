@@ -19,7 +19,9 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=2d5025d4aa3495befef8f17206a5b0a1 \
                     file://avahi-daemon/main.c;endline=21;md5=9ee77368c5407af77caaef1b07285969 \
                     file://avahi-client/client.h;endline=23;md5=f4ac741a25c4f434039ba3e18c8674cf"
 
-SRC_URI = "https://github.com/lathiat/avahi/releases/download/v${PV}/avahi-${PV}.tar.gz"
+SRC_URI = "https://github.com/lathiat/avahi/releases/download/v${PV}/avahi-${PV}.tar.gz \
+           file://fix-CVE-2017-6519.patch \
+           "
 
 UPSTREAM_CHECK_URI = "https://github.com/lathiat/avahi/releases/"
 SRC_URI[md5sum] = "d76c59d0882ac6c256d70a2a585362a6"

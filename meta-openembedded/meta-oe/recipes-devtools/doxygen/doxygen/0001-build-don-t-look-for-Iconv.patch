@@ -1,0 +1,36 @@
+From 24650b0c7db6b213a2eaa5061b75b9f1b43f1ce9 Mon Sep 17 00:00:00 2001
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Fri, 23 Nov 2018 11:44:56 +0100
+Subject: [PATCH] build: don't look for Iconv
+
+Drop the find_package() for Iconv. CMake is unable to find iconv.h in
+native build but all modern systems supply it as part of the standard
+C library. We don't need this check in meta-openembedded.
+
+Signed-off-by: Bartosz Golaszewski <brgl@bgdev.pl>
+
+Upstream-status: Inappropriate
+- upstream doxygen must build on many architectures, this change is
+  too intrusive for upstream
+---
+ CMakeLists.txt | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 45c2f2c1..22cf0144 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -92,10 +92,6 @@ if (sqlite3)
+   endif()
+ endif()
+ 
+-find_package(Iconv REQUIRED)
+-include_directories(${ICONV_INCLUDE_DIR})
+-
+-
+ #set(DOXYDOCS ${CMAKE_SOURCE_DIR}/doc CACHE INTERNAL "Path to doxygen docs")
+ set(DOXYDOCS ${PROJECT_BINARY_DIR}/doc)
+ set(ENV{DOXYGEN_DOCDIR} ${DOXYDOCS})
+-- 
+2.17.1
+

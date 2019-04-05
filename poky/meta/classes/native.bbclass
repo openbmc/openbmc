@@ -119,6 +119,9 @@ PATH_prepend = "${COREBASE}/scripts/native-intercept:"
 # reused if we manipulate the paths.
 SSTATE_SCAN_CMD ?= "${SSTATE_SCAN_CMD_NATIVE}"
 
+# No strip sysroot when DEBUG_BUILD is enabled
+INHIBIT_SYSROOT_STRIP ?= "${@oe.utils.vartrue('DEBUG_BUILD', '1', '', d)}"
+
 python native_virtclass_handler () {
     pn = e.data.getVar("PN")
     if not pn.endswith("-native"):
@@ -189,3 +192,6 @@ do_packagedata[stamp-extra-info] = ""
 do_populate_sysroot[stamp-extra-info] = ""
 
 USE_NLS = "no"
+
+RECIPERDEPTASK = "do_populate_sysroot"
+do_populate_sysroot[rdeptask] = "${RECIPERDEPTASK}"

@@ -1,0 +1,60 @@
+From bf457a83834932ba06de3528b8779a023e73fa7b Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Tue, 12 Mar 2019 16:17:29 +0800
+Subject: [PATCH] mdadm: gcc8 maybe-uninitialized/format-overflow warning
+
+while compiled with -Werror=maybe-uninitialized/-Werror=format-overflow=,
+it failed
+
+[snip]
+| Incremental.c: In function 'Incremental_container':
+| Incremental.c:1593:3: error: 'mdfd' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+| close(mdfd);
+| ^~~~~~~~~~~
+
+[snip]
+super-intel.c: In function 'apply_takeover_update':
+| super-intel.c:9615:15: error: '%d' directive writing between 1 and 11 bytes into a region of size 7 [-Werror=format-overflow=]
+| " MISSING_%d", du->index);
+| ^~
+
+Upstream-Status: Submitted [https://github.com/neilbrown/mdadm/pull/36]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ Incremental.c | 2 +-
+ super-intel.c | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Incremental.c b/Incremental.c
+index a4ff7d4..b667868 100644
+--- a/Incremental.c
++++ b/Incremental.c
+@@ -1500,7 +1500,7 @@ static int Incremental_container(struct supertype *st, char *devname,
+ 		return 0;
+ 	}
+ 	for (ra = list ; ra ; ra = ra->next) {
+-		int mdfd;
++		int mdfd = 0;
+ 		char chosen_name[1024];
+ 		struct map_ent *mp;
+ 		struct mddev_ident *match = NULL;
+diff --git a/super-intel.c b/super-intel.c
+index 10d7218..c3741ea 100644
+--- a/super-intel.c
++++ b/super-intel.c
+@@ -9612,9 +9612,9 @@ static int apply_takeover_update(struct imsm_update_takeover *u,
+ 			du->major = 0;
+ 			du->index = (i * 2) + 1;
+ 			sprintf((char *)du->disk.serial,
+-				" MISSING_%d", du->index);
++				" MISSING_%hu", du->index);
+ 			sprintf((char *)du->serial,
+-				"MISSING_%d", du->index);
++				"MISSING_%hu", du->index);
+ 			du->next = super->missing;
+ 			super->missing = du;
+ 		}
+-- 
+2.7.4
+

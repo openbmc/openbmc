@@ -1,0 +1,46 @@
+From dd353303f62d1dfe32cb000e482616b021708fbe Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Thu, 29 Nov 2018 00:47:34 -0800
+Subject: [PATCH] vsftpd: allow syscalls in the seccomp sandbox
+
+* Allow sysinfo() and getdents64 in the seccomp
+  sandbox otherwise comes below OOPS: priv_sock_get_cmd
+  as the syscall sysinfo() and getdents64 not allowed
+
+root@qemux86-64:~# tnftp 192.168.1.1
+Connected to 192.168.1.1.
+220 (vsFTPd 3.0.3)
+Name (192.168.1.1:root): anonymous
+331 Please specify the password.
+Password:
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> prompt
+Interactive mode off.
+ftp> mget small*
+OOPS: priv_sock_get_cmd
+
+Upstream-Status: Pending
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ seccompsandbox.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/seccompsandbox.c b/seccompsandbox.c
+index 2c350a9..377c50e 100644
+--- a/seccompsandbox.c
++++ b/seccompsandbox.c
+@@ -409,6 +409,8 @@ seccomp_sandbox_setup_postlogin(const struct vsf_session* p_sess)
+   allow_nr(__NR_getcwd);
+   allow_nr(__NR_chdir);
+   allow_nr(__NR_getdents);
++  allow_nr(__NR_getdents64);
++  allow_nr(__NR_sysinfo);
+   /* Misc */
+   allow_nr(__NR_umask);
+ 
+-- 
+2.17.1
+

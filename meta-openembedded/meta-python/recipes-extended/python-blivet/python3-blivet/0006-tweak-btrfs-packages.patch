@@ -1,4 +1,4 @@
-From 0659d8a85bcdd76c0b23b8b5af6958783d35ac65 Mon Sep 17 00:00:00 2001
+From 8932ae933f2b6acf5e98c9956beff69ae430eed2 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Mon, 8 May 2017 16:33:15 +0800
 Subject: [PATCH 06/11] tweak btrfs packages

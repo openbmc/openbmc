@@ -14,6 +14,7 @@ SRC_URI = "http://nchc.dl.sourceforge.net/project/${BPN}/${BPN}/${PV}/${BPN}-${P
            file://0001-ttcp-Add-printf-format-string.patch \
            file://0002-sigd-Replace-on_exit-API-with-atexit.patch \
            file://0003-mpoad-Drop-old-hack-to-compile-with-very-old-glibc.patch \
+           file://0001-IFNAMSIZ-is-defined-in-net-if.h.patch \
 "
 
 SRC_URI[md5sum] = "d49499368c3cf15f73a05d9bce8824a8"

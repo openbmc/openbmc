@@ -338,7 +338,7 @@ def check_path_length(filepath, pathname, limit):
 def get_filesystem_id(path):
     import subprocess
     try:
-        return subprocess.check_output(["stat", "-f", "-c", "%t", path]).decode('utf-8')
+        return subprocess.check_output(["stat", "-f", "-c", "%t", path]).decode('utf-8').strip()
     except subprocess.CalledProcessError:
         bb.warn("Can't get filesystem id of: %s" % path)
         return None

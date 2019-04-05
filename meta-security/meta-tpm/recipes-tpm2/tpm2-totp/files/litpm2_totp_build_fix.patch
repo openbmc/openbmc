@@ -1,0 +1,36 @@
+C99 fixes:
+
+ src/libtpm2-totp.c:172:13: error: format '%li' expects argument of type 'long int', but argument 3 has type 'size_t' {aka 'unsigned int'} [-Werror=format=]
+|          dbg("Calling Esys_GetRandom for %li bytes", SECRETLEN - *secret_size);
+
+src/tpm2-totp.c:343:23: error: format '%ld' expects argument of type 'long int', but argument 3 has type 'uint64_t' {aka 'long long unsigned int'} [-Werror=format=]
+
+Upstream-Status: Pending
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: git/src/libtpm2-totp.c
+===================================================================
+--- git.orig/src/libtpm2-totp.c
++++ git/src/libtpm2-totp.c
+@@ -169,7 +169,7 @@ tpm2totp_generateKey(uint32_t pcrs, uint
+     if (rc != TPM2_RC_INITIALIZE) chkrc(rc, goto error);
+ 
+     while (*secret_size < SECRETLEN) {
+-        dbg("Calling Esys_GetRandom for %li bytes", SECRETLEN - *secret_size);
++        dbg("Calling Esys_GetRandom for %li bytes", (long int) (SECRETLEN - *secret_size));
+         rc = Esys_GetRandom(ctx,
+                             ESYS_TR_NONE, ESYS_TR_NONE, ESYS_TR_NONE,
+                             SECRETLEN - *secret_size, &t);
+Index: git/src/tpm2-totp.c
+===================================================================
+--- git.orig/src/tpm2-totp.c
++++ git/src/tpm2-totp.c
+@@ -340,7 +340,7 @@ main(int argc, char **argv)
+                             localtime (&now));
+             chkrc(rc, exit(1));
+         }
+-        printf("%s%06ld", timestr, totp);
++        printf("%s%06ld", timestr, (long int)totp);
+         break;
+     case CMD_RESEAL:
+         rc = tpm2totp_loadKey_nv(opt.nvindex, &keyBlob, &keyBlob_size);

@@ -1,0 +1,26 @@
+From 2f74a899474f428a4a5368a94accf801c5f97ae4 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 4 Jun 2018 18:33:50 +0300
+Subject: [PATCH] ExtUtils-MakeMaker: add $(LDFLAGS) when linking binary
+ modules
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+---
+ cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Unix.pm | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Unix.pm b/cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Unix.pm
+index fe53be1..249c048 100644
+--- a/cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Unix.pm
++++ b/cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Unix.pm
+@@ -1050,7 +1050,7 @@ sub xs_make_dynamic_lib {
+     }
+ 
+     push @m, sprintf <<'MAKE', $ld_run_path_shell, $ldrun, $dlsyms_arg, $ldfrom, $self->xs_obj_opt('$@'), $libs, $exportlist;
+-	%s$(LD) %s $(LDDLFLAGS) %s %s $(OTHERLDFLAGS) %s $(MYEXTLIB) \
++	%s$(LD) %s $(LDDLFLAGS) %s %s $(LDFLAGS) $(OTHERLDFLAGS) %s $(MYEXTLIB) \
+ 	  $(PERL_ARCHIVE) %s $(PERL_ARCHIVE_AFTER) %s \
+ 	  $(INST_DYNAMIC_FIX)
+ 	$(CHMOD) $(PERM_RWX) $@

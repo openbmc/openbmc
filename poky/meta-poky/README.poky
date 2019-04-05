@@ -27,6 +27,19 @@ DISTRO = "nodistro") and contains only emulated machine support.
 For information about OpenEmbedded, see the OpenEmbedded website:
     http://www.openembedded.org/
 
+
+Contribution Guidelines
+=======================
+
+A guide to submitting patches to OpenEmbedded is available at:
+
+http://www.openembedded.org/wiki/How_to_submit_a_patch_to_OpenEmbedded
+
+There is good documentation on how to write/format patches at:
+
+https://www.openembedded.org/wiki/Commit_Patch_Message_Guidelines
+
+
 Where to Send Patches
 =====================
 

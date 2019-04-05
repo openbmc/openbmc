@@ -1,0 +1,60 @@
+From 4f2fb1e1f785bad22df8f3d96cb4792acf21f315 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Thu, 25 Oct 2018 09:57:07 +0200
+Subject: [PATCH] musl: process-util
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Pending
+
+Stolen from [1] and prettyfied slightly
+
+[1] https://github.com/voidlinux/void-packages/tree/master/srcpkgs/NetworkManager/patches
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+
+---
+ shared/systemd/src/basic/process-util.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/shared/systemd/src/basic/process-util.c b/shared/systemd/src/basic/process-util.c
+index b0afb5c..7adc8bd 100644
+--- a/shared/systemd/src/basic/process-util.c
++++ b/shared/systemd/src/basic/process-util.c
+@@ -21,6 +21,9 @@
+ #include <sys/wait.h>
+ #include <syslog.h>
+ #include <unistd.h>
++#ifndef __GLIBC__
++#include <pthread.h>
++#endif
+ #if 0 /* NM_IGNORED */
+ #if HAVE_VALGRIND_VALGRIND_H
+ #include <valgrind/valgrind.h>
+@@ -1168,11 +1171,13 @@ void reset_cached_pid(void) {
+         cached_pid = CACHED_PID_UNSET;
+ }
+ 
++#ifdef __GLIBC__
+ /* We use glibc __register_atfork() + __dso_handle directly here, as they are not included in the glibc
+  * headers. __register_atfork() is mostly equivalent to pthread_atfork(), but doesn't require us to link against
+  * libpthread, as it is part of glibc anyway. */
+ extern int __register_atfork(void (*prepare) (void), void (*parent) (void), void (*child) (void), void *dso_handle);
+ extern void* __dso_handle _weak_;
++#endif
+ 
+ pid_t getpid_cached(void) {
+         static bool installed = false;
+@@ -1201,7 +1206,11 @@ pid_t getpid_cached(void) {
+                          * only half-documented (glibc doesn't document it but LSB does — though only superficially)
+                          * we'll check for errors only in the most generic fashion possible. */
+ 
++#ifdef __GLIBC__
+                         if (__register_atfork(NULL, NULL, reset_cached_pid, __dso_handle) != 0) {
++#else
++                        if (pthread_atfork(NULL, NULL, reset_cached_pid) != 0) {
++#endif
+                                 /* OOM? Let's try again later */
+                                 cached_pid = CACHED_PID_UNSET;
+                                 return new_pid;

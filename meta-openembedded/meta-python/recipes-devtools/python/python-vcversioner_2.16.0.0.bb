@@ -9,14 +9,6 @@ SRC_URI[sha256sum] = "dae60c17a479781f44a4010701833f1829140b1eeccd258762a74974aa
 
 inherit pypi setuptools
 
-do_compile_append() {
-    ${PYTHON} setup.py -q bdist_egg --dist-dir ./
-}
-
-do_install_append() {
-    install -m 0644 ${S}/vcversioner*.egg ${D}/${PYTHON_SITEPACKAGES_DIR}/
-}
-
 RDEPENDS_${PN} += "\
     ${PYTHON_PN}-subprocess \
     "

@@ -1,7 +1,7 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17  00:00:00 2001 
 From: Benjamin Marzinski <bmarzins@redhat.com>
-Date: Fri, 17 Oct 2014 11:20:34 -0500
-Subject: [PATCH] RH: add wwids from kernel cmdline mpath.wwids with -A
+Date: Fri, 17  Oct 2014 11:20:34 -0500
+Subject: [PATCH] RH: add wwids from kernel cmdline  mpath.wwids with -A
 
 This patch adds another option to multipath, "-A", which reads
 /proc/cmdline for mpath.wwid=<WWID> options, and adds any wwids it finds
@@ -13,16 +13,22 @@ patch also execs "/sbin/multipath -A" before running multipathd in
 multipathd.service
 
 Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+
+Upstream-Status: Pending
+
+Update this patch to new version 0.8.0
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
  libmultipath/wwids.c          | 44 +++++++++++++++++++++++++++++++++++++++++++
  libmultipath/wwids.h          |  1 +
- multipath/main.c              | 10 ++++++++--
- multipath/multipath.8         |  5 ++++-
+ multipath/main.c              |  9 ++++++++-
+ multipath/multipath.8         |  3 +++
  multipathd/multipathd.service |  1 +
- 5 files changed, 58 insertions(+), 3 deletions(-)
+ 5 files changed, 57 insertions(+), 1 deletion(-)
 
 diff --git a/libmultipath/wwids.c b/libmultipath/wwids.c
-index 53e7951..39e08cd 100644
+index 53e7951..9ba9b62 100644
 --- a/libmultipath/wwids.c
 +++ b/libmultipath/wwids.c
 @@ -443,3 +443,47 @@ int op ## _wwid(const char *wwid) \
@@ -32,46 +38,46 @@ index 53e7951..39e08cd 100644
 +
 +int remember_cmdline_wwid(void)
 +{
-+	FILE *f = NULL;
-+	char buf[LINE_MAX], *next, *ptr;
-+	int ret = 0;
++       FILE *f = NULL;
++       char buf[LINE_MAX], *next, *ptr;
++       int ret = 0;
 +
-+	f = fopen("/proc/cmdline", "re");
-+	if (!f) {
-+		condlog(0, "can't open /proc/cmdline : %s", strerror(errno));
-+		return -1;
-+	}
++       f = fopen("/proc/cmdline", "re");
++       if (!f) {
++               condlog(0, "can't open /proc/cmdline : %s", strerror(errno));
++               return -1;
++       }
 +
-+	if (!fgets(buf, sizeof(buf), f)) {
-+		if (ferror(f))
-+			condlog(0, "read of /proc/cmdline failed : %s",
-+				strerror(errno));
-+		else
-+			condlog(0, "couldn't read /proc/cmdline");
-+		fclose(f);
-+		return -1;
-+	}
-+	fclose(f);
-+	next = buf;
-+	while((ptr = strstr(next, "mpath.wwid="))) {
-+		ptr += 11;
-+		next = strpbrk(ptr, " \t\n");
-+		if (next) {
-+			*next = '\0';
-+			next++;
-+		}
-+		if (strlen(ptr)) {
-+			if (remember_wwid(ptr) != 0)
-+				ret = -1;
-+		}
-+		else {
-+			condlog(0, "empty mpath.wwid kernel command line option");
-+			ret = -1;
-+		}
-+		if (!next)
-+			break;
-+	}
-+	return ret;
++       if (!fgets(buf, sizeof(buf), f)) {
++               if (ferror(f))
++                       condlog(0, "read of /proc/cmdline failed : %s",
++                               strerror(errno));
++               else
++                       condlog(0, "couldn't read /proc/cmdline");
++               fclose(f);
++               return -1;
++       }
++       fclose(f);
++       next = buf;
++       while((ptr = strstr(next, "mpath.wwid="))) {
++               ptr += 11;
++               next = strpbrk(ptr, " \t\n");
++               if (next) {
++                       *next = '\0';
++                       next++;
++               }
++               if (strlen(ptr)) {
++                       if (remember_wwid(ptr) != 0)
++                               ret = -1;
++               }
++               else {
++                       condlog(0, "empty mpath.wwid kernel command line option");
++                       ret = -1;
++               }
++               if (!next)
++                       break;
++       }
++       return ret;
 +}
 diff --git a/libmultipath/wwids.h b/libmultipath/wwids.h
 index 0c6ee54..e32a0b0 100644
@@ -86,19 +92,18 @@ index 0c6ee54..e32a0b0 100644
  enum {
  	WWID_IS_NOT_FAILED = 0,
 diff --git a/multipath/main.c b/multipath/main.c
-index 6fdde03..7bac232 100644
+index 5abb118..c751b31 100644
 --- a/multipath/main.c
 +++ b/multipath/main.c
-@@ -109,7 +109,7 @@ usage (char * progname)
- {
+@@ -134,6 +134,7 @@ usage (char * progname)
  	fprintf (stderr, VERSION_STRING);
  	fprintf (stderr, "Usage:\n");
--	fprintf (stderr, "  %s [-a|-c|-w|-W] [-d] [-r] [-i] [-v lvl] [-p pol] [-b fil] [-q] [dev]\n", progname);
+ 	fprintf (stderr, "  %s [-a|-c|-w|-W] [-d] [-r] [-i] [-v lvl] [-p pol] [-b fil] [-q] [dev]\n", progname);
 +	fprintf (stderr, "  %s [-a|-A|-c|-w|-W] [-d] [-r] [-i] [-v lvl] [-p pol] [-b fil] [-q] [dev]\n", progname);
  	fprintf (stderr, "  %s -l|-ll|-f [-v lvl] [-b fil] [-R num] [dev]\n", progname);
  	fprintf (stderr, "  %s -F [-v lvl] [-R num]\n", progname);
- 	fprintf (stderr, "  %s -t\n", progname);
-@@ -123,6 +123,8 @@ usage (char * progname)
+ 	fprintf (stderr, "  %s [-t|-T]\n", progname);
+@@ -147,6 +148,8 @@ usage (char * progname)
  		"  -f      flush a multipath device map\n"
  		"  -F      flush all multipath device maps\n"
  		"  -a      add a device wwid to the wwids file\n"
@@ -107,40 +112,31 @@ index 6fdde03..7bac232 100644
  		"  -c      check if a device should be a path in a multipath device\n"
  		"  -C      check if a multipath device has usable paths\n"
  		"  -q      allow queue_if_no_path when multipathd is not running\n"
-@@ -907,7 +909,7 @@ main (int argc, char *argv[])
- 		exit(1);
+@@ -870,7 +873,7 @@ main (int argc, char *argv[])
+ 		exit(RTVL_FAIL);
  	multipath_conf = conf;
  	conf->retrigger_tries = 0;
--	while ((arg = getopt(argc, argv, ":adcChl::FfM:v:p:b:BrR:itquUwW")) != EOF ) {
-+	while ((arg = getopt(argc, argv, ":aAdcChl::FfM:v:p:b:BrR:itquUwW")) != EOF ) {
+-	while ((arg = getopt(argc, argv, ":adcChl::FfM:v:p:b:BrR:itTquUwW")) != EOF ) {
++	while ((arg = getopt(argc, argv, ":aAdcChl::FfM:v:p:b:BrR:itTquUwW")) != EOF ) {
  		switch(arg) {
  		case 1: printf("optarg : %s\n",optarg);
  			break;
-@@ -974,6 +976,10 @@ main (int argc, char *argv[])
+@@ -937,6 +940,10 @@ main (int argc, char *argv[])
  		case 't':
- 			r = dump_config(conf);
+ 			r = dump_config(conf, NULL, NULL) ? RTVL_FAIL : RTVL_OK;
  			goto out_free_config;
 +		case 'A':
 +			if (remember_cmdline_wwid() != 0)
 +				exit(1);
 +			exit(0);
- 		case 'h':
- 			usage(argv[0]);
- 			exit(0);
+ 		case 'T':
+ 			cmd = CMD_DUMP_CONFIG;
+ 			break;
 diff --git a/multipath/multipath.8 b/multipath/multipath.8
-index 914a8cb..8c6a4c1 100644
+index 9cdd05a..1e120f3 100644
 --- a/multipath/multipath.8
 +++ b/multipath/multipath.8
-@@ -25,7 +25,7 @@ multipath \- Device mapper target autoconfig.
- .RB [\| \-b\ \c
- .IR bindings_file \|]
- .RB [\| \-d \|]
--.RB [\| \-h | \-l | \-ll | \-f | \-t | \-F | \-B | \-c | \-C | \-q | \-r | \-i | \-a | \-u | \-U | \-w | \-W \|]
-+.RB [\| \-h | \-l | \-ll | \-f | \-t | \-F | \-B | \-c | \-C | \-q | \-r | \-i | \-a | \-A | \-u | \-U | \-w | \-W \|]
- .RB [\| \-p\ \c
- .IR failover | multibus | group_by_serial | group_by_prio | group_by_node_name \|]
- .RB [\| \-R\ \c
-@@ -135,6 +135,9 @@ Add the WWID for the specified device to the WWIDs file.
+@@ -167,6 +167,9 @@ itself doesn't attempt to do I/O on the device.
  Check if the device specified in the program environment should be
  a path in a multipath device.
  .

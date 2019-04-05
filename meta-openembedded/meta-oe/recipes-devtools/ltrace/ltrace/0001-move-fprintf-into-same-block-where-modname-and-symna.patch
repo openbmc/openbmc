@@ -1,0 +1,37 @@
+From 0cad025f80cf090dc16a5b70e21477f5b08a67fd Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 20 Dec 2018 11:27:45 -0800
+Subject: [PATCH] move fprintf into same block where modname and symname are
+ computed
+
+In its current state if mod turns out to be NULL then modname and
+symname will also turn out to be NULL and fprinting them as strings will
+be problematic
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ output.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/output.c b/output.c
+index b63befe..5aada7b 100644
+--- a/output.c
++++ b/output.c
+@@ -654,12 +654,11 @@ frame_callback (Dwfl_Frame *state, void *arg)
+ 					   NULL, NULL, NULL);
+ 		symname = dwfl_module_addrinfo(mod, pc, &off, &sym,
+ 					       NULL, NULL, NULL);
++		/* This mimics the output produced by libunwind below.  */
++		fprintf(options.output, " > %s(%s+0x%" PRIx64 ") [%" PRIx64 "]\n",
++			modname, symname, off, pc);
+ 	}
+ 
+-	/* This mimics the output produced by libunwind below.  */
+-	fprintf(options.output, " > %s(%s+0x%" PRIx64 ") [%" PRIx64 "]\n",
+-		modname, symname, off, pc);
+-
+ 	/* See if we can extract the source line too and print it on
+ 	   the next line if we can find it.  */
+ 	if (mod != NULL) {

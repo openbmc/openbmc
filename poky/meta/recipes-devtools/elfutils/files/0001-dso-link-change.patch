@@ -1,7 +1,7 @@
-From c9c6d2414651dbf163dc4963c3c3d6f5cacef898 Mon Sep 17 00:00:00 2001
+From b99aa12cf879ce200e03d75e543c7ab2dfa5503b Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 15 Aug 2017 17:10:57 +0800
-Subject: [PATCH 1/7] dso link change
+Subject: [PATCH] dso link change
 
 Upstream-Status: Pending
 
@@ -16,6 +16,7 @@ more details.
 Rebase to 0.170
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
 ---
  src/Makefile.am   | 2 +-
  tests/Makefile.am | 2 +-
@@ -35,10 +36,10 @@ index 2b1c0dc..9305b84 100644
  endif
  libebl = ../libebl/libebl.a
 diff --git a/tests/Makefile.am b/tests/Makefile.am
-index b45ecdc..dd256fb 100644
+index 1b0c7d3..bced19b 100644
 --- a/tests/Makefile.am
 +++ b/tests/Makefile.am
-@@ -436,7 +436,7 @@ libdw = ../libdw/libdw.a -lz $(zip_LIBS) $(libelf) $(libebl) -ldl
+@@ -476,7 +476,7 @@ libdw = ../libdw/libdw.a -lz $(zip_LIBS) $(libelf) $(libebl) -ldl
  libelf = ../libelf/libelf.a -lz
  libasm = ../libasm/libasm.a
  else
@@ -47,6 +48,3 @@ index b45ecdc..dd256fb 100644
  libelf = ../libelf/libelf.so
  libasm = ../libasm/libasm.so
  endif
--- 
-2.7.4
-

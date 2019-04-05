@@ -28,7 +28,8 @@ re_control_char = re.compile('[%s]' % re.escape("".join(control_chars)))
 
 class QemuRunner:
 
-    def __init__(self, machine, rootfs, display, tmpdir, deploy_dir_image, logfile, boottime, dump_dir, dump_host_cmds, use_kvm, logger):
+    def __init__(self, machine, rootfs, display, tmpdir, deploy_dir_image, logfile, boottime, dump_dir, dump_host_cmds,
+                 use_kvm, logger, use_slirp=False):
 
         # Popen object for runqemu
         self.runqemu = None
@@ -51,6 +52,7 @@ class QemuRunner:
         self.logged = False
         self.thread = None
         self.use_kvm = use_kvm
+        self.use_slirp = use_slirp
         self.msg = ''
 
         self.runqemutime = 120
@@ -129,6 +131,8 @@ class QemuRunner:
                 self.logger.debug('Not using kvm for runqemu')
             if not self.display:
                 launch_cmd += ' nographic'
+            if self.use_slirp:
+                launch_cmd += ' slirp'
             launch_cmd += ' %s %s' % (self.machine, self.rootfs)
 
         return self.launch(launch_cmd, qemuparams=qemuparams, get_ip=get_ip, extra_bootparams=extra_bootparams, env=env)
@@ -238,9 +242,14 @@ class QemuRunner:
                 # because is possible to have control characters
                 cmdline = re_control_char.sub(' ', cmdline)
             try:
-                ips = re.findall(r"((?:[0-9]{1,3}\.){3}[0-9]{1,3})", cmdline.split("ip=")[1])
-                self.ip = ips[0]
-                self.server_ip = ips[1]
+                if self.use_slirp:
+                    tcp_ports = cmdline.split("hostfwd=tcp::")[1]
+                    host_port = tcp_ports[:tcp_ports.find('-')]
+                    self.ip = "localhost:%s" % host_port
+                else:
+                    ips = re.findall(r"((?:[0-9]{1,3}\.){3}[0-9]{1,3})", cmdline.split("ip=")[1])
+                    self.ip = ips[0]
+                    self.server_ip = ips[1]
                 self.logger.debug("qemu cmdline used:\n{}".format(cmdline))
             except (IndexError, ValueError):
                 # Try to get network configuration from runqemu output
@@ -320,6 +329,7 @@ class QemuRunner:
                 self.logger.debug("Target didn't reach login banner in %d seconds (%s)" %
                                   (self.boottime, time.strftime("%D %H:%M:%S")))
             tail = lambda l: "\n".join(l.splitlines()[-25:])
+            bootlog = boolog.decode("utf-8")
             # in case bootlog is empty, use tail qemu log store at self.msg
             lines = tail(bootlog if bootlog else self.msg)
             self.logger.debug("Last 25 lines of text:\n%s" % lines)

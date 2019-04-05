@@ -28,16 +28,16 @@ def convertGMK(unit):
 
     """ Convert the space unit G, M, K, the unit is case-insensitive """
 
-    unitG = re.match('([1-9][0-9]*)[gG]\s?$', unit)
+    unitG = re.match(r'([1-9][0-9]*)[gG]\s?$', unit)
     if unitG:
         return int(unitG.group(1)) * (1024 ** 3)
-    unitM = re.match('([1-9][0-9]*)[mM]\s?$', unit)
+    unitM = re.match(r'([1-9][0-9]*)[mM]\s?$', unit)
     if unitM:
         return int(unitM.group(1)) * (1024 ** 2)
-    unitK = re.match('([1-9][0-9]*)[kK]\s?$', unit)
+    unitK = re.match(r'([1-9][0-9]*)[kK]\s?$', unit)
     if unitK:
         return int(unitK.group(1)) * 1024
-    unitN = re.match('([1-9][0-9]*)\s?$', unit)
+    unitN = re.match(r'([1-9][0-9]*)\s?$', unit)
     if unitN:
         return int(unitN.group(1))
     else:
@@ -83,7 +83,7 @@ def getDiskData(BBDirs, configuration):
     for pathSpaceInode in BBDirs.split():
         # The input format is: "dir,space,inode", dir is a must, space
         # and inode are optional
-        pathSpaceInodeRe = re.match('([^,]*),([^,]*),([^,]*),?(.*)', pathSpaceInode)
+        pathSpaceInodeRe = re.match(r'([^,]*),([^,]*),([^,]*),?(.*)', pathSpaceInode)
         if not pathSpaceInodeRe:
             printErr("Invalid value in BB_DISKMON_DIRS: %s" % pathSpaceInode)
             return None
@@ -147,7 +147,7 @@ def getInterval(configuration):
     else:
         # The disk space or inode interval is optional, but it should
         # have a correct value once it is specified
-        intervalRe = re.match('([^,]*),?\s*(.*)', interval)
+        intervalRe = re.match(r'([^,]*),?\s*(.*)', interval)
         if intervalRe:
             intervalSpace = intervalRe.group(1)
             if intervalSpace:

@@ -1,4 +1,4 @@
-From 65f8bca55aead676cd06fc3210aeffef1f2158c6 Mon Sep 17 00:00:00 2001
+From e99b2eafba5260b8087fc1a85830b08ea3228292 Mon Sep 17 00:00:00 2001
 From: Jeff Wannamaker <jeff_wannamaker@cable.comcast.com>
 Date: Thu, 19 Jan 2017 18:56:07 +0000
 Subject: [PATCH 13/18] Implement triple buffering for wayland
@@ -86,5 +86,5 @@ index e328b77..58a3184 100644
        back_wl_buffer
  
 -- 
-2.19.1
+2.20.1
 

@@ -1,0 +1,23 @@
+# 2014-04-18 Antti Palosaari <crope@iki.fi>
+# generated from http://www.digita.fi/kuluttajat/tv/nakyvyysalueet/kanavanumerot_ja_taajuudet
+
+[Joutsa_Lankia]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 482000000
+	BANDWIDTH_HZ = 8000000
+
+[Joutsa_Lankia]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 722000000
+	BANDWIDTH_HZ = 8000000
+
+[Joutsa_Lankia]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 530000000
+	BANDWIDTH_HZ = 8000000
+
+[Joutsa_Lankia]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 522000000
+	BANDWIDTH_HZ = 8000000
+

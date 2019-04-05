@@ -1,4 +1,4 @@
-From ae7178a78aba2e5766b70191617113487fd7ad0b Mon Sep 17 00:00:00 2001
+From 88661a60629894353512c53ed32f2b901f64149c Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 16 Apr 2018 18:29:17 -0700
 Subject: [PATCH] Fix string overflow in snprintf
@@ -53,7 +53,7 @@ index 81e521e..d53cc48 100644
    TRACE_ENTER();
  
 diff --git a/src/smf/smfd/SmfUpgradeCampaign.cc b/src/smf/smfd/SmfUpgradeCampaign.cc
-index 45cdce8..6761bcf 100644
+index c30ea14..098f17a 100644
 --- a/src/smf/smfd/SmfUpgradeCampaign.cc
 +++ b/src/smf/smfd/SmfUpgradeCampaign.cc
 @@ -447,7 +447,7 @@ SaAisErrorT SmfUpgradeCampaign::tooManyRestarts(bool *o_result) {
@@ -66,11 +66,11 @@ index 45cdce8..6761bcf 100644
    /* Read the SmfCampRestartInfo object smfCampRestartCnt attr */
    std::string obj = "smfRestartInfo=info," +
 @@ -473,7 +473,7 @@ SaAisErrorT SmfUpgradeCampaign::tooManyRestarts(bool *o_result) {
-     attrsmfCampRestartCnt.setName("smfCampRestartCnt");
-     attrsmfCampRestartCnt.setType("SA_IMM_ATTR_SAUINT32T");
+     attrsmfCampRestartCnt.SetAttributeName("smfCampRestartCnt");
+     attrsmfCampRestartCnt.SetAttributeType("SA_IMM_ATTR_SAUINT32T");
      char buf[5];
 -    snprintf(buf, 4, "%d", curCnt);
 +    snprintf(buf, 4, "%hd", curCnt);
-     attrsmfCampRestartCnt.addValue(buf);
-     imoCampRestartInfo.addValue(attrsmfCampRestartCnt);
+     attrsmfCampRestartCnt.AddAttributeValue(buf);
+     imoCampRestartInfo.AddValue(attrsmfCampRestartCnt);
  

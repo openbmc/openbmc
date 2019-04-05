@@ -1,0 +1,23 @@
+meson.build files that use cc.run() in native builds can silently fallback to
+meson.get_cross_property() in cross builds without an exe-wrapper, but there's
+no way to know that this is happening.
+
+As the defaults may be pessimistic (for example, disabling the support for a
+feature that should be enabled) emit a warning when the default is used, so that
+the recipe can explicitly set the cross property as relevant.
+
+Upstream-Status: Submitted [https://github.com/mesonbuild/meson/pull/5071]
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/mesonbuild/interpreter.py b/mesonbuild/interpreter.py
+index 3c3cfae0..10e741ae 100644
+--- a/mesonbuild/interpreter.py
++++ b/mesonbuild/interpreter.py
+@@ -1890,6 +1890,7 @@ class MesonMain(InterpreterObject):
+             return props[propname]
+         except Exception:
+             if len(args) == 2:
++                mlog.warning('Cross property %s is using default value %s' % (propname, args[1]))
+                 return args[1]
+             raise InterpreterException('Unknown cross property: %s.' % propname)
+ 

@@ -1,7 +1,7 @@
-From a8ef81c115a45f05dad145c98e10f3c4940e4e29 Mon Sep 17 00:00:00 2001
+From ffb7942cc73c3d2c6aa7c689cdaf9bc0bcbc144b Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 26 Jan 2017 16:25:47 +0200
-Subject: [PATCH 3/5] Do not hardcode /etc and systemd unit directories
+Subject: [PATCH] Do not hardcode /etc and systemd unit directories
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
@@ -11,20 +11,17 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 650b624a..10199618 100644
+index 73552967..38cf4fbf 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -7,8 +7,8 @@ if (NOT PYTHON_DESIRED)
-     set (PYTHON_DESIRED "2")
- endif()
+@@ -3,8 +3,8 @@ CMAKE_MINIMUM_REQUIRED (VERSION 2.4)
+ 
+ INCLUDE (${CMAKE_SOURCE_DIR}/VERSION.cmake)
  
 -SET( SYSCONFDIR /etc)
 -SET( SYSTEMD_DIR /usr/lib/systemd/system)
 +SET( SYSCONFDIR ${CMAKE_INSTALL_SYSCONFDIR})
 +SET( SYSTEMD_DIR $ENV{systemd_system_unitdir})
  
- if (${PYTHON_DESIRED} STREQUAL "2")
- 	FIND_PACKAGE (PythonInterp REQUIRED)
--- 
-2.14.2
-
+ IF (NOT PYTHON_DESIRED)
+     FIND_PACKAGE (PythonInterp REQUIRED)

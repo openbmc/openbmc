@@ -20,6 +20,11 @@ https://patchwork.openembedded.org/patch/147229/
 
 Upstream-Status: Inappropriate [OE specific]
 Signed-off-by: Martin Hundebøll <martin@geanix.com>
+
+
+Update to fix buildpaths qa issue for '-fmacro-prefix-map'.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  Configurations/unix-Makefile.tmpl | 10 +++++++++-
  crypto/build.info                 |  2 +-
@@ -29,7 +34,7 @@ diff --git a/Configurations/unix-Makefile.tmpl b/Configurations/unix-Makefile.tm
 index 16af4d2087..54c162784c 100644
 --- a/Configurations/unix-Makefile.tmpl
 +++ b/Configurations/unix-Makefile.tmpl
-@@ -317,13 +317,21 @@ BIN_LDFLAGS={- join(' ', $target{bin_lflags} || (),
+@@ -317,13 +317,22 @@ BIN_LDFLAGS={- join(' ', $target{bin_lflags} || (),
                           '$(CNF_LDFLAGS)', '$(LDFLAGS)') -}
  BIN_EX_LIBS=$(CNF_EX_LIBS) $(EX_LIBS)
  
@@ -43,6 +48,7 @@ index 16af4d2087..54c162784c 100644
  
 +CFLAGS_Q={- for (@{$config{CFLAGS}}) {
 +              s|-fdebug-prefix-map=[^ ]+|-fdebug-prefix-map=|g;
++              s|-fmacro-prefix-map=[^ ]+|-fmacro-prefix-map=|g;
 +            }
 +            join(' ', @{$config{CFLAGS}}) -}
 +

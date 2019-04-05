@@ -48,7 +48,7 @@ do_install() {
     install -m 0644 ${B}/toybox.links ${D}${sysconfdir}
 }
 
-inherit update-alternatives
+inherit cml1 update-alternatives
 
 # If you've chosen to install toybox you probably want it to take precedence
 # over busybox where possible but not over other packages

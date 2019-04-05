@@ -183,6 +183,12 @@ do_deploy() {
         echo "dtoverlay=at86rf233,speed=3000000" >>${DEPLOYDIR}/bcm2835-bootfiles/config.txt
     fi
 
+    # ENABLE CAN
+    if [ "${ENABLE_CAN}" = "1" ]; then
+        echo "# Enable CAN" >>${DEPLOYDIR}/bcm2835-bootfiles/config.txt
+        echo "dtoverlay=mcp2515-can0,oscillator=16000000,interrupt=25" >>${DEPLOYDIR}/bcm2835-bootfiles/config.txt
+    fi
+
     # Append extra config if the user has provided any
     printf "${RPI_EXTRA_CONFIG}\n" >> ${DEPLOYDIR}/bcm2835-bootfiles/config.txt
 }

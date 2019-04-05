@@ -1,0 +1,62 @@
+Upstream-Status: Backport [fc88e56bfc2b09a8fb2b350e76f6425ab0a056d7]
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From 141acf6a2f3b21d63c9cfe620b8e20a506e78493 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Wed, 13 Mar 2019 16:22:09 +0000
+Subject: [PATCH] meson: do a build-time check for strlcpy before attempting
+ runtime check
+
+In cross-compilation environments the runtime check isn't possible so it is up
+to the builder to seed the cross file, but we can definitely state that strlcpy
+doesn't exist with a build test.
+---
+ meson.build | 30 ++++++++++++++++--------------
+ 1 file changed, 16 insertions(+), 14 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 15039e448..414f2d9b1 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1860,22 +1860,24 @@ endif
+ 
+ # Test if we have strlcpy/strlcat with a compatible implementation:
+ # https://bugzilla.gnome.org/show_bug.cgi?id=53933
+-if cc_can_run
+-  rres = cc.run('''#include <stdlib.h>
+-                   #include <string.h>
+-                   int main() {
+-                     char p[10];
+-                     (void) strlcpy (p, "hi", 10);
+-                     if (strlcat (p, "bye", 0) != 3)
+-                       return 1;
+-                     return 0;
+-                   }''',
+-                name : 'OpenBSD strlcpy/strlcat')
+-  if rres.compiled() and rres.returncode() == 0
++if cc.has_function('strlcpy')
++  if cc_can_run
++    rres = cc.run('''#include <stdlib.h>
++                    #include <string.h>
++                    int main() {
++                      char p[10];
++                      (void) strlcpy (p, "hi", 10);
++                      if (strlcat (p, "bye", 0) != 3)
++                        return 1;
++                      return 0;
++                    }''',
++                  name : 'OpenBSD strlcpy/strlcat')
++    if rres.compiled() and rres.returncode() == 0
++      glib_conf.set('HAVE_STRLCPY', 1)
++    endif
++  elif meson.get_cross_property('have_strlcpy', false)
+     glib_conf.set('HAVE_STRLCPY', 1)
+   endif
+-elif meson.get_cross_property('have_strlcpy', false)
+-  glib_conf.set('HAVE_STRLCPY', 1)
+ endif
+ 
+ python = import('python').find_installation('python3')
+-- 
+2.11.0
+

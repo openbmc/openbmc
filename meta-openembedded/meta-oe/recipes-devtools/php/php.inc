@@ -8,7 +8,7 @@ BBCLASSEXTEND = "native"
 DEPENDS = "zlib bzip2 libxml2 virtual/libiconv php-native lemon-native"
 DEPENDS_class-native = "zlib-native libxml2-native"
 
-PHP_MAJOR_VERSION = "${@d.getVar('PV', True).split('.')[0]}"
+PHP_MAJOR_VERSION = "${@d.getVar('PV').split('.')[0]}"
 
 SRC_URI = "http://php.net/distributions/php-${PV}.tar.bz2 \
            file://0001-php-don-t-use-broken-wrapper-for-mkdir.patch \
@@ -20,7 +20,6 @@ SRC_URI_append_class-target = " \
             file://php_exec_native.patch \
             file://php-fpm.conf \
             file://php-fpm-apache.conf \
-            file://0001-acinclude.m4-don-t-unset-cache-variables.patch \
             file://70_mod_php${PHP_MAJOR_VERSION}.conf \
             file://php-fpm.service \
           "
@@ -46,10 +45,9 @@ COMMON_EXTRA_OECONF = "--enable-sockets \
 EXTRA_OECONF = "--enable-mbstring \
                 --enable-wddx \
                 --enable-fpm \
-                --enable-zip \
                 --with-libdir=${baselib} \
                 --with-gettext=${STAGING_LIBDIR}/.. \
-                --with-zlib=${STAGING_LIBDIR}/.. \
+                --with-libzip=${STAGING_LIBDIR}/.. \
                 --with-iconv=${STAGING_LIBDIR}/.. \
                 --with-bz2=${STAGING_DIR_TARGET}${exec_prefix} \
                 --with-config-file-path=${sysconfdir}/php/apache2-php${PHP_MAJOR_VERSION} \

@@ -20,6 +20,7 @@ ARMFPARCHEXT ?= ""
 EXTRA_OECONF_append_armv6 = " --with-arch=armv6${ARMFPARCHEXT}"
 EXTRA_OECONF_append_armv7a = " --with-arch=armv7-a${ARMFPARCHEXT}"
 EXTRA_OECONF_append_armv7ve = " --with-arch=armv7ve${ARMFPARCHEXT}"
+EXTRA_OECONF_append_arc = " --with-cpu=${TUNE_PKGARCH}"
 
 # libcc1 requres gcc_cv_objdump when cross build, but gcc_cv_objdump is
 # set in subdir gcc, so subdir libcc1 can't use it, export it here to

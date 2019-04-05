@@ -37,7 +37,7 @@ LEAD_SONAME = "libpq.so"
 # LDFLAGS for shared libraries
 export LDFLAGS_SL = "${LDFLAGS}"
 
-inherit autotools pkgconfig perlnative pythonnative useradd update-rc.d systemd gettext
+inherit autotools pkgconfig perlnative pythonnative useradd update-rc.d systemd gettext cpan-base
 
 CFLAGS += "-I${STAGING_INCDIR}/${PYTHON_DIR} -I${STAGING_INCDIR}/tcl8.6"
 
@@ -106,6 +106,10 @@ python populate_packages_prepend() {
 
 }
 
+# This will make native perl use target settings (for include dirs etc.)
+export PERLCONFIGTARGET = "${@is_target(d)}"
+export PERL_ARCHLIB = "${STAGING_LIBDIR}${PERL_OWN_DIR}/perl5/${@get_perl_version(d)}/${@get_perl_arch(d)}"
+
 do_configure() {
     # do_configure
     autotools_do_configure
@@ -119,7 +123,7 @@ do_configure() {
     BLIBNA="\${STAGING_BASE_LIBDIR_NATIVE}"
     sed -i -e "/^perl_archlibexp/s:${LIBPNA}:${STAGING_LIBDIR}:g" \
         ${B}/src/Makefile.global
-    sed -i -e "/^perl_privlibexp/s:${LIBPNA}:${STAGING_LIBDIR}:g" \
+    sed -i -e "/^perl_privlibexp/s:${libdir}:${STAGING_LIBDIR}:g" \
         ${B}/src/Makefile.global
     # remove the rpath, replace with correct lib path
     sed -i \

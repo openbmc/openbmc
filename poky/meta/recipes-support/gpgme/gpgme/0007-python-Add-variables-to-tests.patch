@@ -1,0 +1,50 @@
+From 317cdf60165d760572a26db317e3d6edb159b04e Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 17 Oct 2018 23:41:09 +0800
+Subject: [PATCH 7/7] python: Add variables to tests
+
+* configure.ac, lang/python/Makefile.am:
+  New variable to `lang/python', set to `lang/python' if RUN_LANG_PYTHON_TESTS
+
+Upstream-Status: Submitted [gnupg-devel@gnupg.org]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac            | 5 +++++
+ lang/python/Makefile.am | 3 +++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 865bd10..035555a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -535,6 +535,11 @@ AC_ARG_ENABLE(g13-test,
+          run_g13_test=$enableval)
+ AM_CONDITIONAL(RUN_G13_TESTS, test "$run_g13_test" = "yes")
+ 
++run_lang_python_test="yes"
++AC_ARG_ENABLE(lang-python-test,
++  AC_HELP_STRING([--disable-lang-python-test], [disable Python regression test]),
++         run_lang_python_test=$enableval)
++AM_CONDITIONAL(RUN_LANG_PYTHON_TESTS, test "$run_lang_python_test" = "yes")
+ 
+ # Checks for header files.
+ AC_CHECK_HEADERS_ONCE([locale.h sys/select.h sys/uio.h argp.h stdint.h
+diff --git a/lang/python/Makefile.am b/lang/python/Makefile.am
+index ce9a108..0c8cfdc 100644
+--- a/lang/python/Makefile.am
++++ b/lang/python/Makefile.am
+@@ -25,7 +25,10 @@ EXTRA_DIST = \
+ 	doc \
+ 	src
+ 
++if RUN_LANG_PYTHON_TESTS
+ SUBDIRS = . tests
++endif
++
+ 
+ .PHONY: prepare
+ prepare: copystamp
+-- 
+2.7.4
+

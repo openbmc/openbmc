@@ -1,0 +1,18 @@
+# 2014-04-18 Antti Palosaari <crope@iki.fi>
+# generated from http://www.digita.fi/kuluttajat/tv/nakyvyysalueet/kanavanumerot_ja_taajuudet
+
+[Kyyjarvi_Noposenaho]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 530000000
+	BANDWIDTH_HZ = 8000000
+
+[Kyyjarvi_Noposenaho]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 586000000
+	BANDWIDTH_HZ = 8000000
+
+[Kyyjarvi_Noposenaho]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 682000000
+	BANDWIDTH_HZ = 8000000
+

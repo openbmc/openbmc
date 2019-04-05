@@ -17,19 +17,19 @@ https://patchwork.freedesktop.org/patch/171458/
 
 Signed-off-by: Tatu Frisk <tatu.frisk@ge.com>
 Signed-off-by: Jose Alarcon <jose.alarcon@ge.com>
+
+[Refreshed for 1.6.7 update]
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
 ---
  src/xcb_io.c | 19 +++++++------------
  1 file changed, 7 insertions(+), 12 deletions(-)
 
-diff --git a/src/xcb_io.c b/src/xcb_io.c
-index 5987329..c64eb04 100644
---- a/src/xcb_io.c
-+++ b/src/xcb_io.c
-@@ -609,22 +609,17 @@ Status _XReply(Display *dpy, xReply *rep, int extra, Bool discard)
- 		 * letting anyone else process this sequence number, we
- 		 * need to process any events that should have come
- 		 * earlier. */
--
+Index: libX11-1.6.7/src/xcb_io.c
+===================================================================
+--- libX11-1.6.7.orig/src/xcb_io.c
++++ libX11-1.6.7/src/xcb_io.c
+@@ -620,18 +620,14 @@ Status _XReply(Display *dpy, xReply *rep
  		if(dpy->xcb->event_owner == XlibOwnsEventQueue)
  		{
  			xcb_generic_reply_t *event;
@@ -42,6 +42,9 @@ index 5987329..c64eb04 100644
 -			while(dpy->xcb->event_waiter)
 -			{ /* need braces around ConditionWait */
 -				ConditionWait(dpy, dpy->xcb->event_notify);
+-			}
+-			while((event = poll_for_event(dpy, True)))
+-				handle_response(dpy, event, True);
 +
 +			/* Assume event queue is empty if another thread is blocking
 +			 * waiting for event. */
@@ -49,12 +52,7 @@ index 5987329..c64eb04 100644
 +			{
 +				while((event = poll_for_response(dpy)))
 +					handle_response(dpy, event, True);
- 			}
--			while((event = poll_for_event(dpy)))
--				handle_response(dpy, event, True);
++                        }
  		}
  
  		req->reply_waiter = 0;
--- 
-2.10.1
-

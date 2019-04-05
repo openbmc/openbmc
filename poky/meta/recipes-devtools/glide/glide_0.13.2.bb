@@ -33,3 +33,6 @@ INSANE_SKIP_${PN} += "textrel"
 # ELF binary '/work/aarch64-oe-linux/glide/0.13.1-r0/packages-split/glide-ptest/usr/lib/glide/ptest/github.com/Masterminds/glide/action/action.test' has relocations in .text
 # ELF binary '/work/aarch64-oe-linux/glide/0.13.1-r0/packages-split/glide-ptest/usr/lib/glide/ptest/github.com/Masterminds/glide/cache/cache.test' has relocations in .text [textrel]
 INSANE_SKIP_${PN}-ptest += "textrel"
+
+# fails to run task compile_ptest_base on mips
+PTEST_ENABLED_mipsarch = "0"

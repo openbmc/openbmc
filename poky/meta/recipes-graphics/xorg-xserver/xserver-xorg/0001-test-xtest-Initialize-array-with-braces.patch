@@ -1,0 +1,36 @@
+From 8a382c015cd3c69fcfc146ef03dcbf30c77ff207 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 1 Mar 2019 09:47:57 -0800
+Subject: [PATCH] test/xtest: Initialize array with braces
+
+Fixes an error when extra warnings are enabled, this is caught with clang
+
+test/xtest.c:64:23: error: suggest braces around initialization of subobject [-Werror,-Wmissing-braces]
+    WindowRec root = {0};
+                      ^
+                      {}
+1 error generated.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ test/xtest.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/xtest.c b/test/xtest.c
+index fc5e433..d7e6620 100644
+--- a/test/xtest.c
++++ b/test/xtest.c
+@@ -61,7 +61,7 @@ xtest_init_devices(void)
+ {
+     ScreenRec screen = {0};
+     ClientRec server_client = {0};
+-    WindowRec root = {0};
++    WindowRec root = {{0}};
+     WindowOptRec optional = {0};
+ 
+     /* random stuff that needs initialization */
+-- 
+2.21.0
+

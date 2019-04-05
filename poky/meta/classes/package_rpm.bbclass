@@ -113,6 +113,10 @@ python write_specfile () {
             source_list = os.listdir(ar_outdir)
             source_number = 0
             for source in source_list:
+                # do_deploy_archives may have already run (from sstate) meaning a .src.rpm may already 
+                # exist in ARCHIVER_OUTDIR so skip if present.
+                if source.endswith(".src.rpm"):
+                    continue
                 # The rpmbuild doesn't need the root permission, but it needs
                 # to know the file's user and group name, the only user and
                 # group in fakeroot is "root" when working in fakeroot.
@@ -690,7 +694,7 @@ python do_package_rpm () {
     cmd = cmd + " --define '_tmppath " + workdir + "'"
     if d.getVarFlag('ARCHIVER_MODE', 'srpm') == '1' and bb.data.inherits_class('archiver', d):
         cmd = cmd + " --define '_sourcedir " + d.getVar('ARCHIVER_OUTDIR') + "'"
-        cmdsrpm = cmd + " --define '_srcrpmdir " + d.getVar('ARCHIVER_OUTDIR') + "'"
+        cmdsrpm = cmd + " --define '_srcrpmdir " + d.getVar('ARCHIVER_RPMOUTDIR') + "'"
         cmdsrpm = cmdsrpm + " -bs " + outspecfile
         # Build the .src.rpm
         d.setVar('SBUILDSPEC', cmdsrpm + "\n")

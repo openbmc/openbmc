@@ -10,5 +10,5 @@ fi
 unset CC CXX CPP LD AR NM STRIP
 
 exec "$OECORE_NATIVE_SYSROOT/usr/bin/meson.real" \
-     --cross-file "$OECORE_NATIVE_SYSROOT/usr/share/meson/meson.cross" \
+     --cross-file "${OECORE_NATIVE_SYSROOT}/usr/share/meson/${TARGET_PREFIX}meson.cross" \
      "$@"

@@ -1,6 +1,8 @@
 inherit cross
 
 CLASSOVERRIDE = "class-crosssdk"
+NATIVESDKLIBC ?= "libc-glibc"
+LIBCOVERRIDE = ":${NATIVESDKLIBC}"
 MACHINEOVERRIDES = ""
 PACKAGE_ARCH = "${SDK_ARCH}"
 python () {

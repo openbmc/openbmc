@@ -1,4 +1,4 @@
-From 94b1e6daf7d70550b0e32fbb269fcf6887948d3f Mon Sep 17 00:00:00 2001
+From 99a5784d33ad5e0e6fa00338d2732cbccad7661c Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 13 Jan 2016 16:08:22 -0800
 Subject: [PATCH] Add STAGING_INCDIR to searchpath for egl headers
@@ -14,10 +14,10 @@ Upstream-Status: Submitted
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/wscript b/wscript
-index fcbb55b..cece8bf 100644
+index 195e247..0f6ec53 100644
 --- a/wscript
 +++ b/wscript
-@@ -163,9 +163,10 @@ def configure_raspberrypi_device(conf, platform):
+@@ -177,9 +177,10 @@ def configure_raspberrypi_device(conf, platform):
  	conf.check_cxx(mandatory = 1, lib = ['GLESv2', 'EGL', 'bcm_host'], uselib_store = 'EGL')
  	import os
  	sysroot = conf.options.sysroot + conf.options.prefix
@@ -30,5 +30,4 @@ index fcbb55b..cece8bf 100644
  	conf.env['WITH_APIS'] = []
  	if check_gles2(conf):
 -- 
-2.7.0
-
+2.19.1

@@ -1,0 +1,27 @@
+From 442da9076b52003743ffc6fd7b9d647de6d7aa8f Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 17 Jan 2019 16:37:54 +0100
+Subject: [PATCH] app.cc: use old school asignment to avoid gcc 4.8 error
+
+This is needed to build vte-native on Centos 7,
+and can be dropped once that OS is no longer supported.
+
+Upstream-Status: Inappropriate [ancient compiler fix]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ src/app/app.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/app/app.cc b/src/app/app.cc
+index d424064..675d789 100644
+--- a/src/app/app.cc
++++ b/src/app/app.cc
+@@ -306,7 +306,7 @@ public:
+                 else
+                         alpha = get_alpha();
+ 
+-                GdkRGBA color{bg_color};
++                GdkRGBA color = bg_color;
+                 color.alpha = alpha;
+                 return color;
+         }

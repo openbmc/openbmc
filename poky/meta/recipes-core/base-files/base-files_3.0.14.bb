@@ -13,11 +13,11 @@ LIC_FILES_CHKSUM = "file://licenses/GPL-2;md5=94d55d512a9ba36caa9b7df079bae19f"
 SRC_URI = "file://rotation \
            file://nsswitch.conf \
            file://motd \
+           file://hosts \
            file://host.conf \
            file://profile \
            file://shells \
            file://fstab \
-           file://filesystems \
            file://issue.net \
            file://issue \
            file://usbd \
@@ -113,6 +113,7 @@ do_install () {
 	ln -snf ../run ${D}${localstatedir}/run
 	ln -snf ../run/lock ${D}${localstatedir}/lock
 
+	install -m 0644 ${WORKDIR}/hosts ${D}${sysconfdir}/hosts
 	${BASEFILESISSUEINSTALL}
 
 	rotation=`cat ${WORKDIR}/rotation`
@@ -121,7 +122,6 @@ do_install () {
 	fi
 
 	install -m 0644 ${WORKDIR}/fstab ${D}${sysconfdir}/fstab
-	install -m 0644 ${WORKDIR}/filesystems ${D}${sysconfdir}/filesystems
 	install -m 0644 ${WORKDIR}/usbd ${D}${sysconfdir}/default/usbd
 	install -m 0644 ${WORKDIR}/profile ${D}${sysconfdir}/profile
 	sed -i 's#ROOTHOME#${ROOT_HOME}#' ${D}${sysconfdir}/profile
@@ -140,6 +140,7 @@ DISTRO_VERSION[vardepsexclude] += "DATE"
 do_install_basefilesissue () {
 	if [ "${hostname}" ]; then
 		echo ${hostname} > ${D}${sysconfdir}/hostname
+		echo "127.0.1.1 ${hostname}" >> ${D}${sysconfdir}/hosts
 	fi
 
 	install -m 644 ${WORKDIR}/issue*  ${D}${sysconfdir}
@@ -147,7 +148,7 @@ do_install_basefilesissue () {
 		printf "${DISTRO_NAME} " >> ${D}${sysconfdir}/issue
 		printf "${DISTRO_NAME} " >> ${D}${sysconfdir}/issue.net
 		if [ -n "${DISTRO_VERSION}" ]; then
-			distro_version_nodate=${@'${DISTRO_VERSION}'.replace('snapshot-${DATE}','snapshot').replace('${DATE}','')}
+			distro_version_nodate="${@d.getVar('DISTRO_VERSION').replace('snapshot-${DATE}','snapshot').replace('${DATE}','')}"
 			printf "%s " $distro_version_nodate >> ${D}${sysconfdir}/issue
 			printf "%s " $distro_version_nodate >> ${D}${sysconfdir}/issue.net
 		fi
@@ -177,5 +178,5 @@ FILES_${PN}-doc = "${docdir} ${datadir}/common-licenses"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-CONFFILES_${PN} = "${sysconfdir}/fstab ${@['', '${sysconfdir}/hostname'][(d.getVar('hostname') != '')]} ${sysconfdir}/shells"
+CONFFILES_${PN} = "${sysconfdir}/fstab ${@['', '${sysconfdir}/hostname ${sysconfdir}/hosts'][(d.getVar('hostname') != '')]} ${sysconfdir}/shells"
 CONFFILES_${PN} += "${sysconfdir}/motd ${sysconfdir}/nsswitch.conf ${sysconfdir}/profile"

@@ -1,0 +1,57 @@
+From ee728434124b9b7d17abbd060a62aac79a9b79c0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 12 Feb 2019 14:31:24 -0800
+Subject: [PATCH] Disable -Wshadow and do not mark default copy constructors
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt                                     | 2 +-
+ utilities/persistent_cache/block_cache_tier.h      | 4 ++--
+ utilities/persistent_cache/block_cache_tier_file.h | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 98e2e1973..3a24a075b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -254,7 +254,7 @@ if(FAIL_ON_WARNINGS)
+   if(MSVC)
+     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX")
+   else() # assume GCC
+-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
++    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wno-error=shadow")
+   endif()
+ endif()
+ 
+diff --git a/utilities/persistent_cache/block_cache_tier.h b/utilities/persistent_cache/block_cache_tier.h
+index 2b2c0ef4f..96d0540a4 100644
+--- a/utilities/persistent_cache/block_cache_tier.h
++++ b/utilities/persistent_cache/block_cache_tier.h
+@@ -91,9 +91,9 @@ class BlockCacheTier : public PersistentCacheTier {
+         : key_(std::move(key)), data_(data) {}
+     ~InsertOp() {}
+ 
+-    InsertOp() = delete;
++    InsertOp() = default;
+     InsertOp(InsertOp&& /*rhs*/) = default;
+-    InsertOp& operator=(InsertOp&& rhs) = default;
++    InsertOp& operator=(InsertOp&& rhs) = delete;
+ 
+     // used for estimating size by bounded queue
+     size_t Size() { return data_.size() + key_.size(); }
+diff --git a/utilities/persistent_cache/block_cache_tier_file.h b/utilities/persistent_cache/block_cache_tier_file.h
+index e38b6c9a1..d9b89a4f7 100644
+--- a/utilities/persistent_cache/block_cache_tier_file.h
++++ b/utilities/persistent_cache/block_cache_tier_file.h
+@@ -262,7 +262,7 @@ class ThreadedWriter : public Writer {
+         : file_(file), buf_(buf), file_off_(file_off), callback_(callback) {}
+ 
+     IO(const IO&) = default;
+-    IO& operator=(const IO&) = default;
++    IO& operator=(const IO&) = delete;
+     size_t Size() const { return sizeof(IO); }
+ 
+     WritableFile* file_ = nullptr;           // File to write to
+-- 
+2.20.1
+

@@ -1,6 +1,6 @@
-From 04df959365e2b54d7503edf0e5534ff094284f2d Mon Sep 17 00:00:00 2001
+From 148861fa16f2aaacd518770f337ea54b5182f981 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
-Date: Fri, 23 Oct 2015 12:25:09 +0300
+Date: Tue, 29 Jan 2019 15:03:01 +0100
 Subject: [PATCH] Do not use the shell version of python-config that was
  introduced in 3.4
 
@@ -14,25 +14,22 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 3 insertions(+), 6 deletions(-)
 
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 236f005..5c4337f 100644
+index 2d2e11f..cc19942 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -1348,12 +1348,9 @@ python-config: $(srcdir)/Misc/python-config.in Misc/python-config.sh
+@@ -1431,12 +1431,9 @@ python-config: $(srcdir)/Misc/python-config.in Misc/python-config.sh
  	sed -e "s,@EXENAME@,$(BINDIR)/python$(LDVERSION)$(EXE)," < $(srcdir)/Misc/python-config.in >python-config.py
- 	# Replace makefile compat. variable references with shell script compat. ones; $(VAR) -> ${VAR}
+ 	@ # Replace makefile compat. variable references with shell script compat. ones; $(VAR) -> ${VAR}
  	LC_ALL=C sed -e 's,\$$(\([A-Za-z0-9_]*\)),\$$\{\1\},g' < Misc/python-config.sh >python-config
--	# On Darwin, always use the python version of the script, the shell
--	# version doesn't use the compiler customizations that are provided
--	# in python (_osx_support.py).
--	if test `uname -s` = Darwin; then \
+-	@ # On Darwin, always use the python version of the script, the shell
+-	@ # version doesn't use the compiler customizations that are provided
+-	@ # in python (_osx_support.py).
+-	@if test `uname -s` = Darwin; then \
 -		cp python-config.py python-config; \
 -	fi
-+	# In OpenEmbedded, always use the python version of the script, the shell
-+	# version is broken in multiple ways, and doesn't return correct directories
++	@  # In OpenEmbedded, always use the python version of the script, the shell
++	@  # version is broken in multiple ways, and doesn't return correct directories
 +	cp python-config.py python-config
  
  
  # Install the include files
--- 
-2.11.0
-

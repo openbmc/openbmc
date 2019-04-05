@@ -1,0 +1,69 @@
+Upstream-Status: Submitted [mailing list]
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From f0c6981322807e179e39ce67aeebd42cf7a54d36 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Wed, 21 Nov 2018 12:44:36 +0000
+Subject: [PATCH] arb_texture_view: fix security format warnings
+
+If built with -Werror=format-security then Piglit fails to build:
+
+/tests/spec/arb_texture_view/rendering-layers-image.c:150:8:
+error: format not a string literal and no format arguments [-Werror=format-security]
+         (desc)); \
+         ^~~~~~
+
+In this case test->uniform_type is being turned into a string using snprintf()
+and then passed to piglit_report_subtest_result() which takes a format string,
+but GCC can't verify the format.
+
+As _subtest_report() takes a format string, we can just remove the snprintf()
+and let it construct the label.
+
+Also as X is used once and doesn't make the code clearer, just inline it.
+
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+---
+ tests/spec/arb_texture_view/rendering-layers-image.c | 19 ++++++-------------
+ 1 file changed, 6 insertions(+), 13 deletions(-)
+
+diff --git a/tests/spec/arb_texture_view/rendering-layers-image.c b/tests/spec/arb_texture_view/rendering-layers-image.c
+index 415b01657..86148075b 100644
+--- a/tests/spec/arb_texture_view/rendering-layers-image.c
++++ b/tests/spec/arb_texture_view/rendering-layers-image.c
+@@ -142,26 +142,19 @@ test_render_layers(const struct test_info *test)
+ 	return pass;
+ }
+ 
+-#define X(f, desc) \
+-	do { \
+-		const bool subtest_pass = (f); \
+-		piglit_report_subtest_result(subtest_pass \
+-						 ? PIGLIT_PASS : PIGLIT_FAIL, \
+-						 (desc)); \
+-		pass = pass && subtest_pass; \
+-	} while (0)
+-
+ enum piglit_result
+ piglit_display(void)
+ {
+ 	bool pass = true;
+ 	for (int test_idx = 0; test_idx < ARRAY_SIZE(tests); test_idx++) {
+ 		const struct test_info *test = &tests[test_idx];
+-		char test_name[128];
+-		snprintf(test_name, sizeof(test_name), "layers rendering of %s", test->uniform_type);
+-		X(test_render_layers(test), test_name);
++
++		const bool subtest_pass = test_render_layers(test);
++
++		piglit_report_subtest_result(subtest_pass ? PIGLIT_PASS : PIGLIT_FAIL,
++					     "layers rendering of %s", test->uniform_type);
++		pass = pass && subtest_pass;
+ 	}
+-#undef X
+ 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+ 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+ }
+-- 
+2.11.0
+

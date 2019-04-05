@@ -1,0 +1,42 @@
+From a6d1678379df6142a68cc9bb76dae540a31b8fdb Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 14 Mar 2019 23:47:50 -0700
+Subject: [PATCH] kexecboot: Use new reboot() API with klibc
+
+Klibc has changed this API in
+https://git.kernel.org/pub/scm/libs/klibc/klibc.git/commit/?id=6b621b8705ce5901dcf49607c8a3523c9e521901
+
+therefore adopt the code
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/kexecboot.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/kexecboot.c b/src/kexecboot.c
+index cf49b40..c785fce 100644
+--- a/src/kexecboot.c
++++ b/src/kexecboot.c
+@@ -857,7 +857,7 @@ int process_ctx_menu(struct params_t *params, int action) {
+ #else
+ 		sync();
+ 		/* if ( -1 == reboot(LINUX_REBOOT_CMD_RESTART) ) { */
+-		if ( -1 == reboot(RB_AUTOBOOT) ) {
++		if ( -1 == reboot(RB_AUTOBOOT, NULL) ) {
+ 			log_msg(lg, "Can't initiate reboot: %s", ERRMSG);
+ 		}
+ #endif
+@@ -874,7 +874,7 @@ int process_ctx_menu(struct params_t *params, int action) {
+ #else
+ 		sync();
+ 		/* if ( -1 == reboot(LINUX_REBOOT_CMD_POWER_OFF) ) { */
+-		if ( -1 == reboot(RB_POWER_OFF) ) {
++		if ( -1 == reboot(RB_POWER_OFF, NULL) ) {
+ 			log_msg(lg, "Can't initiate shutdown: %s", ERRMSG);
+ 		}
+ #endif
+-- 
+2.21.0
+

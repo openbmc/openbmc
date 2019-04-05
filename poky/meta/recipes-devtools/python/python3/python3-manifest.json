@@ -1,3 +1,93 @@
+# DO NOT (entirely) modify this file manually, please read.
+#
+# IMPORTANT NOTE:
+# Please keep in mind that the create_manifest task relies on the fact the the
+# target and native Python packages are the same, and it also needs to be executed
+# with a fully working native package (with all the PACKAGECONFIGs enabled and all
+# and all the modules should be working, check log.do_compile), otherwise the script
+# will fail to find dependencies correctly, this note is valid either if you are
+# upgrading to a new Python version or adding a new package.
+#
+#
+# If you are adding a new package please follow the next steps:
+#     How to add a new package:
+#     - If a user wants to add a new package all that has to be done is:
+#     Modify the python3-manifest.json file, and add the required file(s) to the FILES list,
+#     fill up the SUMMARY section as well, the script should handle all the rest.
+#
+#     Real example:
+#     We want to add a web browser package, including the file webbrowser.py
+#     which at the moment is on python3-misc.
+#     "webbrowser": {
+#         "files": ["${libdir}/python${PYTHON_MAJMIN}/lib-dynload/webbrowser.py"],
+#         "rdepends": [],
+#         "summary": "Python Web Browser support"}
+#
+#     * Note that the rdepends field was left empty
+#
+#     We run $ bitbake python3 -c create_manifest and the resulting manifest
+#     should be completed after a few seconds, showing something like:
+#     "webbrowser": {
+#         "files": ["${libdir}/python${PYTHON_MAJMIN}/webbrowser.py"],
+#         "rdepends": ["core","fcntl","io","pickle","shell","subprocess"],
+#         "summary": "Python Web Browser support"}
+#
+#
+# If you are upgrading Python to a new version please follow the next steps:
+#     After each Python upgrade, the create_manifest task should be executed, because we
+#     don't control what changes on upstream Python, so, some module dependency
+#     might have changed without us realizing it, a certain module can either have
+#     more or less dependencies, or could be depending on a new file that was just
+#     created on the new release and for obvious reasons we wouldn't have it on our
+#     old manifest, all of these issues would cause runtime errors on our system.
+#
+#     - Upgrade both the native and target Python packages to a new version
+#     - Run the create_manifest task for the target Python package as its shown below:
+#
+#     $ bitbake python3 -c create_manifest
+#
+#     This will automatically replace your manifest file located under the Python directory
+#     with an new one, which contains the new dependencies (if any).
+#
+#     Several things could have gone wrong here, I will try to explain a few:
+#
+#     a) A new file was introduced on this release, e.g. sha3*.so:
+#        The task will check what its needed to import every module, more than one module would
+#        would probably depend on sha3*.so, although only one module should contain it.
+#
+#        After running the task, the new manifest will have the sha3*.so file on more than one
+#        module, you need to manually decide which one of them should get it and delete it from
+#        the others, for example sha3*.so should likely be on ${PN}-crypt.
+#        Once you have deleted from the others you need to run the create_manifest task again,
+#        this will populate the other module's rdepends fields, with ${PN}-crypt and you should be
+#        good to go.
+#
+#     b) The native package wasn't built correctly and its missing a certain module:
+#        As mentioned before, you need to make sure the native package was built with all the modules
+#        because it is used as base to build the manifest file, you need to manually check log.do_compile
+#        since it won't error out the compile function if its only missing a couple of modules.
+#
+#        e.g. missing the _uuid module, log.do_compile would show the following:
+#        Python build finished successfully!
+#        The necessary bits to build these optional modules were not found:
+#        _uuid
+#
+#        What will happen here is that the new manifest would not be aware that the _uuid module exists, so
+#        not only we won't know of any dependencies to it, but also, the _uuid* files will be packaged on
+#        the misc package (which is where any file that doesn't belong anywhere else ends up).
+#
+#        This will eventually cause runtime errors on our system if we don't include the misc package on
+#        on our image, because the _uuid files will be missing.
+#        If we build the _uuid module correctly and run the create_manifest task the _uuid files will be
+#        detected correctly along with its dependencies, and we will get a working manifest.
+#
+#        This is the reason why it is important to make sure we have a fully working native build,
+#        so we can avoid these errors.
+#
+#
+#
+# DO NOT MODIFY THE NEXT LINE!, IT IS USED AS A MARKER FOR THE ACTUAL JSON MANIFEST
+# EOC
 {
     "tests": {
         "summary": "Python test suite",
@@ -19,7 +109,7 @@
             "core"
         ],
         "files": [
-            "${bindir}/2to3-*",
+            "${bindir}/2to3*",
             "${libdir}/python${PYTHON_MAJMIN}/lib2to3"
         ],
         "cached": []
@@ -27,24 +117,18 @@
     "asyncio": {
         "summary": "Python Asynchronous I/",
         "rdepends": [
-            "compression",
             "core",
-            "crypt",
             "io",
             "logging",
-            "math",
-            "multiprocessing",
             "netclient",
-            "pickle",
-            "shell",
-            "stringold",
-            "threading",
-            "unixadmin"
+            "numbers",
+            "stringold"
         ],
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/asyncio",
             "${libdir}/python${PYTHON_MAJMIN}/concurrent",
-            "${libdir}/python${PYTHON_MAJMIN}/concurrent/futures"
+            "${libdir}/python${PYTHON_MAJMIN}/concurrent/futures",
+            "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_asyncio.*.so"
         ],
         "cached": []
     },
@@ -84,19 +168,7 @@
     "compile": {
         "summary": "Python bytecode compilation support",
         "rdepends": [
-            "asyncio",
-            "compression",
-            "core",
-            "crypt",
-            "io",
-            "logging",
-            "math",
-            "multiprocessing",
-            "pickle",
-            "shell",
-            "stringold",
-            "threading",
-            "unixadmin"
+            "core"
         ],
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/compileall.py",
@@ -140,6 +212,7 @@
         "files": [
             "${bindir}/python*[!-config]",
             "${includedir}/python${PYTHON_BINABI}/pyconfig*.h",
+            "${prefix}/lib/python${PYTHON_MAJMIN}/config*/*[!.a]",
             "${libdir}/python${PYTHON_MAJMIN}/UserDict.py",
             "${libdir}/python${PYTHON_MAJMIN}/UserList.py",
             "${libdir}/python${PYTHON_MAJMIN}/UserString.py",
@@ -149,7 +222,7 @@
             "${libdir}/python${PYTHON_MAJMIN}/_collections_abc.py",
             "${libdir}/python${PYTHON_MAJMIN}/_markupbase.py",
             "${libdir}/python${PYTHON_MAJMIN}/_sitebuiltins.py",
-            "${libdir}/python${PYTHON_MAJMIN}/_sysconfigdata.py",
+            "${libdir}/python${PYTHON_MAJMIN}/_sysconfigdata*.py",
             "${libdir}/python${PYTHON_MAJMIN}/_weakrefset.py",
             "${libdir}/python${PYTHON_MAJMIN}/abc.py",
             "${libdir}/python${PYTHON_MAJMIN}/argparse.py",
@@ -323,9 +396,13 @@
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/crypt.py",
             "${libdir}/python${PYTHON_MAJMIN}/hashlib.py",
+            "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_blake2.*.so",
             "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_crypt.*.so",
             "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_hashlib.*.so",
             "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_sha256.*.so",
+            "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_sha3.*.so",
+            "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_sha1.*.so",
+            "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_md5.*.so",
             "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_sha512.*.so"
         ],
         "cached": [
@@ -415,9 +492,7 @@
             "${libdir}/*.la",
             "${libdir}/*.o",
             "${libdir}/lib*${SOLIBSDEV}",
-            "${libdir}/pkgconfig",
-            "${libdir}/python${PYTHON_MAJMIN}/config*/Makefile",
-            "${libdir}/python${PYTHON_MAJMIN}/config*/Makefile/__pycache__"
+            "${libdir}/pkgconfig"
         ],
         "rdepends": [
             "core"
@@ -730,7 +805,9 @@
     "multiprocessing": {
         "summary": "Python multiprocessing support",
         "rdepends": [
-            "core"
+            "core",
+            "io",
+            "pickle"
         ],
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_multiprocessing.*.so",
@@ -741,18 +818,14 @@
     "netclient": {
         "summary": "Python Internet Protocol clients",
         "rdepends": [
-            "compression",
             "core",
             "crypt",
-            "ctypes",
             "datetime",
             "email",
             "io",
             "math",
             "mime",
-            "shell",
-            "stringold",
-            "unixadmin"
+            "stringold"
         ],
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/base64.py",
@@ -760,6 +833,7 @@
             "${libdir}/python${PYTHON_MAJMIN}/hmac.py",
             "${libdir}/python${PYTHON_MAJMIN}/http",
             "${libdir}/python${PYTHON_MAJMIN}/http/__pycache__",
+            "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_uuid.*.so",
             "${libdir}/python${PYTHON_MAJMIN}/mimetypes.py",
             "${libdir}/python${PYTHON_MAJMIN}/nntplib.py",
             "${libdir}/python${PYTHON_MAJMIN}/poplib.py",
@@ -814,13 +888,16 @@
         ],
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/_pydecimal.py",
+            "${libdir}/python${PYTHON_MAJMIN}/contextvars.py",
             "${libdir}/python${PYTHON_MAJMIN}/decimal.py",
             "${libdir}/python${PYTHON_MAJMIN}/fractions.py",
+            "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_contextvars.*.so",
             "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_decimal.*.so",
             "${libdir}/python${PYTHON_MAJMIN}/numbers.py"
         ],
         "cached": [
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/_pydecimal.*.pyc",
+            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/contextvars.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/decimal.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/fractions.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/numbers.*.pyc"
@@ -1044,13 +1121,12 @@
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/_dummy_thread.py",
             "${libdir}/python${PYTHON_MAJMIN}/_threading_local.py",
-            "${libdir}/python${PYTHON_MAJMIN}/dummy_threading.py",
+            "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_queue.*.so",
             "${libdir}/python${PYTHON_MAJMIN}/queue.py"
         ],
         "cached": [
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/_dummy_thread.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/_threading_local.*.pyc",
-            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/dummy_threading.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/queue.*.pyc"
         ]
     },
@@ -1060,6 +1136,7 @@
             "core"
         ],
         "files": [
+            "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_tkinter.*.so",
             "${libdir}/python${PYTHON_MAJMIN}/tkinter"
         ],
         "cached": []
@@ -1119,8 +1196,8 @@
             "unixadmin"
         ],
         "files": [
-            "${libdir}/python${PYTHON_MAJMIN}/venv",
-            "${bindir}/pyvenv*"
+            "${bindir}/pyvenv*",
+            "${libdir}/python${PYTHON_MAJMIN}/venv"
         ],
         "cached": []
     },

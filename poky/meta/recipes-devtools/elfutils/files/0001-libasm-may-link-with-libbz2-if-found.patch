@@ -1,4 +1,4 @@
-From 74629016e76343a4bf39915c9192b6bf26a57c2d Mon Sep 17 00:00:00 2001
+From d7be687c35fa42954874034c82ca9059d28196fe Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 4 Oct 2017 22:30:46 -0700
 Subject: [PATCH] libasm may link with libbz2 if found
@@ -11,6 +11,7 @@ where indirect libraries may be not found by linker
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  src/Makefile.am | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
@@ -33,6 +34,3 @@ index 9305b84..9b7e853 100644
  libdw = ../libdw/libdw.so $(zip_LIBS) $(libelf) $(libebl) -ldl
  libelf = ../libelf/libelf.so
  endif
--- 
-2.7.4
-

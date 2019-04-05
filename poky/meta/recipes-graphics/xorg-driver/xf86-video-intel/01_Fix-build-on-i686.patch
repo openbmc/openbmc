@@ -1,0 +1,55 @@
+From a414d4e24461da1cb4cef8ee910bc57bab360ceb Mon Sep 17 00:00:00 2001
+From: Adam Jackson <ajax@redhat.com>
+Date: Tue, 6 Mar 2018 12:07:46 -0500
+Subject: [PATCH] Fix build on i686
+
+Presumably this only matters for i686 because amd64 implies sse2, but:
+
+BUILDSTDERR: In file included from gen4_vertex.c:34:
+BUILDSTDERR: gen4_vertex.c: In function 'emit_vertex':
+BUILDSTDERR: sna_render_inline.h:40:26: error: inlining failed in call to always_inline 'vertex_emit_2s': target specific option mismatch
+BUILDSTDERR:  static force_inline void vertex_emit_2s(struct sna *sna, int16_t x, int16_t y)
+BUILDSTDERR:                           ^~~~~~~~~~~~~~
+BUILDSTDERR: gen4_vertex.c:308:25: note: called from here
+BUILDSTDERR:  #define OUT_VERTEX(x,y) vertex_emit_2s(sna, x,y) /* XXX assert(!too_large(x, y)); */
+BUILDSTDERR:                          ^~~~~~~~~~~~~~~~~~~~~~~~
+BUILDSTDERR: gen4_vertex.c:360:2: note: in expansion of macro 'OUT_VERTEX'
+BUILDSTDERR:   OUT_VERTEX(dstX, dstY);
+BUILDSTDERR:   ^~~~~~~~~~
+
+The bug here appears to be that emit_vertex() is declared 'sse2' but
+vertex_emit_2s is merely always_inline. gcc8 decides that since you said
+always_inline you need to have explicitly cloned it for every
+permutation of targets. Merely saying inline seems to do the job of
+cloning vertex_emit_2s as much as necessary.
+
+So to reiterate: if you say always-inline, it won't, but if you just say
+maybe inline, it will. Thanks gcc, that's helpful.
+
+- ajax
+
+Patch taken from Fedora.
+
+Upstream-Status: Pending
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+
+---
+ src/sna/compiler.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/sna/compiler.h b/src/sna/compiler.h
+index 3c176a16..bc447c7a 100644
+--- a/src/sna/compiler.h
++++ b/src/sna/compiler.h
+@@ -32,7 +32,7 @@
+ #define likely(expr) (__builtin_expect (!!(expr), 1))
+ #define unlikely(expr) (__builtin_expect (!!(expr), 0))
+ #define noinline __attribute__((noinline))
+-#define force_inline inline __attribute__((always_inline))
++#define force_inline inline
+ #define fastcall __attribute__((regparm(3)))
+ #define must_check __attribute__((warn_unused_result))
+ #define constant __attribute__((const))
+-- 
+2.16.2
+

@@ -1,0 +1,50 @@
+From 474e59abec88de0c455836c1f53152bf2aa26c34 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 15 Feb 2019 11:17:27 +0100
+Subject: [PATCH] Do not write $bindir into pkg-config files
+
+This would otherwise break when using the files to build other target
+components (we need to rely on PATH containing the paths to utilities,
+rather than use target paths).
+
+Upstream-Status: Inappropriate [upstream wants the paths in .pc files]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ gio/meson.build  | 6 +++---
+ glib/meson.build | 6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/gio/meson.build b/gio/meson.build
+index 85d8b14..657720a 100644
+--- a/gio/meson.build
++++ b/gio/meson.build
+@@ -813,9 +813,9 @@ pkg.generate(libraries : libgio,
+                'schemasdir=' + join_paths('${datadir}', schemas_subdir),
+                'bindir=' + join_paths('${prefix}', get_option('bindir')),
+                'giomoduledir=' + giomodulesdir,
+-               'glib_compile_schemas=' + join_paths('${bindir}', 'glib-compile-schemas'),
+-               'glib_compile_resources=' + join_paths('${bindir}', 'glib-compile-resources'),
+-               'gdbus_codegen=' + join_paths('${bindir}', 'gdbus-codegen')],
++               'glib_compile_schemas=glib-compile-schemas',
++               'glib_compile_resources=glib-compile-resources',
++               'gdbus_codegen=gdbus-codegen'],
+   version : glib_version,
+   install_dir : glib_pkgconfigreldir,
+   filebase : 'gio-2.0',
+diff --git a/glib/meson.build b/glib/meson.build
+index c05c694..434e8b1 100644
+--- a/glib/meson.build
++++ b/glib/meson.build
+@@ -261,9 +261,9 @@ pkg.generate(libraries : [libglib, libintl],
+   subdirs : ['glib-2.0'],
+   extra_cflags : ['-I${libdir}/glib-2.0/include'] + win32_cflags,
+   variables : ['bindir=' + join_paths('${prefix}', get_option('bindir')),
+-               'glib_genmarshal=' + join_paths('${bindir}', 'glib-genmarshal'),
+-               'gobject_query=' + join_paths('${bindir}', 'gobject-query'),
+-               'glib_mkenums=' + join_paths('${bindir}', 'glib-mkenums')],
++               'glib_genmarshal=glib-genmarshal',
++               'gobject_query=gobject-query',
++               'glib_mkenums=glib-mkenums'],
+   version : glib_version,
+   install_dir : glib_pkgconfigreldir,
+   filebase : 'glib-2.0',

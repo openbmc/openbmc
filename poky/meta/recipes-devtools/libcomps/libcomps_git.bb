@@ -6,10 +6,11 @@ SRC_URI = "git://github.com/rpm-software-management/libcomps.git \
            file://0001-Do-not-set-PYTHON_INSTALL_DIR-by-running-python.patch \
            file://0002-Set-library-installation-path-correctly.patch \
            file://0001-Make-__comps_objmrtree_all-static-inline.patch \
+           file://0001-Add-crc32.c-to-sources-list.patch \
            "
 
-PV = "0.1.8+git${SRCPV}"
-SRCREV = "01a4759894cccff64d2561614a58281adf5ce859"
+PV = "0.1.10"
+SRCREV = "86a82fcd155c27092340d15a34f5c75c4da88243"
 
 S = "${WORKDIR}/git"
 

@@ -1,0 +1,71 @@
+From 4f000a4a19975d6aba71427e693cd1ed080abda9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Thu, 22 Mar 2018 11:08:30 +0100
+Subject: [PATCH] Do not create settings settings/property documentation
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+It was tried to get this work but gi / GirRepository could not be found by
+python. Anyway it is not necessary for us to have the settings/property docs.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ Makefile.am  | 11 -----------
+ configure.ac |  5 -----
+ 2 files changed, 16 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index b180466..1ab4658 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1298,9 +1298,7 @@ EXTRA_DIST += \
+ if HAVE_INTROSPECTION
+ 
+ libnm_noinst_data = \
+-	libnm/nm-property-docs.xml \
+ 	libnm/nm-settings-docs-overrides.xml \
+-	libnm/nm-settings-docs.xml \
+ 	libnm/nm-settings-keyfile-docs.xml \
+ 	libnm/nm-settings-ifcfg-rh-docs.xml
+ 
+@@ -3930,18 +3928,9 @@ $(clients_common_libnmc_base_la_OBJECTS): $(libnm_lib_h_pub_mkenums)
+ $(clients_common_libnmc_base_la_OBJECTS): clients/common/.dirstamp
+ 
+ clients_common_settings_doc_h = clients/common/settings-docs.h
+-if HAVE_INTROSPECTION
+-$(clients_common_settings_doc_h): clients/common/settings-docs.xsl libnm/nm-property-docs.xml clients/common/.dirstamp
+-	$(AM_V_GEN) $(XSLTPROC) --output $@ $< $(word 2,$^)
+-DISTCLEANFILES += $(clients_common_settings_doc_h)
+-check-local-settings-docs: $(clients_common_settings_doc_h)
+-	$(srcdir)/tools/check-settings-docs.sh "$(srcdir)" "$(builddir)" "$(clients_common_settings_doc_h)"
+-check_local += check-local-settings-docs
+-else
+ $(clients_common_settings_doc_h): $(clients_common_settings_doc_h).in clients/common/.dirstamp
+ 	$(AM_V_GEN) cp "$(srcdir)/$(clients_common_settings_doc_h).in" "$(builddir)/$(clients_common_settings_doc_h)"
+ check-local-settings-docs:
+-endif
+ EXTRA_DIST += \
+ 	$(clients_common_settings_doc_h) \
+ 	$(clients_common_settings_doc_h).in
+diff --git a/configure.ac b/configure.ac
+index b914219..872c292 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1215,11 +1215,6 @@ GTK_DOC_CHECK(1.0)
+ # check if we can build setting property documentation
+ build_docs=no
+ if test -n "$INTROSPECTION_MAKEFILE"; then
+-	# If g-i is installed we know we have python, but we might not have pygobject
+-	if ! "$PYTHON" -c 'from gi.repository import GObject' >& /dev/null; then
+-		AC_MSG_ERROR(["--enable-introspection aims to build the settings documentation. This requires GObject introspection for python (pygobject)])
+-	fi
+-
+ 	AC_PATH_PROG(PERL, perl)
+ 	if test -z "$PERL"; then
+ 		AC_MSG_ERROR([--enable-introspection requires perl])
+-- 
+2.20.1
+

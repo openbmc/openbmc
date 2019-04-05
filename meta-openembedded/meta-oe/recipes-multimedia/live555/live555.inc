@@ -8,7 +8,7 @@ LICENSE = "LGPLv3"
 SECTION = "devel"
 
 URLV = "${@d.getVar('PV')[0:4]}.${@d.getVar('PV')[4:6]}.${@d.getVar('PV')[6:8]}"
-SRC_URI = "http://www.live555.com/liveMedia/public/live.${URLV}.tar.gz \
+SRC_URI = "http://www.live555.com/live.${URLV}.tar.gz \
            file://config.linux-cross"
 # only latest live version stays on http://www.live555.com/liveMedia/public/, add mirror for older
 MIRRORS += "http://www.live555.com/liveMedia/public/ http://distcache.FreeBSD.org/ports-distfiles/ \n"

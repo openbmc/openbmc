@@ -1,6 +1,6 @@
-From 5a3e13ae94318c2bed60f875bb3852c45ce0113c Mon Sep 17 00:00:00 2001
+From 3c16d9aaa46602e7594d717d86e7f02066d21134 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Thu, 25 May 2017 05:27:11 -0400
+Date: Mon, 26 Nov 2018 17:20:20 +0800
 Subject: [PATCH] explicitly do not install libdm
 
 Already have package libdevmapper which split from lvm2,
@@ -9,17 +9,21 @@ explicitly do not do the installation here.
 Upstream-Status: Inappropriate [meta-oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
-Signed-off-by: Andrew Bresticker <abrestic@waymo.com>
+
+
+Update context for lvm2 2.03.02.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- libdm/Makefile.in | 6 ++++--
- tools/Makefile.in | 3 ++-
- 2 files changed, 6 insertions(+), 3 deletions(-)
+ libdm/Makefile.in          | 6 ++++--
+ libdm/dm-tools/Makefile.in | 6 ++++--
+ 2 files changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/libdm/Makefile.in b/libdm/Makefile.in
-index 66ec39513..c779c9d86 100644
+index e9bb5ae..4e9ae3f 100644
 --- a/libdm/Makefile.in
 +++ b/libdm/Makefile.in
-@@ -77,9 +77,11 @@ ifeq ("@PKGCONFIG@", "yes")
+@@ -82,9 +82,11 @@ ifeq ("@PKGCONFIG@", "yes")
    INSTALL_TYPE += install_pkgconfig
  endif
  
@@ -32,21 +36,30 @@ index 66ec39513..c779c9d86 100644
 +	echo "Do not install device mapper in lvm2"
  
  install_include: $(srcdir)/libdevmapper.h
- 	$(INSTALL_DATA) -D $< $(includedir)/$(<F)
-diff --git a/tools/Makefile.in b/tools/Makefile.in
-index 103b76732..63ba7fc04 100644
---- a/tools/Makefile.in
-+++ b/tools/Makefile.in
-@@ -267,7 +267,8 @@ install_dmsetup_static: dmsetup.static
- 	$(Q) $(INSTALL_PROGRAM) -D $< $(staticdir)/$(<F)
- 	$(Q) $(LN_S) -f $(<F) $(staticdir)/dmstats
+ 	@echo "    [INSTALL] $<"
+diff --git a/libdm/dm-tools/Makefile.in b/libdm/dm-tools/Makefile.in
+index 15a9d8e..65e1306 100644
+--- a/libdm/dm-tools/Makefile.in
++++ b/libdm/dm-tools/Makefile.in
+@@ -20,7 +20,8 @@ all: device-mapper
  
--install_device-mapper: $(INSTALL_DMSETUP_TARGETS)
+ SOURCES2 = dmsetup.c
+ TARGETS_DM = dmsetup
+-install_device-mapper: install_dmsetup_dynamic
 +install_device-mapper:
 +	echo "Do not install device mapper in lvm2"
  
- install_lvm2: $(INSTALL_LVM_TARGETS)
+ ifeq ("@STATIC_LINK@", "yes")
+   TARGETS_DM += dmsetup.static
+@@ -93,6 +94,7 @@ install_dmfilemapd_static: dmfilemapd.static
+ .PHONY: install_dmsetup_dynamic install_dmsetup_static
+ .PHONY: install_dmfilemapd install_dmfilemapd_static
  
+-install: install_device-mapper install_dmfilemapd
++install:
++	echo "Do not install device mapper in lvm2"
+ 
+ device-mapper: $(TARGETS_DM)
 -- 
-2.19.0.397.gdd90340f6a-goog
+2.7.4
 

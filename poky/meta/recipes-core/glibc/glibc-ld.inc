@@ -10,8 +10,8 @@ def glibc_dl_info(d):
         infos['ldconfig'].add('{"' + loader + '",' + "FLAG_ELF_LIBC6" + ' }')
         infos['lddrewrite'].add(loader)
 
-    infos['ldconfig'] = ','.join(infos['ldconfig'])
-    infos['lddrewrite'] = ' '.join(infos['lddrewrite'])
+    infos['ldconfig'] = ','.join(sorted(infos['ldconfig']))
+    infos['lddrewrite'] = ' '.join(sorted(infos['lddrewrite']))
     return infos
 
 EGLIBC_KNOWN_INTERPRETER_NAMES = "${@glibc_dl_info(d)['ldconfig']}"

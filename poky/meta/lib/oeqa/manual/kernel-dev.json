@@ -1,7 +1,7 @@
 [
     {
         "test": {
-            "@alias": "kernel-configuration.kernel-configuration.TCTEMP_2.3_MANUAL_Kernel_dev_defconfig",
+            "@alias": "kernel-dev.kernel-dev.Kernel_dev_defconfig",
             "author": [
                 {
                     "email": "ee.peng.yeoh@intel.com",
@@ -18,12 +18,12 @@
                     "expected_results": "Review expected results on thethe \"Kernel Development Test Cases\"wiki. https://wiki.yoctoproject.org/wiki/Kernel_Development_Test_Cases#Expected_Results_7"
                 }
             },
-            "summary": "TCTEMP_2.3_MANUAL_Kernel_dev_defconfig"
+            "summary": "Kernel_dev_defconfig"
         }
     },
     {
         "test": {
-            "@alias": "kernel-configuration.kernel-configuration.TCTEMP_2.3_MANUAL_Kernel_dev_defconfig+fragments",
+            "@alias": "kernel-dev.kernel-dev.Kernel_dev_defconfig+fragments",
             "author": [
                 {
                     "email": "ee.peng.yeoh@intel.com",
@@ -40,12 +40,12 @@
                     "expected_results": "Review expected results on thethe \"Kernel Development Test Cases\"wiki. https://wiki.yoctoproject.org/wiki/Kernel_Development_Test_Cases#Expected_Results_8"
                 }
             },
-            "summary": "TCTEMP_2.3_MANUAL_Kernel_dev_defconfig+fragments"
+            "summary": "Kernel_dev_defconfig+fragments"
         }
     },
     {
         "test": {
-            "@alias": "kernel-configuration.kernel-configuration.TCTEMP_2.3_MANUAL_Kernel_dev_Applying_patches",
+            "@alias": "kernel-dev.kernel-dev.Kernel_dev_Applying_patches",
             "author": [
                 {
                     "email": "ee.peng.yeoh@intel.com",
@@ -62,12 +62,12 @@
                     "expected_results": "Review expected results on thethe \"Kernel Development Test Cases\"wiki. https://wiki.yoctoproject.org/wiki/Kernel_Development_Test_Cases#Expected_Results"
                 }
             },
-            "summary": "TCTEMP_2.3_MANUAL_Kernel_dev_Applying_patches"
+            "summary": "Kernel_dev_Applying_patches"
         }
     },
     {
         "test": {
-            "@alias": "kernel-configuration.kernel-configuration.TCTEMP_2.3_MANUAL_Kernel_dev_linux-yocto-local-source",
+            "@alias": "kernel-dev.kernel-dev.Kernel_dev_linux-yocto-local-source",
             "author": [
                 {
                     "email": "ee.peng.yeoh@intel.com",
@@ -84,12 +84,12 @@
                     "expected_results": "Review expected results on thethe \"Kernel Development Test Cases\"wiki. https://wiki.yoctoproject.org/wiki/Kernel_Development_Test_Cases#Expected_Results_2"
                 }
             },
-            "summary": "TCTEMP_2.3_MANUAL_Kernel_dev_linux-yocto-local-source"
+            "summary": "Kernel_dev_linux-yocto-local-source"
         }
     },
     {
         "test": {
-            "@alias": "kernel-configuration.kernel-configuration.TCTEMP_2.3_MANUAL_Kernel_dev_linux-yocto-custom-local-source",
+            "@alias": "kernel-dev.kernel-dev.Kernel_dev_linux-yocto-custom-local-source",
             "author": [
                 {
                     "email": "ee.peng.yeoh@intel.com",
@@ -106,12 +106,12 @@
                     "expected_results": "Review expected results on thethe \"Kernel Development Test Cases\"wiki. https://wiki.yoctoproject.org/wiki/Kernel_Development_Test_Cases#Expected_Results_3"
                 }
             },
-            "summary": "TCTEMP_2.3_MANUAL_Kernel_dev_linux-yocto-custom-local-source"
+            "summary": "Kernel_dev_linux-yocto-custom-local-source"
         }
     },
     {
         "test": {
-            "@alias": "kernel-configuration.kernel-configuration.TCTEMP_2.3_MANUAL_Kernel_dev_recipe-space_meta",
+            "@alias": "kernel-dev.kernel-dev.Kernel_dev_recipe-space_meta",
             "author": [
                 {
                     "email": "ee.peng.yeoh@intel.com",
@@ -128,12 +128,12 @@
                     "expected_results": "Review expected results on thethe \"Kernel Development Test Cases\"wiki. https://wiki.yoctoproject.org/wiki/Kernel_Development_Test_Cases#Expected_Results_5"
                 }
             },
-            "summary": "TCTEMP_2.3_MANUAL_Kernel_dev_recipe-space_meta"
+            "summary": "Kernel_dev_recipe-space_meta"
         }
     },
     {
         "test": {
-            "@alias": "kernel-configuration.kernel-configuration.TCTEMP_2.3_MANUAL_Kernel_dev_External_source",
+            "@alias": "kernel-dev.kernel-dev.Kernel_dev_External_source",
             "author": [
                 {
                     "email": "ee.peng.yeoh@intel.com",
@@ -150,12 +150,12 @@
                     "expected_results": "Review expected results on thethe \"Kernel Development Test Cases\"wiki. https://wiki.yoctoproject.org/wiki/Kernel_Development_Test_Cases#Expected_Results_6"
                 }
             },
-            "summary": "TCTEMP_2.3_MANUAL_Kernel_dev_External_source"
+            "summary": "Kernel_dev_External_source"
         }
     },
     {
         "test": {
-            "@alias": "kernel-configuration.kernel-configuration.TCTEMP_2.3_MANUAL_Kernel_dev_building_external_modules(hello-mod)",
+            "@alias": "kernel-dev.kernel-dev.Kernel_dev_building_external_modules(hello-mod)",
             "author": [
                 {
                     "email": "ee.peng.yeoh@intel.com",
@@ -172,12 +172,12 @@
                     "expected_results": "Review expected results on thethe \"Kernel Development Test Cases\"wiki. https://wiki.yoctoproject.org/wiki/Kernel_Development_Test_Cases#Expected_Results_10"
                 }
             },
-            "summary": "TCTEMP_2.3_MANUAL_Kernel_dev_building_external_modules(hello-mod)"
+            "summary": "Kernel_dev_building_external_modules(hello-mod)"
         }
     },
     {
         "test": {
-            "@alias": "kernel-configuration.kernel-configuration.TCTEMP_2.3_MANUAL_Kernel_dev_local_parallel_meta",
+            "@alias": "kernel-dev.kernel-dev.Kernel_dev_local_parallel_meta",
             "author": [
                 {
                     "email": "ee.peng.yeoh@intel.com",
@@ -194,7 +194,7 @@
                     "expected_results": "Review expected results on thethe \"Kernel Development Test Cases\"wiki. https://wiki.yoctoproject.org/wiki/Kernel_Development_Test_Cases#Expected_Results_4"
                 }
             },
-            "summary": "TCTEMP_2.3_MANUAL_Kernel_dev_local_parallel_meta"
+            "summary": "Kernel_dev_local_parallel_meta"
         }
     }
 ]

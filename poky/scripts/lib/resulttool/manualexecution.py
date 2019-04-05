@@ -24,30 +24,18 @@ def load_json_file(file):
     with open(file, "r") as f:
         return json.load(f)
 
-
 class ManualTestRunner(object):
-    def __init__(self):
-        self.jdata = ''
-        self.test_module = ''
-        self.test_cases_id = ''
-        self.configuration = ''
-        self.starttime = ''
-        self.result_id = ''
-        self.write_dir = ''
 
     def _get_testcases(self, file):
         self.jdata = load_json_file(file)
-        self.test_cases_id = []
         self.test_module = self.jdata[0]['test']['@alias'].split('.', 2)[0]
-        for i in self.jdata:
-            self.test_cases_id.append(i['test']['@alias'])
-    
+
     def _get_input(self, config):
         while True:
             output = input('{} = '.format(config))
-            if re.match('^[a-zA-Z0-9_-]+$', output):
+            if re.match('^[a-z0-9-.]+$', output):
                 break
-            print('Only alphanumeric and underscore/hyphen are allowed. Please try again')
+            print('Only lowercase alphanumeric, hyphen and dot are allowed. Please try again')
         return output
 
     def _create_config(self):
@@ -67,44 +55,42 @@ class ManualTestRunner(object):
         extra_config = set(store_map['manual']) - set(self.configuration)
         for config in sorted(extra_config):
             print('---------------------------------------------')
-            print('This is configuration #%s. Please provide configuration value(use "None" if not applicable).'
-                  % config)
+            print('This is configuration #%s. Please provide configuration value(use "None" if not applicable).' % config)
             print('---------------------------------------------')
             value_conf = self._get_input('Configuration Value')
             print('---------------------------------------------\n')
             self.configuration[config] = value_conf
 
     def _create_result_id(self):
-        self.result_id = 'manual_' + self.test_module + '_' + self.starttime
+        self.result_id = 'manual_%s_%s' % (self.test_module, self.starttime)
 
-    def _execute_test_steps(self, test_id):
+    def _execute_test_steps(self, test):
         test_result = {}
-        total_steps = len(self.jdata[test_id]['test']['execution'].keys())
         print('------------------------------------------------------------------------')
-        print('Executing test case:' + '' '' + self.test_cases_id[test_id])
+        print('Executing test case: %s' % test['test']['@alias'])
         print('------------------------------------------------------------------------')
-        print('You have total ' + str(total_steps) + ' test steps to be executed.')
+        print('You have total %s test steps to be executed.' % len(test['test']['execution']))
         print('------------------------------------------------------------------------\n')
-        for step in sorted((self.jdata[test_id]['test']['execution']).keys()):
-            print('Step %s: ' % step + self.jdata[test_id]['test']['execution']['%s' % step]['action'])
-            print('Expected output: ' + self.jdata[test_id]['test']['execution']['%s' % step]['expected_results'])
-            done = input('\nPlease press ENTER when you are done to proceed to next step.\n')
+        for step, _ in sorted(test['test']['execution'].items(), key=lambda x: int(x[0])):
+            print('Step %s: %s' % (step, test['test']['execution'][step]['action']))
+            expected_output = test['test']['execution'][step]['expected_results']
+            if expected_output:
+                print('Expected output: %s' % expected_output)
         while True:
-            done = input('\nPlease provide test results: (P)assed/(F)ailed/(B)locked/(S)kipped? \n')
-            done = done.lower()
+            done = input('\nPlease provide test results: (P)assed/(F)ailed/(B)locked/(S)kipped? \n').lower()
             result_types = {'p':'PASSED',
-                                'f':'FAILED',
-                                'b':'BLOCKED',
-                                's':'SKIPPED'}
+                            'f':'FAILED',
+                            'b':'BLOCKED',
+                            's':'SKIPPED'}
             if done in result_types:
                 for r in result_types:
                     if done == r:
                         res = result_types[r]
                         if res == 'FAILED':
                             log_input = input('\nPlease enter the error and the description of the log: (Ex:log:211 Error Bitbake)\n')
-                            test_result.update({self.test_cases_id[test_id]: {'status': '%s' % res, 'log': '%s' % log_input}})
+                            test_result.update({test['test']['@alias']: {'status': '%s' % res, 'log': '%s' % log_input}})
                         else:
-                            test_result.update({self.test_cases_id[test_id]: {'status': '%s' % res}})
+                            test_result.update({test['test']['@alias']: {'status': '%s' % res}})
                 break
             print('Invalid input!')
         return test_result
@@ -119,9 +105,9 @@ class ManualTestRunner(object):
         self._create_result_id()
         self._create_write_dir()
         test_results = {}
-        print('\nTotal number of test cases in this test suite: ' + '%s\n' % len(self.jdata))
-        for i in range(0, len(self.jdata)):
-            test_result = self._execute_test_steps(i)
+        print('\nTotal number of test cases in this test suite: %s\n' % len(self.jdata))
+        for t in self.jdata:
+            test_result = self._execute_test_steps(t)
             test_results.update(test_result)
         return self.configuration, self.result_id, self.write_dir, test_results
 
@@ -129,8 +115,7 @@ def manualexecution(args, logger):
     testrunner = ManualTestRunner()
     get_configuration, get_result_id, get_write_dir, get_test_results = testrunner.run_test(args.file)
     resultjsonhelper = OETestResultJSONHelper()
-    resultjsonhelper.dump_testresult_file(get_write_dir, get_configuration, get_result_id,
-                                          get_test_results)
+    resultjsonhelper.dump_testresult_file(get_write_dir, get_configuration, get_result_id, get_test_results)
     return 0
 
 def register_commands(subparsers):

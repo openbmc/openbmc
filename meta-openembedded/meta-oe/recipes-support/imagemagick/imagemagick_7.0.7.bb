@@ -1,5 +1,8 @@
-SUMMARY = "ImageMagick is an image convertion tools"
+SUMMARY = "ImageMagick is an image conversion toolkit"
 SECTION = "console/utils"
+HOMEPAGE = "https://www.imagemagick.org/"
+DESCRIPTION = "ImageMagick is a collection of tools for displaying, converting, and \
+editing raster and vector image files. It can read and write over 200 image file formats."
 LICENSE = "ImageMagick"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=dad5a98f173fd3fa6958a1a58c6131c1"
 # FIXME: There are many more checked libraries. All should be added or explicitly disabled to get consistent results.

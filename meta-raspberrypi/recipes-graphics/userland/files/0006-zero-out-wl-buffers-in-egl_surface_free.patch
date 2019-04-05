@@ -1,4 +1,4 @@
-From 466f28ce302f68ac39be750f4b55285791f43ab1 Mon Sep 17 00:00:00 2001
+From 7d4559c2418f4997dfdddefa9281250d0d8082db Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 6 Feb 2016 11:10:47 -0800
 Subject: [PATCH 06/18] zero-out wl buffers in egl_surface_free
@@ -29,5 +29,5 @@ index 42350bf..1f923d9 100644
  #endif
     }
 -- 
-2.19.1
+2.20.1
 

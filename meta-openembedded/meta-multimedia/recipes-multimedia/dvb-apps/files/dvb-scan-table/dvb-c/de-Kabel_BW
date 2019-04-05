@@ -1,0 +1,23 @@
+# Kabel-BW, Stand 04/2007
+#
+# Nur eine Anfangsfrequenz ist noetig, um den Ball ins
+# Rollen zu bringen. Quasi als Einstiegspunkt fuer eine
+# umfassende Suche. Es besteht kein Grund, sich um all die
+# vielen anderen Frequenzen und deren aktuell verwendete
+# Parameter zu kuemmern und diese dann womoeglich auch
+# noch auf einem aktuellen Stand halten zu wollen. Bei der
+# schieren Anzahl der innerhalb des Ausbaugebiets durch
+# Kabel BW genutzten Frequenzen waere das nur zeitraubend
+# und fehleranfaellig... ;-)
+#
+# Dirk Ritter <dirk@GNUmatic.de>
+#
+# freq      sr      fec  mod
+[CHANNEL]
+	DELIVERY_SYSTEM = DVBC/ANNEX_A
+	FREQUENCY = 114000000
+	SYMBOL_RATE = 6900000
+	INNER_FEC = NONE
+	MODULATION = QAM/256
+	INVERSION = AUTO
+

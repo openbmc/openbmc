@@ -8,7 +8,7 @@ for write_exe_full_path in ${DIR}/add_person_*; do
 	if [ -x "${write_exe_full_path}" ]; then
 		write_exe=`basename ${write_exe_full_path}`
 		echo "Generating new test file using ${write_exe}..."
-		${write_exe_full_path} "${TEST_FILE}"
+    printf "1234\nname\nname@example.com\n" | ${write_exe_full_path} "${TEST_FILE}"
 		RETVAL=$?
 		[ $RETVAL -eq 0 ] || exit $RETVAL
 

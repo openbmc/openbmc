@@ -45,7 +45,6 @@ GO_INSTALL_FILTEROUT ?= "${GO_IMPORT}/vendor/"
 
 B = "${WORKDIR}/build"
 export GOPATH = "${B}"
-export GOCACHE = "off"
 export GOTMPDIR ?= "${WORKDIR}/go-tmp"
 GOTMPDIR[vardepvalue] = ""
 

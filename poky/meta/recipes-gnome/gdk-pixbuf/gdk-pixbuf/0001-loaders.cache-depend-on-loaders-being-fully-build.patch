@@ -1,0 +1,51 @@
+From 116bc8f7a6034ce43053876a72a132fcd4e1e472 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 20 Feb 2019 19:53:07 +0100
+Subject: [PATCH] loaders.cache: depend on loaders being fully build
+
+Otherwise, races have been observed:
+https://autobuilder.yoctoproject.org/typhoon/#/builders/61/builds/310/steps/7/logs/step1b
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+---
+ gdk-pixbuf/meson.build | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/gdk-pixbuf/meson.build b/gdk-pixbuf/meson.build
+index fc3eb33..4e7ed20 100644
+--- a/gdk-pixbuf/meson.build
++++ b/gdk-pixbuf/meson.build
+@@ -171,6 +171,7 @@ gdkpixbuf_dep = declare_dependency(link_with: gdkpixbuf,
+ # Now check if we are building loaders as installed shared modules
+ # We do this here because shared modules depend on libgdk-pixbuf
+ dynamic_loaders = []
++dynamic_loaders_dep = []
+ 
+ foreach l: loaders
+   name = l[0]
+@@ -189,6 +190,7 @@ foreach l: loaders
+ 
+     # We need the path to build loaders.cache for tests
+     dynamic_loaders += mod.full_path()
++    dynamic_loaders_dep += mod
+   endif
+ endforeach
+ 
+@@ -206,6 +208,7 @@ if enable_native_windows_loaders
+                           install: true,
+                           install_dir: gdk_pixbuf_loaderdir)
+       dynamic_loaders += mod.full_path()
++      dynamic_loaders_dep += mod
+     endforeach
+   endif
+ endif
+@@ -236,6 +239,7 @@ if not meson.is_cross_build()
+ loaders_cache = custom_target('loaders.cache',
+                               output: 'loaders.cache',
+                               capture: true,
++                              depends: [ dynamic_loaders_dep ],
+                               command: [
+                                 gdk_pixbuf_query_loaders,
+                                 dynamic_loaders,

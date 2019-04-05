@@ -15,6 +15,7 @@
 import os
 import json
 import scriptpath
+import copy
 scriptpath.add_oe_lib_path()
 
 flatten_map = {
@@ -60,12 +61,6 @@ def append_resultsdata(results, f, configmap=store_map):
         testpath = "/".join(data[res]["configuration"].get(i) for i in configmap[testtype])
         if testpath not in results:
             results[testpath] = {}
-        if 'ptestresult.rawlogs' in data[res]['result']:
-            del data[res]['result']['ptestresult.rawlogs']
-        if 'ptestresult.sections' in data[res]['result']:
-            for i in data[res]['result']['ptestresult.sections']:
-                if 'log' in data[res]['result']['ptestresult.sections'][i]:
-                    del data[res]['result']['ptestresult.sections'][i]['log']
         results[testpath][res] = data[res]
 
 #
@@ -93,15 +88,43 @@ def filter_resultsdata(results, resultid):
                  newresults[r][i] = results[r][i]
     return newresults
 
-def save_resultsdata(results, destdir, fn="testresults.json"):
+def strip_ptestresults(results):
+    newresults = copy.deepcopy(results)
+    #for a in newresults2:
+    #  newresults = newresults2[a]
+    for res in newresults:
+        if 'result' not in newresults[res]:
+            continue
+        if 'ptestresult.rawlogs' in newresults[res]['result']:
+            del newresults[res]['result']['ptestresult.rawlogs']
+        if 'ptestresult.sections' in newresults[res]['result']:
+            for i in newresults[res]['result']['ptestresult.sections']:
+                if 'log' in newresults[res]['result']['ptestresult.sections'][i]:
+                    del newresults[res]['result']['ptestresult.sections'][i]['log']
+    return newresults
+
+def save_resultsdata(results, destdir, fn="testresults.json", ptestjson=False, ptestlogs=False):
     for res in results:
         if res:
             dst = destdir + "/" + res + "/" + fn
         else:
             dst = destdir + "/" + fn
         os.makedirs(os.path.dirname(dst), exist_ok=True)
+        resultsout = results[res]
+        if not ptestjson:
+            resultsout = strip_ptestresults(results[res])
         with open(dst, 'w') as f:
-            f.write(json.dumps(results[res], sort_keys=True, indent=4))
+            f.write(json.dumps(resultsout, sort_keys=True, indent=4))
+        for res2 in results[res]:
+            if ptestlogs and 'result' in results[res][res2]:
+                if 'ptestresult.rawlogs' in results[res][res2]['result']:
+                    with open(dst.replace(fn, "ptest-raw.log"), "w+") as f:
+                        f.write(results[res][res2]['result']['ptestresult.rawlogs']['log'])
+                if 'ptestresult.sections' in results[res][res2]['result']:
+                    for i in results[res][res2]['result']['ptestresult.sections']:
+                        if 'log' in results[res][res2]['result']['ptestresult.sections'][i]:
+                            with open(dst.replace(fn, "ptest-%s.log" % i), "w+") as f:
+                                f.write(results[res][res2]['result']['ptestresult.sections'][i]['log'])
 
 def git_get_result(repo, tags):
     git_objs = []

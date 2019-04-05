@@ -17,6 +17,7 @@ SRC_URI = "file://init \
            file://udev \
            file://e2fs \
            file://debug \
+           file://lvm \
           "
 
 S = "${WORKDIR}"
@@ -45,6 +46,9 @@ do_install() {
     # debug
     install -m 0755 ${WORKDIR}/debug ${D}/init.d/00-debug
 
+    # lvm
+    install -m 0755 ${WORKDIR}/lvm ${D}/init.d/09-lvm
+
     # Create device nodes expected by some kernels in initramfs
     # before even executing /init.
     install -d ${D}/dev
@@ -59,6 +63,7 @@ PACKAGES = "${PN}-base \
             initramfs-module-nfsrootfs \
             initramfs-module-rootfs \
             initramfs-module-debug \
+            initramfs-module-lvm \
            "
 
 FILES_${PN}-base = "/init /init.d/99-finish /dev"
@@ -98,3 +103,7 @@ FILES_initramfs-module-rootfs = "/init.d/90-rootfs"
 SUMMARY_initramfs-module-debug = "initramfs dynamic debug support"
 RDEPENDS_initramfs-module-debug = "${PN}-base"
 FILES_initramfs-module-debug = "/init.d/00-debug"
+
+SUMMARY_initramfs-module-lvm = "initramfs lvm rootfs support"
+RDEPENDS_initramfs-module-lvm = "${PN}-base"
+FILES_initramfs-module-lvm = "/init.d/09-lvm"

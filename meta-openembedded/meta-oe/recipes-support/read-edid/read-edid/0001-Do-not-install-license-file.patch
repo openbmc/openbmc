@@ -1,0 +1,17 @@
+Do not install license file
+
+File name is incorrect as well; must be LICENSE instead of COPYING.
+
+Upstream-Status: Submitted [pyrophobicman@gmail.com]
+
+Signed-off-by: Stefan Wiehler <stefan.wiehler@missinglinkelectronics.com>
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -13,5 +13,5 @@
+ add_subdirectory (parse-edid)
+ 
+ INSTALL(FILES get-edid.1 DESTINATION share/man/man1)
+-INSTALL(FILES AUTHORS ChangeLog COPYING README DESTINATION
++INSTALL(FILES AUTHORS ChangeLog README DESTINATION
+ 	share/doc/read-edid)

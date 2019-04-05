@@ -1,0 +1,46 @@
+From 416cee8707053a9015dfec8332e12f8c263098e3 Mon Sep 17 00:00:00 2001
+From: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Date: Thu, 14 Feb 2019 11:40:50 -0500
+Subject: [PATCH 9/9] Cleanup: tp mempool: Remove logically dead code
+
+Found by Coverity:
+CID 1391045 (#1 of 1): Logically dead code (DEADCODE)
+
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+
+Upstream-Status: backport https://github.com/lttng/lttng-modules/commit/416cee8707053a9015dfec8332e12f8c263098e3
+
+Signed-off-by: Bruce Ashfield <bruce.ashfield@gmail.com>
+---
+ lttng-tp-mempool.c | 11 ++---------
+ 1 file changed, 2 insertions(+), 9 deletions(-)
+
+diff --git a/lttng-tp-mempool.c b/lttng-tp-mempool.c
+index d984bd4..21e8376 100644
+--- a/lttng-tp-mempool.c
++++ b/lttng-tp-mempool.c
+@@ -151,19 +151,12 @@ void lttng_tp_mempool_free(void *ptr)
+ 	struct lttng_tp_buf_entry *entry;
+ 	struct per_cpu_buf *cpu_buf;
+ 
+-	if (!ptr) {
++	if (!ptr)
+ 		goto end;
+-	}
+-
+ 	entry = container_of(ptr, struct lttng_tp_buf_entry, buf);
+-	if (!entry) {
+-		goto end;
+-	}
+-
+ 	cpu_buf = per_cpu_ptr(pool, entry->cpu);
+-	if (!cpu_buf) {
++	if (!cpu_buf)
+ 		goto end;
+-	}
+ 	/* Add it to the free list. */
+ 	list_add_tail(&entry->list, &cpu_buf->free_list);
+ 
+-- 
+2.19.1
+

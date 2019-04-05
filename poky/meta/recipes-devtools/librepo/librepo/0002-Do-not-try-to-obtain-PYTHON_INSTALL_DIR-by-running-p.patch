@@ -1,8 +1,7 @@
-From 5b6849d9d7e030c3a521b5245d86f853b0271a61 Mon Sep 17 00:00:00 2001
+From b08a3b71e716dd0485ef51036d32e4c304fb4e67 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 30 Dec 2016 18:05:36 +0200
-Subject: [PATCH 1/2] Do not try to obtain PYTHON_INSTALL_DIR by running
- python.
+Subject: [PATCH] Do not try to obtain PYTHON_INSTALL_DIR by running python.
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
@@ -13,12 +12,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  2 files changed, 12 insertions(+), 12 deletions(-)
 
 diff --git a/librepo/python/python2/CMakeLists.txt b/librepo/python/python2/CMakeLists.txt
-index 5ffbd62..90d3c22 100644
+index a0f1f9a..1665079 100644
 --- a/librepo/python/python2/CMakeLists.txt
 +++ b/librepo/python/python2/CMakeLists.txt
-@@ -1,11 +1,11 @@
- FIND_PACKAGE (PythonLibs 2 )
- FIND_PACKAGE (PythonInterp 2 REQUIRED)
+@@ -1,9 +1,9 @@
 -EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "
 -from sys import stdout
 -from distutils import sysconfig
@@ -35,13 +32,10 @@ index 5ffbd62..90d3c22 100644
  
  MESSAGE(STATUS "Python install dir is ${PYTHON_INSTALL_DIR}")
 diff --git a/librepo/python/python3/CMakeLists.txt b/librepo/python/python3/CMakeLists.txt
-index 47559f7..b39adc2 100644
+index 52ba44e..da51e10 100644
 --- a/librepo/python/python3/CMakeLists.txt
 +++ b/librepo/python/python3/CMakeLists.txt
-@@ -10,12 +10,12 @@ message("--- ${PYTHON_INCLUDE_DIR}")
- 
- FIND_PACKAGE(PythonLibs 3.0)
- FIND_PACKAGE(PythonInterp 3.0 REQUIRED)
+@@ -1,9 +1,9 @@
 -EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "
 -from sys import stdout
 -from distutils import sysconfig
@@ -57,6 +51,3 @@ index 47559f7..b39adc2 100644
  INCLUDE_DIRECTORIES (${PYTHON_INCLUDE_PATH})
  
  MESSAGE(STATUS "Python3 install dir is ${PYTHON_INSTALL_DIR}")
--- 
-2.14.1
-

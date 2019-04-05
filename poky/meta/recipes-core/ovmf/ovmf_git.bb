@@ -43,8 +43,7 @@ PARALLEL_MAKE = ""
 
 S = "${WORKDIR}/git"
 
-DEPENDS_class-native="util-linux-native iasl-native qemu-native"
-
+DEPENDS_class-native="util-linux-native iasl-native"
 DEPENDS_class-target="ovmf-native"
 
 DEPENDS_append = " nasm-native"
@@ -231,6 +230,10 @@ FILES_ovmf-shell-efi = " \
     EnrollDefaultKeys.efi \
     efi/ \
 "
+
+DEPLOYDEP = ""
+DEPLOYDEP_class-target = "qemu-system-native:do_populate_sysroot"
+do_deploy[depends] += "${DEPLOYDEP}"
 
 do_deploy() {
 }

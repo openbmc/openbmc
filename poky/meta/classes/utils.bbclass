@@ -264,7 +264,7 @@ create_wrapper () {
 realpath=\`readlink -fn \$0\`
 realdir=\`dirname \$realpath\`
 export $exportstring
-exec -a \`dirname \$realpath\`/$cmdname \`dirname \$realpath\`/$cmdname.real "\$@"
+exec -a "\$0" \$realdir/$cmdname.real "\$@"
 END
 	chmod +x $cmd
 }

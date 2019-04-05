@@ -1,4 +1,4 @@
-From 76989205a1411f16d7ab09ff9d279539a73dc259 Mon Sep 17 00:00:00 2001
+From 52d46c4d1fbd4c88d69c2fcf7837b2f2ba7ef6f2 Mon Sep 17 00:00:00 2001
 From: "Maxin B. John" <maxin.john@intel.com>
 Date: Thu, 12 Jan 2017 16:50:58 +0200
 Subject: [PATCH] netbase: add rpcbind as an alias to sunrpc
@@ -10,6 +10,7 @@ Upstream-Status: Pending
 
 Signed-off-by: Li Wang <li.wang@windriver.com>
 Signed-off-by: Maxin B. John <maxin.john@intel.com>
+
 ---
  etc-rpc      | 2 +-
  etc-services | 4 ++--
@@ -29,12 +30,12 @@ index 1b30625..9a9a81a 100644
  rusersd		100002	rusers
  nfs		100003	nfsprog
 diff --git a/etc-services b/etc-services
-index e3202ec..a039d7e 100644
+index fa7ae24..10ba2bc 100644
 --- a/etc-services
 +++ b/etc-services
-@@ -64,8 +64,8 @@ csnet-ns	105/udp		cso-ns
- rtelnet		107/tcp				# Remote Telnet
- rtelnet		107/udp
+@@ -51,8 +51,8 @@ kerberos	88/udp		kerberos5 krb5 kerberos-sec	# Kerberos v5
+ iso-tsap	102/tcp		tsap		# part of ISODE
+ acr-nema	104/tcp		dicom		# Digital Imag. & Comm. 300
  pop3		110/tcp		pop-3		# POP version 3
 -sunrpc		111/tcp		portmapper	# RPC 4.0 portmapper
 -sunrpc		111/udp		portmapper
@@ -43,6 +44,3 @@ index e3202ec..a039d7e 100644
  auth		113/tcp		authentication tap ident
  sftp		115/tcp
  nntp		119/tcp		readnews untp	# USENET News Transfer Protocol
--- 
-2.4.0
-

@@ -5116,15 +5116,15 @@
             So, commands such as the following are useful when exploring the data
             store and running functions:
             <literallayout class='monospaced'>
-     pydevshell> d.getVar("STAGING_DIR", True)
+     pydevshell> d.getVar("STAGING_DIR")
      '/media/build1/poky/build/tmp/sysroots'
-     pydevshell> d.getVar("STAGING_DIR", False)
+     pydevshell> d.getVar("STAGING_DIR")
      '${TMPDIR}/sysroots'
      pydevshell> d.setVar("FOO", "bar")
-     pydevshell> d.getVar("FOO", True)
+     pydevshell> d.getVar("FOO")
      'bar'
      pydevshell> d.delVar("FOO")
-     pydevshell> d.getVar("FOO", True)
+     pydevshell> d.getVar("FOO")
      pydevshell> bb.build.exec_func("do_unpack", d)
      pydevshell>
             </literallayout>
@@ -6323,9 +6323,180 @@
                 </literallayout>
             </para>
         </section>
+
+        <section id="replicating-a-build-offline">
+            <title>Replicating a Build Offline</title>
+
+            <para>
+                It can be useful to take a "snapshot" of upstream sources
+                used in a build and then use that "snapshot" later to
+                replicate the build offline.
+                To do so, you need to first prepare and populate your downloads
+                directory your "snapshot" of files.
+                Once your downloads directory is ready, you can use it at
+                any time and from any machine to replicate your build.
+            </para>
+
+            <para>
+                Follow these steps to populate your Downloads directory:
+                <orderedlist>
+                    <listitem><para>
+                        <emphasis>Create a Clean Downloads Directory:</emphasis>
+                        Start with an empty downloads directory
+                        (<ulink url='&YOCTO_DOCS_REF_URL;#var-DL_DIR'><filename>DL_DIR</filename></ulink>).
+                        You start with an empty downloads directory by either
+                        removing the files in the existing directory or by
+                        setting
+                        <filename>DL_DIR</filename> to point to either an
+                        empty location or one that does not yet exist.
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Generate Tarballs of the Source Git Repositories:</emphasis>
+                        Edit your <filename>local.conf</filename> configuration
+                        file as follows:
+                        <literallayout class='monospaced'>
+     DL_DIR = "/home/<replaceable>your-download-dir</replaceable>/"
+     BB_GENERATE_MIRROR_TARBALLS = "1"
+                        </literallayout>
+                        During the fetch process in the next step, BitBake
+                        gathers the source files and creates tarballs in
+                        the directory pointed to by <filename>DL_DIR</filename>.
+                        See the
+                        <ulink url='&YOCTO_DOCS_REF_URL;#var-BB_GENERATE_MIRROR_TARBALLS'><filename>BB_GENERATE_MIRROR_TARBALLS</filename></ulink>
+                        variable for more information.
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Populate Your Downloads Directory Without Building:</emphasis>
+                        Use BitBake to fetch your sources but inhibit the
+                        build:
+                        <literallayout class='monospaced'>
+     $ bitbake <replaceable>target</replaceable> --runonly=fetch
+                        </literallayout>
+                        The downloads directory (i.e.
+                        <filename>${DL_DIR}</filename>) now has a "snapshot" of
+                        the source files in the form of tarballs, which can
+                        be used for the build.
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Optionally Remove Any Git or other SCM Subdirectories From the Downloads Directory:</emphasis>
+                        If you want, you can clean up your downloads directory
+                        by removing any Git or other Source Control Management
+                        (SCM) subdirectories such as
+                        <filename>${DL_DIR}/git2/*</filename>.
+                        The tarballs already contain these subdirectories.
+                        </para></listitem>
+                </orderedlist>
+            </para>
+
+            <para>
+                Once your downloads directory has everything it needs regarding
+                source files, you can create your "own-mirror" and build
+                your target.
+                Understand that you can use the files to build the target
+                offline from any machine and at any time.
+            </para>
+
+            <para>
+                Follow these steps to build your target using the files in the
+                downloads directory:
+                <orderedlist>
+                    <listitem><para>
+                        <emphasis>Using Local Files Only:</emphasis>
+                        Inside your <filename>local.conf</filename> file, add
+                        the
+                        <ulink url='&YOCTO_DOCS_REF_URL;#var-SOURCE_MIRROR_URL'><filename>SOURCE_MIRROR_URL</filename></ulink>
+                        variable,
+                        inherit the <ulink url='&YOCTO_DOCS_REF_URL;#ref-classes-own-mirrors'><filename>own-mirrors</filename></ulink>
+                        class, and use the
+                        <ulink url='&YOCTO_DOCS_BB_URL;#var-bb-BB_NO_NETWORK'><filename>BB_NO_NETWORK</filename></ulink>
+                        variable to your <filename>local.conf</filename>.
+                        <literallayout class='monospaced'>
+     SOURCE_MIRROR_URL ?= "file:///home/<replaceable>your-download-dir</replaceable>/"
+     INHERIT += "own-mirrors"
+     BB_NO_NETWORK = "1"
+                        </literallayout>
+                        The <filename>SOURCE_MIRROR_URL</filename> and
+                        <filename>own-mirror</filename> class set up the system
+                        to use the downloads directory as your "own mirror".
+                        Using the <filename>BB_NO_NETWORK</filename>
+                        variable makes sure that BitBake's fetching process
+                        in step 3 stays local, which means files from
+                        your "own-mirror" are used.
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Start With a Clean Build:</emphasis>
+                        You can start with a clean build by removing the
+                        <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-TMPDIR'><filename>TMPDIR</filename></ulink><filename>}</filename>
+                        directory or using a new
+                        <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>.
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Build Your Target:</emphasis>
+                        Use BitBake to build your target:
+                        <literallayout class='monospaced'>
+     $ bitbake <replaceable>target</replaceable>
+                        </literallayout>
+                        The build completes using the known local "snapshot" of
+                        source files from your mirror.
+                        The resulting tarballs for your "snapshot" of source
+                        files are in the downloads directory.
+                        <note>
+                            <para>The offline build does not work if recipes
+                            attempt to find the latest version of software
+                            by setting
+                            <ulink url='&YOCTO_DOCS_REF_URL;#var-SRCREV'><filename>SRCREV</filename></ulink>
+                            to
+                            <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-AUTOREV'><filename>AUTOREV</filename></ulink><filename>}</filename>:
+                            <literallayout class='monospaced'>
+     SRCREV = "${AUTOREV}"
+                            </literallayout>
+                            When a recipe sets
+                            <filename>SRCREV</filename> to
+                            <filename>${AUTOREV}</filename>, the build system
+                            accesses the network in an attempt to determine the
+                            latest version of software from the SCM.
+                            Typically, recipes that use
+                            <filename>AUTOREV</filename> are custom or
+                            modified recipes.
+                            Recipes that reside in public repositories
+                            usually do not use <filename>AUTOREV</filename>.
+                            </para>
+
+                            <para>If you do have recipes that use
+                            <filename>AUTOREV</filename>, you can take steps to
+                            still use the recipes in an offline build.
+                            Do the following:
+                                <orderedlist>
+                                    <listitem><para>
+                                        Use a configuration generated by
+                                        enabling
+                                        <link linkend='maintaining-build-output-quality'>build history</link>.
+                                        </para></listitem>
+                                    <listitem><para>
+                                        Use the
+                                        <filename>buildhistory-collect-srcrevs</filename>
+                                        command to collect the stored
+                                        <filename>SRCREV</filename> values from
+                                        the build's history.
+                                        For more information on collecting these
+                                        values, see the
+                                        "<link linkend='build-history-package-information'>Build History Package Information</link>"
+                                        section.
+                                        </para></listitem>
+                                    <listitem><para>
+                                        Once you have the correct source
+                                        revisions, you can modify those recipes
+                                        to to set <filename>SRCREV</filename>
+                                        to specific versions of the software.
+                                        </para></listitem>
+                                </orderedlist>
+                            </para>
+                        </note>
+                        </para></listitem>
+                </orderedlist>
+            </para>
+        </section>
     </section>
-
-
 
     <section id='speeding-up-a-build'>
         <title>Speeding Up a Build</title>
@@ -6892,8 +7063,8 @@
             <literallayout class='monospaced'>
      MACHINE = "qemux86-64"
      DEFAULTTUNE = "x86-64-x32"
-     baselib = "${@d.getVar('BASE_LIB_tune-' + (d.getVar('DEFAULTTUNE', True) \
-        or 'INVALID'), True) or 'lib'}"
+     baselib = "${@d.getVar('BASE_LIB_tune-' + (d.getVar('DEFAULTTUNE') \
+        or 'INVALID')) or 'lib'}"
             </literallayout>
             Once you have set up your configuration file, use BitBake to
             build an image that supports the x32 psABI.

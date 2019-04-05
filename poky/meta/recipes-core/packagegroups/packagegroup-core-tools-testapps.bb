@@ -34,12 +34,10 @@ X11TOOLS = "\
     xrestop \
     xwininfo \
     xprop \
-    xvideo-tests \
     "
 
 RDEPENDS_${PN} = "\
     blktool \
-    lrzsz \
     ${KEXECTOOLS} \
     alsa-utils-amixer \
     alsa-utils-aplay \

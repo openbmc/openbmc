@@ -11,7 +11,7 @@ SRC_URI = "git://github.com/dv1/eglinfo.git;branch=master \
            file://0001-Add-STAGING_INCDIR-to-searchpath-for-egl-headers.patch \
            file://0001-Check-for-libegl-using-pkg-config.patch \
            "
-SRCREV = "4b317648ec6cf39556a9e5d8078f605bc0edd5de"
+SRCREV = "223817ee37988042db7873cfb5b2e899dfe35c10"
 
 CVE_PRODUCT = "eglinfo"
 

@@ -11,3 +11,5 @@ RDEPENDS_${PN} += " \
     ${PYTHON_PN}-codecs \
     ${PYTHON_PN}-json \
 "
+
+BBCLASSEXTEND = "native nativesdk"

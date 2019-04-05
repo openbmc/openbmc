@@ -1,7 +1,7 @@
 [
     {
         "test": {
-            "@alias": "bsps-hw.bsps-tools.rpm_-__install_dependency_package",
+            "@alias": "bsps-hw.bsps-hw.rpm_-__install_dependency_package",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -27,7 +27,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.boot_and_install_from_USB",
+            "@alias": "bsps-hw.bsps-hw.boot_and_install_from_USB",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -61,7 +61,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.live_boot_from_USB",
+            "@alias": "bsps-hw.bsps-hw.live_boot_from_USB",
             "author": [
                 {
                     "email": "juan.fernandox.ramos.frayle@intel.com",
@@ -87,7 +87,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.boot_from_runlevel_3",
+            "@alias": "bsps-hw.bsps-hw.boot_from_runlevel_3",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -121,7 +121,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.boot_from_runlevel_5",
+            "@alias": "bsps-hw.bsps-hw.boot_from_runlevel_5",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -151,7 +151,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.shutdown_system",
+            "@alias": "bsps-hw.bsps-hw.shutdown_system",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -173,7 +173,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.reboot_system",
+            "@alias": "bsps-hw.bsps-hw.reboot_system",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -195,7 +195,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.switch_among_multi_applications_and_desktop",
+            "@alias": "bsps-hw.bsps-hw.switch_among_multi_applications_and_desktop",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -225,7 +225,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.USB_-_mount",
+            "@alias": "bsps-hw.bsps-hw.USB_-_mount",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -251,7 +251,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.USB_-_read_files",
+            "@alias": "bsps-hw.bsps-hw.USB_-_read_files",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -281,7 +281,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.USB_-_umount",
+            "@alias": "bsps-hw.bsps-hw.USB_-_umount",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -307,7 +307,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.USB_-_write_files",
+            "@alias": "bsps-hw.bsps-hw.USB_-_write_files",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -333,7 +333,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.ethernet_static_ip_set_in_connman",
+            "@alias": "bsps-hw.bsps-hw.ethernet_static_ip_set_in_connman",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -367,7 +367,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.ethernet_get_IP_in_connman_via_DHCP",
+            "@alias": "bsps-hw.bsps-hw.ethernet_get_IP_in_connman_via_DHCP",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -397,7 +397,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-tools.connman_offline_mode_in_connman-gnome",
+            "@alias": "bsps-hw.bsps-hw.connman_offline_mode_in_connman-gnome",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -419,7 +419,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.X_server_can_start_up_with_runlevel_5_boot",
+            "@alias": "bsps-hw.bsps-hw.X_server_can_start_up_with_runlevel_5_boot",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -441,7 +441,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.standby",
+            "@alias": "bsps-hw.bsps-hw.standby",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -475,7 +475,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.check_CPU_utilization_after_standby",
+            "@alias": "bsps-hw.bsps-hw.check_CPU_utilization_after_standby",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -505,7 +505,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.Test_if_LAN_device_works_well_after_resume_from_suspend_state",
+            "@alias": "bsps-hw.bsps-hw.Test_if_LAN_device_works_well_after_resume_from_suspend_state",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -535,7 +535,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.Test_if_usb_hid_device_works_well_after_resume_from_suspend_state",
+            "@alias": "bsps-hw.bsps-hw.Test_if_usb_hid_device_works_well_after_resume_from_suspend_state",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -565,7 +565,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-tools.click_terminal_icon_on_X_desktop",
+            "@alias": "bsps-hw.bsps-hw.click_terminal_icon_on_X_desktop",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -587,7 +587,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-tools.Add_multiple_files_in_media_player",
+            "@alias": "bsps-hw.bsps-hw.Add_multiple_files_in_media_player",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -613,7 +613,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.check_bash_in_image",
+            "@alias": "bsps-hw.bsps-hw.check_bash_in_image",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -631,7 +631,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.MicroSD_-__mount",
+            "@alias": "bsps-hw.bsps-hw.MicroSD_-__mount",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -653,7 +653,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.MicroSD_-__read_files",
+            "@alias": "bsps-hw.bsps-hw.MicroSD_-__read_files",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -683,7 +683,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.MicroSD_-__umount",
+            "@alias": "bsps-hw.bsps-hw.MicroSD_-__umount",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -713,7 +713,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.MicroSD_-__write_files",
+            "@alias": "bsps-hw.bsps-hw.MicroSD_-__write_files",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -743,7 +743,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-tools.video_-_libva_check_(ogg_video_play)",
+            "@alias": "bsps-hw.bsps-hw.video_-_libva_check_(ogg_video_play)",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -769,29 +769,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-tools.media_player_-_unable_to_play_MPEG-1_without_\"commercial\"_flag",
-            "author": [
-                {
-                    "email": "alexandru.c.georgescu@intel.com",
-                    "name": "alexandru.c.georgescu@intel.com"
-                }
-            ],
-            "execution": {
-                "1": {
-                    "action": "Copy sample MPEG-1 file to a system without the \"commercial\" flag.",
-                    "expected_results": ""
-                },
-                "2": {
-                    "action": "Launch media player and make sure it cannot play the MPEG-1 file.",
-                    "expected_results": "MPEG-1 file can not be played on images without the \"commercial\" flag. "
-                }
-            },
-            "summary": "media_player_-_unable_to_play_MPEG-1_without_\"commercial\"_flag"
-        }
-    },
-    {
-        "test": {
-            "@alias": "bsps-hw.bsps-tools.media_player_-_play_video_(ogv)",
+            "@alias": "bsps-hw.bsps-hw.media_player_-_play_video_(ogv)",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -813,7 +791,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-tools.media_player_-_stop/play_button_(ogv)",
+            "@alias": "bsps-hw.bsps-hw.media_player_-_stop/play_button_(ogv)",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -843,7 +821,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-tools.audio_-_play_(ogg)_with_HDMI",
+            "@alias": "bsps-hw.bsps-hw.audio_-_play_(ogg)_with_HDMI",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -869,7 +847,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-tools.audio_-_play_(wav)_with_HDMI",
+            "@alias": "bsps-hw.bsps-hw.audio_-_play_(wav)_with_HDMI",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -895,7 +873,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-tools.Graphics_-_ABAT",
+            "@alias": "bsps-hw.bsps-hw.Graphics_-_ABAT",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -921,7 +899,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-tools.Graphics_-_x11perf_-_2D",
+            "@alias": "bsps-hw.bsps-hw.Graphics_-_x11perf_-_2D",
             "author": [
                 {
                     "email": "alexandru.c.georgescu@intel.com",
@@ -943,33 +921,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-oe-core.Test_Run_Integrity_-_Check_that_image_is_buildable",
-            "author": [
-                {
-                    "email": "corneliux.stoicescu@intel.com",
-                    "name": "corneliux.stoicescu@intel.com"
-                }
-            ],
-            "execution": {
-                "1": {
-                    "action": "Check that image can be built using either of the following methods:  \n\n",
-                    "expected_results": ""
-                },
-                "2": {
-                    "action": "Check that image is built by autobuilder \nPlease check at: https://autobuilder.yocto.io/pub/releases/ \nChoose the target release that you are validating.  \n\n",
-                    "expected_results": ""
-                },
-                "3": {
-                    "action": "Build image yourself \nPreferred to build an core-image-sato-dev to ease the process of the dependent test cases in this run. \nNote: Please set MACHINE in conf/local.conf ",
-                    "expected_results": "If either method fails, this test case will be failed and dependent test cases will be blocked. "
-                }
-            },
-            "summary": "Test_Run_Integrity_-_Check_that_image_is_buildable"
-        }
-    },
-    {
-        "test": {
-            "@alias": "bsps-hw.bsps-runtime.Check_if_SATA_disk_can_work_correctly",
+            "@alias": "bsps-hw.bsps-hw.Check_if_SATA_disk_can_work_correctly",
             "author": [
                 {
                     "email": "yi.zhao@windriver.com",
@@ -999,7 +951,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.Install_and_boot_from_USB-drive_to_HDD-drive",
+            "@alias": "bsps-hw.bsps-hw.Install_and_boot_from_USB-drive_to_HDD-drive",
             "author": [
                 {
                     "email": "david.israelx.rodriguez.castellanos@intel.com",
@@ -1041,7 +993,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.Install_and_boot_from_USB-drive_to_SD-drive",
+            "@alias": "bsps-hw.bsps-hw.Install_and_boot_from_USB-drive_to_SD-drive",
             "author": [
                 {
                     "email": "david.israelx.rodriguez.castellanos@intel.com",
@@ -1083,7 +1035,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.Test_boot_on_serial_communication_SD",
+            "@alias": "bsps-hw.bsps-hw.Test_boot_on_serial_communication_SD",
             "author": [
                 {
                     "email": "juan.fernandox.ramos.frayle@intel.com",
@@ -1101,7 +1053,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.Test_boot_on_serial_communication_HDD",
+            "@alias": "bsps-hw.bsps-hw.Test_boot_on_serial_communication_HDD",
             "author": [
                 {
                     "email": "juan.fernandox.ramos.frayle@intel.com",
@@ -1119,7 +1071,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.Test_boot_on_serial_communication_USB",
+            "@alias": "bsps-hw.bsps-hw.Test_boot_on_serial_communication_USB",
             "author": [
                 {
                     "email": "juan.fernandox.ramos.frayle@intel.com",
@@ -1153,7 +1105,7 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-runtime.Test_Seek_bar_and_volume_control",
+            "@alias": "bsps-hw.bsps-hw.Test_Seek_bar_and_volume_control",
             "author": [
                 {
                     "email": "juan.fernandox.ramos.frayle@intel.com",
@@ -1195,6 +1147,140 @@
                 }
             },
             "summary": "Test_Seek_bar_and_volume_control"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-hw.Check_if_watchdog_can_reset_the_target_system",
+            "author": [
+                {
+                    "email": "yi.zhao@windriver.com",
+                    "name": "yi.zhao@windriver.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "1.Check if watchdog device exist in /dev/ directory. Run command echo 1 > /dev/watchdog and wait for 60s. Then, the target will reboot.",
+                    "expected_results": "The watchdog device exist in /dev/ directory and can reboot the target.\n"
+                }
+            },
+            "summary": "Check_if_watchdog_can_reset_the_target_system"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-hw.Check_if_RTC_(Real_Time_Clock)_can_work_correctly",
+            "author": [
+                {
+                    "email": "yi.zhao@windriver.com",
+                    "name": "yi.zhao@windriver.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Read time from RTC registers.  root@localhost:/root> hwclock -r  Sun Mar 22 04:05:47 1970 -0.001948 seconds ",
+                    "expected_results": "Can read and set the time from RTC.\n"
+                },
+                "2": {
+                    "action": "Set system current time  root@localhost:/root> date 062309452008 ",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "Synchronize the system current time to RTC registers  root@localhost:/root> hwclock -w ",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "Read time from RTC registers  root@localhost:/root> hwclock -r ",
+                    "expected_results": ""
+                },
+                "5": {
+                    "action": "Reboot target and read time from RTC again\n",
+                    "expected_results": ""
+                }
+            },
+            "summary": "Check_if_RTC_(Real_Time_Clock)_can_work_correctly"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-hw.Check_if_target_can_support_EEPROM",
+            "author": [
+                {
+                    "email": "yi.zhao@windriver.com",
+                    "name": "yi.zhao@windriver.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Check eeprom device exist in /sys/bus/i2c/devices/ ",
+                    "expected_results": "Hexdump can read data from eeprom.\n"
+                },
+                "2": {
+                    "action": "Run \"hexdump eeprom\" commandroot@mpc8315e-rdb:/sys/bus/i2c/devices/1-0051> hexdump eeprom0000000 9210 0b02 0211 0009 0b52 0108 0c00 3c000000010 6978 6930 6911 208c 7003 3c3c 00f0 8381\u2026\n",
+                    "expected_results": ""
+                }
+            },
+            "summary": "Check_if_target_can_support_EEPROM"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-hw.System_can_boot_up_via_NFS",
+            "author": [
+                {
+                    "email": "yi.zhao@windriver.com",
+                    "name": "yi.zhao@windriver.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Connect the board's first serial port to your workstation and then start up your favourite serial terminal so that you will be able to interact with the serial console. If you don't have a favourite, picocom is suggested:   $ picocom /dev/ttyS0 -b 115200 ",
+                    "expected_results": "The system can boot up without problem\n"
+                },
+                "2": {
+                    "action": "Power up or reset the board and press a key on the terminal when prompted to get to the U-Boot command line ",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "Set up the environment in U-Boot:  => setenv ipaddr   => setenv serverip   ",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "Download the kernel and boot:  => tftp tftp $loadaddr vmlinux => bootoctlinux $loadaddr coremask=0x3 root=/dev/nfs rw nfsroot=: ip=::::edgerouter:eth0:off mtdparts=phys_mapped_flash:512k(boot0),512k(boot1),64k@3072k(eeprom)\n",
+                    "expected_results": ""
+                }
+            },
+            "summary": "System_can_boot_up_via_NFS"
+        }
+    },
+    {
+        "test": {
+            "@alias": "bsps-hw.bsps-hw.Boot_from_JFFS2_image",
+            "author": [
+                {
+                    "email": "yi.zhao@windriver.com",
+                    "name": "yi.zhao@windriver.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "First boot the board with NFS root. ",
+                    "expected_results": "The system can boot up without problem\n"
+                },
+                "2": {
+                    "action": "Install mtd-utils package. Erase the MTD partition which will be used as root: $ flash_eraseall /dev/mtd3 ",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "Copy the JFFS2 image to the MTD partition: $ flashcp core-image-minimal-mpc8315e-rdb.jffs2 /dev/mtd3 ",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "Then reboot the board and set up the environment in U-Boot: => setenv bootargs root=/dev/mtdblock3 rootfstype=jffs2 console=ttyS0,115200 ",
+                    "expected_results": ""
+                }
+            },
+            "summary": "Boot_from_JFFS2_image"
         }
     }
 ]

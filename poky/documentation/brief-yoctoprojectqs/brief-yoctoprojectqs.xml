@@ -131,7 +131,7 @@
                 section in the Yocto Project Reference Manual.
             </note>
             <literallayout class='monospaced'>
-     $ sudo apt-get install &UBUNTU_HOST_PACKAGES_ESSENTIAL; libsdl1.2-dev xterm
+     $ sudo apt-get install &UBUNTU_HOST_PACKAGES_ESSENTIAL;
             </literallayout>
         </para>
     </section>
@@ -148,11 +148,11 @@
             <literallayout class='monospaced'>
      $ git clone git://git.yoctoproject.org/poky
      Cloning into 'poky'...
-     remote: Counting objects: 428632, done.
-     remote: Compressing objects: 100% (101203/101203), done.
-     remote: Total 428632 (delta 320463), reused 428532 (delta 320363)
-     Receiving objects: 100% (428632/428632), 153.01 MiB | 12.40 MiB/s, done.
-     Resolving deltas: 100% (320463/320463), done.
+     remote: Counting objects: 432160, done.
+     remote: Compressing objects: 100% (102056/102056), done.
+     remote: Total 432160 (delta 323116), reused 432037 (delta 323000)
+     Receiving objects: 100% (432160/432160), 153.81 MiB | 8.54 MiB/s, done.
+     Resolving deltas: 100% (323116/323116), done.
      Checking connectivity... done.
             </literallayout>
             Move to the <filename>poky</filename> directory and take a look
@@ -174,6 +174,7 @@
      yocto-2.5.2
      yocto-2.6
      yocto-2.6.1
+     yocto-2.7
      yocto_1.5_M5.rc8
             </literallayout>
             For this example, check out the branch based on the

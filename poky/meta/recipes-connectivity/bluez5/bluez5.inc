@@ -41,7 +41,7 @@ PACKAGECONFIG[sixaxis] = "--enable-sixaxis,--disable-sixaxis"
 PACKAGECONFIG[tools] = "--enable-tools,--disable-tools"
 PACKAGECONFIG[threads] = "--enable-threads,--disable-threads"
 PACKAGECONFIG[deprecated] = "--enable-deprecated,--disable-deprecated"
-PACKAGECONFIG[mesh] = "--enable-mesh,--disable-mesh, json-c"
+PACKAGECONFIG[mesh] = "--enable-mesh,--disable-mesh, json-c ell"
 PACKAGECONFIG[btpclient] = "--enable-btpclient,--disable-btpclient, ell"
 
 SRC_URI = "\
@@ -53,6 +53,7 @@ SRC_URI = "\
     file://0001-tests-add-a-target-for-building-tests-without-runnin.patch \
     file://0001-test-gatt-Fix-hung-issue.patch \
     file://0001-Makefile.am-Fix-a-race-issue-for-tools.patch \
+    file://CVE-2018-10910.patch \
 "
 S = "${WORKDIR}/bluez-${PV}"
 

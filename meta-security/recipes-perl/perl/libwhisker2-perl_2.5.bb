@@ -24,4 +24,6 @@ do_install() {
     oe_runmake install DESTDIR=${D} INSTALLDIR=${PERLLIBDIRS}/vendor_perl/${PERLVERSION} MANDIR=${datadir}/perl/${PERLVERSION}
 }
 
+FILES_${PN} += "${datadir}/perl"
+
 BBCLASSEXTEND = "native"

@@ -1,0 +1,67 @@
+From ffc8ba8d324243a923abe48e9758adecb03d24a4 Mon Sep 17 00:00:00 2001
+From: Peter Kjellerstedt <pkj@axis.com>
+Date: Tue, 12 Feb 2019 21:25:23 +0100
+Subject: [PATCH] atop.daily, atop.init, atop-pm.sh: Avoid using bash
+
+Avoid using bash and bashisms when not necesary. On some systems,
+e.g., embedded products, bash may not be available by default.
+
+Upstream-Status: Submitted [https://github.com/Atoptool/atop/pull/50]
+Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+---
+ atop-pm.sh | 2 +-
+ atop.daily | 4 ++--
+ atop.init  | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/atop-pm.sh b/atop-pm.sh
+index 7f41a86..3ff4ab5 100755
+--- a/atop-pm.sh
++++ b/atop-pm.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ case "$1" in
+ 	pre)	/usr/bin/systemctl stop atop
+diff --git a/atop.daily b/atop.daily
+index 57a9507..fe5a11b 100755
+--- a/atop.daily
++++ b/atop.daily
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ LOGOPTS="-R"				# default options
+ LOGINTERVAL=600				# default interval in seconds
+@@ -38,7 +38,7 @@ then
+ 
+ 	while ps -p `cat "$PIDFILE"` > /dev/null
+ 	do
+-		let CNT+=1
++		CNT=$((CNT + 1))
+ 
+ 		if [ $CNT -gt 5 ]
+ 		then
+diff --git a/atop.init b/atop.init
+index e6e11dc..03c3f02 100755
+--- a/atop.init
++++ b/atop.init
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ #
+ # atop		Startup script for the Atop process logging in background
+ #
+@@ -47,7 +47,7 @@ case "$1" in
+ 
+ 		while ps -p `cat $PIDFILE` > /dev/null
+ 		do
+-			let CNT+=1
++			CNT=$((CNT + 1))
+ 
+ 			if [ $CNT -gt 5 ]
+ 			then
+-- 
+2.12.0
+

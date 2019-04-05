@@ -7,6 +7,7 @@ RDEPENDS_${PN} += "\
     ${PYTHON_PN}-io \
     ${PYTHON_PN}-misc \
     ${PYTHON_PN}-shell \
+    ${PYTHON_PN}-smtpd \
 "
 
 SRC_URI[md5sum] = "8e580fa1ff3971f94a6f81672b76c406"

@@ -69,3 +69,27 @@ FILES_${PN} = " ${sysconfdir} \
 		${systemd_unitdir}/system/distcc.service"
 FILES_distcc-distmon-gnome = "  ${bindir}/distccmon-gnome \
 				${datadir}/distcc"
+
+
+#
+# distcc upstream dropped the 3.2 branch which we reference in older project releases
+# the revisions are there, just the branch is not. In order to be able to continue
+# to build those old releases, adjust any mirror tarball to contain the missing branch
+#
+fixup_distcc_mirror_tarball () {
+	TBALL=${DL_DIR}/git2_github.com.distcc.distcc.git.tar.gz
+	if [ -f $TBALL ]; then
+		TDIR=`mktemp -d`
+		cd $TDIR
+		tar -xzf $TBALL
+		set +e
+		git rev-parse --verify 3.2
+		if [ "$?" != "0" ]; then
+			git branch 3.2 d8b18df3e9dcbe4f092bed565835d3975e99432c
+			tar -czf $TBALL *
+		fi
+		set -e
+		rm -rf $TDIR/*
+	fi
+}
+do_fetch[postfuncs] += "fixup_distcc_mirror_tarball"

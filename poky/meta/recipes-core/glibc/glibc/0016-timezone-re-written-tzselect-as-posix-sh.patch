@@ -1,7 +1,7 @@
-From 04fb7b93dc40c1f96ebc05d29a2f02f9e4f0d572 Mon Sep 17 00:00:00 2001
+From 10f470476dc947d7b950d6a66f7c06f500c96c60 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:33:03 +0000
-Subject: [PATCH] timezone: re-written tzselect as posix sh
+Subject: [PATCH 16/30] timezone: re-written tzselect as posix sh
 
 To avoid the bash dependency.
 
@@ -15,7 +15,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/timezone/Makefile b/timezone/Makefile
-index 0194aba4a1..58e5405a05 100644
+index 493deca790..36e559e16c 100644
 --- a/timezone/Makefile
 +++ b/timezone/Makefile
 @@ -122,7 +122,7 @@ $(testdata)/XT%: testdata/XT%
@@ -28,10 +28,10 @@ index 0194aba4a1..58e5405a05 100644
  	    -e '/TZVERSION=/s|see_Makefile|"$(version)"|' \
  	    -e '/PKGVERSION=/s|=.*|="$(PKGVERSION)"|' \
 diff --git a/timezone/tzselect.ksh b/timezone/tzselect.ksh
-index d2c3a6d1dd..089679f306 100755
+index 18fce27e24..70745f9d36 100755
 --- a/timezone/tzselect.ksh
 +++ b/timezone/tzselect.ksh
-@@ -35,7 +35,7 @@ REPORT_BUGS_TO=tz@iana.org
+@@ -34,7 +34,7 @@ REPORT_BUGS_TO=tz@iana.org
  
  # Specify default values for environment variables if they are unset.
  : ${AWK=awk}
@@ -40,3 +40,6 @@ index d2c3a6d1dd..089679f306 100755
  
  # Output one argument as-is to standard output.
  # Safer than 'echo', which can mishandle '\' or leading '-'.
+-- 
+2.20.1
+

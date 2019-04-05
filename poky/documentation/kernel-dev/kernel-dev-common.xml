@@ -1479,15 +1479,33 @@
 
             <para>
                 To use the <filename>menuconfig</filename> tool in the Yocto
-                Project development environment, you must launch it using
-                BitBake.
-                Thus, the environment must be set up using the
-                <ulink url='&YOCTO_DOCS_REF_URL;#structure-core-script'><filename>&OE_INIT_FILE;</filename></ulink>
-                script found in the
-                <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>.
-                You must also be sure of the state of your build's
-                configuration in the
-                <ulink url='&YOCTO_DOCS_REF_URL;#source-directory'>Source Directory</ulink>.
+                Project development environment, you must do the following:
+                <itemizedlist>
+                    <listitem><para>
+                        Because you launch <filename>menuconfig</filename>
+                        using BitBake, you must be sure to set up your
+                        environment by running the
+                        <ulink url='&YOCTO_DOCS_REF_URL;#structure-core-script'><filename>&OE_INIT_FILE;</filename></ulink>
+                        script found in the
+                        <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>.
+                        </para></listitem>
+                    <listitem><para>
+                        You must be sure of the state of your build's
+                        configuration in the
+                        <ulink url='&YOCTO_DOCS_REF_URL;#source-directory'>Source Directory</ulink>.
+                        </para></listitem>
+                    <listitem><para>
+                        Your build host must have the following two packages
+                        installed:
+                        <literallayout class='monospaced'>
+     libncurses5-dev
+     libtinfo-dev
+                        </literallayout>
+                        </para></listitem>
+                </itemizedlist>
+            </para>
+
+            <para>
                 The following commands initialize the BitBake environment,
                 run the
                 <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-kernel_configme'><filename>do_kernel_configme</filename></ulink>

@@ -6,12 +6,10 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRC_URI = "git://github.com/rpm-software-management/createrepo_c \
            file://0001-Do-not-set-PYTHON_INSTALL_DIR-by-running-python.patch \
-           file://0001-Correctly-install-the-shared-library.patch \
-           file://0001-Fix-setup-of-logging-log-domains-RhBug-1645897.patch \
            "
 
-PV = "0.11.1+git${SRCPV}"
-SRCREV = "434a40babdde57ab405e9a1085a30e9575ea0c92"
+PV = "0.12.1"
+SRCREV = "7744554ddef7c5be2cd7fbcac49c8b24ce60ef88"
 
 S = "${WORKDIR}/git"
 
@@ -20,7 +18,7 @@ DEPENDS_append_class-native = " file-replacement-native"
 
 inherit cmake pkgconfig bash-completion distutils3-base
 
-EXTRA_OECMAKE = " -DPYTHON_INSTALL_DIR=${PYTHON_SITEPACKAGES_DIR} -DPYTHON_DESIRED=3"
+EXTRA_OECMAKE = " -DPYTHON_INSTALL_DIR=${PYTHON_SITEPACKAGES_DIR} -DPYTHON_DESIRED=3 -DWITH_ZCHUNK=OFF"
 
 BBCLASSEXTEND = "native nativesdk"
 

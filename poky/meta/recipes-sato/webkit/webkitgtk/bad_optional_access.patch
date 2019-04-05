@@ -1,0 +1,35 @@
+unbreak build with libc++ 7
+
+based on
+https://svnweb.freebsd.org/ports/head/www/webkit2-gtk3/files/patch-Source_WTF_wtf_Optional.h?view=markup&pathrev=477812
+
+Fixes
+
+/usr/include/c++/v1/optional:171:29: error: redefinition of 'bad_optional_access'
+class _LIBCPP_EXCEPTION_ABI bad_optional_access
+                            ^
+DerivedSources/ForwardingHeaders/wtf/Optional.h:295:7: note: previous definition is here
+class bad_optional_access : public std::logic_error {
+      ^
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/Source/WTF/wtf/Optional.h
++++ b/Source/WTF/wtf/Optional.h
+@@ -276,14 +276,14 @@ struct nullopt_t
+ };
+ constexpr nullopt_t nullopt{nullopt_t::init()};
+ 
+-
++# if !defined(_LIBCPP_VERSION) || _LIBCPP_VERSION < 7000
+ // 20.5.8, class bad_optional_access
+ class bad_optional_access : public std::logic_error {
+ public:
+   explicit bad_optional_access(const std::string& what_arg) : std::logic_error{what_arg} {}
+   explicit bad_optional_access(const char* what_arg) : std::logic_error{what_arg} {}
+ };
+-
++# endif // _LIBCPP_VERSION < 7000
+ 
+ template <class T>
+ union storage_t

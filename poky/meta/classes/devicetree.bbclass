@@ -27,6 +27,8 @@ inherit deploy kernel-arch
 
 COMPATIBLE_MACHINE ?= "^$"
 
+PROVIDES = "virtual/dtb"
+
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 SYSROOT_DIRS += "/boot/devicetree"
@@ -120,9 +122,12 @@ python devicetree_do_compile() {
     includes = expand_includes("DT_INCLUDE", d)
     listpath = d.getVar("DT_FILES_PATH")
     for dts in os.listdir(listpath):
-        if not dts.endswith(".dts"):
-            continue # skip non-.dts files
         dtspath = os.path.join(listpath, dts)
+        try:
+            if not(os.path.isfile(dtspath)) or not(dts.endswith(".dts") or devicetree_source_is_overlay(dtspath)):
+                continue # skip non-.dts files and non-overlay files
+        except:
+            continue # skip if can't determine if overlay
         devicetree_compile(dtspath, includes, d)
 }
 

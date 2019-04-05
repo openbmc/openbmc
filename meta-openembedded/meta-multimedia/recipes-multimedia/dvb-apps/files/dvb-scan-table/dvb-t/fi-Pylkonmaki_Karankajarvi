@@ -1,0 +1,18 @@
+# 2014-04-18 Antti Palosaari <crope@iki.fi>
+# generated from http://www.digita.fi/kuluttajat/tv/nakyvyysalueet/kanavanumerot_ja_taajuudet
+
+[Pylkonmaki_Karankajarvi]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 594000000
+	BANDWIDTH_HZ = 8000000
+
+[Pylkonmaki_Karankajarvi]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 642000000
+	BANDWIDTH_HZ = 8000000
+
+[Pylkonmaki_Karankajarvi]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 578000000
+	BANDWIDTH_HZ = 8000000
+

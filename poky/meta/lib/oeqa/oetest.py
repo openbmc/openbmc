@@ -7,7 +7,7 @@
 
 # It also has some helper functions and it's responsible for actually starting the tests
 
-import os, re, mmap, sys
+import os, re, sys
 import unittest
 import inspect
 import subprocess

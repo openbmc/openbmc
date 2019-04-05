@@ -1,7 +1,7 @@
-From 3063a9211669bee673840ee81f81d30699b9b702 Mon Sep 17 00:00:00 2001
+From a6ddabc8cadb76bfe2d2e374a6702442cfe51cce Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Fri, 9 Oct 2015 17:50:41 +0100
-Subject: [PATCH 2/4] icu: fix install race
+Subject: [PATCH] icu: fix install race
 
 The generic recursive target calls target-local so also adding it to the
 dependency list results in races due to install-local being executed twice in
@@ -18,11 +18,11 @@ Signed-off-by: Ross Burton <ross.burton@intel.com>
  source/Makefile.in | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/source/Makefile.in b/source/Makefile.in
-index c1db15b..4948deb 100644
+diff --git a/Makefile.in b/Makefile.in
+index be9435b..ada20d7 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -73,7 +73,7 @@ EXTRA_DATA =
+@@ -77,7 +77,7 @@ EXTRA_DATA =
  
  ## List of phony targets
  .PHONY : all all-local all-recursive install install-local install-udata install-udata-files install-udata-dlls		\
@@ -31,7 +31,7 @@ index c1db15b..4948deb 100644
  distclean-local distclean-recursive doc dist dist-local dist-recursive	\
  check check-local check-recursive clean-recursive-with-twist install-icu \
  doc install-doc tests icu4j-data icu4j-data-install update-windows-makefiles xcheck-local xcheck-recursive xperf xcheck xperf-recursive \
-@@ -84,9 +84,9 @@ check-exhaustive check-exhaustive-local check-exhaustive-recursive releaseDist
+@@ -88,9 +88,9 @@ check-exhaustive check-exhaustive-local check-exhaustive-recursive releaseDist
  
  ## List of standard targets
  all: all-local all-recursive
@@ -43,15 +43,12 @@ index c1db15b..4948deb 100644
  dist: dist-recursive
  check: all check-recursive
  check-recursive: all
-@@ -350,7 +350,7 @@ config.status: $(srcdir)/configure $(srcdir)/common/unicode/uvernum.h
- 
+@@ -357,7 +357,7 @@ config.status: $(srcdir)/configure $(srcdir)/common/unicode/uvernum.h
  install-manx: $(MANX_FILES)
  	$(MKINSTALLDIRS) $(DESTDIR)$(mandir)/man$(SECTION)
+ ifneq ($(MANX_FILES),)
 -	$(INSTALL_DATA) $? $(DESTDIR)$(mandir)/man$(SECTION)
 +	$(INSTALL_DATA) $^ $(DESTDIR)$(mandir)/man$(SECTION)
+ endif
  
  config/%.$(SECTION): $(srcdir)/config/%.$(SECTION).in
- 	cd $(top_builddir) \
--- 
-2.14.2
-

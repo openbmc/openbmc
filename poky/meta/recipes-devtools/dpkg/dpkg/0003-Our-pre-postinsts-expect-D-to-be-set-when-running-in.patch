@@ -10,15 +10,16 @@ Upstream-Status: Inappropriate [OE Specific]
 RP 2011/12/07
 ALIMON 2016/05/26
 ALIMON 2017/02/21
+KKang 2019/02/20
 ---
  src/script.c | 44 +++-----------------------------------------
  1 file changed, 3 insertions(+), 41 deletions(-)
 
 diff --git a/src/script.c b/src/script.c
-index 2f252ae..768a9d1 100644
+index 0865b95..73ed35d 100644
 --- a/src/script.c
 +++ b/src/script.c
-@@ -97,48 +97,10 @@ setexecute(const char *path, struct stat *stab)
+@@ -96,58 +96,11 @@ setexecute(const char *path, struct stat *stab)
  static const char *
  maintscript_pre_exec(struct command *cmd)
  {
@@ -32,6 +33,8 @@ index 2f252ae..768a9d1 100644
 -		changedir = "/";
 -
 -	if (instdirlen > 0 && !fc_script_chrootless) {
+-		int rc;
+-
 -		if (strncmp(admindir, instdir, instdirlen) != 0)
 -			ohshit(_("admindir must be inside instdir for dpkg to work properly"));
 -		if (setenv("DPKG_ADMINDIR", admindir + instdirlen, 1) < 0)
@@ -39,7 +42,12 @@ index 2f252ae..768a9d1 100644
 -		if (setenv("DPKG_ROOT", "", 1) < 0)
 -			ohshite(_("unable to setenv for subprocesses"));
 -
--		if (chroot(instdir))
+-		rc = chroot(instdir);
+-		if (rc && fc_nonroot && errno == EPERM)
+-			ohshit(_("not enough privileges to change root "
+-			         "directory with --force-not-root, consider "
+-			         "using --force-script-chrootless?"));
+-		else if (rc)
 -			ohshite(_("failed to chroot to '%.250s'"), instdir);
 +	if (*instdir) {
 +		setenv("D", instdir, 1);
@@ -64,7 +72,10 @@ index 2f252ae..768a9d1 100644
 -	if (instdirlen == 0 || fc_script_chrootless)
 -		return cmd->filename;
 -
--	assert(strlen(cmd->filename) >= instdirlen);
+-	if (strlen(cmd->filename) < instdirlen)
+-		internerr("maintscript name '%s' length < instdir length %zd",
+-		          cmd->filename, instdirlen);
+ 
 -	return cmd->filename + instdirlen;
 +	return cmd->filename;
  }

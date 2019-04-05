@@ -1,0 +1,12 @@
+Upstream-Status: OE specific
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: git/bootstrap
+===================================================================
+--- git.orig/bootstrap
++++ git/bootstrap
+@@ -27,4 +27,3 @@ echo "Generating file lists: ${VARS_FILE
+ ) > ${VARS_FILE}
+ 
+ mkdir -p m4
+-${AUTORECONF} --install --sym $@

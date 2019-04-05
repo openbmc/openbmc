@@ -89,15 +89,21 @@ def ua_extend_depends(d):
     if not 'virtual/update-alternatives' in d.getVar('PROVIDES'):
         d.appendVar('DEPENDS', ' virtual/${MLPREFIX}update-alternatives')
 
-python __anonymous() {
+def update_alternatives_enabled(d):
     # Update Alternatives only works on target packages...
     if bb.data.inherits_class('native', d) or \
        bb.data.inherits_class('cross', d) or bb.data.inherits_class('crosssdk', d) or \
        bb.data.inherits_class('cross-canadian', d):
-        return
+        return False
 
     # Disable when targeting mingw32 (no target support)
     if d.getVar("TARGET_OS") == "mingw32":
+        return False
+
+    return True
+
+python __anonymous() {
+    if not update_alternatives_enabled(d):
         return
 
     # compute special vardeps
@@ -125,9 +131,21 @@ def gen_updatealternativesvars(d):
 populate_packages[vardeps] += "${UPDALTVARS} ${@gen_updatealternativesvars(d)}"
 
 # We need to do the rename after the image creation step, but before
-# the split and strip steps..  packagecopy seems to be the earliest reasonable
-# place.
-python perform_packagecopy_append () {
+# the split and strip steps..  PACKAGE_PREPROCESS_FUNCS is the right
+# place for that.
+PACKAGE_PREPROCESS_FUNCS += "apply_update_alternative_renames"
+python apply_update_alternative_renames () {
+    if not update_alternatives_enabled(d):
+       return
+
+    import re
+
+    def update_files(alt_target, alt_target_rename, pkg, d):
+        f = d.getVar('FILES_' + pkg)
+        if f:
+            f = re.sub(r'(^|\s)%s(\s|$)' % re.escape (alt_target), r'\1%s\2' % alt_target_rename, f)
+            d.setVar('FILES_' + pkg, f)
+
     # Check for deprecated usage...
     pn = d.getVar('BPN')
     if d.getVar('ALTERNATIVE_LINKS') != None:
@@ -137,7 +155,7 @@ python perform_packagecopy_append () {
     pkgdest = d.getVar('PKGD')
     for pkg in (d.getVar('PACKAGES') or "").split():
         # If the src == dest, we know we need to rename the dest by appending ${BPN}
-        link_rename = {}
+        link_rename = []
         for alt_name in (d.getVar('ALTERNATIVE_%s' % pkg) or "").split():
             alt_link     = d.getVarFlag('ALTERNATIVE_LINK_NAME', alt_name)
             if not alt_link:
@@ -163,10 +181,11 @@ python perform_packagecopy_append () {
                 elif os.path.lexists(src):
                     if os.path.islink(src):
                         # Delay rename of links
-                        link_rename[alt_target] = alt_target_rename
+                        link_rename.append((alt_target, alt_target_rename))
                     else:
                         bb.note('%s: Rename %s -> %s' % (pn, alt_target, alt_target_rename))
                         os.rename(src, dest)
+                        update_files(alt_target, alt_target_rename, pkg, d)
                 else:
                     bb.warn("%s: alternative target (%s or %s) does not exist, skipping..." % (pn, alt_target, alt_target_rename))
                     continue
@@ -174,31 +193,35 @@ python perform_packagecopy_append () {
 
         # Process delayed link names
         # Do these after other renames so we can correct broken links
-        for alt_target in link_rename:
+        for (alt_target, alt_target_rename) in link_rename:
             src = '%s/%s' % (pkgdest, alt_target)
-            dest = '%s/%s' % (pkgdest, link_rename[alt_target])
-            link = os.readlink(src)
+            dest = '%s/%s' % (pkgdest, alt_target_rename)
             link_target = oe.path.realpath(src, pkgdest, True)
 
             if os.path.lexists(link_target):
                 # Ok, the link_target exists, we can rename
-                bb.note('%s: Rename (link) %s -> %s' % (pn, alt_target, link_rename[alt_target]))
+                bb.note('%s: Rename (link) %s -> %s' % (pn, alt_target, alt_target_rename))
                 os.rename(src, dest)
             else:
                 # Try to resolve the broken link to link.${BPN}
                 link_maybe = '%s.%s' % (os.readlink(src), pn)
                 if os.path.lexists(os.path.join(os.path.dirname(src), link_maybe)):
                     # Ok, the renamed link target exists.. create a new link, and remove the original
-                    bb.note('%s: Creating new link %s -> %s' % (pn, link_rename[alt_target], link_maybe))
+                    bb.note('%s: Creating new link %s -> %s' % (pn, alt_target_rename, link_maybe))
                     os.symlink(link_maybe, dest)
                     os.unlink(src)
                 else:
                     bb.warn('%s: Unable to resolve dangling symlink: %s' % (pn, alt_target))
+                    continue
+            update_files(alt_target, alt_target_rename, pkg, d)
 }
 
 PACKAGESPLITFUNCS_prepend = "populate_packages_updatealternatives "
 
 python populate_packages_updatealternatives () {
+    if not update_alternatives_enabled(d):
+        return
+
     pn = d.getVar('BPN')
 
     # Do actual update alternatives processing
@@ -252,10 +275,15 @@ python populate_packages_updatealternatives () {
 }
 
 python package_do_filedeps_append () {
+    if update_alternatives_enabled(d):
+        apply_update_alternative_provides(d)
+}
+
+def apply_update_alternative_provides(d):
     pn = d.getVar('BPN')
     pkgdest = d.getVar('PKGDEST')
 
-    for pkg in packages.split():
+    for pkg in d.getVar('PACKAGES').split():
         for alt_name in (d.getVar('ALTERNATIVE_%s' % pkg) or "").split():
             alt_link     = d.getVarFlag('ALTERNATIVE_LINK_NAME', alt_name)
             alt_target   = d.getVarFlag('ALTERNATIVE_TARGET_%s' % pkg, alt_name) or d.getVarFlag('ALTERNATIVE_TARGET', alt_name)
@@ -273,5 +301,4 @@ python package_do_filedeps_append () {
             d.appendVar('FILERPROVIDES_%s_%s' % (trans_target, pkg), " " + alt_link)
             if not trans_target in (d.getVar('FILERPROVIDESFLIST_%s' % pkg) or ""):
                 d.appendVar('FILERPROVIDESFLIST_%s' % pkg, " " + trans_target)
-}
 

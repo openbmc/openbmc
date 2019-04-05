@@ -1,0 +1,45 @@
+From cdd69321ec97ed19e66a747a968a1637a251b9e6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Mon, 16 Apr 2018 15:07:20 +0200
+Subject: [PATCH] Add a strndupa replacement for musl
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+
+---
+ shared/systemd/src/basic/in-addr-util.c | 1 +
+ shared/systemd/src/basic/string-util.h  | 5 +++++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/shared/systemd/src/basic/in-addr-util.c b/shared/systemd/src/basic/in-addr-util.c
+index 5ced350..c6b52b8 100644
+--- a/shared/systemd/src/basic/in-addr-util.c
++++ b/shared/systemd/src/basic/in-addr-util.c
+@@ -13,6 +13,7 @@
+ #include "in-addr-util.h"
+ #include "macro.h"
+ #include "parse-util.h"
++#include "string-util.h"
+ #include "util.h"
+ 
+ bool in4_addr_is_null(const struct in_addr *a) {
+diff --git a/shared/systemd/src/basic/string-util.h b/shared/systemd/src/basic/string-util.h
+index 38070ab..6b918e0 100644
+--- a/shared/systemd/src/basic/string-util.h
++++ b/shared/systemd/src/basic/string-util.h
+@@ -27,6 +27,11 @@
+ #define strcaseeq(a,b) (strcasecmp((a),(b)) == 0)
+ #define strncaseeq(a, b, n) (strncasecmp((a), (b), (n)) == 0)
+ 
++/* musl does not know strndupa */
++#if !defined(__GLIBC__)
++#define strndupa(x,s) strncpy(alloca(strlen(x)+1),x,s)
++#endif
++
+ int strcmp_ptr(const char *a, const char *b) _pure_;
+ 
+ static inline bool streq_ptr(const char *a, const char *b) {

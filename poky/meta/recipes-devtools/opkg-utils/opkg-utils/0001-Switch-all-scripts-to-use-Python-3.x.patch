@@ -64,8 +64,9 @@ index 3f757f6..2988f9f 100755
 @@ -1,4 +1,4 @@
 -#!/usr/bin/env python
 +#!/usr/bin/env python3
- from __future__ import absolute_import
- from __future__ import print_function
+ """
+    Utility to create opkg compatible indexes
+ """
  
 diff --git a/opkg-show-deps b/opkg-show-deps
 index 153f21e..4e18b4f 100755

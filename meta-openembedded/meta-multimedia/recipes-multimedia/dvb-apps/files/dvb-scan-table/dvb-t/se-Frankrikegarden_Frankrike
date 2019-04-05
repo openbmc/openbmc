@@ -1,0 +1,5 @@
+# Sweden - Frankrikegården/Frankrike
+[CHANNEL]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 586000000
+	BANDWIDTH_HZ = 8000000

@@ -1,0 +1,31 @@
+From b273e892bd6aaafe448f84356abb78a6d463e784 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 7 Dec 2018 17:22:39 -0800
+Subject: [PATCH] Compute abs diff in a standard compliant way
+
+This make it a bit less implementation defined and silences clang
+warning -Wabsolute-value
+
+| super-intel.c:2822:20: error: taking the absolute value of unsigned type 'unsi
+gned long long' has no effect [-Werror,-Wabsolute-value]
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ super-intel.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/super-intel.c b/super-intel.c
+index 6438987..10d7218 100644
+--- a/super-intel.c
++++ b/super-intel.c
+@@ -2819,7 +2819,7 @@ static unsigned long long calc_component_size(struct imsm_map *map,
+ 	 * 2048 blocks per each device. If the difference is higher it means
+ 	 * that array size was expanded and num_data_stripes was not updated.
+ 	 */
+-	if ((unsigned int)abs(calc_dev_size - dev_size) >
++	if ((unsigned int)abs((int)calc_dev_size - (int)dev_size) >
+ 	    (1 << SECT_PER_MB_SHIFT) * member_disks) {
+ 		component_size = dev_size / member_disks;
+ 		dprintf("Invalid num_data_stripes in metadata; expected=%llu, found=%llu\n",

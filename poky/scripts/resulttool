@@ -51,13 +51,6 @@ import resulttool.report
 import resulttool.manualexecution
 logger = scriptutils.logger_create('resulttool')
 
-def _validate_user_input_arguments(args):
-    if hasattr(args, "source_dir"):
-        if not os.path.isdir(args.source_dir):
-            logger.error('source_dir argument need to be a directory : %s' % args.source_dir)
-            return False
-    return True
-
 def main():
     parser = argparse_oe.ArgumentParser(description="OEQA test result manipulation tool.",
                                         epilog="Use %(prog)s <subcommand> --help to get help on a specific command")
@@ -79,9 +72,6 @@ def main():
         logger.setLevel(logging.DEBUG)
     elif args.quiet:
         logger.setLevel(logging.ERROR)
-
-    if not _validate_user_input_arguments(args):
-        return -1
 
     try:
         ret = args.func(args, logger)

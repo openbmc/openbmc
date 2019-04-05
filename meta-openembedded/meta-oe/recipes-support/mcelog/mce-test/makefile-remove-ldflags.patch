@@ -1,0 +1,23 @@
+Remove the default CFLAGS and LDFLAGS in Makefile. Ensure the extra linker flags can be passed.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+
+diff --git a/cases/stress/hwpoison/Makefile b/cases/stress/hwpoison/Makefile
+index da1cbd8..dec5b14 100644
+--- a/cases/stress/hwpoison/Makefile
++++ b/cases/stress/hwpoison/Makefile
+@@ -1,8 +1,8 @@
+-CFLAGS := -g -Wall
+-LDFLAGS := -g
++#CFLAGS := -g -Wall
++#LDFLAGS := -g
+ 
+-export CFLAGS
+-export LDFLAGS
++#export CFLAGS
++#export LDFLAGS
+ 
+ all:
+ 	mkdir -p bin

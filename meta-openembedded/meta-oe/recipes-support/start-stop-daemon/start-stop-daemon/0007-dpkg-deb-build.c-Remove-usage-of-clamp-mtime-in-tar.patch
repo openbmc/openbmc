@@ -1,0 +1,39 @@
+From 8659eeeeda74d71e12080121f0b13a88cbdda433 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?An=C3=ADbal=20Lim=C3=B3n?= <anibal.limon@linux.intel.com>
+Date: Tue, 21 Feb 2017 11:23:27 -0600
+Subject: [PATCH] dpkg-deb/build.c: Remove usage of --clamp-mtime in tar
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Recently dpkg added --clamp-mtime to tar to create reproducible
+build tarballs [1].
+
+But host tools doesn't support this option because is new on tar
+so disable in our builds.
+
+Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>
+
+Upstream-Status: Inappropriate [Configuration]
+
+[1] https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=759999#20
+[2] https://lists.gnu.org/archive/html/help-tar/2016-01/msg00000.html
+---
+ dpkg-deb/build.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dpkg-deb/build.c b/dpkg-deb/build.c
+index a92b58e..a3d1912 100644
+--- a/dpkg-deb/build.c
++++ b/dpkg-deb/build.c
+@@ -450,7 +450,7 @@ tarball_pack(const char *dir, filenames_feed_func *tar_filenames_feeder,
+ 
+     command_init(&cmd, TAR, "tar -cf");
+     command_add_args(&cmd, "tar", "-cf", "-", "--format=gnu",
+-                           "--mtime", mtime, "--clamp-mtime", NULL);
++                           "--mtime", mtime, NULL);
+     /* Mode might become a positional argument, pass it before -T. */
+     if (mode)
+       command_add_args(&cmd, "--mode", mode, NULL);
+-- 
+2.11.0

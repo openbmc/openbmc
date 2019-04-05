@@ -20,3 +20,5 @@ XORG_PN = "libXi"
 SRC_URI[md5sum] = "1f0f2719c020655a60aee334ddd26d67"
 SRC_URI[sha256sum] = "c2e6b8ff84f9448386c1b5510a5cf5a16d788f76db018194dacdc200180faf45"
 
+BBCLASSEXTEND = "native nativesdk"
+

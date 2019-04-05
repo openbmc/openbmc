@@ -18,7 +18,7 @@ LICENSE = "GPLv2+ & LGPLv2+ & LGPLv2.1+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=73a5855a8119deb017f5f13cf327095d \
                     file://COPYING.LIB;md5=21682e4e8fea52413fd26c60acb907e5 "
 
-DEPENDS += "gstreamer1.0-plugins-base jpeg"
+DEPENDS += "gstreamer1.0-plugins-base"
 
 inherit gettext bluetooth
 

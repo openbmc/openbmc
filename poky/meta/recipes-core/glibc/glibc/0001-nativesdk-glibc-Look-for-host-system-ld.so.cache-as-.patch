@@ -1,7 +1,8 @@
-From bd51b3add89a5cb2d8f44029a1027c780b2afff5 Mon Sep 17 00:00:00 2001
+From 0cac7493366586e8f87e8459359c15f702ef8c81 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:48:24 +0000
-Subject: [PATCH] nativesdk-glibc: Look for host system ld.so.cache as well
+Subject: [PATCH 01/30] nativesdk-glibc: Look for host system ld.so.cache as
+ well
 
 Upstream-Status: Inappropriate [embedded specific]
 
@@ -30,7 +31,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/elf/dl-load.c b/elf/dl-load.c
-index c51e4b3718..44bbb69dc4 100644
+index f972524421..e53c3a1b7b 100644
 --- a/elf/dl-load.c
 +++ b/elf/dl-load.c
 @@ -2085,6 +2085,14 @@ _dl_map_object (struct link_map *loader, const char *name,
@@ -63,3 +64,6 @@ index c51e4b3718..44bbb69dc4 100644
        /* Add another newline when we are tracing the library loading.  */
        if (__glibc_unlikely (GLRO(dl_debug_mask) & DL_DEBUG_LIBS))
  	_dl_debug_printf ("\n");
+-- 
+2.20.1
+

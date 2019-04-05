@@ -1,0 +1,13 @@
+# Net Digital
+# Just the initial transponder is enough
+
+# freq sr fec mod
+# Found on Sao Jose dos Campos, SP
+[CHANNEL]
+	DELIVERY_SYSTEM = DVBC/ANNEX_A
+	FREQUENCY = 573000000
+	SYMBOL_RATE = 5217000
+	INNER_FEC = NONE
+	MODULATION = QAM/256
+	INVERSION = AUTO
+

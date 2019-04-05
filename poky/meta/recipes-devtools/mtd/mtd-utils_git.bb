@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3 \
 
 inherit autotools pkgconfig update-alternatives
 
-DEPENDS = "zlib lzo e2fsprogs util-linux"
+DEPENDS = "zlib e2fsprogs util-linux"
 RDEPENDS_mtd-utils-tests += "bash"
 
 PV = "2.0.2+${SRCPV}"
@@ -25,8 +25,9 @@ EXTRA_OECONF += "--enable-install-tests"
 # xattr support creates an additional compile-time dependency on acl because
 # the sys/acl.h header is needed. libacl is not needed and thus enabling xattr
 # regardless whether acl is enabled or disabled in the distro should be okay.
-PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'xattr', d)}"
-PACKAGECONFIG[xattr] = ",,acl,"
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'xattr', d)} lzo"
+PACKAGECONFIG[lzo] = "--with-lzo,--without-lzo,lzo"
+PACKAGECONFIG[xattr] = "--with-xattr,--without-xattr,acl"
 
 CPPFLAGS_append_riscv64  = " -pthread -D_REENTRANT"
 

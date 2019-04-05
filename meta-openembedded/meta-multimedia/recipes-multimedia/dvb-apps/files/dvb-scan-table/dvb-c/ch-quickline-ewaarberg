@@ -1,0 +1,8 @@
+# Initial scan config for Swiss DVB-C provider Quickline in Aarberg (EWA)
+[CHANNEL]
+	DELIVERY_SYSTEM = DVBC/ANNEX_A
+	FREQUENCY = 306000000
+	SYMBOL_RATE = 6900000
+	INNER_FEC = NONE
+	MODULATION = QAM/256
+	INVERSION = AUTO

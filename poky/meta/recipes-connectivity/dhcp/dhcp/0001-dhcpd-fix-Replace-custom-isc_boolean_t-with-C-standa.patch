@@ -1,0 +1,2882 @@
+From ffb1d1325bd6503df9a324befac5f5039ac77432 Mon Sep 17 00:00:00 2001
+From: Armin Kuster <akuster@mvista.com>
+Date: Tue, 23 Oct 2018 10:36:56 +0000
+Subject: [PATCH] dhcpd: fix Replace custom isc_boolean_t with C standard bool
+ type
+
+
+Upstream-Status: Pending
+
+Fixes issues introduced by bind when they changed their headers.
+
+Signed-off-by: Armin Kuster <akuster@mvista.com>
+---
+ includes/dhcpd.h           | 34 +++++++++++++++++-----------------
+ includes/heap.h            |  2 +-
+ includes/omapip/omapip.h   |  2 +-
+ includes/omapip/omapip_p.h |  6 +++---
+ includes/tree.h            |  2 +-
+ 5 files changed, 23 insertions(+), 23 deletions(-)
+
+Index: dhcp-4.4.1/includes/dhcpd.h
+===================================================================
+--- dhcp-4.4.1.orig/includes/dhcpd.h
++++ dhcp-4.4.1/includes/dhcpd.h
+@@ -461,20 +461,20 @@ struct packet {
+ 	 * options we got in a previous exchange were still there, we need
+ 	 * to signal this in a reliable way.
+ 	 */
+-	isc_boolean_t agent_options_stashed;
++	bool agent_options_stashed;
+ 
+ 	/*
+ 	 * ISC_TRUE if packet received unicast (as opposed to multicast).
+ 	 * Only used in DHCPv6.
+ 	 */
+-	isc_boolean_t unicast;
++	bool unicast;
+ 
+ 	/* Propagates server value SV_ECHO_CLIENT_ID so it is available
+          * in cons_options() */
+ 	int sv_echo_client_id;
+ 
+ 	/* Relay port check */
+-	isc_boolean_t relay_source_port;
++	bool relay_source_port;
+ };
+ 
+ /*
+@@ -1174,7 +1174,7 @@ struct dhc6_lease {
+ 	struct dhc6_lease *next;
+ 	struct data_string server_id;
+ 
+-	isc_boolean_t released;
++	bool released;
+ 	int score;
+ 	u_int8_t pref;
+ 
+@@ -1695,8 +1695,8 @@ struct ipv6_pool {
+ 	int bits;				/* number of bits, CIDR style */
+ 	int units;				/* allocation unit in bits */
+ 	iasubopt_hash_t *leases;		/* non-free leases */
+-	isc_uint64_t num_active;		/* count of active leases */
+-	isc_uint64_t num_abandoned;		/* count of abandoned leases */
++	uint64_t num_active;			/* count of active leases */
++	uint64_t num_abandoned;			/* count of abandoned leases */
+ 	isc_heap_t *active_timeouts;		/* timeouts for active leases */
+ 	int num_inactive;			/* count of inactive leases */
+ 	isc_heap_t *inactive_timeouts;		/* timeouts for expired or
+@@ -1732,11 +1732,11 @@ struct ipv6_pond {
+ 	struct ipv6_pool **ipv6_pools;	/* NULL-terminated array */
+ 	int last_ipv6_pool;		/* offset of last IPv6 pool
+ 					   used to issue a lease */
+-	isc_uint64_t num_total;	    /* Total number of elements in the pond */
+-	isc_uint64_t num_active;    /* Number of elements in the pond in use */
+-	isc_uint64_t num_abandoned;	/* count of abandoned leases */
++	uint64_t num_total;	    	/* Total number of elements in the pond */
++	uint64_t num_active;    	/* Number of elements in the pond in use */
++	uint64_t num_abandoned;		/* count of abandoned leases */
+ 	int logged;			/* already logged a message */
+-	isc_uint64_t low_threshold;	/* low threshold to restart logging */
++	uint64_t low_threshold;		/* low threshold to restart logging */
+ 	int jumbo_range;
+ #ifdef EUI_64
+ 	int use_eui_64;		/* use EUI-64 address assignment when true */
+@@ -1745,9 +1745,9 @@ struct ipv6_pond {
+ 
+ /*
+  * Max addresses in a pond that can be supported by log threshold
+- * Currently based on max value supported by isc_uint64_t.
++ * Currently based on max value supported by uint64_t.
+ */
+-#define POND_TRACK_MAX ISC_UINT64_MAX
++#define POND_TRACK_MAX UINT64_MAX
+ 
+ /* Flags for dhcp_ddns_cb_t */
+ #define DDNS_UPDATE_ADDR		0x0001
+@@ -1868,7 +1868,7 @@ lookup_fqdn6_option(struct universe *uni
+ 		    unsigned code);
+ void
+ save_fqdn6_option(struct universe *universe, struct option_state *options,
+-		  struct option_cache *oc, isc_boolean_t appendp);
++		  struct option_cache *oc, bool appendp);
+ void
+ delete_fqdn6_option(struct universe *universe, struct option_state *options,
+ 		    int code);
+@@ -1953,7 +1953,7 @@ void save_option(struct universe *, stru
+ void also_save_option(struct universe *, struct option_state *,
+ 		      struct option_cache *);
+ void save_hashed_option(struct universe *, struct option_state *,
+-			struct option_cache *, isc_boolean_t appendp);
++			struct option_cache *, bool appendp);
+ void delete_option (struct universe *, struct option_state *, int);
+ void delete_hashed_option (struct universe *,
+ 			   struct option_state *, int);
+@@ -2041,7 +2041,7 @@ int linked_option_state_dereference (str
+ 				     struct option_state *,
+ 				     const char *, int);
+ void save_linked_option(struct universe *, struct option_state *,
+-			struct option_cache *, isc_boolean_t appendp);
++			struct option_cache *, bool appendp);
+ void linked_option_space_foreach (struct packet *, struct lease *,
+ 				  struct client_state *,
+ 				  struct option_state *,
+@@ -2069,7 +2069,7 @@ void do_packet (struct interface_info *,
+ 		struct dhcp_packet *, unsigned,
+ 		unsigned int, struct iaddr, struct hardware *);
+ void do_packet6(struct interface_info *, const char *,
+-		int, int, const struct iaddr *, isc_boolean_t);
++		int, int, const struct iaddr *, bool);
+ int packet6_len_okay(const char *, int);
+ 
+ int validate_packet(struct packet *);
+@@ -2224,7 +2224,7 @@ uint32_t parse_byte_order_uint32(const v
+ int ddns_updates(struct packet *, struct lease *, struct lease *,
+ 		 struct iasubopt *, struct iasubopt *, struct option_state *);
+ isc_result_t ddns_removals(struct lease *, struct iasubopt *,
+-			   struct dhcp_ddns_cb *, isc_boolean_t);
++			   struct dhcp_ddns_cb *, bool);
+ u_int16_t get_conflict_mask(struct option_state *input_options);
+ #if defined (TRACING)
+ void trace_ddns_init(void);
+@@ -2450,7 +2450,7 @@ void dhcpleasequery (struct packet *, in
+ void dhcpv6_leasequery (struct data_string *, struct packet *);
+ 
+ /* dhcpv6.c */
+-isc_boolean_t server_duid_isset(void);
++bool server_duid_isset(void);
+ void copy_server_duid(struct data_string *ds, const char *file, int line);
+ void set_server_duid(struct data_string *new_duid);
+ isc_result_t set_server_duid_from_option(void);
+@@ -2852,7 +2852,7 @@ extern void (*bootp_packet_handler) (str
+ 				     struct iaddr, struct hardware *);
+ extern void (*dhcpv6_packet_handler)(struct interface_info *,
+ 				     const char *, int,
+-				     int, const struct iaddr *, isc_boolean_t);
++				     int, const struct iaddr *, bool);
+ extern struct timeout *timeouts;
+ extern omapi_object_type_t *dhcp_type_interface;
+ #if defined (TRACING)
+@@ -2943,7 +2943,7 @@ int addr_or(struct iaddr *result,
+ 	    const struct iaddr *a1, const struct iaddr *a2);
+ int addr_and(struct iaddr *result,
+ 	     const struct iaddr *a1, const struct iaddr *a2);
+-isc_boolean_t is_cidr_mask_valid(const struct iaddr *addr, int bits);
++bool is_cidr_mask_valid(const struct iaddr *addr, int bits);
+ isc_result_t range2cidr(struct iaddrcidrnetlist **result,
+ 			const struct iaddr *lo, const struct iaddr *hi);
+ isc_result_t free_iaddrcidrnetlist(struct iaddrcidrnetlist **result);
+@@ -3787,7 +3787,7 @@ isc_result_t ia_add_iasubopt(struct ia_x
+ 			     const char *file, int line);
+ void ia_remove_iasubopt(struct ia_xx *ia, struct iasubopt *iasubopt,
+ 			const char *file, int line);
+-isc_boolean_t ia_equal(const struct ia_xx *a, const struct ia_xx *b);
++bool ia_equal(const struct ia_xx *a, const struct ia_xx *b);
+ 
+ isc_result_t ipv6_pool_allocate(struct ipv6_pool **pool, u_int16_t type,
+ 				const struct in6_addr *start_addr,
+@@ -3820,9 +3820,9 @@ isc_result_t expire_lease6(struct iasubo
+ 			   struct ipv6_pool *pool, time_t now);
+ isc_result_t release_lease6(struct ipv6_pool *pool, struct iasubopt *lease);
+ isc_result_t decline_lease6(struct ipv6_pool *pool, struct iasubopt *lease);
+-isc_boolean_t lease6_exists(const struct ipv6_pool *pool,
++bool lease6_exists(const struct ipv6_pool *pool,
+ 			    const struct in6_addr *addr);
+-isc_boolean_t lease6_usable(struct iasubopt *lease);
++bool lease6_usable(struct iasubopt *lease);
+ isc_result_t cleanup_lease6(ia_hash_t *ia_table,
+ 			    struct ipv6_pool *pool,
+ 			    struct iasubopt *lease,
+@@ -3834,13 +3834,13 @@ isc_result_t create_prefix6(struct ipv6_
+ 			    unsigned int *attempts,
+ 			    const struct data_string *uid,
+ 			    time_t soft_lifetime_end_time);
+-isc_boolean_t prefix6_exists(const struct ipv6_pool *pool,
++bool prefix6_exists(const struct ipv6_pool *pool,
+ 			     const struct in6_addr *pref, u_int8_t plen);
+ 
+ isc_result_t add_ipv6_pool(struct ipv6_pool *pool);
+ isc_result_t find_ipv6_pool(struct ipv6_pool **pool, u_int16_t type,
+ 			    const struct in6_addr *addr);
+-isc_boolean_t ipv6_in_pool(const struct in6_addr *addr,
++bool ipv6_in_pool(const struct in6_addr *addr,
+ 			   const struct ipv6_pool *pool);
+ isc_result_t ipv6_pond_allocate(struct ipv6_pond **pond,
+ 				const char *file, int line);
+Index: dhcp-4.4.1/includes/heap.h
+===================================================================
+--- dhcp-4.4.1.orig/includes/heap.h
++++ dhcp-4.4.1/includes/heap.h
+@@ -26,7 +26,7 @@
+  * The comparision function returns ISC_TRUE if the first argument has
+  * higher priority than the second argument, and ISC_FALSE otherwise.
+  */
+-typedef isc_boolean_t (*isc_heapcompare_t)(void *, void *);
++typedef bool (*isc_heapcompare_t)(void *, void *);
+ 
+ /*%
+  * The index function allows the client of the heap to receive a callback
+Index: dhcp-4.4.1/includes/omapip/omapip.h
+===================================================================
+--- dhcp-4.4.1.orig/includes/omapip/omapip.h
++++ dhcp-4.4.1/includes/omapip/omapip.h
+@@ -264,7 +264,7 @@ isc_result_t omapi_protocol_connect (oma
+ isc_result_t omapi_connect_list (omapi_object_t *, omapi_addr_list_t *,
+ 				 omapi_addr_t *);
+ isc_result_t omapi_protocol_listen (omapi_object_t *, unsigned, int);
+-isc_boolean_t omapi_protocol_authenticated (omapi_object_t *);
++bool omapi_protocol_authenticated (omapi_object_t *);
+ isc_result_t omapi_protocol_configure_security (omapi_object_t *,
+ 						isc_result_t (*)
+ 						(omapi_object_t *,
+Index: dhcp-4.4.1/includes/omapip/omapip_p.h
+===================================================================
+--- dhcp-4.4.1.orig/includes/omapip/omapip_p.h
++++ dhcp-4.4.1/includes/omapip/omapip_p.h
+@@ -149,7 +149,7 @@ typedef struct __omapi_protocol_object {
+ 	omapi_remote_auth_t *remote_auth_list;	/* Authenticators active on
+ 						   this connection. */
+ 
+-	isc_boolean_t insecure;		/* Set to allow unauthenticated
++	bool insecure;		/* Set to allow unauthenticated
+ 					   messages. */
+ 
+ 	isc_result_t (*verify_auth) (omapi_object_t *, omapi_auth_key_t *);
+@@ -158,7 +158,7 @@ typedef struct __omapi_protocol_object {
+ typedef struct {
+ 	OMAPI_OBJECT_PREAMBLE;
+ 
+-	isc_boolean_t insecure;		/* Set to allow unauthenticated
++	bool insecure;		/* Set to allow unauthenticated
+ 					   messages. */
+ 
+ 	isc_result_t (*verify_auth) (omapi_object_t *, omapi_auth_key_t *);
+@@ -208,7 +208,7 @@ typedef struct __omapi_io_object {
+ 	isc_result_t (*writer) (omapi_object_t *);
+ 	isc_result_t (*reaper) (omapi_object_t *);
+ 	isc_socket_t *fd;
+-	isc_boolean_t closed; /* ISC_TRUE = closed, do not use */
++	bool closed; /* ISC_TRUE = closed, do not use */
+ } omapi_io_object_t;
+ 
+ typedef struct __omapi_generic_object {
+Index: dhcp-4.4.1/includes/tree.h
+===================================================================
+--- dhcp-4.4.1.orig/includes/tree.h
++++ dhcp-4.4.1/includes/tree.h
+@@ -304,7 +304,7 @@ struct universe {
+ 					     struct option_state *,
+ 					     unsigned);
+ 	void (*save_func) (struct universe *, struct option_state *,
+-			   struct option_cache *, isc_boolean_t);
++			   struct option_cache *, bool );
+ 	void (*foreach) (struct packet *,
+ 			 struct lease *, struct client_state *,
+ 			 struct option_state *, struct option_state *,
+Index: dhcp-4.4.1/common/conflex.c
+===================================================================
+--- dhcp-4.4.1.orig/common/conflex.c
++++ dhcp-4.4.1/common/conflex.c
+@@ -322,7 +322,7 @@ get_raw_token(struct parse *cfile) {
+ 
+ static enum dhcp_token 
+ get_next_token(const char **rval, unsigned *rlen, 
+-	       struct parse *cfile, isc_boolean_t raw) {
++	       struct parse *cfile, bool raw) {
+ 	int rv;
+ 
+ 	if (cfile -> token) {
+@@ -367,7 +367,7 @@ get_next_token(const char **rval, unsign
+ 
+ enum dhcp_token
+ next_token(const char **rval, unsigned *rlen, struct parse *cfile) {
+-	return get_next_token(rval, rlen, cfile, ISC_FALSE);
++	return get_next_token(rval, rlen, cfile, false);
+ }
+ 
+ 
+@@ -378,7 +378,7 @@ next_token(const char **rval, unsigned *
+ 
+ enum dhcp_token
+ next_raw_token(const char **rval, unsigned *rlen, struct parse *cfile) {
+-	return get_next_token(rval, rlen, cfile, ISC_TRUE);
++	return get_next_token(rval, rlen, cfile, true);
+ }
+ 
+ 
+@@ -393,7 +393,7 @@ next_raw_token(const char **rval, unsign
+ 
+ enum dhcp_token
+ do_peek_token(const char **rval, unsigned int *rlen,
+-	      struct parse *cfile, isc_boolean_t raw) {
++	      struct parse *cfile, bool raw) {
+ 	int x;
+ 
+ 	if (!cfile->token || (!raw && (cfile->token == WHITESPACE))) {
+@@ -441,7 +441,7 @@ do_peek_token(const char **rval, unsigne
+ 
+ enum dhcp_token
+ peek_token(const char **rval, unsigned *rlen, struct parse *cfile) {
+-	return do_peek_token(rval, rlen, cfile, ISC_FALSE);
++	return do_peek_token(rval, rlen, cfile, false);
+ }
+ 
+ 
+@@ -452,7 +452,7 @@ peek_token(const char **rval, unsigned *
+ 
+ enum dhcp_token
+ peek_raw_token(const char **rval, unsigned *rlen, struct parse *cfile) {
+-	return do_peek_token(rval, rlen, cfile, ISC_TRUE);
++	return do_peek_token(rval, rlen, cfile, true);
+ }
+ 
+ static void skip_to_eol (cfile)
+Index: dhcp-4.4.1/common/discover.c
+===================================================================
+--- dhcp-4.4.1.orig/common/discover.c
++++ dhcp-4.4.1/common/discover.c
+@@ -73,7 +73,7 @@ void (*bootp_packet_handler) (struct int
+ void (*dhcpv6_packet_handler)(struct interface_info *,
+ 			      const char *, int,
+ 			      int, const struct iaddr *,
+-			      isc_boolean_t);
++			      bool);
+ #endif /* DHCPv6 */
+ 
+ 
+@@ -236,7 +236,7 @@ struct iface_conf_list {
+ struct iface_info {
+ 	char name[IF_NAMESIZE+1];	/* name of the interface, e.g. "bge0" */
+ 	struct sockaddr_storage addr;	/* address information */
+-	isc_uint64_t flags;		/* interface flags, e.g. IFF_LOOPBACK */
++	uint64_t flags;			/* interface flags, e.g. IFF_LOOPBACK */
+ };
+ 
+ /* 
+@@ -312,14 +312,14 @@ int
+ next_iface(struct iface_info *info, int *err, struct iface_conf_list *ifaces) {
+ 	struct LIFREQ *p;
+ 	struct LIFREQ tmp;
+-	isc_boolean_t foundif;
++	bool foundif;
+ #if defined(sun) || defined(__linux)
+ 	/* Pointer used to remove interface aliases. */
+ 	char *s;
+ #endif
+ 
+ 	do {
+-		foundif = ISC_FALSE;
++		foundif = false;
+ 
+ 		if (ifaces->next >= ifaces->num) {
+ 			*err = 0;
+@@ -353,8 +353,8 @@ next_iface(struct iface_info *info, int
+ 		}
+ #endif /* defined(sun) || defined(__linux) */
+ 
+-		foundif = ISC_TRUE;
+-	} while ((foundif == ISC_FALSE) ||
++		foundif = true;
++	} while ((foundif == false) ||
+ 		 (strncmp(info->name, "dummy", 5) == 0));
+ 	
+ 	memset(&tmp, 0, sizeof(tmp));
+@@ -410,7 +410,7 @@ struct iface_conf_list {
+ struct iface_info {
+ 	char name[IFNAMSIZ];		/* name of the interface, e.g. "bge0" */
+ 	struct sockaddr_storage addr;	/* address information */
+-	isc_uint64_t flags;		/* interface flags, e.g. IFF_LOOPBACK */
++	uint64_t flags;			/* interface flags, e.g. IFF_LOOPBACK */
+ };
+ 
+ /* 
+@@ -1190,9 +1190,9 @@ got_one_v6(omapi_object_t *h) {
+ 		 * If a packet is not multicast, we assume it is unicast.
+ 		 */
+ 		if (IN6_IS_ADDR_MULTICAST(&to)) { 
+-			is_unicast = ISC_FALSE;
++			is_unicast = false;
+ 		} else {
+-			is_unicast = ISC_TRUE;
++			is_unicast = true;
+ 		}
+ 
+ 		ifrom.len = 16;
+Index: dhcp-4.4.1/omapip/iscprint.c
+===================================================================
+--- dhcp-4.4.1.orig/omapip/iscprint.c
++++ dhcp-4.4.1/omapip/iscprint.c
+@@ -59,8 +59,8 @@ isc_print_vsnprintf(char *str, size_t si
+ 	int plus;
+ 	int space;
+ 	int neg;
+-	isc_int64_t tmpi;
+-	isc_uint64_t tmpui;
++	int64_t tmpi;
++	uint64_t tmpui;
+ 	unsigned long width;
+ 	unsigned long precision;
+ 	unsigned int length;
+@@ -234,7 +234,7 @@ isc_print_vsnprintf(char *str, size_t si
+ 				goto printint;
+ 			case 'o':
+ 				if (q)
+-					tmpui = va_arg(ap, isc_uint64_t);
++					tmpui = va_arg(ap, uint64_t);
+ 				else if (l)
+ 					tmpui = va_arg(ap, long int);
+ 				else
+@@ -244,7 +244,7 @@ isc_print_vsnprintf(char *str, size_t si
+ 				goto printint;
+ 			case 'u':
+ 				if (q)
+-					tmpui = va_arg(ap, isc_uint64_t);
++					tmpui = va_arg(ap, uint64_t);
+ 				else if (l)
+ 					tmpui = va_arg(ap, unsigned long int);
+ 				else
+@@ -253,7 +253,7 @@ isc_print_vsnprintf(char *str, size_t si
+ 				goto printint;
+ 			case 'x':
+ 				if (q)
+-					tmpui = va_arg(ap, isc_uint64_t);
++					tmpui = va_arg(ap, uint64_t);
+ 				else if (l)
+ 					tmpui = va_arg(ap, unsigned long int);
+ 				else
+@@ -267,7 +267,7 @@ isc_print_vsnprintf(char *str, size_t si
+ 				goto printint;
+ 			case 'X':
+ 				if (q)
+-					tmpui = va_arg(ap, isc_uint64_t);
++					tmpui = va_arg(ap, uint64_t);
+ 				else if (l)
+ 					tmpui = va_arg(ap, unsigned long int);
+ 				else
+Index: dhcp-4.4.1/server/confpars.c
+===================================================================
+--- dhcp-4.4.1.orig/server/confpars.c
++++ dhcp-4.4.1/server/confpars.c
+@@ -4005,15 +4005,15 @@ add_ipv6_pool_to_subnet(struct subnet *s
+ 
+ 	/* Only bother if we aren't already flagged as jumbo */
+ 	if (pond->jumbo_range == 0) {
+-		if ((units - bits) > (sizeof(isc_uint64_t) * 8)) {
++		if ((units - bits) > (sizeof(uint64_t) * 8)) {
+ 			pond->jumbo_range = 1;
+ 			pond->num_total = POND_TRACK_MAX;
+ 		}
+ 		else {
+-			isc_uint64_t space_left
++			uint64_t space_left
+ 				= POND_TRACK_MAX - pond->num_total;
+-			isc_uint64_t addon
+-				= (isc_uint64_t)(1) << (units - bits);
++			uint64_t addon
++				= (uint64_t)(1) << (units - bits);
+ 
+ 			if (addon > space_left) {
+ 				pond->jumbo_range = 1;
+@@ -4739,7 +4739,7 @@ parse_ia_na_declaration(struct parse *cf
+ 	struct iasubopt *iaaddr;
+ 	struct ipv6_pool *pool;
+ 	char addr_buf[sizeof("ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255")];
+-	isc_boolean_t newbinding;
++	bool newbinding;
+ 	struct binding_scope *scope = NULL;
+ 	struct binding *bnd;
+ 	struct binding_value *nv = NULL;
+@@ -4959,9 +4959,9 @@ parse_ia_na_declaration(struct parse *cf
+ 					}
+ 					strcpy(bnd->name, val);
+ 
+-					newbinding = ISC_TRUE;
++					newbinding = true;
+ 				} else {
+-					newbinding = ISC_FALSE;
++					newbinding = false;
+ 				}
+ 
+ 				if (!binding_value_allocate(&nv, MDL)) {
+@@ -5186,7 +5186,7 @@ parse_ia_ta_declaration(struct parse *cf
+ 	struct iasubopt *iaaddr;
+ 	struct ipv6_pool *pool;
+ 	char addr_buf[sizeof("ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255")];
+-	isc_boolean_t newbinding;
++	bool newbinding;
+ 	struct binding_scope *scope = NULL;
+ 	struct binding *bnd;
+ 	struct binding_value *nv = NULL;
+@@ -5406,9 +5406,9 @@ parse_ia_ta_declaration(struct parse *cf
+ 					}
+ 					strcpy(bnd->name, val);
+ 
+-					newbinding = ISC_TRUE;
++					newbinding = true;
+ 				} else {
+-					newbinding = ISC_FALSE;
++					newbinding = false;
+ 				}
+ 
+ 				if (!binding_value_allocate(&nv, MDL)) {
+@@ -5623,7 +5623,7 @@ parse_ia_pd_declaration(struct parse *cf
+ 	struct iasubopt *iapref;
+ 	struct ipv6_pool *pool;
+ 	char addr_buf[sizeof("ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255")];
+-	isc_boolean_t newbinding;
++	bool newbinding;
+ 	struct binding_scope *scope = NULL;
+ 	struct binding *bnd;
+ 	struct binding_value *nv = NULL;
+@@ -5843,9 +5843,9 @@ parse_ia_pd_declaration(struct parse *cf
+ 					}
+ 					strcpy(bnd->name, val);
+ 
+-					newbinding = ISC_TRUE;
++					newbinding = true;
+ 				} else {
+-					newbinding = ISC_FALSE;
++					newbinding = false;
+ 				}
+ 
+ 				if (!binding_value_allocate(&nv, MDL)) {
+Index: dhcp-4.4.1/server/dhcpv6.c
+===================================================================
+--- dhcp-4.4.1.orig/server/dhcpv6.c
++++ dhcp-4.4.1/server/dhcpv6.c
+@@ -71,8 +71,8 @@ struct reply_state {
+ 	unsigned ia_count;
+ 	unsigned pd_count;
+ 	unsigned client_resources;
+-	isc_boolean_t resources_included;
+-	isc_boolean_t static_lease;
++	bool resources_included;
++	bool static_lease;
+ 	unsigned static_prefixes;
+ 	struct ia_xx *ia;
+ 	struct ia_xx *old_ia;
+@@ -123,7 +123,7 @@ static isc_result_t shared_network_from_
+ 						struct packet *packet);
+ static void seek_shared_host(struct host_decl **hp,
+ 			     struct shared_network *shared);
+-static isc_boolean_t fixed_matches_shared(struct host_decl *host,
++static bool fixed_matches_shared(struct host_decl *host,
+ 					  struct shared_network *shared);
+ static isc_result_t reply_process_ia_na(struct reply_state *reply,
+ 					struct option_cache *ia);
+@@ -131,9 +131,9 @@ static isc_result_t reply_process_ia_ta(
+ 					struct option_cache *ia);
+ static isc_result_t reply_process_addr(struct reply_state *reply,
+ 				       struct option_cache *addr);
+-static isc_boolean_t address_is_owned(struct reply_state *reply,
++static bool address_is_owned(struct reply_state *reply,
+ 				      struct iaddr *addr);
+-static isc_boolean_t temporary_is_available(struct reply_state *reply,
++static bool temporary_is_available(struct reply_state *reply,
+ 					    struct iaddr *addr);
+ static isc_result_t find_client_temporaries(struct reply_state *reply);
+ static isc_result_t reply_process_try_addr(struct reply_state *reply,
+@@ -151,7 +151,7 @@ static isc_result_t reply_process_ia_pd(
+ static struct group *find_group_by_prefix(struct reply_state *reply);
+ static isc_result_t reply_process_prefix(struct reply_state *reply,
+ 					 struct option_cache *pref);
+-static isc_boolean_t prefix_is_owned(struct reply_state *reply,
++static bool prefix_is_owned(struct reply_state *reply,
+ 				     struct iaddrcidrnet *pref);
+ static isc_result_t find_client_prefix(struct reply_state *reply);
+ static isc_result_t reply_process_try_prefix(struct reply_state *reply,
+@@ -174,7 +174,7 @@ static void unicast_reject(struct data_s
+ 		  const struct data_string *client_id,
+ 		  const struct data_string *server_id);
+ 
+-static isc_boolean_t is_unicast_option_defined(struct packet *packet);
++static bool is_unicast_option_defined(struct packet *packet);
+ static isc_result_t shared_network_from_requested_addr (struct shared_network
+ 							**shared,
+ 							struct packet* packet);
+@@ -363,7 +363,7 @@ static struct data_string server_duid;
+ /*
+  * Check if the server_duid has been set.
+  */
+-isc_boolean_t
++bool
+ server_duid_isset(void) {
+ 	return (server_duid.data != NULL);
+ }
+@@ -992,7 +992,7 @@ void check_pool6_threshold(struct reply_
+ 			   struct iasubopt *lease)
+ {
+ 	struct ipv6_pond *pond;
+-	isc_uint64_t used, count, high_threshold;
++	uint64_t used, count, high_threshold;
+ 	int poolhigh = 0, poollow = 0;
+ 	char *shared_name = "no name";
+ 	char tmp_addr[INET6_ADDRSTRLEN];
+@@ -1310,9 +1310,9 @@ pick_v6_address(struct reply_state *repl
+ 	unsigned int attempts;
+ 	char tmp_buf[INET6_ADDRSTRLEN];
+ 	struct iasubopt **addr = &reply->lease;
+-        isc_uint64_t total = 0;
+-        isc_uint64_t active = 0;
+-        isc_uint64_t abandoned = 0;
++        uint64_t total = 0;
++        uint64_t active = 0;
++        uint64_t abandoned = 0;
+ 	int jumbo_range = 0;
+ 	char *shared_name = (reply->shared->name ?
+ 			     reply->shared->name : "(no name)");
+@@ -1825,7 +1825,7 @@ lease_to_client(struct data_string *repl
+ 
+ 		/* Start counting resources (addresses) offered. */
+ 		reply.client_resources = 0;
+-		reply.resources_included = ISC_FALSE;
++		reply.resources_included = false;
+ 
+ 		status = reply_process_ia_na(&reply, oc);
+ 
+@@ -1843,7 +1843,7 @@ lease_to_client(struct data_string *repl
+ 
+ 		/* Start counting resources (addresses) offered. */
+ 		reply.client_resources = 0;
+-		reply.resources_included = ISC_FALSE;
++		reply.resources_included = false;
+ 
+ 		status = reply_process_ia_ta(&reply, oc);
+ 
+@@ -1864,7 +1864,7 @@ lease_to_client(struct data_string *repl
+ 
+ 		/* Start counting resources (prefixes) offered. */
+ 		reply.client_resources = 0;
+-		reply.resources_included = ISC_FALSE;
++		reply.resources_included = false;
+ 
+ 		status = reply_process_ia_pd(&reply, oc);
+ 
+@@ -2077,9 +2077,9 @@ reply_process_ia_na(struct reply_state *
+ 					tmp_addr, MDL) == 0)
+ 			log_fatal("Impossible condition at %s:%d.", MDL);
+ 
+-		reply->static_lease = ISC_TRUE;
++		reply->static_lease = true;
+ 	} else
+-		reply->static_lease = ISC_FALSE;
++		reply->static_lease = false;
+ 
+ 	/*
+ 	 * Save the cursor position at the start of the IA, so we can
+@@ -2778,7 +2778,7 @@ reply_process_addr(struct reply_state *r
+  * (fault out all else).  Otherwise it's a dynamic address, so lookup
+  * that address and make sure it belongs to this DUID:IAID pair.
+  */
+-static isc_boolean_t
++static bool
+ address_is_owned(struct reply_state *reply, struct iaddr *addr) {
+ 	int i;
+ 	struct ipv6_pond *pond;
+@@ -2791,13 +2791,13 @@ address_is_owned(struct reply_state *rep
+ 			log_fatal("Impossible condition at %s:%d.", MDL);
+ 
+ 		if (memcmp(addr->iabuf, reply->fixed.data, 16) == 0)
+-			return (ISC_TRUE);
++			return (true);
+ 
+-		return (ISC_FALSE);
++		return (false);
+ 	}
+ 
+ 	if ((reply->old_ia == NULL) || (reply->old_ia->num_iasubopt == 0))
+-		return (ISC_FALSE);
++		return (false);
+ 
+ 	for (i = 0 ; i < reply->old_ia->num_iasubopt ; i++) {
+ 		struct iasubopt *tmp;
+@@ -2805,8 +2805,8 @@ address_is_owned(struct reply_state *rep
+ 		tmp = reply->old_ia->iasubopt[i];
+ 
+ 		if (memcmp(addr->iabuf, &tmp->addr, 16) == 0) {
+-			if (lease6_usable(tmp) == ISC_FALSE) {
+-				return (ISC_FALSE);
++			if (lease6_usable(tmp) == false) {
++				return (false);
+ 			}
+ 
+ 			pond = tmp->ipv6_pool->ipv6_pond;
+@@ -2814,15 +2814,15 @@ address_is_owned(struct reply_state *rep
+ 			     (permitted(reply->packet, pond->prohibit_list))) ||
+ 			    ((pond->permit_list != NULL) &&
+ 			     (!permitted(reply->packet, pond->permit_list))))
+-				return (ISC_FALSE);
++				return (false);
+ 
+ 			iasubopt_reference(&reply->lease, tmp, MDL);
+ 
+-			return (ISC_TRUE);
++			return (true);
+ 		}
+ 	}
+ 
+-	return (ISC_FALSE);
++	return (false);
+ }
+ 
+ /* Process a client-supplied IA_TA.  This may append options to the tail of
+@@ -2890,7 +2890,7 @@ reply_process_ia_ta(struct reply_state *
+ 	/*
+ 	 * Temporary leases are dynamic by definition.
+ 	 */
+-	reply->static_lease = ISC_FALSE;
++	reply->static_lease = false;
+ 
+ 	/*
+ 	 * Save the cursor position at the start of the IA, so we can
+@@ -2972,7 +2972,7 @@ reply_process_ia_ta(struct reply_state *
+ 		}
+ 		status = ISC_R_CANCELED;
+ 		reply->client_resources = 0;
+-		reply->resources_included = ISC_FALSE;
++		reply->resources_included = false;
+ 		if (reply->lease != NULL)
+ 			iasubopt_dereference(&reply->lease, MDL);
+ 	}
+@@ -3364,7 +3364,7 @@ void shorten_lifetimes(struct reply_stat
+ /*
+  * Verify the temporary address is available.
+  */
+-static isc_boolean_t
++static bool
+ temporary_is_available(struct reply_state *reply, struct iaddr *addr) {
+ 	struct in6_addr tmp_addr;
+ 	struct subnet *subnet;
+@@ -3379,7 +3379,7 @@ temporary_is_available(struct reply_stat
+ 	 * So this is not a request for this address.
+ 	 */
+ 	if (IN6_IS_ADDR_UNSPECIFIED(&tmp_addr))
+-		return ISC_FALSE;
++		return false;
+ 
+ 	/*
+ 	 * Verify that this address is on the client's network.
+@@ -3393,13 +3393,13 @@ temporary_is_available(struct reply_stat
+ 
+ 	/* Address not found on shared network. */
+ 	if (subnet == NULL)
+-		return ISC_FALSE;
++		return false;
+ 
+ 	/*
+ 	 * Check if this address is owned (must be before next step).
+ 	 */
+ 	if (address_is_owned(reply, addr))
+-		return ISC_TRUE;
++		return true;
+ 
+ 	/*
+ 	 * Verify that this address is in a temporary pool and try to get it.
+@@ -3424,18 +3424,18 @@ temporary_is_available(struct reply_stat
+ 	}
+ 
+ 	if (pool == NULL)
+-		return ISC_FALSE;
++		return false;
+ 	if (lease6_exists(pool, &tmp_addr))
+-		return ISC_FALSE;
++		return false;
+ 	if (iasubopt_allocate(&reply->lease, MDL) != ISC_R_SUCCESS)
+-		return ISC_FALSE;
++		return false;
+ 	reply->lease->addr = tmp_addr;
+ 	reply->lease->plen = 0;
+ 	/* Default is soft binding for 2 minutes. */
+ 	if (add_lease6(pool, reply->lease, cur_time + 120) != ISC_R_SUCCESS)
+-		return ISC_FALSE;
++		return false;
+ 
+-	return ISC_TRUE;
++	return true;
+ }
+ 
+ /*
+@@ -3652,7 +3652,7 @@ find_client_address(struct reply_state *
+ 			 */
+ 
+ 			if ((candidate_shared != reply->shared) ||
+-			    (lease6_usable(lease) != ISC_TRUE))
++			    (lease6_usable(lease) != true))
+ 				continue;
+ 
+ 			if (((pond->prohibit_list != NULL) &&
+@@ -3971,7 +3971,7 @@ reply_process_send_addr(struct reply_sta
+ 		goto cleanup;
+ 	}
+ 
+-	reply->resources_included = ISC_TRUE;
++	reply->resources_included = true;
+ 
+       cleanup:
+ 	if (data.data != NULL)
+@@ -4722,7 +4722,7 @@ reply_process_prefix(struct reply_state
+  * (fault out all else).  Otherwise it's a dynamic prefix, so lookup
+  * that prefix and make sure it belongs to this DUID:IAID pair.
+  */
+-static isc_boolean_t
++static bool
+ prefix_is_owned(struct reply_state *reply, struct iaddrcidrnet *pref) {
+ 	struct iaddrcidrnetlist *l;
+ 	int i;
+@@ -4736,14 +4736,14 @@ prefix_is_owned(struct reply_state *repl
+ 			if ((pref->bits == l->cidrnet.bits) &&
+ 			    (memcmp(pref->lo_addr.iabuf,
+ 				    l->cidrnet.lo_addr.iabuf, 16) == 0))
+-				return (ISC_TRUE);
++				return (true);
+ 		}
+-		return (ISC_FALSE);
++		return (false);
+ 	}
+ 
+ 	if ((reply->old_ia == NULL) ||
+ 	    (reply->old_ia->num_iasubopt == 0))
+-		return (ISC_FALSE);
++		return (false);
+ 
+ 	for (i = 0 ; i < reply->old_ia->num_iasubopt ; i++) {
+ 		struct iasubopt *tmp;
+@@ -4752,8 +4752,8 @@ prefix_is_owned(struct reply_state *repl
+ 
+ 		if ((pref->bits == (int) tmp->plen) &&
+ 		    (memcmp(pref->lo_addr.iabuf, &tmp->addr, 16) == 0)) {
+-			if (lease6_usable(tmp) == ISC_FALSE) {
+-				return (ISC_FALSE);
++			if (lease6_usable(tmp) == false) {
++				return (false);
+ 			}
+ 
+ 			pond = tmp->ipv6_pool->ipv6_pond;
+@@ -4761,14 +4761,14 @@ prefix_is_owned(struct reply_state *repl
+ 			     (permitted(reply->packet, pond->prohibit_list))) ||
+ 			    ((pond->permit_list != NULL) &&
+ 			     (!permitted(reply->packet, pond->permit_list))))
+-				return (ISC_FALSE);
++				return (false);
+ 
+ 			iasubopt_reference(&reply->lease, tmp, MDL);
+-			return (ISC_TRUE);
++			return (true);
+ 		}
+ 	}
+ 
+-	return (ISC_FALSE);
++	return (false);
+ }
+ 
+ /*
+@@ -4914,7 +4914,7 @@ find_client_prefix(struct reply_state *r
+ 			 */
+ 			if (((candidate_shared != NULL) &&
+ 			     (candidate_shared != reply->shared)) ||
+-			    (lease6_usable(prefix) != ISC_TRUE))
++			    (lease6_usable(prefix) != true))
+ 				continue;
+ 
+ 			/*
+@@ -5233,7 +5233,7 @@ reply_process_send_prefix(struct reply_s
+ 		goto cleanup;
+ 	}
+ 
+-	reply->resources_included = ISC_TRUE;
++	reply->resources_included = true;
+ 
+       cleanup:
+ 	if (data.data != NULL)
+@@ -5383,8 +5383,8 @@ dhcpv6_request(struct data_string *reply
+ 
+ 	/* If the REQUEST arrived via unicast and unicast option isn't set,
+  	 * reject it per RFC 3315, Sec 18.2.1 */
+-	if (packet->unicast == ISC_TRUE &&
+-	    is_unicast_option_defined(packet) == ISC_FALSE) {
++	if (packet->unicast == true &&
++	    is_unicast_option_defined(packet) == false) {
+ 		unicast_reject(reply_ret, packet, &client_id, &server_id);
+ 	} else {
+ 		/*
+@@ -5505,7 +5505,7 @@ dhcpv6_confirm(struct data_string *reply
+ 	struct option_state *cli_enc_opt_state, *opt_state;
+ 	struct iaddr cli_addr;
+ 	int pass;
+-	isc_boolean_t inappropriate, has_addrs;
++	bool inappropriate, has_addrs;
+ 	char reply_data[65536];
+ 	struct dhcpv6_packet *reply = (struct dhcpv6_packet *)reply_data;
+ 	int reply_ofs = (int)(offsetof(struct dhcpv6_packet, options));
+@@ -5556,7 +5556,7 @@ dhcpv6_confirm(struct data_string *reply
+ 		goto exit;
+ 
+ 	/* Are the addresses in all the IA's appropriate for that link? */
+-	has_addrs = inappropriate = ISC_FALSE;
++	has_addrs = inappropriate = false;
+ 	pass = D6O_IA_NA;
+ 	while(!inappropriate) {
+ 		/* If we've reached the end of the IA_NA pass, move to the
+@@ -5602,7 +5602,7 @@ dhcpv6_confirm(struct data_string *reply
+ 			data_string_forget(&iaaddr, MDL);
+ 
+ 			/* Record that we've processed at least one address. */
+-			has_addrs = ISC_TRUE;
++			has_addrs = true;
+ 
+ 			/* Find out if any subnets cover this address. */
+ 			for (subnet = shared->subnets ; subnet != NULL ;
+@@ -5621,7 +5621,7 @@ dhcpv6_confirm(struct data_string *reply
+ 			 * continue searching.
+ 			 */
+ 			if (subnet == NULL) {
+-				inappropriate = ISC_TRUE;
++				inappropriate = true;
+ 				break;
+ 			}
+ 		}
+@@ -5719,8 +5719,8 @@ dhcpv6_renew(struct data_string *reply,
+ 
+ 	/* If the RENEW arrived via unicast and unicast option isn't set,
+ 	 * reject it per RFC 3315, Sec 18.2.3 */
+-	if (packet->unicast == ISC_TRUE &&
+-	    is_unicast_option_defined(packet) == ISC_FALSE) {
++	if (packet->unicast == true &&
++	    is_unicast_option_defined(packet) == false) {
+ 		unicast_reject(reply, packet, &client_id, &server_id);
+ 	} else {
+ 		/*
+@@ -6142,8 +6142,8 @@ dhcpv6_decline(struct data_string *reply
+ 
+ 	/* If the DECLINE arrived via unicast and unicast option isn't set,
+ 	 * reject it per RFC 3315, Sec 18.2.7 */
+-	if (packet->unicast == ISC_TRUE &&
+-	    is_unicast_option_defined(packet) == ISC_FALSE) {
++	if (packet->unicast == true &&
++	    is_unicast_option_defined(packet) == false) {
+ 		unicast_reject(reply, packet, &client_id, &server_id);
+ 	} else {
+ 		/*
+@@ -6597,8 +6597,8 @@ dhcpv6_release(struct data_string *reply
+ 
+ 	/* If the RELEASE arrived via unicast and unicast option isn't set,
+  	 * reject it per RFC 3315, Sec 18.2.6 */
+-	if (packet->unicast == ISC_TRUE &&
+-	    is_unicast_option_defined(packet) == ISC_FALSE) {
++	if (packet->unicast == true &&
++	    is_unicast_option_defined(packet) == false) {
+ 		unicast_reject(reply, packet, &client_id, &server_id);
+ 	} else {
+ 		/*
+@@ -6897,7 +6897,7 @@ dhcpv6_relay_forw(struct data_string *re
+ 		}
+ 		data_string_forget(&a_opt, MDL);
+ 
+-		packet->relay_source_port = ISC_TRUE;
++		packet->relay_source_port = true;
+ 	}
+ #endif
+ 
+@@ -7219,7 +7219,7 @@ dhcp4o6_relay_forw(struct data_string *r
+ 		}
+ 		data_string_forget(&a_opt, MDL);
+ 
+-		packet->relay_source_port = ISC_TRUE;
++		packet->relay_source_port = true;
+ 	}
+ #endif
+ 
+@@ -8036,35 +8036,35 @@ seek_shared_host(struct host_decl **hp,
+ 		host_reference(hp, seek, MDL);
+ }
+ 
+-static isc_boolean_t
++static bool
+ fixed_matches_shared(struct host_decl *host, struct shared_network *shared) {
+ 	struct subnet *subnet;
+ 	struct data_string addr;
+-	isc_boolean_t matched;
++	bool matched;
+ 	struct iaddr fixed;
+ 
+ 	if (host->fixed_addr == NULL)
+-		return ISC_FALSE;
++		return false;
+ 
+ 	memset(&addr, 0, sizeof(addr));
+ 	if (!evaluate_option_cache(&addr, NULL, NULL, NULL, NULL, NULL,
+ 				   &global_scope, host->fixed_addr, MDL))
+-		return ISC_FALSE;
++		return false;
+ 
+ 	if (addr.len < 16) {
+ 		data_string_forget(&addr, MDL);
+-		return ISC_FALSE;
++		return false;
+ 	}
+ 
+ 	fixed.len = 16;
+ 	memcpy(fixed.iabuf, addr.data, 16);
+ 
+-	matched = ISC_FALSE;
++	matched = false;
+ 	for (subnet = shared->subnets ; subnet != NULL ;
+ 	     subnet = subnet->next_sibling) {
+ 		if (addr_eq(subnet_number(fixed, subnet->netmask),
+ 			    subnet->net)) {
+-			matched = ISC_TRUE;
++			matched = true;
+ 			break;
+ 		}
+ 	}
+@@ -8167,15 +8167,15 @@ unicast_reject(struct data_string *reply
+  * statements from the network's group outward into a local option cache.
+  * The option cache is then scanned for the presence of unicast option.  If
+  * the packet cannot be mapped to a shared network, the function returns
+- * ISC_FALSE.
++ * false.
+  * \param packet inbound packet from the client
+  *
+- * \return ISC_TRUE if the dhcp6.unicast option is defined, false otherwise.
++ * \return true if the dhcp6.unicast option is defined, false otherwise.
+  *
+  */
+-isc_boolean_t
++bool
+ is_unicast_option_defined(struct packet *packet) {
+-        isc_boolean_t is_defined = ISC_FALSE;
++        bool is_defined = false;
+ 	struct option_state *opt_state = NULL;
+ 	struct option_cache *oc = NULL;
+ 	struct shared_network *shared = NULL;
+@@ -8195,7 +8195,7 @@ is_unicast_option_defined(struct packet
+ 		 * logic will catch it */
+ 		log_error("is_unicast_option_defined:"
+ 			  "cannot attribute packet to a network.");
+-		return (ISC_FALSE);
++		return (false);
+ 	}
+ 
+ 	/* Now that we've mapped it to a network, execute statments to that
+@@ -8205,7 +8205,7 @@ is_unicast_option_defined(struct packet
+ 				    &global_scope, shared->group, NULL, NULL);
+ 
+ 	oc = lookup_option(&dhcpv6_universe, opt_state, D6O_UNICAST);
+-	is_defined = (oc != NULL ? ISC_TRUE : ISC_FALSE);
++	is_defined = (oc != NULL ? true : false);
+ 	log_debug("is_unicast_option_defined: option found : %d", is_defined);
+ 
+ 	if (shared != NULL) {
+Index: dhcp-4.4.1/client/clparse.c
+===================================================================
+--- dhcp-4.4.1.orig/client/clparse.c
++++ dhcp-4.4.1/client/clparse.c
+@@ -1527,7 +1527,7 @@ parse_client6_lease_statement(struct par
+ 
+ 		      case TOKEN_RELEASED:
+ 		      case TOKEN_ABANDONED:
+-			lease->released = ISC_TRUE;
++			lease->released = true;
+ 			break;
+ 
+ 		      default:
+Index: dhcp-4.4.1/client/dhc6.c
+===================================================================
+--- dhcp-4.4.1.orig/client/dhc6.c
++++ dhcp-4.4.1/client/dhc6.c
+@@ -109,7 +109,7 @@ static isc_result_t dhc6_add_ia_pd(struc
+ 				   u_int8_t message,
+ 				   int wanted,
+ 				   int *added);
+-static isc_boolean_t stopping_finished(void);
++static bool stopping_finished(void);
+ static void dhc6_merge_lease(struct dhc6_lease *src, struct dhc6_lease *dst);
+ void do_select6(void *input);
+ void do_refresh6(void *input);
+@@ -131,7 +131,7 @@ static void script_write_params6(struct
+ 				 const char *prefix,
+ 				 struct option_state *options);
+ static void script_write_requested6(struct client_state *client);
+-static isc_boolean_t active_prefix(struct client_state *client);
++static bool active_prefix(struct client_state *client);
+ 
+ static int check_timing6(struct client_state *client, u_int8_t msg_type,
+ 			 char *msg_str, struct dhc6_lease *lease,
+@@ -149,7 +149,7 @@ static isc_result_t dhc6_add_ia_na_decli
+ 					   struct data_string *packet,
+ 					   struct dhc6_lease *lease);
+ static int drop_declined_addrs(struct dhc6_lease *lease);
+-static isc_boolean_t unexpired_address_in_lease(struct dhc6_lease *lease);
++static bool unexpired_address_in_lease(struct dhc6_lease *lease);
+ 
+ extern int onetry;
+ extern int stateless;
+@@ -418,14 +418,14 @@ valid_reply(struct packet *packet, struc
+ {
+ 	struct data_string sid, cid;
+ 	struct option_cache *oc;
+-	int rval = ISC_TRUE;
++	int rval = true;
+ 
+ 	memset(&sid, 0, sizeof(sid));
+ 	memset(&cid, 0, sizeof(cid));
+ 
+ 	if (!lookup_option(&dhcpv6_universe, packet->options, D6O_SERVERID)) {
+ 		log_error("Response without a server identifier received.");
+-		rval = ISC_FALSE;
++		rval = false;
+ 	}
+ 
+ 	oc = lookup_option(&dhcpv6_universe, packet->options, D6O_CLIENTID);
+@@ -434,7 +434,7 @@ valid_reply(struct packet *packet, struc
+ 				   client->sent_options, &global_scope, oc,
+ 				   MDL)) {
+ 		log_error("Response without a client identifier.");
+-		rval = ISC_FALSE;
++		rval = false;
+ 	}
+ 
+ 	oc = lookup_option(&dhcpv6_universe, client->sent_options,
+@@ -444,7 +444,7 @@ valid_reply(struct packet *packet, struc
+ 				   client->sent_options, NULL, &global_scope,
+ 				   oc, MDL)) {
+ 		log_error("Local client identifier is missing!");
+-		rval = ISC_FALSE;
++		rval = false;
+ 	}
+ 
+ 	if (sid.len == 0 ||
+@@ -452,7 +452,7 @@ valid_reply(struct packet *packet, struc
+ 	    memcmp(sid.data, cid.data, sid.len)) {
+ 		log_error("Advertise with matching transaction ID, but "
+ 			  "mismatching client id.");
+-		rval = ISC_FALSE;
++		rval = false;
+ 	}
+ 
+ 	/* clean up pointers to the strings */
+@@ -2375,7 +2375,7 @@ start_release6(struct client_state *clie
+ 	/* Note this in the lease file. */
+ 	if (client->active_lease == NULL)
+ 		return;
+-	client->active_lease->released = ISC_TRUE;
++	client->active_lease->released = true;
+ 	write_client6_lease(client, client->active_lease, 0, 1);
+ 
+ 	/* Set timers per RFC3315 section 18.1.6. */
+@@ -2612,7 +2612,7 @@ dhc6_check_advertise(struct dhc6_lease *
+ {
+ 	struct dhc6_ia *ia;
+ 	isc_result_t rval = ISC_R_SUCCESS;
+-	int have_addrs = ISC_FALSE;
++	int have_addrs = false;
+ 	unsigned code;
+ 	const char *scope;
+ 	int got_na = 0, got_ta = 0, got_pd = 0;
+@@ -2650,14 +2650,14 @@ dhc6_check_advertise(struct dhc6_lease *
+ 		 * Should we check the addr itself for usability?
+ 		 */
+ 		if (ia->addrs != NULL) {
+-			have_addrs = ISC_TRUE;
++			have_addrs = true;
+ 		}
+ 	}
+ 
+ 	/* If we didn't get some addrs or the user required us to
+ 	 * get all of the requested IAs and we didn't return an error
+ 	 */
+-	if ((have_addrs != ISC_TRUE) ||
++	if ((have_addrs != true) ||
+ 	    ((require_all_ias != 0) &&
+ 	     ((got_na < wanted_ia_na) ||
+ 	      (got_ta < wanted_ia_ta) ||
+@@ -2670,7 +2670,7 @@ dhc6_check_advertise(struct dhc6_lease *
+ /* status code <-> action matrix for the client in INIT state
+  * (rapid/commit).  Returns always false as no action is defined.
+  */
+-static isc_boolean_t
++static bool
+ dhc6_init_action(struct client_state *client, isc_result_t *rvalp,
+ 		 unsigned code)
+ {
+@@ -2679,21 +2679,21 @@ dhc6_init_action(struct client_state *cl
+ 
+ 	if (client == NULL) {
+ 		*rvalp = DHCP_R_INVALIDARG;
+-		return ISC_FALSE;
++		return false;
+ 	}
+ 
+ 	if (*rvalp == ISC_R_SUCCESS)
+-		return ISC_FALSE;
++		return false;
+ 
+ 	/* No possible action in any case... */
+-	return ISC_FALSE;
++	return false;
+ }
+ 
+ /* status code <-> action matrix for the client in SELECT state
+  * (request/reply).  Returns true if action was taken (and the
+  * packet should be ignored), or false if no action was taken.
+  */
+-static isc_boolean_t
++static bool
+ dhc6_select_action(struct client_state *client, isc_result_t *rvalp,
+ 		   unsigned code)
+ {
+@@ -2705,12 +2705,12 @@ dhc6_select_action(struct client_state *
+ 
+ 	if (client == NULL) {
+ 		*rvalp = DHCP_R_INVALIDARG;
+-		return ISC_FALSE;
++		return false;
+ 	}
+ 	rval = *rvalp;
+ 
+ 	if (rval == ISC_R_SUCCESS)
+-		return ISC_FALSE;
++		return false;
+ 
+ 	switch (code) {
+ 		/* We may have an earlier failure status code (so no
+@@ -2723,7 +2723,7 @@ dhc6_select_action(struct client_state *
+ 	      case STATUS_NoBinding:
+ 	      case STATUS_UseMulticast:
+ 		/* Take no action. */
+-		return ISC_FALSE;
++		return false;
+ 
+ 		/* If the server can't deal with us, either try the
+ 		 * next advertised server, or continue retrying if there
+@@ -2739,7 +2739,7 @@ dhc6_select_action(struct client_state *
+ 
+ 			break;
+ 		} else /* Take no action - continue to retry. */
+-			return ISC_FALSE;
++			return false;
+ 
+ 		/* If the server has no addresses, try other servers if
+ 		 * we got some, otherwise go to INIT to hope for more
+@@ -2748,7 +2748,7 @@ dhc6_select_action(struct client_state *
+ 	      case STATUS_NoAddrsAvail:
+ 	      case STATUS_NoPrefixAvail:
+ 		if (client->state == S_REBOOTING)
+-			return ISC_FALSE;
++			return false;
+ 
+ 		if (client->selected_lease == NULL)
+ 			log_fatal("Impossible case at %s:%d.", MDL);
+@@ -2794,7 +2794,7 @@ dhc6_select_action(struct client_state *
+ 		break;
+ 	}
+ 
+-	return ISC_TRUE;
++	return true;
+ }
+ 
+ static void
+@@ -2821,7 +2821,7 @@ dhc6_withdraw_lease(struct client_state
+  * (request/reply).  Returns true if action was taken (and the
+  * packet should be ignored), or false if no action was taken.
+  */
+-static isc_boolean_t
++static bool
+ dhc6_reply_action(struct client_state *client, isc_result_t *rvalp,
+ 		  unsigned code)
+ {
+@@ -2832,12 +2832,12 @@ dhc6_reply_action(struct client_state *c
+ 
+ 	if (client == NULL) {
+ 		*rvalp = DHCP_R_INVALIDARG;
+-		return ISC_FALSE;
++		return false;
+ 	}
+ 	rval = *rvalp;
+ 
+ 	if (rval == ISC_R_SUCCESS)
+-		return ISC_FALSE;
++		return false;
+ 
+ 	switch (code) {
+ 		/* It's possible an earlier status code set rval to a failure
+@@ -2852,7 +2852,7 @@ dhc6_reply_action(struct client_state *c
+ 	      case STATUS_UnspecFail:
+ 		/* For unknown codes...it's a soft (retryable) error. */
+ 	      default:
+-		return ISC_FALSE;
++		return false;
+ 
+ 		/* The server is telling us to use a multicast address, so
+ 		 * we have to delete the unicast option from the active
+@@ -2865,7 +2865,7 @@ dhc6_reply_action(struct client_state *c
+ 			delete_option(&dhcp_universe,
+ 				      client->active_lease->options,
+ 				      D6O_UNICAST);
+-		return ISC_FALSE;
++		return false;
+ 
+ 		/* "When the client receives a NotOnLink status from the
+ 		 *  server in response to a Request, the client can either
+@@ -2914,7 +2914,7 @@ dhc6_reply_action(struct client_state *c
+ 		break;
+ 	}
+ 
+-	return ISC_TRUE;
++	return true;
+ }
+ 
+ /* status code <-> action matrix for the client in STOPPED state
+@@ -2922,7 +2922,7 @@ dhc6_reply_action(struct client_state *c
+  * packet should be ignored), or false if no action was taken.
+  * NoBinding is translated into Success.
+  */
+-static isc_boolean_t
++static bool
+ dhc6_stop_action(struct client_state *client, isc_result_t *rvalp,
+ 		  unsigned code)
+ {
+@@ -2933,12 +2933,12 @@ dhc6_stop_action(struct client_state *cl
+ 
+ 	if (client == NULL) {
+ 		*rvalp = DHCP_R_INVALIDARG;
+-		return ISC_FALSE;
++		return false;
+ 	}
+ 	rval = *rvalp;
+ 
+ 	if (rval == ISC_R_SUCCESS)
+-		return ISC_FALSE;
++		return false;
+ 
+ 	switch (code) {
+ 		/* It's possible an earlier status code set rval to a failure
+@@ -2948,13 +2948,13 @@ dhc6_stop_action(struct client_state *cl
+ 		/* For unknown codes...it's a soft (retryable) error. */
+ 	      case STATUS_UnspecFail:
+ 	      default:
+-		return ISC_FALSE;
++		return false;
+ 
+ 		/* NoBinding is not an error */
+ 	      case STATUS_NoBinding:
+ 		if (rval == ISC_R_FAILURE)
+ 			*rvalp = ISC_R_SUCCESS;
+-		return ISC_FALSE;
++		return false;
+ 
+ 		/* Should not happen */
+ 	      case STATUS_NoAddrsAvail:
+@@ -2976,13 +2976,13 @@ dhc6_stop_action(struct client_state *cl
+ 			delete_option(&dhcp_universe,
+ 				      client->active_lease->options,
+ 				      D6O_UNICAST);
+-		return ISC_FALSE;
++		return false;
+ 	}
+ 
+-	return ISC_TRUE;
++	return true;
+ }
+ 
+-static isc_boolean_t
++static bool
+ dhc6_decline_action(struct client_state *client, isc_result_t *rvalp,
+ 		  unsigned code)
+ {
+@@ -2993,12 +2993,12 @@ dhc6_decline_action(struct client_state
+ 
+ 	if (client == NULL) {
+ 		*rvalp = DHCP_R_INVALIDARG;
+-		return ISC_FALSE;
++		return false;
+ 	}
+ 	rval = *rvalp;
+ 
+ 	if (rval == ISC_R_SUCCESS) {
+-		return ISC_FALSE;
++		return false;
+ 	}
+ 
+ 	switch (code) {
+@@ -3013,13 +3013,13 @@ dhc6_decline_action(struct client_state
+ 			delete_option(&dhcp_universe,
+ 				      client->active_lease->options,
+ 				      D6O_UNICAST);
+-		return ISC_FALSE;
++		return false;
+ 	default:
+ 		/* Anything else is basically meaningless */
+ 		break;
+ 	}
+ 
+-	return ISC_TRUE;
++	return true;
+ }
+ 
+ 
+@@ -3029,14 +3029,14 @@ dhc6_decline_action(struct client_state
+ static isc_result_t
+ dhc6_check_reply(struct client_state *client, struct dhc6_lease *new)
+ {
+-	isc_boolean_t (*action)(struct client_state *,
++	bool (*action)(struct client_state *,
+ 				isc_result_t *, unsigned);
+ 	struct dhc6_ia *ia;
+ 	isc_result_t rval = ISC_R_SUCCESS;
+ 	unsigned code;
+ 	const char *scope;
+ 	int nscore, sscore;
+-	int have_addrs = ISC_FALSE;
++	int have_addrs = false;
+ 	int got_na = 0, got_ta = 0, got_pd = 0;
+ 
+ 	if ((client == NULL) || (new == NULL))
+@@ -3102,7 +3102,7 @@ dhc6_check_reply(struct client_state *cl
+ 			return ISC_R_CANCELED;
+ 
+ 		if (ia->addrs != NULL) {
+-			have_addrs = ISC_TRUE;
++			have_addrs = true;
+ 		}
+ 	}
+ 
+@@ -3119,13 +3119,13 @@ dhc6_check_reply(struct client_state *cl
+ 	 * check in and commented it as I eventually do want
+ 	 * us to check for TAs as well.  SAR
+ 	 */
+-	if ((have_addrs != ISC_TRUE) ||
++	if ((have_addrs != true) ||
+ 	    ((require_all_ias != 0) &&
+ 	     ((got_na < wanted_ia_na) ||
+ 	      /*(got_ta < wanted_ia_ta) ||*/
+ 	      (got_pd < wanted_ia_pd)))) {
+ 		rval = ISC_R_FAILURE;
+-		if (action(client, &rval, STATUS_NoAddrsAvail) == ISC_TRUE) {
++		if (action(client, &rval, STATUS_NoAddrsAvail) == true) {
+ 			return ISC_R_CANCELED;
+ 		}
+ 	}
+@@ -4256,7 +4256,7 @@ dhc6_add_ia_pd(struct client_state *clie
+ 
+ /* stopping_finished() checks if there is a remaining work to do.
+  */
+-static isc_boolean_t
++static bool
+ stopping_finished(void)
+ {
+ 	struct interface_info *ip;
+@@ -4265,12 +4265,12 @@ stopping_finished(void)
+ 	for (ip = interfaces; ip; ip = ip -> next) {
+ 		for (client = ip -> client; client; client = client -> next) {
+ 			if (client->state != S_STOPPED)
+-				return ISC_FALSE;
++				return false;
+ 			if (client->active_lease != NULL)
+-				return ISC_FALSE;
++				return false;
+ 		}
+ 	}
+-	return ISC_TRUE;
++	return true;
+ }
+ 
+ /* reply_handler() accepts a Reply while we're attempting Select or Renew or
+@@ -4474,8 +4474,8 @@ dhc6_check_times(struct client_state *cl
+ 	struct dhc6_addr *addr;
+ 	TIME renew=MAX_TIME, rebind=MAX_TIME, depref=MAX_TIME,
+ 	     lo_expire=MAX_TIME, hi_expire=0, max_ia_starts = 0, tmp;
+-	int has_addrs = ISC_FALSE;
+-	int has_preferred_addrs = ISC_FALSE;
++	int has_addrs = false;
++	int has_preferred_addrs = false;
+ 	struct timeval tv;
+ 
+ 	lease = client->active_lease;
+@@ -4506,7 +4506,7 @@ dhc6_check_times(struct client_state *cl
+ 					depref = tmp;
+ 
+ 				if (!(addr->flags & DHC6_ADDR_EXPIRED)) {
+-					has_preferred_addrs = ISC_TRUE;
++					has_preferred_addrs = true;
+ 				}
+ 			}
+ 
+@@ -4525,7 +4525,7 @@ dhc6_check_times(struct client_state *cl
+ 				if (tmp < this_ia_lo_expire)
+ 					this_ia_lo_expire = tmp;
+ 
+-				has_addrs = ISC_TRUE;
++				has_addrs = true;
+ 			}
+ 		}
+ 
+@@ -4603,7 +4603,7 @@ dhc6_check_times(struct client_state *cl
+ 	 * In the future, we may decide that we're done here, or to
+ 	 * schedule a future request (using 4-pkt info-request model).
+ 	 */
+-	if (has_addrs == ISC_FALSE) {
++	if (has_addrs == false) {
+ 		dhc6_lease_destroy(&client->active_lease, MDL);
+ 		client->active_lease = NULL;
+ 
+@@ -4855,7 +4855,7 @@ start_bound(struct client_state *client)
+ 			  "is selected.");
+ 		return;
+ 	}
+-	lease->released = ISC_FALSE;
++	lease->released = false;
+ 	old = client->old_lease;
+ 
+ 	client->v6_handler = bound_handler;
+@@ -5448,8 +5448,8 @@ do_expire(void *input)
+ 	struct dhc6_lease *lease;
+ 	struct dhc6_ia *ia, **tia;
+ 	struct dhc6_addr *addr;
+-	int has_addrs = ISC_FALSE;
+-	int ia_has_addrs = ISC_FALSE;
++	int has_addrs = false;
++	int ia_has_addrs = false;
+ 
+ 	client = (struct client_state *)input;
+ 
+@@ -5458,7 +5458,7 @@ do_expire(void *input)
+ 		return;
+ 
+ 	for (ia = lease->bindings, tia = &lease->bindings; ia != NULL ; ) {
+-		ia_has_addrs = ISC_FALSE;
++		ia_has_addrs = false;
+ 		for (addr = ia->addrs ; addr != NULL ; addr = addr->next) {
+ 			if (addr->flags & DHC6_ADDR_EXPIRED)
+ 				continue;
+@@ -5495,14 +5495,14 @@ do_expire(void *input)
+ 				continue;
+ 			}
+ 
+-			ia_has_addrs = ISC_TRUE;
+-			has_addrs = ISC_TRUE;
++			ia_has_addrs = true;
++			has_addrs = true;
+ 		}
+ 
+ 		/* Update to the next ia and git rid of this ia
+ 		 * if it doesn't have any leases.
+ 		 */
+-		if (ia_has_addrs == ISC_TRUE) {
++		if (ia_has_addrs == true) {
+ 			/* leases, just advance the list pointer */
+ 			tia = &(*tia)->next;
+ 		} else {
+@@ -5517,7 +5517,7 @@ do_expire(void *input)
+ 	}
+ 
+ 	/* Clean up empty leases. */
+-	if (has_addrs == ISC_FALSE) {
++	if (has_addrs == false) {
+ 		log_info("PRC: Bound lease is devoid of active addresses."
+ 			 "  Re-initializing.");
+ 
+@@ -5596,14 +5596,14 @@ dhc6_check_irt(struct client_state *clie
+ 	TIME expire = MAX_TIME;
+ 	struct timeval tv;
+ 	int i;
+-	isc_boolean_t found = ISC_FALSE;
++	bool found = false;
+ 
+ 	cancel_timeout(refresh_info_request6, client);
+ 
+ 	req = client->config->requested_options;
+ 	for (i = 0; req[i] != NULL; i++) {
+ 		if (req[i] == irt_option) {
+-			found = ISC_TRUE;
++			found = true;
+ 			break;
+ 		}
+ 	}
+@@ -5924,7 +5924,7 @@ static void script_write_requested6(clie
+ /*
+  * Check if there is something not fully defined in the active lease.
+  */
+-static isc_boolean_t
++static bool
+ active_prefix(struct client_state *client)
+ {
+ 	struct dhc6_lease *lease;
+@@ -5934,21 +5934,21 @@ active_prefix(struct client_state *clien
+ 
+ 	lease = client->active_lease;
+ 	if (lease == NULL)
+-		return ISC_FALSE;
++		return false;
+ 	memset(zeros, 0, 16);
+ 	for (ia = lease->bindings; ia != NULL; ia = ia->next) {
+ 		if (ia->ia_type != D6O_IA_PD)
+ 			continue;
+ 		for (pref = ia->addrs; pref != NULL; pref = pref->next) {
+ 			if (pref->plen == 0)
+-				return ISC_FALSE;
++				return false;
+ 			if (pref->address.len != 16)
+-				return ISC_FALSE;
++				return false;
+ 			if (memcmp(pref->address.iabuf, zeros, 16) == 0)
+-				return ISC_FALSE;
++				return false;
+ 		}
+ 	}
+-	return ISC_TRUE;
++	return true;
+ }
+ 
+ /* Adds a leases's declined addreses to the outbound packet
+@@ -6111,26 +6111,26 @@ int drop_declined_addrs(struct dhc6_leas
+ /* Run through the addresses in lease and return true if there's any unexpired.
+  * Return false otherwise.
+  */
+-static isc_boolean_t
++static bool
+ unexpired_address_in_lease(struct dhc6_lease *lease)
+ {
+ 	struct dhc6_ia *ia;
+ 	struct dhc6_addr *addr;
+ 
+ 	if (lease == NULL) {
+-		return ISC_FALSE;
++		return false;
+ 	}
+ 
+ 	for (ia = lease->bindings ; ia != NULL ; ia = ia->next) {
+ 		for (addr = ia->addrs ; addr != NULL ; addr = addr->next) {
+ 			if (!(addr->flags & DHC6_ADDR_EXPIRED) &&
+ 			    (addr->starts + addr->max_life > cur_time)) {
+-				return ISC_TRUE;
++				return true;
+ 			}
+ 		}
+ 	}
+ 
+ 	log_debug("PRC: Previous lease is devoid of active addresses.");
+-	return ISC_FALSE;
++	return false;
+ }
+ #endif /* DHCPv6 */
+Index: dhcp-4.4.1/client/dhclient.c
+===================================================================
+--- dhcp-4.4.1.orig/client/dhclient.c
++++ dhcp-4.4.1/client/dhclient.c
+@@ -52,7 +52,7 @@ char *path_dhclient_script = path_dhclie
+ const char *path_dhclient_duid = NULL;
+ 
+ /* False (default) => we write and use a pid file */
+-isc_boolean_t no_pid_file = ISC_FALSE;
++bool no_pid_file = false;
+ 
+ int dhcp_max_agent_option_packet_length = 0;
+ 
+@@ -397,7 +397,7 @@ main(int argc, char **argv) {
+ 			path_dhclient_pid = argv[i];
+ 			no_dhclient_pid = 1;
+ 		} else if (!strcmp(argv[i], "--no-pid")) {
+-			no_pid_file = ISC_TRUE;
++			no_pid_file = true;
+ 		} else if (!strcmp(argv[i], "-cf")) {
+ 			if (++i == argc)
+ 				usage(use_noarg, argv[i-1]);
+@@ -652,7 +652,7 @@ main(int argc, char **argv) {
+ 	 * to write a pid file - we assume they are controlling
+ 	 * the process in some other fashion.
+ 	 */
+-	if ((release_mode || exit_mode) && (no_pid_file == ISC_FALSE)) {
++	if ((release_mode || exit_mode) && (no_pid_file == false)) {
+ 		FILE *pidfd;
+ 		pid_t oldpid;
+ 		long temp;
+@@ -4469,7 +4469,7 @@ void write_client_pid_file ()
+ 	int pfdesc;
+ 
+ 	/* nothing to do if the user doesn't want a pid file */
+-	if (no_pid_file == ISC_TRUE) {
++	if (no_pid_file == true) {
+ 		return;
+ 	}
+ 
+@@ -4727,7 +4727,7 @@ unsigned cons_agent_information_options
+ static void shutdown_exit (void *foo)
+ {
+ 	/* get rid of the pid if we can */
+-	if (no_pid_file == ISC_FALSE)
++	if (no_pid_file == false)
+ 		(void) unlink(path_dhclient_pid);
+ 	finish(0);
+ }
+Index: dhcp-4.4.1/common/inet.c
+===================================================================
+--- dhcp-4.4.1.orig/common/inet.c
++++ dhcp-4.4.1/common/inet.c
+@@ -299,7 +299,7 @@ addr_and(struct iaddr *result, const str
+  *
+  * Because the final ".1" would get masked out by the /8.
+  */
+-isc_boolean_t
++bool
+ is_cidr_mask_valid(const struct iaddr *addr, int bits) {
+ 	int zero_bits;
+ 	int zero_bytes;
+@@ -311,10 +311,10 @@ is_cidr_mask_valid(const struct iaddr *a
+ 	 * Check our bit boundaries.
+ 	 */
+ 	if (bits < 0) {
+-		return ISC_FALSE;
++		return false;
+ 	}
+ 	if (bits > (addr->len * 8)) {
+-		return ISC_FALSE;
++		return false;
+ 	}
+ 
+ 	/*
+@@ -328,7 +328,7 @@ is_cidr_mask_valid(const struct iaddr *a
+ 	 */
+ 	for (i=1; i<=zero_bytes; i++) {
+ 		if (addr->iabuf[addr->len-i] != 0) {
+-			return ISC_FALSE;
++			return false;
+ 		}
+ 	}
+ 
+@@ -340,7 +340,7 @@ is_cidr_mask_valid(const struct iaddr *a
+ 	 * happy.
+ 	 */
+ 	shift_bits = zero_bits % 8;
+-	if (shift_bits == 0) return ISC_TRUE;
++	if (shift_bits == 0) return true;
+ 	byte = addr->iabuf[addr->len-zero_bytes-1];
+ 	return (((byte >> shift_bits) << shift_bits) == byte);
+ }
+Index: dhcp-4.4.1/common/options.c
+===================================================================
+--- dhcp-4.4.1.orig/common/options.c
++++ dhcp-4.4.1/common/options.c
+@@ -676,7 +676,7 @@ cons_options(struct packet *inpacket, st
+ 		 * the priority_list. This way we'll send it whether or not it
+ 		 * is in the PRL. */
+ 		if ((inpacket != NULL) && (priority_len < PRIORITY_COUNT) &&
+-		    (inpacket->sv_echo_client_id == ISC_TRUE)) {
++		    (inpacket->sv_echo_client_id == true)) {
+ 			priority_list[priority_len++] =
+ 				DHO_DHCP_CLIENT_IDENTIFIER;
+ 		}
+@@ -1802,7 +1802,7 @@ const char *pretty_print_option (option,
+ 	const unsigned char *dp = data;
+ 	char comma;
+ 	unsigned long tval;
+-	isc_boolean_t a_array = ISC_FALSE;
++	bool a_array = false;
+ 	int len_used;
+ 
+ 	if (emit_commas)
+@@ -1828,7 +1828,7 @@ const char *pretty_print_option (option,
+ 		fmtbuf [l] = option -> format [i];
+ 		switch (option -> format [i]) {
+ 		      case 'a':
+-			a_array = ISC_TRUE;
++			a_array = true;
+ 			/* Fall through */
+ 		      case 'A':
+ 			--numelem;
+@@ -1858,7 +1858,7 @@ const char *pretty_print_option (option,
+ 				hunksize++;
+ 				comma = ':';
+ 				numhunk = 0;
+-				a_array = ISC_TRUE;
++				a_array = true;
+ 				hunkinc = 1;
+ 			}
+ 			fmtbuf [l + 1] = 0;
+@@ -1954,7 +1954,7 @@ const char *pretty_print_option (option,
+ 
+ 	/* If this is an array, compute its size. */
+ 	if (numhunk == 0) {
+-		if (a_array == ISC_TRUE) {
++		if (a_array == true) {
+ 			/*
+ 			 * It is an 'a' type array - we repeat the
+ 			 * last format type.  A binary string for 'X'
+@@ -2006,7 +2006,7 @@ const char *pretty_print_option (option,
+ 
+ 	/* Cycle through the array (or hunk) printing the data. */
+ 	for (i = 0; i < numhunk; i++) {
+-		if ((a_array == ISC_TRUE) && (i != 0) && (numelem > 0)) {
++		if ((a_array == true) && (i != 0) && (numelem > 0)) {
+ 			/*
+ 			 * For 'a' type of arrays we repeat
+ 			 * only the last format character
+@@ -2734,7 +2734,7 @@ save_option(struct universe *universe, s
+ 	    struct option_cache *oc)
+ {
+ 	if (universe->save_func)
+-		(*universe->save_func)(universe, options, oc, ISC_FALSE);
++		(*universe->save_func)(universe, options, oc, true);
+ 	else
+ 		log_error("can't store options in %s space.", universe->name);
+ }
+@@ -2745,14 +2745,14 @@ also_save_option(struct universe *univer
+ 		 struct option_cache *oc)
+ {
+ 	if (universe->save_func)
+-		(*universe->save_func)(universe, options, oc, ISC_TRUE);
++		(*universe->save_func)(universe, options, oc, true);
+ 	else
+ 		log_error("can't store options in %s space.", universe->name);
+ }
+ 
+ void
+ save_hashed_option(struct universe *universe, struct option_state *options,
+-		   struct option_cache *oc, isc_boolean_t appendp)
++		   struct option_cache *oc, bool appendp)
+ {
+ 	int hashix;
+ 	pair bptr;
+@@ -3062,7 +3062,7 @@ store_option(struct data_string *result,
+ 						  cfg_options, scope, subu);
+ 				subu = NULL;
+ 			}
+-		} while (ISC_FALSE);
++		} while (false);
+ 
+ 		status = append_option(result, universe, oc->option, &tmp);
+ 		data_string_forget(&tmp, MDL);
+@@ -3459,7 +3459,7 @@ lookup_fqdn6_option(struct universe *uni
+  */
+ void
+ save_fqdn6_option(struct universe *universe, struct option_state *options,
+-		  struct option_cache *oc, isc_boolean_t appendp)
++		  struct option_cache *oc, bool appendp)
+ {
+ 	log_fatal("Impossible condition at %s:%d.", MDL);
+ }
+@@ -3784,7 +3784,7 @@ void hashed_option_space_foreach (struct
+ 
+ void
+ save_linked_option(struct universe *universe, struct option_state *options,
+-		   struct option_cache *oc, isc_boolean_t appendp)
++		   struct option_cache *oc, bool appendp)
+ {
+ 	pair *tail;
+ 	struct option_chain_head *head;
+@@ -4073,7 +4073,7 @@ packet6_len_okay(const char *packet, int
+ void
+ do_packet6(struct interface_info *interface, const char *packet,
+ 	   int len, int from_port, const struct iaddr *from,
+-	   isc_boolean_t was_unicast) {
++	   bool was_unicast) {
+ 	unsigned char msg_type;
+ 	const struct dhcpv6_packet *msg;
+ 	const struct dhcpv6_relay_packet *relay;
+Index: dhcp-4.4.1/common/parse.c
+===================================================================
+--- dhcp-4.4.1.orig/common/parse.c
++++ dhcp-4.4.1/common/parse.c
+@@ -4952,7 +4952,7 @@ int parse_option_token (rv, cfile, fmt,
+ 	unsigned len;
+ 	struct iaddr addr;
+ 	int compress;
+-	isc_boolean_t freeval = ISC_FALSE;
++	bool freeval = false;
+ 	const char *f, *g;
+ 	struct enumeration_value *e;
+ 
+@@ -5038,7 +5038,7 @@ int parse_option_token (rv, cfile, fmt,
+ 			return 0;
+ 		}
+ 		len = strlen (val);
+-		freeval = ISC_TRUE;
++		freeval = true;
+ 		goto make_string;
+ 
+ 	      case 't': /* Text string... */
+@@ -5055,9 +5055,9 @@ int parse_option_token (rv, cfile, fmt,
+ 		if (!make_const_data (&t, (const unsigned char *)val,
+ 				      len, 1, 1, MDL))
+ 			log_fatal ("No memory for concatenation");
+-		if (freeval == ISC_TRUE) {
++		if (freeval == true) {
+ 			dfree((char *)val, MDL);
+-			freeval = ISC_FALSE;
++			freeval = false;
+ 			POST(freeval);
+ 		}
+ 		break;
+Index: dhcp-4.4.1/omapip/dispatch.c
+===================================================================
+--- dhcp-4.4.1.orig/omapip/dispatch.c
++++ dhcp-4.4.1/omapip/dispatch.c
+@@ -156,7 +156,7 @@ omapi_iscsock_cb(isc_task_t   *task,
+ 	 * This should be a temporary fix until we arrange to properly
+ 	 * close the socket.
+ 	 */
+-	if (obj->closed == ISC_TRUE) {
++	if (obj->closed == true) {
+ 		return(0);
+ 	}
+ #endif	  
+@@ -223,7 +223,7 @@ isc_result_t omapi_register_io_object (o
+ 	status = omapi_io_allocate (&obj, MDL);
+ 	if (status != ISC_R_SUCCESS)
+ 		return status;
+-	obj->closed = ISC_FALSE;  /* mark as open */
++	obj->closed = false;  /* mark as open */
+ 
+ 	status = omapi_object_reference (&obj -> inner, h, MDL);
+ 	if (status != ISC_R_SUCCESS) {
+@@ -404,7 +404,7 @@ isc_result_t omapi_unregister_io_object
+ 		isc_socket_detach(&obj->fd);
+ 	}
+ #else
+-	obj->closed = ISC_TRUE;
++	obj->closed = true;
+ #endif
+ 
+ 	omapi_io_dereference (&ph, MDL);
+Index: dhcp-4.4.1/omapip/isclib.c
+===================================================================
+--- dhcp-4.4.1.orig/omapip/isclib.c
++++ dhcp-4.4.1/omapip/isclib.c
+@@ -106,9 +106,9 @@ isclib_cleanup(void)
+ 	if (dhcp_gbl_ctx.taskmgr != NULL)
+ 		isc_taskmgr_destroy(&dhcp_gbl_ctx.taskmgr);
+ 
+-	if (dhcp_gbl_ctx.actx_started != ISC_FALSE) {
++	if (dhcp_gbl_ctx.actx_started != false) {
+ 		isc_app_ctxfinish(dhcp_gbl_ctx.actx);
+-		dhcp_gbl_ctx.actx_started = ISC_FALSE;
++		dhcp_gbl_ctx.actx_started = false;
+ 	}
+ 
+ 	if (dhcp_gbl_ctx.actx != NULL)
+@@ -211,7 +211,7 @@ dhcp_context_create(int flags,
+ 		result = isc_app_ctxstart(dhcp_gbl_ctx.actx);
+ 		if (result != ISC_R_SUCCESS)
+ 			return (result);
+-		dhcp_gbl_ctx.actx_started = ISC_TRUE;
++		dhcp_gbl_ctx.actx_started = true;
+ 
+ 		/* Not all OSs support suppressing SIGPIPE through socket
+ 		 * options, so set the sigal action to be ignore.  This allows
+Index: dhcp-4.4.1/omapip/protocol.c
+===================================================================
+--- dhcp-4.4.1.orig/omapip/protocol.c
++++ dhcp-4.4.1/omapip/protocol.c
+@@ -950,14 +950,14 @@ isc_result_t omapi_protocol_stuff_values
+ /* Returns a boolean indicating whether this protocol requires that
+    messages be authenticated or not. */
+ 
+-isc_boolean_t omapi_protocol_authenticated (omapi_object_t *h)
++bool omapi_protocol_authenticated (omapi_object_t *h)
+ {
+ 	if (h -> type != omapi_type_protocol)
+-		return isc_boolean_false;
++		return false;
+ 	if (((omapi_protocol_object_t *)h) -> insecure)
+-		return isc_boolean_false;
++		return false;
+ 	else
+-		return isc_boolean_true;
++		return true;
+ }
+ 
+ /* Sets the address and authenticator verification callbacks.  The handle
+Index: dhcp-4.4.1/relay/dhcrelay.c
+===================================================================
+--- dhcp-4.4.1.orig/relay/dhcrelay.c
++++ dhcp-4.4.1/relay/dhcrelay.c
+@@ -45,9 +45,9 @@ char *token_line;
+ char *tlname;
+ 
+ const char *path_dhcrelay_pid = _PATH_DHCRELAY_PID;
+-isc_boolean_t no_dhcrelay_pid = ISC_FALSE;
++bool no_dhcrelay_pid = false;
+ /* False (default) => we write and use a pid file */
+-isc_boolean_t no_pid_file = ISC_FALSE;
++bool no_pid_file = false;
+ 
+ int bogus_agent_drops = 0;	/* Packets dropped because agent option
+ 				   field was specified and we're not relaying
+@@ -82,7 +82,7 @@ int dfd[2] = { -1, -1 };
+ 
+ #ifdef DHCPv6
+ 	/* Force use of DHCPv6 interface-id option. */
+-isc_boolean_t use_if_id = ISC_FALSE;
++bool use_if_id = false;
+ #endif
+ 
+ 	/* Maximum size of a packet with agent options added. */
+@@ -556,7 +556,7 @@ main(int argc, char **argv) {
+ 			}
+ 			local_family_set = 1;
+ 			local_family = AF_INET6;
+-			use_if_id = ISC_TRUE;
++			use_if_id = true;
+ 		} else if (!strcmp(argv[i], "-l")) {
+ 			if (local_family_set && (local_family == AF_INET)) {
+ 				usage(use_v6command, argv[i]);
+@@ -564,7 +564,7 @@ main(int argc, char **argv) {
+ 			local_family_set = 1;
+ 			local_family = AF_INET6;
+ 			if (downstreams != NULL)
+-				use_if_id = ISC_TRUE;
++				use_if_id = true;
+ 			if (++i == argc)
+ 				usage(use_noarg, argv[i-1]);
+ 			sl = parse_downstream(argv[i]);
+@@ -595,9 +595,9 @@ main(int argc, char **argv) {
+ 			if (++i == argc)
+ 				usage(use_noarg, argv[i-1]);
+ 			path_dhcrelay_pid = argv[i];
+-			no_dhcrelay_pid = ISC_TRUE;
++			no_dhcrelay_pid = true;
+ 		} else if (!strcmp(argv[i], "--no-pid")) {
+-			no_pid_file = ISC_TRUE;
++			no_pid_file = true;
+  		} else if (argv[i][0] == '-') {
+ 			usage("Unknown command: %s", argv[i]);
+  		} else {
+@@ -645,7 +645,7 @@ main(int argc, char **argv) {
+ 	 * If the user didn't specify a pid file directly
+ 	 * find one from environment variables or defaults
+ 	 */
+-	if (no_dhcrelay_pid == ISC_FALSE) {
++	if (no_dhcrelay_pid == false) {
+ 		if (local_family == AF_INET) {
+ 			path_dhcrelay_pid = getenv("PATH_DHCRELAY_PID");
+ 			if (path_dhcrelay_pid == NULL)
+@@ -774,7 +774,7 @@ main(int argc, char **argv) {
+ 		}
+ 
+ 		/* Create the pid file. */
+-		if (no_pid_file == ISC_FALSE) {
++		if (no_pid_file == false) {
+ 			pfdesc = open(path_dhcrelay_pid,
+ 				      O_CREAT | O_TRUNC | O_WRONLY, 0644);
+ 
+@@ -1569,7 +1569,7 @@ static void
+ setup_streams(void) {
+ 	struct stream_list *dp, *up;
+ 	int i;
+-	isc_boolean_t link_is_set;
++	bool link_is_set;
+ 
+ 	for (dp = downstreams; dp; dp = dp->next) {
+ 		/* Check interface */
+@@ -1579,9 +1579,9 @@ setup_streams(void) {
+ 
+ 		/* Check/set link. */
+ 		if (IN6_IS_ADDR_UNSPECIFIED(&dp->link.sin6_addr))
+-			link_is_set = ISC_FALSE;
++			link_is_set = false;
+ 		else
+-			link_is_set = ISC_TRUE;
++			link_is_set = true;
+ 		for (i = 0; i < dp->ifp->v6address_count; i++) {
+ 			if (IN6_IS_ADDR_LINKLOCAL(&dp->ifp->v6addresses[i]))
+ 				continue;
+@@ -2076,7 +2076,7 @@ dhcp_set_control_state(control_object_st
+ 	if (newstate != server_shutdown)
+ 		return ISC_R_SUCCESS;
+ 
+-	if (no_pid_file == ISC_FALSE)
++	if (no_pid_file == false)
+ 		(void) unlink(path_dhcrelay_pid);
+ 
+ 	if (!no_daemon && dfd[0] != -1 && dfd[1] != -1) {
+Index: dhcp-4.4.1/server/dhcp.c
+===================================================================
+--- dhcp-4.4.1.orig/server/dhcp.c
++++ dhcp-4.4.1/server/dhcp.c
+@@ -225,7 +225,7 @@ dhcp (struct packet *packet) {
+ 			packet->options->universe_count =
+ 						agent_universe.index + 1;
+ 
+-		packet->agent_options_stashed = ISC_TRUE;
++		packet->agent_options_stashed = true;
+ 	}
+       nolease:
+ 
+@@ -1094,7 +1094,7 @@ void dhcpinform (packet, ms_nulltp)
+ 	int nulltp;
+ 	struct sockaddr_in to;
+ 	struct in_addr from;
+-	isc_boolean_t zeroed_ciaddr;
++	bool zeroed_ciaddr;
+ 	struct interface_info *interface;
+ 	int result, h_m_client_ip = 0;
+ 	struct host_decl  *host = NULL, *hp = NULL, *h;
+@@ -1109,7 +1109,7 @@ void dhcpinform (packet, ms_nulltp)
+ 	   it's common for clients not to do this, so we'll use their IP
+ 	   source address if they didn't set ciaddr. */
+ 	if (!packet->raw->ciaddr.s_addr) {
+-		zeroed_ciaddr = ISC_TRUE;
++		zeroed_ciaddr = true;
+ 		/* With DHCPv4-over-DHCPv6 it can be an IPv6 address
+ 		   so we check its length. */
+ 		if (packet->client_addr.len == 4) {
+@@ -1122,7 +1122,7 @@ void dhcpinform (packet, ms_nulltp)
+ 			addr_type = "v4o6";
+ 		}
+ 	} else {
+-		zeroed_ciaddr = ISC_FALSE;
++		zeroed_ciaddr = false;
+ 		cip.len = 4;
+ 		memcpy(cip.iabuf, &packet->raw->ciaddr, 4);
+ 		addr_type = "client";
+@@ -1133,7 +1133,7 @@ void dhcpinform (packet, ms_nulltp)
+ 	if (packet->raw->giaddr.s_addr) {
+ 		gip.len = 4;
+ 		memcpy(gip.iabuf, &packet->raw->giaddr, 4);
+-		if (zeroed_ciaddr == ISC_TRUE) {
++		if (zeroed_ciaddr == true) {
+ 			addr_type = "relay";
+ 			memcpy(sip.iabuf, gip.iabuf, 4);
+ 		}
+@@ -1207,7 +1207,7 @@ void dhcpinform (packet, ms_nulltp)
+ 		save_option(&dhcp_universe, options, noc);
+ 		option_cache_dereference(&noc, MDL);
+ 
+-		if ((zeroed_ciaddr == ISC_TRUE) && (gip.len != 0))
++		if ((zeroed_ciaddr == true) && (gip.len != 0))
+ 			addr_type = "relay link select";
+ 		else
+ 			addr_type = "selected";
+@@ -1261,7 +1261,7 @@ void dhcpinform (packet, ms_nulltp)
+ 				    NULL, NULL);
+ 
+ 	/* If we have ciaddr, find its lease so we can find its pool. */
+-	if (zeroed_ciaddr == ISC_FALSE) {
++	if (zeroed_ciaddr == false) {
+ 		struct lease* cip_lease = NULL;
+ 
+ 		find_lease_by_ip_addr (&cip_lease, cip, MDL);
+@@ -2036,7 +2036,7 @@ void echo_client_id(packet, lease, in_op
+ 		unsigned int opcode = DHO_DHCP_CLIENT_IDENTIFIER;
+ 
+ 		/* Save knowledge that echo is enabled to the packet */
+-		packet->sv_echo_client_id = ISC_TRUE;
++		packet->sv_echo_client_id = true;
+ 
+ 		/* Now see if inbound packet contains client-id */
+ 		oc = lookup_option(&dhcp_universe, packet->options, opcode);
+@@ -2187,7 +2187,7 @@ void ack_lease (packet, lease, offer, wh
+ 	struct iaddr cip;
+ #if defined(DELAYED_ACK)
+ 	/* By default we don't do the enqueue */
+-	isc_boolean_t enqueue = ISC_FALSE;
++	bool enqueue = false;
+ #endif
+ 	int use_old_lease = 0;
+ 
+@@ -3217,7 +3217,7 @@ void ack_lease (packet, lease, offer, wh
+ 		 * can just answer right away, set a flag to indicate this.
+ 		 */
+ 		if (commit)
+-			enqueue = ISC_TRUE;
++			enqueue = true;
+ 
+ 		/* Install the new information on 'lt' onto the lease at
+ 		 * 'lease'.  We will not 'commit' this information to disk
+@@ -4234,7 +4234,7 @@ int find_lease (struct lease **lp,
+ 	 * preference, so the first one is the best one.
+ 	 */
+ 	while (uid_lease) {
+-		isc_boolean_t do_release = !packet->raw->ciaddr.s_addr;
++		bool do_release = !packet->raw->ciaddr.s_addr;
+ #if defined (DEBUG_FIND_LEASE)
+ 		log_info ("trying next lease matching client id: %s",
+ 			  piaddr (uid_lease -> ip_addr));
+@@ -4267,7 +4267,7 @@ int find_lease (struct lease **lp,
+ #endif
+ 			/* Allow multiple leases using the same UID
+ 			   on different subnetworks. */
+-			do_release = ISC_FALSE;
++			do_release = false;
+ 			goto n_uid;
+ 		}
+ 
+@@ -5331,7 +5331,7 @@ get_server_source_address(struct in_addr
+ 	struct option_cache *oc = NULL;
+ 	struct data_string d;
+ 	struct in_addr *a = NULL;
+-	isc_boolean_t found = ISC_FALSE;
++	bool found = false;
+ 	int allocate = 0;
+ 
+ 	memset(&d, 0, sizeof(d));
+@@ -5344,7 +5344,7 @@ get_server_source_address(struct in_addr
+ 					  packet->options, options, 
+ 					  &global_scope, oc, MDL)) {
+ 			if (d.len == sizeof(*from)) {
+-				found = ISC_TRUE;
++				found = true;
+ 				memcpy(from, d.data, sizeof(*from));
+ 
+ 				/*
+@@ -5362,7 +5362,7 @@ get_server_source_address(struct in_addr
+ 		oc = NULL;
+ 	}
+ 
+-	if ((found == ISC_FALSE) &&
++	if ((found == false) &&
+ 	    (packet->interface->address_count > 0)) {
+ 		*from = packet->interface->addresses[0];
+ 
+Index: dhcp-4.4.1/server/failover.c
+===================================================================
+--- dhcp-4.4.1.orig/server/failover.c
++++ dhcp-4.4.1/server/failover.c
+@@ -45,7 +45,7 @@ static isc_result_t failover_message_der
+ static void dhcp_failover_pool_balance(dhcp_failover_state_t *state);
+ static void dhcp_failover_pool_reqbalance(dhcp_failover_state_t *state);
+ static int dhcp_failover_pool_dobalance(dhcp_failover_state_t *state,
+-					isc_boolean_t *sendreq);
++					bool *sendreq);
+ static inline int secondary_not_hoarding(dhcp_failover_state_t *state,
+ 					 struct pool *p);
+ static void scrub_lease(struct lease* lease, const char *file, int line);
+@@ -2464,7 +2464,7 @@ void
+ dhcp_failover_pool_rebalance(void *failover_state)
+ {
+ 	dhcp_failover_state_t *state;
+-	isc_boolean_t sendreq = ISC_FALSE;
++	bool sendreq = false;
+ 
+ 	state = (dhcp_failover_state_t *)failover_state;
+ 
+@@ -2512,7 +2512,7 @@ dhcp_failover_pool_reqbalance(dhcp_failo
+  */
+ static int
+ dhcp_failover_pool_dobalance(dhcp_failover_state_t *state,
+-			    isc_boolean_t *sendreq)
++			    bool *sendreq)
+ {
+ 	int lts, total, thresh, hold, panic, pass;
+ 	int leases_queued = 0;
+@@ -2581,7 +2581,7 @@ dhcp_failover_pool_dobalance(dhcp_failov
+ 
+ 		if ((sendreq != NULL) && (lts < panic)) {
+ 			reqlog = "  (requesting peer rebalance!)";
+-			*sendreq = ISC_TRUE;
++			*sendreq = true;
+ 		} else
+ 			reqlog = "";
+ 
+@@ -5111,7 +5111,7 @@ isc_result_t dhcp_failover_send_update_d
+  * a more detailed system of preferences is required, so this is something we
+  * should monitor as we gain experience with these dueling events.
+  */
+-static isc_boolean_t
++static bool
+ failover_lease_is_better(dhcp_failover_state_t *state, struct lease *lease,
+ 			 failover_message_t *msg)
+ {
+@@ -5132,15 +5132,15 @@ failover_lease_is_better(dhcp_failover_s
+ 	      case FTS_ACTIVE:
+ 		if (msg->binding_status == FTS_ACTIVE) {
+ 			if (msg_cltt < lease->cltt)
+-				return ISC_TRUE;
++				return true;
+ 			else if (msg_cltt > lease->cltt)
+-				return ISC_FALSE;
++				return false;
+ 			else if (state->i_am == primary)
+-				return ISC_TRUE;
++				return true;
+ 			else
+-				return ISC_FALSE;
++				return false;
+ 		} else if (msg->binding_status == FTS_EXPIRED) {
+-			return ISC_FALSE;
++			return false;
+ 		}
+ 		/* FALL THROUGH */
+ 
+@@ -5151,11 +5151,11 @@ failover_lease_is_better(dhcp_failover_s
+ 	      case FTS_ABANDONED:
+ 	      case FTS_RESET:
+ 		if (msg->binding_status == FTS_ACTIVE)
+-			return ISC_FALSE;
++			return false;
+ 		else if (state->i_am == primary)
+-			return ISC_TRUE;
++			return true;
+ 		else
+-			return ISC_FALSE;
++			return false;
+ 		/* FALL THROUGH to impossible condition */
+ 
+ 	      default:
+@@ -5164,7 +5164,7 @@ failover_lease_is_better(dhcp_failover_s
+ 
+ 	log_fatal("Impossible condition at %s:%d.", MDL);
+ 	/* Silence compiler warning. */
+-	return ISC_FALSE;
++	return false;
+ }
+ 
+ isc_result_t dhcp_failover_process_bind_update (dhcp_failover_state_t *state,
+@@ -5177,8 +5177,8 @@ isc_result_t dhcp_failover_process_bind_
+ 	int new_binding_state;
+ 	int send_to_backup = 0;
+ 	int required_options;
+-	isc_boolean_t chaddr_changed = ISC_FALSE;
+-	isc_boolean_t ident_changed = ISC_FALSE;
++	bool chaddr_changed = false;
++	bool ident_changed = false;
+ 
+ 	/* Validate the binding update. */
+ 	required_options = FTB_ASSIGNED_IP_ADDRESS | FTB_BINDING_STATUS;
+@@ -5250,7 +5250,7 @@ isc_result_t dhcp_failover_process_bind_
+ 		if ((lt->hardware_addr.hlen != msg->chaddr.count) ||
+ 		    (memcmp(lt->hardware_addr.hbuf, msg->chaddr.data,
+ 			    msg->chaddr.count) != 0))
+-			chaddr_changed = ISC_TRUE;
++			chaddr_changed = true;
+ 
+ 		lt -> hardware_addr.hlen = msg -> chaddr.count;
+ 		memcpy (lt -> hardware_addr.hbuf, msg -> chaddr.data,
+@@ -5262,7 +5262,7 @@ isc_result_t dhcp_failover_process_bind_
+ 		reason = FTR_MISSING_BINDINFO;
+ 		goto bad;
+ 	} else if (msg->binding_status == FTS_ABANDONED) {
+-		chaddr_changed = ISC_TRUE;
++		chaddr_changed = true;
+ 		lt->hardware_addr.hlen = 0;
+ 		if (lt->scope)
+ 			binding_scope_dereference(&lt->scope, MDL);
+@@ -5282,7 +5282,7 @@ isc_result_t dhcp_failover_process_bind_
+ 		    (lt->uid == NULL) || /* Sanity; should never happen. */
+ 		    (memcmp(lt->uid, msg->client_identifier.data,
+ 			    lt->uid_len) != 0))
+-			ident_changed = ISC_TRUE;
++			ident_changed = true;
+ 
+ 		lt->uid_len = msg->client_identifier.count;
+ 
+@@ -5312,7 +5312,7 @@ isc_result_t dhcp_failover_process_bind_
+ 	} else if (lt->uid && msg->binding_status != FTS_RESET &&
+ 		   msg->binding_status != FTS_FREE &&
+ 		   msg->binding_status != FTS_BACKUP) {
+-		ident_changed = ISC_TRUE;
++		ident_changed = true;
+ 		if (lt->uid != lt->uid_buf)
+ 			dfree (lt->uid, MDL);
+ 		lt->uid = NULL;
+@@ -5347,7 +5347,7 @@ isc_result_t dhcp_failover_process_bind_
+ 	if (msg->binding_status == FTS_ACTIVE &&
+ 	    (chaddr_changed || ident_changed)) {
+ #if defined (NSUPDATE)
+-		(void) ddns_removals(lease, NULL, NULL, ISC_FALSE);
++		(void) ddns_removals(lease, NULL, NULL, false);
+ #endif /* NSUPDATE */
+ 
+ 		if (lease->scope != NULL)
+@@ -5534,7 +5534,7 @@ isc_result_t dhcp_failover_process_bind_
+ 	struct iaddr ia;
+ 	const char *message = "no memory";
+ 	u_int32_t pot_expire;
+-	int send_to_backup = ISC_FALSE;
++	int send_to_backup = false;
+ 	struct timeval tv;
+ 
+ 	ia.len = sizeof msg -> assigned_addr;
+@@ -5621,7 +5621,7 @@ isc_result_t dhcp_failover_process_bind_
+ 		if (state->i_am == primary &&
+ 		    !(lease->flags & (RESERVED_LEASE | BOOTP_LEASE)) &&
+ 		    peer_wants_lease(lease))
+-			send_to_backup = ISC_TRUE;
++			send_to_backup = true;
+ 
+ 		if (!send_to_backup && state->me.state == normal)
+ 			commit_leases();
+Index: dhcp-4.4.1/server/dhcpd.c
+===================================================================
+--- dhcp-4.4.1.orig/server/dhcpd.c
++++ dhcp-4.4.1/server/dhcpd.c
+@@ -98,7 +98,7 @@ const char *path_dhcpd_conf = _PATH_DHCP
+ const char *path_dhcpd_db = _PATH_DHCPD_DB;
+ const char *path_dhcpd_pid = _PATH_DHCPD_PID;
+ /* False (default) => we write and use a pid file */
+-isc_boolean_t no_pid_file = ISC_FALSE;
++bool no_pid_file = false;
+ 
+ int dhcp_max_agent_option_packet_length = DHCP_MTU_MAX;
+ 
+@@ -476,7 +476,7 @@ main(int argc, char **argv) {
+ 			path_dhcpd_pid = argv [i];
+ 			have_dhcpd_pid = 1;
+ 		} else if (!strcmp(argv[i], "--no-pid")) {
+-			no_pid_file = ISC_TRUE;
++			no_pid_file = true;
+                 } else if (!strcmp (argv [i], "-t")) {
+ 			/* test configurations only */
+ #ifndef DEBUG
+@@ -863,7 +863,7 @@ main(int argc, char **argv) {
+ 	 * - we don't have a pid file to check
+ 	 * - there is no other process running
+ 	 */
+-	if ((lftest == 0) && (no_pid_file == ISC_FALSE)) {
++	if ((lftest == 0) && (no_pid_file == false)) {
+ 		/*Read previous pid file. */
+ 		if ((i = open(path_dhcpd_pid, O_RDONLY)) >= 0) {
+ 			status = read(i, pbuf, (sizeof pbuf) - 1);
+@@ -974,7 +974,7 @@ main(int argc, char **argv) {
+ 	 * that we have forked we can write our pid if
+ 	 * appropriate.
+ 	 */
+-	if (no_pid_file == ISC_FALSE) {
++	if (no_pid_file == false) {
+ 		i = open(path_dhcpd_pid, O_WRONLY|O_CREAT|O_TRUNC, 0644);
+ 		if (i >= 0) {
+ 			sprintf(pbuf, "%d\n", (int) getpid());
+@@ -1730,7 +1730,7 @@ static isc_result_t dhcp_io_shutdown_cou
+ 	    free_everything ();
+ 	    omapi_print_dmalloc_usage_by_caller ();
+ #endif
+-	    if (no_pid_file == ISC_FALSE)
++	    if (no_pid_file == false)
+ 		    (void) unlink(path_dhcpd_pid);
+ 	    exit (0);
+ 	}
+@@ -1741,7 +1741,7 @@ static isc_result_t dhcp_io_shutdown_cou
+ 		free_everything ();
+ 		omapi_print_dmalloc_usage_by_caller ();
+ #endif
+-		if (no_pid_file == ISC_FALSE)
++		if (no_pid_file == false)
+ 			(void) unlink(path_dhcpd_pid);
+ 		exit (0);
+ 	}
+@@ -1750,7 +1750,7 @@ static isc_result_t dhcp_io_shutdown_cou
+ #if defined(FAILOVER_PROTOCOL)
+ 	    !failover_connection_count &&
+ #endif
+-	    ISC_TRUE) {
++	    true) {
+ 		shutdown_state = shutdown_done;
+ 		shutdown_time = cur_time;
+ 		goto oncemore;
+Index: dhcp-4.4.1/server/mdb6.c
+===================================================================
+--- dhcp-4.4.1.orig/server/mdb6.c
++++ dhcp-4.4.1/server/mdb6.c
+@@ -514,10 +514,10 @@ ia_remove_all_lease(struct ia_xx *ia, co
+ /*
+  * Compare two IA.
+  */
+-isc_boolean_t
++bool
+ ia_equal(const struct ia_xx *a, const struct ia_xx *b) 
+ {
+-	isc_boolean_t found;
++	bool found;
+ 	int i, j;
+ 
+ 	/*
+@@ -525,9 +525,9 @@ ia_equal(const struct ia_xx *a, const st
+ 	 */
+ 	if (a == NULL) {
+ 		if (b == NULL) {
+-			return ISC_TRUE;
++			return true;
+ 		} else {
+-			return ISC_FALSE;
++			return false;
+ 		}
+ 	}	
+ 
+@@ -535,58 +535,58 @@ ia_equal(const struct ia_xx *a, const st
+ 	 * Check the type is the same.
+ 	 */
+ 	if (a->ia_type != b->ia_type) {
+-		return ISC_FALSE;
++		return false;
+ 	}
+ 
+ 	/*
+ 	 * Check the DUID is the same.
+ 	 */
+ 	if (a->iaid_duid.len != b->iaid_duid.len) {
+-		return ISC_FALSE;
++		return false;
+ 	}
+ 	if (memcmp(a->iaid_duid.data, 
+ 		   b->iaid_duid.data, a->iaid_duid.len) != 0) {
+-		return ISC_FALSE;
++		return false;
+ 	}
+ 
+ 	/*
+ 	 * Make sure we have the same number of addresses/prefixes in each.
+ 	 */
+ 	if (a->num_iasubopt != b->num_iasubopt) {
+-		return ISC_FALSE;
++		return false;
+ 	}
+ 
+ 	/*
+ 	 * Check that each address/prefix is present in both.
+ 	 */
+ 	for (i=0; i<a->num_iasubopt; i++) {
+-		found = ISC_FALSE;
++		found = false;
+ 		for (j=0; j<a->num_iasubopt; j++) {
+ 			if (a->iasubopt[i]->plen != b->iasubopt[i]->plen)
+ 				continue;
+ 			if (memcmp(&(a->iasubopt[i]->addr),
+ 			           &(b->iasubopt[j]->addr), 
+ 				   sizeof(struct in6_addr)) == 0) {
+-				found = ISC_TRUE;
++				found = true;
+ 				break;
+ 			}
+ 		}
+ 		if (!found) {
+-			return ISC_FALSE;
++			return false;
+ 		}
+ 	}
+ 
+ 	/*
+ 	 * These are the same in every way we care about.
+ 	 */
+-	return ISC_TRUE;
++	return true;
+ }
+ 
+ /*
+  * Helper function for lease heaps.
+  * Makes the top of the heap the oldest lease.
+  */
+-static isc_boolean_t 
++static bool 
+ lease_older(void *a, void *b) {
+ 	struct iasubopt *la = (struct iasubopt *)a;
+ 	struct iasubopt *lb = (struct iasubopt *)b;
+@@ -1038,8 +1038,8 @@ create_lease6(struct ipv6_pool *pool, st
+ 	struct data_string new_ds;
+ 	struct iasubopt *iaaddr;
+ 	isc_result_t result;
+-	isc_boolean_t reserved_iid;
+-	static isc_boolean_t init_resiid = ISC_FALSE;
++	bool reserved_iid;
++	static bool init_resiid = false;
+ 
+ 	/*
+ 	 * Fill the reserved IIDs.
+@@ -1049,7 +1049,7 @@ create_lease6(struct ipv6_pool *pool, st
+ 		memset(&resany, 0, 8);
+ 		resany.s6_addr[8] = 0xfd;
+ 		memset(&resany.s6_addr[9], 0xff, 6);
+-		init_resiid = ISC_TRUE;
++		init_resiid = true;
+ 	}
+ 
+ 	/* 
+@@ -1094,14 +1094,14 @@ create_lease6(struct ipv6_pool *pool, st
+ 		/*
+ 		 * Avoid reserved interface IDs. (cf. RFC 5453)
+ 		 */
+-		reserved_iid = ISC_FALSE;
++		reserved_iid = false;
+ 		if (memcmp(&tmp.s6_addr[8], &rtany.s6_addr[8], 8) == 0) {
+-			reserved_iid = ISC_TRUE;
++			reserved_iid = true;
+ 		}
+ 		if (!reserved_iid &&
+ 		    (memcmp(&tmp.s6_addr[8], &resany.s6_addr[8], 7) == 0) &&
+ 		    ((tmp.s6_addr[15] & 0x80) == 0x80)) {
+-			reserved_iid = ISC_TRUE;
++			reserved_iid = true;
+ 		}
+ 
+ 		/*
+@@ -1177,7 +1177,7 @@ create_lease6_eui_64(struct ipv6_pool *p
+ 	struct iasubopt *test_iaaddr;
+ 	struct iasubopt *iaaddr;
+ 	isc_result_t result;
+-	static isc_boolean_t init_resiid = ISC_FALSE;
++	static bool init_resiid = false;
+ 
+ 	/*  Fill the reserved IIDs.  */
+ 	if (!init_resiid) {
+@@ -1185,7 +1185,7 @@ create_lease6_eui_64(struct ipv6_pool *p
+ 		memset(&resany, 0, 8);
+ 		resany.s6_addr[8] = 0xfd;
+ 		memset(&resany.s6_addr[9], 0xff, 6);
+-		init_resiid = ISC_TRUE;
++		init_resiid = true;
+ 	}
+ 
+ 	/* Pool must be IA_NA */
+@@ -1520,7 +1520,7 @@ add_lease6(struct ipv6_pool *pool, struc
+ /*
+  * Determine if an address is present in a pool or not.
+  */
+-isc_boolean_t
++bool
+ lease6_exists(const struct ipv6_pool *pool, const struct in6_addr *addr) {
+ 	struct iasubopt *test_iaaddr;
+ 
+@@ -1528,9 +1528,9 @@ lease6_exists(const struct ipv6_pool *po
+ 	if (iasubopt_hash_lookup(&test_iaaddr, pool->leases, 
+ 				 (void *)addr, sizeof(*addr), MDL)) {
+ 		iasubopt_dereference(&test_iaaddr, MDL);
+-		return ISC_TRUE;
++		return true;
+ 	} else {
+-		return ISC_FALSE;
++		return false;
+ 	}
+ }
+ 
+@@ -1545,20 +1545,20 @@ lease6_exists(const struct ipv6_pool *po
+  * \param[in] lease = lease to check
+  *
+  * \return
+- * ISC_TRUE  = The lease is allowed to use that address
+- * ISC_FALSE = The lease isn't allowed to use that address
++ * true  = The lease is allowed to use that address
++ * false = The lease isn't allowed to use that address
+  */
+-isc_boolean_t
++bool
+ lease6_usable(struct iasubopt *lease) {
+ 	struct iasubopt *test_iaaddr;
+-	isc_boolean_t status = ISC_TRUE;
++	bool status = true;
+ 
+ 	test_iaaddr = NULL;
+ 	if (iasubopt_hash_lookup(&test_iaaddr, lease->ipv6_pool->leases,
+ 				 (void *)&lease->addr,
+ 				 sizeof(lease->addr), MDL)) {
+ 		if (test_iaaddr != lease) {
+-			status = ISC_FALSE;
++			status = false;
+ 		}
+ 		iasubopt_dereference(&test_iaaddr, MDL);
+ 	}
+@@ -1697,7 +1697,7 @@ move_lease_to_inactive(struct ipv6_pool
+ #if defined (NSUPDATE)
+ 		/* Process events upon expiration. */
+ 		if (pool->pool_type != D6O_IA_PD) {
+-			(void) ddns_removals(NULL, lease, NULL, ISC_FALSE);
++			(void) ddns_removals(NULL, lease, NULL, false);
+ 		}
+ #endif
+ 
+@@ -1977,21 +1977,21 @@ create_prefix6(struct ipv6_pool *pool, s
+ /*
+  * Determine if a prefix is present in a pool or not.
+  */
+-isc_boolean_t
++bool
+ prefix6_exists(const struct ipv6_pool *pool,
+ 	       const struct in6_addr *pref, u_int8_t plen) {
+ 	struct iasubopt *test_iapref;
+ 
+ 	if ((int)plen != pool->units)
+-		return ISC_FALSE;
++		return false;
+ 
+ 	test_iapref = NULL;
+ 	if (iasubopt_hash_lookup(&test_iapref, pool->leases, 
+ 				 (void *)pref, sizeof(*pref), MDL)) {
+ 		iasubopt_dereference(&test_iapref, MDL);
+-		return ISC_TRUE;
++		return true;
+ 	} else {
+-		return ISC_FALSE;
++		return false;
+ 	}
+ }
+ 
+@@ -2267,15 +2267,15 @@ ipv6_network_portion(struct in6_addr *re
+ /*
+  * Determine if the given address/prefix is in the pool.
+  */
+-isc_boolean_t
++bool
+ ipv6_in_pool(const struct in6_addr *addr, const struct ipv6_pool *pool) {
+ 	struct in6_addr tmp;
+ 
+ 	ipv6_network_portion(&tmp, addr, pool->bits);
+ 	if (memcmp(&tmp, &pool->start_addr, sizeof(tmp)) == 0) {
+-		return ISC_TRUE;
++		return true;
+ 	} else {
+-		return ISC_FALSE;
++		return false;
+ 	}
+ }
+ 
+Index: dhcp-4.4.1/server/ddns.c
+===================================================================
+--- dhcp-4.4.1.orig/server/ddns.c
++++ dhcp-4.4.1/server/ddns.c
+@@ -373,7 +373,7 @@ ddns_updates(struct packet *packet, stru
+ 
+ 		/* If desired do the removals */
+ 		if (do_remove != 0) {
+-			(void) ddns_removals(lease, lease6, NULL, ISC_TRUE);
++			(void) ddns_removals(lease, lease6, NULL, true);
+ 		}
+ 		goto out;
+ 	}
+@@ -618,7 +618,7 @@ ddns_updates(struct packet *packet, stru
+ 		 * We should log a more specific error closer to the actual
+ 		 * error if we want one. ddns_removal failure not logged here.
+ 		 */
+-		 (void) ddns_removals(lease, lease6, ddns_cb, ISC_TRUE);
++		 (void) ddns_removals(lease, lease6, ddns_cb, true);
+ 	}
+ 	else {
+ 		ddns_fwd_srv_connector(lease, lease6, scope, ddns_cb,
+@@ -1907,7 +1907,7 @@ ddns_fwd_srv_rem1(dhcp_ddns_cb_t *ddns_c
+  *     the current entry.
+  *
+  * \li active - indication about the status of the lease. It is
+- *     ISC_TRUE if the lease is still active, and FALSE if the lease
++ *     true if the lease is still active, and FALSE if the lease
+  *     is inactive.  This is used to indicate if the lease is inactive or going
+  *     to inactive so we can avoid trying to update the lease with cb pointers
+  *     and text information if it isn't useful.
+@@ -1923,7 +1923,7 @@ isc_result_t
+ ddns_removals(struct lease    *lease,
+ 	      struct iasubopt *lease6,
+ 	      dhcp_ddns_cb_t  *add_ddns_cb,
+-	      isc_boolean_t    active)
++	      bool    active)
+ {
+ 	isc_result_t rcode, execute_add = ISC_R_FAILURE;
+ 	struct binding_scope **scope = NULL;
+@@ -1970,7 +1970,7 @@ ddns_removals(struct lease    *lease,
+ 			if (((ddns_cb->state == DDNS_STATE_ADD_PTR) ||
+ 			     (ddns_cb->state == DDNS_STATE_ADD_FW_NXDOMAIN) ||
+ 			     (ddns_cb->state == DDNS_STATE_ADD_FW_YXDHCID)) ||
+-			    ((active == ISC_FALSE) &&
++			    ((active == false) &&
+ 			     ((ddns_cb->flags & DDNS_ACTIVE_LEASE) != 0))) {
+ 				/* Cancel the current request */
+ 				ddns_cancel(lease->ddns_cb, MDL);
+@@ -1998,7 +1998,7 @@ ddns_removals(struct lease    *lease,
+ 			if (((ddns_cb->state == DDNS_STATE_ADD_PTR) ||
+ 			     (ddns_cb->state == DDNS_STATE_ADD_FW_NXDOMAIN) ||
+ 			     (ddns_cb->state == DDNS_STATE_ADD_FW_YXDHCID)) ||
+-			    ((active == ISC_FALSE) &&
++			    ((active == false) &&
+ 			     ((ddns_cb->flags & DDNS_ACTIVE_LEASE) != 0))) {
+ 				/* Cancel the current request */
+ 				ddns_cancel(lease6->ddns_cb, MDL);
+@@ -2053,7 +2053,7 @@ ddns_removals(struct lease    *lease,
+ 	 * the lease information for v6 when the response
+ 	 * from the DNS code is processed.
+ 	 */
+-	if (active == ISC_TRUE) {
++	if (active == true) {
+ 		ddns_cb->flags |= DDNS_ACTIVE_LEASE;
+ 	}
+ 
+Index: dhcp-4.4.1/server/mdb.c
+===================================================================
+--- dhcp-4.4.1.orig/server/mdb.c
++++ dhcp-4.4.1/server/mdb.c
+@@ -1504,7 +1504,7 @@ void make_binding_state_transition (stru
+ 	      lease -> binding_state == FTS_ACTIVE &&
+ 	      lease -> next_binding_state != FTS_RELEASED))) {
+ #if defined (NSUPDATE)
+-		(void) ddns_removals(lease, NULL, NULL, ISC_TRUE);
++		(void) ddns_removals(lease, NULL, NULL, true);
+ #endif
+ 		if (lease->on_star.on_expiry) {
+ 			execute_statements(NULL, NULL, lease,
+@@ -1568,7 +1568,7 @@ void make_binding_state_transition (stru
+ 		 * release message.  This is not true of expiry, where the
+ 		 * peer may have extended the lease.
+ 		 */
+-		(void) ddns_removals(lease, NULL, NULL, ISC_TRUE);
++		(void) ddns_removals(lease, NULL, NULL, true);
+ #endif
+ 		if (lease->on_star.on_release) {
+ 			execute_statements(NULL, NULL, lease,
+@@ -1736,7 +1736,7 @@ void release_lease (lease, packet)
+ 	/* If there are statements to execute when the lease is
+ 	   released, execute them. */
+ #if defined (NSUPDATE)
+-	(void) ddns_removals(lease, NULL, NULL, ISC_FALSE);
++	(void) ddns_removals(lease, NULL, NULL, false);
+ #endif
+ 	if (lease->on_star.on_release) {
+ 		execute_statements (NULL, packet, lease,
+@@ -1810,7 +1810,7 @@ void abandon_lease (lease, message)
+ {
+ 	struct lease *lt = NULL;
+ #if defined (NSUPDATE)
+-	(void) ddns_removals(lease, NULL, NULL, ISC_FALSE);
++	(void) ddns_removals(lease, NULL, NULL, false);
+ #endif
+ 
+ 	if (!lease_copy(&lt, lease, MDL)) {
+@@ -1860,7 +1860,7 @@ void dissociate_lease (lease)
+ {
+ 	struct lease *lt = (struct lease *)0;
+ #if defined (NSUPDATE)
+-	(void) ddns_removals(lease, NULL, NULL, ISC_FALSE);
++	(void) ddns_removals(lease, NULL, NULL, false);
+ #endif
+ 
+ 	if (!lease_copy (&lt, lease, MDL))
+@@ -2072,38 +2072,38 @@ int find_lease_by_hw_addr (struct lease
+  *    should never see reset leases for this.
+  * 4) Abandoned leases are always dead last.
+  */
+-static isc_boolean_t
++static bool
+ client_lease_preferred(struct lease *cand, struct lease *lease)
+ {
+ 	if (cand->binding_state == FTS_ACTIVE) {
+ 		if (lease->binding_state == FTS_ACTIVE &&
+ 		    lease->ends >= cand->ends)
+-			return ISC_TRUE;
++			return true;
+ 	} else if (cand->binding_state == FTS_EXPIRED ||
+ 		   cand->binding_state == FTS_RELEASED) {
+ 		if (lease->binding_state == FTS_ACTIVE)
+-			return ISC_TRUE;
++			return true;
+ 
+ 		if ((lease->binding_state == FTS_EXPIRED ||
+ 		     lease->binding_state == FTS_RELEASED) &&
+ 		    lease->cltt >= cand->cltt)
+-			return ISC_TRUE;
++			return true;
+ 	} else if (cand->binding_state != FTS_ABANDONED) {
+ 		if (lease->binding_state == FTS_ACTIVE ||
+ 		    lease->binding_state == FTS_EXPIRED ||
+ 		    lease->binding_state == FTS_RELEASED)
+-			return ISC_TRUE;
++			return true;
+ 
+ 		if (lease->binding_state != FTS_ABANDONED &&
+ 		    lease->cltt >= cand->cltt)
+-			return ISC_TRUE;
++			return true;
+ 	} else /* (cand->binding_state == FTS_ABANDONED) */ {
+ 		if (lease->binding_state != FTS_ABANDONED ||
+ 		    lease->cltt >= cand->cltt)
+-			return ISC_TRUE;
++			return true;
+ 	}
+ 
+-	return ISC_FALSE;
++	return false;
+ }
+ 
+ /* Add the specified lease to the uid hash. */

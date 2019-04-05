@@ -13,7 +13,7 @@ SRC_URI[md5sum] = "84412221e26505a2b3855d4a1cdcd0e0"
 SRC_URI[sha256sum] = "3552262bf1bcf8e859a2a3a7adfb0367af8593383e730c492e981477aac0a0d4"
 
 
-S = "${WORKDIR}/${PN}"
+S = "${WORKDIR}/${BPN}"
 
 do_install() {
     oe_runmake install DESTDIR=${D} PREFIX=${prefix} LIB=${base_libdir}

@@ -236,3 +236,29 @@ USERADD_GID_TABLES += "files/static-group"
 """
         self.write_config(config)
         bitbake("core-image-base")
+
+    def test_no_busybox_base_utils(self):
+        config = """
+# Enable x11
+DISTRO_FEATURES_append += "x11"
+
+# Switch to systemd
+DISTRO_FEATURES += "systemd"
+VIRTUAL-RUNTIME_init_manager = "systemd"
+VIRTUAL-RUNTIME_initscripts = ""
+VIRTUAL-RUNTIME_syslog = ""
+VIRTUAL-RUNTIME_login_manager = "shadow-base"
+DISTRO_FEATURES_BACKFILL_CONSIDERED = "sysvinit"
+
+# Replace busybox
+PREFERRED_PROVIDER_virtual/base-utils = "packagegroup-core-base-utils"
+VIRTUAL-RUNTIME_base-utils = "packagegroup-core-base-utils"
+VIRTUAL-RUNTIME_base-utils-hwclock = "util-linux-hwclock"
+VIRTUAL-RUNTIME_base-utils-syslog = ""
+
+# Blacklist busybox
+PNBLACKLIST[busybox] = "Don't build this"
+"""
+        self.write_config(config)
+
+        bitbake("--graphviz core-image-sato")

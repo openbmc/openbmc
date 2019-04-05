@@ -4,7 +4,6 @@ LICENSE = "XSL"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6beadd98f9c54ab0c387e14211ee4d0e"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/docbook/docbook-xsl-${PV}.tar.bz2 \
-           file://docbook-xsl.xml \
            file://docbook-xsl-stylesheets-no-bashism-in-docbook-xsl-up.patch \
 "
 
@@ -15,10 +14,11 @@ UPSTREAM_CHECK_URI = "http://sourceforge.net/projects/docbook/files/docbook-xsl/
 # Reject versions ending in .0 as those are release candidates
 UPSTREAM_CHECK_REGEX = "/docbook-xsl/(?P<pver>(\d+[\.\-_]*)+(?!\.0)\.\d+)/"
 
+DEPENDS = "libxml2-native"
+
 S = "${WORKDIR}/docbook-xsl-${PV}"
 
-inherit allarch
-BBCLASSEXTEND = "native"
+inherit allarch xmlcatalog
 
 do_configure (){
 	:
@@ -29,8 +29,6 @@ do_compile (){
 }
 
 do_install () {
-	# Refer to http://www.linuxfromscratch.org/blfs/view/stable/pst/docbook-xsl.html
-	# for details.
 	install -v -m755 -d ${D}${datadir}/xml/docbook/xsl-stylesheets-${PV}
 	ln -s xsl-stylesheets-${PV} ${D}${datadir}/xml/docbook/xsl-stylesheets
 
@@ -42,22 +40,14 @@ do_install () {
 
 	ln -s VERSION ${D}/${datadir}/xml/docbook/xsl-stylesheets-${PV}/VERSION.xsl
 
-	install -v -m644 -D README \
-		${D}${datadir}/doc/docbook-xsl-${PV}/README.txt
-	install -v -m644    RELEASE-NOTES* NEWS* \
-		${D}${datadir}/doc/docbook-xsl-${PV}
-
-	install -d ${D}${sysconfdir}/xml/
-	install -m 755  ${WORKDIR}/docbook-xsl.xml ${D}${sysconfdir}/xml/docbook-xsl.xml
-
-}
-
-do_install_append_class-native () {
-	# Ensure that the catalog file sgml-docbook.cat is properly
-	# updated when the package is installed from sstate cache.
-	sed -i -e "s|file://.*/usr/share/xml|file://${datadir}/xml|g" ${D}${sysconfdir}/xml/docbook-xsl.xml
+	install -d ${D}${docdir}/${BPN}
+	install -v -m644 README RELEASE-NOTES* NEWS* ${D}${docdir}/${BPN}
 }
 
 RDEPENDS_${PN} += "perl"
 FILES_${PN} = "${datadir}/xml/* ${sysconfdir}/xml/docbook-xsl.xml"
 FILES_${PN}-doc = "${datadir}/doc/*"
+
+XMLCATALOGS = "${datadir}/xml/docbook/xsl-stylesheets-${PV}/catalog.xml"
+
+BBCLASSEXTEND = "native"

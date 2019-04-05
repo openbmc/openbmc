@@ -1,6 +1,6 @@
-From 9c7a15312259854f12137a30229e52c30fb7c770 Mon Sep 17 00:00:00 2001
+From f53481dc4a56b8a996628733553e080bb0aafdd7 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Wed, 31 Aug 2016 21:30:32 -0400
+Date: Fri, 23 Nov 2018 17:07:22 +0800
 Subject: [PATCH 07/11] invoking mount with infinite timeout
 
 This large timeout is needed when running on machines with
@@ -14,18 +14,18 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/blivet/util.py b/blivet/util.py
-index bc08af5..b672787 100644
+index 5571e73..02c8033 100644
 --- a/blivet/util.py
 +++ b/blivet/util.py
-@@ -256,7 +256,7 @@ def mount(device, mountpoint, fstype, options=None):
+@@ -258,7 +258,7 @@ def mount(device, mountpoint, fstype, options=None):
+         makedirs(mountpoint)
  
      argv = ["mount", "-t", fstype, "-o", options, device, mountpoint]
-     try:
--        rc = run_program(argv)
-+        rc = run_program(argv, timeout=-1)
-     except OSError:
-         raise
+-    return run_program(argv)
++    return run_program(argv, timeout=-1)
  
+ 
+ def umount(mountpoint):
 -- 
 2.7.4
 

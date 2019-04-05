@@ -12,6 +12,7 @@ SRC_URI = "https://github.com/groeck/lm-sensors/archive/V3-4-0.tar.gz \
            file://sensord.init \
            file://0001-lmsensors-sensors-detect-print-a-special-message-whe.patch \
            file://0001-prog-Do-not-limit-sys-io.h-header-include-to-just-gl.patch \
+           file://0001-lm-sensors-fix-sensors-detect-can-t-read-the-cpu-inf.patch \
 "
 SRC_URI[md5sum] = "1e9f117cbfa11be1955adc96df71eadb"
 SRC_URI[sha256sum] = "e334c1c2b06f7290e3e66bdae330a5d36054701ffd47a5dde7a06f9a7402cb4e"

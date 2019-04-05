@@ -1,6 +1,6 @@
-From 648a18bfc447f076d48ae4147d984b8ef56e37aa Mon Sep 17 00:00:00 2001
+From fc8e93530ba017ecfe111e53d3cbdc3a5b3ac286 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Mon, 30 Jul 2018 16:13:40 +0800
+Date: Fri, 23 Nov 2018 16:58:38 +0800
 Subject: [PATCH 01/11] comment out selinux
 
 Upstream-Status: Inappropriate [oe specific]
@@ -12,7 +12,7 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  2 files changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/blivet/flags.py b/blivet/flags.py
-index 1840121..8789390 100644
+index 4e26d82..94324ff 100644
 --- a/blivet/flags.py
 +++ b/blivet/flags.py
 @@ -20,7 +20,7 @@
@@ -35,7 +35,7 @@ index 1840121..8789390 100644
          self.dmraid = True
          self.ibft = True
 diff --git a/blivet/util.py b/blivet/util.py
-index 7334ff6..0f2a995 100644
+index 9daf151..4eac8b9 100644
 --- a/blivet/util.py
 +++ b/blivet/util.py
 @@ -3,7 +3,7 @@ import functools
@@ -47,7 +47,7 @@ index 7334ff6..0f2a995 100644
  import subprocess
  import re
  import sys
-@@ -430,6 +430,8 @@ def get_cow_sysfs_path(dev_path, dev_sysfsPath):
+@@ -444,6 +444,8 @@ def get_cow_sysfs_path(dev_path, dev_sysfsPath):
  def match_path_context(path):
      """ Return the default SELinux context for the given path. """
      context = None
@@ -56,7 +56,7 @@ index 7334ff6..0f2a995 100644
      try:
          context = selinux.matchpathcon(os.path.normpath(path), 0)[1]
      except OSError as e:
-@@ -454,6 +456,8 @@ def set_file_context(path, context, root=None):
+@@ -468,6 +470,8 @@ def set_file_context(path, context, root=None):
  
              True if successful, False if not.
      """

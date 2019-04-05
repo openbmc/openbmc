@@ -1,0 +1,18 @@
+# 2014-04-18 Antti Palosaari <crope@iki.fi>
+# generated from http://www.digita.fi/kuluttajat/tv/nakyvyysalueet/kanavanumerot_ja_taajuudet
+
+[Pudasjarvi_Iso-Syote]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 650000000
+	BANDWIDTH_HZ = 8000000
+
+[Pudasjarvi_Iso-Syote]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 786000000
+	BANDWIDTH_HZ = 8000000
+
+[Pudasjarvi_Iso-Syote]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 698000000
+	BANDWIDTH_HZ = 8000000
+

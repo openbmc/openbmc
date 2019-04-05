@@ -9,6 +9,9 @@ from oeqa.sdkext.case import OESDKExtTestCase
 from oeqa.core.decorator.oeid import OETestID
 from oeqa.utils.httpserver import HTTPService
 
+from oeqa.utils.subprocesstweak import errors_have_output
+errors_have_output()
+
 class DevtoolTest(OESDKExtTestCase):
     @classmethod
     def setUpClass(cls):

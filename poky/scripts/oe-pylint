@@ -1,0 +1,11 @@
+#!/bin/bash
+#
+# Run the pylint3 against our common python module spaces and print a report of potential issues
+#
+this_dir=$(dirname $(readlink -f $0))
+ERRORS="-E"
+IGNORELIST="$ERRORS -d logging-too-many-args -d missing-docstring -d line-too-long -d invalid-name"
+PYTHONPATH=$this_dir/../bitbake/lib/ pylint3 $IGNORELIST bb
+PYTHONPATH=$this_dir/../bitbake/lib/:$this_dir/../meta/lib pylint3 $IGNORELIST -d undefined-variable oe
+PYTHONPATH=$this_dir/../bitbake/lib/:$this_dir/../meta/lib pylint3  $IGNORELIST oeqa
+PYTHONPATH=$this_dir/../bitbake/lib/:$this_dir/../meta/lib:$this_dir/lib pylint3 $IGNORELIST -d undefined-variable argparse_oe buildstats  devtool recipetool scriptpath testcasemgmt build_perf checklayer resulttool  scriptutils wic

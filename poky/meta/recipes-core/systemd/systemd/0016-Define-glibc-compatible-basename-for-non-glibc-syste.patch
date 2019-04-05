@@ -1,0 +1,34 @@
+From af76c973e41929360a6e021f2ff9a7fc1d7994e9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 27 May 2018 08:36:44 -0700
+Subject: [PATCH 16/24] Define glibc compatible basename() for non-glibc
+ systems
+
+Fixes builds with musl, even though systemd is adamant about
+using non-posix basename implementation, we have a way out
+
+Upstream-Status: Inappropriate [musl specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/machine/machine-dbus.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/machine/machine-dbus.c b/src/machine/machine-dbus.c
+index 7a558df..eca7d4b 100644
+--- a/src/machine/machine-dbus.c
++++ b/src/machine/machine-dbus.c
+@@ -11,6 +11,10 @@
+ #include <libgen.h>
+ #undef basename
+ 
++#if !defined(__GLIBC__)
++#define basename(src) (strrchr(src,'/') ? strrchr(src,'/')+1 : src)
++#endif
++
+ #include "alloc-util.h"
+ #include "bus-common-errors.h"
+ #include "bus-internal.h"
+-- 
+2.7.4
+

@@ -1,32 +1,6 @@
 [
     {
         "test": {
-            "@alias": "build-appliance.build-appliance.Bitbake_build-appliance-image",
-            "author": [
-                {
-                    "email": "alexandru.c.georgescu@intel.com",
-                    "name": "alexandru.c.georgescu@intel.com"
-                }
-            ],
-            "execution": {
-                "1": {
-                    "action": "Get poky source code and prepare the build environment",
-                    "expected_results": "bitbake build-appliance-image is successful  "
-                },
-                "2": {
-                    "action": "Set MACHINE to qemux86 and add the following line to conf/local.conf :  SRCREV_pn-build-appliance-image = \"${AUTOREV}\"",
-                    "expected_results": ""
-                },
-                "3": {
-                    "action": "Run \"bitbake build-appliance-image\" \n \n",
-                    "expected_results": ""
-                }
-            },
-            "summary": "Bitbake_build-appliance-image"
-        }
-    },
-    {
-        "test": {
             "@alias": "build-appliance.build-appliance.Build_core-image-minimal_with_build-appliance-image",
             "author": [
                 {

@@ -9,8 +9,19 @@ LICENSE = "GPLv3+"
 
 DEPENDS = "zlib"
 
-SRC_URI = "https://download.samba.org/pub/${BPN}/${BP}.tar.xz"
+SRC_URI = "https://download.samba.org/pub/${BPN}/${BP}.tar.gz"
 
 inherit autotools
 
+# Remove ccache-native's dependencies, so that it can be used widely by
+# other native recipes.
+DEPENDS_class-native = ""
+EXTRA_OECONF_class-native = "--with-bundled-zlib"
+INHIBIT_AUTOTOOLS_DEPS_class-native = "1"
+PATCHTOOL = "patch"
+
 BBCLASSEXTEND = "native"
+
+do_configure_class-native() {
+    oe_runconf
+}

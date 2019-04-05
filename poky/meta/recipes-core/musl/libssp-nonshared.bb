@@ -8,15 +8,10 @@ SECTION = "libs"
 
 SRC_URI = "file://ssp-local.c"
 
-PATH_prepend = "${STAGING_BINDIR_TOOLCHAIN}.${STAGINGCC}:"
-
 INHIBIT_DEFAULT_DEPS = "1"
 
-STAGINGCC = "gcc-cross-initial-${TARGET_ARCH}"
-STAGINGCC_class-nativesdk = "gcc-crosssdk-initial-${SDK_SYS}"
-
 DEPENDS = "virtual/${TARGET_PREFIX}binutils \
-           virtual/${TARGET_PREFIX}gcc-initial \
+           virtual/${TARGET_PREFIX}gcc \
 "
 
 do_configure[noexec] = "1"

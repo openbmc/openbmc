@@ -1,0 +1,25 @@
+--- a/Makefile
++++ b/Makefile
+@@ -15,17 +15,17 @@ shared	= ${libname}.${VER}.so
+ soname	= ${libname}.so.${MVER}
+ 
+ # overwritten by caller (e.g.: debian/rules)
+-basedir	= /usr/local
++basedir	?= /usr/local
+ srcdir=.
+ 
+ libdir	= ${basedir}/lib
+ incdir	= ${basedir}/include
+ mandir	= ${basedir}/share/man
+ 
+-CC	= gcc
+-LCFLAGS	= -g -O2 -fPIC -Wall -pipe -D_REENTRANT 
+-CFLAGS	= -g
+-LDLIBS	= -llockdev
++CC	?= gcc
++LCFLAGS	?= -g -O2 -fPIC -Wall -pipe -D_REENTRANT 
++CFLAGS	?= -g
++LDLIBS	?= -llockdev
+ 
+ .PHONY: shared static perl-lib
+ ALL:	shared static perl-lib

@@ -1,4 +1,4 @@
-From dd4404a334a545e9beafa1b1e41b3a8f35ef31a9 Mon Sep 17 00:00:00 2001
+From 3de7a5635093c31dcb960ce9dff27da629b85d4d Mon Sep 17 00:00:00 2001
 From: Jason Wessel <jason.wessel@windriver.com>
 Date: Fri, 28 Mar 2014 17:42:43 +0800
 Subject: [PATCH] qemu: Add addition environment space to boot loader
@@ -13,12 +13,13 @@ to only 256 bytes. This patch expands the limit.
 
 Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
 Signed-off-by: Roy Li <rongqing.li@windriver.com>
+
 ---
  hw/mips/mips_malta.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index f6513a4fd5..d5efafb1e8 100644
+index c1cf0fe1..decffd2f 100644
 --- a/hw/mips/mips_malta.c
 +++ b/hw/mips/mips_malta.c
 @@ -62,7 +62,7 @@

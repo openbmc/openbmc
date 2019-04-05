@@ -1,5 +1,6 @@
 #! /bin/sh
 
+set -eux
 useradd glib2-test
 su glib2-test -c gnome-desktop-testing-runner glib
 userdel glib2-test

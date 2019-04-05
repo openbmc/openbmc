@@ -29,6 +29,8 @@ EXTRA_OECONF = "--enable-ftdi --disable-doxygen-html"
 
 do_configure() {
     ./bootstrap nosubmodule
+    install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.guess ${S}/jimtcl/autosetup
+    install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.sub ${S}/jimtcl/autosetup
     oe_runconf ${EXTRA_OECONF}
 }
 

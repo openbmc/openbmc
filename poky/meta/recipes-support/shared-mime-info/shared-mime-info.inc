@@ -30,6 +30,8 @@ do_install () {
 
 do_install_class-native () {
 	autotools_do_install
+
+	${B}/update-mime-database ${D}${datadir}/mime
 }
 
 BBCLASSEXTEND = "native nativesdk"

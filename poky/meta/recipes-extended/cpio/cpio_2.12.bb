@@ -27,6 +27,9 @@ do_install () {
         mv "${D}${bindir}/cpio" "${D}${base_bindir}/cpio"
         rmdir ${D}${bindir}/
     fi
+
+    # Avoid conflicts with the version from tar
+    mv "${D}${mandir}/man8/rmt.8" "${D}${mandir}/man8/rmt-cpio.8"
 }
 
 PACKAGES =+ "${PN}-rmt"

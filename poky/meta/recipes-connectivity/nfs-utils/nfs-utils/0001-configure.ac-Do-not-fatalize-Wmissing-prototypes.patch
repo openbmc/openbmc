@@ -1,0 +1,43 @@
+From 66471fbf7106917da7a1536b18a0a77d07479779 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <Mingli.Yu@windriver.com>
+Date: Mon, 17 Dec 2018 15:29:47 +0800
+Subject: [PATCH] configure.ac: Do not fatalize -Wmissing-prototypes
+
+There comes below error when run "make -C tests/nsm_client nsm_client"
+| nlm_sm_inter_svc.c:20:1: error: no previous prototype for 'nlm_sm_prog_3' [-Werror=missing-prototypes]
+
+It is because rpcgen doesn't generate -Wmissing-prototypes
+free code for nlm_sm_inter_svc.c with below logic
+in tests/nsm_client/Makefile.am
+[snip]
+GENFILES_SVC    = nlm_sm_inter_svc.c
+[snip]
+$(GENFILES_SVC): %_svc.c: %.x $(RPCGEN)
+        test -f $@ && rm -rf $@ || true
+        $(RPCGEN) -m -o $@ $<
+
+So add the logic not to fatalize -Wmissing-prototypes.
+
+Upstream-Status: Submitted[https://marc.info/?l=linux-nfs&m=154503260323936&w=2]
+
+Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index e82ff14..d0cc5d5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -548,7 +548,7 @@ my_am_cflags="\
+  -Wall \
+  -Wextra \
+  -Werror=strict-prototypes \
+- -Werror=missing-prototypes \
++ -Wmissing-prototypes \
+  -Werror=missing-declarations \
+  -Werror=format=2 \
+  -Werror=undef \
+-- 
+2.7.4
+

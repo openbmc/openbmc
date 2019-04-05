@@ -1,0 +1,27 @@
+GNU tar >= 1.27 is required for --owner=NAME:ID and --group=NAME:ID. And fails
+to build .deb packages with error:
+
+| dpkg-deb: building package 'linux-libc-headers-dbg' in '.../tmp/work/i586-poky-linux/linux-libc-headers/4.19-r0/deploy-debs/i586/linux-libc-headers-dbg_ 4.19-r0.0_i386.deb'.
+| tar: root\:0: Invalid owner
+| tar: Error is not recoverable: exiting now
+| dpkg-deb: error: tar -cf subprocess returned error exit status 2
+
+Tweak tar options in dpkg-deb source code to make it work on old machines.
+
+Upstream-Status: Inappropriate [cross build specific]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+diff --git a/dpkg-deb/build.c b/dpkg-deb/build.c
+index 68d187511..86fe22e25 100644
+--- a/dpkg-deb/build.c
++++ b/dpkg-deb/build.c
+@@ -462,7 +462,7 @@ tarball_pack(const char *dir, filenames_feed_func *tar_filenames_feeder,
+     if (options->mode)
+       command_add_args(&cmd, "--mode", options->mode, NULL);
+     if (options->root_owner_group)
+-      command_add_args(&cmd, "--owner", "root:0", "--group", "root:0", NULL);
++      command_add_args(&cmd, "--owner", "root", "--group", "root", NULL);
+     command_add_args(&cmd, "--null", "--no-unquote", "--no-recursion",
+                            "-T", "-", NULL);
+     command_exec(&cmd);

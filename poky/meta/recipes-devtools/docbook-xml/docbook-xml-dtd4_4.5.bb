@@ -8,13 +8,14 @@ HOMEPAGE = "http://www.docbook.org/xml/"
 LICENSE = "OASIS"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/LICENSE-OASIS;md5=c608985dd5f7f215e669e7639a0b1d2e"
 
+DEPENDS = "libxml2-native"
+
 # Note: the upstream sources are not distributed with a license file.
 # LICENSE-OASIS is included as a "patch" to workaround this. When
 # upgrading this recipe, please verify whether this is still needed.
 SRC_URI = "http://snapshot.debian.org/archive/debian/20160728T043443Z/pool/main/d/docbook-xml/docbook-xml_${PV}.orig.tar.gz \
            file://LICENSE-OASIS \
            file://docbook-xml-update-catalog.xml.patch \
-           file://docbook-xml.xml \
 "
 
 SRC_URI[md5sum] = "487b4d44e15cffb1f4048af23f98208e"
@@ -22,7 +23,7 @@ SRC_URI[sha256sum] = "b0f8edcf697f5318e63dd98c9a931f3fee167af0805ba441db372e0f17
 
 UPSTREAM_CHECK_URI = "${DEBIAN_MIRROR}/main/d/docbook-xml/"
 
-S="${WORKDIR}/docbook-xml-4.5.c31424"
+S = "${WORKDIR}/docbook-xml-4.5.c31424"
 
 inherit allarch
 BBCLASSEXTEND = "native"
@@ -36,20 +37,18 @@ do_compile (){
 }
 
 do_install () {
-    # Refer debian https://packages.debian.org/sid/all/docbook-xml/filelist
-    for DTDVERSION in 4.0 4.1.2 4.2 4.3 4.4 4.5; do
-        install -d -m 755 ${D}${datadir}/xml/docbook/schema/dtd/${DTDVERSION}
-        cp -v -R docbook-${DTDVERSION}/* ${D}${datadir}/xml/docbook/schema/dtd/${DTDVERSION}
-    done
-
     install -d ${D}${sysconfdir}/xml/
-    install -m 755  ${WORKDIR}/docbook-xml.xml ${D}${sysconfdir}/xml/docbook-xml.xml
+    xmlcatalog --create --noout ${D}${sysconfdir}/xml/docbook-xml.xml
+
+    for DTDVERSION in 4.0 4.1.2 4.2 4.3 4.4 4.5; do
+        DEST=${datadir}/xml/docbook/schema/dtd/$DTDVERSION
+        install -d -m 755 ${D}$DEST
+        cp -v -R docbook-$DTDVERSION/* ${D}$DEST
+        xmlcatalog --verbose --noout --add nextCatalog unused file://$DEST/catalog.xml ${D}${sysconfdir}/xml/docbook-xml.xml
+    done
 }
 
-do_install_append_class-native () {
-	# Ensure that the catalog file sgml-docbook.cat is properly
-	# updated when the package is installed from sstate cache.
-	sed -i -e "s|file://.*/usr/share/xml|file://${datadir}/xml|g" ${D}${sysconfdir}/xml/docbook-xml.xml
-}
+XMLCATALOGS = "${sysconfdir}/xml/docbook-xml.xml"
+inherit xmlcatalog
 
 FILES_${PN} = "${datadir}/* ${sysconfdir}/xml/docbook-xml.xml"

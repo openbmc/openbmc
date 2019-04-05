@@ -6,7 +6,8 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=2ac251558de685c6b9478d89be3149c2"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/project/glew/glew/${PV}/glew-${PV}.tgz \
-           file://no-strip.patch"
+           file://no-strip.patch \
+           file://0001-Fixed-compilation-with-current-mesa-versions.patch"
 
 SRC_URI[md5sum] = "b2ab12331033ddfaa50dc39345343980"
 SRC_URI[sha256sum] = "04de91e7e6763039bc11940095cd9c7f880baba82196a7765f727ac05a993c95"

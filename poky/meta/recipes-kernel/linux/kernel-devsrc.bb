@@ -32,7 +32,7 @@ B = "${STAGING_KERNEL_BUILDDIR}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-KERNEL_BUILD_ROOT="/lib/modules/"
+KERNEL_BUILD_ROOT="${nonarch_base_libdir}/modules/"
 
 do_install() {
     kerneldir=${D}${KERNEL_BUILD_ROOT}${KERNEL_VERSION}
@@ -48,7 +48,7 @@ do_install() {
     mkdir -p ${D}/usr/src
     (
 	cd ${D}/usr/src
-	ln -s ${KERNEL_BUILD_ROOT}${KERNEL_VERSION}/source kernel
+	lnr ${D}${KERNEL_BUILD_ROOT}${KERNEL_VERSION}/source kernel
     )
 
     # for on target purposes, we unify build and source
@@ -150,6 +150,13 @@ do_install() {
             cp -a --parents arch/arm64/kernel/module.lds $kerneldir/build/
 	fi
 
+	if [ "${ARCH}" = "powerpc" ]; then
+	    # 5.0 needs these files, but don't error if they aren't present in the source
+	    cp -a --parents arch/${ARCH}/kernel/syscalls/syscall.tbl $kerneldir/build/ 2>/dev/null || :
+	    cp -a --parents arch/${ARCH}/kernel/syscalls/syscalltbl.sh $kerneldir/build/ 2>/dev/null || :
+	    cp -a --parents arch/${ARCH}/kernel/syscalls/syscallhdr.sh $kerneldir/build/ 2>/dev/null || :
+	fi
+
 	# include the machine specific headers for ARM variants, if available.
 	if [ "${ARCH}" = "arm" ]; then
 	    cp -a --parents arch/${ARCH}/mach-*/include $kerneldir/build/
@@ -157,7 +164,12 @@ do_install() {
 	    # include a few files for 'make prepare'
 	    cp -a --parents arch/arm/tools/gen-mach-types $kerneldir/build/
 	    cp -a --parents arch/arm/tools/mach-types $kerneldir/build/
-	    cp -a --parents arch/arm/tools/syscall* $kerneldir/build/
+
+	    # ARM syscall table tools only exist for kernels v4.10 or later
+            SYSCALL_TOOLS=$(find arch/arm/tools -name "syscall*")
+            if [ -n "$SYSCALL_TOOLS" ] ; then
+	        cp -a --parents $SYSCALL_TOOLS $kerneldir/build/
+            fi
 
             cp -a --parents arch/arm/kernel/module.lds $kerneldir/build/
 	fi
@@ -209,6 +221,9 @@ do_install() {
 	    cp -a --parents kernel/time/timeconst.bc $kerneldir/build
 	    cp -a --parents kernel/bounds.c $kerneldir/build
 	    cp -a --parents Kbuild $kerneldir/build
+	    cp -a --parents arch/mips/kernel/syscalls/*.sh $kerneldir/build 2>/dev/null || :
+	    cp -a --parents arch/mips/kernel/syscalls/*.tbl $kerneldir/build 2>/dev/null || :
+	    cp -a --parents arch/mips/tools/elf-entry.c $kerneldir/build 2>/dev/null || :
 	fi
 
         # required to build scripts/selinux/genheaders/genheaders

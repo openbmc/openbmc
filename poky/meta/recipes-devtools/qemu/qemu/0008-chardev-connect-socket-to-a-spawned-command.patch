@@ -1,4 +1,4 @@
-From 20a09bb18907e67565c54fc505a741cbbef53f7f Mon Sep 17 00:00:00 2001
+From 9c1e976290e87a83ab1bfe38eb7ff3521ff0d684 Mon Sep 17 00:00:00 2001
 From: Alistair Francis <alistair.francis@xilinx.com>
 Date: Thu, 21 Dec 2017 11:35:16 -0800
 Subject: [PATCH] chardev: connect socket to a spawned command
@@ -44,6 +44,7 @@ as simple as possible.
 Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
+
 ---
  chardev/char-socket.c | 102 ++++++++++++++++++++++++++++++++++++++++++
  chardev/char.c        |   3 ++
@@ -51,10 +52,10 @@ Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
  3 files changed, 110 insertions(+)
 
 diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 159e69c3b1..84778cf31a 100644
+index eaa8e8b6..959ed183 100644
 --- a/chardev/char-socket.c
 +++ b/chardev/char-socket.c
-@@ -934,6 +934,68 @@ static gboolean socket_reconnect_timeout(gpointer opaque)
+@@ -987,6 +987,68 @@ static gboolean socket_reconnect_timeout(gpointer opaque)
      return false;
  }
  
@@ -123,7 +124,7 @@ index 159e69c3b1..84778cf31a 100644
  static void qmp_chardev_open_socket(Chardev *chr,
                                      ChardevBackend *backend,
                                      bool *be_opened,
-@@ -941,6 +1003,9 @@ static void qmp_chardev_open_socket(Chardev *chr,
+@@ -994,6 +1056,9 @@ static void qmp_chardev_open_socket(Chardev *chr,
  {
      SocketChardev *s = SOCKET_CHARDEV(chr);
      ChardevSocket *sock = backend->u.socket.data;
@@ -133,7 +134,7 @@ index 159e69c3b1..84778cf31a 100644
      bool do_nodelay     = sock->has_nodelay ? sock->nodelay : false;
      bool is_listen      = sock->has_server  ? sock->server  : true;
      bool is_telnet      = sock->has_telnet  ? sock->telnet  : false;
-@@ -1008,6 +1073,14 @@ static void qmp_chardev_open_socket(Chardev *chr,
+@@ -1072,6 +1137,14 @@ static void qmp_chardev_open_socket(Chardev *chr,
          s->reconnect_time = reconnect;
      }
  
@@ -145,10 +146,10 @@ index 159e69c3b1..84778cf31a 100644
 +        *be_opened = true;
 +    } else
 +#endif
-     /* If reconnect_time is set, will do that in chr_machine_done. */
-     if (!s->reconnect_time) {
-         if (s->is_listen) {
-@@ -1065,9 +1138,26 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
+     if (s->reconnect_time) {
+         tcp_chr_connect_async(chr);
+     } else {
+@@ -1131,9 +1204,26 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
      const char *port = qemu_opt_get(opts, "port");
      const char *fd = qemu_opt_get(opts, "fd");
      const char *tls_creds = qemu_opt_get(opts, "tls-creds");
@@ -175,7 +176,7 @@ index 159e69c3b1..84778cf31a 100644
      if ((!!path + !!fd + !!host) != 1) {
          error_setg(errp,
                     "Exactly one of 'path', 'fd' or 'host' required");
-@@ -1112,12 +1202,24 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
+@@ -1180,12 +1270,24 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
      sock->reconnect = reconnect;
      sock->tls_creds = g_strdup(tls_creds);
  
@@ -201,10 +202,10 @@ index 159e69c3b1..84778cf31a 100644
          addr->type = SOCKET_ADDRESS_LEGACY_KIND_INET;
          addr->u.inet.data = g_new(InetSocketAddress, 1);
 diff --git a/chardev/char.c b/chardev/char.c
-index 76d866e6fe..9747d51d7c 100644
+index 152dde53..62d5b578 100644
 --- a/chardev/char.c
 +++ b/chardev/char.c
-@@ -792,6 +792,9 @@ QemuOptsList qemu_chardev_opts = {
+@@ -818,6 +818,9 @@ QemuOptsList qemu_chardev_opts = {
          },{
              .name = "path",
              .type = QEMU_OPT_STRING,
@@ -215,10 +216,10 @@ index 76d866e6fe..9747d51d7c 100644
              .name = "host",
              .type = QEMU_OPT_STRING,
 diff --git a/qapi/char.json b/qapi/char.json
-index ae19dcd1ed..6de0f29bcd 100644
+index 79bac598..97bd161a 100644
 --- a/qapi/char.json
 +++ b/qapi/char.json
-@@ -241,6 +241,10 @@
+@@ -242,6 +242,10 @@
  #
  # @addr: socket address to listen on (server=true)
  #        or connect to (server=false)
@@ -229,7 +230,7 @@ index ae19dcd1ed..6de0f29bcd 100644
  # @tls-creds: the ID of the TLS credentials object (since 2.6)
  # @server: create server socket (default: true)
  # @wait: wait for incoming connection on server
-@@ -258,6 +262,7 @@
+@@ -261,6 +265,7 @@
  # Since: 1.4
  ##
  { 'struct': 'ChardevSocket', 'data': { 'addr'       : 'SocketAddressLegacy',

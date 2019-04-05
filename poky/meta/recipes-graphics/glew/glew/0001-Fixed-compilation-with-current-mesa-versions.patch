@@ -1,0 +1,73 @@
+From 7f65a36866f4e24dd1446fe1c9d21424f28bcabd Mon Sep 17 00:00:00 2001
+From: Deve <deveee@gmail.com>
+Date: Wed, 14 Nov 2018 21:07:29 +0100
+Subject: [PATCH] Fixed compilation with current mesa versions.
+
+As you can see in
+https://cgit.freedesktop.org/mesa/mesa/tree/include/GL/glext.h
+now the file uses __gl_glext_h_ instead of __glext_h_
+It's precisely caused by commit f7d42ee7d319256608ad60778f6787c140badada
+
+Backoprt notes: 
+
+* The original patch adjusts auto/src/glew_head.h only
+* include/GL/glew.h is not part of git repo and gets created on tarball
+  creation
+
+=> patch include/GL/glew.h either to cause the desired fix
+
+Upstream-Status: Backport [1]
+
+[1] https://github.com/nigels-com/glew/commit/7f65a36866f4e24dd1446fe1c9d21424f28bcabd
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ auto/src/glew_head.h | 3 ++-
+ include/GL/glew.h    | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/auto/src/glew_head.h b/auto/src/glew_head.h
+index c19cefb..8f313d9 100644
+--- a/auto/src/glew_head.h
++++ b/auto/src/glew_head.h
+@@ -14,7 +14,7 @@
+ #if defined(__REGAL_H__)
+ #error Regal.h included before glew.h
+ #endif
+-#if defined(__glext_h_) || defined(__GLEXT_H_)
++#if defined(__glext_h_) || defined(__GLEXT_H_) || defined(__gl_glext_h_)
+ #error glext.h included before glew.h
+ #endif
+ #if defined(__gl_ATI_h_)
+@@ -30,6 +30,7 @@
+ #define __X_GL_H
+ #define __glext_h_
+ #define __GLEXT_H_
++#define __gl_glext_h_
+ #define __gl_ATI_h_
+ 
+ #if defined(_WIN32)
+diff --git a/include/GL/glew.h b/include/GL/glew.h
+index b5b6987..a9f9e4b 100644
+--- a/include/GL/glew.h
++++ b/include/GL/glew.h
+@@ -93,7 +93,7 @@
+ #if defined(__REGAL_H__)
+ #error Regal.h included before glew.h
+ #endif
+-#if defined(__glext_h_) || defined(__GLEXT_H_)
++#if defined(__glext_h_) || defined(__GLEXT_H_) || defined(__gl_glext_h_)
+ #error glext.h included before glew.h
+ #endif
+ #if defined(__gl_ATI_h_)
+@@ -109,6 +109,7 @@
+ #define __X_GL_H
+ #define __glext_h_
+ #define __GLEXT_H_
++#define __gl_glext_h_
+ #define __gl_ATI_h_
+ 
+ #if defined(_WIN32)
+-- 
+2.20.1
+

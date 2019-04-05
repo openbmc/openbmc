@@ -1,0 +1,31 @@
+From 8d9870b66c3cfcf12ce7e8e013946e2a215bb722 Mon Sep 17 00:00:00 2001
+From: Ankit Navik <ankit.tarot@gmail.com>
+Date: Sat, 22 Dec 2018 19:16:02 +0530
+Subject: [PATCH] Add install PHONY target in Makefile
+
+---
+ Makefile | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 0564b65..0993372 100644
+--- a/Makefile
++++ b/Makefile
+@@ -35,7 +35,13 @@ $(STATIC_LIB): $(OBJECTS)
+ %.o: %.cpp
+ 	$(CXX) -c -o $@ $< $(CXXFLAGS) -MMD
+ 
++install:
++	mkdir -p $(TARGET_DIR_BIN)
++	mkdir -p $(TARGET_DIR_LIB)
++	cp $(TARGET) $(TARGET_DIR_BIN)/
++	cp $(STATIC_LIB) $(TARGET_DIR_LIB)/
++
+ clean:
+ 	rm -f $(TARGET) $(OBJECTS) $(CLI_OBJECTS) $(STATIC_LIB) $(DEPS)
+ 
+-.PHONY: clean
++.PHONY: all install clean
+-- 
+2.7.4
+

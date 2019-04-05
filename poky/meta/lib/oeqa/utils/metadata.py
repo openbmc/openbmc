@@ -72,8 +72,11 @@ def git_rev_info(path):
             info['commit'] = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=path).decode('utf-8').strip()
         except subprocess.CalledProcessError:
             pass
+        try:
+            info['commit_count'] = int(subprocess.check_output(["git", "rev-list", "--count", "HEAD"], cwd=path).decode('utf-8').strip())
+        except subprocess.CalledProcessError:
+            pass
         return info
-
     try:
         repo = Repo(path, search_parent_directories=True)
     except (InvalidGitRepositoryError, NoSuchPathError):

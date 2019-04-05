@@ -1,0 +1,12 @@
+diff -Naur xforms-1.2.3.orig/fdesign/Makefile.am xforms-1.2.3/fdesign/Makefile.am
+--- xforms-1.2.3.orig/fdesign/Makefile.am	2019-02-24 13:08:48.412603250 +0000
++++ xforms-1.2.3/fdesign/Makefile.am	2019-02-24 13:09:18.412601874 +0000
+@@ -15,7 +15,7 @@
+ 
+ bin_PROGRAMS = fdesign
+ 
+-fdesign_LDADD = $(top_srcdir)/lib/libforms.la $(X_LIBS) $(X_PRE_LIBS) $(XPM_LIB) -lX11 $(LIBS) $(X_EXTRA_LIBS)
++fdesign_LDADD = $(top_builddir)/lib/libforms.la $(X_LIBS) $(X_PRE_LIBS) $(XPM_LIB) -lX11 $(LIBS) $(X_EXTRA_LIBS)
+ 
+ fdesign_SOURCES = \
+ 	fd_attribs.c \

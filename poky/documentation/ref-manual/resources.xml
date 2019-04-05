@@ -155,7 +155,7 @@
                 </para></listitem>
             <listitem><para>
                 <emphasis>
-                <ulink url='&YOCTO_DOCS_BB_URL;'>BitBake User Manual:</ulink>
+                <ulink url='&YOCTO_DOCS_BB_URL;'>BitBake User Manual</ulink>:
                 </emphasis>
                 A comprehensive guide to the BitBake tool.
                 If you want information on BitBake, see this manual.

@@ -20,11 +20,7 @@ SRC_URI[md5sum] = "81ec873108b8593c586f91ca65963952"
 SRC_URI[sha256sum] = "c8566335ee74e5fcaeb8595b4ebd0400c4b043d6acb3263ecb1314f8f5501332"
 
 INHIBIT_DEFAULT_DEPS = "1"
-DEPENDS = "virtual/${TARGET_PREFIX}gcc-initial"
-
-PATH_prepend = "${STAGING_BINDIR_TOOLCHAIN}.${STAGINGCC}:"
-STAGINGCC = "gcc-cross-initial-${TARGET_ARCH}"
-STAGINGCC_class-nativesdk = "gcc-crosssdk-initial-${SDK_SYS}"
+DEPENDS = "virtual/${TARGET_PREFIX}gcc"
 
 S = "${WORKDIR}/newlib-${PV}"
 B = "${WORKDIR}/build"

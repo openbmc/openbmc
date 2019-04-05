@@ -38,7 +38,7 @@ S = "${WORKDIR}/OpenIPMI-${PV}"
 SRC_URI[md5sum] = "1461ac4d78fc516646fd0a6e605a8b05"
 SRC_URI[sha256sum] = "f0f1a0ec732409930b7a31a6daa6cf39b585f52059b62a5f092b7ece21aa75a5"
 
-inherit autotools-brokensep pkgconfig pythonnative perlnative update-rc.d systemd
+inherit autotools-brokensep pkgconfig pythonnative perlnative update-rc.d systemd cpan-base
 
 EXTRA_OECONF = "--disable-static \
                 --with-perl='${STAGING_BINDIR_NATIVE}/perl-native/perl' \
@@ -78,6 +78,7 @@ do_configure () {
         echo "SAL: STAGING_INCDIR_NATIVE = $STAGING_INCDIR_NATIVE"
         echo "SAL: libdir = $libdir"
         sed -i -e "/^PERL_CFLAGS/s:-I/usr/local/include:-I${STAGING_INCDIR_NATIVE}:g" $i
+        sed -i -e "/^PERL_CFLAGS/s:-I .* :-I ${STAGING_LIBDIR}${PERL_OWN_DIR}/perl5/${@get_perl_version(d)}/${@get_perl_arch(d)}/CORE :g" $i
         sed -i -e "/^PERL_INSTALL_DIR/s:^PERL_INSTALL_DIR = .*:PERL_INSTALL_DIR = ${libdir}/perl/vendor_perl/$perl_ver:g" $i
     done
 }

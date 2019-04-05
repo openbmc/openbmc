@@ -31,17 +31,13 @@ GID = "clamav"
 
 # Clamav has a built llvm version 2 but does not build with gcc 6.x,
 # disable the internal one. This is a known issue
-# If you want LLVM support, use meta-oe llvm3.3 to build for GCC 6.X,
-# as defined below
+# If you want LLVM support, use the one in core
 
-CLAMAV_LLVM ?= "oellvm"
-CLAMAV_LLVM_RELEASE ?= "6.0"
-
-PACKAGECONFIG ?= "ncurses openssl bz2 zlib ${CLAMAV_LLVM}"
+PACKAGECONFIG ?= "ncurses openssl bz2 zlib llvm"
 PACKAGECONFIG += " ${@bb.utils.contains("DISTRO_FEATURES", "ipv6", "ipv6", "", d)}"
 PACKAGECONFIG += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}"
 
-PACKAGECONFIG[oellvm] = "--with-system-llvm --with-llvm-linking=dynamic --disable-llvm, ,llvm${CLAMAV_LLVM_RELEASE}"
+PACKAGECONFIG[llvm] = "--with-system-llvm --with-llvm-linking=dynamic --disable-llvm, ,llvm8.0"
 
 PACKAGECONFIG[pcre] = "--with-pcre=${STAGING_LIBDIR},  --without-pcre, libpcre"
 PACKAGECONFIG[xml] = "--with-xml=${STAGING_LIBDIR}/.., --with-xml=no, libxml2,"

@@ -53,6 +53,9 @@ RDEPENDS_${PN} = "${@["", "busybox-inittab"][(d.getVar('VIRTUAL-RUNTIME_init_man
 
 inherit cml1 systemd update-rc.d ptest
 
+# busybox's unzip test case needs zip command, which busybox itself does not provide
+RDEPENDS_${PN}-ptest = "zip"
+
 # internal helper
 def busybox_cfg(feature, tokens, cnf, rem):
     if type(tokens) == type(""):
@@ -72,8 +75,7 @@ def features_to_busybox_settings(d):
     busybox_cfg(bb.utils.contains('DISTRO_FEATURES', 'nls', True, False, d), 'CONFIG_LOCALE_SUPPORT', cnf, rem)
     busybox_cfg(bb.utils.contains('DISTRO_FEATURES', 'ipv4', True, False, d), 'CONFIG_FEATURE_IFUPDOWN_IPV4', cnf, rem)
     busybox_cfg(bb.utils.contains('DISTRO_FEATURES', 'ipv6', True, False, d), 'CONFIG_FEATURE_IFUPDOWN_IPV6', cnf, rem)
-    busybox_cfg(bb.utils.contains('DISTRO_FEATURES', 'wifi', True, False, d), 'CONFIG_RFKILL', cnf, rem)
-    busybox_cfg(bb.utils.contains('DISTRO_FEATURES', 'bluetooth', True, False, d), 'CONFIG_RFKILL', cnf, rem)
+    busybox_cfg(bb.utils.contains_any('DISTRO_FEATURES', 'bluetooth wifi', True, False, d), 'CONFIG_RFKILL', cnf, rem)
     return "\n".join(cnf), "\n".join(rem)
 
 # X, Y = ${@features_to_busybox_settings(d)}
@@ -349,6 +351,20 @@ do_install_ptest () {
 	cp -r ${B}/testsuite ${D}${PTEST_PATH}/
 	cp ${B}/.config      ${D}${PTEST_PATH}/
 	ln -s /bin/busybox   ${D}${PTEST_PATH}/busybox
+
+	mkdir ${D}${PTEST_PATH}/bin
+	if [ "${BUSYBOX_SPLIT_SUID}" = "1" ]; then
+		while read link; do
+			ln -s ${base_bindir}/busybox.suid ${D}${PTEST_PATH}/bin/$(basename $link)
+		done <${D}${sysconfdir}/busybox.links.suid
+		while read link; do
+			ln -s ${base_bindir}/busybox.nosuid ${D}${PTEST_PATH}/bin/$(basename $link)
+		done <${D}${sysconfdir}/busybox.links.nosuid
+	else
+		while read link; do
+			ln -s ${base_bindir}/busybox ${D}${PTEST_PATH}/bin/$(basename $link)
+		done <${D}${sysconfdir}/busybox.links
+	fi
 }
 
 inherit update-alternatives
@@ -455,4 +471,4 @@ pkg_prerm_${PN}-syslog () {
 	fi
 }
 
-RPROVIDES_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', '/bin/sh', '', d)}"
+RPROVIDES_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', '/bin/sh /bin/ash', '', d)}"

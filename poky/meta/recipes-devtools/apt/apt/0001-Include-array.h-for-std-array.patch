@@ -1,0 +1,35 @@
+From 4d64ec843185bf6fd1b85c3a6a4c4e3c968c8ab1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 20 Jan 2019 18:56:58 -0800
+Subject: [PATCH] Include <array.h> for std::array
+
+When compiling using clang/libc++ it fails to build because this header
+is not included, with libstdc++ this seems to be pulled in
+automatically.
+
+Fixes below error
+
+apt-pkg/contrib/strutl.cc:949:38: error: implicit instantiation of undefined template 'std::__1::array<const char *const, 7>'
+   std::array<char const * const, 7> c_weekdays = {{ "sun", "mon", "tue", "wed", "thu", "fri", "sat" }};
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Backport [https://github.com/Debian/apt/commit/24a59c62efafbdb8387b2d3c5616b04b9fd21306]
+---
+ apt-pkg/contrib/strutl.cc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/apt-pkg/contrib/strutl.cc b/apt-pkg/contrib/strutl.cc
+index 60d0ca8..c2bfcbc 100644
+--- a/apt-pkg/contrib/strutl.cc
++++ b/apt-pkg/contrib/strutl.cc
+@@ -21,6 +21,7 @@
+ #include <apt-pkg/fileutl.h>
+ #include <apt-pkg/error.h>
+ 
++#include <array>
+ #include <algorithm>
+ #include <iomanip>
+ #include <locale>
+-- 
+2.20.1
+

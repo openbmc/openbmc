@@ -20,9 +20,10 @@ S = "${WORKDIR}/libusb-${PV}"
 
 inherit autotools pkgconfig ptest
 
-# Don't configure udev by default since it will cause a circular
-# dependecy with udev package, which depends on libusb
-EXTRA_OECONF = "--libdir=${base_libdir} --disable-udev"
+PACKAGECONFIG_class-target ??= "udev"
+PACKAGECONFIG[udev] = "--enable-udev,--disable-udev,udev"
+
+EXTRA_OECONF = "--libdir=${base_libdir}"
 
 do_install_append() {
 	install -d ${D}${libdir}

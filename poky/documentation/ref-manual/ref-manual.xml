@@ -128,9 +128,9 @@
                 <revremark>Released with the Yocto Project 2.6 Release.</revremark>
             </revision>
             <revision>
-                <revnumber>2.6.1</revnumber>
+                <revnumber>2.7</revnumber>
                 <date>&REL_MONTH_YEAR;</date>
-                <revremark>Released with the Yocto Project 2.6.1 Release.</revremark>
+                <revremark>Released with the Yocto Project 2.7 Release.</revremark>
             </revision>
         </revhistory>
 

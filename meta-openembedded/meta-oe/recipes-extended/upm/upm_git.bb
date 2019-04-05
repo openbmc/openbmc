@@ -13,6 +13,7 @@ PV = "1.6.0-git${SRCPV}"
 SRC_URI = "git://github.com/intel-iot-devkit/${BPN}.git;protocol=http \
            file://0001-Replace-strncpy-with-memcpy.patch \
            file://0001-include-sys-types.h-for-uint-definition.patch \
+           file://0001-CMakeLists.txt-Use-SWIG_SUPPORT_FILES-to-find-the-li.patch \
            "
 
 S = "${WORKDIR}/git"
@@ -20,7 +21,7 @@ S = "${WORKDIR}/git"
 # Depends on mraa which only supports x86 and ARM for now
 COMPATIBLE_HOST = "(x86_64.*|i.86.*|aarch64.*|arm.*)-linux"
 
-inherit distutils3-base cmake
+inherit distutils3-base cmake pkgconfig
 
 # override this in local.conf to get needed bindings.
 # BINDINGS_pn-upm="python"

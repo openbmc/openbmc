@@ -49,7 +49,7 @@ python populate_packages_append () {
     for pkg in packages:
         schema_dir = '%s/%s/etc/gconf/schemas' % (pkgdest, pkg)
         schemas = []
-        schema_re = re.compile(".*\.schemas$")
+        schema_re = re.compile(r".*\.schemas$")
         if os.path.exists(schema_dir):
             for f in os.listdir(schema_dir):
                 if schema_re.match(f):

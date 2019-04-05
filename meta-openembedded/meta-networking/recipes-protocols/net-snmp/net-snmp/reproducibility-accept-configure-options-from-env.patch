@@ -1,0 +1,15 @@
+Reproducible build: To avoid build host paths being written into binaries,
+accept NETSNMP_CONFIGURE_OPTIONS from the environment.
+NETSNMP_CONFIGURE_OPTIONS can be set either null or to a fixed value.
+
+--- net-snmp-5.8.original/configure.ac	2018-11-20 17:41:39.926529072 +1300
++++ net-snmp-5.8/configure.ac	2018-11-20 17:54:44.488180224 +1300
+@@ -28,7 +28,7 @@
+ #
+ # save the configure arguments
+ #
+-AC_DEFINE_UNQUOTED(NETSNMP_CONFIGURE_OPTIONS,"$ac_configure_args",
++AC_DEFINE_UNQUOTED(NETSNMP_CONFIGURE_OPTIONS,"${NETSNMP_CONFIGURE_OPTIONS-$ac_configure_args}",
+   [configure options specified])
+ CONFIGURE_OPTIONS="\"$ac_configure_args\""
+ AC_SUBST(CONFIGURE_OPTIONS)

@@ -1,0 +1,35 @@
+From 8996f075e64da0e6ffeda57632ef31f8710defcc Mon Sep 17 00:00:00 2001
+From: He Zhe <zhe.he@windriver.com>
+Date: Fri, 15 Mar 2019 16:47:03 +0800
+Subject: [PATCH] utilities: Fix build failure with -Werror=maybe-uninitialized
+
+Summary:
+Initialize magic_number to zero to avoid such failure.
+utilities/blob_db/blob_log_format.cc:91:3: error: 'magic_number' may be used
+uninitialized in this function [-Werror=maybe-uninitialized]
+   if (magic_number != kMagicNumber) {
+   ^~
+
+Upstream-Status: Accepted [expected version 5.19]
+
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ utilities/blob_db/blob_log_format.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/utilities/blob_db/blob_log_format.cc b/utilities/blob_db/blob_log_format.cc
+index 2bf7028..8726cb8 100644
+--- a/utilities/blob_db/blob_log_format.cc
++++ b/utilities/blob_db/blob_log_format.cc
+@@ -82,7 +82,7 @@ Status BlobLogFooter::DecodeFrom(Slice src) {
+   uint32_t src_crc = 0;
+   src_crc = crc32c::Value(src.data(), BlobLogFooter::kSize - sizeof(uint32_t));
+   src_crc = crc32c::Mask(src_crc);
+-  uint32_t magic_number;
++  uint32_t magic_number = 0;
+   if (!GetFixed32(&src, &magic_number) || !GetFixed64(&src, &blob_count) ||
+       !GetFixed64(&src, &expiration_range.first) ||
+       !GetFixed64(&src, &expiration_range.second) || !GetFixed32(&src, &crc)) {
+-- 
+2.7.4
+

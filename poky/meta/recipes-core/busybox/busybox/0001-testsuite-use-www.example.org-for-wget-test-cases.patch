@@ -1,0 +1,62 @@
+From 03acf460990dfcf6e52b298301b348b9504460a8 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Tue, 13 Nov 2018 13:51:42 +0800
+Subject: [PATCH] testsuite: use www.example.org for wget test cases
+
+Use example.org instead of google.com to make sure it's
+always reachible.
+
+Upstream-Status: Submitted [http://lists.busybox.net/pipermail/busybox/2018-November/086835.html]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ testsuite/wget/wget--O-overrides--P        | 2 +-
+ testsuite/wget/wget-handles-empty-path     | 2 +-
+ testsuite/wget/wget-retrieves-google-index | 2 +-
+ testsuite/wget/wget-supports--P            | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/testsuite/wget/wget--O-overrides--P b/testsuite/wget/wget--O-overrides--P
+index 40a3a96..490d743 100644
+--- a/testsuite/wget/wget--O-overrides--P
++++ b/testsuite/wget/wget--O-overrides--P
+@@ -1,5 +1,5 @@
+ test x"$SKIP_INTERNET_TESTS" != x"" && exit
+ 
+ mkdir foo
+-busybox wget -q -O index.html -P foo http://www.google.com/
++busybox wget -q -O index.html -P foo http://www.example.org/
+ test -s index.html
+diff --git a/testsuite/wget/wget-handles-empty-path b/testsuite/wget/wget-handles-empty-path
+index 01d60bd..1802db6 100644
+--- a/testsuite/wget/wget-handles-empty-path
++++ b/testsuite/wget/wget-handles-empty-path
+@@ -1,3 +1,3 @@
+ test x"$SKIP_INTERNET_TESTS" != x"" && exit
+ 
+-busybox wget http://www.google.com
++busybox wget http://www.example.org
+diff --git a/testsuite/wget/wget-retrieves-google-index b/testsuite/wget/wget-retrieves-google-index
+index f9dbb8b..fc801d4 100644
+--- a/testsuite/wget/wget-retrieves-google-index
++++ b/testsuite/wget/wget-retrieves-google-index
+@@ -1,4 +1,4 @@
+ test x"$SKIP_INTERNET_TESTS" != x"" && exit
+ 
+-busybox wget -q -O foo http://www.google.com/
++busybox wget -q -O foo http://www.example.org/
+ test -s foo
+diff --git a/testsuite/wget/wget-supports--P b/testsuite/wget/wget-supports--P
+index bfe4ac4..4ff2fe0 100644
+--- a/testsuite/wget/wget-supports--P
++++ b/testsuite/wget/wget-supports--P
+@@ -1,5 +1,5 @@
+ test x"$SKIP_INTERNET_TESTS" != x"" && exit
+ 
+ mkdir foo
+-busybox wget -q -P foo http://www.google.com/
++busybox wget -q -P foo http://www.example.org/
+ test -s foo/index.html
+-- 
+2.7.4
+

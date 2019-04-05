@@ -8,7 +8,10 @@
 # Short-Description: Misc and other.
 ### END INIT INFO
 
+TIMESTAMP_FILE=/etc/timestamp
+
 . /etc/default/rcS
+[ -f /etc/default/timestamp ] && . /etc/default/timestamp
 #
 # Put a nologin file in /etc to prevent people from logging in before
 # system startup is complete.
@@ -64,10 +67,10 @@ fi
 # If the timestamp is more recent than the current time,
 # use the timestamp instead.
 test -x /etc/init.d/hwclock.sh && /etc/init.d/hwclock.sh start
-if test -e /etc/timestamp
+if test -e "$TIMESTAMP_FILE"
 then
 	SYSTEMDATE=`date -u +%4Y%2m%2d%2H%2M%2S`
-	read TIMESTAMP < /etc/timestamp
+	read TIMESTAMP < "$TIMESTAMP_FILE"
 	if [ ${TIMESTAMP} -gt $SYSTEMDATE ]; then
 		# format the timestamp as date expects it (2m2d2H2M4Y.2S)
 		TS_YR=${TIMESTAMP%??????????}

@@ -1,0 +1,31 @@
+From 98719ea7f717750c790a1f9384ea8d0117e7f52d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 17 Dec 2018 18:15:05 -0800
+Subject: [PATCH] libcollectdclient: Fix string overflow errors
+
+Ensure that string has a space for ending null char
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/libcollectdclient/network_parse.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/libcollectdclient/network_parse.c b/src/libcollectdclient/network_parse.c
+index fef43a9..6d65266 100644
+--- a/src/libcollectdclient/network_parse.c
++++ b/src/libcollectdclient/network_parse.c
+@@ -169,9 +169,9 @@ static int parse_string(void *payload, size_t payload_size, char *out,
+ 
+ static int parse_identifier(uint16_t type, void *payload, size_t payload_size,
+                             lcc_value_list_t *state) {
+-  char buf[LCC_NAME_LEN];
+-
+-  if (parse_string(payload, payload_size, buf, sizeof(buf)) != 0)
++  char buf[LCC_NAME_LEN+1];
++  buf[LCC_NAME_LEN] = '\0';
++  if (parse_string(payload, payload_size, buf, LCC_NAME_LEN) != 0)
+     return EINVAL;
+ 
+   switch (type) {

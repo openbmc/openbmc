@@ -6,14 +6,14 @@ SECTION = "kernel/userland"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ea5bed2f60d357618ca161ad539f7c0a \
                     file://kexec/kexec.c;beginline=1;endline=20;md5=af10f6ae4a8715965e648aa687ad3e09"
-PV = "2.0.17+git${SRCPV}"
+PV = "2.0.18+git${SRCPV}"
 
 DEPENDS = "zlib xz"
 
 inherit klibc autotools
 
 SRC_URI = "git://git.kernel.org/pub/scm/utils/kernel/kexec/kexec-tools.git"
-SRCREV = "b9de21ef51a7ceab7122a707c188602eae22c4ee"
+SRCREV = "5750980cdbbc33ef75bfba6660295b932376ce15"
 
 BUILD_PATCHES = "file://0001-force-static-build.patch \
                  file://0002-Adjust-the-order-of-headers-to-fix-build-for-musl.patch"
@@ -31,7 +31,8 @@ KLIBC_PATCHES += " \
             file://0012-purgatory-string.c-avoid-inclusion-of-string.h.patch \
             file://0013-sha256.h-avoid-inclusion-of-sys-types.h.patch \
             file://0014-add-if_nameindex-from-musl.patch \
-            file://0015-vmcore-dmesg-fix-warning.patch"
+            file://0015-vmcore-dmesg-fix-warning.patch \
+            file://klibc-reboot.patch"
 
 WARNING_FIXES = ""
 FROM_OE_CORE = "file://arm_crashdump-fix-buffer-align.patch \
@@ -41,6 +42,9 @@ FROM_OE_CORE = "file://arm_crashdump-fix-buffer-align.patch \
 SRC_URI += "${BUILD_PATCHES} ${KLIBC_PATCHES} ${WARNING_FIXES} ${FROM_OE_CORE}"
 
 SRC_URI_append_arm = " file://arm_crashdump.patch"
+
+SRC_URI_append_mips = " file://140-mips_disable_devicetree_support.patch"
+SRC_URI_append_mipsel = " file://140-mips_disable_devicetree_support.patch"
 
 SRC_URI_append_x86 = " file://x86_sys_io.patch file://x86_basename.patch \
                        file://x86_vfscanf.patch file://x86_kexec_test.patch"

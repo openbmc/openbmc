@@ -1,0 +1,45 @@
+From 85f164ec427fecbae24140b3c93acbbe2ba1c817 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Tue, 13 Nov 2018 11:27:01 +0800
+Subject: [PATCH] testsuite: check uudecode before using it
+
+The unzip and tar test cases use uudecode command, so also
+check it via optional function.
+
+Upstream-Status: Submitted [http://lists.busybox.net/pipermail/busybox/2018-November/086833.html]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ testsuite/tar.tests   | 2 +-
+ testsuite/unzip.tests | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/testsuite/tar.tests b/testsuite/tar.tests
+index d71a349..8c88567 100755
+--- a/testsuite/tar.tests
++++ b/testsuite/tar.tests
+@@ -336,7 +336,7 @@ SKIP=
+ cd .. || exit 1; rm -rf tar.tempdir 2>/dev/null
+ 
+ mkdir tar.tempdir && cd tar.tempdir || exit 1
+-optional FEATURE_SEAMLESS_BZ2 FEATURE_TAR_AUTODETECT LS
++optional FEATURE_SEAMLESS_BZ2 FEATURE_TAR_AUTODETECT LS UUDECODE
+ testing "Symlink attack: create symlink and then write through it" '\
+ exec 2>&1
+ uudecode -o input && tar xvf input; echo $?
+diff --git a/testsuite/unzip.tests b/testsuite/unzip.tests
+index af53de9..3b45ece 100755
+--- a/testsuite/unzip.tests
++++ b/testsuite/unzip.tests
+@@ -31,7 +31,7 @@ rmdir foo
+ rm foo.zip
+ 
+ # File containing some damaged encrypted stream
+-optional FEATURE_UNZIP_CDF CONFIG_UNICODE_SUPPORT
++optional FEATURE_UNZIP_CDF CONFIG_UNICODE_SUPPORT UUDECODE
+ testing "unzip (bad archive)" "uudecode; unzip bad.zip 2>&1; echo \$?" \
+ "Archive:  bad.zip
+   inflating: ]3j½r«I??K-%Ix
+-- 
+2.7.4
+

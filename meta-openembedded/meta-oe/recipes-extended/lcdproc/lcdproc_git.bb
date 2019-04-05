@@ -19,9 +19,10 @@ S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig update-rc.d
 
-COMPATIBLE_HOST_arm_libc-musl = "null"
-
 LCD_DRIVERS ?= "all,!irman,!svga"
+LCD_DRIVERS_append_aarch64 = ",!serialVFD"
+LCD_DRIVERS_append_arm = ",!serialVFD"
+
 LCD_DEFAULT_DRIVER ?= "curses"
 
 PACKAGECONFIG ??= "usb"

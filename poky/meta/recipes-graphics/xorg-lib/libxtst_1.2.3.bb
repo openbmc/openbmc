@@ -19,3 +19,4 @@ XORG_PN = "libXtst"
 SRC_URI[md5sum] = "ef8c2c1d16a00bd95b9fdcef63b8a2ca"
 SRC_URI[sha256sum] = "4655498a1b8e844e3d6f21f3b2c4e2b571effb5fd83199d428a6ba7ea4bf5204"
 
+BBCLASSEXTEND = "native nativesdk"

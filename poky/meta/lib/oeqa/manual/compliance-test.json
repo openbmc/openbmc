@@ -1,0 +1,194 @@
+[
+    {
+        "test": {
+            "@alias": "compliance-test.compliance-test.LTP_subset_test_suite",
+            "author": [
+                {
+                    "email": "corneliux.stoicescu@intel.com",
+                    "name": "corneliux.stoicescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "For real hardware, run following component, \nsyscalls \nfs \nfsx \ndio \nio \nmm \nipc \nsched \nmath \nnptl \npty \nadmin_tools \ntimers \ncommands  \n\nFor QEMU, run following component \nsyscalls \nmm \nipc \nsched \nmath \nnptl \npty \nadmin_tools \ncommands \n\nRun Instructions: \nLTP download: http://sourceforge.net/projects/ltp/files/LTP%20Source/ltp-20120401/ltp-full-20120401.bz2/download  \n\n(link is outdated, always use the last version released or the one found in the image)  \n\n\n\nbuild steps: refer to http://ltp.sourceforge.net  \n\nRun steps:",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "Build LTP with toolchain or in sdk image. Or use a sato-sdk image which has LTP already included in /opt/ltp",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "For QEMU, create the qemu target with \"-m 512\", which makes some memory stress cases pass. For some issues, we could only set 128M for qemuarm and 256M for qemumips.",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "Copy LTP folder into target, for example, /opt/ltp if you have built it yourself. Modify the default scenario file \"scenario_groups/default\", remove test suites not to be tested",
+                    "expected_results": ""
+                },
+                "5": {
+                    "action": "Comment runtests/sched: hackbench, which is not suitable to run in emulators. Reminder (comment it also for Sugarbay Devices).",
+                    "expected_results": ""
+                },
+                "6": {
+                    "action": "Comment oom01, oom02, oom03, oom04 in runtest/mm, which consume lots of memory",
+                    "expected_results": ""
+                },
+                "7": {
+                    "action": "From /opt/ltp run: ./runltp -p -l result-M2-20101218.log -C result-M2-20101218.fail -d /opt/ltp/tmp &> result-M2-20101218.fulllog \n\n",
+                    "expected_results": "Check the result on wiki, https://wiki.yoctoproject.org/wiki/LTP_result, there should be no regression failure met."
+                }
+            },
+            "summary": "LTP_subset_test_suite"
+        }
+    },
+    {
+        "test": {
+            "@alias": "compliance-test.compliance-test.POSIX_subset_test_suite",
+            "author": [
+                {
+                    "email": "corneliux.stoicescu@intel.com",
+                    "name": "corneliux.stoicescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "In a sato-sdk image go to /opt/ltp or get latest LTP sourcecode,  download location is  http://sourceforge.net/projects/ltp/files/LTP%20Source/  and install it.",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "Go into the folder of LTP, and posix_testsuite is under testcases/open_posix_testsuite/",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "Run connmand: make generate-makefiles",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "Run connmand: make conformance-all",
+                    "expected_results": ""
+                },
+                "5": {
+                    "action": "Run connmand: make conformance-test (this step may show errors, ignore them)",
+                    "expected_results": ""
+                },
+                "6": {
+                    "action": "Run connmand: make tools-all",
+                    "expected_results": ""
+                },
+                "7": {
+                    "action": "Run connmand: sh posix.sh > posix.log, posix.sh as below:  \n \n#!/bin/sh \n./bin/run-posix-option-group-test.sh AIO \n./bin/run-posix-option-group-test.sh MEM \n./bin/run-posix-option-group-test.sh MSG \n./bin/run-posix-option-group-test.sh SEM \n./bin/run-posix-option-group-test.sh SIG \n./bin/run-posix-option-group-test.sh THR \n./bin/run-posix-option-group-test.sh TMR \n./bin/run-posix-option-group-test.sh TPS  \n \n",
+                    "expected_results": ""
+                },
+                "8": {
+                    "action": "Check the posix.log after testing is finished",
+                    "expected_results": "Compare the test result on wiki, https://wiki.yoctoproject.org/wiki/Posix_result, there should be no more regression failures met."
+                }
+            },
+            "summary": "POSIX_subset_test_suite"
+        }
+    },
+    {
+        "test": {
+            "@alias": "compliance-test.compliance-test.LSB_subset_test_suite",
+            "author": [
+                {
+                    "email": "corneliux.stoicescu@intel.com",
+                    "name": "corneliux.stoicescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Get lsd-sdk image and install it on target device or start the image(if it is QEMU) with option \"-m 512M\"",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "Comment in /opt/lsb-test/session any tests you don't want to run.",
+                    "expected_results": ""
+                },
+                "3": {
+                    "action": "Run /usr/bin/LSB_Test.sh which should download the LSB suite and set it up. Some packages may fail to download because their location changed on ftp.linuxfoundation.org. You need to manually update /opt/lsb-test/packages_list",
+                    "expected_results": ""
+                },
+                "4": {
+                    "action": "Tests should start automatically, you can use the web interface to reconfigure the setup. ",
+                    "expected_results": "Check the result on wiki https://wiki.yoctoproject.org/wiki/LSB_Result No regression failures should be met."
+                }
+            },
+            "summary": "LSB_subset_test_suite"
+        }
+    },
+    {
+        "test": {
+            "@alias": "compliance-test.compliance-test.stress_test_-_Genericx86-64",
+            "author": [
+                {
+                    "email": "corneliux.stoicescu@intel.com",
+                    "name": "corneliux.stoicescu@intel.com"
+                }
+            ],
+            "execution": {
+                "1": {
+                    "action": "Bootup with core-image-lsb-sdk image",
+                    "expected_results": ""
+                },
+                "2": {
+                    "action": "Execute the crashme test with below command  \n\n./opt/ltp/runltp f  crashme",
+                    "expected_results": "The stress testing should not make the target crash. Check CPU usage and basic functionality of the system after the tests are over. "
+                }
+            },
+            "summary": "stress_test_-_Genericx86-64"
+        }
+    },
+     {
+    "test": {
+      "@alias": "compliance-test.compliance-test.stress_test_-_- crashme_-_-Beaglebone",
+      "author": [
+        {
+          "email": "corneliux.stoicescu@intel.com",
+          "name": "corneliux.stoicescu@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": " Get crashme from http://people.delphiforums.com/gjc/crashme.html",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Follow the setup steps on above URL, build crashme in target",
+          "expected_results": ""
+        },
+        "3": {
+          "action": " Run crashme for 24 hours",
+          "expected_results": "Target should not crash with the program."
+        }
+      },
+      "summary": "stress_test_-_crashme_-Beaglebone"
+    }
+  },
+  {
+    "test": {
+      "@alias": "compliance-test.compliance-test.stress_test_-_ltp_-Beaglebone",
+      "author": [
+        {
+          "email": "corneliux.stoicescu@intel.com",
+          "name": "corneliux.stoicescu@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Build LTP with toolchain or in sdk image",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Copy LTP folder into target, for example, /opt/ltp. Modify script,  testscripts/ltpstress.sh, set Iostat=1, NO_NETWORK=1",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "cd testscripts/ && ./ltpstress.sh",
+          "expected_results": "This stress case will run for 24 hours Check the result\ntarget should not crash with the program "
+        }
+      },
+      "summary": "stress_test_-_-ltp_-Beaglebone"
+    }
+  }
+]

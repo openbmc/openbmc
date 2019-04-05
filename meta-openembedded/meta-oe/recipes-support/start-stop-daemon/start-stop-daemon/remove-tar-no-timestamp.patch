@@ -1,0 +1,17 @@
+busybox-1.19.4 tar utility doesn't support --warning=no-timestamp
+
+Signed-off-by: Constantin Musca <constantinx.musca@intel.com>
+
+Upstream-Status: Inappropriate [configuration]
+Index: dpkg-1.17.1/dpkg-deb/extract.c
+===================================================================
+--- dpkg-1.17.1.orig/dpkg-deb/extract.c
++++ dpkg-1.17.1/dpkg-deb/extract.c
+@@ -318,7 +318,6 @@ extracthalf(const char *debar, const cha
+ 
+       command_add_arg(&cmd, "-f");
+       command_add_arg(&cmd, "-");
+-      command_add_arg(&cmd, "--warning=no-timestamp");
+ 
+       m_dup2(p2[0],0);
+       close(p2[0]);

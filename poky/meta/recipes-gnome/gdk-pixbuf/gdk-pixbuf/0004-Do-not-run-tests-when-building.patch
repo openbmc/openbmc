@@ -1,0 +1,39 @@
+From 3c4a6c147ae8a0962ba9194373d8a41d14eed44f Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 22 Feb 2019 13:23:55 +0100
+Subject: [PATCH] Do not run tests when building
+
+Upstream-Status: Inappropriate [cross-compile specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ tests/meson.build | 17 -----------------
+ 1 file changed, 17 deletions(-)
+
+diff --git a/tests/meson.build b/tests/meson.build
+index 4fa3fbc..6ef7884 100644
+--- a/tests/meson.build
++++ b/tests/meson.build
+@@ -138,23 +138,6 @@ foreach t: installed_tests
+     install_dir: installed_test_bindir,
+   )
+ 
+-  # Two particularly slow tests
+-  if test_suites.contains('slow')
+-    timeout = 300
+-  else
+-    timeout = 30
+-  endif
+-
+-  test(test_name, test_bin,
+-    suite: test_suites,
+-    args: [ '-k', '--tap' ],
+-    env: [
+-      'G_TEST_SRCDIR=@0@'.format(meson.current_source_dir()),
+-      'G_TEST_BUILDDIR=@0@'.format(meson.current_build_dir()),
+-      'GDK_PIXBUF_MODULE_FILE=@0@'.format(loaders_cache.full_path()),
+-    ],
+-    timeout: timeout,
+-  )
+ endforeach
+ 
+ executable('pixbuf-read',

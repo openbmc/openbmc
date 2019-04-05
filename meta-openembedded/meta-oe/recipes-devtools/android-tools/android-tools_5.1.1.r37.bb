@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = " \
     file://${COMMON_LICENSE_DIR}/BSD-3-Clause;md5=550794465ba0ec5312d6919e203a55f9 \
 "
 DEPENDS = "libbsd libpcre zlib libcap"
-DEPENDS_append_class-target = " openssl10"
+DEPENDS_append_class-target = " openssl"
 
 ANDROID_MIRROR = "android.googlesource.com"
 
@@ -37,6 +37,7 @@ SRC_URI = " \
     file://core/0010-Use-linux-capability.h-on-linux-systems-too.patch;patchdir=system/core \
     file://core/0011-Remove-bionic-specific-calls.patch;patchdir=system/core \
     file://core/0012-Fix-implicit-declaration-of-stlcat-strlcopy-function.patch;patchdir=system/core \
+    file://core/adb_libssl_11.diff;patchdir=system/core \
     file://extras/0001-ext4_utils-remove-selinux-extensions.patch;patchdir=system/extras \
     file://extras/0002-ext4_utils-add-o-argument-to-preserve-ownership.patch;patchdir=system/extras \
     file://libselinux/0001-Remove-bionic-specific-calls.patch;patchdir=external/libselinux \
@@ -56,6 +57,9 @@ B = "${WORKDIR}/${BPN}"
 # http://errors.yoctoproject.org/Errors/Details/133881/
 ARM_INSTRUCTION_SET_armv4 = "arm"
 ARM_INSTRUCTION_SET_armv5 = "arm"
+
+COMPATIBLE_HOST_powerpc = "(null)"
+COMPATIBLE_HOST_powerpc64 = "(null)"
 
 inherit systemd
 
@@ -90,6 +94,9 @@ do_compile() {
       ;;
       mips|mipsel)
         export android_arch=linux-mips
+      ;;
+      mips64|mips64el)
+        export android_arch=linux-mips64
       ;;
       powerpc|powerpc64)
         export android_arch=linux-ppc

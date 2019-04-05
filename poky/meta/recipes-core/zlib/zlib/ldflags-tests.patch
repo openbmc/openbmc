@@ -1,0 +1,45 @@
+Obey LDFLAGS for tests
+
+Upstream-Status: Submitted [https://github.com/madler/zlib/pull/409]
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+--- zlib-1.2.8.orig/Makefile.in
++++ zlib-1.2.8/Makefile.in
+@@ -26,7 +26,7 @@ CFLAGS=-O
+
+ SFLAGS=-O
+ LDFLAGS=
+-TEST_LDFLAGS=-L. libz.a
++TEST_LDFLAGS=-L. $(LDFLAGS)
+ LDSHARED=$(CC)
+ CPP=$(CC) -E
+
+@@ -176,22 +176,22 @@ placebo $(SHAREDLIBV): $(PIC_OBJS) libz.
+	-@rmdir objs
+
+ example$(EXE): example.o $(STATICLIB)
+-	$(CC) $(CFLAGS) -o $@ example.o $(TEST_LDFLAGS)
++	$(CC) $(CFLAGS) -o $@ example.o $(TEST_LDFLAGS) $(STATICLIB)
+
+ minigzip$(EXE): minigzip.o $(STATICLIB)
+-	$(CC) $(CFLAGS) -o $@ minigzip.o $(TEST_LDFLAGS)
++	$(CC) $(CFLAGS) -o $@ minigzip.o $(TEST_LDFLAGS) $(STATICLIB)
+
+ examplesh$(EXE): example.o $(SHAREDLIBV)
+-	$(CC) $(CFLAGS) -o $@ example.o -L. $(SHAREDLIBV)
++	$(CC) $(CFLAGS) -o $@ example.o $(TEST_LDFLAGS) $(SHAREDLIBV)
+
+ minigzipsh$(EXE): minigzip.o $(SHAREDLIBV)
+-	$(CC) $(CFLAGS) -o $@ minigzip.o -L. $(SHAREDLIBV)
++	$(CC) $(CFLAGS) -o $@ minigzip.o $(TEST_LDFLAGS) $(SHAREDLIBV)
+
+ example64$(EXE): example64.o $(STATICLIB)
+-	$(CC) $(CFLAGS) -o $@ example64.o $(TEST_LDFLAGS)
++	$(CC) $(CFLAGS) -o $@ example64.o $(TEST_LDFLAGS) $(STATICLIB)
+
+ minigzip64$(EXE): minigzip64.o $(STATICLIB)
+-	$(CC) $(CFLAGS) -o $@ minigzip64.o $(TEST_LDFLAGS)
++	$(CC) $(CFLAGS) -o $@ minigzip64.o $(TEST_LDFLAGS) $(STATICLIB)
+
+ install-libs: $(LIBS)
+	-@if [ ! -d $(DESTDIR)$(exec_prefix)  ]; then mkdir -p $(DESTDIR)$(exec_prefix); fi

@@ -122,7 +122,7 @@ python populate_packages_prepend () {
     pam_filterdir = d.expand('${base_libdir}/security/pam_filter')
     pam_pkgname = mlprefix + 'pam-plugin%s'
 
-    do_split_packages(d, pam_libdir, '^pam(.*)\.so$', pam_pkgname,
+    do_split_packages(d, pam_libdir, r'^pam(.*)\.so$', pam_pkgname,
                       'PAM plugin for %s', hook=pam_plugin_hook, extra_depends='')
     pam_plugin_append_file('%spam-plugin-unix' % mlprefix, pam_sbindir, 'unix_chkpwd')
     pam_plugin_append_file('%spam-plugin-unix' % mlprefix, pam_sbindir, 'unix_update')
@@ -131,7 +131,7 @@ python populate_packages_prepend () {
     pam_plugin_append_file('%spam-plugin-timestamp' % mlprefix, pam_sbindir, 'pam_timestamp_check')
     pam_plugin_append_file('%spam-plugin-mkhomedir' % mlprefix, pam_sbindir, 'mkhomedir_helper')
     pam_plugin_append_file('%spam-plugin-console' % mlprefix, pam_sbindir, 'pam_console_apply')
-    do_split_packages(d, pam_filterdir, '^(.*)$', 'pam-filter-%s', 'PAM filter for %s', extra_depends='')
+    do_split_packages(d, pam_filterdir, r'^(.*)$', 'pam-filter-%s', 'PAM filter for %s', extra_depends='')
 }
 
 do_install() {

@@ -1,4 +1,4 @@
-From da60a2a34a48e2b324fceae608964814488cc8fb Mon Sep 17 00:00:00 2001
+From 469840d211beb22085e57934bda3caabb71a4695 Mon Sep 17 00:00:00 2001
 From: Tomeu Vizoso <tomeu.vizoso@collabora.com>
 Date: Tue, 1 Oct 2013 13:19:20 +0200
 Subject: [PATCH 02/18] wayland: Add support for the Wayland winsys
@@ -91,13 +91,13 @@ index cfc8ae5..673a5ad 100644
  
  # Global include paths
 diff --git a/README.md b/README.md
-index 94b93b8..50b90b1 100644
+index de5754d..2097036 100644
 --- a/README.md
 +++ b/README.md
 @@ -6,3 +6,7 @@ Use buildme to build. It requires cmake to be installed and an arm cross compile
  https://github.com/raspberrypi/tools/tree/master/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian
  
- Note that this repository does not contain the source for the edid_parser and vcdbg binaries due to licensing restrictions.
+ Note that this repository does not contain the source for the edidparser and vcdbg binaries due to licensing restrictions.
 +
 +To build support for the Wayland winsys in EGL, execute the buildme script like this:
 +
@@ -133,10 +133,10 @@ index b8fd440..a780bb6 100755
  
  	if [ "$1" != "" ]; then
 diff --git a/host_applications/linux/apps/raspicam/CMakeLists.txt b/host_applications/linux/apps/raspicam/CMakeLists.txt
-index 42636e8..d47ad55 100644
+index f7db21e..73997b7 100644
 --- a/host_applications/linux/apps/raspicam/CMakeLists.txt
 +++ b/host_applications/linux/apps/raspicam/CMakeLists.txt
-@@ -33,7 +33,7 @@ add_executable(raspividyuv  ${COMMON_SOURCES} RaspiVidYUV.c)
+@@ -54,7 +54,7 @@ add_executable(raspividyuv  ${COMMON_SOURCES} RaspiVidYUV.c)
  
  set (MMAL_LIBS mmal_core mmal_util mmal_vc_client)
  
@@ -1894,5 +1894,5 @@ index 0000000..ad90d30
 +    set(${_sources} ${${_sources}} PARENT_SCOPE)
 +endfunction()
 -- 
-2.19.1
+2.20.1
 

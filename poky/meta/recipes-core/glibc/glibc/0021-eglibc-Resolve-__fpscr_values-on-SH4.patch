@@ -1,7 +1,7 @@
-From 55531ef57d04006c5a1e3b32a8e0410372f86007 Mon Sep 17 00:00:00 2001
+From 19f041215673d4499ee9b23805d5c224c4063689 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:55:53 +0000
-Subject: [PATCH] eglibc: Resolve __fpscr_values on SH4
+Subject: [PATCH 21/30] eglibc: Resolve __fpscr_values on SH4
 
 2010-09-29  Nobuhiro Iwamatsu  <iwamatsu@nigauri.org>
             Andrew Stubbs  <ams@codesourcery.com>
@@ -33,7 +33,7 @@ index e0938c4165..ca1d7da339 100644
      # a*
      alphasort64;
 diff --git a/sysdeps/unix/sysv/linux/sh/sysdep.S b/sysdeps/unix/sysv/linux/sh/sysdep.S
-index c4e28ffb98..648bae03d5 100644
+index 6ce36d6dd5..425811cc77 100644
 --- a/sysdeps/unix/sysv/linux/sh/sysdep.S
 +++ b/sysdeps/unix/sysv/linux/sh/sysdep.S
 @@ -30,3 +30,14 @@ ENTRY (__syscall_error)
@@ -51,3 +51,6 @@ index c4e28ffb98..648bae03d5 100644
 +       .long 0x80000
 +weak_alias (___fpscr_values, __fpscr_values)
 +
+-- 
+2.20.1
+

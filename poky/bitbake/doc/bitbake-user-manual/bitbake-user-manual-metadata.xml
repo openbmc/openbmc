@@ -595,7 +595,7 @@
 
         <para>
             BitBake uses
-            <link linkend='var-OVERRIDES'><filename>OVERRIDES</filename></link>
+            <link linkend='var-bb-OVERRIDES'><filename>OVERRIDES</filename></link>
             to control what variables are overridden after BitBake
             parses recipes and configuration files.
             This section describes how you can use
@@ -705,7 +705,7 @@
 
                         <para>Internally, this is implemented by prepending
                         the task (e.g. "task-compile:") to the value of
-                        <link linkend='var-OVERRIDES'><filename>OVERRIDES</filename></link>
+                        <link linkend='var-bb-OVERRIDES'><filename>OVERRIDES</filename></link>
                         for the local datastore of the <filename>do_compile</filename>
                         task.</para>
 
@@ -868,7 +868,7 @@
 
             <para>
                 BitBake uses the
-                <link linkend='var-BBPATH'><filename>BBPATH</filename></link>
+                <link linkend='var-bb-BBPATH'><filename>BBPATH</filename></link>
                 variable to locate needed include and class files.
                 Additionally, BitBake searches the current directory for
                 <filename>include</filename> and <filename>require</filename>
@@ -1086,7 +1086,7 @@
             <para>
                 When creating a configuration file (<filename>.conf</filename>),
                 you can use the
-                <link linkend='var-INHERIT'><filename>INHERIT</filename></link>
+                <link linkend='var-bb-INHERIT'><filename>INHERIT</filename></link>
                 configuration directive to inherit a class.
                 BitBake only supports this directive when used within
                 a configuration file.
@@ -1370,7 +1370,7 @@
                         </para></listitem>
                     <listitem><para>
                         BitBake-style Python functions generate a separate
-                        <filename>${</filename><link linkend='var-T'><filename>T</filename></link><filename>}/run.</filename><replaceable>function-name</replaceable><filename>.</filename><replaceable>pid</replaceable>
+                        <filename>${</filename><link linkend='var-bb-T'><filename>T</filename></link><filename>}/run.</filename><replaceable>function-name</replaceable><filename>.</filename><replaceable>pid</replaceable>
                         script that is executed to run the function, and also
                         generate a log file in
                         <filename>${T}/log.</filename><replaceable>function-name</replaceable><filename>.</filename><replaceable>pid</replaceable>
@@ -1773,7 +1773,7 @@
                     things exported or listed in its whitelist to ensure that the build
                     environment is reproducible and consistent.
                     You can prevent this "cleaning" by setting the
-                    <link linkend='var-BB_PRESERVE_ENV'><filename>BB_PRESERVE_ENV</filename></link>
+                    <link linkend='var-bb-BB_PRESERVE_ENV'><filename>BB_PRESERVE_ENV</filename></link>
                     variable.
                 </note>
                 Consequently, if you do want something to get passed into the
@@ -1783,9 +1783,9 @@
                         Tell BitBake to load what you want from the environment
                         into the datastore.
                         You can do so through the
-                        <link linkend='var-BB_ENV_WHITELIST'><filename>BB_ENV_WHITELIST</filename></link>
+                        <link linkend='var-bb-BB_ENV_WHITELIST'><filename>BB_ENV_WHITELIST</filename></link>
                         and
-                        <link linkend='var-BB_ENV_EXTRAWHITE'><filename>BB_ENV_EXTRAWHITE</filename></link>
+                        <link linkend='var-bb-BB_ENV_EXTRAWHITE'><filename>BB_ENV_EXTRAWHITE</filename></link>
                         variables.
                         For example, assume you want to prevent the build system from
                         accessing your <filename>$HOME/.ccache</filename>
@@ -1824,7 +1824,7 @@
                 from the original execution environment.
                 Bitbake saves a copy of the original environment into
                 a special variable named
-                <link linkend='var-BB_ORIGENV'><filename>BB_ORIGENV</filename></link>.
+                <link linkend='var-bb-BB_ORIGENV'><filename>BB_ORIGENV</filename></link>.
             </para>
 
             <para>
@@ -1883,7 +1883,7 @@
                 <listitem><para><emphasis><filename>[depends]</filename>:</emphasis>
                     Controls inter-task dependencies.
                     See the
-                    <link linkend='var-DEPENDS'><filename>DEPENDS</filename></link>
+                    <link linkend='var-bb-DEPENDS'><filename>DEPENDS</filename></link>
                     variable and the
                     "<link linkend='inter-task-dependencies'>Inter-Task Dependencies</link>"
                     section for more information.
@@ -1891,7 +1891,7 @@
                 <listitem><para><emphasis><filename>[deptask]</filename>:</emphasis>
                     Controls task build-time dependencies.
                     See the
-                    <link linkend='var-DEPENDS'><filename>DEPENDS</filename></link>
+                    <link linkend='var-bb-DEPENDS'><filename>DEPENDS</filename></link>
                     variable and the
                     "<link linkend='build-dependencies'>Build Dependencies</link>"
                     section for more information.
@@ -1937,7 +1937,7 @@
                     of cores but certain tasks need to be rate-limited due to various
                     kinds of resource constraints (e.g. to avoid network throttling).
                     <filename>number_threads</filename> works similarly to the
-                    <link linkend='var-BB_NUMBER_THREADS'><filename>BB_NUMBER_THREADS</filename></link>
+                    <link linkend='var-bb-BB_NUMBER_THREADS'><filename>BB_NUMBER_THREADS</filename></link>
                     variable but is task-specific.</para>
 
                     <para>Set the value globally.
@@ -1971,9 +1971,9 @@
                 <listitem><para><emphasis><filename>[rdepends]</filename>:</emphasis>
                     Controls inter-task runtime dependencies.
                     See the
-                    <link linkend='var-RDEPENDS'><filename>RDEPENDS</filename></link>
+                    <link linkend='var-bb-RDEPENDS'><filename>RDEPENDS</filename></link>
                     variable, the
-                    <link linkend='var-RRECOMMENDS'><filename>RRECOMMENDS</filename></link>
+                    <link linkend='var-bb-RRECOMMENDS'><filename>RRECOMMENDS</filename></link>
                     variable, and the
                     "<link linkend='inter-task-dependencies'>Inter-Task Dependencies</link>"
                     section for more information.
@@ -1981,9 +1981,9 @@
                 <listitem><para><emphasis><filename>[rdeptask]</filename>:</emphasis>
                     Controls task runtime dependencies.
                     See the
-                    <link linkend='var-RDEPENDS'><filename>RDEPENDS</filename></link>
+                    <link linkend='var-bb-RDEPENDS'><filename>RDEPENDS</filename></link>
                     variable, the
-                    <link linkend='var-RRECOMMENDS'><filename>RRECOMMENDS</filename></link>
+                    <link linkend='var-bb-RRECOMMENDS'><filename>RRECOMMENDS</filename></link>
                     variable, and the
                     "<link linkend='runtime-dependencies'>Runtime Dependencies</link>"
                     section for more information.
@@ -1996,9 +1996,9 @@
                 <listitem><para><emphasis><filename>[recrdeptask]</filename>:</emphasis>
                     Controls task recursive runtime dependencies.
                     See the
-                    <link linkend='var-RDEPENDS'><filename>RDEPENDS</filename></link>
+                    <link linkend='var-bb-RDEPENDS'><filename>RDEPENDS</filename></link>
                     variable, the
-                    <link linkend='var-RRECOMMENDS'><filename>RRECOMMENDS</filename></link>
+                    <link linkend='var-bb-RRECOMMENDS'><filename>RRECOMMENDS</filename></link>
                     variable, and the
                     "<link linkend='recursive-dependencies'>Recursive Dependencies</link>"
                     section for more information.
@@ -2127,7 +2127,7 @@
                     Any given datastore only has one such event executed
                     against it, however.
                     If
-                    <link linkende='var-BB_INVALIDCONF'><filename>BB_INVALIDCONF</filename></link>
+                    <link linkende='var-bb-BB_INVALIDCONF'><filename>BB_INVALIDCONF</filename></link>
                     is set in the datastore by the event handler, the
                     configuration is reparsed and a new event triggered,
                     allowing the metadata to update configuration.
@@ -2256,17 +2256,17 @@
             from a single recipe file multiple incarnations of that
             recipe file where all incarnations are buildable.
             These features are enabled through the
-            <link linkend='var-BBCLASSEXTEND'><filename>BBCLASSEXTEND</filename></link>
+            <link linkend='var-bb-BBCLASSEXTEND'><filename>BBCLASSEXTEND</filename></link>
             and
-            <link linkend='var-BBVERSIONS'><filename>BBVERSIONS</filename></link>
+            <link linkend='var-bb-BBVERSIONS'><filename>BBVERSIONS</filename></link>
             variables.
             <note>
                 The mechanism for this class extension is extremely
                 specific to the implementation.
                 Usually, the recipe's
-                <link linkend='var-PROVIDES'><filename>PROVIDES</filename></link>,
-                <link linkend='var-PN'><filename>PN</filename></link>, and
-                <link linkend='var-DEPENDS'><filename>DEPENDS</filename></link>
+                <link linkend='var-bb-PROVIDES'><filename>PROVIDES</filename></link>,
+                <link linkend='var-bb-PN'><filename>PN</filename></link>, and
+                <link linkend='var-bb-DEPENDS'><filename>DEPENDS</filename></link>
                 variables would need to be modified by the extension class.
                 For specific examples, see the OE-Core
                 <filename>native</filename>, <filename>nativesdk</filename>,
@@ -2287,7 +2287,7 @@
                     project from a single recipe file.
                     You can also specify conditional metadata
                     (using the
-                    <link linkend='var-OVERRIDES'><filename>OVERRIDES</filename></link>
+                    <link linkend='var-bb-OVERRIDES'><filename>OVERRIDES</filename></link>
                     mechanism) for a single version, or an optionally named range of versions.
                     Here is an example:
                     <literallayout class='monospaced'>
@@ -2306,7 +2306,7 @@
                     into overrides, but it is also made available for the metadata to use
                     in the variable that defines the base recipe versions for use in
                     <filename>file://</filename> search paths
-                    (<link linkend='var-FILESPATH'><filename>FILESPATH</filename></link>).
+                    (<link linkend='var-bb-FILESPATH'><filename>FILESPATH</filename></link>).
                     </para></listitem>
             </itemizedlist>
         </para>
@@ -2408,7 +2408,7 @@
 
             <para>
                 BitBake uses the
-                <link linkend='var-DEPENDS'><filename>DEPENDS</filename></link>
+                <link linkend='var-bb-DEPENDS'><filename>DEPENDS</filename></link>
                 variable to manage build time dependencies.
                 The <filename>[deptask]</filename> varflag for tasks
                 signifies the task of each
@@ -2429,9 +2429,9 @@
 
             <para>
                 BitBake uses the
-                <link linkend='var-PACKAGES'><filename>PACKAGES</filename></link>,
-                <link linkend='var-RDEPENDS'><filename>RDEPENDS</filename></link>, and
-                <link linkend='var-RRECOMMENDS'><filename>RRECOMMENDS</filename></link>
+                <link linkend='var-bb-PACKAGES'><filename>PACKAGES</filename></link>,
+                <link linkend='var-bb-RDEPENDS'><filename>RDEPENDS</filename></link>, and
+                <link linkend='var-bb-RRECOMMENDS'><filename>RRECOMMENDS</filename></link>
                 variables to manage runtime dependencies.
             </para>
 
@@ -2686,7 +2686,7 @@
 
         <para>
             These checksums are stored in
-            <link linkend='var-STAMP'><filename>STAMP</filename></link>.
+            <link linkend='var-bb-STAMP'><filename>STAMP</filename></link>.
             You can examine the checksums using the following BitBake command:
             <literallayout class='monospaced'>
      $ bitbake-dumpsigs
@@ -2708,44 +2708,44 @@
             The following list describes related variables:
             <itemizedlist>
                 <listitem><para>
-                    <link linkend='var-BB_HASHCHECK_FUNCTION'><filename>BB_HASHCHECK_FUNCTION</filename></link>:
+                    <link linkend='var-bb-BB_HASHCHECK_FUNCTION'><filename>BB_HASHCHECK_FUNCTION</filename></link>:
                     Specifies the name of the function to call during
                     the "setscene" part of the task's execution in order
                     to validate the list of task hashes.
                     </para></listitem>
                 <listitem><para>
-                    <link linkend='var-BB_SETSCENE_DEPVALID'><filename>BB_SETSCENE_DEPVALID</filename></link>:
+                    <link linkend='var-bb-BB_SETSCENE_DEPVALID'><filename>BB_SETSCENE_DEPVALID</filename></link>:
                     Specifies a function BitBake calls that determines
                     whether BitBake requires a setscene dependency to
                     be met.
                     </para></listitem>
                 <listitem><para>
-                    <link linkend='var-BB_SETSCENE_VERIFY_FUNCTION2'><filename>BB_SETSCENE_VERIFY_FUNCTION2</filename></link>:
+                    <link linkend='var-bb-BB_SETSCENE_VERIFY_FUNCTION2'><filename>BB_SETSCENE_VERIFY_FUNCTION2</filename></link>:
                     Specifies a function to call that verifies the list of
                     planned task execution before the main task execution
                     happens.
                     </para></listitem>
                 <listitem><para>
-                    <link linkend='var-BB_STAMP_POLICY'><filename>BB_STAMP_POLICY</filename></link>:
+                    <link linkend='var-bb-BB_STAMP_POLICY'><filename>BB_STAMP_POLICY</filename></link>:
                     Defines the mode for comparing timestamps of stamp files.
                     </para></listitem>
                 <listitem><para>
-                    <link linkend='var-BB_STAMP_WHITELIST'><filename>BB_STAMP_WHITELIST</filename></link>:
+                    <link linkend='var-bb-BB_STAMP_WHITELIST'><filename>BB_STAMP_WHITELIST</filename></link>:
                     Lists stamp files that are looked at when the stamp policy
                     is "whitelist".
                     </para></listitem>
                 <listitem><para>
-                    <link linkend='var-BB_TASKHASH'><filename>BB_TASKHASH</filename></link>:
+                    <link linkend='var-bb-BB_TASKHASH'><filename>BB_TASKHASH</filename></link>:
                     Within an executing task, this variable holds the hash
                     of the task as returned by the currently enabled
                     signature generator.
                     </para></listitem>
                 <listitem><para>
-                    <link linkend='var-STAMP'><filename>STAMP</filename></link>:
+                    <link linkend='var-bb-STAMP'><filename>STAMP</filename></link>:
                     The base path to create stamp files.
                     </para></listitem>
                 <listitem><para>
-                    <link linkend='var-STAMPCLEAN'><filename>STAMPCLEAN</filename></link>:
+                    <link linkend='var-bb-STAMPCLEAN'><filename>STAMPCLEAN</filename></link>:
                     Again, the base path to create stamp files but can use wildcards
                     for matching a range of files for clean operations.
                     </para></listitem>

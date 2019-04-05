@@ -1,7 +1,7 @@
-From 6c23660d035e71de0e20b40460ad3050bd057665 Mon Sep 17 00:00:00 2001
+From 8c4d7d70a84a69fe5e8d69539368aa11f8fe20aa Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 31 Dec 2015 15:15:09 -0800
-Subject: [PATCH] eglibc: Clear cache lines on ppc8xx
+Subject: [PATCH 20/30] eglibc: Clear cache lines on ppc8xx
 
 2007-06-13  Nathan Sidwell  <nathan@codesourcery.com>
             Mark Shinwell  <shinwell@codesourcery.com>
@@ -21,7 +21,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 28 insertions(+), 2 deletions(-)
 
 diff --git a/sysdeps/unix/sysv/linux/powerpc/dl-sysdep.c b/sysdeps/unix/sysv/linux/powerpc/dl-sysdep.c
-index 78051bc7bc..e24f442320 100644
+index b04ecc4a4c..75bda97241 100644
 --- a/sysdeps/unix/sysv/linux/powerpc/dl-sysdep.c
 +++ b/sysdeps/unix/sysv/linux/powerpc/dl-sysdep.c
 @@ -24,9 +24,21 @@ int __cache_line_size attribute_hidden;
@@ -48,7 +48,7 @@ index 78051bc7bc..e24f442320 100644
  	break;
  
 diff --git a/sysdeps/unix/sysv/linux/powerpc/libc-start.c b/sysdeps/unix/sysv/linux/powerpc/libc-start.c
-index f2ad0c355d..3e6773795e 100644
+index 4fd5f70700..1a21e4675c 100644
 --- a/sysdeps/unix/sysv/linux/powerpc/libc-start.c
 +++ b/sysdeps/unix/sysv/linux/powerpc/libc-start.c
 @@ -73,11 +73,25 @@ __libc_start_main (int argc, char **argv,
@@ -78,3 +78,6 @@ index f2ad0c355d..3e6773795e 100644
  	__cache_line_size = av->a_un.a_val;
  	break;
  #ifndef SHARED
+-- 
+2.20.1
+

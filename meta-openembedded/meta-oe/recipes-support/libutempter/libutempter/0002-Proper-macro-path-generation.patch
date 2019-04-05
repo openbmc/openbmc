@@ -1,0 +1,34 @@
+From 48b6bcf9f5d8a05eace4bc463c47e8a4715d3000 Mon Sep 17 00:00:00 2001
+From: iddinev <xidinev@gmail.com>
+Date: Mon, 18 Mar 2019 15:45:20 +0200
+Subject: [PATCH] Proper macro path generation.
+
+Signed-off-by: iddinev <xidinev@gmail.com>
+---
+ libutempter/iface.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git libutempter/iface.c libutempter/iface.c
+index 27793f0..c1c0ee9 100644
+--- libutempter/iface.c
++++ libutempter/iface.c
+@@ -44,13 +44,12 @@
+ #endif
+ 
+ #ifdef  LIBEXECDIR
+-#  define CAT_PATH(DIR1,DIR2)           DIR1##DIR2
+-#  define RAW_UTEMPTER_PATH             CAT_PATH(LIBEXECDIR,/utempter/utempter)
++#  define UTEMPTER_DEFAULT_PATHNAME     XSTR_PATH(LIBEXECDIR)"/utempter/utempter"
+ #else
+-#  define RAW_UTEMPTER_PATH             /usr/lib/libtempter/utempter/utempter
++#  define UTEMPTER_DEFAULT_PATHNAME     STR_PATH(/usr/lib/libtempter/utempter/utempter)
+ #endif
+ #define STR_PATH(RAW_STR)               #RAW_STR
+-#define UTEMPTER_DEFAULT_PATHNAME       STR_PATH(RAW_UTEMPTER_PATH)
++#define XSTR_PATH(STR)                  STR_PATH(STR)
+ 
+ static const char *utempter_pathname;
+ static int saved_fd = -1;
+-- 
+2.7.4
+

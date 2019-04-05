@@ -3,18 +3,18 @@
 # For more informaiton https://github.com/nexB/scancode-toolkit
 
 SCANCODE_FORMAT ?= "html-app"
-EXT = "${@'html' if d.getVar('SCANCODE_FORMAT', True) == 'html-app' else 'json'}"
+EXT = "${@'html' if d.getVar('SCANCODE_FORMAT') == 'html-app' else 'json'}"
 SCANCODE_TOOLKIT = "${@get_scancode_toolkit(d)}"
 SCANCODE_TAG = "v2.2.1"
 SCANCODE_GIT_LOCATION ?= "https://github.com/nexB/scancode-toolkit.git"
 SCANCODE_SRC_LOCATION ?= "${DL_DIR}/scancode"
 
 def get_scancode_toolkit(d):
-    lf = bb.utils.lockfile(d.getVar('SCANCODE_SRC_LOCATION', True) + ".lock")
-    if (not os.path.exists(d.getVar('SCANCODE_SRC_LOCATION', True))):
-        os.system("git clone %s %s -b %s" % (d.getVar('SCANCODE_GIT_LOCATION', True), d.getVar('SCANCODE_SRC_LOCATION', True), d.getVar('SCANCODE_TAG', True)))
+    lf = bb.utils.lockfile(d.getVar('SCANCODE_SRC_LOCATION') + ".lock")
+    if (not os.path.exists(d.getVar('SCANCODE_SRC_LOCATION'))):
+        os.system("git clone %s %s -b %s" % (d.getVar('SCANCODE_GIT_LOCATION'), d.getVar('SCANCODE_SRC_LOCATION'), d.getVar('SCANCODE_TAG')))
     bb.utils.unlockfile(lf)
-    return (d.getVar('SCANCODE_SRC_LOCATION', True))
+    return (d.getVar('SCANCODE_SRC_LOCATION'))
 
 do_scancode() {
 	mkdir -p ${DEPLOY_DIR_IMAGE}/scancode

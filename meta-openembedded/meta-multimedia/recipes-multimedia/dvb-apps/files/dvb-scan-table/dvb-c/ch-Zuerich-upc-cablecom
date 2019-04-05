@@ -1,0 +1,11 @@
+# upc cablecom
+# Zurich, Switzerland
+# freq sr fec mod
+[CHANNEL]
+	DELIVERY_SYSTEM = DVBC/ANNEX_A
+	FREQUENCY = 410000000
+	SYMBOL_RATE = 6900000
+	INNER_FEC = NONE
+	MODULATION = QAM/64
+	INVERSION = AUTO
+

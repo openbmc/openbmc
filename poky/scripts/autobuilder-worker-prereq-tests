@@ -15,6 +15,12 @@
 # test buildistory git repo works?
 #
 
+if [ ! -x $HOME/yocto-autobuilder-helper/scripts/checkvnc ]; then
+    echo "$HOME/yocto-autobuilder-helper should be created."
+    exit 1
+fi
+$HOME/yocto-autobuilder-helper/scripts/checkvnc
+
 . ./oe-init-build-env > /dev/null
 if [ "$?" != "0" ]; then
     exit 1
@@ -53,12 +59,12 @@ if [ ! -e bzImage-qemux86-64.bin ]; then
 fi
 popd
 bitbake qemu-helper-native
-runqemu qemux86-64
+DISPLAY=:1 runqemu serialstdio qemux86-64
 if [ "$?" != "0" ]; then
     echo "Unable to use runqemu"
     exit 1
 fi
-runqemu qemux86-64 kvm
+DISPLAY=:1 runqemu serialstdio qemux86-64 kvm
 if [ "$?" != "0" ]; then
     echo "Unable to use runqemu with kvm"
     exit 1

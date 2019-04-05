@@ -1,15 +1,22 @@
-Update permissions of executable files that remove setuid bit and make everyone
-could read.
+From d9498d10d0e8241749835dbc9fa229465d4fdfd7 Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Wed, 6 Feb 2019 13:58:04 +0000
+Subject: [PATCH] Fix permissions
+
+Update permissions of executable files that remove setuid bit and make
+everyone could read.
 
 Upstream-Status: Inappropriate [embedded specific]
-
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
+ Makefile | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
 diff --git a/Makefile b/Makefile
-index a65b9b6..21d9828 100644
+index 3bf5929..1221ee4 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -66,7 +66,7 @@ systemdinstall:	genericinstall
+@@ -72,7 +72,7 @@ systemdinstall:	genericinstall
  		chmod 0644            $(DESTDIR)$(SYSDPATH)/atopacct.service
  		cp atop.cronsystemd   $(DESTDIR)$(CRNPATH)/atop
  		cp atop-pm.sh         $(DESTDIR)$(PMPATHD)
@@ -18,7 +25,7 @@ index a65b9b6..21d9828 100644
  		#
  		# only when making on target system:
  		#
-@@ -91,11 +91,11 @@ sysvinstall:	genericinstall
+@@ -97,11 +97,11 @@ sysvinstall:	genericinstall
  		#
  		if [   -d $(DESTDIR)$(PMPATH1) ]; 			\
  		then	cp 45atoppm $(DESTDIR)$(PMPATH1); 		\
@@ -32,7 +39,7 @@ index a65b9b6..21d9828 100644
  		fi
  		#
  		#
-@@ -139,7 +139,7 @@ genericinstall:	atop atopacctd
+@@ -145,7 +145,7 @@ genericinstall:	atop atopacctd atopconvert
  		#
  		cp atop   		$(DESTDIR)$(BINPATH)/atop
  		chown root		$(DESTDIR)$(BINPATH)/atop
@@ -41,12 +48,12 @@ index a65b9b6..21d9828 100644
  		ln -sf atop             $(DESTDIR)$(BINPATH)/atopsar
  		cp atopacctd  		$(DESTDIR)$(SBINPATH)/atopacctd
  		chown root		$(DESTDIR)$(SBINPATH)/atopacctd
-@@ -147,7 +147,7 @@ genericinstall:	atop atopacctd
- 		cp atop   		$(DESTDIR)$(BINPATH)/atop-$(VERS)
- 		ln -sf atop-$(VERS)     $(DESTDIR)$(BINPATH)/atopsar-$(VERS)
+@@ -159,7 +159,7 @@ genericinstall:	atop atopacctd atopconvert
+ 		chown root		$(DESTDIR)$(BINPATH)/atopconvert
+ 		chmod 0711 		$(DESTDIR)$(BINPATH)/atopconvert
  		cp atop.daily    	$(DESTDIR)$(SCRPATH)
 -		chmod 0711 	 	$(DESTDIR)$(SCRPATH)/atop.daily
 +		chmod 0755 	 	$(DESTDIR)$(SCRPATH)/atop.daily
  		cp man/atop.1    	$(DESTDIR)$(MAN1PATH)
  		cp man/atopsar.1 	$(DESTDIR)$(MAN1PATH)
- 		cp man/atoprc.5  	$(DESTDIR)$(MAN5PATH)
+ 		cp man/atopconvert.1 	$(DESTDIR)$(MAN1PATH)

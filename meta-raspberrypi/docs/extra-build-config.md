@@ -13,9 +13,6 @@ specific to it. For the rest please check:
 2. Overwrite SDIMG_ROOTFS_TYPE in local.conf
     * `SDIMG_ROOTFS_TYPE = "ext3.xz"`
 
-3. Overwrite SDIMG_COMPRESSION in local.conf
-    * `SDIMG_COMPRESSION = "xz"`
-
 Accommodate the values above to your own needs (ex: ext3 / ext4).
 
 ## GPU memory
@@ -245,6 +242,15 @@ When using device tree kernels, set this variable to enable the 802.15.4 hat:
     ENABLE_AT86RF = "1"
 
 See: <https://openlabs.co/OSHW/Raspberry-Pi-802.15.4-radio>
+
+## Enable CAN with Pican2
+
+In order to use Pican2 CAN module, set the following variables:
+
+	ENABLE_SPI_BUS = "1"
+	ENABLE_CAN = "1"
+
+See: <http://skpang.co.uk/catalog/pican2-canbus-board-for-raspberry-pi-23-p-1475.html>
 
 ## Manual additions to config.txt
 

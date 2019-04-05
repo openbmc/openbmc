@@ -31,7 +31,3 @@ RDEPENDS_bluez5 = " \
          pulseaudio-module-loopback', \
         '', d)} \
 "
-
-# Install bluez4 tools or bluez5 tools depending on what is specified in the distro.
-# Otherwise install nothing.
-RDEPENDS_${PN} = "${RDEPENDS_${BLUEZ}}"

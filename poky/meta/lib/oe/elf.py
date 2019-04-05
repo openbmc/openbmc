@@ -63,6 +63,7 @@ def machine_dict(d):
                         "arm" :       (  40,    97,    0,          True,          32),
                         "armeb":      (  40,    97,    0,          False,         32),
                         "powerpc":    (  20,     0,    0,          False,         32),
+                        "powerpc64":  (  21,     0,    0,          False,         64),
                         "i386":       (   3,     0,    0,          True,          32),
                         "i486":       (   3,     0,    0,          True,          32),
                         "i586":       (   3,     0,    0,          True,          32),

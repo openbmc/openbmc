@@ -1,0 +1,179 @@
+From 90ba174fcea1618af57aa594199541d47a89b7f6 Mon Sep 17 00:00:00 2001
+From: William S Fulton <wsf@fultondesigns.co.uk>
+Date: Sun, 17 Sep 2017 19:02:55 +0100
+Subject: [PATCH 1/2] Fix generated code for constant expressions containing
+ wchar_t L literals.
+
+Such as:
+  # define __WCHAR_MAX    (0x7fffffff + L'\0')
+
+Reported on swig-user mailing list.
+---
+ CHANGES.current                                         | 5 +++++
+ Examples/test-suite/csharp/preproc_constants_c_runme.cs | 3 ++-
+ Examples/test-suite/csharp/preproc_constants_runme.cs   | 2 ++
+ Examples/test-suite/d/preproc_constants_c_runme.1.d     | 2 ++
+ Examples/test-suite/d/preproc_constants_c_runme.2.d     | 2 ++
+ Examples/test-suite/d/preproc_constants_runme.1.d       | 2 ++
+ Examples/test-suite/d/preproc_constants_runme.2.d       | 2 ++
+ Examples/test-suite/php/preproc_constants_c_runme.php   | 2 ++
+ Examples/test-suite/php/preproc_constants_runme.php     | 2 ++
+ Examples/test-suite/php5/preproc_constants_c_runme.php  | 2 ++
+ Examples/test-suite/php5/preproc_constants_runme.php    | 2 ++
+ Examples/test-suite/preproc_constants.i                 | 3 +++
+ Source/CParse/parser.y                                  | 2 +-
+ 13 files changed, 29 insertions(+), 2 deletions(-)
+
+Upstream-Status: Backport
+[https://github.com/swig/swig/commit/90ba174fcea1618af57aa594199541d47a89b7f6]
+Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
+
+diff --git a/Examples/test-suite/csharp/preproc_constants_c_runme.cs b/Examples/test-suite/csharp/preproc_constants_c_runme.cs
+index 76c684d..1c28e49 100644
+--- a/Examples/test-suite/csharp/preproc_constants_c_runme.cs
++++ b/Examples/test-suite/csharp/preproc_constants_c_runme.cs
+@@ -61,7 +61,8 @@ public class runme {
+     assert( typeof(int) == preproc_constants_c.EXPR_LAND.GetType() );
+     assert( typeof(int) == preproc_constants_c.EXPR_LOR.GetType() );
+     assert( typeof(double) == preproc_constants_c.EXPR_CONDITIONAL.GetType() );
+-
++    assert( typeof(int) == preproc_constants_c.EXPR_WCHAR_MAX.GetType() );
++    assert( typeof(int) == preproc_constants_c.EXPR_WCHAR_MIN.GetType() );
+   }
+   static void assert(bool assertion) {
+     if (!assertion)
+diff --git a/Examples/test-suite/csharp/preproc_constants_runme.cs b/Examples/test-suite/csharp/preproc_constants_runme.cs
+index 9fae591..6b02e30 100644
+--- a/Examples/test-suite/csharp/preproc_constants_runme.cs
++++ b/Examples/test-suite/csharp/preproc_constants_runme.cs
+@@ -60,6 +60,8 @@ public class runme {
+     assert( typeof(bool) == preproc_constants.EXPR_LAND.GetType() );
+     assert( typeof(bool) == preproc_constants.EXPR_LOR.GetType() );
+     assert( typeof(double) == preproc_constants.EXPR_CONDITIONAL.GetType() );
++    assert( typeof(int) == preproc_constants.EXPR_WCHAR_MAX.GetType() );
++    assert( typeof(int) == preproc_constants.EXPR_WCHAR_MIN.GetType() );
+ 
+   }
+   static void assert(bool assertion) {
+diff --git a/Examples/test-suite/d/preproc_constants_c_runme.1.d b/Examples/test-suite/d/preproc_constants_c_runme.1.d
+index d846c71..2b349af 100644
+--- a/Examples/test-suite/d/preproc_constants_c_runme.1.d
++++ b/Examples/test-suite/d/preproc_constants_c_runme.1.d
+@@ -61,4 +61,6 @@ void main() {
+   static assert(is(int == typeof(EXPR_LAND())));
+   static assert(is(int == typeof(EXPR_LOR())));
+   static assert(is(double == typeof(EXPR_CONDITIONAL())));
++  static assert(is(int == typeof(EXPR_WCHAR_MAX())));
++  static assert(is(int == typeof(EXPR_WCHAR_MIN())));
+ }
+diff --git a/Examples/test-suite/d/preproc_constants_c_runme.2.d b/Examples/test-suite/d/preproc_constants_c_runme.2.d
+index 9bdbb93..1bac525 100644
+--- a/Examples/test-suite/d/preproc_constants_c_runme.2.d
++++ b/Examples/test-suite/d/preproc_constants_c_runme.2.d
+@@ -61,4 +61,6 @@ void main() {
+   static assert(is(int == typeof(EXPR_LAND())));
+   static assert(is(int == typeof(EXPR_LOR())));
+   static assert(is(double == typeof(EXPR_CONDITIONAL())));
++  static assert(is(int == typeof(EXPR_WCHAR_MAX())));
++  static assert(is(int == typeof(EXPR_WCHAR_MIN())));
+ }
+diff --git a/Examples/test-suite/d/preproc_constants_runme.1.d b/Examples/test-suite/d/preproc_constants_runme.1.d
+index 009405f..f743f48 100644
+--- a/Examples/test-suite/d/preproc_constants_runme.1.d
++++ b/Examples/test-suite/d/preproc_constants_runme.1.d
+@@ -60,4 +60,6 @@ void main() {
+   static assert(is(bool == typeof(EXPR_LAND())));
+   static assert(is(bool == typeof(EXPR_LOR())));
+   static assert(is(double == typeof(EXPR_CONDITIONAL())));
++  static assert(is(int == typeof(EXPR_WCHAR_MAX())));
++  static assert(is(int == typeof(EXPR_WCHAR_MIN())));
+ }
+diff --git a/Examples/test-suite/d/preproc_constants_runme.2.d b/Examples/test-suite/d/preproc_constants_runme.2.d
+index 2d92ef0..0d96c37 100644
+--- a/Examples/test-suite/d/preproc_constants_runme.2.d
++++ b/Examples/test-suite/d/preproc_constants_runme.2.d
+@@ -60,4 +60,6 @@ void main() {
+   static assert(is(bool == typeof(EXPR_LAND())));
+   static assert(is(bool == typeof(EXPR_LOR())));
+   static assert(is(double == typeof(EXPR_CONDITIONAL())));
++  static assert(is(int == typeof(EXPR_WCHAR_MAX())));
++  static assert(is(int == typeof(EXPR_WCHAR_MIN())));
+ }
+diff --git a/Examples/test-suite/php/preproc_constants_c_runme.php b/Examples/test-suite/php/preproc_constants_c_runme.php
+index af9b76e..e59fe18 100644
+--- a/Examples/test-suite/php/preproc_constants_c_runme.php
++++ b/Examples/test-suite/php/preproc_constants_c_runme.php
+@@ -62,5 +62,7 @@ check::equal(gettype(preproc_constants_c::EXPR_OR), "integer", "preproc_constant
+ check::equal(gettype(preproc_constants_c::EXPR_LAND), "integer", "preproc_constants.EXPR_LAND has unexpected type");
+ check::equal(gettype(preproc_constants_c::EXPR_LOR), "integer", "preproc_constants.EXPR_LOR has unexpected type");
+ check::equal(gettype(preproc_constants_c::EXPR_CONDITIONAL), "double", "preproc_constants.EXPR_CONDITIONAL has unexpected type");
++check::equal(gettype(preproc_constants_c::EXPR_WCHAR_MAX), "integer", "preproc_constants.EXPR_WCHAR_MAX has unexpected type");
++check::equal(gettype(preproc_constants_c::EXPR_WCHAR_MIN), "integer", "preproc_constants.EXPR_WCHAR_MIN has unexpected type");
+ 
+ ?>
+diff --git a/Examples/test-suite/php/preproc_constants_runme.php b/Examples/test-suite/php/preproc_constants_runme.php
+index 5c9119b..8e117ea 100644
+--- a/Examples/test-suite/php/preproc_constants_runme.php
++++ b/Examples/test-suite/php/preproc_constants_runme.php
+@@ -61,5 +61,7 @@ check::equal(gettype(preproc_constants::EXPR_OR), "integer", "preproc_constants.
+ check::equal(gettype(preproc_constants::EXPR_LAND), "boolean", "preproc_constants.EXPR_LAND has unexpected type");
+ check::equal(gettype(preproc_constants::EXPR_LOR), "boolean", "preproc_constants.EXPR_LOR has unexpected type");
+ check::equal(gettype(preproc_constants::EXPR_CONDITIONAL), "double", "preproc_constants.EXPR_CONDITIONAL has unexpected type");
++check::equal(gettype(preproc_constants::EXPR_WCHAR_MAX), "integer", "preproc_constants.EXPR_WCHAR_MAX has unexpected type");
++check::equal(gettype(preproc_constants::EXPR_WCHAR_MIN), "integer", "preproc_constants.EXPR_WCHAR_MIN has unexpected type");
+ 
+ ?>
+diff --git a/Examples/test-suite/php5/preproc_constants_c_runme.php b/Examples/test-suite/php5/preproc_constants_c_runme.php
+index 1ea0195..d978fab 100644
+--- a/Examples/test-suite/php5/preproc_constants_c_runme.php
++++ b/Examples/test-suite/php5/preproc_constants_c_runme.php
+@@ -62,5 +62,7 @@ check::equal(gettype(preproc_constants_c::EXPR_OR), "integer", "preproc_constant
+ check::equal(gettype(preproc_constants_c::EXPR_LAND), "integer", "preproc_constants.EXPR_LAND has unexpected type");
+ check::equal(gettype(preproc_constants_c::EXPR_LOR), "integer", "preproc_constants.EXPR_LOR has unexpected type");
+ check::equal(gettype(preproc_constants_c::EXPR_CONDITIONAL), "double", "preproc_constants.EXPR_CONDITIONAL has unexpected type");
++check::equal(gettype(preproc_constants_c::EXPR_WCHAR_MAX), "integer", "preproc_constants.EXPR_WCHAR_MAX has unexpected type");
++check::equal(gettype(preproc_constants_c::EXPR_WCHAR_MIN), "integer", "preproc_constants.EXPR_WCHAR_MIN has unexpected type");
+ 
+ ?>
+diff --git a/Examples/test-suite/php5/preproc_constants_runme.php b/Examples/test-suite/php5/preproc_constants_runme.php
+index fb9ee4f..7527026 100644
+--- a/Examples/test-suite/php5/preproc_constants_runme.php
++++ b/Examples/test-suite/php5/preproc_constants_runme.php
+@@ -70,5 +70,7 @@ check::equal(gettype(preproc_constants::EXPR_LAND), "integer", "preproc_constant
+ check::equal(gettype(preproc_constants::EXPR_LOR), "integer", "preproc_constants.EXPR_LOR has unexpected type");
+ 
+ check::equal(gettype(preproc_constants::EXPR_CONDITIONAL), "double", "preproc_constants.EXPR_CONDITIONAL has unexpected type");
++check::equal(gettype(preproc_constants::EXPR_WCHAR_MAX), "integer", "preproc_constants.EXPR_WCHAR_MAX has unexpected type");
++check::equal(gettype(preproc_constants::EXPR_WCHAR_MIN), "integer", "preproc_constants.EXPR_WCHAR_MIN has unexpected type");
+ 
+ ?>
+diff --git a/Examples/test-suite/preproc_constants.i b/Examples/test-suite/preproc_constants.i
+index 3a999ad..16b44c9 100644
+--- a/Examples/test-suite/preproc_constants.i
++++ b/Examples/test-suite/preproc_constants.i
+@@ -87,6 +87,9 @@
+ #define EXPR_LOR         0xFF || 1
+ #define EXPR_CONDITIONAL true ? 2 : 2.2
+ 
++#define EXPR_WCHAR_MAX   (0x7fffffff + L'\0')
++#define EXPR_WCHAR_MIN   (-EXPR_WCHAR_MAX - 1)
++
+ #define EXPR_CHAR_COMPOUND_ADD 'A' + 12
+ #define EXPR_CHAR_COMPOUND_LSHIFT 'B' << 6
+ #define H_SUPPRESS_SCALING_MAGIC (('s'<<24) | ('u'<<16) | ('p'<<8) | 'p')
+diff --git a/Source/CParse/parser.y b/Source/CParse/parser.y
+index 2e92cd0..273dadb 100644
+--- a/Source/CParse/parser.y
++++ b/Source/CParse/parser.y
+@@ -194,7 +194,7 @@ int SWIG_cparse_template_reduce(int treduce) {
+  * ----------------------------------------------------------------------------- */
+ 
+ static int promote_type(int t) {
+-  if (t <= T_UCHAR || t == T_CHAR) return T_INT;
++  if (t <= T_UCHAR || t == T_CHAR || t == T_WCHAR) return T_INT;
+   return t;
+ }
+ 
+-- 
+2.9.5
+

@@ -129,7 +129,7 @@ def findPreferredProvider(pn, cfgData, dataCache, pkg_pn = None, item = None):
         preferred_v = cfgData.getVar("PREFERRED_VERSION")
 
     if preferred_v:
-        m = re.match('(\d+:)*(.*)(_.*)*', preferred_v)
+        m = re.match(r'(\d+:)*(.*)(_.*)*', preferred_v)
         if m:
             if m.group(1):
                 preferred_e = m.group(1)[:-1]
@@ -384,7 +384,7 @@ def getRuntimeProviders(dataCache, rdepend):
 
     # Only search dynamic packages if we can't find anything in other variables
     for pattern in dataCache.packages_dynamic:
-        pattern = pattern.replace('+', "\+")
+        pattern = pattern.replace(r'+', r"\+")
         if pattern in regexp_cache:
             regexp = regexp_cache[pattern]
         else:

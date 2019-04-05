@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=e7807a6282784a7dde4c846626b08fc6 \
 
 SECTION = "devel"
 
-DEPENDS = "libpcre"
+DEPENDS = "libpcre bison-native"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BPN}-${PV}.tar.gz"
 
@@ -38,14 +38,14 @@ EXTRA_OECONF = " \
     --without-tcl \
 "
 
+EXTRA_AUTORECONF += "-I Tools/config"
+
 BBCLASSEXTEND = "native nativesdk"
 
-do_configure() {
-    install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.guess ${S}/Tools/config
-    install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.sub ${S}/Tools/config
-    install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.guess ${S}
-    install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.sub ${S}
-    oe_runconf
+# necessary together with bison dependency until a new upstream version after
+# 3.0.12 includes 0001-Fix-generated-code-for-constant-expressions-containi.patch
+do_configure_append() {
+    mkdir -p ${B}/Source/CParse
 }
 
 do_install_append_class-nativesdk() {

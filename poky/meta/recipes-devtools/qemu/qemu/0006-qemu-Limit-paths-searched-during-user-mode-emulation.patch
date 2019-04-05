@@ -1,4 +1,4 @@
-From c532bcdae8259b0f71723cda331ded4dbb0fa908 Mon Sep 17 00:00:00 2001
+From 02f80ee81681b6307a8032128a07686183662270 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Wed, 9 Mar 2016 22:49:02 +0000
 Subject: [PATCH] qemu: Limit paths searched during user mode emulation
@@ -19,12 +19,13 @@ paths.
 RP
 2016/3/9
 Upstream-Status: Pending
+
 ---
  util/path.c | 44 ++++++++++++++++++++++----------------------
  1 file changed, 22 insertions(+), 22 deletions(-)
 
 diff --git a/util/path.c b/util/path.c
-index 7f9fc272fb..a416cd4ac2 100644
+index 7f9fc272..a416cd4a 100644
 --- a/util/path.c
 +++ b/util/path.c
 @@ -15,6 +15,7 @@ struct pathelem

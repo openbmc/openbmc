@@ -1,0 +1,163 @@
+From 5ea7cd78cd252ffd3a9f3fbc8dc795d6e1596084 Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Mon, 17 Dec 2018 11:25:20 +0100
+Subject: [PATCH] kexec-tools: fix non-device tree devices on mips
+
+Add additional argument '--no-dtb' which disables device tree
+search in currently loaded kernel.
+
+Taken from LEDE-DEV:
+https://patchwork.ozlabs.org/patch/852961/
+
+Rebased for kexec-tools 2.0.18
+Removed ppc change (unwanted ?)
+
+Signed-off-by: Konstantin Kuzov <master.nosferatu@gmail.com>
+Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+---
+ kexec/arch/mips/include/arch/options.h |  4 +-
+ kexec/arch/mips/kexec-elf-mips.c       | 58 ++++++++++++++------------
+ kexec/arch/mips/kexec-mips.c           |  4 ++
+ kexec/arch/mips/kexec-mips.h           |  1 +
+ 4 files changed, 39 insertions(+), 28 deletions(-)
+
+diff --git a/kexec/arch/mips/include/arch/options.h b/kexec/arch/mips/include/arch/options.h
+index 416e224..18d2811 100644
+--- a/kexec/arch/mips/include/arch/options.h
++++ b/kexec/arch/mips/include/arch/options.h
+@@ -5,6 +5,7 @@
+ #define OPT_APPEND	(OPT_ARCH_MAX+0)
+ #define OPT_DTB		(OPT_ARCH_MAX+1)
+ #define OPT_RAMDISK	(OPT_ARCH_MAX+2)
++#define OPT_NO_DTB	(OPT_ARCH_MAX+3)
+ 
+ /* Options relevant to the architecture (excluding loader-specific ones),
+  * in this case none:
+@@ -14,7 +15,8 @@
+ 	{"command-line", 1, 0, OPT_APPEND}, \
+ 	{"append",	 1, 0, OPT_APPEND}, \
+ 	{"dtb",		1, 0, OPT_DTB }, \
+-	{"initrd",	1, 0, OPT_RAMDISK },
++	{"initrd",	1, 0, OPT_RAMDISK }, \
++	{"no-dtb",	0, 0, OPT_NO_DTB },
+ 
+ 
+ #define KEXEC_ARCH_OPT_STR KEXEC_OPT_STR ""
+diff --git a/kexec/arch/mips/kexec-elf-mips.c b/kexec/arch/mips/kexec-elf-mips.c
+index 849a7ba..5c0e535 100644
+--- a/kexec/arch/mips/kexec-elf-mips.c
++++ b/kexec/arch/mips/kexec-elf-mips.c
+@@ -141,35 +141,37 @@ int elf_mips_load(int argc, char **argv, const char *buf, off_t len,
+ 	else
+ 		cmdline_addr = 0;
+ 
+-	/* MIPS systems that have been converted to use device tree
+-	 * passed through UHI will use commandline in the DTB and
+-	 * the DTB passed as a separate buffer. Note that
+-	 * CMDLINE_PREFIX is skipped here intentionally, as it is
+-	 * used only in the legacy method */
+-
+-	if (arch_options.dtb_file) {
+-		dtb_buf = slurp_file(arch_options.dtb_file, &dtb_length);
+-	} else {
+-		create_flatten_tree(&dtb_buf, &dtb_length, cmdline_buf + strlen(CMDLINE_PREFIX));
+-	}
+ 
+-	if (arch_options.initrd_file) {
+-		initrd_buf = slurp_file(arch_options.initrd_file, &initrd_size);
++	if (!arch_options.no_dtb) {
++		/* MIPS systems that have been converted to use device tree
++		 * passed through UHI will use commandline in the DTB and
++		 * the DTB passed as a separate buffer. Note that
++		 * CMDLINE_PREFIX is skipped here intentionally, as it is
++		 * used only in the legacy method */
++
++		if (arch_options.dtb_file) {
++			dtb_buf = slurp_file(arch_options.dtb_file, &dtb_length);
++		} else {
++			create_flatten_tree(&dtb_buf, &dtb_length, cmdline_buf + strlen(CMDLINE_PREFIX));
++		}
+ 
+-		/* Create initrd entries in dtb - although at this time
+-		 * they would not point to the correct location */
+-		dtb_set_initrd(&dtb_buf, &dtb_length, initrd_buf, initrd_buf + initrd_size);
++		if (arch_options.initrd_file) {
++			initrd_buf = slurp_file(arch_options.initrd_file, &initrd_size);
+ 
+-		initrd_base = add_buffer(info, initrd_buf, initrd_size,
+-					initrd_size, sizeof(void *),
+-					_ALIGN_UP(kernel_addr + kernel_size + dtb_length,
+-						pagesize), 0x0fffffff, 1);
++			/* Create initrd entries in dtb - although at this time
++			 * they would not point to the correct location */
++			dtb_set_initrd(&dtb_buf, &dtb_length, initrd_buf, initrd_buf + initrd_size);
+ 
+-		/* Now that the buffer for initrd is prepared, update the dtb
+-		 * with an appropriate location */
+-		dtb_set_initrd(&dtb_buf, &dtb_length, initrd_base, initrd_base + initrd_size);
+-	}
++			initrd_base = add_buffer(info, initrd_buf, initrd_size,
++						initrd_size, sizeof(void *),
++						_ALIGN_UP(kernel_addr + kernel_size + dtb_length,
++							pagesize), 0x0fffffff, 1);
+ 
++			/* Now that the buffer for initrd is prepared, update the dtb
++			 * with an appropriate location */
++			dtb_set_initrd(&dtb_buf, &dtb_length, initrd_base, initrd_base + initrd_size);
++		}
++	}
+ 
+ 	/* This is a legacy method for commandline passing used
+ 	 * currently by Octeon CPUs only */
+@@ -177,9 +179,11 @@ int elf_mips_load(int argc, char **argv, const char *buf, off_t len,
+ 			sizeof(cmdline_buf), sizeof(void *),
+ 			cmdline_addr, 0x0fffffff, 1);
+ 
+-	add_buffer(info, dtb_buf, dtb_length, dtb_length, 0,
+-		_ALIGN_UP(kernel_addr + kernel_size, pagesize),
+-		0x0fffffff, 1);
++	if (!arch_options.no_dtb) {
++		add_buffer(info, dtb_buf, dtb_length, dtb_length, 0,
++			_ALIGN_UP(kernel_addr + kernel_size, pagesize),
++			0x0fffffff, 1);
++	}
+ 
+ 	return 0;
+ }
+diff --git a/kexec/arch/mips/kexec-mips.c b/kexec/arch/mips/kexec-mips.c
+index 415c2ed..e557f8b 100644
+--- a/kexec/arch/mips/kexec-mips.c
++++ b/kexec/arch/mips/kexec-mips.c
+@@ -89,6 +89,7 @@ void arch_usage(void)
+ 	"    --append=STRING       Set the kernel command line to STRING.\n"
+ 	"    --dtb=FILE            Use FILE as the device tree blob.\n"
+ 	"    --initrd=FILE         Use FILE as initial ramdisk.\n"
++	"    --no-dtb              Don't try to find device tree\n"
+ 	);
+ }
+ 
+@@ -121,6 +122,9 @@ int arch_process_options(int argc, char **argv)
+ 		case OPT_RAMDISK:
+ 			arch_options.initrd_file = optarg;
+ 			break;
++		case OPT_NO_DTB:
++			arch_options.no_dtb = 1;
++			break;
+ 		default:
+ 			break;
+ 		}
+diff --git a/kexec/arch/mips/kexec-mips.h b/kexec/arch/mips/kexec-mips.h
+index 222c815..90b21c3 100644
+--- a/kexec/arch/mips/kexec-mips.h
++++ b/kexec/arch/mips/kexec-mips.h
+@@ -22,6 +22,7 @@ struct arch_options_t {
+ 	char *dtb_file;
+ 	char *initrd_file;
+ 	int core_header_type;
++	int no_dtb;
+ };
+ 
+ extern struct memory_ranges usablemem_rgns;
+-- 
+2.17.1
+

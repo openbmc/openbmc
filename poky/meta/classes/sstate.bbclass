@@ -11,7 +11,7 @@ def generate_sstatefn(spec, hash, d):
 SSTATE_PKGARCH    = "${PACKAGE_ARCH}"
 SSTATE_PKGSPEC    = "sstate:${PN}:${PACKAGE_ARCH}${TARGET_VENDOR}-${TARGET_OS}:${PV}:${PR}:${SSTATE_PKGARCH}:${SSTATE_VERSION}:"
 SSTATE_SWSPEC     = "sstate:${PN}::${PV}:${PR}::${SSTATE_VERSION}:"
-SSTATE_PKGNAME    = "${SSTATE_EXTRAPATH}${@generate_sstatefn(d.getVar('SSTATE_PKGSPEC'), d.getVar('BB_TASKHASH'), d)}"
+SSTATE_PKGNAME    = "${SSTATE_EXTRAPATH}${@generate_sstatefn(d.getVar('SSTATE_PKGSPEC'), d.getVar('BB_UNIHASH'), d)}"
 SSTATE_PKG        = "${SSTATE_DIR}/${SSTATE_PKGNAME}"
 SSTATE_EXTRAPATH   = ""
 SSTATE_EXTRAPATHWILDCARD = ""
@@ -23,6 +23,7 @@ PV[vardepvalue] = "${PV}"
 # We don't want the sstate to depend on things like the distro string
 # of the system, we let the sstate paths take care of this.
 SSTATE_EXTRAPATH[vardepvalue] = ""
+SSTATE_EXTRAPATHWILDCARD[vardepvalue] = ""
 
 # For multilib rpm the allarch packagegroup files can overwrite (in theory they're identical)
 SSTATE_DUPWHITELIST = "${DEPLOY_DIR}/licenses/"
@@ -61,6 +62,7 @@ SSTATE_ARCHS = " \
 SSTATE_MANMACH ?= "${SSTATE_PKGARCH}"
 
 SSTATECREATEFUNCS = "sstate_hardcode_path"
+SSTATECREATEFUNCS[vardeps] = "SSTATE_SCAN_FILES"
 SSTATEPOSTCREATEFUNCS = ""
 SSTATEPREINSTFUNCS = ""
 SSTATEPOSTUNPACKFUNCS = "sstate_hardcode_path_unpack"
@@ -82,6 +84,23 @@ SSTATE_SIG_PASSPHRASE ?= ""
 # Whether to verify the GnUPG signatures when extracting sstate archives
 SSTATE_VERIFY_SIG ?= "0"
 
+SSTATE_HASHEQUIV_METHOD ?= "oe.sstatesig.OEOuthashBasic"
+SSTATE_HASHEQUIV_METHOD[doc] = "The fully-qualified function used to calculate \
+    the output hash for a task, which in turn is used to determine equivalency. \
+    "
+
+SSTATE_HASHEQUIV_SERVER ?= ""
+SSTATE_HASHEQUIV_SERVER[doc] = "The hash equivalence sever. For example, \
+    'http://192.168.0.1:5000'. Do not include a trailing slash \
+    "
+
+SSTATE_HASHEQUIV_REPORT_TASKDATA ?= "0"
+SSTATE_HASHEQUIV_REPORT_TASKDATA[doc] = "Report additional useful data to the \
+    hash equivalency server, such as PN, PV, taskname, etc. This information \
+    is very useful for developers looking at task data, but may leak sensitive \
+    data if the equivalence server is public. \
+    "
+
 python () {
     if bb.data.inherits_class('native', d):
         d.setVar('SSTATE_PKGARCH', d.getVar('BUILD_ARCH', False))
@@ -101,7 +120,7 @@ python () {
     if bb.data.inherits_class('native', d) or bb.data.inherits_class('crosssdk', d) or bb.data.inherits_class('cross', d):
         d.setVar('SSTATE_EXTRAPATH', "${NATIVELSBSTRING}/")
         d.setVar('BB_HASHFILENAME', "True ${SSTATE_PKGSPEC} ${SSTATE_SWSPEC}")
-        d.setVar('SSTATE_EXTRAPATHWILDCARD', "*/")
+        d.setVar('SSTATE_EXTRAPATHWILDCARD', "${NATIVELSBSTRING}/")
 
     unique_tasks = sorted(set((d.getVar('SSTATETASKS') or "").split()))
     d.setVar('SSTATETASKS', " ".join(unique_tasks))
@@ -640,7 +659,7 @@ def sstate_package(ss, d):
         return
 
     for f in (d.getVar('SSTATECREATEFUNCS') or '').split() + \
-             ['sstate_create_package', 'sstate_sign_package'] + \
+             ['sstate_report_unihash', 'sstate_create_package', 'sstate_sign_package'] + \
              (d.getVar('SSTATEPOSTCREATEFUNCS') or '').split():
         # All hooks should run in SSTATE_BUILDDIR.
         bb.build.exec_func(f, d, (sstatebuild,))
@@ -764,6 +783,14 @@ python sstate_sign_package () {
                            d.getVar('SSTATE_SIG_PASSPHRASE'), armor=False)
 }
 
+python sstate_report_unihash() {
+    report_unihash = getattr(bb.parse.siggen, 'report_unihash', None)
+
+    if report_unihash:
+        ss = sstate_state_fromvars(d)
+        report_unihash(os.getcwd(), ss['task'], d)
+}
+
 #
 # Shell function to decompress and prepare a package for installation
 # Will be run from within SSTATE_INSTDIR.
@@ -780,13 +807,18 @@ sstate_unpack_package () {
 
 BB_HASHCHECK_FUNCTION = "sstate_checkhashes"
 
-def sstate_checkhashes(sq_fn, sq_task, sq_hash, sq_hashfn, d, siginfo=False):
+def sstate_checkhashes(sq_fn, sq_task, sq_hash, sq_hashfn, d, siginfo=False, *, sq_unihash=None):
 
     ret = []
     missed = []
     extension = ".tgz"
     if siginfo:
         extension = extension + ".siginfo"
+
+    def gethash(task):
+        if sq_unihash is not None:
+            return sq_unihash[task]
+        return sq_hash[task]
 
     def getpathcomponents(task, d):
         # Magic data from BB_HASHFILENAME
@@ -810,7 +842,7 @@ def sstate_checkhashes(sq_fn, sq_task, sq_hash, sq_hashfn, d, siginfo=False):
 
         spec, extrapath, tname = getpathcomponents(task, d)
 
-        sstatefile = d.expand("${SSTATE_DIR}/" + extrapath + generate_sstatefn(spec, sq_hash[task], d) + "_" + tname + extension)
+        sstatefile = d.expand("${SSTATE_DIR}/" + extrapath + generate_sstatefn(spec, gethash(task), d) + "_" + tname + extension)
 
         if os.path.exists(sstatefile):
             bb.debug(2, "SState: Found valid sstate file %s" % sstatefile)
@@ -872,7 +904,7 @@ def sstate_checkhashes(sq_fn, sq_task, sq_hash, sq_hashfn, d, siginfo=False):
             if task in ret:
                 continue
             spec, extrapath, tname = getpathcomponents(task, d)
-            sstatefile = d.expand(extrapath + generate_sstatefn(spec, sq_hash[task], d) + "_" + tname + extension)
+            sstatefile = d.expand(extrapath + generate_sstatefn(spec, gethash(task), d) + "_" + tname + extension)
             tasklist.append((task, sstatefile))
 
         if tasklist:
@@ -898,12 +930,12 @@ def sstate_checkhashes(sq_fn, sq_task, sq_hash, sq_hashfn, d, siginfo=False):
         evdata = {'missed': [], 'found': []};
         for task in missed:
             spec, extrapath, tname = getpathcomponents(task, d)
-            sstatefile = d.expand(extrapath + generate_sstatefn(spec, sq_hash[task], d) + "_" + tname + ".tgz")
-            evdata['missed'].append( (sq_fn[task], sq_task[task], sq_hash[task], sstatefile ) )
+            sstatefile = d.expand(extrapath + generate_sstatefn(spec, gethash(task), d) + "_" + tname + ".tgz")
+            evdata['missed'].append( (sq_fn[task], sq_task[task], gethash(task), sstatefile ) )
         for task in ret:
             spec, extrapath, tname = getpathcomponents(task, d)
-            sstatefile = d.expand(extrapath + generate_sstatefn(spec, sq_hash[task], d) + "_" + tname + ".tgz")
-            evdata['found'].append( (sq_fn[task], sq_task[task], sq_hash[task], sstatefile ) )
+            sstatefile = d.expand(extrapath + generate_sstatefn(spec, gethash(task), d) + "_" + tname + ".tgz")
+            evdata['found'].append( (sq_fn[task], sq_task[task], gethash(task), sstatefile ) )
         bb.event.fire(bb.event.MetadataEvent("MissedSstate", evdata), d)
 
     # Print some summary statistics about the current task completion and how much sstate
@@ -1087,12 +1119,15 @@ python sstate_eventhandler2() {
         with open(i, "r") as f:
             lines = f.readlines()
             for l in lines:
-                (stamp, manifest, workdir) = l.split()
-                if stamp not in stamps and stamp not in preservestamps and stamp in machineindex:
-                    toremove.append(l)
-                    if stamp not in seen:
-                        bb.debug(2, "Stamp %s is not reachable, removing related manifests" % stamp)
-                        seen.append(stamp)
+                try:
+                    (stamp, manifest, workdir) = l.split()
+                    if stamp not in stamps and stamp not in preservestamps and stamp in machineindex:
+                        toremove.append(l)
+                        if stamp not in seen:
+                            bb.debug(2, "Stamp %s is not reachable, removing related manifests" % stamp)
+                            seen.append(stamp)
+                except ValueError:
+                    bb.fatal("Invalid line '%s' in sstate manifest '%s'" % (l, i))
 
         if toremove:
             msg = "Removing %d recipes from the %s sysroot" % (len(toremove), a)

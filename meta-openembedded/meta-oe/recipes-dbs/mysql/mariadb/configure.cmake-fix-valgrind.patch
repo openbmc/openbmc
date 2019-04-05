@@ -1,6 +1,6 @@
-From 5effba0d7d47071a3f1bca56823190d5a95bb1a6 Mon Sep 17 00:00:00 2001
+From 24e2b0edc2612acefcc48414bb6f0aeb086061a9 Mon Sep 17 00:00:00 2001
 From: Jackie Huang <jackie.huang@windriver.com>
-Date: Wed, 12 Nov 2014 03:09:10 -0500
+Date: Tue, 26 Feb 2019 23:57:06 -0800
 Subject: [PATCH] configure.cmake: fix valgrind
 
 Check valgrind headers only if WITH_VALGRIND is set.
@@ -15,27 +15,26 @@ PACKAGECONFIG to decide if valgrind is needed or not.
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+
 ---
- configure.cmake | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ configure.cmake | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/configure.cmake b/configure.cmake
-index 0bd7bbe..51a098f 100644
+index 3cfc4b31..d017b3b3 100644
 --- a/configure.cmake
 +++ b/configure.cmake
-@@ -1047,10 +1047,10 @@ MARK_AS_ADVANCED(WITH_ATOMIC_LOCKS MY_ATOMIC_MODE_RWLOCK MY_ATOMIC_MODE_DUMMY)
+@@ -930,10 +930,9 @@ HAVE_GCC_C11_ATOMICS)
  
  IF(WITH_VALGRIND)
    SET(HAVE_valgrind 1)
-+  CHECK_INCLUDE_FILES("valgrind/memcheck.h;valgrind/valgrind.h"
-+  HAVE_VALGRIND)
- ENDIF()
- 
+-ENDIF()
+-
 -CHECK_INCLUDE_FILES("valgrind/memcheck.h;valgrind/valgrind.h" 
--  HAVE_VALGRIND)
++  CHECK_INCLUDE_FILES("valgrind/memcheck.h;valgrind/valgrind.h"
+   HAVE_VALGRIND_MEMCHECK_H)
++ENDIF()
  
  #--------------------------------------------------------------------
  # Check for IPv6 support
--- 
-2.0.0
-

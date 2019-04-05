@@ -72,7 +72,7 @@ do_install_append() {
     mkdir -p ${D}${localstatedir}/log/snort
     install -d ${D}/var/log/snort
 
-    sed -i 's/-fdebug-prefix-map[^ ]*//g; s#${STAGING_DIR_TARGET}##g' ${D}${libdir}/pkgconfig/*.pc
+    sed -i -e 's|-fdebug-prefix-map[^ ]*||g; s|-fmacro-prefix-map[^ ]*||g; s|${STAGING_DIR_TARGET}||g' ${D}${libdir}/pkgconfig/*.pc
 }
 
 FILES_${PN} += " \

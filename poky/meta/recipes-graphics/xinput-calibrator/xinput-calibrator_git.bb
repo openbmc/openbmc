@@ -14,7 +14,9 @@ REQUIRED_DISTRO_FEATURES = "x11"
 SRCREV = "03dadf55109bd43d3380f040debe9f82f66f2f35"
 SRC_URI = "git://github.com/tias/xinput_calibrator.git \
            file://30xinput_calibrate.sh \
-           file://Allow-xinput_calibrator_pointercal.sh-to-be-run-as-n.patch"
+           file://Allow-xinput_calibrator_pointercal.sh-to-be-run-as-n.patch \
+           file://0001-calibrator.hh-Include-string-to-get-std-string.patch \
+           "
 
 S = "${WORKDIR}/git"
 

@@ -1,0 +1,50 @@
+From fcece65d1b713eaeef41706898440302f8ce92d9 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <Mingli.Yu@windriver.com>
+Date: Thu, 12 Jul 2018 15:19:41 +0800
+Subject: [PATCH] Makefile.am: update the path of libnfs.a
+
+The libnfs.a is under ../support/nfs/.libs/ now,
+update the reference path accordingly to fix below
+build error when run "make -C tests statdb_dump":
+| make: *** No rule to make target '../support/nfs/libnfs.a', needed by 'statdb_dump'.  Stop.
+
+And below error when run "make -C tests/nsm_client nsm_client"
+| make: *** No rule to make target '../../support/nfs/libnfs.a', needed by 'nsm_client'.  Stop.
+
+Upstream-Status: Submitted[https://marc.info/?l=linux-nfs&m=154502636522745&w=2]
+
+Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
+---
+ tests/Makefile.am            | 2 +-
+ tests/nsm_client/Makefile.am | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 1f96264..74aa629 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -3,7 +3,7 @@
+ check_PROGRAMS = statdb_dump
+ statdb_dump_SOURCES = statdb_dump.c
+ 
+-statdb_dump_LDADD = ../support/nfs/libnfs.a \
++statdb_dump_LDADD = ../support/nfs/.libs/libnfs.a \
+ 		    ../support/nsm/libnsm.a $(LIBCAP)
+ 
+ SUBDIRS = nsm_client
+diff --git a/tests/nsm_client/Makefile.am b/tests/nsm_client/Makefile.am
+index a8fc131..43db9c2 100644
+--- a/tests/nsm_client/Makefile.am
++++ b/tests/nsm_client/Makefile.am
+@@ -13,7 +13,7 @@ check_PROGRAMS	= nsm_client
+ nsm_client_SOURCES = $(GENFILES) nsm_client.c
+ 
+ BUILT_SOURCES = $(GENFILES)
+-nsm_client_LDADD = ../../support/nfs/libnfs.a \
++nsm_client_LDADD = ../../support/nfs/.libs/libnfs.a \
+ 		   ../../support/nsm/libnsm.a $(LIBCAP) $(LIBTIRPC)
+ 
+ if CONFIG_RPCGEN
+-- 
+2.7.4
+

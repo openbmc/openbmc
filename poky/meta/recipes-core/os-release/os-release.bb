@@ -30,7 +30,6 @@ def sanitise_version(ver):
     return ret.lower()
 
 python do_compile () {
-    import shutil
     with open(d.expand('${B}/os-release'), 'w') as f:
         for field in d.getVar('OS_RELEASE_FIELDS').split():
             value = d.getVar(field)

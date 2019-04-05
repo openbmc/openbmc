@@ -1,0 +1,21 @@
+Drop enable format string warnings to help gcc9
+
+Fixes
+| /mnt/a/yoe/build/tmp/work/core2-64-yoe-linux-musl/mozjs/52.9.1-r0/mozjs-52.9.1/js/src/jit/x64/BaseAssembler-x64.h:596:13: error: '%s' directive argument is null [-Werror=format-overflow=]
+|   596 |         spew("movq       " MEM_obs ", %s", ADDR_obs(offset, base, index, scale), GPReg64Name(dst));
+|       |         ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Upstream-Status: Inappropriate [Workaround for gcc9]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/js/src/moz.build
++++ b/js/src/moz.build
+@@ -785,7 +785,7 @@ if CONFIG['JS_HAS_CTYPES']:
+         DEFINES['FFI_BUILDING'] = True
+ 
+ if CONFIG['GNU_CXX']:
+-    CXXFLAGS += ['-Wno-shadow', '-Werror=format']
++    CXXFLAGS += ['-Wno-shadow']
+ 
+ # Suppress warnings in third-party code.
+ if CONFIG['CLANG_CXX']:

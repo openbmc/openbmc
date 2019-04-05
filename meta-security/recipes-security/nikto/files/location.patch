@@ -1,36 +1,36 @@
-From e10b9b1f6704057ace39956ae1dc5c7caca07ff1 Mon Sep 17 00:00:00 2001
-From: Andrei Dinu <andrei.adrianx.dinu@intel.com>
-Date: Mon, 8 Jul 2013 11:53:54 +0300
-Subject: [PATCH] Setting the location of nikto on the image
+From d1cb702d5147abea0d3208a4d554c61a6f2decd6 Mon Sep 17 00:00:00 2001
+From: Scott Ellis <scott@jumpnowtek.com>
+Date: Fri, 28 Dec 2018 11:08:25 -0500
+Subject: [PATCH] Set custom paths
 
-Upstream Status: Inapropriate
+Upstream Status: Inappropriate
 
-Signed-off-by: Andrei Dinu <andrei.adrianx.dinu@intel.com>
+Signed-off-by: Scott Ellis <scott@jumpnowtek.com>
 ---
- nikto.conf |   10 +++++-----
+ nikto.conf | 10 +++++-----
  1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/nikto.conf b/nikto.conf
-index 25b784d..9577033 100644
+diff --git a/program/nikto.conf b/program/nikto.conf
+index bf36c58..8c55415 100644
 --- a/nikto.conf
 +++ b/nikto.conf
-@@ -61,11 +61,11 @@ CIRT=174.142.17.165
+@@ -61,11 +61,11 @@ CIRT=107.170.99.251
  CHECKMETHODS=HEAD GET
  
  # If you want to specify the location of any of the files, specify them here
 -# EXECDIR=/opt/nikto				# Location of Nikto
 -# PLUGINDIR=/opt/nikto/plugins			# Location of plugin dir
--# DBDIR=/opt/nikto/databases			# Location of plugin dir
--# TEMPLATEDIR=/opt/nikto/templates		# Location of tempmlate dir
+-# DBDIR=/opt/nikto/databases			# Location of database dir
+-# TEMPLATEDIR=/opt/nikto/templates		# Location of template dir
 -# DOCDIR=/opt/nikto/docs			# Location of docs dir
 +EXECDIR=/usr/bin/nikto				# Location of Nikto
 +PLUGINDIR=/etc/nikto/plugins			# Location of plugin dir
-+DBDIR=/etc/nikto/databases			# Location of plugin dir
-+TEMPLATEDIR=/etc/nikto/templates		# Location of tempmlate dir
++DBDIR=/etc/nikto/databases			# Location of database dir
++TEMPLATEDIR=/etc/nikto/templates		# Location of template dir
 +DOCDIR=/usr/share/doc/nikto			# Location of docs dir
  
  # Default plugin macros
- @@MUTATE=dictionary;subdomain
+ # Remove plugins designed to be run standalone
 -- 
-1.7.9.5
+2.7.4
 

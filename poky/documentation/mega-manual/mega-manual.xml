@@ -12,9 +12,11 @@
 
         <abstract>
             The Yocto Project Mega-Manual is a concatenation of the published
-            Yocto Project HTML manuals for the given release.
-            The manual exists to help users efficiently search for strings
-            across the entire Yocto Project documentation set.
+            Yocto Project HTML manuals along with the corresponding BitBake
+            User Manual for the given release.
+            The Mega-Manual exists to help users efficiently search for strings
+            across the entire Yocto Project documentation set inclusive of
+            the BitBake User Manual.
         </abstract>
 
         <mediaobject>
@@ -81,9 +83,9 @@
                 <revremark>Released with the Yocto Project 2.6 Release.</revremark>
             </revision>
             <revision>
-                <revnumber>2.6.1</revnumber>
+                <revnumber>2.7</revnumber>
                 <date>&REL_MONTH_YEAR;</date>
-                <revremark>Released with the Yocto Project 2.6.1 Release.</revremark>
+                <revremark>Released with the Yocto Project 2.7 Release.</revremark>
             </revision>
        </revhistory>
 
@@ -321,6 +323,30 @@
 
     <xi:include
         xmlns:xi="http://www.w3.org/2003/XInclude" href="../toaster-manual/toaster-manual-reference.xml"/>
+
+<!-- Includes bitbake-user-manual title image and then bitbake-user-manual chapters -->
+
+    <para>
+        <imagedata fileref="figures/bitbake-title.png" width="100%" align="left" scalefit="1" />
+    </para>
+
+    <xi:include
+        xmlns:xi="http://www.w3.org/2003/XInclude" href="../../../bitbake/doc/bitbake-user-manual/bitbake-user-manual-intro.xml"/>
+
+    <xi:include
+        xmlns:xi="http://www.w3.org/2003/XInclude" href="../../../bitbake/doc/bitbake-user-manual/bitbake-user-manual-execution.xml"/>
+
+    <xi:include
+        xmlns:xi="http://www.w3.org/2003/XInclude" href="../../../bitbake/doc/bitbake-user-manual/bitbake-user-manual-metadata.xml"/>
+
+    <xi:include
+        xmlns:xi="http://www.w3.org/2003/XInclude" href="../../../bitbake/doc/bitbake-user-manual/bitbake-user-manual-fetching.xml"/>
+
+    <xi:include
+        xmlns:xi="http://www.w3.org/2003/XInclude" href="../../../bitbake/doc/bitbake-user-manual/bitbake-user-manual-ref-variables.xml"/>
+
+    <xi:include
+        xmlns:xi="http://www.w3.org/2003/XInclude" href="../../../bitbake/doc/bitbake-user-manual/bitbake-user-manual-hello.xml"/>
 
 </book>
 

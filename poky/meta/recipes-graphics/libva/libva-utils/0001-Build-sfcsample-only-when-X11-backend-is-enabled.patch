@@ -1,0 +1,35 @@
+From 8fc14e4bc81885b80c3072e549c2e6f59533d7ef Mon Sep 17 00:00:00 2001
+From: Anuj Mittal <anuj.mittal@intel.com>
+Date: Fri, 8 Feb 2019 11:45:55 +0800
+Subject: [PATCH] Build sfcsample only when X11 backend is enabled
+
+See: https://github.com/intel/libva-utils/pull/149, and
+https://github.com/intel/libva-utils/issues/150
+
+Upstream-Status: Submitted
+
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+---
+ Makefile.am | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index d28175a..e294e25 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -24,10 +24,11 @@ ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
+ 
+ AUTOMAKE_OPTIONS = foreign
+ 
+-SUBDIRS = common decode encode vainfo videoprocess vendor/intel vendor/intel/sfcsample
++SUBDIRS = common decode encode vainfo videoprocess vendor/intel
+ 
+ if USE_X11
+ SUBDIRS += putsurface
++SUBDIRS += vendor/intel/sfcsample
+ else
+ if USE_WAYLAND
+ SUBDIRS += putsurface
+-- 
+2.17.1
+

@@ -1,0 +1,31 @@
+From 0c24f99ca4d4f64ea8584347ca6ae0d638d625a8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Mon, 18 Feb 2019 16:13:17 +0100
+Subject: [PATCH] Use pkg-config to find gpgme
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ build/bundled/gpgme.m4 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/build/bundled/gpgme.m4 b/build/bundled/gpgme.m4
+index 44bf43c..c9a8ae6 100644
+--- a/build/bundled/gpgme.m4
++++ b/build/bundled/gpgme.m4
+@@ -18,7 +18,7 @@ AC_DEFUN([_AM_PATH_GPGME_CONFIG],
+   if test "x$gpgme_config_prefix" != x ; then
+       GPGME_CONFIG="$gpgme_config_prefix/bin/gpgme-config"
+   fi
+-  AC_PATH_PROG(GPGME_CONFIG, gpgme-config, no)
++  GPGME_CONFIG="pkg-config gpgme"
+ 
+   if test "$GPGME_CONFIG" != "no" ; then
+     gpgme_version=`$GPGME_CONFIG --version`
+-- 
+2.20.1
+

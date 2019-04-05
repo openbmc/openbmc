@@ -33,7 +33,7 @@ from bb.cache import MultiProcessCache
 logger = logging.getLogger('BitBake.CodeParser')
 
 def bbhash(s):
-    return hashlib.md5(s.encode("utf-8")).hexdigest()
+    return hashlib.sha256(s.encode("utf-8")).hexdigest()
 
 def check_indent(codestr):
     """If the code is indented, add a top level piece of code to 'remove' the indentation"""
@@ -140,7 +140,7 @@ class CodeParserCache(MultiProcessCache):
     # so that an existing cache gets invalidated. Additionally you'll need
     # to increment __cache_version__ in cache.py in order to ensure that old
     # recipe caches don't trigger "Taskhash mismatch" errors.
-    CACHE_VERSION = 10
+    CACHE_VERSION = 11
 
     def __init__(self):
         MultiProcessCache.__init__(self)
@@ -368,8 +368,9 @@ class ShellParser():
     def _parse_shell(self, value):
         try:
             tokens, _ = pyshyacc.parse(value, eof=True, debug=False)
-        except pyshlex.NeedMore:
-            raise sherrors.ShellSyntaxError("Unexpected EOF")
+        except Exception:
+            bb.error('Error during parse shell code, the last 5 lines are:\n%s' % '\n'.join(value.split('\n')[-5:]))
+            raise
 
         self.process_tokens(tokens)
 

@@ -66,8 +66,8 @@ python split_strongswan_plugins () {
     dbglibdir = os.path.join(libdir, '.debug')
 
     def add_plugin_conf(f, pkg, file_regex, output_pattern, modulename):
-        dvar = d.getVar('PKGD', True)
-        oldfiles = d.getVar('CONFFILES_' + pkg, True)
+        dvar = d.getVar('PKGD')
+        oldfiles = d.getVar('CONFFILES_' + pkg)
         newfile = '/' + os.path.relpath(f, dvar)
 
         if not oldfiles:
@@ -83,7 +83,7 @@ python split_strongswan_plugins () {
     split_staticdev_packages = do_split_packages(d, libdir, 'libstrongswan-(.*)\.a', '${PN}-plugin-%s-staticdev', 'strongSwan %s plugin - Development files (Static Libraries)', prepend=True, extra_depends='${PN}-staticdev')
 
     if split_packages:
-        pn = d.getVar('PN', True)
+        pn = d.getVar('PN')
         d.setVar('RRECOMMENDS_' + pn + '-plugins', ' '.join(split_packages))
         d.appendVar('RRECOMMENDS_' + pn + '-dbg', ' ' + ' '.join(split_dbg_packages))
         d.appendVar('RRECOMMENDS_' + pn + '-dev', ' ' + ' '.join(split_dev_packages))

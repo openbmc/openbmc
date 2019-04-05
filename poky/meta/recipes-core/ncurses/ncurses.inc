@@ -260,9 +260,9 @@ python populate_packages_prepend () {
     libdir = d.expand("${libdir}")
     base_libdir = d.expand("${base_libdir}")
     pnbase = d.expand("${PN}-lib%s")
-    do_split_packages(d, libdir, '^lib(.*)\.so\..*', pnbase, 'ncurses %s library', prepend=True, extra_depends = '', allow_links=True)
+    do_split_packages(d, libdir, r'^lib(.*)\.so\..*', pnbase, 'ncurses %s library', prepend=True, extra_depends = '', allow_links=True)
     if libdir is not base_libdir:
-        do_split_packages(d, base_libdir, '^lib(.*)\.so\..*', pnbase, 'ncurses %s library', prepend=True, extra_depends = '', allow_links=True)
+        do_split_packages(d, base_libdir, r'^lib(.*)\.so\..*', pnbase, 'ncurses %s library', prepend=True, extra_depends = '', allow_links=True)
 }
 
 

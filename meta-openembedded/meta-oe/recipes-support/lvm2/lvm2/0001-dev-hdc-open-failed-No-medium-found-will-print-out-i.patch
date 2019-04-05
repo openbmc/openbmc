@@ -1,0 +1,32 @@
+From 93c93e3b85492e58f9451841e6079d00c497efa4 Mon Sep 17 00:00:00 2001
+From: Jiping Ma <jiping.ma2@windriver.com>
+Date: Mon, 25 Feb 2019 13:29:12 +0800
+Subject: [PATCH] "/dev/hdc: open failed: No medium found" will print out in
+ lvmdiskscan.
+
+commit [57bb46c5e7f8] introduce this issue.
+"/dev/hdc: open failed: No medium found" will be print out
+after run lvmdiskscan. change dev_open_readonly()
+to dev_open_readonly_quiet() in fuction _dev_get_size_dev().
+
+Signed-off-by: Jiping Ma <jiping.ma2@windriver.com>
+---
+ lib/device/dev-io.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/device/dev-io.c b/lib/device/dev-io.c
+index dc95131..81a66b0 100644
+--- a/lib/device/dev-io.c
++++ b/lib/device/dev-io.c
+@@ -338,7 +338,7 @@ static int _dev_get_size_dev(struct device *dev, uint64_t *size)
+ 	}
+ 
+ 	if (fd <= 0) {
+-		if (!dev_open_readonly(dev))
++		if (!dev_open_readonly_quiet(dev))
+ 			return_0;
+ 		fd = dev_fd(dev);
+ 		do_close = 1;
+-- 
+1.9.1
+

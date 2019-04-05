@@ -524,7 +524,7 @@ def fetcher_parse_save():
 def fetcher_parse_done():
     _checksum_cache.save_merge()
 
-def fetcher_compare_revisions():
+def fetcher_compare_revisions(d):
     """
     Compare the revisions in the persistant cache with current values and
     return true/false on whether they've changed.
@@ -777,7 +777,8 @@ def get_srcrev(d, method_name='sortable_revision'):
     #
     format = d.getVar('SRCREV_FORMAT')
     if not format:
-        raise FetchError("The SRCREV_FORMAT variable must be set when multiple SCMs are used.")
+        raise FetchError("The SRCREV_FORMAT variable must be set when multiple SCMs are used.\n"\
+                         "The SCMs are:\n%s" % '\n'.join(scms))
 
     name_to_rev = {}
     seenautoinc = False
@@ -858,7 +859,10 @@ def runfetchcmd(cmd, d, quiet=False, cleanup=None, log=None, workdir=None):
     # Disable pseudo as it may affect ssh, potentially causing it to hang.
     cmd = 'export PSEUDO_DISABLED=1; ' + cmd
 
-    logger.debug(1, "Running %s", cmd)
+    if workdir:
+        logger.debug(1, "Running '%s' in %s" % (cmd, workdir))
+    else:
+        logger.debug(1, "Running %s", cmd)
 
     success = False
     error_message = ""
@@ -894,7 +898,7 @@ def check_network_access(d, info, url):
     log remote network access, and error if BB_NO_NETWORK is set or the given
     URI is untrusted
     """
-    if d.getVar("BB_NO_NETWORK") == "1":
+    if bb.utils.to_boolean(d.getVar("BB_NO_NETWORK")):
         raise NetworkAccess(url, info)
     elif not trusted_network(d, url):
         raise UntrustedUrl(url, info)
@@ -1027,7 +1031,7 @@ def try_mirror_url(fetch, origud, ud, ld, check = False):
         raise
 
     except IOError as e:
-        if e.errno in [os.errno.ESTALE]:
+        if e.errno in [errno.ESTALE]:
             logger.warning("Stale Error Observed %s." % ud.url)
             return False
         raise
@@ -1094,7 +1098,7 @@ def trusted_network(d, url):
     BB_ALLOWED_NETWORKS is set globally or for a specific recipe.
     Note: modifies SRC_URI & mirrors.
     """
-    if d.getVar('BB_NO_NETWORK') == "1":
+    if bb.utils.to_boolean(d.getVar("BB_NO_NETWORK")):
         return True
 
     pkgname = d.expand(d.getVar('PN', False))
@@ -1403,7 +1407,7 @@ class FetchMethod(object):
         Fetch urls
         Assumes localpath was called first
         """
-        raise NoMethodError(url)
+        raise NoMethodError(urldata.url)
 
     def unpack(self, urldata, rootdir, data):
         iterate = False
@@ -1547,7 +1551,7 @@ class FetchMethod(object):
         Check the status of a URL
         Assumes localpath was called first
         """
-        logger.info("URL %s could not be checked for status since no method exists.", url)
+        logger.info("URL %s could not be checked for status since no method exists.", urldata.url)
         return True
 
     def latest_revision(self, ud, d, name):
@@ -1555,7 +1559,7 @@ class FetchMethod(object):
         Look in the cache for the latest revision, if not present ask the SCM.
         """
         if not hasattr(self, "_latest_revision"):
-            raise ParameterError("The fetcher for this URL does not support _latest_revision", url)
+            raise ParameterError("The fetcher for this URL does not support _latest_revision", ud.url)
 
         revs = bb.persist_data.persist('BB_URI_HEADREVS', d)
         key = self.generate_revision_key(ud, d, name)
@@ -1638,7 +1642,7 @@ class Fetch(object):
             urls = self.urls
 
         network = self.d.getVar("BB_NO_NETWORK")
-        premirroronly = (self.d.getVar("BB_FETCH_PREMIRRORONLY") == "1")
+        premirroronly = bb.utils.to_boolean(self.d.getVar("BB_FETCH_PREMIRRORONLY"))
 
         for u in urls:
             ud = self.ud[u]
@@ -1716,7 +1720,7 @@ class Fetch(object):
                 update_stamp(ud, self.d)
 
             except IOError as e:
-                if e.errno in [os.errno.ESTALE]:
+                if e.errno in [errno.ESTALE]:
                     logger.error("Stale Error Observed %s." % u)
                     raise ChecksumError("Stale Error Detected")
 
@@ -1786,7 +1790,7 @@ class Fetch(object):
 
         for url in urls:
             if url not in self.ud:
-                self.ud[url] = FetchData(url, d)
+                self.ud[url] = FetchData(url, self.d)
             ud = self.ud[url]
             ud.setup_localpath(self.d)
 

@@ -1,4 +1,4 @@
-From 8e6cde08077eadfe563dc17c19995ebc48e30b97 Mon Sep 17 00:00:00 2001
+From 2f0b25266d0b4b04ef78b8950f5bd9749857b4f0 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 29 Mar 2016 20:38:30 -0700
 Subject: [PATCH 10/18] Fix for framerate with nested composition
@@ -56,5 +56,5 @@ index 03fe67b..13a110c 100644
  #ifdef ANDROID
                 CLIENT_UNLOCK();
 -- 
-2.19.1
+2.20.1
 

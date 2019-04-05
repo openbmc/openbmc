@@ -1,4 +1,4 @@
-From 5bc3e7ef9700d12054e0125a126f1bb093f01ef9 Mon Sep 17 00:00:00 2001
+From b658bdb38b7ff6a78915fd0ac390fc224e4006cb Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 26 Mar 2017 14:30:33 -0700
 Subject: [PATCH] disable ucontext on musl
@@ -6,12 +6,13 @@ Subject: [PATCH] disable ucontext on musl
 musl does not have *contex() APIs even though it has ucontext.h header
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  include/my_context.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/include/my_context.h b/include/my_context.h
-index dd44103..9b28c17 100644
+index ea0e3496..4c9b37dc 100644
 --- a/include/my_context.h
 +++ b/include/my_context.h
 @@ -31,7 +31,7 @@
@@ -23,6 +24,3 @@ index dd44103..9b28c17 100644
  #define MY_CONTEXT_USE_UCONTEXT
  #else
  #define MY_CONTEXT_DISABLE
--- 
-2.12.1
-

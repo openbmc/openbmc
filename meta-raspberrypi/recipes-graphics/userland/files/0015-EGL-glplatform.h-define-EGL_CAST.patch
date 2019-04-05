@@ -1,4 +1,4 @@
-From b5fa294c0d8fcb6dd5bfbfb96a0885dd9f3ae609 Mon Sep 17 00:00:00 2001
+From 3ba79e86cdec88440885fefc7aadf793b301b000 Mon Sep 17 00:00:00 2001
 From: Andrea Galbusera <gizero@gmail.com>
 Date: Fri, 14 Jul 2017 09:52:54 +0200
 Subject: [PATCH 15/18] EGL/glplatform.h: define EGL_CAST
@@ -28,5 +28,5 @@ index 1f7c930..c39d425 100644
 +
  #endif /* __eglplatform_h */
 -- 
-2.19.1
+2.20.1
 

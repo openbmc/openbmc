@@ -1291,7 +1291,7 @@ class DevtoolExtractTests(DevtoolBase):
             installdir = bb_vars['D']
             fakerootenv = bb_vars['FAKEROOTENV']
             fakerootcmd = bb_vars['FAKEROOTCMD']
-            result = runCmd('%s %s find . -type f -exec ls -l {} \;' % (fakerootenv, fakerootcmd), cwd=installdir)
+            result = runCmd('%s %s find . -type f -exec ls -l {} \\;' % (fakerootenv, fakerootcmd), cwd=installdir)
             filelist1 = self._process_ls_output(result.output)
 
             # Now look on the target

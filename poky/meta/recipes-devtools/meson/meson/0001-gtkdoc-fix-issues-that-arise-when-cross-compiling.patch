@@ -1,4 +1,4 @@
-From 3ac4e58c5494bd7e603a325b5b5c2b8075849fee Mon Sep 17 00:00:00 2001
+From 1afbf5ccff56e582229c8f673f50aedf2b24117e Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 4 Aug 2017 16:16:41 +0300
 Subject: [PATCH] gtkdoc: fix issues that arise when cross-compiling
@@ -16,70 +16,21 @@ Upstream-Status: Pending
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 
 ---
- mesonbuild/modules/gnome.py        | 18 +++++++++++++++---
- mesonbuild/scripts/gtkdochelper.py |  9 +++++++--
- 2 files changed, 22 insertions(+), 5 deletions(-)
+ mesonbuild/modules/gnome.py | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/mesonbuild/modules/gnome.py b/mesonbuild/modules/gnome.py
-index cb69641..727eb6a 100644
+index bf49770..7c5a363 100644
 --- a/mesonbuild/modules/gnome.py
 +++ b/mesonbuild/modules/gnome.py
-@@ -792,6 +792,10 @@ This will become a hard error in the future.''')
+@@ -972,6 +972,10 @@ This will become a hard error in the future.''')
                  '--mode=' + mode]
          if namespace:
              args.append('--namespace=' + namespace)
 +        gtkdoc_exe_wrapper = state.environment.cross_info.config["properties"].get('gtkdoc_exe_wrapper', None)
 +        if gtkdoc_exe_wrapper is not None:
-+            args.append('--gtkdoc-exe-wrapper=' + gtkdoc_exe_wrapper)
++            args.append('--run=' + gtkdoc_exe_wrapper)
 +
          args += self._unpack_args('--htmlargs=', 'html_args', kwargs)
          args += self._unpack_args('--scanargs=', 'scan_args', kwargs)
          args += self._unpack_args('--scanobjsargs=', 'scanobjs_args', kwargs)
-diff --git a/mesonbuild/scripts/gtkdochelper.py b/mesonbuild/scripts/gtkdochelper.py
-index 948dc5a..9c5bd19 100644
---- a/mesonbuild/scripts/gtkdochelper.py
-+++ b/mesonbuild/scripts/gtkdochelper.py
-@@ -45,6 +45,7 @@ parser.add_argument('--ignore-headers', dest='ignore_headers', default='')
- parser.add_argument('--namespace', dest='namespace', default='')
- parser.add_argument('--mode', dest='mode', default='')
- parser.add_argument('--installdir', dest='install_dir')
-+parser.add_argument('--gtkdoc-exe-wrapper', dest='gtkdoc_exe_wrapper')
- 
- def gtkdoc_run_check(cmd, cwd, library_paths=None):
-     if library_paths is None:
-@@ -64,7 +65,7 @@ def gtkdoc_run_check(cmd, cwd, library_paths=None):
-     # This preserves the order of messages.
-     p, out = Popen_safe(cmd, cwd=cwd, env=env, stderr=subprocess.STDOUT)[0:2]
-     if p.returncode != 0:
--        err_msg = ["{!r} failed with status {:d}".format(cmd[0], p.returncode)]
-+        err_msg = ["{!r} failed with status {:d}".format(cmd, p.returncode)]
-         if out:
-             err_msg.append(out)
-         raise MesonException('\n'.join(err_msg))
-@@ -74,7 +75,7 @@ def gtkdoc_run_check(cmd, cwd, library_paths=None):
- def build_gtkdoc(source_root, build_root, doc_subdir, src_subdirs,
-                  main_file, module,
-                  html_args, scan_args, fixxref_args, mkdb_args,
--                 gobject_typesfile, scanobjs_args, ld, cc, ldflags, cflags,
-+                 gobject_typesfile, scanobjs_args, gtkdoc_exe_wrapper, ld, cc, ldflags, cflags,
-                  html_assets, content_files, ignore_headers, namespace,
-                  expand_content_files, mode):
-     print("Building documentation for %s" % module)
-@@ -135,6 +136,9 @@ def build_gtkdoc(source_root, build_root, doc_subdir, src_subdirs,
-     if gobject_typesfile:
-         scanobjs_cmd = ['gtkdoc-scangobj'] + scanobjs_args + ['--types=' + gobject_typesfile,
-                                                               '--module=' + module,
-+                                                              '--run=' + gtkdoc_exe_wrapper,
-+                                                              '--cc=' + cc,
-+                                                              '--ld=' + ld,
-                                                               '--cflags=' + cflags,
-                                                               '--ldflags=' + ldflags,
-                                                               '--cc=' + cc,
-@@ -238,6 +242,7 @@ def run(args):
-         mkdbargs,
-         options.gobject_typesfile,
-         scanobjsargs,
-+        options.gtkdoc_exe_wrapper,
-         options.ld,
-         options.cc,
-         options.ldflags,

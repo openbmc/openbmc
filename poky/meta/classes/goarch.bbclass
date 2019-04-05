@@ -42,6 +42,10 @@ TUNE_CCARGS_remove = "-march=mips32r2"
 SECURITY_CFLAGS_mipsarch = "${SECURITY_NOPIE_CFLAGS}"
 SECURITY_NOPIE_CFLAGS ??= ""
 
+# go can't be built with ccache:
+# gcc: fatal error: no input files
+CCACHE_DISABLE ?= "1"
+
 def go_map_arch(a, d):
     import re
     if re.match('i.86', a):
@@ -64,6 +68,8 @@ def go_map_arch(a, d):
         return 'ppc64'
     elif re.match('p(pc|owerpc)(64el)', a):
         return 'ppc64le'
+    elif a == 'riscv64':
+        return 'riscv64'
     else:
         raise bb.parse.SkipRecipe("Unsupported CPU architecture: %s" % a)
 

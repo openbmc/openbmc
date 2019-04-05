@@ -29,11 +29,11 @@ python debian_package_name_hook () {
 
     pkgdest = d.getVar("PKGDEST")
     packages = d.getVar('PACKAGES')
-    so_re = re.compile("lib.*\.so")
+    so_re = re.compile(r"lib.*\.so")
 
     def socrunch(s):
         s = s.lower().replace('_', '-')
-        m = re.match("^(.*)(.)\.so\.(.*)$", s)
+        m = re.match(r"^(.*)(.)\.so\.(.*)$", s)
         if m is None:
             return None
         if m.group(2) in '0123456789':
@@ -79,7 +79,7 @@ python debian_package_name_hook () {
                     try:
                         cmd = [d.expand("${TARGET_PREFIX}objdump"), "-p", f]
                         output = subprocess.check_output(cmd).decode("utf-8")
-                        for m in re.finditer("\s+SONAME\s+([^\s]+)", output):
+                        for m in re.finditer(r"\s+SONAME\s+([^\s]+)", output):
                             if m.group(1) not in sonames:
                                 sonames.append(m.group(1))
                     except subprocess.CalledProcessError:

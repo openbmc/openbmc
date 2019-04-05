@@ -19,7 +19,7 @@ class BitbakePrTests(OESelftestTestCase):
     def get_pr_version(self, package_name):
         package_data_file = os.path.join(self.pkgdata_dir, 'runtime', package_name)
         package_data = ftools.read_file(package_data_file)
-        find_pr = re.search("PKGR: r[0-9]+\.([0-9]+)", package_data)
+        find_pr = re.search(r"PKGR: r[0-9]+\.([0-9]+)", package_data)
         self.assertTrue(find_pr, "No PKG revision found in %s" % package_data_file)
         return int(find_pr.group(1))
 
@@ -29,7 +29,7 @@ class BitbakePrTests(OESelftestTestCase):
         package_stamps_path = "/".join(stampdata[:-1])
         stamps = []
         for stamp in os.listdir(package_stamps_path):
-            find_stamp = re.match("%s\.%s\.([a-z0-9]{32})" % (re.escape(prefix), recipe_task), stamp)
+            find_stamp = re.match(r"%s\.%s\.([a-z0-9]{32})" % (re.escape(prefix), recipe_task), stamp)
             if find_stamp:
                 stamps.append(find_stamp.group(1))
         self.assertFalse(len(stamps) == 0, msg="Cound not find stamp for task %s for recipe %s" % (recipe_task, package_name))

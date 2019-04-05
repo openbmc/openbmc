@@ -1,0 +1,13 @@
+# 2014-04-18 Antti Palosaari <crope@iki.fi>
+# generated from http://www.digita.fi/kuluttajat/tv/nakyvyysalueet/kanavanumerot_ja_taajuudet
+
+[Utsjoki_Nuvvus]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 546000000
+	BANDWIDTH_HZ = 8000000
+
+[Utsjoki_Nuvvus]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 570000000
+	BANDWIDTH_HZ = 8000000
+

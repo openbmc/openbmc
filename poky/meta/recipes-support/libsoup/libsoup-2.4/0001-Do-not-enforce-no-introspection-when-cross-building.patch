@@ -1,0 +1,24 @@
+From 921888affe66953c92a08ae440e911b016b124be Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 15 Feb 2019 14:21:06 +0100
+Subject: [PATCH] Do not enforce no-introspection when cross-building
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 5a92cda..cfb3520 100644
+--- a/meson.build
++++ b/meson.build
+@@ -262,7 +262,7 @@ enable_gnome = get_option('gnome') and host_machine.system() != 'windows'
+ #########################
+ # GObject introspection #
+ #########################
+-enable_introspection = get_option('introspection') and find_program('g-ir-scanner', required: false).found() and not meson.is_cross_build()
++enable_introspection = get_option('introspection') and find_program('g-ir-scanner', required: false).found()
+ 
+ ############
+ # Vala API #

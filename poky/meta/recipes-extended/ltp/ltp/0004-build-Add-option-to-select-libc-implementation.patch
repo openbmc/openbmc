@@ -42,7 +42,7 @@ diff --git a/testcases/kernel/Makefile b/testcases/kernel/Makefile
 index 50a12fa..4f1987f 100644
 --- a/testcases/kernel/Makefile
 +++ b/testcases/kernel/Makefile
-@@ -48,13 +48,16 @@ SUBDIRS			+= connectors \
+@@ -49,12 +49,15 @@ SUBDIRS			+= connectors \
  			   logging \
  			   mem \
  			   numa \
@@ -51,7 +51,6 @@ index 50a12fa..4f1987f 100644
  			   security \
  			   timers \
  			   tracing \
- 			   module \
  
 +ifneq ($(LIBC),musl)
 +SUBDIRS			+= pty

@@ -45,7 +45,7 @@ Index: libmbim-1.14.0/m4/compiler-warnings.m4
  		      -Wdeclaration-after-statement -Wstrict-prototypes \
 @@ -17,22 +37,23 @@ if test "$GCC" = "yes" -a "$set_more_war
  		      -Wmissing-include-dirs -Waggregate-return \
- 		      -Wformat-security; do
+ 		      -Wformat-security -Wtype-limits; do
  		SAVE_CFLAGS="$CFLAGS"
 -		CFLAGS="$CFLAGS $option"
 +		CFLAGS="$CFLAGS $option $WERROR"

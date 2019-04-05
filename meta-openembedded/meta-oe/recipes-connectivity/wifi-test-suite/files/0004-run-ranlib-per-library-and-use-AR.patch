@@ -1,0 +1,38 @@
+From cca2f9901fb4fdcdd49066fe434eae512964143f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 9 Feb 2019 07:59:47 -0800
+Subject: [PATCH 4/4] run ranlib per library and use AR
+
+Use AR variable to invoke archiver instead of hardcoding, helps cross
+compile
+
+compiler ranlib e.g. llvm-ranlib fails to operate on multiple archives
+on single invocation
+
+fixes errors like
+arm-yoe-linux-musleabi-llvm-ranlib: error: Exactly one archive should be specified.
+
+Upstream-Status: Submitted [https://github.com/Wi-FiTestSuite/Wi-FiTestSuite-Linux-DUT/pull/47]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/Makefile | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/lib/Makefile b/lib/Makefile
+index 299b8d6..5fca322 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -20,7 +20,9 @@ all:    ${LIB_OBJS}
+ 		$(AR) crv ${LIBWFA_NAME} $?
+ 		$(AR) crv ${LIBWFA_NAME_DUT} ${LIB_OBJS_DUT}
+ 		$(AR) crv ${LIBWFA_NAME_CA} ${LIB_OBJS_CA}
+-		${RANLIB} ${LIBWFA_NAME} ${LIBWFA_NAME_DUT} ${LIBWFA_NAME_CA}
++		${RANLIB} ${LIBWFA_NAME}
++		${RANLIB} ${LIBWFA_NAME_DUT}
++		${RANLIB} ${LIBWFA_NAME_CA}
+ 
+ wfa_tg.o: wfa_tg.c ../inc/wfa_agt.h ../inc/wfa_types.h ../inc/wfa_rsp.h ../inc/wfa_tlv.h  ../inc/wfa_tg.h
+ 
+-- 
+2.20.1
+

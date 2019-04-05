@@ -26,6 +26,10 @@ DEPENDS_append_nios2 = " libgcc"
 KERNEL_CC_append_nios2 = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_LD_append_nios2 = " ${TOOLCHAIN_OPTIONS}"
 
+DEPENDS_append_arc = " libgcc"
+KERNEL_CC_append_arc = " ${TOOLCHAIN_OPTIONS}"
+KERNEL_LD_append_arc = " ${TOOLCHAIN_OPTIONS}"
+
 KERNEL_FEATURES_append_qemuall=" features/debug/printk.scc"
 
 KERNEL_FEATURES_append = " ${@bb.utils.contains('MACHINE_FEATURES', 'numa', 'features/numa/numa.scc', '', d)}"

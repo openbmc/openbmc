@@ -1,0 +1,19 @@
+Link with libfribidi, this is to avoid under linking where these functions are
+used but the library is not linked in, and they are marked undefined by BFD linker
+but gold linker refuses to link
+
+| ./.libs/libgdk-3.so: error: undefined reference to 'fribidi_get_bidi_type'
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+
+--- a/gdk/Makefile.am
++++ b/gdk/Makefile.am
+@@ -55,6 +55,7 @@ LDADD = 					\
+ 	-version-info $(LT_VERSION_INFO)	\
+ 	-export-dynamic 			\
+ 	-rpath $(libdir) 			\
++	-lfribidi	 			\
+ 	$(no_undefined)
+ 
+ #

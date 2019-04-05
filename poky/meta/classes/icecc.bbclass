@@ -34,6 +34,7 @@ BB_HASHBASE_WHITELIST += "ICECC_PARALLEL_MAKE ICECC_DISABLED ICECC_USER_PACKAGE_
     ICECC_DEBUG ICECC_LOGFILE ICECC_REPEAT_RATE ICECC_PREFERRED_HOST \
     ICECC_CLANG_REMOTE_CPP ICECC_IGNORE_UNVERIFIED ICECC_TEST_SOCKET \
     ICECC_ENV_DEBUG ICECC_SYSTEM_PACKAGE_BL ICECC_SYSTEM_CLASS_BL \
+    ICECC_REMOTE_CPP \
     "
 
 ICECC_ENV_EXEC ?= "${STAGING_BINDIR_NATIVE}/icecc-create-env"
@@ -55,6 +56,8 @@ ICECC_ENV_VERSION = "2"
 #
 # See: https://github.com/icecc/icecream/issues/190
 export ICECC_CARET_WORKAROUND ??= "0"
+
+export ICECC_REMOTE_CPP ??= "1"
 
 ICECC_CFLAGS = ""
 CFLAGS += "${ICECC_CFLAGS}"
@@ -130,6 +133,13 @@ def use_icecc(bb,d):
         return "no"
 
     pn = d.getVar('PN')
+    bpn = d.getVar('BPN')
+
+    # Blacklist/whitelist checks are made against BPN, because there is a good
+    # chance that if icecc should be skipped for a recipe, it should be skipped
+    # for all the variants of that recipe. PN is still checked in case a user
+    # specified a more specific recipe.
+    check_pn = set([pn, bpn])
 
     system_class_blacklist = (d.getVar('ICECC_SYSTEM_CLASS_BL') or "").split()
     user_class_blacklist = (d.getVar('ICECC_USER_CLASS_BL') or "none").split()
@@ -145,11 +155,11 @@ def use_icecc(bb,d):
     user_package_whitelist = (d.getVar('ICECC_USER_PACKAGE_WL') or "").split()
     package_blacklist = system_package_blacklist + user_package_blacklist
 
-    if pn in package_blacklist:
+    if check_pn & set(package_blacklist):
         bb.debug(1, "%s: found in blacklist, disable icecc" % pn)
         return "no"
 
-    if pn in user_package_whitelist:
+    if check_pn & set(user_package_whitelist):
         bb.debug(1, "%s: found in whitelist, enable icecc" % pn)
         return "yes"
 
@@ -379,7 +389,7 @@ set_icecc_env() {
             ${ICECC_ENV_EXEC} ${ICECC_ENV_DEBUG} "${ICECC_CC}" "${ICECC_CXX}" "${ICECC_AS}" "${ICECC_VERSION}"
         then
             touch "${ICECC_VERSION}.done"
-        elif ! wait_for_file "${ICECC_VERSION}.done" 30 
+        elif ! wait_for_file "${ICECC_VERSION}.done" 30
         then
             # locking failed so wait for ${ICECC_VERSION}.done to appear
             bbwarn "Timeout waiting for ${ICECC_VERSION}.done"
@@ -395,7 +405,8 @@ set_icecc_env() {
     export ICECC_VERSION ICECC_CC ICECC_CXX
     export PATH="$ICE_PATH:$PATH"
 
-    bbnote "Using icecc"
+    bbnote "Using icecc path: $ICE_PATH"
+    bbnote "Using icecc tarball: $ICECC_VERSION"
 }
 
 do_configure_prepend() {

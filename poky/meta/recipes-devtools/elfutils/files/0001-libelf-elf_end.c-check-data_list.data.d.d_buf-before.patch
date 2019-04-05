@@ -1,4 +1,4 @@
-From 3393a2e544818f0bd1887c13f28a76ad60c2df98 Mon Sep 17 00:00:00 2001
+From e571cbd0c20085ec71969971f19280b5de95cfb7 Mon Sep 17 00:00:00 2001
 From: Robert Yang <liezhi.yang@windriver.com>
 Date: Thu, 16 Aug 2018 09:58:26 +0800
 Subject: [PATCH] libelf/elf_end.c: check data_list.data.d.d_buf before free it
@@ -14,6 +14,7 @@ The segmentation fault happens when prelink call elf_end().
 Upstream-Status: Submitted [https://sourceware.org/ml/elfutils-devel/2018-q3/msg00085.html]
 
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+
 ---
  libelf/elf_end.c | 6 ++++--
  1 file changed, 4 insertions(+), 2 deletions(-)
@@ -41,6 +42,3 @@ index 160f0b8..5280a70 100644
  		  free (scn->rawdata_base);
  
  		/* Free the list of data buffers for the section.
--- 
-2.7.4
-

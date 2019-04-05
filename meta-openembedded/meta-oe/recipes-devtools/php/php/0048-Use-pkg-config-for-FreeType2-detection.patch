@@ -1,0 +1,53 @@
+From: =?utf-8?b?T25kxZllaiBTdXLDvQ==?= <ondrej@sury.org>
+Date: Mon, 22 Oct 2018 06:54:31 +0000
+Subject: Use pkg-config for FreeType2 detection
+
+---
+ ext/gd/config.m4 | 30 +++++++++++++++++++-----------
+ 1 file changed, 19 insertions(+), 11 deletions(-)
+
+diff --git a/ext/gd/config.m4 b/ext/gd/config.m4
+index 498d870..d28c6ae 100644
+--- a/ext/gd/config.m4
++++ b/ext/gd/config.m4
+@@ -184,21 +184,29 @@ AC_DEFUN([PHP_GD_XPM],[
+ AC_DEFUN([PHP_GD_FREETYPE2],[
+   if test "$PHP_FREETYPE_DIR" != "no"; then
+ 
+-    for i in $PHP_FREETYPE_DIR /usr/local /usr; do
+-      if test -f "$i/bin/freetype-config"; then
+-        FREETYPE2_DIR=$i
+-        FREETYPE2_CONFIG="$i/bin/freetype-config"
+-        break
++    if test -z "$PKG_CONFIG"; then
++      AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
++    fi
++    if test -x "$PKG_CONFIG" && $PKG_CONFIG --exists freetype2 ; then
++      FREETYPE2_CFLAGS=`$PKG_CONFIG --cflags freetype2`
++      FREETYPE2_LIBS=`$PKG_CONFIG --libs freetype2`
++    else
++      for i in $PHP_FREETYPE_DIR /usr/local /usr; do
++        if test -f "$i/bin/freetype-config"; then
++          FREETYPE2_DIR=$i
++          FREETYPE2_CONFIG="$i/bin/freetype-config"
++          break
++        fi
++      done
++
++      if test -z "$FREETYPE2_DIR"; then
++        AC_MSG_ERROR([freetype-config not found.])
+       fi
+-    done
+ 
+-    if test -z "$FREETYPE2_DIR"; then
+-      AC_MSG_ERROR([freetype-config not found.])
++      FREETYPE2_CFLAGS=`$FREETYPE2_CONFIG --cflags`
++      FREETYPE2_LIBS=`$FREETYPE2_CONFIG --libs`
+     fi
+ 
+-    FREETYPE2_CFLAGS=`$FREETYPE2_CONFIG --cflags`
+-    FREETYPE2_LIBS=`$FREETYPE2_CONFIG --libs`
+-
+     PHP_EVAL_INCLINE($FREETYPE2_CFLAGS)
+     PHP_EVAL_LIBLINE($FREETYPE2_LIBS, GD_SHARED_LIBADD)
+     AC_DEFINE(HAVE_LIBFREETYPE,1,[ ])

@@ -1,7 +1,7 @@
-From bcea5c5063a2d5f07dbe6f40aee30370fc4ba656 Mon Sep 17 00:00:00 2001
+From 2bcd0b9f6310bacdc554e077e85319a5e90e5ce0 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 30 Dec 2016 18:24:50 +0200
-Subject: [PATCH 1/2] Set libsolv variables with pkg-config (cmake's own module
+Subject: [PATCH] Set libsolv variables with pkg-config (cmake's own module
 
  doesn't work properly).
 
@@ -13,19 +13,16 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 8875bbf..ca280f3 100644
+index 0b405cb..cd91f08 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -29,7 +29,8 @@ find_package (PkgConfig REQUIRED)
- SET (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
+@@ -46,7 +46,8 @@ endif(APPLE)
  PKG_CHECK_MODULES(GLIB gio-unix-2.0>=2.46.0 REQUIRED)
+ pkg_check_modules(SMARTCOLS REQUIRED smartcols)
  FIND_LIBRARY (RPMDB_LIBRARY NAMES rpmdb)
--find_package (LibSolv 0.6.21 REQUIRED COMPONENTS ext)
+-find_package (LibSolv 0.6.30 REQUIRED COMPONENTS ext)
 +PKG_CHECK_MODULES (LIBSOLV REQUIRED libsolv)
 +set(LIBSOLV_LIBRARY ${LIBSOLV_LIBRARIES})
  if (ENABLE_RHSM_SUPPORT)
-     pkg_check_modules (RHSM REQUIRED librhsm)
+     pkg_check_modules (RHSM REQUIRED librhsm>=0.0.3)
      include_directories (${RHSM_INCLUDE_DIRS})
--- 
-2.14.2
-

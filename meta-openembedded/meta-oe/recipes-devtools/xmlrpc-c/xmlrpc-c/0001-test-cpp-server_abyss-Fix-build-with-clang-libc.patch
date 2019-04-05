@@ -1,0 +1,27 @@
+From dba3c5bf34ed530fd41ed50968825af2158f142e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 29 Jan 2019 13:31:39 -0800
+Subject: [PATCH] test/cpp/server_abyss: Fix build with clang/libc++
+
+/mnt/a/yoe/workspace/sources/xmlrpc-c/test/cpp/server_abyss.cpp:87:14: error: assigning to 'int' from incompatible type '__bind<int
+&, sockaddr *, unsigned int>'
+        rc = bind(this->fd, (struct sockaddr *)&sockAddr, sizeof(sockAddr));
+             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ test/cpp/server_abyss.cpp | 56 +++++++++++++++++++--------------------
+ 1 file changed, 28 insertions(+), 28 deletions(-)
+
+--- a/test/cpp/server_abyss.cpp
++++ b/test/cpp/server_abyss.cpp
+@@ -85,7 +85,7 @@ public:
+         sockAddr.sin_port   = htons(portNumber);
+         sockAddr.sin_addr.s_addr = 0;
+ 
+-        rc = bind(this->fd, (struct sockaddr *)&sockAddr, sizeof(sockAddr));
++        rc = ::bind(this->fd, (struct sockaddr *)&sockAddr, sizeof(sockAddr));
+         
+         if (rc != 0) {
+             closesock(this->fd);

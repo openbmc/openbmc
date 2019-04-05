@@ -17,15 +17,12 @@ diff --git a/doc/Makefile.am b/doc/Makefile.am
 index 8815476..3237499 100644
 --- a/doc/Makefile.am
 +++ b/doc/Makefile.am
-@@ -22,7 +22,7 @@ htmldir += $(pkgdatadir)/html
+@@ -8,7 +8,7 @@ htmldir += $(pkgdatadir)/html
  html_DATA += $(static_pages) html/index.html
  
  install-data-hook:
 -	cp -pR html/* $(DESTDIR)$(htmldir)
 +	cp -R html/* $(DESTDIR)$(htmldir)
  
- # Automake's "distcheck" is sensitive to having files left over
- # after "make uninstall", so we have to clean up the install hook.
--- 
-2.5.0
-
+ uninstall-local:
+ 	rm -rf $(DESTDIR)$(htmldir)

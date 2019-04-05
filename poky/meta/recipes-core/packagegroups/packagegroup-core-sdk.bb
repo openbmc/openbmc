@@ -27,6 +27,7 @@ RDEPENDS_packagegroup-core-sdk = "\
     tcl"
 
 SANITIZERS = "libasan-dev libubsan-dev"
+SANITIZERS_arc = ""
 SANITIZERS_microblaze = ""
 SANITIZERS_mipsarch = ""
 SANITIZERS_nios2 = ""

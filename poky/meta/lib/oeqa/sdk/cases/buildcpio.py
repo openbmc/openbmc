@@ -1,33 +1,31 @@
+import os
+import tempfile
+import subprocess
 import unittest
+
 from oeqa.sdk.case import OESDKTestCase
-from oeqa.sdk.utils.sdkbuildproject import SDKBuildProject
+from oeqa.utils.subprocesstweak import errors_have_output
+errors_have_output()
 
 class BuildCpioTest(OESDKTestCase):
-    td_vars = ['DATETIME']
-
-    @classmethod
-    def setUpClass(self):
-        dl_dir = self.td.get('DL_DIR', None)
-
-        self.project = SDKBuildProject(self.tc.sdk_dir + "/cpio/", self.tc.sdk_env,
-                        "https://ftp.gnu.org/gnu/cpio/cpio-2.12.tar.gz",
-                        self.tc.sdk_dir, self.td['DATETIME'], dl_dir=dl_dir)
-        self.project.download_archive()
-
-        machine = self.td.get("MACHINE")
-        if not self.tc.hasHostPackage("packagegroup-cross-canadian-%s" % machine):
-            raise unittest.SkipTest("SDK doesn't contain a cross-canadian toolchain")
-
+    """
+    Check that autotools will cross-compile correctly.
+    """
     def test_cpio(self):
-        self.assertEqual(self.project.run_configure(), 0,
-                        msg="Running configure failed")
+        with tempfile.TemporaryDirectory(prefix="cpio-", dir=self.tc.sdk_dir) as testdir:
+            tarball = self.fetch(testdir, self.td["DL_DIR"], "https://ftp.gnu.org/gnu/cpio/cpio-2.12.tar.gz")
 
-        self.assertEqual(self.project.run_make(), 0,
-                        msg="Running make failed")
+            dirs = {}
+            dirs["source"] = os.path.join(testdir, "cpio-2.12")
+            dirs["build"] = os.path.join(testdir, "build")
+            dirs["install"] = os.path.join(testdir, "install")
 
-        self.assertEqual(self.project.run_install(), 0,
-                        msg="Running make install failed")
+            subprocess.check_output(["tar", "xf", tarball, "-C", testdir])
+            self.assertTrue(os.path.isdir(dirs["source"]))
+            os.makedirs(dirs["build"])
 
-    @classmethod
-    def tearDownClass(self):
-        self.project.clean()
+            self._run("cd {build} && {source}/configure $CONFIGURE_FLAGS".format(**dirs))
+            self._run("cd {build} && make -j".format(**dirs))
+            self._run("cd {build} && make install DESTDIR={install}".format(**dirs))
+
+            self.check_elf(os.path.join(dirs["install"], "usr", "local", "bin", "cpio"))

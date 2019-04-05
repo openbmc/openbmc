@@ -1,0 +1,13 @@
+# 2014-04-18 Antti Palosaari <crope@iki.fi>
+# generated from http://www.digita.fi/kuluttajat/tv/nakyvyysalueet/kanavanumerot_ja_taajuudet
+
+[Kittila_Levitunturi]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 506000000
+	BANDWIDTH_HZ = 8000000
+
+[Kittila_Levitunturi]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 626000000
+	BANDWIDTH_HZ = 8000000
+

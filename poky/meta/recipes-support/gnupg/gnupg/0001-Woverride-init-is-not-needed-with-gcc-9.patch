@@ -1,0 +1,31 @@
+From 0df5800cc2e720aad883a517f7d24a9722fe5845 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 20 Dec 2018 17:37:48 -0800
+Subject: [PATCH] Woverride-init is not needed with gcc 9
+
+Fixes
+| ../../gnupg-2.2.12/dirmngr/dns.h:525:16: error: lvalue required as
+unary '&' operand                                                 |
+525 |  dns_rr_i_init(&dns_quietinit((struct dns_rr_i){ 0, __VA_ARGS__
+}), (P))
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ dirmngr/dns.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dirmngr/dns.h b/dirmngr/dns.h
+index 30d0b45..98fe412 100644
+--- a/dirmngr/dns.h
++++ b/dirmngr/dns.h
+@@ -154,7 +154,7 @@ DNS_PUBLIC int *dns_debug_p(void);
+ 
+ #define dns_quietinit(...) \
+ 	DNS_PRAGMA_PUSH DNS_PRAGMA_QUIET __VA_ARGS__ DNS_PRAGMA_POP
+-#elif (__GNUC__ == 4 && __GNUC_MINOR__ >= 6) || __GNUC__ > 4
++#elif (__GNUC__ == 4 && __GNUC_MINOR__ >= 6) || (__GNUC__ > 4 && __GNUC__ < 9)
+ #define DNS_PRAGMA_PUSH _Pragma("GCC diagnostic push")
+ #define DNS_PRAGMA_QUIET _Pragma("GCC diagnostic ignored \"-Woverride-init\"")
+ #define DNS_PRAGMA_POP _Pragma("GCC diagnostic pop")

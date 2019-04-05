@@ -1,0 +1,11 @@
+#!/bin/sh
+
+[ -r /etc/default/usbgx ] && . /etc/default/usbgx
+
+for i in $IMPORT_SCHEMAS; do
+    /usr/bin/gadget-import "$i" /etc/usbgx/"$i".schema
+done
+
+for i in $ENABLED_SCHEMAS; do
+    ls /sys/class/udc/ > /sys/kernel/config/usb_gadget/"$i"/UDC
+done

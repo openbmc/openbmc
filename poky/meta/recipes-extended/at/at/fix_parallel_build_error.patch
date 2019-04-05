@@ -1,3 +1,8 @@
+From 24ef2a6544f9c7ec01bc7ae73dffa2974a1e251d Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Wed, 5 Dec 2018 09:46:22 +0800
+Subject: [PATCH] fix parallel build error
+
 make -j was failing sometimesa like this
 | ccache i586-poky-linux-gcc -march=i586 --sysroot=/home/nitin/build/build0/tmp/sysroots/i586-poky-linux -I. -fexpensive-optimizations -fomit-frame-pointer -frename-registers -O2 -ggdb -feliminate-unused-debug-types -o atd atd.o daemon.o  -lfl  -lpam -Wl,-O1 -Wl,--as-needed
 | parsetime.l:5:19: fatal error: y.tab.h: No such file or directory
@@ -12,24 +17,24 @@ Nitin <nitin.a.kamble@intel.com>
 Upstream-Status: Pending
 
 Signed-off-by: Scott Garman <scott.a.garman@intel.com>
-
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
 ---
  Makefile.in | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/Makefile.in b/Makefile.in
-index dd3c2f8..7897e45 100644
+index 4c11913..18ecc23 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -82,6 +82,8 @@ y.tab.c y.tab.h: parsetime.y
+@@ -83,6 +83,8 @@ y.tab.c y.tab.h: parsetime.y
  lex.yy.c: parsetime.l
  	$(LEX) -i parsetime.l
  
 +parsetime.l: y.tab.h
 +
  atd.service: atd.service.in
- 	sed -e 's![@]sbindir[@]!$(sbindir)!g' < $< > $@
+ 	cat $< | sed -e 's![@]sbindir[@]!$(sbindir)!g' | sed -e 's![@]atjobdir[@]!$(atjobdir)!g' > $@
  
 -- 
-1.9.1
+2.7.4
 

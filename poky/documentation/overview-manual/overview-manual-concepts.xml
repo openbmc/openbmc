@@ -82,7 +82,7 @@
             <para>
                 This section briefly introduces BitBake.
                 If you want more information on BitBake, see the
-                <ulink url='&YOCTO_DOCS_BB_URL;#bitbake-user-manual'>BitBake User Manual</ulink>.
+                <ulink url='&YOCTO_DOCS_BB_URL;'>BitBake User Manual</ulink>.
             </para>
 
             <para>
@@ -1091,7 +1091,7 @@
                 <note>
                     Separate documentation exists for the BitBake tool.
                     See the
-                    <ulink url='&YOCTO_DOCS_BB_URL;#bitbake-user-manual'>BitBake User Manual</ulink>
+                    <ulink url='&YOCTO_DOCS_BB_URL;'>BitBake User Manual</ulink>
                     for reference material on BitBake.
                 </note>
             </para>

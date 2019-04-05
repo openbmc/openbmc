@@ -781,7 +781,7 @@
                     target, you must also enable BitBake to perform multiple
                     configuration builds.
                     Enabling is accomplished by setting the
-                    <link linkend='var-BBMULTICONFIG'><filename>BBMULTICONFIG</filename></link>
+                    <link linkend='var-bb-BBMULTICONFIG'><filename>BBMULTICONFIG</filename></link>
                     variable in the <filename>local.conf</filename>
                     configuration file.
                     As an example, suppose you had configuration files

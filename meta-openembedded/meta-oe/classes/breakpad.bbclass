@@ -25,6 +25,9 @@ PACKAGE_PREPROCESS_FUNCS += "breakpad_package_preprocess"
 breakpad_package_preprocess () {
     mkdir -p ${PKGD}/usr/share/breakpad-syms
     find ${D} -name ${BREAKPAD_BIN} -exec sh -c "dump_syms {} > ${PKGD}/usr/share/breakpad-syms/${BREAKPAD_BIN}.sym" \;
+    HASH=$(head -n1 ${PKGD}/usr/share/breakpad-syms/${BREAKPAD_BIN}.sym | rev | cut -d ' ' -f2 | rev)
+    mkdir -p ${PKGD}/usr/share/breakpad-syms/${BREAKPAD_BIN}/${HASH}
+    mv ${PKGD}/usr/share/breakpad-syms/${BREAKPAD_BIN}.sym ${PKGD}/usr/share/breakpad-syms/${BREAKPAD_BIN}/${HASH}
 }
 
 PACKAGES =+ "${PN}-breakpad"

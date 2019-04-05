@@ -108,6 +108,7 @@ class OESelftestTestContextExecutor(OETestContextExecutor):
         logdir = os.environ.get("BUILDDIR")
         if 'LOG_DIR' in bbvars:
             logdir = bbvars['LOG_DIR']
+        bb.utils.mkdirhier(logdir)
         args.output_log = logdir + '/%s-results-%s.log' % (self.name, args.test_start_time)
 
         super(OESelftestTestContextExecutor, self)._process_args(logger, args)

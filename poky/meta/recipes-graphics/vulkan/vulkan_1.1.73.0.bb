@@ -4,13 +4,13 @@ that provides efficient access to modern GPUs. These packages \
 provide only the common vendor-agnostic library loader, headers and \
 the vulkaninfo utility."
 HOMEPAGE = "https://www.khronos.org/vulkan/"
-BUGTRACKER = "https://github.com/KhronosGroup/Vulkan-LoaderAndValidationLayers"
+BUGTRACKER = "https://github.com/KhronosGroup/Vulkan-Loader"
 SECTION = "libs"
 
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=99c647ca3d4f6a4b9d8628f757aad156 \
                     file://loader/loader.c;endline=25;md5=151b392f46568aaedb4ad22b246237ec"
-SRC_URI = "git://github.com/KhronosGroup/Vulkan-LoaderAndValidationLayers.git;branch=sdk-1.1.73 \
+SRC_URI = "git://github.com/KhronosGroup/Vulkan-Loader.git;nobranch=1 \
            file://demos-Don-t-build-tri-or-cube.patch \
            "
 SRCREV = "5998d6f444a85e6381b7a089ebf3f9e86482a31d"
@@ -35,3 +35,6 @@ PACKAGECONFIG[wayland] = "-DBUILD_WSI_WAYLAND_SUPPORT=ON, -DBUILD_WSI_WAYLAND_SU
 
 RRECOMMENDS_${PN} = "mesa-vulkan-drivers"
 INSANE_SKIP_${PN}-dev += "dev-elf"
+
+# Can't be built with ccache
+CCACHE_DISABLE = "1"

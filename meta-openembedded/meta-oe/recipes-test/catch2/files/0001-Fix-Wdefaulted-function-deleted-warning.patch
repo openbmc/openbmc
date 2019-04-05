@@ -1,0 +1,35 @@
+From a39e0eaa8318335260967ffd1d16388eb5a1d6d8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 12 Feb 2019 12:57:00 -0800
+Subject: [PATCH] Fix -Wdefaulted-function-deleted warning
+
+Clang8 warns
+
+catch_interfaces_reporter.h:84:25: error: explicitly defaulted move assignment operator is implicitly deleted [-Werror,-Wdefaulted-function-deleted]
+|         AssertionStats& operator = ( AssertionStats && )     = default;
+|                         ^
+
+Upstream-Status: Submitted [https://github.com/catchorg/Catch2/pull/1537]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ include/internal/catch_interfaces_reporter.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/internal/catch_interfaces_reporter.h b/include/internal/catch_interfaces_reporter.h
+index 9d99c981..e5fbf8bb 100644
+--- a/include/internal/catch_interfaces_reporter.h
++++ b/include/internal/catch_interfaces_reporter.h
+@@ -80,8 +80,8 @@ namespace Catch {
+ 
+         AssertionStats( AssertionStats const& )              = default;
+         AssertionStats( AssertionStats && )                  = default;
+-        AssertionStats& operator = ( AssertionStats const& ) = default;
+-        AssertionStats& operator = ( AssertionStats && )     = default;
++        AssertionStats& operator = ( AssertionStats const& ) = delete;
++        AssertionStats& operator = ( AssertionStats && )     = delete;
+         virtual ~AssertionStats();
+ 
+         AssertionResult assertionResult;
+-- 
+2.20.1
+

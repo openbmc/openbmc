@@ -30,7 +30,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 RDEPENDS_${PN} = "bash"
 
 python do_package_prepend() {
-    d.setVar('PKGV', d.getVar("KERNEL_VERSION", True).split("-")[0])
+    d.setVar('PKGV', d.getVar("KERNEL_VERSION").split("-")[0])
 }
 
 B = "${WORKDIR}/${BPN}-${PV}"

@@ -1,24 +1,36 @@
-diff -ru openldap-2.4.46.orig/build/mkversion openldap-2.4.46/build/mkversion
---- openldap-2.4.46.orig/build/mkversion	2018-10-25 18:46:10.383750480 +1300
-+++ openldap-2.4.46/build/mkversion	2018-10-25 18:46:33.156232586 +1300
-@@ -50,7 +50,15 @@
- fi
- 
- APPLICATION=$1
--WHOWHERE="$USER@`uname -n`:`pwd`"
-+if [ -n "${SOURCE_DATE_EPOCH}" ]; then
-+   WHOWHERE="openldap"
+From 868a04b0596e2df708ba14ed70815b1411db3db1 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Thu, 21 Feb 2019 11:33:24 +0800
+Subject: [PATCH] mkversion: remove user host pwd from version
+
+Upstream-Status: Pending
+
+Update this patch to version 2.4.47
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ build/mkversion | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/build/mkversion b/build/mkversion
+index 4e35723..9fa3bee 100755
+--- a/build/mkversion
++++ b/build/mkversion
+@@ -53,8 +53,12 @@ APPLICATION=$1
+ # Reproducible builds set SOURCE_DATE_EPOCH, want constant strings
+ if [ -n "${SOURCE_DATE_EPOCH}" ]; then
+    WHOWHERE="openldap"
 +   DATE=$(date -d@$SOURCE_DATE_EPOCH +' %b %d %Y ')
 +   TIME=$(date -d@$SOURCE_DATE_EPOCH +' %H:%M:%S ')
-+else
-+   WHOWHERE="$USER@$(uname -n):$(pwd)"
+ else
+-   WHOWHERE="$USER@$(uname -n):$(pwd)"
++   WHOWHERE="openldap"
 +   DATE='" __DATE__ "'
 +   TIME='" __TIME__ "'
-+fi
+ fi
  
  cat << __EOF__
- /* This work is part of OpenLDAP Software <http://www.openldap.org/>.
-@@ -72,7 +80,7 @@
+@@ -77,7 +81,7 @@ static const char copyright[] =
  "COPYING RESTRICTIONS APPLY\n";
  
  $static $const char $SYMBOL[] =
@@ -27,3 +39,6 @@ diff -ru openldap-2.4.46.orig/build/mkversion openldap-2.4.46/build/mkversion
  "\t$WHOWHERE\n";
  
  __EOF__
+-- 
+2.7.4
+

@@ -214,7 +214,7 @@ def packages_filter_out_system(d):
     PN-dbg PN-doc PN-locale-eb-gb removed.
     """
     pn = d.getVar('PN')
-    blacklist = [pn + suffix for suffix in ('', '-dbg', '-dev', '-doc', '-locale', '-staticdev')]
+    blacklist = [pn + suffix for suffix in ('', '-dbg', '-dev', '-doc', '-locale', '-staticdev', '-src')]
     localepkg = pn + "-locale-"
     pkgs = []
 
@@ -307,6 +307,10 @@ def multiprocess_launch(target, items, d, extraargs=None):
             p.start()
             launched.append(p)
         for q in launched:
+            # Have to manually call update() to avoid deadlocks. The pipe can be full and
+            # transfer stalled until we try and read the results object but the subprocess won't exit
+            # as it still has data to write (https://bugs.python.org/issue8426)
+            q.update()
             # The finished processes are joined when calling is_alive()
             if not q.is_alive():
                 if q.exception:
@@ -326,7 +330,7 @@ def multiprocess_launch(target, items, d, extraargs=None):
 
 def squashspaces(string):
     import re
-    return re.sub("\s+", " ", string).strip()
+    return re.sub(r"\s+", " ", string).strip()
 
 def format_pkg_list(pkg_dict, ret_format=None):
     output = []
@@ -363,14 +367,18 @@ def host_gcc_version(d, taskcontextonly=False):
         return
 
     compiler = d.getVar("BUILD_CC")
+    # Get rid of ccache since it is not present when parsing.
+    if compiler.startswith('ccache '):
+        compiler = compiler[7:]
     try:
         env = os.environ.copy()
         env["PATH"] = d.getVar("PATH")
-        output = subprocess.check_output("%s --version" % compiler, shell=True, env=env).decode("utf-8")
+        output = subprocess.check_output("%s --version" % compiler, \
+                    shell=True, env=env, stderr=subprocess.STDOUT).decode("utf-8")
     except subprocess.CalledProcessError as e:
         bb.fatal("Error running %s --version: %s" % (compiler, e.output.decode("utf-8")))
 
-    match = re.match(".* (\d\.\d)\.\d.*", output.split('\n')[0])
+    match = re.match(r".* (\d\.\d)\.\d.*", output.split('\n')[0])
     if not match:
         bb.fatal("Can't get compiler version from %s --version output" % compiler)
 
@@ -482,3 +490,6 @@ class ImageQAFailed(bb.build.FuncFailed):
 
         return msg
 
+def sh_quote(string):
+    import shlex
+    return shlex.quote(string)

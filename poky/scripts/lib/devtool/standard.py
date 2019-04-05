@@ -849,9 +849,7 @@ def modify(args, config, basepath, workspace):
             if bb.data.inherits_class('kernel', rd):
                 f.write('SRCTREECOVEREDTASKS = "do_validate_branches do_kernel_checkout '
                         'do_fetch do_unpack do_kernel_configme do_kernel_configcheck"\n')
-                f.write('\ndo_patch() {\n'
-                        '    :\n'
-                        '}\n')
+                f.write('\ndo_patch[noexec] = "1"\n')
                 f.write('\ndo_configure_append() {\n'
                         '    cp ${B}/.config ${S}/.config.baseline\n'
                         '    ln -sfT ${B}/.config ${S}/.config.new\n'

@@ -1,0 +1,58 @@
+From fc7b7106dd0d8d123f20cbd8d408637fbc315e17 Mon Sep 17 00:00:00 2001
+From: Ankit Navik <ankit.tarot@gmail.com>
+Date: Tue, 25 Dec 2018 01:12:32 +0530
+Subject: [PATCH 3/3] fix path to /usr/sbin for script and make script for
+ generic shell
+
+Signed-off-by: Ankit Navik <ankit.tarot@gmail.com>
+---
+ lib/wfa_cs.c           | 4 ++--
+ scripts/dev_send_frame | 2 +-
+ scripts/sta_reset_parm | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/lib/wfa_cs.c b/lib/wfa_cs.c
+index 6b1f5a2..2a18533 100644
+--- a/lib/wfa_cs.c
++++ b/lib/wfa_cs.c
+@@ -319,7 +319,7 @@ int wfaStaGetIpConfig(int len, BYTE *caCmdBuf, int *respLen, BYTE *respBuf)
+     /*
+      * check a script file (the current implementation specific)
+      */
+-    ret = access("/usr/local/sbin/getipconfig.sh", F_OK);
++    ret = access("/usr/sbin/getipconfig.sh", F_OK);
+     if(ret == -1)
+     {
+         ipconfigResp->status = STATUS_ERROR;
+@@ -2115,7 +2115,7 @@ int wfaStaPresetParams(int len, BYTE *caCmdBuf, int *respLen, BYTE *respBuf)
+ 	    st = remove("/tmp/processid.txt");
+ 	}
+ 	
+-	sprintf(cmdStr, "/usr/local/sbin/findprocess.sh %s /tmp/processid.txt\n", "wpa_supplicant");
++	sprintf(cmdStr, "/usr/sbin/findprocess.sh %s /tmp/processid.txt\n", "wpa_supplicant");
+ 	st = system(cmdStr);
+ 	
+ 	tmpfd = fopen("/tmp/processid.txt", "r+");
+diff --git a/scripts/dev_send_frame b/scripts/dev_send_frame
+index 9e6afd3..3c37d61 100644
+--- a/scripts/dev_send_frame
++++ b/scripts/dev_send_frame
+@@ -1,4 +1,4 @@
+-#!/bin/bash 
++#!/usr/bin/env sh 
+ 
+ #
+ # Copyright (c) 2016 Wi-Fi Alliance
+diff --git a/scripts/sta_reset_parm b/scripts/sta_reset_parm
+index 2aff1f1..2c1c31e 100644
+--- a/scripts/sta_reset_parm
++++ b/scripts/sta_reset_parm
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env sh
+ 
+ #
+ # Copyright (c) 2016 Wi-Fi Alliance
+-- 
+2.7.4
+

@@ -20,6 +20,7 @@ DUMMYPROVIDES = "\
     libxml-parser-perl \
     perl-module-bytes \
     perl-module-carp \
+    perl-module-config \
     perl-module-constant \
     perl-module-data-dumper \
     perl-module-errno \
@@ -35,11 +36,12 @@ DUMMYPROVIDES = "\
     perl-module-getopt-long \
     perl-module-io-file \
     perl-module-overload \
+    perl-module-overloading \
     perl-module-posix \
-    perl-module-overload \
     perl-module-thread-queue \
     perl-module-threads \
     perl-module-warnings \
+    perl-module-warnings-register \
     /bin/sh \
     /bin/bash \
     /usr/bin/env \

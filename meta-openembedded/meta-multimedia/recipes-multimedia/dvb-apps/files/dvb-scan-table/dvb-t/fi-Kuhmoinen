@@ -1,0 +1,23 @@
+# 2014-04-18 Antti Palosaari <crope@iki.fi>
+# generated from http://www.digita.fi/kuluttajat/tv/nakyvyysalueet/kanavanumerot_ja_taajuudet
+
+[Kuhmoinen]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 594000000
+	BANDWIDTH_HZ = 8000000
+
+[Kuhmoinen]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 666000000
+	BANDWIDTH_HZ = 8000000
+
+[Kuhmoinen]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 674000000
+	BANDWIDTH_HZ = 8000000
+
+[Kuhmoinen]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 754000000
+	BANDWIDTH_HZ = 8000000
+

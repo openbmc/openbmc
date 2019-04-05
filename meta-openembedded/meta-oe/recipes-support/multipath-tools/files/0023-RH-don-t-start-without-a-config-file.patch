@@ -1,7 +1,10 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Benjamin Marzinski <bmarzins@redhat.com>
-Date: Wed, 15 Oct 2014 10:39:30 -0500
-Subject: [PATCH] RH: don't start without a config file
+From 0bf8ff8dab26201b268b419809844c07e168f17d Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Fri, 23 Nov 2018 17:25:15 +0800
+Subject: [PATCH] From 0000000000000000000000000000000000000000 Mon Sep 17
+ 00:00:00 2001 From: Benjamin Marzinski <bmarzins@redhat.com> Date: Wed, 15
+ Oct 2014 10:39:30 -0500 Subject: [PATCH] RH: don't start without a config
+ file
 
 If /etc/multipath.conf doesn't exist, don't start multipathd and blacklist
 all devices when running multipath.  A completely blank configuration file
@@ -11,16 +14,21 @@ simple way to disable multipath.  Simply removing or renaming
 /etc/multipath.conf will keep multipath from doing anything.
 
 Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+
+Upstream-Status: Pending
+
+update this patch to new version
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
- libmultipath/config.c         | 15 +++++++++++++++
+ libmultipath/config.c         | 18 ++++++++++++++++++
  libmultipath/config.h         |  1 +
  multipath/multipath.rules     |  1 +
  multipathd/multipathd.8       |  2 ++
  multipathd/multipathd.service |  1 +
- 5 files changed, 20 insertions(+)
+ 5 files changed, 23 insertions(+)
 
 diff --git a/libmultipath/config.c b/libmultipath/config.c
-index 5872927..0607403 100644
+index 5af7af5..e4233f1 100644
 --- a/libmultipath/config.c
 +++ b/libmultipath/config.c
 @@ -26,6 +26,7 @@
@@ -30,30 +38,33 @@ index 5872927..0607403 100644
 +#include "version.h"
  
  static int
- hwe_strmatch (struct hwentry *hwe1, struct hwentry *hwe2)
-@@ -658,6 +659,20 @@ load_config (char * file)
- 			factorize_hwtable(conf->hwtable, builtin_hwtable_size);
+ hwe_strmatch (const struct hwentry *hwe1, const struct hwentry *hwe2)
+@@ -743,6 +745,23 @@ load_config (char * file)
+ 			goto out;
  		}
- 
+ 		factorize_hwtable(conf->hwtable, builtin_hwtable_size, file);
 +	} else {
 +		condlog(0, "/etc/multipath.conf does not exist, blacklisting all devices.");
 +		if (conf->blist_devnode == NULL) {
 +			conf->blist_devnode = vector_alloc();
 +			if (!conf->blist_devnode) {
-+				condlog(0, "cannot allocate blacklist\n");
++				conf->blist_devnode = vector_alloc();
++				if (!conf->blist_devnode) {
++					condlog(0, "cannot allocate blacklist\n");
++					goto out;
++				}
++			}
++			if (store_ble(conf->blist_devnode, strdup(".*"),
++				ORIGIN_NO_CONFIG)) {
++				condlog(0, "cannot store default no-config blacklist\n");
 +				goto out;
 +			}
-+		}
-+		if (store_ble(conf->blist_devnode, strdup(".*"),
-+		              ORIGIN_NO_CONFIG)) {
-+			condlog(0, "cannot store default no-config blacklist\n");
-+			goto out;
 +		}
  	}
  
  	conf->processed_main_config = 1;
 diff --git a/libmultipath/config.h b/libmultipath/config.h
-index fcbe3fc..3a42435 100644
+index 7d0cd9a..d7fb8e2 100644
 --- a/libmultipath/config.h
 +++ b/libmultipath/config.h
 @@ -9,6 +9,7 @@
@@ -65,7 +76,7 @@ index fcbe3fc..3a42435 100644
  /*
   * In kernel, fast_io_fail == 0 means immediate failure on rport delete.
 diff --git a/multipath/multipath.rules b/multipath/multipath.rules
-index d658073..b3f54d7 100644
+index 9df11a9..0486bf7 100644
 --- a/multipath/multipath.rules
 +++ b/multipath/multipath.rules
 @@ -9,6 +9,7 @@ IMPORT{cmdline}="nompath"
@@ -77,7 +88,7 @@ index d658073..b3f54d7 100644
  ENV{DEVTYPE}!="partition", GOTO="test_dev"
  IMPORT{parent}="DM_MULTIPATH_DEVICE_PATH"
 diff --git a/multipathd/multipathd.8 b/multipathd/multipathd.8
-index e78ac9e..09cdead 100644
+index 94c3f97..ed13efd 100644
 --- a/multipathd/multipathd.8
 +++ b/multipathd/multipathd.8
 @@ -38,6 +38,8 @@ map regains its maximum performance and redundancy.

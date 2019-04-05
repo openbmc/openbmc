@@ -1,0 +1,27 @@
+From 24f74444c00c6c9bf076fb002614ebf6dec31f1a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 28 Dec 2018 09:59:53 -0800
+Subject: [PATCH 39/40] riscv: Disable multilib for OE
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gcc/config/riscv/t-linux | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/gcc/config/riscv/t-linux b/gcc/config/riscv/t-linux
+index 216d2776a18..e4d817621fc 100644
+--- a/gcc/config/riscv/t-linux
++++ b/gcc/config/riscv/t-linux
+@@ -1,3 +1,5 @@
+ # Only XLEN and ABI affect Linux multilib dir names, e.g. /lib32/ilp32d/
+-MULTILIB_DIRNAMES := $(patsubst rv32%,lib32,$(patsubst rv64%,lib64,$(MULTILIB_DIRNAMES)))
+-MULTILIB_OSDIRNAMES := $(patsubst lib%,../lib%,$(MULTILIB_DIRNAMES))
++#MULTILIB_DIRNAMES := $(patsubst rv32%,lib32,$(patsubst rv64%,lib64,$(MULTILIB_DIRNAMES)))
++MULTILIB_DIRNAMES := . .
++#MULTILIB_OSDIRNAMES := $(patsubst lib%,../lib%,$(MULTILIB_DIRNAMES))
++MULTILIB_OSDIRNAMES := ../$(shell basename $(base_libdir)) ../$(shell basename $(base_libdir))
+-- 
+2.21.0
+

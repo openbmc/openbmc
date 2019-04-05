@@ -12,6 +12,7 @@ SRC_URI = "http://www.thekelleys.org.uk/dnsmasq/${@['archive/', ''][float(d.getV
            file://dnsmasq.conf \
            file://dnsmasq-resolvconf.service \
            file://dnsmasq-noresolvconf.service \
+           file://dnsmasq-resolved.conf \
 "
 
 inherit pkgconfig update-rc.d systemd
@@ -58,6 +59,8 @@ do_install () {
     else
         install -m 0644 ${WORKDIR}/dnsmasq-noresolvconf.service ${D}${systemd_unitdir}/system/dnsmasq.service
     fi
+    install -d ${D}${sysconfdir}/systemd/resolved.conf.d/
+    install -m 0644 ${WORKDIR}/dnsmasq-resolved.conf ${D}${sysconfdir}/systemd/resolved.conf.d/
 
     install -m 0755 ${S}/contrib/lease-tools/dhcp_release ${D}${bindir}
 

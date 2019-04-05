@@ -194,7 +194,7 @@
                 <para>
                 When you run BitBake, it begins looking for metadata files.
                 The
-                <link linkend='var-BBPATH'><filename>BBPATH</filename></link>
+                <link linkend='var-bb-BBPATH'><filename>BBPATH</filename></link>
                 variable is what tells BitBake where to look for those files.
                 <filename>BBPATH</filename> is not set and you need to set it.
                 Without <filename>BBPATH</filename>, Bitbake cannot
@@ -273,14 +273,14 @@
                 some editor to create the <filename>bitbake.conf</filename>
                 so that it contains the following:
                 <literallayout class='monospaced'>
-     <link linkend='var-PN'>PN</link>  = "${@bb.parse.BBHandler.vars_from_file(d.getVar('FILE', False),d)[0] or 'defaultpkgname'}"
+     <link linkend='var-bb-PN'>PN</link>  = "${@bb.parse.BBHandler.vars_from_file(d.getVar('FILE', False),d)[0] or 'defaultpkgname'}"
                 </literallayout>
                 <literallayout class='monospaced'>
-     TMPDIR  = "${<link linkend='var-TOPDIR'>TOPDIR</link>}/tmp"
-     <link linkend='var-CACHE'>CACHE</link>   = "${TMPDIR}/cache"
-     <link linkend='var-STAMP'>STAMP</link>   = "${TMPDIR}/${PN}/stamps"
-     <link linkend='var-T'>T</link>       = "${TMPDIR}/${PN}/work"
-     <link linkend='var-B'>B</link>       = "${TMPDIR}/${PN}"
+     TMPDIR  = "${<link linkend='var-bb-TOPDIR'>TOPDIR</link>}/tmp"
+     <link linkend='var-bb-CACHE'>CACHE</link>   = "${TMPDIR}/cache"
+     <link linkend='var-bb-STAMP'>STAMP</link>   = "${TMPDIR}/${PN}/stamps"
+     <link linkend='var-bb-T'>T</link>       = "${TMPDIR}/${PN}/work"
+     <link linkend='var-bb-B'>B</link>       = "${TMPDIR}/${PN}"
                 </literallayout>
                 <note>
                     Without a value for <filename>PN</filename>, the
@@ -402,12 +402,12 @@
                 Move to the <filename>conf</filename> directory and create a
                 <filename>layer.conf</filename> file that has the following:
                 <literallayout class='monospaced'>
-     BBPATH .= ":${<link linkend='var-LAYERDIR'>LAYERDIR</link>}"
+     BBPATH .= ":${<link linkend='var-bb-LAYERDIR'>LAYERDIR</link>}"
 
-     <link linkend='var-BBFILES'>BBFILES</link> += "${LAYERDIR}/*.bb"
+     <link linkend='var-bb-BBFILES'>BBFILES</link> += "${LAYERDIR}/*.bb"
 
-     <link linkend='var-BBFILE_COLLECTIONS'>BBFILE_COLLECTIONS</link> += "mylayer"
-     <link linkend='var-BBFILE_PATTERN'>BBFILE_PATTERN_mylayer</link> := "^${LAYERDIR_RE}/"
+     <link linkend='var-bb-BBFILE_COLLECTIONS'>BBFILE_COLLECTIONS</link> += "mylayer"
+     <link linkend='var-bb-BBFILE_PATTERN'>BBFILE_PATTERN_mylayer</link> := "^${LAYERDIR_RE}/"
                 </literallayout>
                 For information on these variables, click the links
                 to go to the definitions in the glossary.</para>
@@ -416,9 +416,9 @@
                 a recipe file named <filename>printhello.bb</filename> that
                 has the following:
                 <literallayout class='monospaced'>
-     <link linkend='var-DESCRIPTION'>DESCRIPTION</link> = "Prints Hello World"
-     <link linkend='var-PN'>PN</link> = 'printhello'
-     <link linkend='var-PV'>PV</link> = '1'
+     <link linkend='var-bb-DESCRIPTION'>DESCRIPTION</link> = "Prints Hello World"
+     <link linkend='var-bb-PN'>PN</link> = 'printhello'
+     <link linkend='var-bb-PV'>PV</link> = '1'
 
      python do_build() {
         bb.plain("********************");

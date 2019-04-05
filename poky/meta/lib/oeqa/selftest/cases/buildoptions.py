@@ -37,13 +37,13 @@ class ImageOptionsTests(OESelftestTestCase):
         p = bb_vars['SYSROOT_DESTDIR'] + bb_vars['bindir'] + "/" + "ccache"
         self.assertTrue(os.path.isfile(p), msg = "No ccache found (%s)" % p)
         self.write_config('INHERIT += "ccache"')
-        self.add_command_to_tearDown('bitbake -c clean m4')
-        bitbake("m4 -c clean")
-        bitbake("m4 -f -c compile")
-        log_compile = os.path.join(get_bb_var("WORKDIR","m4"), "temp/log.do_compile")
+        self.add_command_to_tearDown('bitbake -c clean m4-native')
+        bitbake("m4-native -c clean")
+        bitbake("m4-native -f -c compile")
+        log_compile = os.path.join(get_bb_var("WORKDIR","m4-native"), "temp/log.do_compile")
         with open(log_compile, "r") as f:
             loglines = "".join(f.readlines())
-        self.assertIn("ccache", loglines, msg="No match for ccache in m4 log.do_compile. For further details: %s" % log_compile)
+        self.assertIn("ccache", loglines, msg="No match for ccache in m4-native log.do_compile. For further details: %s" % log_compile)
 
     @OETestID(1435)
     def test_read_only_image(self):
@@ -187,6 +187,8 @@ class SourceMirroring(OESelftestTestCase):
 BB_ALLOWED_NETWORKS = "downloads.yoctoproject.org"
 MIRRORS = ""
 DL_DIR = "${TMPDIR}/test_downloads"
+STAMPS_DIR = "${TMPDIR}/test_stamps"
+SSTATE_DIR = "${TMPDIR}/test_sstate-cache"
 PREMIRRORS = "\\
     bzr://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \\n \\
     cvs://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \\n \\

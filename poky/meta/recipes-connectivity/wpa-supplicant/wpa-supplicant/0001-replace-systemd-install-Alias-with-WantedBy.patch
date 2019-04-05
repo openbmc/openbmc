@@ -1,0 +1,52 @@
+From 94c401733a5a3d294cc412671166e6adfb409f53 Mon Sep 17 00:00:00 2001
+From: Joshua DeWeese <jdeweese@hennypenny.com>
+Date: Wed, 30 Jan 2019 16:19:47 -0500
+Subject: [PATCH] replace systemd install Alias with WantedBy
+
+According to the systemd documentation "WantedBy=foo.service in a
+service bar.service is mostly equivalent to
+Alias=foo.service.wants/bar.service in the same file." However,
+this is not really the intended purpose of install Aliases.
+
+Upstream-Status: Submitted [hostap@lists.infradead.org]
+
+Signed-off-by: Joshua DeWeese <jdeweese@hennypenny.com>
+---
+ wpa_supplicant/systemd/wpa_supplicant-nl80211.service.arg.in | 2 +-
+ wpa_supplicant/systemd/wpa_supplicant-wired.service.arg.in   | 2 +-
+ wpa_supplicant/systemd/wpa_supplicant.service.arg.in         | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/wpa_supplicant/systemd/wpa_supplicant-nl80211.service.arg.in b/wpa_supplicant/systemd/wpa_supplicant-nl80211.service.arg.in
+index 03ac507..da69a87 100644
+--- a/wpa_supplicant/systemd/wpa_supplicant-nl80211.service.arg.in
++++ b/wpa_supplicant/systemd/wpa_supplicant-nl80211.service.arg.in
+@@ -12,4 +12,4 @@ Type=simple
+ ExecStart=@BINDIR@/wpa_supplicant -c/etc/wpa_supplicant/wpa_supplicant-nl80211-%I.conf -Dnl80211 -i%I
+ 
+ [Install]
+-Alias=multi-user.target.wants/wpa_supplicant-nl80211@%i.service
++WantedBy=multi-user.target
+diff --git a/wpa_supplicant/systemd/wpa_supplicant-wired.service.arg.in b/wpa_supplicant/systemd/wpa_supplicant-wired.service.arg.in
+index c8a744d..ca3054b 100644
+--- a/wpa_supplicant/systemd/wpa_supplicant-wired.service.arg.in
++++ b/wpa_supplicant/systemd/wpa_supplicant-wired.service.arg.in
+@@ -12,4 +12,4 @@ Type=simple
+ ExecStart=@BINDIR@/wpa_supplicant -c/etc/wpa_supplicant/wpa_supplicant-wired-%I.conf -Dwired -i%I
+ 
+ [Install]
+-Alias=multi-user.target.wants/wpa_supplicant-wired@%i.service
++WantedBy=multi-user.target
+diff --git a/wpa_supplicant/systemd/wpa_supplicant.service.arg.in b/wpa_supplicant/systemd/wpa_supplicant.service.arg.in
+index 7788b38..55d2b9c 100644
+--- a/wpa_supplicant/systemd/wpa_supplicant.service.arg.in
++++ b/wpa_supplicant/systemd/wpa_supplicant.service.arg.in
+@@ -12,4 +12,4 @@ Type=simple
+ ExecStart=@BINDIR@/wpa_supplicant -c/etc/wpa_supplicant/wpa_supplicant-%I.conf -i%I
+ 
+ [Install]
+-Alias=multi-user.target.wants/wpa_supplicant@%i.service
++WantedBy=multi-user.target
+-- 
+2.7.4
+

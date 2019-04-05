@@ -28,7 +28,7 @@ diff --git a/Modules/FindQt4.cmake b/Modules/FindQt4.cmake
 index 847a798af..7ad981879 100644
 --- a/Modules/FindQt4.cmake
 +++ b/Modules/FindQt4.cmake
-@@ -517,7 +517,7 @@ endfunction()
+@@ -518,7 +518,7 @@ endfunction()
  
  set(QT4_INSTALLED_VERSION_TOO_OLD FALSE)
  
@@ -37,7 +37,7 @@ index 847a798af..7ad981879 100644
  _qt4_find_qmake("${_QT4_QMAKE_NAMES}" QT_QMAKE_EXECUTABLE QTVERSION)
  
  if (QT_QMAKE_EXECUTABLE AND
-@@ -1135,12 +1135,12 @@ if (QT_QMAKE_EXECUTABLE AND
+@@ -1136,12 +1136,12 @@ if (QT_QMAKE_EXECUTABLE AND
    _find_qt4_program(QT_MOC_EXECUTABLE Qt4::moc moc-qt4 moc4 moc)
    _find_qt4_program(QT_UIC_EXECUTABLE Qt4::uic uic-qt4 uic4 uic)
    _find_qt4_program(QT_UIC3_EXECUTABLE Qt4::uic3 uic3)

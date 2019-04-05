@@ -28,7 +28,7 @@ diff --git a/Modules/CMakeDetermineSystem.cmake b/Modules/CMakeDetermineSystem.c
 index 600d5580e..32d7f1945 100644
 --- a/Modules/CMakeDetermineSystem.cmake
 +++ b/Modules/CMakeDetermineSystem.cmake
-@@ -82,6 +82,13 @@ else()
+@@ -81,6 +81,13 @@ else()
    endif()
  endif()
  

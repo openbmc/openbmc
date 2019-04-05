@@ -20,8 +20,8 @@ EXTRA_OECONF = " \
     --enable-panel-plugins \
 "
 
-PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
-PACKAGECONFIG[systemd] = "--enable-polkit, --disable-polkit, polkit"
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'polkit', d)}"
+PACKAGECONFIG[polkit] = "--enable-polkit, --disable-polkit, polkit"
 
 PACKAGES += "xfce4-powermanager-plugin"
 

@@ -147,6 +147,23 @@ class GitSM(Git):
 
         return submodules != []
 
+    def need_update(self, ud, d):
+        if Git.need_update(self, ud, d):
+            return True
+
+        try:
+            # Check for the nugget dropped by the download operation
+            known_srcrevs = runfetchcmd("%s config --get-all bitbake.srcrev" % \
+                            (ud.basecmd), d, workdir=ud.clonedir)
+
+            if ud.revisions[ud.names[0]] not in known_srcrevs.split():
+                return True
+        except bb.fetch2.FetchError:
+            # No srcrev nuggets, so this is new and needs to be updated
+            return True
+
+        return False
+
     def download(self, ud, d):
         def download_submodule(ud, url, module, modpath, d):
             url += ";bareclone=1;nobranch=1"
@@ -157,6 +174,9 @@ class GitSM(Git):
             try:
                 newfetch = Fetch([url], d, cache=False)
                 newfetch.download()
+                # Drop a nugget to add each of the srcrevs we've fetched (used by need_update)
+                runfetchcmd("%s config --add bitbake.srcrev %s" % \
+                            (ud.basecmd, ud.revisions[ud.names[0]]), d, workdir=ud.clonedir)
             except Exception as e:
                 logger.error('gitsm: submodule download failed: %s %s' % (type(e).__name__, str(e)))
                 raise

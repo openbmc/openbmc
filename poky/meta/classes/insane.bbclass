@@ -33,7 +33,8 @@ ERROR_QA ?= "dev-so debug-deps dev-deps debug-files arch pkgconfig la \
             perms dep-cmp pkgvarcheck perm-config perm-line perm-link \
             split-strip packages-list pkgv-undefined var-undefined \
             version-going-backwards expanded-d invalid-chars \
-            license-checksum dev-elf file-rdeps \
+            license-checksum dev-elf file-rdeps configure-unsafe \
+            configure-gettext \
             "
 # Add usrmerge QA check based on distro feature
 ERROR_QA_append = "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', ' usrmerge', '', d)}"
@@ -307,10 +308,10 @@ def package_qa_check_arch(path,name,d, elf, messages):
     if not ((machine == elf.machine()) or is_32 or is_bpf):
         package_qa_add_message(messages, "arch", "Architecture did not match (%s, expected %s) on %s" % \
                  (oe.qa.elf_machine_to_string(elf.machine()), oe.qa.elf_machine_to_string(machine), package_qa_clean_path(path,d)))
-    elif not ((bits == elf.abiSize()) or is_32):
+    elif not ((bits == elf.abiSize()) or is_32 or is_bpf):
         package_qa_add_message(messages, "arch", "Bit size did not match (%d to %d) %s on %s" % \
                  (bits, elf.abiSize(), bpn, package_qa_clean_path(path,d)))
-    elif not littleendian == elf.isLittleEndian():
+    elif not ((littleendian == elf.isLittleEndian()) or is_bpf):
         package_qa_add_message(messages, "arch", "Endiannes did not match (%d to %d) on %s" % \
                  (littleendian, elf.isLittleEndian(), package_qa_clean_path(path,d)))
 
@@ -457,7 +458,6 @@ python populate_lic_qa_checksum() {
     """
     Check for changes in the license files.
     """
-    import tempfile
     sane = True
 
     lic_files = d.getVar('LIC_FILES_CHKSUM') or ''
@@ -495,61 +495,45 @@ python populate_lic_qa_checksum() {
 
         if (not beginline) and (not endline):
             md5chksum = bb.utils.md5_file(srclicfile)
-            with open(srclicfile, 'rb') as f:
-                license = f.read()
+            with open(srclicfile, 'r', errors='replace') as f:
+                license = f.read().splitlines()
         else:
-            fi = open(srclicfile, 'rb')
-            fo = tempfile.NamedTemporaryFile(mode='wb', prefix='poky.', suffix='.tmp', delete=False)
-            tmplicfile = fo.name;
-            lineno = 0
-            linesout = 0
-            license = []
-            for line in fi:
-                lineno += 1
-                if (lineno >= beginline):
-                    if ((lineno <= endline) or not endline):
-                        fo.write(line)
-                        license.append(line)
-                        linesout += 1
-                    else:
-                        break
-            fo.flush()
-            fo.close()
-            fi.close()
-            md5chksum = bb.utils.md5_file(tmplicfile)
-            license = b''.join(license)
-            os.unlink(tmplicfile)
-
+            with open(srclicfile, 'rb') as f:
+                import hashlib
+                lineno = 0
+                license = []
+                m = hashlib.md5()
+                for line in f:
+                    lineno += 1
+                    if (lineno >= beginline):
+                        if ((lineno <= endline) or not endline):
+                            m.update(line)
+                            license.append(line.decode('utf-8', errors='replace').rstrip())
+                        else:
+                            break
+                md5chksum = m.hexdigest()
         if recipemd5 == md5chksum:
             bb.note (pn + ": md5 checksum matched for ", url)
         else:
             if recipemd5:
                 msg = pn + ": The LIC_FILES_CHKSUM does not match for " + url
                 msg = msg + "\n" + pn + ": The new md5 checksum is " + md5chksum
-                try:
-                    license_lines = license.decode('utf-8').split('\n')
-                except:
-                    # License text might not be valid UTF-8, in which
-                    # case we don't know how to include it in our output
-                    # and have to skip it.
-                    pass
-                else:
-                    max_lines = int(d.getVar('QA_MAX_LICENSE_LINES') or 20)
-                    if not license_lines or license_lines[-1] != '':
-                        # Ensure that our license text ends with a line break
-                        # (will be added with join() below).
-                        license_lines.append('')
-                    remove = len(license_lines) - max_lines
-                    if remove > 0:
-                        start = max_lines // 2
-                        end = start + remove - 1
-                        del license_lines[start:end]
-                        license_lines.insert(start, '...')
-                    msg = msg + "\n" + pn + ": Here is the selected license text:" + \
-                          "\n" + \
-                          "{:v^70}".format(" beginline=%d " % beginline if beginline else "") + \
-                          "\n" + "\n".join(license_lines) + \
-                          "{:^^70}".format(" endline=%d " % endline if endline else "")
+                max_lines = int(d.getVar('QA_MAX_LICENSE_LINES') or 20)
+                if not license or license[-1] != '':
+                    # Ensure that our license text ends with a line break
+                    # (will be added with join() below).
+                    license.append('')
+                remove = len(license) - max_lines
+                if remove > 0:
+                    start = max_lines // 2
+                    end = start + remove - 1
+                    del license[start:end]
+                    license.insert(start, '...')
+                msg = msg + "\n" + pn + ": Here is the selected license text:" + \
+                        "\n" + \
+                        "{:v^70}".format(" beginline=%d " % beginline if beginline else "") + \
+                        "\n" + "\n".join(license) + \
+                        "{:^^70}".format(" endline=%d " % endline if endline else "")
                 if beginline:
                     if endline:
                         srcfiledesc = "%s (lines %d through to %d)" % (srclicfile, beginline, endline)
@@ -570,7 +554,7 @@ python populate_lic_qa_checksum() {
         bb.fatal("Fatal QA errors found, failing task.")
 }
 
-def package_qa_check_staged(path,d):
+def qa_check_staged(path,d):
     """
     Check staged la and pc files for common problems like references to the work
     directory.
@@ -589,20 +573,31 @@ def package_qa_check_staged(path,d):
     else:
         pkgconfigcheck = tmpdir
 
+    skip = (d.getVar('INSANE_SKIP') or "").split()
+    skip_la = False
+    if 'la' in skip:
+        bb.note("Recipe %s skipping qa checking: la" % d.getVar('PN'))
+        skip_la = True
+
+    skip_pkgconfig = False
+    if 'pkgconfig' in skip:
+        bb.note("Recipe %s skipping qa checking: pkgconfig" % d.getVar('PN'))
+        skip_pkgconfig = True
+
     # find all .la and .pc files
     # read the content
     # and check for stuff that looks wrong
     for root, dirs, files in os.walk(path):
         for file in files:
             path = os.path.join(root,file)
-            if file.endswith(".la"):
+            if file.endswith(".la") and not skip_la:
                 with open(path) as f:
                     file_content = f.read()
                     file_content = file_content.replace(recipesysroot, "")
                     if workdir in file_content:
                         error_msg = "%s failed sanity test (workdir) in path %s" % (file,root)
                         sane &= package_qa_handle_error("la", error_msg, d)
-            elif file.endswith(".pc"):
+            elif file.endswith(".pc") and not skip_pkgconfig:
                 with open(path) as f:
                     file_content = f.read()
                     file_content = file_content.replace(recipesysroot, "")
@@ -1017,6 +1012,13 @@ do_package_qa[vardepsexclude] = "BB_TASKDEPDATA"
 do_package_qa[rdeptask] = "do_packagedata"
 addtask do_package_qa after do_packagedata do_package before do_build
 
+# Add the package specific INSANE_SKIPs to the sstate dependencies
+python() {
+    pkgs = (d.getVar('PACKAGES') or '').split()
+    for pkg in pkgs:
+        d.appendVarFlag("do_package_qa", "vardeps", " INSANE_SKIP_{}".format(pkg))
+}
+
 SSTATETASKS += "do_package_qa"
 do_package_qa[sstate-inputdirs] = ""
 do_package_qa[sstate-outputdirs] = ""
@@ -1027,8 +1029,7 @@ addtask do_package_qa_setscene
 
 python do_qa_staging() {
     bb.note("QA checking staging")
-
-    if not package_qa_check_staged(d.expand('${SYSROOT_DESTDIR}${libdir}'), d):
+    if not qa_check_staged(d.expand('${SYSROOT_DESTDIR}${libdir}'), d):
         bb.fatal("QA staging was broken by the package built above")
 }
 
@@ -1042,15 +1043,22 @@ python do_qa_configure() {
     configs = []
     workdir = d.getVar('WORKDIR')
 
-    if bb.data.inherits_class('autotools', d):
+    skip = (d.getVar('INSANE_SKIP') or "").split()
+    skip_configure_unsafe = False
+    if 'configure-unsafe' in skip:
+        bb.note("Recipe %s skipping qa checking: configure-unsafe" % d.getVar('PN'))
+        skip_configure_unsafe = True
+
+    if bb.data.inherits_class('autotools', d) and not skip_configure_unsafe:
         bb.note("Checking autotools environment for common misconfiguration")
         for root, dirs, files in os.walk(workdir):
             statement = "grep -q -F -e 'CROSS COMPILE Badness:' -e 'is unsafe for cross-compilation' %s" % \
                         os.path.join(root,"config.log")
             if "config.log" in files:
                 if subprocess.call(statement, shell=True) == 0:
-                    bb.fatal("""This autoconf log indicates errors, it looked at host include and/or library paths while determining system capabilities.
-Rerun configure task after fixing this.""")
+                    error_msg = """This autoconf log indicates errors, it looked at host include and/or library paths while determining system capabilities.
+Rerun configure task after fixing this."""
+                    package_qa_handle_error("configure-unsafe", error_msg, d)
 
             if "configure.ac" in files:
                 configs.append(os.path.join(root,"configure.ac"))
@@ -1061,8 +1069,14 @@ Rerun configure task after fixing this.""")
     # Check gettext configuration and dependencies are correct
     ###########################################################################
 
+    skip_configure_gettext = False
+    if 'configure-gettext' in skip:
+        bb.note("Recipe %s skipping qa checking: configure-gettext" % d.getVar('PN'))
+        skip_configure_gettext = True
+
     cnf = d.getVar('EXTRA_OECONF') or ""
-    if "gettext" not in d.getVar('P') and "gcc-runtime" not in d.getVar('P') and "--disable-nls" not in cnf:
+    if not ("gettext" in d.getVar('P') or "gcc-runtime" in d.getVar('P') or \
+            "--disable-nls" in cnf or skip_configure_gettext):
         ml = d.getVar("MLPREFIX") or ""
         if bb.data.inherits_class('cross-canadian', d):
             gt = "nativesdk-gettext"
@@ -1073,8 +1087,8 @@ Rerun configure task after fixing this.""")
             for config in configs:
                 gnu = "grep \"^[[:space:]]*AM_GNU_GETTEXT\" %s >/dev/null" % config
                 if subprocess.call(gnu, shell=True) == 0:
-                    bb.fatal("""%s required but not in DEPENDS for file %s.
-Missing inherit gettext?""" % (gt, config))
+                    error_msg = "%s required but not in DEPENDS for file %s. Missing inherit gettext?"
+                    package_qa_handle_error("configure-gettext", error_msg, d)
 
     ###########################################################################
     # Check unrecognised configure options (with a white list)

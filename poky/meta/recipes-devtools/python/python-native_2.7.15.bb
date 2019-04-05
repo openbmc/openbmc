@@ -16,6 +16,8 @@ SRC_URI += "\
             file://builddir.patch \
             file://parallel-makeinst-create-bindir.patch \
             file://revert_use_of_sysconfigdata.patch \
+            file://0001-python-native-fix-one-do_populate_sysroot-warning.patch \
+            file://0001-2.7-bpo-34623-Use-XML_SetHashSalt-in-_elementtree-GH.patch \
            "
 
 S = "${WORKDIR}/Python-${PV}"

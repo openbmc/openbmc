@@ -2,7 +2,7 @@ SUMMARY = "Small collection of benchmarks for storage I/O"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b529aaa6a0c50f15d29f89609b5c22f3"
 
-SRCREV = "79698f645bfb28d0d966484ddad3a1efb562246d"
+SRCREV = "d05006865f68829fa7603bdb92bd51649f5ba1b6"
 PV = "0.0+git${SRCPV}"
 SRC_URI = "git://github.com/Algodev-github/S.git;protocol=https;branch=master"
 
@@ -17,11 +17,13 @@ do_install() {
         install -m0755 -p ${S}/$(basename $i)/* ${D}/opt/S-suite/$(basename $i)
     done
 
+    install -m0755 ${S}/def_config.sh ${D}/opt/S-suite
     install -m0755 ${S}/config_params.sh ${D}/opt/S-suite
-    install -m0755 ${S}/def_config_params.sh ${D}/opt/S-suite
+    install -m0755 ${S}/process_config.sh ${D}/opt/S-suite
 }
 
-RDEPENDS_${PN} = "bash bc coreutils gawk g++ gcc fio libaio libaio-dev sysstat"
+RDEPENDS_${PN} = "bash bc coreutils gawk g++ gcc fio libaio libaio-dev sysstat \
+		  git"
 
 FILES_${PN} = "/opt/S-suite/"
 

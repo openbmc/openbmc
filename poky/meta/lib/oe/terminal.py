@@ -39,7 +39,7 @@ class Terminal(Popen, metaclass=Registry):
                 raise
 
     def format_command(self, sh_cmd, title):
-        fmt = {'title': title or 'Terminal', 'command': sh_cmd}
+        fmt = {'title': title or 'Terminal', 'command': sh_cmd, 'cwd': os.getcwd() }
         if isinstance(self.command, str):
             return shlex.split(self.command.format(**fmt))
         else:
@@ -117,7 +117,7 @@ class Screen(Terminal):
 class TmuxRunning(Terminal):
     """Open a new pane in the current running tmux window"""
     name = 'tmux-running'
-    command = 'tmux split-window "{command}"'
+    command = 'tmux split-window -c "{cwd}" "{command}"'
     priority = 2.75
 
     def __init__(self, sh_cmd, title=None, env=None, d=None):
@@ -135,7 +135,7 @@ class TmuxRunning(Terminal):
 class TmuxNewWindow(Terminal):
     """Open a new window in the current running tmux session"""
     name = 'tmux-new-window'
-    command = 'tmux new-window -n "{title}" "{command}"'
+    command = 'tmux new-window -c "{cwd}" -n "{title}" "{command}"'
     priority = 2.70
 
     def __init__(self, sh_cmd, title=None, env=None, d=None):
@@ -149,7 +149,7 @@ class TmuxNewWindow(Terminal):
 
 class Tmux(Terminal):
     """Start a new tmux session and window"""
-    command = 'tmux new -d -s devshell -n devshell "{command}"'
+    command = 'tmux new -c "{cwd}" -d -s devshell -n devshell "{command}"'
     priority = 0.75
 
     def __init__(self, sh_cmd, title=None, env=None, d=None):
@@ -160,7 +160,7 @@ class Tmux(Terminal):
         # devshells, if it's already there, add a new window to it.
         window_name = 'devshell-%i' % os.getpid()
 
-        self.command = 'tmux new -d -s {0} -n {0} "{{command}}"'.format(window_name)
+        self.command = 'tmux new -c "{{cwd}}" -d -s {0} -n {0} "{{command}}"'.format(window_name)
         Terminal.__init__(self, sh_cmd, title, env, d)
 
         attach_cmd = 'tmux att -t {0}'.format(window_name)
@@ -296,6 +296,8 @@ def check_terminal_version(terminalName):
             vernum = ver.split(' ')[-1]
         if ver.startswith('tmux'):
             vernum = ver.split()[-1]
+        if ver.startswith('tmux next-'):
+            vernum = ver.split()[-1][5:]
     return vernum
 
 def distro_name():

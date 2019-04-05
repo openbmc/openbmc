@@ -1,4 +1,4 @@
-From 207be05c44da5c4c31179a34660e176145ff8d4b Mon Sep 17 00:00:00 2001
+From 990d377a92f4bab04bf6820fc81b3dcb6cf5e31d Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Jul 2018 09:52:23 +0800
 Subject: [PATCH] build: Provide alternatives for glibc assumptions helps
@@ -10,6 +10,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Rebase to 0.175
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
 ---
  Makefile.am                      |  2 +-
  lib/fixedsizehash.h              |  1 -
@@ -221,6 +222,3 @@ index 9f3e8e9..10a347a 100644
  
  #include <errno.h>
  #include <stdbool.h>
--- 
-2.7.4
-

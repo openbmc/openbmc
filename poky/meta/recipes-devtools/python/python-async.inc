@@ -11,4 +11,4 @@ SRC_URI[sha256sum] = "ac6894d876e45878faae493b0cf61d0e28ec417334448ac0a6ea2229d8
 
 RDEPENDS_${PN} += "${PYTHON_PN}-threading"
 
-BBCLASSEXTEND = "nativesdk"
+BBCLASSEXTEND = "native nativesdk"

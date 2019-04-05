@@ -1,35 +1,46 @@
+From 5539442e5f5442606071afc5cf02642314ad13bb Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Wed, 17 Aug 2011 22:52:35 +0200
+Subject: [PATCH] tk 8.5.8: import from OE rev
+
 Patch by Sergei Golovan allows to find tclConfig.sh in /usr/share/tcltk/tcl8.5
 and tkConfig.sh in /usr/share/tcltk/tk8.5 where they are located in Debian
 installation.
 
---- tk8.5-8.5.8.orig/unix/configure
-+++ tk8.5-8.5.8/unix/configure
-@@ -1431,7 +1431,8 @@
- 			`ls -d /usr/contrib/lib 2>/dev/null` \
+---
+ unix/configure | 1 +
+ unix/tcl.m4    | 2 ++
+ 2 files changed, 3 insertions(+)
+
+Index: a/unix/configure
+===================================================================
+--- a/unix/configure.orig
++++ b/unix/configure
+@@ -1432,6 +1432,7 @@ echo "$as_me: error: ${with_tclconfig} d
  			`ls -d /usr/local/lib 2>/dev/null` \
+ 			`ls -d /usr/contrib/lib 2>/dev/null` \
  			`ls -d /usr/pkg/lib 2>/dev/null` \
-+			`ls -d /usr/share/tcltk/tcl8.5 2>/dev/null` \
++			`ls -d /usr/share/tcltk/tcl8.6 2>/dev/null` \
  			`ls -d /usr/lib 2>/dev/null` \
  			`ls -d /usr/lib64 2>/dev/null` \
- 			; do
- 		    if test -f "$i/tclConfig.sh" ; then
---- tk8.5-8.5.8.orig/unix/tcl.m4
-+++ tk8.5-8.5.8/unix/tcl.m4
-@@ -93,7 +93,8 @@
- 			`ls -d /usr/contrib/lib 2>/dev/null` \
+ 			`ls -d /usr/local/lib/tcl8.6 2>/dev/null` \
+Index: a/unix/tcl.m4
+===================================================================
+--- a/unix/tcl.m4.orig
++++ b/unix/tcl.m4
+@@ -94,6 +94,7 @@ AC_DEFUN([SC_PATH_TCLCONFIG], [
  			`ls -d /usr/local/lib 2>/dev/null` \
+ 			`ls -d /usr/contrib/lib 2>/dev/null` \
  			`ls -d /usr/pkg/lib 2>/dev/null` \
-+			`ls -d /usr/share/tcltk/tcl8.5 2>/dev/null` \
++			`ls -d /usr/share/tcltk/tcl8.6 2>/dev/null` \
  			`ls -d /usr/lib 2>/dev/null` \
  			`ls -d /usr/lib64 2>/dev/null` \
- 			; do
- 		    if test -f "$i/tclConfig.sh" ; then
-@@ -223,7 +224,8 @@
- 			`ls -d ${prefix}/lib 2>/dev/null` \
+ 			`ls -d /usr/local/lib/tcl8.6 2>/dev/null` \
+@@ -227,6 +228,7 @@ AC_DEFUN([SC_PATH_TKCONFIG], [
  			`ls -d /usr/local/lib 2>/dev/null` \
  			`ls -d /usr/contrib/lib 2>/dev/null` \
-+			`ls -d /usr/share/tcltk/tk8.5 2>/dev/null` \
+ 			`ls -d /usr/pkg/lib 2>/dev/null` \
++			`ls -d /usr/share/tcltk/tk8.6 2>/dev/null` \
  			`ls -d /usr/lib 2>/dev/null` \
  			`ls -d /usr/lib64 2>/dev/null` \
- 			; do
- 		    if test -f "$i/tkConfig.sh" ; then
+ 			`ls -d /usr/local/lib/tk8.6 2>/dev/null` \

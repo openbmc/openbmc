@@ -22,7 +22,10 @@ SRC_URI = "http://hal.freedesktop.org/releases/${BPN}-${PV}.tar.gz;name=${BPN} \
 SRC_URI[udisks.md5sum] = "70d48dcfe523a74cd7c7fbbc2847fcdd"
 SRC_URI[udisks.sha256sum] = "f2ec82eb0ea7e01dc299b5b29b3c18cdf861236ec43dcff66b3552b4b31c6f71"
 
-inherit autotools-brokensep systemd gtk-doc
+inherit autotools-brokensep systemd gtk-doc distro_features_check
+
+REQUIRED_DISTRO_FEATURES = "polkit"
+
 
 PACKAGECONFIG ??= "libdevmapper"
 PACKAGECONFIG[libdevmapper] = "--enable-devmapper,--disable-devmapper,libdevmapper"

@@ -1,7 +1,7 @@
-From 145f2b829e5362cda975bebafd7fe4d00ff56d1c Mon Sep 17 00:00:00 2001
+From 1fe937835311a2d0afbc85ce4a4dbd3c9e0c912f Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
-Date: Mon, 16 Jul 2018 16:02:07 +0800
-Subject: [PATCH] Always use devmapper for kpartx
+Date: Mon, 26 Nov 2018 11:19:45 +0800
+Subject: [PATCH] Subject: [PATCH] Always use devmapper for kpartx
 
 Do not try to compute the LIBDM_API_COOKIE make variable
 from host information when cross-compiling.
@@ -15,6 +15,9 @@ Rebase to 0.7.1
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 
 Rebase to 0.7.7
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+
+Rebase to 0.7.9
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
  kpartx/Makefile | 4 +---

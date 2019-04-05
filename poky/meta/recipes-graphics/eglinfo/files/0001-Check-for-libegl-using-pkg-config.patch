@@ -1,22 +1,25 @@
-From 58d51d941d3f4dfa38be18282d3e285d76d9020d Mon Sep 17 00:00:00 2001
+From 17f5d2f574236f8c3459f9efadef2f0f6220a4dd Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 13 Aug 2018 15:46:53 -0700
 Subject: [PATCH] Check for libegl using pkg-config
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+[Roman: patch has been rebased to 223817ee3798 ("Add Wayland support")
+ trivial merge conflicts resolved]
+Signed-off-by: Roman Stratiienko <roman.stratiienko@globallogic.com>
 ---
- wscript | 1 +
- 1 file changed, 1 insertion(+)
+ wscript | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
-Index: git/wscript
-===================================================================
---- git.orig/wscript
-+++ git/wscript
-@@ -160,14 +160,9 @@ def configure_raspberrypi_device(conf, p
- 		conf.env['PLATFORM_USELIBS'] += ["X11"]
- 	elif platform == "fb":
- 		conf.env['PLATFORM_SOURCE'] = ['src/platform_fb_raspberrypi.cpp']
+diff --git a/wscript b/wscript
+index 0f6ec53..401f62e 100644
+--- a/wscript
++++ b/wscript
+@@ -174,14 +174,9 @@ def configure_raspberrypi_device(conf, platform):
+ 	else:
+ 		conf.fatal('Unsupported Raspberry Pi platform "%s"' % platform)
+ 		return
 -	conf.check_cxx(mandatory = 1, lib = ['GLESv2', 'EGL', 'bcm_host'], uselib_store = 'EGL')
 +	conf.check_cfg(package='egl', args='--libs --cflags')
  	import os
@@ -29,3 +32,5 @@ Index: git/wscript
  	conf.env['WITH_APIS'] = []
  	if check_gles2(conf):
  		conf.env['WITH_APIS'] += ['GLES1', 'GLES2']
+-- 
+2.19.1

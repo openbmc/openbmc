@@ -1,0 +1,24 @@
+From 03127fd5a6eff5ae2ebea2e9c6c01fbf1a0a421a Mon Sep 17 00:00:00 2001
+From: Ankit Navik <ankit.tarot@gmail.com>
+Date: Tue, 25 Dec 2018 14:34:09 +0530
+Subject: [PATCH] tools/lesspipe: Allow generic shell
+
+Upstream-Status: Submitted [https://github.com/KhronosGroup/SPIRV-Tools/pull/2255]
+Signed-off-by: Ankit Navik <ankit.tarot@gmail.com>
+---
+ tools/lesspipe/spirv-lesspipe.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/lesspipe/spirv-lesspipe.sh b/tools/lesspipe/spirv-lesspipe.sh
+index 81e3355..f955259 100644
+--- a/tools/lesspipe/spirv-lesspipe.sh
++++ b/tools/lesspipe/spirv-lesspipe.sh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env sh
+ # Copyright (c) 2016 The Khronos Group Inc.
+ 
+ # Licensed under the Apache License, Version 2.0 (the "License");
+-- 
+2.7.4
+

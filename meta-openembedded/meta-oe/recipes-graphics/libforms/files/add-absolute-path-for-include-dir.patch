@@ -1,0 +1,12 @@
+diff -Naur xforms-1.2.3.orig/fdesign/Makefile.am xforms-1.2.3/fdesign/Makefile.am
+--- xforms-1.2.3.orig/fdesign/Makefile.am	2019-02-24 12:58:51.968645873 +0000
++++ xforms-1.2.3/fdesign/Makefile.am	2019-02-24 13:00:48.500635163 +0000
+@@ -11,7 +11,7 @@
+ fdesign.1:
+ 	cp -p $(srcdir)/fdesign.man fdesign.1
+ 
+-INCLUDES = -I./xpm $(X_CFLAGS)
++INCLUDES = -I./xpm -I$(srcdir)/xpm $(X_CFLAGS)
+ 
+ bin_PROGRAMS = fdesign
+ 

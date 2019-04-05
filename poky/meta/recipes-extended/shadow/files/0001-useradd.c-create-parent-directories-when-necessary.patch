@@ -4,11 +4,11 @@ Upstream-Status: Inappropriate [OE specific]
 
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
 ---
- src/useradd.c | 82 +++++++++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 54 insertions(+), 28 deletions(-)
+ src/useradd.c | 80 +++++++++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 53 insertions(+), 27 deletions(-)
 
 diff --git a/src/useradd.c b/src/useradd.c
-index 7214e72..3aaf45c 100644
+index 00a3c30..9ecbb58 100644
 --- a/src/useradd.c
 +++ b/src/useradd.c
 @@ -2021,6 +2021,35 @@ static void usr_update (void)
@@ -47,7 +47,7 @@ index 7214e72..3aaf45c 100644
   * create_home - create the user's home directory
   *
   *	create_home() creates the user's home directory if it does not
-@@ -2038,42 +2067,39 @@ static void create_home (void)
+@@ -2038,39 +2067,36 @@ static void create_home (void)
  			fail_exit (E_HOMEDIR);
  		}
  #endif
@@ -74,16 +74,12 @@ index 7214e72..3aaf45c 100644
 -		(void) chown (prefix_user_home, user_id, user_gid);
 -		chmod (prefix_user_home,
 -		       0777 & ~getdef_num ("UMASK", GETDEF_DEFAULT_UMASK));
+-		home_added = true;
 +		fail_exit (E_HOMEDIR);
 +	}
 +	(void) chown (prefix_user_home, user_id, user_gid);
 +	chmod (prefix_user_home,
 +	       0777 & ~getdef_num ("UMASK", GETDEF_DEFAULT_UMASK));
- #ifdef WITH_ATTR
--	               attr_copy_file (def_template, user_home, NULL, NULL);
-+	attr_copy_file (def_template, user_home, NULL, NULL);
- #endif
--		home_added = true;
 +	home_added = true;
  #ifdef WITH_AUDIT
 -		audit_logger (AUDIT_ADD_USER, Prog,

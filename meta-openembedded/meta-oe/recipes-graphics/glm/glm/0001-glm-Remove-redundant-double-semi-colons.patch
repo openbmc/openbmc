@@ -1,0 +1,120 @@
+From 3f6869e392b061f2932f3df155b6cc37e3e7d342 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 1 Mar 2019 10:56:05 -0800
+Subject: [PATCH] glm: Remove redundant double semi-colons
+
+Make clang happy
+/glm/gtc/../ext/../detail/../simd/common.h:106:45: error: empty expression statement has no effect; remove unnecessary ';' to silence this warning [-Werror,-Wextra-semi-stmt]
+|         glm_vec4 const or0 = _mm_or_ps(and0, and1);;
+|                                                    ^
+| 1 error generated.
+
+Upstream-Status: Submitted [https://github.com/g-truc/glm/pull/874]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ glm/gtx/associated_min_max.inl      | 8 ++++----
+ glm/simd/common.h                   | 2 +-
+ test/core/core_func_exponential.cpp | 6 +++---
+ test/gtx/gtx_easing.cpp             | 4 ++--
+ 4 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/glm/gtx/associated_min_max.inl b/glm/gtx/associated_min_max.inl
+index 1a459add..5186c471 100644
+--- a/glm/gtx/associated_min_max.inl
++++ b/glm/gtx/associated_min_max.inl
+@@ -86,7 +86,7 @@ GLM_FUNC_QUALIFIER U associatedMin
+ )
+ {
+ 	T Test1 = min(x, y);
+-	T Test2 = min(z, w);;
++	T Test2 = min(z, w);
+ 	U Result1 = x < y ? a : b;
+ 	U Result2 = z < w ? c : d;
+ 	U Result = Test1 < Test2 ? Result1 : Result2;
+@@ -152,7 +152,7 @@ GLM_FUNC_QUALIFIER vec<L, U, Q> associatedMin
+ 	for(length_t i = 0, n = Result.length(); i < n; ++i)
+ 	{
+ 		T Test1 = min(x[i], y[i]);
+-		T Test2 = min(z[i], w[i]);;
++		T Test2 = min(z[i], w[i]);
+ 		U Result1 = x[i] < y[i] ? a : b;
+ 		U Result2 = z[i] < w[i] ? c : d;
+ 		Result[i] = Test1 < Test2 ? Result1 : Result2;
+@@ -278,7 +278,7 @@ GLM_FUNC_QUALIFIER U associatedMax
+ )
+ {
+ 	T Test1 = max(x, y);
+-	T Test2 = max(z, w);;
++	T Test2 = max(z, w);
+ 	U Result1 = x > y ? a : b;
+ 	U Result2 = z > w ? c : d;
+ 	U Result = Test1 > Test2 ? Result1 : Result2;
+@@ -344,7 +344,7 @@ GLM_FUNC_QUALIFIER vec<L, U, Q> associatedMax
+ 	for(length_t i = 0, n = Result.length(); i < n; ++i)
+ 	{
+ 		T Test1 = max(x[i], y[i]);
+-		T Test2 = max(z[i], w[i]);;
++		T Test2 = max(z[i], w[i]);
+ 		U Result1 = x[i] > y[i] ? a : b;
+ 		U Result2 = z[i] > w[i] ? c : d;
+ 		Result[i] = Test1 > Test2 ? Result1 : Result2;
+diff --git a/glm/simd/common.h b/glm/simd/common.h
+index d07920a3..9b017cb4 100644
+--- a/glm/simd/common.h
++++ b/glm/simd/common.h
+@@ -103,7 +103,7 @@ GLM_FUNC_QUALIFIER glm_vec4 glm_vec4_sign(glm_vec4 x)
+ 	glm_vec4 const cmp1 = _mm_cmpgt_ps(x, zro0);
+ 	glm_vec4 const and0 = _mm_and_ps(cmp0, _mm_set1_ps(-1.0f));
+ 	glm_vec4 const and1 = _mm_and_ps(cmp1, _mm_set1_ps(1.0f));
+-	glm_vec4 const or0 = _mm_or_ps(and0, and1);;
++	glm_vec4 const or0 = _mm_or_ps(and0, and1);
+ 	return or0;
+ }
+ 
+diff --git a/test/core/core_func_exponential.cpp b/test/core/core_func_exponential.cpp
+index a414a4e9..380cdfb1 100644
+--- a/test/core/core_func_exponential.cpp
++++ b/test/core/core_func_exponential.cpp
+@@ -153,13 +153,13 @@ static int test_inversesqrt()
+ 	float A = glm::inversesqrt(16.f) * glm::sqrt(16.f);
+ 	Error += glm::equal(A, 1.f, 0.01f) ? 0 : 1;
+ 
+-	glm::vec1 B = glm::inversesqrt(glm::vec1(16.f)) * glm::sqrt(16.f);;
++	glm::vec1 B = glm::inversesqrt(glm::vec1(16.f)) * glm::sqrt(16.f);
+ 	Error += glm::all(glm::equal(B, glm::vec1(1.f), 0.01f)) ? 0 : 1;
+ 
+-	glm::vec2 C = glm::inversesqrt(glm::vec2(16.f)) * glm::sqrt(16.f);;
++	glm::vec2 C = glm::inversesqrt(glm::vec2(16.f)) * glm::sqrt(16.f);
+ 	Error += glm::all(glm::equal(C, glm::vec2(1.f), 0.01f)) ? 0 : 1;
+ 
+-	glm::vec3 D = glm::inversesqrt(glm::vec3(16.f)) * glm::sqrt(16.f);;
++	glm::vec3 D = glm::inversesqrt(glm::vec3(16.f)) * glm::sqrt(16.f);
+ 	Error += glm::all(glm::equal(D, glm::vec3(1.f), 0.01f)) ? 0 : 1;
+ 
+ 	glm::vec4 E = glm::inversesqrt(glm::vec4(16.f)) * glm::sqrt(16.f);
+diff --git a/test/gtx/gtx_easing.cpp b/test/gtx/gtx_easing.cpp
+index b3e13997..0e98cd53 100644
+--- a/test/gtx/gtx_easing.cpp
++++ b/test/gtx/gtx_easing.cpp
+@@ -34,7 +34,7 @@ namespace
+ 		r = glm::circularEaseOut(a);
+ 		r = glm::circularEaseInOut(a);
+ 
+-		r = glm::exponentialEaseIn(a);;
++		r = glm::exponentialEaseIn(a);
+ 		r = glm::exponentialEaseOut(a);
+ 		r = glm::exponentialEaseInOut(a);
+ 
+@@ -46,7 +46,7 @@ namespace
+ 		r = glm::backEaseOut(a);
+ 		r = glm::backEaseInOut(a);
+ 
+-		r = glm::bounceEaseIn(a);;
++		r = glm::bounceEaseIn(a);
+ 		r = glm::bounceEaseOut(a);
+ 		r = glm::bounceEaseInOut(a);
+ 	}
+-- 
+2.21.0
+

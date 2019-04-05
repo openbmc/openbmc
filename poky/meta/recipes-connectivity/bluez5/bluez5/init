@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Source function library
+. /etc/init.d/functions
+
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 DESC=bluetooth
 
@@ -44,14 +47,7 @@ case $1 in
 	$0 start
   ;;
   status)
-	 pidof ${DAEMON} >/dev/null
-	 status=$?
-        if [ $status -eq 0 ]; then
-                 echo "bluetooth is running."
-        else
-                echo "bluetooth is not running"
-        fi
-        exit $status
+	status ${DAEMON} || exit $?
    ;;
    *)
 	N=/etc/init.d/bluetooth

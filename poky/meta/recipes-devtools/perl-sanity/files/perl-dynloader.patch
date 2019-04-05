@@ -1,0 +1,38 @@
+Upstream-Status:Inappropriate [embedded specific]
+
+Allow the location that .so files are searched for for dynamic
+loading to be changed via an environment variable. This is to allow
+us to load .so's from the host system while building for the target
+system.
+
+Update by Nitin A Kamble <nitin.a.kamble@intel.com> 2011/04/21
+
+Index: perl-5.24.1/dist/XSLoader/XSLoader_pm.PL
+===================================================================
+--- perl-5.24.1.orig/dist/XSLoader/XSLoader_pm.PL
++++ perl-5.24.1/dist/XSLoader/XSLoader_pm.PL
+@@ -52,6 +52,24 @@ sub load {
+     my ($caller, $modlibname) = caller();
+     my $module = $caller;
+ 
++    # OE: Allow env to form dynamic loader to look in a different place
++    # This is so it finds the host .so files, not the targets
++    if (defined $ENV{PERLHOSTLIB})
++    {
++        my $hostlib = $ENV{PERLHOSTLIB};
++        my $hostarchlib = $ENV{PERLHOSTARCHLIB};
++        print STDERR "*** Module name IN: $modlibname\n";
++        ($p1, $p2, $p3, $p4, $p5, $p6, $p7) = $modlibname =~ m/(^(.*lib\w*\/)?)((perl5\/[0-9\.]*\/)?)(([^\/]*)\/)?(.*)$/;
++        print STDERR "*** p1: $p1  p3: $p3  p5: $p5 p7: $p7\n";
++        if ( $p1 ne "" ) {
++            $modlibname = $hostlib.$p7;
++        }
++        if ( $p6 ne "" ) {
++            $modlibname = $hostarchlib.$p7;
++        }
++        print STDERR "*** Module name OUT: $modlibname\n";
++    }
++
+     if (@_) {
+         $module = $_[0];
+     } else {
