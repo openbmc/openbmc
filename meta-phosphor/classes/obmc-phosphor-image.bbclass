@@ -68,7 +68,6 @@ IMAGE_FEATURES += " \
         obmc-inventory \
         obmc-leds \
         obmc-logging-mgmt \
-        obmc-remote-logging-mgmt \
         obmc-net-ipmi \
         obmc-sensors \
         obmc-software \
