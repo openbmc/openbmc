@@ -9,4 +9,4 @@ SyslogIdentifier=obmc-console-server
 Restart=always
 
 [Install]
-WantedBy={SYSTEMD_DEFAULT_TARGET}
+WantedBy=multi-user.target

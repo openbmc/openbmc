@@ -8,4 +8,4 @@ ExecStart=/usr/bin/env iotools --make-links
 SyslogIdentifier=iotools
 
 [Install]
-WantedBy={SYSTEMD_DEFAULT_TARGET}
+WantedBy=multi-user.target

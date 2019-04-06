@@ -4,4 +4,4 @@ Conflicts=obmc-host-stop@%i.target
 RefuseManualStop=yes
 
 [Install]
-WantedBy={SYSTEMD_DEFAULT_TARGET}
+WantedBy=multi-user.target

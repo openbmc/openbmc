@@ -90,7 +90,7 @@ SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'HARD_OFF_FMT_CTRL', 'OBMC_CHASSIS
 
 # Force the standby target to run the chassis reset check target
 RESET_TMPL_CTRL = "obmc-chassis-powerreset@.target"
-SYSD_TGT = "${SYSTEMD_DEFAULT_TARGET}"
+SYSD_TGT = "multi-user.target"
 RESET_INSTFMT_CTRL = "obmc-chassis-powerreset@{0}.target"
 RESET_FMT_CTRL = "../${RESET_TMPL_CTRL}:${SYSD_TGT}.wants/${RESET_INSTFMT_CTRL}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'RESET_FMT_CTRL', 'OBMC_CHASSIS_INSTANCES')}"

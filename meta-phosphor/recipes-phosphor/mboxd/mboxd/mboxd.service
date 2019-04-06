@@ -13,4 +13,4 @@ ExecStart=/usr/bin/env mboxd --flash {FLASH_SIZE} --window-size 1M
 SyslogIdentifier=mboxd
 
 [Install]
-WantedBy={SYSTEMD_DEFAULT_TARGET}
+WantedBy=multi-user.target

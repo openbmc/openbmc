@@ -11,4 +11,4 @@ ExecStart=/usr/bin/env phosphor-read-eeprom --eeprom $SYSFS_PATH --fruid $FRUID
 SyslogIdentifier=phosphor-read-eeprom
 
 [Install]
-WantedBy={SYSTEMD_DEFAULT_TARGET}
+WantedBy=multi-user.target

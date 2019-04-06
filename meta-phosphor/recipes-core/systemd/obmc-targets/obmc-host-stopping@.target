@@ -1,6 +1,6 @@
 [Unit]
 Description=Host%i (Stopping)
-Wants={SYSTEMD_DEFAULT_TARGET}
+Wants=multi-user.target
 Wants=obmc-host-stop-pre@%i.target
 After=obmc-host-stop-pre@%i.target
 Before=obmc-host-stopped@%i.target

@@ -1,7 +1,7 @@
 [Unit]
 Description=Chassis%i (Power On)
-Wants={SYSTEMD_DEFAULT_TARGET}
-After={SYSTEMD_DEFAULT_TARGET}
+Wants=multi-user.target
+After=multi-user.target
 Wants=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
 After=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
 Wants=mapper-subtree-remove@-xyz-openbmc\x5fproject-software\x3Axyz.openbmc_project.Software.ActivationBlocksTransition.service

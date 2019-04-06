@@ -11,4 +11,4 @@ ExecStart=/usr/sbin/obmc-uart-render-controller \
 	  fbterm.service
 
 [Install]
-WantedBy=obmc-standby.target
+WantedBy=multi-user.target

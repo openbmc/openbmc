@@ -9,4 +9,4 @@ ExecStart=/usr/bin/env phosphor-fru-fault-monitor
 SyslogIdentifier=phosphor-fru-fault-monitor
 
 [Install]
-WantedBy={SYSTEMD_DEFAULT_TARGET}
+WantedBy=multi-user.target

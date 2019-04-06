@@ -12,4 +12,4 @@ Type=dbus
 BusName={BUSNAME}
 
 [Install]
-WantedBy={SYSTEMD_DEFAULT_TARGET}
+WantedBy=multi-user.target

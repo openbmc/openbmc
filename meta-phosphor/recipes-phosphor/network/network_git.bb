@@ -25,8 +25,7 @@ S = "${WORKDIR}/git"
 SERVICE_FILE = "xyz.openbmc_project.Network.service"
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} += "${SERVICE_FILE}"
-SYSTEMD_DEFAULT_TARGET ?= "obmc-standby.target"
 
 EXTRA_OECONF = " \
-  SYSTEMD_TARGET="${SYSTEMD_DEFAULT_TARGET}" \
+  SYSTEMD_TARGET="multi-user.target" \
 "

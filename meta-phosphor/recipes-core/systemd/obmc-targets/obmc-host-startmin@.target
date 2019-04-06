@@ -1,7 +1,7 @@
 [Unit]
 Description=Start Host%i Minimum
-Wants={SYSTEMD_DEFAULT_TARGET}
-After={SYSTEMD_DEFAULT_TARGET}
+Wants=multi-user.target
+After=multi-user.target
 Wants=mapper-wait@-org-openbmc-control-chassis%i.service
 After=mapper-wait@-org-openbmc-control-chassis%i.service
 Conflicts=obmc-host-stop@%i.target

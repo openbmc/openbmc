@@ -49,7 +49,7 @@ inherit systemd
 inherit useradd
 
 _INSTALL_SD_UNITS=""
-SYSTEMD_DEFAULT_TARGET ?= "obmc-standby.target"
+SYSTEMD_DEFAULT_TARGET ?= "multi-user.target"
 envfiledir ?= "${sysconfdir}/default"
 
 # Big ugly hack to prevent useradd.bbclass post-parse sanity checker failure.

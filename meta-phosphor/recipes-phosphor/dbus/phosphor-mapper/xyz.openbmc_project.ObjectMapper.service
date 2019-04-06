@@ -17,4 +17,4 @@ RestartSec=5
 EnvironmentFile={envfiledir}/obmc/mapper
 
 [Install]
-WantedBy={SYSTEMD_DEFAULT_TARGET}
+WantedBy=multi-user.target

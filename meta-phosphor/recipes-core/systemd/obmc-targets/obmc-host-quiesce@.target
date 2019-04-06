@@ -1,6 +1,6 @@
 [Unit]
 Description=Quiesce Target
-Wants={SYSTEMD_DEFAULT_TARGET}
-After={SYSTEMD_DEFAULT_TARGET}
+Wants=multi-user.target
+After=multi-user.target
 RefuseManualStop=yes
 Conflicts=obmc-chassis-poweroff@%i.target

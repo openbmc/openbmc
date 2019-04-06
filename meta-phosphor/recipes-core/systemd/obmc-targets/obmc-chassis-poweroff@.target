@@ -1,7 +1,7 @@
 [Unit]
 Description=Chassis%i (Power Off)
-Wants={SYSTEMD_DEFAULT_TARGET}
-After={SYSTEMD_DEFAULT_TARGET}
+Wants=multi-user.target
+After=multi-user.target
 Wants=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
 After=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
 Conflicts=obmc-chassis-poweron@%i.target
