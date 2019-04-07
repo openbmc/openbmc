@@ -25,7 +25,7 @@ DEPENDS += " \
         "
 
 S = "${WORKDIR}/git"
-SRC_URI = "git://github.com/openbmc/kcsbridge.git;protocol=https"
+SRC_URI = "git://github.com/openbmc/kcsbridge.git"
 SRCREV = "17a2ab7f39a78ff0603aa68cf35108ea94eb442f"
 
 # This is how linux-libc-headers says to include custom uapi headers
