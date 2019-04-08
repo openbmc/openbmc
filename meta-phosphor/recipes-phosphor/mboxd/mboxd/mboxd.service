@@ -4,8 +4,8 @@ BindsTo=dev-aspeed\x2dlpc\x2dctrl.device
 After=dev-aspeed\x2dlpc\x2dctrl.device
 BindsTo=dev-aspeed\x2dmbox.device
 After=dev-aspeed\x2dmbox.device
-Requires=phosphor-ipmi-host.service
-After=phosphor-ipmi-host.service
+Requires=xyz.openbmc_project.Control.Host.service
+After=xyz.openbmc_project.Control.Host.service
 
 [Service]
 Restart=always
