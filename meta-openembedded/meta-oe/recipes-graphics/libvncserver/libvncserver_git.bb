@@ -25,6 +25,9 @@ PACKAGECONFIG[systemd] = "-DWITH_SYSTEMD=ON,-DWITH_SYSTEMD=OFF,systemd"
 PACKAGECONFIG[sdl] = "-DWITH_SDL=ON,-DWITH_SDL=OFF,libsdl2"
 PACKAGECONFIG[zlib] = "-DWITH_ZLIB=ON,-DWITH_ZLIB=OFF,zlib"
 
+PACKAGE_BEFORE_PN = "libvncclient"
+FILES_libvncclient = "${libdir}/libvncclient.*"
+
 inherit cmake
 
 SRC_URI = "git://github.com/LibVNC/libvncserver"

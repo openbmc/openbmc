@@ -11,7 +11,7 @@ DEPENDS += " \
     libmpdclient \
 "
 
-PACKAGECONFIG ??= "colors locale mouse nls regex help_screen artist_screen search_screen song_screen key_screen lyrics_screen outputs_screen"
+PACKAGECONFIG ??= "colors locale mouse nls regex help_screen library_screen search_screen song_screen key_screen lyrics_screen outputs_screen"
 
 PACKAGECONFIG[colors] = "-Dcolors=true,-Dcolors=false"
 PACKAGECONFIG[lirc] = "-Dlirc=enabled,-Dlirc=disabled,lirc"
@@ -22,7 +22,7 @@ PACKAGECONFIG[nls] = "-Dnls=enabled,-Dnls=disabled,gettext-native"
 PACKAGECONFIG[regex] = "-Dregex=enabled,-Dregex=disabled,pcre"
 
 PACKAGECONFIG[help_screen] = "-Dhelp_screen=true,-Dhelp_screen=false"
-PACKAGECONFIG[artist_screen] = "-Dartist_screen=true,-Dartist_screen=false"
+PACKAGECONFIG[library_screen] = "-Dlibrary_screen=true,-Dlibrary_screen=false"
 PACKAGECONFIG[search_screen] = "-Dsearch_screen=true,-Dsearch_screen=false"
 PACKAGECONFIG[song_screen] = "-Dsong_screen=true,-Dsong_screen=false"
 PACKAGECONFIG[key_screen] = "-Dkey_screen=true,-Dkey_screen=false"

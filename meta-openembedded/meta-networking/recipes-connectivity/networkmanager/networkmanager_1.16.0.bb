@@ -26,19 +26,14 @@ SRC_URI = " \
     ${GNOME_MIRROR}/NetworkManager/${@gnome_verdir("${PV}")}/NetworkManager-${PV}.tar.xz \
     file://0001-Fixed-configure.ac-Fix-pkgconfig-sysroot-locations.patch \
     file://0002-Do-not-create-settings-settings-property-documentati.patch \
-    file://musl/0001-Do-not-include-net-ethernet.h-and-linux-if_ether.h.patch \
-    file://musl/0002-sd-lldp.h-Remove-net-ethernet.h-seems-to-be-over-spe.patch \
-    file://musl/0003-musl-basic.patch \
-    file://musl/0004-musl-dlopen-configure-ac.patch \
-    file://musl/0005-musl-network-support.patch \
-    file://musl/0006-musl-process-util.patch \
-    file://musl/0007-musl-avoid-further-conflicts-by-including-net-ethern.patch \
-    file://musl/0008-Add-a-strndupa-replacement-for-musl.patch \
+    file://0003-dlopen-failure.patch \
 "
+SRC_URI_append_libc-musl = " file://musl/0001-Fix-build-with-musl.patch"
+
 SRC_URI[md5sum] = "10abacaafb162a67d2942adf03e7e9e4"
 SRC_URI[sha256sum] = "8e962833b6ca03edda1bc57ed6614a7b8c2339531b44acef098d05f2324c5d2c"
 
-UPSTREAM_CHECK_URI = "${GNOME_MIRROR}/NetworkManager/1.10/"
+UPSTREAM_CHECK_URI = "${GNOME_MIRROR}/NetworkManager/1.16/"
 UPSTREAM_CHECK_REGEX = "NetworkManager\-(?P<pver>1\.10(\.\d+)+).tar.xz"
 
 S = "${WORKDIR}/NetworkManager-${PV}"

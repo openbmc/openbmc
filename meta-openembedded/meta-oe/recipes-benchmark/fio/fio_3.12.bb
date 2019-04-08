@@ -16,6 +16,7 @@ RDEPENDS_${PN} = "python bash"
 PACKAGECONFIG_NUMA = "numa"
 # ARM does not currently support NUMA
 PACKAGECONFIG_NUMA_arm = ""
+PACKAGECONFIG_NUMA_armeb = ""
 
 PACKAGECONFIG ??= "${PACKAGECONFIG_NUMA}"
 PACKAGECONFIG[numa] = ",--disable-numa,numactl"

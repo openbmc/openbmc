@@ -31,6 +31,10 @@ GROUPADD_PARAM_${PN} = "--system redis"
 
 REDIS_ON_SYSTEMD = "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}"
 
+do_compile_prepend() {
+    (cd deps && oe_runmake hiredis lua jemalloc linenoise)
+}
+
 do_install() {
     export PREFIX=${D}/${prefix}
     oe_runmake install

@@ -1,0 +1,28 @@
+From 85307f592c7cb87af162cca4b121b874108b7754 Mon Sep 17 00:00:00 2001
+From: Alistair Francis <alistair.francis@wdc.com>
+Date: Tue, 2 Apr 2019 11:25:15 -0700
+Subject: [PATCH] setup.py: Don't hardcode swig and fann2 binary locations
+
+Upstream-Status: Inappropriate [configuration]
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ setup.py | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 37af7c7..8e416f2 100755
+--- a/setup.py
++++ b/setup.py
+@@ -81,11 +81,8 @@ def find_swig():
+ 
+ def build_swig():
+     '''Run SWIG with specified parameters'''
+-    print("Looking for FANN libs...")
+-    find_fann()
+-    print("running SWIG...")
+     swig_bin = find_swig()
+-    swig_cmd = [swig_bin, '-c++', '-python', 'fann2/fann2.i']
++    swig_cmd = ['swig', '-c++', '-python', 'fann2/fann2.i']
+     subprocess.Popen(swig_cmd).wait()
+ 
+ if "sdist" not in sys.argv:

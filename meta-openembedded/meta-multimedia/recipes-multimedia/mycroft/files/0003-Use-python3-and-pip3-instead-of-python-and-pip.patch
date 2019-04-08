@@ -1,0 +1,135 @@
+From 87b94e54fefa1f83b41030444fc87b421c97b2c5 Mon Sep 17 00:00:00 2001
+From: Alistair Francis <alistair.francis@wdc.com>
+Date: Tue, 19 Mar 2019 13:38:44 -0700
+Subject: [PATCH 3/5] Use python3 and pip3 instead of python and pip
+
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Upstream-Status: Inappropriate [embedded specific]
+---
+ bin/mycroft-cli-client          |  2 +-
+ bin/mycroft-pip                 |  2 +-
+ bin/mycroft-say-to              |  2 +-
+ bin/mycroft-skill-testrunner    |  4 ++--
+ bin/mycroft-speak               |  2 +-
+ dev_setup.sh                    | 10 +++++-----
+ scripts/install-pocketsphinx.sh |  2 +-
+ 7 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/bin/mycroft-cli-client b/bin/mycroft-cli-client
+index f40a316e3f6..de2040d9e67 100755
+--- a/bin/mycroft-cli-client
++++ b/bin/mycroft-cli-client
+@@ -21,4 +21,4 @@ DIR="$( dirname "$SOURCE" )"
+ source "$DIR/../venv-activate.sh" -q
+ 
+ # Invoke the Command Line Interface
+-python -m mycroft.client.text $@
++python3 -m mycroft.client.text $@
+diff --git a/bin/mycroft-pip b/bin/mycroft-pip
+index a42b16b847a..81bd5bfb3cf 100755
+--- a/bin/mycroft-pip
++++ b/bin/mycroft-pip
+@@ -21,4 +21,4 @@ DIR="$( dirname "$SOURCE" )"
+ source "$DIR/../venv-activate.sh" -q
+ 
+ # Install pip packages within the Mycroft venv
+-pip $@
+\ No newline at end of file
++pip3 $@
+\ No newline at end of file
+diff --git a/bin/mycroft-say-to b/bin/mycroft-say-to
+index 964e16eb0c5..5575969715c 100755
+--- a/bin/mycroft-say-to
++++ b/bin/mycroft-say-to
+@@ -22,4 +22,4 @@ DIR="$( pwd )"
+ source "$DIR/../venv-activate.sh" -q
+ 
+ # Send a message to be spoken
+-output=$(python -m mycroft.messagebus.send "recognizer_loop:utterance"  "{\"utterances\": [\"$@\"], \"lang\": \"en-us\"}")
++output=$(python3 -m mycroft.messagebus.send "recognizer_loop:utterance"  "{\"utterances\": [\"$@\"], \"lang\": \"en-us\"}")
+diff --git a/bin/mycroft-skill-testrunner b/bin/mycroft-skill-testrunner
+index 9699a4d138f..282f5ca65b0 100755
+--- a/bin/mycroft-skill-testrunner
++++ b/bin/mycroft-skill-testrunner
+@@ -22,7 +22,7 @@ source "$DIR/../venv-activate.sh" -q
+ 
+ # Invoke the individual skill tester
+ if [ "$#" -eq 0 ] ; then
+-    python -m test.integrationtests.skills.runner .
++    python3 -m test.integrationtests.skills.runner .
+ else
+-    python -m test.integrationtests.skills.runner $@
++    python3 -m test.integrationtests.skills.runner $@
+ fi
+\ No newline at end of file
+diff --git a/bin/mycroft-speak b/bin/mycroft-speak
+index 51facf29189..c65556f1173 100755
+--- a/bin/mycroft-speak
++++ b/bin/mycroft-speak
+@@ -22,4 +22,4 @@ DIR="$( pwd )"
+ source "$DIR/../venv-activate.sh" -q
+ 
+ # Send a message to be spoken
+-output=$(python -m mycroft.messagebus.send "speak"  "{\"utterance\": \"$@\"}")
+\ No newline at end of file
++output=$(python3 -m mycroft.messagebus.send "speak"  "{\"utterance\": \"$@\"}")
+\ No newline at end of file
+diff --git a/dev_setup.sh b/dev_setup.sh
+index aed54b2167a..dd391181f19 100755
+--- a/dev_setup.sh
++++ b/dev_setup.sh
+@@ -48,7 +48,7 @@ param=""
+ 
+ for var in "$@" ; do
+     # Check if parameter should be read
+-    if [[ ${param} == "python" ]] ; then
++    if [[ ${param} == "python3" ]] ; then
+         opt_python=${var}
+         param=""
+         continue
+@@ -351,17 +351,17 @@ if [ -z ${INSTALL_PRECOMMIT_HOOK} ] ; then
+     HOOK_FILE="./.git/hooks/pre-commit"
+     if [ ! -f ${HOOK_FILE} ] || grep -q "MYCROFT DEV SETUP" ${HOOK_FILE} ; then
+         echo "Installing PEP8 check as precommit-hook"
+-        echo "#! $( which python )" > ${HOOK_FILE}
++        echo "#! $( which python3 )" > ${HOOK_FILE}
+         echo "# MYCROFT DEV SETUP" >> ${HOOK_FILE}
+         cat ./scripts/pre-commit >> ${HOOK_FILE}
+         chmod +x ${HOOK_FILE}
+     fi
+ fi
+ 
+-PYTHON=$( python -c "import sys;print('python{}.{}'.format(sys.version_info[0], sys.version_info[1]))" )
++PYTHON=$( python3 -c "import sys;print('python{}.{}'.format(sys.version_info[0], sys.version_info[1]))" )
+ 
+ # install required python modules
+-if ! pip install -r requirements.txt ; then
++if ! pip3 install -r requirements.txt ; then
+     echo "Warning: Failed to install all requirements. Continue? y/N"
+     read -n1 continue
+     if [[ "$continue" != "y" ]] ; then
+@@ -369,7 +369,7 @@ if ! pip install -r requirements.txt ; then
+     fi
+ fi
+ 
+-if ! pip install -r test-requirements.txt ; then
++if ! pip3 install -r test-requirements.txt ; then
+     echo "Warning test requirements wasn't installed, Note: normal operation should still work fine..."
+ fi
+ 
+diff --git a/scripts/install-pocketsphinx.sh b/scripts/install-pocketsphinx.sh
+index 44d329b7985..d45f5c22747 100755
+--- a/scripts/install-pocketsphinx.sh
++++ b/scripts/install-pocketsphinx.sh
+@@ -47,7 +47,7 @@ function install_pocketsphinx() {
+ 
+     # build and install pocketsphinx python bindings
+     cd ${TOP}/pocketsphinx-python
+-    python setup.py install
++    python3 setup.py install
+ }
+ 
+ if [ "$1" = "-q" ] ; then
+-- 
+2.21.0
+

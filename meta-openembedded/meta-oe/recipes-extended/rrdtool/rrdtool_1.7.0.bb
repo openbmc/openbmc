@@ -50,6 +50,7 @@ EXTRA_OECONF = " \
     --disable-tcl \
     --disable-rpath \
     --enable-nls=${USE_NLS} \
+    --disable-docs \
 "
 
 export STAGING_LIBDIR

@@ -8,14 +8,21 @@ BPN = "gnome-desktop"
 
 GNOMEBASEBUILDCLASS = "meson"
 
-inherit gnome pkgconfig upstream-version-is-even gobject-introspection
+inherit gnome pkgconfig upstream-version-is-even gobject-introspection distro_features_check
+
+# gobject-introspection is mandatory and cannot be configured
+REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
+UNKNOWN_CONFIGURE_WHITELIST_append = " introspection"
 
 SRC_URI[archive.md5sum] = "e423ed6d648c6c4f9798fa9cd9ea8d99"
 SRC_URI[archive.sha256sum] = "a6393dc5fc29fc0652ac84c73b3da205d0b0168128c4cf6d27797a08f3d07b54"
 
-SRC_URI += "file://gnome-desktop-thumbnail-don-t-assume-time_t-is-long.patch"
+SRC_URI += " \
+    file://gnome-desktop-thumbnail-don-t-assume-time_t-is-long.patch \
+    file://0001-meson.build-Disable-libseccomp-for-all-archs.patch \
+"
 
-DEPENDS += "itstool-native gsettings-desktop-schemas gconf virtual/libx11 gtk+3 glib-2.0 startup-notification xkeyboard-config iso-codes udev"
+DEPENDS += "itstool-native gsettings-desktop-schemas virtual/libx11 gtk+3 startup-notification xkeyboard-config iso-codes udev"
 
 inherit distro_features_check gtk-doc
 REQUIRED_DISTRO_FEATURES = "x11"

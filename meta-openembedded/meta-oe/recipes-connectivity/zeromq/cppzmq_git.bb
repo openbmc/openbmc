@@ -4,14 +4,16 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=db174eaf7b55a34a7c89551197f66e94"
 DEPENDS = "zeromq"
 
-SRCREV = "6aa3ab686e916cb0e62df7fa7d12e0b13ae9fae6"
-PV = "4.2.3+git${SRCPV}"
+SRCREV = "213da0b04ae3b4d846c9abc46bab87f86bfb9cf4"
+PV = "4.3.0"
 
 SRC_URI = "git://github.com/zeromq/cppzmq.git"
 
 S = "${WORKDIR}/git"
 
 inherit cmake
+
+EXTRA_OECMAKE = "-DCPPZMQ_BUILD_TESTS=OFF"
 
 PACKAGES = "${PN}-dev"
 

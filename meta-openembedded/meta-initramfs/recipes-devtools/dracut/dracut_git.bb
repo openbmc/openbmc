@@ -12,6 +12,7 @@ PV = "049"
 SRCREV = "225e4b94cbdb702cf512490dcd2ad9ca5f5b22c1"
 SRC_URI = "git://git.kernel.org/pub/scm/boot/dracut/dracut.git;protocol=http \
            file://0001-util.h-include-sys-reg.h-when-libc-glibc.patch \
+           file://0001-dracut.sh-improve-udevdir.patch \
            "
 
 DEPENDS += "kmod"

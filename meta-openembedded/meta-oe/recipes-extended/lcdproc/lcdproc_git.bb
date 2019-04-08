@@ -11,8 +11,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=18810669f13b87348459e611d31ab760 \
 
 BASEPV = "0.5.9"
 PV = "${BASEPV}+git${SRCPV}"
-SRCREV = "a4b5a7e058fdd0d914a61138748b589c0128b45b"
+SRCREV = "e08546c13a4157ed98cd4a8e9086e7acd66f93c0"
 SRC_URI = "git://github.com/lcdproc/lcdproc \
+           file://0001-Fix-parallel-build-fix-port-internal-make-dependenci.patch \
            "
 
 S = "${WORKDIR}/git"
