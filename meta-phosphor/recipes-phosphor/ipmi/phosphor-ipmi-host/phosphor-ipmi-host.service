@@ -26,3 +26,4 @@ BusName=xyz.openbmc_project.Control.Host
 
 [Install]
 WantedBy=multi-user.target
+Alias=xyz.openbmc_project.Control.Host.service
