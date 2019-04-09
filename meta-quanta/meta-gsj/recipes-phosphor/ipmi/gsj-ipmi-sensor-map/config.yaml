@@ -369,7 +369,7 @@
   entityID: 0x07
   entityInstance: 1
   sensorType: 0x01
-  path: /xyz/openbmc_project/nvme/1
+  path: /xyz/openbmc_project/nvme/0
   sensorReadingType: 0x01
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -386,7 +386,7 @@
   entityID: 0x07
   entityInstance: 2
   sensorType: 0x01
-  path: /xyz/openbmc_project/nvme/2
+  path: /xyz/openbmc_project/nvme/1
   sensorReadingType: 0x01
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -403,7 +403,7 @@
   entityID: 0x07
   entityInstance: 3
   sensorType: 0x01
-  path: /xyz/openbmc_project/nvme/3
+  path: /xyz/openbmc_project/nvme/2
   sensorReadingType: 0x01
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -420,7 +420,7 @@
   entityID: 0x07
   entityInstance: 4
   sensorType: 0x01
-  path: /xyz/openbmc_project/nvme/4
+  path: /xyz/openbmc_project/nvme/3
   sensorReadingType: 0x01
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -437,7 +437,7 @@
   entityID: 0x07
   entityInstance: 5
   sensorType: 0x01
-  path: /xyz/openbmc_project/nvme/5
+  path: /xyz/openbmc_project/nvme/4
   sensorReadingType: 0x01
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -454,7 +454,7 @@
   entityID: 0x07
   entityInstance: 6
   sensorType: 0x01
-  path: /xyz/openbmc_project/nvme/6
+  path: /xyz/openbmc_project/nvme/5
   sensorReadingType: 0x01
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -471,7 +471,7 @@
   entityID: 0x07
   entityInstance: 7
   sensorType: 0x01
-  path: /xyz/openbmc_project/nvme/7
+  path: /xyz/openbmc_project/nvme/6
   sensorReadingType: 0x01
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -488,7 +488,7 @@
   entityID: 0x07
   entityInstance: 8
   sensorType: 0x01
-  path: /xyz/openbmc_project/nvme/8
+  path: /xyz/openbmc_project/nvme/7
   sensorReadingType: 0x01
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -518,10 +518,10 @@
         Offsets:
           0x00:
             type: string
-            assert: xyz.openbmc_project.Sensor.Memory.MemoryECC.ECCStatus.CE
+            assert: xyz.openbmc_project.Memory.MemoryECC.ECCStatus.CE
           0x01:
             type: string
-            assert: xyz.openbmc_project.Sensor.Memory.MemoryECC.ECCStatus.UE
+            assert: xyz.openbmc_project.Memory.MemoryECC.ECCStatus.UE
           0x05:
             type: string
-            assert: xyz.openbmc_project.Sensor.Memory.MemoryECC.ECCStatus.LogFulled
+            assert: xyz.openbmc_project.Memory.MemoryECC.ECCStatus.LogFull
