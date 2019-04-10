@@ -2,8 +2,6 @@
 Description=Stop Host%i
 Wants=multi-user.target
 After=multi-user.target
-Wants=mapper-wait@-org-openbmc-control-chassis%i.service
-After=mapper-wait@-org-openbmc-control-chassis%i.service
 After=obmc-chassis-poweroff@%i.target
 Conflicts=obmc-host-startmin@%i.target
 RefuseManualStop=yes
