@@ -689,7 +689,8 @@ def pstaging_fetch(sstatefetch, d):
 
     # if BB_NO_NETWORK is set but we also have SSTATE_MIRROR_ALLOW_NETWORK,
     # we'll want to allow network access for the current set of fetches.
-    if localdata.getVar('BB_NO_NETWORK') == "1" and localdata.getVar('SSTATE_MIRROR_ALLOW_NETWORK') == "1":
+    if bb.utils.to_boolean(localdata.getVar('BB_NO_NETWORK')) and \
+            bb.utils.to_boolean(localdata.getVar('SSTATE_MIRROR_ALLOW_NETWORK')):
         localdata.delVar('BB_NO_NETWORK')
 
     # Try a fetch from the sstate mirror, if it fails just return and
@@ -867,7 +868,8 @@ def sstate_checkhashes(sq_fn, sq_task, sq_hash, sq_hashfn, d, siginfo=False, *, 
 
         # if BB_NO_NETWORK is set but we also have SSTATE_MIRROR_ALLOW_NETWORK,
         # we'll want to allow network access for the current set of fetches.
-        if localdata.getVar('BB_NO_NETWORK') == "1" and localdata.getVar('SSTATE_MIRROR_ALLOW_NETWORK') == "1":
+        if bb.utils.to_boolean(localdata.getVar('BB_NO_NETWORK')) and \
+                bb.utils.to_boolean(localdata.getVar('SSTATE_MIRROR_ALLOW_NETWORK')):
             localdata.delVar('BB_NO_NETWORK')
 
         from bb.fetch2 import FetchConnectionCache

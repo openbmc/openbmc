@@ -566,6 +566,7 @@ RPROVIDES_udev = "hotplug"
 RDEPENDS_udev-hwdb += "udev"
 
 FILES_udev += "${base_sbindir}/udevd \
+               ${rootlibexecdir}/systemd/network/99-default.link \
                ${rootlibexecdir}/systemd/systemd-udevd \
                ${rootlibexecdir}/udev/accelerometer \
                ${rootlibexecdir}/udev/ata_id \

@@ -931,20 +931,21 @@
 
         <glossentry id='var-BB_GENERATE_MIRROR_TARBALLS'><glossterm>BB_GENERATE_MIRROR_TARBALLS</glossterm>
             <info>
-                BB_GENERATE_MIRROR_TARBALLS[doc] = "Causes tarballs of the Git repositories to be placed in the DL_DIR directory."
+                BB_GENERATE_MIRROR_TARBALLS[doc] = "Causes tarballs of the source control repositories to be placed in the DL_DIR directory."
             </info>
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    Causes tarballs of the Git repositories, including the
-                    Git metadata, to be placed in the
+                    Causes tarballs of the source control repositories
+                    (e.g. Git repositories), including metadata, to be placed
+                    in the
                     <link linkend='var-DL_DIR'><filename>DL_DIR</filename></link>
                     directory.
                 </para>
 
                 <para>
                     For performance reasons, creating and placing tarballs of
-                    the Git repositories is not the default action by the
+                    these repositories is not the default action by the
                     OpenEmbedded build system.
                     <literallayout class='monospaced'>
      BB_GENERATE_MIRROR_TARBALLS = "1"
@@ -952,6 +953,13 @@
                     Set this variable in your <filename>local.conf</filename>
                     file in the
                     <link linkend='build-directory'>Build Directory</link>.
+                </para>
+
+                <para>
+                    Once you have the tarballs containing your source files,
+                    you can clean up your <filename>DL_DIR</filename>
+                    directory by deleting any Git or other source control
+                    work directories.
                 </para>
             </glossdef>
         </glossentry>

@@ -10,7 +10,11 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=751419260aa954499f7abaabaa882bbe"
 SRCREV = "05b112bda7ac2adba8e9b0f088d6e5843b148a38"
 PV = "2.3.1+git${SRCPV}"
 
-SRC_URI = "git://git.yoctoproject.org/ptest-runner2"
+SRC_URI = "git://git.yoctoproject.org/ptest-runner2 \
+ file://0001-utils-Ensure-stdout-stderr-are-flushed.patch \
+ file://0002-use-process-groups-when-spawning.patch \
+ file://0003-utils-Ensure-pipes-are-read-after-exit.patch"
+
 S = "${WORKDIR}/git"
 
 FILES_${PN} = "${bindir}/ptest-runner"

@@ -3186,7 +3186,8 @@
         <para>
             In the
             <ulink url='&YOCTO_DOCS_REF_URL;#build-system-term'>OpenEmbedded build system</ulink>,
-            the program that implements fakeroot is known as Pseudo.
+            the program that implements fakeroot is known as
+            <ulink url='https://www.yoctoproject.org/software-item/pseudo/'>Pseudo</ulink>.
             Pseudo overrides system calls by using the environment variable
             <filename>LD_PRELOAD</filename>, which results in the illusion
             of running as root.
@@ -3220,10 +3221,8 @@
             <ulink url='&YOCTO_DOCS_BB_URL;#var-FAKEROOT'><filename>FAKEROOT*</filename></ulink>
             variables in the BitBake User Manual.
             You can also reference the
-            "<ulink url='http://www.ibm.com/developerworks/opensource/library/os-aapseudo1/index.html'>Pseudo</ulink>"
-            and
             "<ulink url='https://github.com/wrpseudo/pseudo/wiki/WhyNotFakeroot'>Why Not Fakeroot?</ulink>"
-            articles for background information on Pseudo.
+            article for background information on Fakeroot and Pseudo.
         </para>
     </section>
 </chapter>

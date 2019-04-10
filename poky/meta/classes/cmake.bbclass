@@ -10,13 +10,14 @@ OECMAKE_GENERATOR ?= "Ninja"
 
 python() {
     generator = d.getVar("OECMAKE_GENERATOR")
-    if generator == "Unix Makefiles":
-        args = "-G 'Unix Makefiles' -DCMAKE_MAKE_PROGRAM=" + d.getVar("MAKE")
+    if "Unix Makefiles" in generator:
+        args = "-G '" + generator +  "' -DCMAKE_MAKE_PROGRAM=" + d.getVar("MAKE")
         d.setVar("OECMAKE_GENERATOR_ARGS", args)
         d.setVarFlag("do_compile", "progress", "percent")
-    elif generator == "Ninja":
+    elif "Ninja" in generator:
+        args = "-G '" + generator + "' -DCMAKE_MAKE_PROGRAM=ninja"
         d.appendVar("DEPENDS", " ninja-native")
-        d.setVar("OECMAKE_GENERATOR_ARGS", "-G Ninja -DCMAKE_MAKE_PROGRAM=ninja")
+        d.setVar("OECMAKE_GENERATOR_ARGS", args)
         d.setVarFlag("do_compile", "progress", r"outof:^\[(\d+)/(\d+)\]\s+")
     else:
         bb.fatal("Unknown CMake Generator %s" % generator)

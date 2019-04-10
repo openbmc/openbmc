@@ -78,12 +78,12 @@ def prune_suffix(var, suffixes, d):
     # See if var ends with any of the suffixes listed and
     # remove it if found
     for suffix in suffixes:
-        if var.endswith(suffix):
-            var = var.replace(suffix, "")
+        if suffix and var.endswith(suffix):
+            var = var[:-len(suffix)]
 
     prefix = d.getVar("MLPREFIX")
     if prefix and var.startswith(prefix):
-        var = var.replace(prefix, "")
+        var = var[len(prefix):]
 
     return var
 

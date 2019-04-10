@@ -1328,6 +1328,20 @@ def _export_local_files(srctree, rd, destdir, srctreebase):
                 if os.path.exists(os.path.join(local_files_dir, fragment_fn)):
                     os.unlink(os.path.join(local_files_dir, fragment_fn))
 
+    # Special handling for cml1, ccmake, etc bbclasses that generated
+    # configuration fragment files that are consumed as source files
+    for frag_class, frag_name in [("cml1", "fragment.cfg"), ("ccmake", "site-file.cmake")]:
+        if bb.data.inherits_class(frag_class, rd):
+            srcpath = os.path.join(rd.getVar('WORKDIR'), frag_name)
+            if os.path.exists(srcpath):
+                if frag_name not in new_set:
+                    new_set.append(frag_name)
+                # copy fragment into destdir
+                shutil.copy2(srcpath, destdir)
+                # copy fragment into local files if exists
+                if os.path.isdir(local_files_dir):
+                    shutil.copy2(srcpath, local_files_dir)
+
     if new_set is not None:
         for fname in new_set:
             if fname in existing_files:

@@ -876,7 +876,7 @@ def check_sanity_everybuild(status, d):
         with open(checkfile, "r") as f:
             saved_tmpdir = f.read().strip()
             if (saved_tmpdir != tmpdir):
-                status.addresult("Error, TMPDIR has changed location. You need to either move it back to %s or rebuild\n" % saved_tmpdir)
+                status.addresult("Error, TMPDIR has changed location. You need to either move it back to %s or delete it and rebuild\n" % saved_tmpdir)
     else:
         bb.utils.mkdirhier(tmpdir)
         # Remove setuid, setgid and sticky bits from TMPDIR

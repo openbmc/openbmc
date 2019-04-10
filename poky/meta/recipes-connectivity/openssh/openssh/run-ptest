@@ -5,7 +5,7 @@ export TEST_SHELL=sh
 cd regress
 sed -i "/\t\tagent-ptrace /d" Makefile
 make -k .OBJDIR=`pwd` .CURDIR=`pwd` SUDO="sudo" tests \
-        | sed -e 's/^skipped/SKIP: /g' -e 's/^ok /PASS: /g' -e 's/^failed/FAIL: /g'
+        | sed -u -e 's/^skipped/SKIP: /g' -e 's/^ok /PASS: /g' -e 's/^failed/FAIL: /g'
 
 SSHAGENT=`which ssh-agent`
 GDB=`which gdb`
