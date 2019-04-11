@@ -9,4 +9,4 @@ Restart=always
 
 
 [Install]
-WantedBy=obmc-standby.target
+WantedBy=multi-user.target

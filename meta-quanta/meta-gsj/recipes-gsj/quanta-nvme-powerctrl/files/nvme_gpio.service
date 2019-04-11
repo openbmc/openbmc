@@ -7,4 +7,4 @@ After=org.openbmc.records.events.service xyz.openbmc_project.nvme.manager.servic
 ExecStart=/usr/bin/init_once.sh
 
 [Install]
-WantedBy=obmc-standby.target
+WantedBy=multi-user.target
