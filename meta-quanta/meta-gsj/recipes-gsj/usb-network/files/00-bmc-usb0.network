@@ -3,5 +3,5 @@ Name=usb0
 [Address]
 Address=169.254.95.118/16
 [Network]
-LinkLocalAddressing=yes
+LinkLocalAddressing=no
 IPv6AcceptRA=no
