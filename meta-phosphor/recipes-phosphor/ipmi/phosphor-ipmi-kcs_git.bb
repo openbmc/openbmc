@@ -22,6 +22,10 @@ RRECOMMENDS_${PN} += "phosphor-ipmi-host"
 DEPENDS += " \
         autoconf-archive-native \
         systemd \
+        sdbusplus \
+        boost \
+        phosphor-logging \
+        cli11 \
         "
 
 S = "${WORKDIR}/git"
