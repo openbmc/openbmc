@@ -10,6 +10,7 @@ inherit autotools pkgconfig
 inherit obmc-phosphor-systemd
 
 DEPENDS += "autoconf-archive-native"
+DEPENDS += "cli11"
 DEPENDS += "phosphor-mapper"
 DEPENDS += "systemd"
 DEPENDS += "phosphor-ipmi-host"
