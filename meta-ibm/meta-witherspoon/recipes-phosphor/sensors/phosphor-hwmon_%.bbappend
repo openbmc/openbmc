@@ -1,4 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+# Machine specific files override shared files with the same name
+FILESEXTRAPATHS_prepend := "${THISDIR}/${MACHINE}-${PN}:"
 
 SRC_URI += " \
            file://70-hwmon.rules \
@@ -6,7 +8,7 @@ SRC_URI += " \
            file://start_max31785_hwmon.sh \
            "
 
-WSPOON_CHIPS = " \
+CHIPS_witherspoon = " \
                bus@1e78a000/i2c-bus@100/bmp280@77 \
                bus@1e78a000/i2c-bus@100/dps310@76 \
                bus@1e78a000/i2c-bus@100/max31785@52_air \
@@ -19,22 +21,23 @@ WSPOON_CHIPS = " \
                bus@1e78a000/i2c-bus@180/ir35221@71 \
                bus@1e78a000/i2c-bus@380/tmp275@4a \
                "
-WSPOON_ITEMSFMT = "ahb/apb/{0}.conf"
-WSPOON_ITEMS = "${@compose_list(d, 'WSPOON_ITEMSFMT', 'WSPOON_CHIPS')}"
 
-WSPOON_OCCS = " \
+ITEMSFMT = "ahb/apb/{0}.conf"
+ITEMS = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_${MACHINE}')}"
+
+OCCS_witherspoon = " \
               00--00--00--06/sbefifo1-dev0/occ-hwmon.1 \
               00--00--00--0a/fsi1/slave@01--00/01--01--00--06/sbefifo2-dev0/occ-hwmon.2 \
               "
-WSPOON_OCCSFMT = "devices/platform/gpio-fsi/fsi0/slave@00--00/{0}.conf"
-WSPOON_OCCITEMS = "${@compose_list(d, 'WSPOON_OCCSFMT', 'WSPOON_OCCS')}"
+OCCSFMT_witherspoon = "devices/platform/gpio-fsi/fsi0/slave@00--00/{0}.conf"
+OCCITEMS_witherspoon = "${@compose_list(d, 'OCCSFMT_witherspoon', 'OCCS_witherspoon')}"
 
 ENVS = "obmc/hwmon/{0}"
-SYSTEMD_ENVIRONMENT_FILE_${PN} += "${@compose_list(d, 'ENVS', 'WSPOON_ITEMS')}"
-SYSTEMD_ENVIRONMENT_FILE_${PN} += "${@compose_list(d, 'ENVS', 'WSPOON_OCCITEMS')}"
+SYSTEMD_ENVIRONMENT_FILE_${PN} += "${@compose_list(d, 'ENVS', 'ITEMS')}"
+SYSTEMD_ENVIRONMENT_FILE_${PN}_append_witherspoon = " ${@compose_list(d, 'ENVS', 'OCCITEMS_witherspoon')}"
 
-SYSTEMD_ENVIRONMENT_FILE_max31785-msl += "obmc/hwmon-max31785/wspoon.conf"
-SYSTEMD_LINK_max31785-msl += "../phosphor-max31785-msl@.service:multi-user.target.wants/phosphor-max31785-msl@wspoon.service"
+SYSTEMD_ENVIRONMENT_FILE_max31785-msl += "obmc/hwmon-max31785/max31785.conf"
+SYSTEMD_LINK_max31785-msl += "../phosphor-max31785-msl@.service:multi-user.target.wants/phosphor-max31785-msl@${MACHINE}.service"
 
 SYSTEMD_SERVICE_${PN} += "max31785-hwmon-helper@.service"
 
