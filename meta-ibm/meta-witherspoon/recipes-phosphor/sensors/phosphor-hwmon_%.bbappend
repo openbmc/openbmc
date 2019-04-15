@@ -8,11 +8,13 @@ SRC_URI += " \
            file://start_max31785_hwmon.sh \
            "
 
-CHIPS_witherspoon = " \
+CHIPS = " \
+        bus@1e78a000/i2c-bus@100/max31785@52_air \
+        bus@1e78a000/i2c-bus@100/max31785@52_water \
+        "
+CHIPS_append_witherspoon = " \
                bus@1e78a000/i2c-bus@100/bmp280@77 \
                bus@1e78a000/i2c-bus@100/dps310@76 \
-               bus@1e78a000/i2c-bus@100/max31785@52_air \
-               bus@1e78a000/i2c-bus@100/max31785@52_water \
                bus@1e78a000/i2c-bus@100/power-supply@68 \
                bus@1e78a000/i2c-bus@100/power-supply@69 \
                bus@1e78a000/i2c-bus@140/ir35221@70 \
@@ -23,7 +25,7 @@ CHIPS_witherspoon = " \
                "
 
 ITEMSFMT = "ahb/apb/{0}.conf"
-ITEMS = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_${MACHINE}')}"
+ITEMS = "${@compose_list(d, 'ITEMSFMT', 'CHIPS')}"
 
 OCCS_witherspoon = " \
               00--00--00--06/sbefifo1-dev0/occ-hwmon.1 \
