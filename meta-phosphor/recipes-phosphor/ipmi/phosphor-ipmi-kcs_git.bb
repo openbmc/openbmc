@@ -30,7 +30,7 @@ DEPENDS += " \
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/kcsbridge.git"
-SRCREV = "17a2ab7f39a78ff0603aa68cf35108ea94eb442f"
+SRCREV = "ab794149e763f9562dfe1278ee0b3143f2af4226"
 
 # This is how linux-libc-headers says to include custom uapi headers
 CFLAGS_append = " -I ${STAGING_KERNEL_DIR}/include/uapi"

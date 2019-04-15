@@ -3,7 +3,7 @@ Description=Phosphor IPMI KCS DBus Bridge
 
 [Service]
 Restart=always
-ExecStart={sbindir}/kcsbridged --d="/dev/{KCS_DEVICE}"
+ExecStart={bindir}/kcsbridged --d="/dev/{KCS_DEVICE}"
 Type=dbus
 BusName={BUSNAME}
 
