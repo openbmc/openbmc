@@ -26,7 +26,6 @@ SUMMARY_${PN}-chassis = "OpenPOWER Chassis"
 RDEPENDS_${PN}-chassis = " \
         obmc-phosphor-buttons-signals \
         obmc-phosphor-buttons-handler \
-        obmc-control-chassis \
         obmc-op-control-power \
         obmc-host-failure-reboots \
         "
