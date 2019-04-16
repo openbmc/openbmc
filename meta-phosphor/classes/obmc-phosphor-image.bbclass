@@ -83,7 +83,6 @@ IMAGE_FEATURES_append_df-obmc-ubi-fs = " read-only-rootfs"
 
 CORE_IMAGE_EXTRA_INSTALL_append = " bash \
         packagegroup-obmc-apps-extras \
-        packagegroup-obmc-apps-extrasdev \
         packagegroup-obmc-apps-extrasdevtools \
         i2c-tools \
         obmc-console \
