@@ -2,7 +2,7 @@ SUMMARY = "dbus-sensors"
 DESCRIPTION = "Dbus Sensor Services Configured from D-Bus"
 
 SRC_URI = "git://github.com/openbmc/dbus-sensors.git"
-SRCREV = "d2543f81f4dd7a1f3a0989ec5829401d1147674c"
+SRCREV = "93dc2c8e7c710fd65d269ef0bf684fb7a433a602"
 
 PV = "0.1+git${SRCPV}"
 
@@ -16,6 +16,7 @@ SYSTEMD_SERVICE_${PN} += " xyz.openbmc_project.cpusensor.service"
 SYSTEMD_SERVICE_${PN} += " xyz.openbmc_project.exitairsensor.service"
 SYSTEMD_SERVICE_${PN} += " xyz.openbmc_project.ipmbsensor.service"
 SYSTEMD_SERVICE_${PN} += " xyz.openbmc_project.intrusionsensor.service"
+SYSTEMD_SERVICE_${PN} += " xyz.openbmc_project.psusensor.service"
 
 DEPENDS = "boost nlohmann-json sdbusplus i2c-tools"
 inherit cmake systemd
