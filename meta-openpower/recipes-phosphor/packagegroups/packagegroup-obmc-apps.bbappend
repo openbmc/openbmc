@@ -1,5 +1,3 @@
-RDEPENDS_${PN}-extrasdevtools_append_df-openpower = " obmc-pydevtools"
-
 # Add the deprecated /org/openbmc inventory namespace providing
 # obmc-mgr-inventory application to the inventory packagegroup
 # until all applications have been updated to use the new,
