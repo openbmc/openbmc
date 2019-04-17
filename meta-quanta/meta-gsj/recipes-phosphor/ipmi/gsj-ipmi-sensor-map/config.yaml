@@ -365,6 +365,31 @@
           0xFF:
             type: int64_t
 
+0xC0: &fan_pwm
+  sensorType: 0x04
+  path: /xyz/openbmc_project/sensors/fan_tach/Fan0_0_RPM
+  sensorReadingType: 0x01
+  multiplierM: 1
+  offsetB: 0
+  bExp: 0
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Control.FanPwm:
+      Target:
+        Offsets:
+          0xFF:
+            type: uint64_t
+
+0xC1:
+  <<: *fan_pwm
+  path: /xyz/openbmc_project/sensors/fan_tach/Fan1_0_RPM
+
+0xC2:
+  <<: *fan_pwm
+  path: /xyz/openbmc_project/sensors/fan_tach/Fan2_0_RPM
+
 0x34:
   entityID: 0x07
   entityInstance: 1
