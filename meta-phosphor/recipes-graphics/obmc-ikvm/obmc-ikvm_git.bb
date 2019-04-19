@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=75859989545e37968a99b631ef42722e"
 DEPENDS = " libvncserver systemd sdbusplus phosphor-logging phosphor-dbus-interfaces"
 
 SRC_URI = "git://github.com/openbmc/obmc-ikvm"
-SRCREV = "63c3ea18c3ad560fb30d952e37a084c9d730b78a"
+SRCREV = "4749f934f199ae257dba48891a47eade5307c828"
 
 PV = "1.0+git${SRCPV}"
 
