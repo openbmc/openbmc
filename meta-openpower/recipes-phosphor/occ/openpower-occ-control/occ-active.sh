@@ -14,7 +14,7 @@ fi
 
 OCC_CONTROL_SERVICE="org.open_power.OCC.Control"
 
-busctl tree $OCC_CONTROL_SERVICE --list | grep occ | xargs -r -n1 -I{} \
+busctl tree $OCC_CONTROL_SERVICE --list | grep -i occ | xargs -r -n1 -I{} \
     busctl set-property $OCC_CONTROL_SERVICE {} org.open_power.OCC.Status \
     OccActive b $value
 exit 0
