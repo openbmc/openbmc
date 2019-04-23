@@ -1,7 +1,0 @@
-[Unit]
-Description=/usr/local
-
-[Mount]
-What=tmpfs
-Where=/usr/local
-Type=tmpfs

@@ -1,9 +1,0 @@
-[Unit]
-Description=Clean up UBI volumes unattached to a BMC version after DeleteAll
-
-[Service]
-Type=oneshot
-RemainAfterExit=no
-ExecStartPre=/usr/bin/env obmc-flash-bmc createenvbackup
-ExecStart=/usr/bin/env obmc-flash-bmc ubicleanup
-SyslogIdentifier=obmc-flash-bmc
