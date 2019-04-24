@@ -1,4 +1,4 @@
-inherit obmc-phosphor-systemd
+inherit systemd
 inherit useradd
 
 USERADD_PACKAGES = "${PN}"
