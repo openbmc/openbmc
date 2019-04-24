@@ -37,7 +37,6 @@ RDEPENDS_${PN}-chassis += "${@mf_enabled(d, 'p9-cfam-override', 'p9-cfam-overrid
 
 SUMMARY_${PN}-fans = "OpenPOWER Fans"
 RDEPENDS_${PN}-fans = " \
-        obmc-control-fan \
         "
 
 SUMMARY_${PN}-flash = "OpenPOWER Flash"
