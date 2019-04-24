@@ -29,9 +29,7 @@ RDEPENDS_${PN}-chassis = " \
         "
 
 SUMMARY_${PN}-fans = "Inspur Fans"
-RDEPENDS_${PN}-fans = " \
-        obmc-control-fan \
-        "
+RDEPENDS_${PN}-fans = ""
 
 SUMMARY_${PN}-flash = "Inspur Flash"
 RDEPENDS_${PN}-flash = " \
