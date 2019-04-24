@@ -9,8 +9,6 @@ OBMC_MACHINE_FEATURES += "\
         obmc-bmc-state-mgmt \
         "
 
-VIRTUAL-RUNTIME_skeleton_workbook = "${MACHINE}-config"
-
 # Add OpenPOWER OEM commands handler library
 VIRTUAL-RUNTIME_phosphor-ipmi-providers_append_df-openpower = " \
     openpower-ipmi-oem \
@@ -22,7 +20,6 @@ PREFERRED_PROVIDER_virtual/obmc-fan-mgmt = "packagegroup-op-apps"
 PREFERRED_PROVIDER_virtual/obmc-flash-mgmt = "packagegroup-op-apps"
 PREFERRED_PROVIDER_virtual/obmc-system-mgmt = "packagegroup-op-apps"
 PREFERRED_PROVIDER_virtual/obmc-host-ctl ?= "obmc-op-control-host"
-PREFERRED_PROVIDER_virtual/obmc-inventory-data ?= "${VIRTUAL-RUNTIME_skeleton_workbook}"
 PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-hostfw-config ?= "hostboot-inventory-config-native"
 PREFERRED_PROVIDER_virtual/openpower-fru-vpd-layout ?= "openpower-fru-vpd-layout-native"
 PREFERRED_PROVIDER_virtual/openpower-fru-inventory ?= "openpower-fru-inventory-example-native"
