@@ -11,42 +11,74 @@ LED_U2_0_LOCATE:
     LED_U2_0_LOCATE:
         Action: 'Blink'
         DutyOn: 50
-        Period: 1000
+        Period: 250
+    LED_U2_0_FAULT:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 250
 LED_U2_1_LOCATE:
     LED_U2_1_LOCATE:
         Action: 'Blink'
         DutyOn: 50
-        Period: 1000
+        Period: 250
+    LED_U2_1_FAULT:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 250
 LED_U2_2_LOCATE:
     LED_U2_2_LOCATE:
         Action: 'Blink'
         DutyOn: 50
-        Period: 1000
+        Period: 250
+    LED_U2_2_FAULT:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 250
 LED_U2_3_LOCATE:
     LED_U2_3_LOCATE:
         Action: 'Blink'
         DutyOn: 50
-        Period: 1000
+        Period: 250
+    LED_U2_3_FAULT:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 250
 LED_U2_4_LOCATE:
     LED_U2_4_LOCATE:
         Action: 'Blink'
         DutyOn: 50
-        Period: 1000
+        Period: 250
+    LED_U2_4_FAULT:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 250
 LED_U2_5_LOCATE:
     LED_U2_5_LOCATE:
         Action: 'Blink'
         DutyOn: 50
-        Period: 1000
+        Period: 250
+    LED_U2_5_FAULT:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 250
 LED_U2_6_LOCATE:
     LED_U2_6_LOCATE:
         Action: 'Blink'
         DutyOn: 50
-        Period: 1000
+        Period: 250
+    LED_U2_6_FAULT:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 250
 LED_U2_7_LOCATE:
     LED_U2_7_LOCATE:
         Action: 'Blink'
         DutyOn: 50
-        Period: 1000
+        Period: 250
+    LED_U2_7_FAULT:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 250
 LED_U2_0_FAULT:
     LED_U2_0_FAULT:
         Action: 'On'
