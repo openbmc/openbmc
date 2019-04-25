@@ -1,0 +1,218 @@
+groups:
+    - name: air_cooled_zone0_fans
+      description: Group of fan inventory objects for air cooled zone 0
+      type: /xyz/openbmc_project/inventory
+      members:
+          - /system/chassis/motherboard/fan0
+          - /system/chassis/motherboard/fan1
+    - name: zone0_ambient
+      description: Group of ambient temperature sensors for zone 0
+      type: /xyz/openbmc_project/sensors
+      members:
+          - /temperature/ambient
+
+matches:
+    - name: propertiesChanged
+      description: >
+          A property changed match
+      parameters:
+          - object
+          - interface
+      signal: propertySignal
+    - name: interfacesAdded
+      description: >
+          An interfaces added match
+      parameters:
+          - object
+      signal: objectSignal
+    - name: nameOwnerChanged
+      description: >
+          A name owner changed match
+      parameters:
+          - object
+          - interface
+      signal: ownerSignal
+
+signals:
+    - name: propertySignal
+      description: >
+          Handle property signals
+      parameters:
+          - type
+          - object
+          - interface
+          - property
+      handler: setProperty
+    - name: objectSignal
+      description: >
+          Handle object signals
+      parameters:
+          - type
+          - object
+          - interface
+          - property
+      handler: setProperty
+    - name: ownerSignal
+      description: >
+          Handle owner signals
+      parameters:
+          - object
+          - interface
+      handler: setService
+
+handlers:
+    - name: setProperty
+      description: >
+          Sets a value for the given object/interface/property
+      parameters:
+          - type
+          - object
+          - interface
+          - property
+    - name: setService
+      description: >
+          Sets the service name(s) for the given group
+      parameters:
+          - group
+
+preconditions:
+    - name: property_states_match
+      description: >
+          All defined properties must match the values given to
+          enable a set speed event otherwise fan speeds are set to full
+      parameters:
+          - groups
+
+actions:
+    - name: call_actions_based_on_timer
+      description: >
+          Sets up a list of actions to be invoked when the defined timer
+          expires (or for each expiration of a repeating timer)
+      parameters:
+          - timer
+          - actions
+    - name: default_floor_on_missing_owner
+      description: >
+          Set the fan floor to the default floor
+    - name: set_speed_on_missing_owner
+      description: >
+          Set fans to the given speed when any service within the group
+          no longer exists
+      parameters:
+          - speed
+    - name: set_request_speed_base_with_max
+      description: >
+          Set the base request speed of a zone to the max value of a group for
+          calculating a new target speed
+    - name: count_state_before_speed
+      description: Set the speed when a number of properties at a state
+      parameters:
+          - count
+          - property
+          - speed
+    - name: set_floor_from_average_sensor_value
+      description: Set floor speed from first entry with average less than key
+      parameters:
+          - map
+    - name: set_ceiling_from_average_sensor_value
+      description: Set ceiling speed based on key transition values with average
+      parameters:
+          - map
+    - name: set_net_increase_speed
+      description: >
+          Set the speed increase delta based on a factor applied to
+          the delta increase size times the given value and property's
+          value difference
+      parameters:
+          - property
+          - factor
+          - delta
+    - name: set_net_decrease_speed
+      description: >
+          Set the speed decrease delta based on a factor applied to
+          the delta decrease size times the given value and property's
+          value difference
+      parameters:
+          - property
+          - factor
+          - delta
+
+events:
+    - name: default_fan_floor_on_service_fail
+      groups:
+          - name: zone0_ambient
+            interface: xyz.openbmc_project.Sensor.Value
+            property:
+                name: Value
+                type: int64_t
+      matches:
+          - name: nameOwnerChanged
+      actions:
+          - name: call_actions_based_on_timer
+            timer:
+                delay: 5
+                type: oneshot
+            actions:
+                - name: default_floor_on_missing_owner
+    - name: missing_before_high_speed_air
+      groups:
+          - name: air_cooled_zone0_fans
+            interface: xyz.openbmc_project.Inventory.Item
+            property:
+                name: Present
+                type: bool
+      matches:
+          - name: propertiesChanged
+      actions:
+          - name: count_state_before_speed
+            count: 1
+            property:
+                value: false
+                type: bool
+            speed:
+                value: 120
+                type: uint64_t
+    - name: fails_before_high_speed_air
+      groups:
+          - name: air_cooled_zone0_fans
+            interface: xyz.openbmc_project.State.Decorator.OperationalStatus
+            property:
+                name: Functional
+                type: bool
+      matches:
+          - name: propertiesChanged
+      actions:
+          - name: count_state_before_speed
+            count: 1
+            property:
+                value: false
+                type: bool
+            speed:
+                value: 220
+                type: uint64_t
+    - name: set_air_cooled_speed_boundaries_based_on_ambient
+      groups:
+          - name: zone0_ambient
+            interface: xyz.openbmc_project.Sensor.Value
+            property:
+                name: Value
+                type: int64_t
+      matches:
+          - name: propertiesChanged
+      actions:
+          - name: set_floor_from_average_sensor_value
+            map:
+                value:
+                    - 27000: 80
+                    - 30000: 100
+                    - 37000: 150
+                    - 40000: 200
+                type: std::map<int64_t, uint64_t>
+          - name: set_ceiling_from_average_sensor_value
+            map:
+                value:
+                    - 27000: 90
+                    - 30000: 110
+                    - 37000: 160
+                    - 40000: 210
+                type: std::map<int64_t, uint64_t>

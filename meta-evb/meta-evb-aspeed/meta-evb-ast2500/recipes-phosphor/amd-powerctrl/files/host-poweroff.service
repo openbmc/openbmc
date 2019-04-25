@@ -1,0 +1,14 @@
+[Unit]
+Description=Stop Host
+Requires=host-gpio.service
+After=host-gpio.service
+Conflicts=obmc-chassis-poweron@0.target
+
+[Service]
+RemainAfterExit=yes
+Type=oneshot
+ExecStart=/usr/bin/env poweroff.sh
+SyslogIdentifier=poweroff.sh
+
+[Install]
+WantedBy=obmc-chassis-poweroff@0.target

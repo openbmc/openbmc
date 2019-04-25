@@ -3,6 +3,7 @@ DISTRO ?= "openbmc-phosphor"
 PACKAGE_CLASSES ?= "package_rpm"
 SANITY_TESTED_DISTROS_append ?= " *"
 EXTRA_IMAGE_FEATURES = "debug-tweaks"
+IMAGE_INSTALL_append = " ipmitool"
 USER_CLASSES ?= "buildstats image-mklibs image-prelink"
 PATCHRESOLVE = "noop"
 BB_DISKMON_DIRS = "\

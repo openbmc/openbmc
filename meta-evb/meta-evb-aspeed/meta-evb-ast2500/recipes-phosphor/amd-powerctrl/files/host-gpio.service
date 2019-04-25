@@ -1,0 +1,12 @@
+[Unit]
+Description=Configure GPIOs for Host Power Control
+
+[Service]
+Restart=no
+RemainAfterExit=true
+Type=oneshot
+ExecStart=/usr/sbin/init_once.sh
+SyslogIdentifier=init_once.sh
+
+[Install]
+WantedBy=basic.target
