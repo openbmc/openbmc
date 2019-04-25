@@ -1,0 +1,15 @@
+RISC-V supports unaligned accesses, therefore enable it
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/m4/as-unaligned-access.m4
++++ b/m4/as-unaligned-access.m4
+@@ -5,7 +5,7 @@ AC_DEFUN([AS_UNALIGNED_ACCESS], [
+   AC_MSG_CHECKING([if unaligned memory access works correctly])
+   if test x"$as_cv_unaligned_access" = x ; then
+     case $host in
+-      alpha*|arm*|hp*|mips*|sh*|sparc*|ia64*)
++      alpha*|arm*|hp*|mips*|riscv*|sh*|sparc*|ia64*)
+         _AS_ECHO_N([(blacklisted) ])
+         as_cv_unaligned_access=no
+ 	;;

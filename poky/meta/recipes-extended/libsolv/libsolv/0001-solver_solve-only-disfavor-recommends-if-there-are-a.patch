@@ -1,0 +1,33 @@
+From 19d7cc87adba92d31d5fafdf7db00920d24a96a6 Mon Sep 17 00:00:00 2001
+From: Alejandro del Castillo <alejandro.delcastillo@ni.com>
+Date: Wed, 6 Feb 2019 13:24:04 -0600
+Subject: [PATCH] solver_solve: only disfavor recommends if there are any
+
+In a repo that have pkg 'a' and 'b' available, and 'b' is disfavored,
+but 'a' doesn't recommend 'b', libsolv segfaults on
+solver_addrecommendsrules, since solv->recommendsruleq is null. Only
+call solver_addrecommendsrules if there are recommends rules.
+
+Signed-off-by: Alejandro del Castillo <alejandro.delcastillo@ni.com>
+
+Upstream-Status: Accepted
+---
+ src/solver.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/solver.c b/src/solver.c
+index a80090d19..ad78327a8 100644
+--- a/src/solver.c
++++ b/src/solver.c
+@@ -3920,7 +3920,7 @@ solver_solve(Solver *solv, Queue *job)
+   else
+     solv->yumobsrules = solv->yumobsrules_end = solv->nrules;
+ 
+-  if (solv->havedisfavored && solv->strongrecommends)
++  if (solv->havedisfavored && solv->strongrecommends && solv->recommendsruleq)
+     solver_addrecommendsrules(solv);
+   else
+     solv->recommendsrules = solv->recommendsrules_end = solv->nrules;
+-- 
+2.20.1
+

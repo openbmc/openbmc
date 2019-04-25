@@ -124,6 +124,8 @@ PACKAGE_CLASSES ?= "package_rpm"
 # variable can contain the following options:
 #  "dbg-pkgs"       - add -dbg packages for all installed packages
 #                     (adds symbol information for debugging/profiling)
+#  "src-pkgs"       - add -src packages for all installed packages
+#                     (adds source code for debugging)
 #  "dev-pkgs"       - add -dev packages for all installed packages
 #                     (useful if you want to develop against libs in the image)
 #  "ptest-pkgs"     - add -ptest packages for all ptest-enabled packages
@@ -239,7 +241,7 @@ BB_DISKMON_DIRS ??= "\
 # seen. The two lines below enable the SDL backend too. By default libsdl2-native will
 # be built, if you want to use your host's libSDL instead of the minimal libsdl built
 # by libsdl2-native then uncomment the ASSUME_PROVIDED line below.
-PACKAGECONFIG_append_pn-qemu-native = " sdl"
+PACKAGECONFIG_append_pn-qemu-system-native = " sdl"
 PACKAGECONFIG_append_pn-nativesdk-qemu = " sdl"
 #ASSUME_PROVIDED += "libsdl2-native"
 

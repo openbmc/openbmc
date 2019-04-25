@@ -25,7 +25,7 @@ SRC_URI[sha256sum] = "f5a3c824761df351ca91827ac221090943ef28b248573486050de89f4b
 
 XORG_PN = "libXft"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"
 
 python () {
         if d.getVar('DEBIAN_NAMES'):

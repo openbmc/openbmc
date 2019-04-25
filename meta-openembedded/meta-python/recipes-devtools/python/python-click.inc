@@ -6,10 +6,10 @@ Line Interface Creation Kit". It's highly configurable but comes with \
 sensible defaults out of the box."
 HOMEPAGE = "http://click.pocoo.org/"
 LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=09e8b7869f94ba9e9a7b260d53c65dab"
+LIC_FILES_CHKSUM = "file://LICENSE.rst;md5=c13ed890b210a882c1778216694c98c7"
 
-SRC_URI[md5sum] = "fc4cc00c4863833230d3af92af48abd4"
-SRC_URI[sha256sum] = "f15516df478d5a56180fbf80e68f206010e6d160fc39fa508b65e035fd75130b"
+SRC_URI[md5sum] = "7f53d50f7b7373ebc7963f9ff697450a"
+SRC_URI[sha256sum] = "5b94b49521f6456670fdb30cd82a4eca9412788a93fa6dd6df72c94d5a8ff2d7"
 
 UPSTREAM_CHECK_REGEX = "click/(?P<pver>\d+(\.\d+)+)/"
 
@@ -21,3 +21,5 @@ RDEPENDS_${PN} += "\
     "
 
 BBCLASSEXTEND = "native nativesdk"
+
+PYPI_PACKAGE = "Click"

@@ -1,4 +1,4 @@
-From 6d369e8f226594632ce4260129509daf7030de0a Mon Sep 17 00:00:00 2001
+From b431cb4e1ed060122fa300dc0008f74080d38f73 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 9 May 2016 22:03:57 +0000
 Subject: [PATCH] mdadm.h: Undefine dprintf before redefining
@@ -14,17 +14,16 @@ In file included from policy.c:25:
 /mnt/oe/openembedded-core/build/tmp-glibc/sysroots/qemux86/usr/include/bits/stdio2.h:145:12: note: previous definition is here
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
----
 Upstream-Status: Pending
-
+---
  mdadm.h | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/mdadm.h b/mdadm.h
-index 230e60f..8c8f4d1 100755
+index 387e681..bb943bf 100644
 --- a/mdadm.h
 +++ b/mdadm.h
-@@ -1554,11 +1554,13 @@ static inline char *to_subarray(struct mdstat_ent *ent, char *container)
+@@ -1649,11 +1649,13 @@ static inline char *to_subarray(struct mdstat_ent *ent, char *container)
  }
  
  #ifdef DEBUG
@@ -38,6 +37,3 @@ index 230e60f..8c8f4d1 100755
  #define dprintf(fmt, arg...) \
          ({ if (0) fprintf(stderr, "%s: %s: " fmt, Name, __func__, ##arg); 0; })
  #define dprintf_cont(fmt, arg...) \
--- 
-1.9.1
-

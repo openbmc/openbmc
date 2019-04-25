@@ -42,31 +42,25 @@ DEPENDS += "sdeventplus"
 DEPENDS += "phosphor-logging"
 DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "libcereal"
-RDEPENDS_${PN} += "sdbusplus"
 
-RDEPENDS_${PN}-host += "libsystemd phosphor-dbus-interfaces"
-RDEPENDS_${PN}-chassis += "libsystemd phosphor-dbus-interfaces"
-RDEPENDS_${PN}-bmc += "libsystemd phosphor-dbus-interfaces"
-RDEPENDS_${PN}-discover += "libsystemd phosphor-dbus-interfaces"
-RDEPENDS_${PN}-host-check += "libsystemd phosphor-dbus-interfaces"
-RDEPENDS_${PN}-reset-sensor-states += "libsystemd phosphor-dbus-interfaces"
-
-FILES_${PN}-host = "${sbindir}/phosphor-host-state-manager"
+FILES_${PN}-host = "${bindir}/phosphor-host-state-manager"
 DBUS_SERVICE_${PN}-host += "xyz.openbmc_project.State.Host.service"
 DBUS_SERVICE_${PN}-host += "phosphor-reboot-host@.service"
 SYSTEMD_ENVIRONMENT_FILE_${PN}-host += "obmc/phosphor-reboot-host/reboot.conf"
 SYSTEMD_SERVICE_${PN}-host += "phosphor-reset-host-reboot-attempts@.service"
 
-FILES_${PN}-chassis = "${sbindir}/phosphor-chassis-state-manager"
+FILES_${PN}-chassis = "${bindir}/phosphor-chassis-state-manager"
 DBUS_SERVICE_${PN}-chassis += "xyz.openbmc_project.State.Chassis.service"
 
-FILES_${PN}-bmc = "${sbindir}/phosphor-bmc-state-manager"
+FILES_${PN}-chassis += "${bindir}/obmcutil"
+
+FILES_${PN}-bmc = "${bindir}/phosphor-bmc-state-manager"
 DBUS_SERVICE_${PN}-bmc += "xyz.openbmc_project.State.BMC.service"
 
-FILES_${PN}-discover = "${sbindir}/phosphor-discover-system-state"
+FILES_${PN}-discover = "${bindir}/phosphor-discover-system-state"
 SYSTEMD_SERVICE_${PN}-discover += "phosphor-discover-system-state@.service"
 
-FILES_${PN}-host-check = "${sbindir}/phosphor-host-check"
+FILES_${PN}-host-check = "${bindir}/phosphor-host-check"
 SYSTEMD_SERVICE_${PN}-host-check += "phosphor-reset-host-check@.service"
 SYSTEMD_SERVICE_${PN}-host-check += "phosphor-reset-host-running@.service"
 
@@ -94,14 +88,14 @@ SYSTEMD_LINK_${PN}-reset-sensor-states += "${@compose_list_zip(d, 'SENSOR_RESET_
 
 # Force the standby target to run the host reset check target
 RESET_TMPL_CTRL = "obmc-host-reset@.target"
-SYSD_TGT = "${SYSTEMD_DEFAULT_TARGET}"
+SYSD_TGT = "multi-user.target"
 RESET_INSTFMT_CTRL = "obmc-host-reset@{0}.target"
 RESET_FMT_CTRL = "../${RESET_TMPL_CTRL}:${SYSD_TGT}.wants/${RESET_INSTFMT_CTRL}"
 SYSTEMD_LINK_${PN}-host-check += "${@compose_list_zip(d, 'RESET_FMT_CTRL', 'OBMC_HOST_INSTANCES')}"
 
 TMPL = "phosphor-discover-system-state@.service"
 INSTFMT = "phosphor-discover-system-state@{0}.service"
-FMT = "../${TMPL}:${SYSTEMD_DEFAULT_TARGET}.wants/${INSTFMT}"
+FMT = "../${TMPL}:multi-user.target.wants/${INSTFMT}"
 SYSTEMD_LINK_${PN}-discover += "${@compose_list(d, 'FMT', 'OBMC_HOST_INSTANCES')}"
 
 # Force the shutdown target to run the chassis-poweroff target
@@ -138,6 +132,6 @@ HOST_RST_RBT_ATTEMPTS_SVC_FMT = "../${HOST_RST_RBT_ATTEMPTS_SVC}:${HOST_START_TG
 SYSTEMD_LINK_${PN}-host += "${@compose_list_zip(d, 'HOST_RST_RBT_ATTEMPTS_SVC_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_HOST_INSTANCES')}"
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
-SRCREV = "32c532ea9bcddcab30f4fff30e6938211fdf584d"
+SRCREV = "624161cd2e922e790a2aa855c595b9074dc766c2"
 
 S = "${WORKDIR}/git"

@@ -1,0 +1,32 @@
+libc++ also has a file called version and this file and how cflags are specified
+it ends up including this file and resulting in compile errors
+
+fixes errors like
+storage/mroonga/version:1:1: error: expected unqualified-id
+7.07
+^
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/storage/mroonga/CMakeLists.txt
++++ b/storage/mroonga/CMakeLists.txt
+@@ -80,7 +80,7 @@ else()
+   set(MRN_SOURCE_DIR ${CMAKE_SOURCE_DIR})
+ endif()
+ 
+-file(READ ${MRN_SOURCE_DIR}/version        MRN_VERSION)
++file(READ ${MRN_SOURCE_DIR}/ver            MRN_VERSION)
+ file(READ ${MRN_SOURCE_DIR}/version_major  MRN_VERSION_MAJOR)
+ file(READ ${MRN_SOURCE_DIR}/version_minor  MRN_VERSION_MINOR)
+ file(READ ${MRN_SOURCE_DIR}/version_micro  MRN_VERSION_MICRO)
+--- /dev/null
++++ b/storage/mroonga/ver
+@@ -0,0 +1 @@
++7.07
+\ No newline at end of file
+--- a/storage/mroonga/version
++++ /dev/null
+@@ -1 +0,0 @@
+-7.07
+\ No newline at end of file

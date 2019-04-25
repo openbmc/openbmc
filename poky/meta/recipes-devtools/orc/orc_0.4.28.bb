@@ -19,7 +19,7 @@ FILES_${PN} = "${bindir}/*"
 
 python populate_packages_prepend () {
     libdir = d.expand('${libdir}')
-    do_split_packages(d, libdir, '^lib(.*)\.so\.*', 'lib%s', 'ORC %s library', extra_depends='', allow_links=True)
+    do_split_packages(d, libdir, r'^lib(.*)\.so\.*', 'lib%s', 'ORC %s library', extra_depends='', allow_links=True)
 }
 
 do_compile_prepend_class-native () {

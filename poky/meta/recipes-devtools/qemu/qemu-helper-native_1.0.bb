@@ -1,6 +1,6 @@
 SUMMARY = "Helper utilities needed by the runqemu script"
 LICENSE = "GPLv2"
-RDEPENDS_${PN} = "qemu-native"
+RDEPENDS_${PN} = "qemu-system-native"
 PR = "r1"
 
 LIC_FILES_CHKSUM = "file://${WORKDIR}/tunctl.c;endline=4;md5=ff3a09996bc5fff6bc5d4e0b4c28f999"
@@ -20,5 +20,5 @@ do_install() {
 	install tunctl ${D}${bindir}/
 }
 
-DEPENDS += "qemu-native"
+DEPENDS += "qemu-system-native"
 addtask addto_recipe_sysroot after do_populate_sysroot before do_build

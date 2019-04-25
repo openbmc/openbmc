@@ -1,0 +1,40 @@
+From 54698856e5602bbd9d61e855814c854a013b4840 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 22 Dec 2018 18:47:45 -0800
+Subject: [PATCH] Add OpenEmbedded cross compile case
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ genconfig.sh | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/genconfig.sh b/genconfig.sh
+index dc42462..59922e9 100755
+--- a/genconfig.sh
++++ b/genconfig.sh
+@@ -98,6 +98,12 @@ if [ -f ../shared/tomato_version ]; then
+ 	OS_VERSION="Tomato $TOMATO_VER"
+ fi
+ 
++# OpenEmbedded special case
++if [ -f ./os.openembedded ]; then
++	OS_NAME=OpenEmbedded
++	OS_VERSION=$(cat ./os.openembedded)
++fi
++
+ ${RM} ${CONFIGFILE}
+ 
+ echo "/* MiniUPnP Project" >> ${CONFIGFILE}
+@@ -318,6 +324,11 @@ case $OS_NAME in
+ 		echo "#define USE_IFACEWATCHER 1" >> ${CONFIGFILE}
+ 		FW=netfilter
+ 		;;
++	OpenEmbedded)
++		OS_URL=http://www.openembedded.org/
++		echo "#define USE_IFACEWATCHER 1" >> ${CONFIGFILE}
++		FW=netfilter
++		;;
+ 	AstLinux)
+ 		OS_URL=http://www.astlinux.org/
+ 		echo "#define USE_IFACEWATCHER 1" >> ${CONFIGFILE}

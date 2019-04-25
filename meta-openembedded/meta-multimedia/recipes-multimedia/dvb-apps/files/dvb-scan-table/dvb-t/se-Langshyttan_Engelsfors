@@ -1,0 +1,6 @@
+# Sweden - Långshyttan/Engelsfors
+[CHANNEL]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 602000000
+	BANDWIDTH_HZ = 8000000
+

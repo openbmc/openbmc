@@ -164,8 +164,7 @@ python inject_rm_work() {
 
     # Determine what do_build depends upon, without including do_build
     # itself or our own special do_rm_work_all.
-    deps = set(bb.build.preceedtask('do_build', True, d))
-    deps.difference_update(('do_build', 'do_rm_work_all'))
+    deps = sorted((set(bb.build.preceedtask('do_build', True, d))).difference(('do_build', 'do_rm_work_all')) or "")
 
     # deps can be empty if do_build doesn't exist, e.g. *-inital recipes
     if not deps:

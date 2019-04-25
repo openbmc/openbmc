@@ -7,9 +7,6 @@ DEPENDS += "zlib-native"
 
 inherit native
 
-SRC_URI += "file://Change-to-calling-bswap_-instead-of-htobe-and-be-toh.patch \
-           "
-
 do_install_append (){
 	for tool in depmod insmod lsmod modinfo modprobe rmmod
 	do

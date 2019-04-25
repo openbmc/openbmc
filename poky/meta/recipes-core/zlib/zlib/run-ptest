@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if ./examplesh ; then
+    echo "PASS: zlib"
+else
+    echo "FAIL: zlib"
+fi

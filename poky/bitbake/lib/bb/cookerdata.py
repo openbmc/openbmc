@@ -391,7 +391,11 @@ class CookerDataBuilder(object):
                 bb.fatal("BBFILES_DYNAMIC entries must be of the form <collection name>:<filename pattern>, not:\n    %s" % "\n    ".join(invalid))
 
             layerseries = set((data.getVar("LAYERSERIES_CORENAMES") or "").split())
+            collections_tmp = collections[:]
             for c in collections:
+                collections_tmp.remove(c)
+                if c in collections_tmp:
+                    bb.fatal("Found duplicated BBFILE_COLLECTIONS '%s', check bblayers.conf or layer.conf to fix it." % c)
                 compat = set((data.getVar("LAYERSERIES_COMPAT_%s" % c) or "").split())
                 if compat and not (compat & layerseries):
                     bb.fatal("Layer %s is not compatible with the core layer which only supports these series: %s (layer is compatible with %s)"

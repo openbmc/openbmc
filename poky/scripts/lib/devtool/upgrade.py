@@ -600,6 +600,20 @@ def latest_version(args, config, basepath, workspace):
         tinfoil.shutdown()
     return 0
 
+def check_upgrade_status(args, config, basepath, workspace):
+    if not args.recipe:
+        logger.info("Checking the upstream status for all recipes may take a few minutes")
+    results = oe.recipeutils.get_recipe_upgrade_status(args.recipe)
+    for result in results:
+        # pn, update_status, current, latest, maintainer, latest_commit, no_update_reason
+        if args.all or result[1] != 'MATCH':
+            logger.info("{:25} {:15} {:15} {} {} {}".format(   result[0],
+                                                               result[2],
+                                                               result[1] if result[1] != 'UPDATE' else (result[3] if not result[3].endswith("new-commits-available") else "new commits"),
+                                                               result[4],
+                                                               result[5] if result[5] != 'N/A' else "",
+                                                               "cannot be updated due to: %s" %(result[6]) if result[6] else ""))
+
 def register_commands(subparsers, context):
     """Register devtool subcommands from this plugin"""
 
@@ -627,3 +641,10 @@ def register_commands(subparsers, context):
                                                   group='info')
     parser_latest_version.add_argument('recipename', help='Name of recipe to query (just name - no version, path or extension)')
     parser_latest_version.set_defaults(func=latest_version)
+
+    parser_check_upgrade_status = subparsers.add_parser('check-upgrade-status', help="Report upgradability for multiple (or all) recipes",
+                                                        description="Prints a table of recipes together with versions currently provided by recipes, and latest upstream versions, when there is a later version available",
+                                                        group='info')
+    parser_check_upgrade_status.add_argument('recipe', help='Name of the recipe to report (omit to report upgrade info for all recipes)', nargs='*')
+    parser_check_upgrade_status.add_argument('--all', '-a', help='Show all recipes, not just recipes needing upgrade', action="store_true")
+    parser_check_upgrade_status.set_defaults(func=check_upgrade_status)

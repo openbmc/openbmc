@@ -9,6 +9,6 @@ SRC_URI[md5sum] = "3f3f3e0750dab74cfa1dc8b0fd7a5f86"
 inherit pypi
 
 RDEPENDS_${PN}_class-target += " \
-    ${PYTHON_PN}-cryptography \
+    ${PYTHON_PN}-crypt \
     ${PYTHON_PN}-ctypes \
-"    
+"

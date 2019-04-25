@@ -1,0 +1,18 @@
+# 2014-04-18 Antti Palosaari <crope@iki.fi>
+# generated from http://www.digita.fi/kuluttajat/tv/nakyvyysalueet/kanavanumerot_ja_taajuudet
+
+[Heinavesi]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 658000000
+	BANDWIDTH_HZ = 8000000
+
+[Heinavesi]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 706000000
+	BANDWIDTH_HZ = 8000000
+
+[Heinavesi]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 514000000
+	BANDWIDTH_HZ = 8000000
+

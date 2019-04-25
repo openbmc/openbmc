@@ -1,0 +1,39 @@
+From 3158d3788c2e0fb75ace2c89840bd8a977fb4cb0 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 14 Dec 2018 15:12:31 +0800
+Subject: [PATCH] fix gcc-8 format-truncation warning
+
+While compiling with `-Werror=format-truncation=', it failed
+[snip]
+|super0.c:236:32: error: 'snprintf' output may be truncated
+before the last format character [-Werror=format-truncation=]
+|   snprintf(nb, sizeof(nb), "%4d", d);
+|                                ^
+|super0.c:236:3: note: 'snprintf' output between 5 and 12 bytes
+into a destination of size 11
+|   snprintf(nb, sizeof(nb), "%4d", d);
+[snip]
+
+Upstream-Status: Submitted [https://github.com/neilbrown/mdadm/pull/34]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ super0.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/super0.c b/super0.c
+index 756cab5..12c28da 100644
+--- a/super0.c
++++ b/super0.c
+@@ -229,7 +229,7 @@ static void examine_super0(struct supertype *st, char *homehost)
+ 	     d++) {
+ 		mdp_disk_t *dp;
+ 		char *dv;
+-		char nb[11];
++		char nb[12];
+ 		int wonly, failfast;
+ 		if (d>=0) dp = &sb->disks[d];
+ 		else dp = &sb->this_disk;
+-- 
+2.7.4
+

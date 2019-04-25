@@ -1,0 +1,37 @@
+From 686491573827b98ba031adaa5da373366079d3d8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jean-Fran=C3=A7ois=20Dagenais?= <jeff.dagenais@gmail.com>
+Date: Mon, 11 Feb 2019 11:42:59 -0500
+Subject: [PATCH] misc/Makefile.am: don't install Xdummy when configured
+ --without-x
+
+Upstream-status: submitted https://github.com/jeff-dagenais/x11vnc/pull/1
+
+Signed-off-by: Jean-Francois Dagenais <jeff.dagenais@gmail.com>
+---
+ misc/Makefile.am | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/misc/Makefile.am b/misc/Makefile.am
+index c0b98c8..e4a22c1 100644
+--- a/misc/Makefile.am
++++ b/misc/Makefile.am
+@@ -18,7 +18,10 @@ EXTRA_DIST = \
+ 	uinput.pl \
+ 	ultravnc_repeater.pl \
+ 	vcinject.pl \
+-	x11vnc_loop \
++	x11vnc_loop
++
++if HAVE_X11
++EXTRA_DIST += \
+ 	Xdummy.c \
+ 	Xdummy.in
+ 
+@@ -32,3 +35,4 @@ do_dummy_c_subst = $(SED) \
+ Xdummy: $(srcdir)/Xdummy.in $(srcdir)/Xdummy.c
+ 	$(do_dummy_c_subst) < $< > $@.tmp
+ 	mv -f $@.tmp $@
++endif
+-- 
+2.17.1
+

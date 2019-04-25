@@ -1,0 +1,30 @@
+From f0ddd7c36556ad05c1398fdd132947323ad26473 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 6 Dec 2018 11:43:41 +0800
+Subject: [PATCH 2/2] do not display CLFAGS to improve reproducibility build
+
+Macro PA_CFLAGS contains build path, do not use it to
+display CFLAGS which could improve reproducibility build.
+
+Upstream-Status: Inappropriate [oe specific]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ src/daemon/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/daemon/main.c b/src/daemon/main.c
+index c80fa94..75496be 100644
+--- a/src/daemon/main.c
++++ b/src/daemon/main.c
+@@ -908,7 +908,7 @@ int main(int argc, char *argv[]) {
+ 
+     pa_log_info("This is PulseAudio %s", PACKAGE_VERSION);
+     pa_log_debug("Compilation host: %s", CANONICAL_HOST);
+-    pa_log_debug("Compilation CFLAGS: %s", PA_CFLAGS);
++    pa_log_debug("Compilation CFLAGS: ***");
+ 
+ #ifdef HAVE_LIBSAMPLERATE
+     pa_log_warn("Compiled with DEPRECATED libsamplerate support!");
+-- 
+2.7.4
+

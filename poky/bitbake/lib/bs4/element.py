@@ -1,7 +1,7 @@
 __license__ = "MIT"
 
 from pdb import set_trace
-import collections
+import collections.abc
 import re
 import sys
 import warnings
@@ -10,7 +10,7 @@ from bs4.dammit import EntitySubstitution
 DEFAULT_OUTPUT_ENCODING = "utf-8"
 PY3K = (sys.version_info[0] > 2)
 
-whitespace_re = re.compile("\s+")
+whitespace_re = re.compile(r"\s+")
 
 def _alias(attr):
     """Alias one attribute name to another for backward compatibility"""
@@ -67,7 +67,7 @@ class ContentMetaAttributeValue(AttributeValueWithCharsetSubstitution):
     The value of the 'content' attribute will be one of these objects.
     """
 
-    CHARSET_RE = re.compile("((^|;)\s*charset=)([^;]*)", re.M)
+    CHARSET_RE = re.compile(r"((^|;)\s*charset=)([^;]*)", re.M)
 
     def __new__(cls, original_value):
         match = cls.CHARSET_RE.search(original_value)
@@ -155,7 +155,7 @@ class PageElement(object):
 
     def format_string(self, s, formatter='minimal'):
         """Format the given string using the given formatter."""
-        if not isinstance(formatter, collections.Callable):
+        if not isinstance(formatter, collections.abc.Callable):
             formatter = self._formatter_for_name(formatter)
         if formatter is None:
             output = s
@@ -580,7 +580,7 @@ class PageElement(object):
 
     # Methods for supporting CSS selectors.
 
-    tag_name_re = re.compile('^[a-zA-Z0-9][-.a-zA-Z0-9:_]*$')
+    tag_name_re = re.compile(r'^[a-zA-Z0-9][-.a-zA-Z0-9:_]*$')
 
     # /^([a-zA-Z0-9][-.a-zA-Z0-9:_]*)\[(\w+)([=~\|\^\$\*]?)=?"?([^\]"]*)"?\]$/
     #   \---------------------------/  \---/\-------------/    \-------/
@@ -1077,7 +1077,7 @@ class Tag(PageElement):
 
         # First off, turn a string formatter into a function. This
         # will stop the lookup from happening over and over again.
-        if not isinstance(formatter, collections.Callable):
+        if not isinstance(formatter, collections.abc.Callable):
             formatter = self._formatter_for_name(formatter)
 
         attrs = []
@@ -1181,7 +1181,7 @@ class Tag(PageElement):
         """
         # First off, turn a string formatter into a function. This
         # will stop the lookup from happening over and over again.
-        if not isinstance(formatter, collections.Callable):
+        if not isinstance(formatter, collections.abc.Callable):
             formatter = self._formatter_for_name(formatter)
 
         pretty_print = (indent_level is not None)
@@ -1364,7 +1364,7 @@ class Tag(PageElement):
                 if tag_name == '':
                     raise ValueError(
                         "A pseudo-class must be prefixed with a tag name.")
-                pseudo_attributes = re.match('([a-zA-Z\d-]+)\(([a-zA-Z\d]+)\)', pseudo)
+                pseudo_attributes = re.match(r'([a-zA-Z\d-]+)\(([a-zA-Z\d]+)\)', pseudo)
                 found = []
                 if pseudo_attributes is None:
                     pseudo_type = pseudo
@@ -1562,7 +1562,7 @@ class SoupStrainer(object):
     def _normalize_search_value(self, value):
         # Leave it alone if it's a Unicode string, a callable, a
         # regular expression, a boolean, or None.
-        if (isinstance(value, str) or isinstance(value, collections.Callable) or hasattr(value, 'match')
+        if (isinstance(value, str) or isinstance(value, collections.abc.Callable) or hasattr(value, 'match')
             or isinstance(value, bool) or value is None):
             return value
 
@@ -1602,7 +1602,7 @@ class SoupStrainer(object):
             markup = markup_name
             markup_attrs = markup
         call_function_with_tag_data = (
-            isinstance(self.name, collections.Callable)
+            isinstance(self.name, collections.abc.Callable)
             and not isinstance(markup_name, Tag))
 
         if ((not self.name)
@@ -1688,7 +1688,7 @@ class SoupStrainer(object):
             # True matches any non-None value.
             return markup is not None
 
-        if isinstance(match_against, collections.Callable):
+        if isinstance(match_against, collections.abc.Callable):
             return match_against(markup)
 
         # Custom callables take the tag as an argument, but all

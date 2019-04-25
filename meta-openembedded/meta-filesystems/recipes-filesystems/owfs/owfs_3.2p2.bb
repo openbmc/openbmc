@@ -18,7 +18,7 @@ SRC_URI = "git://github.com/owfs/owfs \
 
 S = "${WORKDIR}/git"
 
-inherit autotools-brokensep update-rc.d pkgconfig
+inherit autotools-brokensep update-rc.d pkgconfig systemd
 
 EXTRA_OECONF = " \
                  --with-fuseinclude=${STAGING_INCDIR} \
@@ -52,9 +52,12 @@ DESCRIPTION_libownet = "easy C-language 1-wire interface to the owserver protoco
 DESCRIPTION_owmon = "Monitor for owserver settings and statistics"
 DESCRIPTION_owtap = "Packet sniffer for the owserver protocol"
 
-FILES_owftpd = "${bindir}/owftpd"
-FILES_owhttpd = "${bindir}/owhttpd ${sysconfdir}/init.d/owhttpd"
-FILES_owserver = "${bindir}/owserver ${sysconfdir}/init.d/owserver"
+FILES_owftpd = "${bindir}/owftpd ${systemd_system_unitdir}/owftpd.service"
+FILES_owhttpd = "${bindir}/owhttpd ${sysconfdir}/init.d/owhttpd \
+                 ${systemd_system_unitdir}/owhttpd.service"
+FILES_owserver = "${bindir}/owserver ${sysconfdir}/init.d/owserver \
+                  ${systemd_system_unitdir}/owserver.service \
+                  ${systemd_system_unitdir}/owserver.socket"
 FILES_owshell = "${bindir}/owread ${bindir}/owwrite \
                  ${bindir}/owdir ${bindir}/owpresent \
                  ${bindir}/owget ${bindir}/owside"
@@ -63,9 +66,15 @@ FILES_owtap = "${bindir}/owtap"
 FILES_libowcapi = "${libdir}/libowcapi-*"
 FILES_libow = "${libdir}/libow-*"
 FILES_libownet = "${libdir}/libownet-*"
+FILES_${PN} += "${systemd_system_unitdir}/owfs.service"
 
 INITSCRIPT_PACKAGES = "owhttpd owserver"
 INITSCRIPT_NAME_owserver = "owserver"
 INITSCRIPT_NAME_owhttpd = "owhttpd"
 INITSCRIPT_PARAMS_owserver = "defaults 20"
 INITSCRIPT_PARAMS_owhttpd = "defaults 21"
+
+SYSTEMD_SERVICE_${PN} = "owfs.service"
+SYSTEMD_SERVICE_${PN}-owftpd = "owftpd.service"
+SYSTEMD_SERVICE_${PN}-owhttpd = "owhttpd.service"
+SYSTEMD_SERVICE_${PN}-owserver = "owserver.service owserver.socket"

@@ -12,3 +12,5 @@ SRC_URI[sha256sum] = "317484352271d18cbbcfac3868eab798d67fff1b8402e740baa6ff41d5
 inherit allarch autotools
 
 FILES_${PN} += "${datadir}/icons"
+
+BBCLASSEXTEND = "native nativesdk"

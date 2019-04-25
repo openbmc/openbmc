@@ -1,7 +1,7 @@
-From dbc88349b9eed4268db951df2c3a8387f75a32e7 Mon Sep 17 00:00:00 2001
+From e4ede22e28eaa38d81667ddcb19541ece1a83cf8 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 15 Aug 2017 17:24:06 +0800
-Subject: [PATCH 4/7] Disable the test to convert euc-jp
+Subject: [PATCH] Disable the test to convert euc-jp
 
 Remove the test "Test against HP-UX 11.11 bug:
 No converter from EUC-JP to UTF-8 is provided"
@@ -15,6 +15,7 @@ Signed-off-by: Roy Li <rongqing.li@windriver.com>
 
 Rebase to 0.170
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
 ---
  m4/iconv.m4 | 2 ++
  1 file changed, 2 insertions(+)
@@ -39,6 +40,3 @@ index a503646..299f1eb 100644
    return result;
  }]])],
          [am_cv_func_iconv_works=yes],
--- 
-2.7.4
-

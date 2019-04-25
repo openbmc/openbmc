@@ -1,4 +1,4 @@
-From 14c22987dfa9fec02794856cd15b2d64b4b81c32 Mon Sep 17 00:00:00 2001
+From 4312ce4f9320b25f513c4d8fa163f9d8faebfd97 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 6 Feb 2016 11:09:18 -0800
 Subject: [PATCH 08/18] Remove RPC_FLUSH
@@ -23,5 +23,5 @@ index f9b7287..b04ffef 100644
        }
  #endif
 -- 
-2.19.1
+2.20.1
 

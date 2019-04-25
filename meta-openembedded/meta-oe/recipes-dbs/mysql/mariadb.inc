@@ -4,10 +4,7 @@ SECTION = "libs"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
-SRC_URI = "https://downloads.mariadb.org/f/${BP}/source/${BP}.tar.gz \
-           file://fix-cmake-module-path.patch \
-           file://remove-bad-path.patch \
-           file://fix-mysqlclient-r-version.patch \
+SRC_URI = "https://downloads.mariadb.org/interstitial/${BPN}-${PV}/source/${BPN}-${PV}.tar.gz \
            file://my.cnf \
            file://mysqld.service \
            file://install_db.service \
@@ -15,11 +12,15 @@ SRC_URI = "https://downloads.mariadb.org/f/${BP}/source/${BP}.tar.gz \
            file://mysql-systemd-start \
            file://configure.cmake-fix-valgrind.patch \
            file://fix-a-building-failure.patch \
-           file://change-cc-to-cc-version.patch \
+           file://support-files-CMakeLists.txt-fix-do_populate_sysroot.patch \
+           file://sql-CMakeLists.txt-fix-gen_lex_hash-not-found.patch \
            file://0001-disable-ucontext-on-musl.patch \
+           file://c11_atomics.patch \
+           file://clang_version_header_conflict.patch \
+           file://fix-arm-atomic.patch \
           "
-SRC_URI[md5sum] = "6375d577e9539b839f44d857e70f82b9"
-SRC_URI[sha256sum] = "56a365af71b8a9ec8bfee0801e2dec95011da8ee7507986ca329be11296411db"
+SRC_URI[md5sum] = "603ce42e35b9a688f2cca05275acb5cb"
+SRC_URI[sha256sum] = "b2aa857ef5b84f85a7ea60a1eac7b34c0ca5151c71a0d44ce2d7fb028d71459a"
 
 UPSTREAM_CHECK_URI = "https://github.com/MariaDB/server/releases"
 
@@ -62,7 +63,7 @@ PACKAGECONFIG[setupdb] = ", ,,${PN}-setupdb"
 # MariaDB doesn't link properly with gold
 # https://mariadb.atlassian.net/browse/MDEV-5982
 TARGET_CFLAGS += "-fuse-ld=bfd"
-
+LDFLAGS += " -pthread"
 BUILD_CFLAGS += "-fuse-ld=bfd"
 BUILD_CXXFLAGS += "-fuse-ld=bfd"
 
@@ -120,6 +121,11 @@ do_compile_prepend_class-target () {
             echo "#endif" >>${B}/include/openssl/kssl.h
         fi
     fi
+    # workaround to handle out-of-source build from source package
+    yacc_files="sql_yacc.hh sql_yacc.cc sql_yacc_ora.hh sql_yacc_ora.cc"
+    for yacc_file in ${yacc_files}; do
+        cp ${S}/sql/${yacc_file} ${B}/sql/${yacc_file}
+    done
 }
 
 SYSROOT_PREPROCESS_FUNCS += "mariadb_sysroot_preprocess"
@@ -181,13 +187,13 @@ RDEPENDS_${PN}-client = "perl perl-module-getopt-long perl-module-file-temp \
 RDEPENDS_${PN}-server = "perl perl-module-getopt-long perl-module-data-dumper \
     perl-module-file-basename perl-module-file-path perl-module-sys-hostname \
     perl-module-file-copy perl-module-file-temp perl-module-posix \
-    ${PN}-client libdbi-perl libdbd-mysql-perl"
+    ${PN}-client ${PN}-setupdb libdbi-perl libdbd-mysql-perl"
 RDEPENDS_${PN}-leftovers = "perl perl-module-cwd perl-module-benchmark perl-module-getopt-long \
     perl-module-posix perl-module-data-dumper perl-module-sigtrap perl-module-threads \
     perl-module-threads-shared perl-module-io-socket perl-module-sys-hostname perl-module-file-copy \
     perl-module-file-spec perl-module-file-find perl-module-file-basename perl-module-file-path \
     perl-module-constant perl-module-lib perl-module-file-temp perl-module-file-spec-functions \
-    perl-module-io-socket-inet perl-module-io-select"
+    perl-module-io-socket-inet perl-module-io-select bash"
 RDEPENDS_${PN}-setupdb = "coreutils"
 
 # Allow old code to link to the backward compatible library
@@ -195,10 +201,12 @@ RDEPENDS_libmysqlclient-dev = "libmysqlclient-r-dev"
 
 FILES_libmysqlclient = "\
     ${libdir}/libmysqlclient.so.* \
+    ${libdir}/libmariadb.so.* \
     ${sysconfdir}/my.cnf.d/client.cnf"
 FILES_libmysqlclient-dev = " \
     ${includedir}/mysql/ \
     ${libdir}/libmysqlclient.so \
+    ${libdir}/libmariadb.so \
     ${sysconfdir}/aclocal \
     ${bindir}/mysql_config"
 FILES_libmysqlclient-staticdev = "\
@@ -215,9 +223,11 @@ FILES_libmysqlclient-r-dev = "\
 FILES_libmysqlclient-r-staticdev = "${libdir}/libmysqlclient_r.a"
 
 FILES_libmysqld = "\
-    ${libdir}/libmysqld.so.*"
+    ${libdir}/libmysqld.so.* \
+    ${libdir}/libmariadbd.so.*"
 FILES_libmysqld-dev = "\
-    ${libdir}/libmysqld.so"
+    ${libdir}/libmysqld.so \
+    ${libdir}/libmariadbd.so"
 
 FILES_${PN}-client = "\
     ${bindir}/myisam_ftdump \

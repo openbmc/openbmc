@@ -1,0 +1,39 @@
+From 5ed25c076a1fb1889a3c50dddf29f21850b59a13 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com> 
+Date: Tue, 26 Jun 2018 17:29:09 +0800
+Subject: [PATCH] disable acl header check
+
+Don't check 'sys/acl.h' if acl support disabled for vim/vim-tiny.
+
+Upstream-Status: pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ src/configure.ac | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/configure.ac b/src/configure.ac
+index 2d409b3ca06a..dbcaf6140263 100644
+--- a/src/configure.ac
++++ b/src/configure.ac
+@@ -3257,7 +3257,7 @@ AC_CHECK_HEADERS(stdint.h stdlib.h string.h \
+ 	sys/systeminfo.h locale.h sys/stream.h termios.h \
+ 	libc.h sys/statfs.h poll.h sys/poll.h pwd.h \
+ 	utime.h sys/param.h sys/ptms.h libintl.h libgen.h \
+-	util/debug.h util/msg18n.h frame.h sys/acl.h \
++	util/debug.h util/msg18n.h frame.h \
+ 	sys/access.h sys/sysinfo.h wchar.h wctype.h)
+ 
+ dnl sys/ptem.h depends on sys/stream.h on Solaris
+@@ -3886,6 +3886,7 @@ AC_ARG_ENABLE(acl,
+ 	, [enable_acl="yes"])
+ if test "$enable_acl" = "yes"; then
+   AC_MSG_RESULT(no)
++  AC_CHECK_HEADERS(sys/acl.h)
+   AC_CHECK_LIB(posix1e, acl_get_file, [LIBS="$LIBS -lposix1e"],
+ 	AC_CHECK_LIB(acl, acl_get_file, [LIBS="$LIBS -lacl"
+ 		  AC_CHECK_LIB(attr, fgetxattr, LIBS="$LIBS -lattr",,)],,),)
+-- 
+2.7.4
+

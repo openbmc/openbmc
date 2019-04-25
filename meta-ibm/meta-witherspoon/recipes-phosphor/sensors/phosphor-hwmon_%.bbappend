@@ -7,17 +7,17 @@ SRC_URI += " \
            "
 
 WSPOON_CHIPS = " \
-               i2c@1e78a000/i2c-bus@100/bmp280@77 \
-               i2c@1e78a000/i2c-bus@100/dps310@76 \
-               i2c@1e78a000/i2c-bus@100/max31785@52_air \
-               i2c@1e78a000/i2c-bus@100/max31785@52_water \
-               i2c@1e78a000/i2c-bus@100/power-supply@68 \
-               i2c@1e78a000/i2c-bus@100/power-supply@69 \
-               i2c@1e78a000/i2c-bus@140/ir35221@70 \
-               i2c@1e78a000/i2c-bus@140/ir35221@71 \
-               i2c@1e78a000/i2c-bus@180/ir35221@70 \
-               i2c@1e78a000/i2c-bus@180/ir35221@71 \
-               i2c@1e78a000/i2c-bus@380/tmp275@4a \
+               bus@1e78a000/i2c-bus@100/bmp280@77 \
+               bus@1e78a000/i2c-bus@100/dps310@76 \
+               bus@1e78a000/i2c-bus@100/max31785@52_air \
+               bus@1e78a000/i2c-bus@100/max31785@52_water \
+               bus@1e78a000/i2c-bus@100/power-supply@68 \
+               bus@1e78a000/i2c-bus@100/power-supply@69 \
+               bus@1e78a000/i2c-bus@140/ir35221@70 \
+               bus@1e78a000/i2c-bus@140/ir35221@71 \
+               bus@1e78a000/i2c-bus@180/ir35221@70 \
+               bus@1e78a000/i2c-bus@180/ir35221@71 \
+               bus@1e78a000/i2c-bus@380/tmp275@4a \
                "
 WSPOON_ITEMSFMT = "ahb/apb/{0}.conf"
 WSPOON_ITEMS = "${@compose_list(d, 'WSPOON_ITEMSFMT', 'WSPOON_CHIPS')}"
@@ -34,7 +34,7 @@ SYSTEMD_ENVIRONMENT_FILE_${PN} += "${@compose_list(d, 'ENVS', 'WSPOON_ITEMS')}"
 SYSTEMD_ENVIRONMENT_FILE_${PN} += "${@compose_list(d, 'ENVS', 'WSPOON_OCCITEMS')}"
 
 SYSTEMD_ENVIRONMENT_FILE_max31785-msl += "obmc/hwmon-max31785/wspoon.conf"
-SYSTEMD_LINK_max31785-msl += "../phosphor-max31785-msl@.service:${SYSTEMD_DEFAULT_TARGET}.wants/phosphor-max31785-msl@wspoon.service"
+SYSTEMD_LINK_max31785-msl += "../phosphor-max31785-msl@.service:multi-user.target.wants/phosphor-max31785-msl@wspoon.service"
 
 SYSTEMD_SERVICE_${PN} += "max31785-hwmon-helper@.service"
 

@@ -10,4 +10,4 @@ ExecStart=/usr/bin/env phosphor-gpio-presence --path=${{DEVPATH}} --inventory=${
 SyslogIdentifier=phosphor-gpio-presence
 
 [Install]
-RequiredBy={SYSTEMD_DEFAULT_TARGET}
+RequiredBy=multi-user.target

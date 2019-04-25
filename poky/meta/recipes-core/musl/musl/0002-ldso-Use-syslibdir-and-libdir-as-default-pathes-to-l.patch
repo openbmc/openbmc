@@ -1,0 +1,61 @@
+From 5a2886f81dbca3f2ed28eebe7d27d471da278db8 Mon Sep 17 00:00:00 2001
+From: Serhey Popovych <serhe.popovych@gmail.com>
+Date: Tue, 11 Dec 2018 05:44:20 -0500
+Subject: [PATCH] ldso: Use syslibdir and libdir as default pathes to libdirs
+
+In absence of /etc/ld-musl-$(ARCH).path ldso uses default path to search
+libraries /lib:/usr/local/lib:/usr/lib.
+
+However this path isn't relevant in case when library is put in dirs
+like lib64 or libx32.
+
+Adjust CFLAGS_ALL to pass syslibdir as SYSLIBDIR and libdir as LIBDIR
+preprocessor macroses to construct default ldso library search path
+in ldso/dynlink.c::SYS_PATH_DFLT.
+
+Upstream-Status: Pending
+Signed-off-by: Serhey Popovych <serhe.popovych@gmail.com>
+---
+ Makefile       | 3 ++-
+ ldso/dynlink.c | 4 +++-
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index b46f8ca4..c07e4ae8 100644
+--- a/Makefile
++++ b/Makefile
+@@ -46,7 +46,8 @@ CFLAGS_AUTO = -Os -pipe
+ CFLAGS_C99FSE = -std=c99 -ffreestanding -nostdinc 
+ 
+ CFLAGS_ALL = $(CFLAGS_C99FSE)
+-CFLAGS_ALL += -D_XOPEN_SOURCE=700 -I$(srcdir)/arch/$(ARCH) -I$(srcdir)/arch/generic -Iobj/src/internal -I$(srcdir)/src/include -I$(srcdir)/src/internal -Iobj/include -I$(srcdir)/include
++CFLAGS_ALL += -D_XOPEN_SOURCE=700 -DSYSLIBDIR='"$(syslibdir)"' -DLIBDIR='"$(libdir)"'
++CFLAGS_ALL += -I$(srcdir)/arch/$(ARCH) -I$(srcdir)/arch/generic -Iobj/src/internal -I$(srcdir)/src/include -I$(srcdir)/src/internal -Iobj/include -I$(srcdir)/include
+ CFLAGS_ALL += $(CPPFLAGS) $(CFLAGS_AUTO) $(CFLAGS)
+ 
+ LDFLAGS_ALL = $(LDFLAGS_AUTO) $(LDFLAGS)
+diff --git a/ldso/dynlink.c b/ldso/dynlink.c
+index ec921dfd..7c119c55 100644
+--- a/ldso/dynlink.c
++++ b/ldso/dynlink.c
+@@ -22,6 +22,8 @@
+ #include "dynlink.h"
+ #include "malloc_impl.h"
+ 
++#define SYS_PATH_DFLT SYSLIBDIR ":" LIBDIR
++
+ static void error(const char *, ...);
+ 
+ #define MAXP2(a,b) (-(-(a)&-(b)))
+@@ -1038,7 +1040,7 @@ static struct dso *load_library(const char *name, struct dso *needed_by)
+ 					sys_path = "";
+ 				}
+ 			}
+-			if (!sys_path) sys_path = "/lib:/usr/local/lib:/usr/lib";
++			if (!sys_path) sys_path = SYS_PATH_DFLT;
+ 			fd = path_open(name, sys_path, buf, sizeof buf);
+ 		}
+ 		pathname = buf;
+-- 
+2.7.4
+

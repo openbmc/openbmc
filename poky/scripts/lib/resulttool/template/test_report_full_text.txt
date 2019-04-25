@@ -1,0 +1,44 @@
+==============================================================================================================
+Test Result Status Summary (Counts/Percentages sorted by testseries, ID)
+==============================================================================================================
+--------------------------------------------------------------------------------------------------------------
+{{ 'Test Series'.ljust(maxlen['testseries']) }} | {{ 'ID'.ljust(maxlen['result_id']) }} | {{ 'Passed'.ljust(maxlen['passed']) }} | {{ 'Failed'.ljust(maxlen['failed']) }} | {{ 'Skipped'.ljust(maxlen['skipped']) }}
+--------------------------------------------------------------------------------------------------------------
+{% for report in reportvalues |sort(attribute='sort') %}
+{{ report.testseries.ljust(maxlen['testseries']) }} | {{ report.result_id.ljust(maxlen['result_id']) }} | {{ (report.passed|string).ljust(maxlen['passed']) }} | {{ (report.failed|string).ljust(maxlen['failed']) }} | {{ (report.skipped|string).ljust(maxlen['skipped']) }}
+{% endfor %}
+--------------------------------------------------------------------------------------------------------------
+
+{% if haveptest %}
+==============================================================================================================
+PTest Result Summary
+==============================================================================================================
+--------------------------------------------------------------------------------------------------------------
+{{ 'Recipe'.ljust(maxlen['ptest']) }} | {{ 'Passed'.ljust(maxlen['passed']) }} | {{ 'Failed'.ljust(maxlen['failed']) }} | {{ 'Skipped'.ljust(maxlen['skipped']) }} | {{ 'Time(s)'.ljust(10) }}
+--------------------------------------------------------------------------------------------------------------
+{% for ptest in ptests |sort %}
+{{ ptest.ljust(maxlen['ptest']) }} | {{ (ptests[ptest]['passed']|string).ljust(maxlen['passed']) }} | {{ (ptests[ptest]['failed']|string).ljust(maxlen['failed']) }} | {{ (ptests[ptest]['skipped']|string).ljust(maxlen['skipped']) }} | {{ (ptests[ptest]['duration']|string) }}
+{% endfor %}
+--------------------------------------------------------------------------------------------------------------
+
+{% else %}
+There was no ptest data
+{% endif %}
+
+==============================================================================================================
+Failed test cases (sorted by testseries, ID)
+==============================================================================================================
+{% if havefailed %}
+--------------------------------------------------------------------------------------------------------------
+{% for report in reportvalues |sort(attribute='sort') %}
+{% if report.failed_testcases %}
+testseries | result_id : {{ report.testseries }} | {{ report.result_id }}
+{% for testcase in report.failed_testcases %}
+    {{ testcase }}
+{% endfor %}
+{% endif %}
+{% endfor %}
+--------------------------------------------------------------------------------------------------------------
+{% else %}
+There were no test failures
+{% endif %}

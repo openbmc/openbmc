@@ -1,0 +1,79 @@
+From c51b63758e95247e3c1e2f06e5f5bfb49849e66d Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Tue, 22 Jan 2019 16:30:52 +0800
+Subject: [PATCH] Fix Segmentation fault error when gcc -o /dev/null
+
+Fixed:
+$ export CCACHE_DEBUG=1
+$ ccache gcc -c hello.c -o /dev/null
+
+Segmentation fault (core dumped)
+
+This is because failed to open /dev/null.foo (Permission denied), check file
+stream before write to it can fix the problem.
+
+Upstream-Status: Backport [https://github.com/ccache/ccache/commit/4d86e884d07ba1853a0c70507cc4d04107f57c29]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ src/ccache.c | 15 ++++++++++++---
+ src/util.c   |  8 ++++++--
+ 2 files changed, 18 insertions(+), 5 deletions(-)
+
+diff --git a/src/ccache.c b/src/ccache.c
+index b4cdb86..8c227df 100644
+--- a/src/ccache.c
++++ b/src/ccache.c
+@@ -521,9 +521,13 @@ init_hash_debug(struct hash *hash, const char *obj_path, char type,
+ 
+ 	char *path = format("%s.ccache-input-%c", obj_path, type);
+ 	FILE *debug_binary_file = fopen(path, "wb");
+-	hash_enable_debug(hash, section_name, debug_binary_file, debug_text_file);
++	if (debug_binary_file) {
++		hash_enable_debug(hash, section_name, debug_binary_file, debug_text_file);
++		exitfn_add(fclose_exitfn, debug_binary_file);
++	} else {
++		cc_log("Failed to open %s: %s", path, strerror(errno));
++	}
+ 	free(path);
+-	exitfn_add(fclose_exitfn, debug_binary_file);
+ }
+ 
+ static enum guessed_compiler
+@@ -3670,8 +3674,13 @@ ccache(int argc, char *argv[])
+ 	if (conf->debug) {
+ 		char *path = format("%s.ccache-input-text", output_obj);
+ 		debug_text_file = fopen(path, "w");
++		if (debug_text_file) {
++			exitfn_add(fclose_exitfn, debug_text_file);
++		}
++		else {
++			cc_log("Failed to open %s: %s", path, strerror(errno));
++		}
+ 		free(path);
+-		exitfn_add(fclose_exitfn, debug_text_file);
+ 	}
+ 
+ 	struct hash *common_hash = hash_init();
+diff --git a/src/util.c b/src/util.c
+index e442cc4..a49fb4c 100644
+--- a/src/util.c
++++ b/src/util.c
+@@ -219,8 +219,12 @@ void
+ cc_dump_log_buffer(const char *path)
+ {
+ 	FILE *file = fopen(path, "w");
+-	(void) fwrite(logbuffer, 1, logsize, file);
+-	fclose(file);
++	if (file) {
++		(void) fwrite(logbuffer, 1, logsize, file);
++		fclose(file);
++	} else {
++		cc_log("Failed to open %s: %s", path, strerror(errno));
++	}
+ }
+ 
+ // Something went badly wrong!
+-- 
+2.7.4
+

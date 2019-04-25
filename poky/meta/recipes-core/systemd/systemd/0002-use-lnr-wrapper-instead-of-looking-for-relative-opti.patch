@@ -1,7 +1,7 @@
-From 6e62be87a2722fbe531310a1b052c1301bdf06fb Mon Sep 17 00:00:00 2001
+From bdbafe18c3bf99b3b691cd52b9ccff60f313892d Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Wed, 27 Jun 2018 16:09:24 +0800
-Subject: [PATCH 2/9] use lnr wrapper instead of looking for --relative option
+Subject: [PATCH 2/5] use lnr wrapper instead of looking for --relative option
  for ln
 
 Remove file manually to avoid the 'File Exists' error when creating
@@ -18,10 +18,10 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  3 files changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index 04331dd41..6d5edcb4e 100644
+index 56c98b9..3386546 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -558,10 +558,6 @@ endforeach
+@@ -630,10 +630,6 @@ endforeach
  
  conf.set_quoted('TELINIT', get_option('telinit-path'))
  
@@ -33,7 +33,7 @@ index 04331dd41..6d5edcb4e 100644
  
  gperf = find_program('gperf')
 diff --git a/tools/meson-make-symlink.sh b/tools/meson-make-symlink.sh
-index 501cd43d4..f4e4ac9ac 100755
+index 501cd43..f4e4ac9 100755
 --- a/tools/meson-make-symlink.sh
 +++ b/tools/meson-make-symlink.sh
 @@ -8,5 +8,6 @@ mkdir -vp "$(dirname "${DESTDIR:-}$2")"
@@ -45,7 +45,7 @@ index 501cd43d4..f4e4ac9ac 100755
 +        lnr "${DESTDIR:-}$1" "${DESTDIR:-}$2"
  fi
 diff --git a/units/meson-add-wants.sh b/units/meson-add-wants.sh
-index 70f7172ae..a42666aac 100755
+index e2b2603..210d604 100755
 --- a/units/meson-add-wants.sh
 +++ b/units/meson-add-wants.sh
 @@ -25,4 +25,9 @@ case "$target" in
@@ -60,5 +60,5 @@ index 70f7172ae..a42666aac 100755
 +        lnr "$unitpath" "$dir"
 +fi
 -- 
-2.11.0
+2.7.4
 

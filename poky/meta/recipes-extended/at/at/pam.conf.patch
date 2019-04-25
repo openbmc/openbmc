@@ -1,27 +1,35 @@
+From 8c8a0b6ba199327d2eafefd6611353e1c483a854 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Wed, 5 Dec 2018 10:00:36 +0800
+Subject: [PATCH] fix pam.conf
+
 oe doesn't support "@include", use the concrete directive instead.
 
 Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
-Index: at-3.1.15/pam.conf
-===================================================================
---- at-3.1.15.orig/pam.conf
-+++ at-3.1.15/pam.conf
-@@ -1,10 +1,11 @@
- #
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ pam.conf | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/pam.conf b/pam.conf
+index 3674c0a..2f8d586 100644
+--- a/pam.conf
++++ b/pam.conf
+@@ -2,9 +2,9 @@
  # The PAM configuration file for the at daemon
  #
-+ 
-+auth    required    pam_env.so
-+auth    include     common-auth
-+account include     common-account
-+session include     common-session-noninteractive
-+session required    pam_limits.so
-+session required    pam_loginuid.so
  
--auth	required	pam_env.so
 -@include common-auth
 -@include common-account
--session    required   pam_loginuid.so
++auth       include    common-auth
++acount     include    common-account
+ session    required   pam_loginuid.so
 -@include common-session-noninteractive
--session    required   pam_limits.so
++session    include    common-session-noninteractive
+ session    required   pam_limits.so
+ auth	required	pam_env.so user_readenv=1
+-- 
+2.7.4
+

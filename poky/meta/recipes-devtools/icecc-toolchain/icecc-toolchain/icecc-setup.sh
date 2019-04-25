@@ -32,7 +32,7 @@ mkdir -p "`dirname $ICECC_VERSION`"
 icecc-create-env $ICECC $ICECXX $ICEAS $ICECC_VERSION || exit $?
 
 # Create symbolic links
-d="$OECORE_NATIVE_SYSROOT/usr/share/icecream/bin"
+d="$OECORE_NATIVE_SYSROOT/usr/share/${TARGET_PREFIX}icecream/bin"
 mkdir -p "$d"
-ln -s "$ICECC_PATH" "$d/${CROSS_COMPILE}gcc"
-ln -s "$ICECC_PATH" "$d/${CROSS_COMPILE}g++"
+ln -sf "$ICECC_PATH" "$d/${CROSS_COMPILE}gcc"
+ln -sf "$ICECC_PATH" "$d/${CROSS_COMPILE}g++"

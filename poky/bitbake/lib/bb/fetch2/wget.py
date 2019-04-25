@@ -33,11 +33,14 @@ import logging
 import errno
 import bb
 import bb.progress
+import socket
+import http.client
 import urllib.request, urllib.parse, urllib.error
 from   bb.fetch2 import FetchMethod
 from   bb.fetch2 import FetchError
 from   bb.fetch2 import logger
 from   bb.fetch2 import runfetchcmd
+from   bb.fetch2 import FetchConnectionCache
 from   bb.utils import export_proxies
 from   bs4 import BeautifulSoup
 from   bs4 import SoupStrainer
@@ -132,10 +135,6 @@ class Wget(FetchMethod):
         return True
 
     def checkstatus(self, fetch, ud, d, try_again=True):
-        import urllib.request, urllib.error, urllib.parse, socket, http.client
-        from urllib.response import addinfourl
-        from bb.fetch2 import FetchConnectionCache
-
         class HTTPConnectionCache(http.client.HTTPConnection):
             if fetch.connection_cache:
                 def connect(self):
@@ -168,7 +167,7 @@ class Wget(FetchMethod):
                 """
                 host = req.host
                 if not host:
-                    raise urlllib2.URLError('no host given')
+                    raise urllib.error.URLError('no host given')
 
                 h = http_class(host, timeout=req.timeout) # will parse host:port
                 h.set_debuglevel(self._debuglevel)
@@ -185,7 +184,7 @@ class Wget(FetchMethod):
                 # request.
 
                 # Don't close connection when connection_cache is enabled,
-                if fetch.connection_cache is None: 
+                if fetch.connection_cache is None:
                     headers["Connection"] = "close"
                 else:
                     headers["Connection"] = "Keep-Alive" # Works for HTTP/1.0
@@ -252,7 +251,7 @@ class Wget(FetchMethod):
                         pass
                     closed = False
 
-                resp = addinfourl(fp_dummy(), r.msg, req.get_full_url())
+                resp = urllib.response.addinfourl(fp_dummy(), r.msg, req.get_full_url())
                 resp.code = r.status
                 resp.msg = r.reason
 
@@ -271,17 +270,16 @@ class Wget(FetchMethod):
                 fp.read()
                 fp.close()
 
-                newheaders = dict((k,v) for k,v in list(req.headers.items())
+                newheaders = dict((k, v) for k, v in list(req.headers.items())
                                   if k.lower() not in ("content-length", "content-type"))
                 return self.parent.open(urllib.request.Request(req.get_full_url(),
                                                         headers=newheaders,
                                                         origin_req_host=req.origin_req_host,
                                                         unverifiable=True))
 
-            """
-            Some servers (e.g. GitHub archives, hosted on Amazon S3) return 403
-            Forbidden when they actually mean 405 Method Not Allowed.
-            """
+
+            # Some servers (e.g. GitHub archives, hosted on Amazon S3) return 403
+            # Forbidden when they actually mean 405 Method Not Allowed.
             http_error_403 = http_error_405
 
 
@@ -292,15 +290,15 @@ class Wget(FetchMethod):
             """
             def redirect_request(self, req, fp, code, msg, headers, newurl):
                 newreq = urllib.request.HTTPRedirectHandler.redirect_request(self, req, fp, code, msg, headers, newurl)
-                newreq.get_method = lambda: req.get_method()
+                newreq.get_method = req.get_method
                 return newreq
         exported_proxies = export_proxies(d)
 
         handlers = [FixedHTTPRedirectHandler, HTTPMethodFallback]
-        if export_proxies:
+        if exported_proxies:
             handlers.append(urllib.request.ProxyHandler())
         handlers.append(CacheHTTPHandler())
-        # XXX: Since Python 2.7.9 ssl cert validation is enabled by default
+        # Since Python 2.7.9 ssl cert validation is enabled by default
         # see PEP-0476, this causes verification errors on some https servers
         # so disable by default.
         import ssl
@@ -319,19 +317,19 @@ class Wget(FetchMethod):
                 '''Adds Basic auth to http request, pass in login:password as string'''
                 import base64
                 encodeuser = base64.b64encode(login_str.encode('utf-8')).decode("utf-8")
-                authheader =  "Basic %s" % encodeuser
+                authheader = "Basic %s" % encodeuser
                 r.add_header("Authorization", authheader)
 
-            if ud.user:
-                add_basic_auth(ud.user, r)
+            if ud.user and ud.pswd:
+                add_basic_auth(ud.user + ':' + ud.pswd, r)
 
             try:
-                import netrc, urllib.parse
+                import netrc
                 n = netrc.netrc()
                 login, unused, password = n.authenticators(urllib.parse.urlparse(uri).hostname)
                 add_basic_auth("%s:%s" % (login, password), r)
             except (TypeError, ImportError, IOError, netrc.NetrcParseError):
-                 pass
+                pass
 
             with opener.open(r) as response:
                 pass
@@ -396,18 +394,14 @@ class Wget(FetchMethod):
         (oldpn, oldpv, oldsuffix) = old
         (newpn, newpv, newsuffix) = new
 
-        """
-        Check for a new suffix type that we have never heard of before
-        """
-        if (newsuffix):
+        # Check for a new suffix type that we have never heard of before
+        if newsuffix:
             m = self.suffix_regex_comp.search(newsuffix)
             if not m:
                 bb.warn("%s has a possible unknown suffix: %s" % (newpn, newsuffix))
                 return False
 
-        """
-        Not our package so ignore it
-        """
+        # Not our package so ignore it
         if oldpn != newpn:
             return False
 
@@ -473,15 +467,14 @@ class Wget(FetchMethod):
 
         return ""
 
-    def _check_latest_version_by_dir(self, dirver, package, package_regex,
-            current_version, ud, d):
+    def _check_latest_version_by_dir(self, dirver, package, package_regex, current_version, ud, d):
         """
-            Scan every directory in order to get upstream version.
+        Scan every directory in order to get upstream version.
         """
         version_dir = ['', '', '']
         version = ['', '', '']
 
-        dirver_regex = re.compile("(?P<pfx>\D*)(?P<ver>(\d+[\.\-_])+(\d+))")
+        dirver_regex = re.compile(r"(?P<pfx>\D*)(?P<ver>(\d+[\.\-_])+(\d+))")
         s = dirver_regex.search(dirver)
         if s:
             version_dir[1] = s.group('ver')
@@ -541,26 +534,26 @@ class Wget(FetchMethod):
                 gst-fluendo-mp3
         """
         # match most patterns which uses "-" as separator to version digits
-        pn_prefix1 = "[a-zA-Z][a-zA-Z0-9]*([-_][a-zA-Z]\w+)*\+?[-_]"
+        pn_prefix1 = r"[a-zA-Z][a-zA-Z0-9]*([-_][a-zA-Z]\w+)*\+?[-_]"
         # a loose pattern such as for unzip552.tar.gz
-        pn_prefix2 = "[a-zA-Z]+"
+        pn_prefix2 = r"[a-zA-Z]+"
         # a loose pattern such as for 80325-quicky-0.4.tar.gz
-        pn_prefix3 = "[0-9]+[-]?[a-zA-Z]+"
+        pn_prefix3 = r"[0-9]+[-]?[a-zA-Z]+"
         # Save the Package Name (pn) Regex for use later
-        pn_regex = "(%s|%s|%s)" % (pn_prefix1, pn_prefix2, pn_prefix3)
+        pn_regex = r"(%s|%s|%s)" % (pn_prefix1, pn_prefix2, pn_prefix3)
 
         # match version
-        pver_regex = "(([A-Z]*\d+[a-zA-Z]*[\.\-_]*)+)"
+        pver_regex = r"(([A-Z]*\d+[a-zA-Z]*[\.\-_]*)+)"
 
         # match arch
         parch_regex = "-source|_all_"
 
         # src.rpm extension was added only for rpm package. Can be removed if the rpm
         # packaged will always be considered as having to be manually upgraded
-        psuffix_regex = "(tar\.gz|tgz|tar\.bz2|zip|xz|tar\.lz|rpm|bz2|orig\.tar\.gz|tar\.xz|src\.tar\.gz|src\.tgz|svnr\d+\.tar\.bz2|stable\.tar\.gz|src\.rpm)"
+        psuffix_regex = r"(tar\.gz|tgz|tar\.bz2|zip|xz|tar\.lz|rpm|bz2|orig\.tar\.gz|tar\.xz|src\.tar\.gz|src\.tgz|svnr\d+\.tar\.bz2|stable\.tar\.gz|src\.rpm)"
 
         # match name, version and archive type of a package
-        package_regex_comp = re.compile("(?P<name>%s?\.?v?)(?P<pver>%s)(?P<arch>%s)?[\.-](?P<type>%s$)"
+        package_regex_comp = re.compile(r"(?P<name>%s?\.?v?)(?P<pver>%s)(?P<arch>%s)?[\.-](?P<type>%s$)"
                                                     % (pn_regex, pver_regex, parch_regex, psuffix_regex))
         self.suffix_regex_comp = re.compile(psuffix_regex)
 
@@ -572,7 +565,7 @@ class Wget(FetchMethod):
             version = self._parse_path(package_regex_comp, package)
             if version:
                 package_custom_regex_comp = re.compile(
-                    "(?P<name>%s)(?P<pver>%s)(?P<arch>%s)?[\.-](?P<type>%s)" %
+                    r"(?P<name>%s)(?P<pver>%s)(?P<arch>%s)?[\.-](?P<type>%s)" %
                     (re.escape(version[0]), pver_regex, parch_regex, psuffix_regex))
             else:
                 package_custom_regex_comp = None
@@ -589,7 +582,7 @@ class Wget(FetchMethod):
         current_version = ['', d.getVar('PV'), '']
 
         """possible to have no version in pkg name, such as spectrum-fw"""
-        if not re.search("\d+", package):
+        if not re.search(r"\d+", package):
             current_version[1] = re.sub('_', '.', current_version[1])
             current_version[1] = re.sub('-', '.', current_version[1])
             return (current_version[1], '')
@@ -607,13 +600,13 @@ class Wget(FetchMethod):
 
             # search for version matches on folders inside the path, like:
             # "5.7" in http://download.gnome.org/sources/${PN}/5.7/${PN}-${PV}.tar.gz
-            dirver_regex = re.compile("(?P<dirver>[^/]*(\d+\.)*\d+([-_]r\d+)*)/")
+            dirver_regex = re.compile(r"(?P<dirver>[^/]*(\d+\.)*\d+([-_]r\d+)*)/")
             m = dirver_regex.search(path)
             if m:
                 pn = d.getVar('PN')
                 dirver = m.group('dirver')
 
-                dirver_pn_regex = re.compile("%s\d?" % (re.escape(pn)))
+                dirver_pn_regex = re.compile(r"%s\d?" % (re.escape(pn)))
                 if not dirver_pn_regex.search(dirver):
                     return (self._check_latest_version_by_dir(dirver,
                         package, package_regex, current_version, ud, d), '')

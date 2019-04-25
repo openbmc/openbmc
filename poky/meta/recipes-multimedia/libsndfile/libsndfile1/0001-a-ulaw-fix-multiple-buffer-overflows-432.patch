@@ -1,3 +1,15 @@
+This patch fixes #429 (CVE-2018-19661 CVE-2018-19662) and #344 (CVE-2017-17456
+CVE-2017-17457). As per
+https://github.com/erikd/libsndfile/issues/344#issuecomment-448504425 it also
+fixes #317 (CVE-2017-14245 CVE-2017-14246).
+
+CVE: CVE-2017-14245 CVE-2017-14246
+CVE: CVE-2017-17456 CVE-2017-17457
+CVE: CVE-2018-19661 CVE-2018-19662
+
+Upstream-Status: Backport [8ddc442d539ca775d80cdbc7af17a718634a743f]
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
 From 39453899fe1bb39b2e041fdf51a85aecd177e9c7 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Mon, 7 Jan 2019 15:55:03 +0800
@@ -17,12 +29,6 @@ In this case, arbitrarily set the buffer value to 0.
 This commit fixes #429 (CVE-2018-19661 and CVE-2018-19662) and
 fixes #344 (CVE-2017-17456 and CVE-2017-17457).
 
-Upstream-Status: Backport[https://github.com/erikd/libsndfile/
-commit/585cc28a93be27d6938f276af0011401b9f7c0ca]
-
-CVE: CVE-2017-17456 CVE-2017-17457 CVE-2018-19661 CVE-2018-19662
-
-Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
  src/alaw.c | 9 +++++++--
  src/ulaw.c | 9 +++++++--

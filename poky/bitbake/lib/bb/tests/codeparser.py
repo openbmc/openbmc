@@ -123,6 +123,13 @@ ${D}${libdir}/pkgconfig/*.pc
         self.parseExpression("sed -i -e 's:IP{:I${:g' $pc")
         self.assertExecs(set(["sed"]))
 
+    def test_parameter_expansion_modifiers(self):
+        # - and + are also valid modifiers for parameter expansion, but are
+        # valid characters in bitbake variable names, so are not included here
+        for i in ('=', ':-', ':=', '?', ':?', ':+', '#', '%', '##', '%%'):
+            name = "foo%sbar" % i
+            self.parseExpression("${%s}" % name)
+            self.assertNotIn(name, self.references)
 
     def test_until(self):
         self.parseExpression("until false; do echo true; done")

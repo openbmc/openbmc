@@ -6,11 +6,12 @@ SRC_URI = "git://anongit.freedesktop.org/piglit \
            file://0001-cmake-install-bash-completions-in-the-right-place.patch \
            file://0001-tests-Use-FE_UPWARD-only-if-its-defined-in-fenv.h.patch \
            file://0001-cmake-use-proper-WAYLAND_INCLUDE_DIRS-variable.patch \
+           file://format-fix.patch \
            "
 UPSTREAM_CHECK_COMMITS = "1"
 
-# From 2018-08-13
-SRCREV = "57859e15dc8ba4034348b04d0b72f213b74d6347"
+# From 2018-10-26
+SRCREV = "b9066c7717af1d169a616c9e61706b99ff8515b5"
 # (when PV goes above 1.0 remove the trailing r)
 PV = "1.0+gitr${SRCPV}"
 
@@ -51,3 +52,6 @@ RDEPENDS_${PN} = "waffle waffle-bin python3 python3-mako python3-json \
 	"
 
 INSANE_SKIP_${PN} += "dev-so already-stripped"
+
+# Can't be built with ccache
+CCACHE_DISABLE = "1"

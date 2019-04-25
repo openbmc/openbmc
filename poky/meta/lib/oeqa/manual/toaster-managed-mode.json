@@ -1,0 +1,2572 @@
+[
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.All_layers:_default_view",
+      "author": [
+        {
+          "email": "stanciux.mihail@intel.com",
+          "name": "stanciux.mihail@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": " Access a project page, either by creating a new project or accessing an existing project from the \"All builds\" table.",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "On the project page click on the \"View compatible layers\" link situated on the right-hand side, mid-page, under the \"Project configuration\" menu, in the \"Layers\" table.",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Check that the table is populated with the default layers (eg. meta-yocto-bsp, meta-yocto)",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "Check that by default the following columns are shown: Layer, Summary, Revision, Dependencies and Add/Delete",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "Check that the \"Revision\" entries match the release entry from the main project page, in the project details section.",
+          "expected_results": ""
+        },
+        "6": {
+          "action": "Check that only one instance of the core layers (openembedded-core, meta-yocto and meta-yocto-bsp) shows in this table, and that instance has a branch that matches the selected project release from the main project page.",
+          "expected_results": ""
+        },
+        "7": {
+          "action": "Check that in the \"Dependencies\" column some of the layers should have a square box with a number in it. When clicking on it, a small popup should appear containing a list of other layers required for this layer to work. Every layer listed here should also be a link to the layer's detail page. \n \n",
+          "expected_results": ""
+        },
+        "8": {
+          "action": "From the \"Edit columns\" menu, activate the \"Git repository URL\" and the \"Subdirectory\" columns. In \"Git repository URL\": all the entries should have a link to the external site where the layer was  downloaded from.  Similarly, in \"Subdirectory\" links should exist, if a subdirectory entry is present.",
+          "expected_results": "All mentioned elements should be present and functional."
+        }
+      },
+      "summary": "All_layers:_default_view"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.All_layers:_Add/delete_layers",
+      "author": [
+        {
+          "email": "stanciux.mihail@intel.com",
+          "name": "stanciux.mihail@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": " Access a project page, either by creating a new project or accessing an existing project from the \"All builds\" table. \n\n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "On the project page click on the \"View compatible layers\" link situated on the right-hand side, mid-page, under the \"Project configuration\" menus, in the \"Layers\" table.  \n\n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Check that the Add/delete column is enabled. \n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "Add a new layer \nPick a layer that hasn't been added to the project. \n \nClick on the \"Add layer\" button present in the \"Add/delete\" column. \nIf the layer has unsatisfied dependencies a dialog will appear listing the dependencies (in alphabetical order), each of them with a checkbox so that you can select / deselect them. All checkboxes are checked by default. If you click the \"Cancel\" button the dialog closes. If you click the \"Add layers\" button, the layers are added to the project. \n\nMake sure to uncheck at least 1 of the dependencies so you can check that only the checked dependencies are added, and not the unchecked one(s). ",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "Check that the \"Add layer\" button fades out and is replaced temporarily by a message like \"1 layer added\" and then it is replaced by the \"Delete layer\" button. \nCheck that a confirmation message is displayed at the top of the page similar to \"You have added 1 layer to project_name_here: meta-yocto-bsp\". \n\n",
+          "expected_results": ""
+        },
+        "6": {
+          "action": "Delete an existing layer \nPick a layer that's already been added to the project. \nClick on the \"Delete layer\" button present in the \"Add/delete\" column. \nCheck that once the button is pressed, it fades out and is replaced temporarily by the message \"1 layer deleted\" and then it is replaced by the \"Add layer\" button. \nCheck that a confirmation is displayed at the top of the page similar to \"You have deleted 1 layer from project_name_here: meta-yocto-bsp\". ",
+          "expected_results": "All actions should complete successfully."
+        }
+      },
+      "summary": "All_layers:_Add/delete_layers"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.All_targets:_Default_view",
+      "author": [
+        {
+          "email": "stanciux.mihail@intel.com",
+          "name": "stanciux.mihail@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": " Access a project page, either by creating a new project or accessing an existing project from the \"All builds\" table. \n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": " If no images exist in the project, build an image by inserting \"core-image-minimal\" in the \"Recipes\" field and press the \"Build\" button. Wait for the image to finish building. \n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "On the project page click on the \"Image Recipes\" link situated in the left-handed side of the page, under the \"Project configuration\" menus, in the \"COMPATIBLE METADATA\" table. \n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "Check that \"Compatible image recipes\" table is populated. \n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "Check that the following columns are shown by default: \n\t\tImage recipe \n\t\tDescription \n \n\t\tLayer \n\t\tBuild \n\t\t     Version ",
+          "expected_results": ""
+        }
+      },
+      "summary": "All_targets:_Default_view"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Configuration_variables:_default_view",
+      "author": [
+        {
+          "email": "stanciux.mihail@intel.com",
+          "name": "stanciux.mihail@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": " Access a project page, either by creating a new project or accessing an existing project from the \"All builds\" table.  \n\n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "In the main project page, click on \"BitBake variables\" in the left-hand side of the page, under the \"CONFIGURATION\" menu.  \n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Check that default values are as follows: \n\tDISTRO - poky \n\tIMAGE_FSTYPES - ext3 jffs2 tar.bz2 \n\tIMAGE_INSTALL_append - \"Not set\" \n\tPACKAGE_CLASES - package_rpm \n        SSTATE_DIR  - /homeDirectory/poky/sstate-cache \n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "Check that under the \"Add variable\" section, the \"Variable\" field has the default text \"Type variable name\" present, the \"Value\" field has the default text \"Type variable value\" present and that the \"Add variable\" button is inactive. \n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "Check that under the \"Add variable\" section, there is text present that describes the variables that Toaster cannot modify. ",
+          "expected_results": "All mentioned elements should be present and functional."
+        }
+      },
+      "summary": "Configuration_variables:_default_view"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Configuration_variables:_Test_UI_elements",
+      "author": [
+        {
+          "email": "stanciux.mihail@intel.com",
+          "name": "stanciux.mihail@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": " Access a project page, either by creating a new project or accessing an existing project from the \"All builds\" table. \n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "In the main project page, click on \"BitBake variables\" in the left-hand side of the page, under the \"CONFIGURATION\" menu. \n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "DISTRO: \n\t- check that the \"change\" icon is present (represented by a pen icon) \n\t- click on the \"change\" icon and check that the variable becomes an editable text field, populated with the current value of the variable \n\t- check that, if you delete the content of the text field, the save button is disabled \n\t- enter a distro name containing spaces (for example, \"poky tiny\") - check that an error message is shown explaining that the value entered cannot contain spaces  \n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "IMAGE_FSTYPES: \n\t- check that the \"change\" icon is present (represented by a pen icon) \n\t- click on the \"change\" icon and check that the variable becomes editable like so: the main input control is a set of checkboxes. There is a checkbox for each supported image type. The checkboxes are listed in ascending alphabetical order, broken down in 2 groups: \n\t\t",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "The selected types are checked and listed at the top \n\t\t",
+          "expected_results": ""
+        },
+        "6": {
+          "action": "The other types are not checked and listed afterwards \n\t- check that all this is inside a scrollable div, and a text field is present above that filters out the content of the div as you type. \n\t- check that if there are no image types matching your typed string, a message is shown notifying you of this: \"No image types found\" \n\t- unselect all checkboxes and check that the save button is disabled and a message is shown: \"You must select at least one image type\" \n\t- select different checkboxes and hit save then make sure that the \tsaved value is consistent with the selected checkboxes  \n\n",
+          "expected_results": ""
+        },
+        "7": {
+          "action": "IMAGE_INSTALL_append: \n\t- check that the \"change\" icon is present (represented by a pen icon) \n\t- click on the \"change\" icon and check that the variable becomes a text field, populated with the current value of the variable.  \n\n\t- check that the save button is disabled when the text field is empty \n\t- insert test in the text field (for example \"package1\") and hit save; be aware that there is no input validation for this variable \n\t- check that a new \"delete\" icon(a trashcan) has appeared next to the pen icon \n\t- check that clicking on the trashcan icon resets the value to \"Not set\" and makes the trashcan icon dissapear  \n\n",
+          "expected_results": ""
+        },
+        "8": {
+          "action": "PACKAGE_CLASSES: \n\t- check that the \"change\" icon is present (represented by a pen icon) \n\t- click on the \"change\" icon and check that the variable becomes editable with the following components: \n\t\t",
+          "expected_results": ""
+        },
+        "9": {
+          "action": "A dropdown menu with values 'package_dev', 'package_ipk' and 'package_rpm' in this order. The value selected when you enter the editable state matches the first value of the variable (e.g. if the value is set to 'package_dev package_ipk' the value selected is 'package_dev').  \n \n\t\t",
+          "expected_results": ""
+        },
+        "10": {
+          "action": "Two checkboxes, showing the 2 unselected values in the dropdown menu.  \n\n\t- verify that the checkboxes are checked or unchecked to reflect the variable value (e.g. if the value is set to 'package_dev package_ipk', the 'package_ipk' checkbox is checked, and the 'package_rpm' checkbox is unchecked).  \n\n\tBoth checkboxes can be unchecked.  The value of the checkboxes changes dynamically as I change the selected value in the dropdown menu. This means that any changes to the dropdown menu should uncheck the checkboxes.  \n\n\t- click on save and check that the  value selected in the dropdown menu is the first value in the variable, followed by any checked checkboxes.  \n\n\n",
+          "expected_results": ""
+        },
+        "11": {
+          "action": "Adding variables: \n\t- check that the \"add variable\" form has 2 text fields: one for the variable name and a second one for the variable value, plus an \"add\" button that is disabled until both text fields have some input in them.  \n \n\t- check variable name validation: variable names cannot have spaces, and can only include letters, numbers, underscores and dashes; variable names entered cannot match the name of a variable already on the list; variable names cannot match the blacklisted variables mentioned in the text on the right-hand side of the page  \n\n\t - check that an error message is shown indicating validation has failed and why once you try to put in the value or click on the \"Add variable\" button  ",
+          "expected_results": "All mentioned elements should be present and functional."
+        },
+        "12": {
+          "action": "insert a valid combination and click on \"Add variable\"; check that a new variable/value pair is added at the bottom of the variable list and that the text fields in the \"add variable\" form are cleared and the \"add\" button is disabled \n\t- check that the added variable has a \"change\" icon present next to the variable value, and also that a \"delete\" icon is present next to the variable name \n\t- check that clicking the \"change\" icon makes the variable editable in a text field containing the value of the variable \n\t- check that, if you delete the content of the text field, the save button is\tdisabled\n\t- check that clicking on the \"delete\" button causes both the variable name and the variable value to be removed from the variables list",
+          "expected_results": "All mentioned elements should be present and functional."
+        }
+      },
+      "summary": "Configuration_variables:_Test_UI_elements"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Project_builds:_Default_view",
+      "author": [
+        {
+          "email": "stanciux.mihail@intel.com",
+          "name": "stanciux.mihail@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": " Access a project page, either by creating a new project or accessing an existing project from the \"All builds\" table. \n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Click on the \"Builds\" , next to the \"Configuration\" Button. \n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Check that the page heading includes a counter with the number of builds run for the project(eg. \"Project builds (4)\"). \n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "Check that the following table heads are visible by default: outcome, completed on, failed tasks, errors, warnings, image files. \n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "Check that by default the table is sorted by \"Completed on\" in descending order",
+          "expected_results": "All mentioned elements should be present."
+        }
+      },
+      "summary": "Project_builds:_Default_view"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Project_builds:_Sorting_the_project_builds_table",
+      "author": [
+        {
+          "email": "stanciux.mihail@intel.com",
+          "name": "stanciux.mihail@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": " Access a project page, either by creating a new project or accessing an existing project from the \"All builds\" table. \n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Click on the \"View all project builds\" link situated below the top-most \"Build\" button and text field, next to the \"View all targets\" link \n\n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Verify that, by default, the table is sorted by \"Completed on\" in descending order. \n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "Activate all columns from the \"Edit columns\" table. \n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "Check that the following columns are sortable, both in ascending and descending order: outcome, target, machine, started on, completed on, warning, project \n\n",
+          "expected_results": ""
+        },
+        "6": {
+          "action": "Verify that hiding a column that is currently being used as the sorting criteria causes the sorting to reset to the default - i.e \"Completed on\" in descending order.",
+          "expected_results": "All mentioned elements should be present and functional."
+        }
+      },
+      "summary": "Project_builds:_Sorting_the_project_builds_table"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Project_builds:_customize_the_columns_of_the_table",
+      "author": [
+        {
+          "email": "stanciux.mihail@intel.com",
+          "name": "stanciux.mihail@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": " Access a project page, either by creating a new project or accessing an existing project from the \"All builds\" table. \n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Click on the \"View all project builds\" link situated below the top-most \"Build\" button and text field, next to the \"View all targets\" link \n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Click on the \"Edit column\" menu and check that the selected columns match the columns currently being shown. \n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "Check that the following columns cannot be removed from the shown columns: completed on, outcome, recipe \n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "Check that unchecked items changed to checked immediately appear in the table and that checked items changed to unchecked immediately disappear from the table.",
+          "expected_results": "All mentioned elements should be present and functional."
+        }
+      },
+      "summary": "Project_builds:_customize_the_columns_of_the_table"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Project_builds:_filter_the_contents_of_the_table",
+      "author": [
+        {
+          "email": "stanciux.mihail@intel.com",
+          "name": "stanciux.mihail@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": " Access a project page, either by creating a new project or accessing an existing project from the \"All builds\" table. \n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Click on the \"View all project builds\" link situated below the top-most \"Build\" button and text field, next to the \"View all targets\" link. \n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Make sure the following columns have filters: outcome, started on, completed on, failed tasks. \n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "Filters are mutually exclusive. Click a filter button of a one column and a filter dialogue occurs. Select a filter item. The filter result would be showed. Then select another filter item of another column and the previously applied filter is overridden by the newly selected filter when a filter from a different column is applied to the table. This filter will override the current filter.\" \n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "Filters are overridden by search. Run a search query and you can see previous filter results are overridden by the results of the search query.",
+          "expected_results": "All mentioned elements should be present and functional."
+        }
+      },
+      "summary": "Project_builds:_filter_the_contents_of_the_table"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Project_builds:_search_the_contents_of_the_table",
+      "author": [
+        {
+          "email": "stanciux.mihail@intel.com",
+          "name": "stanciux.mihail@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": " Access a project page, either by creating a new project or accessing an existing project from the \"All builds\" table. \n\n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Click on the \"View all project builds\" link situated below the top-most \"Build\" button and text field, next to the \"View all targets\" link. \n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "When no search query has been entered, we have placeholder text saying: \"Search builds\". The placeholder text disappears when the first character is typed. \n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "When a search query has been submitted and results returned: \n-  We keep the search string in the text input field. \n- We provide a \"Clear search\" icon (icon-remove-sign). Click it to clear the search and display all packages. \n- We change the page heading to indicate the number of results returned by the search query. \n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "If your search query returns no results, the page heading changes to \"No packages found\", and we show you an alert with a search form and an option to show all packages. \n\n",
+          "expected_results": ""
+        },
+        "6": {
+          "action": "Searching does not change the state of the table: the same columns remain hidden and the same sorting applied. ",
+          "expected_results": "All mentioned elements should be present and functional."
+        }
+      },
+      "summary": "Project_builds:_search_the_contents_of_the_table"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Layer_details_page:_Default_view",
+      "author": [
+        {
+          "email": "stanciux.mihail@intel.com",
+          "name": "stanciux.mihail@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": " Access a project page, either by creating a new project or accessing an existing project from the \"All builds\" table. \n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Click on the \"View compatible layers\" link situated in the \"Project configuration\" portion of the page, under \"Layers\" table. \n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Click on a layer (for example \"meta-aarch64\"). Notice that the page is divided into 2 columns: the left one is broken down into tabs; the right one provides information about the layer. \n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "Check that breadcrumbs exist at the top of the page. Check that they work by clicking on them, then hitting back to return to the layer detail page. \n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "Check that the page heading includes the layer branch name - it should look something like meta-aarch64(dizzy) if the dizzy branch was selected. The branch name should also be present in the breadcrumbs. \n\n",
+          "expected_results": ""
+        },
+        "6": {
+          "action": "The \"About\" information: \nit shows summary, description in this order, if not empty. If an information item is empty (like the Summary in the example shown in this page), it does not display. \n \n\n",
+          "expected_results": ""
+        },
+        "7": {
+          "action": "The tabs: \nCheck that there are 3 tabs: \"layer details\", \"recipes\", \"machines\" showing up in this order. \n\n",
+          "expected_results": ""
+        },
+        "8": {
+          "action": "\"Layer details\" tab: \nCheck that the tab shows: \n- A button to add / remove the layer to / from the project. In this tab, the button labels are\"Add the $layer_name layer to your project\" \"Delete the $layer_name layer from your project\" \n- Some details about the layer: repository URL, repository subdirectory, revision (the branch) and the list of layer dependencies. If any of the above details is blank (most likely, the subdirectory) it does not display.The icons next to the repository and subdirectory information are links to their web instances. Those links should open in a new window. \n\n",
+          "expected_results": ""
+        },
+        "9": {
+          "action": "The \"Recipes\" tab: \nCheck that it shows: \n\t",
+          "expected_results": ""
+        },
+        "10": {
+          "action": "A counter in the tab label showing the total number of targets provided by the layer \n\t",
+          "expected_results": ""
+        },
+        "11": {
+          "action": "A button to add / remove the layer to / from the project. In this tab, the button labels are \"Add the $layer_name layer to your project to enable these targets\"/\"Delete the $layer_name layer from your project\" \n\t",
+          "expected_results": ""
+        },
+        "12": {
+          "action": "A recipes table with the following columns: \n \n- Recipe \n- Description: the value of the DESCRIPTION variable. If not set, then the value of the SUMMARY variable. \n- Build recipe, which shows a \"build recipe\" button. The \"build recipe\" button is disabled when the layer is not added to the project. \n\nThe recipes table is sorted by \"Recipe\" in ascending alphabetical order. \n\n1",
+          "expected_results": ""
+        },
+        "13": {
+          "action": "The \"Machines\" tab: \n\t",
+          "expected_results": ""
+        },
+        "14": {
+          "action": "A counter in the tab label showing the total number of machines provided by the layer \n\t",
+          "expected_results": ""
+        },
+        "15": {
+          "action": "A button to add/remove the layer to/from the project. In this tab, the button labels are \"Add the $layer_name layer to your project to enable these machines\"/\"Delete the $layer_name layer from your project\" \n\t",
+          "expected_results": ""
+        },
+        "16": {
+          "action": "A machines table with the following columns: \n \n- Machine. \n \n- Description: The value of the DESCRIPTION variable in the .conf file \n- Select machine, which shows a \"select\" button. The \"select\" button is disabled when the layer is not added to the project. \nThe machines table is sorted by \"Machine\" in ascending alphabetical order.  \n",
+          "expected_results": "All mentioned elements should be present and functional."
+        }
+      },
+      "summary": "Layer_details_page:_Default_view"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Layer_details_page:_UI_functionality",
+      "author": [
+        {
+          "email": "stanciux.mihail@intel.com",
+          "name": "stanciux.mihail@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": " Access a project page, either by creating a new project or accessing an existing project from the \"All builds\" table. \n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Click on the \"View compatible layers\" link situated in the \"Project configuration\" portion of the page, under \"Layers\" \n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Click on a layer (for example \"meta-aarch64\").  \n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "Adding/removing a layer: \nClick on \"Add the $layer_name_here layer to your project\" and verify that the \"Add layer\" button turns into a red button with the label \"Delete the $layer_name_here layer from your project\" and that at the top of the page, below the header, you see a message \"You have added 1 layer to  $project_name_here: $layer_name_here\". This message can be dismissed by clicking on the \"X\" at the top right side of the message. ",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "Click on the red \"Delete the $layer_name_here from your project\" button and verify that the \"Delete layer\" button turns back into a grey button with the label \"Add the $layer_name_here to your project\" and that at the top of the page, below the header, you see a message \"You have deleted 1 layer to $project_name_here: $layer_name_here\". This message can be dismissed by clicking on the \"X\" at the top right side of the message. \n\n",
+          "expected_results": ""
+        },
+        "6": {
+          "action": "Dependencies window: \n For a layer that has dependencies( for example \"meta-ettus\"), once you click the \"Add layer\" button, verify that you get a message window that presents the dependencies for this layer with the message \"$layer_name_here depends on some layers that are not added to your project. Select the ones you want to add:\", a list with a checkbox for each one and 2 options: \"Add layers\" or \"Cancel\". \nClicking on \"Add layers\" adds all the dependencies and the current layer. Clicking on \"Cancel\" takes you back to the layer detail page without adding any of the layers. \n\n",
+          "expected_results": ""
+        },
+        "7": {
+          "action": "\"Recipes\" table \nCheck that if the layer hasn't been added to the project, the \"Build recipe\" button(s) are disabled. After the project is added, check that the \"Build recipe\" button(s) become active and clicking on a button sends you to the main project page and starts a build. \n\n",
+          "expected_results": ""
+        },
+        "8": {
+          "action": "\"Machines table\" \nCheck that if the layer hasn't been added to the project, the \"Select machine\" button(s) are disabled.  After the project is added, check that the \"Build machine\" button(s) become active and clicking on a button sends you to the main project page and modifies the project machine to the one selected. ",
+          "expected_results": "All mentioned elements should be present and functional."
+        }
+      },
+      "summary": "Layer_details_page:_UI_functionality"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Importing_new_layers",
+      "author": [
+        {
+          "email": "stanciux.mihail@intel.com",
+          "name": "stanciux.mihail@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": " Access a project page, either by creating a new project or accessing an existing project from the \"All builds\" table.  \n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Click on the \"Import layer\" link situated in the \"Project configuration\" portion of the page, under \"Layers\" table.  \n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Check that the import layer form is shown, with the following elements as text fields to be filled out: \nLayer name (example: meta-imported) \nGit repository URL (example: git://github.com/shr-distribution/meta-smartphone.git) \nRepository subdirectory (optional) (example: meta-acer) \nRevision (example: master) \n\nIn addition, a separate portion of the form will be the \"Layer dependencies\" portion, where you can add dependency layers for the layer you are importing. This portion will contain a list of dependencies already added, with a trashcan icon next to them that will delete them when pressed and a text field with a \"add layer\" button next to it for adding dependencies. (for example: meta-android, meta-oe) \n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "At the bottom of the form, check that a button exists with the label \"Import and add to project\". Check that this button is inactive until the required fields are filled out. \nCheck that clicking on the \"Import button\" takes you back to the main project page and that the imported layer, along with any dependencies, were added in the project's layers. ",
+          "expected_results": "All mentioned elements should be present and functional."
+        }
+      },
+      "summary": "Importing_new_layers"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Layer_details_page:_UI_functionality_for_imported_layers",
+      "author": [
+        {
+          "email": "stanciux.mihail@intel.com",
+          "name": "stanciux.mihail@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": " Access a project page, either by creating a new project or accessing an existing project from the \"All builds\" table. \n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Click on the \"View compatible layers\" link situated in the \"Project configuration\" portion of the page, under \"Layers\" table. \n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Select an imported layer (see in TC 1112 how to import a layer). \n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "Page heading \nCheck that the page heading includes the branch, tag or commit as entered when importing the layer.\nIf it's a commit, Check that only the first 10 characters are shown followed by an ellipsis character. The full commit shows on hover.The branch, tag or commit information also shows in the breadcrumb. \n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "The \"About\" information \nIt shows: \n- Summary \n- Description \nin this order. Those two items always show, independently of them being blank or not, since they can be edited by users. \n\nWhen an information item is empty, it shows as \"not set\" with a \"change\" icon. Click on the icon to add a value. \n\nFor \"Summary\" and \"Description\" clicking the \"change\" icon shows the selected information item in its editable state. It consists of a text area, set to 2 rows for the \"Summary\" and to 6 rows for the \"Description\", plus 'save' and 'cancel' buttons.  \nThe 'save' buttons only activate when there is at least one character in the text area. \n\n",
+          "expected_results": ""
+        },
+        "6": {
+          "action": "The tabs \nCheck that the tabs shown are: \n- \"Layer details\" \n- \"Recipes\" \n- \"Machines\" \nThe tabs should show in the order in which they are listed above. \n\n\"Layer details\" tab: \nIn not-editable pages, the tab shows: \n- A button to add / remove the layer to / from the project. In this tab, the button labels are: \n\t- \"Add the $layer_name layer to your project\" \n\t- \"Delete the $layer_name layer from your project\" \n\n- Some details about the layer: repository URL, repository subdirectory, revision (branch / tag / commit) and the list of layer dependencies. This is the information required from users when importing a layer.  The subdirectory and the layer dependencies can be blank.",
+          "expected_results": ""
+        },
+        "7": {
+          "action": "If blank, they show as \"not set\". \n\nEditing the \"Repository URL\" \nThe \"Git repository URL\" cannot be blank. Therefore, we show only a \"change\" icon next to it. When you click the icon, the text input field is set to the current value. If you delete the value from the input field, we disable the \"save\" button. We enable it again when you type something in the field.  \n\nEditing the \"Repository subdirectory\" \nThe \"Repository subdirectory\" can be blank. Therefore, we show both \"change\" and \"delete\" icons. When you click the \"delete\" icon, we  \nshow the label \"Not set\".",
+          "expected_results": ""
+        },
+        "8": {
+          "action": "\nWhen you click the \"change\" icon, the text input field is set \nto the current value.  \nIf you delete the value from the input field, we disable the \"save\" button. We enable it again when you type something in the field. \n \n\nEditing the \"Revision\" \nThe \"Revision\" cannot be blank. Therefore, we show only a \"change\" icon next to it. When you click the icon, the text input field is set to the current value. If you delete the value from the input field, we disable the \"save\" button. We enable it again when you type something in the field. \n\nThe \"Recipes\" tab \nIt shows: \n1: A counter in the tab label showing the total number of targets provided by the layer \n2: A button to add/remove the layer to/from the project. ",
+          "expected_results": ""
+        },
+        "9": {
+          "action": "In this tab, the button labels are \n \n\"Add the $layer_name layer to your project to enable \nthese targets\" \n\"Delete the $layer_name layer from your project\" \n\n3: A \"Recipes\" table with the following columns: \n \n- Recipe \n- Description: the value of the DESCRIPTION variable. If not set, then the value of the SUMMARY variable. \n- Build recipe, which shows a \"build recipe\" button. The \"build recipe\" button is disabled when the layer is not added to the project. \nThe recipes table is sorted by \"Recipe\" in ascending alphabetical order. \n\nThe \"Machines\" tab: \nIt shows: \n1: A counter in the tab label showing the total number of machines provided by the layer \n2: A button to add/remove the layer to/from the project.",
+          "expected_results": ""
+        },
+        "10": {
+          "action": "In this tab, the button labels are \n \n\t- \"Add the $layer_name layer to your project to enable these machines\" \n\t- \"Delete the $layer_name layer from your project\" \n3: A \"machines\" table with the following columns:  \n- Machine. \n \n- Description: The value of the DESCRIPTION variable in the .conf file \n- Select machine, which shows a \"select\" button. The \"select\" button is disabled when the layer is not added to the project. \nThe machines table is sorted by \"Machine\" in ascending alphabetical order. ",
+          "expected_results": "All mentioned elements should be present and functional."
+        }
+      },
+      "summary": "Layer_details_page:_UI_functionality_for_imported_layers"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Multiple_build_directories",
+      "author": [
+        {
+          "email": "stanciux.mihail@intel.com",
+          "name": "stanciux.mihail@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "after starting Toaster for the first time, go to http://[localhost]:8000/admin/ and login with the admin user you created during setup. Click on the Build environments section, and on the BuildEnvironment object. \n\n\n\nNote: you can create a superuser to enter as admin with ... poky/bitbake/lib/toaster/manage.py createsuperuser \n\n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "make note of the \"sourcedir\" and \"builddir\" values. The build dir will be something like \"/home/user/path/build\" \n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": " click \"back\", and click on the \"Add build environment\" button in the upper right corner. \n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "enter Address \"2\", Betype: \"local\", \"sourcedir\" is to be set to whatever the original build env is set, and \"builddir\" is ANOTHER path at the same level as the original builddir - e.g. \"/home/user/path/build2\" \n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "Click save \n\n",
+          "expected_results": ""
+        },
+        "6": {
+          "action": "Execute command : /poky$ source oe-init-build-env build2 \n\n",
+          "expected_results": ""
+        },
+        "7": {
+          "action": "Create new project \n\n",
+          "expected_results": ""
+        },
+        "8": {
+          "action": "issue 2 build (e.g. core-image-minimal core-image-sato)\n\n\n\n\n\n",
+          "expected_results": "Both build commands should run simultaneously."
+        }
+      },
+      "summary": "Multiple_build_directories"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Run_again_button_from_all_builds_page_must_run_the_specified_task",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start Toaster.",
+          "expected_results": "Toaster starts. \n"
+        },
+        "2": {
+          "action": "Click on new project button.",
+          "expected_results": " Open create a new project page. \n"
+        },
+        "3": {
+          "action": "Enter a project name, select a release and click on create project or select an existing project.",
+          "expected_results": " Project Created. \n"
+        },
+        "4": {
+          "action": "Build a image task (ex: core-image-minimal:clean) and wait until build finish.\nfrom all build page.",
+          "expected_results": " Build task finishes successfully. \n"
+        },
+        "5": {
+          "action": "Click on rebuild button from all build page.",
+          "expected_results": "Specified task will run again. \n"
+        },
+        "6": {
+          "action": "Click on the build and verify if the number of tasks executed = 1.",
+          "expected_results": "Only the specified task is executed. \n"
+        },
+        "7": {
+          "action": "From project builds page click on run again button.",
+          "expected_results": "Specified task will run again.\n"
+        },
+        "8": {
+          "action": "Click on the build and verify if the number of tasks executed = 1.",
+          "expected_results": ""
+        }
+      },
+      "summary": "Run_again_button_from_all_builds_page_must_run_the_specified_task"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Intel_layers_builds",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start Toaster.",
+          "expected_results": "Toaster starts. \n"
+        },
+        "2": {
+          "action": "Click on new project button.",
+          "expected_results": "Open create a new project page. \n"
+        },
+        "3": {
+          "action": "Enter a project name, select a release and click on create project.",
+          "expected_results": "Project Created. \n"
+        },
+        "4": {
+          "action": "Click on layers tab.",
+          "expected_results": "Open compatible layers page. \n"
+        },
+        "5": {
+          "action": "Search for intel.",
+          "expected_results": "Return results \n"
+        },
+        "6": {
+          "action": "Add intel layers like: meta-intel, meta-intel-quark.",
+          "expected_results": "Layers added to project. \n"
+        },
+        "7": {
+          "action": "Click on the added layer.",
+          "expected_results": "Open layer page. \n"
+        },
+        "8": {
+          "action": "From machine tab, select a machine.",
+          "expected_results": "Machine has changed. \n"
+        },
+        "9": {
+          "action": "Build a recipe(core-image-minimal) or a recipe from recipe tab.",
+          "expected_results": "Build finishes successfully."
+        }
+      },
+      "summary": "Intel_layers_builds"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Download_other_artifacts",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Delete the build/tmp folder. (to make sure the rootfs task runs and other artifacts are generated for the build)",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Start Toaster.",
+          "expected_results": "Toaster starts. \n\t"
+        },
+        "3": {
+          "action": "Click on new project button.",
+          "expected_results": "Open create a new project page. \n\t"
+        },
+        "4": {
+          "action": "Enter a project name, select a release and click on create project.",
+          "expected_results": "Project Created. \n\t"
+        },
+        "5": {
+          "action": "Build an image recipe (ex: core-image-minimal) and wait until build finish.",
+          "expected_results": "Build finishes successfully. \n\t"
+        },
+        "6": {
+          "action": "Click on the built recipe.",
+          "expected_results": "Open build summary page. \n\t"
+        },
+        "7": {
+          "action": "From other artifacts tab click on a link.",
+          "expected_results": "You can download other artifacts."
+        }
+      },
+      "summary": "Download_other_artifacts"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Download_licence_manifest",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Delete the build/tmp folder. (to make sure license manifest is generated)",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Start Toaster \n\n",
+          "expected_results": "Toaster starts. \n"
+        },
+        "3": {
+          "action": "Click on new project button. \n\n",
+          "expected_results": "Open create a new project page. \n"
+        },
+        "4": {
+          "action": "Enter a project name, select a release and click on create project. \n\n",
+          "expected_results": "Project Created. \n"
+        },
+        "5": {
+          "action": "Build an image recipe (ex: core-image-minimal) and wait until build finish. \n\n",
+          "expected_results": "Build finishes successfully. \n"
+        },
+        "6": {
+          "action": "Click on the built recipe. \n\n",
+          "expected_results": "Open build summary page. \n"
+        },
+        "7": {
+          "action": "From Image tab click on \"Download\" button for License manifest.",
+          "expected_results": "You can download license manifest."
+        }
+      },
+      "summary": "Download_licence_manifest"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Test_dependencies_layers",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start Toaster.",
+          "expected_results": "Toaster starts. \n"
+        },
+        "2": {
+          "action": "Click on new project button.",
+          "expected_results": "Open create a new project page. \n"
+        },
+        "3": {
+          "action": "Enter a project name, select a release and click on create project.",
+          "expected_results": "Project Created. \n"
+        },
+        "4": {
+          "action": "Click on Layers.",
+          "expected_results": "Open compatible layers page. \n"
+        },
+        "5": {
+          "action": "Add a layer with multi-level dependencies. (ex: meta-acer) \nThis layer depends on meta-networking, which in turn depends on meta-android. \n \n",
+          "expected_results": "The selected layer and dependencies were added to project. \n"
+        },
+        "6": {
+          "action": "Check if meta-python appears in the dependencies list, and add the layers to project.",
+          "expected_results": ""
+        },
+        "7": {
+          "action": "Delete a dependency layer.",
+          "expected_results": "Layer removed from project. \n \n"
+        },
+        "8": {
+          "action": "Build a recipe (ex: core-image-minimal) and wait until build finish.\n",
+          "expected_results": "Build will fail with an error.\n\n\t"
+        }
+      },
+      "summary": "Test_dependencies_layers"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Test_build_recipe_button_from_recipes_page",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start Toaster.",
+          "expected_results": "Toaster starts. \n"
+        },
+        "2": {
+          "action": "Click on new project button.",
+          "expected_results": "Open create a new project page. \n"
+        },
+        "3": {
+          "action": "Enter a project name, select a release and click on create project.",
+          "expected_results": "Project Created. \n"
+        },
+        "4": {
+          "action": "Click on software recipes / image recipes.",
+          "expected_results": "Open compatible software recipes page. \n"
+        },
+        "5": {
+          "action": "Select a recipe and click on 'add layer' button.",
+          "expected_results": "Layer added to project and the 'add layer' button becomes 'build recipe'. \n"
+        },
+        "6": {
+          "action": "Click on \"Build recipe\" button for one recipe (ex : core-image-minimal / busybox).",
+          "expected_results": "Build finishes successfully."
+        },
+        "7": {
+          "action": "Test this for software and image recipes tables.",
+          "expected_results": ""
+        }
+      },
+      "summary": "Test_build_recipe_button_from_recipes_page"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Test_compatible_machines",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start Toaster.",
+          "expected_results": "Toaster starts. \n"
+        },
+        "2": {
+          "action": "Click on new project button.",
+          "expected_results": "Open create a new project page. \n"
+        },
+        "3": {
+          "action": "Enter a project name, select a master release and click on create project.",
+          "expected_results": "Project Created. \n"
+        },
+        "4": {
+          "action": "Go to machines page.",
+          "expected_results": "Open compatible machines page. \n"
+        },
+        "5": {
+          "action": "Choose a machine and click on add layer for it. (intel-core2-32)",
+          "expected_results": "Layers added to project and add layer button becomes select machine. \n"
+        },
+        "6": {
+          "action": "Click on select machine.",
+          "expected_results": "Machine has changed. \n"
+        },
+        "7": {
+          "action": "Go to layer page that generate the machine. (meta-intel)",
+          "expected_results": "Open layer page \n"
+        },
+        "8": {
+          "action": "Build a recipe generated by that layer.",
+          "expected_results": "Build finishes successfully."
+        }
+      },
+      "summary": "Test_compatible_machines"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Builds_with_different_machines",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start Toaster.",
+          "expected_results": "Toaster starts. \n"
+        },
+        "2": {
+          "action": "Click on new project button.",
+          "expected_results": "Open create a new project page. \n"
+        },
+        "3": {
+          "action": "Enter a project name, select a master release and click on create project.",
+          "expected_results": "Project Created. \n"
+        },
+        "4": {
+          "action": "Select a machine (ex: qemux86-64)",
+          "expected_results": "The machine has changed. \n"
+        },
+        "5": {
+          "action": "Build a recipe (ex: core-image-minimal) and wait until buid finish.",
+          "expected_results": "Build finishes successfully. \n"
+        },
+        "6": {
+          "action": "Go to project page and change the machine (ex: qemumips)",
+          "expected_results": "The machine has changed. \n"
+        },
+        "7": {
+          "action": "Build a recipe (ex: core-image-sato) and wait until build finish.",
+          "expected_results": "Build finishes successfully. \n\nYou can build recipes with different machines."
+        },
+        "8": {
+          "action": "Check on build summary page that the machine match the machine selected.",
+          "expected_results": ""
+        }
+      },
+      "summary": "Builds_with_different_machines"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Test_bitbake_variables_-_IMAGE_FSTYPES",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start Toaster.",
+          "expected_results": "Toaster starts. \n"
+        },
+        "2": {
+          "action": "Click on new project button.",
+          "expected_results": "Open create a new project page. \n"
+        },
+        "3": {
+          "action": "Enter a project name, select release and click on create project.",
+          "expected_results": "Project Created. \n"
+        },
+        "4": {
+          "action": "Go to Configuration --> BitBake variables",
+          "expected_results": "Open Bitbake variables page. \n"
+        },
+        "5": {
+          "action": "Change IMAGE_FSTYPES variable, add some image types like: hddimg, ext4, etc.",
+          "expected_results": "Image types were added. \n"
+        },
+        "6": {
+          "action": "Build a recipe (ex: core-image-minimal) and wait until build finish.",
+          "expected_results": "Build finishes successfully. \n"
+        },
+        "7": {
+          "action": "Verify in the build summary page if the image types selected were built.",
+          "expected_results": "All the image types selected appears in the build summary page."
+        }
+      },
+      "summary": "Test_bitbake_variables_-_IMAGE_FSTYPES"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Software_recipes:_default_view",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": " Access a project page, either by creating a new project or accessing an existing project from the \"All builds\" table. \n\n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": " If no images exist in the project, build an image by inserting \"core-image-minimal\" in the \"Recipes\" field and press the \"Build\" button. Wait for the image to finish building. \n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "On the project page click on the \"Software Recipes\" link situated in the left-handed side of the page, under the \"Project configuration\" menus, in the \"COMPATIBLE METADATA\" table. \n\n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "Check that \"Compatible software recipes\" table is populated. \n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "Check that the following columns are shown by default: \n\n\t\tSoftware recipe \n\t\tDescription \n \n\t\tLayer \n\t\tBuild \n\t\t     Version ",
+          "expected_results": ""
+        }
+      },
+      "summary": "Software_recipes:_default_view"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Software_recipes:_sorting_the_content_of_the_software_recipes_table",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Access a project page, either by creating a new project or accessing an existing project from the \"All builds\" table. \n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Navigate to the \"Software Recipes\" page. \n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Make sure the table is sorted on the \"Software Recipe\" column by default in ascending order. \n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "Activate all columns from the \"Edit column\" drop-down menu. Check that \"Build\" and \"Software Recipe\" columns cannot be unchecked. \n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "Check that \"Software Recipe\", \"Section\", \"License\", \"Layer\" are the only sortable table heads. \n\n",
+          "expected_results": ""
+        },
+        "6": {
+          "action": "Sort the table by \"Layer\" and then navigate away by selecting a layer(such as meta-yocto). When you click \"back\" button in web-browser to go back to the \"Compatible image recipes\" table it should still be sorted by \"Layer\". \n\n",
+          "expected_results": ""
+        },
+        "7": {
+          "action": "Sorting and \"Edit columns\" \nIf you use the \"Edit columns\" menu to hide the column with the applied sorting, we revert the sorting to the default sorting (i.e. \"Recipe\"). The default sorting always uses one of the core columns, which cannot be hidden using the \"Edit columns\" menu. \n\n",
+          "expected_results": ""
+        },
+        "8": {
+          "action": "Sorting and search \nSearching should have no impact on the applied sorting. Any results returned should be sorted by the sorting criteria selected when the search query was submitted. \nSort recipes by \"Layer\" column heading. Input a string (such as \"meta\") in search box and click search button. Make sure results returned are sorted by \"Layer\".",
+          "expected_results": ""
+        }
+      },
+      "summary": "Software_recipes:_sorting_the_content_of_the_software_recipes_table"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Software_recipes:_Searching_the_content_of_the_software_recipes_table",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Access a project page, either by creating a new project or accessing an existing project from the \"All builds\" table. \n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Navigate to the \"Software Recipes\" page. \n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Check that the search is made of a text input field and a \"Search\" button in a toolbar above the table. \n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "When no search query has been entered, we have placeholder text saying: \"Search compatible software recipes\". \n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "Input \"core\" in the text input field. The placeholder text disappears when the first character is typed. Click search button. \n\n",
+          "expected_results": ""
+        },
+        "6": {
+          "action": " \n(1) returned results \nThe search string is kept in the text input field. The results returned occur. Click  \"Clear search\" icon to clear the search and display the compatible recipes. \n(2) no results returned \nIf your search query returns no results, the page heading changes to \"No recipes found\", and we show you an alert with a search form and an option to show all targets. Check that \"show compatible recipes\" button is available. \n\n",
+          "expected_results": ""
+        },
+        "7": {
+          "action": "When I run a search, the search happens against the following columns (independently of they being shown or hidden):\n- Software Recipe\n- Recipe version\n- Description\n- Recipe file\n- Section\n- License\n- Layer\n- Revision\nInput a string to search for the above column headings separately to make sure that the search happens against the columns. \n",
+          "expected_results": ""
+        },
+        "8": {
+          "action": "Search, sorting and \"Edit columns\" \nSearching does not change the state of the table: the same columns remain hidden and the same sorting applied when search results are displayed, but filters are cleared by the search results.\nSearch a string and make sure that the same columns remain hidden and the same sorting applied. \n\n",
+          "expected_results": ""
+        },
+        "9": {
+          "action": "Search and filters \nThe scope of the filters is the content currently on the table (this means all table pages, not only the one displayed). The scope of the search is always the content of the database. \n\nIf I run a search query, any filter applied afterwards will filter the content returned by the search query. \n\nIf I run a search query while a filter is applied, the filter is cleared by the results of the search query (i.e. we display the results of the search query and clear the filter applied beforehand). The same happens if I click the \"Clear search\" icon when a filter is applied to a set of search results (both search results and applied filter are cleared, and the table shows all the targets). ",
+          "expected_results": ""
+        }
+      },
+      "summary": "Software_recipes:_Searching_the_content_of_the_software_recipes_table"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Software_recipes:_Filter_the_contents_of_the_software_recipes_table",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Access a project page, either by creating a new project or accessing an existing project from the \"All builds\" table.",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Navigate to the \"Software Recipes\" page.",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Make sure the following table column has filters: \n- Build",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "Filters are mutually exclusive. Click a filter button of a one column and a filter dialogue occurs. Select a filter item. The filter result would be showed. Then select another filter item of another column and the previously applied filter is overridden by the newly selected filter when a filter from a different column is applied to the table. In this state, we show some help text next to the \"Apply\" button, saying \"You can only apply one filter to the table. This filter will override the current filter.\"",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "Filters are overridden by search. Run a search query and you can see previous filter results are overridden by the results of the search query.",
+          "expected_results": ""
+        }
+      },
+      "summary": "Software_recipes:_Filter_the_contents_of_the_software_recipes_table"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Test_the_packages_included_in_the_image",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start Toaster.",
+          "expected_results": "Toaster starts. \n"
+        },
+        "2": {
+          "action": " Click on new project button.",
+          "expected_results": " Open create a new project page. \n"
+        },
+        "3": {
+          "action": " Enter a project name, select a release and click on create project.",
+          "expected_results": " Project Created. \n"
+        },
+        "4": {
+          "action": " Build a recipe (ex: core-image-minimal) and wait until build finish.",
+          "expected_results": " Build finishes successfully. \n"
+        },
+        "5": {
+          "action": " Click on the built recipe.",
+          "expected_results": " Open build summary page. \n"
+        },
+        "6": {
+          "action": " Under IMAGES tab click on the recipe built.",
+          "expected_results": "Image page open. \n"
+        },
+        "7": {
+          "action": "Click on a package name.",
+          "expected_results": "Open the package page. \n"
+        },
+        "8": {
+          "action": "Under file title click on the link to file.",
+          "expected_results": "You are redirected to directory structure and you can see where the file is located."
+        }
+      },
+      "summary": "Test_the_packages_included_in_the_image"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Test_the_filters_from_a_image_page",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": " Start Toaster.",
+          "expected_results": "Toaster starts. \n"
+        },
+        "2": {
+          "action": " Click on new project button.",
+          "expected_results": " Open create a new project page. \n"
+        },
+        "3": {
+          "action": " Enter a project name, select a release and click on create project.",
+          "expected_results": " Project Created. \n"
+        },
+        "4": {
+          "action": " Build a recipe (ex: core-image-minimal) and wait until build finish.",
+          "expected_results": " Build finishes successfully. \n"
+        },
+        "5": {
+          "action": " Click on the built recipe.",
+          "expected_results": " Open build summary page. \n"
+        },
+        "6": {
+          "action": "Click on Configuration - Bitbake Variables.",
+          "expected_results": "Open bitbake variables page. \n"
+        },
+        "7": {
+          "action": "Test Description filter. ",
+          "expected_results": "Filter works ok. (filter returns only items that match the selected criteria) "
+        }
+      },
+      "summary": "Test_the_filters_from_a_image_page"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Test_dependencies_link",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": " Start Toaster.",
+          "expected_results": "Toaster starts. \n"
+        },
+        "2": {
+          "action": " Click on new project button.",
+          "expected_results": " Open create a new project page. \n"
+        },
+        "3": {
+          "action": " Enter a project name, select a release and click on create project.",
+          "expected_results": " Project Created. \n"
+        },
+        "4": {
+          "action": " Build a recipe (ex: core-image-minimal) and wait until build finish.",
+          "expected_results": " Build finishes successfully. \n"
+        },
+        "5": {
+          "action": " Click on the built recipe.",
+          "expected_results": " Open build summary page. \n"
+        },
+        "6": {
+          "action": "Click on recipes tab.",
+          "expected_results": "Open recipes page. \n"
+        },
+        "7": {
+          "action": "Click on edit columns and select Dependencies.",
+          "expected_results": "Dependencies column is shown in the table. \n"
+        },
+        "8": {
+          "action": "Click on a number of dependencies.",
+          "expected_results": "A pop up with dependencies will appear. \n"
+        },
+        "9": {
+          "action": "Click on a dependency. ",
+          "expected_results": "Open recipe dependency page. "
+        }
+      },
+      "summary": "Test_dependencies_link"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Test_recipe_file_link",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start Toaster. \n\n\t",
+          "expected_results": "Toaster starts. \n\n\t"
+        },
+        "2": {
+          "action": " Click on new project button. \n\n\t",
+          "expected_results": " Open create a new project page. \n\n\t"
+        },
+        "3": {
+          "action": " Enter a project name, select a release (ex: master) and click on create project. \n\n\t",
+          "expected_results": " Project Created. \n\n\t"
+        },
+        "4": {
+          "action": "Click on Image recipes tab. \n\n\t",
+          "expected_results": "Open Compatible image recipes table. \n\n\t"
+        },
+        "5": {
+          "action": "Click on edit columns and select recipe file. \n\n\t",
+          "expected_results": "Recipe file column appears in the table. \n\n\t"
+        },
+        "6": {
+          "action": "Click on the blue button near a recipe file. \n\n\t",
+          "expected_results": ""
+        },
+        "7": {
+          "action": "Repet steps - 4 to 6 for software recipes.",
+          "expected_results": ""
+        }
+      },
+      "summary": "Test_recipe_file_link"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.See_packages_size",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start Toaster. \n\n\t",
+          "expected_results": " Toaster starts. \n\n\t"
+        },
+        "2": {
+          "action": " Click on new project button. \n\n\t",
+          "expected_results": " Open create a new project page. \n\n\t"
+        },
+        "3": {
+          "action": " Enter a project name, select a release and click on create project. \n\n\t",
+          "expected_results": " Project Created. \n\n\t"
+        },
+        "4": {
+          "action": " Build a recipe (ex: core-image-minimal) and wait until build finish. \n\n\t",
+          "expected_results": " Build finishes successfully. \n\n\t"
+        },
+        "5": {
+          "action": " Click on the built recipe. \n\n\t",
+          "expected_results": " Open build summary page. \n\n\t"
+        },
+        "6": {
+          "action": "Click on packages tab. \n\n\t",
+          "expected_results": "Open packages page. \n\n\t"
+        },
+        "7": {
+          "action": "Click on size to sort the table. ",
+          "expected_results": "You can check the size of each package. \n\nWhen you click on 'Size' the first time, the correct sorting is the inverse one (biggest package on top). Clicking a second time will invert the sorting (you'll see packages with 0 B size on top)."
+        }
+      },
+      "summary": "See_packages_size"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Build_multiple_recipes",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": " Start Toaster. \n\n\t",
+          "expected_results": " Toaster starts. \n\n\t"
+        },
+        "2": {
+          "action": " Click on new project button. \n\n\t",
+          "expected_results": " Open create a new project page. \n\n\t"
+        },
+        "3": {
+          "action": " Enter a project name, select a release and click on create project. \n\n\t",
+          "expected_results": " Project Created. \n\n\t"
+        },
+        "4": {
+          "action": " Build a multiple recipes (ex: \"core-image-minimal core-image-sato\") and wait until build finish. ",
+          "expected_results": "Builds finishes successfully. \n\nYou can build multiple recipes with toaster"
+        }
+      },
+      "summary": "Build_multiple_recipes"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Build_a_recipe_with_different_distro",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": " Start Toaster. \n\n\t",
+          "expected_results": " Toaster starts. \n\n\t"
+        },
+        "2": {
+          "action": " Click on new project button. \n\n\t",
+          "expected_results": " Open create a new project page. \n\n\t"
+        },
+        "3": {
+          "action": " Enter a project name, select a release and click on create project. \n\n\t",
+          "expected_results": " Project Created. \n\n\t"
+        },
+        "4": {
+          "action": "From project page click on Bitbake variables tab. \n\n\t",
+          "expected_results": "Open Bitbake variables page. \n\n\t"
+        },
+        "5": {
+          "action": "Click on change button for distro. \n\n\t",
+          "expected_results": "A type in form appears. \n\n\t"
+        },
+        "6": {
+          "action": "Change distro (ex: poky-lsb). \n\n\t",
+          "expected_results": "Distro has changed. \n\n\t"
+        },
+        "7": {
+          "action": "Add specific layers for distro (meta-qt3, meta-qt4) \n\t\n\t",
+          "expected_results": "Layers added to the project \n\n\t"
+        },
+        "8": {
+          "action": " Build a recipe (ex: core-image-minimal) and wait until build finish.",
+          "expected_results": "Build finishes successfully. \n\nThe 'success' criteria for this one should be that the build is reported as using the poky-lsb distro in the build summary page, and that the DISTRO variable value in the bitbake variables table is set to the value specified in toaster (poky-lsb again)."
+        }
+      },
+      "summary": "Build_a_recipe_with_different_distro"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Test_package_format_-_ipk_rpm_deb",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": " Start Toaster. \n\n\t",
+          "expected_results": " Toaster starts. \n\n\t"
+        },
+        "2": {
+          "action": " Click on new project button. \n\n\t",
+          "expected_results": " Open create a new project page. \n\n\t"
+        },
+        "3": {
+          "action": " Enter a project name, select a release and click on create project. \n\n\t",
+          "expected_results": " Project Created. \n\n\t"
+        },
+        "4": {
+          "action": "From the project page click on bitbake variables tab. \n\n\t",
+          "expected_results": "Open bitbake variables page. \n\n\t"
+        },
+        "5": {
+          "action": "Click on change button near PACKAGE_CLASSES and select all the package formats (rpm, deb, ipk). \n\n\t",
+          "expected_results": "Package classes selected. \n\n\t"
+        },
+        "6": {
+          "action": "Build a recipe (ex: core-image-minimal) and wait until build finish.",
+          "expected_results": "Build finishes successfully.\nYou can see the package classes in the build summary page."
+        }
+      },
+      "summary": "Test_package_format_-_ipk_rpm_deb"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Test_IMAGE_INSTALL_append_variable",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start Toaster. \n\n",
+          "expected_results": " Toaster starts. \n\n\t"
+        },
+        "2": {
+          "action": " Click on new project button. \n\n",
+          "expected_results": " Open create a new project page. \n\n\t"
+        },
+        "3": {
+          "action": " Enter a project name, select a release and click on create project. \n\n",
+          "expected_results": " Project Created. \n\n\t"
+        },
+        "4": {
+          "action": "From the project page click on bitbake variables tab. \n\n",
+          "expected_results": "Open bitbake variables page. \n\n\t"
+        },
+        "5": {
+          "action": "Click on change button for IMAGE_INSTALL_append and add a variable (ex: acpid). \n\n",
+          "expected_results": "Variable added. \n\n\t"
+        },
+        "6": {
+          "action": "Build a recipe (ex: core-image-minimal) and wait until build finish. \n\n",
+          "expected_results": "Build finishes successfully. \n\n\t"
+        },
+        "7": {
+          "action": "After build finishes go to build page. \n\n",
+          "expected_results": "Open build summary page. \n\n\t"
+        },
+        "8": {
+          "action": "Go to package tab and search for acpid.",
+          "expected_results": "You should get results for ssh packages."
+        }
+      },
+      "summary": "Test_IMAGE_INSTALL_append_variable"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.New_custom_image:_default_view",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Access a project page, either by creating a new project or accessing an existing project from the \"All projects\" table.  \n\n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "On the project page click on the \"New custom image\" link situated on the left-hand side, near Configuration, builds, import layer \n\n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Check that the table is populated with the list of image recipes (eg. core-image minimal, core-image-lsb) \n\n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": " Check that by default the following columns are shown: Image recipe, Version, Description, Layer, Customise  \n\n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "From the \"Edit columns\" menu, activate the: Recipe file, Section, License, Git revision \n\n\n",
+          "expected_results": ""
+        },
+        "6": {
+          "action": "Check that the \"Git revision\" entries match the release entry from the main project page, in the project details section. \n\n\n",
+          "expected_results": ""
+        },
+        "7": {
+          "action": "Check that the image recipes provided by layers added to the project show a 'customise' button, while image recipes provided by layers not added to the project show an 'add layer' button ",
+          "expected_results": ""
+        }
+      },
+      "summary": "New_custom_image:_default_view"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.New_custom_image:_sorting_the_content_of_new_custom_image_table",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Access a project page, either by creating a new project or accessing an existing project from the \"All projects\" table. \n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "On the project page click on the \"New custom image\" link situated on the left-hand side, near Configuration, builds, import layer  \n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Make sure that the table is sorted on the ‘Image recipe’ column by default in ascending order.  \n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "Clicking on Image recipe should revert the sorting. (from 'a to z' changes to 'z to a')  \n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "From the \"Edit columns\" menu activate all the columns. Check that ‘Image recipe’ and ‘Customise’ columns cannot be unchecked. \n\n",
+          "expected_results": ""
+        },
+        "6": {
+          "action": "Check that Image recipe, Section, Layer and License are the only sortable table heads.  \n\n",
+          "expected_results": ""
+        },
+        "7": {
+          "action": "Sort the table by \"Layer\" and then navigate away by selecting an image (such as core-image-lsb). When you click the \"back\" button in the web-browser to go back, the \"New custom image\" table should still be sorted by \"Layer\".  \nThis should apply also by navigating back to the page by any other means. \n\n",
+          "expected_results": ""
+        },
+        "8": {
+          "action": "Sorting and \"Edit columns\" menu: If you use the \"Edit columns\" menu to hide the column with the applied sorting, we revert the sorting to the default sorting (i.e. \"Image recipe\"). The default sorting always uses one of the core columns, which cannot be hidden using the \"Edit columns\" menu  \n\n",
+          "expected_results": ""
+        },
+        "9": {
+          "action": "Sorting and search: Searching should have no impact on the applied sorting. Any results returned should be sorted by the sorting criteria selected when the search query was submitted. Sort recipes by \"Layer\" column heading. Input a string (such as \"core-image\") in search box and click search button. Make sure results returned are sorted by \"Layer\".",
+          "expected_results": "N/A"
+        }
+      },
+      "summary": "New_custom_image:_sorting_the_content_of_new_custom_image_table"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.New_custom_image:_searching_the_content_of_new_custom_image_table",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Access a project page, either by creating a new project or accessing an existing project from the \"All projects\" table. \n \n\n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "On the project page click on the \"New custom image\" link situated on the left-hand side, near Configuration, builds, import layer  \n \n\n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Check that the search is made of a text input field and a \"Search\" button in a toolbar above the table. When no search query has been entered, the text input field should show the following placeholder text: \"Search select the image recipe you want to customise\" \n  \n\n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "Input \"core\" in the text input field. The placeholder text disappears when the first character is typed. Click search button. \n \n\n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "The search string is kept in the text input field. The results returned occur. Click \"Clear search\" icon to clear the search and display the image recipes.  If your search query returns no results, we show you an alert with a search form and an option to show all image recipes. Check that \"show all\" link is available.  \n\n\n",
+          "expected_results": ""
+        },
+        "6": {
+          "action": "Search, sorting and \"Edit columns\": Searching does not change the state of the table: the same columns remain hidden and the same sorting applied when search results are displayed, but filters are cleared by the search results. Search a string and make sure that the same columns remain hidden and the same sorting applied.  \n\n\n",
+          "expected_results": ""
+        },
+        "7": {
+          "action": "Search and filters \n \n\t•\tThe scope of the filters is the content currently on the table (this means all table pages, not only the one displayed). The scope of the search is always the content of the database.  \n\n\n",
+          "expected_results": ""
+        },
+        "8": {
+          "action": "If I run a search query, any filter applied afterwards will filter the content returned by the search query. \tIf I run a search query while a filter is applied, the filter is cleared by the results of the search query (i.e. we display the results of the search query and clear the filter applied beforehand). The same happens if I click the \"Clear search\" icon when a filter is applied to a set of search results (both search results and applied filter are cleared, and the table shows all the targets). ",
+          "expected_results": "\n  \n"
+        }
+      },
+      "summary": "New_custom_image:_searching_the_content_of_new_custom_image_table"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.New_custom_image:_Filter_the_contents_of_the_new_custom_image_table",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Access a project page, either by creating a new project or accessing an existing project from the \"All projects\" table. \n\n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "On the project page click on the \"New custom image\" link situated on the left-hand side, near Configuration, builds, import layer  \n\n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Make sure the following table column has filters: Customise  \n\n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "Click the filter button in the \"Customise\" column and a filter dialogue comes up. Select a filter option. The filter results should be showed. \n\n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "Filters are overridden by search. Run a search query and you can see previous filter results are overridden by the results of the search query.",
+          "expected_results": "N/A"
+        }
+      },
+      "summary": "New_custom_image:_Filter_the_contents_of_the_new_custom_image_table"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Create_new_custom_image",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Access a project page, either by creating a new project or accessing an existing project from the \"All projects\" table. \n \n\n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "On the project page click on the \"New custom image\" link situated on the left-hand side, near Configuration, builds, import layer \n\n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Search for rpi-basic-image, click on 'add layer' button. Make sure a \"layer added\" notification shows and a \"customise\" button is displayed. Click the \"customise\" button, type a name for you new custom image and click on create custom image. \n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "Verify that image was created: when you create the custom image you will be redirected to the custom image details page, and a notification at the top of the page should tell you: ‘Your custom image X has been created. You can now add or remove packages as needed. \n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "If you select an image that has not been built beforehand you should not see the 'add / remove' packages table until you build the image. \n\n",
+          "expected_results": ""
+        },
+        "6": {
+          "action": "If you select an image that has been built beforehand you should see the 'add / remove' packages table when you create the custom image. ",
+          "expected_results": "N/A"
+        }
+      },
+      "summary": "Create_new_custom_image"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Custom_image_page_details",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "After you create a new custom image  go to the custom image page, by clicking on the custom image.   \n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Breadcrumbs  \n \n\t * Observe that the 3 breadcrumbs at the top left are:  \n \n\t\ta live link that will take you back to the project page \n\t\tCustom images: a live link that will take you back to the custom images table \n\t\timage name(toaster-custom-images): the name of the current custom image (not a link)  \n \n\n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Observe the 2 buttons build Custom image and Download recipe file  \n \n\ti.\tTest this 2 buttons \n\tii.\tYou should always be able to build the custom image, but you only should be able to download the recipe file when the package content of the custom image is known. When you cannot download the recipe file, the 'download' button at the top of the page is disabled, and the right hand column does not show information about the recipe file.  \n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "Observe that there is a right-hand box, with information about the images  \n \n\ti.\tThere is a number of packages included in the custom image \n\tii.\tApprox package size \n \n\tiii.\tLayer \n \n\tiv.\tImage based on \n \n\tv.\tRecipe file (only when you can download it_ \n\tvi.\tVersion \n \n\tvii.\tLicense  \n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "Observe that the page includes a table with packages and you can add or remove packages from the custom image. The packages table only appears when: \n\na) the image recipe you chose as your base image when creating the custom image has been built within the project \n\nb) the custom image itself has been built \n\nIf no packages table shows, you see a notification with a build button instead. ",
+          "expected_results": "N/A"
+        }
+      },
+      "summary": "Custom_image_page_details"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Custom_image_page_–_Add_|_Remove_packages_table",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "After you create a new custom image  go to the custom image page, by clicking on the custom image.  \n\n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Make sure that the table is sorted on the ‘Package’ column by default in ascending order.   \n\n\n",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Check that by default the following columns are shown: Package, Package Version, Approx Size  \n\n\n",
+          "expected_results": ""
+        },
+        "4": {
+          "action": "From the \"Edit columns\" menu, activate the: License, Recipe, Recipe version and Reverse dependencies columns  \n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "Check that ‘Package’, Approx Size, License, Recipe are the only sortable table heads.   \n\n",
+          "expected_results": ""
+        },
+        "6": {
+          "action": "Sorting and \"Edit columns\": If you use the \"Edit columns\" menu to hide the column with the applied sorting, we revert the sorting to the default sorting (i.e. \"Package\"). The default sorting always uses one of the core columns, which cannot be hidden using the \"Edit columns\" menu   \n\n",
+          "expected_results": ""
+        },
+        "7": {
+          "action": "Sorting and search: Searching should have no impact on the applied sorting. Any results returned should be sorted by the sorting criteria selected when the search query was submitted. Sort recipes by \"Recipe\" column heading. Input a string (such as \"acl\") in search box and click search button. Make sure results returned are still sorted by \"Recipe\".   \n\n",
+          "expected_results": ""
+        },
+        "8": {
+          "action": "Click \"Clear search\" icon to clear the search and display the Packages.   \n\n",
+          "expected_results": ""
+        },
+        "9": {
+          "action": "Make sure the following table column has filters: Add | Remove (Click on 'Edit custom image' in the left pane of the custom image)  \n\n1",
+          "expected_results": ""
+        },
+        "10": {
+          "action": "Click the filter button: a filter dialogue displays. Select a filter option. The filter results should be showed.  \n\n1",
+          "expected_results": ""
+        },
+        "11": {
+          "action": "Filters are overridden by search. Run a search query and you can see previous filter results are overridden by the results of the search query.  \n\n1",
+          "expected_results": ""
+        },
+        "12": {
+          "action": "This page needs a special no results message for the search. You can see in the doc attached to\nhttps://bugzilla.yoctoproject.org/show_bug.cgi?id=9154   \n\nTo test it, enter a random string in the search input field (something like \"bbb\") and click the 'search' button. The special no results message includes the following:  \n\na) instructions about searching and building recipes in order to generate new packages  \n\nb) a search text input field with the search string you typed, a 'clear' icon and a search button. Click the 'clear' icon: the search field should be cleared and the full list of packages should be shown.  \n\nc) a 'show all packages' link. Click the link: the search field should be cleared and the full list of packages should be shown.  ",
+          "expected_results": "N/A"
+        }
+      },
+      "summary": "Custom_image_page_–_Add_|_Remove_packages_table"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Adding_packages_without_dependencies_from_custom_images",
+      "author": [
+        {
+          "email": "libertad.gonzalez.de.la.cruz@intel.com",
+          "name": "libertad.gonzalez.de.la.cruz@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Access a project page, either by creating a new project or accessing an existing project from the \"All projects\" table. \n\n    ",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "On the project page click on the \"New custom image\" link situated on the left-hand side, near Configuration, builds, import layer  \n\n\n    ",
+          "expected_results": " "
+        },
+        "3": {
+          "action": "Choose an image recipe example:(core-image-sato) and click on the customise button on the far right (note if that layer is not added the button will say +Add layer, add it and then customise) \n\n\n    ",
+          "expected_results": " A pop out should appear and you should get to give the new image a customized name. Then you will be redirected to a page of Add|Remove Packages. If this image has not been build it will not have packages.\n\n"
+        },
+        "4": {
+          "action": "Build the new image if it has not been build, else start adding packages without dependencies example: attr-doc \n\n    \n    ",
+          "expected_results": "You should get a message in blue that says \"You have added 1 package to $image-custom-name: $package-name\" "
+        },
+        "5": {
+          "action": "Build the image again.\n",
+          "expected_results": "Expected Result on step 5: the packages you have added should be installed in the image."
+        }
+      },
+      "summary": "Adding_packages_without_dependencies_from_custom_images"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Removing_packages_without_and_with_dependencies__from_custom_images",
+      "author": [
+        {
+          "email": "libertad.gonzalez.de.la.cruz@intel.com",
+          "name": "libertad.gonzalez.de.la.cruz@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Access a project page, either by creating a new project or accessing an existing project from the \"All projects\" table. \n\n    ",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "On the project page click on the \"New custom image\" link situated on the left-hand side, near Configuration, builds, import layer  \n\n\n\n    ",
+          "expected_results": " A pop out should appear and you should get to give the new image a customized name. Then you will be redirected to a page of Add|Remove Packages. If this image has not been build it will not have packages. \n\n"
+        },
+        "3": {
+          "action": "Choose an image recipe example:(core-image-sato) and click on the customise button on the far right (note if that layer is not added the button will say +Add layer, add it and then customise) \n\n\n\n    ",
+          "expected_results": "A pop out should appear and you should get to give the new image a customized name. Then you will be redirected to a page of Add|Remove Packages. If this image has not been build it will not have packages.\n\n"
+        },
+        "4": {
+          "action": "Build the new image if it has not been build else start removing a packages (click on 'Edit custom image' in the left pane of the custom image) that have dependencies and packages that have no dependencies that are already included by clicking on the red button \"Remove Package\" \n\n\n    \n    ",
+          "expected_results": "You should get a message in blue that says \"You have removed 1 package to $image-custom-name: $package-name\" "
+        },
+        "5": {
+          "action": "Build the image again.",
+          "expected_results": "the packages you have removed should not be installed in the image."
+        }
+      },
+      "summary": "Removing_packages_without_and_with_dependencies__from_custom_images"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Adding_packages_with_dependencies",
+      "author": [
+        {
+          "email": "libertad.gonzalez.de.la.cruz@intel.com",
+          "name": "libertad.gonzalez.de.la.cruz@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Access a project page, either by creating a new project or accessing an existing project from the \"All projects\" table. \n\n    ",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "On the project page click on the \"New custom image\" link situated on the left-hand side, near Configuration, builds, import layer  \n\n\n    ",
+          "expected_results": " "
+        },
+        "3": {
+          "action": "Choose an image recipe example:(core-image-sato) and click on the customise button on the far right (note if that layer is not added the button will say +Add layer, add it and then customise) \n\n\n    ",
+          "expected_results": "A pop out should appear and you should get to give the new image a customized name. Then you will be redirected to a page of Add|Remove Packages. If this image has not been build it will not have packages."
+        },
+        "4": {
+          "action": "Build the new image if it has not been build else start adding packages that have dependencies ( you will be able to see in the dependencies column a little square with a number, that tells you the dependencies it holds) example: libattr this holds 2 dependencies( bash and glibc) ",
+          "expected_results": " You should get a pop-out that that say \"$package_name dependencies\" then it should list the dependencies. Once clicked on the add packages button it should add the packages listed in the pop-out."
+        },
+        "5": {
+          "action": "Build the image again.",
+          "expected_results": ""
+        }
+      },
+      "summary": "Adding_packages_with_dependencies"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Create_Project",
+      "author": [
+        {
+          "email": "libertad.gonzalez.de.la.cruz@intel.com",
+          "name": "libertad.gonzalez.de.la.cruz@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start toaster",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Create a toaster project by issuing a name and selecting a release version.",
+          "expected_results": "Once project is created it should redirect you to a new project configuration page"
+        },
+        "3": {
+          "action": "Check that the h1 page title is set to the name the user typed in the new project form. ",
+          "expected_results": ""
+        }
+      },
+      "summary": "Create_Project"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Verify_project_detail_page_left_bar_menu",
+      "author": [
+        {
+          "email": "libertad.gonzalez.de.la.cruz@intel.com",
+          "name": "libertad.gonzalez.de.la.cruz@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start toaster",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Create a toaster project \n    \n",
+          "expected_results": "Once project is created it should redirect you to a new project configuration page. \n\n"
+        },
+        "3": {
+          "action": "Check the page contains the tabs \n    Configuration ---> selected by default \n    Compatible Metadata (separation label) \n    Custom images \n    Image recipes \n    Software recipes \n    Machines \n    Layers \n    Extra Configuration (separation label) \n    BitBake variables \n\n",
+          "expected_results": " All elements are present. \n\n"
+        },
+        "4": {
+          "action": "Click on each element to see if the h2 title is changing to the respective link clicked. Example if clicked on \"Custom Images\" then the h2 title should change to \"Custom images\"",
+          "expected_results": "All elements are clickable and h2 title changes to the corresponding title.."
+        }
+      },
+      "summary": "Verify_project_detail_page_left_bar_menu"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Configuration_information_of_Project_Detail_page",
+      "author": [
+        {
+          "email": "libertad.gonzalez.de.la.cruz@intel.com",
+          "name": "libertad.gonzalez.de.la.cruz@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Clone Poky and start toaster \n\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Create a master toaster project \n    \n",
+          "expected_results": "Once project is created it should redirect you to a new project configuration page \n\n"
+        },
+        "3": {
+          "action": "Check that the configuration button on the left side bar is selected by default \n\n",
+          "expected_results": " Expected result step 3 & 4: The configuration link next to the build link should be selected see attachment.  \n\n\n\n"
+        },
+        "4": {
+          "action": "The configuration details should include canvas: \n    Machine \n    Most built recipes \n    Layers \n    Project Release ",
+          "expected_results": "Expected result step 4: A machine must always be set. \n\nThe default layers specified in the Toaster configuration must always be listed in the layer section (in our case, for the poky configuration we should have openembedded-core, meta-poky and meta-yocto-bsp)"
+        }
+      },
+      "summary": "Configuration_information_of_Project_Detail_page"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Verify_Machine_information_of_project_detail_page",
+      "author": [
+        {
+          "email": "libertad.gonzalez.de.la.cruz@intel.com",
+          "name": "libertad.gonzalez.de.la.cruz@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start toaster",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Create a toaster project \n    \n",
+          "expected_results": "Expected result step 2: Once project is created it should redirect you to a new project Configuration page \n\n"
+        },
+        "3": {
+          "action": "The configuration details should include a label in bold font that says: \n    Machine: this canvas should have the machine label type under it and an editing button on the side ",
+          "expected_results": "Expected result step 3: Compare to the attached snapshot. The machine must always be set."
+        }
+      },
+      "summary": "Verify_Machine_information_of_project_detail_page"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Verify_most_built_recipes_information_of_the_project_detail_page",
+      "author": [
+        {
+          "email": "libertad.gonzalez.de.la.cruz@intel.com",
+          "name": "libertad.gonzalez.de.la.cruz@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start toaster ",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Create a toaster project \n    \n",
+          "expected_results": "Expected result step 2: Once project is created it should redirect you to a new project configuration page "
+        },
+        "3": {
+          "action": "The configuration details should include a label in bold font that says: \n    Most built recipes: In this canvas one of the following information should show:  \n\n            a) If there has been no built recipes it should have a label that says: \n                             \"You haven't built any recipes yet, choose a recipe to build\"  \n\n            b) Else it should have a list of built recipes and a check box in front of it. So that it could be selected and built again ",
+          "expected_results": "Expected result step a: See ProjectDetailPage2.png attachment.\n\nExpected result step b: See ProjectDetailPage.png attachment."
+        }
+      },
+      "summary": "Verify_most_built_recipes_information_of_the_project_detail_page"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Verify_project_release_information_on_project_detail_page",
+      "author": [
+        {
+          "email": "libertad.gonzalez.de.la.cruz@intel.com",
+          "name": "libertad.gonzalez.de.la.cruz@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start toaster",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Create a toaster project \n    \n",
+          "expected_results": "Expected result step 2: Once project is created it should redirect you to a new project configuration page. "
+        },
+        "3": {
+          "action": "The configuration details should include a label in bold font that says: \n         Project release: this canvas should also have a label that show the release project you chose at the beginning.",
+          "expected_results": "Expected result step 3: See attachment ProjectDetailPage.jnp."
+        }
+      },
+      "summary": "Verify_project_release_information_on_project_detail_page"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Verify_layer_information_of_the_project_detail_page",
+      "author": [
+        {
+          "email": "libertad.gonzalez.de.la.cruz@intel.com",
+          "name": "libertad.gonzalez.de.la.cruz@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Clone the poky environment     git clone http://git.yoctoproject.org/git/poky",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Start toaster",
+          "expected_results": "Expected result step 2: Once project is created it should redirect you to a new project configuration page. \n\n"
+        },
+        "3": {
+          "action": "Create a toaster project \n    \n",
+          "expected_results": "Expected result step 3: See attachment of layerCanvas.png\n"
+        },
+        "4": {
+          "action": "The configuration details should include a label with bold font that says: \n       Layer:  this canvas should have 3 layers listed by default (openembedded-core, meta-poky, and meta-yocto-bsp).  \n       Each layer should have a trashcan icon at the side that can be used to erase the label from the project. \n        The layer canvas should have a text box with the text \"type a layer name\" a button \"Add layer\" next to it. \n        just underneath a \"view compatible layer | import layer\" link. ",
+          "expected_results": ""
+        }
+      },
+      "summary": "Verify_layer_information_of_the_project_detail_page"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Verify_project_detail_links",
+      "author": [
+        {
+          "email": "libertad.gonzalez.de.la.cruz@intel.com",
+          "name": "libertad.gonzalez.de.la.cruz@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start toaster ",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Create a toaster project \n\n",
+          "expected_results": "Expected result step 2: Once project is created it should redirect you to a new project configuration page.  \n\n"
+        },
+        "3": {
+          "action": "The configuration details should include \n    4 links, starting in the upper left side the Configuration link, Builds(#) link, Import layer link, and the New custom image link. \n\n    ",
+          "expected_results": "Expected result step 3: All links should be clickable and should have information or tables, or forms. see attachment projectDetailLinks.png"
+        }
+      },
+      "summary": "Verify_project_detail_links"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Verify_build_texbox_exists_and_works",
+      "author": [
+        {
+          "email": "libertad.gonzalez.de.la.cruz@intel.com",
+          "name": "libertad.gonzalez.de.la.cruz@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start toaster",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Create a toaster project \n    \n",
+          "expected_results": " Once project is created it should redirect you to a new project configuration page.  \n\n\n"
+        },
+        "3": {
+          "action": "The configuration details should include \n    After the 4 links (Configuration, Build(#), Import layer & New custom image)  at the far right there should be a textbox with the label that says....\"Type the recipe you want to build\"  and a button \"Build\" \n\n",
+          "expected_results": "See attachment buildTXT.png, The build button should be disabled whenever the text input field is empty, so that you cannot start a build with a blank target  \n\n"
+        },
+        "4": {
+          "action": "Type in the textbox an image you would like to build example (core-image-minimal) and click the build button.\n\n",
+          "expected_results": " Image starts building. Whenever there is information in the image recipes and software recipes tables, the text input field should present suggestions from the list of recipes provided by the layers in the \"layers\" list. The suggestions contain the string typed in the input field, and update as you type. They appear on typing the second character. A maximum of 8 suggestions can be shown. They are sorted as follows: first recipes starting with the string, in alphabetical order; then recipes containing the string, also in alphabetical order  \n\n\nWhen you click the build button you are brought to the \"Builds\" tab, and a new build in progress appears at the top of the \"Latest project builds\" section"
+        }
+      },
+      "summary": "Verify_build_texbox_exists_and_works."
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Veryfing_the_builds_link_show_proper_information",
+      "author": [
+        {
+          "email": "libertad.gonzalez.de.la.cruz@intel.com",
+          "name": "libertad.gonzalez.de.la.cruz@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start toaster",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Create a toaster project \n \n",
+          "expected_results": " Once project is created it should redirect you to a new project configuration page. \n\n\n"
+        },
+        "3": {
+          "action": "The configuration details should include \n    A builds tab that when clicking on, it should display one of the following: \n       \n\n        a) A label that says \"Latest project builds\"  then a label with \"All project builds\" \n                   If you have a finished build or there is an ongoing builds then: \n                           You should see a progress bar of the ongoing builds in the project. \n                            You should see a table with the already done builds in the project. \n\n\n        b) \"All project builds\" and a search textbox with a button nothing else only if there are no builds done in the project \n        ",
+          "expected_results": "Expected result for step a):  See ExistingBuilds.png attachment. \n\n\nExpected result for step b): See ZeroBuilds.png attachment. "
+        }
+      },
+      "summary": "Veryfing_the_builds_link_show_proper_information"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Verify_that_the_Import_layer_link_shows_the_form",
+      "author": [
+        {
+          "email": "libertad.gonzalez.de.la.cruz@intel.com",
+          "name": "libertad.gonzalez.de.la.cruz@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start toaster",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Create a toaster project \n\n",
+          "expected_results": "  Once project is created it should redirect you to a new project configuration page. \n\n\n"
+        },
+        "3": {
+          "action": "The configuration details should include \n    An Import layer link  that when clicking on, it should display: \n          A label that says \"Layer repository information\" \n          A label that says \"The layer you are importing must be compatible with Yocto Project master, which is the release you are using in this project.\" \n        Form composed of the following elements: \n            Layer name : textbox \n            Git repository URL : textbox \n            Repository subdirectory (optional) : textbox \n            Git revision : textbox \n            Layer dependencies (optional) : \"openembedded-core\" link and (trash icon), textbox and \"Add layer\" button \n            Import and add to project : button",
+          "expected_results": " See attachment ImportLayerForm.png"
+        }
+      },
+      "summary": "Verify_that_the_Import_layer_link_shows_the_form"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Verify_that_New_Custom_Image_link_works_and_shows_information",
+      "author": [
+        {
+          "email": "libertad.gonzalez.de.la.cruz@intel.com",
+          "name": "libertad.gonzalez.de.la.cruz@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start toaster",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Create a toaster project \n\n",
+          "expected_results": " Once project is created it should redirect you to a new project configuration page \n\n\n"
+        },
+        "3": {
+          "action": "The configuration details should include  \n    A \"New custom image\" tab that when clicking on, it should display: \n        a Title label that says: \"Select the image recipe you want to customise(#number_or_recipes_available)\" \n        A search textbox with the label of: \"Search and select the image recipe you want to customise\" \n        A \"Search button\" \n        A \"Edit columns\" button \n        A table that will display the customise images available ",
+          "expected_results": "See attachment CustomImage.png"
+        }
+      },
+      "summary": "Verify_that_New_Custom_Image_link_works_and_shows_information"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Verify_most_built_recipe_shows_a_maximum_of_5_recipes",
+      "author": [
+        {
+          "email": "libertad.gonzalez.de.la.cruz@intel.com",
+          "name": "libertad.gonzalez.de.la.cruz@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start toaster",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Create a toaster project",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Build 6 recipes example (core-image-sato, core-image-minimal, core-image-base, core-image-lsb, core-image-clutter) to name a few. ",
+          "expected_results": " All recipes are built correctly \n\n"
+        },
+        "4": {
+          "action": "Wait for the recipes to finish ",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "Go to the configuration details.",
+          "expected_results": " You should see 5 of the 6 recipes that were build. If you order the recipes in alphabetical order you should see that the first 5 made the list. "
+        }
+      },
+      "summary": "Verify_most_built_recipe_shows_a_maximum_of_5_recipes"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Verify_order_sequence_of_listing_in_Most_build_recipes",
+      "author": [
+        {
+          "email": "libertad.gonzalez.de.la.cruz@intel.com",
+          "name": "libertad.gonzalez.de.la.cruz@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start toaster",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Create a toaster project",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Build 6 recipes example (core-image-sato, core-image-minimal, core-image-base, core-image-lsb, core-image-clutter) to name a few. \n\n",
+          "expected_results": "All recipes are built correctly \n\n"
+        },
+        "4": {
+          "action": "Wait for the recipes to finish \n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "Go to the configuration details. \n\n",
+          "expected_results": " If you order the recipes in alphabetical order you should see that the first 5 made the list. Only 5 out of the 6 should make the list. \n\n"
+        },
+        "6": {
+          "action": "Select the 6th recipe that did not make the list and build it again. ",
+          "expected_results": " Since the 6th recipe is now built twice it should make the list and the recipe in the 5th place should not appear."
+        }
+      },
+      "summary": "Verify_order_sequence_of_listing_in_Most_build_recipes"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Verify_Most_build_recipes_multiple_selection",
+      "author": [
+        {
+          "email": "libertad.gonzalez.de.la.cruz@intel.com",
+          "name": "libertad.gonzalez.de.la.cruz@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start toaster",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Create a toaster project",
+          "expected_results": ""
+        },
+        "3": {
+          "action": "Build 4 recipes example (core-image-sato, core-image-minimal, core-image-base, core-image-lsb, core-image-clutter) to name a few. \n\n",
+          "expected_results": " All recipes are built correctly \n\n"
+        },
+        "4": {
+          "action": "Wait for the recipes to finish. \n\n",
+          "expected_results": ""
+        },
+        "5": {
+          "action": "Go to the configuration details. \n\n",
+          "expected_results": " You should see the 4 recipes in alphabetical order. You should also note that the Build button on the upper right hand corner is disabled since no recipe has been selected. \n\n"
+        },
+        "6": {
+          "action": "Select 1 of the recipes in the most built recipes section. \n\n",
+          "expected_results": "The build button is automatically enabled. \n\n"
+        },
+        "7": {
+          "action": "Select multiple (example 2 or 3) recipes in the most built recipes section. \n\n",
+          "expected_results": " The build button is enabled. \n\n"
+        },
+        "8": {
+          "action": "Click on the build button to start building the recipes.",
+          "expected_results": "One recipe start to build and the others are on queue."
+        }
+      },
+      "summary": "Verify_Most_build_recipes_multiple_selection"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Verify_layer_addition_functionality",
+      "author": [
+        {
+          "email": "libertad.gonzalez.de.la.cruz@intel.com",
+          "name": "libertad.gonzalez.de.la.cruz@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Clone the poky environment     git clone http://git.yoctoproject.org/git/poky",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Start toaster",
+          "expected_results": " Once project is created it should redirect you to a new project configuration page. \n\n"
+        },
+        "3": {
+          "action": "Create a toaster project with master release \n    \n\n",
+          "expected_results": " See attachment of layerCanvas.png \n\n\n"
+        },
+        "4": {
+          "action": "Add  layers by typing the name in the \"Type a layer name\" input box and adding by clicking the button. \n\n",
+          "expected_results": " A list of layers with similar name to the one you are typing should appear, giving you the choice to add it.  The default text \"Type a layer name\" should disappear as soon as you start typing.  \n\n"
+        },
+        "5": {
+          "action": "Add layers by clicking on the View compatible layers link just bellow the input text box. \n\n",
+          "expected_results": "This should redirect you to the compatible layers page where a list of compatible layers should appear and allow you to Add layers to the project. \n\n"
+        },
+        "6": {
+          "action": "Add a layer by importing a layer clicking in the Import layer",
+          "expected_results": "This link should redirect you to the import layer form where you will be able to add layers from git repository or a local directory. \n\n\n"
+        }
+      },
+      "summary": "Verify_layer_addition_functionality"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Verify_delete_layer_functionality",
+      "author": [
+        {
+          "email": "libertad.gonzalez.de.la.cruz@intel.com",
+          "name": "libertad.gonzalez.de.la.cruz@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Clone the poky environment     git clone http://git.yoctoproject.org/git/poky\n",
+          "expected_results": ""
+        },
+        "2": {
+          "action": "Start toaster",
+          "expected_results": " Once project is created it should redirect you to a new project configuration page.\n\n"
+        },
+        "3": {
+          "action": "Create a toaster project master release  \n   \n",
+          "expected_results": "See attachment of layerCanvas.png  \n\n"
+        },
+        "4": {
+          "action": "Remove openembedded-core layer from the project by clicking the trash icon next to it.  \n\n",
+          "expected_results": "The layer should disappear from the list and a notification should appear at the top of the page saying: \"You have removed 1 layer from your project: \".  The layer_name should be a link to the corresponding layer detail page. The layer counter next to the \"layers\" heading should decrease by one. \n"
+        },
+        "5": {
+          "action": "Remove all the layers from the project",
+          "expected_results": " you should see a message that reads:  \n\nYou need to add some layers. For that you can:  \n\n-View all layers compatible with this project  \n\n-Import a layer  \n\n-Read about layers in the documentation  \n\nOr type a layer name below.  \n\n\n The \"Choose from the layers compatible with this project\" link should go to the compatible layers page The \"Import a layer\" link should go to the import layer page The \"Read about layers in the documentation\" link should open in a new window and bring you to http://www.yoctoproject.org/docs/current/dev-manual/dev-manual.html#understanding-and-creating-layers"
+        }
+      },
+      "summary": "Verify_delete_layer_functionality"
+    }
+  },
+  {
+    "test": {
+      "@alias": "toaster-managed-mode.toaster-managed.Download_task_log",
+      "author": [
+        {
+          "email": "alexandru.costinx.roman@intel.com",
+          "name": "alexandru.costinx.roman@intel.com"
+        }
+      ],
+      "execution": {
+        "1": {
+          "action": "Start Toaster. ",
+          "expected_results": "Toaster starts."
+        },
+        "2": {
+          "action": "Click on new project button.\n\n",
+          "expected_results": "Open create a new project page."
+        },
+        "3": {
+          "action": " Enter a project name, select a release and click on create project or select an existing project. \n\n",
+          "expected_results": "Project Created."
+        },
+        "4": {
+          "action": "Build a recipe (ex: core-image-minimal). \n\n",
+          "expected_results": "Build finish."
+        },
+        "5": {
+          "action": "Click on the built recipe. \n\n",
+          "expected_results": "Open build summary page."
+        },
+        "6": {
+          "action": "Click on tasks tab. \n\n",
+          "expected_results": "Open tasks page."
+        },
+        "7": {
+          "action": "Click on a task executed successfully. \n\n",
+          "expected_results": "Open task page."
+        },
+        "8": {
+          "action": "Click on \"Download task log\" button. \n",
+          "expected_results": "You can download the task log. \n"
+        },
+        "9": {
+          "action": "Click on a failed task.  \n",
+          "expected_results": "Open task page, not appear download task \n"
+        }
+      },
+      "summary": "Download_task_log"
+    }
+  }
+]

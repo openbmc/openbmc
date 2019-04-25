@@ -1,0 +1,16 @@
+diff -Naur octave-4.4.1.orig/configure.ac octave-4.4.1/configure.ac
+--- octave-4.4.1.orig/configure.ac	2019-02-23 10:46:24.287240571 +0000
++++ octave-4.4.1/configure.ac	2019-02-23 10:46:42.255249333 +0000
+@@ -762,6 +762,12 @@
+   AC_MSG_ERROR([BLAS and LAPACK libraries are required])
+ fi
+ 
++if ac_fn_f77_try_run "$LINENO"; then :
++  ax_blas_integer_size=8
++else
++  ax_blas_integer_size=4
++fi
++
+ case $ax_blas_integer_size in
+   4)
+     HAVE_64_BIT_BLAS=no

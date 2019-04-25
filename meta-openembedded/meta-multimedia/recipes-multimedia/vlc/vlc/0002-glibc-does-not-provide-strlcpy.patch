@@ -1,8 +1,6 @@
-Index: vlc-2.1.2/src/input/subtitles.c
-===================================================================
---- vlc-2.1.2.orig/src/input/subtitles.c
-+++ vlc-2.1.2/src/input/subtitles.c
-@@ -44,6 +44,12 @@
+--- a/src/input/subtitles.c
++++ b/src/input/subtitles.c
+@@ -42,6 +42,12 @@
  #include "input_internal.h"
  
  /**
@@ -12,6 +10,6 @@ Index: vlc-2.1.2/src/input/subtitles.c
 +#define strlcpy(dst, src, n) *((char* ) mempcpy(dst, src, n)) = '\0'
 +
 +/**
-  * We are not going to autodetect more subtitle files than this.
+  * The possible extensions for subtitle files we support
   */
- #define MAX_SUBTITLE_FILES 128
+ static const char *const sub_exts[] = { SLAVE_SPU_EXTENSIONS, "" };

@@ -12,6 +12,7 @@ PV = "1.1.6-alt2+git${SRCPV}"
 
 SRC_URI = "git://git.altlinux.org/people/ldv/packages/libutempter.git \
            file://0001-Fix-macro-error.patch \
+           file://0002-Proper-macro-path-generation.patch \
            file://libutempter-remove-glibc-assumption.patch \
           "
 

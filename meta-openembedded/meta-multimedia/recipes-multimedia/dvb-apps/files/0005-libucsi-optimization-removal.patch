@@ -1,0 +1,13 @@
+diff -r 3d43b280298c lib/libucsi/endianops.h
+--- a/lib/libucsi/endianops.h	Fri Mar 21 20:26:36 2014 +0100
++++ b/lib/libucsi/endianops.h	Fri Jan 19 06:56:15 2018 +0000
+@@ -33,6 +33,9 @@
+ #define __ucsi_packed __attribute__((packed))
+ 
+ 
++#if __GNUC__ >= 6 + (0 >= __GNUC_MINOR__)
++#pragma GCC optimize ("O1")
++#endif
+ 
+ 
+ #if __BYTE_ORDER == __BIG_ENDIAN

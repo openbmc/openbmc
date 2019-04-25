@@ -3,7 +3,7 @@ From: Randy MacLeod <Randy.MacLeod@windriver.com>
 Date: Fri, 19 Oct 2018 10:31:12 -0400
 Subject: [PATCH] Guard against __GLIBC_PREREQ for musl libc
 
-Upstream-Status: Pending
+Upstream-Status: Submitted https://bugs.kde.org/show_bug.cgi?id=400162
 
 Signed-off-by: Randy MacLeod <Randy.MacLeod@windriver.com>
 ---

@@ -19,11 +19,15 @@
 # The tasks sequence is set as below, using DEPLOY_IMAGE_DIR as common place to
 # treat the device tree blob:
 #
-#   u-boot:do_deploy_dtb
-#   u-boot:do_deploy
-#   virtual/kernel:do_assemble_fitimage
-#   u-boot:do_concat_dtb
-#   u-boot:do_install
+# * u-boot:do_install_append
+#   Install UBOOT_DTB_BINARY to datadir, so that kernel can use it for
+#   signing, and kernel will deploy UBOOT_DTB_BINARY after signs it.
+#
+# * virtual/kernel:do_assemble_fitimage
+#   Sign the image
+#
+# * u-boot:do_deploy[postfuncs]
+#   Deploy files like UBOOT_DTB_IMAGE, UBOOT_DTB_SYMLINK and others.
 #
 # For more details on signature process, please refer to U-Boot documentation.
 
@@ -38,58 +42,65 @@ UBOOT_NODTB_IMAGE ?= "u-boot-nodtb-${MACHINE}-${PV}-${PR}.${UBOOT_SUFFIX}"
 UBOOT_NODTB_BINARY ?= "u-boot-nodtb.${UBOOT_SUFFIX}"
 UBOOT_NODTB_SYMLINK ?= "u-boot-nodtb-${MACHINE}.${UBOOT_SUFFIX}"
 
-#
-# Following is relevant only for u-boot recipes:
-#
+# Functions in this bbclass is for u-boot only
+UBOOT_PN = "${@d.getVar('PREFERRED_PROVIDER_u-boot') or 'u-boot'}"
 
-do_deploy_dtb () {
-	mkdir -p ${DEPLOYDIR}
-	cd ${DEPLOYDIR}
+concat_dtb() {
+	if [ "${UBOOT_SIGN_ENABLE}" = "1" -a "${PN}" = "${UBOOT_PN}" ]; then
+		mkdir -p ${DEPLOYDIR}
+		if [ -e ${B}/${UBOOT_DTB_BINARY} ]; then
+			ln -sf ${UBOOT_DTB_IMAGE} ${DEPLOYDIR}/${UBOOT_DTB_BINARY}
+			ln -sf ${UBOOT_DTB_IMAGE} ${DEPLOYDIR}/${UBOOT_DTB_SYMLINK}
+		fi
 
-	if [ -f ${B}/${UBOOT_DTB_BINARY} ]; then
-		install ${B}/${UBOOT_DTB_BINARY} ${DEPLOYDIR}/${UBOOT_DTB_IMAGE}
-		rm -f ${UBOOT_DTB_BINARY} ${UBOOT_DTB_SYMLINK}
-		ln -sf ${UBOOT_DTB_IMAGE} ${UBOOT_DTB_SYMLINK}
-		ln -sf ${UBOOT_DTB_IMAGE} ${UBOOT_DTB_BINARY}
-	fi
-	if [ -f ${B}/${UBOOT_NODTB_BINARY} ]; then
-		install ${B}/${UBOOT_NODTB_BINARY} ${DEPLOYDIR}/${UBOOT_NODTB_IMAGE}
-		rm -f ${UBOOT_NODTB_BINARY} ${UBOOT_NODTB_SYMLINK}
-		ln -sf ${UBOOT_NODTB_IMAGE} ${UBOOT_NODTB_SYMLINK}
-		ln -sf ${UBOOT_NODTB_IMAGE} ${UBOOT_NODTB_BINARY}
-	fi
-}
+		if [ -f ${B}/${UBOOT_NODTB_BINARY} ]; then
+            install ${B}/${UBOOT_NODTB_BINARY} ${DEPLOYDIR}/${UBOOT_NODTB_IMAGE}
+            ln -sf ${UBOOT_NODTB_IMAGE} ${UBOOT_NODTB_SYMLINK}
+            ln -sf ${UBOOT_NODTB_IMAGE} ${UBOOT_NODTB_BINARY}
+		fi
 
-do_concat_dtb () {
-	# Concatenate U-Boot w/o DTB & DTB with public key
-	# (cf. kernel-fitimage.bbclass for more details)
-	if [ "x${UBOOT_SIGN_ENABLE}" = "x1" ]; then
+		# Concatenate U-Boot w/o DTB & DTB with public key
+		# (cf. kernel-fitimage.bbclass for more details)
+		deployed_uboot_dtb_binary='${DEPLOY_DIR_IMAGE}/${UBOOT_DTB_IMAGE}'
 		if [ "x${UBOOT_SUFFIX}" = "ximg" -o "x${UBOOT_SUFFIX}" = "xrom" ] && \
-			[ -e "${DEPLOYDIR}/${UBOOT_DTB_IMAGE}" ]; then
+			[ -e "$deployed_uboot_dtb_binary" ]; then
 			cd ${B}
-			oe_runmake EXT_DTB=${DEPLOYDIR}/${UBOOT_DTB_IMAGE}
+			oe_runmake EXT_DTB=$deployed_uboot_dtb_binary
 			install ${B}/${UBOOT_BINARY} ${DEPLOYDIR}/${UBOOT_IMAGE}
-			install ${B}/${UBOOT_BINARY} ${DEPLOY_DIR_IMAGE}/${UBOOT_IMAGE}
-		elif [ -e "${DEPLOYDIR}/${UBOOT_NODTB_IMAGE}" -a -e "${DEPLOYDIR}/${UBOOT_DTB_IMAGE}" ]; then
+		elif [ -e "${DEPLOYDIR}/${UBOOT_NODTB_IMAGE}" -a -e "$deployed_uboot_dtb_binary" ]; then
 			cd ${DEPLOYDIR}
-			cat ${UBOOT_NODTB_IMAGE} ${UBOOT_DTB_IMAGE} | tee ${B}/${UBOOT_BINARY} > ${UBOOT_IMAGE}
-		else
+			cat ${UBOOT_NODTB_IMAGE} $deployed_uboot_dtb_binary | tee ${B}/${UBOOT_BINARY} > ${UBOOT_IMAGE}
+		elif [ -n "${UBOOT_DTB_BINARY}" ]; then
 			bbwarn "Failure while adding public key to u-boot binary. Verified boot won't be available."
 		fi
 	fi
 }
 
+# Install UBOOT_DTB_BINARY to datadir, so that kernel can use it for
+# signing, and kernel will deploy UBOOT_DTB_BINARY after signs it.
+do_install_append() {
+	if [ "${UBOOT_SIGN_ENABLE}" = "1" -a "${PN}" = "${UBOOT_PN}" ]; then
+		if [ -f ${B}/${UBOOT_DTB_BINARY} ]; then
+			install -d ${D}${datadir}
+			# UBOOT_DTB_BINARY is a symlink to UBOOT_DTB_IMAGE, so we
+			# need both of them.
+			install ${B}/${UBOOT_DTB_BINARY} ${D}${datadir}/${UBOOT_DTB_IMAGE}
+			ln -sf ${UBOOT_DTB_IMAGE} ${D}${datadir}/${UBOOT_DTB_BINARY}
+		elif [ -n "${UBOOT_DTB_BINARY}" ]; then
+			bbwarn "${B}/${UBOOT_DTB_BINARY} not found"
+		fi
+	fi
+}
+
 python () {
-	uboot_pn = d.getVar('PREFERRED_PROVIDER_u-boot') or 'u-boot'
-	if d.getVar('UBOOT_SIGN_ENABLE') == '1' and d.getVar('PN') == uboot_pn:
-		kernel_pn = d.getVar('PREFERRED_PROVIDER_virtual/kernel')
+    if d.getVar('UBOOT_SIGN_ENABLE') == '1' and d.getVar('PN') == d.getVar('UBOOT_PN'):
+        kernel_pn = d.getVar('PREFERRED_PROVIDER_virtual/kernel')
 
-		# u-boot.dtb and u-boot-nodtb.bin are deployed _before_ do_deploy
-		# Thus, do_deploy_setscene will also populate them in DEPLOY_IMAGE_DIR
-		bb.build.addtask('do_deploy_dtb', 'do_deploy', 'do_compile', d)
+        # Make "bitbake u-boot -cdeploy" deploys the signed u-boot.dtb
+        d.appendVarFlag('do_deploy', 'depends', ' %s:do_deploy' % kernel_pn)
 
-		# do_concat_dtb is scheduled _before_ do_install as it overwrite the
-		# u-boot.bin in both DEPLOYDIR and DEPLOY_IMAGE_DIR.
-		bb.build.addtask('do_concat_dtb', 'do_install', None, d)
-		d.appendVarFlag('do_concat_dtb', 'depends', ' %s:do_assemble_fitimage' % kernel_pn)
+        # kernerl's do_deploy is a litle special, so we can't use
+        # do_deploy_append, otherwise it would override
+        # kernel_do_deploy.
+        d.appendVarFlag('do_deploy', 'prefuncs', ' concat_dtb')
 }

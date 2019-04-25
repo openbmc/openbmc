@@ -1,0 +1,11 @@
+--- a/kexec/kexec.c
++++ b/kexec/kexec.c
+@@ -901,7 +901,7 @@ static int my_exec(void)
+ 	if (xen_present())
+ 		xen_kexec_exec();
+ 	else
+-		reboot(LINUX_REBOOT_CMD_KEXEC);
++		reboot(LINUX_REBOOT_CMD_KEXEC, NULL);
+ 	/* I have failed if I make it here */
+ 	fprintf(stderr, "kexec failed: %s\n", 
+ 		strerror(errno));

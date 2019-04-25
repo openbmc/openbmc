@@ -128,7 +128,6 @@ RDEPENDS_packagegroup-self-hosted-extended = "\
     libaio \
     libusb1 \
     libxml2 \
-    lrzsz \
     lsof \
     lzo \
     man \

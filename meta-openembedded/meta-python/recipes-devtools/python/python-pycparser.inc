@@ -3,8 +3,9 @@ HOMEPAGE = "https://github.com/eliben/pycparser"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86f1cedb4e6410a88ce8e30b91079169"
 
-SRC_URI[md5sum] = "72370da54358202a60130e223d488136"
-SRC_URI[sha256sum] = "99a8ca03e29851d96616ad0404b4aad7d9ee16f25c9f9708a11faf2810f7b226"
+SRC_URI[md5sum] = "76396762adc3fa769c83d8e202d36b6f"
+SRC_URI[sha256sum] = "a988718abfad80b6b157acce7bf130a30876d27603738ac39f140993246b25b3"
+
 
 BBCLASSEXTEND = "native nativesdk"
 

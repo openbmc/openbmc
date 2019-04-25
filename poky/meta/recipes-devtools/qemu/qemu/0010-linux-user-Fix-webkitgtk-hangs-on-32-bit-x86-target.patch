@@ -1,4 +1,4 @@
-From 3cd92c7a885e4997ef6843313298c1d748d6ca39 Mon Sep 17 00:00:00 2001
+From bce25c9cda73569963615ffd31ed949cbe3a3781 Mon Sep 17 00:00:00 2001
 From: Alistair Francis <alistair.francis@xilinx.com>
 Date: Wed, 17 Jan 2018 10:51:49 -0800
 Subject: [PATCH] linux-user: Fix webkitgtk hangs on 32-bit x86 target
@@ -13,15 +13,16 @@ to what it was before the problematic commit.
 
 Upstream-Status: Submitted http://lists.gnu.org/archive/html/qemu-devel/2018-01/msg04185.html
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+
 ---
  linux-user/main.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/linux-user/main.c b/linux-user/main.c
-index 8907a84114..ea42c43610 100644
+index 923cbb75..fe0b9ff4 100644
 --- a/linux-user/main.c
 +++ b/linux-user/main.c
-@@ -79,7 +79,7 @@ do {                                                                    \
+@@ -69,7 +69,7 @@ int have_guest_base;
        (TARGET_LONG_BITS == 32 || defined(TARGET_ABI32))
  /* There are a number of places where we assign reserved_va to a variable
     of type abi_ulong and expect it to fit.  Avoid the last page.  */

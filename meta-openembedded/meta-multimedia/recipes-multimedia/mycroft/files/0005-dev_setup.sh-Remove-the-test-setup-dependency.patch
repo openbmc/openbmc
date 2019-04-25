@@ -1,0 +1,31 @@
+From 7fc38ae0dec30789fa0d365f1764f4950b700a98 Mon Sep 17 00:00:00 2001
+From: Alistair Francis <alistair.francis@wdc.com>
+Date: Tue, 2 Apr 2019 16:52:44 -0700
+Subject: [PATCH 5/5] dev_setup.sh: Remove the test setup dependency
+
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ dev_setup.sh | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/dev_setup.sh b/dev_setup.sh
+index c6aa783e1ef..bcfaa0c16c2 100755
+--- a/dev_setup.sh
++++ b/dev_setup.sh
+@@ -353,10 +353,6 @@ if ! pip3 install -r requirements.txt ; then
+     fi
+ fi
+ 
+-if ! pip3 install -r test-requirements.txt ; then
+-    echo "Warning test requirements wasn't installed, Note: normal operation should still work fine..."
+-fi
+-
+ SYSMEM=$( free | awk '/^Mem:/ { print $2 }' )
+ MAXCORES=$(($SYSMEM / 512000))
+ MINCORES=1
+-- 
+2.21.0
+

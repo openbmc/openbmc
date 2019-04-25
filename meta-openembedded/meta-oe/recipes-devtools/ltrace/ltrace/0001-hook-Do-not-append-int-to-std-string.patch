@@ -1,0 +1,33 @@
+From 8321f8b3befbaa355cfed988fdd8494133989676 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 4 Feb 2019 00:38:16 -0800
+Subject: [PATCH] hook: Do not append int to std::string
+
+Clang find this error
+
+| ../../../git/sysdeps/linux-gnu/hooks.c:205:51: error: adding 'int' to a string does not append to the string [-Werror,-Wstring-plus
+-int]
+|                     || sprintf(syspath, "%s/%s", sysconfdir, FN + 1) < 0)
+|                                                              ~~~^~~
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ sysdeps/linux-gnu/hooks.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/sysdeps/linux-gnu/hooks.c
++++ b/sysdeps/linux-gnu/hooks.c
+@@ -200,9 +200,10 @@ os_get_ltrace_conf_filenames(struct vect
+ 	const char *sysconfdir = SYSCONFDIR;
+ 	if (sysconfdir != NULL && *sysconfdir != '\0') {
+ 		/* No +1, we skip the initial period.  */
+-		syspath = malloc(strlen(sysconfdir) + sizeof FN);
++		syspath = malloc(strlen(sysconfdir) + sizeof FN + 1);
++		syspath[strlen(sysconfdir) + sizeof FN + 1] = '\0';
+ 		if (syspath == NULL
+-		    || sprintf(syspath, "%s/%s", sysconfdir, FN + 1) < 0)
++		    || sprintf(syspath, "%s/%s", sysconfdir, FN) < 0)
+ 			goto fail;
+ 	}
+ 

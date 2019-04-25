@@ -6,24 +6,26 @@ PV = "1.0+git${SRCPV}"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
-inherit autotools pkgconfig
+inherit meson pkgconfig
 inherit obmc-phosphor-dbus-service
 
 RPROVIDES_${PN} += "virtual/obmc-watchdog"
 PROVIDES += "virtual/obmc-watchdog"
 
-DEPENDS += "autoconf-archive-native"
 DEPENDS += "cli11"
-DEPENDS += "sdbusplus sdbusplus-native"
+DEPENDS += "sdbusplus"
 DEPENDS += "sdeventplus"
 DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "phosphor-logging"
-RDEPENDS_${PN} += "libsystemd"
-RDEPENDS_${PN} += "phosphor-logging"
+DEPENDS += "systemd"
 
 SRC_URI += "git://github.com/openbmc/phosphor-watchdog"
-SRCREV = "b93377104292de0f94087c0cbb79d4d6d8516b84"
+SRCREV = "47a9ec4ee9b05a9794a09d16762e3ef7318c5489"
 S = "${WORKDIR}/git"
+
+EXTRA_OEMESON = " \
+        -Dtests=disabled \
+        "
 
 # Copies config file having arguments for host watchdog
 SYSTEMD_ENVIRONMENT_FILE_${PN} +="obmc/watchdog/poweron"

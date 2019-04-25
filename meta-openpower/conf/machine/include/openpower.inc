@@ -11,6 +11,11 @@ OBMC_MACHINE_FEATURES += "\
 
 VIRTUAL-RUNTIME_skeleton_workbook = "${MACHINE}-config"
 
+# Add OpenPOWER OEM commands handler library
+VIRTUAL-RUNTIME_phosphor-ipmi-providers_append_df-openpower = " \
+    openpower-ipmi-oem \
+"
+
 PREFERRED_PROVIDER_virtual/obmc-host-ipmi-hw = "phosphor-ipmi-bt"
 PREFERRED_PROVIDER_virtual/obmc-chassis-mgmt = "packagegroup-op-apps"
 PREFERRED_PROVIDER_virtual/obmc-fan-mgmt = "packagegroup-op-apps"

@@ -1,0 +1,24 @@
+From 00a3ace35d66e7ae60046e254a4d00f0f9c1abe2 Mon Sep 17 00:00:00 2001
+From: OpenEmbedded <oe.patch@oe>
+Date: Thu, 22 Nov 2018 12:05:04 +0000
+Subject: [PATCH] Do not install to /usr/local
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 77c9310..fc378fd 100644
+--- a/Makefile
++++ b/Makefile
+@@ -30,7 +30,7 @@ CFLAGS += -O2
+ LDFLAGS =
+ 
+ DESTDIR =
+-prefix  = /usr/local
++prefix  = /usr
+ sbindir = $(prefix)/sbin
+ mandir  = $(prefix)/share/man
+ man8dir = $(mandir)/man8

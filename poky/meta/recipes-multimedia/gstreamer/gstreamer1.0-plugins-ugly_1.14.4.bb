@@ -15,7 +15,7 @@ SRC_URI[sha256sum] = "ac02d837f166c35ff6ce0738e281680d0b90052cfb1f0255dcf6aaca5f
 
 S = "${WORKDIR}/gst-plugins-ugly-${PV}"
 
-DEPENDS += "gstreamer1.0-plugins-base libid3tag"
+DEPENDS += "gstreamer1.0-plugins-base"
 
 inherit gettext
 

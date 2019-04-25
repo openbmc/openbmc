@@ -4,17 +4,12 @@ LICENSE = "DMTF"
 
 RCONFLICTS_${PN} = "cim-schema-exper"
 
-SRC_URI = "http://dmtf.org/sites/default/files/cim/cim_schema_v2400/cim_schema_${PV}Final-MOFs.zip \
+SRC_URI = "http://dmtf.org/sites/default/files/cim/cim_schema_v2400/cim_schema_${PV}Final-MOFs.zip;subdir=${BP} \
     file://LICENSE \
 "
 SRC_URI[md5sum] = "a9bdf17c7374e3b5b7adeaac4842c4ad"
 SRC_URI[sha256sum] = "dbfa3064ea427acd71a4bebbc172ca2dc44b0b09a6d83b0945b9ffa988a9058a"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/LICENSE;md5=eecc6f71a56ff3caf17f15bf7aeac7b4"
-
-do_unpack() {
-    unzip -q ${DL_DIR}/cim_schema_${PV}Final-MOFs.zip -d ${S}
-    cp -f ${FILE_DIRNAME}/files/LICENSE ${WORKDIR}/
-}
 
 do_install() {
     install -d -m 0755 ${D}${datadir}/mof/cimv${PV}/

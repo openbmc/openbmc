@@ -1,7 +1,9 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Benjamin Marzinski <bmarzins@redhat.com>
-Date: Thu, 16 Oct 2014 15:49:01 -0500
-Subject: [PATCH] RH: add mpathconf
+From eb5a36e6e0caedf06008e48eb77b7bf7c6534ee5 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Mon, 26 Nov 2018 09:55:12 +0800
+Subject: [PATCH] From 0000000000000000000000000000000000000000 Mon Sep 17
+ 00:00:00 2001 From: Benjamin Marzinski <bmarzins@redhat.com> Date: Thu, 16
+ Oct 2014 15:49:01 -0500 Subject: [PATCH] RH: add mpathconf
 
 mpathconf is a program (largely based on lvmcomf) to help users
 configure /etc/multipath.conf and enable or disable multipathing.  It
@@ -11,6 +13,12 @@ with the OS defaults, and to enable and disable multipathing via
 a single command.
 
 Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+
+Upstream-Status: Pending
+
+update this patch to new version
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
  libmultipath/config.c |   1 +
  multipath/Makefile    |   5 +
@@ -21,11 +29,11 @@ Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
  create mode 100644 multipath/mpathconf.8
 
 diff --git a/libmultipath/config.c b/libmultipath/config.c
-index 0607403..5c98e48 100644
+index e4233f1..b779505 100644
 --- a/libmultipath/config.c
 +++ b/libmultipath/config.c
-@@ -661,6 +661,7 @@ load_config (char * file)
- 
+@@ -747,6 +747,7 @@ load_config (char * file)
+ 		factorize_hwtable(conf->hwtable, builtin_hwtable_size, file);
  	} else {
  		condlog(0, "/etc/multipath.conf does not exist, blacklisting all devices.");
 +		condlog(0, "You can run /sbin/mpathconf to create or modify /etc/multipath.conf");

@@ -10,14 +10,13 @@ DEPENDS += " \
     ${PYTHON_PN}-six \
 "
 
-SRC_URI[md5sum] = "a0f3f563ab1c5c3bc02fae8d4aa3ad16"
-SRC_URI[sha256sum] = "c132bab45d4bd0fff1d3fe294d92b0a6eb8404e93337b3127bdec9f21de117e6"
+SRC_URI[md5sum] = "401cc8268f89496643da3f7a48eb4e8e"
+SRC_URI[sha256sum] = "26c821cbeb683facb966045e2064303029d572a87ee69ca5a1bf54bf55f93ca6"
 
 RDEPENDS_${PN} += " \
     ${PYTHON_PN}-cffi \
     ${PYTHON_PN}-idna \
     ${PYTHON_PN}-asn1crypto \
-    ${PYTHON_PN}-pycparser \
     ${PYTHON_PN}-setuptools \
     ${PYTHON_PN}-six \
 "
@@ -27,7 +26,6 @@ RDEPENDS_${PN}_class-target += " \
     ${PYTHON_PN}-idna \
     ${PYTHON_PN}-numbers \
     ${PYTHON_PN}-asn1crypto \
-    ${PYTHON_PN}-pycparser \
     ${PYTHON_PN}-setuptools \
     ${PYTHON_PN}-six \
     ${PYTHON_PN}-threading \

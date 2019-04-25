@@ -2,7 +2,7 @@ inherit cross
 
 INHIBIT_DEFAULT_DEPS = "1"
 EXTRADEPENDS = ""
-DEPENDS = "virtual/${TARGET_PREFIX}binutils virtual/${TARGET_PREFIX}libc-for-gcc ${EXTRADEPENDS} ${NATIVEDEPS}"
+DEPENDS = "virtual/${TARGET_PREFIX}binutils ${EXTRADEPENDS} ${NATIVEDEPS}"
 PROVIDES = "virtual/${TARGET_PREFIX}gcc virtual/${TARGET_PREFIX}g++"
 python () {
     if d.getVar("TARGET_OS").startswith("linux"):
@@ -31,7 +31,6 @@ EXTRA_OECONF += "\
     --with-system-zlib \
 "
 
-DEPENDS_remove_libc-baremetal := "virtual/${TARGET_PREFIX}libc-for-gcc"
 EXTRA_OECONF_append_libc-baremetal = " --without-headers"
 EXTRA_OECONF_remove_libc-baremetal = "--enable-threads=posix"
 EXTRA_OECONF_remove_libc-newlib = "--enable-threads=posix"
@@ -43,6 +42,12 @@ EXTRA_OECONF_PATHS = "\
 "
 
 ARCH_FLAGS_FOR_TARGET += "-isystem${STAGING_DIR_TARGET}${target_includedir}"
+
+
+do_configure_prepend () {
+	install -d ${RECIPE_SYSROOT}${target_includedir}
+	touch ${RECIPE_SYSROOT}${target_includedir}/limits.h
+}
 
 do_compile () {
 	export CC="${BUILD_CC}"
@@ -209,8 +214,8 @@ do_gcc_stash_builddir () {
 addtask do_gcc_stash_builddir after do_compile before do_install
 SSTATETASKS += "do_gcc_stash_builddir"
 do_gcc_stash_builddir[sstate-inputdirs] = "${BUILDDIRSTASH}"
-do_gcc_stash_builddir[sstate-outputdirs] = "${COMPONENTS_DIR}/${BUILD_ARCH}/gcc-stashed-builddir${COMPILERINITIAL}-${TARGET_SYS}"
-do_gcc_stash_builddir[sstate-fixmedir] = "${COMPONENTS_DIR}/${BUILD_ARCH}/gcc-stashed-builddir${COMPILERINITIAL}-${TARGET_SYS}"
+do_gcc_stash_builddir[sstate-outputdirs] = "${COMPONENTS_DIR}/${BUILD_ARCH}/gcc-stashed-builddir-${TARGET_SYS}"
+do_gcc_stash_builddir[sstate-fixmedir] = "${COMPONENTS_DIR}/${BUILD_ARCH}/gcc-stashed-builddir-${TARGET_SYS}"
 
 python do_gcc_stash_builddir_setscene () {
     sstate_setscene(d)

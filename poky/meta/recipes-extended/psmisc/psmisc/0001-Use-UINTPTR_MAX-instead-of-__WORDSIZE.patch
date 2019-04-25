@@ -1,4 +1,4 @@
-From 5dc872bb2fba6421cb8e1ee578f7bd4aaed55f61 Mon Sep 17 00:00:00 2001
+From 115fcf1daff18aa2f2e130d63704f04031878db0 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 24 Mar 2016 15:46:14 +0000
 Subject: [PATCH] Use UINTPTR_MAX instead of __WORDSIZE
@@ -7,14 +7,13 @@ Do not include sys/user.h since it conflicts with
 pt_regs struct from kernel APIs in asm/ptrace.h
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
----
 Upstream-Status: Pending
-
+---
  src/peekfd.c | 13 ++++++++-----
  1 file changed, 8 insertions(+), 5 deletions(-)
 
 diff --git a/src/peekfd.c b/src/peekfd.c
-index cba2130..0d39878 100644
+index 5aa990a..7e8e3fc 100644
 --- a/src/peekfd.c
 +++ b/src/peekfd.c
 @@ -30,8 +30,11 @@
@@ -28,8 +27,8 @@ index cba2130..0d39878 100644
 +#include <stdint.h>
  #include <getopt.h>
  #include <ctype.h>
- 
-@@ -228,11 +231,11 @@ int main(int argc, char **argv)
+ #include <dirent.h>
+@@ -266,11 +269,11 @@ int main(int argc, char **argv)
  		if (WIFSTOPPED(status)) {
  #ifdef PPC
  			struct pt_regs regs;
@@ -46,6 +45,3 @@ index cba2130..0d39878 100644
  #elif defined(ARM)
  			struct pt_regs regs;
  			ptrace(PTRACE_GETREGS, pid, 0, &regs);
--- 
-1.9.1
-

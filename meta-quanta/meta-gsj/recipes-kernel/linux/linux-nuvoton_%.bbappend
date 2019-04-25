@@ -1,2 +1,2 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/linux-nuvoton:"
-SRC_URI += "file://gsj.cfg"
+FILESEXTRAPATHS_prepend_gsj := "${THISDIR}/linux-nuvoton:"
+SRC_URI_append_gsj = " file://gsj.cfg"

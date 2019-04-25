@@ -10,20 +10,25 @@ So start lvm2-monitor.service after tmp.mount
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+
+Update context for lvm2 2.03.02.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  scripts/lvm2_monitoring_systemd_red_hat.service.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/scripts/lvm2_monitoring_systemd_red_hat.service.in b/scripts/lvm2_monitoring_systemd_red_hat.service.in
-index 22238b7..93b2bee 100644
+index 7ec4e4e..3282a95 100644
 --- a/scripts/lvm2_monitoring_systemd_red_hat.service.in
 +++ b/scripts/lvm2_monitoring_systemd_red_hat.service.in
 @@ -2,7 +2,7 @@
  Description=Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling
  Documentation=man:dmeventd(8) man:lvcreate(8) man:lvchange(8) man:vgchange(8)
- Requires=dm-event.socket lvm2-lvmetad.socket
--After=dm-event.socket dm-event.service lvm2-lvmetad.socket lvm2-activation.service lvm2-lvmetad.service
-+After=dm-event.socket dm-event.service lvm2-lvmetad.socket lvm2-activation.service lvm2-lvmetad.service tmp.mount
+ Requires=dm-event.socket
+-After=dm-event.socket dm-event.service lvm2-activation.service
++After=dm-event.socket dm-event.service lvm2-activation.service tmp.mount
  Before=local-fs-pre.target
  DefaultDependencies=no
  Conflicts=shutdown.target

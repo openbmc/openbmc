@@ -60,10 +60,11 @@ FILES_${PN}-libs = "${libdir}/${BPN}/*.so /usr/lib/${BPN}/*.so"
 INSANE_SKIP_${PN}-libs = "dev-so"
 RDEPENDS_${PN} += "${PN}-libs"
 
-PACKAGECONFIG ??= "libgcrypt non32bit"
+PACKAGECONFIG ??= "libgcrypt non32bit snmp-bc"
 PACKAGECONFIG[sysfs] = "--enable-sysfs,--disable-sysfs,sysfsutils,"
 PACKAGECONFIG[libgcrypt] = "--enable-encryption,--disable-encryption,libgcrypt,"
 PACKAGECONFIG[non32bit] = "--enable-non32bit-int,--disable-non32bit-int,,"
+PACKAGECONFIG[snmp-bc] = "--enable-snmp_bc,--disable-snmp_bc"
 
 export DISTRO
 

@@ -78,7 +78,7 @@ RDEPENDS_packagegroup-security-ptest = " \
     python-scapy-ptest \
     suricata-ptest \
     tripwire-ptest \
-    python3-fail2ban-ptest \
+    python-fail2ban-ptest \
     ${@bb.utils.contains("DISTRO_FEATURES", "apparmor", "apparmor-ptest", "",d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "smack", "smack-ptest", "",d)} \
     ptest-runner \

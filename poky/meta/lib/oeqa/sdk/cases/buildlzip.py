@@ -1,36 +1,33 @@
-import unittest
+import os, tempfile, subprocess, unittest
 from oeqa.sdk.case import OESDKTestCase
-from oeqa.sdk.utils.sdkbuildproject import SDKBuildProject
-
+from oeqa.utils.subprocesstweak import errors_have_output
+errors_have_output()
 
 class BuildLzipTest(OESDKTestCase):
-    td_vars = ['DATETIME']
-
-    @classmethod
-    def setUpClass(self):
-        dl_dir = self.td.get('DL_DIR', None)
-
-        self.project = SDKBuildProject(self.tc.sdk_dir + "/lzip/", self.tc.sdk_env,
-                        "http://downloads.yoctoproject.org/mirror/sources/lzip-1.19.tar.gz",
-                        self.tc.sdk_dir, self.td['DATETIME'], dl_dir=dl_dir)
-        self.project.download_archive()
-
-        machine = self.td.get("MACHINE")
-
-        if not (self.tc.hasHostPackage("packagegroup-cross-canadian-%s" % machine) or
-                self.tc.hasHostPackage("^gcc-", regex=True)):
-            raise unittest.SkipTest("SDK doesn't contain a cross-canadian toolchain")
-
+    """
+    Test that "plain" compilation works, using just $CC $CFLAGS etc.
+    """
     def test_lzip(self):
-        self.assertEqual(self.project.run_configure(), 0,
-                        msg="Running configure failed")
+        with tempfile.TemporaryDirectory(prefix="lzip", dir=self.tc.sdk_dir) as testdir:
+            tarball = self.fetch(testdir, self.td["DL_DIR"], "http://downloads.yoctoproject.org/mirror/sources/lzip-1.19.tar.gz")
 
-        self.assertEqual(self.project.run_make(), 0,
-                        msg="Running make failed")
+            dirs = {}
+            dirs["source"] = os.path.join(testdir, "lzip-1.19")
+            dirs["build"] = os.path.join(testdir, "build")
+            dirs["install"] = os.path.join(testdir, "install")
 
-        self.assertEqual(self.project.run_install(), 0,
-                        msg="Running make install failed")
+            subprocess.check_output(["tar", "xf", tarball, "-C", testdir])
+            self.assertTrue(os.path.isdir(dirs["source"]))
+            os.makedirs(dirs["build"])
 
-    @classmethod
-    def tearDownClass(self):
-        self.project.clean()
+            cmd = """cd {build} && \
+                     {source}/configure --srcdir {source} \
+                     CXX="$CXX" \
+                     CPPFLAGS="$CPPFLAGS" \
+                     CXXFLAGS="$CXXFLAGS" \
+                     LDFLAGS="$LDFLAGS" \
+                  """
+            self._run(cmd.format(**dirs))
+            self._run("cd {build} && make -j".format(**dirs))
+            self._run("cd {build} && make install DESTDIR={install}".format(**dirs))
+            self.check_elf(os.path.join(dirs["install"], "usr", "local", "bin", "lzip"))

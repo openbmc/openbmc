@@ -1,4 +1,4 @@
-From 7a1f4e724f9c68498f401244c2938e784a2e6fbd Mon Sep 17 00:00:00 2001
+From b4b6e9b1be33213ede3f612e87840c0045824d9e Mon Sep 17 00:00:00 2001
 From: Otavio Salvador <otavio@ossystems.com.br>
 Date: Wed, 17 Jan 2018 10:02:14 -0200
 Subject: [PATCH 2/5] cmake: Prevent the detection of Qt5
@@ -16,14 +16,14 @@ Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
  Source/QtDialog/CMakeLists.txt                     | 2 +-
  Tests/CMakeLists.txt                               | 2 +-
  Tests/Qt4And5Automoc/CMakeLists.txt                | 4 ++--
- Tests/QtAutogen/AutogenTest.cmake                  | 2 +-
+ Tests/QtAutogen/AutogenGuiTest.cmake               | 3 +--
  Tests/QtAutogen/MacOsFW/CMakeLists.txt             | 2 +-
  Tests/RunCMake/CMakeLists.txt                      | 2 +-
  Tests/RunCMake/IncompatibleQt/IncompatibleQt.cmake | 2 +-
- 7 files changed, 8 insertions(+), 8 deletions(-)
+ 7 files changed, 8 insertions(+), 9 deletions(-)
 
 diff --git a/Source/QtDialog/CMakeLists.txt b/Source/QtDialog/CMakeLists.txt
-index 330b74729..e7709dee6 100644
+index 9ce0323844..06c86d63eb 100644
 --- a/Source/QtDialog/CMakeLists.txt
 +++ b/Source/QtDialog/CMakeLists.txt
 @@ -6,7 +6,7 @@ if(POLICY CMP0020)
@@ -36,10 +36,10 @@ index 330b74729..e7709dee6 100644
    include_directories(${Qt5Widgets_INCLUDE_DIRS})
    add_definitions(${Qt5Widgets_DEFINITONS})
 diff --git a/Tests/CMakeLists.txt b/Tests/CMakeLists.txt
-index b8b724ed8..63f6bb6d2 100644
+index ed98d974b0..7adfbc301b 100644
 --- a/Tests/CMakeLists.txt
 +++ b/Tests/CMakeLists.txt
-@@ -1322,7 +1322,7 @@ ${CMake_BINARY_DIR}/bin/cmake -DDIR=dev -P ${CMake_SOURCE_DIR}/Utilities/Release
+@@ -1342,7 +1342,7 @@ ${CMake_BINARY_DIR}/bin/cmake -DDIR=dev -P ${CMake_SOURCE_DIR}/Utilities/Release
      set(CMake_TEST_Qt5 1)
    endif()
    if(CMake_TEST_Qt5)
@@ -49,7 +49,7 @@ index b8b724ed8..63f6bb6d2 100644
    if(CMake_TEST_Qt5 AND Qt5Widgets_FOUND)
      add_subdirectory(Qt5Autogen)
 diff --git a/Tests/Qt4And5Automoc/CMakeLists.txt b/Tests/Qt4And5Automoc/CMakeLists.txt
-index ad74961d9..a9dd74b15 100644
+index ad74961d9f..a9dd74b151 100644
 --- a/Tests/Qt4And5Automoc/CMakeLists.txt
 +++ b/Tests/Qt4And5Automoc/CMakeLists.txt
 @@ -3,11 +3,11 @@ cmake_minimum_required(VERSION 2.8.12)
@@ -66,26 +66,27 @@ index ad74961d9..a9dd74b15 100644
  endif()
  
  set(CMAKE_AUTOMOC ON)
-diff --git a/Tests/QtAutogen/AutogenTest.cmake b/Tests/QtAutogen/AutogenTest.cmake
-index 8c0a14fca..e9923b21a 100644
---- a/Tests/QtAutogen/AutogenTest.cmake
-+++ b/Tests/QtAutogen/AutogenTest.cmake
-@@ -22,7 +22,7 @@ if (QT_TEST_VERSION STREQUAL 4)
+diff --git a/Tests/QtAutogen/AutogenGuiTest.cmake b/Tests/QtAutogen/AutogenGuiTest.cmake
+index b76d341a45..a6e0acbafa 100644
+--- a/Tests/QtAutogen/AutogenGuiTest.cmake
++++ b/Tests/QtAutogen/AutogenGuiTest.cmake
+@@ -22,8 +22,7 @@ if (QT_TEST_VERSION EQUAL 4)
    endmacro()
  
- elseif(QT_TEST_VERSION STREQUAL 5)
+ elseif(QT_TEST_VERSION EQUAL 5)
+-
 -  find_package(Qt5Widgets REQUIRED)
 +  #find_package(Qt5Widgets REQUIRED)
  
    set(QT_QTCORE_TARGET Qt5::Core)
-   set(QT_QTGUI_TARGET Qt5::Widgets)
+   set(QT_LIBRARIES Qt5::Widgets)
 diff --git a/Tests/QtAutogen/MacOsFW/CMakeLists.txt b/Tests/QtAutogen/MacOsFW/CMakeLists.txt
-index 26d201926..e48e1c8de 100644
+index c08efc47a2..87e25d9391 100644
 --- a/Tests/QtAutogen/MacOsFW/CMakeLists.txt
 +++ b/Tests/QtAutogen/MacOsFW/CMakeLists.txt
 @@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
  project(MacOsFW)
- include("../AutogenTest.cmake")
+ include("../AutogenGuiTest.cmake")
  
 -find_package(Qt5Test REQUIRED)
 +#find_package(Qt5Test REQUIRED)
@@ -93,10 +94,10 @@ index 26d201926..e48e1c8de 100644
  set(CMAKE_CXX_STANDARD 11)
  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output/bin)
 diff --git a/Tests/RunCMake/CMakeLists.txt b/Tests/RunCMake/CMakeLists.txt
-index 637c5c2cb..c0376effc 100644
+index 1f3e5c3006..8ed8d6ac54 100644
 --- a/Tests/RunCMake/CMakeLists.txt
 +++ b/Tests/RunCMake/CMakeLists.txt
-@@ -291,7 +291,7 @@ add_RunCMake_test(configure_file)
+@@ -326,7 +326,7 @@ add_RunCMake_test(configure_file)
  add_RunCMake_test(CTestTimeoutAfterMatch)
  
  find_package(Qt4 QUIET)
@@ -106,7 +107,7 @@ index 637c5c2cb..c0376effc 100644
    add_RunCMake_test(IncompatibleQt)
  endif()
 diff --git a/Tests/RunCMake/IncompatibleQt/IncompatibleQt.cmake b/Tests/RunCMake/IncompatibleQt/IncompatibleQt.cmake
-index 4fccdc418..b76e1e531 100644
+index 4fccdc418f..b76e1e5313 100644
 --- a/Tests/RunCMake/IncompatibleQt/IncompatibleQt.cmake
 +++ b/Tests/RunCMake/IncompatibleQt/IncompatibleQt.cmake
 @@ -1,6 +1,6 @@
@@ -118,5 +119,5 @@ index 4fccdc418..b76e1e531 100644
  add_executable(mainexe main.cpp)
  target_link_libraries(mainexe Qt4::QtCore Qt5::Core)
 -- 
-2.18.0
+2.11.0
 

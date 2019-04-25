@@ -14,8 +14,8 @@
 # PGVERSION is the full package version, e.g., 8.4.0
 # Note: the specfile inserts the correct value during package build
 PGVERSION=9.2.4
-# PGMAJORVERSION is major version, e.g., 8.4 (this should match PG_VERSION)
-PGMAJORVERSION=`echo "$PGVERSION" | sed 's/^\([0-9]*\.[0-9]*\).*$/\1/'`
+# PGMAJORVERSION is major version, e.g., 10 (this should match PG_VERSION)
+PGMAJORVERSION=`echo "$PGVERSION" | sed 's/^\([0-9]*\).*$/\1/'`
 
 # Source function library.
 . /etc/init.d/functions

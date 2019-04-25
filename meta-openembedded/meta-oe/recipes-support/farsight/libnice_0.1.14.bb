@@ -15,15 +15,16 @@ DEPENDS = "glib-2.0 gnutls"
 
 PACKAGECONFIG ??= "gstreamer1.0"
 PACKAGECONFIG[gupnp] = "--enable-gupnp,--disable-gupnp,gupnp-igd"
-PACKAGECONFIG[gstreamer0.10] = "--with-gstreamer-0.10,--without-gstreamer-0.10,gstreamer gst-plugins-base"
 PACKAGECONFIG[gstreamer1.0] = "--with-gstreamer,--without-gstreamer,gstreamer1.0 gstreamer1.0-plugins-base"
 
 inherit autotools pkgconfig gtk-doc gobject-introspection
 
-FILES_${PN} += "${libdir}/gstreamer-0.10/*.so ${libdir}/gstreamer-1.0/*.so"
-FILES_${PN}-dev += "${libdir}/gstreamer-0.10/*.la ${libdir}/gstreamer-1.0/*.la"
-FILES_${PN}-staticdev += "${libdir}/gstreamer-0.10/*.a ${libdir}/gstreamer-1.0/*.a"
-FILES_${PN}-dbg += "${libdir}/gstreamer-0.10/.debug ${libdir}/gstreamer-1.0/.debug"
+EXTRA_OECONF += "--without-gstreamer-0.10"
+
+FILES_${PN} += "${libdir}/gstreamer-1.0/*.so"
+FILES_${PN}-dev += "${libdir}/gstreamer-1.0/*.la"
+FILES_${PN}-staticdev += "${libdir}/gstreamer-1.0/*.a"
+FILES_${PN}-dbg += "${libdir}/gstreamer-1.0/.debug"
 
 do_configure_prepend() {
     mkdir ${S}/m4 || true

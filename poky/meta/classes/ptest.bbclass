@@ -3,6 +3,9 @@ DESCRIPTION_${PN}-ptest ?= "${DESCRIPTION}  \
 This package contains a test directory ${PTEST_PATH} for package test purposes."
 
 PTEST_PATH ?= "${libdir}/${BPN}/ptest"
+PTEST_BUILD_HOST_FILES ?= "Makefile"
+PTEST_BUILD_HOST_PATTERN ?= ""
+
 FILES_${PN}-ptest = "${PTEST_PATH}"
 SECTION_${PN}-ptest = "devel"
 ALLOW_EMPTY_${PN}-ptest = "1"
@@ -45,6 +48,21 @@ do_install_ptest_base() {
     fi
     do_install_ptest
     chown -R root:root ${D}${PTEST_PATH}
+
+    # Strip build host paths from any installed Makefile
+    for filename in ${PTEST_BUILD_HOST_FILES}; do
+        for installed_ptest_file in $(find ${D}${PTEST_PATH} -type f -name $filename); do
+            bbnote "Stripping host paths from: $installed_ptest_file"
+            sed -e 's#${HOSTTOOLS_DIR}/*##g' \
+                -e 's#${WORKDIR}/*=#.=#g' \
+                -e 's#${WORKDIR}/*##g' \
+                -i $installed_ptest_file
+            if [ -n "${PTEST_BUILD_HOST_PATTERN}" ]; then
+               sed -E '/${PTEST_BUILD_HOST_PATTERN}/d' \
+                   -i $installed_ptest_file
+            fi
+        done
+    done
 }
 
 do_configure_ptest_base[dirs] = "${B}"

@@ -316,8 +316,8 @@ def check_license_flags(d):
     This function checks if a recipe has any LICENSE_FLAGS that
     aren't whitelisted.
 
-    If it does, it returns the first LICENSE_FLAGS item missing from the
-    whitelist, or all of the LICENSE_FLAGS if there is no whitelist.
+    If it does, it returns the all LICENSE_FLAGS missing from the whitelist, or
+    all of the LICENSE_FLAGS if there is no whitelist.
 
     If everything is is properly whitelisted, it returns None.
     """
@@ -354,22 +354,23 @@ def check_license_flags(d):
         return False
 
     def all_license_flags_match(license_flags, whitelist):
-        """ Return first unmatched flag, None if all flags match """
+        """ Return all unmatched flags, None if all flags match """
         pn = d.getVar('PN')
         split_whitelist = whitelist.split()
+        flags = []
         for flag in license_flags.split():
             if not license_flag_matches(flag, split_whitelist, pn):
-                return flag
-        return None
+                flags.append(flag)
+        return flags if flags else None
 
     license_flags = d.getVar('LICENSE_FLAGS')
     if license_flags:
         whitelist = d.getVar('LICENSE_FLAGS_WHITELIST')
         if not whitelist:
-            return license_flags
-        unmatched_flag = all_license_flags_match(license_flags, whitelist)
-        if unmatched_flag:
-            return unmatched_flag
+            return license_flags.split()
+        unmatched_flags = all_license_flags_match(license_flags, whitelist)
+        if unmatched_flags:
+            return unmatched_flags
     return None
 
 def check_license_format(d):

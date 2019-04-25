@@ -1,0 +1,15 @@
+# Initial Tuning file for nl-DELTA
+# This file only lists the main
+# frequency. You still need to do
+# a network scan to find other
+# transponders.
+#
+#
+[Main Frequency]
+	DELIVERY_SYSTEM = DVBC/ANNEX_A
+	FREQUENCY = 402000000
+	SYMBOL_RATE = 6875000
+	INNER_FEC = NONE
+	MODULATION = QAM/64
+	INVERSION = AUTO
+

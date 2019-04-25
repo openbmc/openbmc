@@ -23,10 +23,7 @@ DEPENDS += " \
         phosphor-mapper \
         autoconf-archive-native \
         phosphor-logging \
-        "
-
-RDEPENDS_${PN} += " \
-        sdbusplus \
+        cli11 \
         "
 
 SYSTEMD_SERVICE_${PN} += "obmc-read-eeprom@.service"

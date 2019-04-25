@@ -10,22 +10,22 @@ inherit autotools pkgconfig
 inherit obmc-phosphor-systemd
 
 DEPENDS += "autoconf-archive-native"
+DEPENDS += "cli11"
 DEPENDS += "phosphor-mapper"
 DEPENDS += "systemd"
 DEPENDS += "phosphor-ipmi-host"
-RDEPENDS_${PN} += "libmapper"
-RDEPENDS_${PN} += "libsystemd"
 RDEPENDS_${PN} += "iptables"
 
 SRC_URI += "git://github.com/openbmc/phosphor-net-ipmid"
 SRC_URI += "file://ipmi-net-firewall.sh"
-SRCREV = "4f09eaeec366c89319c344f7dd567063128ce00c"
+SRCREV = "8af90ebcc552e243ae85aa9e9da1a00fbecab56c"
 
 S = "${WORKDIR}/git"
 
 do_install_append() {
+        install -d ${D}${bindir}
         install -m 0755 ${WORKDIR}/ipmi-net-firewall.sh \
-        ${D}${sbindir}/ipmi-net-firewall.sh
+        ${D}${bindir}/ipmi-net-firewall.sh
 }
 
 SYSTEMD_SERVICE_${PN} = " \

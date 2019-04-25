@@ -14,6 +14,7 @@ def oe_terminal_prioritized():
     return " ".join(o.name for o in oe.terminal.prioritized())
 
 def emit_terminal_func(command, envdata, d):
+    import bb.build
     cmd_func = 'do_terminal'
 
     envdata.setVar(cmd_func, 'exec ' + command)
@@ -25,8 +26,7 @@ def emit_terminal_func(command, envdata, d):
     bb.utils.mkdirhier(os.path.dirname(runfile))
 
     with open(runfile, 'w') as script:
-        script.write('#!/usr/bin/env %s\n' % d.getVar('SHELL'))
-        script.write('set -e\n')
+        script.write(bb.build.shell_trap_code())
         bb.data.emit_func(cmd_func, script, envdata)
         script.write(cmd_func)
         script.write("\n")

@@ -13,6 +13,18 @@ active_serial=$(grep "serial" /proc/tty/drivers | cut -d/ -f1 | sed "s/ *$//")
 # Rephrase input parameter from ttyS target index (ttyS1, ttyS2, ttyAMA0, etc).
 runtime_tty=$(echo $2 | grep -oh '[0-9]')
 
+# busybox' getty does this itself, util-linux' agetty needs extra help
+getty="/sbin/getty"
+case $(readlink -f "${getty}") in
+    */busybox*)
+        ;;
+    *)
+        if [ -x "/usr/bin/setsid" ] ; then
+            setsid="/usr/bin/setsid"
+        fi
+        ;;
+esac
+
 # Backup $IFS.
 DEFAULT_IFS=$IFS
 # Customize Internal Field Separator.
@@ -31,7 +43,7 @@ for line in $active_serial; do
 			then
 				if [ -c /dev/$2 ]
 				then
-				    /sbin/getty -L $1 $2 $3
+				    ${setsid:-} ${getty} -L $1 $2 $3
 				fi
 				break
 			fi

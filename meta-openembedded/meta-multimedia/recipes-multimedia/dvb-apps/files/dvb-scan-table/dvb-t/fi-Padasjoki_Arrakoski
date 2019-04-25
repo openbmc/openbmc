@@ -1,0 +1,23 @@
+# 2014-04-18 Antti Palosaari <crope@iki.fi>
+# generated from http://www.digita.fi/kuluttajat/tv/nakyvyysalueet/kanavanumerot_ja_taajuudet
+
+[Padasjoki_Arrakoski]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 498000000
+	BANDWIDTH_HZ = 8000000
+
+[Padasjoki_Arrakoski]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 530000000
+	BANDWIDTH_HZ = 8000000
+
+[Padasjoki_Arrakoski]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 538000000
+	BANDWIDTH_HZ = 8000000
+
+[Padasjoki_Arrakoski]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 746000000
+	BANDWIDTH_HZ = 8000000
+

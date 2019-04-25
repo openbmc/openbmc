@@ -7,4 +7,4 @@ ExecStart=/usr/bin/env obmc-phosphor-flashd
 SyslogIdentifier=obmc-phosphor-flashd
 
 [Install]
-WantedBy={SYSTEMD_DEFAULT_TARGET}
+WantedBy=multi-user.target

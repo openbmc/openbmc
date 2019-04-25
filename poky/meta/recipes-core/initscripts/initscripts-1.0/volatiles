@@ -8,7 +8,7 @@
 # The # character introduces a comment lasting until end of line.
 # Blank lines are ignored.
 #
-# <type> : d|f|l : (d)irectory|(f)ile|(l)ink
+# <type> : d|f|l|b : (d)irectory|(f)ile|(l)ink|(b)ind
 #
 # A linking example:
 # l root root 0777 /var/test /tmp/testfile

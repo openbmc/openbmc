@@ -1,0 +1,40 @@
+From 79019d976584c598f8d0a9d8de43c989946f974b Mon Sep 17 00:00:00 2001
+From: Pascal Bach <pascal.bach@siemens.com>
+Date: Wed, 13 Feb 2019 09:28:07 +0100
+Subject: [PATCH] Don't build tools with CC_FOR_BUILD
+
+The tools are intended for the target not for the host.
+
+Upstream-Status: Pending
+
+Signed-off-by: Pascal Bach <pascal.bach@siemens.com>
+---
+ tools/locktest/Makefile.am | 1 -
+ tools/rpcgen/Makefile.am   | 1 -
+ 2 files changed, 2 deletions(-)
+
+diff --git a/tools/locktest/Makefile.am b/tools/locktest/Makefile.am
+index 3156815..87d0bac 100644
+--- a/tools/locktest/Makefile.am
++++ b/tools/locktest/Makefile.am
+@@ -1,6 +1,5 @@
+ ## Process this file with automake to produce Makefile.in
+ 
+-CC=$(CC_FOR_BUILD)
+ LIBTOOL = @LIBTOOL@ --tag=CC
+ 
+ noinst_PROGRAMS = testlk
+diff --git a/tools/rpcgen/Makefile.am b/tools/rpcgen/Makefile.am
+index 8a9ec89..3e092c9 100644
+--- a/tools/rpcgen/Makefile.am
++++ b/tools/rpcgen/Makefile.am
+@@ -1,6 +1,5 @@
+ ## Process this file with automake to produce Makefile.in
+ 
+-CC=$(CC_FOR_BUILD)
+ LIBTOOL = @LIBTOOL@ --tag=CC
+ 
+ noinst_PROGRAMS = rpcgen
+-- 
+2.11.0
+

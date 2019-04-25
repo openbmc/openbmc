@@ -1,3 +1,11 @@
+From e37f7f6a0f1ef1b594574d11a8b90b8c861d047b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?An=C3=ADbal=20Lim=C3=B3n?= <anibal.limon@linux.intel.com>
+Date: Sun, 15 Mar 2015 09:02:14 +0000
+Subject: [PATCH] mdadm: Fix build in x32 ABI
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
 When try to print time_t values as a long int it causes an error because time_t
 data type in x32 ABI is long long int.
 
@@ -5,11 +13,15 @@ Upstream-Status: Pending
 
 Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>
 
-Index: mdadm-4.0/monitor.c
-===================================================================
---- mdadm-4.0.orig/monitor.c
-+++ mdadm-4.0/monitor.c
-@@ -445,9 +445,12 @@ static int read_and_act(struct active_ar
+---
+ monitor.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/monitor.c b/monitor.c
+index 81537ed..7c33382 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -445,9 +445,12 @@ static int read_and_act(struct active_array *a, fd_set *fds)
  		if (FD_ISSET(mdi->bb_fd, fds))
  			check_for_cleared_bb(a, mdi);
  	}

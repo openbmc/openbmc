@@ -1,0 +1,28 @@
+# 2014-04-18 Antti Palosaari <crope@iki.fi>
+# generated from http://www.digita.fi/kuluttajat/tv/nakyvyysalueet/kanavanumerot_ja_taajuudet
+
+[Tammela]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 482000000
+	BANDWIDTH_HZ = 8000000
+
+[Tammela]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 522000000
+	BANDWIDTH_HZ = 8000000
+
+[Tammela]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 706000000
+	BANDWIDTH_HZ = 8000000
+
+[Tammela]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 650000000
+	BANDWIDTH_HZ = 8000000
+
+[Tammela]
+	DELIVERY_SYSTEM = DVBT2
+	FREQUENCY = 546000000
+	BANDWIDTH_HZ = 8000000
+

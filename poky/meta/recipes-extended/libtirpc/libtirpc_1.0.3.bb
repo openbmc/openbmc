@@ -13,7 +13,8 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BP}.tar.bz2 \
            file://libtirpc-1.0.4-rc1.patch \
            file://musl.patch \
            "
-
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/libtirpc/files/libtirpc/"
+UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)/"
 SRC_URI[md5sum] = "f8403a10695348854e71d525c4db5931"
 SRC_URI[sha256sum] = "86c3a78fc1bddefa96111dd233124c703b22a78884203c55c3e06b3be6a0fd5e"
 

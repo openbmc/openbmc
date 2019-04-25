@@ -16,7 +16,7 @@ diff --git a/include/old/test.h b/include/old/test.h
 index b36764d83..cc6f1b551 100644
 --- a/include/old/test.h
 +++ b/include/old/test.h
-@@ -44,6 +44,9 @@
+@@ -17,6 +17,9 @@
  #include <string.h>
  #include <stdlib.h>
  #include <stdint.h>

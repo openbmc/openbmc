@@ -39,10 +39,11 @@ from bb.COW  import COWDictBase
 logger = logging.getLogger("BitBake.Data")
 
 __setvar_keyword__ = ["_append", "_prepend", "_remove"]
-__setvar_regexp__ = re.compile('(?P<base>.*?)(?P<keyword>_append|_prepend|_remove)(_(?P<add>[^A-Z]*))?$')
-__expand_var_regexp__ = re.compile(r"\${[^{}@\n\t :]+}")
+__setvar_regexp__ = re.compile(r'(?P<base>.*?)(?P<keyword>_append|_prepend|_remove)(_(?P<add>[^A-Z]*))?$')
+__expand_var_regexp__ = re.compile(r"\${[a-zA-Z0-9\-_+./~]+?}")
 __expand_python_regexp__ = re.compile(r"\${@.+?}")
-__whitespace_split__ = re.compile('(\s)')
+__whitespace_split__ = re.compile(r'(\s)')
+__override_regexp__ = re.compile(r'[a-z0-9]+')
 
 def infer_caller_details(loginfo, parent = False, varval = True):
     """Save the caller the trouble of specifying everything."""
@@ -122,7 +123,11 @@ class VariableParse:
                 connector = self.d["_remote_data"]
                 return connector.expandPythonRef(self.varname, code, self.d)
 
-            codeobj = compile(code.strip(), self.varname or "<expansion>", "eval")
+            if self.varname:
+                varname = 'Var <%s>' % self.varname
+            else:
+                varname = '<expansion>'
+            codeobj = compile(code.strip(), varname, "eval")
 
             parser = bb.codeparser.PythonParser(self.varname, logger)
             parser.parse_python(code)
@@ -427,7 +432,8 @@ class DataSmart(MutableMapping):
             except bb.parse.SkipRecipe:
                 raise
             except Exception as exc:
-                raise ExpansionError(varname, s, exc) from exc
+                tb = sys.exc_info()[2]
+                raise ExpansionError(varname, s, exc).with_traceback(tb) from exc
 
         varparse.value = s
 
@@ -592,7 +598,7 @@ class DataSmart(MutableMapping):
         # aka pay the cookie monster
         override = var[var.rfind('_')+1:]
         shortvar = var[:var.rfind('_')]
-        while override and override.islower():
+        while override and __override_regexp__.match(override):
             if shortvar not in self.overridedata:
                 self.overridedata[shortvar] = []
             if [var, override] not in self.overridedata[shortvar]:
@@ -1068,4 +1074,4 @@ class DataSmart(MutableMapping):
                     data.update({i:value})
 
         data_str = str([(k, data[k]) for k in sorted(data.keys())])
-        return hashlib.md5(data_str.encode("utf-8")).hexdigest()
+        return hashlib.sha256(data_str.encode("utf-8")).hexdigest()

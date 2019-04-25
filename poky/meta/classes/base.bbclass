@@ -122,6 +122,10 @@ def setup_hosttools_dir(dest, toolsvar, d, fatal=True):
         desttool = os.path.join(dest, tool)
         if not os.path.exists(desttool):
             srctool = bb.utils.which(path, tool, executable=True)
+            # gcc/g++ may link to ccache on some hosts, e.g.,
+            # /usr/local/bin/ccache/gcc -> /usr/bin/ccache, then which(gcc)
+            # would return /usr/local/bin/ccache/gcc, but what we need is
+            # /usr/bin/gcc, this code can check and fix that.
             if "ccache" in srctool:
                 srctool = bb.utils.which(path, tool, executable=True, direction=1)
             if srctool:
@@ -216,7 +220,7 @@ def buildcfg_neededvars(d):
         bb.fatal('The following variable(s) were not set: %s\nPlease set them directly, or choose a MACHINE or DISTRO that sets them.' % ', '.join(pesteruser))
 
 addhandler base_eventhandler
-base_eventhandler[eventmask] = "bb.event.ConfigParsed bb.event.MultiConfigParsed bb.event.BuildStarted bb.event.RecipePreFinalise bb.runqueue.sceneQueueComplete bb.event.RecipeParsed"
+base_eventhandler[eventmask] = "bb.event.ConfigParsed bb.event.MultiConfigParsed bb.event.BuildStarted bb.event.RecipePreFinalise bb.event.RecipeParsed"
 python base_eventhandler() {
     import bb.runqueue
 
@@ -224,6 +228,12 @@ python base_eventhandler() {
         if not d.getVar("NATIVELSBSTRING", False):
             d.setVar("NATIVELSBSTRING", lsb_distro_identifier(d))
         d.setVar('BB_VERSION', bb.__version__)
+
+    # There might be no bb.event.ConfigParsed event if bitbake server is
+    # running, so check bb.event.BuildStarted too to make sure ${HOSTTOOLS_DIR}
+    # exists.
+    if isinstance(e, bb.event.ConfigParsed) or \
+            (isinstance(e, bb.event.BuildStarted) and not os.path.exists(d.getVar('HOSTTOOLS_DIR'))):
         # Works with the line in layer.conf which changes PATH to point here
         setup_hosttools_dir(d.getVar('HOSTTOOLS_DIR'), 'HOSTTOOLS', d)
         setup_hosttools_dir(d.getVar('HOSTTOOLS_DIR'), 'HOSTTOOLS_NONFATAL', d, fatal=False)
@@ -260,22 +270,9 @@ python base_eventhandler() {
     if isinstance(e, bb.event.RecipePreFinalise):
         if d.getVar("TARGET_PREFIX") == d.getVar("SDK_PREFIX"):
             d.delVar("PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}binutils")
-            d.delVar("PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}gcc-initial")
             d.delVar("PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}gcc")
             d.delVar("PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}g++")
             d.delVar("PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}compilerlibs")
-
-    if isinstance(e, bb.runqueue.sceneQueueComplete):
-        completions = d.expand("${STAGING_DIR}/sstatecompletions")
-        if os.path.exists(completions):
-            cmds = set()
-            with open(completions, "r") as f:
-                cmds = set(f)
-            d.setVar("completion_function", "\n".join(cmds))
-            d.setVarFlag("completion_function", "func", "1")
-            bb.debug(1, "Executing SceneQueue Completion commands: %s" % "\n".join(cmds))
-            bb.build.exec_func("completion_function", d)
-            os.remove(completions)
 
     if isinstance(e, bb.event.RecipeParsed):
         #
@@ -301,7 +298,6 @@ CLEANBROKEN = "0"
 
 addtask configure after do_patch
 do_configure[dirs] = "${B}"
-do_prepare_recipe_sysroot[deptask] = "do_populate_sysroot"
 base_do_configure() {
 	if [ -n "${CONFIGURESTAMPFILE}" -a -e "${CONFIGURESTAMPFILE}" ]; then
 		if [ "`cat ${CONFIGURESTAMPFILE}`" != "${BB_TASKHASH}" ]; then
@@ -467,12 +463,15 @@ python () {
 
     if bb.data.inherits_class('license', d):
         check_license_format(d)
-        unmatched_license_flag = check_license_flags(d)
-        if unmatched_license_flag:
-            bb.debug(1, "Skipping %s because it has a restricted license not"
-                 " whitelisted in LICENSE_FLAGS_WHITELIST" % pn)
-            raise bb.parse.SkipRecipe("because it has a restricted license not"
-                 " whitelisted in LICENSE_FLAGS_WHITELIST")
+        unmatched_license_flags = check_license_flags(d)
+        if unmatched_license_flags:
+            if len(unmatched_license_flags) == 1:
+                message = "because it has a restricted license '{0}'. Which is not whitelisted in LICENSE_FLAGS_WHITELIST".format(unmatched_license_flags[0])
+            else:
+                message = "because it has restricted licenses {0}. Which are not whitelisted in LICENSE_FLAGS_WHITELIST".format(
+                    ", ".join("'{0}'".format(f) for f in unmatched_license_flags))
+            bb.debug(1, "Skipping %s %s" % (pn, message))
+            raise bb.parse.SkipRecipe(message)
 
     # If we're building a target package we need to use fakeroot (pseudo)
     # in order to capture permissions, owners, groups and special files

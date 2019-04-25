@@ -1,0 +1,30 @@
+From a2bfd28034d9aa48d8ff109c1314e53bc9779752 Mon Sep 17 00:00:00 2001
+From: Andre McCurdy <armccurdy@gmail.com>
+Date: Wed, 24 Oct 2018 22:26:08 -0700
+Subject: [PATCH] avoid absolute path when searching for libdlpi
+
+Let the build environment control library search paths.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+---
+ configure.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.in b/configure.in
+index c882909..52aefd6 100644
+--- a/configure.in
++++ b/configure.in
+@@ -542,7 +542,7 @@ don't.])
+ fi
+ 
+ # libdlpi is needed for Solaris 11 and later.
+-AC_CHECK_LIB(dlpi, dlpi_walk, LIBS="$LIBS -ldlpi" LDFLAGS="-L/lib $LDFLAGS", ,-L/lib)
++AC_CHECK_LIB(dlpi, dlpi_walk, LIBS="$LIBS -ldlpi")
+ 
+ dnl
+ dnl Check for "pcap_list_datalinks()", "pcap_set_datalink()",
+-- 
+1.9.1
+

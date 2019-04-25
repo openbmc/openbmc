@@ -1,7 +1,7 @@
-From b6a7b30522455cab39a0b9ea8463313380146e70 Mon Sep 17 00:00:00 2001
+From f00603d58d844422363b896ea7d07aaf48ddaa66 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Tue, 1 Apr 2014 17:23:36 +0100
-Subject: [PATCH 3/4] gdk-pixbuf: add an option so that loader errors are fatal
+Subject: [PATCH] gdk-pixbuf: add an option so that loader errors are fatal
 
 If an environment variable is specified set the return value from main() to
 non-zero if the loader had errors (missing libraries, generally).
@@ -14,10 +14,10 @@ Signed-off-by: Ross Burton <ross.burton@intel.com>
  1 file changed, 15 insertions(+), 4 deletions(-)
 
 diff --git a/gdk-pixbuf/queryloaders.c b/gdk-pixbuf/queryloaders.c
-index a81c804..350bec8 100644
+index 312aa78..b813d99 100644
 --- a/gdk-pixbuf/queryloaders.c
 +++ b/gdk-pixbuf/queryloaders.c
-@@ -146,7 +146,7 @@ write_loader_info (GString *contents, const char *path, GdkPixbufFormat *info)
+@@ -212,7 +212,7 @@ write_loader_info (GString *contents, const char *path, GdkPixbufFormat *info)
          g_string_append_c (contents, '\n');
  }
  
@@ -26,7 +26,7 @@ index a81c804..350bec8 100644
  query_module (GString *contents, const char *dir, const char *file)
  {
          char *path;
-@@ -155,6 +155,7 @@ query_module (GString *contents, const char *dir, const char *file)
+@@ -221,6 +221,7 @@ query_module (GString *contents, const char *dir, const char *file)
          void                    (*fill_vtable)   (GdkPixbufModule *module);
          gpointer fill_info_ptr;
          gpointer fill_vtable_ptr;
@@ -34,7 +34,7 @@ index a81c804..350bec8 100644
  
          if (g_path_is_absolute (file))
                  path = g_strdup (file);
-@@ -204,10 +205,13 @@ query_module (GString *contents, const char *dir, const char *file)
+@@ -270,10 +271,13 @@ query_module (GString *contents, const char *dir, const char *file)
                                     g_module_error());
                  else
                          g_fprintf (stderr, "Cannot load loader %s\n", path);
@@ -48,26 +48,26 @@ index a81c804..350bec8 100644
  }
  
  #ifdef G_OS_WIN32
-@@ -257,6 +261,7 @@ int main (int argc, char **argv)
-         GString *contents;
-         gchar *cache_file = NULL;
+@@ -314,6 +318,7 @@ int main (int argc, char **argv)
          gint first_file = 1;
+         GFile *pixbuf_libdir_file;
+         gchar *pixbuf_libdir;
 +        gboolean success = TRUE;
  
  #ifdef G_OS_WIN32
          gchar *libdir;
-@@ -370,7 +375,9 @@ int main (int argc, char **argv)
+@@ -452,7 +457,9 @@ int main (int argc, char **argv)
                  }
                  modules = g_list_sort (modules, (GCompareFunc)strcmp);
                  for (l = modules; l != NULL; l = l->next)
--                        query_module (contents, path, l->data);
-+                        if (!query_module (contents, path, l->data))
+-                        query_module (contents, moduledir, l->data);
++                        if (!query_module (contents, moduledir, l->data))
 +                                success = FALSE;
 +
                  g_list_free_full (modules, g_free);
+                 g_free (moduledir);
  #else
-                 g_string_append_printf (contents, "# dynamic loading of modules not supported\n");
-@@ -385,7 +392,8 @@ int main (int argc, char **argv)
+@@ -468,7 +475,8 @@ int main (int argc, char **argv)
                          infilename = g_locale_to_utf8 (infilename,
                                                         -1, NULL, NULL, NULL);
  #endif
@@ -77,9 +77,9 @@ index a81c804..350bec8 100644
                  }
                  g_free (cwd);
          }
-@@ -401,5 +409,8 @@ int main (int argc, char **argv)
-         else
-                 g_print ("%s\n", contents->str);
+@@ -486,5 +494,8 @@ int main (int argc, char **argv)
+ 
+         g_free (pixbuf_libdir);
  
 -        return 0;
 +        if (g_getenv ("GDK_PIXBUF_FATAL_LOADER"))
@@ -87,6 +87,3 @@ index a81c804..350bec8 100644
 +        else
 +                return 0;
  }
--- 
-2.14.1
-

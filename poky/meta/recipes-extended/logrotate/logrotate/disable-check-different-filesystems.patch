@@ -1,4 +1,7 @@
-Disable the check for different filesystems
+From e47796c8e8270a3d14f0b06af8a9e916c2225514 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Tue, 8 Jan 2019 06:27:06 +0000
+Subject: [PATCH] Disable the check for different filesystems
 
 The logrotate supports rotate log across different filesystems now, so
 disable the check for different filesystems.
@@ -7,26 +10,29 @@ Upstream-Status: Pending
 
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
 ---
- config.c |    9 ---------
+ config.c | 9 ---------
  1 file changed, 9 deletions(-)
 
 diff --git a/config.c b/config.c
-index dbbf563..64e66f6 100644
+index 633b843..99a4a3b 100644
 --- a/config.c
 +++ b/config.c
-@@ -1493,15 +1493,6 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
- 							goto error;
- 						}
- 					}
+@@ -1765,15 +1765,6 @@ duperror:
+                                     goto error;
+                                 }
+                             }
 -
--					if (sb.st_dev != sb2.st_dev
--						&& !(newlog->flags & (LOG_FLAG_COPYTRUNCATE | LOG_FLAG_COPY | LOG_FLAG_TMPFILENAME))) {
--						message(MESS_ERROR,
--							"%s:%d olddir %s and log file %s "
--							"are on different devices\n", configFile,
--							lineNum, newlog->oldDir, newlog->files[i]);
--						goto error;
--					}
- 				}
- 			}
+-                            if (sb.st_dev != sb2.st_dev
+-                                    && !(newlog->flags & (LOG_FLAG_COPYTRUNCATE | LOG_FLAG_COPY | LOG_FLAG_TMPFILENAME))) {
+-                                message(MESS_ERROR,
+-                                        "%s:%d olddir %s and log file %s "
+-                                        "are on different devices\n", configFile,
+-                                        lineNum, newlog->oldDir, newlog->files[i]);
+-                                goto error;
+-                            }
+                         }
+                     }
  
+-- 
+2.18.1
+

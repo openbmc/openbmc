@@ -31,7 +31,7 @@ diff --git a/Modules/FindQt4.cmake b/Modules/FindQt4.cmake
 index 7ad981879..8b6f43cda 100644
 --- a/Modules/FindQt4.cmake
 +++ b/Modules/FindQt4.cmake
-@@ -987,25 +987,26 @@ if (QT_QMAKE_EXECUTABLE AND
+@@ -988,25 +988,26 @@ if (QT_QMAKE_EXECUTABLE AND
      endif()
    endmacro()
  

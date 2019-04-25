@@ -1,0 +1,23 @@
+# 2014-04-18 Antti Palosaari <crope@iki.fi>
+# generated from http://www.digita.fi/kuluttajat/tv/nakyvyysalueet/kanavanumerot_ja_taajuudet
+
+[Alajarvi]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 642000000
+	BANDWIDTH_HZ = 8000000
+
+[Alajarvi]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 730000000
+	BANDWIDTH_HZ = 8000000
+
+[Alajarvi]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 778000000
+	BANDWIDTH_HZ = 8000000
+
+[Alajarvi]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 578000000
+	BANDWIDTH_HZ = 8000000
+

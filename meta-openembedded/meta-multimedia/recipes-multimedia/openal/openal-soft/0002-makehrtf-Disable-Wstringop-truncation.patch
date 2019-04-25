@@ -1,0 +1,31 @@
+From 07ef86e33ed6f7585f0dfaa1732ea17c816655a4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 14 Jan 2019 11:45:42 -0800
+Subject: [PATCH] makehrtf: Disable Wstringop-truncation
+
+Upstream-Status: Inappropriate [Should be fixed in code]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ utils/makehrtf.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/utils/makehrtf.c b/utils/makehrtf.c
+index 0bd36849..0abe4252 100644
+--- a/utils/makehrtf.c
++++ b/utils/makehrtf.c
+@@ -862,6 +862,7 @@ static int TrReadOperator(TokenReaderT *tr, const char *op)
+  * pattern string are replaced with the replacement string.  The result is
+  * truncated if necessary.
+  */
++#pragma GCC diagnostic ignored "-Wstringop-truncation"
+ static int StrSubst(const char *in, const char *pat, const char *rep, const size_t maxLen, char *out)
+ {
+     size_t inLen, patLen, repLen;
+@@ -900,6 +901,7 @@ static int StrSubst(const char *in, const char *pat, const char *rep, const size
+     return !truncated;
+ }
+ 
++#pragma GCC diagnostic pop
+ 
+ /*********************
+  *** Math routines ***

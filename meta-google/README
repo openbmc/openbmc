@@ -1,0 +1,60 @@
+This README file contains information on the contents of the meta-google layer.
+
+Please see the corresponding sections below for details.
+
+
+Dependencies
+============
+
+This layer depends on:
+
+  URI: https://github.com/openbmc/meta-phosphor
+  branch: master
+
+Patches
+=======
+
+Please submit any patches against the meta-google layer to the OpenBMC gerrit https://gerrit.openbmc-project.xyz/
+
+Layer maintainer: Patrick Venture <venture@google.com>
+
+When sending patches, follow the OpenBMC guidelines.
+
+Table of Contents
+=================
+
+  I. Adding the filesystems layer to your build
+ II. Purpose
+III. Customizations
+
+
+I. Adding the meta-google layer to your build
+=================================================
+
+In order to use this layer, you need to make the build system aware of
+it.
+
+Assuming the meta-google layer exists at the top-level of your
+yocto build tree, you can add it to the build system by adding the
+location of the meta-google layer to bblayers.conf, along with any
+other layers needed. e.g.:
+
+  BBLAYERS ?= " \
+    /path/to/yocto/meta-phosphor \
+    /path/to/yocto/meta-google \
+    "
+
+
+II.  Purpose
+============
+
+Including this layer adds the following packages to your obmc-phosphor-image:
+
+* google-ipmi-sys: OEM IPMI Handler for providing specific information to the host.
+* phosphor-ipmi-blobs: OEM IPMI Blobs Handler for providing the framework for specific blob handlers.
+* phosphor-ipmi-ethstats: OEM IPMI Handler for reporting ethernet device statistics from the BMCs ethernet devices.
+* phosphor-ipmi-flash: OEM IPMI Handler for controlling in-band firmware updates.
+
+III. Customizations
+
+Presently, this layer also enables the Google Iana for registering phosphor-ipmi-ethstats in addition to the OpenBMC one.

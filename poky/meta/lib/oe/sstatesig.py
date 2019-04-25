@@ -263,10 +263,181 @@ class SignatureGeneratorOEBasicHash(bb.siggen.SignatureGeneratorBasicHash):
         if error_msgs:
             bb.fatal("\n".join(error_msgs))
 
+class SignatureGeneratorOEEquivHash(SignatureGeneratorOEBasicHash):
+    name = "OEEquivHash"
+
+    def init_rundepcheck(self, data):
+        super().init_rundepcheck(data)
+        self.server = data.getVar('SSTATE_HASHEQUIV_SERVER')
+        self.method = data.getVar('SSTATE_HASHEQUIV_METHOD')
+        self.unihashes = bb.persist_data.persist('SSTATESIG_UNIHASH_CACHE_v1_' + self.method.replace('.', '_'), data)
+
+    def get_taskdata(self):
+        return (self.server, self.method) + super().get_taskdata()
+
+    def set_taskdata(self, data):
+        self.server, self.method = data[:2]
+        super().set_taskdata(data[2:])
+
+    def __get_task_unihash_key(self, task):
+        # TODO: The key only *needs* to be the taskhash, the task is just
+        # convenient
+        return '%s:%s' % (task, self.taskhash[task])
+
+    def get_stampfile_hash(self, task):
+        if task in self.taskhash:
+            # If a unique hash is reported, use it as the stampfile hash. This
+            # ensures that if a task won't be re-run if the taskhash changes,
+            # but it would result in the same output hash
+            unihash = self.unihashes.get(self.__get_task_unihash_key(task))
+            if unihash is not None:
+                return unihash
+
+        return super().get_stampfile_hash(task)
+
+    def get_unihash(self, task):
+        import urllib
+        import json
+
+        taskhash = self.taskhash[task]
+
+        key = self.__get_task_unihash_key(task)
+
+        # TODO: This cache can grow unbounded. It probably only needs to keep
+        # for each task
+        unihash = self.unihashes.get(key)
+        if unihash is not None:
+            return unihash
+
+        # In the absence of being able to discover a unique hash from the
+        # server, make it be equivalent to the taskhash. The unique "hash" only
+        # really needs to be a unique string (not even necessarily a hash), but
+        # making it match the taskhash has a few advantages:
+        #
+        # 1) All of the sstate code that assumes hashes can be the same
+        # 2) It provides maximal compatibility with builders that don't use
+        #    an equivalency server
+        # 3) The value is easy for multiple independent builders to derive the
+        #    same unique hash from the same input. This means that if the
+        #    independent builders find the same taskhash, but it isn't reported
+        #    to the server, there is a better chance that they will agree on
+        #    the unique hash.
+        unihash = taskhash
+
+        try:
+            url = '%s/v1/equivalent?%s' % (self.server,
+                    urllib.parse.urlencode({'method': self.method, 'taskhash': self.taskhash[task]}))
+
+            request = urllib.request.Request(url)
+            response = urllib.request.urlopen(request)
+            data = response.read().decode('utf-8')
+
+            json_data = json.loads(data)
+
+            if json_data:
+                unihash = json_data['unihash']
+                # A unique hash equal to the taskhash is not very interesting,
+                # so it is reported it at debug level 2. If they differ, that
+                # is much more interesting, so it is reported at debug level 1
+                bb.debug((1, 2)[unihash == taskhash], 'Found unihash %s in place of %s for %s from %s' % (unihash, taskhash, task, self.server))
+            else:
+                bb.debug(2, 'No reported unihash for %s:%s from %s' % (task, taskhash, self.server))
+        except urllib.error.URLError as e:
+            bb.warn('Failure contacting Hash Equivalence Server %s: %s' % (self.server, str(e)))
+        except (KeyError, json.JSONDecodeError) as e:
+            bb.warn('Poorly formatted response from %s: %s' % (self.server, str(e)))
+
+        self.unihashes[key] = unihash
+        return unihash
+
+    def report_unihash(self, path, task, d):
+        import urllib
+        import json
+        import tempfile
+        import base64
+        import importlib
+
+        taskhash = d.getVar('BB_TASKHASH')
+        unihash = d.getVar('BB_UNIHASH')
+        report_taskdata = d.getVar('SSTATE_HASHEQUIV_REPORT_TASKDATA') == '1'
+        tempdir = d.getVar('T')
+        fn = d.getVar('BB_FILENAME')
+        key = fn + '.do_' + task + ':' + taskhash
+
+        # Sanity checks
+        cache_unihash = self.unihashes.get(key)
+        if cache_unihash is None:
+            bb.fatal('%s not in unihash cache. Please report this error' % key)
+
+        if cache_unihash != unihash:
+            bb.fatal("Cache unihash %s doesn't match BB_UNIHASH %s" % (cache_unihash, unihash))
+
+        sigfile = None
+        sigfile_name = "depsig.do_%s.%d" % (task, os.getpid())
+        sigfile_link = "depsig.do_%s" % task
+
+        try:
+            sigfile = open(os.path.join(tempdir, sigfile_name), 'w+b')
+
+            locs = {'path': path, 'sigfile': sigfile, 'task': task, 'd': d}
+
+            (module, method) = self.method.rsplit('.', 1)
+            locs['method'] = getattr(importlib.import_module(module), method)
+
+            outhash = bb.utils.better_eval('method(path, sigfile, task, d)', locs)
+
+            try:
+                url = '%s/v1/equivalent' % self.server
+                task_data = {
+                    'taskhash': taskhash,
+                    'method': self.method,
+                    'outhash': outhash,
+                    'unihash': unihash,
+                    'owner': d.getVar('SSTATE_HASHEQUIV_OWNER')
+                    }
+
+                if report_taskdata:
+                    sigfile.seek(0)
+
+                    task_data['PN'] = d.getVar('PN')
+                    task_data['PV'] = d.getVar('PV')
+                    task_data['PR'] = d.getVar('PR')
+                    task_data['task'] = task
+                    task_data['outhash_siginfo'] = sigfile.read().decode('utf-8')
+
+                headers = {'content-type': 'application/json'}
+
+                request = urllib.request.Request(url, json.dumps(task_data).encode('utf-8'), headers)
+                response = urllib.request.urlopen(request)
+                data = response.read().decode('utf-8')
+
+                json_data = json.loads(data)
+                new_unihash = json_data['unihash']
+
+                if new_unihash != unihash:
+                    bb.debug(1, 'Task %s unihash changed %s -> %s by server %s' % (taskhash, unihash, new_unihash, self.server))
+                else:
+                    bb.debug(1, 'Reported task %s as unihash %s to %s' % (taskhash, unihash, self.server))
+            except urllib.error.URLError as e:
+                bb.warn('Failure contacting Hash Equivalence Server %s: %s' % (self.server, str(e)))
+            except (KeyError, json.JSONDecodeError) as e:
+                bb.warn('Poorly formatted response from %s: %s' % (self.server, str(e)))
+        finally:
+            if sigfile:
+                sigfile.close()
+
+                sigfile_link_path = os.path.join(tempdir, sigfile_link)
+                bb.utils.remove(sigfile_link_path)
+
+                try:
+                    os.symlink(sigfile_name, sigfile_link_path)
+                except OSError:
+                    pass
 
 # Insert these classes into siggen's namespace so it can see and select them
 bb.siggen.SignatureGeneratorOEBasic = SignatureGeneratorOEBasic
 bb.siggen.SignatureGeneratorOEBasicHash = SignatureGeneratorOEBasicHash
+bb.siggen.SignatureGeneratorOEEquivHash = SignatureGeneratorOEEquivHash
 
 
 def find_siginfo(pn, taskname, taskhashlist, d):
@@ -327,7 +498,7 @@ def find_siginfo(pn, taskname, taskhashlist, d):
 
     if not taskhashlist or (len(filedates) < 2 and not foundall):
         # That didn't work, look in sstate-cache
-        hashes = taskhashlist or ['?' * 32]
+        hashes = taskhashlist or ['?' * 64]
         localdata = bb.data.createCopy(d)
         for hashval in hashes:
             localdata.setVar('PACKAGE_ARCH', '*')
@@ -413,5 +584,134 @@ def find_sstate_manifest(taskdata, taskdata2, taskname, d, multilibcache):
             return manifest, d2
     bb.warn("Manifest %s not found in %s (variant '%s')?" % (manifest, d2.expand(" ".join(pkgarchs)), variant))
     return None, d2
+
+def OEOuthashBasic(path, sigfile, task, d):
+    """
+    Basic output hash function
+
+    Calculates the output hash of a task by hashing all output file metadata,
+    and file contents.
+    """
+    import hashlib
+    import stat
+    import pwd
+    import grp
+
+    def update_hash(s):
+        s = s.encode('utf-8')
+        h.update(s)
+        if sigfile:
+            sigfile.write(s)
+
+    h = hashlib.sha256()
+    prev_dir = os.getcwd()
+    include_owners = os.environ.get('PSEUDO_DISABLED') == '0'
+
+    try:
+        os.chdir(path)
+
+        update_hash("OEOuthashBasic\n")
+
+        # It is only currently useful to get equivalent hashes for things that
+        # can be restored from sstate. Since the sstate object is named using
+        # SSTATE_PKGSPEC and the task name, those should be included in the
+        # output hash calculation.
+        update_hash("SSTATE_PKGSPEC=%s\n" % d.getVar('SSTATE_PKGSPEC'))
+        update_hash("task=%s\n" % task)
+
+        for root, dirs, files in os.walk('.', topdown=True):
+            # Sort directories to ensure consistent ordering when recursing
+            dirs.sort()
+            files.sort()
+
+            def process(path):
+                s = os.lstat(path)
+
+                if stat.S_ISDIR(s.st_mode):
+                    update_hash('d')
+                elif stat.S_ISCHR(s.st_mode):
+                    update_hash('c')
+                elif stat.S_ISBLK(s.st_mode):
+                    update_hash('b')
+                elif stat.S_ISSOCK(s.st_mode):
+                    update_hash('s')
+                elif stat.S_ISLNK(s.st_mode):
+                    update_hash('l')
+                elif stat.S_ISFIFO(s.st_mode):
+                    update_hash('p')
+                else:
+                    update_hash('-')
+
+                def add_perm(mask, on, off='-'):
+                    if mask & s.st_mode:
+                        update_hash(on)
+                    else:
+                        update_hash(off)
+
+                add_perm(stat.S_IRUSR, 'r')
+                add_perm(stat.S_IWUSR, 'w')
+                if stat.S_ISUID & s.st_mode:
+                    add_perm(stat.S_IXUSR, 's', 'S')
+                else:
+                    add_perm(stat.S_IXUSR, 'x')
+
+                add_perm(stat.S_IRGRP, 'r')
+                add_perm(stat.S_IWGRP, 'w')
+                if stat.S_ISGID & s.st_mode:
+                    add_perm(stat.S_IXGRP, 's', 'S')
+                else:
+                    add_perm(stat.S_IXGRP, 'x')
+
+                add_perm(stat.S_IROTH, 'r')
+                add_perm(stat.S_IWOTH, 'w')
+                if stat.S_ISVTX & s.st_mode:
+                    update_hash('t')
+                else:
+                    add_perm(stat.S_IXOTH, 'x')
+
+                if include_owners:
+                    update_hash(" %10s" % pwd.getpwuid(s.st_uid).pw_name)
+                    update_hash(" %10s" % grp.getgrgid(s.st_gid).gr_name)
+
+                update_hash(" ")
+                if stat.S_ISBLK(s.st_mode) or stat.S_ISCHR(s.st_mode):
+                    update_hash("%9s" % ("%d.%d" % (os.major(s.st_rdev), os.minor(s.st_rdev))))
+                else:
+                    update_hash(" " * 9)
+
+                update_hash(" ")
+                if stat.S_ISREG(s.st_mode):
+                    update_hash("%10d" % s.st_size)
+                else:
+                    update_hash(" " * 10)
+
+                update_hash(" ")
+                fh = hashlib.sha256()
+                if stat.S_ISREG(s.st_mode):
+                    # Hash file contents
+                    with open(path, 'rb') as d:
+                        for chunk in iter(lambda: d.read(4096), b""):
+                            fh.update(chunk)
+                    update_hash(fh.hexdigest())
+                else:
+                    update_hash(" " * len(fh.hexdigest()))
+
+                update_hash(" %s" % path)
+
+                if stat.S_ISLNK(s.st_mode):
+                    update_hash(" -> %s" % os.readlink(path))
+
+                update_hash("\n")
+
+            # Process this directory and all its child files
+            process(root)
+            for f in files:
+                if f == 'fixmepath':
+                    continue
+                process(os.path.join(root, f))
+    finally:
+        os.chdir(prev_dir)
+
+    return h.hexdigest()
 
 

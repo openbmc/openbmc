@@ -1,4 +1,7 @@
-[PATCH] not check libperl under cross compiling
+From 7e2af4de19be58bc9d551c41ce2750396d357f34 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Tue, 27 Nov 2018 13:25:15 +0800
+Subject: [PATCH] PATCH] not check libperl under cross compiling
 
 Upstream-Status: Inappropriate [configuration]
 
@@ -6,23 +9,29 @@ libperl ldflags returned by PGAC_CHECK_PERL_EMBED_LDFLAGS are native,
 can not be used to check target library.
 
 postpresql has the dependency on perl, so not need to check libperl
-again, like in postgresql-9.2.4 
+again, like in postgresql-9.2.4
 
 Signed-off-by: Roy Li <rongqing.li@windriver.com>
+
+update patch to version 11.1
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
  configure.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Index: postgresql-9.4.15/configure.in
-===================================================================
---- postgresql-9.4.15.orig/configure.in
-+++ postgresql-9.4.15/configure.in
-@@ -1879,7 +1879,7 @@ if test "$with_tcl" = yes; then
+diff --git a/configure.in b/configure.in
+index b98b9bb..8584677 100644
+--- a/configure.in
++++ b/configure.in
+@@ -2211,7 +2211,7 @@ Use --without-tcl to disable building PL/Tcl.])
  fi
  
  # check for <perl.h>
 -if test "$with_perl" = yes; then
 +if test "$with_perl" = yes && test "$cross_compiling" = no; then
    ac_save_CPPFLAGS=$CPPFLAGS
-   CPPFLAGS="$CPPFLAGS -I$perl_archlibexp/CORE"
+   CPPFLAGS="$CPPFLAGS $perl_includespec"
    AC_CHECK_HEADER(perl.h, [], [AC_MSG_ERROR([header file <perl.h> is required for Perl])],
+-- 
+2.7.4
+

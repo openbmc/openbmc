@@ -31,6 +31,7 @@ FILES_${PN} = "${mandir}/*"
 inherit update-alternatives
 
 ALTERNATIVE_PRIORITY = "100"
-ALTERNATIVE_${PN} = "passwd.5 getspnam.3"
+ALTERNATIVE_${PN} = "passwd.5 getspnam.3 crypt.3"
 ALTERNATIVE_LINK_NAME[passwd.5] = "${mandir}/man5/passwd.5"
 ALTERNATIVE_LINK_NAME[getspnam.3] = "${mandir}/man3/getspnam.3"
+ALTERNATIVE_LINK_NAME[crypt.3] = "${mandir}/man3/crypt.3"

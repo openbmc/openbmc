@@ -1,0 +1,32 @@
+From 4f115fc314646500f7b4178d7248a02654c7cd10 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 30 Nov 2018 16:47:57 -0800
+Subject: [PATCH] Do not pass null pointer to freeaddrinfo()
+
+Passing null pointer as input parameter to freeaddrinfo() is undefined
+behaviour, some libcs e.g. glibc might just call free() which does
+accept null pointer but other libcs e.g. musl might not and instead
+cause the program to segfault. Therefore do not rely on undefined
+behaviour instead make it deterministic
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ support/export/client.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+Index: nfs-utils-2.3.2/support/export/client.c
+===================================================================
+--- nfs-utils-2.3.2.orig/support/export/client.c
++++ nfs-utils-2.3.2/support/export/client.c
+@@ -309,7 +309,8 @@ client_lookup(char *hname, int canonical
+ 		init_addrlist(clp, ai);
+ 
+ out:
+-	freeaddrinfo(ai);
++	if (ai)
++		freeaddrinfo(ai);
+ 	return clp;
+ }
+ 

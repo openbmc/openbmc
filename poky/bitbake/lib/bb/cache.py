@@ -97,7 +97,7 @@ class CoreRecipeInfo(RecipeInfoCommon):
 
         self.skipreason = self.getvar('__SKIPPED', metadata)
         if self.skipreason:
-            self.pn = self.getvar('PN', metadata) or bb.parse.BBHandler.vars_from_file(filename,metadata)[0]
+            self.pn = self.getvar('PN', metadata) or bb.parse.vars_from_file(filename,metadata)[0]
             self.skipped = True
             self.provides  = self.depvar('PROVIDES', metadata)
             self.rprovides = self.depvar('RPROVIDES', metadata)

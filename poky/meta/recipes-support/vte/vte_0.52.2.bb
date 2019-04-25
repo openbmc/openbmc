@@ -9,8 +9,9 @@ inherit gnomebase gtk-doc distro_features_check upstream-version-is-even gobject
 
 # vapigen.m4 is required when vala is not present (but the one from vala should be used normally)
 SRC_URI += "file://0001-Don-t-enable-stack-protection-by-default.patch \
-            ${@bb.utils.contains('PACKAGECONFIG', 'vala', '', 'file://0001-Add-m4-vapigen.m4.patch', d) } \
-            "
+           ${@bb.utils.contains('PACKAGECONFIG', 'vala', '', 'file://0001-Add-m4-vapigen.m4.patch', d) } \
+           file://0001-app.cc-use-old-school-asignment-to-avoid-gcc-4.8-err.patch \
+           "
 SRC_URI[archive.md5sum] = "de8181350dccb010e915e366bdd06d18"
 SRC_URI[archive.sha256sum] = "0f2657cef52accbfe56feede553155552d7c1984b1291838af3cb8cfc19b26af"
 
@@ -44,3 +45,5 @@ EXTRA_OEMAKE_class-target = "LIBTOOL=${STAGING_BINDIR_CROSS}/${HOST_SYS}-libtool
 
 PACKAGES =+ "libvte"
 FILES_libvte = "${libdir}/*.so.* ${libdir}/girepository-1.0/*"
+
+BBCLASSEXTEND = "native nativesdk"

@@ -1,0 +1,149 @@
+From cb9f1a821bcf55cecf3813195fd6d4eff8070927 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 5 Nov 2018 11:35:54 -0500
+Subject: [PATCH 3/9] Fix: ext4: adjust reserved cluster count when removing
+ extents (v4.20)
+
+See upstream commit :
+
+  commit 9fe671496b6c286f9033aedfc1718d67721da0ae
+  Author: Eric Whitney <enwlinux@gmail.com>
+  Date:   Mon Oct 1 14:25:08 2018 -0400
+
+    ext4: adjust reserved cluster count when removing extents
+
+    Modify ext4_ext_remove_space() and the code it calls to correct the
+    reserved cluster count for pending reservations (delayed allocated
+    clusters shared with allocated blocks) when a block range is removed
+    from the extent tree.  Pending reservations may be found for the clusters
+    at the ends of written or unwritten extents when a block range is removed.
+    If a physical cluster at the end of an extent is freed, it's necessary
+    to increment the reserved cluster count to maintain correct accounting
+    if the corresponding logical cluster is shared with at least one
+    delayed and unwritten extent as found in the extents status tree.
+
+    Add a new function, ext4_rereserve_cluster(), to reapply a reservation
+    on a delayed allocated cluster sharing blocks with a freed allocated
+    cluster.  To avoid ENOSPC on reservation, a flag is applied to
+    ext4_free_blocks() to briefly defer updating the freeclusters counter
+    when an allocated cluster is freed.  This prevents another thread
+    from allocating the freed block before the reservation can be reapplied.
+
+    Redefine the partial cluster object as a struct to carry more state
+    information and to clarify the code using it.
+
+    Adjust the conditional code structure in ext4_ext_remove_space to
+    reduce the indentation level in the main body of the code to improve
+    readability.
+
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+
+Upstream-Status: backport https://github.com/lttng/lttng-modules/commit/cb9f1a821bcf55cecf3813195fd6d4eff8070927
+
+Signed-off-by: Bruce Ashfield <bruce.ashfield@gmail.com>
+
+---
+ instrumentation/events/lttng-module/ext4.h | 72 +++++++++++++++++++++-
+ 1 file changed, 69 insertions(+), 3 deletions(-)
+
+diff --git a/instrumentation/events/lttng-module/ext4.h b/instrumentation/events/lttng-module/ext4.h
+index fe6f802..83a80ba 100644
+--- a/instrumentation/events/lttng-module/ext4.h
++++ b/instrumentation/events/lttng-module/ext4.h
+@@ -1602,7 +1602,30 @@ LTTNG_TRACEPOINT_EVENT(ext4_ext_show_extent,
+ 	)
+ )
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,11,0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,20,0))
++
++LTTNG_TRACEPOINT_EVENT(ext4_remove_blocks,
++	TP_PROTO(struct inode *inode, struct ext4_extent *ex,
++		 ext4_lblk_t from, ext4_fsblk_t to,
++		 struct partial_cluster *pc),
++
++	TP_ARGS(inode, ex, from, to, pc),
++
++	TP_FIELDS(
++		ctf_integer(dev_t, dev, inode->i_sb->s_dev)
++		ctf_integer(ino_t, ino, inode->i_ino)
++		ctf_integer(ext4_lblk_t, from, from)
++		ctf_integer(ext4_lblk_t, to, to)
++		ctf_integer(ext4_fsblk_t, ee_pblk, ext4_ext_pblock(ex))
++		ctf_integer(ext4_lblk_t, ee_lblk, le32_to_cpu(ex->ee_block))
++		ctf_integer(unsigned short, ee_len, ext4_ext_get_actual_len(ex))
++		ctf_integer(ext4_fsblk_t, pc_pclu, pc->pclu)
++		ctf_integer(ext4_lblk_t, pc_lblk, pc->lblk)
++		ctf_integer(int, pc_state, pc->state)
++	)
++)
++
++#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3,11,0))
+ 
+ LTTNG_TRACEPOINT_EVENT(ext4_remove_blocks,
+ 	    TP_PROTO(struct inode *inode, struct ext4_extent *ex,
+@@ -1646,7 +1669,29 @@ LTTNG_TRACEPOINT_EVENT(ext4_remove_blocks,
+ 
+ #endif
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,11,0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,20,0))
++
++LTTNG_TRACEPOINT_EVENT(ext4_ext_rm_leaf,
++	TP_PROTO(struct inode *inode, ext4_lblk_t start,
++		 struct ext4_extent *ex,
++		 struct partial_cluster *pc),
++
++	TP_ARGS(inode, start, ex, pc),
++
++	TP_FIELDS(
++		ctf_integer(dev_t, dev, inode->i_sb->s_dev)
++		ctf_integer(ino_t, ino, inode->i_ino)
++		ctf_integer(ext4_lblk_t, start, start)
++		ctf_integer(ext4_lblk_t, ee_lblk, le32_to_cpu(ex->ee_block))
++		ctf_integer(ext4_fsblk_t, ee_pblk, ext4_ext_pblock(ex))
++		ctf_integer(short, ee_len, ext4_ext_get_actual_len(ex))
++		ctf_integer(ext4_fsblk_t, pc_pclu, pc->pclu)
++		ctf_integer(ext4_lblk_t, pc_lblk, pc->lblk)
++		ctf_integer(int, pc_state, pc->state)
++	)
++)
++
++#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3,11,0))
+ 
+ LTTNG_TRACEPOINT_EVENT(ext4_ext_rm_leaf,
+ 	TP_PROTO(struct inode *inode, ext4_lblk_t start,
+@@ -1733,7 +1778,28 @@ LTTNG_TRACEPOINT_EVENT(ext4_ext_remove_space,
+ 
+ #endif
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,11,0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,20,0))
++
++LTTNG_TRACEPOINT_EVENT(ext4_ext_remove_space_done,
++	TP_PROTO(struct inode *inode, ext4_lblk_t start, ext4_lblk_t end,
++		 int depth, struct partial_cluster *pc, __le16 eh_entries),
++
++	TP_ARGS(inode, start, end, depth, pc, eh_entries),
++
++	TP_FIELDS(
++		ctf_integer(dev_t, dev, inode->i_sb->s_dev)
++		ctf_integer(ino_t, ino, inode->i_ino)
++		ctf_integer(ext4_lblk_t, start, start)
++		ctf_integer(ext4_lblk_t, end, end)
++		ctf_integer(int, depth, depth)
++		ctf_integer(unsigned short, eh_entries, le16_to_cpu(eh_entries))
++		ctf_integer(ext4_fsblk_t, pc_pclu, pc->pclu)
++		ctf_integer(ext4_lblk_t, pc_lblk, pc->lblk)
++		ctf_integer(int, pc_state, pc->state)
++	)
++)
++
++#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3,11,0))
+ 
+ LTTNG_TRACEPOINT_EVENT(ext4_ext_remove_space_done,
+ 	TP_PROTO(struct inode *inode, ext4_lblk_t start, ext4_lblk_t end,
+-- 
+2.19.1
+

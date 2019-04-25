@@ -193,15 +193,15 @@ PACKAGES =+ "${PN}-python ${PN}-pidl \
 
 python samba_populate_packages() {
     def module_hook(file, pkg, pattern, format, basename):
-        pn = d.getVar('PN', True)
+        pn = d.getVar('PN')
         d.appendVar('RRECOMMENDS_%s-base' % pn, ' %s' % pkg)
 
-    mlprefix = d.getVar('MLPREFIX', True) or ''
+    mlprefix = d.getVar('MLPREFIX') or ''
     pam_libdir = d.expand('${base_libdir}/security')
     pam_pkgname = mlprefix + 'pam-plugin%s'
     do_split_packages(d, pam_libdir, '^pam_(.*)\.so$', pam_pkgname, 'PAM plugin for %s', extra_depends='', prepend=True)
 
-    libdir = d.getVar('libdir', True)
+    libdir = d.getVar('libdir')
     do_split_packages(d, libdir, '^lib(.*)\.so\..*$', 'lib%s', 'Samba %s library', extra_depends='${PN}-common', prepend=True, allow_links=True)
     pkglibdir = '%s/samba' % libdir
     do_split_packages(d, pkglibdir, '^lib(.*)\.so$', 'lib%s', 'Samba %s library', extra_depends='${PN}-common', prepend=True)

@@ -25,6 +25,7 @@ SRC_URI = " \
     file://gtk-doc-tweaks.patch \
     file://0001-gst-gstpluginloader.c-when-env-var-is-set-do-not-fal.patch \
     file://add-a-target-to-compile-tests.patch \
+    file://0002-gstconfig.h.in-initial-RISC-V-support.patch \
     file://run-ptest \
 "
 SRC_URI[md5sum] = "f67fbbc42bd85a0701df119f52fb52bd"

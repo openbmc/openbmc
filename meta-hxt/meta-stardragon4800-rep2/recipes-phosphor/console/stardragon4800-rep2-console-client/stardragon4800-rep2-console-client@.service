@@ -6,4 +6,4 @@ ExecStart=/usr/bin/env stardragon4800-rep2-console-client.sh
 SyslogIdentifier=stardragon4800-rep2-console-client.sh
 
 [Install]
-WantedBy={SYSTEMD_DEFAULT_TARGET}
+WantedBy=multi-user.target

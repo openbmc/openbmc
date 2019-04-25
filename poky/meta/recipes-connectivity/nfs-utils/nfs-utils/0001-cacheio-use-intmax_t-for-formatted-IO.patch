@@ -1,0 +1,38 @@
+From ac32b813f5d6f9a2de944015cf9bb98d68e0203a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 1 Dec 2018 10:02:12 -0800
+Subject: [PATCH] cacheio: use intmax_t for formatted IO
+
+time_t is not same size on x32 ABI (ILP32)
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ support/nfs/cacheio.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/support/nfs/cacheio.c b/support/nfs/cacheio.c
+index 9dc4cf1..2086a95 100644
+--- a/support/nfs/cacheio.c
++++ b/support/nfs/cacheio.c
+@@ -17,6 +17,7 @@
+ 
+ #include <nfslib.h>
+ #include <stdio.h>
++#include <inttypes.h>
+ #include <stdio_ext.h>
+ #include <string.h>
+ #include <ctype.h>
+@@ -234,7 +235,7 @@ cache_flush(int force)
+ 	    stb.st_mtime > now)
+ 		stb.st_mtime = time(0);
+ 	
+-	sprintf(stime, "%ld\n", stb.st_mtime);
++	sprintf(stime, "%jd\n", (intmax_t)stb.st_mtime);
+ 	for (c=0; cachelist[c]; c++) {
+ 		int fd;
+ 		sprintf(path, "/proc/net/rpc/%s/flush", cachelist[c]);
+-- 
+2.19.2
+

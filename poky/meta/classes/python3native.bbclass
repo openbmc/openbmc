@@ -9,6 +9,8 @@ DEPENDS_append = " python3-native "
 export STAGING_INCDIR
 export STAGING_LIBDIR
 
+export _PYTHON_SYSCONFIGDATA_NAME="_sysconfigdata"
+
 # suppress host user's site-packages dirs.
 export PYTHONNOUSERSITE = "1"
 

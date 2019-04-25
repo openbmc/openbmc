@@ -7,4 +7,4 @@ ExecStart=/usr/bin/env obmc-phosphor-chassisd
 SyslogIdentifier=obmc-phosphor-chassisd
 
 [Install]
-WantedBy={SYSTEMD_DEFAULT_TARGET}
+WantedBy=multi-user.target

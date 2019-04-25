@@ -39,7 +39,7 @@ PACKAGES += "${PN}-modules"
 PACKAGES_DYNAMIC += "^${PN}-module-.*"
 
 python populate_packages_prepend() {
-    modules = do_split_packages(d, '${libdir}/xtables', 'lib(.*)\.so$', '${PN}-module-%s', '${PN} module %s', extra_depends='')
+    modules = do_split_packages(d, '${libdir}/xtables', r'lib(.*)\.so$', '${PN}-module-%s', '${PN} module %s', extra_depends='')
     if modules:
         metapkg = d.getVar('PN') + '-modules'
         d.appendVar('RDEPENDS_' + metapkg, ' ' + ' '.join(modules))

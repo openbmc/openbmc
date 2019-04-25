@@ -1,7 +1,7 @@
-From 582af7ec13131dfcc620ed81de7b211914c4cb03 Mon Sep 17 00:00:00 2001
+From 7bcf3b166694090497a0acd2c5299e4e04fcc9b6 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
-Date: Fri, 29 Jun 2018 13:43:49 +0800
-Subject: [PATCH 04/19] add fallback parse_printf_format implementation
+Date: Mon, 25 Feb 2019 14:04:21 +0800
+Subject: [PATCH 04/24] add fallback parse_printf_format implementation
 
 Upstream-Status: Inappropriate [musl specific]
 
@@ -20,25 +20,25 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  create mode 100644 src/basic/parse-printf-format.h
 
 diff --git a/meson.build b/meson.build
-index e045b9224..8c16bc979 100644
+index 3386546..44b24ee 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -598,6 +598,7 @@ foreach header : ['crypt.h',
-                   'linux/btrfs.h',
+@@ -667,6 +667,7 @@ foreach header : ['crypt.h',
                    'linux/memfd.h',
                    'linux/vm_sockets.h',
+                   'linux/can/vxcan.h',
 +                  'printf.h',
                    'sys/auxv.h',
                    'valgrind/memcheck.h',
                    'valgrind/valgrind.h',
 diff --git a/src/basic/meson.build b/src/basic/meson.build
-index 31625b178..0c27528e7 100644
+index e5852f3..2192a0c 100644
 --- a/src/basic/meson.build
 +++ b/src/basic/meson.build
-@@ -302,6 +302,11 @@ foreach item : [['af',     af_list_txt,     'af',         ''],
+@@ -284,6 +284,11 @@ foreach item : [['af',     af_list_txt,     'af',         ''],
  endforeach
  
- basic_sources += [missing_h] + generated_gperf_headers
+ basic_sources += generated_gperf_headers
 +
 +if conf.get('HAVE_PRINTF_H') != 1
 +        basic_sources += [files('parse-printf-format.c')]
@@ -49,7 +49,7 @@ index 31625b178..0c27528e7 100644
          'gcrypt-util.h')
 diff --git a/src/basic/parse-printf-format.c b/src/basic/parse-printf-format.c
 new file mode 100644
-index 000000000..49437e544
+index 0000000..49437e5
 --- /dev/null
 +++ b/src/basic/parse-printf-format.c
 @@ -0,0 +1,273 @@
@@ -328,7 +328,7 @@ index 000000000..49437e544
 +}
 diff --git a/src/basic/parse-printf-format.h b/src/basic/parse-printf-format.h
 new file mode 100644
-index 000000000..47be7522d
+index 0000000..47be752
 --- /dev/null
 +++ b/src/basic/parse-printf-format.h
 @@ -0,0 +1,57 @@
@@ -390,10 +390,10 @@ index 000000000..47be7522d
 +
 +#endif /* HAVE_PRINTF_H */
 diff --git a/src/basic/stdio-util.h b/src/basic/stdio-util.h
-index 73c03274c..30192cd71 100644
+index dc67b6e..cf8d514 100644
 --- a/src/basic/stdio-util.h
 +++ b/src/basic/stdio-util.h
-@@ -1,12 +1,12 @@
+@@ -1,13 +1,13 @@
  /* SPDX-License-Identifier: LGPL-2.1+ */
  #pragma once
  
@@ -403,12 +403,13 @@ index 73c03274c..30192cd71 100644
  #include <sys/types.h>
  
  #include "macro.h"
+ #include "util.h"
 +#include "parse-printf-format.h"
  
  #define snprintf_ok(buf, len, fmt, ...) \
          ((size_t) snprintf(buf, len, fmt, __VA_ARGS__) < (len))
 diff --git a/src/journal/journal-send.c b/src/journal/journal-send.c
-index a0621524a..65bcbcd2e 100644
+index 8618454..3fea912 100644
 --- a/src/journal/journal-send.c
 +++ b/src/journal/journal-send.c
 @@ -2,7 +2,6 @@
@@ -420,13 +421,13 @@ index a0621524a..65bcbcd2e 100644
  #include <sys/socket.h>
  #include <sys/un.h>
 @@ -21,6 +20,7 @@
- #include "stdio-util.h"
  #include "string-util.h"
+ #include "tmpfile-util.h"
  #include "util.h"
 +#include "parse-printf-format.h"
  
  #define SNDBUF_SIZE (8*1024*1024)
  
 -- 
-2.11.0
+2.7.4
 

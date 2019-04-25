@@ -39,15 +39,7 @@ DEPENDS += " \
 "
 
 RDEPENDS_${PN}-manager += " \
-        sdbusplus \
-        phosphor-dbus-interfaces \
-        phosphor-logging \
         ${PN}-dreport \
-"
-RDEPENDS_${PN}-monitor += " \
-        sdbusplus \
-        phosphor-dbus-interfaces \
-        phosphor-logging \
 "
 RDEPENDS_${PN}-dreport += " \
         systemd \

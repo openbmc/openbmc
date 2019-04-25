@@ -1,0 +1,55 @@
+From 989e425d416474c191b020d0825895e3df4bd033 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 10 Jan 2019 18:14:18 +0100
+Subject: [PATCH] rpmscript.c: change logging level around scriptlets to INFO
+ from DEBUG
+
+That way we can debug scriptlet failures without writing lots of
+irrelevant noise to rootfs logs.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ lib/rpmscript.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/lib/rpmscript.c b/lib/rpmscript.c
+index 2b0e43862..e319673f1 100644
+--- a/lib/rpmscript.c
++++ b/lib/rpmscript.c
+@@ -226,7 +226,7 @@ static char * writeScript(const char *cmd, const char *script)
+     if (Ferror(fd))
+ 	goto exit;
+ 
+-    if (rpmIsDebug() && (rstreq(cmd, "/bin/sh") || rstreq(cmd, "/bin/bash"))) {
++    if (rpmIsVerbose() && (rstreq(cmd, "/bin/sh") || rstreq(cmd, "/bin/bash"))) {
+ 	static const char set_x[] = "set -x\n";
+ 	/* Assume failures will be caught by the write below */
+ 	Fwrite(set_x, sizeof(set_x[0]), sizeof(set_x)-1, fd);
+@@ -258,7 +258,7 @@ static rpmRC runExtScript(rpmPlugins plugins, ARGV_const_t prefixes,
+     char *mline = NULL;
+     rpmRC rc = RPMRC_FAIL;
+ 
+-    rpmlog(RPMLOG_DEBUG, "%s: scriptlet start\n", sname);
++    rpmlog(RPMLOG_INFO, "%s: scriptlet start\n", sname);
+ 
+     if (script) {
+ 	fn = writeScript(*argvp[0], script);
+@@ -310,7 +310,7 @@ static rpmRC runExtScript(rpmPlugins plugins, ARGV_const_t prefixes,
+ 		sname, strerror(errno));
+ 	goto exit;
+     } else if (pid == 0) {/* Child */
+-	rpmlog(RPMLOG_DEBUG, "%s: execv(%s) pid %d\n",
++	rpmlog(RPMLOG_INFO, "%s: execv(%s) pid %d\n",
+ 	       sname, *argvp[0], (unsigned)getpid());
+ 
+ 	fclose(in);
+@@ -353,7 +353,7 @@ static rpmRC runExtScript(rpmPlugins plugins, ARGV_const_t prefixes,
+ 	reaped = waitpid(pid, &status, 0);
+     } while (reaped == -1 && errno == EINTR);
+ 
+-    rpmlog(RPMLOG_DEBUG, "%s: waitpid(%d) rc %d status %x\n",
++    rpmlog(RPMLOG_INFO, "%s: waitpid(%d) rc %d status %x\n",
+ 	   sname, (unsigned)pid, (unsigned)reaped, status);
+ 
+     if (reaped < 0) {

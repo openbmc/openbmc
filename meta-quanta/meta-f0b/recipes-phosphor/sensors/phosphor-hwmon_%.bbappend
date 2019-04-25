@@ -3,16 +3,16 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 EXTRA_OECONF_append_f0b = " --enable-negative-errno-on-fail"
 
 NAME = " \
-        i2c@1e78a000/i2c-bus@80/tmp421@4c \
-        i2c@1e78a000/i2c-bus@1c0/tmp421@4c \
-        i2c@1e78a000/i2c-bus@180/tps53679@60\
-        i2c@1e78a000/i2c-bus@180/tps53659@62\
-        i2c@1e78a000/i2c-bus@180/tps53659@64\
-        i2c@1e78a000/i2c-bus@180/tps53679@70\
-        i2c@1e78a000/i2c-bus@180/tps53659@72\
-        i2c@1e78a000/i2c-bus@180/tps53659@74\
-        i2c@1e78a000/i2c-bus@180/ina219@40\
-        i2c@1e78a000/i2c-bus@180/ina219@41\
+        bus@1e78a000/i2c-bus@80/tmp421@4c \
+        bus@1e78a000/i2c-bus@1c0/tmp421@4c \
+        bus@1e78a000/i2c-bus@180/tps53679@60\
+        bus@1e78a000/i2c-bus@180/tps53659@62\
+        bus@1e78a000/i2c-bus@180/tps53659@64\
+        bus@1e78a000/i2c-bus@180/tps53679@70\
+        bus@1e78a000/i2c-bus@180/tps53659@72\
+        bus@1e78a000/i2c-bus@180/tps53659@74\
+        bus@1e78a000/i2c-bus@180/ina219@40\
+        bus@1e78a000/i2c-bus@180/ina219@41\
         "
 ITEMSFMT = "ahb/apb/{0}.conf"
 

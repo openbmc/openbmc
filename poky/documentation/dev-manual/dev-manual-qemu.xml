@@ -590,6 +590,9 @@
                     <filename>nographic</filename>:
                     Disables the video console, which sets the console to
                     "ttys0".
+                    This option is useful when you have logged into a server
+                    and you do not want to disable forwarding from the
+                    X Window System (X11) to your workstation or laptop.
                     </para></listitem>
                 <listitem><para>
                     <filename>serial</filename>:

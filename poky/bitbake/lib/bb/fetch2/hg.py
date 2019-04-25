@@ -99,7 +99,7 @@ class Hg(FetchMethod):
     def try_premirror(self, ud, d):
         # If we don't do this, updating an existing checkout with only premirrors
         # is not possible
-        if d.getVar("BB_FETCH_PREMIRRORONLY") is not None:
+        if bb.utils.to_boolean(d.getVar("BB_FETCH_PREMIRRORONLY")):
             return True
         if os.path.exists(ud.moddir):
             return False

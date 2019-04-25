@@ -15,6 +15,7 @@ DEPENDS += "libdbi-perl-native libmysqlclient"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=d0a06964340e5c0cde88b7af611f755c"
 
 SRC_URI = "http://search.cpan.org/CPAN/authors/id/M/MI/MICHIELB/DBD-mysql-${PV}.tar.gz \
+           file://0001-Use-API-function-for-reconnect.patch \
 "
 
 SRC_URI[md5sum] = "4a00dd7f1c057931147c65dfc4901c36"

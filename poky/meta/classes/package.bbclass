@@ -75,7 +75,7 @@ def legitimize_package_name(s):
             return ('\\u%s' % cp).encode('latin-1').decode('unicode_escape')
 
     # Handle unicode codepoints encoded as <U0123>, as in glibc locale files.
-    s = re.sub('<U([0-9A-Fa-f]{1,4})>', fixutf, s)
+    s = re.sub(r'<U([0-9A-Fa-f]{1,4})>', fixutf, s)
 
     # Remaining package name validity fixes
     return s.lower().replace('_', '-').replace('@', '+').replace(',', '+').replace('/', '-')
@@ -344,7 +344,7 @@ def parse_debugsources_from_dwarfsrcfiles_output(dwarfsrcfiles_output):
 
     return debugfiles.keys()
 
-def append_source_info(file, sourcefile, d, fatal=True):
+def source_info(file, d, fatal=True):
     import subprocess
 
     cmd = ["dwarfsrcfiles", file]
@@ -363,22 +363,15 @@ def append_source_info(file, sourcefile, d, fatal=True):
         bb.note(msg)
 
     debugsources = parse_debugsources_from_dwarfsrcfiles_output(output)
-    # filenames are null-separated - this is an artefact of the previous use
-    # of rpm's debugedit, which was writing them out that way, and the code elsewhere
-    # is still assuming that.
-    debuglistoutput = '\0'.join(debugsources) + '\0'
-    lf = bb.utils.lockfile(sourcefile + ".lock")
-    with open(sourcefile, 'a') as sf:
-        sf.write(debuglistoutput)
-    bb.utils.unlockfile(lf)
 
+    return list(debugsources)
 
-def splitdebuginfo(file, dvar, debugdir, debuglibdir, debugappend, debugsrcdir, sourcefile, d):
+def splitdebuginfo(file, dvar, debugdir, debuglibdir, debugappend, debugsrcdir, d):
     # Function to split a single file into two components, one is the stripped
     # target system binary, the other contains any debugging information. The
     # two files are linked to reference each other.
     #
-    # sourcefile is also generated containing a list of debugsources
+    # return a mapping of files:debugsources
 
     import stat
     import subprocess
@@ -386,6 +379,7 @@ def splitdebuginfo(file, dvar, debugdir, debuglibdir, debugappend, debugsrcdir, 
     src = file[len(dvar):]
     dest = debuglibdir + os.path.dirname(src) + debugdir + "/" + os.path.basename(src) + debugappend
     debugfile = dvar + dest
+    sources = []
 
     # Split the file...
     bb.utils.mkdirhier(os.path.dirname(debugfile))
@@ -397,7 +391,7 @@ def splitdebuginfo(file, dvar, debugdir, debuglibdir, debugappend, debugsrcdir, 
 
     # We ignore kernel modules, we don't generate debug info files.
     if file.find("/lib/modules/") != -1 and file.endswith(".ko"):
-        return 1
+        return (file, sources)
 
     newmode = None
     if not os.access(file, os.W_OK) or os.access(file, os.R_OK):
@@ -407,7 +401,7 @@ def splitdebuginfo(file, dvar, debugdir, debuglibdir, debugappend, debugsrcdir, 
 
     # We need to extract the debug src information here...
     if debugsrcdir:
-        append_source_info(file, sourcefile, d)
+        sources = source_info(file, d)
 
     bb.utils.mkdirhier(os.path.dirname(debugfile))
 
@@ -419,17 +413,26 @@ def splitdebuginfo(file, dvar, debugdir, debuglibdir, debugappend, debugsrcdir, 
     if newmode:
         os.chmod(file, origmode)
 
-    return 0
+    return (file, sources)
 
-def copydebugsources(debugsrcdir, d):
+def copydebugsources(debugsrcdir, sources, d):
     # The debug src information written out to sourcefile is further processed
     # and copied to the destination here.
 
     import stat
     import subprocess
 
-    sourcefile = d.expand("${WORKDIR}/debugsources.list")
-    if debugsrcdir and os.path.isfile(sourcefile):
+    if debugsrcdir and sources:
+        sourcefile = d.expand("${WORKDIR}/debugsources.list")
+        bb.utils.remove(sourcefile)
+
+        # filenames are null-separated - this is an artefact of the previous use
+        # of rpm's debugedit, which was writing them out that way, and the code elsewhere
+        # is still assuming that.
+        debuglistoutput = '\0'.join(sources) + '\0'
+        with open(sourcefile, 'a') as sf:
+           sf.write(debuglistoutput)
+
         dvar = d.getVar('PKGD')
         strip = d.getVar("STRIP")
         objcopy = d.getVar("OBJCOPY")
@@ -471,7 +474,8 @@ def copydebugsources(debugsrcdir, d):
 
         # cpio seems to have a bug with -lL together and symbolic links are just copied, not dereferenced.
         # Work around this by manually finding and copying any symbolic links that made it through.
-        cmd = "find %s%s -type l -print0 -delete | sed s#%s%s/##g | (cd '%s' ; cpio -pd0mL --no-preserve-owner '%s%s' 2>/dev/null)" % (dvar, debugsrcdir, dvar, debugsrcdir, workparentdir, dvar, debugsrcdir)
+        cmd = "find %s%s -type l -print0 -delete | sed s#%s%s/##g | (cd '%s' ; cpio -pd0mL --no-preserve-owner '%s%s')" % \
+                (dvar, debugsrcdir, dvar, debugsrcdir, workparentdir, dvar, debugsrcdir)
         subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
 
         # The copy by cpio may have resulted in some empty directories!  Remove these
@@ -932,9 +936,6 @@ python split_and_strip_files () {
         debuglibdir = ""
         debugsrcdir = "/usr/src/debug"
 
-    sourcefile = d.expand("${WORKDIR}/debugsources.list")
-    bb.utils.remove(sourcefile)
-
     #
     # First lets figure out all of the files we may have to process ... do this only once!
     #
@@ -1039,11 +1040,15 @@ python split_and_strip_files () {
     # First lets process debug splitting
     #
     if (d.getVar('INHIBIT_PACKAGE_DEBUG_SPLIT') != '1'):
-        oe.utils.multiprocess_launch(splitdebuginfo, list(elffiles), d, extraargs=(dvar, debugdir, debuglibdir, debugappend, debugsrcdir, sourcefile, d))
+        results = oe.utils.multiprocess_launch(splitdebuginfo, list(elffiles), d, extraargs=(dvar, debugdir, debuglibdir, debugappend, debugsrcdir, d))
 
         if debugsrcdir and not targetos.startswith("mingw"):
             for file in staticlibs:
-                append_source_info(file, sourcefile, d, fatal=False)
+                results.extend(source_info(file, d, fatal=False))
+
+        sources = set()
+        for r in results:
+            sources.update(r[1])
 
         # Hardlink our debug symbols to the other hardlink copies
         for ref in inodes:
@@ -1091,7 +1096,7 @@ python split_and_strip_files () {
 
         # Process the debugsrcdir if requested...
         # This copies and places the referenced sources for later debugging...
-        copydebugsources(debugsrcdir, d)
+        copydebugsources(debugsrcdir, sources, d)
     #
     # End of debug splitting
     #
@@ -1123,7 +1128,7 @@ python populate_packages () {
     workdir = d.getVar('WORKDIR')
     outdir = d.getVar('DEPLOY_DIR')
     dvar = d.getVar('PKGD')
-    packages = d.getVar('PACKAGES')
+    packages = d.getVar('PACKAGES').split()
     pn = d.getVar('PN')
 
     bb.utils.mkdirhier(outdir)
@@ -1133,32 +1138,34 @@ python populate_packages () {
 
     split_source_package = (d.getVar('PACKAGE_DEBUG_SPLIT_STYLE') == 'debug-with-srcpkg')
 
-    # If debug-with-srcpkg mode is enabled then the src package is added
-    # into the package list and the source directory as its main content
+    # If debug-with-srcpkg mode is enabled then add the source package if it
+    # doesn't exist and add the source file contents to the source package.
     if split_source_package:
         src_package_name = ('%s-src' % d.getVar('PN'))
-        packages += (' ' + src_package_name)
+        if not src_package_name in packages:
+            packages.append(src_package_name)
         d.setVar('FILES_%s' % src_package_name, '/usr/src/debug')
 
     # Sanity check PACKAGES for duplicates
     # Sanity should be moved to sanity.bbclass once we have the infrastructure
     package_dict = {}
 
-    for i, pkg in enumerate(packages.split()):
+    for i, pkg in enumerate(packages):
         if pkg in package_dict:
             msg = "%s is listed in PACKAGES multiple times, this leads to packaging errors." % pkg
             package_qa_handle_error("packages-list", msg, d)
-        # If debug-with-srcpkg mode is enabled then the src package will have
-        # priority over dbg package when assigning the files.
-        # This allows src package to include source files and remove them from dbg.
-        elif split_source_package and pkg.endswith("-src"):
+        # Ensure the source package gets the chance to pick up the source files
+        # before the debug package by ordering it first in PACKAGES. Whether it
+        # actually picks up any source files is controlled by
+        # PACKAGE_DEBUG_SPLIT_STYLE.
+        elif pkg.endswith("-src"):
             package_dict[pkg] = (10, i)
         elif autodebug and pkg.endswith("-dbg"):
             package_dict[pkg] = (30, i)
         else:
             package_dict[pkg] = (50, i)
-    package_list = sorted(package_dict.keys(), key=package_dict.get)
-    d.setVar('PACKAGES', ' '.join(package_list))
+    packages = sorted(package_dict.keys(), key=package_dict.get)
+    d.setVar('PACKAGES', ' '.join(packages))
     pkgdest = d.getVar('PKGDEST')
 
     seen = []
@@ -1176,7 +1183,7 @@ python populate_packages () {
             if "/.debug/" in path or path.endswith("/.debug"):
                 debug.append(path)
 
-    for pkg in package_list:
+    for pkg in packages:
         root = os.path.join(pkgdest, pkg)
         bb.utils.mkdirhier(root)
 
@@ -1247,7 +1254,7 @@ python populate_packages () {
 
     # Handle LICENSE_EXCLUSION
     package_list = []
-    for pkg in packages.split():
+    for pkg in packages:
         if d.getVar('LICENSE_EXCLUSION-' + pkg):
             msg = "%s has an incompatible license. Excluding from packaging." % pkg
             package_qa_handle_error("incompatible-license", msg, d)
@@ -1438,7 +1445,7 @@ fi
             if fstat.st_ino not in seen:
                 seen.add(fstat.st_ino)
                 total_size += fstat.st_size
-        d.setVar('FILES_INFO', json.dumps(files))
+        d.setVar('FILES_INFO', json.dumps(files, sort_keys=True))
 
         subdata_file = pkgdatadir + "/runtime/%s" % pkg
         sf = open(subdata_file, 'w')
@@ -1561,12 +1568,12 @@ python package_do_filedeps() {
         if pkg not in requires_files:
             requires_files[pkg] = []
 
-        for file in provides:
+        for file in sorted(provides):
             provides_files[pkg].append(file)
             key = "FILERPROVIDES_" + file + "_" + pkg
             d.appendVar(key, " " + " ".join(provides[file]))
 
-        for file in requires:
+        for file in sorted(requires):
             requires_files[pkg].append(file)
             key = "FILERDEPENDS_" + file + "_" + pkg
             d.appendVar(key, " " + " ".join(requires[file]))
@@ -1589,8 +1596,8 @@ python package_do_shlibs() {
         bb.note("not generating shlibs")
         return
 
-    lib_re = re.compile("^.*\.so")
-    libdir_re = re.compile(".*/%s$" % d.getVar('baselib'))
+    lib_re = re.compile(r"^.*\.so")
+    libdir_re = re.compile(r".*/%s$" % d.getVar('baselib'))
 
     packages = d.getVar('PACKAGES')
 
@@ -1631,17 +1638,17 @@ python package_do_shlibs() {
         fd.close()
         rpath = tuple()
         for l in lines:
-            m = re.match("\s+RPATH\s+([^\s]*)", l)
+            m = re.match(r"\s+RPATH\s+([^\s]*)", l)
             if m:
                 rpaths = m.group(1).replace("$ORIGIN", ldir).split(":")
                 rpath = tuple(map(os.path.normpath, rpaths))
         for l in lines:
-            m = re.match("\s+NEEDED\s+([^\s]*)", l)
+            m = re.match(r"\s+NEEDED\s+([^\s]*)", l)
             if m:
                 dep = m.group(1)
                 if dep not in needed:
                     needed.add((dep, file, rpath))
-            m = re.match("\s+SONAME\s+([^\s]*)", l)
+            m = re.match(r"\s+SONAME\s+([^\s]*)", l)
             if m:
                 this_soname = m.group(1)
                 prov = (this_soname, ldir, pkgver)
@@ -1721,7 +1728,7 @@ python package_do_shlibs() {
             out, err = p.communicate()
             # process the output, grabbing all .dll names
             if p.returncode == 0:
-                for m in re.finditer("DLL Name: (.*?\.dll)$", out.decode(), re.MULTILINE | re.IGNORECASE):
+                for m in re.finditer(r"DLL Name: (.*?\.dll)$", out.decode(), re.MULTILINE | re.IGNORECASE):
                     dllname = m.group(1)
                     if dllname:
                         needed[pkg].add((dllname, file, tuple()))
@@ -1867,7 +1874,7 @@ python package_do_shlibs() {
             os.remove(deps_file)
         if len(deps):
             fd = open(deps_file, 'w')
-            for dep in deps:
+            for dep in sorted(deps):
                 fd.write(dep + '\n')
             fd.close()
 }
@@ -1882,9 +1889,9 @@ python package_do_pkgconfig () {
     shlibs_dirs = d.getVar('SHLIBSDIRS').split()
     shlibswork_dir = d.getVar('SHLIBSWORKDIR')
 
-    pc_re = re.compile('(.*)\.pc$')
-    var_re = re.compile('(.*)=(.*)')
-    field_re = re.compile('(.*): (.*)')
+    pc_re = re.compile(r'(.*)\.pc$')
+    var_re = re.compile(r'(.*)=(.*)')
+    field_re = re.compile(r'(.*): (.*)')
 
     pkgconfig_provided = {}
     pkgconfig_needed = {}
@@ -1932,7 +1939,7 @@ python package_do_pkgconfig () {
         if not os.path.exists(dir):
             continue
         for file in os.listdir(dir):
-            m = re.match('^(.*)\.pclist$', file)
+            m = re.match(r'^(.*)\.pclist$', file)
             if m:
                 pkg = m.group(1)
                 fd = open(os.path.join(dir, file))
@@ -1988,7 +1995,7 @@ python read_shlibdeps () {
     packages = d.getVar('PACKAGES').split()
     for pkg in packages:
         rdepends = bb.utils.explode_dep_versions2(d.getVar('RDEPENDS_' + pkg) or "")
-        for dep in pkglibdeps[pkg]:
+        for dep in sorted(pkglibdeps[pkg]):
             # Add the dep if it's not already there, or if no comparison is set
             if dep not in rdepends:
                 rdepends[dep] = []
@@ -2021,7 +2028,7 @@ python package_depchains() {
         #bb.note('depends for %s is %s' % (base, depends))
         rreclist = bb.utils.explode_dep_versions2(d.getVar('RRECOMMENDS_' + pkg) or "")
 
-        for depend in depends:
+        for depend in sorted(depends):
             if depend.find('-native') != -1 or depend.find('-cross') != -1 or depend.startswith('virtual/'):
                 #bb.note("Skipping %s" % depend)
                 continue
@@ -2042,7 +2049,7 @@ python package_depchains() {
         #bb.note('rdepends for %s is %s' % (base, rdepends))
         rreclist = bb.utils.explode_dep_versions2(d.getVar('RRECOMMENDS_' + pkg) or "")
 
-        for depend in rdepends:
+        for depend in sorted(rdepends):
             if depend.find('virtual-locale-') != -1:
                 #bb.note("Skipping %s" % depend)
                 continue

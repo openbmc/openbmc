@@ -12,11 +12,11 @@ Upstream-Status: Submitted [ https://bugzilla.mozilla.org/show_bug.cgi?id=124442
  nspr/pr/include/md/_linux.h   | 14 ++++++++++++++
  2 files changed, 59 insertions(+)
 
-diff --git a/pr/include/md/_linux.cfg b/nspr/pr/include/md/_linux.cfg
-index 8cbf0cb..150676b 100644
---- a/pr/include/md/_linux.cfg
-+++ b/pr/include/md/_linux.cfg
-@@ -972,6 +972,51 @@
+Index: nspr/pr/include/md/_linux.cfg
+===================================================================
+--- nspr.orig/pr/include/md/_linux.cfg
++++ nspr/pr/include/md/_linux.cfg
+@@ -975,6 +975,51 @@
  #define PR_BYTES_PER_WORD_LOG2   2
  #define PR_BYTES_PER_DWORD_LOG2  3
  
@@ -68,10 +68,10 @@ index 8cbf0cb..150676b 100644
  #elif defined(__or1k__)
  
  #undef  IS_LITTLE_ENDIAN
-diff --git a/pr/include/md/_linux.h b/nspr/pr/include/md/_linux.h
-index d378db5..18260be 100644
---- a/pr/include/md/_linux.h
-+++ b/pr/include/md/_linux.h
+Index: nspr/pr/include/md/_linux.h
+===================================================================
+--- nspr.orig/pr/include/md/_linux.h
++++ nspr/pr/include/md/_linux.h
 @@ -55,6 +55,8 @@
  #define _PR_SI_ARCHITECTURE "avr32"
  #elif defined(__m32r__)
@@ -80,8 +80,8 @@ index d378db5..18260be 100644
 +#define _PR_SI_ARCHITECTURE "nios2"
  #elif defined(__or1k__)
  #define _PR_SI_ARCHITECTURE "or1k"
- #else
-@@ -125,6 +127,18 @@ extern PRInt32 _PR_x86_64_AtomicSet(PRInt32 *val, PRInt32 newval);
+ #elif defined(__riscv) && (__riscv_xlen == 32)
+@@ -129,6 +131,18 @@ extern PRInt32 _PR_x86_64_AtomicSet(PRIn
  #define _MD_ATOMIC_SET                _PR_x86_64_AtomicSet
  #endif
  
@@ -100,6 +100,3 @@ index d378db5..18260be 100644
  #if defined(__or1k__)
  #if defined(__GNUC__)
  /* Use GCC built-in functions */
--- 
-2.7.0.rc3
-

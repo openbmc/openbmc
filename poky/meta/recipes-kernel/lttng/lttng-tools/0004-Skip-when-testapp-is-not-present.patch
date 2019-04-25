@@ -1,0 +1,610 @@
+From 95c27e6acceaeda55c729b9e92e594322adef13f Mon Sep 17 00:00:00 2001
+From: Jonathan Rajotte <jonathan.rajotte-julien@efficios.com>
+Date: Wed, 3 Apr 2019 16:31:18 -0400
+Subject: [PATCH lttng-tools] Skip when testapp is not present
+
+We expect lttng-ust do be present, this is a wrong assumptions.
+
+This is a quick fix. The real fix is to either detect at runtime
+lttng-ust support or at build time (HAVE_LIBLTTNG_UST_CTL).
+
+This prevent hang for make check done on a build configured with
+--without-lttng-ust.
+
+Upstream-Status: Inappropriate [other] 
+Reason: This patch is inappropriate for upstream for 2.10 stable release 
+since we do not backport "superficial" fix to the test suite. We do 
+backport when a test is broken. The fact that on --without-lttng-ust 
+hang is not a "broken" test per-see. Still, a variation of this fix will 
+be upstreamed in our master branch and possibly 2.11. The upstreamed 
+version will split the test in kernel/ust test and skip them at the 
+build system level. This patch is more succinct.
+
+Signed-off-by: Jonathan Rajotte <jonathan.rajotte-julien@efficios.com>
+---
+ tests/regression/tools/crash/test_crash       |  4 ++
+ .../regression/tools/exclusion/test_exclusion |  4 ++
+ .../tools/filtering/test_valid_filter         | 21 ++++--
+ tests/regression/tools/health/test_thread_ok  | 29 +++++---
+ tests/regression/tools/live/Makefile.am       |  2 -
+ tests/regression/tools/live/test_lttng_ust    |  4 ++
+ tests/regression/tools/live/test_ust          |  4 ++
+ .../tools/live/test_ust_tracefile_count       |  4 ++
+ tests/regression/tools/mi/test_mi             |  4 ++
+ .../notification/test_notification_multi_app  | 18 +++--
+ .../tools/notification/test_notification_ust  |  4 ++
+ .../regression/tools/regen-metadata/test_ust  |  2 +-
+ .../regression/tools/regen-statedump/test_ust |  2 +-
+ .../regression/tools/save-load/test_autoload  |  7 ++
+ tests/regression/tools/save-load/test_load    |  8 +++
+ tests/regression/tools/save-load/test_save    |  7 ++
+ .../regression/tools/snapshots/test_ust_fast  |  2 +-
+ .../regression/tools/snapshots/test_ust_long  |  2 +-
+ .../tools/snapshots/test_ust_streaming        |  2 +-
+ tests/regression/tools/snapshots/ust_test     |  2 +-
+ .../streaming/test_high_throughput_limits     |  2 +-
+ tests/regression/tools/streaming/test_ust     |  2 +-
+ .../tracefile-limits/test_tracefile_count     |  2 +-
+ .../tracefile-limits/test_tracefile_size      |  2 +-
+ .../tools/wildcard/test_event_wildcard        | 67 ++++++++++---------
+ 25 files changed, 147 insertions(+), 60 deletions(-)
+
+diff --git a/tests/regression/tools/crash/test_crash b/tests/regression/tools/crash/test_crash
+index 8c62c513d..3cbe97688 100755
+--- a/tests/regression/tools/crash/test_crash
++++ b/tests/regression/tools/crash/test_crash
+@@ -35,6 +35,10 @@ NUM_TESTS=77
+ 
+ source $TESTDIR/utils/utils.sh
+ 
++if [ ! -x "$TESTAPP_BIN" ]; then
++	plan_skip_all "No UST events binary detected."
++fi
++
+ # Global declaration for simplification
+ LTTNG_CRASH=$TESTDIR/../src/bin/lttng-crash/$CRASH_BIN
+ 
+diff --git a/tests/regression/tools/exclusion/test_exclusion b/tests/regression/tools/exclusion/test_exclusion
+index 949cd41df..42e4d72fb 100755
+--- a/tests/regression/tools/exclusion/test_exclusion
++++ b/tests/regression/tools/exclusion/test_exclusion
+@@ -30,6 +30,10 @@ NUM_TESTS=149
+ 
+ source $TESTDIR/utils/utils.sh
+ 
++if [ ! -x "$TESTAPP_BIN" ]; then
++	plan_skip_all "No UST events binary detected."
++fi
++
+ function enable_ust_lttng_all_event_exclusion()
+ {
+ 	sess_name="$1"
+diff --git a/tests/regression/tools/filtering/test_valid_filter b/tests/regression/tools/filtering/test_valid_filter
+index 163b32182..1e8da630b 100755
+--- a/tests/regression/tools/filtering/test_valid_filter
++++ b/tests/regression/tools/filtering/test_valid_filter
+@@ -418,12 +418,18 @@ issue_356_filter+="intfield > 4 && intfield > 5 && "
+ issue_356_filter+="intfield > 6 && intfield > 7 && "
+ issue_356_filter+="intfield > 8 || intfield > 0"
+ 
++BIN_NAME="gen-ust-events"
++
++skip_ust=1
++if [ ! -x "$CURDIR/$BIN_NAME" ]; then
++	skip_ust=0
++	skip 0 "No UST nevents binary detected." $NUM_UST_TESTS
++fi
++
+ start_lttng_sessiond
+ 
+ ### UST TESTS
+ 
+-BIN_NAME="gen-ust-events"
+-
+ KIRK_KRAUSS_TESTS=(
+ 	# the tests below were written by Kirk Krauss in this article:
+ 	# http://www.drdobbs.com/architecture-and-design/matching-wildcards-an-empirical-way-to-t/240169123
+@@ -897,9 +903,6 @@ UST_STR_FILTERS=(
+ 	END
+ )
+ 
+-if [ ! -x "$CURDIR/$BIN_NAME" ]; then
+-	BAIL_OUT "No UST nevents binary detected."
+-fi
+ 
+ IFS="$OLDIFS"
+ 
+@@ -910,6 +913,10 @@ i=0
+ while true; do
+ 	validator="${UST_FILTERS[$i]}"
+ 
++	if [ $skip_ust -eq 0 ]; then
++		break
++	fi
++
+ 	if [ "$validator" = END ]; then
+ 		break
+ 	fi
+@@ -929,6 +936,10 @@ i=0
+ while true; do
+ 	validator="${UST_STR_FILTERS[$i]}"
+ 
++	if [ $skip_ust -eq 0 ]; then
++		break
++	fi
++
+ 	if [ "$validator" = END ]; then
+ 		break
+ 	fi
+diff --git a/tests/regression/tools/health/test_thread_ok b/tests/regression/tools/health/test_thread_ok
+index e81d6ed24..849b7e71f 100755
+--- a/tests/regression/tools/health/test_thread_ok
++++ b/tests/regression/tools/health/test_thread_ok
+@@ -27,6 +27,9 @@ CHANNEL_NAME="testchan"
+ HEALTH_CHECK_BIN="health_check"
+ NUM_TESTS=17
+ SLEEP_TIME=30
++TESTAPP_PATH="$TESTDIR/utils/testapp"
++TESTAPP_NAME="gen-ust-events"
++TESTAPP_BIN="$TESTAPP_PATH/$TESTAPP_NAME/$TESTAPP_NAME"
+ 
+ source $TESTDIR/utils/utils.sh
+ 
+@@ -76,15 +79,19 @@ function test_thread_ok
+ 	$CURDIR/$HEALTH_CHECK_BIN > ${STDOUT_PATH} 2> ${STDERR_PATH}
+ 	report_errors
+ 
+-	diag "With UST consumer daemons"
+-	create_lttng_session_no_output $SESSION_NAME
+-	enable_ust_lttng_event_ok $SESSION_NAME $UST_EVENT_NAME $CHANNEL_NAME
+-	start_lttng_tracing_ok $SESSION_NAME
+-	destroy_lttng_session_ok $SESSION_NAME
++	skip $skip_ust "Ust does not seems to be supported" "5" ||
++	{
++		diag "With UST consumer daemons"
++		create_lttng_session_no_output $SESSION_NAME
++		enable_ust_lttng_event_ok $SESSION_NAME $UST_EVENT_NAME $CHANNEL_NAME
++		start_lttng_tracing_ok $SESSION_NAME
++		destroy_lttng_session_ok $SESSION_NAME
+ 
+-	# Check health status
+-	$CURDIR/$HEALTH_CHECK_BIN > ${STDOUT_PATH} 2> ${STDERR_PATH}
+-	report_errors
++
++		# Check health status
++		$CURDIR/$HEALTH_CHECK_BIN > ${STDOUT_PATH} 2> ${STDERR_PATH}
++		report_errors
++	}
+ 
+ 	skip $isroot "Root access is needed. Skipping kernel consumer health check test." "5" ||
+ 	{
+@@ -141,6 +148,12 @@ else
+ 	isroot=0
+ fi
+ 
++if [ ! -x "$TESTAPP_BIN" ]; then
++	skip_ust=0
++else
++	skip_ust=1
++fi
++
+ test_thread_ok
+ 
+ rm -rf ${HEALTH_PATH}
+diff --git a/tests/regression/tools/live/Makefile.am b/tests/regression/tools/live/Makefile.am
+index 46186d383..db74de8d5 100644
+--- a/tests/regression/tools/live/Makefile.am
++++ b/tests/regression/tools/live/Makefile.am
+@@ -16,9 +16,7 @@ LIVE=$(top_builddir)/src/bin/lttng-sessiond/session.$(OBJEXT) \
+ noinst_PROGRAMS = live_test
+ EXTRA_DIST = test_kernel test_lttng_kernel
+ 
+-if HAVE_LIBLTTNG_UST_CTL
+ EXTRA_DIST += test_ust test_ust_tracefile_count test_lttng_ust
+-endif
+ 
+ live_test_SOURCES = live_test.c
+ live_test_LDADD = $(LIBTAP) $(LIBCOMMON) $(LIBRELAYD) $(LIBSESSIOND_COMM) \
+diff --git a/tests/regression/tools/live/test_lttng_ust b/tests/regression/tools/live/test_lttng_ust
+index 06017d01d..be9b3d7f7 100755
+--- a/tests/regression/tools/live/test_lttng_ust
++++ b/tests/regression/tools/live/test_lttng_ust
+@@ -38,6 +38,10 @@ NUM_TESTS=12
+ 
+ source $TESTDIR/utils/utils.sh
+ 
++if [ ! -x "$TESTAPP_BIN" ]; then
++	plan_skip_all "No UST events binary detected."
++fi
++
+ # MUST set TESTDIR before calling those functions
+ plan_tests $NUM_TESTS
+ 
+diff --git a/tests/regression/tools/live/test_ust b/tests/regression/tools/live/test_ust
+index 0384a706f..add521bfc 100755
+--- a/tests/regression/tools/live/test_ust
++++ b/tests/regression/tools/live/test_ust
+@@ -36,6 +36,10 @@ DIR=$(readlink -f $TESTDIR)
+ 
+ source $TESTDIR/utils/utils.sh
+ 
++if [ ! -x "$TESTAPP_BIN" ]; then
++	plan_skip_all "No UST events binary detected."
++fi
++
+ echo "$TEST_DESC"
+ 
+ function setup_live_tracing()
+diff --git a/tests/regression/tools/live/test_ust_tracefile_count b/tests/regression/tools/live/test_ust_tracefile_count
+index 6da368fc6..10504f8c6 100755
+--- a/tests/regression/tools/live/test_ust_tracefile_count
++++ b/tests/regression/tools/live/test_ust_tracefile_count
+@@ -36,6 +36,10 @@ DIR=$(readlink -f $TESTDIR)
+ 
+ source $TESTDIR/utils/utils.sh
+ 
++if [ ! -x "$TESTAPP_BIN" ]; then
++	plan_skip_all "No UST events binary detected."
++fi
++
+ echo "$TEST_DESC"
+ 
+ function setup_live_tracing()
+diff --git a/tests/regression/tools/mi/test_mi b/tests/regression/tools/mi/test_mi
+index 48dda7da6..2cc30b29a 100755
+--- a/tests/regression/tools/mi/test_mi
++++ b/tests/regression/tools/mi/test_mi
+@@ -61,6 +61,10 @@ NUM_TESTS=228
+ 
+ source $TESTDIR/utils/utils.sh
+ 
++if [ ! -x "$TESTAPP_BIN" ]; then
++	plan_skip_all "No UST events binary detected."
++fi
++
+ #Overwrite the lttng_bin to get mi output
+ LTTNG_BIN="lttng --mi xml"
+ 
+diff --git a/tests/regression/tools/notification/test_notification_multi_app b/tests/regression/tools/notification/test_notification_multi_app
+index 0a05ea6a0..29b0f62fa 100755
+--- a/tests/regression/tools/notification/test_notification_multi_app
++++ b/tests/regression/tools/notification/test_notification_multi_app
+@@ -52,6 +52,11 @@ plan_tests $NUM_TESTS
+ 
+ print_test_banner "$TEST_DESC"
+ 
++skip_ust=1
++if [ ! -x "$TESTAPP_BIN" ]; then
++	skip_ust=0
++fi
++
+ app_pids=()
+ 
+ function kernel_event_generator_toogle_state
+@@ -468,10 +473,15 @@ function test_on_register_evaluation ()
+ }
+ 
+ 
+-TESTS=(
+-	test_multi_app_ust
+-	test_on_register_evaluation_ust
+-)
++TESTS=()
++if [ $skip_ust -eq "1" ]; then
++	TESTS+=(
++		test_multi_app_ust
++		test_on_register_evaluation_ust
++	)
++else
++	skip 0 "No UST events binary detected." $NUM_TEST_UST
++fi
+ 
+ if [ "$(id -u)" == "0" ]; then
+ 	TESTS+=(
+diff --git a/tests/regression/tools/notification/test_notification_ust b/tests/regression/tools/notification/test_notification_ust
+index 8941e476d..eb2e15cad 100755
+--- a/tests/regression/tools/notification/test_notification_ust
++++ b/tests/regression/tools/notification/test_notification_ust
+@@ -46,6 +46,10 @@ DIR=$(readlink -f $TESTDIR)
+ 
+ source $TESTDIR/utils/utils.sh
+ 
++if [ ! -x "$TESTAPP_BIN" ]; then
++	plan_skip_all "No UST events binary detected."
++fi
++
+ function ust_event_generator_toogle_state
+ {
+ 	ust_event_generator_suspended=$((ust_event_generator_suspended==0))
+diff --git a/tests/regression/tools/regen-metadata/test_ust b/tests/regression/tools/regen-metadata/test_ust
+index b7f1af1d8..312c8a40d 100755
+--- a/tests/regression/tools/regen-metadata/test_ust
++++ b/tests/regression/tools/regen-metadata/test_ust
+@@ -34,7 +34,7 @@ NUM_TESTS=33
+ source $TESTDIR/utils/utils.sh
+ 
+ if [ ! -x "$TESTAPP_BIN" ]; then
+-	BAIL_OUT "No UST events binary detected."
++	plan_skip_all "No UST events binary detected."
+ fi
+ 
+ function lttng_create_session_uri
+diff --git a/tests/regression/tools/regen-statedump/test_ust b/tests/regression/tools/regen-statedump/test_ust
+index 486b9a560..8d455b26a 100755
+--- a/tests/regression/tools/regen-statedump/test_ust
++++ b/tests/regression/tools/regen-statedump/test_ust
+@@ -34,7 +34,7 @@ NUM_TESTS=11
+ source $TESTDIR/utils/utils.sh
+ 
+ if [ ! -x "$TESTAPP_BIN" ]; then
+-	BAIL_OUT "No UST events binary detected."
++	plan_skip_all "No UST events binary detected."
+ fi
+ 
+ function test_ust_local ()
+diff --git a/tests/regression/tools/save-load/test_autoload b/tests/regression/tools/save-load/test_autoload
+index 7ee5e9906..ec376cfb3 100755
+--- a/tests/regression/tools/save-load/test_autoload
++++ b/tests/regression/tools/save-load/test_autoload
+@@ -21,6 +21,9 @@ CURDIR=$(dirname $0)/
+ CONFIG_DIR="${CURDIR}/configuration"
+ TESTDIR=$CURDIR/../../../
+ export LTTNG_SESSION_CONFIG_XSD_PATH=$(readlink -m ${TESTDIR}../src/common/config/)
++TESTAPP_PATH="$TESTDIR/utils/testapp"
++TESTAPP_NAME="gen-ust-events"
++TESTAPP_BIN="$TESTAPP_PATH/$TESTAPP_NAME/$TESTAPP_NAME"
+ 
+ DIR=$(readlink -f $TESTDIR)
+ 
+@@ -28,6 +31,10 @@ NUM_TESTS=9
+ 
+ source $TESTDIR/utils/utils.sh
+ 
++if [ ! -x "$TESTAPP_BIN" ]; then
++	plan_skip_all "No UST events binary detected."
++fi
++
+ # MUST set TESTDIR before calling those functions
+ plan_tests $NUM_TESTS
+ 
+diff --git a/tests/regression/tools/save-load/test_load b/tests/regression/tools/save-load/test_load
+index 5e38b46b6..b6fdd8192 100755
+--- a/tests/regression/tools/save-load/test_load
++++ b/tests/regression/tools/save-load/test_load
+@@ -20,6 +20,10 @@ TEST_DESC="Load session(s)"
+ CURDIR=$(dirname $0)/
+ CONFIG_DIR="${CURDIR}/configuration"
+ TESTDIR=$CURDIR/../../../
++TESTAPP_PATH="$TESTDIR/utils/testapp"
++TESTAPP_NAME="gen-ust-events"
++TESTAPP_BIN="$TESTAPP_PATH/$TESTAPP_NAME/$TESTAPP_NAME"
++
+ export LTTNG_SESSION_CONFIG_XSD_PATH=$(readlink -m ${TESTDIR}../src/common/config/)
+ 
+ SESSION_NAME="load-42"
+@@ -31,6 +35,10 @@ NUM_TESTS=67
+ 
+ source $TESTDIR/utils/utils.sh
+ 
++if [ ! -x "$TESTAPP_BIN" ]; then
++	plan_skip_all "No UST events binary detected."
++fi
++
+ # MUST set TESTDIR before calling those functions
+ plan_tests $NUM_TESTS
+ 
+diff --git a/tests/regression/tools/save-load/test_save b/tests/regression/tools/save-load/test_save
+index c5f6b1341..cfaf67b7a 100755
+--- a/tests/regression/tools/save-load/test_save
++++ b/tests/regression/tools/save-load/test_save
+@@ -23,6 +23,9 @@ TESTDIR=$CURDIR/../../../
+ SESSION_NAME="save-42"
+ CHANNEL_NAME="chan-save"
+ EVENT_NAME="tp:tptest"
++TESTAPP_PATH="$TESTDIR/utils/testapp"
++TESTAPP_NAME="gen-ust-events"
++TESTAPP_BIN="$TESTAPP_PATH/$TESTAPP_NAME/$TESTAPP_NAME"
+ 
+ DIR=$(readlink -f $TESTDIR)
+ 
+@@ -30,6 +33,10 @@ NUM_TESTS=41
+ 
+ source $TESTDIR/utils/utils.sh
+ 
++if [ ! -x "TESTAPP_BIN" ]; then
++	plan_skip_all "No UST events binary detected."
++fi
++
+ # MUST set TESTDIR before calling those functions
+ plan_tests $NUM_TESTS
+ 
+diff --git a/tests/regression/tools/snapshots/test_ust_fast b/tests/regression/tools/snapshots/test_ust_fast
+index edb435c52..5a68ec56d 100755
+--- a/tests/regression/tools/snapshots/test_ust_fast
++++ b/tests/regression/tools/snapshots/test_ust_fast
+@@ -23,7 +23,7 @@ TEST_BIN="ust_test"
+ source $TESTDIR/utils/utils.sh
+ 
+ if [ ! -x "$CURDIR/$TEST_BIN" ]; then
+-	BAIL_OUT "No UST test found: $TEST_BIN"
++	plan_skip_all "No UST test found: $TEST_BIN"
+ fi
+ 
+ ./$CURDIR/$TEST_BIN $NR_SNAPSHOT
+diff --git a/tests/regression/tools/snapshots/test_ust_long b/tests/regression/tools/snapshots/test_ust_long
+index 9e1a0c262..afa019f6a 100755
+--- a/tests/regression/tools/snapshots/test_ust_long
++++ b/tests/regression/tools/snapshots/test_ust_long
+@@ -23,7 +23,7 @@ TEST_BIN="ust_test"
+ source $TESTDIR/utils/utils.sh
+ 
+ if [ ! -x "$CURDIR/$TEST_BIN" ]; then
+-	BAIL_OUT "No UST test found: $TEST_BIN"
++	plan_skip_all "No UST test found: $TEST_BIN"
+ fi
+ 
+ ./$CURDIR/$TEST_BIN $NR_SNAPSHOT
+diff --git a/tests/regression/tools/snapshots/test_ust_streaming b/tests/regression/tools/snapshots/test_ust_streaming
+index 93b0957f3..69291ab4d 100755
+--- a/tests/regression/tools/snapshots/test_ust_streaming
++++ b/tests/regression/tools/snapshots/test_ust_streaming
+@@ -37,7 +37,7 @@ NUM_TESTS=75
+ source $TESTDIR/utils/utils.sh
+ 
+ if [ ! -x "$TESTAPP_BIN" ]; then
+-	BAIL_OUT "No UST events binary detected."
++	plan_skip_all "No UST events binary detected."
+ fi
+ 
+ function snapshot_add_output ()
+diff --git a/tests/regression/tools/snapshots/ust_test b/tests/regression/tools/snapshots/ust_test
+index 755cef9e0..92f9f6cff 100755
+--- a/tests/regression/tools/snapshots/ust_test
++++ b/tests/regression/tools/snapshots/ust_test
+@@ -34,7 +34,7 @@ TRACE_PATH=$(mktemp -d)
+ source $TESTDIR/utils/utils.sh
+ 
+ if [ ! -x "$TESTAPP_BIN" ]; then
+-	BAIL_OUT "No UST events binary detected."
++	plan_skip_all "No UST events binary detected."
+ fi
+ 
+ # Need the number of snapshot to do.
+diff --git a/tests/regression/tools/streaming/test_high_throughput_limits b/tests/regression/tools/streaming/test_high_throughput_limits
+index 32c3f1f2b..f54178923 100755
+--- a/tests/regression/tools/streaming/test_high_throughput_limits
++++ b/tests/regression/tools/streaming/test_high_throughput_limits
+@@ -38,7 +38,7 @@ NUM_TESTS=104
+ source $TESTDIR/utils/utils.sh
+ 
+ if [ ! -x "$TESTAPP_BIN" ]; then
+-	BAIL_OUT "No UST events binary detected."
++	plan_skip_all "No UST events binary detected."
+ fi
+ 
+ function set_bw_limit
+diff --git a/tests/regression/tools/streaming/test_ust b/tests/regression/tools/streaming/test_ust
+index a5d5b5e92..e1dd98ee7 100755
+--- a/tests/regression/tools/streaming/test_ust
++++ b/tests/regression/tools/streaming/test_ust
+@@ -34,7 +34,7 @@ NUM_TESTS=16
+ source $TESTDIR/utils/utils.sh
+ 
+ if [ ! -x "$TESTAPP_BIN" ]; then
+-	BAIL_OUT "No UST events binary detected."
++	plan_skip_all "No UST events binary detected."
+ fi
+ 
+ function lttng_create_session_uri
+diff --git a/tests/regression/tools/tracefile-limits/test_tracefile_count b/tests/regression/tools/tracefile-limits/test_tracefile_count
+index 6ada8580f..7553c7d1f 100755
+--- a/tests/regression/tools/tracefile-limits/test_tracefile_count
++++ b/tests/regression/tools/tracefile-limits/test_tracefile_count
+@@ -33,7 +33,7 @@ PAGE_SIZE=$(getconf PAGE_SIZE)
+ source $TESTDIR/utils/utils.sh
+ 
+ if [ ! -x "$TESTAPP_BIN" ]; then
+-	BAIL_OUT "No UST events binary detected."
++	plan_skip_all "No UST events binary detected."
+ fi
+ 
+ function enable_lttng_channel_count_limit ()
+diff --git a/tests/regression/tools/tracefile-limits/test_tracefile_size b/tests/regression/tools/tracefile-limits/test_tracefile_size
+index 3dddbe613..1089487ff 100755
+--- a/tests/regression/tools/tracefile-limits/test_tracefile_size
++++ b/tests/regression/tools/tracefile-limits/test_tracefile_size
+@@ -33,7 +33,7 @@ NUM_TESTS=66
+ source $TESTDIR/utils/utils.sh
+ 
+ if [ ! -x "$TESTAPP_BIN" ]; then
+-	BAIL_OUT "No UST events binary detected."
++	plan_skip_all "No UST events binary detected."
+ fi
+ 
+ function enable_lttng_channel_size_limit ()
+diff --git a/tests/regression/tools/wildcard/test_event_wildcard b/tests/regression/tools/wildcard/test_event_wildcard
+index 61ea67a72..921a2301d 100755
+--- a/tests/regression/tools/wildcard/test_event_wildcard
++++ b/tests/regression/tools/wildcard/test_event_wildcard
+@@ -97,42 +97,47 @@ print_test_banner "$TEST_DESC"
+ 
+ start_lttng_sessiond
+ 
+-diag "Test UST wildcard"
+-
+ if [ ! -x "$TESTAPP_BIN" ]; then
+-	BAIL_OUT "No UST nevents binary detected."
++	skip_ust=0
++else
++	skip_ust=1
+ fi
+ 
+-EVENT_NAME="tp:tptest"
++skip $skip_ust "No UST nevents binary detected." $NUM_UST_TESTS ||
++{
++	diag "Test UST wildcard"
+ 
+-# non-matching
+-test_event_wildcard ust 0 'tp:abc*'
+-test_event_wildcard ust 0 '*abc'
+-test_event_wildcard ust 0 '*z*'
+-test_event_wildcard ust 0 '*\**'
+-test_event_wildcard ust 0 '*\*'
+-test_event_wildcard ust 0 '\**'
+-test_event_wildcard ust 0 '*:*tpte*s'
+-test_event_wildcard ust 0 'tp**tpTest'
++	EVENT_NAME="tp:tptest"
+ 
+-# matching
+-test_event_wildcard ust 1 'tp:tp*'
+-test_event_wildcard ust 1 '*'
+-test_event_wildcard ust 1 'tp:tptest*'
+-test_event_wildcard ust 1 '**'
+-test_event_wildcard ust 1 '***'
+-test_event_wildcard ust 1 '*tptest'
+-test_event_wildcard ust 1 '**tptest'
+-test_event_wildcard ust 1 '*tpte*'
+-test_event_wildcard ust 1 '*tp*'
+-test_event_wildcard ust 1 '*tp**'
+-test_event_wildcard ust 1 '*:*tptest'
+-test_event_wildcard ust 1 '*:*tpte*t'
+-test_event_wildcard ust 1 't*p*:*t*e*s*t'
+-test_event_wildcard ust 1 '*t*p*:*t*e*s*t*'
+-test_event_wildcard ust 1 'tp*tptest'
+-test_event_wildcard ust 1 'tp**tptest'
+-test_event_wildcard ust 1 'tp*test'
++	# non-matching
++	test_event_wildcard ust 0 'tp:abc*'
++	test_event_wildcard ust 0 '*abc'
++	test_event_wildcard ust 0 '*z*'
++	test_event_wildcard ust 0 '*\**'
++	test_event_wildcard ust 0 '*\*'
++	test_event_wildcard ust 0 '\**'
++	test_event_wildcard ust 0 '*:*tpte*s'
++	test_event_wildcard ust 0 'tp**tpTest'
++
++	# matching
++	test_event_wildcard ust 1 'tp:tp*'
++	test_event_wildcard ust 1 '*'
++	test_event_wildcard ust 1 'tp:tptest*'
++	test_event_wildcard ust 1 '**'
++	test_event_wildcard ust 1 '***'
++	test_event_wildcard ust 1 '*tptest'
++	test_event_wildcard ust 1 '**tptest'
++	test_event_wildcard ust 1 '*tpte*'
++	test_event_wildcard ust 1 '*tp*'
++	test_event_wildcard ust 1 '*tp**'
++	test_event_wildcard ust 1 '*:*tptest'
++	test_event_wildcard ust 1 '*:*tpte*t'
++	test_event_wildcard ust 1 't*p*:*t*e*s*t'
++	test_event_wildcard ust 1 '*t*p*:*t*e*s*t*'
++	test_event_wildcard ust 1 'tp*tptest'
++	test_event_wildcard ust 1 'tp**tptest'
++	test_event_wildcard ust 1 'tp*test'
++}
+ 
+ if [ "$(id -u)" == "0" ]; then
+ 	isroot=1
+-- 
+2.17.1
+

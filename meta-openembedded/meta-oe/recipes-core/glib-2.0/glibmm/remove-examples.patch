@@ -1,6 +1,7 @@
-From f48a69fd11b2eda6c43ff046c202cbc4dcd4e92d Mon Sep 17 00:00:00 2001
+From 52360260c0d73a00082d867bc416225fbc2b657e Mon Sep 17 00:00:00 2001
 From: Koen Kooi <koen@dominion.thruhere.net>
 Date: Tue, 12 Jul 2011 11:46:37 +0200
+Subject: [PATCH] glibmm: add 2.28.2
 
 ---
  Makefile.am  | 7 +------
@@ -8,7 +9,7 @@ Date: Tue, 12 Jul 2011 11:46:37 +0200
  2 files changed, 1 insertion(+), 7 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index a0df8af..c3d5e06 100644
+index 1b366b4..0ff58b5 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -23,12 +23,7 @@ src_subdirs = glib/src gio/src
@@ -26,7 +27,7 @@ index a0df8af..c3d5e06 100644
  glibmm_includedir = $(includedir)/$(GLIBMM_MODULE_NAME)
  glibmm_include_HEADERS = glib/glibmm.h
 diff --git a/configure.ac b/configure.ac
-index c20e778..74203be 100644
+index e706687..198e0d0 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -166,7 +166,6 @@ AC_CONFIG_FILES([Makefile
@@ -36,4 +37,4 @@ index c20e778..74203be 100644
 -                 examples/Makefile
                   docs/Makefile
                   docs/reference/Doxyfile
-                  MSVC_Net2013/glibmm/glibmm.rc
+                  MSVC_NMake/glibmm/glibmm.rc

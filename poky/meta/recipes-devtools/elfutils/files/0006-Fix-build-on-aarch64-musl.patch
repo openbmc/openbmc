@@ -1,7 +1,7 @@
-From b4ec05953f78af26bcd7de45a5bbc5f138d023da Mon Sep 17 00:00:00 2001
+From 578f370c7e7a9f056aefa062b34590b0aa13bce5 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 15 Aug 2017 17:27:30 +0800
-Subject: [PATCH 6/7] Fix build on aarch64/musl
+Subject: [PATCH] Fix build on aarch64/musl
 
 Errors
 
@@ -16,6 +16,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 Rebase to 0.170
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
 ---
  backends/aarch64_initreg.c | 4 ++--
  backends/arm_initreg.c     | 2 +-
@@ -56,6 +57,3 @@ index efcabaf..062bb9e 100644
  # include <sys/user.h>
  # include <sys/ptrace.h>
  /* Deal with old glibc defining user_pt_regs instead of user_regs_struct.  */
--- 
-2.7.4
-

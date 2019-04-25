@@ -1,0 +1,23 @@
+From 1118cc971917abe19ddb029aa80417f6fd6bb343 Mon Sep 17 00:00:00 2001
+From: Thomas Kunze <thommycheck@gmx.de>
+Date: Sat, 6 Aug 2011 05:30:14 +0000
+Subject: [PATCH] klibc: initial commit of version 1.5.24
+
+Patch was imported from the OpenEmbedded git server
+(git://git.openembedded.org/openembedded)
+as of commit id b6764cf32ec93547531130dca364fb95e1c495f4
+Signed-off-by: Thomas Kunze <thommycheck@gmx.de>
+
+---
+ defconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/defconfig
++++ b/defconfig
+@@ -6,5 +6,5 @@ CONFIG_KLIBC_ZLIB=y
+ CONFIG_REGPARM=y
+ # ARM options
+ # CONFIG_KLIBC_THUMB is not set
+-# CONFIG_AEABI is not set
++CONFIG_AEABI=y
+ # CONFIG_DEBUG_INFO is not set

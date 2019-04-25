@@ -11,4 +11,4 @@ Environment="PYTHONUNBUFFERED=1"
 TimeoutStartSec=180s
 
 [Install]
-WantedBy={SYSTEMD_DEFAULT_TARGET}
+WantedBy=multi-user.target

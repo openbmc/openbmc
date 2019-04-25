@@ -1,0 +1,32 @@
+From c69feb2fdb755d6db34d0eb0a9e9994386c15e3a Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Wed, 14 Nov 2018 15:19:57 +0800
+Subject: [PATCH] du-l-works: fix to use 145 instead of 144
+
+64 + 64 + 16 = 144
+144 + size_of_directory >= 145
+So fix to use 145 instead of 144.
+
+Upstream-Status: Submitted [http://lists.busybox.net/pipermail/busybox/2018-November/086836.html]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ testsuite/du/du-l-works | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/testsuite/du/du-l-works b/testsuite/du/du-l-works
+index af87345..575064a 100644
+--- a/testsuite/du/du-l-works
++++ b/testsuite/du/du-l-works
+@@ -5,7 +5,7 @@ cd du.testdir
+ dd if=/dev/zero of=file1 bs=1k count=64 2>/dev/null
+ ln file1 file1.1
+ dd if=/dev/zero of=file2 bs=1k count=16 2>/dev/null
+-test x"`busybox du -l .`" = x"144	." \
++test x"`busybox du -l .`" = x"145	." \
+   -o x"`busybox du -l .`" = x"146	." \
+   -o x"`busybox du -l .`" = x"148	." \
+   -o x"`busybox du -l .`" = x"152	." \
+-- 
+2.7.4
+

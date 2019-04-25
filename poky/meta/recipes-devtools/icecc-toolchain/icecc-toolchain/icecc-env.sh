@@ -38,11 +38,11 @@ if [ -n "$ICECC_PATH" ]; then
         CXXFLAGS="$CXXFLAGS -fno-diagnostics-show-caret"
     fi
     export ICECC_PATH ICECC_CARET_WORKAROUND
-    export ICECC_VERSION="$OECORE_NATIVE_SYSROOT/usr/share/icecream/@TOOLCHAIN_ENV@"
+    export ICECC_VERSION="$(echo "$OECORE_NATIVE_SYSROOT/usr/share/${TARGET_PREFIX}icecream/@TOOLCHAIN_ENV@" | sed "s,@TARGET_PREFIX@,$TARGET_PREFIX,g")"
     export ICECC="$(which ${CROSS_COMPILE}gcc)"
     export ICECXX="$(which ${CROSS_COMPILE}g++)"
     export ICEAS="$(which ${CROSS_COMPILE}as)"
-    export PATH="$OECORE_NATIVE_SYSROOT/usr/share/icecream/bin:$PATH"
+    export PATH="$OECORE_NATIVE_SYSROOT/usr/share/${TARGET_PREFIX}icecream/bin:$PATH"
 else
     echo "Icecc not found. Disabling distributed compiling"
 fi

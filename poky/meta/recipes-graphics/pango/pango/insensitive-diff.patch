@@ -1,0 +1,28 @@
+Do case-insensitive diffs as the test is sensitive as to whether 0x0 is printed
+as (null) or (NULL).
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/pango/merge_requests/44]
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/tests/markup-parse.c b/tests/markup-parse.c
+index 633f3e89..36d2c776 100644
+--- a/tests/markup-parse.c
++++ b/tests/markup-parse.c
+@@ -217,7 +217,7 @@ diff_with_file (const char  *file1,
+                 GString     *string,
+                 GError     **error)
+ {
+-  const char *command[] = { "diff", "-u", file1, NULL, NULL };
++  const char *command[] = { "diff", "-u", "-i", file1, NULL, NULL };
+   char *diff, *tmpfile;
+   int fd;
+ 
+@@ -237,7 +237,7 @@ diff_with_file (const char  *file1,
+       goto done;
+     }
+   close (fd);
+-  command[3] = tmpfile;
++  command[4] = tmpfile;
+ 
+   /* run diff command */
+   g_spawn_sync (NULL, (char **)command, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, &diff, NULL, NULL, error);

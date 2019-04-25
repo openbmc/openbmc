@@ -31,6 +31,8 @@ S = "${WORKDIR}/httpd-${PV}"
 
 inherit autotools update-rc.d pkgconfig systemd update-alternatives
 
+CVE_PRODUCT = "http_server"
+
 ALTERNATIVE_${PN}-doc = "htpasswd.1"
 ALTERNATIVE_LINK_NAME[htpasswd.1] = "${mandir}/man1/htpasswd.1"
 

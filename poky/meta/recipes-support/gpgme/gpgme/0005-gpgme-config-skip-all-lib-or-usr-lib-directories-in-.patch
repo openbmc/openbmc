@@ -1,4 +1,4 @@
-From a58d90632a9907be3e8001800a143ac19075241a Mon Sep 17 00:00:00 2001
+From 8d9613c34ae495bbcbd725a2e7ac48138ba53c30 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 13 Apr 2017 16:40:27 +0300
 Subject: [PATCH 5/7] gpgme-config: skip all /lib* or /usr/lib* directories in

@@ -1,0 +1,13 @@
+#!/bin/sh
+
+lvm_enabled() {
+	if ! lvscan |grep -i -w "inactive" &>/dev/null;then
+		return 1
+	fi
+	return 0
+}
+
+lvm_run() {
+	lvm pvscan --cache --activate ay
+	udevadm trigger --action=add
+}

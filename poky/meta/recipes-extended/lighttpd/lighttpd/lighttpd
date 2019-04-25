@@ -4,7 +4,7 @@ PATH=/sbin:/bin:/usr/sbin:/usr/bin
 DAEMON=/usr/sbin/lighttpd
 NAME=lighttpd
 DESC="Lighttpd Web Server"
-OPTS="-f /etc/lighttpd.conf"
+OPTS="-f /etc/lighttpd/lighttpd.conf"
 
 case "$1" in
   start)

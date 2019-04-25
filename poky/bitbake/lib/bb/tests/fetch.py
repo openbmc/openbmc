@@ -893,12 +893,89 @@ class FetcherNetworkTest(FetcherTest):
 
     @skipIfNoNetwork()
     def test_git_submodule(self):
-        fetcher = bb.fetch.Fetch(["gitsm://git.yoctoproject.org/git-submodule-test;rev=f12e57f2edf0aa534cf1616fa983d165a92b0842"], self.d)
+        # URL with ssh submodules
+        url = "gitsm://git.yoctoproject.org/git-submodule-test;branch=ssh-gitsm-tests;rev=049da4a6cb198d7c0302e9e8b243a1443cb809a7"
+        # Original URL (comment this if you have ssh access to git.yoctoproject.org)
+        url = "gitsm://git.yoctoproject.org/git-submodule-test;branch=master;rev=a2885dd7d25380d23627e7544b7bbb55014b16ee"
+        fetcher = bb.fetch.Fetch([url], self.d)
         fetcher.download()
         # Previous cwd has been deleted
         os.chdir(os.path.dirname(self.unpackdir))
         fetcher.unpack(self.unpackdir)
 
+        repo_path = os.path.join(self.tempdir, 'unpacked', 'git')
+        self.assertTrue(os.path.exists(repo_path), msg='Unpacked repository missing')
+        self.assertTrue(os.path.exists(os.path.join(repo_path, 'bitbake')), msg='bitbake submodule missing')
+        self.assertFalse(os.path.exists(os.path.join(repo_path, 'na')), msg='uninitialized submodule present')
+
+        # Only when we're running the extended test with a submodule's submodule, can we check this.
+        if os.path.exists(os.path.join(repo_path, 'bitbake-gitsm-test1')):
+            self.assertTrue(os.path.exists(os.path.join(repo_path, 'bitbake-gitsm-test1', 'bitbake')), msg='submodule of submodule missing')
+
+    def test_git_submodule_dbus_broker(self):
+        # The following external repositories have show failures in fetch and unpack operations
+        # We want to avoid regressions!
+        url = "gitsm://github.com/bus1/dbus-broker;protocol=git;rev=fc874afa0992d0c75ec25acb43d344679f0ee7d2"
+        fetcher = bb.fetch.Fetch([url], self.d)
+        fetcher.download()
+        # Previous cwd has been deleted
+        os.chdir(os.path.dirname(self.unpackdir))
+        fetcher.unpack(self.unpackdir)
+
+        repo_path = os.path.join(self.tempdir, 'unpacked', 'git')
+        self.assertTrue(os.path.exists(os.path.join(repo_path, '.git/modules/subprojects/c-dvar/config')), msg='Missing submodule config "subprojects/c-dvar"')
+        self.assertTrue(os.path.exists(os.path.join(repo_path, '.git/modules/subprojects/c-list/config')), msg='Missing submodule config "subprojects/c-list"')
+        self.assertTrue(os.path.exists(os.path.join(repo_path, '.git/modules/subprojects/c-rbtree/config')), msg='Missing submodule config "subprojects/c-rbtree"')
+        self.assertTrue(os.path.exists(os.path.join(repo_path, '.git/modules/subprojects/c-sundry/config')), msg='Missing submodule config "subprojects/c-sundry"')
+        self.assertTrue(os.path.exists(os.path.join(repo_path, '.git/modules/subprojects/c-utf8/config')), msg='Missing submodule config "subprojects/c-utf8"')
+
+    def test_git_submodule_CLI11(self):
+        url = "gitsm://github.com/CLIUtils/CLI11;protocol=git;rev=bd4dc911847d0cde7a6b41dfa626a85aab213baf"
+        fetcher = bb.fetch.Fetch([url], self.d)
+        fetcher.download()
+        # Previous cwd has been deleted
+        os.chdir(os.path.dirname(self.unpackdir))
+        fetcher.unpack(self.unpackdir)
+
+        repo_path = os.path.join(self.tempdir, 'unpacked', 'git')
+        self.assertTrue(os.path.exists(os.path.join(repo_path, '.git/modules/extern/googletest/config')), msg='Missing submodule config "extern/googletest"')
+        self.assertTrue(os.path.exists(os.path.join(repo_path, '.git/modules/extern/json/config')), msg='Missing submodule config "extern/json"')
+        self.assertTrue(os.path.exists(os.path.join(repo_path, '.git/modules/extern/sanitizers/config')), msg='Missing submodule config "extern/sanitizers"')
+
+    def test_git_submodule_update_CLI11(self):
+        """ Prevent regression on update detection not finding missing submodule, or modules without needed commits """
+        url = "gitsm://github.com/CLIUtils/CLI11;protocol=git;rev=cf6a99fa69aaefe477cc52e3ef4a7d2d7fa40714"
+        fetcher = bb.fetch.Fetch([url], self.d)
+        fetcher.download()
+
+        # CLI11 that pulls in a newer nlohmann-json
+        url = "gitsm://github.com/CLIUtils/CLI11;protocol=git;rev=49ac989a9527ee9bb496de9ded7b4872c2e0e5ca"
+        fetcher = bb.fetch.Fetch([url], self.d)
+        fetcher.download()
+        # Previous cwd has been deleted
+        os.chdir(os.path.dirname(self.unpackdir))
+        fetcher.unpack(self.unpackdir)
+
+        repo_path = os.path.join(self.tempdir, 'unpacked', 'git')
+        self.assertTrue(os.path.exists(os.path.join(repo_path, '.git/modules/extern/googletest/config')), msg='Missing submodule config "extern/googletest"')
+        self.assertTrue(os.path.exists(os.path.join(repo_path, '.git/modules/extern/json/config')), msg='Missing submodule config "extern/json"')
+        self.assertTrue(os.path.exists(os.path.join(repo_path, '.git/modules/extern/sanitizers/config')), msg='Missing submodule config "extern/sanitizers"')
+
+    def test_git_submodule_aktualizr(self):
+        url = "gitsm://github.com/advancedtelematic/aktualizr;branch=master;protocol=git;rev=d00d1a04cc2366d1a5f143b84b9f507f8bd32c44"
+        fetcher = bb.fetch.Fetch([url], self.d)
+        fetcher.download()
+        # Previous cwd has been deleted
+        os.chdir(os.path.dirname(self.unpackdir))
+        fetcher.unpack(self.unpackdir)
+
+        repo_path = os.path.join(self.tempdir, 'unpacked', 'git')
+        self.assertTrue(os.path.exists(os.path.join(repo_path, '.git/modules/partial/extern/isotp-c/config')), msg='Missing submodule config "partial/extern/isotp-c/config"')
+        self.assertTrue(os.path.exists(os.path.join(repo_path, '.git/modules/partial/extern/isotp-c/modules/deps/bitfield-c/config')), msg='Missing submodule config "partial/extern/isotp-c/modules/deps/bitfield-c/config"')
+        self.assertTrue(os.path.exists(os.path.join(repo_path, 'partial/extern/isotp-c/deps/bitfield-c/.git')), msg="Submodule of submodule isotp-c did not unpack properly")
+        self.assertTrue(os.path.exists(os.path.join(repo_path, '.git/modules/tests/tuf-test-vectors/config')), msg='Missing submodule config "tests/tuf-test-vectors/config"')
+        self.assertTrue(os.path.exists(os.path.join(repo_path, '.git/modules/third_party/googletest/config')), msg='Missing submodule config "third_party/googletest/config"')
+        self.assertTrue(os.path.exists(os.path.join(repo_path, '.git/modules/third_party/HdrHistogram_c/config')), msg='Missing submodule config "third_party/HdrHistogram_c/config"')
 
 class TrustedNetworksTest(FetcherTest):
     def test_trusted_network(self):
@@ -1280,7 +1357,7 @@ class GitShallowTest(FetcherTest):
 
     def fetch(self, uri=None):
         if uri is None:
-            uris = self.d.getVar('SRC_URI', True).split()
+            uris = self.d.getVar('SRC_URI').split()
             uri = uris[0]
             d = self.d
         else:
@@ -1312,6 +1389,7 @@ class GitShallowTest(FetcherTest):
         # fetch and unpack, from the shallow tarball
         bb.utils.remove(self.gitdir, recurse=True)
         bb.utils.remove(ud.clonedir, recurse=True)
+        bb.utils.remove(ud.clonedir.replace('gitsource', 'gitsubmodule'), recurse=True)
 
         # confirm that the unpacked repo is used when no git clone or git
         # mirror tarball is available
@@ -1338,7 +1416,7 @@ class GitShallowTest(FetcherTest):
 
         srcrev = self.git('rev-parse HEAD', cwd=self.srcdir).strip()
         self.d.setVar('SRCREV', srcrev)
-        uri = self.d.getVar('SRC_URI', True).split()[0]
+        uri = self.d.getVar('SRC_URI').split()[0]
         uri = '%s;nobranch=1;bare=1' % uri
 
         self.fetch_shallow(uri)
@@ -1466,6 +1544,7 @@ class GitShallowTest(FetcherTest):
         self.git('config --add remote.origin.url "%s"' % smdir, cwd=smdir)
         self.git('config --add remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"', cwd=smdir)
         self.add_empty_file('asub', cwd=smdir)
+        self.add_empty_file('bsub', cwd=smdir)
 
         self.git('submodule init', cwd=self.srcdir)
         self.git('submodule add file://%s' % smdir, cwd=self.srcdir)
@@ -1475,9 +1554,15 @@ class GitShallowTest(FetcherTest):
         uri = 'gitsm://%s;protocol=file;subdir=${S}' % self.srcdir
         fetcher, ud = self.fetch_shallow(uri)
 
+        # Verify the main repository is shallow
         self.assertRevCount(1)
-        assert './.git/modules/' in bb.process.run('tar -tzf %s' % os.path.join(self.dldir, ud.mirrortarballs[0]))[0]
+
+        # Verify the gitsubmodule directory is present
         assert os.listdir(os.path.join(self.gitdir, 'gitsubmodule'))
+
+        # Verify the submodule is also shallow
+        self.assertRevCount(1, cwd=os.path.join(self.gitdir, 'gitsubmodule'))
+
 
     if any(os.path.exists(os.path.join(p, 'git-annex')) for p in os.environ.get('PATH').split(':')):
         def test_shallow_annex(self):
@@ -1510,7 +1595,7 @@ class GitShallowTest(FetcherTest):
         self.add_empty_file('f')
         self.assertRevCount(7, cwd=self.srcdir)
 
-        uri = self.d.getVar('SRC_URI', True).split()[0]
+        uri = self.d.getVar('SRC_URI').split()[0]
         uri = '%s;branch=master,a_branch;name=master,a_branch' % uri
 
         self.d.setVar('BB_GIT_SHALLOW_DEPTH', '0')
@@ -1536,7 +1621,7 @@ class GitShallowTest(FetcherTest):
         self.add_empty_file('f')
         self.assertRevCount(7, cwd=self.srcdir)
 
-        uri = self.d.getVar('SRC_URI', True).split()[0]
+        uri = self.d.getVar('SRC_URI').split()[0]
         uri = '%s;branch=master,a_branch;name=master,a_branch' % uri
 
         self.d.setVar('BB_GIT_SHALLOW_DEPTH', '0')

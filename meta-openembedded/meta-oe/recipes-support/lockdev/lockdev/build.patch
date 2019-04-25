@@ -1,0 +1,28 @@
+commit 0dd47123655c52d68185f06b9da8fb0e1b925400
+Author: Ludwig Nussel <ludwig.nussel@suse.de>
+Date:   Tue Feb 9 14:56:23 2010 +0100
+
+    RedHat patch 2
+    
+    - change library file name
+    - install devel symlink
+
+--- a/Makefile
++++ b/Makefile
+@@ -11,7 +11,7 @@ VER	= $(shell expr `pwd` : '.*-\([0-9.]*
+ MVER	= ${shell expr `pwd` : '.*-\([0-9]*\).[0-9]*'}
+ 
+ static	= ${libname}.a
+-shared	= ${libname}.${VER}.so
++shared	= ${libname}.so.${VER}
+ soname	= ${libname}.so.${MVER}
+ 
+ # overwritten by caller (e.g.: debian/rules)
+@@ -72,6 +72,7 @@ install_doc:	docs/lockdev.3
+ install_run:	${shared}
+ 	install -m755 -d	${libdir}
+ 	install -m644 ${shared}	${libdir}
++	ln -s ${shared}		${libdir}/liblockdev.so
+ 
+ .PHONY: clean distclean perl-clean mostyclean 
+ perl-clean:	clean

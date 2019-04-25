@@ -1,0 +1,53 @@
+# Hungary / Budapest
+#
+# A.multiplex UHF-38:
+# FREE -----------------------------------------------------------------------------------
+# m1 HD, m2 HD, Duna World, Duna HD, MR1 Kossuth Radio, MR2 Petofi Radio, MR3 Bartok Radio
+[CHANNEL]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 610000000
+	BANDWIDTH_HZ = 8000000
+	CODE_RATE_HP = 3/4
+	CODE_RATE_LP = NONE
+	MODULATION = QAM/64
+	TRANSMISSION_MODE = 8K
+	GUARD_INTERVAL = 1/4
+	HIERARCHY = NONE
+	INVERSION = AUTO
+
+#
+# B.multiplex UHF-55:
+# NON-FREE --------------------------------------------------------------------------------
+# PRO4, VIASAT3, Prizma TV, Muzsika TV, Universal Channel, Comedy Central, Minimax,
+# Cartoon Network, Spektrum, History, Sport1, Sport2, Dorcel TV
+[CHANNEL]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 746000000
+	BANDWIDTH_HZ = 8000000
+	CODE_RATE_HP = 3/4
+	CODE_RATE_LP = NONE
+	MODULATION = QAM/64
+	TRANSMISSION_MODE = 8K
+	GUARD_INTERVAL = 1/4
+	HIERARCHY = NONE
+	INVERSION = AUTO
+
+#
+# C.multiplex UHF-62:
+# FREE --------------------------------------------------------------------------------
+# RTL Klub, TV2, Euronews Test, Info csatorna, Neo FM
+# NON-FREE ----------------------------------------------------------------------------
+# Cool, Film+, HBO, National Geographic, Disney Channel, AXN, FEM3, Private spice, ATV,
+# HirTV, Sportklub
+[CHANNEL]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 802000000
+	BANDWIDTH_HZ = 8000000
+	CODE_RATE_HP = 3/4
+	CODE_RATE_LP = NONE
+	MODULATION = QAM/64
+	TRANSMISSION_MODE = 8K
+	GUARD_INTERVAL = 1/4
+	HIERARCHY = NONE
+	INVERSION = AUTO
+

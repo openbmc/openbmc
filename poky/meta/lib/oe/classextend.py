@@ -114,7 +114,7 @@ class NativesdkClassExtender(ClassExtender):
     def map_depends(self, dep):
         if dep.startswith(self.extname):
             return dep
-        if dep.endswith(("-gcc-initial", "-gcc", "-g++")):
+        if dep.endswith(("-gcc", "-g++")):
             return dep + "-crosssdk"
         elif dep.endswith(("-native", "-native-runtime")) or ('nativesdk-' in dep) or ('-cross-' in dep) or ('-crosssdk-' in dep):
             return dep

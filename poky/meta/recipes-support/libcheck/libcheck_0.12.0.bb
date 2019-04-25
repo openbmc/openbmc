@@ -1,5 +1,5 @@
 SUMMARY  = "Check - unit testing framework for C code"
-HOMEPAGE = "http://check.sourceforge.net/"
+HOMEPAGE = "https://libcheck.github.io/check/"
 SECTION = "devel"
 
 LICENSE  = "LGPLv2.1+"

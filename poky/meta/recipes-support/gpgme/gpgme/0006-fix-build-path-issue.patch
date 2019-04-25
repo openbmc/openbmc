@@ -1,4 +1,4 @@
-From 4f83750ce402b65d16cc09f8a0274a7ec76fc634 Mon Sep 17 00:00:00 2001
+From ef920688bfe1c7328c9e97229d62ccd35304ad84 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Wed, 31 Jan 2018 11:01:09 +0800
 Subject: [PATCH 6/7] fix build path issue
@@ -17,10 +17,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/lang/python/Makefile.am b/lang/python/Makefile.am
-index ce4f0a5..5a468f1 100644
+index 36c6f7b..ce9a108 100644
 --- a/lang/python/Makefile.am
 +++ b/lang/python/Makefile.am
-@@ -90,8 +90,9 @@ install-exec-local:
+@@ -92,8 +92,9 @@ install-exec-local:
  	  build \
  	  --build-base="$$(basename "$${PYTHON}")-gpg" \
  	  install \

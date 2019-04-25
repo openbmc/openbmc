@@ -19,7 +19,7 @@ SRC_URI = "git://git.code.sf.net/p/libdc1394/code;branch=master;protocol=git \
            file://install_examples.patch \
           "
 
-S = "${WORKDIR}/git/${PN}"
+S = "${WORKDIR}/git/${BPN}"
 
 inherit autotools-brokensep pkgconfig
 

@@ -16,40 +16,40 @@ import shutil
 import re
 import fnmatch
 import glob
-from collections import OrderedDict, defaultdict
+import bb.tinfoil
 
+from collections import OrderedDict, defaultdict
+from bb.utils import vercmp_string
 
 # Help us to find places to insert values
 recipe_progression = ['SUMMARY', 'DESCRIPTION', 'HOMEPAGE', 'BUGTRACKER', 'SECTION', 'LICENSE', 'LICENSE_FLAGS', 'LIC_FILES_CHKSUM', 'PROVIDES', 'DEPENDS', 'PR', 'PV', 'SRCREV', 'SRCPV', 'SRC_URI', 'S', 'do_fetch()', 'do_unpack()', 'do_patch()', 'EXTRA_OECONF', 'EXTRA_OECMAKE', 'EXTRA_OESCONS', 'do_configure()', 'EXTRA_OEMAKE', 'do_compile()', 'do_install()', 'do_populate_sysroot()', 'INITSCRIPT', 'USERADD', 'GROUPADD', 'PACKAGES', 'FILES', 'RDEPENDS', 'RRECOMMENDS', 'RSUGGESTS', 'RPROVIDES', 'RREPLACES', 'RCONFLICTS', 'ALLOW_EMPTY', 'populate_packages()', 'do_package()', 'do_deploy()']
 # Variables that sometimes are a bit long but shouldn't be wrapped
-nowrap_vars = ['SUMMARY', 'HOMEPAGE', 'BUGTRACKER', 'SRC_URI\[(.+\.)?md5sum\]', 'SRC_URI\[(.+\.)?sha256sum\]']
+nowrap_vars = ['SUMMARY', 'HOMEPAGE', 'BUGTRACKER', r'SRC_URI\[(.+\.)?md5sum\]', r'SRC_URI\[(.+\.)?sha256sum\]']
 list_vars = ['SRC_URI', 'LIC_FILES_CHKSUM']
 meta_vars = ['SUMMARY', 'DESCRIPTION', 'HOMEPAGE', 'BUGTRACKER', 'SECTION']
 
 
-def pn_to_recipe(cooker, pn, mc=''):
-    """Convert a recipe name (PN) to the path to the recipe file"""
-
-    best = cooker.findBestProvider(pn, mc)
-    return best[3]
-
-
-def get_unavailable_reasons(cooker, pn):
-    """If a recipe could not be found, find out why if possible"""
-    import bb.taskdata
-    taskdata = bb.taskdata.TaskData(None, skiplist=cooker.skiplist)
-    return taskdata.get_reasons(pn)
-
-
-def parse_recipe(cooker, fn, appendfiles):
+def simplify_history(history, d):
     """
-    Parse an individual recipe file, optionally with a list of
-    bbappend files.
+    Eliminate any irrelevant events from a variable history
     """
-    import bb.cache
-    parser = bb.cache.NoCache(cooker.databuilder)
-    envdata = parser.loadDataFull(fn, appendfiles)
-    return envdata
+    ret_history = []
+    has_set = False
+    # Go backwards through the history and remove any immediate operations
+    # before the most recent set
+    for event in reversed(history):
+        if 'flag' in event or not 'file' in event:
+            continue
+        if event['op'] == 'set':
+            if has_set:
+                continue
+            has_set = True
+        elif event['op'] in ('append', 'prepend', 'postdot', 'predot'):
+            # Reminder: "append" and "prepend" mean += and =+ respectively, NOT _append / _prepend
+            if has_set:
+                continue
+        ret_history.insert(0, event)
+    return ret_history
 
 
 def get_var_files(fn, varlist, d):
@@ -58,11 +58,19 @@ def get_var_files(fn, varlist, d):
     """
     varfiles = {}
     for v in varlist:
-        history = d.varhistory.variable(v)
         files = []
-        for event in history:
-            if 'file' in event and not 'flag' in event:
-                files.append(event['file'])
+        if '[' in v:
+            varsplit = v.split('[')
+            varflag = varsplit[1].split(']')[0]
+            history = d.varhistory.variable(varsplit[0])
+            for event in history:
+                if 'file' in event and event.get('flag', '') == varflag:
+                    files.append(event['file'])
+        else:
+            history = d.varhistory.variable(v)
+            for event in history:
+                if 'file' in event and not 'flag' in event:
+                    files.append(event['file'])
         if files:
             actualfile = files[-1]
         else:
@@ -153,7 +161,7 @@ def patch_recipe_lines(fromlines, values, trailing_newline=True):
             key = item[:-2]
         else:
             key = item
-        restr = '%s(_[a-zA-Z0-9-_$(){}]+|\[[^\]]*\])?' % key
+        restr = r'%s(_[a-zA-Z0-9-_$(){}]+|\[[^\]]*\])?' % key
         if item.endswith('()'):
             recipe_progression_restrs.append(restr + '()')
         else:
@@ -176,7 +184,14 @@ def patch_recipe_lines(fromlines, values, trailing_newline=True):
     def outputvalue(name, lines, rewindcomments=False):
         if values[name] is None:
             return
-        rawtext = '%s = "%s"%s' % (name, values[name], newline)
+        if isinstance(values[name], tuple):
+            op, value = values[name]
+            if op == '+=' and value.strip() == '':
+                return
+        else:
+            value = values[name]
+            op = '='
+        rawtext = '%s %s "%s"%s' % (name, op, value, newline)
         addlines = []
         nowrap = False
         for nowrap_re in nowrap_vars_res:
@@ -186,10 +201,10 @@ def patch_recipe_lines(fromlines, values, trailing_newline=True):
         if nowrap:
             addlines.append(rawtext)
         elif name in list_vars:
-            splitvalue = split_var_value(values[name], assignment=False)
+            splitvalue = split_var_value(value, assignment=False)
             if len(splitvalue) > 1:
                 linesplit = ' \\\n' + (' ' * (len(name) + 4))
-                addlines.append('%s = "%s%s"%s' % (name, linesplit.join(splitvalue), linesplit, newline))
+                addlines.append('%s %s "%s%s"%s' % (name, op, linesplit.join(splitvalue), linesplit, newline))
             else:
                 addlines.append(rawtext)
         else:
@@ -321,12 +336,47 @@ def patch_recipe(d, fn, varvalues, patch=False, relpath='', redirect_output=None
     """Modify a list of variable values in the specified recipe. Handles inc files if
     used by the recipe.
     """
+    overrides = d.getVar('OVERRIDES').split(':')
+    def override_applicable(hevent):
+        op = hevent['op']
+        if '[' in op:
+            opoverrides = op.split('[')[1].split(']')[0].split('_')
+            for opoverride in opoverrides:
+                if not opoverride in overrides:
+                    return False
+        return True
+
     varlist = varvalues.keys()
+    fn = os.path.abspath(fn)
     varfiles = get_var_files(fn, varlist, d)
     locs = localise_file_vars(fn, varfiles, varlist)
     patches = []
     for f,v in locs.items():
         vals = {k: varvalues[k] for k in v}
+        f = os.path.abspath(f)
+        if f == fn:
+            extravals = {}
+            for var, value in vals.items():
+                if var in list_vars:
+                    history = simplify_history(d.varhistory.variable(var), d)
+                    recipe_set = False
+                    for event in history:
+                        if os.path.abspath(event['file']) == fn:
+                            if event['op'] == 'set':
+                                recipe_set = True
+                    if not recipe_set:
+                        for event in history:
+                            if event['op'].startswith('_remove'):
+                                continue
+                            if not override_applicable(event):
+                                continue
+                            newvalue = value.replace(event['detail'], '')
+                            if newvalue == value and os.path.abspath(event['file']) == fn and event['op'].startswith('_'):
+                                op = event['op'].replace('[', '_').replace(']', '')
+                                extravals[var + op] = None
+                            value = newvalue
+                            vals[var] = ('+=', value)
+            vals.update(extravals)
         patchdata = patch_recipe_file(f, vals, patch, relpath, redirect_output)
         if patch:
             patches.append(patchdata)
@@ -432,7 +482,14 @@ def get_recipe_local_files(d, patches=False, archives=False):
                     unpack = fetch.ud[uri].parm.get('unpack', True)
                     if unpack:
                         continue
-            ret[fname] = localpath
+            if os.path.isdir(localpath):
+                for root, dirs, files in os.walk(localpath):
+                    for fname in files:
+                        fileabspath = os.path.join(root,fname)
+                        srcdir = os.path.dirname(localpath)
+                        ret[os.path.relpath(fileabspath,srcdir)] = fileabspath
+            else:
+                ret[fname] = localpath
     return ret
 
 
@@ -875,7 +932,7 @@ def get_recipe_pv_without_srcpv(pv, uri_type):
     sfx = ''
 
     if uri_type == 'git':
-        git_regex = re.compile("(?P<pfx>v?)(?P<ver>[^\+]*)((?P<sfx>\+(git)?r?(AUTOINC\+))(?P<rev>.*))?")
+        git_regex = re.compile(r"(?P<pfx>v?)(?P<ver>[^\+]*)((?P<sfx>\+(git)?r?(AUTOINC\+))(?P<rev>.*))?")
         m = git_regex.match(pv)
 
         if m:
@@ -883,7 +940,7 @@ def get_recipe_pv_without_srcpv(pv, uri_type):
             pfx = m.group('pfx')
             sfx = m.group('sfx')
     else:
-        regex = re.compile("(?P<pfx>(v|r)?)(?P<ver>.*)")
+        regex = re.compile(r"(?P<pfx>(v|r)?)(?P<ver>.*)")
         m = regex.match(pv)
         if m:
             pv = m.group('ver')
@@ -969,3 +1026,87 @@ def get_recipe_upstream_version(rd):
         ru['datetime'] = datetime.now()
 
     return ru
+
+def _get_recipe_upgrade_status(data):
+    uv = get_recipe_upstream_version(data)
+
+    pn = data.getVar('PN')
+    cur_ver = uv['current_version']
+
+    upstream_version_unknown = data.getVar('UPSTREAM_VERSION_UNKNOWN')
+    if not uv['version']:
+        status = "UNKNOWN" if upstream_version_unknown else "UNKNOWN_BROKEN"
+    else:
+        cmp = vercmp_string(uv['current_version'], uv['version'])
+        if cmp == -1:
+            status = "UPDATE" if not upstream_version_unknown else "KNOWN_BROKEN"
+        elif cmp == 0:
+            status = "MATCH" if not upstream_version_unknown else "KNOWN_BROKEN"
+        else:
+            status = "UNKNOWN" if upstream_version_unknown else "UNKNOWN_BROKEN"
+
+    next_ver = uv['version'] if uv['version'] else "N/A"
+    revision = uv['revision'] if uv['revision'] else "N/A"
+    maintainer = data.getVar('RECIPE_MAINTAINER')
+    no_upgrade_reason = data.getVar('RECIPE_NO_UPDATE_REASON')
+
+    return (pn, status, cur_ver, next_ver, maintainer, revision, no_upgrade_reason)
+
+def get_recipe_upgrade_status(recipes=None):
+    pkgs_list = []
+    data_copy_list = []
+    copy_vars = ('SRC_URI',
+                 'PV',
+                 'GITDIR',
+                 'DL_DIR',
+                 'PN',
+                 'CACHE',
+                 'PERSISTENT_DIR',
+                 'BB_URI_HEADREVS',
+                 'UPSTREAM_CHECK_COMMITS',
+                 'UPSTREAM_CHECK_GITTAGREGEX',
+                 'UPSTREAM_CHECK_REGEX',
+                 'UPSTREAM_CHECK_URI',
+                 'UPSTREAM_VERSION_UNKNOWN',
+                 'RECIPE_MAINTAINER',
+                 'RECIPE_NO_UPDATE_REASON',
+                 'RECIPE_UPSTREAM_VERSION',
+                 'RECIPE_UPSTREAM_DATE',
+                 'CHECK_DATE',
+            )
+
+    with bb.tinfoil.Tinfoil() as tinfoil:
+        tinfoil.prepare(config_only=False)
+
+        if not recipes:
+            recipes = tinfoil.all_recipe_files(variants=False)
+
+        for fn in recipes:
+            try:
+                if fn.startswith("/"):
+                    data = tinfoil.parse_recipe_file(fn)
+                else:
+                    data = tinfoil.parse_recipe(fn)
+            except bb.providers.NoProvider:
+                bb.note(" No provider for %s" % fn)
+                continue
+
+            unreliable = data.getVar('UPSTREAM_CHECK_UNRELIABLE')
+            if unreliable == "1":
+                bb.note(" Skip package %s as upstream check unreliable" % pn)
+                continue
+
+            data_copy = bb.data.init()
+            for var in copy_vars:
+                data_copy.setVar(var, data.getVar(var))
+            for k in data:
+                if k.startswith('SRCREV'):
+                    data_copy.setVar(k, data.getVar(k))
+
+            data_copy_list.append(data_copy)
+
+    from concurrent.futures import ProcessPoolExecutor
+    with ProcessPoolExecutor(max_workers=utils.cpu_count()) as executor:
+        pkgs_list = executor.map(_get_recipe_upgrade_status, data_copy_list)
+
+    return pkgs_list

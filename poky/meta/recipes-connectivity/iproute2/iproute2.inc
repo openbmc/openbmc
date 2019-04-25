@@ -52,3 +52,7 @@ ALTERNATIVE_${PN} = "ip"
 ALTERNATIVE_TARGET[ip] = "${base_sbindir}/ip.${BPN}"
 ALTERNATIVE_LINK_NAME[ip] = "${base_sbindir}/ip"
 ALTERNATIVE_PRIORITY = "100"
+
+ALTERNATIVE_${PN}-tc = "tc"
+ALTERNATIVE_LINK_NAME[tc] = "${base_sbindir}/tc"
+ALTERNATIVE_PRIORITY_${PN}-tc = "100"

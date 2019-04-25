@@ -9,7 +9,8 @@
 
 import argparse
 import ast
-import imp
+import importlib
+from importlib import machinery
 import logging
 import os.path
 import sys
@@ -17,10 +18,7 @@ import sys
 
 logger = logging.getLogger('pythondeps')
 
-suffixes = []
-for triple in imp.get_suffixes():
-    suffixes.append(triple[0])
-
+suffixes = importlib.machinery.all_suffixes()
 
 class PythonDepError(Exception):
     pass

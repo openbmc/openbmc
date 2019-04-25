@@ -28,13 +28,29 @@
 import os
 import shlex
 import logging
+import re
 
 from argparse import ArgumentParser, ArgumentError, ArgumentTypeError
 
 from wic.engine import find_canned
 from wic.partition import Partition
+from wic.misc import get_bitbake_var
 
 logger = logging.getLogger('wic')
+
+__expand_var_regexp__ = re.compile(r"\${[^{}@\n\t :]+}")
+
+def expand_line(line):
+    while True:
+        m = __expand_var_regexp__.search(line)
+        if not m:
+            return line
+        key = m.group()[2:-1]
+        val = get_bitbake_var(key)
+        if val is None:
+            logger.warning("cannot expand variable %s" % key)
+            return line
+        line = line[:m.start()] + val + line[m.end():]
 
 class KickStartError(Exception):
     """Custom exception."""
@@ -190,6 +206,7 @@ class KickStart():
                 line = line.strip()
                 lineno += 1
                 if line and line[0] != '#':
+                    line = expand_line(line)
                     try:
                         line_args = shlex.split(line)
                         parsed = parser.parse_args(line_args)

@@ -16,6 +16,8 @@ SRC_URI = " \
     file://nginx-cross.patch \
     file://0001-Allow-the-overriding-of-the-endianness-via-the-confi.patch \
     file://nginx.conf \
+    file://default_server.site \
+    file://proxy_params \
     file://nginx.init \
     file://nginx-volatile.conf \
     file://nginx.service \
@@ -102,14 +104,29 @@ do_install () {
 
     install -d ${D}${sysconfdir}/nginx
     install -m 0644 ${WORKDIR}/nginx.conf ${D}${sysconfdir}/nginx/nginx.conf
+    sed -i 's,/etc/,${sysconfdir}/,g' ${D}${sysconfdir}/nginx/nginx.conf
     sed -i 's,/var/,${localstatedir}/,g' ${D}${sysconfdir}/nginx/nginx.conf
     sed -i 's/^user.*/user ${NGINX_USER};/g' ${D}${sysconfdir}/nginx/nginx.conf
+    install -Dm 0644 ${WORKDIR}/default_server.site ${D}${sysconfdir}/nginx/sites-available/default_server
+    sed -i 's,/var/,${localstatedir}/,g' ${D}${sysconfdir}/nginx/sites-available/default_server
     install -d ${D}${sysconfdir}/nginx/sites-enabled
+    ln -s ../sites-available/default_server ${D}${sysconfdir}/nginx/sites-enabled/
+
+    install -m 0644 ${WORKDIR}/proxy_params ${D}${sysconfdir}/nginx/proxy_params
 
     install -d ${D}${sysconfdir}/default/volatiles
     install -m 0644 ${WORKDIR}/nginx-volatile.conf ${D}${sysconfdir}/default/volatiles/99_nginx
     sed -i 's,/var/,${localstatedir}/,g' ${D}${sysconfdir}/default/volatiles/99_nginx
     sed -i 's,@NGINX_USER@,${NGINX_USER},g' ${D}${sysconfdir}/default/volatiles/99_nginx
+
+    # cleanup configuration folder
+    rm ${D}${sysconfdir}/nginx/*.default
+
+    # add additional configuration folders
+    install -d ${D}${sysconfdir}/nginx/modules-available
+    install -d ${D}${sysconfdir}/nginx/modules-enabled
+    install -d ${D}${sysconfdir}/nginx/server-conf.d
+    install -d ${D}${sysconfdir}/nginx/conf.d
 
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)};then
         install -d ${D}${systemd_unitdir}/system
@@ -117,6 +134,7 @@ do_install () {
         sed -i -e 's,@SYSCONFDIR@,${sysconfdir},g' \
             -e 's,@LOCALSTATEDIR@,${localstatedir},g' \
             -e 's,@SBINDIR@,${sbindir},g' \
+            -e 's,@BINDIR@,${bindir},g' \
             ${D}${systemd_unitdir}/system/nginx.service
     fi
 }

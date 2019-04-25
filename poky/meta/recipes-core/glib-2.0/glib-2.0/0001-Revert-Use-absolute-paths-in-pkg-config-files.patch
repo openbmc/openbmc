@@ -1,0 +1,64 @@
+From abc26aed7a28678dfcc20b21726a97c7c02ea73b Mon Sep 17 00:00:00 2001
+From: Anuj Mittal <anuj.mittal@intel.com>
+Date: Thu, 14 Feb 2019 14:55:15 +0800
+Subject: [PATCH] Revert "Use absolute paths in pkg-config files"
+
+This reverts commit e7a7c9b97776fa2a638d18ea3a931ba84e778f80.
+
+The glib pkgconfig files now contain absolute paths, but they're
+target paths so when we used them from a sysroot it fails.  Upstream
+thinks that we should be setting
+GLIB_MKENUMS=/path/to/sysroot/usr/bin/glib-mkenums but that really
+doesn't scale.
+
+For now, we just revert the change to put absolute paths into
+the sysroot. This should be re-evaluated when we move the recipe to use
+meson.
+
+Upstream-Status: Inappropriate [Revert of an upstream commit]
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+---
+ gio-2.0.pc.in  | 7 +++----
+ glib-2.0.pc.in | 7 +++----
+ 2 files changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/gio-2.0.pc.in b/gio-2.0.pc.in
+index d67e80839..526f0daa0 100644
+--- a/gio-2.0.pc.in
++++ b/gio-2.0.pc.in
+@@ -5,11 +5,10 @@ includedir=@includedir@
+ 
+ datadir=@datadir@
+ schemasdir=${datadir}/glib-2.0/schemas
+-bindir=@bindir@
+ giomoduledir=@GIO_MODULE_DIR@
+-glib_compile_schemas=${bindir}/glib-compile-schemas
+-glib_compile_resources=${bindir}/glib-compile-resources
+-gdbus_codegen=${bindir}/gdbus-codegen
++glib_compile_schemas=glib-compile-schemas
++glib_compile_resources=glib-compile-resources
++gdbus_codegen=gdbus-codegen
+ 
+ Name: GIO
+ Description: glib I/O library
+diff --git a/glib-2.0.pc.in b/glib-2.0.pc.in
+index 3c5ea81dc..275fc0163 100644
+--- a/glib-2.0.pc.in
++++ b/glib-2.0.pc.in
+@@ -3,10 +3,9 @@ exec_prefix=@exec_prefix@
+ libdir=@libdir@
+ includedir=@includedir@
+ 
+-bindir=@bindir@
+-glib_genmarshal=${bindir}/glib-genmarshal
+-gobject_query=${bindir}/gobject-query
+-glib_mkenums=${bindir}/glib-mkenums
++glib_genmarshal=glib-genmarshal
++gobject_query=gobject-query
++glib_mkenums=glib-mkenums
+ 
+ Name: GLib
+ Description: C Utility Library
+-- 
+2.17.1
+

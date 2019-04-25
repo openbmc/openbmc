@@ -23,6 +23,9 @@ do_configure() {
     # manually do the copy_bsp step first, so as to be able to fix up use of
     # mb-* commands
     ${S}/../misc/copy_bsp.sh
+
+    # fix xilfpga to include the zynqmp backend
+    mv ${S}/../misc/zynqmp_pmufw_bsp/psu_pmu_0/libsrc/xilfpga/src/interface/zynqmp/* ${S}/../misc/zynqmp_pmufw_bsp/psu_pmu_0/libsrc/xilfpga/src
 }
 
 COMPILER = "${CC}"

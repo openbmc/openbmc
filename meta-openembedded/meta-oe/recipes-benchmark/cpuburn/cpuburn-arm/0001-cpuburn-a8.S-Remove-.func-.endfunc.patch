@@ -1,0 +1,69 @@
+From 064a63860bf9ee4bf54facb76ca66f9f957d4797 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 29 Jan 2019 11:12:38 -0800
+Subject: [PATCH] cpuburn*.S: Remove .func/.endfunc
+
+These are needed to generate stabs debug info which we dont use
+and are silently ignored by gnu assembler when unused, clang assembler
+however barfs, so remove them
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
+ cpuburn-a7.S | 2 --
+ cpuburn-a8.S | 2 --
+ cpuburn-a9.S | 2 --
+ 3 files changed, 6 deletions(-)
+
+diff --git a/cpuburn-a7.S b/cpuburn-a7.S
+index 74e925a..c1e308c 100644
+--- a/cpuburn-a7.S
++++ b/cpuburn-a7.S
+@@ -42,7 +42,6 @@
+ 
+     .global main
+ 
+-.func main
+ .type main, %function
+ main:
+         push        {r4-r12, lr}
+@@ -88,4 +87,3 @@ main:
+ 
+         mov         r0, #0
+         pop         {r4-r12, pc}
+-.endfunc
+diff --git a/cpuburn-a8.S b/cpuburn-a8.S
+index c6f93a6..a42f5a5 100644
+--- a/cpuburn-a8.S
++++ b/cpuburn-a8.S
+@@ -46,7 +46,6 @@
+ /* 16 seems to be a good choice */
+ #define STEP                 16
+ 
+-.func main
+ .thumb_func
+ main:
+         mov         lr, pc
+@@ -70,4 +69,3 @@ main:
+         subs        lr, lr, #(STEP * 4)
+     .endr
+         bne         0b
+-.endfunc
+diff --git a/cpuburn-a9.S b/cpuburn-a9.S
+index 0338b00..a1ccae5 100644
+--- a/cpuburn-a9.S
++++ b/cpuburn-a9.S
+@@ -48,7 +48,6 @@
+ /* 64 seems to be a good choice */
+ #define STEP                 64
+ 
+-.func main
+ .type main, %function
+ main:
+ 
+@@ -94,4 +93,3 @@ main:
+         subsne      lr, lr, #(STEP * 4)
+     .endr
+         bne         0b
+-.endfunc

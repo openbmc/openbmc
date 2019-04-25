@@ -338,7 +338,7 @@ def check_path_length(filepath, pathname, limit):
 def get_filesystem_id(path):
     import subprocess
     try:
-        return subprocess.check_output(["stat", "-f", "-c", "%t", path]).decode('utf-8')
+        return subprocess.check_output(["stat", "-f", "-c", "%t", path]).decode('utf-8').strip()
     except subprocess.CalledProcessError:
         bb.warn("Can't get filesystem id of: %s" % path)
         return None
@@ -876,7 +876,7 @@ def check_sanity_everybuild(status, d):
         with open(checkfile, "r") as f:
             saved_tmpdir = f.read().strip()
             if (saved_tmpdir != tmpdir):
-                status.addresult("Error, TMPDIR has changed location. You need to either move it back to %s or rebuild\n" % saved_tmpdir)
+                status.addresult("Error, TMPDIR has changed location. You need to either move it back to %s or delete it and rebuild\n" % saved_tmpdir)
     else:
         bb.utils.mkdirhier(tmpdir)
         # Remove setuid, setgid and sticky bits from TMPDIR

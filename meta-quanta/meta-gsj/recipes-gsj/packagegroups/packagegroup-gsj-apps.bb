@@ -24,9 +24,7 @@ RDEPENDS_${PN}-chassis = " \
         "
 
 SUMMARY_${PN}-fans = "GSJ Fans"
-RDEPENDS_${PN}-fans = " \
-        obmc-control-fan \
-        "
+RDEPENDS_${PN}-fans = ""
 
 SUMMARY_${PN}-flash = "GSJ Flash"
 RDEPENDS_${PN}-flash = " \

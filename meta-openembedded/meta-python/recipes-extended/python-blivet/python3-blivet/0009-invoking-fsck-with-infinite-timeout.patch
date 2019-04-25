@@ -1,4 +1,4 @@
-From c757666f42f543baeed5df61269798c085665d9b Mon Sep 17 00:00:00 2001
+From 9624b6d0dda40aaecbaf9530be819943575a2ec6 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Thu, 1 Jun 2017 16:05:27 +0800
 Subject: [PATCH 09/11] invoking fsck with infinite timeout

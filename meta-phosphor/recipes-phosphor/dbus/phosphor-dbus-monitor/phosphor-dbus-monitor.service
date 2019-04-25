@@ -8,4 +8,4 @@ ExecStart=/usr/bin/env phosphor-dbus-monitor
 SyslogIdentifier=phosphor-dbus-monitor
 
 [Install]
-WantedBy={SYSTEMD_DEFAULT_TARGET}
+WantedBy=multi-user.target

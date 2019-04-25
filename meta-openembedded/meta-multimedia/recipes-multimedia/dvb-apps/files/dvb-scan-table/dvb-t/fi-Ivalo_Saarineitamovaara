@@ -1,0 +1,13 @@
+# 2014-04-18 Antti Palosaari <crope@iki.fi>
+# generated from http://www.digita.fi/kuluttajat/tv/nakyvyysalueet/kanavanumerot_ja_taajuudet
+
+[Ivalo_Saarineitamovaara]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 490000000
+	BANDWIDTH_HZ = 8000000
+
+[Ivalo_Saarineitamovaara]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 522000000
+	BANDWIDTH_HZ = 8000000
+

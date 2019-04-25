@@ -1,0 +1,40 @@
+{
+    "runtime_core-image-minimal_qemuarm_20181225195701": {
+        "configuration": {
+            "DISTRO": "poky",
+            "HOST_DISTRO": "ubuntu-16.04",
+            "IMAGE_BASENAME": "core-image-minimal",
+            "IMAGE_PKGTYPE": "rpm",
+            "LAYERS": {
+                "meta": {
+                    "branch": "master",
+                    "commit": "801745d918e83f976c706f29669779f5b292ade3",
+                    "commit_count": 52782
+                },
+                "meta-poky": {
+                    "branch": "master",
+                    "commit": "801745d918e83f976c706f29669779f5b292ade3",
+                    "commit_count": 52782
+                },
+                "meta-yocto-bsp": {
+                    "branch": "master",
+                    "commit": "801745d918e83f976c706f29669779f5b292ade3",
+                    "commit_count": 52782
+                }
+            },
+            "MACHINE": "qemuarm",
+            "STARTTIME": "20181225195701",
+            "TEST_TYPE": "runtime"
+        },
+        "result": {
+            "apt.AptRepoTest.test_apt_install_from_repo": {
+                "log": "Test requires apt to be installed",
+                "status": "PASSED"
+            },
+            "buildcpio.BuildCpioTest.test_cpio": {
+                "log": "Test requires autoconf to be installed",
+                "status": "ERROR"
+            }            
+        }
+    }
+}

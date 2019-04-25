@@ -1,0 +1,30 @@
+From c6649fdcfb2f44807089741557f8e527ab9751e4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Sun, 24 Mar 2019 02:46:07 +0100
+Subject: [PATCH] Do not build help - we do not have yelp yet
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Inappropriate [embedded-specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ meson.build | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index d60ced7..6a0ab4b 100644
+--- a/meson.build
++++ b/meson.build
+@@ -183,7 +183,6 @@ subdir('data')
+ subdir('po')
+ subdir('scripts')
+ subdir('src')
+-subdir('help')
+ 
+ 
+ message('\n'.join(['',
+-- 
+2.20.1
+

@@ -45,60 +45,97 @@ class GitSM(Git):
         """
         return ud.type in ['gitsm']
 
-    @staticmethod
-    def parse_gitmodules(gitmodules):
-        modules = {}
-        module = ""
-        for line in gitmodules.splitlines():
-            if line.startswith('[submodule'):
-                module = line.split('"')[1]
-                modules[module] = {}
-            elif module and line.strip().startswith('path'):
-                path = line.split('=')[1].strip()
-                modules[module]['path'] = path
-            elif module and line.strip().startswith('url'):
-                url = line.split('=')[1].strip()
-                modules[module]['url'] = url
-        return modules
+    def process_submodules(self, ud, workdir, function, d):
+        """
+        Iterate over all of the submodules in this repository and execute
+        the 'function' for each of them.
+        """
 
-    def update_submodules(self, ud, d):
         submodules = []
         paths = {}
+        revision = {}
         uris = {}
-        local_paths = {}
+        subrevision = {}
 
+        def parse_gitmodules(gitmodules):
+            modules = {}
+            module = ""
+            for line in gitmodules.splitlines():
+                if line.startswith('[submodule'):
+                    module = line.split('"')[1]
+                    modules[module] = {}
+                elif module and line.strip().startswith('path'):
+                    path = line.split('=')[1].strip()
+                    modules[module]['path'] = path
+                elif module and line.strip().startswith('url'):
+                    url = line.split('=')[1].strip()
+                    modules[module]['url'] = url
+            return modules
+
+        # Collect the defined submodules, and their attributes
         for name in ud.names:
             try:
-                gitmodules = runfetchcmd("%s show %s:.gitmodules" % (ud.basecmd, ud.revisions[name]), d, quiet=True, workdir=ud.clonedir)
+                gitmodules = runfetchcmd("%s show %s:.gitmodules" % (ud.basecmd, ud.revisions[name]), d, quiet=True, workdir=workdir)
             except:
                 # No submodules to update
                 continue
 
-            for m, md in self.parse_gitmodules(gitmodules).items():
+            for m, md in parse_gitmodules(gitmodules).items():
+                try:
+                    module_hash = runfetchcmd("%s ls-tree -z -d %s %s" % (ud.basecmd, ud.revisions[name], md['path']), d, quiet=True, workdir=workdir)
+                except:
+                    # If the command fails, we don't have a valid file to check.  If it doesn't
+                    # fail -- it still might be a failure, see next check...
+                    module_hash = ""
+
+                if not module_hash:
+                    logger.debug(1, "submodule %s is defined, but is not initialized in the repository. Skipping", m)
+                    continue
+
                 submodules.append(m)
                 paths[m] = md['path']
+                revision[m] = ud.revisions[name]
                 uris[m] = md['url']
+                subrevision[m] = module_hash.split()[2]
+
+                # Convert relative to absolute uri based on parent uri
                 if uris[m].startswith('..'):
                     newud = copy.copy(ud)
-                    newud.path = os.path.realpath(os.path.join(newud.path, md['url']))
+                    newud.path = os.path.realpath(os.path.join(newud.path, uris[m]))
                     uris[m] = Git._get_repo_url(self, newud)
 
         for module in submodules:
-            module_hash = runfetchcmd("%s ls-tree -z -d %s %s" % (ud.basecmd, ud.revisions[name], paths[module]), d, quiet=True, workdir=ud.clonedir)
-            module_hash = module_hash.split()[2]
+            # Translate the module url into a SRC_URI
 
-            # Build new SRC_URI
-            proto = uris[module].split(':', 1)[0]
-            url = uris[module].replace('%s:' % proto, 'gitsm:', 1)
+            if "://" in uris[module]:
+                # Properly formated URL already
+                proto = uris[module].split(':', 1)[0]
+                url = uris[module].replace('%s:' % proto, 'gitsm:', 1)
+            else:
+                if ":" in uris[module]:
+                    # Most likely an SSH style reference
+                    proto = "ssh"
+                    if ":/" in uris[module]:
+                        # Absolute reference, easy to convert..
+                        url = "gitsm://" + uris[module].replace(':/', '/', 1)
+                    else:
+                        # Relative reference, no way to know if this is right!
+                        logger.warning("Submodule included by %s refers to relative ssh reference %s.  References may fail if not absolute." % (ud.url, uris[module]))
+                        url = "gitsm://" + uris[module].replace(':', '/', 1)
+                else:
+                    # This has to be a file reference
+                    proto = "file"
+                    url = "gitsm://" + uris[module]
+
             url += ';protocol=%s' % proto
             url += ";name=%s" % module
-            url += ";bareclone=1;nocheckout=1;nobranch=1"
+            url += ";subpath=%s" % paths[module]
 
             ld = d.createCopy()
             # Not necessary to set SRC_URI, since we're passing the URI to
             # Fetch.
             #ld.setVar('SRC_URI', url)
-            ld.setVar('SRCREV_%s' % module, module_hash)
+            ld.setVar('SRCREV_%s' % module, subrevision[module])
 
             # Workaround for issues with SRCPV/SRCREV_FORMAT errors
             # error refer to 'multiple' repositories.  Only the repository
@@ -106,145 +143,83 @@ class GitSM(Git):
             ld.setVar('SRCPV', d.getVar('SRCPV'))
             ld.setVar('SRCREV_FORMAT', module)
 
-            newfetch = Fetch([url], ld, cache=False)
-            newfetch.download()
-            local_paths[module] = newfetch.localpath(url)
+            function(ud, url, module, paths[module], ld)
 
-            # Correct the submodule references to the local download version...
-            runfetchcmd("%(basecmd)s config submodule.%(module)s.url %(url)s" % {'basecmd': ud.basecmd, 'module': module, 'url' : local_paths[module]}, d, workdir=ud.clonedir)
-
-            symlink_path = os.path.join(ud.clonedir, 'modules', paths[module])
-            if not os.path.exists(symlink_path):
-                try:
-                    os.makedirs(os.path.dirname(symlink_path), exist_ok=True)
-                except OSError:
-                    pass
-                os.symlink(local_paths[module], symlink_path)
-
-        return True
+        return submodules != []
 
     def need_update(self, ud, d):
-        main_repo_needs_update = Git.need_update(self, ud, d)
-
-        # First check that the main repository has enough history fetched. If it doesn't, then we don't
-        # even have the .gitmodules and gitlinks for the submodules to attempt asking whether the
-        # submodules' histories are recent enough.
-        if main_repo_needs_update:
+        if Git.need_update(self, ud, d):
             return True
 
-        # Now check that the submodule histories are new enough. The git-submodule command doesn't have
-        # any clean interface for doing this aside from just attempting the checkout (with network
-        # fetched disabled).
-        return not self.update_submodules(ud, d)
+        try:
+            # Check for the nugget dropped by the download operation
+            known_srcrevs = runfetchcmd("%s config --get-all bitbake.srcrev" % \
+                            (ud.basecmd), d, workdir=ud.clonedir)
+
+            if ud.revisions[ud.names[0]] not in known_srcrevs.split():
+                return True
+        except bb.fetch2.FetchError:
+            # No srcrev nuggets, so this is new and needs to be updated
+            return True
+
+        return False
 
     def download(self, ud, d):
-        Git.download(self, ud, d)
+        def download_submodule(ud, url, module, modpath, d):
+            url += ";bareclone=1;nobranch=1"
 
-        if not ud.shallow or ud.localpath != ud.fullshallow:
-            self.update_submodules(ud, d)
+            # Is the following still needed?
+            #url += ";nocheckout=1"
 
-    def copy_submodules(self, submodules, ud, destdir, d):
-        if ud.bareclone:
-            repo_conf = destdir
-        else:
-            repo_conf = os.path.join(destdir, '.git')
-
-        if submodules and not os.path.exists(os.path.join(repo_conf, 'modules')):
-            os.mkdir(os.path.join(repo_conf, 'modules'))
-
-        for module, md in submodules.items():
-            srcpath = os.path.join(ud.clonedir, 'modules', md['path'])
-            modpath = os.path.join(repo_conf, 'modules', md['path'])
-
-            if os.path.exists(srcpath):
-                if os.path.exists(os.path.join(srcpath, '.git')):
-                    srcpath = os.path.join(srcpath, '.git')
-
-                target = modpath
-                if os.path.exists(modpath):
-                    target = os.path.dirname(modpath)
-
-                os.makedirs(os.path.dirname(target), exist_ok=True)
-                runfetchcmd("cp -fpLR %s %s" % (srcpath, target), d)
-            elif os.path.exists(modpath):
-                # Module already exists, likely unpacked from a shallow mirror clone
-                pass
-            else:
-                # This is fatal, as we do NOT want git-submodule to hit the network
-                raise bb.fetch2.FetchError('Submodule %s does not exist in %s or %s.' % (module, srcpath, modpath))
-
-    def clone_shallow_local(self, ud, dest, d):
-        super(GitSM, self).clone_shallow_local(ud, dest, d)
-
-        # Copy over the submodules' fetched histories too.
-        repo_conf = os.path.join(dest, '.git')
-
-        submodules = []
-        for name in ud.names:
             try:
-                gitmodules = runfetchcmd("%s show %s:.gitmodules" % (ud.basecmd, ud.revision), d, quiet=True, workdir=dest)
-            except:
-                # No submodules to update
-                continue
+                newfetch = Fetch([url], d, cache=False)
+                newfetch.download()
+                # Drop a nugget to add each of the srcrevs we've fetched (used by need_update)
+                runfetchcmd("%s config --add bitbake.srcrev %s" % \
+                            (ud.basecmd, ud.revisions[ud.names[0]]), d, workdir=ud.clonedir)
+            except Exception as e:
+                logger.error('gitsm: submodule download failed: %s %s' % (type(e).__name__, str(e)))
+                raise
 
-            submodules = self.parse_gitmodules(gitmodules)
-            self.copy_submodules(submodules, ud, dest, d)
+        Git.download(self, ud, d)
+        self.process_submodules(ud, ud.clonedir, download_submodule, d)
 
     def unpack(self, ud, destdir, d):
+        def unpack_submodules(ud, url, module, modpath, d):
+            url += ";bareclone=1;nobranch=1"
+
+            # Figure out where we clone over the bare submodules...
+            if ud.bareclone:
+                repo_conf = ud.destdir
+            else:
+                repo_conf = os.path.join(ud.destdir, '.git')
+
+            try:
+                newfetch = Fetch([url], d, cache=False)
+                newfetch.unpack(root=os.path.dirname(os.path.join(repo_conf, 'modules', modpath)))
+            except Exception as e:
+                logger.error('gitsm: submodule unpack failed: %s %s' % (type(e).__name__, str(e)))
+                raise
+
+            local_path = newfetch.localpath(url)
+
+            # Correct the submodule references to the local download version...
+            runfetchcmd("%(basecmd)s config submodule.%(module)s.url %(url)s" % {'basecmd': ud.basecmd, 'module': module, 'url' : local_path}, d, workdir=ud.destdir)
+
+            if ud.shallow:
+                runfetchcmd("%(basecmd)s config submodule.%(module)s.shallow true" % {'basecmd': ud.basecmd, 'module': module}, d, workdir=ud.destdir)
+
+            # Ensure the submodule repository is NOT set to bare, since we're checking it out...
+            try:
+                runfetchcmd("%s config core.bare false" % (ud.basecmd), d, quiet=True, workdir=os.path.join(repo_conf, 'modules', modpath))
+            except:
+                logger.error("Unable to set git config core.bare to false for %s" % os.path.join(repo_conf, 'modules', modpath))
+                raise
+
         Git.unpack(self, ud, destdir, d)
 
-        # Copy over the submodules' fetched histories too.
-        if ud.bareclone:
-            repo_conf = ud.destdir
-        else:
-            repo_conf = os.path.join(ud.destdir, '.git')
+        ret = self.process_submodules(ud, ud.destdir, unpack_submodules, d)
 
-        update_submodules = False
-        paths = {}
-        uris = {}
-        local_paths = {}
-        for name in ud.names:
-            try:
-                gitmodules = runfetchcmd("%s show HEAD:.gitmodules" % (ud.basecmd), d, quiet=True, workdir=ud.destdir)
-            except:
-                # No submodules to update
-                continue
-
-            submodules = self.parse_gitmodules(gitmodules)
-            self.copy_submodules(submodules, ud, ud.destdir, d)
-
-            submodules_queue = [(module, os.path.join(repo_conf, 'modules', md['path'])) for module, md in submodules.items()]
-            while len(submodules_queue) != 0:
-                module, modpath = submodules_queue.pop()
-
-                # add submodule children recursively
-                try:
-                    gitmodules = runfetchcmd("%s show HEAD:.gitmodules" % (ud.basecmd), d, quiet=True, workdir=modpath)
-                    for m, md in self.parse_gitmodules(gitmodules).items():
-                        submodules_queue.append([m, os.path.join(modpath, 'modules', md['path'])])
-                except:
-                    # no children
-                    pass
-
-
-                # There are submodules to update
-                update_submodules = True
-
-                # Determine (from the submodule) the correct url to reference
-                try:
-                    output = runfetchcmd("%(basecmd)s config remote.origin.url" % {'basecmd': ud.basecmd}, d, workdir=modpath)
-                except bb.fetch2.FetchError as e:
-                    # No remote url defined in this submodule
-                    continue
-
-                local_paths[module] = output
-
-                # Setup the local URL properly (like git submodule init or sync would do...)
-                runfetchcmd("%(basecmd)s config submodule.%(module)s.url %(url)s" % {'basecmd': ud.basecmd, 'module': module, 'url' : local_paths[module]}, d, workdir=ud.destdir)
-
-                # Ensure the submodule repository is NOT set to bare, since we're checking it out...
-                runfetchcmd("%s config core.bare false" % (ud.basecmd), d, quiet=True, workdir=modpath)
-
-        if update_submodules:
+        if not ud.bareclone and ret:
             # Run submodule update, this sets up the directories -- without touching the config
             runfetchcmd("%s submodule update --recursive --no-fetch" % (ud.basecmd), d, quiet=True, workdir=ud.destdir)

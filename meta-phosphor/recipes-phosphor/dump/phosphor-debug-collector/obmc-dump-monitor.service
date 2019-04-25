@@ -7,4 +7,4 @@ SyslogIdentifier=phosphor-dump-monitor
 Restart=always
 
 [Install]
-WantedBy={SYSTEMD_DEFAULT_TARGET}
+WantedBy=multi-user.target

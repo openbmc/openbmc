@@ -13,7 +13,7 @@ ENVFMT = "obmc/eeproms/{0}"
 SYSTEMD_ENVIRONMENT_FILE_${PN}_append_lanyang := " ${@compose_list(d, 'ENVFMT', 'EEPROMS')}"
 
 TMPL = "obmc-read-eeprom@.service"
-TGT = "${SYSTEMD_DEFAULT_TARGET}"
+TGT = "multi-user.target"
 INSTFMT = "obmc-read-eeprom@{0}.service"
 FMT = "../${TMPL}:${TGT}.wants/${INSTFMT}"
 

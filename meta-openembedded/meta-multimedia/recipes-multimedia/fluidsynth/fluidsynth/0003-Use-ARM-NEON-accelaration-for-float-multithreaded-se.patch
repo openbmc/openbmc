@@ -1,0 +1,304 @@
+From 947f79f97a5fa6547d99bff282606026632e010b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Sat, 13 Oct 2018 23:01:11 +0200
+Subject: [PATCH] Use ARM-NEON accelaration for float-multithreaded setups
+
+Profiling shows a considerable performance win. See estimated number of voices:
+They increase from ~471 to ~513 which makes a ~9% win:
+
+*******************************************************************************
+WITHOUT ARM NEON:
+*******************************************************************************
+
+morona@raspberrypi3:~$ fluidsynth -o synth.cpu-cores=4 -o synth.chorus.active=0 -o synth.reverb.active=0 /usr/share/sf2/fluidr3gm.sf2
+> prof_set_print 1
+> prof_set_notes 10
+> prof_start 3 10000
+Generating 10 notes, generated voices:20
+Number of measures(n_prof):3, duration of one mesure(dur):10000ms
+
+Profiling time(mm:ss): Total=0:30  Remainder=0:30, press <ENTER> to cancel
+ ------------------------------------------------------------------------------
+ Duration(microsecond) and cpu loads(%) (sr: 48000 Hz, sp: 20.83 microsecond)
+ ------------------------------------------------------------------------------
+ Code under profiling       |Voices|       Duration (microsecond)   |  Load(%)
+                            |   nbr|       min|       avg|       max|
+ ---------------------------|------|--------------------------------|----------
+ synth_write_* ------------>|    20|    112.00|    118.96|    206.00|   4.461
+ synth_one_block ---------->|    20|    109.00|    116.44|    196.00|   4.367
+ synth_one_block:clear ---->|    20|      1.00|      1.67|     18.00|   0.063
+ synth_one_block:one voice->|     1|     11.00|     12.36|     58.00|   0.463
+ synth_one_block:all voices>|    20|    107.00|    113.47|    187.00|   4.255
+ synth_one_block:reverb --->| no profiling available
+ synth_one_block:chorus --->| no profiling available
+ voice:note --------------->| no profiling available
+ voice:release ------------>| no profiling available
+ ------------------------------------------------------------------------------
+ Cpu loads(%) (sr: 48000 Hz, sp: 20.83 microsecond) and maximum voices
+ ------------------------------------------------------------------------------
+ nVoices| total(%)|voices(%)| reverb(%)|chorus(%)| voice(%)|estimated maxVoices
+ -------|---------|---------|----------|---------|---------|-------------------
+      20|    4.461|    4.461|     0.000|    0.000|    0.213|              470
+
+Profiling time(mm:ss): Total=0:30  Remainder=0:20, press <ENTER> to cancel
+ ------------------------------------------------------------------------------
+ Duration(microsecond) and cpu loads(%) (sr: 48000 Hz, sp: 20.83 microsecond)
+ ------------------------------------------------------------------------------
+ Code under profiling       |Voices|       Duration (microsecond)   |  Load(%)
+                            |   nbr|       min|       avg|       max|
+ ---------------------------|------|--------------------------------|----------
+ synth_write_* ------------>|    20|    112.00|    118.42|    216.00|   4.441
+ synth_one_block ---------->|    20|    109.00|    115.91|    205.00|   4.347
+ synth_one_block:clear ---->|    20|      1.00|      1.65|     18.00|   0.062
+ synth_one_block:one voice->|     1|     11.00|     12.30|     58.00|   0.461
+ synth_one_block:all voices>|    20|    107.00|    112.98|    197.00|   4.237
+ synth_one_block:reverb --->| no profiling available
+ synth_one_block:chorus --->| no profiling available
+ voice:note --------------->| no profiling available
+ voice:release ------------>| no profiling available
+ ------------------------------------------------------------------------------
+ Cpu loads(%) (sr: 48000 Hz, sp: 20.83 microsecond) and maximum voices
+ ------------------------------------------------------------------------------
+ nVoices| total(%)|voices(%)| reverb(%)|chorus(%)| voice(%)|estimated maxVoices
+ -------|---------|---------|----------|---------|---------|-------------------
+      20|    4.441|    4.441|     0.000|    0.000|    0.212|              472
+
+Profiling time(mm:ss): Total=0:30  Remainder=0:10, press <ENTER> to cancel
+ ------------------------------------------------------------------------------
+ Duration(microsecond) and cpu loads(%) (sr: 48000 Hz, sp: 20.83 microsecond)
+ ------------------------------------------------------------------------------
+ Code under profiling       |Voices|       Duration (microsecond)   |  Load(%)
+                            |   nbr|       min|       avg|       max|
+ ---------------------------|------|--------------------------------|----------
+ synth_write_* ------------>|    20|    112.00|    118.64|    244.00|   4.449
+ synth_one_block ---------->|    20|    109.00|    116.12|    234.00|   4.355
+ synth_one_block:clear ---->|    20|      1.00|      1.67|     37.00|   0.062
+ synth_one_block:one voice->|     1|     11.00|     12.31|     63.00|   0.462
+ synth_one_block:all voices>|    20|    107.00|    113.18|    214.00|   4.244
+ synth_one_block:reverb --->| no profiling available
+ synth_one_block:chorus --->| no profiling available
+ voice:note --------------->| no profiling available
+ voice:release ------------>| no profiling available
+ ------------------------------------------------------------------------------
+ Cpu loads(%) (sr: 48000 Hz, sp: 20.83 microsecond) and maximum voices
+ ------------------------------------------------------------------------------
+ nVoices| total(%)|voices(%)| reverb(%)|chorus(%)| voice(%)|estimated maxVoices
+ -------|---------|---------|----------|---------|---------|-------------------
+      20|    4.449|    4.449|     0.000|    0.000|    0.212|              471
+Stopping 20 voices...voices stopped.
+> quit
+cheers!
+JackTemporaryException : now quits...
+Jack main caught signal 2
+fluid_profiling_print
+fluidsynth: Estimated times: min/avg/max (micro seconds)
+fluidsynth: synth_write_* ------------>: 112.000/118.636/244.000
+fluidsynth: synth_one_block ---------->: 109.000/116.124/234.000
+fluidsynth: synth_one_block:clear ---->: 1.000/1.665/37.000
+fluidsynth: synth_one_block:one voice->: 11.000/12.309/63.000
+fluidsynth: synth_one_block:all voices>: 107.000/113.180/214.000
+
+*******************************************************************************
+WITH ARM NEON:
+*******************************************************************************
+
+morona@raspberrypi3:~$ fluidsynth -o synth.cpu-cores=4 -o synth.chorus.active=0 -o synth.reverb.active=0 /usr/share/sf2/fluidr3gm.sf2
+> prof_set_print 1
+> prof_set_notes 10
+> prof_start 3 10000
+Generating 10 notes, generated voices:20
+Number of measures(n_prof):3, duration of one mesure(dur):10000ms
+
+Profiling time(mm:ss): Total=0:30  Remainder=0:30, press <ENTER> to cancel
+ ------------------------------------------------------------------------------
+ Duration(microsecond) and cpu loads(%) (sr: 48000 Hz, sp: 20.83 microsecond)
+ ------------------------------------------------------------------------------
+ Code under profiling       |Voices|       Duration (microsecond)   |  Load(%)
+                            |   nbr|       min|       avg|       max|
+ ---------------------------|------|--------------------------------|----------
+ synth_write_* ------------>|    20|    102.00|    109.21|    213.00|   4.095
+ synth_one_block ---------->|    20|     99.00|    106.68|    201.00|   4.001
+ synth_one_block:clear ---->|    20|      1.00|      1.64|     18.00|   0.062
+ synth_one_block:one voice->|     1|     11.00|     12.30|     54.00|   0.461
+ synth_one_block:all voices>|    20|     97.00|    103.71|    188.00|   3.889
+ synth_one_block:reverb --->| no profiling available
+ synth_one_block:chorus --->| no profiling available
+ voice:note --------------->| no profiling available
+ voice:release ------------>| no profiling available
+ ------------------------------------------------------------------------------
+ Cpu loads(%) (sr: 48000 Hz, sp: 20.83 microsecond) and maximum voices
+ ------------------------------------------------------------------------------
+ nVoices| total(%)|voices(%)| reverb(%)|chorus(%)| voice(%)|estimated maxVoices
+ -------|---------|---------|----------|---------|---------|-------------------
+      20|    4.095|    4.095|     0.000|    0.000|    0.194|              514
+
+Profiling time(mm:ss): Total=0:30  Remainder=0:20, press <ENTER> to cancel
+ ------------------------------------------------------------------------------
+ Duration(microsecond) and cpu loads(%) (sr: 48000 Hz, sp: 20.83 microsecond)
+ ------------------------------------------------------------------------------
+ Code under profiling       |Voices|       Duration (microsecond)   |  Load(%)
+                            |   nbr|       min|       avg|       max|
+ ---------------------------|------|--------------------------------|----------
+ synth_write_* ------------>|    20|    102.00|    109.46|    278.00|   4.105
+ synth_one_block ---------->|    20|     99.00|    106.91|    265.00|   4.009
+ synth_one_block:clear ---->|    20|      1.00|      1.67|     22.00|   0.062
+ synth_one_block:one voice->|     1|     11.00|     12.30|     54.00|   0.461
+ synth_one_block:all voices>|    20|     97.00|    103.94|    251.00|   3.898
+ synth_one_block:reverb --->| no profiling available
+ synth_one_block:chorus --->| no profiling available
+ voice:note --------------->| no profiling available
+ voice:release ------------>| no profiling available
+ ------------------------------------------------------------------------------
+ Cpu loads(%) (sr: 48000 Hz, sp: 20.83 microsecond) and maximum voices
+ ------------------------------------------------------------------------------
+ nVoices| total(%)|voices(%)| reverb(%)|chorus(%)| voice(%)|estimated maxVoices
+ -------|---------|---------|----------|---------|---------|-------------------
+      20|    4.105|    4.105|     0.000|    0.000|    0.195|              513
+
+Profiling time(mm:ss): Total=0:30  Remainder=0:10, press <ENTER> to cancel
+ ------------------------------------------------------------------------------
+ Duration(microsecond) and cpu loads(%) (sr: 48000 Hz, sp: 20.83 microsecond)
+ ------------------------------------------------------------------------------
+ Code under profiling       |Voices|       Duration (microsecond)   |  Load(%)
+                            |   nbr|       min|       avg|       max|
+ ---------------------------|------|--------------------------------|----------
+ synth_write_* ------------>|    20|    102.00|    109.22|    278.00|   4.096
+ synth_one_block ---------->|    20|     99.00|    106.65|    265.00|   3.999
+ synth_one_block:clear ---->|    20|      1.00|      1.67|     22.00|   0.062
+ synth_one_block:one voice->|     1|     11.00|     12.31|     57.00|   0.462
+ synth_one_block:all voices>|    20|     97.00|    103.68|    251.00|   3.888
+ synth_one_block:reverb --->| no profiling available
+ synth_one_block:chorus --->| no profiling available
+ voice:note --------------->| no profiling available
+ voice:release ------------>| no profiling available
+ ------------------------------------------------------------------------------
+ Cpu loads(%) (sr: 48000 Hz, sp: 20.83 microsecond) and maximum voices
+ ------------------------------------------------------------------------------
+ nVoices| total(%)|voices(%)| reverb(%)|chorus(%)| voice(%)|estimated maxVoices
+ -------|---------|---------|----------|---------|---------|-------------------
+      20|    4.096|    4.096|     0.000|    0.000|    0.194|              514
+Stopping 20 voices...voices stopped.
+> quit
+cheers!
+JackTemporaryException : now quits...
+Jack main caught signal 2
+fluid_profiling_print
+fluidsynth: Estimated times: min/avg/max (micro seconds)
+fluidsynth: synth_write_* ------------>: 102.000/109.216/278.000
+fluidsynth: synth_one_block ---------->: 99.000/106.649/265.000
+fluidsynth: synth_one_block:clear ---->: 1.000/1.666/22.000
+fluidsynth: synth_one_block:one voice->: 11.000/12.307/57.000
+fluidsynth: synth_one_block:all voices>: 97.000/103.681/251.000
+
+Upstream-Status: Inappropriate [embedded-specific]
+
+---
+ src/rvoice/fluid_rvoice_mixer.c | 55 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 54 insertions(+), 1 deletion(-)
+
+diff --git a/src/rvoice/fluid_rvoice_mixer.c b/src/rvoice/fluid_rvoice_mixer.c
+index af0ef75d..07a357c7 100644
+--- a/src/rvoice/fluid_rvoice_mixer.c
++++ b/src/rvoice/fluid_rvoice_mixer.c
+@@ -27,6 +27,9 @@
+ #include "fluid_ladspa.h"
+ #include "fluid_synth.h"
+ 
++#if defined(__ARM_NEON__)
++#include "arm_neon.h"
++#endif
+ 
+ // If less than x voices, the thread overhead is larger than the gain,
+ // so don't activate the thread(s).
+@@ -1053,9 +1056,15 @@ fluid_mixer_buffers_mix(fluid_mixer_buffers_t *dst, fluid_mixer_buffers_t *src,
+     int i, j;
+     int scount = current_blockcount * FLUID_BUFSIZE;
+     int minbuf;
++#if defined(__ARM_NEON__) && defined(WITH_FLOAT)
++    fluid_real_t *FLUID_RESTRICT base_src_left;
++    fluid_real_t *FLUID_RESTRICT base_src_right;
++    fluid_real_t *FLUID_RESTRICT base_dst_left;
++    fluid_real_t *FLUID_RESTRICT base_dst_right;
++#else
+     fluid_real_t *FLUID_RESTRICT base_src;
+     fluid_real_t *FLUID_RESTRICT base_dst;
+-
++#endif
+     minbuf = dst->buf_count;
+ 
+     if(minbuf > src->buf_count)
+@@ -1063,6 +1072,27 @@ fluid_mixer_buffers_mix(fluid_mixer_buffers_t *dst, fluid_mixer_buffers_t *src,
+         minbuf = src->buf_count;
+     }
+ 
++#if defined(__ARM_NEON__) && defined(WITH_FLOAT)
++    base_src_left = fluid_align_ptr(src->left_buf, FLUID_DEFAULT_ALIGNMENT);
++    base_dst_left = fluid_align_ptr(dst->left_buf, FLUID_DEFAULT_ALIGNMENT);
++    base_src_right = fluid_align_ptr(src->right_buf, FLUID_DEFAULT_ALIGNMENT);
++    base_dst_right = fluid_align_ptr(dst->right_buf, FLUID_DEFAULT_ALIGNMENT);
++
++    for(i = 0; i < minbuf; i++)
++    {
++        for(j = 0; j < scount; j+=4)
++        {
++            int dsp_i = i * FLUID_MIXER_MAX_BUFFERS_DEFAULT * FLUID_BUFSIZE + j;
++
++            float32x4_t vleft = vld1q_f32(&base_dst_left[dsp_i]);
++            float32x4_t vright = vld1q_f32(&base_dst_right[dsp_i]);
++            vleft = vaddq_f32(vleft, vld1q_f32(&base_src_left[dsp_i]));
++            vright = vaddq_f32(vright, vld1q_f32(&base_src_right[dsp_i]));
++            vst1q_f32(&base_dst_left[dsp_i], vleft);
++            vst1q_f32(&base_dst_right[dsp_i], vright);
++        }
++    }
++#else
+     base_src = fluid_align_ptr(src->left_buf, FLUID_DEFAULT_ALIGNMENT);
+     base_dst = fluid_align_ptr(dst->left_buf, FLUID_DEFAULT_ALIGNMENT);
+ 
+@@ -1090,6 +1120,7 @@ fluid_mixer_buffers_mix(fluid_mixer_buffers_t *dst, fluid_mixer_buffers_t *src,
+             base_dst[dsp_i] += base_src[dsp_i];
+         }
+     }
++#endif
+ 
+     minbuf = dst->fx_buf_count;
+ 
+@@ -1098,6 +1129,27 @@ fluid_mixer_buffers_mix(fluid_mixer_buffers_t *dst, fluid_mixer_buffers_t *src,
+         minbuf = src->fx_buf_count;
+     }
+ 
++#if defined(__ARM_NEON__) && defined(WITH_FLOAT)
++    base_src_left = fluid_align_ptr(src->fx_left_buf, FLUID_DEFAULT_ALIGNMENT);
++    base_dst_left = fluid_align_ptr(dst->fx_left_buf, FLUID_DEFAULT_ALIGNMENT);
++    base_src_right = fluid_align_ptr(src->fx_right_buf, FLUID_DEFAULT_ALIGNMENT);
++    base_dst_right = fluid_align_ptr(dst->fx_right_buf, FLUID_DEFAULT_ALIGNMENT);
++
++    for(i = 0; i < minbuf; i++)
++    {
++        for(j = 0; j < scount; j+=4)
++        {
++            int dsp_i = i * FLUID_MIXER_MAX_BUFFERS_DEFAULT * FLUID_BUFSIZE + j;
++
++            float32x4_t vleft = vld1q_f32(&base_dst_left[dsp_i]);
++            float32x4_t vright = vld1q_f32(&base_dst_right[dsp_i]);
++            vleft = vaddq_f32(vleft, vld1q_f32(&base_src_left[dsp_i]));
++            vright = vaddq_f32(vright, vld1q_f32(&base_src_right[dsp_i]));
++            vst1q_f32(&base_dst_left[dsp_i], vleft);
++            vst1q_f32(&base_dst_right[dsp_i], vright);
++        }
++    }
++#else
+     base_src = fluid_align_ptr(src->fx_left_buf, FLUID_DEFAULT_ALIGNMENT);
+     base_dst = fluid_align_ptr(dst->fx_left_buf, FLUID_DEFAULT_ALIGNMENT);
+ 
+@@ -1125,6 +1177,7 @@ fluid_mixer_buffers_mix(fluid_mixer_buffers_t *dst, fluid_mixer_buffers_t *src,
+             base_dst[dsp_i] += base_src[dsp_i];
+         }
+     }
++#endif
+ }
+ 
+ 
+-- 
+2.20.1
+

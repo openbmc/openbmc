@@ -1,0 +1,30 @@
+# DVB-T Krompachy (Krompachy, Slovak Republic)
+# Created from http://www.dvbt.towercom.sk/odbornici.php
+
+# 2.st multiplex (commercial) - on channel 59
+[CHANNEL]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 778000000
+	BANDWIDTH_HZ = 8000000
+	CODE_RATE_HP = 2/3
+	CODE_RATE_LP = NONE
+	MODULATION = QAM/64
+	TRANSMISSION_MODE = 8K
+	GUARD_INTERVAL = 1/4
+	HIERARCHY = NONE
+	INVERSION = AUTO
+
+
+# 3.st multiplex (public) - on channel 25
+[CHANNEL]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 506000000
+	BANDWIDTH_HZ = 8000000
+	CODE_RATE_HP = 2/3
+	CODE_RATE_LP = NONE
+	MODULATION = QAM/64
+	TRANSMISSION_MODE = 8K
+	GUARD_INTERVAL = 1/4
+	HIERARCHY = NONE
+	INVERSION = AUTO
+

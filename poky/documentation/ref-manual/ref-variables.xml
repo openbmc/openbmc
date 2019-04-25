@@ -931,20 +931,21 @@
 
         <glossentry id='var-BB_GENERATE_MIRROR_TARBALLS'><glossterm>BB_GENERATE_MIRROR_TARBALLS</glossterm>
             <info>
-                BB_GENERATE_MIRROR_TARBALLS[doc] = "Causes tarballs of the Git repositories to be placed in the DL_DIR directory."
+                BB_GENERATE_MIRROR_TARBALLS[doc] = "Causes tarballs of the source control repositories to be placed in the DL_DIR directory."
             </info>
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    Causes tarballs of the Git repositories, including the
-                    Git metadata, to be placed in the
+                    Causes tarballs of the source control repositories
+                    (e.g. Git repositories), including metadata, to be placed
+                    in the
                     <link linkend='var-DL_DIR'><filename>DL_DIR</filename></link>
                     directory.
                 </para>
 
                 <para>
                     For performance reasons, creating and placing tarballs of
-                    the Git repositories is not the default action by the
+                    these repositories is not the default action by the
                     OpenEmbedded build system.
                     <literallayout class='monospaced'>
      BB_GENERATE_MIRROR_TARBALLS = "1"
@@ -952,6 +953,13 @@
                     Set this variable in your <filename>local.conf</filename>
                     file in the
                     <link linkend='build-directory'>Build Directory</link>.
+                </para>
+
+                <para>
+                    Once you have the tarballs containing your source files,
+                    you can clean up your <filename>DL_DIR</filename>
+                    directory by deleting any Git or other source control
+                    work directories.
                 </para>
             </glossdef>
         </glossentry>
@@ -3621,60 +3629,6 @@
             </glossdef>
         </glossentry>
 
-        <glossentry id='var-DISK_SIGNATURE'><glossterm>DISK_SIGNATURE</glossterm>
-            <info>
-                DISK_SIGNATURE[doc] = "A 32-bit MBR disk signature used by directdisk images."
-            </info>
-            <glossdef>
-                <para role="glossdeffirst">
-<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    A 32-bit MBR disk signature used by
-                    <filename>directdisk</filename> images.
-                </para>
-
-                <para>
-                    By default, the signature is set to an automatically
-                    generated random value that allows the OpenEmbedded
-                    build system to create a boot loader.
-                    You can override the signature in the image recipe
-                    by setting <filename>DISK_SIGNATURE</filename> to an
-                    8-digit hex string.
-                    You might want to override
-                    <filename>DISK_SIGNATURE</filename> if you want the disk
-                    signature to remain constant between image builds.
-                </para>
-
-                <para>
-                    When using Linux 3.8 or later, you can use
-                    <filename>DISK_SIGNATURE</filename> to specify the root
-                    by UUID to allow the kernel to locate the root device
-                    even if the device name changes due to differences in
-                    hardware configuration.
-                    By default, <filename>ROOT_VM</filename> is set
-                    as follows:
-                    <literallayout class='monospaced'>
-     ROOT_VM ?= "root=/dev/sda2"
-                    </literallayout>
-                    However, you can change this to locate the root device
-                    using the disk signature instead:
-                    <literallayout class='monospaced'>
-     ROOT_VM = "root=PARTUUID=${DISK_SIGNATURE}-02"
-                    </literallayout>
-                </para>
-
-                <para>
-                    As previously mentioned, it is possible to set the
-                    <filename>DISK_SIGNATURE</filename> variable in your
-                    <filename>local.conf</filename> file to a fixed
-                    value if you do not want <filename>syslinux.cfg</filename>
-                    changing for each build.
-                    You might find this useful when you want to upgrade the
-                    root filesystem on a device without having to recreate or
-                    modify the master boot record.
-                </para>
-            </glossdef>
-        </glossentry>
-
         <glossentry id='var-DISTRO'><glossterm>DISTRO</glossterm>
             <info>
                 DISTRO[doc] = "The short name of the distribution. If the variable is blank, meta/conf/distro/defaultsetup.conf will be used."
@@ -3877,7 +3831,7 @@
                     <filename>DISTRO_FEATURES_DEFAULT</filename> from a
                     custom distro configuration file:
                     <literallayout class='monospaced'>
-     DISTRO_FEATURES ?= "${DISTRO_FEATURES_DEFAULT} ${DISTRO_FEATURES_LIBC} myfeature"
+     DISTRO_FEATURES ?= "${DISTRO_FEATURES_DEFAULT} myfeature"
                     </literallayout>
                 </para>
             </glossdef>
@@ -3924,13 +3878,14 @@
             </glossdef>
         </glossentry>
 
+<!--
         <glossentry id='var-DISTRO_FEATURES_LIBC'><glossterm>DISTRO_FEATURES_LIBC</glossterm>
             <info>
                 DISTRO_FEATURES_LIBC[doc] = "Specifies the list of distro features that are specific to the C library (libc)."
             </info>
             <glossdef>
                 <para role="glossdeffirst">
-<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" />
                     A convenience variable that specifies the list of distro
                     features that are specific to the C library
                     (<filename>libc</filename>).
@@ -3940,6 +3895,7 @@
                 </para>
             </glossdef>
         </glossentry>
+-->
 
         <glossentry id='var-DISTRO_FEATURES_NATIVE'><glossterm>DISTRO_FEATURES_NATIVE</glossterm>
             <info>
@@ -5012,9 +4968,17 @@
                     A subset of <link linkend='var-OVERRIDES'><filename>OVERRIDES</filename></link>
                     used by the OpenEmbedded build system for creating
                     <link linkend='var-FILESPATH'><filename>FILESPATH</filename></link>.
-                    You can find more information on how overrides are handled
-                    in the
-                    <ulink url='&YOCTO_DOCS_BB_URL;'>BitBake User Manual</ulink>.
+                    The <filename>FILESOVERRIDES</filename> variable uses
+                    overrides to automatically extend the
+                    <link linkend='var-FILESPATH'><filename>FILESPATH</filename></link>
+                    variable.
+                    For an example of how that works, see the
+                    <link linkend='var-FILESPATH'><filename>FILESPATH</filename></link>
+                    variable description.
+                    Additionally, you find more information on how overrides
+                    are handled in the
+                    "<ulink url='&YOCTO_DOCS_BB_URL;#conditional-syntax-overrides'>Conditional Syntax (Overrides)</ulink>"
+                    section of the BitBake User Manual.
                 </para>
 
                 <para>
@@ -5041,11 +5005,14 @@
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    The default set of directories the OpenEmbedded build system
-                    uses when searching for patches and files.
-                    During the build process, BitBake searches each directory in
-                    <filename>FILESPATH</filename> in the specified order when
-                    looking for files and patches specified by each
+                    The default set of directories the OpenEmbedded build
+                    system uses when searching for patches and files.
+                </para>
+
+                <para>
+                    During the build process, BitBake searches each directory
+                    in <filename>FILESPATH</filename> in the specified order
+                    when looking for files and patches specified by each
                     <filename>file://</filename> URI in a recipe's
                     <link linkend='var-SRC_URI'><filename>SRC_URI</filename></link>
                     statements.
@@ -5060,23 +5027,62 @@
      FILESPATH = "${@base_set_filespath(["${FILE_DIRNAME}/${BP}", \
         "${FILE_DIRNAME}/${BPN}", "${FILE_DIRNAME}/files"], d)}"
                     </literallayout>
-                    <note>
-                        Do not hand-edit the <filename>FILESPATH</filename>
-                        variable.
-                        If you want the build system to look in directories
-                        other than the defaults, extend the
-                        <filename>FILESPATH</filename> variable by using the
-                        <link linkend='var-FILESEXTRAPATHS'><filename>FILESEXTRAPATHS</filename></link>
-                        variable.
+                    The <filename>FILESPATH</filename> variable is automatically
+                    extended using the overrides from the
+                    <link linkend='var-FILESOVERRIDES'><filename>FILESOVERRIDES</filename></link>
+                    variable.
+                    <note><title>Notes</title>
+                        <itemizedlist>
+                            <listitem><para>
+                                Do not hand-edit the
+                                <filename>FILESPATH</filename> variable.
+                                If you want the build system to look in
+                                directories other than the defaults, extend the
+                                <filename>FILESPATH</filename> variable by
+                                using the
+                                <link linkend='var-FILESEXTRAPATHS'><filename>FILESEXTRAPATHS</filename></link>
+                                variable.
+                                </para></listitem>
+                            <listitem><para>
+                                Be aware that the default
+                                <filename>FILESPATH</filename> directories do
+                                not map to directories in custom layers
+                                where append files
+                                (<filename>.bbappend</filename>) are used.
+                                If you want the build system to find patches
+                                or files that reside with your append files,
+                                you need to extend the
+                                <filename>FILESPATH</filename> variable by
+                                using the <filename>FILESEXTRAPATHS</filename>
+                                variable.
+                                </para></listitem>
+                        </itemizedlist>
                     </note>
-                    Be aware that the default <filename>FILESPATH</filename>
-                    directories do not map to directories in custom layers
-                    where append files (<filename>.bbappend</filename>)
-                    are used.
-                    If you want the build system to find patches or files
-                    that reside with your append files, you need to extend
-                    the <filename>FILESPATH</filename> variable by using
-                    the <filename>FILESEXTRAPATHS</filename> variable.
+                </para>
+
+                <para>
+                    You can take advantage of this searching behavior in
+                    useful ways.
+                    For example, consider a case where the following
+                    directory structure exists for general and machine-specific
+                    configurations:
+                    <literallayout class='monospaced'>
+     files/defconfig
+     files/MACHINEA/defconfig
+     files/MACHINEB/defconfig
+                    </literallayout>
+                    Also in the example, the <filename>SRC_URI</filename>
+                    statement contains "file://defconfig".
+                    Given this scenario, you can set
+                    <link linkend='var-MACHINE'><filename>MACHINE</filename></link>
+                    to "MACHINEA" and cause the build system to use files
+                    from <filename>files/MACHINEA</filename>.
+                    Set <filename>MACHINE</filename> to "MACHINEB" and the
+                    build system uses files from
+                    <filename>files/MACHINEB</filename>.
+                    Finally, for any machine other than "MACHINEA" and
+                    "MACHINEB", the build system uses files from
+                    <filename>files/defconfig</filename>.
                 </para>
 
                 <para>
@@ -6076,11 +6082,12 @@
                 <note><title>Notes</title>
                     <itemizedlist>
                         <listitem><para>
-                            If you add "live" to
-                            <filename>IMAGE_FSTYPES</filename> inside an image
-                            recipe, be sure that you do so prior to the
-                            "inherit image" line of the recipe or the live
-                            image will not build.
+                            If an image recipe uses the "inherit image" line
+                            and you are setting
+                            <filename>IMAGE_FSTYPES</filename> inside the
+                            recipe, you must set
+                            <filename>IMAGE_FSTYPES</filename> prior to
+                            using the "inherit image" line.
                             </para></listitem>
                         <listitem><para>
                             Due to the way the OpenEmbedded build system
@@ -6862,6 +6869,44 @@
                      Consequently, you should not set
                      <filename>INHIBIT_PACKAGE_STRIP</filename> when you plan
                      to debug in general.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-INHIBIT_SYSROOT_STRIP'><glossterm>INHIBIT_SYSROOT_STRIP</glossterm>
+            <info>
+                INHIBIT_SYSROOT_STRIP[doc] = "If set to "1", causes the build to not strip binaries in the resulting sysroot."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    If set to "1", causes the build to not strip binaries in
+                    the resulting sysroot.
+                </para>
+
+                <para>
+                    By default, the OpenEmbedded build system strips
+                    binaries in the resulting sysroot.
+                    When you specifically set the
+                    <filename>INHIBIT_SYSROOT_STRIP</filename> variable to
+                    "1" in your recipe, you inhibit this stripping.
+                </para>
+
+                <para>
+                    If you want to use this variable, include the
+                    <link linkend='ref-classes-staging'><filename>staging</filename></link>
+                    class.
+                    This class uses a <filename>sys_strip()</filename>
+                    function to test for the variable and acts accordingly.
+                    <note>
+                        Use of the <filename>INHIBIT_SYSROOT_STRIP</filename>
+                        variable occurs in rare and special circumstances.
+                        For example, suppose you are building bare-metal
+                        firmware by using an external GCC toolchain.
+                        Furthermore, even if the toolchain's binaries are
+                        strippable, other files exist that are needed for the
+                        build that are not strippable.
+                    </note>
                 </para>
             </glossdef>
         </glossentry>
@@ -9933,7 +9978,6 @@
                             <filename>/bin/.debug</filename>.
                             Source files are placed in
                             <filename>/usr/src/debug</filename>.
-                            This is the default behavior.
                             </para></listitem>
                         <listitem><para>
                             "debug-file-directory": Debug symbol files are
@@ -9957,6 +10001,7 @@
                             ".debug" previously described with the exception
                             that all source files are placed in a separate
                             <filename>*-src</filename> pkg.
+                            This is the default behavior.
                             </para></listitem>
                     </itemizedlist>
                 </para>
@@ -13002,7 +13047,7 @@
                     <filename>/meta-poky/conf/distro/poky.conf</filename>)
                     defines the <filename>SDK_VERSION</filename> as follows:
                     <literallayout class='monospaced'>
-     SDK_VERSION := "${@'${DISTRO_VERSION}'.replace('snapshot-${DATE}','snapshot')}"
+     SDK_VERSION = "${@d.getVar('DISTRO_VERSION').replace('snapshot-${DATE}','snapshot')}"
                     </literallayout>
                 </para>
 
@@ -13707,7 +13752,7 @@
                             </para></listitem>
                         <listitem><para><emphasis><filename>maxdate</filename> -</emphasis>
                             Apply the patch only if <filename>SRCDATE</filename>
-                            is not later than <filename>mindate</filename>.
+                            is not later than <filename>maxdate</filename>.
                             </para></listitem>
                         <listitem><para><emphasis><filename>minrev</filename> -</emphasis>
                             Apply the patch only if <filename>SRCREV</filename>

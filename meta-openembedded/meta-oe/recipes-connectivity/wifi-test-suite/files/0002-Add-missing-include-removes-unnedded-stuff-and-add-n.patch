@@ -1,0 +1,45 @@
+From 451b162c903a1ef070a75dc18171620f3beef7b3 Mon Sep 17 00:00:00 2001
+From: Ankit Navik <ankit.tarot@gmail.com>
+Date: Tue, 25 Dec 2018 00:36:59 +0530
+Subject: [PATCH 2/3] Add missing include, removes unnedded stuff and add non
+ glibc rpc
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Reto Schneider <code@reto-schneider.ch>
+Signed-off-by: Ankit Navik <ankit.tarot@gmail.com>
+---
+ Makefile     | 2 +-
+ inc/wfa_tg.h | 3 +++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 2c41a17..5c4ad8c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -15,7 +15,7 @@
+ #
+ include Makefile.inc
+ 
+-DIRS= ${LIB} ${DUT} ${CA} ${TC} ${WTG} ${CON}
++DIRS= ${LIB} ${DUT} ${CA} ${TC}
+ 
+ all:
+ 	for i in ${DIRS}; do \
+diff --git a/inc/wfa_tg.h b/inc/wfa_tg.h
+index 799bf9f..a1804dd 100644
+--- a/inc/wfa_tg.h
++++ b/inc/wfa_tg.h
+@@ -24,6 +24,9 @@
+ #ifndef _WFA_TG_H
+ #define _WFA_TG_H
+ 
++#ifndef _WINDOWS
++#include <pthread.h>
++#endif
+ #include <sys/time.h>
+ 
+ /* maximum number of streams to support */
+-- 
+2.7.4
+

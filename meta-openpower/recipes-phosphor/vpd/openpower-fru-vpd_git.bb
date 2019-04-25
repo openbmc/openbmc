@@ -23,11 +23,6 @@ DEPENDS += " \
         autoconf-archive-native \
         "
 
-RDEPENDS_${PN} += " \
-               sdbusplus \
-               phosphor-logging \
-               "
-
 SYSTEMD_SERVICE_${PN} += "op-vpd-parser.service"
 
 S = "${WORKDIR}/git"

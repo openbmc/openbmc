@@ -1,0 +1,83 @@
+#!/usr/bin/env python3
+#
+# test results tool - tool for manipulating OEQA test result json files
+# (merge results, summarise results, regression analysis, generate manual test results file)
+#
+# To look for help information.
+#    $ resulttool
+#
+# To store test results from oeqa automated tests, execute the below
+#     $ resulttool store <source_dir> <git_branch>
+#
+# To merge test results, execute the below
+#    $ resulttool merge <base_result_file> <target_result_file>
+#
+# To report test report, execute the below
+#     $ resulttool report <source_dir>
+#
+# To perform regression file analysis, execute the below
+#     $ resulttool regression-file <base_result_file> <target_result_file>
+#
+# To execute manual test cases, execute the below
+#     $ resulttool manualexecution <manualjsonfile>
+#
+# By default testresults.json for manualexecution store in <build>/tmp/log/manual/
+#
+# Copyright (c) 2019, Intel Corporation.
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms and conditions of the GNU General Public License,
+# version 2, as published by the Free Software Foundation.
+#
+# This program is distributed in the hope it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+
+import os
+import sys
+import argparse
+import logging
+script_path = os.path.dirname(os.path.realpath(__file__))
+lib_path = script_path + '/lib'
+sys.path = sys.path + [lib_path]
+import argparse_oe
+import scriptutils
+import resulttool.merge
+import resulttool.store
+import resulttool.regression
+import resulttool.report
+import resulttool.manualexecution
+logger = scriptutils.logger_create('resulttool')
+
+def main():
+    parser = argparse_oe.ArgumentParser(description="OEQA test result manipulation tool.",
+                                        epilog="Use %(prog)s <subcommand> --help to get help on a specific command")
+    parser.add_argument('-d', '--debug', help='enable debug output', action='store_true')
+    parser.add_argument('-q', '--quiet', help='print only errors', action='store_true')
+    subparsers = parser.add_subparsers(dest="subparser_name", title='subcommands', metavar='<subcommand>')
+    subparsers.required = True
+    subparsers.add_subparser_group('manualexecution', 'manual testcases', 300)
+    resulttool.manualexecution.register_commands(subparsers)
+    subparsers.add_subparser_group('setup', 'setup', 200)
+    resulttool.merge.register_commands(subparsers)
+    resulttool.store.register_commands(subparsers)
+    subparsers.add_subparser_group('analysis', 'analysis', 100)
+    resulttool.regression.register_commands(subparsers)
+    resulttool.report.register_commands(subparsers)
+
+    args = parser.parse_args()
+    if args.debug:
+        logger.setLevel(logging.DEBUG)
+    elif args.quiet:
+        logger.setLevel(logging.ERROR)
+
+    try:
+        ret = args.func(args, logger)
+    except argparse_oe.ArgumentUsageError as ae:
+        parser.error_subcommand(ae.message, ae.subcommand)
+    return ret
+
+if __name__ == "__main__":
+    sys.exit(main())

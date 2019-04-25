@@ -38,7 +38,7 @@ PACKAGECONFIG ??= "python \
 PACKAGECONFIG[python] = "--with-python=${PYTHON},--without-python,python3"
 PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"
 
-inherit autotools pkgconfig binconfig-disabled ptest
+inherit autotools pkgconfig binconfig-disabled ptest distro_features_check
 
 inherit ${@bb.utils.contains('PACKAGECONFIG', 'python', 'python3native', '', d)}
 

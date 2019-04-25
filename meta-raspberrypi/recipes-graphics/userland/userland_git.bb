@@ -12,11 +12,11 @@ COMPATIBLE_MACHINE = "^rpi$"
 
 SRCBRANCH = "master"
 SRCFORK = "raspberrypi"
-SRCREV = "d574b51a60a075baefe863670466ee24e6c4256e"
+SRCREV = "e5803f2c986cbf8c919c60278b3231dcdf4271a6"
 
 # Use the date of the above commit as the package version. Update this when
 # SRCREV is changed.
-PV = "20181120"
+PV = "20190114"
 
 SRC_URI = "\
     git://github.com/${SRCFORK}/userland.git;protocol=git;branch=${SRCBRANCH} \
@@ -64,6 +64,8 @@ do_install_append () {
 		sed -i 's/include "vcos_futex_mutex.h"/include "pthreads\/vcos_futex_mutex.h"/g' ${f}
 		sed -i 's/include "vcos_platform_types.h"/include "pthreads\/vcos_platform_types.h"/g' ${f}
 	done
+        install -D -m 0755 ${D}${prefix}${sysconfdir}/init.d/vcfiled ${D}${sysconfdir}/init.d/vcfiled
+        rm -rf ${D}${prefix}${sysconfdir}
 	if [ "${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", "1", "0", d)}" = "1" ]; then
 		rm -rf ${D}${libdir}/libEGL*
 		rm -rf ${D}${libdir}/libGLES*

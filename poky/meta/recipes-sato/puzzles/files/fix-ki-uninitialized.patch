@@ -1,0 +1,25 @@
+puzzles: avoid compiler unitialized variable error
+
+The compiler does not realize that we must go through the while()
+loop at least once, so we replace it with a for() loop.
+
+Upstream-Status: Pending
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+--- a/tree234.c
++++ b/tree234.c
+@@ -326,8 +326,11 @@ static void *add234_internal(tree234 *t,
+ 	return orig_e;
+     }
+ 
+-    n = t->root;
+-    while (n) {
++    /*
++     * We know t->root is not NULL.  The logic
++     * to break out of this is at the end of the loop.
++     */
++    for (n = t->root;;) {
+ 	LOG(("  node %p: %p/%d \"%s\" %p/%d \"%s\" %p/%d \"%s\" %p/%d\n",
+ 	     n,
+ 	     n->kids[0], n->counts[0], n->elems[0],

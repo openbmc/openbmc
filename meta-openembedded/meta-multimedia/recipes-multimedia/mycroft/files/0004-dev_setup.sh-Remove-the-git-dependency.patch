@@ -1,0 +1,48 @@
+From a480dde949f820fda6e46c13261883e851f5a430 Mon Sep 17 00:00:00 2001
+From: Alistair Francis <alistair.francis@wdc.com>
+Date: Fri, 29 Mar 2019 16:09:57 -0700
+Subject: [PATCH 4/5] dev_setup.sh: Remove the git dependency
+
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Upstream-Status: Inappropriate [embedded specific]
+---
+ dev_setup.sh | 16 ----------------
+ 1 file changed, 16 deletions(-)
+
+diff --git a/dev_setup.sh b/dev_setup.sh
+index dd391181f19..c6aa783e1ef 100755
+--- a/dev_setup.sh
++++ b/dev_setup.sh
+@@ -312,10 +312,6 @@ function install_deps() {
+ 
+ install_deps
+ 
+-# Configure to use the standard commit template for
+-# this repo only.
+-git config commit.template .gitmessage
+-
+ # Check whether to build mimic (it takes a really long time!)
+ build_mimic="n"
+ if [[ ${opt_forcemimicbuild} == true ]] ; then
+@@ -346,18 +342,6 @@ fi
+ # Start the virtual environment
+ cd "${TOP}"
+ 
+-# Install pep8 pre-commit hook
+-if [ -z ${INSTALL_PRECOMMIT_HOOK} ] ; then
+-    HOOK_FILE="./.git/hooks/pre-commit"
+-    if [ ! -f ${HOOK_FILE} ] || grep -q "MYCROFT DEV SETUP" ${HOOK_FILE} ; then
+-        echo "Installing PEP8 check as precommit-hook"
+-        echo "#! $( which python3 )" > ${HOOK_FILE}
+-        echo "# MYCROFT DEV SETUP" >> ${HOOK_FILE}
+-        cat ./scripts/pre-commit >> ${HOOK_FILE}
+-        chmod +x ${HOOK_FILE}
+-    fi
+-fi
+-
+ PYTHON=$( python3 -c "import sys;print('python{}.{}'.format(sys.version_info[0], sys.version_info[1]))" )
+ 
+ # install required python modules
+-- 
+2.21.0
+

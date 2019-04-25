@@ -1,0 +1,27 @@
+From 635fe26af51f20194c8b208e7d01303be1086d68 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 19 Feb 2019 10:31:11 +0100
+Subject: [PATCH] meson.build: do not hardcode 'linux' as the host system
+
+OE build system can set this to other values that include 'linux',
+e.g. 'linux-gnueabi'
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 4348f20..af5ed63 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1574,7 +1574,7 @@ atomicdefine = '''
+ # We know that we can always use real ("lock free") atomic operations with MSVC
+ if cc.get_id() == 'msvc' or cc.links(atomictest, name : 'atomic ops')
+   have_atomic_lock_free = true
+-  if (host_system == 'android' or host_system == 'linux') and not cc.compiles(atomicdefine, name : 'atomic ops define')
++  if (host_system == 'android' or host_system.contains('linux')) and not cc.compiles(atomicdefine, name : 'atomic ops define')
+     # When building for armv5 on Linux, gcc provides
+     # __sync_bool_compare_and_swap but doesn't define
+     # __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4

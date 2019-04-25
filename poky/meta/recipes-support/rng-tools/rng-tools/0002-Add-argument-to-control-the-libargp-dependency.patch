@@ -1,23 +1,26 @@
-From afc8712a9e6c72fbd03c36f84ecf8703e5d22a8c Mon Sep 17 00:00:00 2001
+From 711e2f76890e3c5b08f64859d9fd913ddbec7d50 Mon Sep 17 00:00:00 2001
 From: Christopher Larson <chris_larson@mentor.com>
-Date: Mon, 15 Feb 2016 16:11:32 -0700
-Subject: [PATCH 2/2] Add argument to control the libargp dependency
+Date: Mon, 22 Oct 2018 15:26:47 +0800
+Subject: [PATCH 2/4] Add argument to control the libargp dependency
 
 This ensures that the builds are always deterministic. If the argument isn't
 passed, the default behavior is to use libargp if the libc doesn't have argp.
 
 Upstream-Status: Pending
 Signed-off-by: Christopher Larson <chris_larson@mentor.com>
+
+Rebase to 6.6
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  configure.ac | 55 ++++++++++++++++++++++++++++++++++++-------------------
  1 file changed, 36 insertions(+), 19 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 04fcd25..11a5321 100644
+index c4a5dd8..dd1c30f 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -32,6 +32,13 @@ AC_ARG_WITH([libgcrypt],
- 	[with_libgcrypt=check]
+@@ -40,6 +40,13 @@ AC_ARG_WITH([nistbeacon],
+ 	[with_nistbeacon=check]
  )
  
 +AC_ARG_WITH([libargp],
@@ -29,8 +32,8 @@ index 04fcd25..11a5321 100644
 +
  dnl Make sure anyone changing configure.ac/Makefile.am has a clue
  AM_MAINTAINER_MODE
- 
-@@ -82,27 +89,37 @@ AS_IF(
+ AM_PROG_AS
+@@ -135,27 +142,37 @@ AS_IF(
  	]
  )
  
@@ -88,5 +91,5 @@ index 04fcd25..11a5321 100644
  dnl -----------------
  dnl Configure options
 -- 
-2.2.1
+2.7.4
 

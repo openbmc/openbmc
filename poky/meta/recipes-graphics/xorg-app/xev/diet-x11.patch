@@ -4,79 +4,106 @@ Upstream-Status: Inappropriate [disable feature]
  xev.c |   16 ++++++++--------
  1 file changed, 8 insertions(+), 8 deletions(-)
 
-Index: xev-1.2.0/xev.c
+Index: xev-1.2.3/xev.c
 ===================================================================
---- xev-1.2.0.orig/xev.c
-+++ xev-1.2.0/xev.c
-@@ -116,7 +116,7 @@ do_KeyPress (XEvent *eventp)
-     nbytes = XLookupString (e, str, 256, &ks, NULL);
+--- xev-1.2.3.orig/xev.c
++++ xev-1.2.3/xev.c
+@@ -125,17 +125,6 @@ do_KeyPress(XEvent *eventp)
+     nbytes = XLookupString(e, str, 256, &ks, NULL);
  
      /* not supposed to call XmbLookupString on a key release event */
 -    if (e->type == KeyPress && xic) {
-+    /*if (e->type == KeyPress && xic) {
-         do {
-             nmbbytes = XmbLookupString (xic, e, buf, bsize - 1, &ks, &status);
-             buf[nmbbytes] = '\0';
-@@ -126,7 +126,7 @@ do_KeyPress (XEvent *eventp)
-                 buf = realloc (buf, bsize);
-             }
-         } while (status == XBufferOverflow);
+-        do {
+-            nmbbytes = XmbLookupString(xic, e, buf, bsize - 1, &ks, &status);
+-            buf[nmbbytes] = '\0';
+-
+-            if (status == XBufferOverflow) {
+-                bsize = nmbbytes + 1;
+-                buf = realloc(buf, bsize);
+-            }
+-        } while (status == XBufferOverflow);
 -    }
-+    }*/
  
      if (ks == NoSymbol)
- 	ksname = "NoSymbol";
-@@ -156,7 +156,7 @@ do_KeyPress (XEvent *eventp)
+         ksname = "NoSymbol";
+@@ -168,16 +157,6 @@ do_KeyPress(XEvent *eventp)
      }
  
      /* not supposed to call XmbLookupString on a key release event */
 -    if (e->type == KeyPress && xic) {
-+    /*if (e->type == KeyPress && xic) {
-         printf ("    XmbLookupString gives %d bytes: ", nmbbytes);
-         if (nmbbytes > 0) {
-            dump (buf, nmbbytes);
-@@ -164,7 +164,7 @@ do_KeyPress (XEvent *eventp)
-         } else {
-     	   printf ("\n");
+-        printf("    XmbLookupString gives %d bytes: ", nmbbytes);
+-        if (nmbbytes > 0) {
+-            dump(buf, nmbbytes);
+-            printf(" \"%s\"\n", buf);
+-        }
+-        else {
+-            printf("\n");
+-        }
+-    }
+ 
+     printf("    XFilterEvent returns: %s\n",
+            XFilterEvent(eventp, e->window) ? "True" : "False");
+@@ -1141,7 +1120,7 @@ parse_event_mask(const char *s, long eve
+             if (s)
+                 return True;
          }
 -    }
-+    } */
++	}
  
-     printf ("    XFilterEvent returns: %s\n",
- 	    XFilterEvent (eventp, e->window) ? "True" : "False");
-@@ -1015,7 +1015,7 @@ main (int argc, char **argv)
-         fprintf (stderr, "%s:  XSetLocaleModifiers failed\n", ProgramName);
+     if (s != NULL)
+         fprintf(stderr, "%s: unrecognized event mask '%s'\n", ProgramName, s);
+@@ -1288,37 +1267,6 @@ main(int argc, char **argv)
+         fprintf(stderr, "%s:  XSetLocaleModifiers failed\n", ProgramName);
      }
  
--    xim = XOpenIM (dpy, NULL, NULL, NULL);
-+    /*xim = XOpenIM (dpy, NULL, NULL, NULL);
-     if (xim == NULL) {
-         fprintf (stderr, "%s:  XOpenIM failed\n", ProgramName);
-     }
-@@ -1042,7 +1042,7 @@ main (int argc, char **argv)
-             }
-             XFree (xim_styles);
-         }
+-    xim = XOpenIM(dpy, NULL, NULL, NULL);
+-    if (xim == NULL) {
+-        fprintf(stderr, "%s:  XOpenIM failed\n", ProgramName);
 -    }
-+	}*/
+-
+-    if (xim) {
+-        imvalret = XGetIMValues(xim, XNQueryInputStyle, &xim_styles, NULL);
+-        if (imvalret != NULL || xim_styles == NULL) {
+-            fprintf(stderr, "%s:  input method doesn't support any styles\n",
+-                    ProgramName);
+-        }
+-
+-        if (xim_styles) {
+-            xim_style = 0;
+-            for (i = 0; i < xim_styles->count_styles; i++) {
+-                if (xim_styles->supported_styles[i] ==
+-                    (XIMPreeditNothing | XIMStatusNothing)) {
+-                    xim_style = xim_styles->supported_styles[i];
+-                    break;
+-                }
+-            }
+-
+-            if (xim_style == 0) {
+-                fprintf(stderr,
+-                        "%s: input method doesn't support the style we support\n",
+-                        ProgramName);
+-            }
+-            XFree(xim_styles);
+-        }
+-    }
+-
+     screen = DefaultScreen(dpy);
  
-     screen = DefaultScreen (dpy);
- 
-@@ -1109,7 +1109,7 @@ main (int argc, char **argv)
- 	printf ("Outer window is 0x%lx, inner window is 0x%lx\n", w, subw);
+     attr.event_mask = event_masks[EVENT_MASK_INDEX_CORE];
+@@ -1373,16 +1321,6 @@ main(int argc, char **argv)
+         printf("Outer window is 0x%lx, inner window is 0x%lx\n", w, subw);
      }
  
 -    if (xim && xim_style) {
-+    /*if (xim && xim_style) {
-         xic = XCreateIC (xim,
-                          XNInputStyle, xim_style,
-                          XNClientWindow, w,
-@@ -1119,7 +1119,7 @@ main (int argc, char **argv)
-         if (xic == NULL) {
-             fprintf (stderr, "XCreateIC failed\n");
-         }
+-        xic = XCreateIC(xim,
+-                        XNInputStyle, xim_style,
+-                        XNClientWindow, w, XNFocusWindow, w, NULL);
+-
+-        if (xic == NULL) {
+-            fprintf(stderr, "XCreateIC failed\n");
+-        }
 -    }
-+    }*/
- 
-     have_rr = XRRQueryExtension (dpy, &rr_event_base, &rr_error_base);
+-
+     have_rr = XRRQueryExtension(dpy, &rr_event_base, &rr_error_base);
      if (have_rr) {
+         int rr_major, rr_minor;

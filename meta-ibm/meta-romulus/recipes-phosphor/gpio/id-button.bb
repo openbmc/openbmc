@@ -23,7 +23,7 @@ ID_BUTTON_SERVICE = "id_button"
 
 TMPL = "phosphor-gpio-monitor@.service"
 INSTFMT = "phosphor-gpio-monitor@{0}.service"
-TGT = "${SYSTEMD_DEFAULT_TARGET}"
+TGT = "multi-user.target"
 FMT = "../${TMPL}:${TGT}.requires/${INSTFMT}"
 
 SYSTEMD_SERVICE_${PN} += "id-button-pressed.service"

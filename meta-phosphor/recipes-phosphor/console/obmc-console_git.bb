@@ -6,17 +6,19 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=fa818a259cbed7ce8bc2a22d35a464fc"
 
 inherit obmc-phosphor-systemd
-inherit autotools
+inherit autotools pkgconfig
 inherit obmc-phosphor-discovery-service
 
 TARGET_CFLAGS   += "-fpic -O2"
 
-DEPENDS += "autoconf-archive-native"
+DEPENDS += "autoconf-archive-native \
+            systemd \
+            "
 
 SRC_URI += "git://github.com/openbmc/obmc-console"
 SRC_URI += "file://${PN}.conf"
 
-SRCREV = "fcf8541b87c13d4fe02d1fc4812b7f6df92c8c27"
+SRCREV = "1cecc5deeae236e9886f624ea7168e075f057047"
 PV = "1.0+git${SRCPV}"
 
 REGISTERED_SERVICES_${PN} += "obmc_console:tcp:2200"

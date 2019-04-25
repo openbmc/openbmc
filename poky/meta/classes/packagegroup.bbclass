@@ -48,6 +48,8 @@ deltask do_compile
 deltask do_install
 deltask do_populate_sysroot
 
+INHIBIT_DEFAULT_DEPS = "1"
+
 python () {
     if bb.data.inherits_class('nativesdk', d):
         return

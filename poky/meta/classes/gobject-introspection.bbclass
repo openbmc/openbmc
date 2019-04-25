@@ -25,7 +25,7 @@ DEPENDS_append_class-native = " gobject-introspection-native"
 DEPENDS_append_class-nativesdk = " gobject-introspection-native"
 
 # This is used by introspection tools to find .gir includes
-export XDG_DATA_DIRS = "${STAGING_DATADIR}"
+export XDG_DATA_DIRS = "${STAGING_DATADIR}:${STAGING_LIBDIR}"
 
 do_configure_prepend_class-target () {
     # introspection.m4 pre-packaged with upstream tarballs does not yet

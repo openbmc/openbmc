@@ -17,7 +17,7 @@ DEPENDS += "systemd"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/phosphor-host-postd"
-SRCREV = "7101f76b54507631a0ab4aefd37277e901150679"
+SRCREV = "49a18b220229304b690097041d8028895bd4215a"
 
 SNOOP_DEVICE ?= "aspeed-lpc-snoop0"
 POST_CODE_BYTES ?= "1"
@@ -25,10 +25,9 @@ POST_CODE_BYTES ?= "1"
 SERVICE_FILE = "lpcsnoop.service"
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} += "${SERVICE_FILE}"
-SYSTEMD_DEFAULT_TARGET ?= "obmc-standby.target"
 
 EXTRA_OECONF = " \
   SNOOP_DEVICE="${SNOOP_DEVICE}" \
   POST_CODE_BYTES="${POST_CODE_BYTES}" \
-  SYSTEMD_TARGET="${SYSTEMD_DEFAULT_TARGET}" \
+  SYSTEMD_TARGET="multi-user.target" \
 "

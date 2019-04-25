@@ -26,16 +26,15 @@ RRECOMMENDS_${PN} += "phosphor-debug-collector"
 # systemd service setup
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} = "hostlogger.service"
-SYSTEMD_DEFAULT_TARGET ?= "multi-user.target"
 
 # Host TTY setup
 OBMC_CONSOLE_HOST_TTY ?= "ttyVUART0"
 
 # Extra parameters for 'configure' script
 EXTRA_OECONF = "HOST_TTY=${OBMC_CONSOLE_HOST_TTY} \
-                SYSTEMD_TARGET=${SYSTEMD_DEFAULT_TARGET}"
+                SYSTEMD_TARGET=multi-user.target"
 
 # Source code repository
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/phosphor-hostlogger"
-SRCREV = "f780288ad8ce72e4ff924dada1c996ad1bddb2b8"
+SRCREV = "b8cf26fe933c7f020f5195b9575f596b9cb23719"

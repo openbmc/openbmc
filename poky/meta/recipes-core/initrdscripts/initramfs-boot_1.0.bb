@@ -9,8 +9,13 @@ S = "${WORKDIR}"
 
 do_install() {
         install -m 0755 ${WORKDIR}/init-boot.sh ${D}/init
+
+        # Create device nodes expected by some kernels in initramfs
+        # before even executing /init.
+        install -d ${D}/dev
+        mknod -m 622 ${D}/dev/console c 5 1
 }
 
 inherit allarch
 
-FILES_${PN} += " /init "
+FILES_${PN} += "/init /dev/console"

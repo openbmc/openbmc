@@ -42,6 +42,10 @@ class VerCmpString(unittest.TestCase):
         self.assertTrue(result < 0)
         result = bb.utils.vercmp_string('1.1', '1.0+1.1-beta1')
         self.assertTrue(result > 0)
+        result = bb.utils.vercmp_string('1.', '1.1')
+        self.assertTrue(result < 0)
+        result = bb.utils.vercmp_string('1.1', '1.')
+        self.assertTrue(result > 0)
 
     def test_explode_dep_versions(self):
         correctresult = {"foo" : ["= 1.10"]}

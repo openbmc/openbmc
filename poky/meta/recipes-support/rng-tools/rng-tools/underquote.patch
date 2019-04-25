@@ -1,4 +1,8 @@
-Fix underquoted m4 entry. This causes a failure if gcrypt isn't present:
+From 03fe7efa1bc04a83fb9b6787998e7baa7ee90646 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Mon, 22 Oct 2018 15:27:41 +0800
+Subject: [PATCH 3/4] Fix underquoted m4 entry. This causes a failure if gcrypt
+ isn't present:
 
 | configure: libgcrypt support disabled
 | ../rng-tools-5/configure: line 4345: ac_fn_c_try_link: command not found
@@ -9,11 +13,17 @@ RP
 
 Upstream-Status: Pending
 
-Index: rng-tools-5/configure.ac
-===================================================================
---- rng-tools-5.orig/configure.ac
-+++ rng-tools-5/configure.ac
-@@ -71,7 +71,7 @@ AS_IF(
+Rebase to 6.6
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index dd1c30f..88d2be3 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -124,7 +124,7 @@ AS_IF(
  	[test "x$with_libgcrypt" != "xno"],
  	[
  		AC_CHECK_HEADER([gcrypt.h],
@@ -22,7 +32,7 @@ Index: rng-tools-5/configure.ac
  				[gcrypt],
  				[gcry_check_version], ,
  				[
-@@ -80,7 +80,7 @@ AS_IF(
+@@ -133,7 +133,7 @@ AS_IF(
  						AC_MSG_NOTICE([libgcrypt support disabled])
  					fi
  				]
@@ -31,3 +41,6 @@ Index: rng-tools-5/configure.ac
  			[if test "x$with_libgcrypt" != "xcheck"; then
  				AC_MSG_FAILURE([libgcrypt headers not found]); else
  				AC_MSG_NOTICE([libgcrypt support disabled])
+-- 
+2.7.4
+

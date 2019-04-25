@@ -17,7 +17,6 @@ LANGUAGES ?= "c,c++${FORTRAN}${JAVA}"
 
 EXTRA_OECONF_BASE ?= ""
 EXTRA_OECONF_PATHS ?= ""
-EXTRA_OECONF_INITIAL ?= ""
 
 GCCMULTILIB ?= "--disable-multilib"
 GCCTHREADS ?= "posix"
@@ -46,6 +45,10 @@ EXTRA_OECONF = "\
     ${@get_long_double_setting(bb, d)} \
     ${@get_gcc_multiarch_setting(bb, d)} \
 "
+
+# glibc version is a minimum controlling whether features are enabled. 
+# Doesn't need to track glibc exactly
+EXTRA_OECONF_append_libc-glibc = " --with-glibc-version=2.28 "
 
 # Set this here since GCC configure won't auto-detect and enable
 # initfini-arry when cross compiling.

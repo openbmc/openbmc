@@ -1,0 +1,23 @@
+Use pkg-config for libxml2 detection.
+
+xml2-config does not work. Use pkgconfig to set CPPFLAGS and LIBS.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by:  Khem Raj <raj.khem@gmail.com>
+---
+ configure.in | 15 ++-------------
+ 1 file changed, 2 insertions(+), 13 deletions(-)
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -2481,8 +2481,8 @@ AC_DEFUN([PHP_SETUP_LIBXML], [
+     LIBXML_VERSION=`expr [$]1 \* 1000000 + [$]2 \* 1000 + [$]3`
+     if test "$LIBXML_VERSION" -ge "2006011"; then
+       found_libxml=yes
+-      LIBXML_LIBS=`$XML2_CONFIG --libs`
+-      LIBXML_INCS=`$XML2_CONFIG --cflags`
++      LIBXML_LIBS=`pkg-config --libs libxml-2.0`
++      LIBXML_INCS=`pkg-config --cflags libxml-2.0`
+     else
+       AC_MSG_ERROR([libxml2 version 2.6.11 or greater required.])
+     fi

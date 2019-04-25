@@ -1,7 +1,7 @@
-From e1dc85af1800afa4fbf4eb5a59cc41025495af57 Mon Sep 17 00:00:00 2001
+From b2ec111dc3a42d9dce71c903524724ae82ff22d8 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 3 Aug 2018 09:55:12 -0700
-Subject: [PATCH] nativesdk-glibc: Make relocatable install for locales
+Subject: [PATCH 05/30] nativesdk-glibc: Make relocatable install for locales
 
 The glibc locale path is hard-coded to the install prefix, but in SDKs we need
 to be able to relocate the binaries.  Expand the strings to 4K and put them in a
@@ -18,7 +18,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  3 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/locale/findlocale.c b/locale/findlocale.c
-index 872cadb5b9..dd651e07f5 100644
+index 9af605bd64..b2b0a3f93b 100644
 --- a/locale/findlocale.c
 +++ b/locale/findlocale.c
 @@ -56,7 +56,7 @@ struct __locale_data *const _nl_C[] attribute_hidden =
@@ -40,7 +40,7 @@ index 872cadb5b9..dd651e07f5 100644
    else
      /* We really have to load some data.  First see whether the name is
 diff --git a/locale/loadarchive.c b/locale/loadarchive.c
-index 516d30d8d1..9bfbe1a5dd 100644
+index 803c1cf2a4..9023f475b8 100644
 --- a/locale/loadarchive.c
 +++ b/locale/loadarchive.c
 @@ -42,7 +42,7 @@
@@ -53,7 +53,7 @@ index 516d30d8d1..9bfbe1a5dd 100644
  /* Size of initial mapping window, optimal if large enough to
     cover the header plus the initial locale.  */
 diff --git a/locale/localeinfo.h b/locale/localeinfo.h
-index 68822a6319..537bc35149 100644
+index 7c1cc3eecb..53cb8bfc59 100644
 --- a/locale/localeinfo.h
 +++ b/locale/localeinfo.h
 @@ -325,7 +325,7 @@ _nl_lookup_word (locale_t l, int category, int item)
@@ -65,3 +65,6 @@ index 68822a6319..537bc35149 100644
  
  /* Load the locale data for CATEGORY from the file specified by *NAME.
     If *NAME is "", use environment variables as specified by POSIX, and
+-- 
+2.20.1
+

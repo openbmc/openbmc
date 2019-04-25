@@ -1,4 +1,4 @@
-From 60baf9ebf30bed0e2ee3c7c5a74d5b6d50035862 Mon Sep 17 00:00:00 2001
+From f632148fcc8757bb9a9601a6dab275e88cd309d2 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 30 Jan 2018 15:28:49 +0800
 Subject: [PATCH 3/7] Correctly install python modules
@@ -17,10 +17,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/lang/python/Makefile.am b/lang/python/Makefile.am
-index 8d74cbd..ce4f0a5 100644
+index 6988faf..36c6f7b 100644
 --- a/lang/python/Makefile.am
 +++ b/lang/python/Makefile.am
-@@ -91,6 +91,7 @@ install-exec-local:
+@@ -93,6 +93,7 @@ install-exec-local:
  	  --build-base="$$(basename "$${PYTHON}")-gpg" \
  	  install \
  	  --prefix "$(DESTDIR)$(prefix)" \

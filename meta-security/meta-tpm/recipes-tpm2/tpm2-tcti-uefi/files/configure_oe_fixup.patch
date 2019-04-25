@@ -1,0 +1,27 @@
+Upstream-Status: OE specific
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: git/configure.ac
+===================================================================
+--- git.orig/configure.ac
++++ git/configure.ac
+@@ -84,9 +84,6 @@ AC_ARG_WITH([efi-lds],
+             AS_HELP_STRING([--with-efi-lds=LDS_PATH],[Path to gnu-efi lds file.]),
+             [],
+             [with_efi_lds="/usr/lib/elf_${ARCH}_efi.lds"])
+-AC_CHECK_FILE(["${with_efi_lds}"],
+-              [],
+-              [AC_MSG_ERROR([Missing file: ${with_efi_lds}.])])
+ EXTRA_LDFLAGS="-L /usr/lib -L /usr/lib64 -Wl,--script=${with_efi_lds}"
+ 
+ # path to object file from gnu-efi
+@@ -94,9 +91,6 @@ AC_ARG_WITH([efi-crt0],
+             AS_HELP_STRING([--with-efi-crt0=OBJ_PATH],[Path to gnu-efi crt0 object file.]),
+             [],
+             [with_efi_crt0="/usr/lib/crt0-efi-${ARCH}.o"])
+-AC_CHECK_FILE(["${with_efi_crt0}"],
+-              [],
+-              [AC_MSG_ERROR([Missing ${with_efi_crt0} file.])])
+ EXTRA_LDLIBS="${with_efi_crt0}"
+ 
+ # check for efi and gnuefi libraries

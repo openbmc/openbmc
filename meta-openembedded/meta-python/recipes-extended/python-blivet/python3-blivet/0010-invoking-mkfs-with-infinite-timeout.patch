@@ -1,4 +1,4 @@
-From 42d8e57c748951098534bf7f52c4ebc790ef66e9 Mon Sep 17 00:00:00 2001
+From 33844f6773a676bd57240954e402ae9a843663a4 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 16 Jun 2017 15:43:00 +0800
 Subject: [PATCH 10/11] invoking mkfs with infinite timeout

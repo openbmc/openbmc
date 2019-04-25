@@ -29,6 +29,9 @@ ALTERNATIVE_PRIORITY = "100"
 ALTERNATIVE_${PN} = "setfattr"
 ALTERNATIVE_TARGET[setfattr] = "${bindir}/setfattr"
 
+PTEST_BUILD_HOST_FILES = "builddefs"
+PTEST_BUILD_HOST_PATTERN = "^RPM"
+
 do_install_ptest() {
 	tar -c --exclude=ext test/ | ( cd ${D}${PTEST_PATH} && tar -xf - )
 	mkdir ${D}${PTEST_PATH}/include
@@ -36,12 +39,6 @@ do_install_ptest() {
 	  do cp ${S}/include/$i ${D}${PTEST_PATH}/include/; \
 	done
 	sed -e 's|; @echo|; echo|' -i ${D}${PTEST_PATH}/test/Makefile
-    
-	# Remove any build host references
-	sed -e "s:--sysroot=${STAGING_DIR_TARGET}::g" \
-	    -e 's:${HOSTTOOLS_DIR}/::g' \
-	    -e 's:${RECIPE_SYSROOT_NATIVE}::g' \
-	    -i ${D}${PTEST_PATH}/include/builddefs
 }
 
 RDEPENDS_${PN}-ptest = "attr coreutils perl-module-filehandle perl-module-getopt-std perl-module-posix"

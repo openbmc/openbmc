@@ -12,7 +12,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=5df208ec65eb84ce5bb8d82d8f3b9675 \
 DEPENDS = "encodings util-macros"
 DEPENDS_class-native = "util-macros-native"
 RDEPENDS_${PN} = "mkfontdir mkfontscale encodings"
-RDEPENDS_${PN}_class-native = "mkfontdir-native mkfontscale-native"
+RDEPENDS_${PN}_class-native = ""
 
 BBCLASSEXTEND = "native"
 

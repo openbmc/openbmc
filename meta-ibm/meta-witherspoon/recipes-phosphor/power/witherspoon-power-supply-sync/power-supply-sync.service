@@ -1,0 +1,14 @@
+[Unit]
+Description=Power Supply Input History SYNC
+Wants=obmc-power-start-pre@0.target
+After=obmc-power-start-pre@0.target
+Wants=obmc-chassis-poweron@0.target
+Before=obmc-chassis-poweron@0.target
+ConditionPathExists=!/run/openbmc/chassis@0-on
+
+[Service]
+ExecStart=/usr/bin/env phosphor-gpio-util --gpio=105 --path=/dev/gpiochip0 --delay=5 --action=low_high
+SyslogIdentifier=power-supply-sync
+
+[Install]
+RequiredBy=obmc-chassis-poweron@0.target

@@ -109,7 +109,7 @@
             "core"
         ], 
         "files": [
-            "${bindir}/2to3", 
+            "${bindir}/2to3*",
             "${libdir}/python2.7/lib2to3"
         ]
     }, 
@@ -1056,6 +1056,7 @@
             "core"
         ], 
         "files": [
+            "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_tkinter.so",
             "${libdir}/python2.7/lib-tk"
         ]
     }, 
@@ -1121,7 +1122,8 @@
         ], 
         "files": [
             "${libdir}/python2.7/DocXMLRPCServer.py", 
-            "${libdir}/python2.7/SimpleXMLRPCServer.py"
+            "${libdir}/python2.7/SimpleXMLRPCServer.py", 
+            "${libdir}/python2.7/xmlrpclib.py"
         ]
     }, 
     "zlib": {

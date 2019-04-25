@@ -16,4 +16,4 @@ ExecStart=/usr/bin/env phosphor-discover-system-state --host %i
 SyslogIdentifier=phosphor-discover-system-state
 
 [Install]
-WantedBy={SYSTEMD_DEFAULT_TARGET}
+WantedBy=multi-user.target

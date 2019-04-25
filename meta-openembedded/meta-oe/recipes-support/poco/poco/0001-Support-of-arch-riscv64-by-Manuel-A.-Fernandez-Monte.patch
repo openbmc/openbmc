@@ -1,0 +1,41 @@
+From ed04c97abe015a226269de391e36c4d251292725 Mon Sep 17 00:00:00 2001
+From: Francis ANDRE <francis.andre.kampbell@orange.fr>
+Date: Sun, 6 May 2018 12:28:25 +0200
+Subject: [PATCH] Support of arch riscv64 by Manuel A. Fernandez Montecelo
+ <mafm@debian.org>
+
+---
+ Foundation/include/Poco/Platform.h | 6 +++++-
+ Foundation/src/utils.h             | 1 +
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+--- a/Foundation/include/Poco/Platform.h
++++ b/Foundation/include/Poco/Platform.h
+@@ -134,6 +134,7 @@
+ #define POCO_ARCH_NIOS2   0x0e
+ #define POCO_ARCH_AARCH64 0x0f
+ #define POCO_ARCH_ARM64   0x0f // same as POCO_ARCH_AARCH64
++#define POCO_ARCH_RISCV64 0x10
+ 
+ 
+ #if defined(__ALPHA) || defined(__alpha) || defined(__alpha__) || defined(_M_ALPHA)
+@@ -224,6 +225,9 @@
+ #elif defined(__AARCH64EB__)
+ 	#define POCO_ARCH POCO_ARCH_AARCH64
+ 	#define POCO_ARCH_BIG_ENDIAN 1
++#elif defined(__riscv) && (__riscv_xlen == 64)
++	#define POCO_ARCH POCO_ARCH_RISCV64
++	#define POCO_ARCH_LITTLE_ENDIAN 1
+ #endif
+ 
+ 
+--- a/Foundation/src/utils.h
++++ b/Foundation/src/utils.h
+@@ -63,6 +63,7 @@
+     defined(__SH4__) || defined(__alpha__) || \
+     defined(_MIPS_ARCH_MIPS32R2) || \
+     defined(__AARCH64EL__) || \
++    defined(__riscv) || \
+     defined(nios2) || defined(__nios2) || defined(__nios2__)
+ #define DOUBLE_CONVERSION_CORRECT_DOUBLE_OPERATIONS 1
+ #elif defined(_M_IX86) || defined(__i386__) || defined(__i386)

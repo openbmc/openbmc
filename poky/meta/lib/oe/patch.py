@@ -38,21 +38,10 @@ def runcmd(args, dir = None):
         if exitstatus != 0:
             raise CmdError(cmd, exitstatus >> 8, output)
         if " fuzz " in output:
-            bb.warn("""
-Some of the context lines in patches were ignored. This can lead to incorrectly applied patches.
-The context lines in the patches can be updated with devtool:
+            # Drop patch fuzz info with header and footer to log file so
+            # insane.bbclass can handle to throw error/warning
+            bb.note("--- Patch fuzz start ---\n%s\n--- Patch fuzz end ---" % format(output))
 
-    devtool modify <recipe>
-    devtool finish --force-patch-refresh <recipe> <layer_path>
-
-Then the updated patches and the source tree (in devtool's workspace)
-should be reviewed to make sure the patches apply in the correct place
-and don't introduce duplicate lines (which can, and does happen
-when some of the context is ignored). Further information:
-http://lists.openembedded.org/pipermail/openembedded-core/2018-March/148675.html
-https://bugzilla.yoctoproject.org/show_bug.cgi?id=10450
-Details:
-{}""".format(output))
         return output
 
     finally:
@@ -334,8 +323,8 @@ class GitApplyTree(PatchTree):
     @staticmethod
     def interpretPatchHeader(headerlines):
         import re
-        author_re = re.compile('[\S ]+ <\S+@\S+\.\S+>')
-        from_commit_re = re.compile('^From [a-z0-9]{40} .*')
+        author_re = re.compile(r'[\S ]+ <\S+@\S+\.\S+>')
+        from_commit_re = re.compile(r'^From [a-z0-9]{40} .*')
         outlines = []
         author = None
         date = None
@@ -790,9 +779,11 @@ class UserResolver(Resolver):
 
 
 def patch_path(url, fetch, workdir, expand=True):
-    """Return the local path of a patch, or None if this isn't a patch"""
+    """Return the local path of a patch, or return nothing if this isn't a patch"""
 
     local = fetch.localpath(url)
+    if os.path.isdir(local):
+        return
     base, ext = os.path.splitext(os.path.basename(local))
     if ext in ('.gz', '.bz2', '.xz', '.Z'):
         if expand:

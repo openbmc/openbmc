@@ -1,6 +1,6 @@
-From 45d828356efc140a1492befb1e6dc59a9f4e16b5 Mon Sep 17 00:00:00 2001
+From 03819ad1270a279223219c0e70ba631bfe517714 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Wed, 31 Jan 2018 10:44:19 +0800
+Date: Wed, 17 Oct 2018 23:32:19 +0800
 Subject: [PATCH 2/7] gpgme/lang/python: gpg-error-config should not be used
 
 gpg-error-config was modified by OE to always return an error.
@@ -11,38 +11,40 @@ Upstream-Status: Inappropriate [changes are specific to OE]
 
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 
-Rework to 1.10.0
+Rebase to 1.12.0
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- lang/python/setup.py.in | 10 +---------
- 1 file changed, 1 insertion(+), 9 deletions(-)
+ lang/python/setup.py.in | 11 +----------
+ 1 file changed, 1 insertion(+), 10 deletions(-)
 
 diff --git a/lang/python/setup.py.in b/lang/python/setup.py.in
-index 2595073..60b5257 100755
+index 65a4be0..11b8413 100755
 --- a/lang/python/setup.py.in
 +++ b/lang/python/setup.py.in
-@@ -26,7 +26,6 @@ import shutil
- import subprocess
+@@ -30,7 +30,6 @@ import subprocess
+ import sys
  
  # Out-of-tree build of the gpg bindings.
 -gpg_error_config = ["gpg-error-config"]
  gpgme_config_flags = ["--thread=pthread"]
  gpgme_config = ["gpgme-config"] + gpgme_config_flags
  gpgme_h = ""
-@@ -157,14 +156,7 @@ class BuildExtFirstHack(build):
+@@ -181,16 +180,8 @@ class BuildExtFirstHack(build):
+         shutil.copy2(source_name, sink_name)
  
      def _generate_errors_i(self):
- 
+-
 -        try:
--            subprocess.check_call(gpg_error_config + ['--version'],
--                                  stdout=devnull)
+-            subprocess.check_call(
+-                gpg_error_config + ['--version'], stdout=devnull)
 -        except:
 -            sys.exit("Could not find gpg-error-config.  " +
 -                     "Please install the libgpg-error development package.")
 -
--        gpg_error_content = self._read_header("gpg-error.h", getconfig("cflags", config=gpg_error_config))
-+        gpg_error_content = self._read_header("gpg-error.h", os.environ.get('CFLAGS').split())
+         gpg_error_content = self._read_header(
+-            "gpg-error.h", getconfig("cflags", config=gpg_error_config))
++            "gpg-error.h", os.environ.get('CFLAGS').split())
  
          filter_re = re.compile(r'GPG_ERR_[^ ]* =')
          rewrite_re = re.compile(r' *(.*) = .*')

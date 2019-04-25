@@ -1,0 +1,67 @@
+#! /usr/bin/env python3
+#
+# Copyright (C) 2018 Garmin Ltd.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+import os
+import sys
+import logging
+import argparse
+import sqlite3
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)),'lib'))
+
+import hashserv
+
+VERSION = "1.0.0"
+
+DEFAULT_HOST = ''
+DEFAULT_PORT = 8686
+
+def main():
+    parser = argparse.ArgumentParser(description='HTTP Equivalence Reference Server. Version=%s' % VERSION)
+    parser.add_argument('--address', default=DEFAULT_HOST, help='Bind address (default "%(default)s")')
+    parser.add_argument('--port', type=int, default=DEFAULT_PORT, help='Bind port (default %(default)d)')
+    parser.add_argument('--prefix', default='', help='HTTP path prefix (default "%(default)s")')
+    parser.add_argument('--database', default='./hashserv.db', help='Database file (default "%(default)s")')
+    parser.add_argument('--log', default='WARNING', help='Set logging level')
+
+    args = parser.parse_args()
+
+    logger = logging.getLogger('hashserv')
+
+    level = getattr(logging, args.log.upper(), None)
+    if not isinstance(level, int):
+        raise ValueError('Invalid log level: %s' % args.log)
+
+    logger.setLevel(level)
+    console = logging.StreamHandler()
+    console.setLevel(level)
+    logger.addHandler(console)
+
+    db = sqlite3.connect(args.database)
+
+    server = hashserv.create_server((args.address, args.port), db, args.prefix)
+    server.serve_forever()
+    return 0
+
+if __name__ == '__main__':
+    try:
+        ret = main()
+    except Exception:
+        ret = 1
+        import traceback
+        traceback.print_exc()
+    sys.exit(ret)
+

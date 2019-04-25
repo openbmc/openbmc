@@ -19,7 +19,7 @@ diff --git a/testcases/kernel/controllers/memcg/functional/memcg_lib.sh b/testca
 index b785fe3..2918cc5 100755
 --- a/testcases/kernel/controllers/memcg/functional/memcg_lib.sh
 +++ b/testcases/kernel/controllers/memcg/functional/memcg_lib.sh
-@@ -283,6 +283,7 @@ test_proc_kill()
+@@ -291,6 +291,7 @@ test_proc_kill()
  	pid=$!
  	TST_CHECKPOINT_WAIT 0
  	echo $pid > tasks

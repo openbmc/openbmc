@@ -103,8 +103,10 @@ python devtool_post_unpack() {
                 for l in sccfile:
                     line = l.split()
                     if line and line[0] in ('kconf', 'patch'):
-                        local_files[line[-1]] = os.path.join(os.path.dirname(local_files[key]), line[-1])
-                        shutil.copy2(os.path.join(os.path.dirname(local_files[key]), line[-1]), workdir)
+                        cfg = os.path.join(os.path.dirname(local_files[key]), line[-1])
+                        if not cfg in local_files.values():
+                            local_files[line[-1]] = cfg
+                            shutil.copy2(cfg, workdir)
                 sccfile.close()
 
     # Ignore local files with subdir={BP}

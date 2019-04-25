@@ -40,7 +40,7 @@ do_install() {
 	for f in ${B}/${GO_BUILD_BINDIR}/*; do
 		name=`basename $f`
 		install -m 0755 $f ${D}${libdir}/go/bin/
-		ln -sf ../${BASELIB}/go/bin/$name ${D}${bindir}/
+		ln -sf ../${baselib}/go/bin/$name ${D}${bindir}/
 	done
 }
 

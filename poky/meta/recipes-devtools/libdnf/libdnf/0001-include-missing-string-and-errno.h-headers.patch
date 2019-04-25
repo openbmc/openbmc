@@ -1,0 +1,65 @@
+From ccc89ff0c1f8e55a4a22444d051925408f265df1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 30 Jan 2019 10:32:11 -0800
+Subject: [PATCH] include missing <string> and errno.h headers
+
+This is unearthed when compiling with clang/libc++
+
+Upstream-Status: Submitted [https://github.com/rpm-software-management/libdnf/pull/677]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libdnf/conf/ConfigParser.hpp             | 1 +
+ libdnf/module/modulemd/ModuleProfile.hpp | 1 +
+ libdnf/sack/changelog.hpp                | 1 +
+ libdnf/utils/smartcols/Cell.hpp          | 1 +
+ 4 files changed, 4 insertions(+)
+
+diff --git a/libdnf/conf/ConfigParser.hpp b/libdnf/conf/ConfigParser.hpp
+index 97f25500..2a3851fa 100644
+--- a/libdnf/conf/ConfigParser.hpp
++++ b/libdnf/conf/ConfigParser.hpp
+@@ -23,6 +23,7 @@
+ 
+ #include <map>
+ #include <stdexcept>
++#include <string>
+ #include <utility>
+ 
+ namespace libdnf {
+diff --git a/libdnf/module/modulemd/ModuleProfile.hpp b/libdnf/module/modulemd/ModuleProfile.hpp
+index ab018deb..8d996ff4 100644
+--- a/libdnf/module/modulemd/ModuleProfile.hpp
++++ b/libdnf/module/modulemd/ModuleProfile.hpp
+@@ -23,6 +23,7 @@
+ 
+ 
+ #include <memory>
++#include <string>
+ #include <vector>
+ 
+ #include <modulemd/modulemd.h>
+diff --git a/libdnf/sack/changelog.hpp b/libdnf/sack/changelog.hpp
+index a3d3fc44..d830c414 100644
+--- a/libdnf/sack/changelog.hpp
++++ b/libdnf/sack/changelog.hpp
+@@ -23,6 +23,7 @@
+ #define __CHANGELOG_HPP
+ 
+ #include <ctime>
++#include <string>
+ 
+ namespace libdnf {
+ 
+diff --git a/libdnf/utils/smartcols/Cell.hpp b/libdnf/utils/smartcols/Cell.hpp
+index 2e811dee..b90f0050 100644
+--- a/libdnf/utils/smartcols/Cell.hpp
++++ b/libdnf/utils/smartcols/Cell.hpp
+@@ -22,6 +22,7 @@
+ #define LIBDNF_CELL_HPP
+ 
+ #include <libsmartcols/libsmartcols.h>
++#include <cerrno>
+ #include <string>
+ #include <stdexcept>
+ 

@@ -1,0 +1,53 @@
+If SGML_CATALOG_FILES is in the environment, pass --catalogs to xmllint and
+xsltproc. Also pass --nonet to xsltproc to detect future missing stylesheet
+problems.
+
+An earlier version of this patch was filed upstream at
+https://github.com/asciidoc/asciidoc-py3/issues/61 so depending on how that goes
+this could get merged.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/a2x.py b/a2x.py
+index 2d7699a..582d809 100755
+--- a/a2x.py
++++ b/a2x.py
+@@ -57,6 +57,10 @@ LYNX_OPTS = '-dump'
+ W3M_OPTS = '-dump -cols 70 -T text/html -no-graph'
+ XSLTPROC_OPTS = ''
+ 
++if "SGML_CATALOG_FILES" in os.environ:
++  XMLLINT += " --catalogs"
++  XSLTPROC += " --catalogs"
++
+ ######################################################################
+ # End of configuration file parameters.
+ ######################################################################
+@@ -298,7 +302,7 @@ def exec_xsltproc(xsl_file, xml_file, dst_dir, opts = ''):
+     cwd = os.getcwd()
+     shell_cd(dst_dir)
+     try:
+-        shell('"%s" %s "%s" "%s"' % (XSLTPROC, opts, xsl_file, xml_file))
++        shell('%s %s "%s" "%s"' % (XSLTPROC, opts, xsl_file, xml_file))
+     finally:
+         shell_cd(cwd)
+ 
+@@ -483,7 +487,7 @@ class A2X(AttrDict):
+             self.asciidoc_opts += ' --doctype %s' % self.doctype
+         for attr in self.attributes:
+             self.asciidoc_opts += ' --attribute "%s"' % attr
+-#        self.xsltproc_opts += ' --nonet'
++        self.xsltproc_opts += ' --nonet'
+         if self.verbose:
+             self.asciidoc_opts += ' --verbose'
+             self.dblatex_opts += ' -V'
+@@ -634,7 +638,7 @@ class A2X(AttrDict):
+         shell('"%s" --backend docbook -a "a2x-format=%s" %s --out-file "%s" "%s"' %
+              (self.asciidoc, self.format, self.asciidoc_opts, docbook_file, self.asciidoc_file))
+         if not self.no_xmllint and XMLLINT:
+-            shell('"%s" --nonet --noout --valid "%s"' % (XMLLINT, docbook_file))
++            shell('%s --nonet --noout --valid "%s"' % (XMLLINT, docbook_file))
+ 
+     def to_xhtml(self):
+         self.to_docbook()

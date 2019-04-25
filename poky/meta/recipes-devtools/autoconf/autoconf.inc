@@ -22,10 +22,14 @@ RDEPENDS_${PN} = "m4 gnu-config \
 		  perl-module-file-find \
 		  perl-module-file-glob \
 		  perl-module-file-path \
+		  perl-module-file-spec \
+		  perl-module-file-spec-unix \
 		  perl-module-file-stat \
 		  perl-module-getopt-long \
 		  perl-module-io-file \
+		  perl-module-overloading \
 		  perl-module-posix \
+		  perl-module-symbol \
 		  perl-module-thread-queue \
 		  perl-module-threads \
 		 "
@@ -46,13 +50,19 @@ RDEPENDS_${PN}_class-nativesdk = "\
 		  nativesdk-perl-module-file-find \
 		  nativesdk-perl-module-file-glob \
 		  nativesdk-perl-module-file-path \
+		  nativesdk-perl-module-file-spec \
+		  nativesdk-perl-module-file-spec-unix \
 		  nativesdk-perl-module-file-stat \
 		  nativesdk-perl-module-getopt-long \
 		  nativesdk-perl-module-io-file \
+		  nativesdk-perl-module-overloading \
 		  nativesdk-perl-module-posix \
+		  nativesdk-perl-module-symbol \
 		  nativesdk-perl-module-thread-queue \
 		  nativesdk-perl-module-threads \
                   "
+
+
 
 SRC_URI = "${GNU_MIRROR}/autoconf/autoconf-${PV}.tar.gz \
 	   file://program_prefix.patch"

@@ -10,18 +10,21 @@ false warnings that gcc throws because of the changed options. Fix these
 too.
 
 Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+
+Update patch to 0.8.0
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
  Makefile.inc        | 2 +-
  kpartx/kpartx.rules | 2 +-
  multipath/Makefile  | 4 ++--
- multipath/main.c    | 2 +-
- 4 files changed, 5 insertions(+), 5 deletions(-)
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/Makefile.inc b/Makefile.inc
-index af2f5ba..0b271ea 100644
+index fc728ca..2f0bcea 100644
 --- a/Makefile.inc
 +++ b/Makefile.inc
-@@ -51,7 +51,7 @@ endif
+@@ -48,7 +48,7 @@ endif
  prefix		=
  exec_prefix	= $(prefix)
  usr_prefix	= $(prefix)
@@ -63,19 +66,6 @@ index 0828a8f..b9bbb3c 100644
 +	$(RM) $(DESTDIR)$(libudevdir)/rules.d/62-multipath.rules
  	$(RM) $(DESTDIR)$(man8dir)/$(EXEC).8.gz
  	$(RM) $(DESTDIR)$(man5dir)/$(EXEC).conf.5.gz
- 
-diff --git a/multipath/main.c b/multipath/main.c
-index 3f0a6aa..6fdde03 100644
---- a/multipath/main.c
-+++ b/multipath/main.c
-@@ -389,7 +389,7 @@ static int find_multipaths_check_timeout(const struct path *pp, long tmo,
- 	struct timespec now, ftimes[2], tdiff;
- 	struct stat st;
- 	long fd;
--	int r, err, retries = 0;
-+	int r, err = 0, retries = 0;
- 
- 	clock_gettime(CLOCK_REALTIME, &now);
  
 -- 
 2.7.4

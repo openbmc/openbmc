@@ -1,7 +1,7 @@
 [Unit]
 Description=Power%i Off (Pre)
-Wants={SYSTEMD_DEFAULT_TARGET}
-After={SYSTEMD_DEFAULT_TARGET}
+Wants=multi-user.target
+After=multi-user.target
 Wants=obmc-host-stopped@%i.target
 After=obmc-host-stopped@%i.target
 Conflicts=obmc-chassis-poweron@%i.target

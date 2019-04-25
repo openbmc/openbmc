@@ -1,0 +1,28 @@
+From 79bc507b48d4acd3dec8a85ab6b341b872d44a05 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 29 Jan 2019 22:40:24 -0800
+Subject: [PATCH] calibrator.hh: Include <string> to get std::string
+
+Found with libc++
+
+Upstream-Status: Submitted [https://github.com/tias/xinput_calibrator/pull/76]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/calibrator.hh | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/calibrator.hh b/src/calibrator.hh
+index a6f9504..e75bcef 100644
+--- a/src/calibrator.hh
++++ b/src/calibrator.hh
+@@ -29,6 +29,7 @@
+ #include <X11/Xlib.h>
+ #include <stdio.h>
+ #include <vector>
++#include <string>
+ 
+ // XXX: we currently don't handle lines that are longer than this
+ #define MAX_LINE_LEN 1024
+-- 
+2.20.1
+

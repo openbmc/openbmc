@@ -1,0 +1,5 @@
+# Sweden - Falkenberg/Ringsegård
+[CHANNEL]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 474000000
+	BANDWIDTH_HZ = 8000000

@@ -6,7 +6,7 @@ HOMEPAGE = "https://github.com/openbmc/ibm-logging"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 SRC_URI += "git://github.com/openbmc/ibm-logging"
-SRCREV = "18825049f94eaeda078e7fa94d32eea31f1b48db"
+SRCREV = "3dd7c2e6deec6b4fe3e46b240eae53848dcc520a"
 
 inherit autotools
 inherit pkgconfig
@@ -20,12 +20,6 @@ DEPENDS += " \
          phosphor-logging \
          nlohmann-json \
          autoconf-archive-native \
-         sdbusplus \
-         "
-
-RDEPENDS_${PN} += " \
-         phosphor-logging \
-         phosphor-dbus-interfaces \
          sdbusplus \
          "
 

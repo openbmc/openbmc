@@ -1,4 +1,4 @@
-From 57f6b661d7865e8cecd17be36fab68f7f8447998 Mon Sep 17 00:00:00 2001
+From b2723ff18b70c67c8a7fab5375a7f3c442d49790 Mon Sep 17 00:00:00 2001
 From: Rico Tzschichholz <ricotz@ubuntu.com>
 Date: Wed, 6 Sep 2017 18:52:55 +0200
 Subject: [PATCH] libvaladoc: Allow disabling the graphviz dependency of
@@ -10,10 +10,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 Upstream-Status: Submitted [bugzilla link above]
 
 ---
- configure.ac                          | 60 +++++++++++++++++++----------------
- libvaladoc/Makefile.am                | 25 +++++++++++----
- libvaladoc/html/basicdoclet.vala      |  8 +++++
- libvaladoc/html/htmlmarkupwriter.vala |  4 +++
+ configure.ac                          | 60 ++++++++++++++-------------
+ libvaladoc/Makefile.am                | 25 ++++++++---
+ libvaladoc/html/basicdoclet.vala      |  8 ++++
+ libvaladoc/html/htmlmarkupwriter.vala |  4 ++
  4 files changed, 63 insertions(+), 34 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
@@ -88,10 +88,10 @@ index 730c72d..af81986 100644
  
  AC_PATH_PROG([XSLTPROC], [xsltproc], :)
 diff --git a/libvaladoc/Makefile.am b/libvaladoc/Makefile.am
-index 384292f..cce50d8 100644
+index f3f790e..3c5dc4c 100644
 --- a/libvaladoc/Makefile.am
 +++ b/libvaladoc/Makefile.am
-@@ -126,10 +126,6 @@ libvaladoc_la_VALASOURCES = \
+@@ -128,10 +128,6 @@ libvaladoc_la_VALASOURCES = \
  	content/tablerow.vala \
  	content/taglet.vala \
  	content/text.vala \
@@ -102,7 +102,7 @@ index 384292f..cce50d8 100644
  	parser/manyrule.vala \
  	parser/oneofrule.vala \
  	parser/optionalrule.vala \
-@@ -156,13 +152,24 @@ libvaladoc_la_VALASOURCES = \
+@@ -158,13 +154,24 @@ libvaladoc_la_VALASOURCES = \
  	highlighter/codetoken.vala \
  	highlighter/highlighter.vala \
  	html/basicdoclet.vala \
@@ -128,18 +128,20 @@ index 384292f..cce50d8 100644
  libvaladoc@PACKAGE_SUFFIX@_la_SOURCES = \
  	libvaladoc.vala.stamp \
  	$(libvaladoc_la_VALASOURCES:.vala=.c) \
-@@ -182,9 +189,9 @@ libvaladoc.vala.stamp: $(libvaladoc_la_VALASOURCES)
+@@ -184,11 +191,11 @@ libvaladoc.vala.stamp: $(libvaladoc_la_VALASOURCES)
  		--library valadoc \
  		--vapi valadoc@PACKAGE_SUFFIX@.vapi \
  		--vapidir $(top_srcdir)/vapi --pkg gmodule-2.0 \
 -		--vapidir $(top_srcdir)/vapi --pkg libgvc \
  		--vapidir $(top_srcdir)/gee --pkg gee \
  		--vapidir $(top_srcdir)/vala --pkg vala \
+ 		--vapidir $(top_srcdir)/ccode --pkg ccode \
+ 		--vapidir $(top_srcdir)/codegen --pkg codegen \
 +		$(LIBGVC_PKG) \
  		--pkg config \
  		$(filter %.vala %.c,$^)
  	touch $@
-@@ -211,6 +218,9 @@ nodist_pkgconfig_DATA = valadoc@PACKAGE_SUFFIX@.pc
+@@ -217,6 +224,9 @@ nodist_pkgconfig_DATA = valadoc@PACKAGE_SUFFIX@.pc
  
  valadoc@PACKAGE_SUFFIX@.pc: valadoc.pc
  	cp $< $@
@@ -149,7 +151,7 @@ index 384292f..cce50d8 100644
  
  vapidir = $(datadir)/vala/vapi
  dist_vapi_DATA = valadoc@PACKAGE_SUFFIX@.vapi
-@@ -218,6 +228,9 @@ nodist_vapi_DATA = valadoc@PACKAGE_SUFFIX@.deps
+@@ -224,6 +234,9 @@ nodist_vapi_DATA = valadoc@PACKAGE_SUFFIX@.deps
  
  valadoc@PACKAGE_SUFFIX@.deps: valadoc.deps
  	cp $< $@
@@ -160,7 +162,7 @@ index 384292f..cce50d8 100644
  EXTRA_DIST = \
  	$(libvaladoc_la_VALASOURCES) \
 diff --git a/libvaladoc/html/basicdoclet.vala b/libvaladoc/html/basicdoclet.vala
-index 37c731c..e0326ef 100644
+index 192e488..ec09602 100644
 --- a/libvaladoc/html/basicdoclet.vala
 +++ b/libvaladoc/html/basicdoclet.vala
 @@ -46,7 +46,11 @@ public abstract class Valadoc.Html.BasicDoclet : Api.Visitor, Doclet {
@@ -185,7 +187,7 @@ index 37c731c..e0326ef 100644
  	}
  
  
-@@ -1025,6 +1031,7 @@ public abstract class Valadoc.Html.BasicDoclet : Api.Visitor, Doclet {
+@@ -1026,6 +1032,7 @@ public abstract class Valadoc.Html.BasicDoclet : Api.Visitor, Doclet {
  	}
  
  	protected void write_image_block (Api.Node element) {
@@ -193,7 +195,7 @@ index 37c731c..e0326ef 100644
  		if (element is Class || element is Interface || element is Struct) {
  			unowned string format = (settings.use_svg_images ? "svg" : "png");
  			var chart = new Charts.Hierarchy (image_factory, element);
-@@ -1044,6 +1051,7 @@ public abstract class Valadoc.Html.BasicDoclet : Api.Visitor, Doclet {
+@@ -1045,6 +1052,7 @@ public abstract class Valadoc.Html.BasicDoclet : Api.Visitor, Doclet {
  									   this.get_img_path_html (element, format)});
  			writer.add_usemap (chart);
  		}

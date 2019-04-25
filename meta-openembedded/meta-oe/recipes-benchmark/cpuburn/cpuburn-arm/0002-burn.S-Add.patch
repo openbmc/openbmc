@@ -1,0 +1,47 @@
+From c2adcca93a0075665a8195caad49b89785886e8e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 29 Jan 2019 12:02:22 -0800
+Subject: [PATCH] burn.S: Add
+
+This is originally from
+https://hardwarebug.org/files/burn.S
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ burn.S | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+ create mode 100644 burn.S
+
+diff --git a/burn.S b/burn.S
+new file mode 100644
+index 0000000..c372c87
+--- /dev/null
++++ b/burn.S
+@@ -0,0 +1,26 @@
++        .arch   armv7-a
++        .fpu    neon
++
++        .text
++
++        .global main
++        .type   main, STT_FUNC
++        .func   main
++main:
++        bic             sp,  sp,  #15
++1:
++        vld1.8          {q8}, [sp,:128]
++        smuad           r6,  r4,  r5
++        veor            q9,  q0,  q1
++        add             lr,  r4,  r5
++        ldr             ip,  [sp]
++        vext.8          q10, q3,  q4,  #1
++        eor             r5,  r4,  r5
++        vadd.i32        q11, q0,  q1
++        smusd           r6,  r4,  r5
++        ldr             r2,  [sp]
++        vext.8          q12, q1,  q2,  #3
++        ssub8           lr,  r4,  r5
++        vmul.u16        q13, q0,  q4
++        b               1b
++.endfunc

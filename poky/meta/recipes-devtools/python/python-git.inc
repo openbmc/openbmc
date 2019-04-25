@@ -29,4 +29,4 @@ RDEPENDS_${PN} += " \
                    ${PYTHON_PN}-unixadmin \
                    git \
 "
-BBCLASSEXTEND = "nativesdk"
+BBCLASSEXTEND = "native nativesdk"

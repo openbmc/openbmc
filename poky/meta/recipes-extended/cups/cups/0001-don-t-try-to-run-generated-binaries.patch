@@ -1,20 +1,21 @@
-Upstream-Status: Inappropriate [embedded specific]
-
-From 90069586167b930befce7303aea57078f04b4ed8 Mon Sep 17 00:00:00 2001
+From 1fb07162a9ed187cccf06e34c9bf841d15c6e64e Mon Sep 17 00:00:00 2001
 From: Koen Kooi <koen@dominion.thruhere.net>
 Date: Sun, 30 Jan 2011 16:37:27 +0100
 Subject: [PATCH] don't try to run generated binaries
 
-Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
----
- ppdc/Makefile |   30 +++++++++++++++---------------
- 1 files changed, 15 insertions(+), 15 deletions(-)
+Upstream-Status: Inappropriate [embedded specific]
 
-Index: cups-2.2.6/ppdc/Makefile
-===================================================================
---- cups-2.2.6.orig/ppdc/Makefile
-+++ cups-2.2.6/ppdc/Makefile
-@@ -228,8 +228,8 @@ genstrings:		genstrings.o libcupsppdc.a
+Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+
+---
+ ppdc/Makefile | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
+
+diff --git a/ppdc/Makefile b/ppdc/Makefile
+index e563988..973dd3f 100644
+--- a/ppdc/Makefile
++++ b/ppdc/Makefile
+@@ -189,8 +189,8 @@ genstrings:		genstrings.o libcupsppdc.a ../cups/$(LIBCUPSSTATIC) \
  	$(LD_CXX) $(ARCHFLAGS) $(LDFLAGS) -o genstrings genstrings.o \
  		libcupsppdc.a ../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) \
  		$(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
@@ -25,10 +26,10 @@ Index: cups-2.2.6/ppdc/Makefile
  
  
  #
-@@ -246,9 +246,9 @@ ppdc-static:		ppdc.o libcupsppdc.a ../cu
- 	$(LD_CXX) $(ARCHFLAGS) $(LDFLAGS) -o ppdc-static ppdc.o libcupsppdc.a \
+@@ -209,9 +209,9 @@ ppdc-static:		ppdc.o libcupsppdc.a ../cups/$(LIBCUPSSTATIC) foo.drv foo-fr.po
  		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
  		$(COMMONLIBS) $(LIBZ)
+ 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 -	echo Testing PPD compiler...
 -	./ppdc-static -l en,fr -I ../data foo.drv
 -	./ppdc-static -l en,fr -z -I ../data foo.drv
@@ -38,10 +39,10 @@ Index: cups-2.2.6/ppdc/Makefile
  
  
  #
-@@ -274,17 +274,17 @@ ppdi-static:		ppdc-static ppdi.o libcups
- 	$(LD_CXX) $(ARCHFLAGS) $(LDFLAGS) -o ppdi-static ppdi.o libcupsppdc.a \
+@@ -240,17 +240,17 @@ ppdi-static:		ppdc-static ppdi.o libcupsppdc.a  ../cups/$(LIBCUPSSTATIC)
  		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
  		$(COMMONLIBS) $(LIBZ)
+ 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 -	echo Testing PPD importer...
 -	$(RM) -r ppd ppd2 sample-import.drv
 -	./ppdc-static -l en -I ../data sample.drv

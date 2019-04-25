@@ -64,7 +64,6 @@ RRECOMMENDS_${PN} = " \
     xfce4-appfinder \
     xfce4-screenshooter \
     xfce4-power-manager \
-    xfce4-mixer \
     ristretto \
     xfce4-taskmanager \
     gigolo \

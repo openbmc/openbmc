@@ -1,0 +1,21 @@
+
+thin-provisioning-tools: use sh on path when invoking txt2man
+
+txt2man contains a test which might try to use ksh to run the script, so we
+avoid running /bin/sh.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: joe.slater <joe.slater@windriver.com>
+
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -210,7 +210,7 @@ endif
+ 
+ %.8: %.txt bin/txt2man
+ 	@echo "    [txt2man] $<"
+-	$(V) bin/txt2man -p -t $(basename $(notdir $<)) $< > $@
++	$(V) sh bin/txt2man -p -t $(basename $(notdir $<)) $< > $@
+ 
+ #----------------------------------------------------------------
+ 

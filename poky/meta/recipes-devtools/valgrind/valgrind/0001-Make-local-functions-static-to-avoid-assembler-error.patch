@@ -18,7 +18,7 @@ and more importantly also avoid an assembler error:
 /tmp/cce22iiw.s:915: Error: symbol `exit_0' is already defined
 /tmp/cce22iiw.s:917: Error: symbol `exit' is already defined
 
-Upstream-Status: Pending
+Upstream-Status: Submitted https://bugs.kde.org/show_bug.cgi?id=400164
 
 Signed-off-by: Randy MacLeod <Randy.MacLeod@windriver.com>
 ---

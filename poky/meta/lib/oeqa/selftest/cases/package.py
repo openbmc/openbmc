@@ -137,7 +137,7 @@ class PackageTests(OESelftestTestCase):
                 elif "Breakpoint 1, main () at hello.c:4" in l:
                     return True
 
-            self.logger.error("GDB result:\n%s: %s" % output)
+            self.logger.error("GDB result:\n%d: %s", status, output)
             return False
 
         with runqemu('core-image-minimal') as qemu:

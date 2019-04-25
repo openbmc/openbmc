@@ -72,6 +72,7 @@ ROOTFS_DIR="/rootfs" # where to do the switch root
 MODULE_PRE_HOOKS=""  # functions to call before running each module
 MODULE_POST_HOOKS="" # functions to call after running each module
 MODULES_DIR=/init.d  # place to look for modules
+EFI_DIR=/sys/firmware/efi  # place to store device firmware information
 
 # make mount stop complaining about missing /etc/fstab
 touch /etc/fstab
@@ -80,6 +81,10 @@ touch /etc/fstab
 mkdir -p /proc /sys /run/lock /var/lock
 mount -t proc proc /proc
 mount -t sysfs sysfs /sys
+
+if [ -d $EFI_DIR ];then
+	mount -t efivarfs none /sys/firmware/efi/efivars
+fi
 
 # populate bootparam environment
 for p in `cat /proc/cmdline`; do

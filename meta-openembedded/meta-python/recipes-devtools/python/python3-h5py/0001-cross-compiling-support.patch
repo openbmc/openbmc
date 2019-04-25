@@ -1,0 +1,46 @@
+From 7e3b1745c1fef34683a0610381dd3308ad4d1ba9 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 29 Jan 2019 17:08:32 +0800
+Subject: [PATCH] cross compiling support
+
+Remove useless dirs
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ setup_build.py     | 4 ----
+ setup_configure.py | 2 +-
+ 2 files changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/setup_build.py b/setup_build.py
+index 85b321a..2c78e92 100644
+--- a/setup_build.py
++++ b/setup_build.py
+@@ -53,10 +53,6 @@ if sys.platform.startswith('win'):
+         ('_HDF5USEDLL_', None),
+         ('H5_BUILT_AS_DYNAMIC_LIB', None)
+     ])
+-else:
+-    FALLBACK_PATHS['include_dirs'].extend(['/opt/local/include', '/usr/local/include'])
+-    FALLBACK_PATHS['library_dirs'].extend(['/opt/local/lib', '/usr/local/lib'])
+-
+ 
+ class h5py_build_ext(build_ext):
+ 
+diff --git a/setup_configure.py b/setup_configure.py
+index a2de76a..197f2da 100644
+--- a/setup_configure.py
++++ b/setup_configure.py
+@@ -208,7 +208,7 @@ def autodetect_version(hdf5_dir=None):
+     else:
+         regexp = re.compile(r'^libhdf5.so')
+ 
+-    libdirs = ['/usr/local/lib', '/opt/local/lib']
++    libdirs = []
+     try:
+         if pkgconfig.exists("hdf5"):
+             libdirs.extend(pkgconfig.parse("hdf5")['library_dirs'])
+-- 
+2.7.4
+

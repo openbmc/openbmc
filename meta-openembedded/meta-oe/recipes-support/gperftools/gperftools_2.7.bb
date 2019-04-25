@@ -26,4 +26,5 @@ COMPATIBLE_HOST_mipsarch_libc-glibc = "null"
 # {standard input}:434: Error: lo register required -- `ldr pc,[sp]'
 # Makefile:4538: recipe for target 'src/base/libtcmalloc_la-linuxthreads.lo' failed
 ARM_INSTRUCTION_SET_armv5 = "arm"
+ARM_INSTRUCTION_SET_toolchain-clang_arm = "arm"
 

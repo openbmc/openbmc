@@ -209,7 +209,13 @@ for key in old_manifest:
 
             inFolders=False
             for folder in allfolders:
-                if folder in item:
+                # The module could have a directory named after it, e.g. xml, if we take out the filename from the path
+                # we'll end up with ${libdir}, and we want ${libdir}/xml
+                if isFolder(item):
+                    check_path = item
+                else:
+                    check_path = os.path.dirname(item)
+                if folder in check_path :
                     inFolders = True # Did we find a folder?
                     folderFound = False # Second flag to break inner for
                     # Loop only through packages which contain folders
@@ -262,16 +268,16 @@ for key in old_manifest:
                                        new_manifest[key]['rdepends'].append(newkey)
                                     break
                     else:
-                      # Debug
-                      print('Adding %s to %s FILES' % (item, key))
-                      # Since it wasnt found on another package, its not an RDEP, so add it to FILES for this package
-                      new_manifest[key]['files'].append(item)
-                      if item.endswith('*'):
-                          wildcards.append(item)
-                      if item not in allfiles:
-                          allfiles.append(item)
-                      else:
-                          repeated.append(item)
+                        # Debug
+                        print('Adding %s to %s FILES' % (item, key))
+                        # Since it wasnt found on another package, its not an RDEP, so add it to FILES for this package
+                        new_manifest[key]['files'].append(item)
+                        if item.endswith('*'):
+                            wildcards.append(item)
+                        if item not in allfiles:
+                            allfiles.append(item)
+                        else:
+                            repeated.append(item)
 
 print ('The following files are repeated (contained in more than one package), please check which package should get it:')
 print (repeated)

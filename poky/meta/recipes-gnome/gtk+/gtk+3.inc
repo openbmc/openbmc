@@ -12,6 +12,10 @@ LICENSE = "LGPLv2 & LGPLv2+ & LGPLv2.1+"
 
 inherit autotools gettext pkgconfig gtk-doc update-alternatives gtk-immodules-cache gsettings distro_features_check gobject-introspection
 
+BBCLASSEXTEND = "native nativesdk"
+
+GSETTINGS_PACKAGE_class-native = ""
+
 # versions >= 3.90 are development versions, otherwise like upstream-version-is-even
 UPSTREAM_CHECK_REGEX = "[^\d\.](?P<pver>3\.([1-8]?[02468])+(\.\d+)+)\.tar"
 
@@ -33,7 +37,6 @@ EXTRA_OECONF += " \
                  --disable-glibtest \
                  --disable-xinerama \
                  --enable-modules \
-                 --disable-cups \
                  --disable-colord \
                  ${@bb.utils.contains("DISTRO_FEATURES", "x11", "", "--disable-gtk-doc", d)} \
                  "
@@ -50,15 +53,32 @@ PACKAGECONFIG[x11] = "--enable-x11-backend,--disable-x11-backend,at-spi2-atk fon
 PACKAGECONFIG[opengl] = "--enable-opengl,--disable-opengl,libepoxy"
 PACKAGECONFIG[glx] = "--enable-glx,--disable-glx,,libgl"
 PACKAGECONFIG[wayland] = "--enable-wayland-backend,--disable-wayland-backend,wayland wayland-protocols libxkbcommon virtual/mesa wayland-native"
+PACKAGECONFIG[cups] = "--enable-cups,--disable-cups,cups"
 
-do_install_append() {
-	mv ${D}${bindir}/gtk-update-icon-cache ${D}${bindir}/gtk-update-icon-cache-3.0
+prepare_gtk_scripts() {
+    mv ${D}${bindir}/gtk-update-icon-cache ${D}${bindir}/gtk-update-icon-cache-3.0
 
     # duplicate gtk-query-immodules for post install script update_gtk_immodules_cache
     mkdir -p ${D}${libexecdir}
     ln ${D}${bindir}/gtk-query-immodules-3.0 ${D}${libexecdir}/${MLPREFIX}gtk-query-immodules-3.0
 }
 
+do_install_append_class-target() {
+    prepare_gtk_scripts
+}
+
+do_install_append_class-nativesdk() {
+    prepare_gtk_scripts
+}
+
+do_install_append_class-native() {
+        create_wrapper ${D}/${bindir}/gtk-update-icon-cache \
+                GDK_PIXBUF_MODULE_FILE=${STAGING_LIBDIR_NATIVE}/gdk-pixbuf-2.0/2.10.0/loaders.cache
+        create_wrapper ${D}/${bindir}/gtk-encode-symbolic-svg \
+                GDK_PIXBUF_MODULE_FILE=${STAGING_LIBDIR_NATIVE}/gdk-pixbuf-2.0/2.10.0/loaders.cache
+}
+
+PROVIDES += "gtk-icon-utils"
 PACKAGES =+ "${PN}-demo"
 LIBV = "3.0.0"
 
@@ -104,6 +124,10 @@ GTKBASE_RRECOMMENDS ?= "liberation-fonts \
                         shared-mime-info \
                         adwaita-icon-theme-symbolic \
                         "
+
+GTKBASE_RRECOMMENDS_class-native ?= "\
+                        "
+
 GTKGLIBC_RRECOMMENDS ?= "${GTKBASE_RRECOMMENDS} glibc-gconv-iso8859-1"
 
 RRECOMMENDS_${PN} = "${GTKBASE_RRECOMMENDS}"
@@ -123,11 +147,11 @@ python populate_packages_prepend () {
     immodules_root = os.path.join(gtk_libdir, 'immodules')
     printmodules_root = os.path.join(gtk_libdir, 'printbackends');
 
-    immodules = do_split_packages(d, immodules_root, '^im-(.*)\.so$', 'gtk3-immodule-%s', 'GTK input module for %s')
+    immodules = do_split_packages(d, immodules_root, r'^im-(.*)\.so$', 'gtk3-immodule-%s', 'GTK input module for %s')
     if immodules:
         d.setVar("GTKIMMODULES_PACKAGES", " ".join(immodules))
 
-    do_split_packages(d, printmodules_root, '^libprintbackend-(.*)\.so$', 'gtk3-printbackend-%s', 'GTK printbackend module for %s')
+    do_split_packages(d, printmodules_root, r'^libprintbackend-(.*)\.so$', 'gtk3-printbackend-%s', 'GTK printbackend module for %s')
 
     if (d.getVar('DEBIAN_NAMES')):
         d.setVar(d.expand('PKG_${PN}'), '${MLPREFIX}libgtk-3.0')

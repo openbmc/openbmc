@@ -1,4 +1,4 @@
-From 8efd81e96bdd3be68063a6fd32be4755225e93b2 Mon Sep 17 00:00:00 2001
+From 0d3c6b7ca5d352cc00d9501b9d5576c4ece70a83 Mon Sep 17 00:00:00 2001
 From: Hugo Hromic <hhromic@gmail.com>
 Date: Sun, 13 May 2018 10:49:04 +0100
 Subject: [PATCH 17/18] khronos: backport typedef for
@@ -34,5 +34,5 @@ index d7e5ba7..dcc90ce 100755
  #ifndef EGL_WL_bind_wayland_display
  #define EGL_WL_bind_wayland_display 1
 -- 
-2.19.1
+2.20.1
 

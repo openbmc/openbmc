@@ -43,8 +43,8 @@ index de51d43..810e5c8 100644
 + * 3. Should get ENOMEM or EINVAL.
   */
  
- #define _XOPEN_SOURCE 600
-@@ -93,8 +93,8 @@ int main(void)
+ #include <stdio.h>
+@@ -92,8 +92,8 @@ int main(void)
  	       (unsigned long)len);
  	pa = mmap(addr, len, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_SHARED, fd,
  		  0);
@@ -55,7 +55,7 @@ index de51d43..810e5c8 100644
  		exit(PTS_PASS);
  	}
  
-@@ -103,6 +103,6 @@ int main(void)
+@@ -102,6 +102,6 @@ int main(void)
  	else
  		munmap(pa, len);
  	close(fd);

@@ -1,7 +1,9 @@
 #!/bin/sh
 
-current_dir=$(readlink -f $0)
-export bindir=$(dirname $current_dir)
+current_path=$(readlink -f $0)
+export bindir=$(dirname $current_path)
+export PATH=$bindir/bin:$PATH
+export SKIP_KNOWN_BUGS=1
 
 cd testsuite || exit 1
 ./runtest -v | sed -r 's/^(SKIPPED|UNTESTED):/SKIP:/'

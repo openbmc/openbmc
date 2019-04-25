@@ -1,7 +1,7 @@
-From 0fcb6e646401205e17cc6c129441a49023c62cef Mon Sep 17 00:00:00 2001
+From 47864989388bcd04d647ecf618ad7e260399dbb6 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 5 Sep 2015 06:31:47 +0000
-Subject: [PATCH 3/9] implment systemd-sysv-install for OE
+Subject: [PATCH 3/5] implment systemd-sysv-install for OE
 
 Use update-rc.d for enabling/disabling and status command
 to check the status of the sysv service
@@ -14,7 +14,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/src/systemctl/systemd-sysv-install.SKELETON b/src/systemctl/systemd-sysv-install.SKELETON
-index 8c16cf999..9f078a121 100755
+index 8c16cf9..9f078a1 100755
 --- a/src/systemctl/systemd-sysv-install.SKELETON
 +++ b/src/systemctl/systemd-sysv-install.SKELETON
 @@ -32,17 +32,17 @@ case "$1" in
@@ -39,5 +39,5 @@ index 8c16cf999..9f078a121 100755
      *)
          usage ;;
 -- 
-2.11.0
+2.7.4
 

@@ -1,0 +1,74 @@
+From 630086cf1b3fba71822319a268d3711734cd6aa8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 31 Jan 2019 12:56:13 -0800
+Subject: [PATCH] linux-port: Rename pthread_mutex_t variable 'lock'
+
+lock is also used by libc++ in std namespace and using it here causes
+clang to fail e.g.
+
+dibbler-client.cpp:47:25: error: reference to 'lock' is ambiguous
+    pthread_mutex_lock(&lock);
+                        ^
+../../../../../../../workspace/sources/dibbler/Port-linux/dibbler-client.cpp:29:26: note: candidate found by name lookup is 'lock'
+extern ::pthread_mutex_t lock;
+                         ^
+/mnt/a/yoe/build/tmp/work/aarch64-yoe-linux/dibbler/1.0.1+1.0.2RC1+gitc4b0ed52e751da7823dd9a36e91f93a6310e5525-r0/recipe-sysroot/usr/include/c++/v1/mutex:446:1: note: candidate found by name lookup is 'std::__1::lock'
+lock(_L0& __l0, _L1& __l1, _L2& __l2, _L3& ...__l3)
+
+Upstream-Status: Submitted [https://github.com/tomaszmrugalski/dibbler/pull/37]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Port-linux/dibbler-client.cpp          | 6 +++---
+ Port-linux/lowlevel-linux-link-state.c | 6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/Port-linux/dibbler-client.cpp b/Port-linux/dibbler-client.cpp
+index 78f34241..b5ebb9f0 100644
+--- a/Port-linux/dibbler-client.cpp
++++ b/Port-linux/dibbler-client.cpp
+@@ -26,7 +26,7 @@ using namespace std;
+ 
+ #define IF_RECONNECTED_DETECTED -1
+ 
+-extern pthread_mutex_t lock;
++extern pthread_mutex_t dibbler_lock;
+ 
+ TDHCPClient* ptr = 0;
+ 
+@@ -44,8 +44,8 @@ void signal_handler(int n) {
+ #ifdef MOD_CLNT_CONFIRM
+ void signal_handler_of_linkstate_change(int n) {
+     Log(Notice) << "Network switch off event detected. initiating CONFIRM." << LogEnd;
+-    pthread_mutex_lock(&lock);
+-    pthread_mutex_unlock(&lock);
++    pthread_mutex_lock(&dibbler_lock);
++    pthread_mutex_unlock(&dibbler_lock);
+ }
+ #endif
+ 
+diff --git a/Port-linux/lowlevel-linux-link-state.c b/Port-linux/lowlevel-linux-link-state.c
+index 76293ea1..e6b94063 100644
+--- a/Port-linux/lowlevel-linux-link-state.c
++++ b/Port-linux/lowlevel-linux-link-state.c
+@@ -34,7 +34,7 @@ volatile int * notifier = 0;
+ int isDone = 0;
+ pthread_t parent_id;
+ pthread_t ntid;
+-pthread_mutex_t lock;
++pthread_mutex_t dibbler_lock;
+ 
+ struct state {
+     int id;
+@@ -86,9 +86,9 @@ void link_state_changed(int ifindex)
+     {
+ 	if (changed_links->cnt<16)
+ 	    changed_links->ifindex[changed_links->cnt++] = ifindex;
+-	pthread_mutex_lock(&lock);
++	pthread_mutex_lock(&dibbler_lock);
+ 	*notifier = 1; /* notify that change has occured */
+-	pthread_mutex_unlock(&lock);
++	pthread_mutex_unlock(&dibbler_lock);
+ 	pthread_kill(parent_id,SIGUSR1);
+     } else
+     {

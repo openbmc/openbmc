@@ -1,7 +1,7 @@
 [Unit]
 Description=Power%i On (Pre)
-Wants={SYSTEMD_DEFAULT_TARGET}
-After={SYSTEMD_DEFAULT_TARGET}
+Wants=multi-user.target
+After=multi-user.target
 Conflicts=obmc-chassis-poweroff@%i.target
 RefuseManualStart=yes
 RefuseManualStop=yes

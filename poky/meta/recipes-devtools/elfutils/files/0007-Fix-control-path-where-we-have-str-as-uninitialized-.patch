@@ -1,8 +1,7 @@
-From 8eb100b2e51be5d473b0748a223e2e7f61ec606c Mon Sep 17 00:00:00 2001
+From 112d1645bab7922c7796fe32ddea8fa6e1bbded1 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 29 Jun 2018 15:14:28 +0800
-Subject: [PATCH 7/7] Fix control path where we have str as uninitialized
- string
+Subject: [PATCH] Fix control path where we have str as uninitialized string
 
 |
 /home/ubuntu/work/oe/openembedded-core/build/tmp-musl/work/i586-oe-linux-musl/elfutils/0.164-r0/elfutils-0.164/libcpu/i386_disasm.c:
@@ -24,6 +23,7 @@ Upstream-Status: Pending
 Rebase to 0.172
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
 ---
  libcpu/i386_disasm.c | 1 +
  1 file changed, 1 insertion(+)
@@ -40,6 +40,3 @@ index a7e03f9..837a3a8 100644
  			  assert (! "INVALID not handled");
  			}
  		    }
--- 
-2.7.4
-

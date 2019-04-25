@@ -185,11 +185,11 @@ fi
 
 if [ -e "$target_sdk_dir/environment-setup-@REAL_MULTIMACH_TARGET_SYS@" ]; then
 	echo "The directory \"$target_sdk_dir\" already contains a SDK for this architecture."
-	printf "If you continue, existing files will be overwritten! Proceed[y/N]? "
+	printf "If you continue, existing files will be overwritten! Proceed [y/N]? "
 
 	default_answer="n"
 else
-	printf "You are about to install the SDK to \"$target_sdk_dir\". Proceed[Y/n]? "
+	printf "You are about to install the SDK to \"$target_sdk_dir\". Proceed [Y/n]? "
 
 	default_answer="y"
 fi

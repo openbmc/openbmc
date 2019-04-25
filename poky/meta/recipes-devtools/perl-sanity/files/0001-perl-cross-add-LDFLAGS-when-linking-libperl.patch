@@ -1,0 +1,27 @@
+From f824cbec9ac8f113a4ae35d57bd18625d415a71b Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 27 Nov 2018 15:37:40 +0100
+Subject: [PATCH] perl-cross: add LDFLAGS when linking libperl
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 01644cd..be811a7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -180,7 +180,7 @@ endif
+ 
+ ifeq ($(useshrplib),true)
+ $(LIBPERL):
+-	$(CC) $(LDDLFLAGS) -o $@ $(filter %$o,$^) $(LIBS)
++	$(CC) $(LDFLAGS) $(LDDLFLAGS) -o $@ $(filter %$o,$^) $(LIBS)
+ else
+ $(LIBPERL):
+ 	$(AR) cru $@ $(filter %$o,$^)
+-- 
+2.17.1
+

@@ -7,10 +7,12 @@ class TargetBuildProject(BuildProject):
 
     def __init__(self, target, uri, foldername=None, dl_dir=None):
         self.target = target
-        self.targetdir = "~/"
+        self.targetdir = "~/buildtest/"
         BuildProject.__init__(self, uri, foldername, dl_dir=dl_dir)
 
     def download_archive(self):
+        self.target.run("mkdir " + self.targetdir + " || true")
+
         self._download_archive()
 
         status, output = self.target.copyTo(self.localarchive, self.targetdir)

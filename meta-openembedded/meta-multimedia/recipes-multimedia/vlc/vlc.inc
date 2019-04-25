@@ -5,7 +5,7 @@ SECTION = "multimedia"
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-DEPENDS = "fribidi libtool libgcrypt libgcrypt-native \
+DEPENDS = "coreutils-native fribidi libtool libgcrypt libgcrypt-native \
    dbus dbus-glib libxml2 gnutls \
    tremor faad2 ffmpeg flac fluidsynth alsa-lib \
    lua-native lua libidn \
@@ -21,12 +21,12 @@ SRC_URI = "http://download.videolan.org/pub/videolan/${BPN}/${PV}/${BP}.tar.xz"
 inherit autotools gettext pkgconfig distro_features_check
 
 ARM_INSTRUCTION_SET = "arm"
-
+export BUILDCC = "${BUILD_CC}"
 EXTRA_OECONF = "\
     --enable-run-as-root \
     --enable-xvideo \
     --disable-screen --disable-caca \
-    --enable-httpd --enable-vlm \
+    --enable-vlm \
     --enable-freetype \
     --enable-tremor \
     --enable-v4l2 --disable-aa --disable-faad \
@@ -35,22 +35,22 @@ EXTRA_OECONF = "\
     --without-kde-solid \
     --enable-realrtsp \
     --disable-libtar \
+    --enable-avcodec \
     ac_cv_path_MOC=${STAGING_BINDIR_NATIVE}/moc4 \
     ac_cv_path_RCC=${STAGING_BINDIR_NATIVE}/rcc4 \
     ac_cv_path_UIC=${STAGING_BINDIR_NATIVE}/uic4 \
 "
 
-PACKAGECONFIG ?= " live555 dc1394 dv1394 notify fontconfig freetype dvdread png ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11 sdl vdpau', '', d)}"
+PACKAGECONFIG ?= " live555 dc1394 dv1394 notify fontconfig freetype dvdread png ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)}"
+
 PACKAGECONFIG[mad] = "--enable-mad,--disable-mad,libmad"
-PACKAGECONFIG[sdl] = "--enable-sdl,--disable-sdl,virtual/libsdl libsdl-image "
 PACKAGECONFIG[a52] = "--enable-a52,--disable-a52,liba52"
 PACKAGECONFIG[jack] = "--enable-jack,--disable-jack,jack"
 PACKAGECONFIG[live555] = "--enable-live555,--disable-live555,live555"
 PACKAGECONFIG[libass] = "--enable-libass,--disable-libass,libass"
-PACKAGECONFIG[mkv] = "--enable-mkv,--disable-mkv,libmatroska libebml"
 PACKAGECONFIG[postproc] = "--enable-postproc,--disable-postproc,libpostproc"
+PACKAGECONFIG[libva] = "--enable-libva,--disable-libva,libva"
 PACKAGECONFIG[opencv] = "--enable-opencv,--disable-opencv,opencv"
-PACKAGECONFIG[libva] = "--enable-libva --enable-avcodec,--disable-libva --disable-avcodec,libva libav"
 PACKAGECONFIG[speex] = "--enable-speex,--disable-speex,speex"
 PACKAGECONFIG[gstreamer] = "--enable-gst-decode,--disable-gst-decode,gstreamer1.0 gstreamer1.0-plugins-base gst-plugins-bad"
 PACKAGECONFIG[vpx] = "--enable-vpx,--disable-vpx, libvpx"
@@ -81,7 +81,6 @@ do_configure_prepend() {
 }
 
 do_configure_append() {
-    sed -i -e s:'$(MOC) $(DEFS) $(CPPFLAGS)':'$(MOC) $(DEFS)'\ -I${B}/include\ -DSYS_LINUX:g ${B}/modules/gui/qt4/Makefile
     sed -i -e s:'${top_builddir_slash}libtool':'${top_builddir_slash}'${TARGET_SYS}-libtool:g ${B}/doltlibtool
 }
 
@@ -94,10 +93,11 @@ FILES_libvlc = "${libdir}/lib*.so.*"
 
 FILES_${PN} += "\
     ${bindir}/vlc \
+    ${libdir}/vlc/vlc/libvlc_vdpau.so \
     ${datadir}/applications \
     ${datadir}/vlc/ \
     ${datadir}/icons \
-    ${lindir}/vlc/vlc/libvlc_vdpau.so \
+    ${datadir}/metainfo/vlc.appdata.xml \
 "
 
 FILES_${PN}-dbg += "\

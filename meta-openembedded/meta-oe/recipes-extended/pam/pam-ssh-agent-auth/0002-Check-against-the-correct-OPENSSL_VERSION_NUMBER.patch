@@ -1,0 +1,365 @@
+From b2ee29809a54e16567323d8fbac2d652ee58c692 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 1 Feb 2019 22:45:19 -0800
+Subject: [PATCH] Check against the correct OPENSSL_VERSION_NUMBER
+
+From: Guido Falsi <mad@madpilot.net>
+https://sources.debian.org/src/pam-ssh-agent-auth/0.10.3-3/debian/patches/openssl-1.1.1-2.patch/
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ authfd.c    | 12 ++++++------
+ bufbn.c     |  2 +-
+ key.c       | 36 ++++++++++++++++++------------------
+ ssh-dss.c   | 10 +++++-----
+ ssh-ecdsa.c |  8 ++++----
+ ssh-rsa.c   |  4 ++--
+ 6 files changed, 36 insertions(+), 36 deletions(-)
+
+diff --git a/authfd.c b/authfd.c
+index f91514d..4c6cec8 100644
+--- a/authfd.c
++++ b/authfd.c
+@@ -367,7 +367,7 @@ ssh_get_next_identity(AuthenticationConnection *auth, char **comment, int versio
+ 	case 1:
+ 		key = pamsshagentauth_key_new(KEY_RSA1);
+ 		bits = pamsshagentauth_buffer_get_int(&auth->identities);
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 		pamsshagentauth_buffer_get_bignum(&auth->identities, key->rsa->e);
+ 		pamsshagentauth_buffer_get_bignum(&auth->identities, key->rsa->n);
+ 		*comment = pamsshagentauth_buffer_get_string(&auth->identities, NULL);
+@@ -427,7 +427,7 @@ ssh_decrypt_challenge(AuthenticationConnection *auth,
+ 	}
+ 	pamsshagentauth_buffer_init(&buffer);
+ 	pamsshagentauth_buffer_put_char(&buffer, SSH_AGENTC_RSA_CHALLENGE);
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 	pamsshagentauth_buffer_put_int(&buffer, BN_num_bits(key->rsa->n));
+ 	pamsshagentauth_buffer_put_bignum(&buffer, key->rsa->e);
+ 	pamsshagentauth_buffer_put_bignum(&buffer, key->rsa->n);
+@@ -512,7 +512,7 @@ ssh_agent_sign(AuthenticationConnection *auth,
+ static void
+ ssh_encode_identity_rsa1(Buffer *b, RSA *key, const char *comment)
+ {
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 	pamsshagentauth_buffer_put_int(b, BN_num_bits(key->n));
+ 	pamsshagentauth_buffer_put_bignum(b, key->n);
+ 	pamsshagentauth_buffer_put_bignum(b, key->e);
+@@ -540,7 +540,7 @@ ssh_encode_identity_ssh2(Buffer *b, Key *key, const char *comment)
+ 	pamsshagentauth_buffer_put_cstring(b, key_ssh_name(key));
+ 	switch (key->type) {
+ 	case KEY_RSA:
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 		pamsshagentauth_buffer_put_bignum2(b, key->rsa->n);
+ 		pamsshagentauth_buffer_put_bignum2(b, key->rsa->e);
+ 		pamsshagentauth_buffer_put_bignum2(b, key->rsa->d);
+@@ -557,7 +557,7 @@ ssh_encode_identity_ssh2(Buffer *b, Key *key, const char *comment)
+ #endif
+ 		break;
+ 	case KEY_DSA:
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 		pamsshagentauth_buffer_put_bignum2(b, key->dsa->p);
+ 		pamsshagentauth_buffer_put_bignum2(b, key->dsa->q);
+ 		pamsshagentauth_buffer_put_bignum2(b, key->dsa->g);
+@@ -649,7 +649,7 @@ ssh_remove_identity(AuthenticationConnection *auth, Key *key)
+ 
+ 	if (key->type == KEY_RSA1) {
+ 		pamsshagentauth_buffer_put_char(&msg, SSH_AGENTC_REMOVE_RSA_IDENTITY);
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 		pamsshagentauth_buffer_put_int(&msg, BN_num_bits(key->rsa->n));
+ 		pamsshagentauth_buffer_put_bignum(&msg, key->rsa->e);
+ 		pamsshagentauth_buffer_put_bignum(&msg, key->rsa->n);
+diff --git a/bufbn.c b/bufbn.c
+index 4ecedc1..b4754cc 100644
+--- a/bufbn.c
++++ b/bufbn.c
+@@ -151,7 +151,7 @@ pamsshagentauth_buffer_put_bignum2_ret(Buffer *buffer, const BIGNUM *value)
+ 		pamsshagentauth_buffer_put_int(buffer, 0);
+ 		return 0;
+ 	}
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 	if (value->neg) {
+ #else
+ 	if (BN_is_negative(value)) {
+diff --git a/key.c b/key.c
+index aedbbb5..dcc5fc8 100644
+--- a/key.c
++++ b/key.c
+@@ -77,7 +77,7 @@ pamsshagentauth_key_new(int type)
+ 	case KEY_RSA:
+ 		if ((rsa = RSA_new()) == NULL)
+ 			pamsshagentauth_fatal("key_new: RSA_new failed");
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 		if ((rsa->n = BN_new()) == NULL)
+ 			pamsshagentauth_fatal("key_new: BN_new failed");
+ 		if ((rsa->e = BN_new()) == NULL)
+@@ -91,7 +91,7 @@ pamsshagentauth_key_new(int type)
+ 	case KEY_DSA:
+ 		if ((dsa = DSA_new()) == NULL)
+ 			pamsshagentauth_fatal("key_new: DSA_new failed");
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 		if ((dsa->p = BN_new()) == NULL)
+ 			pamsshagentauth_fatal("key_new: BN_new failed");
+ 		if ((dsa->q = BN_new()) == NULL)
+@@ -130,7 +130,7 @@ pamsshagentauth_key_new_private(int type)
+ 	switch (k->type) {
+ 	case KEY_RSA1:
+ 	case KEY_RSA:
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 		if ((k->rsa->d = BN_new()) == NULL)
+ 			pamsshagentauth_fatal("key_new_private: BN_new failed");
+ 		if ((k->rsa->iqmp = BN_new()) == NULL)
+@@ -153,7 +153,7 @@ pamsshagentauth_key_new_private(int type)
+ #endif
+ 		break;
+ 	case KEY_DSA:
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 		if ((k->dsa->priv_key = BN_new()) == NULL)
+ 			pamsshagentauth_fatal("key_new_private: BN_new failed");
+ #else
+@@ -162,7 +162,7 @@ pamsshagentauth_key_new_private(int type)
+ #endif
+ 		break;
+ 	case KEY_ECDSA:
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 		if (EC_KEY_set_private_key(k->ecdsa, BN_new()) != 1)
+ 			pamsshagentauth_fatal("key_new_private: EC_KEY_set_private_key failed");
+ #else
+@@ -224,7 +224,7 @@ pamsshagentauth_key_equal(const Key *a, const Key *b)
+ 	case KEY_RSA1:
+ 	case KEY_RSA:
+ 		return a->rsa != NULL && b->rsa != NULL &&
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 		    BN_cmp(a->rsa->e, b->rsa->e) == 0 &&
+ 		    BN_cmp(a->rsa->n, b->rsa->n) == 0;
+ #else
+@@ -233,7 +233,7 @@ pamsshagentauth_key_equal(const Key *a, const Key *b)
+ #endif
+ 	case KEY_DSA:
+ 		return a->dsa != NULL && b->dsa != NULL &&
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 		    BN_cmp(a->dsa->p, b->dsa->p) == 0 &&
+ 		    BN_cmp(a->dsa->q, b->dsa->q) == 0 &&
+ 		    BN_cmp(a->dsa->g, b->dsa->g) == 0 &&
+@@ -293,7 +293,7 @@ pamsshagentauth_key_fingerprint_raw(const Key *k, enum fp_type dgst_type,
+ 	}
+ 	switch (k->type) {
+ 	case KEY_RSA1:
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 		nlen = BN_num_bytes(k->rsa->n);
+ 		elen = BN_num_bytes(k->rsa->e);
+ 		len = nlen + elen;
+@@ -510,7 +510,7 @@ pamsshagentauth_key_read(Key *ret, char **cpp)
+ 			return -1;
+ 		*cpp = cp;
+ 		/* Get public exponent, public modulus. */
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 		if (!read_bignum(cpp, ret->rsa->e))
+ 			return -1;
+ 		if (!read_bignum(cpp, ret->rsa->n))
+@@ -643,7 +643,7 @@ pamsshagentauth_key_write(const Key *key, FILE *f)
+ 
+ 	if (key->type == KEY_RSA1 && key->rsa != NULL) {
+ 		/* size of modulus 'n' */
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 		bits = BN_num_bits(key->rsa->n);
+ 		fprintf(f, "%u", bits);
+ 		if (write_bignum(f, key->rsa->e) &&
+@@ -742,7 +742,7 @@ pamsshagentauth_key_size(const Key *k)
+ {
+ 	switch (k->type) {
+ 	case KEY_RSA1:
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 	case KEY_RSA:
+ 		return BN_num_bits(k->rsa->n);
+ 	case KEY_DSA:
+@@ -843,7 +843,7 @@ pamsshagentauth_key_from_private(const Key *k)
+ 	switch (k->type) {
+ 	case KEY_DSA:
+ 		n = pamsshagentauth_key_new(k->type);
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 		if ((BN_copy(n->dsa->p, k->dsa->p) == NULL) ||
+ 		    (BN_copy(n->dsa->q, k->dsa->q) == NULL) ||
+ 		    (BN_copy(n->dsa->g, k->dsa->g) == NULL) ||
+@@ -859,7 +859,7 @@ pamsshagentauth_key_from_private(const Key *k)
+ 	case KEY_RSA:
+ 	case KEY_RSA1:
+ 		n = pamsshagentauth_key_new(k->type);
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 		if ((BN_copy(n->rsa->n, k->rsa->n) == NULL) ||
+ 		    (BN_copy(n->rsa->e, k->rsa->e) == NULL))
+ #else
+@@ -967,7 +967,7 @@ pamsshagentauth_key_from_blob(const u_char *blob, u_int blen)
+ 	switch (type) {
+ 	case KEY_RSA:
+ 		key = pamsshagentauth_key_new(type);
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 		if (pamsshagentauth_buffer_get_bignum2_ret(&b, key->rsa->e) == -1 ||
+ 		    pamsshagentauth_buffer_get_bignum2_ret(&b, key->rsa->n) == -1) {
+ #else
+@@ -985,7 +985,7 @@ pamsshagentauth_key_from_blob(const u_char *blob, u_int blen)
+ 		break;
+ 	case KEY_DSA:
+ 		key = pamsshagentauth_key_new(type);
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 		if (pamsshagentauth_buffer_get_bignum2_ret(&b, key->dsa->p) == -1 ||
+ 		    pamsshagentauth_buffer_get_bignum2_ret(&b, key->dsa->q) == -1 ||
+ 		    pamsshagentauth_buffer_get_bignum2_ret(&b, key->dsa->g) == -1 ||
+@@ -1113,7 +1113,7 @@ pamsshagentauth_key_to_blob(const Key *key, u_char **blobp, u_int *lenp)
+ 	}
+ 	pamsshagentauth_buffer_init(&b);
+ 	switch (key->type) {
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 	case KEY_DSA:
+ 		pamsshagentauth_buffer_put_cstring(&b, key_ssh_name(key));
+ 		pamsshagentauth_buffer_put_bignum2(&b, key->dsa->p);
+@@ -1251,7 +1251,7 @@ pamsshagentauth_key_demote(const Key *k)
+ 	case KEY_RSA:
+ 		if ((pk->rsa = RSA_new()) == NULL)
+ 			pamsshagentauth_fatal("key_demote: RSA_new failed");
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 		if ((pk->rsa->e = BN_dup(k->rsa->e)) == NULL)
+ 			pamsshagentauth_fatal("key_demote: BN_dup failed");
+ 		if ((pk->rsa->n = BN_dup(k->rsa->n)) == NULL)
+@@ -1264,7 +1264,7 @@ pamsshagentauth_key_demote(const Key *k)
+ 	case KEY_DSA:
+ 		if ((pk->dsa = DSA_new()) == NULL)
+ 			pamsshagentauth_fatal("key_demote: DSA_new failed");
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 		if ((pk->dsa->p = BN_dup(k->dsa->p)) == NULL)
+ 			pamsshagentauth_fatal("key_demote: BN_dup failed");
+ 		if ((pk->dsa->q = BN_dup(k->dsa->q)) == NULL)
+diff --git a/ssh-dss.c b/ssh-dss.c
+index 1051ae2..9b96274 100644
+--- a/ssh-dss.c
++++ b/ssh-dss.c
+@@ -52,7 +52,7 @@ ssh_dss_sign(const Key *key, u_char **sigp, u_int *lenp,
+ 	u_char digest[EVP_MAX_MD_SIZE], sigblob[SIGBLOB_LEN];
+ 	u_int rlen, slen, len, dlen;
+ 	Buffer b;
+-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
++#if OPENSSL_VERSION_NUMBER >= 0x10100005L
+ 	const BIGNUM *r, *s;
+ #endif
+ 
+@@ -74,7 +74,7 @@ ssh_dss_sign(const Key *key, u_char **sigp, u_int *lenp,
+ 		return -1;
+ 	}
+ 
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 	rlen = BN_num_bytes(sig->r);
+ 	slen = BN_num_bytes(sig->s);
+ #else
+@@ -88,7 +88,7 @@ ssh_dss_sign(const Key *key, u_char **sigp, u_int *lenp,
+ 		return -1;
+ 	}
+ 	memset(sigblob, 0, SIGBLOB_LEN);
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 	BN_bn2bin(sig->r, sigblob+ SIGBLOB_LEN - INTBLOB_LEN - rlen);
+ 	BN_bn2bin(sig->s, sigblob+ SIGBLOB_LEN - slen);
+ #else
+@@ -131,7 +131,7 @@ ssh_dss_verify(const Key *key, const u_char *signature, u_int signaturelen,
+ 	u_int len, dlen;
+ 	int rlen, ret;
+ 	Buffer b;
+-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
++#if OPENSSL_VERSION_NUMBER >= 0x10100005L
+ 	BIGNUM *r, *s;
+ #endif
+ 
+@@ -176,7 +176,7 @@ ssh_dss_verify(const Key *key, const u_char *signature, u_int signaturelen,
+ 	/* parse signature */
+ 	if ((sig = DSA_SIG_new()) == NULL)
+ 		pamsshagentauth_fatal("ssh_dss_verify: DSA_SIG_new failed");
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 	if ((sig->r = BN_new()) == NULL)
+ 		pamsshagentauth_fatal("ssh_dss_verify: BN_new failed");
+ 	if ((sig->s = BN_new()) == NULL)
+diff --git a/ssh-ecdsa.c b/ssh-ecdsa.c
+index c213959..5b13b30 100644
+--- a/ssh-ecdsa.c
++++ b/ssh-ecdsa.c
+@@ -45,7 +45,7 @@ ssh_ecdsa_sign(const Key *key, u_char **sigp, u_int *lenp,
+     u_char digest[EVP_MAX_MD_SIZE];
+     u_int len, dlen;
+     Buffer b, bb;
+-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
++#if OPENSSL_VERSION_NUMBER >= 0x10100005L
+ 	BIGNUM *r, *s;
+ #endif
+ 
+@@ -69,7 +69,7 @@ ssh_ecdsa_sign(const Key *key, u_char **sigp, u_int *lenp,
+     }
+ 
+     pamsshagentauth_buffer_init(&bb);
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+     if (pamsshagentauth_buffer_get_bignum2_ret(&bb, sig->r) == -1 ||
+         pamsshagentauth_buffer_get_bignum2_ret(&bb, sig->s) == -1) {
+ #else
+@@ -110,7 +110,7 @@ ssh_ecdsa_verify(const Key *key, const u_char *signature, u_int signaturelen,
+     u_int len, dlen;
+     int rlen, ret;
+     Buffer b;
+-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
++#if OPENSSL_VERSION_NUMBER >= 0x10100005L
+ 	BIGNUM *r, *s;
+ #endif
+ 
+@@ -141,7 +141,7 @@ ssh_ecdsa_verify(const Key *key, const u_char *signature, u_int signaturelen,
+ 
+     pamsshagentauth_buffer_init(&b);
+     pamsshagentauth_buffer_append(&b, sigblob, len);
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+     if ((pamsshagentauth_buffer_get_bignum2_ret(&b, sig->r) == -1) ||
+         (pamsshagentauth_buffer_get_bignum2_ret(&b, sig->s) == -1))
+ #else
+diff --git a/ssh-rsa.c b/ssh-rsa.c
+index 9d74eb6..35f2e36 100644
+--- a/ssh-rsa.c
++++ b/ssh-rsa.c
+@@ -119,13 +119,13 @@ ssh_rsa_verify(const Key *key, const u_char *signature, u_int signaturelen,
+ 		pamsshagentauth_logerror("ssh_rsa_verify: no RSA key");
+ 		return -1;
+ 	}
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 	if (BN_num_bits(key->rsa->n) < SSH_RSA_MINIMUM_MODULUS_SIZE) {
+ #else
+ 	if (BN_num_bits(RSA_get0_n(key->rsa)) < SSH_RSA_MINIMUM_MODULUS_SIZE) {
+ #endif
+ 		pamsshagentauth_logerror("ssh_rsa_verify: RSA modulus too small: %d < minimum %d bits",
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100005L
+ 		    BN_num_bits(key->rsa->n), SSH_RSA_MINIMUM_MODULUS_SIZE);
+ #else
+ 		    BN_num_bits(RSA_get0_n(key->rsa)), SSH_RSA_MINIMUM_MODULUS_SIZE);

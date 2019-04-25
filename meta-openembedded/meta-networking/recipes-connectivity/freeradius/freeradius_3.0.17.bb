@@ -68,6 +68,7 @@ EXTRA_OECONF = " --enable-strict-dependencies \
 
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam', '', d)} \
                    pcre libcap \
+                   openssl rlm-eap-fast rlm-eap-pwd \
 "
 
 PACKAGECONFIG[krb5] = "--with-rlm_krb5,--without-rlm_krb5,krb5"
@@ -83,6 +84,9 @@ PACKAGECONFIG[perl] = "--with-perl=${STAGING_BINDIR_NATIVE}/perl-native/perl --w
 PACKAGECONFIG[python] = "--with-rlm_python --with-rlm-python-bin=${STAGING_BINDIR_NATIVE}/python-native/python --with-rlm-python-include-dir=${STAGING_INCDIR}/${PYTHON_DIR},--without-rlm_python,python-native python"
 PACKAGECONFIG[rest] = "--with-rlm_rest,--without-rlm_rest,curl json-c"
 PACKAGECONFIG[ruby] = "--with-rlm_ruby,--without-rlm_ruby,ruby"
+PACKAGECONFIG[openssl] = "--with-openssl, --without-openssl"
+PACKAGECONFIG[rlm-eap-fast] = "--with-rlm_eap_fast, --without-rlm_eap_fast"
+PACKAGECONFIG[rlm-eap-pwd] = "--with-rlm_eap_pwd, --without-rlm_eap_pwd"
 
 inherit useradd autotools-brokensep update-rc.d systemd
 

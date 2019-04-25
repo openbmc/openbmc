@@ -1,0 +1,20 @@
+Link atomic library to fix missing undefined referrences
+like "undefined reference to `__atomic_fetch_add_8'"
+
+Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
+
+diff -Naur node-v10.15.1/deps/v8/gypfiles/v8.gyp node-v10.15.1/deps/v8/gypfiles/v8.gyp
+--- node-v10.15.1/deps/v8/gypfiles/v8.gyp	2019-02-13 09:02:21.000000000 +0100
++++ node-v10.15.1/deps/v8/gypfiles/v8.gyp	2019-02-15 21:27:11.755679660 +0100
+@@ -452,6 +452,11 @@
+         '<(DEPTH)',
+         '<(SHARED_INTERMEDIATE_DIR)'
+       ],
++      'link_settings': {
++        'libraries': [
++          '-latomic'
++        ],
++      },
+       'sources': [
+         '<@(inspector_all_sources)',
+         '../include//v8-inspector-protocol.h',

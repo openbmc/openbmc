@@ -14,6 +14,7 @@ SRC_URI = "http://archive.ubuntu.com/ubuntu/pool/main/m/mozjs52/mozjs52_52.9.1.o
            file://disable-mozglue-in-stand-alone-builds.patch \
            file://add-riscv-support.patch \
            file://0001-mozjs-fix-coredump-caused-by-getenv.patch \
+           file://format-overflow.patch \
            file://JS_PUBLIC_API.patch \
            "
 SRC_URI_append_libc-musl = " \
@@ -44,7 +45,7 @@ EXTRA_OECONF = " \
     --host=${BUILD_SYS} \
     --prefix=${prefix} \
     --libdir=${libdir} \
-    --disable-tests \
+    --disable-tests --disable-strip --disable-optimize \
     --with-nspr-libs='-lplds4 -lplc4 -lnspr4' \
     ${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', "--enable-gold", '--disable-gold', d)} \
 "
@@ -52,8 +53,14 @@ EXTRA_OECONF = " \
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'x11', d)}"
 PACKAGECONFIG[x11] = "--x-includes=${STAGING_INCDIR} --x-libraries=${STAGING_LIBDIR},--x-includes=no --x-libraries=no,virtual/libx11"
 
-EXTRA_OEMAKE_task-compile += "OS_LDFLAGS='-Wl,-latomic ${LDFLAGS}'"
+EXTRA_OEMAKE_task-compile += "BUILD_OPT=1 OS_LDFLAGS='-Wl,-latomic ${LDFLAGS}'"
 EXTRA_OEMAKE_task-install += "STATIC_LIBRARY_NAME=js_static"
+
+export HOST_CC = "${BUILD_CC}"
+export HOST_CXX = "${BUILD_CXX}"
+export HOST_CFLAGS = "${BUILD_CFLAGS}"
+export HOST_CPPFLAGS = "${BUILD_CPPFLAGS}"
+export HOST_CXXFLAGS = "${BUILD_CXXFLAGS}"
 
 do_configure() {
     export SHELL="/bin/sh"

@@ -160,6 +160,7 @@ def _is_compress_doc(file, compress_format_list):
     return False, ''
 
 def compress_doc(topdir, compress_mode, compress_cmds):
+    import subprocess
     hardlink_dict = {}
     for root, dirs, files in os.walk(topdir):
         for f in files:
@@ -187,6 +188,7 @@ def compress_doc(topdir, compress_mode, compress_cmds):
 
 # Decompress doc files which format is not compress_mode
 def decompress_doc(topdir, compress_mode, decompress_cmds):
+    import subprocess
     hardlink_dict = {}
     decompress = True
     for root, dirs, files in os.walk(topdir):

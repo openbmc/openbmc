@@ -7,16 +7,17 @@ python __anonymous() {
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-raspberrypi:"
 
-LINUX_VERSION ?= "4.16"
-LINUX_RPI_DEV_BRANCH ?= "rpi-4.16.y"
+LINUX_VERSION ?= "4.19"
+LINUX_RPI_BRANCH ?= "rpi-4.19.y"
 
 SRCREV = "${AUTOREV}"
 SRC_URI = " \
-    git://github.com/raspberrypi/linux.git;protocol=git;branch=${LINUX_RPI_DEV_BRANCH} \
-    file://0001-menuconfig-check-lxdiaglog.sh-Allow-specification-of.patch \
+    git://github.com/raspberrypi/linux.git;protocol=git;branch=${LINUX_RPI_BRANCH} \
     "
 require linux-raspberrypi.inc
 
 # Disable version check so that we don't have to edit this recipe every time
 # upstream bumps the version
 KERNEL_VERSION_SANITY_SKIP = "1"
+
+LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"

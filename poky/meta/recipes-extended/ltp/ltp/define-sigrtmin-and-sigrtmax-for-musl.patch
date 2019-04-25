@@ -1,0 +1,114 @@
+From 34b91edc70709f32b44f6b3a32c8f18db393e36c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20D=C3=ADaz?= <daniel.diaz@linaro.org>
+Date: Wed, 20 Feb 2019 08:07:27 -0600
+Subject: [PATCH] Define __SIGRTMIN and __SIGRTMAX for MUSL
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Some libc implementations might differ in the definitions they
+include. Exempli gratia: MUSL does not define __SIGRTMAX nor
+__SIGRTMIN.
+
+These two tests fail to build because of the missing
+definitions:
+  testcases/kernel/syscalls/ptrace/ptrace05.c
+  testcases/kernel/syscalls/sighold/sighold02.c
+
+Out of precaution, these two also include this header:
+  lib/tst_sig.c
+  testcases/kernel/syscalls/rt_sigsuspend/rt_sigsuspend01.c
+
+Upstream-Status: Submitted [http://lists.linux.it/pipermail/ltp/2019-February/010916.html]
+
+Signed-off-by: Daniel Díaz <daniel.diaz@linaro.org>
+---
+ include/lapi/signal.h                         | 24 +++++++++++++++++++
+ lib/tst_sig.c                                 |  1 +
+ testcases/kernel/syscalls/ptrace/ptrace05.c   |  1 +
+ .../syscalls/rt_sigsuspend/rt_sigsuspend01.c  |  1 +
+ testcases/kernel/syscalls/sighold/sighold02.c |  1 +
+ 5 files changed, 28 insertions(+)
+ create mode 100644 include/lapi/signal.h
+
+diff --git a/include/lapi/signal.h b/include/lapi/signal.h
+new file mode 100644
+index 000000000..d22965a94
+--- /dev/null
++++ b/include/lapi/signal.h
+@@ -0,0 +1,24 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Copyright (c) 2019 Linaro Limited. All rights reserved.
++ * Author: Daniel Díaz <daniel.diaz@linaro.org>
++ */
++
++#ifndef LAPI_SIGNAL_H
++#define LAPI_SIGNAL_H
++
++#include <signal.h>
++
++/*
++ * Some libc implementations might differ in the definitions they include. This
++ * covers those differences for all tests to successfully build.
++ */
++
++#ifndef __SIGRTMIN
++# define __SIGRTMIN 32
++#endif
++#ifndef __SIGRTMAX
++# define __SIGRTMAX (_NSIG - 1)
++#endif
++
++#endif
+diff --git a/lib/tst_sig.c b/lib/tst_sig.c
+index 36565e13d..6d77aeafd 100644
+--- a/lib/tst_sig.c
++++ b/lib/tst_sig.c
+@@ -72,6 +72,7 @@
+ #include <signal.h>
+ #include <unistd.h>
+ #include "test.h"
++#include "lapi/signal.h"
+ 
+ #define MAXMESG 150		/* size of mesg string sent to tst_res */
+ 
+diff --git a/testcases/kernel/syscalls/ptrace/ptrace05.c b/testcases/kernel/syscalls/ptrace/ptrace05.c
+index 420330029..54cfa4d7b 100644
+--- a/testcases/kernel/syscalls/ptrace/ptrace05.c
++++ b/testcases/kernel/syscalls/ptrace/ptrace05.c
+@@ -38,6 +38,7 @@
+ #include "ptrace.h"
+ 
+ #include "test.h"
++#include "lapi/signal.h"
+ 
+ char *TCID = "ptrace05";
+ int TST_TOTAL = 0;
+diff --git a/testcases/kernel/syscalls/rt_sigsuspend/rt_sigsuspend01.c b/testcases/kernel/syscalls/rt_sigsuspend/rt_sigsuspend01.c
+index f17a9aae6..e577cf227 100644
+--- a/testcases/kernel/syscalls/rt_sigsuspend/rt_sigsuspend01.c
++++ b/testcases/kernel/syscalls/rt_sigsuspend/rt_sigsuspend01.c
+@@ -18,6 +18,7 @@
+ #include "tst_test.h"
+ #include "lapi/syscalls.h"
+ #include "lapi/safe_rt_signal.h"
++#include "lapi/signal.h"
+ 
+ static void sig_handler(int sig)
+ {
+diff --git a/testcases/kernel/syscalls/sighold/sighold02.c b/testcases/kernel/syscalls/sighold/sighold02.c
+index d1d4b0b06..b763142df 100644
+--- a/testcases/kernel/syscalls/sighold/sighold02.c
++++ b/testcases/kernel/syscalls/sighold/sighold02.c
+@@ -49,6 +49,7 @@
+ #include <sys/wait.h>
+ #include "test.h"
+ #include "safe_macros.h"
++#include "lapi/signal.h"
+ 
+ /* _XOPEN_SOURCE disables NSIG */
+ #ifndef NSIG
+-- 
+2.17.1
+

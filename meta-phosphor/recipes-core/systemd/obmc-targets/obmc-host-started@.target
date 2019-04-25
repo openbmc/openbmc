@@ -1,6 +1,6 @@
 [Unit]
 Description=Host%i (Started)
-Wants={SYSTEMD_DEFAULT_TARGET}
+Wants=multi-user.target
 After=obmc-host-starting@%i.target
 Conflicts=obmc-host-stop@%i.target
 RefuseManualStart=yes

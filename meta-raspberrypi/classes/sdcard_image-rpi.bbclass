@@ -64,13 +64,6 @@ do_image_rpi_sdimg[recrdeps] = "do_build"
 # SD card image name
 SDIMG = "${IMGDEPLOYDIR}/${IMAGE_NAME}.rootfs.rpi-sdimg"
 
-# Compression method to apply to SDIMG after it has been created. Supported
-# compression formats are "gzip", "bzip2" or "xz". The original .rpi-sdimg file
-# is kept and a new compressed file is created if one of these compression
-# formats is chosen. If SDIMG_COMPRESSION is set to any other value it is
-# silently ignored.
-#SDIMG_COMPRESSION ?= ""
-
 # Additional files and/or directories to be copied into the vfat partition from the IMAGE_ROOTFS.
 FATPAYLOAD ?= ""
 
@@ -177,19 +170,6 @@ IMAGE_CMD_rpi-sdimg () {
     else
         dd if=${SDIMG_ROOTFS} of=${SDIMG} conv=notrunc seek=1 bs=$(expr 1024 \* ${BOOT_SPACE_ALIGNED} + ${IMAGE_ROOTFS_ALIGNMENT} \* 1024)
     fi
-
-    # Optionally apply compression
-    case "${SDIMG_COMPRESSION}" in
-    "gzip")
-        gzip -k9 "${SDIMG}"
-        ;;
-    "bzip2")
-        bzip2 -k9 "${SDIMG}"
-        ;;
-    "xz")
-        xz -k "${SDIMG}"
-        ;;
-    esac
 }
 
 ROOTFS_POSTPROCESS_COMMAND += " rpi_generate_sysctl_config ; "

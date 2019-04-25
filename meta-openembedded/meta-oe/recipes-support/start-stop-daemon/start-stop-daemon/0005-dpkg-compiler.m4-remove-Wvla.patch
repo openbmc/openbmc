@@ -1,0 +1,36 @@
+From 0ad7bba80d5b9035089ff2b2f77a774b5b201915 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 26 Aug 2015 16:28:59 +0300
+Subject: [PATCH 5/5] dpkg-compiler.m4: remove -Wvla
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Remove the -Wvla flag from the set of compiler warning flags, since gcc
+on old host systems such as CentOS 5.8 doesn't support it, and it
+causes a build error for dpkg-native.
+
+Upstream-Status: Pending
+
+Signed-off-by: Donn Seeley <donn.seeley@windriver.com>
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>
+---
+ m4/dpkg-compiler.m4 | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/m4/dpkg-compiler.m4 b/m4/dpkg-compiler.m4
+index 682857c..23ed7d0 100644
+--- a/m4/dpkg-compiler.m4
++++ b/m4/dpkg-compiler.m4
+@@ -52,7 +52,6 @@ AC_DEFUN([DPKG_CHECK_COMPILER_WARNINGS], [
+   DPKG_CHECK_COMPILER_FLAG([-Wlogical-op])
+   DPKG_CHECK_COMPILER_FLAG([-Wlogical-not-parentheses])
+   DPKG_CHECK_COMPILER_FLAG([-Wswitch-bool])
+-  DPKG_CHECK_COMPILER_FLAG([-Wvla])
+   DPKG_CHECK_COMPILER_FLAG([-Winit-self])
+   DPKG_CHECK_COMPILER_FLAG([-Wwrite-strings])
+   DPKG_CHECK_COMPILER_FLAG([-Wcast-align])
+-- 
+2.1.4
+

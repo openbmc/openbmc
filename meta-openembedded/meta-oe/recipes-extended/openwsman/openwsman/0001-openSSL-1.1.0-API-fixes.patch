@@ -1,0 +1,77 @@
+From 634b95157e1823672a2c95fac0cecf079b5967e7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Klaus=20K=C3=A4mpf?= <kkaempf@suse.de>
+Date: Mon, 19 Nov 2018 15:31:27 +0100
+Subject: [PATCH] openSSL 1.1.0 API fixes
+
+---
+ src/server/shttpd/io_ssl.c |  5 +++++
+ src/server/shttpd/shttpd.c | 11 ++++++++++-
+ src/server/shttpd/ssl.h    |  3 +++
+ 3 files changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/src/server/shttpd/io_ssl.c b/src/server/shttpd/io_ssl.c
+index 6de0db2a..ece610ef 100644
+--- a/src/server/shttpd/io_ssl.c
++++ b/src/server/shttpd/io_ssl.c
+@@ -21,8 +21,13 @@ struct ssl_func	ssl_sw[] = {
+ 	{"SSL_set_fd",			{0}},
+ 	{"SSL_new",			{0}},
+ 	{"SSL_CTX_new",			{0}},
++#if OPENSSL_VERSION_NUMBER < 0x10100000L
+ 	{"SSLv23_server_method",	{0}},
+ 	{"SSL_library_init",		{0}},
++#else
++	{"TLS_server_method",	{0}},
++	{"OPENSSL_init_ssl",		{0}},
++#endif
+ 	{"SSL_CTX_use_PrivateKey_file",	{0}},
+ 	{"SSL_CTX_use_certificate_file",{0}},
+ 	{NULL,				{0}}
+diff --git a/src/server/shttpd/shttpd.c b/src/server/shttpd/shttpd.c
+index f0f3fbd8..652aea17 100644
+--- a/src/server/shttpd/shttpd.c
++++ b/src/server/shttpd/shttpd.c
+@@ -1489,9 +1489,14 @@ set_ssl(struct shttpd_ctx *ctx, const char *pem)
+ 		}
+ 
+ 	/* Initialize SSL crap */
+-	SSL_library_init();
+ 
++#if OPENSSL_VERSION_NUMBER < 0x10100000L
++	SSL_library_init();
+ 	if ((CTX = SSL_CTX_new(SSLv23_server_method())) == NULL)
++#else
++        OPENSSL_init_ssl();
++	if ((CTX = SSL_CTX_new(TLS_server_method())) == NULL)
++#endif
+ 		_shttpd_elog(E_LOG, NULL, "SSL_CTX_new error");
+ 	else if (SSL_CTX_use_certificate_file(CTX, wsmand_options_get_ssl_cert_file(), SSL_FILETYPE_PEM) != 1)
+ 		_shttpd_elog(E_LOG, NULL, "cannot open certificate file %s", pem);
+@@ -1552,6 +1557,10 @@ set_ssl(struct shttpd_ctx *ctx, const char *pem)
+           if (rc != 1) {
+             _shttpd_elog(E_LOG, NULL, "Failed to set SSL cipher list \"%s\"", ssl_cipher_list);
+           }
++          else if ((*ssl_cipher_list == 0) || (*ssl_cipher_list == ' ')) {
++            _shttpd_elog(E_LOG, NULL, "Empty 'ssl_cipher_list' defaults to 'TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256'.");
++            _shttpd_elog(E_LOG, NULL, "Check openSSL documentation.");
++          }
+         }
+ 	ctx->ssl_ctx = CTX;
+ 
+diff --git a/src/server/shttpd/ssl.h b/src/server/shttpd/ssl.h
+index 2304b70a..89a73c49 100644
+--- a/src/server/shttpd/ssl.h
++++ b/src/server/shttpd/ssl.h
+@@ -56,6 +56,9 @@ extern struct ssl_func	ssl_sw[];
+ #if OPENSSL_VERSION_NUMBER < 0x10100000L
+ #define	SSLv23_server_method()	(* (SSL_METHOD * (*)(void)) FUNC(9))()
+ #define	SSL_library_init() (* (int (*)(void)) FUNC(10))()
++#else
++#define	TLS_server_method()	(* (SSL_METHOD * (*)(void)) FUNC(9))()
++#define	OPENSSL_init_ssl() (* (int (*)(void)) FUNC(10))()
+ #endif
+ #define	SSL_CTX_use_PrivateKey_file(x,y,z)	(* (int (*)(SSL_CTX *, \
+ 		const char *, int)) FUNC(11))((x), (y), (z))
+-- 
+2.19.1
+

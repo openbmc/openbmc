@@ -41,6 +41,7 @@ LCL_STOP_SERVICES = "-DSERVICE_RunControl=0 -DSERVICE_Breakpoints=0 \
 
 # These features don't compile for several cases.
 #
+CFLAGS_append_arc = " ${LCL_STOP_SERVICES}"
 CFLAGS_append_mips = " ${LCL_STOP_SERVICES}"
 CFLAGS_append_mips64 = " ${LCL_STOP_SERVICES}"
 CFLAGS_append_libc-musl = " ${LCL_STOP_SERVICES}"

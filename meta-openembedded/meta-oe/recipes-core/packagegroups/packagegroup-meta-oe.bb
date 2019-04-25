@@ -136,8 +136,7 @@ RDEPENDS_packagegroup-meta-oe-extended ="\
     libpwquality libqb libuio \
     lockfile-progs logwatch lprng mailx md5deep \
     mozjs mraa nana nicstat \
-    p7zip p8platform libfile-fnmatch-perl polkit \
-    polkit-group-rule-datetime polkit-group-rule-network \
+    p7zip p8platform libfile-fnmatch-perl \
     rarpd redis rrdtool libfastjson librelp rsyslog sanlock \
     sblim-cmpi-devel sblim-sfc-common sblim-sfcc \
     scsirastools sgpio smartmontools snappy can-isotp \
@@ -148,6 +147,8 @@ RDEPENDS_packagegroup-meta-oe-extended ="\
     ${@bb.utils.contains("DISTRO_FEATURES", "bluez", "collectd", "", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "pam-plugin-ccreds pam-plugin-ldapdb", "", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "pam-ssh-agent-auth openwsman sblim-sfcb ", "", d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "polkit", "polkit polkit-group-rule-datetime ", "", d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "polkit", "polkit-group-rule-network ", "", d)} \
     ${@bb.utils.contains("BBPATH", "meta-python", "openlmi-tools", "", d)} \
     "
 RDEPENDS_packagegroup-meta-oe-extended_remove_mipsarch = "upm mraa tiptop"
@@ -225,7 +226,7 @@ RDEPENDS_packagegroup-meta-oe-support ="\
     anthy asio atop augeas avro-c bdwgc frame grail \
     ccid ceres-solver ckermit cpprest ctapi-common daemonize \
     daemontools debsums devmem2 dfu-util dfu-util-native digitemp \
-    dstat eject enca epeg espeak espeak-data fbset fbset-modes \
+    dstat eject enca epeg espeak fbset fbset-modes \
     fftw fltk-native gd gflags glog gnulib gperftools \
     gpm gradm gsl gsoap hddtemp hidapi htop hunspell hwdata iksemel \
     libinih inotify-tools joe lcms lcov libatasmart libbytesize \
@@ -242,7 +243,7 @@ RDEPENDS_packagegroup-meta-oe-support ="\
     sjf2410-linux-native satyr sdparm pty-forward-native serial-forward \
     sg3-utils sharutils smem spitools srecord ssiapi start-stop-daemon stm32flash \
     syslog-ng system-config-keyboard tbb thin-provisioning-tools tokyocabinet \
-    tree udisks udisks2 uhubctl unixodbc upower uriparser usb-modeswitch \
+    tree uhubctl unixodbc uriparser usb-modeswitch \
     usb-modeswitch-data usbpath uthash utouch-evemu utouch-frame \
     vim vim-tiny websocketpp wmiconfig xdelta3 xdg-user-dirs xmlstarlet \
     zbar zile \
@@ -250,6 +251,7 @@ RDEPENDS_packagegroup-meta-oe-support ="\
     ${@bb.utils.contains("DISTRO_FEATURES", "pulseadio bluez4", "libcanberra", "", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11 pam", "xorgxrdp xrdp", "", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "bluez4", "procmail", "", d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "polkit", "udisks udisks2 upower", "", d)} \
     ${NE10} \
     "
 

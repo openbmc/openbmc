@@ -1,4 +1,4 @@
-From 207fc7814bbeb0241382329215d21fd3b57066f9 Mon Sep 17 00:00:00 2001
+From ef5040b4f15006a22ac63a3bacfceac36ffc2045 Mon Sep 17 00:00:00 2001
 From: Gabriel Barbu <gabriel.barbu@enea.com>
 Date: Thu, 25 Jul 2013 15:28:33 +0200
 Subject: [PATCH] strace: Add ptest
@@ -14,10 +14,10 @@ Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
  1 file changed, 19 insertions(+)
 
 diff --git a/tests/Makefile.am b/tests/Makefile.am
-index a2f3950..4fa97e2 100644
+index 825c989..4623c48 100644
 --- a/tests/Makefile.am
 +++ b/tests/Makefile.am
-@@ -34,6 +34,7 @@ SIZEOF_LONG = @SIZEOF_LONG@
+@@ -14,6 +14,7 @@ SIZEOF_LONG = @SIZEOF_LONG@
  MPERS_NAME =
  MPERS_CC_FLAGS =
  ARCH_MFLAGS =
@@ -25,7 +25,7 @@ index a2f3950..4fa97e2 100644
  AM_CFLAGS = $(WARN_CFLAGS)
  AM_CPPFLAGS = $(ARCH_MFLAGS) \
  	      -I$(builddir) \
-@@ -490,3 +491,21 @@ BUILT_SOURCES = ksysent.h
+@@ -477,3 +478,21 @@ BUILT_SOURCES = ksysent.h
  CLEANFILES = ksysent.h
  
  include ../scno.am

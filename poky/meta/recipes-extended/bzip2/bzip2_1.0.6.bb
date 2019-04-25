@@ -29,7 +29,7 @@ CFLAGS_append = " -fPIC -fpic -Winline -fno-strength-reduce -D_FILE_OFFSET_BITS=
 inherit autotools update-alternatives ptest relative_symlinks
 
 ALTERNATIVE_PRIORITY = "100"
-ALTERNATIVE_${PN} = "bunzip2 bzcat"
+ALTERNATIVE_${PN} = "bunzip2 bzcat bzip2"
 
 #install binaries to bzip2-native under sysroot for replacement-native
 EXTRA_OECONF_append_class-native = " --bindir=${STAGING_BINDIR_NATIVE}/${PN}"

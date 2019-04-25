@@ -1,6 +1,6 @@
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
-SRCREV = "428f84e9e656bce71018e8902e4edb8aacafcc0e"
+SRCREV = "90ff34ac0506f0d5440393a4c78565f6aaf9b726"
 PV = "4.0"
 
 SRC_URI = "git://sourceware.org/git/systemtap.git \

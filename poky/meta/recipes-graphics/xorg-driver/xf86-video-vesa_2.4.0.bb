@@ -17,3 +17,7 @@ RRECOMMENDS_${PN} += "xserver-xorg-module-libint10"
 
 SRC_URI[md5sum] = "8134201beaf6f77150c7809c3cc802e6"
 SRC_URI[sha256sum] = "bf443c94d7bf6cd4e248f8a3147f4647be04dc4c80250d9405006263bbdee38c"
+
+SRC_URI += " \
+    file://0001-Refuse-to-run-on-UEFI-machines.patch \
+    "

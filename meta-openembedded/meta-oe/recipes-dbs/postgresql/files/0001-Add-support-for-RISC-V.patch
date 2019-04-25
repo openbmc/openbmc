@@ -1,0 +1,41 @@
+From b06a228a5fd1589fc9bed654b3288b321fc21aa1 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Sun, 20 Nov 2016 15:04:52 +0000
+Subject: [PATCH] Add support for RISC-V.
+
+The architecture is sufficiently similar to aarch64 that simply
+extending the existing aarch64 macro works.
+---
+ src/include/storage/s_lock.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/include/storage/s_lock.h b/src/include/storage/s_lock.h
+index 3fe29ce..7cd578f 100644
+--- a/src/include/storage/s_lock.h
++++ b/src/include/storage/s_lock.h
+@@ -316,11 +316,12 @@ tas(volatile slock_t *lock)
+ 
+ /*
+  * On ARM and ARM64, we use __sync_lock_test_and_set(int *, int) if available.
++ * On RISC-V, the same.
+  *
+  * We use the int-width variant of the builtin because it works on more chips
+  * than other widths.
+  */
+-#if defined(__arm__) || defined(__arm) || defined(__aarch64__) || defined(__aarch64)
++#if defined(__arm__) || defined(__arm) || defined(__aarch64__) || defined(__aarch64) || defined(__riscv)
+ #ifdef HAVE_GCC__SYNC_INT32_TAS
+ #define HAS_TEST_AND_SET
+ 
+@@ -337,7 +338,7 @@ tas(volatile slock_t *lock)
+ #define S_UNLOCK(lock) __sync_lock_release(lock)
+ 
+ #endif	 /* HAVE_GCC__SYNC_INT32_TAS */
+-#endif	 /* __arm__ || __arm || __aarch64__ || __aarch64 */
++#endif	 /* __arm__ || __arm || __aarch64__ || __aarch64 || __riscv */
+ 
+ 
+ /* S/390 and S/390x Linux (32- and 64-bit zSeries) */
+-- 
+2.9.3
+

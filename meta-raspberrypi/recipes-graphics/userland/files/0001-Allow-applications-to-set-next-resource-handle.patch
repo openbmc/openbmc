@@ -1,4 +1,4 @@
-From 08d56c1174e27573ae8df2a7b9e6632afd0bfe86 Mon Sep 17 00:00:00 2001
+From 829dff626d423ad34c8e710cd10d5fc9a4ea80b3 Mon Sep 17 00:00:00 2001
 From: Dom Cobley <dc4@broadcom.com>
 Date: Tue, 9 Jul 2013 09:26:26 -0400
 Subject: [PATCH 01/18] Allow applications to set next resource handle
@@ -204,5 +204,5 @@ index 8a5734c..51b3580 100644
  
  FN(void, eglIntGetColorData_impl, (EGL_SURFACE_ID_T s, KHRN_IMAGE_FORMAT_T format, uint32_t width, uint32_t height, int32_t stride, uint32_t y_offset, void *data))
 -- 
-2.19.1
+2.20.1
 

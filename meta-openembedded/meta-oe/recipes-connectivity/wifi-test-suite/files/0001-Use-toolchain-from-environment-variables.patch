@@ -1,0 +1,92 @@
+From 6b822b36739222d0c864249992b5d28e3ff4d948 Mon Sep 17 00:00:00 2001
+From: Adrian Friedli <adrian.friedli@husqvarnagroup.com>
+Date: Mon, 3 Sep 2018 17:58:27 +0200
+Subject: [PATCH] Use toolchain from environment variables
+
+Upstream-Status: Submitted [https://github.com/Wi-FiTestSuite/Wi-FiTestSuite-Linux-DUT/pull/42]
+Signed-off-by: Adrian Friedli <adrian.friedli@husqvarnagroup.com>
+Signed-off-by: Ankit Navik <ankit.tarot@gmail.com>
+---
+ Makefile.inc         | 7 ++++---
+ WTGService/Makefile  | 2 +-
+ console_src/Makefile | 2 +-
+ lib/Makefile         | 6 +++---
+ 4 files changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/Makefile.inc b/Makefile.inc
+index b0edf5a..0094bdf 100644
+--- a/Makefile.inc
++++ b/Makefile.inc
+@@ -13,14 +13,15 @@
+ # NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE
+ # USE OR PERFORMANCE OF THIS SOFTWARE.
+ #
+-CC = gcc
++CC ?= gcc
++AR ?= ar
+ LIB=lib
+ DUT=dut
+ CA=ca
+ UCC=ucc
+ CON=console_src
+ WTG=WTGService
+-MAKE=make
++MAKE?=make
+ 
+ # This is for WMM-PS
+ #for Ext TG
+@@ -46,7 +47,7 @@ CFLAGS = -g -O2 -D_REENTRANT -Wall -I../inc
+ 
+ DUTLIBS = ../lib/libwfa_dut.a -lpthread
+ CALIBS = ../lib/libwfa_ca.a -lpthread
+-RANLIB = ranlib
++RANLIB ?= ranlib
+ 
+ LIBWFA_NAME_DUT = libwfa_dut.a
+ LIBWFA_NAME_CA = libwfa_ca.a
+diff --git a/WTGService/Makefile b/WTGService/Makefile
+index 5312eb6..4855771 100644
+--- a/WTGService/Makefile
++++ b/WTGService/Makefile
+@@ -13,7 +13,7 @@
+ # NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE
+ # USE OR PERFORMANCE OF THIS SOFTWARE.
+ #
+-CC=gcc
++CC?=gcc
+ CFLAGS= -Wall
+ LIB=-lpthread
+ 
+diff --git a/console_src/Makefile b/console_src/Makefile
+index 8282283..d1098eb 100644
+--- a/console_src/Makefile
++++ b/console_src/Makefile
+@@ -14,7 +14,7 @@
+ # USE OR PERFORMANCE OF THIS SOFTWARE.
+ #
+ 
+-CC	= gcc
++CC	?= gcc
+ CFLAGS	= -g -DWFA_DEBUG -pthread
+ 
+ TARGETS = wfa_con
+diff --git a/lib/Makefile b/lib/Makefile
+index ffcef94..299b8d6 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -17,9 +17,9 @@
+ include ../Makefile.inc
+ 
+ all:    ${LIB_OBJS}
+-		ar crv ${LIBWFA_NAME} $?
+-		ar crv ${LIBWFA_NAME_DUT} ${LIB_OBJS_DUT}
+-		ar crv ${LIBWFA_NAME_CA} ${LIB_OBJS_CA} 
++		$(AR) crv ${LIBWFA_NAME} $?
++		$(AR) crv ${LIBWFA_NAME_DUT} ${LIB_OBJS_DUT}
++		$(AR) crv ${LIBWFA_NAME_CA} ${LIB_OBJS_CA}
+ 		${RANLIB} ${LIBWFA_NAME} ${LIBWFA_NAME_DUT} ${LIBWFA_NAME_CA}
+ 
+ wfa_tg.o: wfa_tg.c ../inc/wfa_agt.h ../inc/wfa_types.h ../inc/wfa_rsp.h ../inc/wfa_tlv.h  ../inc/wfa_tg.h
+-- 
+2.7.4
+

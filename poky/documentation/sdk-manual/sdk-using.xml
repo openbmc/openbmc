@@ -149,7 +149,7 @@
      Poky (Yocto Project Reference Distro) SDK installer version &DISTRO;
      ===============================================================
      Enter target directory for SDK (default: /opt/poky/&DISTRO;):
-     You are about to install the SDK to "/opt/poky/&DISTRO;". Proceed[Y/n]? Y
+     You are about to install the SDK to "/opt/poky/&DISTRO;". Proceed [Y/n]? Y
      Extracting SDK........................................ ..............................done
      Setting it up...done
      SDK has been successfully set up and is ready to be used.

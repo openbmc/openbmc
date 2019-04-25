@@ -16,6 +16,4 @@ SRC_URI[sha256sum] = "673109910e22d4cf94cc8be4dcb9a0c41b5fbdb1736d4b7bdc7778894d
 
 inherit autotools pkgconfig
 
-S = "${WORKDIR}/${PN}-${PV}"
-
 EXTRA_OECONF = ""

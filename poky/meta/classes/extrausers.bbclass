@@ -1,17 +1,16 @@
-# This bbclass is mainly used for image level user/group configuration.
+# This bbclass is used for image level user/group configuration.
 # Inherit this class if you want to make EXTRA_USERS_PARAMS effective.
 
 # Below is an example showing how to use this functionality.
-# INHERIT += "extrausers"
+# IMAGE_CLASSES += "extrausers"
 # EXTRA_USERS_PARAMS = "\
-# useradd -p '' tester; \
-# groupadd developers; \
-# userdel nobody; \
-# groupdel -g video; \
-# groupmod -g 1020 developers; \
-# usermod -s /bin/sh tester; \
+#     useradd -p '' tester; \
+#     groupadd developers; \
+#     userdel nobody; \
+#     groupdel -g video; \
+#     groupmod -g 1020 developers; \
+#     usermod -s /bin/sh tester; \
 # "
-
 
 inherit useradd_base
 

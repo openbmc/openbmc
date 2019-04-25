@@ -4,26 +4,23 @@ Date: Thu, 27 Apr 2017 14:25:42 +0200
 Subject: [PATCH] Disable running gyp on shared deps
 
 ---
- Makefile | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 0a217bd893..e1229ad07f 100644
+index a98772f..f5663e2 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -79,10 +79,9 @@ $(NODE_G_EXE): config.gypi out/Makefile
- 	$(MAKE) -C out BUILDTYPE=Debug V=$(V)
- 	if [ ! -r $@ -o ! -L $@ ]; then ln -fs out/Debug/$(NODE_EXE) $@; fi
+@@ -123,8 +123,8 @@ with-code-cache:
+ test-code-cache: with-code-cache
+ 	$(PYTHON) tools/test.py $(PARALLEL_ARGS) --mode=$(BUILDTYPE_LOWER) code-cache
  
 -out/Makefile: common.gypi deps/uv/uv.gyp deps/http_parser/http_parser.gyp \
 -              deps/zlib/zlib.gyp deps/v8/gypfiles/toolchain.gypi \
--              deps/v8/gypfiles/features.gypi deps/v8/src/v8.gyp node.gyp \
--              config.gypi
 +out/Makefile: common.gypi deps/http_parser/http_parser.gyp \
-+              deps/v8/gypfiles/toolchain.gypi deps/v8/gypfiles/features.gypi \
-+			  deps/v8/src/v8.gyp node.gyp config.gypi
++              deps/v8/gypfiles/toolchain.gypi \
+               deps/v8/gypfiles/features.gypi deps/v8/gypfiles/v8.gyp node.gyp \
+               config.gypi
  	$(PYTHON) tools/gyp_node.py -f make
- 
- config.gypi: configure
 -- 
-2.12.2
+2.19.2

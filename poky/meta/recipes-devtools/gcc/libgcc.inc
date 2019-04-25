@@ -1,6 +1,6 @@
 require libgcc-common.inc
 
-DEPENDS = "virtual/${TARGET_PREFIX}gcc virtual/${TARGET_PREFIX}g++"
+DEPENDS = "virtual/${TARGET_PREFIX}gcc virtual/${TARGET_PREFIX}g++ virtual/${MLPREFIX}libc"
 
 do_install_append_class-target () {
 	if [ "${TCLIBC}" != "glibc" ]; then
@@ -8,6 +8,13 @@ do_install_append_class-target () {
 			"linux-musl" | "linux-*spe") extra_target_os="linux";;
 			"linux-musleabi") extra_target_os="linux-gnueabi";;
 			*) extra_target_os="linux";;
+		esac
+		ln -s ${TARGET_SYS} ${D}${libdir}/${TARGET_ARCH}${TARGET_VENDOR}-$extra_target_os
+	fi
+	if [ -n "${@ bb.utils.contains('TUNE_CCARGS_MFLOAT', 'hard', 'hf', '', d)}" ]; then
+		case "${TARGET_OS}" in
+			"linux-musleabi") extra_target_os="linux-musleabihf";;
+			"linux-gnueabi") extra_target_os="linux-gnueabihf";;
 		esac
 		ln -s ${TARGET_SYS} ${D}${libdir}/${TARGET_ARCH}${TARGET_VENDOR}-$extra_target_os
 	fi

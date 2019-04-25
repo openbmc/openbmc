@@ -178,7 +178,7 @@ class MethodNode(AstNode):
             funcname = ("__anon_%s_%s" % (self.lineno, self.filename.translate(MethodNode.tr_tbl)))
             self.python = True
             text = "def %s(d):\n" % (funcname) + text
-            bb.methodpool.insert_method(funcname, text, self.filename, self.lineno - len(self.body))
+            bb.methodpool.insert_method(funcname, text, self.filename, self.lineno - len(self.body) - 1)
             anonfuncs = data.getVar('__BBANONFUNCS', False) or []
             anonfuncs.append(funcname)
             data.setVar('__BBANONFUNCS', anonfuncs)

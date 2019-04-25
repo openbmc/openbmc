@@ -4,16 +4,9 @@ from oeqa.utils.decorators import testcase
 from oeqa.utils.ftools import write_file
 from oeqa.core.decorator.oeid import OETestID
 
+import oe.recipeutils
+
 class Distrodata(OESelftestTestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        super(Distrodata, cls).setUpClass()
-        feature = 'INHERIT += "distrodata"\n'
-        feature += 'LICENSE_FLAGS_WHITELIST += " commercial"\n'
-
-        cls.write_config(cls, feature)
-        bitbake('-c checkpkg world')
 
     @OETestID(1902)
     def test_checkpkg(self):
@@ -23,9 +16,13 @@ class Distrodata(OESelftestTestCase):
         Product:     oe-core
         Author:      Alexander Kanavin <alex.kanavin@gmail.com>
         """
-        checkpkg_result = open(os.path.join(get_bb_var("LOG_DIR"), "checkpkg.csv")).readlines()[1:]
-        regressed_failures = [pkg_data[0] for pkg_data in [pkg_line.split('\t') for pkg_line in checkpkg_result] if pkg_data[11] == 'UNKNOWN_BROKEN']
-        regressed_successes = [pkg_data[0] for pkg_data in [pkg_line.split('\t') for pkg_line in checkpkg_result] if pkg_data[11] == 'KNOWN_BROKEN']
+        feature = 'LICENSE_FLAGS_WHITELIST += " commercial"\n'
+        self.write_config(feature)
+
+        pkgs = oe.recipeutils.get_recipe_upgrade_status()
+
+        regressed_failures = [pkg[0] for pkg in pkgs if pkg[1] == 'UNKNOWN_BROKEN']
+        regressed_successes = [pkg[0] for pkg in pkgs if pkg[1] == 'KNOWN_BROKEN']
         msg = ""
         if len(regressed_failures) > 0:
             msg = msg + """
@@ -55,45 +52,36 @@ but their recipes claim otherwise by setting UPSTREAM_VERSION_UNKNOWN. Please re
                      return True
             return False
 
-        def is_in_oe_core(recipe, recipes):
-            self.assertTrue(recipe in recipes.keys(), "Recipe %s was not in 'bitbake-layers show-recipes' output" %(recipe))
-            self.assertTrue(len(recipes[recipe]) > 0, "'bitbake-layers show-recipes' could not determine what layer(s) a recipe %s is in" %(recipe))
-            try:
-                recipes[recipe].index('meta')
-                return True
-            except ValueError:
-                return False
+        feature = 'require conf/distro/include/maintainers.inc\n'
+        self.write_config(feature)
 
-        def get_recipe_layers():
-            import re
+        with bb.tinfoil.Tinfoil() as tinfoil:
+            tinfoil.prepare(config_only=False)
 
-            recipes = {}
-            recipe_regex = re.compile('^(?P<name>.*):$')
-            layer_regex = re.compile('^  (?P<name>\S*) +')
-            output = runCmd('bitbake-layers show-recipes').output
-            for line in output.split('\n'):
-                recipe_name_obj = recipe_regex.search(line)
-                if recipe_name_obj:
-                    recipe_name = recipe_name_obj.group('name')
-                    recipes[recipe_name] = []
-                recipe_layer_obj = layer_regex.search(line)
-                if recipe_layer_obj:
-                    layer_name = recipe_layer_obj.group('name')
-                    recipes[recipe_name].append(layer_name)
-            return recipes
+            with_maintainer_list = []
+            no_maintainer_list = []
+            # We could have used all_recipes() here, but this method will find
+            # every recipe if we ever move to setting RECIPE_MAINTAINER in recipe files
+            # instead of maintainers.inc
+            for fn in tinfoil.all_recipe_files(variants=False):
+                if not '/meta/recipes-' in fn:
+                    # We are only interested in OE-Core
+                    continue
+                rd = tinfoil.parse_recipe_file(fn, appends=False)
+                pn = rd.getVar('PN')
+                if is_exception(pn):
+                    continue
+                if rd.getVar('RECIPE_MAINTAINER'):
+                    with_maintainer_list.append((pn, fn))
+                else:
+                    no_maintainer_list.append((pn, fn))
 
-        checkpkg_result = open(os.path.join(get_bb_var("LOG_DIR"), "checkpkg.csv")).readlines()[1:]
-        recipes_layers = get_recipe_layers()
-        no_maintainer_list = [pkg_data[0] for pkg_data in [pkg_line.split('\t') for pkg_line in checkpkg_result] \
-            if pkg_data[14] == '' and is_in_oe_core(pkg_data[0], recipes_layers) and not is_exception(pkg_data[0])]
-        msg = """
-The following packages do not have a maintainer assigned to them. Please add an entry to meta/conf/distro/include/maintainers.inc file.
-""" + "\n".join(no_maintainer_list)
-        self.assertTrue(len(no_maintainer_list) == 0, msg)
+        if no_maintainer_list:
+            self.fail("""
+The following recipes do not have a maintainer assigned to them. Please add an entry to meta/conf/distro/include/maintainers.inc file.
+""" + "\n".join(['%s (%s)' % i for i in no_maintainer_list]))
 
-        with_maintainer_list = [pkg_data[0] for pkg_data in [pkg_line.split('\t') for pkg_line in checkpkg_result] \
-            if pkg_data[14] != '' and is_in_oe_core(pkg_data[0], recipes_layers) and not is_exception(pkg_data[0])]
-        msg = """
-The list of oe-core packages with maintainers is empty. This may indicate that the test has regressed and needs fixing.
-"""
-        self.assertTrue(len(with_maintainer_list) > 0, msg)
+        if not with_maintainer_list:
+            self.fail("""
+The list of oe-core recipes with maintainers is empty. This may indicate that the test has regressed and needs fixing.
+""")

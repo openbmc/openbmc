@@ -224,9 +224,11 @@ copy_initramfs() {
 				break
 				;;
 			esac
+			break
 		fi
 	done
-	echo "Finished copy of initramfs into ./usr"
+	# Verify that the above loop found a initramfs, fail otherwise
+	[ -f ${B}/usr/${INITRAMFS_IMAGE_NAME}.cpio ] && echo "Finished copy of initramfs into ./usr" || die "Could not find any ${DEPLOY_DIR_IMAGE}/${INITRAMFS_IMAGE_NAME}.cpio{.gz|.lz4|.lzo|.lzma|.xz) for bundling; INITRAMFS_IMAGE_NAME might be wrong."
 }
 
 do_bundle_initramfs () {
@@ -485,6 +487,15 @@ do_shared_workdir () {
 		mkdir -p $kerneldir/arch/${ARCH}/include/generated/
 		cp -fR arch/${ARCH}/include/generated/* $kerneldir/arch/${ARCH}/include/generated/
 	fi
+
+	if (grep -q -i -e '^CONFIG_UNWINDER_ORC=y$' $kerneldir/.config); then
+		# With CONFIG_UNWINDER_ORC (the default in 4.14), objtool is required for
+		# out-of-tree modules to be able to generate object files.
+		if [ -x tools/objtool/objtool ]; then
+			mkdir -p ${kerneldir}/tools/objtool
+			cp tools/objtool/objtool ${kerneldir}/tools/objtool/
+		fi
+	fi
 }
 
 # We don't need to stage anything, not the modules/firmware since those would clash with linux-firmware
@@ -578,7 +589,7 @@ pkg_postinst_${KERNEL_PACKAGE_NAME}-base () {
 PACKAGESPLITFUNCS_prepend = "split_kernel_packages "
 
 python split_kernel_packages () {
-    do_split_packages(d, root='${nonarch_base_libdir}/firmware', file_regex='^(.*)\.(bin|fw|cis|csp|dsp)$', output_pattern='${KERNEL_PACKAGE_NAME}-firmware-%s', description='Firmware for %s', recursive=True, extra_depends='')
+    do_split_packages(d, root='${nonarch_base_libdir}/firmware', file_regex=r'^(.*)\.(bin|fw|cis|csp|dsp)$', output_pattern='${KERNEL_PACKAGE_NAME}-firmware-%s', description='Firmware for %s', recursive=True, extra_depends='')
 }
 
 # Many scripts want to look in arch/$arch/boot for the bootable

@@ -19,6 +19,7 @@ SRC_URI = "http://freedesktop.org/software/pulseaudio/webrtc-audio-processing/${
            file://0004-typedefs.h-add-support-for-64-bit-and-big-endian-MIP.patch \
            file://0005-typedefs.h-add-support-for-PowerPC.patch \
            file://0006-common_audio-implement-endianness-conversion-in-wav-.patch \
+           file://riscv_support.patch \
 "
 
 SRC_URI[md5sum] = "336ae032f608e65808ac577cde0ab72c"

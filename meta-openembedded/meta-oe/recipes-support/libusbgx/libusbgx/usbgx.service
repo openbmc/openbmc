@@ -1,0 +1,9 @@
+[Unit]
+Description=Load USB gadget schemas
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/gadget-start
+
+[Install]
+WantedBy=multi-user.target

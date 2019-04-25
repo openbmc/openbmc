@@ -1,0 +1,10 @@
+prefix=/usr
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: libdvbcsa
+Description:  is a free implementation of the DVB Common Scrambling Algorithm - DVB/CSA - with encryption and decryption capabilities.
+Version: 1.1.0
+Requires:
+Libs: -L${libdir} -ldvbcsa
+

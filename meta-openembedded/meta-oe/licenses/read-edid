@@ -1,0 +1,17 @@
+
+ * This is an unofficial license. Let's call it BSD-like, with these terms:
+ *   * You are free to use this software for any purpose. I cannot guarantee
+ *     anything about this software or its fitness for any purpose. I will
+ *     offer support for this software as long as I am capable of doing so,
+ *     but this should not be interpreted as a support contract of any kind.
+ *
+ *   * You are free to modify, distribute, etc. this code under the strict
+ *     condition that you email me, Matthew Kern <pyrophobicman@gmail.com>, a
+ *     brief message on what you're doing. Nothing will be rejected, this is
+ *     simply to keep tabs on my work, and maybe we can share ideas on EDIDs.
+ *
+ *   * (C)opyright 2008-2014 Matthew Kern
+ *
+ *   Please see AUTHORS for a list of the people who made this software
+ *   possible. All of the current code is a rewrite of my own work, but
+ *   I am still indebted to those guys for a ton of the ideas.

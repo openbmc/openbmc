@@ -10,16 +10,12 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
 
 DEPENDS = "libpng jpeg udev"
 
-PV = "2017.07+${SRCPV}"
+PV = "20190205+${SRCPV}"
 
 COMPATIBLE_HOST_rpi  = "${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', '.*-linux*', 'null', d)}"
 
-SRC_URI = "git://github.com/glmark2/glmark2.git;protocol=https \
-           file://build-Check-packages-to-be-used-by-the-enabled-flavo.patch \
-           file://Fix-configure-for-sqrt-check.patch \
-           file://0001-Fix-clang-warnings.patch \
-           "
-SRCREV = "ed20c633f1926d1dd78e3e89043c85a81302cbe6"
+SRC_URI = "git://github.com/glmark2/glmark2.git;protocol=https"
+SRCREV = "0c90dd48df43a6b0db1d9aabca6298240f4968f7"
 
 S = "${WORKDIR}/git"
 
@@ -30,9 +26,6 @@ REQUIRED_DISTRO_FEATURES += "opengl"
 PACKAGECONFIG ?= "${@bb.utils.contains('DISTRO_FEATURES', 'x11 opengl', 'x11-gl x11-gles2', '', d)} \
                   ${@bb.utils.contains('DISTRO_FEATURES', 'wayland opengl', 'wayland-gl wayland-gles2', '', d)} \
                   drm-gl drm-gles2"
-
-# Enable C++11 features
-CXXFLAGS += "-std=c++11"
 
 PACKAGECONFIG[x11-gl] = ",,virtual/libgl virtual/libx11"
 PACKAGECONFIG[x11-gles2] = ",,virtual/libgles2 virtual/libx11"

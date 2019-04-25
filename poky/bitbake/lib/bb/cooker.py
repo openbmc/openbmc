@@ -1216,8 +1216,8 @@ class BBCooker:
                     continue
                 elif regex == "":
                     parselog.debug(1, "BBFILE_PATTERN_%s is empty" % c)
+                    cre = re.compile('^NULL$')
                     errors = False
-                    continue
                 else:
                     try:
                         cre = re.compile(regex)
@@ -1890,35 +1890,6 @@ class ParsingFailure(Exception):
         self.recipe = recipe
         Exception.__init__(self, realexception, recipe)
 
-class Feeder(multiprocessing.Process):
-    def __init__(self, jobs, to_parsers, quit):
-        self.quit = quit
-        self.jobs = jobs
-        self.to_parsers = to_parsers
-        multiprocessing.Process.__init__(self)
-
-    def run(self):
-        while True:
-            try:
-                quit = self.quit.get_nowait()
-            except queue.Empty:
-                pass
-            else:
-                if quit == 'cancel':
-                    self.to_parsers.cancel_join_thread()
-                break
-
-            try:
-                job = self.jobs.pop()
-            except IndexError:
-                break
-
-            try:
-                self.to_parsers.put(job, timeout=0.5)
-            except queue.Full:
-                self.jobs.insert(0, job)
-                continue
-
 class Parser(multiprocessing.Process):
     def __init__(self, jobs, results, quit, init, profile):
         self.jobs = jobs
@@ -1965,11 +1936,8 @@ class Parser(multiprocessing.Process):
                 result = pending.pop()
             else:
                 try:
-                    job = self.jobs.get(timeout=0.25)
-                except queue.Empty:
-                    continue
-
-                if job is None:
+                    job = self.jobs.pop()
+                except IndexError:
                     break
                 result = self.parse(*job)
 
@@ -2053,14 +2021,15 @@ class CookerParser(object):
                 multiprocessing.util.Finalize(None, bb.codeparser.parser_cache_save, exitpriority=1)
                 multiprocessing.util.Finalize(None, bb.fetch.fetcher_parse_save, exitpriority=1)
 
-            self.feeder_quit = multiprocessing.Queue(maxsize=1)
             self.parser_quit = multiprocessing.Queue(maxsize=self.num_processes)
-            self.jobs = multiprocessing.Queue(maxsize=self.num_processes)
             self.result_queue = multiprocessing.Queue()
-            self.feeder = Feeder(self.willparse, self.jobs, self.feeder_quit)
-            self.feeder.start()
+
+            def chunkify(lst,n):
+                return [lst[i::n] for i in range(n)]
+            self.jobs = chunkify(self.willparse, self.num_processes)
+
             for i in range(0, self.num_processes):
-                parser = Parser(self.jobs, self.result_queue, self.parser_quit, init, self.cooker.configuration.profile)
+                parser = Parser(self.jobs[i], self.result_queue, self.parser_quit, init, self.cooker.configuration.profile)
                 parser.start()
                 self.process_names.append(parser.name)
                 self.processes.append(parser)
@@ -2081,17 +2050,12 @@ class CookerParser(object):
                                             self.total)
 
             bb.event.fire(event, self.cfgdata)
-            self.feeder_quit.put(None)
             for process in self.processes:
                 self.parser_quit.put(None)
         else:
-            self.feeder_quit.put('cancel')
-
             self.parser_quit.cancel_join_thread()
             for process in self.processes:
                 self.parser_quit.put(None)
-
-            self.jobs.cancel_join_thread()
 
         for process in self.processes:
             if force:
@@ -2099,7 +2063,6 @@ class CookerParser(object):
                 process.terminate()
             else:
                 process.join()
-        self.feeder.join()
 
         sync = threading.Thread(target=self.bb_cache.sync)
         sync.start()

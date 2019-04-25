@@ -2,7 +2,7 @@
 # cpan-base providers various perl related information needed for building
 # cpan modules
 #
-FILES_${PN} += "${libdir}/perl ${datadir}/perl"
+FILES_${PN} += "${libdir}/perl5 ${datadir}/perl5"
 
 DEPENDS  += "${@["perl", "perl-native"][(bb.data.inherits_class('native', d))]}"
 RDEPENDS_${PN} += "${@["perl", ""][(bb.data.inherits_class('native', d))]}"
@@ -14,5 +14,5 @@ def is_target(d):
         return "yes"
     return "no"
 
-PERLLIBDIRS = "${libdir}/perl"
-PERLLIBDIRS_class-native = "${libdir}/perl-native"
+PERLLIBDIRS = "${libdir}/perl5"
+PERLLIBDIRS_class-native = "${libdir}/perl5"

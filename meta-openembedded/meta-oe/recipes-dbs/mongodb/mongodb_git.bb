@@ -1,6 +1,6 @@
 SUMMARY = "mongodb"
-LICENSE = "AGPL-3.0 & Apache-2.0 & Zlib"
-LIC_FILES_CHKSUM = "file://GNU-AGPL-3.0.txt;md5=73f1eb20517c55bf9493b7dd6e480788 \
+LICENSE = "SSPL-1 & Apache-2.0 & Zlib"
+LIC_FILES_CHKSUM = "file://LICENSE-Community.txt;md5=3a865f27f11f43ecbe542d9ea387dcf1 \
                     file://APACHE-2.0.txt;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
 DEPENDS = "openssl libpcre libpcap zlib boost curl python \
@@ -10,9 +10,9 @@ DEPENDS = "openssl libpcre libpcap zlib boost curl python \
 
 inherit scons dos2unix siteinfo pythonnative
 
-PV = "4.0.1+git${SRCPV}"
-#v4.0.1
-SRCREV = "54f1582fc6eb01de4d4c42f26fc133e623f065fb"
+PV = "4.0.6+git${SRCPV}"
+#v4.0.6
+SRCREV = "caa42a1f75a56c7643d0b68d3880444375ec42e3"
 SRC_URI = "git://github.com/mongodb/mongo.git;branch=v4.0 \
            file://0001-Tell-scons-to-use-build-settings-from-environment-va.patch \
            file://0001-Use-long-long-instead-of-int64_t.patch \
@@ -20,8 +20,8 @@ SRC_URI = "git://github.com/mongodb/mongo.git;branch=v4.0 \
            file://0002-Add-a-definition-for-the-macro-__ELF_NATIVE_CLASS.patch \
            file://arm64-support.patch \
            file://0001-IntelRDFPMathLib20U1-Check-for-__DEFINED_wchar_t.patch \
-           file://disable-hw-crc32-on-arm64-s390x.patch \
            file://0001-Support-deprecated-resolver-functions.patch \
+           file://0001-asio-Dont-use-experimental-with-clang.patch \
            "
 SRC_URI_append_libc-musl ="\
            file://0002-Fix-default-stack-size-to-256K.patch \

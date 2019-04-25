@@ -7,25 +7,23 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=12713b4d9386533feeb07d6e4831765a \
 
 DEPENDS += "util-linux libaio"
 
-SRC_URI = "ftp://sources.redhat.com/pub/lvm2/old/LVM2.${PV}.tgz \
+SRC_URI = "ftp://sources.redhat.com/pub/lvm2/releases/LVM2.${PV}.tgz \
            file://lvm.conf \
            file://0001-implement-libc-specific-reopen_stream.patch \
            file://0002-Guard-use-of-mallinfo-with-__GLIBC__.patch \
-           file://0003-include-fcntl.h-for-O_-defines-and-fcntl-signature.patch \
            file://0004-tweak-MODPROBE_CMD-for-cross-compile.patch \
            file://0001-Avoid-bashisms-in-init-scripts.patch \
            file://0005-do-not-build-manual.patch \
            file://0006-start-lvm2-monitor.service-after-tmp.mount.patch \
            "
-
-UPSTREAM_CHECK_URI = "ftp://sources.redhat.com/pub/lvm2/"
-UPSTREAM_CHECK_REGEX = "LVM2\.(?P<pver>\d+(\.\d+)+)"
+SRC_URI[md5sum] = "5fc07da5461a3794a751dcfc355827d5"
+SRC_URI[sha256sum] = "550ba750239fd75b7e52c9877565cabffef506bbf6d7f6f17b9700dee56c720f"
 
 S = "${WORKDIR}/LVM2.${PV}"
 
 inherit autotools-brokensep pkgconfig systemd license
 
-LVM2_PACKAGECONFIG = "dmeventd lvmetad"
+LVM2_PACKAGECONFIG = "dmeventd"
 LVM2_PACKAGECONFIG_append_class-target = " \
     ${@bb.utils.filter('DISTRO_FEATURES', 'selinux', d)} \
     ${@incompatible_license_contains('GPLv3', '', 'thin-provisioning-tools', d)} \
@@ -39,7 +37,6 @@ LVM2_PACKAGECONFIG_append_class-target = " \
 PACKAGECONFIG ??= "odirect ${LVM2_PACKAGECONFIG}"
 
 PACKAGECONFIG[dmeventd] = "--enable-dmeventd,--disable-dmeventd"
-PACKAGECONFIG[lvmetad] = "--enable-lvmetad,--disable-lvmetad"
 PACKAGECONFIG[odirect] = "--enable-o_direct,--disable-o_direct"
 PACKAGECONFIG[readline] = "--enable-readline,--disable-readline,readline"
 PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux,libselinux"
@@ -50,7 +47,6 @@ PACKAGECONFIG[udev] = "--enable-udev_sync --enable-udev_rules --with-udevdir=${n
 EXTRA_OECONF = "--with-user= \
                 --with-group= \
                 --enable-realtime \
-                --enable-applib \
                 --enable-cmdlib \
                 --enable-pkgconfig \
                 --with-usrlibdir=${libdir} \

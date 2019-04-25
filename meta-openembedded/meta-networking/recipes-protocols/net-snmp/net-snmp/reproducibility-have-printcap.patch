@@ -1,0 +1,19 @@
+Reproducible build: Don't check for /etc/printcap on the build machine when
+cross-compiling. Use AC_CHECK_FILE to set the cached variable
+ac_cv_file__etc_printcap instead. When cross-compiling, this variable should be
+set in the environment to "yes" or "no" as appropriate for the target platform.
+
+--- net-snmp-5.8.original/configure.d/config_os_misc4	2018-11-20 17:05:03.986274522 +1300
++++ net-snmp-5.8/configure.d/config_os_misc4	2018-11-20 17:08:32.250700448 +1300
+@@ -116,9 +116,9 @@
+ 	[Path to the lpstat command])
+     AC_DEFINE(HAVE_LPSTAT, 1, [Set if the lpstat command is available])
+ fi
+-if test -r /etc/printcap; then
++AC_CHECK_FILE([/etc/printcap],
+     AC_DEFINE(HAVE_PRINTCAP, 1, [Set if /etc/printcap exists])
+-fi
++)
+ 
+ 
+ #       Check ps args

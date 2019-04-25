@@ -1,0 +1,18 @@
+# 2014-04-18 Antti Palosaari <crope@iki.fi>
+# generated from http://www.digita.fi/kuluttajat/tv/nakyvyysalueet/kanavanumerot_ja_taajuudet
+
+[Nilsia_Pisa]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 498000000
+	BANDWIDTH_HZ = 8000000
+
+[Nilsia_Pisa]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 594000000
+	BANDWIDTH_HZ = 8000000
+
+[Nilsia_Pisa]
+	DELIVERY_SYSTEM = DVBT
+	FREQUENCY = 618000000
+	BANDWIDTH_HZ = 8000000
+

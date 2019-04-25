@@ -1,0 +1,49 @@
+From 0d0155c4dd6c0b3305ea2ab0e10b0f84d024a6e1 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 6 Nov 2018 13:54:43 +0100
+Subject: [PATCH] Add WITH_TESTS option
+
+This makes a dependency on cppunit optional.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+---
+ CMakeLists.txt               | 3 +++
+ python/hawkey/CMakeLists.txt | 2 ++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index b73a03d7..a9e0200f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -36,6 +36,7 @@ OPTION(WITH_MAN "Enables hawkey man page generation" ON)
+ OPTION(WITH_HTML "Enables hawkey HTML generation" ON)
+ 
+ OPTION(WITH_BINDINGS "Enables python/SWIG bindings" ON)
++OPTION(WITH_TESTS "Enables unit tests" ON)
+ 
+ OPTION (ENABLE_SOLV_URPMREORDER "Build with support for URPM-like solution reordering?" OFF)
+ option (ENABLE_RHSM_SUPPORT "Build with Red Hat Subscription Manager support?" OFF)
+@@ -122,8 +123,10 @@ IF (WITH_BINDINGS)
+ # ADD_SUBDIRECTORY (bindings/perl)
+ ADD_SUBDIRECTORY (bindings/python)
+ ENDIF()
++IF (WITH_TESTS)
+ ENABLE_TESTING()
+ ADD_SUBDIRECTORY (tests)
++ENDIF()
+ IF (WITH_BINDINGS)
+ ADD_SUBDIRECTORY (python/hawkey)
+ ADD_SUBDIRECTORY (docs/hawkey)
+diff --git a/python/hawkey/CMakeLists.txt b/python/hawkey/CMakeLists.txt
+index 3c0b3c0c..31466ed9 100644
+--- a/python/hawkey/CMakeLists.txt
++++ b/python/hawkey/CMakeLists.txt
+@@ -49,4 +49,6 @@ TARGET_LINK_LIBRARIES(_hawkeymodule ${PYTHON_LIBRARY})
+ INSTALL(FILES __init__.py DESTINATION ${PYTHON_INSTALL_DIR}/hawkey)
+ INSTALL(TARGETS _hawkeymodule LIBRARY DESTINATION ${PYTHON_INSTALL_DIR}/hawkey)
+ 
++IF (WITH_TESTS)
+ ADD_SUBDIRECTORY(tests)
++ENDIF()

@@ -1,0 +1,48 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides: firewalld
+# Required-Start: $syslog $local_fs messagebus
+# Required-Stop: 
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: 
+# Description: 
+### END INIT INFO
+
+. /etc/init.d/functions
+
+firewalld=/usr/sbin/firewalld
+pidfile=/var/run/firewalld.pid
+
+case "$1" in
+    start)
+        echo -n "Starting firewalld: "
+        start-stop-daemon --start --quiet --exec $firewalld
+        echo "."
+        ;;
+    stop)
+        echo -n "Stopping firewalld: "
+        start-stop-daemon --stop --quiet --pidfile $pidfile
+        echo "."
+        ;;
+    restart)
+        echo -n "Stopping firewalld: "
+        start-stop-daemon --stop --quiet --pidfile $pidfile
+        echo "."
+        echo -n "Starting firewalld: "
+        start-stop-daemon --start --quiet --exec $firewalld
+        echo "."
+        ;;
+    reload)
+        echo -n "Reloading firewalld: "
+        firewall-cmd --reload
+        echo "."
+        ;;
+    status)
+        firewall-cmd --state
+        ;;
+    *)
+        echo "Usage: /etc/init.d/firewalld {start|stop|restart|reload|status}" >&2
+        exit 1
+esac

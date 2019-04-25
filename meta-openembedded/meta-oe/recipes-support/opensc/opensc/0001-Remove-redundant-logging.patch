@@ -1,0 +1,34 @@
+From c012f46965b3fe24e31367796e52c2d0b14ca5d9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 17 Dec 2018 18:44:23 -0800
+Subject: [PATCH] Remove redundant logging
+
+Same information is printed a few line below in same function, the only
+difference is that there it takes care of case when label is NULL pointer
+unlike this line
+
+secondly, every function call to cosm_write_tokeninfo() in this file
+passes label=NULL, and then it tries to print a null pointer
+
+Fixes errors like
+src/libopensc/log.h:48:47: error: '%s' directive argument is null
+[-Werror=format-overflow=]
+
+Upstream-Status: Submitted [https://github.com/OpenSC/OpenSC/pull/1557]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/pkcs15init/pkcs15-oberthur.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+Index: git/src/pkcs15init/pkcs15-oberthur.c
+===================================================================
+--- git.orig/src/pkcs15init/pkcs15-oberthur.c
++++ git/src/pkcs15init/pkcs15-oberthur.c
+@@ -70,7 +70,6 @@ cosm_write_tokeninfo (struct sc_pkcs15_c
+ 	ctx = p15card->card->ctx;
+ 
+ 	SC_FUNC_CALLED(ctx, SC_LOG_DEBUG_VERBOSE);
+-	sc_debug(ctx, SC_LOG_DEBUG_NORMAL, "cosm_write_tokeninfo() label '%s'; flags 0x%X", label, flags);
+ 	if (sc_profile_get_file(profile, COSM_TITLE"-token-info", &file)) {
+ 		rv = SC_ERROR_INCONSISTENT_PROFILE;
+ 		SC_TEST_GOTO_ERR(ctx, SC_LOG_DEBUG_NORMAL, rv, "Cannot find "COSM_TITLE"-token-info");

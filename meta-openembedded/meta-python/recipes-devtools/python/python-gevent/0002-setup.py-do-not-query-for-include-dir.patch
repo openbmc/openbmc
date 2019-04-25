@@ -1,0 +1,26 @@
+From a53ed6b2f967a5f95e69d51cad3f8c120d7df65b Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 7 Feb 2019 15:21:15 +0100
+Subject: [PATCH] setup.py: do not query for include dir
+
+As this will return the native python directory erroneously.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ setup.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 86d6c5a..5d22291 100755
+--- a/setup.py
++++ b/setup.py
+@@ -52,7 +52,7 @@ from _setupares import ARES
+ # Get access to the greenlet header file.
+ # The sysconfig dir is not enough if we're in a virtualenv
+ # See https://github.com/pypa/pip/issues/4610
+-include_dirs = [sysconfig.get_path("include")]
++include_dirs = []
+ venv_include_dir = os.path.join(sys.prefix, 'include', 'site',
+                                 'python' + sysconfig.get_python_version())
+ venv_include_dir = os.path.abspath(venv_include_dir)

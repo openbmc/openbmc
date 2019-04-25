@@ -1,0 +1,38 @@
+From 8bb183926078b6dd54048fb6820838fe7b6e6163 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Sun, 23 Oct 2016 22:46:43 +0200
+Subject: [PATCH] use pkg-config to find freetype2
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: inappropriate [OE specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ configure.ac | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 53560ea..b5bb6a3 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -41,8 +41,13 @@ AC_CHECK_FUNCS(strndup)
+ 
+ AC_PATH_X
+ 
+-AC_CHECK_FT2([9.0.3],[],
+-             [AC_MSG_ERROR([FreeType2 is required to compile this library])])
++PKG_CHECK_MODULES(FT2, freetype2,
++    CFLAGS="$CFLAGS $FT2_CFLAGS"
++    LIBS="$LIBS $FT2_LIBS",
++    AC_MSG_ERROR([FreeType2 is required to compile this library])
++)
++AC_SUBST([FT2_CFLAGS])
++AC_SUBST([FT2_LIBS])
+ 
+ AC_PATH_XTRA
+ 
+-- 
+2.5.5
+

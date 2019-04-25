@@ -1,7 +1,7 @@
-From d929a1ea5e42ecbe30c990644ed4ada2817c6439 Mon Sep 17 00:00:00 2001
+From e4acb46b10484d1da6f093257e34f269832e6a37 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
-Date: Mon, 16 Jul 2018 16:00:14 +0800
-Subject: [PATCH]  Always use devmapper
+Date: Mon, 26 Nov 2018 11:17:41 +0800
+Subject: [PATCH] Subject: [PATCH]  Always use devmapper
 
 Do not try to compute several _API_ make variables
 from host information when cross-compiling.
@@ -18,12 +18,15 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Rebase to 0.7.7
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
+
+Rebase to 0.7.9
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
  libmultipath/Makefile | 19 ++++---------------
  1 file changed, 4 insertions(+), 15 deletions(-)
 
 diff --git a/libmultipath/Makefile b/libmultipath/Makefile
-index f51786d..3ad9c48 100644
+index 33f5269..adf6f4a 100644
 --- a/libmultipath/Makefile
 +++ b/libmultipath/Makefile
 @@ -20,21 +20,10 @@ ifdef SYSTEMD

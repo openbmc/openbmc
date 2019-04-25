@@ -1,0 +1,47 @@
+From 83407aa50e06d967d0a1095a140bd7b0e5d51d27 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 21 Nov 2018 13:09:05 +0100
+Subject: [PATCH] Add crc32.c to sources list
+
+Otherwise, there is a missing symbol runtime error under musl C library.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ libcomps/src/python/src/CMakeLists.txt | 4 ++--
+ libcomps/src/python/src/crc32.c        | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/libcomps/src/python/src/CMakeLists.txt b/libcomps/src/python/src/CMakeLists.txt
+index 6ed25bb..c15c8b2 100644
+--- a/libcomps/src/python/src/CMakeLists.txt
++++ b/libcomps/src/python/src/CMakeLists.txt
+@@ -9,13 +9,13 @@ set (pycomps_SRCDIR ${CMAKE_CURRENT_SOURCE_DIR})
+ set (pycomps_SRC pycomps.c pycomps_sequence.c
+      pycomps_envs.c pycomps_categories.c pycomps_groups.c
+      pycomps_gids.c pycomps_utils.c pycomps_dict.c pycomps_mdict.c
+-     pycomps_hash.c pycomps_exc.c pycomps_lbw.c)
++     pycomps_hash.c pycomps_exc.c pycomps_lbw.c crc32.c)
+ 
+ set (pycomps_HEADERS pycomps_23macros.h pycomps_sequence.h
+      pycomps_envs.h pycomps_categories.h pycomps_groups.h
+      pycomps_gids.h pycomps_utils.h pycomps_dict.h pycomps_mdict.h
+      pycomps_hash.h pycomps_exc.h pycomps_lbw.h
+-     pycomps_types.h)
++     pycomps_types.h crc32.h)
+ 
+ #set(TEST_FILES ../__init__.py __test.py test_merge_comps.py test_libcomps.py
+ #               utest.py)
+diff --git a/libcomps/src/python/src/crc32.c b/libcomps/src/python/src/crc32.c
+index d8f5e34..f266067 100644
+--- a/libcomps/src/python/src/crc32.c
++++ b/libcomps/src/python/src/crc32.c
+@@ -41,7 +41,7 @@
+  */
+ 
+ #include <sys/param.h>
+-#include <sys/systm.h>
++#include <stdint.h>
+ 
+ static uint32_t crc32_tab[] = {
+ 	0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f,

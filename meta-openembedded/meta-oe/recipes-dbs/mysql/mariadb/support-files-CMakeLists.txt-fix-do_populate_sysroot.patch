@@ -1,0 +1,34 @@
+From 4ac5b555d058d4d489f25a3806a787b7b2465d09 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Wed, 27 Feb 2019 22:41:26 -0800
+Subject: [PATCH] support-files/CMakeLists.txt: fix do_populate_sysroot issue
+
+Comment out the logic which for suse as it introduces
+below do_populate_sysroot error:
+ERROR: mariadb-native-10.3.13-r0 do_populate_sysroot: sstate found an absolute path symlink /build/tmp/work/x86_64-linux/mariadb-native/10.3.13-r0/sysroot-destdir/build/tmp/work/x86_64-linux/mariadb-native/10.3.13-r0/recipe-sysroot-native/usr/sbin/rcmysql pointing at /build/tmp/work/x86_64-linux/mariadb-native/10.3.13-r0/recipe-sysroot-native/etc/init.d/mysql. Please replace this with a relative link.
+
+Upstream-Status: Inappropriate[oe build specific]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+
+---
+ support-files/CMakeLists.txt | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/support-files/CMakeLists.txt b/support-files/CMakeLists.txt
+index b5767432..56733de1 100644
+--- a/support-files/CMakeLists.txt
++++ b/support-files/CMakeLists.txt
+@@ -165,12 +165,5 @@ IF(UNIX)
+       INSTALL(FILES rpm/enable_encryption.preset DESTINATION ${INSTALL_SYSCONF2DIR}
+               COMPONENT IniFiles)
+     ENDIF()
+-
+-    # This is for SuSE:
+-    INSTALL(CODE "EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E create_symlink
+-                   ${INSTALL_SYSCONFDIR}/init.d/mysql
+-                   ${INSTALL_SBINDIR}/rcmysql
+-                   WORKING_DIRECTORY \$ENV{DESTDIR}${prefix})"
+-                   COMPONENT SupportFiles)
+   ENDIF(INSTALL_SYSCONFDIR)
+ ENDIF()

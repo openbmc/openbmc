@@ -13,6 +13,8 @@ SRC_URI = "git://git.tartarus.org/simon/puzzles.git \
            file://0001-Use-labs-instead-of-abs.patch \
            file://0001-palisade-Fix-warnings-with-clang-on-arm.patch \
            file://0001-Use-Wno-error-format-overflow-if-the-compiler-suppor.patch \
+           file://0001-pattern.c-Change-string-lenght-parameter-to-be-size_.patch \
+           file://fix-ki-uninitialized.patch \
            "
 
 UPSTREAM_CHECK_COMMITS = "1"

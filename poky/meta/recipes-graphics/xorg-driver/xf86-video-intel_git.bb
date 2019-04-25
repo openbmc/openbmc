@@ -9,20 +9,20 @@ Infrastructure (DRI)."
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=8730ad58d11c7bbad9a7066d69f7808e"
 
-SRCREV = "e4fe79cf0d9a05ee3f3a027148ef0aeb2b1b34e1"
+SRCREV = "33ee0c3b21ea279e08d0863fcb2e874f0974b00e"
 PV = "2.99.917+git${SRCPV}"
 S = "${WORKDIR}/git"
 
 SRC_URI = "git://anongit.freedesktop.org/xorg/driver/xf86-video-intel \
-           file://0001-Add-Coffeelake-PCI-IDs-for-S-Skus.patch \
-           file://glibc.patch \
            "
+
+SRC_URI_append_qemux86 = "file://01_Fix-build-on-i686.patch"
 
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+(\.\d+)+)"
 
 DEPENDS += "virtual/libx11 drm libpciaccess pixman"
 
-PACKAGECONFIG ??= "xvmc uxa udev ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'dri dri2 dri3', '', d)}"
+PACKAGECONFIG ??= "sna xvmc uxa udev ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'dri dri2 dri3', '', d)}"
 
 PACKAGECONFIG[dri] = "--enable-dri,--disable-dri"
 PACKAGECONFIG[dri1] = "--enable-dri1,--disable-dri1"

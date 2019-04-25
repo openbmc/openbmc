@@ -9,15 +9,8 @@ RDEPENDS_${PN}_class-native = ""
 
 UPSTREAM_CHECK_URI = "${DEBIAN_MIRROR}/main/d/dpkg/"
 
-inherit autotools gettext perlnative pkgconfig systemd perl-version
+inherit autotools gettext perlnative pkgconfig perl-version
 
-python () {
-    if not bb.utils.contains('DISTRO_FEATURES', 'sysvinit', True, False, d):
-        pn = d.getVar('PN')
-        d.setVar('SYSTEMD_SERVICE_%s' % (pn), 'dpkg-configure.service')
-}
-
-export PERL = "${bindir}/perl"
 PERL_class-native = "${STAGING_BINDIR_NATIVE}/perl-native/perl"
 
 export PERL_LIBDIR = "${libdir}/perl/${@get_perl_version(d)}"
@@ -29,13 +22,13 @@ EXTRA_OECONF = "\
 		--with-libz \
 		--with-libbz2 \
 		--without-libselinux \
+		TAR=tar \
 		"
+
+EXTRA_OECONF_append_class-target = " --disable-update-alternatives DEB_HOST_ARCH=${DPKG_ARCH}"
 
 PACKAGECONFIG = "liblzma"
 PACKAGECONFIG[liblzma] = "--with-liblzma,--without-liblzma, xz"
-
-EXTRA_OECONF += "TAR=tar"
-EXTRA_OECONF_append_class-target = " DEB_HOST_ARCH=${DPKG_ARCH}"
 
 do_install_append () {
 	if [ "${PN}" = "dpkg-native" ]; then
@@ -44,16 +37,6 @@ do_install_append () {
 		sed -i -e 's|^#!.*${bindir}/perl-native.*/perl|#!/usr/bin/env nativeperl|' ${D}${bindir}/dpkg-*
 	else
 		sed -i -e 's|^#!.*${bindir}/perl-native.*/perl|#!/usr/bin/env perl|' ${D}${bindir}/dpkg-*
-	fi
-
-	if ${@bb.utils.contains('DISTRO_FEATURES','sysvinit','false','true',d)};then
-		install -d ${D}${systemd_unitdir}/system
-		install -m 0644 ${WORKDIR}/dpkg-configure.service ${D}${systemd_unitdir}/system/
-		sed -i -e 's,@BASE_BINDIR@,${base_bindir},g' \
-			-e 's,@SYSCONFDIR@,${sysconfdir},g' \
-			-e 's,@BINDIR@,${bindir},g' \
-			-e 's,@SYSTEMD_UNITDIR@,${systemd_unitdir},g' \
-			${D}${systemd_unitdir}/system/dpkg-configure.service
 	fi
 }
 

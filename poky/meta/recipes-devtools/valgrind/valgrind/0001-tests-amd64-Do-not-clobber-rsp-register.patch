@@ -1,0 +1,37 @@
+From 8c1ebb564f5eca2baeedc27a703200786d1abb0b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 22 Dec 2018 15:28:40 -0800
+Subject: [PATCH] tests/amd64: Do not clobber %rsp register
+
+This is seen with gcc-9.0 compiler now which is fix that gcc community
+did recently
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52813
+
+Upstream-Status: Submitted [https://bugs.kde.org/show_bug.cgi?id=402480]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ none/tests/amd64-linux/bug345887.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/none/tests/amd64-linux/bug345887.c b/none/tests/amd64-linux/bug345887.c
+index 0f9237d..4b07fe1 100644
+--- a/none/tests/amd64-linux/bug345887.c
++++ b/none/tests/amd64-linux/bug345887.c
+@@ -20,13 +20,14 @@ static void inner(void)
+       "movq $0x10d, %%r14\n"
+       "movq $0x10e, %%r15\n"
+       // not %rbp as mdb is then not able to reconstruct stack trace
+-      "movq $0x10f, %%rsp\n"
++      // not %rsp since gcc ignores it and since gcc >= 9.0 errors about it
++      // see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52813
+       "movq $0x1234, (%%rax)\n"  // should cause SEGV here
+       "ud2"                      // should never get here
+       : // no output registers
+       : // no input registers
+       : "memory", "%rax", "%rbx", "%rcx", "%rdx", "%rsi", "%rdi",
+-        "%r8", "%r9", "%r10", "%r11", "%r12", "%r13", "%r14", "%r15", "%rsp");
++        "%r8", "%r9", "%r10", "%r11", "%r12", "%r13", "%r14", "%r15");
+ }
+ 
+ __attribute__((noinline))

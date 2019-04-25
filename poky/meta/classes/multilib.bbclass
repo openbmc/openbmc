@@ -88,8 +88,6 @@ python multilib_virtclass_handler () {
 addhandler multilib_virtclass_handler
 multilib_virtclass_handler[eventmask] = "bb.event.RecipePreFinalise"
 
-STAGINGCC_prepend = "${BBEXTENDVARIANT}-"
-
 python __anonymous () {
     variant = d.getVar("BBEXTENDVARIANT")
 

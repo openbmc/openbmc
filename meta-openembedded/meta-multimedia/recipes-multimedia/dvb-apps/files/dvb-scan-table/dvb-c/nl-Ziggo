@@ -1,0 +1,17 @@
+# Initial Tuning file for nl-Ziggo
+# This file only lists the main
+# frequencie. You still need to do
+# a network scan to find other
+# transponders.
+# Also set the network id
+# (aka nit other) to: 5555
+#
+
+[Main Frequency Ziggo]
+	DELIVERY_SYSTEM = DVBC/ANNEX_A
+	FREQUENCY = 474000000
+	SYMBOL_RATE = 6875000
+	INNER_FEC = NONE
+	MODULATION = QAM/64
+	INVERSION = AUTO
+

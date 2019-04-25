@@ -1,5 +1,10 @@
-From: Francisco Blas Izquierdo Riera (klondike) <klondike@gentoo.org>
-Subject: [PATCH] Fix assemby textrels on rdrand_asm.S on PIC x86
+From d8b1bb8edd99b2898720b4f10d292a67d532db48 Mon Sep 17 00:00:00 2001
+From: "Francisco Blas Izquierdo Riera (klondike)" <klondike@gentoo.org>
+Date: Mon, 22 Oct 2018 15:29:36 +0800
+Subject: [PATCH 4/4] Fix assemby textrels on rdrand_asm.S on PIC x86
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 This patch updates the fixes in the assembly in rdrand_asm.S in
 sys-apps/rng-tools-5 so it won't generate textrels on PIC systems.
@@ -19,11 +24,14 @@ Reported-by: Manuel Rüger <mrueg@gentoo.org>
 Tested-by: Anthony Basile <blueness@gentoo.org>
 
 Upstream-Status: Pending
+---
+ rdrand_asm.S | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-Index: rng-tools-5/rdrand_asm.S
-===================================================================
---- rng-tools-5.orig/rdrand_asm.S
-+++ rng-tools-5/rdrand_asm.S
+diff --git a/rdrand_asm.S b/rdrand_asm.S
+index b5d260a..7811cf2 100644
+--- a/rdrand_asm.S
++++ b/rdrand_asm.S
 @@ -2,6 +2,7 @@
   * Copyright (c) 2011-2014, Intel Corporation
   * Authors: Fenghua Yu <fenghua.yu@intel.com>,
@@ -32,7 +40,7 @@ Index: rng-tools-5/rdrand_asm.S
   *
   * This program is free software; you can redistribute it and/or modify it
   * under the terms and conditions of the GNU General Public License,
-@@ -174,7 +175,19 @@ ENTRY(x86_rdseed_or_rdrand_bytes)
+@@ -172,7 +173,19 @@ ENTRY(x86_rdseed_or_rdrand_bytes)
  	jmp	4b
  ENDPROC(x86_rdseed_or_rdrand_bytes)
  
@@ -52,7 +60,7 @@ Index: rng-tools-5/rdrand_asm.S
  #define PTR0	%eax
  #define PTR1	%edx
  #define PTR2	%ecx
-@@ -190,6 +203,7 @@ ENTRY(x86_aes_mangle)
+@@ -188,6 +201,7 @@ ENTRY(x86_aes_mangle)
  	movl	8(%ebp), %eax
  	movl	12(%ebp), %edx
  	push	%esi
@@ -60,7 +68,7 @@ Index: rng-tools-5/rdrand_asm.S
  #endif
  	movl	$512, CTR3	/* Number of rounds */
  	
-@@ -280,6 +294,7 @@ offset = offset + 16
+@@ -278,6 +292,7 @@ offset = offset + 16
  	movdqa	%xmm7, (7*16)(PTR1)
  
  #ifdef __i386__
@@ -68,7 +76,7 @@ Index: rng-tools-5/rdrand_asm.S
  	pop	%esi
  	pop	%ebp
  #endif
-@@ -294,6 +309,7 @@ ENTRY(x86_aes_expand_key)
+@@ -292,6 +307,7 @@ ENTRY(x86_aes_expand_key)
  	push	%ebp
  	mov	%esp, %ebp
  	movl	8(%ebp), %eax
@@ -76,7 +84,7 @@ Index: rng-tools-5/rdrand_asm.S
  #endif
  
  	SETPTR(aes_round_keys, PTR1)
-@@ -323,6 +339,7 @@ ENTRY(x86_aes_expand_key)
+@@ -321,6 +337,7 @@ ENTRY(x86_aes_expand_key)
  	call	1f
  
  #ifdef __i386__
@@ -84,7 +92,7 @@ Index: rng-tools-5/rdrand_asm.S
  	pop	%ebp
  #endif
  	ret
-@@ -343,6 +360,16 @@ ENTRY(x86_aes_expand_key)
+@@ -341,6 +358,16 @@ ENTRY(x86_aes_expand_key)
  
  ENDPROC(x86_aes_expand_key)
  
@@ -101,3 +109,6 @@ Index: rng-tools-5/rdrand_asm.S
  	.bss
  	.balign 64
  aes_round_keys:
+-- 
+2.7.4
+

@@ -6,4 +6,4 @@ ExecStart=/usr/bin/env centriq-2400rep-console-client.sh
 SyslogIdentifier=centriq-2400rep-console-client.sh
 
 [Install]
-WantedBy={SYSTEMD_DEFAULT_TARGET}
+WantedBy=multi-user.target

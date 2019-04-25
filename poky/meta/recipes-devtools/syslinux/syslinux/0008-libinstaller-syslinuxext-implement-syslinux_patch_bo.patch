@@ -1,8 +1,7 @@
-From 78d76b87a4b855e6b661ae457283a63f385c04c9 Mon Sep 17 00:00:00 2001
+From efce87e5ab98664c57e5f4e3955a2f3747df5737 Mon Sep 17 00:00:00 2001
 From: Robert Yang <liezhi.yang@windriver.com>
 Date: Fri, 2 Jan 2015 12:26:46 +0800
-Subject: [PATCH 8/9] libinstaller/syslinuxext: implement
- syslinux_patch_bootsect()
+Subject: [PATCH] libinstaller/syslinuxext: implement syslinux_patch_bootsect()
 
 Move the related from extlinux/main.c to libinstaller/syslinuxext.c, the
 syslinux_patch_bootsect() are used by both extlinux/main.c and
@@ -12,17 +11,21 @@ Upstream-Status: Submitted
 
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
 Tested-by: Du Dolpher <dolpher.du@intel.com>
+
+Edited to include sysmacros.h
+
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
 ---
  extlinux/Makefile          |   3 +-
- extlinux/main.c            | 167 +-------------------------------------------
- libinstaller/syslinuxext.c | 170 +++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 175 insertions(+), 165 deletions(-)
+ extlinux/main.c            | 167 +-----------------------------------
+ libinstaller/syslinuxext.c | 171 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 176 insertions(+), 165 deletions(-)
 
 diff --git a/extlinux/Makefile b/extlinux/Makefile
-index 02d1db5..90dd92f 100644
+index 1721ee54..62a49728 100644
 --- a/extlinux/Makefile
 +++ b/extlinux/Makefile
-@@ -31,7 +31,8 @@ SRCS     = main.c \
+@@ -32,7 +32,8 @@ SRCS     = main.c \
  	   ../libinstaller/advio.c \
  	   ../libinstaller/bootsect_bin.c \
  	   ../libinstaller/ldlinuxc32_bin.c \
@@ -33,10 +36,10 @@ index 02d1db5..90dd92f 100644
  
  .SUFFIXES: .c .o .i .s .S
 diff --git a/extlinux/main.c b/extlinux/main.c
-index 09740bd..6fe026e 100644
+index ebff7eae..9add50fb 100644
 --- a/extlinux/main.c
 +++ b/extlinux/main.c
-@@ -60,6 +60,7 @@
+@@ -62,6 +62,7 @@
  #include "setadv.h"
  #include "syslxopt.h" /* unified options */
  #include "mountinfo.h"
@@ -44,7 +47,7 @@ index 09740bd..6fe026e 100644
  
  #ifdef DEBUG
  # define dprintf printf
-@@ -67,10 +68,6 @@
+@@ -69,10 +70,6 @@
  # define dprintf(...) ((void)0)
  #endif
  
@@ -55,10 +58,11 @@ index 09740bd..6fe026e 100644
  /* Since we have unused 2048 bytes in the primary AG of an XFS partition,
   * we will use the first 0~512 bytes starting from 2048 for the Syslinux
   * boot sector.
-@@ -92,136 +89,6 @@ static char subvol[BTRFS_SUBVOL_MAX];
+@@ -93,136 +90,6 @@ static char subvol[BTRFS_SUBVOL_MAX];
+ #define BTRFS_ADV_OFFSET (BTRFS_BOOT_AREA_A_OFFSET + BTRFS_BOOT_AREA_A_SIZE \
  			  - 2*ADV_SIZE)
  
- /*
+-/*
 - * Get the size of a block device
 - */
 -static uint64_t get_size(int devfd)
@@ -188,11 +192,10 @@ index 09740bd..6fe026e 100644
 -    return rv;
 -}
 -
--/*
+ /*
   * Query the device geometry and put it into the boot sector.
   * Map the file and put the map in the boot sector and file.
-  * Stick the "current directory" inode number into the file.
-@@ -231,11 +98,8 @@ ok:
+@@ -233,11 +100,8 @@ ok:
  static int patch_file_and_bootblock(int fd, const char *dir, int devfd)
  {
      struct stat dirst, xdst;
@@ -204,7 +207,7 @@ index 09740bd..6fe026e 100644
      char *dirpath, *subpath, *xdirpath;
      int rv;
  
-@@ -279,33 +143,8 @@ static int patch_file_and_bootblock(int fd, const char *dir, int devfd)
+@@ -281,33 +145,8 @@ static int patch_file_and_bootblock(int fd, const char *dir, int devfd)
      /* Now subpath should contain the path relative to the fs base */
      dprintf("subpath = %s\n", subpath);
  
@@ -241,14 +244,15 @@ index 09740bd..6fe026e 100644
      /* Construct the boot file map */
  
 diff --git a/libinstaller/syslinuxext.c b/libinstaller/syslinuxext.c
-index bb54cef..5a4423b 100644
+index bb54cefc..9ae82884 100644
 --- a/libinstaller/syslinuxext.c
 +++ b/libinstaller/syslinuxext.c
-@@ -1,7 +1,177 @@
+@@ -1,7 +1,178 @@
  #define _GNU_SOURCE
  
 +#include <sys/stat.h>
 +#include <sys/types.h>
++#include <sys/sysmacros.h>
 +#include <getopt.h>
 +#include <ext2fs/ext2fs.h>
 +
@@ -423,5 +427,5 @@ index bb54cef..5a4423b 100644
  }
  
 -- 
-1.9.1
+2.17.1
 

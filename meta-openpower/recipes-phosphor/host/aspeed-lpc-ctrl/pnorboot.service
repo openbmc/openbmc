@@ -6,4 +6,4 @@ Type=oneshot
 ExecStart=/usr/sbin/pnorboot --size 32
 
 [Install]
-WantedBy=obmc-standby.target
+WantedBy=multi-user.target

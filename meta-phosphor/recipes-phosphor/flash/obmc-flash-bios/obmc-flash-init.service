@@ -9,4 +9,4 @@ ExecStart=/bin/sh -c "busctl call `mapper get-service /org/openbmc/control/flash
 SyslogIdentifier=obmc-flash-init
 
 [Install]
-WantedBy={SYSTEMD_DEFAULT_TARGET}
+WantedBy=multi-user.target

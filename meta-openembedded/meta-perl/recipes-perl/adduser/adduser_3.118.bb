@@ -22,7 +22,7 @@ do_install() {
     install -m 0755 ${S}/adduser ${D}${sbindir}
     install -m 0755 ${S}/deluser ${D}${sbindir}
 
-    install -D -m 0644 ${S}/AdduserCommon.pm ${D}${libdir}/perl/${@get_perl_version(d)}/Debian/AdduserCommon.pm
+    install -D -m 0644 ${S}/AdduserCommon.pm ${D}${libdir}/perl5/${@get_perl_version(d)}/Debian/AdduserCommon.pm
     sed -i -e "s/VERSION/${PV}/" ${D}${sbindir}/*
 
     install -d ${D}/${sysconfdir}

@@ -7,14 +7,13 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 inherit flto-automake pkgconfig
-inherit pythonnative
 
 inherit phosphor-pid-control
 inherit obmc-phosphor-ipmiprovider-symlink
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/phosphor-pid-control"
-SRCREV = "6d31049a4eb38f7b86874e9286c771ae0dd5f14d"
+SRCREV = "ce6a3f36cedc2f822fb446bc5094eaeab47eb4af"
 
 # Each platform will need a service file that starts
 # at an appropriate time per system.  For instance, if
@@ -22,20 +21,19 @@ SRCREV = "6d31049a4eb38f7b86874e9286c771ae0dd5f14d"
 # sensors then it may be prudent to wait for all of them.
 
 DEPENDS += "autoconf-archive-native"
-DEPENDS += "python-pyyaml-native"
-DEPENDS += "python-mako-native"
 DEPENDS += "sdbusplus"
+DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "phosphor-logging"
+DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "libevdev"
 DEPENDS += "nlohmann-json"
 DEPENDS += "cli11"
+DEPENDS += "boost"
 
 # We depend on this to be built first so we can build our providers.
 DEPENDS += "phosphor-ipmi-host"
 
-RDEPENDS_${PN} += "sdbusplus phosphor-dbus-interfaces"
-
-FILES_${PN} = "${sbindir}/swampd ${sbindir}/setsensor"
+FILES_${PN} = "${bindir}/swampd ${bindir}/setsensor"
 
 # The following installs the OEM IPMI handler for the fan controls.
 FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"

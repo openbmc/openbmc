@@ -32,6 +32,7 @@ TESTIMAGE_AUTO ??= "0"
 # Booting is handled by this class, and it's not a test in itself.
 # TEST_QEMUBOOT_TIMEOUT can be used to set the maximum time in seconds the launch code will wait for the login prompt.
 # TEST_QEMUPARAMS can be used to pass extra parameters to qemu, e.g. "-m 1024" for setting the amount of ram to 1 GB.
+# TEST_RUNQEMUPARAMS can be used to pass extra parameters to runqemu, e.g. "gl" to enable OpenGL acceleration.
 
 TEST_LOG_DIR ?= "${WORKDIR}/testimage"
 
@@ -65,6 +66,7 @@ TEST_SUITES ?= "${DEFAULT_TEST_SUITES}"
 TEST_QEMUBOOT_TIMEOUT ?= "1000"
 TEST_TARGET ?= "qemu"
 TEST_QEMUPARAMS ?= ""
+TEST_RUNQEMUPARAMS ?= ""
 
 TESTIMAGEDEPENDS = ""
 TESTIMAGEDEPENDS_append_qemuall = " qemu-native:do_populate_sysroot qemu-helper-native:do_populate_sysroot qemu-helper-native:do_addto_recipe_sysroot"
@@ -294,7 +296,7 @@ def testimage_main(d):
     try:
         # We need to check if runqemu ends unexpectedly
         # or if the worker send us a SIGTERM
-        tc.target.start(params=d.getVar("TEST_QEMUPARAMS"))
+        tc.target.start(params=d.getVar("TEST_QEMUPARAMS"), runqemuparams=d.getVar("TEST_RUNQEMUPARAMS"))
         results = tc.runTests()
     except (RuntimeError, BlockingIOError) as err:
         if isinstance(err, RuntimeError):

@@ -54,7 +54,7 @@ FILES_${PN} += " \
     ${datadir}/icons \
 "
 
-FILES_${PN}-python = "${PYTHON_SITEPACKAGES_DIR} ${datadir}/${PN}/python"
+FILES_${PN}-python = "${PYTHON_SITEPACKAGES_DIR} ${datadir}/${BPN}/python"
 RDEPENDS_${PN}-python = "python"
 
 # for e.g kde's oxygen-fonts

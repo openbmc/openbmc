@@ -26,7 +26,6 @@ SUMMARY_${PN}-chassis = "OpenPOWER Chassis"
 RDEPENDS_${PN}-chassis = " \
         obmc-phosphor-buttons-signals \
         obmc-phosphor-buttons-handler \
-        obmc-control-chassis \
         obmc-op-control-power \
         obmc-host-failure-reboots \
         "
@@ -38,17 +37,12 @@ RDEPENDS_${PN}-chassis += "${@mf_enabled(d, 'p9-cfam-override', 'p9-cfam-overrid
 
 SUMMARY_${PN}-fans = "OpenPOWER Fans"
 RDEPENDS_${PN}-fans = " \
-        obmc-control-fan \
         "
 
 SUMMARY_${PN}-flash = "OpenPOWER Flash"
+
 RDEPENDS_${PN}-flash = " \
-        obmc-flash-bios \
-        obmc-mgr-download \
-        obmc-op-flasher \
-        "
-RDEPENDS_${PN}-flash_df-openpower-ubi-fs = " \
-        openpower-software-manager \
+        openpower-software-manager\
         "
 
 SUMMARY_${PN}-system = "OpenPOWER System"

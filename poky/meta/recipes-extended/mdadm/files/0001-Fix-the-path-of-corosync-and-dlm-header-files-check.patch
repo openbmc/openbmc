@@ -1,4 +1,4 @@
-From 1f5baf3ad95ae4c39efe4d8ad8b2e642b3a351da Mon Sep 17 00:00:00 2001
+From a9166bf422da1001bac9cc819386bf39b7cd1b73 Mon Sep 17 00:00:00 2001
 From: "Maxin B. John" <maxin.john@intel.com>
 Date: Tue, 9 Feb 2016 11:44:01 +0200
 Subject: [PATCH] Fix the path of corosync and dlm header files check
@@ -9,28 +9,18 @@ Fix it.
 Upstream-Status: Inappropriate [Yocto specific]
 
 Signed-off-by: Maxin B. John <maxin.john@intel.com>
----
-mdadm only works with corosync 2.x which provides header file corosync/cmap.h.
-If build mdadm with corosync 1.x, it fails with:
 
-| member.c:12:27: fatal error: corosync/cmap.h: No such file or directory
-|  #include <corosync/cmap.h>
-|                            ^
-
-Build with corosync only header file corosync/cmap.h exists.
-
-Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  Makefile | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index fd79cfb..34150a9 100644
+index 2767ac6..46bf57b 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -80,8 +80,8 @@ MDMON_DIR = $(RUN_DIR)
- FAILED_SLOTS_DIR = $(RUN_DIR)/failed-slots
+@@ -91,8 +91,8 @@ FAILED_SLOTS_DIR = $(RUN_DIR)/failed-slots
  SYSTEMD_DIR=/lib/systemd/system
+ LIB_DIR=/usr/libexec/mdadm
  
 -COROSYNC:=$(shell [ -d /usr/include/corosync ] || echo -DNO_COROSYNC)
 -DLM:=$(shell [ -f /usr/include/libdlm.h ] || echo -DNO_DLM)
@@ -39,6 +29,3 @@ index fd79cfb..34150a9 100644
  
  DIRFLAGS = -DMAP_DIR=\"$(MAP_DIR)\" -DMAP_FILE=\"$(MAP_FILE)\"
  DIRFLAGS += -DMDMON_DIR=\"$(MDMON_DIR)\"
--- 
-2.4.0
-

@@ -1,4 +1,4 @@
-From 18fb45c34a473c4ba247bb82bcea94b7c3ba493a Mon Sep 17 00:00:00 2001
+From c53ddb5acbee56db6423f369b9f9a9b62501b4af Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Wed, 18 Sep 2013 14:04:54 +0100
 Subject: [PATCH] sdl.c: allow user to disable pointer grabs
@@ -21,15 +21,16 @@ the current grabbing behaviour for everyone else.
 Upstream-Status: Pending
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 Signed-off-by: Eric Bénard <eric@eukrea.com>
+
 ---
  ui/sdl.c | 13 +++++++++++--
  1 file changed, 11 insertions(+), 2 deletions(-)
 
 diff --git a/ui/sdl.c b/ui/sdl.c
-index a5fd503c25..ab8d1b1eb1 100644
+index 190b16f5..aa89471d 100644
 --- a/ui/sdl.c
 +++ b/ui/sdl.c
-@@ -68,6 +68,11 @@ static int idle_counter;
+@@ -69,6 +69,11 @@ static int idle_counter;
  static const guint16 *keycode_map;
  static size_t keycode_maplen;
  
@@ -41,7 +42,7 @@ index a5fd503c25..ab8d1b1eb1 100644
  #define SDL_REFRESH_INTERVAL_BUSY 10
  #define SDL_MAX_IDLE_COUNT (2 * GUI_REFRESH_INTERVAL_DEFAULT \
                              / SDL_REFRESH_INTERVAL_BUSY + 1)
-@@ -398,14 +403,16 @@ static void sdl_grab_start(void)
+@@ -399,14 +404,16 @@ static void sdl_grab_start(void)
          }
      } else
          sdl_hide_cursor();

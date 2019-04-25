@@ -1,10 +1,78 @@
+From 8fe468682c550606ea961a1f996a8618940eb084 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 16 Jul 2010 12:26:46 +0800
+Subject: [PATCH] elfutils: upgrade to version 0.148
+
 Upstream-Status: Pending [from debian]
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 
-Index: elfutils-0.175/backends/parisc_init.c
-===================================================================
+---
+ backends/Makefile.am      |   8 +-
+ backends/libebl_parisc.h  |   9 ++
+ backends/parisc_init.c    |  73 +++++++++++++
+ backends/parisc_regs.c    | 159 ++++++++++++++++++++++++++++
+ backends/parisc_reloc.def | 128 +++++++++++++++++++++++
+ backends/parisc_retval.c  | 213 ++++++++++++++++++++++++++++++++++++++
+ backends/parisc_symbol.c  | 113 ++++++++++++++++++++
+ libelf/elf.h              |  11 ++
+ 8 files changed, 712 insertions(+), 2 deletions(-)
+ create mode 100644 backends/libebl_parisc.h
+ create mode 100644 backends/parisc_init.c
+ create mode 100644 backends/parisc_regs.c
+ create mode 100644 backends/parisc_reloc.def
+ create mode 100644 backends/parisc_retval.c
+ create mode 100644 backends/parisc_symbol.c
+
+diff --git a/backends/Makefile.am b/backends/Makefile.am
+index 2126a2e..5671a32 100644
+--- a/backends/Makefile.am
++++ b/backends/Makefile.am
+@@ -33,12 +33,13 @@ AM_CPPFLAGS += -I$(top_srcdir)/libebl -I$(top_srcdir)/libasm \
+ 
+ 
+ modules = i386 sh x86_64 ia64 alpha arm aarch64 sparc ppc ppc64 s390 \
+-	  tilegx m68k bpf riscv
++	  tilegx m68k bpf riscv parisc
+ libebl_pic = libebl_i386_pic.a libebl_sh_pic.a libebl_x86_64_pic.a    \
+ 	     libebl_ia64_pic.a libebl_alpha_pic.a libebl_arm_pic.a    \
+ 	     libebl_aarch64_pic.a libebl_sparc_pic.a libebl_ppc_pic.a \
+ 	     libebl_ppc64_pic.a libebl_s390_pic.a libebl_tilegx_pic.a \
+-	     libebl_m68k_pic.a libebl_bpf_pic.a libebl_riscv_pic.a
++	     libebl_m68k_pic.a libebl_bpf_pic.a libebl_riscv_pic.a \
++	     libebl_parisc_pic.a
+ noinst_LIBRARIES = $(libebl_pic)
+ noinst_DATA = $(libebl_pic:_pic.a=.so)
+ 
+@@ -136,6 +137,9 @@ riscv_SRCS = riscv_init.c riscv_symbol.c riscv_cfi.c riscv_regs.c \
+ libebl_riscv_pic_a_SOURCES = $(riscv_SRCS)
+ am_libebl_riscv_pic_a_OBJECTS = $(riscv_SRCS:.c=.os)
+ 
++parisc_SRCS = parisc_init.c parisc_symbol.c parisc_regs.c parisc_retval.c
++libebl_parisc_pic_a_SOURCES = $(parisc_SRCS)
++am_libebl_parisc_pic_a_OBJECTS = $(parisc_SRCS:.c=.os)
+ 
+ libebl_%.so libebl_%.map: libebl_%_pic.a $(libelf) $(libdw) $(libeu)
+ 	@rm -f $(@:.so=.map)
+diff --git a/backends/libebl_parisc.h b/backends/libebl_parisc.h
+new file mode 100644
+index 0000000..f473b79
 --- /dev/null
-+++ elfutils-0.175/backends/parisc_init.c
++++ b/backends/libebl_parisc.h
+@@ -0,0 +1,9 @@
++#ifndef _LIBEBL_HPPA_H
++#define _LIBEBL_HPPA_H 1
++
++#include <libdw.h>
++
++extern int parisc_return_value_location_32(Dwarf_Die *, const Dwarf_Op **locp);
++extern int parisc_return_value_location_64(Dwarf_Die *, const Dwarf_Op **locp);
++
++#endif
+diff --git a/backends/parisc_init.c b/backends/parisc_init.c
+new file mode 100644
+index 0000000..f1e401c
+--- /dev/null
++++ b/backends/parisc_init.c
 @@ -0,0 +1,73 @@
 +/* Initialization of PA-RISC specific backend library.
 +   Copyright (C) 2002, 2005, 2006 Red Hat, Inc.
@@ -79,10 +147,11 @@ Index: elfutils-0.175/backends/parisc_init.c
 +
 +  return MODVERSION;
 +}
-Index: elfutils-0.175/backends/parisc_regs.c
-===================================================================
+diff --git a/backends/parisc_regs.c b/backends/parisc_regs.c
+new file mode 100644
+index 0000000..3895f8e
 --- /dev/null
-+++ elfutils-0.175/backends/parisc_regs.c
++++ b/backends/parisc_regs.c
 @@ -0,0 +1,159 @@
 +/* Register names and numbers for PA-RISC DWARF.
 +   Copyright (C) 2005, 2006 Red Hat, Inc.
@@ -243,10 +312,11 @@ Index: elfutils-0.175/backends/parisc_regs.c
 +  name[namelen++] = '\0';
 +  return namelen;
 +}
-Index: elfutils-0.175/backends/parisc_reloc.def
-===================================================================
+diff --git a/backends/parisc_reloc.def b/backends/parisc_reloc.def
+new file mode 100644
+index 0000000..1f875ba
 --- /dev/null
-+++ elfutils-0.175/backends/parisc_reloc.def
++++ b/backends/parisc_reloc.def
 @@ -0,0 +1,128 @@
 +/* List the relocation types for PA-RISC.  -*- C -*-
 +   Copyright (C) 2005 Red Hat, Inc.
@@ -376,10 +446,11 @@ Index: elfutils-0.175/backends/parisc_reloc.def
 +RELOC_TYPE (TLS_DTPMOD64,	DYN)
 +
 +#define NO_RELATIVE_RELOC       1
-Index: elfutils-0.175/backends/parisc_retval.c
-===================================================================
+diff --git a/backends/parisc_retval.c b/backends/parisc_retval.c
+new file mode 100644
+index 0000000..df7ec3a
 --- /dev/null
-+++ elfutils-0.175/backends/parisc_retval.c
++++ b/backends/parisc_retval.c
 @@ -0,0 +1,213 @@
 +/* Function return value location for Linux/PA-RISC ABI.
 +   Copyright (C) 2005 Red Hat, Inc.
@@ -594,10 +665,11 @@ Index: elfutils-0.175/backends/parisc_retval.c
 +  return parisc_return_value_location_ (functypedie, locp, 1);
 +}
 +
-Index: elfutils-0.175/backends/parisc_symbol.c
-===================================================================
+diff --git a/backends/parisc_symbol.c b/backends/parisc_symbol.c
+new file mode 100644
+index 0000000..5754bd8
 --- /dev/null
-+++ elfutils-0.175/backends/parisc_symbol.c
++++ b/backends/parisc_symbol.c
 @@ -0,0 +1,113 @@
 +/* PA-RISC specific symbolic name handling.
 +   Copyright (C) 2002, 2005 Red Hat, Inc.
@@ -712,54 +784,10 @@ Index: elfutils-0.175/backends/parisc_symbol.c
 +      return ELF_T_NUM;
 +    }
 +}
-Index: elfutils-0.175/backends/libebl_parisc.h
-===================================================================
---- /dev/null
-+++ elfutils-0.175/backends/libebl_parisc.h
-@@ -0,0 +1,9 @@
-+#ifndef _LIBEBL_HPPA_H
-+#define _LIBEBL_HPPA_H 1
-+
-+#include <libdw.h>
-+
-+extern int parisc_return_value_location_32(Dwarf_Die *, const Dwarf_Op **locp);
-+extern int parisc_return_value_location_64(Dwarf_Die *, const Dwarf_Op **locp);
-+
-+#endif
-Index: elfutils-0.175/backends/Makefile.am
-===================================================================
---- elfutils-0.175.orig/backends/Makefile.am
-+++ elfutils-0.175/backends/Makefile.am
-@@ -33,12 +33,13 @@ AM_CPPFLAGS += -I$(top_srcdir)/libebl -I
- 
- 
- modules = i386 sh x86_64 ia64 alpha arm aarch64 sparc ppc ppc64 s390 \
--	  tilegx m68k bpf riscv
-+	  tilegx m68k bpf riscv parisc
- libebl_pic = libebl_i386_pic.a libebl_sh_pic.a libebl_x86_64_pic.a    \
- 	     libebl_ia64_pic.a libebl_alpha_pic.a libebl_arm_pic.a    \
- 	     libebl_aarch64_pic.a libebl_sparc_pic.a libebl_ppc_pic.a \
- 	     libebl_ppc64_pic.a libebl_s390_pic.a libebl_tilegx_pic.a \
--	     libebl_m68k_pic.a libebl_bpf_pic.a libebl_riscv_pic.a
-+	     libebl_m68k_pic.a libebl_bpf_pic.a libebl_riscv_pic.a \
-+	     libebl_parisc_pic.a
- noinst_LIBRARIES = $(libebl_pic)
- noinst_DATA = $(libebl_pic:_pic.a=.so)
- 
-@@ -136,6 +137,9 @@ riscv_SRCS = riscv_init.c riscv_symbol.c
- libebl_riscv_pic_a_SOURCES = $(riscv_SRCS)
- am_libebl_riscv_pic_a_OBJECTS = $(riscv_SRCS:.c=.os)
- 
-+parisc_SRCS = parisc_init.c parisc_symbol.c parisc_regs.c parisc_retval.c
-+libebl_parisc_pic_a_SOURCES = $(parisc_SRCS)
-+am_libebl_parisc_pic_a_OBJECTS = $(parisc_SRCS:.c=.os)
- 
- libebl_%.so libebl_%.map: libebl_%_pic.a $(libelf) $(libdw) $(libeu)
- 	@rm -f $(@:.so=.map)
-Index: elfutils-0.175/libelf/elf.h
-===================================================================
---- elfutils-0.175.orig/libelf/elf.h
-+++ elfutils-0.175/libelf/elf.h
+diff --git a/libelf/elf.h b/libelf/elf.h
+index 75043bc..6310054 100644
+--- a/libelf/elf.h
++++ b/libelf/elf.h
 @@ -2155,16 +2155,24 @@ enum
  #define R_PARISC_PCREL17F	12	/* 17 bits of rel. address.  */
  #define R_PARISC_PCREL14R	14	/* Right 14 bits of rel. address.  */

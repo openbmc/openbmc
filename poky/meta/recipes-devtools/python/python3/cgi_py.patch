@@ -1,11 +1,20 @@
-Lib/cgi.py: Update the script as mentioned in the comment
+From 62336285cba38017b35cb761c03f0c7e80a671a3 Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@windriver.com>
+Date: Wed, 21 Sep 2011 20:55:33 -0500
+Subject: [PATCH] Lib/cgi.py: Update the script as mentioned in the comment
 
 Upstream-Status: Inappropriate [distribution]
 
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 
---- Python-2.6.6/Lib/cgi.py.orig	2010-08-01 22:14:27.000000000 -0500
-+++ Python-2.6.6/Lib/cgi.py	2011-09-21 15:28:40.478208631 -0500
+---
+ Lib/cgi.py | 11 +----------
+ 1 file changed, 1 insertion(+), 10 deletions(-)
+
+diff --git a/Lib/cgi.py b/Lib/cgi.py
+index 8cf6687..094c7b4 100755
+--- a/Lib/cgi.py
++++ b/Lib/cgi.py
 @@ -1,13 +1,4 @@
 -#! /usr/local/bin/python
 -

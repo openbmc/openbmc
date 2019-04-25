@@ -10,3 +10,5 @@ SRC_URI[md5sum] = "b85c9916ac755cad489a9005f5a0d390"
 SRC_URI[sha256sum] = "8a21885513e6d915fe33a8ee5fdfa675433b61405ba13e2a69e62ee36828d7e2"
 
 RDEPENDS_${PN} += "${PYTHON_PN}-compression ${PYTHON_PN}-io ${PYTHON_PN}-pprint ${PYTHON_PN}-shell"
+
+BBCLASSEXTEND = "native nativesdk"

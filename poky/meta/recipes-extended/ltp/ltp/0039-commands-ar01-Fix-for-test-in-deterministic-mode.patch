@@ -21,16 +21,18 @@ Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
  1 file changed, 52 insertions(+), 40 deletions(-)
 
 diff --git a/testcases/commands/ar/ar01 b/testcases/commands/ar/ar01
-index ddab2e0..d688f76 100644
+index be105f6da..813a51d9c 100644
 --- a/testcases/commands/ar/ar01
 +++ b/testcases/commands/ar/ar01
-@@ -23,14 +23,26 @@
- # This is a basic ar command test.
+@@ -24,16 +24,28 @@
  #
+ AR="${AR:=ar}"
  TST_CNT=17
 +TST_SETUP=setup
  TST_TESTFUNC=test
  TST_NEEDS_TMPDIR=1
+ TST_NEEDS_CMDS="$AR"
+ 
  . tst_test.sh
  
 +setup()
@@ -53,7 +55,7 @@ index ddab2e0..d688f76 100644
  	ROD ar -t lib.a \> ar.out
  
  	printf "file1.in\nfile2.in\nfile3.in\n" > ar.exp
-@@ -47,9 +59,9 @@ test1()
+@@ -50,9 +62,9 @@ test1()
  
  test2()
  {
@@ -66,7 +68,7 @@ index ddab2e0..d688f76 100644
  	ROD ar -t lib.a \> ar.out
  
  	printf "file1.in\nfile4.in\nfile2.in\nfile3.in\n" > ar.exp
-@@ -66,8 +78,8 @@ test2()
+@@ -69,8 +81,8 @@ test2()
  
  test3()
  {
@@ -77,7 +79,7 @@ index ddab2e0..d688f76 100644
  	ROD ar -t lib.a \> ar.out
  
  	printf "file1.in\nfile2.in\nfile3.in\n" > ar.exp
-@@ -84,9 +96,9 @@ test3()
+@@ -87,9 +99,9 @@ test3()
  
  test4()
  {
@@ -90,7 +92,7 @@ index ddab2e0..d688f76 100644
  	ROD ar -t lib.a \> ar.out
  
  	printf "file1.in\nfile2.in\nfile3.in\n" > ar.exp
-@@ -103,7 +115,7 @@ test4()
+@@ -106,7 +118,7 @@ test4()
  
  test5()
  {
@@ -99,7 +101,7 @@ index ddab2e0..d688f76 100644
  
  	if [ -s ar.out ]; then
  		tst_res TFAIL "ar produced output unexpectedly (-c)"
-@@ -117,7 +129,7 @@ test5()
+@@ -120,7 +132,7 @@ test5()
  
  test6()
  {
@@ -108,7 +110,7 @@ index ddab2e0..d688f76 100644
  
  	if [ -s ar.out ]; then
  		tst_res TFAIL "ar produced output unexpectedly (-qc)"
-@@ -131,9 +143,9 @@ test6()
+@@ -134,9 +146,9 @@ test6()
  
  test7()
  {
@@ -121,7 +123,7 @@ index ddab2e0..d688f76 100644
  	ROD ar -t lib.a \> ar.out
  
  	printf "file3.in\n" > ar.exp
-@@ -150,9 +162,9 @@ test7()
+@@ -153,9 +165,9 @@ test7()
  
  test8()
  {
@@ -134,7 +136,7 @@ index ddab2e0..d688f76 100644
  	ROD ar -t lib.a \> ar.out
  
  	printf "file1.in\nfile2.in\nfile3.in\n" > ar.exp
-@@ -169,8 +181,8 @@ test8()
+@@ -172,8 +184,8 @@ test8()
  
  test9()
  {
@@ -145,7 +147,7 @@ index ddab2e0..d688f76 100644
  	ROD ar -t lib.a \> ar.out
  
  	printf "file1.in\nfile2.in\nfile3.in\n" > ar.exp
-@@ -187,9 +199,9 @@ test9()
+@@ -190,9 +202,9 @@ test9()
  
  test10()
  {
@@ -158,7 +160,7 @@ index ddab2e0..d688f76 100644
  	ROD ar -t lib.a \> ar.out
  
  	printf "file1.in\nfile2.in\nfile3.in\n" > ar.exp
-@@ -206,9 +218,9 @@ test10()
+@@ -209,9 +221,9 @@ test10()
  
  test11()
  {
@@ -171,7 +173,7 @@ index ddab2e0..d688f76 100644
  	ROD ar -t lib.a \> ar.out
  
  	printf "file1.in\nfile2.in\nfile3.in\n" > ar.exp
-@@ -225,9 +237,9 @@ test11()
+@@ -228,9 +240,9 @@ test11()
  
  test12()
  {
@@ -184,7 +186,7 @@ index ddab2e0..d688f76 100644
  
  	printf "This is file one\nThis is file two\nThis is file three\n" > ar.exp
  
-@@ -244,9 +256,9 @@ test12()
+@@ -247,9 +259,9 @@ test12()
  test13()
  {
  
@@ -197,7 +199,7 @@ index ddab2e0..d688f76 100644
  	ROD ar -t lib.a \> ar.out
  
  	printf "file1.in\nfile2.in\nfile3.in\nfile4.in\n" > ar.exp
-@@ -264,14 +276,14 @@ test13()
+@@ -267,14 +279,14 @@ test13()
  test14()
  {
  	ROD touch file0.in
@@ -214,7 +216,7 @@ index ddab2e0..d688f76 100644
  
  	file0_mtime2=$(ar -tv lib.a | grep file0.in)
  	file1_mtime2=$(ar -tv lib.a | grep file1.in)
-@@ -293,7 +305,7 @@ test14()
+@@ -296,7 +308,7 @@ test14()
  
  test15()
  {
@@ -223,7 +225,7 @@ index ddab2e0..d688f76 100644
  	ROD ar -tv lib.a \> ar.out
  
  	if grep -q '[rwx-]\{9\} [0-9].*/[0-9].*\s*[0-9].*.*file1.in' ar.out; then
-@@ -308,9 +320,9 @@ test15()
+@@ -311,9 +323,9 @@ test15()
  
  test16()
  {
@@ -236,7 +238,7 @@ index ddab2e0..d688f76 100644
  
  	printf "x - file1.in\nx - file2.in\nx - file3.in\n" > ar.exp
  
-@@ -332,8 +344,8 @@ test16()
+@@ -335,8 +347,8 @@ test16()
  
  test17()
  {
@@ -248,5 +250,5 @@ index ddab2e0..d688f76 100644
  	printf "x - file2.in\n" > ar.exp
  
 -- 
-2.7.4
+2.19.0.rc2
 

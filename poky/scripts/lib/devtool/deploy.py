@@ -211,6 +211,11 @@ def deploy(args, config, basepath, workspace):
         if not args.show_status:
             extraoptions += ' -q'
 
+        scp_sshexec = ''
+        ssh_sshexec = 'ssh'
+        if args.ssh_exec:
+            scp_sshexec = "-S %s" % args.ssh_exec
+            ssh_sshexec = args.ssh_exec
         scp_port = ''
         ssh_port = ''
         if args.port:
@@ -238,7 +243,7 @@ def deploy(args, config, basepath, workspace):
                 for fpath, fsize in filelist:
                     f.write('%s %d\n' % (fpath, fsize))
             # Copy them to the target
-            ret = subprocess.call("scp %s %s %s/* %s:%s" % (scp_port, extraoptions, tmpdir, args.target, os.path.dirname(tmpscript)), shell=True)
+            ret = subprocess.call("scp %s %s %s %s/* %s:%s" % (scp_sshexec, scp_port, extraoptions, tmpdir, args.target, os.path.dirname(tmpscript)), shell=True)
             if ret != 0:
                 raise DevtoolError('Failed to copy script to %s - rerun with -s to '
                                 'get a complete error message' % args.target)
@@ -246,7 +251,7 @@ def deploy(args, config, basepath, workspace):
             shutil.rmtree(tmpdir)
 
         # Now run the script
-        ret = exec_fakeroot(rd, 'tar cf - . | ssh  %s %s %s \'sh %s %s %s %s\'' % (ssh_port, extraoptions, args.target, tmpscript, args.recipename, destdir, tmpfilelist), cwd=recipe_outdir, shell=True)
+        ret = exec_fakeroot(rd, 'tar cf - . | %s  %s %s %s \'sh %s %s %s %s\'' % (ssh_sshexec, ssh_port, extraoptions, args.target, tmpscript, args.recipename, destdir, tmpfilelist), cwd=recipe_outdir, shell=True)
         if ret != 0:
             raise DevtoolError('Deploy failed - rerun with -s to get a complete '
                             'error message')
@@ -276,6 +281,11 @@ def undeploy(args, config, basepath, workspace):
     if not args.show_status:
         extraoptions += ' -q'
 
+    scp_sshexec = ''
+    ssh_sshexec = 'ssh'
+    if args.ssh_exec:
+        scp_sshexec = "-S %s" % args.ssh_exec
+        ssh_sshexec = args.ssh_exec
     scp_port = ''
     ssh_port = ''
     if args.port:
@@ -292,7 +302,7 @@ def undeploy(args, config, basepath, workspace):
         with open(os.path.join(tmpdir, os.path.basename(tmpscript)), 'w') as f:
             f.write(shellscript)
         # Copy it to the target
-        ret = subprocess.call("scp %s %s %s/* %s:%s" % (scp_port, extraoptions, tmpdir, args.target, os.path.dirname(tmpscript)), shell=True)
+        ret = subprocess.call("scp %s %s %s %s/* %s:%s" % (scp_sshexec, scp_port, extraoptions, tmpdir, args.target, os.path.dirname(tmpscript)), shell=True)
         if ret != 0:
             raise DevtoolError('Failed to copy script to %s - rerun with -s to '
                                 'get a complete error message' % args.target)
@@ -300,7 +310,7 @@ def undeploy(args, config, basepath, workspace):
         shutil.rmtree(tmpdir)
 
     # Now run the script
-    ret = subprocess.call('ssh %s %s %s \'sh %s %s\'' % (ssh_port, extraoptions, args.target, tmpscript, args.recipename), shell=True)
+    ret = subprocess.call('%s %s %s %s \'sh %s %s\'' % (ssh_sshexec, ssh_port, extraoptions, args.target, tmpscript, args.recipename), shell=True)
     if ret != 0:
         raise DevtoolError('Undeploy failed - rerun with -s to get a complete '
                            'error message')
@@ -324,6 +334,7 @@ def register_commands(subparsers, context):
     parser_deploy.add_argument('-n', '--dry-run', help='List files to be deployed only', action='store_true')
     parser_deploy.add_argument('-p', '--no-preserve', help='Do not preserve existing files', action='store_true')
     parser_deploy.add_argument('--no-check-space', help='Do not check for available space before deploying', action='store_true')
+    parser_deploy.add_argument('-e', '--ssh-exec', help='Executable to use in place of ssh')
     parser_deploy.add_argument('-P', '--port', help='Specify port to use for connection to the target')
 
     strip_opts = parser_deploy.add_mutually_exclusive_group(required=False)
@@ -346,5 +357,6 @@ def register_commands(subparsers, context):
     parser_undeploy.add_argument('-s', '--show-status', help='Show progress/status output', action='store_true')
     parser_undeploy.add_argument('-a', '--all', help='Undeploy all recipes deployed on the target', action='store_true')
     parser_undeploy.add_argument('-n', '--dry-run', help='List files to be undeployed only', action='store_true')
+    parser_undeploy.add_argument('-e', '--ssh-exec', help='Executable to use in place of ssh')
     parser_undeploy.add_argument('-P', '--port', help='Specify port to use for connection to the target')
     parser_undeploy.set_defaults(func=undeploy)

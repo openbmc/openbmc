@@ -13,7 +13,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=8ca43cbc842c2336e835926c2166c28b \
 
 inherit update-rc.d update-alternatives systemd
 
-SRC_URI = "http://www.infodrom.org/projects/sysklogd/download/sysklogd-${PV}.tar.gz \
+SRC_URI = "git://github.com/troglobit/sysklogd.git;nobranch=1 \
            file://no-strip-install.patch \
            file://0001-Fix-build-with-musl.patch \
            file://0001-fix-problems-that-causes-a-segmentation-fault-under-.patch \
@@ -24,6 +24,7 @@ SRC_URI = "http://www.infodrom.org/projects/sysklogd/download/sysklogd-${PV}.tar
            file://klogd.service \
            file://tmpfiles.sysklogd.conf \
            "
+S = "${WORKDIR}/git"
 
 SRC_URI_append_e500v2 = " file://no-vectorization.patch"
 

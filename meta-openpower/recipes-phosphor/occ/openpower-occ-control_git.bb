@@ -36,13 +36,6 @@ DEPENDS += " \
         systemd \
         "
 
-RDEPENDS_${PN} += " \
-               sdbusplus \
-               phosphor-logging \
-               openpower-dbus-interfaces \
-               phosphor-dbus-interfaces \
-               "
-
 EXTRA_OECONF = " \
              YAML_PATH=${STAGING_DATADIR_NATIVE}/${PN} \
              PS_DERATING_FACTOR=${POWER_SUPPLY_DERATING_FACTOR} \

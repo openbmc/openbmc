@@ -15,7 +15,7 @@ Index: nspr/pr/tests/Makefile.in
 ===================================================================
 --- nspr.orig/pr/tests/Makefile.in
 +++ nspr/pr/tests/Makefile.in
-@@ -315,7 +315,7 @@ ifeq ($(OS_ARCH), SunOS)
+@@ -316,7 +316,7 @@ ifeq ($(OS_ARCH), SunOS)
  endif # SunOS
  
  ifeq (,$(filter-out Linux GNU GNU_%,$(OS_ARCH)))

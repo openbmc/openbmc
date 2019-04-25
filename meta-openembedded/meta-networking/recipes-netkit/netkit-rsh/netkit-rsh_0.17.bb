@@ -39,6 +39,8 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG += "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}"
 PACKAGECONFIG[pam] = " , --without-pam, libpam, libpam"
 
+COMPATIBLE_HOST_libc-musl = 'null'
+
 do_configure () {
     ./configure --prefix=${prefix} --exec-prefix=${exec_prefix}
     echo "INSTALLROOT=${D}" > MCONFIG

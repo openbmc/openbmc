@@ -1,0 +1,307 @@
+From d672de675a16e5ab9efcf783705cbd171f38188e Mon Sep 17 00:00:00 2001
+From: "Billy O'Neal (VC LIBS)" <bion@microsoft.com>
+Date: Thu, 28 Mar 2019 15:17:12 -0700
+Subject: [PATCH] Avoid tripping over 32 bit time_t mistakes.
+
+Resolves https://github.com/Microsoft/cpprestsdk/issues/1090
+---
+ Release/src/utilities/asyncrt_utils.cpp     |  30 ++---
+ Release/tests/functional/utils/datetime.cpp | 140 ++++++++++----------
+ 2 files changed, 84 insertions(+), 86 deletions(-)
+
+diff --git a/Release/src/utilities/asyncrt_utils.cpp b/Release/src/utilities/asyncrt_utils.cpp
+index 4a692e5fa..986b64bb7 100644
+--- a/Release/src/utilities/asyncrt_utils.cpp
++++ b/Release/src/utilities/asyncrt_utils.cpp
+@@ -618,7 +618,7 @@ std::string __cdecl conversions::to_utf8string(const utf16string& value) { retur
+ 
+ utf16string __cdecl conversions::to_utf16string(const std::string& value) { return utf8_to_utf16(value); }
+ 
+-static const uint64_t ntToUnixOffsetSeconds = 11644473600U; // diff between windows and unix epochs (seconds)
++static const int64_t ntToUnixOffsetSeconds = 11644473600; // diff between windows and unix epochs (seconds)
+ 
+ datetime __cdecl datetime::utc_now()
+ {
+@@ -634,10 +634,10 @@ datetime __cdecl datetime::utc_now()
+ #else // LINUX
+     struct timeval time;
+     gettimeofday(&time, nullptr);
+-    uint64_t result = ntToUnixOffsetSeconds + time.tv_sec;
++    int64_t result = ntToUnixOffsetSeconds + time.tv_sec;
+     result *= _secondTicks;      // convert to 10e-7
+     result += time.tv_usec * 10; // convert and add microseconds, 10e-6 to 10e-7
+-    return datetime(result);
++    return datetime(static_cast<interval_type>(result));
+ #endif
+ }
+ 
+@@ -646,7 +646,7 @@ static const char monthNames[] = "Jan\0Feb\0Mar\0Apr\0May\0Jun\0Jul\0Aug\0Sep\0O
+ 
+ utility::string_t datetime::to_string(date_format format) const
+ {
+-    const uint64_t input = m_interval / _secondTicks; // convert to seconds
++    const int64_t input = static_cast<int64_t>(m_interval / _secondTicks); // convert to seconds
+     const int frac_sec = static_cast<int>(m_interval % _secondTicks);
+     const time_t time = static_cast<time_t>(input - ntToUnixOffsetSeconds);
+     struct tm t;
+@@ -797,22 +797,20 @@ static int atoi2(const CharT* str)
+     return (static_cast<unsigned char>(str[0]) - '0') * 10 + (static_cast<unsigned char>(str[1]) - '0');
+ }
+ 
+-static const time_t maxTimeT = sizeof(time_t) == 4 ? (time_t)INT_MAX : (time_t)LLONG_MAX;
+-
+-static time_t timezone_adjust(time_t result, unsigned char chSign, int adjustHours, int adjustMinutes)
++static int64_t timezone_adjust(int64_t result, unsigned char chSign, int adjustHours, int adjustMinutes)
+ {
+     if (adjustHours > 23)
+     {
+-        return (time_t)-1;
++        return -1;
+     }
+ 
+     // adjustMinutes > 59 is impossible due to digit 5 check
+     const int tzAdjust = adjustMinutes * 60 + adjustHours * 60 * 60;
+     if (chSign == '-')
+     {
+-        if (maxTimeT - result < tzAdjust)
++        if (INT64_MAX - result < tzAdjust)
+         {
+-            return (time_t)-1;
++            return -1;
+         }
+ 
+         result += tzAdjust;
+@@ -821,7 +819,7 @@ static time_t timezone_adjust(time_t result, unsigned char chSign, int adjustHou
+     {
+         if (tzAdjust > result)
+         {
+-            return (time_t)-1;
++            return -1;
+         }
+ 
+         result -= tzAdjust;
+@@ -830,10 +828,10 @@ static time_t timezone_adjust(time_t result, unsigned char chSign, int adjustHou
+     return result;
+ }
+ 
+-static time_t make_gm_time(struct tm* t)
++static int64_t make_gm_time(struct tm* t)
+ {
+ #ifdef _MSC_VER
+-    return _mkgmtime(t);
++    return static_cast<int64_t>(_mkgmtime(t));
+ #elif (defined(ANDROID) || defined(__ANDROID__))
+     // HACK: The (nonportable?) POSIX function timegm is not available in
+     //       bionic. As a workaround[1][2], we set the C library timezone to
+@@ -867,9 +865,9 @@ static time_t make_gm_time(struct tm* t)
+             unsetenv("TZ");
+         }
+     }
+-    return time;
++    return static_cast<int64_t>(time);
+ #else  // ^^^ ANDROID // Other POSIX platforms vvv
+-    return timegm(t);
++    return static_cast<int64_t>(timegm(t));
+ #endif // _MSC_VER
+ }
+ 
+@@ -916,7 +914,7 @@ zone        =  "UT"  / "GMT"                ; Universal Time
+ datetime __cdecl datetime::from_string(const utility::string_t& dateString, date_format format)
+ {
+     datetime result;
+-    time_t seconds;
++    int64_t seconds;
+     uint64_t frac_sec = 0;
+     struct tm t{};
+     auto str = dateString.c_str();
+diff --git a/Release/tests/functional/utils/datetime.cpp b/Release/tests/functional/utils/datetime.cpp
+index ae7f7a5e4..acd6fddb0 100644
+--- a/Release/tests/functional/utils/datetime.cpp
++++ b/Release/tests/functional/utils/datetime.cpp
+@@ -133,75 +133,77 @@ SUITE(datetime)
+ 
+     TEST(parsing_time_rfc1123_accepts_each_day)
+     {
+-        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 00:00:00 GMT"), (time_t) 0);
+-        TestRfc1123IsTimeT(_XPLATSTR("Fri, 02 Jan 1970 00:00:00 GMT"), (time_t) 86400 * 1);
+-        TestRfc1123IsTimeT(_XPLATSTR("Sat, 03 Jan 1970 00:00:00 GMT"), (time_t) 86400 * 2);
+-        TestRfc1123IsTimeT(_XPLATSTR("Sun, 04 Jan 1970 00:00:00 GMT"), (time_t) 86400 * 3);
+-        TestRfc1123IsTimeT(_XPLATSTR("Mon, 05 Jan 1970 00:00:00 GMT"), (time_t) 86400 * 4);
+-        TestRfc1123IsTimeT(_XPLATSTR("Tue, 06 Jan 1970 00:00:00 GMT"), (time_t) 86400 * 5);
+-        TestRfc1123IsTimeT(_XPLATSTR("Wed, 07 Jan 1970 00:00:00 GMT"), (time_t) 86400 * 6);
++        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 00:00:00 GMT"), (time_t)0);
++        TestRfc1123IsTimeT(_XPLATSTR("Fri, 02 Jan 1970 00:00:00 GMT"), (time_t)86400 * 1);
++        TestRfc1123IsTimeT(_XPLATSTR("Sat, 03 Jan 1970 00:00:00 GMT"), (time_t)86400 * 2);
++        TestRfc1123IsTimeT(_XPLATSTR("Sun, 04 Jan 1970 00:00:00 GMT"), (time_t)86400 * 3);
++        TestRfc1123IsTimeT(_XPLATSTR("Mon, 05 Jan 1970 00:00:00 GMT"), (time_t)86400 * 4);
++        TestRfc1123IsTimeT(_XPLATSTR("Tue, 06 Jan 1970 00:00:00 GMT"), (time_t)86400 * 5);
++        TestRfc1123IsTimeT(_XPLATSTR("Wed, 07 Jan 1970 00:00:00 GMT"), (time_t)86400 * 6);
+     }
+ 
+     TEST(parsing_time_rfc1123_boundary_cases)
+     {
+-        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 00:00:00 GMT"), (time_t) 0);
+-        TestRfc1123IsTimeT(_XPLATSTR("19 Jan 2038 03:14:06 GMT"), (time_t) INT_MAX - 1);
+-#ifndef _USE_32BIT_TIME_T
+-        TestRfc1123IsTimeT(_XPLATSTR("19 Jan 2038 03:13:07 -0001"), (time_t) INT_MAX);
+-        TestRfc1123IsTimeT(_XPLATSTR("19 Jan 2038 03:14:07 -0000"), (time_t) INT_MAX);
+-#endif // _USE_32BIT_TIME_T
+-        TestRfc1123IsTimeT(_XPLATSTR("14 Jan 2019 23:16:21 +0000"), (time_t) 1547507781);
+-        TestRfc1123IsTimeT(_XPLATSTR("14 Jan 2019 23:16:21 -0001"), (time_t) 1547507841);
+-        TestRfc1123IsTimeT(_XPLATSTR("14 Jan 2019 23:16:21 +0001"), (time_t) 1547507721);
+-        TestRfc1123IsTimeT(_XPLATSTR("14 Jan 2019 23:16:21 -0100"), (time_t) 1547511381);
+-        TestRfc1123IsTimeT(_XPLATSTR("14 Jan 2019 23:16:21 +0100"), (time_t) 1547504181);
++        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 00:00:00 GMT"), (time_t)0);
++        TestRfc1123IsTimeT(_XPLATSTR("19 Jan 2038 03:14:06 GMT"), (time_t)INT_MAX - 1);
++        if (sizeof(time_t) == 8)
++        {
++            TestRfc1123IsTimeT(_XPLATSTR("19 Jan 2038 03:13:07 -0001"), (time_t)INT_MAX);
++            TestRfc1123IsTimeT(_XPLATSTR("19 Jan 2038 03:14:07 -0000"), (time_t)INT_MAX);
++        }
++        TestRfc1123IsTimeT(_XPLATSTR("14 Jan 2019 23:16:21 +0000"), (time_t)1547507781);
++        TestRfc1123IsTimeT(_XPLATSTR("14 Jan 2019 23:16:21 -0001"), (time_t)1547507841);
++        TestRfc1123IsTimeT(_XPLATSTR("14 Jan 2019 23:16:21 +0001"), (time_t)1547507721);
++        TestRfc1123IsTimeT(_XPLATSTR("14 Jan 2019 23:16:21 -0100"), (time_t)1547511381);
++        TestRfc1123IsTimeT(_XPLATSTR("14 Jan 2019 23:16:21 +0100"), (time_t)1547504181);
+     }
+ 
+     TEST(parsing_time_rfc1123_uses_each_field)
+     {
+-        TestRfc1123IsTimeT(_XPLATSTR("02 Jan 1970 00:00:00 GMT"), (time_t) 86400);
+-        TestRfc1123IsTimeT(_XPLATSTR("12 Jan 1970 00:00:00 GMT"), (time_t) 950400);
+-        TestRfc1123IsTimeT(_XPLATSTR("01 Feb 1970 00:00:00 GMT"), (time_t) 2678400);
+-        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 2000 00:00:00 GMT"), (time_t) 946684800);
+-#ifndef _USE_32BIT_TIME_T
+-        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 2100 00:00:00 GMT"), (time_t) 4102444800);
+-#endif // _USE_32BIT_TIME_T
+-        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1990 00:00:00 GMT"), (time_t) 631152000);
+-        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1971 00:00:00 GMT"), (time_t) 31536000);
+-        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 10:00:00 GMT"), (time_t) 36000);
+-        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 01:00:00 GMT"), (time_t) 3600);
+-        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 00:10:00 GMT"), (time_t) 600);
+-        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 00:01:00 GMT"), (time_t) 60);
+-        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 00:00:10 GMT"), (time_t) 10);
+-        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 00:00:01 GMT"), (time_t) 1);
+-        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 10:00:00 GMT"), (time_t) 36000);
+-        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 02:00:00 PST"), (time_t) 36000);
+-        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 03:00:00 PDT"), (time_t) 36000);
+-        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 03:00:00 MST"), (time_t) 36000);
+-        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 04:00:00 MDT"), (time_t) 36000);
+-        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 04:00:00 CST"), (time_t) 36000);
+-        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 05:00:00 CDT"), (time_t) 36000);
+-        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 05:00:00 EST"), (time_t) 36000);
+-        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 06:00:00 EDT"), (time_t) 36000);
+-        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 06:00:00 -0400"), (time_t) 36000);
+-        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 05:59:00 -0401"), (time_t) 36000);
++        TestRfc1123IsTimeT(_XPLATSTR("02 Jan 1970 00:00:00 GMT"), (time_t)86400);
++        TestRfc1123IsTimeT(_XPLATSTR("12 Jan 1970 00:00:00 GMT"), (time_t)950400);
++        TestRfc1123IsTimeT(_XPLATSTR("01 Feb 1970 00:00:00 GMT"), (time_t)2678400);
++        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 2000 00:00:00 GMT"), (time_t)946684800);
++        if (sizeof(time_t) == 8)
++        {
++            TestRfc1123IsTimeT(_XPLATSTR("01 Jan 2100 00:00:00 GMT"), (time_t)4102444800);
++        }
++        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1990 00:00:00 GMT"), (time_t)631152000);
++        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1971 00:00:00 GMT"), (time_t)31536000);
++        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 10:00:00 GMT"), (time_t)36000);
++        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 01:00:00 GMT"), (time_t)3600);
++        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 00:10:00 GMT"), (time_t)600);
++        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 00:01:00 GMT"), (time_t)60);
++        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 00:00:10 GMT"), (time_t)10);
++        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 00:00:01 GMT"), (time_t)1);
++        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 10:00:00 GMT"), (time_t)36000);
++        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 02:00:00 PST"), (time_t)36000);
++        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 03:00:00 PDT"), (time_t)36000);
++        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 03:00:00 MST"), (time_t)36000);
++        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 04:00:00 MDT"), (time_t)36000);
++        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 04:00:00 CST"), (time_t)36000);
++        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 05:00:00 CDT"), (time_t)36000);
++        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 05:00:00 EST"), (time_t)36000);
++        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 06:00:00 EDT"), (time_t)36000);
++        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 06:00:00 -0400"), (time_t)36000);
++        TestRfc1123IsTimeT(_XPLATSTR("01 Jan 1970 05:59:00 -0401"), (time_t)36000);
+     }
+ 
+     TEST(parsing_time_rfc1123_max_days)
+     {
+-        TestRfc1123IsTimeT(_XPLATSTR("31 Jan 1970 00:00:00 GMT"), (time_t) 2592000);
+-        TestRfc1123IsTimeT(_XPLATSTR("28 Feb 2019 00:00:00 GMT"), (time_t) 1551312000); // non leap year allows feb 28
+-        TestRfc1123IsTimeT(_XPLATSTR("29 Feb 2020 00:00:00 GMT"), (time_t) 1582934400); // leap year allows feb 29
+-        TestRfc1123IsTimeT(_XPLATSTR("31 Mar 1970 00:00:00 GMT"), (time_t) 7689600);
+-        TestRfc1123IsTimeT(_XPLATSTR("30 Apr 1970 00:00:00 GMT"), (time_t) 10281600);
+-        TestRfc1123IsTimeT(_XPLATSTR("31 May 1970 00:00:00 GMT"), (time_t) 12960000);
+-        TestRfc1123IsTimeT(_XPLATSTR("30 Jun 1970 00:00:00 GMT"), (time_t) 15552000);
+-        TestRfc1123IsTimeT(_XPLATSTR("31 Jul 1970 00:00:00 GMT"), (time_t) 18230400);
+-        TestRfc1123IsTimeT(_XPLATSTR("31 Aug 1970 00:00:00 GMT"), (time_t) 20908800);
+-        TestRfc1123IsTimeT(_XPLATSTR("30 Sep 1970 00:00:00 GMT"), (time_t) 23500800);
+-        TestRfc1123IsTimeT(_XPLATSTR("31 Oct 1970 00:00:00 GMT"), (time_t) 26179200);
+-        TestRfc1123IsTimeT(_XPLATSTR("30 Nov 1970 00:00:00 GMT"), (time_t) 28771200);
+-        TestRfc1123IsTimeT(_XPLATSTR("31 Dec 1970 00:00:00 GMT"), (time_t) 31449600);
++        TestRfc1123IsTimeT(_XPLATSTR("31 Jan 1970 00:00:00 GMT"), (time_t)2592000);
++        TestRfc1123IsTimeT(_XPLATSTR("28 Feb 2019 00:00:00 GMT"), (time_t)1551312000); // non leap year allows feb 28
++        TestRfc1123IsTimeT(_XPLATSTR("29 Feb 2020 00:00:00 GMT"), (time_t)1582934400); // leap year allows feb 29
++        TestRfc1123IsTimeT(_XPLATSTR("31 Mar 1970 00:00:00 GMT"), (time_t)7689600);
++        TestRfc1123IsTimeT(_XPLATSTR("30 Apr 1970 00:00:00 GMT"), (time_t)10281600);
++        TestRfc1123IsTimeT(_XPLATSTR("31 May 1970 00:00:00 GMT"), (time_t)12960000);
++        TestRfc1123IsTimeT(_XPLATSTR("30 Jun 1970 00:00:00 GMT"), (time_t)15552000);
++        TestRfc1123IsTimeT(_XPLATSTR("31 Jul 1970 00:00:00 GMT"), (time_t)18230400);
++        TestRfc1123IsTimeT(_XPLATSTR("31 Aug 1970 00:00:00 GMT"), (time_t)20908800);
++        TestRfc1123IsTimeT(_XPLATSTR("30 Sep 1970 00:00:00 GMT"), (time_t)23500800);
++        TestRfc1123IsTimeT(_XPLATSTR("31 Oct 1970 00:00:00 GMT"), (time_t)26179200);
++        TestRfc1123IsTimeT(_XPLATSTR("30 Nov 1970 00:00:00 GMT"), (time_t)28771200);
++        TestRfc1123IsTimeT(_XPLATSTR("31 Dec 1970 00:00:00 GMT"), (time_t)31449600);
+     }
+ 
+     TEST(parsing_time_rfc1123_invalid_cases)
+@@ -266,7 +268,7 @@ SUITE(datetime)
+             _XPLATSTR("Thu, 01 Jan 1970 00:00:00 G"),
+             _XPLATSTR("Thu, 01 Jan 1970 00:00:00 GM"),
+             _XPLATSTR("Fri, 01 Jan 1970 00:00:00 GMT"), // wrong day
+-            _XPLATSTR("01 Jan 4970 00:00:00 GMT"), // year too big
++            _XPLATSTR("01 Jan 4970 00:00:00 GMT"),      // year too big
+             _XPLATSTR("01 Jan 3001 00:00:00 GMT"),
+             _XPLATSTR("01 Xxx 1971 00:00:00 GMT"), // month bad
+             _XPLATSTR("00 Jan 1971 00:00:00 GMT"), // day too small
+@@ -288,8 +290,8 @@ SUITE(datetime)
+             _XPLATSTR("01 Jan 1971 00:60:00 GMT"), // minute too big
+             _XPLATSTR("01 Jan 1971 00:00:70 GMT"), // second too big
+             _XPLATSTR("01 Jan 1971 00:00:61 GMT"),
+-            _XPLATSTR("01 Jan 1969 00:00:00 GMT"), // underflow
+-            _XPLATSTR("01 Jan 1969 00:00:00 CEST"), // bad tz
++            _XPLATSTR("01 Jan 1969 00:00:00 GMT"),   // underflow
++            _XPLATSTR("01 Jan 1969 00:00:00 CEST"),  // bad tz
+             _XPLATSTR("01 Jan 1970 00:00:00 +2400"), // bad tzoffsets
+             _XPLATSTR("01 Jan 1970 00:00:00 -3000"),
+             _XPLATSTR("01 Jan 1970 00:00:00 +2160"),
+@@ -309,11 +311,12 @@ SUITE(datetime)
+         // boundary cases:
+         TestDateTimeRoundtrip(_XPLATSTR("1970-01-01T00:00:00Z"));                                         // epoch
+         TestDateTimeRoundtrip(_XPLATSTR("2038-01-19T03:14:06+00:00"), _XPLATSTR("2038-01-19T03:14:06Z")); // INT_MAX - 1
+-#ifndef _USE_32BIT_TIME_T
+-        TestDateTimeRoundtrip(_XPLATSTR("2038-01-19T03:13:07-00:01"),
+-                              _XPLATSTR("2038-01-19T03:14:07Z")); // INT_MAX after subtacting 1
+-        TestDateTimeRoundtrip(_XPLATSTR("2038-01-19T03:14:07-00:00"), _XPLATSTR("2038-01-19T03:14:07Z"));
+-#endif // _USE_32BIT_TIME_T
++        if (sizeof(time_t) == 8)
++        {
++            TestDateTimeRoundtrip(_XPLATSTR("2038-01-19T03:13:07-00:01"),
++                                  _XPLATSTR("2038-01-19T03:14:07Z")); // INT_MAX after subtacting 1
++            TestDateTimeRoundtrip(_XPLATSTR("2038-01-19T03:14:07-00:00"), _XPLATSTR("2038-01-19T03:14:07Z"));
++        }
+     }
+ 
+     TEST(parsing_time_iso8601_uses_each_timezone_digit)
+@@ -456,11 +459,8 @@ SUITE(datetime)
+             _XPLATSTR("1971-01-01T00:60:00Z"), // minute too big
+             _XPLATSTR("1971-01-01T00:00:70Z"), // second too big
+             _XPLATSTR("1971-01-01T00:00:61Z"),
+-            _XPLATSTR("1969-01-01T00:00:00Z"), // underflow
+-#ifdef _USE_32BIT_TIME_T
+-            _XPLATSTR("3000-01-01T00:00:01Z"), // overflow
+-#endif
+-            _XPLATSTR("3001-01-01T00:00:00Z"),
++            _XPLATSTR("1969-01-01T00:00:00Z"),      // underflow
++            _XPLATSTR("3001-01-01T00:00:00Z"),      // overflow
+             _XPLATSTR("1970-01-01T00:00:00+00:01"), // time zone underflow
+             // _XPLATSTR("1970-01-01T00:00:00.Z"), // accepted as invalid timezone above
+             _XPLATSTR("1970-01-01T00:00:00+24:00"), // bad tzoffsets

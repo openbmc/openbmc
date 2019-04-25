@@ -5,12 +5,21 @@ PATCH_GIT_USER_NAME ?= "OpenEmbedded"
 
 # returns local (absolute) path names for all valid patches in the
 # src_uri
-def find_patches(d):
+def find_patches(d,subdir):
     patches = src_patches(d)
     patch_list=[]
     for p in patches:
-        _, _, local, _, _, _ = bb.fetch.decodeurl(p)
-        patch_list.append(local)
+        _, _, local, _, _, parm = bb.fetch.decodeurl(p)
+        # if patchdir has been passed, we won't be able to apply it so skip
+        # the patch for now, and special processing happens later
+        patchdir = ''
+        if "patchdir" in parm:
+            patchdir = parm["patchdir"]
+        if subdir:
+            if subdir == patchdir:
+                patch_list.append(local)
+        else:
+            patch_list.append(local)
 
     return patch_list
 
@@ -119,8 +128,20 @@ do_kernel_metadata() {
 		fi
 	fi
 
+	# was anyone trying to patch the kernel meta data ?, we need to do
+	# this here, since the scc commands migrate the .cfg fragments to the
+	# kernel source tree, where they'll be used later.
+	check_git_config
+	patches="${@" ".join(find_patches(d,'kernel-meta'))}"
+	for p in $patches; do
+	    (
+		cd ${WORKDIR}/kernel-meta
+		git am -s $p
+	    )
+	done
+
 	sccs_from_src_uri="${@" ".join(find_sccs(d))}"
-	patches="${@" ".join(find_patches(d))}"
+	patches="${@" ".join(find_patches(d,''))}"
 	feat_dirs="${@" ".join(find_kernel_feature_dirs(d))}"
 
 	# a quick check to make sure we don't have duplicate defconfigs
@@ -138,10 +159,10 @@ do_kernel_metadata() {
 	for f in ${feat_dirs}; do
 		if [ -d "${WORKDIR}/$f/meta" ]; then
 			includes="$includes -I${WORKDIR}/$f/kernel-meta"
-	        elif [ -d "${WORKDIR}/$f" ]; then
-			includes="$includes -I${WORKDIR}/$f"
 		elif [ -d "${WORKDIR}/../oe-local-files/$f" ]; then
 			includes="$includes -I${WORKDIR}/../oe-local-files/$f"
+	        elif [ -d "${WORKDIR}/$f" ]; then
+			includes="$includes -I${WORKDIR}/$f"
 		fi
 	done
 	for s in ${sccs} ${patches}; do

@@ -14,7 +14,6 @@ inherit systemd
 
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "systemd"
-RDEPENDS_${PN} += "libsystemd"
 RDEPENDS_${PN} += "fbterm"
 
 SRCREV = "14decab20f621c050760e5f3310f5a960cf21211"

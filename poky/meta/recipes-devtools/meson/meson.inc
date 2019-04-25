@@ -9,17 +9,20 @@ SRC_URI = "https://github.com/mesonbuild/meson/releases/download/${PV}/meson-${P
            file://0002-gobject-introspection-determine-g-ir-scanner-and-g-i.patch \
            file://0001-Linker-rules-move-cross_args-in-front-of-output_args.patch \
            file://0003-native_bindir.patch \
-           file://gi-flags.patch \
-           file://gtkdoc-flags.patch \
            file://0001-python-module-do-not-manipulate-the-environment-when.patch \
            file://disable-rpath-handling.patch \
+           file://0001-modules-windows-split-WINDRES-env-variable.patch \
+           file://0002-environment.py-detect-windows-also-if-the-system-str.patch \
+           file://cross-prop-default.patch \
+           file://many-cross.patch \
+           file://cross-libdir.patch \
            "
-SRC_URI[sha256sum] = "92d8afd921751261e36151643464efd3394162f69efbe8cd53e0a66b1cf395eb"
-SRC_URI[md5sum] = "31bda3519d8c0eb3438267268a78085e"
+SRC_URI[sha256sum] = "ef9f14326ec1e30d3ba1a26df0f92826ede5a79255ad723af78a2691c37109fd"
+SRC_URI[md5sum] = "0267b0871266056184c484792572c682"
 
 SRC_URI_append_class-native = " \
-    file://0002-Make-CPU-family-warnings-fatal.patch \
-    file://0001-Support-building-allarch-recipes-again.patch \
+    file://0001-Make-CPU-family-warnings-fatal.patch \
+    file://0002-Support-building-allarch-recipes-again.patch \
 "
 
 UPSTREAM_CHECK_URI = "https://github.com/mesonbuild/meson/releases"

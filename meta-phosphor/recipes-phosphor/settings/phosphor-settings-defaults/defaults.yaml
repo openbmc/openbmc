@@ -127,3 +127,9 @@
       Properties:
           Enabled:
              Default: 'false'
+
+/xyz/openbmc_project/software/apply_time:
+    - Interface: xyz.openbmc_project.Software.ApplyTime
+      Properties:
+          RequestedApplyTime:
+             Default: ApplyTime::RequestedApplyTimes::OnReset

@@ -44,7 +44,7 @@
             </literallayout>
             This code sets up an instance of the fetch class.
             The instance uses a space-separated list of URLs from the
-            <link linkend='var-SRC_URI'><filename>SRC_URI</filename></link>
+            <link linkend='var-bb-SRC_URI'><filename>SRC_URI</filename></link>
             variable and then calls the <filename>download</filename>
             method to download the files.
         </para>
@@ -78,7 +78,7 @@
                 <listitem><para><emphasis>Pre-mirror Sites:</emphasis>
                     BitBake first uses pre-mirrors to try and find source files.
                     These locations are defined using the
-                    <link linkend='var-PREMIRRORS'><filename>PREMIRRORS</filename></link>
+                    <link linkend='var-bb-PREMIRRORS'><filename>PREMIRRORS</filename></link>
                     variable.
                     </para></listitem>
                 <listitem><para><emphasis>Source URI:</emphasis>
@@ -88,7 +88,7 @@
                 <listitem><para><emphasis>Mirror Sites:</emphasis>
                     If fetch failures occur, BitBake next uses mirror locations as
                     defined by the
-                    <link linkend='var-MIRRORS'><filename>MIRRORS</filename></link>
+                    <link linkend='var-bb-MIRRORS'><filename>MIRRORS</filename></link>
                     variable.
                     </para></listitem>
             </itemizedlist>
@@ -144,7 +144,7 @@
             Any source files that are not local (i.e.
             downloaded from the Internet) are placed into the download
             directory, which is specified by the
-            <link linkend='var-DL_DIR'><filename>DL_DIR</filename></link>
+            <link linkend='var-bb-DL_DIR'><filename>DL_DIR</filename></link>
             variable.
         </para>
 
@@ -184,11 +184,11 @@
 
         <para>
             If
-            <link linkend='var-BB_STRICT_CHECKSUM'><filename>BB_STRICT_CHECKSUM</filename></link>
+            <link linkend='var-bb-BB_STRICT_CHECKSUM'><filename>BB_STRICT_CHECKSUM</filename></link>
             is set, any download without a checksum triggers an
             error message.
             The
-            <link linkend='var-BB_NO_NETWORK'><filename>BB_NO_NETWORK</filename></link>
+            <link linkend='var-bb-BB_NO_NETWORK'><filename>BB_NO_NETWORK</filename></link>
             variable can be used to make any attempted network access a fatal
             error, which is useful for checking that mirrors are complete
             as well as other things.
@@ -265,11 +265,11 @@
                 The filename you specify within the URL can be
                 either an absolute or relative path to a file.
                 If the filename is relative, the contents of the
-                <link linkend='var-FILESPATH'><filename>FILESPATH</filename></link>
+                <link linkend='var-bb-FILESPATH'><filename>FILESPATH</filename></link>
                 variable is used in the same way
                 <filename>PATH</filename> is used to find executables.
                 If the file cannot be found, it is assumed that it is available in
-                <link linkend='var-DL_DIR'><filename>DL_DIR</filename></link>
+                <link linkend='var-bb-DL_DIR'><filename>DL_DIR</filename></link>
                 by the time the <filename>download()</filename> method is called.
             </para>
 
@@ -304,7 +304,7 @@
                 allows the name of the downloaded file to be specified.
                 Specifying the name of the downloaded file is useful
                 for avoiding collisions in
-                <link linkend='var-DL_DIR'><filename>DL_DIR</filename></link>
+                <link linkend='var-bb-DL_DIR'><filename>DL_DIR</filename></link>
                 when dealing with multiple files that have the same name.
             </para>
 
@@ -355,7 +355,7 @@
                         A special value of "now" causes the checkout to
                         be updated on every build.
                         </para></listitem>
-                    <listitem><para><emphasis><link linkend='var-CVSDIR'><filename>CVSDIR</filename></link>:</emphasis>
+                    <listitem><para><emphasis><link linkend='var-bb-CVSDIR'><filename>CVSDIR</filename></link>:</emphasis>
                         Specifies where a temporary checkout is saved.
                         The location is often <filename>DL_DIR/cvs</filename>.
                         </para></listitem>
@@ -395,7 +395,7 @@
                     <listitem><para><emphasis>"date":</emphasis>
                         Specifies a date.
                         If no "date" is specified, the
-                        <link linkend='var-SRCDATE'><filename>SRCDATE</filename></link>
+                        <link linkend='var-bb-SRCDATE'><filename>SRCDATE</filename></link>
                         of the configuration is used to checkout a specific date.
                         The special value of "now" causes the checkout to be
                         updated on every build.
@@ -406,7 +406,7 @@
                         to which the module is unpacked.
                         You are forcing the module into a special
                         directory relative to
-                        <link linkend='var-CVSDIR'><filename>CVSDIR</filename></link>.
+                        <link linkend='var-bb-CVSDIR'><filename>CVSDIR</filename></link>.
                         </para></listitem>
                     <listitem><para><emphasis>"rsh"</emphasis>
                         Used in conjunction with the "method" parameter.
@@ -448,7 +448,7 @@
                 <filename>FETCHCMD_svn</filename>, which defaults
                 to "svn".
                 The fetcher's temporary working directory is set by
-                <link linkend='var-SVNDIR'><filename>SVNDIR</filename></link>,
+                <link linkend='var-bb-SVNDIR'><filename>SVNDIR</filename></link>,
                 which is usually <filename>DL_DIR/svn</filename>.
             </para>
 
@@ -509,7 +509,7 @@
                 source control system.
                 The fetcher works by creating a bare clone of the
                 remote into
-                <link linkend='var-GITDIR'><filename>GITDIR</filename></link>,
+                <link linkend='var-bb-GITDIR'><filename>GITDIR</filename></link>,
                 which is usually <filename>DL_DIR/git2</filename>.
                 This bare clone is then cloned into the work directory during the
                 unpack stage when a specific tree is checked out.
@@ -612,7 +612,7 @@
                 This fetcher submodule inherits from the
                 <link linkend='git-fetcher'>Git fetcher</link> and extends
                 that fetcher's behavior by fetching a repository's submodules.
-                <link linkend='var-SRC_URI'><filename>SRC_URI</filename></link>
+                <link linkend='var-bb-SRC_URI'><filename>SRC_URI</filename></link>
                 is passed to the Git fetcher as described in the
                 "<link linkend='git-fetcher'>Git Fetcher (<filename>git://</filename>)</link>"
                 section.
@@ -647,9 +647,9 @@
 
             <para>
                 To use this fetcher, make sure your recipe has proper
-                <link linkend='var-SRC_URI'><filename>SRC_URI</filename></link>,
-                <link linkend='var-SRCREV'><filename>SRCREV</filename></link>, and
-                <link linkend='var-PV'><filename>PV</filename></link> settings.
+                <link linkend='var-bb-SRC_URI'><filename>SRC_URI</filename></link>,
+                <link linkend='var-bb-SRCREV'><filename>SRCREV</filename></link>, and
+                <link linkend='var-bb-PV'><filename>PV</filename></link> settings.
                 Here is an example:
                 <literallayout class='monospaced'>
      SRC_URI = "ccrc://cc.example.org/ccrc;vob=/example_vob;module=/example_module"
@@ -734,15 +734,15 @@
                 <filename>FETCHCMD_p4</filename>, which defaults
                 to "p4".
                 The fetcher's temporary working directory is set by
-                <link linkend='var-P4DIR'><filename>P4DIR</filename></link>,
+                <link linkend='var-bb-P4DIR'><filename>P4DIR</filename></link>,
                 which defaults to "DL_DIR/p4".
             </para>
 
             <para>
                 To use this fetcher, make sure your recipe has proper
-                <link linkend='var-SRC_URI'><filename>SRC_URI</filename></link>,
-                <link linkend='var-SRCREV'><filename>SRCREV</filename></link>, and
-                <link linkend='var-PV'><filename>PV</filename></link> values.
+                <link linkend='var-bb-SRC_URI'><filename>SRC_URI</filename></link>,
+                <link linkend='var-bb-SRCREV'><filename>SRCREV</filename></link>, and
+                <link linkend='var-bb-PV'><filename>PV</filename></link> values.
                 The p4 executable is able to use the config file defined by your
                 system's <filename>P4CONFIG</filename> environment variable in
                 order to define the Perforce server URL and port, username, and
@@ -793,9 +793,9 @@
                 <filename>google-repo</filename> source control system.
                 The fetcher works by initiating and syncing sources of the
                 repository into
-                <link linkend='var-REPODIR'><filename>REPODIR</filename></link>,
+                <link linkend='var-bb-REPODIR'><filename>REPODIR</filename></link>,
                 which is usually
-                <link linkend='var-DL_DIR'><filename>DL_DIR</filename></link><filename>/repo</filename>.
+                <link linkend='var-bb-DL_DIR'><filename>DL_DIR</filename></link><filename>/repo</filename>.
             </para>
 
             <para>
