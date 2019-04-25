@@ -1,60 +1,58 @@
 #!/bin/bash
 
+source /usr/libexec/nvme_powerctrl_library.sh
+
 function set_gpio() {
   #$1 gpio pin
   echo $1 > /sys/class/gpio/export
 }
 
-function set_gpio_direction(){
-    #$1 gpio pin, $2 'in','high','low'
-    echo $2 > /sys/class/gpio/gpio$1/direction
-}
+echo "Read Clock Gen Value is: $CLOCK_GEN_VALUE"
 
-function read_gpio_input(){
-    #$1 read input gpio pin
-    cat /sys/class/gpio/gpio$1/value
-}
-
-function read_present_set_related_power(){
-    #$1 read present gpio, $2 output power gpio,$3 output direction
-    var=$(cat /sys/class/gpio/gpio$1/value)
-    # present 0 is plugged,present 1 is removal
-    if [ "$var" == "0" ];then
-        set_gpio_direction $2 "high"
-    else 
-        set_gpio_direction $2 "low"
-    fi
-}
-
-
-## Initial U2_PRESNET_N
-U2_PRESENT=( 148 149 150 151 152 153 154 155 )
-for i in "${U2_PRESENT[@]}";
-do 
-    set_gpio $i;
-    set_gpio_direction $i 'in';
+## Initial U2_PRESENT_N
+for i in ${!U2_PRESENT[@]};
+do
+    set_gpio ${U2_PRESENT[$i]};
+    set_gpio_direction ${U2_PRESENT[$i]} 'in';
+    echo "Read $i SSD present: $(read_gpio_input ${U2_PRESENT[$i]})"
 done
 
 ## Initial POWER_U2_EN
-POWER_U2=( 195 196 202 199 198 197 127 126 )
-for i in "${POWER_U2[@]}";
+for i in ${!POWER_U2[@]};
 do
-    set_gpio $i;
+    set_gpio ${POWER_U2[$i]};
 done
 
 ## Initial PWRGD_U2
-PWRGD_U2=( 161 162 163 164 165 166 167 168 )
-for i in "${PWRGD_U2[@]}";
-do 
-    set_gpio $i;
-    set_gpio_direction $i 'in';
+for i in ${!PWRGD_U2[@]};
+do
+    set_gpio ${PWRGD_U2[$i]};
+    set_gpio_direction ${PWRGD_U2[$i]} 'in';
+    echo "Read $i SSD Power Good: $(read_gpio_input ${PWRGD_U2[$i]})"
 done
 
-### Initial SSD Power reference U2_PRESNET_N
+## Initial RST_BMC_U2
+for i in ${!RST_BMC_U2[@]};
+do
+    set_gpio ${RST_BMC_U2[$i]};
+done
+
+### Initial related Power by Present
 for i in {0..7};
 do
-    read_present_set_related_power "${U2_PRESENT[$i]}" "${POWER_U2[$i]}";
-done 
+    update_value=$(printf '%x\n' "$((0x01 <<$i))")
+    if [ $(read_gpio_input ${U2_PRESENT[$i]}) == $PLUGGED ];then
+        CLOCK_GEN_VALUE=$(printf '0x%x\n' \
+        "$(($CLOCK_GEN_VALUE | 0x$update_value))")
+    else
+        set_gpio_direction "${RST_BMC_U2[$1]}" "low"
+        set_gpio_direction "${POWER_U2[$1]}" "low"
 
+        CLOCK_GEN_VALUE=$(printf '0x%x\n' \
+        "$(($CLOCK_GEN_VALUE & ~0x$update_value))")
+    fi
+done
+i2cset -y $I2C_BUS $CHIP_ADDR 0 $CLOCK_GEN_VALUE s
+echo "Read Clock Gen Value again is: $CLOCK_GEN_VALUE"
 
 exit 0;
