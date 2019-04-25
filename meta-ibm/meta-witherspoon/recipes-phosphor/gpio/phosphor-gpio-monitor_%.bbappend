@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_append := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS_append := "${THISDIR}/${PN}:${THISDIR}/${PN}/${MACHINE}:"
 
 TMPL_POWERSUPPLY = "phosphor-gpio-presence@.service"
 INSTFMT_POWERSUPPLY = "phosphor-gpio-presence@{0}.service"
