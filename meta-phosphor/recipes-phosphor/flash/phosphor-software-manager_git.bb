@@ -72,21 +72,4 @@ SYSTEMD_SERVICE_${PN}-updater += " \
     obmc-flash-bmc-setenv@.service \
 "
 
-SRC_URI += "file://software.conf"
-SRC_URI += "file://obmc-flash-bmc"
-
-do_install_append() {
-    install -d ${D}${bindir}
-    install -m 0755 ${WORKDIR}/obmc-flash-bmc ${D}${bindir}/obmc-flash-bmc
-
-    # /tmp/images is the software image upload directory.
-    # It should not be deleted since it is watched by the Image Manager
-    # for new images.
-
-    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true', 'false', d)}; then
-        install -d ${D}${exec_prefix}/lib/tmpfiles.d
-        install -m 644 ${WORKDIR}/software.conf ${D}${exec_prefix}/lib/tmpfiles.d/
-    fi
-}
-
 S = "${WORKDIR}/git"

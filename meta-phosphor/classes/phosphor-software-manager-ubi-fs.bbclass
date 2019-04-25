@@ -46,12 +46,6 @@ SYSTEMD_SUBSTITUTIONS += "RO_MTD:${BMC_RO_MTD}:obmc-flash-bmc-ubiro@.service"
 SYSTEMD_SUBSTITUTIONS += "KERNEL_MTD:${BMC_KERNEL_MTD}:obmc-flash-bmc-ubiro@.service"
 SYSTEMD_SUBSTITUTIONS += "RW_SIZE:${BMC_RW_SIZE}:obmc-flash-bmc-ubirw.service"
 
-SRC_URI += "file://synclist"
 do_install_append() {
     install -d ${D}/usr/local
-
-    if [ -f ${WORKDIR}/build/phosphor-sync-software-manager ]; then
-        install -d ${D}${sysconfdir}
-        install -m 0644 ${WORKDIR}/synclist ${D}${sysconfdir}/synclist
-    fi
 }
