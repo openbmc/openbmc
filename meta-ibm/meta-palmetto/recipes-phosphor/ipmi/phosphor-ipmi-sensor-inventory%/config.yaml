@@ -46,7 +46,7 @@
             deassert: false
             type: bool
   mutability: Mutability::Write|Mutability::Read
-  path: /org/open_power/control/occ_3_0050
+  path: /org/open_power/control/occ0
   readingType: assertion
   sensorNamePattern: nameLeaf
   sensorReadingType: 9
