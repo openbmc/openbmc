@@ -23,6 +23,10 @@ CHIPS_append_witherspoon = " \
                bus@1e78a000/i2c-bus@180/ir35221@71 \
                bus@1e78a000/i2c-bus@380/tmp275@4a \
                "
+CHIPS_append_swift = " \
+               bus@1e78a000/i2c-bus@440/tmp275@4a \
+               bus@1e78a000/i2c-bus@440/tmp275@48 \
+               "
 
 ITEMSFMT = "ahb/apb/{0}.conf"
 ITEMS = "${@compose_list(d, 'ITEMSFMT', 'CHIPS')}"
