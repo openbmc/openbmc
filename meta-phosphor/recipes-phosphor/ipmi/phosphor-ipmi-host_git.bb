@@ -46,6 +46,7 @@ RDEPENDS_${PN} += "phosphor-network"
 RDEPENDS_${PN} += "phosphor-time-manager"
 RDEPENDS_${PN} += "${VIRTUAL-RUNTIME_ipmi-config}"
 RDEPENDS_${PN} += "virtual/obmc-watchdog"
+RDEPENDS_${PN} += "${VIRTUAL-RUNTIME_obmc-bmc-state-manager}"
 
 inherit useradd
 
