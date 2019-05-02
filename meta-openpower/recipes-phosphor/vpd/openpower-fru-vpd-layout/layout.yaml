@@ -5,8 +5,6 @@ BMC:
         OPFR,VN: Manufacturer
     xyz.openbmc_project.Inventory.Item:
         VINI,DR: PrettyName
-    xyz.openbmc_project.Common.UUID:
-        OPFR,UD: UUID
     xyz.openbmc_project.Inventory.Item.Bmc:
 ETHERNET:
     xyz.openbmc_project.Inventory.Item.NetworkInterface:
