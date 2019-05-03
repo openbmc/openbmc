@@ -14,7 +14,9 @@ SYSTEMD_SERVICE_${PN} = "ipmb.service"
 DEPENDS = "sdbusplus \
            phosphor-logging \
            i2c-tools \
-           boost"
+           boost \
+           nlohmann-json"
 
 S = "${WORKDIR}/git/"
 inherit cmake systemd
+FILES_${PN} += "/usr/share/ipmbbridge/ipmb-channels.json"
