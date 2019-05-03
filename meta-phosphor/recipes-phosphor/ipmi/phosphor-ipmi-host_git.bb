@@ -48,6 +48,7 @@ RDEPENDS_${PN} += "${VIRTUAL-RUNTIME_ipmi-config}"
 RDEPENDS_${PN} += "virtual/obmc-watchdog"
 RDEPENDS_${PN} += "${VIRTUAL-RUNTIME_obmc-bmc-state-manager}"
 RDEPENDS_${PN} += "${VIRTUAL-RUNTIME_obmc-bmc-version}"
+RDEPENDS_${PN} += "${VIRTUAL-RUNTIME_obmc-bmc-updater}"
 
 inherit useradd
 
