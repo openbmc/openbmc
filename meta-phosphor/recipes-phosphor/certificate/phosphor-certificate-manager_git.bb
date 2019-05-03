@@ -22,6 +22,7 @@ DEPENDS = " \
         phosphor-dbus-interfaces-native \
         sdbusplus \
         sdbusplus-native \
+        sdeventplus \
         "
 
 S = "${WORKDIR}/git"
