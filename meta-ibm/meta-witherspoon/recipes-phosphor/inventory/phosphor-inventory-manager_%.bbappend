@@ -3,7 +3,7 @@ PACKAGECONFIG_append = " associations"
 SRC_URI += "file://associations.json"
 
 
-DEPENDS_append_witherspoon = " inventory-cleanup"
+DEPENDS_append = " inventory-cleanup"
 
 do_install_append() {
     install -d ${D}${base_datadir}
