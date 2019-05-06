@@ -16,7 +16,6 @@ S = "${WORKDIR}/git"
 
 SRC_URI += "git://github.com/openbmc/mboxbridge.git"
 
-SRC_URI += "file://99-aspeed-mbox.rules"
 SRC_URI += "file://99-aspeed-lpc-ctrl.rules"
 SRC_URI += "file://aspeed-lpc-ctrl-h.patch"
 
@@ -33,7 +32,6 @@ CFLAGS_append = " -I include"
 
 do_install_append() {
     install -d ${D}/lib/udev/rules.d
-    install -m 0644 ${WORKDIR}/99-aspeed-mbox.rules ${D}/lib/udev/rules.d
     install -m 0644 ${WORKDIR}/99-aspeed-lpc-ctrl.rules ${D}/lib/udev/rules.d
 }
 
