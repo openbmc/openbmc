@@ -101,11 +101,7 @@ RDEPENDS_${PN}-sensors = " \
         ${VIRTUAL-RUNTIME_obmc-sensors-hwmon} \
         "
 
-# These packages are not required with UBI enabled
-${PN}-software-extras = " \
-        obmc-flash-bmc \
-        obmc-mgr-download \
-        "
+${PN}-software-extras = ""
 
 ${PN}-software-extras_df-obmc-ubi-fs = " \
         phosphor-image-signing \
