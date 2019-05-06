@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${S}/COPYING;md5=3b83ef96387f14655fc854ddc3c6bd57"
 PV = "2.0+git${SRCPV}"
 
 SRC_URI += "git://github.com/open-power/pdbg.git"
-SRCREV = "deb577949a3505064f471e7b7c692e37c38ec8a4"
+SRCREV = "854c4c5facff43af9e0fe5d7062b58f631987b0b"
 
 DEPENDS += "dtc-native"
 
