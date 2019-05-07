@@ -12,6 +12,11 @@ import sys
 import yaml
 import copy
 
+# Custom representer for None types. This is to handle empty dictionaries.
+# By default Pyyaml outputs these as "null", whereas we want an empty character.
+def represent_none(self, _):
+    return self.represent_scalar('tag:yaml.org,2002:null', '')
+
 def dict_merge(target, source):
     """Deep merge for dicts.
 
@@ -42,6 +47,8 @@ if len(sys.argv) < 2:
 if len(sys.argv) == 2:
     # No overrides to handle
     sys.exit(0)
+
+yaml.add_representer(type(None), represent_none)
 
 target_filename = sys.argv[1]
 with open(target_filename) as target_file:

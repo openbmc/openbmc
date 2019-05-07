@@ -207,6 +207,7 @@ gpu_func_sensor:
             type: "bool"
             assert: true
             deassert: false
+    xyz.openbmc_project.Inventory.Item.Accelerator:
 # Field replaceable doesn't come as a sensor data
 # but we know that GPU is Field replaceable so setting
 # true in both cases.
