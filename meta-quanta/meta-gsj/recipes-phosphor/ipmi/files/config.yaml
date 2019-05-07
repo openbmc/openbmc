@@ -1,20 +1,4 @@
 0x01:
-  /system:
-    entityID: 23
-    entityInstance: 1
-    interfaces:
-      xyz.openbmc_project.Inventory.Item:
-        PrettyName:
-          IPMIFruProperty: Name
-          IPMIFruSection: Product
-  /system/chassis:
-    entityID: 23
-    entityInstance: 1
-    interfaces:
-      xyz.openbmc_project.Inventory.Item:
-        PrettyName:
-          IPMIFruProperty: Name
-          IPMIFruSection: Product
   /system/chassis/hsbp:
     entityID: 16
     entityInstance: 1
