@@ -25,3 +25,5 @@ FILES_${PN}_append = " ${libdir}/blob-ipmid/lib*${SOLIBS}"
 FILES_${PN}-dev_append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV} ${libdir}/ipmid-providers/*.la"
 
 BLOBIPMI_PROVIDER_LIBRARY += "libfirmwareblob.so"
+
+do_configure[depends] += "virtual/kernel:do_shared_workdir"
