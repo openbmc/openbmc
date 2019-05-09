@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_append_romulus := ":${THISDIR}/${PN}"
+FILESEXTRAPATHS_prepend_romulus := "${THISDIR}/${PN}:"
 SRC_URI_append_romulus = " \
     file://channel.yaml \
     "
