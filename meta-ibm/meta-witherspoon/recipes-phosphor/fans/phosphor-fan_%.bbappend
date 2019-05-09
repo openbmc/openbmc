@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_append := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 # Package configuration
 FAN_PACKAGES += " \

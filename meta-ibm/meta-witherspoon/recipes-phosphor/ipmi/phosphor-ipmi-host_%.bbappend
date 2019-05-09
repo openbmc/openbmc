@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_append := ":${THISDIR}/${PN}"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 SRC_URI_append = " \
 	file://occ_sensors.hardcoded.yaml \
 	file://hwmon_sensors.hardcoded.yaml \

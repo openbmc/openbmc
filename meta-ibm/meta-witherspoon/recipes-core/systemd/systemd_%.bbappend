@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_append := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 SRC_URI += "file://journald-storage-policy.conf"
 SRC_URI += "file://systemd-journald-override.conf"
 SRC_URI += "file://journald-size-policy.conf"
