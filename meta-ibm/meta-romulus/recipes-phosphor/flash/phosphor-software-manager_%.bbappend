@@ -1,1 +1,1 @@
-PACKAGECONFIG_append = " verify_signature"
+PACKAGECONFIG_append_romulus = " verify_signature"
