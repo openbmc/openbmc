@@ -9,9 +9,6 @@ SRC_URI_append = " \
 SRC_URI_append_witherspoon = " \
 	file://witherspoon_hwmon_sensors.hardcoded.yaml \
 	"
-SRC_URI_append_witherspoon-128 = " \
-	file://witherspoon_hwmon_sensors.hardcoded.yaml \
-	"
 
 EXTRA_OECONF_append = " \
         CHANNEL_YAML_GEN=${WORKDIR}/channel.yaml \
