@@ -4,7 +4,7 @@ LICENSE = "Apache-2.0"
 SRC_URI += "git://github.com/open-power/skiboot.git"
 SRC_URI += "file://0001-libffs-fix-gcc8-stringop-truncation-warnings.patch"
 
-FILESEXTRAPATHS_append := "${THISDIR}/skiboot:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/skiboot:"
 
 LIC_FILES_CHKSUM = "file://${S}/LICENCE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
