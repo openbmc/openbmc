@@ -1,6 +1,4 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-# Machine specific files override shared files with the same name
-FILESEXTRAPATHS_prepend := "${THISDIR}/${MACHINE}-${PN}:"
 
 SRC_URI += " \
            file://70-hwmon.rules \
