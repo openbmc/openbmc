@@ -1,6 +1,4 @@
-FILESEXTRAPATHS_append := ":${THISDIR}/${PN}"
-# Machine specific files override shared files with the same name
-FILESEXTRAPATHS_prepend := "${THISDIR}/${MACHINE}-${PN}:"
+FILESEXTRAPATHS_append := "${THISDIR}/${PN}:"
 
 # Package configuration
 FAN_PACKAGES += " \
