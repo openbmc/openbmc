@@ -8,42 +8,16 @@ inherit obmc-phosphor-systemd
 RDEPENDS_${PN} += "i2c-tools"
 
 S = "${WORKDIR}"
-SRC_URI_append_swift = " file://swift-avsbus-disable.sh"
-SRC_URI_append_swift = " file://swift-avsbus-enable.sh"
-SRC_URI_append_swift = " file://swift-power-workarounds.sh"
-SRC_URI_append_witherspoon = " file://witherspoon-avsbus-disable.sh"
-SRC_URI_append_witherspoon = " file://witherspoon-avsbus-enable.sh"
-SRC_URI_append_witherspoon = " file://witherspoon-power-workarounds.sh"
-SRC_URI_append_witherspoon-128 = " file://witherspoon-avsbus-disable.sh"
-SRC_URI_append_witherspoon-128 = " file://witherspoon-avsbus-enable.sh"
-SRC_URI_append_witherspoon-128 = " file://witherspoon-power-workarounds.sh"
+
+SRC_URI += "file://avsbus-disable.sh \
+            file://avsbus-enable.sh \
+            file://power-workarounds.sh"
 
 do_install() {
         install -d ${D}${bindir}
-}
-do_install_append_swift() {
-        install -m 0755 ${WORKDIR}/swift-avsbus-disable.sh \
-            ${D}${bindir}/avsbus-disable.sh
-        install -m 0755 ${WORKDIR}/swift-avsbus-enable.sh \
-            ${D}${bindir}/avsbus-enable.sh
-        install -m 0755 ${WORKDIR}/swift-power-workarounds.sh \
-            ${D}${bindir}/power-workarounds.sh
-}
-do_install_append_witherspoon() {
-        install -m 0755 ${WORKDIR}/witherspoon-avsbus-disable.sh \
-            ${D}${bindir}/avsbus-disable.sh
-        install -m 0755 ${WORKDIR}/witherspoon-avsbus-enable.sh \
-            ${D}${bindir}/avsbus-enable.sh
-        install -m 0755 ${WORKDIR}/witherspoon-power-workarounds.sh \
-            ${D}${bindir}/power-workarounds.sh
-}
-do_install_append_witherspoon-128() {
-        install -m 0755 ${WORKDIR}/witherspoon-avsbus-disable.sh \
-            ${D}${bindir}/avsbus-disable.sh
-        install -m 0755 ${WORKDIR}/witherspoon-avsbus-enable.sh \
-            ${D}${bindir}/avsbus-enable.sh
-        install -m 0755 ${WORKDIR}/witherspoon-power-workarounds.sh \
-            ${D}${bindir}/power-workarounds.sh
+        install -m 0755 ${S}/avsbus-disable.sh ${D}${bindir}/avsbus-disable.sh
+        install -m 0755 ${S}/avsbus-enable.sh ${D}${bindir}/avsbus-enable.sh
+        install -m 0755 ${S}/power-workarounds.sh ${D}${bindir}/power-workarounds.sh
 }
 
 TMPL_EN= "avsbus-enable@.service"
