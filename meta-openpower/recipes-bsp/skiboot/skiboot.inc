@@ -2,14 +2,13 @@ HOMEPAGE = "https://github.com/open-power"
 LICENSE = "Apache-2.0"
 
 SRC_URI += "git://github.com/open-power/skiboot.git"
-SRC_URI += "file://0001-libffs-fix-gcc8-stringop-truncation-warnings.patch"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/skiboot:"
 
 LIC_FILES_CHKSUM = "file://${S}/LICENCE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
-SRCREV = "30f8a6006de45fadedd80c98059b63d3874a5269"
-PV = "6.0.13+git${SRCPV}"
+SRCREV = "54811997b6d02dacaf8dd0d61cadaf3786dbabb0"
+PV = "6.3.0+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 
