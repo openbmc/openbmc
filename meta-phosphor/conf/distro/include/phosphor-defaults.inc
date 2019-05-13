@@ -102,7 +102,7 @@ VIRTUAL-RUNTIME_obmc-dump-manager ?= "phosphor-debug-collector-manager"
 # Provide support for monitoring BMC core dumps
 VIRTUAL-RUNTIME_obmc-dump-monitor ?= "phosphor-debug-collector-monitor"
 
-PREFERRED_PROVIDER_virtual/obmc-system-mgmt ?= "obmc-phosphor-sysd"
+PREFERRED_PROVIDER_virtual/obmc-system-mgmt ??= "obmc-phosphor-sysd"
 
 # phosphor-hwmon-config
 #
