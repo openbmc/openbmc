@@ -10,6 +10,7 @@ inherit autotools pkgconfig pythonnative
 inherit obmc-phosphor-systemd
 inherit phosphor-fan
 
+PHOSPHOR_FAN_STAGING_DIR = "${@bb.utils.contains('PHOSPHOR_FAN_CONFIG_USE_NATIVE_SYSROOT', '1', '${STAGING_DIR_NATIVE}', '${STAGING_DIR_HOST}', d)}"
 S = "${WORKDIR}/git"
 
 # Common build dependencies
@@ -39,7 +40,7 @@ SYSTEMD_PACKAGES = "${FAN_PACKAGES}"
 # ${PN}-presence-tach specific configuration
 PACKAGECONFIG[presence] = " \
         --enable-presence \
-        PRESENCE_CONFIG=${STAGING_DIR_NATIVE}${presence_datadir}/config.yaml, \
+        PRESENCE_CONFIG=${PHOSPHOR_FAN_STAGING_DIR}${presence_datadir}/config.yaml, \
         --disable-presence, \
         virtual/phosphor-fan-presence-config \
         , \
@@ -58,16 +59,16 @@ SYSTEMD_LINK_${PN}-presence-tach += "${@compose_list(d, 'FMT_TACH', 'OBMC_CHASSI
 # --------------------------------------
 # ${PN}-control specific configuration
 PACKAGECONFIG[control] = "--enable-control \
-     FAN_DEF_YAML_FILE=${STAGING_DIR_NATIVE}${control_datadir}/fans.yaml \
-     FAN_ZONE_YAML_FILE=${STAGING_DIR_NATIVE}${control_datadir}/zones.yaml \
-     ZONE_EVENTS_YAML_FILE=${STAGING_DIR_NATIVE}${control_datadir}/events.yaml \
-     ZONE_CONDITIONS_YAML_FILE=${STAGING_DIR_NATIVE}${control_datadir}/zone_conditions.yaml \
+     FAN_DEF_YAML_FILE=${PHOSPHOR_FAN_STAGING_DIR}${control_datadir}/fans.yaml \
+     FAN_ZONE_YAML_FILE=${PHOSPHOR_FAN_STAGING_DIR}${control_datadir}/zones.yaml \
+     ZONE_EVENTS_YAML_FILE=${PHOSPHOR_FAN_STAGING_DIR}${control_datadir}/events.yaml \
+     ZONE_CONDITIONS_YAML_FILE=${PHOSPHOR_FAN_STAGING_DIR}${control_datadir}/zone_conditions.yaml \
      FAN_ZONE_OUTPUT_DIR=${S}/control, \
     --disable-control, \
     virtual/phosphor-fan-control-fan-config \
-    phosphor-fan-control-zone-config-native \
-    phosphor-fan-control-events-config-native \
-    phosphor-fan-control-zone-conditions-config-native \
+    phosphor-fan-control-zone-config${PHOSPHOR_FAN_CONFIG_RECIPE_SUFFIX} \
+    phosphor-fan-control-events-config${PHOSPHOR_FAN_CONFIG_RECIPE_SUFFIX} \
+    phosphor-fan-control-zone-conditions-config${PHOSPHOR_FAN_CONFIG_RECIPE_SUFFIX} \
     , \
 "
 
@@ -89,10 +90,10 @@ SYSTEMD_LINK_${PN}-control += "${@compose_list(d, 'FMT_CONTROL_INIT', 'OBMC_CHAS
 # --------------------------------------
 # ${PN}-monitor specific configuration
 PACKAGECONFIG[monitor] = "--enable-monitor \
-     FAN_MONITOR_YAML_FILE=${STAGING_DIR_NATIVE}${monitor_datadir}/monitor.yaml \
+     FAN_MONITOR_YAML_FILE=${PHOSPHOR_FAN_STAGING_DIR}${monitor_datadir}/monitor.yaml \
      FAN_MONITOR_OUTPUT_DIR=${S}/monitor, \
     --disable-monitor, \
-    phosphor-fan-monitor-config-native \
+    phosphor-fan-monitor-config${PHOSPHOR_FAN_CONFIG_RECIPE_SUFFIX} \
     , \
 "
 
