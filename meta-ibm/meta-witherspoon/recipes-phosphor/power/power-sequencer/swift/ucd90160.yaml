@@ -28,12 +28,12 @@
         gpi:             2
         pinID:           9
         poll:            false
-        analysis:        none
+        analysis:        memGOOD0
       - name:            MEM_GOOD1
         gpi:             3
         pinID:           10
         poll:            false
-        analysis:        none
+        analysis:        memGOOD1
       - name:            GPU_PGOOD
         gpi:             4
         pinID:           14
@@ -90,3 +90,91 @@
             - GPIODefinition: GPU Card 3 Overtemperature
               gpio:      5
               callout:   /system/chassis/motherboard/gv100card3
+      - type:            memGOOD0
+        # The PCA9xxx chip device path and address (0xE8 8-bit = 0x74 7-bit)
+        path:            /sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a400.i2c-bus/i2c-9/9-0074
+        gpio_value:      low # What GPIO value indicates a fault/problem?
+        error_function:  memGoodError # Extra analysis function to call for this type
+        option_flags:    none
+        GPIODefinitions:
+            - GPIODefinition: CPU 0 OMI0A PGOOD
+              gpio:      0 # GPIO pin/register to check for fault
+              # Call out path for fault
+              callout:   /system/chassis/motherboard/dimm4
+            - GPIODefinition: CPU 0 OMI0B PGOOD
+              gpio:      1
+              callout:   /system/chassis/motherboard/dimm3
+            - GPIODefinition: CPU 0 OMI0C PGOOD
+              gpio:      2
+              callout:   /system/chassis/motherboard/dimm2
+            - GPIODefinition: CPU 0 OMI1A PGOOD
+              gpio:      3
+              callout:   /system/chassis/motherboard/dimm5
+            - GPIODefinition: CPU 0 OMI1B PGOOD
+              gpio:      4
+              callout:   /system/chassis/motherboard/dimm10
+            - GPIODefinition: CPU 0 OMI1C PGOOD
+              gpio:      5
+              callout:   /system/chassis/motherboard/dimm8
+            - GPIODefinition: CPU 0 OMI2A PGOOD
+              gpio:      6
+              callout:   /system/chassis/motherboard/dimm11
+            - GPIODefinition: CPU 0 OMI2B PGOOD
+              gpio:      7
+              callout:   /system/chassis/motherboard/dimm9
+            - GPIODefinition: CPU 0 OMI3A PGOOD
+              gpio:      8
+              callout:   /system/chassis/motherboard/dimm0
+            - GPIODefinition: CPU 0 OMI3B PGOOD
+              gpio:      9
+              callout:   /system/chassis/motherboard/dimm1
+            - GPIODefinition: CPU 0 OMI3C PGOOD
+              gpio:      10
+              callout:   /system/chassis/motherboard/dimm7
+            - GPIODefinition: CPU 0 OMI4A PGOOD
+              gpio:      11
+              callout:   /system/chassis/motherboard/dimm6
+      - type:            memGOOD1
+        # The PCA9xxx chip device path and address (0xE8 8-bit = 0x74 7-bit)
+        path:            /sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a400.i2c-bus/i2c-10/10-0074
+        gpio_value:      low # What GPIO value indicates a fault/problem?
+        error_function:  memGoodError # Extra analysis function to call for this type
+        option_flags:    none
+        GPIODefinitions:
+            - GPIODefinition: CPU 1 OMI0A PGOOD
+              gpio:      0 # GPIO pin/register to check for fault
+              # Call out path for fault
+              callout:   /system/chassis/motherboard/dimm16
+            - GPIODefinition: CPU 1 OMI0B PGOOD
+              gpio:      1
+              callout:   /system/chassis/motherboard/dimm15
+            - GPIODefinition: CPU 1 OMI0C PGOOD
+              gpio:      2
+              callout:   /system/chassis/motherboard/dimm14
+            - GPIODefinition: CPU 1 OMI1A PGOOD
+              gpio:      3
+              callout:   /system/chassis/motherboard/dimm17
+            - GPIODefinition: CPU 1 OMI1B PGOOD
+              gpio:      4
+              callout:   /system/chassis/motherboard/dimm22
+            - GPIODefinition: CPU 1 OMI1C PGOOD
+              gpio:      5
+              callout:   /system/chassis/motherboard/dimm20
+            - GPIODefinition: CPU 1 OMI2A PGOOD
+              gpio:      6
+              callout:   /system/chassis/motherboard/dimm23
+            - GPIODefinition: CPU 1 OMI2B PGOOD
+              gpio:      7
+              callout:   /system/chassis/motherboard/dimm21
+            - GPIODefinition: CPU 1 OMI3A PGOOD
+              gpio:      8
+              callout:   /system/chassis/motherboard/dimm12
+            - GPIODefinition: CPU 1 OMI3B PGOOD
+              gpio:      9
+              callout:   /system/chassis/motherboard/dimm13
+            - GPIODefinition: CPU 1 OMI3C PGOOD
+              gpio:      10
+              callout:   /system/chassis/motherboard/dimm19
+            - GPIODefinition: CPU 1 OMI4A PGOOD
+              gpio:      11
+              callout:   /system/chassis/motherboard/dimm18
