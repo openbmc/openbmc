@@ -1,5 +1,3 @@
-PHOSPHOR_FAN_CONFIG_USE_NATIVE_SYSROOT ?= "1"
-PHOSPHOR_FAN_CONFIG_RECIPE_SUFFIX = "${@bb.utils.contains('PHOSPHOR_FAN_CONFIG_USE_NATIVE_SYSROOT', '1', '-native', '', d)}"
 OBMC_BMC_INSTANCES ?= "0"
 OBMC_CHASSIS_INSTANCES ?= "0"
 OBMC_CHECKSTOP_INSTANCES ?= "0"
@@ -202,14 +200,14 @@ PREFERRED_PROVIDER_virtual/phosphor-logging-callouts ?= \
 # sysroot location expected by the phosphor-fan-presence build process in the
 # sysroot.
 PREFERRED_PROVIDER_virtual/phosphor-fan-presence-config ?= \
-    "phosphor-fan-presence-config${PHOSPHOR_FAN_CONFIG_RECIPE_SUFFIX}"
+    "phosphor-fan-presence-config"
 
 # The phosphor-fan-control application is data driven and requires a YAML file
 # to define the fans in the system.  This virtual is a recipe that provides
 # that definition by installing the YAML file in the format and sysroot
 # location expected by the phosphor-fan-control build process in the sysroot.
 PREFERRED_PROVIDER_virtual/phosphor-fan-control-fan-config ?= \
-    "phosphor-fan-control-fan-config${PHOSPHOR_FAN_CONFIG_RECIPE_SUFFIX}"
+    "phosphor-fan-control-fan-config"
 
 # The phosphor-gpio-monitor application is data-driven and requires an input.
 # The application then watches the passed in input event entry for the
