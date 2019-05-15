@@ -12,10 +12,7 @@ DEPENDS += " \
         autoconf-archive-native \
         "
 
-EXTRA_OECONF_append += " \
-        --disable-examples \
-        --disable-tests \
-        "
+EXTRA_OECONF = "--disable-examples --disable-tests"
 
 SRC_URI += "git://github.com/openbmc/gpioplus"
 SRCREV = "48e6288da8486a25fd52e944fb0f7148fc1c02db"
