@@ -148,3 +148,5 @@ BAD_RECOMMENDATIONS_pn-obmc-phosphor-image = "udev-hwdb"
 BAD_RECOMMENDATIONS_pn-obmc-phosphor-image += "shared-mime-info"
 
 LAYER_CONF_VERSION ?= "8"
+
+KERNEL_CLASSES_append = " obmc-phosphor-kernel-version"
