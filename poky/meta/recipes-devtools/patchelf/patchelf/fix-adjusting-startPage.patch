@@ -1,6 +1,9 @@
+From 1630d3f846c7721b1e7cd3b005bb2b34816e1d0f Mon Sep 17 00:00:00 2001
+From: Ed Bartosh <ed.bartosh@linux.intel.com>
+Date: Fri, 21 Jul 2017 12:33:53 +0300
+Subject: [PATCH] patchelf: fix segfault for binaries linked by gold
+
 commit 1cc234fea5600190d872329aca60e2365cefc39e
-Author: Ed Bartosh <ed.bartosh@linux.intel.com>
-Date:   Fri Jul 21 12:33:53 2017 +0300
 
 fix adjusting startPage
 
@@ -19,11 +22,15 @@ Github PR: https://github.com/NixOS/patchelf/pull/127
 
 Upstream-Status: Submitted
 
+---
+ src/patchelf.cc | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
 diff --git a/src/patchelf.cc b/src/patchelf.cc
-index cbd36c0..e9d7ea5 100644
+index a63e3a11c61f..2483d25d78f1 100644
 --- a/src/patchelf.cc
 +++ b/src/patchelf.cc
-@@ -720,10 +720,8 @@ void ElfFile<ElfFileParamNames>::rewriteSectionsLibrary()
+@@ -756,10 +756,8 @@ void ElfFile<ElfFileParamNames>::rewriteSectionsLibrary()
         since DYN executables tend to start at virtual address 0, so
         rewriteSectionsExecutable() won't work because it doesn't have
         any virtual address space to grow downwards into. */

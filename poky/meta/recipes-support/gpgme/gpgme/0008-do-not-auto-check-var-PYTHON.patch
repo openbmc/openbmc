@@ -1,0 +1,36 @@
+From fc3d9cc218e60582fd158d21a1cd537a3dc1b007 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 10 May 2019 16:19:54 +0800
+Subject: [PATCH] do not auto check var-PYTHON
+
+Upstream auto check the version of python rather than specify option
+[ff6ff61 python: Auto-check for all installed python versions.]
+
+In oe-core, don't check var-PYTHON, use the setting from recipe,
+only check specific python 2.7 and 3.7
+
+Upstream-Status: Inappropriate [oe-core specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index cb2f073..7d74a6d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -423,8 +423,8 @@ if test "$found_py" = "1"; then
+ 	if test "$found_py" = "1" -o "$found_py3" = "1"; then
+ 	  # Reset everything, so that we can look for another Python.
+           m4_foreach([mym4pythonver],
+-                     [[2.7],[3.4],[3.5],[3.6],[3.7],[3.8],[all]],
+-           [unset PYTHON
++                     [[2.7],[3.7]],
++           [
+ 	    unset PYTHON_VERSION
+ 	    unset PYTHON_CPPFLAGS
+ 	    unset PYTHON_LDFLAGS
+-- 
+2.7.4
+

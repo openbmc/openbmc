@@ -560,7 +560,7 @@ def check_perl_modules(sanity_data):
         try:
             subprocess.check_output(["perl", "-e", "use %s" % m])
         except subprocess.CalledProcessError as e:
-            errresult += e.output
+            errresult += bytes.decode(e.output)
             ret += "%s " % m
     if ret:
         return "Required perl module(s) not found: %s\n\n%s\n" % (ret, errresult)

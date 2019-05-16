@@ -4,19 +4,19 @@ configure files instead.
 Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
-Index: cronie-1.5.1/pam/crond
-===================================================================
---- cronie-1.5.1.orig/pam/crond
-+++ cronie-1.5.1/pam/crond
+diff --git a/pam/crond b/pam/crond
+index 560529d..95a6457 100644
+--- a/pam/crond
++++ b/pam/crond
 @@ -4,8 +4,8 @@
  #
  # Although no PAM authentication is called, auth modules
  # are used for credential setting
--auth       include    password-auth
+-auth       include    system-auth
 +auth       include    common-auth
  account    required   pam_access.so
--account    include    password-auth
-+account    include    common-account
+-account    include    system-auth
++account    include    common-auth
  session    required   pam_loginuid.so
--session    include    password-auth
+-session    include    system-auth
 +session    include    common-session-noninteractive

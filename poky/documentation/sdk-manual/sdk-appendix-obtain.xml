@@ -216,12 +216,6 @@
      TOOLCHAIN_TARGET_TASK_append = " libc-staticdev"
                             </literallayout>
                             </para></listitem>
-                        <listitem><para>
-                            For additional information on building the
-                            installer, see the
-                            <ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'>Cookbook guide to Making an <trademark class='trade'>Eclipse</trademark> Debug Capable Image</ulink>
-                            wiki page.
-                            </para></listitem>
                     </itemizedlist>
                 </note>
             </para></listitem>
@@ -259,9 +253,6 @@
             <listitem><para>
                 You want to use the root filesystem as the
                 target sysroot.
-                For example, the Eclipse IDE environment with the Eclipse
-                Yocto Plug-in installed allows you to use QEMU to boot
-                under NFS.
                 </para></listitem>
             <listitem><para>
                 You want to develop your target application

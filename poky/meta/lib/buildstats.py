@@ -1,3 +1,6 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
 # Implements system state sampling. Called by buildstats.bbclass.
 # Because it is a real Python module, it can hold persistent state,
 # like open log files and the time of the last sampling.

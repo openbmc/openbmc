@@ -1,18 +1,22 @@
-2ff54ad7478a90bd75c91e434236a Mon Sep 17 00:00:00 2001
+From e92a915183f8bff268f74c8cd00d986301a2bbf8 Mon Sep 17 00:00:00 2001
 From: makepost <makepost@firemail.cc>
 Date: Mon, 24 Dec 2018 03:13:16 +0200
 Subject: [PATCH] Use st_mtim if st_mtime is macro, fix #1510
 
 In POSIX.1-2008, sys_stat has a st_mtim member and a st_mtime backward
 compatibility macro. Should help avoid hardcoding platform detection.
+
+Signed-off-by: Oleksandr Kravchuk <open.source@oleksandr-kravchuk.com>
+
+Upstream-Status: Pending
 ---
  src/disk_interface.cc | 14 ++++----------
  1 file changed, 4 insertions(+), 10 deletions(-)
 
 diff --git a/src/disk_interface.cc b/src/disk_interface.cc
-index d4c2fb087..dc297c449 100644
---- src/disk_interface.cc
-+++ /src/disk_interface.cc
+index d4c2fb0..dc297c4 100644
+--- a/src/disk_interface.cc
++++ b/src/disk_interface.cc
 @@ -202,19 +202,13 @@ TimeStamp RealDiskInterface::Stat(const string& path, string* err) const {
    // that it doesn't exist.
    if (st.st_mtime == 0)
@@ -37,3 +41,6 @@ index d4c2fb087..dc297c449 100644
  #else
    return (int64_t)st.st_mtime * 1000000000LL + st.st_mtimensec;
  #endif
+-- 
+2.17.1
+

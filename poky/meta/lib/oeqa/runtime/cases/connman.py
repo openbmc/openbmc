@@ -1,6 +1,9 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
-from oeqa.core.decorator.oeid import OETestID
 from oeqa.runtime.decorator.package import OEHasPackage
 
 class ConnmanTest(OERuntimeTestCase):
@@ -12,7 +15,6 @@ class ConnmanTest(OERuntimeTestCase):
         else:
             return "Unable to get status or logs for %s" % service
 
-    @OETestID(961)
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     @OEHasPackage(["connman"])
     def test_connmand_help(self):
@@ -20,7 +22,6 @@ class ConnmanTest(OERuntimeTestCase):
         msg = 'Failed to get connman help. Output: %s' % output
         self.assertEqual(status, 0, msg=msg)
 
-    @OETestID(221)
     @OETestDepends(['connman.ConnmanTest.test_connmand_help'])
     def test_connmand_running(self):
         cmd = '%s | grep [c]onnmand' % self.tc.target_cmds['ps']

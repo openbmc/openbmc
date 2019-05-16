@@ -1,10 +1,12 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import oe.path
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import bitbake
-from oeqa.core.decorator.oeid import OETestID
 
 class Fetch(OESelftestTestCase):
-    @OETestID(1058)
     def test_git_mirrors(self):
         """
         Verify that the git fetcher will fall back to the HTTP mirrors. The

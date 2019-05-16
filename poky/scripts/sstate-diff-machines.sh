@@ -1,5 +1,7 @@
 #!/bin/bash
-
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
 # Used to compare sstate checksums between MACHINES.
 # Execute script and compare generated list.M files.
 # Using bash to have PIPESTATUS variable.

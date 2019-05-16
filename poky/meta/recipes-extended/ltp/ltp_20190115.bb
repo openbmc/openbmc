@@ -49,6 +49,7 @@ SRC_URI = "git://github.com/linux-test-project/ltp.git \
            file://0001-open_posix_testsuite-mmap24-2-Relax-condition-a-bit.patch \
            file://define-sigrtmin-and-sigrtmax-for-musl.patch \
            file://setregid01-security-string-formatting.patch \
+           file://0001-syscalls-setrlimit03.c-read-proc-sys-fs-nr_open-for-.patch \
            "
 
 S = "${WORKDIR}/git"

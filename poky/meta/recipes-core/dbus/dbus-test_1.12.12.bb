@@ -7,7 +7,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=10dded3b58148f3f1fd804b26354af3e \
 
 DEPENDS = "dbus glib-2.0"
 
-RDEPENDS_${PN} += "make"
 RDEPENDS_${PN}-dev = ""
 
 SRC_URI = "http://dbus.freedesktop.org/releases/dbus/dbus-${PV}.tar.gz \
@@ -33,13 +32,14 @@ EXTRA_OECONF = "--enable-tests \
                 --enable-installed-tests \
                 --enable-checks \
                 --enable-asserts \
-                --enable-verbose-mode \
                 --enable-largefile \
                 --disable-xml-docs \
                 --disable-doxygen-docs \
                 --disable-libaudit \
                 --with-dbus-test-dir=${PTEST_PATH} \
-                ${EXTRA_OECONF_X}"
+                ${EXTRA_OECONF_X} \
+                --enable-embedded-tests \
+             "
 
 EXTRA_OECONF_append_class-target = " SYSTEMCTL=${base_bindir}/systemctl"
 
@@ -50,6 +50,7 @@ PACKAGECONFIG_class-nativesdk = ""
 PACKAGECONFIG[systemd] = "--enable-systemd --with-systemdsystemunitdir=${systemd_system_unitdir},--disable-systemd --without-systemdsystemunitdir,systemd"
 PACKAGECONFIG[x11] = "--with-x --enable-x11-autolaunch,--without-x --disable-x11-autolaunch, virtual/libx11 libsm"
 PACKAGECONFIG[user-session] = "--enable-user-session --with-systemduserunitdir=${systemd_user_unitdir},--disable-user-session"
+PACKAGECONFIG[verbose-mode] = "--enable-verbose-mode,,,"
 
 do_install() {
     :
@@ -58,11 +59,16 @@ do_install() {
 do_install_ptest() {
 	install -d ${D}${PTEST_PATH}/test
 	l="shell printf refs syslog marshal syntax corrupt dbus-daemon dbus-daemon-eavesdrop loopback relay \
-	   variant uid-permissions syntax spawn sd-activation names monitor message fdpass "
+	   variant uid-permissions syntax spawn sd-activation names monitor message fdpass service shell-service"
 	for i in $l; do install ${B}/test/.libs/test-$i ${D}${PTEST_PATH}/test; done
 
 	l="bus bus-system bus-launch-helper"
 	for i in $l; do install ${B}/bus/.libs/test-$i ${D}${PTEST_PATH}/test; done
+
+	install -d ${D}${PTEST_PATH}/bus
+	install ${B}/bus/.libs/dbus-daemon-launch-helper-test ${D}${PTEST_PATH}/bus
+
+	install ${B}/test/test-segfault ${D}${PTEST_PATH}/test
 
 	cp -r ${B}/test/data ${D}${PTEST_PATH}/test
 	install ${B}/dbus/.libs/test-dbus ${D}${PTEST_PATH}/test
@@ -78,6 +84,7 @@ do_install_ptest() {
         sed -i -e 's;@PTEST_PATH@;${PTEST_PATH};g'  ${D}${PTEST_PATH}/run-ptest
 }
 
-RDEPENDS_${PN}-ptest += "bash"
+RDEPENDS_${PN}-ptest += "bash make dbus"
+RDEPENDS_${PN}-ptest_remove = "${PN}"
 
 PRIVATE_LIBS_${PN}-ptest = "libdbus-1.so.3"

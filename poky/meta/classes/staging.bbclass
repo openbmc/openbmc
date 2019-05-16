@@ -27,9 +27,10 @@ SYSROOT_DIRS_BLACKLIST = " \
     ${mandir} \
     ${docdir} \
     ${infodir} \
-    ${datadir}/locale \
     ${datadir}/applications \
     ${datadir}/fonts \
+    ${datadir}/gtk-doc/html \
+    ${datadir}/locale \
     ${datadir}/pixmaps \
     ${libdir}/${PN}/ptest \
 "

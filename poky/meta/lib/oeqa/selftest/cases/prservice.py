@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import os
 import re
 import shutil
@@ -6,7 +10,6 @@ import datetime
 import oeqa.utils.ftools as ftools
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import runCmd, bitbake, get_bb_var
-from oeqa.core.decorator.oeid import OETestID
 from oeqa.utils.network import get_free_port
 
 class BitbakePrTests(OESelftestTestCase):
@@ -88,39 +91,30 @@ class BitbakePrTests(OESelftestTestCase):
 
         self.assertTrue(pr_2 - pr_1 == 1, "Step between same pkg. revision is greater than 1")
 
-    @OETestID(930)
     def test_import_export_replace_db(self):
         self.run_test_pr_export_import('m4')
 
-    @OETestID(931)
     def test_import_export_override_db(self):
         self.run_test_pr_export_import('m4', replace_current_db=False)
 
-    @OETestID(932)
     def test_pr_service_rpm_arch_dep(self):
         self.run_test_pr_service('m4', 'rpm', 'do_package')
 
-    @OETestID(934)
     def test_pr_service_deb_arch_dep(self):
         self.run_test_pr_service('m4', 'deb', 'do_package')
 
-    @OETestID(933)
     def test_pr_service_ipk_arch_dep(self):
         self.run_test_pr_service('m4', 'ipk', 'do_package')
 
-    @OETestID(935)
     def test_pr_service_rpm_arch_indep(self):
         self.run_test_pr_service('xcursor-transparent-theme', 'rpm', 'do_package')
 
-    @OETestID(937)
     def test_pr_service_deb_arch_indep(self):
         self.run_test_pr_service('xcursor-transparent-theme', 'deb', 'do_package')
 
-    @OETestID(936)
     def test_pr_service_ipk_arch_indep(self):
         self.run_test_pr_service('xcursor-transparent-theme', 'ipk', 'do_package')
 
-    @OETestID(1419)
     def test_stopping_prservice_message(self):
         port = get_free_port()
 

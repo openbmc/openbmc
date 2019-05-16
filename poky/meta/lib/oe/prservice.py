@@ -1,3 +1,6 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
 
 def prserv_make_conn(d, check = False):
     import prserv.serv

@@ -54,4 +54,4 @@ FILES_${PN}-gnome += " \
 
 FILES_${PN}-config += "${sysconfdir}"
 
-RDEPENDS_${PN} += "${PN}-core ${PN}-config ${PN}-theme-clearlooks python pyxdg"
+RDEPENDS_${PN} += "${PN}-core ${PN}-config ${PN}-theme-clearlooks python python-shell pyxdg"

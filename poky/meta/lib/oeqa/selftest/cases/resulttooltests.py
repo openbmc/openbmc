@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import os
 import sys
 basepath = os.path.abspath(os.path.dirname(__file__) + '/../../../../../')

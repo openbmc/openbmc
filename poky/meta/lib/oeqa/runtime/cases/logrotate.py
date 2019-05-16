@@ -1,9 +1,12 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 # This test should cover https://bugzilla.yoctoproject.org/tr_show_case.cgi?case_id=289 testcase
 # Note that the image under test must have logrotate installed
 
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
-from oeqa.core.decorator.oeid import OETestID
 from oeqa.runtime.decorator.package import OEHasPackage
 
 class LogrotateTest(OERuntimeTestCase):
@@ -16,7 +19,6 @@ class LogrotateTest(OERuntimeTestCase):
     def tearDownClass(cls):
         cls.tc.target.run('mv -f $HOME/wtmp.oeqabak /etc/logrotate.d/wtmp && rm -rf $HOME/logrotate_dir')
 
-    @OETestID(1544)
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     @OEHasPackage(['logrotate'])
     def test_1_logrotate_setup(self):
@@ -31,7 +33,6 @@ class LogrotateTest(OERuntimeTestCase):
                ' %s and %s' % (status, output))
         self.assertEqual(status, 0, msg = msg)
 
-    @OETestID(1542)
     @OETestDepends(['logrotate.LogrotateTest.test_1_logrotate_setup'])
     def test_2_logrotate(self):
         status, output = self.target.run('logrotate -f /etc/logrotate.conf')

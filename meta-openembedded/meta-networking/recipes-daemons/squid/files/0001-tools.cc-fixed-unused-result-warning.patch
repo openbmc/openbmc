@@ -1,4 +1,4 @@
-From faaa796a138cbd5033b1e53f33faac0cf4162bf5 Mon Sep 17 00:00:00 2001
+From 86dae8010310d13bd2a2beb006b4085d06ae1556 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 25 Jun 2017 00:59:24 -0700
 Subject: [PATCH] tools.cc: fixed unused-result warning
@@ -12,21 +12,23 @@ fix
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---
- src/tools.cc | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ src/tools.cc | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/src/tools.cc b/src/tools.cc
-index 8137a03..843e266 100644
+index 5829574..19f0836 100644
 --- a/src/tools.cc
 +++ b/src/tools.cc
-@@ -612,8 +612,8 @@ enter_suid(void)
-     if (setresuid((uid_t)-1, 0, (uid_t)-1) < 0)
-         debugs (21, 3, "enter_suid: setresuid failed: " << xstrerror ());
+@@ -581,8 +581,10 @@ enter_suid(void)
+         debugs (21, 3, "enter_suid: setresuid failed: " << xstrerr(xerrno));
+     }
  #else
 -
 -    setuid(0);
-+    if (setuid(0) < 0)
-+        debugs(50, DBG_IMPORTANT, "WARNING: no_suid: setuid(0): " << xstrerror());
++    if (setuid(0) < 0) {
++        const auto xerrno = errno;
++        debugs(50, DBG_IMPORTANT, "WARNING: no_suid: setuid(0): " << xstrerr(xerrno));
++    }
  #endif
  #if HAVE_PRCTL && defined(PR_SET_DUMPABLE)
      /* Set Linux DUMPABLE flag */

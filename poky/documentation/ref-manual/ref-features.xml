@@ -342,9 +342,6 @@
             class.
             The current list of these valid features is as follows:
             <itemizedlist>
-                <listitem><para><emphasis>eclipse-debug:</emphasis> Provides
-                    Eclipse remote debugging support.
-                    </para></listitem>
                 <listitem><para><emphasis>hwcodecs:</emphasis> Installs
                     hardware acceleration codecs.
                     </para></listitem>

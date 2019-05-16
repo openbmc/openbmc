@@ -10,4 +10,7 @@ LIC_FILES_CHKSUM = "file://COPYING.LESSER;md5=4fbd65380cdd255951079008b364516c"
 
 SRC_URI = "http://libmodbus.org/releases/${BP}.tar.gz"
 
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[documentation] = "--with-documentation,--without-documentation,asciidoc-native xmlto-native"
+
 inherit autotools pkgconfig

@@ -3,6 +3,7 @@ require ruby.inc
 SRC_URI += " \
            file://ruby-CVE-2017-9226.patch \
            file://ruby-CVE-2017-9228.patch \
+           file://run-ptest \
            "
 
 SRC_URI[md5sum] = "20c85b67846d49622ef3b24230803fef"
@@ -28,6 +29,7 @@ EXTRA_OECONF = "\
     --disable-dtrace \
     --enable-shared \
     --enable-load-relative \
+    --with-pkg-config=pkg-config \
 "
 
 do_install() {
@@ -54,6 +56,13 @@ do_install_append_class-target () {
 
 }
 
+do_install_ptest () {
+    cp -rf ${S}/test ${D}${PTEST_PATH}/
+    cp -r ${S}/include ${D}/${libdir}/ruby/
+    test_case_rb=`grep rubygems/test_case.rb ${B}/.installed.list`
+    sed -i -e 's:../../../test/:../../../ptest/test/:g' ${D}/$test_case_rb
+}
+
 PACKAGES =+ "${PN}-ri-docs ${PN}-rdoc"
 
 SUMMARY_${PN}-ri-docs = "ri (Ruby Interactive) documentation for the Ruby standard library"
@@ -65,5 +74,7 @@ RDEPENDS_${PN}-rdoc = "${PN}"
 FILES_${PN}-rdoc += "${libdir}/ruby/*/rdoc ${bindir}/rdoc"
 
 FILES_${PN} += "${datadir}/rubygems"
+
+FILES_${PN}-ptest_append_class-target += "${libdir}/ruby/include"
 
 BBCLASSEXTEND = "native"

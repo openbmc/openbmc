@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
 """git-make-shallow: make the current git repository shallow
 
 Remove the history of the specified revisions, then optionally filter the

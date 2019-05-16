@@ -1,4 +1,4 @@
-From ad1d2161c811cff25d1684c33611f300adb753bc Mon Sep 17 00:00:00 2001
+From c4677e155736062e75687f1a655732c8902e912b Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 29 May 2015 20:56:00 -0700
 Subject: [PATCH] make error() portable
@@ -18,12 +18,12 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  create mode 100644 libweston/weston-error.h
 
 diff --git a/configure.ac b/configure.ac
-index 7aebbdb..dc9c802 100644
+index c05ad01..6da6e04 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -109,6 +109,8 @@ AC_CHECK_DECL(CLOCK_MONOTONIC,[],
+@@ -126,6 +126,8 @@ AC_CHECK_DECL(CLOCK_MONOTONIC,[],
+ 	      [AC_MSG_ERROR("CLOCK_MONOTONIC is needed to compile weston")],
  	      [[#include <time.h>]])
- AC_CHECK_HEADERS([execinfo.h])
  
 +AC_CHECK_HEADERS([error.h])
 +
@@ -57,7 +57,7 @@ index 0000000..2089d02
 +#endif
 +
 diff --git a/libweston/weston-launch.c b/libweston/weston-launch.c
-index 1adcf21..166bf3b 100644
+index bf73e0d..9064439 100644
 --- a/libweston/weston-launch.c
 +++ b/libweston/weston-launch.c
 @@ -33,7 +33,6 @@

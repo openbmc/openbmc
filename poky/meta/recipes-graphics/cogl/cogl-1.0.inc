@@ -31,6 +31,7 @@ EXTRA_OECONF += "--enable-examples-install	\
 	       	 --disable-gles1		\
 	         --disable-cairo                \
 	    	"
+DEBUG_OPTIMIZATION_append = " -Wno-error=maybe-uninitialized"
 
 # OpenGL/GLX
 PACKAGECONFIG[glx] = "--enable-gl --enable-glx,--disable-gl --disable-glx,${EDEPENDS_GL} ${EDEPENDS_X11},${ERDEPENDS_GL}"

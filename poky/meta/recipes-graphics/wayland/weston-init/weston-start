@@ -5,8 +5,8 @@
 export PATH="/sbin:/usr/sbin:/bin:/usr/bin"
 
 usage() {
-    cat <<EOF
-    $0 [<openvt arguments>] [-- <weston options>]
+	cat <<EOF
+	$0 [<openvt arguments>] [-- <weston options>]
 EOF
 }
 
@@ -27,10 +27,19 @@ if [ -n "$WAYLAND_DISPLAY" ]; then
 	echo "ERROR: A Wayland compositor is already running, nested Weston instance is not supported yet."
 	exit 1
 fi
+
+if [ -n "$WESTON_USER" ]; then
+	if [ -z "$WESTON_TTY" ]; then
+		echo "ERROR: If you have WESTON_USER variable set, you also need WESTON_TTY."
+		exit 1
+	fi
+	weston_args_user="-u $WESTON_USER -t $WESTON_TTY"
+fi
+
 if [ -n "$DISPLAY" ]; then
 	launcher="weston"
 else
-	launcher="weston-launch --"
+	launcher="weston-launch $weston_args_user --"
 fi
 
 openvt_args="-s"
@@ -59,11 +68,15 @@ if [ -d "$modules_dir" ]; then
 fi
 
 if test -z "$XDG_RUNTIME_DIR"; then
-    export XDG_RUNTIME_DIR=/run/user/`id -u`
-    if ! test -d "$XDG_RUNTIME_DIR"; then
-        mkdir --parents $XDG_RUNTIME_DIR
-        chmod 0700 $XDG_RUNTIME_DIR
-    fi
+	export XDG_RUNTIME_DIR=/run/user/`id -u ${WESTON_USER}`
+	if ! test -d "$XDG_RUNTIME_DIR"; then
+		mkdir --parents $XDG_RUNTIME_DIR
+		chmod 0700 $XDG_RUNTIME_DIR
+	fi
+	if [ -n "$WESTON_USER" ]
+	then
+		chown $WESTON_USER:$WESTON_USER $XDG_RUNTIME_DIR
+	fi
 fi
 
 exec openvt $openvt_args -- $launcher $weston_args --log=@LOCALSTATEDIR@/log/weston.log

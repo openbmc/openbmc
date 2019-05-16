@@ -6,14 +6,24 @@
 # This also sets up autoconf-based recipes to build introspection data (or not),
 # depending on distro and machine features (see gobject-introspection-data class).
 inherit python3native gobject-introspection-data
+
+# meson: default option name to enable/disable introspection. This matches most
+# project's configuration. In doubts - check meson_options.txt in project's
+# source path.
+GIR_MESON_OPTION ?= 'introspection'
+GIR_MESON_ENABLE_FLAG ?= 'true'
+GIR_MESON_DISABLE_FLAG ?= 'false'
+
+# Auto enable/disable based on GI_DATA_ENABLED
 EXTRA_OECONF_prepend_class-target = "${@bb.utils.contains('GI_DATA_ENABLED', 'True', '--enable-introspection', '--disable-introspection', d)} "
+EXTRA_OEMESON_prepend_class-target = "-D${GIR_MESON_OPTION}=${@bb.utils.contains('GI_DATA_ENABLED', 'True', '${GIR_MESON_ENABLE_FLAG}', '${GIR_MESON_DISABLE_FLAG}', d)} "
 
 # When building native recipes, disable introspection, as it is not necessary,
 # pulls in additional dependencies, and makes build times longer
 EXTRA_OECONF_prepend_class-native = "--disable-introspection "
 EXTRA_OECONF_prepend_class-nativesdk = "--disable-introspection "
-
-UNKNOWN_CONFIGURE_WHITELIST_append = " --enable-introspection --disable-introspection"
+EXTRA_OEMESON_prepend_class-native = "-D${GIR_MESON_OPTION}=${GIR_MESON_DISABLE_FLAG} "
+EXTRA_OEMESON_prepend_class-nativesdk = "-D${GIR_MESON_OPTION}=${GIR_MESON_DISABLE_FLAG} "
 
 # Generating introspection data depends on a combination of native and target
 # introspection tools, and qemu to run the target tools.

@@ -35,6 +35,8 @@ EXTRA_OECONF += " --disable-rpath \
 
 EXTRA_OEMAKE = 'LDFLAGS="${LDFLAGS}"'
 
+DEBUG_OPTIMIZATION_append = " -Wno-error=maybe-uninitialized"
+
 do_install_append() {
     # cleanup buildpaths from gdlib.pc
     sed -i -e 's#${STAGING_DIR_HOST}##g' ${D}${libdir}/pkgconfig/gdlib.pc
@@ -48,3 +50,5 @@ FILES_${PN}-tools = "${bindir}/*"
 PROVIDES += "${PN}-tools"
 RPROVIDES_${PN}-tools = "${PN}-tools"
 RDEPENDS_${PN}-tools = "perl perl-module-strict"
+
+CVE_PRODUCT = "libgd"

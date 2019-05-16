@@ -13,6 +13,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
 
 inherit update-alternatives
 
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/traceroute/files/traceroute/"
+
 SRC_URI = "${SOURCEFORGE_MIRROR}/traceroute/traceroute/${BP}/${BP}.tar.gz \
            file://filter-out-the-patches-from-subdirs.patch \
 "

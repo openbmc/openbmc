@@ -1,0 +1,14 @@
+Use libsdl2 instead of libsdl 1.2, which is dead upstream.
+
+Luckily the API that mpg123 use didn't change so this is a trivial change.
+
+Upstream-Status: Submitted [https://sourceforge.net/p/mpg123/bugs/268/]
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/configure.ac b/configure.ac
+index 6216d4f..b8d3344 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1694 +1694 @@ do
+-			PKG_CHECK_MODULES(SDL, sdl, output_modules="$output_modules sdl" HAVE_SDL="yes", HAVE_SDL="no" check_failed=yes)
++			PKG_CHECK_MODULES(SDL, sdl2, output_modules="$output_modules sdl" HAVE_SDL="yes", HAVE_SDL="no" check_failed=yes)

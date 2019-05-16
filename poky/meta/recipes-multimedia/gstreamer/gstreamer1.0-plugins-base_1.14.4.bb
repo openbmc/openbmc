@@ -28,7 +28,7 @@ S = "${WORKDIR}/gst-plugins-base-${PV}"
 
 DEPENDS += "iso-codes util-linux"
 
-inherit gettext
+inherit gettext gobject-introspection
 
 PACKAGES_DYNAMIC =+ "^libgst.*"
 

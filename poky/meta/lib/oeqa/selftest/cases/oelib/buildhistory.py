@@ -1,8 +1,11 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import os
 from oeqa.selftest.case import OESelftestTestCase
 import tempfile
 from oeqa.utils.commands import get_bb_var
-from oeqa.core.decorator.oeid import OETestID
 
 class TestBlobParsing(OESelftestTestCase):
 
@@ -40,7 +43,6 @@ class TestBlobParsing(OESelftestTestCase):
         self.repo.git.add("--all")
         self.repo.git.commit(message=msg)
 
-    @OETestID(1859)
     def test_blob_to_dict(self):
         """
         Test convertion of git blobs to dictionary
@@ -53,7 +55,6 @@ class TestBlobParsing(OESelftestTestCase):
         self.assertEqual(valuesmap, blob_to_dict(blob),
             "commit was not translated correctly to dictionary")
 
-    @OETestID(1860)
     def test_compare_dict_blobs(self):
         """
         Test comparisson of dictionaries extracted from git blobs
@@ -74,7 +75,6 @@ class TestBlobParsing(OESelftestTestCase):
         var_changes = { x.fieldname : (x.oldvalue, x.newvalue) for x in change_records}
         self.assertEqual(changesmap, var_changes, "Changes not reported correctly")
 
-    @OETestID(1861)
     def test_compare_dict_blobs_default(self):
         """
         Test default values for comparisson of git blob dictionaries

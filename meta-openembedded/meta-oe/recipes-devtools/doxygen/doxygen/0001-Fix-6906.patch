@@ -1,0 +1,94 @@
+From 81b213b98f51ec3eed5774f6f797c074ac35db3e Mon Sep 17 00:00:00 2001
+From: Ton van den Heuvel <tonvandenheuvel@gmail.com>
+Date: Mon, 6 May 2019 15:17:28 +0200
+Subject: [PATCH] Fix #6906
+
+Generate configvalues.h only as a dependency for the VHDL parser. Fixes
+a problem in combination with Ninja v1.9.0 because of duplicate rules
+for generating configvalues.h.
+
+Upstream-Status: Backport
+Signed-off-by: Oleksandr Kravchuk <open.source@oleksandr-kravchuk.com>
+---
+ addon/doxyapp/CMakeLists.txt   |  8 --------
+ addon/doxyparse/CMakeLists.txt |  8 --------
+ src/CMakeLists.txt             |  4 ++++
+ vhdlparser/CMakeLists.txt      | 12 +++---------
+ 4 files changed, 7 insertions(+), 25 deletions(-)
+
+diff --git a/addon/doxyapp/CMakeLists.txt b/addon/doxyapp/CMakeLists.txt
+index a7377112..0aaf4655 100644
+--- a/addon/doxyapp/CMakeLists.txt
++++ b/addon/doxyapp/CMakeLists.txt
+@@ -1,11 +1,3 @@
+-# configvalues.h
+-add_custom_command(
+-    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/src/configgen.py -maph ${CMAKE_SOURCE_DIR}/src/config.xml > ${GENERATED_SRC}/configvalues.h
+-    DEPENDS ${CMAKE_SOURCE_DIR}/src/config.xml ${CMAKE_SOURCE_DIR}/src/configgen.py
+-    OUTPUT ${GENERATED_SRC}/configvalues.h
+-)
+-set_source_files_properties(${GENERATED_SRC}/configvalues.h PROPERTIES GENERATED 1)
+-
+ find_package(Iconv)
+ 
+ include_directories(
+diff --git a/addon/doxyparse/CMakeLists.txt b/addon/doxyparse/CMakeLists.txt
+index ff198fb4..1620c72e 100644
+--- a/addon/doxyparse/CMakeLists.txt
++++ b/addon/doxyparse/CMakeLists.txt
+@@ -1,11 +1,3 @@
+-# configvalues.h
+-add_custom_command(
+-    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/src/configgen.py -maph ${CMAKE_SOURCE_DIR}/src/config.xml > ${GENERATED_SRC}/configvalues.h
+-    DEPENDS ${CMAKE_SOURCE_DIR}/src/config.xml ${CMAKE_SOURCE_DIR}/src/configgen.py
+-    OUTPUT ${GENERATED_SRC}/configvalues.h
+-)
+-set_source_files_properties(${GENERATED_SRC}/configvalues.h PROPERTIES GENERATED 1)
+-
+ find_package(Iconv)
+ 
+ include_directories(
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 92a302ab..37a21ff6 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -43,6 +43,10 @@ add_custom_command(
+     OUTPUT ${GENERATED_SRC}/configvalues.h
+ )
+ set_source_files_properties(${GENERATED_SRC}/configvalues.h PROPERTIES GENERATED 1)
++add_custom_target(
++    generate_configvalues_header
++    DEPENDS ${GENERATED_SRC}/configvalues.h
++)
+ 
+ # configvalues.cpp
+ add_custom_command(
+diff --git a/vhdlparser/CMakeLists.txt b/vhdlparser/CMakeLists.txt
+index 71e97df5..f89008c5 100644
+--- a/vhdlparser/CMakeLists.txt
++++ b/vhdlparser/CMakeLists.txt
+@@ -1,14 +1,5 @@
+-# configvalues.h
+-add_custom_command(
+-    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/src/configgen.py -maph ${CMAKE_SOURCE_DIR}/src/config.xml > ${GENERATED_SRC}/configvalues.h
+-    DEPENDS ${CMAKE_SOURCE_DIR}/src/config.xml ${CMAKE_SOURCE_DIR}/src/configgen.py
+-    OUTPUT ${GENERATED_SRC}/configvalues.h
+-)
+-set_source_files_properties(${GENERATED_SRC}/configvalues.h PROPERTIES GENERATED 1)
+-
+ include_directories(${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/qtools ${GENERATED_SRC})
+ add_library(vhdlparser STATIC
+-${GENERATED_SRC}/configvalues.h
+ CharStream.cc
+ ParseException.cc
+ Token.cc
+@@ -17,3 +8,6 @@ VhdlParser.cc
+ VhdlParserTokenManager.cc
+ VhdlParserIF.cpp
+ )
++add_dependencies(vhdlparser
++    generate_configvalues_header
++)
+-- 
+2.17.1
+

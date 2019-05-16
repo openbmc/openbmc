@@ -1,13 +1,15 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
-from oeqa.core.decorator.oeid import OETestID
 from oeqa.core.decorator.data import skipIfNotInDataVar
 
 class X32libTest(OERuntimeTestCase):
 
     @skipIfNotInDataVar('DEFAULTTUNE', 'x86-64-x32',
                         'DEFAULTTUNE is not set to x86-64-x32')
-    @OETestID(281)
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     def test_x32_file(self):
         cmd = 'readelf -h /bin/ls | grep Class | grep ELF32'

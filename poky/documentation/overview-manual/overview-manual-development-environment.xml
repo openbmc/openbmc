@@ -166,22 +166,6 @@
                 section in the Yocto Project Linux Kernel Development Manual.
                 </para></listitem>
             <listitem><para>
-                <emphasis>Using the <trademark class='trade'>Eclipse</trademark> IDE:</emphasis>
-                One of two Yocto Project development methods that involves an
-                interface that effectively puts the Yocto Project into the
-                background is the popular Eclipse IDE.
-                This method of development is advantageous if you are already
-                familiar with working within Eclipse.
-                Development is supported through a plugin that you install
-                onto your development host.</para>
-
-                <para>For steps that show you how to set up your development
-                host to use the Eclipse Yocto Project plugin, see the
-                "<ulink url='&YOCTO_DOCS_SDK_URL;#sdk-eclipse-project'>Developing Applications Using <trademark class='trade'>Eclipse</trademark></ulink>"
-                Chapter in the Yocto Project Application Development and the
-                Extensible Software Development Kit (eSDK) manual.
-                </para></listitem>
-            <listitem><para>
                 <emphasis>Using Toaster:</emphasis>
                 The other Yocto Project development method that involves an
                 interface that effectively puts the Yocto Project into the
@@ -276,11 +260,10 @@
                 <emphasis>
                 <ulink url='&YOCTO_DL_URL;/releases/'>Index of /releases:</ulink>
                 </emphasis>
-                This is an index of releases such as
-                the <trademark class='trade'>Eclipse</trademark>
-                Yocto Plug-in, miscellaneous support, Poky, Pseudo, installers
-                for cross-development toolchains, and all released versions of
-                Yocto Project in the form of images or tarballs.
+                This is an index of releases such as Poky, Pseudo, installers
+                for cross-development toolchains, miscellaneous support
+                and all released versions of Yocto Project in the form of
+                images or tarballs.
                 Downloading and extracting these files does not produce a local
                 copy of the Git repository but rather a snapshot of a
                 particular release or image.</para>

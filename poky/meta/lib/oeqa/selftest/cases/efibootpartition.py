@@ -2,6 +2,8 @@
 #
 # Copyright (c) 2017 Wind River Systems, Inc.
 #
+# SPDX-License-Identifier: MIT
+#
 
 import re
 

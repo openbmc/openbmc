@@ -24,4 +24,3 @@ UNKNOWN_CONFIGURE_WHITELIST += "--enable-malloc0returnsnull --disable-malloc0ret
 "
 
 REQUIRED_DISTRO_FEATURES ?= "x11"
-REQUIRED_DISTRO_FEATURES_class-native = ""

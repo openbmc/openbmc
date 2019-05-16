@@ -7,29 +7,36 @@ Upstream-Status: Pending
 Signed-off-by: Christopher Larson <chris_larson@mentor.com>
 Signed-off-by: Maxin B. John <maxin.john@intel.com>
 ---
-diff -Naur iw-4.3-origin/Makefile iw-4.3/Makefile
---- iw-4.3-origin/Makefile	2015-11-20 16:37:58.752077287 +0200
-+++ iw-4.3/Makefile	2015-11-20 16:57:15.510615815 +0200
-@@ -1,5 +1,7 @@
+ Makefile | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 33aaf6a..9030796 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,5 +1,9 @@
  MAKEFLAGS += --no-print-directory
--
+
 +SRCDIR ?= $(dir $(lastword $(MAKEFILE_LIST)))
 +OBJDIR ?= $(PWD)
 +VPATH = $(SRCDIR)
++
  PREFIX ?= /usr
  SBINDIR ?= $(PREFIX)/sbin
  MANDIR ?= $(PREFIX)/share/man
-@@ -95,11 +97,11 @@
+@@ -103,11 +107,11 @@ VERSION_OBJS := $(filter-out version.o, $(OBJS))
  version.c: version.sh $(patsubst %.o,%.c,$(VERSION_OBJS)) nl80211.h iw.h Makefile \
  		$(wildcard .git/index .git/refs/tags)
  	@$(NQ) ' GEN ' $@
 -	$(Q)./version.sh $@
 +	$(Q)cd $(SRCDIR) && ./version.sh $(OBJDIR)/$@
- 
+
  %.o: %.c iw.h nl80211.h
  	@$(NQ) ' CC  ' $@
--	$(Q)$(CC) $(CFLAGS) -c -o $@ $<
-+	$(Q)$(CC) -I$(SRCDIR) $(CFLAGS) -c -o $@ $<
- 
+-	$(Q)$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
++	$(Q)$(CC) -I$(SRCDIR) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
+
  ifeq ($(IW_ANDROID_BUILD),)
  iw:	$(OBJS)
+--
+2.20.1 (Apple Git-117)

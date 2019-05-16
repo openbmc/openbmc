@@ -1,8 +1,11 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import os
 
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
-from oeqa.core.decorator.oeid import OETestID
 from oeqa.core.decorator.data import skipIfNotFeature
 from oeqa.runtime.decorator.package import OEHasPackage
 
@@ -19,7 +22,6 @@ class StapTest(OERuntimeTestCase):
         files = '/tmp/hello.stp'
         cls.tc.target.run('rm %s' % files)
 
-    @OETestID(1652)
     @skipIfNotFeature('tools-profile',
                       'Test requires tools-profile to be in IMAGE_FEATURES')
     @OETestDepends(['kernelmodule.KernelModuleTest.test_kernel_module'])

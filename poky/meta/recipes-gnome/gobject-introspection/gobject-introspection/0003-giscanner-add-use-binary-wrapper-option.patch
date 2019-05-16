@@ -1,4 +1,4 @@
-From 46dbe963aa6435591c87e788cdb54bc0daeac42e Mon Sep 17 00:00:00 2001
+From 5f985fd8a24764ccb38af6335d4584d7e33fc3a1 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 19 Oct 2015 18:26:40 +0300
 Subject: [PATCH] giscanner: add --use-binary-wrapper option
@@ -16,10 +16,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 14 insertions(+)
 
 diff --git a/giscanner/scannermain.py b/giscanner/scannermain.py
-index ccb14e9..061def0 100644
+index c004fb1..0b6a2d2 100644
 --- a/giscanner/scannermain.py
 +++ b/giscanner/scannermain.py
-@@ -126,6 +126,9 @@ def _get_option_parser():
+@@ -120,6 +120,9 @@ def _get_option_parser():
      parser.add_option("", "--program",
                        action="store", dest="program", default=None,
                        help="program to execute")
@@ -29,7 +29,7 @@ index ccb14e9..061def0 100644
      parser.add_option("", "--program-arg",
                        action="append", dest="program_args", default=[],
                        help="extra arguments to program")
-@@ -418,6 +421,17 @@ def create_binary(transformer, options, args):
+@@ -417,6 +420,17 @@ def create_binary(transformer, options, args):
                                                gdump_parser.get_error_quark_functions())
  
      shlibs = resolve_shlibs(options, binary, options.libraries)

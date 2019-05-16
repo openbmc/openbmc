@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
 import hashlib
 import logging
 import os
@@ -119,6 +123,12 @@ class SignatureGeneratorBasic(SignatureGenerator):
             k = fn + "." + task
             if not ignore_mismatch and k in self.basehash and self.basehash[k] != basehash[k]:
                 bb.error("When reparsing %s, the basehash value changed from %s to %s. The metadata is not deterministic and this needs to be fixed." % (k, self.basehash[k], basehash[k]))
+                bb.error("The following commands may help:")
+                cmd = "$ bitbake %s -c%s" % (d.getVar('PN'), task)
+                # Make sure sigdata is dumped before run printdiff
+                bb.error("%s -Snone" % cmd)
+                bb.error("Then:")
+                bb.error("%s -Sprintdiff\n" % cmd)
             self.basehash[k] = basehash[k]
 
         self.taskdeps[fn] = taskdeps
@@ -633,6 +643,10 @@ def compare_sigfiles(a, b, recursecb=None, color=False, collapsed=False):
     a_taint = a_data.get('taint', None)
     b_taint = b_data.get('taint', None)
     if a_taint != b_taint:
+        if a_taint.startswith('nostamp:'):
+            a_taint = a_taint.replace('nostamp:', 'nostamp(uuid4):')
+        if b_taint.startswith('nostamp:'):
+            b_taint = b_taint.replace('nostamp:', 'nostamp(uuid4):')
         output.append(color_format("{color_title}Taint (by forced/invalidated task) changed{color_default} from %s to %s") % (a_taint, b_taint))
 
     return output
@@ -705,7 +719,11 @@ def dump_sigfile(a):
             output.append("Hash for dependent task %s is %s" % (dep, a_data['runtaskhashes'][dep]))
 
     if 'taint' in a_data:
-        output.append("Tainted (by forced/invalidated task): %s" % a_data['taint'])
+        if a_data['taint'].startswith('nostamp:'):
+            msg = a_data['taint'].replace('nostamp:', 'nostamp(uuid4):')
+        else:
+            msg = a_data['taint']
+        output.append("Tainted (by forced/invalidated task): %s" % msg)
 
     if 'task' in a_data:
         computed_basehash = calc_basehash(a_data)

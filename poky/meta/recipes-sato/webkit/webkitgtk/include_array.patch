@@ -1,0 +1,15 @@
+Added missing include for std::array
+
+Upstream-Status: Submitted [https://bugs.webkit.org/show_bug.cgi?id=197085]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- webkitgtk-2.24.0/Source/JavaScriptCore/assembler/PerfLog.cpp.org	2019-04-18 18:03:50.226231691 -0700
++++ webkitgtk-2.24.0/Source/JavaScriptCore/assembler/PerfLog.cpp	2019-04-18 18:07:28.569153989 -0700
+@@ -31,6 +31,7 @@
+ #include <elf.h>
+ #include <fcntl.h>
+ #include <mutex>
++#include <array>
+ #include <sys/mman.h>
+ #include <sys/stat.h>
+ #include <sys/syscall.h>

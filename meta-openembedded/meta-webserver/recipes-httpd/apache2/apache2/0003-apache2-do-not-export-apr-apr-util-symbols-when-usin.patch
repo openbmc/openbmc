@@ -1,0 +1,34 @@
+From ddd560024a6d526187fd126f306b59533ca3f7e2 Mon Sep 17 00:00:00 2001
+From: Paul Eggleton <paul.eggleton@linux.intel.com>
+Date: Tue, 17 Jul 2012 11:27:39 +0100
+Subject: [PATCH] apache2: do not export apr/apr-util symbols when using
+ shared libapr
+
+There is no need to "suck in" the apr/apr-util symbols when using
+a shared libapr{,util}, it just bloats the symbol table; so don't.
+
+Upstream-Status: Pending
+
+Note: EXPORT_DIRS change is conditional on using shared apr
+
+---
+ server/Makefile.in | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/server/Makefile.in b/server/Makefile.in
+index 1fa3344..f635d76 100644
+--- a/server/Makefile.in
++++ b/server/Makefile.in
+@@ -60,9 +60,6 @@ export_files:
+ 	      ls $$dir/*.h ; \
+ 	  done; \
+ 	  echo "$(top_srcdir)/server/mpm_fdqueue.h"; \
+-	  for dir in $(EXPORT_DIRS_APR); do \
+-	      ls $$dir/ap[ru].h $$dir/ap[ru]_*.h 2>/dev/null; \
+-	  done; \
+ 	) | sed -e s,//,/,g | sort -u > $@
+ 
+ exports.c: export_files
+-- 
+2.7.4
+

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+OPKG_PATH=$(which opkg)
+
+make OPKG_PATH=$OPKG_PATH run-tests

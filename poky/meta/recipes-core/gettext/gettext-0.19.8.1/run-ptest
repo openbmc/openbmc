@@ -1,0 +1,6 @@
+#!/bin/sh
+#
+#This script is used to run gettext test suites
+cd tests
+
+make -k runtest-TESTS top_srcdir=.. srcdir=. abs_srcdir=$PWD top_builddir=$PWD/../ abs_top_srcdir=$PWD/../ | cat

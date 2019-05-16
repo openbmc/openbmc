@@ -25,3 +25,22 @@ class ApparmorTest(OERuntimeTestCase):
             msg = ('aa-status  failed. '
                'Status and output:%s and %s' % (status, output))
             self.assertEqual(status, 0, msg = msg)
+
+    @OETestDepends(['apparmor.ApparmorTest.test_apparmor_aa_status'])
+    def test_apparmor_aa_complain(self):
+        status, output = self.target.run('aa-complain /etc/apparmor.d/*')
+        match = re.search('apparmor module is loaded.', output)
+        if not match:
+            msg = ('aa-complain  failed. '
+               'Status and output:%s and %s' % (status, output))
+            self.assertEqual(status, 0, msg = msg)
+
+    @OETestDepends(['apparmor.ApparmorTest.test_apparmor_aa_complain'])
+    def test_apparmor_aa_enforce(self):
+        status, output = self.target.run('aa-enforce /etc/apparmor.d/*')
+        match = re.search('apparmor module is loaded.', output)
+        if not match:
+            msg = ('aa-enforce  failed. '
+               'Status and output:%s and %s' % (status, output))
+            self.assertEqual(status, 0, msg = msg)
+

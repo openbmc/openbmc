@@ -17,13 +17,6 @@
 <!ENTITY OE_DOCS_URL "http://docs.openembedded.org">
 <!ENTITY OH_HOME_URL "http://o-hand.com">
 <!ENTITY BITBAKE_HOME_URL "http://developer.berlios.de/projects/bitbake/">
-<!ENTITY ECLIPSE_MAIN_URL "http://www.eclipse.org/downloads">
-<!ENTITY ECLIPSE_DL_URL "http://download.eclipse.org">
-<!ENTITY ECLIPSE_DL_PLUGIN_URL "&YOCTO_DL_URL;/releases/eclipse-plugin/&DISTRO;">
-<!ENTITY ECLIPSE_UPDATES_URL "&ECLIPSE_DL_URL;/tm/updates/3.3">
-<!ENTITY ECLIPSE_INDIGO_URL "&ECLIPSE_DL_URL;/releases/indigo">
-<!ENTITY ECLIPSE_JUNO_URL "&ECLIPSE_DL_URL;/releases/juno">
-<!ENTITY ECLIPSE_INDIGO_CDT_URL "&ECLIPSE_DL_URL;tools/cdt/releases/indigo">
 <!ENTITY YOCTO_DOCS_URL "&YOCTO_HOME_URL;/docs">
 <!ENTITY YOCTO_SOURCES_URL "&YOCTO_HOME_URL;/sources/">
 <!ENTITY YOCTO_AB_PORT_URL "&YOCTO_AB_URL;:8010">
@@ -31,7 +24,6 @@
 <!ENTITY YOCTO_POKY_URL "&YOCTO_DL_URL;/releases/poky/">
 <!ENTITY YOCTO_RELEASE_DL_URL "&YOCTO_DL_URL;/releases/yocto/yocto-&DISTRO;">
 <!ENTITY YOCTO_TOOLCHAIN_DL_URL "&YOCTO_RELEASE_DL_URL;/toolchain/">
-<!ENTITY YOCTO_ECLIPSE_DL_URL "&YOCTO_RELEASE_DL_URL;/eclipse-plugin/indigo;">
 <!ENTITY YOCTO_ADTINSTALLER_DL_URL "&YOCTO_RELEASE_DL_URL;/adt_installer">
 <!ENTITY YOCTO_POKY_DL_URL "&YOCTO_RELEASE_DL_URL;/&YOCTO_POKY;.tar.bz2">
 <!ENTITY YOCTO_MACHINES_DL_URL "&YOCTO_RELEASE_DL_URL;/machines">

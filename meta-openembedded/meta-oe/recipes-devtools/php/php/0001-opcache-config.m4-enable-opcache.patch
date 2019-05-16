@@ -1,7 +1,9 @@
-From fb139d9707dabe1684b472a08a6eb5761ede4a3a Mon Sep 17 00:00:00 2001
+From 8de5ba69d20d049b8ca983a9470c7303142ec0b3 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
-Date: Tue, 12 Feb 2019 14:56:16 +0800
-Subject: [PATCH] opcache/config.m4: enable opcache
+Date: Sun, 28 Apr 2019 16:55:13 +0800
+Subject: [PATCH] From fb139d9707dabe1684b472a08a6eb5761ede4a3a Mon Sep 17
+ 00:00:00 2001 From: Changqing Li <changqing.li@windriver.com> Date: Tue, 12
+ Feb 2019 14:56:16 +0800 Subject: [PATCH] opcache/config.m4: enable opcache
 
 We can't use AC_TRY_RUN to run programs in a cross compile environment. Set
 the variables directly instead since we know that we'd be running on latest
@@ -11,17 +13,17 @@ Upstream-Status: Inappropriate [Configuration]
 
 Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
 
-update patch to version 7.3.2
+update patch to version 7.3.4
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
- ext/opcache/config.m4 | 357 +-------------------------------------------------
- 1 file changed, 6 insertions(+), 351 deletions(-)
+ ext/opcache/config.m4 | 312 +-------------------------------------------------
+ 1 file changed, 6 insertions(+), 306 deletions(-)
 
 diff --git a/ext/opcache/config.m4 b/ext/opcache/config.m4
-index 392f4c6..6617693 100644
+index 4810217..22c3d61 100644
 --- a/ext/opcache/config.m4
 +++ b/ext/opcache/config.m4
-@@ -27,374 +27,29 @@ if test "$PHP_OPCACHE" != "no"; then
+@@ -27,319 +27,19 @@ if test "$PHP_OPCACHE" != "no"; then
    AC_CHECK_HEADERS([unistd.h sys/uio.h])
  
    AC_MSG_CHECKING(for sysvipc shared memory support)
@@ -93,8 +95,9 @@ index 392f4c6..6617693 100644
 -    AC_DEFINE(HAVE_SHM_IPC, 1, [Define if you have SysV IPC SHM support])
 -    msg=yes],[msg=no],[msg=no])
 -  AC_MSG_RESULT([$msg])
+-
 +  AC_DEFINE(HAVE_SHM_IPC, 1, [Define if you have SysV IPC SHM support])
- 
++  
    AC_MSG_CHECKING(for mmap() using MAP_ANON shared memory support)
 -  AC_RUN_IFELSE([AC_LANG_SOURCE([[
 -#include <sys/types.h>
@@ -344,64 +347,8 @@ index 392f4c6..6617693 100644
 -  AC_MSG_RESULT([$msg])
 +  AC_DEFINE(HAVE_SHM_MMAP_FILE, 1, [Define if you have mmap() SHM support])
  
- flock_type=unknown
- AC_MSG_CHECKING(for struct flock layout)
- 
- if test "$flock_type" = "unknown"; then
--AC_RUN_IFELSE([AC_LANG_SOURCE([[
--  #include <fcntl.h>
--  struct flock lock = { 1, 2, 3, 4, 5, 6, 7 };
--  int main() {
--    if(lock.l_type == 1 && lock.l_whence == 2 && lock.l_start == 6 && lock.l_len== 7) {
--		return 0;
--    }
--    return 1;
--  }
--]])], [
--    flock_type=aix64
--    AC_DEFINE([HAVE_FLOCK_AIX64], [], [Struct flock is 64-bit AIX-type])
--], [])
--fi
--
--if test "$flock_type" = "unknown"; then
--AC_RUN_IFELSE([AC_LANG_SOURCE([[
--  #include <fcntl.h>
--  struct flock lock = { 1, 2, 3, 4, 5 };
--  int main() {
--    if(lock.l_type == 1 && lock.l_whence == 2 && lock.l_start == 3 && lock.l_len == 4) {
--		return 0;
--    }
--    return 1;
--  }
--]])], [
--	flock_type=linux
-+    flock_type=linux
-     AC_DEFINE([HAVE_FLOCK_LINUX], [], [Struct flock is Linux-type])
--], [])
- fi
- 
- if test "$flock_type" = "unknown"; then
--AC_RUN_IFELSE([AC_LANG_SOURCE([[
--  #include <fcntl.h>
--  struct flock lock = { 1, 2, 3, 4, 5 };
--  int main() {
--    if(lock.l_start == 1 && lock.l_len == 2 && lock.l_type == 4 && lock.l_whence == 5) {
--		return 0;
--    }
--    return 1;
--  }
--]])], [
--	flock_type=bsd
--    AC_DEFINE([HAVE_FLOCK_BSD], [], [Struct flock is BSD-type])
--], [])
--fi
--
--AC_MSG_RESULT([$flock_type])
--
--if test "$flock_type" = "unknown"; then
- 	AC_MSG_ERROR([Don't know how to define struct flock on this system[,] set --enable-opcache=no])
- fi
- 
+   PHP_NEW_EXTENSION(opcache,
+ 	ZendAccelerator.c \
 -- 
 2.7.4
 

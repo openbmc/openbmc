@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
 import oe.path
 import oe.types
 
@@ -847,6 +851,7 @@ def src_patches(d, all=False, expand=True):
 
 
 def should_apply(parm, d):
+    import bb.utils
     if "mindate" in parm or "maxdate" in parm:
         pn = d.getVar('PN')
         srcdate = d.getVar('SRCDATE_%s' % pn)
@@ -882,6 +887,16 @@ def should_apply(parm, d):
         srcrev = d.getVar('SRCREV')
         if srcrev and parm["notrev"] in srcrev:
             return False, "doesn't apply to revision"
+
+    if "maxver" in parm:
+        pv = d.getVar('PV')
+        if bb.utils.vercmp_string_op(pv, parm["maxver"], ">"):
+            return False, "applies to earlier version"
+
+    if "minver" in parm:
+        pv = d.getVar('PV')
+        if bb.utils.vercmp_string_op(pv, parm["minver"], "<"):
+            return False, "applies to later version"
 
     return True, None
 

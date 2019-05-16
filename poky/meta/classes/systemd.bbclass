@@ -23,38 +23,41 @@ python __anonymous() {
 }
 
 systemd_postinst() {
-OPTS=""
-
-if [ -n "$D" ]; then
-    OPTS="--root=$D"
-fi
-
 if type systemctl >/dev/null 2>/dev/null; then
-	if [ -z "$D" ]; then
-		systemctl daemon-reload
+	OPTS=""
+
+	if [ -n "$D" ]; then
+		OPTS="--root=$D"
 	fi
 
-	systemctl $OPTS ${SYSTEMD_AUTO_ENABLE} ${SYSTEMD_SERVICE_ESCAPED}
+	if [ "${SYSTEMD_AUTO_ENABLE}" = "enable" ]; then
+		for service in ${SYSTEMD_SERVICE_ESCAPED}; do
+			case "${service}" in
+			*@*)
+				systemctl ${OPTS} enable "${service}"
+				;;
+			esac
+		done
+	fi
 
-	if [ -z "$D" -a "${SYSTEMD_AUTO_ENABLE}" = "enable" ]; then
-		systemctl --no-block restart ${SYSTEMD_SERVICE_ESCAPED}
+	if [ -z "$D" ]; then
+		systemctl daemon-reload
+		systemctl preset ${SYSTEMD_SERVICE_ESCAPED}
+
+		if [ "${SYSTEMD_AUTO_ENABLE}" = "enable" ]; then
+			systemctl --no-block restart ${SYSTEMD_SERVICE_ESCAPED}
+		fi
 	fi
 fi
 }
 
 systemd_prerm() {
-OPTS=""
-
-if [ -n "$D" ]; then
-    OPTS="--root=$D"
-fi
-
 if type systemctl >/dev/null 2>/dev/null; then
 	if [ -z "$D" ]; then
 		systemctl stop ${SYSTEMD_SERVICE_ESCAPED}
-	fi
 
-	systemctl $OPTS disable ${SYSTEMD_SERVICE_ESCAPED}
+		systemctl disable ${SYSTEMD_SERVICE_ESCAPED}
+	fi
 fi
 }
 
@@ -177,12 +180,25 @@ python systemd_populate_packages() {
                 else:
                     bb.fatal("SYSTEMD_SERVICE_%s value %s does not exist" % (pkg_systemd, service))
 
+    def systemd_create_presets(pkg, action):
+        presetf = oe.path.join(d.getVar("PKGD"), d.getVar("systemd_unitdir"), "system-preset/98-%s.preset" % pkg)
+        bb.utils.mkdirhier(os.path.dirname(presetf))
+        with open(presetf, 'a') as fd:
+            for service in d.getVar('SYSTEMD_SERVICE_%s' % pkg).split():
+                fd.write("%s %s\n" % (action,service))
+        d.appendVar("FILES_%s" % pkg, ' ' + oe.path.join(d.getVar("systemd_unitdir"), "system-preset/98-%s.preset" % pkg))
+
     # Run all modifications once when creating package
     if os.path.exists(d.getVar("D")):
         for pkg in d.getVar('SYSTEMD_PACKAGES').split():
             systemd_check_package(pkg)
             if d.getVar('SYSTEMD_SERVICE_' + pkg):
                 systemd_generate_package_scripts(pkg)
+                action = get_package_var(d, 'SYSTEMD_AUTO_ENABLE', pkg)
+                if action in ("enable", "disable"):
+                    systemd_create_presets(pkg, action)
+                elif action not in ("mask", "preset"):
+                    bb.fatal("SYSTEMD_AUTO_ENABLE_%s '%s' is not 'enable', 'disable', 'mask' or 'preset'" % (pkg, action))
         systemd_check_services()
 }
 

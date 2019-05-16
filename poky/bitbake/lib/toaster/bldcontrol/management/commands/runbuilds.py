@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import Q

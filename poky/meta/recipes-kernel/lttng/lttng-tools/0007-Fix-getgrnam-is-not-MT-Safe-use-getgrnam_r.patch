@@ -55,6 +55,8 @@ want to move the warning elsewhere in the future. For now, pass a bool
 if we need to warn or not.
 
 Signed-off-by: Jonathan Rajotte <jonathan.rajotte-julien@efficios.com>
+
+Upstream-Status: Submitted [https://patchwork.lttng.org/patch/2314703]
 ---
  src/bin/lttng-consumerd/health-consumerd.c   | 10 ++-
  src/bin/lttng-relayd/health-relayd.c         | 20 ++++--

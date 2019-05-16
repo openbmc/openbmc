@@ -502,35 +502,6 @@
                         Manual.
                         </para></listitem>
                     <listitem><para>
-                        <emphasis><trademark class='trade'>Eclipse</trademark> IDE Plug-in:</emphasis>
-                        This plug-in enables you to use the popular Eclipse
-                        Integrated Development Environment (IDE), which allows
-                        for development using the Yocto Project all within the
-                        Eclipse IDE.
-                        You can work within Eclipse to cross-compile, deploy,
-                        and execute your output into a QEMU emulation session
-                        as well as onto actual target hardware.</para>
-
-                        <para>The environment also supports performance
-                        enhancing tools that allow you to perform remote
-                        profiling, tracing, collection of power data,
-                        collection of latency data, and collection of
-                        performance data.</para>
-
-                        <para>Once you enable the plug-in, standard Eclipse
-                        functions automatically use the cross-toolchain
-                        and target system libraries.
-                        You can build applications using any of these
-                        libraries.</para>
-
-                        <para>For more information on the Eclipse plug-in,
-                        see the
-                        "<ulink url='&YOCTO_DOCS_SDK_URL;#adt-eclipse'>Working Within Eclipse</ulink>"
-                        section in the Yocto Project Application Development
-                        and the Extensible Software Development Kit (eSDK)
-                        manual.
-                        </para></listitem>
-                    <listitem><para>
                         <emphasis>Toaster:</emphasis>
                         Toaster is a web interface to the Yocto Project
                         OpenEmbedded build system.
@@ -952,20 +923,6 @@
                     <para>For information about and how to use Toaster,
                     see the
                     <ulink url='&YOCTO_DOCS_TOAST_URL;'>Toaster User Manual</ulink>.
-                    </para></listitem>
-                <listitem><para>
-                    <emphasis><trademark class='trade'>Eclipse</trademark> IDE:</emphasis>
-                    If your Build Host supports and runs the popular
-                    Eclipse IDE, you can install the Yocto Project Eclipse
-                    plug-in and use the Yocto Project to develop software.
-                    The plug-in integrates the Yocto Project functionality
-                    into Eclipse development practices.</para>
-
-                    <para>For information about how to install and use the
-                    Yocto Project Eclipse plug-in, see the
-                    "<ulink url='&YOCTO_DOCS_SDK_URL;#sdk-eclipse-project'>Developing Applications Using Eclipse</ulink>"
-                    chapter in the Yocto Project Application Development and
-                    the Extensible Software Development Kit (eSDK) Manual.
                     </para></listitem>
             </itemizedlist>
         </para>

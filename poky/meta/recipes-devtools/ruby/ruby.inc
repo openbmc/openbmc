@@ -14,7 +14,7 @@ LIC_FILES_CHKSUM = "\
     file://LEGAL;md5=23a79bb4c1a40f6cc9bcb6f4e7c39799 \
 "
 
-DEPENDS = "ruby-native zlib openssl tcl libyaml gdbm readline"
+DEPENDS = "ruby-native zlib openssl tcl libyaml gdbm readline libffi"
 DEPENDS_class-native = "openssl-native libyaml-native readline-native"
 
 SHRT_VER = "${@oe.utils.trim_version("${PV}", 2)}"
@@ -24,7 +24,7 @@ SRC_URI = "http://cache.ruby-lang.org/pub/ruby/${SHRT_VER}/ruby-${PV}.tar.gz \
            "
 UPSTREAM_CHECK_URI = "https://www.ruby-lang.org/en/downloads/"
 
-inherit autotools
+inherit autotools ptest
 
 
 # This snippet lets compiled extensions which rely on external libraries,

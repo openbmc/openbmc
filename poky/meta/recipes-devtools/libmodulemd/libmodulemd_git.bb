@@ -7,8 +7,8 @@ SRC_URI = "git://github.com/fedora-modularity/libmodulemd;protocol=https \
            file://0002-modulemd-v1-meson.build-do-not-generate-gir-or-gtkdo.patch \
            "
 
-PV = "2.1.0"
-SRCREV = "072e6ee791fe7822a6d423bdac7e4a5cbb118bce"
+PV = "2.2.3"
+SRCREV = "4c75c6f8b39ee57aebe8fd36ef84808e893048c0"
 
 S = "${WORKDIR}/git"
 
@@ -20,11 +20,6 @@ DEPENDS += "glib-2.0 libyaml glib-2.0-native"
 
 BBCLASSEXTEND = "native nativesdk"
 
-GI_ENABLE_FLAG = "-Dskip_introspection=false"
-GI_DISABLE_FLAG = "-Dskip_introspection=true"
-
-EXTRA_OEMESON_append_class-nativesdk = " ${GI_DISABLE_FLAG}"
-EXTRA_OEMESON_append_class-native = " ${GI_DISABLE_FLAG}"
-
-EXTRA_OEMESON_append_class-target = " ${@bb.utils.contains('GI_DATA_ENABLED', 'True', '${GI_ENABLE_FLAG}', \
-                                                                                       '${GI_DISABLE_FLAG}', d)} "
+GIR_MESON_OPTION = 'skip_introspection'
+GIR_MESON_ENABLE_FLAG = 'false'
+GIR_MESON_DISABLE_FLAG = 'true'

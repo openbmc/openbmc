@@ -31,6 +31,8 @@ BINCONFIG = "${bindir}/sdl-config"
 
 inherit autotools lib_package binconfig-disabled pkgconfig
 
+CVE_PRODUCT = "simple_directmedia_layer sdl"
+
 EXTRA_OECONF = "--disable-static --enable-cdrom --enable-threads --enable-timers \
                 --enable-file --disable-oss --disable-esd --disable-arts \
                 --disable-diskaudio --disable-nas \

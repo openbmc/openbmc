@@ -1,4 +1,7 @@
 #!/bin/sh
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
 # Hook to add source component/revision info to commit message
 # Parameter:
 #   $1 patch-file

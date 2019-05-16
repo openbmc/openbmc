@@ -1,6 +1,8 @@
+#
 # Copyright (C) 2013 Intel Corporation
 #
-# Released under the MIT license (see COPYING.MIT)
+# SPDX-License-Identifier: MIT
+#
 
 # Some custom decorators that can be used by unittests
 # Most useful is skipUnlessPassed which can be used for

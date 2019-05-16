@@ -1,14 +1,11 @@
 import os
 
 from oeqa.selftest.case import OESelftestTestCase
-from oeqa.core.decorator.oeid import OETestID
 from oeqa.core.decorator.depends import OETestDepends
 from oeqa.utils.commands import runCmd, bitbake, get_bb_var, runqemu
 
 class Systemdboot(OESelftestTestCase):
 
-    @OETestID(1445)
-    @OETestID(1528)
     def test_efi_systemdboot_images_can_be_built(self):
         """
         Summary:     Check if systemd-boot images can be built correctly

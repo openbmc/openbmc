@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-
-
+#
 # Copyright (C) 2013 Intel Corporation
 #
-# Released under the MIT license (see COPYING.MIT)
+# SPDX-License-Identifier: MIT
+#
 
 # This script should be used outside of the build system to run image tests.
 # It needs a json file as input as exported by the build.

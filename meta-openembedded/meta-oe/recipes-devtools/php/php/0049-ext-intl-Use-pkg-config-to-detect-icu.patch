@@ -1,84 +1,131 @@
-From: Hugh McMaster <hugh.mcmaster@outlook.com>
-Date: Wed, 5 Dec 2018 23:27:30 +1100
-Subject: ext/intl: Use pkg-config to detect icu
+From 03fecab78f9fa747ad8ab3484e7ca00c0148321d Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Sun, 28 Apr 2019 16:45:02 +0800
+Subject: [PATCH] From: Hugh McMaster <hugh.mcmaster@outlook.com> Date: Wed, 5
+ Dec 2018 23:27:30 +1100 Subject: ext/intl: Use pkg-config to detect icu
 
 The developers of icu recommend using pkg-config to detect icu,
 because icu-config is deprecated.
----
- acinclude.m4       | 56 +++++++-----------------------------------------------
- ext/intl/config.m4 | 16 ++++++----------
- 2 files changed, 13 insertions(+), 59 deletions(-)
 
---- php7.3.orig/acinclude.m4
-+++ php7.3/acinclude.m4
-@@ -2168,58 +2168,16 @@ dnl
+Upstream-Status: Pending
+
+update to version 7.3.4
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ acinclude.m4       | 95 ++++++------------------------------------------------
+ ext/intl/config.m4 | 16 ++++-----
+ 2 files changed, 15 insertions(+), 96 deletions(-)
+
+diff --git a/acinclude.m4 b/acinclude.m4
+index 7d77c33..86b0ecc 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -2158,92 +2158,15 @@ dnl
  dnl Common setup macro for ICU
  dnl
  AC_DEFUN([PHP_SETUP_ICU],[
 -  PHP_ARG_WITH(icu-dir,,
 -  [  --with-icu-dir=DIR      Specify where ICU libraries and headers can be found], DEFAULT, no)
-+  PKG_CHECK_MODULES([ICU], [icu-io >= 50.1])
- 
+-
 -  if test "$PHP_ICU_DIR" = "no"; then
 -    PHP_ICU_DIR=DEFAULT
 -  fi
 -
--  if test "$PHP_ICU_DIR" = "DEFAULT"; then
--    dnl Try to find icu-config
--    AC_PATH_PROG(ICU_CONFIG, icu-config, no, [$PATH:/usr/local/bin])
--  else
--    ICU_CONFIG="$PHP_ICU_DIR/bin/icu-config"
+-  AC_MSG_CHECKING([for location of ICU headers and libraries])
+-  found_icu=no
+-
+-  dnl First try to find pkg-config
+-  if test -z "$PKG_CONFIG"; then
+-    AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
 -  fi
 -
--  AC_MSG_CHECKING([for location of ICU headers and libraries])
+-  dnl If pkg-config is found try using it
+-  if test "$PHP_ICU_DIR" = "DEFAULT" && test -x "$PKG_CONFIG" && $PKG_CONFIG --exists icu-uc icu-io icu-i18n; then
+-    if $PKG_CONFIG --atleast-version=40 icu-uc; then
+-      found_icu=yes
+-      icu_version_full=`$PKG_CONFIG --modversion icu-uc`
+-      ac_IFS=$IFS
+-      IFS="."
+-      set $icu_version_full
+-      IFS=$ac_IFS
+-      icu_version=`expr [$]1 \* 1000 + [$]2`
+-      AC_MSG_RESULT([found $icu_version_full])
 -
--  dnl Trust icu-config to know better what the install prefix is..
--  icu_install_prefix=`$ICU_CONFIG --prefix 2> /dev/null`
--  if test "$?" != "0" || test -z "$icu_install_prefix"; then
--    AC_MSG_RESULT([not found])
--    AC_MSG_ERROR([Unable to detect ICU prefix or $ICU_CONFIG failed. Please verify ICU install prefix and make sure icu-config works.])
--  else
--    AC_MSG_RESULT([$icu_install_prefix])
+-      ICU_LIBS=`$PKG_CONFIG --libs icu-uc icu-io icu-i18n`
+-      ICU_INCS=`$PKG_CONFIG --cflags-only-I icu-uc icu-io icu-i18n`
+-      ICU_CXXFLAGS="-DU_USING_ICU_NAMESPACE=1"
 -
--    dnl Check ICU version
--    AC_MSG_CHECKING([for ICU 4.0 or greater])
--    icu_version_full=`$ICU_CONFIG --version`
--    ac_IFS=$IFS
--    IFS="."
--    set $icu_version_full
--    IFS=$ac_IFS
--    icu_version=`expr [$]1 \* 1000 + [$]2`
--    AC_MSG_RESULT([found $icu_version_full])
+-      AC_MSG_RESULT([found $ICU_VERSION])
 -
--    if test "$icu_version" -lt "4000"; then
--      AC_MSG_ERROR([ICU version 4.0 or later is required])
+-      PHP_EVAL_LIBLINE($ICU_LIBS, $1)
+-      PHP_EVAL_INCLINE($ICU_INCS)
+-    else
+-      AC_MSG_ERROR([ICU version 4.0 or later required.])
 -    fi
+-  fi
+-
+-  dnl If pkg-config fails for some reason, revert to the old method
+-  if test "$found_icu" = "no"; then
+-    if test "$PHP_ICU_DIR" = "DEFAULT"; then
+-      dnl Try to find icu-config
+-      AC_PATH_PROG(ICU_CONFIG, icu-config, no, [$PATH:/usr/local/bin])
+-    else
+-      ICU_CONFIG="$PHP_ICU_DIR/bin/icu-config"
+-    fi
+-
+-    dnl Trust icu-config to know better what the install prefix is..
+-    icu_install_prefix=`$ICU_CONFIG --prefix 2> /dev/null`
+-    if test "$?" != "0" || test -z "$icu_install_prefix"; then
+-      AC_MSG_RESULT([not found])
+-      AC_MSG_ERROR([Unable to detect ICU prefix or $ICU_CONFIG failed. Please verify ICU install prefix and make sure icu-config works.])
+-    else
+-      AC_MSG_RESULT([$icu_install_prefix])
+-
+-      dnl Check ICU version
+-      AC_MSG_CHECKING([for ICU 4.0 or greater])
+-      icu_version_full=`$ICU_CONFIG --version`
+-      ac_IFS=$IFS
+-      IFS="."
+-      set $icu_version_full
+-      IFS=$ac_IFS
+-      icu_version=`expr [$]1 \* 1000 + [$]2`
+-      AC_MSG_RESULT([found $icu_version_full])
+-
+-      if test "$icu_version" -lt "4000"; then
+-        AC_MSG_ERROR([ICU version 4.0 or later is required])
+-      fi
+-
+-      ICU_VERSION=$icu_version
+-      ICU_INCS=`$ICU_CONFIG --cppflags-searchpath`
+-      ICU_LIBS=`$ICU_CONFIG --ldflags --ldflags-icuio`
+-      PHP_EVAL_INCLINE($ICU_INCS)
+-      PHP_EVAL_LIBLINE($ICU_LIBS, $1)
+-
+-      ICU_CXXFLAGS=`$ICU_CONFIG --cxxflags`
+-      if test "$icu_version" -ge "49000"; then
+-        ICU_CXXFLAGS="$ICU_CXXFLAGS -DUNISTR_FROM_CHAR_EXPLICIT=explicit -DUNISTR_FROM_STRING_EXPLICIT=explicit"
+-        ICU_CFLAGS="-DU_NO_DEFAULT_INCLUDE_UTF_HEADERS=1"
+-      fi
+-      if test "$icu_version" -ge "60000"; then
+-        ICU_CFLAGS="$ICU_CFLAGS -DU_HIDE_OBSOLETE_UTF_OLD_H=1"
+-      fi
+-    fi
++  PKG_CHECK_MODULES([ICU], [icu-io >= 50.1])
 +  PHP_EVAL_INCLINE($ICU_CFLAGS)
 +  PHP_EVAL_LIBLINE($ICU_LIBS, $1)
- 
--    ICU_VERSION=$icu_version
--    ICU_INCS=`$ICU_CONFIG --cppflags-searchpath`
--    ICU_LIBS=`$ICU_CONFIG --ldflags --ldflags-icuio`
--    PHP_EVAL_INCLINE($ICU_INCS)
--    PHP_EVAL_LIBLINE($ICU_LIBS, $1)
++  
 +  ICU_CFLAGS="$ICU_CFLAGS -DU_NO_DEFAULT_INCLUDE_UTF_HEADERS=1"
 +  ICU_CXXFLAGS="$ICU_CXXFLAGS -DUNISTR_FROM_CHAR_EXPLICIT=explicit -DUNISTR_FROM_STRING_EXPLICIT=explicit"
- 
--    ICU_CXXFLAGS=`$ICU_CONFIG --cxxflags`
--    if test "$icu_version" -ge "49000"; then
--      ICU_CXXFLAGS="$ICU_CXXFLAGS -DUNISTR_FROM_CHAR_EXPLICIT=explicit -DUNISTR_FROM_STRING_EXPLICIT=explicit"
--      ICU_CFLAGS="-DU_NO_DEFAULT_INCLUDE_UTF_HEADERS=1"
--    fi
--    if test "$icu_version" -ge "60000"; then
--      ICU_CFLAGS="$ICU_CFLAGS -DU_HIDE_OBSOLETE_UTF_OLD_H=1"
--    fi
++  
 +  if $PKG_CONFIG icu-io --atleast-version=60; then
 +    ICU_CFLAGS="$ICU_CFLAGS -DU_HIDE_OBSOLETE_UTF_OLD_H=1"
    fi
  ])
  
---- php7.3.orig/ext/intl/config.m4
-+++ php7.3/ext/intl/config.m4
+diff --git a/ext/intl/config.m4 b/ext/intl/config.m4
+index 4b9f469..fdae88a 100644
+--- a/ext/intl/config.m4
++++ b/ext/intl/config.m4
 @@ -9,15 +9,7 @@ if test "$PHP_INTL" != "no"; then
    PHP_SETUP_ICU(INTL_SHARED_LIBADD)
    PHP_SUBST(INTL_SHARED_LIBADD)
@@ -109,3 +156,6 @@ because icu-config is deprecated.
  
    PHP_INTL_CXX_SOURCES="intl_convertcpp.cpp \
      common/common_enum.cpp \
+-- 
+2.7.4
+

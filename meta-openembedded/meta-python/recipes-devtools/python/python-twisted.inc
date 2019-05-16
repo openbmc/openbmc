@@ -5,10 +5,10 @@ HOMEPAGE = "http://www.twistedmatrix.com"
 
 #twisted/topfiles/NEWS:655: - Relicensed: Now under the MIT license, rather than LGPL.
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=04e7730aecedc79d805625a91bc06145"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=d136e8cf7b52f2e64079186ae2060d8a"
 
-SRC_URI[sha256sum] = "a4cc164a781859c74de47f17f0e85f4bce8a3321a9d0892c015c8f80c4158ad9"
-SRC_URI[md5sum] = "da8142ad4e9971a75fe751ac96a33b95"
+SRC_URI[sha256sum] = "1708e1928ae84ec9d3ebab0d427e20e1e38ff721b15bbced476d047d4a43abbe"
+SRC_URI[md5sum] = "473e12f4226e0fecc0ca5698e418e3f6"
 
 PYPI_PACKAGE = "Twisted"
 PYPI_PACKAGE_EXT = "tar.bz2"

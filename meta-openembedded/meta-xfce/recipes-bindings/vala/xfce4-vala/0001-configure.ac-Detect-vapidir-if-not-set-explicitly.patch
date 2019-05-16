@@ -1,0 +1,31 @@
+From 35267d995a81263b98f0ad56399ac3e30f9cf152 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Tue, 30 Apr 2019 09:48:08 +0200
+Subject: [PATCH] configure.ac: Detect vala-api version if not set explicitly
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 9bf4230..c489385 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -38,7 +38,7 @@ AC_ARG_WITH([vala-api],
+ 		AC_HELP_STRING([--with-vala-api=VERSION],
+ 				[Use Vala API version VERSION]),
+ 		[vala_api=$withval],
+-		[vala_api='0.16'])
++		[vala_api=`$PKG_CONFIG --variable=vapidir_versioned vapigen | sed -e 's:.*vala-::' -e s:/vapi::`])
+ M8T_CHECK_VALA([$vala_api])
+ AC_ARG_WITH([default-vapidir],
+ 		AC_HELP_STRING([--with-default-vapidir],
+-- 
+2.20.1
+

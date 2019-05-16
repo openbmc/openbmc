@@ -44,6 +44,10 @@ SRC_URI = "\
      file://0013-Detect-64-bit-MIPS-targets.patch \
      file://0014-sync-with-OE-libtool-changes.patch \
      file://0015-binutils-enable-x86_64-pep-for-producing-EFI-binarie.patch \
+     file://CVE-2019-9074.patch \
+     file://CVE-2019-9075.patch \
+     file://CVE-2019-9076.patch \
+     file://CVE-2019-9077.patch \
 "
 S  = "${WORKDIR}/git"
 

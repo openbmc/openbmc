@@ -1,5 +1,9 @@
 #!/bin/sh
 
+current_path=$(readlink -f $0)
+export bindir=$(dirname $current_path)
+export PATH=$bindir/bin:$PATH
+
 cd tests || exit 1                                                          
 
 comps=$(find ts/ -type f -perm -111 -regex ".*/[^\.~]*" |  sort)

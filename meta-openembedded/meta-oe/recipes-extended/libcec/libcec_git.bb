@@ -9,11 +9,11 @@ DEPENDS = "p8platform udev ncurses swig-native python3"
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'libx11 libxrandr', '', d)}"
 DEPENDS_append_rpi = "${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', '', ' userland', d)}"
 
-PV = "4.0.2+gitr${SRCPV}"
+PV = "4.0.4"
 
-SRCREV = "0a97062dd4b196ceeb003ec41841c7a7edc36dd1"
+SRCREV = "3bbd4321618503d14008387a72fabb6743878831"
 SRC_URI = "git://github.com/Pulse-Eight/libcec.git \
-           file://0001-Explicitly-use-python3-in-pyCecClient.patch"
+"
 
 S = "${WORKDIR}/git"
 

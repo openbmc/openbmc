@@ -1,5 +1,8 @@
+#
 # Copyright (C) 2013-2017 Intel Corporation
-# Released under the MIT license (see COPYING.MIT)
+#
+# SPDX-License-Identifier: MIT
+#
 
 import sys
 import os

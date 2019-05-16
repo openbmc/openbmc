@@ -925,14 +925,16 @@
 
                 <para>
                     Another place the build system can get source files from is
-                    through an SCM such as Git or Subversion.
-                    In this case, a repository is cloned or checked out.
+                    through a Source Control Manager (SCM) such as Git or
+                    Subversion.
+                    In such cases, a repository is cloned or checked out.
                     The
                     <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-fetch'><filename>do_fetch</filename></ulink>
                     task inside BitBake uses
                     the <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
                     variable and the argument's prefix to determine the correct
-                    fetcher module.
+                    <ulink url='&YOCTO_DOCS_BB_URL;#bb-fetchers'><filename>fetcher</filename></ulink>
+                    module.
                     <note>
                         For information on how to have the OpenEmbedded build
                         system generate tarballs for Git repositories and place
@@ -940,7 +942,7 @@
                         <ulink url='&YOCTO_DOCS_REF_URL;#var-DL_DIR'><filename>DL_DIR</filename></ulink>
                         directory, see the
                         <ulink url='&YOCTO_DOCS_REF_URL;#var-BB_GENERATE_MIRROR_TARBALLS'><filename>BB_GENERATE_MIRROR_TARBALLS</filename></ulink>
-                        variable.
+                        variable in the Yocto Project Reference Manual.
                     </note>
                 </para>
 

@@ -11,7 +11,7 @@ inherit autotools gettext pkgconfig systemd
 
 DEPENDS += "iptables net-tools util-linux libmnl libnetfilter-conntrack"
 
-SRC_URI = "http://miniupnp.tuxfamily.org/files/download.php?file=${P}.tar.gz;downloadfilename=${P}.tar.gz \
+SRC_URI = "http://miniupnp.tuxfamily.org/files/download.php?file=${BP}.tar.gz;downloadfilename=${BP}.tar.gz \
            file://miniupnpd.service \
            file://0001-Add-OpenEmbedded-cross-compile-case.patch \
            "

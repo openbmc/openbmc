@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import unittest
 from oeqa.sdk.case import OESDKTestCase
 

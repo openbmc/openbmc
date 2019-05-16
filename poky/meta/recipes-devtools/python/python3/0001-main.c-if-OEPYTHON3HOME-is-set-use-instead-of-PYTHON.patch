@@ -1,0 +1,49 @@
+From ffe7797637f08cd6ee4c82e2d67462c5e194d30a Mon Sep 17 00:00:00 2001
+From: Jaewon Lee <jaewon.lee@xilinx.com>
+Date: Thu, 25 Apr 2019 15:34:26 -0700
+Subject: [PATCH] main.c: if OEPYTHON3HOME is set use instead of PYTHONHOME
+
+There is one variable PYTHONHOME to determine where libraries are coming
+from for both python2 and python3. This becomes an issue if only one has
+libraries in the specified PYTHONHOME path, but they are using the same
+PYTHONHOME. Creating another variable OEPYTHON3HOME to allow for a way
+to set a different path for python3
+
+Signed-off-by: Jaewon Lee <jaewon.lee@xilinx.com>
+
+Upstream-Status: Inappropriate [OE specific configuration]
+---
+ Modules/main.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/Modules/main.c b/Modules/main.c
+index a745381..b553e30 100644
+--- a/Modules/main.c
++++ b/Modules/main.c
+@@ -1855,10 +1855,19 @@ config_init_home(_PyCoreConfig *config)
+         }
+         return _Py_INIT_OK();
+     }
+-
+-    int res = config_get_env_var_dup(&home, L"PYTHONHOME", "PYTHONHOME");
+-    if (res < 0) {
+-        return DECODE_LOCALE_ERR("PYTHONHOME", res);
++    int res;
++    const char *oepython3home = config_get_env_var("OEPYTHON3HOME");
++    if (oepython3home) {
++        res = config_get_env_var_dup(&home, L"OEPYTHON3HOME", "OEPYTHON3HOME");
++        if (res < 0) {
++            return DECODE_LOCALE_ERR("OEPYTHON3HOME", res);
++        }
++    }
++    else {
++        res = config_get_env_var_dup(&home, L"PYTHONHOME", "PYTHONHOME");
++        if (res < 0) {
++            return DECODE_LOCALE_ERR("PYTHONHOME", res);
++        }
+     }
+     config->home = home;
+     return _Py_INIT_OK();
+-- 
+2.7.4
+

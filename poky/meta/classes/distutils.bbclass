@@ -9,6 +9,9 @@ DISTUTILS_INSTALL_ARGS ?= "--root=${D} \
     --install-lib=${PYTHON_SITEPACKAGES_DIR} \
     --install-data=${datadir}"
 
+DISTUTILS_PYTHON = "python"
+DISTUTILS_PYTHON_class-native = "nativepython"
+
 distutils_do_configure() {
         if [ "${CLEANBROKEN}" != "1" ] ; then
                 NO_FETCH_BUILD=1 \
@@ -49,29 +52,20 @@ distutils_do_install() {
 
         # support filenames with *spaces*
         # only modify file if it contains path  and recompile it
-        find ${D} -name "*.py" -exec grep -q ${D} {} \; -exec sed -i -e s:${D}::g {} \; -exec ${STAGING_BINDIR_NATIVE}/python-native/python -mcompileall {} \;
+        find ${D} -name "*.py" -exec grep -q ${D} {} \; \
+                               -exec sed -i -e s:${D}::g {} \; \
+                               -exec ${STAGING_BINDIR_NATIVE}/python-native/python -mcompileall {} \;
 
-        if test -e ${D}${bindir} ; then	
-            for i in ${D}${bindir}/* ; do \
-                if [ ${PN} != "${BPN}-native" ]; then
-			sed -i -e s:${STAGING_BINDIR_NATIVE}/python-native/python:${USRBINPATH}/env\ python:g $i
-		fi
+        for i in ${D}${bindir}/* ${D}${sbindir}/*; do
+            if [ -f "$i" ]; then
+                sed -i -e s:${PYTHON}:${USRBINPATH}/env\ ${DISTUTILS_PYTHON}:g $i
                 sed -i -e s:${STAGING_BINDIR_NATIVE}:${bindir}:g $i
-            done
-        fi
-
-        if [ -e ${D}${sbindir} ]; then
-            for i in ${D}${sbindir}/* ; do \
-                if [ ${PN} != "${BPN}-native" ]; then
-			sed -i -e s:${STAGING_BINDIR_NATIVE}/python-native/python:${USRBINPATH}/env\ python:g $i
-		fi
-                sed -i -e s:${STAGING_BINDIR_NATIVE}:${bindir}:g $i
-            done
-        fi
+            fi
+        done
 
         rm -f ${D}${PYTHON_SITEPACKAGES_DIR}/easy-install.pth
         rm -f ${D}${PYTHON_SITEPACKAGES_DIR}/site.py*
-        
+
         #
         # FIXME: Bandaid against wrong datadir computation
         #
@@ -81,7 +75,8 @@ distutils_do_install() {
         fi
 
 	# Fix backport modules
-	if [ -e ${STAGING_LIBDIR}/${PYTHON_DIR}/site-packages/backports/__init__.py ] && [ -e ${D}${PYTHON_SITEPACKAGES_DIR}/backports/__init__.py ]; then
+	if [ -e ${STAGING_LIBDIR}/${PYTHON_DIR}/site-packages/backports/__init__.py ] && 
+           [ -e ${D}${PYTHON_SITEPACKAGES_DIR}/backports/__init__.py ]; then
 	   rm ${D}${PYTHON_SITEPACKAGES_DIR}/backports/__init__.py;
 	   rm ${D}${PYTHON_SITEPACKAGES_DIR}/backports/__init__.pyc;
 	fi

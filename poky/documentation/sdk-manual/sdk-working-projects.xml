@@ -7,12 +7,8 @@
     <title>Using the SDK Toolchain Directly</title>
 
     <para>
-        You can use the SDK toolchain directly with Makefile,
-        Autotools, and <trademark class='trade'>Eclipse</trademark>-based
-        projects.
-        This chapter covers the first two, while the
-        "<link linkend='sdk-eclipse-project'>Developing Applications Using <trademark class='trade'>Eclipse</trademark></link>"
-        Chapter covers the latter.
+        You can use the SDK toolchain directly with Makefile and
+        Autotools-based projects.
     </para>
 
     <section id='autotools-based-projects'>

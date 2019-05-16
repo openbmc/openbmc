@@ -1,10 +1,13 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import os
 
 from subprocess import check_output
 from shutil import rmtree
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
-from oeqa.core.decorator.oeid import OETestID
 from oeqa.core.decorator.data import skipIfDataVar
 from oeqa.runtime.decorator.package import OEHasPackage
 
@@ -351,7 +354,6 @@ class ParseLogsTest(OERuntimeTestCase):
     def write_dmesg(self):
         (status, dmesg) = self.target.run('dmesg > /tmp/dmesg_output.log')
 
-    @OETestID(1059)
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     def test_parselogs(self):
         self.write_dmesg()

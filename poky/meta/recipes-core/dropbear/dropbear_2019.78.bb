@@ -1,0 +1,4 @@
+require dropbear.inc
+
+SRC_URI[md5sum] = "a972c85ed678ad0fdcb7844e1294fb54"
+SRC_URI[sha256sum] = "525965971272270995364a0eb01f35180d793182e63dd0b0c3eb0292291644a4"

@@ -1,11 +1,20 @@
-AM_PATH_XML2 uses xml-config which we disable through
+From 43edc9a445ed66cceb7533eadeef242940b4592c Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Sat, 11 May 2019 20:37:12 +0800
+Subject: [PATCH] AM_PATH_XML2 uses xml-config which we disable through
 binconfig-disabled.bbclass, so port it to use pkg-config instead.
 
 Upstream-Status: Pending
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 
+Rebase to 2.9.9
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ libxml.m4 | 186 ++------------------------------------------------------------
+ 1 file changed, 5 insertions(+), 181 deletions(-)
+
 diff --git a/libxml.m4 b/libxml.m4
-index 68cd824..5fa0a9b 100644
+index 2d7a6f5..1c53585 100644
 --- a/libxml.m4
 +++ b/libxml.m4
 @@ -1,188 +1,12 @@
@@ -202,3 +211,6 @@ index 68cd824..5fa0a9b 100644
 -  AC_SUBST(XML_LIBS)
 -  rm -f conf.xmltest
  ])
+-- 
+2.7.4
+

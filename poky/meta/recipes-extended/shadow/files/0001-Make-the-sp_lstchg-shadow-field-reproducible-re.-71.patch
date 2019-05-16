@@ -1,0 +1,89 @@
+From fe34a2a0e44bc80ff213bfd185046a5f10c94997 Mon Sep 17 00:00:00 2001
+From: Chris Lamb <chris@chris-lamb.co.uk>
+Date: Wed, 2 Jan 2019 18:06:16 +0000
+Subject: [PATCH 1/2] Make the sp_lstchg shadow field reproducible (re. #71)
+
+From <https://github.com/shadow-maint/shadow/pull/71>:
+
+```
+The third field in the /etc/shadow file (sp_lstchg) contains the date of
+the last password change expressed as the number of days since Jan 1, 1970.
+As this is a relative time, creating a user today will result in:
+
+username:17238:0:99999:7:::
+whilst creating the same user tomorrow will result in:
+
+username:17239:0:99999:7:::
+This has an impact for the Reproducible Builds[0] project where we aim to
+be independent of as many elements the build environment as possible,
+including the current date.
+
+This patch changes the behaviour to use the SOURCE_DATE_EPOCH[1]
+environment variable (instead of Jan 1, 1970) if valid.
+```
+
+This updated PR adds some missing calls to gettime (). This was originally
+filed by Johannes Schauer in Debian as #917773 [2].
+
+[0] https://reproducible-builds.org/
+[1] https://reproducible-builds.org/specs/source-date-epoch/
+[2] https://bugs.debian.org/917773
+
+Upstream-Status: Backport
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+---
+ libmisc/pwd2spwd.c | 3 +--
+ src/pwck.c         | 2 +-
+ src/pwconv.c       | 2 +-
+ 3 files changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/libmisc/pwd2spwd.c b/libmisc/pwd2spwd.c
+index c1b9b29ac873..6799dd50d490 100644
+--- a/libmisc/pwd2spwd.c
++++ b/libmisc/pwd2spwd.c
+@@ -40,7 +40,6 @@
+ #include "prototypes.h"
+ #include "defines.h"
+ #include <pwd.h>
+-extern time_t time (time_t *);
+ 
+ /*
+  * pwd_to_spwd - create entries for new spwd structure
+@@ -66,7 +65,7 @@ struct spwd *pwd_to_spwd (const struct passwd *pw)
+ 		 */
+ 		sp.sp_min = 0;
+ 		sp.sp_max = (10000L * DAY) / SCALE;
+-		sp.sp_lstchg = (long) time ((time_t *) 0) / SCALE;
++		sp.sp_lstchg = (long) gettime () / SCALE;
+ 		if (0 == sp.sp_lstchg) {
+ 			/* Better disable aging than requiring a password
+ 			 * change */
+diff --git a/src/pwck.c b/src/pwck.c
+index 0ffb711efb13..f70071b12500 100644
+--- a/src/pwck.c
++++ b/src/pwck.c
+@@ -609,7 +609,7 @@ static void check_pw_file (int *errors, bool *changed)
+ 					sp.sp_inact  = -1;
+ 					sp.sp_expire = -1;
+ 					sp.sp_flag   = SHADOW_SP_FLAG_UNSET;
+-					sp.sp_lstchg = (long) time ((time_t *) 0) / SCALE;
++					sp.sp_lstchg = (long) gettime () / SCALE;
+ 					if (0 == sp.sp_lstchg) {
+ 						/* Better disable aging than
+ 						 * requiring a password change
+diff --git a/src/pwconv.c b/src/pwconv.c
+index 9c69fa131d8e..f932f266c59c 100644
+--- a/src/pwconv.c
++++ b/src/pwconv.c
+@@ -267,7 +267,7 @@ int main (int argc, char **argv)
+ 			spent.sp_flag   = SHADOW_SP_FLAG_UNSET;
+ 		}
+ 		spent.sp_pwdp = pw->pw_passwd;
+-		spent.sp_lstchg = (long) time ((time_t *) 0) / SCALE;
++		spent.sp_lstchg = (long) gettime () / SCALE;
+ 		if (0 == spent.sp_lstchg) {
+ 			/* Better disable aging than requiring a password
+ 			 * change */
+-- 
+2.17.1
+

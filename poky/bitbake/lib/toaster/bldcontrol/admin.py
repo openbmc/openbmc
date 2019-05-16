@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
 from django.contrib import admin
 from django.contrib.admin.filters import RelatedFieldListFilter
 from .models import BuildEnvironment

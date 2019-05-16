@@ -1,6 +1,9 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import runCmd, bitbake, get_bb_var, runqemu
-from oeqa.core.decorator.oeid import OETestID
 from oeqa.utils.sshcontrol import SSHControl
 import os
 import json
@@ -10,7 +13,6 @@ class ImageFeatures(OESelftestTestCase):
     test_user = 'tester'
     root_user = 'root'
 
-    @OETestID(1107)
     def test_non_root_user_can_connect_via_ssh_without_password(self):
         """
         Summary: Check if non root user can connect via ssh without password
@@ -36,7 +38,6 @@ class ImageFeatures(OESelftestTestCase):
                 status, output = ssh.run("true")
                 self.assertEqual(status, 0, 'ssh to user %s failed with %s' % (user, output))
 
-    @OETestID(1115)
     def test_all_users_can_connect_via_ssh_without_password(self):
         """
         Summary:     Check if all users can connect via ssh without password
@@ -66,7 +67,6 @@ class ImageFeatures(OESelftestTestCase):
                     self.assertEqual(status, 0, 'ssh to user tester failed with %s' % output)
 
 
-    @OETestID(1116)
     def test_clutter_image_can_be_built(self):
         """
         Summary:     Check if clutter image can be built
@@ -79,7 +79,6 @@ class ImageFeatures(OESelftestTestCase):
         # Build a core-image-clutter
         bitbake('core-image-clutter')
 
-    @OETestID(1117)
     def test_wayland_support_in_image(self):
         """
         Summary:     Check Wayland support in image
@@ -97,7 +96,6 @@ class ImageFeatures(OESelftestTestCase):
         # Build a core-image-weston
         bitbake('core-image-weston')
 
-    @OETestID(1497)
     def test_bmap(self):
         """
         Summary:     Check bmap support
@@ -131,7 +129,6 @@ class ImageFeatures(OESelftestTestCase):
         # check if the resulting gzip is valid
         self.assertTrue(runCmd('gzip -t %s' % gzip_path))
 
-    @OETestID(1903)
     def test_hypervisor_fmts(self):
         """
         Summary:     Check various hypervisor formats
@@ -166,7 +163,6 @@ class ImageFeatures(OESelftestTestCase):
                             native_sysroot=sysroot)
             self.assertTrue(json.loads(result.output).get('format') == itype)
 
-    @OETestID(1905)
     def test_long_chain_conversion(self):
         """
         Summary:     Check for chaining many CONVERSION_CMDs together
@@ -198,7 +194,6 @@ class ImageFeatures(OESelftestTestCase):
         self.assertTrue(runCmd('cd %s;sha256sum -c %s.%s.sha256sum' %
                                (deploy_dir_image, link_name, conv)))
 
-    @OETestID(1904)
     def test_image_fstypes(self):
         """
         Summary:     Check if image of supported image fstypes can be built

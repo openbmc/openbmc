@@ -1,0 +1,30 @@
+From c125a806de951359ab7e302b0584f7c92fa451ad Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 12 Apr 2019 16:25:58 +0200
+Subject: [PATCH] Do not build tests
+
+They require installing tests from g-i, which we do not do.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 278fa16f..aacbd4a2 100644
+--- a/meson.build
++++ b/meson.build
+@@ -175,6 +175,6 @@ configure_file(input : 'PKG-INFO.in',
+ subdir('gi')
+ subdir('pygtkcompat')
+ with_tests = get_option('tests')
+-if with_tests
+-subdir('tests')
+-endif
++#if with_tests
++#subdir('tests')
++#endif
+-- 
+2.17.1
+

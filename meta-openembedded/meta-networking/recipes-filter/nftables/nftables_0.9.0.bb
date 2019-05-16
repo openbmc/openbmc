@@ -5,6 +5,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d1a78fdd879a263a5e0b42d1fc565e79"
 
 DEPENDS = "libmnl libnftnl readline gmp bison-native"
 
+UPSTREAM_CHECK_URI = "https://www.netfilter.org/projects/nftables/files/"
+
 SRC_URI = "http://www.netfilter.org/projects/nftables/files/${BP}.tar.bz2 \
            "
 SRC_URI[md5sum] = "d4dcb61df80aa544b2e142e91d937635"

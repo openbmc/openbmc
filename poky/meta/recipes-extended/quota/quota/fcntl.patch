@@ -9,13 +9,11 @@ Upstream-Status: Pending
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
-ndex: quota-tools/quota.h
-===================================================================
-Index: quota-tools/quota.h
-===================================================================
---- quota-tools.orig/quota.h
-+++ quota-tools/quota.h
-@@ -165,6 +165,6 @@ enum {
+diff --git a/quota.h b/quota.h
+index 4c21411..d20c217 100644
+--- a/quota.h
++++ b/quota.h
+@@ -182,6 +182,6 @@ enum {
  	#endif
  #endif
  
@@ -23,10 +21,10 @@ Index: quota-tools/quota.h
 +long quotactl (int, const char *, qid_t, caddr_t);
  
  #endif /* _QUOTA_ */
-Index: quota-tools/quotacheck.c
-===================================================================
---- quota-tools.orig/quotacheck.c
-+++ quota-tools/quotacheck.c
+diff --git a/quotacheck.c b/quotacheck.c
+index 2cdf475..07c18a7 100644
+--- a/quotacheck.c
++++ b/quotacheck.c
 @@ -19,6 +19,7 @@
  #include <unistd.h>
  #include <stdlib.h>
@@ -35,10 +33,10 @@ Index: quota-tools/quotacheck.c
  
  #include <sys/stat.h>
  #include <sys/types.h>
-Index: quota-tools/quotaio.c
-===================================================================
---- quota-tools.orig/quotaio.c
-+++ quota-tools/quotaio.c
+diff --git a/quotaio.c b/quotaio.c
+index 94ae458..d57fc1a 100644
+--- a/quotaio.c
++++ b/quotaio.c
 @@ -12,6 +12,7 @@
  #include <string.h>
  #include <unistd.h>
@@ -47,22 +45,10 @@ Index: quota-tools/quotaio.c
  #include <sys/types.h>
  #include <sys/stat.h>
  #include <sys/file.h>
-Index: quota-tools/dqblk_v2.h
-===================================================================
---- quota-tools.orig/dqblk_v2.h
-+++ quota-tools/dqblk_v2.h
-@@ -7,6 +7,7 @@
- #ifndef GUARD_DQBLK_V2_H
- #define GUARD_DQBLK_V2_H
- 
-+#include <fcntl.h>
- #include <sys/types.h>
- #include "quota_tree.h"
- 
-Index: quota-tools/rquota_client.c
-===================================================================
---- quota-tools.orig/rquota_client.c
-+++ quota-tools/rquota_client.c
+diff --git a/rquota_client.c b/rquota_client.c
+index a3a4ae3..0ffe7a9 100644
+--- a/rquota_client.c
++++ b/rquota_client.c
 @@ -19,7 +19,9 @@
  
  #include "config.h"

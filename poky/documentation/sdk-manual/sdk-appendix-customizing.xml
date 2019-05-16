@@ -503,7 +503,7 @@
         have set <filename>SDK_EXT_TYPE</filename> to "minimal", which by
         default, excludes the toolchain.
         Also, it is helpful if you are building a small SDK for use with
-        an IDE, such as <trademark class='trade'>Eclipse</trademark>, or some
+        an IDE or some
         other tool where you do not want to take extra steps to install a
         toolchain.
     </para>

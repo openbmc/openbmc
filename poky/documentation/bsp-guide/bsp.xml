@@ -148,16 +148,11 @@
         Some layers function as a layer to hold other BSP layers.
         These layers are knows as
         "<ulink url='&YOCTO_DOCS_REF_URL;#term-container-layer'>container layers</ulink>".
-        An example of this type of layer is the
-        <filename>meta-intel</filename> layer.
-        This layer contains BSP layers for the Intel-core2-32
-        <trademark class='registered'>Intel</trademark> Common Core
-        (Intel-core2-32) and the Intel-corei7-64
-        <trademark class='registered'>Intel</trademark> Common Core
-        (Intel-corei7-64).
-        the <filename>meta-intel</filename> layer also contains
-        the <filename>common/</filename> directory, which contains
-        common content across those layers.
+        An example of this type of layer is OpenEmbedded's
+        <ulink url='https://github.com/openembedded/meta-openembedded'><filename>meta-openembedded</filename></ulink>
+        layer.
+        The <filename>meta-openembedded</filename> layer contains
+        many <filename>meta-*</filename> layers.
     </para>
 
     <para>
@@ -1817,9 +1812,8 @@
         The remainder of this section provides a description of
         the Yocto Project reference BSP for Beaglebone, which
         resides in the
-        <ulink url='&YOCTO_DOCS_REF_URL;#term-container-layer'>Container Layer</ulink>
-        (i.e.
-        <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi/poky/tree/meta-yocto-bsp'><filename>meta-yocto-bsp</filename></ulink>).
+        <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi/poky/tree/meta-yocto-bsp'><filename>meta-yocto-bsp</filename></ulink>
+        layer.
     </para>
 
     <section id='bsp-layer-configuration-example'>
@@ -1882,7 +1876,7 @@
             </literallayout>
             For example, the machine configuration file for the
             <ulink url='http://beagleboard.org/bone'>BeagleBone and BeagleBone Black development boards</ulink>
-            is located in the container layer
+            is located in the layer
             <filename>poky/meta-yocto-bsp/conf/machine</filename>
             and is named <filename>beaglebone-yocto.conf</filename>:
             <literallayout class='monospaced'>
@@ -1908,10 +1902,11 @@
      IMAGE_INSTALL_append = " kernel-devicetree kernel-image-zimage"
      do_image_wic[depends] += "mtools-native:do_populate_sysroot dosfstools-native:do_populate_sysroot"
 
-     SERIAL_CONSOLES = "115200;ttyO0"
+     SERIAL_CONSOLES ?= "115200;ttyS0 115200;ttyO0"
+     SERIAL_CONSOLES_CHECK = "${SERIAL_CONSOLES}"
 
      PREFERRED_PROVIDER_virtual/kernel ?= "linux-yocto"
-     PREFERRED_VERSION_linux-yocto ?= "4.12%"
+     PREFERRED_VERSION_linux-yocto ?= "5.0%"
 
      KERNEL_IMAGETYPE = "zImage"
      KERNEL_DEVICETREE = "am335x-bone.dtb am335x-boneblack.dtb am335x-bonegreen.dtb"
@@ -1919,13 +1914,13 @@
 
      SPL_BINARY = "MLO"
      UBOOT_SUFFIX = "img"
-     UBOOT_MACHINE = "am335x_boneblack_config"
+     UBOOT_MACHINE = "am335x_evm_defconfig"
      UBOOT_ENTRYPOINT = "0x80008000"
      UBOOT_LOADADDRESS = "0x80008000"
 
      MACHINE_FEATURES = "usbgadget usbhost vfat alsa"
 
-     IMAGE_BOOT_FILES ?= "u-boot.${UBOOT_SUFFIX} MLO"
+     IMAGE_BOOT_FILES ?= "u-boot.${UBOOT_SUFFIX} MLO zImage am335x-bone.dtb am335x-boneblack.dtb am335x-bonegreen.dtb"
             </literallayout>
             The variables used to configure the machine define
             machine-specific properties.
@@ -1954,7 +1949,7 @@
                     In this case, the recipe that provides
                     "virtual/xserver" is "xserver-xorg", which
                     exists in
-                    <filename>poky/meta/recipes-graphics/xserver-xorg</filename>.
+                    <filename>poky/meta/recipes-graphics/xorg-xserver</filename>.
                     </para></listitem>
                 <listitem><para>
                     <ulink url='&YOCTO_DOCS_REF_URL;#var-XSERVER'><filename>XSERVER</filename></ulink>:
@@ -2067,7 +2062,7 @@
                 <listitem><para>
                     <ulink url='&YOCTO_DOCS_REF_URL;#var-PREFERRED_VERSION'><filename>PREFERRED_VERSION_linux-yocto</filename></ulink>:
                     Defines the version of the recipe used
-                    to build the kernel, which is "4.12" in this
+                    to build the kernel, which is "5.0" in this
                     case.
                     </para></listitem>
                 <listitem><para>
@@ -2078,8 +2073,8 @@
                     </para></listitem>
                 <listitem><para>
                     <ulink url='&YOCTO_DOCS_REF_URL;#var-KERNEL_DEVICETREE'><filename>KERNEL_DEVICETREE</filename></ulink>:
-                    The name of the generated Linux kernel device
-                    tree (i.e. the <filename>.dtb</filename>) file.
+                    The names of the generated Linux kernel device
+                    trees (i.e. the <filename>*.dtb</filename>) files.
                     All the device trees for the various BeagleBone
                     devices are included.
 <!--
@@ -2153,8 +2148,6 @@
                     when preparing the image using the Wic tool
                     with the <filename>bootimg-partition</filename>
                     source plugin.
-                    In this case, the "u-boot.${UBOOT_SUFFIX}" and
-                    "MLO" files are installed.
                     </para></listitem>
             </itemizedlist>
         </para>
@@ -2169,38 +2162,37 @@
             machine configuration:
             <literallayout class='monospaced'>
      PREFERRED_PROVIDER_virtual/kernel ?= "linux-yocto"
-     PREFERRED_VERSION_linux-yocto ?= "4.12%"
+     PREFERRED_VERSION_linux-yocto ?= "5.0%"
             </literallayout>
             The <filename>meta-yocto-bsp/recipes-kernel/linux</filename>
             directory in the layer contains metadata used
             to build the kernel.
-            In this case, a kernel append file is used to
-            override an established kernel recipe, which is
+            In this case, a kernel append file (i.e.
+            <filename>linux-yocto_5.0.bbappend</filename>) is used to
+            override an established kernel recipe (i.e.
+            <filename>linux-yocto_5.0.bb</filename>), which is
             located in
-            <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi/poky/tree/meta/recipes-kernel/linux'></ulink>
-            and named
-            <filename>linux-yocto_4.12.bb</filename>.
+            <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi/poky/tree/meta/recipes-kernel/linux'></ulink>.
         </para>
 
         <para>
             Following is the contents of the append file:
             <literallayout class='monospaced'>
-     KBRANCH_genericx86  = "standard/base"
-     KBRANCH_genericx86-64  = "standard/base"
+     KBRANCH_genericx86  = "v5.0/standard/base"
+     KBRANCH_genericx86-64  = "v5.0/standard/base"
+     KBRANCH_edgerouter = "v5.0/standard/edgerouter"
+     KBRANCH_beaglebone-yocto = "v5.0/standard/beaglebone"
+     KBRANCH_mpc8315e-rdb = "v5.0/standard/fsl-mpc8315e-rdb"
 
      KMACHINE_genericx86 ?= "common-pc"
      KMACHINE_genericx86-64 ?= "common-pc-64"
-     KBRANCH_edgerouter = "standard/edgerouter"
-     KBRANCH_beaglebone-yocto = "standard/beaglebone"
-     KMACHINE_beaglebone-yocto = "beaglebone"
-     KBRANCH_mpc8315e-rdb = "standard/fsl-mpc8315e-rdb"
+     KMACHINE_beaglebone-yocto ?= "beaglebone"
 
-     SRCREV_machine_genericx86    ?= "1c4ad569af3e23a77994235435040e322908687f"
-     SRCREV_machine_genericx86-64 ?= "1c4ad569af3e23a77994235435040e322908687f"
-     SRCREV_machine_edgerouter ?= "257f843ea367744620f1d92910afd2f454e31483"
-     SRCREV_machine_beaglebone-yocto ?= "257f843ea367744620f1d92910afd2f454e31483"
-     SRCREV_machine_mpc8315e-rdb ?= "014560874f9eb2a86138c9cc35046ff1720485e1"
-
+     SRCREV_machine_genericx86    ?= "3df4aae6074e94e794e27fe7f17451d9353cdf3d"
+     SRCREV_machine_genericx86-64 ?= "3df4aae6074e94e794e27fe7f17451d9353cdf3d"
+     SRCREV_machine_edgerouter ?= "3df4aae6074e94e794e27fe7f17451d9353cdf3d"
+     SRCREV_machine_beaglebone-yocto ?= "3df4aae6074e94e794e27fe7f17451d9353cdf3d"
+     SRCREV_machine_mpc8315e-rdb ?= "8b62af7f252af10588276802c4c6d7c502e875be"
 
      COMPATIBLE_MACHINE_genericx86 = "genericx86"
      COMPATIBLE_MACHINE_genericx86-64 = "genericx86-64"
@@ -2208,16 +2200,15 @@
      COMPATIBLE_MACHINE_beaglebone-yocto = "beaglebone-yocto"
      COMPATIBLE_MACHINE_mpc8315e-rdb = "mpc8315e-rdb"
 
-     LINUX_VERSION_genericx86 = "4.12.20"
-     LINUX_VERSION_genericx86-64 = "4.12.20"
-     LINUX_VERSION_edgerouter = "4.12.19"
-     LINUX_VERSION_beaglebone-yocto = "4.12.19"
-     LINUX_VERSION_mpc8315e-rdb = "4.12.19"
+     LINUX_VERSION_genericx86 = "5.0.3"
+     LINUX_VERSION_genericx86-64 = "5.0.3"
+     LINUX_VERSION_edgerouter = "5.0.3"
+     LINUX_VERSION_beaglebone-yocto = "5.0.3"
+     LINUX_VERSION_mpc8315e-rdb = "5.0.3"
             </literallayout>
             This particular append file works for all the
             machines that are part of the
-            <filename>meta-yocto-bsp</filename> container
-            layer.
+            <filename>meta-yocto-bsp</filename> layer.
             The relevant statements are appended with
             the "beaglebone-yocto" string.
             The OpenEmbedded build system uses these
@@ -2240,15 +2231,6 @@
                     <ulink url='&YOCTO_DOCS_REF_URL;#var-SRCREV'><filename>SRCREV</filename></ulink>:
                     Identifies the revision of the source code used
                     to build the image.
-<!--
-                    You find out about that point in the kernel source tree by
-                    doing the following command:
-
-                    git log &dash;&dash;decorate 257f843ea367744620f1d92910afd2f454e31483
-
-                    Returns information about the commit, which is usually
-                    that it is a merge point for a stable kernel release.
--->
                     </para></listitem>
                 <listitem><para>
                     <ulink url='&YOCTO_DOCS_REF_URL;#var-COMPATIBLE_MACHINE'><filename>COMPATIBLE_MACHINE</filename></ulink>:

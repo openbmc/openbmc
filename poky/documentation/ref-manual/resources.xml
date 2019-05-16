@@ -247,14 +247,6 @@
                 </para></listitem>
             <listitem><para>
                 <emphasis>
-                <ulink url='&YOCTO_DOCS_SDK_URL;#adt-eclipse'>Eclipse IDE Yocto Plug-in</ulink>:
-                </emphasis>
-                Instructions that demonstrate how an application developer
-                uses the Eclipse Yocto Project Plug-in feature within
-                the Eclipse IDE.
-                </para></listitem>
-            <listitem><para>
-                <emphasis>
                 <ulink url='&YOCTO_WIKI_URL;/wiki/FAQ'>FAQ</ulink>:
                 </emphasis>
                 A list of commonly asked questions and their answers.

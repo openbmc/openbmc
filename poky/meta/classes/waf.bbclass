@@ -5,6 +5,32 @@ B = "${WORKDIR}/build"
 
 EXTRA_OECONF_append = " ${PACKAGECONFIG_CONFARGS}"
 
+def waflock_hash(d):
+    # Calculates the hash used for the waf lock file. This should include
+    # all of the user controllable inputs passed to waf configure. Note
+    # that the full paths for ${B} and ${S} are used; this is OK and desired
+    # because a change to either of these should create a unique lock file
+    # to prevent collisions.
+    import hashlib
+    h = hashlib.sha512()
+    def update(name):
+        val = d.getVar(name)
+        if val is not None:
+            h.update(val.encode('utf-8'))
+    update('S')
+    update('B')
+    update('prefix')
+    update('EXTRA_OECONF')
+    return h.hexdigest()
+
+# Use WAFLOCK to specify a separate lock file. The build is already
+# sufficiently isolated by setting the output directory, this ensures that
+# bitbake won't step on toes of any other configured context in the source
+# directory (e.g. if the source is coming from externalsrc and was previously
+# configured elsewhere).
+export WAFLOCK = ".lock-waf_oe_${@waflock_hash(d)}_build"
+BB_HASHBASE_WHITELIST += "WAFLOCK"
+
 python waf_preconfigure() {
     import subprocess
     from distutils.version import StrictVersion

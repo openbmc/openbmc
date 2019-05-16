@@ -4,6 +4,9 @@
 #
 # Copyright (C) 2013 Intel Corporation
 # Author: Paul Eggleton <paul.eggleton@linux.intel.com>
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
 
 import sys
 import os

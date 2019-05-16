@@ -18,6 +18,7 @@ EXTRA_OECONF += "--with-vendor-info=${DISTRO}"
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[gladeui] = "--enable-gladeui,--disable-gladeui,glade3"
+PACKAGECONFIG[gladeui2] = "--enable-gladeui2,--disable-gladeui2,glade"
 PACKAGECONFIG[startup-notification] = "--enable-startup-notification,--disable-startup-notification,startup-notification"
 
 PACKAGES =+ "${PN}-gtk2 ${PN}-gtk3"
@@ -25,8 +26,12 @@ FILES_${PN}-gtk2 += "${libdir}/libxfce4ui-1.so.* ${libdir}/libxfce4kbd-private-2
 FILES_${PN}-gtk3 += "${libdir}/libxfce4ui-2.so.* ${libdir}/libxfce4kbd-private-3.so.*"
 
 PACKAGES += "${PN}-glade"
-FILES_${PN}-glade = "${libdir}/glade3 \
-                     ${datadir}/glade3"
+FILES_${PN}-glade = " \
+    ${libdir}/glade \
+    ${libdir}/glade3 \
+    ${datadir}/glade \
+    ${datadir}/glade3 \
+"
 
 RDEPENDS_${PN}-gtk2 = "${PN}"
 RDEPENDS_${PN}-gtk3 = "${PN}"

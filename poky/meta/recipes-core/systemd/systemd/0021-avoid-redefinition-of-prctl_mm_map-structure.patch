@@ -11,8 +11,7 @@ Upstream-Status: Inappropriate [musl specific]
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
 ---
  src/basic/missing_prctl.h | 2 ++
- src/basic/util.h          | 3 ++-
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ 1 file changed, 2 insertions(+)
 
 diff --git a/src/basic/missing_prctl.h b/src/basic/missing_prctl.h
 index f80cd17..47e4893 100644
@@ -28,20 +27,6 @@ index f80cd17..47e4893 100644
  
  /* 58319057b7847667f0c9585b9de0e8932b0fdb08 (4.3) */
  #ifndef PR_CAP_AMBIENT
-diff --git a/src/basic/util.h b/src/basic/util.h
-index 2c5dc32..f721184 100644
---- a/src/basic/util.h
-+++ b/src/basic/util.h
-@@ -26,7 +26,8 @@
- #include "format-util.h"
- #include "macro.h"
- #include "time-util.h"
--#include "missing.h"
-+#include "missing_stdlib.h"
-+#include "missing_type.h"
- 
- size_t page_size(void) _pure_;
- #define PAGE_ALIGN(l) ALIGN_TO((l), page_size())
 -- 
-2.7.4
+2.11.0
 

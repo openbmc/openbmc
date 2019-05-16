@@ -1,0 +1,5 @@
+#!/bin/sh
+#
+#This script is used to run m4 test suites
+cd tests 
+make -k runtest-TESTS top_srcdir=.. srcdir=.

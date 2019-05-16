@@ -4,12 +4,11 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://mmc.c;beginline=1;endline=20;md5=fae32792e20f4d27ade1c5a762d16b7d"
 
 SRCBRANCH ?= "master"
-SRCREV = "b4fe0c8c0e57a74c01755fa9362703b60d7ee49d"
+SRCREV = "aef913e31b659462fe6b9320d241676cba97f67b"
 
-PV = "0.1"
+PV = "0.1+git${SRCPV}"
 
 SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/cjb/mmc-utils.git;branch=${SRCBRANCH} \
-           file://0001-lsmmc-replace-strncpy-with-memmove-on-overlapping-me.patch \
            "
 UPSTREAM_CHECK_COMMITS = "1"
 

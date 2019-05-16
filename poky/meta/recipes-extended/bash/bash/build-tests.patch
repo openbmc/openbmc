@@ -2,15 +2,18 @@ Add 'ptest' target to Makefile, to run tests without checking dependencies.
 
 Upstream-Status: Pending
 Signed-off-by: Anders Roxell <anders.roxell@enea.com>
+
+Rebase to 5.0
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  Makefile.in | 24 +++++++++++++++++++-----
  1 file changed, 19 insertions(+), 5 deletions(-)
 
 diff --git a/Makefile.in b/Makefile.in
+index 5fcb44b..de1c255 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -848,20 +848,34 @@ maybe-clean:
+@@ -932,20 +932,34 @@ maybe-clean:
  	fi
  
  recho$(EXEEXT):		$(SUPPORT_SRC)recho.c
@@ -51,5 +54,5 @@ diff --git a/Makefile.in b/Makefile.in
  		PATH=$(BUILD_DIR)/tests:$$PATH THIS_SH=$(THIS_SH) $(SHELL) ${TESTSCRIPT} )
  
 -- 
-1.8.1.2
+2.7.4
 

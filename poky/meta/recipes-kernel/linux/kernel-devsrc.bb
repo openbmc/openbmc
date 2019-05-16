@@ -228,6 +228,9 @@ do_install() {
 
         # required to build scripts/selinux/genheaders/genheaders
         cp -a --parents security/selinux/include/* $kerneldir/build/
+
+	# copy any localversion files
+	cp -a localversion* $kerneldir/build/ 2>/dev/null || :
     )
 
     # Make sure the Makefile and version.h have a matching timestamp so that

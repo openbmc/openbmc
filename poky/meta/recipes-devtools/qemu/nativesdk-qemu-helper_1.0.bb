@@ -7,7 +7,7 @@ RDEPENDS_${PN} = "nativesdk-qemu \
 PR = "r9"
 
 LIC_FILES_CHKSUM = "file://${WORKDIR}/tunctl.c;endline=4;md5=ff3a09996bc5fff6bc5d4e0b4c28f999 \
-                    file://${COREBASE}/scripts/runqemu;endline=19;md5=a8ad1905c709a2deaa057608ebaf705a"
+                    file://${COREBASE}/scripts/runqemu;beginline=5;endline=10;md5=ac2b489a58739c7628a2604698db5e7f"
 
 
 SRC_URI = "file://${COREBASE}/scripts/runqemu \

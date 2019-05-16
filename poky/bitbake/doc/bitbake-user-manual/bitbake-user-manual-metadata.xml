@@ -61,6 +61,78 @@
             </para>
         </section>
 
+        <section id='modifying-existing-variables'>
+            <title>Modifying Existing Variables</title>
+
+            <para>
+                Sometimes you need to modify existing variables.
+                Following are some cases where you might find you want to
+                modify an existing variable:
+                <itemizedlist>
+                    <listitem><para>
+                        Customize a recipe that uses the variable.
+                        </para></listitem>
+                    <listitem><para>
+                        Change a variable's default value used in a
+                        <filename>*.bbclass</filename> file.
+                        </para></listitem>
+                    <listitem><para>
+                        Change the variable in a <filename>*.bbappend</filename>
+                        file to override the variable in the original recipe.
+                        </para></listitem>
+                    <listitem><para>
+                        Change the variable in a configuration file so that the
+                        value overrides an existing configuration.
+                        </para></listitem>
+                </itemizedlist>
+            </para>
+
+            <para>
+                Changing a variable value can sometimes depend on how the
+                value was originally assigned and also on the desired
+                intent of the change.
+                In particular, when you append a value to a variable that
+                has a default value, the resulting value might not be what
+                you expect.
+                In this case, the value you provide might replace the value
+                rather than append to the default value.
+            </para>
+
+            <para>
+                If after you have changed a variable's value and something
+                unexplained occurs, you can use BitBake to check the actual
+                value of the suspect variable.
+                You can make these checks for both configuration and recipe
+                level changes:
+                <itemizedlist>
+                    <listitem><para>
+                        For configuration changes, use the following:
+                        <literallayout class='monospaced'>
+     $ bitbake -e
+                        </literallayout>
+                        This command displays variable values after the
+                        configuration files (i.e. <filename>local.conf</filename>,
+                        <filename>bblayers.conf</filename>,
+                        <filename>bitbake.conf</filename> and so forth) have
+                        been parsed.
+                        <note>
+                            Variables that are exported to the environment are
+                            preceded by the string "export" in the command's
+                            output.
+                        </note>
+                        </para></listitem>
+                    <listitem><para>
+                        For recipe changes, use the following:
+                        <literallayout class='monospaced'>
+     $ bitbake <replaceable>recipe</replaceable> -e | grep VARIABLE="
+                        </literallayout>
+                        This command checks to see if the variable actually
+                        makes it into a specific recipe.
+                        </para></listitem>
+                </itemizedlist>
+            </para>
+        </section>
+
         <section id='line-joining'>
             <title>Line Joining</title>
 

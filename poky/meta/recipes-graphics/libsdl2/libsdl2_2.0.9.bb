@@ -23,6 +23,8 @@ SRC_URI[sha256sum] = "255186dc676ecd0c1dbf10ec8a2cc5d6869b5079d8a38194c2aecdff54
 
 inherit autotools lib_package binconfig pkgconfig
 
+CVE_PRODUCT = "simple_directmedia_layer sdl"
+
 EXTRA_OECONF = "--disable-oss --disable-esd --disable-arts \
                 --disable-diskaudio --disable-nas --disable-esd-shared --disable-esdtest \
                 --disable-video-dummy \

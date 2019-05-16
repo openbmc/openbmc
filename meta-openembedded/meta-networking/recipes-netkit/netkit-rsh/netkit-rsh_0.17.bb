@@ -16,6 +16,7 @@ SRC_URI = "${DEBIAN_MIRROR}/main/n/netkit-rsh/netkit-rsh_${PV}.orig.tar.gz;name=
             file://netkit-rsh-0.17-rexec-ipv6.patch \
             file://fix-host-variable.patch \
             file://fixup_wait3_api_change.patch \
+            file://CVE-2019-7282-and-CVE-2019-7283.patch \
 "
 
 SRC_URI[archive.md5sum] = "65f5f28e2fe22d9ad8b17bb9a10df096"

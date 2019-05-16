@@ -6,6 +6,9 @@
 # Copyright (C) 2013 Intel Corporation
 # Author: Andreea Proca <andreea.b.proca@intel.com>
 # Author: Michael Wood <michael.g.wood@intel.com>
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
 
 import urllib.request, urllib.error
 import sys

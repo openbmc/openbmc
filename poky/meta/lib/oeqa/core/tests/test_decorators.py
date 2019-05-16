@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-
+#
 # Copyright (C) 2016 Intel Corporation
-# Released under the MIT license (see COPYING.MIT)
+#
+# SPDX-License-Identifier: MIT
+#
 
 import signal
 import unittest
@@ -41,29 +43,6 @@ class TestFilterDecorator(TestBase):
 
         for test in tests:
             self._runFilterTest(['oetag'], test[0], test[1], test[2])
-
-    def test_oeid(self):
-        # Get all cases without filtering.
-        filter_all = {}
-        test_all = {'testIdGood', 'testIdOther', 'testIdNone'}
-        msg_all = 'Failed to get all oeid cases without filtering.'
-
-        # Get cases with '101' oeid.
-        filter_good = {'oeid': 101}
-        test_good = {'testIdGood'}
-        msg_good = 'Failed to get just one tes filtering with "101" oeid.'
-
-        # Get cases with an invalid id.
-        filter_invalid = {'oeid':999}
-        test_invalid = set()
-        msg_invalid = 'Failed to filter all test using an invalid oeid.'
-
-        tests = ((filter_all, test_all, msg_all),
-                 (filter_good, test_good, msg_good),
-                 (filter_invalid, test_invalid, msg_invalid))
-
-        for test in tests:
-            self._runFilterTest(['oeid'], test[0], test[1], test[2])
 
 class TestDependsDecorator(TestBase):
     modules = ['depends']

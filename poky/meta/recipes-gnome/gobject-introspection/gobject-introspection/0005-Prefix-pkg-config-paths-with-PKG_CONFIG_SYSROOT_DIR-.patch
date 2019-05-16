@@ -1,4 +1,4 @@
-From a97d060933932e478c03f1de9513b69bc459eefc Mon Sep 17 00:00:00 2001
+From 74dab0fb6104ab6b715a24b783f8e8dfa5f83617 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 8 Oct 2015 18:30:35 +0300
 Subject: [PATCH] Prefix pkg-config paths with PKG_CONFIG_SYSROOT_DIR
@@ -16,7 +16,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  2 files changed, 13 insertions(+), 13 deletions(-)
 
 diff --git a/Makefile-gir.am b/Makefile-gir.am
-index 2cd7358..eaf0afd 100644
+index b59b0a6..24a50c2 100644
 --- a/Makefile-gir.am
 +++ b/Makefile-gir.am
 @@ -58,8 +58,8 @@ else
@@ -41,7 +41,7 @@ index 2cd7358..eaf0afd 100644
  
  GOBJECT_LIBRARY=gobject-2.0
  
-@@ -123,8 +123,8 @@ GObject_2_0_gir_FILES = \
+@@ -124,8 +124,8 @@ GObject_2_0_gir_FILES = \
  BUILT_GIRSOURCES += GObject-2.0.gir
  
  # gmodule
@@ -52,7 +52,7 @@ index 2cd7358..eaf0afd 100644
  
  GMODULE_LIBRARY=gmodule-2.0
  
-@@ -149,13 +149,13 @@ GModule_2_0_gir_FILES = $(GLIB_INCLUDEDIR)/gmodule.h \
+@@ -150,13 +150,13 @@ GModule_2_0_gir_FILES = $(GLIB_INCLUDEDIR)/gmodule.h \
  BUILT_GIRSOURCES += GModule-2.0.gir
  
  # gio
@@ -66,7 +66,7 @@ index 2cd7358..eaf0afd 100644
  if HAVE_GIO_UNIX
 -GIO_UNIX_INCLUDEDIR = $(shell "${PKG_CONFIG}" --variable=includedir gio-unix-2.0)/gio-unix-2.0
 +GIO_UNIX_INCLUDEDIR = $(PKG_CONFIG_SYSROOT_DIR)$(shell "${PKG_CONFIG}" --variable=includedir gio-unix-2.0)/gio-unix-2.0
- GIO_UNIX_HDRS = $(GIO_UNIX_INCLUDEDIR)/gio/*.h
+ GIO_UNIX_HDRS = $(wildcard $(GIO_UNIX_INCLUDEDIR)/gio/*.h)
  GIO_UNIX_PACKAGES = gio-unix-2.0
  else
 diff --git a/m4/introspection.m4 b/m4/introspection.m4

@@ -312,6 +312,7 @@ def set_icecc_env():
     # dummy python version of set_icecc_env
     return
 
+set_icecc_env[vardepsexclude] += "KERNEL_CC"
 set_icecc_env() {
     if [ "${@use_icecc(bb, d)}" = "no" ]
     then

@@ -1,6 +1,9 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
-from oeqa.core.decorator.oeid import OETestID
 from oeqa.runtime.decorator.package import OEHasPackage
 
 from oeqa.runtime.utils.targetbuildproject import TargetBuildProject
@@ -19,7 +22,6 @@ class BuildLzipTest(OERuntimeTestCase):
     def tearDownClass(cls):
         cls.project.clean()
 
-    @OETestID(206)
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     @OEHasPackage(['gcc'])
     @OEHasPackage(['make'])

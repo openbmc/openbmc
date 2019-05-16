@@ -1,4 +1,4 @@
-From 3fea5e83803f4cfef21b2e06e37a6ba56f2bb914 Mon Sep 17 00:00:00 2001
+From 6653c28f0b76aad86e26c512b03efcec6d9d9e95 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 3 Jan 2018 17:02:01 +0200
 Subject: [PATCH] giscanner: add a --lib-dirs-envvar option
@@ -19,10 +19,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  3 files changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/giscanner/ccompiler.py b/giscanner/ccompiler.py
-index c003828..8a8ba2b 100644
+index 32c9296..3fb262b 100644
 --- a/giscanner/ccompiler.py
 +++ b/giscanner/ccompiler.py
-@@ -109,7 +109,7 @@ class CCompiler(object):
+@@ -174,7 +174,7 @@ class CCompiler(object):
  
              self._cflags_no_deprecation_warnings = "-Wno-deprecated-declarations"
  
@@ -31,7 +31,7 @@ index c003828..8a8ba2b 100644
          # An "internal" link is where the library to be introspected
          # is being built in the current directory.
  
-@@ -119,7 +119,7 @@ class CCompiler(object):
+@@ -184,7 +184,7 @@ class CCompiler(object):
          if os.name == 'nt':
              runtime_path_envvar = ['LIB', 'PATH']
          else:
@@ -41,10 +41,10 @@ index c003828..8a8ba2b 100644
              # (This flag is not supported nor needed for Visual C++)
              args.append('-L.')
 diff --git a/giscanner/dumper.py b/giscanner/dumper.py
-index 2c668f5..2e515a0 100644
+index 2b851a5..10a7c39 100644
 --- a/giscanner/dumper.py
 +++ b/giscanner/dumper.py
-@@ -249,7 +249,8 @@ class DumpCompiler(object):
+@@ -244,7 +244,8 @@ class DumpCompiler(object):
                                                     libtool,
                                                     self._options.libraries,
                                                     self._options.extra_libraries,
@@ -55,10 +55,10 @@ index 2c668f5..2e515a0 100644
  
          else:
 diff --git a/giscanner/scannermain.py b/giscanner/scannermain.py
-index 5cb793e..87227e2 100644
+index 9013562..9c9fe12 100644
 --- a/giscanner/scannermain.py
 +++ b/giscanner/scannermain.py
-@@ -132,6 +132,9 @@ def _get_option_parser():
+@@ -126,6 +126,9 @@ def _get_option_parser():
      parser.add_option("", "--use-ldd-wrapper",
                        action="store", dest="ldd_wrapper", default=None,
                        help="wrapper to use instead of ldd (useful when cross-compiling)")

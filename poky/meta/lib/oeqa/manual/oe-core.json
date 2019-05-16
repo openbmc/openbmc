@@ -1,32 +1,6 @@
 [
   {
     "test": {
-      "@alias": "oe-core.scripts.Use_scripts/pybootchartgui/pybootchartgui.py_to_generate_build_profiles",
-      "author": [
-        {
-          "email": "alexandru.c.georgescu@intel.com",
-          "name": "alexandru.c.georgescu@intel.com"
-        }
-      ],
-      "execution": {
-        "1": {
-          "action": "Run a build for a recipe (e.g. core-image-minimal)",
-          "expected_results": ""
-        },
-        "2": {
-          "action": "Run the profiling script, ../scripts/pybootchartgui/pybootchartgui.py  tmp/buildstats/    \n\n",
-          "expected_results": ""
-        },
-        "3": {
-          "action": "Verify the results ",
-          "expected_results": "The scripts generates svg files with the profiling results . "
-        }
-      },
-      "summary": "Use_scripts/pybootchartgui/pybootchartgui.py_to_generate_build_profiles"
-    }
-  },
-  {
-    "test": {
       "@alias": "oe-core.scripts.Crosstap_script_check",
       "author": [
         {

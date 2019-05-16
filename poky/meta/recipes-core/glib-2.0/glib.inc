@@ -30,11 +30,7 @@ LEAD_SONAME = "libglib-2.0.*"
 
 inherit meson gettext gtk-doc pkgconfig ptest-gnome upstream-version-is-even bash-completion gio-module-cache manpages distro_features_check
 
-GTKDOC_ENABLE_FLAG = "-Dgtk_doc=true"
-GTKDOC_DISABLE_FLAG = "-Dgtk_doc=false"
-
-EXTRA_OEMESON_append_class-target = " ${@bb.utils.contains('GTKDOC_ENABLED', 'True', '${GTKDOC_ENABLE_FLAG}', \
-                                                                                     '${GTKDOC_DISABLE_FLAG}', d)} "
+GTKDOC_MESON_OPTION = "gtk_doc"
 
 # This avoids the need to depend on target python3, which in case of mingw is not even possible.
 # meson's python configuration pokes into python3 configuration, so this provides the native config to it.
@@ -152,6 +148,14 @@ RDEPENDS_${PN}-ptest += "\
             tzdata-europe \
             tzdata-posix \
             shared-mime-info \
+            ${PN}-locale-ja \
+            ${PN}-locale-fr \
+            ${PN}-locale-el \
+            ${PN}-locale-hr \
+            ${PN}-locale-lt \
+            ${PN}-locale-pl \
+            ${PN}-locale-ru \
+            ${PN}-locale-th \
            "
 
 RDEPENDS_${PN}-ptest_append_libc-glibc = "\
@@ -177,5 +181,7 @@ RDEPENDS_${PN}-ptest_append_libc-glibc = "\
             locale-base-fr-fr \
             locale-base-es-es \
             locale-base-en-gb \
+            locale-base-en-us \
             locale-base-pl-pl \
+            locale-base-pl-pl.iso-8859-2 \
            "

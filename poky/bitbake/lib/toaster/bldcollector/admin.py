@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
 from django.contrib import admin
 from orm.models import BitbakeVersion, Release, ToasterSetting, Layer_Version
 from django import forms

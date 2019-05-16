@@ -5,36 +5,27 @@ LICENSE = "GPLv2 & LGPLv2.1"
 RDEPENDS_${PN}-ptest = "bash make"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=441c28d2cf86e15a37fa47e15a72fbac \
-                    file://COPYING.LIB;endline=24;md5=c04def7ae38850e7d3ef548588159913"
+                    file://COPYING.LIB;endline=24;md5=8c5efda6cf1e1b03dcfd0e6c0d271c7f"
 
 SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://powerpc_rom.bin \
-           file://0001-sdl.c-allow-user-to-disable-pointer-grabs.patch \
-           file://0002-qemu-Add-missing-wacom-HID-descriptor.patch \
-           file://0003-Add-subpackage-ptest-which-runs-all-unit-test-cases-.patch \
            file://run-ptest \
-           file://0004-qemu-Add-addition-environment-space-to-boot-loader-q.patch \
-           file://0005-qemu-disable-Valgrind.patch \
-           file://0006-qemu-Limit-paths-searched-during-user-mode-emulation.patch \
-           file://0007-qemu-native-set-ld.bfd-fix-cflags-and-set-some-envir.patch \
-           file://0008-chardev-connect-socket-to-a-spawned-command.patch \
-           file://0009-apic-fixup-fallthrough-to-PIC.patch \
-           file://0010-linux-user-Fix-webkitgtk-hangs-on-32-bit-x86-target.patch \
-           file://0011-Revert-linux-user-fix-mmap-munmap-mprotect-mremap-sh.patch \
-           file://0001-Add-a-missing-X11-include.patch \
-           file://0001-egl-headless-add-egl_create_context.patch \
-           file://0014-fix-CVE-2018-16872.patch \
-           file://0015-fix-CVE-2018-20124.patch \
-           file://0016-fix-CVE-2018-20125.patch \
-           file://0017-fix-CVE-2018-20126.patch \
-           file://0018-fix-CVE-2018-20191.patch \
-           file://0019-fix-CVE-2018-20216.patch \
-           file://CVE-2019-3812.patch \
+           file://0001-qemu-Add-missing-wacom-HID-descriptor.patch \
+           file://0002-Add-subpackage-ptest-which-runs-all-unit-test-cases-.patch \
+           file://0003-qemu-Add-addition-environment-space-to-boot-loader-q.patch \
+           file://0004-qemu-disable-Valgrind.patch \
+           file://0005-qemu-Limit-paths-searched-during-user-mode-emulation.patch \
+           file://0006-qemu-native-set-ld.bfd-fix-cflags-and-set-some-envir.patch \
+           file://0007-chardev-connect-socket-to-a-spawned-command.patch \
+           file://0008-apic-fixup-fallthrough-to-PIC.patch \
+           file://0009-linux-user-Fix-webkitgtk-hangs-on-32-bit-x86-target.patch \
+           file://0010-Revert-linux-user-fix-mmap-munmap-mprotect-mremap-sh.patch \
+           file://0013-Revert-target-arm-Use-vector-operations-for-saturati.patch \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 
-SRC_URI[md5sum] = "fb687ce0b02d3bf4327e36d3b99427a8"
-SRC_URI[sha256sum] = "6a0508df079a0a33c2487ca936a56c12122f105b8a96a44374704bef6c69abfc"
+SRC_URI[md5sum] = "0afeca336fd57ae3d3086ec07f59d708"
+SRC_URI[sha256sum] = "13a93dfe75b86734326f8d5b475fde82ec692d5b5a338b4262aeeb6b0fa4e469"
 
 COMPATIBLE_HOST_mipsarchn32 = "null"
 COMPATIBLE_HOST_mipsarchn64 = "null"
@@ -133,7 +124,7 @@ make_qemu_wrapper() {
 PACKAGECONFIG_remove_darwin = "kvm virglrenderer glx gtk+"
 PACKAGECONFIG_remove_mingw32 = "kvm virglrenderer glx gtk+"
 
-PACKAGECONFIG[sdl] = "--enable-sdl --with-sdlabi=2.0,--disable-sdl,libsdl2"
+PACKAGECONFIG[sdl] = "--enable-sdl,--disable-sdl,libsdl2"
 PACKAGECONFIG[virtfs] = "--enable-virtfs --enable-attr,--disable-virtfs,libcap attr,"
 PACKAGECONFIG[aio] = "--enable-linux-aio,--disable-linux-aio,libaio,"
 PACKAGECONFIG[xfs] = "--enable-xfsctl,--disable-xfsctl,xfsprogs,"
@@ -144,7 +135,8 @@ PACKAGECONFIG[vnc-png] = "--enable-vnc --enable-vnc-png,--disable-vnc-png,libpng
 PACKAGECONFIG[libcurl] = "--enable-curl,--disable-curl,libcurl,"
 PACKAGECONFIG[nss] = "--enable-smartcard,--disable-smartcard,nss,"
 PACKAGECONFIG[curses] = "--enable-curses,--disable-curses,ncurses,"
-PACKAGECONFIG[gtk+] = "--enable-gtk --enable-vte,--disable-gtk --disable-vte,gtk+3 vte gettext-native"
+PACKAGECONFIG[gtk+] = "--enable-gtk,--disable-gtk,gtk+3 gettext-native"
+PACKAGECONFIG[vte] = "--enable-vte,--disable-vte,vte gettext-native"
 PACKAGECONFIG[libcap-ng] = "--enable-cap-ng,--disable-cap-ng,libcap-ng,"
 PACKAGECONFIG[ssh2] = "--enable-libssh2,--disable-libssh2,libssh2,"
 PACKAGECONFIG[gcrypt] = "--enable-gcrypt,--disable-gcrypt,libgcrypt,"
@@ -165,5 +157,8 @@ PACKAGECONFIG[virglrenderer] = "--enable-virglrenderer,--disable-virglrenderer,v
 PACKAGECONFIG[spice] = "--enable-spice,--disable-spice,spice"
 # usbredir will be in meta-networking layer
 PACKAGECONFIG[usb-redir] = "--enable-usb-redir,--disable-usb-redir,usbredir"
+PACKAGECONFIG[snappy] = "--enable-snappy,--disable-snappy,snappy"
 
 INSANE_SKIP_${PN} = "arch"
+
+FILES_${PN} += "${datadir}/icons"

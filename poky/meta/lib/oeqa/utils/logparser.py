@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+#
+# SPDX-License-Identifier: MIT
+#
 
 import sys
 import os
@@ -86,3 +89,65 @@ class PtestParser(object):
                     status = self.results[section][test_name]
                     f.write(status + ": " + test_name + "\n")
 
+
+# ltp log parsing
+class LtpParser(object):
+    def __init__(self):
+        self.results = {}
+        self.section = {'duration': "", 'log': ""}
+
+    def parse(self, logfile):
+        test_regex = {}
+        test_regex['PASSED'] = re.compile(r"PASS")
+        test_regex['FAILED'] = re.compile(r"FAIL")
+        test_regex['SKIPPED'] = re.compile(r"SKIP")
+
+        with open(logfile, errors='replace') as f:
+            for line in f:
+                for t in test_regex:
+                    result = test_regex[t].search(line)
+                    if result:
+                        self.results[line.split()[0].strip()] = t
+
+        for test in self.results:
+            result = self.results[test]
+            self.section['log'] = self.section['log'] + ("%s: %s\n" % (result.strip()[:-2], test.strip()))
+
+        return self.results, self.section
+
+
+# ltp Compliance log parsing
+class LtpComplianceParser(object):
+    def __init__(self):
+        self.results = {}
+        self.section = {'duration': "", 'log': ""}
+
+    def parse(self, logfile):
+        test_regex = {}
+        test_regex['PASSED'] = re.compile(r"^PASS")
+        test_regex['FAILED'] = re.compile(r"^FAIL")
+        test_regex['SKIPPED'] = re.compile(r"(?:UNTESTED)|(?:UNSUPPORTED)")
+
+        section_regex = {}
+        section_regex['test'] = re.compile(r"^Testing")
+
+        with open(logfile, errors='replace') as f:
+            for line in f:
+                result = section_regex['test'].search(line)
+                if result:
+                    self.name = ""
+                    self.name = line.split()[1].strip()
+                    self.results[self.name] = "PASSED"
+                    failed = 0
+
+                failed_result = test_regex['FAILED'].search(line)
+                if failed_result:
+                    failed = line.split()[1].strip()
+                    if int(failed) > 0:
+                        self.results[self.name] = "FAILED"
+
+        for test in self.results:
+            result = self.results[test]
+            self.section['log'] = self.section['log'] + ("%s: %s\n" % (result.strip()[:-2], test.strip()))
+
+        return self.results, self.section

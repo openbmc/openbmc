@@ -16,7 +16,7 @@ SRC_URI[sha256sum] = "7989b39598c769820ad451ad91e5cb0de29946940c8240aac94ca8238c
 
 inherit autotools distro_features_check
 
-REQUIRED_DISTRO_FEATURES = "opengl"
+REQUIRED_DISTRO_FEATURES = "opengl x11"
 
 S = "${WORKDIR}/xforms-${PV}"
 

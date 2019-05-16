@@ -16,7 +16,11 @@ PNREAL = "gst-python"
 
 S = "${WORKDIR}/${PNREAL}-${PV}"
 
-inherit autotools pkgconfig distutils3-base upstream-version-is-even gobject-introspection
+# gobject-introspection is mandatory and cannot be configured
+REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
+UNKNOWN_CONFIGURE_WHITELIST_append = " --enable-introspection --disable-introspection"
+
+inherit autotools pkgconfig distutils3-base upstream-version-is-even gobject-introspection distro_features_check
 
 do_install_append() {
     # gstpythonplugin hardcodes the location of the libpython from the build

@@ -113,7 +113,16 @@ done
 
 payload_offset=$(($(grep -na -m1 "^MARKER:$" $0|cut -d':' -f1) + 1))
 if [ "$listcontents" = "1" ] ; then
-    tail -n +$payload_offset $0| tar tvJ || exit 1
+    if [ @SDK_ARCHIVE_TYPE@ = "zip" ]; then
+        tail -n +$payload_offset $0 > sdk.zip
+        if unzip -l sdk.zip;then
+            rm sdk.zip
+        else
+            rm sdk.zip && exit 1
+        fi
+    else
+        tail -n +$payload_offset $0| tar tvJ || exit 1
+    fi
     exit
 fi
 
@@ -232,7 +241,16 @@ if [ ! -x $target_sdk_dir -o ! -w $target_sdk_dir -o ! -r $target_sdk_dir ]; the
 fi
 
 printf "Extracting SDK..."
-tail -n +$payload_offset $0| $SUDO_EXEC tar xJ -C $target_sdk_dir --checkpoint=.2500 $EXTRA_TAR_OPTIONS || exit 1
+if [ @SDK_ARCHIVE_TYPE@ = "zip" ]; then
+    tail -n +$payload_offset $0 > sdk.zip
+    if $SUDO_EXEC unzip $EXTRA_TAR_OPTIONS sdk.zip -d $target_sdk_dir;then
+        rm sdk.zip
+    else
+        rm sdk.zip && exit 1
+    fi
+else
+    tail -n +$payload_offset $0| $SUDO_EXEC tar xJ -C $target_sdk_dir --checkpoint=.2500 $EXTRA_TAR_OPTIONS || exit 1
+fi
 echo "done"
 
 printf "Setting it up..."

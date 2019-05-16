@@ -1,3 +1,6 @@
+#
+# SPDX-License-Identifier: MIT
+#
 import subprocess
 
 class OETestCalledProcessError(subprocess.CalledProcessError):

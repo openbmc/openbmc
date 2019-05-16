@@ -1,7 +1,7 @@
 SUMMARY = "Utilities and libraries for handling compiled object files"
 HOMEPAGE = "https://sourceware.org/elfutils"
 SECTION = "base"
-LICENSE = "(GPLv3 & Elfutils-Exception)"
+LICENSE = "GPLv2 & LGPLv3+ & GPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 DEPENDS = "libtool bzip2 zlib virtual/libintl"
 DEPENDS_append_libc-musl = " argp-standalone fts "
@@ -27,20 +27,46 @@ SRC_URI = "https://sourceware.org/elfutils/ftp/${PV}/${BP}.tar.bz2 \
            file://debian/hurd_path.patch \
            file://debian/ignore_strmerge.diff \
            file://debian/disable_werror.patch \
+           file://debian/testsuite-ignore-elflint.diff \
+           file://0001-skip-the-test-when-gcc-not-deployed.patch \
+           file://run-ptest \
+           file://ptest.patch \
+           file://musl.patch \
            "
-SRC_URI_append_libc-musl = " file://0008-build-Provide-alternatives-for-glibc-assumptions-hel.patch"
+SRC_URI_append_libc-musl = " file://0008-build-Provide-alternatives-for-glibc-assumptions-hel.patch \
+                             file://0001-fix-err-variable-and-function-conflicts.patch \
+"
 
 SRC_URI[md5sum] = "077e4f49320cad82bf17a997068b1db9"
 SRC_URI[sha256sum] = "eb5747c371b0af0f71e86215a5ebb88728533c3a104a43d4231963f308cd1023"
 
-inherit autotools gettext
+inherit autotools gettext ptest
 
 EXTRA_OECONF = "--program-prefix=eu- --without-lzma"
 EXTRA_OECONF_append_class-native = " --without-bzlib"
+RDEPENDS_${PN}-ptest = "libasm libelf bash make coreutils ${PN}-binutils ${PN}"
+
+EXTRA_OECONF_append_class-target += "--disable-tests-rpath"
 
 do_install_append() {
 	if [ "${TARGET_ARCH}" != "x86_64" ] && [ -z `echo "${TARGET_ARCH}"|grep 'i.86'` ];then
 		rm -f ${D}${bindir}/eu-objdump
+	fi
+}
+
+do_compile_ptest() {
+	cd ${B}/tests
+	oe_runmake buildtest-TESTS oecheck
+}
+
+do_install_ptest() {
+	if [ ${PTEST_ENABLED} = "1" ]; then
+		cp -r ${S}/tests/                       ${D}${PTEST_PATH}
+		cp -r ${B}/tests/*                      ${D}${PTEST_PATH}/tests
+		cp -r ${B}/config.h                     ${D}${PTEST_PATH}
+		cp -r ${B}/backends                     ${D}${PTEST_PATH}
+		sed -i '/^Makefile:/c Makefile:'        ${D}${PTEST_PATH}/tests/Makefile
+		find ${D}${PTEST_PATH} -type f -name *.[hoc] | xargs -i rm {}
 	fi
 }
 
@@ -53,6 +79,18 @@ BBCLASSEXTEND = "native nativesdk"
 
 # Package utilities separately
 PACKAGES =+ "${PN}-binutils libelf libasm libdw"
+
+# shared libraries are licensed GPLv2 or GPLv3+, binaries GPLv3+
+# according to NEWS file:
+# "The license is now GPLv2/LGPLv3+ for the libraries and GPLv3+ for stand-alone
+# programs. There is now also a formal CONTRIBUTING document describing how to
+# submit patches."
+LICENSE_${PN}-binutils = "GPLv3+"
+LICENSE_${PN} = "GPLv3+"
+LICENSE_libelf = "GPLv2 | LGPLv3+"
+LICENSE_libasm = "GPLv2 | LGPLv3+"
+LICENSE_libdw = "GPLv2 | LGPLv3+"
+
 FILES_${PN}-binutils = "\
     ${bindir}/eu-addr2line \
     ${bindir}/eu-ld \

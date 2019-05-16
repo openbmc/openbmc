@@ -13,7 +13,8 @@
 # ALL_PROXY=https://proxy.example.com:8080
 #
 # Copyright (c) 2013, Intel Corporation.
-# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-only
 #
 # AUTHORS
 # Darren Hart <dvhart@linux.intel.com>

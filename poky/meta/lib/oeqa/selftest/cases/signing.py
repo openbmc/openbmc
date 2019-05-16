@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import runCmd, bitbake, get_bb_var, get_bb_vars
 import os
@@ -7,7 +11,6 @@ import re
 import shutil
 import tempfile
 from contextlib import contextmanager
-from oeqa.core.decorator.oeid import OETestID
 from oeqa.utils.ftools import write_file
 
 
@@ -51,7 +54,6 @@ class Signing(OESelftestTestCase):
                 os.environ[e] = origenv[e]
             os.chdir(builddir)
 
-    @OETestID(1362)
     def test_signing_packages(self):
         """
         Summary:     Test that packages can be signed in the package feed
@@ -116,7 +118,6 @@ class Signing(OESelftestTestCase):
         bitbake('core-image-minimal')
 
 
-    @OETestID(1382)
     def test_signing_sstate_archive(self):
         """
         Summary:     Test that sstate archives can be signed
@@ -169,7 +170,6 @@ class Signing(OESelftestTestCase):
 
 class LockedSignatures(OESelftestTestCase):
 
-    @OETestID(1420)
     def test_locked_signatures(self):
         """
         Summary:     Test locked signature mechanism

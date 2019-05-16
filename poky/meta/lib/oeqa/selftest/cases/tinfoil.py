@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import os
 import re
 import time
@@ -6,12 +10,10 @@ import bb.tinfoil
 
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import runCmd
-from oeqa.core.decorator.oeid import OETestID
 
 class TinfoilTests(OESelftestTestCase):
     """ Basic tests for the tinfoil API """
 
-    @OETestID(1568)
     def test_getvar(self):
         with bb.tinfoil.Tinfoil() as tinfoil:
             tinfoil.prepare(True)
@@ -19,7 +21,6 @@ class TinfoilTests(OESelftestTestCase):
             if not machine:
                 self.fail('Unable to get MACHINE value - returned %s' % machine)
 
-    @OETestID(1569)
     def test_expand(self):
         with bb.tinfoil.Tinfoil() as tinfoil:
             tinfoil.prepare(True)
@@ -28,7 +29,6 @@ class TinfoilTests(OESelftestTestCase):
             if not pid:
                 self.fail('Unable to expand "%s" - returned %s' % (expr, pid))
 
-    @OETestID(1570)
     def test_getvar_bb_origenv(self):
         with bb.tinfoil.Tinfoil() as tinfoil:
             tinfoil.prepare(True)
@@ -37,7 +37,6 @@ class TinfoilTests(OESelftestTestCase):
                 self.fail('Unable to get BB_ORIGENV value - returned %s' % origenv)
             self.assertEqual(origenv.getVar('HOME', False), os.environ['HOME'])
 
-    @OETestID(1571)
     def test_parse_recipe(self):
         with bb.tinfoil.Tinfoil() as tinfoil:
             tinfoil.prepare(config_only=False, quiet=2)
@@ -48,7 +47,6 @@ class TinfoilTests(OESelftestTestCase):
             rd = tinfoil.parse_recipe_file(best[3])
             self.assertEqual(testrecipe, rd.getVar('PN'))
 
-    @OETestID(1572)
     def test_parse_recipe_copy_expand(self):
         with bb.tinfoil.Tinfoil() as tinfoil:
             tinfoil.prepare(config_only=False, quiet=2)
@@ -67,7 +65,6 @@ class TinfoilTests(OESelftestTestCase):
             localdata.setVar('PN', 'hello')
             self.assertEqual('hello', localdata.getVar('BPN'))
 
-    @OETestID(1573)
     def test_parse_recipe_initial_datastore(self):
         with bb.tinfoil.Tinfoil() as tinfoil:
             tinfoil.prepare(config_only=False, quiet=2)
@@ -81,7 +78,6 @@ class TinfoilTests(OESelftestTestCase):
             # Check we can get variable values
             self.assertEqual('somevalue', rd.getVar('MYVARIABLE'))
 
-    @OETestID(1574)
     def test_list_recipes(self):
         with bb.tinfoil.Tinfoil() as tinfoil:
             tinfoil.prepare(config_only=False, quiet=2)
@@ -100,7 +96,6 @@ class TinfoilTests(OESelftestTestCase):
             if checkpns:
                 self.fail('Unable to find pkg_fn entries for: %s' % ', '.join(checkpns))
 
-    @OETestID(1575)
     def test_wait_event(self):
         with bb.tinfoil.Tinfoil() as tinfoil:
             tinfoil.prepare(config_only=True)
@@ -136,7 +131,6 @@ class TinfoilTests(OESelftestTestCase):
             self.assertTrue(commandcomplete, 'Timed out waiting for CommandCompleted event from bitbake server')
             self.assertTrue(eventreceived, 'Did not receive FilesMatchingFound event from bitbake server')
 
-    @OETestID(1576)
     def test_setvariable_clean(self):
         # First check that setVariable affects the datastore
         with bb.tinfoil.Tinfoil() as tinfoil:
@@ -159,7 +153,6 @@ class TinfoilTests(OESelftestTestCase):
             value = tinfoil.run_command('getVariable', 'TESTVAR')
             self.assertEqual(value, 'specialvalue', 'Value set using config_data.setVar() is not reflected in config_data.getVar()')
 
-    @OETestID(1884)
     def test_datastore_operations(self):
         with bb.tinfoil.Tinfoil() as tinfoil:
             tinfoil.prepare(config_only=True)

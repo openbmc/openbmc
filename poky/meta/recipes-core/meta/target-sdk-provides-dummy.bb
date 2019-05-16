@@ -52,3 +52,5 @@ DUMMYPROVIDES = "\
 "
 
 require dummy-sdk-package.inc
+
+SSTATE_DUPWHITELIST += "${PKGDATA_DIR}/${PN} ${PKGDATA_DIR}/runtime/${PN}"

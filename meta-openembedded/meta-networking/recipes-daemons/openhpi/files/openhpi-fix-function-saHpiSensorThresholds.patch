@@ -1,0 +1,35 @@
+From e0b2be7a1fce0fed63bac8c350b711b69edfe30e Mon Sep 17 00:00:00 2001
+From: "yanjun.zhu" <yanjun.zhu@windriver.com>
+Date: Tue, 30 Apr 2019 10:04:58 +0800
+Subject: [PATCH] openhpid/safhpi.c: fix function saHpiSensorThresholdsSet
+
+In COPY_TH the SensorThresholds->TH will be copied to tmp.TH only if
+TH.IsSupported == SAHPI_TRUE. So we should pass &tmp but not
+SensorThresholds as the argument to OH_CALL_ABI. Otherwise the TH will
+be set even if TH.IsSupported == SAHPI_FALSE.
+
+Upstream-Status: Submitted
+[https://github.com/open-hpi/openhpi/pull/2744/commits/77a78bb1ada56e55c5ba6d7a5987c214705bf035]
+
+Signed-off-by: yanjun.zhu <yanjun.zhu@windriver.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ openhpid/safhpi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/openhpid/safhpi.c b/openhpid/safhpi.c
+index 28a2632..61b7f03 100644
+--- a/openhpid/safhpi.c
++++ b/openhpid/safhpi.c
+@@ -1933,7 +1933,7 @@ SaErrorT SAHPI_API saHpiSensorThresholdsSet (
+         oh_release_domain(d); /* Unlock domain */
+ 
+         OH_CALL_ABI(h, set_sensor_thresholds, SA_ERR_HPI_INVALID_CMD, rv,
+-                    ResourceId, SensorNum, SensorThresholds);
++                    ResourceId, SensorNum, &tmp);
+         oh_release_handler(h);
+ 
+         return rv;
+-- 
+2.7.4
+

@@ -37,7 +37,7 @@ EOF
         chmod +x ${B}/vapigen-wrapper
 }
 
-EXTRA_OECONF += " --disable-graphviz"
+EXTRA_OECONF += " --disable-valadoc"
 
 # Vapigen wrapper needs to be available system-wide, because it will be used
 # to build vapi files from all other packages with vala support

@@ -176,14 +176,6 @@
                         isolated applications.
                         </para></listitem>
                     <listitem><para>
-                        When possible, use the Yocto Project plug-in for the
-                        <trademark class='trade'>Eclipse</trademark> IDE
-                        and SDK development practices.
-                        For more information, see the
-                        <ulink url='&YOCTO_DOCS_SDK_URL;'>Yocto Project Application Development and the Extensible Software Development Kit (eSDK)</ulink>
-                        manual.
-                        </para></listitem>
-                    <listitem><para>
                         Keep your cross-development toolchains updated.
                         You can do this through provisioning either as new
                         toolchain downloads or as updates through a package
@@ -421,8 +413,7 @@
         further steps are necessary depending on what you want to
         accomplish.
         See the following references for information on how to prepare for
-        Board Support Package (BSP) development, kernel development, and
-        development using the <trademark class='trade'>Eclipse</trademark> IDE:
+        Board Support Package (BSP) development and kernel development:
         <itemizedlist>
             <listitem><para>
                 <emphasis>BSP Development:</emphasis>
@@ -436,13 +427,6 @@
                 See the
                 "<ulink url='&YOCTO_DOCS_KERNEL_DEV_URL;#preparing-the-build-host-to-work-on-the-kernel'>Preparing the Build Host to Work on the Kernel</ulink>"
                 section in the Yocto Project Linux Kernel Development Manual.
-                </para></listitem>
-            <listitem><para>
-                <emphasis>Eclipse Development:</emphasis>
-                See the
-                "<ulink url='&YOCTO_DOCS_SDK_URL;#sdk-eclipse-project'>Developing Applications Using <trademark class='trade'>Eclipse</trademark></ulink>"
-                Chapter in the Yocto Project Application Development and the
-                Extensible Software Development Kit (eSDK) manual.
                 </para></listitem>
         </itemizedlist>
     </para>
@@ -767,7 +751,7 @@
                     <ulink url='&YOCTO_DL_URL;/releases'></ulink> to access the
                     Index of Releases.
                     The list represents released components (e.g.
-                    <filename>eclipse-plugin</filename>,
+                    <filename>bitbake</filename>,
                     <filename>sato</filename>, and so on).
                     <note>
                         The <filename>yocto</filename> directory contains the
@@ -864,8 +848,7 @@
             Yocto Project maintains an area for nightly builds that contains
             tarball releases at <ulink url='&YOCTO_AB_NIGHTLY_URL;'/>.
             These builds include Yocto Project releases ("poky"),
-            toolchains, Yocto Project plugins for Eclipse, and builds for
-            supported machines.
+            toolchains, and builds for supported machines.
         </para>
 
         <para>
@@ -1130,6 +1113,7 @@
      yocto-2.5.3
      yocto-2.6
      yocto-2.6.1
+     yocto-2.6.2
      yocto-2.7
      yocto_1.5_M5.rc8
                     </literallayout>

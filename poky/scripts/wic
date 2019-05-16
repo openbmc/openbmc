@@ -1,22 +1,8 @@
 #!/usr/bin/env python3
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 #
 # Copyright (c) 2013, Intel Corporation.
-# All rights reserved.
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+# SPDX-License-Identifier: GPL-2.0-only
 #
 # DESCRIPTION 'wic' is the OpenEmbedded Image Creator that users can
 # use to generate bootable images.  Invoking it without any arguments
@@ -426,7 +412,7 @@ def expandtype(rules):
     if rules == 'auto':
         return {}
     result = {}
-    for rule in rules.split('-'):
+    for rule in rules.split(','):
         try:
             part, size = rule.split(':')
         except ValueError:
@@ -501,6 +487,9 @@ subcommands = {
 def init_parser(parser):
     parser.add_argument("--version", action="version",
         version="%(prog)s {version}".format(version=__version__))
+    parser.add_argument("-D", "--debug", dest="debug", action="store_true",
+        default=False, help="output debug information")
+
     subparsers = parser.add_subparsers(dest='command', help=hlp.wic_usage)
     for subcmd in subcommands:
         subparser = subparsers.add_parser(subcmd, help=subcommands[subcmd][2])
@@ -514,6 +503,8 @@ def main(argv):
     init_parser(parser)
 
     args = parser.parse_args(argv)
+    if args.debug:
+        logger.setLevel(logging.DEBUG)
 
     if "command" in vars(args):
         if args.command == "help":

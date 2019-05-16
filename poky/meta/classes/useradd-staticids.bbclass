@@ -76,8 +76,8 @@ def update_useradd_static_config(d):
         for param in oe.useradd.split_commands(params):
             try:
                 uaargs = parser.parse_args(oe.useradd.split_args(param))
-            except:
-                bb.fatal("%s: Unable to parse arguments for USERADD_PARAM_%s: '%s'" % (d.getVar('PN'), pkg, param))
+            except Exception as e:
+                bb.fatal("%s: Unable to parse arguments for USERADD_PARAM_%s '%s': %s" % (d.getVar('PN'), pkg, param, e))
 
             # Read all passwd files specified in USERADD_UID_TABLES or files/passwd
             # Use the standard passwd layout:
@@ -197,8 +197,8 @@ def update_useradd_static_config(d):
             try:
                 # If we're processing multiple lines, we could have left over values here...
                 gaargs = parser.parse_args(oe.useradd.split_args(param))
-            except:
-                bb.fatal("%s: Unable to parse arguments for GROUPADD_PARAM_%s: '%s'" % (d.getVar('PN'), pkg, param))
+            except Exception as e:
+                bb.fatal("%s: Unable to parse arguments for GROUPADD_PARAM_%s '%s': %s" % (d.getVar('PN'), pkg, param, e))
 
             # Read all group files specified in USERADD_GID_TABLES or files/group
             # Use the standard group layout:

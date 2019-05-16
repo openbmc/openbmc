@@ -347,24 +347,12 @@ do_install () {
 	fi
 }
 
+PTEST_BINDIR = "1"
+
 do_install_ptest () {
 	cp -r ${B}/testsuite ${D}${PTEST_PATH}/
 	cp ${B}/.config      ${D}${PTEST_PATH}/
 	ln -s /bin/busybox   ${D}${PTEST_PATH}/busybox
-
-	mkdir ${D}${PTEST_PATH}/bin
-	if [ "${BUSYBOX_SPLIT_SUID}" = "1" ]; then
-		while read link; do
-			ln -s ${base_bindir}/busybox.suid ${D}${PTEST_PATH}/bin/$(basename $link)
-		done <${D}${sysconfdir}/busybox.links.suid
-		while read link; do
-			ln -s ${base_bindir}/busybox.nosuid ${D}${PTEST_PATH}/bin/$(basename $link)
-		done <${D}${sysconfdir}/busybox.links.nosuid
-	else
-		while read link; do
-			ln -s ${base_bindir}/busybox ${D}${PTEST_PATH}/bin/$(basename $link)
-		done <${D}${sysconfdir}/busybox.links
-	fi
 }
 
 inherit update-alternatives

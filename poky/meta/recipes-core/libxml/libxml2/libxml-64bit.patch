@@ -1,14 +1,19 @@
-Upstream-Status: Backport [from debian: bugs.debian.org/439843]
+From 056b14345b1abd76a761ab14538f1bc21302781a Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Sat, 11 May 2019 20:26:51 +0800
+Subject: [PATCH] libxml 64bit
 
+Upstream-Status: Backport [from debian: bugs.debian.org/439843]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- libxml.h |    3 +++
+ libxml.h | 3 +++
  1 file changed, 3 insertions(+)
 
---- libxml2-2.6.29.orig/libxml.h
-+++ libxml2-2.6.29/libxml.h
-@@ -11,10 +11,13 @@
- 
- #ifndef NO_LARGEFILE_SOURCE
+diff --git a/libxml.h b/libxml.h
+index 64e30f7..4e80d90 100644
+--- a/libxml.h
++++ b/libxml.h
+@@ -15,6 +15,9 @@
  #ifndef _LARGEFILE_SOURCE
  #define _LARGEFILE_SOURCE
  #endif
@@ -18,5 +23,6 @@ Upstream-Status: Backport [from debian: bugs.debian.org/439843]
  #ifndef _FILE_OFFSET_BITS
  #define _FILE_OFFSET_BITS 64
  #endif
- #endif
- 
+-- 
+2.7.4
+

@@ -4,6 +4,8 @@
 #
 # Copyright (C) 2013-2017 Intel Corporation
 #
+# SPDX-License-Identifier: GPL-2.0-only
+#
 
 import sys
 import os

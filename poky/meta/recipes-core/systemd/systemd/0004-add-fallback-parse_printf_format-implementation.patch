@@ -20,10 +20,10 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  create mode 100644 src/basic/parse-printf-format.h
 
 diff --git a/meson.build b/meson.build
-index 3386546..44b24ee 100644
+index 79195c9748..0bffbf29c5 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -667,6 +667,7 @@ foreach header : ['crypt.h',
+@@ -685,6 +685,7 @@ foreach header : ['crypt.h',
                    'linux/memfd.h',
                    'linux/vm_sockets.h',
                    'linux/can/vxcan.h',
@@ -32,10 +32,10 @@ index 3386546..44b24ee 100644
                    'valgrind/memcheck.h',
                    'valgrind/valgrind.h',
 diff --git a/src/basic/meson.build b/src/basic/meson.build
-index e5852f3..2192a0c 100644
+index 91e0df3d2f..a732b554da 100644
 --- a/src/basic/meson.build
 +++ b/src/basic/meson.build
-@@ -284,6 +284,11 @@ foreach item : [['af',     af_list_txt,     'af',         ''],
+@@ -298,6 +298,11 @@ foreach item : [['af',     af_list_txt,     'af',         ''],
  endforeach
  
  basic_sources += generated_gperf_headers
@@ -49,7 +49,7 @@ index e5852f3..2192a0c 100644
          'gcrypt-util.h')
 diff --git a/src/basic/parse-printf-format.c b/src/basic/parse-printf-format.c
 new file mode 100644
-index 0000000..49437e5
+index 0000000000..49437e5445
 --- /dev/null
 +++ b/src/basic/parse-printf-format.c
 @@ -0,0 +1,273 @@
@@ -328,7 +328,7 @@ index 0000000..49437e5
 +}
 diff --git a/src/basic/parse-printf-format.h b/src/basic/parse-printf-format.h
 new file mode 100644
-index 0000000..47be752
+index 0000000000..47be7522d7
 --- /dev/null
 +++ b/src/basic/parse-printf-format.h
 @@ -0,0 +1,57 @@
@@ -390,7 +390,7 @@ index 0000000..47be752
 +
 +#endif /* HAVE_PRINTF_H */
 diff --git a/src/basic/stdio-util.h b/src/basic/stdio-util.h
-index dc67b6e..cf8d514 100644
+index c3b9448d4f..2937aa13b1 100644
 --- a/src/basic/stdio-util.h
 +++ b/src/basic/stdio-util.h
 @@ -1,13 +1,13 @@
@@ -403,13 +403,13 @@ index dc67b6e..cf8d514 100644
  #include <sys/types.h>
  
  #include "macro.h"
- #include "util.h"
+ #include "memory-util.h"
 +#include "parse-printf-format.h"
  
  #define snprintf_ok(buf, len, fmt, ...) \
          ((size_t) snprintf(buf, len, fmt, __VA_ARGS__) < (len))
 diff --git a/src/journal/journal-send.c b/src/journal/journal-send.c
-index 8618454..3fea912 100644
+index 5ef11fa1a4..6384ab620c 100644
 --- a/src/journal/journal-send.c
 +++ b/src/journal/journal-send.c
 @@ -2,7 +2,6 @@
@@ -421,13 +421,13 @@ index 8618454..3fea912 100644
  #include <sys/socket.h>
  #include <sys/un.h>
 @@ -21,6 +20,7 @@
+ #include "stdio-util.h"
  #include "string-util.h"
  #include "tmpfile-util.h"
- #include "util.h"
 +#include "parse-printf-format.h"
  
  #define SNDBUF_SIZE (8*1024*1024)
  
 -- 
-2.7.4
+2.11.0
 

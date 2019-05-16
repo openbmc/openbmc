@@ -183,16 +183,11 @@
             <listitem><para id='term-container-layer'>
                 <emphasis>Container Layer:</emphasis>
                 Layers that hold other layers.
-                An example of a container layer is the
-                <filename>meta-intel</filename> layer.
-                This layer contains BSP layers for the Intel-core2-32
-                <trademark class='registered'>Intel</trademark> Common Core
-                (Intel-core2-32) and the Intel-corei7-64
-                <trademark class='registered'>Intel</trademark> Common Core
-                (Intel-corei7-64).
-                the <filename>meta-intel</filename> layer also contains
-                the <filename>common/</filename> directory, which contains
-                common content across those layers.
+                An example of a container layer is OpenEmbedded's
+                <ulink url='https://github.com/openembedded/meta-openembedded'><filename>meta-openembedded</filename></ulink>
+                layer.
+                The <filename>meta-openembedded</filename> layer contains
+                many <filename>meta-*</filename> layers.
                 </para></listitem>
             <listitem><para id='cross-development-toolchain'>
                 <emphasis>Cross-Development Toolchain:</emphasis>

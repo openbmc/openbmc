@@ -3,15 +3,9 @@
 # Copyright (c) 2019, Intel Corporation.
 # Copyright (c) 2019, Linux Foundation
 #
-# This program is free software; you can redistribute it and/or modify it
-# under the terms and conditions of the GNU General Public License,
-# version 2, as published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-# more details.
-#
+
 import resulttool.resultutils as resultutils
 import json
 
@@ -64,7 +58,7 @@ def regression_common(args, logger, base_results, target_results):
         if a in target_results:
             base = list(base_results[a].keys())
             target = list(target_results[a].keys())
-            # We may have multiple base/targets which are for different configurations. Start by 
+            # We may have multiple base/targets which are for different configurations. Start by
             # removing any pairs which match
             for c in base.copy():
                 for b in target.copy():
@@ -161,9 +155,9 @@ def register_commands(subparsers):
                                          group='analysis')
     parser_build.set_defaults(func=regression)
     parser_build.add_argument('base_result',
-                              help='base result file/directory for the comparison')
+                              help='base result file/directory/URL for the comparison')
     parser_build.add_argument('target_result',
-                              help='target result file/directory to compare with')
+                              help='target result file/directory/URL to compare with')
     parser_build.add_argument('-b', '--base-result-id', default='',
                               help='(optional) filter the base results to this result ID')
     parser_build.add_argument('-t', '--target-result-id', default='',

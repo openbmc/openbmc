@@ -27,8 +27,6 @@ ALTERNATIVE_LINK_NAME[file] = "${bindir}/file"
 EXTRA_OEMAKE_append_class-target = "-e FILE_COMPILE=${STAGING_BINDIR_NATIVE}/file-native/file"
 EXTRA_OEMAKE_append_class-nativesdk = "-e FILE_COMPILE=${STAGING_BINDIR_NATIVE}/file-native/file"
 
-CFLAGS_append = " -std=c99"
-
 FILES_${PN} += "${datadir}/misc/*.mgc"
 
 do_install_append_class-native() {

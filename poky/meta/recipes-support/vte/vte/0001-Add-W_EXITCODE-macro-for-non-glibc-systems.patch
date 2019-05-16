@@ -1,0 +1,59 @@
+From f78988d3bb5929c857e788a86c7919d6a4ffacc9 Mon Sep 17 00:00:00 2001
+From: Danilo Spinella <danyspin97@protonmail.com>
+Date: Thu, 21 Mar 2019 14:19:26 +0100
+Subject: [PATCH] Add W_EXITCODE macro for non-glibc systems
+
+Upstream-Status: Submitted [1]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+
+[1] https://gitlab.gnome.org/GNOME/vte/issues/72
+
+---
+ src/missing.hh | 21 +++++++++++++++++++++
+ src/widget.cc  |  1 +
+ 2 files changed, 22 insertions(+)
+ create mode 100644 src/missing.hh
+
+diff --git a/src/missing.hh b/src/missing.hh
+new file mode 100644
+index 00000000..1baa993d
+--- /dev/null
++++ b/src/missing.hh
+@@ -0,0 +1,21 @@
++/* Copyright 2019 Danilo Spinella
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 3 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++#ifndef W_EXITCODE
++#define W_EXITCODE(ret, sig) ((ret) << 8 | (sig))
++#endif
++
+diff --git a/src/widget.cc b/src/widget.cc
+index 331ddba9..555a4adf 100644
+--- a/src/widget.cc
++++ b/src/widget.cc
+@@ -21,6 +21,7 @@
+ #include "widget.hh"
+ 
+ #include <sys/wait.h> // for W_EXITCODE
++#include "missing.hh" // for W_EXITCODE on non-glibc systems
+ 
+ #include <new>
+ #include <string>
+-- 
+2.21.0
+

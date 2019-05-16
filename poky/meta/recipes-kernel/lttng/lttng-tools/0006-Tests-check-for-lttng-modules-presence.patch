@@ -3,7 +3,7 @@ From: Jonathan Rajotte <jonathan.rajotte-julien@efficios.com>
 Date: Mon, 25 Mar 2019 14:24:51 -0400
 Subject: [2/2] tests: check for lttng-modules presence
 
-Upstream-status: Accepted [5da3fc8579a9f93ea4767729a107784bf2d034ae]
+Upstream-Status: Accepted [5da3fc8579a9f93ea4767729a107784bf2d034ae]
 Backported to 2.11 and 2.10
 
 Signed-off-by: Jonathan Rajotte <jonathan.rajotte-julien@efficios.com>

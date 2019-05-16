@@ -28,7 +28,10 @@ SRC_URI = " \
     file://0002-Do-not-create-settings-settings-property-documentati.patch \
     file://0003-dlopen-failure.patch \
 "
-SRC_URI_append_libc-musl = " file://musl/0001-Fix-build-with-musl.patch"
+SRC_URI_append_libc-musl = " \
+    file://musl/0001-Fix-build-with-musl-systemd-specific.patch \
+    file://musl/0002-Fix-build-with-musl.patch \
+"
 
 SRC_URI[md5sum] = "10abacaafb162a67d2942adf03e7e9e4"
 SRC_URI[sha256sum] = "8e962833b6ca03edda1bc57ed6614a7b8c2339531b44acef098d05f2324c5d2c"
@@ -47,13 +50,20 @@ EXTRA_OECONF = " \
     --with-udev-dir=${nonarch_base_libdir}/udev \
 "
 
-# gobject-introspection related
-GI_DATA_ENABLED_libc-musl = "False"
-
-# stolen from https://github.com/voidlinux/void-packages/blob/master/srcpkgs/NetworkManager/template
-CFLAGS_libc-musl_append = " \
-    -DHAVE_SECURE_GETENV -Dsecure_getenv=getenv \
-    -D__USE_POSIX199309 -DRTLD_DEEPBIND=0 \
+# stolen from https://github.com/void-linux/void-packages/blob/master/srcpkgs/NetworkManager/template
+# avoids:
+# | ../NetworkManager-1.16.0/libnm-core/nm-json.c:106:50: error: 'RTLD_DEEPBIND' undeclared (first use in this function); did you mean 'RTLD_DEFAULT'?
+#
+# and
+#
+# | In file included from ../NetworkManager-1.16.0/src/systemd/nm-sd-utils-core.c:25:
+# | ../NetworkManager-1.16.0/src/systemd/sd-adapt-core/nm-sd-adapt-core.h:68:6: error: #error neither secure_getenv nor __secure_getenv is available
+# |  #    error neither secure_getenv nor __secure_getenv is available
+# |       ^~~~~
+CFLAGS_append_libc-musl = " \
+    -DRTLD_DEEPBIND=0 \
+    -DHAVE_SECURE_GETENV \
+    -Dsecure_getenv=getenv \
 "
 
 do_compile_prepend() {

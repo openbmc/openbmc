@@ -21,12 +21,16 @@ SRC_URI = "git://github.com/mongodb/mongo.git;branch=v4.0 \
            file://arm64-support.patch \
            file://0001-IntelRDFPMathLib20U1-Check-for-__DEFINED_wchar_t.patch \
            file://0001-Support-deprecated-resolver-functions.patch \
-           file://0001-asio-Dont-use-experimental-with-clang.patch \
            "
 SRC_URI_append_libc-musl ="\
            file://0002-Fix-default-stack-size-to-256K.patch \
            file://0004-wiredtiger-Disable-strtouq-on-musl.patch \
            "
+
+SRC_URI_append_toolchain-clang = "\
+           file://0001-asio-Dont-use-experimental-with-clang.patch \
+           "
+
 S = "${WORKDIR}/git"
 
 COMPATIBLE_HOST ?= '(x86_64|i.86|powerpc64|arm|aarch64).*-linux'

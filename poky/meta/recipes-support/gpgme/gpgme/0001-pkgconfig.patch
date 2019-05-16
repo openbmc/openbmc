@@ -1,7 +1,7 @@
-From 6492c952d61bb93a8bf8200c093d7e491456aa5a Mon Sep 17 00:00:00 2001
+From 98ce65902b197faa8f660564613ca2e504c2f8f8 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
-Date: Fri, 29 Jun 2018 14:35:41 +0800
-Subject: [PATCH 1/7] pkgconfig
+Date: Fri, 10 May 2019 14:23:55 +0800
+Subject: [PATCH] pkgconfig
 
 Update gpgme to use pkgconfig instead of -config files since its
 simpler and less error prone when cross compiling.
@@ -11,7 +11,7 @@ RP 2015/4/17
 
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
-Rebase to 1.11.1
+Rebase to 1.13.0
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
@@ -19,43 +19,40 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  src/Makefile.am         |   4 +-
  src/gpgme-pthread.pc.in |  15 +++++++
  src/gpgme.m4            | 114 ++++--------------------------------------------
- src/gpgme.pc.in         |  15 +++++++
- 5 files changed, 42 insertions(+), 107 deletions(-)
+ src/gpgme.pc.in         |   4 +-
+ 5 files changed, 28 insertions(+), 110 deletions(-)
  create mode 100644 src/gpgme-pthread.pc.in
- create mode 100644 src/gpgme.pc.in
 
 diff --git a/configure.ac b/configure.ac
-index af569ac..865bd10 100644
+index 25184f4..1c0a386 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -895,6 +895,7 @@ AC_CONFIG_FILES(Makefile src/Makefile
-                 src/versioninfo.rc
+@@ -899,6 +899,7 @@ AC_CONFIG_FILES(Makefile src/Makefile
+                 src/gpgme-glib.pc
                  src/gpgme.h)
  AC_CONFIG_FILES(src/gpgme-config, chmod +x src/gpgme-config)
-+AC_CONFIG_FILES(src/gpgme.pc src/gpgme-pthread.pc)
++AC_CONFIG_FILES(src/gpgme-pthread.pc)
  AC_CONFIG_FILES(lang/cpp/Makefile lang/cpp/src/Makefile)
+ AC_CONFIG_FILES(lang/cpp/tests/Makefile)
  AC_CONFIG_FILES(lang/cpp/src/GpgmeppConfig-w32.cmake.in)
- AC_CONFIG_FILES(lang/cpp/src/GpgmeppConfig.cmake.in)
 diff --git a/src/Makefile.am b/src/Makefile.am
-index 1394c02..8451c3a 100644
+index d85a85c..d942f3e 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
-@@ -19,12 +19,14 @@
+@@ -20,11 +20,11 @@
  ## Process this file with automake to produce Makefile.in
  
+ pkgconfigdir = $(libdir)/pkgconfig
+-pkgconfig_DATA = gpgme.pc gpgme-glib.pc
++pkgconfig_DATA = gpgme.pc gpgme-glib.pc gpgme-pthread.pc
+ 
  EXTRA_DIST = gpgme-config.in gpgme.m4 libgpgme.vers ChangeLog-2011 \
--	     gpgme.h.in versioninfo.rc.in gpgme.def
-+	     gpgme.h.in versioninfo.rc.in gpgme.def gpgme.pc.in gpgme-pthread.pc.in
+ 	     gpgme.h.in versioninfo.rc.in gpgme.def \
+-	     gpgme.pc.in gpgme-glib.pc.in
++	     gpgme.pc.in gpgme-glib.pc.in gpgme-pthread.pc.in
  
  bin_SCRIPTS = gpgme-config
  m4datadir = $(datadir)/aclocal
- m4data_DATA = gpgme.m4
- nodist_include_HEADERS = gpgme.h
-+pkgconfigdir = $(libdir)/pkgconfig
-+pkgconfig_DATA = gpgme.pc gpgme-pthread.pc
- 
- bin_PROGRAMS = gpgme-tool gpgme-json
- 
 diff --git a/src/gpgme-pthread.pc.in b/src/gpgme-pthread.pc.in
 new file mode 100644
 index 0000000..074bbf6
@@ -277,27 +274,18 @@ index 6c2be44..d8a75cb 100644
 -  AC_SUBST(GPGME_GLIB_LIBS)
  ])
 diff --git a/src/gpgme.pc.in b/src/gpgme.pc.in
-new file mode 100644
-index 0000000..b69539f
---- /dev/null
+index be288b8..16f56ac 100644
+--- a/src/gpgme.pc.in
 +++ b/src/gpgme.pc.in
-@@ -0,0 +1,15 @@
-+prefix=@prefix@
-+exec_prefix=@exec_prefix@
-+libdir=@libdir@
-+includedir=@includedir@
-+
-+# API info
-+api_version=@GPGME_CONFIG_API_VERSION@
-+host=@GPGME_CONFIG_HOST@
-+
-+Name: gpgme
-+Description: GnuPG Made Easy (GPGME) is a C language library that allows to addsupport for cryptography to a program.
-+Version: @VERSION@
-+Libs: -L${libdir} -lgpgme
+@@ -9,6 +9,6 @@ Name: gpgme
+ Description: GnuPG Made Easy to access GnuPG
+ Requires: gpg-error, libassuan
+ Version: @PACKAGE_VERSION@
+-Cflags: @GPGME_CONFIG_CFLAGS@
+-Libs: @GPGME_CONFIG_LIBS@
 +Cflags: -I${includedir}
-+Requires: libassuan gpg-error
-\ No newline at end of file
++Libs: -L${libdir} -lgpgme
+ URL: https://www.gnupg.org/software/gpgme/index.html
 -- 
 2.7.4
 

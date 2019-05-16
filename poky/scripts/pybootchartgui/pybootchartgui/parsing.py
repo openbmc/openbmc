@@ -267,7 +267,7 @@ def _parse_headers(file):
             value = line.strip()
         headers[last] += value
         return headers, last
-    return reduce(parse, file.read().decode('utf-8').split('\n'), (defaultdict(str),''))[0]
+    return reduce(parse, file.read().split('\n'), (defaultdict(str),''))[0]
 
 def _parse_timed_blocks(file):
     """Parses (ie., splits) a file into so-called timed-blocks. A
@@ -281,7 +281,7 @@ def _parse_timed_blocks(file):
             return (int(lines[0]), lines[1:])
         except ValueError:
             raise ParseError("expected a timed-block, but timestamp '%s' is not an integer" % lines[0])
-    blocks = file.read().decode('utf-8').split('\n\n')
+    blocks = file.read().split('\n\n')
     return [parse(block) for block in blocks if block.strip() and not block.endswith(' not running\n')]
 
 def _parse_proc_ps_log(writer, file):
@@ -577,7 +577,7 @@ def _parse_dmesg(writer, file):
     processMap['k-boot'] = kernel
     base_ts = False
     max_ts = 0
-    for line in file.read().decode('utf-8').split('\n'):
+    for line in file.read().split('\n'):
         t = timestamp_re.match (line)
         if t is None:
 #                       print "duff timestamp " + line
@@ -665,7 +665,7 @@ def _parse_pacct(writer, file):
 def _parse_paternity_log(writer, file):
     parent_map = {}
     parent_map[0] = 0
-    for line in file.read().decode('utf-8').split('\n'):
+    for line in file.read().split('\n'):
         if not line:
             continue
         elems = line.split(' ') # <Child> <Parent>
@@ -678,7 +678,7 @@ def _parse_paternity_log(writer, file):
 
 def _parse_cmdline_log(writer, file):
     cmdLines = {}
-    for block in file.read().decode('utf-8').split('\n\n'):
+    for block in file.read().split('\n\n'):
         lines = block.split('\n')
         if len (lines) >= 3:
 #                       print "Lines '%s'" % (lines[0])
@@ -751,7 +751,7 @@ def parse_file(writer, state, filename):
     if state.filename is None:
         state.filename = filename
     basename = os.path.basename(filename)
-    with open(filename, "rb") as file:
+    with open(filename, "r") as file:
         return _do_parse(writer, state, filename, file)
 
 def parse_paths(writer, state, paths):

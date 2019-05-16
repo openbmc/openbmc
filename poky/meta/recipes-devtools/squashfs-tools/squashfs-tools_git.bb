@@ -44,3 +44,5 @@ ARM_INSTRUCTION_SET_armv5 = "arm"
 ARM_INSTRUCTION_SET_armv6 = "arm"
 
 BBCLASSEXTEND = "native nativesdk"
+
+CVE_PRODUCT = "squashfs"

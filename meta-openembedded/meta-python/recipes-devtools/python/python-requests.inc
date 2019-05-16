@@ -23,4 +23,6 @@ RDEPENDS_${PN} += " \
     ${PYTHON_PN}-idna \
 "
 
+CVE_PRODUCT = "requests"
+
 BBCLASSEXTEND = "native nativesdk"

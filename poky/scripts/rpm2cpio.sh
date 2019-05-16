@@ -1,5 +1,4 @@
 #!/bin/sh -efu
-
 # This file comes from rpm 4.x distribution
 
 fatal() {

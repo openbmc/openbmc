@@ -1,4 +1,6 @@
-# vi:sts=4:sw=4:et
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
 """Code for parsing OpenEmbedded license strings"""
 
 import ast

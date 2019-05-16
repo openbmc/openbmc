@@ -1,12 +1,14 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import importlib
 from oeqa.utils.commands import runCmd
 import oeqa.selftest
 from oeqa.selftest.case import OESelftestTestCase
-from oeqa.core.decorator.oeid import OETestID
 
 class ExternalLayer(OESelftestTestCase):
 
-    @OETestID(1885)
     def test_list_imported(self):
         """
         Summary: Checks functionality to import tests from other layers.

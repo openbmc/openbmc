@@ -284,6 +284,7 @@ ALTERNATIVE_LINK_NAME[wall.1] = "${mandir}/man1/wall.1"
 
 BBCLASSEXTEND = "native nativesdk"
 
+PTEST_BINDIR = "1"
 do_compile_ptest() {
     oe_runmake buildtest-TESTS
 }
@@ -312,8 +313,8 @@ do_install_ptest() {
         '/^\tif[[:space:]]\[[[:space:]]![[:space:]]-x[[:space:]]"$1"/s|$1|`which $1 2>/dev/null`|g' \
          ${D}${PTEST_PATH}/tests/functions.sh
 
-    # "kill -L" behaves differently than "/bin/kill -L" so we need an additional fix
+    # Running "kill" without the the complete path would use the shell's built-in kill
     sed -i -e \
-         '/^TS_CMD_KILL/ s|kill|/bin/kill|g' \
+         '/^TS_CMD_KILL/ s|kill|${PTEST_PATH}/bin/kill|g' \
          ${D}${PTEST_PATH}/tests/commands.sh
 }

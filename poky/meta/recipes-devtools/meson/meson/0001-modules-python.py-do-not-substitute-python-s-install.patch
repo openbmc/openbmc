@@ -1,0 +1,44 @@
+From 1d178fb2928d325e339b15972890ceced863d3ec Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 18 Apr 2019 17:36:11 +0200
+Subject: [PATCH] modules/python.py: do not substitute python's install prefix
+ with meson's
+
+Not sure why this is being done, but it
+a) relies on Python's internal variable substitution which may break in the future
+b) shouldn't be necessary as Python's prefix ought to be correct in the first place
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ mesonbuild/modules/python.py | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/mesonbuild/modules/python.py b/mesonbuild/modules/python.py
+index 6e2c63b..f5a37ac 100644
+--- a/mesonbuild/modules/python.py
++++ b/mesonbuild/modules/python.py
+@@ -254,7 +254,7 @@ import sysconfig
+ import json
+ import sys
+ 
+-install_paths = sysconfig.get_paths(scheme='posix_prefix', vars={'base': '', 'platbase': '', 'installed_base': ''})
++install_paths = sysconfig.get_paths(scheme='posix_prefix')
+ 
+ def links_against_libpython():
+     from distutils.core import Distribution, Extension
+@@ -279,12 +279,11 @@ class PythonInstallation(ExternalProgramHolder):
+         ExternalProgramHolder.__init__(self, python)
+         self.interpreter = interpreter
+         self.subproject = self.interpreter.subproject
+-        prefix = self.interpreter.environment.coredata.get_builtin_option('prefix')
+         self.variables = info['variables']
+         self.paths = info['paths']
+         install_paths = info['install_paths']
+-        self.platlib_install_path = os.path.join(prefix, install_paths['platlib'][1:])
+-        self.purelib_install_path = os.path.join(prefix, install_paths['purelib'][1:])
++        self.platlib_install_path = install_paths['platlib']
++        self.purelib_install_path = install_paths['purelib']
+         self.version = info['version']
+         self.platform = info['platform']
+         self.is_pypy = info['is_pypy']

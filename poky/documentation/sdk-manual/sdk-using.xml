@@ -18,8 +18,8 @@
     </para>
 
     <para>
-        You can use a standard SDK to work on Makefile, Autotools, and
-        <trademark class='trade'>Eclipse</trademark>-based projects.
+        You can use a standard SDK to work on Makefile and Autotools-based
+        projects.
         See the
         "<link linkend='sdk-working-projects'>Using the SDK Toolchain Directly</link>"
         chapter for more information.
@@ -111,11 +111,6 @@
                 For information on building the installer, see the
                 "<link linkend='sdk-building-an-sdk-installer'>Building an SDK Installer</link>"
                 section.
-                Another helpful resource for building an installer is the
-                <ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'>Cookbook guide to Making an Eclipse Debug Capable Image</ulink>
-                wiki page.
-                This wiki page focuses on development when using the Eclipse
-                IDE.
             </note>
         </para>
 

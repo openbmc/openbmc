@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
 def get_os_release():
     """Get all key-value pairs from /etc/os-release as a dict"""
     from collections import OrderedDict

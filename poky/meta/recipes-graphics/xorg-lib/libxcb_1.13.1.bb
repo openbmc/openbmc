@@ -12,7 +12,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d763b081cb10c223435b01e00dc0aba7"
 SRC_URI = "http://xcb.freedesktop.org/dist/libxcb-${PV}.tar.bz2 \
            file://xcbincludedir.patch \
            file://disable-check.patch \
-           file://gcc-mips-pr68302-mips-workaround.patch \
           "
 
 SRC_URI[md5sum] = "f33cdfc67346f7217a9326c0d8679975"
@@ -30,7 +29,6 @@ inherit autotools pkgconfig distro_features_check
 
 # The libxau and others requires x11 in DISTRO_FEATURES
 REQUIRED_DISTRO_FEATURES = "x11"
-REQUIRED_DISTRO_FEATURES_class-native = ""
 
 export PYTHON = "python3"
 

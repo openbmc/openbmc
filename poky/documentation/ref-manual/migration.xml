@@ -4506,8 +4506,8 @@ id=f4d4f99cfbc2396e49c1613a7d237b9e57f06f81'>commit message</ulink>.
                     </para></listitem>
                 <listitem><para>
                     <emphasis>fsimage Plug-in Removed:</emphasis>
-                    The Wic fsimage plug-in has been removed as it duplicates
-                    functionality of the rawcopy plug-in.
+                    The Wic fsimage plugin has been removed as it duplicates
+                    functionality of the rawcopy plugin.
                     </para></listitem>
             </itemizedlist>
         </para>
@@ -6320,6 +6320,280 @@ id=f4d4f99cfbc2396e49c1613a7d237b9e57f06f81'>commit message</ulink>.
                     <filename>dhcpd6.service</filename> for IPv6 DHCP rather
                     than re-using <filename>dhcpd.conf</filename>, which is
                     now reserved for IPv4.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+</section>
+
+<section id='moving-to-the-yocto-project-2.7-release'>
+    <title>Moving to the Yocto Project 2.7 Release</title>
+
+    <para>
+        This section provides migration information for moving to the
+        Yocto Project 2.7 Release from the prior release.
+    </para>
+
+    <section id='migration-2.7-bitbake-changes'>
+        <title>BitBake Changes</title>
+
+        <para>
+            The following changes have been made to BitBake:
+            <itemizedlist>
+                <listitem><para>
+                    BitBake now checks anonymous Python functions and pure
+                    Python functions (e.g. <filename>def funcname:</filename>)
+                    in the metadata for tab indentation.
+                    If found, BitBake  produces a warning.
+                    </para></listitem>
+                <listitem><para>
+                    Bitbake now checks
+                    <link linkend='var-BBFILE_COLLECTIONS'><filename>BBFILE_COLLECTIONS</filename></link>
+                    for duplicate entries and triggers an error if any are
+                    found.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='migration-2.7-eclipse-support-dropped'>
+        <title><trademark class='trade'>Eclipse</trademark> Support Removed</title>
+
+        <para>
+            Support for the Eclipse IDE has been removed.
+            Support continues for those releases prior to 2.7 that did include
+            support.
+            The 2.7 release does not include the Eclipse Yocto plugin.
+        </para>
+    </section>
+
+    <section id='migration-2.7-qemu-native-splits-system-and-user-mode-parts'>
+        <title><filename>qemu-native</filename> Splits the System and User-Mode Parts</title>
+
+        <para>
+            The system and user-mode parts of <filename>qemu-native</filename>
+            are now split.
+            <filename>qemu-native</filename> provides the user-mode components
+            and <filename>qemu-system-native</filename> provides the system
+            components.
+            If you have recipes that depend on QEMU's system emulation
+            functionality at build time, they should now depend upon
+            <filename>qemu-system-native</filename> instead of
+            <filename>qemu-native</filename>.
+        </para>
+    </section>
+
+    <section id='migration-2.7-upstream-tracking.inc-removed'>
+        <title>The <filename>upstream-tracking.inc</filename> File Has Been Removed</title>
+
+        <para>
+            The previously deprecated <filename>upstream-tracking.inc</filename>
+            file is now removed.
+            Any <filename>UPSTREAM_TRACKING*</filename> variables are now set
+            in the corresponding recipes instead.
+        </para>
+
+        <para>
+            Remove any references you have to the
+            <filename>upstream-tracking.inc</filename> file in your
+            configuration.
+        </para>
+    </section>
+
+    <section id='migration-2.7-distro-features-libc-removed'>
+        <title>The <filename>DISTRO_FEATURES_LIBC</filename> Variable Has Been Removed</title>
+
+        <para>
+            The <filename>DISTRO_FEATURES_LIBC</filename> variable is no
+            longer used.
+            The ability to configure glibc using kconfig has been removed
+            for quite some time making the <filename>libc-*</filename> features
+            set no longer effective.
+        </para>
+
+        <para>
+            Remove any references you have to
+            <filename>DISTRO_FEATURES_LIBC</filename> in your own layers.
+        </para>
+    </section>
+
+    <section id='migration-2.7-license-values'>
+        <title>License Value Corrections</title>
+
+        <para>
+            The following corrections have been made to the
+            <link linkend='var-LICENSE'><filename>LICENSE</filename></link>
+            values set by recipes:
+            <literallayout class='monospaced'>
+     <emphasis>socat</emphasis>: Corrected <filename>LICENSE</filename> to be "GPLv2" rather than
+        "GPLv2+".
+
+     <emphasis>libgfortran</emphasis>: Set license to "GPL-3.0-with-GCC-exception".
+
+     <emphasis>elfutils</emphasis>: Removed "Elfutils-Exception" and set to "GPLv2" for shared
+        libraries
+            </literallayout>
+        </para>
+    </section>
+
+    <section id='migration-2.7-packaging-changes'>
+        <title>Packaging Changes</title>
+
+        <para>
+            This section provides information about packaging changes.
+            <itemizedlist>
+                <listitem><para>
+                    <filename>bind</filename>: The
+                    <filename>nsupdate</filename> binary has been moved to
+                    the <filename>bind-utils</filename> package.
+                    </para></listitem>
+                <listitem><para>
+                    Debug split: The default debug split has been changed to
+                    create separate source packages (i.e.
+                    <replaceable>package_name</replaceable><filename>-dbg</filename>
+                    and
+                    <replaceable>package_name</replaceable><filename>-src</filename>).
+                    If you are currently using <filename>dbg-pkgs</filename>
+                    in
+                    <link linkend='var-IMAGE_FEATURES'><filename>IMAGE_FEATURES</filename></link>
+                    to bring in debug symbols and you still need the sources,
+                    you must now also add <filename>src-pkgs</filename> to
+                    <filename>IMAGE_FEATURES</filename>.
+                    Source packages remain in the target portion of the SDK
+                    by default, unless you have set your own value for
+                    <link linkend='var-SDKIMAGE_FEATURES'><filename>SDKIMAGE_FEATURES</filename></link>
+                    that does not include <filename>src-pkgs</filename>.
+                    </para></listitem>
+                <listitem><para>
+                    Mount all using <filename>util-linux</filename>:
+                    <filename>/etc/default/mountall</filename> has
+                    moved into the -mount sub-package.
+                    </para></listitem>
+                <listitem><para>
+                    Splitting binaries using <filename>util-linux</filename>:
+                    <filename>util-linux</filename> now splits each binary into
+                    its own package for fine-grained control.
+                    The main <filename>util-linux</filename> package pulls in
+                    the individual binary packages using the
+                    <link linkend='var-RRECOMMENDS'><filename>RRECOMMENDS</filename></link>
+                    and
+                    <link linkend='var-RDEPENDS'><filename>RDEPENDS</filename></link>
+                    variables.
+                    As a result, existing images should not see any changes
+                    assuming
+                    <link linkend='var-NO_RECOMMENDATIONS'><filename>NO_RECOMMENDATIONS</filename></link>
+                    is not set.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>netbase/base-files</filename>:
+                    <filename>/etc/hosts</filename> has moved from
+                    <filename>netbase</filename> to
+                    <filename>base-files</filename>.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>tzdata</filename>: The main package has been
+                    converted to an empty meta package that pulls in all
+                    <filename>tzdata</filename> packages by default.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>lrzsz</filename>: This package has been removed
+                    from <filename>packagegroup-self-hosted</filename> and
+                    <filename>packagegroup-core-tools-testapps</filename>.
+                    The X/Y/ZModem support is less likely to be needed on
+                    modern systems.
+                    If you are relying on these packagegroups to include the
+                    <filename>lrzsz</filename> package in your image, you
+                    now need to explicitly add the package.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='migration-2.7-removed-recipes'>
+        <title>Removed Recipes</title>
+
+        <para>
+            The following recipes have been removed:
+            <literallayout class='monospaced'>
+     <emphasis>gcc</emphasis>: Drop version 7.3 recipes. Version 8.3 now remains.
+
+     <emphasis>linux-yocto</emphasis>: Drop versions 4.14 and 4.18 recipes. Versions 4.19 and 5.0 remain.
+
+     <emphasis>go</emphasis>: Drop version 1.9 recipes. Versions 1.11 and 1.12 remain.
+
+     <emphasis>xvideo-tests</emphasis>: Became obsolete.
+
+     <emphasis>libart-lgpl</emphasis>: Became obsolete.
+
+     <emphasis>gtk-icon-utils-native</emphasis>: These tools are now provided by gtk+3-native
+
+     <emphasis>gcc-cross-initial</emphasis>: No longer needed. gcc-cross/gcc-crosssdk is now used instead.
+
+     <emphasis>gcc-crosssdk-initial</emphasis>: No longer needed. gcc-cross/gcc-crosssdk is now used instead.
+
+     <emphasis>glibc-initial</emphasis>: Removed because the benefits of having it for site_config are
+        currently outweighed by the cost of building the recipe.
+            </literallayout>
+         </para>
+    </section>
+
+    <section id='migration-2.7-removed-classes'>
+        <title>Removed Classes</title>
+
+        <para>
+            The following classes have been removed:
+            <literallayout class='monospaced'>
+     <emphasis>distutils-tools</emphasis>: This class was never used.
+
+     <emphasis>bugzilla.bbclass</emphasis>: Became obsolete.
+
+     <emphasis>distrodata</emphasis>: This functionally has been replaced by a more modern
+         tinfoil-based implementation.
+            </literallayout>
+        </para>
+    </section>
+
+    <section id='migration-2.7-miscellaneous-changes'>
+        <title>Miscellaneous Changes</title>
+
+        <para>
+            The following miscellaneous changes occurred:
+            <itemizedlist>
+                <listitem><para>
+                    The <filename>distro</filename> subdirectory of the Poky
+                    repository has been removed from the top-level
+                    <filename>scripts</filename> directory.
+                    </para></listitem>
+                <listitem><para>
+                    Perl now builds for the target using
+                    <ulink url='http://arsv.github.io/perl-cross/'><filename>perl-cross</filename></ulink>
+                    for better maintainability and improved build performance.
+                    This change should not present any problems unless you have
+                    heavily customized your Perl recipe.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>arm-tunes</filename>: Removed the "-march"
+                    option if mcpu is already added.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>update-alternatives</filename>: Convert file
+                    renames to
+                    <link linkend='var-PACKAGE_PREPROCESS_FUNCS'><filename>PACKAGE_PREPROCESS_FUNCS</filename></link>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>base/pixbufcache</filename>: Obsolete
+                    <filename>sstatecompletions</filename> code has been
+                    removed.
+                    </para></listitem>
+                <listitem><para>
+                    <link linkend='ref-classes-native'><filename>native</filename></link>
+                    class:
+                    <link linkend='var-RDEPENDS'><filename>RDEPENDS</filename></link>
+                    handling has been enabled.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>inetutils</filename>: This recipe has rsh
+                    disabled.
                     </para></listitem>
             </itemizedlist>
         </para>

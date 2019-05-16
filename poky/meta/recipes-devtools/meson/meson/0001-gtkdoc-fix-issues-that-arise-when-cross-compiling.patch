@@ -27,7 +27,7 @@ index bf49770..7c5a363 100644
                  '--mode=' + mode]
          if namespace:
              args.append('--namespace=' + namespace)
-+        gtkdoc_exe_wrapper = state.environment.cross_info.config["properties"].get('gtkdoc_exe_wrapper', None)
++        gtkdoc_exe_wrapper = state.environment.properties.host.get('gtkdoc_exe_wrapper', None)
 +        if gtkdoc_exe_wrapper is not None:
 +            args.append('--run=' + gtkdoc_exe_wrapper)
 +

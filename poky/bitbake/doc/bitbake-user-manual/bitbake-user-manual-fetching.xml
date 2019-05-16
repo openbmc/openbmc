@@ -832,7 +832,13 @@
                         Bazaar (<filename>bzr://</filename>)
                         </para></listitem>
                     <listitem><para>
-                        Trees using Git Annex (<filename>gitannex://</filename>)
+                        Mercurial (<filename>hg://</filename>)
+                        </para></listitem>
+                    <listitem><para>
+                        npm (<filename>npm://</filename>)
+                        </para></listitem>
+                    <listitem><para>
+                        OSC (<filename>osc://</filename>)
                         </para></listitem>
                     <listitem><para>
                         Secure FTP (<filename>sftp://</filename>)
@@ -841,10 +847,7 @@
                         Secure Shell (<filename>ssh://</filename>)
                         </para></listitem>
                     <listitem><para>
-                        OSC (<filename>osc://</filename>)
-                        </para></listitem>
-                    <listitem><para>
-                        Mercurial (<filename>hg://</filename>)
+                        Trees using Git Annex (<filename>gitannex://</filename>)
                         </para></listitem>
                 </itemizedlist>
                 No documentation currently exists for these lesser used

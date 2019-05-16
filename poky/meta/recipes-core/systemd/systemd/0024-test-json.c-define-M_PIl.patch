@@ -14,11 +14,11 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  1 file changed, 4 insertions(+)
 
 diff --git a/src/test/test-json.c b/src/test/test-json.c
-index fdf1b4f..fa541f8 100644
+index 9b8a2a9..efc746c 100644
 --- a/src/test/test-json.c
 +++ b/src/test/test-json.c
-@@ -10,6 +10,10 @@
- #include "strv.h"
+@@ -11,6 +11,10 @@
+ #include "tests.h"
  #include "util.h"
  
 +#ifndef M_PIl
@@ -29,5 +29,5 @@ index fdf1b4f..fa541f8 100644
          unsigned line = 0, column = 0;
          void *state = NULL;
 -- 
-2.7.4
+2.11.0
 

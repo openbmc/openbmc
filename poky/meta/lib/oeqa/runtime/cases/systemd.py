@@ -1,9 +1,12 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import re
 import time
 
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
-from oeqa.core.decorator.oeid import OETestID
 from oeqa.core.decorator.data import skipIfDataVar, skipIfNotDataVar
 from oeqa.runtime.decorator.package import OEHasPackage
 from oeqa.core.decorator.data import skipIfNotFeature
@@ -78,12 +81,10 @@ class SystemdBasicTests(SystemdTest):
     def test_systemd_basic(self):
         self.systemctl('--version')
 
-    @OETestID(551)
     @OETestDepends(['systemd.SystemdBasicTests.test_systemd_basic'])
     def test_systemd_list(self):
         self.systemctl('list-unit-files')
 
-    @OETestID(550)
     @OETestDepends(['systemd.SystemdBasicTests.test_systemd_basic'])
     def test_systemd_failed(self):
         settled, output = self.settle()
@@ -104,7 +105,6 @@ class SystemdServiceTests(SystemdTest):
     def test_systemd_status(self):
         self.systemctl('status --full', 'avahi-daemon.service')
 
-    @OETestID(695)
     @OETestDepends(['systemd.SystemdServiceTests.test_systemd_status'])
     def test_systemd_stop_start(self):
         self.systemctl('stop', 'avahi-daemon.service')
@@ -113,7 +113,6 @@ class SystemdServiceTests(SystemdTest):
         self.systemctl('start','avahi-daemon.service')
         self.systemctl('is-active', 'avahi-daemon.service', verbose=True)
 
-    @OETestID(696)
     @OETestDepends(['systemd.SystemdServiceTests.test_systemd_status'])
     def test_systemd_disable_enable(self):
         self.systemctl('disable', 'avahi-daemon.service')

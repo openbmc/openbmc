@@ -48,5 +48,5 @@ RDEPENDS_packagegroup-meta-multimedia-mkv = "\
     "
 
 RDEPENDS_packagegroup-meta-multimedia-support = "\
-    liboil libmediaart libmediaart-2.0 gst-instruments libsrtp crossguid \
+    libmediaart libmediaart-2.0 gst-instruments libsrtp crossguid \
     "

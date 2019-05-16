@@ -27,6 +27,7 @@ DEPENDS += "itstool-native gsettings-desktop-schemas virtual/libx11 gtk+3 startu
 inherit distro_features_check gtk-doc
 REQUIRED_DISTRO_FEATURES = "x11"
 
+GTKDOC_MESON_OPTION = "gtk_doc"
 EXTRA_OEMESON = "-Ddesktop_docs=false"
 
 PACKAGES =+ "libgnome-desktop3"

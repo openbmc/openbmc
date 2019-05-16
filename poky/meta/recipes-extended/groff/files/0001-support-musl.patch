@@ -1,0 +1,41 @@
+From 695965c27be74acb5968f19d51af86065c4b71a9 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 13 May 2019 09:48:14 +0800
+Subject: [PATCH] support musl
+
+...
+|./lib/math.h:2877:1: error: 'int signbit(float)' conflicts with a previous declaration
+| _GL_MATH_CXX_REAL_FLOATING_DECL_2 (signbit)
+| ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+|In file included from recipe-sysroot/usr/include/c++/8.3.0/math.h:36,
+|                 from ./lib/math.h:27,
+|                 from ./src/include/driver.h:27,
+|                 from src/devices/grodvi/dvi.cpp:20:
+|recipe-sysroot/usr/include/c++/8.3.0/cmath:661:3: note: previous declaration 'constexpr bool std::signbit(float)'
+|   signbit(float __x)
+|   ^~~~~~~
+...
+
+Upstream-Status: Backport [http://git.savannah.gnu.org/gitweb/?p=gnulib.git;a=commit;h=453ff940449bbbde9ec00f0bbf82a359c5598fc7]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ gnulib_m4/signbit.m4 | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/gnulib_m4/signbit.m4 b/gnulib_m4/signbit.m4
+index 9e7884d..8b9c70c 100644
+--- a/gnulib_m4/signbit.m4
++++ b/gnulib_m4/signbit.m4
+@@ -31,6 +31,8 @@ AC_DEFUN([gl_SIGNBIT],
+         [case "$host_os" in
+                           # Guess yes on glibc systems.
+            *-gnu* | gnu*) gl_cv_func_signbit="guessing yes" ;;
++                          # Guess yes on musl systems.
++           *-musl*)       gl_cv_func_signbit="guessing yes" ;;
+                           # Guess yes on native Windows.
+            mingw*)        gl_cv_func_signbit="guessing yes" ;;
+                           # If we don't know, assume the worst.
+-- 
+2.7.4
+

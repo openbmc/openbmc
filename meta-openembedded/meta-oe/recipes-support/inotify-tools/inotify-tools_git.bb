@@ -5,11 +5,10 @@ SECTION = "console/devel"
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ac6c26e52aea428ee7f56dc2c56424c6"
 
-SRCREV = "1df9af4d6cd0f4af4b1b19254bcf056aed4ae395"
-PV = "3.14+git${SRCPV}"
+SRCREV = "e203934e46784bb34c213078423ba1678e0c4936"
+PV = "3.20.1"
 
 SRC_URI = "git://github.com/rvoicilas/${BPN} \
-           file://inotifywait-fix-compile-error-with-GCC-6.patch \
            file://inotify-nosys-fix-system-call-number.patch \
           "
 

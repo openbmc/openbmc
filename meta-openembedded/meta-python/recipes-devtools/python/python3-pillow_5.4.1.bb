@@ -23,6 +23,8 @@ DEPENDS += " \
     openjpeg \
 "
 
+CVE_PRODUCT = "pillow"
+
 S = "${WORKDIR}/git"
 
 BBCLASSEXTEND = "native"

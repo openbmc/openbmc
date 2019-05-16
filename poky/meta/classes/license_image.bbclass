@@ -102,7 +102,7 @@ def write_license_files(d, license_manifest, pkg_dic, rootfs=True):
         rootfs_license_manifest = os.path.join(rootfs_license_dir,
                 os.path.split(license_manifest)[1])
         if not os.path.exists(rootfs_license_manifest):
-            os.link(license_manifest, rootfs_license_manifest)
+            oe.path.copyhardlink(license_manifest, rootfs_license_manifest)
 
         if copy_lic_dirs == "1":
             for pkg in sorted(pkg_dic):
@@ -136,7 +136,7 @@ def write_license_files(d, license_manifest, pkg_dic, rootfs=True):
                             continue
 
                         if not os.path.exists(rootfs_license):
-                            os.link(pkg_license, rootfs_license)
+                            oe.path.copyhardlink(pkg_license, rootfs_license)
 
                         if not os.path.exists(pkg_rootfs_license):
                             os.symlink(os.path.join('..', lic), pkg_rootfs_license)
@@ -146,7 +146,7 @@ def write_license_files(d, license_manifest, pkg_dic, rootfs=True):
                                 os.path.exists(pkg_rootfs_license)):
                             continue
 
-                        os.link(pkg_license, pkg_rootfs_license)
+                        oe.path.copyhardlink(pkg_license, pkg_rootfs_license)
             # Fixup file ownership and permissions
             for walkroot, dirs, files in os.walk(rootfs_license_dir):
                 for f in files:

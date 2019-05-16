@@ -1,0 +1,76 @@
+Changes to allow ptest to run standalone on target:
+
+a) Run the tests serially
+b) Use the standalone test mode which allows the tests to be run in their
+  'installled' locations on target (but not any of the standalone build pieces)
+c) We want to use the binaries from their installed locations so the run-subr
+   script needs tweaking to run them like that. The rpath conditional isn't
+   enough since we want the second entry in the case statement.
+d) Add an oecheck make target which we can use to build the test binaries we need
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Upstream-Status: Inappropriate [oe specific]
+
+Index: elfutils-0.176/configure.ac
+===================================================================
+--- elfutils-0.176.orig/configure.ac
++++ elfutils-0.176/configure.ac
+@@ -45,7 +45,7 @@ AC_COPYRIGHT([Copyright (C) 1996-2018 Th
+ AC_PREREQ(2.63)			dnl Minimum Autoconf version required.
+ 
+ dnl We use GNU make extensions; automake 1.10 defaults to -Wportability.
+-AM_INIT_AUTOMAKE([gnits 1.11 -Wno-portability dist-bzip2 no-dist-gzip parallel-tests])
++AM_INIT_AUTOMAKE([gnits 1.11 -Wno-portability dist-bzip2 no-dist-gzip serial-tests])
+ AM_MAINTAINER_MODE
+ 
+ AM_SILENT_RULES([yes])
+Index: elfutils-0.176/tests/Makefile.am
+===================================================================
+--- elfutils-0.176.orig/tests/Makefile.am
++++ elfutils-0.176/tests/Makefile.am
+@@ -445,10 +445,10 @@ installed_TESTS_ENVIRONMENT = libdir=$(D
+ installed_LOG_COMPILER = $(abs_srcdir)/test-wrapper.sh \
+ 			 installed $(tests_rpath) \
+ 			 '$(program_transform_name)'
+-if STANDALONE
++if !STANDALONE
+ TESTS_ENVIRONMENT = $(installed_TESTS_ENVIRONMENT)
+ LOG_COMPILER = $(installed_LOG_COMPILER)
+-else !STANDALONE
++else STANDALONE
+ TESTS_ENVIRONMENT = LC_ALL=C; LANG=C; VALGRIND_CMD=$(valgrind_cmd); \
+ 		    abs_srcdir=$(abs_srcdir);  abs_builddir=$(abs_builddir); \
+ 		    abs_top_builddir=$(abs_top_builddir); \
+@@ -463,7 +463,7 @@ installcheck-local:
+ 	$(MAKE) $(AM_MAKEFLAGS) \
+ 		TESTS_ENVIRONMENT="$(installed_TESTS_ENVIRONMENT)" \
+ 		LOG_COMPILER="$(installed_LOG_COMPILER)" check-TESTS
+-endif !STANDALONE
++endif STANDALONE
+ 
+ if STANDALONE
+ libdw = -ldw
+@@ -612,3 +612,5 @@ check: check-am coverage
+ coverage:
+ 	-$(srcdir)/coverage.sh
+ endif
++oecheck:
++	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
+Index: elfutils-0.176/tests/test-subr.sh
+===================================================================
+--- elfutils-0.176.orig/tests/test-subr.sh
++++ elfutils-0.176/tests/test-subr.sh
+@@ -91,12 +91,6 @@ installed_testrun()
+   program="$1"
+   shift
+   case "$program" in
+-  ${abs_builddir}/*)
+-    if [ "x$elfutils_tests_rpath" != xno ]; then
+-      echo >&2 installcheck not possible with --enable-tests-rpath
+-      exit 77
+-    fi
+-    ;;
+   ${abs_top_builddir}/src/*)
+     program=${bindir}/`program_transform ${program##*/}`
+     ;;

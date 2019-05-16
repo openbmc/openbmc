@@ -3,15 +3,9 @@
 # Copyright (c) 2019, Intel Corporation.
 # Copyright (c) 2019, Linux Foundation
 #
-# This program is free software; you can redistribute it and/or modify it
-# under the terms and conditions of the GNU General Public License,
-# version 2, as published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-# more details.
-#
+
 import os
 import glob
 import json
@@ -23,6 +17,8 @@ import oeqa.utils.gitarchive as gitarchive
 class ResultsTextReport(object):
     def __init__(self):
         self.ptests = {}
+        self.ltptests = {}
+        self.ltpposixtests = {}
         self.result_types = {'passed': ['PASSED', 'passed'],
                              'failed': ['FAILED', 'failed', 'ERROR', 'error', 'UNKNOWN'],
                              'skipped': ['SKIPPED', 'skipped']}
@@ -57,6 +53,69 @@ class ResultsTextReport(object):
             if status in self.result_types[tk]:
                 self.ptests[suite][tk] += 1
 
+    def handle_ltptest_result(self, k, status, result):
+        if k == 'ltpresult.sections':
+            # Ensure tests without any test results still show up on the report
+            for suite in result['ltpresult.sections']:
+                if suite not in self.ltptests:
+                    self.ltptests[suite] = {'passed': 0, 'failed': 0, 'skipped': 0, 'duration' : '-', 'failed_testcases': []}
+                if 'duration' in result['ltpresult.sections'][suite]:
+                    self.ltptests[suite]['duration'] = result['ltpresult.sections'][suite]['duration']
+                if 'timeout' in result['ltpresult.sections'][suite]:
+                    self.ltptests[suite]['duration'] += " T"
+            return
+        try:
+            _, suite, test = k.split(".", 2)
+        except ValueError:
+            return
+        # Handle 'glib-2.0'
+        if 'ltpresult.sections' in result and suite not in result['ltpresult.sections']:
+            try:
+                _, suite, suite1, test = k.split(".", 3)
+                print("split2: %s %s %s" % (suite, suite1, test))
+                if suite + "." + suite1 in result['ltpresult.sections']:
+                    suite = suite + "." + suite1
+            except ValueError:
+                pass
+        if suite not in self.ltptests:
+            self.ltptests[suite] = {'passed': 0, 'failed': 0, 'skipped': 0, 'duration' : '-', 'failed_testcases': []}
+        for tk in self.result_types:
+            if status in self.result_types[tk]:
+                self.ltptests[suite][tk] += 1
+
+    def handle_ltpposixtest_result(self, k, status, result):
+        if k == 'ltpposixresult.sections':
+            # Ensure tests without any test results still show up on the report
+            for suite in result['ltpposixresult.sections']:
+                if suite not in self.ltpposixtests:
+                    self.ltpposixtests[suite] = {'passed': 0, 'failed': 0, 'skipped': 0, 'duration' : '-', 'failed_testcases': []}
+                if 'duration' in result['ltpposixresult.sections'][suite]:
+                    self.ltpposixtests[suite]['duration'] = result['ltpposixresult.sections'][suite]['duration']
+            return
+        try:
+            _, suite, test = k.split(".", 2)
+        except ValueError:
+            return
+        # Handle 'glib-2.0'
+        if 'ltpposixresult.sections' in result and suite not in result['ltpposixresult.sections']:
+            try:
+                _, suite, suite1, test = k.split(".", 3)
+                if suite + "." + suite1 in result['ltpposixresult.sections']:
+                    suite = suite + "." + suite1
+            except ValueError:
+                pass
+        if suite not in self.ltpposixtests:
+            self.ltpposixtests[suite] = {'passed': 0, 'failed': 0, 'skipped': 0, 'duration' : '-', 'failed_testcases': []}
+        for tk in self.result_types:
+            if status in self.result_types[tk]:
+                self.ltpposixtests[suite][tk] += 1
+
+    def get_aggregated_test_result(self, logger, testresult):
+        test_count_report = {'passed': 0, 'failed': 0, 'skipped': 0, 'failed_testcases': []}
+    def get_aggregated_test_result(self, logger, testresult):
+        test_count_report = {'passed': 0, 'failed': 0, 'skipped': 0, 'failed_testcases': []}
+    def get_aggregated_test_result(self, logger, testresult):
+        test_count_report = {'passed': 0, 'failed': 0, 'skipped': 0, 'failed_testcases': []}
     def get_aggregated_test_result(self, logger, testresult):
         test_count_report = {'passed': 0, 'failed': 0, 'skipped': 0, 'failed_testcases': []}
         result = testresult.get('result', [])
@@ -69,6 +128,10 @@ class ResultsTextReport(object):
                 test_count_report['failed_testcases'].append(k)
             if k.startswith("ptestresult."):
                 self.handle_ptest_result(k, test_status, result)
+            if k.startswith("ltpresult."):
+                self.handle_ltptest_result(k, test_status, result)
+            if k.startswith("ltpposixresult."):
+                self.handle_ltpposixtest_result(k, test_status, result)
         return test_count_report
 
     def print_test_report(self, template_file_name, test_count_reports):
@@ -79,9 +142,11 @@ class ResultsTextReport(object):
         template = env.get_template(template_file_name)
         havefailed = False
         haveptest = bool(self.ptests)
+        haveltp = bool(self.ltptests)
+        haveltpposix = bool(self.ltpposixtests)
         reportvalues = []
         cols = ['passed', 'failed', 'skipped']
-        maxlen = {'passed' : 0, 'failed' : 0, 'skipped' : 0, 'result_id': 0, 'testseries' : 0, 'ptest' : 0 }
+        maxlen = {'passed' : 0, 'failed' : 0, 'skipped' : 0, 'result_id': 0, 'testseries' : 0, 'ptest' : 0 ,'ltptest': 0, 'ltpposixtest': 0}
         for line in test_count_reports:
             total_tested = line['passed'] + line['failed'] + line['skipped']
             vals = {}
@@ -100,10 +165,20 @@ class ResultsTextReport(object):
         for ptest in self.ptests:
             if len(ptest) > maxlen['ptest']:
                 maxlen['ptest'] = len(ptest)
+        for ltptest in self.ltptests:
+            if len(ltptest) > maxlen['ltptest']:
+                maxlen['ltptest'] = len(ltptest)
+        for ltpposixtest in self.ltpposixtests:
+            if len(ltpposixtest) > maxlen['ltpposixtest']:
+                maxlen['ltpposixtest'] = len(ltpposixtest)
         output = template.render(reportvalues=reportvalues,
                                  havefailed=havefailed,
                                  haveptest=haveptest,
                                  ptests=self.ptests,
+                                 haveltp=haveltp,
+                                 haveltpposix=haveltpposix,
+                                 ltptests=self.ltptests,
+                                 ltpposixtests=self.ltpposixtests,
                                  maxlen=maxlen)
         print(output)
 
@@ -143,7 +218,7 @@ def register_commands(subparsers):
                                          group='analysis')
     parser_build.set_defaults(func=report)
     parser_build.add_argument('source_dir',
-                              help='source file/directory that contain the test result files to summarise')
+                              help='source file/directory/URL that contain the test result files to summarise')
     parser_build.add_argument('--branch', '-B', default='master', help="Branch to find commit in")
     parser_build.add_argument('--commit', help="Revision to report")
     parser_build.add_argument('-t', '--tag', default='',

@@ -3,6 +3,8 @@ HOMEPAGE = "http://netfilter.org/projects/nfacct/"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=8ca43cbc842c2336e835926c2166c28b"
 
+UPSTREAM_CHECK_URI = "ftp://ftp.netfilter.org/pub/nfacct/"
+
 SRC_URI = "ftp://ftp.netfilter.org/pub/${BPN}/${BP}.tar.bz2"
 
 SRC_URI[md5sum] = "94faafdaaed85ca9220c5692be8a408e"

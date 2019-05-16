@@ -6,7 +6,7 @@ DEPENDS = "pkgconfig intltool-native libpng jpeg"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=42bafded1b380c6fefbeb6c5cd5448d9"
 
-SRC_URI = "${SOURCEFORGE_MIRROR}/${PN}/${P}.tar.bz2 \
+SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BP}.tar.bz2 \
            file://0001-undefine-__va_arg_pack.patch \
            file://0001-make-relies-GNU-extentions.patch \
 "

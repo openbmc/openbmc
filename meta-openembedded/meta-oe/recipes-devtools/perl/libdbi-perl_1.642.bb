@@ -7,10 +7,11 @@ database interface independent of the actual database being used. \
 HOMEPAGE = "http://search.cpan.org/dist/DBI/"
 SECTION = "libs"
 LICENSE = "Artistic-1.0 | GPL-1.0+"
-RDEPENDS_${PN} = " perl-module-carp \
-                   perl-module-exporter \
-                   perl-module-exporter-heavy \
-                   perl-module-dynaloader \
+RDEPENDS_${PN}_class-target = " \
+    perl-module-carp \
+    perl-module-exporter \
+    perl-module-exporter-heavy \
+    perl-module-dynaloader \
 "
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=10982c7148e0a012c0fd80534522f5c5"

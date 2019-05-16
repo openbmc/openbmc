@@ -16,3 +16,5 @@ FILES_${PN} += "${libdir}/xfce4/xfconf/xfconfd \
                 ${datadir}/dbus-1/services/org.xfce.Xfconf.service"
 
 FILES_${PN}-dev += "${libdir}/gio/modules/libxfconfgsettingsbackend.la"
+
+PACKAGECONFIG[gsettings-backend] = "--enable-gsettings-backend,--disable-gsettings-backend,"

@@ -6,7 +6,7 @@ DEPENDS = "audiofile"
 
 inherit gnome
 
-SRC_URI = "ftp://ftp.gnome.org/pub/GNOME/sources/esound/0.2/${P}.tar.bz2;name=archive \
+SRC_URI = "ftp://ftp.gnome.org/pub/GNOME/sources/esound/0.2/${BP}.tar.bz2;name=archive \
            file://no-docs.patch \
            file://0001-audio_alsa09.c-alsa-drain-fix.patch \
            file://0002-Undefine-open64-and-fopen64.patch \

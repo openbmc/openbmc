@@ -1883,7 +1883,8 @@
                 <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-fetch'><filename>do_fetch</filename></ulink>
                 task uses the prefix of each entry in the
                 <filename>SRC_URI</filename> variable value to determine which
-                fetcher to use to get your source files.
+                <ulink url='&YOCTO_DOCS_BB_URL;#bb-fetchers'>fetcher</ulink>
+                to use to get your source files.
                 It is the <filename>SRC_URI</filename> variable that triggers
                 the fetcher.
                 The
@@ -7387,17 +7388,17 @@
             it is based on is by definition incomplete.
             The purpose of the command is to allow the generation of
             customized images, and as such, was designed to be
-            completely extensible through a plug-in interface.
+            completely extensible through a plugin interface.
             See the
-            "<link linkend='wic-using-the-wic-plug-ins-interface'>Using the Wic Plug-Ins Interface</link>"
-            section for information on these plug-ins.
+            "<link linkend='wic-using-the-wic-plugin-interface'>Using the Wic PlugIn Interface</link>"
+            section for information on these plugins.
         </para>
 
         <para>
             This section provides some background information on Wic,
             describes what you need to have in
             place to run the tool, provides instruction on how to use
-            the Wic utility, provides information on using the Wic plug-ins
+            the Wic utility, provides information on using the Wic plugins
             interface, and provides several examples that show how to use
             Wic.
         </para>
@@ -7792,28 +7793,28 @@
             </para>
         </section>
 
-        <section id='wic-using-the-wic-plug-ins-interface'>
-            <title>Using the Wic Plug-Ins Interface</title>
+        <section id='wic-using-the-wic-plugin-interface'>
+            <title>Using the Wic Plugin Interface</title>
 
             <para>
                 You can extend and specialize Wic functionality by using
-                Wic plug-ins.
-                This section explains the Wic plug-in interface.
+                Wic plugins.
+                This section explains the Wic plugin interface.
                 <note>
-                    Wic plug-ins consist of "source" and "imager" plug-ins.
-                    Imager plug-ins are beyond the scope of this section.
+                    Wic plugins consist of "source" and "imager" plugins.
+                    Imager plugins are beyond the scope of this section.
                 </note>
             </para>
 
             <para>
-                Source plug-ins provide a mechanism to customize partition
+                Source plugins provide a mechanism to customize partition
                 content during the Wic image generation process.
-                You can use source plug-ins to map values that you specify
+                You can use source plugins to map values that you specify
                 using <filename>--source</filename> commands in kickstart
-                files (i.e. <filename>*.wks</filename>) to a plug-in
+                files (i.e. <filename>*.wks</filename>) to a plugin
                 implementation used to populate a given partition.
                 <note>
-                    If you use plug-ins that have build-time dependencies
+                    If you use plugins that have build-time dependencies
                     (e.g. native tools, bootloaders, and so forth)
                     when building a Wic image, you need to specify those
                     dependencies using the
@@ -7823,43 +7824,43 @@
             </para>
 
             <para>
-                Source plug-ins are subclasses defined in plug-in files.
-                As shipped, the Yocto Project provides several plug-in
+                Source plugins are subclasses defined in plugin files.
+                As shipped, the Yocto Project provides several plugin
                 files.
-                You can see the source plug-in files that ship with the
+                You can see the source plugin files that ship with the
                 Yocto Project
                 <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi/poky/tree/scripts/lib/wic/plugins/source'>here</ulink>.
-                Each of these plug-in files contains source plug-ins that
+                Each of these plugin files contains source plugins that
                 are designed to populate a specific Wic image partition.
             </para>
 
             <para>
-                Source plug-ins are subclasses of the
+                Source plugins are subclasses of the
                 <filename>SourcePlugin</filename> class, which is
                 defined in the
                 <filename>poky/scripts/lib/wic/pluginbase.py</filename>
                 file.
                 For example, the <filename>BootimgEFIPlugin</filename>
-                source plug-in found in the
+                source plugin found in the
                 <filename>bootimg-efi.py</filename> file is a subclass of
                 the <filename>SourcePlugin</filename> class, which is found
                 in the <filename>pluginbase.py</filename> file.
             </para>
 
             <para>
-                You can also implement source plug-ins in a layer outside
+                You can also implement source plugins in a layer outside
                 of the Source Repositories (external layer).
-                To do so, be sure that your plug-in files are located in
+                To do so, be sure that your plugin files are located in
                 a directory whose path is
                 <filename>scripts/lib/wic/plugins/source/</filename>
                 within your external layer.
-                When the plug-in files are located there, the source
-                plug-ins they contain are made available to Wic.
+                When the plugin files are located there, the source
+                plugins they contain are made available to Wic.
             </para>
 
             <para>
                 When the Wic implementation needs to invoke a
-                partition-specific implementation, it looks for the plug-in
+                partition-specific implementation, it looks for the plugin
                 with the same name as the <filename>--source</filename>
                 parameter used in the kickstart file given to that
                 partition.
@@ -7869,13 +7870,13 @@
      part /boot --source bootimg-pcbios --ondisk sda --label boot --active --align 1024
                 </literallayout>
                 The methods defined as class members of the matching
-                source plug-in (i.e. <filename>bootimg-pcbios</filename>)
-                in the <filename>bootimg-pcbios.py</filename> plug-in file
+                source plugin (i.e. <filename>bootimg-pcbios</filename>)
+                in the <filename>bootimg-pcbios.py</filename> plugin file
                 are used.
             </para>
 
             <para>
-                To be more concrete, here is the corresponding plug-in
+                To be more concrete, here is the corresponding plugin
                 definition from the <filename>bootimg-pcbios.py</filename>
                 file for the previous command along with an example
                 method called by the Wic implementation when it needs to
@@ -7907,19 +7908,19 @@
                   .
                   .
                 </literallayout>
-                If a subclass (plug-in) itself does not implement a
+                If a subclass (plugin) itself does not implement a
                 particular function, Wic locates and uses the default
                 version in the superclass.
-                It is for this reason that all source plug-ins are derived
+                It is for this reason that all source plugins are derived
                 from the <filename>SourcePlugin</filename> class.
             </para>
 
             <para>
                 The <filename>SourcePlugin</filename> class defined in
                 the <filename>pluginbase.py</filename> file defines
-                a set of methods that source plug-ins can implement or
+                a set of methods that source plugins can implement or
                 override.
-                Any plug-ins (subclass of
+                Any plugins (subclass of
                 <filename>SourcePlugin</filename>) that do not implement
                 a particular method inherit the implementation of the
                 method from the <filename>SourcePlugin</filename> class.
@@ -7980,11 +7981,11 @@
             </para>
 
             <para>
-                You can extend the source plug-in mechanism.
-                To add more hooks, create more source plug-in methods
+                You can extend the source plugin mechanism.
+                To add more hooks, create more source plugin methods
                 within <filename>SourcePlugin</filename> and the
                 corresponding derived subclasses.
-                The code that calls the plug-in methods uses the
+                The code that calls the plugin methods uses the
                 <filename>plugin.get_source_plugin_methods()</filename>
                 function to find the method or methods needed by the call.
                 Retrieval of those methods is accomplished by filling up
@@ -9404,7 +9405,7 @@
 
             <para>
                 Many pieces of software split functionality into optional
-                modules (or plug-ins) and the plug-ins that are built
+                modules (or plugins) and the plugins that are built
                 might depend on configuration options.
                 To avoid having to duplicate the logic that determines what
                 modules are available in your recipe or to avoid having
@@ -12489,14 +12490,6 @@
             </itemizedlist>
         </para>
 
-        <para>
-            For debugging information within the popular
-            <trademark class='trade'>Eclipse</trademark> IDE, see the
-            "<ulink url='&YOCTO_DOCS_SDK_URL;#adt-eclipse'>Working within Eclipse</ulink>"
-            section in the Yocto Project Application Development and the
-            Extensible Software Development Kit (eSDK) manual.
-        </para>
-
         <section id='dev-debugging-viewing-logs-from-failed-tasks'>
             <title>Viewing Logs from Failed Tasks</title>
 
@@ -12532,6 +12525,16 @@
 
         <section id='dev-debugging-viewing-variable-values'>
             <title>Viewing Variable Values</title>
+
+            <para>
+                Sometimes you need to know the value of a variable as a
+                result of BitBake's parsing step.
+                This could be because some unexpected behavior occurred
+                in your project.
+                Perhaps an attempt to
+                <ulink url='&YOCTO_DOCS_BB_URL;#modifying-existing-variables'>modify a variable</ulink>
+                did not work out as expected.
+            </para>
 
             <para>
                 BitBake's <filename>-e</filename> option is used to display
@@ -15059,12 +15062,12 @@
                 </para>
 
                 <para>
-                    Specifying audio and video plug-ins as part of the
+                    Specifying audio and video plugins as part of the
                     <filename>COMMERCIAL_AUDIO_PLUGINS</filename> and
                     <filename>COMMERCIAL_VIDEO_PLUGINS</filename> statements
                     (along with the enabling
                     <filename>LICENSE_FLAGS_WHITELIST</filename>) includes the
-                    plug-ins or components into built images, thus adding
+                    plugins or components into built images, thus adding
                     support for media formats or components.
                 </para>
             </section>

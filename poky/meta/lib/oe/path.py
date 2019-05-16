@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
 import errno
 import glob
 import shutil
@@ -90,7 +94,7 @@ def copytree(src, dst):
     subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
 
 def copyhardlinktree(src, dst):
-    """ Make the hard link when possible, otherwise copy. """
+    """Make a tree of hard links when possible, otherwise copy."""
     bb.utils.mkdirhier(dst)
     if os.path.isdir(src) and not len(os.listdir(src)):
         return
@@ -113,6 +117,17 @@ def copyhardlinktree(src, dst):
         subprocess.check_output(cmd, shell=True, cwd=s_dir, stderr=subprocess.STDOUT)
     else:
         copytree(src, dst)
+
+def copyhardlink(src, dst):
+    """Make a hard link when possible, otherwise copy."""
+
+    # We need to stat the destination directory as the destination file probably
+    # doesn't exist yet.
+    dstdir = os.path.dirname(dst)
+    if os.stat(src).st_dev == os.stat(dstdir).st_dev:
+        os.link(src, dst)
+    else:
+        shutil.copy(src, dst)
 
 def remove(path, recurse=True):
     """

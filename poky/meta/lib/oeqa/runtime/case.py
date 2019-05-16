@@ -1,5 +1,8 @@
+#
 # Copyright (C) 2016 Intel Corporation
-# Released under the MIT license (see COPYING.MIT)
+#
+# SPDX-License-Identifier: MIT
+#
 
 from oeqa.core.case import OETestCase
 from oeqa.utils.package_manager import install_package, uninstall_package

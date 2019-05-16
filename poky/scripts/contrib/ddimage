@@ -1,4 +1,7 @@
 #!/bin/sh
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
 
 # Default to avoiding the first two disks on typical Linux and Mac OS installs
 # Better safe than sorry :-)

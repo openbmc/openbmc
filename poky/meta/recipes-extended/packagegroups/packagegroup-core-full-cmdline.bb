@@ -94,7 +94,6 @@ RDEPENDS_packagegroup-core-full-cmdline-utils = "\
     tar \
     time \
     util-linux \
-    zlib \
     "
 
 RDEPENDS_packagegroup-core-full-cmdline-extended = "\

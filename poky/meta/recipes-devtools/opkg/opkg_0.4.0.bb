@@ -15,12 +15,20 @@ SRC_URI = "http://downloads.yoctoproject.org/releases/${BPN}/${BPN}-${PV}.tar.gz
            file://opkg.conf \
            file://0001-opkg_conf-create-opkg.lock-in-run-instead-of-var-run.patch \
            file://0001-libopkg-add-add-ignore-recommends-option.patch \
+           file://0001-regress-issue72.py-resolve-paths-before-comparision.patch \
+           file://0001-opkg-add-target-for-testsuite-installation.patch \
+           file://run-ptest \
 "
 
 SRC_URI[md5sum] = "ae51d95fee599bb4dce08453529158f5"
 SRC_URI[sha256sum] = "f6c00515d8a2ad8f6742a8e73830315d1983ed0459cba77c4d656cfc9e7fe6fe"
 
-inherit autotools pkgconfig systemd
+# This needs to be before ptest inherit, otherwise all ptest files end packaged
+# in libopkg package if OPKGLIBDIR == libdir, because default
+# PTEST_PATH ?= "${libdir}/${BPN}/ptest"
+PACKAGES =+ "libopkg"
+
+inherit autotools pkgconfig systemd ptest
 
 target_localstatedir := "${localstatedir}"
 OPKGLIBDIR = "${target_localstatedir}/lib"
@@ -49,11 +57,10 @@ do_install_append () {
 RDEPENDS_${PN} = "${VIRTUAL-RUNTIME_update-alternatives} opkg-arch-config libarchive"
 RDEPENDS_${PN}_class-native = ""
 RDEPENDS_${PN}_class-nativesdk = ""
+RDEPENDS_${PN}-ptest += "make binutils python3-core python3-compression"
 RREPLACES_${PN} = "opkg-nogpg opkg-collateral"
 RCONFLICTS_${PN} = "opkg-collateral"
 RPROVIDES_${PN} = "opkg-collateral"
-
-PACKAGES =+ "libopkg"
 
 FILES_libopkg = "${libdir}/*.so.* ${OPKGLIBDIR}/opkg/"
 

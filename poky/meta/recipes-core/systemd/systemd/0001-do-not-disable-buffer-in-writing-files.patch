@@ -14,6 +14,8 @@ This is specific to musl.
 Upstream-Status: Inappropriate [musl]
 
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+[Rebased for v242]
+Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
 ---
  src/basic/cgroup-util.c                 | 14 +++++++-------
  src/basic/procfs-util.c                 |  4 ++--
@@ -25,21 +27,20 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  src/hibernate-resume/hibernate-resume.c |  2 +-
  src/libsystemd/sd-device/sd-device.c    |  2 +-
  src/login/logind-dbus.c                 |  2 +-
- src/network/networkd-ipv6-proxy-ndp.c   |  2 +-
- src/network/networkd-link.c             | 18 +++++++++---------
  src/nspawn/nspawn-cgroup.c              |  2 +-
  src/nspawn/nspawn.c                     |  6 +++---
+ src/shared/sysctl-util.c                |  2 +-
  src/sleep/sleep.c                       | 12 ++++++------
  src/udev/udevadm-trigger.c              |  2 +-
  src/udev/udevd.c                        |  6 +++---
  src/vconsole/vconsole-setup.c           |  2 +-
- 18 files changed, 48 insertions(+), 48 deletions(-)
+ 17 files changed, 39 insertions(+), 39 deletions(-)
 
 diff --git a/src/basic/cgroup-util.c b/src/basic/cgroup-util.c
-index 8ce7ccb..b633226 100644
+index fc28109..44fe985 100644
 --- a/src/basic/cgroup-util.c
 +++ b/src/basic/cgroup-util.c
-@@ -818,7 +818,7 @@ int cg_attach(const char *controller, const char *path, pid_t pid) {
+@@ -822,7 +822,7 @@ int cg_attach(const char *controller, const char *path, pid_t pid) {
  
          xsprintf(c, PID_FMT "\n", pid);
  
@@ -48,7 +49,7 @@ index 8ce7ccb..b633226 100644
          if (r < 0)
                  return r;
  
-@@ -1100,7 +1100,7 @@ int cg_install_release_agent(const char *controller, const char *agent) {
+@@ -1104,7 +1104,7 @@ int cg_install_release_agent(const char *controller, const char *agent) {
  
          sc = strstrip(contents);
          if (isempty(sc)) {
@@ -57,7 +58,7 @@ index 8ce7ccb..b633226 100644
                  if (r < 0)
                          return r;
          } else if (!path_equal(sc, agent))
-@@ -1118,7 +1118,7 @@ int cg_install_release_agent(const char *controller, const char *agent) {
+@@ -1122,7 +1122,7 @@ int cg_install_release_agent(const char *controller, const char *agent) {
  
          sc = strstrip(contents);
          if (streq(sc, "0")) {
@@ -66,7 +67,7 @@ index 8ce7ccb..b633226 100644
                  if (r < 0)
                          return r;
  
-@@ -1145,7 +1145,7 @@ int cg_uninstall_release_agent(const char *controller) {
+@@ -1149,7 +1149,7 @@ int cg_uninstall_release_agent(const char *controller) {
          if (r < 0)
                  return r;
  
@@ -75,7 +76,7 @@ index 8ce7ccb..b633226 100644
          if (r < 0)
                  return r;
  
-@@ -1155,7 +1155,7 @@ int cg_uninstall_release_agent(const char *controller) {
+@@ -1159,7 +1159,7 @@ int cg_uninstall_release_agent(const char *controller) {
          if (r < 0)
                  return r;
  
@@ -84,7 +85,7 @@ index 8ce7ccb..b633226 100644
          if (r < 0)
                  return r;
  
-@@ -2012,7 +2012,7 @@ int cg_set_attribute(const char *controller, const char *path, const char *attri
+@@ -2016,7 +2016,7 @@ int cg_set_attribute(const char *controller, const char *path, const char *attri
          if (r < 0)
                  return r;
  
@@ -93,7 +94,7 @@ index 8ce7ccb..b633226 100644
  }
  
  int cg_get_attribute(const char *controller, const char *path, const char *attribute, char **ret) {
-@@ -2660,7 +2660,7 @@ int cg_enable_everywhere(
+@@ -2664,7 +2664,7 @@ int cg_enable_everywhere(
                                          return log_debug_errno(errno, "Failed to open cgroup.subtree_control file of %s: %m", p);
                          }
  
@@ -103,10 +104,10 @@ index 8ce7ccb..b633226 100644
                                  log_debug_errno(r, "Failed to %s controller %s for %s (%s): %m",
                                                  FLAGS_SET(mask, bit) ? "enable" : "disable", n, p, fs);
 diff --git a/src/basic/procfs-util.c b/src/basic/procfs-util.c
-index 42ce53d..5751253 100644
+index 7aaf95b..25fc3de 100644
 --- a/src/basic/procfs-util.c
 +++ b/src/basic/procfs-util.c
-@@ -86,13 +86,13 @@ int procfs_tasks_set_limit(uint64_t limit) {
+@@ -85,13 +85,13 @@ int procfs_tasks_set_limit(uint64_t limit) {
           * decrease it, as threads-max is the much more relevant sysctl. */
          if (limit > pid_max-1) {
                  sprintf(buffer, "%" PRIu64, limit+1); /* Add one, since PID 0 is not a valid PID */
@@ -136,10 +137,10 @@ index 123d00e..e7ea78f 100644
                  return r;
  
 diff --git a/src/basic/util.c b/src/basic/util.c
-index e577c93..3c64f91 100644
+index 93d610b..97dca64 100644
 --- a/src/basic/util.c
 +++ b/src/basic/util.c
-@@ -631,7 +631,7 @@ void disable_coredumps(void) {
+@@ -294,7 +294,7 @@ void disable_coredumps(void) {
          if (detect_container() > 0)
                  return;
  
@@ -149,10 +150,10 @@ index e577c93..3c64f91 100644
                  log_debug_errno(r, "Failed to turn off coredumps, ignoring: %m");
  }
 diff --git a/src/binfmt/binfmt.c b/src/binfmt/binfmt.c
-index af31f09..eec5738 100644
+index 66e2f01..5daa43b 100644
 --- a/src/binfmt/binfmt.c
 +++ b/src/binfmt/binfmt.c
-@@ -47,7 +47,7 @@ static int delete_rule(const char *rule) {
+@@ -48,7 +48,7 @@ static int delete_rule(const char *rule) {
          if (!fn)
                  return log_oom();
  
@@ -161,7 +162,7 @@ index af31f09..eec5738 100644
  }
  
  static int apply_rule(const char *rule) {
-@@ -55,7 +55,7 @@ static int apply_rule(const char *rule) {
+@@ -56,7 +56,7 @@ static int apply_rule(const char *rule) {
  
          (void) delete_rule(rule);
  
@@ -170,7 +171,7 @@ index af31f09..eec5738 100644
          if (r < 0)
                  return log_error_errno(r, "Failed to add binary format: %m");
  
-@@ -212,7 +212,7 @@ static int run(int argc, char *argv[]) {
+@@ -213,7 +213,7 @@ static int run(int argc, char *argv[]) {
                  }
  
                  /* Flush out all rules */
@@ -180,10 +181,10 @@ index af31f09..eec5738 100644
                  STRV_FOREACH(f, files) {
                          k = apply_file(*f, true);
 diff --git a/src/core/main.c b/src/core/main.c
-index 561f956..db6f113 100644
+index 46db471..726ccaf 100644
 --- a/src/core/main.c
 +++ b/src/core/main.c
-@@ -1468,7 +1468,7 @@ static int bump_unix_max_dgram_qlen(void) {
+@@ -1469,7 +1469,7 @@ static int bump_unix_max_dgram_qlen(void) {
          if (v >= DEFAULT_UNIX_MAX_DGRAM_QLEN)
                  return 0;
  
@@ -192,7 +193,7 @@ index 561f956..db6f113 100644
          if (r < 0)
                  return log_full_errno(IN_SET(r, -EROFS, -EPERM, -EACCES) ? LOG_DEBUG : LOG_WARNING, r,
                                        "Failed to bump AF_UNIX datagram queue length, ignoring: %m");
-@@ -1683,7 +1683,7 @@ static void initialize_core_pattern(bool skip_setup) {
+@@ -1684,7 +1684,7 @@ static void initialize_core_pattern(bool skip_setup) {
          if (getpid_cached() != 1)
                  return;
  
@@ -202,10 +203,10 @@ index 561f956..db6f113 100644
                  log_warning_errno(r, "Failed to write '%s' to /proc/sys/kernel/core_pattern, ignoring: %m", arg_early_core_pattern);
  }
 diff --git a/src/core/smack-setup.c b/src/core/smack-setup.c
-index 49b37ae..c96eedc 100644
+index cd7fb01..077e861 100644
 --- a/src/core/smack-setup.c
 +++ b/src/core/smack-setup.c
-@@ -350,17 +350,17 @@ int mac_smack_setup(bool *loaded_policy) {
+@@ -351,17 +351,17 @@ int mac_smack_setup(bool *loaded_policy) {
          }
  
  #ifdef SMACK_RUN_LABEL
@@ -241,10 +242,10 @@ index 17e7cd1..87a7667 100644
                  log_error_errno(r, "Failed to write '%s' to /sys/power/resume: %m", major_minor);
                  return EXIT_FAILURE;
 diff --git a/src/libsystemd/sd-device/sd-device.c b/src/libsystemd/sd-device/sd-device.c
-index 2a69f2e..9d55340 100644
+index c2315c0..00f81b4 100644
 --- a/src/libsystemd/sd-device/sd-device.c
 +++ b/src/libsystemd/sd-device/sd-device.c
-@@ -1836,7 +1836,7 @@ _public_ int sd_device_set_sysattr_value(sd_device *device, const char *sysattr,
+@@ -1852,7 +1852,7 @@ _public_ int sd_device_set_sysattr_value(sd_device *device, const char *sysattr,
          if (!value)
                  return -ENOMEM;
  
@@ -254,10 +255,10 @@ index 2a69f2e..9d55340 100644
                  if (r == -ELOOP)
                          return -EINVAL;
 diff --git a/src/login/logind-dbus.c b/src/login/logind-dbus.c
-index 8ab498f..d27ef9c 100644
+index 2cebcce..7111fc1 100644
 --- a/src/login/logind-dbus.c
 +++ b/src/login/logind-dbus.c
-@@ -1231,7 +1231,7 @@ static int trigger_device(Manager *m, sd_device *d) {
+@@ -1285,7 +1285,7 @@ static int trigger_device(Manager *m, sd_device *d) {
                  if (!t)
                          return -ENOMEM;
  
@@ -266,109 +267,11 @@ index 8ab498f..d27ef9c 100644
          }
  
          return 0;
-diff --git a/src/network/networkd-ipv6-proxy-ndp.c b/src/network/networkd-ipv6-proxy-ndp.c
-index f594b27..c283cc3 100644
---- a/src/network/networkd-ipv6-proxy-ndp.c
-+++ b/src/network/networkd-ipv6-proxy-ndp.c
-@@ -43,7 +43,7 @@ static int ipv6_proxy_ndp_set(Link *link) {
-         v = ipv6_proxy_ndp_is_needed(link);
-         p = strjoina("/proc/sys/net/ipv6/conf/", link->ifname, "/proxy_ndp");
- 
--        r = write_string_file(p, one_zero(v), WRITE_STRING_FILE_VERIFY_ON_FAILURE | WRITE_STRING_FILE_DISABLE_BUFFER);
-+        r = write_string_file(p, one_zero(v), WRITE_STRING_FILE_VERIFY_ON_FAILURE | 0);
-         if (r < 0)
-                 log_link_warning_errno(link, r, "Cannot configure proxy NDP for interface: %m");
- 
-diff --git a/src/network/networkd-link.c b/src/network/networkd-link.c
-index 22392d7..e0ed551 100644
---- a/src/network/networkd-link.c
-+++ b/src/network/networkd-link.c
-@@ -274,7 +274,7 @@ static int link_enable_ipv6(Link *link) {
- 
-         p = strjoina("/proc/sys/net/ipv6/conf/", link->ifname, "/disable_ipv6");
- 
--        r = write_string_file(p, one_zero(disabled), WRITE_STRING_FILE_VERIFY_ON_FAILURE | WRITE_STRING_FILE_DISABLE_BUFFER);
-+        r = write_string_file(p, one_zero(disabled), WRITE_STRING_FILE_VERIFY_ON_FAILURE | 0);
-         if (r < 0)
-                 log_link_warning_errno(link, r, "Cannot %s IPv6 for interface %s: %m",
-                                        enable_disable(!disabled), link->ifname);
-@@ -1272,7 +1272,7 @@ static int link_set_proxy_arp(Link *link) {
- 
-         p = strjoina("/proc/sys/net/ipv4/conf/", link->ifname, "/proxy_arp");
- 
--        r = write_string_file(p, one_zero(link->network->proxy_arp), WRITE_STRING_FILE_VERIFY_ON_FAILURE | WRITE_STRING_FILE_DISABLE_BUFFER);
-+        r = write_string_file(p, one_zero(link->network->proxy_arp), WRITE_STRING_FILE_VERIFY_ON_FAILURE | 0);
-         if (r < 0)
-                 log_link_warning_errno(link, r, "Cannot configure proxy ARP for interface: %m");
- 
-@@ -2541,7 +2541,7 @@ static int link_set_ipv4_forward(Link *link) {
-          * primarily to keep IPv4 and IPv6 packet forwarding behaviour
-          * somewhat in sync (see below). */
- 
--        r = write_string_file("/proc/sys/net/ipv4/ip_forward", "1", WRITE_STRING_FILE_VERIFY_ON_FAILURE | WRITE_STRING_FILE_DISABLE_BUFFER);
-+        r = write_string_file("/proc/sys/net/ipv4/ip_forward", "1", WRITE_STRING_FILE_VERIFY_ON_FAILURE | 0);
-         if (r < 0)
-                 log_link_warning_errno(link, r, "Cannot turn on IPv4 packet forwarding, ignoring: %m");
- 
-@@ -2563,7 +2563,7 @@ static int link_set_ipv6_forward(Link *link) {
-          * same behaviour there and also propagate the setting from
-          * one to all, to keep things simple (see above). */
- 
--        r = write_string_file("/proc/sys/net/ipv6/conf/all/forwarding", "1", WRITE_STRING_FILE_VERIFY_ON_FAILURE | WRITE_STRING_FILE_DISABLE_BUFFER);
-+        r = write_string_file("/proc/sys/net/ipv6/conf/all/forwarding", "1", WRITE_STRING_FILE_VERIFY_ON_FAILURE | 0);
-         if (r < 0)
-                 log_link_warning_errno(link, r, "Cannot configure IPv6 packet forwarding, ignoring: %m");
- 
-@@ -2583,7 +2583,7 @@ static int link_set_ipv6_privacy_extensions(Link *link) {
-         p = strjoina("/proc/sys/net/ipv6/conf/", link->ifname, "/use_tempaddr");
-         xsprintf(buf, "%u", (unsigned) link->network->ipv6_privacy_extensions);
- 
--        r = write_string_file(p, buf, WRITE_STRING_FILE_VERIFY_ON_FAILURE | WRITE_STRING_FILE_DISABLE_BUFFER);
-+        r = write_string_file(p, buf, WRITE_STRING_FILE_VERIFY_ON_FAILURE | 0);
-         if (r < 0)
-                 log_link_warning_errno(link, r, "Cannot configure IPv6 privacy extension for interface: %m");
- 
-@@ -2607,7 +2607,7 @@ static int link_set_ipv6_accept_ra(Link *link) {
-         p = strjoina("/proc/sys/net/ipv6/conf/", link->ifname, "/accept_ra");
- 
-         /* We handle router advertisements ourselves, tell the kernel to GTFO */
--        r = write_string_file(p, "0", WRITE_STRING_FILE_VERIFY_ON_FAILURE | WRITE_STRING_FILE_DISABLE_BUFFER);
-+        r = write_string_file(p, "0", WRITE_STRING_FILE_VERIFY_ON_FAILURE | 0);
-         if (r < 0)
-                 log_link_warning_errno(link, r, "Cannot disable kernel IPv6 accept_ra for interface: %m");
- 
-@@ -2635,7 +2635,7 @@ static int link_set_ipv6_dad_transmits(Link *link) {
-         p = strjoina("/proc/sys/net/ipv6/conf/", link->ifname, "/dad_transmits");
-         xsprintf(buf, "%i", link->network->ipv6_dad_transmits);
- 
--        r = write_string_file(p, buf, WRITE_STRING_FILE_VERIFY_ON_FAILURE | WRITE_STRING_FILE_DISABLE_BUFFER);
-+        r = write_string_file(p, buf, WRITE_STRING_FILE_VERIFY_ON_FAILURE | 0);
-         if (r < 0)
-                 log_link_warning_errno(link, r, "Cannot set IPv6 dad transmits for interface: %m");
- 
-@@ -2663,7 +2663,7 @@ static int link_set_ipv6_hop_limit(Link *link) {
-         p = strjoina("/proc/sys/net/ipv6/conf/", link->ifname, "/hop_limit");
-         xsprintf(buf, "%i", link->network->ipv6_hop_limit);
- 
--        r = write_string_file(p, buf, WRITE_STRING_FILE_VERIFY_ON_FAILURE | WRITE_STRING_FILE_DISABLE_BUFFER);
-+        r = write_string_file(p, buf, WRITE_STRING_FILE_VERIFY_ON_FAILURE | 0);
-         if (r < 0)
-                 log_link_warning_errno(link, r, "Cannot set IPv6 hop limit for interface: %m");
- 
-@@ -2689,7 +2689,7 @@ static int link_set_ipv6_mtu(Link *link) {
- 
-         xsprintf(buf, "%" PRIu32, link->network->ipv6_mtu);
- 
--        r = write_string_file(p, buf, WRITE_STRING_FILE_DISABLE_BUFFER);
-+        r = write_string_file(p, buf, 0);
-         if (r < 0)
-                 log_link_warning_errno(link, r, "Cannot set IPv6 MTU for interface: %m");
- 
 diff --git a/src/nspawn/nspawn-cgroup.c b/src/nspawn/nspawn-cgroup.c
-index 97fa092..b841f51 100644
+index 168125d..dd0ab79 100644
 --- a/src/nspawn/nspawn-cgroup.c
 +++ b/src/nspawn/nspawn-cgroup.c
-@@ -123,7 +123,7 @@ int sync_cgroup(pid_t pid, CGroupUnified unified_requested, uid_t uid_shift) {
+@@ -124,7 +124,7 @@ int sync_cgroup(pid_t pid, CGroupUnified unified_requested, uid_t uid_shift) {
          (void) mkdir_parents(fn, 0755);
  
          sprintf(pid_string, PID_FMT, pid);
@@ -378,10 +281,10 @@ index 97fa092..b841f51 100644
                  log_error_errno(r, "Failed to move process: %m");
                  goto finish;
 diff --git a/src/nspawn/nspawn.c b/src/nspawn/nspawn.c
-index e0c2d71..213790c 100644
+index 3b0ecb1..a1b5240 100644
 --- a/src/nspawn/nspawn.c
 +++ b/src/nspawn/nspawn.c
-@@ -2117,7 +2117,7 @@ static int reset_audit_loginuid(void) {
+@@ -2341,7 +2341,7 @@ static int reset_audit_loginuid(void) {
          if (streq(p, "4294967295"))
                  return 0;
  
@@ -390,7 +293,7 @@ index e0c2d71..213790c 100644
          if (r < 0) {
                  log_error_errno(r,
                                  "Failed to reset audit login UID. This probably means that your kernel is too\n"
-@@ -3195,13 +3195,13 @@ static int setup_uid_map(pid_t pid) {
+@@ -3531,13 +3531,13 @@ static int setup_uid_map(pid_t pid) {
  
          xsprintf(uid_map, "/proc/" PID_FMT "/uid_map", pid);
          xsprintf(line, UID_FMT " " UID_FMT " " UID_FMT "\n", 0, arg_uid_shift, arg_uid_range);
@@ -406,11 +309,24 @@ index e0c2d71..213790c 100644
          if (r < 0)
                  return log_error_errno(r, "Failed to write GID map: %m");
  
+diff --git a/src/shared/sysctl-util.c b/src/shared/sysctl-util.c
+index 9be4055..f935cde 100644
+--- a/src/shared/sysctl-util.c
++++ b/src/shared/sysctl-util.c
+@@ -73,7 +73,7 @@ int sysctl_write_ip_property(int af, const char *ifname, const char *property, c
+ 
+         log_debug("Setting '%s' to '%s'", p, value);
+ 
+-        return write_string_file(p, value, WRITE_STRING_FILE_VERIFY_ON_FAILURE | WRITE_STRING_FILE_DISABLE_BUFFER);
++        return write_string_file(p, value, WRITE_STRING_FILE_VERIFY_ON_FAILURE | 0);
+ }
+ 
+ int sysctl_read(const char *property, char **content) {
 diff --git a/src/sleep/sleep.c b/src/sleep/sleep.c
-index 5b7984a..bf818aa 100644
+index 11aabaf..6aa5d37 100644
 --- a/src/sleep/sleep.c
 +++ b/src/sleep/sleep.c
-@@ -43,7 +43,7 @@ static int write_hibernate_location_info(void) {
+@@ -48,7 +48,7 @@ static int write_hibernate_location_info(void) {
  
          /* if it's a swap partition, we just write the disk to /sys/power/resume */
          if (streq(type, "partition")) {
@@ -419,7 +335,7 @@ index 5b7984a..bf818aa 100644
                  if (r < 0)
                          return log_debug_errno(r, "Faileed to write partitoin device to /sys/power/resume: %m");
  
-@@ -79,12 +79,12 @@ static int write_hibernate_location_info(void) {
+@@ -84,12 +84,12 @@ static int write_hibernate_location_info(void) {
  
          offset = fiemap->fm_extents[0].fe_physical / page_size();
          xsprintf(offset_str, "%" PRIu64, offset);
@@ -434,7 +350,7 @@ index 5b7984a..bf818aa 100644
          if (r < 0)
                  return log_debug_errno(r, "Failed to write device '%s': %m", device_str);
  
-@@ -98,7 +98,7 @@ static int write_mode(char **modes) {
+@@ -103,7 +103,7 @@ static int write_mode(char **modes) {
          STRV_FOREACH(mode, modes) {
                  int k;
  
@@ -443,7 +359,7 @@ index 5b7984a..bf818aa 100644
                  if (k >= 0)
                          return 0;
  
-@@ -117,7 +117,7 @@ static int write_state(FILE **f, char **states) {
+@@ -122,7 +122,7 @@ static int write_state(FILE **f, char **states) {
          STRV_FOREACH(state, states) {
                  int k;
  
@@ -452,7 +368,7 @@ index 5b7984a..bf818aa 100644
                  if (k >= 0)
                          return 0;
                  log_debug_errno(k, "Failed to write '%s' to /sys/power/state: %m", *state);
-@@ -212,7 +212,7 @@ static int rtc_write_wake_alarm(uint64_t sec) {
+@@ -217,7 +217,7 @@ static int rtc_write_wake_alarm(uint64_t sec) {
  
          xsprintf(buf, "%" PRIu64, sec);
  
@@ -462,10 +378,10 @@ index 5b7984a..bf818aa 100644
                  return log_error_errno(r, "Failed to write '%s' to /sys/class/rtc/rtc0/wakealarm: %m", buf);
  
 diff --git a/src/udev/udevadm-trigger.c b/src/udev/udevadm-trigger.c
-index 9532946..2e576bb 100644
+index b7dafb7..bab4907 100644
 --- a/src/udev/udevadm-trigger.c
 +++ b/src/udev/udevadm-trigger.c
-@@ -42,7 +42,7 @@ static int exec_list(sd_device_enumerator *e, const char *action, Set *settle_se
+@@ -43,7 +43,7 @@ static int exec_list(sd_device_enumerator *e, const char *action, Set *settle_se
                  if (!filename)
                          return log_oom();
  
@@ -475,10 +391,10 @@ index 9532946..2e576bb 100644
                          log_debug_errno(r, "Failed to write '%s' to '%s', ignoring: %m", action, filename);
                          continue;
 diff --git a/src/udev/udevd.c b/src/udev/udevd.c
-index 0303f36..687d009 100644
+index 140ec35..33063a9 100644
 --- a/src/udev/udevd.c
 +++ b/src/udev/udevd.c
-@@ -1218,7 +1218,7 @@ static int synthesize_change(sd_device *dev) {
+@@ -1185,7 +1185,7 @@ static int synthesize_change(sd_device *dev) {
                   */
                  log_debug("Device '%s' is closed, synthesising 'change'", devname);
                  strscpyl(filename, sizeof(filename), syspath, "/uevent", NULL);
@@ -487,7 +403,7 @@ index 0303f36..687d009 100644
  
                  FOREACH_DEVICE(e, d) {
                          const char *t, *n, *s;
-@@ -1233,7 +1233,7 @@ static int synthesize_change(sd_device *dev) {
+@@ -1200,7 +1200,7 @@ static int synthesize_change(sd_device *dev) {
  
                          log_debug("Device '%s' is closed, synthesising partition '%s' 'change'", devname, n);
                          strscpyl(filename, sizeof(filename), s, "/uevent", NULL);
@@ -496,7 +412,7 @@ index 0303f36..687d009 100644
                  }
  
                  return 0;
-@@ -1241,7 +1241,7 @@ static int synthesize_change(sd_device *dev) {
+@@ -1208,7 +1208,7 @@ static int synthesize_change(sd_device *dev) {
  
          log_debug("Device %s is closed, synthesising 'change'", devname);
          strscpyl(filename, sizeof(filename), syspath, "/uevent", NULL);
@@ -506,10 +422,10 @@ index 0303f36..687d009 100644
          return 0;
  }
 diff --git a/src/vconsole/vconsole-setup.c b/src/vconsole/vconsole-setup.c
-index ebdeba3..aa879e6 100644
+index 67dc2e4..01b83d0 100644
 --- a/src/vconsole/vconsole-setup.c
 +++ b/src/vconsole/vconsole-setup.c
-@@ -114,7 +114,7 @@ static int toggle_utf8(const char *name, int fd, bool utf8) {
+@@ -116,7 +116,7 @@ static int toggle_utf8(const char *name, int fd, bool utf8) {
  static int toggle_utf8_sysfs(bool utf8) {
          int r;
  
@@ -519,5 +435,5 @@ index ebdeba3..aa879e6 100644
                  return log_warning_errno(r, "Failed to %s sysfs UTF-8 flag: %m", enable_disable(utf8));
  
 -- 
-2.7.4
+2.11.0
 

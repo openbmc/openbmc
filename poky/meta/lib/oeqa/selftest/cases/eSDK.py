@@ -1,9 +1,12 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import tempfile
 import shutil
 import os
 import glob
 import time
-from oeqa.core.decorator.oeid import OETestID
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import runCmd, bitbake, get_bb_var, get_bb_vars
 
@@ -104,14 +107,12 @@ SSTATE_MIRRORS =  "file://.* file://%s/PATH"
         cls.tmpdirobj.cleanup()
         super().tearDownClass()
 
-    @OETestID(1602)
     def test_install_libraries_headers(self):
         pn_sstate = 'bc'
         bitbake(pn_sstate)
         cmd = "devtool sdk-install %s " % pn_sstate
         oeSDKExtSelfTest.run_esdk_cmd(self.env_eSDK, self.tmpdir_eSDKQA, cmd)
 
-    @OETestID(1603)
     def test_image_generation_binary_feeds(self):
         image = 'core-image-minimal'
         cmd = "devtool build-image %s" % image

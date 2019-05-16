@@ -9,14 +9,16 @@ is not provided.
 Upstream-Status: Inappropriate [musl specific]
 
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+[Rebased for v242]
+Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
 ---
  src/basic/missing_type.h | 9 +++++++++
- src/basic/util.h         | 1 +
+ src/basic/sort-util.h    | 1 +
  src/journal/catalog.c    | 1 +
  3 files changed, 11 insertions(+)
 
 diff --git a/src/basic/missing_type.h b/src/basic/missing_type.h
-index bf8a6ca..c487e65 100644
+index bf8a6caa1b..2134fe5095 100644
 --- a/src/basic/missing_type.h
 +++ b/src/basic/missing_type.h
 @@ -10,3 +10,12 @@
@@ -32,30 +34,30 @@ index bf8a6ca..c487e65 100644
 +#define __COMPAR_FN_T
 +typedef int (*__compar_fn_t)(const void *, const void *);
 +#endif
-diff --git a/src/basic/util.h b/src/basic/util.h
-index 9f6a6ce..2c5dc32 100644
---- a/src/basic/util.h
-+++ b/src/basic/util.h
-@@ -26,6 +26,7 @@
- #include "format-util.h"
+diff --git a/src/basic/sort-util.h b/src/basic/sort-util.h
+index e029f86..7247d40 100644
+--- a/src/basic/sort-util.h
++++ b/src/basic/sort-util.h
+@@ -4,6 +4,7 @@
+ #include <stdlib.h>
+ 
  #include "macro.h"
- #include "time-util.h"
 +#include "missing.h"
  
- size_t page_size(void) _pure_;
- #define PAGE_ALIGN(l) ALIGN_TO((l), page_size())
+ void *xbsearch_r(const void *key, const void *base, size_t nmemb, size_t size,
+                  __compar_d_fn_t compar, void *arg);
 diff --git a/src/journal/catalog.c b/src/journal/catalog.c
-index 4062f12..034e00c 100644
+index 7beffc1e1a..4818a2e5cc 100644
 --- a/src/journal/catalog.c
 +++ b/src/journal/catalog.c
-@@ -26,6 +26,7 @@
+@@ -29,6 +29,7 @@
+ #include "string-util.h"
  #include "strv.h"
  #include "tmpfile-util.h"
- #include "util.h"
 +#include "missing.h"
  
  const char * const catalog_file_dirs[] = {
          "/usr/local/lib/systemd/catalog/",
 -- 
-2.7.4
+2.11.0
 

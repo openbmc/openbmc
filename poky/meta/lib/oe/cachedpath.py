@@ -1,4 +1,6 @@
 #
+# SPDX-License-Identifier: GPL-2.0-only
+#
 # Based on standard python library functions but avoid
 # repeated stat calls. Its assumed the files will not change from under us
 # so we can cache stat calls.

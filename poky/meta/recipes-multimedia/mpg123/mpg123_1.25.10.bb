@@ -9,7 +9,8 @@ SECTION = "multimedia"
 LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1e86753638d3cf2512528b99079bc4f3"
 
-SRC_URI = "https://www.mpg123.de/download/${BP}.tar.bz2"
+SRC_URI = "https://www.mpg123.de/download/${BP}.tar.bz2 \
+           file://sdl2.patch"
 SRC_URI[md5sum] = "ea32caa61d41d8be797f0b04a1b43ad9"
 SRC_URI[sha256sum] = "6c1337aee2e4bf993299851c70b7db11faec785303cfca3a5c3eb5f329ba7023"
 
@@ -27,7 +28,7 @@ PACKAGECONFIG[jack] = ",,jack"
 PACKAGECONFIG[openal] = ",,openal-soft"
 PACKAGECONFIG[portaudio] = ",,portaudio-v19"
 PACKAGECONFIG[pulseaudio] = "--with-default-audio=pulse,,pulseaudio"
-PACKAGECONFIG[sdl] = ",,libsdl"
+PACKAGECONFIG[sdl] = ",,libsdl2"
 
 # Following are possible sound output modules:
 # alsa arts coreaudio dummy esd jack nas openal os2 oss portaudio pulse sdl sndio sun tinyalsa win32 win32_wasapi

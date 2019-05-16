@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import os
 import re
 import glob as g
@@ -7,11 +11,9 @@ from oeqa.selftest.case import OESelftestTestCase
 from oeqa.selftest.cases.buildhistory import BuildhistoryBase
 from oeqa.utils.commands import runCmd, bitbake, get_bb_var, get_bb_vars
 import oeqa.utils.ftools as ftools
-from oeqa.core.decorator.oeid import OETestID
 
 class ImageOptionsTests(OESelftestTestCase):
 
-    @OETestID(761)
     def test_incremental_image_generation(self):
         image_pkgtype = get_bb_var("IMAGE_PKGTYPE")
         if image_pkgtype != 'rpm':
@@ -30,7 +32,6 @@ class ImageOptionsTests(OESelftestTestCase):
         incremental_removed = re.search(r"Erasing\s*:\s*packagegroup-core-ssh-openssh", log_data_removed)
         self.assertTrue(incremental_removed, msg = "Match failed in:\n%s" % log_data_removed)
 
-    @OETestID(286)
     def test_ccache_tool(self):
         bitbake("ccache-native")
         bb_vars = get_bb_vars(['SYSROOT_DESTDIR', 'bindir'], 'ccache-native')
@@ -45,7 +46,6 @@ class ImageOptionsTests(OESelftestTestCase):
             loglines = "".join(f.readlines())
         self.assertIn("ccache", loglines, msg="No match for ccache in m4-native log.do_compile. For further details: %s" % log_compile)
 
-    @OETestID(1435)
     def test_read_only_image(self):
         distro_features = get_bb_var('DISTRO_FEATURES')
         if not ('x11' in distro_features and 'opengl' in distro_features):
@@ -56,7 +56,6 @@ class ImageOptionsTests(OESelftestTestCase):
 
 class DiskMonTest(OESelftestTestCase):
 
-    @OETestID(277)
     def test_stoptask_behavior(self):
         self.write_config('BB_DISKMON_DIRS = "STOPTASKS,${TMPDIR},100000G,100K"')
         res = bitbake("delay -c delay", ignore_status = True)
@@ -76,7 +75,6 @@ class SanityOptionsTest(OESelftestTestCase):
             if line in l:
                 return l
 
-    @OETestID(927)
     def test_options_warnqa_errorqa_switch(self):
 
         self.write_config("INHERIT_remove = \"report-error\"")
@@ -98,7 +96,6 @@ class SanityOptionsTest(OESelftestTestCase):
         line = self.getline(res, "QA Issue: xcursor-transparent-theme-dbg is listed in PACKAGES multiple times, this leads to packaging errors.")
         self.assertTrue(line and line.startswith("WARNING:"), msg=res.output)
 
-    @OETestID(1421)
     def test_layer_without_git_dir(self):
         """
         Summary:     Test that layer git revisions are displayed and do not fail without git repository
@@ -140,12 +137,10 @@ class SanityOptionsTest(OESelftestTestCase):
 
 class BuildhistoryTests(BuildhistoryBase):
 
-    @OETestID(293)
     def test_buildhistory_basic(self):
         self.run_buildhistory_operation('xcursor-transparent-theme')
         self.assertTrue(os.path.isdir(get_bb_var('BUILDHISTORY_DIR')), "buildhistory dir was not created.")
 
-    @OETestID(294)
     def test_buildhistory_buildtime_pr_backwards(self):
         target = 'xcursor-transparent-theme'
         error = "ERROR:.*QA Issue: Package version for package %s went backwards which would break package feeds from (.*-r1.* to .*-r0.*)" % target
@@ -153,7 +148,6 @@ class BuildhistoryTests(BuildhistoryBase):
         self.run_buildhistory_operation(target, target_config="PR = \"r0\"", change_bh_location=False, expect_error=True, error_regex=error)
 
 class ArchiverTest(OESelftestTestCase):
-    @OETestID(926)
     def test_arch_work_dir_and_export_source(self):
         """
         Test for archiving the work directory and exporting the source files.

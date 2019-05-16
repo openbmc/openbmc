@@ -34,6 +34,8 @@ RDEPENDS_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'pam', '${PAM_PLUGINS
 
 inherit autotools update-rc.d systemd
 
+CVE_PRODUCT = "dropbear_ssh"
+
 INITSCRIPT_NAME = "dropbear"
 INITSCRIPT_PARAMS = "defaults 10"
 

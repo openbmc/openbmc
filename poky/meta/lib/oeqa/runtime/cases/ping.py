@@ -1,13 +1,15 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 from subprocess import Popen, PIPE
 
 from oeqa.runtime.case import OERuntimeTestCase
-from oeqa.core.decorator.oeid import OETestID
 from oeqa.core.decorator.oetimeout import OETimeout
 
 class PingTest(OERuntimeTestCase):
 
     @OETimeout(30)
-    @OETestID(964)
     def test_ping(self):
         output = ''
         count = 0

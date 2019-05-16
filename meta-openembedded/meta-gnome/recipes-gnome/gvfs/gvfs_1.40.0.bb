@@ -63,14 +63,14 @@ PACKAGECONFIG[cdda] = "-Dcdda=true, -Dcdda=false, libcdio-paranoia"
 
 do_install_append() {
     # Fix up permissions on polkit rules.d to work with rpm4 constraints
-	chmod 700 ${D}/${datadir}/polkit-1/rules.d
-	chown polkitd:root ${D}/${datadir}/polkit-1/rules.d
+    chmod 700 ${D}/${datadir}/polkit-1/rules.d
+    chown polkitd:root ${D}/${datadir}/polkit-1/rules.d
 
     # After rebuilds (not from scracth) it can happen that the executables in
     # libexec ar missing executable permission flag. Not sure but it came up
     # during transition to meson. Looked into build files and logs but could
     # not find suspicious
-    for exe in `find ${D}/${libexec}`; do
+    for exe in `find ${D}/${libexecdir}`; do
        chmod +x $exe
     done
 }

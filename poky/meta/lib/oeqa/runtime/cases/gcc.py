@@ -1,8 +1,11 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import os
 
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
-from oeqa.core.decorator.oeid import OETestID
 from oeqa.runtime.decorator.package import OEHasPackage
 
 class GccCompileTest(OERuntimeTestCase):
@@ -24,7 +27,6 @@ class GccCompileTest(OERuntimeTestCase):
         files = '/tmp/test.c /tmp/test.o /tmp/test /tmp/testmakefile'
         cls.tc.target.run('rm %s' % files)
 
-    @OETestID(203)
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     @OEHasPackage(['gcc'])
     def test_gcc_compile(self):
@@ -36,7 +38,6 @@ class GccCompileTest(OERuntimeTestCase):
         msg = 'running compiled file failed, output: %s' % output
         self.assertEqual(status, 0, msg=msg)
 
-    @OETestID(200)
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     @OEHasPackage(['g++'])
     def test_gpp_compile(self):
@@ -48,7 +49,6 @@ class GccCompileTest(OERuntimeTestCase):
         msg = 'running compiled file failed, output: %s' % output
         self.assertEqual(status, 0, msg=msg)
 
-    @OETestID(1142)
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     @OEHasPackage(['g++'])
     def test_gpp2_compile(self):
@@ -60,7 +60,6 @@ class GccCompileTest(OERuntimeTestCase):
         msg = 'running compiled file failed, output: %s' % output
         self.assertEqual(status, 0, msg=msg)
 
-    @OETestID(204)
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     @OEHasPackage(['gcc'])
     @OEHasPackage(['make'])

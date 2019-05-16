@@ -1,7 +1,8 @@
-# -*- coding: utf-8 -*-
+#
 # Copyright (C) 2013 Intel Corporation
 #
-# Released under the MIT license (see COPYING.MIT)
+# SPDX-License-Identifier: MIT
+#
 
 # Provides a class for setting up ssh connections,
 # running commands and copying files to/from a target.

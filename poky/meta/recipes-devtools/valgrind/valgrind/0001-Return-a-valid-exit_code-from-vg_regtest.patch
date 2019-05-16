@@ -1,0 +1,27 @@
+From 5eebdefd2251803e7d21081745018fcb16b2ba71 Mon Sep 17 00:00:00 2001
+From: Randy MacLeod <Randy.MacLeod@windriver.com>
+Date: Wed, 8 May 2019 20:16:52 -0400
+Subject: [PATCH] Return a valid exit_code from vg_regtest
+
+Upstream-Status: Pending
+
+Signed-off-by: Randy MacLeod <Randy.MacLeod@windriver.com>
+---
+ tests/vg_regtest.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/vg_regtest.in b/tests/vg_regtest.in
+index 909af3be8..f2799c4e3 100755
+--- a/tests/vg_regtest.in
++++ b/tests/vg_regtest.in
+@@ -403,6 +403,7 @@ sub mysystem($)
+             exit 1;
+         }
+     }
++    return $exit_code;
+ }
+ # if $keepunfiltered, copies $1 to $1.unfiltered.out
+ # renames $0 tp $1
+-- 
+2.17.0
+

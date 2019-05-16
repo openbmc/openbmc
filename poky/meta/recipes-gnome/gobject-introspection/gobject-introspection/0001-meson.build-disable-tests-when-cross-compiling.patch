@@ -1,0 +1,26 @@
+From 2c384187cc22113c0c9b1cd233948118f7c085ef Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 25 Mar 2019 13:28:48 +0100
+Subject: [PATCH] meson.build: disable tests when cross-compiling
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/gobject-introspection/merge_requests/64]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ meson.build | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 2544ff3..4c16fe5 100644
+--- a/meson.build
++++ b/meson.build
+@@ -168,7 +168,9 @@ if get_option('enable-introspection-data') == true
+ endif
+ subdir('examples')
+ subdir('docs')
+-subdir('tests')
++if not meson.is_cross_build()
++    subdir('tests')
++endif
+ 
+ install_data('Makefile.introspection', install_dir: join_paths(get_option('datadir'), 'gobject-introspection-1.0'))
+ install_data('m4/introspection.m4', install_dir: join_paths(get_option('datadir'), 'aclocal'))

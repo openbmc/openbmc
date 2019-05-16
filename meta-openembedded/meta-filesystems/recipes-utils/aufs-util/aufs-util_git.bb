@@ -61,6 +61,6 @@ do_install_class-native () {
     done
 }
 
-RRECOMMENDS_${PN} += "kernel-module-aufs"
+RRECOMMENDS_${PN}_class-target += "kernel-module-aufs"
 
 BBCLASSEXTEND = "native"

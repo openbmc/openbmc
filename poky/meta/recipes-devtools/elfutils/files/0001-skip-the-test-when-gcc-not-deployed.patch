@@ -1,0 +1,45 @@
+From 61939d2e552e7645ecd671fa01cf1c7a72caa82a Mon Sep 17 00:00:00 2001
+From: Mingli Yu <Mingli.Yu@windriver.com>
+Date: Fri, 12 Apr 2019 16:29:58 +0800
+Subject: [PATCH] skip the test when gcc not deployed
+
+Skip the tests which depend on gcc when
+gcc not deployed.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
+---
+ tests/run-strip-g.sh       | 2 ++
+ tests/run-strip-nothing.sh | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/tests/run-strip-g.sh b/tests/run-strip-g.sh
+index 1303819..a943dec 100755
+--- a/tests/run-strip-g.sh
++++ b/tests/run-strip-g.sh
+@@ -24,6 +24,8 @@
+ 
+ tempfiles a.out strip.out debug.out readelf.out
+ 
++# skip the test if gcc deployed
++which gcc || exit 77
+ echo Create debug a.out.
+ echo "int main() { return 1; }" | gcc -g -xc -
+ 
+diff --git a/tests/run-strip-nothing.sh b/tests/run-strip-nothing.sh
+index 914fdfb..d03f734 100755
+--- a/tests/run-strip-nothing.sh
++++ b/tests/run-strip-nothing.sh
+@@ -22,6 +22,8 @@
+ 
+ tempfiles a.out strip.out debug.out
+ 
++# skip the case if no gcc deployed
++which gcc || exit 77
+ # Create no-debug a.out.
+ echo "int main() { return 1; }" | gcc -s -xc -
+ 
+-- 
+2.7.4
+

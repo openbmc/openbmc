@@ -1,5 +1,6 @@
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
 """
 Bitbake "Fetch" implementation for osc (Opensuse build service client).
 Based on the svn "Fetch" implementation.

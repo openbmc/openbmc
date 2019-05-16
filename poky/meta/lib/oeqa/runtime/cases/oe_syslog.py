@@ -1,12 +1,14 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
-from oeqa.core.decorator.oeid import OETestID
 from oeqa.core.decorator.data import skipIfDataVar
 from oeqa.runtime.decorator.package import OEHasPackage
 
 class SyslogTest(OERuntimeTestCase):
 
-    @OETestID(201)
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     @OEHasPackage(["busybox-syslog", "sysklogd", "rsyslog", "syslog-ng"])
     def test_syslog_running(self):
@@ -19,7 +21,6 @@ class SyslogTest(OERuntimeTestCase):
 
 class SyslogTestConfig(OERuntimeTestCase):
 
-    @OETestID(1149)
     @OETestDepends(['oe_syslog.SyslogTest.test_syslog_running'])
     def test_syslog_logger(self):
         status, output = self.target.run('logger foobar')
@@ -36,7 +37,6 @@ class SyslogTestConfig(OERuntimeTestCase):
                ' Output: %s ' % output)
         self.assertEqual(status, 0, msg=msg)
 
-    @OETestID(1150)
     @OETestDepends(['oe_syslog.SyslogTest.test_syslog_running'])
     def test_syslog_restart(self):
         if "systemd" != self.tc.td.get("VIRTUAL-RUNTIME_init_manager", ""):
@@ -45,7 +45,6 @@ class SyslogTestConfig(OERuntimeTestCase):
             (_, _) = self.target.run('systemctl restart syslog.service')
 
 
-    @OETestID(202)
     @OETestDepends(['oe_syslog.SyslogTestConfig.test_syslog_logger'])
     @OEHasPackage(["busybox-syslog"])
     @skipIfDataVar('VIRTUAL-RUNTIME_init_manager', 'systemd',

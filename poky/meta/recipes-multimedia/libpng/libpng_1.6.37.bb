@@ -1,0 +1,31 @@
+SUMMARY = "PNG image format decoding library"
+HOMEPAGE = "http://www.libpng.org/"
+SECTION = "libs"
+LICENSE = "Libpng"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=b0085051bf265bac2bfc38bc89f50000\
+                    file://png.h;endline=144;md5=8acd23d544623816b097e07be0139509\
+                    "
+DEPENDS = "zlib"
+
+LIBV = "16"
+
+SRC_URI = "${SOURCEFORGE_MIRROR}/project/${BPN}/${BPN}${LIBV}/${PV}/${BP}.tar.xz"
+SRC_URI[md5sum] = "015e8e15db1eecde5f2eb9eb5b6e59e9"
+SRC_URI[sha256sum] = "505e70834d35383537b6491e7ae8641f1a4bed1876dbfe361201fc80868d88ca"
+
+MIRRORS += "${SOURCEFORGE_MIRROR}/project/${BPN}/${BPN}${LIBV}/${PV}/ ${SOURCEFORGE_MIRROR}/project/${BPN}/${BPN}${LIBV}/older-releases/${PV}/"
+
+UPSTREAM_CHECK_URI = "http://libpng.org/pub/png/libpng.html"
+
+BINCONFIG = "${bindir}/libpng-config ${bindir}/libpng16-config"
+
+inherit autotools binconfig-disabled pkgconfig
+
+# Work around missing symbols
+EXTRA_OECONF_append_class-target = " ${@bb.utils.contains("TUNE_FEATURES", "neon", "--enable-arm-neon=on", "--enable-arm-neon=off" ,d)}"
+
+PACKAGES =+ "${PN}-tools"
+
+FILES_${PN}-tools = "${bindir}/png-fix-itxt ${bindir}/pngfix ${bindir}/pngcp"
+
+BBCLASSEXTEND = "native nativesdk"

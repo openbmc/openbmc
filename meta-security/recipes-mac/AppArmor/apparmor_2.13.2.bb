@@ -14,7 +14,7 @@ LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=fd57a4b0bc782d7b80fd431f10bbf9d0"
 DEPENDS = "bison-native apr gettext-native coreutils-native"
 
 SRC_URI = " \
-	http://archive.ubuntu.com/ubuntu/pool/main/a/${BPN}/${BPN}_${PV}.orig.tar.gz \
+	git://gitlab.com/apparmor/apparmor.git;protocol=https;branch=apparmor-2.13 \
 	file://disable_perl_h_check.patch \
 	file://crosscompile_perl_bindings.patch \
 	file://apparmor.rc \
@@ -24,8 +24,8 @@ SRC_URI = " \
 	file://run-ptest \
 	"
 
-SRC_URI[md5sum] = "2439b35266b5a3a461b0a2dba6e863c3"
-SRC_URI[sha256sum] = "844def9926dfda5c7858428d06e44afc80573f9706458b6e7282edbb40b11a30"
+SRCREV = "af4808b5f6b58946f5c5a4de4b77df5e0eae6ca0"
+S = "${WORKDIR}/git"
 
 PARALLEL_MAKE = ""
 

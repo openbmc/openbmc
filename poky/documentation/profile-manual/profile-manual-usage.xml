@@ -2350,22 +2350,8 @@
         <para>
             For this section, we'll assume you've already performed the
             basic setup outlined in the General Setup section.
-        </para>
-
-        <para>
             LTTng is run on the target system by ssh'ing to it.
-            However, if you want to see the traces graphically,
-            install Eclipse as described in section
-            "<link linkend='manually-copying-a-trace-to-the-host-and-viewing-it-in-eclipse'>Manually copying a trace to the host and viewing it in Eclipse (i.e. using Eclipse without network support)</link>"
-            and follow the directions to manually copy traces to the host and
-            view them in Eclipse (i.e. using Eclipse without network support).
         </para>
-
-        <note>
-            Be sure to download and install/run the 'SR1' or later Juno release
-            of eclipse e.g.:
-            <ulink url='http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/juno/SR1/eclipse-cpp-juno-SR1-linux-gtk-x86_64.tar.gz'>http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/juno/SR1/eclipse-cpp-juno-SR1-linux-gtk-x86_64.tar.gz</ulink>
-        </note>
     </section>
 
     <section id='collecting-and-viewing-traces'>
@@ -2564,163 +2550,6 @@
             </para>
         </section>
 
-        <section id='manually-copying-a-trace-to-the-host-and-viewing-it-in-eclipse'>
-            <title>Manually copying a trace to the host and viewing it in Eclipse (i.e. using Eclipse without network support)</title>
-
-            <para>
-                If you already have an LTTng trace on a remote target and
-                would like to view it in Eclipse on the host, you can easily
-                copy it from the target to the host and import it into
-                Eclipse to view it using the LTTng Eclipse plug-in already
-                bundled in the Eclipse (Juno SR1 or greater).
-            </para>
-
-            <para>
-                Using the trace we created in the previous section, archive
-                it and copy it to your host system:
-                <literallayout class='monospaced'>
-     root@crownbay:~/lttng-traces# tar zcvf auto-20121015-232120.tar.gz auto-20121015-232120
-     auto-20121015-232120/
-     auto-20121015-232120/kernel/
-     auto-20121015-232120/kernel/metadata
-     auto-20121015-232120/kernel/channel0_1
-     auto-20121015-232120/kernel/channel0_0
-
-     $ scp root@192.168.1.47:lttng-traces/auto-20121015-232120.tar.gz .
-     root@192.168.1.47's password:
-     auto-20121015-232120.tar.gz                                             100% 1566KB   1.5MB/s   00:01
-                </literallayout>
-                Unarchive it on the host:
-                <literallayout class='monospaced'>
-     $ gunzip -c auto-20121015-232120.tar.gz | tar xvf -
-     auto-20121015-232120/
-     auto-20121015-232120/kernel/
-     auto-20121015-232120/kernel/metadata
-     auto-20121015-232120/kernel/channel0_1
-     auto-20121015-232120/kernel/channel0_0
-                </literallayout>
-                We can now import the trace into Eclipse and view it:
-                <orderedlist>
-                    <listitem><para>First, start eclipse and open the
-                        'LTTng Kernel' perspective by selecting the following
-                        menu item:
-                        <literallayout class='monospaced'>
-     Window | Open Perspective | Other...
-                        </literallayout></para></listitem>
-                    <listitem><para>In the dialog box that opens, select
-                        'LTTng Kernel' from the list.</para></listitem>
-                    <listitem><para>Back at the main menu, select the
-                        following menu item:
-                        <literallayout class='monospaced'>
-     File | New | Project...
-                        </literallayout></para></listitem>
-                    <listitem><para>In the dialog box that opens, select
-                        the 'Tracing | Tracing Project' wizard and press
-                        'Next>'.</para></listitem>
-                    <listitem><para>Give the project a name and press
-                        'Finish'.</para></listitem>
-                    <listitem><para>In the 'Project Explorer' pane under
-                        the project you created, right click on the
-                        'Traces' item.</para></listitem>
-                    <listitem><para>Select 'Import..." and in the dialog
-                        that's displayed:</para></listitem>
-                    <listitem><para>Browse the filesystem and find the
-                        select the 'kernel' directory containing the trace
-                        you copied from the target
-                        e.g. auto-20121015-232120/kernel</para></listitem>
-                    <listitem><para>'Checkmark' the directory in the tree
-                        that's displayed for the trace</para></listitem>
-                    <listitem><para>Below that, select 'Common Trace Format:
-                        Kernel Trace' for the 'Trace Type'</para></listitem>
-                    <listitem><para>Press 'Finish' to close the dialog
-                        </para></listitem>
-                    <listitem><para>Back in the 'Project Explorer' pane,
-                        double-click on the 'kernel' item for the
-                        trace you just imported under 'Traces'
-                        </para></listitem>
-                </orderedlist>
-                You should now see your trace data displayed graphically
-                in several different views in Eclipse:
-            </para>
-
-            <para>
-                <imagedata fileref="figures/lttngmain0.png" width="6in" depth="6in" align="center" scalefit="1" />
-            </para>
-
-            <para>
-                You can access extensive help information on how to use
-                the LTTng plug-in to search and analyze captured traces via
-                the Eclipse help system:
-                <literallayout class='monospaced'>
-     Help | Help Contents | LTTng Plug-in User Guide
-                </literallayout>
-            </para>
-        </section>
-
-        <section id='collecting-and-viewing-a-trace-in-eclipse'>
-            <title>Collecting and viewing a trace in Eclipse</title>
-
-            <note>
-                This section on collecting traces remotely doesn't currently
-                work because of Eclipse 'RSE' connectivity problems. Manually
-                tracing on the target, copying the trace files to the host,
-                and viewing the trace in Eclipse on the host as outlined in
-                previous steps does work however - please use the manual
-                steps outlined above to view traces in Eclipse.
-            </note>
-
-            <para>
-                In order to trace a remote target, you also need to add
-                a 'tracing' group on the target and connect as a user
-                who's part of that group e.g:
-                <literallayout class='monospaced'>
-     # adduser tomz
-     # groupadd -r tracing
-     # usermod -a -G tracing tomz
-                </literallayout>
-                <orderedlist>
-                    <listitem><para>First, start eclipse and open the
-                        'LTTng Kernel' perspective by selecting the following
-                         menu item:
-                         <literallayout class='monospaced'>
-     Window | Open Perspective | Other...
-                         </literallayout></para></listitem>
-                    <listitem><para>In the dialog box that opens, select
-                        'LTTng Kernel' from the list.</para></listitem>
-                    <listitem><para>Back at the main menu, select the
-                        following menu item:
-                        <literallayout class='monospaced'>
-     File | New | Project...
-                        </literallayout></para></listitem>
-                    <listitem><para>In the dialog box that opens, select
-                        the 'Tracing | Tracing Project' wizard and
-                        press 'Next>'.</para></listitem>
-                    <listitem><para>Give the project a name and press
-                        'Finish'. That should result in an entry in the
-                        'Project' subwindow.</para></listitem>
-                    <listitem><para>In the 'Control' subwindow just below
-                        it, press 'New Connection'.</para></listitem>
-                    <listitem><para>Add a new connection, giving it the
-                        hostname or IP address of the target system.
-                        </para></listitem>
-                    <listitem><para>Provide the username and password
-                        of a qualified user (a member of the 'tracing' group)
-                        or root account on the target system.
-                        </para></listitem>
-                    <listitem><para>Provide appropriate answers to whatever
-                        else is asked for e.g. 'secure storage password'
-                        can be anything you want.
-                        If you get an 'RSE Error' it may be due to proxies.
-                        It may be possible to get around the problem by
-                        changing the following setting:
-                        <literallayout class='monospaced'>
-     Window | Preferences | Network Connections
-                        </literallayout>
-                        Switch 'Active Provider' to 'Direct'
-                        </para></listitem>
-                </orderedlist>
-            </para>
-        </section>
     </section>
 
     <section id='lltng-documentation'>
@@ -2741,15 +2570,6 @@
             site.
             You can find a "Getting Started" link on this site that takes
             you to an LTTng Quick Start.
-        </para>
-
-        <para>
-            Finally, you can access extensive help information on how to use
-            the LTTng plug-in to search and analyze captured traces via the
-            Eclipse help system:
-            <literallayout class='monospaced'>
-     Help | Help Contents | LTTng Plug-in User Guide
-            </literallayout>
         </para>
     </section>
 </section>

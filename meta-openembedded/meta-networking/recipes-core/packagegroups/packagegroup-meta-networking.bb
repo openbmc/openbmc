@@ -38,8 +38,9 @@ RDEPENDS_packagegroup-meta-networking-connectivity = "\
     inetutils wolfssl lftp miniupnpd networkmanager \
     networkmanager-openvpn rdist nanomsg python-networkmanager \
     wireless-regdb \
-    ${@bb.utils.contains("DISTRO_FEATURE", "bluez5 x11", "blueman", "", d)} \
-    ${@bb.utils.contains("DISTRO_FEATURE", "pam", "samba", "", d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "bluez5 x11", "blueman", "", d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "pam", "samba", "", d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "pam", "samba", "", d)} \
     "
 
 RDEPENDS_packagegroup-meta-networking-daemons = "\
@@ -47,7 +48,7 @@ RDEPENDS_packagegroup-meta-networking-daemons = "\
     ptpd igmpproxy opensaf squid \
     atftp postfix iscsi-initiator-utils vsftpd cyrus-sasl \
     pure-ftpd vblade tftp-hpa ncftp \
-    ${@bb.utils.contains("DISTRO_FEATURE", "systemd", "networkd-dispatcher", "", d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "networkd-dispatcher", "", d)} \
     "
 
 RDEPENDS_packagegroup-meta-networking-devtools = "\
@@ -56,7 +57,7 @@ RDEPENDS_packagegroup-meta-networking-devtools = "\
 
 RDEPENDS_packagegroup-meta-networking-extended = "\
     corosync \
-    ${@bb.utils.contains("DISTRO_FEATURE", "systemd", "dlm", "", d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "dlm", "", d)} \
     "
 
 RDEPENDS_packagegroup-meta-networking-filter = "\
@@ -85,7 +86,7 @@ RDEPENDS_packagegroup-meta-networking-protocols = "\
     tsocks freediameter xl2tpd babeld mdns net-snmp \
     quagga pptp-linux zeroconf nopoll openflow rp-pppoe \
     radiusclient-ng openl2tp usrsctp \
-    ${@bb.utils.contains("DISTRO_FEATURE", "pam", "dante", "", d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "pam", "dante", "", d)} \
     "
 
 RDEPENDS_packagegroup-meta-networking-support = "\
@@ -104,7 +105,7 @@ RDEPENDS_packagegroup-meta-networking-support = "\
     netcat-openbsd fetchmail yp-tools ypbind-mt yp-tools \
     arptables macchanger nghttp2 strongswan fping \
     dnssec-conf libesmtp cifs-utils open-isns \
-    ${@bb.utils.contains("DISTRO_FEATURE", "pam", "libldb", "", d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "pam", "libldb", "", d)} \
     ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "non-commercial", "netperf", "", d)} \
     ${@bb.utils.contains_any("TRANSLATED_TARGET_ARCH", "i586 x86-64", "spice", "", d)} \
     "

@@ -1,0 +1,43 @@
+From 2ee8796db5019341b774bcb4f7d0944d89e1845b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 9 Apr 2019 21:26:55 -0700
+Subject: [PATCH 2/2] include sys/select.h and sys/types.h
+
+sys/select.h is needed to provide fd_set definition
+sys/types.h is needed for ssize_t
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/dellssd.c | 1 +
+ src/utils.h   | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/src/dellssd.c b/src/dellssd.c
+index 7b8d431..e97fe45 100644
+--- a/src/dellssd.c
++++ b/src/dellssd.c
+@@ -27,6 +27,7 @@
+ #include <unistd.h>
+ 
+ #include <sys/ioctl.h>
++#include <sys/select.h>
+ #include <linux/ipmi.h>
+ 
+ #if _HAVE_DMALLOC_H
+diff --git a/src/utils.h b/src/utils.h
+index 720447a..c106529 100644
+--- a/src/utils.h
++++ b/src/utils.h
+@@ -21,6 +21,7 @@
+ #define _UTILS_H_INCLUDED_
+ 
+ #include <getopt.h>
++#include <sys/types.h>
+ #include "config_file.h"
+ #include "stdlib.h"
+ #include "stdint.h"
+-- 
+2.21.0
+

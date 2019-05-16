@@ -1,0 +1,28 @@
+From c54488ad5fd657e0f154d76d7456d9080be24836 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 10 Jun 2017 11:18:49 -0700
+Subject: [PATCH] Disable PIE during link
+
+We have explcitly disabled PIE during compile so we
+just need to match it with linker flags
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ purgatory/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/purgatory/Makefile b/purgatory/Makefile
+index 416e6b9..f00edb4 100644
+--- a/purgatory/Makefile
++++ b/purgatory/Makefile
+@@ -59,7 +59,7 @@ $(PURGATORY): CPPFLAGS=$($(ARCH)_PURGATORY_EXTRA_CFLAGS) \
+ 			-Iinclude \
+ 			-I$(shell $(CC) -print-file-name=include)
+ $(PURGATORY): LDFLAGS=$($(ARCH)_PURGATORY_EXTRA_CFLAGS)\
+-			-Wl,--no-undefined -nostartfiles -nostdlib \
++			-Wl,--no-undefined -no-pie -nostartfiles -nostdlib \
+ 			-nodefaultlibs -e purgatory_start -Wl,-r \
+ 			-Wl,-Map=$(PURGATORY_MAP)
+ 

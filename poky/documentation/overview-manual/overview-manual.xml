@@ -37,9 +37,14 @@
                 <revremark>The initial document released with the Yocto Project 2.5 Release.</revremark>
             </revision>
             <revision>
-                <revnumber>2.6</revnumber>
+                <revnumber>2.7</revnumber>
+                <date>May 2019</date>
+                <revremark>Released with the Yocto Project 2.7 Release.</revremark>
+            </revision>
+            <revision>
+                <revnumber>2.8</revnumber>
                 <date>&REL_MONTH_YEAR;</date>
-                <revremark>Released with the Yocto Project 2.6 Release.</revremark>
+                <revremark>Released with the Yocto Project 2.8 Release.</revremark>
             </revision>
         </revhistory>
 

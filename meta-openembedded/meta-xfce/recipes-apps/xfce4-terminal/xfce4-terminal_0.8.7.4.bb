@@ -10,3 +10,5 @@ FILES_${PN} += "${datadir}/xfce4 \
 
 SRC_URI[md5sum] = "c861540dd1dd05f56e62382b3851cf66"
 SRC_URI[sha256sum] = "a88f98af4da72394f2cfbd7f14b0f053ec0a3b58a4f6a577836357c60a6c42ab"
+
+RRECOMMENDS_${PN} += "vte-prompt"

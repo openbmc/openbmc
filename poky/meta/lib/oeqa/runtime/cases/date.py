@@ -1,8 +1,11 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import re
 
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
-from oeqa.core.decorator.oeid import OETestID
 from oeqa.runtime.decorator.package import OEHasPackage
 
 class DateTest(OERuntimeTestCase):
@@ -17,7 +20,6 @@ class DateTest(OERuntimeTestCase):
             self.logger.debug('Starting systemd-timesyncd daemon')
             self.target.run('systemctl start systemd-timesyncd')
 
-    @OETestID(211)
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     @OEHasPackage(['coreutils', 'busybox'])
     def test_date(self):

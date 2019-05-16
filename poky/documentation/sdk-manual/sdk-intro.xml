@@ -14,9 +14,6 @@
         This manual provides information that explains how to use both the
         Yocto Project extensible and standard SDKs to develop
         applications and images.
-        Additionally, the manual also provides information on how to use
-        the popular <trademark class='trade'>Eclipse</trademark> IDE as part
-        of your application development workflow within the SDK environment.
         <note>
             Prior to the 2.0 Release of the Yocto Project, application
             development was primarily accomplished through the use of the
@@ -111,21 +108,6 @@
                 You must build and include this emulator separately.
                 However, QEMU plays an important role in the development
                 process that revolves around use of the SDK.
-                </para></listitem>
-            <listitem><para>
-                The Eclipse IDE Yocto Plug-in.
-                This plug-in is available for you if you are an Eclipse
-                user.
-                In the same manner as QEMU, the plug-in is not literally part
-                of the SDK but is rather available for use as part of the
-                development process.
-                </para></listitem>
-            <listitem><para>
-                Various performance-related
-                <ulink url='http://www.eclipse.org/linuxtools/index.php'>tools</ulink>
-                that can enhance your development experience.
-                These tools are also separate from the actual SDK but can be
-                independently obtained and used in the development process.
                 </para></listitem>
         </itemizedlist>
     </para>
@@ -269,53 +251,6 @@
                     is also installed and automatically available.
                     </para></listitem>
             </itemizedlist>
-        </para>
-    </section>
-
-    <section id='eclipse-overview'>
-        <title><trademark class='trade'>Eclipse</trademark> Yocto Plug-in</title>
-
-        <para>
-            The Eclipse IDE is a popular development environment and it fully
-            supports development using the Yocto Project.
-            When you install and configure the Eclipse Yocto Project Plug-in
-            into the Eclipse IDE, you maximize your Yocto Project experience.
-            Installing and configuring the Plug-in results in an environment
-            that has extensions specifically designed to let you more easily
-            develop software.
-            These extensions allow for cross-compilation, deployment, and
-            execution of your output into a QEMU emulation session.
-            You can also perform cross-debugging and profiling.
-            The environment also supports many performance-related
-            <ulink url='http://www.eclipse.org/linuxtools/index.php'>tools</ulink>
-            that enhance your development experience.
-            <note>
-                Previous releases of the Eclipse Yocto Plug-in supported
-                "user-space tools" (i.e. LatencyTOP, PowerTOP, Perf, SystemTap,
-                and Lttng-ust) that also added to the development experience.
-                These tools have been deprecated with the release of the
-                Eclipse Yocto Plug-in.
-            </note>
-        </para>
-
-        <para>
-            For information about the application development workflow that
-            uses the Eclipse IDE and for a detailed example of how to install
-            and configure the Eclipse Yocto Project Plug-in, see the
-            "<link linkend='sdk-eclipse-project'>Developing Applications Using <trademark class='trade'>Eclipse</trademark></link>"
-            Chapter.
-        </para>
-    </section>
-
-    <section id='performance-enhancing-tools'>
-        <title>Performance Enhancing Tools</title>
-
-        <para>
-            Supported performance enhancing tools are available that let you
-            profile, debug, and perform tracing on your projects developed
-            using Eclipse.
-            For information on these tools see
-            <ulink url='http://www.eclipse.org/linuxtools/'>http://www.eclipse.org/linuxtools/</ulink>.
         </para>
     </section>
 </section>

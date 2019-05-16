@@ -1,16 +1,18 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import os
 import fnmatch
 
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
-from oeqa.core.decorator.oeid import OETestID
 from oeqa.core.decorator.data import skipIfDataVar
 from oeqa.runtime.decorator.package import OEHasPackage
 from oeqa.core.utils.path import findFile
 
 class RpmBasicTest(OERuntimeTestCase):
 
-    @OETestID(960)
     @OEHasPackage(['rpm'])
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     def test_rpm_help(self):
@@ -18,7 +20,6 @@ class RpmBasicTest(OERuntimeTestCase):
         msg = 'status and output: %s and %s' % (status, output)
         self.assertEqual(status, 0, msg=msg)
 
-    @OETestID(191)
     @OETestDepends(['rpm.RpmBasicTest.test_rpm_help'])
     def test_rpm_query(self):
         status, output = self.target.run('ls /var/lib/rpm/')
@@ -43,7 +44,6 @@ class RpmInstallRemoveTest(OERuntimeTestCase):
             cls.test_file = os.path.join(rpmdir, f)
         cls.dst = '/tmp/base-passwd-doc.rpm'
 
-    @OETestID(192)
     @OETestDepends(['rpm.RpmBasicTest.test_rpm_query'])
     def test_rpm_install(self):
         self.tc.target.copyTo(self.test_file, self.dst)
@@ -52,14 +52,12 @@ class RpmInstallRemoveTest(OERuntimeTestCase):
         self.assertEqual(status, 0, msg=msg)
         self.tc.target.run('rm -f %s' % self.dst)
 
-    @OETestID(194)
     @OETestDepends(['rpm.RpmInstallRemoveTest.test_rpm_install'])
     def test_rpm_remove(self):
         status,output = self.target.run('rpm -e base-passwd-doc')
         msg = 'Failed to remove base-passwd-doc package: %s' % output
         self.assertEqual(status, 0, msg=msg)
 
-    @OETestID(1096)
     @OETestDepends(['rpm.RpmBasicTest.test_rpm_query'])
     def test_rpm_query_nonroot(self):
 
@@ -92,7 +90,6 @@ class RpmInstallRemoveTest(OERuntimeTestCase):
         finally:
             unset_up_test_user(tuser)
 
-    @OETestID(195)
     @OETestDepends(['rpm.RpmInstallRemoveTest.test_rpm_remove'])
     def test_check_rpm_install_removal_log_file_size(self):
         """

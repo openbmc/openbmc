@@ -1,4 +1,4 @@
-From a28cc8413b68bec5b4cf2ee5f37b40a8965490a5 Mon Sep 17 00:00:00 2001
+From 2335d22e4c64db3d5dfc16ac65468b9dd66db8ac Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 19 Oct 2015 18:29:21 +0300
 Subject: [PATCH] configure.ac: add host-gi, gi-cross-wrapper, gi-ldd-wrapper
@@ -34,7 +34,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  4 files changed, 87 insertions(+), 1 deletion(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index 44ed115..2a1fa56 100644
+index 952bf71..797a3bd 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -21,7 +21,9 @@ include Makefile-cmph.am
@@ -48,7 +48,7 @@ index 44ed115..2a1fa56 100644
  
  ## Process this file with automake to produce Makefile.in
 diff --git a/common.mk b/common.mk
-index e26c637..9f3a65f 100644
+index 77e819d..379ab53 100644
 --- a/common.mk
 +++ b/common.mk
 @@ -6,6 +6,15 @@
@@ -132,10 +132,10 @@ index e26c637..9f3a65f 100644
  INTROSPECTION_DOCTOOL_ARGS = \
      --add-include-path=$(srcdir) \
 diff --git a/configure.ac b/configure.ac
-index d48e6c3..ed5f8a2 100644
+index 885da70..cd8108b 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -367,6 +367,48 @@ dnl
+@@ -383,6 +383,48 @@ dnl
  AM_CONDITIONAL(MSVC_BASE_NO_TOOLSET_SET, [test x$MSVC_BASE_TOOLSET = x])
  AM_CONDITIONAL(MSVC_NO_TOOLSET_SET, [test x$MSVC_TOOLSET = x])
  
