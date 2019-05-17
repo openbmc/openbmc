@@ -8,6 +8,7 @@ NAMES = " \
         i2c@84000/lm75@5c  \
         i2c@8b000/hotswap@15 \
         i2c@8b000/power-brick@36 \
+        i2c@8c000/ucd90160@6b \
         "
 ITEMSFMT = "ahb/apb/{0}.conf"
 
