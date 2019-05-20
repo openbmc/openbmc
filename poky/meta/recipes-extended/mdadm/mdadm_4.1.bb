@@ -57,12 +57,14 @@ do_install() {
 do_install_append() {
         install -d ${D}/${sysconfdir}/
         install -m 644 ${S}/mdadm.conf-example ${D}${sysconfdir}/mdadm.conf
-        install -d ${D}/${systemd_unitdir}/system
-        install -m 644 ${WORKDIR}/mdmonitor.service ${D}/${systemd_unitdir}/system
-        install -m 644 ${S}/systemd/mdmon@.service ${D}/${systemd_unitdir}/system
         install -d ${D}/${sysconfdir}/init.d
         install -m 755 ${WORKDIR}/mdadm.init ${D}${sysconfdir}/init.d/mdmonitor
 }
+
+do_install_append() {
+        oe_runmake install-systemd DESTDIR=${D}
+}
+
 
 do_compile_ptest() {
 	oe_runmake test
@@ -90,3 +92,5 @@ RRECOMMENDS_${PN}-ptest += " \
     kernel-module-raid10 \
     kernel-module-raid456 \
 "
+
+FILES_${PN} += "/lib/systemd/*"

@@ -1,0 +1,68 @@
+From a59cb98a473caa2afd64d7ae368480b6e9f91b3f Mon Sep 17 00:00:00 2001
+From: Ming Liu <liu.ming50@gmail.com>
+Date: Tue, 14 May 2019 11:07:15 +0200
+Subject: [PATCH] Fix a NSUPDATE compiling issue
+
+Upstream-Status: Pending [Patch sent to: https://gitlab.isc.org/isc-projects/dhcp/issues/16]
+
+A following error was observed when NSUPDATE is not defined:
+| omapip/isclib.c: In function 'dns_client_init':
+| omapip/isclib.c:356:18: error: 'dhcp_context_t {aka struct dhcp_context}' has no member named 'dnsclient'
+|   if (dhcp_gbl_ctx.dnsclient == NULL) {
+|                   ^
+| omapip/isclib.c:363:24: error: 'dhcp_context_t {aka struct dhcp_context}' has no member named 'dnsclient'
+|            &dhcp_gbl_ctx.dnsclient,
+|                         ^
+| omapip/isclib.c:364:24: error: 'dhcp_context_t {aka struct dhcp_context}' has no member named 'use_local4'
+|            (dhcp_gbl_ctx.use_local4 ?
+|                         ^
+| omapip/isclib.c:365:25: error: 'dhcp_context_t {aka struct dhcp_context}' has no member named 'local4_sockaddr'
+|             &dhcp_gbl_ctx.local4_sockaddr
+|                          ^
+| omapip/isclib.c:367:24: error: 'dhcp_context_t {aka struct dhcp_context}' has no member named 'use_local6'
+|            (dhcp_gbl_ctx.use_local6 ?
+|                         ^
+| omapip/isclib.c:368:25: error: 'dhcp_context_t {aka struct dhcp_context}' has no member named 'local6_sockaddr'
+|             &dhcp_gbl_ctx.local6_sockaddr
+
+Fix it by adding NSUPDATE conditional checking.
+
+Signed-off-by: Ming Liu <liu.ming50@gmail.com>
+---
+ includes/omapip/isclib.h | 2 ++
+ omapip/isclib.c          | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/includes/omapip/isclib.h b/includes/omapip/isclib.h
+index 538b927..6c20584 100644
+--- a/includes/omapip/isclib.h
++++ b/includes/omapip/isclib.h
+@@ -141,6 +141,8 @@ void isclib_cleanup(void);
+ void dhcp_signal_handler(int signal);
+ extern int shutdown_signal;
+ 
++#if defined (NSUPDATE)
+ isc_result_t dns_client_init();
++#endif
+ 
+ #endif /* ISCLIB_H */
+diff --git a/omapip/isclib.c b/omapip/isclib.c
+index db3b895..ce4b4a1 100644
+--- a/omapip/isclib.c
++++ b/omapip/isclib.c
+@@ -351,6 +351,7 @@ void dhcp_signal_handler(int signal) {
+ 	}
+ }
+ 
++#if defined (NSUPDATE)
+ isc_result_t dns_client_init() {
+ 	isc_result_t result;
+ 	if (dhcp_gbl_ctx.dnsclient == NULL) {
+@@ -387,3 +388,4 @@ isc_result_t dns_client_init() {
+ 
+ 	return ISC_R_SUCCESS;
+ }
++#endif
+-- 
+2.7.4
+

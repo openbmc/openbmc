@@ -11,14 +11,14 @@ LICENSE = "Artistic-1.0 | GPL-1.0+"
 CPAN_NAME = "Test-Needs"
 CPAN_AUTHOR = "HAARG"
 
-LIC_FILES_CHKSUM = "file://README;md5=3f3ccd21a0a48aa313db212cc3b1bc09;beginline=81;endline=82"
+LIC_FILES_CHKSUM = "file://README;md5=3f3ccd21a0a48aa313db212cc3b1bc09;beginline=88;endline=89"
 
 DEPENDS += "perl"
 
-SRC_URI = "http://www.cpan.org/authors/id/H/HA/${CPAN_AUTHOR}/${CPAN_NAME}-${PV}.tar.gz"
+SRC_URI = "https://cpan.metacpan.org/authors/id/H/HA/${CPAN_AUTHOR}/${CPAN_NAME}-${PV}.tar.gz"
 
-SRC_URI[md5sum] = "356634a56c99282e8059f290f5d534c8"
-SRC_URI[sha256sum] = "5a4f33983586edacdbe00a3b429a9834190140190dab28d0f873c394eb7df399"
+SRC_URI[md5sum] = "d5c96d51d8d5510f7c0b7f354c49af1c"
+SRC_URI[sha256sum] = "77f9fff0c96c5e09f34d0416b3533c3319f7cd0bb1f7fe8f8072ad59f433f0e5"
 
 S = "${WORKDIR}/${CPAN_NAME}-${PV}"
 

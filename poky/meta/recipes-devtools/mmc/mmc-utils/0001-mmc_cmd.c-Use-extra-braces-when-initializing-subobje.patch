@@ -1,0 +1,32 @@
+From 04fbe6ddb5f1e02efbcae3cdf5beb16757a98948 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 10 May 2019 12:58:01 -0700
+Subject: [PATCH] mmc_cmd.c: Use extra braces when initializing subobjects
+
+clang warns with -Werror,-Wmissing-braces, as following error
+| mmc_cmds.c:1886:36: error: suggest braces around initialization of subobject [-Werror,-W
+missing-braces]
+|         struct rpmb_frame frame_status = {0};
+|                                           ^
+|                                           {}
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ mmc_cmds.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mmc_cmds.c b/mmc_cmds.c
+index 19a9da1..838e8c3 100644
+--- a/mmc_cmds.c
++++ b/mmc_cmds.c
+@@ -1883,7 +1883,7 @@ static int do_rpmb_op(int fd,
+ 	u_int16_t rpmb_type;
+ 	struct mmc_ioc_multi_cmd *mioc;
+ 	struct mmc_ioc_cmd *ioc;
+-	struct rpmb_frame frame_status = {0};
++	struct rpmb_frame frame_status = {{0}};
+ 
+ 	if (!frame_in || !frame_out || !out_cnt)
+ 		return -EINVAL;

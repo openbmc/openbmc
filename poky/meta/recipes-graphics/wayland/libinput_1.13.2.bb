@@ -8,8 +8,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=1f2ea9ebff3a2c6d458faf58492efb63"
 DEPENDS = "libevdev udev mtdev"
 
 SRC_URI = "http://www.freedesktop.org/software/${BPN}/${BP}.tar.xz"
-SRC_URI[md5sum] = "869a7e68c4290d99868500a369645def"
-SRC_URI[sha256sum] = "e1d487d478ee2bb118890a64211c2b7f2348aaed7363b214bed4d642274841ab"
+SRC_URI[md5sum] = "8b745894f5d1b2e883bfc686aebadcfe"
+SRC_URI[sha256sum] = "1d9fa0698348dea46f75321d98788f8ac7181c069b70c4d10736910a12bb6a6d"
 
 UPSTREAM_CHECK_REGEX = "libinput-(?P<pver>\d+\.\d+\.(?!9\d+)\d+)"
 

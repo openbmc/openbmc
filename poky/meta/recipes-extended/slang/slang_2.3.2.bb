@@ -75,6 +75,8 @@ do_install_ptest() {
 
 FILES_${PN} += "${libdir}/${BPN}/v2/modules/ ${datadir}/slsh/"
 
+RDEPENDS_${PN}-ptest += "make"
+
 PARALLEL_MAKE = ""
 PARALLEL_MAKEINST = ""
 

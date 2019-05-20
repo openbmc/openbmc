@@ -48,7 +48,7 @@ PACKAGES =+ "${PN}-libfl"
 FILES_${PN}-libfl = "${libdir}/libfl.so.* ${libdir}/libfl_pic.so.*"
 
 RDEPENDS_${PN} += "m4"
-RDEPENDS_${PN}-ptest += "bash gawk"
+RDEPENDS_${PN}-ptest += "bash gawk make"
 
 do_compile_ptest() {
 	oe_runmake -C ${B}/tests -f ${B}/tests/Makefile top_builddir=${B} INCLUDES=-I${S}/src buildtests

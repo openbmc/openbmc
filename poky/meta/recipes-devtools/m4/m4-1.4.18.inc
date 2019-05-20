@@ -52,6 +52,8 @@ do_install_ptest() {
                      ${D}${PTEST_PATH}/tests/test-xalloc-die
 }
 
+
+RDEPENDS_${PN}-ptest += "make"
 RDEPENDS_${PN}-ptest_append_libc-glibc = "\
      locale-base-fr-fr.iso-8859-1 \
 "

@@ -64,18 +64,10 @@ index 292082b..308a762 100644
  #include <stddef.h>
  #include <stdint.h>
  #include <sys/param.h>
-@@ -51,6 +51,16 @@
+@@ -51,6 +51,8 @@
  #else
  # error "Unknown byte order"
  #endif
-+#ifndef TEMP_FAILURE_RETRY
-+#define TEMP_FAILURE_RETRY(expression) \
-+  (__extension__							      \
-+    ({ long int __result;						      \
-+       do __result = (long int) (expression);				      \
-+       while (__result == -1L && errno == EINTR);			      \
-+       __result; }))
-+#endif
 +
 +#define error(status, errno, ...) err(status, __VA_ARGS__)
  
@@ -141,26 +133,6 @@ index 56e6105..f4a0649 100644
  #include "../libdw/libdwP.h"	/* DWARF_E_* values are here.  */
  #include "../libelf/libelfP.h"
  #include "system.h"
-diff --git a/libdwfl/libdwfl_crc32_file.c b/libdwfl/libdwfl_crc32_file.c
-index f849128..6f0aca1 100644
---- a/libdwfl/libdwfl_crc32_file.c
-+++ b/libdwfl/libdwfl_crc32_file.c
-@@ -29,6 +29,15 @@
- # include <config.h>
- #endif
- 
-+#ifndef TEMP_FAILURE_RETRY
-+#define TEMP_FAILURE_RETRY(expression) \
-+  (__extension__                                                             \
-+    ({ long int __result;                                                    \
-+       do __result = (long int) (expression);                                \
-+       while (__result == -1L && errno == EINTR);                            \
-+       __result; }))
-+#endif
-+
- #define crc32_file attribute_hidden __libdwfl_crc32_file
- #define crc32 __libdwfl_crc32
- #include <libdwflP.h>
 diff --git a/libdwfl/linux-kernel-modules.c b/libdwfl/linux-kernel-modules.c
 index 360e4ee..b5aa397 100644
 --- a/libdwfl/linux-kernel-modules.c

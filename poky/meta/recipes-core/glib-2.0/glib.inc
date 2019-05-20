@@ -140,6 +140,7 @@ CODEGEN_PYTHON_RDEPENDS_mingw32 = ""
 RDEPENDS_${PN}-codegen += "${CODEGEN_PYTHON_RDEPENDS}"
 
 RDEPENDS_${PN}-ptest += "\
+            libgcc \
             dbus \
             gnome-desktop-testing \
             tzdata \

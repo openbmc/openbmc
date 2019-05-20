@@ -117,7 +117,7 @@ class GitSM(Git):
 
             url += ';protocol=%s' % proto
             url += ";name=%s" % module
-            url += ";subpath=%s" % paths[module]
+            url += ";subpath=%s" % module
 
             ld = d.createCopy()
             # Not necessary to set SRC_URI, since we're passing the URI to
@@ -184,7 +184,7 @@ class GitSM(Git):
 
             try:
                 newfetch = Fetch([url], d, cache=False)
-                newfetch.unpack(root=os.path.dirname(os.path.join(repo_conf, 'modules', modpath)))
+                newfetch.unpack(root=os.path.dirname(os.path.join(repo_conf, 'modules', module)))
             except Exception as e:
                 logger.error('gitsm: submodule unpack failed: %s %s' % (type(e).__name__, str(e)))
                 raise
@@ -199,9 +199,9 @@ class GitSM(Git):
 
             # Ensure the submodule repository is NOT set to bare, since we're checking it out...
             try:
-                runfetchcmd("%s config core.bare false" % (ud.basecmd), d, quiet=True, workdir=os.path.join(repo_conf, 'modules', modpath))
+                runfetchcmd("%s config core.bare false" % (ud.basecmd), d, quiet=True, workdir=os.path.join(repo_conf, 'modules', module))
             except:
-                logger.error("Unable to set git config core.bare to false for %s" % os.path.join(repo_conf, 'modules', modpath))
+                logger.error("Unable to set git config core.bare to false for %s" % os.path.join(repo_conf, 'modules', module))
                 raise
 
         Git.unpack(self, ud, destdir, d)
@@ -209,5 +209,7 @@ class GitSM(Git):
         ret = self.process_submodules(ud, ud.destdir, unpack_submodules, d)
 
         if not ud.bareclone and ret:
-            # Run submodule update, this sets up the directories -- without touching the config
+            # All submodules should already be downloaded and configured in the tree.  This simply sets
+            # up the configuration and checks out the files.  The main project config should remain
+            # unmodified, and no download from the internet should occur.
             runfetchcmd("%s submodule update --recursive --no-fetch" % (ud.basecmd), d, quiet=True, workdir=ud.destdir)

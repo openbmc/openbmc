@@ -47,7 +47,7 @@ do_install_ptest() {
 	sed -e 's| ../parted||' -i $t/tests/*.sh
 }
 
-RDEPENDS_${PN}-ptest = "bash coreutils perl util-linux-losetup python3"
+RDEPENDS_${PN}-ptest = "bash coreutils perl util-linux-losetup python3 make"
 
 inherit update-alternatives
 

@@ -27,6 +27,9 @@ EFIDIR = "/EFI/BOOT"
 GRUB_ROOT ?= "${ROOT}"
 APPEND ?= ""
 
+# Uses MACHINE specific KERNEL_IMAGETYPE
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 # Need UUID utility code.
 inherit fs-uuid
 

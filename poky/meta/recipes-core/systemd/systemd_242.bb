@@ -36,7 +36,6 @@ SRC_URI_MUSL = "file://0001-Use-getenv-when-secure-versions-are-not-available.pa
                file://0006-Include-netinet-if_ether.h.patch \
                file://0007-don-t-fail-if-GLOB_BRACE-and-GLOB_ALTDIRFUNC-is-not.patch \
                file://0008-add-missing-FTW_-macros-for-musl.patch \
-               file://0009-socket-util-don-t-fail-if-libc-doesn-t-support-IDN.patch \
                file://0010-fix-missing-of-__register_atfork-for-non-glibc-build.patch \
                file://0011-Use-uintmax_t-for-handling-rlim_t.patch \
                file://0012-fix-missing-ULONG_LONG_MAX-definition-in-case-of-mus.patch \
@@ -71,6 +70,7 @@ PACKAGECONFIG ??= " \
     gshadow \
     hibernate \
     hostnamed \
+    idn \
     ima \
     kmod \
     localed \
@@ -95,6 +95,7 @@ PACKAGECONFIG ??= " \
 
 PACKAGECONFIG_remove_libc-musl = " \
     gshadow \
+    idn \
     localed \
     myhostname \
     nss \
@@ -129,6 +130,7 @@ PACKAGECONFIG[gnutls] = "-Dgnutls=true,-Dgnutls=false,gnutls"
 PACKAGECONFIG[gshadow] = "-Dgshadow=true,-Dgshadow=false"
 PACKAGECONFIG[hibernate] = "-Dhibernate=true,-Dhibernate=false"
 PACKAGECONFIG[hostnamed] = "-Dhostnamed=true,-Dhostnamed=false"
+PACKAGECONFIG[idn] = "-Didn=true,-Didn=false"
 PACKAGECONFIG[ima] = "-Dima=true,-Dima=false"
 # importd requires curl/xz/zlib/bzip2/gcrypt
 PACKAGECONFIG[importd] = "-Dimportd=true,-Dimportd=false"

@@ -9,6 +9,7 @@ SRCREV = "aef913e31b659462fe6b9320d241676cba97f67b"
 PV = "0.1+git${SRCPV}"
 
 SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/cjb/mmc-utils.git;branch=${SRCBRANCH} \
+           file://0001-mmc_cmd.c-Use-extra-braces-when-initializing-subobje.patch \
            "
 UPSTREAM_CHECK_COMMITS = "1"
 

@@ -79,6 +79,7 @@ INSANE_SKIP_${PN} += "dev-so"
 inherit ptest
 
 RDEPENDS_${PN}-ptest_append_libc-glibc = " glibc-gconv-iso8859-1 glibc-gconv-iso8859-2 glibc-gconv-utf-7"
+RDEPENDS_${PN}-ptest += "libgcc"
 
 do_compile_ptest() {
 	cd ${B}/test

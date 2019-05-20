@@ -53,6 +53,8 @@ do_configure_prepend() {
 FILES_${PN}-dev += "${libdir}/apr.exp ${datadir}/build-1/*"
 RDEPENDS_${PN}-dev += "bash"
 
+RDEPENDS_${PN}-ptest += "libgcc"
+
 #for some reason, build/libtool.m4 handled by buildconf still be overwritten
 #when autoconf, so handle it again.
 do_configure_append() {
