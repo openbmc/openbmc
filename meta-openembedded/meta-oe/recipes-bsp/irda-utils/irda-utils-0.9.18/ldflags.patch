@@ -1,0 +1,87 @@
+Obey LDFLAGS
+
+Signed-off-by: Christopher Larson <chris_larson@mentor.com>
+Upstream-Status: Pending
+
+Index: irda-utils-0.9.18/findchip/Makefile
+===================================================================
+--- irda-utils-0.9.18.orig/findchip/Makefile
++++ irda-utils-0.9.18/findchip/Makefile
+@@ -65,5 +65,5 @@ install: findchip
+ 
+ gfindchip: gfindchip.c 
+ 	$(prn_cc)
+-	$(ECMD))$(CC) $(CFLAGS) `gtk-config --cflags`  $< -o $@ `gtk-config --libs`
++	$(ECMD)$(CC) $(CFLAGS) $(LDFLAGS) `gtk-config --cflags`  $< -o $@ `gtk-config --libs`
+ 
+Index: irda-utils-0.9.18/irattach/Makefile
+===================================================================
+--- irda-utils-0.9.18.orig/irattach/Makefile
++++ irda-utils-0.9.18/irattach/Makefile
+@@ -49,13 +49,13 @@ all: $(TARGETS)
+ 
+ irattach: irattach.o util.o
+ 	$(prn_cc_o)
+-	$(ECMD)$(CC) $(CFLAGS) irattach.o util.o -o $@
++	$(ECMD)$(CC) $(CFLAGS) $(LDFLAGS) irattach.o util.o -o $@
+ 
+ 
+ 
+ dongle_attach: dongle_attach.o
+ 	$(prn_cc_o)
+-	$(ECMD)$(CC) $(CFLAGS) dongle_attach.o -o $@
++	$(ECMD)$(CC) $(CFLAGS) $(LDFLAGS) dongle_attach.o -o $@
+ 
+ 
+ install: $(TARGETS)
+Index: irda-utils-0.9.18/irdadump/Makefile
+===================================================================
+--- irda-utils-0.9.18.orig/irdadump/Makefile
++++ irda-utils-0.9.18/irdadump/Makefile
+@@ -40,7 +40,7 @@ lib_irdadump.a: $(LIBIRDADUMP_OBJS)
+ 
+ irdadump: $(IRDADUMP_OBJS) $(LIBIRDADUMP_TARGET)
+ 	$(prn_cc_o)
+-	$(ECMD)$(CC) $(CFLAGS) `pkg-config --libs glib-2.0` -o  $(IRDADUMP_TARGET) $< $(LIBIRDADUMP_TARGET)
++	$(ECMD)$(CC) $(CFLAGS) $(LDFLAGS) `pkg-config --libs glib-2.0` -o  $(IRDADUMP_TARGET) $< $(LIBIRDADUMP_TARGET)
+ 
+ 
+ .c.o:
+Index: irda-utils-0.9.18/irdaping/Makefile
+===================================================================
+--- irda-utils-0.9.18.orig/irdaping/Makefile
++++ irda-utils-0.9.18/irdaping/Makefile
+@@ -56,7 +56,7 @@ all: $(TARGETS)
+ 
+ irdaping: $(OBJS)
+ 	$(prn_cc_o)
+-	$(ECMD)$(CC) $(CFLAGS) $(OBJS) -o $@
++	$(ECMD)$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) -o $@
+ 
+ 
+ .c.o:
+Index: irda-utils-0.9.18/irnetd/Makefile
+===================================================================
+--- irda-utils-0.9.18.orig/irnetd/Makefile
++++ irda-utils-0.9.18/irnetd/Makefile
+@@ -50,7 +50,7 @@ all: $(TARGETS)
+ 
+ irnetd: $(OBJS)
+ 	$(prn_cc_o)
+-	$(ECMD)$(CC) $(CFLAGS) $(OBJS) -o $@
++	$(ECMD)$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) -o $@
+ 
+ 
+ install: irnetd
+Index: irda-utils-0.9.18/psion/Makefile
+===================================================================
+--- irda-utils-0.9.18.orig/psion/Makefile
++++ irda-utils-0.9.18/psion/Makefile
+@@ -25,4 +25,4 @@ install: $(PSION_TARGETS)
+ CFLAGS += -g -I../include -Wall -Wstrict-prototypes $(RPM_OPT_FLAGS)
+ irpsion5: 
+ 	$(prn_cc_o)
+-	$(ECMD)$(CC) $(CFLAGS) $(PSION_SRC) -o $@
+\ No newline at end of file
++	$(ECMD)$(CC) $(CFLAGS) $(LDFLAGS) $(PSION_SRC) -o $@
+\ No newline at end of file

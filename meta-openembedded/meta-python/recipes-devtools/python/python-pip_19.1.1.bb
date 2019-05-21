@@ -3,8 +3,8 @@ HOMEPAGE = "https://pip.pypa.io/"
 LICENSE = "MIT & LGPL-2.1"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=8ba06d529c955048e5ddd7c45459eb2e"
 
-SRC_URI[md5sum] = "22e3726252b492ce24312c2b43d0127f"
-SRC_URI[sha256sum] = "d9137cb543d8a4d73140a3282f6d777b2e786bb6abb8add3ac5b6539c82cd624"
+SRC_URI[md5sum] = "4fb98a060f21c731d6743b90a714fc73"
+SRC_URI[sha256sum] = "44d3d7d3d30a1eb65c7e5ff1173cdf8f7467850605ac7cc3707b6064bddd0958"
 
 inherit pypi setuptools
 

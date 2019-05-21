@@ -5,6 +5,8 @@ DEPENDS = "attr virtual/crypt"
 LICENSE = "BSD-0-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=f0b8b3dd6431bcaa245da0a08bd0d511"
 
+inherit cml1 update-alternatives
+
 SRC_URI = "http://www.landley.net/toybox/downloads/${BPN}-${PV}.tar.gz \
            file://OE-path-changes.patch \
            "
@@ -47,8 +49,6 @@ do_install() {
     install -d ${D}${sysconfdir}
     install -m 0644 ${B}/toybox.links ${D}${sysconfdir}
 }
-
-inherit cml1 update-alternatives
 
 # If you've chosen to install toybox you probably want it to take precedence
 # over busybox where possible but not over other packages

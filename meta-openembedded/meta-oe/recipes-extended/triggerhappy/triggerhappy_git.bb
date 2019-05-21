@@ -4,12 +4,12 @@ HOMEPAGE = "https://github.com/wertarbyte/triggerhappy"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
-SRC_URI = "https://github.com/wertarbyte/triggerhappy/archive/debian/0.5.0-1.tar.gz"
+# matches debian/0.5.0-1 tag
+SRCREV = "44a173195986d0d853316cb02a58785ded66c12b"
+PV = "0.5.0+git${SRCPV}"
+SRC_URI = "git://github.com/wertarbyte/${BPN}.git;branch=debian"
 
-SRC_URI[md5sum] = "77f90a18c775e47c4c5e9e08987ca32f"
-SRC_URI[sha256sum] = "9150bafbf7f2de7d57e6cc154676c33da98dc11ac6442e1ca57e5dce82bd4292"
-
-S = "${WORKDIR}/${PN}-debian-${PV}-1"
+S = "${WORKDIR}/git"
 
 inherit autotools-brokensep pkgconfig update-rc.d systemd
 
@@ -21,12 +21,12 @@ INITSCRIPT_PARAMS = "defaults"
 SYSTEMD_SERVICE_${PN} = "triggerhappy.service triggerhappy.socket"
 
 FILES_${PN} = "\
-${sbindir}/thd \
-${sbindir}/th-cmd \
-${sysconfdir}/triggerhappy/triggers.d \
-${nonarch_base_libdir}/udev/rules.d/80-triggerhappy.rules \
-${sysconfdir}/init.d/triggerhappy \
-${systemd_unitdir}/system \
+    ${sbindir}/thd \
+    ${sbindir}/th-cmd \
+    ${sysconfdir}/triggerhappy/triggers.d \
+    ${nonarch_base_libdir}/udev/rules.d/80-triggerhappy.rules \
+    ${sysconfdir}/init.d/triggerhappy \
+    ${systemd_unitdir}/system \
 "
 CONFFILES_${PN} = "${sysconfdir}/udev/rules.d/80-triggerhappy.rules"
 
