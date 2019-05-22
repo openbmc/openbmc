@@ -1,0 +1,13 @@
+[Unit]
+Description=Init BMC Hostname
+Wants=mapper-wait@-xyz-openbmc_project-inventory.service
+After=mapper-wait@-xyz-openbmc_project-inventory.service
+
+[Service]
+ExecStart=/usr/bin/first-boot-set-hostname.sh
+Type=oneshot
+RemainAfterExit=Yes
+
+[Install]
+WantedBy=multi-user.target
+
