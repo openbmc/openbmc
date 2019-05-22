@@ -15,7 +15,7 @@ inherit autotools \
 require phosphor-inventory-manager.inc
 
 DEPENDS += " \
-        ${PN}-config-native \
+        phosphor-inventory-manager-assettag \
         phosphor-dbus-interfaces \
         phosphor-dbus-interfaces-native \
         phosphor-logging \
@@ -33,11 +33,11 @@ DBUS_SERVICE_${PN} = "${OBMC_INVENTORY_MGR_IFACE}.service"
 S = "${WORKDIR}/git"
 
 EXTRA_OECONF = " \
-        YAML_PATH=${STAGING_DIR_NATIVE}${base_datadir} \
+        YAML_PATH=${STAGING_DIR_HOST}${base_datadir} \
         BUSNAME=${OBMC_INVENTORY_MGR_IFACE} \
         INVENTORY_ROOT=${OBMC_INVENTORY_PATH} \
         IFACE=${OBMC_INVENTORY_MGR_IFACE} \
-        IFACES_PATH=${STAGING_DIR_NATIVE}${yaml_dir} \
+        IFACES_PATH=${STAGING_DIR_HOST}${yaml_dir} \
         "
 
 PACKAGECONFIG ??= ""
