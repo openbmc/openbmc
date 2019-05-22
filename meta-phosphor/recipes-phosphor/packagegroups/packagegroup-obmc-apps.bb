@@ -92,7 +92,6 @@ RDEPENDS_${PN}-logging = " \
 SUMMARY_${PN}-remote-logging = "Remote logging applications"
 RDEPENDS_${PN}-remote-logging = " \
         rsyslog \
-        rsyslog-policy \
         phosphor-rsyslog-config \
         "
 
