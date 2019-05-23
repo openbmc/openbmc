@@ -96,52 +96,53 @@ groups:
 
 matches:
     - name: propertiesChanged
-      description: >
-          A property changed match
       parameters:
           - object
           - interface
-      signal: propertySignal
+    - name: interfacesAdded
+      parameters:
+          - object
+    - name: nameOwnerChanged
+      parameters:
+          - object
+          - interface
+
+signals:
+    - name: propertiesChanged
+      description: >
+          A property changed match
+      parameters:
+          - type
+          - object
+          - interface
+          - property
+      match: propertiesChanged
     - name: interfacesAdded
       description: >
           An interfaces added match
       parameters:
+          - type
           - object
-      signal: objectSignal
+          - interface
+          - property
+      match: interfacesAdded
     - name: nameOwnerChanged
       description: >
           A name owner changed match
       parameters:
-          - object
-          - interface
-      signal: ownerSignal
+      match: nameOwnerChanged
 
-signals:
-    - name: propertySignal
+methods:
+    - name: getProperties
       description: >
-          Handle property signals
+          Get the property values of the given group members
+          by performing a `GetProperty` method call on each
       parameters:
           - type
-          - object
-          - interface
-          - property
-      handler: setProperty
-    - name: objectSignal
+    - name: nameHasOwner
       description: >
-          Handle object signals
+          A NameHasOwner method call to be performed on all event group members
       parameters:
-          - type
-          - object
-          - interface
-          - property
-      handler: setProperty
-    - name: ownerSignal
-      description: >
-          Handle owner signals
-      parameters:
-          - object
-          - interface
-      handler: setService
 
 handlers:
     - name: setProperty
@@ -149,12 +150,9 @@ handlers:
           Sets a value for the given object/interface/property
       parameters:
           - type
-          - object
-          - interface
-          - property
     - name: setService
       description: >
-          Sets the service name(s) for the given group
+          Sets the service name and ownership status for the given group
       parameters:
           - group
 
@@ -165,6 +163,11 @@ preconditions:
           enable a set speed event otherwise fan speeds are set to full
       parameters:
           - groups
+    - name: services_missing_owner
+      description: >
+          Any services missing an owner enable the events given otherwise
+          the events are removed/disabled
+      parameters:
 
 actions:
     - name: call_actions_based_on_timer
@@ -222,86 +225,83 @@ actions:
 
 events:
     - name: default_fan_floor_on_service_fail
-      groups:
-          - name: zone0_ambient
-            interface: xyz.openbmc_project.Sensor.Value
-            property:
-                name: Value
-                type: int64_t
-      matches:
-          - name: nameOwnerChanged
-      actions:
-          - name: call_actions_based_on_timer
-            timer:
-                delay: 5
-                type: oneshot
-            actions:
-                - name: default_floor_on_missing_owner
-    - name: high_speed_on_occ0_service_fail
+      precondition:
+          name: services_missing_owner
+          groups:
+              - name: zone0_ambient
+                interface: xyz.openbmc_project.Sensor.Value
+                property:
+                    name: Value
+                    type: int64_t
+          triggers:
+              - name: init
+                method: nameHasOwner
+                handler: setService
+              - name: signal
+                signal: nameOwnerChanged
+                handler: setService
+          events:
+              - name: default_fan_floor
+                groups:
+                    - name: zone0_ambient
+                      interface: xyz.openbmc_project.Sensor.Value
+                      property:
+                          name: Value
+                          type: int64_t
+                triggers:
+                    - name: timer
+                      interval: 5000000
+                      type: oneshot
+                actions:
+                    - name: default_floor_on_missing_owner
+    - name: high_speed_on_occ_service_fail
       groups:
           - name: occ0_object
             interface: org.open_power.OCC.Status
             property:
                 name: OccActive
                 type: bool
-      matches:
-          - name: nameOwnerChanged
-      actions:
-          - name: call_actions_based_on_timer
-            timer:
-                delay: 5
-                type: oneshot
-            actions:
-                - name: set_speed_on_missing_owner
-                  speed:
-                      value: 255
-                      type: uint64_t
-    - name: high_speed_on_occ1_service_fail
-      groups:
           - name: occ1_object
             interface: org.open_power.OCC.Status
             property:
                 name: OccActive
                 type: bool
-      matches:
-          - name: nameOwnerChanged
+      triggers:
+          - name: init
+            method: nameHasOwner
+            handler: setService
+          - name: signal
+            signal: nameOwnerChanged
+            handler: setService
       actions:
           - name: call_actions_based_on_timer
             timer:
-                delay: 5
+                interval: 5000000
                 type: oneshot
             actions:
                 - name: set_speed_on_missing_owner
                   speed:
                       value: 255
                       type: uint64_t
-    - name: missing_before_high_speed_air
+    - name: missing_or_fails_before_high_speed_air
       groups:
           - name: air_cooled_zone0_fans
             interface: xyz.openbmc_project.Inventory.Item
             property:
                 name: Present
                 type: bool
-      matches:
-          - name: propertiesChanged
-      actions:
-          - name: count_state_before_speed
-            count: 1
-            property:
-                value: false
-                type: bool
-            speed:
-                value: 255
-                type: uint64_t
-    - name: fails_before_high_speed_air
-      groups:
           - name: air_cooled_zone0_fans
             interface: xyz.openbmc_project.State.Decorator.OperationalStatus
             property:
                 name: Functional
                 type: bool
-      matches:
-          - name: propertiesChanged
+      triggers:
+          - name: init
+            method: getProperties
+            handler: setProperty
+          - name: signal
+            signal: propertiesChanged
+            handler: setProperty
       actions:
           - name: count_state_before_speed
             count: 1
@@ -318,8 +318,13 @@ events:
             property:
                 name: Value
                 type: int64_t
-      matches:
-          - name: propertiesChanged
+      triggers:
+          - name: init
+            method: getProperties
+            handler: setProperty
+          - name: signal
+            signal: propertiesChanged
+            handler: setProperty
       actions:
           - name: set_floor_from_average_sensor_value
             map:
@@ -351,22 +356,53 @@ events:
                     name: OccActive
                     type: bool
                     value: true
-          matches:
-              - name: interfacesAdded
-              - name: propertiesChanged
+          triggers:
+              - name: init
+                method: getProperties
+                handler: setProperty
+              - name: signal
+                signal: interfacesAdded
+                handler: setProperty
+              - name: signal
+                signal: propertiesChanged
+                handler: setProperty
           events:
-              - name: speed_changes_based_on_core_temps
+              - name: speed_control_sensors
                 groups:
                     - name: zone0_cores
                       interface: xyz.openbmc_project.Sensor.Value
                       property:
                           name: Value
                           type: int64_t
-                matches:
-                    - name: interfacesAdded
-                    - name: propertiesChanged
+                    - name: zone0_dimms
+                      interface: xyz.openbmc_project.Sensor.Value
+                      property:
+                          name: Value
+                          type: int64_t
+                triggers:
+                    - name: init
+                      method: getProperties
+                      handler: setProperty
+                    - name: signal
+                      signal: interfacesAdded
+                      handler: setProperty
+                    - name: signal
+                      signal: propertiesChanged
+                      handler: setProperty
+              - name: 1sec_speed_change_request_sampling
+                triggers:
+                    - name: timer
+                      interval: 1000000
+                      type: repeating
                 actions:
+                    # Speed changes based on core temps
                     - name: set_net_increase_speed
+                      groups:
+                          - name: zone0_cores
+                            interface: xyz.openbmc_project.Sensor.Value
+                            property:
+                                name: Value
+                                type: int64_t
                       property:
                           value: 73000
                           type: int64_t
@@ -377,6 +413,12 @@ events:
                           value: 11
                           type: uint64_t
                     - name: set_net_decrease_speed
+                      groups:
+                          - name: zone0_cores
+                            interface: xyz.openbmc_project.Sensor.Value
+                            property:
+                                name: Value
+                                type: int64_t
                       property:
                           value: 70000
                           type: int64_t
@@ -386,20 +428,14 @@ events:
                       delta:
                           value: 11
                           type: uint64_t
-                timer:
-                    interval: 5
-              - name: speed_changes_based_on_dimm_temps
-                groups:
-                    - name: zone0_dimms
-                      interface: xyz.openbmc_project.Sensor.Value
-                      property:
-                          name: Value
-                          type: int64_t
-                matches:
-                    - name: interfacesAdded
-                    - name: propertiesChanged
-                actions:
+                    # Speed changes based on dimm temps
                     - name: set_net_increase_speed
+                      groups:
+                          - name: zone0_dimms
+                            interface: xyz.openbmc_project.Sensor.Value
+                            property:
+                                name: Value
+                                type: int64_t
                       property:
                           value: 64000
                           type: int64_t
@@ -410,6 +446,12 @@ events:
                           value: 6
                           type: uint64_t
                     - name: set_net_decrease_speed
+                      groups:
+                          - name: zone0_dimms
+                            interface: xyz.openbmc_project.Sensor.Value
+                            property:
+                                name: Value
+                                type: int64_t
                       property:
                           value: 61000
                           type: int64_t
@@ -419,5 +461,3 @@ events:
                       delta:
                           value: 6
                           type: uint64_t
-                timer:
-                    interval: 5
