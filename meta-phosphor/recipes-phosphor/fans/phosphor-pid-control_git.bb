@@ -13,7 +13,7 @@ inherit obmc-phosphor-ipmiprovider-symlink
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/phosphor-pid-control"
-SRCREV = "d4695590d2f2b9f6295097714624b8043d25a701"
+SRCREV = "ded0ab5662212155e5d209343375e34ce9d34cdb"
 
 # Each platform will need a service file that starts
 # at an appropriate time per system.  For instance, if
