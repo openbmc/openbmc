@@ -5,6 +5,8 @@ After=mapper-wait@-xyz-openbmc_project-inventory.service
 ConditionPathExists={envfiledir}/obmc/phosphor-fan/phosphor-cooling-type-%i.conf
 
 [Service]
+Type=oneshot
+RemainAfterExit=yes
 EnvironmentFile={envfiledir}/obmc/phosphor-fan/phosphor-cooling-type-%i.conf
 ExecStart=/usr/bin/env phosphor-cooling-type ${{OBJPATH}} ${{AIR}}
 SyslogIdentifier=phosphor-cooling-type
