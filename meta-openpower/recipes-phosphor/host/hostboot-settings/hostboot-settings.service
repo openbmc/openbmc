@@ -3,6 +3,7 @@ Description=Hostboot Boot Settings
 
 [Service]
 Type=oneshot
+RemainAfterExit=true
 ExecStart=/usr/bin/hb_settings --uart vuart
 
 [Install]
