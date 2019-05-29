@@ -53,7 +53,7 @@
             "name": "POWER_BUTTON",
             "pin": "I3",
             "direction": "both"
-        }
+        },
         {
             "name": "AIR_WATER_N",
             "pin": "B5",
