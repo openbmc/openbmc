@@ -1,0 +1,14 @@
+Different components of meta-lenovo are under different licenses (a mix
+of MIT, GPL version 2 and BSD-3 license). Please see:
+
+COPYING.GPL
+COPYING.MIT
+COPYING.BSD
+
+All metadata is license under an MIT licensed unless otherwise stated. Source code included in tree for individual recipes is under the LICENSE stated in
+the associated recipe (.bb file) unless otherwise stated.
+
+License information for any other files is either explicitly stated
+or defaults to BSD license.
+
+The software code or recipe (.bb file) developed by Lenovo in the meta-lenovo folder, the licenses use BSD license.
