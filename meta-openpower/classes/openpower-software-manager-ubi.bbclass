@@ -1,11 +1,4 @@
-SRC_URI += "file://obmc-flash-bios"
-
 PACKAGECONFIG_append = " ubifs_layout"
-
-do_install_append() {
-        install -d ${D}${bindir}
-        install -m 0755 ${WORKDIR}/obmc-flash-bios ${D}${bindir}/obmc-flash-bios
-}
 
 SYSTEMD_SERVICE_${PN} += " \
         obmc-flash-bios-ubiattach.service \
@@ -18,7 +11,6 @@ SYSTEMD_SERVICE_${PN} += " \
         obmc-flash-bios-cleanup.service \
         obmc-flash-bios-enable-clearvolatile@.service \
         obmc-flash-bios-check-clearvolatile@.service \
-        op-pnor-msl.service \
         "
 
 ENABLE_CLEAR_VOLATILE_TMPL = "obmc-flash-bios-enable-clearvolatile@.service"
