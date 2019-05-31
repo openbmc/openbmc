@@ -27,6 +27,9 @@ CHIPS_append_swift = " \
                bus@1e78a000/i2c-bus@300/tmp275@48 \
                bus@1e78a000/i2c-bus@300/dps310@76 \
                bus@1e78a000/i2c-bus@300/si7021a20@20 \
+               bus@1e78a000/i2c-bus@380/ir35219@70 \
+               bus@1e78a000/i2c-bus@380/ir35221@71 \
+               bus@1e78a000/i2c-bus@380/ir35221@72 \
                "
 
 ITEMSFMT = "ahb/apb/{0}.conf"
