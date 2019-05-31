@@ -33,6 +33,7 @@ SYSTEMD_SERVICE_phosphor-software-manager-updater-ubi += " \
     obmc-flash-bmc-mirroruboot.service \
     reboot-guard-enable.service \
     reboot-guard-disable.service \
+    force-reboot.service \
     usr-local.mount \
 "
 
