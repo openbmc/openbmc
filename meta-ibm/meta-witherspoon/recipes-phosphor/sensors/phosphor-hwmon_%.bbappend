@@ -24,6 +24,7 @@ CHIPS_append_witherspoon = " \
 CHIPS_append_swift = " \
                bus@1e78a000/i2c-bus@440/tmp275@4a \
                bus@1e78a000/i2c-bus@440/tmp275@48 \
+               bus@1e78a000/i2c-bus@300/tmp275@48 \
                "
 
 ITEMSFMT = "ahb/apb/{0}.conf"
