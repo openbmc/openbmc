@@ -3,8 +3,8 @@ SRC_URI += "file://obmc-flash-bios"
 PACKAGECONFIG_append = " ubifs_layout"
 
 do_install_append() {
-        install -d ${D}${sbindir}
-        install -m 0755 ${WORKDIR}/obmc-flash-bios ${D}${sbindir}/obmc-flash-bios
+        install -d ${D}${bindir}
+        install -m 0755 ${WORKDIR}/obmc-flash-bios ${D}${bindir}/obmc-flash-bios
 }
 
 SYSTEMD_SERVICE_${PN} += " \
