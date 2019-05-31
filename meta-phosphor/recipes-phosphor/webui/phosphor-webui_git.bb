@@ -33,7 +33,7 @@ FILES_${PN} += "${datadir}/www/*"
 do_compile () {
     cd ${S}
     rm -rf node_modules
-    npm --loglevel info --proxy=${HTTP_PROXY} --https-proxy=${HTTPS_PROXY} install
+    npm --loglevel info --proxy=${http_proxy} --https-proxy=${https_proxy} install
     npm run-script build
 }
 
