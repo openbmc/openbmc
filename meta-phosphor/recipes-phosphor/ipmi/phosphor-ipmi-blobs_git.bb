@@ -16,7 +16,7 @@ DEPENDS += "ipmi-blob-tool"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/phosphor-ipmi-blobs"
-SRCREV = "00d5f0de56f3e453be37c2ffc45418fb406396a2"
+SRCREV = "826e17355db0a575e0ad60e25bf82480ac711135"
 
 FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
 FILES_${PN}_append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
