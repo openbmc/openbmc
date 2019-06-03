@@ -38,16 +38,16 @@ CHIPS_append_swift = " \
 ITEMSFMT = "ahb/apb/{0}.conf"
 ITEMS = "${@compose_list(d, 'ITEMSFMT', 'CHIPS')}"
 
-OCCS_witherspoon = " \
-              00--00--00--06/sbefifo1-dev0/occ-hwmon.1 \
-              00--00--00--0a/fsi1/slave@01--00/01--01--00--06/sbefifo2-dev0/occ-hwmon.2 \
-              "
-OCCSFMT_witherspoon = "devices/platform/gpio-fsi/fsi0/slave@00--00/{0}.conf"
-OCCITEMS_witherspoon = "${@compose_list(d, 'OCCSFMT_witherspoon', 'OCCS_witherspoon')}"
+OCCS = " \
+        00--00--00--06/sbefifo1-dev0/occ-hwmon.1 \
+        00--00--00--0a/fsi1/slave@01--00/01--01--00--06/sbefifo2-dev0/occ-hwmon.2 \
+        "
+OCCSFMT = "devices/platform/gpio-fsi/fsi0/slave@00--00/{0}.conf"
+OCCITEMS = "${@compose_list(d, 'OCCSFMT', 'OCCS')}"
 
 ENVS = "obmc/hwmon/{0}"
 SYSTEMD_ENVIRONMENT_FILE_${PN} += "${@compose_list(d, 'ENVS', 'ITEMS')}"
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append_witherspoon = " ${@compose_list(d, 'ENVS', 'OCCITEMS_witherspoon')}"
+SYSTEMD_ENVIRONMENT_FILE_${PN}_append = " ${@compose_list(d, 'ENVS', 'OCCITEMS')}"
 
 SYSTEMD_ENVIRONMENT_FILE_max31785-msl += "obmc/hwmon-max31785/max31785.conf"
 SYSTEMD_LINK_max31785-msl += "../phosphor-max31785-msl@.service:multi-user.target.wants/phosphor-max31785-msl@${MACHINE}.service"
