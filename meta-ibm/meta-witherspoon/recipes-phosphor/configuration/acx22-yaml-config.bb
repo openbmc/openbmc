@@ -6,10 +6,6 @@ LIC_FILES_CHKSUM = "file://${IBMBASE}/COPYING.apache-2.0;md5=34400b68072d710fecd
 inherit allarch
 inherit mrw-xml
 
-EXTRA_SRC_URI = ""
-EXTRA_SRC_URI_witherspoon = " \
-    file://ac922-ipmi-extra-hwmon-sensors.yaml \
-    "
 SRC_URI = " \
     file://acx22-ipmi-fru-bmc.yaml \
     file://acx22-ipmi-fru-not-sent-by-host.yaml \
@@ -17,7 +13,6 @@ SRC_URI = " \
     file://acx22-ipmi-inventory-sensors.yaml \
     file://acx22-ipmi-occ-sensors.yaml \
     file://acx22-ipmi-sensors-mrw.yaml \
-    ${EXTRA_SRC_URI} \
     "
 
 DEPENDS = " \
@@ -32,14 +27,9 @@ ACx22_IPMI_EXTRA_FRU_READ_YAMLS = " \
     acx22-ipmi-fru-bmc.yaml \
     acx22-ipmi-fru-not-sent-by-host.yaml \
     "
-ACx22_IPMI_EXTRA_MACHINE_SENSOR_YAMLS = ""
-ACx22_IPMI_EXTRA_MACHINE_SENSOR_YAMLS_witherspoon = " \
-    ac922-ipmi-extra-hwmon-sensors.yaml \
-    "
 ACx22_IPMI_EXTRA_SENSOR_YAMLS = " \
     acx22-ipmi-hwmon-sensors.yaml \
     acx22-ipmi-occ-sensors.yaml \
-    ${ACx22_IPMI_EXTRA_MACHINE_SENSOR_YAMLS} \
     "
 
 do_install() {
