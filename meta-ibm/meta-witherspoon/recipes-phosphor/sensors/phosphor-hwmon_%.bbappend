@@ -9,12 +9,12 @@ SRC_URI += " \
 CHIPS = " \
         bus@1e78a000/i2c-bus@100/max31785@52_air \
         bus@1e78a000/i2c-bus@100/max31785@52_water \
+        bus@1e78a000/i2c-bus@100/power-supply@68 \
+        bus@1e78a000/i2c-bus@100/power-supply@69 \
         "
 CHIPS_append_witherspoon = " \
                bus@1e78a000/i2c-bus@100/bmp280@77 \
                bus@1e78a000/i2c-bus@100/dps310@76 \
-               bus@1e78a000/i2c-bus@100/power-supply@68 \
-               bus@1e78a000/i2c-bus@100/power-supply@69 \
                bus@1e78a000/i2c-bus@140/ir35221@70 \
                bus@1e78a000/i2c-bus@140/ir35221@71 \
                bus@1e78a000/i2c-bus@180/ir35221@70 \
