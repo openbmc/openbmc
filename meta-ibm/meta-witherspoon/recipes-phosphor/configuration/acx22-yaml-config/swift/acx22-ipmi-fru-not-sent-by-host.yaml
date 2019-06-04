@@ -1,0 +1,21 @@
+15:
+  /system/chassis/motherboard/ga100card0: &DEFAULTS
+    entityInstance: 1
+    entityID: 3
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Board Name
+          IPMIFruSection: Board
+16:
+  /system/chassis/motherboard/ga100card1:
+    <<: *DEFAULTS
+    entityInstance: 2
+17:
+  /system/chassis/motherboard/ga100card2:
+    <<: *DEFAULTS
+    entityInstance: 3
+18:
+  /system/chassis/motherboard/ga100card3:
+    <<: *DEFAULTS
+    entityInstance: 4
