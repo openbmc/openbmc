@@ -1,0 +1,16 @@
+[Unit]
+Description=Perform power workarounds on VRMs after PGOOD is up
+Wants=obmc-power-on@%i.target
+After=obmc-power-on@%i.target
+Before=obmc-host-start-pre@%i.target
+Conflicts=obmc-chassis-poweroff@%i.target
+ConditionPathExists=!/run/openbmc/chassis@%i-on
+
+[Service]
+ExecStart=/usr/bin/power-workarounds.sh
+SyslogIdentifier=power-workarounds.sh
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=obmc-chassis-poweron@%i.target
