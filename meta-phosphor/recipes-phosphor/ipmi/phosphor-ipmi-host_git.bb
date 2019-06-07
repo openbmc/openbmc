@@ -14,6 +14,8 @@ inherit obmc-phosphor-systemd
 inherit phosphor-ipmi-host
 inherit pythonnative
 
+SRC_URI += "file://entity.yaml"
+
 def ipmi_whitelists(d):
     whitelists = d.getVar(
         'VIRTUAL-RUNTIME_phosphor-ipmi-providers', True) or ''
@@ -33,7 +35,6 @@ DEPENDS += "sdbus++-native"
 DEPENDS += "virtual/phosphor-ipmi-inventory-sel"
 DEPENDS += "virtual/phosphor-ipmi-fru-merge-config"
 DEPENDS += "virtual/phosphor-ipmi-sensor-inventory"
-DEPENDS += "virtual/phosphor-ipmi-entity-config"
 DEPENDS += "boost"
 DEPENDS += "sdeventplus"
 
@@ -74,7 +75,6 @@ EXTRA_OECONF = " \
         SENSOR_YAML_GEN=${STAGING_DIR_NATIVE}${sensor_datadir}/sensor.yaml \
         INVSENSOR_YAML_GEN=${STAGING_DIR_NATIVE}${sensor_datadir}/invsensor.yaml \
         FRU_YAML_GEN=${STAGING_DIR_NATIVE}${config_datadir}/fru_config.yaml \
-        ENTITY_YAML_GEN=${STAGING_DIR_NATIVE}${sensor_datadir}/entity.yaml \
         "
 EXTRA_OECONF_append = " \
         WHITELIST_CONF="${WHITELIST_CONF}" \
@@ -102,6 +102,16 @@ SOFT_SVC = "xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service"
 SOFT_TGTFMT = "obmc-host-shutdown@{0}.target"
 SOFT_FMT = "../${SOFT_SVC}:${SOFT_TGTFMT}.requires/${SOFT_SVC}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'SOFT_FMT', 'OBMC_HOST_INSTANCES')}"
+
+do_replace_entity_default() {
+    # The in-repo provided default is tailored to testing the ipmid code.
+    # Replace it with a reasonable default for users.
+    cp entity.yaml ${S}/scripts/entity-example.yaml
+}
+
+do_patch_append() {
+    bb.build.exec_func('do_replace_entity_default', d)
+}
 
 #Collect all hardcoded sensor yamls from different recipes and
 #merge all of them with sensor.yaml.

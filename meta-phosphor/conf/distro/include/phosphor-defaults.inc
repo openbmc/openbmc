@@ -160,13 +160,6 @@ PREFERRED_PROVIDER_virtual/phosphor-ipmi-sensor-inventory ?= \
     "phosphor-ipmi-sensor-inventory-native"
 
 # The phosphor-host-ipmid application is data-driven and requires an input
-# yaml of entity association record metadata.
-# This virtual is a native recipe that provides that mapping by installing
-# configuration files in the format and native sysroot location expected by
-# the phosphor-host-ipmid build process in the native sysroot.
-PREFERRED_PROVIDER_virtual/phosphor-ipmi-entity-config ?= "phosphor-ipmi-entity-inventory-native"
-
-# The phosphor-host-ipmid application is data-driven and requires an input
 # mapping of inventory object path to the sensor number and sensor metadata.
 # This virtual is a native recipe that provides that mapping by installing
 # configuration files in the format and native sysroot location expected by
