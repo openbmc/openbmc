@@ -1,0 +1,130 @@
+DIMM:
+    EntityID: 32
+    Interfaces:
+        xyz.openbmc_project.Inventory.Decorator.Asset:
+            BuildDate:
+                IPMIFruProperty: Mfg Date
+                IPMIFruSection: Product
+            Manufacturer:
+                IPMIFruProperty: Manufacturer
+                IPMIFruSection: Product
+            Model:
+                IPMIFruProperty: Model Number
+                IPMIFruSection: Product
+            PartNumber:
+                IPMIFruProperty: Part Number
+                IPMIFruSection: Product
+            SerialNumber:
+                IPMIFruProperty: Serial Number
+                IPMIFruSection: Product
+        xyz.openbmc_project.Inventory.Decorator.Revision:
+            Version:
+                IPMIFruProperty: Version
+                IPMIFruSection: Product
+        xyz.openbmc_project.Inventory.Item:
+            PrettyName:
+                IPMIFruProperty: Name
+                IPMIFruSection: Product
+        xyz.openbmc_project.Inventory.Item.Dimm:
+MEMBUFF:
+    EntityID: 8
+    Interfaces:
+        xyz.openbmc_project.Inventory.Decorator.Asset:
+            BuildDate:
+                IPMIFruProperty: Mfg Date
+                IPMIFruSection: Board
+            Manufacturer:
+                IPMIFruProperty: Manufacturer
+                IPMIFruSection: Board
+            PartNumber:
+                IPMIFruProperty: Part Number
+                IPMIFruSection: Board
+            SerialNumber:
+                IPMIFruProperty: Serial Number
+                IPMIFruSection: Board
+        xyz.openbmc_project.Inventory.Item:
+            PrettyName:
+                IPMIFruProperty: Name
+                IPMIFruSection: Board
+        xyz.openbmc_project.Inventory.Item.MemoryBuffer:
+NODE:
+    AssociatedTypes:
+    - SYS
+    EntityID: 7
+    Interfaces:
+        xyz.openbmc_project.Inventory.Decorator.Asset:
+            BuildDate:
+                IPMIFruProperty: Mfg Date
+                IPMIFruSection: Board
+            Manufacturer:
+                IPMIFruProperty: Manufacturer
+                IPMIFruSection: Board
+            PartNumber:
+                IPMIFruProperty: Part Number
+                IPMIFruSection: Board
+            SerialNumber:
+                IPMIFruProperty: Serial Number
+                IPMIFruSection: Board
+        xyz.openbmc_project.Inventory.Item:
+            PrettyName:
+                IPMIFruProperty: Name
+                IPMIFruSection: Board
+        xyz.openbmc_project.Inventory.Item.Board:
+PROC:
+    EntityID: 3
+    Interfaces:
+        xyz.openbmc_project.Inventory.Decorator.Asset:
+            BuildDate:
+                IPMIFruProperty: Mfg Date
+                IPMIFruSection: Board
+            Manufacturer:
+                IPMIFruProperty: Manufacturer
+                IPMIFruSection: Board
+            PartNumber:
+                IPMIFruProperty: Part Number
+                IPMIFruSection: Board
+            SerialNumber:
+                IPMIFruProperty: Serial Number
+                IPMIFruSection: Board
+        xyz.openbmc_project.Inventory.Decorator.Revision:
+            Version:
+                IPMIFruProperty: Custom Field 2
+                IPMIFruSection: Board
+                IPMIFruValueDelimiter: '58'
+        xyz.openbmc_project.Inventory.Item:
+            PrettyName:
+                IPMIFruProperty: Name
+                IPMIFruSection: Board
+        xyz.openbmc_project.Inventory.Item.Cpu:
+SYS:
+    EntityID: 7
+    Interfaces:
+        xyz.openbmc_project.Inventory.Decorator.Asset:
+            Model:
+                IPMIFruProperty: Part Number
+                IPMIFruSection: Chassis
+            SerialNumber:
+                IPMIFruProperty: Serial Number
+                IPMIFruSection: Chassis
+        xyz.openbmc_project.Inventory.Item.System:
+TPM:
+    EntityID: 176
+    Interfaces:
+        xyz.openbmc_project.Inventory.Decorator.Asset:
+            BuildDate:
+                IPMIFruProperty: Mfg Date
+                IPMIFruSection: Board
+            Manufacturer:
+                IPMIFruProperty: Manufacturer
+                IPMIFruSection: Board
+            PartNumber:
+                IPMIFruProperty: Part Number
+                IPMIFruSection: Board
+            SerialNumber:
+                IPMIFruProperty: Serial Number
+                IPMIFruSection: Board
+        xyz.openbmc_project.Inventory.Item:
+            PrettyName:
+                IPMIFruProperty: Name
+                IPMIFruSection: Board
+        xyz.openbmc_project.Inventory.Item.Tpm:
