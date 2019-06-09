@@ -1,0 +1,54 @@
+20:
+    /system/chassis/motherboard/gv100card0:
+        entityID: 3
+        entityInstance: 1
+        interfaces:
+            xyz.openbmc_project.Inventory.Item:
+                PrettyName:
+                    IPMIFruProperty: Board Name
+                    IPMIFruSection: Board
+21:
+    /system/chassis/motherboard/gv100card1:
+        entityID: 3
+        entityInstance: 2
+        interfaces:
+            xyz.openbmc_project.Inventory.Item:
+                PrettyName:
+                    IPMIFruProperty: Board Name
+                    IPMIFruSection: Board
+22:
+    /system/chassis/motherboard/gv100card2:
+        entityID: 3
+        entityInstance: 3
+        interfaces:
+            xyz.openbmc_project.Inventory.Item:
+                PrettyName:
+                    IPMIFruProperty: Board Name
+                    IPMIFruSection: Board
+23:
+    /system/chassis/motherboard/gv100card3:
+        entityID: 3
+        entityInstance: 4
+        interfaces:
+            xyz.openbmc_project.Inventory.Item:
+                PrettyName:
+                    IPMIFruProperty: Board Name
+                    IPMIFruSection: Board
+24:
+    /system/chassis/motherboard/gv100card4:
+        entityID: 3
+        entityInstance: 5
+        interfaces:
+            xyz.openbmc_project.Inventory.Item:
+                PrettyName:
+                    IPMIFruProperty: Board Name
+                    IPMIFruSection: Board
+25:
+    /system/chassis/motherboard/gv100card5:
+        entityID: 3
+        entityInstance: 6
+        interfaces:
+            xyz.openbmc_project.Inventory.Item:
+                PrettyName:
+                    IPMIFruProperty: Board Name
+                    IPMIFruSection: Board

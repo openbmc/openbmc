@@ -1,0 +1,44 @@
+8:
+    entityID: 210
+    entityInstance: 1
+    interfaces:
+        org.open_power.OCC.Status:
+            OccActive:
+                Offsets:
+                    0:
+                        assert: false
+                        deassert: true
+                        type: bool
+                    1:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /org/open_power/control/occ0
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 9
+    sensorType: 9
+    serviceInterface: org.freedesktop.DBus.Properties
+9:
+    entityID: 210
+    entityInstance: 2
+    interfaces:
+        org.open_power.OCC.Status:
+            OccActive:
+                Offsets:
+                    0:
+                        assert: false
+                        deassert: true
+                        type: bool
+                    1:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /org/open_power/control/occ1
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 9
+    sensorType: 9
+    serviceInterface: org.freedesktop.DBus.Properties
