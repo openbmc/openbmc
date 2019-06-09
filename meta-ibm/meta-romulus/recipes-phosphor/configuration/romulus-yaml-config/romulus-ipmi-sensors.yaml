@@ -1,0 +1,3560 @@
+2:
+    entityID: 34
+    entityInstance: 1
+    interfaces:
+        xyz.openbmc_project.State.Boot.Progress:
+            BootProgress:
+                Offsets:
+                    0:
+                        set: xyz.openbmc_project.State.Boot.Progress.ProgressStages.Unspecified
+                        type: string
+                    1:
+                        set: xyz.openbmc_project.State.Boot.Progress.ProgressStages.MemoryInit
+                        type: string
+                    3:
+                        set: xyz.openbmc_project.State.Boot.Progress.ProgressStages.SecondaryProcInit
+                        type: string
+                    7:
+                        set: xyz.openbmc_project.State.Boot.Progress.ProgressStages.PCIInit
+                        type: string
+                    19:
+                        set: xyz.openbmc_project.State.Boot.Progress.ProgressStages.OSStart
+                        type: string
+                    20:
+                        set: xyz.openbmc_project.State.Boot.Progress.ProgressStages.MotherboardInit
+                        type: string
+    mutability: Mutability::Write|Mutability::Read
+    path: /xyz/openbmc_project/state/host0
+    readingType: eventdata2
+    sensorNamePattern: nameProperty
+    sensorReadingType: 111
+    sensorType: 15
+    serviceInterface: org.freedesktop.DBus.Properties
+3:
+    entityID: 210
+    entityInstance: 1
+    interfaces:
+        org.open_power.OCC.Status:
+            OccActive:
+                Offsets:
+                    0:
+                        assert: false
+                        deassert: true
+                        type: bool
+                    1:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /org/open_power/control/occ0
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 9
+    sensorType: 7
+    serviceInterface: org.freedesktop.DBus.Properties
+4:
+    entityID: 210
+    entityInstance: 2
+    interfaces:
+        org.open_power.OCC.Status:
+            OccActive:
+                Offsets:
+                    0:
+                        assert: false
+                        deassert: true
+                        type: bool
+                    1:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /org/open_power/control/occ1
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 9
+    sensorType: 7
+    serviceInterface: org.freedesktop.DBus.Properties
+8:
+    entityID: 3
+    entityInstance: 1
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+9:
+    entityID: 3
+    entityInstance: 2
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+11:
+    entityID: 32
+    entityInstance: 1
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    4:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/dimm0
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 111
+    sensorType: 12
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+12:
+    entityID: 32
+    entityInstance: 2
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    4:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/dimm1
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 111
+    sensorType: 12
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+13:
+    entityID: 32
+    entityInstance: 3
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    4:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/dimm2
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 111
+    sensorType: 12
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+14:
+    entityID: 32
+    entityInstance: 4
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    4:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/dimm3
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 111
+    sensorType: 12
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+15:
+    entityID: 32
+    entityInstance: 5
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    4:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/dimm4
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 111
+    sensorType: 12
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+16:
+    entityID: 32
+    entityInstance: 6
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    4:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/dimm5
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 111
+    sensorType: 12
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+17:
+    entityID: 32
+    entityInstance: 7
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    4:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/dimm6
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 111
+    sensorType: 12
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+18:
+    entityID: 32
+    entityInstance: 8
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    4:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/dimm7
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 111
+    sensorType: 12
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+19:
+    entityID: 32
+    entityInstance: 9
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    4:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/dimm8
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 111
+    sensorType: 12
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+20:
+    entityID: 32
+    entityInstance: 10
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    4:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/dimm9
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 111
+    sensorType: 12
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+21:
+    entityID: 32
+    entityInstance: 11
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    4:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/dimm10
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 111
+    sensorType: 12
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+22:
+    entityID: 32
+    entityInstance: 12
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    4:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/dimm11
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 111
+    sensorType: 12
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+23:
+    entityID: 32
+    entityInstance: 13
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    4:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/dimm12
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 111
+    sensorType: 12
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+24:
+    entityID: 32
+    entityInstance: 14
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    4:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/dimm13
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 111
+    sensorType: 12
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+25:
+    entityID: 32
+    entityInstance: 15
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    4:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/dimm14
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 111
+    sensorType: 12
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+26:
+    entityID: 32
+    entityInstance: 16
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    4:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/dimm15
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 111
+    sensorType: 12
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+27:
+    bExp: 0
+    entityID: 32
+    entityInstance: 17
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/dimm0_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+28:
+    bExp: 0
+    entityID: 32
+    entityInstance: 18
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/dimm1_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+29:
+    bExp: 0
+    entityID: 32
+    entityInstance: 25
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/dimm2_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+30:
+    bExp: 0
+    entityID: 32
+    entityInstance: 26
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/dimm3_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+31:
+    bExp: 0
+    entityID: 32
+    entityInstance: 27
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/dimm4_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+32:
+    bExp: 0
+    entityID: 32
+    entityInstance: 28
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/dimm5_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+33:
+    bExp: 0
+    entityID: 32
+    entityInstance: 29
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/dimm6_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+34:
+    bExp: 0
+    entityID: 32
+    entityInstance: 30
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/dimm7_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+35:
+    bExp: 0
+    entityID: 32
+    entityInstance: 31
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/dimm8_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+36:
+    bExp: 0
+    entityID: 32
+    entityInstance: 32
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/dimm9_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+37:
+    bExp: 0
+    entityID: 32
+    entityInstance: 19
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/dimm10_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+38:
+    bExp: 0
+    entityID: 32
+    entityInstance: 20
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/dimm11_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+39:
+    bExp: 0
+    entityID: 32
+    entityInstance: 21
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/dimm12_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+40:
+    bExp: 0
+    entityID: 32
+    entityInstance: 22
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/dimm13_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+41:
+    bExp: 0
+    entityID: 32
+    entityInstance: 23
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/dimm14_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+42:
+    bExp: 0
+    entityID: 32
+    entityInstance: 24
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/dimm15_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+43:
+    entityID: 208
+    entityInstance: 1
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core0
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+44:
+    entityID: 208
+    entityInstance: 2
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core1
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+45:
+    entityID: 208
+    entityInstance: 3
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core2
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+46:
+    entityID: 208
+    entityInstance: 4
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core3
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+47:
+    entityID: 208
+    entityInstance: 5
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core4
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+48:
+    entityID: 208
+    entityInstance: 6
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core5
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+49:
+    entityID: 208
+    entityInstance: 7
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core6
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+50:
+    entityID: 208
+    entityInstance: 8
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core7
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+51:
+    entityID: 208
+    entityInstance: 9
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core8
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+52:
+    entityID: 208
+    entityInstance: 10
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core9
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+53:
+    entityID: 208
+    entityInstance: 11
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core10
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+54:
+    entityID: 208
+    entityInstance: 12
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core11
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+55:
+    entityID: 208
+    entityInstance: 13
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core12
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+56:
+    entityID: 208
+    entityInstance: 14
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core13
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+57:
+    entityID: 208
+    entityInstance: 15
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core14
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+58:
+    entityID: 208
+    entityInstance: 16
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core15
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+59:
+    entityID: 208
+    entityInstance: 17
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core16
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+60:
+    entityID: 208
+    entityInstance: 18
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core17
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+61:
+    entityID: 208
+    entityInstance: 19
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core18
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+62:
+    entityID: 208
+    entityInstance: 20
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core19
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+63:
+    entityID: 208
+    entityInstance: 21
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core20
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+64:
+    entityID: 208
+    entityInstance: 22
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core21
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+65:
+    entityID: 208
+    entityInstance: 23
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core22
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+66:
+    entityID: 208
+    entityInstance: 24
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core23
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+67:
+    entityID: 208
+    entityInstance: 25
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1/core0
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+68:
+    entityID: 208
+    entityInstance: 26
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1/core1
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+69:
+    entityID: 208
+    entityInstance: 27
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1/core2
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+70:
+    entityID: 208
+    entityInstance: 28
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1/core3
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+71:
+    entityID: 208
+    entityInstance: 29
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1/core4
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+72:
+    entityID: 208
+    entityInstance: 30
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1/core5
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+73:
+    entityID: 208
+    entityInstance: 31
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1/core6
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+74:
+    entityID: 208
+    entityInstance: 32
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1/core7
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+75:
+    entityID: 208
+    entityInstance: 33
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1/core8
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+76:
+    entityID: 208
+    entityInstance: 34
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1/core9
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+77:
+    entityID: 208
+    entityInstance: 35
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1/core10
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+78:
+    entityID: 208
+    entityInstance: 36
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1/core11
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+79:
+    entityID: 208
+    entityInstance: 37
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1/core12
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+80:
+    entityID: 208
+    entityInstance: 38
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1/core13
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+81:
+    entityID: 208
+    entityInstance: 39
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1/core14
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+82:
+    entityID: 208
+    entityInstance: 40
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1/core15
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+83:
+    entityID: 208
+    entityInstance: 41
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1/core16
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+84:
+    entityID: 208
+    entityInstance: 42
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1/core17
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+85:
+    entityID: 208
+    entityInstance: 43
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1/core18
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+86:
+    entityID: 208
+    entityInstance: 44
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1/core19
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+87:
+    entityID: 208
+    entityInstance: 45
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1/core20
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+88:
+    entityID: 208
+    entityInstance: 46
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1/core21
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+89:
+    entityID: 208
+    entityInstance: 47
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1/core22
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+90:
+    entityID: 208
+    entityInstance: 48
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu1/core23
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+91:
+    bExp: 0
+    entityID: 208
+    entityInstance: 49
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p0_core0_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+92:
+    bExp: 0
+    entityID: 208
+    entityInstance: 50
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p0_core1_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+93:
+    bExp: 0
+    entityID: 208
+    entityInstance: 51
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p0_core2_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+94:
+    bExp: 0
+    entityID: 208
+    entityInstance: 52
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p0_core3_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+95:
+    bExp: 0
+    entityID: 208
+    entityInstance: 53
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p0_core4_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+96:
+    bExp: 0
+    entityID: 208
+    entityInstance: 54
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p0_core5_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+97:
+    bExp: 0
+    entityID: 208
+    entityInstance: 55
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p0_core6_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+98:
+    bExp: 0
+    entityID: 208
+    entityInstance: 56
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p0_core7_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+99:
+    bExp: 0
+    entityID: 208
+    entityInstance: 57
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p0_core8_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+100:
+    bExp: 0
+    entityID: 208
+    entityInstance: 58
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p0_core9_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+101:
+    bExp: 0
+    entityID: 208
+    entityInstance: 59
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p0_core10_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+102:
+    bExp: 0
+    entityID: 208
+    entityInstance: 60
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p0_core11_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+103:
+    bExp: 0
+    entityID: 208
+    entityInstance: 61
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p0_core12_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+104:
+    bExp: 0
+    entityID: 208
+    entityInstance: 62
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p0_core13_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+105:
+    bExp: 0
+    entityID: 208
+    entityInstance: 63
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p0_core14_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+106:
+    bExp: 0
+    entityID: 208
+    entityInstance: 64
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p0_core15_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+107:
+    bExp: 0
+    entityID: 208
+    entityInstance: 65
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p0_core16_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+108:
+    bExp: 0
+    entityID: 208
+    entityInstance: 66
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p0_core17_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+109:
+    bExp: 0
+    entityID: 208
+    entityInstance: 67
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p0_core18_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+110:
+    bExp: 0
+    entityID: 208
+    entityInstance: 68
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p0_core19_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+111:
+    bExp: 0
+    entityID: 208
+    entityInstance: 69
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p0_core20_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+112:
+    bExp: 0
+    entityID: 208
+    entityInstance: 70
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p0_core21_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+113:
+    bExp: 0
+    entityID: 208
+    entityInstance: 71
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p0_core22_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+114:
+    bExp: 0
+    entityID: 208
+    entityInstance: 72
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p0_core23_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+115:
+    bExp: 0
+    entityID: 208
+    entityInstance: 73
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p1_core0_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+116:
+    bExp: 0
+    entityID: 208
+    entityInstance: 74
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p1_core1_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+117:
+    bExp: 0
+    entityID: 208
+    entityInstance: 75
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p1_core2_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+118:
+    bExp: 0
+    entityID: 208
+    entityInstance: 76
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p1_core3_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+119:
+    bExp: 0
+    entityID: 208
+    entityInstance: 77
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p1_core4_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+120:
+    bExp: 0
+    entityID: 208
+    entityInstance: 78
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p1_core5_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+121:
+    bExp: 0
+    entityID: 208
+    entityInstance: 79
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p1_core6_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+122:
+    bExp: 0
+    entityID: 208
+    entityInstance: 80
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p1_core7_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+123:
+    bExp: 0
+    entityID: 208
+    entityInstance: 81
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p1_core8_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+124:
+    bExp: 0
+    entityID: 208
+    entityInstance: 82
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p1_core9_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+125:
+    bExp: 0
+    entityID: 208
+    entityInstance: 83
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p1_core10_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+126:
+    bExp: 0
+    entityID: 208
+    entityInstance: 84
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p1_core11_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+127:
+    bExp: 0
+    entityID: 208
+    entityInstance: 85
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p1_core12_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+128:
+    bExp: 0
+    entityID: 208
+    entityInstance: 86
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p1_core13_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+129:
+    bExp: 0
+    entityID: 208
+    entityInstance: 87
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p1_core14_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+130:
+    bExp: 0
+    entityID: 208
+    entityInstance: 88
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p1_core15_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+131:
+    bExp: 0
+    entityID: 208
+    entityInstance: 89
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p1_core16_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+132:
+    bExp: 0
+    entityID: 208
+    entityInstance: 90
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p1_core17_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+133:
+    bExp: 0
+    entityID: 208
+    entityInstance: 91
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p1_core18_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+134:
+    bExp: 0
+    entityID: 208
+    entityInstance: 92
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p1_core19_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+135:
+    bExp: 0
+    entityID: 208
+    entityInstance: 93
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p1_core20_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+136:
+    bExp: 0
+    entityID: 208
+    entityInstance: 94
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p1_core21_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+137:
+    bExp: 0
+    entityID: 208
+    entityInstance: 95
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p1_core22_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+138:
+    bExp: 0
+    entityID: 208
+    entityInstance: 96
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 1
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/p1_core23_temp
+    rExp: 0
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+139:
+    entityID: 34
+    entityInstance: 2
+    interfaces:
+        xyz.openbmc_project.Control.Boot.RebootAttempts:
+            AttemptsLeft:
+                Offsets:
+                    255:
+                        type: uint32_t
+    mutability: Mutability::Write|Mutability::Read
+    path: /xyz/openbmc_project/state/host0
+    readingType: readingAssertion
+    sensorNamePattern: nameProperty
+    sensorReadingType: 111
+    sensorType: 195
+    serviceInterface: org.freedesktop.DBus.Properties
+145:
+    entityID: 35
+    entityInstance: 1
+    interfaces:
+        xyz.openbmc_project.State.OperatingSystem.Status:
+            OperatingSystemState:
+                Offsets:
+                    1:
+                        assert: xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.CBoot
+                        type: string
+                    2:
+                        assert: xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.PXEBoot
+                        type: string
+                    3:
+                        assert: xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.DiagBoot
+                        type: string
+                    4:
+                        assert: xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.CDROMBoot
+                        type: string
+                    5:
+                        assert: xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.ROMBoot
+                        type: string
+                    6:
+                        assert: xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.BootComplete
+                        type: string
+    mutability: Mutability::Write|Mutability::Read
+    path: /xyz/openbmc_project/state/host0
+    readingType: assertion
+    sensorNamePattern: nameProperty
+    sensorReadingType: 111
+    sensorType: 31
+    serviceInterface: org.freedesktop.DBus.Properties
