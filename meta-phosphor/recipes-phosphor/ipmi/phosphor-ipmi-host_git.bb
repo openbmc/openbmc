@@ -71,11 +71,13 @@ WHITELIST_CONF = " \
         ${S}/host-ipmid-whitelist.conf \
         "
 EXTRA_OECONF = " \
-        WHITELIST_CONF="${WHITELIST_CONF}" \
         SENSOR_YAML_GEN=${STAGING_DIR_NATIVE}${sensor_datadir}/sensor.yaml \
         INVSENSOR_YAML_GEN=${STAGING_DIR_NATIVE}${sensor_datadir}/invsensor.yaml \
         FRU_YAML_GEN=${STAGING_DIR_NATIVE}${config_datadir}/fru_config.yaml \
         ENTITY_YAML_GEN=${STAGING_DIR_NATIVE}${sensor_datadir}/entity.yaml \
+        "
+EXTRA_OECONF_append = " \
+        WHITELIST_CONF="${WHITELIST_CONF}" \
         "
 
 S = "${WORKDIR}/git"
