@@ -1,10 +1,7 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-SRC_URI_append = " \
-	file://occ_sensors.hardcoded.yaml \
-	file://hwmon_sensors.hardcoded.yaml \
-	"
+DEPENDS_append = " acx22-yaml-config"
 
-# System-specific sensors
-SRC_URI_append_witherspoon = " \
-	file://witherspoon_hwmon_sensors.hardcoded.yaml \
-	"
+EXTRA_OECONF = " \
+    SENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/acx22-yaml-config/ipmi-sensors.yaml \
+    INVSENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/acx22-yaml-config/ipmi-inventory-sensors.yaml \
+    FRU_YAML_GEN=${STAGING_DIR_HOST}${datadir}/acx22-yaml-config/ipmi-fru-read.yaml \
+    "
