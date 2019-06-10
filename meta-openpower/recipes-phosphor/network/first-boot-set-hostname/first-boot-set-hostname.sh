@@ -1,7 +1,11 @@
 #!/bin/sh -eu
 
 show_error() {
-    echo "$@" >&2
+    if [ -n "${JOURNAL_STREAM-}" ]; then
+        echo "$@" | systemd-cat -t first-boot-set-hostname -p emerg
+    else
+        echo "$@" >&2
+    fi
 }
 
 sync_hostname() {
@@ -26,7 +30,7 @@ sync_hostname() {
                                 ${BMC_ITEM_PATH} 2>/dev/null || true)
 
     if [[ -z "${BMC_ITEM_SERVICE}" ]]; then
-        echo "No BMC item found in the Inventory. Is VPD EEPROM empty?" >&2
+        show_error "No BMC item found in the Inventory. Is VPD EEPROM empty?"
         return
     fi
 
@@ -43,4 +47,3 @@ sync_hostname() {
 [ "$(hostname)" = "{MACHINE}" ] && sync_hostname
 
 systemctl disable first-boot-set-hostname.service
-

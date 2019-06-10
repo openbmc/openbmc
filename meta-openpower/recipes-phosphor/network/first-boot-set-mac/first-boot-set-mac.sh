@@ -1,7 +1,11 @@
 #!/bin/sh -eu
 
 show_error() {
-    logger -p user.error -t bmc-first-init $@
+    if [ -n "${JOURNAL_STREAM-}" ]; then
+        echo "$@" | systemd-cat -t first-boot-set-mac -p emerg
+    else
+        echo "$@" >&2
+    fi
 }
 
 sync_mac() {
@@ -47,8 +51,8 @@ sync_mac() {
     fi
 }
 
-if [ $# -eq 0 ]
-    then echo 'No Ethernet interface name is given'
+if [ $# -eq 0 ]; then
+    show_error 'No Ethernet interface name is given'
     exit 1
 fi
 
