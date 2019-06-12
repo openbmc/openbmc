@@ -1,0 +1,4 @@
+DEVPATH=/dev/input/by-path/platform-gpio-keys-event
+KEY=11
+POLARITY=1
+TARGET=obmc-host-crash@0.target
