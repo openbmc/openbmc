@@ -20,7 +20,7 @@ SYSTEMD_PACKAGES = "${PN} phosphor-msl-verify"
 SYSTEMD_SERVICE_phosphor-msl-verify = "phosphor-msl-verify.service"
 
 DEPENDS += " \
-        ${PN}-config-native \
+        ${PN}-config \
         phosphor-logging \
         autoconf-archive-native \
         sdbusplus-native \
@@ -34,5 +34,5 @@ FILES_phosphor-msl-verify = "${bindir}/phosphor-msl-verify"
 S = "${WORKDIR}/git"
 
 EXTRA_OECONF = " \
-        YAML_PATH=${STAGING_DIR_NATIVE}${config_dir} \
+        YAML_PATH=${STAGING_DIR_HOST}${config_dir} \
         "
