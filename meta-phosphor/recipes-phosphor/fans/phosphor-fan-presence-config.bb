@@ -1,7 +1,7 @@
 # Provides the config file for the phosphor-fan-presence application.
 # The default config file is empty.  To provide a real one,
 # append this recipe in a layer, add:
-# FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+# FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 # and provide a config file.
 
 SUMMARY = "Config file for phosphor-fan-presence"
