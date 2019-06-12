@@ -1,12 +1,12 @@
-# Witherspoon thermal policy for PDM.
+# Machine thermal policy for PDM.
 #
-# Shut down a Witherspoon system if more than three POWER9 cores
+# Shut down the system if more than three cores
 # have a temperature greater than 115 degrees Celcius.
 
 
 - name: core sensors
   description: >
-    'Witherspoon has two POWER9 chips with 24 cores each.'
+    'The machine has two processor chips with 24 cores each.'
   class: group
   group: path
   members:

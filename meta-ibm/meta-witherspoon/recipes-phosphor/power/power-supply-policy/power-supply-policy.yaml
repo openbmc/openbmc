@@ -1,4 +1,4 @@
-# Witherspoon power supply policy for PDM.
+# Machine power supply policy for PDM.
 #
 # Create an error if a power supply is removed while the system is powered on
 
@@ -18,7 +18,7 @@
 
 - name: power supplies
   description: >
-    'A Witherspoon has two power supplies to monitor.'
+    'The machine has two power supplies to monitor.'
   class: group
   group: path
   members:
@@ -29,7 +29,7 @@
 
 - name: chassis state
   description: >
-    'A Witherspoon has a single chassis to monitor.'
+    'The machine has a single chassis to monitor.'
   class: group
   group: path
   members:
