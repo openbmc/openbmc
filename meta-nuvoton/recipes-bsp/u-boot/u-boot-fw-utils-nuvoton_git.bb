@@ -1,7 +1,7 @@
 require u-boot-common-nuvoton.inc
 
 SUMMARY = "U-Boot bootloader fw_printenv/setenv utilities"
-DEPENDS = "mtd-utils"
+DEPENDS = "mtd-utils bison-native"
 
 PROVIDES += "u-boot-fw-utils"
 
@@ -14,7 +14,7 @@ inherit uboot-config
 
 do_compile () {
   oe_runmake ${UBOOT_MACHINE}
-  oe_runmake env
+  oe_runmake envtools
 }
 
 do_install () {
