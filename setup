@@ -38,7 +38,7 @@ machine() {
 						oe-init-build-env ${build_dir}
 
 				if [ "$(cat conf/templateconf.cfg)" = "${tmpl}" ]; then
-					sed "s/^\(MACHINE\s*[?:]*\s*=\s*\).*$/\1${target}/" \
+					sed "s/^\(MACHINE\s*[?:]*\s*=\s*\).*$/\1\"${target}\"/" \
 						-i conf/local.conf
 				fi
 				return
