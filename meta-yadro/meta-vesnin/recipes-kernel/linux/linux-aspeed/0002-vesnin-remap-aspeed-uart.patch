@@ -1,0 +1,41 @@
+From 85027d94696464269ae77702ead788a14fc8305f Mon Sep 17 00:00:00 2001
+From: Alexander Filippov <a.filippov@yadro.com>
+Date: Wed, 28 Mar 2018 17:46:28 +0300
+Subject: [PATCH] vesnin: remap aspeed-uart
+
+Remaps UART2 <-> UART3
+
+Signed-off-by: Alexander Filippov <a.filippov@yadro.com>
+---
+ drivers/misc/aspeed-lpc-ctrl.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/misc/aspeed-lpc-ctrl.c b/drivers/misc/aspeed-lpc-ctrl.c
+index 332210e06e98..ce5138474130 100644
+--- a/drivers/misc/aspeed-lpc-ctrl.c
++++ b/drivers/misc/aspeed-lpc-ctrl.c
+@@ -27,6 +27,7 @@
+ 
+ #define HICR7 0x8
+ #define HICR8 0xc
++#define HICRA 0x1c
+ 
+ struct aspeed_lpc_ctrl {
+ 	struct miscdevice	miscdev;
+@@ -274,6 +275,13 @@ static int aspeed_lpc_ctrl_probe(struct platform_device *pdev)
+ 		goto err;
+ 	}
+ 
++    /* Switch UART2 to IO3 and UART3 to IO2 */
++    rc = regmap_write(lpc_ctrl->regmap, HICRA, 0x00C80108);
++    if (rc) {
++        dev_err(dev, "Unable to switch UART 2<->3\n");
++        goto err;
++    }
++
+ 	return 0;
+ 
+ err:
+-- 
+2.20.1
+

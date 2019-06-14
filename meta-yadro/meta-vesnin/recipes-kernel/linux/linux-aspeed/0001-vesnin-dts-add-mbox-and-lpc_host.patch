@@ -1,0 +1,38 @@
+From 229cd43c240a8395ac6ed684a5eee7a0586f9724 Mon Sep 17 00:00:00 2001
+From: Alexander Filippov <a.filippov@yadro.com>
+Date: Tue, 4 Jun 2019 14:12:00 +0300
+Subject: [PATCH] vesnin: dts: add mbox and lpc_host
+
+These nodes were removed from our DTS by the ask of Andrew Jeffery as
+its are not upstreamed yet. But its are still required to start the
+host.
+
+Signed-off-by: Alexander Filippov <a.filippov@yadro.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-opp-vesnin.dts | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-vesnin.dts b/arch/arm/boot/dts/aspeed-bmc-opp-vesnin.dts
+index 0b9e29c3212e..20f07f5bb4f4 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-opp-vesnin.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-opp-vesnin.dts
+@@ -120,6 +120,16 @@
+ 	status = "okay";
+ };
+ 
++&lpc_host {
++    sio_regs: regs {
++        compatible = "aspeed,bmc-misc";
++    };
++};
++
++&mbox {
++	status = "okay";
++};
++
+ &uart3 {
+ 	status = "okay";
+ 	pinctrl-names = "default";
+-- 
+2.20.1
+

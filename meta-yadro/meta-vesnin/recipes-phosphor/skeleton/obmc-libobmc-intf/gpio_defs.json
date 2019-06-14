@@ -1,0 +1,131 @@
+{
+    "gpio_configs": {
+        "power_config": {
+            "power_good_in": "SYS_PWROK_BUFF",
+            "power_up_outs": [
+                {"name": "BMC_POWER_UP", "polarity": false}
+            ],
+            "reset_outs": [
+                {"name": "CM1_OE_R_N", "polarity": true},
+                {"name": "BMC_CP0_RESET_N", "polarity": false}
+            ],
+            "pci_reset_outs": [
+                {"name": "PEX8718_DEVICES_RESET_N", "polarity": false, "hold": true}
+            ]
+        }
+    },
+
+    "gpio_definitions": [
+        {
+            "name": "BMC_POWER_UP",
+            "pin": "E1",
+            "direction": "out"
+        },
+        {
+            "name": "SYS_PWROK_BUFF",
+            "pin": "E6",
+            "direction": "in"
+        },
+        {
+            "name": "BMC_WD_CLEAR_PULSE_N",
+            "pin": "N4",
+            "direction": "out"
+        },
+        {
+            "name": "CM1_OE_R_N",
+            "pin": "Q6",
+            "direction": "out"
+        },
+        {
+            "name": "BMC_CP0_RESET_N",
+            "pin": "O2",
+            "direction": "out"
+        },
+        {
+            "name": "PSU_PG",
+            "pin": "J2",
+            "direction": "in"
+        },
+        {
+            "name": "PEX8718_DEVICES_RESET_N",
+            "pin": "B6",
+            "direction": "out"
+        },
+        {
+            "name": "CP0_DEVICES_RESET_N",
+            "pin": "N3",
+            "direction": "in"
+        },
+        {
+            "name": "CP1_DEVICES_RESET_N",
+            "pin": "N5",
+            "direction": "in"
+        },
+        {
+            "name": "CP2_DEVICES_RESET_N",
+            "pin": "P0",
+            "direction": "in"
+        },
+
+        {
+            "name": "CP3_DEVICES_RESET_N",
+            "pin": "P1",
+            "direction": "in"
+        },
+        {
+            "name": "IDBTN",
+            "pin": "Q7",
+            "direction": "out"
+        },
+        {
+            "name": "POWER_BUTTON",
+            "pin": "E0",
+            "direction": "both"
+        },
+        {
+            "name": "RESET_BUTTON",
+            "pin": "E2",
+            "direction": "both"
+        },
+        {
+            "name": "CHECKSTOP",
+            "pin": "P5",
+            "direction": "falling"
+        },
+        {
+            "name": "PS0_PRES_N",
+            "pin": "P7",
+            "direction": "in"
+        },
+        {
+            "name": "PS1_PRES_N",
+            "pin": "N0",
+            "direction": "in"
+        },
+        {
+            "name": "FSI_DATA",
+            "pin": "A5",
+            "direction": "out"
+        },
+        {
+            "name": "FSI_CLK",
+            "pin": "A4",
+            "direction": "out"
+        },
+        {
+            "name": "FSI_ENABLE",
+            "pin": "E5",
+            "direction": "out"
+        },
+        {
+            "name": "CRONUS_SEL",
+            "pin": "A6",
+            "direction": "out"
+        },
+        {
+            "name": "CP0_FSI0_DATA_EN",
+            "pin": "H6",
+            "direction": "out"
+        }
+    ]
+}
