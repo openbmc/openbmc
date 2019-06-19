@@ -56,11 +56,11 @@ MGR_SVC ?= "xyz.openbmc_project.Dump.Manager.service"
 SYSTEMD_SUBSTITUTIONS += "BMC_DUMP_PATH:${bmc_dump_path}:${MGR_SVC}"
 
 FILES_${PN}-manager +=  " \
-    ${sbindir}/phosphor-dump-manager \
+    ${bindir}/phosphor-dump-manager \
     ${exec_prefix}/lib/tmpfiles.d/coretemp.conf \
     ${datadir}/dump/ \
     "
-FILES_${PN}-monitor += "${sbindir}/phosphor-dump-monitor"
+FILES_${PN}-monitor += "${bindir}/phosphor-dump-monitor"
 FILES_${PN}-dreport += "${bindir}/dreport"
 FILES_${PN}-scripts += "${dreport_dir}"
 
