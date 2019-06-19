@@ -15,7 +15,7 @@ SRC_URI[md5sum] = "4111de4faa3b9848a0686b2f260c5056"
 SRC_URI[sha256sum] = "fea0a94d4b605894f3e2d5572e3f96e4413bcad3a085aae7367c2cf07908b2ff"
 
 inherit autotools texinfo update-alternatives gettext ptest
-RDEPENDS_${PN}-ptest += "make ${PN}"
+RDEPENDS_${PN}-ptest += "make"
 RRECOMMENDS_${PN}-ptest_append_libc-glibc = " locale-base-ru-ru"
 
 EXTRA_OECONF = "--disable-acl \

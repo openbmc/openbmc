@@ -22,23 +22,24 @@ LICENSE_modules/linux = "GPL-2.0"
 LICENSE_modules/solaris = "CDDL-1.0"
 
 SRC_URI = "git://github.com/vmware/open-vm-tools.git;protocol=https \
-           file://tools.conf \
-           file://vmtoolsd.service \
-           file://vmtoolsd.init \
-           file://0001-configure.ac-don-t-use-dnet-config.patch \
-           file://0002-add-include-sys-sysmacros.h.patch \
-           file://0005-Use-configure-test-for-struct-timespec.patch \
-           file://0006-Fix-definition-of-ALLPERMS-and-ACCESSPERMS.patch \
-           file://0007-Use-configure-to-test-for-feature-instead-of-platfor.patch \
-           file://0011-Use-configure-test-for-sys-stat.h-include.patch \
-           file://fix-subdir-objects-configure-error.patch \
-           file://0001-include-poll.h-instead-of-sys-poll.h.patch \
-           file://0002-Rename-poll.h-to-vm_poll.h.patch \
-           file://0003-use-posix-strerror_r-unless-on-gnu-libc-system.patch \
-           file://0004-Use-uintmax_t-for-handling-rlim_t.patch \
-           file://0001-Use-off64_t-instead-of-__off64_t.patch \
-           file://0001-misc-Do-not-print-NULL-string-into-logs.patch \
-           "
+    file://tools.conf \
+    file://vmtoolsd.service \
+    file://vmtoolsd.init \
+    file://0001-configure.ac-don-t-use-dnet-config.patch;patchdir=.. \
+    file://0002-add-include-sys-sysmacros.h.patch;patchdir=.. \
+    file://0003-Use-configure-test-for-struct-timespec.patch;patchdir=.. \
+    file://0004-Fix-definition-of-ALLPERMS-and-ACCESSPERMS.patch;patchdir=.. \
+    file://0005-Use-configure-to-test-for-feature-instead-of-platfor.patch;patchdir=.. \
+    file://0006-Use-configure-test-for-sys-stat.h-include.patch;patchdir=.. \
+    file://0007-Fix-subdir-objects-configure-error.patch;patchdir=.. \
+    file://0008-include-poll.h-instead-of-sys-poll.h.patch;patchdir=.. \
+    file://0009-Rename-poll.h-to-vm_poll.h.patch;patchdir=.. \
+    file://0010-use-posix-strerror_r-unless-on-gnu-libc-system.patch;patchdir=.. \
+    file://0011-Use-uintmax_t-for-handling-rlim_t.patch;patchdir=.. \
+    file://0012-Use-off64_t-instead-of-__off64_t.patch;patchdir=.. \
+    file://0013-misc-Do-not-print-NULL-string-into-logs.patch;patchdir=.. \
+    file://0014-Fix-new-warnings-from-gcc9.patch;patchdir=.. \
+"
 # stable-10.3.5
 SRCREV = "f2ff192717375b95a6b7e278fb47dbb3d3bc56d1"
 

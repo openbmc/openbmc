@@ -1,0 +1,50 @@
+From 321a602098d11ee712ebd01f51033b5fd369eae9 Mon Sep 17 00:00:00 2001
+From: Patrick Ohly <patrick.ohly@intel.com>
+Date: Wed, 13 May 2015 03:41:02 -0700
+Subject: [PATCH] Makefile.am: disable man page creation
+
+Depends on asciidoc, which is not available.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
+---
+ Makefile.am | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 06ebf59..4ddd52c 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,5 +1,5 @@
+ SUBDIRS = src
+-dist_man_MANS = evmctl.1
++# dist_man_MANS = evmctl.1
+ 
+ doc_DATA =  examples/ima-genkey-self.sh examples/ima-genkey.sh examples/ima-gen-local-ca.sh
+ EXTRA_DIST = autogen.sh $(doc_DATA)
+@@ -39,4 +39,21 @@ rmman:
+ 
+ doc: evmctl.1.html rmman evmctl.1
+ 
++# requires asciidoc, xslproc, docbook-xsl
++# FIXME Disabled until docbook-xsl is unavaliable on tizen.org
++#MANPAGE_DOCBOOK_XSL = /usr/share/xml/docbook/stylesheet/docbook-xsl/manpages/docbook.xsl
++#
++#evmctl.1.html: README
++#	@asciidoc -o $@ $<
++#
++#evmctl.1:
++#	asciidoc -d manpage -b docbook -o evmctl.1.xsl README
++#	xsltproc --nonet -o $@ $(MANPAGE_DOCBOOK_XSL) evmctl.1.xsl
++#	rm -f evmctl.1.xsl
++#
++#rmman:
++#	rm -f evmctl.1
++#
++#doc: evmctl.1.html rmman evmctl.1
++
+ .PHONY: $(tarname)
+-- 
+1.8.4.5
+

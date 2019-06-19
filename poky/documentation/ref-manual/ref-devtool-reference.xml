@@ -34,7 +34,7 @@
             You can run <filename>devtool --help</filename> to see all
             the commands:
             <literallayout class='monospaced'>
-     $ devtool --help
+     $ devtool -h
      NOTE: Starting bitbake server...
      usage: devtool [--basepath BASEPATH] [--bbpath BBPATH] [-d] [-q]
                     [--color COLOR] [-h]
@@ -43,50 +43,48 @@
      OpenEmbedded development tool
 
      options:
-       --basepath BASEPATH  Base directory of SDK / build directory
-       --bbpath BBPATH      Explicitly specify the BBPATH, rather than getting it
-                            from the metadata
-       -d, --debug          Enable debug output
-       -q, --quiet          Print only errors
-       --color COLOR        Colorize output (where COLOR is auto, always, never)
-       -h, --help           show this help message and exit
+       --basepath BASEPATH   Base directory of SDK / build directory
+       --bbpath BBPATH       Explicitly specify the BBPATH, rather than getting it
+                             from the metadata
+       -d, --debug           Enable debug output
+       -q, --quiet           Print only errors
+       --color COLOR         Colorize output (where COLOR is auto, always, never)
+       -h, --help            show this help message and exit
 
      subcommands:
        Beginning work on a recipe:
-         add                  Add a new recipe
-         modify               Modify the source for an existing recipe
-         upgrade              Upgrade an existing recipe
+         add                   Add a new recipe
+         modify                Modify the source for an existing recipe
+         upgrade               Upgrade an existing recipe
        Getting information:
-         status               Show workspace status
-         search               Search available recipes
-         latest-version       Report the latest version of an existing recipe
+         status                Show workspace status
+         search                Search available recipes
+         latest-version        Report the latest version of an existing recipe
+         check-upgrade-status  Report upgradability for multiple (or all) recipes
        Working on a recipe in the workspace:
-         build                Build a recipe
-         rename               Rename a recipe file in the workspace
-         edit-recipe          Edit a recipe file
-         find-recipe          Find a recipe file
-         configure-help       Get help on configure script options
-         update-recipe        Apply changes from external source tree to recipe
-         reset                Remove a recipe from your workspace
-         finish               Finish working on a recipe in your workspace
+         build                 Build a recipe
+         rename                Rename a recipe file in the workspace
+         edit-recipe           Edit a recipe file
+         find-recipe           Find a recipe file
+         configure-help        Get help on configure script options
+         update-recipe         Apply changes from external source tree to recipe
+         reset                 Remove a recipe from your workspace
+         finish                Finish working on a recipe in your workspace
        Testing changes on target:
-         deploy-target        Deploy recipe output files to live target machine
-         undeploy-target      Undeploy recipe output files in live target machine
-         build-image          Build image including workspace recipe packages
+         deploy-target         Deploy recipe output files to live target machine
+         undeploy-target       Undeploy recipe output files in live target machine
+         build-image           Build image including workspace recipe packages
        Advanced:
-         create-workspace     Set up workspace in an alternative location
-         export               Export workspace into a tar archive
-         import               Import exported tar archive into workspace
-         extract              Extract the source for an existing recipe
-         sync                 Synchronize the source tree for an existing recipe
+         create-workspace      Set up workspace in an alternative location
+         export                Export workspace into a tar archive
+         import                Import exported tar archive into workspace
+         extract               Extract the source for an existing recipe
+         sync                  Synchronize the source tree for an existing recipe
      Use devtool &lt;subcommand&gt; --help to get help on a specific command
             </literallayout>
-        </para>
-
-        <para>
-                As directed in the general help output, you can get more
-                syntax on a specific command by providing the command
-                name and using <filename>--help</filename>:
+            As directed in the general help output, you can get more syntax
+            on a specific command by providing the command name and using
+            "--help":
             <literallayout class='monospaced'>
      $ devtool add --help
      NOTE: Starting bitbake server...
@@ -429,6 +427,108 @@
         </para>
     </section>
 
+    <section id='devtool-checking-on-the-upgrade-status-of-a-recipe'>
+        <title>Checking on the Upgrade Status of a Recipe</title>
+
+        <para>
+            Upstream recipes change over time.
+            Consequently, you might find that you need to determine if you
+            can upgrade a recipe to a newer version.
+        </para>
+
+        <para>
+            To check on the upgrade status of a recipe, use the
+            <filename>devtool check-upgrade-status</filename> command.
+            The command displays a table of your current recipe versions,
+            the latest upstream versions, the email address of the recipe's
+            maintainer, and any additional information such as commit hash
+            strings and reasons you might not be able to upgrade a particular
+            recipe.
+            <note><title>NOTES:</title>
+                <itemizedlist>
+                    <listitem><para>
+                        For the <filename>oe-core</filename> layer, recipe
+                        maintainers come from the
+                        <ulink url='http://git.yoctoproject.org/cgit/cgit.cgi/poky/tree/meta/conf/distro/include/maintainers.inc'><filename>maintainers.inc</filename></ulink>
+                        file.
+                        </para></listitem>
+                    <listitem><para>
+                        If the recipe is using the
+                        <ulink url='&YOCTO_DOCS_BB_URL;#git-fetcher'>Git fetcher</ulink>
+                        rather than a tarball, the commit hash points to the
+                        commit that matches the recipe's latest version tag.
+                        </para></listitem>
+                </itemizedlist>
+            </note>
+        </para>
+
+        <para>
+            As with all <filename>devtool</filename> commands, you can get
+            help on the individual command:
+            <literallayout class='monospaced'>
+     $ devtool check-upgrade-status -h
+     NOTE: Starting bitbake server...
+     usage: devtool check-upgrade-status [-h] [--all] [recipe [recipe ...]]
+
+     Prints a table of recipes together with versions currently provided by
+     recipes, and latest upstream versions, when there is a later version available
+
+     arguments:
+       recipe      Name of the recipe to report (omit to report upgrade info for
+                   all recipes)
+
+     options:
+      -h, --help  show this help message and exit
+       --all, -a   Show all recipes, not just recipes needing upgrade
+            </literallayout>
+        </para>
+
+        <para>
+            Unless you provide a specific recipe name on the command line,
+            the command checks all recipes in all configured layers.
+        </para>
+
+        <para>
+            Following is a partial example table that reports on all the
+            recipes.
+            Notice the reported reason for not upgrading the
+            <filename>base-passwd</filename> recipe.
+            In this example, while a new version is available upstream,
+            you do not want to use it because the dependency on
+            <filename>cdebconf</filename> is not easily satisfied.
+            <note>
+                When a reason for not upgrading displays, the reason is
+                usually written into the recipe using the
+                <filename>RECIPE_NO_UPDATE_REASON</filename> variable.
+                See the
+                <ulink url='http://git.yoctoproject.org/cgit/cgit.cgi/poky/tree/meta/recipes-core/base-passwd/base-passwd_3.5.29.bb'><filename>base-passwd.bb</filename></ulink>
+                recipe for an example.
+            </note>
+            <literallayout class='monospaced'>
+     $ devtool check-upgrade-status
+         ...
+         NOTE: acpid                     2.0.30          2.0.31
+     Ross Burton &lt;ross.burton@intel.com&gt;
+         NOTE: u-boot-fw-utils           2018.11         2019.01
+     Marek Vasut &lt;marek.vasut@gmail.com&gt;
+     d3689267f92c5956e09cc7d1baa4700141662bff
+         NOTE: u-boot-tools              2018.11         2019.01
+     Marek Vasut &lt;marek.vasut@gmail.com&gt;
+     d3689267f92c5956e09cc7d1baa4700141662bff
+          .
+          .
+          .
+         NOTE: base-passwd               3.5.29          3.5.45
+     Anuj Mittal &lt;anuj.mittal@intel.com&gt;  cannot be updated due to: Version
+     3.5.38 requires cdebconf for update-passwd utility
+         NOTE: busybox                   1.29.2          1.30.0
+     Andrej Valek &lt;andrej.valek@siemens.com&gt;
+         NOTE: dbus-test                 1.12.10         1.12.12
+     Chen Qi &lt;Qi.Chen@windriver.com&gt;
+            </literallayout>
+        </para>
+    </section>
+
     <section id='devtool-upgrading-a-recipe'>
         <title>Upgrading a Recipe</title>
 
@@ -443,6 +543,13 @@
             section of the Yocto Project Development Tasks Manual.
             This section overviews the <filename>devtool upgrade</filename>
             command.
+            <note>
+                Before you upgrade a recipe, you can check on its upgrade
+                status.
+                See the
+                "<link linkend='devtool-checking-on-the-upgrade-status-of-a-recipe'>Checking on the Upgrade Status of a Recipe</link>"
+                for more information.
+            </note>
         </para>
 
         <para>

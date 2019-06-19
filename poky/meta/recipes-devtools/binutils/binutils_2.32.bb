@@ -20,6 +20,11 @@ EXTRA_OECONF_class-native = "--enable-targets=all \
                              --enable-install-libbfd \
                              --disable-werror"
 
+# gcc9.0 end up mis-compiling libbfd.so with O2 which then crashes on target
+# So remove -O2 and use -Os as workaround
+SELECTED_OPTIMIZATION_remove_mipsarch = "-O2"
+SELECTED_OPTIMIZATION_append_mipsarch = " -Os"
+
 do_install_class-native () {
 	autotools_do_install
 
@@ -47,3 +52,4 @@ PACKAGE_BEFORE_PN += "libbfd"
 FILES_libbfd = "${libdir}/libbfd-*.so"
 
 BBCLASSEXTEND = "native nativesdk"
+

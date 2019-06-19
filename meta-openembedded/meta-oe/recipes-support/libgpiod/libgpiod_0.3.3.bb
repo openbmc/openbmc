@@ -1,5 +1,8 @@
 require libgpiod.inc
 
+# enable tools
+PACKAGECONFIG ?= "tools"
+
 PACKAGECONFIG[tests] = "--enable-tests,--disable-tests,kmod udev"
 
 SRC_URI[md5sum] = "2aa1e1a80c3c919ae142ab9a55fb59ca"

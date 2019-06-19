@@ -91,6 +91,13 @@ class Svn(FetchMethod):
             svncmd = "%s log --limit 1 %s %s://%s/%s/" % (ud.basecmd, " ".join(options), proto, svnroot, ud.module)
         else:
             suffix = ""
+
+            # externals may be either 'allowed' or 'nowarn', but not both.  Allowed
+            # will not issue a warning, but will log to the debug buffer what has likely
+            # been downloaded by SVN.
+            if not ("externals" in ud.parm and ud.parm["externals"] == "allowed"):
+                options.append("--ignore-externals")
+
             if ud.revision:
                 options.append("-r %s" % ud.revision)
                 suffix = "@%s" % (ud.revision)
@@ -135,6 +142,18 @@ class Svn(FetchMethod):
                 logger.debug(1, "Running %s", svnfetchcmd)
                 bb.fetch2.check_network_access(d, svnfetchcmd, ud.url)
                 runfetchcmd(svnfetchcmd, d, workdir=ud.pkgdir)
+
+            if not ("externals" in ud.parm and ud.parm["externals"] == "nowarn"):
+                # Warn the user if this had externals (won't catch them all)
+                output = runfetchcmd("svn propget svn:externals", d, workdir=ud.moddir)
+                if output:
+                    if "--ignore-externals" in svnfetchcmd.split():
+                        bb.warn("%s contains svn:externals." % ud.url)
+                        bb.warn("These should be added to the recipe SRC_URI as necessary.")
+                        bb.warn("svn fetch has ignored externals:\n%s" % output)
+                        bb.warn("To disable this warning add ';externals=nowarn' to the url.")
+                    else:
+                        bb.debug(1, "svn repository has externals:\n%s" % output)
 
             scmdata = ud.parm.get("scmdata", "")
             if scmdata == "keep":

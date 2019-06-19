@@ -1,0 +1,31 @@
+From 0c9e8f586ba52a9aef5ed298e8315b2598b8fb72 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 25 May 2019 16:54:45 -0700
+Subject: [PATCH] js: Fix build with musl
+
+The MIPS specific header <sgidefs.h> is not provided by musl
+linux kernel headers provide <asm/sgidefs.h> which has same definitions
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ js/src/jsmath.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/js/src/jsmath.cpp b/js/src/jsmath.cpp
+index a28968be..8facaa81 100644
+--- a/js/src/jsmath.cpp
++++ b/js/src/jsmath.cpp
+@@ -71,7 +71,7 @@
+ #elif defined(__s390__)
+ #define GETRANDOM_NR 349
+ #elif defined(__mips__)
+-#include <sgidefs.h>
++#include <asm/sgidefs.h>
+ #if _MIPS_SIM == _MIPS_SIM_ABI32
+ #define GETRANDOM_NR 4353
+ #elif _MIPS_SIM == _MIPS_SIM_ABI64
+-- 
+2.21.0
+

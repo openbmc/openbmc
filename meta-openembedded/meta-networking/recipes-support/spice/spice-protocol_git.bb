@@ -13,9 +13,9 @@ architectures."
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b37311cb5604f3e5cc2fb0fd23527e95"
 
-PV = "0.12.13+git${SRCPV}"
+PV = "0.14.0+git${SRCPV}"
 
-SRCREV = "87441524f4e7b79658e42bd8f1f6c3e3c8649aa5"
+SRCREV = "f72ece993aeaf23f77e2845562b20e5563e52ba0"
 
 SRC_URI = " \
     git://anongit.freedesktop.org/spice/spice-protocol \

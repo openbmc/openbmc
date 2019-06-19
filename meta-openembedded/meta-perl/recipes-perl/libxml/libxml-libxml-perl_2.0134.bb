@@ -35,7 +35,7 @@ SRC_URI[libxml.sha256sum] = "f0bca4d0c2da35d879fee4cd13f352014186cedab27ab5e191f
 
 S = "${WORKDIR}/XML-LibXML-${PV}"
 
-inherit cpan
+inherit cpan ptest-perl
 
 EXTRA_CPANFLAGS = "INC=-I${STAGING_INCDIR}/libxml2 LIBS=-L${STAGING_LIBDIR}"
 
@@ -45,3 +45,27 @@ CFLAGS += " -D_GNU_SOURCE "
 BUILD_CFLAGS += " -D_GNU_SOURCE "
 
 FILES_${PN}-dbg =+ "${libdir}/perl/vendor_perl/*/auto/XML/LibXML/.debug/"
+
+RDEPENDS_${PN}-ptest += " \
+    liburi-perl \
+    perl-module-encode-byte \
+    perl-module-encode-unicode \
+    perl-module-locale \
+    perl-module-perlio-scalar \
+    perl-module-test-more \
+"
+
+do_install_prepend() {
+	# test requires "-T" (taint) command line option
+	rm -rf ${B}/t/pod.t
+	# this only applies to author build
+	rm -rf ${B}/t/pod-files-presence.t
+}
+
+do_install_ptest() {
+	cp -r ${B}/t/data ${D}${PTEST_PATH}/t/
+	cp -r ${B}/t/lib ${D}${PTEST_PATH}/t/
+	cp -r ${B}/example ${D}${PTEST_PATH}
+	cp -r ${B}/test ${D}${PTEST_PATH}
+	chown -R root:root ${D}${PTEST_PATH}
+}

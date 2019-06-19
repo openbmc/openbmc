@@ -1,4 +1,4 @@
-From 04af15322f677db42ecc2acc465334a04de9a871 Mon Sep 17 00:00:00 2001
+From a3f69f2ed45efbdaee47c2dde4df3d78323300e5 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Mon, 5 Sep 2016 22:25:44 +0100
 Subject: [PATCH] Use native pkg-config when looking for gtk-doc.
@@ -7,10 +7,10 @@ Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 
 ---
- gtk-doc.m4 | 7 ++++++-
+ buildsystems/autotools/gtk-doc.m4 | 7 ++++++-
  1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/gtk-doc.m4 b/gtk-doc.m4
+diff --git a/buildsystems/autotools/gtk-doc.m4 b/buildsystems/autotools/gtk-doc.m4
 index 2d12f01..e5afc3f 100644
 --- a/buildsystems/autotools/gtk-doc.m4
 +++ b/buildsystems/autotools/gtk-doc.m4

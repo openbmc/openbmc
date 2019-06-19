@@ -14,21 +14,19 @@ Upstream-Status: Pending
  server/red-client.c  | 6 +++---
  2 files changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/server/red-channel.c b/server/red-channel.c
-index 1b38f04d..11dc667b 100644
 --- a/server/red-channel.c
 +++ b/server/red-channel.c
-@@ -192,7 +192,7 @@ red_channel_constructed(GObject *object)
+@@ -204,7 +204,7 @@ red_channel_constructed(GObject *object)
  {
      RedChannel *self = RED_CHANNEL(object);
  
--    red_channel_debug(self, "thread_id 0x%lx", self->priv->thread_id);
-+    red_channel_debug(self, "thread_id 0x%lx", (unsigned long)self->priv->thread_id);
+-    red_channel_debug(self, "thread_id 0x%" G_GSIZE_MODIFIER "x", self->priv->thread_id);
++    red_channel_debug(self, "thread_id 0x%" G_GSIZE_MODIFIER "x", (unsigned long)self->priv->thread_id);
  
      RedChannelClass *klass = RED_CHANNEL_GET_CLASS(self);
  
-@@ -475,7 +475,8 @@ void red_channel_remove_client(RedChannel *channel, RedChannelClient *rcc)
-         red_channel_warning(channel, "channel->thread_id (0x%lx) != pthread_self (0x%lx)."
+@@ -479,7 +479,8 @@ void red_channel_remove_client(RedChanne
+                             "pthread_self (0x%" G_GSIZE_MODIFIER "x)."
                              "If one of the threads is != io-thread && != vcpu-thread, "
                              "this might be a BUG",
 -                            channel->priv->thread_id, pthread_self());
@@ -37,12 +35,10 @@ index 1b38f04d..11dc667b 100644
      }
      spice_return_if_fail(channel);
      link = g_list_find(channel->priv->clients, rcc);
-diff --git a/server/red-client.c b/server/red-client.c
-index ddfc5400..76986640 100644
 --- a/server/red-client.c
 +++ b/server/red-client.c
-@@ -180,7 +180,7 @@ void red_client_migrate(RedClient *client)
-         spice_warning("client->thread_id (0x%lx) != pthread_self (0x%lx)."
+@@ -180,7 +180,7 @@ void red_client_migrate(RedClient *clien
+                       "pthread_self (0x%" G_GSIZE_MODIFIER "x)."
                        "If one of the threads is != io-thread && != vcpu-thread,"
                        " this might be a BUG",
 -                      client->thread_id, pthread_self());
@@ -50,8 +46,8 @@ index ddfc5400..76986640 100644
      }
      FOREACH_CHANNEL_CLIENT(client, rcc) {
          if (red_channel_client_is_connected(rcc)) {
-@@ -199,8 +199,8 @@ void red_client_destroy(RedClient *client)
-         spice_warning("client->thread_id (0x%lx) != pthread_self (0x%lx)."
+@@ -199,8 +199,8 @@ void red_client_destroy(RedClient *clien
+                       "pthread_self (0x%" G_GSIZE_MODIFIER "x)."
                        "If one of the threads is != io-thread && != vcpu-thread,"
                        " this might be a BUG",
 -                      client->thread_id,
@@ -61,6 +57,3 @@ index ddfc5400..76986640 100644
      }
      red_client_set_disconnecting(client);
      FOREACH_CHANNEL_CLIENT(client, rcc) {
--- 
-2.17.1
-

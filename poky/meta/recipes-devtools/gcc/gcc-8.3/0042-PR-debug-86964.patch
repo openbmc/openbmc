@@ -1,0 +1,94 @@
+From beb921e1106b5bcbb0c6e2be84b241327e2ffc51 Mon Sep 17 00:00:00 2001
+From: law <law@138bc75d-0d04-0410-961f-82ee72b054a4>
+Date: Mon, 25 Mar 2019 21:19:09 +0000
+Subject: [PATCH] 	PR debug/86964 	* dwarf2out.c
+ (premark_used_variables): New function. 	(prune_unused_types_walk): Do
+ not mark not premarked external 	variables. 	(prune_unused_types):
+ Call premark_used_variables.
+
+	* gcc.dg/debug/dwarf2/pr86964.c: New testcase.
+
+git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/trunk@269925 138bc75d-0d04-0410-961f-82ee72b054a4
+
+Upstream-Status: Backport
+Signed-off-by: Zhixiong Chi <zhixiong.chi@windriver.com>
+---
+ gcc/ChangeLog                               |  8 ++++++
+ gcc/dwarf2out.c                             | 32 +++++++++++++++++++++
+ 2 files changed, 40 insertions(+)
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index 2075480ca2b..cdce539ac6f 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,3 +1,11 @@
++2019-03-25  Johan Karlsson <johan.karlsson@enea.com>
++
++	PR debug/86964
++	* dwarf2out.c (premark_used_variables): New function.
++	(prune_unused_types_walk): Do not mark not premarked external
++	variables.
++	(prune_unused_types): Call premark_used_variables.
++
+ 2019-02-22  Release Manager
+ 
+ 	* GCC 8.3.0 released.
+diff --git a/gcc/dwarf2out.c b/gcc/dwarf2out.c
+index ae8bdee9981..b9a624e1ac7 100644
+--- a/gcc/dwarf2out.c
++++ b/gcc/dwarf2out.c
+@@ -22658,6 +22658,21 @@ premark_types_used_by_global_vars (void)
+       ->traverse<void *, premark_types_used_by_global_vars_helper> (NULL);
+ }
+ 
++/* Mark all variables used by the symtab as perennial.  */
++
++static void
++premark_used_variables (void)
++{
++  /* Mark DIEs in the symtab as used.  */
++  varpool_node *var;
++  FOR_EACH_VARIABLE (var)
++    {
++      dw_die_ref die = lookup_decl_die (var->decl);
++      if (die)
++	die->die_perennial_p = 1;
++    }
++}
++
+ /* Generate a DW_TAG_call_site DIE in function DECL under SUBR_DIE
+    for CA_LOC call arg loc node.  */
+ 
+@@ -29264,6 +29279,19 @@ prune_unused_types_walk (dw_die_ref die)
+ 
+       return;
+ 
++    case DW_TAG_variable:
++      if (flag_debug_only_used_symbols)
++	{
++	  if (die->die_perennial_p)
++	    break;
++
++	  /* premark_used_variables marks external variables --- don't mark
++	     them here.  */
++	  if (get_AT (die, DW_AT_external))
++	    return;
++	}
++      /* FALLTHROUGH */
++
+     default:
+       /* Mark everything else.  */
+       break;
+@@ -29390,6 +29418,10 @@ prune_unused_types (void)
+   /* Mark types that are used in global variables.  */
+   premark_types_used_by_global_vars ();
+ 
++  /* Mark variables used in the symtab.  */
++  if (flag_debug_only_used_symbols)
++    premark_used_variables ();
++
+   /* Set the mark on nodes that are actually used.  */
+   prune_unused_types_walk (comp_unit_die ());
+   for (node = limbo_die_list; node; node = node->next)
+-- 
+2.21.0

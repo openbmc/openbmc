@@ -85,5 +85,5 @@ RDEPENDS_${PN}-ptest = "make file sed gawk diffutils findutils ed perl \
                         perl-module-filehandle perl-module-getopt-std \
                         perl-module-posix perl-module-file-temp \
                         perl-module-text-parsewords perl-module-overloading \
-                        bash util-linux-getopt \
+                        bash util-linux-getopt patch \
                        "

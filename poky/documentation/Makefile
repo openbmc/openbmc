@@ -156,7 +156,7 @@ TARFILES = dev-style.css dev-manual.html \
 TARFILES = dev-style.css dev-manual.html figures/buildhistory-web.png \
            figures/dev-title.png figures/buildhistory.png \
            figures/recipe-workflow.png figures/bitbake-build-flow.png \
-           figures/multiconfig_files.png
+           figures/multiconfig_files.png figures/cute-files-npm-example.png
 	endif
 
 MANUALS = $(DOC)/$(DOC).html
@@ -260,7 +260,7 @@ TARFILES = mega-manual.html mega-style.css \
 	figures/sdk-devtool-modify-flow.png \
 	figures/sdk-devtool-upgrade-flow.png figures/bitbake-build-flow.png figures/bypqs-title.png \
 	figures/overview-manual-title.png figures/sdk-autotools-flow.png figures/sdk-makefile-flow.png \
-	figures/bb_multiconfig_files.png figures/bitbake-title.png
+	figures/bb_multiconfig_files.png figures/bitbake-title.png figures/cute-files-npm-example.png
 	endif
 
 MANUALS = $(DOC)/$(DOC).html

@@ -1,4 +1,4 @@
-From 2391bba64116135369147e930fb14b5824a9cef0 Mon Sep 17 00:00:00 2001
+From 642110bbc9ebcb9ad497f4f1c1ccbc5a9afda753 Mon Sep 17 00:00:00 2001
 From: Tomeu Vizoso <tomeu.vizoso@collabora.com>
 Date: Tue, 1 Oct 2013 13:19:20 +0200
 Subject: [PATCH 03/18] wayland: Add Wayland example
@@ -862,5 +862,5 @@ index 8225dd5..0be6ce7 100755
 -
 +make -C hello_wayland
 -- 
-2.20.1
+2.21.0
 

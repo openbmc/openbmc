@@ -40,6 +40,7 @@ PACKAGECONFIG ??= "ssl"
 
 PACKAGECONFIG[http2] = "--with-http_v2_module,,"
 PACKAGECONFIG[ssl] = "--with-http_ssl_module,,openssl"
+PACKAGECONFIG[http-auth-request] = "--with-http_auth_request_module,,"
 
 do_configure () {
     if [ "${SITEINFO_BITS}" = "64" ]; then
@@ -134,7 +135,7 @@ do_install () {
         sed -i -e 's,@SYSCONFDIR@,${sysconfdir},g' \
             -e 's,@LOCALSTATEDIR@,${localstatedir},g' \
             -e 's,@SBINDIR@,${sbindir},g' \
-            -e 's,@BINDIR@,${bindir},g' \
+            -e 's,@BASE_BINDIR@,${base_bindir},g' \
             ${D}${systemd_unitdir}/system/nginx.service
     fi
 }

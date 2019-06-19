@@ -57,7 +57,7 @@ fakeroot create_sdk_files() {
 }
 
 
-fakeroot tar_sdk() {
+fakeroot archive_sdk() {
 	cd ${SDK_OUTPUT}/${SDKPATH}
 
 	DEST="./${SDK_ARCH}-${SDK_OS}"
@@ -65,5 +65,5 @@ fakeroot tar_sdk() {
 	rm sysroots -rf
 	patchelf --set-interpreter ${@''.join('a' for n in range(1024))} $DEST/usr/bin/patchelf
 	mv $DEST/usr/bin/patchelf $DEST/usr/bin/patchelf-uninative
-	tar ${SDKTAROPTS} -c -j --file=${SDKDEPLOYDIR}/${TOOLCHAIN_OUTPUTNAME}.tar.bz2 .
+	${SDK_ARCHIVE_CMD}
 }

@@ -2566,9 +2566,7 @@
             <link linkend='oe-core'>OE-Core</link>.
             The change includes <filename>package_regex.inc</filename> and
             <filename>distro_alias.inc</filename>, which are typically enabled
-            when using the
-            <link linkend='ref-classes-distrodata'><filename>distrodata</filename></link>
-            class.
+            when using the <filename>distrodata</filename> class.
             Additionally, the contents of
             <filename>upstream_tracking.inc</filename> has now been split out
             to the relevant recipes.

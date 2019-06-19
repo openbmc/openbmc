@@ -1,0 +1,74 @@
+From 26742544bc9f136093b6be78259f4a891870aa3c Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Wed, 21 Sep 2016 03:17:32 -0400
+Subject: [PATCH 2/2] lm-sensors: fix sensors-detect can't read the cpu
+ information on fsl-t4xxx
+
+This is because two reasons:
+
+1. The sensors-detect program in lm-sensors depends on the file '/proc/cpuinfo',
+   different arch write different infomation to it. That program supports x86
+   and x86-64 well, but weak on ppc and arm.
+
+2. The sensors-detect program show the cpu information just design for intel's
+   cpu, when meets other arch, it can't output the correct information.
+
+So we need to add the ppc and arm support for this program:
+
+1. add the ppc cpu information field 'cpu' in initialize_cpu_list function.
+
+2. add the correspond case of ppc and arm when print cpu information in
+   print_cpu_info function.
+
+Upstream-Status: Pending
+
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+---
+ prog/detect/sensors-detect | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/prog/detect/sensors-detect b/prog/detect/sensors-detect
+index 68594cd7..efe2c1af 100755
+--- a/prog/detect/sensors-detect
++++ b/prog/detect/sensors-detect
+@@ -3088,6 +3088,7 @@ sub kernel_version_at_least
+ # model name and stepping, directly taken from /proc/cpuinfo.
+ use vars qw(@cpu);
+ 
++# The added field 'cpu' is for support the ppc.
+ sub initialize_cpu_list
+ {
+ 	local $_;
+@@ -3103,7 +3104,7 @@ sub initialize_cpu_list
+ 			};
+ 			next;
+ 		}
+-		if (m/^(vendor_id|cpu family|model|model name|stepping|cpuid level)\s*:\s*(.+)$/) {
++		if (m/^(vendor_id|cpu family|model|model name|stepping|cpuid level|cpu|revision)\s*:\s*(.+)$/) {
+ 			my $k = $1;
+ 			my $v = $2;
+ 			$v =~ s/\s+/ /g;	# Merge multiple spaces
+@@ -3116,12 +3117,20 @@ sub initialize_cpu_list
+ 	push @cpu, $entry if scalar keys(%{$entry}); # Last entry
+ }
+ 
++# The field 'model name' is for ARM.
++# The field 'cpu' is for ppc.
+ sub print_cpu_info
+ {
+ 	my $cpu = $cpu[0];
+ 	if ( $cpu->{'model name'} && $cpu->{'cpu family'} && $cpu->{model} && $cpu->{stepping} ) {
+ 		print "# Processor: $cpu->{'model name'} ($cpu->{'cpu family'}/$cpu->{model}/$cpu->{stepping})\n";
+ 	}
++	elsif ( $cpu->{'model name'} ) {
++		print "# Processor: $cpu->{'model name'}\n";
++	}
++	elsif ( $cpu->{'cpu'} && $cpu->{'revision'} ) {
++		print "# Processor: $cpu->{'cpu'} $cpu->{'revision'}\n";
++	}
+ 	else {
+ 		print "# Processor: There isn't enough cpu info for this arch!!!\n";
+ 	}
+-- 
+2.21.0
+

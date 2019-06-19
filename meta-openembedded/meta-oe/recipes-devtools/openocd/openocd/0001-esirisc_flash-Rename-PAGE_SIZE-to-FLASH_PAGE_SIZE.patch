@@ -1,0 +1,59 @@
+From bee22f143ffa0457aefcf31053f76416e6d242e5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 20 May 2019 23:24:26 -0700
+Subject: [PATCH] esirisc_flash: Rename PAGE_SIZE to FLASH_PAGE_SIZE
+
+PAGE_SIZE is defined in system includes on some systems, this would
+avoid the unintended conflict
+
+Fixes
+| src/flash/nor/esirisc_flash.c:95:9: error: 'PAGE_SIZE' macro redefined [-Werror,-Wmacro-redefined]
+| #define PAGE_SIZE                       4096
+|         ^
+| /mnt/a/yoe/build/tmp/work/core2-64-yoe-linux-musl/openocd/0.10+gitrAUTOINC+7ee618692f-r0/recipe-sysroot/usr/inclu
+de/limits.h:89:9: note: previous definition is here
+| #define PAGE_SIZE PAGESIZE
+
+Upstream-Status: Submitted [http://openocd.zylin.com/#/c/5180/2]
+Change-Id: I195b303fc88a7c848ca4e55fd6ba893796df55cc
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/flash/nor/esirisc_flash.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/flash/nor/esirisc_flash.c b/src/flash/nor/esirisc_flash.c
+index 4e33b942..3bed0658 100644
+--- a/src/flash/nor/esirisc_flash.c
++++ b/src/flash/nor/esirisc_flash.c
+@@ -92,7 +92,7 @@
+ #endif
+ 
+ #define CONTROL_TIMEOUT		5000		/* 5s    */
+-#define PAGE_SIZE			4096
++#define FLASH_PAGE_SIZE		4096
+ #define PB_MAX				32
+ 
+ #define NUM_NS_PER_S		1000000000ULL
+@@ -264,7 +264,7 @@ static int esirisc_flash_erase(struct flash_bank *bank, int first, int last)
+ 	(void)esirisc_flash_disable_protect(bank);
+ 
+ 	for (int page = first; page < last; ++page) {
+-		uint32_t address = page * PAGE_SIZE;
++		uint32_t address = page * FLASH_PAGE_SIZE;
+ 
+ 		target_write_u32(target, esirisc_info->cfg + ADDRESS, address);
+ 
+@@ -464,8 +464,8 @@ static int esirisc_flash_probe(struct flash_bank *bank)
+ 	if (target->state != TARGET_HALTED)
+ 		return ERROR_TARGET_NOT_HALTED;
+ 
+-	bank->num_sectors = bank->size / PAGE_SIZE;
+-	bank->sectors = alloc_block_array(0, PAGE_SIZE, bank->num_sectors);
++	bank->num_sectors = bank->size / FLASH_PAGE_SIZE;
++	bank->sectors = alloc_block_array(0, FLASH_PAGE_SIZE, bank->num_sectors);
+ 
+ 	retval = esirisc_flash_init(bank);
+ 	if (retval != ERROR_OK) {
+-- 
+2.21.0
+

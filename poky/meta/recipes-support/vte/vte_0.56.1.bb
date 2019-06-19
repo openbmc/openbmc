@@ -1,7 +1,7 @@
 SUMMARY = "Virtual terminal emulator GTK+ widget library"
 BUGTRACKER = "https://bugzilla.gnome.org/buglist.cgi?product=vte"
-LICENSE = "GPLv3 & LGPLv2.1+"
-LICENSE_libvte = "LGPLv2.1+"
+LICENSE = "GPLv3 & LGPLv3+ & LGPLv2.1+"
+LICENSE_libvte = "LGPLv3+"
 
 LIC_FILES_CHKSUM = " \
     file://COPYING.GPL3;md5=2f31b266d3440dd7ee50f92cf67d8e6c \

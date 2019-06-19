@@ -20,19 +20,14 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  config/config.mk | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/config/config.mk b/config/config.mk
-index 4e3fd1a..d847ffa 100644
 --- a/config/config.mk
 +++ b/config/config.mk
-@@ -523,7 +523,7 @@ EXPAND_MKSHLIB_ARGS = --uselist
+@@ -423,7 +423,7 @@ EXPAND_MKSHLIB_ARGS = --uselist
  ifdef SYMBOL_ORDER
  EXPAND_MKSHLIB_ARGS += --symbol-order $(SYMBOL_ORDER)
  endif
 -EXPAND_MKSHLIB = $(EXPAND_LIBS_EXEC) $(EXPAND_MKSHLIB_ARGS) -- $(MKSHLIB)
 +EXPAND_MKSHLIB = $(EXPAND_LIBS_EXEC) $(EXPAND_MKSHLIB_ARGS) -- $(MKSHLIB) $(OS_LDFLAGS)
  
- # $(call CHECK_SYMBOLS,lib,PREFIX,dep_name,test)
- # Checks that the given `lib` doesn't contain dependency on symbols with a
--- 
-2.7.4
-
+ # autoconf.mk sets OBJ_SUFFIX to an error to avoid use before including
+ # this file

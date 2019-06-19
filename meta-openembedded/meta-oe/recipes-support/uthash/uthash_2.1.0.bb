@@ -9,15 +9,14 @@ HOMEPAGE = "https://troydhanson.github.io/uthash/"
 SECTION = "base"
 LICENSE = "BSD-1-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=a2513f7d2291df840527b76b2a8f9718"
+SRCREV = "8b214aefcb81df86a7e5e0d4fa20e59a6c18bc02"
 
 SRC_URI = "\
-    https://github.com/troydhanson/${BPN}/archive/v${PV}.tar.gz;downloadfilename=${BP}.tar.gz \
+    git://github.com/troydhanson/${BPN}.git \
     file://run-ptest \
 "
-UPSTREAM_CHECK_URI = "https://github.com/troydhanson/${BPN}/releases"
 
-SRC_URI[md5sum] = "4d0a33f6393260926032f1fad4bad39a"
-SRC_URI[sha256sum] = "152ccd8e64d0f495377232e3964d06c7ec8bb8c3fbd3217f8a5702614f9a669e"
+S = "${WORKDIR}/git"
 
 inherit ptest
 

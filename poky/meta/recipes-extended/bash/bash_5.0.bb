@@ -16,8 +16,8 @@ SRC_URI = "${GNU_MIRROR}/bash/${BP}.tar.gz;name=tarball \
            file://mkbuiltins_have_stringize.patch \
            file://build-tests.patch \
            file://test-output.patch \
-           file://fix-run-coproc-run-heredoc-run-execscript-run-test-f.patch \
            file://run-ptest \
+           file://run-bash-ptests \
            file://fix-run-builtins.patch \
            "
 

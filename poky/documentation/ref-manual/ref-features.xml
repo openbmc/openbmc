@@ -76,8 +76,6 @@
                     </para></listitem>
                 <listitem><para><emphasis>ext2:</emphasis> Hardware HDD or Microdrive
                     </para></listitem>
-                <listitem><para><emphasis>irda:</emphasis> Hardware has IrDA support
-                    </para></listitem>
                 <listitem><para><emphasis>keyboard:</emphasis> Hardware has a keyboard
                     </para></listitem>
                 <listitem><para><emphasis>pcbios:</emphasis> Support for booting through BIOS
@@ -189,8 +187,6 @@
                 <listitem><para><emphasis>ipsec:</emphasis> Include IPSec
                     support.</para></listitem>
                 <listitem><para><emphasis>ipv6:</emphasis> Include IPv6 support.
-                    </para></listitem>
-                <listitem><para><emphasis>irda:</emphasis> Include IrDA support.
                     </para></listitem>
                 <listitem><para><emphasis>keyboard:</emphasis> Include keyboard
                     support (e.g. keymaps will be loaded during boot).

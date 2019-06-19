@@ -1005,6 +1005,12 @@ python split_and_strip_files () {
                 symlinks[file] = target
 
         results = oe.utils.multiprocess_launch(oe.package.is_elf, checkelf.keys(), d)
+
+        # Sort results by file path. This ensures that the files are always
+        # processed in the same order, which is important to make sure builds
+        # are reproducible when dealing with hardlinks
+        results.sort(key=lambda x: x[0])
+
         for (file, elf_file) in results:
             # It's a file (or hardlink), not a link
             # ...but is it ELF, and is it already stripped?
@@ -1343,6 +1349,8 @@ EXPORT_FUNCTIONS package_name_hook
 
 PKGDESTWORK = "${WORKDIR}/pkgdata"
 
+PKGDATA_VARS = "PN PE PV PR PKGE PKGV PKGR LICENSE DESCRIPTION SUMMARY RDEPENDS RPROVIDES RRECOMMENDS RSUGGESTS RREPLACES RCONFLICTS SECTION PKG ALLOW_EMPTY FILES CONFFILES FILES_INFO pkg_postinst pkg_postrm pkg_preinst pkg_prerm"
+
 python emit_pkgdata() {
     from glob import glob
     import json
@@ -1447,48 +1455,26 @@ fi
                 total_size += fstat.st_size
         d.setVar('FILES_INFO', json.dumps(files, sort_keys=True))
 
-        subdata_file = pkgdatadir + "/runtime/%s" % pkg
-        sf = open(subdata_file, 'w')
-        write_if_exists(sf, pkg, 'PN')
-        write_if_exists(sf, pkg, 'PE')
-        write_if_exists(sf, pkg, 'PV')
-        write_if_exists(sf, pkg, 'PR')
-        write_if_exists(sf, pkg, 'PKGE')
-        write_if_exists(sf, pkg, 'PKGV')
-        write_if_exists(sf, pkg, 'PKGR')
-        write_if_exists(sf, pkg, 'LICENSE')
-        write_if_exists(sf, pkg, 'DESCRIPTION')
-        write_if_exists(sf, pkg, 'SUMMARY')
-        write_if_exists(sf, pkg, 'RDEPENDS')
-        rprov = write_if_exists(sf, pkg, 'RPROVIDES')
-        write_if_exists(sf, pkg, 'RRECOMMENDS')
-        write_if_exists(sf, pkg, 'RSUGGESTS')
-        write_if_exists(sf, pkg, 'RREPLACES')
-        write_if_exists(sf, pkg, 'RCONFLICTS')
-        write_if_exists(sf, pkg, 'SECTION')
-        write_if_exists(sf, pkg, 'PKG')
-        write_if_exists(sf, pkg, 'ALLOW_EMPTY')
-        write_if_exists(sf, pkg, 'FILES')
-        write_if_exists(sf, pkg, 'CONFFILES')
         process_postinst_on_target(pkg, d.getVar("MLPREFIX"))
         add_set_e_to_scriptlets(pkg)
-        write_if_exists(sf, pkg, 'pkg_postinst')
-        write_if_exists(sf, pkg, 'pkg_postrm')
-        write_if_exists(sf, pkg, 'pkg_preinst')
-        write_if_exists(sf, pkg, 'pkg_prerm')
-        write_if_exists(sf, pkg, 'FILERPROVIDESFLIST')
-        write_if_exists(sf, pkg, 'FILES_INFO')
-        for dfile in (d.getVar('FILERPROVIDESFLIST_' + pkg) or "").split():
-            write_if_exists(sf, pkg, 'FILERPROVIDES_' + dfile)
 
-        write_if_exists(sf, pkg, 'FILERDEPENDSFLIST')
-        for dfile in (d.getVar('FILERDEPENDSFLIST_' + pkg) or "").split():
-            write_if_exists(sf, pkg, 'FILERDEPENDS_' + dfile)
+        subdata_file = pkgdatadir + "/runtime/%s" % pkg
+        with open(subdata_file, 'w') as sf:
+            for var in (d.getVar('PKGDATA_VARS') or "").split():
+                val = write_if_exists(sf, pkg, var)
 
-        sf.write('%s_%s: %d\n' % ('PKGSIZE', pkg, total_size))
-        sf.close()
+            write_if_exists(sf, pkg, 'FILERPROVIDESFLIST')
+            for dfile in (d.getVar('FILERPROVIDESFLIST_' + pkg) or "").split():
+                write_if_exists(sf, pkg, 'FILERPROVIDES_' + dfile)
+
+            write_if_exists(sf, pkg, 'FILERDEPENDSFLIST')
+            for dfile in (d.getVar('FILERDEPENDSFLIST_' + pkg) or "").split():
+                write_if_exists(sf, pkg, 'FILERDEPENDS_' + dfile)
+
+            sf.write('%s_%s: %d\n' % ('PKGSIZE', pkg, total_size))
 
         # Symlinks needed for rprovides lookup
+        rprov = d.getVar('RPROVIDES_%s' % pkg) or d.getVar('RPROVIDES')
         if rprov:
             for p in rprov.strip().split():
                 subdata_sym = pkgdatadir + "/runtime-rprovides/%s/%s" % (p, pkg)

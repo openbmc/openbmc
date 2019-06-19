@@ -14,7 +14,7 @@ diff --git a/gst-libs/gst/codecparsers/gstvc1parser.c b/gst-libs/gst/codecparser
 index fd16ee0..ddb890c 100644
 --- a/gst-libs/gst/codecparsers/gstvc1parser.c
 +++ b/gst-libs/gst/codecparsers/gstvc1parser.c
-@@ -1729,7 +1729,7 @@ gst_vc1_parse_sequence_layer (const guint8 * data, gsize size,
+@@ -1730,7 +1730,7 @@ gst_vc1_parse_sequence_layer (const guint8 * data, gsize size,
      GstVC1SeqLayer * seqlayer)
  {
    guint32 tmp;

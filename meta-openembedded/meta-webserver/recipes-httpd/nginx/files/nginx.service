@@ -8,7 +8,7 @@ PIDFile=/run/nginx/nginx.pid
 ExecStartPre=@SBINDIR@/nginx -t
 ExecStart=@SBINDIR@/nginx
 ExecReload=@SBINDIR@/nginx -s reload
-ExecStop=@BINDIR@/kill -s QUIT $MAINPID
+ExecStop=@BASE_BINDIR@/kill -s QUIT $MAINPID
 PrivateTmp=true
 
 [Install]

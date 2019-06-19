@@ -200,7 +200,7 @@ RDEPENDS_${PN}-tftpd += "xinetd"
 
 FILES_${PN}-telnetd = "${sbindir}/in.telnetd ${sysconfdir}/xinetd.d/telnet"
 FILES_${PN}-telnetd-dbg = "${sbindir}/.debug/in.telnetd"
-RCONFLICTS_${PN}-telnetd += "netkit-telnetd"
+RCONFLICTS_${PN}-telnetd += "netkit-telnet"
 RPROVIDES_${PN}-telnetd = "telnetd"
 RDEPENDS_${PN}-telnetd += "xinetd"
 

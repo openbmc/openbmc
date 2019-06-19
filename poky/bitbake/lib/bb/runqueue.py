@@ -39,7 +39,7 @@ def taskname_from_tid(tid):
     return tid.rsplit(":", 1)[1]
 
 def mc_from_tid(tid):
-    if tid.startswith('multiconfig:'):
+    if tid.startswith('mc:'):
         return tid.split(':')[1]
     return ""
 
@@ -48,12 +48,12 @@ def split_tid(tid):
     return (mc, fn, taskname)
 
 def split_tid_mcfn(tid):
-    if tid.startswith('multiconfig:'):
+    if tid.startswith('mc:'):
         elems = tid.split(':')
         mc = elems[1]
         fn = ":".join(elems[2:-1])
         taskname = elems[-1]
-        mcfn = "multiconfig:" + mc + ":" + fn
+        mcfn = "mc:" + mc + ":" + fn
     else:
         tid = tid.rsplit(":", 1)
         mc = ""
@@ -65,7 +65,7 @@ def split_tid_mcfn(tid):
 
 def build_tid(mc, fn, taskname):
     if mc:
-        return "multiconfig:" + mc + ":" + fn + ":" + taskname
+        return "mc:" + mc + ":" + fn + ":" + taskname
     return fn + ":" + taskname
 
 class RunQueueStats:

@@ -29,4 +29,7 @@ do_install_ptest() {
 	chown -R root:root ${D}${PTEST_PATH}/testfiles
 }
 
+RDEPENDS_${PN} += "perl-module-encode perl-module-perlio"
+RDEPENDS_${PN}-ptest += "perl-module-test perl-module-base perl-module-fatal perl-module-encode-unicode perl-module-encode-byte"
+
 BBCLASSEXTEND = "native nativesdk"

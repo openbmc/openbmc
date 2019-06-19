@@ -34,7 +34,7 @@ index 1ecc950..d6417ac 100644
 +		--add-include-path=$(PKG_CONFIG_SYSROOT_DIR)`PKG_CONFIG_PATH="$(GST_PKG_CONFIG_PATH)" $(PKG_CONFIG) --variable=girdir gstreamer-@GST_API_VERSION@` \
  		--library=libgstallocators-@GST_API_VERSION@.la \
  		--include=Gst-@GST_API_VERSION@ \
- 		--libtool="$(LIBTOOL)" \
+ 		--libtool="${LIBTOOL}" \
 @@ -63,7 +63,7 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
  		$(INTROSPECTION_COMPILER) \
  		--includedir=$(srcdir) \
@@ -63,7 +63,7 @@ diff --git a/gst-libs/gst/audio/Makefile.am b/gst-libs/gst/audio/Makefile.am
 index 7fb65f2..5379f79 100644
 --- a/gst-libs/gst/audio/Makefile.am
 +++ b/gst-libs/gst/audio/Makefile.am
-@@ -174,12 +174,12 @@ GstAudio-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstaudio-@GST_API_VE
+@@ -176,12 +176,12 @@ GstAudio-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstaudio-@GST_API_VE
  		-I$(top_srcdir)/gst-libs \
  		-I$(top_builddir)/gst-libs \
  		--c-include "gst/audio/audio.h" \
@@ -80,7 +80,7 @@ index 7fb65f2..5379f79 100644
  		--library-path="$(top_builddir)/gst-libs/gst/tag/" \
  		--include=Gst-@GST_API_VERSION@ \
  		--include=GstBase-@GST_API_VERSION@ \
-@@ -208,8 +208,8 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
+@@ -210,8 +210,8 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
  		--includedir=$(srcdir) \
  		--includedir=$(builddir) \
  		--includedir="$(top_builddir)/gst-libs/gst/tag/" \
@@ -95,7 +95,7 @@ diff --git a/gst-libs/gst/gl/Makefile.am b/gst-libs/gst/gl/Makefile.am
 index 3276d7f..0cdfe26 100644
 --- a/gst-libs/gst/gl/Makefile.am
 +++ b/gst-libs/gst/gl/Makefile.am
-@@ -186,9 +186,9 @@ GstGL-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstgl-@GST_API_VERSION@
+@@ -209,9 +209,9 @@ GstGL-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstgl-@GST_API_VERSION@
  		$(GST_PLUGINS_BASE_CFLAGS) \
  		$(GL_CFLAGS) \
  		--add-include-path="$(top_builddir)/gst-libs/gst/video/" \
@@ -107,7 +107,7 @@ index 3276d7f..0cdfe26 100644
  		--library=libgstgl-@GST_API_VERSION@.la \
  		--include=Gst-@GST_API_VERSION@ \
  		--include=GstBase-@GST_API_VERSION@ \
-@@ -218,8 +218,8 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
+@@ -241,8 +241,8 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
  		--includedir=$(srcdir) \
  		--includedir=$(builddir) \
  		--includedir="$(top_builddir)/gst-libs/gst/video/" \
@@ -117,7 +117,7 @@ index 3276d7f..0cdfe26 100644
 +		--includedir=$(PKG_CONFIG_SYSROOT_DIR)`PKG_CONFIG_PATH="$(GST_PKG_CONFIG_PATH)" $(PKG_CONFIG) --variable=girdir gstreamer-base-@GST_API_VERSION@` \
  		$(INTROSPECTION_COMPILER_OPTS) $< -o $(@F)
  
- CLEANFILES = $(BUILT_GIRSOURCES) $(typelibs_DATA)
+ CLEANFILES += $(BUILT_GIRSOURCES) $(typelibs_DATA)
 diff --git a/gst-libs/gst/pbutils/Makefile.am b/gst-libs/gst/pbutils/Makefile.am
 index 35a6e44..49d6894 100644
 --- a/gst-libs/gst/pbutils/Makefile.am
@@ -182,7 +182,7 @@ diff --git a/gst-libs/gst/rtp/Makefile.am b/gst-libs/gst/rtp/Makefile.am
 index 77ebeeb..9aee788 100644
 --- a/gst-libs/gst/rtp/Makefile.am
 +++ b/gst-libs/gst/rtp/Makefile.am
-@@ -64,8 +64,8 @@ GstRtp-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstrtp-@GST_API_VERSIO
+@@ -66,8 +66,8 @@ GstRtp-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstrtp-@GST_API_VERSIO
  		--c-include "gst/rtp/rtp.h" \
  		-I$(top_builddir)/gst-libs \
  		-I$(top_srcdir)/gst-libs \
@@ -193,7 +193,7 @@ index 77ebeeb..9aee788 100644
  		--library=libgstrtp-@GST_API_VERSION@.la \
  		--include=Gst-@GST_API_VERSION@ \
  		--include=GstBase-@GST_API_VERSION@ \
-@@ -92,8 +92,8 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
+@@ -94,8 +94,8 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
  		$(INTROSPECTION_COMPILER) \
  		--includedir=$(srcdir) \
  		--includedir=$(builddir) \
@@ -208,24 +208,17 @@ diff --git a/gst-libs/gst/rtsp/Makefile.am b/gst-libs/gst/rtsp/Makefile.am
 index db9d0fd..79027cb 100644
 --- a/gst-libs/gst/rtsp/Makefile.am
 +++ b/gst-libs/gst/rtsp/Makefile.am
-@@ -71,7 +71,7 @@ GstRtsp-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstrtsp-@GST_API_VERS
+@@ -71,8 +71,8 @@ GstRtsp-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstrtsp-@GST_API_VERS
  		-I$(top_builddir)/gst-libs \
  		-I$(top_srcdir)/gst-libs \
  		--add-include-path=$(builddir)/../sdp \
 -		--add-include-path=`PKG_CONFIG_PATH="$(GST_PKG_CONFIG_PATH)" $(PKG_CONFIG) --variable=girdir gstreamer-@GST_API_VERSION@` \
+-		--add-include-path=`PKG_CONFIG_PATH="$(GST_PKG_CONFIG_PATH)" $(PKG_CONFIG) --variable=girdir gstreamer-base-@GST_API_VERSION@` \
 +		--add-include-path=$(PKG_CONFIG_SYSROOT_DIR)`PKG_CONFIG_PATH="$(GST_PKG_CONFIG_PATH)" $(PKG_CONFIG) --variable=girdir gstreamer-@GST_API_VERSION@` \
++		--add-include-path=$(PKG_CONFIG_SYSROOT_DIR)`PKG_CONFIG_PATH="$(GST_PKG_CONFIG_PATH)" $(PKG_CONFIG) --variable=girdir gstreamer-base-@GST_API_VERSION@` \
  		--library=libgstrtsp-@GST_API_VERSION@.la \
  		--include=Gio-2.0 \
  		--include=Gst-@GST_API_VERSION@ \
-@@ -101,7 +101,7 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
- 		--includedir=$(srcdir) \
- 		--includedir=$(builddir) \
- 		--includedir=$(builddir)/../sdp \
--		--includedir=`PKG_CONFIG_PATH="$(GST_PKG_CONFIG_PATH)" $(PKG_CONFIG) --variable=girdir gstreamer-@GST_API_VERSION@` \
-+		--includedir=$(PKG_CONFIG_SYSROOT_DIR)`PKG_CONFIG_PATH="$(GST_PKG_CONFIG_PATH)" $(PKG_CONFIG) --variable=girdir gstreamer-@GST_API_VERSION@` \
- 		$(INTROSPECTION_COMPILER_OPTS) $< -o $(@F)
- 
- CLEANFILES += $(BUILT_GIRSOURCES) $(typelibs_DATA)
 diff --git a/gst-libs/gst/sdp/Makefile.am b/gst-libs/gst/sdp/Makefile.am
 index 6e05cc7..c7cf514 100644
 --- a/gst-libs/gst/sdp/Makefile.am
@@ -238,7 +231,7 @@ index 6e05cc7..c7cf514 100644
 +		--add-include-path=$(PKG_CONFIG_SYSROOT_DIR)`PKG_CONFIG_PATH="$(GST_PKG_CONFIG_PATH)" $(PKG_CONFIG) --variable=girdir gstreamer-@GST_API_VERSION@` \
  		--library=libgstsdp-@GST_API_VERSION@.la \
  		--include=Gst-@GST_API_VERSION@ \
- 		--libtool="$(LIBTOOL)" \
+ 		--libtool="${LIBTOOL}" \
 @@ -55,7 +55,7 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
  		$(INTROSPECTION_COMPILER) \
  		--includedir=$(srcdir) \
@@ -278,7 +271,7 @@ diff --git a/gst-libs/gst/video/Makefile.am b/gst-libs/gst/video/Makefile.am
 index 0f8455f..8c9955c 100644
 --- a/gst-libs/gst/video/Makefile.am
 +++ b/gst-libs/gst/video/Makefile.am
-@@ -119,8 +119,8 @@ GstVideo-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstvideo-@GST_API_VE
+@@ -124,8 +124,8 @@ GstVideo-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstvideo-@GST_API_VE
  		--c-include "gst/video/video.h" \
  		-I$(top_srcdir)/gst-libs \
  		-I$(top_builddir)/gst-libs \
@@ -289,7 +282,7 @@ index 0f8455f..8c9955c 100644
  		--library=libgstvideo-@GST_API_VERSION@.la \
  		--include=Gst-@GST_API_VERSION@ \
  		--include=GstBase-@GST_API_VERSION@ \
-@@ -147,8 +147,8 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
+@@ -152,8 +152,8 @@ typelibs_DATA = $(BUILT_GIRSOURCES:.gir=.typelib)
  		$(INTROSPECTION_COMPILER) \
  		--includedir=$(srcdir) \
  		--includedir=$(builddir) \

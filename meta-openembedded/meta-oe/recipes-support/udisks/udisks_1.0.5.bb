@@ -17,12 +17,14 @@ SRC_URI = "http://hal.freedesktop.org/releases/${BPN}-${PV}.tar.gz;name=${BPN} \
            file://udisks-1.0.5-fix-service-file.patch \
            file://0001-Make-udev-rules-directory-configurable.patch \
            file://0001-include-sys-sysmacros.h.patch \
+           file://0001-tools-Install-bash_completion-script-in-etc-bash_com.patch \
+           file://0001-udisks-helper-Use-sh-interpreter-instead-of-bash.patch \
            "
 
 SRC_URI[udisks.md5sum] = "70d48dcfe523a74cd7c7fbbc2847fcdd"
 SRC_URI[udisks.sha256sum] = "f2ec82eb0ea7e01dc299b5b29b3c18cdf861236ec43dcff66b3552b4b31c6f71"
 
-inherit autotools-brokensep systemd gtk-doc distro_features_check
+inherit autotools-brokensep systemd gtk-doc distro_features_check bash-completion
 
 REQUIRED_DISTRO_FEATURES = "polkit"
 

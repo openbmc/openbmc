@@ -7,7 +7,7 @@ Date: Mon, 24 Jul 2017 21:30:16 +0200
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/libpurple/protocols/irc/irc.h b/libpurple/protocols/irc/irc.h
-index fde35c4..66e52dd 100644
+index 596ddaf..b70f3a9 100644
 --- a/libpurple/protocols/irc/irc.h
 +++ b/libpurple/protocols/irc/irc.h
 @@ -40,9 +40,9 @@
@@ -20,5 +20,5 @@ index fde35c4..66e52dd 100644
 -#define IRC_DEFAULT_QUIT "Leaving."
 +#define IRC_DEFAULT_QUIT "Powered by OE: www.openembedded.org"
  
- #define IRC_INITIAL_BUFSIZE 1024
- 
+ #define IRC_BUFSIZE_INCREMENT 1024
+ #define IRC_MAX_BUFSIZE 16384

@@ -3,6 +3,7 @@
 #
 
 import os
+import unittest
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.selftest.cases.buildhistory import BuildhistoryBase
 from oeqa.utils.commands import Command, runCmd, bitbake, get_bb_var, get_test_layer
@@ -38,7 +39,7 @@ class OEScriptTests(OESelftestTestCase):
         try:
             import cairo
         except ImportError:
-            cls.skipTest('Python module cairo is not present')
+            raise unittest.SkipTest('Python module cairo is not present')
         bitbake("core-image-minimal -c rootfs -f")
         cls.tmpdir = get_bb_var('TMPDIR')
         cls.buildstats = cls.tmpdir + "/buildstats/" + sorted(os.listdir(cls.tmpdir + "/buildstats"))[-1]

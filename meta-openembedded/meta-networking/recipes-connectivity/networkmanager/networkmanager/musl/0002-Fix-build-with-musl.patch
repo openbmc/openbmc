@@ -1,4 +1,4 @@
-From 0b0f2d5abe27b2c9587f449795f0ae3568fc3e38 Mon Sep 17 00:00:00 2001
+From 3d1307735667758f44378585482fe421db086af8 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 Date: Mon, 8 Apr 2019 23:10:43 +0200
 Subject: [PATCH 2/2] Fix build with musl
@@ -23,7 +23,7 @@ The build issues caused by definition conflicts musl vs linux-libc headers
 Note:
 Be aware that this is still nasty business: We have to trust that musl headers
 define same signatures as linux would do - just because musl-makers consider
-linux-libc headers 'notoriously broken for userspace' [2] (search for 
+linux-libc headers 'notoriously broken for userspace' [2] (search for
 'error: redefinition of').
 
 [1] http://lists.openembedded.org/pipermail/openembedded-core/2019-March/280440.html
@@ -53,7 +53,7 @@ index 43fbbc1..3eae286 100644
  #include "nmtui.h"
  
 diff --git a/libnm-core/nm-utils.h b/libnm-core/nm-utils.h
-index 2b5baba..8a50131 100644
+index 2b5baba..f7abab6 100644
 --- a/libnm-core/nm-utils.h
 +++ b/libnm-core/nm-utils.h
 @@ -25,6 +25,10 @@
@@ -68,7 +68,7 @@ index 2b5baba..8a50131 100644
  
  #include <netinet/in.h>
 diff --git a/shared/nm-default.h b/shared/nm-default.h
-index 26d6476..b29e8af 100644
+index 54e9916..26e9f4e 100644
 --- a/shared/nm-default.h
 +++ b/shared/nm-default.h
 @@ -211,6 +211,9 @@
@@ -82,7 +82,7 @@ index 26d6476..b29e8af 100644
  /*****************************************************************************/
  
 diff --git a/src/devices/nm-device.c b/src/devices/nm-device.c
-index 7514fa7..d305fa5 100644
+index bd4fbcc..f70b309 100644
 --- a/src/devices/nm-device.c
 +++ b/src/devices/nm-device.c
 @@ -24,6 +24,7 @@
@@ -102,17 +102,17 @@ index 7514fa7..d305fa5 100644
  #include <linux/pkt_sched.h>
  
 diff --git a/src/platform/nm-linux-platform.c b/src/platform/nm-linux-platform.c
-index 2f5c75b..d6ca6d9 100644
+index d4b0115..22a3a90 100644
 --- a/src/platform/nm-linux-platform.c
 +++ b/src/platform/nm-linux-platform.c
-@@ -27,7 +27,6 @@
- #include <fcntl.h>
+@@ -28,7 +28,6 @@
  #include <libudev.h>
+ #include <linux/fib_rules.h>
  #include <linux/ip.h>
 -#include <linux/if_arp.h>
+ #include <linux/if_bridge.h>
  #include <linux/if_link.h>
  #include <linux/if_tun.h>
- #include <linux/if_tunnel.h>
 -- 
-2.20.1
+2.17.1
 

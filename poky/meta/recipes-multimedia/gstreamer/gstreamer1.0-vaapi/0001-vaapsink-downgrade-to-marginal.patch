@@ -24,7 +24,7 @@ diff --git a/gst/vaapi/gstvaapi.c b/gst/vaapi/gstvaapi.c
 index 9a82454..4d94f2b 100644
 --- a/gst/vaapi/gstvaapi.c
 +++ b/gst/vaapi/gstvaapi.c
-@@ -210,7 +210,6 @@ plugin_init (GstPlugin * plugin)
+@@ -195,7 +195,6 @@ plugin_init (GstPlugin * plugin)
  {
    GstVaapiDisplay *display;
    GArray *decoders;
@@ -32,7 +32,7 @@ index 9a82454..4d94f2b 100644
  
    plugin_add_dependencies (plugin);
  
-@@ -235,10 +234,7 @@ plugin_init (GstPlugin * plugin)
+@@ -220,10 +219,7 @@ plugin_init (GstPlugin * plugin)
    gst_element_register (plugin, "vaapidecodebin",
        GST_RANK_PRIMARY + 2, GST_TYPE_VAAPI_DECODE_BIN);
  

@@ -13,10 +13,10 @@ architectures."
 LICENSE = "BSD & LGPLv2.1+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 
-PV = "0.14.1+git${SRCPV}"
+PV = "0.14.2+git${SRCPV}"
 
-SRCREV_spice = "eaa07ef15cfc3bf57a69da2576af66f028787774"
-SRCREV_spice-common = "6b93b3fce8909b836ef1d1434d191900d8aa00be"
+SRCREV_spice = "7cbd70b931db76c69c89c2d9d5d704f67381a81b"
+SRCREV_spice-common = "4fc4c2db36c7f07b906e9a326a9d3dc0ae6a2671"
 
 SRCREV_FORMAT = "spice_spice-common"
 
@@ -24,7 +24,7 @@ SRC_URI = " \
     git://anongit.freedesktop.org/spice/spice;name=spice \
     git://anongit.freedesktop.org/spice/spice-common;destsuffix=git/subprojects/spice-common;name=spice-common \
     file://0001-Convert-pthread_t-to-be-numeric.patch \
-    file://0001-spice-fix-compile-fail-problem.patch \
+    file://0001-Fix-compile-errors-on-Linux-32bit-system.patch \
 "
 
 S = "${WORKDIR}/git"
@@ -36,6 +36,8 @@ DEPENDS_append_class-nativesdk = "nativesdk-openssl"
 
 export PYTHON="${STAGING_BINDIR_NATIVE}/python-native/python"
 export PYTHONPATH="${PKG_CONFIG_SYSROOT_DIR}${libdir}/python2.7/site-packages"
+
+CFLAGS_append = " -Wno-error=address-of-packed-member"
 
 PACKAGECONFIG_class-native = ""
 PACKAGECONFIG_class-nativesdk = ""
@@ -54,4 +56,4 @@ COMPATIBLE_HOST = '(x86_64|i.86).*-linux'
 
 BBCLASSEXTEND = "native nativesdk"
 
-EXTRA_OECONF_toolchain-clang += "--disable-werror"
+EXTRA_OECONF_append_toolchain-clang = " --disable-werror"

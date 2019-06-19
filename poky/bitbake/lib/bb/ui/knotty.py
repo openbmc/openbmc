@@ -300,8 +300,8 @@ class TerminalFilter(object):
                         if start_time:
                             pbar.start_time = start_time
                     pbar.setmessage('%s:%s' % (tasknum, pbar.msg.split(':', 1)[1]))
+                    pbar.setextra(rate)
                     if progress > -1:
-                        pbar.setextra(rate)
                         content = pbar.update(progress)
                     else:
                         content = pbar.update(1)

@@ -18,7 +18,7 @@ diff --git a/ext/gl/gstopengl.c b/ext/gl/gstopengl.c
 index a4b2540..0ccaacd 100644
 --- a/ext/gl/gstopengl.c
 +++ b/ext/gl/gstopengl.c
-@@ -118,7 +118,7 @@ plugin_init (GstPlugin * plugin)
+@@ -127,7 +127,7 @@ plugin_init (GstPlugin * plugin)
  #endif
  
    if (!gst_element_register (plugin, "glimagesink",

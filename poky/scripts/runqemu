@@ -185,10 +185,11 @@ class BaseConfig(object):
         self.lock_descriptor = None
         self.bitbake_e = ''
         self.snapshot = False
+        self.wictypes = ('wic', 'wic.vmdk', 'wic.qcow2', 'wic.vdi')
         self.fstypes = ('ext2', 'ext3', 'ext4', 'jffs2', 'nfs', 'btrfs',
                         'cpio.gz', 'cpio', 'ramfs', 'tar.bz2', 'tar.gz')
-        self.vmtypes = ('hddimg', 'hdddirect', 'wic', 'wic.vmdk',
-                        'wic.qcow2', 'wic.vdi', 'iso')
+        self.vmtypes = ('hddimg', 'hdddirect', 'iso')
+        self.fsinfo = {}
         self.network_device = "-device e1000,netdev=net0,mac=@MAC@"
         # Use different mac section for tap and slirp to avoid
         # conflicts, e.g., when one is running with tap, the other is
@@ -253,7 +254,7 @@ class BaseConfig(object):
 
     def check_arg_fstype(self, fst):
         """Check and set FSTYPE"""
-        if fst not in self.fstypes + self.vmtypes:
+        if fst not in self.fstypes + self.vmtypes + self.wictypes:
             logger.warning("Maybe unsupported FSTYPE: %s" % fst)
         if not self.fstype or self.fstype == fst:
             if fst == 'ramfs':
@@ -390,7 +391,7 @@ class BaseConfig(object):
 
         unknown_arg = ""
         for arg in sys.argv[1:]:
-            if arg in self.fstypes + self.vmtypes:
+            if arg in self.fstypes + self.vmtypes + self.wictypes:
                 self.check_arg_fstype(arg)
             elif arg == 'nographic':
                 self.qemu_opt_script += ' -nographic'
@@ -438,7 +439,7 @@ class BaseConfig(object):
             elif arg == 'publicvnc':
                 self.qemu_opt_script += ' -vnc :0'
             elif arg.startswith('tcpserial='):
-                self.tcpserial_portnum = arg[len('tcpserial='):]
+                self.tcpserial_portnum = '%s' % arg[len('tcpserial='):]
             elif arg.startswith('biosdir='):
                 self.custombiosdir = arg[len('biosdir='):]
             elif arg.startswith('biosfilename='):
@@ -491,12 +492,13 @@ class BaseConfig(object):
         yocto_paravirt_kvm_wiki = "https://wiki.yoctoproject.org/wiki/Running_an_x86_Yocto_Linux_image_under_QEMU_KVM"
         dev_kvm = '/dev/kvm'
         dev_vhost = '/dev/vhost-net'
-        with open('/proc/cpuinfo', 'r') as f:
-            kvm_cap = re.search('vmx|svm', "".join(f.readlines()))
-        if not kvm_cap:
-            logger.error("You are trying to enable KVM on a cpu without VT support.")
-            logger.error("Remove kvm from the command-line, or refer:")
-            raise RunQemuError(yocto_kvm_wiki)
+        if self.qemu_system.endswith(('i386', 'x86_64')):
+            with open('/proc/cpuinfo', 'r') as f:
+                kvm_cap = re.search('vmx|svm', "".join(f.readlines()))
+            if not kvm_cap:
+                logger.error("You are trying to enable KVM on a cpu without VT support.")
+                logger.error("Remove kvm from the command-line, or refer:")
+                raise RunQemuError(yocto_kvm_wiki)
 
         if not os.path.exists(dev_kvm):
             logger.error("Missing KVM device. Have you inserted kvm modules?")
@@ -534,6 +536,40 @@ class BaseConfig(object):
                 self.fstype = fstype
             else:
                 raise RunQemuError("FSTYPE is NULL!")
+
+        # parse QB_FSINFO into dict, e.g. { 'wic': ['no-kernel-in-fs', 'a-flag'], 'ext4': ['another-flag']}
+        wic_fs = False
+        qb_fsinfo = self.get('QB_FSINFO')
+        if qb_fsinfo:
+            qb_fsinfo = qb_fsinfo.split()
+            for fsinfo in qb_fsinfo:
+                try:
+                    fstype, fsflag = fsinfo.split(':')
+
+                    if fstype == 'wic':
+                        if fsflag == 'no-kernel-in-fs':
+                            wic_fs = True
+                        elif fsflag == 'kernel-in-fs':
+                            wic_fs = False
+                        else:
+                            logger.warn('Unknown flag "%s:%s" in QB_FSINFO', fstype, fsflag)
+                            continue
+                    else:
+                        logger.warn('QB_FSINFO is not supported for image type "%s"', fstype)
+                        continue
+
+                    if fstype in self.fsinfo:
+                        self.fsinfo[fstype].append(fsflag)
+                    else:
+                        self.fsinfo[fstype] = [fsflag]
+                except Exception:
+                    logger.error('Invalid parameter "%s" in QB_FSINFO', fsinfo)
+
+        # treat wic images as vmimages (with kernel) or as fsimages (rootfs only)
+        if wic_fs:
+            self.fstypes = self.fstypes + self.wictypes
+        else:
+            self.vmtypes = self.vmtypes + self.wictypes
 
     def check_rootfs(self):
         """Check and set rootfs"""
@@ -681,10 +717,16 @@ class BaseConfig(object):
 
     def check_tcpserial(self):
         if self.tcpserial_portnum:
+            ports = self.tcpserial_portnum.split(':')
+            port = ports[0]
             if self.get('QB_TCPSERIAL_OPT'):
-                self.qemu_opt_script += ' ' + self.get('QB_TCPSERIAL_OPT').replace('@PORT@', self.tcpserial_portnum)
+                self.qemu_opt_script += ' ' + self.get('QB_TCPSERIAL_OPT').replace('@PORT@', port)
             else:
-                self.qemu_opt_script += ' -serial tcp:127.0.0.1:%s' % self.tcpserial_portnum
+                self.qemu_opt_script += ' -serial tcp:127.0.0.1:%s' % port
+
+            if len(ports) > 1:
+                for port in ports[1:]:
+                    self.qemu_opt_script += ' -serial tcp:127.0.0.1:%s' % port
 
     def check_and_set(self):
         """Check configs sanity and set when needed"""
@@ -703,6 +745,7 @@ class BaseConfig(object):
         else:
             os.putenv('QEMU_AUDIO_DRV', 'none')
 
+        self.check_qemu_system()
         self.check_kvm()
         self.check_fstype()
         self.check_rootfs()
@@ -824,7 +867,11 @@ class BaseConfig(object):
             if self.dtb:
                 print('DTB: [%s]' % self.dtb)
         print('MACHINE: [%s]' % self.get('MACHINE'))
-        print('FSTYPE: [%s]' % self.fstype)
+        try:
+            fstype_flags = ' (' + ', '.join(self.fsinfo[self.fstype]) + ')'
+        except KeyError:
+            fstype_flags = ''
+        print('FSTYPE: [%s%s]' % (self.fstype, fstype_flags))
         if self.fstype  == 'nfs':
             print('NFS_DIR: [%s]' % self.rootfs)
         else:
@@ -1128,21 +1175,23 @@ class BaseConfig(object):
 
         return 'qemu-system-%s' % qbsys
 
-    def setup_final(self):
+    def check_qemu_system(self):
         qemu_system = self.get('QB_SYSTEM_NAME')
         if not qemu_system:
             qemu_system = self.guess_qb_system()
         if not qemu_system:
             raise RunQemuError("Failed to boot, QB_SYSTEM_NAME is NULL!")
+        self.qemu_system = qemu_system
 
-        qemu_bin = os.path.join(self.bindir_native, qemu_system)
+    def setup_final(self):
+        qemu_bin = os.path.join(self.bindir_native, self.qemu_system)
 
         # It is possible to have qemu-native in ASSUME_PROVIDED, and it won't
         # find QEMU in sysroot, it needs to use host's qemu.
         if not os.path.exists(qemu_bin):
             logger.info("QEMU binary not found in %s, trying host's QEMU" % qemu_bin)
             for path in (os.environ['PATH'] or '').split(':'):
-                qemu_bin_tmp = os.path.join(path, qemu_system)
+                qemu_bin_tmp = os.path.join(path, self.qemu_system)
                 logger.info("Trying: %s" % qemu_bin_tmp)
                 if os.path.exists(qemu_bin_tmp):
                     qemu_bin = qemu_bin_tmp

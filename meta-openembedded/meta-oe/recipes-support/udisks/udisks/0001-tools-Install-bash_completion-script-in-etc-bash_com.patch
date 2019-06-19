@@ -1,0 +1,33 @@
+From 7863a72c723035529d6fd8d626d7fbf9a765f162 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 23 May 2019 21:49:57 -0700
+Subject: [PATCH] tools: Install bash_completion script in
+ /etc/bash_completion.d
+
+In OE this is one of common locations to install bash_completion files
+and its covered for packaging automatically when bash_completion class
+is inherited
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tools/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/Makefile.am b/tools/Makefile.am
+index 0aaec11..839c961 100644
+--- a/tools/Makefile.am
++++ b/tools/Makefile.am
+@@ -72,7 +72,7 @@ udisks_tcp_bridge_LDADD = $(DBUS_GLIB_LIBS)
+ 
+ CLEANFILES = $(BUILT_SOURCES)
+ 
+-profiledir = $(sysconfdir)/profile.d
++profiledir = $(sysconfdir)/bash_completion.d
+ profile_SCRIPTS = udisks-bash-completion.sh
+ 
+ EXTRA_DIST = $(profile_SCRIPTS)
+-- 
+2.21.0
+

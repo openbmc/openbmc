@@ -1,0 +1,51 @@
+From 45ea681ebc0dd44aaec5d3cc4143b9722070d3ac Mon Sep 17 00:00:00 2001
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Date: Tue, 8 Mar 2016 16:43:55 -0500
+Subject: [PATCH] ima: fix ima_inode_post_setattr
+
+Changing file metadata (eg. uid, guid) could result in having to
+re-appraise a file's integrity, but does not change the "new file"
+status nor the security.ima xattr.  The IMA_PERMIT_DIRECTIO and
+IMA_DIGSIG_REQUIRED flags are policy rule specific.  This patch
+only resets these flags, not the IMA_NEW_FILE or IMA_DIGSIG flags.
+
+With this patch, changing the file timestamp will not remove the
+file signature on new files.
+
+Upstream-Status: Accepted [https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/security/integrity/ima/ima_appraise.c?id=42a4c603198f0d45b7aa936d3ac6ba1b8bd14a1b]
+
+Reported-by: Dmitry Rozhkov <dmitry.rozhkov@linux.intel.com>
+Signed-off-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
+---
+ security/integrity/ima/ima_appraise.c | 2 +-
+ security/integrity/integrity.h        | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/security/integrity/ima/ima_appraise.c b/security/integrity/ima/ima_appraise.c
+index 4df493e..a384ba1 100644
+--- a/security/integrity/ima/ima_appraise.c
++++ b/security/integrity/ima/ima_appraise.c
+@@ -327,7 +327,7 @@ void ima_inode_post_setattr(struct dentry *dentry)
+ 	if (iint) {
+ 		iint->flags &= ~(IMA_APPRAISE | IMA_APPRAISED |
+ 				 IMA_APPRAISE_SUBMASK | IMA_APPRAISED_SUBMASK |
+-				 IMA_ACTION_FLAGS);
++				 IMA_ACTION_RULE_FLAGS);
+ 		if (must_appraise)
+ 			iint->flags |= IMA_APPRAISE;
+ 	}
+diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
+index 0fc9519..f9decae 100644
+--- a/security/integrity/integrity.h
++++ b/security/integrity/integrity.h
+@@ -28,6 +28,7 @@
+ 
+ /* iint cache flags */
+ #define IMA_ACTION_FLAGS	0xff000000
++#define IMA_ACTION_RULE_FLAGS	0x06000000
+ #define IMA_DIGSIG		0x01000000
+ #define IMA_DIGSIG_REQUIRED	0x02000000
+ #define IMA_PERMIT_DIRECTIO	0x04000000
+-- 
+2.5.0
+

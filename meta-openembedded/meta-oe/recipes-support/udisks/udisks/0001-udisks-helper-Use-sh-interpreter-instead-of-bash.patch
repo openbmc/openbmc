@@ -1,0 +1,38 @@
+From 44953e5501e92c87611be45221338004e8032a74 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 23 May 2019 22:00:14 -0700
+Subject: [PATCH] udisks-helper: Use sh interpreter instead of bash
+
+These scripts do not require bash, since they do not use any bash
+specific extentions
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/helpers/udisks-helper-change-luks-password | 2 +-
+ src/helpers/udisks-helper-mdadm-expand         | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/helpers/udisks-helper-change-luks-password b/src/helpers/udisks-helper-change-luks-password
+index edcf6c9..c71fc72 100755
+--- a/src/helpers/udisks-helper-change-luks-password
++++ b/src/helpers/udisks-helper-change-luks-password
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env sh
+ set -e
+ 
+ DEVICE=$1
+diff --git a/src/helpers/udisks-helper-mdadm-expand b/src/helpers/udisks-helper-mdadm-expand
+index 8b4e23d..921f96a 100755
+--- a/src/helpers/udisks-helper-mdadm-expand
++++ b/src/helpers/udisks-helper-mdadm-expand
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env sh
+ 
+ set -e
+ 
+-- 
+2.21.0
+

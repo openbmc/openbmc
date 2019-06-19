@@ -2,7 +2,7 @@ BBCLASSEXTEND = "nativesdk"
 
 require qemu.inc
 
-DEPENDS = "glib-2.0 zlib pixman"
+DEPENDS = "glib-2.0 zlib pixman bison-native"
 
 RDEPENDS_${PN}_class-target += "bash"
 

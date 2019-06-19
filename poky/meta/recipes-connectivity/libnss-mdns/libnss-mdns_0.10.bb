@@ -9,7 +9,6 @@ DEPENDS = "avahi"
 PR = "r7"
 
 SRC_URI = "http://0pointer.de/lennart/projects/nss-mdns/nss-mdns-${PV}.tar.gz \
-           file://0001-check-for-nss.h.patch \
            "
 
 SRC_URI[md5sum] = "03938f17646efbb50aa70ba5f99f51d7"
@@ -20,6 +19,8 @@ S = "${WORKDIR}/nss-mdns-${PV}"
 localstatedir = "/"
 
 inherit autotools
+
+COMPATIBLE_HOST_libc-musl = 'null'
 
 EXTRA_OECONF = "--libdir=${base_libdir} --disable-lynx --enable-avahi"
 

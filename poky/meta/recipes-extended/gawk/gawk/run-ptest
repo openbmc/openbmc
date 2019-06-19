@@ -1,10 +1,22 @@
 #!/bin/sh
 
 cd test
-for i in `grep -vE "@|^$|#|Gt-dummy" Maketests |awk -F: '{print $1}'`; \
-  do LC_ALL=${GAWKLOCALE:-C} LANG=${GAWKLOCALE:-C} srcdir=`pwd` AWK=gawk CMP=cmp \
-  make -f Maketests $i >$i.tmp 2>&1; \
-  grep -q "Error" $i.tmp; \
-  if [ $? -eq 0 ]; then echo "FAIL: $i"; \
-  else echo "PASS: $i"; rm -f $i.tmp; fi; \
+for i in `grep -E "^[a-z0-9_-]*:$" Maketests |awk -F: '{print $1}'`; do
+  #LC_ALL=${GAWKLOCALE:-C} LANG=${GAWKLOCALE:-C} 
+  srcdir=`pwd` AWKPROG=gawk AWK=gawk CMP=cmp make -f Maketests $i >$i.tmp 2>&1
+  if [ -e _$i ]; then
+    cat _$i
+    grep -q "support not compiled in" _$i
+    if [ $? -eq 0 ]; then
+      echo "SKIP: $i"
+      continue
+    fi
+  fi
+  grep -q "Error" $i.tmp
+  if [ $? -eq 0 ]; then
+    echo "FAIL: $i"
+  else
+    echo "PASS: $i"
+    rm -f $i.tmp
+  fi
 done

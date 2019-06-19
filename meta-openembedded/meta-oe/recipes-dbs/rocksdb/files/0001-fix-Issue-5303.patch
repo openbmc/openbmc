@@ -1,0 +1,80 @@
+From 512aaf3d833973f6146c6f1235b590901876175e Mon Sep 17 00:00:00 2001
+From: biocodz <biocodz@protonmail.com>
+Date: Fri, 7 Jun 2019 09:49:37 -0400
+Subject: [PATCH] fix Issue 5303
+
+Upstream-Status: Submitted [https://github.com/facebook/rocksdb/pull/5426]
+
+---
+ db/internal_stats.h                                | 21 +++++++++++++++++++++
+ db/version_edit.h                                  |  8 ++++++++
+ utilities/persistent_cache/persistent_cache_util.h |  2 +-
+ 3 files changed, 30 insertions(+), 1 deletion(-)
+
+diff --git a/db/internal_stats.h b/db/internal_stats.h
+index 6fa8727a4..09447644d 100644
+--- a/db/internal_stats.h
++++ b/db/internal_stats.h
+@@ -236,6 +236,27 @@ class InternalStats {
+       }
+     }
+
++	CompactionStats & operator=(const CompactionStats& c) {
++	  count = c.count;
++	  micros = c.micros;
++	  cpu_micros = c.cpu_micros;
++	  bytes_read_non_output_levels = c.bytes_read_non_output_levels;
++	  bytes_read_output_level = c.bytes_read_output_level;
++	  bytes_written = c.bytes_written;
++	  bytes_moved = c.bytes_moved;
++	  num_input_files_in_non_output_levels =
++	      c.num_input_files_in_non_output_levels;
++	  num_input_files_in_output_level = c.num_input_files_in_output_level;
++	  num_output_files = c.num_output_files;
++	  num_input_records = c.num_input_records;
++	  num_dropped_records = c.num_dropped_records;
++	  int num_of_reasons = static_cast<int>(CompactionReason::kNumOfReasons);
++	  for (int i = 0; i < num_of_reasons; i++) {
++	  	counts[i] = c.counts[i];
++	  }
++	  return *this;
++	}
++
+     void Clear() {
+       this->micros = 0;
+       this->cpu_micros = 0;
+diff --git a/db/version_edit.h b/db/version_edit.h
+index 229531792..5c50ef552 100644
+--- a/db/version_edit.h
++++ b/db/version_edit.h
+@@ -52,6 +52,14 @@ struct FileDescriptor {
+         smallest_seqno(_smallest_seqno),
+         largest_seqno(_largest_seqno) {}
+
++  FileDescriptor(const FileDescriptor& fd) {
++    table_reader = fd.table_reader;
++    packed_number_and_path_id = fd.packed_number_and_path_id;
++    file_size = fd.file_size;
++    smallest_seqno = fd.smallest_seqno;
++    largest_seqno = fd.largest_seqno;
++  }
++
+   FileDescriptor& operator=(const FileDescriptor& fd) {
+     table_reader = fd.table_reader;
+     packed_number_and_path_id = fd.packed_number_and_path_id;
+diff --git a/utilities/persistent_cache/persistent_cache_util.h b/utilities/persistent_cache/persistent_cache_util.h
+index 214bb5875..254c038f9 100644
+--- a/utilities/persistent_cache/persistent_cache_util.h
++++ b/utilities/persistent_cache/persistent_cache_util.h
+@@ -48,7 +48,7 @@ class BoundedQueue {
+     T t = std::move(q_.front());
+     size_ -= t.Size();
+     q_.pop_front();
+-    return std::move(t);
++    return t;
+   }
+
+   size_t Size() const {
+--
+2.11.0
+

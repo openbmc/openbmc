@@ -1,0 +1,34 @@
+php-ptest: xfail two tests
+
+If and when these tests are modified to expect the correct output, they will
+succeed and generate warnings in the test summary.  This patch can then be removed.
+
+Note that we add a closing '?>' to one test so that it can be executed directly by php.
+
+Upstream-Status: Pending
+
+Signed-off-By: Joe Slater <joe.slater@windriver.com>
+
+
+--- a/tests/basic/bug71273.phpt
++++ b/tests/basic/bug71273.phpt
+@@ -16,6 +16,8 @@ Bug #71273 A wrong ext directory setup i
+ 	var_dump(preg_match(",.+a[\\/].+[\\/]w.php_kartoffelbrei.dll.+,s", $out));
+ ?>
+ ==DONE==
++--XFAIL--
++Output is int(0), not int(1)
+ --EXPECT--
+ int(1)
+ ==DONE==
+--- a/tests/run-test/bug75042-3.phpt
++++ b/tests/run-test/bug75042-3.phpt
+@@ -8,5 +8,8 @@ display_errors=1
+ nonexistentsharedmodule
+ --FILE--
+ <?php
++?>
++--XFAIL--
++No warning message printed.
+ --EXPECTF--
+ PHP Warning:  PHP Startup: Unable to load dynamic library '%snonexistentsharedmodule.%s' %A

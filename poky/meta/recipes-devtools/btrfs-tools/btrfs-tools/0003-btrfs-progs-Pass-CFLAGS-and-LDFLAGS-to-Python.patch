@@ -1,0 +1,43 @@
+From 730fe2ee2fb9e08cbe885f370afe83fecb18d048 Mon Sep 17 00:00:00 2001
+From: Joshua Watt <JPEWhacker@gmail.com>
+Date: Sun, 26 May 2019 21:26:04 -0500
+Subject: [PATCH] btrfs-progs: Pass CFLAGS and LDFLAGS to Python
+
+Adds Make variables EXTRA_PYTHON_CFLAGS and EXTRA_PYTHON_LDFLAGS which
+can be used to pass CFLAGS and LDFLAGS respectively when building the
+Python library.
+
+This is required to support reproducible builds, as there are often
+compiler and linker flags that must be passed in order to generate
+reproducible output (e.g. -fdebug-prefix-map)
+
+Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
+Upstream-Status: Accepted [https://github.com/kdave/btrfs-progs/pull/176]
+---
+ Makefile | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 505bd9c1..814767a8 100644
+--- a/Makefile
++++ b/Makefile
+@@ -24,6 +24,10 @@
+ #   DEBUG_CFLAGS   additional compiler flags for debugging build
+ #   EXTRA_CFLAGS   additional compiler flags
+ #   EXTRA_LDFLAGS  additional linker flags
++#   EXTRA_PYTHON_CFLAGS  additional compiler flags to pass when building Python
++#                        library
++#   EXTRA_PYTHON_LDFLAGS additional linker flags to pass when building Python
++#                        library
+ #
+ # Testing-specific options (see also tests/README.md):
+ #   TEST=GLOB      run test(s) from directories matching GLOB
+@@ -439,7 +443,7 @@ ifeq ($(PYTHON_BINDINGS),1)
+ libbtrfsutil_python: libbtrfsutil.so.$(libbtrfsutil_major) libbtrfsutil.so libbtrfsutil/btrfsutil.h
+ 	@echo "    [PY]     libbtrfsutil"
+ 	$(Q)cd libbtrfsutil/python; \
+-		CFLAGS= LDFLAGS= $(PYTHON) setup.py $(SETUP_PY_Q) build_ext -i build
++		CFLAGS="$(EXTRA_PYTHON_CFLAGS)" LDFLAGS="$(EXTRA_PYTHON_LDFLAGS)" $(PYTHON) setup.py $(SETUP_PY_Q) build_ext -i build
+ 
+ .PHONY: libbtrfsutil_python
+ endif

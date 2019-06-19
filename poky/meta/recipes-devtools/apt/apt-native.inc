@@ -7,8 +7,6 @@ USE_NLS = "yes"
 
 SRC_URI += "file://db_linking_hack.patch \
             file://0001-Revert-always-run-dpkg-configure-a-at-the-end-of-our.patch \
-            file://0001-remove-Wsuggest-attribute-from-CFLAGS.patch \
-            file://0001-fix-the-gcc-version-check.patch \
 "
 
 python do_install () {

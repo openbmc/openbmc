@@ -1,0 +1,68 @@
+From 5834216fb3aa4e5e59ee13e871c70db1b4e13f02 Mon Sep 17 00:00:00 2001
+From: Patrick Ohly <patrick.ohly@intel.com>
+Date: Fri, 30 Sep 2016 10:22:16 +0200
+Subject: [PATCH] command line: apply operation to all paths
+
+Previously, invocations like "evmctl ima_hash foo bar" silently
+ignored all parameters after the first path name ("foo" in this
+example).
+
+Now evmctl iterates over all specified paths. It aborts with an
+error as soon as the selected operation fails for a path.
+
+Supporting more than one parameter is useful in combination with
+"find" and "xargs" because it is noticably faster than invoking
+evmutil separately for each file, in particular when run under pseudo
+(a fakeroot environment used by the OpenEmbedded build system).
+
+This complements the recursive mode and can be used when more control
+over file selection is needed.
+
+Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
+---
+ src/evmctl.c | 21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
+
+diff --git a/src/evmctl.c b/src/evmctl.c
+index 23cf54c..2072034 100644
+--- a/src/evmctl.c
++++ b/src/evmctl.c
+@@ -626,7 +626,7 @@ static int get_file_type(const char *path, const char *search_type)
+ static int do_cmd(struct command *cmd, find_cb_t func)
+ {
+ 	char *path = g_argv[optind++];
+-	int err, dts = REG_MASK; /* only regular files by default */
++	int err = 0, dts = REG_MASK; /* only regular files by default */
+ 
+ 	if (!path) {
+ 		log_err("Parameters missing\n");
+@@ -634,15 +634,18 @@ static int do_cmd(struct command *cmd, find_cb_t func)
+ 		return -1;
+ 	}
+ 
+-	if (recursive) {
+-		if (search_type) {
+-			dts = get_file_type(path, search_type);
+-			if (dts < 0)
+-				return dts;
++	while (path && !err) {
++		if (recursive) {
++			if (search_type) {
++				dts = get_file_type(path, search_type);
++				if (dts < 0)
++					return dts;
++			}
++			err = find(path, dts, func);
++		} else {
++			err = func(path);
+ 		}
+-		err = find(path, dts, func);
+-	} else {
+-		err = func(path);
++		path = g_argv[optind++];
+ 	}
+ 
+ 	return err;
+-- 
+2.1.4
+

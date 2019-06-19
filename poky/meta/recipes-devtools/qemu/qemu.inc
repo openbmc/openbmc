@@ -4,6 +4,9 @@ LICENSE = "GPLv2 & LGPLv2.1"
 
 RDEPENDS_${PN}-ptest = "bash make"
 
+require qemu-targets.inc
+inherit pkgconfig bluetooth ptest
+
 LIC_FILES_CHKSUM = "file://COPYING;md5=441c28d2cf86e15a37fa47e15a72fbac \
                     file://COPYING.LIB;endline=24;md5=8c5efda6cf1e1b03dcfd0e6c0d271c7f"
 
@@ -20,7 +23,7 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://0008-apic-fixup-fallthrough-to-PIC.patch \
            file://0009-linux-user-Fix-webkitgtk-hangs-on-32-bit-x86-target.patch \
            file://0010-Revert-linux-user-fix-mmap-munmap-mprotect-mremap-sh.patch \
-           file://0013-Revert-target-arm-Use-vector-operations-for-saturati.patch \
+           file://0013-target-arm-Fix-vector-operation-segfault.patch \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 
@@ -48,10 +51,6 @@ do_install_ptest() {
 	sed -i -e '/wildcard config-host.mak/d' \
 	       -e '$ {/endif/d}' ${D}${PTEST_PATH}/tests/Makefile.include
 }
-
-
-require qemu-targets.inc
-inherit pkgconfig bluetooth ptest
 
 # QEMU_TARGETS is overridable variable
 QEMU_TARGETS ?= "arm aarch64 i386 mips mipsel mips64 mips64el ppc riscv32 riscv64 sh4 x86_64"

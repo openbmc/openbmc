@@ -44,7 +44,7 @@ inherit autotools gettext ptest
 
 EXTRA_OECONF = "--program-prefix=eu- --without-lzma"
 EXTRA_OECONF_append_class-native = " --without-bzlib"
-RDEPENDS_${PN}-ptest = "libasm libelf bash make coreutils ${PN}-binutils ${PN}"
+RDEPENDS_${PN}-ptest += "libasm libelf bash make coreutils ${PN}-binutils"
 
 EXTRA_OECONF_append_class-target += "--disable-tests-rpath"
 
@@ -61,6 +61,18 @@ do_compile_ptest() {
 
 do_install_ptest() {
 	if [ ${PTEST_ENABLED} = "1" ]; then
+		# copy the files which needed by the cases
+		TEST_FILES="strip strip.o addr2line elfcmp objdump readelf size.o nm.o nm elflint"
+		install -d -m 755                       ${D}${PTEST_PATH}/src
+		install -d -m 755                       ${D}${PTEST_PATH}/libelf
+		install -d -m 755                       ${D}${PTEST_PATH}/libdw
+		for test_file in ${TEST_FILES}; do
+			if [ -f ${B}/src/${test_file} ]; then
+				cp -r ${B}/src/${test_file} ${D}${PTEST_PATH}/src
+			fi
+		done
+		cp ${D}${libdir}/libelf-${PV}.so ${D}${PTEST_PATH}/libelf/libelf.so
+		cp ${D}${libdir}/libdw-${PV}.so ${D}${PTEST_PATH}/libdw/libdw.so
 		cp -r ${S}/tests/                       ${D}${PTEST_PATH}
 		cp -r ${B}/tests/*                      ${D}${PTEST_PATH}/tests
 		cp -r ${B}/config.h                     ${D}${PTEST_PATH}
@@ -109,3 +121,26 @@ FILES_libdw  = "${libdir}/libdw-${PV}.so ${libdir}/libdw.so.* ${libdir}/elfutils
 
 # The package contains symlinks that trip up insane
 INSANE_SKIP_${MLPREFIX}libdw = "dev-so"
+
+# avoid stripping some generated binaries otherwise some of the tests such as test-nlist,
+# run-strip-reloc.sh, run-strip-strmerge.sh and so on will fail
+INHIBIT_PACKAGE_STRIP_FILES = "\
+    ${PKGD}${PTEST_PATH}/tests/test-nlist \
+    ${PKGD}${PTEST_PATH}/tests/elfstrmerge \
+    ${PKGD}${PTEST_PATH}/tests/backtrace-child \
+    ${PKGD}${PTEST_PATH}/tests/backtrace-data \
+    ${PKGD}${PTEST_PATH}/tests/deleted \
+    ${PKGD}${PTEST_PATH}/src/strip \
+    ${PKGD}${PTEST_PATH}/src/addr2line \
+    ${PKGD}${PTEST_PATH}/src/elfcmp \
+    ${PKGD}${PTEST_PATH}/src/objdump \
+    ${PKGD}${PTEST_PATH}/src/readelf \
+    ${PKGD}${PTEST_PATH}/src/nm \
+    ${PKGD}${PTEST_PATH}/src/elflint \
+    ${PKGD}${PTEST_PATH}/libelf/libelf.so \
+    ${PKGD}${PTEST_PATH}/libdw/libdw.so \
+    ${PKGD}${PTEST_PATH}/backends/libebl_i386.so \
+    ${PKGD}${PTEST_PATH}/backends/libebl_x86_64.so \
+"
+
+EXCLUDE_PACKAGES_FROM_SHLIBS = "${PN}-ptest"

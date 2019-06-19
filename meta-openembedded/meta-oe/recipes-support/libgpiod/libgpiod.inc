@@ -7,9 +7,6 @@ SRC_URI = "https://www.kernel.org/pub/software/libs/libgpiod/${BP}.tar.xz"
 
 inherit autotools pkgconfig
 
-# enable tools
-PACKAGECONFIG ?= "tools"
-
 PACKAGECONFIG[tests] = "--enable-tests,--disable-tests,kmod udev"
 PACKAGECONFIG[tools] = "--enable-tools,--disable-tools,"
 

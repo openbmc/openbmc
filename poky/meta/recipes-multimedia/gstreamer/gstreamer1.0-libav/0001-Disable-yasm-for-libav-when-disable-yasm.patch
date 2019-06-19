@@ -15,7 +15,7 @@ diff --git a/configure.ac b/configure.ac
 index 22ede88..ef3c050 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -305,6 +305,12 @@ else
+@@ -355,6 +355,12 @@ else
      emblibav_configure_args="$emblibav_configure_args --enable-gpl"
    fi
 

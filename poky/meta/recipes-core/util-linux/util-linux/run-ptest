@@ -1,5 +1,14 @@
 #!/bin/sh
 
+
+# When udevd (from eudev) is running most eject/mount tests will fail because
+# of automount. We need to stop udevd before executing util-linux's tests.
+# The systemd-udevd daemon doesn't change the outcome of util-linux's tests.
+UDEV_PID="`pidof "@base_sbindir@/udevd"`"
+if [ "x$UDEV_PID" != "x" ]; then
+    /etc/init.d/udev stop
+fi
+
 current_path=$(readlink -f $0)
 export bindir=$(dirname $current_path)
 export PATH=$bindir/bin:$PATH
@@ -26,4 +35,9 @@ do
       s/^\(.*\):\(.*\) \.\.\. SKIPPED \(.*\)$/SKIP: \1:\2 \3/               
    }' 
 done
+
+
+if [ "x$UDEV_PID" != "x" ]; then
+    /etc/init.d/udev start
+fi
 

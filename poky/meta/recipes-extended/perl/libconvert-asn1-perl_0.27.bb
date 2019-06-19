@@ -14,4 +14,7 @@ inherit cpan ptest-perl
 
 EXTRA_PERLFLAGS = "-I ${PERLHOSTLIB}"
 
+RDEPENDS_${PN} += "perl-module-exporter perl-module-constant perl-module-encode perl-module-encode-encoding perl-module-utf8 perl-module-socket perl-module-time-local perl-module-posix"
+RDEPENDS_${PN}-ptest += "perl-module-math-bigint perl-module-io-socket perl-module-data-dumper perl-module-math-bigint-calc"
+
 BBCLASSEXTEND = "native"

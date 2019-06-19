@@ -8,8 +8,8 @@ DEPENDS_class-native = "hostperl-runtime-native"
 
 INHIBIT_DEFAULT_DEPS = "1"
 
-SRCREV = "058639be227bbe8f03cc39f79f7ce84918012143"
-PV = "20181128+git${SRCPV}"
+SRCREV = "b98424c249119b79d3f709e26eb86f2fd4d5e5f3"
+PV = "20190501+git${SRCPV}"
 
 SRC_URI = "git://git.savannah.gnu.org/config.git \
            file://gnu-configize.in"

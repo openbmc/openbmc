@@ -6,7 +6,7 @@ LICENSE = "GPLv2+ & LGPLv2.1+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=12f884d2ae1ff87c09e5b7ccc2c4ca7e \
                     file://COPYING.LIB;md5=fb504b67c50331fc78734fed90fb0e09 \
                     file://src/main.c;beginline=1;endline=24;md5=9bc54b93cd7e17bf03f52513f39f926e"
-DEPENDS = "udev dbus-glib glib-2.0"
+DEPENDS = "dbus-glib glib-2.0"
 PROVIDES += "bluez-hcidump"
 RPROVIDES_${PN} += "bluez-hcidump"
 
@@ -22,6 +22,7 @@ PACKAGECONFIG ??= "obex-profiles \
     hog-profiles \
     tools \
     deprecated \
+    udev \
 "
 PACKAGECONFIG[obex-profiles] = "--enable-obex,--disable-obex,libical"
 PACKAGECONFIG[readline] = "--enable-client,--disable-client,readline,"
@@ -43,6 +44,7 @@ PACKAGECONFIG[threads] = "--enable-threads,--disable-threads"
 PACKAGECONFIG[deprecated] = "--enable-deprecated,--disable-deprecated"
 PACKAGECONFIG[mesh] = "--enable-mesh,--disable-mesh, json-c ell"
 PACKAGECONFIG[btpclient] = "--enable-btpclient,--disable-btpclient, ell"
+PACKAGECONFIG[udev] = "--enable-udev,--disable-udev,udev"
 
 SRC_URI = "\
     ${KERNELORG_MIRROR}/linux/bluetooth/bluez-${PV}.tar.xz \
@@ -54,6 +56,7 @@ SRC_URI = "\
     file://0001-test-gatt-Fix-hung-issue.patch \
     file://0001-Makefile.am-Fix-a-race-issue-for-tools.patch \
     file://CVE-2018-10910.patch \
+    file://gcc9-fixes.patch \
 "
 S = "${WORKDIR}/bluez-${PV}"
 
@@ -117,7 +120,10 @@ FILES_${PN}-dev += " \
 
 FILES_${PN}-obex = "${libexecdir}/bluetooth/obexd \
                     ${exec_prefix}/lib/systemd/user/obex.service \
+                    ${systemd_system_unitdir}/obex.service \
+                    ${sysconfdir}/systemd/system/multi-user.target.wants/obex.service \
                     ${datadir}/dbus-1/services/org.bluez.obex.service \
+                    ${sysconfdir}/dbus-1/system.d/obexd.conf \
                    "
 SYSTEMD_SERVICE_${PN}-obex = "obex.service"
 

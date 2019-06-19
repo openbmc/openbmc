@@ -1,4 +1,4 @@
-From a9726c7fdcd386bd104b13c494d261f693dde792 Mon Sep 17 00:00:00 2001
+From 49604e158b8171033bc8a9db5d8893887fb98557 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 10 May 2017 06:39:34 +0000
 Subject: [PATCH 14/18] GLES2/gl2ext.h: Define GL_R8_EXT and GL_RG8_EXT
@@ -31,5 +31,5 @@ index 4eacf7f..b1acc9f 100644
  #ifndef GL_EXT_texture_type_2_10_10_10_REV
  #define GL_UNSIGNED_INT_2_10_10_10_REV_EXT                      0x8368
 -- 
-2.20.1
+2.21.0
 

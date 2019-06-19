@@ -41,8 +41,7 @@ S = "${WORKDIR}/Bastille"
 
 do_install () {
 	install -d ${D}${sbindir}
-	install -d ${D}${libdir}/perl/site_perl/Curses
-	ln -sf perl ${D}/${libdir}/perl5
+	install -d ${D}${libdir}/perl5/site_perl/Curses
 
 	install -d ${D}${libdir}/Bastille
 	install -d ${D}${libdir}/Bastille/API
@@ -51,7 +50,6 @@ do_install () {
 	install -d ${D}${datadir}/Bastille/OSMap/Modules
 	install -d ${D}${datadir}/Bastille/Questions
 	install -d ${D}${datadir}/Bastille/FKL/configs/
-	install -d ${D}${localstatedir}/lock/subsys/bastille
 	install -d ${D}${localstatedir}/log/Bastille
 	install -d ${D}${sysconfdir}/Bastille
 	install -m 0755 AutomatedBastille  ${D}${sbindir}

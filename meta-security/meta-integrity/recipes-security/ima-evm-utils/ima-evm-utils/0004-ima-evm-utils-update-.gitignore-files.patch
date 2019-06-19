@@ -1,0 +1,34 @@
+From b9f327c5c513ccea9cb56d4bbd50c1f66d629099 Mon Sep 17 00:00:00 2001
+From: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date: Wed, 6 Mar 2019 01:24:04 +0300
+Subject: [PATCH 4/4] ima-evm-utils: update .gitignore files
+
+Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+---
+ .gitignore     | 1 +
+ src/.gitignore | 1 +
+ 2 files changed, 2 insertions(+)
+ create mode 100644 src/.gitignore
+
+diff --git a/.gitignore b/.gitignore
+index ca7a06e..cb82166 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -45,6 +45,7 @@ cscope.*
+ ncscope.*
+ 
+ # Generated documentation
++*.1
+ *.8
+ *.5
+ manpage.links
+diff --git a/src/.gitignore b/src/.gitignore
+new file mode 100644
+index 0000000..38e8e3c
+--- /dev/null
++++ b/src/.gitignore
+@@ -0,0 +1 @@
++hash_info.h
+-- 
+2.17.1
+

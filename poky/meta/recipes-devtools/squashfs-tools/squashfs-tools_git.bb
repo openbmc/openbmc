@@ -19,6 +19,9 @@ SRC_URI[lzma.sha256sum] = "c935fd04dd8e0e8c688a3078f3675d699679a90be81c12686837e
 
 S = "${WORKDIR}/git/squashfs-tools"
 
+# needs FNM_EXTMATCH
+COMPATIBLE_HOST_libc-musl = 'null'
+
 EXTRA_OEMAKE = "${PACKAGECONFIG_CONFARGS}"
 
 PACKAGECONFIG ??= "gzip xz lzo lz4 lzma xattr"

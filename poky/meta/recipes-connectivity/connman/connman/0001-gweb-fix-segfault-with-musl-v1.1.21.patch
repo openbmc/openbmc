@@ -1,0 +1,34 @@
+From f0a8c69971b30ea7ca255bb885fdd1179fa5d298 Mon Sep 17 00:00:00 2001
+From: Nicola Lunghi <nick83ola@gmail.com>
+Date: Thu, 23 May 2019 07:55:25 +0100
+Subject: [PATCH] gweb: fix segfault with musl v1.1.21
+
+In musl > v1.1.21 freeaddrinfo() implementation changed and
+was causing a segmentation fault on recent Yocto using musl.
+
+See this commit:
+
+ https://git.musl-libc.org/cgit/musl/commit/src/network/freeaddrinfo.c?id=d1395c43c019aec6b855cf3c656bf47c8a719e7f
+
+Upstream-Status: Submitted
+---
+ gweb/gweb.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/gweb/gweb.c b/gweb/gweb.c
+index 393afe0a..12fcb1d8 100644
+--- a/gweb/gweb.c
++++ b/gweb/gweb.c
+@@ -1274,7 +1274,8 @@ static bool is_ip_address(const char *host)
+ 	addr = NULL;
+ 
+ 	result = getaddrinfo(host, NULL, &hints, &addr);
+-	freeaddrinfo(addr);
++	if(!result)
++		freeaddrinfo(addr);
+ 
+ 	return result == 0;
+ }
+-- 
+2.19.1
+

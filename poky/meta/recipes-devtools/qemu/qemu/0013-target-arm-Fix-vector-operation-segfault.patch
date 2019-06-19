@@ -1,0 +1,66 @@
+From 2f143d3ad1c05e91cf2cdf5de06d59a80a95e6c8 Mon Sep 17 00:00:00 2001
+From: Alistair Francis <alistair.francis@wdc.com>
+Date: Thu, 23 May 2019 14:47:43 +0100
+Subject: [PATCH] target/arm: Fix vector operation segfault
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Commit 89e68b575 "target/arm: Use vector operations for saturation"
+causes this abort() when booting QEMU ARM with a Cortex-A15:
+
+0  0x00007ffff4c2382f in raise () at /usr/lib/libc.so.6
+1  0x00007ffff4c0e672 in abort () at /usr/lib/libc.so.6
+2  0x00005555559c1839 in disas_neon_data_insn (insn=<optimized out>, s=<optimized out>) at ./target/arm/translate.c:6673
+3  0x00005555559c1839 in disas_neon_data_insn (s=<optimized out>, insn=<optimized out>) at ./target/arm/translate.c:6386
+4  0x00005555559cd8a4 in disas_arm_insn (insn=4081107068, s=0x7fffe59a9510) at ./target/arm/translate.c:9289
+5  0x00005555559cd8a4 in arm_tr_translate_insn (dcbase=0x7fffe59a9510, cpu=<optimized out>) at ./target/arm/translate.c:13612
+6  0x00005555558d1d39 in translator_loop (ops=0x5555561cc580 <arm_translator_ops>, db=0x7fffe59a9510, cpu=0x55555686a2f0, tb=<optimized out>, max_insns=<optimized out>) at ./accel/tcg/translator.c:96
+7  0x00005555559d10d4 in gen_intermediate_code (cpu=cpu@entry=0x55555686a2f0, tb=tb@entry=0x7fffd7840080 <code_gen_buffer+126091347>, max_insns=max_insns@entry=512) at ./target/arm/translate.c:13901
+8  0x00005555558d06b9 in tb_gen_code (cpu=cpu@entry=0x55555686a2f0, pc=3067096216, cs_base=0, flags=192, cflags=-16252928, cflags@entry=524288) at ./accel/tcg/translate-all.c:1736
+9  0x00005555558ce467 in tb_find (cf_mask=524288, tb_exit=1, last_tb=0x7fffd783e640 <code_gen_buffer+126084627>, cpu=0x1) at ./accel/tcg/cpu-exec.c:407
+10 0x00005555558ce467 in cpu_exec (cpu=cpu@entry=0x55555686a2f0) at ./accel/tcg/cpu-exec.c:728
+11 0x000055555588b0cf in tcg_cpu_exec (cpu=0x55555686a2f0) at ./cpus.c:1431
+12 0x000055555588d223 in qemu_tcg_cpu_thread_fn (arg=0x55555686a2f0) at ./cpus.c:1735
+13 0x000055555588d223 in qemu_tcg_cpu_thread_fn (arg=arg@entry=0x55555686a2f0) at ./cpus.c:1709
+14 0x0000555555d2629a in qemu_thread_start (args=<optimized out>) at ./util/qemu-thread-posix.c:502
+15 0x00007ffff4db8a92 in start_thread () at /usr/lib/libpthread.
+
+This patch ensures that we don't hit the abort() in the second switch
+case in disas_neon_data_insn() as we will return from the first case.
+
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Tested-by: Alex Bennée <alex.bennee@linaro.org>
+Message-id: ad91b397f360b2fc7f4087e476f7df5b04d42ddb.1558021877.git.alistair.francis@wdc.com
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Upstream-Status: Backport [4.1.0]
+---
+ target/arm/translate.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index dd053c80d6..298c262825 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -6598,13 +6598,13 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+             tcg_gen_gvec_4(rd_ofs, offsetof(CPUARMState, vfp.qc),
+                            rn_ofs, rm_ofs, vec_size, vec_size,
+                            (u ? uqadd_op : sqadd_op) + size);
+-            break;
++            return 0;
+ 
+         case NEON_3R_VQSUB:
+             tcg_gen_gvec_4(rd_ofs, offsetof(CPUARMState, vfp.qc),
+                            rn_ofs, rm_ofs, vec_size, vec_size,
+                            (u ? uqsub_op : sqsub_op) + size);
+-            break;
++            return 0;
+ 
+         case NEON_3R_VMUL: /* VMUL */
+             if (u) {
+-- 
+2.21.0
+

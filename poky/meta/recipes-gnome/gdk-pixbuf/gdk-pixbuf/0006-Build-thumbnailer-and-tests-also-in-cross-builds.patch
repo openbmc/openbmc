@@ -1,0 +1,28 @@
+From 1a532e090c558a830de9503f56e23414e880bb95 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 5 Jun 2019 14:17:55 +0200
+Subject: [PATCH] Build thumbnailer and tests also in cross builds.
+
+Upstream-Status: Inappropriate [relies on oe-core specific hacks]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ meson.build | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index d104cea..7acb88a 100644
+--- a/meson.build
++++ b/meson.build
+@@ -397,10 +397,8 @@ endif
+ # i18n
+ subdir('po')
+ 
+-if not meson.is_cross_build()
+-  subdir('tests')
+-  subdir('thumbnailer')
+-endif
++subdir('tests')
++subdir('thumbnailer')
+ 
+ # Documentation
+ subdir('docs')

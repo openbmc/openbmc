@@ -1,0 +1,34 @@
+From 9d6b8321c5b46199baca907f3d42bdcaaf1958a8 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Thu, 23 May 2019 23:59:42 -0700
+Subject: [PATCH] remove AC_TRY_RUN
+
+AC_TRY_RUN doesn't work in cross compile env,
+use AC_COMPILE_IFELSE instead to fix below configure
+error:
+ | checking for usuable C++11 regex... configure: error: in `/builddir/tmp/work/core2-64-poky-linux/kea/1.5.0-r0/build':
+ | configure: error: cannot run test program while cross compiling
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index c880b77..dd40c7c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -580,7 +580,7 @@ AC_TRY_COMPILE([
+         AC_MSG_RESULT(no))
+ 
+ AC_MSG_CHECKING(for usuable C++11 regex)
+-AC_TRY_RUN([
++AC_COMPILE_IFELSE([
+ #include <regex>
+ #include <iostream>
+ int main() {
+-- 
+2.21.0
+

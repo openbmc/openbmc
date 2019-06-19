@@ -32,4 +32,4 @@ do_install_ptest() {
     sed -i 's#../../mcelog#mcelog#' ${D}${PTEST_PATH}/tests/test
 }
 
-RDEPENDS_${PN}-ptest += "${PN} make bash mce-inject"
+RDEPENDS_${PN}-ptest += "make bash mce-inject"

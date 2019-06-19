@@ -42,10 +42,12 @@ def is_url(p):
     """
     return p.startswith('http://') or p.startswith('https://')
 
+extra_configvars = {'TESTSERIES': ''}
+
 #
 # Load the json file and append the results data into the provided results dict
 #
-def append_resultsdata(results, f, configmap=store_map):
+def append_resultsdata(results, f, configmap=store_map, configvars=extra_configvars):
     if type(f) is str:
         if is_url(f):
             with urllib.request.urlopen(f) as response:
@@ -61,12 +63,15 @@ def append_resultsdata(results, f, configmap=store_map):
     for res in data:
         if "configuration" not in data[res] or "result" not in data[res]:
             raise ValueError("Test results data without configuration or result section?")
-        if "TESTSERIES" not in data[res]["configuration"]:
-            data[res]["configuration"]["TESTSERIES"] = testseries
+        for config in configvars:
+            if config == "TESTSERIES" and "TESTSERIES" not in data[res]["configuration"]:
+                data[res]["configuration"]["TESTSERIES"] = testseries
+                continue
+            if config not in data[res]["configuration"]:
+                data[res]["configuration"][config] = configvars[config]
         testtype = data[res]["configuration"].get("TEST_TYPE")
         if testtype not in configmap:
             raise ValueError("Unknown test type %s" % testtype)
-        configvars = configmap[testtype]
         testpath = "/".join(data[res]["configuration"].get(i) for i in configmap[testtype])
         if testpath not in results:
             results[testpath] = {}
@@ -76,16 +81,16 @@ def append_resultsdata(results, f, configmap=store_map):
 # Walk a directory and find/load results data
 # or load directly from a file
 #
-def load_resultsdata(source, configmap=store_map):
+def load_resultsdata(source, configmap=store_map, configvars=extra_configvars):
     results = {}
     if is_url(source) or os.path.isfile(source):
-        append_resultsdata(results, source, configmap)
+        append_resultsdata(results, source, configmap, configvars)
         return results
     for root, dirs, files in os.walk(source):
         for name in files:
             f = os.path.join(root, name)
             if name == "testresults.json":
-                append_resultsdata(results, f, configmap)
+                append_resultsdata(results, f, configmap, configvars)
     return results
 
 def filter_resultsdata(results, resultid):

@@ -1,4 +1,4 @@
-From 929150608c16644695f19cd2e0cc8a06a41cd497 Mon Sep 17 00:00:00 2001
+From fc9bf1ce9f1a21150b10736a1c968d4ca6d4eaa3 Mon Sep 17 00:00:00 2001
 From: Martin Kelly <mkelly@xevo.com>
 Date: Fri, 7 Apr 2017 15:20:30 -0700
 Subject: [PATCH] configure.ac: don't use dnet-config
@@ -11,14 +11,14 @@ Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Martin Kelly <mkelly@xevo.com>
 ---
- configure.ac | 4 ++--
+ open-vm-tools/configure.ac | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Index: open-vm-tools/configure.ac
-===================================================================
---- open-vm-tools.orig/configure.ac
-+++ open-vm-tools/configure.ac
-@@ -944,7 +944,7 @@ if test "$with_dnet" = "yes"; then
+diff --git a/open-vm-tools/configure.ac b/open-vm-tools/configure.ac
+index 325a39f5..713ea683 100644
+--- a/open-vm-tools/configure.ac
++++ b/open-vm-tools/configure.ac
+@@ -949,7 +949,7 @@ if test "$with_dnet" = "yes"; then
        AC_VMW_CHECK_LIB([dnet],
                         [DNET],
                         [],
@@ -27,7 +27,7 @@ Index: open-vm-tools/configure.ac
                         [],
                         [dnet.h],
                         [intf_open],
-@@ -954,7 +954,7 @@ if test "$with_dnet" = "yes"; then
+@@ -959,7 +959,7 @@ if test "$with_dnet" = "yes"; then
  
     if test $have_dnet = "no"; then
  		AC_MSG_ERROR(

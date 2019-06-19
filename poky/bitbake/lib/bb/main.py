@@ -491,7 +491,7 @@ def setup_bitbake(configParams, configuration, extrafeatures=None):
 def lockBitbake():
     topdir = bb.cookerdata.findTopdir()
     if not topdir:
-        bb.error("Unable to find conf/bblayers.conf or conf/bitbake.conf. BBAPTH is unset and/or not in a build directory?")
+        bb.error("Unable to find conf/bblayers.conf or conf/bitbake.conf. BBPATH is unset and/or not in a build directory?")
         raise BBMainFatal
     lockfile = topdir + "/bitbake.lock"
     return topdir, bb.utils.lockfile(lockfile, False, False)

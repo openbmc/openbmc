@@ -31,7 +31,7 @@ diff --git a/m4/gst-gl.m4 b/m4/gst-gl.m4
 index 1e97240..ab7774c 100644
 --- a/m4/gst-gl.m4
 +++ b/m4/gst-gl.m4
-@@ -231,7 +231,7 @@ case $host in
+@@ -275,7 +275,7 @@ case $host in
                              HAVE_EGL=yes
                              HAVE_GLES2=yes
                              HAVE_EGL_RPI=yes

@@ -1,0 +1,29 @@
+From 18eea61a7a768c6c3b57c6683c7bef7049f0f6ab Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 13 Jun 2018 23:37:09 -0700
+Subject: [PATCH] Use uintmax_t for handling rlim_t
+
+rlimit types are not representable with long or long long
+formats, therefore use uintmax_t to typecast rlim_t types
+and use %j to print it
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ open-vm-tools/lib/hgfsServer/hgfsServerLinux.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/open-vm-tools/lib/hgfsServer/hgfsServerLinux.c b/open-vm-tools/lib/hgfsServer/hgfsServerLinux.c
+index 0e6351a9..a2ee1740 100644
+--- a/open-vm-tools/lib/hgfsServer/hgfsServerLinux.c
++++ b/open-vm-tools/lib/hgfsServer/hgfsServerLinux.c
+@@ -5294,8 +5294,8 @@ HgfsWriteCheckIORange(off_t offset,         // IN:
+       goto exit;
+    }
+ 
+-   LOG(6, ("%s: File Size limits: 0x%"FMT64"x 0x%"FMT64"x\n",
+-           __FUNCTION__, fileSize.rlim_cur, fileSize.rlim_max));
++   LOG(6, ("%s: File Size limits: 0x%jx 0x%jx\n",
++           __FUNCTION__, (uintmax_t)fileSize.rlim_cur, (uintmax_t)fileSize.rlim_max));
+ 
+    /*
+     * Check the offset is within the file size range.

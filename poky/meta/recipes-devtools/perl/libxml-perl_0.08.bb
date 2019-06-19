@@ -26,3 +26,5 @@ do_compile() {
 	cpan_do_compile
 }
 
+RDEPENDS_${PN} += "perl-module-carp perl-module-overload perl-module-universal perl-module-io-handle"
+RDEPENDS_${PN}-ptest += "libxml-parser-perl perl-module-file-glob"

@@ -60,7 +60,7 @@ BUILD_CFLAGS = ""
 BUILD_CXXFLAGS = ""
 BUILD_LDFLAGS = ""
 
-CFLAGS_append = "-Wno-error"
+CFLAGS_append = " -Wno-error"
 
 do_configure_prepend() {
 	# The grub2 configure script uses variables such as TARGET_CFLAGS etc

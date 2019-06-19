@@ -1,4 +1,4 @@
-From 0f98ccac128265b85af3c5e310413fc9fce9f78c Mon Sep 17 00:00:00 2001
+From e5fcfe7af2c7f75b66356680bb641f4f6555d0c5 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 15 Jul 2018 00:48:38 -0700
 Subject: [PATCH 18/18] Add EGL_IMG_context_priority related defines
@@ -31,5 +31,5 @@ index dcc90ce..6842bf9 100755
  #define EGL_KHR_vg_parent_image 1
  #define EGL_VG_PARENT_IMAGE_KHR			0x30BA	/* eglCreateImageKHR target */
 -- 
-2.20.1
+2.21.0
 

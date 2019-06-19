@@ -25,7 +25,7 @@ QA_SANE = "True"
 WARN_QA ?= "ldflags useless-rpaths rpaths staticdev libdir xorg-driver-abi \
             textrel already-stripped incompatible-license files-invalid \
             installed-vs-shipped compile-host-path install-host-path \
-            pn-overrides infodir build-deps \
+            pn-overrides infodir build-deps src-uri-bad \
             unknown-configure-option symlink-to-sysroot multilib \
             invalid-packageconfig host-user-contaminated uppercase-pn patch-fuzz \
             "
@@ -891,6 +891,17 @@ def package_qa_check_host_user(path, name, d, elf, messages):
             package_qa_add_message(messages, "host-user-contaminated", "%s: %s is owned by gid %d, which is the same as the user running bitbake. This may be due to host contamination" % (pn, rootfs_path, check_gid))
             return False
     return True
+
+QARECIPETEST[src-uri-bad] = "package_qa_check_src_uri"
+def package_qa_check_src_uri(pn, d, messages):
+    import re
+
+    if "${PN}" in d.getVar("SRC_URI", False):
+        package_qa_handle_error("src-uri-bad", "%s: SRC_URI uses PN not BPN" % pn, d)
+
+    pn = d.getVar("SRC_URI")
+    if re.search(r"github\.com/.+/.+/archive/.+", pn):
+        package_qa_handle_error("src-uri-bad", "%s: SRC_URI uses unstable GitHub archives" % pn, d)
 
 
 # The PACKAGE FUNC to scan each package

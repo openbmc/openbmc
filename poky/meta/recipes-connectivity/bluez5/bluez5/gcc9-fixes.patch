@@ -1,0 +1,301 @@
+Backported commit from upstream master branch (post 5.50 release), which
+resolves assertion failures in several unit tests.
+
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/patch/?id=0be5246170
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/unit/test-avctp.c b/unit/test-avctp.c
+index 3bc3569..24de663 100644
+--- a/unit/test-avctp.c
++++ b/unit/test-avctp.c
+@@ -43,7 +43,7 @@
+ 
+ struct test_pdu {
+ 	bool valid;
+-	const uint8_t *data;
++	uint8_t *data;
+ 	size_t size;
+ };
+ 
+@@ -66,7 +66,7 @@ struct context {
+ #define raw_pdu(args...)					\
+ 	{							\
+ 		.valid = true,					\
+-		.data = data(args),				\
++		.data = g_memdup(data(args), sizeof(data(args))), \
+ 		.size = sizeof(data(args)),			\
+ 	}
+ 
+@@ -91,6 +91,11 @@ static void test_debug(const char *str, void *user_data)
+ static void test_free(gconstpointer user_data)
+ {
+ 	const struct test_data *data = user_data;
++	struct test_pdu *pdu;
++	int i;
++
++	for (i = 0; (pdu = &data->pdu_list[i]) && pdu->valid; i++)
++		g_free(pdu->data);
+ 
+ 	g_free(data->test_name);
+ 	g_free(data->pdu_list);
+diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
+index dd8aed7..e2c951a 100644
+--- a/unit/test-avdtp.c
++++ b/unit/test-avdtp.c
+@@ -47,7 +47,7 @@
+ struct test_pdu {
+ 	bool valid;
+ 	bool fragmented;
+-	const uint8_t *data;
++	uint8_t *data;
+ 	size_t size;
+ };
+ 
+@@ -61,7 +61,7 @@ struct test_data {
+ #define raw_pdu(args...) \
+ 	{							\
+ 		.valid = true,					\
+-		.data = data(args),				\
++		.data = g_memdup(data(args), sizeof(data(args))), \
+ 		.size = sizeof(data(args)),			\
+ 	}
+ 
+@@ -69,7 +69,7 @@ struct test_data {
+ 	{							\
+ 		.valid = true,					\
+ 		.fragmented = true,				\
+-		.data = data(args),				\
++		.data = g_memdup(data(args), sizeof(data(args))), \
+ 		.size = sizeof(data(args)),			\
+ 	}
+ 
+@@ -81,7 +81,7 @@ struct test_data {
+ 		static struct test_data data;				\
+ 		data.test_name = g_strdup(name);			\
+ 		data.pdu_list = g_memdup(pdus, sizeof(pdus));		\
+-		tester_add(name, &data, NULL, function, NULL);		\
++		tester_add(name, &data, NULL, function, NULL);	\
+ 	} while (0)
+ 
+ struct context {
+@@ -109,6 +109,11 @@ static void test_debug(const char *str, void *user_data)
+ static void test_free(gconstpointer user_data)
+ {
+ 	const struct test_data *data = user_data;
++	struct test_pdu *pdu;
++	int i;
++
++	for (i = 0; (pdu = &data->pdu_list[i]) && pdu->valid; i++)
++		g_free(pdu->data);
+ 
+ 	g_free(data->test_name);
+ 	g_free(data->pdu_list);
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index 01307e6..f1aa353 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -49,7 +49,7 @@ struct test_pdu {
+ 	bool fragmented;
+ 	bool continuing;
+ 	bool browse;
+-	const uint8_t *data;
++	uint8_t *data;
+ 	size_t size;
+ };
+ 
+@@ -74,7 +74,7 @@ struct context {
+ #define raw_pdu(args...)					\
+ 	{							\
+ 		.valid = true,					\
+-		.data = data(args),				\
++		.data = g_memdup(data(args), sizeof(data(args))), \
+ 		.size = sizeof(data(args)),			\
+ 	}
+ 
+@@ -82,7 +82,7 @@ struct context {
+ 	{							\
+ 		.valid = true,					\
+ 		.browse = true,					\
+-		.data = data(args),				\
++		.data = g_memdup(data(args), sizeof(data(args))), \
+ 		.size = sizeof(data(args)),			\
+ 	}
+ 
+@@ -90,7 +90,7 @@ struct context {
+ 	{							\
+ 		.valid = true,					\
+ 		.fragmented = true,				\
+-		.data = data(args),				\
++		.data = g_memdup(data(args), sizeof(data(args))), \
+ 		.size = sizeof(data(args)),			\
+ 	}
+ 
+@@ -98,7 +98,7 @@ struct context {
+ 	{							\
+ 		.valid = true,					\
+ 		.continuing = true,				\
+-		.data = data(args),				\
++		.data = g_memdup(data(args), sizeof(data(args))), \
+ 		.size = sizeof(data(args)),			\
+ 	}
+ 
+@@ -123,6 +123,11 @@ static void test_debug(const char *str, void *user_data)
+ static void test_free(gconstpointer user_data)
+ {
+ 	const struct test_data *data = user_data;
++	struct test_pdu *pdu;
++	int i;
++
++	for (i = 0; (pdu = &data->pdu_list[i]) && pdu->valid; i++)
++		g_free(pdu->data);
+ 
+ 	g_free(data->test_name);
+ 	g_free(data->pdu_list);
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index c7e28f8..d49f7a0 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -48,7 +48,7 @@
+ 
+ struct test_pdu {
+ 	bool valid;
+-	const uint8_t *data;
++	uint8_t *data;
+ 	size_t size;
+ };
+ 
+@@ -86,7 +86,7 @@ struct context {
+ #define raw_pdu(args...)					\
+ 	{							\
+ 		.valid = true,					\
+-		.data = data(args),				\
++		.data = g_memdup(data(args), sizeof(data(args))), \
+ 		.size = sizeof(data(args)),			\
+ 	}
+ 
+@@ -306,6 +306,11 @@ static bt_uuid_t uuid_char_128 = {
+ static void test_free(gconstpointer user_data)
+ {
+ 	const struct test_data *data = user_data;
++	struct test_pdu *pdu;
++	int i;
++
++	for (i = 0; (pdu = &data->pdu_list[i]) && pdu->valid; i++)
++		g_free(pdu->data);
+ 
+ 	g_free(data->test_name);
+ 	g_free(data->pdu_list);
+@@ -1911,6 +1916,8 @@ static void test_server(gconstpointer data)
+ 	g_assert_cmpint(len, ==, pdu.size);
+ 
+ 	util_hexdump('<', pdu.data, len, test_debug, "GATT: ");
++
++	g_free(pdu.data);
+ }
+ 
+ static void test_search_primary(gconstpointer data)
+diff --git a/unit/test-hfp.c b/unit/test-hfp.c
+index f2b9622..890eee6 100644
+--- a/unit/test-hfp.c
++++ b/unit/test-hfp.c
+@@ -43,7 +43,7 @@ struct context {
+ 
+ struct test_pdu {
+ 	bool valid;
+-	const uint8_t *data;
++	uint8_t *data;
+ 	size_t size;
+ 	enum hfp_gw_cmd_type type;
+ 	bool fragmented;
+@@ -63,7 +63,7 @@ struct test_data {
+ #define raw_pdu(args...)					\
+ 	{							\
+ 		.valid = true,					\
+-		.data = data(args),				\
++		.data = g_memdup(data(args), sizeof(data(args))), \
+ 		.size = sizeof(data(args)),			\
+ 	}
+ 
+@@ -75,7 +75,7 @@ struct test_data {
+ #define type_pdu(cmd_type, args...)				\
+ 	{							\
+ 		.valid = true,					\
+-		.data = data(args),				\
++		.data = g_memdup(data(args), sizeof(data(args))), \
+ 		.size = sizeof(data(args)),			\
+ 		.type = cmd_type,				\
+ 	}
+@@ -83,7 +83,7 @@ struct test_data {
+ #define frg_pdu(args...)					\
+ 	{							\
+ 		.valid = true,					\
+-		.data = data(args),				\
++		.data = g_memdup(data(args), sizeof(data(args))), \
+ 		.size = sizeof(data(args)),			\
+ 		.fragmented = true,				\
+ 	}
+@@ -119,6 +119,11 @@ struct test_data {
+ static void test_free(gconstpointer user_data)
+ {
+ 	const struct test_data *data = user_data;
++	struct test_pdu *pdu;
++	int i;
++
++	for (i = 0; (pdu = &data->pdu_list[i]) && pdu->valid; i++)
++		g_free(pdu->data);
+ 
+ 	g_free(data->test_name);
+ 	g_free(data->pdu_list);
+diff --git a/unit/test-hog.c b/unit/test-hog.c
+index d117968..25bdb42 100644
+--- a/unit/test-hog.c
++++ b/unit/test-hog.c
+@@ -68,11 +68,11 @@ struct context {
+ 
+ #define data(args...) ((const unsigned char[]) { args })
+ 
+-#define raw_pdu(args...)    \
+-{      \
+-	.valid = true,		\
+-	.data = data(args), \
+-	.size = sizeof(data(args)),\
++#define raw_pdu(args...)					\
++{								\
++	.valid = true,						\
++	.data = g_memdup(data(args), sizeof(data(args))),	\
++	.size = sizeof(data(args)),				\
+ }
+ 
+ #define false_pdu()	\
+diff --git a/unit/test-sdp.c b/unit/test-sdp.c
+index ac921a9..c71ee1f 100644
+--- a/unit/test-sdp.c
++++ b/unit/test-sdp.c
+@@ -59,14 +59,14 @@ struct test_data {
+ #define raw_pdu(args...) \
+ 	{							\
+ 		.valid = true,					\
+-		.raw_data = raw_data(args),			\
++		.raw_data = g_memdup(raw_data(args), sizeof(raw_data(args))), \
+ 		.raw_size = sizeof(raw_data(args)),		\
+ 	}
+ 
+ #define raw_pdu_cont(cont, args...) \
+ 	{							\
+ 		.valid = true,					\
+-		.raw_data = raw_data(args),			\
++		.raw_data = g_memdup(raw_data(args), sizeof(raw_data(args))), \
+ 		.raw_size = sizeof(raw_data(args)),		\
+ 		.cont_len = cont,				\
+ 	}
+@@ -103,7 +103,7 @@ struct test_data_de {
+ #define define_test_de_attr(name, input, exp) \
+ 	do {								\
+ 		static struct test_data_de data;			\
+-		data.input_data = input;				\
++		data.input_data = g_memdup(input, sizeof(input));	\
+ 		data.input_size = sizeof(input);			\
+ 		data.expected = exp;					\
+ 		tester_add("/sdp/DE/ATTR/" name, &data,	NULL,		\

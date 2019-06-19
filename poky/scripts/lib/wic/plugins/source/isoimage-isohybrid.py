@@ -70,8 +70,10 @@ class IsoImagePlugin(SourcePlugin):
         syslinux_conf += "DEFAULT boot\n"
         syslinux_conf += "LABEL boot\n"
 
-        kernel = "/bzImage"
-        syslinux_conf += "KERNEL " + kernel + "\n"
+        kernel = get_bitbake_var("KERNEL_IMAGETYPE")
+        if not kernel:
+            kernel = "bzImage"
+        syslinux_conf += "KERNEL /" + kernel + "\n"
         syslinux_conf += "APPEND initrd=/initrd LABEL=boot %s\n" \
                              % bootloader.append
 
@@ -114,9 +116,11 @@ class IsoImagePlugin(SourcePlugin):
             grubefi_conf += "\n"
             grubefi_conf += "menuentry 'boot'{\n"
 
-            kernel = "/bzImage"
+            kernel = get_bitbake_var("KERNEL_IMAGETYPE")
+            if not kernel:
+                kernel = "bzImage"
 
-            grubefi_conf += "linux %s rootwait %s\n" \
+            grubefi_conf += "linux /%s rootwait %s\n" \
                             % (kernel, bootloader.append)
             grubefi_conf += "initrd /initrd \n"
             grubefi_conf += "}\n"
@@ -268,9 +272,12 @@ class IsoImagePlugin(SourcePlugin):
         if os.path.isfile("%s/initrd.cpio.gz" % cr_workdir):
             os.remove("%s/initrd.cpio.gz" % cr_workdir)
 
-        # Install bzImage
-        install_cmd = "install -m 0644 %s/bzImage %s/bzImage" % \
-                      (kernel_dir, isodir)
+        kernel = get_bitbake_var("KERNEL_IMAGETYPE")
+        if not kernel:
+            kernel = "bzImage"
+
+        install_cmd = "install -m 0644 %s/%s %s/%s" % \
+                      (kernel_dir, kernel, isodir, kernel)
         exec_cmd(install_cmd)
 
         #Create bootloader for efi boot

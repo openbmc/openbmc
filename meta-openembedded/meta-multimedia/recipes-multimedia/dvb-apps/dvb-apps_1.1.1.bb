@@ -7,7 +7,6 @@ SRCREV = "3d43b280298c39a67d1d889e01e173f52c12da35"
 SRC_URI = "hg://linuxtv.org/hg;module=dvb-apps;protocol=http \
           file://dvb-scan-table \
           file://0001-Fix-generate-keynames.patch \
-          file://0002-Fix-compiler-warning-flags.patch \
           file://0003-handle-static-shared-only-build.patch \
           file://0004-Makefile-remove-test.patch \
           file://0005-libucsi-optimization-removal.patch \

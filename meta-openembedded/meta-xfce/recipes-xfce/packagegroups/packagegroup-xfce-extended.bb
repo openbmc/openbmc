@@ -62,6 +62,7 @@ RRECOMMENDS_${PN} = " \
     thunar-archive-plugin \
     \
     xfce4-appfinder \
+    xfce4-screensaver \
     xfce4-screenshooter \
     xfce4-power-manager \
     ristretto \

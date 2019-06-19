@@ -1,4 +1,4 @@
-From 1481c6d5f08f9dbbe10abc87b372a1f61db36476 Mon Sep 17 00:00:00 2001
+From 23cd157352ac8a53f992ddc6d6d01caadf1c79bc Mon Sep 17 00:00:00 2001
 From: Jussi Kukkonen <jussi.kukkonen@intel.com>
 Date: Mon, 9 Nov 2015 11:07:27 +0200
 Subject: [PATCH] Enable more tests while cross-compiling
@@ -9,54 +9,16 @@ case we can depend on glib-2.0-native.
 
 Upstream-Status: Inappropriate [OE specific]
 Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
----
- gio/tests/Makefile.am     | 10 ++++++----
- gio/tests/meson.build     | 15 ++++++++-------
- tests/gobject/Makefile.am |  6 ++++++
- 3 files changed, 20 insertions(+), 11 deletions(-)
 
-diff --git a/gio/tests/Makefile.am b/gio/tests/Makefile.am
-index c4e7a92..633e85c 100644
---- a/gio/tests/Makefile.am
-+++ b/gio/tests/Makefile.am
-@@ -583,10 +583,9 @@ test_programs += \
- endif
- 
- # -----------------------------------------------------------------------------
--#  The resources test is a bit more complicated, and we cannot build it when
--#  cross-compiling GIO because it requires running a binary...
-+#  The resources test is a bit more complicated, and requires glib-native
-+#  for running a binary
- 
--if !CROSS_COMPILING
- test_programs += resources
- resources_SOURCES = resources.c
- nodist_resources_SOURCES = test_resources.c test_resources2.c test_resources2.h
-@@ -611,7 +610,11 @@ if !ENABLE_INSTALLED_TESTS
- libresourceplugin_la_LDFLAGS += -rpath /
- endif
- 
-+if !CROSS_COMPILING
- glib_compile_resources=$(top_builddir)/gio/glib-compile-resources
-+else
-+glib_compile_resources=glib-compile-resources
-+endif
- 
- test-generated.txt: test1.txt
- 	$(AM_V_GEN) echo "Generated" > $@ && \
-@@ -632,7 +635,6 @@ test.gresource: test.gresource.xml Makefile $(shell $(glib_compile_resources) --
- 
- EXTRA_DIST += test.gresource.xml test1.txt test2.gresource.xml test2.txt test3.gresource.xml test3.txt test4.gresource.xml
- CLEANFILES += test-generated.txt test_resources.c test_resources2.[ch] plugin_resources.c test.gresource
--endif # !CROSS_COMPILING
- 
- BUILT_SOURCES += giotypefuncs.inc
- 
+---
+ gio/tests/meson.build | 26 ++++++++++++++------------
+ 1 file changed, 14 insertions(+), 12 deletions(-)
+
 diff --git a/gio/tests/meson.build b/gio/tests/meson.build
-index dca33bd..181f5c7 100644
+index 65f43e2..028b196 100644
 --- a/gio/tests/meson.build
 +++ b/gio/tests/meson.build
-@@ -173,7 +173,7 @@ if host_machine.system() != 'windows'
+@@ -185,7 +185,7 @@ if host_machine.system() != 'windows'
  
    #  Test programs that need to bring up a session bus (requires dbus-daemon)
    have_dbus_daemon = find_program('dbus-daemon', required : false).found()
@@ -65,8 +27,8 @@ index dca33bd..181f5c7 100644
      annotate_args = [
        '--annotate', 'org.project.Bar', 'Key1', 'Value1',
        '--annotate', 'org.project.Bar', 'org.gtk.GDBus.Internal', 'Value2',
-@@ -406,12 +406,13 @@ if installed_tests_enabled
-   install_subdir('cert-tests', install_dir : installed_tests_execdir)
+@@ -453,12 +453,13 @@ if installed_tests_enabled
+   install_data('static-link.py', install_dir : installed_tests_execdir)
  endif
  
 -if not meson.is_cross_build() or meson.has_exe_wrapper()
@@ -81,7 +43,7 @@ index dca33bd..181f5c7 100644
                 '--target=@OUTPUT@',
                 '--sourcedir=' + meson.current_source_dir(),
                 '--generate-source',
-@@ -428,7 +429,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
+@@ -482,7 +483,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
    test_gresource = custom_target('test.gresource',
      input : 'test.gresource.xml',
      output : 'test.gresource',
@@ -90,7 +52,7 @@ index dca33bd..181f5c7 100644
                 '--target=@OUTPUT@',
                 '--sourcedir=' + meson.current_source_dir(),
                 '--sourcedir=' + meson.current_build_dir(),
-@@ -439,7 +440,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
+@@ -493,7 +494,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
    test_resources2_c = custom_target('test_resources2.c',
      input : 'test3.gresource.xml',
      output : 'test_resources2.c',
@@ -99,7 +61,7 @@ index dca33bd..181f5c7 100644
                 '--target=@OUTPUT@',
                 '--sourcedir=' + meson.current_source_dir(),
                 '--generate',
-@@ -450,7 +451,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
+@@ -504,7 +505,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
    test_resources2_h = custom_target('test_resources2.h',
      input : 'test3.gresource.xml',
      output : 'test_resources2.h',
@@ -108,30 +70,54 @@ index dca33bd..181f5c7 100644
                 '--target=@OUTPUT@',
                 '--sourcedir=' + meson.current_source_dir(),
                 '--generate',
-@@ -461,7 +462,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
-   test_resources_c = custom_target('test_resources.c',
+@@ -516,7 +517,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
      input : 'test2.gresource.xml',
+     depends : big_test_resource,
      output : 'test_resources.c',
 -    command : [glib_compile_resources,
 +    command : ['glib-compile-resources',
                 '--target=@OUTPUT@',
                 '--sourcedir=' + meson.current_source_dir(),
-                '--generate-source',
-diff --git a/tests/gobject/Makefile.am b/tests/gobject/Makefile.am
-index 1bcefbe..77e646a 100644
---- a/tests/gobject/Makefile.am
-+++ b/tests/gobject/Makefile.am
-@@ -51,7 +51,13 @@ if ENABLE_TIMELOOP
- installed_test_programs += timeloop-closure
- endif
- 
-+# The marshal test requires running a binary, which means we require
-+# glib-native when cross-compiling
-+if !CROSS_COMPILING
- glib_genmarshal=$(top_builddir)/gobject/glib-genmarshal
-+else
-+glib_genmarshal=$(shell which glib-genmarshal)
-+endif
- 
- testmarshal.h: stamp-testmarshal.h
- 	@true
+                '--sourcedir=' + meson.current_build_dir(),
+@@ -527,7 +528,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
+   digit_test_resources_c = custom_target('digit_test_resources.c',
+     input : '111_digit_test.gresource.xml',
+     output : 'digit_test_resources.c',
+-    command : [glib_compile_resources,
++    command : ['glib-compile-resources',
+                '--target=@OUTPUT@',
+                '--sourcedir=' + meson.current_source_dir(),
+                '--sourcedir=' + meson.current_build_dir(),
+@@ -538,7 +539,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
+   digit_test_resources_h = custom_target('digit_test_resources.h',
+     input : '111_digit_test.gresource.xml',
+     output : 'digit_test_resources.h',
+-    command : [glib_compile_resources,
++    command : ['glib-compile-resources',
+                '--target=@OUTPUT@',
+                '--sourcedir=' + meson.current_source_dir(),
+                '--generate',
+@@ -565,11 +566,12 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
+   # Support for --add-symbol was added to LLVM objcopy in 2019
+   # (https://reviews.llvm.org/D58234). FIXME: This test could be enabled for
+   # LLVM once that support is in a stable release.
+-  if build_machine.system() == 'linux' and cc.get_id() == 'gcc'
++  #if build_machine.system() == 'linux' and cc.get_id() == 'gcc'
++  if not meson.is_cross_build()
+     test_gresource_binary = custom_target('test5.gresource',
+       input : 'test5.gresource.xml',
+       output : 'test5.gresource',
+-      command : [glib_compile_resources,
++      command : ['glib-compile-resources',
+                  '--target=@OUTPUT@',
+                  '--sourcedir=' + meson.current_source_dir(),
+                  '--sourcedir=' + meson.current_build_dir(),
+@@ -581,7 +583,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
+     test_resources_binary_c = custom_target('test_resources_binary.c',
+       input : 'test5.gresource.xml',
+       output : 'test_resources_binary.c',
+-      command : [glib_compile_resources,
++      command : ['glib-compile-resources',
+                  '--target=@OUTPUT@',
+                  '--sourcedir=' + meson.current_source_dir(),
+                  '--sourcedir=' + meson.current_build_dir(),

@@ -24,6 +24,6 @@ S = "${WORKDIR}/${CPAN_NAME}-${PV}"
 
 inherit cpan ptest-perl
 
-RDEPENDS_${PN}-ptest += "perl-module-test-more"
+RDEPENDS_${PN}-ptest += "perl-module-test-more perl-module-ipc-open3 perl-module-lib perl-module-version"
 
 BBCLASSEXTEND = "native"

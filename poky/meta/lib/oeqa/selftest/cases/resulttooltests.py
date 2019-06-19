@@ -56,7 +56,7 @@ class ResultToolTests(OESelftestTestCase):
                                   'test4': {'status': 'ERROR'},
                                   'test5': {'status': 'SKIPPED'}}}
         report = ResultsTextReport()
-        result_report = report.get_aggregated_test_result(None, result_data)
+        result_report = report.get_aggregated_test_result(None, result_data, 'DummyMachine')
         self.assertTrue(result_report['passed'] == 2, msg="Passed count not correct:%s" % result_report['passed'])
         self.assertTrue(result_report['failed'] == 2, msg="Failed count not correct:%s" % result_report['failed'])
         self.assertTrue(result_report['skipped'] == 1, msg="Skipped count not correct:%s" % result_report['skipped'])

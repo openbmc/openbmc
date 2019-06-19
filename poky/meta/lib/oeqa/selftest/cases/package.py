@@ -7,6 +7,7 @@ from oeqa.utils.commands import bitbake, get_bb_vars, get_bb_var, runqemu
 import stat
 import subprocess, os
 import oe.path
+import re
 
 class VersionOrdering(OESelftestTestCase):
     # version1, version2, sort order
@@ -134,7 +135,7 @@ class PackageTests(OESelftestTestCase):
                     return False
 
                 # Check debugging symbols works correctly
-                elif "Breakpoint 1, main () at hello.c:4" in l:
+                elif re.match("Breakpoint 1.*hello\.c.*4", l):
                     return True
 
             self.logger.error("GDB result:\n%d: %s", status, output)

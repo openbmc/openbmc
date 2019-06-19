@@ -237,7 +237,7 @@ def virtualfn2realfn(virtualfn):
     Convert a virtual file name to a real one + the associated subclass keyword
     """
     mc = ""
-    if virtualfn.startswith('multiconfig:'):
+    if virtualfn.startswith('mc:'):
         elems = virtualfn.split(':')
         mc = elems[1]
         virtualfn = ":".join(elems[2:])
@@ -258,7 +258,7 @@ def realfn2virtual(realfn, cls, mc):
     if cls:
         realfn = "virtual:" + cls + ":" + realfn
     if mc:
-        realfn = "multiconfig:" + mc + ":" + realfn
+        realfn = "mc:" + mc + ":" + realfn
     return realfn
 
 def variant2virtual(realfn, variant):
@@ -267,11 +267,11 @@ def variant2virtual(realfn, variant):
     """
     if variant == "":
         return realfn
-    if variant.startswith("multiconfig:"):
+    if variant.startswith("mc:"):
         elems = variant.split(":")
         if elems[2]:
-            return "multiconfig:" + elems[1] + ":virtual:" + ":".join(elems[2:]) + ":" + realfn
-        return "multiconfig:" + elems[1] + ":" + realfn
+            return "mc:" + elems[1] + ":virtual:" + ":".join(elems[2:]) + ":" + realfn
+        return "mc:" + elems[1] + ":" + realfn
     return "virtual:" + variant + ":" + realfn
 
 def parse_recipe(bb_data, bbfile, appends, mc=''):
@@ -349,7 +349,7 @@ class NoCache(object):
             bb_data = self.databuilder.mcdata[mc].createCopy()
             newstores = parse_recipe(bb_data, bbfile, appends, mc)
             for ns in newstores:
-                datastores["multiconfig:%s:%s" % (mc, ns)] = newstores[ns]
+                datastores["mc:%s:%s" % (mc, ns)] = newstores[ns]
 
         return datastores
 

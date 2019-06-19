@@ -10,6 +10,7 @@ LICENSE = "GPLv3+"
 DEPENDS = "zlib"
 
 SRC_URI = "https://github.com/ccache/ccache/releases/download/v${PV}/${BP}.tar.gz"
+UPSTREAM_CHECK_URI = "https://github.com/ccache/ccache/releases/"
 
 inherit autotools
 

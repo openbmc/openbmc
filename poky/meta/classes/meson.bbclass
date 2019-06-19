@@ -56,6 +56,8 @@ def meson_cpu_family(var, d):
         return 'ppc64'
     elif arch == 'armeb':
         return 'arm'
+    elif arch == 'aarch64_be':
+        return 'aarch64'
     elif arch == 'mipsel':
         return 'mips'
     elif arch == 'mips64el':

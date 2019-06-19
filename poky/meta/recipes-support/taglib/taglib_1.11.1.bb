@@ -1,7 +1,7 @@
 SUMMARY = "Library for reading and editing the meta-data of popular audio formats"
 SECTION = "libs/multimedia"
 HOMEPAGE = "http://taglib.github.io/"
-LICENSE = "LGPLv2.1 | MPL-1"
+LICENSE = "LGPLv2.1 | MPL-1.1"
 LIC_FILES_CHKSUM = "file://COPYING.LGPL;md5=4fbd65380cdd255951079008b364516c \
                     file://COPYING.MPL;md5=bfe1f75d606912a4111c90743d6c7325 \
                     file://taglib/audioproperties.h;beginline=1;endline=24;md5=9df2c7399519b7310568a7c55042ecee"

@@ -15,21 +15,27 @@ class LocalSigner(object):
     def __init__(self, d):
         self.gpg_bin = d.getVar('GPG_BIN') or \
                   bb.utils.which(os.getenv('PATH'), 'gpg')
-        self.gpg_path = d.getVar('GPG_PATH')
-        self.gpg_version = self.get_gpg_version()
-        self.rpm_bin = bb.utils.which(os.getenv('PATH'), "rpmsign")
+        self.gpg_cmd = [self.gpg_bin]
         self.gpg_agent_bin = bb.utils.which(os.getenv('PATH'), "gpg-agent")
+        # Without this we see "Cannot allocate memory" errors when running processes in parallel
+        # It needs to be set for any gpg command since any agent launched can stick around in memory
+        # and this parameter must be set.
+        if self.gpg_agent_bin:
+            self.gpg_cmd += ["--agent-program=%s|--auto-expand-secmem" % (self.gpg_agent_bin)]
+        self.gpg_path = d.getVar('GPG_PATH')
+        self.rpm_bin = bb.utils.which(os.getenv('PATH'), "rpmsign")
+        self.gpg_version = self.get_gpg_version()
+
 
     def export_pubkey(self, output_file, keyid, armor=True):
         """Export GPG public key to a file"""
-        cmd = '%s --no-permission-warning --batch --yes --export -o %s ' % \
-                (self.gpg_bin, output_file)
+        cmd = self.gpg_cmd + ["--no-permission-warning", "--batch", "--yes", "--export", "-o", output_file]
         if self.gpg_path:
-            cmd += "--homedir %s " % self.gpg_path
+            cmd += ["--homedir", self.gpg_path]
         if armor:
-            cmd += "--armor "
-        cmd += keyid
-        subprocess.check_output(shlex.split(cmd), stderr=subprocess.STDOUT)
+            cmd += ["--armor"]
+        cmd += [keyid]
+        subprocess.check_output(cmd, stderr=subprocess.STDOUT)
 
     def sign_rpms(self, files, keyid, passphrase, digest, sign_chunk, fsk=None, fsk_password=None):
         """Sign RPM files"""
@@ -59,7 +65,7 @@ class LocalSigner(object):
         if passphrase_file and passphrase:
             raise Exception("You should use either passphrase_file of passphrase, not both")
 
-        cmd = [self.gpg_bin, '--detach-sign', '--no-permission-warning', '--batch',
+        cmd = self.gpg_cmd + ['--detach-sign', '--no-permission-warning', '--batch',
                '--no-tty', '--yes', '--passphrase-fd', '0', '-u', keyid]
 
         if self.gpg_path:
@@ -71,9 +77,6 @@ class LocalSigner(object):
         #gpg < 2.1 errors out if given unknown parameters
         if self.gpg_version > (2,1,):
             cmd += ['--pinentry-mode', 'loopback']
-
-        if self.gpg_agent_bin:
-            cmd += ["--agent-program=%s|--auto-expand-secmem" % (self.gpg_agent_bin)]
 
         cmd += [input_file]
 
@@ -101,7 +104,8 @@ class LocalSigner(object):
     def get_gpg_version(self):
         """Return the gpg version as a tuple of ints"""
         try:
-            ver_str = subprocess.check_output((self.gpg_bin, "--version", "--no-permission-warning")).split()[2].decode("utf-8")
+            cmd = self.gpg_cmd + ["--version", "--no-permission-warning"]
+            ver_str = subprocess.check_output(cmd).split()[2].decode("utf-8")
             return tuple([int(i) for i in ver_str.split("-")[0].split('.')])
         except subprocess.CalledProcessError as e:
             raise bb.build.FuncFailed("Could not get gpg version: %s" % e)
@@ -109,11 +113,12 @@ class LocalSigner(object):
 
     def verify(self, sig_file):
         """Verify signature"""
-        cmd = self.gpg_bin + " --verify --no-permission-warning "
+        cmd = self.gpg_cmd + [" --verify", "--no-permission-warning"]
         if self.gpg_path:
-            cmd += "--homedir %s " % self.gpg_path
-        cmd += sig_file
-        status = subprocess.call(shlex.split(cmd))
+            cmd += ["--homedir", self.gpg_path]
+
+        cmd += [sig_file]
+        status = subprocess.call(cmd)
         ret = False if status else True
         return ret
 

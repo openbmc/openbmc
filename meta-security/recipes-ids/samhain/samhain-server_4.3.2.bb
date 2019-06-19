@@ -18,3 +18,4 @@ do_install_append() {
 }
 
 RDEPENDS_${PN} += "gmp bash perl"
+RCONFLICTS_${PN} = "samhain-standalone"

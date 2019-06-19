@@ -1,0 +1,29 @@
+From 38146a5d803a1fb9b10f011aa857872b6f20cd02 Mon Sep 17 00:00:00 2001
+From: Tongliang Liao <xkszltl@gmail.com>
+Date: Mon, 29 Apr 2019 03:51:51 -0700
+Subject: [PATCH] CMake has stock FindZLIB in upper case. More details in
+ https://cmake.org/cmake/help/v3.14/module/FindZLIB.html
+
+
+Upstream-Status: Backport https://github.com/facebook/rocksdb/pull/5261
+
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 40cdd26bb..355686566 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -92,7 +92,7 @@ else()
+   endif()
+
+   if(WITH_ZLIB)
+-    find_package(zlib REQUIRED)
++    find_package(ZLIB REQUIRED)
+     add_definitions(-DZLIB)
+     if(ZLIB_INCLUDE_DIRS)
+       # CMake 3
+--
+2.11.0
+

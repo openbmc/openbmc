@@ -17,7 +17,7 @@ Index: gst-libav-1.10.1/gst-libs/ext/libav/configure
 ===================================================================
 --- gst-libav-1.10.1.orig/gst-libs/ext/libav/configure
 +++ gst-libav-1.10.1/gst-libs/ext/libav/configure
-@@ -5269,12 +5269,9 @@ elif enabled mips; then
+@@ -5650,12 +5650,9 @@ elif enabled mips; then
  
      # Enable minimum ISA based on selected options
      if enabled mips64; then

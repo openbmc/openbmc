@@ -19,16 +19,6 @@ RDEPENDS_${PN}-dev += "bash"
 
 BBCLASSEXTEND = "native nativesdk"
 
-# for x86 ends with textrel in ${PN}
-# http://errors.yoctoproject.org/Errors/Details/185630/
-# ERROR: QA Issue: ELF binary '/work/i586-oe-linux/go-dep/0.4.1-r0/packages-split/go-dep/usr/bin/dep' has relocations in .text [textrel]
-INSANE_SKIP_${PN} += "textrel"
-
-# for aarch64 ends with textrel in ${PN}-ptest
-# http://errors.yoctoproject.org/Errors/Details/185632/
-# ERROR: QA Issue: ELF binary '/work/aarch64-oe-linux/go-dep/0.4.1-r0/packages-split/go-dep-ptest/usr/lib/go-dep/ptest/github.com/golang/dep/cmd/dep/dep.test' has relocations in .text [textrel]  
-INSANE_SKIP_${PN}-ptest += "textrel"
-
 # For compiling ptest on mips and mips64, the current go-dep version fails with the go 1.11 toolchain.
 # error message: vet config not found
 PTEST_ENABLED_mips = "0"

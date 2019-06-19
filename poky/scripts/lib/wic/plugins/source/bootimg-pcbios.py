@@ -149,8 +149,12 @@ class BootimgPcbiosPlugin(SourcePlugin):
 
         hdddir = "%s/hdd/boot" % cr_workdir
 
-        cmds = ("install -m 0644 %s/bzImage %s/vmlinuz" %
-                (staging_kernel_dir, hdddir),
+        kernel = get_bitbake_var("KERNEL_IMAGETYPE")
+        if not kernel:
+            kernel = "bzImage"
+
+        cmds = ("install -m 0644 %s/%s %s/vmlinuz" %
+                (staging_kernel_dir, kernel, hdddir),
                 "install -m 444 %s/syslinux/ldlinux.sys %s/ldlinux.sys" %
                 (bootimg_dir, hdddir),
                 "install -m 0644 %s/syslinux/vesamenu.c32 %s/vesamenu.c32" %

@@ -22,7 +22,7 @@ Index: gst-plugins-bad-1.12.3/configure.ac
 ===================================================================
 --- gst-plugins-bad-1.12.3.orig/configure.ac
 +++ gst-plugins-bad-1.12.3/configure.ac
-@@ -2139,6 +2139,15 @@ AG_GST_CHECK_FEATURE(CHROMAPRINT, [chrom
+@@ -1202,6 +1202,15 @@ AG_GST_CHECK_FEATURE(CHROMAPRINT, [chrom
  ])
  
  dnl *** Curl ***
@@ -38,7 +38,7 @@ Index: gst-plugins-bad-1.12.3/configure.ac
  translit(dnm, m, l) AM_CONDITIONAL(USE_CURL, true)
  AG_GST_CHECK_FEATURE(CURL, [Curl plugin], curl, [
    PKG_CHECK_MODULES(CURL, libcurl >= 7.35.0, [
-@@ -2161,12 +2170,14 @@ AG_GST_CHECK_FEATURE(CURL, [Curl plugin]
+@@ -1224,12 +1233,14 @@ AG_GST_CHECK_FEATURE(CURL, [Curl plugin]
    ])
    AC_SUBST(CURL_CFLAGS)
    AC_SUBST(CURL_LIBS)

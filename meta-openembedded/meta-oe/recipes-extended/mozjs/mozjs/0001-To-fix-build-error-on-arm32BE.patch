@@ -7,13 +7,13 @@ error: #error Target architecture was not detected as supported by Double-Conver
 
 Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
 ---
- mfbt/double-conversion/utils.h | 2 +-
+ mfbt/double-conversion/double-conversion/utils.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/mfbt/double-conversion/utils.h b/mfbt/double-conversion/utils.h
+diff --git a/mfbt/double-conversion/double-conversion/utils.h b/mfbt/double-conversion/double-conversion/utils.h
 index 4f37218..93575cb 100644
---- a/mfbt/double-conversion/utils.h
-+++ b/mfbt/double-conversion/utils.h
+--- a/mfbt/double-conversion/double-conversion/utils.h
++++ b/mfbt/double-conversion/double-conversion/utils.h
 @@ -53,7 +53,7 @@
  // disabled.)
  // On Linux,x86 89255e-22 != Div_double(89255.0/1e22)

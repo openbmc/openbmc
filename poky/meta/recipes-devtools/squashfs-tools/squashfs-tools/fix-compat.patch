@@ -1,39 +1,8 @@
-Define FNM_EXTMATCH if not defined its glibc specific define
 include missing sys/stat.h for stat* function declarations
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
-Index: squashfs-tools/action.c
-===================================================================
---- squashfs-tools.orig/action.c
-+++ squashfs-tools/action.c
-@@ -44,6 +44,10 @@
- #include "action.h"
- #include "error.h"
- 
-+#if !defined(FNM_EXTMATCH)
-+#define FNM_EXTMATCH 0
-+#endif
-+
- /*
-  * code to parse actions
-  */
-Index: squashfs-tools/mksquashfs.c
-===================================================================
---- squashfs-tools.orig/mksquashfs.c
-+++ squashfs-tools/mksquashfs.c
-@@ -1261,6 +1261,10 @@ void write_dir(squashfs_inode *inode, st
- 		dir_size + 3, directory_block, directory_offset, NULL, NULL,
- 		dir, 0);
- 
-+#if !defined(FNM_EXTMATCH)
-+#define FNM_EXTMATCH 0
-+#endif
-+
- #ifdef SQUASHFS_TRACE
- 	{
- 		unsigned char *dirp;
 Index: squashfs-tools/pseudo.c
 ===================================================================
 --- squashfs-tools.orig/pseudo.c
@@ -46,18 +15,3 @@ Index: squashfs-tools/pseudo.c
  #include <ctype.h>
  
  #include "pseudo.h"
-Index: squashfs-tools/unsquashfs.c
-===================================================================
---- squashfs-tools.orig/unsquashfs.c
-+++ squashfs-tools/unsquashfs.c
-@@ -42,6 +42,10 @@
- #include <sys/sysmacros.h>
- #endif
- 
-+#ifndef FNM_EXTMATCH
-+#define FNM_EXTMATCH 0
-+#endif
-+
- struct cache *fragment_cache, *data_cache;
- struct queue *to_reader, *to_inflate, *to_writer, *from_writer;
- pthread_t *thread, *inflator_thread;

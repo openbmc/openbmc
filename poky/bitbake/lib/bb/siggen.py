@@ -179,7 +179,7 @@ class SignatureGeneratorBasic(SignatureGenerator):
     def get_taskhash(self, fn, task, deps, dataCache):
 
         mc = ''
-        if fn.startswith('multiconfig:'):
+        if fn.startswith('mc:'):
             mc = fn.split(':')[1]
         k = fn + "." + task
 
@@ -194,7 +194,7 @@ class SignatureGeneratorBasic(SignatureGenerator):
                 depmc = pkgname.split(':')[1]
                 if mc != depmc:
                     continue
-            if dep.startswith("multiconfig:") and not mc:
+            if dep.startswith("mc:") and not mc:
                 continue
             depname = dataCache.pkg_fn[pkgname]
             if not self.rundep_check(fn, recipename, task, dep, depname, dataCache):
@@ -412,13 +412,13 @@ def list_inline_diff(oldlist, newlist, colors=None):
 
 def clean_basepath(a):
     mc = None
-    if a.startswith("multiconfig:"):
+    if a.startswith("mc:"):
         _, mc, a = a.split(":", 2)
     b = a.rsplit("/", 2)[1] + '/' + a.rsplit("/", 2)[2]
     if a.startswith("virtual:"):
         b = b + ":" + a.rsplit(":", 1)[0]
     if mc:
-        b = b + ":multiconfig:" + mc
+        b = b + ":mc:" + mc
     return b
 
 def clean_basepaths(a):

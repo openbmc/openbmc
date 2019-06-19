@@ -18,14 +18,14 @@ PR = "r7"
 
 S = "${WORKDIR}/${BPN}-${BPN}-${PV}"
 
-UPSTREAM_CHECK_URI = "https://github.com/fedora-sysv/${BPN}/releases"
-
-SRC_URI = "https://github.com/fedora-sysv/chkconfig/archive/chkconfig-${PV}.tar.gz \
+SRC_URI = "git://github.com/fedora-sysv/chkconfig.git \
            file://replace_caddr_t.patch \
           "
 
-SRC_URI[md5sum] = "3f51ac38a234be5278b3a2d9705eda5e"
-SRC_URI[sha256sum] = "bf1e81f0d7cc999b536c9fe7877abf584a4082fd03c9d2597b6f090966579b40"
+SRCREV = "3e0b3909ff6328d232b27b9c32f1a9309c6cd0a4"
+UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+(\.\d+)+)"
+
+S = "${WORKDIR}/git"
 
 inherit gettext
 

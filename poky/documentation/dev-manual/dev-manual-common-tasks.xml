@@ -4197,11 +4197,27 @@
             built by layer recipes.
             It is recommended to keep recipes up-to-date with upstream
             version releases.
+        </para>
+
+        <para>
+            While several methods exist that allow you upgrade a recipe,
+            you might consider checking on the upgrade status of a recipe
+            first.
+            You can do so using the
+            <filename>devtool check-upgrade-status</filename> command.
+            See the
+            "<ulink url='&YOCTO_DOCS_REF_URL;#devtool-checking-on-the-upgrade-status-of-a-recipe'>Checking on the Upgrade Status of a Recipe</ulink>"
+            section in the Yocto Project Reference Manual for more information.
+        </para>
+
+        <para>
+            The remainder of this section describes three ways you can
+            upgrade a recipe.
             You can use the Automated Upgrade Helper (AUH) to set up
             automatic version upgrades.
             Alternatively, you can use <filename>devtool upgrade</filename>
             to set up semi-automatic version upgrades.
-            Finally, you can even manually upgrade a recipe by editing the
+            Finally, you can manually upgrade a recipe by editing the
             recipe itself.
         </para>
 
@@ -4319,12 +4335,6 @@
                         directory you just created for AUH.
                         Make these following configurations:
                         <itemizedlist>
-                            <listitem><para>
-                                Enable "distrodata" as follows:
-                                <literallayout class='monospaced'>
-     INHERIT =+ "distrodata"
-                                </literallayout>
-                                </para></listitem>
                             <listitem><para>
                                 If you want to enable
                                 <ulink url='&YOCTO_DOCS_DEV_URL;#maintaining-build-output-quality'>Build History</ulink>,
@@ -8964,10 +8974,16 @@
                     <link linkend='handling-optional-module-packaging'>Handling optional module packaging</link>
                     </para></listitem>
                 <listitem><para>
-                    <link linkend='using-runtime-package-management'>Using Runtime Package Management</link>
+                    <link linkend='using-runtime-package-management'>Using runtime package management</link>
+                    </para></listitem>
+                <listitem><para>
+                    <link linkend='generating-and-using-signed-packages'>Generating and using signed packages</link>
                     </para></listitem>
                 <listitem><para>
                     <link linkend='testing-packages-with-ptest'>Setting up and running package test (ptest)</link>
+                    </para></listitem>
+                <listitem><para>
+                    <link linkend='creating-node-package-manager-npm-packages'>Creating node package manager (NPM) packages</link>
                     </para></listitem>
             </itemizedlist>
         </para>
@@ -10397,6 +10413,292 @@
                 </para>
             </section>
         </section>
+
+        <section id='creating-node-package-manager-npm-packages'>
+            <title>Creating Node Package Manager (NPM) Packages</title>
+
+            <para>
+                <ulink url='https://en.wikipedia.org/wiki/Npm_(software)'>NPM</ulink>
+                is a package manager for the JavaScript programming
+                language.
+                The Yocto Project supports the NPM
+                <ulink url='&YOCTO_DOCS_BB_URL;#bb-fetchers'>fetcher</ulink>.
+                You can use this fetcher in combination with
+                <ulink url='&YOCTO_DOCS_REF_URL;#ref-devtool-reference'><filename>devtool</filename></ulink>
+                to create recipes that produce NPM packages.
+            </para>
+
+            <para>
+                Two workflows exist that allow you to create NPM packages
+                using <filename>devtool</filename>: the NPM registry modules
+                method and the NPM project code method.
+                <note>
+                    While it is possible to create NPM recipes manually,
+                    using <filename>devtool</filename> is far simpler.
+                </note>
+                Additionally, some requirements and caveats exist.
+            </para>
+
+            <section id='npm-package-creation-requirements'>
+                <title>Requirements and Caveats</title>
+
+                <para>
+                    You need to be aware of the following before using
+                    <filename>devtool</filename> to create NPM packages:
+                    <itemizedlist>
+                        <listitem><para>
+                            Of the two methods that you can use
+                            <filename>devtool</filename> to create NPM
+                            packages, the registry approach is slightly
+                            simpler.
+                            However, you might consider the project
+                            approach because you do not have to publish
+                            your module in the NPM registry
+                            (<ulink url='https://docs.npmjs.com/misc/registry'><filename>npm-registry</filename></ulink>),
+                            which is NPM's public registry.
+                            </para></listitem>
+                        <listitem><para>
+                            Be familiar with
+                            <ulink url='&YOCTO_DOCS_REF_URL;#ref-devtool-reference'><filename>devtool</filename></ulink>.
+                            </para></listitem>
+                        <listitem><para>
+                            The NPM host tools need the native
+                            <filename>nodejs-npm</filename> package, which
+                            is part of the OpenEmbedded environment.
+                            You need to get the package by cloning the
+                            <ulink url='https://github.com/openembedded/meta-openembedded'></ulink>
+                            repository out of GitHub.
+                            Be sure to add the path to your local copy to
+                            your <filename>bblayers.conf</filename> file.
+                            </para></listitem>
+                        <listitem><para>
+                            <filename>devtool</filename> cannot detect
+                            native libraries in module dependencies.
+                            Consequently, you must manually add packages
+                            to your recipe.
+                            </para></listitem>
+                        <listitem><para>
+                            While deploying NPM packages,
+                            <filename>devtool</filename> cannot determine
+                            which dependent packages are missing on the
+                            target (e.g. the node runtime
+                            <filename>nodejs</filename>).
+                            Consequently, you need to find out what
+                            files are missing and be sure they are on the
+                            target.
+                            </para></listitem>
+                        <listitem><para>
+                            Although you might not need NPM to run your
+                            node package, it is useful to have NPM on your
+                            target.
+                            The NPM package name is
+                            <filename>nodejs-npm</filename>.
+                            </para></listitem>
+                    </itemizedlist>
+                </para>
+            </section>
+
+            <section id='npm-using-the-registry-modules-method'>
+                <title>Using the Registry Modules Method</title>
+
+                <para>
+                    This section presents an example that uses the
+                    <filename>cute-files</filename> module, which is a
+                    file browser web application.
+                    <note>
+                        You must know the <filename>cute-files</filename>
+                        module version.
+                    </note>
+                </para>
+
+                <para>
+                    The first thing you need to do is use
+                    <filename>devtool</filename> and the NPM fetcher to
+                    create the recipe:
+                    <literallayout class='monospaced'>
+     $ devtool add "npm://registry.npmjs.org;name=cute-files;version=1.0.2"
+                    </literallayout>
+                    The <filename>devtool add</filename> command runs
+                    <filename>recipetool create</filename> and uses the
+                    same fetch URI to download each dependency and capture
+                    license details where possible.
+                    The result is a generated recipe.
+                </para>
+
+                <para>
+                    The recipe file is fairly simple and contains every
+                    license that <filename>recipetool</filename> finds
+                    and includes the licenses in the recipe's
+                    <ulink url='&YOCTO_DOCS_REF_URL;#var-LIC_FILES_CHKSUM'><filename>LIC_FILES_CHKSUM</filename></ulink>
+                    variables.
+                    You need to examine the variables and look for those
+                    with "unknown" in the
+                    <ulink url='&YOCTO_DOCS_REF_URL;#var-LICENSE'><filename>LICENSE</filename></ulink>
+                    field.
+                    You need to track down the license information for
+                    "unknown" modules and manually add the information to the
+                    recipe.
+                </para>
+
+                <para>
+                    <filename>recipetool</filename> creates "shrinkwrap" and
+                    "lockdown" files for your recipe.
+                    Shrinkwrap files capture the version of all dependent
+                    modules.
+                    Many packages do not provide shrinkwrap files.
+                    <filename>recipetool</filename> create a shrinkwrap
+                    file as it runs.
+                    You can replace the shrinkwrap file with your own file
+                    by setting the <filename>NPM_SHRINKWRAP</filename>
+                    variable.
+                </para>
+
+                <para>
+                    Lockdown files contain the checksum for each module
+                    to determine if your users download the same files when
+                    building with a recipe.
+                    Lockdown files ensure that dependencies have not been
+                    changed and that your NPM registry is still providing
+                    the same file.
+                    <note>
+                        A package is created for each sub-module.
+                        This policy is the only practical way to have the
+                        licenses for all of the dependencies represented
+                        in the license manifest of the image.
+                    </note>
+                </para>
+
+                <para>
+                    The <filename>devtool edit-recipe</filename> command
+                    lets you take a look at the recipe:
+                    <literallayout class='monospaced'>
+     $ devtool edit-recipe cute-files
+     SUMMARY = "Turn any folder on your computer into a cute file browser, available on the local network."
+     LICENSE = "BSD-3-Clause &amp; Unknown &amp; MIT &amp; ISC"
+     LIC_FILES_CHKSUM = "file://LICENSE;md5=71d98c0a1db42956787b1909c74a86ca \
+                         file://node_modules/content-disposition/LICENSE;md5=c6e0ce1e688c5ff16db06b7259e9cd20 \
+                         file://node_modules/express/LICENSE;md5=5513c00a5c36cd361da863dd9aa8875d \
+                         ...
+
+     SRC_URI = "npm://registry.npmjs.org;name=cute-files;version=${PV}"
+     NPM_SHRINKWRAP := "${THISDIR}/${PN}/npm-shrinkwrap.json"
+     NPM_LOCKDOWN := "${THISDIR}/${PN}/lockdown.json"
+     inherit npm
+     # Must be set after inherit npm since that itself sets S
+     S = "${WORKDIR}/npmpkg"
+
+     LICENSE_${PN}-content-disposition = "MIT"
+     ...
+     LICENSE_${PN}-express = "MIT"
+     LICENSE_${PN} = "MIT"
+                    </literallayout>
+                    Three key points exist in the previous example:
+                    <itemizedlist>
+                        <listitem><para>
+                            <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
+                            uses the NPM scheme so that the NPM fetcher
+                            is used.
+                            </para></listitem>
+                        <listitem><para>
+                            <filename>recipetool</filename> collects all
+                            the license information.
+                            If a sub-module's license is unavailable,
+                            the sub-module's name appears in the comments.
+                            </para></listitem>
+                        <listitem><para>
+                            The <filename>inherit npm</filename> statement
+                            causes the
+                            <ulink url='&YOCTO_DOCS_REF_URL;#ref-classes-npm'><filename>npm</filename></ulink>
+                            class to package up all the modules.
+                            </para></listitem>
+                    </itemizedlist>
+                </para>
+
+                <para>
+                    You can run the following command to build the
+                    <filename>cute-files</filename> package:
+                    <literallayout class='monospaced'>
+     $ devtool build cute-files
+                    </literallayout>
+                    Remember that <filename>nodejs</filename> must be
+                    installed on the target before your package.
+                </para>
+
+                <para>
+                    Assuming 192.168.7.2 for the target's IP address, use
+                    the following command to deploy your package:
+                    <literallayout class='monospaced'>
+     $ devtool deploy-target -s cute-files root@192.168.7.2
+                    </literallayout>
+                    Once the package is installed on the target, you can
+                    test the application:
+                    <note>
+                        Because of a know issue, you cannot simply run
+                        <filename>cute-files</filename> as you would if you
+                        had run <filename>npm install</filename>.
+                    </note>
+                    <literallayout class='monospaced'>
+     $ cd /usr/lib/node_modules/cute-files
+     $ node cute-files.js
+                    </literallayout>
+                    On a browser, go to
+                    <filename>http://192.168.7.2:3000</filename> and you
+                    see the following:
+                    <imagedata fileref="figures/cute-files-npm-example.png" align="center" width="6in" depth="4in" />
+                </para>
+
+                <para>
+                    You can find the recipe in
+                    <filename>workspace/recipes/cute-files</filename>.
+                    You can use the recipe in any layer you choose.
+                </para>
+            </section>
+
+            <section id='npm-using-the-npm-projects-method'>
+                <title>Using the NPM Projects Code Method</title>
+
+                <para>
+                    Although it is useful to package modules already in the
+                    NPM registry, adding <filename>node.js</filename> projects
+                    under development is a more common developer use case.
+                </para>
+
+                <para>
+                    This section covers the NPM projects code method, which is
+                    very similar to the "registry" approach described in the
+                    previous section.
+                    In the NPM projects method, you provide
+                    <filename>devtool</filename> with an URL that points to the
+                    source files.
+                </para>
+
+                <para>
+                    Replicating the same example, (i.e.
+                    <filename>cute-files</filename>) use the following command:
+                    <literallayout class='monospaced'>
+     $ devtool add https://github.com/martinaglv/cute-files.git
+                    </literallayout>
+                    The recipe this command generates is very similar to the
+                    recipe created in the previous section.
+                    However, the <filename>SRC_URI</filename> looks like the
+                    following:
+                    <literallayout class='monospaced'>
+     SRC_URI = "git://github.com/martinaglv/cute-files.git;protocol=https \
+               npm://registry.npmjs.org;name=commander;version=2.9.0;subdir=node_modules/commander \
+               npm://registry.npmjs.org;name=express;version=4.14.0;subdir=node_modules/express \
+               npm://registry.npmjs.org;name=content-disposition;version=0.3.0;subdir=node_modules/content-disposition \
+               "
+                    </literallayout>
+                    In this example, the main module is taken from the Git
+                    repository and dependents are taken from the NPM registry.
+                    Other than those differences, the recipe is basically the
+                    same between the two methods.
+                    You can build and deploy the package exactly as described
+                    in the previous section that uses the registry modules
+                    method.
+                </para>
+            </section>
+        </section>
     </section>
 
     <section id='efficiently-fetching-source-files-during-a-build'>
@@ -10519,7 +10821,7 @@
             <title>Using systemd Exclusively</title>
 
             <para>
-                Set the these variables in your distribution configuration
+                Set these variables in your distribution configuration
                 file as follows:
                 <literallayout class='monospaced'>
      DISTRO_FEATURES_append = " systemd"

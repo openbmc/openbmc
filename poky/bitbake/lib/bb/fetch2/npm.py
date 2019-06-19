@@ -151,20 +151,11 @@ class Npm(FetchMethod):
         Parse the output of npm view --json; the last JSON result
         is assumed to be the one that we're interested in.
         '''
-        pdata = None
-        outdeps = {}
-        datalines = []
-        bracelevel = 0
-        for line in output.splitlines():
-            if bracelevel:
-                datalines.append(line)
-            elif '{' in line:
-                datalines = []
-                datalines.append(line)
-            bracelevel = bracelevel + line.count('{') - line.count('}')
-        if datalines:
-            pdata = json.loads('\n'.join(datalines))
-        return pdata
+        pdata = json.loads(output);
+        try:
+            return pdata[-1]
+        except:
+            return pdata
 
     def _getdependencies(self, pkg, data, version, d, ud, optional=False, fetchedlist=None):
         if fetchedlist is None:

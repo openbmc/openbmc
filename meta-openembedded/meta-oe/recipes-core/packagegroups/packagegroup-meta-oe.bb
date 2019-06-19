@@ -220,7 +220,8 @@ RDEPENDS_packagegroup-meta-oe-shells ="\
 
 NE10 = ""
 NE10_aarch64 = "ne10"
-NE10_arm7 = "ne10"
+NE10_armv7a = "ne10"
+NE10_armv7ve = "ne10"
 
 RDEPENDS_packagegroup-meta-oe-support ="\
     anthy asio atop augeas avro-c bdwgc frame grail \
@@ -241,7 +242,7 @@ RDEPENDS_packagegroup-meta-oe-support ="\
     pngcheck poco poppler poppler-data portaudio-v19 pps-tools \
     pv pxaregs raptor2 rdfind read-edid rsnapshot s3c24xx-gpio s3c64xx-gpio \
     sjf2410-linux-native satyr sdparm pty-forward-native serial-forward \
-    sg3-utils sharutils smem spitools srecord ssiapi start-stop-daemon stm32flash \
+    sg3-utils sharutils smem spitools srecord ssiapi stm32flash \
     syslog-ng system-config-keyboard tbb thin-provisioning-tools tokyocabinet \
     tree uhubctl unixodbc uriparser usb-modeswitch \
     usb-modeswitch-data usbpath uthash utouch-evemu utouch-frame \

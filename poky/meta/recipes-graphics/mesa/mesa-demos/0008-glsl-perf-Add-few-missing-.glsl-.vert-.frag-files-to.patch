@@ -1,12 +1,13 @@
-From 0b6f95f9b8ece22e9856c150e4be29fd86eaf546 Mon Sep 17 00:00:00 2001
+From 894add34c2b5e6b4ccc78996bf681d7ec7bc9e36 Mon Sep 17 00:00:00 2001
 From: Martin Jansa <Martin.Jansa@gmail.com>
 Date: Thu, 10 Jul 2014 14:29:27 +0200
-Subject: [PATCH 8/9] glsl, perf: Add few missing .glsl, .vert, .frag files to
+Subject: [PATCH] glsl, perf: Add few missing .glsl, .vert, .frag files to
  EXTRA_DATA
 
 Upstream-Status: Pending
 
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
 ---
  src/fpglsl/Makefile.am |  2 ++
  src/glsl/Makefile.am   | 10 ++++++++--
@@ -15,7 +16,7 @@ Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
  4 files changed, 17 insertions(+), 2 deletions(-)
 
 diff --git a/src/fpglsl/Makefile.am b/src/fpglsl/Makefile.am
-index 47c1039..fd43c91 100644
+index 47c1039f..fd43c919 100644
 --- a/src/fpglsl/Makefile.am
 +++ b/src/fpglsl/Makefile.am
 @@ -39,10 +39,12 @@ noinst_PROGRAMS = \
@@ -32,7 +33,7 @@ index 47c1039..fd43c91 100644
  	mov-imm.glsl \
  	simpleif.glsl \
 diff --git a/src/glsl/Makefile.am b/src/glsl/Makefile.am
-index 4faa8db..079a29d 100644
+index 4faa8dbf..079a29d8 100644
 --- a/src/glsl/Makefile.am
 +++ b/src/glsl/Makefile.am
 @@ -37,7 +37,7 @@ AM_LDFLAGS = \
@@ -71,13 +72,13 @@ index 4faa8db..079a29d 100644
 +	skinning.vert \
  	toyball.shtest
 diff --git a/src/perf/Makefile.am b/src/perf/Makefile.am
-index 5363c58..c5cca8d 100644
+index f0031fea..60069396 100644
 --- a/src/perf/Makefile.am
 +++ b/src/perf/Makefile.am
-@@ -57,3 +57,9 @@ bin_PROGRAMS = \
- endif
+@@ -59,3 +59,9 @@ endif
  
  glslstateschange_LDADD = libperf.la ../util/libutil.la
+ glsl_compile_time_LDADD = ../util/libutil.la
 +
 +EXTRA_DIST = \
 +	glslstateschange1.frag \
@@ -85,7 +86,7 @@ index 5363c58..c5cca8d 100644
 +	glslstateschange2.frag \
 +	glslstateschange2.vert
 diff --git a/src/vpglsl/Makefile.am b/src/vpglsl/Makefile.am
-index 4a85ed4..48b08f4 100644
+index 4a85ed40..48b08f48 100644
 --- a/src/vpglsl/Makefile.am
 +++ b/src/vpglsl/Makefile.am
 @@ -44,6 +44,7 @@ EXTRA_DIST = \
@@ -96,6 +97,3 @@ index 4a85ed4..48b08f4 100644
  	mov.glsl \
  	nestedifs.glsl \
  	nestedswizzle.glsl \
--- 
-2.0.0
-

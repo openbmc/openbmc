@@ -1,0 +1,200 @@
+Compile warning fixes from Debian
+
+Signed-off-by: Adrian Bunk <bunk@stusta.de>
+Upstream-Status: Inappropriate [upstream is dead]
+
+--- a/clean_exit.c
++++ b/clean_exit.c
+@@ -13,6 +13,7 @@ static char sccsid[] = "@(#) clean_exit.
+ #endif
+ 
+ #include <stdio.h>
++#include <unistd.h>
+ 
+ extern void exit();
+ 
+--- a/hosts_access.c
++++ b/hosts_access.c
+@@ -34,6 +34,7 @@ static char sccsid[] = "@(#) hosts_acces
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <syslog.h>
+ #include <ctype.h>
+ #include <errno.h>
+--- a/misc.c
++++ b/misc.c
+@@ -13,6 +13,7 @@ static char sccsic[] = "@(#) misc.c 1.2
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <string.h>
+ 
+ #include "tcpd.h"
+--- a/options.c
++++ b/options.c
+@@ -41,6 +41,7 @@ static char sccsid[] = "@(#) options.c 1
+ #include <netinet/in.h>
+ #include <netdb.h>
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <unistd.h>
+ #include <syslog.h>
+ #include <pwd.h>
+--- a/percent_x.c
++++ b/percent_x.c
+@@ -17,6 +17,7 @@ static char sccsid[] = "@(#) percent_x.c
+ /* System libraries. */
+ 
+ #include <stdio.h>
++#include <unistd.h>
+ #include <syslog.h>
+ #include <string.h>
+ 
+--- a/rfc931.c
++++ b/rfc931.c
+@@ -16,6 +16,7 @@ static char sccsid[] = "@(#) rfc931.c 1.
+ /* System libraries. */
+ 
+ #include <stdio.h>
++#include <unistd.h>
+ #include <syslog.h>
+ #include <sys/types.h>
+ #include <sys/socket.h>
+--- a/tcpd.c
++++ b/tcpd.c
+@@ -22,6 +22,7 @@ static char sccsid[] = "@(#) tcpd.c 1.10
+ #include <sys/socket.h>
+ #include <netinet/in.h>
+ #include <stdio.h>
++#include <unistd.h>
+ #include <syslog.h>
+ #include <string.h>
+ 
+--- a/update.c
++++ b/update.c
+@@ -20,6 +20,7 @@ static char sccsid[] = "@(#) update.c 1.
+ /* System libraries */
+ 
+ #include <stdio.h>
++#include <unistd.h>
+ #include <syslog.h>
+ #include <string.h>
+ 
+--- a/fakelog.c
++++ b/fakelog.c
+@@ -17,7 +17,7 @@ static char sccsid[] = "@(#) fakelog.c 1
+ 
+ /* ARGSUSED */
+ 
+-openlog(name, logopt, facility)
++void openlog(name, logopt, facility)
+ char   *name;
+ int     logopt;
+ int     facility;
+@@ -27,7 +27,7 @@ int     facility;
+ 
+ /* vsyslog - format one record */
+ 
+-vsyslog(severity, fmt, ap)
++void vsyslog(severity, fmt, ap)
+ int     severity;
+ char   *fmt;
+ va_list ap;
+@@ -43,7 +43,7 @@ va_list ap;
+ 
+ /* VARARGS */
+ 
+-VARARGS(syslog, int, severity)
++void VARARGS(syslog, int, severity)
+ {
+     va_list ap;
+     char   *fmt;
+@@ -56,7 +56,7 @@ VARARGS(syslog, int, severity)
+ 
+ /* closelog - dummy */
+ 
+-closelog()
++void closelog()
+ {
+     /* void */
+ }
+--- a/safe_finger.c
++++ b/safe_finger.c
+@@ -22,10 +22,15 @@ static char sccsid[] = "@(#) safe_finger
+ 
+ #include <sys/types.h>
+ #include <sys/stat.h>
++#include <sys/wait.h>
++#include <fcntl.h>
+ #include <signal.h>
+ #include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
+ #include <ctype.h>
+ #include <pwd.h>
++#include <grp.h>
+ #include <syslog.h>
+ 
+ extern void exit();
+@@ -52,7 +59,7 @@ int     sig;
+     exit(0);
+ }
+ 
+-main(argc, argv)
++int main(argc, argv)
+ int     argc;
+ char  **argv;
+ {
+--- a/tcpdchk.c
++++ b/tcpdchk.c
+@@ -28,6 +28,8 @@ static char sccsid[] = "@(#) tcpdchk.c 1
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
+ #include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
+ #include <syslog.h>
+ #include <setjmp.h>
+ #include <errno.h>
+--- a/tcpdmatch.c
++++ b/tcpdmatch.c
+@@ -26,6 +26,7 @@ static char sccsid[] = "@(#) tcpdmatch.c
+ #include <arpa/inet.h>
+ #include <netdb.h>
+ #include <stdio.h>
++#include <unistd.h>
+ #include <syslog.h>
+ #include <setjmp.h>
+ #include <string.h>
+--- a/try-from.c
++++ b/try-from.c
+@@ -37,7 +37,7 @@ static char sccsid[] = "@(#) try-from.c
+ int     allow_severity = SEVERITY;	/* run-time adjustable */
+ int     deny_severity = LOG_WARNING;	/* ditto */
+ 
+-main(argc, argv)
++int main(argc, argv)
+ int     argc;
+ char  **argv;
+ {
+--- a/inetcf.c
++++ b/inetcf.c
+@@ -12,6 +12,7 @@ static char sccsid[] = "@(#) inetcf.c 1.
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <errno.h>
+ #include <string.h>
+ 
+@@ -20,6 +21,7 @@ extern void exit();
+ 
+ #include "tcpd.h"
+ #include "inetcf.h"
++#include "scaffold.h"
+ 
+  /*
+   * Network configuration files may live in unusual places. Here are some

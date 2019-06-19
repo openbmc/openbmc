@@ -8,7 +8,6 @@ inherit autotools texinfo ptest
 
 SRC_URI = "${GNU_MIRROR}/m4/m4-${PV}.tar.gz \
            file://ac_config_links.patch \
-           file://remove-gets.patch \
            file://m4-1.4.18-glibc-change-work-around.patch \
            "
 SRC_URI_append_class-target = " file://0001-Unset-need_charset_alias-when-building-for-musl.patch \
@@ -53,7 +52,7 @@ do_install_ptest() {
 }
 
 
-RDEPENDS_${PN}-ptest += "make"
+RDEPENDS_${PN}-ptest += "make coreutils diffutils"
 RDEPENDS_${PN}-ptest_append_libc-glibc = "\
      locale-base-fr-fr.iso-8859-1 \
 "

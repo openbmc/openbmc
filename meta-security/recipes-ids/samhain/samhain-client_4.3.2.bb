@@ -9,3 +9,4 @@ EXTRA_OECONF += " \
         "
 
 RDEPENDS_${PN} = "acl zlib attr bash"
+RCONFLICTS_${PN} = "samhain-standalone"

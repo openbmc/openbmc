@@ -1,0 +1,50 @@
+From eeaf8dac80f15a2b7c18d1d4ee63106973a6a873 Mon Sep 17 00:00:00 2001
+From: Adrian Bunk <bunk@kernel.org>
+Date: Tue, 21 May 2019 14:13:35 +0300
+Subject: Makefile.am: Don't overwrite src_ofonod_DEPENDENCIES
+
+src_ofonod_DEPENDENCIES did overwrite the dependencies
+automatically generated from src_ofonod_LDADD with
+incomplete dependencies.
+
+This fixes the following build error:
+...
+  CCLD     src/ofonod
+libtool:   error: cannot find the library 'gdbus/libgdbus-internal.la' or unhandled argument 'gdbus/libgdbus-internal.la'
+make: *** [Makefile:3448: src/ofonod] Error 1
+
+Upstream-Status: Submitted
+Signed-off-by: Adrian Bunk <bunk@stusta.de>
+---
+ Makefile.am | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index d2e310d5..5edc4488 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -6,12 +6,10 @@ noinst_LTLIBRARIES =
+ if EXTERNAL_ELL
+ ell_cflags = @ELL_CFLAGS@
+ ell_ldadd = @ELL_LIBS@
+-ell_dependencies =
+ ell_built_sources =
+ else
+ ell_cflags =
+ ell_ldadd = ell/libell-internal.la
+-ell_dependencies = $(ell_ldadd)
+ ell_built_sources = ell/internal ell/ell.h
+ 
+ noinst_LTLIBRARIES += ell/libell-internal.la
+@@ -729,8 +727,6 @@ src_ofonod_LDADD = gdbus/libgdbus-internal.la $(builtin_libadd) $(ell_ldadd) \
+ src_ofonod_LDFLAGS = -Wl,--export-dynamic \
+ 				-Wl,--version-script=$(srcdir)/src/ofono.ver
+ 
+-src_ofonod_DEPENDENCIES = $(ell_dependencies)
+-
+ BUILT_SOURCES = $(local_headers) $(ell_built_sources) src/builtin.h
+ 
+ CLEANFILES = $(BUILT_SOURCES) $(rules_DATA)
+-- 
+2.20.1
+

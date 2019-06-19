@@ -16629,16 +16629,16 @@
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    When the
-                    <link linkend='ref-classes-distrodata'><filename>distrodata</filename></link>
-                    class is enabled globally, you can perform a per-recipe
-                    check for what the latest upstream source code version is
-                    by calling
+                    You can perform a per-recipe check for what the latest
+                    upstream source code version is by calling
                     <filename>bitbake -c checkpkg</filename> <replaceable>recipe</replaceable>.
                     If the recipe source code is provided from Git
                     repositories, the OpenEmbedded build system determines the
                     latest upstream version by picking the latest tag from the
                     list of all repository tags.
+                </para>
+
+                <para>
                     You can use the
                     <filename>UPSTREAM_CHECK_GITTAGREGEX</filename>
                     variable to provide a regular expression to filter only the
@@ -16658,11 +16658,8 @@
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    When the
-                    <link linkend='ref-classes-distrodata'><filename>distrodata</filename></link>
-                    class is enabled globally, use the
-                    <filename>UPSTREAM_CHECK_REGEX</filename> variable to
-                    specify a different regular expression instead of the
+                    Use the <filename>UPSTREAM_CHECK_REGEX</filename> variable
+                    to specify a different regular expression instead of the
                     default one when the package checking system is parsing
                     the page found using
                     <link linkend='var-UPSTREAM_CHECK_URI'><filename>UPSTREAM_CHECK_URI</filename></link>.
@@ -16680,12 +16677,9 @@
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    When the
-                    <link linkend='ref-classes-distrodata'><filename>distrodata</filename></link>
-                    class is enabled globally, you can perform a per-recipe
-                    check for what the latest upstream source code version is
-                    by calling <filename>bitbake -c checkpkg</filename>
-                    <replaceable>recipe</replaceable>.
+                    You can perform a per-recipe check for what the latest
+                    upstream source code version is by calling
+                    <filename>bitbake -c checkpkg</filename> <replaceable>recipe</replaceable>.
                     If the source code is provided from tarballs, the latest
                     version is determined by fetching the directory listing
                     where the tarball is and attempting to find a later tarball.

@@ -24,16 +24,19 @@ class ResultsTextReport(object):
                              'skipped': ['SKIPPED', 'skipped']}
 
 
-    def handle_ptest_result(self, k, status, result):
+    def handle_ptest_result(self, k, status, result, machine):
+        if machine not in self.ptests:
+            self.ptests[machine] = {}
+
         if k == 'ptestresult.sections':
             # Ensure tests without any test results still show up on the report
             for suite in result['ptestresult.sections']:
-                if suite not in self.ptests:
-                    self.ptests[suite] = {'passed': 0, 'failed': 0, 'skipped': 0, 'duration' : '-', 'failed_testcases': []}
+                if suite not in self.ptests[machine]:
+                    self.ptests[machine][suite] = {'passed': 0, 'failed': 0, 'skipped': 0, 'duration' : '-', 'failed_testcases': []}
                 if 'duration' in result['ptestresult.sections'][suite]:
-                    self.ptests[suite]['duration'] = result['ptestresult.sections'][suite]['duration']
+                    self.ptests[machine][suite]['duration'] = result['ptestresult.sections'][suite]['duration']
                 if 'timeout' in result['ptestresult.sections'][suite]:
-                    self.ptests[suite]['duration'] += " T"
+                    self.ptests[machine][suite]['duration'] += " T"
             return
         try:
             _, suite, test = k.split(".", 2)
@@ -47,22 +50,25 @@ class ResultsTextReport(object):
                     suite = suite + "." + suite1
             except ValueError:
                 pass
-        if suite not in self.ptests:
-            self.ptests[suite] = {'passed': 0, 'failed': 0, 'skipped': 0, 'duration' : '-', 'failed_testcases': []}
+        if suite not in self.ptests[machine]:
+            self.ptests[machine][suite] = {'passed': 0, 'failed': 0, 'skipped': 0, 'duration' : '-', 'failed_testcases': []}
         for tk in self.result_types:
             if status in self.result_types[tk]:
-                self.ptests[suite][tk] += 1
+                self.ptests[machine][suite][tk] += 1
 
-    def handle_ltptest_result(self, k, status, result):
+    def handle_ltptest_result(self, k, status, result, machine):
+        if machine not in self.ltptests:
+            self.ltptests[machine] = {}
+
         if k == 'ltpresult.sections':
             # Ensure tests without any test results still show up on the report
             for suite in result['ltpresult.sections']:
-                if suite not in self.ltptests:
-                    self.ltptests[suite] = {'passed': 0, 'failed': 0, 'skipped': 0, 'duration' : '-', 'failed_testcases': []}
+                if suite not in self.ltptests[machine]:
+                    self.ltptests[machine][suite] = {'passed': 0, 'failed': 0, 'skipped': 0, 'duration' : '-', 'failed_testcases': []}
                 if 'duration' in result['ltpresult.sections'][suite]:
-                    self.ltptests[suite]['duration'] = result['ltpresult.sections'][suite]['duration']
+                    self.ltptests[machine][suite]['duration'] = result['ltpresult.sections'][suite]['duration']
                 if 'timeout' in result['ltpresult.sections'][suite]:
-                    self.ltptests[suite]['duration'] += " T"
+                    self.ltptests[machine][suite]['duration'] += " T"
             return
         try:
             _, suite, test = k.split(".", 2)
@@ -77,20 +83,23 @@ class ResultsTextReport(object):
                     suite = suite + "." + suite1
             except ValueError:
                 pass
-        if suite not in self.ltptests:
-            self.ltptests[suite] = {'passed': 0, 'failed': 0, 'skipped': 0, 'duration' : '-', 'failed_testcases': []}
+        if suite not in self.ltptests[machine]:
+            self.ltptests[machine][suite] = {'passed': 0, 'failed': 0, 'skipped': 0, 'duration' : '-', 'failed_testcases': []}
         for tk in self.result_types:
             if status in self.result_types[tk]:
-                self.ltptests[suite][tk] += 1
+                self.ltptests[machine][suite][tk] += 1
 
-    def handle_ltpposixtest_result(self, k, status, result):
+    def handle_ltpposixtest_result(self, k, status, result, machine):
+        if machine not in self.ltpposixtests:
+            self.ltpposixtests[machine] = {}
+
         if k == 'ltpposixresult.sections':
             # Ensure tests without any test results still show up on the report
             for suite in result['ltpposixresult.sections']:
-                if suite not in self.ltpposixtests:
-                    self.ltpposixtests[suite] = {'passed': 0, 'failed': 0, 'skipped': 0, 'duration' : '-', 'failed_testcases': []}
+                if suite not in self.ltpposixtests[machine]:
+                    self.ltpposixtests[machine][suite] = {'passed': 0, 'failed': 0, 'skipped': 0, 'duration' : '-', 'failed_testcases': []}
                 if 'duration' in result['ltpposixresult.sections'][suite]:
-                    self.ltpposixtests[suite]['duration'] = result['ltpposixresult.sections'][suite]['duration']
+                    self.ltpposixtests[machine][suite]['duration'] = result['ltpposixresult.sections'][suite]['duration']
             return
         try:
             _, suite, test = k.split(".", 2)
@@ -104,19 +113,13 @@ class ResultsTextReport(object):
                     suite = suite + "." + suite1
             except ValueError:
                 pass
-        if suite not in self.ltpposixtests:
-            self.ltpposixtests[suite] = {'passed': 0, 'failed': 0, 'skipped': 0, 'duration' : '-', 'failed_testcases': []}
+        if suite not in self.ltpposixtests[machine]:
+            self.ltpposixtests[machine][suite] = {'passed': 0, 'failed': 0, 'skipped': 0, 'duration' : '-', 'failed_testcases': []}
         for tk in self.result_types:
             if status in self.result_types[tk]:
-                self.ltpposixtests[suite][tk] += 1
+                self.ltpposixtests[machine][suite][tk] += 1
 
-    def get_aggregated_test_result(self, logger, testresult):
-        test_count_report = {'passed': 0, 'failed': 0, 'skipped': 0, 'failed_testcases': []}
-    def get_aggregated_test_result(self, logger, testresult):
-        test_count_report = {'passed': 0, 'failed': 0, 'skipped': 0, 'failed_testcases': []}
-    def get_aggregated_test_result(self, logger, testresult):
-        test_count_report = {'passed': 0, 'failed': 0, 'skipped': 0, 'failed_testcases': []}
-    def get_aggregated_test_result(self, logger, testresult):
+    def get_aggregated_test_result(self, logger, testresult, machine):
         test_count_report = {'passed': 0, 'failed': 0, 'skipped': 0, 'failed_testcases': []}
         result = testresult.get('result', [])
         for k in result:
@@ -127,11 +130,11 @@ class ResultsTextReport(object):
             if test_status in self.result_types['failed']:
                 test_count_report['failed_testcases'].append(k)
             if k.startswith("ptestresult."):
-                self.handle_ptest_result(k, test_status, result)
+                self.handle_ptest_result(k, test_status, result, machine)
             if k.startswith("ltpresult."):
-                self.handle_ltptest_result(k, test_status, result)
+                self.handle_ltptest_result(k, test_status, result, machine)
             if k.startswith("ltpposixresult."):
-                self.handle_ltpposixtest_result(k, test_status, result)
+                self.handle_ltpposixtest_result(k, test_status, result, machine)
         return test_count_report
 
     def print_test_report(self, template_file_name, test_count_reports):
@@ -141,10 +144,8 @@ class ResultsTextReport(object):
         env = Environment(loader=file_loader, trim_blocks=True)
         template = env.get_template(template_file_name)
         havefailed = False
-        haveptest = bool(self.ptests)
-        haveltp = bool(self.ltptests)
-        haveltpposix = bool(self.ltpposixtests)
         reportvalues = []
+        machines = []
         cols = ['passed', 'failed', 'skipped']
         maxlen = {'passed' : 0, 'failed' : 0, 'skipped' : 0, 'result_id': 0, 'testseries' : 0, 'ptest' : 0 ,'ltptest': 0, 'ltpposixtest': 0}
         for line in test_count_reports:
@@ -162,21 +163,24 @@ class ResultsTextReport(object):
             reportvalues.append(vals)
             if line['failed_testcases']:
                 havefailed = True
-        for ptest in self.ptests:
-            if len(ptest) > maxlen['ptest']:
-                maxlen['ptest'] = len(ptest)
-        for ltptest in self.ltptests:
-            if len(ltptest) > maxlen['ltptest']:
-                maxlen['ltptest'] = len(ltptest)
-        for ltpposixtest in self.ltpposixtests:
-            if len(ltpposixtest) > maxlen['ltpposixtest']:
-                maxlen['ltpposixtest'] = len(ltpposixtest)
+            if line['machine'] not in machines:
+                machines.append(line['machine'])
+        for (machine, report) in self.ptests.items():
+            for ptest in self.ptests[machine]:
+                if len(ptest) > maxlen['ptest']:
+                    maxlen['ptest'] = len(ptest)
+        for (machine, report) in self.ltptests.items():
+            for ltptest in self.ltptests[machine]:
+                if len(ltptest) > maxlen['ltptest']:
+                    maxlen['ltptest'] = len(ltptest)
+        for (machine, report) in self.ltpposixtests.items():
+            for ltpposixtest in self.ltpposixtests[machine]:
+                if len(ltpposixtest) > maxlen['ltpposixtest']:
+                    maxlen['ltpposixtest'] = len(ltpposixtest)
         output = template.render(reportvalues=reportvalues,
                                  havefailed=havefailed,
-                                 haveptest=haveptest,
+                                 machines=machines,
                                  ptests=self.ptests,
-                                 haveltp=haveltp,
-                                 haveltpposix=haveltpposix,
                                  ltptests=self.ltptests,
                                  ltpposixtests=self.ltpposixtests,
                                  maxlen=maxlen)
@@ -200,7 +204,9 @@ class ResultsTextReport(object):
         for testsuite in testresults:
             for resultid in testresults[testsuite]:
                 result = testresults[testsuite][resultid]
-                test_count_report = self.get_aggregated_test_result(logger, result)
+                machine = result['configuration']['MACHINE']
+                test_count_report = self.get_aggregated_test_result(logger, result, machine)
+                test_count_report['machine'] = machine
                 test_count_report['testseries'] = result['configuration']['TESTSERIES']
                 test_count_report['result_id'] = resultid
                 test_count_reports.append(test_count_report)

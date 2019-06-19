@@ -1,7 +1,7 @@
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
-SRCREV = "90ff34ac0506f0d5440393a4c78565f6aaf9b726"
-PV = "4.0"
+SRCREV = "984d6d1696ed06626b07cb65ab55d6ae0ece1131"
+PV = "4.1"
 
 SRC_URI = "git://sourceware.org/git/systemtap.git \
            file://configure-allow-to-disable-libvirt.patch \

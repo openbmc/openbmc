@@ -63,3 +63,4 @@ FILES_${PN} += "${sbindir}/in.* ${libdir}/* ${sysconfdir}/xinetd.d/*"
 
 # http://errors.yoctoproject.org/Errors/Details/186954/
 EXCLUDE_FROM_WORLD_libc-musl = "1"
+RCONFLICTS_${PN} = "inetutils-telnetd"

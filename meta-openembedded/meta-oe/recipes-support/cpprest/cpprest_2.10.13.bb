@@ -17,3 +17,7 @@ SRCREV= "9d8f544001cb74544de6dc8c565592f7e2626d6e"
 S = "${WORKDIR}/git"
 
 inherit cmake pkgconfig
+
+# Temporary until https://github.com/Microsoft/cpprestsdk/issues/1099
+# is fixed properly
+CXXFLAGS += "-Wno-error=deprecated-copy -Wno-error=redundant-move"

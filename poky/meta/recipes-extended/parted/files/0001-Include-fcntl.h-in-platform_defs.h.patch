@@ -1,29 +1,33 @@
-From d78dd087c4ec4715aab5fe115668e726046ecd76 Mon Sep 17 00:00:00 2001
-From: Khem Raj <raj.khem@gmail.com>
-Date: Mon, 13 Apr 2015 18:16:05 -0700
-Subject: [PATCH] Include fcntl.h in /platform_defs.h
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@intel.com>
 
-exposed when compiling using musl
+From a3877115f1956949096d77aca5a703a47ed68397 Mon Sep 17 00:00:00 2001
+From: Felix Janda <felix.janda@posteo.de>
+Date: Sun, 3 May 2015 10:33:31 +0200
+Subject: [PATCH] libparted/fs/xfs/platform_defs.h: Include <fcntl.h> for
+ loff_t
 
-Upstream-Status: Pending
+This is needed for compilation with musl libc
 
-Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Suggested-by: Travis Tilley <ttilley@gmail.com>
+
+Signed-off-by: Brian C. Lane <bcl@redhat.com>
 ---
  libparted/fs/xfs/platform_defs.h | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/libparted/fs/xfs/platform_defs.h b/libparted/fs/xfs/platform_defs.h
-index 2b55752..32bd3d3 100644
+index 2b55752..a6ec8fb 100644
 --- a/libparted/fs/xfs/platform_defs.h
 +++ b/libparted/fs/xfs/platform_defs.h
-@@ -42,6 +42,7 @@
+@@ -38,6 +38,7 @@
+ #include <stdarg.h>
+ #include <assert.h>
+ #include <endian.h>
++#include <fcntl.h>
+ #include <stddef.h>
  #include <stdlib.h>
  #include <string.h>
- #include <unistd.h>
-+#include <fcntl.h>
- #include <sys/param.h>
- #include <sys/types.h>
- 
 -- 
-2.1.4
+2.11.0
 

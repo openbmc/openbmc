@@ -1,4 +1,4 @@
-From 27194bc05a7a488827590208285a8757164edcef Mon Sep 17 00:00:00 2001
+From 70c5c684fbfbc8ebd890b0aafb2bb5c13d6cfb11 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 2 Apr 2016 10:54:59 -0700
 Subject: [PATCH 12/18] implement buffer wrapping interface for dispmanx
@@ -88,5 +88,5 @@ index c18626d..11ed1ef 100644
  
  </protocol>
 -- 
-2.20.1
+2.21.0
 

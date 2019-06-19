@@ -214,7 +214,11 @@ FILES_${PN}-lib-trapd = "${libdir}/libnetsnmptrapd${SOLIBS}"
 FILES_${PN} = ""
 FILES_${PN}-client = "${bindir}/* ${datadir}/snmp/"
 FILES_${PN}-dbg += "${libdir}/.debug/ ${sbindir}/.debug/ ${bindir}/.debug/"
-FILES_${PN}-dev += "${bindir}/mib2c ${bindir}/mib2c-update"
+FILES_${PN}-dev += "${bindir}/mib2c \
+                    ${bindir}/mib2c-update \
+                    ${bindir}/net-snmp-config \
+                    ${bindir}/net-snmp-create-v3-user \
+"
 
 CONFFILES_${PN}-server-snmpd = "${sysconfdir}/snmp/snmpd.conf"
 CONFFILES_${PN}-server-snmptrapd = "${sysconfdir}/snmp/snmptrapd.conf"

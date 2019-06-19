@@ -1,0 +1,20 @@
+slang: modify array test
+
+One array test tries to create an array that is far too large and anticipates an exception.
+IndexError will only be thrown for 64 bit machines, so we add InvalidParmError for 32 bit ones.
+
+Upstream-Status: Submitted [jedsoft.org]
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+--- a/src/test/array.sl
++++ b/src/test/array.sl
+@@ -165,7 +165,7 @@ try
+ {
+    SS = Long_Type[10000,10000,10000,10000,10000,10000];
+ }
+-catch IndexError;
++catch IndexError,InvalidParmError;
+ 
+ private define array_map2_func ()
+ {

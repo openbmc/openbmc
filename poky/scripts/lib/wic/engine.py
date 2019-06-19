@@ -75,7 +75,8 @@ def find_canned_image(scripts_path, wks_file):
             for fname in files:
                 if fname.endswith("~") or fname.endswith("#"):
                     continue
-                if fname.endswith(".wks") and wks_file + ".wks" == fname:
+                if ((fname.endswith(".wks") and wks_file + ".wks" == fname) or \
+                   (fname.endswith(".wks.in") and wks_file + ".wks.in" == fname)):
                     fullpath = os.path.join(canned_wks_dir, fname)
                     return fullpath
     return None
@@ -92,7 +93,7 @@ def list_canned_images(scripts_path):
             for fname in files:
                 if fname.endswith("~") or fname.endswith("#"):
                     continue
-                if fname.endswith(".wks"):
+                if fname.endswith(".wks") or fname.endswith(".wks.in"):
                     fullpath = os.path.join(canned_wks_dir, fname)
                     with open(fullpath) as wks:
                         for line in wks:
@@ -101,7 +102,7 @@ def list_canned_images(scripts_path):
                             if idx != -1:
                                 desc = line[idx + len("short-description:"):].strip()
                                 break
-                    basename = os.path.splitext(fname)[0]
+                    basename = fname.split('.')[0]
                     print("  %s\t\t%s" % (basename.ljust(30), desc))
 
 

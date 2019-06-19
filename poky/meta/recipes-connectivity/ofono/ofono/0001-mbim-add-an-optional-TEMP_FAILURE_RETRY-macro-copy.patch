@@ -1,0 +1,36 @@
+From 22b52db4842611ac31a356f023fc09595384e2ad Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 23 May 2019 18:11:22 -0700
+Subject: [PATCH] mbim: add an optional TEMP_FAILURE_RETRY macro copy
+
+Fixes build on musl which does not provide this macro
+
+Upstream-Status: Submitted [https://lists.ofono.org/pipermail/ofono/2019-May/019370.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ drivers/mbimmodem/mbim-private.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/drivers/mbimmodem/mbim-private.h b/drivers/mbimmodem/mbim-private.h
+index e159235..51693ea 100644
+--- a/drivers/mbimmodem/mbim-private.h
++++ b/drivers/mbimmodem/mbim-private.h
+@@ -21,6 +21,15 @@
+ 
+ #define align_len(len, boundary) (((len)+(boundary)-1) & ~((boundary)-1))
+ 
++#ifndef TEMP_FAILURE_RETRY
++#define TEMP_FAILURE_RETRY(expression) ({     \
++  __typeof(expression) __result;              \
++  do {                                        \
++    __result = (expression);                  \
++  } while (__result == -1 && errno == EINTR); \
++  __result; })
++#endif
++
+ enum mbim_control_message {
+ 	MBIM_OPEN_MSG = 0x1,
+ 	MBIM_CLOSE_MSG = 0x2,
+-- 
+2.21.0
+

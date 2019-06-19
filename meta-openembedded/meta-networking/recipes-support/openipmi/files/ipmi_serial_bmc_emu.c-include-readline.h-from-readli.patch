@@ -1,0 +1,31 @@
+From bebfb3c24582ec4e45d79c5b52135197bf7373da Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 14 Jun 2019 14:17:34 +0800
+Subject: [PATCH] ipmi_serial_bmc_emu.c: include readline.h from readline
+
+The libedit had been removed and swithed to readline.
+We need to include readline.h from readline rather than editline.
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ sample/ipmi_serial_bmc_emu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sample/ipmi_serial_bmc_emu.c b/sample/ipmi_serial_bmc_emu.c
+index e0ae019..1b8bb9a 100644
+--- a/sample/ipmi_serial_bmc_emu.c
++++ b/sample/ipmi_serial_bmc_emu.c
+@@ -42,7 +42,7 @@
+ #include <unistd.h>
+ #include <stdlib.h>
+ #include <sys/select.h>
+-#include <editline/readline.h>
++#include <readline/readline.h>
+ 
+ #define _GNU_SOURCE
+ #include <getopt.h>
+-- 
+2.7.4
+

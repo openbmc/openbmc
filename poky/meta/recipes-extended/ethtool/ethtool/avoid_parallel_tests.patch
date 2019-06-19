@@ -1,4 +1,4 @@
-From 1484545a150de79483b6e2a74be02ebd030f1920 Mon Sep 17 00:00:00 2001
+From 2ca4c2492c4a06b28012e3e1033d10aa48f153b4 Mon Sep 17 00:00:00 2001
 From: Tudor Florea <tudor.florea@enea.com>
 Date: Wed, 28 May 2014 18:59:54 +0200
 Subject: [PATCH] ethtool: use serial-tests config needed by ptest.
@@ -9,17 +9,16 @@ serial-tests is required to generate those targets.
 Signed-off-by: Tudor Florea <tudor.florea@enea.com>
 Upstream-Status: Inappropriate
 (default automake behavior incompatible with ptest)
-
 ---
  configure.ac | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
-index e891d91..600f8a8 100644
+index 2941a65..b0a1896 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
- AC_INIT(ethtool, 5.0, netdev@vger.kernel.org)
+ AC_INIT(ethtool, 5.1, netdev@vger.kernel.org)
  AC_PREREQ(2.52)
  AC_CONFIG_SRCDIR([ethtool.c])
 -AM_INIT_AUTOMAKE([gnu])
@@ -27,3 +26,6 @@ index e891d91..600f8a8 100644
  AC_CONFIG_HEADERS([ethtool-config.h])
  
  AM_MAINTAINER_MODE
+-- 
+2.17.1
+

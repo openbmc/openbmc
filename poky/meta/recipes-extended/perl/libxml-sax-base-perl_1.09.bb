@@ -21,4 +21,6 @@ S = "${WORKDIR}/XML-SAX-Base-${PV}"
 
 inherit cpan ptest-perl
 
+RDEPENDS_${PN}-ptest += "perl-module-test perl-module-test-more"
+
 BBCLASSEXTEND = "native nativesdk"

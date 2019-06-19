@@ -335,18 +335,6 @@
     </para>
 </section>
 
-<section id='ref-classes-bugzilla'>
-    <title><filename>bugzilla.bbclass</filename></title>
-
-    <para>
-        The <filename>bugzilla</filename> class supports setting up an
-        instance of Bugzilla in which you can automatically files bug reports
-        in response to build failures.
-        For this class to work, you need to enable the XML-RPC interface in
-        the instance of Bugzilla.
-    </para>
-</section>
-
 <section id='ref-classes-buildhistory'>
     <title><filename>buildhistory.bbclass</filename></title>
 
@@ -714,39 +702,6 @@
     </para>
 </section>
 
-<section id='ref-classes-distrodata'>
-    <title><filename>distrodata.bbclass</filename></title>
-
-    <para>
-        The <filename>distrodata</filename> class
-        provides for automatic checking for upstream recipe updates.
-        The class creates a comma-separated value (CSV) spreadsheet that
-        contains information about the recipes.
-        The information provides the
-        <link linkend='ref-tasks-distrodata'><filename>do_distrodata</filename></link>
-        and
-        <filename>do_distro_check</filename> tasks, which do upstream checking
-        and also verify if a package is used in multiple major distributions.
-    </para>
-
-    <para>
-        The class is not included by default.
-        To use it, you must set the
-        <link linkend='var-INHERIT'><filename>INHERIT</filename></link>
-        variable:
-        <literallayout class='monospaced'>
-     INHERIT+= "distrodata"
-        </literallayout>
-    </para>
-
-    <para>
-        The <filename>distrodata</filename> class also provides the
-        <link linkend='ref-tasks-checkpkg'><filename>do_checkpkg</filename></link>
-        task, which can be used against a simple recipe or against an
-        image to get all its recipe information.
-    </para>
-</section>
-
 <section id='ref-classes-distutils'>
     <title><filename>distutils*.bbclass</filename></title>
 
@@ -775,11 +730,6 @@
         The <filename>distutils-common-base</filename> class is required by
         some of the <filename>distutils*</filename> classes to provide common
         Python2 support.
-    </para>
-
-    <para>
-	    The <filename>distutils-tools</filename> class supports recipes for
-        additional "distutils" tools.
     </para>
 </section>
 
@@ -2335,13 +2285,16 @@ This check was removed for YP 2.3 release
     <title><filename>npm.bbclass</filename></title>
 
     <para>
-        Provides support for building Node.js software fetched using the npm
-        package manager.
+        Provides support for building Node.js software fetched using the
+        <ulink url='https://en.wikipedia.org/wiki/Npm_(software)'>node package manager (NPM)</ulink>.
         <note>
             Currently, recipes inheriting this class must use the
             <filename>npm://</filename> fetcher to have dependencies fetched
             and packaged automatically.
         </note>
+        For information on how to create NPM packages, see the
+        "<ulink url='&YOCTO_DOCS_DEV_URL;#creating-node-package-manager-npm-packages'>Creating Node Package Manager (NPM) Packages</ulink>"
+        section in the Yocto Project Development Tasks Manual.
     </para>
 </section>
 

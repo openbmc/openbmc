@@ -50,4 +50,6 @@ do_install_ptest() {
 	chown -R root:root ${D}${PTEST_PATH}/samples
 }
 
+RDEPENDS_${PN}-ptest += "perl-module-filehandle perl-module-if perl-module-test perl-module-test-more"
+
 BBCLASSEXTEND="native nativesdk"

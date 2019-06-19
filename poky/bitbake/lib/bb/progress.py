@@ -13,6 +13,7 @@ import time
 import inspect
 import bb.event
 import bb.build
+from bb.build import StdoutNoopContextManager
 
 class ProgressHandler(object):
     """
@@ -27,7 +28,14 @@ class ProgressHandler(object):
         if outfile:
             self._outfile = outfile
         else:
-            self._outfile = sys.stdout
+            self._outfile = StdoutNoopContextManager()
+
+    def __enter__(self):
+        self._outfile.__enter__()
+        return self
+
+    def __exit__(self, *excinfo):
+        self._outfile.__exit__(*excinfo)
 
     def _fire_progress(self, taskprogress, rate=None):
         """Internal function to fire the progress event"""
@@ -146,6 +154,12 @@ class MultiStageProgressReporter(object):
             self._stage_times = []
             self._stage_total = None
             self._callers = []
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *excinfo):
+        pass
 
     def _fire_progress(self, taskprogress):
         bb.event.fire(bb.build.TaskProgress(taskprogress), self._data)

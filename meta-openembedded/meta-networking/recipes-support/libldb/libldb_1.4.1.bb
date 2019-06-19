@@ -5,6 +5,8 @@ LICENSE = "LGPL-3.0+ & LGPL-2.1+ & GPL-3.0+"
 
 DEPENDS += "libtdb libtalloc libtevent popt"
 RDEPENDS_pyldb += "python samba"
+RCONFLICTS_${PN} = "samba"
+RCONFLICTS_pyldb = "samba-python"
 
 SRC_URI = "http://samba.org/ftp/ldb/ldb-${PV}.tar.gz \
            file://do-not-import-target-module-while-cross-compile.patch \

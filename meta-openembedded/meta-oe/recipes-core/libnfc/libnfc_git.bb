@@ -9,6 +9,9 @@ inherit autotools pkgconfig
 
 S = "${WORKDIR}/git"
 SRCREV = "c42e2502d4627d3ea62f83c32677b100bb3cebdc"
-SRC_URI = "git://github.com/nfc-tools/libnfc.git"
+SRC_URI = "git://github.com/nfc-tools/libnfc.git \
+           file://0001-usbbus-Include-stdint.h-for-uintX_t.patch \
+          "
 
+CFLAGS_append_libc-musl = " -D_GNU_SOURCE"
 DEPENDS = "libusb"

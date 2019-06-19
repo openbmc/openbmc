@@ -8,8 +8,8 @@ DEPENDS += " \
     ${PYTHON_PN}-cryptography \
 "
 
-SRC_URI[md5sum] = "f8b166652e7a9d668b851b28e4417057"
-SRC_URI[sha256sum] = "03f38115dccb266dd96538f94067442a877932c2322661bdc5bf2502c76658af"
+SRC_URI[md5sum] = "1a518a28ed9c924ca6c570aa8ea0c334"
+SRC_URI[sha256sum] = "f12dfb9bd669a68004074cb5b26df6e93ed1a95ebd1a999dff0a840212ff68bc"
 
 PYPI_PACKAGE = "cryptography_vectors"
 

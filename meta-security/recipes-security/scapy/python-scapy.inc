@@ -12,13 +12,6 @@ SRC_URI = "git://github.com/secdev/scapy.git"
 
 inherit ptest
 
-do_install_append() {
-    if [ "${PYTHON_PN}" = "python3" ]; then
-        sed -i -e 's/python/python3/' ${D}${bindir}/scapy
-        sed -i -e 's/python/python3/' ${D}${bindir}/UTscapy
-    fi
-}
-
 do_install_ptest() {
     install -m 0644 ${S}/test/regression.uts ${D}${PTEST_PATH}
     sed -i 's,@PTEST_PATH@,${PTEST_PATH},' ${D}${PTEST_PATH}/run-ptest

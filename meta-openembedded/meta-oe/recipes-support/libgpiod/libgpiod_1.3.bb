@@ -5,6 +5,9 @@ DEPENDS += "autoconf-archive-native"
 SRC_URI[md5sum] = "9f7530a5d56f070ba0af78d6ba077973"
 SRC_URI[sha256sum] = "6ec837f23e8f2196e5976dec4ac81403170830075e7f33ede1394eaf67f2e962"
 
+# enable tools and cxx bindings
+PACKAGECONFIG ?= "cxx tools"
+
 PACKAGECONFIG[cxx] = "--enable-bindings-cxx,--disable-bindings-cxx"
 PACKAGECONFIG[tests] = "--enable-tests --enable-install-tests,--disable-tests --disable-install-tests,kmod udev"
 

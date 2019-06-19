@@ -21,16 +21,19 @@ import oeqa.utils.gitarchive as gitarchive
 def store(args, logger):
     tempdir = tempfile.mkdtemp(prefix='testresults.')
     try:
+        configvars = resultutils.extra_configvars.copy()
+        if args.executed_by:
+            configvars['EXECUTED_BY'] = args.executed_by
         results = {}
         logger.info('Reading files from %s' % args.source)
         if resultutils.is_url(args.source) or os.path.isfile(args.source):
-            resultutils.append_resultsdata(results, args.source)
+            resultutils.append_resultsdata(results, args.source, configvars=configvars)
         else:
             for root, dirs,  files in os.walk(args.source):
                 for name in files:
                     f = os.path.join(root, name)
                     if name == "testresults.json":
-                        resultutils.append_resultsdata(results, f)
+                        resultutils.append_resultsdata(results, f, configvars=configvars)
                     elif args.all:
                         dst = f.replace(args.source, tempdir + "/")
                         os.makedirs(os.path.dirname(dst), exist_ok=True)
@@ -93,4 +96,6 @@ def register_commands(subparsers):
                               help='include all files, not just testresults.json files')
     parser_build.add_argument('-e', '--allow-empty', action='store_true',
                               help='don\'t error if no results to store are found')
+    parser_build.add_argument('-x', '--executed-by', default='',
+                              help='add executed-by configuration to each result file')
 

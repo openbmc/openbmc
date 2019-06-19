@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=eb723b61539feef013de476e68b5c50a \
 
 inherit autotools pkgconfig update-rc.d systemd bluetooth gobject-introspection-data
 
-DEPENDS  = "dbus glib-2.0 udev mobile-broadband-provider-info"
+DEPENDS  = "dbus glib-2.0 udev mobile-broadband-provider-info ell"
 
 INITSCRIPT_NAME = "ofono"
 INITSCRIPT_PARAMS = "defaults 22"
@@ -19,7 +19,7 @@ PACKAGECONFIG ??= "\
 PACKAGECONFIG[systemd] = "--with-systemdunitdir=${systemd_unitdir}/system/,--with-systemdunitdir="
 PACKAGECONFIG[bluez] = "--enable-bluetooth, --disable-bluetooth, ${BLUEZ}"
 
-EXTRA_OECONF += "--enable-test"
+EXTRA_OECONF += "--enable-test --enable-external-ell"
 
 SYSTEMD_SERVICE_${PN} = "ofono.service"
 

@@ -342,14 +342,24 @@ class CookerDataBuilder(object):
             data = parse_config_file(layerconf, data)
 
             layers = (data.getVar('BBLAYERS') or "").split()
+            broken_layers = []
 
             data = bb.data.createCopy(data)
             approved = bb.utils.approved_variables()
+
+            # Check whether present layer directories exist
             for layer in layers:
                 if not os.path.isdir(layer):
-                    parselog.critical("Layer directory '%s' does not exist! "
-                                      "Please check BBLAYERS in %s" % (layer, layerconf))
-                    sys.exit(1)
+                    broken_layers.append(layer)
+
+            if broken_layers:
+                parselog.critical("The following layer directories do not exist:")
+                for layer in broken_layers:
+                    parselog.critical("   %s", layer)
+                parselog.critical("Please check BBLAYERS in %s" % (layerconf))
+                sys.exit(1)
+
+            for layer in layers:
                 parselog.debug(2, "Adding layer %s", layer)
                 if 'HOME' in approved and '~' in layer:
                     layer = os.path.expanduser(layer)

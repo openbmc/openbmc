@@ -90,5 +90,4 @@ CONFFILES_${PN} = "${sysconfdir}/inittab"
 USE_VT ?= "1"
 SYSVINIT_ENABLED_GETTYS ?= "1"
 
-
-
+RCONFLICTS_${PN} = "busybox-inittab"

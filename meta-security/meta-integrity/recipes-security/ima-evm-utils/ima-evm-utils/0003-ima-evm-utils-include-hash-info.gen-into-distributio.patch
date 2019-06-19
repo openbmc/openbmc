@@ -1,0 +1,31 @@
+From c587ec307a6259a990bfab727cea7db28dba4c23 Mon Sep 17 00:00:00 2001
+From: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Date: Wed, 6 Mar 2019 01:22:30 +0300
+Subject: [PATCH 3/4] ima-evm-utils: include hash-info.gen into distribution
+
+Include hash-info.gen into tarball and call it from the sourcedir to fix
+out-of-tree build (and thus 'make distcheck').
+
+Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+---
+ src/Makefile.am | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 164e7e4..9c037e2 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -11,8 +11,9 @@ include_HEADERS = imaevm.h
+ 
+ nodist_libimaevm_la_SOURCES = hash_info.h
+ BUILT_SOURCES = hash_info.h
++EXTRA_DIST = hash_info.gen
+ hash_info.h: Makefile
+-	./hash_info.gen $(KERNEL_HEADERS) >$@
++	$(srcdir)/hash_info.gen $(KERNEL_HEADERS) >$@
+ 
+ bin_PROGRAMS = evmctl
+ 
+-- 
+2.17.1
+

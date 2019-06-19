@@ -1,0 +1,28 @@
+From b651551134cf170038b3e01812e3767969506491 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 21 May 2019 17:59:26 +0200
+Subject: [PATCH] v1/meson.build: explicitly specify the v1 library in
+ pkgconfig
+
+Otherwise there would be '-lmodulemd' which resolves
+to v2 version if both v2 and v1 are present in the sysroot.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ modulemd/v1/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modulemd/v1/meson.build b/modulemd/v1/meson.build
+index 4d54e69..9144ca2 100644
+--- a/modulemd/v1/meson.build
++++ b/modulemd/v1/meson.build
+@@ -325,7 +325,7 @@ configure_file(
+ )
+ 
+ pkg.generate(
+-    libraries : modulemd_v1_lib,
++    libraries : '-l:libmodulemd.so.1',
+     subdirs : v1_header_path,
+     version : libmodulemd_v1_version,
+     name : 'modulemd',

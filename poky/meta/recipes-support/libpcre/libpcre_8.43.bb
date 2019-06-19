@@ -72,3 +72,5 @@ do_install_ptest() {
 	# locale so the test fails if fr_FR is UTF-8 locale.
 	sed -i -e 's:do3=yes:do3=no:g' ${D}${PTEST_PATH}/RunTest 
 }
+
+RDEPENDS_${PN}-ptest += "make"

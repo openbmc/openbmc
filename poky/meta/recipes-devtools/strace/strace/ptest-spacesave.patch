@@ -1,0 +1,19 @@
+If the test is successful, remove the log and exp files. This stops strace
+using around 600MB of disk space and running our ptest images out of space.
+
+RP 2019/5/29
+
+Upstream-Status: Inappropriate [specific to OE image space issues]
+
+Index: strace-4.26/tests/gen_tests.sh
+===================================================================
+--- strace-4.26.orig/tests/gen_tests.sh
++++ strace-4.26/tests/gen_tests.sh
+@@ -62,6 +62,7 @@ while read -r name arg0 args; do {
+ 		$hdr
+ 		. "\${srcdir=.}/init.sh"
+ 		run_strace_match_diff $arg0 $args
++		rm -rf log exp
+ 		EOF
+ 		;;
+ 

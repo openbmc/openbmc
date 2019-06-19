@@ -1,0 +1,24 @@
+From 58e4dcce48b48b68b65bffc0cd51d9e26b44c75d Mon Sep 17 00:00:00 2001
+From: Jonathan Rajotte <jonathan.rajotte-julien@efficios.com>
+Date: Wed, 22 May 2019 16:44:54 -0400
+Subject: [PATCH] Fix: check for lttng modules presence before testing
+
+Upstream-Status: Submitted [https://lists.lttng.org/pipermail/lttng-dev/2019-May/028987.html]
+
+Signed-off-by: Jonathan Rajotte <jonathan.rajotte-julien@efficios.com>
+---
+ tests/regression/tools/notification/test_notification_multi_app | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/regression/tools/notification/test_notification_multi_app b/tests/regression/tools/notification/test_notification_multi_app
+index 29b0f62..a6baf65 100755
+--- a/tests/regression/tools/notification/test_notification_multi_app
++++ b/tests/regression/tools/notification/test_notification_multi_app
+@@ -484,6 +484,7 @@ else
+ fi
+ 
+ if [ "$(id -u)" == "0" ]; then
++	validate_lttng_modules_present
+ 	TESTS+=(
+ 	test_multi_app_kernel
+ 	test_on_register_evaluation_kernel

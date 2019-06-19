@@ -15,13 +15,13 @@ Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
 Rebase to 52.8.1
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- js/src/js.pc.in | 2 +-
+ js/src/build/js.pc.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/js/src/js.pc.in b/js/src/js.pc.in
+diff --git a/js/src/build/js.pc.in b/js/src/build/js.pc.in
 index 2eae393..c2dea62 100644
---- a/js/src/js.pc.in
-+++ b/js/src/js.pc.in
+--- a/js/src/build/js.pc.in
++++ b/js/src/build/js.pc.in
 @@ -8,4 +8,4 @@ Description: The Mozilla library for JavaScript
  Version: @MOZILLA_VERSION@
  @PKGCONF_REQUIRES_PRIVATE@

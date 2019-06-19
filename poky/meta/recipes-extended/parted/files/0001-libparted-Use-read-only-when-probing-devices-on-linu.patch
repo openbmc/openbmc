@@ -1,7 +1,8 @@
-From d6e15a60e84c1511523aa81272b7db7a6ec441d0 Mon Sep 17 00:00:00 2001
-From: Ovidiu Panait <ovidiu.panait@windriver.com>
+From 843225aa9d5077bebdb08bbf9699c02aec0b83eb Mon Sep 17 00:00:00 2001
+From: "Brian C. Lane" <bcl@redhat.com>
 Date: Tue, 26 Sep 2017 08:04:58 +0000
 Subject: [PATCH] libparted: Use read only when probing devices on linux
+
  (#1245144)
 
 When a device is opened for RW closing it can trigger other actions,
@@ -25,17 +26,17 @@ Resolves: rhbz#1245144
 
 Upstream-Status: Backport
 
-Author: Brian C. Lane <bcl@redhat.com>
 Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
+
 ---
  libparted/arch/linux.c | 62 +++++++++++++++++++++++++++++++++++---------------
  1 file changed, 44 insertions(+), 18 deletions(-)
 
 diff --git a/libparted/arch/linux.c b/libparted/arch/linux.c
-index f612617..0a06a54 100644
+index 7f12f58..4ddea58 100644
 --- a/libparted/arch/linux.c
 +++ b/libparted/arch/linux.c
-@@ -294,7 +294,9 @@ struct blkdev_ioctl_param {
+@@ -292,7 +292,9 @@ struct blkdev_ioctl_param {
  static char* _device_get_part_path (PedDevice const *dev, int num);
  static int _partition_is_mounted_by_path (const char* path);
  static unsigned int _device_get_partition_range(PedDevice const* dev);
@@ -46,7 +47,7 @@ index f612617..0a06a54 100644
  
  static int
  _read_fd (int fd, char **buf)
-@@ -913,7 +915,7 @@ init_ide (PedDevice* dev)
+@@ -911,7 +913,7 @@ init_ide (PedDevice* dev)
          if (!_device_stat (dev, &dev_stat))
                  goto error;
  
@@ -55,7 +56,7 @@ index f612617..0a06a54 100644
                  goto error;
  
          if (ioctl (arch_specific->fd, HDIO_GET_IDENTITY, &hdi)) {
-@@ -982,11 +984,11 @@ init_ide (PedDevice* dev)
+@@ -980,11 +982,11 @@ init_ide (PedDevice* dev)
          if (!_device_probe_geometry (dev))
                  goto error_close_dev;
  
@@ -69,7 +70,7 @@ index f612617..0a06a54 100644
  error:
          return 0;
  }
-@@ -1119,7 +1121,7 @@ init_scsi (PedDevice* dev)
+@@ -1117,7 +1119,7 @@ init_scsi (PedDevice* dev)
          char* vendor;
          char* product;
  
@@ -78,7 +79,7 @@ index f612617..0a06a54 100644
                  goto error;
  
          if (ioctl (arch_specific->fd, SCSI_IOCTL_GET_IDLUN, &idlun) < 0) {
-@@ -1133,7 +1135,7 @@ init_scsi (PedDevice* dev)
+@@ -1131,7 +1133,7 @@ init_scsi (PedDevice* dev)
                          goto error_close_dev;
                  if (!_device_probe_geometry (dev))
                          goto error_close_dev;
@@ -87,7 +88,7 @@ index f612617..0a06a54 100644
                  return 1;
          }
  
-@@ -1155,11 +1157,11 @@ init_scsi (PedDevice* dev)
+@@ -1153,11 +1155,11 @@ init_scsi (PedDevice* dev)
          if (!_device_probe_geometry (dev))
                  goto error_close_dev;
  
@@ -101,7 +102,7 @@ index f612617..0a06a54 100644
  error:
          return 0;
  }
-@@ -1171,7 +1173,7 @@ init_file (PedDevice* dev)
+@@ -1169,7 +1171,7 @@ init_file (PedDevice* dev)
  
          if (!_device_stat (dev, &dev_stat))
                  goto error;
@@ -110,7 +111,7 @@ index f612617..0a06a54 100644
                  goto error;
  
          dev->sector_size = PED_SECTOR_SIZE_DEFAULT;
-@@ -1198,7 +1200,7 @@ init_file (PedDevice* dev)
+@@ -1196,7 +1198,7 @@ init_file (PedDevice* dev)
                  goto error_close_dev;
          }
  
@@ -119,7 +120,7 @@ index f612617..0a06a54 100644
  
          dev->bios_geom.cylinders = dev->length / 4 / 32;
          dev->bios_geom.heads = 4;
-@@ -1209,7 +1211,7 @@ init_file (PedDevice* dev)
+@@ -1207,7 +1209,7 @@ init_file (PedDevice* dev)
          return 1;
  
  error_close_dev:
@@ -128,7 +129,7 @@ index f612617..0a06a54 100644
  error:
          return 0;
  }
-@@ -1225,7 +1227,7 @@ init_dasd (PedDevice* dev, const char* model_name)
+@@ -1223,7 +1225,7 @@ init_dasd (PedDevice* dev, const char* model_name)
          if (!_device_stat (dev, &dev_stat))
                  goto error;
  
@@ -137,7 +138,7 @@ index f612617..0a06a54 100644
                  goto error;
  
          LinuxSpecific* arch_specific = LINUX_SPECIFIC (dev);
-@@ -1265,11 +1267,11 @@ init_dasd (PedDevice* dev, const char* model_name)
+@@ -1263,11 +1265,11 @@ init_dasd (PedDevice* dev, const char* model_name)
  
          dev->model = strdup (model_name);
  
@@ -151,7 +152,7 @@ index f612617..0a06a54 100644
  error:
          return 0;
  }
-@@ -1284,7 +1286,7 @@ init_generic (PedDevice* dev, const char* model_name)
+@@ -1282,7 +1284,7 @@ init_generic (PedDevice* dev, const char* model_name)
          if (!_device_stat (dev, &dev_stat))
                  goto error;
  
@@ -160,7 +161,7 @@ index f612617..0a06a54 100644
                  goto error;
  
          ped_exception_fetch_all ();
-@@ -1332,11 +1334,11 @@ init_generic (PedDevice* dev, const char* model_name)
+@@ -1330,11 +1332,11 @@ init_generic (PedDevice* dev, const char* model_name)
  
          dev->model = strdup (model_name);
  
@@ -174,7 +175,7 @@ index f612617..0a06a54 100644
  error:
          return 0;
  }
-@@ -1623,12 +1625,27 @@ retry:
+@@ -1621,12 +1623,27 @@ retry:
  }
  
  static int
@@ -203,7 +204,7 @@ index f612617..0a06a54 100644
  
          if (arch_specific->fd == -1) {
                  char*   rw_error_msg = strerror (errno);
-@@ -1697,6 +1714,15 @@ linux_refresh_close (PedDevice* dev)
+@@ -1695,6 +1712,15 @@ linux_refresh_close (PedDevice* dev)
          return 1;
  }
  
@@ -218,7 +219,4 @@ index f612617..0a06a54 100644
 +
  #if SIZEOF_OFF_T < 8
  
- #if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,20)
--- 
-2.11.0
-
+ static _syscall5(int,_llseek,

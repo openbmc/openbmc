@@ -5,7 +5,6 @@ SRC_URI += "file://0001-define-macro-_PATH_DHCPD_CONF-and-_PATH_DHCLIENT_CON.pat
             file://0003-link-with-lcrypto.patch \
             file://0004-Fix-out-of-tree-builds.patch \
             file://0005-dhcp-client-fix-invoke-dhclient-script-failed-on-Rea.patch \
-            file://0006-site.h-enable-gentle-shutdown.patch \
             file://0007-Add-configure-argument-to-make-the-libxml2-dependenc.patch \
             file://0009-remove-dhclient-script-bash-dependency.patch \
             file://0012-dhcp-correct-the-intention-for-xml2-lib-search.patch \

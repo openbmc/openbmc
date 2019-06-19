@@ -1,4 +1,4 @@
-From 6fc7f341399ec49ab06c94426f50dbdca49a2844 Mon Sep 17 00:00:00 2001
+From 2d1b65bd1272ad63b7fbd4babd9a8e8c296d15b5 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 22 Feb 2019 13:22:06 +0100
 Subject: [PATCH] (target only) Work-around thumbnailer and pixdata
@@ -15,6 +15,7 @@ The upstream issue is https://bugzilla.gnome.org/show_bug.cgi?id=779057
 
 Upstream-Status: Inappropriate [workaround]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  build-aux/gen-thumbnailer.py |  2 --
  tests/meson.build            | 11 +++++++++--
@@ -35,7 +36,7 @@ index 05ac821..c5b99ab 100644
  if os.name == 'nt':
      gdk_pixbuf_dll_buildpath = os.path.dirname(args.pixdata)
 diff --git a/tests/meson.build b/tests/meson.build
-index 4fa3fbc..eca5166 100644
+index 8ed7cc1..e011b77 100644
 --- a/tests/meson.build
 +++ b/tests/meson.build
 @@ -1,12 +1,19 @@
@@ -91,6 +92,3 @@ index aaafec8..71bd61b 100644
                ],
                install: true,
                install_dir: join_paths(gdk_pixbuf_datadir, 'thumbnailers'))
--- 
-2.17.1
-

@@ -53,7 +53,7 @@
   <object model="orm.release" pk="4">
     <field type="CharField" name="name">thud</field>
     <field type="CharField" name="description">Openembedded Thud</field>
-    <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">1</field>
+    <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">4</field>
     <field type="CharField" name="branch_name">thud</field>
     <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href=\"http://cgit.openembedded.org/openembedded-core/log/?h=thud\"&gt;OpenEmbedded Thud&lt;/a&gt; branch.</field>
   </object>

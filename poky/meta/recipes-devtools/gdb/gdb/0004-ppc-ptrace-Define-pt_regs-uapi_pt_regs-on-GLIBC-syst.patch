@@ -1,24 +1,24 @@
-From 1dd5c44474b01d84de60faded960fef4a0a87e41 Mon Sep 17 00:00:00 2001
+From da30370c1e3ff7728a857e119e0529a9f097086e Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 30 Apr 2016 18:32:14 -0700
-Subject: [PATCH 04/11] ppc/ptrace: Define pt_regs uapi_pt_regs on !GLIBC
- systems
+Subject: [PATCH] ppc/ptrace: Define pt_regs uapi_pt_regs on !GLIBC systems
 
 Upstream-Status: Pending
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  gdb/gdbserver/linux-ppc-low.c | 6 ++++++
  gdb/nat/ppc-linux.h           | 6 ++++++
  2 files changed, 12 insertions(+)
 
 diff --git a/gdb/gdbserver/linux-ppc-low.c b/gdb/gdbserver/linux-ppc-low.c
-index 47428c1529..841a5e02b9 100644
+index 1b695e53..1978347c 100644
 --- a/gdb/gdbserver/linux-ppc-low.c
 +++ b/gdb/gdbserver/linux-ppc-low.c
-@@ -21,7 +21,13 @@
- #include "linux-low.h"
- 
+@@ -23,7 +23,13 @@
+ #include "elf/common.h"
+ #include <sys/uio.h>
  #include <elf.h>
 +#if !defined(__GLIBC__)
 +# define pt_regs uapi_pt_regs
@@ -31,12 +31,12 @@ index 47428c1529..841a5e02b9 100644
  #include "arch/ppc-linux-common.h"
  #include "arch/ppc-linux-tdesc.h"
 diff --git a/gdb/nat/ppc-linux.h b/gdb/nat/ppc-linux.h
-index 3d4d4fdc56..5b93af8d3a 100644
+index f1561b3b..40399361 100644
 --- a/gdb/nat/ppc-linux.h
 +++ b/gdb/nat/ppc-linux.h
 @@ -18,7 +18,13 @@
- #ifndef PPC_LINUX_H
- #define PPC_LINUX_H 1
+ #ifndef NAT_PPC_LINUX_H
+ #define NAT_PPC_LINUX_H
  
 +#if !defined(__GLIBC__)
 +# define pt_regs uapi_pt_regs
@@ -48,6 +48,3 @@ index 3d4d4fdc56..5b93af8d3a 100644
  #include <asm/cputable.h>
  
  /* This sometimes isn't defined.  */
--- 
-2.18.0
-

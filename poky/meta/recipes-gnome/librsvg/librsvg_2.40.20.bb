@@ -14,16 +14,14 @@ BBCLASSEXTEND = "native"
 
 inherit gnomebase gtk-doc pixbufcache upstream-version-is-even gobject-introspection
 
-SRC_URI += "file://gtk-option.patch"
+SRC_URI += "file://gtk-option.patch \
+            file://0001-Auto-detect-Bsymbolic-fixes-configure-on-macOS.patch \
+"
 
 SRC_URI[archive.md5sum] = "4949d313b0c5d9161a5c259104af5568"
 SRC_URI[archive.sha256sum] = "cff4dd3c3b78bfe99d8fcfad3b8ba1eee3289a0823c0e118d78106be6b84c92b"
 
 CACHED_CONFIGUREVARS = "ac_cv_path_GDK_PIXBUF_QUERYLOADERS=${STAGING_LIBDIR_NATIVE}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders"
-
-# The older ld (2.22) on the host (Centos 6.5) doesn't have the
-# -Bsymbolic-functions option, we can disable it for native.
-EXTRA_OECONF_append_class-native = " --enable-Bsymbolic=auto"
 
 PACKAGECONFIG ??= "gdkpixbuf"
 # The gdk-pixbuf loader

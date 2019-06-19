@@ -45,7 +45,7 @@ DEBUG_OPTIMIZATION_append = " -Wno-error"
 
 do_compile() {
 	# Point to right sbindir
-	sed -i -e "s;BINDIR  = /sbin;BINDIR = $base_sbindir;" -e "s;UDEVDIR = /lib;UDEVDIR = $nonarch_base_libdir;" ${S}/Makefile
+	sed -i -e "s;BINDIR  = /sbin;BINDIR = $base_sbindir;" -e "s;UDEVDIR = /lib;UDEVDIR = $nonarch_base_libdir;" -e "s;SYSTEMD_DIR=/lib/systemd/system;SYSTEMD_DIR=${systemd_unitdir}/system;" ${S}/Makefile
 	oe_runmake SYSROOT="${STAGING_DIR_TARGET}"
 }
 
@@ -81,7 +81,7 @@ do_install_ptest() {
 	done
 }
 
-RDEPENDS_${PN}-ptest += "bash"
+RDEPENDS_${PN}-ptest += "bash e2fsprogs-mke2fs"
 RRECOMMENDS_${PN}-ptest += " \
     coreutils \
     util-linux \
@@ -93,4 +93,4 @@ RRECOMMENDS_${PN}-ptest += " \
     kernel-module-raid456 \
 "
 
-FILES_${PN} += "/lib/systemd/*"
+FILES_${PN} += "${systemd_unitdir}/*"

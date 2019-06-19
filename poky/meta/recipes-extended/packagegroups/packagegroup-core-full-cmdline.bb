@@ -135,6 +135,5 @@ RDEPENDS_packagegroup-core-full-cmdline-sys-services = "\
     at \
     cronie \
     logrotate \
-    nfs-utils \
-    rpcbind \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'nfs', 'nfs-utils rpcbind', '', d)} \
     "

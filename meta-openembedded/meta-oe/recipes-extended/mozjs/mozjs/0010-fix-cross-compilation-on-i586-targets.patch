@@ -17,12 +17,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  js/src/old-configure | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/js/src/old-configure b/js/src/old-configure
-index 8a8ef52..d7afcff 100644
 --- a/js/src/old-configure
 +++ b/js/src/old-configure
-@@ -3964,7 +3964,7 @@ IMPORT_LIB_SUFFIX=
- DIRENT_INO=d_ino
+@@ -3833,7 +3833,7 @@ AS='$(CC)'
+ AS_DASH_C_FLAG='-c'
  MOZ_USER_DIR=".mozilla"
  
 -MOZ_FIX_LINK_PATHS="-Wl,-rpath-link,${DIST}/bin -Wl,-rpath-link,${prefix}/lib"
@@ -30,6 +28,3 @@ index 8a8ef52..d7afcff 100644
  
  
  
--- 
-2.7.4
-

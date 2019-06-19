@@ -158,32 +158,6 @@
         </para>
     </section>
 
-    <section id='ref-tasks-distrodata'>
-        <title><filename>do_distrodata</filename></title>
-
-        <para>
-            Provides information about the recipe.
-        </para>
-
-        <para>
-            The <filename>distrodata</filename> task is included as part of the
-            <link linkend='ref-classes-distrodata'><filename>distrodata</filename></link>
-            class.
-        </para>
-
-        <para>
-            To build the <filename>distrodata</filename> task, use the
-            <filename>bitbake</filename> command with the "-c" option and
-            task name:
-            <literallayout class='monospaced'>
-     $ bitbake core-image-minimal -c distrodata
-            </literallayout>
-            By default, the results are stored in
-            <link linkend='var-LOG_DIR'><filename>$LOG_DIR</filename></link>
-            (e.g. <filename>$BUILD_DIR/tmp/log</filename>).
-        </para>
-    </section>
-
     <section id='ref-tasks-fetch'>
         <title><filename>do_fetch</filename></title>
 
@@ -192,7 +166,8 @@
             This task uses the
             <link linkend='var-SRC_URI'><filename>SRC_URI</filename></link>
             variable and the argument's prefix to determine the correct
-            fetcher module.
+            <ulink url='&YOCTO_DOCS_BB_URL;#bb-fetchers'>fetcher</ulink>
+            module.
         </para>
     </section>
 
@@ -635,9 +610,18 @@
         </para>
 
         <para>
-            The <filename>checkpkg</filename> task is included as part of the
-            <link linkend='ref-classes-distrodata'><filename>distrodata</filename></link>
-            class.
+            To check the upstream version and status of a recipe, use the
+            following devtool commands:
+            <literallayout class='monospaced'>
+     $ devtool latest-version
+     $ devtool check-upgrade-status
+            </literallayout>
+            See the
+            "<link linkend='ref-devtool-reference'><filename>devtool</filename> Quick Reference</link>"
+            chapter for more information on <filename>devtool</filename>.
+            See the
+            "<ulink url='&YOCTO_DOCS_REF_URL;#devtool-checking-on-the-upgrade-status-of-a-recipe'>Checking on the Upgrade Status of a Recipe</ulink>"
+            section for information on checking the upgrade status of a recipe.
         </para>
 
         <para>

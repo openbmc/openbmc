@@ -14,11 +14,9 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  js/src/old-configure               |  4 ++--
  3 files changed, 11 insertions(+), 21 deletions(-)
 
-diff --git a/build/moz.configure/init.configure b/build/moz.configure/init.configure
-index 2123beb..6fe6591 100644
 --- a/build/moz.configure/init.configure
 +++ b/build/moz.configure/init.configure
-@@ -179,24 +179,6 @@ def virtualenv_python(env_python, build_env, mozconfig, help):
+@@ -250,24 +250,6 @@ def virtualenv_python(env_python, build_
      else:
          python = sys.executable
  
@@ -42,9 +40,7 @@ index 2123beb..6fe6591 100644
 -
      return python
  
- set_config('PYTHON', virtualenv_python)
-diff --git a/configure.py b/configure.py
-index f7392d0..45323a5 100644
+ 
 --- a/configure.py
 +++ b/configure.py
 @@ -12,7 +12,15 @@ import textwrap
@@ -62,22 +58,11 @@ index f7392d0..45323a5 100644
 +        sys.path.insert(0, os.path.join(sub_dir, module_dir))
 +
  from mozbuild.configure import ConfigureSandbox
- from mozbuild.util import (
-     indented_repr,
-diff --git a/js/src/old-configure b/js/src/old-configure
-index ee4527b..75b00e1 100644
+ from mozbuild.makeutil import Makefile
+ from mozbuild.pythonutil import iter_modules_in_path
 --- a/js/src/old-configure
 +++ b/js/src/old-configure
-@@ -10512,7 +10512,7 @@ if test "$MOZ_BUILD_APP" != js -o -n "$JS_STANDALONE"; then
-     ;;
-   esac
- 
--  eval $dumpenv $PYTHON $_topsrcdir/build/subconfigure.py --prepare "$srcdir" "$moz_config_dir" "$_CONFIG_SHELL" $ac_configure_args 
-+  eval $dumpenv PYTHONPATH=$_topsrcdir/python/mozbuild/ $PYTHON $_topsrcdir/build/subconfigure.py --prepare "$srcdir" "$moz_config_dir" "$_CONFIG_SHELL" $ac_configure_args
- 
-   done
- 
-@@ -10931,7 +10931,7 @@ if test "$JS_STANDALONE"; then
+@@ -9974,7 +9974,7 @@ if test "$JS_STANDALONE"; then
    
  if test "$no_recursion" != yes; then
    trap '' EXIT
@@ -86,6 +71,3 @@ index ee4527b..75b00e1 100644
        exit 1
    fi
  fi
--- 
-2.7.4
-

@@ -9,6 +9,7 @@ LIC_FILES_CHKSUM="file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 SRCREV = "faa40ff345af194d3253f5fb030403e3c9831c36"
 SRC_URI = "git://github.com/jirka-h/haveged.git \
            file://haveged-init.d-Makefile.am-add-missing-dependency.patch \
+           file://fix-cpu-cache-size-detection.patch \
 "
 S = "${WORKDIR}/git"
 

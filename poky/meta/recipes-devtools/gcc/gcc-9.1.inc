@@ -33,7 +33,6 @@ SRC_URI = "\
            file://0003-gcc-4.3.3-SYSROOT_CFLAGS_FOR_TARGET.patch \
            file://0004-64-bit-multilib-hack.patch \
            file://0005-optional-libstdc.patch \
-           file://0006-gcc-disable-MASK_RELAX_PIC_CALLS-bit.patch \
            file://0007-COLLECT_GCC_OPTIONS.patch \
            file://0008-Use-the-defaults.h-in-B-instead-of-S-and-t-oe-in-B.patch \
            file://0009-fortran-cross-compile-hack.patch \

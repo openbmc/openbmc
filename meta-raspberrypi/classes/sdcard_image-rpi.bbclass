@@ -143,7 +143,7 @@ IMAGE_CMD_rpi-sdimg () {
         fi
     fi
 
-    if [ -n ${FATPAYLOAD} ] ; then
+    if [ -n "${FATPAYLOAD}" ] ; then
         echo "Copying payload into VFAT"
         for entry in ${FATPAYLOAD} ; do
             # add the || true to stop aborting on vfat issues like not supporting .~lock files

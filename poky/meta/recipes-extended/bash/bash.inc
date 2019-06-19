@@ -23,13 +23,19 @@ ALTERNATIVE_PRIORITY = "100"
 
 RDEPENDS_${PN} += "base-files"
 RDEPENDS_${PN}_class-nativesdk = ""
-RDEPENDS_${PN}-ptest += "make"
+RDEPENDS_${PN}-ptest += "make coreutils perl sed shadow util-linux-setpriv"
 
 DEPENDS_append_libc-glibc = " virtual/libc-locale"
-RDEPENDS_${PN}-ptest_append_libc-glibc = " locale-base-fr-fr locale-base-de-de"
-
-USERADD_PACKAGES = "${PN}-ptest"
-USERADD_PARAM_${PN}-ptest = "--create-home --user-group test"
+RDEPENDS_${PN}-ptest_append_libc-glibc = " \
+	glibc-gconv-big5hkscs \
+	glibc-gconv-iso8859-1 \
+	glibc-utils \
+	locale-base-de-de \
+	locale-base-en-us \
+	locale-base-fr-fr \
+	locale-base-fr-fr.iso-8859-1 \
+	locale-base-zh-hk.big5-hkscs \
+	"
 
 CACHED_CONFIGUREVARS += "headersdir=${includedir}/${PN}"
 
@@ -66,12 +72,18 @@ do_install_append_class-target () {
 do_install_ptest () {
 	make INSTALL_TEST_DIR=${D}${PTEST_PATH}/tests install-test
 	cp ${B}/Makefile ${D}${PTEST_PATH}
+	install -D ${WORKDIR}/run-bash-ptests ${D}${PTEST_PATH}/run-bash-ptests
         sed -i -e 's/^Makefile/_Makefile/' -e "s,--sysroot=${STAGING_DIR_TARGET},,g" \
 	    -e 's|${DEBUG_PREFIX_MAP}||g' \
 	    -e "s,${S},,g" -e "s,${B},,g" -e "s,${STAGING_DIR_NATIVE},,g" \
 	    -e 's:${HOSTTOOLS_DIR}/::g' \
+	    -e 's:${UNINATIVE_LOADER}:${base_bindir}/false:g' \
 	     ${D}${PTEST_PATH}/Makefile
 }
+# The uninative loader is different on i386 & x86_64 hosts. Since it is only
+# being replaced with /bin/false anyway, it doesn't need to be part of the task
+# hash
+do_install_ptest[vardepsexclude] += "UNINATIVE_LOADER"
 
 pkg_postinst_${PN} () {
 	grep -q "^${base_bindir}/bash$" $D${sysconfdir}/shells || echo ${base_bindir}/bash >> $D${sysconfdir}/shells

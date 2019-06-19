@@ -1,0 +1,35 @@
+From 010f917cf222d2c7205584056fe0e4c581a2e1b1 Mon Sep 17 00:00:00 2001
+From: Adrian Bunk <bunk@stusta.de>
+Date: Thu, 16 May 2019 22:09:46 +0300
+Subject: src/udev/udev-event.c must #include <sys/wait.h>
+
+Fixes the following build failure with musl:
+../git/src/udev/udev-event.c: In function 'spawn_wait':
+../git/src/udev/udev-event.c:600:53: error: 'WEXITED' undeclared (first use in this function); did you mean 'WIFEXITED'?
+         r = sd_event_add_child(e, NULL, spawn->pid, WEXITED, on_spawn_sigchld, spawn);
+                                                     ^~~~~~~
+
+This looks like a bug in udev-event.c that could also have broken
+the compilation after some future glibc header reshuffle.
+
+Upstream-Status: Backport
+Signed-off-by: Adrian Bunk <bunk@stusta.de>
+---
+ src/udev/udev-event.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/udev/udev-event.c b/src/udev/udev-event.c
+index cab1b5ac0c..a0a7ac0f9e 100644
+--- a/src/udev/udev-event.c
++++ b/src/udev/udev-event.c
+@@ -7,6 +7,7 @@
+ #include <stddef.h>
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <sys/wait.h>
+ #include <unistd.h>
+ 
+ #include "sd-event.h"
+-- 
+2.20.1
+

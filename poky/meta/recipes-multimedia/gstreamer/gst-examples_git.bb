@@ -6,11 +6,11 @@ DEPENDS = "glib-2.0 gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-
 
 SRC_URI = "git://gitlab.freedesktop.org/gstreamer/gst-examples.git;protocol=https \
            file://0001-Make-player-examples-installable.patch \
-           file://gst-player.desktop"
+           file://gst-player.desktop \
+           "
 
-SRCREV = "2b3fc175c252cd5a537e4b2864b572a8372473d6"
-PV = "0.0.1+git${SRCPV}"
-UPSTREAM_CHECK_COMMITS = "1"
+SRCREV = "d953c127c1146b50d5676618299933950685dcd7"
+PV = "1.16.0"
 
 S = "${WORKDIR}/git"
 

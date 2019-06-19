@@ -21,8 +21,9 @@ BINCONFIG = "${bindir}/xslt-config"
 
 inherit autotools pkgconfig binconfig-disabled lib_package
 
-# We don't DEPEND on binutils for ansidecl.h so ensure we don't use the header
 do_configure_prepend () {
+	# We don't DEPEND on binutils for ansidecl.h so ensure we don't use the header.
+	# This can be removed when upgrading to 1.1.34.
 	sed -i -e 's/ansidecl.h//' ${S}/configure.ac
 
 	# The timestamps in the 1.1.28 tarball are messed up causing this file to

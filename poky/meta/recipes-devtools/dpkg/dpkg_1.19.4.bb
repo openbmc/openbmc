@@ -9,12 +9,11 @@ SRC_URI = "${DEBIAN_MIRROR}/main/d/${BPN}/${BPN}_${PV}.tar.xz \
            file://0002-Adapt-to-linux-wrs-kernel-version-which-has-characte.patch \
            file://0003-Our-pre-postinsts-expect-D-to-be-set-when-running-in.patch \
            file://0004-The-lutimes-function-doesn-t-work-properly-for-all-s.patch \
-           file://0005-dpkg-compiler.m4-remove-Wvla.patch \
            file://0006-add-musleabi-to-known-target-tripets.patch \
            file://0007-dpkg-deb-build.c-Remove-usage-of-clamp-mtime-in-tar.patch \
            file://0001-dpkg-Support-muslx32-build.patch \
            "
-SRC_URI_append_class-native = " file://glibc2.5-sync_file_range.patch \
+SRC_URI_append_class-native = " \
                                 file://tweak-options-require-tar-1.27.patch \
 "
 

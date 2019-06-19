@@ -65,6 +65,7 @@ PTESTS_SLOW = "\
     gstreamer1.0-ptest \
     libevent-ptest \
     lttng-tools-ptest \
+    mdadm-ptest \
     openssh-ptest \
     openssl-ptest \
     perl-ptest \

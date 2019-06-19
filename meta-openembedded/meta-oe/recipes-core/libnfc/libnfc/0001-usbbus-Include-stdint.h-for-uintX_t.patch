@@ -1,0 +1,24 @@
+From cb2a3991545ba9e885704226ed3e831bd5e4cb27 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 20 May 2019 22:10:05 -0700
+Subject: [PATCH] usbbus: Include stdint.h for uintX_t
+
+stdint.h is needed for uintX_t typedefs which are
+used to replace u_intX_t in libusb API headers in the cmake files
+
+Upstream-Status: Submitted [https://github.com/nfc-tools/libnfc/pull/544]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libnfc/buses/usbbus.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+--- a/libnfc/buses/usbbus.h
++++ b/libnfc/buses/usbbus.h
+@@ -35,6 +35,7 @@
+ 
+ #ifndef _WIN32
+ // Under POSIX system, we use libusb (>= 0.1.12)
++#include <stdint.h>
+ #include <usb.h>
+ #define USB_TIMEDOUT ETIMEDOUT
+ #define _usb_strerror( X ) strerror(-X)

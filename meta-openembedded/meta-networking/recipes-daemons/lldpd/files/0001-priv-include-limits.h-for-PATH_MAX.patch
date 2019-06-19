@@ -1,0 +1,27 @@
+From c6a283bfcbfefe9c89113e81b0f792c12c4eefb8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?S=C3=B6ren=20Tempel?= <soeren+git@soeren-tempel.net>
+Date: Mon, 25 Mar 2019 18:43:03 +0100
+Subject: [PATCH] priv: include limits.h for PATH_MAX
+
+Upstream-Status: Backport
+
+Signed-off-by: Oleksandr Kravchuk <open.source@oleksandr-kravchuk.com>
+---
+ src/daemon/priv.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/daemon/priv.c b/src/daemon/priv.c
+index f4d6bdf..ba5ae58 100644
+--- a/src/daemon/priv.c
++++ b/src/daemon/priv.c
+@@ -27,6 +27,7 @@
+ #include <unistd.h>
+ #include <signal.h>
+ #include <errno.h>
++#include <limits.h>
+ #include <sys/wait.h>
+ #include <sys/stat.h>
+ #include <sys/socket.h>
+-- 
+2.17.1
+

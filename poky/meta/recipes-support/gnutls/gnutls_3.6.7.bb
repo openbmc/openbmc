@@ -44,6 +44,7 @@ EXTRA_OECONF = " \
     --enable-local-libopts \
     --enable-openssl-compatibility \
     --with-libpthread-prefix=${STAGING_DIR_HOST}${prefix} \
+    --with-default-trust-store-file=${sysconfdir}/ssl/certs/ca-certificates.crt \
 "
 
 LDFLAGS_append_libc-musl = " -largp"
