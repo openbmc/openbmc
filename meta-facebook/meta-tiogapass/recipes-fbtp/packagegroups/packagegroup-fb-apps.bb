@@ -19,4 +19,5 @@ RDEPENDS_${PN}-system = " \
         fb-powerctrl \
         phosphor-ipmi-ipmb \
         fb-ipmi-oem \
+        phosphor-pid-control \
         "
