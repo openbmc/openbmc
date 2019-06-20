@@ -1,5 +1,4 @@
 {
-  "redfishSupportEnabled" : true,
   "customKeyEnable": true,
   "keyType" : "VT100+",
   "customConsoleDisplaySize": {
