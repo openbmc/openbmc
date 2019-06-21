@@ -162,7 +162,7 @@ py_package_preprocess () {
 PACKAGES_remove = "${PN}"
 
 # manual dependency additions
-RPROVIDES_${PN}-core = "${PN}"
+RPROVIDES_${PN}-modules = "${PN}"
 RRECOMMENDS_${PN}-core_append_class-nativesdk = " nativesdk-python-modules"
 RRECOMMENDS_${PN}-crypt = "openssl"
 

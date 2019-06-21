@@ -35,7 +35,9 @@ class LogrotateTest(OERuntimeTestCase):
 
     @OETestDepends(['logrotate.LogrotateTest.test_1_logrotate_setup'])
     def test_2_logrotate(self):
-        status, output = self.target.run('logrotate -f /etc/logrotate.conf')
+        status, output = self.target.run('echo "create \n include /etc/logrotate.d" > /tmp/logrotate-test.conf')
+        status, output = self.target.run('logrotate -f /tmp/logrotate-test.conf')
+
         msg = ('logrotate service could not be reloaded. Status and output: '
                 '%s and %s' % (status, output))
         self.assertEqual(status, 0, msg = msg)

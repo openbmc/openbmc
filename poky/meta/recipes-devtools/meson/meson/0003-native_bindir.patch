@@ -51,7 +51,7 @@ index 6d3678f..90fdb80 100644
 -        cmd = self.pkgbin.get_command() + args
 +    def _call_pkgbin_real(self, args, env, use_native=False):
 +        if use_native:
-+            cmd = self.pkgbin.get_command() + "-native" + args
++            cmd = [self.pkgbin.get_command()[0] + "-native"] + args
 +        else:
 +            cmd = self.pkgbin.get_command() + args
          p, out = Popen_safe(cmd, env=env)[0:2]

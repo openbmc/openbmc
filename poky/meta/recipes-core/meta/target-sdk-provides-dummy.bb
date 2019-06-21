@@ -46,6 +46,7 @@ DUMMYPROVIDES = "\
     /bin/bash \
     /usr/bin/env \
     /usr/bin/perl \
+    libperl.so.5 \
     pkgconfig \
     pkgconfig-dev \
     pkgconfig-src \

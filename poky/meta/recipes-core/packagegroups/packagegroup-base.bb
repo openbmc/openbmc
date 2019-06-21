@@ -271,6 +271,7 @@ RRECOMMENDS_packagegroup-base-ipsec = "\
 SUMMARY_packagegroup-base-wifi = "WiFi support"
 RDEPENDS_packagegroup-base-wifi = "\
     iw \
+    wireless-regdb-static \
     wpa-supplicant"
 
 RRECOMMENDS_packagegroup-base-wifi = "\

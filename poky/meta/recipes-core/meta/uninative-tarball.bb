@@ -16,6 +16,7 @@ TOOLCHAIN_HOST_TASK = "\
     nativesdk-glibc-gconv-libjis \
     nativesdk-patchelf \
     nativesdk-libxcrypt \
+    nativesdk-libxcrypt-compat \
     nativesdk-libnss-nis \
     "
 

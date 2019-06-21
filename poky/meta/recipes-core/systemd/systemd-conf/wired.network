@@ -1,5 +1,6 @@
 [Match]
 Name=en* eth*
+KernelCommandLine=!nfsroot
 
 [Network]
 DHCP=yes

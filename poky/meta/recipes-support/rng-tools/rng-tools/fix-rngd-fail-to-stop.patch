@@ -1,0 +1,25 @@
+It fails to stop rngd. It just shows warnings when stop rngd such as by:
+
+$ systemctl stop rngd.service
+
+but stalls shutdown untill daemon rngd is killed.
+
+Backport patch to fix the issue.
+
+Upstream-Status: Backport [https://bugzilla.redhat.com/show_bug.cgi?id=1690364#c8]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+diff --git a/rngd_jitter.c b/rngd_jitter.c
+index 54070ae..7a69bf9 100644
+--- a/rngd_jitter.c
++++ b/rngd_jitter.c
+@@ -280,7 +280,7 @@ static void *thread_entropy_task(void *data)
+ 
+ 		/* Write to pipe */
+ 		written = 0;
+-		while(written != me->buf_sz) {
++		while(me->active && written != me->buf_sz) {
+ 			message(LOG_DAEMON|LOG_DEBUG, "Writing to pipe\n");
+ 			ret = write(me->pipe_fd, &tmpbuf[written], me->buf_sz - written);
+ 			message(LOG_DAEMON|LOG_DEBUG, "DONE Writing to pipe with return %ld\n", ret);

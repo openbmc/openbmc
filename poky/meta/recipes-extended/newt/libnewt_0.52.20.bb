@@ -15,7 +15,7 @@ LICENSE = "LGPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=5f30f0716dfdd0d91eb439ebec522ec2"
 
 # slang needs to be >= 2.2
-DEPENDS = "slang popt"
+DEPENDS = "slang popt python3"
 
 SRC_URI = "https://releases.pagure.org/newt/newt-${PV}.tar.gz \
            file://fix_SHAREDDIR.patch \
@@ -30,15 +30,20 @@ SRC_URI[sha256sum] = "8d66ba6beffc3f786d4ccfee9d2b43d93484680ef8db9397a4fb70b5ad
 
 S = "${WORKDIR}/newt-${PV}"
 
-EXTRA_OECONF = "--without-tcl --without-python"
+inherit autotools-brokensep python3native python3-dir
 
-inherit autotools-brokensep
+EXTRA_OECONF = "--without-tcl --with-python"
+
+EXTRA_OEMAKE += "PYTHONVERS=${PYTHON_DIR}"
 
 CLEANBROKEN = "1"
 
 export CPPFLAGS
 
-PACKAGES_prepend = "whiptail "
+PACKAGES_prepend = "whiptail ${PN}-python "
+
+RDEPENDS_${PN}-python += "python3-core"
+FILES_${PN}-python = "${PYTHON_SITEPACKAGES_DIR}/*"
 
 do_configure_prepend() {
     sh autogen.sh

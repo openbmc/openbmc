@@ -16,7 +16,7 @@ class PtestParser(object):
     def parse(self, logfile):
         test_regex = {}
         test_regex['PASSED'] = re.compile(r"^PASS:(.+)")
-        test_regex['FAILED'] = re.compile(r"^FAIL:(.+)")
+        test_regex['FAILED'] = re.compile(r"^FAIL:([^(]+)")
         test_regex['SKIPPED'] = re.compile(r"^SKIP:(.+)")
 
         section_regex = {}
@@ -69,7 +69,7 @@ class PtestParser(object):
                     if result:
                         if current_section['name'] not in self.results:
                             self.results[current_section['name']] = {}
-                        self.results[current_section['name']][result.group(1)] = t
+                        self.results[current_section['name']][result.group(1).strip()] = t
 
         return self.results, self.sections
 

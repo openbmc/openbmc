@@ -839,11 +839,15 @@ python buildhistory_eventhandler() {
             if e.data.getVar("BUILDHISTORY_COMMIT") == "1":
                 bb.note("Writing buildhistory")
                 bb.build.exec_func("buildhistory_write_sigs", d)
+                import time
+                start=time.time()
                 localdata = bb.data.createCopy(e.data)
                 localdata.setVar('BUILDHISTORY_BUILD_FAILURES', str(e._failures))
                 interrupted = getattr(e, '_interrupted', 0)
                 localdata.setVar('BUILDHISTORY_BUILD_INTERRUPTED', str(interrupted))
                 bb.build.exec_func("buildhistory_commit", localdata)
+                stop=time.time()
+                bb.note("Writing buildhistory took: %s seconds" % round(stop-start))
             else:
                 bb.note("No commit since BUILDHISTORY_COMMIT != '1'")
 }

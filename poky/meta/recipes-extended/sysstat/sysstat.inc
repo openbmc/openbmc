@@ -52,12 +52,11 @@ do_install() {
 }
 
 pkg_postinst_${PN} () {
-        if [ -n "$D" ]; then
-                exit 0
-        fi
-        if [ -e /etc/init.d/populate-volatile.sh ]; then
-                /etc/init.d/populate-volatile.sh update
-        fi
+	if [  ! -n "$D" ]; then
+		if [ -e /etc/init.d/populate-volatile.sh ]; then
+			/etc/init.d/populate-volatile.sh update
+		fi
+	fi
 }
 
 FILES_${PN} += "${libdir}/sa ${systemd_system_unitdir}"

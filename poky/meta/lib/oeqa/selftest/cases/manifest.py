@@ -86,11 +86,8 @@ class VerifyManifest(OESelftestTestCase):
         try:
             mdir = self.get_dir_from_bb_var('SDK_DEPLOY', self.buildtarget)
             for k in d_target.keys():
-                bb_vars = get_bb_vars(['SDK_NAME', 'SDK_VERSION'], self.buildtarget)
-                mfilename[k] = "{}-toolchain-{}.{}.manifest".format(
-                        bb_vars['SDK_NAME'],
-                        bb_vars['SDK_VERSION'],
-                        k)
+                toolchain_outputname = get_bb_var('TOOLCHAIN_OUTPUTNAME', self.buildtarget)
+                mfilename[k] = "{}.{}.manifest".format(toolchain_outputname, k)
                 mpath[k] = os.path.join(mdir, mfilename[k])
                 if not os.path.isfile(mpath[k]):
                     self.logger.debug("{}: {} does not exist".format(

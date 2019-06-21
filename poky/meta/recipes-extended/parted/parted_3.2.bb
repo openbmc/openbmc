@@ -18,6 +18,7 @@ SRC_URI = "${GNU_MIRROR}/parted/parted-${PV}.tar.xz \
            file://run-ptest \
            file://Makefile \
            file://0001-libparted-Use-read-only-when-probing-devices-on-linu.patch \
+           file://dm_check.patch \
 "
 
 SRC_URI[md5sum] = "0247b6a7b314f8edeb618159fa95f9cb"

@@ -647,6 +647,7 @@ class DpkgRootfs(DpkgOpkgRootfs):
             if pkg_type in pkgs_to_install:
                 self.pm.install(pkgs_to_install[pkg_type],
                                 [False, True][pkg_type == Manifest.PKG_TYPE_ATTEMPT_ONLY])
+                self.pm.fix_broken_dependencies()
 
         if self.progress_reporter:
             # Don't support attemptonly, so skip that

@@ -259,13 +259,6 @@ def package_qa_check_dbg(path, name, d, elf, messages):
             package_qa_add_message(messages, "debug-files", "non debug package contains .debug directory: %s path %s" % \
                      (name, package_qa_clean_path(path,d)))
 
-QAPATHTEST[perms] = "package_qa_check_perm"
-def package_qa_check_perm(path,name,d, elf, messages):
-    """
-    Check the permission of files
-    """
-    return
-
 QAPATHTEST[arch] = "package_qa_check_arch"
 def package_qa_check_arch(path,name,d, elf, messages):
     """
@@ -408,7 +401,8 @@ def package_qa_check_buildpaths(path, name, d, elf, messages):
     with open(path, 'rb') as f:
         file_content = f.read()
         if tmpdir in file_content:
-            package_qa_add_message(messages, "buildpaths", "File %s in package contained reference to tmpdir" % package_qa_clean_path(path,d))
+            trimmed = path.replace(os.path.join (d.getVar("PKGDEST"), name), "")
+            package_qa_add_message(messages, "buildpaths", "File %s in package %s contains reference to TMPDIR" % (trimmed, name))
 
 
 QAPATHTEST[xorg-driver-abi] = "package_qa_check_xorg_driver_abi"

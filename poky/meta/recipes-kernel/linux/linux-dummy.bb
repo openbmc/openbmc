@@ -39,6 +39,10 @@ do_compile () {
 	:
 }
 
+do_compile_kernelmodules() {
+    :
+}
+
 do_shared_workdir () {
 	:
 }
@@ -58,3 +62,4 @@ do_deploy() {
 addtask bundle_initramfs after do_install before do_deploy
 addtask deploy after do_install
 addtask shared_workdir after do_compile before do_install
+addtask compile_kernelmodules

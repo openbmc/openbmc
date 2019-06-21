@@ -40,15 +40,6 @@ binconfig_package_preprocess () {
 		    -e 's:${STAGING_DIR_HOST}${prefix}:${prefix}:' \
                     $config
 	done
-	for lafile in `find ${PKGD} -type f -name "*.la"` ; do
-		sed -i \
-		    -e 's:${STAGING_BASELIBDIR}:${base_libdir}:g;' \
-		    -e 's:${STAGING_LIBDIR}:${libdir}:g;' \
-		    -e 's:${STAGING_INCDIR}:${includedir}:g;' \
-		    -e 's:${STAGING_DATADIR}:${datadir}:' \
-		    -e 's:${STAGING_DIR_HOST}${prefix}:${prefix}:' \
-		    $lafile
-	done	    
 }
 
 SYSROOT_PREPROCESS_FUNCS += "binconfig_sysroot_preprocess"

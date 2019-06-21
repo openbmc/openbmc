@@ -21,7 +21,9 @@ S = "${WORKDIR}/SDL2-${PV}"
 SRC_URI[md5sum] = "f2ecfba915c54f7200f504d8b48a5dfe"
 SRC_URI[sha256sum] = "255186dc676ecd0c1dbf10ec8a2cc5d6869b5079d8a38194c2aecdff54b324b1"
 
-inherit autotools lib_package binconfig pkgconfig
+inherit autotools lib_package binconfig-disabled pkgconfig
+
+BINCONFIG = "${bindir}/sdl2-config"
 
 CVE_PRODUCT = "simple_directmedia_layer sdl"
 

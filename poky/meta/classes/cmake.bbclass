@@ -119,7 +119,7 @@ set( ENV{QT_CONF_PATH} ${WORKDIR}/qt.conf )
 # directory as rpath by default
 set( CMAKE_INSTALL_RPATH ${OECMAKE_RPATH} )
 
-# Use native cmake modules
+# Use our cmake modules
 list(APPEND CMAKE_MODULE_PATH "${STAGING_DATADIR}/cmake/Modules/")
 
 # add for non /usr/lib libdir, e.g. /usr/lib64

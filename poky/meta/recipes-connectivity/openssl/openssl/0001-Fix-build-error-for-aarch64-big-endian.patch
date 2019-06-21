@@ -1,0 +1,43 @@
+From 1f8c0f2feea5cdcae0bcd9dfc78198d9e2c4cf09 Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@cn.fujitsu.com>
+Date: Thu, 13 Jun 2019 12:17:30 +0900
+Subject: [PATCH] Fix build error for aarch64 big endian.
+
+Modified rev to rev64, because rev only takes integer registers.
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=90827
+Otherwise, the following error will occur.
+
+Error: operand 1 must be an integer register -- `rev v31.16b,v31.16b'
+
+Upstream-Status: Submitted [https://github.com/openssl/openssl/pull/9151]
+
+Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
+---
+ crypto/sha/asm/keccak1600-armv8.pl | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/sha/asm/keccak1600-armv8.pl b/crypto/sha/asm/keccak1600-armv8.pl
+index dc72f18..6620690 100755
+--- a/crypto/sha/asm/keccak1600-armv8.pl
++++ b/crypto/sha/asm/keccak1600-armv8.pl
+@@ -731,7 +731,7 @@ $code.=<<___;
+ 	blo	.Lprocess_block_ce
+ 	ldr	d31,[$inp],#8		// *inp++
+ #ifdef	__AARCH64EB__
+-	rev	v31.16b,v31.16b
++	rev64	v31.16b,v31.16b
+ #endif
+ 	eor	$A[$j/5][$j%5],$A[$j/5][$j%5],v31.16b
+ 	beq	.Lprocess_block_ce
+@@ -740,7 +740,7 @@ ___
+ $code.=<<___;
+ 	ldr	d31,[$inp],#8		// *inp++
+ #ifdef	__AARCH64EB__
+-	rev	v31.16b,v31.16b
++	rev64	v31.16b,v31.16b
+ #endif
+ 	eor	$A[4][4],$A[4][4],v31.16b
+ 
+-- 
+2.7.4
+

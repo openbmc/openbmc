@@ -55,8 +55,10 @@ class BootimgEFIPlugin(SourcePlugin):
             if not bootimg_dir:
                 raise WicError("Couldn't find DEPLOY_DIR_IMAGE, exiting")
 
-            cp_cmd = "cp %s/%s %s" % (bootimg_dir, initrd, hdddir)
-            exec_cmd(cp_cmd, True)
+            initrds = initrd.split(';')
+            for rd in initrds:
+                cp_cmd = "cp %s/%s %s" % (bootimg_dir, rd, hdddir)
+                exec_cmd(cp_cmd, True)
         else:
             logger.debug("Ignoring missing initrd")
 
@@ -84,7 +86,11 @@ class BootimgEFIPlugin(SourcePlugin):
                 % (kernel, label_conf, bootloader.append)
 
             if initrd:
-               grubefi_conf += "initrd /%s\n" % initrd
+                initrds = initrd.split(';')
+                grubefi_conf += "initrd"
+                for rd in initrds:
+                    grubefi_conf += " /%s" % rd
+                grubefi_conf += "\n"
 
             grubefi_conf += "}\n"
 
@@ -119,8 +125,10 @@ class BootimgEFIPlugin(SourcePlugin):
             if not bootimg_dir:
                 raise WicError("Couldn't find DEPLOY_DIR_IMAGE, exiting")
 
-            cp_cmd = "cp %s/%s %s" % (bootimg_dir, initrd, hdddir)
-            exec_cmd(cp_cmd, True)
+            initrds = initrd.split(';')
+            for rd in initrds:
+                cp_cmd = "cp %s/%s %s" % (bootimg_dir, rd, hdddir)
+                exec_cmd(cp_cmd, True)
         else:
             logger.debug("Ignoring missing initrd")
 
@@ -164,7 +172,9 @@ class BootimgEFIPlugin(SourcePlugin):
                              (label_conf, bootloader.append)
 
             if initrd:
-                boot_conf += "initrd /%s\n" % initrd
+                initrds = initrd.split(';')
+                for rd in initrds:
+                    boot_conf += "initrd /%s\n" % rd
 
         logger.debug("Writing systemd-boot config "
                      "%s/hdd/boot/loader/entries/boot.conf", cr_workdir)
