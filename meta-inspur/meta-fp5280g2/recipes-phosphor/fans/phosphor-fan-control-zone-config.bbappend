@@ -1,0 +1,2 @@
+FILESEXTRAPATHS_prepend_fp5280g2 := "${THISDIR}/${BPN}:"
+
