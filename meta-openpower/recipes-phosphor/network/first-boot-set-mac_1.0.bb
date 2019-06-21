@@ -10,11 +10,11 @@ RDEPENDS_${PN} = "${VIRTUAL-RUNTIME_base-utils}"
 
 SYSTEMD_SERVICE_${PN} = "first-boot-set-mac@.service"
 
-SRC_URI = "file://${PN}.sh file://${PN}@.service"
+SRC_URI = "file://${BPN}.sh file://${BPN}@.service"
 
 S = "${WORKDIR}"
 do_install() {
     install -d ${D}${bindir} ${D}${systemd_system_unitdir}
-    install ${PN}.sh ${D}${bindir}/
-    install -m 644 ${PN}@.service ${D}${systemd_system_unitdir}/
+    install ${BPN}.sh ${D}${bindir}/
+    install -m 644 ${BPN}@.service ${D}${systemd_system_unitdir}/
 }
