@@ -32,18 +32,12 @@ SRC_URI = "https://lttng.org/files/lttng-tools/lttng-tools-${PV}.tar.bz2 \
            file://x32.patch \
            file://run-ptest \
            file://lttng-sessiond.service \
-           file://0001-Fix-tests-link-libpause_consumer-on-liblttng-ctl.patch \
-           file://0002-Fix-test-skip-test_getcpu_override-on-single-thread-.patch \
-           file://0003-Fix-test-unit-the-tree-origin-can-be-a-symlink-itsel.patch \
-           file://0004-Skip-when-testapp-is-not-present.patch\
-           file://0005-Tests-use-modprobe-to-test-for-the-presence-of-lttng.patch \
-           file://0006-Tests-check-for-lttng-modules-presence.patch \
-           file://0007-Fix-getgrnam-is-not-MT-Safe-use-getgrnam_r.patch \
-           file://0008-Fix-check-for-lttng-modules-presence-before-testing.patch \
+           file://0001-Skip-when-testapp-is-not-present.patch \
+           file://0002-Fix-check-for-lttng-modules-presence-before-testing.patch \
            "
 
-SRC_URI[md5sum] = "e88c521b5da6bb48a8187af633336ecc"
-SRC_URI[sha256sum] = "f05df52bbebf8ce88d1b29e9e98cfc957d2ed738a345118018237ebdb581537c"
+SRC_URI[md5sum] = "e7804d10e4cade381e241601f6047373"
+SRC_URI[sha256sum] = "ed71ebe00c5d985c74f30e97b614e909573cbd9276c85e05d9557a0b817a1312"
 
 inherit autotools ptest pkgconfig useradd python3-dir manpages systemd
 

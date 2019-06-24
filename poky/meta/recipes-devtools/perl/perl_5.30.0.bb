@@ -19,6 +19,8 @@ SRC_URI = "https://www.cpan.org/src/5.0/perl-${PV}.tar.gz;name=perl \
            file://perl-dynloader.patch \
            file://0001-configure_path.sh-do-not-hardcode-prefix-lib-as-libr.patch \
            file://fix-setgroup.patch \
+           file://0001-enc2xs-Add-environment-variable-to-suppress-comments.patch \
+           file://0002-Constant-Fix-up-shebang.patch \
            "
 SRC_URI_append_class-native = " \
            file://perl-configpm-switch.patch \
@@ -36,6 +38,9 @@ inherit upstream-version-is-even
 DEPENDS += "db gdbm zlib virtual/crypt"
 
 PERL_LIB_VER = "${@'.'.join(d.getVar('PV').split('.')[0:2])}.0"
+
+# Don't generate comments in enc2xs output files. They are not reproducible
+export ENC2XS_NO_COMMENTS = "1"
 
 do_unpack_append() {
     bb.build.exec_func('do_copy_perlcross', d)

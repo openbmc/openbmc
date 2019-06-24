@@ -10,13 +10,12 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=37b5762e07f0af8c74ce80a8bda4266b"
 DEPENDS = "zlib"
 DEPENDS_append_class-target = " protobuf-native"
 
-PV .= "+git${SRCPV}"
+SRCREV = "09745575a923640154bcf307fba8aedff47f240a"
 
-SRCREV = "48cb18e5c419ddd23d9badcfe4e9df7bde1979b2"
-
-SRC_URI = "git://github.com/google/protobuf.git;branch=3.6.x \
+SRC_URI = "git://github.com/google/protobuf.git;branch=3.8.x \
            file://run-ptest \
            file://0001-protobuf-fix-configure-error.patch \
+           file://0001-Added-stubs-map_util.h-to-list-of-installed-headers.patch \
 "
 S = "${WORKDIR}/git"
 

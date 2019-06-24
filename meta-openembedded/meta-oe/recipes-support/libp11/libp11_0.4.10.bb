@@ -19,7 +19,6 @@ inherit autotools pkgconfig
 EXTRA_OECONF = "--disable-static"
 
 do_install_append () {
-    rm -rf ${D}${libdir}/*.la
     rm -rf ${D}${docdir}/${BPN}
 }
 

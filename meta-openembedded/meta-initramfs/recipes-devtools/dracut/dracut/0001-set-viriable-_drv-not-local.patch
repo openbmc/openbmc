@@ -1,0 +1,69 @@
+From 6e0da103effe64832eea52fad5c44a328f7141b7 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 20 Jun 2019 17:31:11 +0800
+Subject: [PATCH] set viriable _drv not local
+
+If shebang is set to /bin/sh and /bin/sh is a symlink to /bin/bash,
+bash turn on posix mode.
+
+Since bash is upgraded to 5.0, it follows 'IEEE 1003.2 POSIX Shell
+Standard', to implement 'functions do not have local traps or options,
+and it is not possible to define local variables'
+
+For more detail, see variables.c:push_posix_temp_var in the following commit
+http://git.savannah.gnu.org/cgit/bash.git/commit/?id=d233b485e83c3a784b803fb894280773f16f2deb
+
+The IEEE 1003.2 POSIX Shell Standard:
+https://www.cs.ait.ac.th/~on/O/oreilly/unix/ksh/appa_02.htm
+
+While /bin/sh points to bash 5.0, it caused the following issue:
+
+$ cat <<ENDOF>case.sh
+fsck_drv_com(){
+  echo "issuing \$_drv"
+}
+
+fsck_able() {
+  _drv="_drv=e2fsck fsck_drv_com"
+}
+
+fsck_single() {
+  local _drv
+  fsck_able
+  eval "\$_drv"
+}
+fsck_single
+ENDOF
+$ chmod a+x case.sh
+
+Unexpected:
+$ ./cash.sh
+issuing _drv=e2fsck fsck_drv_com
+
+Set viriable _drv not local, get expected result:
+$ ./case.sh
+issuing e2fsck
+
+Upstream-Status: Submitted [https://github.com/dracutdevs/dracut/pull/587]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ modules.d/99fs-lib/fs-lib.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules.d/99fs-lib/fs-lib.sh b/modules.d/99fs-lib/fs-lib.sh
+index d39ca1b..60877ee 100755
+--- a/modules.d/99fs-lib/fs-lib.sh
++++ b/modules.d/99fs-lib/fs-lib.sh
+@@ -142,7 +142,7 @@ fsck_single() {
+     local _fs="${2:-auto}"
+     local _fsopts="$3"
+     local _fop="$4"
+-    local _drv
++    _drv=""
+ 
+     [ $# -lt 2 ] && return 255
+     # if UUID= marks more than one device, take only the first one
+-- 
+2.7.4
+

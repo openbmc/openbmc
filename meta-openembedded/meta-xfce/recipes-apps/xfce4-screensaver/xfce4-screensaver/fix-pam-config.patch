@@ -1,0 +1,14 @@
+'@include' is not a standard sysntax and not supported by oe.
+
+Upstream-Status: Submitted [https://bugzilla.xfce.org/show_bug.cgi?id=15626]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+diff --git a/data/xfce4-screensaver.common-auth b/data/xfce4-screensaver.common-auth
+index a9fd9ce..3bfea70 100644
+--- a/data/xfce4-screensaver.common-auth
++++ b/data/xfce4-screensaver.common-auth
+@@ -1,2 +1,2 @@
+-@include common-auth
++auth include common-auth
+ auth optional pam_gnome_keyring.so

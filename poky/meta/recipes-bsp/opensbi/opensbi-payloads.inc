@@ -31,7 +31,7 @@ def riscv_get_do_compile_depends(d):
 
     if 'linux' in sbi_payload or 'Image' in sbi_payload:
         return "virtual/kernel:do_deploy"
-    if 'u-boot' in sbi_payload:
+    if 'u-boot.bin' in sbi_payload:
         return "virtual/bootloader:do_deploy"
 
     return ""

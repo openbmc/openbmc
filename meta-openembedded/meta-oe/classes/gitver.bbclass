@@ -48,7 +48,7 @@ def get_git_hash(d):
     srcdir = d.getVar("EXTERNALSRC") or d.getVar("S")
     gitdir = os.path.abspath(os.path.join(srcdir, ".git"))
     try:
-        rev = gitrev_run("git rev-list HEAD -1")
+        rev = gitrev_run("git rev-list HEAD -1", gitdir)
         return rev[:7]
     except Exception as exc:
         bb.fatal(str(exc))

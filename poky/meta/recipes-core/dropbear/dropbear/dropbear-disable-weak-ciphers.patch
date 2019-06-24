@@ -1,0 +1,44 @@
+This feature disables all CBC, SHA1, and diffie-hellman group1 ciphers 
+in the dropbear ssh server and client since they're considered weak ciphers
+and we want to support the stong algorithms.
+
+Upstream-Status: Inappropriate [configuration]
+Signed-off-by: Joseph Reynolds <joseph.reynolds1@ibm.com>
+
+Index: dropbear-2019.78/default_options.h
+===================================================================
+--- dropbear-2019.78.orig/default_options.h
++++ dropbear-2019.78/default_options.h
+@@ -91,7 +91,7 @@ IMPORTANT: Some options will require "ma
+ 
+ /* Enable CBC mode for ciphers. This has security issues though
+  * is the most compatible with older SSH implementations */
+-#define DROPBEAR_ENABLE_CBC_MODE 1
++#define DROPBEAR_ENABLE_CBC_MODE 0
+ 
+ /* Enable "Counter Mode" for ciphers. This is more secure than
+  * CBC mode against certain attacks. It is recommended for security
+@@ -101,7 +101,7 @@ IMPORTANT: Some options will require "ma
+ /* Message integrity. sha2-256 is recommended as a default, 
+    sha1 for compatibility */
+ #define DROPBEAR_SHA1_HMAC 1
+-#define DROPBEAR_SHA1_96_HMAC 1
++#define DROPBEAR_SHA1_96_HMAC 0
+ #define DROPBEAR_SHA2_256_HMAC 1
+ 
+ /* Hostkey/public key algorithms - at least one required, these are used
+@@ -149,12 +149,12 @@ IMPORTANT: Some options will require "ma
+  * Small systems should generally include either curve25519 or ecdh for performance.
+  * curve25519 is less widely supported but is faster
+  */ 
+-#define DROPBEAR_DH_GROUP14_SHA1 1
++#define DROPBEAR_DH_GROUP14_SHA1 0
+ #define DROPBEAR_DH_GROUP14_SHA256 1
+ #define DROPBEAR_DH_GROUP16 0
+ #define DROPBEAR_CURVE25519 1
+ #define DROPBEAR_ECDH 1
+-#define DROPBEAR_DH_GROUP1 1
++#define DROPBEAR_DH_GROUP1 0
+ 
+ /* When group1 is enabled it will only be allowed by Dropbear client
+ not as a server, due to concerns over its strength. Set to 0 to allow

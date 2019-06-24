@@ -32,6 +32,8 @@ class OETestCase(unittest.TestCase):
     @classmethod
     def _oeSetUpClass(clss):
         _validate_td_vars(clss.td, clss.td_vars, "class")
+        if hasattr(clss, 'setUpHooker') and callable(getattr(clss, 'setUpHooker')):
+            clss.setUpHooker()
         clss.setUpClassMethod()
 
     @classmethod

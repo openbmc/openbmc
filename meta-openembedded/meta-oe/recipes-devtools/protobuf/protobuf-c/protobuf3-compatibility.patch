@@ -1,0 +1,55 @@
+From 7456d1621223d425b8a3fd74e435a79c046169fb Mon Sep 17 00:00:00 2001
+From: Robert Edmonds <edmonds@users.noreply.github.com>
+Date: Wed, 10 Apr 2019 20:47:48 -0400
+Subject: [PATCH] t/generated-code2/cxx-generate-packed-data.cc: Fix build
+ failure on newer protobuf
+
+ Upstream-Status: Backport [https://github.com/protobuf-c/protobuf-c/pull/369]
+
+google::protobuf::Message::Reflection has been removed in newer versions
+of protobuf. The replacement is google::protobuf::Reflection.
+
+protobuf in commit 779f61c6a3ce02a119e28e802f229e61b69b9046 ("Integrate
+recent changes from google3.", from August 2008) changed the following
+in message.h:
+
+    @@ -336,7 +337,8 @@ class LIBPROTOBUF_EXPORT Message {
+
+       // Introspection ---------------------------------------------------
+
+    -  class Reflection;  // Defined below.
+    +  // Typedef for backwards-compatibility.
+    +  typedef google::protobuf::Reflection Reflection;
+
+The "typedef for backwards-compatibility" apparently lasted ten years
+until protobuf commit 6bbe197e9c1b6fc38cbdc45e3bf83fa7ced792a3
+("Down-integrate from google3.", from August 2018) which finally removed
+the typedef:
+
+    @@ -327,8 +344,6 @@ class LIBPROTOBUF_EXPORT Message : public MessageLite {
+
+       // Introspection ---------------------------------------------------
+
+    -  // Typedef for backwards-compatibility.
+    -  typedef google::protobuf::Reflection Reflection;
+
+This commit updates the only use of this typedef (in the test suite) to
+directly refer to the replacement, google::protobuf::Reflection. This
+fixes the build failure in the test suite.
+---
+ t/generated-code2/cxx-generate-packed-data.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/t/generated-code2/cxx-generate-packed-data.cc b/t/generated-code2/cxx-generate-packed-data.cc
+index 4fd3e25..0865d2e 100644
+--- a/t/generated-code2/cxx-generate-packed-data.cc
++++ b/t/generated-code2/cxx-generate-packed-data.cc
+@@ -998,7 +998,7 @@ static void dump_test_packed_repeated_enum (void)
+ static void dump_test_unknown_fields (void)
+ {
+   EmptyMess mess;
+-  const google::protobuf::Message::Reflection *reflection = mess.GetReflection();
++  const google::protobuf::Reflection *reflection = mess.GetReflection();
+   google::protobuf::UnknownFieldSet *fs = reflection->MutableUnknownFields(&mess);
+
+ #if GOOGLE_PROTOBUF_VERSION >= 2001000

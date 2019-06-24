@@ -18,21 +18,35 @@ SRC_URI = "git://github.com/ssvb/cpuburn-arm.git \
 S = "${WORKDIR}/git"
 
 do_compile() {
-    ${CC} ${CFLAGS} ${LDFLAGS} burn.S -o burn
-    ${CC} ${CFLAGS} ${LDFLAGS} cpuburn-a7.S -o burn-a7
-    ${CC} ${CFLAGS} ${LDFLAGS} cpuburn-a8.S -o burn-a8
-    ${CC} ${CFLAGS} ${LDFLAGS} cpuburn-a9.S -o burn-a9
-    ${CC} ${CFLAGS} ${LDFLAGS} cpuburn-a53.S -o burn-a53
-    ${CC} ${CFLAGS} ${LDFLAGS} cpuburn-krait.S -o burn-krait
+
+    # If the arch is set to ARM 64-bit -  we only produce and ship burn-a53 version.
+    # In case of ARM 32-bit - we would build all variants, since burn-a53 supports both
+    # 32 and 64-bit builds
+    if ${@bb.utils.contains('TUNE_FEATURES', 'aarch64', 'true', 'false', d)}; then
+        ${CC} ${CFLAGS} ${LDFLAGS} cpuburn-a53.S -o burn-a53
+    else
+        ${CC} ${CFLAGS} ${LDFLAGS} burn.S -o burn
+        ${CC} ${CFLAGS} ${LDFLAGS} cpuburn-a7.S -o burn-a7
+        ${CC} ${CFLAGS} ${LDFLAGS} cpuburn-a8.S -o burn-a8
+        ${CC} ${CFLAGS} ${LDFLAGS} cpuburn-a9.S -o burn-a9
+        ${CC} ${CFLAGS} ${LDFLAGS} cpuburn-a53.S -o burn-a53
+        ${CC} ${CFLAGS} ${LDFLAGS} cpuburn-krait.S -o burn-krait
+    fi
 }
 
 do_install() {
     install -d ${D}${bindir}
-    for f in burn burn-a7 burn-a8 burn-a9 burn-a53 burn-krait; do
-        install -m 0755 $f ${D}${bindir}/$f
-    done
+
+    if ${@bb.utils.contains('TUNE_FEATURES', 'aarch64', 'true', 'false', d)}; then
+        install -m 0755 burn-a53 ${D}${bindir}
+    else
+        for f in burn burn-a7 burn-a8 burn-a9 burn-a53 burn-krait; do
+            install -m 0755 $f ${D}${bindir}/$f
+        done
+    fi
 }
 
 COMPATIBLE_MACHINE ?= "(^$)"
 COMPATIBLE_MACHINE_armv7a = "(.*)"
 COMPATIBLE_MACHINE_armv7ve = "(.*)"
+COMPATIBLE_MACHINE_aarch64 = "(.*)"

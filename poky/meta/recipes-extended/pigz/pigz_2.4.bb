@@ -38,7 +38,7 @@ do_install_append_class-native() {
 	ln -nsf gzip ${D}${bindir}/zcat
 }
 
-ALTERNATIVE_PRIORITY = "80"
+ALTERNATIVE_PRIORITY = "110"
 ALTERNATIVE_${PN} = "gunzip gzip zcat"
 ALTERNATIVE_${PN}_class-nativesdk = ""
 ALTERNATIVE_LINK_NAME[gunzip] = "${base_bindir}/gunzip"

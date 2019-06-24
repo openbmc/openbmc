@@ -24,6 +24,7 @@ PTESTS_FAST = "\
     kbd-ptest \
     libconvert-asn1-perl-ptest \
     liberror-perl-ptest \
+    libmodule-build-perl-ptest \
     libpcre-ptest \
     libtimedate-perl-ptest \
     libtest-needs-perl-ptest \

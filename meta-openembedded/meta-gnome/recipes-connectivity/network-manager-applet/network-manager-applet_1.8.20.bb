@@ -2,7 +2,7 @@ SUMMARY = "GTK+ applet for NetworkManager"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552"
 
-DEPENDS = "gtk+3 libnotify libsecret networkmanager dbus-glib \
+DEPENDS = "gtk+3 libnotify libsecret networkmanager \
            gconf libgnome-keyring iso-codes nss \
            intltool-native \
 "
@@ -34,14 +34,13 @@ do_configure_append() {
 GI_DATA_ENABLED_libc-musl = "False"
 
 do_compile_prepend() {
-    export GIR_EXTRA_LIBS_PATH="${B}/src/libnma/.libs:${B}/src/libnm-gtk/.libs"
+    export GIR_EXTRA_LIBS_PATH="${B}/src/libnma/.libs"
 }
 
 RDEPENDS_${PN} =+ "networkmanager"
 
 FILES_${PN} += " \
     ${datadir}/nm-applet/ \
-    ${datadir}/libnm-gtk/wifi.ui \
     ${datadir}/libnma/wifi.ui \
     ${datadir}/metainfo \
 "

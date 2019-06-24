@@ -34,6 +34,6 @@ RDEPENDS_${PN} += "\
     perl-module-io-select \
     perl-module-io-socket \
 "
-RDEPENDS_${PN}-ptest += "${PN} freeradius"
+RDEPENDS_${PN}-ptest += "freeradius"
 
 BBCLASSEXTEND = "native"

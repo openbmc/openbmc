@@ -10,10 +10,6 @@ SRC_URI = "git://git.code.sf.net/p/tipc/tipcutils \
 SRCREV = "7ab2211b87414ba240b0b2e4af219c1057c9cf9a"
 PV = "2.2.0+git${SRCPV}"
 
-DEPENDS="virtual/kernel"
-
-PACKAGE_ARCH = "${MACHINE_ARCH}"
-
 inherit autotools pkgconfig
 
 DEPENDS += "libdaemon"

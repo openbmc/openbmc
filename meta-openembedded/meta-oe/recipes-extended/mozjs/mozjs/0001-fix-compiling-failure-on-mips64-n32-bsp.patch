@@ -1,6 +1,6 @@
-From 5ad700c92224193bfc789f7d53af38fc6f8b8904 Mon Sep 17 00:00:00 2001
+From f2f8be496c8e34b4d909b688a95c6f8565201081 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Thu, 19 Jul 2018 17:31:35 +0800
+Date: Wed, 19 Jun 2019 14:30:44 +0800
 Subject: [PATCH] fix compiling failure on mips64-n32 bsp
 
 - Tweak mips64-n32 with mips32
@@ -16,15 +16,18 @@ Subject: [PATCH] fix compiling failure on mips64-n32 bsp
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
 ---
  build/moz.configure/init.configure                | 5 ++++-
  js/src/jit/mips-shared/Architecture-mips-shared.h | 4 +++-
  python/mozbuild/mozbuild/configure/constants.py   | 2 +-
  3 files changed, 8 insertions(+), 3 deletions(-)
 
+diff --git a/build/moz.configure/init.configure b/build/moz.configure/init.configure
+index 648ac2d..d0bcaf8 100644
 --- a/build/moz.configure/init.configure
 +++ b/build/moz.configure/init.configure
-@@ -650,7 +650,10 @@ def split_triplet(triplet, allow_unknown
+@@ -650,7 +650,10 @@ def split_triplet(triplet, allow_unknown=False):
          canonical_cpu = 'mips32'
          endianness = 'little' if 'el' in cpu else 'big'
      elif cpu in ('mips64', 'mips64el'):
@@ -36,26 +39,30 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
          endianness = 'little' if 'el' in cpu else 'big'
      elif cpu.startswith('aarch64'):
          canonical_cpu = 'aarch64'
+diff --git a/js/src/jit/mips-shared/Architecture-mips-shared.h b/js/src/jit/mips-shared/Architecture-mips-shared.h
+index e95ffd4..caf83f7 100644
 --- a/js/src/jit/mips-shared/Architecture-mips-shared.h
 +++ b/js/src/jit/mips-shared/Architecture-mips-shared.h
-@@ -26,6 +26,8 @@
- #define USES_O32_ABI
- #elif (defined(_MIPS_SIM) && (_MIPS_SIM == _ABI64)) || defined(JS_SIMULATOR_MIPS64)
+@@ -28,6 +28,8 @@
+ #elif (defined(_MIPS_SIM) && (_MIPS_SIM == _ABI64)) || \
+     defined(JS_SIMULATOR_MIPS64)
  #define USES_N64_ABI
 +#elif (defined(_MIPS_SIM) && (_MIPS_SIM == _ABIN32))
 +#define USES_N32_ABI
  #else
  #error "Unsupported ABI"
  #endif
-@@ -93,7 +95,7 @@ class Registers
-         ta1 = t5,
-         ta2 = t6,
-         ta3 = t7,
+@@ -94,7 +96,7 @@ class Registers {
+     ta1 = t5,
+     ta2 = t6,
+     ta3 = t7,
 -#elif defined(USES_N64_ABI)
 +#elif defined(USES_N64_ABI) || defined(USES_N32_ABI)
-         a4 = r8,
-         a5 = r9,
-         a6 = r10,
+     a4 = r8,
+     a5 = r9,
+     a6 = r10,
+diff --git a/python/mozbuild/mozbuild/configure/constants.py b/python/mozbuild/mozbuild/configure/constants.py
+index 1067b6a..e0f0405 100644
 --- a/python/mozbuild/mozbuild/configure/constants.py
 +++ b/python/mozbuild/mozbuild/configure/constants.py
 @@ -90,8 +90,8 @@ CPU_preprocessor_checks = OrderedDict((
@@ -68,3 +75,6 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
      ('sh4', '__sh__'),
  ))
  
+-- 
+2.7.4
+

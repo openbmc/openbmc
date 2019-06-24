@@ -1,0 +1,28 @@
+Fix compile on sytems using libc++ instead of libstdc++
+
+libc++ does not really implement __gnu_cxx namespace and it
+compiles fine without this namespace, therefore detect libc++
+and if it is used them exclude this namespace 
+
+See https://github.com/stressapptest/stressapptest/issues/47
+
+Fixes
+
+./sattypes.h:33:17: error: expected namespace name
+using namespace __gnu_cxx; //NOLINT
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- stressapptest-1.0.9.orig/src/sattypes.h
++++ stressapptest-1.0.9/src/sattypes.h
+@@ -30,7 +30,9 @@
+ #include "stressapptest_config_android.h"  // NOLINT
+ #else
+ #include "stressapptest_config.h"  // NOLINT
++#ifndef _LIBCPP_VERSION
+ using namespace __gnu_cxx;  //NOLINT
++#endif  // _LIBCPP_VERSION
+ #endif  // __ANDROID__
+ using namespace std;
+

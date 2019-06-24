@@ -39,6 +39,12 @@ RDEPENDS_${PN}-ptest_append_libc-glibc = " \
 
 CACHED_CONFIGUREVARS += "headersdir=${includedir}/${PN}"
 
+do_compile_prepend() {
+    # Remove any leftover .build files. This ensures that bash always has the
+    # same version number and keeps builds reproducible
+    rm -f ${B}/.build
+}
+
 do_compile_ptest () {
 	oe_runmake buildtest
 }

@@ -13,8 +13,8 @@ SRC_URI = "https://www.snort.org/downloads/archive/snort/${BP}.tar.gz \
     file://disable-run-test-program-while-cross-compiling.patch \
 "
 
-SRC_URI[md5sum] = "378e3938b2b5c8e358f942d0ffce18cc"
-SRC_URI[sha256sum] = "9f6b3aeac5a109f55504bd370564ac431cb1773507929dc461626898f33f46cd"
+SRC_URI[md5sum] = "b61ae846af022018b05511076baad60c"
+SRC_URI[sha256sum] = "31447393d15286b848810dd78ab2cb3ad231fcd1f1663f959587690eeea75413"
 
 UPSTREAM_CHECK_URI = "https://www.snort.org/downloads"
 UPSTREAM_CHECK_REGEX = "snort-(?P<pver>\d+(\.\d+)+)\.tar"
@@ -45,6 +45,7 @@ EXTRA_OECONF = " \
 PACKAGECONFIG ?= "openssl lzma"
 PACKAGECONFIG[openssl] = "--with-openssl-includes=${STAGING_INCDIR} --with-openssl-libraries=${STAGING_LIBDIR}, --without-openssl-includes --without-openssl-libraries, openssl,"
 PACKAGECONFIG[lzma] = "--with-lzma-includes=${STAGING_INCDIR} --with-lzma-libraries=${STAGING_LIBDIR}, --without-lzma-includes --without-lzma-libraries, xz,"
+PACKAGECONFIG[appid] = "--enable-open-appid, --disable-open-appid, luajit, bash"
 
 CFLAGS += "-I${STAGING_INCDIR}/tirpc"
 LDFLAGS += " -ltirpc"

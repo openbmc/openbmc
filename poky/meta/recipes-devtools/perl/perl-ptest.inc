@@ -2,6 +2,9 @@ inherit ptest
 
 SRC_URI += "file://run-ptest \
            "
+
+DEBUG_PREFIX_MAP_REGEX = "${@'\\|'.join(d.getVar('DEBUG_PREFIX_MAP').split())}"
+
 do_install_ptest () {
 	mkdir -p ${D}${PTEST_PATH}
 	sed -e "s:\/usr\/local:${bindir}:g" -i cpan/version/t/*
@@ -13,7 +16,7 @@ do_install_ptest () {
 	    --exclude='win32/config.*' --exclude=plan9 --exclude=README.plan9 --exclude=perlplan9.pod --exclude=Configure \
 	    --exclude=veryclean.sh --exclude=realclean.sh  --exclude=getioctlsizes \
 	    --exclude=dl_aix.xs --exclude=sdbm.3 --exclude='cflags.SH' --exclude=makefile.old \
-		--exclude=miniperl --exclude=generate_uudmap --exclude=patches * | ( cd ${D}${PTEST_PATH} && tar -x )
+		--exclude=miniperl --exclude=generate_uudmap --exclude=patches --exclude='config.log' * | ( cd ${D}${PTEST_PATH} && tar -x )
 
 	ln -sf ${bindir}/perl ${D}${PTEST_PATH}/t/perl
 
@@ -21,12 +24,12 @@ do_install_ptest () {
 	find "${D}${PTEST_PATH}" \
 	     \( -name '*.PL' -o -name 'myconfig' -o -name 'cflags' -o -name '*.pl' -o -name '*.sh' -o -name '*.pm' \
 	     -o -name 'h2xs' -o -name 'h2ph' \
-	     -o -name '*.h' -o -name 'config.sh-*' -o -name 'pod2man'  -o -name 'pod2text' \) \
+	     -o -name '*.h' -o -name 'config.sh-*' -o -name 'pod2man'  -o -name 'pod2text' -o -name 'Makefile.config' \) \
 	    -type f -exec sed -i \
 	       -e "s,${D},,g" \
 	       -e "s,--sysroot=${STAGING_DIR_HOST},,g" \
 	       -e "s,-isystem${STAGING_INCDIR} ,,g" \
-	       -e 's|${DEBUG_PREFIX_MAP}||g' \
+	       -e 's^${DEBUG_PREFIX_MAP_REGEX}^^g' \
 	       -e "s,${STAGING_BINDIR_NATIVE}/perl-native/,${bindir}/,g" \
 	       -e "s,${STAGING_LIBDIR},${libdir},g" \
 	       -e "s,${STAGING_BINDIR},${bindir},g" \
