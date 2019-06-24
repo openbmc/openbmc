@@ -7,7 +7,6 @@ python() {
     slp_enabled = bb.utils.contains(
             'DISTRO_FEATURES', 'slp', True, False, d)
 
-
     if not avahi_enabled and not slp_enabled:
         return
 
@@ -28,7 +27,7 @@ python() {
         for service in listvar_to_list(d, 'REGISTERED_SERVICES_%s' % pkg):
             if avahi_enabled:
                 set_append(d, 'RRECOMMENDS_%s' % pkg, 'avahi-daemon')
-                svc_name, svc_type, svc_port = service.split(':')
+                svc_name, svc_type, svc_port, svc_txt_data = service.split(':')
                 set_append(d, 'FILES_%s' % pkg, os.path.join(
                     syscnfdir,
                     'avahi',
@@ -37,7 +36,7 @@ python() {
 
             if slp_enabled:
                 set_append(d, 'RRECOMMENDS_%s' % pkg, 'slpd-lite')
-                svc_name, svc_type, svc_port = service.split(':')
+                svc_name, svc_type, svc_port, svc_txt_data = service.split(':')
                 set_append(d, 'FILES_%s' % pkg, os.path.join(
                     syscnfdir,
                     'slp',
@@ -64,7 +63,8 @@ python discovery_services_postinstall() {
     if not os.path.exists(slp_service_dir):
         os.makedirs(slp_service_dir)
 
-    def register_service_avahi(d, service_name, service_type, service_port):
+    def register_service_avahi(d, service_name, service_type, service_port, service_txt_data):
+        service_txt_data = service_txt_data.split('|')
         service_file = os.path.join(
             avahi_service_dir,
             '%s.service' % service_name)
@@ -76,9 +76,15 @@ python discovery_services_postinstall() {
             fd.write('        <service>\n')
             fd.write('                <type>%s</type>\n' % service_type)
             fd.write('                <port>%s</port>\n' % service_port)
+            for txt_record in service_txt_data:
+                if txt_record:
+                    key, value = txt_record.split('=')
+                    if key.strip() and value.strip():
+                        fd.write('                <txt-record>%s</txt-record>\n' % txt_record)
+                    else:
+                        bb.fatal('Invalid Additional data : \'%s\'. Ignoring!' % txt_record)
             fd.write('        </service>\n')
             fd.write('</service-group>\n')
-
 
     def register_service_slp(d, service_name, service_type, service_port):
         service_file = os.path.join(
@@ -91,12 +97,12 @@ python discovery_services_postinstall() {
         for service in listvar_to_list(d, 'REGISTERED_SERVICES_%s' % pkg):
             svc_info = service.split(":")
             try:
-                svc_name, svc_type, svc_port = svc_info
+                svc_name, svc_type, svc_port, svc_txt_data = svc_info
             except:
                 continue
             if avahi_enabled:
                 avahi_svc_type = "_" + svc_name + "._" + svc_type
-                register_service_avahi(d, svc_name, avahi_svc_type, svc_port)
+                register_service_avahi(d, svc_name, avahi_svc_type, svc_port, svc_txt_data)
             if slp_enabled:
                 register_service_slp(d, svc_name, svc_type, svc_port)
 
