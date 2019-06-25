@@ -7,7 +7,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -21,7 +21,7 @@
                 "types":
                 {
                     "rType": "chassis",
-                    "fType": "sensors"
+                    "fType": "all_sensors"
                 },
                 "paths":
                 [
@@ -52,7 +52,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -66,7 +66,7 @@
                 "types":
                 {
                     "rType": "chassis",
-                    "fType": "sensors"
+                    "fType": "all_sensors"
                 },
                 "paths":
                 [
@@ -98,7 +98,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -127,7 +127,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -156,7 +156,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -185,7 +185,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -214,7 +214,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -279,7 +279,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -297,7 +297,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -315,7 +315,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -333,7 +333,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -351,7 +351,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -369,7 +369,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -387,7 +387,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -404,7 +404,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -421,7 +421,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -438,7 +438,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -455,7 +455,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -472,7 +472,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -489,7 +489,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -506,7 +506,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -523,7 +523,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -540,7 +540,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -557,7 +557,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -574,7 +574,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -591,7 +591,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -608,7 +608,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -625,7 +625,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -642,7 +642,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -659,7 +659,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -676,7 +676,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -693,7 +693,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -710,7 +710,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -727,7 +727,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -744,7 +744,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -761,7 +761,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -778,7 +778,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -796,7 +796,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -813,7 +813,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -830,7 +830,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -847,7 +847,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -864,7 +864,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -881,7 +881,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -898,7 +898,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -915,7 +915,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -932,7 +932,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -949,7 +949,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -966,7 +966,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -983,7 +983,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1000,7 +1000,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1017,7 +1017,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1034,7 +1034,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1051,7 +1051,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1068,7 +1068,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1085,7 +1085,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1102,7 +1102,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1119,7 +1119,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1136,7 +1136,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1153,7 +1153,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1170,7 +1170,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1187,7 +1187,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1205,7 +1205,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1222,7 +1222,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1239,7 +1239,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1256,7 +1256,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1273,7 +1273,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1290,7 +1290,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1307,7 +1307,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1324,7 +1324,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1341,7 +1341,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1358,7 +1358,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1375,7 +1375,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1392,7 +1392,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1409,7 +1409,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1426,7 +1426,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1443,7 +1443,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1460,7 +1460,7 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "child_sensors"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
@@ -1477,7 +1477,7 @@
                 "types":
                 {
                     "rType": "chassis",
-                    "fType": "sensors"
+                    "fType": "all_sensors"
                 },
                 "paths":
                 [
