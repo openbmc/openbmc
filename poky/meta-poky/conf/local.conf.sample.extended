@@ -321,7 +321,6 @@ DISTRO_FEATURES_remove = "x11"
 # show an example of how it can be done
 # You'll also need your fortran recipe to depend on libgfortran
 #FORTRAN_forcevariable = ",fortran"
-#RUNTIMETARGET_append_pn-gcc-runtime = " libquadmath"
 
 #
 # Kernel image features

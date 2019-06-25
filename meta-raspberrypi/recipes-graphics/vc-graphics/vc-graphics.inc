@@ -25,9 +25,6 @@ do_install () {
   install -d ${D}${bindir}
   cp -R bin/* ${D}${bindir}
 
-  install -d ${D}${sbindir}
-  cp -R sbin/* ${D}${sbindir}
-
   install -d ${D}${libdir}
   # note: -H option to deref symlinked .so
   cp -R -H lib/* ${D}${libdir}
@@ -49,7 +46,6 @@ INITSCRIPT_NAME = "vchiq.sh"
 INITSCRIPT_PARAMS = "start 03 S ."
 
 FILES_${PN} = "${bindir}/* \
-               ${sbindir}/* \
                ${libdir}/lib*.so \
                ${sysconfdir}/init.d \
                ${libdir}/plugins"
