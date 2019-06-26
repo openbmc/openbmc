@@ -1,0 +1,11 @@
+[Unit]
+Description=Initialize MAC Address
+Before=usb_network.service network-pre.target
+Wants=network-pre.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/mac-address
+
+[Install]
+WantedBy=multi-user.target
