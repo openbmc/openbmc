@@ -1,5 +1,7 @@
 FILESEXTRAPATHS_prepend_romulus := "${THISDIR}/${BPN}:"
 
+SRCREV = "d9a580aa5037fdb08911940263a580b036f2d9fa"
+
 # Package configuration
 FAN_PACKAGES += " \
         phosphor-cooling-type \
@@ -19,4 +21,3 @@ SYSTEMD_LINK_phosphor-cooling-type += "${@compose_list(d, 'FMT_COOLING', 'OBMC_C
 COOLING_ENV_FMT = "obmc/phosphor-fan/phosphor-cooling-type-{0}.conf"
 
 SYSTEMD_ENVIRONMENT_FILE_phosphor-cooling-type_append_romulus = " ${@compose_list(d, 'COOLING_ENV_FMT', 'OBMC_CHASSIS_INSTANCES')}"
-
