@@ -2,7 +2,7 @@ HOMEPAGE = "http://github.com/openbmc/phosphor-ipmi-flash"
 SUMMARY = "Phosphor OEM IPMI In-band Firmware Update over BLOB"
 DESCRIPTION = "This package handles a series of OEM IPMI commands that implement the firmware update handler over the BLOB protocol."
 PR = "r1"
-PV = "0.1+git${SRCPV}"
+PV = "1.0+git${SRCPV}"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
