@@ -18,6 +18,8 @@ DEPENDS += "pciutils"
 
 PACKAGECONFIG ?= "cleanup-delete"
 PACKAGECONFIG[cleanup-delete] = "--enable-cleanup-delete, --disable-cleanup-delete"
+# If using static-layout, reboot-update is a good option to handle updating.
+PACKAGECONFIG[reboot-update] = "--enable-reboot-update, --disable-reboot-update"
 
 EXTRA_OECONF = "--disable-tests --disable-build-host-tool"
 
