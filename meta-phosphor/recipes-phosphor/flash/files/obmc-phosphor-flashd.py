@@ -16,6 +16,7 @@
 # implied. See the License for the specific language governing
 # permissions and limitations under the License.
 
+from __future__ import print_function
 import time
 import sys
 import dbus
@@ -23,7 +24,7 @@ import dbus.service
 import dbus.mainloop.glib
 
 if __name__ == '__main__':
-	print "obmc-phosphor-flashd starting..."
+	print("obmc-phosphor-flashd starting...")
 
 	while 1:
 		time.sleep(5)

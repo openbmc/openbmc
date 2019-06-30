@@ -7,6 +7,7 @@
 
 """PLY grammar file.
 """
+from __future__ import print_function
 import os.path
 import sys
 
@@ -746,7 +747,7 @@ def print_commands(cmds, output=sys.stdout):
             for c in cmd:
                 print_tree(c, spaces + 3, output)              
         else:
-            print >>output, ' '*spaces + str(cmd)
+            print(' '*spaces + str(cmd), file=output)
     
     formatted = format_commands(cmds)
     print_tree(formatted, 0, output)
