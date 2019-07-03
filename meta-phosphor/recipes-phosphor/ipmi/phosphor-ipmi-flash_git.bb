@@ -23,7 +23,7 @@ EXTRA_OECONF = "--disable-tests --disable-build-host-tool"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/phosphor-ipmi-flash"
-SRCREV = "48e309c5ffd21961f2acf3acf9937221c7fe64d1"
+SRCREV = "33311b47b3b656cfc16568b4b971730cb79130bc"
 
 FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
 FILES_${PN}_append = " ${libdir}/blob-ipmid/lib*${SOLIBS}"
