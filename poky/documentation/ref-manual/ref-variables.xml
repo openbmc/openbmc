@@ -11309,7 +11309,7 @@
                     Here are two examples:
                     <literallayout class='monospaced'>
      PREFERRED_VERSION_python = "3.4.0"
-     PREFERRED_VERSION_linux-yocto = "5.0%"
+     PREFERRED_VERSION_linux-yocto = "4.12%"
                     </literallayout>
                     <note><title>Important</title>
                         The use of the "<filename>%</filename>" character
@@ -11355,14 +11355,14 @@
                     to set a machine-specific override.
                     Here is an example:
                     <literallayout class='monospaced'>
-     PREFERRED_VERSION_linux-yocto_qemux86 = "5.0%"
+     PREFERRED_VERSION_linux-yocto_qemux86 = "4.12%"
                     </literallayout>
                     Although not recommended, worst case, you can also use the
                     "forcevariable" override, which is the strongest override
                     possible.
                     Here is an example:
                     <literallayout class='monospaced'>
-     PREFERRED_VERSION_linux-yocto_forcevariable = "5.0%"
+     PREFERRED_VERSION_linux-yocto_forcevariable = "4.12%"
                     </literallayout>
                     <note>
                         The <filename>_forcevariable</filename> override is
@@ -13722,9 +13722,6 @@
                             a secure shell.</para></listitem>
                         <listitem><para><emphasis><filename>svn://</filename> -</emphasis> Fetches files from
                             a Subversion (<filename>svn</filename>) revision control repository.</para></listitem>
-                        <listitem><para><emphasis><filename>npm://</filename> -</emphasis> Fetches JavaScript
-                            modules from a registry.
-                            </para></listitem>
                     </itemizedlist>
                 </para>
 

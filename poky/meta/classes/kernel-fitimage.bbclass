@@ -42,16 +42,13 @@ python __anonymous () {
         # Verified boot will sign the fitImage and append the public key to
         # U-Boot dtb. We ensure the U-Boot dtb is deployed before assembling
         # the fitImage:
-        if d.getVar('UBOOT_SIGN_ENABLE') == "1" and d.getVar('UBOOT_DTB_BINARY'):
+        if d.getVar('UBOOT_SIGN_ENABLE') == "1":
             uboot_pn = d.getVar('PREFERRED_PROVIDER_u-boot') or 'u-boot'
             d.appendVarFlag('do_assemble_fitimage', 'depends', ' %s:do_populate_sysroot' % uboot_pn)
 }
 
 # Options for the device tree compiler passed to mkimage '-D' feature:
 UBOOT_MKIMAGE_DTCOPTS ??= ""
-
-# fitImage Hash Algo
-FIT_HASH_ALG ?= "sha256"
 
 #
 # Emit the fitImage ITS header
@@ -112,7 +109,7 @@ EOF
 # $4 ... Compression type
 fitimage_emit_section_kernel() {
 
-	kernel_csum="${FIT_HASH_ALG}"
+	kernel_csum="sha1"
 
 	ENTRYPOINT="${UBOOT_ENTRYPOINT}"
 	if [ -n "${UBOOT_ENTRYSYMBOL}" ]; then
@@ -145,7 +142,7 @@ EOF
 # $3 ... Path to DTB image
 fitimage_emit_section_dtb() {
 
-	dtb_csum="${FIT_HASH_ALG}"
+	dtb_csum="sha1"
 
 	dtb_loadline=""
 	dtb_ext=${DTB##*.}
@@ -179,7 +176,7 @@ EOF
 # $3 ... Path to setup image
 fitimage_emit_section_setup() {
 
-	setup_csum="${FIT_HASH_ALG}"
+	setup_csum="sha1"
 
 	cat << EOF >> ${1}
                 setup@${2} {
@@ -206,7 +203,7 @@ EOF
 # $3 ... Path to ramdisk image
 fitimage_emit_section_ramdisk() {
 
-	ramdisk_csum="${FIT_HASH_ALG}"
+	ramdisk_csum="sha1"
 	ramdisk_ctype="none"
 	ramdisk_loadline=""
 	ramdisk_entryline=""
@@ -264,7 +261,7 @@ EOF
 # $6 ... default flag
 fitimage_emit_section_config() {
 
-	conf_csum="${FIT_HASH_ALG}"
+	conf_csum="sha1"
 	if [ -n "${UBOOT_SIGN_ENABLE}" ] ; then
 		conf_sign_keyname="${UBOOT_SIGN_KEYNAME}"
 	fi

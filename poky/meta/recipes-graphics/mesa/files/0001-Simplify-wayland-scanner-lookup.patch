@@ -1,0 +1,44 @@
+From e53837ad7b01364f34a533b95f4817c1795789de Mon Sep 17 00:00:00 2001
+From: Fabio Berton <fabio.berton@ossystems.com.br>
+Date: Wed, 20 Feb 2019 16:17:00 -0300
+Subject: [PATCH 1/4] Simplify wayland-scanner lookup
+Organization: O.S. Systems Software LTDA.
+
+Don't use pkg-config to lookup the path of a binary that's in the path.
+
+Alternatively we'd have to prefix the path returned by pkg-config with
+PKG_CONFIG_SYSROOT_DIR.
+
+Upstream-Status: Pending
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+Signed-off-by: Fabio Berton <fabio.berton@ossystems.com.br>
+---
+ configure.ac | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 1ef68fe68e6..1816a4cd475 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1854,16 +1854,11 @@ for plat in $platforms; do
+         fi
+         WAYLAND_PROTOCOLS_DATADIR=`$PKG_CONFIG --variable=pkgdatadir wayland-protocols`
+ 
+-        PKG_CHECK_MODULES([WAYLAND_SCANNER], [wayland-scanner],
+-                          WAYLAND_SCANNER=`$PKG_CONFIG --variable=wayland_scanner wayland-scanner`,
+-                          WAYLAND_SCANNER='')
+         PKG_CHECK_EXISTS([wayland-scanner >= 1.15],
+                           AC_SUBST(SCANNER_ARG, 'private-code'),
+                           AC_SUBST(SCANNER_ARG, 'code'))
+ 
+-        if test "x$WAYLAND_SCANNER" = x; then
+-            AC_PATH_PROG([WAYLAND_SCANNER], [wayland-scanner], [:])
+-        fi
++        AC_PATH_PROG([WAYLAND_SCANNER], [wayland-scanner], [:])
+ 
+         if test "x$WAYLAND_SCANNER" = "x:"; then
+                 AC_MSG_ERROR([wayland-scanner is needed to compile the wayland platform])
+-- 
+2.21.0
+

@@ -1,0 +1,40 @@
+#
+# NOTE: This file will not be used if you use racoon-tool(8) to manage your
+# IPsec connections. racoon-tool will process racoon-tool.conf(5) and
+# generate a configuration (/var/lib/racoon/racoon.conf) and use it, instead
+# of this file.
+#
+# Simple racoon.conf
+# 
+#
+# Please look in /usr/share/doc/racoon/examples for
+# examples that come with the source.
+#
+# Please read racoon.conf(5) for details, and alsoread setkey(8).
+#
+#
+# Also read the Linux IPSEC Howto up at 
+# http://www.ipsec-howto.org/t1.html 
+#
+log notify;
+path pre_shared_key "/etc/racoon/psk.txt";
+path certificate "/etc/racoon/certs";
+
+#remote 172.31.1.1 {
+#        exchange_mode main,aggressive;
+#        proposal {
+#                encryption_algorithm 3des;
+#                hash_algorithm sha1;
+#                authentication_method pre_shared_key;
+#                dh_group modp1024;
+#        }
+#        generate_policy off;
+#}
+# 
+#sainfo address 192.168.203.10[any] any address 192.168.22.0/24[any] any {
+#        pfs_group modp768;
+#        encryption_algorithm 3des;
+#        authentication_algorithm hmac_md5;
+#        compression_algorithm deflate;
+#}
+

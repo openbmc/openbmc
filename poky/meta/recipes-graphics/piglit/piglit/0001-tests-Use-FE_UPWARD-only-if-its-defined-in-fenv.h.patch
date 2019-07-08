@@ -1,0 +1,75 @@
+Upstream-Status: Submitted [mailing list]
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From 0e0a2a69261031d55d52b6045990e8982ea12912 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 9 Jul 2016 07:52:19 +0000
+Subject: [PATCH] tests: only run rounding tests if FE_UPWARD is present
+
+On ARM, musl does not define FE_* when the architecture does not have VFP (which
+is the right interpretation).
+
+As these tests depend on calling fesetround(), skip the test if FE_UPWARD isn't
+available.
+
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+---
+ tests/general/roundmode-getintegerv.c | 12 ++++++++----
+ tests/general/roundmode-pixelstore.c  | 12 ++++++++----
+ 2 files changed, 16 insertions(+), 8 deletions(-)
+
+diff --git a/tests/general/roundmode-getintegerv.c b/tests/general/roundmode-getintegerv.c
+index 28ecfaf55..aa99044a1 100644
+--- a/tests/general/roundmode-getintegerv.c
++++ b/tests/general/roundmode-getintegerv.c
+@@ -79,13 +79,17 @@ test(float val, int expect)
+ void
+ piglit_init(int argc, char **argv)
+ {
+-	int ret;
+ 	bool pass = true;
+-	ret = fesetround(FE_UPWARD);
+-	if (ret != 0) {
+-		printf("Couldn't set rounding mode\n");
++
++#ifdef FE_UPWARD
++	if (fesetround(FE_UPWARD) != 0) {
++		printf("Setting rounding mode failed\n");
+ 		piglit_report_result(PIGLIT_SKIP);
+ 	}
++#else
++	printf("Cannot set rounding mode\n");
++	piglit_report_result(PIGLIT_SKIP);
++#endif
+ 
+ 	pass = test(2.2, 2) && pass;
+ 	pass = test(2.8, 3) && pass;
+diff --git a/tests/general/roundmode-pixelstore.c b/tests/general/roundmode-pixelstore.c
+index 8a029b257..57ec11c09 100644
+--- a/tests/general/roundmode-pixelstore.c
++++ b/tests/general/roundmode-pixelstore.c
+@@ -79,13 +79,17 @@ test(float val, int expect)
+ void
+ piglit_init(int argc, char **argv)
+ {
+-	int ret;
+ 	bool pass = true;
+-	ret = fesetround(FE_UPWARD);
+-	if (ret != 0) {
+-		printf("Couldn't set rounding mode\n");
++
++#ifdef FE_UPWARD
++	if (fesetround(FE_UPWARD) != 0) {
++		printf("Setting rounding mode failed\n");
+ 		piglit_report_result(PIGLIT_SKIP);
+ 	}
++#else
++	printf("Cannot set rounding mode\n");
++	piglit_report_result(PIGLIT_SKIP);
++#endif
+ 
+ 	pass = test(2.2, 2) && pass;
+ 	pass = test(2.8, 3) && pass;
+-- 
+2.11.0
+

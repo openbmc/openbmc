@@ -1,0 +1,68 @@
+From: Raphael Geissert <geissert@debian.org>
+Description: make X509_verify_cert indicate that any certificate whose
+ name contains "DigiNotar" is revoked.
+Forwarded: not-needed
+Origin: vendor
+Last-Update: 2011-09-08
+Bug: http://bugs.debian.org/639744
+Reviewed-by: Kurt Roeckx <kurt@roeckx.be>
+Reviewed-by: Dr Stephen N Henson <shenson@drh-consultancy.co.uk>
+
+This is not meant as final patch.  
+
+Upstream-Status: Backport [debian]
+
+Signed-off-by: Armin Kuster <akuster@mvista.com>
+
+Index: openssl-1.0.2g/crypto/x509/x509_vfy.c
+===================================================================
+--- openssl-1.0.2g.orig/crypto/x509/x509_vfy.c
++++ openssl-1.0.2g/crypto/x509/x509_vfy.c
+@@ -119,6 +119,7 @@ static int check_trust(X509_STORE_CTX *c
+ static int check_revocation(X509_STORE_CTX *ctx);
+ static int check_cert(X509_STORE_CTX *ctx);
+ static int check_policy(X509_STORE_CTX *ctx);
++static int check_ca_blacklist(X509_STORE_CTX *ctx);
+ 
+ static int get_crl_score(X509_STORE_CTX *ctx, X509 **pissuer,
+                          unsigned int *preasons, X509_CRL *crl, X509 *x);
+@@ -489,6 +490,9 @@ int X509_verify_cert(X509_STORE_CTX *ctx
+     if (!ok)
+         goto err;
+ 
++	ok = check_ca_blacklist(ctx);
++	if(!ok) goto err;
++
+ #ifndef OPENSSL_NO_RFC3779
+     /* RFC 3779 path validation, now that CRL check has been done */
+     ok = v3_asid_validate_path(ctx);
+@@ -996,6 +1000,29 @@ static int check_crl_time(X509_STORE_CTX
+     return 1;
+ }
+ 
++static int check_ca_blacklist(X509_STORE_CTX *ctx)
++	{
++	X509 *x;
++	int i;
++	/* Check all certificates against the blacklist */
++	for (i = sk_X509_num(ctx->chain) - 1; i >= 0; i--)
++		{
++		x = sk_X509_value(ctx->chain, i);
++		/* Mark DigiNotar certificates as revoked, no matter
++		 * where in the chain they are.
++		 */
++		if (x->name && strstr(x->name, "DigiNotar"))
++			{
++			ctx->error = X509_V_ERR_CERT_REVOKED;
++			ctx->error_depth = i;
++			ctx->current_cert = x;
++			if (!ctx->verify_cb(0,ctx))
++				return 0;
++			}
++		}
++	return 1;
++	}
++
+ static int get_crl_sk(X509_STORE_CTX *ctx, X509_CRL **pcrl, X509_CRL **pdcrl,
+                       X509 **pissuer, int *pscore, unsigned int *preasons,
+                       STACK_OF(X509_CRL) *crls)

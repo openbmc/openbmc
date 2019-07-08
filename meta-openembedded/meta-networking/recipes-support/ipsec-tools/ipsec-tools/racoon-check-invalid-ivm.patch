@@ -1,0 +1,26 @@
+Subject: [PATCH] ipsec-tools: racoon: check several invalid ivm
+
+Upstream-Status: Pending
+
+Add checking for invalid ivm, or it will crash racoon.
+
+Signed-off-by: Ming Liu <ming.liu@windriver.com>
+---
+ isakmp_cfg.c |    5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff -urpN a/src/racoon/isakmp_cfg.c b/src/racoon/isakmp_cfg.c
+--- a/src/racoon/isakmp_cfg.c
++++ b/src/racoon/isakmp_cfg.c
+@@ -171,6 +171,11 @@ isakmp_cfg_r(iph1, msg)
+ 	    iph1->mode_cfg->last_msgid != packet->msgid )
+ 		iph1->mode_cfg->ivm = 
+ 		    isakmp_cfg_newiv(iph1, packet->msgid);
++	if(iph1->mode_cfg->ivm == NULL) {
++		plog(LLV_ERROR, LOCATION, NULL, 
++		    "failed to create new IV\n");
++		return;
++	}
+ 	ivm = iph1->mode_cfg->ivm;
+ 
+ 	dmsg = oakley_do_decrypt(iph1, msg, ivm->iv, ivm->ive);

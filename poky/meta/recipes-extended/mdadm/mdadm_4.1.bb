@@ -17,7 +17,6 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/utils/raid/mdadm/${BPN}-${PV}.tar.xz \
            file://0001-Use-CC-to-check-for-implicit-fallthrough-warning-sup.patch \
            file://0001-Compute-abs-diff-in-a-standard-compliant-way.patch \
            file://0001-fix-gcc-8-format-truncation-warning.patch \
-           file://debian-no-Werror.patch \
 	   file://mdadm.init \
 	   file://mdmonitor.service \
            "
@@ -45,7 +44,7 @@ DEBUG_OPTIMIZATION_append = " -Wno-error"
 
 do_compile() {
 	# Point to right sbindir
-	sed -i -e "s;BINDIR  = /sbin;BINDIR = $base_sbindir;" -e "s;UDEVDIR = /lib;UDEVDIR = $nonarch_base_libdir;" -e "s;SYSTEMD_DIR=/lib/systemd/system;SYSTEMD_DIR=${systemd_unitdir}/system;" ${S}/Makefile
+	sed -i -e "s;BINDIR  = /sbin;BINDIR = $base_sbindir;" -e "s;UDEVDIR = /lib;UDEVDIR = $nonarch_base_libdir;" ${S}/Makefile
 	oe_runmake SYSROOT="${STAGING_DIR_TARGET}"
 }
 
@@ -57,14 +56,12 @@ do_install() {
 do_install_append() {
         install -d ${D}/${sysconfdir}/
         install -m 644 ${S}/mdadm.conf-example ${D}${sysconfdir}/mdadm.conf
+        install -d ${D}/${systemd_unitdir}/system
+        install -m 644 ${WORKDIR}/mdmonitor.service ${D}/${systemd_unitdir}/system
+        install -m 644 ${S}/systemd/mdmon@.service ${D}/${systemd_unitdir}/system
         install -d ${D}/${sysconfdir}/init.d
         install -m 755 ${WORKDIR}/mdadm.init ${D}${sysconfdir}/init.d/mdmonitor
 }
-
-do_install_append() {
-        oe_runmake install-systemd DESTDIR=${D}
-}
-
 
 do_compile_ptest() {
 	oe_runmake test
@@ -81,7 +78,7 @@ do_install_ptest() {
 	done
 }
 
-RDEPENDS_${PN}-ptest += "bash e2fsprogs-mke2fs"
+RDEPENDS_${PN}-ptest += "bash"
 RRECOMMENDS_${PN}-ptest += " \
     coreutils \
     util-linux \
@@ -92,5 +89,3 @@ RRECOMMENDS_${PN}-ptest += " \
     kernel-module-raid10 \
     kernel-module-raid456 \
 "
-
-FILES_${PN} += "${systemd_unitdir}/*"

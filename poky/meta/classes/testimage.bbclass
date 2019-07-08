@@ -210,11 +210,7 @@ def testimage_main(d):
             bb.fatal('Unsupported image type built. Add a comptible image to '
                      'IMAGE_FSTYPES. Supported types: %s' %
                      ', '.join(supported_fstypes))
-    qfstype = fstypes[0]
-    qdeffstype = d.getVar("QB_DEFAULT_FSTYPE")
-    if qdeffstype:
-        qfstype = qdeffstype
-    rootfs = '%s.%s' % (image_name, qfstype)
+    rootfs = '%s.%s' % (image_name, fstypes[0])
 
     # Get tmpdir (not really used, just for compatibility)
     tmpdir = d.getVar("TMPDIR")

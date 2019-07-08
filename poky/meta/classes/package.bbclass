@@ -1005,12 +1005,6 @@ python split_and_strip_files () {
                 symlinks[file] = target
 
         results = oe.utils.multiprocess_launch(oe.package.is_elf, checkelf.keys(), d)
-
-        # Sort results by file path. This ensures that the files are always
-        # processed in the same order, which is important to make sure builds
-        # are reproducible when dealing with hardlinks
-        results.sort(key=lambda x: x[0])
-
         for (file, elf_file) in results:
             # It's a file (or hardlink), not a link
             # ...but is it ELF, and is it already stripped?

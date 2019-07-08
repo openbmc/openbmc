@@ -943,7 +943,7 @@
                         <ulink url='&YOCTO_DOCS_REF_URL;#var-DL_DIR'><filename>DL_DIR</filename></ulink>
                         directory, see the
                         <ulink url='&YOCTO_DOCS_REF_URL;#var-BB_GENERATE_MIRROR_TARBALLS'><filename>BB_GENERATE_MIRROR_TARBALLS</filename></ulink>
-                        variable in the Yocto Project Reference Manual.
+                        variable.
                     </note>
                 </para>
 

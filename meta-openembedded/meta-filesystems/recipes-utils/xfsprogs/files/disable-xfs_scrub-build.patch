@@ -1,0 +1,30 @@
+From 2bd40e5ed4df0b0a42beff8806b1ec5daa372c48 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 19 Jul 2018 16:49:41 +0800
+Subject: [PATCH] Disable xfs_scrub build
+
+Disable xfs_scrub build since it is experimental.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 7ddfa31..cd60319 100644
+--- a/Makefile
++++ b/Makefile
+@@ -48,7 +48,7 @@ LIBFROG_SUBDIR = libfrog
+ DLIB_SUBDIRS = libxlog libxcmd libhandle
+ LIB_SUBDIRS = libxfs $(DLIB_SUBDIRS)
+ TOOL_SUBDIRS = copy db estimate fsck growfs io logprint mkfs quota \
+-		mdrestore repair rtcp m4 man doc debian spaceman scrub
++		mdrestore repair rtcp m4 man doc debian spaceman
+ 
+ ifneq ("$(PKG_PLATFORM)","darwin")
+ TOOL_SUBDIRS += fsr
+-- 
+2.7.4
+

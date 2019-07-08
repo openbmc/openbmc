@@ -1,0 +1,30 @@
+From 7dab2995ed8eeccd7b0acd79668bc28f3a2427d5 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Wed, 16 Sep 2015 19:45:40 -0700
+Subject: [PATCH] dev.mk.in: fix file name too long error
+
+The all_cppflags changes path to filename which causes file name too long
+error when the path is longer than NAME_MAX (usually 255). Strip srcdir
+to fix the problem.
+
+Upstream-Status: Backport [https://github.com/ccache/ccache/commit/4d86e884d07ba1853a0c70507cc4d04107f57c29]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+
+---
+ dev.mk.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dev.mk.in b/dev.mk.in
+index 91b0a57..583ade0 100644
+--- a/dev.mk.in
++++ b/dev.mk.in
+@@ -1,7 +1,7 @@
+ # GNU make syntax reigns in this file.
+ 
+ all_cflags += -Werror @more_warnings@
+-all_cppflags += -MD -MP -MF .deps/$(subst .._,,$(subst /,_,$<)).d
++all_cppflags += -MD -MP -MF .deps/$(subst .._,,$(subst /,_,$(subst $(srcdir)/,,$<))).d
+ 
+ A2X = a2x
+ ASCIIDOC = asciidoc

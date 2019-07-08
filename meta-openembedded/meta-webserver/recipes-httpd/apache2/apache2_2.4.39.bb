@@ -181,8 +181,7 @@ PACKAGES = "${PN}-scripts ${PN}-doc ${PN}-dev ${PN}-dbg ${PN}"
 
 CONFFILES_${PN} = "${sysconfdir}/${BPN}/httpd.conf \
                    ${sysconfdir}/${BPN}/magic \
-                   ${sysconfdir}/${BPN}/mime.types \
-                   ${sysconfdir}/${BPN}/extra/*"
+                   ${sysconfdir}/${BPN}/mime.types"
 
 # We override here rather than append so that .so links are
 # included in the runtime package rather than here (-dev)

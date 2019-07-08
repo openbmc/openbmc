@@ -1,0 +1,27 @@
+From 9a6e6374da7d7056db0950f0f7d6b8b905009775 Mon Sep 17 00:00:00 2001
+From: Constantin Musca <constantinx.musca@intel.com>
+Date: Fri, 15 Jul 2016 10:04:48 +0300
+Subject: [PATCH] Add missing GL_GENERATE_ARGZ_H conditional
+
+- GL_GENERATE_ARGZ_H is used in gnulib/lib/Makefile.am
+
+Upstream-Status: Pending
+Signed-off-by: Constantin Musca <constantinx.musca@intel.com>
+
+---
+ configure.ac | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 72b6984..fb9653e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -55,6 +55,8 @@ AC_ARG_WITH([failmalloc],
+ 
+ AM_CONDITIONAL([WITH_FAILMALLOC], [test x$with_failmalloc != xno])
+ 
++AM_CONDITIONAL([GL_GENERATE_ARGZ_H], [test -n "$ARGZ_H"])
++
+ dnl --enable-debug=(yes|no)
+ AC_ARG_ENABLE([debug],
+               [AC_HELP_STRING([--enable-debug=no/yes],

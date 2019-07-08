@@ -1,0 +1,24 @@
+eglibc has remove gets starting 2.16
+therefore check for its being there before 
+undefining it.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+diff --git a/lib/stdio.in.h b/lib/stdio.in.h
+index 5727452..f04a691 100644
+--- a/lib/stdio.in.h
++++ b/lib/stdio.in.h
+@@ -742,10 +742,12 @@ _GL_WARN_ON_USE (getline, "getline is unportable - "
+ /* It is very rare that the developer ever has full control of stdin,
+    so any use of gets warrants an unconditional warning; besides, C11
+    removed it.  */
++#if defined gets
+ #undef gets
+ #if HAVE_RAW_DECL_GETS && !defined __cplusplus
+ _GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");
+ #endif
++#endif
+ 
+ #if @GNULIB_OBSTACK_PRINTF@ || @GNULIB_OBSTACK_PRINTF_POSIX@
+ struct obstack;

@@ -1,0 +1,27 @@
+From 99b0efebd765803203686d89bc4f995bcb103e78 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Sat, 10 Nov 2018 09:53:19 +0800
+Subject: [PATCH] configure.ac: fix typo
+
+Upstream-Status: Submitted [https://github.com/nhorman/rng-tools.git]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 4e799dc..0251928 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -62,7 +62,7 @@ AS_IF([test $target_cpu = powerpc64le], [AC_DEFINE([HAVE_DARN],1,[Enable DARN])]
+ AM_CONDITIONAL([JITTER], [false])
+ 
+ AC_ARG_ENABLE(jitterentropy,
+-	AS_HELP_STRING([--disable-jitterntropy | --enable-jitterentropy=<path>],
++	AS_HELP_STRING([--disable-jitterentropy | --enable-jitterentropy=<path>],
+ 	[Disable jitterentropy source, or specify its location]),
+ 	[if [ test -d $enable_jitterentropy ]; then
+ 		export LDFLAGS+=-L$enable_jitterentropy;
+-- 
+2.7.4
+

@@ -1,0 +1,28 @@
+From f6c4d2468ae0dadd2f35680d61b98b2a59077328 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 7 Jul 2017 10:31:03 -0700
+Subject: [PATCH] include missing sys/types.h
+
+Fixes errors seen on musl
+pqueue.h:21:3: error: unknown type name 'u_int32_t'
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ pqueue.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/pqueue.h b/pqueue.h
+index c37ba7b..ae4cc6a 100644
+--- a/pqueue.h
++++ b/pqueue.h
+@@ -3,6 +3,7 @@
+ 
+ #include <time.h>
+ #include <sys/time.h>
++#include <sys/types.h>
+ 
+ /* wait this many seconds for missing packets before forgetting about them */
+ #define DEFAULT_PACKET_TIMEOUT 0.3
+-- 
+2.13.2
+

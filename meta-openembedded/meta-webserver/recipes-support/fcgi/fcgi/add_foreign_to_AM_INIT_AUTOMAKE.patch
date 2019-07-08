@@ -1,0 +1,18 @@
+Upstream-Status: Pending
+
+use automake options "foreign" to set the strictness as appropriate
+
+Signed-off-by: Yang Haibo <b40869@freescale.com>
+--- fcgi-ori/configure.in	2014-08-05 14:58:35.000000000 +0800
++++ fcgi-2.4.0/configure.in	2014-08-05 14:59:08.000000000 +0800
+@@ -4,8 +4,8 @@
+ dnl     generate the file "configure", which is run during the build
+ dnl     to configure the system for the local environment.
+ 
+-AC_INIT
+-AM_INIT_AUTOMAKE(fcgi, 2.4.1-SNAP-0910052249)
++AC_INIT([fcgi], [2.4.1-SNAP-0910052249])
++AM_INIT_AUTOMAKE([foreign])
+ 
+ AM_CONFIG_HEADER(fcgi_config.h)
+ 

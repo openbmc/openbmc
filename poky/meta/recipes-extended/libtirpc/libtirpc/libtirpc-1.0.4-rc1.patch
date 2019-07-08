@@ -1,0 +1,103 @@
+Patch from Fedora https://src.fedoraproject.org/rpms/libtirpc/raw/master/f/libtirpc-1.0.4-rc1.patch
+
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+diff --git a/src/clnt_generic.c b/src/clnt_generic.c
+index e5a314f..3f3dabf 100644
+--- a/src/clnt_generic.c
++++ b/src/clnt_generic.c
+@@ -47,7 +47,6 @@
+ 
+ extern bool_t __rpc_is_local_host(const char *);
+ int __rpc_raise_fd(int);
+-extern int __binddynport(int fd);
+ 
+ #ifndef NETIDLEN
+ #define	NETIDLEN 32
+@@ -341,8 +340,7 @@ clnt_tli_create(int fd, const struct netconfig *nconf,
+ 		servtype = nconf->nc_semantics;
+ 		if (!__rpc_fd2sockinfo(fd, &si))
+ 			goto err;
+-		if (__binddynport(fd) == -1)
+-			goto err;
++		bindresvport(fd, NULL);
+ 	} else {
+ 		if (!__rpc_fd2sockinfo(fd, &si))
+ 			goto err;
+diff --git a/src/rpc_soc.c b/src/rpc_soc.c
+index af6c482..5a6eeb7 100644
+--- a/src/rpc_soc.c
++++ b/src/rpc_soc.c
+@@ -67,8 +67,6 @@
+ 
+ extern mutex_t	rpcsoc_lock;
+ 
+-extern int __binddynport(int fd);
+-
+ static CLIENT *clnt_com_create(struct sockaddr_in *, rpcprog_t, rpcvers_t,
+     int *, u_int, u_int, char *, int);
+ static SVCXPRT *svc_com_create(int, u_int, u_int, char *);
+@@ -147,8 +145,7 @@ clnt_com_create(raddr, prog, vers, sockp, sendsz, recvsz, tp, flags)
+ 	bindaddr.maxlen = bindaddr.len =  sizeof (struct sockaddr_in);
+ 	bindaddr.buf = raddr;
+ 
+-	if (__binddynport(fd) == -1)
+-		goto err;
++	bindresvport(fd, NULL);
+ 	cl = clnt_tli_create(fd, nconf, &bindaddr, prog, vers,
+ 				sendsz, recvsz);
+ 	if (cl) {
+diff --git a/src/rpcb_clnt.c b/src/rpcb_clnt.c
+index a94fc73..4b44364 100644
+--- a/src/rpcb_clnt.c
++++ b/src/rpcb_clnt.c
+@@ -752,7 +752,7 @@ __try_protocol_version_2(program, version, nconf, host, tp)
+ 
+ 	client = getpmaphandle(nconf, host, &parms.r_addr);
+ 	if (client == NULL)
+-		return (NULL);
++		goto error;
+ 
+ 	/*
+ 	 * Set retry timeout.
+@@ -771,11 +771,11 @@ __try_protocol_version_2(program, version, nconf, host, tp)
+ 	if (clnt_st != RPC_SUCCESS) {
+ 		rpc_createerr.cf_stat = RPC_PMAPFAILURE;
+ 		clnt_geterr(client, &rpc_createerr.cf_error);
+-		return (NULL);
++		goto error;
+ 	} else if (port == 0) {
+ 		pmapaddress = NULL;
+ 		rpc_createerr.cf_stat = RPC_PROGNOTREGISTERED;
+-		return (NULL);
++		goto error;
+ 	}
+ 	port = htons(port);
+ 	CLNT_CONTROL(client, CLGET_SVC_ADDR, (char *)&remote);
+@@ -789,14 +789,24 @@ __try_protocol_version_2(program, version, nconf, host, tp)
+ 			free(pmapaddress);
+ 			pmapaddress = NULL;
+ 		}
+-		return (NULL);
++		goto error;
+ 	}
+ 	memcpy(pmapaddress->buf, remote.buf, remote.len);
+ 	memcpy(&((char *)pmapaddress->buf)[sizeof (short)],
+ 			(char *)(void *)&port, sizeof (short));
+ 	pmapaddress->len = pmapaddress->maxlen = remote.len;
+ 
++	CLNT_DESTROY(client);
+ 	return pmapaddress;
++
++error:
++	if (client) {
++		CLNT_DESTROY(client);
++		client = NULL;
++
++	}
++	return (NULL);
++
+ }
+ #endif
+ 

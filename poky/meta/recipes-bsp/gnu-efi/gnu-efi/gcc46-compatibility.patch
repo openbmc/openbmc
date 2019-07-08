@@ -1,0 +1,35 @@
+From 8d16ae374c5d4d9fac45c002605a66cfb8c08be5 Mon Sep 17 00:00:00 2001
+From: Steve Langasek <steve.langasek@ubuntu.com>
+Date: Wed, 9 Sep 2015 08:26:06 +0000
+Subject: [PATCH 3/3] gnu-efi, syslinux: Support gcc < 4.7
+
+don't break with old compilers and -DGNU_EFI_USE_MS_ABI
+It's entirely legitimate to request GNU_EFI_USE_MS_ABI even if the current
+compiler doesn't support it, and gnu-efi should transparently fall back to
+using legacy techniques to set the calling convention.  We don't get type
+checking, but at least it will still compile.
+
+Author: Steve Langasek <steve.langasek@ubuntu.com>
+Upstream-Status: Pending
+[Rebased for 3.0.6]
+Signed-off-by: California Sullivan <california.l.sullivan@intel.com>
+---
+ inc/x86_64/efibind.h | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/inc/x86_64/efibind.h b/inc/x86_64/efibind.h
+index 4309f9f..02c0af1 100644
+--- a/inc/x86_64/efibind.h
++++ b/inc/x86_64/efibind.h
+@@ -25,8 +25,6 @@ Revision History
+ #if defined(GNU_EFI_USE_MS_ABI)
+     #if (defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7)))||(defined(__clang__) && (__clang_major__ > 3 || (__clang_major__ == 3 && __clang_minor__ >= 2)))
+         #define HAVE_USE_MS_ABI 1
+-    #else
+-        #error Compiler is too old for GNU_EFI_USE_MS_ABI
+     #endif
+ #endif
+ 
+-- 
+2.9.4
+

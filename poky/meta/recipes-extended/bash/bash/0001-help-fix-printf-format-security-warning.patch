@@ -1,0 +1,35 @@
+From e5837a42f8f48a6a721805ff8f7fcd32861d09ca Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andr=C3=A9=20Draszik?= <adraszik@tycoint.com>
+Date: Tue, 26 Jul 2016 13:09:47 +0100
+Subject: [PATCH] help: fix printf() format security warning
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+| ../../bash-4.3.30/builtins/../../bash-4.3.30/builtins/help.def: In function 'help_builtin':
+| ../../bash-4.3.30/builtins/../../bash-4.3.30/builtins/help.def:130:7: error: format not a string literal and no format arguments [-Werror=format-security]
+|        printf (ngettext ("Shell commands matching keyword `", "Shell commands matching keywords `", (list->next ? 2 : 1)));
+|        ^~~~~~
+
+Signed-off-by: André Draszik <adraszik@tycoint.com>
+---
+Upstream-Status: Pending
+ builtins/help.def | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/builtins/help.def b/builtins/help.def
+index 1894f17..cf624c6 100644
+--- a/builtins/help.def
++++ b/builtins/help.def
+@@ -127,7 +127,7 @@ help_builtin (list)
+ 
+   if (glob_pattern_p (list->word->word))
+     {
+-      printf (ngettext ("Shell commands matching keyword `", "Shell commands matching keywords `", (list->next ? 2 : 1)));
++      printf ("%s", ngettext ("Shell commands matching keyword `", "Shell commands matching keywords `", (list->next ? 2 : 1)));
+       print_word_list (list, ", ");
+       printf ("'\n\n");
+     }
+-- 
+2.8.1
+

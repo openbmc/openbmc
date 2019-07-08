@@ -1,0 +1,68 @@
+configure.ac: make GIR_DIR configurable
+
+Some .gir files such as GLib-2.0.gir are arch related which contain such
+as lengths of pointers that they are different for 64 and 32 bit target.
+It causes install file conflicts for multilib when intall
+gobject-introspection and lib32-gobject-introspection both.
+
+Add configure option 'with-gir-dir-prefix' for autotools to make .gir
+could be installed to a configured path such as ${libdir}. And update
+girdir in .pc files as well.
+
+Upstream-Status: Accepted [https://gitlab.gnome.org/GNOME/gobject-introspection/commit/3301c7e]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ configure.ac                              | 7 +++++--
+ gobject-introspection-1.0.pc.in           | 2 +-
+ gobject-introspection-no-export-1.0.pc.in | 2 +-
+ 3 files changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index b4294c57..60506947 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -114,9 +114,12 @@ GIR_SUFFIX="gir-1.0"
+ AC_SUBST(GIR_SUFFIX)
+ AC_DEFINE_UNQUOTED(GIR_SUFFIX, "$GIR_SUFFIX", [Name of the gir directory])
+ 
+-GIR_DIR="$EXPANDED_DATADIR/$GIR_SUFFIX"
++AC_ARG_WITH([gir-dir-prefix],
++		[AS_HELP_STRING([--with-gir-dir-prefix], [Directory prefix for gir installation])],
++		[GIR_DIR_PREFIX="$withval"], [GIR_DIR_PREFIX="$EXPANDED_DATADIR"])
++GIR_DIR="$GIR_DIR_PREFIX/$GIR_SUFFIX"
+ AC_SUBST(GIR_DIR)
+-AC_DEFINE_UNQUOTED(GIR_DIR, "$GIR_DIR", [Director prefix for gir installation])
++AC_DEFINE_UNQUOTED(GIR_DIR, "$GIR_DIR", [Directory prefix for gir installation])
+ 
+ PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.58.0])
+ 
+diff --git a/gobject-introspection-1.0.pc.in b/gobject-introspection-1.0.pc.in
+index a08b5d27..3409856c 100644
+--- a/gobject-introspection-1.0.pc.in
++++ b/gobject-introspection-1.0.pc.in
+@@ -10,7 +10,7 @@ g_ir_scanner=${bindir}/g-ir-scanner
+ g_ir_compiler=${bindir}/g-ir-compiler@EXEEXT@
+ g_ir_generate=${bindir}/g-ir-generate@EXEEXT@
+ gidatadir=${datadir}/gobject-introspection-1.0
+-girdir=${datadir}/gir-1.0
++girdir=@GIR_DIR@
+ typelibdir=${libdir}/girepository-1.0
+ 
+ Cflags: -I${includedir}/gobject-introspection-1.0 @FFI_PC_CFLAGS@
+diff --git a/gobject-introspection-no-export-1.0.pc.in b/gobject-introspection-no-export-1.0.pc.in
+index d214d22d..745aaade 100644
+--- a/gobject-introspection-no-export-1.0.pc.in
++++ b/gobject-introspection-no-export-1.0.pc.in
+@@ -9,7 +9,7 @@ includedir=@includedir@
+ g_ir_scanner=${bindir}/g-ir-scanner
+ g_ir_compiler=${bindir}/g-ir-compiler@EXEEXT@
+ g_ir_generate=${bindir}/g-ir-generate@EXEEXT@
+-girdir=${datadir}/gir-1.0
++girdir=@GIR_DIR@
+ typelibdir=${libdir}/girepository-1.0
+ 
+ Cflags: -I${includedir}/gobject-introspection-1.0 @FFI_PC_CFLAGS@
+-- 
+2.17.0
+

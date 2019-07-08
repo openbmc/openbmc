@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# ex:ts=4:sw=4:sts=4:et
+# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 """
    class for handling .bb files
 
@@ -29,7 +31,7 @@ __func_start_regexp__    = re.compile(r"(((?P<py>python)|(?P<fr>fakeroot))\s*)*(
 __inherit_regexp__       = re.compile(r"inherit\s+(.+)" )
 __export_func_regexp__   = re.compile(r"EXPORT_FUNCTIONS\s+(.+)" )
 __addtask_regexp__       = re.compile(r"addtask\s+(?P<func>\w+)\s*((before\s*(?P<before>((.*(?=after))|(.*))))|(after\s*(?P<after>((.*(?=before))|(.*)))))*")
-__deltask_regexp__       = re.compile(r"deltask\s+(?P<func>\w+)(?P<ignores>.*)")
+__deltask_regexp__       = re.compile(r"deltask\s+(?P<func>\w+)")
 __addhandler_regexp__    = re.compile(r"addhandler\s+(.+)" )
 __def_regexp__           = re.compile(r"def\s+(\w+).*:" )
 __python_func_regexp__   = re.compile(r"(\s+.*)|(^$)|(^#)" )
@@ -223,27 +225,11 @@ def feeder(lineno, s, fn, root, statements, eof=False):
 
     m = __addtask_regexp__.match(s)
     if m:
-        if len(m.group().split()) == 2:
-            # Check and warn for "addtask task1 task2"
-            m2 = re.match(r"addtask\s+(?P<func>\w+)(?P<ignores>.*)", s)
-            if m2 and m2.group('ignores'):
-                logger.warning('addtask ignored: "%s"' % m2.group('ignores'))
-
-        # Check and warn for "addtask task1 before task2 before task3", the
-        # similar to "after"
-        taskexpression = s.split()
-        for word in ('before', 'after'):
-            if taskexpression.count(word) > 1:
-                logger.warning("addtask contained multiple '%s' keywords, only one is supported" % word)
-
         ast.handleAddTask(statements, fn, lineno, m)
         return
 
     m = __deltask_regexp__.match(s)
     if m:
-        # Check and warn "for deltask task1 task2"
-        if m.group('ignores'):
-            logger.warning('deltask ignored: "%s"' % m.group('ignores'))
         ast.handleDelTask(statements, fn, lineno, m)
         return
 

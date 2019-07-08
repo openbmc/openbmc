@@ -1,0 +1,48 @@
+From 69a3813c513c84e02212250c3d5b8a02ecefa698 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <Mingli.Yu@windriver.com>
+Date: Mon, 15 Jan 2018 08:00:33 +0000
+Subject: [PATCH] test: fix 32bit linux regress
+
+This patch comes from https://github.com/libevent/libevent.git,
+the commit is 63c4bf78d6af3c6ff46d2e8e4b53dd9f577a9ca9
+
+Upstream-Status: Backport
+
+Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
+---
+ configure.ac        | 1 +
+ test/regress_util.c | 2 ++
+ 2 files changed, 3 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 7528d37..e64cb1f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -663,6 +663,7 @@ AC_CHECK_SIZEOF(short)
+ AC_CHECK_SIZEOF(size_t)
+ AC_CHECK_SIZEOF(void *)
+ AC_CHECK_SIZEOF(off_t)
++AC_CHECK_SIZEOF(time_t)
+ 
+ AC_CHECK_TYPES([struct in6_addr, struct sockaddr_in6, sa_family_t, struct addrinfo, struct sockaddr_storage], , ,
+ [#define _GNU_SOURCE
+diff --git a/test/regress_util.c b/test/regress_util.c
+index ef6a148..0c7eafb 100644
+--- a/test/regress_util.c
++++ b/test/regress_util.c
+@@ -1412,10 +1412,12 @@ static struct date_rfc1123_case {
+ 	{  1289433600, "Thu, 11 Nov 2010 00:00:00 GMT"},
+ 	{  1323648000, "Mon, 12 Dec 2011 00:00:00 GMT"},
+ #ifndef _WIN32
++#if EVENT__SIZEOF_TIME_T > 4
+ 	/** In win32 case we have max   "23:59:59 January 18, 2038, UTC" for time32 */
+ 	{  4294967296, "Sun, 07 Feb 2106 06:28:16 GMT"} /* 2^32 */,
+ 	/** In win32 case we have max "23:59:59, December 31, 3000, UTC" for time64 */
+ 	{253402300799, "Fri, 31 Dec 9999 23:59:59 GMT"} /* long long future no one can imagine */,
++#endif /* time_t != 32bit */
+ 	{  1456704000, "Mon, 29 Feb 2016 00:00:00 GMT"} /* leap year */,
+ #endif
+ 	{  1435708800, "Wed, 01 Jul 2015 00:00:00 GMT"} /* leap second */,
+-- 
+2.13.3
+

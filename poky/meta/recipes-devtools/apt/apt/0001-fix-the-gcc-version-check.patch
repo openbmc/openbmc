@@ -1,0 +1,74 @@
+From 53c5d0982f03fd0e24c4195d6e1e42b9ade9d500 Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Wed, 27 May 2015 14:30:28 +0800
+Subject: [PATCH] fix the gcc version check
+
+Upstream-Status: pending
+
+"GCC diagnostic push" is gcc 4.6 feature, gcc 4.4.7 on centos did not know it
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ apt-pkg/contrib/macros.h     | 2 +-
+ apt-pkg/deb/debsrcrecords.cc | 4 ++--
+ apt-pkg/srcrecords.cc        | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/apt-pkg/contrib/macros.h b/apt-pkg/contrib/macros.h
+index 2727fd8..0ecae50 100644
+--- a/apt-pkg/contrib/macros.h
++++ b/apt-pkg/contrib/macros.h
+@@ -136,7 +136,7 @@
+ #endif
+ #endif
+ 
+-#if __GNUC__ >= 4
++#if __GNUC__ >= 4 + (6 >= __GNUC_MINOR__)
+ 	#define APT_IGNORE_DEPRECATED_PUSH \
+ 		_Pragma("GCC diagnostic push") \
+ 		_Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+diff --git a/apt-pkg/deb/debsrcrecords.cc b/apt-pkg/deb/debsrcrecords.cc
+index e8295de..40160b2 100644
+--- a/apt-pkg/deb/debsrcrecords.cc
++++ b/apt-pkg/deb/debsrcrecords.cc
+@@ -139,13 +139,13 @@ bool debSrcRecordParser::Files(std::vector<pkgSrcRecords::File> &F)
+    for (std::vector<pkgSrcRecords::File2>::const_iterator f2 = F2.begin(); f2 != F2.end(); ++f2)
+    {
+       pkgSrcRecords::File2 f;
+-#if __GNUC__ >= 4
++#if __GNUC__ >= 4 + (6 >= __GNUC_MINOR__)
+ 	#pragma GCC diagnostic push
+ 	#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+ #endif
+       f.MD5Hash = f2->MD5Hash;
+       f.Size = f2->Size;
+-#if __GNUC__ >= 4
++#if __GNUC__ >= 4 + (6 >= __GNUC_MINOR__)
+ 	#pragma GCC diagnostic pop
+ #endif
+       f.Path = f2->Path;
+diff --git a/apt-pkg/srcrecords.cc b/apt-pkg/srcrecords.cc
+index 53d7e60..1484828 100644
+--- a/apt-pkg/srcrecords.cc
++++ b/apt-pkg/srcrecords.cc
+@@ -157,7 +157,7 @@ bool pkgSrcRecords::Parser::Files2(std::vector<pkgSrcRecords::File2> &F2)/*{{{*/
+    for (std::vector<pkgSrcRecords::File>::const_iterator f = F.begin(); f != F.end(); ++f)
+    {
+       pkgSrcRecords::File2 f2;
+-#if __GNUC__ >= 4
++#if __GNUC__ >= 4 + (6 >= __GNUC_MINOR__)
+ 	#pragma GCC diagnostic push
+ 	#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+ #endif
+@@ -165,7 +165,7 @@ bool pkgSrcRecords::Parser::Files2(std::vector<pkgSrcRecords::File2> &F2)/*{{{*/
+       f2.Size = f->Size;
+       f2.Hashes.push_back(HashString("MD5Sum", f->MD5Hash));
+       f2.FileSize = f->Size;
+-#if __GNUC__ >= 4
++#if __GNUC__ >= 4 + (6 >= __GNUC_MINOR__)
+ 	#pragma GCC diagnostic pop
+ #endif
+       f2.Path = f->Path;
+-- 
+2.1.4
+

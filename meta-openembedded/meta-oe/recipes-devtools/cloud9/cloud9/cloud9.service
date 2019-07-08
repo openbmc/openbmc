@@ -1,0 +1,11 @@
+[Unit]
+Description=Cloud9 IDE
+ConditionPathExists=|/var/lib/cloud9
+
+[Service]
+Restart=always
+EnvironmentFile=-/etc/default/node
+ExecStart=/usr/bin/node4 /usr/share/cloud9/bin/cloud9.js -l 0.0.0.0 -w /var/lib/cloud9 -p 3000
+
+[Install]
+WantedBy=multi-user.target

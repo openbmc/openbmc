@@ -118,9 +118,6 @@ def preferred_ml_updates(d):
             d.renameVar(prov, provexp)
 
     def translate_provide(prefix, prov):
-        # Really need to know if kernel modules class is inherited somehow
-        if prov == "lttng-modules":
-            return prov
         if not prov.startswith("virtual/"):
             return prefix + "-" + prov
         if prov == "virtual/kernel":

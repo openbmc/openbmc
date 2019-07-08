@@ -1,0 +1,44 @@
+From 4bfe2c8570a4a7080ec662504882969054d8a072 Mon Sep 17 00:00:00 2001
+From: Andre McCurdy <armccurdy@gmail.com>
+Date: Wed, 3 Feb 2016 18:12:38 -0800
+Subject: [PATCH] avoid including <sys/poll.h> directly
+
+musl libc generates warnings if <sys/poll.h> is included directly.
+
+Upstream-Status: Pending
+
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+---
+ ext/raw1394/gstdv1394src.c  | 2 +-
+ ext/raw1394/gsthdv1394src.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/ext/raw1394/gstdv1394src.c b/ext/raw1394/gstdv1394src.c
+index dbc7607..3c42b41 100644
+--- a/ext/raw1394/gstdv1394src.c
++++ b/ext/raw1394/gstdv1394src.c
+@@ -37,7 +37,7 @@
+ #include "config.h"
+ #endif
+ #include <unistd.h>
+-#include <sys/poll.h>
++#include <poll.h>
+ #include <sys/socket.h>
+ #include <errno.h>
+ #include <fcntl.h>
+diff --git a/ext/raw1394/gsthdv1394src.c b/ext/raw1394/gsthdv1394src.c
+index 0b07a37..9785a15 100644
+--- a/ext/raw1394/gsthdv1394src.c
++++ b/ext/raw1394/gsthdv1394src.c
+@@ -36,7 +36,7 @@
+ #include "config.h"
+ #endif
+ #include <unistd.h>
+-#include <sys/poll.h>
++#include <poll.h>
+ #include <sys/socket.h>
+ #include <errno.h>
+ #include <fcntl.h>
+-- 
+1.9.1
+

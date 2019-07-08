@@ -28,6 +28,6 @@ RDEPENDS_${PN} += "\
     libevent \
 "
 
-DEPENDS += "\
+DEPENDS_${PN} += "\
     ${PYTHON_PN}-cython \
 "

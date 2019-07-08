@@ -1,0 +1,24 @@
+From 16e8c072709572ccefa6c7f835136db01f031323 Mon Sep 17 00:00:00 2001
+From: Pascal Bach <pascal.bach@siemens.com>
+Date: Fri, 28 Sep 2018 16:56:14 +0200
+Subject: [PATCH] Explicitly use python3 in pyCecClient
+
+Upstream-Status: Submitted [https://github.com/Pulse-Eight/libcec/pull/433]
+
+---
+ src/pyCecClient/pyCecClient.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/pyCecClient/pyCecClient.py b/src/pyCecClient/pyCecClient.py
+index 6d47857..d0504ac 100755
+--- a/src/pyCecClient/pyCecClient.py
++++ b/src/pyCecClient/pyCecClient.py
+@@ -1,4 +1,4 @@
+-#! /usr/bin/python
++#! /usr/bin/python3
+ ## demo of the python-libcec API
+ 
+ # This file is part of the libCEC(R) library.
+-- 
+2.11.0
+

@@ -1,0 +1,39 @@
+Upstream-Status: Pending
+
+Received from H J Liu @ Intel
+Make the assembly syntax compatible with x32 gcc. Othewise x32 gcc throws errors.
+Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com> 2011/07/13
+
+ported the patch to the 1.0.0e version
+Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com> 2011/12/01
+Index: openssl-1.0.2/crypto/bn/bn.h
+===================================================================
+--- openssl-1.0.2.orig/crypto/bn/bn.h
++++ openssl-1.0.2/crypto/bn/bn.h
+@@ -173,6 +173,13 @@ extern "C" {
+ #  endif
+ # endif
+ 
++/* Address type.  */
++#ifdef _WIN64
++#define BN_ADDR unsigned long long
++#else
++#define BN_ADDR unsigned long
++#endif
++
+ /*
+  * assuming long is 64bit - this is the DEC Alpha unsigned long long is only
+  * 64 bits :-(, don't define BN_LLONG for the DEC Alpha
+Index: openssl-1.0.2/crypto/bn/bn_exp.c
+===================================================================
+--- openssl-1.0.2.orig/crypto/bn/bn_exp.c
++++ openssl-1.0.2/crypto/bn/bn_exp.c
+@@ -638,7 +638,7 @@ static int MOD_EXP_CTIME_COPY_FROM_PREBU
+  * multiple.
+  */
+ #define MOD_EXP_CTIME_ALIGN(x_) \
+-        ((unsigned char*)(x_) + (MOD_EXP_CTIME_MIN_CACHE_LINE_WIDTH - (((size_t)(x_)) & (MOD_EXP_CTIME_MIN_CACHE_LINE_MASK))))
++	((unsigned char*)(x_) + (MOD_EXP_CTIME_MIN_CACHE_LINE_WIDTH - (((BN_ADDR)(x_)) & (MOD_EXP_CTIME_MIN_CACHE_LINE_MASK))))
+ 
+ /*
+  * This variant of BN_mod_exp_mont() uses fixed windows and the special

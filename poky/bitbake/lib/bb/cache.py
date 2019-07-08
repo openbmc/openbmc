@@ -1,3 +1,5 @@
+# ex:ts=4:sw=4:sts=4:et
+# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 #
 # BitBake Cache implementation
 #
@@ -237,7 +239,7 @@ def virtualfn2realfn(virtualfn):
     Convert a virtual file name to a real one + the associated subclass keyword
     """
     mc = ""
-    if virtualfn.startswith('mc:'):
+    if virtualfn.startswith('multiconfig:'):
         elems = virtualfn.split(':')
         mc = elems[1]
         virtualfn = ":".join(elems[2:])
@@ -258,7 +260,7 @@ def realfn2virtual(realfn, cls, mc):
     if cls:
         realfn = "virtual:" + cls + ":" + realfn
     if mc:
-        realfn = "mc:" + mc + ":" + realfn
+        realfn = "multiconfig:" + mc + ":" + realfn
     return realfn
 
 def variant2virtual(realfn, variant):
@@ -267,11 +269,11 @@ def variant2virtual(realfn, variant):
     """
     if variant == "":
         return realfn
-    if variant.startswith("mc:"):
+    if variant.startswith("multiconfig:"):
         elems = variant.split(":")
         if elems[2]:
-            return "mc:" + elems[1] + ":virtual:" + ":".join(elems[2:]) + ":" + realfn
-        return "mc:" + elems[1] + ":" + realfn
+            return "multiconfig:" + elems[1] + ":virtual:" + ":".join(elems[2:]) + ":" + realfn
+        return "multiconfig:" + elems[1] + ":" + realfn
     return "virtual:" + variant + ":" + realfn
 
 def parse_recipe(bb_data, bbfile, appends, mc=''):
@@ -349,7 +351,7 @@ class NoCache(object):
             bb_data = self.databuilder.mcdata[mc].createCopy()
             newstores = parse_recipe(bb_data, bbfile, appends, mc)
             for ns in newstores:
-                datastores["mc:%s:%s" % (mc, ns)] = newstores[ns]
+                datastores["multiconfig:%s:%s" % (mc, ns)] = newstores[ns]
 
         return datastores
 

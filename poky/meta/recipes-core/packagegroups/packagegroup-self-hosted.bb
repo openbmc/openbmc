@@ -189,6 +189,7 @@ RDEPENDS_packagegroup-self-hosted-graphics = "\
     libx11-dev \
     adwaita-icon-theme \
     xdg-utils \
+    epiphany \
     l3afpad \
     pcmanfm \
     vte \

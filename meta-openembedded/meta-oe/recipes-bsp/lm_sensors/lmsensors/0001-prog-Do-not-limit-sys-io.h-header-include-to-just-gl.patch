@@ -1,0 +1,88 @@
+From 727524453f115ddc05109e9bbb3d0e60a7db9185 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 16 Jul 2017 15:05:50 -0700
+Subject: [PATCH] prog: Do not limit sys/io.h header include to just glibc
+
+musl provides it too.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ prog/dump/isadump.c | 6 ------
+ prog/dump/isaset.c  | 6 ------
+ prog/dump/superio.c | 5 -----
+ prog/dump/util.c    | 5 -----
+ 4 files changed, 22 deletions(-)
+
+diff --git a/prog/dump/isadump.c b/prog/dump/isadump.c
+index e0e6f00..8794537 100644
+--- a/prog/dump/isadump.c
++++ b/prog/dump/isadump.c
+@@ -36,13 +36,7 @@
+ #include "util.h"
+ #include "superio.h"
+ 
+-
+-/* To keep glibc2 happy */
+-#if defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ >= 0
+ #include <sys/io.h>
+-#else
+-#include <asm/io.h>
+-#endif
+ 
+ #ifdef __powerpc__
+ unsigned long isa_io_base = 0; /* XXX for now */
+diff --git a/prog/dump/isaset.c b/prog/dump/isaset.c
+index e743755..85a4f64 100644
+--- a/prog/dump/isaset.c
++++ b/prog/dump/isaset.c
+@@ -32,13 +32,7 @@
+ #include <string.h>
+ #include "util.h"
+ 
+-
+-/* To keep glibc2 happy */
+-#if defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ >= 0
+ #include <sys/io.h>
+-#else
+-#include <asm/io.h>
+-#endif
+ 
+ #ifdef __powerpc__
+ unsigned long isa_io_base = 0; /* XXX for now */
+diff --git a/prog/dump/superio.c b/prog/dump/superio.c
+index 64ef27b..906fe55 100644
+--- a/prog/dump/superio.c
++++ b/prog/dump/superio.c
+@@ -20,12 +20,7 @@
+ */
+ 
+ #include <stdlib.h>
+-
+-#if defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ >= 0
+ #include <sys/io.h>
+-#else
+-#include <asm/io.h>
+-#endif
+ 
+ #include "superio.h"
+ 
+diff --git a/prog/dump/util.c b/prog/dump/util.c
+index 874c1b9..197fa64 100644
+--- a/prog/dump/util.c
++++ b/prog/dump/util.c
+@@ -11,12 +11,7 @@
+ #include <stdio.h>
+ #include "util.h"
+ 
+-/* To keep glibc2 happy */
+-#if defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ >= 0
+ #include <sys/io.h>
+-#else
+-#include <asm/io.h>
+-#endif
+ 
+ /* Return 1 if we should continue, 0 if we should abort */
+ int user_ack(int def)
+-- 
+2.13.3
+

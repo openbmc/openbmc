@@ -1,0 +1,32 @@
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Upstream-Status: Backport
+
+
+Original upstream commit follows:
+
+From b583e21d8698dbd58013320cfb47739102efdea7 Mon Sep 17 00:00:00 2001
+From: Kalev Lember <klember@redhat.com>
+Date: Wed, 19 Oct 2016 23:38:28 +0200
+Subject: [PATCH] Fix an incorrect preprocessor conditional
+
+This fixes the build with wayland wayland egl server support disabled.
+---
+ cogl/winsys/cogl-winsys-egl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cogl/winsys/cogl-winsys-egl.c b/cogl/winsys/cogl-winsys-egl.c
+index 39bfd884..4a9f3aa6 100644
+--- a/cogl/winsys/cogl-winsys-egl.c
++++ b/cogl/winsys/cogl-winsys-egl.c
+@@ -1029,7 +1029,7 @@ _cogl_egl_create_image (CoglContext *ctx,
+     egl_ctx = EGL_NO_CONTEXT;
+   else
+ #endif
+-#if COGL_HAS_WAYLAND_EGL_SERVER_SUPPORT
++#ifdef COGL_HAS_WAYLAND_EGL_SERVER_SUPPORT
+   /* The WL_bind_wayland_display spec states that EGL_NO_CONTEXT is to be used
+    * in conjunction with the EGL_WAYLAND_BUFFER_WL target */
+   if (target == EGL_WAYLAND_BUFFER_WL)
+-- 
+2.11.0
+

@@ -1,0 +1,36 @@
+From c10368b397483a2fc7b493c099d8416d902f8cd8 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 31 Jul 2018 14:18:35 +0800
+Subject: [PATCH] allow multi definitions for native
+
+Upstream-Status: Pending
+
+It fails to create .so file when build efivar-native:
+
+| lib.o:(*IND*+0x0): multiple definition of `efi_set_variable'
+| lib.o:lib.c:(.text+0xa0): first defined here
+
+Add link option '-z muldefs' to fix it.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ Make.rules | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Make.rules b/Make.rules
+index 042585b..257ba45 100644
+--- a/Make.rules
++++ b/Make.rules
+@@ -20,6 +20,7 @@ include $(TOPDIR)/Make.version
+ 	$(CCLD) $(ccldflags) $(CPPFLAGS) $(SOFLAGS) \
+ 	  -Wl,-soname,$@.1 \
+ 	  -Wl,--version-script=$(MAP) \
++	  -Wl,-z,muldefs \
+ 	  -o $@ $^ $(LDLIBS)
+ 	ln -vfs $@ $@.1
+ 
+-- 
+2.7.4
+

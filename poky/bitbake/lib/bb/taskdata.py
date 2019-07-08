@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# ex:ts=4:sw=4:sts=4:et
+# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 """
 BitBake 'TaskData' implementation
 
@@ -81,7 +83,7 @@ class TaskData:
         def add_mcdepends(task):
             for dep in task_deps['mcdepends'][task].split():
                 if len(dep.split(':')) != 5:
-                    bb.msg.fatal("TaskData", "Error for %s:%s[%s], multiconfig dependency %s does not contain exactly four  ':' characters.\n Task '%s' should be specified in the form 'mc:fromMC:toMC:packagename:task'" % (fn, task, 'mcdepends', dep, 'mcdepends'))
+                    bb.msg.fatal("TaskData", "Error for %s:%s[%s], multiconfig dependency %s does not contain exactly four  ':' characters.\n Task '%s' should be specified in the form 'multiconfig:fromMC:toMC:packagename:task'" % (fn, task, 'mcdepends', dep, 'mcdepends'))
                 if dep not in self.mcdepends:
                     self.mcdepends.append(dep)
 

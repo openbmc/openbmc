@@ -1,0 +1,35 @@
+From b19b68eab567aa534cf8dec79fe18e3dc0e14043 Mon Sep 17 00:00:00 2001
+From: Quanyang Wang <quanyang.wang@windriver.com>
+Date: Tue, 16 Jun 2015 12:59:57 +0800
+Subject: [PATCH] powerpc: change the memory size limit
+
+When run "kexec" in powerpc board, the kexec has a limit that
+the kernel text and bss size must be less than 24M. But now
+some kernel size exceed the limit. So we need to change the limit,
+else will get the error log as below:
+
+my_load:669: do
+Could not find a free area of memory of 0x12400 bytes...
+Could not find a free area of memory of 0x13000 bytes...
+locate_hole failed
+
+Upstream-Status: Pending
+
+Signed-off-by: Quanyang Wang <quanyang.wang@windriver.com>
+---
+ kexec/arch/ppc/kexec-ppc.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: kexec-tools-2.0.10/kexec/arch/ppc/kexec-ppc.h
+===================================================================
+--- kexec-tools-2.0.10.orig/kexec/arch/ppc/kexec-ppc.h
++++ kexec-tools-2.0.10/kexec/arch/ppc/kexec-ppc.h
+@@ -42,7 +42,7 @@ void dol_ppc_usage(void);
+  * During inital setup the kernel does not map the whole memory but a part of
+  * it. On Book-E that is 64MiB, 601 24MiB or 256MiB (if possible).
+  */
+-#define KERNEL_ACCESS_TOP (24 * 1024 * 1024)
++#define KERNEL_ACCESS_TOP (36 * 1024 * 1024)
+ 
+ /* boot block version 17 as defined by the linux kernel */
+ struct bootblock {

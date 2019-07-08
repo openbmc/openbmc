@@ -1,0 +1,35 @@
+From b3d35e7dd27a755df5acbe050837885914dbb28b Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 10 May 2016 11:34:50 -0400
+Subject: [PATCH]  fix unknow option for gold linker
+
+- Revert the following patch, since oe-core work with gcc 5
+...
+commit 3055a3797f16693dfdd855fa68bc57fd900dc408
+Author: Peter Jones <pjones@redhat.com>
+Date:   Mon Feb 15 14:15:40 2016 -0500
+
+    Make gcc.specs work with gcc 6 / binutils 2.26
+
+    Apparently binutils 2.26 gets real picky about "ld -PIC" vs "ld -fPIC".
+
+    Signed-off-by: Peter Jones <pjones@redhat.com>
+...
+
+- Remove unknown option '--add-needed'
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ gcc.specs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: git/gcc.specs
+===================================================================
+--- git.orig/gcc.specs
++++ git/gcc.specs
+@@ -14,4 +14,4 @@
+ + %{!shared:%{!static:%{!r:-pie}}} %{static:-Wl,-no-fatal-warnings -Wl,-static -static -Wl,-z,relro,-z,now}
+ 
+ *link:
+-+ %{!static:--fatal-warnings} --no-undefined-version --no-allow-shlib-undefined --add-needed -z now --build-id %{!static:%{!shared:-pie}} %{shared:-z relro} %{static:%<pie}
+++ %{!static:--fatal-warnings} --no-undefined-version --no-allow-shlib-undefined -z now --build-id %{!static:%{!shared:-pie}} %{shared:-z relro} %{static:%<pie}

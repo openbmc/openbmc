@@ -1,0 +1,45 @@
+From d1cd4c31ea0ed7406a3ad4bdaa211f581063f655 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 15 Aug 2017 10:21:21 +0800
+Subject: [PATCH 2/2] fix run-execscript/run-test/ failed
+
+FAIL: run-execscript:
+the test suite should not be run as root
+
+FAIL: run-test
+the test suite should not be run as root
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ tests/run-execscript | 3 ++-
+ tests/run-test       | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/tests/run-execscript b/tests/run-execscript
+index de78644..38397c1 100644
+--- a/tests/run-execscript
++++ b/tests/run-execscript
+@@ -5,5 +5,6 @@ echo "warning: \`/tmp/bash-notthere' not being found or \`/' being a directory"
+ echo "warning: produce diff output, please do not consider this a test failure" >&2
+ echo "warning: if diff output differing only in the location of the bash" >&2
+ echo "warning: binary appears, please do not consider this a test failure" >&2
+-${THIS_SH} ./execscript > ${BASH_TSTOUT} 2>&1
++rm -f ${BASH_TSTOUT}
++su -c "${THIS_SH} ./execscript > ${BASH_TSTOUT} 2>&1" test
+ diff ${BASH_TSTOUT} exec.right && rm -f ${BASH_TSTOUT}
+diff --git a/tests/run-test b/tests/run-test
+index d68791c..d6317d2 100644
+--- a/tests/run-test
++++ b/tests/run-test
+@@ -1,4 +1,5 @@
+ unset GROUPS UID 2>/dev/null
+ 
+-${THIS_SH} ./test.tests >${BASH_TSTOUT} 2>&1
++rm -f ${BASH_TSTOUT}
++su -c "${THIS_SH} ./test.tests > ${BASH_TSTOUT} 2>&1" test
+ diff ${BASH_TSTOUT} test.right && rm -f ${BASH_TSTOUT}
+-- 
+1.8.3.1
+

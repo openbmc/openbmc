@@ -1,0 +1,40 @@
+From 2169f2205c0205a220d826d7573e5a863bd36e0a Mon Sep 17 00:00:00 2001
+From: Andre McCurdy <armccurdy@gmail.com>
+Date: Tue, 9 Feb 2016 14:00:00 -0800
+Subject: [PATCH] ensure valid sentinal for gst_structure_get()
+
+gst_structure_get() is declared with G_GNUC_NULL_TERMINATED, ie
+__attribute__((__sentinel__)), which means gcc will generate a
+warning if the last parameter passed to the function is not NULL
+(where a valid NULL in this context is defined as zero with any
+pointer type).
+
+The C code callers to gst_structure_get() within gst-plugins-good
+use the C NULL definition (ie ((void*)0)), which is a valid sentinel.
+
+However gstid3v2mux.cc uses the C++ NULL definition (ie 0L), which
+is not a valid sentinel without an explicit cast to a pointer type.
+
+Upstream-Status: Pending
+
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+---
+ ext/taglib/gstid3v2mux.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ext/taglib/gstid3v2mux.cc b/ext/taglib/gstid3v2mux.cc
+index 8651e77..a87234f 100644
+--- a/ext/taglib/gstid3v2mux.cc
++++ b/ext/taglib/gstid3v2mux.cc
+@@ -465,7 +465,7 @@ add_image_tag (ID3v2::Tag * id3v2tag, const GstTagList * list,
+ 
+           if (info_struct) {
+             if (gst_structure_get (info_struct, "image-type",
+-                    GST_TYPE_TAG_IMAGE_TYPE, &image_type, NULL)) {
++                    GST_TYPE_TAG_IMAGE_TYPE, &image_type, (void *) NULL)) {
+               if (image_type > 0 && image_type <= 18) {
+                 image_type += 2;
+               } else {
+-- 
+1.9.1
+

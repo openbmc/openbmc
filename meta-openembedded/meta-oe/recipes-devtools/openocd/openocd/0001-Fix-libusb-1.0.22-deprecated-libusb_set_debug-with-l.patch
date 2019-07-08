@@ -1,0 +1,39 @@
+From b95a996bfb281104b68ec66f32ebb79db519a4a8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 31 May 2018 21:06:46 -0700
+Subject: [PATCH] Fix libusb-1.0.22 deprecated libusb_set_debug with
+ libusb_set_option
+
+libusb_set_debug is deprecated in libusb >= 1.0.22 therefore replace
+with equivalent libusb_set_option()  API
+
+see libusb commit for more details
+
+https://github.com/libusb/libusb/commit/539f22e2fd916558d11ab9a66f10f461c5593168
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted [http://openocd.zylin.com/#/c/4540/]
+ src/jtag/drivers/xds110.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/jtag/drivers/xds110.c b/src/jtag/drivers/xds110.c
+index 90b699027..9bfe02ea8 100644
+--- a/src/jtag/drivers/xds110.c
++++ b/src/jtag/drivers/xds110.c
+@@ -367,8 +367,11 @@ static bool usb_connect(void)
+ 
+ 		/* Set libusb to auto detach kernel and disable debug messages */
+ 		(void)libusb_set_auto_detach_kernel_driver(dev, 1);
++#if LIBUSB_API_VERSION >= 0x01000106
++		libusb_set_option(ctx, LIBUSB_OPTION_LOG_LEVEL, LIBUSB_LOG_LEVEL_NONE);
++#else
+ 		libusb_set_debug(ctx, LIBUSB_LOG_LEVEL_NONE);
+-
++#endif
+ 		/* Claim the debug interface on the XDS110 */
+ 		result = libusb_claim_interface(dev, INTERFACE_DEBUG);
+ 	} else {
+-- 
+2.17.1
+

@@ -1,0 +1,48 @@
+Author: Krishnanjanappa, Jagadeesh <jagadeesh.krishnanjanappa@caviumnetworks.com>
+Date:   Wed Apr 8 18:08:14 2015 +0530
+
+[PATCH] add armeb triplet entry into triplettable.
+
+Cross-compling dpkg application for armeb fails with below error
+during configure task,
+
+(snip)
+ configure:23141: checking dpkg cpu type
+ configure:23148: result: armeb
+ configure:23150: WARNING: armeb not found in cputable
+ configure:23162: checking dpkg operating system type
+ configure:23169: result: linux-gnueabi
+ configure:23171: WARNING: linux-gnueabi not found in ostable
+ configure:23183: checking dpkg architecture name
+ configure:23189: error: cannot determine host dpkg architecture
+-- CUT --
+
+the required combination of "gnueabi-linux-armeb" was not found in
+the triplettable file thereby returning dpkg_arch as
+empty in configure script.
+
+Upstream-Status: Pending
+
+Signed-off-by: Krishnanjanappa, Jagadeesh <jagadeesh.krishnanjanappa@caviumnetworks.com>
+Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>
+
+---
+ data/tupletable | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/data/tupletable b/data/tupletable
+index b7802bec3..5f500f6ca 100644
+--- a/data/tupletable
++++ b/data/tupletable
+@@ -12,6 +12,7 @@ base-musl-linux-<cpu>		musl-linux-<cpu>
+ ilp32-gnu-linux-arm64		arm64ilp32
+ eabihf-gnu-linux-arm		armhf
+ eabi-gnu-linux-arm		armel
++eabi-gnu-linux-armeb		armeb
+ abin32-gnu-linux-mips64r6el	mipsn32r6el
+ abin32-gnu-linux-mips64r6	mipsn32r6
+ abin32-gnu-linux-mips64el	mipsn32el
+-- 
+2.11.0
+
+

@@ -1,0 +1,27 @@
+From: Sebastian Reichel <sebastian.reichel@collabora.co.uk>
+Date: Tue, 29 Auf 2017 16:08:42 +0200
+Subject: [PATCH] Avoid absolute symlinks
+
+Avoid usage of absolute symlinks, which breaks yocto builds
+since pyro.
+
+Upstream-Status: Pending
+Signed-off-by: Sebastian Reichel <sebastian.reichel@collabora.co.uk>
+
+diff --git a/default-config/Makefile.am b/default-config/Makefile.am
+index 5e16d095a137..5404145a742c 100644
+--- a/default-config/Makefile.am
++++ b/default-config/Makefile.am
+@@ -17,9 +17,9 @@ EXTRA_DIST  = images \
+ 
+ install-data-hook:
+ 	cp -r $(srcdir)/images $(inst_location)
+-	ln -sf $(inst_location)/FvwmScript-DateTime $(inst_location)/..
+-	ln -sf $(inst_location)/FvwmScript-ConfirmQuit $(inst_location)/..
+-	ln -sf $(inst_location)/FvwmScript-ConfirmCopyConfig $(inst_location)/..
++	ln -sf default-config/FvwmScript-DateTime $(inst_location)/..
++	ln -sf default-config/FvwmScript-ConfirmQuit $(inst_location)/..
++	ln -sf default-config/FvwmScript-ConfirmCopyConfig $(inst_location)/..
+ 
+ uninstall-hook:
+ 	rm -fr $(DESTDIR)/$(configdir)

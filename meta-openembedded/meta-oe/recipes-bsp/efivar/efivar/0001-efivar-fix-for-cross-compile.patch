@@ -1,0 +1,32 @@
+From a9115d9e6f0f62d6bb735ce3698858d1f89f8d73 Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Fri, 25 Sep 2015 18:14:31 +0800
+Subject: [PATCH] efivar: fix for cross compile
+
+It builds and calls elf file makeguids to generate a header file which
+doesn't work for cross compile. Fix it.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Upstream-Status: Pending
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+---
+ src/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index 0c16597..dcc7fc8 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -40,8 +40,8 @@ abicheck : $(patsubst %.so,%.abicheck,$(LIBTARGETS))
+ ./guid-symbols.c : include/efivar/efivar-guids.h
+ ./guids.bin : include/efivar/efivar-guids.h
+ ./names.bin : include/efivar/efivar-guids.h
+-include/efivar/efivar-guids.h : makeguids guids.txt
+-	./makeguids guids.txt guids.bin names.bin \
++include/efivar/efivar-guids.h : guids.txt
++	makeguids guids.txt guids.bin names.bin \
+ 		guid-symbols.c include/efivar/efivar-guids.h
+ 
+ makeguids : CPPFLAGS+=-DEFIVAR_BUILD_ENVIRONMENT

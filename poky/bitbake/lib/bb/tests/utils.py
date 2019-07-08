@@ -1,3 +1,5 @@
+# ex:ts=4:sw=4:sts=4:et
+# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 #
 # BitBake Tests for utils.py
 #
@@ -28,10 +30,6 @@ class VerCmpString(unittest.TestCase):
         result = bb.utils.vercmp_string('1.0', '1.0+1.1-beta1')
         self.assertTrue(result < 0)
         result = bb.utils.vercmp_string('1.1', '1.0+1.1-beta1')
-        self.assertTrue(result > 0)
-        result = bb.utils.vercmp_string('1a', '1a1')
-        self.assertTrue(result < 0)
-        result = bb.utils.vercmp_string('1a1', '1a')
         self.assertTrue(result > 0)
         result = bb.utils.vercmp_string('1.', '1.1')
         self.assertTrue(result < 0)

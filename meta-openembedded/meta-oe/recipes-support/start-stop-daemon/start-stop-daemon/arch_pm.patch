@@ -1,0 +1,29 @@
+configure cannot determine the proper cpu, os, or
+architecture for mips64, and possibly other arch's
+because of faulty code added to Arch.pm in the latest
+release from upstream.  We remove that code.
+
+Upstream-Status: Pending
+
+Signed-off-by: Joe Slater <jslater@windriver.com>
+
+---
+ scripts/Dpkg/Arch.pm | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/scripts/Dpkg/Arch.pm b/scripts/Dpkg/Arch.pm
+index 1720847b8..6345ce3b9 100644
+--- a/scripts/Dpkg/Arch.pm
++++ b/scripts/Dpkg/Arch.pm
+@@ -323,9 +323,6 @@ sub _load_tupletable()
+ 		    (my $dt = $debtuple) =~ s/<cpu>/$_cpu/;
+ 		    (my $da = $debarch) =~ s/<cpu>/$_cpu/;
+ 
+-		    next if exists $debarch_to_debtuple{$da}
+-		         or exists $debtuple_to_debarch{$dt};
+-
+ 		    $debarch_to_debtuple{$da} = $dt;
+ 		    $debtuple_to_debarch{$dt} = $da;
+ 		}
+-- 
+2.11.0

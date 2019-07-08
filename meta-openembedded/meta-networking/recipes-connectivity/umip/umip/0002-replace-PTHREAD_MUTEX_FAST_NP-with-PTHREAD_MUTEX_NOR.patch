@@ -1,0 +1,143 @@
+From 19b6cf8099e1974b5fc39086fc54103b0cbc2658 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 4 Mar 2018 23:01:25 -0800
+Subject: [PATCH 2/2] replace PTHREAD_MUTEX_FAST_NP with PTHREAD_MUTEX_NORMAL
+
+PTHREAD_MUTEX_FAST_NP is not available on non-posix systems
+e.g. musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ src/ha.c        | 2 +-
+ src/icmp6.c     | 2 +-
+ src/mh.c        | 2 +-
+ src/mn.c        | 2 +-
+ src/movement.c  | 2 +-
+ src/mpdisc_ha.c | 2 +-
+ src/mpdisc_mn.c | 2 +-
+ src/tqueue.c    | 2 +-
+ src/tunnelctl.c | 2 +-
+ 9 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/src/ha.c b/src/ha.c
+index fbdcff0..b2f811e 100644
+--- a/src/ha.c
++++ b/src/ha.c
+@@ -1246,7 +1246,7 @@ int ha_init(void)
+ {
+ 	pthread_mutexattr_t mattrs;
+ 	pthread_mutexattr_init(&mattrs);
+-	pthread_mutexattr_settype(&mattrs, PTHREAD_MUTEX_FAST_NP);
++	pthread_mutexattr_settype(&mattrs, PTHREAD_MUTEX_NORMAL);
+ 	if (pthread_mutex_init(&bu_worker_mutex, &mattrs) ||
+ 	    pthread_cond_init(&cond, NULL))
+ 		return -1;
+diff --git a/src/icmp6.c b/src/icmp6.c
+index 3695135..6460634 100644
+--- a/src/icmp6.c
++++ b/src/icmp6.c
+@@ -243,7 +243,7 @@ int icmp6_init(void)
+ 		return -1;
+ 	/* create ICMP listener thread */
+ 	pthread_mutexattr_init(&mattrs);
+-	pthread_mutexattr_settype(&mattrs, PTHREAD_MUTEX_FAST_NP);
++	pthread_mutexattr_settype(&mattrs, PTHREAD_MUTEX_NORMAL);
+ 	if (pthread_mutex_init(&icmp6_sock.send_mutex, &mattrs) ||
+ 	    pthread_rwlock_init(&handler_lock, NULL) ||
+ 	    pthread_create(&icmp6_listener, NULL, icmp6_listen, NULL))
+diff --git a/src/mh.c b/src/mh.c
+index 60e345e..7928f4c 100644
+--- a/src/mh.c
++++ b/src/mh.c
+@@ -204,7 +204,7 @@ int mh_init(void)
+ 		return -1;
+ 
+ 	pthread_mutexattr_init(&mattrs);
+-	pthread_mutexattr_settype(&mattrs, PTHREAD_MUTEX_FAST_NP);
++	pthread_mutexattr_settype(&mattrs, PTHREAD_MUTEX_NORMAL);
+ 	if (pthread_mutex_init(&mh_sock.send_mutex, &mattrs) ||
+ 	    pthread_rwlock_init(&handler_lock, NULL) ||
+ 	    pthread_create(&mh_listener, NULL, mh_listen, NULL))
+diff --git a/src/mn.c b/src/mn.c
+index 092cfcb..8f7f448 100644
+--- a/src/mn.c
++++ b/src/mn.c
+@@ -1478,7 +1478,7 @@ static struct home_addr_info *hai_copy(struct home_addr_info *conf_hai)
+ 	if (hai != NULL) {
+ 		pthread_mutexattr_t mattrs;
+ 		pthread_mutexattr_init(&mattrs);
+-		pthread_mutexattr_settype(&mattrs, PTHREAD_MUTEX_FAST_NP);
++		pthread_mutexattr_settype(&mattrs, PTHREAD_MUTEX_NORMAL);
+ 
+ 		memcpy(hai, conf_hai, sizeof(struct home_addr_info));
+ 
+diff --git a/src/movement.c b/src/movement.c
+index d985937..6400448 100644
+--- a/src/movement.c
++++ b/src/movement.c
+@@ -2013,7 +2013,7 @@ int md_init(void)
+ 	int val;
+ 
+ 	pthread_mutexattr_init(&mattrs);
+-	pthread_mutexattr_settype(&mattrs, PTHREAD_MUTEX_FAST_NP);
++	pthread_mutexattr_settype(&mattrs, PTHREAD_MUTEX_NORMAL);
+ 	if (pthread_mutex_init(&iface_lock, &mattrs))
+ 		return -1;
+ 
+diff --git a/src/mpdisc_ha.c b/src/mpdisc_ha.c
+index 40ba05f..fd7a90d 100644
+--- a/src/mpdisc_ha.c
++++ b/src/mpdisc_ha.c
+@@ -559,7 +559,7 @@ int mpd_ha_init(void)
+ {
+ 	pthread_mutexattr_t mattrs;
+ 	pthread_mutexattr_init(&mattrs);
+-	pthread_mutexattr_settype(&mattrs, PTHREAD_MUTEX_FAST_NP);
++	pthread_mutexattr_settype(&mattrs, PTHREAD_MUTEX_NORMAL);
+ 	if (pthread_mutex_init(&mpa_lock, &mattrs) ||
+ 	    pthread_rwlock_init(&prefix_lock, NULL) ||
+ 	    hash_init(&mpa_hash, DOUBLE_ADDR, MPA_BUCKETS) < 0)
+diff --git a/src/mpdisc_mn.c b/src/mpdisc_mn.c
+index 4873bd6..ada02bd 100644
+--- a/src/mpdisc_mn.c
++++ b/src/mpdisc_mn.c
+@@ -267,7 +267,7 @@ int mpd_mn_init(void)
+ {
+ 	pthread_mutexattr_t mattrs;
+ 	pthread_mutexattr_init(&mattrs);
+-	pthread_mutexattr_settype(&mattrs, PTHREAD_MUTEX_FAST_NP);
++	pthread_mutexattr_settype(&mattrs, PTHREAD_MUTEX_NORMAL);
+ 	if (pthread_mutex_init(&mps_lock, &mattrs))
+ 		return -1;
+ 	if (hash_init(&mps_hash, DOUBLE_ADDR, MPS_BUCKETS) < 0)
+diff --git a/src/tqueue.c b/src/tqueue.c
+index 2f7aa0b..9c185b8 100644
+--- a/src/tqueue.c
++++ b/src/tqueue.c
+@@ -65,7 +65,7 @@ int taskqueue_init(void)
+ {
+ 	pthread_mutexattr_t mattrs;
+ 	pthread_mutexattr_init(&mattrs);
+-	pthread_mutexattr_settype(&mattrs, PTHREAD_MUTEX_FAST_NP);
++	pthread_mutexattr_settype(&mattrs, PTHREAD_MUTEX_NORMAL);
+ 	if (pthread_mutex_init(&mutex, &mattrs) ||
+ 	    pthread_cond_init(&cond, NULL) ||
+ 	    pthread_create(&tq_runner, NULL, runner, NULL))
+diff --git a/src/tunnelctl.c b/src/tunnelctl.c
+index 23fc20b..813b8ec 100644
+--- a/src/tunnelctl.c
++++ b/src/tunnelctl.c
+@@ -433,7 +433,7 @@ int tunnelctl_init(void)
+ 		return -1;
+ 
+ 	pthread_mutexattr_init(&mattrs);
+-	pthread_mutexattr_settype(&mattrs, PTHREAD_MUTEX_FAST_NP);
++	pthread_mutexattr_settype(&mattrs, PTHREAD_MUTEX_NORMAL);
+ 	if (pthread_mutex_init(&tnl_lock, &mattrs))
+ 		return -1;
+ 
+-- 
+2.16.2
+

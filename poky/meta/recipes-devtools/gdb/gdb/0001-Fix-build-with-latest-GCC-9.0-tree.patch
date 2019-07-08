@@ -1,0 +1,50 @@
+From 7406a50077773e78282a495cb32ef5b8179f6a33 Mon Sep 17 00:00:00 2001
+From: Dimitar Dimitrov <dimitar@dinux.eu>
+Date: Mon, 17 Dec 2018 21:30:52 +0200
+Subject: [PATCH] Fix build with latest GCC 9.0 tree
+
+A recent patch [1] to fix a GCC PR [2] actually broke the GDB build.
+To fix, remove the stack pointer clobber. GCC will ignore the clobber
+marker, and will not save or restore the stack pointer.
+
+I ran "make check-gdb" on x86_64 to ensure there are no regressions.
+
+gdb/ChangeLog:
+
+2018-12-17  Dimitar Dimitrov  <dimitar@dinux.eu>
+
+	* nat/linux-ptrace.c (linux_ptrace_test_ret_to_nx): Remove sp clobbers.
+
+[1] https://gcc.gnu.org/ml/gcc-patches/2018-12/msg00532.html
+[2] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52813
+
+Upstream-Status: Backport
+Signed-off-by: Dimitar Dimitrov <dimitar@dinux.eu>
+---
+ gdb/ChangeLog          | 5 +++++
+ gdb/nat/linux-ptrace.c | 4 ++--
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/gdb/nat/linux-ptrace.c b/gdb/nat/linux-ptrace.c
+index d4c1b8f9fd..187cfeb9bc 100644
+--- a/gdb/nat/linux-ptrace.c
++++ b/gdb/nat/linux-ptrace.c
+@@ -161,14 +161,14 @@ linux_ptrace_test_ret_to_nx (void)
+ 			".globl linux_ptrace_test_ret_to_nx_instr;"
+ 			"linux_ptrace_test_ret_to_nx_instr:"
+ 			"ret"
+-			: : "r" (return_address) : "%esp", "memory");
++			: : "r" (return_address) : "memory");
+ #elif defined __x86_64__
+ 	  asm volatile ("pushq %0;"
+ 			".globl linux_ptrace_test_ret_to_nx_instr;"
+ 			"linux_ptrace_test_ret_to_nx_instr:"
+ 			"ret"
+ 			: : "r" ((uint64_t) (uintptr_t) return_address)
+-			: "%rsp", "memory");
++			: "memory");
+ #else
+ # error "!__i386__ && !__x86_64__"
+ #endif
+--
+2.20.1

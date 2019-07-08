@@ -40,3 +40,4 @@ do_install_append() {
 	rm -rf ${D}${exec_prefix}/lib
 	cross_canadian_bindirlinks
 }
+

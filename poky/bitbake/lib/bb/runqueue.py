@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# ex:ts=4:sw=4:sts=4:et
+# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 """
 BitBake 'RunQueue' implementation
 
@@ -39,7 +41,7 @@ def taskname_from_tid(tid):
     return tid.rsplit(":", 1)[1]
 
 def mc_from_tid(tid):
-    if tid.startswith('mc:'):
+    if tid.startswith('multiconfig:'):
         return tid.split(':')[1]
     return ""
 
@@ -48,12 +50,12 @@ def split_tid(tid):
     return (mc, fn, taskname)
 
 def split_tid_mcfn(tid):
-    if tid.startswith('mc:'):
+    if tid.startswith('multiconfig:'):
         elems = tid.split(':')
         mc = elems[1]
         fn = ":".join(elems[2:-1])
         taskname = elems[-1]
-        mcfn = "mc:" + mc + ":" + fn
+        mcfn = "multiconfig:" + mc + ":" + fn
     else:
         tid = tid.rsplit(":", 1)
         mc = ""
@@ -65,7 +67,7 @@ def split_tid_mcfn(tid):
 
 def build_tid(mc, fn, taskname):
     if mc:
-        return "mc:" + mc + ":" + fn + ":" + taskname
+        return "multiconfig:" + mc + ":" + fn + ":" + taskname
     return fn + ":" + taskname
 
 class RunQueueStats:
@@ -1655,7 +1657,7 @@ class RunQueue:
             recout = []
             if len(hashfiles) == 2:
                 out2 = bb.siggen.compare_sigfiles(hashfiles[hash1], hashfiles[hash2], recursecb)
-                recout.extend(list('    ' + l for l in out2))
+                recout.extend(list('  ' + l for l in out2))
             else:
                 recout.append("Unable to find matching sigdata for %s with hashes %s or %s" % (key, hash1, hash2))
 

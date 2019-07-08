@@ -1,0 +1,32 @@
+From a1135b3170963ba956f2364c1283864c35541295 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 7 Sep 2015 07:59:45 +0000
+Subject: [PATCH] purgatory: Pass -r directly to linker
+
+This helps compiling with clang since -r is not a known option for clang
+where as gcc knows how to deal with it and passes it down to linker
+unfiltered
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ purgatory/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/purgatory/Makefile b/purgatory/Makefile
+index 2b5c061..b251353 100644
+--- a/purgatory/Makefile
++++ b/purgatory/Makefile
+@@ -61,7 +61,7 @@ $(PURGATORY): CPPFLAGS=$($(ARCH)_PURGATORY_EXTRA_CFLAGS) \
+ 			-I$(shell $(CC) -print-file-name=include)
+ $(PURGATORY): LDFLAGS=$($(ARCH)_PURGATORY_EXTRA_CFLAGS)\
+ 			-Wl,--no-undefined -nostartfiles -nostdlib \
+-			-nodefaultlibs -e purgatory_start -r \
++			-nodefaultlibs -e purgatory_start -Wl,-r \
+ 			-Wl,-Map=$(PURGATORY_MAP)
+ 
+ $(PURGATORY): $(PURGATORY_OBJS)
+-- 
+2.5.1
+

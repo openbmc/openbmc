@@ -1,0 +1,50 @@
+From 0cc7362e171616dcfeb93c6e1576362761bf14e5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 31 Jan 2018 18:37:16 -0800
+Subject: [PATCH] Do not use obsolete pow10f() function
+
+exp10 name is standardized in TS 18661-4 and its
+available in glibc since version 2.1
+it has been now removed from glibc 2.27+
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ dsp/v4f_IIR2.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/dsp/v4f_IIR2.h b/dsp/v4f_IIR2.h
+index a68ecf5..ebd1234 100644
+--- a/dsp/v4f_IIR2.h
++++ b/dsp/v4f_IIR2.h
+@@ -33,7 +33,7 @@
+ namespace DSP {
+ 
+ #ifdef __APPLE__
+-inline float pow10f(float f) {return pow(10,f);}
++inline float exp10f(float f) {return __exp10f(f);}
+ #endif
+ 
+ class RBJv4
+@@ -142,7 +142,7 @@ class IIR2v4
+ 				/* A = pow (10, gain / 40) */
+ 				v4f_t A = (v4f_t) {.025,.025,.025,.025};
+ 				A *= gain;
+-				A = v4f_map<pow10f> (A);
++				A = v4f_map<exp10f> (A);
+ 
+ 				RBJv4 p (f, Q);
+ 
+@@ -429,7 +429,7 @@ class IIR2v4Bank
+ 					/* A = pow (10, gain / 40) */
+ 					v4f_t A = (v4f_t) {.025,.025,.025,.025};
+ 					A *= gain[i];
+-					A = v4f_map<pow10f> (A);
++					A = v4f_map<exp10f> (A);
+ 
+ 					RBJv4 p (f[i], Q[i]);
+ 
+-- 
+2.16.1
+

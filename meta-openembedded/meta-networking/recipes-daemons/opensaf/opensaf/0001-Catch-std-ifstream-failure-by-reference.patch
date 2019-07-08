@@ -1,0 +1,67 @@
+From 38c5343f84799fc5041575f3ec808f7476b6eea3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 16 Apr 2018 14:33:35 -0700
+Subject: [PATCH] Catch std::ifstream::failure by reference
+
+Fixes
+error: catching polymorphic type 'class std::ios_base::failure' by value
+[-Werror=catch-value=]
+   } catch (std::ofstream::failure) {
+                           ^~~~~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
+ src/base/conf.cc           | 4 ++--
+ src/dtm/dtmnd/dtm_main.cc  | 2 +-
+ src/dtm/dtmnd/multicast.cc | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/base/conf.cc b/src/base/conf.cc
+index d5755a1..4820357 100644
+--- a/src/base/conf.cc
++++ b/src/base/conf.cc
+@@ -189,7 +189,7 @@ std::string Conf::ReadFile(const std::string& path_name,
+   try {
+     str.open(path_name);
+     str >> contents;
+-  } catch (std::ifstream::failure) {
++  } catch (std::ifstream::failure& e) {
+     contents.clear();
+   }
+   return (str.fail() || contents.empty()) ? default_contents : contents;
+@@ -203,7 +203,7 @@ void Conf::WriteFileAtomically(const std::string& path_name,
+   try {
+     str.open(tmp_file, std::ofstream::out | std::ofstream::trunc);
+     str << contents << std::endl;
+-  } catch (std::ofstream::failure) {
++  } catch (std::ofstream::failure& e) {
+     success = false;
+   }
+   str.close();
+diff --git a/src/dtm/dtmnd/dtm_main.cc b/src/dtm/dtmnd/dtm_main.cc
+index 585e11e..5cf6ad7 100644
+--- a/src/dtm/dtmnd/dtm_main.cc
++++ b/src/dtm/dtmnd/dtm_main.cc
+@@ -367,7 +367,7 @@ void UpdateNodeIdFile(DTM_INTERNODE_CB *cb) {
+       try {
+         str.open(PKGLOCALSTATEDIR "/node_id", std::ofstream::out);
+         str << std::hex << node_id << std::endl;
+-      } catch (std::ofstream::failure) {
++      } catch (std::ofstream::failure& e) {
+       }
+       str.close();
+     }
+diff --git a/src/dtm/dtmnd/multicast.cc b/src/dtm/dtmnd/multicast.cc
+index cadc002..7c25fea 100644
+--- a/src/dtm/dtmnd/multicast.cc
++++ b/src/dtm/dtmnd/multicast.cc
+@@ -199,7 +199,7 @@ bool Multicast::GetPeersFromFile(const std::string &path_name) {
+         }
+       }
+     }
+-  } catch (std::ifstream::failure) {
++  } catch (std::ifstream::failure& e) {
+     LOG_ER("Caught std::ifstream::failure when reading file '%s', peers=%zu",
+            path_name.c_str(), static_cast<size_t>(peers_.size()));
+     peers_.clear();

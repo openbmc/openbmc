@@ -1,0 +1,12 @@
+[Unit]
+Description=Web Based Enterprise Management (WBEM) Implementation
+After=syslog.target
+
+[Service]
+Type=forking
+ExecStart=/usr/sbin/owcimomd
+ExecStartPre=/etc/openwbem/checkserverkey
+PIDFile=/var/run/owcimomd.pid
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,20 @@
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -51,7 +51,7 @@ noinst_PROGRAMS = test-oop
+ 
+ test_oop_SOURCES = test-oop.c
+ test_oop_CFLAGS = $(GLIB2_CFLAGS) $(GLIB_INCLUDES) $(TCL_INCLUDES) $(WWW_INCLUDES)
+-test_oop_LDADD = $(lib_LTLIBRARIES)
++test_oop_LDADD = $(lib_LTLIBRARIES) $(GLIB2_LIBS) $(ADNS_LIBS) $(TCL_LIBS) $(READLINE_LIBS)
+ 
+ release: dist
+ 	gzip -dc $(PACKAGE)-$(VERSION).tar.gz | bzip2 -9 \
+--- a/liboop-glib2.pc.in
++++ b/liboop-glib2.pc.in
+@@ -7,5 +7,5 @@ Name: liboop-glib2
+ Description: Event loop management library (GLIB2 support)
+ Version: @VERSION@
+ Requires: liboop = @VERSION@ glib-2.0
+-Libs: -L${libdir} -loop-glib2
++Libs: -L${libdir} -loop-glib2 @GLIB2_LIBS@
+ Cflags: -D_REENTRANT -I${includedir}

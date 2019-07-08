@@ -1,0 +1,100 @@
+From c5034fe42df8923bcefc10e163151997d70b6241 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 16 Apr 2018 14:56:47 -0700
+Subject: [PATCH] Fix format-truncation errors
+
+Fixes errors with gcc8 eg.
+error: '%u' directive output may be truncated writing between 1 and 10 bytes into a region of size between 0 and 254 [-Werror=format-truncation=]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
+ src/base/daemon.c  | 4 ++--
+ src/mds/mds_c_db.c | 8 ++++----
+ src/mds/mds_core.h | 4 ++--
+ src/mds/mds_dt2c.h | 2 +-
+ 4 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/src/base/daemon.c b/src/base/daemon.c
+index 361dd8d..4001b73 100644
+--- a/src/base/daemon.c
++++ b/src/base/daemon.c
+@@ -95,11 +95,11 @@ static int __create_pidfile(const char *pidfile)
+ {
+ 	FILE *file = NULL;
+ 	int fd, rc = 0;
+-	char pidfiletmp[NAME_MAX] = {0};
++	char pidfiletmp[NAME_MAX+12] = {0};
+ 	pid_t pid;
+ 
+ 	pid = getpid();
+-	snprintf(pidfiletmp, NAME_MAX, "%s.%u.tmp", pidfile, pid);
++	snprintf(pidfiletmp, NAME_MAX+12, "%s.%u.tmp", pidfile, pid);
+ 
+ 	/* open the file and associate a stream with it */
+ 	if (((fd = open(pidfiletmp, O_RDWR | O_CREAT, 0644)) == -1) ||
+diff --git a/src/mds/mds_c_db.c b/src/mds/mds_c_db.c
+index e6b95cd..3d4a222 100644
+--- a/src/mds/mds_c_db.c
++++ b/src/mds/mds_c_db.c
+@@ -124,10 +124,10 @@ void get_adest_details(MDS_DEST adest, char *adest_details)
+ 	}
+ 
+ 	if (remote == true)
+-		snprintf(adest_details, MDS_MAX_PROCESS_NAME_LEN,
++		snprintf(adest_details, MDS_MAX_PROCESS_NAME_LEN+24,
+ 			 "<rem_nodeid[0x%" PRIx32 "]:%s>", ncs_node_id, process_name);
+ 	else
+-		snprintf(adest_details, MDS_MAX_PROCESS_NAME_LEN,
++		snprintf(adest_details, MDS_MAX_PROCESS_NAME_LEN+24,
+ 			 "<nodeid[0x%" PRIx32 "]:%s>", ncs_node_id, process_name);
+ 
+ 	m_MDS_LOG_DBG("MDS:DB: adest_details: %s ", adest_details);
+@@ -207,10 +207,10 @@ void get_subtn_adest_details(MDS_PWE_HDL pwe_hdl, MDS_SVC_ID svc_id,
+ 	}
+ 
+ 	if (remote == true)
+-		snprintf(adest_details, MDS_MAX_PROCESS_NAME_LEN,
++		snprintf(adest_details, MDS_MAX_PROCESS_NAME_LEN+24,
+ 			 "<rem_node[0x%" PRIx32 "]:%s>", ncs_node_id, process_name);
+ 	else
+-		snprintf(adest_details, MDS_MAX_PROCESS_NAME_LEN,
++		snprintf(adest_details, MDS_MAX_PROCESS_NAME_LEN+24,
+ 			 "<node[0x%" PRIx32 "]:%s>", ncs_node_id, process_name);
+ done:
+ 	m_MDS_LOG_DBG("MDS:DB: adest_details: %s ", adest_details);
+diff --git a/src/mds/mds_core.h b/src/mds/mds_core.h
+index 37696d4..7f5225d 100644
+--- a/src/mds/mds_core.h
++++ b/src/mds/mds_core.h
+@@ -163,7 +163,7 @@ typedef struct mds_subscription_results_info {
+   uint32_t msg_snd_cnt; /* Message send count to this destination */
+   uint32_t msg_rcv_cnt; /* Message rcv count from this destination */
+   char sub_adest_details
+-      [MDS_MAX_PROCESS_NAME_LEN]; /* <node[slotno]:processname[pid]> */
++      [MDS_MAX_PROCESS_NAME_LEN+24]; /* <node[slotno]:processname[pid]> */
+ 
+ } MDS_SUBSCRIPTION_RESULTS_INFO;
+ 
+@@ -194,7 +194,7 @@ typedef struct mds_subscription_info {
+     count is grater than ZERO bcast (multi-unicast) */
+   uint32_t prev_ver_sub_count;
+   char sub_adest_details
+-      [MDS_MAX_PROCESS_NAME_LEN]; /* <node[slotno]:processname[pid]> */
++      [MDS_MAX_PROCESS_NAME_LEN+24]; /* <node[slotno]:processname[pid]> */
+ 
+ } MDS_SUBSCRIPTION_INFO;
+ 
+diff --git a/src/mds/mds_dt2c.h b/src/mds/mds_dt2c.h
+index 012999c..006b722 100644
+--- a/src/mds/mds_dt2c.h
++++ b/src/mds/mds_dt2c.h
+@@ -143,7 +143,7 @@ typedef struct mdtm_send_req {
+                        */
+   MDS_DEST adest;      /* MDTM to do local/remote routing, destination adest */
+   char sub_adest_details
+-      [MDS_MAX_PROCESS_NAME_LEN]; /* <node[nodeid]:processname[pid]> */
++      [MDS_MAX_PROCESS_NAME_LEN+24]; /* <node[nodeid]:processname[pid]> */
+   MDS_SEND_PRIORITY_TYPE pri;
+   MDS_CLIENT_MSG_FORMAT_VER
+       msg_fmt_ver; /* message format version specification */

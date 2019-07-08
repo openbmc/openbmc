@@ -28,4 +28,3 @@ do_install() {
 }
 
 FILES_${PN} = "/init ${sysconfdir}/rc.local.sample"
-RCONFLICTS_${PN} = "systemd"

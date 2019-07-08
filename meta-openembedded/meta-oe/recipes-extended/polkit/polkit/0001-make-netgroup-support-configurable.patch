@@ -1,0 +1,93 @@
+From 7d5e205aa58a10e7b1ccc2fa75b443508a5c3e18 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 20 Jan 2016 04:31:59 +0000
+Subject: [PATCH] make netgroup support configurable
+
+Disable using innetgr and *netigrent function if not available
+
+These functions are not available on all libc implementations e.g. musl
+doesnt have them.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+Rebase to 0.115
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac                                          | 2 +-
+ src/polkitbackend/polkitbackendinteractiveauthority.c | 6 +++++-
+ src/polkitbackend/polkitbackendjsauthority.cpp        | 2 ++
+ 3 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 8b3e1b1..1c392df 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -99,7 +99,7 @@ AC_CHECK_LIB(expat,XML_ParserCreate,[EXPAT_LIBS="-lexpat"],
+ 	     [AC_MSG_ERROR([Can't find expat library. Please install expat.])])
+ AC_SUBST(EXPAT_LIBS)
+ 
+-AC_CHECK_FUNCS(clearenv fdatasync)
++AC_CHECK_FUNCS(clearenv fdatasync getnetgrent innetgr)
+ 
+ if test "x$GCC" = "xyes"; then
+   LDFLAGS="-Wl,--as-needed $LDFLAGS"
+diff --git a/src/polkitbackend/polkitbackendinteractiveauthority.c b/src/polkitbackend/polkitbackendinteractiveauthority.c
+index cb6fdab..de3f752 100644
+--- a/src/polkitbackend/polkitbackendinteractiveauthority.c
++++ b/src/polkitbackend/polkitbackendinteractiveauthority.c
+@@ -2224,7 +2224,7 @@ get_users_in_group (PolkitIdentity                    *group,
+  out:
+   return ret;
+ }
+-
++#if defined HAVE_GETNETGRENT
+ static GList *
+ get_users_in_net_group (PolkitIdentity                    *group,
+                         gboolean                           include_root)
+@@ -2285,6 +2285,8 @@ get_users_in_net_group (PolkitIdentity                    *group,
+   return ret;
+ }
+ 
++#endif
++
+ /* ---------------------------------------------------------------------------------------------------- */
+ 
+ static void
+@@ -2369,10 +2371,12 @@ authentication_agent_initiate_challenge (AuthenticationAgent         *agent,
+         {
+           user_identities = g_list_concat (user_identities, get_users_in_group (identity, FALSE));
+         }
++#if defined HAVE_GETNETGRENT
+       else if (POLKIT_IS_UNIX_NETGROUP (identity))
+         {
+           user_identities =  g_list_concat (user_identities, get_users_in_net_group (identity, FALSE));
+         }
++#endif
+       else
+         {
+           g_warning ("Unsupported identity");
+diff --git a/src/polkitbackend/polkitbackendjsauthority.cpp b/src/polkitbackend/polkitbackendjsauthority.cpp
+index 517f3c6..6042dd2 100644
+--- a/src/polkitbackend/polkitbackendjsauthority.cpp
++++ b/src/polkitbackend/polkitbackendjsauthority.cpp
+@@ -1502,6 +1502,7 @@ js_polkit_user_is_in_netgroup (JSContext  *cx,
+   user = JS_EncodeString (cx, args[0].toString());
+   netgroup = JS_EncodeString (cx, args[1].toString());
+ 
++#if defined HAVE_INNETGR
+   if (innetgr (netgroup,
+                NULL,  /* host */
+                user,
+@@ -1509,6 +1510,7 @@ js_polkit_user_is_in_netgroup (JSContext  *cx,
+     {
+       is_in_netgroup =  true;
+     }
++#endif
+ 
+   JS_free (cx, netgroup);
+   JS_free (cx, user);
+-- 
+2.7.4
+

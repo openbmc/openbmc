@@ -1,0 +1,29 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+Avoids using python from the HOSTs native sysroot for f2py,
+uses TARGET env python instead.
+
+Signed-off-by: Alejandro Hernandez <alejandro.hernandez@linux.intel.com>
+
+Index: numpy-1.11.0/numpy/f2py/setup.py
+===================================================================
+--- numpy-1.11.0.orig/numpy/f2py/setup.py
++++ numpy-1.11.0/numpy/f2py/setup.py
+@@ -37,10 +37,13 @@ def _get_f2py_shebang():
+     should be ``#!python`` rather than ``#!`` followed by the contents of
+     ``sys.executable``.
+     """
+-    if set(('bdist_wheel', 'bdist_egg', 'bdist_wininst',
+-            'bdist_rpm')).intersection(sys.argv):
+-        return '#!python'
+-    return '#!' + sys.executable
++    #if set(('bdist_wheel', 'bdist_egg', 'bdist_wininst',
++    #        'bdist_rpm')).intersection(sys.argv):
++    #    return '#!python'
++    #return '#!' + sys.executable
++    
++    # On OE, we need to avoid using the HOSTs python-native, we return env python instead
++    return '#!/usr/bin/env python'
+ 
+ 
+ def configuration(parent_package='', top_path=None):

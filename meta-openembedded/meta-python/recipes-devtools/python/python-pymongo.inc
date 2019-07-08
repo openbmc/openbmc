@@ -8,8 +8,8 @@ HOMEPAGE = "http://github.com/mongodb/mongo-python-driver"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
-SRC_URI[md5sum] = "3e8035f85cfb2be95207724c59bddfaa"
-SRC_URI[sha256sum] = "9d50c99c6388863cbfdc5db9bad62e3a7c2e5fc151554a07c7f3c2530334a34f"
+SRC_URI[md5sum] = "7a1a774160cfdc5e6942b6914a912e95"
+SRC_URI[sha256sum] = "8c74e2a9b594f7962c62cef7680a4cb92a96b4e6e3c2f970790da67cc0213a7e"
 
 PACKAGES =+ "${PYTHON_PN}-bson"
 

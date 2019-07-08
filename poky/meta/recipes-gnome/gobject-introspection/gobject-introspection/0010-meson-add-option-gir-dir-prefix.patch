@@ -1,0 +1,66 @@
+From bbc34f00fd30a13eafc607a956de60d822260355 Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Fri, 14 Sep 2018 01:26:38 -0700
+Subject: [PATCH] meson: add option 'gir-dir-prefix'
+
+Add option 'gir-dir-prefix' for meson to make the installation path of
+.gir files could be configured which has been done for autoconf.
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/gobject-introspection/commit/3938b86f5289c2b28a5ec42965b8da4b509445c4]
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ gir/meson.build   | 1 -
+ meson.build       | 8 +++++++-
+ meson_options.txt | 4 ++++
+ 3 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/gir/meson.build b/gir/meson.build
+index 607bbc4..1cb514a 100644
+--- a/gir/meson.build
++++ b/gir/meson.build
+@@ -34,7 +34,6 @@ gir_files = [
+ ]
+ 
+ typelibdir = join_paths(get_option('libdir'), 'girepository-1.0')
+-girdir = join_paths(get_option('datadir'), 'gir-1.0')
+ install_data(gir_files, install_dir: girdir)
+ 
+ scanner_command = [
+diff --git a/meson.build b/meson.build
+index a1432f7..17acd82 100644
+--- a/meson.build
++++ b/meson.build
+@@ -18,7 +18,12 @@ python = pymod.find_installation(get_option('python'))
+ cc = meson.get_compiler('c')
+ config = configuration_data()
+ config.set_quoted('GIR_SUFFIX', 'gir-1.0')
+-config.set_quoted('GIR_DIR', join_paths(get_option('prefix'), get_option('datadir'), 'gir-1.0'))
++gir_dir_prefix = get_option('gir-dir-prefix')
++if gir_dir_prefix == ''
++    gir_dir_prefix = get_option('datadir')
++endif
++girdir = join_paths(get_option('prefix'), gir_dir_prefix, 'gir-1.0')
++config.set_quoted('GIR_DIR', girdir)
+ config.set_quoted('GOBJECT_INTROSPECTION_LIBDIR', join_paths(get_option('prefix'), get_option('libdir')))
+ 
+ foreach type : ['char', 'short', 'int', 'long']
+@@ -93,6 +98,7 @@ pkgconfig_conf.set('libdir', join_paths('${prefix}', get_option('libdir')))
+ pkgconfig_conf.set('datarootdir', join_paths('${prefix}', get_option('datadir')))
+ pkgconfig_conf.set('datadir', '${datarootdir}')
+ pkgconfig_conf.set('includedir', join_paths('${prefix}', get_option('includedir')))
++pkgconfig_conf.set('GIR_DIR', join_paths('${prefix}', gir_dir_prefix, 'gir-1.0'))
+ if host_system == 'windows' or host_system == 'cygwin'
+   pkgconfig_conf.set('EXEEXT', '.exe')
+ else
+diff --git a/meson_options.txt b/meson_options.txt
+index 49726be..ee6958d 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -21,3 +21,7 @@ option('cairo-libname', type: 'string',
+ option('python', type: 'string', value: 'python3',
+   description: 'Path or name of the Python interpreter to build for'
+ )
++
++option('gir-dir-prefix', type: 'string',
++  description: 'Intermediate prefix for gir installation under ${prefix}'
++)

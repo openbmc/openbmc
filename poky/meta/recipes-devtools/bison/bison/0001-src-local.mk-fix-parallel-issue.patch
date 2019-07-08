@@ -1,0 +1,34 @@
+From 5b9204eee4b06b48d54ecc3ef3a0b56fc5cc84f8 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Fri, 24 Apr 2015 00:38:32 -0700
+Subject: [PATCH] src/local.mk: fix parallel issue
+
+Fixed:
+rm -f src/yacc src/yacc.tmp
+echo '#! /bin/sh' >src/yacc.tmp
+/bin/bash: src/yacc.tmp: No such file or directory
+Makefile:6670: recipe for target 'src/yacc' failed
+
+Upstream-Status: Submitted [ http://lists.gnu.org/archive/html/bison-patches/2017-07/msg00000.html ]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+---
+ src/local.mk | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/local.mk b/src/local.mk
+index 573ad00..28bfae4 100644
+--- a/src/local.mk
++++ b/src/local.mk
+@@ -119,6 +119,7 @@ MOSTLYCLEANFILES += src/yacc
+ 
+ src/yacc:
+ 	$(AM_V_GEN)rm -f $@ $@.tmp
++	$(AM_V_at)$(MKDIR_P) src
+ 	$(AM_V_at)echo '#! /bin/sh' >$@.tmp
+ 	$(AM_V_at)echo "exec '$(bindir)/bison' -y "'"$$@"' >>$@.tmp
+ 	$(AM_V_at)chmod a+x $@.tmp
+-- 
+2.8.1
+

@@ -1,0 +1,94 @@
+atftp exhibits the well known "Sorcerer's Apprentice Syndrome"(SAS) problem.
+According to RFC 1350, the fix to SAS is quite simple: further copies of the
+acknowledgment for a particular data block would be ignored.
+
+Patch originally from OpenSUSE:
+https://build.opensuse.org/package/view_file?file=atftp-0.7-sorcerers_apprentice.patch&package=atftp.539&project=openSUSE%3A12.1%3AUpdate&rev=84569792975e00573d7df597d2a6e895
+
+Upstream-Status: Pending
+
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+Index: atftp-0.7/tftp_file.c
+===================================================================
+--- atftp-0.7.orig/tftp_file.c	2011-11-22 15:12:53.792744083 +0100
++++ atftp-0.7/tftp_file.c	2011-11-22 15:13:51.706421893 +0100
+@@ -605,6 +605,7 @@
+      int timeout_state = state; /* what state should we go on when timeout */
+      int result;
+      long block_number = 0;
++     long last_requested_block = -1;
+      long last_block = -1;
+      int data_size;             /* size of data received */
+      int sockfd = data->sockfd; /* just to simplify calls */
+@@ -765,6 +766,17 @@
+                          connected = 1;
+                     }
+                     block_number = ntohs(tftphdr->th_block);
++
++                    if (last_requested_block >= block_number)
++                    {
++                        if (data->trace)
++                            fprintf(stderr, "received duplicated ACK <block: %ld >= %ld>\n",
++                                    last_requested_block, block_number);
++                        break;
++                    }
++                    else
++                        last_requested_block = block_number;
++
+                     if (data->trace)
+                          fprintf(stderr, "received ACK <block: %ld>\n",
+                                  block_number);
+Index: atftp-0.7/tftpd_file.c
+===================================================================
+--- atftp-0.7.orig/tftpd_file.c	2011-11-22 15:12:53.793744112 +0100
++++ atftp-0.7/tftpd_file.c	2011-11-22 15:15:04.617534260 +0100
+@@ -403,6 +403,7 @@
+      int timeout_state = state;
+      int result;
+      long block_number = 0;
++     long last_requested_block = -1;
+      long last_block = -1;
+      int block_loops = 0;
+      int data_size;
+@@ -859,6 +860,32 @@
+                     {
+                          logger(LOG_DEBUG, "received ACK <block: %d>", block_number);
+                     }
++
++		    /* check whether the block request isn't already fulfilled */
++
++                    /* multicast, block numbers could contain gaps */
++                    if (multicast) {
++                        if (last_requested_block >= block_number)
++                        {
++                            if (data->trace)
++                                logger(LOG_DEBUG, "received duplicated ACK <block: %d >= %d>", last_requested_block, block_number);
++                            break;
++                        }
++                        else
++                            last_requested_block = block_number;
++                    /* unicast, blocks should be requested one after another */
++		    } else {
++                        if (last_requested_block + 1 != block_number && last_requested_block != -1)
++                        {
++                            if (data->trace)
++                                logger(LOG_DEBUG, "received out of order ACK <block: %d != %d>", last_requested_block + 1, block_number);
++                            break;
++                        }
++                        else
++                            last_requested_block = block_number;
++                    }
++
++
+                     if (ntohs(tftphdr->th_block) == 65535)
+                     {
+                          block_loops++;
+@@ -958,6 +985,8 @@
+                          /* nedd to send an oack to that client */
+                          state = S_SEND_OACK;                
+                          fseek(fp, 0, SEEK_SET);
++			 /* reset the last block received counter */
++			 last_requested_block = -1;
+                     }
+                     else
+                     {

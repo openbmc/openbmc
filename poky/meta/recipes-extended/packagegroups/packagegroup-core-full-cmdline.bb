@@ -94,6 +94,7 @@ RDEPENDS_packagegroup-core-full-cmdline-utils = "\
     tar \
     time \
     util-linux \
+    zlib \
     "
 
 RDEPENDS_packagegroup-core-full-cmdline-extended = "\
@@ -135,5 +136,6 @@ RDEPENDS_packagegroup-core-full-cmdline-sys-services = "\
     at \
     cronie \
     logrotate \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'nfs', 'nfs-utils rpcbind', '', d)} \
+    nfs-utils \
+    rpcbind \
     "

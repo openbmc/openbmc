@@ -1,3 +1,5 @@
+# ex:ts=4:sw=4:sts=4:et
+# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 #
 # BitBake Build System Python Library
 #
@@ -9,7 +11,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-__version__ = "1.43.0"
+__version__ = "1.42.0"
 
 import sys
 if sys.version_info < (3, 4, 0):

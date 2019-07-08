@@ -27,58 +27,20 @@ SRC_URI = "https://sourceware.org/elfutils/ftp/${PV}/${BP}.tar.bz2 \
            file://debian/hurd_path.patch \
            file://debian/ignore_strmerge.diff \
            file://debian/disable_werror.patch \
-           file://debian/testsuite-ignore-elflint.diff \
-           file://0001-skip-the-test-when-gcc-not-deployed.patch \
-           file://run-ptest \
-           file://ptest.patch \
-           file://musl.patch \
            "
-SRC_URI_append_libc-musl = " file://0008-build-Provide-alternatives-for-glibc-assumptions-hel.patch \
-                             file://0001-fix-err-variable-and-function-conflicts.patch \
-"
+SRC_URI_append_libc-musl = " file://0008-build-Provide-alternatives-for-glibc-assumptions-hel.patch"
 
 SRC_URI[md5sum] = "077e4f49320cad82bf17a997068b1db9"
 SRC_URI[sha256sum] = "eb5747c371b0af0f71e86215a5ebb88728533c3a104a43d4231963f308cd1023"
 
-inherit autotools gettext ptest
+inherit autotools gettext
 
 EXTRA_OECONF = "--program-prefix=eu- --without-lzma"
 EXTRA_OECONF_append_class-native = " --without-bzlib"
-RDEPENDS_${PN}-ptest += "libasm libelf bash make coreutils ${PN}-binutils"
-
-EXTRA_OECONF_append_class-target += "--disable-tests-rpath"
 
 do_install_append() {
 	if [ "${TARGET_ARCH}" != "x86_64" ] && [ -z `echo "${TARGET_ARCH}"|grep 'i.86'` ];then
 		rm -f ${D}${bindir}/eu-objdump
-	fi
-}
-
-do_compile_ptest() {
-	cd ${B}/tests
-	oe_runmake buildtest-TESTS oecheck
-}
-
-do_install_ptest() {
-	if [ ${PTEST_ENABLED} = "1" ]; then
-		# copy the files which needed by the cases
-		TEST_FILES="strip strip.o addr2line elfcmp objdump readelf size.o nm.o nm elflint"
-		install -d -m 755                       ${D}${PTEST_PATH}/src
-		install -d -m 755                       ${D}${PTEST_PATH}/libelf
-		install -d -m 755                       ${D}${PTEST_PATH}/libdw
-		for test_file in ${TEST_FILES}; do
-			if [ -f ${B}/src/${test_file} ]; then
-				cp -r ${B}/src/${test_file} ${D}${PTEST_PATH}/src
-			fi
-		done
-		cp ${D}${libdir}/libelf-${PV}.so ${D}${PTEST_PATH}/libelf/libelf.so
-		cp ${D}${libdir}/libdw-${PV}.so ${D}${PTEST_PATH}/libdw/libdw.so
-		cp -r ${S}/tests/                       ${D}${PTEST_PATH}
-		cp -r ${B}/tests/*                      ${D}${PTEST_PATH}/tests
-		cp -r ${B}/config.h                     ${D}${PTEST_PATH}
-		cp -r ${B}/backends                     ${D}${PTEST_PATH}
-		sed -i '/^Makefile:/c Makefile:'        ${D}${PTEST_PATH}/tests/Makefile
-		find ${D}${PTEST_PATH} -type f -name *.[hoc] | xargs -i rm {}
 	fi
 }
 
@@ -121,26 +83,3 @@ FILES_libdw  = "${libdir}/libdw-${PV}.so ${libdir}/libdw.so.* ${libdir}/elfutils
 
 # The package contains symlinks that trip up insane
 INSANE_SKIP_${MLPREFIX}libdw = "dev-so"
-
-# avoid stripping some generated binaries otherwise some of the tests such as test-nlist,
-# run-strip-reloc.sh, run-strip-strmerge.sh and so on will fail
-INHIBIT_PACKAGE_STRIP_FILES = "\
-    ${PKGD}${PTEST_PATH}/tests/test-nlist \
-    ${PKGD}${PTEST_PATH}/tests/elfstrmerge \
-    ${PKGD}${PTEST_PATH}/tests/backtrace-child \
-    ${PKGD}${PTEST_PATH}/tests/backtrace-data \
-    ${PKGD}${PTEST_PATH}/tests/deleted \
-    ${PKGD}${PTEST_PATH}/src/strip \
-    ${PKGD}${PTEST_PATH}/src/addr2line \
-    ${PKGD}${PTEST_PATH}/src/elfcmp \
-    ${PKGD}${PTEST_PATH}/src/objdump \
-    ${PKGD}${PTEST_PATH}/src/readelf \
-    ${PKGD}${PTEST_PATH}/src/nm \
-    ${PKGD}${PTEST_PATH}/src/elflint \
-    ${PKGD}${PTEST_PATH}/libelf/libelf.so \
-    ${PKGD}${PTEST_PATH}/libdw/libdw.so \
-    ${PKGD}${PTEST_PATH}/backends/libebl_i386.so \
-    ${PKGD}${PTEST_PATH}/backends/libebl_x86_64.so \
-"
-
-EXCLUDE_PACKAGES_FROM_SHLIBS = "${PN}-ptest"

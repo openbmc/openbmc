@@ -16,7 +16,6 @@ TOOLCHAIN_HOST_TASK = "\
     nativesdk-glibc-gconv-libjis \
     nativesdk-patchelf \
     nativesdk-libxcrypt \
-    nativesdk-libxcrypt-compat \
     nativesdk-libnss-nis \
     "
 
@@ -58,7 +57,7 @@ fakeroot create_sdk_files() {
 }
 
 
-fakeroot archive_sdk() {
+fakeroot tar_sdk() {
 	cd ${SDK_OUTPUT}/${SDKPATH}
 
 	DEST="./${SDK_ARCH}-${SDK_OS}"
@@ -66,5 +65,5 @@ fakeroot archive_sdk() {
 	rm sysroots -rf
 	patchelf --set-interpreter ${@''.join('a' for n in range(1024))} $DEST/usr/bin/patchelf
 	mv $DEST/usr/bin/patchelf $DEST/usr/bin/patchelf-uninative
-	${SDK_ARCHIVE_CMD}
+	tar ${SDKTAROPTS} -c -j --file=${SDKDEPLOYDIR}/${TOOLCHAIN_OUTPUTNAME}.tar.bz2 .
 }

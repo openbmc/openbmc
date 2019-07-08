@@ -1,0 +1,28 @@
+From a163c81ac430cdc292add200f3e6a0c048be4d7e Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 11 Oct 2017 17:40:09 +0300
+Subject: [PATCH] src/fcxml.c: avoid double free() of filename
+
+It's also freed after bail1, so no need to do it here.
+
+Upstream-Status: Submitted [https://bugs.freedesktop.org/show_bug.cgi?id=103221]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ src/fcxml.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/fcxml.c b/src/fcxml.c
+index 19ce96a..edb6054 100644
+--- a/src/fcxml.c
++++ b/src/fcxml.c
+@@ -3398,7 +3398,6 @@ FcConfigParseAndLoad (FcConfig	    *config,
+ 
+     fd = FcOpen ((char *) filename, O_RDONLY);
+     if (fd == -1) {
+-	FcStrFree (filename);
+ 	goto bail1;
+     }
+ 
+-- 
+2.14.1
+

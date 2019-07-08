@@ -1,0 +1,12 @@
+[Unit]
+Description=Domain Name Relay Daemon
+After=network.target
+
+[Service]
+Type=forking
+PIDFile=/var/run/dnrd.pid
+EnvironmentFile=/etc/dnrd/dnrd.conf
+ExecStart=/usr/sbin/dnrd $DNRD_OPTS -u $DNRD_USER
+
+[Install]
+WantedBy=multi-user.target

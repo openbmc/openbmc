@@ -22,8 +22,8 @@ IMAGE_FSTYPES = "wic.vmdk"
 
 inherit core-image module-base setuptools3
 
-SRCREV ?= "bb59bcd016bdd815809ac10df45d61c364c46df0"
-SRC_URI = "git://git.yoctoproject.org/poky \
+SRCREV ?= "2070a08cdd2233cd5f249c49b56f8bdbc50a4b6b"
+SRC_URI = "git://git.yoctoproject.org/poky;branch=warrior \
            file://Yocto_Build_Appliance.vmx \
            file://Yocto_Build_Appliance.vmxf \
            file://README_VirtualBox_Guest_Additions.txt \

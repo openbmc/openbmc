@@ -16,7 +16,7 @@ diff --git a/sys/dvb/gstdvbsrc.c b/sys/dvb/gstdvbsrc.c
 index b93255f..49f145a 100644
 --- a/sys/dvb/gstdvbsrc.c
 +++ b/sys/dvb/gstdvbsrc.c
-@@ -97,7 +97,7 @@
+@@ -93,7 +93,7 @@
  #include <gst/gst.h>
  #include <gst/glib-compat-private.h>
  #include <sys/ioctl.h>

@@ -1,0 +1,30 @@
+From 73526cb546ae6b00ea6169e40b01fb7b5f0dbb50 Mon Sep 17 00:00:00 2001
+From: Fabio Berton <fabio.berton@ossystems.com.br>
+Date: Thu, 28 Jul 2016 11:05:06 -0300
+Subject: [PATCH] Skip empty section (fixes #66)
+Organization: O.S. Systems Software LTDA.
+
+Upstream-Status: Pending
+
+Signed-off-by: Fabio Berton <fabio.berton@ossystems.com.br>
+---
+ src/patchelf.cc | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/patchelf.cc b/src/patchelf.cc
+index 136098f..2677a26 100644
+--- a/src/patchelf.cc
++++ b/src/patchelf.cc
+@@ -684,6 +684,9 @@ void ElfFile<ElfFileParamNames>::rewriteSectionsExecutable()
+     for (unsigned int i = 1; i <= lastReplaced; ++i) {
+         Elf_Shdr & shdr(shdrs[i]);
+         string sectionName = getSectionName(shdr);
++        if (sectionName == "") {
++            continue;
++        }
+         debug("looking at section `%s'\n", sectionName.c_str());
+         /* !!! Why do we stop after a .dynstr section? I can't
+            remember! */
+-- 
+2.1.4
+

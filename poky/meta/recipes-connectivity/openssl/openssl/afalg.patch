@@ -18,14 +18,14 @@ index 3baa8ce..9ef52ed 100755
 -            ($mi2) = $mi2 =~ /(\d+)/;
 -            my $ver = $ma*10000 + $mi1*100 + $mi2;
 -            if ($ver < $minver) {
--                disable('too-old-kernel', 'afalgeng');
+-                $disabled{afalgeng} = "too-old-kernel";
 -            } else {
 -                push @{$config{engdirs}}, "afalg";
 -            }
 -        } else {
--            disable('cross-compiling', 'afalgeng');
+-            $disabled{afalgeng} = "cross-compiling";
 -        }
 +        push @{$config{engdirs}}, "afalg";
      } else {
-         disable('not-linux', 'afalgeng');
+         $disabled{afalgeng}  = "not-linux";
      }

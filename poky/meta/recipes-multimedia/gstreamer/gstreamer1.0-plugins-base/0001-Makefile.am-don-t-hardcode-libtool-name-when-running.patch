@@ -1,0 +1,167 @@
+From 7022b87353a37b78bae7cf0106a4e47913bb5c97 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 5 Apr 2018 10:15:08 +0800
+Subject: [PATCH] Makefile.am: don't hardcode libtool name when running
+ introspection tools
+
+Upstream-Status: Pending [review on oe-core maillist]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+
+---
+ gst-libs/gst/allocators/Makefile.am | 2 +-
+ gst-libs/gst/app/Makefile.am        | 2 +-
+ gst-libs/gst/audio/Makefile.am      | 2 +-
+ gst-libs/gst/gl/Makefile.am         | 2 +-
+ gst-libs/gst/pbutils/Makefile.am    | 2 +-
+ gst-libs/gst/riff/Makefile.am       | 2 +-
+ gst-libs/gst/rtp/Makefile.am        | 2 +-
+ gst-libs/gst/rtsp/Makefile.am       | 2 +-
+ gst-libs/gst/sdp/Makefile.am        | 2 +-
+ gst-libs/gst/tag/Makefile.am        | 2 +-
+ gst-libs/gst/video/Makefile.am      | 2 +-
+ 11 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/gst-libs/gst/allocators/Makefile.am b/gst-libs/gst/allocators/Makefile.am
+index 1957d28..1ecc950 100644
+--- a/gst-libs/gst/allocators/Makefile.am
++++ b/gst-libs/gst/allocators/Makefile.am
+@@ -42,7 +42,7 @@ GstAllocators-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstallocators-@
+ 		--add-include-path=`PKG_CONFIG_PATH="$(GST_PKG_CONFIG_PATH)" $(PKG_CONFIG) --variable=girdir gstreamer-@GST_API_VERSION@` \
+ 		--library=libgstallocators-@GST_API_VERSION@.la \
+ 		--include=Gst-@GST_API_VERSION@ \
+-		--libtool="$(top_builddir)/libtool" \
++		--libtool="$(LIBTOOL)" \
+ 		--pkg gstreamer-@GST_API_VERSION@ \
+ 		--pkg-export gstreamer-allocators-@GST_API_VERSION@ \
+ 		--output $@ \
+diff --git a/gst-libs/gst/app/Makefile.am b/gst-libs/gst/app/Makefile.am
+index 52f6ad3..5bfd606 100644
+--- a/gst-libs/gst/app/Makefile.am
++++ b/gst-libs/gst/app/Makefile.am
+@@ -56,7 +56,7 @@ GstApp-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstapp-@GST_API_VERSIO
+ 		--library=libgstapp-@GST_API_VERSION@.la \
+ 		--include=Gst-@GST_API_VERSION@ \
+ 		--include=GstBase-@GST_API_VERSION@ \
+-		--libtool="$(top_builddir)/libtool" \
++		--libtool="$(LIBTOOL)" \
+ 		--pkg gstreamer-@GST_API_VERSION@ \
+ 		--pkg gstreamer-base-@GST_API_VERSION@ \
+ 		--pkg-export gstreamer-app-@GST_API_VERSION@ \
+diff --git a/gst-libs/gst/audio/Makefile.am b/gst-libs/gst/audio/Makefile.am
+index 2922245..7fb65f2 100644
+--- a/gst-libs/gst/audio/Makefile.am
++++ b/gst-libs/gst/audio/Makefile.am
+@@ -184,7 +184,7 @@ GstAudio-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstaudio-@GST_API_VE
+ 		--include=Gst-@GST_API_VERSION@ \
+ 		--include=GstBase-@GST_API_VERSION@ \
+ 		--include=GstTag-@GST_API_VERSION@ \
+-		--libtool="$(top_builddir)/libtool" \
++		--libtool="$(LIBTOOL)" \
+ 		--pkg gstreamer-@GST_API_VERSION@ \
+ 		--pkg gstreamer-base-@GST_API_VERSION@ \
+ 		--pkg-export gstreamer-audio-@GST_API_VERSION@ \
+diff --git a/gst-libs/gst/gl/Makefile.am b/gst-libs/gst/gl/Makefile.am
+index 4e77e8c..3276d7f 100644
+--- a/gst-libs/gst/gl/Makefile.am
++++ b/gst-libs/gst/gl/Makefile.am
+@@ -193,7 +193,7 @@ GstGL-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstgl-@GST_API_VERSION@
+ 		--include=Gst-@GST_API_VERSION@ \
+ 		--include=GstBase-@GST_API_VERSION@ \
+ 		--include=GstVideo-@GST_API_VERSION@ \
+-		--libtool="${LIBTOOL}" \
++		--libtool="$(LIBTOOL)" \
+ 		--pkg gstreamer-@GST_API_VERSION@ \
+ 		--pkg gstreamer-base-@GST_API_VERSION@ \
+ 		--pkg gstreamer-video-@GST_API_VERSION@ \
+diff --git a/gst-libs/gst/pbutils/Makefile.am b/gst-libs/gst/pbutils/Makefile.am
+index ae51993..35a6e44 100644
+--- a/gst-libs/gst/pbutils/Makefile.am
++++ b/gst-libs/gst/pbutils/Makefile.am
+@@ -103,7 +103,7 @@ GstPbutils-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstpbutils-@GST_AP
+ 		--include=GstTag-@GST_API_VERSION@ \
+ 		--include=GstVideo-@GST_API_VERSION@ \
+ 		--include=GstAudio-@GST_API_VERSION@ \
+-		--libtool="$(top_builddir)/libtool" \
++		--libtool="$(LIBTOOL)" \
+ 		--pkg gstreamer-@GST_API_VERSION@ \
+ 		--pkg gstreamer-tag-@GST_API_VERSION@ \
+ 		--pkg gstreamer-video-@GST_API_VERSION@ \
+diff --git a/gst-libs/gst/riff/Makefile.am b/gst-libs/gst/riff/Makefile.am
+index fb53f06..e66ef4f 100644
+--- a/gst-libs/gst/riff/Makefile.am
++++ b/gst-libs/gst/riff/Makefile.am
+@@ -49,7 +49,7 @@ libgstriff_@GST_API_VERSION@_la_LDFLAGS = $(GST_LIB_LDFLAGS) $(GST_ALL_LDFLAGS)
+ #		--include=GstAudio-@GST_API_VERSION@ \
+ #		--include=GstTag-@GST_API_VERSION@ \
+ #		--include=Gst-@GST_API_VERSION@ \
+-#		--libtool="$(top_builddir)/libtool" \
++#		--libtool="$(LIBTOOL)" \
+ #		--pkg gstreamer-@GST_API_VERSION@ \
+ #		--pkg gstreamer-tag-@GST_API_VERSION@ \
+ #		--pkg gstreamer-audio-@GST_API_VERSION@ \
+diff --git a/gst-libs/gst/rtp/Makefile.am b/gst-libs/gst/rtp/Makefile.am
+index a6f971d..77ebeeb 100644
+--- a/gst-libs/gst/rtp/Makefile.am
++++ b/gst-libs/gst/rtp/Makefile.am
+@@ -69,7 +69,7 @@ GstRtp-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstrtp-@GST_API_VERSIO
+ 		--library=libgstrtp-@GST_API_VERSION@.la \
+ 		--include=Gst-@GST_API_VERSION@ \
+ 		--include=GstBase-@GST_API_VERSION@ \
+-		--libtool="$(top_builddir)/libtool" \
++		--libtool="$(LIBTOOL)" \
+ 		--pkg gstreamer-@GST_API_VERSION@ \
+ 		--pkg gstreamer-base-@GST_API_VERSION@ \
+ 		--pkg-export gstreamer-rtp-@GST_API_VERSION@ \
+diff --git a/gst-libs/gst/rtsp/Makefile.am b/gst-libs/gst/rtsp/Makefile.am
+index ceb07f4..db9d0fd 100644
+--- a/gst-libs/gst/rtsp/Makefile.am
++++ b/gst-libs/gst/rtsp/Makefile.am
+@@ -76,7 +76,7 @@ GstRtsp-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstrtsp-@GST_API_VERS
+ 		--include=Gio-2.0 \
+ 		--include=Gst-@GST_API_VERSION@ \
+ 		--include=GstSdp-@GST_API_VERSION@ \
+-		--libtool="$(top_builddir)/libtool" \
++		--libtool="$(LIBTOOL)" \
+ 		--pkg gio-2.0 \
+ 		--pkg gstreamer-@GST_API_VERSION@ \
+ 		--pkg gstreamer-sdp-@GST_API_VERSION@ \
+diff --git a/gst-libs/gst/sdp/Makefile.am b/gst-libs/gst/sdp/Makefile.am
+index e197e9b..6e05cc7 100644
+--- a/gst-libs/gst/sdp/Makefile.am
++++ b/gst-libs/gst/sdp/Makefile.am
+@@ -34,7 +34,7 @@ GstSdp-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstsdp-@GST_API_VERSIO
+ 		--add-include-path=`PKG_CONFIG_PATH="$(GST_PKG_CONFIG_PATH)" $(PKG_CONFIG) --variable=girdir gstreamer-@GST_API_VERSION@` \
+ 		--library=libgstsdp-@GST_API_VERSION@.la \
+ 		--include=Gst-@GST_API_VERSION@ \
+-		--libtool="$(top_builddir)/libtool" \
++		--libtool="$(LIBTOOL)" \
+ 		--pkg gstreamer-@GST_API_VERSION@ \
+ 		--pkg-export gstreamer-sdp-@GST_API_VERSION@ \
+ 		--output $@ \
+diff --git a/gst-libs/gst/tag/Makefile.am b/gst-libs/gst/tag/Makefile.am
+index 0247c33..c86515b 100644
+--- a/gst-libs/gst/tag/Makefile.am
++++ b/gst-libs/gst/tag/Makefile.am
+@@ -66,7 +66,7 @@ GstTag-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgsttag-@GST_API_VERSIO
+ 		--library=libgsttag-@GST_API_VERSION@.la \
+ 		--include=Gst-@GST_API_VERSION@ \
+ 		--include=GstBase-@GST_API_VERSION@ \
+-		--libtool="$(top_builddir)/libtool" \
++		--libtool="$(LIBTOOL)" \
+ 		--pkg gstreamer-@GST_API_VERSION@ \
+ 		--pkg gstreamer-base-@GST_API_VERSION@ \
+ 		--pkg-export gstreamer-tag-@GST_API_VERSION@ \
+diff --git a/gst-libs/gst/video/Makefile.am b/gst-libs/gst/video/Makefile.am
+index 9fc1ccf..0f8455f 100644
+--- a/gst-libs/gst/video/Makefile.am
++++ b/gst-libs/gst/video/Makefile.am
+@@ -124,7 +124,7 @@ GstVideo-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstvideo-@GST_API_VE
+ 		--library=libgstvideo-@GST_API_VERSION@.la \
+ 		--include=Gst-@GST_API_VERSION@ \
+ 		--include=GstBase-@GST_API_VERSION@ \
+-		--libtool="$(top_builddir)/libtool" \
++		--libtool="$(LIBTOOL)" \
+ 		--pkg gstreamer-@GST_API_VERSION@ \
+ 		--pkg gstreamer-base-@GST_API_VERSION@ \
+ 		--pkg-export gstreamer-video-@GST_API_VERSION@ \

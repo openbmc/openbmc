@@ -1,0 +1,15 @@
+--- a/src/input/subtitles.c
++++ b/src/input/subtitles.c
+@@ -42,6 +42,12 @@
+ #include "input_internal.h"
+ 
+ /**
++ * Drepper's alternative 
++ * http://en.wikibooks.org/wiki/C_Programming/C_Reference/nonstandard/strlcpy
++ */
++#define strlcpy(dst, src, n) *((char* ) mempcpy(dst, src, n)) = '\0'
++
++/**
+  * The possible extensions for subtitle files we support
+  */
+ static const char *const sub_exts[] = { SLAVE_SPU_EXTENSIONS, "" };

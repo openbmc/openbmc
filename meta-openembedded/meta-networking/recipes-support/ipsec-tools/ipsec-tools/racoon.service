@@ -1,0 +1,11 @@
+[Unit]
+Description=Racoon IKEv1 key management daemon for IPSEC
+After=syslog.target network.target
+
+[Service]
+Type=forking
+EnvironmentFile=-@SYSCONFDIR@/default/racoon
+ExecStart=@SBINDIR@/racoon $RACOON_ARGS
+
+[Install]
+WantedBy=multi-user.target

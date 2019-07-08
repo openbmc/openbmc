@@ -1,0 +1,35 @@
+From c6f0080b55679b6e8b5d332d6e05fdcbda1e4064 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Mon, 4 May 2015 00:58:47 -0700
+Subject: [PATCH] Makefile.in: fix for parallel build
+
+Fixed:
+vsnprintf_r.o: file not recognized: File truncated
+collect2: error: ld returned 3 exit status
+Makefile:122: recipe for target 'filan' failed
+
+Let filan depend on vsnprintf_r.o and snprinterr.o to fix the issue.
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ Makefile.in |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index f2a6edb..88b784b 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -118,7 +118,7 @@ PROCAN_OBJS=procan_main.o procan.o procan-cdefs.o hostan.o error.o sycls.o sysut
+ procan: $(PROCAN_OBJS)
+ 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(PROCAN_OBJS) $(CLIBS)
+ 
+-filan: filan_main.o filan.o fdname.o error.o sycls.o sysutils.o utils.o
++filan: filan_main.o filan.o fdname.o error.o sycls.o sysutils.o utils.o vsnprintf_r.o snprinterr.o
+ 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ filan_main.o filan.o fdname.o error.o sycls.o sysutils.o utils.o vsnprintf_r.o snprinterr.o $(CLIBS)
+ 
+ libxio.a: $(XIOOBJS) $(UTLOBJS)
+-- 
+1.7.9.5
+

@@ -1,0 +1,33 @@
+From 247b3188cde5f3347091cd54271127386d3aece0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 6 Feb 2019 22:10:33 -0800
+Subject: [PATCH] Fix BN_LLONG breakage
+
+opensslconf.h is un-defining BN_LLONG only when included from bn.h which
+is not robust at all, especially when include guards are used and
+multiple inclusions of a given header is not allowed. so lets take out
+the nesting constraint and add OPENSSL_SYS_UEFI constraint instead
+
+Upstream-Status: Inappropriate [ fixed differently with OpenSSL 1.1+ ]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ crypto/opensslconf.h.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/crypto/opensslconf.h.in b/crypto/opensslconf.h.in
+index 7a1c85d..a10c10f 100644
+--- a/crypto/opensslconf.h.in
++++ b/crypto/opensslconf.h.in
+@@ -56,7 +56,7 @@
+ #endif
+ #endif
+ 
+-#if defined(HEADER_BN_H) && !defined(CONFIG_HEADER_BN_H)
++#if !defined(OPENSSL_SYS_UEFI) && !defined(CONFIG_HEADER_BN_H)
+ #define CONFIG_HEADER_BN_H
+ #undef BN_LLONG
+ 
+-- 
+2.20.1
+

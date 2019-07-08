@@ -155,7 +155,7 @@ class SignatureGeneratorOEBasicHash(bb.siggen.SignatureGeneratorBasicHash):
         else:
             def get_mc(tid):
                 tid = tid.rsplit('.', 1)[0]
-                if tid.startswith('mc:'):
+                if tid.startswith('multiconfig:'):
                     elems = tid.split(':')
                     return elems[1]
             def recipename_from_dep(dep):

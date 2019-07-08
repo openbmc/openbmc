@@ -1,0 +1,71 @@
+From 540d80469e6a7dce6baf7214df90e86daffc5175 Mon Sep 17 00:00:00 2001
+From: Fan Xin <fan.xin@jp.fujitsu.com>
+Date: Mon, 5 Jun 2017 13:26:38 +0900
+Subject: [PATCH] aslfiles.c: manipulate fds instead of FILE
+
+Copying what stdout/stderr point to is not portable and fails with
+musl because FILE is an undefined struct.
+
+Instead, use lower-level Unix functions to modify the file that stderr
+writes into. This works on the platforms that Yocto targets.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
+
+Rebase on acpica 20170303
+
+Signed-off-by: Fan Xin <fan.xin@jp.fujitsu.com>
+
+---
+ source/compiler/aslfiles.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/source/compiler/aslfiles.c b/source/compiler/aslfiles.c
+index 82865db..cc072dc 100644
+--- a/source/compiler/aslfiles.c
++++ b/source/compiler/aslfiles.c
+@@ -43,6 +43,11 @@
+ 
+ #include "aslcompiler.h"
+ #include "acapps.h"
++#include "dtcompiler.h"
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <fcntl.h>
++#include <unistd.h>
+ 
+ #define _COMPONENT          ACPI_COMPILER
+         ACPI_MODULE_NAME    ("aslfiles")
+@@ -606,6 +611,8 @@ FlOpenMiscOutputFiles (
+ 
+     if (Gbl_DebugFlag)
+     {
++	int fd;
++
+         Filename = FlGenerateFilename (FilenamePrefix, FILE_SUFFIX_DEBUG);
+         if (!Filename)
+         {
+@@ -617,10 +624,10 @@ FlOpenMiscOutputFiles (
+         /* Open the debug file as STDERR, text mode */
+ 
+         Gbl_Files[ASL_FILE_DEBUG_OUTPUT].Filename = Filename;
+-        Gbl_Files[ASL_FILE_DEBUG_OUTPUT].Handle =
+-            freopen (Filename, "w+t", stderr);
+ 
+-        if (!Gbl_Files[ASL_FILE_DEBUG_OUTPUT].Handle)
++        fd = open(Filename, O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
++        if (fd < 0 ||
++            dup2(fd, fileno(stderr)))
+         {
+             /*
+              * A problem with freopen is that on error, we no longer
+@@ -634,6 +641,8 @@ FlOpenMiscOutputFiles (
+             exit (1);
+         }
+ 
++        Gbl_Files[ASL_FILE_DEBUG_OUTPUT].Handle = stderr;
++
+         AslCompilerSignon (ASL_FILE_DEBUG_OUTPUT);
+         AslCompilerFileHeader (ASL_FILE_DEBUG_OUTPUT);
+     }

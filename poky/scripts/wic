@@ -487,9 +487,6 @@ subcommands = {
 def init_parser(parser):
     parser.add_argument("--version", action="version",
         version="%(prog)s {version}".format(version=__version__))
-    parser.add_argument("-D", "--debug", dest="debug", action="store_true",
-        default=False, help="output debug information")
-
     subparsers = parser.add_subparsers(dest='command', help=hlp.wic_usage)
     for subcmd in subcommands:
         subparser = subparsers.add_parser(subcmd, help=subcommands[subcmd][2])
@@ -503,8 +500,6 @@ def main(argv):
     init_parser(parser)
 
     args = parser.parse_args(argv)
-    if args.debug:
-        logger.setLevel(logging.DEBUG)
 
     if "command" in vars(args):
         if args.command == "help":

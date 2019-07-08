@@ -1,0 +1,21 @@
+#pragma namespace("root/security")
+
+instance of OpenWBEM_NamespaceACL
+{
+	nspace = "root";
+	capability = "";
+};
+
+instance of OpenWBEM_NamespaceACL
+{
+	nspace = "root/cimv2";
+	capability = "";
+};
+
+instance of OpenWBEM_UserACL
+{
+	nspace = "root/cimv2";
+	username = "root";
+	capability = "rw";
+};
+

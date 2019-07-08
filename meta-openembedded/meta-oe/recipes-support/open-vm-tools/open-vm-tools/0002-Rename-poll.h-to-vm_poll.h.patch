@@ -1,0 +1,115 @@
+From 92955b3a6180b4285d11ef79766df01b9ab60dbd Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 13 Jun 2018 23:11:58 -0700
+Subject: [PATCH] Rename poll.h to vm_poll.h
+
+musl libc's system headers pulls in open-vm-tools' poll.h. To avoid this
+we rename poll.h to vm_poll.h.
+
+Signed-off-by: Natanael Copa <ncopa@alpinelinux.org>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ open-vm-tools/lib/asyncsocket/asyncsocket.c                     | 2 +-
+ open-vm-tools/lib/hgfsServer/hgfsServer.c                       | 2 +-
+ open-vm-tools/lib/include/asyncsocket.h                         | 2 +-
+ open-vm-tools/lib/include/pollImpl.h                            | 2 +-
+ open-vm-tools/lib/include/{poll.h => vm_poll.h}                 | 2 +-
+ open-vm-tools/lib/rpcIn/rpcin.c                                 | 2 +-
+ .../services/plugins/grabbitmqProxy/grabbitmqProxyPlugin.c      | 2 +-
+ 7 files changed, 7 insertions(+), 7 deletions(-)
+ rename open-vm-tools/lib/include/{poll.h => vm_poll.h} (99%)
+
+diff --git a/lib/asyncsocket/asyncsocket.c b/lib/asyncsocket/asyncsocket.c
+index e0a68e7e..b9675674 100644
+--- a/lib/asyncsocket/asyncsocket.c
++++ b/lib/asyncsocket/asyncsocket.c
+@@ -86,7 +86,7 @@
+ #include "random.h"
+ #include "asyncsocket.h"
+ #include "asyncSocketBase.h"
+-#include "poll.h"
++#include "vm_poll.h"
+ #include "log.h"
+ #include "err.h"
+ #include "hostinfo.h"
+diff --git a/lib/hgfsServer/hgfsServer.c b/lib/hgfsServer/hgfsServer.c
+index 991a7941..ed0c09f9 100644
+--- a/lib/hgfsServer/hgfsServer.c
++++ b/lib/hgfsServer/hgfsServer.c
+@@ -48,7 +48,7 @@
+ #include "hgfsServerOplock.h"
+ #include "hgfsDirNotify.h"
+ #include "userlock.h"
+-#include "poll.h"
++#include "vm_poll.h"
+ #include "mutexRankLib.h"
+ #include "vm_basic_asm.h"
+ #include "unicodeOperations.h"
+diff --git a/lib/include/asyncsocket.h b/lib/include/asyncsocket.h
+index 524147ea..103f944f 100644
+--- a/lib/include/asyncsocket.h
++++ b/lib/include/asyncsocket.h
+@@ -164,7 +164,7 @@ typedef struct AsyncSocket AsyncSocket;
+  * Or the client can specify its favorite poll class and locking behavior.
+  * Use of IVmdbPoll is only supported for regular sockets and for Attach.
+  */
+-#include "poll.h"
++#include "vm_poll.h"
+ struct IVmdbPoll;
+ typedef struct AsyncSocketPollParams {
+    int flags;               /* Default 0, only POLL_FLAG_NO_BULL is valid */
+diff --git a/lib/include/pollImpl.h b/lib/include/pollImpl.h
+index 46442e55..8bc66997 100644
+--- a/lib/include/pollImpl.h
++++ b/lib/include/pollImpl.h
+@@ -44,7 +44,7 @@
+ #define INCLUDE_ALLOW_USERLEVEL
+ #include "includeCheck.h"
+ 
+-#include "poll.h"
++#include "vm_poll.h"
+ #include "vm_basic_asm.h"
+ 
+ #if defined(__cplusplus)
+diff --git a/lib/include/poll.h b/lib/include/vm_poll.h
+similarity index 99%
+rename from open-vm-tools/lib/include/poll.h
+rename to open-vm-tools/lib/include/vm_poll.h
+index 988fe6d0..e9e74fb5 100644
+--- a/lib/include/poll.h
++++ b/lib/include/vm_poll.h
+@@ -60,7 +60,7 @@ extern "C" {
+ #if !defined(TARGET_OS_IPHONE) || TARGET_OS_IPHONE == 0
+ #include <sys/kernel.h>
+ #endif
+-#include <sys/poll.h>
++#include <poll.h>
+ #define HZ 100
+ #endif
+ #ifdef __ANDROID__
+diff --git a/lib/rpcIn/rpcin.c b/lib/rpcIn/rpcin.c
+index c2c51583..d6c62f10 100644
+--- a/lib/rpcIn/rpcin.c
++++ b/lib/rpcIn/rpcin.c
+@@ -57,7 +57,7 @@
+ 
+ #if defined(VMTOOLS_USE_VSOCKET)
+ #  include <glib.h>
+-#  include "poll.h"
++#  include "vm_poll.h"
+ #  include "asyncsocket.h"
+ #  include "vmci_defs.h"
+ #include "dataMap.h"
+diff --git a/services/plugins/grabbitmqProxy/grabbitmqProxyPlugin.c b/services/plugins/grabbitmqProxy/grabbitmqProxyPlugin.c
+index 03700937..f0b49ad7 100644
+--- a/services/plugins/grabbitmqProxy/grabbitmqProxyPlugin.c
++++ b/services/plugins/grabbitmqProxy/grabbitmqProxyPlugin.c
+@@ -48,7 +48,7 @@
+ #include "rpcout.h"
+ #include "rabbitmqProxyConst.h"
+ #include "vm_basic_types.h"
+-#include "poll.h"
++#include "vm_poll.h"
+ #ifdef OPEN_VM_TOOLS
+ #include "vmci_sockets.h"
+ #include "sslDirect.h"

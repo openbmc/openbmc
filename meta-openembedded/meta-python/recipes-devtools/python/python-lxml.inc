@@ -18,8 +18,8 @@ LIC_FILES_CHKSUM = "file://LICENSES.txt;md5=e4c045ebad958ead4b48008f70838403 \
 
 DEPENDS += "libxml2 libxslt"
 
-SRC_URI[md5sum] = "aec44da0457dca385261e5ceb3fe36f9"
-SRC_URI[sha256sum] = "3ce1c49d4b4a7bc75fb12acb3a6247bb7a91fe420542e6d671ba9187d12a12c2"
+SRC_URI[md5sum] = "d35e90d9de17e1370fbb7e6059bd95ed"
+SRC_URI[sha256sum] = "4a03dd682f8e35a10234904e0b9508d705ff98cf962c5851ed052e9340df3d90"
 
 DISTUTILS_BUILD_ARGS += " \
                      --with-xslt-config='pkg-config libxslt' \
@@ -32,18 +32,6 @@ DISTUTILS_INSTALL_ARGS += " \
 "
 
 inherit pypi
-
-# {standard input}: Assembler messages:
-# {standard input}:1488805: Error: branch out of range
-DEBUG_OPTIMIZATION_remove_mips = " -Og"
-DEBUG_OPTIMIZATION_append_mips = " -O"
-BUILD_OPTIMIZATION_remove_mips = " -Og"
-BUILD_OPTIMIZATION_append_mips = " -O"
-
-DEBUG_OPTIMIZATION_remove_mipsel = " -Og"
-DEBUG_OPTIMIZATION_append_mipsel = " -O"
-BUILD_OPTIMIZATION_remove_mipsel = " -Og"
-BUILD_OPTIMIZATION_append_mipsel = " -O"
 
 do_configure_prepend() {
     sed -i -e 's/--version/--modversion/' ${B}/setupinfo.py

@@ -1,0 +1,95 @@
+From 711e2f76890e3c5b08f64859d9fd913ddbec7d50 Mon Sep 17 00:00:00 2001
+From: Christopher Larson <chris_larson@mentor.com>
+Date: Mon, 22 Oct 2018 15:26:47 +0800
+Subject: [PATCH 2/4] Add argument to control the libargp dependency
+
+This ensures that the builds are always deterministic. If the argument isn't
+passed, the default behavior is to use libargp if the libc doesn't have argp.
+
+Upstream-Status: Pending
+Signed-off-by: Christopher Larson <chris_larson@mentor.com>
+
+Rebase to 6.6
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac | 55 ++++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 36 insertions(+), 19 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index c4a5dd8..dd1c30f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -40,6 +40,13 @@ AC_ARG_WITH([nistbeacon],
+ 	[with_nistbeacon=check]
+ )
+ 
++AC_ARG_WITH([libargp],
++	AS_HELP_STRING([--without-libargp],
++		[Disable libargp support. Systems whose libc lacks argp can use libargp instead. (Default: check if libc lacks argp)]),
++	[with_libargp=$withval],
++	[with_libargp=check]
++)
++
+ dnl Make sure anyone changing configure.ac/Makefile.am has a clue
+ AM_MAINTAINER_MODE
+ AM_PROG_AS
+@@ -135,27 +142,37 @@ AS_IF(
+ 	]
+ )
+ 
+-dnl First check if we have argp available from libc
+-AC_LINK_IFELSE(
+-	[AC_LANG_PROGRAM(
+-		[#include <argp.h>],
+-		[int argc=1; char *argv[]={"test"}; argp_parse(0,argc,argv,0,0,0); return 0;]
+-		)],
+-	[libc_has_argp="true"],
+-	[libc_has_argp="false"]
++dnl Determine if we need libargp: either user requested, or libc has no argp
++AS_IF(
++	[test "x$with_libargp" != "xyes"],
++	[
++		AC_LINK_IFELSE(
++			[AC_LANG_PROGRAM(
++				[#include <argp.h>],
++				[int argc=1; char *argv[]={"test"}; argp_parse(0,argc,argv,0,0,0); return 0;]
++				)],
++			[need_libargp=no],
++			[need_libargp=yes
++			 if test "x$with_libargp" = "xno"; then
++				AC_MSG_FAILURE([libargp disabled and libc does not have argp])
++			 fi]
++		)
++	],
++	[need_libargp=yes],
+ )
+ 
+-dnl If libc doesn't provide argp, then test for libargp
+-if test "$libc_has_argp" = "false" ; then
+-	AC_MSG_WARN("libc does not have argp")
+-	AC_CHECK_LIB([argp], [argp_parse], [have_argp="true"], [have_argp="false"])
+-
+-	if test "$have_argp" = "false"; then
+-		AC_MSG_ERROR("no libargp found")
+-	else
+-		LIBS+=" -largp"
+-	fi
+-fi
++dnl Check for libargp
++AS_IF(
++	[test "x$need_libargp" = "xyes"],
++	[
++		AC_CHECK_LIB(
++			[argp],
++			[argp_parse],
++			[LIBS="$LIBS -largp"],
++			[AC_MSG_FAILURE([libargp not found])]
++		)
++	]
++)
+ 
+ dnl -----------------
+ dnl Configure options
+-- 
+2.7.4
+

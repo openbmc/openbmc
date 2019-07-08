@@ -33,18 +33,6 @@ do_install_prepend() {
 	rm -rf ${B}/t/file.t
 }
 
-RDEPENDS_${PN} += "perl-module-integer perl-module-mime-base64"
-RDEPENDS_${PN}-ptest += " \
-    libtest-needs-perl \
-    perl-module-test-more \
-    perl-module-test \
-    perl-module-utf8 \
-    perl-module-extutils-makemaker \
-    perl-module-net-domain \
-    perl-module-encode \
-    perl-module-extutils-mm-unix \
-    perl-module-file-spec-functions \
-    perl-module-perlio \
-"
+RDEPENDS_${PN}-ptest += "libtest-needs-perl perl-module-test-more"
 
 BBCLASSEXTEND = "native"

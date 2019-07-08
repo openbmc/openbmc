@@ -1,0 +1,12 @@
+Index: open-vm-tools/configure.ac
+===================================================================
+--- open-vm-tools.orig/configure.ac
++++ open-vm-tools/configure.ac
+@@ -303,6 +303,7 @@ AC_ARG_ENABLE(
+    [],
+    [enable_resolutionkms="auto"])
+ 
++AM_INIT_AUTOMAKE([subdir-objects])
+ AM_INIT_AUTOMAKE
+ 
+ ###

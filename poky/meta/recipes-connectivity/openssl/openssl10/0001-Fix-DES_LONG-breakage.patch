@@ -1,0 +1,35 @@
+From 1aec49cc45e7cf5ebc059a77081ac3ea2a5aff7b Mon Sep 17 00:00:00 2001
+From: Denys Dmytriyenko <denys@ti.com>
+Date: Fri, 1 Mar 2019 13:14:56 -0500
+Subject: [PATCH] Fix DES_LONG breakage
+
+Mimic previous BN_LLONG fix by Khem Raj here. Re-use its description:
+
+opensslconf.h is defining DES_LONG only when included from des.h which
+is not robust at all, especially when include guards are used and
+multiple inclusions of a given header is not allowed. so lets take out
+the nesting constraint and add OPENSSL_SYS_UEFI constraint instead
+
+Upstream-Status: Inappropriate [ fixed differently with OpenSSL 1.1+ ]
+
+Signed-off-by: Denys Dmytriyenko <denys@ti.com>
+---
+ crypto/opensslconf.h.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/crypto/opensslconf.h.in b/crypto/opensslconf.h.in
+index a10c10f..0147a4d 100644
+--- a/crypto/opensslconf.h.in
++++ b/crypto/opensslconf.h.in
+@@ -48,7 +48,7 @@
+ #endif
+ #endif
+ 
+-#if (defined(HEADER_NEW_DES_H) || defined(HEADER_DES_H)) && !defined(DES_LONG)
++#if !defined(OPENSSL_SYS_UEFI) && !defined(DES_LONG)
+ /* If this is set to 'unsigned int' on a DEC Alpha, this gives about a
+  * %20 speed up (longs are 8 bytes, int's are 4). */
+ #ifndef DES_LONG
+-- 
+2.7.4
+

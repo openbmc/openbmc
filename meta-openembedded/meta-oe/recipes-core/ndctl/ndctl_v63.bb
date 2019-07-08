@@ -13,7 +13,7 @@ inherit autotools-brokensep pkgconfig bash-completion systemd
 SRCREV = "cb2d678dd6d286dd96d31548c32449a8b883ae32"
 SRC_URI = "git://github.com/pmem/ndctl.git"
 
-DEPENDS = "kmod udev json-c"
+DEPENDS = "virtual/kernel kmod udev json-c"
 
 S = "${WORKDIR}/git"
 

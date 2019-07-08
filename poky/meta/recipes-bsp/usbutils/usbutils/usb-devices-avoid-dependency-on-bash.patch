@@ -1,0 +1,30 @@
+Upstream-Status: Backport (https://github.com/gregkh/usbutils/commit/508d1acf42e1bfd470c6bf1a188574c69c20aeed)
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From 1c9162a5b30550aec8fa163906067bc179291b57 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Fri, 27 Jul 2018 15:28:34 +0100
+Subject: [PATCH] usb-devices: use /bin/sh
+
+This script doesn't use any bashisms, so change the hashbang to /bin/sh.
+
+Fixes #73.
+
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+---
+ usb-devices | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/usb-devices b/usb-devices
+index afb4217..89d1b7d 100755
+--- a/usb-devices
++++ b/usb-devices
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ # SPDX-License-Identifier: GPL-2.0+
+ #
+ # Copyright (c) 2009 Greg Kroah-Hartman <greg@kroah.com>
+-- 
+2.11.0
+

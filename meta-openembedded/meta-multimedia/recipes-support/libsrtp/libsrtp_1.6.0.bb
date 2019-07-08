@@ -11,8 +11,6 @@ SRC_URI = "git://github.com/cisco/libsrtp.git;protocol=https;branch=1_6_x_thrott
            file://0001-Rename-conflicting-variable-mips.patch \
            "
 
-inherit autotools pkgconfig
-
-EXTRA_OEMAKE += "shared_library"
+inherit autotools
 
 ALLOW_EMPTY_${PN} = "1"

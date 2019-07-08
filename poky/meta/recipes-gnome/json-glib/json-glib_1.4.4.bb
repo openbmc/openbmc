@@ -19,6 +19,13 @@ SRC_URI[archive.sha256sum] = "720c5f4379513dc11fd97dc75336eb0c0d3338c53128044d9f
 
 PACKAGECONFIG[manpages] = "-Dman=true,-Dman=false,libxslt-native xmlto-native"
 
+# This builds both API docs (via gtk-doc)
+GTKDOC_ENABLE_FLAG = "-Ddocs=true"
+GTKDOC_DISABLE_FLAG = "-Ddocs=false"
+
+EXTRA_OEMESON_append_class-target = " ${@bb.utils.contains('GTKDOC_ENABLED', 'True', '${GTKDOC_ENABLE_FLAG}', \
+                                                                                    '${GTKDOC_DISABLE_FLAG}', d)} "
+
 do_install_append() {
 	if ! ${@bb.utils.contains('PTEST_ENABLED', '1', 'true', 'false', d)}; then
 		rm -rf ${D}${datadir}/installed-tests ${D}${libexecdir}

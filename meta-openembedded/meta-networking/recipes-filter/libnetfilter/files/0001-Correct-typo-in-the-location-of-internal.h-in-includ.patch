@@ -1,0 +1,26 @@
+From 32af64e1811c74292891dc4dc8455736f7d33ccf Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 30 Mar 2017 13:26:56 -0700
+Subject: [PATCH] Correct typo in the location of internal.h in #include
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/libnetfilter_queue.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libnetfilter_queue.c b/src/libnetfilter_queue.c
+index 211a8ba..065d618 100644
+--- a/src/libnetfilter_queue.c
++++ b/src/libnetfilter_queue.c
+@@ -32,7 +32,7 @@
+ 
+ #include <libnfnetlink/libnfnetlink.h>
+ #include <libnetfilter_queue/libnetfilter_queue.h>
+-#include "src/internal.h"
++#include "internal.h"
+ 
+ /**
+  * \mainpage
+-- 
+2.12.1
+

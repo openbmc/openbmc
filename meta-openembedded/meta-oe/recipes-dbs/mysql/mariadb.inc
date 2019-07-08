@@ -2,9 +2,9 @@ SUMMARY = "A robust, scalable, and reliable SQL server"
 HOMEPAGE = "http://mariadb.org"
 SECTION = "libs"
 LICENSE = "GPLv2"
-LIC_FILES_CHKSUM = "file://COPYING;md5=b1becf0cfa3366e0f4d854d1d264f311"
+LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
-SRC_URI = "https://downloads.mariadb.com/MariaDB/${BPN}-${PV}/source/${BPN}-${PV}.tar.gz \
+SRC_URI = "https://downloads.mariadb.org/interstitial/${BPN}-${PV}/source/${BPN}-${PV}.tar.gz \
            file://my.cnf \
            file://mysqld.service \
            file://install_db.service \
@@ -19,8 +19,8 @@ SRC_URI = "https://downloads.mariadb.com/MariaDB/${BPN}-${PV}/source/${BPN}-${PV
            file://clang_version_header_conflict.patch \
            file://fix-arm-atomic.patch \
           "
-SRC_URI[md5sum] = "11220d0b94c5c24caa2e1e9eaba38e31"
-SRC_URI[sha256sum] = "39e9723eaf620afd99b0925b2c2a5a50a89110ba50040adf14cce7cf89e5e21b"
+SRC_URI[md5sum] = "603ce42e35b9a688f2cca05275acb5cb"
+SRC_URI[sha256sum] = "b2aa857ef5b84f85a7ea60a1eac7b34c0ca5151c71a0d44ce2d7fb028d71459a"
 
 UPSTREAM_CHECK_URI = "https://github.com/MariaDB/server/releases"
 

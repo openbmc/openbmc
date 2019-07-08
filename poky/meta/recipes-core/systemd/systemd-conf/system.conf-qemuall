@@ -1,3 +1,0 @@
-[Manager]
-# Change DefaultTimeoutStartSec from 90s to 240s
-DefaultTimeoutStartSec = 240s

@@ -30,5 +30,3 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 FILES_${PN} = "${sysconfdir}/inittab"
 CONFFILES_${PN} = "${sysconfdir}/inittab"
-
-RCONFLICTS_${PN} = "sysvinit-inittab"

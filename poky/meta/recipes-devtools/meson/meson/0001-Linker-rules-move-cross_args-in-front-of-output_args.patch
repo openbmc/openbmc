@@ -1,0 +1,30 @@
+From 4676224dbdff0f7107e8cbdbe0eab19c855f1454 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 17 Nov 2017 13:18:28 +0200
+Subject: [PATCH] Linker rules: move {cross_args} in front of {output_args}
+
+The previous order was found to break linking in some cases
+(e.g. when -no-pic -fno-PIC was present in {cross_args}.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ mesonbuild/backend/ninjabackend.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mesonbuild/backend/ninjabackend.py b/mesonbuild/backend/ninjabackend.py
+index bb281e1..969b70e 100644
+--- a/mesonbuild/backend/ninjabackend.py
++++ b/mesonbuild/backend/ninjabackend.py
+@@ -1501,7 +1501,7 @@ int dummy;
+  rspfile_content = $ARGS  {output_args} $in $LINK_ARGS {cross_args} $aliasing
+ '''
+                 else:
+-                    command_template = ' command = {executable} $ARGS {output_args} $in $LINK_ARGS {cross_args} $aliasing\n'
++                    command_template = ' command = {executable} $ARGS {cross_args} {output_args} $in $LINK_ARGS $aliasing\n'
+                 command = command_template.format(
+                     executable=' '.join(compiler.get_linker_exelist()),
+                     cross_args=' '.join(cross_args),
+-- 
+2.15.0
+

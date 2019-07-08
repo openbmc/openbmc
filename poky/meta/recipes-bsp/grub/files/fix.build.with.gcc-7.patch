@@ -1,0 +1,39 @@
+* e.g. with gentoo gcc-7.1 they define _FORTIFY_SOURCE by default with:
+  https://sources.gentoo.org/cgi-bin/viewvc.cgi/gentoo/src/patchsets/gcc/7.1.0/gentoo/10_all_default-fortify-source.patch?view=markup
+  which results in following error while building grub-efi-native:
+  ./config-util.h:1504:48: error: this use of "defined" may not be portable [-Werror=expansion-to-defined]
+               || (defined _FORTIFY_SOURCE && 0 < _FORTIFY_SOURCE \
+                                                  ^~~~~~~~~~~~~~~
+  this part comes from gnulib and it's used only for Apple and BSD,
+  so we can ignore it, but we cannot add -Wno-error=expansion-to-defined
+  because this warning was introduced only in gcc-7 and older gcc
+  will fail with:
+  cc1: error: -Werror=expansion-to-defined: no option -Wexpansion-to-defined
+  use #pragma to work around this
+
+Upstream-Status: Pending (should be fixed in gnulib which is then rarely updated in grub)
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
+diff -uNr grub-2.02.old/m4/extern-inline.m4 grub-2.02/m4/extern-inline.m4
+--- grub-2.02.old/m4/extern-inline.m4	2016-02-28 15:22:21.000000000 +0100
++++ grub-2.02/m4/extern-inline.m4	2017-08-22 19:26:45.213637276 +0200
+@@ -39,6 +39,10 @@
+    OS X 10.9 has a macro __header_inline indicating the bug is fixed for C and
+    for clang but remains for g++; see <http://trac.macports.org/ticket/41033>.
+    Assume DragonFly and FreeBSD will be similar.  */
++#pragma GCC diagnostic push
++#if __GNUC__ >= 7
++#pragma GCC diagnostic ignored "-Wexpansion-to-defined"
++#endif
+ #if (((defined __APPLE__ && defined __MACH__) \
+       || defined __DragonFly__ || defined __FreeBSD__) \
+      && (defined __header_inline \
+@@ -50,6 +52,7 @@
+                 && defined __GNUC__ && ! defined __cplusplus))))
+ # define _GL_EXTERN_INLINE_STDHEADER_BUG
+ #endif
++#pragma GCC diagnostic pop
+ #if ((__GNUC__ \
+       ? defined __GNUC_STDC_INLINE__ && __GNUC_STDC_INLINE__ \
+       : (199901L <= __STDC_VERSION__ \

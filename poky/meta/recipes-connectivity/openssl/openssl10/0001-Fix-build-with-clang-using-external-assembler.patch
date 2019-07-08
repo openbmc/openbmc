@@ -1,0 +1,45 @@
+From 2f6026cb8b16cf00726e3c5625c023f196680f07 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 17 Mar 2017 12:52:08 -0700
+Subject: [PATCH] Fix build with clang using external assembler
+
+Cherry-picked from
+https://github.com/openssl/openssl/commit/11208dcfb9105e8afa37233185decefd45e89e17
+https://github.com/openssl/openssl/commit/fbab8baddef8d3346ae40ff068871e2ddaf10270
+https://github.com/openssl/openssl/commit/6cf412c473d8145562b76219ce3da73b201b3255
+
+Fixes
+
+| ghash-armv4.S: Assembler messages:
+| ghash-armv4.S:81: Error: bad instruction `ldrbpl r12,[r2,r3]'
+| ghash-armv4.S:91: Error: bad instruction `ldrbpl r8,[r0,r3]'
+| ghash-armv4.S:137: Error: bad instruction `ldrbne r12,[r2,#15]'
+| ghash-armv4.S:224: Error: bad instruction `ldrbpl r12,[r0,r3]'
+| clang-4.0: error: assembler command failed with exit code 1 (use -v to see invocation)
+| make[2]: *** [<builtin>: ghash-armv4.o] Error 1
+
+Upstream-Status: Backport
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ crypto/modes/asm/ghash-armv4.pl | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/crypto/modes/asm/ghash-armv4.pl b/crypto/modes/asm/ghash-armv4.pl
+index 8ccc963ef..442fed4da 100644
+--- a/crypto/modes/asm/ghash-armv4.pl
++++ b/crypto/modes/asm/ghash-armv4.pl
+@@ -124,7 +124,10 @@ $code=<<___;
+ #include "arm_arch.h"
+ 
+ .text
++#if defined(__thumb2__) || defined(__clang__)
++.syntax	unified
++#endif
+ .code	32
+ 
+ #ifdef __clang__
+ #define ldrplb	ldrbpl
+-- 
+2.12.0
+

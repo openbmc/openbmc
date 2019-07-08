@@ -123,12 +123,6 @@ class SignatureGeneratorBasic(SignatureGenerator):
             k = fn + "." + task
             if not ignore_mismatch and k in self.basehash and self.basehash[k] != basehash[k]:
                 bb.error("When reparsing %s, the basehash value changed from %s to %s. The metadata is not deterministic and this needs to be fixed." % (k, self.basehash[k], basehash[k]))
-                bb.error("The following commands may help:")
-                cmd = "$ bitbake %s -c%s" % (d.getVar('PN'), task)
-                # Make sure sigdata is dumped before run printdiff
-                bb.error("%s -Snone" % cmd)
-                bb.error("Then:")
-                bb.error("%s -Sprintdiff\n" % cmd)
             self.basehash[k] = basehash[k]
 
         self.taskdeps[fn] = taskdeps
@@ -179,7 +173,7 @@ class SignatureGeneratorBasic(SignatureGenerator):
     def get_taskhash(self, fn, task, deps, dataCache):
 
         mc = ''
-        if fn.startswith('mc:'):
+        if fn.startswith('multiconfig:'):
             mc = fn.split(':')[1]
         k = fn + "." + task
 
@@ -194,7 +188,7 @@ class SignatureGeneratorBasic(SignatureGenerator):
                 depmc = pkgname.split(':')[1]
                 if mc != depmc:
                     continue
-            if dep.startswith("mc:") and not mc:
+            if dep.startswith("multiconfig:") and not mc:
                 continue
             depname = dataCache.pkg_fn[pkgname]
             if not self.rundep_check(fn, recipename, task, dep, depname, dataCache):
@@ -412,13 +406,13 @@ def list_inline_diff(oldlist, newlist, colors=None):
 
 def clean_basepath(a):
     mc = None
-    if a.startswith("mc:"):
+    if a.startswith("multiconfig:"):
         _, mc, a = a.split(":", 2)
     b = a.rsplit("/", 2)[1] + '/' + a.rsplit("/", 2)[2]
     if a.startswith("virtual:"):
         b = b + ":" + a.rsplit(":", 1)[0]
     if mc:
-        b = b + ":mc:" + mc
+        b = b + ":multiconfig:" + mc
     return b
 
 def clean_basepaths(a):
@@ -643,10 +637,6 @@ def compare_sigfiles(a, b, recursecb=None, color=False, collapsed=False):
     a_taint = a_data.get('taint', None)
     b_taint = b_data.get('taint', None)
     if a_taint != b_taint:
-        if a_taint.startswith('nostamp:'):
-            a_taint = a_taint.replace('nostamp:', 'nostamp(uuid4):')
-        if b_taint.startswith('nostamp:'):
-            b_taint = b_taint.replace('nostamp:', 'nostamp(uuid4):')
         output.append(color_format("{color_title}Taint (by forced/invalidated task) changed{color_default} from %s to %s") % (a_taint, b_taint))
 
     return output
@@ -719,11 +709,7 @@ def dump_sigfile(a):
             output.append("Hash for dependent task %s is %s" % (dep, a_data['runtaskhashes'][dep]))
 
     if 'taint' in a_data:
-        if a_data['taint'].startswith('nostamp:'):
-            msg = a_data['taint'].replace('nostamp:', 'nostamp(uuid4):')
-        else:
-            msg = a_data['taint']
-        output.append("Tainted (by forced/invalidated task): %s" % msg)
+        output.append("Tainted (by forced/invalidated task): %s" % a_data['taint'])
 
     if 'task' in a_data:
         computed_basehash = calc_basehash(a_data)

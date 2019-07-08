@@ -1,0 +1,27 @@
+From fcfd57105b4bdb30d906df152ef01748fa95daff Mon Sep 17 00:00:00 2001
+From: Alexey Brodkin <abrodkin@synopsys.com>
+Date: Thu, 13 Sep 2018 17:13:20 +0300
+Subject: [PATCH] icu: Add ARC support
+
+Signed-off-by: Alexey Brodkin <abrodkin@synopsys.com>
+
+Upstream-Status: Submitted [ https://github.com/unicode-org/icu/pull/149 ]
+---
+ i18n/double-conversion-utils.h                 | 2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/i18n/double-conversion-utils.h b/i18n/double-conversion-utils.h
+index 57fc49b231a3..0bd3e8340673 100644
+--- a/i18n/double-conversion-utils.h
++++ b/i18n/double-conversion-utils.h
+@@ -86,7 +86,7 @@ inline void abort_noreturn() { abort(); }
+     defined(__SH4__) || defined(__alpha__) || \
+     defined(_MIPS_ARCH_MIPS32R2) || \
+     defined(__AARCH64EL__) || defined(__aarch64__) || \
+-    defined(__riscv)
++    defined(__riscv) || defined(__arc__)
+ #define DOUBLE_CONVERSION_CORRECT_DOUBLE_OPERATIONS 1
+ #elif defined(__mc68000__)
+ #undef DOUBLE_CONVERSION_CORRECT_DOUBLE_OPERATIONS
+2.17.1
+

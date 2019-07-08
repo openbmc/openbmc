@@ -1,0 +1,15 @@
+* Also look for postprocess.h under libpostproc/
+
+Upstream-status: Pending
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -2589,7 +2589,7 @@ then
+       VLC_SAVE_FLAGS
+       CPPFLAGS="${CPPFLAGS} ${POSTPROC_CFLAGS}"
+       CFLAGS="${CFLAGS} ${POSTPROC_CFLAGS}"
+-      AC_CHECK_HEADERS(postproc/postprocess.h)
++      AC_CHECK_HEADERS(postproc/postprocess.h,[],[AC_CHECK_HEADERS(libpostproc/postprocess.h)])
+       VLC_ADD_PLUGIN([postproc])
+       VLC_RESTORE_FLAGS
+     ],[

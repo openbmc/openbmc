@@ -1,0 +1,36 @@
+From 7023732c65b4dc509c46a54fb7715da275b5597f Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Thu, 13 Sep 2018 12:39:44 +0800
+Subject: [PATCH] spice: fix compile fail problem
+
+compile error:
+format '%d' expects argument of type 'int', but argument 6 has 
+type 'long unsigned int' [-Werror=format=]
+
+spice compile failed on 32bit system, since upstream commit
+9541cd2fe(in V0.14.1) change %ld to %PRIdPTR, %PRIdPTR is %d, but argument
+strm.total_out is uLong.
+
+Upstream-Status: Submitted[https://github.com/freedesktop/spice/pull/1]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ server/red-replay-qxl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/server/red-replay-qxl.c b/server/red-replay-qxl.c
+index 1fce76c..bd33b58 100644
+--- a/server/red-replay-qxl.c
++++ b/server/red-replay-qxl.c
+@@ -266,7 +266,7 @@ static replay_t read_binary(SpiceReplay *replay, const char *prefix, size_t *siz
+             exit(1);
+         }
+         if ((ret = inflate(&strm, Z_NO_FLUSH)) != Z_STREAM_END) {
+-            spice_error("inflate error %d (disc: %" PRIdPTR ")", ret, *size - strm.total_out);
++            spice_error("inflate error %d (disc: %ld)", ret, *size - strm.total_out);
+             if (ret == Z_DATA_ERROR) {
+                 /* last operation may be wrong. since we do the recording
+                  * in red_worker, when there is a shutdown from the vcpu/io thread
+-- 
+2.7.4
+

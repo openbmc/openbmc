@@ -1,0 +1,43 @@
+From 9fdf50d63df08ee65e7d8e62c35f19ac4841bca9 Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Wed, 27 May 2015 09:48:45 +0800
+Subject: [PATCH] remove Wsuggest-attribute from CXXFLAGS
+
+Upstream-Status: Inappropriate
+
+Wsuggest-attribute is GCC 4.6 feature, centos6 is using GCC
+4.4.7 which unknown this flag, so remove it from CXXFLAGS
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ buildlib/environment.mak.in | 1 -
+ test/libapt/makefile        | 1 -
+ 2 files changed, 2 deletions(-)
+
+diff --git a/buildlib/environment.mak.in b/buildlib/environment.mak.in
+index 9620722..c344d01 100644
+--- a/buildlib/environment.mak.in
++++ b/buildlib/environment.mak.in
+@@ -14,7 +14,6 @@ CXXFLAGS+= @CXXFLAGS@ -Wall -Wextra
+ CXXFLAGS+= -Wcast-align -Wlogical-op -Wredundant-decls -Wmissing-declarations -Wunsafe-loop-optimizations
+ CXXFLAGS+= -Wctor-dtor-privacy -Wdisabled-optimization -Winit-self -Wmissing-include-dirs -Wnoexcept -Wsign-promo -Wundef
+ # suggests methods which already have such an attribute
+-#CXXFLAGS+= -Wsuggest-attribute=pure -Wsuggest-attribute=const -Wsuggest-attribute=noreturn
+ # sanitize options to be enabled for testing
+ #CXXFLAGS+= -fsanitize=address -fsanitize=undefined -fno-sanitize=vptr
+ # a bit too pedantic to be run by default
+diff --git a/test/libapt/makefile b/test/libapt/makefile
+index 5ff9cf6..c5b5190 100644
+--- a/test/libapt/makefile
++++ b/test/libapt/makefile
+@@ -40,7 +40,6 @@ CXXFLAGS += -pthread
+ # disable some flags for gtest again
+ CXXFLAGS+= -Wno-missing-declarations
+ CXXFLAGS+= -Wno-missing-field-initializers
+-CXXFLAGS+= -Wno-suggest-attribute=pure -Wno-suggest-attribute=const -Wno-suggest-attribute=noreturn
+ CXXFLAGS+= -Wno-undef
+ 
+ # All Google Test headers.  Usually you shouldn't change this definition.
+-- 
+2.1.4
+

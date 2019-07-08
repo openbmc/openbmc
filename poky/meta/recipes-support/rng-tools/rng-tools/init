@@ -1,19 +1,26 @@
-#!/bin/sh
+#! /bin/sh 
 #
 # This is an init script for openembedded
-# Copy it to @SYSCONFDIR@/init.d/rng-tools and type
+# Copy it to /etc/init.d/rng-tools and type
 # > update-rc.d rng-tools defaults 60
 #
 
-rngd=@SBINDIR@/rngd
+rngd=/usr/sbin/rngd
 test -x "$rngd" || exit 1
 
-[ -r @SYSCONFDIR@/default/rng-tools ] && . "@SYSCONFDIR@/default/rng-tools"
+if [ -e /etc/default/rng-tools ]; then
+    . /etc/default/rng-tools
+fi
+
+if [ -n "$RNG_DEVICE" ]; then
+    EXTRA_ARGS="-- -r $RNG_DEVICE"
+fi
+
 
 case "$1" in
   start)
     echo -n "Starting random number generator daemon"
-    start-stop-daemon -S -q -x $rngd -- $EXTRA_ARGS
+    start-stop-daemon -S -q -x $rngd $EXTRA_ARGS
     echo "."
     ;;
   stop)
@@ -31,11 +38,11 @@ case "$1" in
     start-stop-daemon -K -q -n rngd
     echo "."
     echo -n "Starting random number generator daemon"
-    start-stop-daemon -S -q -x $rngd -- $EXTRA_ARGS
+    start-stop-daemon -S -q -x $rngd $EXTRA_ARGS
     echo "."
     ;;
   *)
-    echo "Usage: @SYSCONFDIR@/init.d/rng-tools {start|stop|reload|restart|force-reload}"
+    echo "Usage: /etc/init.d/rng-tools {start|stop|reload|restart|force-reload}"
     exit 1
 esac
 

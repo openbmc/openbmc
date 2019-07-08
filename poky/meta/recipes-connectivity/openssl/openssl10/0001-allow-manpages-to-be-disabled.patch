@@ -1,0 +1,31 @@
+From e1c39b80b01d4d18feeadfdc6e45a3e1dd110634 Mon Sep 17 00:00:00 2001
+From: Andre McCurdy <armccurdy@gmail.com>
+Date: Fri, 27 Jul 2018 21:41:06 +0000
+Subject: [PATCH] allow manpages to be disabled
+
+Define OE_DISABLE_MANPAGES (via environment or the make command line)
+to skip creation and installation of manpages.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+---
+ Makefile.org | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.org b/Makefile.org
+index ed98d2a..747d8cb 100644
+--- a/Makefile.org
++++ b/Makefile.org
+@@ -549,7 +549,7 @@ dist:
+ 	@$(MAKE) SDIRS='$(SDIRS)' clean
+ 	@$(MAKE) TAR='$(TAR)' TARFLAGS='$(TARFLAGS)' $(DISTTARVARS) tar
+ 
+-install: all install_docs install_sw
++install: all $(if $(OE_DISABLE_MANPAGES),,install_docs) install_sw
+ 
+ install_sw:
+ 	@$(PERL) $(TOP)/util/mkdir-p.pl $(INSTALL_PREFIX)$(INSTALLTOP)/bin \
+-- 
+1.9.1
+

@@ -9,9 +9,9 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=05ff94b3ff59fe6fa7489fa26e3d9142"
 DEPENDS = "lcms bzip2 jpeg libpng tiff zlib fftw freetype libtool"
 
 BASE_PV := "${PV}"
-PV .= "_47"
+PV .= "_35"
 SRC_URI = "git://github.com/ImageMagick/ImageMagick.git "
-SRCREV = "b672df7a44b0ab0219b1fa78b3673c2810ddd374"
+SRCREV = "224159dfcc0ae3da9a247921e3c8bfb44d39965e"
 
 S = "${WORKDIR}/git"
 

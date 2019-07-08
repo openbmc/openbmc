@@ -1,0 +1,35 @@
+From 62fa9bceb15a9d160dd5d624a6d46907c1019c5c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 8 Sep 2017 17:02:55 -0700
+Subject: [PATCH] fluent-bit-shared: Link with -lpthread
+
+This fixes a reference to pthread_atfork in libfluent-bit.so
+otherwise we get undefined reference to the symbols in binaries
+which are linked with libfluent-bit.so
+
+Fixes errors like
+arm-bec-linux-gnueabi-ld: ../../bin/hello_world: hidden symbol `pthread_atfork' in /mnt/a/oe/build/tmp/work/cortexa7t2hf-neon-vfpv4-bec-linux-gnueabi/fluentbit/0.12.1-r0/recipe-sysroot/usr/lib/libpthread_nonshared.a(pthread_atfork.oS) is referenced by DSO
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ src/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 425a246..1264e59 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -168,7 +168,7 @@ set(FLB_DEPS
+ # Shared Library
+ if(NOT FLB_WITHOUT_SHARED_LIB)
+   add_library(fluent-bit-shared SHARED ${src})
+-  target_link_libraries(fluent-bit-shared ${FLB_DEPS})
++  target_link_libraries(fluent-bit-shared ${FLB_DEPS} -lpthread)
+   set_target_properties(fluent-bit-shared
+     PROPERTIES OUTPUT_NAME fluent-bit)
+ 
+-- 
+2.14.1
+

@@ -1,0 +1,22 @@
+Upstream-Status: Inappropriate [disable feature]
+
+---
+ Makefile.am | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 0da52cb16..a1f79e0a2 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -13,8 +13,7 @@ SUBDIRS = \
+ 	$(MAYBE_DSELECT) \
+ 	scripts \
+ 	t-func \
+-	po \
+-	man
++	po
+ 
+ ACLOCAL_AMFLAGS = -I m4
+ 
+-- 
+2.11.0

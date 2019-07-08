@@ -1,0 +1,133 @@
+From 0a0d736ec89dffdbc83e7181166a99d5563acfe8 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 5 Nov 2018 11:35:52 -0500
+Subject: [PATCH 1/9] Fix: signal: Distinguish between kernel_siginfo and
+ siginfo (v4.20)
+
+See upstream commit :
+
+  commit ae7795bc6187a15ec51cf258abae656a625f9980
+  Author: Eric W. Biederman <ebiederm@xmission.com>
+  Date:   Tue Sep 25 11:27:20 2018 +0200
+
+    signal: Distinguish between kernel_siginfo and siginfo
+
+    Linus recently observed that if we did not worry about the padding
+    member in struct siginfo it is only about 48 bytes, and 48 bytes is
+    much nicer than 128 bytes for allocating on the stack and copying
+    around in the kernel.
+
+    The obvious thing of only adding the padding when userspace is
+    including siginfo.h won't work as there are sigframe definitions in
+    the kernel that embed struct siginfo.
+
+    So split siginfo in two; kernel_siginfo and siginfo.  Keeping the
+    traditional name for the userspace definition.  While the version that
+    is used internally to the kernel and ultimately will not be padded to
+    128 bytes is called kernel_siginfo.
+
+    The definition of struct kernel_siginfo I have put in include/signal_types.h
+
+    A set of buildtime checks has been added to verify the two structures have
+    the same field offsets.
+
+    To make it easy to verify the change kernel_siginfo retains the same
+    size as siginfo.  The reduction in size comes in a following change.
+
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+
+Upstream-Status: backport https://github.com/lttng/lttng-modules/commit/0a0d736ec89dffdbc83e7181166a99d5563acfe8
+
+Signed-off-by: Bruce Ashfield <bruce.ashfield@gmail.com>
+---
+ instrumentation/events/lttng-module/signal.h | 41 ++++++++++++++++++--
+ 1 file changed, 37 insertions(+), 4 deletions(-)
+
+diff --git a/instrumentation/events/lttng-module/signal.h b/instrumentation/events/lttng-module/signal.h
+index b3c9126..8783b52 100644
+--- a/instrumentation/events/lttng-module/signal.h
++++ b/instrumentation/events/lttng-module/signal.h
+@@ -35,21 +35,24 @@
+  * SEND_SIG_NOINFO means that si_code is SI_USER, and SEND_SIG_PRIV
+  * means that si_code is SI_KERNEL.
+  */
+-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,4,0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,20,0))
+ LTTNG_TRACEPOINT_EVENT(signal_generate,
+ 
+-	TP_PROTO(int sig, struct siginfo *info, struct task_struct *task),
++	TP_PROTO(int sig, struct kernel_siginfo *info, struct task_struct *task,
++			int group, int result),
+ 
+-	TP_ARGS(sig, info, task),
++	TP_ARGS(sig, info, task, group, result),
+ 
+ 	TP_FIELDS(
+ 		ctf_integer(int, sig, sig)
+ 		LTTNG_FIELDS_SIGINFO(info)
+ 		ctf_array_text(char, comm, task->comm, TASK_COMM_LEN)
+ 		ctf_integer(pid_t, pid, task->pid)
++		ctf_integer(int, group, group)
++		ctf_integer(int, result, result)
+ 	)
+ )
+-#else
++#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0))
+ LTTNG_TRACEPOINT_EVENT(signal_generate,
+ 
+ 	TP_PROTO(int sig, struct siginfo *info, struct task_struct *task,
+@@ -66,6 +69,20 @@ LTTNG_TRACEPOINT_EVENT(signal_generate,
+ 		ctf_integer(int, result, result)
+ 	)
+ )
++#else
++LTTNG_TRACEPOINT_EVENT(signal_generate,
++
++	TP_PROTO(int sig, struct siginfo *info, struct task_struct *task),
++
++	TP_ARGS(sig, info, task),
++
++	TP_FIELDS(
++		ctf_integer(int, sig, sig)
++		LTTNG_FIELDS_SIGINFO(info)
++		ctf_array_text(char, comm, task->comm, TASK_COMM_LEN)
++		ctf_integer(pid_t, pid, task->pid)
++	)
++)
+ #endif
+ 
+ /**
+@@ -82,6 +99,21 @@ LTTNG_TRACEPOINT_EVENT(signal_generate,
+  * This means, this can show which signals are actually delivered, but
+  * matching generated signals and delivered signals may not be correct.
+  */
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,20,0))
++LTTNG_TRACEPOINT_EVENT(signal_deliver,
++
++	TP_PROTO(int sig, struct kernel_siginfo *info, struct k_sigaction *ka),
++
++	TP_ARGS(sig, info, ka),
++
++	TP_FIELDS(
++		ctf_integer(int, sig, sig)
++		LTTNG_FIELDS_SIGINFO(info)
++		ctf_integer(unsigned long, sa_handler, (unsigned long) ka->sa.sa_handler)
++		ctf_integer(unsigned long, sa_flags, ka->sa.sa_flags)
++	)
++)
++#else
+ LTTNG_TRACEPOINT_EVENT(signal_deliver,
+ 
+ 	TP_PROTO(int sig, struct siginfo *info, struct k_sigaction *ka),
+@@ -95,6 +127,7 @@ LTTNG_TRACEPOINT_EVENT(signal_deliver,
+ 		ctf_integer(unsigned long, sa_flags, ka->sa.sa_flags)
+ 	)
+ )
++#endif
+ 
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(3,4,0))
+ LTTNG_TRACEPOINT_EVENT_CLASS(signal_queue_overflow,
+-- 
+2.19.1
+

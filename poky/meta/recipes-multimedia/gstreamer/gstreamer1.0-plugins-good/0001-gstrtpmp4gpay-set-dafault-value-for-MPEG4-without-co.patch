@@ -1,0 +1,62 @@
+From c782a30482908a4b4dd9cd4abff9f9bc4016698f Mon Sep 17 00:00:00 2001
+From: Song Bing <b06498@freescale.com>
+Date: Tue, 5 Aug 2014 14:40:46 +0800
+Subject: [PATCH] gstrtpmp4gpay: set dafault value for MPEG4 without codec
+ data in caps.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=734263
+
+Upstream-Status: Submitted
+
+Signed-off-by: Song Bing <b06498@freescale.com>
+---
+ gst/rtp/gstrtpmp4gpay.c |   19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/gst/rtp/gstrtpmp4gpay.c b/gst/rtp/gstrtpmp4gpay.c
+index 7913d9a..1749d39 100644
+--- a/gst/rtp/gstrtpmp4gpay.c
++++ b/gst/rtp/gstrtpmp4gpay.c
+@@ -391,6 +391,7 @@ gst_rtp_mp4g_pay_setcaps (GstRTPBasePayload * payload, GstCaps * caps)
+   const GValue *codec_data;
+   const gchar *media_type = NULL;
+   gboolean res;
++  const gchar *name;
+ 
+   rtpmp4gpay = GST_RTP_MP4G_PAY (payload);
+ 
+@@ -401,7 +402,6 @@ gst_rtp_mp4g_pay_setcaps (GstRTPBasePayload * payload, GstCaps * caps)
+     GST_LOG_OBJECT (rtpmp4gpay, "got codec_data");
+     if (G_VALUE_TYPE (codec_data) == GST_TYPE_BUFFER) {
+       GstBuffer *buffer;
+-      const gchar *name;
+ 
+       buffer = gst_value_get_buffer (codec_data);
+       GST_LOG_OBJECT (rtpmp4gpay, "configuring codec_data");
+@@ -427,6 +427,23 @@ gst_rtp_mp4g_pay_setcaps (GstRTPBasePayload * payload, GstCaps * caps)
+ 
+       rtpmp4gpay->config = gst_buffer_copy (buffer);
+     }
++  } else {
++    name = gst_structure_get_name (structure);
++
++    if (!strcmp (name, "video/mpeg")) {
++      rtpmp4gpay->profile = g_strdup ("1");
++
++      /* fixed rate */
++      rtpmp4gpay->rate = 90000;
++      /* video stream type */
++      rtpmp4gpay->streamtype = "4";
++      /* no params for video */
++      rtpmp4gpay->params = NULL;
++      /* mode */
++      rtpmp4gpay->mode = "generic";
++
++      media_type = "video";
++    }
+   }
+   if (media_type == NULL)
+     goto config_failed;
+-- 
+1.7.9.5
+

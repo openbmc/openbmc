@@ -1,0 +1,32 @@
+From a3808fd165847298d025971eb3c7be7d11caba9d Mon Sep 17 00:00:00 2001
+From: "Maxin B. John" <maxin.john@intel.com>
+Date: Wed, 8 Nov 2017 11:56:55 +0200
+Subject: [PATCH] Replace getrpcbynumber_r with getrpcbynumber
+
+musl and uclibc dont implement it
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Maxin B. John <maxin.john@intel.com>
+---
+ svc_socket.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/svc_socket.c b/svc_socket.c
+index 8a44604..5bdaaa0 100644
+--- a/svc_socket.c
++++ b/svc_socket.c
+@@ -36,7 +36,8 @@ static int get_service_port(u_long number, const char *proto)
+ 	struct servent servbuf, *servp = NULL;
+ 	int ret;
+ 
+-	ret = getrpcbynumber_r(number, &rpcbuf, rpcdata, sizeof(rpcdata), &rpcp);
++    rpcp = getrpcbynumber(number);
++    ret = 0;
+ 	if (ret == 0 && rpcp != NULL) {
+ 		/* First try name */
+ 		ret = getservbyname_r(rpcp->r_name, proto, &servbuf, servdata,
+-- 
+2.4.0
+

@@ -46,12 +46,9 @@ DUMMYPROVIDES = "\
     /bin/bash \
     /usr/bin/env \
     /usr/bin/perl \
-    libperl.so.5 \
     pkgconfig \
     pkgconfig-dev \
     pkgconfig-src \
 "
 
 require dummy-sdk-package.inc
-
-SSTATE_DUPWHITELIST += "${PKGDATA_DIR}/${PN} ${PKGDATA_DIR}/runtime/${PN}"

@@ -34,9 +34,10 @@ RDEPENDS_packagegroup-meta-networking-connectivity = "\
     openconnect ez-ipupdate mosquitto sethdlc crda \
     dibbler-server dibbler-client dibbler-requestor dibbler-relay \
     libdnet ufw civetweb freeradius kea daq \
-    mbedtls relayd snort dhcpcd rdate vlan vpnc \
+    mbedtls relayd snort dhcpcd rdate vlan umip vpnc \
     inetutils wolfssl lftp miniupnpd networkmanager \
     networkmanager-openvpn rdist nanomsg python-networkmanager \
+    wireless-regdb \
     ${@bb.utils.contains("DISTRO_FEATURES", "bluez5 x11", "blueman", "", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "samba", "", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "samba", "", d)} \
@@ -92,7 +93,7 @@ RDEPENDS_packagegroup-meta-networking-support = "\
     ncp ndisc6 mtr tinyproxy ssmping ntp \
     wpan-tools bridge-utils ifenslave celt051 pimd \
     nbd-client nbd-server nbd-trdump \
-    phytool fwknop htpdate tcpreplay \
+    phytool fwknop htpdate tcpreplay ipsec-tools \
     traceroute geoip-perl geoip geoipupdate esmtp \
     libtdb netcf dnsmasq curlpp openipmi drbd-utils \
     drbd tunctl dovecot ipvsadm stunnel chrony spice-protocol \

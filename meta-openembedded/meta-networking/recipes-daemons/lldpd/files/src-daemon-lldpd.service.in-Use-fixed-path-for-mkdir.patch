@@ -1,0 +1,32 @@
+From f9f3e4dd31588cce5f655730da7b5c3f56a9bdc1 Mon Sep 17 00:00:00 2001
+From: Fabio Berton <fabio.berton@ossystems.com.br>
+Date: Tue, 26 Sep 2017 09:19:51 -0300
+Subject: [PATCH] src/daemon/lldpd.service.in: Use fixed path for mkdir command
+Organization: O.S. Systems Software LTDA.
+
+@mkdir_p@ is expanded to host tools path ../build/tmp/hosttools/mkdir that
+doesn't exist on target. Remove @mkdir_p@ and use /bin/mkdir -p to
+create /var/run/lldpd directory.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Fabio Berton <fabio.berton@ossystems.com.br>
+---
+ src/daemon/lldpd.service.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/daemon/lldpd.service.in b/src/daemon/lldpd.service.in
+index fdb7338..4291830 100644
+--- a/src/daemon/lldpd.service.in
++++ b/src/daemon/lldpd.service.in
+@@ -9,7 +9,7 @@ Type=notify
+ NotifyAccess=main
+ EnvironmentFile=-/etc/default/lldpd
+ EnvironmentFile=-/etc/sysconfig/lldpd
+-ExecStartPre=@mkdir_p@ @PRIVSEP_CHROOT@
++ExecStartPre=/bin/mkdir -p @PRIVSEP_CHROOT@
+ ExecStart=@sbindir@/lldpd $DAEMON_ARGS $LLDPD_OPTIONS
+ Restart=on-failure
+ PrivateTmp=yes
+-- 
+2.14.2

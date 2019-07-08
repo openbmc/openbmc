@@ -825,9 +825,7 @@
                 versioning schemes, extract code into or out of the
                 <filename>devtool</filename>
                 <ulink url='&YOCTO_DOCS_REF_URL;#devtool-the-workspace-layer-structure'>workspace</ulink>,
-                and work with any source file forms that the
-                <ulink url='&YOCTO_DOCS_BB_URL;#bb-fetchers'>fetchers</ulink>
-                support.
+                and work with any source file forms that the fetchers support.
             </para>
 
             <para>

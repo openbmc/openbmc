@@ -1,0 +1,27 @@
+From b1f61296e2f16c2b9a39c5501e4538628ff01ab4 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 30 Dec 2016 18:26:00 +0200
+Subject: [PATCH 2/2] Set library installation path correctly
+
+Upstream-Status: Submitted [https://github.com/rpm-software-management/libcomps/pull/32]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ libcomps/src/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libcomps/src/CMakeLists.txt b/libcomps/src/CMakeLists.txt
+index e553d77..e2eef9c 100644
+--- a/libcomps/src/CMakeLists.txt
++++ b/libcomps/src/CMakeLists.txt
+@@ -52,7 +52,7 @@ add_dependencies(libcomps src-copy)
+ IF (CMAKE_SIZEOF_VOID_P MATCHES "8")
+     SET (LIB_SUFFIX "64")
+ ENDIF (CMAKE_SIZEOF_VOID_P MATCHES "8")
+-set (LIB_INST_DIR ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX})
++set (LIB_INST_DIR ${CMAKE_INSTALL_LIBDIR})
+ 
+ 
+ install (FILES ${libcomps_HEADERS} DESTINATION include/libcomps)
+-- 
+2.11.0
+

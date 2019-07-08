@@ -1,0 +1,27 @@
+set-ddr should use Python3 like all the other tests.
+
+Upstream-Status: Submitted
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From 17b69cd1da4c5c5f732acb38ca1602446c567ee7 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Mon, 29 Jan 2018 11:31:25 +0000
+Subject: [PATCH] test/setddr: use Python 3
+
+All the other tests use Python 3, so this should to.
+---
+ test/set-ddr | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/set-ddr b/test/set-ddr
+index 5d061b95..33631f31 100755
+--- a/test/set-ddr
++++ b/test/set-ddr
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
+ 
+ import sys
+ import dbus
+-- 
+2.11.0

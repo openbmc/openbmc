@@ -1,3 +1,5 @@
+# ex:ts=4:sw=4:sts=4:et
+# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 #
 # BitBake 'Build' implementation
 #
@@ -163,35 +165,12 @@ class LogTee(object):
 
     def __repr__(self):
         return '<LogTee {0}>'.format(self.name)
-
     def flush(self):
         self.outfile.flush()
 
-
-class StdoutNoopContextManager:
-    """
-    This class acts like sys.stdout, but adds noop __enter__ and __exit__ methods.
-    """
-    def __enter__(self):
-        return sys.stdout
-
-    def __exit__(self, *exc_info):
-        pass
-
-    def write(self, string):
-        return sys.stdout.write(string)
-
-    def flush(self):
-        sys.stdout.flush()
-
-    @property
-    def name(self):
-        return sys.stdout.name
-
-
 #
 # pythonexception allows the python exceptions generated to be raised
-# as the real exceptions (not FuncFailed) and without a backtrace at the
+# as the real exceptions (not FuncFailed) and without a backtrace at the 
 # origin of the failure.
 #
 def exec_func(func, d, dirs = None, pythonexception=False):
@@ -346,42 +325,6 @@ trap 'bb_exit_handler' 0
 set -e
 '''
 
-def create_progress_handler(func, progress, logfile, d):
-    if progress == 'percent':
-        # Use default regex
-        return bb.progress.BasicProgressHandler(d, outfile=logfile)
-    elif progress.startswith('percent:'):
-        # Use specified regex
-        return bb.progress.BasicProgressHandler(d, regex=progress.split(':', 1)[1], outfile=logfile)
-    elif progress.startswith('outof:'):
-        # Use specified regex
-        return bb.progress.OutOfProgressHandler(d, regex=progress.split(':', 1)[1], outfile=logfile)
-    elif progress.startswith("custom:"):
-        # Use a custom progress handler that was injected via OE_EXTRA_IMPORTS or __builtins__
-        import functools
-        from types import ModuleType
-
-        parts = progress.split(":", 2)
-        _, cls, otherargs = parts[0], parts[1], (parts[2] or None) if parts[2:] else None
-        if cls:
-            def resolve(x, y):
-                if not x:
-                    return None
-                if isinstance(x, ModuleType):
-                    return getattr(x, y, None)
-                return x.get(y)
-            cls_obj = functools.reduce(resolve, cls.split("."), bb.utils._context)
-            if not cls_obj:
-                # Fall-back on __builtins__
-                cls_obj = functools.reduce(lambda x, y: x.get(y), cls.split("."), __builtins__)
-            if cls_obj:
-                return cls_obj(d, outfile=logfile, otherargs=otherargs)
-            bb.warn('%s: unknown custom progress handler in task progress varflag value "%s", ignoring' % (func, cls))
-    else:
-        bb.warn('%s: invalid task progress varflag value "%s", ignoring' % (func, progress))
-
-    return logfile
-
 def exec_func_shell(func, d, runfile, cwd=None):
     """Execute a shell function from the metadata
 
@@ -419,13 +362,23 @@ exit $ret
             cmd = [fakerootcmd, runfile]
 
     if bb.msg.loggerDefaultVerbose:
-        logfile = LogTee(logger, StdoutNoopContextManager())
+        logfile = LogTee(logger, sys.stdout)
     else:
-        logfile = StdoutNoopContextManager()
+        logfile = sys.stdout
 
     progress = d.getVarFlag(func, 'progress')
     if progress:
-        logfile = create_progress_handler(func, progress, logfile, d)
+        if progress == 'percent':
+            # Use default regex
+            logfile = bb.progress.BasicProgressHandler(d, outfile=logfile)
+        elif progress.startswith('percent:'):
+            # Use specified regex
+            logfile = bb.progress.BasicProgressHandler(d, regex=progress.split(':', 1)[1], outfile=logfile)
+        elif progress.startswith('outof:'):
+            # Use specified regex
+            logfile = bb.progress.OutOfProgressHandler(d, regex=progress.split(':', 1)[1], outfile=logfile)
+        else:
+            bb.warn('%s: invalid task progress varflag value "%s", ignoring' % (func, progress))
 
     fifobuffer = bytearray()
     def readfifo(data):
@@ -444,8 +397,6 @@ exit $ret
                     bb.plain(value)
                 elif cmd == 'bbnote':
                     bb.note(value)
-                elif cmd == 'bbverbnote':
-                    bb.verbnote(value)
                 elif cmd == 'bbwarn':
                     bb.warn(value)
                 elif cmd == 'bberror':
@@ -477,7 +428,7 @@ exit $ret
             bb.debug(2, "Executing shell function %s" % func)
 
             try:
-                with open(os.devnull, 'r+') as stdin, logfile:
+                with open(os.devnull, 'r+') as stdin:
                     bb.process.run(cmd, shell=False, stdin=stdin, log=logfile, extrafiles=[(fifo,readfifo)])
             except bb.process.CmdError:
                 logfn = d.getVar('BB_LOGFILE')
@@ -853,9 +804,6 @@ def add_tasks(tasklist, d):
         task_deps['parents'][task] = []
         if 'deps' in flags:
             for dep in flags['deps']:
-                # Check and warn for "addtask task after foo" while foo does not exist
-                #if not dep in tasklist:
-                #    bb.warn('%s: dependent task %s for %s does not exist' % (d.getVar('PN'), dep, task))
                 dep = d.expand(dep)
                 task_deps['parents'][task].append(dep)
 

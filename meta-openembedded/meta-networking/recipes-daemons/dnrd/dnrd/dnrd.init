@@ -1,0 +1,94 @@
+#!/bin/sh
+#
+# Startup script for dnrd
+#
+#       Copyright 2008, Rakesh Pandit <rakesh.pandit@gmail.com>
+#
+#       This source is free software; you can redistribute it and/or modify
+#       it under the terms of the GNU General Public License as published by
+#       the Free Software Foundation; either version 2, or (at your option)
+#       any later version.
+
+#       This source is distributed in the hope that it will be useful,
+#       but WITHOUT ANY WARRANTY; without even the implied warranty of
+#       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#       GNU General Public License for more details.
+
+#       You should have received a copy of the GNU General Public License
+#       along with this program; if not, write to the Free Software
+#       Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# chkconfig: - 85 15
+# description: dnrd is a proxying nameserver. It forwards DNS queries to the
+# appropriate nameserver, but can also act as the primary nameserver for
+# a subnet behind a firewall. It also has features such as caching DNS
+# requests, support for DNS servers, cache poisoning prevention, TCP
+# support, etc..
+
+# processname: dnrd
+# pidfile: /var/run/dnrd.pid
+# config: /etc/dnrd/dnrd.conf
+
+# Provides:          dnrd
+# Required-Start:
+# Should-Start:
+# Required-Stop:
+# Default-Stop:      0 1 2 6
+# Short-Description: Start dnrd daemon
+# Description:       Domain Name Relay Daemon
+# END INIT INFO
+
+exe=/usr/sbin/dnrd
+pfile=/etc/passwd
+
+# Source function library.
+. /etc/init.d/functions
+
+# Source conf file
+. /etc/dnrd/dnrd.conf
+
+[ -x $exe ] || exit 1
+[ -r "/etc/dnrd/dnrd.conf" ] || exit 1
+if [ $DNRD_USER ]
+then
+         grep "^${LOGIN}:" $pfile >/dev/null 2>&1
+         if [ $? -eq 0 ];then
+                 echo "$DNRD_USER specified in /etc/dnrd/dnrd.conf does not exist!"
+         fi
+else
+        echo "DNRD_USER not set at /etc/dnrd/dnrd.conf!"
+        exit 1
+fi
+
+case "$1" in
+  start)
+        echo -n "Starting  dnrd: "
+        daemon  dnrd $DNRD_OPTS -u $DNRD_USER
+        echo
+        touch /var/lock/subsys/dnrd
+        ;;
+  stop)
+        echo -n "Shutting down dnrd: "
+        killproc dnrd
+        echo
+        rm -f /var/lock/subsys/dnrd
+        rm -f /var/run/dnrd.pid
+        ;;
+  status)
+        status dnrd
+        ;;
+  restart)
+        $0 stop
+        $0 start
+        ;;
+  reload)
+        echo -n "Reloading dnrd: "
+        killproc dnrd -HUP
+        echo
+        ;;
+  *)
+        echo "Usage: $0 {start|stop|restart|reload|status}"
+        exit 1
+esac
+
+exit 0

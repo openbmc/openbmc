@@ -1,0 +1,30 @@
+From 02ed10fc5215c4a32e6740b0a0c2439659be6801 Mon Sep 17 00:00:00 2001
+From: Changhyeok Bae <changhyeok.bae@gmail.com>
+Date: Mon, 13 Nov 2017 15:59:35 +0000
+Subject: [PATCH] ip: Remove unneed header
+
+Fix redefinition of struct ethhdr with a suitably patched musl libc
+that suppresses the kernel if_ether.h.
+
+Signed-off-by: Changhyeok Bae <changhyeok.bae@gmail.com>
+
+Upstream-Status: Pending [netdev@vger.kernel.org]
+---
+ ip/iplink_bridge.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/ip/iplink_bridge.c b/ip/iplink_bridge.c
+index cccdec1..f065b22 100644
+--- a/ip/iplink_bridge.c
++++ b/ip/iplink_bridge.c
+@@ -13,7 +13,6 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <netinet/in.h>
+-#include <netinet/ether.h>
+ #include <linux/if_link.h>
+ #include <linux/if_bridge.h>
+ #include <net/if.h>
+-- 
+2.7.4
+

@@ -56,18 +56,24 @@ distutils3_do_install() {
         bbfatal_log "'${PYTHON_PN} setup.py install ${DISTUTILS_INSTALL_ARGS}' execution failed."
 
         # support filenames with *spaces*
-        find ${D} -name "*.py" -exec grep -q ${D} {} \; \
-                               -exec sed -i -e s:${D}::g {} \;
+        find ${D} -name "*.py" -exec grep -q ${D} {} \; -exec sed -i -e s:${D}::g {} \;
 
-        for i in ${D}${bindir}/* ${D}${sbindir}/*; do
-            if [ -f "$i" ]; then
-                sed -i -e s:${PYTHON}:${USRBINPATH}/env\ ${DISTUTILS_PYTHON}:g $i
+        if test -e ${D}${bindir} ; then	
+            for i in ${D}${bindir}/* ; do \
+                sed -i -e s:${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN}:${USRBINPATH}/env\ ${DISTUTILS_PYTHON}:g $i
                 sed -i -e s:${STAGING_BINDIR_NATIVE}:${bindir}:g $i
-            fi
-        done
+            done
+        fi
+
+        if test -e ${D}${sbindir}; then
+            for i in ${D}${sbindir}/* ; do \
+                sed -i -e s:${STAGING_BINDIR_NATIVE}/python-${PYTHON_PN}/${PYTHON_PN}:${USRBINPATH}/env\ ${DISTUTILS_PYTHON}:g $i
+                sed -i -e s:${STAGING_BINDIR_NATIVE}:${bindir}:g $i
+            done
+        fi
 
         rm -f ${D}${PYTHON_SITEPACKAGES_DIR}/easy-install.pth
-
+        
         #
         # FIXME: Bandaid against wrong datadir computation
         #

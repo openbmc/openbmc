@@ -1,0 +1,112 @@
+#!/bin/sh
+#
+# mip6d		Start script for the Mobile IPv6 daemon
+#
+# chkconfig:	- 55 25
+# description:	The mobile IPv6 daemon allows nodes to remain \
+#		reachable while moving around in the IPv6 Internet.
+# processname:	mip6d
+# config:	/etc/mip6d.conf
+# config:	/etc/sysconfig/mip6d
+#
+### BEGIN INIT INFO
+# Provides: mipv6-daemon
+# Required-Start: $local_fs $remote_fs $network $named
+# Required-Stop: $local_fs $remote_fs $network
+# Should-Start: $syslog
+# Should-Stop: $network $syslog
+# Default-Start:
+# Default-Stop: 0 1 6
+# Short-Description: Start and stop Mobile IPV6 daemon
+# Description:	The mobile IPv6 daemon allows nodes to remain
+#		reachable while moving around in the IPv6 Internet.
+### END INIT INFO
+
+# Source function library.
+. /etc/init.d/functions
+
+if [ -f /etc/sysconfig/mip6d ]; then
+	. /etc/sysconfig/mip6d
+fi
+
+mip6d=/usr/sbin/mip6d
+prog="mip6d"
+lockfile=/var/lock/subsys/$prog
+
+start() {
+	[ -x $mip6d ] || exit 5
+	echo -n $"Starting $prog: "
+	start-stop-daemon -S -x ${mip6d} && success || failure
+	retval=$?
+	echo
+	[ $retval -eq 0 ] && touch ${lockfile}
+	return $retval
+}
+
+stop() {
+	echo -n $"Stopping $prog: "
+	start-stop-daemon -K -x $mip6d
+	retval=$?
+	echo
+	[ $retval -eq 0 ] && rm -f ${lockfile}
+	return $retval
+}
+
+restart() {
+	stop
+	start
+}
+
+reload()
+{
+	echo -n $"Reloading $prog configuration: "
+	killproc $mip6d -HUP
+	retval=$?
+	echo
+	return $retval
+}
+
+force_reload() {
+	restart
+}
+
+rh_status() {
+	status $prog
+}
+
+rh_status_q() {
+	rh_status > /dev/null 2>&1
+}
+
+case "$1" in
+  start)
+	rh_status_q && exit 0
+	$1
+	;;
+  stop)
+	rh_status_q || exit 0
+	$1
+	;;
+  restart)
+	$1
+	;;
+  reload)
+	rh_status_q || exit 7
+	$1
+	;;
+  force-reload)
+	force_reload
+	;;
+  status)
+	rh_status
+	;;
+  condrestart|try-restart)
+	rh_status_q || exit 0
+	restart
+	;;
+  *)
+	echo $"Usage: $prog {start|stop|status|restart|condrestart|try-restart|reload|force-reload}"
+	exit 2
+esac
+
+exit $?

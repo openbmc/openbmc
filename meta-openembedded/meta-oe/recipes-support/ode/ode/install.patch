@@ -1,0 +1,23 @@
+--- ode-0.9.orig/Makefile.am	2007-02-21 15:54:54.000000000 +0100
++++ ode-0.9/Makefile.am	2010-08-21 16:15:55.000000000 +0200
+@@ -25,13 +25,13 @@
+ 
+ if USE_SONAME
+ install-exec-hook:
+-	ln -s $(libdir)/@ODE_SONAME@.@ODE_REVISION@.@ODE_AGE@ \
+-	$(libdir)/libode.so
+-	ln -s $(libdir)/@ODE_SONAME@.@ODE_REVISION@.@ODE_AGE@ \
+-	$(libdir)/@ODE_SONAME@
+-	ln -s $(libdir)/@ODE_SONAME@.@ODE_REVISION@.@ODE_AGE@ \
+-	$(libdir)/@ODE_SONAME@.@ODE_REVISION@
+-	/sbin/ldconfig
++	ln -s @ODE_SONAME@.@ODE_REVISION@.@ODE_AGE@ \
++	$(DESTDIR)/$(libdir)/libode.so
++	ln -s @ODE_SONAME@.@ODE_REVISION@.@ODE_AGE@ \
++	$(DESTDIR)/$(libdir)/@ODE_SONAME@
++	ln -s @ODE_SONAME@.@ODE_REVISION@.@ODE_AGE@ \
++	$(DESTDIR)/$(libdir)/@ODE_SONAME@.@ODE_REVISION@
++	echo /sbin/ldconfig
+ else
+ install-exec-hook:
+ endif

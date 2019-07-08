@@ -10,8 +10,6 @@ PYTHONHOME. Creating another variable OEPYTHON3HOME to allow for a way
 to set a different path for python3
 
 Signed-off-by: Jaewon Lee <jaewon.lee@xilinx.com>
-
-Upstream-Status: Inappropriate [OE specific configuration]
 ---
  Modules/main.c | 17 +++++++++++++----
  1 file changed, 13 insertions(+), 4 deletions(-)

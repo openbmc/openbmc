@@ -1,0 +1,19 @@
+Upstream: https://bugs.freedesktop.org/show_bug.cgi?id=31358
+
+configure: fix whitelisting of x86_64 unaligned memory access
+
+Fix typo in whitelist so cross-compile works for x86_64.
+
+Upstream-Status: Inappropriate [configuration]
+
+--- liboil-0.3.17/m4/as-unaligned-access.m4.orig	2009-02-26 14:40:08.000000000 -0500
++++ liboil-0.3.17/m4/as-unaligned-access.m4	2010-11-03 12:19:55.000000000 -0400
+@@ -9,7 +9,7 @@
+         _AS_ECHO_N([(blacklisted) ])
+         as_cv_unaligned_access=no
+ 	;;
+-      i?86*|x86_64|amd64|powerpc*|m68k*|cris*)
++      i?86*|x86_64*|amd64*|powerpc*|m68k*|cris*)
+         _AS_ECHO_N([(whitelisted) ])
+         as_cv_unaligned_access=yes
+ 	;;

@@ -1,0 +1,30 @@
+From 9aa01fd5f9d8b2b98c34684dc8f68115750ef41c Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 12 Jul 2016 17:15:13 +0300
+Subject: [PATCH] source-highlight.pc.in: do not add Boost's libraries and
+ includes
+
+This breaks when compiling in sysroots; a proper way is to use Depends
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ source-highlight.pc.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/source-highlight.pc.in b/source-highlight.pc.in
+index 79ab63e..64114a7 100644
+--- a/source-highlight.pc.in
++++ b/source-highlight.pc.in
+@@ -7,6 +7,6 @@ Name: libsource-highlight
+ Description: GNU Source-highlight library.
+ URL: http://www.gnu.org/software/src-highlite/
+ Version: @VERSION@
+-Libs: -L${libdir} -lsource-highlight @BOOST_LDFLAGS@ @BOOST_REGEX_LIB@
+-Cflags: -I${includedir} @BOOST_CPPFLAGS@
++Libs: -L${libdir} -lsource-highlight
++Cflags: -I${includedir}
+ 
+-- 
+2.8.1
+

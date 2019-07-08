@@ -1,0 +1,89 @@
+From a176c69f4fdfbfa7e4ccb79d91c3b6602da7e69a Mon Sep 17 00:00:00 2001
+From: Anders Roxell <anders.roxell@enea.com>
+Date: Thu, 24 Apr 2014 19:28:25 +0200
+Subject: [PATCH 19/28] openssl: enable ptest support
+
+Add 'buildtest' and 'runtest' targets to Makefile, to build and run tests
+cross-compiled.
+
+Signed-off-by: Anders Roxell <anders.roxell@enea.com>
+Signed-off-by: Maxin B. John <maxin.john@enea.com>
+Upstream-Status: Pending
+
+---
+ Makefile.org  | 10 +++++++++-
+ test/Makefile | 13 +++++++++----
+ 2 files changed, 18 insertions(+), 5 deletions(-)
+ 
+diff --git a/Makefile.org b/Makefile.org
+index 111fbba..8e7936c 100644
+--- a/Makefile.org
++++ b/Makefile.org
+@@ -467,8 +467,16 @@ rehash.time: certs apps
+ test:   tests
+ 
+ tests: rehash
++	$(MAKE) buildtest
++	$(MAKE) runtest
++
++buildtest:
++	@(cd test && \
++	$(CLEARENV) && $(MAKE) -e $(BUILDENV) TOP=.. TESTS='$(TESTS)' OPENSSL_DEBUG_MEMORY=on OPENSSL_CONF=../apps/openssl.cnf exe apps);
++
++runtest:
+ 	@(cd test && echo "testing..." && \
+-	$(CLEARENV) && $(MAKE) -e $(BUILDENV) TOP=.. TESTS='$(TESTS)' OPENSSL_DEBUG_MEMORY=on OPENSSL_CONF=../apps/openssl.cnf tests );
++	$(CLEARENV) && $(MAKE) -e $(BUILDENV) TOP=.. TESTS='$(TESTS)' OPENSSL_DEBUG_MEMORY=on OPENSSL_CONF=../apps/openssl.cnf alltests );
+ 	OPENSSL_CONF=apps/openssl.cnf util/opensslwrap.sh version -a
+ 
+ report:
+diff --git a/test/Makefile b/test/Makefile
+index 55a6b50..d46b4d1 100644
+--- a/test/Makefile
++++ b/test/Makefile
+@@ -150,7 +150,7 @@ tests:	exe apps $(TESTS)
+ apps:
+ 	@(cd ..; $(MAKE) DIRS=apps all)
+ 
+-alltests: \
++all-tests= \
+ 	test_des test_idea test_sha test_md4 test_md5 test_hmac \
+ 	test_md2 test_mdc2 test_wp \
+ 	test_rmd test_rc2 test_rc4 test_rc5 test_bf test_cast test_aes \
+@@ -162,6 +162,11 @@ alltests: \
+ 	test_constant_time test_verify_extra test_clienthello test_sslv2conftest \
+ 	test_dtls test_bad_dtls test_fatalerr test_x509_time
+ 
++alltests:
++	@(for i in $(all-tests); do \
++	( $(MAKE) $$i && echo "PASS: $$i" ) || echo "FAIL: $$i"; \
++	done)
++
+ test_evp: $(EVPTEST)$(EXE_EXT) evptests.txt
+ 	../util/shlib_wrap.sh ./$(EVPTEST) evptests.txt
+ 
+@@ -230,7 +235,7 @@ test_x509: ../apps/openssl$(EXE_EXT) tx509 testx509.pem v3-cert1.pem v3-cert2.pe
+ 	echo test second x509v3 certificate
+ 	sh ./tx509 v3-cert2.pem 2>/dev/null
+ 
+-test_rsa: $(RSATEST)$(EXE_EXT) ../apps/openssl$(EXE_EXT) trsa testrsa.pem
++test_rsa: ../apps/openssl$(EXE_EXT) trsa testrsa.pem
+ 	@sh ./trsa 2>/dev/null
+ 	../util/shlib_wrap.sh ./$(RSATEST)
+ 
+@@ -331,11 +336,11 @@ test_tsa: ../apps/openssl$(EXE_EXT) testtsa CAtsa.cnf ../util/shlib_wrap.sh
+ 	  sh ./testtsa; \
+ 	fi
+ 
+-test_ige: $(IGETEST)$(EXE_EXT)
++test_ige:
+ 	@echo "Test IGE mode"
+ 	../util/shlib_wrap.sh ./$(IGETEST)
+ 
+-test_jpake: $(JPAKETEST)$(EXE_EXT)
++test_jpake:
+ 	@echo "Test JPAKE"
+ 	../util/shlib_wrap.sh ./$(JPAKETEST)
+ 
+-- 
+2.15.1

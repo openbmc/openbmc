@@ -8,7 +8,6 @@ DEPENDS += "virtual/${TARGET_PREFIX}binutils virtual/${TARGET_PREFIX}gcc kmod-na
 PACKAGE_WRITE_DEPS += "depmodwrapper-cross"
 
 do_deploy[depends] += "depmodwrapper-cross:do_populate_sysroot"
-do_clean[depends] += "make-mod-scripts:do_clean"
 
 CVE_PRODUCT ?= "linux_kernel"
 

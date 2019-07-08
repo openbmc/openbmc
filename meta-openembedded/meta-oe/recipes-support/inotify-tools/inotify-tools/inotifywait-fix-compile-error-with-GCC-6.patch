@@ -1,0 +1,45 @@
+From 7affb288d6c0726e7b1ebc317a878927b6ef0d02 Mon Sep 17 00:00:00 2001
+From: Andrea Galbusera <gizero@gmail.com>
+Date: Tue, 13 Sep 2016 08:10:29 +0200
+Subject: [PATCH] inotifywait: fix compile error with GCC 6
+
+Fails to compile with misleading-indentation error
+
+| src/inotifywait.c: In function 'output_event_csv':
+| src/inotifywait.c:126:5: error: this 'if' clause does not guard... [-Werror=misleading-indentation]
+|      if (filename != NULL)
+|      ^~
+| src/inotifywait.c:129:2: note: ...this statement, but the latter is misleadingly indented as if it is guarded by the 'if'
+|   printf("%s,", csv_escape( inotifytools_event_to_str( event->mask ) ) );
+|   ^~~~~~
+| cc1: all warnings being treated as errors
+
+Fix indentation to resolve.
+
+Upstream-Status: Submitted [https://github.com/rvoicilas/inotify-tools/pull/66]
+
+Signed-off-by: Andrea Galbusera <gizero@gmail.com>
+---
+ src/inotifywait.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/inotifywait.c b/src/inotifywait.c
+index c5ce5e3..404a85b 100644
+--- a/src/inotifywait.c
++++ b/src/inotifywait.c
+@@ -122,9 +122,9 @@ void validate_format( char * fmt ) {
+ 
+ 
+ void output_event_csv( struct inotify_event * event ) {
+-    char *filename = csv_escape(inotifytools_filename_from_wd(event->wd));
+-    if (filename != NULL)
+-        printf("%s,", filename);
++	char *filename = csv_escape(inotifytools_filename_from_wd(event->wd));
++	if (filename != NULL)
++		printf("%s,", filename);
+ 
+ 	printf("%s,", csv_escape( inotifytools_event_to_str( event->mask ) ) );
+ 	if ( event->len > 0 )
+-- 
+1.9.1
+

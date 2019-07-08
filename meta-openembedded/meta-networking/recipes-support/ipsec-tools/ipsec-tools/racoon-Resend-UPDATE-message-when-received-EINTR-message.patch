@@ -1,0 +1,220 @@
+racoon: Resend UPDATE message when received EINTR message
+
+Upstream-Status: Pending
+
+While kernel is processing the UPDATE message which is sent from racoon,
+it maybe interrupted by system signal and if this case happens,
+kernel responds with an EINTR message to racoon and kernel fails to
+establish the corresponding SA.
+Fix this problem by resend the UPDATE message when EINTR(Interrupted
+system call) error happens.
+
+Signed-off-by: Xufeng Zhang <xufeng.zhang@windriver.com>
+---
+--- a/src/libipsec/libpfkey.h
++++ b/src/libipsec/libpfkey.h
+@@ -92,6 +92,12 @@
+ 	u_int16_t ctxstrlen;		/* length of security context string */
+ };
+ 
++struct update_msg_info {
++        struct sadb_msg *update_msg;
++        int so;
++        int len;
++};
++
+ /* The options built into libipsec */
+ extern int libipsec_opt;
+ #define LIBIPSEC_OPT_NATT		0x01
+--- a/src/libipsec/pfkey.c
++++ b/src/libipsec/pfkey.c
+@@ -1219,7 +1219,8 @@
+ }
+ #endif
+ 
+-
++struct update_msg_info update_msg_send = {NULL, 0, 0};
++
+ /* sending SADB_ADD or SADB_UPDATE message to the kernel */
+ static int
+ pfkey_send_x1(struct pfkey_send_sa_args *sa_parms)
+@@ -1483,10 +1484,24 @@
+ 
+ 	/* send message */
+ 	len = pfkey_send(sa_parms->so, newmsg, len);
+-	free(newmsg);
+ 
+-	if (len < 0)
+-		return -1;
++	if (newmsg->sadb_msg_type == SADB_UPDATE) {
++		if (update_msg_send.update_msg)
++			free(update_msg_send.update_msg);
++		update_msg_send.update_msg = newmsg;
++		update_msg_send.so = sa_parms->so;
++		update_msg_send.len = len;
++
++		if (len < 0) {
++			free(update_msg_send.update_msg);
++			update_msg_send.update_msg = NULL;
++			return -1;
++		}
++	} else {
++		free(newmsg);
++		if (len < 0)
++			return -1;
++	}
+ 
+ 	__ipsec_errcode = EIPSEC_NO_ERROR;
+ 	return len;
+--- a/src/racoon/session.c
++++ b/src/racoon/session.c
+@@ -100,6 +100,8 @@
+ 
+ #include "sainfo.h"
+ 
++extern struct update_msg_info update_msg_send;
++
+ struct fd_monitor {
+ 	int (*callback)(void *ctx, int fd);
+ 	void *ctx;
+@@ -348,6 +350,11 @@
+ 	close_sockets();
+ 	backupsa_clean();
+ 
++	if (update_msg_send.update_msg) {
++		free(update_msg_send.update_msg);
++		update_msg_send.update_msg = NULL;
++	}
++
+ 	plog(LLV_INFO, LOCATION, NULL, "racoon process %d shutdown\n", getpid());
+ 
+ 	exit(0);
+--- a/src/racoon/pfkey.c
++++ b/src/racoon/pfkey.c
+@@ -103,10 +103,12 @@
+ #include "crypto_openssl.h"
+ #include "grabmyaddr.h"
++#include "../libipsec/libpfkey.h"
+ 
+ #if defined(SADB_X_EALG_RIJNDAELCBC) && !defined(SADB_X_EALG_AESCBC)
+ #define SADB_X_EALG_AESCBC  SADB_X_EALG_RIJNDAELCBC
+ #endif
+ 
++extern struct update_msg_info update_msg_send;
+ /* prototype */
+ static u_int ipsecdoi2pfkey_aalg __P((u_int));
+ static u_int ipsecdoi2pfkey_ealg __P((u_int));
+@@ -253,6 +255,13 @@
+ 			s_pfkey_type(msg->sadb_msg_type),
+ 			strerror(msg->sadb_msg_errno));
+ 
++		if (msg->sadb_msg_errno == EINTR &&
++			update_msg_send.update_msg) {
++			plog(LLV_DEBUG, LOCATION, NULL,
++			"pfkey update resend\n");
++			send(update_msg_send.so, (void *)update_msg_send.update_msg, (socklen_t)update_msg_send.len, 0);
++		}
++
+ 		goto end;
+ 	}
+ 
+@@ -498,6 +507,11 @@
+ {
+ 	flushsp();
+ 
++	if (update_msg_send.update_msg) {
++		free(update_msg_send.update_msg);
++		update_msg_send.update_msg = NULL;
++	}
++
+ 	if (pfkey_send_spddump(lcconf->sock_pfkey) < 0) {
+ 		plog(LLV_ERROR, LOCATION, NULL,
+ 			"libipsec sending spddump failed: %s\n",
+@@ -1295,6 +1309,8 @@
+ 	return 0;
+ }
+ 
++int update_received = 0;
++
+ static int
+ pk_recvupdate(mhp)
+ 	caddr_t *mhp;
+@@ -1307,6 +1323,13 @@
+ 	int incomplete = 0;
+ 	struct saproto *pr;
+ 
++	update_received = 1;
++
++	if (update_msg_send.update_msg) {
++                free(update_msg_send.update_msg);
++                update_msg_send.update_msg = NULL;
++        }
++
+ 	/* ignore this message because of local test mode. */
+ 	if (f_local)
+ 		return 0;
+@@ -4163,3 +4186,8 @@
+ 
+ 	return buf;
+ }
++
++int receive_from_isakmp()
++{
++	return pfkey_handler(NULL, lcconf->sock_pfkey);
++}
+--- a/src/racoon/pfkey.h
++++ b/src/racoon/pfkey.h
+@@ -71,5 +71,6 @@
+ extern u_int32_t pk_getseq __P((void));
+ extern const char *sadbsecas2str
+ 	__P((struct sockaddr *, struct sockaddr *, int, u_int32_t, int));
++extern int receive_from_isakmp __P((void));
+ 
+ #endif /* _PFKEY_H */
+--- a/src/racoon/isakmp_quick.c
++++ b/src/racoon/isakmp_quick.c
+@@ -774,6 +774,8 @@
+ 	return error;
+ }
+ 
++extern int update_received;
++
+ /*
+  * send to responder
+  * 	HDR*, HASH(3)
+@@ -892,6 +894,11 @@
+ 	}
+ 	plog(LLV_DEBUG, LOCATION, NULL, "pfkey update sent.\n");
+ 
++	while (!update_received)
++		receive_from_isakmp();
++
++	update_received = 0;
++
+ 	/* Do ADD for responder */
+ 	if (pk_sendadd(iph2) < 0) {
+ 		plog(LLV_ERROR, LOCATION, NULL, "pfkey add failed.\n");
+@@ -1035,6 +1042,11 @@
+ 	}
+ 	plog(LLV_DEBUG, LOCATION, NULL, "pfkey update sent.\n");
+ 
++	while (!update_received)
++		receive_from_isakmp();
++
++	update_received = 0;
++
+ 	/* Do ADD for responder */
+ 	if (pk_sendadd(iph2) < 0) {
+ 		plog(LLV_ERROR, LOCATION, NULL, "pfkey add failed.\n");
+@@ -1989,6 +2001,11 @@
+ 	}
+ 	plog(LLV_DEBUG, LOCATION, NULL, "pfkey update sent.\n");
+ 
++	while (!update_received)
++		receive_from_isakmp();
++
++	update_received = 0;
++
+ 	/* Do ADD for responder */
+ 	if (pk_sendadd(iph2) < 0) {
+ 		plog(LLV_ERROR, LOCATION, NULL, "pfkey add failed.\n");

@@ -1,0 +1,33 @@
+From ab9522177a8396a51812fdbebb6387df451a8499 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Mon, 24 Dec 2018 11:03:58 +0800
+Subject: [PATCH] src/fccache.c: Fix define for HAVE_POSIX_FADVISE
+
+Otherwise, there would be build errors in the following 2 cases:
+* define HAVE_POSIX_FADVISE
+Or:
+* undef HAVE_POSIX_FADVISE
+
+Upstream-Status: Backport [https://gitlab.freedesktop.org/fontconfig/fontconfig/commit/586e35450e9ca7c1dc647ceb9d75ac8ed08c5c16]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ fccache.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/fccache.c b/src/fccache.c
+index 6f3c68a..85cc4b4 100644
+--- a/src/fccache.c
++++ b/src/fccache.c
+@@ -700,7 +700,7 @@ FcDirCacheMapFd (FcConfig *config, int fd, struct stat *fd_stat, struct stat *di
+     {
+ #if defined(HAVE_MMAP) || defined(__CYGWIN__)
+ 	cache = mmap (0, fd_stat->st_size, PROT_READ, MAP_SHARED, fd, 0);
+-#if (HAVE_POSIX_FADVISE) && defined(POSIX_FADV_WILLNEED)
++#if defined(HAVE_POSIX_FADVISE) && defined(POSIX_FADV_WILLNEED)
+ 	posix_fadvise (fd, 0, fd_stat->st_size, POSIX_FADV_WILLNEED);
+ #endif
+ 	if (cache == MAP_FAILED)
+-- 
+2.7.4
+

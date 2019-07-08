@@ -8,17 +8,17 @@ PR = "r1"
 
 SRC_URI = "${GNU_MIRROR}/parted/parted-${PV}.tar.xz \
            file://no_check.patch \
+           file://syscalls.patch \
            file://fix-doc-mandir.patch \
            file://fix-compile-failure-while-dis.patch \
            file://0001-Include-fcntl.h-in-platform_defs.h.patch \
            file://0001-Unset-need_charset_alias-when-building-for-musl.patch \
            file://0002-libparted_fs_resize-link-against-libuuid-explicitly-.patch \
            file://0001-Move-python-helper-scripts-used-only-in-tests-to-Pyt.patch \
-	   file://0001-linux-Include-sys-sysmacros.h-for-major-macro.patch \
+	   file://parted-3.2-sysmacros.patch \
            file://run-ptest \
            file://Makefile \
            file://0001-libparted-Use-read-only-when-probing-devices-on-linu.patch \
-           file://dm_check.patch \
 "
 
 SRC_URI[md5sum] = "0247b6a7b314f8edeb618159fa95f9cb"

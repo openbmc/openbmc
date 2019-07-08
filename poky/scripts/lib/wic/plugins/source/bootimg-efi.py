@@ -55,10 +55,8 @@ class BootimgEFIPlugin(SourcePlugin):
             if not bootimg_dir:
                 raise WicError("Couldn't find DEPLOY_DIR_IMAGE, exiting")
 
-            initrds = initrd.split(';')
-            for rd in initrds:
-                cp_cmd = "cp %s/%s %s" % (bootimg_dir, rd, hdddir)
-                exec_cmd(cp_cmd, True)
+            cp_cmd = "cp %s/%s %s" % (bootimg_dir, initrd, hdddir)
+            exec_cmd(cp_cmd, True)
         else:
             logger.debug("Ignoring missing initrd")
 
@@ -73,24 +71,13 @@ class BootimgEFIPlugin(SourcePlugin):
             grubefi_conf += "timeout=%s\n" % bootloader.timeout
             grubefi_conf += "menuentry '%s'{\n" % (title if title else "boot")
 
-            kernel = get_bitbake_var("KERNEL_IMAGETYPE")
-            if not kernel:
-                kernel = "bzImage"
+            kernel = "/bzImage"
 
-            label = source_params.get('label')
-            label_conf = "root=%s" % creator.rootdev
-            if label:
-                label_conf = "LABEL=%s" % label
-
-            grubefi_conf += "linux /%s %s rootwait %s\n" \
-                % (kernel, label_conf, bootloader.append)
+            grubefi_conf += "linux %s root=%s rootwait %s\n" \
+                % (kernel, creator.rootdev, bootloader.append)
 
             if initrd:
-                initrds = initrd.split(';')
-                grubefi_conf += "initrd"
-                for rd in initrds:
-                    grubefi_conf += " /%s" % rd
-                grubefi_conf += "\n"
+               grubefi_conf += "initrd /%s\n" % initrd
 
             grubefi_conf += "}\n"
 
@@ -125,10 +112,8 @@ class BootimgEFIPlugin(SourcePlugin):
             if not bootimg_dir:
                 raise WicError("Couldn't find DEPLOY_DIR_IMAGE, exiting")
 
-            initrds = initrd.split(';')
-            for rd in initrds:
-                cp_cmd = "cp %s/%s %s" % (bootimg_dir, rd, hdddir)
-                exec_cmd(cp_cmd, True)
+            cp_cmd = "cp %s/%s %s" % (bootimg_dir, initrd, hdddir)
+            exec_cmd(cp_cmd, True)
         else:
             logger.debug("Ignoring missing initrd")
 
@@ -153,28 +138,17 @@ class BootimgEFIPlugin(SourcePlugin):
 
         if not custom_cfg:
             # Create systemd-boot configuration using parameters from wks file
-            kernel = get_bitbake_var("KERNEL_IMAGETYPE")
-            if not kernel:
-                kernel = "bzImage"
-
+            kernel = "/bzImage"
             title = source_params.get('title')
 
             boot_conf = ""
             boot_conf += "title %s\n" % (title if title else "boot")
-            boot_conf += "linux /%s\n" % kernel
-
-            label = source_params.get('label')
-            label_conf = "LABEL=Boot root=%s" % creator.rootdev
-            if label:
-                label_conf = "LABEL=%s" % label
-
-            boot_conf += "options %s %s\n" % \
-                             (label_conf, bootloader.append)
+            boot_conf += "linux %s\n" % kernel
+            boot_conf += "options LABEL=Boot root=%s %s\n" % \
+                             (creator.rootdev, bootloader.append)
 
             if initrd:
-                initrds = initrd.split(';')
-                for rd in initrds:
-                    boot_conf += "initrd /%s\n" % rd
+                boot_conf += "initrd /%s\n" % initrd
 
         logger.debug("Writing systemd-boot config "
                      "%s/hdd/boot/loader/entries/boot.conf", cr_workdir)
@@ -224,12 +198,8 @@ class BootimgEFIPlugin(SourcePlugin):
 
         hdddir = "%s/hdd/boot" % cr_workdir
 
-        kernel = get_bitbake_var("KERNEL_IMAGETYPE")
-        if not kernel:
-            kernel = "bzImage"
-
-        install_cmd = "install -m 0644 %s/%s %s/%s" % \
-            (staging_kernel_dir, kernel, hdddir, kernel)
+        install_cmd = "install -m 0644 %s/bzImage %s/bzImage" % \
+            (staging_kernel_dir, hdddir)
         exec_cmd(install_cmd)
 
 

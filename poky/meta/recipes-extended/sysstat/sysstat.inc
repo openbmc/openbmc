@@ -10,16 +10,15 @@ SRC_URI = "http://pagesperso-orange.fr/sebastien.godard/sysstat-${PV}.tar.xz \
           "
 
 UPSTREAM_CHECK_URI = "http://sebastien.godard.pagesperso-orange.fr/download.html"
-UPSTREAM_VERSION_UNKNOWN = "1"
+UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)\.tar"
 
 DEPENDS += "base-passwd"
 
 # autotools-brokensep as this package doesn't use automake
-inherit autotools-brokensep gettext systemd upstream-version-is-even
+inherit autotools-brokensep gettext systemd
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[lm-sensors] = "--enable-sensors,--disable-sensors,lmsensors,lmsensors-libsensors"
-PACKAGECONFIG[cron] = "--enable-install-cron --enable-copy-only,--disable-install-cron --disable-copy-only"
 
 EXTRA_OECONF += "--disable-stripping"
 
@@ -52,13 +51,15 @@ do_install() {
 }
 
 pkg_postinst_${PN} () {
-	if [  ! -n "$D" ]; then
-		if [ -e /etc/init.d/populate-volatile.sh ]; then
-			/etc/init.d/populate-volatile.sh update
-		fi
-	fi
+        if [ -n "$D" ]; then
+                exit 0
+        fi
+        if [ -e /etc/init.d/populate-volatile.sh ]; then
+                /etc/init.d/populate-volatile.sh update
+        fi
 }
 
-FILES_${PN} += "${libdir}/sa ${systemd_system_unitdir}"
+
+FILES_${PN} += "${libdir}/sa"
 
 TARGET_CC_ARCH += "${LDFLAGS}"
