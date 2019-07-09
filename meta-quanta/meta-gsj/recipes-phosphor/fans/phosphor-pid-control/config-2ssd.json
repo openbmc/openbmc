@@ -3,7 +3,7 @@
         {
             "name": "Fan0_0_RPM",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Fan0_0_RPM",
+            "readPath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/**/fan1_input",
             "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/**/pwm1",
             "min": 0,
             "max": 255
@@ -11,7 +11,7 @@
         {
             "name": "Fan0_1_RPM",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Fan0_1_RPM",
+            "readPath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/**/fan2_input",
             "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/**/pwm1",
             "min": 0,
             "max": 255
@@ -19,7 +19,7 @@
         {
             "name": "Fan1_0_RPM",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Fan1_0_RPM",
+            "readPath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/**/fan3_input",
             "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/**/pwm2",
             "min": 0,
             "max": 255
@@ -27,7 +27,7 @@
         {
             "name": "Fan1_1_RPM",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Fan1_1_RPM",
+            "readPath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/**/fan4_input",
             "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/**/pwm2",
             "min": 0,
             "max": 255
@@ -35,7 +35,7 @@
         {
             "name": "Fan2_0_RPM",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Fan2_0_RPM",
+            "readPath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/**/fan5_input",
             "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/**/pwm3",
             "min": 0,
             "max": 255
@@ -43,7 +43,7 @@
         {
             "name": "Fan2_1_RPM",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Fan2_1_RPM",
+            "readPath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/**/fan6_input",
             "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/**/pwm3",
             "min": 0,
             "max": 255
