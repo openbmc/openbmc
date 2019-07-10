@@ -11,11 +11,19 @@ In addition to witherspoon, this layer contains additional machine
 configurations such as swift. The default machine target is witherspoon,
 so in order to build a different configuration, or to build witherspoon
 after building a different one, set the MACHINE environment to the desired
-configuration name as follows (this is only needed once):
+configuration name (see the conf/machine/ subdirectory for available options):
 
-    export MACHINE="<machine_configuration>"; \
-    export BB_ENV_EXTRAWHITE="$BB_ENV_EXTRAWHITE MACHINE"
+    export MACHINE=machine_configuration_name
 
 Then build:
 
+    bitbake obmc-phosphor-image
+
+Example:
+
+    export MACHINE=swift
+    bitbake obmc-phosphor-image
+    bitbake phosphor-logging
+
+    export MACHINE=witherspoon
     bitbake obmc-phosphor-image
