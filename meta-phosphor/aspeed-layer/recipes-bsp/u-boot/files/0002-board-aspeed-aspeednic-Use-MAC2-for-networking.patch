@@ -1,0 +1,43 @@
+From cbb09e400a5283e5b543e2b01b8c0038890a5260 Mon Sep 17 00:00:00 2001
+From: Xo Wang <xow@google.com>
+Date: Thu, 20 Oct 2016 17:42:13 -0700
+Subject: [PATCH 2/2] board/aspeed, aspeednic: Use MAC2 for networking
+
+Enable and select MAC2 for aspeednic.
+
+Signed-off-by: Xo Wang <xow@google.com>
+---
+ drivers/net/aspeednic.c       | 4 ++--
+ include/configs/ast-g5-ncsi.h | 1 +
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/aspeednic.c b/drivers/net/aspeednic.c
+index 8b85893..cff8370 100644
+--- a/drivers/net/aspeednic.c
++++ b/drivers/net/aspeednic.c
+@@ -18,8 +18,8 @@
+ /* From the board config file */
+ #define CONFIG_MAC1_PHY_SETTING         2
+ #define CONFIG_MAC2_PHY_SETTING         0
+-#define CONFIG_ASPEED_MAC_NUMBER  1
+-#define CONFIG_ASPEED_MAC_CONFIG  1 // config MAC1
++#define CONFIG_ASPEED_MAC_NUMBER  2
++#define CONFIG_ASPEED_MAC_CONFIG  2 // config MAC2
+ #define _PHY_SETTING_CONCAT(mac) CONFIG_MAC##mac##_PHY_SETTING
+ #define _GET_MAC_PHY_SETTING(mac) _PHY_SETTING_CONCAT(mac)
+ #define CONFIG_ASPEED_MAC_PHY_SETTING \
+diff --git a/include/configs/ast-g5-ncsi.h b/include/configs/ast-g5-ncsi.h
+index f73a8f1..1408618 100644
+--- a/include/configs/ast-g5-ncsi.h
++++ b/include/configs/ast-g5-ncsi.h
+@@ -22,6 +22,7 @@
+ /* Ethernet */
+ #define CONFIG_LIB_RAND
+ #define CONFIG_ASPEEDNIC
++#define CONFIG_MAC2_ENABLE
+ 
+ /* platform.S settings */
+ #define	CONFIG_DRAM_ECC_SIZE		0x10000000
+-- 
+2.8.0.rc3.226.g39d4020
+

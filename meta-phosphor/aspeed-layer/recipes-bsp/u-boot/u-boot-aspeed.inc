@@ -12,6 +12,9 @@ SRC_URI_append_aspeed_df-obmc-ubi-fs = " \
 SRC_URI_append_aspeed_df-isolate-bmc = " \
     file://0001-aspeed-Disable-unnecessary-features.patch \
     "
+SRC_URI_append_aspeed_df-aspeednic-use-mac2 = " \
+    file://0002-board-aspeed-aspeednic-Use-MAC2-for-networking.patch \
+    "
 
 do_patch[depends] += "os-release:do_populate_sysroot"
 
