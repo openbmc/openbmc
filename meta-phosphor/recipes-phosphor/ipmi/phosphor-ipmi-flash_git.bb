@@ -24,6 +24,11 @@ PACKAGECONFIG[cleanup-delete] = "--enable-cleanup-delete, --disable-cleanup-dele
 PACKAGECONFIG[reboot-update] = "--enable-reboot-update, --disable-reboot-update"
 PACKAGECONFIG[host-bios] = "--enable-host-bios, --disable-host-bios"
 
+# Hardware options to enable transmitting the data from the host.
+PACKAGECONFIG[aspeed-p2a] = "--enable-aspeed-p2a, --disable-aspeed-p2a"
+PACKAGECONFIG[aspeed-lpc] = "--enable-aspeed-lpc, --disable-aspeed-lpc"
+PACKAGECONFIG[nuvoton-lpc] = "--enable-nuvoton-lpc, --disable-nuvoton-lpc"
+
 EXTRA_OECONF = "--disable-tests --disable-build-host-tool"
 
 S = "${WORKDIR}/git"
