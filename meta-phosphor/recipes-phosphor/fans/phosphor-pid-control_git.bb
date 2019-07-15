@@ -14,7 +14,7 @@ inherit systemd
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/phosphor-pid-control"
-SRCREV = "e7f4a5d5c93b8ee7e91351c6f7c3e66f03cb40f5"
+SRCREV = "fc2e803f5d9256944e18c7c878a441606b1f121c"
 
 # Each platform will need a service file that starts
 # at an appropriate time per system.  For instance, if
