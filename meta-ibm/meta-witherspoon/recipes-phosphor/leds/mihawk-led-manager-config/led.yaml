@@ -1,0 +1,148 @@
+BmcBooted:
+    power:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 250
+        Priority: 'On'
+PowerOn:
+    power:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+EnclosureFault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+EnclosureIdentify:
+    rear-id:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+Fan0Fault:
+    fan0:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'Blink'
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+Fan1Fault:
+    fan1:
+        Action: 'On'
+        DutyOn: 50
+        Period: 1000
+        Priority: 'Blink'
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+Fan2Fault:
+    fan2:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'Blink'
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+Fan3Fault:
+    fan3:
+        Action: 'On'
+        DutyOn: 50
+        Period: 1000
+        Priority: 'Blink'
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+Fan4Fault:
+    fan4:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'Blink'
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+Fan5Fault:
+    fan5:
+        Action: 'On'
+        DutyOn: 50
+        Period: 1000
+        Priority: 'Blink'
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+Powersupply0Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+Powersupply1Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+LampTest:
+    fault:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+        Priority: 'On'
+    rear-id:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+        Priority: 'On'
+    power:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+        Priority: 'On'
+    fan0:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+        Priority: 'Blink'
+    fan1:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+        Priority: 'Blink'
+    fan2:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+        Priority: 'Blink'
+    fan3:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+        Priority: 'Blink'
+    fan4:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+        Priority: 'Blink'
+    fan5:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+        Priority: 'Blink'

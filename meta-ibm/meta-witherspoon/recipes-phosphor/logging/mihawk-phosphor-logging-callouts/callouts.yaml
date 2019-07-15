@@ -1,0 +1,3 @@
+/sys/devices/platform/gpio-fsi/fsi0/slave@00:00/raw: /system/chassis/motherboard/cpu0
+/sys/devices/platform/gpio-fsi/fsi0/slave@00:00/00:00:00:0a/fsi1/slave@01:00/raw: /system/chassis/motherboard/cpu1
+

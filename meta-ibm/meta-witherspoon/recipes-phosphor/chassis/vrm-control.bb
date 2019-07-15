@@ -1,5 +1,5 @@
-SUMMARY = "Witherspoon VRM Overrides"
-DESCRIPTION = "Sets Witherspoon VRMs to custom voltages"
+SUMMARY = "VRM Overrides"
+DESCRIPTION = "Sets VRMs to custom voltages"
 PR = "r1"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${IBMBASE}/COPYING.apache-2.0;md5=34400b68072d710fecd0a2940a0d1658"
@@ -10,13 +10,16 @@ inherit obmc-phosphor-systemd
 RDEPENDS_${PN} += "i2c-tools bash"
 
 S = "${WORKDIR}"
-SRC_URI += "file://vrm-control.sh \
-            file://ir35221-unbind-bind.sh"
+SRC_URI = "file://ir35221-unbind-bind.sh"
+SRC_URI_append_ibm-ac-server = " file://vrm-control.sh"
 
 do_install() {
         install -d ${D}${bindir}
-        install -m 0755 ${WORKDIR}/vrm-control.sh ${D}${bindir}/vrm-control.sh
         install -m 0755 ${WORKDIR}/ir35221-unbind-bind.sh ${D}${bindir}/ir35221-unbind-bind.sh
+}
+
+do_install_append_ibm-ac-server() {
+        install -m 0755 ${WORKDIR}/vrm-control.sh ${D}${bindir}/vrm-control.sh
 }
 
 TMPL = "vrm-control@.service"
@@ -32,7 +35,8 @@ TMPL_ON_IRUNBIND = "ir35221-on-unbind@.service"
 INSTFMT_ON_IRUNBIND = "ir35221-on-unbind@{0}.service"
 FMT_ON_IRUNBIND = "../${TMPL_ON_IRUNBIND}:${TGTFMT_ON}.requires/${INSTFMT_ON_IRUNBIND}"
 
-SYSTEMD_SERVICE_${PN} += "${TMPL} ${TMPL_ON_IRUNBIND} ${TMPL_ON_IRBIND}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_ON', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_SERVICE_${PN} += "${TMPL_ON_IRUNBIND} ${TMPL_ON_IRBIND}"
+SYSTEMD_SERVICE_${PN}_append_ibm-ac-server = " ${TMPL}"
+SYSTEMD_LINK_${PN}_append_ibm-ac-server = " ${@compose_list(d, 'FMT_ON', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_ON_IRBIND', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_ON_IRUNBIND', 'OBMC_CHASSIS_INSTANCES')}"
