@@ -21,6 +21,13 @@ if [ "$(basename -- "$0")" = "setup" ]; then
 	exit 1
 fi
 
+# Check if 'column' command is present
+COLUMN=`which column`
+if [ -z "$COLUMN" ]; then
+    # If it is not, use 'cat'
+	COLUMN=`which cat`
+fi
+
 machine() {
 	local target=$1
 	local build_dir=$2
@@ -54,7 +61,7 @@ machine() {
 if [ -z "$1" ]; then
 	echo Target machine must be specified. Use one of:
 	echo
-	(echo qemuarm; machine) | sort
+	(echo qemuarm; machine) | sort | $COLUMN
 elif [ "$1" = "qemuarm" ]; then
 	source openbmc-env
 else
