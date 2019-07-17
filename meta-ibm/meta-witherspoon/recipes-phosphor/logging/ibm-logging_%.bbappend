@@ -1,2 +1,2 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-PACKAGECONFIG += "policy-interface"
+PACKAGECONFIG_append_ibm-ac-server = " policy-interface"

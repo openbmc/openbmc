@@ -16,7 +16,7 @@ inherit image_version
 unset do_patch[noexec]
 do_patch[depends] = "os-release:do_populate_sysroot"
 
-python do_patch() {
+python do_patch_ibm-ac-server() {
     import json
     import re
     from shutil import copyfile

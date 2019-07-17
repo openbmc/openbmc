@@ -1,6 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-SRC_URI += " \
+SRC_URI_append_ibm-ac-server = " \
            file://70-hwmon.rules \
            file://70-max31785-hwmon.rules \
            file://start_max31785_hwmon.sh \
@@ -46,15 +46,15 @@ OCCSFMT = "devices/platform/gpio-fsi/fsi0/slave@00--00/{0}.conf"
 OCCITEMS = "${@compose_list(d, 'OCCSFMT', 'OCCS')}"
 
 ENVS = "obmc/hwmon/{0}"
-SYSTEMD_ENVIRONMENT_FILE_${PN} += "${@compose_list(d, 'ENVS', 'ITEMS')}"
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append = " ${@compose_list(d, 'ENVS', 'OCCITEMS')}"
+SYSTEMD_ENVIRONMENT_FILE_${PN}_append_ibm-ac-server = " ${@compose_list(d, 'ENVS', 'ITEMS')}"
+SYSTEMD_ENVIRONMENT_FILE_${PN}_append_ibm-ac-server = " ${@compose_list(d, 'ENVS', 'OCCITEMS')}"
 
-SYSTEMD_ENVIRONMENT_FILE_max31785-msl += "obmc/hwmon-max31785/max31785.conf"
-SYSTEMD_LINK_max31785-msl += "../phosphor-max31785-msl@.service:multi-user.target.wants/phosphor-max31785-msl@${MACHINE}.service"
+SYSTEMD_ENVIRONMENT_FILE_max31785-msl_append_ibm-ac-server = " obmc/hwmon-max31785/max31785.conf"
+SYSTEMD_LINK_max31785-msl_append_ibm-ac-server = " ../phosphor-max31785-msl@.service:multi-user.target.wants/phosphor-max31785-msl@${MACHINE}.service"
 
-SYSTEMD_SERVICE_${PN} += "max31785-hwmon-helper@.service"
+SYSTEMD_SERVICE_${PN}_append_ibm-ac-server = " max31785-hwmon-helper@.service"
 
-do_install_append() {
+do_install_append_ibm-ac-server() {
     install -d ${D}/${base_libdir}/udev/rules.d/
     install ${WORKDIR}/70-max31785-hwmon.rules ${D}/${base_libdir}/udev/rules.d/
 
