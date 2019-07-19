@@ -150,6 +150,7 @@ fw_boot_sensor:
     serviceInterface: org.freedesktop.DBus.Properties
 gpu_func_sensor:
     interfaces:
+        xyz.openbmc_project.Inventory.Item.Accelerator:
         xyz.openbmc_project.Inventory.Decorator.Replaceable:
             FieldReplaceable:
                 Offsets:
