@@ -23,6 +23,7 @@ DEPENDS += "virtual/phosphor-logging-callouts"
 DEPENDS += "phosphor-logging-error-logs-native"
 DEPENDS += "phosphor-logging-native"
 DEPENDS += "libcereal"
+DEPENDS += "sdeventplus"
 
 PACKAGE_BEFORE_PN = "${PN}-test"
 FILES_${PN}-test = "${bindir}/*-test"
@@ -64,6 +65,7 @@ DEPENDS_remove_class-native = " \
         sdbus++ \
         systemd \
         libcereal \
+        sdeventplus \
         "
 
 # Do not DEPEND on the specified packages for native SDK build
@@ -74,6 +76,7 @@ DEPENDS_remove_class-nativesdk = " \
         libcereal \
         systemd \
         phosphor-dbus-interfaces \
+        sdeventplus \
         "
 
 PACKAGECONFIG ??= "metadata-processing install_scripts"
