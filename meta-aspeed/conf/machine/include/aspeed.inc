@@ -8,4 +8,10 @@ PREFERRED_PROVIDER_virtual/bootloader_aspeed-g6 ?= "u-boot-aspeed-sdk"
 PREFERRED_PROVIDER_u-boot_aspeed-g6 ?= "u-boot-aspeed-sdk"
 PREFERRED_PROVIDER_u-boot-fw-utils_aspeed-g6 ?= "u-boot-fw-utils-aspeed-sdk"
 
+# Build a FIT image and stuff core-image-minimal in it by default.
+KERNEL_IMAGETYPE ?= "fitImage"
+KERNEL_CLASSES ?= "kernel-fitimage"
+INITRAMFS_IMAGE ?= "aspeed-image-initramfs"
+INITRAMFS_FSTYPES ?= "cpio.xz"
+
 MACHINEOVERRIDES =. "aspeed:"
