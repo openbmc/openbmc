@@ -85,7 +85,7 @@ FLASH_STATIC_RWFS_CMD_static-rwfs-jffs2 = "${JFFS2_RWFS_CMD}"
 FLASH_UBI_RWFS_CMD_ubi-rwfs-jffs2 = "${JFFS2_RWFS_CMD}"
 FLASH_UBI_RWFS_CMD_ubi-rwfs-ubifs = "${UBIFS_RWFS_CMD}"
 
-mk_nor_image() {
+mk_empty_image() {
 	image_dst="$1"
 	image_size_kb=$2
 	dd if=/dev/zero bs=1k count=$image_size_kb \
@@ -170,7 +170,7 @@ do_make_ubi() {
 	ubinize -p ${FLASH_PEB_SIZE}KiB -m ${FLASH_PAGE_SIZE} -o ubi-img $cfg
 
 	# Concatenate the uboot and ubi partitions
-	mk_nor_image ${IMGDEPLOYDIR}/${IMAGE_NAME}.ubi.mtd ${FLASH_SIZE}
+	mk_empty_image ${IMGDEPLOYDIR}/${IMAGE_NAME}.ubi.mtd ${FLASH_SIZE}
 	dd bs=1k conv=notrunc seek=${FLASH_UBOOT_OFFSET} \
 		if=${DEPLOY_DIR_IMAGE}/u-boot.${UBOOT_SUFFIX} \
 		of=${IMGDEPLOYDIR}/${IMAGE_NAME}.ubi.mtd
@@ -191,7 +191,7 @@ do_make_ubi[depends] += " \
 
 do_mk_static_nor_image() {
 	# Assemble the flash image
-	mk_nor_image ${IMGDEPLOYDIR}/${IMAGE_NAME}.static.mtd ${FLASH_SIZE}
+	mk_empty_image ${IMGDEPLOYDIR}/${IMAGE_NAME}.static.mtd ${FLASH_SIZE}
 }
 
 python do_generate_static() {
