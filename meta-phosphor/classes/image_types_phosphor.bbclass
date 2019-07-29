@@ -16,16 +16,18 @@ IMAGE_BASETYPE ?= "squashfs-xz"
 OVERLAY_BASETYPE ?= "jffs2"
 FLASH_UBI_BASETYPE ?= "${IMAGE_BASETYPE}"
 FLASH_UBI_OVERLAY_BASETYPE ?= "ubifs"
+FLASH_EXT4_BASETYPE ?= "ext4"
 FLASH_EXT4_OVERLAY_BASETYPE ?= "ext4"
 
-IMAGE_TYPES += "mtd-static mtd-static-alltar mtd-static-tar mtd-ubi mtd-ubi-tar"
+IMAGE_TYPES += "mtd-static mtd-static-alltar mtd-static-tar mtd-ubi mtd-ubi-tar mmc-ext4-tar"
 
 IMAGE_TYPEDEP_mtd-static = "${IMAGE_BASETYPE}"
 IMAGE_TYPEDEP_mtd-static-tar = "${IMAGE_BASETYPE}"
 IMAGE_TYPEDEP_mtd-static-alltar = "mtd-static"
 IMAGE_TYPEDEP_mtd-ubi = "${FLASH_UBI_BASETYPE}"
 IMAGE_TYPEDEP_mtd-ubi-tar = "${FLASH_UBI_BASETYPE}"
-IMAGE_TYPES_MASKED += "mtd-static mtd-static-alltar mtd-static-tar mtd-ubi mtd-ubi-tar"
+IMAGE_TYPEDEP_mmc-ext4-tar = "${FLASH_EXT4_BASETYPE}"
+IMAGE_TYPES_MASKED += "mtd-static mtd-static-alltar mtd-static-tar mtd-ubi mtd-ubi-tar mmc-ext4-tar"
 
 # Flash characteristics in KB unless otherwise noted
 DISTROOVERRIDES .= ":flash-${FLASH_SIZE}"
@@ -383,6 +385,23 @@ do_generate_ubi_tar[depends] += " \
         ${PN}:do_copy_signing_pubkey \
         "
 
+do_generate_ext4_tar() {
+	ln -sf ${S}/MANIFEST MANIFEST
+	ln -sf ${S}/publickey publickey
+	make_image_links rwfs.${FLASH_EXT4_OVERLAY_BASETYPE} ${FLASH_EXT4_BASETYPE}
+	make_signatures image-u-boot image-kernel image-rofs image-rwfs MANIFEST publickey
+	make_tar_of_images ext4.mmc MANIFEST publickey ${signature_files}
+}
+do_generate_ext4_tar[dirs] = " ${S}/ext4"
+do_generate_ext4_tar[depends] += " \
+        ${PN}:do_image_${FLASH_EXT4_BASETYPE} \
+        virtual/kernel:do_deploy \
+        u-boot:do_populate_sysroot \
+        openssl-native:do_populate_sysroot \
+        ${SIGNING_KEY_DEPENDS} \
+        ${PN}:do_copy_signing_pubkey \
+        "
+
 def get_pubkey_basedir(d):
     return os.path.join(
         d.getVar('STAGING_DIR_TARGET', True),
@@ -460,4 +479,10 @@ python() {
                 'do_generate_ubi_tar',
                 'do_image_complete',
                 'do_generate_rwfs_ubi do_generate_phosphor_manifest', d)
+
+    if 'mmc-ext4-tar' in types:
+        bb.build.addtask(
+                'do_generate_ext4_tar',
+                'do_image_complete',
+                'do_generate_rwfs_ext4 do_generate_phosphor_manifest', d)
 }
