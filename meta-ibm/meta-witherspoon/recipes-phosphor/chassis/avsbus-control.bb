@@ -10,13 +10,16 @@ RDEPENDS_${PN} += "i2c-tools"
 
 S = "${WORKDIR}"
 
-SRC_URI += "file://avsbus-disable.sh \
-            file://avsbus-enable.sh"
+SRC_URI += "file://avsbus-enable.sh"
+SRC_URI_append_witherspoon = " file://avsbus-disable.sh"
 
 do_install() {
         install -d ${D}${bindir}
-        install -m 0755 ${S}/avsbus-disable.sh ${D}${bindir}/avsbus-disable.sh
         install -m 0755 ${S}/avsbus-enable.sh ${D}${bindir}/avsbus-enable.sh
+}
+
+do_install_append_witherspoon() {
+        install -m 0755 ${S}/avsbus-disable.sh ${D}${bindir}/avsbus-disable.sh
 }
 
 TMPL_EN= "avsbus-enable@.service"
@@ -29,5 +32,5 @@ FMT_DIS = "../${TMPL_DIS}:${TGTFMT}.requires/${INSTFMT_DIS}"
 
 SYSTEMD_SERVICE_${PN} += "${TMPL_EN}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_EN', 'OBMC_CHASSIS_INSTANCES')}"
-SYSTEMD_SERVICE_${PN} += "${TMPL_DIS}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_DIS', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_SERVICE_${PN}_append_witherspoon = " ${TMPL_DIS}"
+SYSTEMD_LINK_${PN}_append_witherspoon = " ${@compose_list(d, 'FMT_DIS', 'OBMC_CHASSIS_INSTANCES')}"

@@ -1,12 +1,13 @@
 [Unit]
-Description=Disable the AVS bus on the VRMs
-Before=vrm-control@%i.service
+Description=Enable the AVS bus on VRMs
+Wants=op-power-start@%i.service
+Before=op-power-start@%i.service
 Conflicts=obmc-chassis-poweroff@%i.target
 ConditionPathExists=!/run/openbmc/chassis@%i-on
 
 [Service]
-ExecStart=/usr/bin/env avsbus-disable.sh
-SyslogIdentifier=avsbus-disable.sh
+ExecStart={bindir}/avsbus-enable.sh
+SyslogIdentifier=avsbus-enable.sh
 Type=oneshot
 RemainAfterExit=yes
 
