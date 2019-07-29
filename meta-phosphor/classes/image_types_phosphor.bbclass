@@ -92,6 +92,15 @@ mk_empty_image() {
 		| tr '\000' '\377' > $image_dst
 }
 
+clean_rwfs() {
+	type=$1
+	shift
+
+	rm -f ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.$type
+	rm -rf $type
+	mkdir $type
+}
+
 make_rwfs() {
 	type=$1
 	cmd=$2
@@ -99,14 +108,13 @@ make_rwfs() {
 	shift
 	opts="$@"
 
-	rm -f ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.$type
-	rm -rf $type
-	mkdir $type
+	mkdir -p $type
 
 	$cmd $opts
 }
 
 do_generate_rwfs_static() {
+	clean_rwfs ${OVERLAY_BASETYPE}
 	make_rwfs ${OVERLAY_BASETYPE} "${FLASH_STATIC_RWFS_CMD}" ${OVERLAY_MKFS_OPTS}
 }
 do_generate_rwfs_static[dirs] = " ${S}/static"
@@ -115,6 +123,7 @@ do_generate_rwfs_static[depends] += " \
         "
 
 do_generate_rwfs_ubi() {
+	clean_rwfs ${FLASH_UBI_OVERLAY_BASETYPE}
 	make_rwfs ${FLASH_UBI_OVERLAY_BASETYPE} "${FLASH_UBI_RWFS_CMD}"
 }
 do_generate_rwfs_ubi[dirs] = " ${S}/ubi"
