@@ -16,6 +16,7 @@ IMAGE_BASETYPE ?= "squashfs-xz"
 OVERLAY_BASETYPE ?= "jffs2"
 FLASH_UBI_BASETYPE ?= "${IMAGE_BASETYPE}"
 FLASH_UBI_OVERLAY_BASETYPE ?= "ubifs"
+FLASH_EXT4_OVERLAY_BASETYPE ?= "ext4"
 
 IMAGE_TYPES += "mtd-static mtd-static-alltar mtd-static-tar mtd-ubi mtd-ubi-tar"
 
@@ -77,13 +78,16 @@ python() {
 # Instead, prefix the overlay override value with 'rwfs-' to avoid collisions.
 DISTROOVERRIDES .= ":static-rwfs-${OVERLAY_BASETYPE}"
 DISTROOVERRIDES .= ":ubi-rwfs-${FLASH_UBI_OVERLAY_BASETYPE}"
+DISTROOVERRIDES .= ":mmc-rwfs-${FLASH_EXT4_OVERLAY_BASETYPE}"
 
 JFFS2_RWFS_CMD = "mkfs.jffs2 --root=jffs2 --faketime --output=${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.jffs2"
 UBIFS_RWFS_CMD = "mkfs.ubifs -r ubifs -c ${FLASH_UBI_RWFS_LEBS} -m ${FLASH_PAGE_SIZE} -e ${FLASH_LEB_SIZE} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.ubifs"
+EXT4_RWFS_CMD = "mkfs.ext4 -F ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.rwfs.ext4"
 
 FLASH_STATIC_RWFS_CMD_static-rwfs-jffs2 = "${JFFS2_RWFS_CMD}"
 FLASH_UBI_RWFS_CMD_ubi-rwfs-jffs2 = "${JFFS2_RWFS_CMD}"
 FLASH_UBI_RWFS_CMD_ubi-rwfs-ubifs = "${UBIFS_RWFS_CMD}"
+FLASH_EXT4_RWFS_CMD_mmc-rwfs-ext4 = "${EXT4_RWFS_CMD}"
 
 mk_empty_image() {
 	image_dst="$1"
@@ -129,6 +133,16 @@ do_generate_rwfs_ubi() {
 do_generate_rwfs_ubi[dirs] = " ${S}/ubi"
 do_generate_rwfs_ubi[depends] += " \
         mtd-utils-native:do_populate_sysroot \
+        "
+
+do_generate_rwfs_ext4() {
+	clean_rwfs rwfs.${FLASH_EXT4_OVERLAY_BASETYPE}
+	mk_empty_image ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.rwfs.ext4 1024
+	make_rwfs ${FLASH_EXT4_OVERLAY_BASETYPE} "${FLASH_EXT4_RWFS_CMD}" ${OVERLAY_MKFS_OPTS}
+}
+do_generate_rwfs_ext4[dirs] = " ${S}/ext4"
+do_generate_rwfs_ext4[depends] += " \
+        e2fsprogs-native:do_populate_sysroot \
         "
 
 add_volume() {
@@ -415,6 +429,7 @@ addtask copy_signing_pubkey after do_rootfs
 addtask generate_phosphor_manifest after do_rootfs
 addtask generate_rwfs_static after do_rootfs
 addtask generate_rwfs_ubi after do_rootfs
+addtask generate_rwfs_ext4 after do_rootfs
 
 python() {
     types = d.getVar('IMAGE_FSTYPES', True).split()
