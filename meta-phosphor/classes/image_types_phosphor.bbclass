@@ -314,11 +314,11 @@ make_tar_of_images() {
 	extra_files="$@"
 
 	# Create the tar archive
-	tar -h -cvf ${IMGDEPLOYDIR}/${IMAGE_NAME}.$type.mtd.tar \
+	tar -h -cvf ${IMGDEPLOYDIR}/${IMAGE_NAME}.$type.tar \
 		image-u-boot image-kernel image-rofs image-rwfs $extra_files
 
 	cd ${IMGDEPLOYDIR}
-	ln -sf ${IMAGE_NAME}.$type.mtd.tar ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.$type.mtd.tar
+	ln -sf ${IMAGE_NAME}.$type.tar ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.$type.tar
 }
 
 do_generate_static_tar() {
@@ -326,7 +326,7 @@ do_generate_static_tar() {
 	ln -sf ${S}/publickey publickey
 	make_image_links ${OVERLAY_BASETYPE} ${IMAGE_BASETYPE}
 	make_signatures image-u-boot image-kernel image-rofs image-rwfs MANIFEST publickey
-	make_tar_of_images static MANIFEST publickey ${signature_files}
+	make_tar_of_images static.mtd MANIFEST publickey ${signature_files}
 
 	# Maintain non-standard legacy link.
 	cd ${IMGDEPLOYDIR}
@@ -348,7 +348,7 @@ do_generate_ubi_tar() {
 	ln -sf ${S}/publickey publickey
 	make_image_links ${FLASH_UBI_OVERLAY_BASETYPE} ${FLASH_UBI_BASETYPE}
 	make_signatures image-u-boot image-kernel image-rofs image-rwfs MANIFEST publickey
-	make_tar_of_images ubi MANIFEST publickey ${signature_files}
+	make_tar_of_images ubi.mtd MANIFEST publickey ${signature_files}
 }
 do_generate_ubi_tar[dirs] = " ${S}/ubi"
 do_generate_ubi_tar[depends] += " \
