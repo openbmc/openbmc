@@ -12,6 +12,7 @@ SRCREV = "baa29d5ecc47e6b32a3422c897dcbe30e7209e2b"
 
 UBRANCH = "aspeed-master-v2019.04"
 SRC_URI = "git://github.com/AspeedTech-BMC/u-boot;branch=${UBRANCH};protocol=https"
+SRC_URI += "file://0001-aspeed-Limit-bootm-memory.patch"
 
 S = "${WORKDIR}/git"
 
