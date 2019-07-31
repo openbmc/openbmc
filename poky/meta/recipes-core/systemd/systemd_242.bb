@@ -198,6 +198,11 @@ EXTRA_OEMESON += "-Dnobody-user=nobody \
                   -Dsysvrcnd-path=${sysconfdir} \
                   -Ddefault-locale=C \
                   "
+		  
+# Fallback to more trustworthy NTP and DNS servers (OpenNIC Anycast and NTP Pool Project)
+EXTRA_OEMESON += "-Ddns-servers=\"185.121.177.177 169.239.202.202\" \
+                  -Dntp-servers=\"0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 3.pool.ntp.org\" \
+		 "
 
 # Hardcode target binary paths to avoid using paths from sysroot
 EXTRA_OEMESON += "-Dkexec-path=${sbindir}/kexec \
