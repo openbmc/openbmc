@@ -34,9 +34,38 @@ CHIPS_append_swift = " \
                bus@1e78a000/i2c-bus@3c0/ir35221@71 \
                bus@1e78a000/i2c-bus@3c0/ir35221@72 \
                "
+CHIPS_mihawk = " \
+               bus@1e78a000/i2c-bus@100/power-supply@58 \
+               bus@1e78a000/i2c-bus@100/power-supply@5b \
+               bus@1e78a000/i2c-bus@140/ir35221@70 \
+               bus@1e78a000/i2c-bus@140/ir35221@72 \
+               bus@1e78a000/i2c-bus@180/ir35221@70 \
+               bus@1e78a000/i2c-bus@180/ir35221@72 \
+               bus@1e78a000/i2c-bus@400/tmp275@48 \
+               bus@1e78a000/i2c-bus@400/tmp275@49 \
+               pwm-tacho-controller@1e786000 \
+               bus@1e78a000/i2c-bus@400/emc1403@4c \
+               bus@1e78a000/i2c-bus@440/pca9545@70/i2c@3/tmp275@48 \
+               "
 
 ITEMSFMT = "ahb/apb/{0}.conf"
 ITEMS = "${@compose_list(d, 'ITEMSFMT', 'CHIPS')}"
+ITEMS_append_mihawk += " iio-hwmon-vdd0.conf"
+ITEMS_append_mihawk += " iio-hwmon-vdd1.conf"
+ITEMS_append_mihawk += " iio-hwmon-vcs0.conf"
+ITEMS_append_mihawk += " iio-hwmon-vcs1.conf"
+ITEMS_append_mihawk += " iio-hwmon-vdn0.conf"
+ITEMS_append_mihawk += " iio-hwmon-vdn1.conf"
+ITEMS_append_mihawk += " iio-hwmon-vio0.conf"
+ITEMS_append_mihawk += " iio-hwmon-vio1.conf"
+ITEMS_append_mihawk += " iio-hwmon-vddra.conf"
+ITEMS_append_mihawk += " iio-hwmon-vddrb.conf"
+ITEMS_append_mihawk += " iio-hwmon-vddrc.conf"
+ITEMS_append_mihawk += " iio-hwmon-vddrd.conf"
+ITEMS_append_mihawk += " iio-hwmon-12v.conf"
+ITEMS_append_mihawk += " iio-hwmon-5v.conf"
+ITEMS_append_mihawk += " iio-hwmon-3v.conf"
+ITEMS_append_mihawk += " iio-hwmon-battery.conf"
 
 OCCS = " \
         00--00--00--06/sbefifo1-dev0/occ-hwmon.1 \
@@ -48,6 +77,8 @@ OCCITEMS = "${@compose_list(d, 'OCCSFMT', 'OCCS')}"
 ENVS = "obmc/hwmon/{0}"
 SYSTEMD_ENVIRONMENT_FILE_${PN}_append_ibm-ac-server = " ${@compose_list(d, 'ENVS', 'ITEMS')}"
 SYSTEMD_ENVIRONMENT_FILE_${PN}_append_ibm-ac-server = " ${@compose_list(d, 'ENVS', 'OCCITEMS')}"
+SYSTEMD_ENVIRONMENT_FILE_${PN}_append_mihawk = " ${@compose_list(d, 'ENVS', 'ITEMS')}"
+SYSTEMD_ENVIRONMENT_FILE_${PN}_append_mihawk = " ${@compose_list(d, 'ENVS', 'OCCITEMS')}"
 
 SYSTEMD_ENVIRONMENT_FILE_max31785-msl_append_ibm-ac-server = " obmc/hwmon-max31785/max31785.conf"
 SYSTEMD_LINK_max31785-msl_append_ibm-ac-server = " ../phosphor-max31785-msl@.service:multi-user.target.wants/phosphor-max31785-msl@${MACHINE}.service"

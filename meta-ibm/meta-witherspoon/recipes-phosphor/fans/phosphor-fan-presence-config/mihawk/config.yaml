@@ -1,0 +1,47 @@
+- name: fan0
+  path: /system/chassis/motherboard/fan0
+  methods:
+    - type: gpio
+      key: 9
+      physpath: /sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c-bus/i2c-3/3-0060
+      devpath: /dev/input/by-path/platform-gpio-keys-polled-event
+
+- name: fan1
+  path: /system/chassis/motherboard/fan1
+  methods:
+    - type: gpio
+      key: 10
+      physpath: /sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c-bus/i2c-3/3-0060
+      devpath: /dev/input/by-path/platform-gpio-keys-polled-event
+
+- name: fan2
+  path: /system/chassis/motherboard/fan2
+  methods:
+    - type: gpio
+      key: 11
+      physpath: /sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c-bus/i2c-3/3-0060
+      devpath: /dev/input/by-path/platform-gpio-keys-polled-event
+
+- name: fan3
+  path: /system/chassis/motherboard/fan3
+  methods:
+    - type: gpio
+      key: 12
+      physpath: /sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c-bus/i2c-3/3-0060
+      devpath: /dev/input/by-path/platform-gpio-keys-polled-event
+
+- name: fan4
+  path: /system/chassis/motherboard/fan4
+  methods:
+    - type: gpio
+      key: 13
+      physpath: /sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c-bus/i2c-3/3-0060
+      devpath: /dev/input/by-path/platform-gpio-keys-polled-event
+
+- name: fan5
+  path: /system/chassis/motherboard/fan5
+  methods:
+    - type: gpio
+      key: 14
+      physpath: /sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c-bus/i2c-3/3-0060
+      devpath: /dev/input/by-path/platform-gpio-keys-polled-event

@@ -9,15 +9,20 @@ inherit phosphor-dbus-monitor
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI += "file://air-cooled.yaml"
-SRC_URI += "file://water-cooled.yaml"
+SRC_URI_append_ibm-ac-server = " file://water-cooled.yaml"
 SRC_URI += "file://fan-errors.yaml"
 
-do_install() {
+do_install_append_ibm-ac-server() {
         install -D ${WORKDIR}/air-cooled.yaml ${D}${config_dir}/air-cooled.yaml
         install -D ${WORKDIR}/water-cooled.yaml ${D}${config_dir}/water-cooled.yaml
         install -D ${WORKDIR}/fan-errors.yaml ${D}${config_dir}/fan-errors.yaml
 }
 
+do_install_append_mihawk() {
+        install -D ${WORKDIR}/air-cooled.yaml ${D}${config_dir}/air-cooled.yaml
+        install -D ${WORKDIR}/fan-errors.yaml ${D}${config_dir}/fan-errors.yaml
+}
+
 FILES_${PN} += "${config_dir}/air-cooled.yaml"
-FILES_${PN} += "${config_dir}/water-cooled.yaml"
+FILES_${PN}_append_ibm-ac-server = " ${config_dir}/water-cooled.yaml"
 FILES_${PN} += "${config_dir}/fan-errors.yaml"
