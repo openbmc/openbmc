@@ -19,6 +19,15 @@ DEPENDS += " \
         phosphor-dbus-interfaces \
         openpower-dbus-interfaces \
         "
+
+# For libpdbg, provided by the pdbg package
+DEPENDS += "pdbg"
+
+# For now, explicitly depend on the pdbg package for the pdbg binary at runtime
+# (as documentation). This will be removed shortly when we only depend on
+# libpdbg; the pdbg package will automatically injected into RDEPENDS by
+# bitbake as it is in DEPENDS and openpower-proc-nmi has a runtime link
+# dependency on libpdbg.
 RDEPENDS_${PN} += "pdbg"
 
 TEMPLATE = "pcie-poweroff@.service"
