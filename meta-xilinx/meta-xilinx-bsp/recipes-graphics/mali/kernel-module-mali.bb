@@ -21,6 +21,9 @@ SRC_URI = " \
 	file://0009-mali_memory_swap_alloc.c-Rename-global_page_state-wi.patch \
 	file://0010-common-mali_pm.c-Add-PM-runtime-barrier-after-removi.patch \
 	file://0011-linux-mali_kernel_linux.c-Enable-disable-clock-for-r.patch\
+	file://0012-linux-mali_memory_os_alloc-Remove-__GFP_COLD.patch\
+	file://0013-linux-mali_memory_secure-Add-header-file-dma-direct..patch\
+	file://0014-linux-mali_-timer-Get-rid-of-init_timer.patch\
 	"
 SRC_URI[md5sum] = "8f04ae86957fd56197ad5a9d017b84ff"
 SRC_URI[sha256sum] = "bfd14fa3f75a71d4ba313534e651ca1c58dc354e882c0b39867e335882a06350"

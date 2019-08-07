@@ -1,4 +1,4 @@
-From 19e63107670bb15833744402d68c8fcae9e53a12 Mon Sep 17 00:00:00 2001
+From 4e0f83d815461d501fef788236dab356c9b60ea5 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 6 Feb 2016 11:11:41 -0800
 Subject: [PATCH 07/18] initialize front back wayland buffers
@@ -30,5 +30,5 @@ index 1f923d9..9a9582c 100644
     }
  #endif
 -- 
-2.20.1
+2.21.0
 

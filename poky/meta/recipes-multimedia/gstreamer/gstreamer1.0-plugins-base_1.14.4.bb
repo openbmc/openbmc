@@ -20,6 +20,7 @@ SRC_URI = " \
             file://0010-gl-Add-switch-for-explicitely-enabling-disabling-GBM.patch \
             file://0011-gl-Add-switches-for-explicitely-enabling-disabling-P.patch \
             file://link-with-libvchostif.patch \
+            file://CVE-2019-9928.patch \
             "
 SRC_URI[md5sum] = "4dbe20c1bf44191c2b8833234df5cb2a"
 SRC_URI[sha256sum] = "ca6139490e48863e7706d870ff4e8ac9f417b56f3b9e4b3ce490c13b09a77461"

@@ -12,6 +12,7 @@ SRC_URI = "git://github.com/vim/vim.git \
            file://disable_acl_header_check.patch;patchdir=.. \
            file://vim-add-knob-whether-elf.h-are-checked.patch;patchdir=.. \
            file://0001-src-Makefile-improve-reproducibility.patch;patchdir=.. \
+           file://CVE-2019-12735.patch;patchdir=.. \
 "
 SRCREV = "493fbe4abee660d30b4f2aef87b754b0a720213c"
 

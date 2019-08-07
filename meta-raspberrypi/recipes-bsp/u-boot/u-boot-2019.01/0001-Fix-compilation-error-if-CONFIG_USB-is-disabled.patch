@@ -1,0 +1,73 @@
+From e4617bdb29e9c88e85f056f3aea46a2c8a5312e2 Mon Sep 17 00:00:00 2001
+From: akaher <akaher@vmware.com>
+Date: Thu, 11 Apr 2019 05:23:50 +0000
+Subject: [PATCH] Fix compilation error if CONFIG_USB is disabled
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This patch is to fix the following compilation error when
+disabling CONFIG_USB for Rpi3:
+
+include/config_distro_bootcmd.h:242:2: error: expected ‘}’
+before ‘BOOT_TARGET_DEVICES_references_USB_without_CONFIG_CMD_USB’
+     BOOT_TARGET_DEVICES_references_USB_without_CONFIG_CMD_USB
+
+Signed-off-by: Ajay Kaher <akaher@vmware.com>
+Signed-off-by: Matthias Brugger <mbrugger@suse.com>
+Upstream-status: Backport
+---
+ include/configs/rpi.h | 36 +++++++++++++++++++++++++++++++-----
+ 1 file changed, 31 insertions(+), 5 deletions(-)
+
+diff --git a/include/configs/rpi.h b/include/configs/rpi.h
+index 9ce41767a9..f76c7d18ef 100644
+--- a/include/configs/rpi.h
++++ b/include/configs/rpi.h
+@@ -146,12 +146,38 @@
+ 	"fdt_addr_r=0x02600000\0" \
+ 	"ramdisk_addr_r=0x02700000\0"
+ 
++#if CONFIG_IS_ENABLED(CMD_MMC)
++	#define BOOT_TARGET_MMC(func) \
++		func(MMC, mmc, 0) \
++		func(MMC, mmc, 1)
++#else
++	#define BOOT_TARGET_MMC(func)
++#endif
++
++#if CONFIG_IS_ENABLED(CMD_USB)
++	#define BOOT_TARGET_USB(func) func(USB, usb, 0)
++#else
++	#define BOOT_TARGET_USB(func)
++#endif
++
++#if CONFIG_IS_ENABLED(CMD_PXE)
++	#define BOOT_TARGET_PXE(func) func(PXE, pxe, na)
++#else
++	#define BOOT_TARGET_PXE(func)
++#endif
++
++#if CONFIG_IS_ENABLED(CMD_DHCP)
++	#define BOOT_TARGET_DHCP(func) func(DHCP, dhcp, na)
++#else
++	#define BOOT_TARGET_DHCP(func)
++#endif
++
+ #define BOOT_TARGET_DEVICES(func) \
+-	func(MMC, mmc, 0) \
+-	func(MMC, mmc, 1) \
+-	func(USB, usb, 0) \
+-	func(PXE, pxe, na) \
+-	func(DHCP, dhcp, na)
++	BOOT_TARGET_MMC(func) \
++	BOOT_TARGET_USB(func) \
++	BOOT_TARGET_PXE(func) \
++	BOOT_TARGET_DHCP(func)
++
+ #include <config_distro_bootcmd.h>
+ 
+ #define CONFIG_EXTRA_ENV_SETTINGS \
+-- 
+2.22.0
+

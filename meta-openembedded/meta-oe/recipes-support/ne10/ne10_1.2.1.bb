@@ -15,13 +15,15 @@ PV .= "gitr+${SRCPV}"
 
 inherit cmake
 
-# Incompatible with archs other than armv7 and aarch64
+# Incompatible with archs other than armv7, armv7ve and aarch64
 COMPATIBLE_MACHINE = "(^$)"
 COMPATIBLE_MACHINE_aarch64 = "(.*)"
 COMPATIBLE_MACHINE_armv7a = "(.*)"
+COMPATIBLE_MACHINE_armv7ve = "(.*)"
 NE10_TARGET_ARCH = ""
 NE10_TARGET_ARCH_aarch64 = "aarch64"
 NE10_TARGET_ARCH_armv7a = "armv7"
+NE10_TARGET_ARCH_armv7ve = "armv7"
 
 EXTRA_OECMAKE = '-DGNULINUX_PLATFORM=ON -DNE10_BUILD_SHARED=ON -DNE10_LINUX_TARGET_ARCH="${NE10_TARGET_ARCH}"'
 

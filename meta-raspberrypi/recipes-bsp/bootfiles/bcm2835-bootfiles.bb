@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENCE.broadcom;md5=4a4d169737c0786fb9482bb6d30401d1
 
 inherit deploy nopackages
 
-include recipes-bsp/common/firmware.inc
+include recipes-bsp/common/raspberrypi-firmware.inc
 
 INHIBIT_DEFAULT_DEPS = "1"
 

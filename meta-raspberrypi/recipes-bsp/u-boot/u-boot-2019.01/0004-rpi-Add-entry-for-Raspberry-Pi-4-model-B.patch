@@ -1,0 +1,33 @@
+From c1f29f486b08ab6d90fe2c191157274f6dea0443 Mon Sep 17 00:00:00 2001
+From: Andrei Gherzan <andrei@balena.io>
+Date: Wed, 17 Jul 2019 15:34:18 +0100
+Subject: [PATCH 4/7] rpi: Add entry for Raspberry Pi 4 model B
+
+The Raspebrry Pi 4 uses the new revision code scheme as documented by
+the foundation. This change adds an entry for this board as well.
+
+Signed-off-by: Andrei Gherzan <andrei@balena.io>
+Upstream-status: Pending
+---
+ board/raspberrypi/rpi/rpi.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/board/raspberrypi/rpi/rpi.c b/board/raspberrypi/rpi/rpi.c
+index 153a1fdcb7..5510ea25c1 100644
+--- a/board/raspberrypi/rpi/rpi.c
++++ b/board/raspberrypi/rpi/rpi.c
+@@ -143,6 +143,11 @@ static const struct rpi_model rpi_models_new_scheme[] = {
+ 		DTB_DIR "bcm2837-rpi-3-a-plus.dtb",
+ 		false,
+ 	},
++	[0x11] = {
++		"4 Model B",
++		DTB_DIR "bcm2838-rpi-4-b.dtb",
++		true,
++	},
+ };
+ 
+ static const struct rpi_model rpi_models_old_scheme[] = {
+-- 
+2.22.0
+

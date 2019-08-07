@@ -20,6 +20,9 @@ SRC_URI = "git://git.umip.org/umip/umip.git \
            "
 SRCREV = "cbd441c5db719db554ff2b4fcb02fef88ae2f791"
 
+# Depends on ipsec-tools which is already MACHINE_ARCH (and also RRECOMMENDS kernel modules)
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 S = "${WORKDIR}/git"
 
 EXTRA_OECONF = "--enable-vt"

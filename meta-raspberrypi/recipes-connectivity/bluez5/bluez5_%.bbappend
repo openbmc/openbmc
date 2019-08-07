@@ -1,6 +1,6 @@
 FILESEXTRAPATHS_prepend_rpi := "${THISDIR}/${PN}:"
 
-RC_URI_append_rpi = "\
+SRC_URI_append_rpi = "\
     file://0001-bcm43xx-Add-bcm43xx-3wire-variant.patch \
     file://0002-bcm43xx-The-UART-speed-must-be-reset-after-the-firmw.patch \
     file://0003-Increase-firmware-load-timeout-to-30s.patch \

@@ -1,0 +1,26 @@
+From cb65478b8ec240b372a9da7fe33875a59e89a1fe Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Mon, 10 Jul 2017 16:07:28 +0530
+Subject: [PATCH] fixing the imm bug. with relax option imm -1 is also getting
+ removed this is corrected now.
+
+Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
+
+---
+ bfd/elf32-microblaze.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
+index d19a6dc..d001437 100644
+--- a/bfd/elf32-microblaze.c
++++ b/bfd/elf32-microblaze.c
+@@ -1869,8 +1869,7 @@ microblaze_elf_relax_section (bfd *abfd,
+       else
+ 	symval += irel->r_addend;
+ 
+-      if ((symval & 0xffff8000) == 0
+-	  || (symval & 0xffff8000) == 0xffff8000)
++      if ((symval & 0xffff8000) == 0)
+ 	{
+ 	  /* We can delete this instruction.  */
+ 	  sec->relax[sec->relax_count].addr = irel->r_offset;

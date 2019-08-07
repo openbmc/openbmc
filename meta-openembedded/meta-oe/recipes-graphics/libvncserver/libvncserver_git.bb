@@ -32,6 +32,6 @@ inherit cmake
 
 SRC_URI = "git://github.com/LibVNC/libvncserver"
 SRCREV = "c0a23857a5c42b45b6d22ccf7218becd1fa69402"
-
+PV = "0.9.12+git${SRCPV}"
 
 S = "${WORKDIR}/git"

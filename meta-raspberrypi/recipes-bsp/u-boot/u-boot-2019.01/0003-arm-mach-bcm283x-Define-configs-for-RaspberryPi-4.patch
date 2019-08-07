@@ -1,0 +1,108 @@
+From 83f8a3a98ea268873e45a1b3868b2f5bdcc3b5f1 Mon Sep 17 00:00:00 2001
+From: Andrei Gherzan <andrei@balena.io>
+Date: Wed, 17 Jul 2019 15:33:01 +0100
+Subject: [PATCH 3/7] arm: mach-bcm283x: Define configs for RaspberryPi 4
+
+Define two target configs for Raspberry Pi 4 (32 and 64bit) and the
+corresponding BCM2838* configs.
+
+Be aware of the current limitation in firmware which requires an
+explicit configuration to force the arm in 64bit mode when the
+respective target is used.
+
+Signed-off-by: Andrei Gherzan <andrei@balena.io>
+Signed-off-by: Matthias Brugger <mbrugger@suse.com>
+Upstream-status: Pending
+---
+ arch/arm/mach-bcm283x/Kconfig | 62 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 62 insertions(+)
+
+diff --git a/arch/arm/mach-bcm283x/Kconfig b/arch/arm/mach-bcm283x/Kconfig
+index d702f17f4b..a3311500fa 100644
+--- a/arch/arm/mach-bcm283x/Kconfig
++++ b/arch/arm/mach-bcm283x/Kconfig
+@@ -26,6 +26,23 @@ config BCM2837_64B
+ 	select BCM2837
+ 	select ARM64
+ 
++config BCM2838
++	bool "Broadcom BCM2838 SoC support"
++	depends on ARCH_BCM283X
++
++config BCM2838_32B
++	bool "Broadcom BCM2838 SoC 32-bit support"
++	depends on ARCH_BCM283X
++	select BCM2838
++	select ARMV7_LPAE
++	select CPU_V7A
++
++config BCM2838_64B
++	bool "Broadcom BCM2838 SoC 64-bit support"
++	depends on ARCH_BCM283X
++	select BCM2838
++	select ARM64
++
+ menu "Broadcom BCM283X family"
+ 	depends on ARCH_BCM283X
+ 
+@@ -127,6 +144,50 @@ config TARGET_RPI_3
+ 	  This option creates a build targetting the ARMv8/AArch64 ISA.
+ 	select BCM2837_64B
+ 
++config TARGET_RPI_4_32B
++	bool "Raspberry Pi 4 32-bit build"
++	help
++	  Support for all BCM2838-based Raspberry Pi variants, such as
++	  the RPi 4 model B, in AArch32 (32-bit) mode.
++
++	  This option assumes the VideoCore firmware is configured to use the
++	  mini UART (rather than PL011) for the serial console. This is the
++	  default on the RPi 4. To enable the UART console, the following non-
++	  default option must be present in config.txt: enable_uart=1. This is
++	  required for U-Boot to operate correctly, even if you only care
++	  about the HDMI/usbkbd console.
++
++	  Due to hardware incompatibilities, this can't be used with
++	  BCM283/5/6/7.
++
++	  This option creates a build targeting the ARMv7/AArch32 ISA.
++	select BCM2838_32B
++
++config TARGET_RPI_4
++	bool "Raspberry Pi 4 64-bit build"
++	help
++	  Support for all BCM2838-based Raspberry Pi variants, such as
++	  the RPi 4 model B, in AArch64 (64-bit) mode.
++
++	  This option assumes the VideoCore firmware is configured to use the
++	  mini UART (rather than PL011) for the serial console. This is the
++	  default on the RPi 4. To enable the UART console, the following non-
++	  default option must be present in config.txt: enable_uart=1. This is
++	  required for U-Boot to operate correctly, even if you only care
++	  about the HDMI/usbkbd console.
++
++	  Due to hardware incompatibilities, this can't be used with
++	  BCM283/5/6/7.
++
++	  Also, due to a bug in firmware, switching to 64bit mode doesn't
++	  happen automatically based on the kernel's image filename. See
++	  https://github.com/raspberrypi/firmware/issues/1193 for more details.
++	  Until that is resolved, the configuration (config.txt) needs to
++	  explicitly set: arm_64bit=1.
++
++	  This option creates a build targeting the ARMv8/AArch64 ISA.
++	select BCM2838_64B
++
+ endchoice
+ 
+ config SYS_BOARD
+@@ -145,5 +206,6 @@ config BCM283x_BASE
+ 	hex
+ 	default "0x20000000" if BCM2835
+ 	default "0x3f000000" if BCM2836 || BCM2837
++	default "0xfe000000" if BCM2838
+ 
+ endmenu
+-- 
+2.22.0
+

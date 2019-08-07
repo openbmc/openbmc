@@ -14,6 +14,8 @@ SRC_URI = "http://downloads.yoctoproject.org/mirror/sources/${BP}.tar.gz \
            file://Makefile.am;subdir=${BP} \
            file://run-ptest \
            file://CVE-2016-3189.patch \
+           file://CVE-2019-12900.patch \
+           file://fix-regression-CVE-2019-12900.patch \
            "
 
 SRC_URI[md5sum] = "00b516f4704d4a7cb50a1d97e6e8e15b"

@@ -55,6 +55,7 @@ do_image_rpi_sdimg[depends] = " \
     dosfstools-native:do_populate_sysroot \
     virtual/kernel:do_deploy \
     ${IMAGE_BOOTLOADER}:do_deploy \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'armstub', 'armstubs:do_deploy', '' ,d)} \
     ${@bb.utils.contains('RPI_USE_U_BOOT', '1', 'u-boot:do_deploy', '',d)} \
     ${@bb.utils.contains('RPI_USE_U_BOOT', '1', 'rpi-u-boot-scr:do_deploy', '',d)} \
 "
@@ -113,6 +114,9 @@ IMAGE_CMD_rpi-sdimg () {
     rm -f ${WORKDIR}/boot.img
     mkfs.vfat -F32 -n "${BOOTDD_VOLUME_ID}" -S 512 -C ${WORKDIR}/boot.img $BOOT_BLOCKS
     mcopy -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/bcm2835-bootfiles/* ::/
+    if [ "${@bb.utils.contains("MACHINE_FEATURES", "armstub", "1", "0", d)}" = "1" ]; then
+        mcopy -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/armstubs/${ARMSTUB} ::/
+    fi
     if test -n "${DTS}"; then
         # Copy board device trees to root folder
         for dtbf in ${@split_overlays(d, True)}; do
@@ -143,7 +147,7 @@ IMAGE_CMD_rpi-sdimg () {
         fi
     fi
 
-    if [ -n ${FATPAYLOAD} ] ; then
+    if [ -n "${FATPAYLOAD}" ] ; then
         echo "Copying payload into VFAT"
         for entry in ${FATPAYLOAD} ; do
             # add the || true to stop aborting on vfat issues like not supporting .~lock files

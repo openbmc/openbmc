@@ -1,0 +1,62 @@
+From cfb82f8e75438979565617d323eb2c2849e486ce Mon Sep 17 00:00:00 2001
+From: Andrei Gherzan <andrei@balena.io>
+Date: Fri, 12 Jul 2019 14:27:31 +0100
+Subject: [PATCH 7/7] rpi: Add memory map for bcm2838
+
+Define the memory map for the BCM2838 based on the dt configuration
+available in the Raspberry Pi kernel fork.
+
+Signed-off-by: Andrei Gherzan <andrei@balena.io>
+Upstream-status: Pending
+---
+ board/raspberrypi/rpi/rpi.c | 27 ++++++++++++++++++++++++---
+ 1 file changed, 24 insertions(+), 3 deletions(-)
+
+diff --git a/board/raspberrypi/rpi/rpi.c b/board/raspberrypi/rpi/rpi.c
+index 5510ea25c1..9dac64b920 100644
+--- a/board/raspberrypi/rpi/rpi.c
++++ b/board/raspberrypi/rpi/rpi.c
+@@ -244,7 +244,8 @@ static uint32_t rev_type;
+ static const struct rpi_model *model;
+ 
+ #ifdef CONFIG_ARM64
+-static struct mm_region bcm2837_mem_map[] = {
++#ifndef CONFIG_BCM2838
++static struct mm_region bcm283x_mem_map[] = {
+ 	{
+ 		.virt = 0x00000000UL,
+ 		.phys = 0x00000000UL,
+@@ -263,8 +264,28 @@ static struct mm_region bcm2837_mem_map[] = {
+ 		0,
+ 	}
+ };
+-
+-struct mm_region *mem_map = bcm2837_mem_map;
++#else
++static struct mm_region bcm283x_mem_map[] = {
++	{
++		.virt = 0x00000000UL,
++		.phys = 0x00000000UL,
++		.size = 0xfe000000UL,
++		.attrs = PTE_BLOCK_MEMTYPE(MT_NORMAL) |
++			 PTE_BLOCK_INNER_SHARE
++	}, {
++		.virt = 0xfe000000UL,
++		.phys = 0xfe000000UL,
++		.size = 0x01800000UL,
++		.attrs = PTE_BLOCK_MEMTYPE(MT_DEVICE_NGNRNE) |
++			 PTE_BLOCK_NON_SHARE |
++			 PTE_BLOCK_PXN | PTE_BLOCK_UXN
++	}, {
++		/* List terminator */
++		0,
++	}
++};
++#endif
++struct mm_region *mem_map = bcm283x_mem_map;
+ #endif
+ 
+ int dram_init(void)
+-- 
+2.22.0
+

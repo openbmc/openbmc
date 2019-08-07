@@ -1358,7 +1358,7 @@
                     For example, the following line specifies three
                     configuration files:
                     <literallayout class='monospaced'>
-     BBMULTIFONFIG = "configA configB configC"
+     BBMULTICONFIG = "configA configB configC"
                     </literallayout>
                     Each configuration file you use must reside in the
                     <link linkend='build-directory'>Build Directory</link>

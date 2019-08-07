@@ -1,5 +1,6 @@
 SRC_URI = "${GNU_MIRROR}/wget/wget-${PV}.tar.gz \
            file://0002-improve-reproducibility.patch \
+           file://CVE-2019-5953.patch \
           "
 
 SRC_URI[md5sum] = "f6ebe9c7b375fc9832fb1b2028271fb7"

@@ -1,4 +1,4 @@
-From 469840d211beb22085e57934bda3caabb71a4695 Mon Sep 17 00:00:00 2001
+From ad6f485d9eb809b67398ce0948844dd30ea1c8e3 Mon Sep 17 00:00:00 2001
 From: Tomeu Vizoso <tomeu.vizoso@collabora.com>
 Date: Tue, 1 Oct 2013 13:19:20 +0200
 Subject: [PATCH 02/18] wayland: Add support for the Wayland winsys
@@ -91,11 +91,11 @@ index cfc8ae5..673a5ad 100644
  
  # Global include paths
 diff --git a/README.md b/README.md
-index de5754d..2097036 100644
+index 404e4d4..97a6b8f 100644
 --- a/README.md
 +++ b/README.md
-@@ -6,3 +6,7 @@ Use buildme to build. It requires cmake to be installed and an arm cross compile
- https://github.com/raspberrypi/tools/tree/master/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian
+@@ -8,3 +8,7 @@ https://github.com/raspberrypi/tools/tree/master/arm-bcm2708/gcc-linaro-arm-linu
+ Whilst 64-bit userspace is not officially supported, some of the libraries will work for it. To cross compile, install gcc-aarch64-linux-gnu and g++-aarch64-linux-gnu first. For both native and cross compiles, add the option ```--aarch64``` to the buildme command.
  
  Note that this repository does not contain the source for the edidparser and vcdbg binaries due to licensing restrictions.
 +
@@ -103,10 +103,10 @@ index de5754d..2097036 100644
 +
 +$ BUILD_WAYLAND=1 ./buildme.
 diff --git a/buildme b/buildme
-index b8fd440..a780bb6 100755
+index cee90a6..d1d76a7 100755
 --- a/buildme
 +++ b/buildme
-@@ -8,6 +8,10 @@ fi
+@@ -17,6 +17,10 @@ fi
  
  BUILDSUBDIR=`echo $BUILDTYPE | tr '[A-Z]' '[a-z]'`;
  
@@ -114,10 +114,10 @@ index b8fd440..a780bb6 100755
 +       WAYLAND_VARS="-DBUILD_WAYLAND=TRUE"
 +fi
 +
- if [ "armv6l" = `arch` ] || [ "armv7l" = `arch` ]; then
+ if [ $ARCH = "armv6l" ] || [ $ARCH = "armv7l" ] || [ $ARCH = "aarch64" ]; then
  	# Native compile on the Raspberry Pi
  	mkdir -p build/raspberry/$BUILDSUBDIR
-@@ -32,9 +36,13 @@ elif [ "$1" = "--native" ]; then
+@@ -41,9 +45,13 @@ elif [ "$1" = "--native" ]; then
  	make -j `nproc` $*
  else
  	# Cross compile on a more capable machine
@@ -127,8 +127,8 @@ index b8fd440..a780bb6 100755
 +	fi
  	mkdir -p build/arm-linux/$BUILDSUBDIR
  	pushd build/arm-linux/$BUILDSUBDIR
--	cmake -DCMAKE_TOOLCHAIN_FILE=../../../makefiles/cmake/toolchains/arm-linux-gnueabihf.cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE ../../..
-+	cmake -DCMAKE_TOOLCHAIN_FILE=../../../makefiles/cmake/toolchains/arm-linux-gnueabihf.cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE $WAYLAND_VARS ../../..
+-	cmake -DCMAKE_TOOLCHAIN_FILE=$CMAKE_TOOLCHAIN_FILE -DCMAKE_BUILD_TYPE=$BUILDTYPE -DARM64=$ARM64 ../../..
++	cmake -DCMAKE_TOOLCHAIN_FILE=$CMAKE_TOOLCHAIN_FILE -DCMAKE_BUILD_TYPE=$BUILDTYPE -DARM64=$ARM64 $WAYLAND_VARS ../../..
  	make -j `nproc`
  
  	if [ "$1" != "" ]; then
@@ -1894,5 +1894,5 @@ index 0000000..ad90d30
 +    set(${_sources} ${${_sources}} PARENT_SCOPE)
 +endfunction()
 -- 
-2.20.1
+2.21.0
 

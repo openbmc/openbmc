@@ -220,7 +220,8 @@ RDEPENDS_packagegroup-meta-oe-shells ="\
 
 NE10 = ""
 NE10_aarch64 = "ne10"
-NE10_arm7 = "ne10"
+NE10_armv7a = "ne10"
+NE10_armv7ve = "ne10"
 
 RDEPENDS_packagegroup-meta-oe-support ="\
     anthy asio atop augeas avro-c bdwgc frame grail \

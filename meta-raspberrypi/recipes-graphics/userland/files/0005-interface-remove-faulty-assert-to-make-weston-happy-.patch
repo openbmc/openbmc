@@ -1,4 +1,4 @@
-From d17e5b9285635dcbe1c6e5a7398f6e5b1560a0c0 Mon Sep 17 00:00:00 2001
+From e2d13265a34519364bd7d27d54a860967b320504 Mon Sep 17 00:00:00 2001
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Date: Sat, 24 Jan 2015 22:07:19 +0100
 Subject: [PATCH 05/18] interface: remove faulty assert() to make weston happy
@@ -25,5 +25,5 @@ index eab146e..29e0dee 100755
              }
           } else {
 -- 
-2.20.1
+2.21.0
 
