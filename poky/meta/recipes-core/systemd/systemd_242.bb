@@ -200,7 +200,7 @@ EXTRA_OEMESON += "-Dnobody-user=nobody \
                   "
 		  
 # Fallback to more trustworthy NTP and DNS servers (OpenNIC Anycast and NTP Pool Project)
-EXTRA_OEMESON += "-Ddns-servers=\"185.121.177.177 169.239.202.202\" \
+EXTRA_OEMESON += "-Ddns-servers=\"185.121.177.177 169.239.202.202 2a05:dfc7:5::53 2a05:dfc7:5353::53\" \
                   -Dntp-servers=\"0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 3.pool.ntp.org\" \
 		 "
 
