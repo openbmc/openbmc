@@ -17,3 +17,5 @@ INITRAMFS_FSTYPES ?= "cpio.xz"
 MACHINEOVERRIDES =. "aspeed:"
 
 SERIAL_CONSOLES ?= "115200;ttyS4"
+
+DEFAULTTUNE_aspeed-g6 ?= "armv7a-vfpv4d16"
