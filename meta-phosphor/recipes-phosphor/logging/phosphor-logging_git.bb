@@ -92,6 +92,11 @@ PACKAGECONFIG[install_scripts] = " \
         --disable-install_scripts, ,\
         "
 
+PACKAGECONFIG[openpower-pels] = " \
+        --enable-openpower-pel-extension, \
+        --disable-openpower-pel-extension, ,\
+        "
+
 # Enable install_scripts during native and native SDK build
 PACKAGECONFIG_add_class-native = "install_scripts"
 PACKAGECONFIG_add_class-nativesdk = "install_scripts"
