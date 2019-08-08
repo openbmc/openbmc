@@ -15,3 +15,5 @@ INITRAMFS_IMAGE ?= "aspeed-image-initramfs"
 INITRAMFS_FSTYPES ?= "cpio.xz"
 
 MACHINEOVERRIDES =. "aspeed:"
+
+SERIAL_CONSOLES ?= "115200;ttyS4"
