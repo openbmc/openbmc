@@ -2,5 +2,3 @@ SOC_FAMILY = "aspeed-g4"
 include conf/machine/include/soc-family.inc
 require conf/machine/include/aspeed.inc
 require conf/machine/include/tune-arm926ejs.inc
-
-UBOOT_MACHINE ?= "ast_g4_ncsi_config"
