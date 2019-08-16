@@ -4,5 +4,3 @@ require conf/machine/include/aspeed.inc
 require conf/machine/include/tune-arm926ejs.inc
 
 UBOOT_MACHINE ?= "ast_g4_ncsi_config"
-
-MACHINE_EXTRA_RDEPENDS += "udev-aspeed-vuart"
