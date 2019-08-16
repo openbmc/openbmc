@@ -1,14 +1,13 @@
-DESCRIPTION = "A small image for building meta-security packages"
+DESCRIPTION = "A small image for building a tpm image for testing"
 
 IMAGE_FEATURES += "ssh-server-openssh"
 
 IMAGE_INSTALL = "\
     packagegroup-base \
     packagegroup-core-boot \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'tpm',  'packagegroup-security-tpm',  '', d)} \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'tpm2', 'packagegroup-security-tpm2', '', d)} \
+    packagegroup-security-tpm \
     os-release \
-    ${CORE_IMAGE_EXTRA_INSTALL}"
+"
 
 IMAGE_LINGUAS ?= " "
 

@@ -1,0 +1,31 @@
+php: remove host specific info from header file
+
+https://sources.debian.org/data/main/p/php7.3/7.3.6-1/debian/patches/
+        0036-php-5.4.9-fixheader.patch
+
+Upstream-Status: Inappropriate [not author]
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+---
+From: Debian PHP Maintainers <pkg-php-maint@lists.alioth.debian.org>
+Date: Sat, 2 May 2015 10:26:56 +0200
+Subject: php-5.4.9-fixheader
+
+Make generated php_config.h constant across rebuilds.
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 433d7e6..41893d7 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1357,7 +1357,7 @@ PHP_BUILD_DATE=`date -u +%Y-%m-%d`
+ fi
+ AC_DEFINE_UNQUOTED(PHP_BUILD_DATE,"$PHP_BUILD_DATE",[PHP build date])
+ 
+-PHP_UNAME=`uname -a | xargs`
++PHP_UNAME=`uname | xargs`
+ AC_DEFINE_UNQUOTED(PHP_UNAME,"$PHP_UNAME",[uname -a output])
+ PHP_OS=`uname | xargs`
+ AC_DEFINE_UNQUOTED(PHP_OS,"$PHP_OS",[uname output])

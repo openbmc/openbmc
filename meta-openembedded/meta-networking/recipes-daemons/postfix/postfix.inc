@@ -14,17 +14,6 @@ DEPENDS = "db icu libpcre libnsl2 openssl postfix-native \
 LICENSE = "IPL-1.0 | EPL-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=b181651ad99a7dc4cc8c4ce2f491ed1a"
 
-SRC_URI = "ftp://ftp.porcupine.org/mirrors/postfix-release/official/postfix-${PV}.tar.gz \
-    file://makedefs.patch \
-    file://install.patch \
-    file://main.cf \
-    file://postfix \
-    file://internal_recipient \
-    file://postfix.service \
-    file://aliasesdb \
-    file://check_hostname.sh \
-"
-
 S = "${WORKDIR}/postfix-${PV}"
 
 CLEANBROKEN = "1"
@@ -196,11 +185,15 @@ do_install_append_class-native() {
     ln -sf ../sbin/sendmail.postfix ${D}${bindir}/mailq
 }
 
-ALTERNATIVE_${PN} += "sendmail mailq newaliases"
+ALTERNATIVE_${PN} = "sendmail mailq newaliases"
+# /usr/lib/sendmial is required by LSB core test
+ALTERNATIVE_${PN}_linuxstdbase = "sendmail mailq newaliases usr-lib-sendmail"
 ALTERNATIVE_TARGET[mailq] = "${bindir}/mailq"
 ALTERNATIVE_TARGET[newaliases] = "${bindir}/newaliases"
 ALTERNATIVE_TARGET[sendmail] = "${sbindir}/sendmail.postfix"
 ALTERNATIVE_LINK_NAME[sendmail] = "${sbindir}/sendmail"
+ALTERNATIVE_TARGET[usr-lib-sendmail] = "${sbindir}/sendmail.postfix"
+ALTERNATIVE_LINK_NAME[usr-lib-sendmail] = "/usr/lib/sendmail"
 
 ALTERNATIVE_PRIORITY = "120"
 
@@ -219,11 +212,6 @@ pkg_postinst_${PN} () {
         touch /etc/postfix/virtual_alias
         postmap /etc/postfix/virtual_alias
     else
-        if ${@'true' if 'linuxstdbase' in d.getVar('DISTROOVERRIDES', False) else 'false'}; then
-            # /usr/lib/sendmail is required by LSB core test
-            [ ! -L $D/usr/lib/sendmail ] && ln -sf ${sbindir}/sendmail $D/usr/lib/
-        fi
-
         touch $D/etc/aliases
         # This can fail depending on host setup
         if ! newaliases -C $D/etc/postfix/main.cf -oA$D/etc/aliases; then

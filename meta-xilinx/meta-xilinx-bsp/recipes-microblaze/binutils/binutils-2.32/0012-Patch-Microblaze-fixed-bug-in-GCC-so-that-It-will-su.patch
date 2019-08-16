@@ -1,0 +1,33 @@
+From 58271555959fcc3eadb1f23c8d31d793c979984b Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Fri, 29 Sep 2017 18:00:23 +0530
+Subject: [PATCH] fixed bug in GCC so that It will support .long 0U and .long
+ 0u
+
+Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
+Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
+
+---
+ gas/expr.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/gas/expr.c b/gas/expr.c
+index ee85bda..b502418 100644
+--- a/gas/expr.c
++++ b/gas/expr.c
+@@ -810,6 +810,15 @@ operand (expressionS *expressionP, enum expr_mode mode)
+ 	      break;
+ 	    }
+ 	}
++      if ((*input_line_pointer == 'U') || (*input_line_pointer == 'u'))
++      {
++      input_line_pointer--;
++
++      integer_constant ((NUMBERS_WITH_SUFFIX || flag_m68k_mri)
++                        ? 0 : 10,
++                        expressionP);
++      break;
++      }
+       c = *input_line_pointer;
+       switch (c)
+ 	{

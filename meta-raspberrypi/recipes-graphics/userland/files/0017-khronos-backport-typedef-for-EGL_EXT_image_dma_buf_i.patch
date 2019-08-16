@@ -1,7 +1,7 @@
-From d65939b5bdc6cfddb68803e87efffac13182ae46 Mon Sep 17 00:00:00 2001
+From cc25f8abd4498004a276a4ee40e37681fa42422a Mon Sep 17 00:00:00 2001
 From: Hugo Hromic <hhromic@gmail.com>
 Date: Sun, 13 May 2018 10:49:04 +0100
-Subject: [PATCH 17/18] khronos: backport typedef for
+Subject: [PATCH 17/19] khronos: backport typedef for
  EGL_EXT_image_dma_buf_import
 
 The `gstreamer1.0-plugins-base` package version `1.14` uses `EGL_EXT_image_dma_buf_import`, which
@@ -34,5 +34,5 @@ index d7e5ba7..dcc90ce 100755
  #ifndef EGL_WL_bind_wayland_display
  #define EGL_WL_bind_wayland_display 1
 -- 
-2.21.0
+2.22.0
 

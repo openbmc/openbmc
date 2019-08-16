@@ -1,0 +1,156 @@
+From b6936450484b5aa9dd2438367a907af020341d1d Mon Sep 17 00:00:00 2001
+From: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+Date: Thu, 6 Dec 2018 13:30:44 -0800
+Subject: [PATCH 3/3] linux: mali_*timer: Get rid of init_timer
+
+kernel 4.19 got rid of ancient init_timer. Hence, replace it with
+timer_setup API. For more information refer kernel commit
+7eeb6b893bd28c68b6d664de1d3120e49b855cdb
+
+Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+Reviewed-by: Hyun Kwon <hyun.kwon@xilinx.com>
+Upstream Status: Pending
+---
+ driver/src/devicedrv/mali/common/mali_control_timer.c |  6 ++++++
+ driver/src/devicedrv/mali/common/mali_group.c         |  6 ++++++
+ driver/src/devicedrv/mali/common/mali_osk.h           | 15 ++++++++++++++-
+ driver/src/devicedrv/mali/linux/mali_osk_timers.c     | 15 ++++++++++++++-
+ 4 files changed, 40 insertions(+), 2 deletions(-)
+
+diff --git a/driver/src/devicedrv/mali/common/mali_control_timer.c b/driver/src/devicedrv/mali/common/mali_control_timer.c
+index 1296ffe..d24b934 100644
+--- common/mali_control_timer.c
++++ b/common/mali_control_timer.c
+@@ -65,11 +65,17 @@ _mali_osk_errcode_t mali_control_timer_init(void)
+ 		}
+ 	}
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
++	mali_control_timer = _mali_osk_timer_init(mali_control_timer_callback);
++#else
+ 	mali_control_timer = _mali_osk_timer_init();
++#endif
+ 	if (NULL == mali_control_timer) {
+ 		return _MALI_OSK_ERR_FAULT;
+ 	}
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 14, 0)
+ 	_mali_osk_timer_setcallback(mali_control_timer, mali_control_timer_callback, NULL);
++#endif
+ 
+ 	return _MALI_OSK_ERR_OK;
+ }
+diff --git a/driver/src/devicedrv/mali/common/mali_group.c b/driver/src/devicedrv/mali/common/mali_group.c
+index 5c7b3f4..1702e9a 100644
+--- common/mali_group.c
++++ b/common/mali_group.c
+@@ -65,9 +65,15 @@ struct mali_group *mali_group_create(struct mali_l2_cache_core *core,
+ 
+ 	group = _mali_osk_calloc(1, sizeof(struct mali_group));
+ 	if (NULL != group) {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
++		group->timeout_timer = _mali_osk_timer_init(mali_group_timeout);
++#else
+ 		group->timeout_timer = _mali_osk_timer_init();
++#endif
+ 		if (NULL != group->timeout_timer) {
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 14, 0)
+ 			_mali_osk_timer_setcallback(group->timeout_timer, mali_group_timeout, (void *)group);
++#endif
+ 
+ 			group->l2_cache_core[0] = core;
+ 			_mali_osk_list_init(&group->group_list);
+diff --git a/driver/src/devicedrv/mali/common/mali_osk.h b/driver/src/devicedrv/mali/common/mali_osk.h
+index a501778..fe93d79 100644
+--- common/mali_osk.h
++++ b/common/mali_osk.h
+@@ -947,7 +947,17 @@ _mali_osk_errcode_t _mali_osk_notification_queue_dequeue(_mali_osk_notification_
+  * asked for.
+  *
+  * @{ */
+-
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
++/** @brief Initialize a timer
++ *
++ * Allocates resources for a new timer, and initializes them. This does not
++ * start the timer.
++ *
++ * @param callback Function to call when timer expires
++ * @return a pointer to the allocated timer object, or NULL on failure.
++ */
++_mali_osk_timer_t *_mali_osk_timer_init(_mali_osk_timer_callback_t callback);
++#else
+ /** @brief Initialize a timer
+  *
+  * Allocates resources for a new timer, and initializes them. This does not
+@@ -956,6 +966,7 @@ _mali_osk_errcode_t _mali_osk_notification_queue_dequeue(_mali_osk_notification_
+  * @return a pointer to the allocated timer object, or NULL on failure.
+  */
+ _mali_osk_timer_t *_mali_osk_timer_init(void);
++#endif
+ 
+ /** @brief Start a timer
+  *
+@@ -1034,6 +1045,7 @@ void _mali_osk_timer_del_async(_mali_osk_timer_t *tim);
+  */
+ mali_bool _mali_osk_timer_pending(_mali_osk_timer_t *tim);
+ 
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 14, 0)
+ /** @brief Set a timer's callback parameters.
+  *
+  * This must be called at least once before a timer is started/modified.
+@@ -1047,6 +1059,7 @@ mali_bool _mali_osk_timer_pending(_mali_osk_timer_t *tim);
+  * @param data Function-specific data to supply to the function on expiry.
+  */
+ void _mali_osk_timer_setcallback(_mali_osk_timer_t *tim, _mali_osk_timer_callback_t callback, void *data);
++#endif
+ 
+ /** @brief Terminate a timer, and deallocate resources.
+  *
+diff --git a/driver/src/devicedrv/mali/linux/mali_osk_timers.c b/driver/src/devicedrv/mali/linux/mali_osk_timers.c
+index e5d7238..f9b5a86 100644
+--- linux/mali_osk_timers.c
++++ b/linux/mali_osk_timers.c
+@@ -21,13 +21,24 @@
+ struct _mali_osk_timer_t_struct {
+ 	struct timer_list timer;
+ };
+-
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
++typedef void (*timer_timeout_function_t)(struct timer_list *);
++#else
+ typedef void (*timer_timeout_function_t)(unsigned long);
++#endif
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
++_mali_osk_timer_t *_mali_osk_timer_init(_mali_osk_timer_callback_t callback)
++#else
+ _mali_osk_timer_t *_mali_osk_timer_init(void)
++#endif
+ {
+ 	_mali_osk_timer_t *t = (_mali_osk_timer_t *)kmalloc(sizeof(_mali_osk_timer_t), GFP_KERNEL);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
++	if (NULL != t) timer_setup(&t->timer, (timer_timeout_function_t)callback, 0);
++#else
+ 	if (NULL != t) init_timer(&t->timer);
++#endif
+ 	return t;
+ }
+ 
+@@ -62,12 +73,14 @@ mali_bool _mali_osk_timer_pending(_mali_osk_timer_t *tim)
+ 	return 1 == timer_pending(&(tim->timer));
+ }
+ 
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 14, 0)
+ void _mali_osk_timer_setcallback(_mali_osk_timer_t *tim, _mali_osk_timer_callback_t callback, void *data)
+ {
+ 	MALI_DEBUG_ASSERT_POINTER(tim);
+ 	tim->timer.data = (unsigned long)data;
+ 	tim->timer.function = (timer_timeout_function_t)callback;
+ }
++#endif
+ 
+ void _mali_osk_timer_term(_mali_osk_timer_t *tim)
+ {
+-- 
+2.7.4
+

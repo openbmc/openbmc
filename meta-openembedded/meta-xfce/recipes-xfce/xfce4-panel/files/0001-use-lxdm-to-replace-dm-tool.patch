@@ -1,0 +1,49 @@
+From b80108f01b1425427f98341168ea44c4b1a5a2cf Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 28 Jun 2019 16:02:13 +0800
+Subject: [PATCH] use lxdm to replace dm-tool
+
+OE does not support lightdm but lxdm,
+so use lxdm to replace dm-tool
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ plugins/actions/actions.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/plugins/actions/actions.c b/plugins/actions/actions.c
+index 474798e..63eb41d 100644
+--- a/plugins/actions/actions.c
++++ b/plugins/actions/actions.c
+@@ -905,12 +905,12 @@ actions_plugin_actions_allowed (void)
+   GError          *error = NULL;
+ 
+   /* check for commands we use */
+-  path = g_find_program_in_path ("dm-tool");
++  path = g_find_program_in_path ("lxdm");
+   if (path != NULL)
+     PANEL_SET_FLAG (allow_mask, ACTION_TYPE_SWITCH_USER);
+   else
+   {
+-    /* check for gdmflexiserver if dm-tool is not present */
++    /* check for gdmflexiserver if lxdm is not present */
+     g_free (path);
+     path = g_find_program_in_path ("gdmflexiserver");
+     if (path != NULL)
+@@ -1027,9 +1027,9 @@ actions_plugin_action_activate (GtkWidget      *widget,
+       break;
+ 
+     case ACTION_TYPE_SWITCH_USER:
+-      path = g_find_program_in_path ("dm-tool");
++      path = g_find_program_in_path ("lxdm");
+       if (path != NULL)
+-        succeed = g_spawn_command_line_async ("dm-tool switch-to-greeter", &error);
++        succeed = g_spawn_command_line_async ("lxdm -c USER_SWITCH", &error);
+       else
+         succeed = g_spawn_command_line_async ("gdmflexiserver", &error);
+       g_free (path);
+-- 
+2.8.1
+

@@ -7,7 +7,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=12f884d2ae1ff87c09e5b7ccc2c4ca7e"
 
 SRCREV = "5be9a16547234cef5aca8bfaccd920490ea1cfa7"
 SRC_URI = "git://github.com/intel/pm-graph.git \
-           file://0001-Makefile-fix-multilib-build-failure.patch"
+           file://0001-Makefile-fix-multilib-build-failure.patch \
+           file://0001-bootgraph.py.patch \
+"
 S = "${WORKDIR}/git"
 
 COMPATIBLE_HOST='(i.86|x86_64).*'

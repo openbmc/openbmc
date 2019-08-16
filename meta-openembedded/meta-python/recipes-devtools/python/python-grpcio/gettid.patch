@@ -1,0 +1,26 @@
+use glibc provided gettid API for glibc 2.30+
+
+glibc 2.30 introduced this function see [1]
+so it's best to detect it
+and provide fallback only if it's not present
+
+[1] https://sourceware.org/bugzilla/show_bug.cgi?id=6399
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/src/core/lib/gpr/log_linux.cc
++++ b/src/core/lib/gpr/log_linux.cc
+@@ -40,7 +40,13 @@
+ #include <time.h>
+ #include <unistd.h>
+ 
++#if  defined(__GLIBC__)
++#if !__GLIBC_PREREQ(2,29)
+ static long gettid(void) { return syscall(__NR_gettid); }
++#endif
++#else
++static long gettid(void) { return syscall(__NR_gettid); }
++#endif
+ 
+ void gpr_log(const char* file, int line, gpr_log_severity severity,
+              const char* format, ...) {

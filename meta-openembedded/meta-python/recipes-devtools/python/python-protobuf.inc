@@ -7,8 +7,8 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/BSD-3-Clause;md5=550794465ba0ec
 
 inherit pypi
 
-SRC_URI[md5sum] = "b7095f3eb736459716d606677b5a29ee"
-SRC_URI[sha256sum] = "8c61cc8a76e9d381c665aecc5105fa0f1878cf7db8b5cd17202603bcb386d0fc"
+SRC_URI[md5sum] = "4ec7b2d49a5d1460591e520b54153c87"
+SRC_URI[sha256sum] = "b3452bbda12b1cbe2187d416779de07b2ab4c497d83a050e43c344778763721d"
 
 # http://errors.yoctoproject.org/Errors/Details/184715/
 # Can't find required file: ../src/google/protobuf/descriptor.proto

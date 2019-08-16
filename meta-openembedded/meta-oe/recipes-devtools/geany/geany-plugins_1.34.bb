@@ -29,7 +29,7 @@ inherit distro_features_check autotools pkgconfig gtk-icon-cache
 REQUIRED_DISTRO_FEATURES = "x11"
 
 SRC_URI = " \
-    http://plugins.geany.org/${PN}/${PN}-${PV}.tar.bz2 \
+    http://plugins.geany.org/${BPN}/${BP}.tar.bz2 \
     file://0001-Use-pkg-config-to-find-gpgme.patch \
 "
 SRC_URI[md5sum] = "bf5fdd50727ad8bbbfe00027ccf2dac5"
@@ -40,7 +40,7 @@ do_configure_prepend() {
 }
 
 FILES_${PN} += "${datadir}/icons"
-FILES_${PN}-dev += "${libdir}/geany/*.la ${libdir}/${PN}/*/*.la"
+FILES_${PN}-dev += "${libdir}/geany/*.la ${libdir}/${BPN}/*/*.la"
 
 PLUGINS += "${PN}-addons"
 LIC_FILES_CHKSUM += "file://addons/COPYING;md5=4325afd396febcb659c36b49533135d4"

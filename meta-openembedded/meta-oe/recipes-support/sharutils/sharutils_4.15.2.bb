@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 inherit gettext autotools
 
-SRC_URI = "ftp://ftp.gnu.org/gnu/${BPN}/${BP}.tar.gz \
+SRC_URI = "${GNU_MIRROR}/${BPN}/${BP}.tar.gz \
            file://0001-Fix-build-with-clang.patch \
            file://CVE-2018-1000097.patch \
 "

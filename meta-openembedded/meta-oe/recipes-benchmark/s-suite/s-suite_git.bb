@@ -2,8 +2,8 @@ SUMMARY = "Small collection of benchmarks for storage I/O"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b529aaa6a0c50f15d29f89609b5c22f3"
 
-SRCREV = "8d22ab8a4cc1484622c47ac9c5944fb9a61a5c0f"
-PV = "3.4"
+SRCREV = "3b9eef2259a70f412ab02fbe6b3a4d313d09c38a"
+PV = "3.5"
 SRC_URI = "git://github.com/Algodev-github/S.git;protocol=https;branch=master"
 
 S = "${WORKDIR}/git"

@@ -9,7 +9,6 @@ PR = "r13"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 inherit packagegroup
-inherit bluetooth
 
 # Poke extra recomendations into the list using your machine.conf
 #
@@ -46,7 +45,7 @@ RRECOMMENDS_${PN} = "\
     ${@bb.utils.contains("MACHINE_FEATURES", "alsa", "alsa-utils-alsamixer", "", d)} \
     ${@bb.utils.contains("MACHINE_FEATURES", "usbgadget", "kernel-module-g-ether kernel-module-g-serial kernel-module-g-mass-storage", "", d)} \
     \
-    ${@bb.utils.contains("DISTRO_FEATURES", "bluetooth", "${BLUEZ}", "", d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "bluetooth", "bluez5", "", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "wifi", "iw wpa-supplicant", "", d)} \
     \
     tzdata \

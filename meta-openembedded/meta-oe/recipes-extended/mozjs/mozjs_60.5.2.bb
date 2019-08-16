@@ -17,6 +17,7 @@ SRC_URI = "https://dev.gentoo.org/~axs/distfiles/mozjs-60.5.2.tar.bz2 \
            file://0001-To-fix-build-error-on-arm32BE.patch \
            file://JS_PUBLIC_API.patch \
            file://0001-riscv-Disable-atomic-operations.patch \
+           file://fallback-to-2011-C++-standard.patch \
            "
 SRC_URI_append_libc-musl = " \
            file://0006-support-musl.patch \
@@ -53,6 +54,9 @@ EXTRA_OECONF = " \
     --with-nspr-libs='-lplds4 -lplc4 -lnspr4' \
     ${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', "--enable-gold", '--disable-gold', d)} \
 "
+
+# Without this, JS_Init() will fail for mips64.
+EXTRA_OECONF_append_mips64 = " --with-intl-api=build"
 
 EXTRA_OECONF_append_mipsarch = " --disable-ion"
 EXTRA_OECONF_append_riscv64 = " --disable-ion"

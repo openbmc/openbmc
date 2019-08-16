@@ -14,3 +14,5 @@ SRCREV = "e96443dda3c080fa991decec26bc4ac98d24b9a2"
 S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig
+
+CPPFLAGS += "-Wno-error"

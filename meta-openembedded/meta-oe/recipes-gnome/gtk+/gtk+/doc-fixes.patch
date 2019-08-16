@@ -1,0 +1,22 @@
+There are issues building the gtk+ tutorial and faq documentation.
+Since they were removed in gtk+ upstream and are superfluous in
+embedded applications, just don't build them.
+
+Thanks to Joshua Lock for suggesting this approach.
+
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+Upstream-Status: Inappropriate [embedded specific]
+
+diff -urN gtk+-2.22.1.orig/docs/Makefile.am gtk+-2.22.1/docs/Makefile.am
+--- gtk+-2.22.1.orig/docs/Makefile.am	2010-11-15 04:13:09.000000000 -0800
++++ gtk+-2.22.1/docs/Makefile.am	2011-02-23 19:25:16.914815097 -0800
+@@ -1,7 +1,7 @@
+ ## Process this file with automake to produce Makefile.in
+ include $(top_srcdir)/Makefile.decl
+ 
+-SUBDIRS = tutorial faq reference tools
++SUBDIRS = reference tools
+ 
+ EXTRA_DIST += \
+ 	defsformat.txt			\

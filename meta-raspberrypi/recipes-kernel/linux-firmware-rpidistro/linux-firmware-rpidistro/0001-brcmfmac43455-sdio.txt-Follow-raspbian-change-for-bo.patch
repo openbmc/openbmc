@@ -1,0 +1,39 @@
+From c9d4f263131cb8e62597e0a296968b5cdbfe0019 Mon Sep 17 00:00:00 2001
+From: Andrei Gherzan <andrei@gherzan.ro>
+Date: Thu, 27 Jun 2019 20:49:10 +0100
+Subject: [PATCH] brcmfmac43455-sdio.txt: Follow raspbian change for
+ boardflags3
+
+Without this change the WiFi interface on RPi4 never comes up. Also the
+upstream repository doesn't include this change. It is only (as far as I
+know) part of the raspberrypi deb repository with the following
+changelog:
+
+firmware-nonfree (1:20190114-1+rpt2) buster; urgency=medium
+  * Update brcmfmac43455-sdio.txt
+    - Update boardflags3
+ -- Serge Schneider <serge@raspberrypi.org>  Thu, 18 Apr 2019 14:35:34
++0100
+
+Upstream-status: Pending
+Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
+---
+ brcm/brcmfmac43455-sdio.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/brcm/brcmfmac43455-sdio.txt b/brcm/brcmfmac43455-sdio.txt
+index 54d9321..6801286 100644
+--- a/brcm/brcmfmac43455-sdio.txt
++++ b/brcm/brcmfmac43455-sdio.txt
+@@ -21,7 +21,7 @@ btc_mode=1
+ #            bit1 for btcoex
+ boardflags=0x00480201
+ boardflags2=0x40800000
+-boardflags3=0x48200100
++boardflags3=0x44200100
+ phycal_tempdelta=15
+ rxchain=1
+ txchain=1
+-- 
+2.17.1
+

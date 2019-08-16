@@ -1,0 +1,60 @@
+From 65463a7c5cb2514b1523a81911810effffb75a79 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 28 Jun 2019 15:05:31 +0800
+Subject: [PATCH] configure.in: disable tirpc checking for fedora
+
+The Fedora 28+ does not have inbuilt SunRPC support in glibc and is
+separately availble in tirpc package. So it enables tirpc checking for
+fedora in configure.
+
+Drop this piece of code since we had specify '-ltirpc' in LDFLAGS
+explicitly. Otherwise it will cause a compile-host-path QA issue if the
+host is Fedora 28+:
+cc1: warning: include location "/usr/include/tirpc" is unsafe for
+cross-compilation [-Wpoison-system-directories]
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ configure.in | 24 ------------------------
+ 1 file changed, 24 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index 8662cdd..0ff7e27 100644
+--- a/configure.in
++++ b/configure.in
+@@ -895,30 +895,6 @@ if test "x$enable_dlclose" = "xno"; then
+     AC_DEFINE([DISABLE_DLCLOSE_FOR_VALGRIND_TESTING],[1],[Don't close opened shared objects for valgrind leak testing of dynamic libraries])
+ fi
+ 
+-##################################################
+-# Fedora 28+ does not have inbuilt SunRPC support#
+-# in glibc and is separately availble in tirpc   #
+-# package. Make sure we've got the library and   #
+-# link it                                        #
+-##################################################
+-
+-if test -f /etc/fedora-release ; then
+-    DISTRO_VERSION=$(awk '{ print $3 }' /etc/fedora-release)
+-    if test $DISTRO_VERSION -ge 28 ; then
+-        TIRPC=""
+-        AC_CHECK_LIB(tirpc,bindresvport,, TIRPC="no")
+-        echo "$TIRPC"
+-        if test "x$TIRPC" = "xno"; then
+-            echo
+-            echo " ERROR! tirpc not found, get it by running "
+-            echo " yum install libtirpc-devel "
+-            exit
+-        fi
+-        LIBS="${LIBS} -ltirpc"
+-        extra_incl="-I/usr/include/tirpc"
+-    fi
+-fi
+-
+ Z_LIB=""
+ AC_CHECK_HEADERS(zlib.h,, Z_LIB="no")
+ if test "x$Z_LIB" = "xno"; then
+-- 
+2.7.4
+

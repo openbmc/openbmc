@@ -1,0 +1,92 @@
+From acdceb0b28d86199b8c2233880fa8a04cb24d4d4 Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Wed, 24 Jul 2019 09:48:04 +0800
+Subject: [PATCH] Revert "compositor: Revert to GLX as default vblank method
+ (again)"
+
+This reverts commit e07574d6e7a2dbaa08c3ba4765c6306073d9493e.
+
+It sets the default vblank method (auto) to GLX from 4.13.2. But it
+fails to start xfwm4 on intel-x86-64 boards with error:
+
+| xfwm4: ../mesa-19.1.1/src/mesa/drivers/dri/i965/intel_mipmap_tree.c:1293:
+| intel_miptree_match_image: Assertion `image->TexObject->Target == mt->target' failed.
+| Aborted
+
+There is also a RHEL defect:
+https://bugzilla.redhat.com/show_bug.cgi?id=1678334
+
+Revert the commit to fix the issue.
+
+Upstream-Status: Inappropriate [workaround]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ src/compositor.c | 41 +++++++++++++++++++----------------------
+ 1 file changed, 19 insertions(+), 22 deletions(-)
+
+diff --git a/src/compositor.c b/src/compositor.c
+index 25615282..daced607 100644
+--- a/src/compositor.c
++++ b/src/compositor.c
+@@ -4483,13 +4483,28 @@ compositorManageScreen (ScreenInfo *screen_info)
+     XClearArea (display_info->dpy, screen_info->output, 0, 0, 0, 0, TRUE);
+     TRACE ("manual compositing enabled");
+ 
++#ifdef HAVE_PRESENT_EXTENSION
++    screen_info->use_present = display_info->have_present &&
++                               (screen_info->vblank_mode == VBLANK_AUTO ||
++                                screen_info->vblank_mode == VBLANK_XPRESENT);
++    if (screen_info->use_present)
++    {
++        screen_info->present_pending = FALSE;
++        XPresentSelectInput (display_info->dpy,
++                             screen_info->output,
++                             PresentCompleteNotifyMask);
++    }
++#else /* HAVE_PRESENT_EXTENSION */
++    screen_info->use_present = FALSE;
++#endif /* HAVE_PRESENT_EXTENSION */
++
+ #ifdef HAVE_EPOXY
+-    screen_info->use_glx = (screen_info->vblank_mode == VBLANK_AUTO ||
+-                            screen_info->vblank_mode == VBLANK_GLX);
++    screen_info->use_glx = !screen_info->use_present &&
+ #ifdef HAVE_XSYNC
+-    screen_info->use_glx &= display_info->have_xsync;
++                            display_info->have_xsync &&
+ #endif /* HAVE_XSYNC */
+-
++                            (screen_info->vblank_mode == VBLANK_AUTO ||
++                             screen_info->vblank_mode == VBLANK_GLX);
+     if (screen_info->use_glx)
+     {
+         screen_info->glx_context = None;
+@@ -4503,24 +4518,6 @@ compositorManageScreen (ScreenInfo *screen_info)
+     screen_info->use_glx = FALSE;
+ #endif /* HAVE_EPOXY */
+ 
+-#ifdef HAVE_PRESENT_EXTENSION
+-    screen_info->use_present = display_info->have_present &&
+-#ifdef HAVE_EPOXY
+-                               !screen_info->use_glx &&
+-#endif /* HAVE_EPOXY */
+-                               (screen_info->vblank_mode == VBLANK_AUTO ||
+-                                screen_info->vblank_mode == VBLANK_XPRESENT);
+-    if (screen_info->use_present)
+-    {
+-        screen_info->present_pending = FALSE;
+-        XPresentSelectInput (display_info->dpy,
+-                             screen_info->output,
+-                             PresentCompleteNotifyMask);
+-    }
+-#else /* HAVE_PRESENT_EXTENSION */
+-    screen_info->use_present = FALSE;
+-#endif /* HAVE_PRESENT_EXTENSION */
+-
+     if (screen_info->use_present)
+     {
+         g_info ("Compositor using XPresent for vsync");
+-- 
+2.20.1
+

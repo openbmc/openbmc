@@ -1,4 +1,4 @@
-From 1cfee75d9662c3382bb7cb8f1c952333837598ae Mon Sep 17 00:00:00 2001
+From 43fb9cec1749b337bfa252fc2c1b0288847e8fa7 Mon Sep 17 00:00:00 2001
 From: Andrea Adami <andrea.adami@gmail.com>
 Date: Wed, 18 Apr 2018 02:21:30 +0200
 Subject: [PATCH] crashdump-elf.c: work around for _SC_NPROCESSORS_CONF
@@ -18,7 +18,7 @@ Upstream-Status: Inappropriate [klibc specific]
 Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
 
 ---
- kexec/crashdump-elf.c | 92 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ kexec/crashdump-elf.c | 92 +++++++++++++++++++++++++++++++++++++++++++
  1 file changed, 92 insertions(+)
 
 diff --git a/kexec/crashdump-elf.c b/kexec/crashdump-elf.c

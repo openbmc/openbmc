@@ -19,8 +19,8 @@ DEPENDS += " \
     gdb \
 "
 
-PACKAGES += "python3-${PN}"
-FILES_python3-${PN} = "${PYTHON_SITEPACKAGES_DIR}/${BPN}"
+PACKAGES += "python3-${BPN}"
+FILES_python3-${BPN} = "${PYTHON_SITEPACKAGES_DIR}/${BPN}"
 
 PACKAGECONFIG ??= "python3 rpm"
 PACKAGECONFIG[python2] = "--with-python2, --without-python2,,python2"

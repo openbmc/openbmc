@@ -4,7 +4,7 @@ DESCRIPTION = "Runtime libraries for parsing and creating MIME mail"
 SECTION = "libs"
 DEPENDS = "glib-2.0 zlib"
 
-inherit gnome autotools gobject-introspection
+inherit gnomebase autotools gobject-introspection
 
 SRC_URI += "file://iconv-detect.h \
             file://nodolt.patch"

@@ -1,0 +1,53 @@
+From c27261a8bc1e45ff7d7a585c79b2b871d47217e4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 26 Jul 2019 18:56:26 -0700
+Subject: [PATCH] Define gettid() only for glibc < 2.30
+
+glibc 2.30 has added this API, so let us use that when possible
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/core/lib/gpr/log_linux.cc          | 4 ++++
+ src/core/lib/iomgr/ev_epollex_linux.cc | 7 +++++--
+ 2 files changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/src/core/lib/gpr/log_linux.cc b/src/core/lib/gpr/log_linux.cc
+index 561276f0c2..25a74864a1 100644
+--- a/src/core/lib/gpr/log_linux.cc
++++ b/src/core/lib/gpr/log_linux.cc
+@@ -40,7 +40,11 @@
+ #include <time.h>
+ #include <unistd.h>
+ 
++#if defined(__GLIBC__) && (__GLIBC_MINOR__ >= 29)
++#include <unistd.h>
++#else
+ static long gettid(void) { return syscall(__NR_gettid); }
++#endif
+ 
+ void gpr_log(const char* file, int line, gpr_log_severity severity,
+              const char* format, ...) {
+diff --git a/src/core/lib/iomgr/ev_epollex_linux.cc b/src/core/lib/iomgr/ev_epollex_linux.cc
+index 08116b3ab5..d3d3025111 100644
+--- a/src/core/lib/iomgr/ev_epollex_linux.cc
++++ b/src/core/lib/iomgr/ev_epollex_linux.cc
+@@ -1101,10 +1101,13 @@ static void end_worker(grpc_pollset* pollset, grpc_pollset_worker* worker,
+   gpr_atm_no_barrier_fetch_add(&pollset->worker_count, -1);
+ }
+ 
+-#ifndef NDEBUG
++#if !defined(DEBUG)
++#if defined(__GLIBC__) && (__GLIBC_MINOR__ >= 29)
++#include <unistd.h>
++#else
+ static long gettid(void) { return syscall(__NR_gettid); }
+ #endif
+-
++#endif
+ /* pollset->mu lock must be held by the caller before calling this.
+    The function pollset_work() may temporarily release the lock (pollset->po.mu)
+    during the course of its execution but it will always re-acquire the lock and
+-- 
+2.22.0
+

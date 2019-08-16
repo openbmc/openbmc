@@ -20,6 +20,7 @@ SRC_URI += "\
             file://COPYING \
             "
 
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 DEPENDS = "virtual/kernel"
 
 # This looks in S, so we better make sure there's

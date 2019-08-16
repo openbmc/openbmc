@@ -1,0 +1,25 @@
+From 05cac23e0cdb94705c87cf9d94ffe00e7cba53f6 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Sun, 30 Sep 2018 17:06:58 +0530
+Subject: [PATCH] Fixing the branch related issues
+
+Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
+Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
+
+---
+ bfd/elf64-microblaze.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
+index 54a2461..e9b3cf3 100644
+--- a/bfd/elf64-microblaze.c
++++ b/bfd/elf64-microblaze.c
+@@ -2532,7 +2532,7 @@ microblaze_elf_check_relocs (bfd * abfd,
+ 
+ 	  /* PR15323, ref flags aren't set for references in the same
+ 	     object.  */
+-	  h->root.non_ir_ref = 1;
++	  h->root.non_ir_ref_regular = 1;
+ 	}
+ 
+       switch (r_type)

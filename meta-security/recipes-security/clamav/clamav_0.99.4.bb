@@ -66,14 +66,12 @@ EXTRA_OECONF_class-native += "${EXTRA_OECONF_CLAMAV}"
 EXTRA_OECONF_class-target += "--with-user=${UID}  --with-group=${GID} --disable-rpath ${EXTRA_OECONF_CLAMAV}"
 
 do_configure () {
-    cd ${S}
-    ./configure ${CONFIGUREOPTS} ${EXTRA_OECONF} 
+    ${S}/configure ${CONFIGUREOPTS} ${EXTRA_OECONF} 
     install -d ${S}/clamav_db
 }
 
 do_configure_class-native () {
-    cd ${S}
-    ./configure ${CONFIGUREOPTS} ${EXTRA_OECONF} 
+    ${S}/configure ${CONFIGUREOPTS} ${EXTRA_OECONF} 
 }
 
 

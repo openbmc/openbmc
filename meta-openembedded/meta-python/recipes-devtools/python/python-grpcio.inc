@@ -9,6 +9,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/python-grpcio:"
 SRC_URI_append_class-target = " file://0001-setup.py-Do-not-mix-C-and-C-compiler-options.patch \
                                 file://ppc-boringssl-support.patch \
                                 file://riscv64_support.patch \
+                                file://gettid.patch \
 "
 
 RDEPENDS_${PN} = "${PYTHON_PN}-protobuf \

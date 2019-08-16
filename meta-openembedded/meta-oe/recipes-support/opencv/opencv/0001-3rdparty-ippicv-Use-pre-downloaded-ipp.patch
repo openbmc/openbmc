@@ -1,16 +1,17 @@
-From 4801a057730632225337d7f6d26b9335e6b9b078 Mon Sep 17 00:00:00 2001
+From 85b882b4ceb57fe6538f47af58d0a970923fde0e Mon Sep 17 00:00:00 2001
 From: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
 Date: Thu, 31 Mar 2016 00:20:15 +0200
 Subject: [PATCH] 3rdparty/ippicv: Use pre-downloaded ipp
 
 Signed-off-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
 Signed-off-by: Ismo Puustinen <ismo.puustinen@intel.com>
+
 ---
  3rdparty/ippicv/ippicv.cmake | 15 +--------------
  1 file changed, 1 insertion(+), 14 deletions(-)
 
 diff --git a/3rdparty/ippicv/ippicv.cmake b/3rdparty/ippicv/ippicv.cmake
-index d601da4bb..f6fc1098c 100644
+index ae8748c..305abdb 100644
 --- a/3rdparty/ippicv/ippicv.cmake
 +++ b/3rdparty/ippicv/ippicv.cmake
 @@ -39,18 +39,5 @@ function(download_ippicv root_var)
@@ -33,6 +34,3 @@ index d601da4bb..f6fc1098c 100644
 -  endif()
 +  set(${root_var} "${THE_ROOT}/${OPENCV_ICV_PACKAGE_SUBDIR}" PARENT_SCOPE)
  endfunction()
--- 
-2.13.4
-

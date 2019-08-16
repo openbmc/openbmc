@@ -32,6 +32,7 @@ SRC_URI = "https://github.com/thkukuk/ypbind-mt/releases/download/v${PV}/${BPN}-
            file://ypbind.init \
            file://ypbind.service \
            file://0001-dns_hosts-Fix-build-with-musl.patch \
+           file://0001-Add-configure-time-check-for-gettid-API.patch \
            "
 SRC_URI[md5sum] = "7cf89641fdc128d0919207e4b7caaf1d"
 SRC_URI[sha256sum] = "0696c0263c4fd48a4ff2ce6c109f05f37aab0f71646d81cb22c7c28591bf80eb"

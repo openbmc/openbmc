@@ -1,0 +1,139 @@
+From 5a1e731d71d577f56a2c013e4a75a8e90188e63b Mon Sep 17 00:00:00 2001
+From: Paul Eggleton <paul.eggleton@linux.intel.com>
+Date: Tue, 9 Jul 2019 05:21:59 -0700
+Subject: [PATCH] Use stdint types
+
+Fixes compilation with musl.
+
+Upstream-Status: Pending
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+---
+ src/bma250e/bma250e.cxx   | 16 ++++++++--------
+ src/bmg160/bmg160.cxx     | 10 +++++-----
+ src/bmi160/bosch_bmi160.h |  2 +-
+ src/bmm150/bmm150.cxx     |  8 ++++----
+ 4 files changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/src/bma250e/bma250e.cxx b/src/bma250e/bma250e.cxx
+index a8792782..1b3ecdd8 100644
+--- a/src/bma250e/bma250e.cxx
++++ b/src/bma250e/bma250e.cxx
+@@ -195,35 +195,35 @@ BMA250E::BMA250E(std::string initStr) : mraaIo(initStr)
+             fifoConfig(mode, axes);
+         }
+         if(tok.substr(0, 20) == "setInterruptEnable0:") {
+-            u_int8_t bits = (u_int8_t)std::stoul(tok.substr(20), nullptr, 0);
++            uint8_t bits = (uint8_t)std::stoul(tok.substr(20), nullptr, 0);
+             setInterruptEnable0(bits);
+         }
+         if(tok.substr(0, 20) == "setInterruptEnable1:") {
+-            u_int8_t bits = (u_int8_t)std::stoul(tok.substr(20), nullptr, 0);
++            uint8_t bits = (uint8_t)std::stoul(tok.substr(20), nullptr, 0);
+             setInterruptEnable1(bits);
+         }
+         if(tok.substr(0, 20) == "setInterruptEnable2:") {
+-            u_int8_t bits = (u_int8_t)std::stoul(tok.substr(20), nullptr, 0);
++            uint8_t bits = (uint8_t)std::stoul(tok.substr(20), nullptr, 0);
+             setInterruptEnable2(bits);
+         }
+         if(tok.substr(0, 17) == "setInterruptMap0:") {
+-            u_int8_t bits = (u_int8_t)std::stoul(tok.substr(17), nullptr, 0);
++            uint8_t bits = (uint8_t)std::stoul(tok.substr(17), nullptr, 0);
+             setInterruptMap0(bits);
+         }
+         if(tok.substr(0, 17) == "setInterruptMap1:") {
+-            u_int8_t bits = (u_int8_t)std::stoul(tok.substr(17), nullptr, 0);
++            uint8_t bits = (uint8_t)std::stoul(tok.substr(17), nullptr, 0);
+             setInterruptMap1(bits);
+         }
+         if(tok.substr(0, 17) == "setInterruptMap2:") {
+-            u_int8_t bits = (u_int8_t)std::stoul(tok.substr(17), nullptr, 0);
++            uint8_t bits = (uint8_t)std::stoul(tok.substr(17), nullptr, 0);
+             setInterruptMap2(bits);
+         }
+         if(tok.substr(0, 16) == "setInterruptSrc:") {
+-            u_int8_t bits = (u_int8_t)std::stoul(tok.substr(16), nullptr, 0);
++            uint8_t bits = (uint8_t)std::stoul(tok.substr(16), nullptr, 0);
+             setInterruptSrc(bits);
+         }
+         if(tok.substr(0, 26) == "setInterruptOutputControl:") {
+-            u_int8_t bits = (u_int8_t)std::stoul(tok.substr(26), nullptr, 0);
++            uint8_t bits = (uint8_t)std::stoul(tok.substr(26), nullptr, 0);
+             setInterruptOutputControl(bits);
+         }
+         if(tok.substr(0, 26) == "setInterruptLatchBehavior:") {
+diff --git a/src/bmg160/bmg160.cxx b/src/bmg160/bmg160.cxx
+index 1a0939f8..2438c399 100644
+--- a/src/bmg160/bmg160.cxx
++++ b/src/bmg160/bmg160.cxx
+@@ -173,23 +173,23 @@ BMG160::BMG160(std::string initStr) : mraaIo(initStr)
+             fifoConfig(mode, axes);
+         }
+         if(tok.substr(0, 20) == "setInterruptEnable0:") {
+-            u_int8_t bits = (u_int8_t)std::stoul(tok.substr(20), nullptr, 0);
++            uint8_t bits = (uint8_t)std::stoul(tok.substr(20), nullptr, 0);
+             setInterruptEnable0(bits);
+         }
+         if(tok.substr(0, 17) == "setInterruptMap0:") {
+-            u_int8_t bits = (u_int8_t)std::stoul(tok.substr(17), nullptr, 0);
++            uint8_t bits = (uint8_t)std::stoul(tok.substr(17), nullptr, 0);
+             setInterruptMap0(bits);
+         }
+         if(tok.substr(0, 17) == "setInterruptMap1:") {
+-            u_int8_t bits = (u_int8_t)std::stoul(tok.substr(17), nullptr, 0);
++            uint8_t bits = (uint8_t)std::stoul(tok.substr(17), nullptr, 0);
+             setInterruptMap1(bits);
+         }
+         if(tok.substr(0, 16) == "setInterruptSrc:") {
+-            u_int8_t bits = (u_int8_t)std::stoul(tok.substr(16), nullptr, 0);
++            uint8_t bits = (uint8_t)std::stoul(tok.substr(16), nullptr, 0);
+             setInterruptSrc(bits);
+         }
+         if(tok.substr(0, 26) == "setInterruptOutputControl:") {
+-            u_int8_t bits = (u_int8_t)std::stoul(tok.substr(26), nullptr, 0);
++            uint8_t bits = (uint8_t)std::stoul(tok.substr(26), nullptr, 0);
+             setInterruptOutputControl(bits);
+         }
+         if(tok.substr(0, 26) == "setInterruptLatchBehavior:") {
+diff --git a/src/bmi160/bosch_bmi160.h b/src/bmi160/bosch_bmi160.h
+index 87ca2249..cd9efe6f 100644
+--- a/src/bmi160/bosch_bmi160.h
++++ b/src/bmi160/bosch_bmi160.h
+@@ -81,7 +81,7 @@ typedef	int16_t s16;/**< used for signed 16bit */
+ typedef	int32_t s32;/**< used for signed 32bit */
+ typedef	int64_t s64;/**< used for signed 64bit */
+ 
+-typedef	u_int8_t u8;/**< used for unsigned 8bit */
++typedef	uint8_t u8;/**< used for unsigned 8bit */
+ typedef	u_int16_t u16;/**< used for unsigned 16bit */
+ typedef	u_int32_t u32;/**< used for unsigned 32bit */
+ typedef	u_int64_t u64;/**< used for unsigned 64bit */
+diff --git a/src/bmm150/bmm150.cxx b/src/bmm150/bmm150.cxx
+index 234ebf92..02436788 100644
+--- a/src/bmm150/bmm150.cxx
++++ b/src/bmm150/bmm150.cxx
+@@ -170,19 +170,19 @@ BMM150::BMM150(std::string initStr) : mraaIo(initStr)
+             setOpmode(opmode);
+         }
+         if(tok.substr(0, 19) == "setInterruptEnable:") {
+-            u_int8_t bits = (u_int8_t)std::stoul(tok.substr(19), nullptr, 0);
++            uint8_t bits = (uint8_t)std::stoul(tok.substr(19), nullptr, 0);
+             setInterruptEnable(bits);
+         }
+         if(tok.substr(0, 19) == "setInterruptConfig:") {
+-            u_int8_t bits = (u_int8_t)std::stoul(tok.substr(19), nullptr, 0);
++            uint8_t bits = (uint8_t)std::stoul(tok.substr(19), nullptr, 0);
+             setInterruptConfig(bits);
+         }
+         if(tok.substr(0, 17) == "setRepetitionsXY:") {
+-            u_int8_t reps = (u_int8_t)std::stoul(tok.substr(17), nullptr, 0);
++            uint8_t reps = (uint8_t)std::stoul(tok.substr(17), nullptr, 0);
+             setRepetitionsXY(reps);
+         }
+         if(tok.substr(0, 16) == "setRepetitionsZ:") {
+-            u_int8_t reps = (u_int8_t)std::stoul(tok.substr(16), nullptr, 0);
++            uint8_t reps = (uint8_t)std::stoul(tok.substr(16), nullptr, 0);
+             setRepetitionsZ(reps);
+         }
+         if(tok.substr(0, 14) == "setPresetMode:") {

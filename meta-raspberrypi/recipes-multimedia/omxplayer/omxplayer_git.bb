@@ -5,13 +5,13 @@ HOMEPAGE = "https://github.com/popcornmix/omxplayer"
 SECTION = "console/utils"
 
 LICENSE = "GPLv2"
-LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
+LIC_FILES_CHKSUM = "file://COPYING;md5=00a27da7ac0f9bcd17320ec29ef4bbf6"
 
 DEPENDS = "libpcre libav virtual/egl boost freetype dbus openssl libssh libomxil coreutils-native curl-native userland"
 
-PR = "r4"
+PR = "r5"
 
-SRCREV_default = "b4bbef8fac5e8c2ddafa895f98456ba715b39c6b"
+SRCREV_default = "f543a0d0e707ab56415f17b0ca6d397394ee8b63"
 
 # omxplayer builds its own copy of ffmpeg from source instead of using the
 # system's ffmpeg library. This isn't ideal but it's ok for now. We do however

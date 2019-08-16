@@ -6,16 +6,15 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=42dfffebc56fec7527aac53b7a89d1d8 \
                     file://COPYING.tools;md5=751419260aa954499f7abaabaa882bbe"
 
 DEPENDS = "mm-common glib-2.0 libsigc++-2.0 glib-2.0-native"
-inherit autotools pkgconfig
+inherit gnomebase
 
 SHRT_VER = "${@d.getVar('PV').split('.')[0]}.${@d.getVar('PV').split('.')[1]}"
 
-SRC_URI = " \
-    ftp://ftp.gnome.org/pub/GNOME/sources/glibmm/${SHRT_VER}/glibmm-${PV}.tar.xz \
+SRC_URI += " \
     file://remove-examples.patch \
 "
-SRC_URI[md5sum] = "77f1016cbb27e15d4e04a2b7bfdb4cae"
-SRC_URI[sha256sum] = "6e5fe03bdf1e220eeffd543e017fd2fb15bcec9235f0ffd50674aff9362a85f0"
+SRC_URI[archive.md5sum] = "77f1016cbb27e15d4e04a2b7bfdb4cae"
+SRC_URI[archive.sha256sum] = "6e5fe03bdf1e220eeffd543e017fd2fb15bcec9235f0ffd50674aff9362a85f0"
 
 do_install_append() {
     install -d ${D}${datadir}/glibmm-2.4

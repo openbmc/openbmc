@@ -15,11 +15,11 @@ RDEPENDS_${PN} = "\
     rpio \
     rpi-gpio \
     pi-blaster \
-    python-rtimu \
-    python-sense-hat \
+    python3-rtimu \
+    python3-sense-hat \
     connman \
     connman-client \
-    crda \
+    wireless-regdb \
     bluez5 \
 "
 

@@ -6,8 +6,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=14d5a68b28755c04ebdba226e888b157"
 DEPENDS = "libtool"
 
 S = "${WORKDIR}/git"
-SRCREV = "3c56934f44a8f5a1257c342942e6e034fc6f20be"
-PV = "1.1.4+git${SRCPV}"
+SRCREV = "5649050d201856bf06c8738b5d2aa1710c86ac2f"
+PV = "1.1.5"
 SRC_URI = " \
     git://github.com/smuellerDD/libkcapi.git \
 "

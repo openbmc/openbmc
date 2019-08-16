@@ -1,0 +1,26 @@
+From 0e64782a45cba9753d1210ee7d7c9dbd42f74ceb Mon Sep 17 00:00:00 2001
+From: Zang Ruochen <zangrc.fnst@cn.fujitsu.com>
+Date: Fri, 12 Jul 2019 12:46:54 +0800
+Subject: [PATCH] Fixed build error on musl.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Zang Ruochen <zangrc.fnst@cn.fujitsu.com>
+---
+ library/adutil.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/library/adutil.c b/library/adutil.c
+index 9b0c47f..b673edd 100644
+--- a/library/adutil.c
++++ b/library/adutil.c
+@@ -30,6 +30,7 @@
+ #include <assert.h>
+ #include <ctype.h>
+ #include <errno.h>
++#include <endian.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+-- 
+2.20.1
+

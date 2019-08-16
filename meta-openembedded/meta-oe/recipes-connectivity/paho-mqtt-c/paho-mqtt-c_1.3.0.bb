@@ -26,3 +26,5 @@ do_install_append() {
     rm -rf ${D}${prefix}/samples
     find ${D}${prefix} -maxdepth 1 -type f -delete
 }
+
+EXTRA_OECMAKE = "-DPAHO_WITH_SSL=ON"

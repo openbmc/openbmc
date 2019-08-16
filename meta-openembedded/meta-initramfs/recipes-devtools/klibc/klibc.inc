@@ -33,6 +33,9 @@ ARMPATCHES_arm = "file://klibc-config-eabi.patch \
 
 S = "${WORKDIR}/git"
 
+OPTFLAGS = "${TUNE_CCARGS} -Os"
+OPTFLAGS_append_libc-musl_toolchain-clang = " -fno-builtin-bcmp"
+
 PARALLEL_MAKE = ""
 EXTRA_OEMAKE = "'KLIBCARCH=${KLIBC_ARCH}' \
                 'CROSS_COMPILE=${TARGET_PREFIX}' \
@@ -43,7 +46,7 @@ EXTRA_OEMAKE = "'KLIBCARCH=${KLIBC_ARCH}' \
                 'INSTALLDIR=${libdir}/klibc' \
                 'SHLIBDIR=${libdir}' \
                 '${KLIBCTHUMB}' \
-                'KLIBCOPTFLAGS=${TUNE_CCARGS} -Os' \
+                'KLIBCOPTFLAGS=${OPTFLAGS}' \
                  V=1 \
                 "
 

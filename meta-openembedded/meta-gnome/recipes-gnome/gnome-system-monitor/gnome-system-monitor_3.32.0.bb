@@ -10,13 +10,14 @@ DEPENDS = " \
     gtkmm3 \
     libgtop \
     librsvg \
+    polkit \
 "
 
 GNOMEBASEBUILDCLASS = "meson"
 
-inherit gnomebase gtk-icon-cache distro_features_check gettext
+inherit gnomebase gconf gtk-icon-cache distro_features_check gettext
 
-REQUIRED_DISTRO_FEATURES = "x11"
+REQUIRED_DISTRO_FEATURES = "x11 polkit"
 
 SRC_URI[archive.md5sum] = "6c2c5c5bf8f15d3e6985faacbd3055dd"
 SRC_URI[archive.sha256sum] = "af00c4a42dd1db17d9abe88edb11c7751b20982db1a8a2a467bab206fd8a77e3"

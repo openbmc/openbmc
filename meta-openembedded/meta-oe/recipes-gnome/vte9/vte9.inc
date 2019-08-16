@@ -8,7 +8,7 @@ RDEPENDS_libvte = "vte-termcap"
 GNOMEBN = "vte"
 S = "${WORKDIR}/vte-${PV}"
 
-inherit gnome gtk-doc distro_features_check upstream-version-is-even gobject-introspection
+inherit gnomebase gtk-doc distro_features_check upstream-version-is-even gobject-introspection
 ANY_OF_DISTRO_FEATURES = "${GTK2DISTROFEATURES}"
 
 EXTRA_OECONF = "--disable-python"

@@ -31,12 +31,14 @@ PACKAGECONFIG ??= " \
     cryptsetup-reencrypt \
     integritysetup \
     ${@bb.utils.filter('DISTRO_FEATURES', 'selinux', d)} \
-    udev \
     kernel_crypto \
     internal-argon2 \
     blkid \
     luks-adjust-xts-keysize \
     openssl \
+"
+PACKAGECONFIG_append_class-target = " \
+    udev \
 "
 
 PACKAGECONFIG[keyring] = "--enable-keyring,--disable-keyring"
@@ -48,7 +50,7 @@ PACKAGECONFIG[veritysetup] = "--enable-veritysetup,--disable-veritysetup"
 PACKAGECONFIG[cryptsetup-reencrypt] = "--enable-cryptsetup-reencrypt,--disable-cryptsetup-reencrypt"
 PACKAGECONFIG[integritysetup] = "--enable-integritysetup,--disable-integritysetup"
 PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux"
-PACKAGECONFIG[udev] = "--enable-udev,--disable-udev,udev"
+PACKAGECONFIG[udev] = "--enable-udev,--disable-udev,,udev"
 PACKAGECONFIG[kernel_crypto] = "--enable-kernel_crypto,--disable-kernel_crypto"
 # gcrypt-pkbdf2 requries --with-crypto_backend=gcrypt or the flag isn't
 # recognized.
@@ -63,6 +65,7 @@ PACKAGECONFIG[gcrypt] = "--with-crypto_backend=gcrypt,,libgcrypt"
 PACKAGECONFIG[nss] = "--with-crypto_backend=nss,,nss"
 PACKAGECONFIG[kernel] = "--with-crypto_backend=kernel"
 PACKAGECONFIG[nettle] = "--with-crypto_backend=nettle,,nettle"
+PACKAGECONFIG[luks2] = "--with-default-luks-format=LUKS2,--with-default-luks-format=LUKS1"
 
 RRECOMMENDS_${PN} = "kernel-module-aes-generic \
                      kernel-module-dm-crypt \

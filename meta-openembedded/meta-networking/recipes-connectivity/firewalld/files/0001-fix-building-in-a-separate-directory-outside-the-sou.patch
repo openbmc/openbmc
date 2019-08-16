@@ -1,10 +1,8 @@
 firewalld: fix building in a separate directory outside the source tree
 
-Upstream-Status: Submitted [https://github.com/firewalld/firewalld/pull/456]
+Upstream-Status: Accepted [https://github.com/firewalld/firewalld/pull/456]
 Signed-off-by: Dan Callaghan <dan.callaghan@opengear.com>
 
-diff --git a/config/Makefile.am b/config/Makefile.am
-index 7048d2ee..5270d408 100644
 --- a/config/Makefile.am
 +++ b/config/Makefile.am
 @@ -377,11 +377,11 @@ install-config:
@@ -24,8 +22,6 @@ index 7048d2ee..5270d408 100644
  
  uninstall-config:
  	rmdir $(DESTDIR)$(sconfdir)/icmptypes
-diff --git a/doc/xml/Makefile.am b/doc/xml/Makefile.am
-index 8c93ab9c..d0313e3e 100644
 --- a/doc/xml/Makefile.am
 +++ b/doc/xml/Makefile.am
 @@ -69,7 +69,8 @@ edit = sed \
@@ -38,25 +34,23 @@ index 8c93ab9c..d0313e3e 100644
  
  transform-man.xsl: transform-man.xsl.in
  	$(edit) $< >$@
-diff --git a/doc/xml/firewall-cmd.xml.in b/doc/xml/firewall-cmd.xml.in
-index c2606553..24d77858 100644
 --- a/doc/xml/firewall-cmd.xml.in
 +++ b/doc/xml/firewall-cmd.xml.in
-@@ -1,9 +1,9 @@
+@@ -1,10 +1,10 @@
  <?xml version="1.0" encoding="utf-8"?>
  <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
  [
 -<!ENTITY authors SYSTEM "authors.xml">
 -<!ENTITY seealso SYSTEM "seealso.xml">
 -<!ENTITY notes SYSTEM "notes.xml">
+-<!ENTITY errorcodes SYSTEM "errorcodes.xml">
 +<!ENTITY authors SYSTEM "@SRCDIR@/authors.xml">
 +<!ENTITY seealso SYSTEM "@SRCDIR@/seealso.xml">
 +<!ENTITY notes SYSTEM "@SRCDIR@/notes.xml">
- <!ENTITY errorcodes SYSTEM "errorcodes.xml">
++<!ENTITY errorcodes SYSTEM "@SRCDIR@/errorcodes.xml">
  ]>
  
-diff --git a/doc/xml/firewalld.xml.in b/doc/xml/firewalld.xml.in
-index de802059..3d319b04 100644
+ <!--
 --- a/doc/xml/firewalld.xml.in
 +++ b/doc/xml/firewalld.xml.in
 @@ -1,9 +1,9 @@
@@ -72,6 +66,3 @@ index de802059..3d319b04 100644
  ]>
  
  <!--
--- 
-2.20.1
-

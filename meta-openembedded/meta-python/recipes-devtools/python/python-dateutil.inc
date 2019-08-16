@@ -21,3 +21,5 @@ RDEPENDS_${PN}_class-target = "\
     ${PYTHON_PN}-six \
     ${PYTHON_PN}-stringold \
 "
+
+BBCLASSEXTEND = "native"

@@ -33,14 +33,14 @@ RDEPENDS_packagegroup-meta-python = "\
     python-robotframework-seriallibrary python-pyalsaaudio python-pytest-helpers-namespace \
     python-alembic python-flask-pymongo python-slip-dbus python-pydbus python-automat python-rfc3987 \
     python-tzlocal python-backports-ssl python-subprocess32 python-asn1crypto python-pybind11 \
-    python-ptyprocess python-babel python-passlib python-oauthlib python-sdnotify \
+    python-ptyprocess python-babel python-passlib python-sdnotify \
     python-lazy-object-proxy python-cryptography-vectors python-crcmod python-pyusb python-vobject \
     python-webcolors python-pyparsing python-beautifulsoup4 python-cffi python-tornado-redis \
     python-itsdangerous python-pyasn1-modules python-netaddr python-vcversioner \
     python-sh python-greenlet python-paho-mqtt python-traceback2 python-gdata python-dbusmock \
     python-whoosh python-lockfile python-isort python-wtforms python-feedparser python-flask-restful \
     python-pysnmp python-flask-babel python-pytest-tempdir python-flask-nav python-pyzmq python-pyyaml \
-    python-protobuf python-pluggy python-jsonschema python-msgpack python-pandas \
+    python-protobuf python-pluggy python-jsonschema python-msgpack \
     python-periphery python-pint python-pycryptodome python-yappi python-pycrypto python-pretend \
     python-pyserial python-pyiface python-docutils python-grpcio-tools python-django-south \
     python-backports-functools-lru-cache python-py python-click python-flask-migrate \
@@ -57,7 +57,7 @@ RDEPENDS_packagegroup-meta-python = "\
     python-markupsafe python-pytest-runner python-grpcio python-mccabe python-pytz python-selectors34 \
     python-cython python-chardet python-editor python-flask-bootstrap python-html5lib \
     python-singledispatch python-redis python-flask-mail python-funcsigs python-snimpy python-pyasn1 \
-    python-decorator python-urllib3 python-feedformatter python-matplotlib python-iso8601 \
+    python-decorator python-urllib3 python-feedformatter python-iso8601 \
     python-numeric python-robotframework python-django python-simplejson python-wcwidth \
     python-configparser python-epydoc python-intervals python-speaklater \
     python-aws-iot-device-sdk-python python-constantly python-bitarray python-flask-wtf \

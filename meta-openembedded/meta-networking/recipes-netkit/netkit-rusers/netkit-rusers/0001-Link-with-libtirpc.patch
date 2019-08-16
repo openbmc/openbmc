@@ -13,21 +13,69 @@ Upstream-Status: Pending
  rup/rup.c                 | 2 +-
  4 files changed, 4 insertions(+), 13 deletions(-)
 
-diff --git a/configure b/configure
-index 85f6ca6..2d2d4b7 100755
 --- a/configure
 +++ b/configure
-@@ -147,7 +147,7 @@ else
+@@ -92,7 +92,6 @@ else
+     echo -n 'Checking if C compiler works... '
+     if (
+           $CC __conftest.c -o __conftest || exit 1
+-          ./__conftest || exit 1
+        ) >/dev/null 2>&1; then
+          echo 'yes'
+      else
+@@ -146,8 +145,7 @@ else
+ 
  fi
  
- LDFLAGS=
+-LDFLAGS=
 -LIBS=
-+LIBS="-ltirpc"
++LIBS="$LIBS -ltirpc"
  
  rm -f __conftest*
  
-diff --git a/rpc.rusersd/rusers_proc.c b/rpc.rusersd/rusers_proc.c
-index 9ae6306..f9e237c 100644
+@@ -172,13 +170,11 @@ int main() {
+ EOF
+ if (
+       $CC $CFLAGS  __conftest.c  -o __conftest || exit 1
+-      ./__conftest || exit 1
+    ) >/dev/null 2>&1; then
+     echo 'yes'
+ else
+     if (
+           $CC $CFLAGS -D__USE_BSD_SIGNAL __conftest.c  -o __conftest || exit 1
+-          ./__conftest || exit 1
+        ) >/dev/null 2>&1; then
+         echo '-D__USE_BSD_SIGNAL'
+         CFLAGS="$CFLAGS -D__USE_BSD_SIGNAL"
+@@ -231,7 +227,6 @@ if (
+ else
+     if (
+           $CC $CFLAGS -D_GNU_SOURCE __conftest.c  -o __conftest || exit 1
+-          ./__conftest || exit 1
+        ) >/dev/null 2>&1; then
+         echo '-D_GNU_SOURCE'
+         CFLAGS="$CFLAGS -D_GNU_SOURCE"
+@@ -262,20 +257,17 @@ int main() {
+ EOF
+ if (
+       $CC $CFLAGS  __conftest.c $LIBBSD -o __conftest || exit 1
+-      ./__conftest || exit 1
+    ) >/dev/null 2>&1; then
+     echo 'ok'
+ else
+     if (
+           $CC $CFLAGS  __conftest.c -lsnprintf $LIBBSD -o __conftest || exit 1
+-          ./__conftest || exit 1
+        ) >/dev/null 2>&1; then
+         echo '-lsnprintf'
+         LIBS="$LIBS -lsnprintf"
+     else
+         if (
+               $CC $CFLAGS  __conftest.c -ldb $LIBBSD -o __conftest || exit 1
+-              ./__conftest || exit 1
+            ) >/dev/null 2>&1; then
+             echo '-ldb'
+             LIBS="$LIBS -ldb"
 --- a/rpc.rusersd/rusers_proc.c
 +++ b/rpc.rusersd/rusers_proc.c
 @@ -57,12 +57,7 @@ char rp_rcsid[] =
@@ -44,8 +92,6 @@ index 9ae6306..f9e237c 100644
  
  void rusers_service(struct svc_req *rqstp, SVCXPRT *transp);
  
-diff --git a/rpc.rusersd/rusersd.c b/rpc.rusersd/rusersd.c
-index 762be9b..dd355ac 100644
 --- a/rpc.rusersd/rusersd.c
 +++ b/rpc.rusersd/rusersd.c
 @@ -38,11 +38,7 @@ char rusersd_rcsid[] =
@@ -61,11 +107,9 @@ index 762be9b..dd355ac 100644
  
  #include "../version.h"
  
-diff --git a/rup/rup.c b/rup/rup.c
-index e5669ff..887f89d 100644
 --- a/rup/rup.c
 +++ b/rup/rup.c
-@@ -48,7 +48,7 @@ char rcsid[] = "$Id: rup.c,v 1.8 2000/07/22 19:51:40 dholland Exp $";
+@@ -48,7 +48,7 @@ char rcsid[] = "$Id: rup.c,v 1.8 2000/07
  
  #undef FSHIFT			/* Use protocol's shift and scale values */
  #undef FSCALE
@@ -74,6 +118,3 @@ index e5669ff..887f89d 100644
  
  #include "../version.h"
  
--- 
-2.17.0
-

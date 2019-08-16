@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=2d5025d4aa3495befef8f17206a5b0a1 \
 
 DEPENDS = "atk glibmm"
 
-inherit distro_features_check gnome autotools pkgconfig
+inherit distro_features_check gnomebase autotools pkgconfig
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

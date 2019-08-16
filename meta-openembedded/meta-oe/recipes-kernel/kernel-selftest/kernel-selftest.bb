@@ -121,3 +121,14 @@ FILES_${PN} += "/usr/kernel-selftest"
 RDEPENDS_${PN} += "python3"
 # tools/testing/selftests/vm/Makefile doesn't respect LDFLAGS and tools/testing/selftests/Makefile explicitly overrides to empty
 INSANE_SKIP_${PN} += "ldflags"
+
+# userfaultfd.c:126:2: error: format not a string literal and no format arguments [-Werror=format-security]
+#  fprintf(stderr, examples);
+#  ^~~~~~~
+SECURITY_STRINGFORMAT = ""
+
+# https://errors.yoctoproject.org/Errors/Details/261657/
+# kernel-selftest/1.0-r0/recipe-sysroot/usr/include/bits/fcntl2.h:50:4: error: call to '__open_missing_mode' declared with attribute error: open with O_CREAT or O_TMPFILE in second argument needs 3 arguments
+#     __open_missing_mode ();
+#     ^~~~~~~~~~~~~~~~~~~~~~
+lcl_maybe_fortify = ""

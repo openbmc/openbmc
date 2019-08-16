@@ -8,7 +8,7 @@ COMPATIBLE_MACHINE = "^rpi$"
 
 INHIBIT_DEFAULT_DEPS = "1"
 
-include recipes-bsp/common/firmware.inc
+include recipes-bsp/common/raspberrypi-firmware.inc
 
 SRC_URI += " \
     file://egl.pc \

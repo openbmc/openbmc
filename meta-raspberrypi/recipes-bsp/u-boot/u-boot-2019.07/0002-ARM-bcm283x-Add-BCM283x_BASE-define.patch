@@ -1,0 +1,105 @@
+From df2aa4c6be33b468adc09de337a055556d1f37fb Mon Sep 17 00:00:00 2001
+From: Matthias Brugger <mbrugger@suse.com>
+Date: Fri, 12 Jul 2019 18:20:53 +0200
+Subject: [PATCH 2/7] ARM: bcm283x: Add BCM283x_BASE define
+
+Devices of bcm283x have different base address, depending if they are on
+bcm2835 or bcm2836/7. Use BCM283x_BASE depending on the SoC you want to
+build and only add the offset in the header files.
+
+Signed-off-by: Matthias Brugger <mbrugger@suse.com>
+Signed-off-by: Andrei Gherzan <andrei@balena.io>
+Upstream-status: Pending
+---
+ arch/arm/mach-bcm283x/Kconfig              | 5 +++++
+ arch/arm/mach-bcm283x/include/mach/mbox.h  | 6 +-----
+ arch/arm/mach-bcm283x/include/mach/sdhci.h | 6 +-----
+ arch/arm/mach-bcm283x/include/mach/timer.h | 6 +-----
+ arch/arm/mach-bcm283x/include/mach/wdog.h  | 6 +-----
+ 5 files changed, 9 insertions(+), 20 deletions(-)
+
+diff --git a/arch/arm/mach-bcm283x/Kconfig b/arch/arm/mach-bcm283x/Kconfig
+index 3eb5a9a897..8e69914a83 100644
+--- a/arch/arm/mach-bcm283x/Kconfig
++++ b/arch/arm/mach-bcm283x/Kconfig
+@@ -141,4 +141,9 @@ config SYS_SOC
+ config SYS_CONFIG_NAME
+ 	default "rpi"
+ 
++config BCM283x_BASE
++	hex
++	default "0x20000000" if BCM2835
++	default "0x3f000000" if BCM2836 || BCM2837
++
+ endmenu
+diff --git a/arch/arm/mach-bcm283x/include/mach/mbox.h b/arch/arm/mach-bcm283x/include/mach/mbox.h
+index e3a893e49c..e44c7577da 100644
+--- a/arch/arm/mach-bcm283x/include/mach/mbox.h
++++ b/arch/arm/mach-bcm283x/include/mach/mbox.h
+@@ -37,11 +37,7 @@
+ 
+ /* Raw mailbox HW */
+ 
+-#ifndef CONFIG_BCM2835
+-#define BCM2835_MBOX_PHYSADDR	0x3f00b880
+-#else
+-#define BCM2835_MBOX_PHYSADDR	0x2000b880
+-#endif
++#define BCM2835_MBOX_PHYSADDR	(CONFIG_BCM283x_BASE + 0x0000b880)
+ 
+ struct bcm2835_mbox_regs {
+ 	u32 read;
+diff --git a/arch/arm/mach-bcm283x/include/mach/sdhci.h b/arch/arm/mach-bcm283x/include/mach/sdhci.h
+index 5cb6ec3340..b443c379d8 100644
+--- a/arch/arm/mach-bcm283x/include/mach/sdhci.h
++++ b/arch/arm/mach-bcm283x/include/mach/sdhci.h
+@@ -6,11 +6,7 @@
+ #ifndef _BCM2835_SDHCI_H_
+ #define _BCM2835_SDHCI_H_
+ 
+-#ifndef CONFIG_BCM2835
+-#define BCM2835_SDHCI_BASE 0x3f300000
+-#else
+-#define BCM2835_SDHCI_BASE 0x20300000
+-#endif
++#define BCM2835_SDHCI_BASE (CONFIG_BCM283x_BASE + 0x00300000)
+ 
+ int bcm2835_sdhci_init(u32 regbase, u32 emmc_freq);
+ 
+diff --git a/arch/arm/mach-bcm283x/include/mach/timer.h b/arch/arm/mach-bcm283x/include/mach/timer.h
+index 56b0c356bb..014355e759 100644
+--- a/arch/arm/mach-bcm283x/include/mach/timer.h
++++ b/arch/arm/mach-bcm283x/include/mach/timer.h
+@@ -6,11 +6,7 @@
+ #ifndef _BCM2835_TIMER_H
+ #define _BCM2835_TIMER_H
+ 
+-#ifndef CONFIG_BCM2835
+-#define BCM2835_TIMER_PHYSADDR	0x3f003000
+-#else
+-#define BCM2835_TIMER_PHYSADDR	0x20003000
+-#endif
++#define BCM2835_TIMER_PHYSADDR	(CONFIG_BCM283x_BASE + 0x00003000)
+ 
+ #define BCM2835_TIMER_CS_M3	(1 << 3)
+ #define BCM2835_TIMER_CS_M2	(1 << 2)
+diff --git a/arch/arm/mach-bcm283x/include/mach/wdog.h b/arch/arm/mach-bcm283x/include/mach/wdog.h
+index 99c88e5df7..00b5e06c3a 100644
+--- a/arch/arm/mach-bcm283x/include/mach/wdog.h
++++ b/arch/arm/mach-bcm283x/include/mach/wdog.h
+@@ -6,11 +6,7 @@
+ #ifndef _BCM2835_WDOG_H
+ #define _BCM2835_WDOG_H
+ 
+-#ifndef CONFIG_BCM2835
+-#define BCM2835_WDOG_PHYSADDR			0x3f100000
+-#else
+-#define BCM2835_WDOG_PHYSADDR			0x20100000
+-#endif
++#define BCM2835_WDOG_PHYSADDR 			(CONFIG_BCM283x_BASE + 0x00100000)
+ 
+ struct bcm2835_wdog_regs {
+ 	u32 unknown0[7];
+-- 
+2.22.0
+

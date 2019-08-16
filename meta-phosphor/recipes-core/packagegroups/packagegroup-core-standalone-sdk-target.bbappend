@@ -1,1 +1,1 @@
-RRECOMMENDS_${PN}_append = " gtest sdbusplus phosphor-logging libstdc++-staticdev"
+RRECOMMENDS_${PN}_append = " googletest sdbusplus phosphor-logging libstdc++-staticdev"

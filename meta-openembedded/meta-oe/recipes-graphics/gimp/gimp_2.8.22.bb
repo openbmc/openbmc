@@ -8,6 +8,7 @@ DEPENDS = " \
     gdk-pixbuf-native \
     intltool-native \
     libxslt-native \
+    dbus-glib \
     gtk+ \
     babl \
     gegl \
@@ -24,7 +25,7 @@ DEPENDS = " \
 "
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'libxmu libxpm', '', d)}"
 
-inherit distro_features_check gnome gtk-doc
+inherit distro_features_check gnomebase gtk-icon-cache gtk-doc
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

@@ -1,7 +1,7 @@
-From 460a96e390cb80278784cfe36629e280fe7ffef7 Mon Sep 17 00:00:00 2001
+From 3863d8bd71d6a5638cf984f8d8f9cccac0c7f2a4 Mon Sep 17 00:00:00 2001
 From: Alistair Francis <alistair.francis@wdc.com>
 Date: Mon, 23 Jul 2018 11:31:17 -0700
-Subject: [PATCH 2/2] Makefile: Don't install the docs
+Subject: [PATCH] Makefile: Don't install the docs
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Upstream-Status: Inappropriate [disable feature]
@@ -10,17 +10,17 @@ Upstream-Status: Inappropriate [disable feature]
  1 file changed, 1 deletion(-)
 
 diff --git a/Makefile b/Makefile
-index 224a315f6..ce7f84afb 100644
+index 47a447f12..7c0f9848f 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -144,7 +144,6 @@ rpm dpkg: pkg-clean source
+@@ -148,7 +148,6 @@ rpm dpkg: pkg-clean
  
  install uninstall:
  	$(MAKE) -C src $@
 -	$(MAKE) -C doc $@
  
  .PHONY: all clean clobber test check cstyle check-license install uninstall\
- 	source rpm dpkg pkg-clean pcheck check-remote format doc $(SUBDIRS)
+ 	source rpm dpkg pkg-clean pcheck check-remote format doc require-rpmem\
 -- 
-2.17.1
+2.14.4
 

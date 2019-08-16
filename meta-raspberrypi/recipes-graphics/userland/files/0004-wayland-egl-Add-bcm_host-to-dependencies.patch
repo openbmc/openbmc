@@ -1,7 +1,7 @@
-From 33374e6b19a28d52a0089aa7b9af9b698fb98a86 Mon Sep 17 00:00:00 2001
+From 4463e2732a09dbb721d0614e7147cbfaa9059930 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 10 Aug 2015 02:38:27 -0700
-Subject: [PATCH 04/18] wayland-egl: Add bcm_host to dependencies
+Subject: [PATCH 04/19] wayland-egl: Add bcm_host to dependencies
 
 It uses headers like vcos_platform_types.h but does not
 depend on module which should add the required include paths
@@ -24,5 +24,5 @@ index 8bafc15..fd259c9 100644
  Libs: -L${libdir} -lwayland-egl
  Cflags: -I${includedir}
 -- 
-2.21.0
+2.22.0
 

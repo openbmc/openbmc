@@ -10,6 +10,6 @@ S = "${WORKDIR}/git"
 SRCREV = "62e6b2df55084316d027165d286e46beb40513dc"
 SRC_URI = "git://github.com/rurban/safeclib.git"
 
-COMPATIBLE_HOST = '(x86_64|i.86|powerpc|powerpc64|arm|aarch64).*-linux'
+COMPATIBLE_HOST = '(x86_64|i.86|powerpc|powerpc64|arm).*-linux'
 
 RDEPENDS_${PN} = "perl"

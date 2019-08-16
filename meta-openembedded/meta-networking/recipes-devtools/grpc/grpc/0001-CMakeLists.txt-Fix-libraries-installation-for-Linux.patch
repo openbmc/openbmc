@@ -7,16 +7,13 @@ Subject: [PATCH] CMakeLists.txt: Fix libraries installation for Linux
 
 Signed-off-by: Alexey Firago <alexey_firago@mentor.com>
 
-%% original patch: 0001-CMakeLists.txt-Fix-libraries-installation-for-Linux.patch
 ---
  CMakeLists.txt | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++
  1 file changed, 59 insertions(+)
 
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index a59fd818e3..5066f44a32 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -30,6 +30,15 @@ set(PACKAGE_TARNAME   "${PACKAGE_NAME}-${PACKAGE_VERSION}")
+@@ -30,6 +30,15 @@ set(PACKAGE_TARNAME   "${PACKAGE_NAME}-$
  set(PACKAGE_BUGREPORT "https://github.com/grpc/grpc/issues/")
  project(${PACKAGE_NAME} C CXX)
  
@@ -32,7 +29,7 @@ index a59fd818e3..5066f44a32 100644
  set(gRPC_INSTALL_BINDIR "bin" CACHE STRING "Installation directory for executables")
  set(gRPC_INSTALL_LIBDIR "lib" CACHE STRING "Installation directory for libraries")
  set(gRPC_INSTALL_INCLUDEDIR "include" CACHE STRING "Installation directory for headers")
-@@ -702,6 +711,10 @@ if(WIN32 AND MSVC)
+@@ -769,6 +778,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -43,7 +40,7 @@ index a59fd818e3..5066f44a32 100644
  
  target_include_directories(address_sorting
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -825,6 +838,10 @@ if(WIN32 AND MSVC)
+@@ -903,6 +916,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -54,7 +51,7 @@ index a59fd818e3..5066f44a32 100644
  
  target_include_directories(gpr
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -1259,6 +1276,10 @@ if(WIN32 AND MSVC)
+@@ -1333,6 +1350,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -65,7 +62,7 @@ index a59fd818e3..5066f44a32 100644
  
  target_include_directories(grpc
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -1633,6 +1654,10 @@ if(WIN32 AND MSVC)
+@@ -1731,6 +1752,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -76,7 +73,7 @@ index a59fd818e3..5066f44a32 100644
  
  target_include_directories(grpc_cronet
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -2575,6 +2600,10 @@ if(WIN32 AND MSVC)
+@@ -2744,6 +2769,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -87,7 +84,7 @@ index a59fd818e3..5066f44a32 100644
  
  target_include_directories(grpc_unsecure
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -2791,6 +2820,10 @@ if(WIN32 AND MSVC)
+@@ -3083,6 +3112,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -98,7 +95,7 @@ index a59fd818e3..5066f44a32 100644
  
  target_include_directories(grpc++
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -3357,6 +3390,10 @@ if(WIN32 AND MSVC)
+@@ -3703,6 +3736,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -109,7 +106,7 @@ index a59fd818e3..5066f44a32 100644
  
  target_include_directories(grpc++_cronet
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -3630,6 +3667,11 @@ protobuf_generate_grpc_cpp(
+@@ -4013,6 +4050,11 @@ protobuf_generate_grpc_cpp(
    src/proto/grpc/status/status.proto
  )
  
@@ -121,7 +118,7 @@ index a59fd818e3..5066f44a32 100644
  target_include_directories(grpc++_error_details
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
-@@ -3762,6 +3804,11 @@ protobuf_generate_grpc_cpp(
+@@ -4147,6 +4189,11 @@ protobuf_generate_grpc_cpp(
    src/proto/grpc/reflection/v1alpha/reflection.proto
  )
  
@@ -133,7 +130,7 @@ index a59fd818e3..5066f44a32 100644
  target_include_directories(grpc++_reflection
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
-@@ -4265,6 +4312,10 @@ if(WIN32 AND MSVC)
+@@ -4704,6 +4751,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -144,7 +141,7 @@ index a59fd818e3..5066f44a32 100644
  
  target_include_directories(grpc++_unsecure
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -4649,6 +4700,10 @@ if(WIN32 AND MSVC)
+@@ -5124,6 +5175,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -155,7 +152,19 @@ index a59fd818e3..5066f44a32 100644
  
  target_include_directories(grpc_plugin_support
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -5184,6 +5239,10 @@ if(WIN32 AND MSVC)
+@@ -5190,6 +5245,11 @@ protobuf_generate_grpc_cpp(
+   src/proto/grpc/channelz/channelz.proto
+ )
+ 
++if(_gRPC_PLATFORM_LINUX)
++	set_property(TARGET grpcpp_channelz PROPERTY VERSION ${CPP_VERSION})
++  set_property(TARGET grpcpp_channelz PROPERTY SOVERSION ${CPP_VERSION_MAJOR})
++endif()
++
+ target_include_directories(grpcpp_channelz
+   PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+@@ -5728,6 +5788,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -166,6 +175,3 @@ index a59fd818e3..5066f44a32 100644
  
  target_include_directories(grpc_csharp_ext
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
--- 
-2.17.1
-

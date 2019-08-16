@@ -14,14 +14,15 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=91f1cb870c1cc2d31351a4d2595441cb"
 # While this item does not require it, it depends on ffmpeg which does
 LICENSE_FLAGS = "commercial"
 
+SRCREV_mpv = "4db82f04502cbcd20d9a975df9dfde91d8c389e3"
 SRC_URI = " \
-    https://github.com/mpv-player/mpv/archive/v${PV}.tar.gz;name=mpv \
-    http://www.freehackers.org/~tnagy/release/waf-1.8.12;name=waf;downloadfilename=waf;subdir=${BPN}-${PV} \
+    git://github.com/mpv-player/mpv;name=mpv \
+    http://www.freehackers.org/~tnagy/release/waf-1.8.12;name=waf;downloadfilename=waf;subdir=git \
 "
-SRC_URI[mpv.md5sum] = "038d0b660de07ff645ad6a741704ecab"
-SRC_URI[mpv.sha256sum] = "daf3ef358d5f260f2269f7caabce27f446c291457ec330077152127133b71b46"
 SRC_URI[waf.md5sum] = "cef4ee82206b1843db082d0b0506bf71"
 SRC_URI[waf.sha256sum] = "01bf2beab2106d1558800c8709bc2c8e496d3da4a2ca343fe091f22fca60c98b"
+
+S = "${WORKDIR}/git"
 
 inherit waf pkgconfig pythonnative distro_features_check
 

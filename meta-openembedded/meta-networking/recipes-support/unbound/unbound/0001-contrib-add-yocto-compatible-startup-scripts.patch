@@ -1,0 +1,78 @@
+From 186ac39de8eb9aedcf3d87cdbe389d10cde03d66 Mon Sep 17 00:00:00 2001
+From: Beniamin Sandu <beniaminsandu@gmail.com>
+Date: Tue, 16 Jul 2019 19:59:23 +0300
+Subject: [PATCH] contrib: add yocto compatible startup scripts
+
+Signed-off-by: Beniamin Sandu <beniaminsandu@gmail.com>
+---
+ contrib/unbound.init       | 10 +++++-----
+ contrib/unbound.service.in |  4 ++--
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+ mode change 100644 => 100755 contrib/unbound.init
+
+diff --git a/contrib/unbound.init b/contrib/unbound.init
+old mode 100644
+new mode 100755
+index cccadecc..4eba752b
+--- a/contrib/unbound.init
++++ b/contrib/unbound.init
+@@ -19,11 +19,11 @@
+ ### END INIT INFO
+ 
+ # Source function library.
+-. /etc/rc.d/init.d/functions
++. /etc/init.d/functions
+ 
+ exec="/usr/sbin/unbound"
+ prog="unbound"
+-config="/var/unbound/unbound.conf"
++config="/etc/unbound/unbound.conf"
+ pidfile="/var/unbound/unbound.pid"
+ rootdir="/var/unbound"
+ 
+@@ -61,7 +61,7 @@ start() {
+     fi;
+ 
+     # if not running, start it up here
+-    daemon $exec
++    daemonize $exec
+     retval=$?
+     echo
+     [ $retval -eq 0 ] && touch $lockfile
+@@ -71,7 +71,7 @@ start() {
+ stop() {
+     echo -n $"Stopping $prog: "
+     # stop it here, often "killproc $prog"
+-    killproc -p $pidfile $prog
++    killproc $prog
+     retval=$?
+     echo
+     [ $retval -eq 0 ] && rm -f $lockfile
+@@ -99,7 +99,7 @@ force_reload() {
+ 
+ rh_status() {
+     # run checks to determine if the service is running or use generic status
+-    status -p $pidfile $prog
++    status $prog
+ }
+ 
+ rh_status_q() {
+diff --git a/contrib/unbound.service.in b/contrib/unbound.service.in
+index 95976dd9..0e7f79a9 100644
+--- a/contrib/unbound.service.in
++++ b/contrib/unbound.service.in
+@@ -10,9 +10,9 @@ WantedBy=multi-user.target
+ 
+ [Service]
+ ExecReload=/bin/kill -HUP $MAINPID
+-ExecStart=@UNBOUND_SBIN_DIR@/unbound
++ExecStart=@UNBOUND_SBIN_DIR@/unbound -d
+ NotifyAccess=main
+-Type=notify
++Type=simple
+ CapabilityBoundingSet=CAP_IPC_LOCK CAP_NET_BIND_SERVICE CAP_SETGID CAP_SETUID CAP_SYS_CHROOT CAP_SYS_RESOURCE
+ MemoryDenyWriteExecute=true
+ NoNewPrivileges=true
+-- 
+2.17.1
+

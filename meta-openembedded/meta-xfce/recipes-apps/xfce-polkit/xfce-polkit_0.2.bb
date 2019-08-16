@@ -4,7 +4,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=758b03f872a88c99fc36d50c5932091c"
 
 DEPENDS = "libxfce4ui polkit"
 
-inherit xfce-app
+inherit xfce-app distro_features_check
+REQUIRED_DISTRO_FEATURES = "polkit"
 
 SRC_URI = " \
     git://github.com/ncopa/${BPN}.git \

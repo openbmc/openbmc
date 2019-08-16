@@ -1,0 +1,42 @@
+Option '-std=gnu++14' has been supported from gcc 4.9. But on some build hosts
+such as CentOS 7.6 which only has gcc 4.8.5 and fails to configure:
+
+| checking whether the host C compiler can be used... no
+| ERROR: Only GCC 4.9 or newer is supported (found version 4.8.5).
+
+Fallback to 2011 C++ standard and lower required gcc version to 4.8.0 which is
+the same as in previous version 52.9.1 of mozjs.
+
+Upstream-Status: Inappropriate [Workaround]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+diff --git a/build/moz.configure/toolchain.configure b/build/moz.configure/toolchain.configure
+index 9c772a8..fc640c7 100755
+--- a/build/moz.configure/toolchain.configure
++++ b/build/moz.configure/toolchain.configure
+@@ -502,10 +502,8 @@ def check_compiler(compiler, language, target):
+             append_flag('-std=c++14')
+         # GCC 4.9 indicates that it implements draft C++14 features
+         # instead of the full language.
+-        elif info.type == 'gcc' and \
+-                info.language_version not in (draft_cxx14_version,
+-                                              cxx14_version):
+-            append_flag('-std=gnu++14')
++        elif info.type == 'gcc' and info.language_version != 201103:
++            append_flag('-std=gnu++11')
+ 
+     # We force clang-cl to emulate Visual C++ 2017 version 15.4
+     if info.type == 'clang-cl' and info.version != '19.11.25547':
+@@ -903,9 +901,9 @@ def compiler(language, host_or_target, c_compiler=None, other_compiler=None,
+         # Check the compiler version here instead of in `compiler_version` so
+         # that the `checking` message doesn't pretend the compiler can be used
+         # to then bail out one line later.
+-        if info.type == 'gcc' and info.version < '4.9.0':
++        if info.type == 'gcc' and info.version < '4.8.0':
+             raise FatalCheckError(
+-                'Only GCC 4.9 or newer is supported (found version %s).'
++                'Only GCC 4.8 or newer is supported (found version %s).'
+                 % info.version)
+ 
+         if info.type == 'gcc' and host_or_target.os == 'Android':

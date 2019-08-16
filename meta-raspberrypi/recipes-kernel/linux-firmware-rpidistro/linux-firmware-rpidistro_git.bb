@@ -33,7 +33,10 @@ LIC_FILES_CHKSUM = "\
 NO_GENERIC_LICENSE[Firmware-broadcom_bcm43xx-rpidistro] = "LICENCE.broadcom_bcm43xx"
 NO_GENERIC_LICENSE[WHENCE] = "WHENCE"
 
-SRC_URI = "git://github.com/RPi-Distro/firmware-nonfree"
+SRC_URI = " \
+    git://github.com/RPi-Distro/firmware-nonfree \
+    file://0001-brcmfmac43455-sdio.txt-Follow-raspbian-change-for-bo.patch \
+    "
 SRCREV = "b518de45ced519e8f7a499f4778100173402ae43"
 PV = "0.0+git${SRCPV}"
 
@@ -42,6 +45,13 @@ S = "${WORKDIR}/git"
 inherit allarch
 
 CLEANBROKEN = "1"
+
+do_unpack_append() {
+    bb.build.exec_func('do_clean_pc', d)
+}
+do_clean_pc() {
+    rm -rf ${S}/.pc
+}
 
 do_compile() {
     :

@@ -11,7 +11,7 @@ inherit autotools pkgconfig texinfo gettext
 
 EXTRA_OECONF = "--disable-java --disable-docs"
 
-SRC_URI = "https://ftp.gnu.org/gnu/octave/${PN}-${PV}.tar.gz \
+SRC_URI = "${GNU_MIRROR}/octave/${PN}-${PV}.tar.gz \
            file://fix-blas-library-integer-size.patch \
 "
 

@@ -1,0 +1,84 @@
+From ec08ab41495ac40641475707c46e844503ada5b3 Mon Sep 17 00:00:00 2001
+From: Jonas Witschel <diabonas@gmx.de>
+Date: Mon, 7 Jan 2019 22:15:06 +0100
+Subject: [PATCH] build: update for ax_code_coverage.m4 version 2019.01.06
+
+@CODE_COVERAGE_RULES@ doesn't exist any more and needs to be replaced.
+Also includes a compatibility switch for older versions of the file.
+
+Signed-off-by: Jonas Witschel <diabonas@gmx.de>
+---
+ .gitignore   |  1 +
+ .travis.yml  | 10 +++++-----
+ Makefile.am  |  6 ++++++
+ configure.ac |  3 +++
+ 4 files changed, 15 insertions(+), 5 deletions(-)
+
+diff --git a/.gitignore b/.gitignore
+index 7c6a7b62e6c1..aa1a7efdff71 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -26,6 +26,7 @@
+ AUTHORS
+ tags
+ aclocal.m4
++aminclude_static.am
+ autom4te.cache/
+ [Bb]uild/
+ [Dd]ebug/
+diff --git a/.travis.yml b/.travis.yml
+index 55f88e22999b..a668e2953dc2 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -44,11 +44,11 @@ addons:
+ 
+ install:
+ # Autoconf archive
+-  - wget https://download.01.org/tpm2/autoconf-archive-2017.09.28.tar.xz
+-  - sha256sum autoconf-archive-2017.09.28.tar.xz | grep -q 5c9fb5845b38b28982a3ef12836f76b35f46799ef4a2e46b48e2bd3c6182fa01 || travis_terminate 1
+-  - tar xJf autoconf-archive-2017.09.28.tar.xz
+-  - cp autoconf-archive-2017.09.28/m4/ax_code_coverage.m4 m4/
+-  - cp autoconf-archive-2017.09.28/m4/ax_prog_doxygen.m4 m4/
++  - wget http://ftpmirror.gnu.org/autoconf-archive/autoconf-archive-2019.01.06.tar.xz
++  - sha256sum autoconf-archive-2019.01.06.tar.xz | grep -q 17195c833098da79de5778ee90948f4c5d90ed1a0cf8391b4ab348e2ec511e3f || travis_terminate 1
++  - tar xJf autoconf-archive-2019.01.06.tar.xz
++  - cp autoconf-archive-2019.01.06/m4/ax_code_coverage.m4 m4/
++  - cp autoconf-archive-2019.01.06/m4/ax_prog_doxygen.m4 m4/
+ # IBM-TPM
+   - wget https://download.01.org/tpm2/ibmtpm974.tar.gz
+ # OpenSSL 1.0.2
+diff --git a/Makefile.am b/Makefile.am
+index 1b792d89a392..8e62e9c77c7d 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -19,7 +19,13 @@ noinst_PROGRAMS =
+ 
+ ### Add ax_* rules ###
+ # ax_code_coverage
++if AUTOCONF_CODE_COVERAGE_2019_01_06
++include $(top_srcdir)/aminclude_static.am
++clean-local: code-coverage-clean
++dist-clean-local: code-coverage-dist-clean
++else
+ @CODE_COVERAGE_RULES@
++endif
+ 
+ # ax_doxygen
+ @DX_RULES@
+diff --git a/configure.ac b/configure.ac
+index 6c7b0fd96399..22b79c50c015 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -312,6 +312,9 @@ AS_IF([test "x$enable_doxygen_doc" != xno],
+       [ERROR_IF_NO_PROG([doxygen])])
+ 
+ AX_CODE_COVERAGE
++m4_ifdef([_AX_CODE_COVERAGE_RULES],
++         [AM_CONDITIONAL(AUTOCONF_CODE_COVERAGE_2019_01_06, [true])],
++         [AM_CONDITIONAL(AUTOCONF_CODE_COVERAGE_2019_01_06, [false])])
+ 
+ AC_OUTPUT
+ 
+-- 
+2.20.1
+

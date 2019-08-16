@@ -1,6 +1,6 @@
-From 15838a86d5ea94fa05976ea32fd847b18261b403 Mon Sep 17 00:00:00 2001
-From: Ruslan Bilovol <rbilovol@cisco.com>
-Date: Tue, 2 Jan 2018 14:50:03 +0200
+From 4143fa0092fe4cafee10b24a97d3ad0b41ab7a30 Mon Sep 17 00:00:00 2001
+From: Zang Ruochen <zangrc.fnst@cn.fujitsu.com>
+Date: Wed, 7 Aug 2019 03:24:39 +0900
 Subject: [PATCH] kpatch-build: allow overriding of distro name
 
 It is sometimes useful to have ability to override
@@ -14,17 +14,16 @@ implements all needed functionality
 Upstream-Status: Pending
 
 Signed-off-by: Ruslan Bilovol <rbilovol@cisco.com>
-
 ---
  kpatch-build/kpatch-build | 9 +++++++--
  1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/kpatch-build/kpatch-build b/kpatch-build/kpatch-build
-index 4a011aa..eb6cd64 100755
+index 39933fc..c0258a2 100755
 --- a/kpatch-build/kpatch-build
 +++ b/kpatch-build/kpatch-build
-@@ -394,12 +394,13 @@ usage() {
- 	echo "		                   (can be specified multiple times)" >&2
+@@ -413,12 +413,13 @@ usage() {
+ 	echo "		                   specify current version of module" >&2
  	echo "		--cross-compile    Specify the prefix used for all executables" >&2
  	echo "		                   used during compilation" >&2
 +	echo "		--distro           Override distro name" >&2
@@ -33,12 +32,12 @@ index 4a011aa..eb6cd64 100755
  	echo "		                   (not recommended)" >&2
  }
  
--options="$(getopt -o ha:r:s:c:v:j:t:n:o:d -l "help,archversion:,sourcerpm:,sourcedir:,config:,vmlinux:,jobs:,target:,name:,output:,debug,cross-compile:,skip-gcc-check,skip-cleanup" -- "$@")" || die "getopt failed"
-+options="$(getopt -o ha:r:s:c:v:j:t:n:o:d -l "help,archversion:,sourcerpm:,sourcedir:,config:,vmlinux:,jobs:,target:,name:,output:,debug,cross-compile:,distro:,skip-gcc-check,skip-cleanup" -- "$@")" || die "getopt failed"
+-options="$(getopt -o ha:r:s:c:v:j:t:n:o:de: -l "help,archversion:,sourcerpm:,sourcedir:,config:,vmlinux:,jobs:,target:,name:,output:,oot-module:,debug,cross-compile:,skip-gcc-check,skip-cleanup" -- "$@")" || die "getopt failed"
++options="$(getopt -o ha:r:s:c:v:j:t:n:o:de: -l "help,archversion:,sourcerpm:,sourcedir:,config:,vmlinux:,jobs:,target:,name:,output:,oot-module:,debug,cross-compile:,distro:,skip-gcc-check,skip-cleanup" -- "$@")" || die "getopt failed"
  
  eval set -- "$options"
  
-@@ -461,6 +462,10 @@ while [[ $# -gt 0 ]]; do
+@@ -485,6 +486,10 @@ while [[ $# -gt 0 ]]; do
  		KPATCH_CROSS_COMPILE="$2"
  		shift
  		;;
@@ -49,7 +48,7 @@ index 4a011aa..eb6cd64 100755
  	--skip-cleanup)
  		echo "Skipping cleanup"
  		SKIPCLEANUP=1
-@@ -539,7 +544,7 @@ fi
+@@ -571,7 +576,7 @@ fi
  # Don't check external file.
  # shellcheck disable=SC1091
  source /etc/os-release
@@ -58,3 +57,6 @@ index 4a011aa..eb6cd64 100755
  if [[ "$DISTRO" = fedora ]] || [[ "$DISTRO" = rhel ]] || [[ "$DISTRO" = ol ]] || [[ "$DISTRO" = centos ]]; then
  	[[ -z "$VMLINUX" ]] && VMLINUX="/usr/lib/debug/lib/modules/$ARCHVERSION/vmlinux"
  	[[ -e "$VMLINUX" ]] || die "kernel-debuginfo-$ARCHVERSION not installed"
+-- 
+2.7.4
+

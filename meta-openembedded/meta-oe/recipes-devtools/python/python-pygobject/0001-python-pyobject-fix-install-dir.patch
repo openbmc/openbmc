@@ -1,0 +1,121 @@
+From 8b4648d5bc50cb1c14961ed38bf97d5a693f5237 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Mon, 24 Jun 2019 14:51:52 +0800
+Subject: [PATCH] python-pyobject: fix the wrong install dir for python2
+
+* after upgrade to 3.32.1, pygobject switch to build with meson, and
+  default python option is python3, switch to python2
+
+* default install dir get by python.install_sources and 
+python.get_install_dir is get from python's sysconfig info,
+not like python3, for python2, the install dir include the basedir of
+recipe-sysroot-native, add stagedir option for user to config
+correct install dir.
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ gi/meson.build            | 7 +++----
+ gi/overrides/meson.build  | 4 ++--
+ gi/repository/meson.build | 4 ++--
+ meson.build               | 4 +++-
+ meson_options.txt         | 1 +
+ pygtkcompat/meson.build   | 4 ++--
+ 6 files changed, 13 insertions(+), 11 deletions(-)
+
+diff --git a/gi/meson.build b/gi/meson.build
+index c1afd68..249c23d 100644
+--- a/gi/meson.build
++++ b/gi/meson.build
+@@ -60,9 +60,8 @@ python_sources = [
+   'types.py',
+ ]
+ 
+-python.install_sources(python_sources,
+-  pure : false,
+-  subdir : 'gi'
++install_data(python_sources,
++  install_dir: join_paths(stagedir, 'gi')
+ )
+ 
+ # https://github.com/mesonbuild/meson/issues/4117
+@@ -76,7 +75,7 @@ giext = python.extension_module('_gi', sources,
+   dependencies : [python_ext_dep, glib_dep, gi_dep, ffi_dep],
+   include_directories: include_directories('..'),
+   install: true,
+-  subdir : 'gi',
++  install_dir: join_paths(stagedir, 'gi'),
+   c_args: pyext_c_args + main_c_args
+ )
+
+diff --git a/gi/overrides/meson.build b/gi/overrides/meson.build
+index 6ff073f..964fef1 100644
+--- a/gi/overrides/meson.build
++++ b/gi/overrides/meson.build
+@@ -10,6 +10,6 @@ python_sources = [
+   'keysyms.py',
+   '__init__.py']
+ 
+-python.install_sources(python_sources,
+-  subdir : join_paths('gi', 'overrides')
++install_data(python_sources,
++  install_dir: join_paths(stagedir, 'gi', 'overrides')
+ )
+diff --git a/gi/repository/meson.build b/gi/repository/meson.build
+index fdc136b..fc88adf 100644
+--- a/gi/repository/meson.build
++++ b/gi/repository/meson.build
+@@ -1,5 +1,5 @@
+ python_sources = ['__init__.py']
+ 
+-python.install_sources(python_sources,
+-  subdir : join_paths('gi', 'repository')
++install_data(python_sources,
++  install_dir: join_paths(stagedir, 'gi', 'repository')
+ )
+diff --git a/meson.build b/meson.build
+index d27a005..ecd55d5 100644
+--- a/meson.build
++++ b/meson.build
+@@ -165,12 +165,14 @@ else
+   py_version = pygobject_version
+ endif
+ 
++stagedir = get_option('stagedir')
++
+ pkginfo_conf = configuration_data()
+ pkginfo_conf.set('VERSION', py_version)
+ configure_file(input : 'PKG-INFO.in',
+   output : 'PyGObject-@0@.egg-info'.format(py_version),
+   configuration : pkginfo_conf,
+-  install_dir : python.get_install_dir(pure : false))
++  install_dir : stagedir)
+ 
+ subdir('gi')
+ subdir('pygtkcompat')
+diff --git a/meson_options.txt b/meson_options.txt
+index 5dd4cbc..21def16 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -1,3 +1,4 @@
+ option('python', type : 'string', value : 'python3')
+ option('pycairo', type : 'boolean', value : true, description : 'build with pycairo integration')
+ option('tests', type : 'boolean', value : true, description : 'build unit tests')
++option('stagedir', type : 'string', value : '')
+diff --git a/pygtkcompat/meson.build b/pygtkcompat/meson.build
+index 9e43c44..ef3322d 100644
+--- a/pygtkcompat/meson.build
++++ b/pygtkcompat/meson.build
+@@ -3,6 +3,6 @@ python_sources = [
+   'generictreemodel.py',
+   'pygtkcompat.py']
+ 
+-python.install_sources(python_sources,
+-  subdir : 'pygtkcompat'
++install_data(python_sources,
++  install_dir: join_paths(stagedir, 'pygtkcompat')
+ )
+-- 
+2.7.4
+

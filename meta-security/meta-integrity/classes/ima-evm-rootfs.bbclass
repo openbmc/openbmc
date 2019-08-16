@@ -1,7 +1,7 @@
 # No default! Either this or IMA_EVM_PRIVKEY/IMA_EVM_X509 have to be
 # set explicitly in a local.conf before activating ima-evm-rootfs.
 # To use the insecure (because public) example keys, use
-# IMA_EVM_KEY_DIR = "${IMA_EVM_BASE}/data/debug-keys"
+# IMA_EVM_KEY_DIR = "${INTEGRITY_BASE}/data/debug-keys"
 IMA_EVM_KEY_DIR ?= "IMA_EVM_KEY_DIR_NOT_SET"
 
 # Private key for IMA signing. The default is okay when

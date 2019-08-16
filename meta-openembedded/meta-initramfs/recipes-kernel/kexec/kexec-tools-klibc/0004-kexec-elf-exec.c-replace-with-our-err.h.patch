@@ -1,4 +1,4 @@
-From 8b9da93ac9a4ea79ae953f80f6fe6e4f080341f2 Mon Sep 17 00:00:00 2001
+From 720e24029fca7dcd8e1cd0b556f37aa1dc2b8fe8 Mon Sep 17 00:00:00 2001
 From: Andrea Adami <andrea.adami@gmail.com>
 Date: Tue, 17 Apr 2018 10:57:23 +0200
 Subject: [PATCH] kexec-elf-exec.c: replace with our elf.h

@@ -34,6 +34,14 @@ RDEPENDS_${PN} += "\
     perl-module-io-select \
     perl-module-io-socket \
 "
-RDEPENDS_${PN}-ptest += "freeradius"
+RDEPENDS_${PN}-ptest += " \
+    ${@bb.utils.contains('PTEST_ENABLED', '1', 'freeradius', '', d)} \
+"
 
 BBCLASSEXTEND = "native"
+
+python() {
+    if bb.utils.contains('PTEST_ENABLED', '1', 'True', 'False', d) and \
+       'networking-layer' not in d.getVar('BBFILE_COLLECTIONS').split():
+        raise bb.parse.SkipRecipe('ptest requires meta-networking to be present.')
+}

@@ -1,0 +1,25 @@
+From 340110292b35d367205953a59e7eab28e1f4a0bb Mon Sep 17 00:00:00 2001
+From: Daniel Frey <d.frey@gmx.de>
+Date: Sat, 7 Apr 2018 09:13:51 +0200
+Subject: [PATCH] Fix clang-warning about non-virtual dtor
+
+Upstream-Status: Backport [https://github.com/taocpp/PEGTL/commit/340110292b35d367205953a59e7eab28e1f4a0bb]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/example/pegtl/json_classes.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/src/example/pegtl/json_classes.hpp
++++ b/src/example/pegtl/json_classes.hpp
+@@ -34,10 +34,7 @@ namespace examples
+          : type( in_type )
+       {
+       }
+-
+-      ~json_base()
+-      {
+-      }
++      virtual ~json_base() = default;
+    };
+ 
+    inline std::ostream& operator<<( std::ostream& o, const json_base& j )

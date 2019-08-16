@@ -1,20 +1,31 @@
-Minic GNU basename() API for non-glibc library e.g. musl
+From 2ac679158062b14729f82f513fc7cafbb6f4f7a6 Mon Sep 17 00:00:00 2001
+From: Randy MacLeod <Randy.MacLeod@windriver.com>
+Date: Fri, 26 Jul 2019 14:26:54 -0400
+Subject: [PATCH 3/3] Minic GNU basename() API for non-glibc library e.g. musl
 
 Upstream-Status: Pending
-Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
-Index: poppler-0.64.0/utils/pdfsig.cc
-===================================================================
---- poppler-0.64.0.orig/utils/pdfsig.cc
-+++ poppler-0.64.0/utils/pdfsig.cc
-@@ -35,6 +35,10 @@
- #include "numberofcharacters.h"
- #include <libgen.h>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Randy MacLeod <Randy.MacLeod@windriver.com>
+---
+ goo/gbasename.cc | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/goo/gbasename.cc b/goo/gbasename.cc
+index 830c1c80..e93eb368 100644
+--- a/goo/gbasename.cc
++++ b/goo/gbasename.cc
+@@ -46,6 +46,10 @@
+ #include <stdlib.h>
+ #include <string.h>
  
 +#if !defined(__GLIBC__)
 +#define basename(src) (strrchr(src,'/') ? strrchr(src,'/')+1 : src)
 +#endif
 +
- static const char * getReadableSigState(SignatureValidationStatus sig_vs)
+ std::string gbasename(const char* filename)
  {
-   switch(sig_vs) {
+ #ifdef _MSC_VER
+-- 
+2.17.0
+

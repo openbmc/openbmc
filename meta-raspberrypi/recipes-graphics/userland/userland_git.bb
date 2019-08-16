@@ -12,11 +12,11 @@ COMPATIBLE_MACHINE = "^rpi$"
 
 SRCBRANCH = "master"
 SRCFORK = "raspberrypi"
-SRCREV = "517cdc30da167d81a485e7a994e02cec2390a269"
+SRCREV = "17d2fdc1abd370e09ba7074753294c7976dd6b0d"
 
 # Use the date of the above commit as the package version. Update this when
 # SRCREV is changed.
-PV = "20190501"
+PV = "20190724"
 
 SRC_URI = "\
     git://github.com/${SRCFORK}/userland.git;protocol=git;branch=${SRCBRANCH} \
@@ -38,6 +38,7 @@ SRC_URI = "\
     file://0016-Allow-multiple-wayland-compositor-state-data-per-pro.patch \
     file://0017-khronos-backport-typedef-for-EGL_EXT_image_dma_buf_i.patch \
     file://0018-Add-EGL_IMG_context_priority-related-defines.patch \
+    file://0019-libfdt-Undefine-__wordsize-if-already-defined.patch \
 "
 S = "${WORKDIR}/git"
 
@@ -64,7 +65,6 @@ do_install_append () {
 		sed -i 's/include "vcos_futex_mutex.h"/include "pthreads\/vcos_futex_mutex.h"/g' ${f}
 		sed -i 's/include "vcos_platform_types.h"/include "pthreads\/vcos_platform_types.h"/g' ${f}
 	done
-        install -D -m 0755 ${D}${prefix}${sysconfdir}/init.d/vcfiled ${D}${sysconfdir}/init.d/vcfiled
         rm -rf ${D}${prefix}${sysconfdir}
 	if [ "${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", "1", "0", d)}" = "1" ]; then
 		rm -rf ${D}${libdir}/libEGL*

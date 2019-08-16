@@ -10,11 +10,10 @@ DEPENDS = "libpam openldap"
 inherit distro_features_check
 REQUIRED_DISTRO_FEATURES = "pam"
 
-SRC_URI = "https://github.com/rmbreak/pam_ldapdb/archive/v${PV}.tar.gz;downloadfilename=${BP}.tar.gz"
-SRC_URI[md5sum] = "2dd4f1370fcfe995ee0ad09611109b87"
-SRC_URI[sha256sum] = "8ed92b36523556bb5d9bf3eb33a1035e46041d4be767c8d62136930c0ca0e45b"
+SRCREV = "84d7b260f1ae6857ae36e014c9a5968e8aa1cbe8"
+SRC_URI = "git://github.com/rmbreak/pam_ldapdb"
 
-S = "${WORKDIR}/pam_ldapdb-${PV}"
+S = "${WORKDIR}/git"
 
 do_install () {
     oe_runmake install DESTDIR=${D} PAMDIR=${base_libdir}/security

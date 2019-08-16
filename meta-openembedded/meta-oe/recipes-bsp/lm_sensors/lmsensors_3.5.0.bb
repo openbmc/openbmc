@@ -70,6 +70,18 @@ do_install() {
 
 RPROVIDES_${PN}-dbg += "${PN}-libsensors-dbg ${PN}-sensors-dbg ${PN}-sensord-dbg ${PN}-isatools-dbg"
 
+ALLOW_EMPTY_${PN} = "1"
+RDEPENDS_${PN} += " \
+    ${PN}-libsensors \
+    ${PN}-sensors \
+    ${PN}-sensord \
+    ${PN}-fancontrol \
+    ${PN}-sensorsdetect \
+    ${PN}-sensorsconfconvert \
+    ${PN}-pwmconfig \
+    ${PN}-isatools \
+"
+
 # libsensors packages
 PACKAGES =+ "${PN}-libsensors ${PN}-libsensors-dev ${PN}-libsensors-staticdev ${PN}-libsensors-doc"
 

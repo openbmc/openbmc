@@ -23,9 +23,9 @@ diff --git a/src/evmctl.c b/src/evmctl.c
 index c54efbb..23cf54c 100644
 --- a/src/evmctl.c
 +++ b/src/evmctl.c
-@@ -56,6 +56,18 @@
- #include <ctype.h>
+@@ -57,6 +57,18 @@
  #include <termios.h>
+ #include <assert.h>
  
 +/*
 + * linux/xattr.h might be old to have this. Allow compilation on older

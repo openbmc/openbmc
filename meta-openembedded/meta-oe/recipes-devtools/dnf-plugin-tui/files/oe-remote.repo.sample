@@ -1,0 +1,5 @@
+[base]
+name=myrepo
+baseurl=http://127.0.0.1/oe_repo/
+enabled=1
+gpgcheck=0

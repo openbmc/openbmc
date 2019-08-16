@@ -1,6 +1,6 @@
-From 13bbc851d9fd7396f087758e614abba60eeb2aad Mon Sep 17 00:00:00 2001
+From 71a10c176c34da898c0169371b3c1b032d2f88b1 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
-Date: Wed, 23 Jan 2019 10:14:05 +0800
+Date: Wed, 19 Jun 2019 17:53:34 +0800
 Subject: [PATCH] tdb: Add configure options for packages
 
 Add configure options for the following packages:
@@ -15,22 +15,16 @@ Upstream-Status: Inappropriate [oe deterministic build specific]
 
 Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
 
-Update for libtdb_1.3.14.
+Update to 1.4.0
 
-Signed-off-by: Huang Qiyu <huangqy.fnst@cn.fujitsu.com>
-
-Update for libtdb_1.3.16
-Signed-off-by: Changqing Li <changqing.li@windriver.com>
-
-Update for libtdb_1.3.17
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
- lib/replace/wscript | 95 ++++++++++++++++++++++++++++++++++++++++-------------
+ lib/replace/wscript | 94 ++++++++++++++++++++++++++++++++++++++++-------------
  wscript             |  6 ++++
- 2 files changed, 79 insertions(+), 22 deletions(-)
+ 2 files changed, 78 insertions(+), 22 deletions(-)
 
 diff --git a/lib/replace/wscript b/lib/replace/wscript
-index 6cbae93..7aeaf46 100644
+index 1d01e1e..2336dc3 100644
 --- a/lib/replace/wscript
 +++ b/lib/replace/wscript
 @@ -25,6 +25,41 @@ def options(opt):
@@ -104,26 +98,26 @@ index 6cbae93..7aeaf46 100644
 +        conf.CHECK_HEADERS('sys/capability.h')
 +
      conf.CHECK_HEADERS('port.h')
-     conf.CHECK_HEADERS('sys/fcntl.h sys/filio.h sys/filsys.h sys/fs/s5param.h sys/fs/vx/quota.h')
+     conf.CHECK_HEADERS('sys/fcntl.h sys/filio.h sys/filsys.h sys/fs/s5param.h')
      conf.CHECK_HEADERS('sys/id.h sys/ioctl.h sys/ipc.h sys/mman.h sys/mode.h sys/ndir.h sys/priv.h')
-@@ -110,8 +158,10 @@ def configure(conf):
+@@ -110,9 +158,10 @@ def configure(conf):
      conf.CHECK_HEADERS('sys/fileio.h sys/filesys.h sys/dustat.h sys/sysmacros.h')
      conf.CHECK_HEADERS('xfs/libxfs.h netgroup.h')
  
 -    conf.CHECK_HEADERS('valgrind.h valgrind/valgrind.h')
 -    conf.CHECK_HEADERS('valgrind/memcheck.h valgrind/helgrind.h')
+-    conf.CHECK_HEADERS('nss_common.h nsswitch.h ns_api.h')
 +    if Options.options.enable_valgrind:
 +        conf.CHECK_HEADERS('valgrind.h valgrind/valgrind.h')
 +        conf.CHECK_HEADERS('valgrind/memcheck.h valgrind/helgrind.h')
 +
-     conf.CHECK_HEADERS('nss_common.h nsswitch.h ns_api.h')
      conf.CHECK_HEADERS('sys/extattr.h sys/ea.h sys/proplist.h sys/cdefs.h')
      conf.CHECK_HEADERS('utmp.h utmpx.h lastlog.h')
-@@ -379,21 +429,22 @@ def configure(conf):
-     conf.CHECK_FUNCS('prctl dirname basename')
+     conf.CHECK_HEADERS('syscall.h sys/syscall.h inttypes.h')
+@@ -380,20 +429,21 @@ def configure(conf):
  
      strlcpy_in_bsd = False
--
+ 
 -    # libbsd on some platforms provides strlcpy and strlcat
 -    if not conf.CHECK_FUNCS('strlcpy strlcat'):
 -        if conf.CHECK_FUNCS_IN('strlcpy strlcat', 'bsd', headers='bsd/string.h',
@@ -138,7 +132,6 @@ index 6cbae93..7aeaf46 100644
 -
 -    if not conf.CHECK_FUNCS('closefrom'):
 -        conf.CHECK_FUNCS_IN('closefrom', 'bsd', headers='bsd/unistd.h')
-+    
 +    if Options.options.enable_libbsd:
 +        # libbsd on some platforms provides strlcpy and strlcat
 +        if not conf.CHECK_FUNCS('strlcpy strlcat'):
@@ -158,7 +151,7 @@ index 6cbae93..7aeaf46 100644
      conf.CHECK_CODE('''
                  struct ucred cred;
 diff --git a/wscript b/wscript
-index bc5ee26..9ac10b6 100644
+index 5598d02..8d47244 100644
 --- a/wscript
 +++ b/wscript
 @@ -69,6 +69,12 @@ def options(opt):

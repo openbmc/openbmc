@@ -2,8 +2,8 @@ SUMMARY = "Invoke py.test as distutils command with dependency resolution"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=a33f38bbf47d48c70fe0d40e5f77498e"
 
-SRC_URI[md5sum] = "4b696b0f35767f0694f183d0a1855300"
-SRC_URI[sha256sum] = "d23f117be39919f00dd91bffeb4f15e031ec797501b717a245e377aee0f577be"
+SRC_URI[md5sum] = "a52d65bd3dbc88bed751cf934dc41db3"
+SRC_URI[sha256sum] = "25a013c8d84f0ca60bb01bd11913a3bcab420f601f0f236de4423074af656e7a"
 
 inherit pypi
 

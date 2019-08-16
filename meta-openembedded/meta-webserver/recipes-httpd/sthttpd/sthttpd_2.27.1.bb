@@ -6,18 +6,16 @@ LIC_FILES_CHKSUM = "file://src/thttpd.c;beginline=1;endline=26;md5=0c5762c2c34dc
 
 DEPENDS += "base-passwd virtual/crypt"
 
-SRC_URI = "https://github.com/blueness/${BPN}/archive/v${PV}.tar.gz;downloadfilename=${BP}.tar.gz \
+SRCREV = "2845bf5bff2b820d2336c8c8061cbfc5f271e720"
+SRC_URI = "git://github.com/blueness/${BPN} \
            file://thttpd.service \
            file://thttpd.conf \
            file://init"
 
-SRC_URI[md5sum] = "3cda1b6c8c8542b1510eadb8e540d8b6"
-SRC_URI[sha256sum] = "a1ee2806432eaf5b5dd267a0523701f9f1fa00fefd499d5bec42165a41e05846"
-
 UPSTREAM_CHECK_URI = "https://github.com/blueness/sthttpd/releases/"
 UPSTREAM_CHECK_REGEX = "v(?P<pver>\d+(\.\d+)+).tar.gz"
 
-S = "${WORKDIR}/sthttpd-${PV}"
+S = "${WORKDIR}/git"
 
 inherit autotools update-rc.d systemd update-alternatives
 

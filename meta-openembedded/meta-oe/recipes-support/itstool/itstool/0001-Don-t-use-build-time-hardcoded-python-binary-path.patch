@@ -1,0 +1,29 @@
+From cd9b56224895576125e91cca317ace8a80f3eb77 Mon Sep 17 00:00:00 2001
+From: Piotr Tworek <tworaz@tworaz.net>
+Date: Sat, 27 Jul 2019 10:19:11 +0200
+Subject: [PATCH] Don't use build time hardcoded python binary path.
+
+This path obviously won't work on target since they refer to build
+machine directory structure. Native builds will also fail if local.conf
+has INHERIT+=rm_work. Instread of hardcoding path to python binary use
+whatever is found in PATH first. This should also allow the tool to use
+python3 binary provided in recipe-sysroot-native.
+
+Upstream-Status: Inappropriate [OE specific]
+---
+ itstool.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/itstool.in b/itstool.in
+index b3c0033..7df2476 100755
+--- a/itstool.in
++++ b/itstool.in
+@@ -1,4 +1,4 @@
+-#!@PYTHON@ -s
++#!/usr/bin/env -S python3 -s
+ #
+ # Copyright (c) 2010-2018 Shaun McCance <shaunm@gnome.org>
+ #
+--
+2.21.0
+

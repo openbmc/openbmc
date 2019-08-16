@@ -10,6 +10,7 @@ SRC_URI[sha256sum] = "041c81822e9f84b1d9c401182e174996f0bae9991f33725d059b771744
 RDEPENDS_${PN}_class-target = " \
     ${PYTHON_PN}-ctypes \
     ${PYTHON_PN}-io \
+    ${PYTHON_PN}-pycparser \
     ${PYTHON_PN}-shell \
 "
 

@@ -45,6 +45,7 @@ PACKAGECONFIG_remove_armv6 = "tcmalloc"
 PACKAGECONFIG_remove_libc-musl = "tcmalloc"
 
 PACKAGECONFIG[tcmalloc] = "--use-system-tcmalloc,--allocator=system,gperftools,"
+PACKAGECONFIG[shell] = ",--js-engine=none,,"
 
 EXTRA_OESCONS = "--prefix=${D}${prefix} \
                  LIBPATH=${STAGING_LIBDIR} \
@@ -55,12 +56,11 @@ EXTRA_OESCONS = "--prefix=${D}${prefix} \
                  --disable-warnings-as-errors \
                  --use-system-pcre \
                  --use-system-zlib \
-                 --js-engine=none \
                  --nostrip \
                  --endian=${@oe.utils.conditional('SITEINFO_ENDIANNESS', 'le', 'little', 'big', d)} \
                  --wiredtiger=${@['off','on'][d.getVar('SITEINFO_BITS') != '32']} \
                  ${PACKAGECONFIG_CONFARGS} \
-                 mongod mongos"
+                 core"
 
 do_configure_prepend() {
         # tests use hex floats, not supported in plain C++
@@ -75,3 +75,5 @@ scons_do_install() {
         ${STAGING_BINDIR_NATIVE}/scons install ${EXTRA_OESCONS}|| \
         die "scons install execution failed."
 }
+
+PNBLACKLIST[mongodb] = "Since bbclass scons convert to python3, build mongodb failed"

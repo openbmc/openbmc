@@ -1,15 +1,16 @@
-From 06b0d43c20f7c6200902d4c6db3d33416877f71c Mon Sep 17 00:00:00 2001
+From edf186f45d543e318400195cc25175387ff3f5c4 Mon Sep 17 00:00:00 2001
 From: Andrea Adami <andrea.adami@gmail.com>
 Date: Sun, 26 Aug 2018 21:40:06 +0200
-Subject: [PATCH 1/1] arm- backport from oe-core
+Subject: [PATCH] arm- backport from oe-core
 
 Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+
 ---
  kexec/arch/arm/crashdump-arm.c | 5 ++++-
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/kexec/arch/arm/crashdump-arm.c b/kexec/arch/arm/crashdump-arm.c
-index 2530b29..af2600d 100644
+index daa4788..3f72b38 100644
 --- a/kexec/arch/arm/crashdump-arm.c
 +++ b/kexec/arch/arm/crashdump-arm.c
 @@ -240,6 +240,7 @@ int load_crashdump_segments(struct kexec_info *info, char *mod_cmdline)
@@ -39,6 +40,3 @@ index 2530b29..af2600d 100644
  					  crash_kernel_mem.start,
  					  crash_kernel_mem.end, -1, 0);
  
--- 
-2.7.4
-

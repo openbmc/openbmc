@@ -1,4 +1,4 @@
-From 52879439f2976662140b76951f43f16e1d5ef08e Mon Sep 17 00:00:00 2001
+From 9f3073bf6a7c7c51bb49d25f65c8f75cc704a5ee Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Mon, 18 Mar 2019 23:23:55 -0400
 Subject: [PATCH] explicitly set compile options
@@ -15,12 +15,12 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 12 insertions(+)
 
 diff --git a/setup.cfg b/setup.cfg
-index 95900ff..27da313 100644
+index 3ab2e127..e92615f3 100644
 --- a/setup.cfg
 +++ b/setup.cfg
-@@ -9,3 +9,15 @@ addopts = -vx Tests
- 
+@@ -4,3 +4,15 @@ test=pytest
  [flake8]
+ extend-ignore = E203, W503
  max-line-length = 88
 +
 +[build_ext]
@@ -35,5 +35,5 @@ index 95900ff..27da313 100644
 +disable-webpmux = 1
 +disable-imagequant = 1
 -- 
-2.8.1
+2.20.1
 

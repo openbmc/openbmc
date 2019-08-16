@@ -1,0 +1,43 @@
+From 8ca8a05d92fa799fe93a6edc27b058802211fddc Mon Sep 17 00:00:00 2001
+From: Jens Axboe <axboe@kernel.dk>
+Date: Sat, 3 Aug 2019 08:33:24 -0600
+Subject: [PATCH] engines/splice: remove buggy ->mem_align set
+
+Two things wrong here:
+
+1) We align buffers by default, so no need for splice to do anything
+   extra.
+2) ->mem_align is not a true/false setting, it's the alignment itself.
+   Hence the current setting to 1 is just buggy.
+
+Upstream-Status: Backport [https://github.com/axboe/fio/commit/8ca8a05d92fa799fe93a6edc27b058802211fddc]
+
+Fixes: https://github.com/axboe/fio/issues/810
+Reported-by: Sitsofe Wheeler <sitsofe@yahoo.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Liwei Song <liwei.song@windriver.com>
+---
+ engines/splice.c | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/engines/splice.c b/engines/splice.c
+index feb764feb2f4..6fc36bb6f154 100644
+--- a/engines/splice.c
++++ b/engines/splice.c
+@@ -278,13 +278,6 @@ static int fio_spliceio_init(struct thread_data *td)
+ 	 */
+ 	sd->vmsplice_to_user_map = 1;
+ 
+-	/*
+-	 * And if vmsplice_to_user works, we definitely need aligned
+-	 * buffers. Just set ->odirect to force that.
+-	 */
+-	if (td_read(td))
+-		td->o.mem_align = 1;
+-
+ 	td->io_ops_data = sd;
+ 	return 0;
+ }
+-- 
+2.22.0
+
