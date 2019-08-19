@@ -16,7 +16,7 @@ SRC_URI = "https://www.tcpdump.org/release/${BP}.tar.gz \
 SRC_URI[md5sum] = "dffd65cb14406ab9841f421732eb0f33"
 SRC_URI[sha256sum] = "2edb88808e5913fdaa8e9c1fcaf272e19b2485338742b5074b9fe44d68f37019"
 
-inherit autotools binconfig-disabled pkgconfig bluetooth
+inherit autotools binconfig-disabled pkgconfig
 
 BINCONFIG = "${bindir}/pcap-config"
 
@@ -29,7 +29,7 @@ EXTRA_OECONF = " \
                  "
 EXTRA_AUTORECONF += "--exclude=aclocal"
 
-PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', '${BLUEZ}', '', d)} \
+PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluez5', '', d)} \
                    ${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)} \
 "
 PACKAGECONFIG[bluez5] = "--enable-bluetooth,--disable-bluetooth,bluez5"

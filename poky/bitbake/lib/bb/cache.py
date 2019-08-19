@@ -83,20 +83,20 @@ class CoreRecipeInfo(RecipeInfoCommon):
         self.appends = self.listvar('__BBAPPEND', metadata)
         self.nocache = self.getvar('BB_DONT_CACHE', metadata)
 
-        self.skipreason = self.getvar('__SKIPPED', metadata)
-        if self.skipreason:
-            self.pn = self.getvar('PN', metadata) or bb.parse.vars_from_file(filename,metadata)[0]
-            self.skipped = True
-            self.provides  = self.depvar('PROVIDES', metadata)
-            self.rprovides = self.depvar('RPROVIDES', metadata)
-            return
-
-        self.tasks = metadata.getVar('__BBTASKS', False)
-
-        self.pn = self.getvar('PN', metadata)
+        self.provides  = self.depvar('PROVIDES', metadata)
+        self.rprovides = self.depvar('RPROVIDES', metadata)
+        self.pn = self.getvar('PN', metadata) or bb.parse.vars_from_file(filename,metadata)[0]
         self.packages = self.listvar('PACKAGES', metadata)
         if not self.packages:
             self.packages.append(self.pn)
+        self.packages_dynamic = self.listvar('PACKAGES_DYNAMIC', metadata)
+
+        self.skipreason = self.getvar('__SKIPPED', metadata)
+        if self.skipreason:
+            self.skipped = True
+            return
+
+        self.tasks = metadata.getVar('__BBTASKS', False)
 
         self.basetaskhashes = self.taskvar('BB_BASEHASH', self.tasks, metadata)
         self.hashfilename = self.getvar('BB_HASHFILENAME', metadata)
@@ -113,11 +113,8 @@ class CoreRecipeInfo(RecipeInfoCommon):
         self.stampclean = self.getvar('STAMPCLEAN', metadata)
         self.stamp_extrainfo = self.flaglist('stamp-extra-info', self.tasks, metadata)
         self.file_checksums = self.flaglist('file-checksums', self.tasks, metadata, True)
-        self.packages_dynamic = self.listvar('PACKAGES_DYNAMIC', metadata)
         self.depends          = self.depvar('DEPENDS', metadata)
-        self.provides         = self.depvar('PROVIDES', metadata)
         self.rdepends         = self.depvar('RDEPENDS', metadata)
-        self.rprovides        = self.depvar('RPROVIDES', metadata)
         self.rrecommends      = self.depvar('RRECOMMENDS', metadata)
         self.rprovides_pkg    = self.pkgvar('RPROVIDES', self.packages, metadata)
         self.rdepends_pkg     = self.pkgvar('RDEPENDS', self.packages, metadata)
@@ -398,6 +395,15 @@ class Cache(NoCache):
             logger.info("Out of date cache found, rebuilding...")
         else:
             logger.debug(1, "Cache file %s not found, building..." % self.cachefile)
+
+        # We don't use the symlink, its just for debugging convinience
+        symlink = os.path.join(self.cachedir, "bb_cache.dat")
+        if os.path.exists(symlink):
+            bb.utils.remove(symlink)
+        try:
+            os.symlink(os.path.basename(self.cachefile), symlink)
+        except OSError:
+            pass
 
     def load_cachefile(self):
         cachesize = 0

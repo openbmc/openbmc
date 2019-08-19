@@ -9,7 +9,7 @@ makes the file non-reproducible when building because ^X could be the
 absolute path to miniperl.
 
 Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
-Upstream-status: Submitted [https://rt.cpan.org/Public/Bug/Display.html?id=129866]
+Upstream-Status: Submitted [https://rt.cpan.org/Public/Bug/Display.html?id=129866]
 ---
  cpan/ExtUtils-Constant/lib/ExtUtils/Constant/XS.pm | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

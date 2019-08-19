@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #
 # Copyright (C) 2003, 2004  Chris Larson
 # Copyright (C) 2003, 2004  Phil Blundell
@@ -122,6 +121,7 @@ class CookerConfiguration(object):
         self.profile = False
         self.nosetscene = False
         self.setsceneonly = False
+        self.skipsetscene = False
         self.invalidate_stamp = False
         self.dump_signatures = []
         self.dry_run = False

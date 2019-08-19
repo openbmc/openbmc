@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #
 # Copyright (c) 2015, Intel Corporation.
 #
@@ -500,7 +499,8 @@ class Wic2(WicTestCase):
         wicvars = set(bb_vars['WICVARS'].split())
         # filter out optional variables
         wicvars = wicvars.difference(('DEPLOY_DIR_IMAGE', 'IMAGE_BOOT_FILES',
-                                      'INITRD', 'INITRD_LIVE', 'ISODIR'))
+                                      'INITRD', 'INITRD_LIVE', 'ISODIR','INITRAMFS_IMAGE',
+                                      'INITRAMFS_IMAGE_BUNDLE', 'INITRAMFS_LINK_NAME'))
         with open(path) as envfile:
             content = dict(line.split("=", 1) for line in envfile)
             # test if variables used by wic present in the .env file
@@ -679,6 +679,65 @@ class Wic2(WicTestCase):
             runCmd(cmd)
             wksname = os.path.splitext(os.path.basename(wks.name))[0]
             out = glob(self.resultdir + "%s-*direct" % wksname)
+            self.assertEqual(1, len(out))
+
+    @only_for_arch(['i586', 'i686', 'x86_64'])
+    def test_biosplusefi_plugin_qemu(self):
+        """Test biosplusefi plugin in qemu"""
+        for fstype in ("ext4", "wic"):
+            config = 'IMAGE_FSTYPES = "%s"\nWKS_FILE = "test_biosplusefi_plugin.wks"\nMACHINE_FEATURES_append = " efi"\n' % fstype
+            self.append_config(config)
+            self.assertEqual(0, bitbake('core-image-minimal').status)
+            self.remove_config(config)
+
+        with runqemu('core-image-minimal', ssh=False, image_fstype='wic') as qemu:
+            # Check that we have ONLY two /dev/sda* partitions (/boot and /)
+            cmd = "grep sda. /proc/partitions | wc -l"
+            status, output = qemu.run_serial(cmd)
+            self.assertEqual(1, status, 'Failed to run command "%s": %s' % (cmd, output))
+            self.assertEqual(output, '2')
+            # Check that /dev/sda1 is /boot and that either /dev/root OR /dev/sda2 is /
+            cmd = "mount | grep '^/dev/' | cut -f1,3 -d ' ' | egrep -c -e '/dev/sda1 /boot' -e '/dev/root /|/dev/sda2 /'"
+            status, output = qemu.run_serial(cmd)
+            self.assertEqual(1, status, 'Failed to run command "%s": %s' % (cmd, output))
+            self.assertEqual(output, '2')
+            # Check that /boot has EFI bootx64.efi (required for EFI)
+            cmd = "ls /boot/EFI/BOOT/bootx64.efi | wc -l"
+            status, output = qemu.run_serial(cmd)
+            self.assertEqual(1, status, 'Failed to run command "%s": %s' % (cmd, output))
+            self.assertEqual(output, '1')
+            # Check that "BOOTABLE" flag is set on boot partition (required for PC-Bios)
+            # Trailing "cat" seems to be required; otherwise run_serial() sends back echo of the input command
+            cmd = "fdisk -l /dev/sda | grep /dev/sda1 | awk {print'$2'} | cat"
+            status, output = qemu.run_serial(cmd)
+            self.assertEqual(1, status, 'Failed to run command "%s": %s' % (cmd, output))
+            self.assertEqual(output, '*')
+
+    @only_for_arch(['i586', 'i686', 'x86_64'])
+    def test_biosplusefi_plugin(self):
+        """Test biosplusefi plugin"""
+        # Wic generation below may fail depending on the order of the unittests
+        # This is because bootimg-pcbios (that bootimg-biosplusefi uses) generate its MBR inside STAGING_DATADIR directory
+        #    which may or may not exists depending on what was built already
+        # If an image hasn't been built yet, directory ${STAGING_DATADIR}/syslinux won't exists and _get_bootimg_dir()
+        #   will raise with "Couldn't find correct bootimg_dir"
+        # The easiest way to work-around this issue is to make sure we already built an image here, hence the bitbake call
+        for fstype in ("ext4", "wic"):
+            config = 'IMAGE_FSTYPES = "%s"\nWKS_FILE = "test_biosplusefi_plugin.wks"\nMACHINE_FEATURES_append = " efi"\n' % fstype
+            self.append_config(config)
+            self.assertEqual(0, bitbake('core-image-minimal').status)
+            self.remove_config(config)
+
+        img = 'core-image-minimal'
+        with NamedTemporaryFile("w", suffix=".wks") as wks:
+            wks.writelines(['part /boot --active --source bootimg-biosplusefi --sourceparams="loader=grub-efi"\n',
+                            'part / --source rootfs --fstype=ext4 --align 1024 --use-uuid\n'\
+                            'bootloader --timeout=0 --append="console=ttyS0,115200n8"\n'])
+            wks.flush()
+            cmd = "wic create %s -e %s -o %s" % (wks.name, img, self.resultdir)
+            runCmd(cmd)
+            wksname = os.path.splitext(os.path.basename(wks.name))[0]
+            out = glob(self.resultdir + "%s-*.direct" % wksname)
             self.assertEqual(1, len(out))
 
     def test_fs_types(self):

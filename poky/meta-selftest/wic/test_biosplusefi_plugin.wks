@@ -1,0 +1,6 @@
+# short-description: This file is used in oe-selftest wic module to test biosplusefi plugin
+
+part /boot --source bootimg-biosplusefi --sourceparams="loader=grub-efi" --active --align 1024 --use-uuid
+part / --source rootfs --fstype=ext4 --align 1024 --use-uuid
+
+bootloader  --timeout=0 --append="console=ttyS0,115200n8"

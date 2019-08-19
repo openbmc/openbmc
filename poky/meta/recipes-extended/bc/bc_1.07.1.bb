@@ -13,7 +13,8 @@ DEPENDS = "flex-native"
 
 SRC_URI = "${GNU_MIRROR}/${BPN}/${BP}.tar.gz \
            file://no-gen-libmath.patch \
-           file://libmath.h"
+           file://libmath.h \
+           file://0001-dc-fix-exit-code-of-q-command.patch"
 SRC_URI[md5sum] = "cda93857418655ea43590736fc3ca9fc"
 SRC_URI[sha256sum] = "62adfca89b0a1c0164c2cdca59ca210c1d44c3ffc46daf9931cf4942664cb02a"
 

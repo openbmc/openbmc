@@ -19,11 +19,10 @@ inherit gettext autotools update-alternatives pkgconfig
 EXTRA_OECONF += "--without-libsecret --without-libgsasl --without-libidn"
 
 ALTERNATIVE_${PN} = "sendmail"
+# /usr/lib/sendmial is required by LSB core test
+ALTERNATIVE_${PN}_linuxstdbase = "sendmail usr-lib-sendmail"
 ALTERNATIVE_TARGET[sendmail] = "${bindir}/msmtp"
 ALTERNATIVE_LINK_NAME[sendmail] = "${sbindir}/sendmail"
+ALTERNATIVE_TARGET[usr-lib-sendmail] = "${bindir}/msmtp"
+ALTERNATIVE_LINK_NAME[usr-lib-sendmail] = "/usr/lib/sendmail"
 ALTERNATIVE_PRIORITY = "100"
-
-pkg_postinst_${PN}_linuxstdbase () {
-	# /usr/lib/sendmial is required by LSB core test
-	[ ! -L $D/usr/lib/sendmail ] && ln -sf ${sbindir}/sendmail $D/usr/lib/
-}

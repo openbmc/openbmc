@@ -927,6 +927,10 @@ def sstate_checkhashes(sq_fn, sq_task, sq_hash, sq_hashfn, d, siginfo=False, *, 
 
             bb.event.fire(bb.event.ProcessFinished(msg), d)
 
+    # Likely checking an individual task hash again for multiconfig sharing of sstate tasks so skip reporting
+    if len(sq_fn) == 1:
+        return ret
+
     inheritlist = d.getVar("INHERIT")
     if "toaster" in inheritlist:
         evdata = {'missed': [], 'found': []};

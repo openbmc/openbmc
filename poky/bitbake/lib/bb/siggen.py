@@ -49,7 +49,9 @@ class SignatureGenerator(object):
         return self.taskhash[task]
 
     def get_taskhash(self, fn, task, deps, dataCache):
-        return "0"
+        k = fn + "." + task
+        self.taskhash[k] = hashlib.sha256(k.encode("utf-8")).hexdigest()
+        return self.taskhash[k]
 
     def writeout_file_checksum_cache(self):
         """Write/update the file checksum cache onto disk"""
@@ -643,9 +645,9 @@ def compare_sigfiles(a, b, recursecb=None, color=False, collapsed=False):
     a_taint = a_data.get('taint', None)
     b_taint = b_data.get('taint', None)
     if a_taint != b_taint:
-        if a_taint.startswith('nostamp:'):
+        if a_taint and a_taint.startswith('nostamp:'):
             a_taint = a_taint.replace('nostamp:', 'nostamp(uuid4):')
-        if b_taint.startswith('nostamp:'):
+        if b_taint and b_taint.startswith('nostamp:'):
             b_taint = b_taint.replace('nostamp:', 'nostamp(uuid4):')
         output.append(color_format("{color_title}Taint (by forced/invalidated task) changed{color_default} from %s to %s") % (a_taint, b_taint))
 

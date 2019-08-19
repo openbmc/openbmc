@@ -18,8 +18,10 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/utils/raid/mdadm/${BPN}-${PV}.tar.xz \
            file://0001-Compute-abs-diff-in-a-standard-compliant-way.patch \
            file://0001-fix-gcc-8-format-truncation-warning.patch \
            file://debian-no-Werror.patch \
+           file://0001-Revert-tests-wait-for-complete-rebuild-in-integrity-.patch \
 	   file://mdadm.init \
-	   file://mdmonitor.service \
+	   file://0001-mdadm-add-option-y-for-use-syslog-to-recive-event-re.patch \
+           file://include_sysmacros.patch \
            "
 SRC_URI[md5sum] = "51bf3651bd73a06c413a2f964f299598"
 SRC_URI[sha256sum] = "ab7688842908d3583a704d491956f31324c3a5fc9f6a04653cb75d19f1934f4a"
@@ -65,7 +67,6 @@ do_install_append() {
         oe_runmake install-systemd DESTDIR=${D}
 }
 
-
 do_compile_ptest() {
 	oe_runmake test
 }
@@ -74,6 +75,14 @@ do_install_ptest() {
 	cp -R --no-dereference --preserve=mode,links -v ${S}/tests ${D}${PTEST_PATH}/tests
 	cp ${S}/test ${D}${PTEST_PATH}
 	sed -e 's!sleep 0.*!sleep 1!g; s!/var/tmp!/!g' -i ${D}${PTEST_PATH}/test
+        sed -i -e '/echo -ne "$_script... "/d' \
+               -e 's/echo "succeeded"/echo -e "PASS: $_script"/g' \
+               -e '/save_log fail/N; /_fail=1/i\\t\t\techo -ne "FAIL: $_script"' \
+               -e '/die "dmesg prints errors when testing $_basename!"/i\\t\t\t\techo -ne "FAIL: $_script" &&' \
+               ${D}${PTEST_PATH}/test
+
+        chmod +x ${D}${PTEST_PATH}/test
+
 	ln -s ${base_sbindir}/mdadm ${D}${PTEST_PATH}/mdadm
 	for prg in test_stripe swap_super raid6check
 	do

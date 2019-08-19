@@ -21,7 +21,7 @@ OPKG_PREPROCESS_COMMANDS = ""
 
 OPKG_POSTPROCESS_COMMANDS = ""
 
-OPKGLIBDIR = "${localstatedir}/lib"
+OPKGLIBDIR ??= "${localstatedir}/lib"
 
 MULTILIBRE_ALLOW_REP = "${OPKGLIBDIR}/opkg|/usr/lib/opkg"
 

@@ -181,7 +181,7 @@ class ChangeRecord:
             diff = difflib.unified_diff(alines, blines, self.fieldname, self.fieldname, lineterm='')
             out += '\n  '.join(list(diff)[2:])
             out += '\n  --'
-        elif self.fieldname in img_monitor_files or '/image-files/' in self.path:
+        elif self.fieldname in img_monitor_files or '/image-files/' in self.path or self.fieldname == "sysroot":
             if self.filechanges or (self.oldvalue and self.newvalue):
                 fieldname = self.fieldname
                 if '/image-files/' in self.path:
@@ -282,7 +282,7 @@ def file_list_to_dict(lines):
     return adict
 
 
-def compare_file_lists(alines, blines):
+def compare_file_lists(alines, blines, compare_ownership=True):
     adict = file_list_to_dict(alines)
     bdict = file_list_to_dict(blines)
     filechanges = []
@@ -294,16 +294,20 @@ def compare_file_lists(alines, blines):
             newvalue = newsplitv[0][0]
             if oldvalue != newvalue:
                 filechanges.append(FileChange(path, FileChange.changetype_type, oldvalue, newvalue))
+
             # Check permissions
             oldvalue = splitv[0][1:]
             newvalue = newsplitv[0][1:]
             if oldvalue != newvalue:
                 filechanges.append(FileChange(path, FileChange.changetype_perms, oldvalue, newvalue))
-            # Check owner/group
-            oldvalue = '%s/%s' % (splitv[1], splitv[2])
-            newvalue = '%s/%s' % (newsplitv[1], newsplitv[2])
-            if oldvalue != newvalue:
-                filechanges.append(FileChange(path, FileChange.changetype_ownergroup, oldvalue, newvalue))
+
+            if compare_ownership:
+                # Check owner/group
+                oldvalue = '%s/%s' % (splitv[1], splitv[2])
+                newvalue = '%s/%s' % (newsplitv[1], newsplitv[2])
+                if oldvalue != newvalue:
+                    filechanges.append(FileChange(path, FileChange.changetype_ownergroup, oldvalue, newvalue))
+
             # Check symlink target
             if newsplitv[0][0] == 'l':
                 if len(splitv) > 3:
@@ -571,6 +575,15 @@ def process_changes(repopath, revision1, revision2='HEAD', report_all=False, rep
             elif filename.startswith('latest.'):
                 chg = ChangeRecord(path, filename, d.a_blob.data_stream.read().decode('utf-8'), d.b_blob.data_stream.read().decode('utf-8'), True)
                 changes.append(chg)
+            elif filename == 'sysroot':
+                alines = d.a_blob.data_stream.read().decode('utf-8').splitlines()
+                blines = d.b_blob.data_stream.read().decode('utf-8').splitlines()
+                filechanges = compare_file_lists(alines,blines, compare_ownership=False)
+                if filechanges:
+                    chg = ChangeRecord(path, filename, None, None, True)
+                    chg.filechanges = filechanges
+                    changes.append(chg)
+
         elif path.startswith('images/'):
             filename = os.path.basename(d.a_blob.path)
             if filename in img_monitor_files:

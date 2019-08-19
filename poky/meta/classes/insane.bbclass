@@ -874,15 +874,14 @@ def package_qa_check_host_user(path, name, d, elf, messages):
         if exc.errno != errno.ENOENT:
             raise
     else:
-        rootfs_path = path[len(dest):]
         check_uid = int(d.getVar('HOST_USER_UID'))
         if stat.st_uid == check_uid:
-            package_qa_add_message(messages, "host-user-contaminated", "%s: %s is owned by uid %d, which is the same as the user running bitbake. This may be due to host contamination" % (pn, rootfs_path, check_uid))
+            package_qa_add_message(messages, "host-user-contaminated", "%s: %s is owned by uid %d, which is the same as the user running bitbake. This may be due to host contamination" % (pn, package_qa_clean_path(path, d, name), check_uid))
             return False
 
         check_gid = int(d.getVar('HOST_USER_GID'))
         if stat.st_gid == check_gid:
-            package_qa_add_message(messages, "host-user-contaminated", "%s: %s is owned by gid %d, which is the same as the user running bitbake. This may be due to host contamination" % (pn, rootfs_path, check_gid))
+            package_qa_add_message(messages, "host-user-contaminated", "%s: %s is owned by gid %d, which is the same as the user running bitbake. This may be due to host contamination" % (pn, package_qa_clean_path(path, d, name), check_gid))
             return False
     return True
 

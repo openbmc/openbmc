@@ -406,22 +406,19 @@ class RecipetoolTests(RecipetoolBase):
         self._test_recipe_contents(os.path.join(temprecipe, dirlist[0]), checkvars, inherits)
 
     def test_recipetool_create_cmake(self):
-        bitbake('-c packagedata gtk+')
-
-        # Try adding a recipe
         temprecipe = os.path.join(self.tempdir, 'recipe')
         os.makedirs(temprecipe)
-        recipefile = os.path.join(temprecipe, 'navit_0.5.0.bb')
-        srcuri = 'http://downloads.yoctoproject.org/mirror/sources/navit-0.5.0.tar.gz'
+        recipefile = os.path.join(temprecipe, 'taglib_1.11.1.bb')
+        srcuri = 'http://taglib.github.io/releases/taglib-1.11.1.tar.gz'
         result = runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
         self.assertTrue(os.path.isfile(recipefile))
         checkvars = {}
-        checkvars['LICENSE'] = set(['Unknown', 'GPLv2', 'LGPLv2'])
-        checkvars['SRC_URI'] = 'http://downloads.yoctoproject.org/mirror/sources/navit-${PV}.tar.gz'
-        checkvars['SRC_URI[md5sum]'] = '242f398e979a6b8c0f3c802b63435b68'
-        checkvars['SRC_URI[sha256sum]'] = '13353481d7fc01a4f64e385dda460b51496366bba0fd2cc85a89a0747910e94d'
-        checkvars['DEPENDS'] = set(['freetype', 'zlib', 'openssl', 'glib-2.0', 'virtual/libgl', 'virtual/egl', 'gtk+', 'libpng', 'libsdl', 'freeglut', 'dbus-glib', 'fribidi'])
-        inherits = ['cmake', 'python-dir', 'gettext', 'pkgconfig']
+        checkvars['LICENSE'] = set(['LGPLv2.1', 'MPL-1.1'])
+        checkvars['SRC_URI'] = 'http://taglib.github.io/releases/taglib-${PV}.tar.gz'
+        checkvars['SRC_URI[md5sum]'] = 'cee7be0ccfc892fa433d6c837df9522a'
+        checkvars['SRC_URI[sha256sum]'] = 'b6d1a5a610aae6ff39d93de5efd0fdc787aa9e9dc1e7026fa4c961b26563526b'
+        checkvars['DEPENDS'] = set(['boost', 'zlib'])
+        inherits = ['cmake']
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
     def test_recipetool_create_github(self):

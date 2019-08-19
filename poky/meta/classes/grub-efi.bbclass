@@ -9,9 +9,16 @@ efi_populate() {
 
 	GRUB_IMAGE="grub-efi-bootia32.efi"
 	DEST_IMAGE="bootia32.efi"
-	if [ "${TARGET_ARCH}" = "x86_64" ]; then
-		GRUB_IMAGE="grub-efi-bootx64.efi"
-		DEST_IMAGE="bootx64.efi"
+	if [ -n "${MLPREFIX}" ]; then
+		if [ "${TARGET_ARCH_MULTILIB_ORIGINAL}" = "x86_64" ]; then
+			GRUB_IMAGE="grub-efi-bootx64.efi"
+			DEST_IMAGE="bootx64.efi"
+		fi
+	else
+		if [ "${TARGET_ARCH}" = "x86_64" ]; then
+			GRUB_IMAGE="grub-efi-bootx64.efi"
+			DEST_IMAGE="bootx64.efi"
+		fi
 	fi
 	install -m 0644 ${DEPLOY_DIR_IMAGE}/${GRUB_IMAGE} ${DEST}${EFIDIR}/${DEST_IMAGE}
 	EFIPATH=$(echo "${EFIDIR}" | sed 's/\//\\/g')

@@ -54,6 +54,8 @@ import shutil
 import bb
 from   bb.fetch2 import FetchMethod
 from   bb.fetch2 import FetchError
+from   bb.fetch2 import MissingParameterError
+from   bb.fetch2 import ParameterError
 from   bb.fetch2 import runfetchcmd
 from   bb.fetch2 import logger
 
@@ -79,7 +81,7 @@ class ClearCase(FetchMethod):
         if 'protocol' in ud.parm:
             ud.proto = ud.parm['protocol']
         if not ud.proto in ('http', 'https'):
-            raise fetch2.ParameterError("Invalid protocol type", ud.url)
+            raise ParameterError("Invalid protocol type", ud.url)
 
         ud.vob = ''
         if 'vob' in ud.parm:

@@ -1,0 +1,149 @@
+From ec282980e6eee96f5b74aba464141f86049263e6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 7 Jan 2016 18:19:03 +0000
+Subject: [PATCH] build: Add option to select libc implementation
+
+There are more than glibc for C library implementation available on
+linux now a days, uclibc cloaked like glibc but musl e.g. is very
+different and does not implement all GNU extentions
+
+Disable tests specifically not building _yet_ on musl based systems
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile                                    | 5 +++++
+ testcases/kernel/Makefile                   | 5 ++++-
+ testcases/kernel/sched/Makefile             | 4 +++-
+ testcases/kernel/syscalls/Makefile          | 5 +++++
+ testcases/network/nfsv4/acl/Makefile        | 4 ++++
+ testcases/network/rpc/basic_tests/Makefile  | 5 +++++
+ testcases/realtime/func/pi-tests/Makefile   | 4 ++++
+ testcases/realtime/stress/pi-tests/Makefile | 5 +++++
+ 8 files changed, 35 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 768ca46..e9d679a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -41,6 +41,11 @@ vpath %.mk		$(top_srcdir)/mk:$(top_srcdir)/mk/include
+ UCLINUX			?= 0
+ export UCLINUX
+ 
++# System C library implementation (glibc,uclibc,musl etc.)
++# default to glibc if not set
++LIBC			?= glibc
++export LIBC
++
+ # CLEAN_TARGETS:	Targets which exist solely in clean.
+ # COMMON_TARGETS:	Targets which exist in all, clean, and install.
+ # INSTALL_TARGETS:	Targets which exist in clean and install (contains
+diff --git a/testcases/kernel/Makefile b/testcases/kernel/Makefile
+index 39d79c7..24a57d9 100644
+--- a/testcases/kernel/Makefile
++++ b/testcases/kernel/Makefile
+@@ -49,12 +49,15 @@ SUBDIRS			+= connectors \
+ 			   logging \
+ 			   mem \
+ 			   numa \
+-			   pty \
+ 			   sched \
+ 			   security \
+ 			   timers \
+ 			   tracing \
+ 
++ifneq ($(LIBC),musl)
++SUBDIRS			+= pty
++endif
++
+ ifeq ($(WITH_POWER_MANAGEMENT_TESTSUITE),yes)
+ SUBDIRS			+= power_management
+ endif
+diff --git a/testcases/kernel/sched/Makefile b/testcases/kernel/sched/Makefile
+index 6a57d79..74bb933 100644
+--- a/testcases/kernel/sched/Makefile
++++ b/testcases/kernel/sched/Makefile
+@@ -23,5 +23,7 @@
+ top_srcdir		?= ../../..
+ 
+ include $(top_srcdir)/include/mk/env_pre.mk
+-
++ifeq ($(LIBC),musl)
++	FILTER_OUT_DIRS += process_stress
++endif
+ include $(top_srcdir)/include/mk/generic_trunk_target.mk
+diff --git a/testcases/kernel/syscalls/Makefile b/testcases/kernel/syscalls/Makefile
+index 45a00cf..d1becd0 100644
+--- a/testcases/kernel/syscalls/Makefile
++++ b/testcases/kernel/syscalls/Makefile
+@@ -28,6 +28,11 @@ ifeq ($(UCLINUX),1)
+ FILTER_OUT_DIRS	+= capget capset chmod chown clone fork getcontext llseek \
+ 		   mincore mprotect nftw profil remap_file_pages sbrk
+ endif
++ifeq ($(LIBC),musl)
++FILTER_OUT_DIRS	+= confstr fmtmsg getcontext ioctl mallopt profil \
++		   rt_sigsuspend setdomainname sethostname sigsuspend \
++		   ustat
++endif
+ 
+ ifeq ($(UCLIBC),1)
+ FILTER_OUT_DIRS	+= profil
+diff --git a/testcases/network/nfsv4/acl/Makefile b/testcases/network/nfsv4/acl/Makefile
+index 8c55a6b..f7cda62 100644
+--- a/testcases/network/nfsv4/acl/Makefile
++++ b/testcases/network/nfsv4/acl/Makefile
+@@ -26,4 +26,8 @@ include $(top_srcdir)/include/mk/env_pre.mk
+ 
+ LDLIBS			+= $(ACL_LIBS)
+ 
++ifeq ($(LIBC),musl)
++FILTER_OUT_MAKE_TARGETS	:= acl1
++endif
++
+ include $(top_srcdir)/include/mk/generic_leaf_target.mk
+diff --git a/testcases/network/rpc/basic_tests/Makefile b/testcases/network/rpc/basic_tests/Makefile
+index 66e9d56..ea8eb8a 100644
+--- a/testcases/network/rpc/basic_tests/Makefile
++++ b/testcases/network/rpc/basic_tests/Makefile
+@@ -23,4 +23,9 @@
+ top_srcdir		?= ../../../..
+ 
+ include $(top_srcdir)/include/mk/env_pre.mk
++
++ifeq ($(LIBC),musl)
++FILTER_OUT_DIRS += rpc01
++endif
++
+ include $(top_srcdir)/include/mk/generic_trunk_target.mk
+diff --git a/testcases/realtime/func/pi-tests/Makefile b/testcases/realtime/func/pi-tests/Makefile
+index 68616a7..748754b 100644
+--- a/testcases/realtime/func/pi-tests/Makefile
++++ b/testcases/realtime/func/pi-tests/Makefile
+@@ -27,5 +27,9 @@ include $(top_srcdir)/include/mk/env_pre.mk
+ include $(abs_srcdir)/../../config.mk
+ 
+ MAKE_TARGETS		:= testpi-0 testpi-1 testpi-2 testpi-4 testpi-5 testpi-6 testpi-7 sbrk_mutex
++ifeq ($(LIBC),musl)
++FILTER_OUT_MAKE_TARGETS	:= testpi-5 testpi-6 sbrk_mutex
++endif
++
+ 
+ include $(top_srcdir)/include/mk/generic_leaf_target.mk
+diff --git a/testcases/realtime/stress/pi-tests/Makefile b/testcases/realtime/stress/pi-tests/Makefile
+index 1881f75..266e0b8 100644
+--- a/testcases/realtime/stress/pi-tests/Makefile
++++ b/testcases/realtime/stress/pi-tests/Makefile
+@@ -24,4 +24,9 @@ top_srcdir		?= ../../../..
+ 
+ include $(top_srcdir)/include/mk/env_pre.mk
+ include $(abs_srcdir)/../../config.mk
++
++ifeq ($(LIBC),musl)
++FILTER_OUT_MAKE_TARGETS	:= testpi-3
++endif
++
+ include $(top_srcdir)/include/mk/generic_leaf_target.mk
+-- 
+2.7.4
+

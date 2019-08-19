@@ -19,7 +19,7 @@ sys/types.h might not always include sys/sysmacros.h for major/minor/makedev
  #include "squashfs_fs.h"
 --- a/squashfs-tools/unsquashfs.c
 +++ b/squashfs-tools/unsquashfs.c
-@@ -38,6 +38,10 @@
+@@ -40,6 +40,10 @@
  #include <limits.h>
  #include <ctype.h>
  

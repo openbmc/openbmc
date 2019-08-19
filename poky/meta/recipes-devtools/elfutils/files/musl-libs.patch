@@ -1,0 +1,111 @@
+Collection of fixes needed to compile libelf and other libraries
+provided by elfutils for musl targets
+
+error is glibc specific API, so this patch will mostly not accepted
+upstream given that elfutils has been closely tied to glibc
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Inappropriate [workaround for musl]
+
+--- /dev/null
++++ b/lib/error.h
+@@ -0,0 +1,27 @@
++#ifndef _ERROR_H_
++#define _ERROR_H_
++
++#include <stdarg.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <errno.h>
++
++static unsigned int error_message_count = 0;
++
++static inline void error(int status, int errnum, const char* format, ...)
++{
++	va_list ap;
++	fprintf(stderr, "%s: ", program_invocation_name);
++	va_start(ap, format);
++	vfprintf(stderr, format, ap);
++	va_end(ap);
++	if (errnum)
++		fprintf(stderr, ": %s", strerror(errnum));
++	fprintf(stderr, "\n");
++	error_message_count++;
++	if (status)
++		exit(status);
++}
++
++#endif	/* _ERROR_H_ */
+--- a/lib/fixedsizehash.h
++++ b/lib/fixedsizehash.h
+@@ -30,7 +30,6 @@
+ #include <errno.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#include <sys/cdefs.h>
+ 
+ #include <system.h>
+ 
+--- a/lib/libeu.h
++++ b/lib/libeu.h
+@@ -29,6 +29,7 @@
+ #ifndef LIBEU_H
+ #define LIBEU_H
+ 
++#include "system.h"
+ #include <stddef.h>
+ #include <stdint.h>
+ 
+--- a/libdwfl/dwfl_error.c
++++ b/libdwfl/dwfl_error.c
+@@ -154,7 +154,16 @@ dwfl_errmsg (int error)
+   switch (error &~ 0xffff)
+     {
+     case OTHER_ERROR (ERRNO):
++#if defined(__GLIBC__)
+       return strerror_r (error & 0xffff, "bad", 0);
++#else
++      {
++        static __thread char buf[128] = "";
++        if (strerror_r (error & 0xffff, buf, sizeof(buf)) == 0)
++          return buf;
++      }
++      return "strerror_r() failed";
++#endif
+     case OTHER_ERROR (LIBELF):
+       return elf_errmsg (error & 0xffff);
+     case OTHER_ERROR (LIBDW):
+--- a/libdwfl/linux-kernel-modules.c
++++ b/libdwfl/linux-kernel-modules.c
+@@ -50,6 +50,7 @@
+ #include <sys/utsname.h>
+ #include <fcntl.h>
+ #include <unistd.h>
++#include "system.h"
+ 
+ /* If fts.h is included before config.h, its indirect inclusions may not
+    give us the right LFS aliases of these functions, so map them manually.  */
+--- a/libelf/elf.h
++++ b/libelf/elf.h
+@@ -21,7 +21,9 @@
+ 
+ #include <features.h>
+ 
+-__BEGIN_DECLS
++#ifdef __cplusplus
++extern "C" {
++#endif
+ 
+ /* Standard ELF types.  */
+ 
+@@ -3937,6 +3939,7 @@ enum
+ #define R_METAG_TLS_LE_HI16	60
+ #define R_METAG_TLS_LE_LO16	61
+ 
+-__END_DECLS
+-
++#ifdef __cplusplus
++}
++#endif
+ #endif	/* elf.h */

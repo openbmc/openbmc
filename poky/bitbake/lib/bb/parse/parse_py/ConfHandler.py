@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
    class for handling configuration data files
 

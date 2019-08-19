@@ -8,6 +8,11 @@ INC_PR = "r1"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e466242989bd33c1bd2b6a526a742498"
 
 SRC_URI = "http://www.python.org/ftp/python/${PV}/Python-${PV}.tar.xz \
+           file://bpo-35907-cve-2019-9948.patch \
+           file://bpo-35907-cve-2019-9948-fix.patch \
+           file://bpo-36216-cve-2019-9636.patch \
+           file://bpo-36216-cve-2019-9636-fix.patch \
+           file://CVE-2019-9740.patch \
            "
 
 SRC_URI[md5sum] = "30157d85a2c0479c09ea2cbe61f2aaf5"

@@ -114,7 +114,7 @@ def print_ver_diff(bs1, bs2):
             print(fmt_str.format(name, field1, field2, maxlen=maxlen))
 
 
-def print_task_diff(bs1, bs2, val_type, min_val=0, min_absdiff=0, sort_by=('absdiff',)):
+def print_task_diff(bs1, bs2, val_type, min_val=0, min_absdiff=0, sort_by=('absdiff',), only_tasks=[]):
     """Diff task execution times"""
     def val_to_str(val, human_readable=False):
         """Convert raw value to printable string"""
@@ -151,8 +151,9 @@ def print_task_diff(bs1, bs2, val_type, min_val=0, min_absdiff=0, sort_by=('absd
         """Get cumulative sum of all tasks"""
         total = 0.0
         for recipe_data in buildstats.values():
-            for bs_task in recipe_data.tasks.values():
-                total += getattr(bs_task, val_type)
+            for name, bs_task in recipe_data.tasks.items():
+                if not only_tasks or name in only_tasks:
+                    total += getattr(bs_task, val_type)
         return total
 
     if min_val:
@@ -163,7 +164,7 @@ def print_task_diff(bs1, bs2, val_type, min_val=0, min_absdiff=0, sort_by=('absd
                 val_to_str(min_absdiff, True), val_to_str(min_absdiff)))
 
     # Prepare the data
-    tasks_diff = diff_buildstats(bs1, bs2, val_type, min_val, min_absdiff)
+    tasks_diff = diff_buildstats(bs1, bs2, val_type, min_val, min_absdiff, only_tasks)
 
     # Sort our list
     for field in reversed(sort_by):
@@ -248,6 +249,8 @@ Script for comparing buildstats of two separate builds."""
     parser.add_argument('--multi', action='store_true',
                         help="Read all buildstats from the given paths and "
                              "average over them")
+    parser.add_argument('--only-task', dest='only_tasks', metavar='TASK', action='append', default=[],
+                        help="Only include TASK in report. May be specified multiple times")
     parser.add_argument('buildstats1', metavar='BUILDSTATS1', help="'Left' buildstat")
     parser.add_argument('buildstats2', metavar='BUILDSTATS2', help="'Right' buildstat")
 
@@ -265,7 +268,6 @@ Script for comparing buildstats of two separate builds."""
         args.min_absdiff = min_absdiff_defaults[args.diff_attr]
 
     return args
-
 
 def main(argv=None):
     """Script entry point"""
@@ -290,7 +292,7 @@ def main(argv=None):
             print_ver_diff(bs1, bs2)
         else:
             print_task_diff(bs1, bs2, args.diff_attr, args.min_val,
-                            args.min_absdiff, sort_by)
+                            args.min_absdiff, sort_by, args.only_tasks)
     except ScriptError as err:
         log.error(str(err))
         return 1

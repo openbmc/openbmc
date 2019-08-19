@@ -49,7 +49,6 @@ class DirectPlugin(ImagerPlugin):
 
         # parse possible 'rootfs=name' items
         self.rootfs_dir = dict(rdir.split('=') for rdir in rootfs_dir.split(' '))
-        self.replaced_rootfs_paths = {}
         self.bootimg_dir = bootimg_dir
         self.kernel_dir = kernel_dir
         self.native_sysroot = native_sysroot
@@ -59,6 +58,7 @@ class DirectPlugin(ImagerPlugin):
         self.compressor = options.compressor
         self.bmap = options.bmap
         self.no_fstab_update = options.no_fstab_update
+        self.original_fstab = None
 
         self.name = "%s-%s" % (os.path.splitext(os.path.basename(wks_file))[0],
                                strftime("%Y%m%d%H%M"))
@@ -104,24 +104,13 @@ class DirectPlugin(ImagerPlugin):
 
         with open(fstab_path) as fstab:
             fstab_lines = fstab.readlines()
+            self.original_fstab = fstab_lines.copy()
 
         if self._update_fstab(fstab_lines, self.parts):
-            # copy rootfs dir to workdir to update fstab
-            # as rootfs can be used by other tasks and can't be modified
-            new_pseudo = os.path.realpath(os.path.join(self.workdir, "pseudo"))
-            from_dir = os.path.join(os.path.join(image_rootfs, ".."), "pseudo")
-            from_dir = os.path.realpath(from_dir)
-            copyhardlinktree(from_dir, new_pseudo)
-            new_rootfs = os.path.realpath(os.path.join(self.workdir, "rootfs_copy"))
-            copyhardlinktree(image_rootfs, new_rootfs)
-            fstab_path = os.path.join(new_rootfs, 'etc/fstab')
-
-            os.unlink(fstab_path)
-
             with open(fstab_path, "w") as fstab:
                 fstab.writelines(fstab_lines)
-
-            return new_rootfs
+        else:
+            self.original_fstab = None
 
     def _update_fstab(self, fstab_lines, parts):
         """Assume partition order same as in wks"""
@@ -170,14 +159,8 @@ class DirectPlugin(ImagerPlugin):
         filesystems from the artifacts directly and combine them into
         a partitioned image.
         """
-        if self.no_fstab_update:
-            new_rootfs = None
-        else:
-            new_rootfs = self._write_fstab(self.rootfs_dir.get("ROOTFS_DIR"))
-        if new_rootfs:
-            # rootfs was copied to update fstab
-            self.replaced_rootfs_paths[new_rootfs] = self.rootfs_dir['ROOTFS_DIR']
-            self.rootfs_dir['ROOTFS_DIR'] = new_rootfs
+        if not self.no_fstab_update:
+            self._write_fstab(self.rootfs_dir.get("ROOTFS_DIR"))
 
         for part in self.parts:
             # get rootfs size from bitbake variable if it's not set in .ks file
@@ -253,8 +236,6 @@ class DirectPlugin(ImagerPlugin):
             else:
                 suffix = '["%s"]:' % (part.mountpoint or part.label)
             rootdir = part.rootfs_dir
-            if rootdir in self.replaced_rootfs_paths:
-                rootdir = self.replaced_rootfs_paths[rootdir]
             msg += '  ROOTFS_DIR%s%s\n' % (suffix.ljust(20), rootdir)
 
         msg += '  BOOTIMG_DIR:                  %s\n' % self.bootimg_dir
@@ -291,6 +272,12 @@ class DirectPlugin(ImagerPlugin):
             path = os.path.join(self.workdir, fname)
             if os.path.isfile(path):
                 shutil.move(path, os.path.join(self.outdir, fname))
+
+        #Restore original fstab
+        if self.original_fstab:
+            fstab_path = self.rootfs_dir.get("ROOTFS_DIR") + "/etc/fstab"
+            with open(fstab_path, "w") as fstab:
+                fstab.writelines(self.original_fstab)
 
         # remove work directory
         shutil.rmtree(self.workdir, ignore_errors=True)

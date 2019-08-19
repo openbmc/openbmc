@@ -111,9 +111,6 @@ RDEPENDS_packagegroup-core-full-cmdline-dev-utils = "\
     patch \
     "
 
-VIRTUAL-RUNTIME_initscripts ?= "initscripts"
-VIRTUAL-RUNTIME_init_manager ?= "sysvinit"
-VIRTUAL-RUNTIME_login_manager ?= "busybox"
 VIRTUAL-RUNTIME_syslog ?= "sysklogd"
 RDEPENDS_packagegroup-core-full-cmdline-initscripts = "\
     ${VIRTUAL-RUNTIME_initscripts} \

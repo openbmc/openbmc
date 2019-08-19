@@ -71,8 +71,11 @@ class IsoImagePlugin(SourcePlugin):
         syslinux_conf += "LABEL boot\n"
 
         kernel = get_bitbake_var("KERNEL_IMAGETYPE")
-        if not kernel:
-            kernel = "bzImage"
+        if get_bitbake_var("INITRAMFS_IMAGE_BUNDLE") == "1":
+            if get_bitbake_var("INITRAMFS_IMAGE"):
+                kernel = "%s-%s.bin" % \
+                    (get_bitbake_var("KERNEL_IMAGETYPE"), get_bitbake_var("INITRAMFS_LINK_NAME"))
+
         syslinux_conf += "KERNEL /" + kernel + "\n"
         syslinux_conf += "APPEND initrd=/initrd LABEL=boot %s\n" \
                              % bootloader.append
@@ -117,8 +120,10 @@ class IsoImagePlugin(SourcePlugin):
             grubefi_conf += "menuentry 'boot'{\n"
 
             kernel = get_bitbake_var("KERNEL_IMAGETYPE")
-            if not kernel:
-                kernel = "bzImage"
+            if get_bitbake_var("INITRAMFS_IMAGE_BUNDLE") == "1":
+                if get_bitbake_var("INITRAMFS_IMAGE"):
+                    kernel = "%s-%s.bin" % \
+                        (get_bitbake_var("KERNEL_IMAGETYPE"), get_bitbake_var("INITRAMFS_LINK_NAME"))
 
             grubefi_conf += "linux /%s rootwait %s\n" \
                             % (kernel, bootloader.append)
@@ -273,8 +278,10 @@ class IsoImagePlugin(SourcePlugin):
             os.remove("%s/initrd.cpio.gz" % cr_workdir)
 
         kernel = get_bitbake_var("KERNEL_IMAGETYPE")
-        if not kernel:
-            kernel = "bzImage"
+        if get_bitbake_var("INITRAMFS_IMAGE_BUNDLE") == "1":
+            if get_bitbake_var("INITRAMFS_IMAGE"):
+                kernel = "%s-%s.bin" % \
+                    (get_bitbake_var("KERNEL_IMAGETYPE"), get_bitbake_var("INITRAMFS_LINK_NAME"))
 
         install_cmd = "install -m 0644 %s/%s %s/%s" % \
                       (kernel_dir, kernel, isodir, kernel)

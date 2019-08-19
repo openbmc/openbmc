@@ -4,6 +4,7 @@
 
 import os
 import fnmatch
+import time
 
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
@@ -28,6 +29,53 @@ class RpmBasicTest(OERuntimeTestCase):
         status, output = self.target.run('rpm -q rpm')
         msg = 'status and output: %s and %s' % (status, output)
         self.assertEqual(status, 0, msg=msg)
+
+    @OETestDepends(['rpm.RpmBasicTest.test_rpm_query'])
+    def test_rpm_query_nonroot(self):
+
+        def set_up_test_user(u):
+            status, output = self.target.run('id -u %s' % u)
+            if status:
+                status, output = self.target.run('useradd %s' % u)
+                msg = 'Failed to create new user: %s' % output
+                self.assertTrue(status == 0, msg=msg)
+
+        def exec_as_test_user(u):
+            status, output = self.target.run('su -c id %s' % u)
+            msg = 'Failed to execute as new user'
+            self.assertTrue("({0})".format(u) in output, msg=msg)
+
+            status, output = self.target.run('su -c "rpm -qa" %s ' % u)
+            msg = 'status: %s. Cannot run rpm -qa: %s' % (status, output)
+            self.assertEqual(status, 0, msg=msg)
+
+        def check_no_process_for_user(u):
+            _, output = self.target.run(self.tc.target_cmds['ps'])
+            if u + ' ' in output:
+                return False
+            else:
+                return True
+
+        def unset_up_test_user(u):
+            # ensure no test1 process in running
+            timeout = time.time() + 30
+            while time.time() < timeout:
+                if check_no_process_for_user(u):
+                    break
+                else:
+                    time.sleep(1)
+            status, output = self.target.run('userdel -r %s' % u)
+            msg = 'Failed to erase user: %s' % output
+            self.assertTrue(status == 0, msg=msg)
+
+        tuser = 'test1'
+
+        try:
+            set_up_test_user(tuser)
+            exec_as_test_user(tuser)
+        finally:
+            unset_up_test_user(tuser)
+
 
 class RpmInstallRemoveTest(OERuntimeTestCase):
 
@@ -57,38 +105,6 @@ class RpmInstallRemoveTest(OERuntimeTestCase):
         status,output = self.target.run('rpm -e base-passwd-doc')
         msg = 'Failed to remove base-passwd-doc package: %s' % output
         self.assertEqual(status, 0, msg=msg)
-
-    @OETestDepends(['rpm.RpmBasicTest.test_rpm_query'])
-    def test_rpm_query_nonroot(self):
-
-        def set_up_test_user(u):
-            status, output = self.target.run('id -u %s' % u)
-            if status:
-                status, output = self.target.run('useradd %s' % u)
-                msg = 'Failed to create new user: %s' % output
-                self.assertTrue(status == 0, msg=msg)
-
-        def exec_as_test_user(u):
-            status, output = self.target.run('su -c id %s' % u)
-            msg = 'Failed to execute as new user'
-            self.assertTrue("({0})".format(u) in output, msg=msg)
-
-            status, output = self.target.run('su -c "rpm -qa" %s ' % u)
-            msg = 'status: %s. Cannot run rpm -qa: %s' % (status, output)
-            self.assertEqual(status, 0, msg=msg)
-
-        def unset_up_test_user(u):
-            status, output = self.target.run('userdel -r %s' % u)
-            msg = 'Failed to erase user: %s' % output
-            self.assertTrue(status == 0, msg=msg)
-
-        tuser = 'test1'
-
-        try:
-            set_up_test_user(tuser)
-            exec_as_test_user(tuser)
-        finally:
-            unset_up_test_user(tuser)
 
     @OETestDepends(['rpm.RpmInstallRemoveTest.test_rpm_remove'])
     def test_check_rpm_install_removal_log_file_size(self):

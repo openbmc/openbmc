@@ -1,0 +1,23 @@
+From 63bc4cd1ce2d918c6566a4e0c7d830713432fc82 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 28 Jun 2019 13:08:24 +0200
+Subject: [PATCH] highlight.py: correctly set permissions on file to be written
+
+Upstream-Status: Backport [https://github.com/GNOME/gtk-doc/commit/12d9a698fb58f3d1a840d3bfc0d15a3a9f57afc1]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ gtkdoc/highlight.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gtkdoc/highlight.py b/gtkdoc/highlight.py
+index 8f6e470..82e11e8 100644
+--- a/gtkdoc/highlight.py
++++ b/gtkdoc/highlight.py
+@@ -47,6 +47,6 @@ def highlight_code(code, lang='c'):
+ 
+ 
+ def append_style_defs(css_file_name):
+-    os.chmod(css_file_name, stat.S_IWRITE)
++    os.chmod(css_file_name, 0o644)
+     with open(css_file_name, 'at', newline='\n', encoding='utf-8') as css:
+         css.write(HTML_FORMATTER.get_style_defs())

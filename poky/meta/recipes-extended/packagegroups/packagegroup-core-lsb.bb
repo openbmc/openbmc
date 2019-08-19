@@ -218,8 +218,6 @@ RDEPENDS_packagegroup-core-lsb-desktop = "\
     gdk-pixbuf-loader-ani \
     gdk-pixbuf-xlib \
     liberation-fonts \
-    gtk+ \
-    atk \
     alsa-lib \
 "
 

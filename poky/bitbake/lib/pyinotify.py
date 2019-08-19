@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-
+#
 # pyinotify.py - python interface to inotify
 # Copyright (c) 2005-2015 Sebastien Martini <seb@dbzteam.org>
 #

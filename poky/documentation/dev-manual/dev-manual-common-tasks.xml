@@ -7129,7 +7129,8 @@
             This problem is solved with the OpenEmbedded build system by
             running the code through QEMU, which allows precisely that.
             Unfortunately, QEMU does not always work perfectly as mentioned
-            in the xxx section.
+            in the
+            "<link linkend='known-issues'>Known Issues</link>" section.
         </para>
 
         <section id='enabling-the-generation-of-introspection-data'>

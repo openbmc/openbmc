@@ -260,7 +260,7 @@ python write_image_manifest () {
     with open(manifest_name, 'w+') as image_manifest:
         image_manifest.write(format_pkg_list(pkgs, "ver"))
 
-    if os.path.exists(manifest_name):
+    if os.path.exists(manifest_name) and link_name:
         manifest_link = deploy_dir + "/" + link_name + ".manifest"
         if os.path.lexists(manifest_link):
             os.remove(manifest_link)
@@ -328,7 +328,7 @@ python write_image_test_data() {
     searchString = "%s/"%(d.getVar("TOPDIR")).replace("//","/")
     export2json(d, testdata_name, searchString=searchString, replaceString="")
 
-    if os.path.exists(testdata_name):
+    if os.path.exists(testdata_name) and link_name:
         testdata_link = os.path.join(deploy_dir, "%s.testdata.json" % link_name)
         if os.path.lexists(testdata_link):
             os.remove(testdata_link)

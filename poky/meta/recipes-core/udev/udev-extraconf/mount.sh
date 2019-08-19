@@ -57,6 +57,8 @@ automount_systemd() {
     vfat|fat)
         MOUNT="$MOUNT -o umask=007,gid=`awk -F':' '/^disk/{print $3}' /etc/group`"
         ;;
+    swap)
+        return ;;
     # TODO
     *)
         ;;
@@ -98,6 +100,8 @@ automount() {
 	vfat|fat)
 		MOUNT="$MOUNT -o umask=007,gid=`awk -F':' '/^disk/{print $3}' /etc/group`"
 		;;
+	swap)
+		return ;;
 	# TODO
 	*)
 		;;

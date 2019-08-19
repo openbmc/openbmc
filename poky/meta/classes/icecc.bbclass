@@ -57,7 +57,7 @@ ICECC_ENV_VERSION = "2"
 # See: https://github.com/icecc/icecream/issues/190
 export ICECC_CARET_WORKAROUND ??= "0"
 
-export ICECC_REMOTE_CPP ??= "1"
+export ICECC_REMOTE_CPP ??= "0"
 
 ICECC_CFLAGS = ""
 CFLAGS += "${ICECC_CFLAGS}"

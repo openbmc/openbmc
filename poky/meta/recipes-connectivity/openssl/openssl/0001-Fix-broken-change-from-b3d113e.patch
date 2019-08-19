@@ -1,0 +1,35 @@
+From 711a161f03ef9ed7cd149a22bf1203700c103e96 Mon Sep 17 00:00:00 2001
+From: Pauli <paul.dale@oracle.com>
+Date: Fri, 29 Mar 2019 09:24:07 +1000
+Subject: [PATCH] Fix broken change from b3d113e.
+
+Reviewed-by: Tim Hudson <tjh@openssl.org>
+(Merged from https://github.com/openssl/openssl/pull/8606)
+
+Running valgrind against code using Openssl v1.1.1c reports a large number of
+uninitialized memory errors. This fix from upstream solves this problem.
+
+Upstream-Status: Backport [https://github.com/openssl/openssl/commit/711a161f03ef9ed7cd149a22bf1203700c103e96]
+Signed-off-by: Laurent Bonnans <laurent.bonnans@here.com>
+---
+ crypto/rand/rand_lib.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/crypto/rand/rand_lib.c b/crypto/rand/rand_lib.c
+index 23abbde156..a298b7515b 100644
+--- a/crypto/rand/rand_lib.c
++++ b/crypto/rand/rand_lib.c
+@@ -235,8 +235,9 @@ size_t rand_drbg_get_nonce(RAND_DRBG *drbg,
+     struct {
+         void * instance;
+         int count;
+-    } data = { NULL, 0 };
++    } data;
+ 
++    memset(&data, 0, sizeof(data));
+     pool = rand_pool_new(0, min_len, max_len);
+     if (pool == NULL)
+         return 0;
+-- 
+2.20.1
+

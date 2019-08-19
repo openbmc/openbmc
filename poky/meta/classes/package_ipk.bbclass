@@ -14,7 +14,7 @@ OPKG_ARGS += "--force_postinstall --prefer-arch-to-version"
 OPKG_ARGS += "${@['', '--no-install-recommends'][d.getVar("NO_RECOMMENDATIONS") == "1"]}"
 OPKG_ARGS += "${@['', '--add-exclude ' + ' --add-exclude '.join((d.getVar('PACKAGE_EXCLUDE') or "").split())][(d.getVar("PACKAGE_EXCLUDE") or "").strip() != ""]}"
 
-OPKGLIBDIR = "${localstatedir}/lib"
+OPKGLIBDIR ??= "${localstatedir}/lib"
 
 python do_package_ipk () {
     workdir = d.getVar('WORKDIR')

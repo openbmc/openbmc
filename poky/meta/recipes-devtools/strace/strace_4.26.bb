@@ -20,13 +20,13 @@ SRC_URI = "https://strace.io/files/${PV}/strace-${PV}.tar.xz \
 SRC_URI[md5sum] = "daa51acc0c7c696221ec03cf0b30a7af"
 SRC_URI[sha256sum] = "7c4d2ffeef4f7d1cdc71062ca78d1130eb52f947c2fca82f59f6a1183bfa1e1c"
 
-inherit autotools ptest bluetooth
+inherit autotools ptest
 
 PACKAGECONFIG_class-target ??= "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluez', '', d)} \
 "
 
-PACKAGECONFIG[bluez] = "ac_cv_header_bluetooth_bluetooth_h=yes,ac_cv_header_bluetooth_bluetooth_h=no,${BLUEZ}"
+PACKAGECONFIG[bluez] = "ac_cv_header_bluetooth_bluetooth_h=yes,ac_cv_header_bluetooth_bluetooth_h=no,bluez5"
 PACKAGECONFIG[libunwind] = "--with-libunwind,--without-libunwind,libunwind"
 
 EXTRA_OECONF += "--enable-mpers=no"

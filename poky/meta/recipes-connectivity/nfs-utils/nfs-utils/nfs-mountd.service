@@ -1,6 +1,7 @@
 [Unit]
 Description=NFS Mount Daemon
 DefaultDependencies=no
+After=rpcbind.socket
 Requires=proc-fs-nfsd.mount
 After=proc-fs-nfsd.mount
 After=network.target local-fs.target

@@ -60,15 +60,34 @@ SSTATEPOSTUNPACKFUNCS[vardepvalueexclude] .= "| buildhistory_emit_outputsigs"
 # When extending build history, derive your class from buildhistory.bbclass
 # and extend this list here with the additional files created by the derived
 # class.
-BUILDHISTORY_PRESERVE = "latest latest_srcrev"
+BUILDHISTORY_PRESERVE = "latest latest_srcrev sysroot"
 
 PATCH_GIT_USER_EMAIL ?= "buildhistory@oe"
 PATCH_GIT_USER_NAME ?= "OpenEmbedded"
 
 #
+# Write out the contents of the sysroot
+#
+buildhistory_emit_sysroot() {
+	mkdir --parents ${BUILDHISTORY_DIR_PACKAGE}
+	case ${CLASSOVERRIDE} in
+	class-native|class-cross|class-crosssdk)
+		BASE=${SYSROOT_DESTDIR}/${STAGING_DIR_NATIVE}
+		;;
+	*)
+		BASE=${SYSROOT_DESTDIR}
+		;;
+	esac
+	buildhistory_list_files_no_owners $BASE ${BUILDHISTORY_DIR_PACKAGE}/sysroot
+}
+
+#
 # Write out metadata about this package for comparison when writing future packages
 #
 python buildhistory_emit_pkghistory() {
+    if d.getVar('BB_CURRENTTASK') in ['populate_sysroot', 'populate_sysroot_setscene']:
+        bb.build.exec_func("buildhistory_emit_sysroot", d)
+
     if not d.getVar('BB_CURRENTTASK') in ['packagedata', 'packagedata_setscene']:
         return 0
 
@@ -526,6 +545,20 @@ buildhistory_list_files() {
 		eval ${FAKEROOTENV} ${FAKEROOTCMD} $find_cmd
 	else
 		eval $find_cmd
+	fi | sort -k5 | sed 's/ * -> $//' > $2 )
+}
+
+buildhistory_list_files_no_owners() {
+	# List the files in the specified directory, but exclude date/time etc.
+	# Also don't output the ownership data, but instead output just - - so
+	# that the same parsing code as for _list_files works.
+	# This is somewhat messy, but handles where the size is not printed for device files under pseudo
+	( cd $1
+	find_cmd='find . ! -path . -printf "%M -          -          %10s %p -> %l\n"'
+	if [ "$3" = "fakeroot" ] ; then
+		eval ${FAKEROOTENV} ${FAKEROOTCMD} "$find_cmd"
+	else
+		eval "$find_cmd"
 	fi | sort -k5 | sed 's/ * -> $//' > $2 )
 }
 

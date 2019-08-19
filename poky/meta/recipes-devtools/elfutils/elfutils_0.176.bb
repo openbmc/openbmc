@@ -4,7 +4,7 @@ SECTION = "base"
 LICENSE = "GPLv2 & LGPLv3+ & GPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 DEPENDS = "libtool bzip2 zlib virtual/libintl"
-DEPENDS_append_libc-musl = " argp-standalone fts "
+DEPENDS_append_libc-musl = " argp-standalone fts musl-obstack "
 # The Debian patches below are from:
 # http://ftp.de.debian.org/debian/pool/main/e/elfutils/elfutils_0.175-1.debian.tar.xz
 SRC_URI = "https://sourceware.org/elfutils/ftp/${PV}/${BP}.tar.bz2 \
@@ -31,12 +31,13 @@ SRC_URI = "https://sourceware.org/elfutils/ftp/${PV}/${BP}.tar.bz2 \
            file://0001-skip-the-test-when-gcc-not-deployed.patch \
            file://run-ptest \
            file://ptest.patch \
-           file://musl.patch \
            "
-SRC_URI_append_libc-musl = " file://0008-build-Provide-alternatives-for-glibc-assumptions-hel.patch \
-                             file://0001-fix-err-variable-and-function-conflicts.patch \
-"
-
+SRC_URI_append_libc-musl = " \
+           file://musl-obstack-fts.patch \
+           file://musl-libs.patch \
+           file://musl-utils.patch \
+           file://musl-tests.patch \
+           "
 SRC_URI[md5sum] = "077e4f49320cad82bf17a997068b1db9"
 SRC_URI[sha256sum] = "eb5747c371b0af0f71e86215a5ebb88728533c3a104a43d4231963f308cd1023"
 
@@ -84,8 +85,6 @@ do_install_ptest() {
 
 EXTRA_OEMAKE_class-native = ""
 EXTRA_OEMAKE_class-nativesdk = ""
-
-ALLOW_EMPTY_${PN}_libc-musl = "1"
 
 BBCLASSEXTEND = "native nativesdk"
 

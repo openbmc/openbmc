@@ -30,10 +30,6 @@ SRC_URI += " \
            file://support_SOURCE_DATE_EPOCH_in_py_compile_2.7.patch \
            file://float-endian.patch \
            file://0001-python2-use-cc_basename-to-replace-CC-for-checking-c.patch \
-    file://bpo-35907-cve-2019-9948.patch \
-    file://bpo-35907-cve-2019-9948-fix.patch \
-    file://bpo-36216-cve-2019-9636.patch \
-    file://bpo-36216-cve-2019-9636-fix.patch \
 "
 
 S = "${WORKDIR}/Python-${PV}"

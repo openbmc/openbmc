@@ -60,7 +60,9 @@ class RecipeHandler(object):
         if RecipeHandler.recipelibmap:
             return
         # First build up library->package mapping
-        shlib_providers = oe.package.read_shlib_providers(d)
+        d2 = bb.data.createCopy(d)
+        d2.setVar("WORKDIR_PKGDATA", "${PKGDATA_DIR}")
+        shlib_providers = oe.package.read_shlib_providers(d2)
         libdir = d.getVar('libdir')
         base_libdir = d.getVar('base_libdir')
         libpaths = list(set([base_libdir, libdir]))
@@ -1053,6 +1055,7 @@ def get_license_md5sums(d, static_only=False):
     md5sums['3b83ef96387f14655fc854ddc3c6bd57'] = 'Apache-2.0'
     md5sums['385c55653886acac3821999a3ccd17b3'] = 'Artistic-1.0 | GPL-2.0' # some perl modules
     md5sums['54c7042be62e169199200bc6477f04d1'] = 'BSD-3-Clause'
+    md5sums['bfe1f75d606912a4111c90743d6c7325'] = 'MPL-1.1'
     return md5sums
 
 def crunch_license(licfile):

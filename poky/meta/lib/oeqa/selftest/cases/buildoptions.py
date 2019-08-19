@@ -162,17 +162,14 @@ class ArchiverTest(OESelftestTestCase):
         self.assertTrue((g.glob(src_file_glob) and g.glob(tar_file_glob)), "Couldn't find .src.rpm and .tar.gz files under %s/allarch*/xcursor*" % deploy_dir_src)
 
 class ToolchainOptions(OESelftestTestCase):
-
     def test_toolchain_fortran(self):
         """
-        Test whether we can enable and build fortran and its supporting libraries
+        Test that Fortran works by building a Hello, World binary.
         """
 
         features = 'FORTRAN_forcevariable = ",fortran"\n'
-        features += 'RUNTIMETARGET_append_pn-gcc-runtime = " libquadmath"\n'
         self.write_config(features)
-
-        bitbake('gcc-runtime libgfortran')
+        bitbake('fortran-helloworld')
 
 class SourceMirroring(OESelftestTestCase):
     # Can we download everything from the Yocto Sources Mirror over http only

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #
 # Copyright (C) 2003, 2004  Chris Larson
 # Copyright (C) 2003, 2004  Phil Blundell

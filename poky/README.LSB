@@ -12,6 +12,9 @@ therefore provides compatibility with the following caveats:
   tests any longer. Users are recommended to group together to support
   maintenance of that layer. [http://git.yoctoproject.org/cgit/cgit.cgi/meta-qt4/]
 
+* GTK+ 2 is provided by meta-oe.  It is noted that GTK+ 2 is end of life
+  and use of GTK+ 2 isn't recommended.
+
 * mailx has been dropped since its no longer being developed upstream 
   and there are better, more modern replacements such as s-nail 
   (http://sdaoden.eu/code.html) or mailutils (http://mailutils.org/).

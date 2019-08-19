@@ -36,7 +36,7 @@ def write_rpm_perfiledata(srcname, d):
     pkgd = d.getVar('PKGD')
 
     def dump_filerdeps(varname, outfile, d):
-        outfile.write("#!/usr/bin/env python\n\n")
+        outfile.write("#!/usr/bin/env python3\n\n")
         outfile.write("# Dependency table\n")
         outfile.write('deps = {\n')
         for pkg in packages.split():

@@ -240,6 +240,9 @@ class DevtoolTests(DevtoolBase):
         # Check preconditions
         result = runCmd('bitbake-layers show-layers')
         self.assertTrue('\nworkspace' not in result.output, 'This test cannot be run with a workspace layer in bblayers.conf')
+        # remove conf/devtool.conf to avoid it corrupting tests
+        devtoolconf = os.path.join(self.builddir, 'conf', 'devtool.conf')
+        self.track_for_cleanup(devtoolconf)
         # Try creating a workspace layer with a specific path
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir)

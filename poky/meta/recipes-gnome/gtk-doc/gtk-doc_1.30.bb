@@ -24,6 +24,7 @@ SRC_URI += "file://0001-Do-not-hardocode-paths-to-perl-python-in-scripts.patch \
            file://0001-Do-not-error-out-if-xsltproc-is-not-found.patch \
            file://conditionaltests.patch \
            file://no-clobber.patch \
+           file://0001-highlight.py-correctly-set-permissions-on-file-to-be.patch \
            "
 SRC_URI_append_class-native = " file://pkg-config-native.patch"
 

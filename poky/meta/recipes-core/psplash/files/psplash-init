@@ -24,6 +24,7 @@ for x in $CMDLINE; do
 done
 
 export TMPDIR=/mnt/.psplash
+[ -d $TMPDIR ] || mkdir -p $TMPDIR
 mount tmpfs -t tmpfs $TMPDIR -o,size=40k
 
 rotation=0

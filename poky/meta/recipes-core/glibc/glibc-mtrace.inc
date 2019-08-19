@@ -11,3 +11,6 @@ do_install() {
 	install -d -m 0755 ${D}${bindir}
 	install -m 0755 ${SRC}/mtrace ${D}${bindir}/
 }
+
+# Don't scan for CVEs as glibc will be scanned
+CVE_PRODUCT = ""

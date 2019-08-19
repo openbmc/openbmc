@@ -1,5 +1,7 @@
 require libcap-ng.inc
 
+FILESEXTRAPATHS_prepend := "${THISDIR}/libcap-ng:"
+
 SUMMARY .= " - python"
 
 inherit lib_package autotools python3native

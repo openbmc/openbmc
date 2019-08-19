@@ -1297,6 +1297,8 @@ class OpkgPM(OpkgDpkgPM):
         rootfs_config = os.path.join('%s/etc/opkg/base-feeds.conf'
                                   % self.target_rootfs)
 
+        os.makedirs('%s/etc/opkg' % self.target_rootfs, exist_ok=True)
+
         feed_uris = self.construct_uris(feed_uris.split(), feed_base_paths.split())
         archs = self.pkg_archs.split() if feed_archs is None else feed_archs.split()
 

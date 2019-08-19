@@ -1,0 +1,32 @@
+From f4fafbdffae3a63c81f65cef98c72dda26283e06 Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Wed, 8 Feb 2017 16:17:17 +0800
+Subject: [PATCH] Fix test_proc_kill hanging
+
+Sometimes the signal is delivered to memcg_process before the framework took
+into consideration its pid entered in the tasks. Fixed by delaying the signal
+send command.
+
+Upstream-Status: Pending
+
+Signed-off-by: George Nita <george.nita@enea.com>
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+---
+ testcases/kernel/controllers/memcg/functional/memcg_lib.sh | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/testcases/kernel/controllers/memcg/functional/memcg_lib.sh b/testcases/kernel/controllers/memcg/functional/memcg_lib.sh
+index aadaae4..deea5d6 100755
+--- a/testcases/kernel/controllers/memcg/functional/memcg_lib.sh
++++ b/testcases/kernel/controllers/memcg/functional/memcg_lib.sh
+@@ -291,6 +291,7 @@ test_proc_kill()
+ 	pid=$!
+ 	TST_CHECKPOINT_WAIT 0
+ 	echo $pid > tasks
++	sleep 1
+ 
+ 	signal_memcg_process $pid $3
+ 
+-- 
+2.7.4
+

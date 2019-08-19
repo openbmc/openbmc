@@ -10,7 +10,6 @@ DEPENDS = "sysfsutils"
 
 SRC_URI = "\
     git://github.com/nhorman/rng-tools.git \
-    file://fix-rngd-fail-to-stop.patch \
     file://init \
     file://default \
     file://rngd.service \
@@ -46,8 +45,8 @@ do_install_append() {
     install -Dm 0644 ${WORKDIR}/rngd.service \
                      ${D}${systemd_system_unitdir}/rngd.service
     sed -i \
-        -e 's,@SYSCONFDIR@,${sysconfdir},' \
-        -e 's,@SBINDIR@,${sbindir},' \
+        -e 's,@SYSCONFDIR@,${sysconfdir},g' \
+        -e 's,@SBINDIR@,${sbindir},g' \
         ${D}${sysconfdir}/init.d/rng-tools \
         ${D}${systemd_system_unitdir}/rngd.service
 }

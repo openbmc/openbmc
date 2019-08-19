@@ -3,11 +3,13 @@ HOMEPAGE = "http://live.gnome.org/NetworkManager/MobileBroadband/ServiceProvider
 SECTION = "network"
 LICENSE = "PD"
 LIC_FILES_CHKSUM = "file://COPYING;md5=87964579b2a8ece4bc6744d2dc9a8b04"
-SRCREV = "c7def60ba50d9cc30a90f69f89d7e82243501e86"
-PV = "20190116"
+SRCREV = "22b49d86fb7aded2c195a9d49e5924da696b3228"
+PV = "20190618"
 PE = "1"
 
 SRC_URI = "git://gitlab.gnome.org/GNOME/mobile-broadband-provider-info.git;protocol=https"
 S = "${WORKDIR}/git"
 
 inherit autotools
+
+DEPENDS += "libxslt-native"

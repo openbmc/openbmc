@@ -1,23 +1,32 @@
+From b08c43a0842076e0a94e88ad6456a9326cd7ffc9 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Tue, 17 May 2011 23:03:02 +0000
+Subject: [PATCH] Improve handling of 'all' architecture recipes and their
+
 Upstream-Status: Inappropriate [configuration]
 
 XORG_DEFAULT_OPTIONS pulls in the following dependency chains:
 
 XORG_CWARNFLAGS -> AC_PROG_CC_C99
 XORG_STRICT_OPTION -> AC_PROG_CC_C99, XORG_CWARNFLAGS
-XORG_MANPAGE_SECTIONS -> AC_CANONICAL_HOST -> Checks host 
+XORG_MANPAGE_SECTIONS -> AC_CANONICAL_HOST -> Checks host
 
 each of which triggers the use of the host compiler. As an "all"
 architecture package, it shouldn't need a compiler (and doesn't).
 
 RP 17/5/2011
 
-Index: encodings-1.0.4/configure.ac
-===================================================================
---- encodings-1.0.4.orig/configure.ac	2011-05-17 23:36:19.505095876 +0100
-+++ encodings-1.0.4/configure.ac	2011-05-17 23:54:14.935096128 +0100
-@@ -4,12 +4,12 @@
+---
+ configure.ac | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 622c27b..5ee84ed 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3,12 +3,12 @@ AC_INIT([encodings], [1.0.5],
+         [https://gitlab.freedesktop.org/xorg/font/encodings/issues])
  AM_INIT_AUTOMAKE([foreign dist-bzip2])
- AM_MAINTAINER_MODE
  
 -# Require xorg-macros: XORG_DEFAULT_OPTIONS
  m4_ifndef([XORG_MACROS_VERSION],

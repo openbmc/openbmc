@@ -87,6 +87,9 @@ do_install() {
 	if [ ${PACKAGE_NO_GCONV} -eq 0 ]; then
 		copy_locale_files ${libdir}/gconv 0755
 		copy_locale_files ${datadir}/i18n 0644
+	else
+		# Remove the libdir if it is empty when gconv is not copied
+		find ${D}${libdir} -type d -empty -delete
 	fi
 	copy_locale_files ${datadir}/locale 0644
 	install -m 0644 ${LOCALETREESRC}/SUPPORTED ${WORKDIR}/SUPPORTED
@@ -95,3 +98,6 @@ do_install() {
 inherit libc-package
 
 BBCLASSEXTEND = "nativesdk"
+
+# Don't scan for CVEs as glibc will be scanned
+CVE_PRODUCT = ""
