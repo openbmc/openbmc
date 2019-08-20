@@ -1,9 +1,9 @@
-UBOOT_VERSION = "v2018.01"
-XILINX_RELEASE_VERSION = "v2018.3"
+UBOOT_VERSION = "v2019.01"
+XILINX_RELEASE_VERSION = "v2019.1"
 
 UBRANCH ?= "master"
 
-SRCREV ?= "d8fc4b3b70bccf1577dab69f6ddfd4ada9a93bac"
+SRCREV ?= "d895ac5e94815d4b45dcf09d4752c5c2334a51db"
 
 include u-boot-xlnx.inc
 include u-boot-spl-zynq-init.inc
@@ -11,7 +11,7 @@ include u-boot-spl-zynq-init.inc
 SRC_URI_append_kc705-microblazeel = " file://microblaze-kc705-Convert-microblaze-generic-to-k.patch"
 
 LICENSE = "GPLv2+"
-LIC_FILES_CHKSUM = "file://README;beginline=1;endline=6;md5=157ab8408beab40cd8ce1dc69f702a6c"
+LIC_FILES_CHKSUM = "file://README;beginline=1;endline=4;md5=744e7e3bb0c94b4b9f6b3db3bf893897"
 
 # u-boot-xlnx has support for these
 HAS_PLATFORM_INIT ?= " \

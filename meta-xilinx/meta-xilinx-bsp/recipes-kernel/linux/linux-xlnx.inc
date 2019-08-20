@@ -17,6 +17,7 @@ require recipes-kernel/linux/linux-yocto.inc
 require linux-microblaze.inc
 
 DESCRIPTION = "Xilinx Kernel"
+LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 
 EXTKERNELSRC = "${@'1' if d.getVar('EXTERNALSRC') else ''}"
 

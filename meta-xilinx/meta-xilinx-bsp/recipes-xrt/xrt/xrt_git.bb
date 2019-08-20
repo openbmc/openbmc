@@ -7,10 +7,10 @@ LIC_FILES_CHKSUM = "file://${WORKDIR}/git/LICENSE;md5=fa343562af4b9b922b8d7fe7b0
                     file://runtime_src/driver/xclng/xrt/user_gem/LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57 \
                     file://runtime_src/driver/xclng/tools/xbutil/LICENSE;md5=d273d63619c9aeaf15cdaf76422c4f87"
 
-SRC_URI = "git://github.com/Xilinx/XRT.git;protocol=https"
+SRC_URI = "git://github.com/Xilinx/XRT.git;protocol=https;nobranch=1"
 
 PV = "2.2.0+git${SRCPV}"
-SRCREV = "69a7e181d8d53c3b5dde9e8f17ace790141eaa01"
+SRCREV = "da87ac894a037d7e11c0496361458efed4bab438"
 
 S = "${WORKDIR}/git/src"
 
