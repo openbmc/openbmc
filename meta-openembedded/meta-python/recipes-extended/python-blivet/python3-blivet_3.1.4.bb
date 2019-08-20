@@ -30,7 +30,7 @@ REQUIRED_DISTRO_FEATURES = "systemd"
 
 inherit setuptools3 python3native
 
-RDEPENDS_${PN} = "python3-pykickstart python3-pyudev \
+RDEPENDS_${PN} += "python3-pykickstart python3-pyudev \
                   parted python3-pyparted multipath-tools \
                   lsof cryptsetup libblockdev \
                   libbytesize \

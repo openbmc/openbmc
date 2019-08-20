@@ -21,7 +21,7 @@ S = "${WORKDIR}/${SRCNAME}-${PV}"
 
 inherit cpan
 
-RDEPENDS_${PN} = " perl-module-carp \
+RDEPENDS_${PN} += " perl-module-carp \
     perl-module-cwd \
     perl-module-dynaloader \
     perl-module-extutils-cbuilder \

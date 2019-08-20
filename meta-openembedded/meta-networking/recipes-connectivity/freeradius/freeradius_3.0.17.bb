@@ -224,4 +224,4 @@ FILES_${PN}-unixodbc = "${libdir}/rlm_sql_unixodbc.so*"
 FILES_${PN} =+ "${libdir}/rlm_*.so* ${libdir}/proto_*so*"
 
 RDEPENDS_${PN} += "perl"
-RDEPENDS_${PN}-utils = "${PN}"
+RDEPENDS_${PN}-utils = "${PN} perl"

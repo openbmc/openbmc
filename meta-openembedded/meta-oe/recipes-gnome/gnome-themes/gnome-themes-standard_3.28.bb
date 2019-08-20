@@ -4,20 +4,19 @@ BUGTRACKER = "https://bugzilla.gnome.org/"
 SECTION = "x11/gnome"
 
 LICENSE = "LGPL-2.1"
-LIC_FILES_CHKSUM = "file://COPYING;md5=2d5025d4aa3495befef8f17206a5b0a1"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=2d5025d4aa3495befef8f17206a5b0a1"
 
-inherit autotools pkgconfig gettext gtk-icon-cache upstream-version-is-even distro_features_check
+# Upstream renamed this package to gnome-themes-extra at some point
+BPN = "gnome-themes-extra"
+
+inherit gnomebase gettext gtk-icon-cache upstream-version-is-even distro_features_check
 
 ANY_OF_DISTRO_FEATURES = "${GTK2DISTROFEATURES}"
 
 DEPENDS += "intltool-native gtk+"
 
-MAJ_VER = "${@oe.utils.trim_version("${PV}", 2)}"
-SRC_URI = "${GNOME_MIRROR}/${BPN}/${MAJ_VER}/${BPN}-${PV}.tar.xz \
-          "
-
-SRC_URI[md5sum] = "b51c362b157b6407303d44f93c31ee11"
-SRC_URI[sha256sum] = "61dc87c52261cfd5b94d65e8ffd923ddeb5d3944562f84942eeeb197ab8ab56a"
+SRC_URI[archive.md5sum] = "f9f2c6c521948da427f702372e16f826"
+SRC_URI[archive.sha256sum] = "7c4ba0bff001f06d8983cfc105adaac42df1d1267a2591798a780bac557a5819"
 
 EXTRA_OECONF = "--disable-gtk3-engine"
 

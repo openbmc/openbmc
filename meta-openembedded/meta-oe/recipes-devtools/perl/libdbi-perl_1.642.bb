@@ -28,6 +28,7 @@ do_install_prepend() {
 }
 
 RDEPENDS_${PN}_class-target = " \
+    perl \
     perl-module-carp \
     perl-module-exporter \
     perl-module-exporter-heavy \

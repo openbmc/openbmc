@@ -12,8 +12,11 @@ SRC_URI = "git://github.com/westerndigitalcorporation/ufs-tool.git;protocol=git;
 
 S = "${WORKDIR}/git"
 
-EXTRA_OEMAKE = "CROSS_COMPILE=${TARGET_PREFIX} CC="${CC}""
+EXTRA_OEMAKE = "CROSS_COMPILE=${TARGET_PREFIX} CC="${CC}" CFLAGS="${CFLAGS}""
 
+do_configure() {
+	sed -i -e "s|-static$||g" ${S}/Makefile
+}
 do_install() {
 	install -d ${D}${bindir}/
 	install -c -m 755 ${S}/ufs-tool ${D}${bindir}/

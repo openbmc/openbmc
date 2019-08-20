@@ -17,7 +17,7 @@ SRC_URI[sha256sum] = "4cd7bb61b51d41192d1498c1051aa6a4ccd75aeb09b71d2ec706a7084a
 
 inherit cpan
 
-RDEPENDS_${PN} = "libmime-types-perl libproc-waitstat-perl msmtp \
+RDEPENDS_${PN} += "libmime-types-perl libproc-waitstat-perl msmtp \
     perl-module-filehandle perl-module-mime-base64 perl-module-mime-quotedprint perl-module-posix \
 "
 

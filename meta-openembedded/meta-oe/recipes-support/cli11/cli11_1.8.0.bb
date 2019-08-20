@@ -17,3 +17,6 @@ inherit ptest
 
 EXTRA_OECMAKE += "-DCLANG_TIDY=OFF"
 DEPENDS += "boost"
+
+# cli11 is a header only C++ library, so the main package will be empty.
+RDEPENDS_${PN}-dev = ""

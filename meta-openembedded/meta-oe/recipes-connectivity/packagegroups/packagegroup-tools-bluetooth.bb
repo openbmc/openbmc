@@ -11,7 +11,7 @@ These tools are used at runtime."
 
 inherit packagegroup
 
-RDEPENDS_bluez5 = " \
+RDEPENDS_${PN} = " \
     bluez5-noinst-tools \
     bluez5-obex \
     bluez5-testtools  \

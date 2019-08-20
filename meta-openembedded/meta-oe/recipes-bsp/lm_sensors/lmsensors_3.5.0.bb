@@ -144,7 +144,7 @@ RDEPENDS_${PN}-sensorsconfconvert = "${PN}-sensors perl perl-modules"
 # pwmconfig script files
 FILES_${PN}-pwmconfig = "${sbindir}/pwmconfig"
 FILES_${PN}-pwmconfig-doc = "${mandir}/man8/pwmconfig.8"
-RDEPENDS_${PN}-pwmconfig = "${PN}-fancontrol"
+RDEPENDS_${PN}-pwmconfig = "${PN}-fancontrol bash"
 
 # isadump and isaset helper program files
 FILES_${PN}-isatools = "${sbindir}/isa*"

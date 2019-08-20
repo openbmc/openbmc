@@ -41,6 +41,7 @@ EXTRA_OECONF += "\
 PACKAGES += "${PN}-ppd ${PN}-cups ${PN}-backend ${PN}-filter ${PN}-hal"
 
 RDEPENDS_${PN} += " \
+        python \
         python-syslog \
         python-pprint \
         python-compression \

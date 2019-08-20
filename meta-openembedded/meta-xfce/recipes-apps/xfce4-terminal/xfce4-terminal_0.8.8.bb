@@ -8,7 +8,7 @@ inherit xfce-app
 FILES_${PN} += "${datadir}/xfce4 \
                 ${datadir}/gnome-control-center"
 
-SRC_URI[md5sum] = "c861540dd1dd05f56e62382b3851cf66"
-SRC_URI[sha256sum] = "a88f98af4da72394f2cfbd7f14b0f053ec0a3b58a4f6a577836357c60a6c42ab"
+SRC_URI[md5sum] = "4295d4d783f6d6dfe92f5bb15d96f6c6"
+SRC_URI[sha256sum] = "8fba6a60d3a0fee07417ad7c36bf78cc45be1b27f0759e125051aa73f08487fd"
 
 RRECOMMENDS_${PN} += "vte-prompt"

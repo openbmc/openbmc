@@ -14,25 +14,26 @@ inherit distutils3-base
 S = "${WORKDIR}/git"
 
 do_install_append() {
-        install -d ${D}${datadir}/dnf
-        install -m 0755 ${S}/samples/* ${D}${datadir}/dnf
-        install -d ${D}${PYTHON_SITEPACKAGES_DIR}/dnf-plugins/mkimg
-        install -m 0755 ${S}/dnf-plugins/mkimg/* ${D}${PYTHON_SITEPACKAGES_DIR}/dnf-plugins/mkimg
-        for file in $(ls ${S}/dnf-plugins/ | grep -v mkimg); do
-            install -m 0755 ${S}/dnf-plugins/$file ${D}${PYTHON_SITEPACKAGES_DIR}/dnf-plugins
-        done
+    install -d ${D}${datadir}/dnf
+    install -m 0755 ${S}/samples/* ${D}${datadir}/dnf
+    install -d ${D}${PYTHON_SITEPACKAGES_DIR}/dnf-plugins/mkimg
+    install -m 0755 ${S}/dnf-plugins/mkimg/* ${D}${PYTHON_SITEPACKAGES_DIR}/dnf-plugins/mkimg
+    for file in $(ls ${S}/dnf-plugins/ | grep -v mkimg); do
+        install -m 0755 ${S}/dnf-plugins/$file ${D}${PYTHON_SITEPACKAGES_DIR}/dnf-plugins
+    done
 }
 
 do_install_append_class-target() {
-        install -d ${D}${sysconfdir}/yum.repos.d
-        install -m 0644 ${WORKDIR}/oe-remote.repo.sample ${D}${sysconfdir}/yum.repos.d
+    install -d ${D}${sysconfdir}/yum.repos.d
+    install -m 0644 ${WORKDIR}/oe-remote.repo.sample ${D}${sysconfdir}/yum.repos.d
 }
 
 FILES_${PN} += "${datadir}/dnf"
 
 RDEPENDS_${PN} += " \
-  dnf \
-  libnewt-python \
-  "
+    bash \
+    dnf \
+    libnewt-python \
+"
 
 BBCLASSEXTEND = "nativesdk"
