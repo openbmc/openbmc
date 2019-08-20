@@ -10,7 +10,7 @@ A layer must exist above `libffi' that handles type conversions for values passe
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=3610bb17683a0089ed64055416b2ae1b"
 
-SRC_URI = "ftp://sourceware.org/pub/libffi/${BP}.tar.gz \
+SRC_URI = "https://sourceware.org/pub/libffi/${BP}.tar.gz \
            file://not-win32.patch \
            file://0001-mips-Use-compiler-internal-define-for-linux.patch \
            file://0001-mips-fix-MIPS-softfloat-build-issue.patch \

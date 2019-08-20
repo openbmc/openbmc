@@ -466,7 +466,7 @@ class TaskHash(unittest.TestCase):
             tasklist, gendeps, lookupcache = bb.data.generate_dependencies(d)
             taskdeps, basehash = bb.data.generate_dependency_hash(tasklist, gendeps, lookupcache, set(), "somefile")
             bb.warn(str(lookupcache))
-            return basehash["somefile." + taskname]
+            return basehash["somefile:" + taskname]
 
         d = bb.data.init()
         d.setVar("__BBTASKS", ["mytask"])

@@ -63,9 +63,6 @@ do_compile () {
 	(cd ${B}/${TARGET_SYS}/libgcc; oe_runmake enable-execute-stack.c unwind.h md-unwind-support.h sfp-machine.h gthr-default.h)
 }
 
-# Having anything auto depending on gcc-cross-sdk is a really bad idea...
-EXCLUDE_FROM_SHLIBS = "1"
-
 PACKAGES = "${PN}-dbg ${PN} ${PN}-doc"
 
 FILES_${PN} = "\

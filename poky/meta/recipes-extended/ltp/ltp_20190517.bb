@@ -34,7 +34,6 @@ SRC_URI = "git://github.com/linux-test-project/ltp.git \
            file://0002-kernel-controllers-Link-with-libfts-explicitly-on-mu.patch \
            file://0003-Check-if-__GLIBC_PREREQ-is-defined-before-using-it.patch \
            file://0004-guard-mallocopt-with-__GLIBC__.patch \
-           file://0005-getdents-define-getdents-getdents64-only-for-glibc.patch \
            file://0006-rt_tgsigqueueinfo-disable-test-on-musl.patch \
            file://0007-Fix-test_proc_kill-hanging.patch \
            file://0008-testcases-network-nfsv4-acl-acl1.c-Security-fix-on-s.patch \
@@ -42,6 +41,8 @@ SRC_URI = "git://github.com/linux-test-project/ltp.git \
            file://0010-shmctl01-don-t-use-hardcoded-index-0-for-SHM_STAT-te.patch \
            file://0011-direct_io-diotest4-drop-MAP_FIXED.patch \
            file://0012-getrlimit03-adjust-a-bit-of-code-to-compatiable-with.patch \
+           file://0001-Add-configure-time-check-for-getdents-getdents64-API.patch \
+           file://0002-check-for-RES_USE_INET6-during-configure.patch \
            "
 
 S = "${WORKDIR}/git"

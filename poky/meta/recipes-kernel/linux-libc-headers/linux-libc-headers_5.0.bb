@@ -12,6 +12,7 @@ SRC_URI_append_libc-musl = "\
 SRC_URI_append = "\
     file://0001-scripts-Use-fixed-input-and-output-files-instead-of-.patch \
     file://0001-kbuild-install_headers.sh-Strip-_UAPI-from-if-define.patch \
+    file://0001-arm64-sve-uapi-asm-ptrace.h-should-not-depend-on-uap.patch \
 "
 
 SRC_URI[md5sum] = "7381ce8aac80a01448e065ce795c19c0"

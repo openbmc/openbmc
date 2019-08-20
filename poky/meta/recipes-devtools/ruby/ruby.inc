@@ -15,7 +15,7 @@ LIC_FILES_CHKSUM = "\
 "
 
 DEPENDS = "ruby-native zlib openssl tcl libyaml gdbm readline libffi"
-DEPENDS_class-native = "openssl-native libyaml-native readline-native"
+DEPENDS_class-native = "openssl-native libyaml-native readline-native zlib-native"
 
 SHRT_VER = "${@oe.utils.trim_version("${PV}", 2)}"
 SRC_URI = "http://cache.ruby-lang.org/pub/ruby/${SHRT_VER}/ruby-${PV}.tar.gz \

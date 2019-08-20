@@ -1,4 +1,4 @@
-From b77c9c3d07430b014b2d1bff42027f483c81f15a Mon Sep 17 00:00:00 2001
+From 4a2a592c5a3898df37ff231d9c410f0fd32f5d5d Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 6 Nov 2018 13:43:00 +0100
 Subject: [PATCH] modulemd/v[12]/meson.build: do not generate gtkdoc or python
@@ -10,13 +10,13 @@ Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 
 ---
- meson.build             | 3 +--
- modulemd/v1/meson.build | 8 --------
- modulemd/v2/meson.build | 8 --------
- 3 files changed, 1 insertion(+), 18 deletions(-)
+ meson.build             |  3 +--
+ modulemd/v1/meson.build |  8 --------
+ modulemd/v2/meson.build | 12 ------------
+ 3 files changed, 1 insertion(+), 22 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index 228bd34..a1e60bb 100644
+index 5a0cd3d..f51b16e 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -52,7 +52,6 @@ gnome = import('gnome')
@@ -27,17 +27,17 @@ index 228bd34..a1e60bb 100644
  
  sh = find_program('sh')
  sed = find_program('sed')
-@@ -110,4 +109,4 @@ configure_file(
+@@ -127,4 +126,4 @@ configure_file(
  )
  
  subdir('modulemd')
 -subdir('bindings/python')
 +
 diff --git a/modulemd/v1/meson.build b/modulemd/v1/meson.build
-index 74db89a..4d54e69 100644
+index ddc95a1..e85fafd 100644
 --- a/modulemd/v1/meson.build
 +++ b/modulemd/v1/meson.build
-@@ -341,11 +341,3 @@ configure_file(
+@@ -356,11 +356,3 @@ configure_file(
    configuration : xcdata
  )
  
@@ -50,10 +50,10 @@ index 74db89a..4d54e69 100644
 -)
 -
 diff --git a/modulemd/v2/meson.build b/modulemd/v2/meson.build
-index 7b94e0c..c5f72b9 100644
+index 93c7fbd..0d9ed24 100644
 --- a/modulemd/v2/meson.build
 +++ b/modulemd/v2/meson.build
-@@ -530,11 +530,3 @@ configure_file(
+@@ -285,15 +285,3 @@ configure_file(
    configuration : xcdata
  )
  
@@ -62,6 +62,10 @@ index 7b94e0c..c5f72b9 100644
 -    install_dir: 'modulemd-2.0',
 -    src_dir : './modulemd/v2',
 -    main_xml : 'modulemd-v2-docs.xml',
+-    gobject_typesfile : join_paths(meson.current_build_dir(), 'modulemd-2.0.types'),
+-    dependencies : [
+-        modulemd_v2_dep,
+-    ],
 -    install : true,
 -)
 -

@@ -59,6 +59,9 @@ do_install() {
 	done
 	find ${D}${libdir}/go/src -depth -type d -name testdata -exec rm -rf {} \;
 	rm -f ${D}${libdir}/go/src/cmd/dist/dist
+        rm -f ${D}${libdir}/go/src/cmd/cgo/zdefaultcc.go
+        rm -f ${D}${libdir}/go/src/cmd/go/internal/cfg/zdefaultcc.go
+
 }
 
 ALLOW_EMPTY_${PN} = "1"

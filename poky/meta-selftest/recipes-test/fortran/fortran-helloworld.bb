@@ -11,12 +11,11 @@ SECURITY_CFLAGS = ""
 SECURITY_LDFLAGS = ""
 
 do_compile() {
-	${HOST_PREFIX}gfortran ${HOST_CC_ARCH}${TOOLCHAIN_OPTIONS} ${LDFLAGS} ${WORKDIR}/hello.f95 -o ${B}/fortran-hello
+	${FC} ${LDFLAGS} ${WORKDIR}/hello.f95 -o ${B}/fortran-hello
 }
 
 do_install() {
-	install -d ${D}${bindir}
-	install ${B}/fortran-hello ${D}${bindir}
+	install -D ${B}/fortran-hello ${D}${bindir}/fortran-hello
 }
 
 python () {

@@ -220,7 +220,7 @@ class CoreRecipeInfo(RecipeInfoCommon):
 
         cachedata.hashfn[fn] = self.hashfilename
         for task, taskhash in self.basetaskhashes.items():
-            identifier = '%s.%s' % (fn, task)
+            identifier = '%s:%s' % (fn, task)
             cachedata.basetaskhash[identifier] = taskhash
 
         cachedata.inherits[fn] = self.inherits
@@ -881,5 +881,58 @@ class MultiProcessCache(object):
         with open(self.cachefile, "wb") as f:
             p = pickle.Pickler(f, -1)
             p.dump([data, self.__class__.CACHE_VERSION])
+
+        bb.utils.unlockfile(glf)
+
+
+class SimpleCache(object):
+    """
+    BitBake multi-process cache implementation
+
+    Used by the codeparser & file checksum caches
+    """
+
+    def __init__(self, version):
+        self.cachefile = None
+        self.cachedata = None
+        self.cacheversion = version
+
+    def init_cache(self, d, cache_file_name=None, defaultdata=None):
+        cachedir = (d.getVar("PERSISTENT_DIR") or
+                    d.getVar("CACHE"))
+        if not cachedir:
+            return defaultdata
+
+        bb.utils.mkdirhier(cachedir)
+        self.cachefile = os.path.join(cachedir,
+                                      cache_file_name or self.__class__.cache_file_name)
+        logger.debug(1, "Using cache in '%s'", self.cachefile)
+
+        glf = bb.utils.lockfile(self.cachefile + ".lock")
+
+        try:
+            with open(self.cachefile, "rb") as f:
+                p = pickle.Unpickler(f)
+                data, version = p.load()
+        except:
+            bb.utils.unlockfile(glf)
+            return defaultdata
+
+        bb.utils.unlockfile(glf)
+
+        if version != self.cacheversion:
+            return defaultdata
+
+        return data
+
+    def save(self, data):
+        if not self.cachefile:
+            return
+
+        glf = bb.utils.lockfile(self.cachefile + ".lock")
+
+        with open(self.cachefile, "wb") as f:
+            p = pickle.Pickler(f, -1)
+            p.dump([data, self.cacheversion])
 
         bb.utils.unlockfile(glf)

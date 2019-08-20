@@ -119,19 +119,6 @@ def get_first_file(cmds):
                     return f
     return ''
 
-def check_free_port(host, port):
-    """ Check whether the port is free or not """
-    import socket
-    from contextlib import closing
-
-    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
-        if sock.connect_ex((host, port)) == 0:
-            # Port is open, so not free
-            return False
-        else:
-            # Port is not open, so free
-            return True
-
 class BaseConfig(object):
     def __init__(self):
         # The self.d saved vars from self.set(), part of them are from qemuboot.conf
@@ -161,6 +148,10 @@ class BaseConfig(object):
         # Setting one also adds "-vga std" because that is all that
         # OVMF supports.
         self.ovmf_bios = []
+        # When enrolling default Secure Boot keys, the hypervisor
+        # must provide the Platform Key and the first Key Exchange Key
+        # certificate in the Type 11 SMBIOS table.
+        self.ovmf_secboot_pkkek1 = ''
         self.qemuboot = ''
         self.qbconfload = False
         self.kernel = ''
@@ -181,14 +172,15 @@ class BaseConfig(object):
         self.audio_enabled = False
         self.tcpserial_portnum = ''
         self.custombiosdir = ''
-        self.lock = ''
-        self.lock_descriptor = None
+        self.taplock = ''
+        self.taplock_descriptor = None
+        self.portlocks = {}
         self.bitbake_e = ''
         self.snapshot = False
         self.wictypes = ('wic', 'wic.vmdk', 'wic.qcow2', 'wic.vdi')
         self.fstypes = ('ext2', 'ext3', 'ext4', 'jffs2', 'nfs', 'btrfs',
                         'cpio.gz', 'cpio', 'ramfs', 'tar.bz2', 'tar.gz')
-        self.vmtypes = ('hddimg', 'hdddirect', 'iso')
+        self.vmtypes = ('hddimg', 'iso')
         self.fsinfo = {}
         self.network_device = "-device e1000,netdev=net0,mac=@MAC@"
         # Use different mac section for tap and slirp to avoid
@@ -204,30 +196,78 @@ class BaseConfig(object):
         # avoid cleanup twice
         self.cleaned = False
 
-    def acquire_lock(self, error=True):
-        logger.debug("Acquiring lockfile %s..." % self.lock)
+    def acquire_taplock(self, error=True):
+        logger.debug("Acquiring lockfile %s..." % self.taplock)
         try:
-            self.lock_descriptor = open(self.lock, 'w')
-            fcntl.flock(self.lock_descriptor, fcntl.LOCK_EX|fcntl.LOCK_NB)
+            self.taplock_descriptor = open(self.taplock, 'w')
+            fcntl.flock(self.taplock_descriptor, fcntl.LOCK_EX|fcntl.LOCK_NB)
         except Exception as e:
-            msg = "Acquiring lockfile %s failed: %s" % (self.lock, e)
+            msg = "Acquiring lockfile %s failed: %s" % (self.taplock, e)
             if error:
                 logger.error(msg)
             else:
                 logger.info(msg)
-            if self.lock_descriptor:
-                self.lock_descriptor.close()
-                self.lock_descriptor = None
+            if self.taplock_descriptor:
+                self.taplock_descriptor.close()
+                self.taplock_descriptor = None
             return False
         return True
 
-    def release_lock(self):
-        if self.lock_descriptor:
+    def release_taplock(self):
+        if self.taplock_descriptor:
             logger.debug("Releasing lockfile for tap device '%s'" % self.tap)
-            fcntl.flock(self.lock_descriptor, fcntl.LOCK_UN)
-            self.lock_descriptor.close()
-            os.remove(self.lock)
-            self.lock_descriptor = None
+            fcntl.flock(self.taplock_descriptor, fcntl.LOCK_UN)
+            self.taplock_descriptor.close()
+            os.remove(self.taplock)
+            self.taplock_descriptor = None
+
+    def check_free_port(self, host, port, lockdir):
+        """ Check whether the port is free or not """
+        import socket
+        from contextlib import closing
+
+        lockfile = os.path.join(lockdir, str(port) + '.lock')
+        if self.acquire_portlock(lockfile):
+            with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
+                if sock.connect_ex((host, port)) == 0:
+                    # Port is open, so not free
+                    self.release_portlock(lockfile)
+                    return False
+                else:
+                    # Port is not open, so free
+                    return True
+        else:
+            return False
+
+    def acquire_portlock(self, lockfile):
+        logger.debug("Acquiring lockfile %s..." % lockfile)
+        try:
+            portlock_descriptor = open(lockfile, 'w')
+            self.portlocks.update({lockfile: portlock_descriptor})
+            fcntl.flock(self.portlocks[lockfile], fcntl.LOCK_EX|fcntl.LOCK_NB)
+        except Exception as e:
+            msg = "Acquiring lockfile %s failed: %s" % (lockfile, e)
+            logger.info(msg)
+            if lockfile in self.portlocks.keys() and self.portlocks[lockfile]:
+                self.portlocks[lockfile].close()
+                del self.portlocks[lockfile]
+            return False
+        return True
+
+    def release_portlock(self, lockfile=None):
+        if lockfile != None:
+           logger.debug("Releasing lockfile '%s'" % lockfile)
+           fcntl.flock(self.portlocks[lockfile], fcntl.LOCK_UN)
+           self.portlocks[lockfile].close()
+           os.remove(lockfile)
+           del self.portlocks[lockfile]
+        elif len(self.portlocks):
+            for lockfile, descriptor in self.portlocks.items():
+                logger.debug("Releasing lockfile '%s'" % lockfile)
+                fcntl.flock(descriptor, fcntl.LOCK_UN)
+                descriptor.close()
+                os.remove(lockfile)
+            self.portlocks = {}
 
     def get(self, key):
         if key in self.d:
@@ -602,6 +642,23 @@ class BaseConfig(object):
         if not os.path.exists(self.rootfs):
             raise RunQemuError("Can't find rootfs: %s" % self.rootfs)
 
+    def setup_pkkek1(self):
+        """
+        Extract from PEM certificate the Platform Key and first Key
+        Exchange Key certificate string. The hypervisor needs to provide
+        it in the Type 11 SMBIOS table
+        """
+        pemcert = '%s/%s' % (self.get('DEPLOY_DIR_IMAGE'), 'OvmfPkKek1.pem')
+        try:
+            with open(pemcert, 'r') as pemfile:
+                key = pemfile.read().replace('\n', ''). \
+                      replace('-----BEGIN CERTIFICATE-----', ''). \
+                      replace('-----END CERTIFICATE-----', '')
+                self.ovmf_secboot_pkkek1 = key
+
+        except FileNotFoundError:
+            raise RunQemuError("Can't open PEM certificate %s " % pemcert)
+
     def check_ovmf(self):
         """Check and set full path for OVMF firmware and variable file(s)."""
 
@@ -612,6 +669,8 @@ class BaseConfig(object):
                 path = '%s/%s.%s' % (self.get('DEPLOY_DIR_IMAGE'), ovmf, suffix)
                 if os.path.exists(path):
                     self.ovmf_bios[index] = path
+                    if ovmf.endswith('secboot'):
+                        self.setup_pkkek1()
                     break
             else:
                 raise RunQemuError("Can't find OVMF firmware: %s" % ovmf)
@@ -878,6 +937,8 @@ class BaseConfig(object):
             print('ROOTFS: [%s]' % self.rootfs)
         if self.ovmf_bios:
             print('OVMF: %s' % self.ovmf_bios)
+        if (self.ovmf_secboot_pkkek1):
+            print('SECBOOT PKKEK1: [%s...]' % self.ovmf_secboot_pkkek1[0:100])
         print('CONFFILE: [%s]' % self.qemuboot)
         print('')
 
@@ -958,10 +1019,21 @@ class BaseConfig(object):
         ports = re.findall('hostfwd=[^-]*:([0-9]+)-[^,-]*', qb_slirp_opt)
         ports = [int(i) for i in ports]
         mac = 2
+
+        lockdir = "/tmp/qemu-port-locks"
+        if not os.path.exists(lockdir):
+            # There might be a race issue when multi runqemu processess are
+            # running at the same time.
+            try:
+                os.mkdir(lockdir)
+                os.chmod(lockdir, 0o777)
+            except FileExistsError:
+                pass
+
         # Find a free port to avoid conflicts
         for p in ports[:]:
             p_new = p
-            while not check_free_port('localhost', p_new):
+            while not self.check_free_port('localhost', p_new, lockdir):
                 p_new += 1
                 mac += 1
                 while p_new in ports:
@@ -1016,8 +1088,8 @@ class BaseConfig(object):
             if os.path.exists('%s.skip' % lockfile):
                 logger.info('Found %s.skip, skipping %s' % (lockfile, p))
                 continue
-            self.lock = lockfile + '.lock'
-            if self.acquire_lock(error=False):
+            self.taplock = lockfile + '.lock'
+            if self.acquire_taplock(error=False):
                 tap = p
                 logger.info("Using preconfigured tap device %s" % tap)
                 logger.info("If this is not intended, touch %s.skip to make runqemu skip %s." %(lockfile, tap))
@@ -1035,8 +1107,8 @@ class BaseConfig(object):
             cmd = ('sudo', self.qemuifup, str(uid), str(gid), self.bindir_native)
             tap = subprocess.check_output(cmd).decode('utf-8').strip()
             lockfile = os.path.join(lockdir, tap)
-            self.lock = lockfile + '.lock'
-            self.acquire_lock()
+            self.taplock = lockfile + '.lock'
+            self.acquire_taplock()
             self.cleantap = True
             logger.debug('Created tap: %s' % tap)
 
@@ -1215,6 +1287,13 @@ class BaseConfig(object):
 
         self.qemu_opt += ' ' + self.qemu_opt_script
 
+        if self.ovmf_secboot_pkkek1:
+			# Provide the Platform Key and first Key Exchange Key certificate as an
+			# OEM string in the SMBIOS Type 11 table. Prepend the certificate string
+			# with "application prefix" of the EnrollDefaultKeys.efi application
+            self.qemu_opt += ' -smbios type=11,value=4e32566d-8e9e-4f52-81d3-5bb9715f9727:' \
+                             + self.ovmf_secboot_pkkek1
+
         # Append qemuparams to override previous settings
         if self.qemuparams:
             self.qemu_opt += ' ' + self.qemuparams
@@ -1268,8 +1347,11 @@ class BaseConfig(object):
         cmds = shlex.split(cmd)
         logger.info('Running %s\n' % cmd)
         pass_fds = []
-        if self.lock_descriptor:
-            pass_fds = [self.lock_descriptor.fileno()]
+        if self.taplock_descriptor:
+            pass_fds = [self.taplock_descriptor.fileno()]
+        if len(self.portlocks):
+            for descriptor in self.portlocks.values():
+                pass_fds.append(descriptor.fileno())
         process = subprocess.Popen(cmds, stderr=subprocess.PIPE, pass_fds=pass_fds)
         self.qemupid = process.pid
         retcode = process.wait()
@@ -1291,7 +1373,8 @@ class BaseConfig(object):
             cmd = ('sudo', self.qemuifdown, self.tap, self.bindir_native)
             logger.debug('Running %s' % str(cmd))
             subprocess.check_call(cmd)
-        self.release_lock()
+        self.release_taplock()
+        self.release_portlock()
 
         if self.nfs_running:
             logger.info("Shutting down the userspace NFS server...")

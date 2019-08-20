@@ -1,7 +1,7 @@
-From 761bf993ca55095f46380c0238583791c1797295 Mon Sep 17 00:00:00 2001
+From a91c588b5a4122506e7fe949c37d530621bdd997 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20D=C3=ADaz?= <daniel.diaz@linaro.org>
 Date: Tue, 11 Jul 2017 14:50:37 -0500
-Subject: [PATCH kmscube] Detect gst_bo_map/_unmap and use it (or avoid it)
+Subject: [PATCH] Detect gst_bo_map/_unmap and use it (or avoid it)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -18,6 +18,7 @@ Cc: Rob Clark <robdclark@gmail.com>
 Reviewed-by: Eric Engestrom <eric.engestrom@imgtec.com>
 
 Upstream-Status: Submitted [https://lists.freedesktop.org/archives/mesa-dev/2017-July/163020.html]
+Signed-off-by: Zoltan Kuscsik <zoltan.kuscsik@solution57.com>
 ---
  Makefile.am   | 5 ++++-
  configure.ac  | 3 +++
@@ -26,7 +27,7 @@ Upstream-Status: Submitted [https://lists.freedesktop.org/archives/mesa-dev/2017
  4 files changed, 17 insertions(+), 2 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index a36087d..ab4adbf 100644
+index ba064e4..3a0a50b 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -43,7 +43,6 @@ kmscube_SOURCES = \
@@ -37,16 +38,16 @@ index a36087d..ab4adbf 100644
  	drm-atomic.c \
  	drm-common.c \
  	drm-common.h \
-@@ -59,3 +58,7 @@ kmscube_LDADD += $(GST_LIBS)
- kmscube_CFLAGS += $(GST_CFLAGS)
- kmscube_SOURCES += cube-video.c gst-decoder.c
- endif
+@@ -68,3 +67,7 @@ texturator_SOURCES = \
+ 	drm-common.c \
+ 	drm-legacy.c \
+ 	texturator.c
 +
 +if ENABLE_GBM_MAP
 +kmscube_SOURCES += cube-tex.c
 +endif
 diff --git a/configure.ac b/configure.ac
-index 8397f7b..c7f1f4d 100644
+index 6be6541..3d20121 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -49,5 +49,8 @@ if test "x$HAVE_GST" = "xyes"; then
@@ -59,7 +60,7 @@ index 8397f7b..c7f1f4d 100644
  AC_CONFIG_FILES([Makefile])
  AC_OUTPUT
 diff --git a/gst-decoder.c b/gst-decoder.c
-index 2d6d581..b84980e 100644
+index 5431014..0aa7a55 100644
 --- a/gst-decoder.c
 +++ b/gst-decoder.c
 @@ -332,6 +332,7 @@ set_last_frame(struct decoder *dec, EGLImage frame, GstSample *samp)
@@ -96,10 +97,10 @@ index 2d6d581..b84980e 100644
  	if (dmabuf_fd < 0) {
  		GST_ERROR("could not obtain DMABUF FD");
 diff --git a/kmscube.c b/kmscube.c
-index 3a2c4dd..276dc55 100644
+index 81803be..e93da67 100644
 --- a/kmscube.c
 +++ b/kmscube.c
-@@ -148,7 +148,11 @@ int main(int argc, char *argv[])
+@@ -166,7 +166,11 @@ int main(int argc, char *argv[])
  	else if (mode == VIDEO)
  		egl = init_cube_video(gbm, video, samples);
  	else
@@ -112,5 +113,5 @@ index 3a2c4dd..276dc55 100644
  	if (!egl) {
  		printf("failed to initialize EGL\n");
 -- 
-2.7.4
+2.22.0
 

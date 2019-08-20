@@ -35,9 +35,12 @@ S = "${WORKDIR}/perl-${PV}"
 
 inherit upstream-version-is-even
 
-DEPENDS += "db gdbm zlib virtual/crypt"
+DEPENDS += "gdbm zlib virtual/crypt"
 
 PERL_LIB_VER = "${@'.'.join(d.getVar('PV').split('.')[0:2])}.0"
+
+PACKAGECONFIG ??= "bdb"
+PACKAGECONFIG[bdb] = ",-Ui_db,db"
 
 # Don't generate comments in enc2xs output files. They are not reproducible
 export ENC2XS_NO_COMMENTS = "1"
@@ -56,7 +59,8 @@ do_configure_class-target() {
     -Duseshrplib \
     -Dsoname=libperl.so.5 \
     -Dvendorprefix=${prefix} \
-    -Darchlibexp=${STAGING_LIBDIR}/perl5/${PV}/${TARGET_ARCH}-linux
+    -Darchlibexp=${STAGING_LIBDIR}/perl5/${PV}/${TARGET_ARCH}-linux \
+    ${PACKAGECONFIG_CONFARGS}
 
     #perl.c uses an ARCHLIB_EXP define to generate compile-time code that
     #adds the archlibexp path to @INC during run-time initialization of a
@@ -79,7 +83,8 @@ do_configure_class-nativesdk() {
     -Duseshrplib \
     -Dsoname=libperl.so.5 \
     -Dvendorprefix=${prefix} \
-    -Darchlibexp=${STAGING_LIBDIR}/perl5/${PV}/${TARGET_ARCH}-linux
+    -Darchlibexp=${STAGING_LIBDIR}/perl5/${PV}/${TARGET_ARCH}-linux \
+    ${PACKAGECONFIG_CONFARGS}
 
     # See the comment above
     sed -i -e "s,${STAGING_LIBDIR},${libdir},g" config.h
@@ -91,7 +96,8 @@ do_configure_class-native() {
     -Duseshrplib \
     -Dsoname=libperl.so.5 \
     -Dvendorprefix=${prefix} \
-    -Ui_xlocale
+    -Ui_xlocale \
+    ${PACKAGECONFIG_CONFARGS}
 }
 
 do_configure_append() {
@@ -179,7 +185,7 @@ perl_package_preprocess () {
             ${PKGD}${libdir}/perl5/${PV}/Config.pm \
             ${PKGD}${libdir}/perl5/${PV}/${TARGET_ARCH}-linux/Config.pm \
             ${PKGD}${libdir}/perl5/${PV}/${TARGET_ARCH}-linux/Config.pod \
-	    ${PKGD}${libdir}/perl5/${PV}/${TARGET_ARCH}-linux/Config_git.pl \
+            ${PKGD}${libdir}/perl5/${PV}/${TARGET_ARCH}-linux/Config_git.pl \
             ${PKGD}${libdir}/perl5/${PV}/${TARGET_ARCH}-linux/Config_heavy.pl \
             ${PKGD}${libdir}/perl5/${PV}/ExtUtils/Liblist/Kid.pm \
             ${PKGD}${libdir}/perl5/${PV}/FileCache.pm \
@@ -192,7 +198,7 @@ require perl-ptest.inc
 FILES_${PN} = "${bindir}/perl ${bindir}/perl.real ${bindir}/perl${PV} ${libdir}/libperl.so* \
                ${libdir}/perl5/site_perl \
                ${libdir}/perl5/${PV}/Config.pm \
-	       ${libdir}/perl5/${PV}/*/Config_git.pl \
+               ${libdir}/perl5/${PV}/*/Config_git.pl \
                ${libdir}/perl5/${PV}/*/Config_heavy-target.pl \
                ${libdir}/perl5/config.sh \
                ${libdir}/perl5/${PV}/strict.pm \

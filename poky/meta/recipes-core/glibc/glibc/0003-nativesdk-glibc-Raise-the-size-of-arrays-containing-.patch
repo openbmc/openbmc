@@ -1,7 +1,7 @@
-From 92df5673de18779b612609afa4f687e33e5ecb6e Mon Sep 17 00:00:00 2001
+From 3aceb84e2bc0f796204fe059beede91179b1bc6e Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:51:38 +0000
-Subject: [PATCH 03/30] nativesdk-glibc: Raise the size of arrays containing dl
+Subject: [PATCH 03/28] nativesdk-glibc: Raise the size of arrays containing dl
  paths
 
 This patch puts the dynamic loader path in the binaries, SYSTEM_DIRS strings
@@ -41,7 +41,7 @@ index d8d1e2344e..d2247bfc4f 100644
  _dl_cache_libcmp (const char *p1, const char *p2)
  {
 diff --git a/elf/dl-load.c b/elf/dl-load.c
-index 2bd9bc27f2..4170cc1a09 100644
+index c7a0fa58cb..4b87505d45 100644
 --- a/elf/dl-load.c
 +++ b/elf/dl-load.c
 @@ -110,8 +110,8 @@ static size_t max_capstrlen attribute_relro;
@@ -67,7 +67,7 @@ index 243829f5f7..0e74241703 100644
 +const char __invoke_dynamic_linker__[4096] __attribute__ ((section (".interp")))
    = RUNTIME_LINKER;
 diff --git a/elf/ldconfig.c b/elf/ldconfig.c
-index 206cd51df6..2fd4fb54ae 100644
+index 3bc9e61891..6a23096435 100644
 --- a/elf/ldconfig.c
 +++ b/elf/ldconfig.c
 @@ -168,6 +168,9 @@ static struct argp argp =
@@ -81,10 +81,10 @@ index 206cd51df6..2fd4fb54ae 100644
     a platform.  */
  static int
 diff --git a/elf/rtld.c b/elf/rtld.c
-index 5d97f41b7b..26c5fef929 100644
+index c9490ff694..3962373ebb 100644
 --- a/elf/rtld.c
 +++ b/elf/rtld.c
-@@ -130,6 +130,7 @@ dso_name_valid_for_suid (const char *p)
+@@ -173,6 +173,7 @@ dso_name_valid_for_suid (const char *p)
      }
    return *p != '\0';
  }
@@ -92,7 +92,7 @@ index 5d97f41b7b..26c5fef929 100644
  
  /* LD_AUDIT variable contents.  Must be processed before the
     audit_list below.  */
-@@ -1001,12 +1002,12 @@ of this helper program; chances are you did not intend to run this program.\n\
+@@ -1220,13 +1221,13 @@ of this helper program; chances are you did not intend to run this program.\n\
    --list                list all dependencies and how they are resolved\n\
    --verify              verify that given object really is a dynamically linked\n\
  			object we can handle\n\
@@ -102,8 +102,9 @@ index 5d97f41b7b..26c5fef929 100644
  			variable LD_LIBRARY_PATH\n\
    --inhibit-rpath LIST  ignore RUNPATH and RPATH information in object names\n\
  			in LIST\n\
--  --audit LIST          use objects named in LIST as auditors\n");
-+  --audit LIST          use objects named in LIST as auditors\n", LD_SO_CACHE);
+   --audit LIST          use objects named in LIST as auditors\n\
+-  --preload LIST        preload objects named in LIST\n");
++  --preload LIST        preload objects named in LIST\n", LD_SO_CACHE);
  
        ++_dl_skip_args;
        --_dl_argc;
@@ -136,5 +137,5 @@ index bc8b40331d..b0fdd2144b 100644
  # define add_system_dir(dir) add_dir (dir)
  #endif
 -- 
-2.20.1
+2.22.0
 

@@ -198,10 +198,6 @@ def get_deployed_dependencies(d):
 
     deploy = {}
     # Get all the dependencies for the current task (rootfs).
-    # Also get EXTRA_IMAGEDEPENDS because the bootloader is
-    # usually in this var and not listed in rootfs.
-    # At last, get the dependencies from boot classes because
-    # it might contain the bootloader.
     taskdata = d.getVar("BB_TASKDEPDATA", False)
     depends = list(set([dep[0] for dep
                     in list(taskdata.values())

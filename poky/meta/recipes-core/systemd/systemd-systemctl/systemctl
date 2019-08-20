@@ -28,6 +28,10 @@ class SystemdFile():
     def __init__(self, root, path):
         self.sections = dict()
         self._parse(root, path)
+        dirname = os.path.basename(path.name) + ".d"
+        for location in locations:
+            for path2 in sorted((root / location / "system" / dirname).glob("*.conf")):                
+                self._parse(root, path2)
 
     def _parse(self, root, path):
         """Parse a systemd syntax configuration file
@@ -56,8 +60,11 @@ class SystemdFile():
                 line = line.rstrip("\n")
                 m = section_re.match(line)
                 if m:
-                    section = dict()
-                    self.sections[m.group('section')] = section
+                    if m.group('section') not in self.sections:
+                        section = dict()
+                        self.sections[m.group('section')] = section
+                    else:
+                        section = self.sections[m.group('section')]
                     continue
 
                 while line.endswith("\\"):

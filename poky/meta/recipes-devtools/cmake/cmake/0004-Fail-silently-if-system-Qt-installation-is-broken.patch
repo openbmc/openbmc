@@ -1,8 +1,7 @@
-From 9516fc4260f701c6d9db0c341bb36480362e1747 Mon Sep 17 00:00:00 2001
+From d4a78e8739e845c2963666f7ef6a6c7a89827988 Mon Sep 17 00:00:00 2001
 From: Otavio Salvador <otavio@ossystems.com.br>
 Date: Thu, 5 Jul 2018 10:26:48 -0300
-Subject: [PATCH 4/5] Fail silently if system Qt installation is broken
-Organization: O.S. Systems Software LTDA.
+Subject: [PATCH] Fail silently if system Qt installation is broken
 
 Fixes a regression in behaviour from 2.8.10 to 2.8.11 resulting in the
 following error if the system Qt installation is broken:
@@ -23,12 +22,13 @@ within the if(QT_QTCORE_FOUND) statement.
 
 Signed-off-by: Moritz Blume <moritz.blume@bmw-carit.de>
 Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+
 ---
  Modules/FindQt4.cmake | 39 ++++++++++++++++++++-------------------
  1 file changed, 20 insertions(+), 19 deletions(-)
 
 diff --git a/Modules/FindQt4.cmake b/Modules/FindQt4.cmake
-index 7ad981879..8b6f43cda 100644
+index 7e18243..497d5c3 100644
 --- a/Modules/FindQt4.cmake
 +++ b/Modules/FindQt4.cmake
 @@ -988,25 +988,26 @@ if (QT_QMAKE_EXECUTABLE AND
@@ -77,6 +77,3 @@ index 7ad981879..8b6f43cda 100644
  
    foreach(QT_MODULE ${QT_MODULES})
      _QT4_ADJUST_LIB_VARS(${QT_MODULE})
--- 
-2.18.0
-

@@ -1,0 +1,39 @@
+Don't embed the path to the build-time POSIX shell as this will be
+$TMPDIR/hosttools/bash, which is no good on the target.
+
+Instead default to /bin/sh but allow it to be set in the environment.
+
+This isn't really upstreamable but I filed a bug at
+https://gitlab.com/gnutls/gnutls/issues/807 and hope a proper fix will be
+integrated.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/src/libopts/m4/libopts.m4 b/src/libopts/m4/libopts.m4
+index c6ad738..a62faca 100644
+--- a/src/libopts/m4/libopts.m4
++++ b/src/libopts/m4/libopts.m4
+@@ -112,21 +112,7 @@ AC_DEFUN([INVOKE_LIBOPTS_MACROS_FIRST],[
+   AC_CHECK_FUNCS([mmap canonicalize_file_name snprintf strdup strchr \
+                  strrchr strsignal fchmod fstat chmod])
+   AC_PROG_SED
+-  [while :
+-  do
+-      POSIX_SHELL=`which bash`
+-      test -x "$POSIX_SHELL" && break
+-      POSIX_SHELL=`which dash`
+-      test -x "$POSIX_SHELL" && break
+-      POSIX_SHELL=/usr/xpg4/bin/sh
+-      test -x "$POSIX_SHELL" && break
+-      POSIX_SHELL=`/bin/sh -c '
+-          exec 2>/dev/null
+-          if ! true ; then exit 1 ; fi
+-          echo /bin/sh'`
+-      test -x "$POSIX_SHELL" && break
+-      ]AC_MSG_ERROR([cannot locate a working POSIX shell])[
+-  done]
++  POSIX_SHELL="${POSIX_SHELL:-/bin/sh}"
+   AC_DEFINE_UNQUOTED([POSIX_SHELL], ["${POSIX_SHELL}"],
+            [define to a working POSIX compliant shell])
+   AC_SUBST([POSIX_SHELL])

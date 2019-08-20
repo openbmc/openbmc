@@ -300,6 +300,10 @@ class PartitionedImage():
         self.path = path  # Path to the image file
         self.numpart = 0  # Number of allocated partitions
         self.realpart = 0 # Number of partitions in the partition table
+        self.primary_part_num = 0  # Number of primary partitions (msdos)
+        self.extendedpart = 0      # Create extended partition before this logical partition (msdos)
+        self.extended_size_sec = 0 # Size of exteded partition (msdos)
+        self.logical_part_cnt = 0  # Number of total logical paritions (msdos)
         self.offset = 0   # Offset of next partition (in sectors)
         self.min_size = 0 # Minimum required disk size to fit
                           # all partitions (in bytes)
@@ -391,12 +395,16 @@ class PartitionedImage():
                 # Skip one sector required for the partitioning scheme overhead
                 self.offset += overhead
 
-            if self.realpart > 3 and num_real_partitions > 4:
+            if self.ptable_format == "msdos":
+                if self.primary_part_num > 3 or \
+                   (self.extendedpart == 0 and self.primary_part_num >= 3 and num_real_partitions > 4):
+                    part.type = 'logical'
                 # Reserve a sector for EBR for every logical partition
                 # before alignment is performed.
-                if self.ptable_format == "msdos":
+                if part.type == 'logical':
                     self.offset += 1
 
+            align_sectors = 0
             if part.align:
                 # If not first partition and we do have alignment set we need
                 # to align the partition.
@@ -422,18 +430,25 @@ class PartitionedImage():
             part.start = self.offset
             self.offset += part.size_sec
 
-            part.type = 'primary'
             if not part.no_table:
                 part.num = self.realpart
             else:
                 part.num = 0
 
-            if self.ptable_format == "msdos":
-                # only count the partitions that are in partition table
-                if num_real_partitions > 4:
-                    if self.realpart > 3:
-                        part.type = 'logical'
-                        part.num = self.realpart + 1
+            if self.ptable_format == "msdos" and not part.no_table:
+                if part.type == 'logical':
+                    self.logical_part_cnt += 1
+                    part.num = self.logical_part_cnt + 4
+                    if self.extendedpart == 0:
+                        # Create extended partition as a primary partition
+                        self.primary_part_num += 1
+                        self.extendedpart = part.num
+                    else:
+                        self.extended_size_sec += align_sectors
+                    self.extended_size_sec += part.size_sec + 1
+                else:
+                    self.primary_part_num += 1
+                    part.num = self.primary_part_num
 
             logger.debug("Assigned %s to %s%d, sectors range %d-%d size %d "
                          "sectors (%d bytes).", part.mountpoint, part.disk,
@@ -483,7 +498,7 @@ class PartitionedImage():
             if part.num == 0:
                 continue
 
-            if self.ptable_format == "msdos" and part.num == 5:
+            if self.ptable_format == "msdos" and part.num == self.extendedpart:
                 # Create an extended partition (note: extended
                 # partition is described in MBR and contains all
                 # logical partitions). The logical partitions save a
@@ -497,7 +512,7 @@ class PartitionedImage():
                 # room for all logical partitions.
                 self._create_partition(self.path, "extended",
                                        None, part.start - 1,
-                                       self.offset - part.start + 1)
+                                       self.extended_size_sec)
 
             if part.fstype == "swap":
                 parted_fs_type = "linux-swap"

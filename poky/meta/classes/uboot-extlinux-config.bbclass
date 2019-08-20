@@ -104,13 +104,16 @@ python do_create_extlinux_config() {
                 if default:
                     cfgfile.write('DEFAULT %s\n' % (default))
 
+            # Need to deconflict the labels with existing overrides
+            label_overrides = labels.split()
+            default_overrides = localdata.getVar('OVERRIDES').split(':')
+            # We're keeping all the existing overrides that aren't used as a label
+            # an override for that label will be added back in while we're processing that label
+            keep_overrides = list(filter(lambda x: x not in label_overrides, default_overrides))
+
             for label in labels.split():
 
-                overrides = localdata.getVar('OVERRIDES')
-                if not overrides:
-                    bb.fatal('OVERRIDES not defined')
-
-                localdata.setVar('OVERRIDES', label + ':' + overrides)
+                localdata.setVar('OVERRIDES', ':'.join(keep_overrides + [label]))
 
                 extlinux_console = localdata.getVar('UBOOT_EXTLINUX_CONSOLE')
 

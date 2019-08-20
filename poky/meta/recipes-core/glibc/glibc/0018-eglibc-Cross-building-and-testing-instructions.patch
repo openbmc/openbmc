@@ -1,7 +1,7 @@
-From 016d6987600d49d3f45874096e943b97d1667539 Mon Sep 17 00:00:00 2001
+From 6b603d25cc5723ba631dfc60b544774db1147d81 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:42:58 +0000
-Subject: [PATCH 18/30] eglibc: Cross building and testing instructions
+Subject: [PATCH 18/28] eglibc: Cross building and testing instructions
 
 Ported from eglibc
 Upstream-Status: Pending
@@ -615,5 +615,5 @@ index 0000000000..b67b468466
 +  simply place copies of these libraries in the top GLIBC build
 +  directory.
 -- 
-2.20.1
+2.22.0
 

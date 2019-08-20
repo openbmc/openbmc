@@ -1,7 +1,6 @@
 require iproute2.inc
 
 SRC_URI = "${KERNELORG_MIRROR}/linux/utils/net/${BPN}/${BP}.tar.xz \
-           file://configure-cross.patch \
            file://0001-libc-compat.h-add-musl-workaround.patch \
           "
 

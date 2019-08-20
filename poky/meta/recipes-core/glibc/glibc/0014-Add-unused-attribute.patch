@@ -1,7 +1,7 @@
-From b9cd992052550d4b2bba954099e221677a6652e7 Mon Sep 17 00:00:00 2001
+From b84999dcf642b07e6c14e6ff507be14743349949 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:28:41 +0000
-Subject: [PATCH 14/30] Add unused attribute
+Subject: [PATCH 14/28] Add unused attribute
 
 Helps in avoiding gcc warning when header is is included in
 a source file which does not use both functions
@@ -30,5 +30,5 @@ index 91e0ad3141..2e9549fe49 100644
  {
    int slash_count = 0;
 -- 
-2.20.1
+2.22.0
 

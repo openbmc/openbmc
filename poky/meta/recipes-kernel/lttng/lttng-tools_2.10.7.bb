@@ -34,6 +34,7 @@ SRC_URI = "https://lttng.org/files/lttng-tools/lttng-tools-${PV}.tar.bz2 \
            file://lttng-sessiond.service \
            file://0001-Skip-when-testapp-is-not-present.patch \
            file://0002-Fix-check-for-lttng-modules-presence-before-testing.patch \
+           file://0001-check-for-gettid-API-during-configure.patch \
            "
 
 SRC_URI[md5sum] = "e7804d10e4cade381e241601f6047373"

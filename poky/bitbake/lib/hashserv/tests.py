@@ -6,30 +6,31 @@
 #
 
 import unittest
-import threading
+import multiprocessing
 import sqlite3
 import hashlib
 import urllib.request
 import json
+import tempfile
 from . import create_server
 
 class TestHashEquivalenceServer(unittest.TestCase):
     def setUp(self):
-        # Start an in memory hash equivalence server in the background bound to
+        # Start a hash equivalence server in the background bound to
         # an ephemeral port
-        db = sqlite3.connect(':memory:', check_same_thread=False)
-        self.server = create_server(('localhost', 0), db)
+        self.dbfile = tempfile.NamedTemporaryFile(prefix="bb-hashserv-db-")
+        self.server = create_server(('localhost', 0), self.dbfile.name)
         self.server_addr = 'http://localhost:%d' % self.server.socket.getsockname()[1]
-        self.server_thread = threading.Thread(target=self.server.serve_forever)
+        self.server_thread = multiprocessing.Process(target=self.server.serve_forever)
+        self.server_thread.daemon = True
         self.server_thread.start()
 
     def tearDown(self):
         # Shutdown server
         s = getattr(self, 'server', None)
         if s is not None:
-            self.server.shutdown()
+            self.server_thread.terminate()
             self.server_thread.join()
-            self.server.server_close()
 
     def send_get(self, path):
         url = '%s/%s' % (self.server_addr, path)

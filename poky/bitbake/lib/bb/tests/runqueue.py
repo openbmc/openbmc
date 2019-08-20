@@ -25,7 +25,7 @@ class RunQueueTests(unittest.TestCase):
     a1_sstatevalid = "a1:do_package a1:do_package_qa a1:do_packagedata a1:do_package_write_ipk a1:do_package_write_rpm a1:do_populate_lic a1:do_populate_sysroot"
     b1_sstatevalid = "b1:do_package b1:do_package_qa b1:do_packagedata b1:do_package_write_ipk b1:do_package_write_rpm b1:do_populate_lic b1:do_populate_sysroot"
 
-    def run_bitbakecmd(self, cmd, builddir, sstatevalid="", slowtasks="", extraenv=None):
+    def run_bitbakecmd(self, cmd, builddir, sstatevalid="", slowtasks="", extraenv=None, cleanup=False):
         env = os.environ.copy()
         env["BBPATH"] = os.path.realpath(os.path.join(os.path.dirname(__file__), "runqueue-tests"))
         env["BB_ENV_EXTRAWHITE"] = "SSTATEVALID SLOWTASKS"
@@ -37,11 +37,16 @@ class RunQueueTests(unittest.TestCase):
                 env["BB_ENV_EXTRAWHITE"] = env["BB_ENV_EXTRAWHITE"] + " " + k
         try:
             output = subprocess.check_output(cmd, env=env, stderr=subprocess.STDOUT,universal_newlines=True, cwd=builddir)
+            print(output)
         except subprocess.CalledProcessError as e:
             self.fail("Command %s failed with %s" % (cmd, e.output))
         tasks = []
-        with open(builddir + "/task.log", "r") as f:
-            tasks = [line.rstrip() for line in f]
+        tasklog = builddir + "/task.log"
+        if os.path.exists(tasklog):
+            with open(tasklog, "r") as f:
+                tasks = [line.rstrip() for line in f]
+            if cleanup:
+                os.remove(tasklog)
         return tasks
 
     def test_no_setscenevalid(self):
@@ -225,4 +230,167 @@ class RunQueueTests(unittest.TestCase):
             for x in ['mc1:a1:package_qa_setscene', 'mc2:a1:package_qa_setscene', 'a1:build', 'a1:package_qa']:
                 expected.remove(x)
             self.assertEqual(set(tasks), set(expected))
+
+
+    def test_hashserv_single(self):
+        with tempfile.TemporaryDirectory(prefix="runqueuetest") as tempdir:
+            extraenv = {
+                "BB_HASHSERVE" : "localhost:0",
+                "BB_SIGNATURE_HANDLER" : "TestEquivHash"
+            }
+            cmd = ["bitbake", "a1", "b1"]
+            setscenetasks = ['package_write_ipk_setscene', 'package_write_rpm_setscene', 'packagedata_setscene',
+                             'populate_sysroot_setscene', 'package_qa_setscene']
+            sstatevalid = ""
+            tasks = self.run_bitbakecmd(cmd, tempdir, sstatevalid, extraenv=extraenv, cleanup=True)
+            expected = ['a1:' + x for x in self.alltasks] + ['b1:' + x for x in self.alltasks]
+            self.assertEqual(set(tasks), set(expected))
+            cmd = ["bitbake", "a1", "-c", "install", "-f"]
+            tasks = self.run_bitbakecmd(cmd, tempdir, sstatevalid, extraenv=extraenv, cleanup=True)
+            expected = ['a1:install']
+            self.assertEqual(set(tasks), set(expected))
+            cmd = ["bitbake", "a1", "b1"]
+            tasks = self.run_bitbakecmd(cmd, tempdir, sstatevalid, extraenv=extraenv, cleanup=True)
+            expected = ['a1:populate_sysroot', 'a1:package', 'a1:package_write_rpm_setscene', 'a1:packagedata_setscene',
+                        'a1:package_write_ipk_setscene', 'a1:package_qa_setscene']
+            self.assertEqual(set(tasks), set(expected))
+
+    def test_hashserv_double(self):
+        with tempfile.TemporaryDirectory(prefix="runqueuetest") as tempdir:
+            extraenv = {
+                "BB_HASHSERVE" : "localhost:0",
+                "BB_SIGNATURE_HANDLER" : "TestEquivHash"
+            }
+            cmd = ["bitbake", "a1", "b1", "e1"]
+            setscenetasks = ['package_write_ipk_setscene', 'package_write_rpm_setscene', 'packagedata_setscene',
+                             'populate_sysroot_setscene', 'package_qa_setscene']
+            sstatevalid = ""
+            tasks = self.run_bitbakecmd(cmd, tempdir, sstatevalid, extraenv=extraenv, cleanup=True)
+            expected = ['a1:' + x for x in self.alltasks] + ['b1:' + x for x in self.alltasks] + ['e1:' + x for x in self.alltasks]
+            self.assertEqual(set(tasks), set(expected))
+            cmd = ["bitbake", "a1", "b1", "-c", "install", "-fn"]
+            tasks = self.run_bitbakecmd(cmd, tempdir, sstatevalid, extraenv=extraenv, cleanup=True)
+            cmd = ["bitbake", "e1"]
+            tasks = self.run_bitbakecmd(cmd, tempdir, sstatevalid, extraenv=extraenv, cleanup=True)
+            expected = ['a1:package', 'a1:install', 'b1:package', 'b1:install', 'a1:populate_sysroot', 'b1:populate_sysroot',
+                        'a1:package_write_ipk_setscene', 'b1:packagedata_setscene', 'b1:package_write_rpm_setscene',
+                        'a1:package_write_rpm_setscene', 'b1:package_write_ipk_setscene', 'a1:packagedata_setscene']
+            self.assertEqual(set(tasks), set(expected))
+
+
+    def test_hashserv_multiple_setscene(self):
+        # Runs e1:do_package_setscene twice
+        with tempfile.TemporaryDirectory(prefix="runqueuetest") as tempdir:
+            extraenv = {
+                "BB_HASHSERVE" : "localhost:0",
+                "BB_SIGNATURE_HANDLER" : "TestEquivHash"
+            }
+            cmd = ["bitbake", "a1", "b1", "e1"]
+            setscenetasks = ['package_write_ipk_setscene', 'package_write_rpm_setscene', 'packagedata_setscene',
+                             'populate_sysroot_setscene', 'package_qa_setscene']
+            sstatevalid = ""
+            tasks = self.run_bitbakecmd(cmd, tempdir, sstatevalid, extraenv=extraenv, cleanup=True)
+            expected = ['a1:' + x for x in self.alltasks] + ['b1:' + x for x in self.alltasks] + ['e1:' + x for x in self.alltasks]
+            self.assertEqual(set(tasks), set(expected))
+            cmd = ["bitbake", "a1", "b1", "-c", "install", "-fn"]
+            tasks = self.run_bitbakecmd(cmd, tempdir, sstatevalid, extraenv=extraenv, cleanup=True)
+            cmd = ["bitbake", "e1"]
+            sstatevalid = "e1:do_package"
+            tasks = self.run_bitbakecmd(cmd, tempdir, sstatevalid, extraenv=extraenv, cleanup=True, slowtasks="a1:populate_sysroot b1:populate_sysroot")
+            expected = ['a1:package', 'a1:install', 'b1:package', 'b1:install', 'a1:populate_sysroot', 'b1:populate_sysroot',
+                        'a1:package_write_ipk_setscene', 'b1:packagedata_setscene', 'b1:package_write_rpm_setscene',
+                        'a1:package_write_rpm_setscene', 'b1:package_write_ipk_setscene', 'a1:packagedata_setscene',
+                        'e1:package_setscene']
+            self.assertEqual(set(tasks), set(expected))
+            for i in expected:
+                if i in ["e1:package_setscene"]:
+                    self.assertEqual(tasks.count(i), 4, "%s not in task list four times" % i)
+                else:
+                    self.assertEqual(tasks.count(i), 1, "%s not in task list once" % i)
+
+    def test_hashserv_partial_match(self):
+        # e1:do_package matches initial built but not second hash value
+        with tempfile.TemporaryDirectory(prefix="runqueuetest") as tempdir:
+            extraenv = {
+                "BB_HASHSERVE" : "localhost:0",
+                "BB_SIGNATURE_HANDLER" : "TestEquivHash"
+            }
+            cmd = ["bitbake", "a1", "b1"]
+            setscenetasks = ['package_write_ipk_setscene', 'package_write_rpm_setscene', 'packagedata_setscene',
+                             'populate_sysroot_setscene', 'package_qa_setscene']
+            sstatevalid = ""
+            tasks = self.run_bitbakecmd(cmd, tempdir, sstatevalid, extraenv=extraenv, cleanup=True)
+            expected = ['a1:' + x for x in self.alltasks] + ['b1:' + x for x in self.alltasks]
+            self.assertEqual(set(tasks), set(expected))
+            with open(tempdir + "/stamps/a1.do_install.taint", "w") as f:
+               f.write("d460a29e-903f-4b76-a96b-3bcc22a65994")
+            with open(tempdir + "/stamps/b1.do_install.taint", "w") as f:
+               f.write("ed36d46a-2977-458a-b3de-eef885bc1817")
+            cmd = ["bitbake", "e1"]
+            sstatevalid = "e1:do_package:685e69a026b2f029483fdefe6a11e1e06641dd2a0f6f86e27b9b550f8f21229d"
+            tasks = self.run_bitbakecmd(cmd, tempdir, sstatevalid, extraenv=extraenv, cleanup=True)
+            expected = ['a1:package', 'a1:install', 'b1:package', 'b1:install', 'a1:populate_sysroot', 'b1:populate_sysroot',
+                        'a1:package_write_ipk_setscene', 'b1:packagedata_setscene', 'b1:package_write_rpm_setscene',
+                        'a1:package_write_rpm_setscene', 'b1:package_write_ipk_setscene', 'a1:packagedata_setscene',
+                        'e1:package_setscene'] + ['e1:' + x for x in self.alltasks]
+            expected.remove('e1:package')
+            self.assertEqual(set(tasks), set(expected))
+
+    def test_hashserv_partial_match2(self):
+        # e1:do_package + e1:do_populate_sysroot matches initial built but not second hash value
+        with tempfile.TemporaryDirectory(prefix="runqueuetest") as tempdir:
+            extraenv = {
+                "BB_HASHSERVE" : "localhost:0",
+                "BB_SIGNATURE_HANDLER" : "TestEquivHash"
+            }
+            cmd = ["bitbake", "a1", "b1"]
+            setscenetasks = ['package_write_ipk_setscene', 'package_write_rpm_setscene', 'packagedata_setscene',
+                             'populate_sysroot_setscene', 'package_qa_setscene']
+            sstatevalid = ""
+            tasks = self.run_bitbakecmd(cmd, tempdir, sstatevalid, extraenv=extraenv, cleanup=True)
+            expected = ['a1:' + x for x in self.alltasks] + ['b1:' + x for x in self.alltasks]
+            self.assertEqual(set(tasks), set(expected))
+            with open(tempdir + "/stamps/a1.do_install.taint", "w") as f:
+               f.write("d460a29e-903f-4b76-a96b-3bcc22a65994")
+            with open(tempdir + "/stamps/b1.do_install.taint", "w") as f:
+               f.write("ed36d46a-2977-458a-b3de-eef885bc1817")
+            cmd = ["bitbake", "e1"]
+            sstatevalid = "e1:do_package:685e69a026b2f029483fdefe6a11e1e06641dd2a0f6f86e27b9b550f8f21229d e1:do_populate_sysroot:ef7dc0e2dd55d0534e75cba50731ff42f949818b6f29a65d72bc05856e56711d"
+            tasks = self.run_bitbakecmd(cmd, tempdir, sstatevalid, extraenv=extraenv, cleanup=True)
+            expected = ['a1:package', 'a1:install', 'b1:package', 'b1:install', 'a1:populate_sysroot', 'b1:populate_sysroot',
+                        'a1:package_write_ipk_setscene', 'b1:packagedata_setscene', 'b1:package_write_rpm_setscene',
+                        'a1:package_write_rpm_setscene', 'b1:package_write_ipk_setscene', 'a1:packagedata_setscene',
+                        'e1:package_setscene', 'e1:populate_sysroot_setscene', 'e1:build', 'e1:package_qa', 'e1:package_write_rpm', 'e1:package_write_ipk', 'e1:packagedata']
+            self.assertEqual(set(tasks), set(expected))
+
+    def test_hashserv_partial_match3(self):
+        # e1:do_package is valid for a1 but not after b1
+        # In former buggy code, this triggered e1:do_fetch, then e1:do_populate_sysroot to run
+        # with none of the intermediate tasks which is a serious bug
+        with tempfile.TemporaryDirectory(prefix="runqueuetest") as tempdir:
+            extraenv = {
+                "BB_HASHSERVE" : "localhost:0",
+                "BB_SIGNATURE_HANDLER" : "TestEquivHash"
+            }
+            cmd = ["bitbake", "a1", "b1"]
+            setscenetasks = ['package_write_ipk_setscene', 'package_write_rpm_setscene', 'packagedata_setscene',
+                             'populate_sysroot_setscene', 'package_qa_setscene']
+            sstatevalid = ""
+            tasks = self.run_bitbakecmd(cmd, tempdir, sstatevalid, extraenv=extraenv, cleanup=True)
+            expected = ['a1:' + x for x in self.alltasks] + ['b1:' + x for x in self.alltasks]
+            self.assertEqual(set(tasks), set(expected))
+            with open(tempdir + "/stamps/a1.do_install.taint", "w") as f:
+               f.write("d460a29e-903f-4b76-a96b-3bcc22a65994")
+            with open(tempdir + "/stamps/b1.do_install.taint", "w") as f:
+               f.write("ed36d46a-2977-458a-b3de-eef885bc1817")
+            cmd = ["bitbake", "e1", "-DD"]
+            sstatevalid = "e1:do_package:af056eae12a733a6a8c4f4da8c6757e588e13565852c94e2aad4d953a3989c13 e1:do_package:a3677703db82b22d28d57c1820a47851dd780104580863f5bd32e66e003a779d"
+            tasks = self.run_bitbakecmd(cmd, tempdir, sstatevalid, extraenv=extraenv, cleanup=True, slowtasks="e1:fetch b1:install")
+            expected = ['a1:package', 'a1:install', 'b1:package', 'b1:install', 'a1:populate_sysroot', 'b1:populate_sysroot',
+                        'a1:package_write_ipk_setscene', 'b1:packagedata_setscene', 'b1:package_write_rpm_setscene',
+                        'a1:package_write_rpm_setscene', 'b1:package_write_ipk_setscene', 'a1:packagedata_setscene',
+                        'e1:package_setscene']  + ['e1:' + x for x in self.alltasks]
+            expected.remove('e1:package')
+            self.assertEqual(set(tasks), set(expected))
+
 

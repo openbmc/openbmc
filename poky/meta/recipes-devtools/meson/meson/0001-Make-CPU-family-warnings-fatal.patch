@@ -1,4 +1,4 @@
-From 4b4b3d4932d928f05dbd74d730a3c8a5ac371e1d Mon Sep 17 00:00:00 2001
+From f70fee13e4dbc757cd8153cd42d92fa9394fb542 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Tue, 3 Jul 2018 13:59:09 +0100
 Subject: [PATCH] Make CPU family warnings fatal
@@ -12,10 +12,10 @@ Signed-off-by: Ross Burton <ross.burton@intel.com>
  2 files changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/mesonbuild/envconfig.py b/mesonbuild/envconfig.py
-index 5309ef4..3f0a399 100644
+index 03c6346..86b350b 100644
 --- a/mesonbuild/envconfig.py
 +++ b/mesonbuild/envconfig.py
-@@ -178,7 +178,7 @@ class MachineInfo:
+@@ -186,7 +186,7 @@ class MachineInfo:
  
          cpu_family = literal['cpu_family']
          if cpu_family not in known_cpu_families:
@@ -25,10 +25,10 @@ index 5309ef4..3f0a399 100644
          endian = literal['endian']
          if endian not in ('little', 'big'):
 diff --git a/mesonbuild/environment.py b/mesonbuild/environment.py
-index 3031a82..ecd18d0 100644
+index 0cfdf9c..40aa189 100644
 --- a/mesonbuild/environment.py
 +++ b/mesonbuild/environment.py
-@@ -242,9 +242,7 @@ def detect_cpu_family(compilers):
+@@ -262,9 +262,7 @@ def detect_cpu_family(compilers: CompilersDict) -> str:
          trial = 'parisc'
  
      if trial not in known_cpu_families:

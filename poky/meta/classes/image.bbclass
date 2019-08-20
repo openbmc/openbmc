@@ -305,11 +305,8 @@ fakeroot python do_image_qa () {
             bb.build.exec_func(cmd, d)
         except oe.utils.ImageQAFailed as e:
             qamsg = qamsg + '\tImage QA function %s failed: %s\n' % (e.name, e.description)
-        except bb.build.FuncFailed as e:
-            qamsg = qamsg + '\tImage QA function %s failed' % e.name
-            if e.logfile:
-                qamsg = qamsg + ' (log file is located at %s)' % e.logfile
-            qamsg = qamsg + '\n'
+        except Exception as e:
+            qamsg = qamsg + '\tImage QA function %s failed\n' % cmd
 
     if qamsg:
         imgname = d.getVar('IMAGE_NAME')

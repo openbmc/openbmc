@@ -257,13 +257,15 @@ class Wget(FetchMethod):
                 fp.read()
                 fp.close()
 
-                newheaders = dict((k, v) for k, v in list(req.headers.items())
-                                  if k.lower() not in ("content-length", "content-type"))
-                return self.parent.open(urllib.request.Request(req.get_full_url(),
-                                                        headers=newheaders,
-                                                        origin_req_host=req.origin_req_host,
-                                                        unverifiable=True))
+                if req.get_method() != 'GET':
+                    newheaders = dict((k, v) for k, v in list(req.headers.items())
+                                      if k.lower() not in ("content-length", "content-type"))
+                    return self.parent.open(urllib.request.Request(req.get_full_url(),
+                                                            headers=newheaders,
+                                                            origin_req_host=req.origin_req_host,
+                                                            unverifiable=True))
 
+                raise urllib.request.HTTPError(req, code, msg, headers, None)
 
             # Some servers (e.g. GitHub archives, hosted on Amazon S3) return 403
             # Forbidden when they actually mean 405 Method Not Allowed.

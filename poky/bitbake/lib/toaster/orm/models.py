@@ -965,12 +965,12 @@ class TargetSDKFile(models.Model):
 class Target_Image_File(models.Model):
     # valid suffixes for image files produced by a build
     SUFFIXES = {
-        'btrfs', 'cpio', 'cpio.gz', 'cpio.lz4', 'cpio.lzma', 'cpio.xz',
-        'cramfs', 'elf', 'ext2', 'ext2.bz2', 'ext2.gz', 'ext2.lzma', 'ext4',
-        'ext4.gz', 'ext3', 'ext3.gz', 'hdddirect', 'hddimg', 'iso', 'jffs2',
-        'jffs2.sum', 'multiubi', 'qcow2', 'squashfs', 'squashfs-lzo',
+        'btrfs', 'container', 'cpio', 'cpio.gz', 'cpio.lz4', 'cpio.lzma',
+        'cpio.xz', 'cramfs', 'ext2', 'ext2.bz2', 'ext2.gz', 'ext2.lzma',
+        'ext3', 'ext3.gz', 'ext4', 'ext4.gz', 'f2fs', 'hddimg', 'iso', 'jffs2',
+        'jffs2.sum', 'multiubi', 'squashfs', 'squashfs-lz4', 'squashfs-lzo',
         'squashfs-xz', 'tar', 'tar.bz2', 'tar.gz', 'tar.lz4', 'tar.xz', 'ubi',
-        'ubifs', 'vdi', 'vmdk', 'wic', 'wic.bmap', 'wic.bz2', 'wic.gz', 'wic.lzma'
+        'ubifs', 'wic', 'wic.bz2', 'wic.gz', 'wic.lzma'
     }
 
     target = models.ForeignKey(Target)

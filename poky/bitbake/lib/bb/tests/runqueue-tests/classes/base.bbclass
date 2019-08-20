@@ -5,17 +5,29 @@ def stamptask(d):
     import time
 
     thistask = d.expand("${PN}:${BB_CURRENTTASK}")
-    with open(d.expand("${TOPDIR}/%s.run") % thistask, "a+") as f:
-        f.write("\n")
+    stampname = d.expand("${TOPDIR}/%s.run" % thistask)
+    with open(stampname, "a+") as f:
+        f.write(d.getVar("BB_UNIHASH") + "\n")
 
     if d.getVar("BB_CURRENT_MC") != "default":
         thistask = d.expand("${BB_CURRENT_MC}:${PN}:${BB_CURRENTTASK}")
     if thistask in d.getVar("SLOWTASKS").split():
         bb.note("Slowing task %s" % thistask)
         time.sleep(0.5)
+    if d.getVar("BB_HASHSERVE"):
+        task = d.getVar("BB_CURRENTTASK")
+        if task in ['package', 'package_qa', 'packagedata', 'package_write_ipk', 'package_write_rpm', 'populate_lic', 'populate_sysroot']:
+            bb.parse.siggen.report_unihash(os.getcwd(), d.getVar("BB_CURRENTTASK"), d)
 
     with open(d.expand("${TOPDIR}/task.log"), "a+") as f:
         f.write(thistask + "\n")
+
+
+def sstate_output_hash(path, sigfile, task, d):
+    import hashlib
+    h = hashlib.sha256()
+    h.update(d.expand("${PN}:${BB_CURRENTTASK}").encode('utf-8'))
+    return h.hexdigest()
 
 python do_fetch() {
     # fetch
@@ -216,27 +228,35 @@ def setscene_depvalid(task, taskdependees, notneeded, d, log=None):
 
 BB_HASHCHECK_FUNCTION = "sstate_checkhashes"
 
-def sstate_checkhashes(sq_fn, sq_task, sq_hash, sq_hashfn, d, siginfo=False, *, sq_unihash=None):
+def sstate_checkhashes(sq_data, d, siginfo=False, currentcount=0, **kwargs):
 
-    ret = []
-    missed = []
+    found = set()
+    missed = set()
 
     valid = d.getVar("SSTATEVALID").split()
 
-    for task in range(len(sq_fn)):
-        n = os.path.basename(sq_fn[task]).rsplit(".", 1)[0] + ":" + sq_task[task]
+    for tid in sorted(sq_data['hash']):
+        n = os.path.basename(bb.runqueue.fn_from_tid(tid)).split(".")[0] + ":do_" + bb.runqueue.taskname_from_tid(tid)[3:]
+        print(n)
+        stampfile = d.expand("${TOPDIR}/%s.run" % n.replace("do_", ""))
         if n in valid:
             bb.note("SState: Found valid sstate for %s" % n)
-            ret.append(task)
-        elif os.path.exists(d.expand("${TOPDIR}/%s.run" % n.replace("do_", ""))):
-            bb.note("SState: Found valid sstate for %s (already run)" % n)
-            ret.append(task)
+            found.add(tid)
+        elif n + ":" + sq_data['hash'][tid] in valid:
+            bb.note("SState: Found valid sstate for %s" % n)
+            found.add(tid)
+        elif os.path.exists(stampfile):
+            with open(stampfile, "r") as f:
+                hash = f.readline().strip()
+            if hash == sq_data['hash'][tid]:
+                bb.note("SState: Found valid sstate for %s (already run)" % n)
+                found.add(tid)
+            else:
+                bb.note("SState: sstate hash didn't match previous run for %s (%s vs %s)" % (n, sq_data['hash'][tid], hash))
+                missed.add(tid)
         else:
-            missed.append(task)
-            bb.note("SState: Found no valid sstate for %s" % n)
+            missed.add(tid)
+            bb.note("SState: Found no valid sstate for %s (%s)" % (n, sq_data['hash'][tid]))
 
-    if hasattr(bb.parse.siggen, "checkhashes"):
-        bb.parse.siggen.checkhashes(missed, ret, sq_fn, sq_task, sq_hash, sq_hashfn, d)
-
-    return ret
+    return found
 

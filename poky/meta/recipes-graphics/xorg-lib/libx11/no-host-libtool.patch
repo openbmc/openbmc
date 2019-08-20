@@ -1,0 +1,45 @@
+Upstream-Status: Backport [https://gitlab.freedesktop.org/xorg/lib/libx11/merge_requests/22]
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From edc7680ed5a03cedb5facf14693823455e12c29c Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Tue, 6 Aug 2019 14:53:43 +0100
+Subject: [PATCH libX11] src/util/Makefile: explicitly reset LINK to not use
+ libtool
+
+Simply looking at libtool redefines LINK globally to use libtool, which when
+you're trying to cross-compile to Windows can cause complications.
+
+As in src/util/ we're simply building a small binary for the build host, reset
+LINK to the automake default so that the traditional compile/link steps occur
+without libtool.
+
+Also remove -all-static from LDFLAGS as that is a libtool-specific argument
+intended to solve this problem.
+
+Closes: #100
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+---
+ src/util/Makefile.am | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/util/Makefile.am b/src/util/Makefile.am
+index 37314370..b7236530 100644
+--- a/src/util/Makefile.am
++++ b/src/util/Makefile.am
+@@ -7,10 +7,11 @@ AM_CFLAGS = \
+ AM_CPPFLAGS = \
+ 	-I$(top_srcdir)/include
+ 
++LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+ CC = @CC_FOR_BUILD@
+ CPPFLAGS = @CPPFLAGS_FOR_BUILD@
+ CFLAGS = @CFLAGS_FOR_BUILD@
+-LDFLAGS = @LDFLAGS_FOR_BUILD@ -all-static
++LDFLAGS = @LDFLAGS_FOR_BUILD@
+ LIBS =
+ EXEEXT = @EXEEXT_FOR_BUILD@
+ 
+-- 
+2.20.1
+

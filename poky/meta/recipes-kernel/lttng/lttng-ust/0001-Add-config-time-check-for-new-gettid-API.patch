@@ -1,0 +1,57 @@
+From 2bb3e259d0410f16a8b2058a05af434376a1583a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 26 Jul 2019 09:57:32 -0700
+Subject: [lttng-ust][PATCH] Add config time check for new gettid API
+
+glibc 2.30 introdoced this function see [1]
+so its best to detect it
+and provide fallbacks only if its not present
+
+[1] https://sourceware.org/bugzilla/show_bug.cgi?id=6399
+
+Upstream-Status: Submitted [https://lists.lttng.org/pipermail/lttng-dev/2019-July/029131.html]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac            | 1 +
+ include/lttng/ust-tid.h | 7 +++++--
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 7fa059a..b1099c1 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -137,6 +137,7 @@ AC_CHECK_FUNCS([ \
+ 	clock_gettime \
+ 	ftruncate \
+ 	getpagesize \
++	gettid \
+ 	gettimeofday \
+ 	localeconv \
+ 	memchr \
+diff --git a/include/lttng/ust-tid.h b/include/lttng/ust-tid.h
+index e669d7e..7995c78 100644
+--- a/include/lttng/ust-tid.h
++++ b/include/lttng/ust-tid.h
+@@ -26,7 +26,10 @@
+  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  * SOFTWARE.
+  */
+-
++#include <config.h>
++#if HAVE_GETTID
++#include <unistd.h>
++#else
+ #ifdef __linux__
+ #include <syscall.h>
+ #endif
+@@ -49,5 +52,5 @@ static inline pid_t gettid(void)
+ 	return getpid();
+ }
+ #endif
+-
++#endif /* HAVE_GETTID */
+ #endif /* _LTTNG_UST_TID_H */
+-- 
+2.22.0
+

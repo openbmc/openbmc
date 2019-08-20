@@ -126,7 +126,7 @@ class QemuRunner:
             env["DEPLOY_DIR_IMAGE"] = self.deploy_dir_image
 
         if not launch_cmd:
-            launch_cmd = 'runqemu %s %s ' % ('snapshot' if discard_writes else '', runqemuparams)
+            launch_cmd = 'runqemu %s' % ('snapshot' if discard_writes else '')
             if self.use_kvm:
                 self.logger.debug('Using kvm for runqemu')
                 launch_cmd += ' kvm'
@@ -136,7 +136,7 @@ class QemuRunner:
                 launch_cmd += ' nographic'
             if self.use_slirp:
                 launch_cmd += ' slirp'
-            launch_cmd += ' %s %s' % (self.machine, self.rootfs)
+            launch_cmd += ' %s %s %s' % (runqemuparams, self.machine, self.rootfs)
 
         return self.launch(launch_cmd, qemuparams=qemuparams, get_ip=get_ip, extra_bootparams=extra_bootparams, env=env)
 

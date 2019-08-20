@@ -1,0 +1,33 @@
+From 4bc241539246f7a17d07357257ab47cb96bc4b69 Mon Sep 17 00:00:00 2001
+From: "ysuzuki@apple.com" <ysuzuki@apple.com>
+Date: Thu, 18 Apr 2019 07:30:18 +0000
+Subject: [PATCH] Unreviewed, fix build failure
+ https://bugs.webkit.org/show_bug.cgi?id=195938
+
+Including <array>.
+
+* bmalloc/AvailableMemory.cpp:
+
+git-svn-id: http://svn.webkit.org/repository/webkit/trunk@244422 268f45cc-cd09-0410-ab3c-d52691b4dbfc
+
+Upstream-Status: Backport [https://github.com/WebKit/webkit/commit/84c111dc0d83b5acf60706ef49bc2f5e91112471]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Source/bmalloc/bmalloc/AvailableMemory.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Source/bmalloc/bmalloc/AvailableMemory.cpp b/Source/bmalloc/bmalloc/AvailableMemory.cpp
+index 595889fe..b72000d5 100644
+--- a/Source/bmalloc/bmalloc/AvailableMemory.cpp
++++ b/Source/bmalloc/bmalloc/AvailableMemory.cpp
+@@ -32,6 +32,7 @@
+ #include "PerProcess.h"
+ #include "Scavenger.h"
+ #include "Sizes.h"
++#include <array>
+ #include <mutex>
+ #if BOS(DARWIN)
+ #if BPLATFORM(IOS_FAMILY)
+-- 
+2.22.0
+

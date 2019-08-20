@@ -9,6 +9,7 @@ SRCREV = "402c228861c9893f64cffbbcb4cb23044b8c721c"
 SRC_URI = "git://anongit.freedesktop.org/virglrenderer \
            file://0001-vtest-add-missing-includes.patch \
            file://0001-Makefile.am-explicitly-link-with-libdrm.patch \
+           file://0001-gallium-Expand-libc-check-to-be-platform-OS-check.patch \
            "
 
 S = "${WORKDIR}/git"

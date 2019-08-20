@@ -8,7 +8,7 @@ SECTION = "devel"
 
 LIC_FILES_CHKSUM = "file://LICENSE.TXT;md5=c6b766a4e85dd28301eeed54a6684648"
 
-DEPENDS = "libffi libxml2 zlib ninja-native llvm-native"
+DEPENDS = "libffi libxml2 zlib libedit ninja-native llvm-native"
 
 RDEPENDS_${PN}_append_class-target = " ncurses-terminfo"
 
@@ -19,17 +19,17 @@ PROVIDES += "llvm${PV}"
 LLVM_RELEASE = "${PV}"
 LLVM_DIR = "llvm${LLVM_RELEASE}"
 
-SRCREV = "d2298e74235598f15594fe2c99bbac870a507c59"
+SRCREV = "19a71f6bdf2dddb10764939e7f0ec2b98dba76c9"
 
 BRANCH = "release/${MAJOR_VERSION}.x"
 MAJOR_VERSION = "8"
 MINOR_VERSION = "0"
-PATCH_VERSION = "0"
+PATCH_VERSION = "1"
 SOLIBVER = "1"
 PV = "${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}"
 SRC_URI = "git://github.com/llvm/llvm-project.git;branch=${BRANCH} \
-           file://0001-llvm-TargetLibraryInfo-Undefine-libc-functions-if-th.patch \
-           file://0002-llvm-allow-env-override-of-exe-path.patch \
+           file://0006-llvm-TargetLibraryInfo-Undefine-libc-functions-if-th.patch;striplevel=2 \
+           file://0007-llvm-allow-env-override-of-exe-path.patch;striplevel=2 \
           "
 
 S = "${WORKDIR}/git/llvm"

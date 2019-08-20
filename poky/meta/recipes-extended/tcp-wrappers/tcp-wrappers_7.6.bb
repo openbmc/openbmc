@@ -18,7 +18,7 @@ FILES_libwrap-staticdev = "${libdir}/lib*.a"
 FILES_${PN} = "${sbindir}"
 FILES_${PN}-doc = "${mandir}/man8"
 
-SRC_URI = "ftp://ftp.porcupine.org/pub/security/tcp_wrappers_${PV}.tar.gz \
+SRC_URI = "http://ftp.porcupine.org/pub/security/tcp_wrappers_${PV}.tar.gz \
            file://00_man_quoting.diff \
            file://01_man_portability.patch \
            file://05_wildcard_matching.patch \

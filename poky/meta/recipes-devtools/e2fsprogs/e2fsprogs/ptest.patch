@@ -5,11 +5,13 @@ Subject: [PATCH] e2fsprogs: add ptest
 
 Upstream-Status: Inappropriate
 
+Rebase for e2fsprogs 1.45.3.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- tests/Makefile.in    |  4 ++--
- tests/test_config    | 32 ++++++++++++++++----------------
- tests/test_script.in |  2 +-
- 3 files changed, 19 insertions(+), 19 deletions(-)
+ tests/Makefile.in |  4 ++--
+ tests/test_config | 32 ++++++++++++++++----------------
+ 2 files changed, 18 insertions(+), 18 deletions(-)
 
 diff --git a/tests/Makefile.in b/tests/Makefile.in
 index 8c4d2048..e021af32 100644
@@ -34,10 +36,10 @@ index 8c4d2048..e021af32 100644
  	@chmod +x-w test_script
  
 diff --git a/tests/test_config b/tests/test_config
-index 1f146ca2..05125f9c 100644
+index 9dc762ce..a5fbdef6 100644
 --- a/tests/test_config
 +++ b/tests/test_config
-@@ -3,16 +3,16 @@
+@@ -3,25 +3,25 @@
  #
  
  unset LANG LANGUAGE LC_ADDRESS LC_ALL LC_COLLATE LC_CTYPE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_TIME PAGER
@@ -62,12 +64,6 @@ index 1f146ca2..05125f9c 100644
 +DEBUGFS="$USE_VALGRIND debugfs"
 +DEBUGFS_EXE="/sbin/debugfs"
  TEST_BITS="test_data.tmp"
- if [ ! -s $TEST_BITS ]; then
- 	# create a non-sparse test file if possible, since debugfs may be
-@@ -21,14 +21,14 @@ if [ ! -s $TEST_BITS ]; then
- 	dd if=/dev/urandom of=$TEST_BITS bs=128k count=1 > /dev/null 2>&1 ||
- 		TEST_BITS="$DEFBUGFS_EXE"
- fi
 -RESIZE2FS_EXE="../resize/resize2fs"
 +RESIZE2FS_EXE="/sbin/resize2fs"
  RESIZE2FS="$USE_VALGRIND $RESIZE2FS_EXE"
@@ -85,16 +81,3 @@ index 1f146ca2..05125f9c 100644
  CLEAN_OUTPUT="sed -f $cmd_dir/filter.sed"
  LD_LIBRARY_PATH=../lib:../lib/ext2fs:../lib/e2p:../lib/et:../lib/ss:${LD_LIBRARY_PATH}
  DYLD_LIBRARY_PATH=../lib:../lib/ext2fs:../lib/e2p:../lib/et:../lib/ss:${DYLD_LIBRARY_PATH}
-diff --git a/tests/test_script.in b/tests/test_script.in
-index 9959e308..442999db 100644
---- a/tests/test_script.in
-+++ b/tests/test_script.in
-@@ -39,7 +39,7 @@ for i; do
- done
- 
- if test "$TESTS"x = x ; then
--    if test -n "DO_FAILED"; then
-+    if test -n "$DO_FAILED"; then
- 	exit 0
-     fi
-     TESTS=`ls -d $SRCDIR/[a-zA-Z]_*`

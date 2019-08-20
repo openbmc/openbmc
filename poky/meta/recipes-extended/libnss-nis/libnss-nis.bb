@@ -18,6 +18,7 @@ PV = "3.0+git${SRCPV}"
 SRCREV = "d4aea48657a8e90d7922574b8021ee03915a36cb"
 
 SRC_URI = "git://github.com/thkukuk/libnss_nis \
+           file://0001-nis-hosts-Remove-use-of-RES_USE_INET6.patch \
           "
 
 S = "${WORKDIR}/git"

@@ -1,7 +1,7 @@
-From b2ec111dc3a42d9dce71c903524724ae82ff22d8 Mon Sep 17 00:00:00 2001
+From 50ab0b0c116f4ae3d975ec1b15ed4595fd9147f6 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 3 Aug 2018 09:55:12 -0700
-Subject: [PATCH 05/30] nativesdk-glibc: Make relocatable install for locales
+Subject: [PATCH 05/28] nativesdk-glibc: Make relocatable install for locales
 
 The glibc locale path is hard-coded to the install prefix, but in SDKs we need
 to be able to relocate the binaries.  Expand the strings to 4K and put them in a
@@ -66,5 +66,5 @@ index 7c1cc3eecb..53cb8bfc59 100644
  /* Load the locale data for CATEGORY from the file specified by *NAME.
     If *NAME is "", use environment variables as specified by POSIX, and
 -- 
-2.20.1
+2.22.0
 

@@ -35,6 +35,7 @@ FILES_${PN} = "${bindir}/apt-cdrom ${bindir}/apt-get \
 	       ${libdir}/dpkg \
 	       ${systemd_unitdir}/system \
            "
+RDEPENDS_${PN} += "perl"
 FILES_${PN}-utils = "${bindir}/apt-sortpkgs ${bindir}/apt-extracttemplates"
 FILES_${PN}-doc = "${@get_files_apt_doc(d, bb, d.getVar('apt-manpages'))} \
 		   ${docdir}/apt"

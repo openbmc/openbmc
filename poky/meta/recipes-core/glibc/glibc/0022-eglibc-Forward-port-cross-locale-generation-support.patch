@@ -1,7 +1,7 @@
-From 1ae15f60a84f16187e06a05906f44a6658bae487 Mon Sep 17 00:00:00 2001
+From be382b4e0c6de52573f7e037f2d4ff9b1b5bbb6b Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:33:49 +0000
-Subject: [PATCH 22/30] eglibc: Forward port cross locale generation support
+Subject: [PATCH 22/28] eglibc: Forward port cross locale generation support
 
 Upstream-Status: Pending
 
@@ -23,7 +23,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  create mode 100644 locale/catnames.c
 
 diff --git a/locale/Makefile b/locale/Makefile
-index 764e751c36..866957fefa 100644
+index d78cf9b83a..e166f5252e 100644
 --- a/locale/Makefile
 +++ b/locale/Makefile
 @@ -26,7 +26,8 @@ headers		= langinfo.h locale.h bits/locale.h \
@@ -150,7 +150,7 @@ index 94c122df68..80e53e12c8 100644
    return NULL;
  }
 diff --git a/locale/programs/ld-collate.c b/locale/programs/ld-collate.c
-index bb4e2c539d..9d08d422c4 100644
+index 6baab6cfb0..b12a2fceab 100644
 --- a/locale/programs/ld-collate.c
 +++ b/locale/programs/ld-collate.c
 @@ -349,7 +349,7 @@ new_element (struct locale_collate_t *collate, const char *mbs, size_t mbslen,
@@ -199,7 +199,7 @@ index bb4e2c539d..9d08d422c4 100644
  			 == runp->wcnext->wcs[runp->nwcs - 1] + 1));
  
 diff --git a/locale/programs/ld-ctype.c b/locale/programs/ld-ctype.c
-index 36fd08ba80..08155a27d6 100644
+index cfc9c43fd5..6572cc199c 100644
 --- a/locale/programs/ld-ctype.c
 +++ b/locale/programs/ld-ctype.c
 @@ -915,7 +915,7 @@ ctype_output (struct localedef_t *locale, const struct charmap_t *charmap,
@@ -211,7 +211,7 @@ index 36fd08ba80..08155a27d6 100644
  			 : 0);
  
    init_locale_data (&file, nelems);
-@@ -1926,7 +1926,7 @@ read_translit_entry (struct linereader *ldfile, struct locale_ctype_t *ctype,
+@@ -1927,7 +1927,7 @@ read_translit_entry (struct linereader *ldfile, struct locale_ctype_t *ctype,
  	    ignore = 1;
  	  else
  	    /* This value is usable.  */
@@ -220,7 +220,7 @@ index 36fd08ba80..08155a27d6 100644
  
  	  first = 0;
  	}
-@@ -2460,8 +2460,8 @@ with character code range values one must use the absolute ellipsis `...'"));
+@@ -2461,8 +2461,8 @@ with character code range values one must use the absolute ellipsis `...'"));
  	    }
  
  	handle_tok_digit:
@@ -231,7 +231,7 @@ index 36fd08ba80..08155a27d6 100644
  	  handle_digits = 1;
  	  goto read_charclass;
  
-@@ -3901,8 +3901,7 @@ allocate_arrays (struct locale_ctype_t *ctype, const struct charmap_t *charmap,
+@@ -3904,8 +3904,7 @@ allocate_arrays (struct locale_ctype_t *ctype, const struct charmap_t *charmap,
  
  	  while (idx < number)
  	    {
@@ -241,7 +241,7 @@ index 36fd08ba80..08155a27d6 100644
  	      if (res == 0)
  		{
  		  replace = 1;
-@@ -3939,11 +3938,11 @@ allocate_arrays (struct locale_ctype_t *ctype, const struct charmap_t *charmap,
+@@ -3942,11 +3941,11 @@ allocate_arrays (struct locale_ctype_t *ctype, const struct charmap_t *charmap,
        for (size_t cnt = 0; cnt < number; ++cnt)
  	{
  	  struct translit_to_t *srunp;
@@ -255,7 +255,7 @@ index 36fd08ba80..08155a27d6 100644
  	      srunp = srunp->next;
  	    }
  	  /* Plus one for the extra NUL character marking the end of
-@@ -3967,18 +3966,18 @@ allocate_arrays (struct locale_ctype_t *ctype, const struct charmap_t *charmap,
+@@ -3970,18 +3969,18 @@ allocate_arrays (struct locale_ctype_t *ctype, const struct charmap_t *charmap,
  	  ctype->translit_from_idx[cnt] = from_len;
  	  ctype->translit_to_idx[cnt] = to_len;
  
@@ -521,7 +521,7 @@ index c063fc097d..4e7465e55a 100644
 +
  #endif /* locfile.h */
 diff --git a/locale/setlocale.c b/locale/setlocale.c
-index 9427a5ad28..8f4140d684 100644
+index 9bd35454b9..2a67dc6589 100644
 --- a/locale/setlocale.c
 +++ b/locale/setlocale.c
 @@ -64,36 +64,6 @@ static char *const _nl_current_used[] =
@@ -562,5 +562,5 @@ index 9427a5ad28..8f4140d684 100644
  # define WEAK_POSTLOAD(postload) weak_extern (postload)
  #else
 -- 
-2.20.1
+2.22.0
 

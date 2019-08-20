@@ -27,6 +27,7 @@ PE = "2"
 
 SRC_URI = "https://lttng.org/files/lttng-ust/lttng-ust-${PV}.tar.bz2 \
            file://lttng-ust-doc-examples-disable.patch \
+           file://0001-Add-config-time-check-for-new-gettid-API.patch \
           "
 
 SRC_URI[md5sum] = "19916ff0dec23c90f985586a8cbd1fd2"

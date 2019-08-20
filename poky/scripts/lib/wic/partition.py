@@ -50,6 +50,7 @@ class Partition():
         self.use_uuid = args.use_uuid
         self.uuid = args.uuid
         self.fsuuid = args.fsuuid
+        self.type = args.type
 
         self.lineno = lineno
         self.source_file = ""
@@ -211,19 +212,13 @@ class Partition():
         if os.path.isfile(rootfs):
             os.remove(rootfs)
 
-        # Get rootfs size from bitbake variable if it's not set in .ks file
+        # If size is not specified compute it from the rootfs_dir size
         if not self.size and real_rootfs:
-            # Bitbake variable ROOTFS_SIZE is calculated in
-            # Image._get_rootfs_size method from meta/lib/oe/image.py
-            # using IMAGE_ROOTFS_SIZE, IMAGE_ROOTFS_ALIGNMENT,
-            # IMAGE_OVERHEAD_FACTOR and IMAGE_ROOTFS_EXTRA_SPACE
-            rsize_bb = get_bitbake_var('ROOTFS_SIZE')
-            if rsize_bb:
-                logger.warning('overhead-factor was specified, but size was not,'
-                               ' so bitbake variables will be used for the size.'
-                               ' In this case both IMAGE_OVERHEAD_FACTOR and '
-                               '--overhead-factor will be applied')
-                self.size = int(round(float(rsize_bb)))
+            # Use the same logic found in get_rootfs_size()
+            # from meta/classes/image.bbclass
+            du_cmd = "du -ks %s" % rootfs_dir
+            out = exec_cmd(du_cmd)
+            self.size = int(out.split()[0])
 
         prefix = "ext" if self.fstype.startswith("ext") else self.fstype
         method = getattr(self, "prepare_rootfs_" + prefix)

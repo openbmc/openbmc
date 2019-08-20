@@ -20,3 +20,7 @@ EXTRA_OECONF = "--disable-docs"
 
 PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'x11', d)}"
 PACKAGECONFIG[x11] = "--enable-x11,--disable-x11,libxcb xkeyboard-config,"
+
+# Fix a following runtime error:
+# xkbcommon: ERROR: couldn't find a Compose file for locale "C"
+RDEPENDS_${PN} = "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'libx11-locale', 'libx11-compose-data', d)}"

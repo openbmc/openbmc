@@ -1,13 +1,14 @@
-From 7461a3de38b66edbe2f5593f9bdab9f2704d32bc Mon Sep 17 00:00:00 2001
+From 917133acc701dbc4636165d3b08d15dc5829a06f Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Wed, 17 Aug 2016 04:06:34 -0400
 Subject: [PATCH] grub module explicitly keeps symbole .module_license
 
 While using oe-core toolchain to strip grub module 'all_video.mod',
 it stripped symbol table:
---------------
-root@localhost:~# objdump -t all_video.mod
 
+---------------
+root@localhost:~# objdump -t all_video.mod
+ 
 all_video.mod:     file format elf64-x86-64
 
 SYMBOL TABLE:
@@ -43,16 +44,16 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  grub-core/genmod.sh.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Index: grub-2.02/grub-core/genmod.sh.in
-===================================================================
---- grub-2.02.orig/grub-core/genmod.sh.in
-+++ grub-2.02/grub-core/genmod.sh.in
-@@ -56,7 +56,7 @@ if test x@TARGET_APPLE_LINKER@ != x1; th
+diff --git a/grub-core/genmod.sh.in b/grub-core/genmod.sh.in
+index 1250589..dd14308 100644
+--- a/grub-core/genmod.sh.in
++++ b/grub-core/genmod.sh.in
+@@ -56,7 +56,7 @@ if test x@TARGET_APPLE_LINKER@ != x1; then
  	if test x@platform@ != xemu; then
  	    @TARGET_STRIP@ --strip-unneeded \
  		-K grub_mod_init -K grub_mod_fini \
 -		-K _grub_mod_init -K _grub_mod_fini \
 +		-K _grub_mod_init -K _grub_mod_fini -K .module_license \
  		-R .note.gnu.gold-version -R .note.GNU-stack \
- 		-R .note -R .comment -R .ARM.exidx $tmpfile || exit 1
- 	fi
+ 		-R .gnu.build.attributes \
+ 		-R .rel.gnu.build.attributes \

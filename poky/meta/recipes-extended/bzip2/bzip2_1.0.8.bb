@@ -16,7 +16,6 @@ SRC_URI[md5sum] = "67e051268d0c475ea773822f7500d0e5"
 SRC_URI[sha256sum] = "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269"
 
 UPSTREAM_CHECK_URI = "https://www.sourceware.org/pub/bzip2/"
-UPSTREAM_VERSION_UNKNOWN = "1"
 
 PACKAGES =+ "libbz2"
 
@@ -29,6 +28,10 @@ ALTERNATIVE_${PN} = "bunzip2 bzcat bzip2"
 
 #install binaries to bzip2-native under sysroot for replacement-native
 EXTRA_OECONF_append_class-native = " --bindir=${STAGING_BINDIR_NATIVE}/${PN}"
+
+do_configure_prepend () {
+    sed -i -e "s|%BZIP2_VERSION%|${PV}|" ${S}/configure.ac
+}
 
 do_install_ptest () {
 	sed -i -e "s|^Makefile:|_Makefile:|" ${D}${PTEST_PATH}/Makefile

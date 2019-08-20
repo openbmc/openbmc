@@ -1,7 +1,8 @@
-From b4b6e9b1be33213ede3f612e87840c0045824d9e Mon Sep 17 00:00:00 2001
+From 5cb6c86696f842274043e7d406f84b3ead1c36e0 Mon Sep 17 00:00:00 2001
 From: Otavio Salvador <otavio@ossystems.com.br>
 Date: Wed, 17 Jan 2018 10:02:14 -0200
-Subject: [PATCH 2/5] cmake: Prevent the detection of Qt5
+Subject: [PATCH] cmake: Prevent the detection of Qt5
+
 Organization: O.S. Systems Software LTDA.
 
 CMake doesn't have dependency on qt4/qt5, so these tests usually fail
@@ -12,6 +13,7 @@ while running the test in cmake)
 Upstream-Status: Inappropriate [configuration]
 
 Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+
 ---
  Source/QtDialog/CMakeLists.txt                     | 2 +-
  Tests/CMakeLists.txt                               | 2 +-
@@ -23,12 +25,12 @@ Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
  7 files changed, 8 insertions(+), 9 deletions(-)
 
 diff --git a/Source/QtDialog/CMakeLists.txt b/Source/QtDialog/CMakeLists.txt
-index 9ce0323844..06c86d63eb 100644
+index cb89d19..9e68981 100644
 --- a/Source/QtDialog/CMakeLists.txt
 +++ b/Source/QtDialog/CMakeLists.txt
-@@ -6,7 +6,7 @@ if(POLICY CMP0020)
-   cmake_policy(SET CMP0020 NEW) # Drop when CMake >= 2.8.11 required
- endif()
+@@ -3,7 +3,7 @@
+ 
+ project(QtDialog)
  CMake_OPTIONAL_COMPONENT(cmake-gui)
 -find_package(Qt5Widgets QUIET)
 +#find_package(Qt5Widgets QUIET)
@@ -36,10 +38,10 @@ index 9ce0323844..06c86d63eb 100644
    include_directories(${Qt5Widgets_INCLUDE_DIRS})
    add_definitions(${Qt5Widgets_DEFINITONS})
 diff --git a/Tests/CMakeLists.txt b/Tests/CMakeLists.txt
-index ed98d974b0..7adfbc301b 100644
+index e73b277..91b8b67 100644
 --- a/Tests/CMakeLists.txt
 +++ b/Tests/CMakeLists.txt
-@@ -1342,7 +1342,7 @@ ${CMake_BINARY_DIR}/bin/cmake -DDIR=dev -P ${CMake_SOURCE_DIR}/Utilities/Release
+@@ -1348,7 +1348,7 @@ ${CMake_SOURCE_DIR}/Utilities/Release/push.bash --dir dev -- '${CMake_BUILD_NIGH
      set(CMake_TEST_Qt5 1)
    endif()
    if(CMake_TEST_Qt5)
@@ -49,7 +51,7 @@ index ed98d974b0..7adfbc301b 100644
    if(CMake_TEST_Qt5 AND Qt5Widgets_FOUND)
      add_subdirectory(Qt5Autogen)
 diff --git a/Tests/Qt4And5Automoc/CMakeLists.txt b/Tests/Qt4And5Automoc/CMakeLists.txt
-index ad74961d9f..a9dd74b151 100644
+index ad74961..a9dd74b 100644
 --- a/Tests/Qt4And5Automoc/CMakeLists.txt
 +++ b/Tests/Qt4And5Automoc/CMakeLists.txt
 @@ -3,11 +3,11 @@ cmake_minimum_required(VERSION 2.8.12)
@@ -67,7 +69,7 @@ index ad74961d9f..a9dd74b151 100644
  
  set(CMAKE_AUTOMOC ON)
 diff --git a/Tests/QtAutogen/AutogenGuiTest.cmake b/Tests/QtAutogen/AutogenGuiTest.cmake
-index b76d341a45..a6e0acbafa 100644
+index b76d341..a6e0acb 100644
 --- a/Tests/QtAutogen/AutogenGuiTest.cmake
 +++ b/Tests/QtAutogen/AutogenGuiTest.cmake
 @@ -22,8 +22,7 @@ if (QT_TEST_VERSION EQUAL 4)
@@ -81,7 +83,7 @@ index b76d341a45..a6e0acbafa 100644
    set(QT_QTCORE_TARGET Qt5::Core)
    set(QT_LIBRARIES Qt5::Widgets)
 diff --git a/Tests/QtAutogen/MacOsFW/CMakeLists.txt b/Tests/QtAutogen/MacOsFW/CMakeLists.txt
-index c08efc47a2..87e25d9391 100644
+index c08efc4..87e25d9 100644
 --- a/Tests/QtAutogen/MacOsFW/CMakeLists.txt
 +++ b/Tests/QtAutogen/MacOsFW/CMakeLists.txt
 @@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
@@ -94,10 +96,10 @@ index c08efc47a2..87e25d9391 100644
  set(CMAKE_CXX_STANDARD 11)
  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output/bin)
 diff --git a/Tests/RunCMake/CMakeLists.txt b/Tests/RunCMake/CMakeLists.txt
-index 1f3e5c3006..8ed8d6ac54 100644
+index 69f8162..f389523 100644
 --- a/Tests/RunCMake/CMakeLists.txt
 +++ b/Tests/RunCMake/CMakeLists.txt
-@@ -326,7 +326,7 @@ add_RunCMake_test(configure_file)
+@@ -334,7 +334,7 @@ add_RunCMake_test(configure_file)
  add_RunCMake_test(CTestTimeoutAfterMatch)
  
  find_package(Qt4 QUIET)
@@ -107,7 +109,7 @@ index 1f3e5c3006..8ed8d6ac54 100644
    add_RunCMake_test(IncompatibleQt)
  endif()
 diff --git a/Tests/RunCMake/IncompatibleQt/IncompatibleQt.cmake b/Tests/RunCMake/IncompatibleQt/IncompatibleQt.cmake
-index 4fccdc418f..b76e1e5313 100644
+index 4fccdc4..b76e1e5 100644
 --- a/Tests/RunCMake/IncompatibleQt/IncompatibleQt.cmake
 +++ b/Tests/RunCMake/IncompatibleQt/IncompatibleQt.cmake
 @@ -1,6 +1,6 @@
@@ -118,6 +120,3 @@ index 4fccdc418f..b76e1e5313 100644
  
  add_executable(mainexe main.cpp)
  target_link_libraries(mainexe Qt4::QtCore Qt5::Core)
--- 
-2.11.0
-

@@ -229,7 +229,7 @@ python(){
 
     newpackages=[]
     for key in python_manifest:
-        pypackage= pn + '-' + key
+        pypackage = pn + '-' + key
 
         if pypackage not in packages:
             # We need to prepend, otherwise python-misc gets everything
@@ -249,8 +249,14 @@ python(){
         for value in python_manifest[key]['rdepends']:
             # Make it work with or without $PN
             if '${PN}' in value:
-                value=value.split('-')[1]
+                value=value.split('-', 1)[1]
             d.appendVar('RDEPENDS_' + pypackage, ' ' + pn + '-' + value)
+
+        for value in python_manifest[key].get('rrecommends', ()):
+            if '${PN}' in value:
+                value=value.split('-', 1)[1]
+            d.appendVar('RRECOMMENDS_' + pypackage, ' ' + pn + '-' + value)
+
         d.setVar('SUMMARY_' + pypackage, python_manifest[key]['summary'])
 
     # Prepending so to avoid python-misc getting everything

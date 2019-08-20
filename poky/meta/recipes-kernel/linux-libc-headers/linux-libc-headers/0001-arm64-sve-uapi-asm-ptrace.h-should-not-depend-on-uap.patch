@@ -1,0 +1,62 @@
+From 35341ca0614ab13e1ef34ad4f29a39e15ef31fa8 Mon Sep 17 00:00:00 2001
+From: Anisse Astier <aastier@freebox.fr>
+Date: Mon, 17 Jun 2019 15:22:22 +0200
+Subject: [PATCH] arm64/sve: <uapi/asm/ptrace.h> should not depend on
+ <uapi/linux/prctl.h>
+
+Pulling linux/prctl.h into asm/ptrace.h in the arm64 UAPI headers causes
+userspace build issues for any program (e.g. strace and qemu) that
+includes both <sys/prctl.h> and <linux/ptrace.h> when using musl libc:
+
+  | error: redefinition of 'struct prctl_mm_map'
+  |  struct prctl_mm_map {
+
+See https://github.com/foundriesio/meta-lmp/commit/6d4a106e191b5d79c41b9ac78fd321316d3013c0
+for a public example of people working around this issue.
+
+Although it's a bit grotty, fix this breakage by duplicating the prctl
+constant definitions. Since these are part of the kernel ABI, they
+cannot be changed in future and so it's not the end of the world to have
+them open-coded.
+
+Fixes: 43d4da2c45b2 ("arm64/sve: ptrace and ELF coredump support")
+
+Upstream-Status: Backport [https://github.com/torvalds/linux/commit/35341ca0614ab13e1ef34ad4f29a39e15ef31fa8]
+Cc: stable@vger.kernel.org
+Acked-by: Dave Martin <Dave.Martin@arm.com>
+Signed-off-by: Anisse Astier <aastier@freebox.fr>
+Signed-off-by: Will Deacon <will.deacon@arm.com>
+---
+ arch/arm64/include/uapi/asm/ptrace.h | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm64/include/uapi/asm/ptrace.h b/arch/arm64/include/uapi/asm/ptrace.h
+index 97c53203150b..e932284993d4 100644
+--- a/arch/arm64/include/uapi/asm/ptrace.h
++++ b/arch/arm64/include/uapi/asm/ptrace.h
+@@ -65,8 +65,6 @@
+ 
+ #ifndef __ASSEMBLY__
+ 
+-#include <linux/prctl.h>
+-
+ /*
+  * User structures for general purpose, floating point and debug registers.
+  */
+@@ -113,10 +111,10 @@ struct user_sve_header {
+ 
+ /*
+  * Common SVE_PT_* flags:
+- * These must be kept in sync with prctl interface in <linux/ptrace.h>
++ * These must be kept in sync with prctl interface in <linux/prctl.h>
+  */
+-#define SVE_PT_VL_INHERIT		(PR_SVE_VL_INHERIT >> 16)
+-#define SVE_PT_VL_ONEXEC		(PR_SVE_SET_VL_ONEXEC >> 16)
++#define SVE_PT_VL_INHERIT		((1 << 17) /* PR_SVE_VL_INHERIT */ >> 16)
++#define SVE_PT_VL_ONEXEC		((1 << 18) /* PR_SVE_SET_VL_ONEXEC */ >> 16)
+ 
+ 
+ /*
+-- 
+2.22.0
+

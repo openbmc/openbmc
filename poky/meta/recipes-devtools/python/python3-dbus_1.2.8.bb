@@ -22,3 +22,5 @@ EXTRA_OECONF += "--disable-documentation"
 RDEPENDS_${PN} = "python3-io python3-logging python3-stringold python3-threading python3-xml"
 
 FILES_${PN}-dev += "${libdir}/pkgconfig"
+
+BBCLASSEXTEND = "native nativesdk"

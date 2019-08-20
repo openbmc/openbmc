@@ -41,9 +41,7 @@ def main():
     console.setLevel(level)
     logger.addHandler(console)
 
-    db = sqlite3.connect(args.database)
-
-    server = hashserv.create_server((args.address, args.port), db, args.prefix)
+    server = hashserv.create_server((args.address, args.port), args.database, args.prefix)
     server.serve_forever()
     return 0
 

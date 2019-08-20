@@ -1,9 +1,8 @@
-From 71085723f8028b3e1c4029fc1abe1243ac49ffc6 Mon Sep 17 00:00:00 2001
+From 1e67c3fe52c6c51c00cf1ebb0bfc30c7a5ef9fdb Mon Sep 17 00:00:00 2001
 From: Cody P Schafer <dev@codyps.com>
 Date: Thu, 27 Apr 2017 11:35:05 -0400
-Subject: [PATCH 1/5] CMakeDetermineSystem: use oe environment vars to load
- default toolchain file in sdk
-Organization: O.S. Systems Software LTDA.
+Subject: [PATCH] CMakeDetermineSystem: use oe environment vars to load default
+ toolchain file in sdk
 
 Passing the toolchain by:
 
@@ -20,12 +19,13 @@ because '-D' options are cache entries themselves.
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Cody P Schafer <dev@codyps.com>
 Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+
 ---
  Modules/CMakeDetermineSystem.cmake | 7 +++++++
  1 file changed, 7 insertions(+)
 
 diff --git a/Modules/CMakeDetermineSystem.cmake b/Modules/CMakeDetermineSystem.cmake
-index 600d5580e..32d7f1945 100644
+index dc208c6..e0af4ca 100644
 --- a/Modules/CMakeDetermineSystem.cmake
 +++ b/Modules/CMakeDetermineSystem.cmake
 @@ -81,6 +81,13 @@ else()
@@ -42,6 +42,3 @@ index 600d5580e..32d7f1945 100644
  # if a toolchain file is used, the user wants to cross compile.
  # in this case read the toolchain file and keep the CMAKE_HOST_SYSTEM_*
  # variables around so they can be used in CMakeLists.txt.
--- 
-2.18.0
-

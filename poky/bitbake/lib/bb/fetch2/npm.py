@@ -101,11 +101,19 @@ class Npm(FetchMethod):
             return False
         return True
 
-    def _runwget(self, ud, d, command, quiet):
-        logger.debug(2, "Fetching %s using command '%s'" % (ud.url, command))
-        bb.fetch2.check_network_access(d, command, ud.url)
+    def _runpack(self, ud, d, pkgfullname: str, quiet=False) -> str:
+        """
+        Runs npm pack on a full package name.
+        Returns the filename of the downloaded package
+        """
+        bb.fetch2.check_network_access(d, pkgfullname, ud.registry)
         dldir = d.getVar("DL_DIR")
-        runfetchcmd(command, d, quiet, workdir=dldir)
+        dldir = os.path.join(dldir, ud.prefixdir)
+
+        command = "npm pack {} --registry {}".format(pkgfullname, ud.registry)
+        logger.debug(2, "Fetching {} using command '{}' in {}".format(pkgfullname, command, dldir))
+        filename = runfetchcmd(command, d, quiet, workdir=dldir)
+        return filename.rstrip()
 
     def _unpackdep(self, ud, pkg, data, destdir, dldir, d):
         file = data[pkg]['tgz']
@@ -163,6 +171,9 @@ class Npm(FetchMethod):
         pkgfullname = pkg
         if version != '*' and not '/' in version:
             pkgfullname += "@'%s'" % version
+        if pkgfullname in fetchedlist:
+            return
+
         logger.debug(2, "Calling getdeps on %s" % pkg)
         fetchcmd = "npm view %s --json --registry %s" % (pkgfullname, ud.registry)
         output = runfetchcmd(fetchcmd, d, True)
@@ -182,15 +193,10 @@ class Npm(FetchMethod):
                 if (not blacklist and 'linux' not in pkg_os) or '!linux' in pkg_os:
                     logger.debug(2, "Skipping %s since it's incompatible with Linux" % pkg)
                     return
-        #logger.debug(2, "Output URL is %s - %s - %s" % (ud.basepath, ud.basename, ud.localfile))
-        outputurl = pdata['dist']['tarball']
+        filename = self._runpack(ud, d, pkgfullname)
         data[pkg] = {}
-        data[pkg]['tgz'] = os.path.basename(outputurl)
-        if outputurl in fetchedlist:
-            return
-
-        self._runwget(ud, d, "%s --directory-prefix=%s %s" % (self.basecmd, ud.prefixdir, outputurl), False)
-        fetchedlist.append(outputurl)
+        data[pkg]['tgz'] = filename
+        fetchedlist.append(pkgfullname)
 
         dependencies = pdata.get('dependencies', {})
         optionalDependencies = pdata.get('optionalDependencies', {})
@@ -217,17 +223,12 @@ class Npm(FetchMethod):
                     if obj == pkg:
                         self._getshrinkeddependencies(obj, data['dependencies'][obj], data['dependencies'][obj]['version'], d, ud, lockdown, manifest, False)
                         return
-        outputurl = "invalid"
-        if ('resolved' not in data) or (not data['resolved'].startswith('http://') and not data['resolved'].startswith('https://')):
-            # will be the case for ${PN}
-            fetchcmd = "npm view %s@%s dist.tarball --registry %s" % (pkg, version, ud.registry)
-            logger.debug(2, "Found this matching URL: %s" % str(fetchcmd))
-            outputurl = runfetchcmd(fetchcmd, d, True)
-        else:
-            outputurl = data['resolved']
-        self._runwget(ud, d, "%s --directory-prefix=%s %s" % (self.basecmd, ud.prefixdir, outputurl), False)
+
+        pkgnameWithVersion = "{}@{}".format(pkg, version)
+        logger.debug(2, "Get dependencies for {}".format(pkgnameWithVersion))
+        filename = self._runpack(ud, d, pkgnameWithVersion)
         manifest[pkg] = {}
-        manifest[pkg]['tgz'] = os.path.basename(outputurl).rstrip()
+        manifest[pkg]['tgz'] = filename
         manifest[pkg]['deps'] = {}
 
         if pkg in lockdown:

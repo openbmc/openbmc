@@ -10,8 +10,12 @@ FILESEXTRAPATHS =. "${FILE_DIRNAME}/libx11:"
 
 PE = "1"
 
-SRC_URI[md5sum] = "034fdd6cc5393974d88aec6f5bc96162"
-SRC_URI[sha256sum] = "910e9e30efba4ad3672ca277741c2728aebffa7bc526f04dcfa74df2e52a1348"
+SRC_URI += "file://Fix-hanging-issue-in-_XReply.patch \
+            file://no-host-libtool.patch \
+            file://no-host-x.patch"
+
+SRC_URI[md5sum] = "c5fa5a86a20e3591bed6c046498d4b8f"
+SRC_URI[sha256sum] = "b289a845c189e251e0e884cc0f9269bbe97c238df3741e854ec4c17c21e473d5"
 
 PROVIDES = "virtual/libx11"
 

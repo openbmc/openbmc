@@ -6,7 +6,7 @@ DEPENDS += "dtc-native"
 
 require opensbi-payloads.inc
 
-inherit autotools-brokensep
+inherit autotools-brokensep deploy
 
 SRCREV = "ce228ee0919deb9957192d723eecc8aaae2697c6"
 SRC_URI = "git://github.com/riscv/opensbi.git \
@@ -35,13 +35,12 @@ do_install_append() {
 }
 
 do_deploy () {
-	install -d ${DEPLOY_DIR_IMAGE}
-	install -m 755 ${D}/platform/${RISCV_SBI_PLAT}/firmware/fw_payload.* ${DEPLOY_DIR_IMAGE}/
-	install -m 755 ${D}/platform/${RISCV_SBI_PLAT}/firmware/fw_jump.* ${DEPLOY_DIR_IMAGE}/
-	install -m 755 ${D}/platform/${RISCV_SBI_PLAT}/firmware/fw_dynamic.* ${DEPLOY_DIR_IMAGE}/
+	install -m 755 ${D}/platform/${RISCV_SBI_PLAT}/firmware/fw_payload.* ${DEPLOYDIR}/
+	install -m 755 ${D}/platform/${RISCV_SBI_PLAT}/firmware/fw_jump.* ${DEPLOYDIR}/
+	install -m 755 ${D}/platform/${RISCV_SBI_PLAT}/firmware/fw_dynamic.* ${DEPLOYDIR}/
 }
 
-addtask deploy after do_install
+addtask deploy before do_build after do_install
 
 FILES_${PN} += "/platform/${RISCV_SBI_PLAT}/firmware/fw_jump.*"
 FILES_${PN} += "/platform/${RISCV_SBI_PLAT}/firmware/fw_payload.*"

@@ -1,7 +1,7 @@
-From b2d1c9b4159bfd661a4996588d06d922491dfecb Mon Sep 17 00:00:00 2001
+From c13e18adb634a6fd59129150ab7f9468f64dc931 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 3 Aug 2018 09:42:06 -0700
-Subject: [PATCH 24/30] localedef --add-to-archive uses a hard-coded locale
+Subject: [PATCH 24/28] localedef --add-to-archive uses a hard-coded locale
  path
 
 it doesn't exist in normal use, and there's no way to pass an
@@ -80,5 +80,5 @@ index e6310b18be..f54a76eade 100644
  	      if (readonly)
  		{
 -- 
-2.20.1
+2.22.0
 

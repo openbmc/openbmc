@@ -31,6 +31,7 @@ import pyinotify
 import json
 import pickle
 import codecs
+import hashserv
 
 logger      = logging.getLogger("BitBake")
 collectlog  = logging.getLogger("BitBake.Collection")
@@ -192,6 +193,8 @@ class BBCooker:
         bb.parse.BBHandler.cached_statements = {}
 
         self.ui_cmdline = None
+        self.hashserv = None
+        self.hashservport = None
 
         self.initConfigurationData()
 
@@ -372,8 +375,6 @@ class BBCooker:
         # Copy of the data store which has been expanded.
         # Used for firing events and accessing variables where expansion needs to be accounted for
         #
-        bb.parse.init_parser(self.data)
-
         if CookerFeatures.BASEDATASTORE_TRACKING in self.featureset:
             self.disableDataTracking()
 
@@ -390,6 +391,22 @@ class BBCooker:
             self.prhost = prserv.serv.auto_start(self.data)
         except prserv.serv.PRServiceConfigError as e:
             bb.fatal("Unable to start PR Server, exitting")
+
+        if self.data.getVar("BB_HASHSERVE") == "localhost:0":
+            if not self.hashserv:
+                dbfile = (self.data.getVar("PERSISTENT_DIR") or self.data.getVar("CACHE")) + "/hashserv.db"
+                self.hashserv = hashserv.create_server(('localhost', 0), dbfile, '')
+                self.hashservport = "localhost:" + str(self.hashserv.server_port)
+                self.hashserv.process = multiprocessing.Process(target=self.hashserv.serve_forever)
+                self.hashserv.process.daemon = True
+                self.hashserv.process.start()
+            self.data.setVar("BB_HASHSERVE", self.hashservport)
+            self.databuilder.origdata.setVar("BB_HASHSERVE", self.hashservport)
+            self.databuilder.data.setVar("BB_HASHSERVE", self.hashservport)
+            for mc in self.databuilder.mcdata:
+                self.databuilder.mcdata[mc].setVar("BB_HASHSERVE", self.hashservport)
+
+        bb.parse.init_parser(self.data)
 
     def enableDataTracking(self):
         self.configuration.tracking = True
@@ -1645,8 +1662,10 @@ class BBCooker:
 
     def post_serve(self):
         prserv.serv.auto_shutdown()
+        if self.hashserv:
+            self.hashserv.process.terminate()
+            self.hashserv.process.join()
         bb.event.fire(CookerExit(), self.data)
-
 
     def shutdown(self, force = False):
         if force:
@@ -1662,6 +1681,7 @@ class BBCooker:
 
     def reset(self):
         self.initConfigurationData()
+        self.handlePRServ()
 
     def clientComplete(self):
         """Called when the client is done using the server"""
@@ -2061,6 +2081,14 @@ class CookerParser(object):
             self.parser_quit.cancel_join_thread()
             for process in self.processes:
                 self.parser_quit.put(None)
+
+        # Cleanup the queue before call process.join(), otherwise there might be
+        # deadlocks.
+        while True:
+            try:
+               self.result_queue.get(timeout=0.25)
+            except queue.Empty:
+                break
 
         for process in self.processes:
             if force:

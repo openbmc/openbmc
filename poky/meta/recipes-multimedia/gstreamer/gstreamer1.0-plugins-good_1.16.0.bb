@@ -4,6 +4,7 @@ SRC_URI = " \
             http://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-${PV}.tar.xz \
             file://0001-scaletempo-Advertise-interleaved-layout-in-caps-temp.patch \
             file://0001-introspection.m4-prefix-pkgconfig-paths-with-PKG_CON.patch \
+            file://headerfix.patch \
             "
 
 SRC_URI[md5sum] = "d1a7b442994d9522418de4af4330e034"

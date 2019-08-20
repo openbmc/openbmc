@@ -5,6 +5,8 @@
 SUMMARY = "Full-featured set of base utils"
 DESCRIPTION = "Package group bringing in packages needed to provide much of the base utils type functionality found in busybox"
 
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 inherit packagegroup
 
 VIRTUAL-RUNTIME_vim ?= "vim-tiny"

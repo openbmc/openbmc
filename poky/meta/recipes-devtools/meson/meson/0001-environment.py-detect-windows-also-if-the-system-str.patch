@@ -1,4 +1,4 @@
-From 63b78b7990c5d60f7bc674a26f655caa0bec3c49 Mon Sep 17 00:00:00 2001
+From b52e47c9d61dc4c930cfc7236fbeb70338c3b953 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 25 Mar 2019 17:17:06 +0100
 Subject: [PATCH] environment.py: detect windows also if the system string
@@ -6,20 +6,24 @@ Subject: [PATCH] environment.py: detect windows also if the system string
 
 Upstream-Status: Pending
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  mesonbuild/envconfig.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/mesonbuild/envconfig.py b/mesonbuild/envconfig.py
-index f2510c1..5309ef4 100644
+index 03c6346..a59cd89 100644
 --- a/mesonbuild/envconfig.py
 +++ b/mesonbuild/envconfig.py
-@@ -194,7 +194,7 @@ class MachineInfo:
+@@ -198,7 +198,7 @@ class MachineInfo:
          """
          Machine is windows?
          """
--        return self.system == 'windows'
+-        return self.system in {'windows', 'mingw'}
 +        return self.system == 'windows' or 'mingw' in self.system
  
-     def is_cygwin(self):
+     def is_cygwin(self) -> bool:
          """
+-- 
+2.17.1
+

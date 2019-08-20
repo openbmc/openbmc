@@ -243,7 +243,11 @@ def icecc_get_external_tool(bb, d, tool):
 
 def icecc_get_tool_link(tool, d):
     import subprocess
-    return subprocess.check_output("readlink -f %s" % tool, shell=True).decode("utf-8")[:-1]
+    try:
+        return subprocess.check_output("readlink -f %s" % tool, shell=True).decode("utf-8")[:-1]
+    except subprocess.CalledProcessError as e:
+        bb.note("icecc: one of the tools probably disappeared during recipe parsing, cmd readlink -f %s returned %d:\n%s" % (tool, e.returncode, e.output.decode("utf-8")))
+        return tool
 
 def icecc_get_path_tool(tool, d):
     # This is a little ugly, but we want to make sure we add an actual

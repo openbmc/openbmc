@@ -512,17 +512,15 @@
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/difflib.*.pyc"
         ]
     },
-    "distutils-staticdev": {
-        "cached": [
-            "${libdir}/python${PYTHON_MAJMIN}/config/__pycache__/lib*.a"
-        ],
+    "distutils-windows": {
+        "cached": [],
         "files": [
-            "${libdir}/python${PYTHON_MAJMIN}/config/lib*.a"
+            "${libdir}/python${PYTHON_MAJMIN}/distutils/command/wininst-*.exe"
         ],
         "rdepends": [
             "distutils"
         ],
-        "summary": "Python distribution utilities (static libraries)"
+        "summary": "Python distribution utilities (Windows installer stubs)"
     },
     "distutils": {
         "summary": "Python Distribution Utilities",
@@ -800,6 +798,9 @@
             "venv",
             "xml",
             "xmlrpc"
+        ],
+        "rrecommends": [
+            "distutils-windows"
         ],
         "summary": "All Python modules"
     },

@@ -8,8 +8,8 @@ SRC_URI = "git://github.com/fedora-modularity/libmodulemd;protocol=https \
            file://0001-v1-meson.build-explicitly-specify-the-v1-library-in-.patch \
            "
 
-PV = "2.5.0"
-SRCREV = "8d9a99ddf037df7c032119cdd3a87238a3cc9090"
+PV = "2.6.0"
+SRCREV = "7c7f88258491866cdb86d26cadfce37a78f242ec"
 
 S = "${WORKDIR}/git"
 

@@ -14,7 +14,7 @@ class myArgumentParser(argparse.ArgumentParser):
         error(message)
 
     def error(self, message):
-        raise bb.build.FuncFailed(message)
+        bb.fatal(message)
 
 def split_commands(params):
     params = re.split('''[ \t]*;[ \t]*(?=(?:[^'"]|'[^']*'|"[^"]*")*$)''', params.strip())

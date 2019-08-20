@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-__version__ = "1.43.0"
+__version__ = "1.43.1"
 
 import sys
 if sys.version_info < (3, 4, 0):

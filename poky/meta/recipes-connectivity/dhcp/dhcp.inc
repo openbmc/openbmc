@@ -21,7 +21,7 @@ SRC_URI = "http://ftp.isc.org/isc/dhcp/${PV}/dhcp-${PV}.tar.gz \
            file://dhcpd.service file://dhcrelay.service \
            file://dhcpd6.service \
            "
-UPSTREAM_CHECK_URI = "ftp://ftp.isc.org/isc/dhcp/"
+UPSTREAM_CHECK_URI = "http://ftp.isc.org/isc/dhcp/"
 UPSTREAM_CHECK_REGEX = "(?P<pver>\d+\.\d+\.(\d+?))/"
 
 inherit autotools-brokensep systemd useradd update-rc.d

@@ -71,17 +71,13 @@ python go_do_unpack() {
     if len(src_uri) == 0:
         return
 
-    try:
-        fetcher = bb.fetch2.Fetch(src_uri, d)
-        for url in fetcher.urls:
-            if fetcher.ud[url].type == 'git':
-                if fetcher.ud[url].parm.get('destsuffix') is None:
-                    s_dirname = os.path.basename(d.getVar('S'))
-                    fetcher.ud[url].parm['destsuffix'] = os.path.join(s_dirname, 'src',
-                                                                      d.getVar('GO_IMPORT')) + '/'
-        fetcher.unpack(d.getVar('WORKDIR'))
-    except bb.fetch2.BBFetchException as e:
-        raise bb.build.FuncFailed(e)
+    fetcher = bb.fetch2.Fetch(src_uri, d)
+    for url in fetcher.urls:
+        if fetcher.ud[url].type == 'git':
+            if fetcher.ud[url].parm.get('destsuffix') is None:
+                s_dirname = os.path.basename(d.getVar('S'))
+                fetcher.ud[url].parm['destsuffix'] = os.path.join(s_dirname, 'src', d.getVar('GO_IMPORT')) + '/'
+    fetcher.unpack(d.getVar('WORKDIR'))
 }
 
 go_list_packages() {

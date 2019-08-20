@@ -24,6 +24,7 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://0009-linux-user-Fix-webkitgtk-hangs-on-32-bit-x86-target.patch \
            file://0010-Revert-linux-user-fix-mmap-munmap-mprotect-mremap-sh.patch \
            file://0013-target-arm-Fix-vector-operation-segfault.patch \
+           file://0014-linux-user-fix-to-handle-variably-sized-SIOCGSTAMP-w.patch \
 	   file://CVE-2019-12155.patch \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"

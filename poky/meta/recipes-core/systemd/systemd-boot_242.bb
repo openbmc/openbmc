@@ -8,6 +8,7 @@ DEPENDS = "intltool-native libcap util-linux gnu-efi gperf-native"
 SRC_URI += "file://0001-Revert-meson-use-an-array-option-for-efi-cc.patch \
             file://0001-Revert-meson-print-EFI-CC-configuration-nicely.patch \
             file://0001-Fix-to-run-efi_cc-and-efi_ld-correctly-when-cross-co.patch \
+            file://0001-meson-Add-Defi-objcopy-option-to-specify-objcopy.patch \
             "
 
 inherit meson pkgconfig gettext
@@ -22,6 +23,7 @@ EXTRA_OEMESON += "-Defi=true \
                   -Dman=false \
                   -Defi-cc='${EFI_CC}' \
                   -Defi-ld='${LD}' \
+                  -Defi-objcopy='${OBJCOPY}' \
                   "
 
 # install to the image as boot*.efi if its the EFI_PROVIDER,

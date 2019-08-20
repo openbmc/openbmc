@@ -259,9 +259,12 @@ FILES_${PN}-module-gsettings += "${libexecdir}/pulse/gsettings-helper ${datadir}
 # modules must be installed when X11 is enabled.
 RDEPENDS_pulseaudio-server += "\
         ${@bb.utils.contains('DISTRO_FEATURES', 'x11', '\
-                pulseaudio-module-console-kit \
                 pulseaudio-module-device-manager \
                 pulseaudio-module-x11-cork-request \
                 pulseaudio-module-x11-publish \
                 pulseaudio-module-x11-xsmp \
         ', '', d)}"
+
+RDEPENDS_pulseaudio-server += "${@bb.utils.contains('DISTRO_FEATURES', 'x11', \
+                                  bb.utils.contains('DISTRO_FEATURES', 'systemd', 'pulseaudio-module-systemd-login', 'pulseaudio-module-console-kit', d), \
+                                  '', d)}"

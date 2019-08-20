@@ -17,6 +17,12 @@ EXTRA_OECONF_PATHS = "\
 EXTRA_OECONF_append_linuxstdbase = " --enable-clocale=gnu"
 EXTRA_OECONF_append = " --cache-file=${B}/config.cache"
 
+# Disable ifuncs for libatomic on arm conflicts -march/-mcpu
+EXTRA_OECONF_append_arm = " libat_cv_have_ifunc=no "
+
+# Building with thumb enabled on armv6t fails
+ARM_INSTRUCTION_SET_armv6 = "arm"
+
 RUNTIMELIBITM = "libitm"
 RUNTIMELIBITM_arc = ""
 RUNTIMELIBITM_mipsarch = ""
@@ -77,6 +83,11 @@ do_install () {
 		cd ${B}/${TARGET_SYS}/$d/
 		oe_runmake 'DESTDIR=${D}' MULTIBUILDTOP=${B}/${TARGET_SYS}/$d/ install
 	done
+	if [ -d ${D}${libdir}/gcc/${TARGET_SYS}/${BINV}/include ]; then
+		install -d ${D}${libdir}/${TARGET_SYS}/${BINV}/include 
+		mv ${D}${libdir}/gcc/${TARGET_SYS}/${BINV}/include/* ${D}${libdir}/${TARGET_SYS}/${BINV}/include
+		rmdir --ignore-fail-on-non-empty -p ${D}${libdir}/gcc/${TARGET_SYS}/${BINV}/include
+	fi
 	rm -rf ${D}${infodir}/libgomp.info ${D}${infodir}/dir
 	rm -rf ${D}${infodir}/libitm.info ${D}${infodir}/dir
 	rm -rf ${D}${infodir}/libquadmath.info ${D}${infodir}/dir
@@ -205,7 +216,7 @@ FILES_libssp-dev = "\
     ${libdir}/libssp*.so \
     ${libdir}/libssp*_nonshared.a \
     ${libdir}/libssp*.la \
-    ${libdir}/gcc/${TARGET_SYS}/${BINV}/include/ssp \
+    ${libdir}/${TARGET_SYS}/${BINV}/include/ssp \
 "
 SUMMARY_libssp-dev = "GNU stack smashing protection library - development files"
 FILES_libssp-staticdev = "${libdir}/libssp*.a"
@@ -214,7 +225,7 @@ SUMMARY_libssp-staticdev = "GNU stack smashing protection library - static devel
 FILES_libquadmath = "${libdir}/libquadmath*.so.*"
 SUMMARY_libquadmath = "GNU quad-precision math library"
 FILES_libquadmath-dev = "\
-    ${libdir}/gcc/${TARGET_SYS}/${BINV}/include/quadmath* \
+    ${libdir}/${TARGET_SYS}/${BINV}/include/quadmath* \
     ${libdir}/libquadmath*.so \
     ${libdir}/libquadmath.la \
 "
@@ -239,7 +250,8 @@ FILES_libgomp-dev = "\
     ${libdir}/libgomp*${SOLIBSDEV} \
     ${libdir}/libgomp*.la \
     ${libdir}/libgomp.spec \
-    ${libdir}/gcc/${TARGET_SYS}/${BINV}/include/omp.h \
+    ${libdir}/${TARGET_SYS}/${BINV}/include/omp.h \
+    ${libdir}/${TARGET_SYS}/${BINV}/include/openacc.h \
 "
 SUMMARY_libgomp-dev = "GNU OpenMP parallel programming library - development files"
 FILES_libgomp-staticdev = "${libdir}/libgomp*.a"

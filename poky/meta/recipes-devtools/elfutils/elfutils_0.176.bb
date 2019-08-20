@@ -142,4 +142,4 @@ INHIBIT_PACKAGE_STRIP_FILES = "\
     ${PKGD}${PTEST_PATH}/backends/libebl_x86_64.so \
 "
 
-EXCLUDE_PACKAGES_FROM_SHLIBS = "${PN}-ptest"
+PRIVATE_LIBS_${PN}-ptest = "libdw.so.1 libelf.so.1"

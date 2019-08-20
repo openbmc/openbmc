@@ -1,0 +1,23 @@
+From 042147675c7c2ea7dd65b2597f2e350376a710aa Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 6 Aug 2019 17:28:56 +0200
+Subject: [PATCH] bash-completion: remove the shebang at the start
+
+bash completion files do not need to specify that.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ bash-completion/stress-ng | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/bash-completion/stress-ng b/bash-completion/stress-ng
+index 8b1421c..7f195be 100755
+--- a/bash-completion/stress-ng
++++ b/bash-completion/stress-ng
+@@ -1,5 +1,3 @@
+-#!/bin/bash
+-#
+ # stress-ng tab completion for bash.
+ #
+ # Copyright (C) 2019 Canonical

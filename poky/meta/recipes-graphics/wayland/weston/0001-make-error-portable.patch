@@ -9,27 +9,14 @@ kind of systemsi e.g. musl.
 Upstream-Status: Submitted
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-
+Signed-off-by: Ming Liu <ming.liu@toradex.com>
 ---
- configure.ac              |  2 ++
  libweston/weston-error.h  | 20 ++++++++++++++++++++
  libweston/weston-launch.c |  2 +-
- 3 files changed, 23 insertions(+), 1 deletion(-)
+ meson.build               |  1 +
+ 3 files changed, 22 insertions(+), 1 deletion(-)
  create mode 100644 libweston/weston-error.h
 
-diff --git a/configure.ac b/configure.ac
-index c05ad01..6da6e04 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -126,6 +126,8 @@ AC_CHECK_DECL(CLOCK_MONOTONIC,[],
- 	      [AC_MSG_ERROR("CLOCK_MONOTONIC is needed to compile weston")],
- 	      [[#include <time.h>]])
- 
-+AC_CHECK_HEADERS([error.h])
-+
- AC_CHECK_FUNCS([mkostemp strchrnul initgroups posix_fallocate])
- 
- # check for libdrm as a build-time dependency only
 diff --git a/libweston/weston-error.h b/libweston/weston-error.h
 new file mode 100644
 index 0000000..2089d02
@@ -76,3 +63,18 @@ index bf73e0d..9064439 100644
  
  #define DRM_MAJOR 226
  
+diff --git a/meson.build b/meson.build
+index 2155b7b..baa52d9 100644
+--- a/meson.build
++++ b/meson.build
+@@ -94,6 +94,7 @@ foreach func : optional_libc_funcs
+ endforeach
+ 
+ optional_system_headers = [
++	'error.h',
+ 	'linux/sync_file.h'
+ ]
+ foreach hdr : optional_system_headers
+-- 
+2.7.4
+

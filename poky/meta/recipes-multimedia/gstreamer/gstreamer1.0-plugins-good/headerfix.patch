@@ -1,0 +1,43 @@
+Things break with overlapping defines between glib and gstreamer with glibc 2.30.
+
+Discussion in the link below, basically internal __ prefixed variables 
+shouldn't be redefined.
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/gstreamer/gst-plugins-good/issues/635]
+RP 2019/8/6
+
+Index: gst-plugins-good-1.16.0/sys/v4l2/ext/types-compat.h
+===================================================================
+--- gst-plugins-good-1.16.0.orig/sys/v4l2/ext/types-compat.h
++++ gst-plugins-good-1.16.0/sys/v4l2/ext/types-compat.h
+@@ -24,29 +24,6 @@
+ #ifndef __TYPES_COMPAT_H__
+ #define __TYPES_COMPAT_H__
+ 
+-/* From linux/types.h */
+-#ifndef __bitwise__
+-#  ifdef __CHECKER__
+-#    define __bitwise__ __attribute__((bitwise))
+-#  else
+-#    define __bitwise__
+-#  endif
+-#endif
+-
+-#ifndef __bitwise
+-#  ifdef __CHECK_ENDIAN__
+-#    define __bitwise __bitwise__
+-#  else
+-#    define __bitwise
+-#  endif
+-#endif
+-
+-#define __u64 guint64
+-#define __u32 guint32
+-#define __u16 guint16
+-#define __u8 guint8
+-#define __s64 gint64
+-#define __s32 gint32
+-#define __le32 guint32 __bitwise
++#include <linux/types.h>
+ 
+ #endif /* __TYPES_COMPAT_H__ */

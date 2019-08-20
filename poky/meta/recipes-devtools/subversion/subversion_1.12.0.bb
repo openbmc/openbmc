@@ -23,6 +23,7 @@ CVE_PRODUCT = "apache:subversion"
 
 PACKAGECONFIG ?= ""
 
+PACKAGECONFIG[boost] = "--with-boost=${RECIPE_SYSROOT}${exec_prefix},--without-boost,boost"
 PACKAGECONFIG[sasl] = "--with-sasl,--without-sasl,cyrus-sasl"
 PACKAGECONFIG[gnome-keyring] = "--with-gnome-keyring,--without-gnome-keyring,glib-2.0 gnome-keyring"
 

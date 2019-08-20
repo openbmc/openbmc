@@ -1,0 +1,36 @@
+From 3d30df8d8ccb919733b5339b2a82474305b83998 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 6 Aug 2019 01:19:48 +0000
+Subject: [PATCH] gallium: Expand libc check to be platform OS check
+
+endianness on musl based systems can also be detected in same way as
+glibc, therefore check for __linux__ define instead of __GLIBC__
+
+Fixes build on musl/mips
+
+| ../../../../git/src/gallium/include/pipe/p_config.h:171:2: error: #error Unknown Endianness
+| #error Unknown Endianness
+|  ^~~~~
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/gallium/include/pipe/p_config.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/gallium/include/pipe/p_config.h b/src/gallium/include/pipe/p_config.h
+index d603681..71cdf49 100644
+--- a/src/gallium/include/pipe/p_config.h
++++ b/src/gallium/include/pipe/p_config.h
+@@ -130,7 +130,7 @@
+  * Endian detection.
+  */
+ 
+-#ifdef __GLIBC__
++#ifdef __linux__
+ #include <endian.h>
+ 
+ #if __BYTE_ORDER == __LITTLE_ENDIAN
+-- 
+2.17.1
+

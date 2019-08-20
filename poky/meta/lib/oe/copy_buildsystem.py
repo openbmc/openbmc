@@ -174,7 +174,7 @@ class BuildSystem(object):
 def generate_locked_sigs(sigfile, d):
     bb.utils.mkdirhier(os.path.dirname(sigfile))
     depd = d.getVar('BB_TASKDEPDATA', False)
-    tasks = ['%s.%s' % (v[2], v[1]) for v in depd.values()]
+    tasks = ['%s:%s' % (v[2], v[1]) for v in depd.values()]
     bb.parse.siggen.dump_lockedsigs(sigfile, tasks)
 
 def prune_lockedsigs(excluded_tasks, excluded_targets, lockedsigs, pruned_output):

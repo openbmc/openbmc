@@ -13,22 +13,19 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  ptrace.h | 8 +++++++-
  1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/ptrace.h b/ptrace.h
-index 89d4b95..b3f45bb 100644
 --- a/ptrace.h
 +++ b/ptrace.h
 @@ -30,7 +30,13 @@
- # define ptrace_peeksiginfo_args XXX_ptrace_peeksiginfo_args
- #endif
+ #  define ptrace_peeksiginfo_args XXX_ptrace_peeksiginfo_args
+ # endif
  
--#include <linux/ptrace.h>
 +#if defined(POWERPC) && !defined(__GLIBC__)
 +#define pt_regs uapi_pt_regs
 +#endif
-+# include <linux/ptrace.h>
+ # include <linux/ptrace.h>
 +#if defined(POWERPC) && !defined(__GLIBC__)
 +# undef pt_regs
 +#endif
  
- #ifdef HAVE_STRUCT_IA64_FPREG
- # undef ia64_fpreg
+ # ifdef HAVE_STRUCT_IA64_FPREG
+ #  undef ia64_fpreg

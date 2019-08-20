@@ -130,7 +130,7 @@ def emit_var(var, o=sys.__stdout__, d = init(), all=False):
         if all:
             oval = d.getVar(var, False)
         val = d.getVar(var)
-    except (KeyboardInterrupt, bb.build.FuncFailed):
+    except (KeyboardInterrupt):
         raise
     except Exception as exc:
         o.write('# expansion of %s threw %s: %s\n' % (var, exc.__class__.__name__, str(exc)))
@@ -422,7 +422,7 @@ def generate_dependency_hash(tasklist, gendeps, lookupcache, whitelist, fn):
             var = lookupcache[dep]
             if var is not None:
                 data = data + str(var)
-        k = fn + "." + task
+        k = fn + ":" + task
         basehash[k] = hashlib.sha256(data.encode("utf-8")).hexdigest()
         taskdeps[task] = alldeps
 

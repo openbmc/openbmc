@@ -75,8 +75,11 @@ class BitbakeTests(OESelftestTestCase):
         result = bitbake('man-db -c patch', ignore_status=True)
         self.delete_recipeinc('man-db')
         bitbake('-cclean man-db')
-        line = self.getline(result, "Function failed: patch_do_patch")
-        self.assertTrue(line and line.startswith("ERROR:"), msg = "Incorrectly formed patch application didn't fail. bitbake output: %s" % result.output)
+        found = False
+        for l in result.output.split('\n'):
+            if l.startswith("ERROR:") and "failed" in l and "do_patch" in l:
+                found = l
+        self.assertTrue(found and found.startswith("ERROR:"), msg = "Incorrectly formed patch application didn't fail. bitbake output: %s" % result.output)
 
     def test_force_task_1(self):
         # test 1 from bug 5875

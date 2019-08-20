@@ -722,25 +722,7 @@ def package_qa_check_rdepends(pkg, pkgdest, skip, taskdeps, packages, d):
                             filerdepends[subkey] = key[13:]
 
             if filerdepends:
-                next = rdepends
                 done = rdepends[:]
-                # Find all the rdepends on the dependency chain
-                while next:
-                    new = []
-                    for rdep in next:
-                        rdep_data = oe.packagedata.read_subpkgdata(rdep, d)
-                        sub_rdeps = rdep_data.get("RDEPENDS_" + rdep)
-                        if not sub_rdeps:
-                            continue
-                        for sub_rdep in bb.utils.explode_deps(sub_rdeps):
-                            if sub_rdep in done:
-                                continue
-                            if oe.packagedata.has_subpkgdata(sub_rdep, d):
-                                # It's a new rdep
-                                done.append(sub_rdep)
-                                new.append(sub_rdep)
-                    next = new
-
                 # Add the rprovides of itself
                 if pkg not in done:
                     done.insert(0, pkg)
@@ -1236,6 +1218,11 @@ python () {
     prog = re.compile(r'[A-Z]')
     if prog.search(pn):
         package_qa_handle_error("uppercase-pn", 'PN: %s is upper case, this can result in unexpected behavior.' % pn, d)
+
+    # Some people mistakenly use DEPENDS_${PN} instead of DEPENDS and wonder
+    # why it doesn't work.
+    if (d.getVar(d.expand('DEPENDS_${PN}'))):
+        package_qa_handle_error("pkgvarcheck", "recipe uses DEPENDS_${PN}, should use DEPENDS", d)
 
     issues = []
     if (d.getVar('PACKAGES') or "").split():

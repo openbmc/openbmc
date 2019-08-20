@@ -1,7 +1,7 @@
-From ea969d7767428d73823c91ad9955829bd66b9e58 Mon Sep 17 00:00:00 2001
+From 42a01c55786a9472934e12e0bf0c40983579b607 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:15:07 +0000
-Subject: [PATCH 08/30] ppc/sqrt: Fix undefined reference to `__sqrt_finite'
+Subject: [PATCH 08/28] ppc/sqrt: Fix undefined reference to `__sqrt_finite'
 
 on ppc fixes the errors like below
 | ./.libs/libpulsecore-1.1.so: undefined reference to `__sqrt_finite'
@@ -204,5 +204,5 @@ index 26fa067abf..9d175122a8 100644
  }
 +strong_alias (__ieee754_sqrtf, __sqrtf_finite)
 -- 
-2.20.1
+2.22.0
 

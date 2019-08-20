@@ -1,0 +1,23 @@
+From bbc85a439672120fa1d36be79e959b28fe840919 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 30 Jul 2019 18:38:03 +0200
+Subject: [PATCH] Do not preserve ownership when installing example jobs
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index f36e57e..20488af 100644
+--- a/Makefile
++++ b/Makefile
+@@ -452,6 +452,6 @@ install: stress-ng stress-ng.1.gz
+ 	mkdir -p ${DESTDIR}${MANDIR}
+ 	cp stress-ng.1.gz ${DESTDIR}${MANDIR}
+ 	mkdir -p ${DESTDIR}${JOBDIR}
+-	cp -rp example-jobs/*.job ${DESTDIR}${JOBDIR}
++	cp -r example-jobs/*.job ${DESTDIR}${JOBDIR}
+ 	mkdir -p ${DESTDIR}${BASHDIR}
+ 	cp bash-completion/stress-ng ${DESTDIR}${BASHDIR}

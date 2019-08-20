@@ -35,5 +35,5 @@ RRECOMMENDS_${PN} += "kernel-module-tun mobile-broadband-provider-info"
 
 FILES_${PN} += "${systemd_unitdir}"
 FILES_${PN}-tests = "${libdir}/${BPN}/test"
-RDEPENDS_${PN}-tests = "python3 python3-dbus"
+RDEPENDS_${PN}-tests = "python3-core python3-dbus"
 RDEPENDS_${PN}-tests += "${@bb.utils.contains('GI_DATA_ENABLED', 'True', 'python3-pygobject', '', d)}"

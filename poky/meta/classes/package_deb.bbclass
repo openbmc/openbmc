@@ -6,6 +6,8 @@ inherit package
 
 IMAGE_PKGTYPE ?= "deb"
 
+DPKG_BUILDCMD ??= "dpkg-deb"
+
 DPKG_ARCH ?= "${@debian_arch_map(d.getVar('TARGET_ARCH'), d.getVar('TUNE_FEATURES'))}"
 DPKG_ARCH[vardepvalue] = "${DPKG_ARCH}"
 
@@ -269,7 +271,8 @@ def deb_write_pkg(pkg, d):
             conffiles.close()
 
         os.chdir(basedir)
-        subprocess.check_output("PATH=\"%s\" dpkg-deb -b %s %s" % (localdata.getVar("PATH"), root, pkgoutdir),
+        subprocess.check_output("PATH=\"%s\" %s -b %s %s" % (localdata.getVar("PATH"), localdata.getVar("DPKG_BUILDCMD"),
+                                                             root, pkgoutdir),
                                 stderr=subprocess.STDOUT,
                                 shell=True)
 

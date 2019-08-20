@@ -573,7 +573,7 @@ def sanity_check_conffiles(d):
         if check_conf_exists(conffile, d) and d.getVar(current_version) is not None and \
                 d.getVar(current_version) != d.getVar(required_version):
             try:
-                bb.build.exec_func(func, d, pythonexception=True)
+                bb.build.exec_func(func, d)
             except NotImplementedError as e:
                 bb.fatal(str(e))
             d.setVar("BB_INVALIDCONF", True)

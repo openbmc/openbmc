@@ -34,6 +34,9 @@ PACKAGECONFIG[json1] = "--enable-json1,--disable-json1"
 PACKAGECONFIG[rtree] = "--enable-rtree,--disable-rtree"
 PACKAGECONFIG[session] = "--enable-session,--disable-session"
 PACKAGECONFIG[dyn_ext] = "--enable-dynamic-extensions,--disable-dynamic-extensions"
+PACKAGECONFIG[zlib] = ",,zlib"
+
+CACHED_CONFIGUREVARS += "${@bb.utils.contains('PACKAGECONFIG', 'zlib', '', 'ac_cv_search_deflate=no',d)}"
 
 EXTRA_OECONF = " \
     --enable-shared \
