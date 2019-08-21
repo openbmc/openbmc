@@ -11,6 +11,7 @@ such as [Yocto](https://www.yoctoproject.org/),
 [D-Bus](https://www.freedesktop.org/wiki/Software/dbus/) to allow easy
 customization for your server platform.
 
+The OpenBMC project is hosted by the [LinuxFoundation](https://www.openbmc.org/)
 
 ## Setting up your OpenBMC project
 
