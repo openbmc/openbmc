@@ -20,6 +20,7 @@ PV = "26"
 
 SRC_URI = "git://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git \
            file://depmod-search.conf \
+           file://0001-build-Stop-using-dolt.patch \
            file://avoid_parallel_tests.patch \
           "
 
@@ -28,14 +29,8 @@ S = "${WORKDIR}/git"
 EXTRA_AUTORECONF += "--install --symlink"
 EXTRA_OECONF +=" --enable-tools --with-zlib"
 
-CACHED_CONFIGUREVARS += "ac_cv_path_DOLT_BASH='/usr/bin/env bash'"
-
 PACKAGECONFIG[debug] = "--enable-debug,--disable-debug"
 PACKAGECONFIG[logging] = " --enable-logging,--disable-logging"
 PACKAGECONFIG[manpages] = "--enable-manpages, --disable-manpages, libxslt-native xmlto-native"
 
 GTKDOC_DOCDIR = "${S}/libkmod/docs"
-
-do_configure_append () {
-	sed -i 's#}libtool#}${TARGET_SYS}-libtool#' ${B}/doltlibtool
-}

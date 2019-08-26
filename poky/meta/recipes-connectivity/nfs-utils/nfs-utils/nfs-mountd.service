@@ -11,6 +11,7 @@ ConditionPathExists=@SYSCONFDIR@/exports
 [Service]
 EnvironmentFile=-@SYSCONFDIR@/nfs-utils.conf
 ExecStart=@SBINDIR@/rpc.mountd -F $MOUNTD_OPTS
+LimitNOFILE=@HIGH_RLIMIT_NOFILE@
 
 [Install]
 WantedBy=multi-user.target

@@ -1,4 +1,4 @@
-From 476eda9054df443d094273c8b61fce63d940adfc Mon Sep 17 00:00:00 2001
+From 94cc995cee76a9d59204a900fcaa2afb2eaa75c2 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 20 Feb 2015 10:25:11 +0000
 Subject: [PATCH 21/40] Ensure target gcc headers can be included
@@ -23,14 +23,14 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  4 files changed, 15 insertions(+), 7 deletions(-)
 
 diff --git a/gcc/Makefile.in b/gcc/Makefile.in
-index 71a8275c39f..5ae693fb06c 100644
+index 71a8275c39f..aa4adc3db24 100644
 --- a/gcc/Makefile.in
 +++ b/gcc/Makefile.in
 @@ -614,6 +614,7 @@ libexecdir = @libexecdir@
  
  # Directory in which the compiler finds libraries etc.
  libsubdir = $(libdir)/gcc/$(real_target_noncanonical)/$(version)$(accel_dir_suffix)
-+libsubdir_target = gcc/$(target_noncanonical)/$(version)
++libsubdir_target = $(target_noncanonical)/$(version)
  # Directory in which the compiler finds executables
  libexecsubdir = $(libexecdir)/gcc/$(real_target_noncanonical)/$(version)$(accel_dir_suffix)
  # Directory in which all plugin resources are installed
@@ -94,5 +94,5 @@ index 570cdc00034..3fb64d453f1 100644
  #undef MD_EXEC_PREFIX
  #undef MD_STARTFILE_PREFIX
 -- 
-2.21.0
+2.22.1
 

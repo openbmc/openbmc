@@ -14,6 +14,11 @@ SRC_URI[sha256sum] = "d09dd2a1aea549e478995bf9be90b38906a4cdf33ea7b245ef9d46aa52
 
 DEPENDS = "coreutils-native"
 
+PROVIDES = "stress"
+RPROVIDES_${PN} = "stress"
+RREPLACES_${PN} = "stress"
+RCONFLICTS_${PN} = "stress"
+
 inherit bash-completion
 
 do_install() {

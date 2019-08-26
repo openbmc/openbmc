@@ -268,11 +268,11 @@ class CookerDataBuilder(object):
 
     def parseBaseConfiguration(self):
         try:
-            bb.parse.init_parser(self.basedata)
             self.data = self.parseConfigurationFiles(self.prefiles, self.postfiles)
 
             if self.data.getVar("BB_WORKERCONTEXT", False) is None:
                 bb.fetch.fetcher_init(self.data)
+            bb.parse.init_parser(self.data)
             bb.codeparser.parser_cache_init(self.data)
 
             bb.event.fire(bb.event.ConfigParsed(), self.data)

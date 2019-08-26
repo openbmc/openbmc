@@ -119,6 +119,9 @@ do_compile_prepend() {
 	make clean
 }
 
+# Works on systemd only
+HIGH_RLIMIT_NOFILE ??= "4096"
+
 do_install_append () {
 	install -d ${D}${sysconfdir}/init.d
 	install -m 0755 ${WORKDIR}/nfsserver ${D}${sysconfdir}/init.d/nfsserver
@@ -133,6 +136,7 @@ do_install_append () {
 	install -m 0644 ${WORKDIR}/nfs-statd.service ${D}${systemd_unitdir}/system/
 	sed -i -e 's,@SBINDIR@,${sbindir},g' \
 		-e 's,@SYSCONFDIR@,${sysconfdir},g' \
+		-e 's,@HIGH_RLIMIT_NOFILE@,${HIGH_RLIMIT_NOFILE},g' \
 		${D}${systemd_unitdir}/system/*.service
 	if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
 	    install -m 0644 ${WORKDIR}/proc-fs-nfsd.mount ${D}${systemd_unitdir}/system/

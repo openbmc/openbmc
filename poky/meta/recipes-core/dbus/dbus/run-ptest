@@ -21,7 +21,8 @@ do
      #these programs are used by testcase test-bus, don't run here
      if [ $i = "test/test-service" ] \
         || [ $i = "test/test-shell-service" ] \
-        || [ $i = "test/test-segfault" ]
+        || [ $i = "test/test-segfault" ] \
+        || [ $i = "test/test-bus" ]
      then
          continue
      fi

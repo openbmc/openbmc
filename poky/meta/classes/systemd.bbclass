@@ -214,7 +214,6 @@ python rm_systemd_unitdir (){
         if (os.path.exists(systemd_libdir) and not os.listdir(systemd_libdir)):
             os.rmdir(systemd_libdir)
 }
-do_install[postfuncs] += "rm_systemd_unitdir "
 
 python rm_sysvinit_initddir (){
     import shutil
@@ -229,4 +228,8 @@ python rm_sysvinit_initddir (){
         if (os.path.exists(systemd_system_unitdir) and os.listdir(systemd_system_unitdir)):
             shutil.rmtree(sysv_initddir)
 }
-do_install[postfuncs] += "rm_sysvinit_initddir "
+
+do_install[postfuncs] += "${RMINITDIR} "
+RMINITDIR_class-target = " rm_sysvinit_initddir rm_systemd_unitdir "
+RMINITDIR = ""
+

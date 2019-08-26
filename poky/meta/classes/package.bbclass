@@ -2252,14 +2252,18 @@ python do_package_setscene () {
 }
 addtask do_package_setscene
 
-do_packagedata () {
-	:
+# Copy from PKGDESTWORK to tempdirectory as tempdirectory can be cleaned at both
+# do_package_setscene and do_packagedata_setscene leading to races
+python do_packagedata () {
+    src = d.expand("${PKGDESTWORK}")
+    dest = d.expand("${WORKDIR}/pkgdata-pdata-input")
+    oe.path.copyhardlinktree(src, dest)
 }
 
 addtask packagedata before do_build after do_package
 
 SSTATETASKS += "do_packagedata"
-do_packagedata[sstate-inputdirs] = "${PKGDESTWORK}"
+do_packagedata[sstate-inputdirs] = "${WORKDIR}/pkgdata-pdata-input"
 do_packagedata[sstate-outputdirs] = "${PKGDATA_DIR}"
 do_packagedata[stamp-extra-info] = "${MACHINE_ARCH}"
 

@@ -65,7 +65,6 @@ do_install() {
     )
 
     # then drop all but the needed Makefiles/Kconfig files
-    rm -rf $kerneldir/build/Documentation
     rm -rf $kerneldir/build/scripts
     rm -rf $kerneldir/build/include
 
@@ -205,11 +204,12 @@ do_install() {
 	    cp -a --parents arch/x86/purgatory/sha256.c $kerneldir/build/ 2>/dev/null || :
 
 	    cp -a --parents arch/x86/purgatory/stack.S $kerneldir/build/
-	    cp -a --parents arch/x86/purgatory/string.c $kerneldir/build/
+	    cp -a --parents arch/x86/purgatory/string.c $kerneldir/build/ 2>/dev/null || :
 	    cp -a --parents arch/x86/purgatory/setup-x86_64.S $kerneldir/build/
 	    cp -a --parents arch/x86/purgatory/entry64.S $kerneldir/build/
 	    cp -a --parents arch/x86/boot/string.h $kerneldir/build/
 	    cp -a --parents arch/x86/boot/string.c $kerneldir/build/
+	    cp -a --parents arch/x86/boot/compressed/string.c $kerneldir/build/ 2>/dev/null || :
 	    cp -a --parents arch/x86/boot/ctype.h $kerneldir/build/
 	fi
 

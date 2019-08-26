@@ -27,6 +27,7 @@ SRC_URI = "http://www.python.org/ftp/python/${PV}/Python-${PV}.tar.xz \
 	   file://crosspythonpath.patch \
            file://reformat_sysconfig.py \
            file://0001-Use-FLAG_REF-always-for-interned-strings.patch \
+           file://0001-test_locale.py-correct-the-test-output-format.patch \
            "
 
 SRC_URI_append_class-native = " \

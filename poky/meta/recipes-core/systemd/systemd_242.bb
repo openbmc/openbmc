@@ -32,7 +32,7 @@ SRC_URI += "file://touchscreen.rules \
 
 # patches needed by musl
 SRC_URI_append_libc-musl = " ${SRC_URI_MUSL}"
-SRC_URI_MUSL = "file://0001-Use-getenv-when-secure-versions-are-not-available.patch \
+SRC_URI_MUSL = "\
                file://0002-don-t-use-glibc-specific-qsort_r.patch \
                file://0003-missing_type.h-add-__compare_fn_t-and-comparison_fn_.patch \
                file://0004-add-fallback-parse_printf_format-implementation.patch \
@@ -126,6 +126,7 @@ PACKAGECONFIG[coredump] = "-Dcoredump=true,-Dcoredump=false"
 PACKAGECONFIG[cryptsetup] = "-Dlibcryptsetup=true,-Dlibcryptsetup=false,cryptsetup"
 PACKAGECONFIG[dbus] = "-Ddbus=true,-Ddbus=false,dbus"
 PACKAGECONFIG[efi] = "-Defi=true,-Defi=false"
+PACKAGECONFIG[gnu-efi] = "-Dgnu-efi=true -Defi-libdir=${STAGING_LIBDIR} -Defi-includedir=${STAGING_INCDIR}/efi,-Dgnu-efi=false,gnu-efi"
 PACKAGECONFIG[elfutils] = "-Delfutils=true,-Delfutils=false,elfutils"
 PACKAGECONFIG[firstboot] = "-Dfirstboot=true,-Dfirstboot=false"
 # Sign the journal for anti-tampering

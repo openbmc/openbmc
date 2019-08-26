@@ -24,7 +24,8 @@ inherit autotools-brokensep pkgconfig manpages distutils3-base
 CLEANBROKEN = "1"
 
 PACKAGECONFIG[manpages] = "--enable-documentation, --disable-documentation, asciidoc-native xmlto-native"
-EXTRA_OECONF = " --disable-zstd"
+PACKAGECONFIG[zstd] = "--enable-zstd,--disable-zstd,zstd"
+
 EXTRA_OECONF_append_libc-musl = " --disable-backtrace "
 EXTRA_PYTHON_CFLAGS = "${DEBUG_PREFIX_MAP}"
 EXTRA_PYTHON_CFLAGS_class-native = ""

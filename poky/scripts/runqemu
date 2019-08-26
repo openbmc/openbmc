@@ -59,6 +59,7 @@ def print_usage():
 Usage: you can run this script with any valid combination
 of the following environment variables (in any order):
   KERNEL - the kernel image file to use
+  BIOS - the bios image file to use
   ROOTFS - the rootfs image file or nfsroot directory to use
   DEVICE_TREE - the device tree blob to use
   MACHINE - the machine name (optional, autodetected from KERNEL filename if unspecified)
@@ -77,8 +78,6 @@ of the following environment variables (in any order):
     audio - enable audio
     [*/]ovmf* - OVMF firmware file or base name for booting with UEFI
   tcpserial=<port> - specify tcp serial port number
-  biosdir=<dir> - specify custom bios dir
-  biosfilename=<filename> - specify bios filename
   qemuparams=<xyz> - specify custom parameters to QEMU
   bootparams=<xyz> - specify custom kernel parameters during boot
   help, -h, --help: print this text
@@ -129,6 +128,7 @@ class BaseConfig(object):
         self.env_vars = ('MACHINE',
                         'ROOTFS',
                         'KERNEL',
+                        'BIOS',
                         'DEVICE_TREE',
                         'DEPLOY_DIR_IMAGE',
                         'OE_TMPDIR',
@@ -155,6 +155,7 @@ class BaseConfig(object):
         self.qemuboot = ''
         self.qbconfload = False
         self.kernel = ''
+        self.bios = ''
         self.kernel_cmdline = ''
         self.kernel_cmdline_script = ''
         self.bootparams = ''
@@ -171,7 +172,6 @@ class BaseConfig(object):
         self.saved_stty = ''
         self.audio_enabled = False
         self.tcpserial_portnum = ''
-        self.custombiosdir = ''
         self.taplock = ''
         self.taplock_descriptor = None
         self.portlocks = {}
@@ -480,10 +480,6 @@ class BaseConfig(object):
                 self.qemu_opt_script += ' -vnc :0'
             elif arg.startswith('tcpserial='):
                 self.tcpserial_portnum = '%s' % arg[len('tcpserial='):]
-            elif arg.startswith('biosdir='):
-                self.custombiosdir = arg[len('biosdir='):]
-            elif arg.startswith('biosfilename='):
-                self.qemu_opt_script += ' -bios %s' % arg[len('biosfilename='):]
             elif arg.startswith('qemuparams='):
                 self.qemuparams = ' %s' % arg[len('qemuparams='):]
             elif arg.startswith('bootparams='):
@@ -725,25 +721,30 @@ class BaseConfig(object):
             if not os.path.exists(self.dtb):
                 raise RunQemuError('DTB not found: %s, %s or %s' % cmds)
 
-    def check_biosdir(self):
-        """Check custombiosdir"""
-        if not self.custombiosdir:
+    def check_bios(self):
+        """Check and set bios"""
+
+        # See if the user supplied a BIOS option
+        if self.get('BIOS'):
+            self.bios = self.get('BIOS')
+
+        # QB_DEFAULT_BIOS is always a full file path
+        bios_name = os.path.basename(self.get('QB_DEFAULT_BIOS'))
+
+        # The user didn't want a bios to be loaded
+        if (bios_name == "" or bios_name == "none") and not self.bios:
             return
 
-        biosdir = ""
-        biosdir_native = "%s/%s" % (self.get('STAGING_DIR_NATIVE'), self.custombiosdir)
-        biosdir_host = "%s/%s" % (self.get('STAGING_DIR_HOST'), self.custombiosdir)
-        for i in (self.custombiosdir, biosdir_native, biosdir_host):
-            if os.path.isdir(i):
-                biosdir = i
-                break
+        if not self.bios:
+            deploy_dir_image = self.get('DEPLOY_DIR_IMAGE')
+            self.bios = "%s/%s" % (deploy_dir_image, bios_name)
 
-        if biosdir:
-            logger.debug("Assuming biosdir is: %s" % biosdir)
-            self.qemu_opt_script += ' -L %s' % biosdir
-        else:
-            logger.error("Custom BIOS directory not found. Tried: %s, %s, and %s" % (self.custombiosdir, biosdir_native, biosdir_host))
-            raise RunQemuError("Invalid custombiosdir: %s" % self.custombiosdir)
+            if not self.bios:
+                raise RunQemuError('BIOS not found: %s' % bios_match_name)
+
+        if not os.path.exists(self.bios):
+            raise RunQemuError("KERNEL %s not found" % self.bios)
+
 
     def check_mem(self):
         """
@@ -811,7 +812,7 @@ class BaseConfig(object):
         self.check_ovmf()
         self.check_kernel()
         self.check_dtb()
-        self.check_biosdir()
+        self.check_bios()
         self.check_mem()
         self.check_tcpserial()
 
@@ -923,6 +924,8 @@ class BaseConfig(object):
         logger.info('Continuing with the following parameters:\n')
         if not self.fstype in self.vmtypes:
             print('KERNEL: [%s]' % self.kernel)
+            if self.bios:
+                print('BIOS: [%s]' % self.bios)
             if self.dtb:
                 print('DTB: [%s]' % self.dtb)
         print('MACHINE: [%s]' % self.get('MACHINE'))
@@ -1339,6 +1342,8 @@ class BaseConfig(object):
             kernel_opts = "-kernel %s -append '%s %s %s %s'" % (self.kernel, self.kernel_cmdline,
                                                                 self.kernel_cmdline_script, self.get('QB_KERNEL_CMDLINE_APPEND'),
                                                                 self.bootparams)
+            if self.bios:
+                kernel_opts += " -bios %s" % self.bios
             if self.dtb:
                 kernel_opts += " -dtb %s" % self.dtb
         else:

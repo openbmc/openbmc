@@ -13,12 +13,11 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 SECTION = "libs"
 DEPENDS += "libtirpc libnsl2"
 
-PV = "3.0+git${SRCPV}"
+PV = "3.1+git${SRCPV}"
 
-SRCREV = "d4aea48657a8e90d7922574b8021ee03915a36cb"
+SRCREV = "062f31999b35393abf7595cb89dfc9590d5a42ad"
 
 SRC_URI = "git://github.com/thkukuk/libnss_nis \
-           file://0001-nis-hosts-Remove-use-of-RES_USE_INET6.patch \
           "
 
 S = "${WORKDIR}/git"

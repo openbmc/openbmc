@@ -190,20 +190,19 @@ do_install () {
 	echo 'MOUNTALL="-t nonfs,nosmbfs,noncpfs"' > ${D}${sysconfdir}/default/mountall
 
 	rm -f ${D}${bindir}/chkdupexe
+}
 
-	if [ "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}" ]; then
+do_install_append_class-target () {
+	if [ "${@bb.utils.filter('PACKAGECONFIG', 'pam', d)}" ]; then
 		install -d ${D}${sysconfdir}/pam.d
 		install -m 0644 ${WORKDIR}/runuser.pamd ${D}${sysconfdir}/pam.d/runuser
 		install -m 0644 ${WORKDIR}/runuser-l.pamd ${D}${sysconfdir}/pam.d/runuser-l
-	fi
-	if [ "${@bb.utils.filter('PACKAGECONFIG', 'pam', d)}" ]; then
 		# Required for "su -" aka "su --login" because
 		# otherwise it uses "other", which has "auth pam_deny.so"
 		# and thus prevents the operation.
 		ln -s su ${D}${sysconfdir}/pam.d/su-l
 	fi
 }
-
 # nologin causes a conflict with shadow-native
 # kill causes a conflict with coreutils-native (if ${bindir}==${base_bindir})
 do_install_append_class-native () {

@@ -245,7 +245,7 @@ def get_signatures(builddir, failsafe=False, machine=None):
     sigs = {}
     tune2tasks = {}
 
-    cmd = ''
+    cmd = 'BB_ENV_EXTRAWHITE="$BB_ENV_EXTRAWHITE BB_SIGNATURE_HANDLER" BB_SIGNATURE_HANDLER="OEBasicHash" '
     if machine:
         cmd += 'MACHINE=%s ' % machine
     cmd += 'bitbake '

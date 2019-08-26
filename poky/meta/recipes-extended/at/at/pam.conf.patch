@@ -24,7 +24,7 @@ index 3674c0a..2f8d586 100644
 -@include common-auth
 -@include common-account
 +auth       include    common-auth
-+acount     include    common-account
++account     include    common-account
  session    required   pam_loginuid.so
 -@include common-session-noninteractive
 +session    include    common-session-noninteractive

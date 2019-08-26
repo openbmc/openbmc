@@ -24,7 +24,7 @@ BINUVERSION ?= "2.32%"
 GDBVERSION ?= "8.3%"
 GLIBCVERSION ?= "2.30%"
 LINUXLIBCVERSION ?= "5.0%"
-QEMUVERSION ?= "4.0%"
+QEMUVERSION ?= "4.1%"
 GOVERSION ?= "1.12%"
 # This can not use wildcards like 8.0.% since it is also used in mesa to denote
 # llvm version being used, so always bump it with llvm recipe version bump

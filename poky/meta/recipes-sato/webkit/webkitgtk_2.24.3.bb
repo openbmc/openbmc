@@ -88,6 +88,7 @@ EXTRA_OECMAKE_append_armv5 = " -DENABLE_JIT=OFF "
 EXTRA_OECMAKE_append_armv6 = " -DENABLE_JIT=OFF "
 EXTRA_OECMAKE_append_armv4 = " -DENABLE_JIT=OFF "
 
+EXTRA_OECMAKE_append_mipsarchn32 = " -DUSE_LD_GOLD=OFF "
 EXTRA_OECMAKE_append_powerpc = " -DUSE_LD_GOLD=OFF "
 
 # JIT not supported on MIPS either

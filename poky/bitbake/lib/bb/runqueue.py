@@ -1711,6 +1711,7 @@ class RunQueueExecute:
         self.stampcache = {}
 
         self.holdoff_tasks = set()
+        self.holdoff_need_update = True
         self.sqdone = False
 
         self.stats = RunQueueStats(len(self.rqdata.runtaskentries))
@@ -2039,6 +2040,8 @@ class RunQueueExecute:
             if self.can_start_task():
                 return True
 
+        self.update_holdofftasks()
+
         if not self.sq_live and not self.sqdone and not self.sq_deferred and not self.updated_taskhash_queue and not self.holdoff_tasks:
             logger.info("Setscene tasks completed")
 
@@ -2157,12 +2160,11 @@ class RunQueueExecute:
 
         return True
 
-    def filtermcdeps(self, task, deps):
+    def filtermcdeps(self, task, mc, deps):
         ret = set()
-        mainmc = mc_from_tid(task)
         for dep in deps:
-            mc = mc_from_tid(dep)
-            if mc != mainmc:
+            thismc = mc_from_tid(dep)
+            if thismc != mc:
                 continue
             ret.add(dep)
         return ret
@@ -2171,9 +2173,10 @@ class RunQueueExecute:
     # as most code can't handle them
     def build_taskdepdata(self, task):
         taskdepdata = {}
+        mc = mc_from_tid(task)
         next = self.rqdata.runtaskentries[task].depends.copy()
         next.add(task)
-        next = self.filtermcdeps(task, next)
+        next = self.filtermcdeps(task, mc, next)
         while next:
             additional = []
             for revdep in next:
@@ -2183,7 +2186,7 @@ class RunQueueExecute:
                 provides = self.rqdata.dataCaches[mc].fn_provides[taskfn]
                 taskhash = self.rqdata.runtaskentries[revdep].hash
                 unihash = self.rqdata.runtaskentries[revdep].unihash
-                deps = self.filtermcdeps(task, deps)
+                deps = self.filtermcdeps(task, mc, deps)
                 taskdepdata[revdep] = [pn, taskname, fn, deps, provides, taskhash, unihash]
                 for revdep2 in deps:
                     if revdep2 not in taskdepdata:
@@ -2194,6 +2197,32 @@ class RunQueueExecute:
         return taskdepdata
 
     def update_holdofftasks(self):
+
+        if not self.holdoff_need_update:
+            return
+
+        notcovered = set(self.scenequeue_notcovered)
+        notcovered |= self.cantskip
+        for tid in self.scenequeue_notcovered:
+            notcovered |= self.sqdata.sq_covered_tasks[tid]
+        notcovered |= self.sqdata.unskippable.difference(self.rqdata.runq_setscene_tids)
+        notcovered.intersection_update(self.tasks_scenequeue_done)
+
+        covered = set(self.scenequeue_covered)
+        for tid in self.scenequeue_covered:
+            covered |= self.sqdata.sq_covered_tasks[tid]
+        covered.difference_update(notcovered)
+        covered.intersection_update(self.tasks_scenequeue_done)
+
+        for tid in notcovered | covered:
+            if len(self.rqdata.runtaskentries[tid].depends) == 0:
+                self.setbuildable(tid)
+            elif self.rqdata.runtaskentries[tid].depends.issubset(self.runq_complete):
+                 self.setbuildable(tid)
+
+        self.tasks_covered = covered
+        self.tasks_notcovered = notcovered
+
         self.holdoff_tasks = set()
 
         for tid in self.rqdata.runq_setscene_tids:
@@ -2204,6 +2233,8 @@ class RunQueueExecute:
             for dep in self.sqdata.sq_covered_tasks[tid]:
                 if dep not in self.runq_complete:
                     self.holdoff_tasks.add(dep)
+
+        self.holdoff_need_update = False
 
     def process_possible_migrations(self):
 
@@ -2283,6 +2314,7 @@ class RunQueueExecute:
                 continue
 
             self.pending_migrations.remove(tid)
+            changed = True
 
             if tid in self.tasks_scenequeue_done:
                 self.tasks_scenequeue_done.remove(tid)
@@ -2323,7 +2355,7 @@ class RunQueueExecute:
             self.sqdone = False
 
         if changed:
-            self.update_holdofftasks()
+            self.holdoff_need_update = True
 
     def scenequeue_updatecounters(self, task, fail=False):
 
@@ -2350,29 +2382,7 @@ class RunQueueExecute:
                         new.add(dep)
             next = new
 
-        notcovered = set(self.scenequeue_notcovered)
-        notcovered |= self.cantskip
-        for tid in self.scenequeue_notcovered:
-            notcovered |= self.sqdata.sq_covered_tasks[tid]
-        notcovered |= self.sqdata.unskippable.difference(self.rqdata.runq_setscene_tids)
-        notcovered.intersection_update(self.tasks_scenequeue_done)
-
-        covered = set(self.scenequeue_covered)
-        for tid in self.scenequeue_covered:
-            covered |= self.sqdata.sq_covered_tasks[tid]
-        covered.difference_update(notcovered)
-        covered.intersection_update(self.tasks_scenequeue_done)
-
-        for tid in notcovered | covered:
-            if len(self.rqdata.runtaskentries[tid].depends) == 0:
-                self.setbuildable(tid)
-            elif self.rqdata.runtaskentries[tid].depends.issubset(self.runq_complete):
-                 self.setbuildable(tid)
-
-        self.tasks_covered = covered
-        self.tasks_notcovered = notcovered
-
-        self.update_holdofftasks()
+        self.holdoff_need_update = True
 
     def sq_task_completeoutright(self, task):
         """

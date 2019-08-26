@@ -17,7 +17,7 @@ inherit meson gobject-introspection
 
 EXTRA_OEMESON = "-Ddeveloper_build=false -Dbuild_api_v1=true -Dbuild_api_v2=true"
 
-DEPENDS += "glib-2.0 libyaml glib-2.0-native"
+DEPENDS += "glib-2.0 libyaml glib-2.0-native python3"
 
 BBCLASSEXTEND = "native nativesdk"
 

@@ -1,4 +1,4 @@
-From 281116b31981b0b9e174bda8abe00f4eaa33c2ae Mon Sep 17 00:00:00 2001
+From 67751f3a23e3db3012f391b3b3b73a4484488ce9 Mon Sep 17 00:00:00 2001
 From: Juro Bystricky <juro.bystricky@intel.com>
 Date: Thu, 31 Aug 2017 11:06:56 -0700
 Subject: [PATCH] Add subpackage -ptest which runs all unit test cases for
@@ -15,10 +15,10 @@ Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
  1 file changed, 8 insertions(+)
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 36fc73fe..01fecd4d 100644
+index fd7fdb86..83b7f409 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -1184,4 +1184,12 @@ all: $(QEMU_IOTESTS_HELPERS-y)
+@@ -1183,4 +1183,12 @@ all: $(QEMU_IOTESTS_HELPERS-y)
  -include $(wildcard tests/*.d)
  -include $(wildcard tests/libqos/*.d)
  

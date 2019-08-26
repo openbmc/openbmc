@@ -43,6 +43,8 @@ SRC_URI = "git://github.com/linux-test-project/ltp.git \
            file://0012-getrlimit03-adjust-a-bit-of-code-to-compatiable-with.patch \
            file://0001-Add-configure-time-check-for-getdents-getdents64-API.patch \
            file://0002-check-for-RES_USE_INET6-during-configure.patch \
+           file://0001-syscalls-tgkill03-wait-for-defunct-tid-to-get-detach.patch \
+           file://0001-ustat02-Fix-EFAULT-in-32bit-compatibility-mode.patch \
            "
 
 S = "${WORKDIR}/git"

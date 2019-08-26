@@ -76,7 +76,7 @@ Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
 --- a/src/basic/missing_stdlib.h
 +++ b/src/basic/missing_stdlib.h
 @@ -11,3 +11,15 @@
- #    define secure_getenv getenv
+ #    error "neither secure_getenv nor __secure_getenv are available"
  #  endif
  #endif
 +

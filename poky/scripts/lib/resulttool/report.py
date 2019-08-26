@@ -203,8 +203,22 @@ class ResultsTextReport(object):
             testresults = resultutils.load_resultsdata(source_dir)
         for testsuite in testresults:
             for resultid in testresults[testsuite]:
+                skip = False
                 result = testresults[testsuite][resultid]
                 machine = result['configuration']['MACHINE']
+
+                # Check to see if there is already results for these kinds of tests for the machine
+                for key in result['result'].keys():
+                    testtype = str(key).split('.')[0]
+                    if ((machine in self.ptests and testtype == "ptestresult" and self.ptests[machine]) or
+                        (machine in self.ltptests and testtype == "ltpiresult" and self.ltptests[machine]) or
+                        (machine in self.ltpposixtests and testtype == "ltpposixresult" and self.ltpposixtests[machine])):
+                        print("Already have test results for %s on %s, skipping %s" %(str(key).split('.')[0], machine, resultid))
+                        skip = True
+                        break
+                if skip:
+                    break
+
                 test_count_report = self.get_aggregated_test_result(logger, result, machine)
                 test_count_report['machine'] = machine
                 test_count_report['testseries'] = result['configuration']['TESTSERIES']

@@ -78,7 +78,7 @@ FILES_guards = "${bindir}/guards"
 FILES_${PN}-doc = "${mandir}/man1/quilt.1 ${docdir}/${BPN}"
 FILES_guards-doc = "${mandir}/man1/guards.1"
 
-RDEPENDS_${PN} = "bash patch diffstat bzip2 util-linux"
+RDEPENDS_${PN} = "bash patch diffstat bzip2 util-linux less"
 RDEPENDS_${PN}_class-native = "diffstat-native patch-native bzip2-native"
 
 RDEPENDS_${PN}-ptest = "make file sed gawk diffutils findutils ed perl \
