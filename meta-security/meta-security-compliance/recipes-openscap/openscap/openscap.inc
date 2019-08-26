@@ -41,6 +41,7 @@ do_configure_append_class-native () {
 }
 
 do_clean[cleandirs] += "${STAGING_OSCAP_BUILDDIR}"
+do_install[nostamp] = "1"
 
 do_install_append_class-native () {
     oscapdir=${STAGING_OSCAP_BUILDDIR}/${datadir_native}
@@ -50,6 +51,6 @@ do_install_append_class-native () {
 
 FILES_${PN} += "${PYTHON_SITEPACKAGES_DIR}"
 
-RDEPENDS_${PN} += "libxml2 python3 libgcc"
+RDEPENDS_${PN} += "libxml2 python3-core libgcc bash"
 
 BBCLASSEXTEND = "native"

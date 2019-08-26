@@ -48,7 +48,7 @@ INITSCRIPT_PARAMS = "start 16 2 3 4 5 . stop 35 0 1 6 ."
 FILES_${PN} += "${sysconfdir}/init.d/smack"
 FILES_${PN}-ptest += "generator"
 
-RDEPENDS_${PN} += "coreutils"
+RDEPENDS_${PN} += "coreutils python3-core"
 RDEPENDS_${PN}-ptest += "make bash bc"
 
 BBCLASSEXTEND = "native"
