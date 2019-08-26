@@ -4,7 +4,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
 SRC_URI = "http://poppler.freedesktop.org/${BP}.tar.xz \
            file://0001-Do-not-overwrite-all-our-build-flags.patch \
-           file://0002-CairoOutputDev.cc-fix-build-error-when-using-fixedpo.patch \
            file://basename-include.patch \
            "
 SRC_URI[md5sum] = "0aac1fcb6466f8b7bdf51871264c7e83"
@@ -43,14 +42,6 @@ do_configure_append() {
     # gir-wrappers are:
     sed -i 's: ${bindir}/g-ir: ${STAGING_BINDIR}/g-ir:' ${B}/build.ninja
 }
-
-# check for TARGET_FPU=soft and inform configure of the result so it can disable some floating points
-def get_poppler_fpu_setting(bb, d):
-    if d.getVar('TARGET_FPU') in [ 'soft' ]:
-        return "-DUSE_FIXEDPOINT=ON"
-    return ""
-
-EXTRA_OECMAKE += "${@get_poppler_fpu_setting(bb, d)}"
 
 PACKAGES =+ "libpoppler libpoppler-glib"
 FILES_libpoppler = "${libdir}/libpoppler.so.*"

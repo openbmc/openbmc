@@ -5,7 +5,6 @@ SECTION = "net/misc"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=cbbffd568227ada506640fe950a4823b \
                     file://libnm-util/COPYING;md5=1c4fa765d6eb3cd2fbd84344a1b816cd \
-                    file://docs/api/html/license.html;md5=233931303ef80eded167add1f60a50c1 \
 "
 
 DEPENDS = " \
@@ -31,8 +30,8 @@ SRC_URI_append_libc-musl = " \
     file://musl/0001-Fix-build-with-musl-systemd-specific.patch \
     file://musl/0002-Fix-build-with-musl.patch \
 "
-SRC_URI[md5sum] = "c8c27116a8083bab5d5fcca0d03e988a"
-SRC_URI[sha256sum] = "c6e8df25e5a3c7309bc17664be8971689314884cdd08afdd6b0847d29d2a8ba6"
+SRC_URI[md5sum] = "ca1e6175c6ba97ca1adf65a67861ccd9"
+SRC_URI[sha256sum] = "4dd97ca974cd1f97990746527258f551f4257cbf011fecd01d10b7d74a6fa5c3"
 
 UPSTREAM_CHECK_URI = "${GNOME_MIRROR}/NetworkManager/1.16/"
 UPSTREAM_CHECK_REGEX = "NetworkManager\-(?P<pver>1\.10(\.\d+)+).tar.xz"
@@ -51,17 +50,8 @@ EXTRA_OECONF = " \
 # stolen from https://github.com/void-linux/void-packages/blob/master/srcpkgs/NetworkManager/template
 # avoids:
 # | ../NetworkManager-1.16.0/libnm-core/nm-json.c:106:50: error: 'RTLD_DEEPBIND' undeclared (first use in this function); did you mean 'RTLD_DEFAULT'?
-#
-# and
-#
-# | In file included from ../NetworkManager-1.16.0/src/systemd/nm-sd-utils-core.c:25:
-# | ../NetworkManager-1.16.0/src/systemd/sd-adapt-core/nm-sd-adapt-core.h:68:6: error: #error neither secure_getenv nor __secure_getenv is available
-# |  #    error neither secure_getenv nor __secure_getenv is available
-# |       ^~~~~
 CFLAGS_append_libc-musl = " \
     -DRTLD_DEEPBIND=0 \
-    -DHAVE_SECURE_GETENV \
-    -Dsecure_getenv=getenv \
 "
 
 do_compile_prepend() {

@@ -40,6 +40,12 @@ TARGET_CC_ARCH += "${LDFLAGS}"
 
 EXTRA_OECONF_append_class-nativesdk = " --with-confdir=${sysconfdir}"
 
+DEPENDS += "util-linux"
+LVM2_PACKAGECONFIG_append_class-target = " \
+    udev \
+"
+PACKAGECONFIG[udev] = "--enable-udev_sync --enable-udev_rules --with-udevdir=${nonarch_base_libdir}/udev/rules.d,--disable-udev_sync --disable-udev_rules,udev"
+
 FILES_${PN} += "${libdir}/device-mapper/*.so"
 FILES_${PN}-scripts = " \
     ${sbindir}/blkdeactivate \

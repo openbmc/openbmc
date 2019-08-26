@@ -9,8 +9,8 @@ LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=fbc093901857fcd118f065f900982c24"
 
 PE = "1"
+inherit gnomebase vala gobject-introspection
 
-inherit autotools vala pkgconfig gobject-introspection
 do_configure_prepend() {
     MACROS="libtool.m4 lt~obsolete.m4 ltoptions.m4 ltsugar.m4 ltversion.m4"
     for i in ${MACROS}; do
@@ -18,7 +18,5 @@ do_configure_prepend() {
     done
 }
 
-SHRT_VER = "${@d.getVar('PV').split('.')[0]}.${@d.getVar('PV').split('.')[1]}"
-SRC_URI = "http://ftp.gnome.org/pub/GNOME/sources/libgee/${SHRT_VER}/${BP}.tar.xz"
-SRC_URI[md5sum] = "d224dca55bb909f6730f40cc267337be"
-SRC_URI[sha256sum] = "bb2802d29a518e8c6d2992884691f06ccfcc25792a5686178575c7111fea4630"
+SRC_URI[archive.md5sum] = "45db478f2b300ada8e039ebc6c9458de"
+SRC_URI[archive.sha256sum] = "9e035c4b755f46bfae70ba81cdcf8328b03f554373cec8c816e8b5680f85353c"

@@ -2,11 +2,11 @@ SUMMARY = "TinyXML-2 is a simple, small, efficient, C++ XML parser that can be e
 HOMEPAGE = "http://www.grinninglizard.com/tinyxml2/"
 SECTION = "libs"
 LICENSE = "Zlib"
-LIC_FILES_CHKSUM = "file://tinyxml2.cpp;endline=22;md5=c19221dbd8a66ad3090462af4c5de5e7"
+LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=135624eef03e1f1101b9ba9ac9b5fffd"
 
 SRC_URI = "git://github.com/leethomason/tinyxml2.git"
 
-SRCREV = "de6d164822076f9b1e26a7222808a25ac03867d8"
+SRCREV = "9c740e8d2341bd46dbe8e87053cdb4d931971967"
 
 S = "${WORKDIR}/git"
 
