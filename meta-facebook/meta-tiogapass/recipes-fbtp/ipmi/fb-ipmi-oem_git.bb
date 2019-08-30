@@ -21,6 +21,9 @@ LIBRARY_NAMES = "libzfboemcmds.so"
 HOSTIPMI_PROVIDER_LIBRARY += "${LIBRARY_NAMES}"
 NETIPMI_PROVIDER_LIBRARY += "${LIBRARY_NAMES}"
 
+FILES_${PN}_append = " ${datadir}/ipmi-providers/post_desc.json"
+FILES_${PN}_append = " ${datadir}/ipmi-providers/gpio_desc.json"
+
 FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
 FILES_${PN}_append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
 FILES_${PN}_append = " ${libdir}/net-ipmid/lib*${SOLIBS}"
