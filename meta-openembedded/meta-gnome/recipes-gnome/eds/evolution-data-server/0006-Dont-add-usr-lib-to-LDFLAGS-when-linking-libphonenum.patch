@@ -1,0 +1,36 @@
+From fb9164bbca5b425f1cf1bb3cac51d06afe81938a Mon Sep 17 00:00:00 2001
+From: Piotr Tworek <tworaz@tworaz.net>
+Date: Wed, 14 Aug 2019 00:47:59 +0200
+Subject: [PATCH 6/7] Dont add /usr/lib to LDFLAGS when linking libphonenumber.
+
+This will refer to host lib dir which is not what we want.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Piotr Tworek <tworaz@tworaz.net>
+---
+ cmake/modules/FindPhonenumber.cmake | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/cmake/modules/FindPhonenumber.cmake b/cmake/modules/FindPhonenumber.cmake
+index 04d1056..70c0c41 100644
+--- a/cmake/modules/FindPhonenumber.cmake
++++ b/cmake/modules/FindPhonenumber.cmake
+@@ -37,12 +37,10 @@ string(TOUPPER "${WITH_PHONENUMBER}" optupper)
+ if(("${optupper}" STREQUAL "ON") OR ("${substr}" STREQUAL "${CMAKE_BINARY_DIR}"))
+ 	set(WITH_PHONENUMBER "ON")
+ 	set(PHONENUMBER_INCLUDE_DIRS "${INCLUDE_INSTALL_DIR}")
+-	set(PHONENUMBER_LIB_DIRS ${LIB_INSTALL_DIR})
+-	set(PHONENUMBER_LDFLAGS -L${PHONENUMBER_LIB_DIRS} ${PHONENUMBER_LDFLAGS})
++	set(PHONENUMBER_LDFLAGS  ${PHONENUMBER_LDFLAGS})
+ else(("${optupper}" STREQUAL "ON") OR ("${substr}" STREQUAL "${CMAKE_BINARY_DIR}"))
+ 	set(PHONENUMBER_INCLUDE_DIRS "${WITH_PHONENUMBER}/include")
+-	set(PHONENUMBER_LIB_DIRS ${WITH_PHONENUMBER}/lib${LIB_SUFFIX})
+-	set(PHONENUMBER_LDFLAGS -L${PHONENUMBER_LIB_DIRS} ${PHONENUMBER_LDFLAGS})
++	set(PHONENUMBER_LDFLAGS ${PHONENUMBER_LDFLAGS})
+ endif(("${optupper}" STREQUAL "ON") OR ("${substr}" STREQUAL "${CMAKE_BINARY_DIR}"))
+ 
+ unset(bindirlen)
+-- 
+2.21.0
+

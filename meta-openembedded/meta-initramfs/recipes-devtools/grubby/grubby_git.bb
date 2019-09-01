@@ -25,7 +25,7 @@ RDEPENDS_${PN} += "dracut"
 
 inherit autotools-brokensep ptest
 
-EXTRA_OEMAKE = "-e 'CC=${CC}' 'LDFLAGS=${LDFLAGS}' LIBS='${LIBS}'"
+EXTRA_OEMAKE = "-e 'CC=${CC}' 'LDFLAGS=${LDFLAGS}' LIBS='${LIBS}' 'PREFIX'=${@bb.utils.contains('DISTRO_FEATURES','usrmerge','/usr','',d)}"
 
 LIBS_libc-musl = "-lexecinfo"
 LIBS ?= ""

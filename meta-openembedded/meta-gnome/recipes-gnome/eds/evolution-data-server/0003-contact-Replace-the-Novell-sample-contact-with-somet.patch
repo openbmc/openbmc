@@ -1,14 +1,14 @@
-From 4df8bd8ae4258289663b27af1207027c7ee06340 Mon Sep 17 00:00:00 2001
+From d616eddf3a214a49900344f4455155879d3b82db Mon Sep 17 00:00:00 2001
 From: Martin Jansa <Martin.Jansa@gmail.com>
 Date: Sun, 4 Aug 2013 09:13:25 +0200
-Subject: [PATCH 1/5] contact: Replace the Novell sample contact with something
+Subject: [PATCH 3/7] contact: Replace the Novell sample contact with something
  more appropriate
 
 Upstream-Status: Inappropriate [configuration]
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
 ---
- src/addressbook/libedata-book/ximian-vcard.h | 179 ++++++++++++++++++-------------
- 2 files changed, 103 insertions(+), 77 deletions(-)
+ src/addressbook/libedata-book/ximian-vcard.h | 179 +++++++++++--------
+ 1 file changed, 102 insertions(+), 77 deletions(-)
 
 diff --git a/src/addressbook/libedata-book/ximian-vcard.h b/src/addressbook/libedata-book/ximian-vcard.h
 index 782d37b..5b0b250 100644
@@ -198,5 +198,5 @@ index 782d37b..5b0b250 100644
 +" gQIUKE+H+C/wMGX8Ias1s6CQAAAABJRU5ErkJggg==\n" \
  "END:VCARD"
 -- 
-1.8.3.2
+2.21.0
 

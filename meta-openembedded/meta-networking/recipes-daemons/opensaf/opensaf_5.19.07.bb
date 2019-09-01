@@ -69,4 +69,4 @@ INSANE_SKIP_${PN} = "dev-so"
 RDEPENDS_${PN} += "bash python"
 
 # http://errors.yoctoproject.org/Errors/Details/186970/
-EXCLUDE_FROM_WORLD_libc-musl = "1"
+COMPATIBLE_HOST_libc-musl = 'null'

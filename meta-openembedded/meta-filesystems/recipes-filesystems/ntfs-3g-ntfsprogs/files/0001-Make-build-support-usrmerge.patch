@@ -1,0 +1,43 @@
+From 33f678bf74367aab8ddc2858a9f7797455ea9b9f Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Thu, 29 Aug 2019 10:21:58 +0800
+Subject: [PATCH] Make build support usrmerge
+
+Upstream-Status: Inappropriate[oe-specific]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ ntfsprogs/Makefile.am | 2 --
+ src/Makefile.am       | 3 ---
+ 2 files changed, 5 deletions(-)
+
+diff --git a/ntfsprogs/Makefile.am b/ntfsprogs/Makefile.am
+index f4f9d1b..1f6a673 100644
+--- a/ntfsprogs/Makefile.am
++++ b/ntfsprogs/Makefile.am
+@@ -165,8 +165,6 @@ extras:	libs $(EXTRA_PROGRAMS)
+ 
+ if ENABLE_MOUNT_HELPER
+ install-exec-hook:
+-	$(INSTALL) -d $(DESTDIR)/sbin
+-	$(LN_S) -f $(sbindir)/mkntfs $(DESTDIR)/sbin/mkfs.ntfs
+ 
+ install-data-hook:
+ 	$(INSTALL) -d $(DESTDIR)$(man8dir)
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 8d98408..d0a6a45 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -66,9 +66,6 @@ endif
+ 
+ if ENABLE_MOUNT_HELPER
+ install-exec-local:	install-rootbinPROGRAMS
+-	$(MKDIR_P) "$(DESTDIR)/sbin"
+-	$(LN_S) -f "$(rootbindir)/ntfs-3g" "$(DESTDIR)/sbin/mount.ntfs-3g"
+-	$(LN_S) -f "$(rootbindir)/lowntfs-3g" "$(DESTDIR)/sbin/mount.lowntfs-3g"
+ 
+ install-data-local:	install-man8
+ 	$(LN_S) -f ntfs-3g.8 "$(DESTDIR)$(man8dir)/mount.ntfs-3g.8"
+-- 
+2.7.4
+

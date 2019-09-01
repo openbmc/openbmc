@@ -12,7 +12,7 @@ data."
 
 SECTION = "System/Servers"
 
-LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/PD;md5=b3597d12946881e13cb3b548d1173851"
+LIC_FILES_CHKSUM = "file://src/prot.c;beginline=1;endline=1;md5=96964cadf07e8f8c1e2ffb3b507dd647"
 LICENSE = "PD"
 
 SRC_URI = "http://cr.yp.to/daemontools/${BPN}-${PV}.tar.gz \

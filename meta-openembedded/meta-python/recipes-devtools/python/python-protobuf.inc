@@ -3,7 +3,7 @@ HOMEPAGE = "https://developers.google.com/protocol-buffers/"
 SECTION = "devel/python"
 
 LICENSE = "BSD-3-Clause"
-LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/BSD-3-Clause;md5=550794465ba0ec5312d6919e203a55f9"
+LIC_FILES_CHKSUM = "file://PKG-INFO;beginline=8;endline=8;md5=19e8f490f9526b1de84f8d949cfcfd4e"
 
 inherit pypi
 

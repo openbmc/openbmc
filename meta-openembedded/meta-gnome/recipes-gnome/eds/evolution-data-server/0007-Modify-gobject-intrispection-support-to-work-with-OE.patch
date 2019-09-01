@@ -1,0 +1,75 @@
+From d84f4fd68441e934b37be2a6917abad52c5d1bda Mon Sep 17 00:00:00 2001
+From: Piotr Tworek <tworaz@tworaz.net>
+Date: Fri, 16 Aug 2019 21:22:16 +0200
+Subject: [PATCH 7/7] Modify gobject-intrispection support to work with OE.
+
+1. Use tools provided by the recipe sysroot instread of host ones.
+2. Make sure all the required dirs make it into g-ir-scanner via
+   LDFLAGS.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Piotr Tworek <tworaz@tworaz.net>
+---
+ cmake/modules/GObjectIntrospection.cmake | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/cmake/modules/GObjectIntrospection.cmake b/cmake/modules/GObjectIntrospection.cmake
+index 5be5042..67c035a 100644
+--- a/cmake/modules/GObjectIntrospection.cmake
++++ b/cmake/modules/GObjectIntrospection.cmake
+@@ -20,6 +20,9 @@ if(ENABLE_INTROSPECTION)
+ 	pkg_check_variable(G_IR_SCANNER gobject-introspection-1.0 g_ir_scanner)
+ 	pkg_check_variable(G_IR_COMPILER gobject-introspection-1.0 g_ir_compiler)
+ 
++	string(CONCAT G_IR_SCANNER $ENV{PKG_CONFIG_SYSROOT_DIR} "${G_IR_SCANNER}")
++	string(CONCAT G_IR_COMPILER $ENV{PKG_CONFIG_SYSROOT_DIR} "${G_IR_COMPILER}")
++
+ 	if(NOT G_IR_SCANNER)
+ 		message(FATAL_ERROR "g-ir-scanner not provided by gobject-introspection-1.0, you can disable GObject introspection by -DENABLE_INTROSPECTION=OFF")
+ 	endif(NOT G_IR_SCANNER)
+@@ -116,7 +119,7 @@ macro(gir_add_introspection gir)
+ 		file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${_gir_name}_files "${_gir_files}")
+ 
+ 		add_custom_command(
+-			COMMAND ${CMAKE_COMMAND} -E env "CC='${CMAKE_C_COMPILER}'" LDFLAGS=
++			COMMAND ${CMAKE_COMMAND} -E env "CC='${CMAKE_C_COMPILER}'" LDFLAGS=${INTROSPECTION_SCANNER_LDFLAGS}
+ 				${INTROSPECTION_SCANNER_ENV}
+ 				${G_IR_SCANNER}
+ 				${INTROSPECTION_SCANNER_ARGS}
+@@ -186,6 +189,7 @@ macro(gir_add_introspection_simple gir_library pkg_export_prefix gir_library_ver
+ 	unset(INTROSPECTION_SCANNER_ARGS)
+ 	unset(INTROSPECTION_SCANNER_ENV)
+ 	unset(INTROSPECTION_COMPILER_ARGS)
++	unset(INTROSPECTION_SCANNER_LDFLAGS)
+ 
+ 	set(${gir_vars_prefix} ${gir_library})
+ 	set(${gir_vars_prefix}_SCANNERFLAGS "--warn-all")
+@@ -223,12 +227,12 @@ macro(gir_add_introspection_simple gir_library pkg_export_prefix gir_library_ver
+ 		--add-include-path=${CMAKE_CURRENT_SOURCE_DIR}
+ 		--library-path=${CMAKE_BINARY_DIR}
+ 		--library-path=${CMAKE_BINARY_DIR}/src
++		--library-path=${CMAKE_BINARY_DIR}/src/private
+ 		--library-path=${CMAKE_CURRENT_BINARY_DIR}
+ 		${_gir_extra_libdirs}
+ 		${_gir_identifies_prefixes}
+ 		${_gir_deps}
+ 		--add-include-path=${SHARE_INSTALL_PREFIX}/gir-1.0
+-		--library-path=${LIB_INSTALL_DIR}
+ 		${_extra_library_path}
+ 		--pkg-export ${pkg_export_prefix}-${gir_library_version}
+ 		--c-include=${c_include}
+@@ -279,6 +283,10 @@ macro(gir_add_introspection_simple gir_library pkg_export_prefix gir_library_ver
+ 		)
+ 	endif(UNIX)
+ 
++	_gir_list_prefix(_gir_scanner_ldflags ${gir_extra_libdirs_var} "-Wl,-rpath-link=")
++	string(REPLACE ";" " " _gir_scanner_ldflags "${_gir_scanner_ldflags}")
++	set(INTROSPECTION_SCANNER_LDFLAGS "${_gir_scanner_ldflags}")
++
+ 	set(INTROSPECTION_SCANNER_ENV
+ 		${_loader_library_path_var}="${_extra_loader_library_path_native}"
+ 	)
+-- 
+2.21.0
+

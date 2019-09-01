@@ -1,0 +1,31 @@
+From a47ca75702318ff43446c70120f7aacde4ccee1b Mon Sep 17 00:00:00 2001
+From: Eero Aaltonen <eero.aaltonen@vaisala.com>
+Date: Thu, 20 Jun 2019 16:21:20 +0300
+Subject: [PATCH] Set library VERSION and SOVERSION
+
+With soversion and version specified, `install` target will install the
+library with the specified version and also create the proper symlink.
+
+Upstream-Status: Submitted [https://github.com/docopt/docopt.cpp/pull/112]
+but unlikely to be merged soon as it is a duplicate of
+[https://github.com/docopt/docopt.cpp/pull/112] which has been **Open**
+since 2016-12-08.
+---
+ CMakeLists.txt | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 23da468..feff32e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -50,6 +50,10 @@ else()
+     set_target_properties(docopt_o PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
+ 
+     add_library(docopt SHARED $<TARGET_OBJECTS:docopt_o>)
++	set_target_properties(docopt PROPERTIES
++		VERSION ${PROJECT_VERSION}
++		SOVERSION ${PROJECT_VERSION_MAJOR}
++		)
+     add_library(docopt_s STATIC $<TARGET_OBJECTS:docopt_o>)
+ endif()
+ 

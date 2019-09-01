@@ -1,0 +1,16 @@
+Description: Fix "NETLINK: Error: Invalid argument" for links that are down, in kernel 4.4+
+Author: Jim Paris <jim@jtan.com>
+Bug-Debian: http://bugs.debian.org/864889
+Index: ifmetric/src/nlrequest.c
+===================================================================
+--- a/src/ifmetric.c
++++ b/src/ifmetric.c
+@@ -97,6 +97,8 @@
+     l = NLMSG_PAYLOAD(n, sizeof(struct rtmsg));
+     a = RTM_RTA(r);
+     
++    r->rtm_flags &= ~(RTNH_F_DEAD | RTNH_F_LINKDOWN);
++
+     while(RTA_OK(a, l)) {
+         switch(a->rta_type) {
+             case RTA_PRIORITY:

@@ -16,6 +16,10 @@ DEPENDS = " \
     util-linux \
 "
 
+RDEPENDS_${PN} = " \
+    libdevmapper \
+"
+
 SRC_URI = "${KERNELORG_MIRROR}/linux/utils/${BPN}/v${@d.getVar('PV').split('.')[0]}.${@d.getVar('PV').split('.')[1]}/${BP}.tar.xz"
 SRC_URI[md5sum] = "f7818082056e5bc0be12e4c7fc20345a"
 SRC_URI[sha256sum] = "9d8f8cac2836a1623c075b5cba96032271dc81a28b2aa27fbd8331e831416bb1"

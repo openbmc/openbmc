@@ -1,0 +1,85 @@
+#!/bin/sh
+
+check_return() {
+    if [ $? == 0 ]; then
+        echo -e "PASS: $1\n"
+    else
+        echo -e "FAIL: $1\n"
+    fi
+}
+
+echo "---------------------------------------------------"
+echo "Signing a template file..."
+./sign1 sign1-tmpl.xml rsakey.pem > sign1-res.xml
+./verify1 sign1-res.xml rsapub.pem
+check_return sign-tmpl
+
+echo "---------------------------------------------------"
+echo "Signing a dynamicaly created template..."
+./sign2 sign2-doc.xml rsakey.pem > sign2-res.xml
+./verify1 sign2-res.xml rsapub.pem
+check_return sign-dynamic-templ
+
+echo "---------------------------------------------------"
+echo "Signing with X509 certificate..."
+./sign3 sign3-doc.xml rsakey.pem rsacert.pem > sign3-res.xml
+./verify3 sign3-res.xml ca2cert.pem cacert.pem
+check_return sign-x509
+
+echo "---------------------------------------------------"
+echo "Verifying a signature with a single key..."
+./verify1 sign1-res.xml rsapub.pem
+./verify1 sign2-res.xml rsapub.pem
+check_return verify-single-key
+
+echo "---------------------------------------------------"
+echo "Verifying a signature with keys manager..."
+./verify2 sign1-res.xml rsapub.pem
+./verify2 sign2-res.xml rsapub.pem
+check_return verify-keys-manager
+
+echo "---------------------------------------------------"
+echo "Verifying a signature with X509 certificates..."
+./verify3 sign3-res.xml ca2cert.pem cacert.pem
+check_return verify-x509
+
+echo "---------------------------------------------------"
+echo "Verifying a signature with additional restrictions..."
+./verify4 verify4-res.xml ca2cert.pem cacert.pem
+check_return verify-res
+
+echo "---------------------------------------------------"
+echo "Encrypting data with a template file..."
+./encrypt1 encrypt1-tmpl.xml deskey.bin > encrypt1-res.xml
+./decrypt1 encrypt1-res.xml deskey.bin
+check_return encrypt-tmpl
+
+echo "---------------------------------------------------"
+echo "Encrypting data with a dynamicaly created template..."
+./encrypt2 encrypt2-doc.xml deskey.bin > encrypt2-res.xml
+./decrypt1 encrypt2-res.xml deskey.bin
+check_return encrypt-dynamic-tmpl
+
+echo "---------------------------------------------------"
+echo "Encrypting data with a session key..."
+./encrypt3 encrypt3-doc.xml rsakey.pem > encrypt3-res.xml
+./decrypt3 encrypt3-res.xml
+check_return encrypt-session-key
+
+echo "---------------------------------------------------"
+echo "Decrypting data with a single key..."
+./decrypt1 encrypt1-res.xml deskey.bin
+./decrypt1 encrypt2-res.xml deskey.bin
+check_return encrypt-single-key
+
+echo "---------------------------------------------------"
+echo "Decrypting data with keys manager..."
+./decrypt2 encrypt1-res.xml deskey.bin
+./decrypt2 encrypt2-res.xml deskey.bin
+check_return encrypt-keys-manager
+
+echo "---------------------------------------------------"
+echo "Writing a custom keys manager..."
+./decrypt3 encrypt1-res.xml
+./decrypt3 encrypt2-res.xml
+check_return write-keys-manager

@@ -11,6 +11,7 @@ SRC_URI = "https://www.kernel.org/pub/linux/utils/fs/xfs/xfsprogs/${BP}.tar.xz \
            file://0001-build-Check-for-sync_file_range-libc-function.patch \
            file://0001-Check-for-MAP_SYNC-in-sys-mman.h.patch \
            file://0002-include-include-xfs-linux.h-after-sys-mman.h.patch \
+           file://0001-support-usrmerge.patch \
            "
 SRC_URI[md5sum] = "5ca3f79e76e3fb984a03d1b42a2e60ba"
 SRC_URI[sha256sum] = "7b500e148cebd08f99e37cf744c7843817b37e7be2a32c4dc57d6ea16e3019ae"
@@ -68,6 +69,8 @@ do_install_append() {
         rm ${D}${libdir}/*.la
         rmdir --ignore-fail-on-non-empty ${D}${libdir}
 
-        ln -sf -r ${D}${libdir}/libhandle.a ${D}${base_libdir}/libhandle.a
-        ln -sf -r ${D}${base_libdir}/libhandle.so ${D}${libdir}/libhandle.so
+        if [ ${libdir} != ${base_libdir} ];then
+            ln -sf -r ${D}${libdir}/libhandle.a ${D}${base_libdir}/libhandle.a
+            ln -sf -r ${D}${base_libdir}/libhandle.so ${D}${libdir}/libhandle.so
+        fi
 }

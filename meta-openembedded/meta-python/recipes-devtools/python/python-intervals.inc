@@ -2,8 +2,8 @@ DESCRIPTION = "Interval arithmetic for Python"
 HOMEPAGE = "https://github.com/AlexandreDecan/python-intervals"
 SECTION = "devel/python"
 
-LICENSE = "BSD-3-Clause"
-LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/BSD-3-Clause;md5=550794465ba0ec5312d6919e203a55f9"
+LICENSE = "LGPLv3"
+LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=05f1e16a8e59ce3e9a979e881816c2ab"
 
 PYPI_PACKAGE := "python-intervals"
 

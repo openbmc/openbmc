@@ -1,0 +1,40 @@
+From 83a1381e1d6bd1b5ec3df6f7c4bc1f4fe4f860b6 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Thu, 15 Jun 2017 14:44:01 +0800
+Subject: [PATCH] xmlsec1: add new recipe
+
+This enables the building of the examples directory
+and it's installed as ptest.
+
+Upstream-Status: Inappropriate [ OE ptest specific ]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+
+---
+ examples/Makefile | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/examples/Makefile b/examples/Makefile
+index 89b1d61..c1cbcca 100644
+--- a/examples/Makefile
++++ b/examples/Makefile
+@@ -8,9 +8,17 @@ PROGRAMS = \
+ 	decrypt1 decrypt2 decrypt3 \
+ 	xmldsigverify
+ 
++ifndef CC
+ CC	= gcc
+-CFLAGS	+= -g $(shell xmlsec1-config --cflags) -DUNIX_SOCKETS
+-LDLIBS	+= -g $(shell xmlsec1-config --libs)
++endif
++
++CFLAGS  += -I../include -g $(shell PKG_CONFIG_PATH=.. pkg-config --cflags xmlsec1 ) -DUNIX_SOCKETS
++LDLIBS += -L../src/.libs -g $(shell PKG_CONFIG_PATH=.. pkg-config --libs xmlsec1 )
++
++DESTDIR = /usr/share/xmlsec1
++install-ptest:
++	if [ ! -d $(DESTDIR) ]; then mkdir -p $(DESTDIR); fi
++	cp * $(DESTDIR)
+ 
+ all: $(PROGRAMS)
+ 

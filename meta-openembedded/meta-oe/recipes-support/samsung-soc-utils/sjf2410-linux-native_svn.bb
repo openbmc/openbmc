@@ -27,8 +27,7 @@ do_install() {
 }
 
 do_deploy() {
-    install -d ${DEPLOY_DIR_TOOLS}
-    install -m 0755 sjf2410 ${DEPLOY_DIR_TOOLS}/sjf2410-${PV}
+    install -m 0755 sjf2410 ${DEPLOYDIR}/sjf2410-${PV}
 }
 
 addtask deploy before do_build after do_install

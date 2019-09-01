@@ -8,7 +8,7 @@ SECTION = "devel/lib"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=c07cb499d259452f324bb90c3067d85c"
 
-inherit autotools python3native gobject-introspection
+inherit autotools gobject-introspection
 
 SRCREV = "f6e4538485d0442b3674e182c01ffe5a0f258ad4"
 SRC_URI = " \
@@ -17,11 +17,11 @@ SRC_URI = " \
 
 S = "${WORKDIR}/git"
 
-FILES_${PN} += "${PYTHON_SITEPACKAGES_DIR}"
+FILES_${PN} += "${libdir}/python2.7/dist-packages ${libdir}/python3.7/site-packages"
 
 PACKAGECONFIG ??= "python3 lvm dm kmod parted fs escrow btrfs crypto mdraid kbd mpath nvdimm"
 PACKAGECONFIG[python3] = "--with-python3, --without-python3,,python3"
-PACKAGECONFIG[python2] = "--with-python2, --without-python2,,python2"
+PACKAGECONFIG[python2] = "--with-python2, --without-python2,,python"
 PACKAGECONFIG[lvm] = "--with-lvm, --without-lvm, multipath-tools, lvm2"
 PACKAGECONFIG[lvm-dbus] = "--with-lvm_dbus, --without-lvm_dbus, multipath-tools, lvm2"
 PACKAGECONFIG[dm] = "--with-dm, --without-dm, multipath-tools, lvm2"

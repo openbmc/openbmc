@@ -19,6 +19,7 @@ and deletion"
 HOMEPAGE = "http://christophe.varoqui.free.fr/"
 
 DEPENDS = "libdevmapper \
+           lvm2 \
            libaio \
            liburcu \
            readline \
@@ -108,4 +109,4 @@ FILES_kpartx = "${base_sbindir}/kpartx \
                 ${nonarch_libdir}/udev/kpartx_id \
                "
 
-RDEPENDS_${PN} += "bash kpartx"
+RDEPENDS_${PN} += "kpartx"

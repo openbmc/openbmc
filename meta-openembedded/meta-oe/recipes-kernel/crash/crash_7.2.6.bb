@@ -117,4 +117,4 @@ RDEPENDS_${PN}_class-cross = ""
 ARM_INSTRUCTION_SET = "arm"
 
 # http://errors.yoctoproject.org/Errors/Details/186964/
-EXCLUDE_FROM_WORLD_libc-musl = "1"
+COMPATIBLE_HOST_libc-musl = 'null'

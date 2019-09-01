@@ -2,7 +2,7 @@ require lvm2.inc
 
 SRCREV = "913c28917e62577a2ef67152b2e5159237503dda"
 
-SRC_URI += "file://0001-explicitly-do-not-install-libdm.patch \
+SRC_URI += " \
             file://0001-dev-hdc-open-failed-No-medium-found-will-print-out-i.patch \
            "
 
@@ -46,6 +46,13 @@ LVM2_PACKAGECONFIG_append_class-target = " \
 "
 PACKAGECONFIG[udev] = "--enable-udev_sync --enable-udev_rules --with-udevdir=${nonarch_base_libdir}/udev/rules.d,--disable-udev_sync --disable-udev_rules,udev"
 
+PACKAGES =+ "libdevmapper"
+FILES_libdevmapper = " \
+    ${libdir}/libdevmapper.so.* \
+    ${sbindir}/dmsetup \
+    ${sbindir}/dmstats \
+"
+
 FILES_${PN} += "${libdir}/device-mapper/*.so"
 FILES_${PN}-scripts = " \
     ${sbindir}/blkdeactivate \
@@ -64,5 +71,14 @@ RDEPENDS_${PN}-scripts = "${PN} (= ${EXTENDPKGV}) bash"
 RRECOMMENDS_${PN}_class-target = "${PN}-scripts (= ${EXTENDPKGV})"
 
 CONFFILES_${PN} += "${sysconfdir}/lvm/lvm.conf"
+
+SYSROOT_PREPROCESS_FUNCS_append = " remove_libdevmapper_sysroot_preprocess"
+remove_libdevmapper_sysroot_preprocess() {
+    rm -f ${SYSROOT_DESTDIR}${libdir}/libdevmapper.so* \
+       ${SYSROOT_DESTDIR}${sbindir}/dmsetup \
+       ${SYSROOT_DESTDIR}${sbindir}/dmstats \
+       ${SYSROOT_DESTDIR}${includedir}/libdevmapper.h \
+       ${SYSROOT_DESTDIR}${libdir}/pkgconfig/devmapper.pc
+}
 
 BBCLASSEXTEND = "native nativesdk"

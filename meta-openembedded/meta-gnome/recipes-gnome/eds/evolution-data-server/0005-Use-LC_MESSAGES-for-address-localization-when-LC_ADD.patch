@@ -1,0 +1,33 @@
+From 95425206e7317e59b7ca06d7f838ad357cdd200c Mon Sep 17 00:00:00 2001
+From: Piotr Tworek <tworaz@tworaz.net>
+Date: Wed, 14 Aug 2019 00:31:54 +0200
+Subject: [PATCH 5/7] Use LC_MESSAGES for address localization when LC_ADDRESS
+ is not available.
+
+Musl does not define LC_ADDRESS unfortunately.
+
+Upstream-Status: Inappropriate [musl specific]
+
+Signed-off-by: Piotr Tworek <tworaz@tworaz.net>
+---
+ src/addressbook/libebook-contacts/e-phone-number-private.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/addressbook/libebook-contacts/e-phone-number-private.cpp b/src/addressbook/libebook-contacts/e-phone-number-private.cpp
+index 4c5aebb..9abcebd 100644
+--- a/src/addressbook/libebook-contacts/e-phone-number-private.cpp
++++ b/src/addressbook/libebook-contacts/e-phone-number-private.cpp
+@@ -36,6 +36,10 @@
+ #include <phonenumbers/logger.h>
+ #include <phonenumbers/phonenumberutil.h>
+ 
++#ifndef LC_ADDRESS
++#define LC_ADDRESS LC_MESSAGES
++#endif
++
+ using i18n::phonenumbers::PhoneNumber;
+ using i18n::phonenumbers::PhoneNumberUtil;
+ 
+-- 
+2.21.0
+

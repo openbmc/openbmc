@@ -62,5 +62,5 @@ SRC_URI[sha256sum] = "9c80d5c7838361a328fb6b60016d503def9ce53ad3c589f3b08ff71a2b
 FILES_${PN} += "${sbindir}/in.* ${libdir}/* ${sysconfdir}/xinetd.d/*"
 
 # http://errors.yoctoproject.org/Errors/Details/186954/
-EXCLUDE_FROM_WORLD_libc-musl = "1"
+COMPATIBLE_HOST_libc-musl = 'null'
 RCONFLICTS_${PN} = "inetutils-telnetd"

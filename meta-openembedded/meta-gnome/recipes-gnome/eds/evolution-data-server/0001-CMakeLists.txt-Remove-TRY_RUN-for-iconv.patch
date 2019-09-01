@@ -1,7 +1,7 @@
-From 131b88a81aba3d72d566bc8a9d968941a98e0007 Mon Sep 17 00:00:00 2001
+From e32075119803f9fffbba01a31083e416cb213011 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 Date: Tue, 19 Dec 2017 16:37:20 +0100
-Subject: [PATCH] CMakeLists.txt: Remove TRY_RUN for iconv
+Subject: [PATCH 1/7] CMakeLists.txt: Remove TRY_RUN for iconv
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -13,18 +13,20 @@ Upstream-Status: Inappropriate [OE specific]
 
 Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
 ---
- CMakeLists.txt | 5 -----
- 1 file changed, 5 deletions(-)
+ CMakeLists.txt | 6 ------
+ 1 file changed, 6 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 8d07772..a2396f2 100644
+index f9d72db..ed99904 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -521,13 +521,8 @@ if(NOT HAVE_ICONV)
- endif(NOT HAVE_ICONV)
+@@ -526,15 +526,9 @@ endif(NOT HAVE_ICONV)
  
  set(CMAKE_REQUIRED_LIBRARIES ${ICONV_LIBS})
--CHECK_C_SOURCE_RUNS("#include \"${CMAKE_SOURCE_DIR}/iconv-detect.c\"" _correct_iconv)
+ file(TO_NATIVE_PATH "${CMAKE_BINARY_DIR}/" _binary_dir_with_separator)
+-CHECK_C_SOURCE_RUNS("#define ICONV_DETECT_BUILD_DIR \"${_binary_dir_with_separator}\"
+-		     #include \"${CMAKE_SOURCE_DIR}/iconv-detect.c\"" _correct_iconv)
+ unset(_binary_dir_with_separator)
  unset(CMAKE_REQUIRED_LIBRARIES)
  
 -if(NOT _correct_iconv)
@@ -35,5 +37,5 @@ index 8d07772..a2396f2 100644
  # Backtraces for debugging
  # ******************************
 -- 
-2.14.3
+2.21.0
 

@@ -46,7 +46,7 @@ do_install_ptest () {
 }
 
 
-RDEPENDS_${PN}-ptest += "lsb"
+RDEPENDS_${PN}-ptest += "lsb-release"
 RDEPENDS_${PN}-ptest_append_libc-glibc = " glibc-utils"
 RDEPENDS_${PN}-ptest_append_libc-musl = " musl-utils"
 

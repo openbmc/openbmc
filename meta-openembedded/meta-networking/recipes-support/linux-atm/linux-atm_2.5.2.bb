@@ -12,6 +12,7 @@ SRC_URI = "http://nchc.dl.sourceforge.net/project/${BPN}/${BPN}/${PV}/${BPN}-${P
            file://0001-ttcp-Add-printf-format-string.patch \
            file://0003-mpoad-Drop-old-hack-to-compile-with-very-old-glibc.patch \
            file://0001-IFNAMSIZ-is-defined-in-net-if.h.patch \
+           file://0001-saaldump-atmdump-Include-linux-sockios.h-for-SIOCGST.patch \
 "
 
 SRC_URI_append_libc-musl = " file://musl-no-on_exit.patch"

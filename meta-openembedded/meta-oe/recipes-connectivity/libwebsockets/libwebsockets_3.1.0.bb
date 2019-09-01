@@ -28,3 +28,5 @@ EXTRA_OECMAKE += " \
 PACKAGES =+ "${PN}-testapps"
 
 FILES_${PN}-testapps += "${datadir}/libwebsockets-test-server/*"
+
+CFLAGS_append = " -Wno-error"

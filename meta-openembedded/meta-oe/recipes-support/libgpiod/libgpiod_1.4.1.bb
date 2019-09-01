@@ -12,7 +12,8 @@ PACKAGECONFIG[cxx] = "--enable-bindings-cxx,--disable-bindings-cxx"
 PACKAGECONFIG[tests] = "--enable-tests,--disable-tests,kmod udev"
 
 PACKAGECONFIG[python3] = "--enable-bindings-python,--disable-bindings-python,python3"
-inherit ${@bb.utils.contains('PACKAGECONFIG', 'python3', 'python3native', '', d)}
+
+inherit python3native
 
 PACKAGES =+ "${PN}-python"
 FILES_${PN}-python = "${PYTHON_SITEPACKAGES_DIR}"
