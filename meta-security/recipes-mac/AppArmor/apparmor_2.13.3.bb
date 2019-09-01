@@ -24,7 +24,7 @@ SRC_URI = " \
 	file://run-ptest \
 	"
 
-SRCREV = "af4808b5f6b58946f5c5a4de4b77df5e0eae6ca0"
+SRCREV = "2f9d9ea7e01a115b29858455d3b1b5c6a0bab75c"
 S = "${WORKDIR}/git"
 
 PARALLEL_MAKE = ""
@@ -141,6 +141,12 @@ do_install_ptest () {
 	cp -rf ${B}/binutils ${t}
 }
 
+pkg_postinst_ontarget_${PN} () {
+if [ ! -d /etc/apparmor.d/cache ] ; then
+    mkdir /etc/apparmor.d/cache
+fi
+}
+
 INITSCRIPT_PACKAGES = "${PN}"
 INITSCRIPT_NAME = "apparmor"
 INITSCRIPT_PARAMS = "start 16 2 3 4 5 . stop 35 0 1 6 ."
@@ -155,6 +161,6 @@ FILES_${PN} += "/lib/apparmor/ ${sysconfdir}/apparmor ${PYTHON_SITEPACKAGES_DIR}
 FILES_mod-${PN} = "${libdir}/apache2/modules/*"
 
 RDEPENDS_${PN} += "bash lsb"
-RDEPENDS_${PN} += "${@bb.utils.contains('PACKAGECONFIG','python','python3 python3-modules','', d)}"
+RDEPENDS_${PN} += "${@bb.utils.contains('PACKAGECONFIG','python','python3-core python3-modules','', d)}"
 RDEPENDS_${PN}_remove += "${@bb.utils.contains('PACKAGECONFIG','perl','','perl', d)}"
 RDEPENDS_${PN}-ptest += "perl coreutils dbus-lib bash"

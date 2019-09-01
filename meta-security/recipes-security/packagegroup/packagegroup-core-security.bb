@@ -29,7 +29,6 @@ RDEPENDS_packagegroup-security-utils = "\
     pinentry \
     python-scapy \
     ding-libs \
-    xmlsec1 \
     keyutils \
     libseccomp \
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "sssd", "",d)} \

@@ -13,7 +13,6 @@ SUMMARY_${PN} = "Security packages with ptests"
 RDEPENDS_${PN} = " \
     ptest-runner \
     samhain-standalone-ptest \
-    xmlsec1-ptest \
     keyutils-ptest \
     libseccomp-ptest \
     python-scapy-ptest \

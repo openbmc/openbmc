@@ -1,0 +1,32 @@
+From ab671b02e3aaf65dd1fd279789ea933b8140fe52 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Tue, 27 Aug 2019 16:08:00 +0800
+Subject: [PATCH] avoid race condition
+
+The rootsbin directory is self defined. The install-rootsbinPROGRAMS
+is actually treated as part of install-data.
+
+This would avoid race condition which causes install failure.
+
+Upstream-Status: Pending
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/utils/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/utils/Makefile.am b/src/utils/Makefile.am
+index 83cf851..344883a 100644
+--- a/src/utils/Makefile.am
++++ b/src/utils/Makefile.am
+@@ -67,6 +67,6 @@ ecryptfs_stat_LDADD = $(top_builddir)/src/libecryptfs/libecryptfs.la
+ test_SOURCES = test.c io.c
+ test_LDADD = $(top_builddir)/src/libecryptfs/libecryptfs.la
+ 
+-install-exec-hook:	install-rootsbinPROGRAMS
++install-data-hook:	install-rootsbinPROGRAMS
+ 	-rm -f "$(DESTDIR)/$(rootsbindir)/umount.ecryptfs_private"
+ 	$(LN_S) "mount.ecryptfs_private" "$(DESTDIR)/$(rootsbindir)/umount.ecryptfs_private"
+-- 
+2.17.1
+
