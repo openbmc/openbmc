@@ -94,6 +94,19 @@ cases.
 GitHub.  It is recommended you search through the issues before opening
 a new one.
 
+## Questions
+
+First, please do a search on the internet. There's a good chance your question
+has already been asked.
+
+For general questions, please use the openbmc tag on
+[Stack Overflow](https://stackoverflow.com/questions/tagged/openbmc).
+Please review the [discussion](https://meta.stackexchange.com/questions/272956/a-new-code-license-the-mit-this-time-with-attribution-required?cb=1)
+on Stack Overflow licensing before posting any code.
+
+For technical discussions, please see [contact info](#contact) below for IRC and
+mailing list information.
+
 ## Features of OpenBMC
 
 **Feature List**
