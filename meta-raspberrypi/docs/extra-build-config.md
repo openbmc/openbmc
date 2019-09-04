@@ -219,7 +219,7 @@ needs a fixed core frequency and enable_uart wil set it to the minimum. Certain
 operations - 60fps h264 decode, high quality deinterlace - which aren't
 performed on the ARM may be affected, and we wouldn't want to do that to users
 who don't want to use the serial port. Users who want serial console support on
-RaspberryPi3 will have to explicitly set in local.conf:
+RaspberryPi 0 Wifi or 3 will have to explicitly set in local.conf:
 
     ENABLE_UART = "1"
 
