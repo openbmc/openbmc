@@ -8,7 +8,7 @@ PE = "1"
 
 # We use the revision in order to avoid having to fetch it from the
 # repo during parse
-SRCREV = "3d624802e82868bc5c2b6314cdff7499d8441761"
+SRCREV = "9b5fc98374593c49133b709f71119222ecfff3eb"
 
 UBRANCH = "aspeed-dev-v2019.04"
 SRC_URI = "git://github.com/AspeedTech-BMC/u-boot;branch=${UBRANCH};protocol=https"
