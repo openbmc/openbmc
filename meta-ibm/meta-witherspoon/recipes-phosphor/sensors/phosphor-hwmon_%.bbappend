@@ -1,5 +1,7 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
+EXTRA_OECONF_append_mihawk = " --enable-negative-errno-on-fail"
+
 SRC_URI_append_ibm-ac-server = " \
            file://70-hwmon.rules \
            file://70-max31785-hwmon.rules \
