@@ -81,6 +81,7 @@ IMAGE_FEATURES += " \
         "
 
 IMAGE_FEATURES_append_df-obmc-ubi-fs = " read-only-rootfs"
+IMAGE_FEATURES_append_df-phosphor-mmc = " read-only-rootfs"
 
 CORE_IMAGE_EXTRA_INSTALL_append = " bash \
         packagegroup-obmc-apps-extras \
