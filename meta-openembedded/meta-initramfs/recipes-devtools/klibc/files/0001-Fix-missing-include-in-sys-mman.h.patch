@@ -1,0 +1,36 @@
+From 36360b16833400de7818151be5588b16ac4fd5bc Mon Sep 17 00:00:00 2001
+From: Barret Rhoden <brho@google.com>
+Date: Thu, 14 Mar 2019 17:30:38 -0400
+Subject: [PATCH] Fix missing include in sys/mman.h
+
+Linux commit 746c9398f5ac ("arch: move common mmap flags to
+linux/mman.h") moved a few mmap flags, particularly MAP_PRIVATE, from
+asm/mman.h to linux/mman.h.  This broke klibc's build, which uses
+MAP_PRIVATE.
+
+linux/mman.h includes asm/mman.h, so this commit merely includes
+linux/mman.h instead of asm/mman.h.
+
+Signed-off-by: Barret Rhoden <brho@google.com>
+Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+---
+Upstream-Status: Backport [https://git.kernel.org/pub/scm/libs/klibc/klibc.git/commit/?id=d4853d030639cf3542ae39129c18b654d8d4f020]
+ usr/include/sys/mman.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/usr/include/sys/mman.h b/usr/include/sys/mman.h
+index 56f0b65c..3fd626e7 100644
+--- a/usr/include/sys/mman.h
++++ b/usr/include/sys/mman.h
+@@ -7,7 +7,7 @@
+ 
+ #include <klibc/extern.h>
+ #include <sys/types.h>
+-#include <asm/mman.h>
++#include <linux/mman.h>
+ 
+ #define MAP_FAILED ((void *)-1)
+ 
+-- 
+2.23.0
+

@@ -104,7 +104,7 @@ RDEPENDS_packagegroup-meta-oe-dbs ="\
 RDEPENDS_packagegroup-meta-oe-devtools ="\
     android-tools android-tools-conf bootchart breakpad \
     capnproto cgdb cscope ctags \
-    debootstrap dejagnu dmalloc flatbuffers \
+    debootstrap dmalloc flatbuffers \
     giflib icon-slicer iptraf-ng jq jsoncpp jsonrpc json-spirit \
     kconfig-frontends lemon libedit libgee libsombok3 \
     libubox log4cplus lshw ltrace lua mcpp memstat mercurial \
@@ -138,7 +138,7 @@ RDEPENDS_packagegroup-meta-oe-extended ="\
     p7zip p8platform libfile-fnmatch-perl \
     rarpd redis rrdtool libfastjson librelp rsyslog sanlock \
     sblim-cmpi-devel sblim-sfc-common sblim-sfcc \
-    scsirastools sgpio smartmontools snappy can-isotp \
+    scsirastools sgpio smartmontools snappy \
     can-utils libsocketcan tipcutils tiptop \
     tmux uml-utilities upm vlock volume-key wipe zlog zram \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11 wayland opengl", "boinc-client", "", d)} \
@@ -181,10 +181,10 @@ RDEPENDS_packagegroup-meta-oe-graphics ="\
     "
 
 RDEPENDS_packagegroup-meta-oe-kernel ="\
-    agent-proxy bpftool broadcom-bt-firmware cpupower \
+    agent-proxy broadcom-bt-firmware cpupower \
     crash ipmitool minicoredumper oprofile \
     "
-RDEPENDS_packagegroup-meta-oe-kernel_remove_libc-musl = "bpftool crash minicoredumper"
+RDEPENDS_packagegroup-meta-oe-kernel_remove_libc-musl = "crash minicoredumper"
 
 RDEPENDS_packagegroup-meta-oe-kernel_remove_mips64 = "crash"
 RDEPENDS_packagegroup-meta-oe-kernel_remove_mips64el = "crash"

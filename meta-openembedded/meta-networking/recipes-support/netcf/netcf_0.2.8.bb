@@ -16,7 +16,7 @@ UPSTREAM_CHECK_GITTAGREGEX = "release-(?P<pver>(\d+(\.\d+)+))"
 
 DEPENDS += "augeas libnl libxslt libxml2"
 
-do_configure[depends] += "gnulib:do_populate_sysroot"
+do_configure[depends] += "${MLPREFIX}gnulib:do_populate_sysroot"
 
 S = "${WORKDIR}/git"
 

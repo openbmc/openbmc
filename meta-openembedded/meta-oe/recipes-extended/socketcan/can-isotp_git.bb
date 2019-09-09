@@ -10,3 +10,5 @@ S = "${WORKDIR}/git"
 inherit module
 
 EXTRA_OEMAKE += "KERNELDIR=${STAGING_KERNEL_DIR}"
+
+PNBLACKLIST[can-isotp] = "Kernel module Needs forward porting to kernel 5.2+"

@@ -10,6 +10,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=5574c6965ae5f583e55880e397fbb018"
 
 SRC_URI = "git://github.com/LINBIT/drbd-utils;name=drbd-utils \
            git://github.com/LINBIT/drbd-headers;name=drbd-headers;destsuffix=git/drbd-headers \
+           ${@bb.utils.contains('DISTRO_FEATURES','usrmerge','file://0001-drbd-utils-support-usrmerge.patch','',d)} \
           "
 # v9.10.0
 SRCREV_drbd-utils = "859151b228d3b3aacefb09d06d515a2589c22e35"
@@ -38,17 +39,6 @@ EXTRA_OECONF = " \
 # If we have inherited reproducible_build, we want to use it.
 export WANT_DRBD_REPRODUCIBLE_BUILD = "yes"
 
-do_configure_prepend() {
-    # move the the file under folder /lib/drbd/ to /usr/lib/drbd when usrmerge enabled
-    if ${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', 'true', 'false', d)}; then
-        for m_file in `find ${S} -name 'Makefile.in'`; do
-            sed -i -e "s;\$(DESTDIR)\/lib\/drbd;\$(DESTDIR)\${nonarch_libdir}\/drbd;g" $m_file
-        done
-        # move the the file under folder /lib/udev/ to /usr/lib/udev when usrmerge enabled
-        sed -i -e "s;default_udevdir=/lib/udev;default_udevdir=\${prefix}/lib/udev;g" ${S}/configure.ac
-    fi
-
-}
 do_install_append() {
     # don't install empty /var/lock and /var/run to avoid conflict with base-files
     rm -rf ${D}${localstatedir}/lock

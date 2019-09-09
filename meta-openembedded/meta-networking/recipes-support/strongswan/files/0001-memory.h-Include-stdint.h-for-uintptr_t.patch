@@ -9,13 +9,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  src/libstrongswan/utils/utils/memory.h | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/src/libstrongswan/utils/utils/memory.h b/src/libstrongswan/utils/utils/memory.h
-index e840330..8a356a8 100644
 --- a/src/libstrongswan/utils/utils/memory.h
 +++ b/src/libstrongswan/utils/utils/memory.h
-@@ -22,6 +22,8 @@
- #ifndef MEMORY_H_
- #define MEMORY_H_
+@@ -26,6 +26,8 @@
+ #include <string.h>
+ #endif
  
 +#include <stdint.h>
 +

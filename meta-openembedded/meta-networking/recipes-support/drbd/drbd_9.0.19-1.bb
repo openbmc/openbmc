@@ -21,3 +21,5 @@ EXTRA_OEMAKE += "KDIR='${STAGING_KERNEL_DIR}'"
 do_install () {
     oe_runmake install DESTDIR="${D}"
 }
+
+PNBLACKLIST[drbd] = "Kernel module Needs forward porting to kernel 5.2+"

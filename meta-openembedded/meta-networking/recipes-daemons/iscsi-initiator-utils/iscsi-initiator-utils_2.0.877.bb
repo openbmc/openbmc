@@ -7,11 +7,11 @@ disk access using SCSI commands sent over Internet Protocol networks."
 HOMEPAGE = "http://www.open-iscsi.com/"
 LICENSE = "GPLv2 & LGPLv2.1"
 SECTION = "net"
-DEPENDS = "openssl flex-native bison-native open-isns util-linux"
+DEPENDS = "openssl flex-native bison-native open-isns util-linux kmod"
 
-LIC_FILES_CHKSUM = "file://COPYING;md5=393a5ca445f6965873eca0259a17f833"
+LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-SRCREV ?= "bd79e4ed1004a6035d2538a308c5930890421a22"
+SRCREV ?= "120ac127654c4644d46a74799fffe527ab1f4f42"
 
 SRC_URI = "git://github.com/open-iscsi/open-iscsi \
            file://0001-Fix-i586-build-issues-with-string-length-overflow.patch \
@@ -21,13 +21,15 @@ SRC_URI = "git://github.com/open-iscsi/open-iscsi \
            file://iscsi-initiator.service \
            file://iscsi-initiator-targets.service \
            file://set_initiatorname \
+           file://0001-Use-pkg-config-in-Makefiles-for-newer-libraries.patch \
+           file://0001-Make-iscsid-systemd-usage-optional.patch \
            "
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
 PV .= "+git${SRCPV}"
 
-inherit update-rc.d systemd autotools
+inherit update-rc.d systemd autotools pkgconfig
 
 EXTRA_OECONF = " \
     --target=${TARGET_SYS} \
@@ -39,6 +41,9 @@ EXTRA_OEMAKE = ' \
     TARGET="${TARGET_OS}" \
     BASE="${prefix}" \
     MANDIR="${mandir}" \
+    OPTFLAGS="-DNO_SYSTEMD ${CFLAGS}" \
+    PKG_CONFIG="${STAGING_BINDIR_NATIVE}/pkg-config" \
+    NO_SYSTEMD=1 \
 '
 
 do_configure () {

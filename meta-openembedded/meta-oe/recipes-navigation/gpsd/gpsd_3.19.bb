@@ -124,7 +124,6 @@ RDEPENDS_python-pygps = " \
     python-io \
     python-threading \
     python-terminal \
-    python-curses \
     gpsd \
     python-json"
 

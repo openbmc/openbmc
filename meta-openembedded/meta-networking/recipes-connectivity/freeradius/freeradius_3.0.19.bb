@@ -13,12 +13,11 @@ LICENSE = "GPLv2 & LGPLv2+"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=eb723b61539feef013de476e68b5c50a"
 DEPENDS = "openssl-native openssl libidn libtool libpcap libtalloc"
 
-SRC_URI = "ftp://ftp.freeradius.org/pub/freeradius/freeradius-server-${PV}.tar.bz2 \
+SRC_URI = "git://github.com/FreeRADIUS/freeradius-server.git;branch=v3.0.x; \
     file://freeradius \
     file://volatiles.58_radiusd \
     file://freeradius-enble-user-in-conf.patch \
     file://freeradius-configure.ac-allow-cross-compilation.patch \
-    file://freeradius-fix-issues-related-to-m4-include-path.patch \
     file://freeradius-libtool-detection.patch \
     file://freeradius-configure.ac-add-option-for-libcap.patch \
     file://freeradius-avoid-searching-host-dirs.patch \
@@ -29,14 +28,16 @@ SRC_URI = "ftp://ftp.freeradius.org/pub/freeradius/freeradius-server-${PV}.tar.b
     file://0001-rlm_mschap-Use-includedir-instead-of-hardcoding-usr-.patch \
     file://radiusd.service \
     file://radiusd-volatiles.conf \
-    file://0001-freeradius-correct-version-number-of-libssl-defect.patch \
 "
-SRC_URI[md5sum] = "1f4ad38f32101a7d50d818afa6f17339"
-SRC_URI[sha256sum] = "3f03404b6e4a4f410e1f15ea2ababfec7f8a7ae8a49836d8a0c137436d913b96"
+
+SRCREV = "ab4c767099f263a7cd4109bcdca80ee74210a769"
 
 PARALLEL_MAKE = ""
 
-S = "${WORKDIR}/freeradius-server-${PV}"
+S = "${WORKDIR}/git"
+
+LDFLAGS_append_powerpc = " -latomic"
+LDFLAGS_append_mipsarch = " -latomic"
 
 EXTRA_OECONF = " --enable-strict-dependencies \
         --with-docdir=${docdir}/freeradius-${PV} \
@@ -59,6 +60,8 @@ EXTRA_OECONF = " --enable-strict-dependencies \
         --without-rlm_sql_oracle \
         --without-rlm_sql_sybase \
         --without-rlm_sqlhpwippool \
+        --without-rlm_securid \
+        --without-rlm_unbound \
         ac_cv_path_PERL=${bindir}/perl \
         ax_cv_cc_builtin_choose_expr=no \
         ax_cv_cc_builtin_types_compatible_p=no \

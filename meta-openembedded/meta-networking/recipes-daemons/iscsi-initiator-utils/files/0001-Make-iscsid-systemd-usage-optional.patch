@@ -1,0 +1,88 @@
+From 365efb2fd3062065af4b6eb3dc1661b96557dae8 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Wed, 21 Aug 2019 16:37:53 +0800
+Subject: [PATCH] Make iscsid systemd usage optional
+
+Upstream-Status: Backport[https://github.com/open-iscsi/open-iscsi
+/commit/f71581bd641dc26d330cb8b97e5ec272dd08f811]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ Makefile     |  5 +++++
+ usr/Makefile |  2 ++
+ usr/iscsid.c | 6 ++++++
+ 3 files changed, 13 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index c533e9d..1ef0921 100644
+--- a/Makefile
++++ b/Makefile
+@@ -39,6 +39,11 @@ ifneq (,$(CFLAGS))
+ export CFLAGS
+ endif
+ 
++# export systemd disablement if set
++ifneq ($(NO_SYSTEMD),)
++export NO_SYSTEMD
++endif
++
+ # Random comments:
+ # using '$(MAKE)' instead of just 'make' allows make to run in parallel
+ # over multiple makefile.
+diff --git a/usr/Makefile b/usr/Makefile
+index f9445ad..0203127 100644
+--- a/usr/Makefile
++++ b/usr/Makefile
+@@ -41,7 +41,9 @@ CFLAGS += $(WARNFLAGS) -I../include -I. -D_GNU_SOURCE \
+ CFLAGS += $(shell $(PKG_CONFIG) --cflags libkmod)
+ ISCSI_LIB = -L$(TOPDIR)/libopeniscsiusr -lopeniscsiusr
+ LDFLAGS += $(shell $(PKG_CONFIG) --libs libkmod)
++ifneq ($(NO_SYSTEMD),)
+ LDFLAGS += $(shell $(PKG_CONFIG) --libs libsystemd)
++endif
+ PROGRAMS = iscsid iscsiadm iscsistart
+ 
+ # libc compat files
+diff --git a/usr/iscsid.c b/usr/iscsid.c
+index 0c98440..164325e 100644
+--- a/usr/iscsid.c
++++ b/usr/iscsid.c
+@@ -34,7 +34,9 @@
+ #include <sys/wait.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
++#ifndef	NO_SYSTEMD
+ #include <systemd/sd-daemon.h>
++#endif
+ 
+ #include "iscsid.h"
+ #include "mgmt_ipc.h"
+@@ -339,6 +341,7 @@ static void missing_iname_warn(char *initiatorname_file)
+ /* called right before we enter the event loop */
+ static void set_state_to_ready(void)
+ {
++#ifndef	NO_SYSTEMD
+ 	if (sessions_to_recover)
+ 		sd_notify(0, "READY=1\n"
+ 				"RELOADING=1\n"
+@@ -346,14 +349,17 @@ static void set_state_to_ready(void)
+ 	else
+ 		sd_notify(0, "READY=1\n"
+ 				"STATUS=Ready to process requests\n");
++#endif
+ }
+ 
+ /* called when recovery process has been reaped */
+ static void set_state_done_reloading(void)
+ {
++#ifndef NO_SYSTEMD
+ 	sessions_to_recover = 0;
+ 	sd_notifyf(0, "READY=1\n"
+ 			"STATUS=Ready to process requests\n");
++#endif
+ }
+ 
+ int main(int argc, char *argv[])
+-- 
+2.7.4
+

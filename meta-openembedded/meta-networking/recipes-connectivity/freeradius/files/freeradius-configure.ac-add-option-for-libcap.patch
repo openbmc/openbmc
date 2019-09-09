@@ -1,20 +1,21 @@
-From 74eed61dec8702c89f3e121d577ea9db25c961a4 Mon Sep 17 00:00:00 2001
-From: Jackie Huang <jackie.huang@windriver.com>
-Date: Mon, 11 Jan 2016 02:52:16 -0500
-Subject: [PATCH] configure.ac: add option for libcap
+From 98a9eff357959d1113e33a615c2178751d5b2054 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Thu, 22 Aug 2019 10:50:21 +0800
+Subject: [PATCH 2/2] configure.ac: add option for libcap
 
 Upstream-Status: Pending
 
 Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
- configure.ac | 37 ++++++++++++++++++++++++++++---------
- 1 file changed, 28 insertions(+), 9 deletions(-)
+ configure.ac | 36 +++++++++++++++++++++++++++---------
+ 1 file changed, 27 insertions(+), 9 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 066d3d7..6e4266b 100644
+index 65db61e..6486aac 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -948,6 +948,23 @@ fi
+@@ -977,6 +977,22 @@ fi
  dnl Set by FR_SMART_CHECKLIB
  LIBS="${old_LIBS}"
  
@@ -34,11 +35,10 @@ index 066d3d7..6e4266b 100644
 +  esac ]
 +)
 +
-+
  dnl Check for cap
  dnl extra argument: --with-cap-lib-dir=DIR
  cap_lib_dir=
-@@ -981,15 +998,17 @@ AC_ARG_WITH(cap-include-dir,
+@@ -1010,15 +1026,17 @@ AC_ARG_WITH(cap-include-dir,
        ;;
    esac])
  
@@ -64,7 +64,7 @@ index 066d3d7..6e4266b 100644
 +  fi
  fi
  
- VL_LIB_READLINE
+ dnl #
 -- 
-1.9.1
+2.7.4
 

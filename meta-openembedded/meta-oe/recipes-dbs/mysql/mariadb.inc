@@ -28,7 +28,9 @@ S = "${WORKDIR}/mariadb-${PV}"
 
 BINCONFIG_GLOB = "mysql_config"
 
-inherit cmake gettext binconfig update-rc.d useradd systemd
+inherit cmake gettext binconfig update-rc.d useradd systemd multilib_script
+
+MULTILIB_SCRIPTS = "${PN}-server:${bindir}/mysql_install_db ${PN}-server:${bindir}/mysqld_safe"
 
 INITSCRIPT_PACKAGES = "${PN}-server ${PN}-setupdb"
 INITSCRIPT_NAME_${PN}-server = "mysqld"

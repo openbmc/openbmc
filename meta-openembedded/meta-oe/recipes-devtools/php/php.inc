@@ -172,10 +172,8 @@ do_install_append_class-target() {
     done
 
     if ${@bb.utils.contains('PACKAGECONFIG', 'apache2', 'true', 'false', d)}; then
-        install -d ${D}${libdir}/apache2/modules
         install -d ${D}${sysconfdir}/apache2/modules.d
         install -d ${D}${sysconfdir}/php/apache2-php${PHP_MAJOR_VERSION}
-        install -m 755  libs/libphp${PHP_MAJOR_VERSION}.so ${D}${libdir}/apache2/modules
         install -m 644  ${WORKDIR}/70_mod_php${PHP_MAJOR_VERSION}.conf ${D}${sysconfdir}/apache2/modules.d
         sed -i s,lib/,${libdir}/, ${D}${sysconfdir}/apache2/modules.d/70_mod_php${PHP_MAJOR_VERSION}.conf
         cat ${S}/php.ini-production | \
@@ -211,7 +209,7 @@ INITSCRIPT_PACKAGES = "${PN}-fpm"
 inherit update-rc.d
 
 FILES_${PN}-dbg =+ "${bindir}/.debug \
-                    ${libdir}/apache2/modules/.debug"
+                    ${libexecdir}/apache2/modules/.debug"
 FILES_${PN}-doc += "${PHP_LIBDIR}/php/doc"
 FILES_${PN}-cli = "${bindir}/php"
 FILES_${PN}-phar = "${bindir}/phar*"
@@ -237,7 +235,7 @@ FILES_${PN}-dev = "${includedir}/php ${PHP_LIBDIR}/build ${bindir}/phpize \
 FILES_${PN}-staticdev += "${PHP_LIBDIR}/extensions/*/*.a"
 FILES_${PN}-opcache = "${PHP_LIBDIR}/extensions/*/opcache${SOLIBSDEV}"
 FILES_${PN} = "${PHP_LIBDIR}/php"
-FILES_${PN} += "${bindir}"
+FILES_${PN} += "${bindir} ${libexecdir}/apache2"
 
 SUMMARY_${PN}-modphp = "PHP module for the Apache HTTP server"
 FILES_${PN}-modphp = "${libdir}/apache2 ${sysconfdir}"

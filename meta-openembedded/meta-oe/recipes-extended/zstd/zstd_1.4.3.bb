@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=c7f0b161edbe52f5f345a3d1311d0b32 \
 
 SRC_URI = "git://github.com/facebook/zstd.git;nobranch=1"
 
-SRCREV = "ff304e9e65e7cde17a637eea190a874c26c48634"
+SRCREV = "a3d655d2255481333e09ecca9855f1b37f757c52"
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+)"
 
 S = "${WORKDIR}/git"

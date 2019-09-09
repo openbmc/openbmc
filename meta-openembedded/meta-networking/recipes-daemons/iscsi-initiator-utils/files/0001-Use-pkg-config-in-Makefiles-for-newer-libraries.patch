@@ -1,0 +1,92 @@
+From e9b49664e969fd5cad1abef7b8b59e1fb8d02a47 Mon Sep 17 00:00:00 2001
+From: Lee Duncan <lduncan@suse.com>
+Date: Mon, 12 Nov 2018 13:10:04 -0800
+Subject: [PATCH] Use pkg-config in Makefiles for newer libraries.
+
+These two recently-added libraries can be in different
+locations on different distros, so use pkg-config to
+added the appropriate actions in the make files.
+
+Upstream-Status: Backport[https://github.com/open-iscsi/open-iscsi/commit/
+623a81123c494f5c69dc6616bd72e838862e2f1f#diff-c4bf6688222ad28c9719cfaf88c16329]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ libopeniscsiusr/Makefile |  8 +++++++-
+ usr/Makefile             | 11 ++++++++---
+ 2 files changed, 15 insertions(+), 4 deletions(-)
+
+diff --git a/libopeniscsiusr/Makefile b/libopeniscsiusr/Makefile
+index bf7c96c..a045a45 100644
+--- a/libopeniscsiusr/Makefile
++++ b/libopeniscsiusr/Makefile
+@@ -23,6 +23,8 @@ endif
+ INCLUDE_DIR ?= $(prefix)/include
+ PKGCONF_DIR ?= $(LIB_DIR)/pkgconfig
+ 
++PKG_CONFIG = /usr/bin/pkg-config
++
+ LIBISCSI_USR_DIR=$(TOPDIR)/libopeniscsiusr
+ 
+ LIBISCSI_USR_VERSION_MAJOR=0
+@@ -43,13 +45,17 @@ OBJS = context.o misc.o session.o sysfs.o iface.o idbm.o node.o default.o
+ 
+ CFLAGS ?= -O2 -g
+ CFLAGS += -Wall -Werror -Wextra -fvisibility=hidden -fPIC
++CFLAGS += $(shell $(PKG_CONFIG) --cflags libkmod)
++
++LDFLAGS += $(shell $(PKG_CONFIG) --libs libkmod)
+ 
+ LIBADD =
+ 
+ all: $(LIBS) $(LIBS_MAJOR) $(TESTS) doc
+ 
+ $(LIBS): $(OBJS)
+-	$(CC) $(CFLAGS) $(LDFLAGS) -shared -Wl,-soname=$@ -o $@ $(OBJS) $(LIBADD)
++	@echo CFLAGS= $(CFLAGS)
++	$(CC) $(CFLAGS) -shared -Wl,-soname=$@ -o $@ $(OBJS) $(LDFLAGS) $(LIBADD)
+ 	ln -sf $@ $(DEVLIB)
+ 
+ $(LIBS_MAJOR): $(LIBS)
+diff --git a/usr/Makefile b/usr/Makefile
+index f9445ad..f1c35aa 100644
+--- a/usr/Makefile
++++ b/usr/Makefile
+@@ -32,11 +32,16 @@ IPC_OBJ=ioctl.o
+ endif
+ endif
+ 
++PKG_CONFIG = /usr/bin/pkg-config
++
+ CFLAGS ?= -O2 -g
+ WARNFLAGS ?= -Wall -Wstrict-prototypes
+ CFLAGS += $(WARNFLAGS) -I../include -I. -D_GNU_SOURCE \
+ 	  -I$(TOPDIR)/libopeniscsiusr
++CFLAGS += $(shell $(PKG_CONFIG) --cflags libkmod)
+ ISCSI_LIB = -L$(TOPDIR)/libopeniscsiusr -lopeniscsiusr
++LDFLAGS += $(shell $(PKG_CONFIG) --libs libkmod)
++LDFLAGS += $(shell $(PKG_CONFIG) --libs libsystemd)
+ PROGRAMS = iscsid iscsiadm iscsistart
+ 
+ # libc compat files
+@@ -60,14 +65,14 @@ all: $(PROGRAMS)
+ 
+ iscsid: $(ISCSI_LIB_SRCS) $(INITIATOR_SRCS) $(DISCOVERY_SRCS) \
+ 	iscsid.o session_mgmt.o discoveryd.o mntcheck.o
+-	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@  -lisns -lcrypto -lrt -lmount $(ISCSI_LIB)
++	$(CC) $(CFLAGS) $^ -o $@  -lisns -lcrypto -lrt -lmount $(LDFLAGS) $(ISCSI_LIB)
+ 
+ iscsiadm: $(ISCSI_LIB_SRCS) $(DISCOVERY_SRCS) iscsiadm.o session_mgmt.o mntcheck.o
+-	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@ -lisns -lcrypto -lmount $(ISCSI_LIB)
++	$(CC) $(CFLAGS) $^ -o $@ -lisns -lcrypto -lmount $(LDFLAGS) $(ISCSI_LIB)
+ 
+ iscsistart: $(ISCSI_LIB_SRCS) $(INITIATOR_SRCS) $(FW_BOOT_SRCS) \
+ 		iscsistart.o statics.o
+-	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@ -lrt $(ISCSI_LIB)
++	$(CC) $(CFLAGS) $^ -o $@ -lrt $(LDFLAGS) $(ISCSI_LIB)
+ clean:
+ 	rm -f *.o $(PROGRAMS) .depend $(LIBSYS)
+ 
+-- 
+2.7.4
+

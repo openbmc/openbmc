@@ -4,6 +4,7 @@ SRCREV = "913c28917e62577a2ef67152b2e5159237503dda"
 
 SRC_URI += " \
             file://0001-dev-hdc-open-failed-No-medium-found-will-print-out-i.patch \
+            file://0001-fix-command-bin-findmnt-bin-lsblk-bin-sort-not-found.patch \
            "
 
 DEPENDS += "autoconf-archive-native"
@@ -67,7 +68,12 @@ RDEPENDS_${PN}-udevrules = "libdevmapper"
 RDEPENDS_${PN}_append_class-target = " libdevmapper"
 RDEPENDS_${PN}_append_class-nativesdk = " libdevmapper"
 
-RDEPENDS_${PN}-scripts = "${PN} (= ${EXTENDPKGV}) bash"
+RDEPENDS_${PN}-scripts = "${PN} (= ${EXTENDPKGV}) \
+                          bash \
+                          util-linux-lsblk \
+                          util-linux-findmnt \
+                          coreutils \
+"
 RRECOMMENDS_${PN}_class-target = "${PN}-scripts (= ${EXTENDPKGV})"
 
 CONFFILES_${PN} += "${sysconfdir}/lvm/lvm.conf"

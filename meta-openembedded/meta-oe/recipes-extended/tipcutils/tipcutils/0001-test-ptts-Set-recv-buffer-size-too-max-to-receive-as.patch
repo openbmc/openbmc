@@ -1,0 +1,66 @@
+From 4e4c8c7a1cca2125e2bf2a67cbab0bdbd78fdb86 Mon Sep 17 00:00:00 2001
+From: He Zhe <zhe.he@windriver.com>
+Date: Tue, 30 Jul 2019 13:24:22 +0800
+Subject: [PATCH] ptts: Set recv buffer size too max to receive as many
+ packets as possible
+
+Flooding multicast may make the rcv buffer overrun and is considered
+premature messages later and thus cause the following error.
+
+"Ignoring premature msg 16, currently handling 12"
+
+This patch sets SO_RCVBUF the of socket to max int value to receive as many
+packets as possible, and give a hint to user when possible overrun occurs. Note
+that the value of SO_RCVBUF will be limited up to min(INT_MAX/2,
+sysctl_rmem_max) in kernel.
+
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+
+Upstream-Status: Backport
+
+Signed-off-by: Li Zhou <li.zhou@windriver.com>
+---
+ ptts/tipc_ts_server.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/ptts/tipc_ts_server.c b/ptts/tipc_ts_server.c
+index a286daa..3a2f96f 100644
+--- a/ptts/tipc_ts_server.c
++++ b/ptts/tipc_ts_server.c
+@@ -641,8 +641,9 @@ void server_mcast
+ 				if (rc < 0)
+ 					err("multicast message not received");
+ 				if (msgno != *(int*) buf) {
+-					dbg1("Ignoring premature msg %u, currently handling %u\n",
+-					       *(int*)buf, msgno);
++					dbg1("Ignoring premature msg %u, currently handling %u\n"
++                                             "You can enlarge /proc/sys/net/core/rmem_max and try again\n",
++                                             *(int*)buf, msgno);
+ 					continue;
+ 				}
+ 				rc = recvfrom(sd[i], buf, expected_szs[numSubTest], 
+@@ -687,8 +688,21 @@ void server_test_multicast(void)
+ 	FD_ZERO(&readfds);
+ 
+ 	for (i = 0; i < TIPC_MCAST_SOCKETS; i++) {
++		int optval = (int)(~0U >> 1);
++		socklen_t optlen = sizeof(optval);
++		int rc = 0;
++
+ 		sd[i] = createSocketTIPC (SOCK_RDM);
+ 		FD_SET(sd[i], &readfds);
++
++		/*
++                 * Flooding multicast may make the rcv buffer overrun and considered premature msg later.
++                 * Set SO_RCVBUF to max int value to receive as many packets as possible.
++                 * Note that it will be limited up to min(INT_MAX/2, sysctl_rmem_max) in kernel.
++                 */
++		rc = setsockopt(sd[i], SOL_SOCKET, SO_RCVBUF, (const char*)&optval, optlen);
++		if(rc != 0)
++			printf("Failed to set SO_RCVBUF of %d: %s\n", sd[i], strerror(errno));
+ 	}
+ 
+ 	server_bindMulticast(  0,  99, sd[0]);
+-- 
+2.17.1
+

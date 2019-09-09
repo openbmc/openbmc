@@ -11,6 +11,10 @@ SRC_URI = "git://github.com/GNOME/pyatspi2.git;protocol=https;branch=gnome-3-32"
 SRCREV = "dc4565208fca00da06b972915a080ad3c63f640d"
 S = "${WORKDIR}/git" 
 
+# Same restriction as gtk+
+inherit distro_features_check
+ANY_OF_DISTRO_FEATURES = "${GTK2DISTROFEATURES}"
+
 inherit pkgconfig autotools python3native
 
 FILES_${PN} += "${PYTHON_SITEPACKAGES_DIR}/pyatspi/*"

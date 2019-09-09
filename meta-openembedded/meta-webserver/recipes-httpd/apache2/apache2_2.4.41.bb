@@ -53,7 +53,7 @@ EXTRA_OECONF_class-target = "\
     --sysconfdir=${sysconfdir}/${BPN} \
     --datadir=${datadir}/${BPN} \
     --libdir=${libdir} \
-    --libexecdir=${libdir}/${BPN}/modules \
+    --libexecdir=${libexecdir}/${BPN}/modules \
     --localstatedir=${localstatedir} \
     --enable-ssl \
     --with-dbm=sdbm \
@@ -78,7 +78,7 @@ EXTRA_OECONF_class-native = "\
     "
 
 do_configure_prepend() {
-    sed -i -e 's:$''{prefix}/usr/lib/cgi-bin:$''{libdir}/cgi-bin:g' ${S}/config.layout
+    sed -i -e 's:$''{prefix}/usr/lib/cgi-bin:$''{libexecdir}/cgi-bin:g' ${S}/config.layout
 }
 
 do_install_append_class-target() {
@@ -139,7 +139,7 @@ do_install_append_class-target() {
         install -m 0644 ${WORKDIR}/volatiles.04_apache2 ${D}${sysconfdir}/default/volatiles/04_apache2
     fi
 
-    rm -rf ${D}${localstatedir}
+    rm -rf ${D}${localstatedir} ${D}${sbindir}/envvars*
     chown -R root:root ${D}
 }
 

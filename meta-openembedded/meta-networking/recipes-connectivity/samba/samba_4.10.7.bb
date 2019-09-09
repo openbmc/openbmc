@@ -24,6 +24,8 @@ SRC_URI = "${SAMBA_MIRROR}/stable/samba-${PV}.tar.gz \
            file://smb_conf-4.7.0.patch \
            file://volatiles.03_samba \
            file://0001-waf-add-support-of-cross_compile.patch \
+           file://0001-lib-replace-wscript-Avoid-generating-nested-main-fun.patch \
+           file://0002-util_sec.c-Move-__thread-variable-to-global-scope.patch \
            "
 SRC_URI_append_libc-musl = " \
            file://samba-pam.patch \

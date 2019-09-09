@@ -1,0 +1,48 @@
+From 2da4cfe17b994d7f10017561ca8efe6b6bd5f3cf Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Thu, 5 Sep 2019 11:17:15 +0800
+Subject: [PATCH] xfsdump: support usrmerge
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ dump/Makefile    | 4 +---
+ restore/Makefile | 4 +---
+ 2 files changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/dump/Makefile b/dump/Makefile
+index 97879fa..14da664 100644
+--- a/dump/Makefile
++++ b/dump/Makefile
+@@ -97,10 +97,8 @@ default: depend $(LTCOMMAND)
+ include $(BUILDRULES)
+ 
+ install: default
+-	$(INSTALL) -m 755 -d $(PKG_ROOT_SBIN_DIR)
+-	$(LTINSTALL) -m 755 $(LTCOMMAND) $(PKG_ROOT_SBIN_DIR)
+ 	$(INSTALL) -m 755 -d $(PKG_SBIN_DIR)
+-	$(INSTALL) -S $(PKG_ROOT_SBIN_DIR)/$(LTCOMMAND) $(PKG_SBIN_DIR)/$(LTCOMMAND)
++	$(LTINSTALL) -m 755 $(LTCOMMAND) $(PKG_SBIN_DIR)
+ install-dev:
+ 
+ .dep: $(COMMINCL) $(COMMON) $(INVINCL) $(INVCOMMON)
+diff --git a/restore/Makefile b/restore/Makefile
+index c6f3f25..7835ecc 100644
+--- a/restore/Makefile
++++ b/restore/Makefile
+@@ -107,10 +107,8 @@ default: depend $(LTCOMMAND)
+ include $(BUILDRULES)
+ 
+ install: default
+-	$(INSTALL) -m 755 -d $(PKG_ROOT_SBIN_DIR)
+-	$(LTINSTALL) -m 755 $(LTCOMMAND) $(PKG_ROOT_SBIN_DIR)
+ 	$(INSTALL) -m 755 -d $(PKG_SBIN_DIR)
+-	$(INSTALL) -S $(PKG_ROOT_SBIN_DIR)/$(LTCOMMAND) $(PKG_SBIN_DIR)/$(LTCOMMAND)
++	$(LTINSTALL) -m 755 $(LTCOMMAND) $(PKG_SBIN_DIR)
+ install-dev:
+ 
+ .dep: $(COMMINCL) $(COMMON) $(INVINCL) $(INVCOMMON)
+-- 
+2.7.4
+

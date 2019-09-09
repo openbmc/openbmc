@@ -3,14 +3,14 @@ SECTION = "devel/python"
 HOMEPAGE = "http://www.freedesktop.org/Software/dbus"
 LICENSE = "MIT & AFL-2.1 | GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b03240518994df6d8c974675675e5ca4 \
-		    file://dbus-gmain/COPYING;md5=05c3eacd50f69bb1d58afec460baad57 "
+		    file://dbus-gmain/COPYING;md5=99fece6728a80737c8fd3e7c734c17c4 "
 DEPENDS = "expat dbus dbus-glib virtual/libintl python-pyrex-native"
 
 SRC_URI = "http://dbus.freedesktop.org/releases/dbus-python/dbus-python-${PV}.tar.gz \
 "
 
-SRC_URI[md5sum] = "7379db774c10904f27e7e2743d90fb43"
-SRC_URI[sha256sum] = "abf12bbb765e300bf8e2a1b2f32f85949eab06998dbda127952c31cb63957b6f"
+SRC_URI[md5sum] = "5d21d5ae6423f0e41caa3400af44edac"
+SRC_URI[sha256sum] = "d4332bbd4a0054fa4010b259c293b84d461bbd9d7a8ef528157d151c0398d886"
 S = "${WORKDIR}/dbus-python-${PV}"
 
 inherit distutils-base autotools pkgconfig
