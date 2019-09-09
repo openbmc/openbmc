@@ -1,6 +1,13 @@
+require recipes-devtools/qemu/qemu.inc
 require qemu-xilinx.inc
 
-XILINX_RELEASE_VERSION = "v2019.1"
-XILINX_QEMU_VERSION ?= "v2.11.1"
-BRANCH ?= "branch/xilinx-v2019.1"
-SRCREV ?= "5f38ea92fb697b94ad43f01fe162f3ed6e6b0e16"
+BBCLASSEXTEND = "nativesdk"
+
+RDEPENDS_${PN}_class-target += "bash"
+
+EXTRA_OECONF_append_class-target = " --target-list=${@get_qemu_target_list(d)}"
+EXTRA_OECONF_append_class-nativesdk = " --target-list=${@get_qemu_target_list(d)}"
+
+do_install_append_class-nativesdk() {
+    ${@bb.utils.contains('PACKAGECONFIG', 'gtk+', 'make_qemu_wrapper', '', d)}
+}
