@@ -3,6 +3,10 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302 \
                     file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
+inherit distro_features_check
+
+REQUIRED_DISTRO_FEATURES = "ptest"
+
 PACKAGES = "\
     ${PN} \
     "
@@ -15,7 +19,7 @@ RDEPENDS_${PN} = " \
     samhain-standalone-ptest \
     keyutils-ptest \
     libseccomp-ptest \
-    python-scapy-ptest \
+    python3-scapy-ptest \
     suricata-ptest \
     tripwire-ptest \
     python-fail2ban-ptest \

@@ -7,13 +7,10 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=97662e4486d9a1d09f358851d9f41a1a"
 LICENSE = "LGPL-2.1"
 
 DEPENDS = "openscap-native python3 python3-pyyaml-native python3-jinja2-native libxml2-native"
-RDEPENDS_${PN} = "openscap"
 
 S = "${WORKDIR}/git"
 
 inherit cmake pkgconfig python3native
-
-#PARALLEL_MAKE = ""
 
 STAGING_OSCAP_BUILDDIR = "${TMPDIR}/work-shared/openscap/oscap-build-artifacts"
 
@@ -23,9 +20,13 @@ EXTRA_OECMAKE += "-DENABLE_PYTHON_COVERAGE=OFF"
 
 B = "${S}/build"
 
+do_configure[depends] += "openscap-native:do_install"
+
 do_configure_prepend () {
     sed -i -e 's:NAMES\ sed:NAMES\ ${HOSTTOOLS_DIR}/sed:g' ${S}/CMakeLists.txt
     sed -i -e 's:NAMES\ grep:NAMES\ ${HOSTTOOLS_DIR}/grep:g' ${S}/CMakeLists.txt
 }
 
 FILES_${PN} += "${datadir}/xml"
+
+RDEPENDS_${PN} = "openscap"

@@ -40,14 +40,13 @@ do_configure_append_class-native () {
     sed -i 's:OSCAP_DEFAULT_XSLT_PATH.*$:OSCAP_DEFAULT_XSLT_PATH "${STAGING_OSCAP_BUILDDIR}${datadir_native}/openscap/xsl":' ${B}/config.h
 }
 
-do_clean[cleandirs] += "${STAGING_OSCAP_BUILDDIR}"
-do_install[nostamp] = "1"
-
+do_install_class-native[cleandirs] += " ${STAGING_OSCAP_BUILDDIR}"
 do_install_append_class-native () {
     oscapdir=${STAGING_OSCAP_BUILDDIR}/${datadir_native}
     install -d $oscapdir
     cp -a ${D}/${STAGING_DATADIR_NATIVE}/openscap $oscapdir
 }
+
 
 FILES_${PN} += "${PYTHON_SITEPACKAGES_DIR}"
 
