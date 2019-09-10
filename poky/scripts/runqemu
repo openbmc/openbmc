@@ -82,7 +82,7 @@ of the following environment variables (in any order):
   bootparams=<xyz> - specify custom kernel parameters during boot
   help, -h, --help: print this text
   -d, --debug: Enable debug output
-  -q, --quite: Hide most output except error messages
+  -q, --quiet: Hide most output except error messages
 
 Examples:
   runqemu
@@ -145,8 +145,6 @@ class BaseConfig(object):
         # to be added with -drive if=pflash.
         # Found in the same places as the rootfs, with or without one of
         # these suffices: qcow2, bin.
-        # Setting one also adds "-vga std" because that is all that
-        # OVMF supports.
         self.ovmf_bios = []
         # When enrolling default Secure Boot keys, the hypervisor
         # must provide the Platform Key and the first Key Exchange Key
@@ -755,8 +753,8 @@ class BaseConfig(object):
         if s:
             self.set('QB_MEM', '-m %s' % s.group(1))
         elif not self.get('QB_MEM'):
-            logger.info('QB_MEM is not set, use 512M by default')
-            self.set('QB_MEM', '-m 512')
+            logger.info('QB_MEM is not set, use 256M by default')
+            self.set('QB_MEM', '-m 256')
 
         # Check and remove M or m suffix
         qb_mem = self.get('QB_MEM')
@@ -1283,10 +1281,6 @@ class BaseConfig(object):
         for ovmf in self.ovmf_bios:
             format = ovmf.rsplit('.', 1)[-1]
             self.qemu_opt += ' -drive if=pflash,format=%s,file=%s' % (format, ovmf)
-        if self.ovmf_bios:
-            # OVMF only supports normal VGA, i.e. we need to override a -vga vmware
-            # that gets added for example for normal qemux86.
-            self.qemu_opt += ' -vga std'
 
         self.qemu_opt += ' ' + self.qemu_opt_script
 

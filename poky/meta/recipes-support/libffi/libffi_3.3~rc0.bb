@@ -12,9 +12,13 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=3610bb17683a0089ed64055416b2ae1b"
 
 SRC_URI = "https://github.com/libffi/libffi/releases/download/v3.3-rc0/libffi-3.3-rc0.tar.gz \
            file://not-win32.patch \
+           file://0001-Fixed-missed-ifndef-for-__mips_soft_float.patch \
            "
 SRC_URI[md5sum] = "8d2a82a78faf10a5e53c27d986e8f04e"
 SRC_URI[sha256sum] = "403d67aabf1c05157855ea2b1d9950263fb6316536c8c333f5b9ab1eb2f20ecf"
+UPSTREAM_CHECK_URI = "https://github.com/libffi/libffi/releases/"
+UPSTREAM_CHECK_REGEX = "libffi-(?P<pver>\d+(\.\d+)+)\.tar"
+UPSTREAM_VERSION_UNKNOWN = "1"
 
 EXTRA_OECONF += "--disable-builddir"
 EXTRA_OEMAKE_class-target = "LIBTOOLFLAGS='--tag=CC'"

@@ -277,3 +277,45 @@ FILES_libitm-dev = "\
 SUMMARY_libitm-dev = "GNU transactional memory support library - development files"
 FILES_libitm-staticdev = "${libdir}/libitm.a"
 SUMMARY_libitm-staticdev = "GNU transactional memory support library - static development files"
+
+require gcc-testsuite.inc
+
+EXTRA_OEMAKE_prepend_task-check = "${PARALLEL_MAKE} "
+
+MAKE_CHECK_TARGETS ??= "check-gcc ${@" ".join("check-target-" + i for i in d.getVar("RUNTIMETARGET").split())}"
+# prettyprinters and xmethods require gdb tooling
+MAKE_CHECK_IGNORE ??= "prettyprinters.exp xmethods.exp"
+MAKE_CHECK_RUNTESTFLAGS ??= "${MAKE_CHECK_BOARDARGS} --ignore '${MAKE_CHECK_IGNORE}'"
+
+# specific host and target dependencies required for test suite running
+do_check[depends] += "dejagnu-native:do_populate_sysroot expect-native:do_populate_sysroot"
+do_check[depends] += "virtual/libc:do_populate_sysroot"
+# only depend on qemu if targeting linux user execution
+do_check[depends] += "${@'qemu-native:do_populate_sysroot' if "user" in d.getVar('TOOLCHAIN_TEST_TARGET') else ''}"
+# extend the recipe sysroot to include the built libraries (for qemu usermode)
+do_check[prefuncs] += "extend_recipe_sysroot"
+do_check[prefuncs] += "check_prepare"
+do_check[dirs] = "${WORKDIR}/dejagnu ${B}"
+do_check[nostamp] = "1"
+do_check() {
+    export DEJAGNU="${WORKDIR}/dejagnu/site.exp"
+
+    # HACK: this works around the configure setting CXX with -nostd* args
+    sed -i 's/-nostdinc++ -nostdlib++//g' $(find ${B} -name testsuite_flags | head -1)
+    # HACK: this works around the de-stashing changes to configargs.h, as well as recipe-sysroot changing the content
+    sed -i '/static const char configuration_arguments/d' ${B}/gcc/configargs.h
+    ${CC} -v 2>&1 | grep "^Configured with:" | \
+        sed 's/Configured with: \(.*\)/static const char configuration_arguments[] = "\1";/g' >> ${B}/gcc/configargs.h
+
+    if [ "${TOOLCHAIN_TEST_TARGET}" = "user" ]; then
+        # qemu user has issues allocating large amounts of memory
+        export G_SLICE=always-malloc
+        # no test should need more that 10G of memory, this prevents tests like pthread7-rope from leaking memory
+        ulimit -m 4194304
+        ulimit -v 10485760
+    fi
+
+    oe_runmake -i ${MAKE_CHECK_TARGETS} RUNTESTFLAGS="${MAKE_CHECK_RUNTESTFLAGS}"
+}
+addtask check after do_compile do_populate_sysroot
+

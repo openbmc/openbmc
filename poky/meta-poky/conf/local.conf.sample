@@ -238,11 +238,15 @@ BB_DISKMON_DIRS ??= "\
 # Qemu configuration
 #
 # By default native qemu will build with a builtin VNC server where graphical output can be
-# seen. The line below enable the SDL backend too. By default libsdl2-native will
-# be built, if you want to use your host's libSDL instead of the minimal libsdl built
-# by libsdl2-native then uncomment the ASSUME_PROVIDED line below.
+# seen. The line below enables the SDL UI frontend too.
 PACKAGECONFIG_append_pn-qemu-system-native = " sdl"
+# By default libsdl2-native will be built, if you want to use your host's libSDL instead of 
+# the minimal libsdl built by libsdl2-native then uncomment the ASSUME_PROVIDED line below.
 #ASSUME_PROVIDED += "libsdl2-native"
+
+# You can also enable the Gtk UI frontend, which takes somewhat longer to build, but adds
+# a handy set of menus for controlling the emulator.
+#PACKAGECONFIG_append_pn-qemu-system-native = " gtk+"
 
 # CONF_VERSION is increased each time build/conf/ changes incompatibly and is used to
 # track the version of this file when it was generated. This can safely be ignored if

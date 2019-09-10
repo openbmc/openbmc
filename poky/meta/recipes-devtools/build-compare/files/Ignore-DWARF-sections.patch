@@ -23,18 +23,15 @@ Signed-off-by: Randy Witt <randy.e.witt@linux.intel.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/pkg-diff.sh b/pkg-diff.sh
-index 56035c1..0f1fa76 100755
+index 9c2125e..b0d77c8 100755
 --- a/pkg-diff.sh
 +++ b/pkg-diff.sh
-@@ -658,7 +658,7 @@ check_single_file()
+@@ -851,7 +851,7 @@ check_single_file()
         echo "" >$file1
         echo "" >$file2
-        # Don't compare .build-id and .gnu_debuglink sections
--       sections="$(objdump -s new/$file | grep "Contents of section .*:" | sed -r "s,.* (.*):,\1,g" | grep -v -e "\.build-id" -e "\.gnu_debuglink" | tr "\n" " ")"
-+       sections="$(objdump -s new/$file | grep "Contents of section .*:" | sed -r "s,.* (.*):,\1,g" | grep -v -e "\.build-id" -e "\.gnu_debuglink" -e "\.debug_abbrev" -e "\.debug_aranges" -e "\.debug_frame" -e "\.debug_info" -e "\.debug_line" -e "\.debug_loc" -e "\.debug_macinfo" -e "\.debug_pubnames" -e "\.debug_pubtypes" -e "\.debug_ranges"  -e "\.debug_str" | tr "\n" " ")"
+        # Don't compare .build-id, .gnu_debuglink and .gnu_debugdata sections
+-       sections="$($OBJDUMP -s new/$file | grep "Contents of section .*:" | sed -r "s,.* (.*):,\1,g" | grep -v -e "\.build-id" -e "\.gnu_debuglink" -e "\.gnu_debugdata" | tr "\n" " ")"
++       sections="$($OBJDUMP -s new/$file | grep "Contents of section .*:" | sed -r "s,.* (.*):,\1,g" | grep -v -e "\.build-id" -e "\.gnu_debuglink" -e "\.gnu_debugdata" -e "\.debug_abbrev" -e "\.debug_aranges" -e "\.debug_frame" -e "\.debug_info" -e "\.debug_line" -e "\.debug_loc" -e "\.debug_macinfo" -e "\.debug_pubnames" -e "\.debug_pubtypes" -e "\.debug_ranges"  -e "\.debug_str" | tr "\n" " ")"
         for section in $sections; do
-           objdump -s -j $section old/$file | sed "s,^old/,," > $file1
-           objdump -s -j $section new/$file | sed "s,^new/,," > $file2
--- 
-1.9.3
-
+           $OBJDUMP -s -j $section old/$file | sed "s,^old/,," > $file1
+           $OBJDUMP -s -j $section new/$file | sed "s,^new/,," > $file2

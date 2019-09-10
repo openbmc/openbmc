@@ -95,6 +95,7 @@
                 <listitem><para>CentOS 7.x</para></listitem>
                 <listitem><para>Debian GNU/Linux 8.x (Jessie)</para></listitem>
                 <listitem><para>Debian GNU/Linux 9.x (Stretch)</para></listitem>
+                <listitem><para>Debian GNU/Linux 10.x (Buster)</para></listitem>
                 <listitem><para>OpenSUSE 42.3</para></listitem>
             </itemizedlist>
         </para>

@@ -37,7 +37,7 @@ RDEPENDS_packagegroup-self-hosted-host-tools = "\
     e2fsprogs-tune2fs \
     hdparm \
     iptables \
-    lsb \
+    lsb-release \
     mc \
     mc-fish \
     mc-helpers \

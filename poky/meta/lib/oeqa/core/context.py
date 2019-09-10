@@ -64,12 +64,12 @@ class OETestContext(object):
                     setattr(tclass, 'setUpHooker', skipfuncgen('Skip by the command line argument "%s"' % skip))
 
     def loadTests(self, module_paths, modules=[], tests=[],
-            modules_manifest="", modules_required=[], filters={}):
+            modules_manifest="", modules_required=[], **kwargs):
         if modules_manifest:
             modules = self._read_modules_from_manifest(modules_manifest)
 
         self.loader = self.loaderClass(self, module_paths, modules, tests,
-                modules_required, filters)
+                modules_required, **kwargs)
         self.suites = self.loader.discover()
 
     def runTests(self, processes=None, skips=[]):

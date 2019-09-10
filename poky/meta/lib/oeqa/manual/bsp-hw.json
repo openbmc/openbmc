@@ -526,7 +526,7 @@
                     "expected_results": ""
                 },
                 "4": {
-                    "action": "check ping status  \n\nNote: This TC apply only for core-image-full-cmd and core-image-lsb .",
+                    "action": "check ping status  \n\nNote: This TC apply only for core-image-full-cmd.",
                     "expected_results": "ping should always work before/after standby"
                 }
             },

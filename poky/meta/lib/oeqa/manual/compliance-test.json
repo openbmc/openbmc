@@ -1,36 +1,6 @@
 [
     {
         "test": {
-            "@alias": "compliance-test.compliance-test.LSB_subset_test_suite",
-            "author": [
-                {
-                    "email": "corneliux.stoicescu@intel.com",
-                    "name": "corneliux.stoicescu@intel.com"
-                }
-            ],
-            "execution": {
-                "1": {
-                    "action": "Get lsd-sdk image and install it on target device or start the image(if it is QEMU) with option \"-m 512M\"",
-                    "expected_results": ""
-                },
-                "2": {
-                    "action": "Comment in /opt/lsb-test/session any tests you don't want to run.",
-                    "expected_results": ""
-                },
-                "3": {
-                    "action": "Run /usr/bin/LSB_Test.sh which should download the LSB suite and set it up. Some packages may fail to download because their location changed on ftp.linuxfoundation.org. You need to manually update /opt/lsb-test/packages_list",
-                    "expected_results": ""
-                },
-                "4": {
-                    "action": "Tests should start automatically, you can use the web interface to reconfigure the setup. ",
-                    "expected_results": "Check the result on wiki https://wiki.yoctoproject.org/wiki/LSB_Result No regression failures should be met."
-                }
-            },
-            "summary": "LSB_subset_test_suite"
-        }
-    },
-    {
-        "test": {
             "@alias": "compliance-test.compliance-test.stress_test_-_Genericx86-64",
             "author": [
                 {
@@ -40,7 +10,7 @@
             ],
             "execution": {
                 "1": {
-                    "action": "Bootup with core-image-lsb-sdk image",
+                    "action": "Bootup with core-image-sato-sdk image",
                     "expected_results": ""
                 },
                 "2": {

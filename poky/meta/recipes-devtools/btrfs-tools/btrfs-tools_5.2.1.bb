@@ -10,7 +10,7 @@ HOMEPAGE = "https://btrfs.wiki.kernel.org"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=fcb02dc552a041dee27e4b85c7396067"
 SECTION = "base"
-DEPENDS = "util-linux attr e2fsprogs lzo acl python3-setuptools-native"
+DEPENDS = "util-linux attr e2fsprogs lzo acl"
 DEPENDS_append_class-target = " udev"
 RDEPENDS_${PN} = "libgcc"
 
@@ -19,12 +19,15 @@ SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/kdave/btrfs-progs.git \
            file://0001-Add-a-possibility-to-specify-where-python-modules-ar.patch \
            "
 
-inherit autotools-brokensep pkgconfig manpages distutils3-base
+PACKAGECONFIG ??= "python"
+PACKAGECONFIG[manpages] = "--enable-documentation, --disable-documentation, asciidoc-native xmlto-native"
+PACKAGECONFIG[python] = "--enable-python,--disable-python,python3-setuptools-native"
+PACKAGECONFIG[zstd] = "--enable-zstd,--disable-zstd,zstd"
+
+inherit autotools-brokensep pkgconfig manpages
+inherit ${@bb.utils.contains('PACKAGECONFIG', 'python', 'distutils3-base', '', d)}
 
 CLEANBROKEN = "1"
-
-PACKAGECONFIG[manpages] = "--enable-documentation, --disable-documentation, asciidoc-native xmlto-native"
-PACKAGECONFIG[zstd] = "--enable-zstd,--disable-zstd,zstd"
 
 EXTRA_OECONF_append_libc-musl = " --disable-backtrace "
 EXTRA_PYTHON_CFLAGS = "${DEBUG_PREFIX_MAP}"
@@ -41,7 +44,9 @@ do_configure_prepend() {
 S = "${WORKDIR}/git"
 
 do_install_append() {
-    oe_runmake 'DESTDIR=${D}' 'PYTHON_SITEPACKAGES_DIR=${PYTHON_SITEPACKAGES_DIR}' install_python
+    if [ "${@bb.utils.filter('PACKAGECONFIG', 'python', d)}" ]; then
+        oe_runmake 'DESTDIR=${D}' 'PYTHON_SITEPACKAGES_DIR=${PYTHON_SITEPACKAGES_DIR}' install_python
+    fi
 }
 
 BBCLASSEXTEND = "native"

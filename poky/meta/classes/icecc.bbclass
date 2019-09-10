@@ -73,10 +73,13 @@ ICECC_ENV_DEBUG ??= ""
 #
 # libgcc-initial - fails with CPP sanity check error if host sysroot contains
 #                  cross gcc built for another target tune/variant
+# systemtap - _HelperSDT.c undefs macros and uses the identifiers in macros emitting
+#             inline assembly
 # target-sdk-provides-dummy - ${HOST_PREFIX} is empty which triggers the "NULL
 #                             prefix" error.
 ICECC_SYSTEM_PACKAGE_BL += "\
     libgcc-initial \
+    systemtap \
     target-sdk-provides-dummy \
     "
 

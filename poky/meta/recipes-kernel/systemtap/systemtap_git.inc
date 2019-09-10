@@ -1,13 +1,9 @@
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
-SRCREV = "984d6d1696ed06626b07cb65ab55d6ae0ece1131"
-PV = "4.1"
+SRCREV = "57c9aca9f1ff32a6add10e02ecd33b7314fad499"
+PV = "4.1+git${SRCPV}"
 
 SRC_URI = "git://sourceware.org/git/systemtap.git \
-           file://configure-allow-to-disable-libvirt.patch \
-           file://x32_abi_time.patch \
-           file://monitor-option.patch \
-           file://no-msgfmt-check.patch \
            file://0001-Do-not-let-configure-write-a-python-location-into-th.patch \
            file://0001-Install-python-modules-to-correct-library-dir.patch \
            file://0001-staprun-stapbpf-don-t-support-installing-a-non-root.patch \

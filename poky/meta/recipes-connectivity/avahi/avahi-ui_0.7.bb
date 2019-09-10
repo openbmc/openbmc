@@ -20,7 +20,13 @@ FILES_avahi-discover = "${datadir}/applications/avahi-discover.desktop \
 
 do_install_append () {
 	rm ${D}${sysconfdir} -rf
-	rm ${D}${base_libdir} -rf
+	if ${@bb.utils.contains('DISTRO_FEATURES','usrmerge','true','false',d)}; then
+               if [ "${nonarch_base_libdir}" != "${base_libdir}" ];then
+                   rm ${D}${nonarch_base_libdir} -rf
+               fi
+        else
+		rm ${D}${base_libdir} -rf
+        fi
 	rm ${D}${systemd_unitdir} -rf
 	# The ${systemd_unitdir} is /lib/systemd, so we need rmdir /lib,
 	# but not ${base_libdir} here. And the /lib may not exist

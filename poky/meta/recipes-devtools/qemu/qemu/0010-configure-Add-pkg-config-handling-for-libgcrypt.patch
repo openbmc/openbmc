@@ -1,0 +1,93 @@
+From 5214dd4461f2090ef0965b4d2518f49927d61cbc Mon Sep 17 00:00:00 2001
+From: He Zhe <zhe.he@windriver.com>
+Date: Wed, 28 Aug 2019 19:56:28 +0800
+Subject: [Qemu-devel] [PATCH] configure: Add pkg-config handling for libgcrypt
+
+libgcrypt may also be controlled by pkg-config, this patch adds pkg-config
+handling for libgcrypt.
+
+Upstream-Status: Denied [https://lists.nongnu.org/archive/html/qemu-devel/2019-08/msg06333.html]
+
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ configure | 48 ++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 40 insertions(+), 8 deletions(-)
+
+diff --git a/configure b/configure
+index e44e454..0f362a7 100755
+--- a/configure
++++ b/configure
+@@ -2875,6 +2875,30 @@ has_libgcrypt() {
+     return 0
+ }
+ 
++has_libgcrypt_pkgconfig() {
++    if ! has $pkg_config ; then
++        return 1
++    fi
++
++    if ! $pkg_config --list-all | grep libgcrypt > /dev/null 2>&1 ; then
++        return 1
++    fi
++
++    if test -n "$cross_prefix" ; then
++        host=$($pkg_config --variable=host libgcrypt)
++        if test "${host%-gnu}-" != "${cross_prefix%-gnu}" ; then
++            print_error "host($host) does not match cross_prefix($cross_prefix)"
++            return 1
++        fi
++    fi
++
++    if ! $pkg_config --atleast-version=1.5.0 libgcrypt ; then
++        print_error "libgcrypt version is $($pkg_config --modversion libgcrypt)"
++        return 1
++    fi
++
++    return 0
++}
+ 
+ if test "$nettle" != "no"; then
+     pass="no"
+@@ -2902,7 +2926,14 @@ fi
+ 
+ if test "$gcrypt" != "no"; then
+     pass="no"
+-    if has_libgcrypt; then
++    if has_libgcrypt_pkgconfig; then
++        gcrypt_cflags=$($pkg_config --cflags libgcrypt)
++        if test "$static" = "yes" ; then
++            gcrypt_libs=$($pkg_config --libs --static libgcrypt)
++        else
++            gcrypt_libs=$($pkg_config --libs libgcrypt)
++        fi
++    elif has_libgcrypt; then
+         gcrypt_cflags=$(libgcrypt-config --cflags)
+         gcrypt_libs=$(libgcrypt-config --libs)
+         # Debian has removed -lgpg-error from libgcrypt-config
+@@ -2912,15 +2943,16 @@ if test "$gcrypt" != "no"; then
+         then
+             gcrypt_libs="$gcrypt_libs -lgpg-error"
+         fi
++    fi
+ 
+-        # Link test to make sure the given libraries work (e.g for static).
+-        write_c_skeleton
+-        if compile_prog "" "$gcrypt_libs" ; then
+-            LIBS="$gcrypt_libs $LIBS"
+-            QEMU_CFLAGS="$QEMU_CFLAGS $gcrypt_cflags"
+-            pass="yes"
+-        fi
++    # Link test to make sure the given libraries work (e.g for static).
++    write_c_skeleton
++    if compile_prog "" "$gcrypt_libs" ; then
++	    LIBS="$gcrypt_libs $LIBS"
++	    QEMU_CFLAGS="$QEMU_CFLAGS $gcrypt_cflags"
++	    pass="yes"
+     fi
++
+     if test "$pass" = "yes"; then
+         gcrypt="yes"
+         cat > $TMPC << EOF
+-- 
+2.7.4
+

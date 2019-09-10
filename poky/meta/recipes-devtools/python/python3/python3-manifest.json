@@ -115,7 +115,7 @@
         "cached": []
     },
     "asyncio": {
-        "summary": "Python Asynchronous I/",
+        "summary": "Python Asynchronous I/O",
         "rdepends": [
             "core",
             "io",

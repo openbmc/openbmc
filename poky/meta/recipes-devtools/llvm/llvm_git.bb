@@ -71,7 +71,7 @@ EXTRA_OECMAKE += "-DLLVM_ENABLE_ASSERTIONS=OFF \
                   -DLLVM_OPTIMIZED_TABLEGEN=ON \
                   -DLLVM_TARGETS_TO_BUILD='${LLVM_TARGETS}' \
                   -DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=ON \
-                  -DPYTHON_EXECUTABLE=${HOSTTOOLS_DIR}/python2 \
+                  -DPYTHON_EXECUTABLE=${HOSTTOOLS_DIR}/python3 \
                   -G Ninja"
 
 EXTRA_OECMAKE_append_class-target = "\

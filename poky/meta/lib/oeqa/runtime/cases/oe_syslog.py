@@ -17,7 +17,7 @@ class SyslogTest(OERuntimeTestCase):
         msg = "Failed to execute %s" % self.tc.target_cmds['ps']
         self.assertEqual(status, 0, msg=msg)
         msg = "No syslog daemon process; %s output:\n%s" % (self.tc.target_cmds['ps'], output)
-        hasdaemon = "syslogd" in output or "syslog-ng" in output
+        hasdaemon = "syslogd" in output or "syslog-ng" in output or "svlogd" in output
         self.assertTrue(hasdaemon, msg=msg)
 
 class SyslogTestConfig(OERuntimeTestCase):

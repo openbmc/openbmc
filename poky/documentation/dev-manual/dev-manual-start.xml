@@ -23,9 +23,8 @@
         It might not be immediately clear how you can use the Yocto
         Project in a team development environment, or how to scale it for a
         large team of developers.
-        One of the strengths of the Yocto Project is that it is extremely
-        flexible.
-        Thus, you can adapt it to many different use cases and scenarios.
+        You can adapt the Yocto Project to many different use cases and
+        scenarios.
         However, this flexibility could cause difficulties if you are trying
         to create a working setup that scales across a large team.
     </para>

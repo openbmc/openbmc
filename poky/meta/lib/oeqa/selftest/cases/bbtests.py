@@ -119,7 +119,7 @@ class BitbakeTests(OESelftestTestCase):
 
     def test_bitbake_g(self):
         result = bitbake('-g core-image-minimal')
-        for f in ['pn-buildlist', 'recipe-depends.dot', 'task-depends.dot']:
+        for f in ['pn-buildlist', 'task-depends.dot']:
             self.addCleanup(os.remove, f)
         self.assertTrue('Task dependencies saved to \'task-depends.dot\'' in result.output, msg = "No task dependency \"task-depends.dot\" file was generated for the given task target. bitbake output: %s" % result.output)
         self.assertTrue('busybox' in ftools.read_file(os.path.join(self.builddir, 'task-depends.dot')), msg = "No \"busybox\" dependency found in task-depends.dot file.")

@@ -37,7 +37,6 @@ EXTRA_OECONF = "\
   --enable-shared \
   --enable-ipv6=${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', 'yes', 'no', d)} \
   ac_cv_header_bluetooth_bluetooth_h=no ac_cv_header_bluetooth_h=no \
-  ${PYTHONLSBOPTS} \
 "
 
 do_configure_prepend() {

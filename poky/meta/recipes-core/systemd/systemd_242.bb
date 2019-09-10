@@ -22,12 +22,7 @@ SRC_URI += "file://touchscreen.rules \
            file://0003-implment-systemd-sysv-install-for-OE.patch \
            file://0004-rules-whitelist-hd-devices.patch \
            file://0005-rules-watch-metadata-changes-in-ide-devices.patch \
-           file://0006-network-remove-redunant-link-name-in-message.patch \
            file://99-default.preset \
-           file://0001-resolved-Fix-incorrect-use-of-OpenSSL-BUF_MEM.patch \
-           file://0001-core-set-fs.file-max-sysctl-to-LONG_MAX-rather-than-.patch \
-           file://0001-networkd-fix-link-up.patch \
-           file://0002-network-do-not-send-ipv6.patch \
            "
 
 # patches needed by musl
@@ -88,6 +83,7 @@ PACKAGECONFIG ??= " \
     quotacheck \
     randomseed \
     resolved \
+    set-time-epoch \
     smack \
     sysusers \
     timedated \
@@ -171,7 +167,12 @@ PACKAGECONFIG[seccomp] = "-Dseccomp=true,-Dseccomp=false,libseccomp"
 PACKAGECONFIG[selinux] = "-Dselinux=true,-Dselinux=false,libselinux,initscripts-sushell"
 PACKAGECONFIG[smack] = "-Dsmack=true,-Dsmack=false"
 PACKAGECONFIG[sysusers] = "-Dsysusers=true,-Dsysusers=false"
-PACKAGECONFIG[time-epoch] = "-Dtime-epoch=0,,"
+# When enabled use reproducble build timestamp if set as time epoch,
+# or build time if not. When disabled, time epoch is unset.
+def build_epoch(d):
+    epoch = d.getVar('SOURCE_DATE_EPOCH') or "-1"
+    return '-Dtime-epoch=%d' % int(epoch)
+PACKAGECONFIG[set-time-epoch] = "${@build_epoch(d)},-Dtime-epoch=0"
 PACKAGECONFIG[timedated] = "-Dtimedated=true,-Dtimedated=false"
 PACKAGECONFIG[timesyncd] = "-Dtimesyncd=true,-Dtimesyncd=false"
 PACKAGECONFIG[usrmerge] = "-Dsplit-usr=false,-Dsplit-usr=true"
@@ -210,6 +211,7 @@ EXTRA_OEMESON += "-Dkexec-path=${sbindir}/kexec \
                   -Dquotacheck-path=${sbindir}/quotacheck \
                   -Dquotaon-path=${sbindir}/quotaon \
                   -Dsulogin-path=${base_sbindir}/sulogin \
+                  -Dnologin-path=${base_sbindir}/nologin \
                   -Dumount-path=${base_bindir}/umount"
 
 do_install() {
@@ -618,6 +620,12 @@ python __anonymous() {
     if not bb.utils.contains('DISTRO_FEATURES', 'sysvinit', True, False, d):
         d.setVar("INHIBIT_UPDATERCD_BBCLASS", "1")
 }
+
+python do_warn_musl() {
+    if d.getVar('TCLIBC') == "musl":
+        bb.warn("Using systemd with musl is not recommended since it is not supported upstream and some patches are known to be problematic.")
+}
+addtask warn_musl before do_configure
 
 ALTERNATIVE_${PN} = "halt reboot shutdown poweroff runlevel resolv-conf"
 

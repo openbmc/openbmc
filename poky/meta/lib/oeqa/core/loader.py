@@ -16,7 +16,7 @@ from oeqa.core.utils.test import getSuiteModules, getCaseID
 from oeqa.core.exception import OEQATestNotFound
 from oeqa.core.case import OETestCase
 from oeqa.core.decorator import decoratorClasses, OETestDecorator, \
-        OETestFilter, OETestDiscover
+        OETestDiscover
 
 # When loading tests, the unittest framework stores any exceptions and
 # displays them only when the run method is called.
@@ -68,7 +68,7 @@ class OETestLoader(unittest.TestLoader):
             '_top_level_dir']
 
     def __init__(self, tc, module_paths, modules, tests, modules_required,
-            filters, *args, **kwargs):
+            *args, **kwargs):
         self.tc = tc
 
         self.modules = _built_modules_dict(modules)
@@ -76,13 +76,7 @@ class OETestLoader(unittest.TestLoader):
         self.tests = tests
         self.modules_required = modules_required
 
-        self.filters = filters
-        self.decorator_filters = [d for d in decoratorClasses if \
-                issubclass(d, OETestFilter)]
-        self._validateFilters(self.filters, self.decorator_filters)
-        self.used_filters = [d for d in self.decorator_filters
-                             for f in self.filters
-                             if f in d.attrs]
+        self.tags_filter = kwargs.get("tags_filter", None)
 
         if isinstance(module_paths, str):
             module_paths = [module_paths]
@@ -103,28 +97,6 @@ class OETestLoader(unittest.TestLoader):
         setattr(testCaseClass, 'tc', self.tc)
         setattr(testCaseClass, 'td', self.tc.td)
         setattr(testCaseClass, 'logger', self.tc.logger)
-
-    def _validateFilters(self, filters, decorator_filters):
-        # Validate if filter isn't empty
-        for key,value in filters.items():
-            if not value:
-                raise TypeError("Filter %s specified is empty" % key)
-
-        # Validate unique attributes
-        attr_filters = [attr for clss in decorator_filters \
-                                for attr in clss.attrs]
-        dup_attr = [attr for attr in attr_filters
-                    if attr_filters.count(attr) > 1]
-        if dup_attr:
-            raise TypeError('Detected duplicated attribute(s) %s in filter'
-                            ' decorators' % ' ,'.join(dup_attr))
-
-        # Validate if filter is supported
-        for f in filters:
-            if f not in attr_filters:
-                classes = ', '.join([d.__name__ for d in decorator_filters])
-                raise TypeError('Found "%s" filter but not declared in any of '
-                                '%s decorators' % (f, classes))
 
     def _registerTestCase(self, case):
         case_id = case.id()
@@ -188,19 +160,20 @@ class OETestLoader(unittest.TestLoader):
                         return True
 
         # Decorator filters
-        if self.filters and isinstance(case, OETestCase):
-            filters = self.filters.copy()
-            case_decorators = [cd for cd in case.decorators
-                               if cd.__class__ in self.used_filters]
+        if self.tags_filter is not None and callable(self.tags_filter):
+            alltags = set()
+            # pull tags from the case class
+            if hasattr(case, "__oeqa_testtags"):
+                for t in getattr(case, "__oeqa_testtags"):
+                    alltags.add(t)
+            # pull tags from the method itself
+            if hasattr(case, test_name):
+                method = getattr(case, test_name)
+                if hasattr(method, "__oeqa_testtags"):
+                    for t in getattr(method, "__oeqa_testtags"):
+                        alltags.add(t)
 
-            # Iterate over case decorators to check if needs to be filtered.
-            for cd in case_decorators:
-                if cd.filtrate(filters):
-                    return True
-
-            # Case is missing one or more decorators for all the filters
-            # being used, so filter test case.
-            if filters:
+            if self.tags_filter(alltags):
                 return True
 
         return False

@@ -849,6 +849,20 @@ class RunQueueData:
             for depend in depends:
                 mark_active(depend, depth+1)
 
+        def invalidate_task(tid, error_nostamp):
+            (mc, fn, taskname, taskfn) = split_tid_mcfn(tid)
+            taskdep = self.dataCaches[mc].task_deps[taskfn]
+            if fn + ":" + taskname not in taskData[mc].taskentries:
+                logger.warning("Task %s does not exist, invalidating this task will have no effect" % taskname)
+            if 'nostamp' in taskdep and taskname in taskdep['nostamp']:
+                if error_nostamp:
+                    bb.fatal("Task %s is marked nostamp, cannot invalidate this task" % taskname)
+                else:
+                    bb.debug(1, "Task %s is marked nostamp, cannot invalidate this task" % taskname)
+            else:
+                logger.verbose("Invalidate task %s, %s", taskname, fn)
+                bb.parse.siggen.invalidate_task(taskname, self.dataCaches[mc], taskfn)
+
         self.target_tids = []
         for (mc, target, task, fn) in self.targets:
 
@@ -917,6 +931,8 @@ class RunQueueData:
 
                 for tid in list(runall_tids):
                     mark_active(tid,1)
+                    if self.cooker.configuration.force:
+                        invalidate_task(tid, False)
 
             for tid in list(self.runtaskentries.keys()):
                 if tid not in runq_build:
@@ -938,6 +954,8 @@ class RunQueueData:
 
                 for tid in list(runonly_tids):
                     mark_active(tid,1)
+                    if self.cooker.configuration.force:
+                        invalidate_task(tid, False)
 
             for tid in list(self.runtaskentries.keys()):
                 if tid not in runq_build:
@@ -1113,20 +1131,6 @@ class RunQueueData:
                 if setscenetid not in taskData[mc].taskentries:
                     continue
                 self.runq_setscene_tids.append(tid)
-
-        def invalidate_task(tid, error_nostamp):
-            (mc, fn, taskname, taskfn) = split_tid_mcfn(tid)
-            taskdep = self.dataCaches[mc].task_deps[taskfn]
-            if fn + ":" + taskname not in taskData[mc].taskentries:
-                logger.warning("Task %s does not exist, invalidating this task will have no effect" % taskname)
-            if 'nostamp' in taskdep and taskname in taskdep['nostamp']:
-                if error_nostamp:
-                    bb.fatal("Task %s is marked nostamp, cannot invalidate this task" % taskname)
-                else:
-                    bb.debug(1, "Task %s is marked nostamp, cannot invalidate this task" % taskname)
-            else:
-                logger.verbose("Invalidate task %s, %s", taskname, fn)
-                bb.parse.siggen.invalidate_task(taskname, self.dataCaches[mc], taskfn)
 
         self.init_progress_reporter.next_stage()
 

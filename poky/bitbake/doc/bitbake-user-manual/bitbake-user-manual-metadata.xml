@@ -420,13 +420,17 @@
      FOO = "123 456 789 123456 123 456 123 456"
      FOO_remove = "123"
      FOO_remove = "456"
-     FOO2 = "abc def ghi abcdef abc def abc def"
-     FOO2_remove = "abc def"
+     FOO2 = " abc  def ghi abcdef abc def abc  def def"
+     FOO2_remove = " \
+         def \
+         abc \
+         ghi \
+     "
                 </literallayout>
                 The variable <filename>FOO</filename> becomes
-                "&nbsp;&nbsp;789 123456&nbsp;&nbsp;&nbsp;&nbsp;"
+                "&nbsp;&nbsp;789&nbsp;123456&nbsp;&nbsp;&nbsp;&nbsp;"
                 and <filename>FOO2</filename> becomes
-                "&nbsp;&nbsp;ghi abcdef&nbsp;&nbsp;&nbsp;&nbsp;".
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;jkl&nbsp;&nbsp;abcdef&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".
             </para>
 
             <para>

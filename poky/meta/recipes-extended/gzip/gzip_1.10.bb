@@ -14,7 +14,7 @@ PROVIDES_append_class-native = " gzip-replacement-native"
 
 RDEPENDS_${PN}-ptest += "make perl perl-ptest grep diffutils"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"
 
 inherit ptest
 

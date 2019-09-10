@@ -962,7 +962,8 @@ def rename_bad_checksum(ud, suffix):
 
     new_localpath = "%s_bad-checksum_%s" % (ud.localpath, suffix)
     bb.warn("Renaming %s to %s" % (ud.localpath, new_localpath))
-    bb.utils.movefile(ud.localpath, new_localpath)
+    if not bb.utils.movefile(ud.localpath, new_localpath):
+        bb.warn("Renaming %s to %s failed, grep movefile in log.do_fetch to see why" % (ud.localpath, new_localpath))
 
 
 def try_mirror_url(fetch, origud, ud, ld, check = False):

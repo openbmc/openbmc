@@ -19,9 +19,9 @@ class ResultsTextReport(object):
         self.ptests = {}
         self.ltptests = {}
         self.ltpposixtests = {}
-        self.result_types = {'passed': ['PASSED', 'passed'],
-                             'failed': ['FAILED', 'failed', 'ERROR', 'error', 'UNKNOWN'],
-                             'skipped': ['SKIPPED', 'skipped']}
+        self.result_types = {'passed': ['PASSED', 'passed', 'PASS', 'XFAIL'],
+                             'failed': ['FAILED', 'failed', 'FAIL', 'ERROR', 'error', 'UNKNOWN', 'XPASS'],
+                             'skipped': ['SKIPPED', 'skipped', 'UNSUPPORTED', 'UNTESTED', 'UNRESOLVED']}
 
 
     def handle_ptest_result(self, k, status, result, machine):

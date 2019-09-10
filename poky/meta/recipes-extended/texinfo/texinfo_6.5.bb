@@ -42,7 +42,9 @@ SRC_URI[sha256sum] = "d34272e4042c46186ddcd66bd5d980c0ca14ff734444686ccf8131f6ec
 
 tex_texinfo = "texmf/tex/texinfo"
 
-inherit gettext autotools
+inherit gettext autotools multilib_script
+
+MULTILIB_SCRIPTS = "${PN}:${bindir}/texi2any"
 
 EXTRA_AUTORECONF += "-I ${S}/gnulib/m4"
 

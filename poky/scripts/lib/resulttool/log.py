@@ -16,6 +16,16 @@ def show_ptest(result, ptest, logger):
     print("ptest '%s' not found" % ptest)
     return 1
 
+def show_reproducible(result, reproducible, logger):
+    try:
+        print(result['reproducible'][reproducible]['diffoscope.text'])
+        return 0
+
+    except KeyError:
+        print("reproducible '%s' not found" % reproducible)
+        return 1
+
+
 def log(args, logger):
     results = resultutils.load_resultsdata(args.source)
 
@@ -40,15 +50,26 @@ def log(args, logger):
                         with open(dest, 'w') as f:
                             f.write(ptest['log'])
 
-        if args.raw:
+        if args.raw_ptest:
             if 'ptestresult.rawlogs' in r:
                 print(r['ptestresult.rawlogs']['log'])
             else:
-                print('Raw logs not found')
+                print('Raw ptest logs not found')
+                return 1
+
+        if args.raw_reproducible:
+            if 'reproducible.rawlogs' in r:
+                print(r['reproducible.rawlogs']['log'])
+            else:
+                print('Raw reproducible logs not found')
                 return 1
 
         for ptest in args.ptest:
             if not show_ptest(r, ptest, logger):
+                return 1
+
+        for reproducible in args.reproducible:
+            if not show_reproducible(r, reproducible, logger):
                 return 1
 
 def register_commands(subparsers):
@@ -63,9 +84,15 @@ def register_commands(subparsers):
             help='show logs for a ptest')
     parser.add_argument('--dump-ptest', metavar='DIR',
             help='Dump all ptest log files to the specified directory.')
+    parser.add_argument('--reproducible', action='append', default=[],
+            help='show logs for a reproducible test')
     parser.add_argument('--prepend-run', action='store_true',
             help='''Dump ptest results to a subdirectory named after the test run when using --dump-ptest.
                     Required if more than one test run is present in the result file''')
     parser.add_argument('--raw', action='store_true',
-            help='show raw logs')
+            help='show raw (ptest) logs. Deprecated. Alias for "--raw-ptest"', dest='raw_ptest')
+    parser.add_argument('--raw-ptest', action='store_true',
+            help='show raw ptest log')
+    parser.add_argument('--raw-reproducible', action='store_true',
+            help='show raw reproducible build logs')
 

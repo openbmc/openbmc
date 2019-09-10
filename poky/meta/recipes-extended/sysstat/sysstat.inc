@@ -4,7 +4,7 @@ HOMEPAGE = "http://sebastien.godard.pagesperso-orange.fr/"
 LICENSE = "GPLv2+"
 SECTION = "console/utils"
 
-SRC_URI = "http://pagesperso-orange.fr/sebastien.godard/sysstat-${PV}.tar.xz \
+SRC_URI = "http://pagesperso-orange.fr/sebastien.godard/${BP}.tar.xz \
            file://99_sysstat \
            file://sysstat.service \
           "
@@ -29,7 +29,7 @@ SYSTEMD_SERVICE_${PN} = "sysstat.service"
 SYSTEMD_AUTO_ENABLE = "enable"
 
 do_configure_prepend() {
-    export sa_lib_dir=${libdir}/sa
+    export sa_lib_dir=${libexecdir}/sa
 }
 
 do_install() {

@@ -2,6 +2,10 @@ BBCLASSEXTEND = "nativesdk"
 
 require qemu.inc
 
+# error: a parameter list without types is only allowed in a function definition
+#            void (*_function)(sigval_t);
+COMPATIBLE_HOST_libc-musl = 'null'
+
 DEPENDS = "glib-2.0 zlib pixman bison-native"
 
 RDEPENDS_${PN}_class-target += "bash"

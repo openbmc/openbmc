@@ -14,6 +14,10 @@ SRC_URI += " \
             file://run-ptest \
             file://rt_bmark.py \
            "
+
+# rt-tests needs PI mutex support in libc
+COMPATIBLE_HOST_libc-musl = 'null'
+
 # Do not install hwlatdetect
 EXTRA_OEMAKE += "PYLIB=''"
 

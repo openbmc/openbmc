@@ -22,8 +22,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  gcc/gcc.c        | 7 -------
  4 files changed, 15 insertions(+), 7 deletions(-)
 
-diff --git a/gcc/Makefile.in b/gcc/Makefile.in
-index 0064a282488..98d1488171f 100644
 --- a/gcc/Makefile.in
 +++ b/gcc/Makefile.in
 @@ -618,6 +618,7 @@ libexecdir = @libexecdir@
@@ -34,7 +32,7 @@ index 0064a282488..98d1488171f 100644
  # Directory in which the compiler finds executables
  libexecsubdir = $(libexecdir)/gcc/$(real_target_noncanonical)/$(version)$(accel_dir_suffix)
  # Directory in which all plugin resources are installed
-@@ -2866,6 +2867,7 @@ CFLAGS-intl.o += -DLOCALEDIR=\"$(localedir)\"
+@@ -2866,6 +2867,7 @@ CFLAGS-intl.o += -DLOCALEDIR=\"$(localed
  
  PREPROCESSOR_DEFINES = \
    -DGCC_INCLUDE_DIR=\"$(libsubdir)/include\" \
@@ -42,11 +40,9 @@ index 0064a282488..98d1488171f 100644
    -DFIXED_INCLUDE_DIR=\"$(libsubdir)/include-fixed\" \
    -DGPLUSPLUS_INCLUDE_DIR=\"$(gcc_gxx_include_dir)\" \
    -DGPLUSPLUS_INCLUDE_DIR_ADD_SYSROOT=$(gcc_gxx_include_dir_add_sysroot) \
-diff --git a/gcc/cppdefault.c b/gcc/cppdefault.c
-index c4796385643..980e2bd47a7 100644
 --- a/gcc/cppdefault.c
 +++ b/gcc/cppdefault.c
-@@ -59,6 +59,10 @@ const struct default_include cpp_include_defaults[]
+@@ -59,6 +59,10 @@ const struct default_include cpp_include
      /* This is the dir for gcc's private headers.  */
      { GCC_INCLUDE_DIR, "GCC", 0, 0, 0, 0 },
  #endif
@@ -57,42 +53,3 @@ index c4796385643..980e2bd47a7 100644
  #ifdef LOCAL_INCLUDE_DIR
      /* /usr/local/include comes before the fixincluded header files.  */
      { LOCAL_INCLUDE_DIR, 0, 0, 1, 1, 2 },
-diff --git a/gcc/defaults.h b/gcc/defaults.h
-index b7534256119..41ca579b267 100644
---- a/gcc/defaults.h
-+++ b/gcc/defaults.h
-@@ -1459,4 +1459,13 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
- #define DWARF_GNAT_ENCODINGS_DEFAULT DWARF_GNAT_ENCODINGS_GDB
- #endif
- 
-+/* Default prefixes to attach to command names.  */
-+
-+#ifndef STANDARD_STARTFILE_PREFIX_1
-+#define STANDARD_STARTFILE_PREFIX_1 "/lib/"
-+#endif
-+#ifndef STANDARD_STARTFILE_PREFIX_2
-+#define STANDARD_STARTFILE_PREFIX_2 "/usr/lib/"
-+#endif
-+
- #endif  /* ! GCC_DEFAULTS_H */
-diff --git a/gcc/gcc.c b/gcc/gcc.c
-index 4e7c45b268c..1a3704b2763 100644
---- a/gcc/gcc.c
-+++ b/gcc/gcc.c
-@@ -1470,13 +1470,6 @@ static const char *gcc_libexec_prefix;
- 
- /* Default prefixes to attach to command names.  */
- 
--#ifndef STANDARD_STARTFILE_PREFIX_1
--#define STANDARD_STARTFILE_PREFIX_1 "/lib/"
--#endif
--#ifndef STANDARD_STARTFILE_PREFIX_2
--#define STANDARD_STARTFILE_PREFIX_2 "/usr/lib/"
--#endif
--
- #ifdef CROSS_DIRECTORY_STRUCTURE  /* Don't use these prefixes for a cross compiler.  */
- #undef MD_EXEC_PREFIX
- #undef MD_STARTFILE_PREFIX
--- 
-2.22.1
-

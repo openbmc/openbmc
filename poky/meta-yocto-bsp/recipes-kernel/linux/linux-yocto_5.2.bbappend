@@ -1,0 +1,27 @@
+KBRANCH_genericx86  = "v5.2/standard/base"
+KBRANCH_genericx86-64  = "v5.2/standard/base"
+KBRANCH_edgerouter = "v5.2/standard/edgerouter"
+KBRANCH_beaglebone-yocto = "v5.2/standard/beaglebone"
+KBRANCH_mpc8315e-rdb = "v5.2/standard/fsl-mpc8315e-rdb"
+
+KMACHINE_genericx86 ?= "common-pc"
+KMACHINE_genericx86-64 ?= "common-pc-64"
+KMACHINE_beaglebone-yocto ?= "beaglebone"
+
+SRCREV_machine_genericx86    ?= "77c28ea0e55cabb0b22b47d4eb2cc94b0940dfe6"
+SRCREV_machine_genericx86-64 ?= "35276d20c01a78ee3640a074446b0c15c486c5d0"
+SRCREV_machine_edgerouter ?= "35276d20c01a78ee3640a074446b0c15c486c5d0"
+SRCREV_machine_beaglebone-yocto ?= "77c28ea0e55cabb0b22b47d4eb2cc94b0940dfe6"
+SRCREV_machine_mpc8315e-rdb ?= "cae01d71ef67eaafec75ce24f49b038b705b8711"
+
+COMPATIBLE_MACHINE_genericx86 = "genericx86"
+COMPATIBLE_MACHINE_genericx86-64 = "genericx86-64"
+COMPATIBLE_MACHINE_edgerouter = "edgerouter"
+COMPATIBLE_MACHINE_beaglebone-yocto = "beaglebone-yocto"
+COMPATIBLE_MACHINE_mpc8315e-rdb = "mpc8315e-rdb"
+
+LINUX_VERSION_genericx86 = "5.2.10"
+LINUX_VERSION_genericx86-64 = "5.2.10"
+LINUX_VERSION_edgerouter = "5.2.10"
+LINUX_VERSION_beaglebone-yocto = "5.2.10"
+LINUX_VERSION_mpc8315e-rdb = "5.2.10"

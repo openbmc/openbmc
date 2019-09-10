@@ -78,6 +78,9 @@ python () {
         bb.debug(1, 'archiver: %s is excluded, covered by gcc-source' % pn)
         return
 
+    def hasTask(task):
+        return bool(d.getVarFlag(task, "task", False)) and not bool(d.getVarFlag(task, "noexec", False))
+
     ar_src = d.getVarFlag('ARCHIVER_MODE', 'src')
     ar_dumpdata = d.getVarFlag('ARCHIVER_MODE', 'dumpdata')
     ar_recipe = d.getVarFlag('ARCHIVER_MODE', 'recipe')
@@ -98,9 +101,6 @@ python () {
 
         # There is a corner case with "gcc-source-${PV}" recipes, they don't have
         # the "do_configure" task, so we need to use "do_preconfigure"
-        def hasTask(task):
-            return bool(d.getVarFlag(task, "task", False)) and not bool(d.getVarFlag(task, "noexec", False))
-
         if hasTask("do_preconfigure"):
             d.appendVarFlag('do_ar_configured', 'depends', ' %s:do_preconfigure' % pn)
         elif hasTask("do_configure"):
@@ -118,7 +118,11 @@ python () {
 
     # Output the SRPM package
     if d.getVarFlag('ARCHIVER_MODE', 'srpm') == "1" and d.getVar('PACKAGES'):
-        if "package_rpm" in d.getVar('PACKAGE_CLASSES'):
+        if "package_rpm" not in d.getVar('PACKAGE_CLASSES'):
+            bb.fatal("ARCHIVER_MODE[srpm] needs package_rpm in PACKAGE_CLASSES")
+
+        # Some recipes do not have any packaging tasks
+        if hasTask("do_package_write_rpm"):
             d.appendVarFlag('do_deploy_archives', 'depends', ' %s:do_package_write_rpm' % pn)
             d.appendVarFlag('do_package_write_rpm', 'dirs', ' ${ARCHIVER_RPMTOPDIR}')
             d.appendVarFlag('do_package_write_rpm', 'sstate-inputdirs', ' ${ARCHIVER_RPMTOPDIR}')
@@ -133,8 +137,6 @@ python () {
                 d.appendVarFlag('do_package_write_rpm', 'depends', ' %s:do_ar_patched' % pn)
             elif ar_src == "configured":
                 d.appendVarFlag('do_package_write_rpm', 'depends', ' %s:do_ar_configured' % pn)
-        else:
-            bb.fatal("ARCHIVER_MODE[srpm] needs package_rpm in PACKAGE_CLASSES")
 }
 
 # Take all the sources for a recipe and puts them in WORKDIR/archiver-work/.

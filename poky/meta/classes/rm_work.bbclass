@@ -121,7 +121,7 @@ do_rm_work_all () {
 }
 do_rm_work_all[recrdeptask] = "do_rm_work"
 do_rm_work_all[noexec] = "1"
-addtask rm_work_all after before do_build
+addtask rm_work_all before do_build
 
 do_populate_sdk[postfuncs] += "rm_work_populatesdk"
 rm_work_populatesdk () {

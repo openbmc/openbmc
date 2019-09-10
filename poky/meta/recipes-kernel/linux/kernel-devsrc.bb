@@ -141,7 +141,7 @@ do_install() {
 	    # arch/arm64/include/asm/opcodes.h references arch/arm
 	    cp -a --parents arch/arm/include/asm/opcodes.h $kerneldir/build/
 
-            cp -a --parents arch/arm64/kernel/vdso/gettimeofday.S $kerneldir/build/
+            cp -a --parents arch/arm64/kernel/vdso/*gettimeofday.* $kerneldir/build/
             cp -a --parents arch/arm64/kernel/vdso/sigreturn.S $kerneldir/build/
             cp -a --parents arch/arm64/kernel/vdso/note.S $kerneldir/build/
             cp -a --parents arch/arm64/kernel/vdso/gen_vdso_offsets.sh $kerneldir/build/
@@ -178,6 +178,8 @@ do_install() {
 	fi
 
 	cp -a include $kerneldir/build
+
+	cp -a --parents lib/vdso/* $kerneldir/build/ 2>/dev/null || :
 
 	cp -a --parents tools/include/tools/le_byteshift.h $kerneldir/build/
 	cp -a --parents tools/include/tools/be_byteshift.h $kerneldir/build/
@@ -240,6 +242,15 @@ do_install() {
     # Copy .config to include/config/auto.conf so "make prepare" is unnecessary.
     cp $kerneldir/build/.config $kerneldir/build/include/config/auto.conf
 
+    # make the scripts python3 safe. We won't be running these, and if they are
+    # left as /usr/bin/python rootfs assembly will fail, since we only have python3
+    # in the RDEPENDS (and the python3 package does not include /usr/bin/python)
+    for ss in $(find $kerneldir/build/scripts -type f -name '*'); do
+	sed -i 's,/usr/bin/python2,/usr/bin/env python3,' "$ss"
+	sed -i 's,/usr/bin/env python2,/usr/bin/env python3,' "$ss"
+	sed -i 's,/usr/bin/python,/usr/bin/env python3,' "$ss"
+    done
+
     chown -R root:root ${D}
 }
 
@@ -249,7 +260,7 @@ do_install[lockfiles] = "${TMPDIR}/kernel-scripts.lock"
 FILES_${PN} = "${KERNEL_BUILD_ROOT} ${KERNEL_SRC_PATH}"
 FILES_${PN}-dbg += "${KERNEL_BUILD_ROOT}*/build/scripts/*/.debug/*"
 
-RDEPENDS_${PN} = "bc python flex bison ${TCLIBC}-utils"
+RDEPENDS_${PN} = "bc python3 flex bison ${TCLIBC}-utils"
 # 4.15+ needs these next two RDEPENDS
 RDEPENDS_${PN} += "openssl-dev util-linux"
 # and x86 needs a bit more for 4.15+

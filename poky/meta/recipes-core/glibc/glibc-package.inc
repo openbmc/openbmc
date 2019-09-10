@@ -88,14 +88,7 @@ do_install_append () {
 		rm -f ${D}${sysconfdir}/ld.so.conf
 		rm -f ${D}${base_sbindir}/ldconfig
 		# This directory will be empty now so remove it too.
-		# But check whether it exists first, since it won't for glibc-initial.
-		if [ -d ${D}${sysconfdir} ]; then
-			rmdir ${D}${sysconfdir}
-		fi
-	fi
-
-	if echo ${PN}|grep -q "glibc-initial"; then
-		return
+		rmdir ${D}${sysconfdir}
 	fi
 
 	install -d ${D}${sysconfdir}/init.d

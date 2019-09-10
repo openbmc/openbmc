@@ -335,7 +335,7 @@
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    The minimal command and arguments used to run the
+                    Minimal command and arguments needed to run the
                     assembler.
                 </para>
             </glossdef>
@@ -6606,6 +6606,7 @@
                     by default:
                     <literallayout class='monospaced'>
      btrfs
+     container
      cpio
      cpio.gz
      cpio.lz4
@@ -6621,13 +6622,14 @@
      ext3.gz
      ext4
      ext4.gz
-     hdddirect
+     f2fs
      hddimg
      iso
      jffs2
      jffs2.sum
      multiubi
      squashfs
+     squashfs-lz4
      squashfs-lzo
      squashfs-xz
      tar
@@ -7580,15 +7582,9 @@
                         However, providing just the <filename>.dtb</filename>
                         file is preferred.
                     </note>
-                    In order to use this variable, you must have the include
-                    files in your kernel recipe:
-                    <literallayout class='monospaced'>
-     require recipes-kernel/linux/linux-dtb.inc
-                    </literallayout>
-                    or
-                    <literallayout class='monospaced'>
-     require recipes-kernel/linux/linux-yocto.inc
-                    </literallayout>
+                    In order to use this variable, the
+                    <link linkend='ref-classes-kernel-devicetree'><filename>kernel-devicetree</filename></link>
+                    class must be inherited.
                 </para>
             </glossdef>
         </glossentry>

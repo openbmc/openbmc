@@ -43,4 +43,7 @@ do_install_ptest() {
 	do
 		install -m 0755 $file ${D}${PTEST_PATH}/test
 	done
+        
+        # handle multilib
+        sed -i s:@libdir@:${libdir}:g ${D}${PTEST_PATH}/run-ptest
 }

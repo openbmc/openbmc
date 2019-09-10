@@ -6,7 +6,6 @@
 import os
 
 import bb
-import oe.utils
 import subprocess
 import shlex
 

@@ -26,18 +26,15 @@ Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
-index e82ff14..d0cc5d5 100644
+index 50002b4..aebff01 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -548,7 +548,7 @@ my_am_cflags="\
+@@ -582,7 +582,7 @@ my_am_cflags="\
   -Wall \
   -Wextra \
-  -Werror=strict-prototypes \
+  $rpcgen_cflags \
 - -Werror=missing-prototypes \
 + -Wmissing-prototypes \
   -Werror=missing-declarations \
   -Werror=format=2 \
   -Werror=undef \
--- 
-2.7.4
-

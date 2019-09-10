@@ -318,23 +318,6 @@
     </para>
 </section>
 
-<section id='ref-classes-bluetooth'>
-    <title><filename>bluetooth.bbclass</filename></title>
-
-    <para>
-        The <filename>bluetooth</filename> class defines a variable that
-        expands to the recipe (package) providing core
-        bluetooth support on the platform.
-    </para>
-
-    <para>
-        For details on how the class works, see the
-        <filename>meta/classes/bluetooth.bbclass</filename> file in the Yocto
-        Project
-        <link linkend='source-directory'>Source Directory</link>.
-    </para>
-</section>
-
 <section id='ref-classes-buildhistory'>
     <title><filename>buildhistory.bbclass</filename></title>
 
@@ -934,21 +917,6 @@
         internationalization and localization system.
         All recipes building software that use
         <filename>gettext</filename> should inherit this class.
-    </para>
-</section>
-
-<section id='ref-classes-gnome'>
-    <title><filename>gnome.bbclass</filename></title>
-
-    <para>
-        The <filename>gnome</filename> class supports recipes that
-        build software from the GNOME stack.
-        This class inherits the
-        <link linkend='ref-classes-gnomebase'><filename>gnomebase</filename></link>,
-        <link linkend='ref-classes-gtk-icon-cache'><filename>gtk-icon-cache</filename></link>,
-        <link linkend='ref-classes-gconf'><filename>gconf</filename></link> and
-        <link linkend='ref-classes-mime'><filename>mime</filename></link> classes.
-        The class also disables GObject introspection where applicable.
     </para>
 </section>
 

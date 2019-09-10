@@ -1494,7 +1494,7 @@
           "expected_results": "A type in form appears. \n\n\t"
         },
         "6": {
-          "action": "Change distro (ex: poky-lsb). \n\n\t",
+          "action": "Change distro (ex: poky-tiny). \n\n\t",
           "expected_results": "Distro has changed. \n\n\t"
         },
         "7": {
@@ -1503,7 +1503,7 @@
         },
         "8": {
           "action": " Build a recipe (ex: core-image-minimal) and wait until build finish.",
-          "expected_results": "Build finishes successfully. \n\nThe 'success' criteria for this one should be that the build is reported as using the poky-lsb distro in the build summary page, and that the DISTRO variable value in the bitbake variables table is set to the value specified in toaster (poky-lsb again)."
+          "expected_results": "Build finishes successfully. \n\nThe 'success' criteria for this one should be that the build is reported as using the poky-tiny distro in the build summary page, and that the DISTRO variable value in the bitbake variables table is set to the value specified in toaster (poky-tiny again)."
         }
       },
       "summary": "Build_a_recipe_with_different_distro"
@@ -1612,7 +1612,7 @@
           "expected_results": ""
         },
         "3": {
-          "action": "Check that the table is populated with the list of image recipes (eg. core-image minimal, core-image-lsb) \n\n\n",
+          "action": "Check that the table is populated with the list of image recipes (eg. core-image minimal) \n\n\n",
           "expected_results": ""
         },
         "4": {
@@ -1670,7 +1670,7 @@
           "expected_results": ""
         },
         "7": {
-          "action": "Sort the table by \"Layer\" and then navigate away by selecting an image (such as core-image-lsb). When you click the \"back\" button in the web-browser to go back, the \"New custom image\" table should still be sorted by \"Layer\".  \nThis should apply also by navigating back to the page by any other means. \n\n",
+          "action": "Sort the table by \"Layer\" and then navigate away by selecting an image. When you click the \"back\" button in the web-browser to go back, the \"New custom image\" table should still be sorted by \"Layer\".  \nThis should apply also by navigating back to the page by any other means. \n\n",
           "expected_results": ""
         },
         "8": {
@@ -2348,7 +2348,7 @@
           "expected_results": ""
         },
         "3": {
-          "action": "Build 6 recipes example (core-image-sato, core-image-minimal, core-image-base, core-image-lsb, core-image-clutter) to name a few. ",
+          "action": "Build 6 recipes example (core-image-sato, core-image-minimal, core-image-base, core-image-clutter) to name a few. ",
           "expected_results": " All recipes are built correctly \n\n"
         },
         "4": {
@@ -2382,7 +2382,7 @@
           "expected_results": ""
         },
         "3": {
-          "action": "Build 6 recipes example (core-image-sato, core-image-minimal, core-image-base, core-image-lsb, core-image-clutter) to name a few. \n\n",
+          "action": "Build 6 recipes example (core-image-sato, core-image-minimal, core-image-base, core-image-clutter) to name a few. \n\n",
           "expected_results": "All recipes are built correctly \n\n"
         },
         "4": {
@@ -2420,7 +2420,7 @@
           "expected_results": ""
         },
         "3": {
-          "action": "Build 4 recipes example (core-image-sato, core-image-minimal, core-image-base, core-image-lsb, core-image-clutter) to name a few. \n\n",
+          "action": "Build 4 recipes example (core-image-sato, core-image-minimal, core-image-base, core-image-clutter) to name a few. \n\n",
           "expected_results": " All recipes are built correctly \n\n"
         },
         "4": {

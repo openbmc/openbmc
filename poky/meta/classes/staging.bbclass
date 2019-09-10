@@ -197,7 +197,7 @@ def staging_populate_sysroot_dir(targetsysroot, nativesysroot, native, d):
     for pkgarch in pkgarchs:
         for manifest in glob.glob(d.expand("${SSTATE_MANIFESTS}/manifest-%s-*.populate_sysroot" % pkgarch)):
             if manifest.endswith("-initial.populate_sysroot"):
-                # skip glibc-initial and libgcc-initial due to file overlap
+                # skip libgcc-initial due to file overlap
                 continue
             if not native and (manifest.endswith("-native.populate_sysroot") or "nativesdk-" in manifest):
                 continue

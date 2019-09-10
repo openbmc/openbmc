@@ -482,9 +482,9 @@ def symlink_oelocal_files_srctree(rd,srctree):
                 addfiles.append(os.path.join(relpth, fn))
         if addfiles:
             bb.process.run('git add %s' % ' '.join(addfiles), cwd=srctree)
-        useroptions = []
-        oe.patch.GitApplyTree.gitCommandUserOptions(useroptions, d=rd)
-        bb.process.run('git %s commit -a -m "Committing local file symlinks\n\n%s"' % (' '.join(useroptions), oe.patch.GitApplyTree.ignore_commit_prefix), cwd=srctree)
+            useroptions = []
+            oe.patch.GitApplyTree.gitCommandUserOptions(useroptions, d=rd)
+            bb.process.run('git %s commit -m "Committing local file symlinks\n\n%s"' % (' '.join(useroptions), oe.patch.GitApplyTree.ignore_commit_prefix), cwd=srctree)
 
 
 def _extract_source(srctree, keep_temp, devbranch, sync, config, basepath, workspace, fixed_setup, d, tinfoil, no_overrides=False):

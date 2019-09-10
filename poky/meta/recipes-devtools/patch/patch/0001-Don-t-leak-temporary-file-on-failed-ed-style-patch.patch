@@ -17,6 +17,7 @@ https://savannah.gnu.org/bugs/index.php?53820
 
 Fixes: 123eaff0d5d1 ("Fix arbitrary command execution in ed-style patches (CVE-2018-1000156)")
 
+CVE: CVE-2018-1000156
 Upstream-Status: Backport [http://git.savannah.gnu.org/cgit/patch.git/commit/?id=19599883ffb6a450d2884f081f8ecf68edbed7ee]
 Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
 ---

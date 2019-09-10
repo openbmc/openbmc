@@ -33,5 +33,5 @@ do_configure_prepend() {
 
 FILES_${PN} += "${systemd_unitdir}/systemd-bootchart"
 
-EXTRA_OECONF = " --with-rootprefix=${base_prefix} \
+EXTRA_OECONF = " --with-rootprefix=${root_prefix} \
                  --with-rootlibdir=${base_libdir}"

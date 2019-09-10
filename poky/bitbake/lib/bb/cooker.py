@@ -919,6 +919,10 @@ class BBCooker:
             os.unlink('package-depends.dot')
         except FileNotFoundError:
             pass
+        try:
+            os.unlink('recipe-depends.dot')
+        except FileNotFoundError:
+            pass
 
         with open('task-depends.dot', 'w') as f:
             f.write("digraph depends {\n")
@@ -931,27 +935,6 @@ class BBCooker:
                     f.write('"%s" -> "%s"\n' % (task, dep))
             f.write("}\n")
         logger.info("Task dependencies saved to 'task-depends.dot'")
-
-        with open('recipe-depends.dot', 'w') as f:
-            f.write("digraph depends {\n")
-            pndeps = {}
-            for task in sorted(depgraph["tdepends"]):
-                (pn, taskname) = task.rsplit(".", 1)
-                if pn not in pndeps:
-                    pndeps[pn] = set()
-                for dep in sorted(depgraph["tdepends"][task]):
-                    (deppn, deptaskname) = dep.rsplit(".", 1)
-                    pndeps[pn].add(deppn)
-            for pn in sorted(pndeps):
-                fn = depgraph["pn"][pn]["filename"]
-                version = depgraph["pn"][pn]["version"]
-                f.write('"%s" [label="%s\\n%s\\n%s"]\n' % (pn, pn, version, fn))
-                for dep in sorted(pndeps[pn]):
-                    if dep == pn:
-                        continue
-                    f.write('"%s" -> "%s"\n' % (pn, dep))
-            f.write("}\n")
-        logger.info("Flattened recipe dependencies saved to 'recipe-depends.dot'")
 
     def show_appends_with_no_recipes(self):
         # Determine which bbappends haven't been applied
@@ -1869,6 +1852,7 @@ class CookerCollectFiles(object):
             (bbappend, filename) = b
             if (bbappend == f) or ('%' in bbappend and bbappend.startswith(f[:bbappend.index('%')])):
                 filelist.append(filename)
+        filelist.sort()
         return filelist
 
     def collection_priorities(self, pkgfns, d):
