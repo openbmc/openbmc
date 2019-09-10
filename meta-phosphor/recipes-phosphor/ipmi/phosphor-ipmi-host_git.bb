@@ -106,7 +106,7 @@ SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'SOFT_FMT', 'OBMC_HOST_INSTANCES')
 do_replace_entity_default() {
     # The in-repo provided default is tailored to testing the ipmid code.
     # Replace it with a reasonable default for users.
-    cp entity.yaml ${S}/scripts/entity-example.yaml
+    cp ${THISDIR}/${PN}/entity.yaml ${S}/scripts/entity-example.yaml
 }
 
 do_patch_append() {
