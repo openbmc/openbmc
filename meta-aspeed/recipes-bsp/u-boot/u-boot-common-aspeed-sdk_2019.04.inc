@@ -12,6 +12,7 @@ SRCREV = "9b5fc98374593c49133b709f71119222ecfff3eb"
 
 UBRANCH = "aspeed-dev-v2019.04"
 SRC_URI = "git://github.com/AspeedTech-BMC/u-boot;branch=${UBRANCH};protocol=https"
+SRC_URI += "file://0001-arm-evb-ast2600-put-environment-back-at-512KiB.patch"
 
 S = "${WORKDIR}/git"
 
