@@ -27,7 +27,7 @@ inherit pkgconfig autotools-brokensep gettext
 BBCLASSEXTEND += "nativesdk"
 
 EXTRA_OECONF = "--enable-ftdi --disable-doxygen-html"
-
+EXTRA_OECONF_append_toolchain-gcc = " --disable-werror "
 do_configure() {
     ./bootstrap nosubmodule
     install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.guess ${S}/jimtcl/autosetup

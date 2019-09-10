@@ -115,3 +115,5 @@ RDEPENDS_${PN} += "python3"
 INSANE_SKIP_${PN} += "ldflags"
 
 SECURITY_CFLAGS = ""
+COMPATIBLE_HOST_libc-musl = 'null'
+
