@@ -420,6 +420,27 @@
     unit: xyz.openbmc_project.Sensor.Value.Unit.Amperes
 252:
     bExp: 0
+    entityID: 10
+    entityInstance: 15
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 20
+    offsetB: 0
+    path: /xyz/openbmc_project/sensors/power/total_power
+    rExp: 0
+    readingType: readingData
+    scale: -6
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 8
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.Watts
+253:
+    bExp: 0
     entityID: 35
     entityInstance: 1
     interfaces:
@@ -439,7 +460,7 @@
     sensorType: 1
     serviceInterface: org.freedesktop.DBus.Properties
     unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-253:
+254:
     bExp: 0
     entityID: 35
     entityInstance: 2
@@ -460,7 +481,7 @@
     sensorType: 1
     serviceInterface: org.freedesktop.DBus.Properties
     unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-254:
+255:
     bExp: 0
     entityID: 64
     entityInstance: 1
