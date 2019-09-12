@@ -10,5 +10,5 @@
       "session_supported" : "session-less",
       "is_ipmi" : true
     }
-  },
+  }
 }
