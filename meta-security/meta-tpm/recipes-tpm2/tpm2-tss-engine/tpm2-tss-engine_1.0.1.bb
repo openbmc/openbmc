@@ -8,7 +8,7 @@ SECTION = "security/tpm"
 
 DEPENDS = "autoconf-archive-native bash-completion libtss2 libgcrypt openssl"
 
-SRCREV = "a81d44a8610e28e5987af64f8aae16e4a2d09eaa"
+SRCREV = "e1bbabe29377e45282d753a1b103625c420a19cf"
 SRC_URI = "git://github.com/tpm2-software/tpm2-tss-engine.git"
 
 inherit autotools-brokensep pkgconfig systemd

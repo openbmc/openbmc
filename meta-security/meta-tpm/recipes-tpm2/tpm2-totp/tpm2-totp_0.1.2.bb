@@ -9,7 +9,7 @@ DEPENDS = "autoconf-archive libtss2-dev qrencode"
 
 PE = "1"
 
-SRCREV = "2807a509a9da383e14dc0f759e71fd676db04ab1"
+SRCREV = "15cc8fbc8fe71be9c04c3169ee1f70450d52a51a"
 SRC_URI = "git://github.com/tpm2-software/tpm2-totp.git;branch=v0.1.x \
            file://litpm2_totp_build_fix.patch "
 

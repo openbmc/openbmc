@@ -9,7 +9,7 @@ DEPENDS = "libtasn1 expect socat glib-2.0 net-tools-native libtpm libtpm-native"
 # then swtpm_setup needs them at runtime
 DEPENDS += "tpm-tools-native expect-native socat-native"
 
-SRCREV = "d803d84575ab3e5dac316bf863c7f569a27ea35f"
+SRCREV = "39673a0139b0ee14a0109aba50a0635592c672c4"
 SRC_URI = "git://github.com/stefanberger/swtpm.git;branch=stable-${PV} \
            file://fix_fcntl_h.patch \
            file://ioctl_h.patch \

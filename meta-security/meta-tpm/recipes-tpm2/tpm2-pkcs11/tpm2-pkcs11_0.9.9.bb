@@ -10,7 +10,7 @@ SRC_URI = "git://github.com/tpm2-software/tpm2-pkcs11.git \
            file://bootstrap_fixup.patch \
           "
 
-SRCREV = "9eed9df823a960da481327468a73d477241befdb"
+SRCREV = "caf20c04651029626466c59d88b36c05cc6ea20b"
 
 S = "${WORKDIR}/git"
 

@@ -6,10 +6,9 @@ SECTION = "tpm"
 
 DEPENDS = "autoconf-archive-native libgcrypt openssl"
 
-SRCREV = "36b1539c82bf675265d6f6a6cd808a189b6971f4"
+SRCREV = "a99e733ba66c359502689a9c42fd5e02ed1dd7d6"
 
-SRC_URI = "git://github.com/tpm2-software/tpm2-tss.git;branch=2.2.x \
-    file://0001-build-update-for-ax_code_coverage.m4-version-2019.01.patch"
+SRC_URI = "git://github.com/tpm2-software/tpm2-tss.git;branch=2.3.x"
 
 inherit autotools-brokensep pkgconfig systemd
 

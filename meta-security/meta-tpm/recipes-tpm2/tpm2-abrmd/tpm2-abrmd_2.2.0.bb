@@ -12,14 +12,13 @@ LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=500b2e742befc3da00684d8a1d5fd9da"
 DEPENDS = "autoconf-archive dbus glib-2.0 tpm2-tss glib-2.0-native \
             libtss2 libtss2-mu libtss2-tcti-device libtss2-tcti-mssim"
 
-
 SRC_URI = "\
     git://github.com/tpm2-software/tpm2-abrmd.git \
     file://tpm2-abrmd-init.sh \
     file://tpm2-abrmd.default \
 "
 
-SRCREV = "06d9d433ba27159687255406baa37940db15465b"
+SRCREV = "ac2a5a4b5a4e548177ed7a5b74cea23e00fd30b4"
 
 S = "${WORKDIR}/git"
 
