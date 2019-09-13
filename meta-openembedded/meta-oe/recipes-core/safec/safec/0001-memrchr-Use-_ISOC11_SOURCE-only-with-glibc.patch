@@ -1,0 +1,30 @@
+From 57456b5d034c8965b11eceed1bf861c98a18c324 Mon Sep 17 00:00:00 2001
+From: "jenkins@kwaj" <jenkins@kwaj>
+Date: Wed, 11 Sep 2019 13:43:45 -0700
+Subject: [PATCH] memrchr: Use _ISOC11_SOURCE only with glibc
+
+this is a glibc feature test macro which is not available
+on other libraries e.g. musl
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/extmem/memrchr_s.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/extmem/memrchr_s.c b/src/extmem/memrchr_s.c
+index 8d10a7b9..e73d3579 100644
+--- a/src/extmem/memrchr_s.c
++++ b/src/extmem/memrchr_s.c
+@@ -36,7 +36,7 @@
+ #endif
+ 
+ #ifdef HAVE_MEMRCHR
+-#ifndef _ISOC11_SOURCE
++#if defined (__GLIBC__) && !defined(_ISOC11_SOURCE)
+ extern void *memrchr(const void *, int, size_t);
+ #endif
+ #endif
+-- 
+2.17.1
+

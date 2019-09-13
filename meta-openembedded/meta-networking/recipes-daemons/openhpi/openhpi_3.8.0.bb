@@ -85,6 +85,21 @@ do_install_append () {
 do_compile_ptest () {
     for x in `find ${B} -name Makefile -exec grep -l buildtest-TESTS {} \;`; do
         dir=`dirname ${x}`
+        case $dir in
+            *cpp/t)      ;;
+            *snmp_bc/t)  if ${@bb.utils.contains('PACKAGECONFIG','snmp-bc','true','false',d)}
+                         then
+                           oe_runmake -C ${dir} buildtest-TESTS
+                         fi
+                         ;;
+            *)           oe_runmake -C ${dir} buildtest-TESTS ;;
+        esac
+    done
+}
+
+ack_do_compile_ptest () {
+    for x in `find ${B} -name Makefile -exec grep -l buildtest-TESTS {} \;`; do
+        dir=`dirname ${x}`
         upper=`dirname ${dir}`
         if [ `basename ${upper}` != "cpp" ]; then
             oe_runmake -C ${dir} buildtest-TESTS

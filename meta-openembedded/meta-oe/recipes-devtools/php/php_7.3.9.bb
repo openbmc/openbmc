@@ -17,11 +17,3 @@ SRC_URI_append_class-target = " \
 
 SRC_URI[md5sum] = "bcc37749815009c9201e4c126e1ab8ee"
 SRC_URI[sha256sum] = "a39c9709a8c9eb7ea8ac4933ef7a78b92f7e5735a405c8b8e42ee39541d963c4"
-
-PACKAGECONFIG[mysql] = "--with-mysqli=mysqlnd \
-                        --with-pdo-mysql=mysqlnd \
-                        ,--without-mysqli --without-pdo-mysql \
-                        ,mysql5"
-PACKAGECONFIG[valgrind] = "--with-valgrind=${STAGING_DIR_TARGET}/usr,--with-valgrind=no,valgrind"
-
-FILES_${PN}-fpm += "${sysconfdir}/php-fpm.d/www.conf.default"

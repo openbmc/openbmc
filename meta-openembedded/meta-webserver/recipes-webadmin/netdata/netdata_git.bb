@@ -6,8 +6,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=fc9b848046ef54b5eaee6071947abd24"
 SRC_URI = "git://github.com/firehol/netdata.git;protocol=https \
            file://0002-Makefiles-does-not-build-contrib-dir.patch \
 "
-SRCREV = "2c4146832061635273d153a5174c85fb1d967d57"
-PV = "1.16.0+git${SRCPV}"
+SRCREV = "588ce5a7b18999dfa66698cd3a2f005f7a3c31cf"
+PV = "1.17.0"
 
 # patch to disable timeout because timeout are not available with actual version
 # of core-utils
@@ -24,6 +24,9 @@ S = "${WORKDIR}/git"
 DEPENDS += "zlib util-linux"
 
 inherit pkgconfig autotools-brokensep useradd systemd
+
+LIBS_toolchain-clang_x86 = "-latomic"
+export LIBS
 
 #systemd
 SYSTEMD_PACKAGES = "${PN}"

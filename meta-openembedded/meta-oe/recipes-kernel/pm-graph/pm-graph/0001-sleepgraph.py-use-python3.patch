@@ -1,0 +1,39 @@
+From 22ce65d997f99606a3bb9d2a660ead42eecc234a Mon Sep 17 00:00:00 2001
+From: Naveen Saini <naveen.kumar.saini@intel.com>
+Date: Wed, 11 Sep 2019 11:31:07 +0800
+Subject: [PATCH] sleepgraph.py: use python3
+
+Already compatible with Python 3.
+Same goes for bootgraph.py
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Naveen Saini <naveen.kumar.saini@intel.com>
+---
+ bootgraph.py  | 2 +-
+ sleepgraph.py | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/bootgraph.py b/bootgraph.py
+index d3b99a1..efb5714 100755
+--- a/bootgraph.py
++++ b/bootgraph.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
+ # SPDX-License-Identifier: GPL-2.0-only
+ #
+ # Tool for analyzing boot timing
+diff --git a/sleepgraph.py b/sleepgraph.py
+index 1794c79..cfed8e0 100755
+--- a/sleepgraph.py
++++ b/sleepgraph.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
+ # SPDX-License-Identifier: GPL-2.0-only
+ #
+ # Tool for analyzing suspend/resume timing
+-- 
+2.17.1
+

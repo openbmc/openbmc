@@ -102,7 +102,7 @@ do_compile() {
       powerpc|powerpc64)
         export android_arch=linux-ppc
       ;;
-      i586|x86_64)
+      i586|i686|x86_64)
         export android_arch=linux-x86
       ;;
     esac

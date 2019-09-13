@@ -20,6 +20,7 @@ RDEPENDS_${PN}_class-target += " \
     ${PYTHON_PN}-py \
     ${PYTHON_PN}-setuptools \
     ${PYTHON_PN}-six \
+    ${PYTHON_PN}-atomicwrites \
 "
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/python-pytest:"
