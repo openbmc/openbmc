@@ -369,9 +369,8 @@
 
             <para>
                 These operators differ from the ":=", ".=", "=.", "+=", and "=+"
-                operators in that their effects are deferred
-                until after parsing completes rather than being immediately
-                applied.
+                operators in that their effects are applied at variable
+                expansion time rather than being immediately applied.
                 Here are some examples:
                 <literallayout class='monospaced'>
      B = "bval"
@@ -435,7 +434,7 @@
 
             <para>
                 Like "_append" and "_prepend", "_remove"
-                is deferred until after parsing completes.
+                is applied at variable expansion time.
             </para>
         </section>
 
@@ -800,17 +799,15 @@
             <title>Key Expansion</title>
 
             <para>
-                Key expansion happens when the BitBake datastore is finalized
-                just before BitBake expands overrides.
+                Key expansion happens when the BitBake datastore is finalized.
                 To better understand this, consider the following example:
                 <literallayout class='monospaced'>
      A${B} = "X"
      B = "2"
      A2 = "Y"
                 </literallayout>
-                In this case, after all the parsing is complete, and
-                before any overrides are handled, BitBake expands
-                <filename>${B}</filename> into "2".
+                In this case, after all the parsing is complete,
+                BitBake expands <filename>${B}</filename> into "2".
                 This expansion causes <filename>A2</filename>, which was
                 set to "Y" before the expansion, to become "X".
             </para>

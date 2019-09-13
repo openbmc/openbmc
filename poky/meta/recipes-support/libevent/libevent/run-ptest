@@ -10,10 +10,11 @@ LOG="${LIBEVENTLIB}/ptest/libevent_ptest_$(date +%Y%m%d-%H%M%S).log"
 
 cd ${LIBEVENTLIB}/ptest 
 
-for test in ./test/*
-do
-    $test 2>&1| sed -e '/OK/ s/^/PASS: / ; /FAILED/ s/^/FAIL: / ; /SKIPPED/ s/^/SKIP: / ; /DISABLED/ s/^/SKIP: /' | cut -f1,2 -d ':' | tee -a ${LOG}
-done
+# Run only the libevent "regress" test. All other test scripts in the
+# libevent "test" folder are related to performance, e.g. read/write
+# rates, and/or do not provide a pass/fail output that can be recorded
+# in the ptest log.
+./test/regress 2>&1| sed -e '/TESTS/d' -e '/tests/d' -e '/OK/ s/^/PASS: / ; /FAILED/ s/^/FAIL: / ; /SKIPPED/ s/^/SKIP: / ; /DISABLED/ s/^/SKIP: /' | cut -f1,2 -d ':' | tee -a ${LOG}
 
 passed=`grep PASS ${LOG}|wc -l`
 failed=`grep FAIL ${LOG}|wc -l`
