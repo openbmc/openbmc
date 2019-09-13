@@ -1,7 +1,7 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-raspberrypi:"
 
 SRC_URI = " \
-    git://github.com/raspberrypi/linux.git;protocol=git;branch=${LINUX_RPI_BRANCH} \
+    git://github.com/raspberrypi/linux.git;branch=${LINUX_RPI_BRANCH} \
     "
 SRC_URI_append_raspberrypi4-64 = " file://rpi4-64-kernel-misc.cfg"
 
