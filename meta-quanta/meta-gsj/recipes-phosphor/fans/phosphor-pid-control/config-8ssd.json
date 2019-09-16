@@ -55,6 +55,7 @@
             "writePath": "",
             "min": 0,
             "max": 0,
+            "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
@@ -64,6 +65,7 @@
             "writePath": "",
             "min": 0,
             "max": 0,
+            "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
@@ -73,6 +75,7 @@
             "writePath": "",
             "min": 0,
             "max": 0,
+            "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
@@ -82,6 +85,7 @@
             "writePath": "",
             "min": 0,
             "max": 0,
+            "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
@@ -91,6 +95,7 @@
             "writePath": "",
             "min": 0,
             "max": 0,
+            "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
@@ -100,6 +105,7 @@
             "writePath": "",
             "min": 0,
             "max": 0,
+            "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
@@ -109,6 +115,7 @@
             "writePath": "",
             "min": 0,
             "max": 0,
+            "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
@@ -118,6 +125,7 @@
             "writePath": "",
             "min": 0,
             "max": 0,
+            "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
@@ -127,6 +135,7 @@
             "writePath": "",
             "min": 0,
             "max": 0,
+            "ignoreDbusMinMax": true,
             "timeout": 0
         }
     ],
