@@ -1,0 +1,50 @@
+From 38eeb345fdfca0298b11427aa942b68e627ba10e Mon Sep 17 00:00:00 2001
+From: Bartosz Golaszewski <bgolaszewski@baylibre.com>
+Date: Thu, 12 Sep 2019 13:14:55 +0200
+Subject: [PATCH] build: don't generate manual
+
+We don't have yelp in yocto and even if we did it would pull in
+webkitgtk just to generate help. Just remove the manual generation
+altogether.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Bartosz Golaszewski <bgolaszewski@baylibre.com>
+---
+ Makefile.am  | 3 +--
+ configure.ac | 5 -----
+ 2 files changed, 1 insertion(+), 7 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 81ae6a7..bd073dd 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -4,8 +4,7 @@ AM_CPPFLAGS = src
+ SUBDIRS = \
+ 	src	\
+ 	po	\
+-	data	\
+-	help
++	data
+ 
+ EXTRA_DIST = \
+ 	autogen.sh		\
+diff --git a/configure.ac b/configure.ac
+index 5dccdb0..f88b2c0 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -115,11 +115,6 @@ GETTEXT_PACKAGE=zenity
+ AC_SUBST([GETTEXT_PACKAGE])
+ AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE],["$GETTEXT_PACKAGE"],[Gettext domain])
+ 
+-# *******************************
+-# User manual
+-# *******************************
+-YELP_HELP_INIT
+-
+ # *******************************
+ 
+ AC_SUBST([AM_CPPFLAGS])
+-- 
+2.21.0
+

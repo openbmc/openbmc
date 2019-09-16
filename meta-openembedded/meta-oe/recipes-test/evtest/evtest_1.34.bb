@@ -7,10 +7,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
 DEPENDS = "libxml2"
 
-SRCREV = "ab140a2dab1547f7deb5233be6d94a388cf08b26"
-SRC_URI = "git://anongit.freedesktop.org/evtest;protocol=git"
-
-PV = "1.33+${SRCPV}"
+SRCREV = "16e5104127a620686bdddc4a9ad62881134d6c69"
+SRC_URI = "git://anongit.freedesktop.org/evtest;protocol=git \
+           file://add_missing_limits_h_include.patch"
 
 S = "${WORKDIR}/git"
 

@@ -3,10 +3,10 @@ DESCRIPTION = "Cap’n Proto is an insanely fast data interchange format and cap
 HOMEPAGE = "https://github.com/sandstorm-io/capnproto"
 SECTION = "console/tools"
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://../LICENSE;md5=0a5b5b742baf10cc1c158579eba7fb1d"
+LIC_FILES_CHKSUM = "file://../LICENSE;md5=a05663ae6cca874123bf667a60dca8c9"
 
 SRC_URI = "git://github.com/sandstorm-io/capnproto.git;branch=release-${PV}"
-SRCREV = "c949a18da5f041a36cc218c5c4b79c7705999b4f"
+SRCREV = "3f44c6db0f0f6c0cab0633f15f15d0a2acd01d19"
 
 S = "${WORKDIR}/git/c++"
 

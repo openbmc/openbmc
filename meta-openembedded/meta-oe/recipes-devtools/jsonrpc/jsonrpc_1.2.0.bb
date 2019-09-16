@@ -3,18 +3,14 @@ DESCRIPTION = "JsonRpc-Cpp is an OpenSource implementation of JSON-RPC \
                protocol in C++. JSON-RPC is a lightweight remote procedure \
                call protocol similar to XML-RPC."
 HOMEPAGE = "https://github.com/cinemast/libjson-rpc-cpp"
-
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=4e728c5b36018f6c383b4b9efd9c8840"
 SECTION = "libs"
+
 DEPENDS = "curl jsoncpp libmicrohttpd hiredis"
 
-PV = "1.1.1+git${SRCPV}"
-# v1.1.1
-SRCREV = "319783c635cf8cabcc1a980495c99a88f9ebbd97"
-
-SRC_URI = "git://github.com/cinemast/libjson-rpc-cpp \
-           "
+SRC_URI = "git://github.com/cinemast/libjson-rpc-cpp"
+SRCREV = "4ed5b00dcc409405a19e6d8c6478f703153430e1"
 
 S = "${WORKDIR}/git"
 

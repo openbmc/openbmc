@@ -64,7 +64,7 @@ RDEPENDS_${PN} += "python3-pip \
                  "
 
 # Mycroft uses Alsa, PulseAudio and Flac
-RDEPENDS_${PN} += "alsa-oss alsa-utils alsa-plugins alsa-tools"
+RDEPENDS_${PN} += "alsa-utils alsa-plugins alsa-tools"
 RDEPENDS_${PN} += "pulseaudio pulseaudio-misc pulseaudio-server"
 RDEPENDS_${PN} += "flac"
 

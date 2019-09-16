@@ -12,7 +12,6 @@ DEPENDS = "glib-2.0 glib-2.0-native"
 inherit autotools pkgconfig bash-completion
 
 SRC_URI = "http://www.freedesktop.org/software/${BPN}/${BPN}-${PV}.tar.xz \
-           file://0001-Detect-clang.patch \
            "
 SRC_URI[md5sum] = "3fd831c1b0de4a4432be628432a960ff"
 SRC_URI[sha256sum] = "f1f1e514a89b1dcba05cf7274895e7301a2da4c947b7c2f17acb84fc74038227"
@@ -21,3 +20,4 @@ PACKAGECONFIG ??= "udev mbim"
 PACKAGECONFIG[udev] = ",--without-udev,libgudev"
 PACKAGECONFIG[mbim] = "--enable-mbim-qmux,--disable-mbim-qmux,libmbim"
 
+EXTRA_OECONF_append_toolchain-clang = " --enable-more-warnings=no"

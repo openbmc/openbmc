@@ -4,8 +4,9 @@ BUGTRACKER = "https://github.com/libuv/libuv/issues"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=a68902a430e32200263d182d44924d47"
 
-SRCREV = "a4fc9a66cc35256dbc4dcd67c910174f05b6daa6"
-SRC_URI = "git://github.com/libuv/libuv"
+SRCREV = "697bea87b3a0b0e9b4e5ff86b39d1dedb70ee46d"
+SRC_URI = "git://github.com/libuv/libuv;branch=v1.x"
+
 S = "${WORKDIR}/git"
 
 inherit autotools
