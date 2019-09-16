@@ -1,7 +1,10 @@
+SUMMARY = "Primary bootloader for NPCM7XX (Poleg) devices"
+DESCRIPTION = "Primary bootloader for NPCM7XX (Poleg) devices"
+HOMEPAGE = "https://github.com/Nuvoton-Israel/npcm7xx-bootblock"
 LICENSE = "CLOSED"
 LIC_FILES_CHKSUM = ""
 
-SRCREV = "10.09.05"
+SRCREV = "${PV}"
 FILENAME = "Poleg_bootblock.bin"
 
 SRC_URI = "git://github.com/Nuvoton-Israel/npcm7xx-bootblock;protocol=git"
