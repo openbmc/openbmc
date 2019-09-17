@@ -31,6 +31,10 @@ Accommodate the values above to your own needs (ex: ext3 / ext4).
 
 See: <https://www.raspberrypi.org/documentation/configuration/config-txt/memory.md>
 
+## VC4
+
+By default, each machine uses `vc4` for graphics. This will in turn sets mesa as provider for `gl` libraries. `DISABLE_VC4GRAPHICS` can be set to `1` to disable this behaviour falling back to using `userland`. Be aware that `userland` has not support for 64-bit arch. If you disable `vc4` on a 64-bit Raspberry Pi machine, expect build breakage.
+
 ## Add purchased license codecs
 
 To add you own licenses use variables `KEY_DECODE_MPG2` and `KEY_DECODE_WVC1` in
