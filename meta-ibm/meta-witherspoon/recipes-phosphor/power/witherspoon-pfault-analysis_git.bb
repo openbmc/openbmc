@@ -3,7 +3,7 @@ DESCRIPTION = "Analyzes power devices for faults"
 PR = "r1"
 PV = "1.0+git${SRCPV}"
 
-inherit autotools
+inherit meson
 inherit pkgconfig
 inherit obmc-phosphor-systemd
 inherit pythonnative
