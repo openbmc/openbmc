@@ -1,33 +1,13 @@
-EXTRA_DEPENDS = ""
-
-EXTRA_DEPENDS_npcm7xx = " \
-    npcm7xx-bootblock:do_deploy \
-    npcm7xx-bingo-native:do_populate_sysroot \
-    "
-
 UBOOT_BINARY := "u-boot.${UBOOT_SUFFIX}"
-
 BOOTBLOCK = "Poleg_bootblock.bin"
-
-
 FULL_SUFFIX = "full"
 MERGED_SUFFIX = "merged"
-
-UBOOT_SUFFIX_append_npcm7xx = ".${MERGED_SUFFIX}"
-
-
-do_prepare_bootloaders() {
-
-}
-
+UBOOT_SUFFIX_append = ".${MERGED_SUFFIX}"
 
 # Prepare the Bootblock and U-Boot images using npcm7xx-bingo
-
-do_prepare_bootloaders_npcm7xx() {
-
-    currdir=`pwd`
+do_prepare_bootloaders() {
+    local olddir="$(pwd)"
     cd ${DEPLOY_DIR_IMAGE}
-
     bingo ${STAGING_DIR_NATIVE}/${bindir}/BootBlockAndHeader_EB.xml \
             -o ${DEPLOY_DIR_IMAGE}/${BOOTBLOCK}.${FULL_SUFFIX}
 
@@ -36,29 +16,25 @@ do_prepare_bootloaders_npcm7xx() {
 
     bingo ${STAGING_DIR_NATIVE}/${bindir}/mergedBootBlockAndUboot.xml \
             -o ${DEPLOY_DIR_IMAGE}/${UBOOT_BINARY}.${MERGED_SUFFIX}
-
-    cd $currdir
+    cd "$olddir"
 }
 
-
-do_prepare_bootloaders[depends] += "${EXTRA_DEPENDS}"
-
+do_prepare_bootloaders[depends] += " \
+    npcm7xx-bootblock:do_deploy \
+    npcm7xx-bingo-native:do_populate_sysroot \
+    "
 
 addtask do_prepare_bootloaders before do_generate_static after do_generate_rwfs_static
 
-
 # Include the full bootblock and u-boot in the final static image
-
-python do_generate_static_append_npcm7xx() {
-
+python do_generate_static_append() {
     _append_image(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
                                'u-boot.%s' % d.getVar('UBOOT_SUFFIX',True)),
                   int(d.getVar('FLASH_UBOOT_OFFSET', True)),
                   int(d.getVar('FLASH_KERNEL_OFFSET', True)))
 }
 
-do_make_ubi_append_npcm7xx() {
-
+do_make_ubi_append() {
     # Concatenate the uboot and ubi partitions
     dd bs=1k conv=notrunc seek=${FLASH_UBOOT_OFFSET} \
         if=${DEPLOY_DIR_IMAGE}/u-boot.${UBOOT_SUFFIX} \
