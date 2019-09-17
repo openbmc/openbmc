@@ -72,8 +72,8 @@ python() {
 DISTROOVERRIDES .= ":static-rwfs-${OVERLAY_BASETYPE}"
 DISTROOVERRIDES .= ":ubi-rwfs-${FLASH_UBI_OVERLAY_BASETYPE}"
 
-JFFS2_RWFS_CMD = "mkfs.jffs2 --root=jffs2 --faketime --output=rwfs.jffs2"
-UBIFS_RWFS_CMD = "mkfs.ubifs -r ubifs -c ${FLASH_UBI_RWFS_LEBS} -m ${FLASH_PAGE_SIZE} -e ${FLASH_LEB_SIZE} rwfs.ubifs"
+JFFS2_RWFS_CMD = "mkfs.jffs2 --root=jffs2 --faketime --output=${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.jffs2"
+UBIFS_RWFS_CMD = "mkfs.ubifs -r ubifs -c ${FLASH_UBI_RWFS_LEBS} -m ${FLASH_PAGE_SIZE} -e ${FLASH_LEB_SIZE} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.ubifs"
 
 FLASH_STATIC_RWFS_CMD_static-rwfs-jffs2 = "${JFFS2_RWFS_CMD}"
 FLASH_UBI_RWFS_CMD_ubi-rwfs-jffs2 = "${JFFS2_RWFS_CMD}"
@@ -93,7 +93,7 @@ make_rwfs() {
 	shift
 	opts="$@"
 
-	rm -f rwfs.$type
+	rm -f ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.$type
 	rm -rf $type
 	mkdir $type
 
@@ -158,7 +158,7 @@ do_make_ubi() {
 	add_volume $cfg 1 static rofs-${VERSION_ID} \
 		${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${FLASH_UBI_BASETYPE}
 
-	add_volume $cfg 2 dynamic rwfs rwfs.${FLASH_UBI_OVERLAY_BASETYPE} ${FLASH_UBI_RWFS_TXT_SIZE}
+	add_volume $cfg 2 dynamic rwfs ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${FLASH_UBI_OVERLAY_BASETYPE} ${FLASH_UBI_RWFS_TXT_SIZE}
 
 	# Build the ubi partition image
 	ubinize -p ${FLASH_PEB_SIZE}KiB -m ${FLASH_PAGE_SIZE} -o ubi-img $cfg
@@ -223,7 +223,10 @@ python do_generate_static() {
                   int(d.getVar('FLASH_ROFS_OFFSET', True)),
                   int(d.getVar('FLASH_RWFS_OFFSET', True)))
 
-    _append_image('rwfs.%s' % d.getVar('OVERLAY_BASETYPE', True),
+    _append_image(os.path.join(d.getVar('IMGDEPLOYDIR', True),
+                               '%s.%s' % (
+                                    d.getVar('IMAGE_LINK_NAME', True),
+                                    d.getVar('OVERLAY_BASETYPE', True))),
                   int(d.getVar('FLASH_RWFS_OFFSET', True)),
                   int(d.getVar('FLASH_SIZE', True)))
 
@@ -231,9 +234,6 @@ python do_generate_static() {
 }
 
 do_mk_static_symlinks() {
-	# File needed for generating non-standard legacy links below
-	cp rwfs.${OVERLAY_BASETYPE} ${IMGDEPLOYDIR}/rwfs.${OVERLAY_BASETYPE}
-
 	cd ${IMGDEPLOYDIR}
 	ln -sf ${IMAGE_NAME}.static.mtd ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.static.mtd
 
@@ -243,7 +243,7 @@ do_mk_static_symlinks() {
 	ln -sf u-boot.${UBOOT_SUFFIX} ${IMGDEPLOYDIR}/image-u-boot
 	ln -sf ${FLASH_KERNEL_IMAGE} ${IMGDEPLOYDIR}/image-kernel
 	ln -sf ${IMAGE_LINK_NAME}.${IMAGE_BASETYPE} ${IMGDEPLOYDIR}/image-rofs
-	ln -sf rwfs.${OVERLAY_BASETYPE} ${IMGDEPLOYDIR}/image-rwfs
+	ln -sf ${IMAGE_LINK_NAME}.${OVERLAY_BASETYPE} ${IMGDEPLOYDIR}/image-rwfs
 }
 do_generate_static[dirs] = "${S}/static"
 do_generate_static[depends] += " \
@@ -299,7 +299,7 @@ make_image_links() {
 	ln -sf ${DEPLOY_DIR_IMAGE}/u-boot.${UBOOT_SUFFIX} image-u-boot
 	ln -sf ${DEPLOY_DIR_IMAGE}/${FLASH_KERNEL_IMAGE} image-kernel
 	ln -sf ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.$rofs image-rofs
-	ln -sf rwfs.$rwfs image-rwfs
+	ln -sf ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.$rwfs image-rwfs
 }
 
 make_tar_of_images() {
