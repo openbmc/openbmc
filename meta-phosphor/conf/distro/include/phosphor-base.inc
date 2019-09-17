@@ -135,6 +135,8 @@ KERNEL_FEATURES_remove_qemuall = " phosphor-gpio-keys"
 
 IMAGE_CLASSES_append = " image_types_phosphor"
 
+IMAGE_INSTALL_append = " dbus-broker"
+
 # OpenBMC uses a couple recipes from meta-virtualization
 # but we do not actually want any virtualization support
 # enabled on a BMC distribution.  Silence the emitted

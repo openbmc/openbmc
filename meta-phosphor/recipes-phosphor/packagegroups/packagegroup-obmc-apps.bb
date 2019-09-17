@@ -45,7 +45,6 @@ RDEPENDS_${PN}-extras = " \
         obmc-ikvm \
         phosphor-dbus-monitor \
         phosphor-systemd-policy \
-        dbus-broker \
         "
 
 SUMMARY_${PN}-extrasdev = "Development features"
