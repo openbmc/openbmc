@@ -146,8 +146,8 @@ SKIP_META_VIRT_SANITY_CHECK = "1"
 # Skip the udev database by default.  It adds around 2MB
 # compressed to the root filesystem, and probably doesn't
 # make sense on a BMC anyway.
-BAD_RECOMMENDATIONS_pn-obmc-phosphor-image = "udev-hwdb"
-BAD_RECOMMENDATIONS_pn-obmc-phosphor-image += "shared-mime-info"
+BAD_RECOMMENDATIONS += "udev-hwdb"
+BAD_RECOMMENDATIONS += "shared-mime-info"
 
 LAYER_CONF_VERSION ?= "8"
 
