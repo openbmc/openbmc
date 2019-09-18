@@ -21,7 +21,10 @@ DEPENDS += "pciutils"
 PACKAGECONFIG ?= "cleanup-delete"
 PACKAGECONFIG[cleanup-delete] = "--enable-cleanup-delete, --disable-cleanup-delete"
 # If using static-layout, reboot-update is a good option to handle updating.
+# To be able to track the update status, update-status option can be used.
+# Note that both reboot-update and update-status cannot be enabled at the same time.
 PACKAGECONFIG[reboot-update] = "--enable-reboot-update, --disable-reboot-update"
+PACKAGECONFIG[update-status] = "--enable-update-status, --disable-update-status"
 
 # Default options for supporting various flash types:
 PACKAGECONFIG[static-bmc] = "--enable-static-layout, --disable-static-layout"
