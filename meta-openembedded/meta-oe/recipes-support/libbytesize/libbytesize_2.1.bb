@@ -9,10 +9,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=c07cb499d259452f324bb90c3067d85c"
 S = "${WORKDIR}/git"
 B = "${S}"
 
-SRCREV = "92c00638a6f846df5c40dbb690f9fcf998ad6df2"
-SRC_URI = "git://github.com/rhinstaller/libbytesize;branch=master \
-           file://0001-fix-out-of-tree-build-failure.patch \
-"
+SRCREV = "9ecc1042109528051983261ffd491d45e7c471e1"
+SRC_URI = "git://github.com/rhinstaller/libbytesize;branch=master"
 
 inherit gettext autotools python3native
 

@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=c07cb499d259452f324bb90c3067d85c"
 
 inherit autotools gobject-introspection
 
-SRCREV = "f6e4538485d0442b3674e182c01ffe5a0f258ad4"
+SRCREV = "f5d2458e9e52d8c55b609ae8cf46ef0673b4a02a"
 SRC_URI = " \
     git://github.com/rhinstaller/libblockdev;branch=master \
 "

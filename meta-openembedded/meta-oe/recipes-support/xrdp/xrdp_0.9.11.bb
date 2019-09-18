@@ -12,15 +12,13 @@ REQUIRED_DISTRO_FEATURES = "x11 pam"
 
 SRC_URI = "git://github.com/neutrinolabs/xrdp.git \
            file://xrdp.sysconfig \
-           file://0001-Fix-sesman.ini-and-xrdp.ini.patch \
            file://0001-Added-req_distinguished_name-in-etc-xrdp-openssl.con.patch \
            file://0001-Fix-the-compile-error.patch \
-           file://0001-Fix-of-CVE-2017-16927.patch \
            "
 
-SRCREV = "c295dd61b882e8b56677cf12791f43634f9190b5"
+SRCREV = "1e4b03eb3c9aa7173de251a328c93c073dcc0fca"
 
-PV = "0.9.4+git${SRCPV}"
+PV = "0.9.11"
 
 S = "${WORKDIR}/git"
 
@@ -68,9 +66,9 @@ do_install_append() {
 	sed -i -e 's,@sbindir@,${sbindir},g' ${D}${systemd_unitdir}/system/xrdp.service ${D}${systemd_unitdir}/system/xrdp-sesman.service
 
 	install -m 0644 ${S}/instfiles/*.ini ${D}${sysconfdir}/xrdp/
-	install -m 0644 ${S}/sesman/sesman.ini ${D}${sysconfdir}/xrdp/
+	install -m 0644 ${S}/sesman/sesman.ini.in ${D}${sysconfdir}/xrdp/
 	install -m 0644 ${S}/sesman/startwm.sh ${D}${sysconfdir}/xrdp/
-	install -m 0644 ${S}/xrdp/xrdp.ini ${D}${sysconfdir}/xrdp/
+	install -m 0644 ${S}/xrdp/xrdp.ini.in ${D}${sysconfdir}/xrdp/
 	install -m 0644 ${S}/xrdp/xrdp_keyboard.ini ${D}${sysconfdir}/xrdp/
 	install -m 0644 ${S}/instfiles/xrdp.sh ${D}${sysconfdir}/xrdp/
 	install -m 0644 ${S}/keygen/openssl.conf ${D}${sysconfdir}/xrdp/

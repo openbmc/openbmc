@@ -8,3 +8,5 @@ SRC_URI[md5sum] = "862b56452c64948c787ad8ef9498590b"
 SRC_URI[sha256sum] = "4e9b72cc4a4205ca64fbf1f3fff39a335512166c151ad103e55c8223ac147362"
 
 inherit pypi
+
+BBCLASSEXTEND = "native nativesdk"

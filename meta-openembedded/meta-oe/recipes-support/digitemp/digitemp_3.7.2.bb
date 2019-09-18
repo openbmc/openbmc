@@ -4,11 +4,9 @@ DEPENDS = "libusb1"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=44fee82a1d2ed0676cf35478283e0aa0"
 
-PV = "3.7.1+git${SRCPV}"
-
 SRC_URI = "git://github.com/bcl/digitemp"
 
-SRCREV = "389f67655efa1674f595106c3a47b5ad082609a7"
+SRCREV = "a162e63aad35358aab325388f3d5e88121606419"
 
 S = "${WORKDIR}/git"
 

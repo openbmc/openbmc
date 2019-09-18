@@ -5,14 +5,12 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=83af8811a28727a13f04132cc33b7f58"
 
 DEPENDS = "virtual/libx11 libxext xorgproto"
 
-PV = "1.1.1+git${SRCPV}"
-
-SRCREV = "a21bf7aa438f5dd40d0a300a3167aa3d6f26dccc"
+SRCREV = "f57a9904c43ef5d726320c77baa91d0c38361ed4"
 SRC_URI = "git://anongit.freedesktop.org/vdpau/libvdpau"
 
 S = "${WORKDIR}/git"
 
-inherit distro_features_check autotools pkgconfig
+inherit distro_features_check meson
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

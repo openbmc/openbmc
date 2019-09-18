@@ -6,10 +6,9 @@ DEPENDS = "intltool-native libusb1 libgudev glib-2.0 dbus-glib"
 
 SRC_URI = " \
     http://upower.freedesktop.org/releases/${BPN}-${PV}.tar.xz \
-    file://0001-linux-lower-severity-of-unhandled-action-messages.patch \
 "
-SRC_URI[md5sum] = "236bb439d9ff1151450b3d8582399532"
-SRC_URI[sha256sum] = "24bcc2f6ab25a2533bac70b587bcb019e591293076920f5b5e04bdedc140a401"
+SRC_URI[md5sum] = "abe6acb617f11f2e8dbd9846fcf86e24"
+SRC_URI[sha256sum] = "64b5ffbfccd5bdb15d925777979a4dbee1a957f9eaeb158dc76175267eddbdef"
 
 inherit autotools pkgconfig gettext gobject-introspection systemd distro_features_check
 

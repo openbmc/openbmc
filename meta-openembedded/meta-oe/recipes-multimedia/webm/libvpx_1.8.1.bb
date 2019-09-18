@@ -7,8 +7,7 @@ LICENSE = "BSD"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=d5b04755015be901744a78cc30d390d4"
 
-# SRCREV for 1.7.0
-SRCREV = "133f83e2c34b8d770ae06aa595cef3e254173fcb"
+SRCREV = "8ae686757b708cd8df1d10c71586aff5355cfe1e"
 SRC_URI += "git://chromium.googlesource.com/webm/libvpx;protocol=https \
             file://libvpx-configure-support-blank-prefix.patch \
            "

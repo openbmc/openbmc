@@ -1,15 +1,12 @@
-# Copyright (C) 2018 Khem Raj <raj.khem@gmail.com>
-# Released under the MIT license (see COPYING.MIT for the terms)
-
-DESCRIPTION = "Crypto and TLS for C++11"
+SUMMARY = "Crypto and TLS for C++11"
 HOMEPAGE = "https://botan.randombit.net"
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://license.txt;md5=f4c145d4d70a3244a053c9f90d4841fc"
 SECTION = "libs"
 
-SRC_URI = "https://botan.randombit.net/releases/Botan-${PV}.tgz"
-SRC_URI[md5sum] = "db8403d6a2f10c20fde3f3c76be9a045"
-SRC_URI[sha256sum] = "305564352334dd63ae63db039077d96ae52dfa57a3248871081719b6a9f2d119"
+SRC_URI = "https://botan.randombit.net/releases/Botan-${PV}.tar.xz"
+SRC_URI[md5sum] = "2dba13b0d25d0e9d2a6f9867c62c9f2e"
+SRC_URI[sha256sum] = "f7874da2aeb8c018fd77df40b2137879bf90b66f5589490c991e83fb3e8094be"
 
 S = "${WORKDIR}/Botan-${PV}"
 

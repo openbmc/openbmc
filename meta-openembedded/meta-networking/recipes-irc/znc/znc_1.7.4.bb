@@ -8,7 +8,7 @@ DEPENDS = "openssl zlib icu"
 SRC_URI = "git://github.com/znc/znc.git;name=znc \
            git://github.com/jimloco/Csocket.git;destsuffix=git/third_party/Csocket;name=Csocket \
           "
-SRCREV_znc = "be1b6bcd4cafbc57ebc298d89a5402ae7df55a8a"
+SRCREV_znc = "e661cdf9a394e2afd1b97517efa21fa2fa757e22"
 SRCREV_Csocket = "e8d9e0bb248c521c2c7fa01e1c6a116d929c41b4"
 
 # This constructs a composite revision based on multiple SRCREV's.

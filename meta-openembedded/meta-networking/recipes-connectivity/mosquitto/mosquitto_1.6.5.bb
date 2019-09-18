@@ -1,5 +1,9 @@
-SUMMARY = "Open source MQTT v3.1/3.1.1 implemention"
-DESCRIPTION = "Mosquitto is an open source (Eclipse licensed) message broker that implements the MQ Telemetry Transport protocol version 3.1 and 3.1.1. MQTT provides a lightweight method of carrying out messaging using a publish/subscribe model. "
+SUMMARY = "Open source MQTT implementation"
+DESCRIPTION = "Mosquitto is an open source (Eclipse licensed) message broker \
+that implements the MQ Telemetry Transport protocol version 3.1, 3.1.1 and \
+5, providing both an MQTT broker and several command-line clients. MQTT \
+provides a lightweight method of carrying out messaging using a \
+publish/subscribe model. "
 HOMEPAGE = "http://mosquitto.org/"
 SECTION = "console/network"
 LICENSE = "EPL-1.0 | EDL-1.0"
@@ -14,8 +18,8 @@ SRC_URI = "http://mosquitto.org/files/source/mosquitto-${PV}.tar.gz \
            file://mosquitto.init \
 "
 
-SRC_URI[md5sum] = "bbbcceb32db3657d9d436a8440a9db1c"
-SRC_URI[sha256sum] = "78d7e70c3794dc3a1d484b4f2f8d3addebe9c2da3f5a1cebe557f7d13beb0da4"
+SRC_URI[md5sum] = "12a1bd274d5ec454649a06c1bf65d802"
+SRC_URI[sha256sum] = "bc71b38b5a26fc7cc772853e5607c657868db9f9a6d2b15e2b677649a0f85d20"
 
 inherit systemd update-rc.d useradd
 
@@ -79,6 +83,7 @@ FILES_libmosquittopp1 = "${libdir}/libmosquittopp.so.1"
 
 FILES_${PN}-clients = "${bindir}/mosquitto_pub \
                        ${bindir}/mosquitto_sub \
+                       ${bindir}/mosquitto_rr \
 "
 
 FILES_${PN}-examples = "${sysconfdir}/mosquitto/*.example"
