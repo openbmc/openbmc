@@ -377,11 +377,13 @@ def get_pubkey_path(d):
 
 python do_generate_phosphor_manifest() {
     version = do_get_version(d)
+    target_machine = d.getVar('MACHINE', True)
     with open('MANIFEST', 'w') as fd:
         fd.write('purpose=xyz.openbmc_project.Software.Version.VersionPurpose.BMC\n')
         fd.write('version={}\n'.format(version.strip('"')))
         fd.write('KeyType={}\n'.format(get_pubkey_type(d)))
         fd.write('HashType=RSA-SHA256\n')
+        fd.write('MachineName={}\n'.format(target_machine))
 }
 do_generate_phosphor_manifest[dirs] = "${S}"
 do_generate_phosphor_manifest[depends] += " \
