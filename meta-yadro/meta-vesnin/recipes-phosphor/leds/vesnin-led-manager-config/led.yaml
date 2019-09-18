@@ -7,6 +7,9 @@ BmcBooted:
         Action: 'On'
         Priority: 'Blink'
 PowerOn:
+    power_green:
+        Action: 'On'
+        Priority: 'On'
 PgoodTimeout:
     power_red:
         Action: 'On'
