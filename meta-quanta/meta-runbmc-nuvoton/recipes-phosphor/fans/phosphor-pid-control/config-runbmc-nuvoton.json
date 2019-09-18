@@ -1,0 +1,400 @@
+{
+    "sensors" : [
+        {
+            "name": "fan1",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/fan1",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/**/pwm1",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "Core_0_CPU0",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_0_CPU0",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "timeout": 0
+        },
+        {
+            "name": "Core_0_CPU1",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_0_CPU1",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "timeout": 0
+        },
+        {
+            "name": "Core_1_CPU0",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_1_CPU0",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "timeout": 0
+        },
+        {
+            "name": "Core_1_CPU1",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_1_CPU1",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "timeout": 0
+        },
+        {
+            "name": "Core_2_CPU0",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_2_CPU0",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "timeout": 0
+        },
+        {
+            "name": "Core_2_CPU1",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_2_CPU1",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "timeout": 0
+        },
+        {
+            "name": "Core_3_CPU0",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_3_CPU0",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "timeout": 0
+        },
+        {
+            "name": "Core_3_CPU1",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_3_CPU1",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "timeout": 0
+        },
+        {
+            "name": "Core_4_CPU0",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_4_CPU0",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "timeout": 0
+        },
+        {
+            "name": "Core_4_CPU1",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_4_CPU1",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "timeout": 0
+        },
+        {
+            "name": "Core_5_CPU0",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_5_CPU0",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "timeout": 0
+        },
+        {
+            "name": "Core_5_CPU1",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/Core_5_CPU1",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "timeout": 0
+        }
+    ],
+    "zones" : [
+        {
+            "id": 0,
+            "minThermalOutput": 0.0,
+            "failsafePercent": 100.0,
+            "pids": [
+                {
+                    "name": "fan1",
+                    "type": "fan",
+                    "inputs": ["fan1"],
+                    "setpoint": 40.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": 0.0,
+                        "integralCoeff": 0.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 1.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 3.0,
+                        "outLim_max": 100.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0
+                    }
+                },
+                {
+                    "name": "Core_0_CPU0",
+                    "type": "temp",
+                    "inputs": ["Core_0_CPU0"],
+                    "setpoint": 30.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -20.0,
+                        "integralCoeff": -0.1,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 16000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 1.0,
+                        "negativeHysteresis": 1.0
+                    }
+                },
+                {
+                    "name": "Core_0_CPU1",
+                    "type": "temp",
+                    "inputs": ["Core_0_CPU1"],
+                    "setpoint": 30.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -20.0,
+                        "integralCoeff": -0.1,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 16000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 1.0,
+                        "negativeHysteresis": 1.0
+                    }
+                },
+                {
+                    "name": "Core_1_CPU0",
+                    "type": "temp",
+                    "inputs": ["Core_1_CPU0"],
+                    "setpoint": 30.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -20.0,
+                        "integralCoeff": -0.1,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 16000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 1.0,
+                        "negativeHysteresis": 1.0
+                    }
+                },
+                {
+                    "name": "Core_1_CPU1",
+                    "type": "temp",
+                    "inputs": ["Core_1_CPU1"],
+                    "setpoint": 30.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -20.0,
+                        "integralCoeff": -0.1,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 16000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 1.0,
+                        "negativeHysteresis": 1.0
+                    }
+                },
+                {
+                    "name": "Core_2_CPU0",
+                    "type": "temp",
+                    "inputs": ["Core_2_CPU0"],
+                    "setpoint": 30.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -20.0,
+                        "integralCoeff": -0.1,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 16000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 1.0,
+                        "negativeHysteresis": 1.0
+                    }
+                },
+                {
+                    "name": "Core_2_CPU1",
+                    "type": "temp",
+                    "inputs": ["Core_2_CPU1"],
+                    "setpoint": 30.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -20.0,
+                        "integralCoeff": -0.1,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 16000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 1.0,
+                        "negativeHysteresis": 1.0
+                    }
+                },
+                {
+                    "name": "Core_3_CPU0",
+                    "type": "temp",
+                    "inputs": ["Core_3_CPU0"],
+                    "setpoint": 30.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -20.0,
+                        "integralCoeff": -0.1,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 16000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 1.0,
+                        "negativeHysteresis": 1.0
+                    }
+                },
+                {
+                    "name": "Core_3_CPU1",
+                    "type": "temp",
+                    "inputs": ["Core_3_CPU1"],
+                    "setpoint": 30.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -20.0,
+                        "integralCoeff": -0.1,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 16000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 1.0,
+                        "negativeHysteresis": 1.0
+                    }
+                },
+                {
+                    "name": "Core_4_CPU0",
+                    "type": "temp",
+                    "inputs": ["Core_4_CPU0"],
+                    "setpoint": 30.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -20.0,
+                        "integralCoeff": -0.1,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 16000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 1.0,
+                        "negativeHysteresis": 1.0
+                    }
+                },
+                {
+                    "name": "Core_4_CPU1",
+                    "type": "temp",
+                    "inputs": ["Core_4_CPU1"],
+                    "setpoint": 30.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -20.0,
+                        "integralCoeff": -0.1,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 16000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 1.0,
+                        "negativeHysteresis": 1.0
+                    }
+                },
+                {
+                    "name": "Core_5_CPU0",
+                    "type": "temp",
+                    "inputs": ["Core_5_CPU0"],
+                    "setpoint": 30.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -20.0,
+                        "integralCoeff": -0.1,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 16000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 1.0,
+                        "negativeHysteresis": 1.0
+                    }
+                },
+                {
+                    "name": "Core_5_CPU1",
+                    "type": "temp",
+                    "inputs": ["Core_5_CPU1"],
+                    "setpoint": 30.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -20.0,
+                        "integralCoeff": -0.1,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 16000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 1.0,
+                        "negativeHysteresis": 1.0
+                    }
+                }
+            ]
+        }
+    ]
+}
