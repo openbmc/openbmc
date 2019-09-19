@@ -1,0 +1,20 @@
+bmc_booted:
+    power:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+        Priority: 'On'
+    init-ok:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+
+#fp5280g2 does not use "power" and "power_on". but the led.yaml needs it, otherwise the machine won't power on.
+power_on:
+    power:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+
