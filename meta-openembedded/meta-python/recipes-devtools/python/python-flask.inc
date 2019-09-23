@@ -13,4 +13,4 @@ CLEANBROKEN = "1"
 
 PYPI_PACKAGE = "Flask"
 
-RDEPENDS_${PN} = "${PYTHON_PN}-werkzeug ${PYTHON_PN}-werkzeug-tests ${PYTHON_PN}-jinja2 ${PYTHON_PN}-itsdangerous ${PYTHON_PN}-click"
+RDEPENDS_${PN} = "${PYTHON_PN}-werkzeug ${PYTHON_PN}-jinja2 ${PYTHON_PN}-itsdangerous ${PYTHON_PN}-click"

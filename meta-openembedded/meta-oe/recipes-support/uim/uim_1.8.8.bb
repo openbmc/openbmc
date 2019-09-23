@@ -1,19 +1,19 @@
 DESCRIPTION = "A multilingual user input method library"
 HOMEPAGE = "http://uim.freedesktop.org/"
 LICENSE = "BSD-3-Clause & LGPLv2+"
-LIC_FILES_CHKSUM = "file://COPYING;md5=32463fd29aa303fb2360faeeae17256b"
+LIC_FILES_CHKSUM = "file://COPYING;md5=ab2826b41ca0ff4030d38cc39791d1c8"
 SECTION = "inputmethods"
 
-SRC_URI = "https://github.com/uim/uim/releases/download/uim-${PV}/uim-${PV}.tar.bz2"
+SRC_URI = "https://github.com/uim/uim/releases/download/${PV}/uim-${PV}.tar.bz2"
 
-SRC_URI_append_class-target = " file://uim-module-manager.patch \
+SRC_URI_append_class-target = "\
+    file://uim-module-manager.patch \
     file://0001-fix-bug-for-cross-compile.patch \
-    file://0001-Add-support-for-aarch64.patch \
 "
-SRC_URI[md5sum] = "ecea4c597bab1fd4ba98ea84edcece59"
-SRC_URI[sha256sum] = "7b1ea803c73f3478917166f04f67cce6e45ad7ea5ab6df99b948c17eb1cb235f"
+SRC_URI[md5sum] = "01c7bd5d0d4f3a9f6f5befe6f57a470b"
+SRC_URI[sha256sum] = "34599bbcc4e5ab87832370763e38be5100984a64237555e9234a1ea225a0fadc"
 
-DEPENDS = "anthy fontconfig libxft libxt glib-2.0 ncurses intltool"
+DEPENDS = "anthy fontconfig libxft libxt glib-2.0 ncurses intltool libedit"
 DEPENDS_append_class-target = " intltool-native gtk+ gtk+3 uim-native takao-fonts"
 
 RDEPENDS_uim = "libuim0 libedit"
@@ -38,6 +38,9 @@ EXTRA_OECONF += "--disable-emacs \
 "
 
 CONFIGUREOPTS_remove_class-target = "--disable-silent-rules"
+
+# https://github.com/uim/uim/issues/44
+PARALLEL_MAKE = ""
 
 #Because m4 file's find maxdepth=2, so copy the m4 files of the deep depth.
 do_configure_prepend () {

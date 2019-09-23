@@ -19,8 +19,6 @@ PE = "1"
 
 inherit cmake pkgconfig python3native perlnative upstream-version-is-even
 
-ARM_INSTRUCTION_SET = "arm"
-
 PACKAGECONFIG ?= "libpcap gnutls libnl libcap sbc"
 
 PACKAGECONFIG_class-native = "libpcap gnutls ssl libssh"

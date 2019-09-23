@@ -13,8 +13,8 @@ SRC_URI = "https://samba.org/ftp/tevent/tevent-${PV}.tar.gz \
 "
 LIC_FILES_CHKSUM = "file://tevent.h;endline=26;md5=4e458d658cb25e21efc16f720e78b85a"
 
-SRC_URI[md5sum] = "97ea9861252e52c24adf6c45ab676a60"
-SRC_URI[sha256sum] = "33f39612cd6d1ae6a737245784581494846f5bb07827983d2f41f942446aa4e6"
+SRC_URI[md5sum] = "1060eb69d6994a847eecb73c4d391ced"
+SRC_URI[sha256sum] = "79a4da68b38b86ac71d8ac824ee3605ab22a6a91cfa83033a7db73f3dd6910b6"
 
 inherit waf-samba
 

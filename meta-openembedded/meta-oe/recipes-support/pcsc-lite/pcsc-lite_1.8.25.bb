@@ -8,13 +8,12 @@ LICENSE_${PN}-dev = "BSD"
 LICENSE_${PN}-dbg = "BSD & GPLv3+"
 LICENSE_${PN}-spy = "GPLv3+"
 LICENSE_${PN}-spy-dev = "GPLv3+"
-LIC_FILES_CHKSUM = "file://COPYING;md5=f38b3d1c7ef7fc2c8b6d20cd38efdc29"
+LIC_FILES_CHKSUM = "file://COPYING;md5=628c01ba985ecfa21677f5ee2d5202f6"
 DEPENDS = "udev"
 
 SRC_URI = "https://pcsclite.apdu.fr/files/${BP}.tar.bz2"
-SRC_URI[md5sum] = "0ec103b1ef298d0c58d6ef6b00b9cf17"
-SRC_URI[sha256sum] = "6a358f61ed3b66a7f6e1f4e794a94c7be4c81b7a58ec360c33791e8d7d9bd405"
-
+SRC_URI[md5sum] = "c20650a36062ab1689f37f3302c988f2"
+SRC_URI[sha256sum] = "d76d79edc31cf76e782b9f697420d3defbcc91778c3c650658086a1b748e8792"
 
 inherit autotools systemd pkgconfig
 
@@ -26,6 +25,10 @@ EXTRA_OECONF = " \
 
 S = "${WORKDIR}/pcsc-lite-${PV}"
 
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
+
+PACKAGECONFIG[systemd]  = ",--disable-libsystemd,systemd,"
+
 PACKAGES = "${PN} ${PN}-dbg ${PN}-dev ${PN}-lib ${PN}-doc ${PN}-spy ${PN}-spy-dev"
 
 RRECOMMENDS_${PN} = "ccid"
@@ -36,7 +39,7 @@ FILES_${PN}-dev = "${includedir} \
                    ${libdir}/pkgconfig \
                    ${libdir}/libpcsclite.la \
                    ${libdir}/libpcsclite.so"
-                   
+
 FILES_${PN}-spy = "${bindir}/pcsc-spy \
                    ${libdir}/libpcscspy*${SOLIBS}"
 FILES_${PN}-spy-dev = "${libdir}/libpcscspy.la \

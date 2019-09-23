@@ -21,6 +21,11 @@ RDEPENDS_${PN}_class-target += " \
     ${PYTHON_PN}-setuptools \
     ${PYTHON_PN}-six \
     ${PYTHON_PN}-atomicwrites \
+    ${PYTHON_PN}-importlib-metadata \
+    ${PYTHON_PN}-pathlib2 \
+    ${PYTHON_PN}-wcwidth \
+    ${PYTHON_PN}-more-itertools \
+    ${PYTHON_PN}-packaging \
 "
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/python-pytest:"
