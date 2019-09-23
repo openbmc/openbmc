@@ -5,7 +5,7 @@ first 'init' program more efficiently."
 PACKAGE_INSTALL = "${VIRTUAL-RUNTIME_base-utils} base-passwd ${ROOTFS_BOOTSTRAP_INSTALL} obmc-phosphor-initfs"
 
 # Do not pollute the initrd image with rootfs features
-IMAGE_FEATURES = ""
+IMAGE_FEATURES = "read-only-rootfs"
 
 export IMAGE_BASENAME = "obmc-phosphor-initramfs"
 IMAGE_LINGUAS = ""
