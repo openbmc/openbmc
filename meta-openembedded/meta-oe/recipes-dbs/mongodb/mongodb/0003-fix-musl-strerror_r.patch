@@ -1,0 +1,30 @@
+Index: git/src/mongo/util/errno_util.cpp
+===================================================================
+--- git.orig/src/mongo/util/errno_util.cpp
++++ git/src/mongo/util/errno_util.cpp
+@@ -49,6 +49,16 @@ const char kUnknownMsg[] = "Unknown erro
+ const int kBuflen = 256;  // strerror strings in non-English locales can be large.
+ }  // namespace
+ 
++inline char const * strerror_r_helper( char const * r, char const * )
++{
++    return r;
++}
++
++inline char const * strerror_r_helper( int r, char const * buffer )
++{
++    return r == 0? buffer: "Unknown error";
++}
++
+ std::string errnoWithDescription(int errNumber) {
+ #if defined(_WIN32)
+     if (errNumber == -1)
+@@ -63,7 +73,7 @@ std::string errnoWithDescription(int err
+ 
+ #if defined(__GNUC__) && defined(_GNU_SOURCE) && \
+     (!defined(__ANDROID_API__) || !(__ANDROID_API__ <= 22)) && !defined(EMSCRIPTEN)
+-    msg = strerror_r(errNumber, buf, kBuflen);
++    msg = strerror_r_helper(strerror_r(errNumber, buf, kBuflen));
+ #elif defined(_WIN32)
+ 
+     LPWSTR errorText = nullptr;

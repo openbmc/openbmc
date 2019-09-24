@@ -1,19 +1,20 @@
-From 53368d3f4adc09dd84234a9af31771bcd8ca2757 Mon Sep 17 00:00:00 2001
-From: Sven Ebenfeld <sven.ebenfeld@gmail.com>
-Date: Fri, 15 Jan 2016 22:41:28 +0100
-Subject: [PATCH] Tell scons to use build settings from environment variables
+From 1b2e24e14ee72e54e466be2512c78272f62d60b4 Mon Sep 17 00:00:00 2001
+From: Vincent Prince <vincent.prince.fr@gmail.com>
+Date: Mon, 16 Sep 2019 13:21:44 +0200
+Subject: [PATCH 01/10] Tell scons to use build settings from environment
+ variables
 
 Signed-off-by: Sven Ebenfeld <sven.ebenfeld@gmail.com>
+Signed-off-by: Vincent Prince <vincent.prince.fr@gmail.com>
 ---
  SConstruct                | 8 ++++++--
- src/mongo/util/SConscript | 2 ++
- 2 files changed, 8 insertions(+), 2 deletions(-)
+ 1 files changed, 8 insertions(+), 2 deletions(-)
 
-Index: git/SConstruct
-===================================================================
---- git.orig/SConstruct
-+++ git/SConstruct
-@@ -564,6 +564,7 @@ def variable_arch_converter(val):
+diff --git a/SConstruct b/SConstruct
+index 7ebbcbc..e63cf15 100644
+--- a/SConstruct
++++ b/SConstruct
+@@ -608,6 +608,7 @@ def variable_arch_converter(val):
          'amd64':  'x86_64',
          'emt64':   'x86_64',
          'x86':    'i386',
@@ -21,7 +22,7 @@ Index: git/SConstruct
      }
      val = val.lower()
  
-@@ -652,7 +653,8 @@ env_vars.Add(
+@@ -695,7 +696,8 @@ env_vars.Add(
  )
  
  env_vars.Add('CC',
@@ -31,7 +32,7 @@ Index: git/SConstruct
  
  env_vars.Add('CCFLAGS',
      help='Sets flags for the C and C++ compiler',
-@@ -672,7 +674,8 @@ env_vars.Add('CPPPATH',
+@@ -715,7 +717,8 @@ env_vars.Add('CPPPATH',
      converter=variable_shlex_converter)
  
  env_vars.Add('CXX',
@@ -41,24 +42,15 @@ Index: git/SConstruct
  
  env_vars.Add('CXXFLAGS',
      help='Sets flags for the C++ compiler',
-@@ -961,6 +964,7 @@ envDict = dict(BUILD_ROOT=buildDir,
+@@ -1018,6 +1021,7 @@ envDict = dict(BUILD_ROOT=buildDir,
                 )
  
  env = Environment(variables=env_vars, **envDict)
 +env.PrependENVPath('PATH', os.getenv('PATH'))
  del envDict
  
- env.AddMethod(mongo_platform.env_os_is_wrapper, 'TargetOSIs')
-Index: git/src/mongo/util/SConscript
-===================================================================
---- git.orig/src/mongo/util/SConscript
-+++ git/src/mongo/util/SConscript
-@@ -329,6 +329,8 @@ if env['MONGO_ALLOCATOR'] == 'tcmalloc':
-                 'MONGO_HAVE_GPERFTOOLS_SIZE_CLASS_STATS'
-             ]
-         )
-+    if not use_system_version_of_library('valgrind'):
-+        tcmspEnv.InjectThirdPartyIncludePaths('valgrind')
+ for var in ['CC', 'CXX']:
  
-     if not use_system_version_of_library('valgrind'):
-         # Include valgrind since tcmalloc disables itself while running under valgrind
+-- 
+2.7.4
+

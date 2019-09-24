@@ -1,7 +1,7 @@
-From 98543889f7ba38c02eb7cd9822f45e27d619edd6 Mon Sep 17 00:00:00 2001
+From ffe6045b190b735601cd209d3e7ac121604c5a4e Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 24 Aug 2018 13:07:01 -0700
-Subject: [PATCH 2/2] Fix default stack size to 256K
+Subject: [PATCH 08/10] Fix default stack size to 256K
 
 On musl default stack size is ~80K which is too low
 for mongodb
@@ -10,14 +10,14 @@ Upstream-Status: Pending
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- .../platform/stack_locator_pthread_getattr_np.cpp      | 10 ++++++++++
+ src/mongo/platform/stack_locator_pthread_getattr_np.cpp | 10 ++++++++++
  1 file changed, 10 insertions(+)
 
 diff --git a/src/mongo/platform/stack_locator_pthread_getattr_np.cpp b/src/mongo/platform/stack_locator_pthread_getattr_np.cpp
-index 648d26a41c..6e398f00c9 100644
+index 4f3044c..68e47e3 100644
 --- a/src/mongo/platform/stack_locator_pthread_getattr_np.cpp
 +++ b/src/mongo/platform/stack_locator_pthread_getattr_np.cpp
-@@ -35,6 +35,16 @@
+@@ -36,6 +36,16 @@
  #include "mongo/util/assert_util.h"
  #include "mongo/util/scopeguard.h"
  
@@ -35,5 +35,5 @@ index 648d26a41c..6e398f00c9 100644
  
  StackLocator::StackLocator() {
 -- 
-2.18.0
+2.7.4
 

@@ -1,0 +1,19 @@
+Index: git/SConstruct
+===================================================================
+--- git.orig/SConstruct
++++ git/SConstruct
+@@ -884,6 +884,14 @@ env_vars.Add('WINDOWS_OPENSSL_BIN',
+     help='Sets the path to the openssl binaries for packaging',
+     default='c:/openssl/bin')
+ 
++env_vars.Add('PREFIX',
++    help='installation prefix')
++
++env_vars.Add('prefix',
++    help='installation prefix')
++
++
++
+ # -- Validate user provided options --
+ 
+ # A dummy environment that should *only* have the variables we have set. In practice it has

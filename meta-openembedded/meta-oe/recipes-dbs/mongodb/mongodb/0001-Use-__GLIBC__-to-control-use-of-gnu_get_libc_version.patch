@@ -1,18 +1,18 @@
-From 3eed8388b49d5d3cbc2db74fee1b017eb4b40d0a Mon Sep 17 00:00:00 2001
-From: Khem Raj <raj.khem@gmail.com>
-Date: Sat, 2 Sep 2017 10:06:24 -0700
-Subject: [PATCH] Use __GLIBC__ to control use of gnu_get_libc_version
+From d701ceeb15662038435b80ba556a80c17f76d2dc Mon Sep 17 00:00:00 2001
+From: Vincent Prince <vincent.prince.fr@gmail.com>
+Date: Mon, 16 Sep 2019 13:30:13 +0200
+Subject: [PATCH 03/10] Use __GLIBC__ to control use of gnu_get_libc_version
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Vincent Prince <vincent.prince.fr@gmail.com>
 ---
-Upstream-Status: Pending
- src/mongo/util/processinfo_linux.cpp | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ src/mongo/util/processinfo_linux.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Index: git/src/mongo/util/processinfo_linux.cpp
-===================================================================
---- git.orig/src/mongo/util/processinfo_linux.cpp
-+++ git/src/mongo/util/processinfo_linux.cpp
+diff --git a/src/mongo/util/processinfo_linux.cpp b/src/mongo/util/processinfo_linux.cpp
+index cccb91c..45c4b7d 100644
+--- a/src/mongo/util/processinfo_linux.cpp
++++ b/src/mongo/util/processinfo_linux.cpp
 @@ -44,10 +44,10 @@
  #include <unistd.h>
  #ifdef __BIONIC__
@@ -27,8 +27,8 @@ Index: git/src/mongo/util/processinfo_linux.cpp
  #endif
  
  #include <boost/filesystem.hpp>
-@@ -503,7 +503,7 @@ void ProcessInfo::SystemInfo::collectSys
-     stringstream ss;
+@@ -546,7 +546,7 @@ void ProcessInfo::SystemInfo::collectSystemInfo() {
+     std::stringstream ss;
      ss << "uClibc-" << __UCLIBC_MAJOR__ << "." << __UCLIBC_MINOR__ << "." << __UCLIBC_SUBLEVEL__;
      bExtra.append("libcVersion", ss.str());
 -#else
@@ -36,3 +36,6 @@ Index: git/src/mongo/util/processinfo_linux.cpp
      bExtra.append("libcVersion", gnu_get_libc_version());
  #endif
      if (!verSig.empty())
+-- 
+2.7.4
+

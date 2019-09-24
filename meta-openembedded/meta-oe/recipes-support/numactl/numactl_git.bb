@@ -18,6 +18,7 @@ SRC_URI = "git://github.com/numactl/numactl \
     file://Makefile \
     file://run-ptest \
     file://0001-define-run-test-target.patch \
+    file://0001-numademo-fix-error-on-32bit-system.patch \
 "
 
 S = "${WORKDIR}/git"

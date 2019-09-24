@@ -1,7 +1,7 @@
-From a4951489d649c2b609cbb80f6cfb49fdcad8bd43 Mon Sep 17 00:00:00 2001
+From 20fcbf2a05ee6542aba942f6006d149db70fb9ce Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 2 Sep 2017 10:03:37 -0700
-Subject: [PATCH] Use long long instead of int64_t
+Subject: [PATCH 02/10] Use long long instead of int64_t
 
 Fixes
 error: call to member function 'appendNumber' is ambiguous
@@ -9,15 +9,14 @@ since this function expects long long as parameter and not int64_t
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
-Upstream-Status: Pending
  src/mongo/util/procparser.cpp | 10 +++++-----
  1 file changed, 5 insertions(+), 5 deletions(-)
 
-Index: git/src/mongo/util/procparser.cpp
-===================================================================
---- git.orig/src/mongo/util/procparser.cpp
-+++ git/src/mongo/util/procparser.cpp
-@@ -260,7 +260,7 @@ Status parseProcStat(const std::vector<S
+diff --git a/src/mongo/util/procparser.cpp b/src/mongo/util/procparser.cpp
+index c574a3f..5ea66b7 100644
+--- a/src/mongo/util/procparser.cpp
++++ b/src/mongo/util/procparser.cpp
+@@ -261,7 +261,7 @@ Status parseProcStat(const std::vector<StringData>& keys,
  
                      StringData stringValue((*partIt).begin(), (*partIt).end() - (*partIt).begin());
  
@@ -26,7 +25,7 @@ Index: git/src/mongo/util/procparser.cpp
  
                      if (!parseNumberFromString(stringValue, &value).isOK()) {
                          value = 0;
-@@ -272,7 +272,7 @@ Status parseProcStat(const std::vector<S
+@@ -273,7 +273,7 @@ Status parseProcStat(const std::vector<StringData>& keys,
              } else {
                  StringData stringValue((*partIt).begin(), (*partIt).end() - (*partIt).begin());
  
@@ -35,7 +34,7 @@ Index: git/src/mongo/util/procparser.cpp
  
                  if (!parseNumberFromString(stringValue, &value).isOK()) {
                      value = 0;
-@@ -365,7 +365,7 @@ Status parseProcMemInfo(const std::vecto
+@@ -366,7 +366,7 @@ Status parseProcMemInfo(const std::vector<StringData>& keys,
  
              StringData stringValue((*partIt).begin(), (*partIt).end());
  
@@ -44,7 +43,7 @@ Index: git/src/mongo/util/procparser.cpp
  
              if (!parseNumberFromString(stringValue, &value).isOK()) {
                  value = 0;
-@@ -522,7 +522,7 @@ Status parseProcDiskStats(const std::vec
+@@ -522,7 +522,7 @@ Status parseProcDiskStats(const std::vector<StringData>& disks,
                            StringData data,
                            BSONObjBuilder* builder) {
      bool foundKeys = false;
@@ -53,7 +52,7 @@ Index: git/src/mongo/util/procparser.cpp
      stats.reserve(kDiskFieldCount);
  
      using string_split_iterator = boost::split_iterator<StringData::const_iterator>;
-@@ -597,7 +597,7 @@ Status parseProcDiskStats(const std::vec
+@@ -597,7 +597,7 @@ Status parseProcDiskStats(const std::vector<StringData>& disks,
  
                  StringData stringValue((*partIt).begin(), (*partIt).end());
  
@@ -62,3 +61,6 @@ Index: git/src/mongo/util/procparser.cpp
  
                  if (!parseNumberFromString(stringValue, &value).isOK()) {
                      value = 0;
+-- 
+2.7.4
+
