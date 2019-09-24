@@ -11,6 +11,8 @@ Upstream-Status: Inappropriate [OE-Specific]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+[rebased for systemd 243]
+Signed-off-by: Scott Murray <scott.murray@konsulko.com>
 ---
  meson.build                 | 4 ----
  tools/meson-make-symlink.sh | 3 ++-
@@ -18,10 +20,10 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  3 files changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index 56c98b9..3386546 100644
+index e5ceb1e169..79b762faeb 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -630,10 +630,6 @@ endforeach
+@@ -579,10 +579,6 @@ endforeach
  
  conf.set_quoted('TELINIT', get_option('telinit-path'))
  
@@ -33,23 +35,23 @@ index 56c98b9..3386546 100644
  
  gperf = find_program('gperf')
 diff --git a/tools/meson-make-symlink.sh b/tools/meson-make-symlink.sh
-index 501cd43..f4e4ac9 100755
+index da0d13a341..90bc0a93c2 100755
 --- a/tools/meson-make-symlink.sh
 +++ b/tools/meson-make-symlink.sh
 @@ -8,5 +8,6 @@ mkdir -vp "$(dirname "${DESTDIR:-}$2")"
  if [ "$(dirname $1)" = . ]; then
-         ln -vfs -T "$1" "${DESTDIR:-}$2"
+     ln -vfs -T "$1" "${DESTDIR:-}$2"
  else
--        ln -vfs -T --relative "${DESTDIR:-}$1" "${DESTDIR:-}$2"
-+        rm -f "${DESTDIR:-}$2"
-+        lnr "${DESTDIR:-}$1" "${DESTDIR:-}$2"
+-    ln -vfs -T --relative "${DESTDIR:-}$1" "${DESTDIR:-}$2"
++    rm -f "${DESTDIR:-}$2"
++    lnr "${DESTDIR:-}$1" "${DESTDIR:-}$2"
  fi
 diff --git a/units/meson-add-wants.sh b/units/meson-add-wants.sh
-index e2b2603..210d604 100755
+index a483d75b86..3c01c523f1 100755
 --- a/units/meson-add-wants.sh
 +++ b/units/meson-add-wants.sh
 @@ -25,4 +25,9 @@ case "$target" in
-                 ;;
+         ;;
  esac
  
 -ln -vfs --relative "$unitpath" "$dir"
@@ -59,6 +61,3 @@ index e2b2603..210d604 100755
 +else
 +        lnr "$unitpath" "$dir"
 +fi
--- 
-2.7.4
-

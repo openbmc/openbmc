@@ -1,0 +1,38 @@
+Upstream-Status: Backport [https://gitlab.com/gnutls/libtasn1/merge_requests/49]
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From ebd4f871b5241809f6a5b461444a6d331e15c949 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Mon, 9 Sep 2019 13:11:39 +0100
+Subject: [PATCH] doc/reference: don't add empty object hierarchy chapter
+
+The object hierarchy section is empty because there are no GObjects in the
+libtasn1 API.  With gtk-doc 1.30 onwards if there are no objects then the object
+hierarchy file won't exist, resulting in a failure when building the
+documentation:
+
+| ../libtasn1-docs.xml:39: element include: XInclude error : could not load ../xml/tree_index.sgml, and no fallback was found
+
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+---
+ doc/reference/libtasn1-docs.xml | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/doc/reference/libtasn1-docs.xml b/doc/reference/libtasn1-docs.xml
+index accdb85..f88b888 100644
+--- a/doc/reference/libtasn1-docs.xml
++++ b/doc/reference/libtasn1-docs.xml
+@@ -34,10 +34,6 @@
+         <xi:include href="xml/libtasn1.xml"/>
+ 
+   </chapter>
+-  <chapter id="object-tree">
+-    <title>Object Hierarchy</title>
+-    <xi:include href="xml/tree_index.sgml"/>
+-  </chapter>
+   <index id="api-index-full">
+     <title>API Index</title>
+     <xi:include href="xml/api-index-full.xml"><xi:fallback /></xi:include>
+-- 
+2.20.1
+

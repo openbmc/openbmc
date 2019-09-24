@@ -2,6 +2,7 @@
 import os
 import contextlib
 from oeqa.core.decorator import OETestTag
+from oeqa.core.case import OEPTestResultTestCase
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import bitbake, get_bb_var, get_bb_vars, runqemu, Command
 from oeqa.utils.nfs import unfs_server
@@ -13,7 +14,7 @@ def parse_values(content):
                 yield i[len(v) + 2:].strip(), v
                 break
 
-class GlibcSelfTestBase(OESelftestTestCase):
+class GlibcSelfTestBase(OESelftestTestCase, OEPTestResultTestCase):
     def run_check(self, ssh = None):
         # configure ssh target
         features = []
@@ -31,10 +32,10 @@ class GlibcSelfTestBase(OESelftestTestCase):
         builddir = get_bb_var("B", "glibc-testsuite")
 
         ptestsuite = "glibc-user" if ssh is None else "glibc"
-        self.extraresults = {"ptestresult.sections" : {ptestsuite : {}}}
+        self.ptest_section(ptestsuite)
         with open(os.path.join(builddir, "tests.sum"), "r") as f:
             for test, result in parse_values(f):
-                self.extraresults["ptestresult.{}.{}".format(ptestsuite, test)] = {"status" : result}
+                self.ptest_result(ptestsuite, test, result)
 
     def run_check_emulated(self):
         with contextlib.ExitStack() as s:

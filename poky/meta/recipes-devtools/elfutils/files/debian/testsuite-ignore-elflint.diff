@@ -1,16 +1,13 @@
-From 03a343c6b1b72598fce654b8a638f106da44abfb Mon Sep 17 00:00:00 2001
-From: OpenEmbedded <oe.patch@oe>
-Date: Fri, 12 Apr 2019 08:05:50 +0000
-Subject: [PATCH] On many architectures this test fails because binaries/libs
- produced by binutils don't pass elflint. However elfutils shouldn't FTBFS
- because of this.
+From 6393b0e57872b3ffedf0dbd6784cd29694010878 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 21 Aug 2019 16:59:01 +0800
+Subject: [PATCH 1/2] testsuite-ignore-elflint
 
-So we run the tests on all archs to see what breaks, but if it breaks we ignore
-the result (exitcode 77 means: this test was skipped).
+Upstream-Status: Pending [from debian]
 
-Upstream-Status: Inappropriate [oe specific]
+Rebase to 0.177
 
-Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  tests/run-elflint-self.sh |  2 +-
  tests/test-subr.sh        | 15 +++++++++++++++
@@ -50,3 +47,6 @@ index 09f428d..26f61f1 100644
 +  if test $exit_status != 0; then exit $exit_status; fi
 +}
 +
+-- 
+2.7.4
+

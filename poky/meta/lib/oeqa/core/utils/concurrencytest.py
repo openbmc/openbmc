@@ -216,7 +216,7 @@ def removebuilddir(d):
     while delay and os.path.exists(d + "/bitbake.lock"):
         time.sleep(1)
         delay = delay - 1
-    bb.utils.prunedir(d)
+    bb.utils.prunedir(d, ionice=True)
 
 def fork_for_tests(concurrency_num, suite):
     result = []

@@ -25,6 +25,19 @@ def errorreport_savedata(e, newdata, file):
         json.dump(newdata, f, indent=4, sort_keys=True)
     return datafile
 
+def get_conf_data(e, filename):
+    builddir = e.data.getVar('TOPDIR')
+    filepath = os.path.join(builddir, "conf", filename)
+    jsonstring = ""
+    if os.path.exists(filepath):
+        with open(filepath, 'r') as f:
+            for line in f.readlines():
+                if line.startswith("#") or len(line.strip()) == 0:
+                    continue
+                else:
+                    jsonstring=jsonstring + line
+    return jsonstring
+
 python errorreport_handler () {
         import json
         import codecs
@@ -51,6 +64,8 @@ python errorreport_handler () {
             data['failures'] = []
             data['component'] = " ".join(e.getPkgs())
             data['branch_commit'] = str(base_detect_branch(e.data)) + ": " + str(base_detect_revision(e.data))
+            data['local_conf'] = get_conf_data(e, 'local.conf')
+            data['auto_conf'] = get_conf_data(e, 'auto.conf')
             lock = bb.utils.lockfile(datafile + '.lock')
             errorreport_savedata(e, data, "error-report.txt")
             bb.utils.unlockfile(lock)

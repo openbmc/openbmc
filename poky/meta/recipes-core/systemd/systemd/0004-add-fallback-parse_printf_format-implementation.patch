@@ -8,6 +8,8 @@ Upstream-Status: Inappropriate [musl specific]
 Signed-off-by: Emil Renner Berthing <systemd@esmil.dk>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+[rebased for systemd 243]
+Signed-off-by: Scott Murray <scott.murray@konsulko.com>
 ---
  meson.build                     |   1 +
  src/basic/meson.build           |   5 +
@@ -20,22 +22,22 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  create mode 100644 src/basic/parse-printf-format.h
 
 diff --git a/meson.build b/meson.build
-index 79195c9748..0bffbf29c5 100644
+index 79b762faeb..7f8c679411 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -685,6 +685,7 @@ foreach header : ['crypt.h',
+@@ -613,6 +613,7 @@ endif
+ foreach header : ['crypt.h',
                    'linux/memfd.h',
                    'linux/vm_sockets.h',
-                   'linux/can/vxcan.h',
 +                  'printf.h',
                    'sys/auxv.h',
                    'valgrind/memcheck.h',
                    'valgrind/valgrind.h',
 diff --git a/src/basic/meson.build b/src/basic/meson.build
-index 91e0df3d2f..a732b554da 100644
+index d6caf28f14..32c1acf349 100644
 --- a/src/basic/meson.build
 +++ b/src/basic/meson.build
-@@ -298,6 +298,11 @@ foreach item : [['af',     af_list_txt,     'af',         ''],
+@@ -312,6 +312,11 @@ foreach item : [['af',     af_list_txt,     'af',         ''],
  endforeach
  
  basic_sources += generated_gperf_headers
@@ -428,6 +430,3 @@ index 5ef11fa1a4..6384ab620c 100644
  
  #define SNDBUF_SIZE (8*1024*1024)
  
--- 
-2.11.0
-

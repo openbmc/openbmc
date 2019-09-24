@@ -1,9 +1,11 @@
 require grub2.inc
 
+require conf/image-uefi.conf
+
 GRUBPLATFORM = "efi"
 
 DEPENDS_append_class-target = " grub-efi-native"
-RDEPENDS_${PN}_class-target = "diffutils freetype grub-common virtual/grub-bootconf"
+RDEPENDS_${PN}_class-target = "grub-common virtual/grub-bootconf"
 
 SRC_URI += " \
            file://cfg \
@@ -18,18 +20,15 @@ python __anonymous () {
     prefix = "" if d.getVar('EFI_PROVIDER') == "grub-efi" else "grub-efi-"
     if target == "x86_64":
         grubtarget = 'x86_64'
-        grubimage = prefix + "bootx64.efi"
     elif re.match('i.86', target):
         grubtarget = 'i386'
-        grubimage = prefix + "bootia32.efi"
     elif re.match('aarch64', target):
         grubtarget = 'arm64'
-        grubimage = prefix + "bootaa64.efi"
     elif re.match('arm', target):
         grubtarget = 'arm'
-        grubimage = prefix + "bootarm.efi"
     else:
         raise bb.parse.SkipRecipe("grub-efi is incompatible with target %s" % target)
+    grubimage = prefix + d.getVar("EFI_BOOT_IMAGE")
     d.setVar("GRUB_TARGET", grubtarget)
     d.setVar("GRUB_IMAGE", grubimage)
     prefix = "grub-efi-" if prefix == "" else ""
@@ -45,7 +44,7 @@ do_mkimage() {
 	cd ${B}
 	# Search for the grub.cfg on the local boot media by using the
 	# built in cfg file provided via this recipe
-	grub-mkimage -c ../cfg -p /EFI/BOOT -d ./grub-core/ \
+	grub-mkimage -c ../cfg -p ${EFIDIR} -d ./grub-core/ \
 	               -O ${GRUB_TARGET}-efi -o ./${GRUB_IMAGE_PREFIX}${GRUB_IMAGE} \
 	               ${GRUB_BUILDIN}
 }
@@ -57,10 +56,8 @@ do_mkimage_class-native() {
 }
 
 do_install_append_class-target() {
-	install -d ${D}/boot
-	install -d ${D}/boot/EFI
-	install -d ${D}/boot/EFI/BOOT
-	install -m 644 ${B}/${GRUB_IMAGE_PREFIX}${GRUB_IMAGE} ${D}/boot/EFI/BOOT/${GRUB_IMAGE}
+	install -d ${D}${EFI_FILES_PATH}
+	install -m 644 ${B}/${GRUB_IMAGE_PREFIX}${GRUB_IMAGE} ${D}${EFI_FILES_PATH}/${GRUB_IMAGE}
 }
 
 do_install_class-native() {
@@ -100,7 +97,7 @@ addtask deploy after do_install before do_build
 
 FILES_${PN} = "${libdir}/grub/${GRUB_TARGET}-efi \
                ${datadir}/grub \
-               /boot/EFI/BOOT/${GRUB_IMAGE} \
+               ${EFI_FILES_PATH}/${GRUB_IMAGE} \
                "
 
 FILES_${PN}_remove_aarch64 = "${libdir}/grub/${GRUB_TARGET}-efi"

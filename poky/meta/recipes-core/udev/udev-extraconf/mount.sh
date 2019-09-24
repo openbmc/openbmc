@@ -38,6 +38,12 @@ done
 automount_systemd() {
     name="`basename "$DEVNAME"`"
 
+    # Skip already mounted partitions
+    if [ -f /run/systemd/transient/run-media-$name.mount ]; then
+        logger "mount.sh/automount" "/run/media/$name already mounted"
+        return
+    fi
+
     # Skip the partition which are already in /etc/fstab
     grep "^[[:space:]]*$DEVNAME" /etc/fstab && return
     for n in LABEL PARTLABEL UUID PARTUUID; do

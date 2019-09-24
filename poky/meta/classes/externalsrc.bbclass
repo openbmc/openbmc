@@ -203,7 +203,7 @@ def srctree_hash_files(d, srcdir=None):
 
     ret = " "
     if git_dir is not None:
-        oe_hash_file = os.path.join(git_dir, 'oe-devtool-tree-sha1')
+        oe_hash_file = os.path.join(git_dir, 'oe-devtool-tree-sha1-%s' % d.getVar('PN'))
         with tempfile.NamedTemporaryFile(prefix='oe-devtool-index') as tmp_index:
             # Clone index
             shutil.copyfile(os.path.join(git_dir, 'index'), tmp_index.name)

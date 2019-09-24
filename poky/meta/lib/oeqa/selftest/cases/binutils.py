@@ -4,6 +4,7 @@ import sys
 import re
 import logging
 from oeqa.core.decorator import OETestTag
+from oeqa.core.case import OEPTestResultTestCase
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import bitbake, get_bb_var, get_bb_vars
 
@@ -15,7 +16,7 @@ def parse_values(content):
                 break
 
 @OETestTag("toolchain-user", "toolchain-system")
-class BinutilsCrossSelfTest(OESelftestTestCase):
+class BinutilsCrossSelfTest(OESelftestTestCase, OEPTestResultTestCase):
     def test_binutils(self):
         self.run_binutils("binutils")
 
@@ -36,14 +37,14 @@ class BinutilsCrossSelfTest(OESelftestTestCase):
 
         bitbake("{0} -c check".format(recipe))
 
-        ptestsuite = "binutils-{}".format(suite) if suite != "binutils" else suite
-        self.extraresults = {"ptestresult.sections" : {ptestsuite : {}}}
-
         sumspath = os.path.join(builddir, suite, "{0}.sum".format(suite))
         if not os.path.exists(sumspath):
             sumspath = os.path.join(builddir, suite, "testsuite", "{0}.sum".format(suite))
+        logpath = os.path.splitext(sumspath)[0] + ".log"
 
+        ptestsuite = "binutils-{}".format(suite) if suite != "binutils" else suite
+        self.ptest_section(ptestsuite, logfile = logpath)
         with open(sumspath, "r") as f:
             for test, result in parse_values(f):
-                self.extraresults["ptestresult.{}.{}".format(ptestsuite, test)] = {"status" : result}
+                self.ptest_result(ptestsuite, test, result)
 

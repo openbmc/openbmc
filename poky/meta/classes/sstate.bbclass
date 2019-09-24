@@ -89,11 +89,6 @@ SSTATE_HASHEQUIV_METHOD[doc] = "The fully-qualified function used to calculate \
     the output hash for a task, which in turn is used to determine equivalency. \
     "
 
-SSTATE_HASHEQUIV_SERVER ?= ""
-SSTATE_HASHEQUIV_SERVER[doc] = "The hash equivalence sever. For example, \
-    'http://192.168.0.1:5000'. Do not include a trailing slash \
-    "
-
 SSTATE_HASHEQUIV_REPORT_TASKDATA ?= "0"
 SSTATE_HASHEQUIV_REPORT_TASKDATA[doc] = "Report additional useful data to the \
     hash equivalency server, such as PN, PV, taskname, etc. This information \

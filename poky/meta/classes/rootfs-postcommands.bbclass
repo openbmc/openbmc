@@ -361,7 +361,9 @@ rootfs_reproducible () {
 		echo $sformatted > ${IMAGE_ROOTFS}/etc/version
 		bbnote "rootfs_reproducible: set /etc/version to $sformatted"
 
-		find ${IMAGE_ROOTFS}/etc/gconf -name '%gconf.xml' -print0 | xargs -0r \
-		sed -i -e 's@\bmtime="[0-9][0-9]*"@mtime="'${REPRODUCIBLE_TIMESTAMP_ROOTFS}'"@g'
+		if [ -d ${IMAGE_ROOTFS}${sysconfdir}/gconf ]; then
+			find ${IMAGE_ROOTFS}${sysconfdir}/gconf -name '%gconf.xml' -print0 | xargs -0r \
+			sed -i -e 's@\bmtime="[0-9][0-9]*"@mtime="'${REPRODUCIBLE_TIMESTAMP_ROOTFS}'"@g'
+		fi
 	fi
 }

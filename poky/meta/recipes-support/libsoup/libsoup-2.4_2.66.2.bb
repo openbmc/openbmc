@@ -36,3 +36,5 @@ DEBIAN_NOAUTONAME_${PN} = "1"
 
 # glib-networking is needed for SSL, proxies, etc.
 RRECOMMENDS_${PN} = "glib-networking"
+
+BBCLASSEXTEND = "native"

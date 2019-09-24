@@ -1,7 +1,7 @@
 require grub2.inc
 
 RDEPENDS_${PN}-common += "${PN}-editenv"
-RDEPENDS_${PN} += "diffutils freetype ${PN}-common"
+RDEPENDS_${PN} += "${PN}-common"
 
 RPROVIDES_${PN}-editenv += "${PN}-efi-editenv"
 

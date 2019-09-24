@@ -8,6 +8,13 @@ PROVIDES = ""
 # setup depends
 INHIBIT_DEFAULT_DEPS = ""
 
+python () {
+    libc = d.getVar("PREFERRED_PROVIDER_virtual/libc")
+    libclocale = d.getVar("PREFERRED_PROVIDER_virtual/libc-locale")
+    if libc != "glibc" or libclocale != "glibc-locale":
+        raise bb.parse.SkipRecipe("glibc-testsuite requires that virtual/libc is glibc")
+}
+
 DEPENDS += "glibc-locale libgcc gcc-runtime"
 
 # remove the initial depends

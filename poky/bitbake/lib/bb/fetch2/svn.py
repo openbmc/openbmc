@@ -145,7 +145,7 @@ class Svn(FetchMethod):
 
             if not ("externals" in ud.parm and ud.parm["externals"] == "nowarn"):
                 # Warn the user if this had externals (won't catch them all)
-                output = runfetchcmd("svn propget svn:externals", d, workdir=ud.moddir)
+                output = runfetchcmd("svn propget svn:externals || true", d, workdir=ud.moddir)
                 if output:
                     if "--ignore-externals" in svnfetchcmd.split():
                         bb.warn("%s contains svn:externals." % ud.url)

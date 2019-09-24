@@ -57,7 +57,7 @@ class SystemdFile():
                 if skip_re.match(line):
                     continue
 
-                line = line.rstrip("\n")
+                line = line.strip()
                 m = section_re.match(line)
                 if m:
                     if m.group('section') not in self.sections:

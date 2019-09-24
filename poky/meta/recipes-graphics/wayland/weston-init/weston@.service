@@ -1,0 +1,37 @@
+[Unit]
+Description=Weston Wayland Compositor (on tty7)
+RequiresMountsFor=/run
+Conflicts=getty@tty7.service plymouth-quit.service
+After=systemd-user-sessions.service getty@tty7.service plymouth-quit-wait.service
+
+[Service]
+User=%i
+PermissionsStartOnly=true
+
+# Log us in via PAM so we get our XDG & co. environment and
+# are treated as logged in so we can use the tty:
+PAMName=login
+
+# Grab tty7
+UtmpIdentifier=tty7
+TTYPath=/dev/tty7
+TTYReset=yes
+TTYVHangup=yes
+TTYVTDisallocate=yes
+
+# stderr to journal so our logging doesn't get thrown into /dev/null
+StandardOutput=tty
+StandardInput=tty
+StandardError=journal
+
+EnvironmentFile=-/etc/default/weston
+
+# Weston does not successfully change VT, nor does systemd place us on
+# the VT it just activated for us. Switch manually:
+ExecStartPre=/usr/bin/chvt 7
+ExecStart=/usr/bin/weston --log=${XDG_RUNTIME_DIR}/weston.log $OPTARGS
+
+IgnoreSIGPIPE=no
+
+#[Install]
+#Alias=multi-user.target.wants/weston.service

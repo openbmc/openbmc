@@ -128,7 +128,9 @@ do_prepare_config () {
 		${S}/.config.oe-tmp > ${S}/.config
 	fi
 	sed -i 's/CONFIG_IFUPDOWN_UDHCPC_CMD_OPTIONS="-R -n"/CONFIG_IFUPDOWN_UDHCPC_CMD_OPTIONS="-R -b"/' ${S}/.config
-	sed -i 's|${DEBUG_PREFIX_MAP}||g' ${S}/.config
+	if [ -n "${DEBUG_PREFIX_MAP}" ]; then
+		sed -i 's|${DEBUG_PREFIX_MAP}||g' ${S}/.config
+	fi
 }
 
 # returns all the elements from the src uri that are .cfg files
@@ -142,6 +144,7 @@ def find_cfgs(d):
     return sources_list
 
 do_configure () {
+	set -x
 	do_prepare_config
 	merge_config.sh -m .config ${@" ".join(find_cfgs(d))}
 	cml1_do_configure
@@ -316,8 +319,8 @@ do_install () {
 		fi
 	fi
 	if grep -q "CONFIG_INIT=y" ${B}/.config; then
-		install -D -m 0777 ${WORKDIR}/rcS ${D}${sysconfdir}/init.d/rcS
-		install -D -m 0777 ${WORKDIR}/rcK ${D}${sysconfdir}/init.d/rcK
+		install -D -m 0755 ${WORKDIR}/rcS ${D}${sysconfdir}/init.d/rcS
+		install -D -m 0755 ${WORKDIR}/rcK ${D}${sysconfdir}/init.d/rcK
 	fi
 
 	if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then

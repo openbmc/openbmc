@@ -194,7 +194,7 @@ class BBCooker:
 
         self.ui_cmdline = None
         self.hashserv = None
-        self.hashservport = None
+        self.hashservaddr = None
 
         self.initConfigurationData()
 
@@ -392,19 +392,20 @@ class BBCooker:
         except prserv.serv.PRServiceConfigError as e:
             bb.fatal("Unable to start PR Server, exitting")
 
-        if self.data.getVar("BB_HASHSERVE") == "localhost:0":
+        if self.data.getVar("BB_HASHSERVE") == "auto":
+            # Create a new hash server bound to a unix domain socket
             if not self.hashserv:
                 dbfile = (self.data.getVar("PERSISTENT_DIR") or self.data.getVar("CACHE")) + "/hashserv.db"
-                self.hashserv = hashserv.create_server(('localhost', 0), dbfile, '')
-                self.hashservport = "localhost:" + str(self.hashserv.server_port)
+                self.hashservaddr = "unix://%s/hashserve.sock" % self.data.getVar("TOPDIR")
+                self.hashserv = hashserv.create_server(self.hashservaddr, dbfile, sync=False)
                 self.hashserv.process = multiprocessing.Process(target=self.hashserv.serve_forever)
                 self.hashserv.process.daemon = True
                 self.hashserv.process.start()
-            self.data.setVar("BB_HASHSERVE", self.hashservport)
-            self.databuilder.origdata.setVar("BB_HASHSERVE", self.hashservport)
-            self.databuilder.data.setVar("BB_HASHSERVE", self.hashservport)
+            self.data.setVar("BB_HASHSERVE", self.hashservaddr)
+            self.databuilder.origdata.setVar("BB_HASHSERVE", self.hashservaddr)
+            self.databuilder.data.setVar("BB_HASHSERVE", self.hashservaddr)
             for mc in self.databuilder.mcdata:
-                self.databuilder.mcdata[mc].setVar("BB_HASHSERVE", self.hashservport)
+                self.databuilder.mcdata[mc].setVar("BB_HASHSERVE", self.hashservaddr)
 
         bb.parse.init_parser(self.data)
 
@@ -1852,7 +1853,6 @@ class CookerCollectFiles(object):
             (bbappend, filename) = b
             if (bbappend == f) or ('%' in bbappend and bbappend.startswith(f[:bbappend.index('%')])):
                 filelist.append(filename)
-        filelist.sort()
         return filelist
 
     def collection_priorities(self, pkgfns, d):

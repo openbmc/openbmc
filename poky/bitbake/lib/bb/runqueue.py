@@ -1173,6 +1173,7 @@ class RunQueueData:
                     self.prepare_task_hash(tid)
 
         bb.parse.siggen.writeout_file_checksum_cache()
+        bb.parse.siggen.set_setscene_tasks(self.runq_setscene_tids)
 
         #self.dump_data()
         return len(self.runtaskentries)
@@ -1259,7 +1260,7 @@ class RunQueue:
             "buildname" : self.cfgData.getVar("BUILDNAME"),
             "date" : self.cfgData.getVar("DATE"),
             "time" : self.cfgData.getVar("TIME"),
-            "hashservport" : self.cooker.hashservport,
+            "hashservaddr" : self.cooker.hashservaddr,
         }
 
         worker.stdin.write(b"<cookerconfig>" + pickle.dumps(self.cooker.configuration) + b"</cookerconfig>")
@@ -1393,7 +1394,7 @@ class RunQueue:
             cache[tid] = iscurrent
         return iscurrent
 
-    def validate_hashes(self, tocheck, data, currentcount=None, siginfo=False):
+    def validate_hashes(self, tocheck, data, currentcount=0, siginfo=False):
         valid = set()
         if self.hashvalidate:
             sq_data = {}
@@ -1600,7 +1601,7 @@ class RunQueue:
 
             tocheck.add(tid)
 
-        valid_new = self.validate_hashes(tocheck, self.cooker.data, None, True)
+        valid_new = self.validate_hashes(tocheck, self.cooker.data, 0, True)
 
         # Tasks which are both setscene and noexec never care about dependencies
         # We therefore find tasks which are setscene and noexec and mark their
@@ -1981,7 +1982,7 @@ class RunQueueExecute:
                             continue
                         logger.debug(1, "Task %s no longer deferred" % nexttask)
                         del self.sq_deferred[nexttask]
-                        valid = self.rq.validate_hashes(set([nexttask]), self.cooker.data, None, False)
+                        valid = self.rq.validate_hashes(set([nexttask]), self.cooker.data, 0, False)
                         if not valid:
                             logger.debug(1, "%s didn't become valid, skipping setscene" % nexttask)
                             self.sq_task_failoutright(nexttask)
@@ -2173,7 +2174,7 @@ class RunQueueExecute:
             ret.add(dep)
         return ret
 
-    # We filter out multiconfig dependencies from taskdepdata we pass to the tasks 
+    # We filter out multiconfig dependencies from taskdepdata we pass to the tasks
     # as most code can't handle them
     def build_taskdepdata(self, task):
         taskdepdata = {}

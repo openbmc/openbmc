@@ -18,6 +18,7 @@ SRC_URI = "http://gstreamer.freedesktop.org/src/gst-libav/gst-libav-${PV}.tar.xz
            file://mips64_cpu_detection.patch \
            file://0001-configure-check-for-armv7ve-variant.patch \
            file://0001-fix-host-contamination.patch \
+           file://gtkdoc-no-tree.patch \
            "
 SRC_URI[md5sum] = "e3a201a45985ddc1327cd496046ca818"
 SRC_URI[sha256sum] = "dfac119043a9cfdcacd7acde77f674ab172cf2537b5812be52f49e9cddc53d9a"
@@ -27,11 +28,6 @@ S = "${WORKDIR}/gst-libav-${PV}"
 DEPENDS = "gstreamer1.0 gstreamer1.0-plugins-base zlib bzip2 xz"
 
 inherit autotools pkgconfig upstream-version-is-even gtk-doc
-
-# Disable documentation for now as it is failing with gtk-doc 1.30:
-# gst-libav-plugins-docs.sgml:38: element include: XInclude error:
-# could not load xml/tree_index.sgml, and no fallback was found
-GTKDOC_ENABLED = "False"
 
 # CAUTION: Using the system libav is not recommended. Since the libav API is changing all the time,
 # compilation errors (and other, more subtle bugs) can happen. It is usually better to rely on the

@@ -24,6 +24,8 @@ class ClassExtender(object):
             if not subs.startswith(self.extname):
                 return "virtual/" + self.extname + "-" + subs
             return name
+        if name.startswith("/"):
+            return name
         if not name.startswith(self.extname):
             return self.extname + "-" + name
         return name

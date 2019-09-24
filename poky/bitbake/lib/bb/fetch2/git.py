@@ -464,6 +464,8 @@ class Git(FetchMethod):
         if os.path.exists(destdir):
             bb.utils.prunedir(destdir)
 
+        need_lfs = ud.parm.get("lfs", "1") == "1"
+
         source_found = False
         source_error = []
 
@@ -493,14 +495,16 @@ class Git(FetchMethod):
         runfetchcmd("%s remote set-url origin %s" % (ud.basecmd, repourl), d, workdir=destdir)
 
         if self._contains_lfs(ud, d, destdir):
-            path = d.getVar('PATH')
-            if path:
-                gitlfstool = bb.utils.which(path, "git-lfs", executable=True)
-                if not gitlfstool:
-                    raise bb.fetch2.FetchError("Repository %s has lfs content, install git-lfs plugin on host to download" % (repourl))
+            if need_lfs:
+                path = d.getVar('PATH')
+                if path:
+                    gitlfstool = bb.utils.which(path, "git-lfs", executable=True)
+                    if not gitlfstool:
+                        raise bb.fetch2.FetchError("Repository %s has LFS content, install git-lfs on host to download (or set lfs=0 to ignore it)" % (repourl))
+                else:
+                    bb.note("Could not find 'PATH'")
             else:
-                bb.note("Could not find 'PATH'")
-
+                bb.note("Repository %s has LFS content but it is not being fetched" % (repourl))
 
         if not ud.nocheckout:
             if subdir != "":

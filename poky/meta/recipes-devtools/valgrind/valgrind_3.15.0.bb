@@ -15,6 +15,7 @@ SRC_URI = "https://sourceware.org/pub/valgrind/valgrind-${PV}.tar.bz2 \
            file://fixed-perl-path.patch \
            file://Added-support-for-PPC-instructions-mfatbu-mfatbl.patch \
            file://run-ptest \
+           file://remove-for-aarch64 \
            file://0004-Fix-out-of-tree-builds.patch \
            file://0005-Modify-vg_test-wrapper-to-support-PTEST-formats.patch \
            file://0001-Remove-tests-that-fail-to-build-on-some-PPC32-config.patch \
@@ -38,6 +39,7 @@ SRC_URI = "https://sourceware.org/pub/valgrind/valgrind-${PV}.tar.bz2 \
            file://0001-Return-a-valid-exit_code-from-vg_regtest.patch \
            file://0001-valgrind-filter_xml_frames-do-not-filter-usr.patch \
            file://0002-valgrind-adjust-std_list-expected-output.patch \
+           file://0001-adjust-path-filter-for-2-memcheck-tests.patch \
            "
 SRC_URI[md5sum] = "46e5fbdcbc3502a5976a317a0860a975"
 SRC_URI[sha256sum] = "417c7a9da8f60dd05698b3a7bc6002e4ef996f14c13f0ff96679a16873e78ab1"
@@ -109,7 +111,11 @@ RDEPENDS_${PN} += "perl"
 # redirect functions like strlen.
 RRECOMMENDS_${PN} += "${TCLIBC}-dbg"
 
-RDEPENDS_${PN}-ptest += " file perl perl-module-file-glob sed ${PN}-dbg"
+RDEPENDS_${PN}-ptest += " bash coreutils file \
+   gdb libgomp \
+   perl \
+   perl-module-getopt-long perl-module-file-basename perl-module-file-glob \
+   procps sed ${PN}-dbg"
 RDEPENDS_${PN}-ptest_append_libc-glibc = " glibc-utils"
 
 # One of the tests contains a bogus interpreter path on purpose.
@@ -134,21 +140,23 @@ do_install_ptest() {
     for parent_dir in ${S} ${B} ; do
         cd $parent_dir
 
-        # exclude shell or the package won't install
-        rm -rf none/tests/shell* 2>/dev/null
-
         subdirs=" \
+	   .in_place \
 	   cachegrind/tests \
 	   callgrind/tests \
+	   dhat/tests \
 	   drd/tests \
 	   gdbserver_tests \
 	   helgrind/tests \
+	   lackey/tests \
 	   massif/tests \
 	   memcheck/tests \
 	   none/tests \
 	   tests \
+	   exp-bbv/tests \
+	   exp-dhat/tests \
+	   exp-sgcheck/tests \
 	"
-
         # Get the vg test scripts, filters, and expected files
         for dir in $subdirs ; do
             find $dir | cpio -pvdu ${D}${PTEST_PATH}
@@ -156,17 +164,33 @@ do_install_ptest() {
         cd $saved_dir
     done
 
-    # Hide then restore a.c that is used by ann[12].vgtest in call/cachegrind
-    mv ${D}${PTEST_PATH}/cachegrind/tests/a.c ${D}${PTEST_PATH}/cachegrind/tests/a_c
-    # clean out build artifacts before building the rpm
+    # The scripts reference config.h so add it to the top ptest dir.
+    cp ${B}/config.h ${D}${PTEST_PATH}
+    install -D ${WORKDIR}/remove-for-aarch64 ${D}${PTEST_PATH}
+
+    # Add an executable need by none/tests/bigcode
+    mkdir ${D}${PTEST_PATH}/perf
+    cp ${B}/perf/bigcode ${D}${PTEST_PATH}/perf
+
+    # Add an executable needed by memcheck/tests/vcpu_bz2
+    cp ${B}/perf/bz2 ${D}${PTEST_PATH}/perf
+
+    # Make the ptest dir look like the top level valgrind src dir
+    # This is checked by the gdbserver_tests/make_local_links script
+    mkdir ${D}${PTEST_PATH}/coregrind
+    cp ${B}/coregrind/vgdb ${D}${PTEST_PATH}/coregrind
+
+    # Add an executable needed by massif tests
+    cp ${B}/massif/ms_print ${D}${PTEST_PATH}/massif/ms_print
+
     find ${D}${PTEST_PATH} \
-         \( -name "Makefile*" \
+        \( \
+	   -name "Makefile*" \
         -o -name "*.o" \
-        -o -name "*.c" \
-        -o -name "*.S" \
-        -o -name "*.h" \) \
+	\) \
         -exec rm {} \;
-    mv ${D}${PTEST_PATH}/cachegrind/tests/a_c ${D}${PTEST_PATH}/cachegrind/tests/a.c
+
+    # These files need to be newer so touch them.
     touch ${D}${PTEST_PATH}/cachegrind/tests/a.c -r ${D}${PTEST_PATH}/cachegrind/tests/cgout-test
 
     # find *_annotate in ${bindir} for yocto build
@@ -176,9 +200,7 @@ do_install_ptest() {
     sed -i s:\.\./\.\./callgrind/callgrind_annotate:${bindir}/callgrind_annotate: ${D}${PTEST_PATH}/callgrind/tests/ann1.vgtest
     sed -i s:\.\./\.\./callgrind/callgrind_annotate:${bindir}/callgrind_annotate: ${D}${PTEST_PATH}/callgrind/tests/ann2.vgtest
 
-    # needed by massif tests
-    cp ${B}/massif/ms_print ${D}${PTEST_PATH}/massif/ms_print
-
     # handle multilib
     sed -i s:@libdir@:${libdir}:g ${D}${PTEST_PATH}/run-ptest
+    sed -i s:@bindir@:${bindir}:g ${D}${PTEST_PATH}/run-ptest
 }

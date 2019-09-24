@@ -100,6 +100,8 @@ python () {
     clsextend.map_packagevars()
     clsextend.map_variable("PROVIDES")
     clsextend.map_regexp_variable("PACKAGES_DYNAMIC")
+    d.setVar("LIBCEXTENSION", "")
+    d.setVar("ABIEXTENSION", "")
 }
 
 addhandler nativesdk_virtclass_handler

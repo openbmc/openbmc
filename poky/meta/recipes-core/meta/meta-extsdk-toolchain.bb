@@ -24,3 +24,8 @@ python do_locked_sigs() {
     sigfile = os.path.join(outdir, 'locked-sigs-extsdk-toolchain.inc')
     oe.copy_buildsystem.generate_locked_sigs(sigfile, d)
 }
+
+python do_locked_sigs_setscene () {
+    sstate_setscene(d)
+}
+addtask do_locked_sigs_setscene

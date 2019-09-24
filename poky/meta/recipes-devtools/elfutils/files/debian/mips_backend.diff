@@ -1,18 +1,19 @@
-From 10a75fd2beefafe2043163f85426d0e575de58d8 Mon Sep 17 00:00:00 2001
+From 68b497668cde5171880d073a7ea50d11c3bddbfc Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Fri, 16 Jul 2010 12:26:46 +0800
-Subject: [PATCH] elfutils: upgrade to version 0.148
+Date: Wed, 21 Aug 2019 15:49:52 +0800
+Subject: [PATCH] mips backend
 
+Rebase to 0.177
 Upstream-Status: Pending [from debian]
-Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  backends/Makefile.am    |   8 +-
- backends/mips_init.c    |  59 ++++++++
- backends/mips_regs.c    | 104 +++++++++++++
- backends/mips_reloc.def |  79 ++++++++++
- backends/mips_retval.c  | 321 ++++++++++++++++++++++++++++++++++++++++
- backends/mips_symbol.c  |  53 +++++++
+ backends/mips_init.c    |  59 +++++++++
+ backends/mips_regs.c    | 104 ++++++++++++++++
+ backends/mips_reloc.def |  79 ++++++++++++
+ backends/mips_retval.c  | 321 ++++++++++++++++++++++++++++++++++++++++++++++++
+ backends/mips_symbol.c  |  53 ++++++++
  libebl/eblopenbackend.c |   2 +
  7 files changed, 624 insertions(+), 2 deletions(-)
  create mode 100644 backends/mips_init.c
@@ -22,28 +23,28 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  create mode 100644 backends/mips_symbol.c
 
 diff --git a/backends/Makefile.am b/backends/Makefile.am
-index 5671a32..ba84da6 100644
+index 91a38e2..aba8a4a 100644
 --- a/backends/Makefile.am
 +++ b/backends/Makefile.am
 @@ -33,13 +33,13 @@ AM_CPPFLAGS += -I$(top_srcdir)/libebl -I$(top_srcdir)/libasm \
  
  
  modules = i386 sh x86_64 ia64 alpha arm aarch64 sparc ppc ppc64 s390 \
--	  tilegx m68k bpf riscv parisc
-+	  tilegx m68k bpf riscv parisc mips
+-	  tilegx m68k bpf riscv csky parisc
++	  tilegx m68k bpf riscv csky parisc mips
  libebl_pic = libebl_i386_pic.a libebl_sh_pic.a libebl_x86_64_pic.a    \
  	     libebl_ia64_pic.a libebl_alpha_pic.a libebl_arm_pic.a    \
  	     libebl_aarch64_pic.a libebl_sparc_pic.a libebl_ppc_pic.a \
  	     libebl_ppc64_pic.a libebl_s390_pic.a libebl_tilegx_pic.a \
- 	     libebl_m68k_pic.a libebl_bpf_pic.a libebl_riscv_pic.a \
--	     libebl_parisc_pic.a
-+	     libebl_parisc_pic.a libebl_mips_pic.a
+ 	     libebl_m68k_pic.a libebl_bpf_pic.a libebl_riscv_pic.a    \
+-	     libebl_csky_pic.a libebl_parisc_pic.a
++	     libebl_csky_pic.a libebl_parisc_pic.a libebl_mips_pic.a
  noinst_LIBRARIES = $(libebl_pic)
  noinst_DATA = $(libebl_pic:_pic.a=.so)
  
-@@ -141,6 +141,10 @@ parisc_SRCS = parisc_init.c parisc_symbol.c parisc_regs.c parisc_retval.c
- libebl_parisc_pic_a_SOURCES = $(parisc_SRCS)
- am_libebl_parisc_pic_a_OBJECTS = $(parisc_SRCS:.c=.os)
+@@ -145,6 +145,10 @@ csky_SRCS = csky_attrs.c csky_init.c csky_symbol.c csky_cfi.c \
+ libebl_csky_pic_a_SOURCES = $(csky_SRCS)
+ am_libebl_csky_pic_a_OBJECTS = $(csky_SRCS:.c=.os)
  
 +mips_SRCS = mips_init.c mips_symbol.c mips_regs.c mips_retval.c
 +libebl_mips_pic_a_SOURCES = $(mips_SRCS)
@@ -699,7 +700,7 @@ index 0000000..261b05d
 +    }
 +}
 diff --git a/libebl/eblopenbackend.c b/libebl/eblopenbackend.c
-index d54b720..6cf766f 100644
+index 01711f5..d0c3589 100644
 --- a/libebl/eblopenbackend.c
 +++ b/libebl/eblopenbackend.c
 @@ -71,6 +71,8 @@ static const struct
@@ -711,3 +712,6 @@ index d54b720..6cf766f 100644
  
    { "m32", "elf_m32", "m32", 3, EM_M32, 0, 0 },
    { "m68k", "elf_m68k", "m68k", 4, EM_68K, ELFCLASS32, ELFDATA2MSB },
+-- 
+2.7.4
+

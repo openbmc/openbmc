@@ -1,19 +1,8 @@
-From d326ad99be856815260a04e573fc97044c02f444 Mon Sep 17 00:00:00 2001
-From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Mon, 2 Jul 2018 13:57:09 +0800
-Subject: [PATCH] elfutils: 0.170 -> 0.172
-
 Upstream-Status: Pending [from debian]
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 
----
- tests/run-strip-strmerge.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tests/run-strip-strmerge.sh b/tests/run-strip-strmerge.sh
-index aa9c1eb..2bab8ec 100755
---- a/tests/run-strip-strmerge.sh
-+++ b/tests/run-strip-strmerge.sh
+--- elfutils-0.165.orig/tests/run-strip-strmerge.sh
++++ elfutils-0.165/tests/run-strip-strmerge.sh
 @@ -30,7 +30,7 @@ remerged=remerged.elf
  tempfiles $merged $stripped $debugfile $remerged
  

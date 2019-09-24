@@ -8,12 +8,12 @@ import os
 import resulttool.resultutils as resultutils
 
 def show_ptest(result, ptest, logger):
-    if 'ptestresult.sections' in result:
-        if ptest in result['ptestresult.sections'] and 'log' in result['ptestresult.sections'][ptest]:
-            print(result['ptestresult.sections'][ptest]['log'])
-            return 0
+    logdata = resultutils.ptestresult_get_log(result, ptest)
+    if logdata is not None:
+        print(logdata)
+        return 0
 
-    print("ptest '%s' not found" % ptest)
+    print("ptest '%s' log not found" % ptest)
     return 1
 
 def show_reproducible(result, reproducible, logger):
@@ -25,7 +25,6 @@ def show_reproducible(result, reproducible, logger):
         print("reproducible '%s' not found" % reproducible)
         return 1
 
-
 def log(args, logger):
     results = resultutils.load_resultsdata(args.source)
 
@@ -35,24 +34,24 @@ def log(args, logger):
         return 1
 
     for _, run_name, _, r in resultutils.test_run_results(results):
-        if args.dump_ptest:
-            if 'ptestresult.sections' in r:
-                for name, ptest in r['ptestresult.sections'].items():
-                    if 'log' in ptest:
-                        dest_dir = args.dump_ptest
-                        if args.prepend_run:
-                            dest_dir = os.path.join(dest_dir, run_name)
+        if args.dump_ptest and 'ptestresult.sections' in r:
+            for name, ptest in r['ptestresult.sections'].items():
+                logdata = resultutils.ptestresult_get_log(r, name)
+                if logdata is not None:
+                    dest_dir = args.dump_ptest
+                    if args.prepend_run:
+                        dest_dir = os.path.join(dest_dir, run_name)
 
-                        os.makedirs(dest_dir, exist_ok=True)
-
-                        dest = os.path.join(dest_dir, '%s.log' % name)
-                        print(dest)
-                        with open(dest, 'w') as f:
-                            f.write(ptest['log'])
+                    os.makedirs(dest_dir, exist_ok=True)
+                    dest = os.path.join(dest_dir, '%s.log' % name)
+                    print(dest)
+                    with open(dest, 'w') as f:
+                        f.write(logdata)
 
         if args.raw_ptest:
-            if 'ptestresult.rawlogs' in r:
-                print(r['ptestresult.rawlogs']['log'])
+            rawlog = resultutils.ptestresult_get_rawlogs(r)
+            if rawlog is not None:
+                print(rawlog)
             else:
                 print('Raw ptest logs not found')
                 return 1

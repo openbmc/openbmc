@@ -1,17 +1,8 @@
-From bac45996ece75900e0cde97f3889eaf6c1b286f8 Mon Sep 17 00:00:00 2001
-From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Fri, 23 Nov 2018 15:47:20 +0800
-Subject: [PATCH] elfutils: 0.170 -> 0.172
-
 Upstream-Status: Pending [from debian]
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 
----
- tests/run-native-test.sh | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/tests/run-native-test.sh b/tests/run-native-test.sh
-index d19007f..5351e02 100755
+Index: b/tests/run-native-test.sh
+===================================================================
 --- a/tests/run-native-test.sh
 +++ b/tests/run-native-test.sh
 @@ -77,6 +77,12 @@ native_test()

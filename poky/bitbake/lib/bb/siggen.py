@@ -13,6 +13,7 @@ import difflib
 import simplediff
 from bb.checksum import FileChecksumCache
 from bb import runqueue
+import hashserv
 
 logger = logging.getLogger('BitBake.SigGen')
 
@@ -91,6 +92,8 @@ class SignatureGenerator(object):
     def save_unitaskhashes(self):
         return
 
+    def set_setscene_tasks(self, setscene_tasks):
+        return
 
 class SignatureGeneratorBasic(SignatureGenerator):
     """
@@ -106,6 +109,7 @@ class SignatureGeneratorBasic(SignatureGenerator):
         self.taints = {}
         self.gendeps = {}
         self.lookupcache = {}
+        self.setscenetasks = {}
         self.basewhitelist = set((data.getVar("BB_HASHBASE_WHITELIST") or "").split())
         self.taskwhitelist = None
         self.init_rundepcheck(data)
@@ -150,6 +154,9 @@ class SignatureGeneratorBasic(SignatureGenerator):
         self.lookupcache[fn] = lookupcache
 
         return taskdeps
+
+    def set_setscene_tasks(self, setscene_tasks):
+        self.setscenetasks = setscene_tasks
 
     def finalise(self, fn, d, variant):
 
@@ -369,6 +376,11 @@ class SignatureGeneratorUniHashMixIn(object):
         self.server, self.method = data[:2]
         super().set_taskdata(data[2:])
 
+    def client(self):
+        if getattr(self, '_client', None) is None:
+            self._client = hashserv.create_client(self.server)
+        return self._client
+
     def __get_task_unihash_key(self, tid):
         # TODO: The key only *needs* to be the taskhash, the tid is just
         # convenient
@@ -389,10 +401,11 @@ class SignatureGeneratorUniHashMixIn(object):
         self.unitaskhashes[self.__get_task_unihash_key(tid)] = unihash
 
     def get_unihash(self, tid):
-        import urllib
-        import json
-
         taskhash = self.taskhash[tid]
+
+        # If its not a setscene task we can return
+        if self.setscenetasks and tid not in self.setscenetasks:
+            return taskhash
 
         key = self.__get_task_unihash_key(tid)
 
@@ -418,36 +431,22 @@ class SignatureGeneratorUniHashMixIn(object):
         unihash = taskhash
 
         try:
-            url = '%s/v1/equivalent?%s' % (self.server,
-                    urllib.parse.urlencode({'method': self.method, 'taskhash': self.taskhash[tid]}))
-
-            request = urllib.request.Request(url)
-            response = urllib.request.urlopen(request)
-            data = response.read().decode('utf-8')
-
-            json_data = json.loads(data)
-
-            if json_data:
-                unihash = json_data['unihash']
+            data = self.client().get_unihash(self.method, self.taskhash[tid])
+            if data:
+                unihash = data
                 # A unique hash equal to the taskhash is not very interesting,
                 # so it is reported it at debug level 2. If they differ, that
                 # is much more interesting, so it is reported at debug level 1
                 bb.debug((1, 2)[unihash == taskhash], 'Found unihash %s in place of %s for %s from %s' % (unihash, taskhash, tid, self.server))
             else:
                 bb.debug(2, 'No reported unihash for %s:%s from %s' % (tid, taskhash, self.server))
-        except urllib.error.URLError as e:
-            bb.warn('Failure contacting Hash Equivalence Server %s: %s' % (self.server, str(e)))
-        except (KeyError, json.JSONDecodeError) as e:
-            bb.warn('Poorly formatted response from %s: %s' % (self.server, str(e)))
+        except hashserv.HashConnectionError as e:
+            bb.warn('Error contacting Hash Equivalence Server %s: %s' % (self.server, str(e)))
 
         self.unitaskhashes[key] = unihash
         return unihash
 
     def report_unihash(self, path, task, d):
-        import urllib
-        import json
-        import tempfile
-        import base64
         import importlib
 
         taskhash = d.getVar('BB_TASKHASH')
@@ -482,42 +481,31 @@ class SignatureGeneratorUniHashMixIn(object):
                 outhash = bb.utils.better_eval(self.method + '(path, sigfile, task, d)', locs)
 
             try:
-                url = '%s/v1/equivalent' % self.server
-                task_data = {
-                    'taskhash': taskhash,
-                    'method': self.method,
-                    'outhash': outhash,
-                    'unihash': unihash,
-                    'owner': d.getVar('SSTATE_HASHEQUIV_OWNER')
-                    }
+                extra_data = {}
+
+                owner = d.getVar('SSTATE_HASHEQUIV_OWNER')
+                if owner:
+                    extra_data['owner'] = owner
 
                 if report_taskdata:
                     sigfile.seek(0)
 
-                    task_data['PN'] = d.getVar('PN')
-                    task_data['PV'] = d.getVar('PV')
-                    task_data['PR'] = d.getVar('PR')
-                    task_data['task'] = task
-                    task_data['outhash_siginfo'] = sigfile.read().decode('utf-8')
+                    extra_data['PN'] = d.getVar('PN')
+                    extra_data['PV'] = d.getVar('PV')
+                    extra_data['PR'] = d.getVar('PR')
+                    extra_data['task'] = task
+                    extra_data['outhash_siginfo'] = sigfile.read().decode('utf-8')
 
-                headers = {'content-type': 'application/json'}
-
-                request = urllib.request.Request(url, json.dumps(task_data).encode('utf-8'), headers)
-                response = urllib.request.urlopen(request)
-                data = response.read().decode('utf-8')
-
-                json_data = json.loads(data)
-                new_unihash = json_data['unihash']
+                data = self.client().report_unihash(taskhash, self.method, outhash, unihash, extra_data)
+                new_unihash = data['unihash']
 
                 if new_unihash != unihash:
                     bb.debug(1, 'Task %s unihash changed %s -> %s by server %s' % (taskhash, unihash, new_unihash, self.server))
                     bb.event.fire(bb.runqueue.taskUniHashUpdate(fn + ':do_' + task, new_unihash), d)
                 else:
                     bb.debug(1, 'Reported task %s as unihash %s to %s' % (taskhash, unihash, self.server))
-            except urllib.error.URLError as e:
-                bb.warn('Failure contacting Hash Equivalence Server %s: %s' % (self.server, str(e)))
-            except (KeyError, json.JSONDecodeError) as e:
-                bb.warn('Poorly formatted response from %s: %s' % (self.server, str(e)))
+            except hashserv.HashConnectionError as e:
+                bb.warn('Error contacting Hash Equivalence Server %s: %s' % (self.server, str(e)))
         finally:
             if sigfile:
                 sigfile.close()
@@ -538,7 +526,7 @@ class SignatureGeneratorTestEquivHash(SignatureGeneratorUniHashMixIn, SignatureG
     name = "TestEquivHash"
     def init_rundepcheck(self, data):
         super().init_rundepcheck(data)
-        self.server = "http://" + data.getVar('BB_HASHSERVE')
+        self.server = data.getVar('BB_HASHSERVE')
         self.method = "sstate_output_hash"
 
 

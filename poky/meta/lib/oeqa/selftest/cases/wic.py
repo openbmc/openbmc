@@ -632,8 +632,10 @@ class Wic2(WicTestCase):
         # 1:0.00MiB:200MiB:200MiB:ext4::;\n
         partlns = res.output.splitlines()[2:]
 
-        self.assertEqual(1, len(partlns))
-        self.assertEqual("1:0.00MiB:200MiB:200MiB:ext4::;", partlns[0])
+        self.assertEqual(1, len(partlns),
+                         msg="Partition list '%s'" % res.output)
+        self.assertEqual("1:0.00MiB:200MiB:200MiB:ext4::;", partlns[0],
+                         msg="Partition list '%s'" % res.output)
 
     def test_fixed_size_error(self):
         """

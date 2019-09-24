@@ -83,14 +83,6 @@ do_install_append () {
 		rm -f ${D}${infodir}/dir
 	fi
 
-	if ! ${@bb.utils.contains('DISTRO_FEATURES', 'ldconfig', 'true', 'false', d)}; then
-		# The distro doesn't want these files so let's not install them
-		rm -f ${D}${sysconfdir}/ld.so.conf
-		rm -f ${D}${base_sbindir}/ldconfig
-		# This directory will be empty now so remove it too.
-		rmdir ${D}${sysconfdir}
-	fi
-
 	install -d ${D}${sysconfdir}/init.d
 	install -d ${D}${localstatedir}/db/nscd
 	install -m 0755 ${S}/nscd/nscd.init ${D}${sysconfdir}/init.d/nscd
@@ -102,6 +94,24 @@ do_install_append () {
 	install -d ${D}${systemd_unitdir}/system
 	install -m 0644 ${S}/nscd/nscd.service ${D}${systemd_unitdir}/system/
 
+	# The dynamic loader will have been installed into
+	# ${base_libdir}. However, if that isn't going to end up being
+	# available in the ABI-mandated location, then a symlink must
+	# be created.
+
+	if [ -n "${ARCH_DYNAMIC_LOADER}" -a ! -e "${D}${root_prefix}/lib/${ARCH_DYNAMIC_LOADER}" ]; then
+		install -d ${D}${root_prefix}/lib
+		ln -s ${@oe.path.relative('${root_prefix}/lib', '${base_libdir}')}/${ARCH_DYNAMIC_LOADER} \
+				${D}${root_prefix}/lib/${ARCH_DYNAMIC_LOADER}
+	fi
+}
+
+do_install_append_class-target() {
+	if ! ${@bb.utils.contains('DISTRO_FEATURES', 'ldconfig', 'true', 'false', d)}; then
+		# The distro doesn't want these files so let's not install them
+		rm -f ${D}${sysconfdir}/ld.so.conf
+		rm -f ${D}${base_sbindir}/ldconfig
+	fi
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
 		install -d ${D}${sysconfdir}/tmpfiles.d
 		echo "d /run/nscd 755 root root -" \
@@ -114,18 +124,7 @@ do_install_append () {
 			> ${D}${sysconfdir}/default/volatiles/98_nscd
 	fi
 
-	# The dynamic loader will have been installed into
-	# ${base_libdir}. However, if that isn't going to end up being
-	# available in the ABI-mandated location, then a symlink must
-        # be created.
-
-	if [ -n "${ARCH_DYNAMIC_LOADER}" -a ! -e "${D}${root_prefix}/lib/${ARCH_DYNAMIC_LOADER}" ]; then
-		install -d ${D}${root_prefix}/lib
-		ln -s ${@oe.path.relative('${root_prefix}/lib', '${base_libdir}')}/${ARCH_DYNAMIC_LOADER} \
-				${D}${root_prefix}/lib/${ARCH_DYNAMIC_LOADER}
-	fi
 }
-
 do_install_append_aarch64 () {
 	do_install_armmultilib
 }

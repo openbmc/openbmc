@@ -1,0 +1,156 @@
+From 2fbc62e2a13fc22b6ae4910e295a2c10fb790486 Mon Sep 17 00:00:00 2001
+From: Zoltan Karcagi <zkr7432@gmail.com>
+Date: Mon, 12 Aug 2019 13:27:16 -0400
+Subject: [PATCH] Fix include order between config.h and stat.h
+
+At least on Arch linux ARM, the definition of struct stat in stat.h depends
+on __USE_FILE_OFFSET64. This symbol comes from config.h when defined,
+therefore config.h must always be included before stat.h. Fix all
+occurrences where the order is wrong by moving config.h to the top.
+
+This fixes the client side error "Stale file handle" when mounting from
+a server running Arch Linux ARM.
+
+Signed-off-by: Zoltan Karcagi <zkr7432@gmail.com>
+Signed-off-by: Steve Dickson <steved@redhat.com>
+
+Upstream-Status: Backport
+[http://git.linux-nfs.org/?p=steved/nfs-utils.git;a=commit;h=2fbc62e2a13fc22b6ae4910e295a2c10fb790486]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ support/misc/nfsd_path.c         | 5 ++++-
+ support/misc/xstat.c             | 5 ++++-
+ support/nfs/conffile.c           | 8 +++++++-
+ utils/blkmapd/device-discovery.c | 8 ++++----
+ utils/idmapd/idmapd.c            | 8 ++++----
+ 5 files changed, 23 insertions(+), 11 deletions(-)
+
+diff --git a/support/misc/nfsd_path.c b/support/misc/nfsd_path.c
+index 84e4802..f078a66 100644
+--- a/support/misc/nfsd_path.c
++++ b/support/misc/nfsd_path.c
+@@ -1,3 +1,7 @@
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
+ #include <errno.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+@@ -5,7 +9,6 @@
+ #include <stdlib.h>
+ #include <unistd.h>
+ 
+-#include "config.h"
+ #include "conffile.h"
+ #include "xmalloc.h"
+ #include "xlog.h"
+diff --git a/support/misc/xstat.c b/support/misc/xstat.c
+index fa04788..4c997ee 100644
+--- a/support/misc/xstat.c
++++ b/support/misc/xstat.c
+@@ -1,3 +1,7 @@
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
+ #include <errno.h>
+ #include <sys/types.h>
+ #include <fcntl.h>
+@@ -5,7 +9,6 @@
+ #include <sys/sysmacros.h>
+ #include <unistd.h>
+ 
+-#include "config.h"
+ #include "xstat.h"
+ 
+ #ifdef HAVE_FSTATAT
+diff --git a/support/nfs/conffile.c b/support/nfs/conffile.c
+index b6400be..6ba8a35 100644
+--- a/support/nfs/conffile.c
++++ b/support/nfs/conffile.c
+@@ -500,7 +500,7 @@ conf_readfile(const char *path)
+ 
+ 	if ((stat (path, &sb) == 0) || (errno != ENOENT)) {
+ 		char *new_conf_addr = NULL;
+-		size_t sz = sb.st_size;
++		off_t sz;
+ 		int fd = open (path, O_RDONLY, 0);
+ 
+ 		if (fd == -1) {
+@@ -517,6 +517,11 @@ conf_readfile(const char *path)
+ 
+ 		/* only after we have the lock, check the file size ready to read it */
+ 		sz = lseek(fd, 0, SEEK_END);
++		if (sz < 0) {
++			xlog_warn("conf_readfile: unable to determine file size: %s",
++				  strerror(errno));
++			goto fail;
++		}
+ 		lseek(fd, 0, SEEK_SET);
+ 
+ 		new_conf_addr = malloc(sz+1);
+@@ -2162,6 +2167,7 @@ conf_write(const char *filename, const char *section, const char *arg,
+ 	ret = 0;
+ 
+ cleanup:
++	flush_outqueue(&inqueue, NULL);
+ 	flush_outqueue(&outqueue, NULL);
+ 
+ 	if (buff)
+diff --git a/utils/blkmapd/device-discovery.c b/utils/blkmapd/device-discovery.c
+index e811703..f5f9b10 100644
+--- a/utils/blkmapd/device-discovery.c
++++ b/utils/blkmapd/device-discovery.c
+@@ -26,6 +26,10 @@
+  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  */
+ 
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif /* HAVE_CONFIG_H */
++
+ #include <sys/sysmacros.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+@@ -51,10 +55,6 @@
+ #include <errno.h>
+ #include <libdevmapper.h>
+ 
+-#ifdef HAVE_CONFIG_H
+-#include "config.h"
+-#endif /* HAVE_CONFIG_H */
+-
+ #include "device-discovery.h"
+ #include "xcommon.h"
+ #include "nfslib.h"
+diff --git a/utils/idmapd/idmapd.c b/utils/idmapd/idmapd.c
+index 62e37b8..267acea 100644
+--- a/utils/idmapd/idmapd.c
++++ b/utils/idmapd/idmapd.c
+@@ -34,6 +34,10 @@
+  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  */
+ 
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif /* HAVE_CONFIG_H */
++
+ #include <sys/types.h>
+ #include <sys/time.h>
+ #include <sys/inotify.h>
+@@ -62,10 +66,6 @@
+ #include <libgen.h>
+ #include <nfsidmap.h>
+ 
+-#ifdef HAVE_CONFIG_H
+-#include "config.h"
+-#endif /* HAVE_CONFIG_H */
+-
+ #include "xlog.h"
+ #include "conffile.h"
+ #include "queue.h"
+-- 
+2.7.4
+

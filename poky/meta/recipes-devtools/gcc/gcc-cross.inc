@@ -206,9 +206,17 @@ do_package_write_ipk[noexec] = "1"
 do_package_write_rpm[noexec] = "1"
 do_package_write_deb[noexec] = "1"
 
-BUILDDIRSTASH = "${WORKDIR}/stashed-builddir"
+inherit chrpath
+
+python gcc_stash_builddir_fixrpaths() {
+    # rewrite rpaths, breaking hardlinks as required
+    process_dir("/", d.getVar("BUILDDIRSTASH"), d, break_hardlinks = True)
+}
+
+BUILDDIRSTASH = "${WORKDIR}/stashed-builddir/build"
 do_gcc_stash_builddir[dirs] = "${B}"
 do_gcc_stash_builddir[cleandirs] = "${BUILDDIRSTASH}"
+do_gcc_stash_builddir[postfuncs] += "gcc_stash_builddir_fixrpaths"
 do_gcc_stash_builddir () {
 	dest=${BUILDDIRSTASH}
 	hardlinkdir . $dest

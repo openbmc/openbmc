@@ -40,6 +40,7 @@ SRC_URI = "file://functions \
 S = "${WORKDIR}"
 
 SRC_URI_append_arm = " file://alignment.sh"
+SRC_URI_append_armeb = " file://alignment.sh"
 
 KERNEL_VERSION = ""
 

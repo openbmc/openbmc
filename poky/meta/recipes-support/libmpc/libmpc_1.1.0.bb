@@ -8,8 +8,6 @@ SRC_URI = "${GNU_MIRROR}/mpc/mpc-${PV}.tar.gz"
 SRC_URI[md5sum] = "4125404e41e482ec68282a2e687f6c73"
 SRC_URI[sha256sum] = "6985c538143c1208dcb1ac42cedad6ff52e267b47e5f970183a3e75125b43c2e"
 
-UPSTREAM_CHECK_URI = "http://www.multiprecision.org/mpc/download.html"
-
 S = "${WORKDIR}/mpc-${PV}"
 BBCLASSEXTEND = "native nativesdk"
 

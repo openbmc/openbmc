@@ -11,6 +11,7 @@ LIC_FILES_CHKSUM = "file://doc/COPYING;md5=d32239bcb673463ab874e80d47fae504 \
 SRC_URI = "${GNU_MIRROR}/libtasn1/libtasn1-${PV}.tar.gz \
            file://dont-depend-on-help2man.patch \
            file://fix-ldflags.patch \
+           file://fix-gtkdoc.patch \
            "
 
 DEPENDS = "bison-native"

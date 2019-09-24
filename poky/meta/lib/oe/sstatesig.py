@@ -262,13 +262,9 @@ class SignatureGeneratorOEEquivHash(bb.siggen.SignatureGeneratorUniHashMixIn, Si
 
     def init_rundepcheck(self, data):
         super().init_rundepcheck(data)
-        autostart = data.getVar('BB_HASHSERVE')
-        if autostart:
-            self.server = "http://" + autostart
-        else:
-            self.server = data.getVar('SSTATE_HASHEQUIV_SERVER')
+        self.server = data.getVar('BB_HASHSERVE')
         if not self.server:
-            bb.fatal("OEEquivHash requires SSTATE_HASHEQUIV_SERVER or BB_HASHSERVE to be set")
+            bb.fatal("OEEquivHash requires BB_HASHSERVE to be set")
         self.method = data.getVar('SSTATE_HASHEQUIV_METHOD')
         if not self.method:
             bb.fatal("OEEquivHash requires SSTATE_HASHEQUIV_METHOD to be set")

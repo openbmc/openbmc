@@ -16,6 +16,8 @@ Upstream-Status: Inappropriate [musl]
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
 [Rebased for v242]
 Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
+[rebased for systemd 243]
+Signed-off-by: Scott Murray <scott.murray@konsulko.com>
 ---
  src/basic/cgroup-util.c                 | 14 +++++++-------
  src/basic/procfs-util.c                 |  4 ++--
@@ -30,17 +32,17 @@ Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
  src/nspawn/nspawn-cgroup.c              |  2 +-
  src/nspawn/nspawn.c                     |  6 +++---
  src/shared/sysctl-util.c                |  2 +-
- src/sleep/sleep.c                       | 12 ++++++------
+ src/sleep/sleep.c                       | 10 +++++-----
  src/udev/udevadm-trigger.c              |  2 +-
- src/udev/udevd.c                        |  6 +++---
+ src/udev/udevd.c                        |  2 +-
  src/vconsole/vconsole-setup.c           |  2 +-
- 17 files changed, 39 insertions(+), 39 deletions(-)
+ 17 files changed, 36 insertions(+), 36 deletions(-)
 
 diff --git a/src/basic/cgroup-util.c b/src/basic/cgroup-util.c
-index fc28109..44fe985 100644
+index 7b5839ccd6..18f6e8ffc8 100644
 --- a/src/basic/cgroup-util.c
 +++ b/src/basic/cgroup-util.c
-@@ -822,7 +822,7 @@ int cg_attach(const char *controller, const char *path, pid_t pid) {
+@@ -860,7 +860,7 @@ int cg_attach(const char *controller, const char *path, pid_t pid) {
  
          xsprintf(c, PID_FMT "\n", pid);
  
@@ -49,7 +51,7 @@ index fc28109..44fe985 100644
          if (r < 0)
                  return r;
  
-@@ -1104,7 +1104,7 @@ int cg_install_release_agent(const char *controller, const char *agent) {
+@@ -1142,7 +1142,7 @@ int cg_install_release_agent(const char *controller, const char *agent) {
  
          sc = strstrip(contents);
          if (isempty(sc)) {
@@ -58,7 +60,7 @@ index fc28109..44fe985 100644
                  if (r < 0)
                          return r;
          } else if (!path_equal(sc, agent))
-@@ -1122,7 +1122,7 @@ int cg_install_release_agent(const char *controller, const char *agent) {
+@@ -1160,7 +1160,7 @@ int cg_install_release_agent(const char *controller, const char *agent) {
  
          sc = strstrip(contents);
          if (streq(sc, "0")) {
@@ -67,7 +69,7 @@ index fc28109..44fe985 100644
                  if (r < 0)
                          return r;
  
-@@ -1149,7 +1149,7 @@ int cg_uninstall_release_agent(const char *controller) {
+@@ -1187,7 +1187,7 @@ int cg_uninstall_release_agent(const char *controller) {
          if (r < 0)
                  return r;
  
@@ -76,7 +78,7 @@ index fc28109..44fe985 100644
          if (r < 0)
                  return r;
  
-@@ -1159,7 +1159,7 @@ int cg_uninstall_release_agent(const char *controller) {
+@@ -1197,7 +1197,7 @@ int cg_uninstall_release_agent(const char *controller) {
          if (r < 0)
                  return r;
  
@@ -85,7 +87,7 @@ index fc28109..44fe985 100644
          if (r < 0)
                  return r;
  
-@@ -2016,7 +2016,7 @@ int cg_set_attribute(const char *controller, const char *path, const char *attri
+@@ -2053,7 +2053,7 @@ int cg_set_attribute(const char *controller, const char *path, const char *attri
          if (r < 0)
                  return r;
  
@@ -94,7 +96,7 @@ index fc28109..44fe985 100644
  }
  
  int cg_get_attribute(const char *controller, const char *path, const char *attribute, char **ret) {
-@@ -2664,7 +2664,7 @@ int cg_enable_everywhere(
+@@ -2697,7 +2697,7 @@ int cg_enable_everywhere(
                                          return log_debug_errno(errno, "Failed to open cgroup.subtree_control file of %s: %m", p);
                          }
  
@@ -104,10 +106,10 @@ index fc28109..44fe985 100644
                                  log_debug_errno(r, "Failed to %s controller %s for %s (%s): %m",
                                                  FLAGS_SET(mask, bit) ? "enable" : "disable", n, p, fs);
 diff --git a/src/basic/procfs-util.c b/src/basic/procfs-util.c
-index 7aaf95b..25fc3de 100644
+index 42ce53d5aa..57512532a6 100644
 --- a/src/basic/procfs-util.c
 +++ b/src/basic/procfs-util.c
-@@ -85,13 +85,13 @@ int procfs_tasks_set_limit(uint64_t limit) {
+@@ -86,13 +86,13 @@ int procfs_tasks_set_limit(uint64_t limit) {
           * decrease it, as threads-max is the much more relevant sysctl. */
          if (limit > pid_max-1) {
                  sprintf(buffer, "%" PRIu64, limit+1); /* Add one, since PID 0 is not a valid PID */
@@ -124,7 +126,7 @@ index 7aaf95b..25fc3de 100644
                  uint64_t threads_max;
  
 diff --git a/src/basic/smack-util.c b/src/basic/smack-util.c
-index 123d00e..e7ea78f 100644
+index 123d00e13e..e7ea78f349 100644
 --- a/src/basic/smack-util.c
 +++ b/src/basic/smack-util.c
 @@ -115,7 +115,7 @@ int mac_smack_apply_pid(pid_t pid, const char *label) {
@@ -137,7 +139,7 @@ index 123d00e..e7ea78f 100644
                  return r;
  
 diff --git a/src/basic/util.c b/src/basic/util.c
-index 93d610b..97dca64 100644
+index 93d610bc98..97dca64f73 100644
 --- a/src/basic/util.c
 +++ b/src/basic/util.c
 @@ -294,7 +294,7 @@ void disable_coredumps(void) {
@@ -150,7 +152,7 @@ index 93d610b..97dca64 100644
                  log_debug_errno(r, "Failed to turn off coredumps, ignoring: %m");
  }
 diff --git a/src/binfmt/binfmt.c b/src/binfmt/binfmt.c
-index 66e2f01..5daa43b 100644
+index aa9d811f2e..8c7f2dae7a 100644
 --- a/src/binfmt/binfmt.c
 +++ b/src/binfmt/binfmt.c
 @@ -48,7 +48,7 @@ static int delete_rule(const char *rule) {
@@ -175,16 +177,16 @@ index 66e2f01..5daa43b 100644
                  }
  
                  /* Flush out all rules */
--                write_string_file("/proc/sys/fs/binfmt_misc/status", "-1", WRITE_STRING_FILE_DISABLE_BUFFER);
-+                write_string_file("/proc/sys/fs/binfmt_misc/status", "-1", 0);
+-                (void) write_string_file("/proc/sys/fs/binfmt_misc/status", "-1", WRITE_STRING_FILE_DISABLE_BUFFER);
++                (void) write_string_file("/proc/sys/fs/binfmt_misc/status", "-1", 0);
  
                  STRV_FOREACH(f, files) {
                          k = apply_file(*f, true);
 diff --git a/src/core/main.c b/src/core/main.c
-index 46db471..726ccaf 100644
+index bcce7178a8..4199cedab9 100644
 --- a/src/core/main.c
 +++ b/src/core/main.c
-@@ -1469,7 +1469,7 @@ static int bump_unix_max_dgram_qlen(void) {
+@@ -1285,7 +1285,7 @@ static int bump_unix_max_dgram_qlen(void) {
          if (v >= DEFAULT_UNIX_MAX_DGRAM_QLEN)
                  return 0;
  
@@ -193,7 +195,7 @@ index 46db471..726ccaf 100644
          if (r < 0)
                  return log_full_errno(IN_SET(r, -EROFS, -EPERM, -EACCES) ? LOG_DEBUG : LOG_WARNING, r,
                                        "Failed to bump AF_UNIX datagram queue length, ignoring: %m");
-@@ -1684,7 +1684,7 @@ static void initialize_core_pattern(bool skip_setup) {
+@@ -1509,7 +1509,7 @@ static void initialize_core_pattern(bool skip_setup) {
          if (getpid_cached() != 1)
                  return;
  
@@ -203,10 +205,10 @@ index 46db471..726ccaf 100644
                  log_warning_errno(r, "Failed to write '%s' to /proc/sys/kernel/core_pattern, ignoring: %m", arg_early_core_pattern);
  }
 diff --git a/src/core/smack-setup.c b/src/core/smack-setup.c
-index cd7fb01..077e861 100644
+index b95e6239d4..fdbdaaaccb 100644
 --- a/src/core/smack-setup.c
 +++ b/src/core/smack-setup.c
-@@ -351,17 +351,17 @@ int mac_smack_setup(bool *loaded_policy) {
+@@ -325,17 +325,17 @@ int mac_smack_setup(bool *loaded_policy) {
          }
  
  #ifdef SMACK_RUN_LABEL
@@ -229,7 +231,7 @@ index cd7fb01..077e861 100644
                  log_warning_errno(r, "Failed to set SMACK netlabel rule \"127.0.0.1 -CIPSO\": %m");
  #endif
 diff --git a/src/hibernate-resume/hibernate-resume.c b/src/hibernate-resume/hibernate-resume.c
-index 17e7cd1..87a7667 100644
+index 17e7cd1a00..87a7667716 100644
 --- a/src/hibernate-resume/hibernate-resume.c
 +++ b/src/hibernate-resume/hibernate-resume.c
 @@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
@@ -242,10 +244,10 @@ index 17e7cd1..87a7667 100644
                  log_error_errno(r, "Failed to write '%s' to /sys/power/resume: %m", major_minor);
                  return EXIT_FAILURE;
 diff --git a/src/libsystemd/sd-device/sd-device.c b/src/libsystemd/sd-device/sd-device.c
-index c2315c0..00f81b4 100644
+index c4a7f2f3d3..bcac758284 100644
 --- a/src/libsystemd/sd-device/sd-device.c
 +++ b/src/libsystemd/sd-device/sd-device.c
-@@ -1852,7 +1852,7 @@ _public_ int sd_device_set_sysattr_value(sd_device *device, const char *sysattr,
+@@ -1849,7 +1849,7 @@ _public_ int sd_device_set_sysattr_value(sd_device *device, const char *sysattr,
          if (!value)
                  return -ENOMEM;
  
@@ -255,10 +257,10 @@ index c2315c0..00f81b4 100644
                  if (r == -ELOOP)
                          return -EINVAL;
 diff --git a/src/login/logind-dbus.c b/src/login/logind-dbus.c
-index 2cebcce..7111fc1 100644
+index 30b9a66334..cc1d577933 100644
 --- a/src/login/logind-dbus.c
 +++ b/src/login/logind-dbus.c
-@@ -1285,7 +1285,7 @@ static int trigger_device(Manager *m, sd_device *d) {
+@@ -1325,7 +1325,7 @@ static int trigger_device(Manager *m, sd_device *d) {
                  if (!t)
                          return -ENOMEM;
  
@@ -268,23 +270,23 @@ index 2cebcce..7111fc1 100644
  
          return 0;
 diff --git a/src/nspawn/nspawn-cgroup.c b/src/nspawn/nspawn-cgroup.c
-index 168125d..dd0ab79 100644
+index 0462b46413..7c53d41483 100644
 --- a/src/nspawn/nspawn-cgroup.c
 +++ b/src/nspawn/nspawn-cgroup.c
-@@ -124,7 +124,7 @@ int sync_cgroup(pid_t pid, CGroupUnified unified_requested, uid_t uid_shift) {
-         (void) mkdir_parents(fn, 0755);
+@@ -123,7 +123,7 @@ int sync_cgroup(pid_t pid, CGroupUnified unified_requested, uid_t uid_shift) {
+         fn = strjoina(tree, cgroup, "/cgroup.procs");
  
          sprintf(pid_string, PID_FMT, pid);
--        r = write_string_file(fn, pid_string, WRITE_STRING_FILE_DISABLE_BUFFER);
-+        r = write_string_file(fn, pid_string, 0);
+-        r = write_string_file(fn, pid_string, WRITE_STRING_FILE_DISABLE_BUFFER|WRITE_STRING_FILE_MKDIR_0755);
++        r = write_string_file(fn, pid_string, WRITE_STRING_FILE_MKDIR_0755);
          if (r < 0) {
                  log_error_errno(r, "Failed to move process: %m");
                  goto finish;
 diff --git a/src/nspawn/nspawn.c b/src/nspawn/nspawn.c
-index 3b0ecb1..a1b5240 100644
+index 2aec8041f0..841542f2f3 100644
 --- a/src/nspawn/nspawn.c
 +++ b/src/nspawn/nspawn.c
-@@ -2341,7 +2341,7 @@ static int reset_audit_loginuid(void) {
+@@ -2357,7 +2357,7 @@ static int reset_audit_loginuid(void) {
          if (streq(p, "4294967295"))
                  return 0;
  
@@ -293,7 +295,7 @@ index 3b0ecb1..a1b5240 100644
          if (r < 0) {
                  log_error_errno(r,
                                  "Failed to reset audit login UID. This probably means that your kernel is too\n"
-@@ -3531,13 +3531,13 @@ static int setup_uid_map(pid_t pid) {
+@@ -3566,13 +3566,13 @@ static int setup_uid_map(pid_t pid) {
  
          xsprintf(uid_map, "/proc/" PID_FMT "/uid_map", pid);
          xsprintf(line, UID_FMT " " UID_FMT " " UID_FMT "\n", 0, arg_uid_shift, arg_uid_range);
@@ -310,10 +312,10 @@ index 3b0ecb1..a1b5240 100644
                  return log_error_errno(r, "Failed to write GID map: %m");
  
 diff --git a/src/shared/sysctl-util.c b/src/shared/sysctl-util.c
-index 9be4055..f935cde 100644
+index 93bdcf11bf..68cddb7a9f 100644
 --- a/src/shared/sysctl-util.c
 +++ b/src/shared/sysctl-util.c
-@@ -73,7 +73,7 @@ int sysctl_write_ip_property(int af, const char *ifname, const char *property, c
+@@ -88,7 +88,7 @@ int sysctl_write_ip_property(int af, const char *ifname, const char *property, c
  
          log_debug("Setting '%s' to '%s'", p, value);
  
@@ -323,19 +325,19 @@ index 9be4055..f935cde 100644
  
  int sysctl_read(const char *property, char **content) {
 diff --git a/src/sleep/sleep.c b/src/sleep/sleep.c
-index 11aabaf..6aa5d37 100644
+index b9fe96635d..f168d7f890 100644
 --- a/src/sleep/sleep.c
 +++ b/src/sleep/sleep.c
-@@ -48,7 +48,7 @@ static int write_hibernate_location_info(void) {
+@@ -54,7 +54,7 @@ static int write_hibernate_location_info(void) {
  
          /* if it's a swap partition, we just write the disk to /sys/power/resume */
          if (streq(type, "partition")) {
 -                r = write_string_file("/sys/power/resume", device, WRITE_STRING_FILE_DISABLE_BUFFER);
 +                r = write_string_file("/sys/power/resume", device, 0);
                  if (r < 0)
-                         return log_debug_errno(r, "Faileed to write partitoin device to /sys/power/resume: %m");
+                         return log_debug_errno(r, "Failed to write partition device to /sys/power/resume: %m");
  
-@@ -84,12 +84,12 @@ static int write_hibernate_location_info(void) {
+@@ -98,14 +98,14 @@ static int write_hibernate_location_info(void) {
  
          offset = fiemap->fm_extents[0].fe_physical / page_size();
          xsprintf(offset_str, "%" PRIu64, offset);
@@ -344,13 +346,15 @@ index 11aabaf..6aa5d37 100644
          if (r < 0)
                  return log_debug_errno(r, "Failed to write offset '%s': %m", offset_str);
  
+         log_debug("Wrote calculated resume_offset value to /sys/power/resume_offset: %s", offset_str);
+ 
          xsprintf(device_str, "%lx", (unsigned long)stb.st_dev);
 -        r = write_string_file("/sys/power/resume", device_str, WRITE_STRING_FILE_DISABLE_BUFFER);
 +        r = write_string_file("/sys/power/resume", device_str, 0);
          if (r < 0)
                  return log_debug_errno(r, "Failed to write device '%s': %m", device_str);
  
-@@ -103,7 +103,7 @@ static int write_mode(char **modes) {
+@@ -121,7 +121,7 @@ static int write_mode(char **modes) {
          STRV_FOREACH(mode, modes) {
                  int k;
  
@@ -359,7 +363,7 @@ index 11aabaf..6aa5d37 100644
                  if (k >= 0)
                          return 0;
  
-@@ -122,7 +122,7 @@ static int write_state(FILE **f, char **states) {
+@@ -140,7 +140,7 @@ static int write_state(FILE **f, char **states) {
          STRV_FOREACH(state, states) {
                  int k;
  
@@ -368,17 +372,8 @@ index 11aabaf..6aa5d37 100644
                  if (k >= 0)
                          return 0;
                  log_debug_errno(k, "Failed to write '%s' to /sys/power/state: %m", *state);
-@@ -217,7 +217,7 @@ static int rtc_write_wake_alarm(uint64_t sec) {
- 
-         xsprintf(buf, "%" PRIu64, sec);
- 
--        r = write_string_file("/sys/class/rtc/rtc0/wakealarm", buf, WRITE_STRING_FILE_DISABLE_BUFFER);
-+        r = write_string_file("/sys/class/rtc/rtc0/wakealarm", buf, 0);
-         if (r < 0)
-                 return log_error_errno(r, "Failed to write '%s' to /sys/class/rtc/rtc0/wakealarm: %m", buf);
- 
 diff --git a/src/udev/udevadm-trigger.c b/src/udev/udevadm-trigger.c
-index b7dafb7..bab4907 100644
+index 77d95e513f..25ce4abfb1 100644
 --- a/src/udev/udevadm-trigger.c
 +++ b/src/udev/udevadm-trigger.c
 @@ -43,7 +43,7 @@ static int exec_list(sd_device_enumerator *e, const char *action, Set *settle_se
@@ -388,44 +383,26 @@ index b7dafb7..bab4907 100644
 -                r = write_string_file(filename, action, WRITE_STRING_FILE_DISABLE_BUFFER);
 +                r = write_string_file(filename, action, 0);
                  if (r < 0) {
-                         log_debug_errno(r, "Failed to write '%s' to '%s', ignoring: %m", action, filename);
-                         continue;
+                         log_full_errno(r == -ENOENT ? LOG_DEBUG : LOG_ERR, r,
+                                        "Failed to write '%s' to '%s': %m", action, filename);
 diff --git a/src/udev/udevd.c b/src/udev/udevd.c
-index 140ec35..33063a9 100644
+index cb5123042a..ea309a9e7f 100644
 --- a/src/udev/udevd.c
 +++ b/src/udev/udevd.c
-@@ -1185,7 +1185,7 @@ static int synthesize_change(sd_device *dev) {
-                  */
-                 log_debug("Device '%s' is closed, synthesising 'change'", devname);
-                 strscpyl(filename, sizeof(filename), syspath, "/uevent", NULL);
--                write_string_file(filename, "change", WRITE_STRING_FILE_DISABLE_BUFFER);
-+                write_string_file(filename, "change", 0);
+@@ -1113,7 +1113,7 @@ static int synthesize_change_one(sd_device *dev, const char *syspath) {
  
-                 FOREACH_DEVICE(e, d) {
-                         const char *t, *n, *s;
-@@ -1200,7 +1200,7 @@ static int synthesize_change(sd_device *dev) {
- 
-                         log_debug("Device '%s' is closed, synthesising partition '%s' 'change'", devname, n);
-                         strscpyl(filename, sizeof(filename), s, "/uevent", NULL);
--                        write_string_file(filename, "change", WRITE_STRING_FILE_DISABLE_BUFFER);
-+                        write_string_file(filename, "change", 0);
-                 }
- 
-                 return 0;
-@@ -1208,7 +1208,7 @@ static int synthesize_change(sd_device *dev) {
- 
-         log_debug("Device %s is closed, synthesising 'change'", devname);
-         strscpyl(filename, sizeof(filename), syspath, "/uevent", NULL);
--        write_string_file(filename, "change", WRITE_STRING_FILE_DISABLE_BUFFER);
-+        write_string_file(filename, "change", 0);
- 
+         filename = strjoina(syspath, "/uevent");
+         log_device_debug(dev, "device is closed, synthesising 'change' on %s", syspath);
+-        r = write_string_file(filename, "change", WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file(filename, "change", 0);
+         if (r < 0)
+                 return log_device_debug_errno(dev, r, "Failed to write 'change' to %s: %m", filename);
          return 0;
- }
 diff --git a/src/vconsole/vconsole-setup.c b/src/vconsole/vconsole-setup.c
-index 67dc2e4..01b83d0 100644
+index 75d052ae70..5a15c939d8 100644
 --- a/src/vconsole/vconsole-setup.c
 +++ b/src/vconsole/vconsole-setup.c
-@@ -116,7 +116,7 @@ static int toggle_utf8(const char *name, int fd, bool utf8) {
+@@ -117,7 +117,7 @@ static int toggle_utf8_vc(const char *name, int fd, bool utf8) {
  static int toggle_utf8_sysfs(bool utf8) {
          int r;
  
@@ -434,6 +411,3 @@ index 67dc2e4..01b83d0 100644
          if (r < 0)
                  return log_warning_errno(r, "Failed to %s sysfs UTF-8 flag: %m", enable_disable(utf8));
  
--- 
-2.11.0
-

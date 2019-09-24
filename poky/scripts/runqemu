@@ -65,13 +65,15 @@ of the following environment variables (in any order):
   MACHINE - the machine name (optional, autodetected from KERNEL filename if unspecified)
   Simplified QEMU command-line options can be passed with:
     nographic - disable video console
-    sdl - choose the SDL frontend instead of the Gtk+ default
-    gtk-gl - enable virgl-based GL acceleration using Gtk+ frontend
-    gtk-gl-es - enable virgl-based GL acceleration, using OpenGL ES and Gtk+ frontend
+    sdl - choose the SDL UI frontend
+    gtk - choose the Gtk UI frontend
+    gl - enable virgl-based GL acceleration (also needs gtk option)
+    gl-es - enable virgl-based GL acceleration, using OpenGL ES (also needs gtk option)
     egl-headless - enable headless EGL output; use vnc or spice to see it
     serial - enable a serial console on /dev/ttyS0
     serialstdio - enable a serial console on the console (regardless of graphics mode)
     slirp - enable user networking, no root privileges is required
+    snapshot - don't write changes to back to images
     kvm - enable KVM when running x86/x86_64 (VT-capable CPU required)
     kvm-vhost - enable KVM with vhost when running x86/x86_64 (VT-capable CPU required)
     publicvnc - enable a VNC server open to all hosts
@@ -436,10 +438,16 @@ class BaseConfig(object):
                 self.kernel_cmdline_script += ' console=ttyS0'
             elif arg == 'sdl':
                 self.qemu_opt_script += ' -display sdl'
-            elif arg == 'gtk-gl':
-                self.qemu_opt_script += ' -vga virtio -display gtk,gl=on'
-            elif arg == 'gtk-gl-es':
-                self.qemu_opt_script += ' -vga virtio -display gtk,gl=es'
+            elif arg == 'gtk':
+                if 'gl' in sys.argv[1:]:
+                    self.qemu_opt_script += ' -vga virtio -display gtk,gl=on'
+                elif 'gl-es' in sys.argv[1:]:
+                    self.qemu_opt_script += ' -vga virtio -display gtk,gl=es'
+                else:
+                    self.qemu_opt_script += ' -display gtk'
+            elif arg == 'gl' or arg == 'gl-es':
+                # These args are handled inside sdl or gtk blocks above
+                pass
             elif arg == 'egl-headless':
                 self.qemu_opt_script += ' -vga virtio -display egl-headless'
                 # As runqemu can be run within bitbake (when using testimage, for example),

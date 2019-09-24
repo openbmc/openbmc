@@ -13,15 +13,16 @@ do_compile() {
 }
 
 do_install() {
-    install -d ${D}${sysconfdir}
-    install -D -m 0644 ${WORKDIR}/inittab ${D}${sysconfdir}/inittab
-    tmp="${SERIAL_CONSOLES}"
-    for i in $tmp
-    do
-            j=`echo ${i} | sed s/\;/\ /g`
-            id=`echo ${i} | sed -e 's/^.*;//' -e 's/;.*//'`
-            echo "$id::respawn:${base_sbindir}/getty ${j}" >> ${D}${sysconfdir}/inittab
-    done
+	install -d ${D}${sysconfdir}
+	install -D -m 0644 ${WORKDIR}/inittab ${D}${sysconfdir}/inittab
+	tmp="${SERIAL_CONSOLES}"
+	[ -n "$tmp" ] && echo >> ${D}${sysconfdir}/inittab
+	for i in $tmp
+	do
+		j=`echo ${i} | sed s/\;/\ /g`
+		id=`echo ${i} | sed -e 's/^.*;//' -e 's/;.*//'`
+		echo "$id::respawn:${base_sbindir}/getty ${j}" >> ${D}${sysconfdir}/inittab
+	done
 }
 
 # SERIAL_CONSOLES is generally defined by the MACHINE .conf.

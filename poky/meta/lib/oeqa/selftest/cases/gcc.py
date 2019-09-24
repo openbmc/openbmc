@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MIT
 import os
 from oeqa.core.decorator import OETestTag
+from oeqa.core.case import OEPTestResultTestCase
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import bitbake, get_bb_var, get_bb_vars, runqemu, Command
 
@@ -11,7 +12,7 @@ def parse_values(content):
                 yield i[len(v) + 2:].strip(), v
                 break
 
-class GccSelfTestBase(OESelftestTestCase):
+class GccSelfTestBase(OESelftestTestCase, OEPTestResultTestCase):
     def check_skip(self, suite):
         targets = get_bb_var("RUNTIMETARGET", "gcc-runtime").split()
         if suite not in targets:
@@ -41,20 +42,20 @@ class GccSelfTestBase(OESelftestTestCase):
         bb_vars = get_bb_vars(["B", "TARGET_SYS"], recipe)
         builddir, target_sys = bb_vars["B"], bb_vars["TARGET_SYS"]
 
-        self.extraresults = {"ptestresult.sections" : {}}
         for suite in suites:
             sumspath = os.path.join(builddir, "gcc", "testsuite", suite, "{0}.sum".format(suite))
             if not os.path.exists(sumspath): # check in target dirs
                 sumspath = os.path.join(builddir, target_sys, suite, "testsuite", "{0}.sum".format(suite))
             if not os.path.exists(sumspath): # handle libstdc++-v3 -> libstdc++
                 sumspath = os.path.join(builddir, target_sys, suite, "testsuite", "{0}.sum".format(suite.split("-")[0]))
+            logpath = os.path.splitext(sumspath)[0] + ".log"
 
             ptestsuite = "gcc-{}".format(suite) if suite != "gcc" else suite
             ptestsuite = ptestsuite + "-user" if ssh is None else ptestsuite
-            self.extraresults["ptestresult.sections"][ptestsuite] = {}
+            self.ptest_section(ptestsuite, logfile = logpath)
             with open(sumspath, "r") as f:
                 for test, result in parse_values(f):
-                    self.extraresults["ptestresult.{}.{}".format(ptestsuite, test)] = {"status" : result}
+                    self.ptest_result(ptestsuite, test, result)
 
     def run_check_emulated(self, *args, **kwargs):
         # build core-image-minimal with required packages

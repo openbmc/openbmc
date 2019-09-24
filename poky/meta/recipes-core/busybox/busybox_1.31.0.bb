@@ -9,7 +9,6 @@ SRC_URI = "http://www.busybox.net/downloads/busybox-${PV}.tar.bz2;name=tarball \
            file://default.script \
            file://simple.script \
            file://hwclock.sh \
-           file://mount.busybox \
            file://syslog \
            file://syslog-startup.conf \
            file://syslog.conf \
@@ -17,7 +16,6 @@ SRC_URI = "http://www.busybox.net/downloads/busybox-${PV}.tar.bz2;name=tarball \
            file://mdev \
            file://mdev.conf \
            file://mdev-mount.sh \
-           file://umount.busybox \
            file://defconfig \
            file://busybox-syslog.service.in \
            file://busybox-klogd.service.in \
@@ -38,7 +36,6 @@ SRC_URI = "http://www.busybox.net/downloads/busybox-${PV}.tar.bz2;name=tarball \
            ${@["", "file://mdev.cfg"][(d.getVar('VIRTUAL-RUNTIME_dev_manager') == 'busybox-mdev')]} \
            file://syslog.cfg \
            file://unicode.cfg \
-           file://inittab \
            file://rcS \
            file://rcK \
            file://makefile-libbb-race.patch \

@@ -677,7 +677,7 @@ def _check_unsafe_delete_path(path):
         return True
     return False
 
-def remove(path, recurse=False):
+def remove(path, recurse=False, ionice=False):
     """Equivalent to rm -f or rm -rf"""
     if not path:
         return
@@ -686,7 +686,10 @@ def remove(path, recurse=False):
             if _check_unsafe_delete_path(path):
                 raise Exception('bb.utils.remove: called with dangerous path "%s" and recurse=True, refusing to delete!' % path)
         # shutil.rmtree(name) would be ideal but its too slow
-        subprocess.check_call(['rm', '-rf'] + glob.glob(path))
+        cmd = []
+        if ionice:
+            cmd = ['ionice', '-c', '3']
+        subprocess.check_call(cmd + ['rm', '-rf'] + glob.glob(path))
         return
     for name in glob.glob(path):
         try:
@@ -695,12 +698,12 @@ def remove(path, recurse=False):
             if exc.errno != errno.ENOENT:
                 raise
 
-def prunedir(topdir):
+def prunedir(topdir, ionice=False):
     # Delete everything reachable from the directory named in 'topdir'.
     # CAUTION:  This is dangerous!
     if _check_unsafe_delete_path(topdir):
         raise Exception('bb.utils.prunedir: called with dangerous path "%s", refusing to delete!' % topdir)
-    remove(topdir, recurse=True)
+    remove(topdir, recurse=True, ionice=ionice)
 
 #
 # Could also use return re.compile("(%s)" % "|".join(map(re.escape, suffixes))).sub(lambda mo: "", var)

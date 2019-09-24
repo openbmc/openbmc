@@ -3,10 +3,12 @@
 #
 
 import os
+import shutil
 import unittest
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.selftest.cases.buildhistory import BuildhistoryBase
 from oeqa.utils.commands import Command, runCmd, bitbake, get_bb_var, get_test_layer
+from oeqa.utils import CommandError
 
 class BuildhistoryDiffTests(BuildhistoryBase):
 
@@ -63,3 +65,59 @@ class OEPybootchartguyTests(OEScriptTests):
         runCmd('%s/pybootchartgui/pybootchartgui.py  %s -o %s/charts -f pdf' % (self.scripts_dir, self.buildstats, self.tmpdir))
         self.assertTrue(os.path.exists(self.tmpdir + "/charts.pdf"))
 
+class OEGitproxyTests(OESelftestTestCase):
+
+    scripts_dir = os.path.join(get_bb_var('COREBASE'), 'scripts')
+
+    def test_oegitproxy_help(self):
+        try:
+            res = runCmd('%s/oe-git-proxy  --help' % self.scripts_dir, assert_error=False)
+            self.assertTrue(False)
+        except CommandError as e:
+            self.assertEqual(2, e.retcode)
+
+    def run_oegitproxy(self, custom_shell=None):
+        os.environ['SOCAT'] = shutil.which("echo")
+        os.environ['ALL_PROXY'] = "https://proxy.example.com:3128"
+        os.environ['NO_PROXY'] = "*.example.com,.no-proxy.org,192.168.42.0/24,127.*.*.*"
+
+        if custom_shell is None:
+            prefix = ''
+        else:
+            prefix = custom_shell + ' '
+
+        # outside, use the proxy
+        res = runCmd('%s%s/oe-git-proxy host.outside-example.com 9418' %
+                     (prefix,self.scripts_dir))
+        self.assertIn('PROXY:', res.output)
+        # match with wildcard suffix
+        res = runCmd('%s%s/oe-git-proxy host.example.com 9418' %
+                     (prefix, self.scripts_dir))
+        self.assertIn('TCP:', res.output)
+        # match just suffix
+        res = runCmd('%s%s/oe-git-proxy host.no-proxy.org 9418' %
+                     (prefix, self.scripts_dir))
+        self.assertIn('TCP:', res.output)
+        # match IP subnet
+        res = runCmd('%s%s/oe-git-proxy 192.168.42.42 9418' %
+                     (prefix, self.scripts_dir))
+        self.assertIn('TCP:', res.output)
+        # match IP wildcard
+        res = runCmd('%s%s/oe-git-proxy 127.1.2.3 9418' %
+                     (prefix, self.scripts_dir))
+        self.assertIn('TCP:', res.output)
+        
+        # test that * globbering is off
+        os.environ['NO_PROXY'] = "*"
+        res = runCmd('%s%s/oe-git-proxy host.example.com 9418' %
+                     (prefix, self.scripts_dir))
+        self.assertIn('TCP:', res.output)
+
+    def test_oegitproxy_proxy(self):
+        self.run_oegitproxy()
+
+    def test_oegitproxy_proxy_dash(self):
+        dash = shutil.which("dash")
+        if dash is None:
+            self.skipTest("No \"dash\" found on test system.")
+        self.run_oegitproxy(custom_shell=dash)

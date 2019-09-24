@@ -18,7 +18,7 @@ EDEPENDS_GLES2 = "virtual/libgles2"
 EDEPENDS_KMS = "libdrm virtual/egl"
 EDEPENDS_EGL = "virtual/egl"
 EDEPENDS_X11 = "virtual/libx11 libxcomposite libxfixes libxi libxrandr"
-EDEPENDS_WAYLAND = "virtual/mesa wayland"
+EDEPENDS_WAYLAND = "virtual/egl virtual/libgles2 wayland"
 
 # Extra RDEPENDS for PACKAGECONFIG
 # This has to be explictly listed, because cogl dlopens the backends
@@ -74,5 +74,7 @@ FILES_libcogl-path = "${libdir}/libcogl-path${SOLIBS}"
 RPROVIDES_libcogl = "cogl-1.0"
 RCONFLICTS_libcogl = "cogl-1.0"
 RREPLACES_libcogl = "cogl-1.0"
+
+RDEPENDS_${PN}-dev = "libcogl"
 
 COMPATIBLE_HOST_armv4 = 'null'

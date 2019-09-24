@@ -1,0 +1,35 @@
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From 6f720cebe632d7dc187c6907857d67ce1f7313d6 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Mon, 9 Sep 2019 22:48:49 +0100
+Subject: [PATCH] docs: don't include the type hierarchy
+
+gtk-doc can't generate a type hierarchy when scanning gst-libav, and gtk-doc
+1.30 onwards doesn't write a file if there is no type hierarchy (unlike previous
+releases, which wrote an empty file).  This results in the build failing with
+gtk-doc 1.30 onwards, so remove the type hierarchy section from the
+documentation as it doesn't serve any purpose.
+
+Fixes https://gitlab.freedesktop.org/gstreamer/gst-libav/issues/57
+---
+ docs/plugins/gst-libav-plugins-docs.sgml | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/docs/plugins/gst-libav-plugins-docs.sgml b/docs/plugins/gst-libav-plugins-docs.sgml
+index 75c68f4..f68d554 100644
+--- a/docs/plugins/gst-libav-plugins-docs.sgml
++++ b/docs/plugins/gst-libav-plugins-docs.sgml
+@@ -32,9 +32,4 @@
+     <title>gst-libav Plugins</title>
+     <xi:include href="xml/plugin-libav.xml" />
+   </chapter>
+-
+-  <chapter>
+-    <title>Object Hierarchy</title>
+-    <xi:include href="xml/tree_index.sgml" />
+-  </chapter>
+ </book>
+-- 
+2.22.0

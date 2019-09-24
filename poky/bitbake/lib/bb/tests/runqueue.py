@@ -11,6 +11,7 @@ import bb
 import os
 import tempfile
 import subprocess
+import sys
 
 #
 # TODO:
@@ -232,10 +233,11 @@ class RunQueueTests(unittest.TestCase):
             self.assertEqual(set(tasks), set(expected))
 
 
+    @unittest.skipIf(sys.version_info < (3, 5, 0), 'Python 3.5 or later required')
     def test_hashserv_single(self):
         with tempfile.TemporaryDirectory(prefix="runqueuetest") as tempdir:
             extraenv = {
-                "BB_HASHSERVE" : "localhost:0",
+                "BB_HASHSERVE" : "auto",
                 "BB_SIGNATURE_HANDLER" : "TestEquivHash"
             }
             cmd = ["bitbake", "a1", "b1"]
@@ -255,10 +257,11 @@ class RunQueueTests(unittest.TestCase):
                         'a1:package_write_ipk_setscene', 'a1:package_qa_setscene']
             self.assertEqual(set(tasks), set(expected))
 
+    @unittest.skipIf(sys.version_info < (3, 5, 0), 'Python 3.5 or later required')
     def test_hashserv_double(self):
         with tempfile.TemporaryDirectory(prefix="runqueuetest") as tempdir:
             extraenv = {
-                "BB_HASHSERVE" : "localhost:0",
+                "BB_HASHSERVE" : "auto",
                 "BB_SIGNATURE_HANDLER" : "TestEquivHash"
             }
             cmd = ["bitbake", "a1", "b1", "e1"]
@@ -278,11 +281,12 @@ class RunQueueTests(unittest.TestCase):
             self.assertEqual(set(tasks), set(expected))
 
 
+    @unittest.skipIf(sys.version_info < (3, 5, 0), 'Python 3.5 or later required')
     def test_hashserv_multiple_setscene(self):
         # Runs e1:do_package_setscene twice
         with tempfile.TemporaryDirectory(prefix="runqueuetest") as tempdir:
             extraenv = {
-                "BB_HASHSERVE" : "localhost:0",
+                "BB_HASHSERVE" : "auto",
                 "BB_SIGNATURE_HANDLER" : "TestEquivHash"
             }
             cmd = ["bitbake", "a1", "b1", "e1"]
@@ -308,11 +312,12 @@ class RunQueueTests(unittest.TestCase):
                 else:
                     self.assertEqual(tasks.count(i), 1, "%s not in task list once" % i)
 
+    @unittest.skipIf(sys.version_info < (3, 5, 0), 'Python 3.5 or later required')
     def test_hashserv_partial_match(self):
         # e1:do_package matches initial built but not second hash value
         with tempfile.TemporaryDirectory(prefix="runqueuetest") as tempdir:
             extraenv = {
-                "BB_HASHSERVE" : "localhost:0",
+                "BB_HASHSERVE" : "auto",
                 "BB_SIGNATURE_HANDLER" : "TestEquivHash"
             }
             cmd = ["bitbake", "a1", "b1"]
@@ -336,11 +341,12 @@ class RunQueueTests(unittest.TestCase):
             expected.remove('e1:package')
             self.assertEqual(set(tasks), set(expected))
 
+    @unittest.skipIf(sys.version_info < (3, 5, 0), 'Python 3.5 or later required')
     def test_hashserv_partial_match2(self):
         # e1:do_package + e1:do_populate_sysroot matches initial built but not second hash value
         with tempfile.TemporaryDirectory(prefix="runqueuetest") as tempdir:
             extraenv = {
-                "BB_HASHSERVE" : "localhost:0",
+                "BB_HASHSERVE" : "auto",
                 "BB_SIGNATURE_HANDLER" : "TestEquivHash"
             }
             cmd = ["bitbake", "a1", "b1"]
@@ -363,13 +369,14 @@ class RunQueueTests(unittest.TestCase):
                         'e1:package_setscene', 'e1:populate_sysroot_setscene', 'e1:build', 'e1:package_qa', 'e1:package_write_rpm', 'e1:package_write_ipk', 'e1:packagedata']
             self.assertEqual(set(tasks), set(expected))
 
+    @unittest.skipIf(sys.version_info < (3, 5, 0), 'Python 3.5 or later required')
     def test_hashserv_partial_match3(self):
         # e1:do_package is valid for a1 but not after b1
         # In former buggy code, this triggered e1:do_fetch, then e1:do_populate_sysroot to run
         # with none of the intermediate tasks which is a serious bug
         with tempfile.TemporaryDirectory(prefix="runqueuetest") as tempdir:
             extraenv = {
-                "BB_HASHSERVE" : "localhost:0",
+                "BB_HASHSERVE" : "auto",
                 "BB_SIGNATURE_HANDLER" : "TestEquivHash"
             }
             cmd = ["bitbake", "a1", "b1"]

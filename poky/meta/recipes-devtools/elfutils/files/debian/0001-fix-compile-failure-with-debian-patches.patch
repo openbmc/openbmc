@@ -1,0 +1,48 @@
+From 3f3e7b16934ec58ab47d2bdc9982f54a55b07534 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 21 Aug 2019 16:25:33 +0800
+Subject: [PATCH] fix compile failure with debian patches
+
+While applying debian patches, there is a compile failure
+...
+elfutils-0.177/backends/mips_init.c:48:5: error: 'Ebl' {aka 'struct ebl'} has no member named 'name'
+...
+
+Since upstream applied commit [b323391 libdwelf: Add dwelf_elf_e_machine_string
+and use it in readelf], it remove 'name' from 'struct ebl'
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ backends/mips_init.c   | 1 -
+ backends/parisc_init.c | 1 -
+ 2 files changed, 2 deletions(-)
+
+diff --git a/backends/mips_init.c b/backends/mips_init.c
+index bce5abe..e1c65c8 100644
+--- a/backends/mips_init.c
++++ b/backends/mips_init.c
+@@ -45,7 +45,6 @@ mips_init (Elf *elf __attribute__ ((unused)),
+     return NULL;
+ 
+   /* We handle it.  */
+-  eh->name = "MIPS";
+   mips_init_reloc (eh);
+   HOOK (eh, reloc_simple_type);
+   HOOK (eh, return_value_location);
+diff --git a/backends/parisc_init.c b/backends/parisc_init.c
+index f1e401c..97b4a8c 100644
+--- a/backends/parisc_init.c
++++ b/backends/parisc_init.c
+@@ -56,7 +56,6 @@ parisc_init (Elf *elf __attribute__ ((unused)),
+       pa64 = 1;
+   }
+   /* We handle it.  */
+-  eh->name = "PA-RISC";
+   parisc_init_reloc (eh);
+   HOOK (eh, reloc_simple_type);
+   HOOK (eh, machine_flag_check);
+-- 
+2.7.4
+

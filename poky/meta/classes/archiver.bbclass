@@ -221,9 +221,10 @@ python do_ar_patched() {
 
     # Get the ARCHIVER_OUTDIR before we reset the WORKDIR
     ar_outdir = d.getVar('ARCHIVER_OUTDIR')
-    ar_workdir = d.getVar('ARCHIVER_WORKDIR')
+    if not is_work_shared(d):
+        ar_workdir = d.getVar('ARCHIVER_WORKDIR')
+        d.setVar('WORKDIR', ar_workdir)
     bb.note('Archiving the patched source...')
-    d.setVar('WORKDIR', ar_workdir)
     create_tarball(d, d.getVar('S'), 'patched', ar_outdir)
 }
 
