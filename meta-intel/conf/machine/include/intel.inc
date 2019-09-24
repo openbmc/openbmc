@@ -19,3 +19,5 @@ PREFERRED_PROVIDER_virtual/obmc-host-ctl ?= "obmc-op-control-host"
 PREFERRED_PROVIDER_virtual/obmc-inventory-data ?= "${VIRTUAL-RUNTIME_skeleton_workbook}"
 PREFERRED_PROVIDER_virtual/obmc-host-ipmi-hw = "phosphor-ipmi-kcs"
 #PREFERRED_PROVIDER_virtual/obmc-gpio-monitor ?= "phosphor-gpio-monitor"
+
+OVERRIDES .= ":intel"
