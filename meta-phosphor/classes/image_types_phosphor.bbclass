@@ -27,6 +27,7 @@ IMAGE_TYPEDEP_mtd-ubi-tar = "${FLASH_UBI_BASETYPE}"
 IMAGE_TYPES_MASKED += "mtd-static mtd-static-alltar mtd-static-tar mtd-ubi mtd-ubi-tar"
 
 # Flash characteristics in KB unless otherwise noted
+DISTROOVERRIDES .= ":flash-${FLASH_SIZE}"
 FLASH_SIZE ?= "32768"
 FLASH_PEB_SIZE ?= "64"
 # Flash page and overhead sizes in bytes
@@ -36,13 +37,18 @@ FLASH_NOR_UBI_OVERHEAD ?= "64"
 # Fixed partition offsets
 FLASH_UBOOT_OFFSET ?= "0"
 FLASH_KERNEL_OFFSET ?= "512"
+FLASH_KERNEL_OFFSET_flash-131072 ?= "1024"
 FLASH_UBI_OFFSET ?= "${FLASH_KERNEL_OFFSET}"
 FLASH_ROFS_OFFSET ?= "4864"
+FLASH_ROFS_OFFSET_flash-131072 ?= "10240"
 FLASH_RWFS_OFFSET ?= "28672"
+FLASH_RWFS_OFFSET_flash-131072 ?= "98304"
 
 # UBI volume sizes in KB unless otherwise noted.
 FLASH_UBI_RWFS_SIZE ?= "6144"
+FLASH_UBI_RWFS_SIZE_flash-131072 ?= "32768"
 FLASH_UBI_RWFS_TXT_SIZE ?= "6MiB"
+FLASH_UBI_RWFS_TXT_SIZE_flash-131072 ?= "32MiB"
 
 SIGNING_KEY ?= "${STAGING_DIR_NATIVE}${datadir}/OpenBMC.priv"
 INSECURE_KEY = "${@'${SIGNING_KEY}' == '${STAGING_DIR_NATIVE}${datadir}/OpenBMC.priv'}"
