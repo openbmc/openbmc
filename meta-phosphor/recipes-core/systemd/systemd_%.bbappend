@@ -2,7 +2,7 @@ FILES_${PN}-catalog-extralocales = \
             "${exec_prefix}/lib/systemd/catalog/*.*.catalog"
 PACKAGES =+ "${PN}-catalog-extralocales"
 PACKAGECONFIG = "pam hostnamed networkd randomseed resolved sysusers timedated \
-                 timesyncd xz"
+                 timesyncd xz kmod"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 SRC_URI += "file://default.network"
