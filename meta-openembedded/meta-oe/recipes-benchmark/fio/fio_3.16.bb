@@ -21,10 +21,9 @@ PACKAGECONFIG_NUMA_armeb = ""
 PACKAGECONFIG ??= "${PACKAGECONFIG_NUMA}"
 PACKAGECONFIG[numa] = ",--disable-numa,numactl"
 
-SRCREV = "01bf5128d0581e267383f280c6a1dcd26517240f"
+SRCREV = "92f75708b530989fdb13b50be6604f44b80d038d"
 SRC_URI = "git://git.kernel.dk/fio.git \
           file://0001-update-the-interpreter-paths.patch \
-          file://0001-engines-splice-remove-buggy-mem_align-set.patch \
 "
 
 S = "${WORKDIR}/git"

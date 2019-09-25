@@ -25,8 +25,8 @@ SRC_URI = "git://github.com/mongodb/mongo.git;branch=v4.2 \
            file://0003-Fix-unknown-prefix-env.patch \
            "
 SRC_URI_append_libc-musl ="\
+           file://0001-Mark-one-of-strerror_r-implementation-glibc-specific.patch \
            file://0002-Fix-default-stack-size-to-256K.patch \
-           file://0003-fix-musl-strerror_r.patch \
            file://0004-wiredtiger-Disable-strtouq-on-musl.patch \
            "
 
