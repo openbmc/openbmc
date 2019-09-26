@@ -14,6 +14,11 @@ UBRANCH = "aspeed-dev-v2019.04"
 SRC_URI = "git://github.com/AspeedTech-BMC/u-boot;branch=${UBRANCH};protocol=https"
 SRC_URI += "file://0001-arm-evb-ast2600-put-environment-back-at-512KiB.patch"
 
+# There are different BOOTCOMMANDS for differently sized raw flash modules.
+ASPEED_IMAGE_SIZE_KB ?= "32768"
+MACHINEOVERRIDES .= ":flash-${ASPEED_IMAGE_SIZE_KB}"
+SRC_URI_append_flash-131072 = " file://bootcmd.cfg"
+
 S = "${WORKDIR}/git"
 
 PV = "v2019.04+git${SRCPV}"

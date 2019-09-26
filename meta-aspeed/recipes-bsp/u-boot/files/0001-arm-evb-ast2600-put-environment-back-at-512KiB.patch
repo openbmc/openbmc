@@ -1,36 +1,31 @@
-From c89683eaf94f1f9ac899963c518d10f8abfaf00b Mon Sep 17 00:00:00 2001
+From 2add5b8d1216be2e446a3d707767c2a5ec6be9f4 Mon Sep 17 00:00:00 2001
 From: Brad Bishop <bradleyb@fuzziesquirrel.com>
 Date: Thu, 5 Sep 2019 20:39:57 -0400
-Subject: [PATCH v3 u-boot aspeed-dev-v2019.04] arm: evb-ast2600: put
- environment back at 512KiB
+Subject: [PATCH u-boot aspeed-dev-v2019.04] arm: evb-ast2600: put environment
+ back at 512KiB
 
 Prior to 473f430b90 the environment was at 512KiB, and compatible with
 OpenBMC.  Restore OpenBMC compatibility by moving the environment back
 to 512KiB.
 
-Upstream-Status: Pending
-Upstream-Status: https://github.com/AspeedTech-BMC/u-boot/pull/1
 Signed-off-by: Brad Bishop <bradleyb@fuzziesquirrel.com>
 ---
-v3:
-  -apply bootm address parameter change globally in aspeed-common.h
-v2:
-  -adjusted bootcmd fit address to match new image location
----
- include/configs/aspeed-common.h | 2 +-
+ include/configs/aspeed-common.h | 4 +++-
  include/configs/evb_ast2600.h   | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/include/configs/aspeed-common.h b/include/configs/aspeed-common.h
-index 7a730d17ad..7b8b2a118d 100644
+index 7a730d17ad..d1eb4688e6 100644
 --- a/include/configs/aspeed-common.h
 +++ b/include/configs/aspeed-common.h
-@@ -52,7 +52,7 @@
+@@ -52,7 +52,9 @@
  /*
   * Miscellaneous configurable options
   */
 -#define CONFIG_BOOTCOMMAND		"bootm 200a0000"
++#ifndef CONFIG_BOOTCOMMAND
 +#define CONFIG_BOOTCOMMAND		"bootm 20080000"
++#endif
  #define CONFIG_ENV_OVERWRITE
  
  #define CONFIG_SYS_BOOTM_LEN 		(0x800000 * 2)
