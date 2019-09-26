@@ -94,7 +94,9 @@ PACKAGECONFIG[install_scripts] = " \
 
 PACKAGECONFIG[openpower-pels] = " \
         --enable-openpower-pel-extension, \
-        --disable-openpower-pel-extension, ,\
+        --disable-openpower-pel-extension, \
+        nlohmann-json, \
+        , \
         "
 
 # Enable install_scripts during native and native SDK build
