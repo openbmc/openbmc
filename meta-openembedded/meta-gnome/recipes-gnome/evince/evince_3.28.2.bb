@@ -6,11 +6,13 @@ DEPENDS = "gtk+3 libsecret ${@bb.utils.contains('DISTRO_FEATURES','x11','gnome-d
 
 inherit gnome pkgconfig gtk-icon-cache gsettings gobject-introspection distro_features_check systemd
 
-SRC_URI = "${GNOME_MIRROR}/${GNOMEBN}/${@gnome_verdir("${PV}")}/${GNOMEBN}-${PV}.tar.${GNOME_COMPRESS_TYPE};name=archive \
-           file://0001-help-remove-YELP-macro.patch \
-           file://0001-Add-format-attribute-to-_synctex_malloc.patch \
-           file://0001-add-a-formatting-attribute-check.patch \
-           "
+SRC_URI = " \
+    ${GNOME_MIRROR}/${GNOMEBN}/${@gnome_verdir("${PV}")}/${GNOMEBN}-${PV}.tar.${GNOME_COMPRESS_TYPE};name=archive \
+    file://0001-help-remove-YELP-macro.patch \
+    file://0001-Add-format-attribute-to-_synctex_malloc.patch \
+    file://0001-add-a-formatting-attribute-check.patch \
+    file://0001-libview-Remove-EvDocumentModel-get-type-function-dec.patch \
+"
 SRC_URI[archive.md5sum] = "66aa1766eaaa37536e48def11a0e67a3"
 SRC_URI[archive.sha256sum] = "0955d22d85c9f6d322b6cbb464f1cc4c352db619017ec95dad4cc5c3440f73e1"
 

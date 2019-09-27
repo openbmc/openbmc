@@ -1,6 +1,5 @@
 require oprofile.inc
 
-DEPENDS += "virtual/kernel"
 DEPENDS_append_powerpc64 = " libpfm4"
 
 SRC_URI[md5sum] = "bd998df5521ebedae31e71cd3fb6200b"

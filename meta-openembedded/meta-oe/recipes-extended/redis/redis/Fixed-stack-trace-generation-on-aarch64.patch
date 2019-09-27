@@ -1,0 +1,45 @@
+From c8ca71d40bc51e255457cd4374dd45ec9ebf8ae1 Mon Sep 17 00:00:00 2001
+From: Jun He <jun.he@arm.com>
+Date: Mon, 3 Jul 2017 07:18:32 +0000
+Subject: [PATCH] Fixed stack trace generation on aarch64
+
+Change-Id: I9801239c98cb7362ed07e8b9ec2ba7e45749dba7
+Signed-off-by: Jun He <jun.he@arm.com>
+
+* fixes also this error when building with -Werror=return-type:
+  debug.c:698:1: error: no return statement in function returning non-void [-Werror=return-type]
+
+Upstream-Status: Backport [https://github.com/antirez/redis/commit/c8ca71d40bc51e255457cd4374dd45ec9ebf8ae1]
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ src/Makefile | 2 +-
+ src/debug.c  | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index 24e960593eb..a1ff4258a9d 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -40,7 +40,7 @@
+ endif
+ 
+ # To get ARM stack traces if Redis crashes we need a special C flag.
+-ifneq (,$(findstring armv,$(uname_M)))
++ifneq (,$(filter aarch64 armv,$(uname_M)))
+         CFLAGS+=-funwind-tables
+ endif
+ 
+diff --git a/src/debug.c b/src/debug.c
+index a4caa49f285..c976d0ed919 100644
+--- a/src/debug.c
++++ b/src/debug.c
+@@ -691,6 +691,8 @@
+     return (void*) uc->uc_mcontext.sc_ip;
+     #elif defined(__arm__) /* Linux ARM */
+     return (void*) uc->uc_mcontext.arm_pc;
++    #elif defined(__aarch64__) /* Linux AArch64 */
++    return (void*) uc->uc_mcontext.pc;
+     #endif
+ #else
+     return NULL;

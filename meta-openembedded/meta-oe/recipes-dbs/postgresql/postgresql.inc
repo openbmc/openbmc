@@ -280,7 +280,9 @@ FILES_${PN}-timezone = "${datadir}/${BPN}/timezone \
     ${datadir}/${BPN}/timezonesets \
 "
 RDEPENDS_${PN} += "${PN}-timezone"
-FILES_${PN}-server-dev = "${includedir}/${BPN}/server"
+FILES_${PN}-server-dev = "${includedir}/${BPN}/server \
+                          ${libdir}/${BPN}/pgxs \
+"
 
 FILES_libecpg = "${libdir}/libecpg*${SOLIBS}"
 FILES_libecpg-dev = "${libdir}/libecpg*${SOLIBSDEV} \

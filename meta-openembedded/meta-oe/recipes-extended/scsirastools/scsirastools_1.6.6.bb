@@ -43,5 +43,5 @@ FILES_${PN}-diskmon = "${sbindir}/sgdiskmon ${sysconfdir}/init.d/sgdisk"
 FILES_${PN}-raidmon = "${sbindir}/sgraidmon ${sysconfdir}/init.d/sgraid"
 
 RDEPENDS_${PN} += "bash"
-RDEPENDS_${PN}-diskmon += "${PN}"
-RDEPENDS_${PN}-raidmon += "${PN}"
+RDEPENDS_${PN}-diskmon += "${PN} bash"
+RDEPENDS_${PN}-raidmon += "${PN} bash"

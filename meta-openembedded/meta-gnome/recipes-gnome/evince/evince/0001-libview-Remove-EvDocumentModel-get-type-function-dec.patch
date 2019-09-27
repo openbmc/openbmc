@@ -1,0 +1,33 @@
+From 0cdce687d3edfa5ac0fd19539ba1815d039026d5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?I=C3=B1igo=20Mart=C3=ADnez?= <inigomartinez@gmail.com>
+Date: Fri, 7 Sep 2018 22:34:29 +0200
+Subject: [PATCH] libview: Remove EvDocumentModel get type function declaration
+
+The EvDocumentModel class declares the `ev_document_model_get_type`
+function as part of the `GObject` boilerplate code.
+
+However, this declaration is not necessary and also causes a warning
+when introspection data file, `EvinceView-3.0.gir`, is generated.
+
+Upstream-Status: Applied [1]
+
+
+---
+ libview/ev-document-model.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/libview/ev-document-model.h b/libview/ev-document-model.h
+index 784e27d6..6a99e43a 100644
+--- a/libview/ev-document-model.h
++++ b/libview/ev-document-model.h
+@@ -54,7 +54,6 @@ typedef enum {
+ 	EV_PAGE_LAYOUT_AUTOMATIC
+ } EvPageLayout;
+ 
+-GType            ev_document_model_get_type          (void) G_GNUC_CONST;
+ EvDocumentModel *ev_document_model_new               (void);
+ EvDocumentModel *ev_document_model_new_with_document (EvDocument      *document);
+ 
+-- 
+2.20.1
+

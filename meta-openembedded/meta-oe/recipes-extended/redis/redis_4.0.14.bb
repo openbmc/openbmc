@@ -10,6 +10,7 @@ SRC_URI = "http://download.redis.io/releases/${BP}.tar.gz \
            file://hiredis-use-default-CC-if-it-is-set.patch \
            file://lua-update-Makefile-to-use-environment-build-setting.patch \
            file://oe-use-libc-malloc.patch \
+           file://Fixed-stack-trace-generation-on-aarch64.patch \
            file://redis.conf \
            file://init-redis-server \
            file://redis.service \
