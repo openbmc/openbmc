@@ -134,6 +134,18 @@ groups:
           - /temperature/p1_vdn_temp
           - /temperature/p0_vdd_temp
           - /temperature/p1_vdd_temp
+    - name: zone0_gpu
+      description: Group of gpu temperature sensors for zone 0
+      type: /xyz/openbmc_project/sensors
+      members:
+          - /temperature/gpu0
+          - /temperature/gpu1
+          - /temperature/gpu2
+          - /temperature/gpu3
+          - /temperature/gpu4
+          - /temperature/gpu5
+          - /temperature/gpu6
+          - /temperature/gpu7
 matches:
     - name: propertiesChanged
       parameters:
@@ -473,6 +485,11 @@ events:
                     property:
                         name: Value
                         type: int64_t
+                  - name: zone0_gpu
+                    interface: xyz.openbmc_project.Sensor.Value
+                    property:
+                        name: Value
+                        type: int64_t
               triggers:
                   - name: init
                     method: getProperties
@@ -662,4 +679,37 @@ events:
                         type: int64_t
                     delta:
                         value: 3
+                        type: uint64_t
+                  # Speed changes based on gpu temps
+                  - name: set_net_increase_speed
+                    groups:
+                        - name: zone0_gpu
+                          interface: xyz.openbmc_project.Sensor.Value
+                          property:
+                              name: Value
+                              type: int64_t
+                    property:
+                        value: 70
+                        type: int64_t
+                    factor:
+                        value: 1
+                        type: int64_t
+                    delta:
+                        value: 13
+                        type: uint64_t
+                  - name: set_net_decrease_speed
+                    groups:
+                        - name: zone0_gpu
+                          interface: xyz.openbmc_project.Sensor.Value
+                          property:
+                              name: Value
+                              type: int64_t
+                    property:
+                        value: 67
+                        type: int64_t
+                    factor:
+                        value: 4
+                        type: int64_t
+                    delta:
+                        value: 5
                         type: uint64_t
