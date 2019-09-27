@@ -335,7 +335,7 @@
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    The minimal command and arguments used to run the
+                    Minimal command and arguments needed to run the
                     assembler.
                 </para>
             </glossdef>
