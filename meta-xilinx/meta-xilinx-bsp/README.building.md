@@ -56,32 +56,39 @@ https://github.com/lucaceresoli/zynqmp-pmufw-builder/blob/master/0001-Load-XPm_C
 Using multiconfig to build ZU+
 ------------------------------
 
-multiconfig dependency has to be added in image file or local.conf.
-For example in core-image-minimal you will need  
-do_image[mcdepends] = "multiconfig:zcu102:pmu:pmu-firmware:do_deploy"
+In your local.conf multiconfig should be enabled by:
 
-Add conf/multiconfig in the build directory and create pmu.conf and zcu102.conf
+`BBMULTICONFIG ?= "pmu"`
 
-Add the following in pmu.conf:  
-	MACHINE="zynqmp-pmu"  
-	DISTRO="xilinx-standalone"  
-    	GCCVERSION="7.%"  
-    	TMPDIR="${TOPDIR}/pmutmp"  
+Add a directory conf/multiconfig in the build directory and create pmu.conf inside it.
 
-Add the following in zcu102.conf:  
-	MACHINE="zcu102-zynqmp"  
-    	DISTRO="poky"  
+Add the following in pmu.conf: 
 
-In local.conf multiconfig is enabled by: BBMULTICONFIG ?= "zcu102 pmu"
+	MACHINE="zynqmp-pmu" 
+	DISTRO="xilinx-standalone" 
+	TMPDIR="${TOPDIR}/pmutmp" 
 
-bitbake multiconfig:zcu102:core-image-minimal  
+Add the following in your local.conf
+
+	MACHINE="zcu102-zynqmp" 
+	DISTRO="poky" 
+
+A multiconfig dependency has to be added in the image recipe or local.conf.
+
+For example in core-image-minimal you would need: 
+
+	do_image[mcdepends] = "multiconfig::pmu:pmu-firmware:do_deploy"
+
+This creates a multiconfig dependency between the task do_image from the default multiconfig '' (which has no name)
+to the task do_deploy() from the package pmu-firmware from the pmu multiconfig which was just created above.
+
+	$ bitbake core-image-minimal
+
+This will build both core-image-minimal and pmu-firmware.
+
 
 More information about multiconfig:
 https://www.yoctoproject.org/docs/current/mega-manual/mega-manual.html#dev-building-images-for-multiple-targets-using-multiple-configurations
-
-Workaround:  
-There is additional workaround required in u-boot-xlnx recipe. Add the below dependency  
-do_compile[mcdepends] = "multiconfig:zcu102:pmu:pmu-firmware:do_deploy"
 
 
 Additional Information

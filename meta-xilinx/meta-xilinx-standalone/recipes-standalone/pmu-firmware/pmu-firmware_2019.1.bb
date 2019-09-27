@@ -1,10 +1,10 @@
 inherit deploy
 
 LICENSE = "Proprietary"
-LIC_FILES_CHKSUM = "file://../../../../license.txt;md5=71602ce1bc2917a9be07ceee6fab6711"
+LIC_FILES_CHKSUM = "file://../../../../license.txt;md5=e9b6d01d45faccfbf05d8caea53f0a35"
 
-XILINX_RELEASE_VERSION = "v2018.3"
-SRCREV = "56f3da2afbc817988c9a45b0b26a7fef2ac91706"
+XILINX_RELEASE_VERSION = "v2019.1"
+SRCREV = "26c14d9861010a0e3a55c73fb79efdb816eb42ca"
 PV = "${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
 SRC_URI = "git://github.com/Xilinx/embeddedsw.git;protocol=https;nobranch=1"
@@ -23,9 +23,6 @@ do_configure() {
     # manually do the copy_bsp step first, so as to be able to fix up use of
     # mb-* commands
     ${S}/../misc/copy_bsp.sh
-
-    # fix xilfpga to include the zynqmp backend
-    mv ${S}/../misc/zynqmp_pmufw_bsp/psu_pmu_0/libsrc/xilfpga/src/interface/zynqmp/* ${S}/../misc/zynqmp_pmufw_bsp/psu_pmu_0/libsrc/xilfpga/src
 }
 
 COMPILER = "${CC}"

@@ -25,6 +25,7 @@ UBOOT_BINARY ?= "u-boot.${UBOOT_SUFFIX}"
 UBOOT_ELF ?= "u-boot"
 UBOOT_ELF_zynq ?= "u-boot.elf"
 UBOOT_ELF_aarch64 ?= "u-boot.elf"
+UBOOT_ELF_versal ?= "u-boot.elf"
 
 #Hardware accelaration
 PREFERRED_PROVIDER_virtual/libgles1_mali400 = "libmali-xlnx"
@@ -33,6 +34,11 @@ PREFERRED_PROVIDER_virtual/egl_mali400 = "libmali-xlnx"
 PREFERRED_PROVIDER_virtual/libgl_mali400 = "mesa-gl"
 PREFERRED_PROVIDER_virtual/mesa_mali400 = "mesa-gl"
 
+# microblaze does not get on with pie for reasons not looked into as yet
+GCCPIE_microblaze = ""
+GLIBCPIE_microblaze = ""
+SECURITY_CFLAGS_microblaze = ""
+SECURITY_LDFLAGS_microblaze = ""
 
 XSERVER ?= " \
 	xserver-xorg \

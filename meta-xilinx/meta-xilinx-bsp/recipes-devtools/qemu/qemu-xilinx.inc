@@ -1,14 +1,19 @@
-QEMU_TARGETS = "aarch64 arm microblaze microblazeel"
-
-require recipes-devtools/qemu/qemu.inc
-
 SUMMARY = "Xilinx's fork of a fast open source processor emulator"
 HOMEPAGE = "https://github.com/xilinx/qemu/"
+
+QEMU_TARGETS = "aarch64 arm microblaze microblazeel"
+
+XILINX_RELEASE_VERSION = "v2019.1"
+XILINX_QEMU_VERSION ?= "v2.11.1"
+BRANCH ?= "branch/xilinx-v2019.1"
+SRCREV ?= "5f38ea92fb697b94ad43f01fe162f3ed6e6b0e16"
+
 
 LIC_FILES_CHKSUM = " \
 		file://COPYING;md5=441c28d2cf86e15a37fa47e15a72fbac \
 		file://COPYING.LIB;endline=24;md5=c04def7ae38850e7d3ef548588159913 \
 		"
+DEPENDS = "glib-2.0 zlib pixman"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
@@ -46,4 +51,3 @@ do_install_append() {
 	# Prevent QA warnings about installed ${localstatedir}/run
 	if [ -d ${D}${localstatedir}/run ]; then rmdir ${D}${localstatedir}/run; fi
 }
-

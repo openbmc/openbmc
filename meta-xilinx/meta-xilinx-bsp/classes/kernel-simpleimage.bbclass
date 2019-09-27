@@ -13,7 +13,7 @@ do_prep_simpleimage[dirs] += "${B}"
 do_prep_simpleimage () {
     install -d ${B}/arch/${ARCH}/boot/dts
     for type in ${KERNEL_IMAGETYPES} ; do
-        if [[ "${type}" =~ "simpleImage" ]] && [ ${ARCH} = "microblaze" ]; then
+        if [ -z "${type##*simpleImage*}" ] && [ ${ARCH} = "microblaze" ]; then
             ext="${type##*.}"
             # Microblaze simpleImage only works with dts file
             cp ${RECIPE_SYSROOT}/boot/devicetree/${ext}.dts ${B}/arch/${ARCH}/boot/dts/
@@ -23,7 +23,7 @@ do_prep_simpleimage () {
 
 do_deploy_append () {
     for type in ${KERNEL_IMAGETYPES} ; do
-        if [[ "${type}" =~ "simpleImage" ]] && [ ${ARCH} = "microblaze" ]; then
+        if [ -z "${type##*simpleImage*}" ] && [ ${ARCH} = "microblaze" ]; then
             base_name=${imageType}-${KERNEL_IMAGE_NAME}
             install -m 0644 ${KERNEL_OUTPUT_DIR}/${type}.strip $deployDir/${base_name}.strip
             install -m 0644 ${KERNEL_OUTPUT_DIR}/${type}.unstrip $deployDir/${base_name}.unstrip
