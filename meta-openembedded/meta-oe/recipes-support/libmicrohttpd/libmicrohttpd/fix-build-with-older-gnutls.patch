@@ -1,0 +1,32 @@
+From b84ee1fa41c53c43aa7ed1583c36af5cb7c77a0f Mon Sep 17 00:00:00 2001
+From: Christian Grothoff <christian@grothoff.org>
+Date: Fri, 2 Aug 2019 15:43:44 +0200
+Subject: trying to fix #5806
+
+Upstream-Status: Backport from 0.9.67 [https://git.gnunet.org/libmicrohttpd.git/commit/?id=b84ee1fa41c53c43aa7ed1583c36af5cb7c77a0f]
+
+---
+ src/microhttpd/daemon.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/src/microhttpd/daemon.c b/src/microhttpd/daemon.c
+index bf01ba9b..a8fc98c6 100644
+--- a/src/microhttpd/daemon.c
++++ b/src/microhttpd/daemon.c
+@@ -2536,7 +2536,12 @@ internal_add_connection (struct MHD_Daemon *daemon,
+   else
+     {
+ #ifdef HTTPS_SUPPORT
+-      gnutls_init_flags_t flags;
++#if (GNUTLS_VERSION_NUMBER+0 >= 0x030500)
++      gnutls_init_flags_t
++#else
++      unsigned int
++#endif
++        flags;
+ 
+       flags = GNUTLS_SERVER;
+ #if (GNUTLS_VERSION_NUMBER+0 >= 0x030402)
+-- 
+cgit v1.2.1
+

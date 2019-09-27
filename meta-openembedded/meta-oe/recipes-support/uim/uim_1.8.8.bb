@@ -4,11 +4,11 @@ LICENSE = "BSD-3-Clause & LGPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ab2826b41ca0ff4030d38cc39791d1c8"
 SECTION = "inputmethods"
 
-SRC_URI = "https://github.com/uim/uim/releases/download/${PV}/uim-${PV}.tar.bz2"
-
+SRC_URI = "https://github.com/uim/uim/releases/download/${PV}/uim-${PV}.tar.bz2 \
+    file://0001-Fix-to-set-libedit-path-from-configure-option-proper.patch \
+"
 SRC_URI_append_class-target = "\
     file://uim-module-manager.patch \
-    file://0001-fix-bug-for-cross-compile.patch \
 "
 SRC_URI[md5sum] = "01c7bd5d0d4f3a9f6f5befe6f57a470b"
 SRC_URI[sha256sum] = "34599bbcc4e5ab87832370763e38be5100984a64237555e9234a1ea225a0fadc"
@@ -22,6 +22,9 @@ RDEPENDS_uim-anthy_append_libc-glibc = " glibc-utils glibc-gconv-euc-jp"
 
 LEAD_SONAME = "libuim.so.1"
 
+COMPATIBLE_HOST_riscv64 = "null"
+COMPATIBLE_HOST_riscv32 = "null"
+
 inherit distro_features_check autotools pkgconfig gettext qemu gtk-immodules-cache
 
 REQUIRED_DISTRO_FEATURES = "x11"
@@ -29,6 +32,7 @@ REQUIRED_DISTRO_FEATURES = "x11"
 GTKIMMODULES_PACKAGES = "uim-gtk2.0 uim-gtk3"
 
 EXTRA_OECONF += "--disable-emacs \
+    --with-libedit=${STAGING_EXECPREFIXDIR} \
     --without-scim \
     --without-m17nlib \
     --without-prime \

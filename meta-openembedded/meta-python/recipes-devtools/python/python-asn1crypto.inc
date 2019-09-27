@@ -20,4 +20,4 @@ RDEPENDS_${PN}_class-target += " \
     ${PYTHON_PN}-netclient \
 "
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

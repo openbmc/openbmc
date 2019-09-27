@@ -5,15 +5,12 @@ LIC_FILES_CHKSUM = "file://COPYING.lgpl-3;md5=e6a600fd5e1d9cbde2d983680233ad02 \
 "
 
 SRC_URI = "git://github.com/libyui/libyui-ncurses.git \
-           file://0001-Use-override-consistently.patch \
-           file://0002-Define-own-resize-in-NCPad-and-fix-param-type-of-Set.patch \
            file://0003-Simplify-ncurses-finding-module.patch \
           "
 
 SRC_URI_append_class-target = " file://0001-Fix-the-error-of-can-t-find-header-file.patch"
 
-PV = "2.48.3+git${SRCPV}"
-SRCREV = "c941b32246e8b2952fce4fd5743f8e318222ab98"
+SRCREV = "d5b64b6291b6f292871ad5c6df25c4f6896f7d50"
 
 S = "${WORKDIR}/git"
 

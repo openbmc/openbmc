@@ -26,7 +26,7 @@ SRC_URI = "git://github.com/crash-utility/${BPN}.git \
            file://0002-crash-fix-build-error-unknown-type-name-gdb_fpregset.patch \
            file://0003-crash-detect-the-sysroot-s-glibc-header-file.patch \
            "
-SRCREV = "4076ebea6626e3f0a20150602c6ffab999ea5c90"
+SRCREV = "5b0e3777ccbb571678791903e93446ccd0aba03a"
 
 SRC_URI[gdb.md5sum] = "a9836707337e5f7bf76a009a8904f470"
 SRC_URI[gdb.sha256sum] = "8070389a5dcc104eb0be483d582729f98ed4d761ad19cedd3f17b5d2502faa36"

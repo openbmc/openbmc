@@ -1,6 +1,7 @@
 SUMMARY = "Dynamic firewall daemon with a D-Bus interface"
 HOMEPAGE = "https://firewalld.org/"
 BUGTRACKER = "https://github.com/firewalld/firewalld/issues"
+UPSTREAM_CHECK_URI = "https://github.com/firewalld/firewalld/releases"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 

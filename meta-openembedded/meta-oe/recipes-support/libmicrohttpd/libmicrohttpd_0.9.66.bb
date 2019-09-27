@@ -6,7 +6,9 @@ SECTION = "net"
 
 DEPENDS = "file"
 
-SRC_URI = "${GNU_MIRROR}/libmicrohttpd/${BPN}-${PV}.tar.gz"
+SRC_URI = "${GNU_MIRROR}/libmicrohttpd/${BPN}-${PV}.tar.gz \
+    file://fix-build-with-older-gnutls.patch \
+"
 SRC_URI[md5sum] = "ce4050e75cc40d68506e2b403e1a76f9"
 SRC_URI[sha256sum] = "4e66d4db1574f4912fbd2690d10d227cc9cc56df6a10aa8f4fc2da75cea7ab1b"
 

@@ -36,11 +36,7 @@ SRC_URI_append_toolchain-clang = "\
 
 S = "${WORKDIR}/git"
 
-COMPATIBLE_HOST ?= '(x86_64|i.86|powerpc64|arm|aarch64).*-linux'
-
-COMPATIBLE_HOST_arm = "null"
-COMPATIBLE_HOST_libc-musl_x86 = "null"
-COMPATIBLE_HOST_toolchain-clang_x86 = "null"
+COMPATIBLE_HOST ?= '(x86_64|powerpc64|aarch64).*-linux'
 
 PACKAGECONFIG ??= "tcmalloc"
 # gperftools compilation fails for arm below v7 because of missing support of
@@ -66,10 +62,6 @@ EXTRA_OESCONS = "--prefix=${D}${prefix} \
                  ${PACKAGECONFIG_CONFARGS} \
                  core"
 
-do_configure_prepend() {
-        # tests use hex floats, not supported in plain C++
-        sed -e 's|-std=c++11|-std=gnu++11|g' -i ${S}/SConstruct
-}
 scons_do_compile() {
         ${STAGING_BINDIR_NATIVE}/scons ${PARALLEL_MAKE} ${EXTRA_OESCONS} || \
         die "scons build execution failed."
