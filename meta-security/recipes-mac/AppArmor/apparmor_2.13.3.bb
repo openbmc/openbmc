@@ -21,6 +21,7 @@ SRC_URI = " \
 	file://functions \
 	file://apparmor \
 	file://apparmor.service \
+	file://0001-Makefile.am-suppress-perllocal.pod.patch \
 	file://run-ptest \
 	"
 
