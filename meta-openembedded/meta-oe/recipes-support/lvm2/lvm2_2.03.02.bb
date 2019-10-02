@@ -45,7 +45,7 @@ DEPENDS += "util-linux"
 LVM2_PACKAGECONFIG_append_class-target = " \
     udev \
 "
-PACKAGECONFIG[udev] = "--enable-udev_sync --enable-udev_rules --with-udevdir=${nonarch_base_libdir}/udev/rules.d,--disable-udev_sync --disable-udev_rules,udev"
+PACKAGECONFIG[udev] = "--enable-udev_sync --enable-udev_rules --with-udevdir=${nonarch_base_libdir}/udev/rules.d,--disable-udev_sync --disable-udev_rules,udev,${PN}-udevrules"
 
 PACKAGES =+ "libdevmapper"
 FILES_libdevmapper = " \

@@ -13,8 +13,9 @@ DEPENDS = "glib-2.0 libgudev intltool-native libxslt-native"
 
 SRC_URI = "http://www.freedesktop.org/software/ModemManager/ModemManager-${PV}.tar.xz \
            "
-SRC_URI[md5sum] = "92d25176d0cc9d588ca29700b33c7d98"
-SRC_URI[sha256sum] = "fd0f39996025dac96995daea8a58ec7dd571582f7563a8ae0d5f65b571b76ee2"
+
+SRC_URI[md5sum] = "dad80b3b4f27c1d6eae7e019542338be"
+SRC_URI[sha256sum] = "bbcf6da35da3d72f688675bde91dfed6485845c3fedd1805ae914b71d1b783f2"
 
 S = "${WORKDIR}/ModemManager-${PV}"
 
@@ -38,6 +39,7 @@ FILES_${PN} += " \
     ${datadir}/icons \
     ${datadir}/polkit-1 \
     ${datadir}/dbus-1 \
+    ${datadir}/ModemManager \
     ${libdir}/ModemManager \
     ${systemd_unitdir}/system \
 "

@@ -2,7 +2,7 @@ require ttf.inc
 
 SUMMARY = "Gentium fonts - TTF Version"
 HOMEPAGE = "http://scripts.sil.org/gentium"
-LICENSE = "OFL"
+LICENSE = "OFL-1.0"
 LICENSE_URL = "http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&item_id=OFL"
 LIC_FILES_CHKSUM = "file://OFL;md5=33a5bf7b98a9c0ae87430760ba762295 \
 "

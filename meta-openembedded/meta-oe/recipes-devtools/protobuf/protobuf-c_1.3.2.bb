@@ -15,6 +15,7 @@ DEPENDS = "protobuf-native protobuf"
 SRCREV = "1390409f4ee4e26d0635310995b516eb702c3f9e"
 
 SRC_URI = "git://github.com/protobuf-c/protobuf-c.git \
+           file://0001-avoid-race-condition.patch \
           "
 
 S = "${WORKDIR}/git"

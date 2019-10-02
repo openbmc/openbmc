@@ -25,6 +25,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/releases/${BPN}-${PV}.tar.gz \
            file://0001-src-Add-missing-header-limits.h-for-_POSIX_HOST_NAME.patch \
            file://0001-immpbe_dump.cc-Use-sys-wait.h-instead-of-wait.h.patch \
            file://0001-Add-configure-time-check-for-gettid-API.patch \
+           file://0001-create_empty_library-Use-CC-variable-intead-of-hardc.patch \
            "
 SRC_URI[md5sum] = "e9ae9de803a99b7ab33757a49858542f"
 SRC_URI[sha256sum] = "caed672d03ab1fe3f27d333429c7ca03022714e7c6350500208b7bd7349f03ce"
@@ -44,13 +45,11 @@ PACKAGECONFIG[plm] = "--enable-ais-plm,--disable-ais-plm,libvirt openhpi"
 
 PACKAGECONFIG ?= "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', ' systemd', '', d)}"
 
-PKGLIBDIR="${libdir}"
 CPPFLAGS += "-Wno-error=stringop-overflow= -Wno-error=stringop-truncation"
 CXXFLAGS += "-Wno-error=stringop-overflow= -Wno-error=stringop-truncation -Wno-error=format-truncation="
 LDFLAGS += "-Wl,--as-needed -latomic -Wl,--no-as-needed"
 
 do_install_append() {
-    cp -av --no-preserve=ownership ${B}/lib/.libs/*.so* ${D}${libdir}
     rm -fr "${D}${localstatedir}/lock"
     rm -fr "${D}${localstatedir}/run"
     rmdir --ignore-fail-on-non-empty "${D}${localstatedir}"
@@ -61,7 +60,8 @@ do_install_append() {
     fi
 }
 
-FILES_${PN} += "${systemd_unitdir}/system/*.service"
+FILES_${PN} += "${libdir}/libSa*.so ${systemd_unitdir}/system/*.service"
+FILES_${PN}-dev += "${libdir}/libopensaf_core.so"
 FILES_${PN}-staticdev += "${PKGLIBDIR}/*.a"
 
 INSANE_SKIP_${PN} = "dev-so"
@@ -70,3 +70,5 @@ RDEPENDS_${PN} += "bash python"
 
 # http://errors.yoctoproject.org/Errors/Details/186970/
 COMPATIBLE_HOST_libc-musl = 'null'
+
+FILES_SOLIBSDEV = ""
