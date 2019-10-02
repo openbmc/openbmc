@@ -8,13 +8,11 @@ SRC_URI_append_ibm-ac-server = " \
            file://start_max31785_hwmon.sh \
            "
 
-CHIPS = " \
-        bus@1e78a000/i2c-bus@100/max31785@52_air \
-        bus@1e78a000/i2c-bus@100/max31785@52_water \
-        bus@1e78a000/i2c-bus@100/power-supply@68 \
-        bus@1e78a000/i2c-bus@100/power-supply@69 \
-        "
-CHIPS_append_witherspoon = " \
+CHIPS_witherspoon = " \
+               bus@1e78a000/i2c-bus@100/max31785@52_air \
+               bus@1e78a000/i2c-bus@100/max31785@52_water \
+               bus@1e78a000/i2c-bus@100/power-supply@68 \
+               bus@1e78a000/i2c-bus@100/power-supply@69 \
                bus@1e78a000/i2c-bus@100/bmp280@77 \
                bus@1e78a000/i2c-bus@100/dps310@76 \
                bus@1e78a000/i2c-bus@140/ir35221@70 \
@@ -23,7 +21,11 @@ CHIPS_append_witherspoon = " \
                bus@1e78a000/i2c-bus@180/ir35221@71 \
                bus@1e78a000/i2c-bus@380/tmp275@4a \
                "
-CHIPS_append_swift = " \
+CHIPS_swift = " \
+               bus@1e78a000/i2c-bus@100/max31785@52_air \
+               bus@1e78a000/i2c-bus@100/max31785@52_water \
+               bus@1e78a000/i2c-bus@100/power-supply@68 \
+               bus@1e78a000/i2c-bus@100/power-supply@69 \
                bus@1e78a000/i2c-bus@440/tmp275@4a \
                bus@1e78a000/i2c-bus@440/tmp275@48 \
                bus@1e78a000/i2c-bus@300/tmp275@48 \
@@ -50,6 +52,19 @@ CHIPS_mihawk = " \
                bus@1e78a000/i2c-bus@440/pca9545@70/i2c@3/tmp275@48 \
                "
 
+CHIPS_witherspoon-tacoma = " \
+               bus@1e78a000/i2c-bus@200/max31785@52_air \
+               bus@1e78a000/i2c-bus@200/max31785@52_water \
+               bus@1e78a000/i2c-bus@200/power-supply@68 \
+               bus@1e78a000/i2c-bus@200/power-supply@69 \
+               bus@1e78a000/i2c-bus@200/bmp280@77 \
+               bus@1e78a000/i2c-bus@200/dps310@76 \
+               bus@1e78a000/i2c-bus@280/ir35221@70 \
+               bus@1e78a000/i2c-bus@280/ir35221@71 \
+               bus@1e78a000/i2c-bus@300/ir35221@70 \
+               bus@1e78a000/i2c-bus@300/ir35221@71 \
+               bus@1e78a000/i2c-bus@500/tmp275@4a \
+               "
 ITEMSFMT = "ahb/apb/{0}.conf"
 ITEMS = "${@compose_list(d, 'ITEMSFMT', 'CHIPS')}"
 ITEMS_append_mihawk += " iio-hwmon-vdd0.conf"
