@@ -1,7 +1,7 @@
 - Device:
   index: 0
   # Linux sysfs path for this power sequencer (0x22 8-bit address)
-  path:  /sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a480.i2c-bus/i2c-8/8-0011
+  path:  /sys/bus/i2c/devices/i2c-8/8-0011
   RailNames:
       - "12.0V"
       - "5.0V_USB"
