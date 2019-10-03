@@ -13,3 +13,5 @@ DEPENDS += "dtc-native"
 S = "${WORKDIR}/git"
 
 inherit autotools
+
+BBCLASSEXTEND = "native"
