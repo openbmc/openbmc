@@ -32,7 +32,6 @@ class TestHashEquivalenceServer(object):
 
         self.server = create_server(self.get_server_addr(), self.dbfile)
         self.server_thread = multiprocessing.Process(target=self._run_server)
-        self.server_thread.daemon = True
         self.server_thread.start()
         self.client = create_client(self.server.address)
 

@@ -7,6 +7,7 @@ from contextlib import closing
 import json
 import logging
 import socket
+import os
 
 
 logger = logging.getLogger('hashserv.client')

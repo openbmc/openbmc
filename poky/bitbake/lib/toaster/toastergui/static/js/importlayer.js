@@ -17,11 +17,15 @@ function importLayerPageInit (ctx) {
   var currentLayerDepSelection;
   var validLayerName = /^(\w|-)+$/;
 
+  /* Catch 'disable' race condition between type-ahead started and "input change" */
+  var typeAheadStarted = 0;
+
   libtoaster.makeTypeahead(layerDepInput,
                            libtoaster.ctx.layersTypeAheadUrl,
                            { include_added: "true" }, function(item){
     currentLayerDepSelection = item;
     layerDepBtn.removeAttr("disabled");
+    typeAheadStarted = 1;
   });
 
   layerDepInput.on("typeahead:select", function(event, data){
@@ -34,7 +38,10 @@ function importLayerPageInit (ctx) {
   // disable the "Add layer" button when the layer input typeahead is empty
   // or not in the typeahead choices
   layerDepInput.on("input change", function(){
-    layerDepBtn.attr("disabled","disabled");
+    if (0 == typeAheadStarted) {
+      layerDepBtn.attr("disabled","disabled");
+    }
+    typeAheadStarted = 0;
   });
 
   /* We automatically add "openembedded-core" layer for convenience as a
@@ -50,6 +57,7 @@ function importLayerPageInit (ctx) {
   });
 
   layerDepBtn.click(function(){
+    typeAheadStarted = 0;
     if (currentLayerDepSelection == undefined)
       return;
 
@@ -77,7 +85,7 @@ function importLayerPageInit (ctx) {
 
     $("#layer-deps-list").append(newLayerDep);
 
-    libtoaster.getLayerDepsForProject(currentLayerDepSelection.layerdetailurl,
+    libtoaster.getLayerDepsForProject(currentLayerDepSelection.xhrLayerUrl,
                                       function (data){
         /* These are the dependencies of the layer added as a dependency */
         if (data.list.length > 0) {

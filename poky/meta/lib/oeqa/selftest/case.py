@@ -193,13 +193,20 @@ to ensure accurate results.")
         self.logger.debug("Adding path '%s' to be cleaned up when test is over" % path)
         self._track_for_cleanup.append(path)
 
-    def write_config(self, data):
-        """Write to <builddir>/conf/selftest.inc"""
+    def write_config(self, data, multiconfig=None):
+        """Write to config file"""
+        if multiconfig:
+            multiconfigdir = "%s/conf/multiconfig" % self.builddir
+            os.makedirs(multiconfigdir, exist_ok=True)
+            dest_path = '%s/%s.conf' % (multiconfigdir, multiconfig)
+            self.track_for_cleanup(dest_path)
+        else:
+            dest_path = self.testinc_path
 
-        self.logger.debug("Writing to: %s\n%s\n" % (self.testinc_path, data))
-        ftools.write_file(self.testinc_path, data)
+        self.logger.debug("Writing to: %s\n%s\n" % (dest_path, data))
+        ftools.write_file(dest_path, data)
 
-        if self.tc.custommachine and 'MACHINE' in data:
+        if not multiconfig and self.tc.custommachine and 'MACHINE' in data:
             machine = get_bb_var('MACHINE')
             self.logger.warning('MACHINE overridden: %s' % machine)
 

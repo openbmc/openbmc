@@ -1,0 +1,122 @@
+Upstream-Status: Backport [https://github.com/distcc/distcc/pull/319]
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From 2faacc2be8d7eeee0a3f66d88fedd1d3ab11070e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Micha=C5=82=20G=C3=B3rny?= <mgorny@gentoo.org>
+Date: Sat, 8 Dec 2018 12:50:07 +0100
+Subject: [PATCH] Fix desktop spec compliance of distccmon-gnome install
+
+Update the .desktop file and install rules for distccmon-gnome to
+conform to the freedesktop.org specifications.  More specifically:
+
+- update to version 1.0 of the spec
+- remove obsolete 'Encoding' key
+- remove obsolete 'Application' category and add recommended 'GTK'
+- install icon file to the correct directory
+- strip suffix from desktop file (specifying it is deprecated)
+- while at it, remove redundant '-icon' from the filename
+- install desktop file to the correct directory
+---
+ Makefile.in                                   |  18 ++++++++++--------
+ gnome/distccmon-gnome.desktop                 |   7 +++----
+ ...mon-gnome-icon.png => distccmon-gnome.png} | Bin
+ src/mon-gnome.c                               |   2 +-
+ 4 files changed, 14 insertions(+), 13 deletions(-)
+ rename gnome/{distccmon-gnome-icon.png => distccmon-gnome.png} (100%)
+
+diff --git a/Makefile.in b/Makefile.in
+index 6e1e467..1106559 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -52,13 +52,14 @@ mandir = @mandir@
+ includedir = @includedir@
+ oldincludedir = /usr/include
+ docdir = @docdir@
+-pkgdatadir = $(datadir)/@PACKAGE_NAME@
++icondir = $(datarootdir)/pixmaps
++desktopdir = $(datarootdir)/applications
+ 
+ include_server_builddir = $(builddir)/_include_server
+ 
+ # These must be done from here, not from autoconf, because they can 
+ # contain variable expansions written in Make syntax.  Ew.
+-DIR_DEFS = -DLIBDIR="\"${libdir}\"" -DSYSCONFDIR="\"${sysconfdir}\"" -DPKGDATADIR="\"${pkgdatadir}\""
++DIR_DEFS = -DLIBDIR="\"${libdir}\"" -DSYSCONFDIR="\"${sysconfdir}\"" -DICONDIR="\"${icondir}\""
+ 
+ # arguments to pkgconfig
+ GNOME_PACKAGES = @GNOME_PACKAGES@
+@@ -387,7 +388,7 @@ man_HTML = man/distcc_1.html man/distccd_1.html man/distccmon_text_1.html \
+            man/lsdistcc_1.html man/pump_1.html man/include_server_1.html
+ MEN = $(man1_MEN)
+ 
+-gnome_data = gnome/distccmon-gnome-icon.png	\
++gnome_data = gnome/distccmon-gnome.png	\
+ 	gnome/distccmon-gnome.desktop
+ 
+ popt_OBJS=popt/findme.o  popt/popt.o  popt/poptconfig.o \
+@@ -1033,7 +1034,8 @@ showpaths:
+ 	@echo "  programs             $(DESTDIR)$(bindir)"
+ 	@echo "  sbin programs        $(DESTDIR)$(sbindir)"
+ 	@echo "  system configuration $(DESTDIR)$(sysconfdir)"
+-	@echo "  shared data files    $(DESTDIR)$(pkgdatadir)"
++	@echo "  icon file            $(DESTDIR)$(icondir)"
++	@echo "  application file     $(DESTDIR)$(desktopdir)"
+ 
+ 
+ # install-sh can't handle multiple arguments, but we don't need any
+@@ -1129,10 +1131,10 @@ install-example: $(example_DOCS)
+ 	done
+ 
+ install-gnome-data: $(gnome_data)
+-	$(mkinstalldirs) "$(DESTDIR)$(pkgdatadir)"
+-	for p in $(gnome_data); do \
+-	  $(INSTALL_DATA) "$$p" "$(DESTDIR)$(pkgdatadir)" || exit 1; \
+-	done
++	$(mkinstalldirs) "$(DESTDIR)$(icondir)"
++	$(mkinstalldirs) "$(DESTDIR)$(desktopdir)"
++	$(INSTALL_DATA) gnome/distccmon-gnome.png "$(DESTDIR)$(icondir)"
++	$(INSTALL_DATA) gnome/distccmon-gnome.desktop "$(DESTDIR)$(desktopdir)"
+ 
+ install-conf: $(conf_files) $(default_files)
+ 	$(mkinstalldirs) "$(DESTDIR)$(sysconfdir)/distcc"
+diff --git a/gnome/distccmon-gnome.desktop b/gnome/distccmon-gnome.desktop
+index bd1fa26..7205f5e 100644
+--- a/gnome/distccmon-gnome.desktop
++++ b/gnome/distccmon-gnome.desktop
+@@ -1,6 +1,5 @@
+ [Desktop Entry]
+-Version=0.9.4
+-Encoding=UTF-8
++Version=1.0
+ Exec=distccmon-gnome
+ Name=distcc monitor
+ Name[sv]=distcc övervakare
+@@ -8,9 +7,9 @@ GenericName=Distributed Compile Monitor
+ GenericName[sv]=Distribuerad kompilerings-övervakare
+ Comment=Graphical view of distributed compile tasks
+ Comment[sv]=Grafisk vy av distribuerade kompileringsuppgifter
+-Icon=distccmon-gnome-icon.png
++Icon=distccmon-gnome
+ TryExec=distccmon-gnome
+ Terminal=false
+ Type=Application
+-Categories=GNOME;Application;Development;
++Categories=GNOME;GTK;Development;
+ StartupNotify=true
+diff --git a/gnome/distccmon-gnome-icon.png b/gnome/distccmon-gnome.png
+similarity index 100%
+rename from gnome/distccmon-gnome-icon.png
+rename to gnome/distccmon-gnome.png
+diff --git a/src/mon-gnome.c b/src/mon-gnome.c
+index 24681d0..bfc286d 100644
+--- a/src/mon-gnome.c
++++ b/src/mon-gnome.c
+@@ -599,7 +599,7 @@ static GtkWidget * dcc_gnome_make_mainwin (void)
+ 
+ #if GTK_CHECK_VERSION(2,2,0)
+   gtk_window_set_icon_from_file (GTK_WINDOW (mainwin),
+-                                 PKGDATADIR "/distccmon-gnome-icon.png",
++                                 ICONDIR "/distccmon-gnome.png",
+                                  NULL);
+ #endif
+ 

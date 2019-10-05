@@ -1,0 +1,67 @@
+From 52a37610650e7366a398dd07393d3902d2f3faa3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 28 Sep 2019 12:19:57 -0700
+Subject: [PATCH] Change container for riscv floating-point state to __riscv_mc_fp_state
+
+Match the struct elements with glibc
+glibc also uses __riscv_mc prefix, some packages like gdb uses that
+
+Upstream-Status: Submitted [https://www.openwall.com/lists/musl/2019/09/28/1]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ arch/riscv64/bits/signal.h | 18 +++++++++---------
+ arch/riscv64/bits/user.h   |  2 +-
+ 2 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/arch/riscv64/bits/signal.h b/arch/riscv64/bits/signal.h
+index 76d7ad80..aba7ab00 100644
+--- a/arch/riscv64/bits/signal.h
++++ b/arch/riscv64/bits/signal.h
+@@ -13,25 +13,25 @@ typedef unsigned long greg_t;
+ typedef unsigned long gregset_t[32];
+ 
+ struct __riscv_mc_f_ext_state {
+-	unsigned int f[32];
+-	unsigned int fcsr;
++	unsigned int __f[32];
++	unsigned int __fcsr;
+ };
+ 
+ struct __riscv_mc_d_ext_state {
+-	unsigned long long f[32];
+-	unsigned int fcsr;
++	unsigned long long __f[32];
++	unsigned int __fcsr;
+ };
+ 
+ struct __riscv_mc_q_ext_state {
+-	unsigned long long f[64] __attribute__((aligned(16)));
+-	unsigned int fcsr;
++	unsigned long long __f[64] __attribute__((aligned(16)));
++	unsigned int __fcsr;
+ 	unsigned int reserved[3];
+ };
+ 
+ union __riscv_mc_fp_state {
+-	struct __riscv_mc_f_ext_state f;
+-	struct __riscv_mc_d_ext_state d;
+-	struct __riscv_mc_q_ext_state q;
++	struct __riscv_mc_f_ext_state __f;
++	struct __riscv_mc_d_ext_state __d;
++	struct __riscv_mc_q_ext_state __q;
+ };
+ 
+ typedef union __riscv_mc_fp_state fpregset_t;
+diff --git a/arch/riscv64/bits/user.h b/arch/riscv64/bits/user.h
+index d2e383b2..9918a2fe 100644
+--- a/arch/riscv64/bits/user.h
++++ b/arch/riscv64/bits/user.h
+@@ -5,4 +5,4 @@ struct user_fpregs_struct {
+ 
+ #define ELF_NGREG 32
+ typedef unsigned long elf_greg_t, elf_gregset_t[ELF_NGREG];
+-typedef struct user_fpregs_struct elf_fpregset_t;
++typedef union __riscv_mc_fp_state elf_fpregset_t;
+-- 
+2.23.0
+

@@ -14,12 +14,12 @@ SRC_URI = "https://github.com/shadow-maint/shadow/releases/download/${PV}/${BP}.
            file://0001-Make-the-sp_lstchg-shadow-field-reproducible-re.-71.patch  \
            file://0001-configure.ac-fix-configure-error-with-dash.patch \
            ${@bb.utils.contains('PACKAGECONFIG', 'pam', '${PAM_SRC_URI}', '', d)} \
+           file://shadow-relaxed-usernames.patch \
            "
 
 SRC_URI_append_class-target = " \
            file://login_defs_pam.sed \
            file://shadow-update-pam-conf.patch \
-           file://shadow-relaxed-usernames.patch \
            "
 
 SRC_URI_append_class-native = " \

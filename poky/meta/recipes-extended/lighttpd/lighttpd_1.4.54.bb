@@ -39,14 +39,13 @@ PACKAGECONFIG[krb5] = "--with-krb5,--without-krb5,krb5"
 PACKAGECONFIG[pcre] = "--with-pcre,--without-pcre,libpcre"
 PACKAGECONFIG[zlib] = "--with-zlib,--without-zlib,zlib"
 PACKAGECONFIG[bzip2] = "--with-bzip2,--without-bzip2,bzip2"
-PACKAGECONFIG[fam] = "--with-fam,--without-fam,gamin"
 PACKAGECONFIG[webdav-props] = "--with-webdav-props,--without-webdav-props,libxml2 sqlite3"
 PACKAGECONFIG[webdav-locks] = "--with-webdav-locks,--without-webdav-locks,util-linux"
 PACKAGECONFIG[gdbm] = "--with-gdbm,--without-gdbm,gdbm"
 PACKAGECONFIG[memcache] = "--with-memcached,--without-memcached,libmemcached"
 PACKAGECONFIG[lua] = "--with-lua,--without-lua,lua"
 
-EXTRA_OECONF += "--enable-lfs"
+EXTRA_OECONF += "--enable-lfs --without-fam"
 
 inherit autotools pkgconfig update-rc.d gettext systemd
 

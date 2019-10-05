@@ -8,7 +8,7 @@ PACKAGES = "${PN}"
 
 # By default, packagegroup packages do not depend on a certain architecture.
 # Only if dependencies are modified by MACHINE_FEATURES, packages
-# need to be set to MACHINE_ARCH after inheriting packagegroup.bbclass
+# need to be set to MACHINE_ARCH before inheriting packagegroup.bbclass
 PACKAGE_ARCH ?= "all"
 
 # Fully expanded - so it applies the overrides as well

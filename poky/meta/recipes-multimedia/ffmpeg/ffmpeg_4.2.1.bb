@@ -26,8 +26,8 @@ LIC_FILES_CHKSUM = "file://COPYING.GPLv2;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
 SRC_URI = "https://www.ffmpeg.org/releases/${BP}.tar.xz \
            file://mips64_cpu_detection.patch \
            "
-SRC_URI[md5sum] = "fb33a9110251873002869664686b2a3f"
-SRC_URI[sha256sum] = "023f10831a97ad93d798f53a3640e55cd564abfeba807ecbe8524dac4fedecd5"
+SRC_URI[md5sum] = "67da904cf9fddeeb10a1308fc0dc39de"
+SRC_URI[sha256sum] = "cec7c87e9b60d174509e263ac4011b522385fd0775292e1670ecc1180c9bb6d4"
 
 # Build fails when thumb is enabled: https://bugzilla.yoctoproject.org/show_bug.cgi?id=7717
 ARM_INSTRUCTION_SET_armv4 = "arm"
@@ -119,6 +119,8 @@ EXTRA_OECONF_append_linux-gnux32 = " --disable-asm"
 # ld.gold: internal error in relocate_section, at ../../gold/i386.cc:3684
 
 LDFLAGS_append_x86 = "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', ' -fuse-ld=bfd ', '', d)}"
+
+EXTRA_OEMAKE = "V=1"
 
 do_configure() {
     ${S}/configure ${EXTRA_OECONF}

@@ -1,0 +1,36 @@
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From 12beb39925b5a4574a7cfd86073b59bceb49f791 Mon Sep 17 00:00:00 2001
+From: Matthias Clasen <mclasen@redhat.com>
+Date: Wed, 4 Sep 2019 15:51:06 -0400
+Subject: [PATCH] Skip thai break tests without libthai
+
+If we don't have libthai, these tests fail.
+
+Closes: https://gitlab.gnome.org/GNOME/pango/issues/420
+---
+ tests/meson.build | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/tests/meson.build b/tests/meson.build
+index 4c22c12c..c617331f 100644
+--- a/tests/meson.build
++++ b/tests/meson.build
+@@ -89,9 +89,12 @@ test_breaks_data = [
+   'breaks/one',
+   'breaks/two',
+   'breaks/three',
+-  'breaks/four',
+ ]
+ 
++if thai_dep.found()
++  test_breaks_data += [ 'breaks/four', ]
++endif
++
+ test_items_data = [
+   'itemize/one',
+ ]
+-- 
+2.20.1
+

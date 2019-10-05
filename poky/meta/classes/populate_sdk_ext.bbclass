@@ -379,6 +379,11 @@ python copy_buildsystem () {
             f.write('require conf/locked-sigs.inc\n')
             f.write('require conf/unlocked-sigs.inc\n')
 
+    if os.path.exists(builddir + '/cache/bb_unihashes.dat'):
+        bb.parse.siggen.save_unitaskhashes()
+        bb.utils.mkdirhier(os.path.join(baseoutpath, 'cache'))
+        shutil.copyfile(builddir + '/cache/bb_unihashes.dat', baseoutpath + '/cache/bb_unihashes.dat')
+
     # Write a templateconf.cfg
     with open(baseoutpath + '/conf/templateconf.cfg', 'w') as f:
         f.write('meta/conf\n')
@@ -439,6 +444,11 @@ python copy_buildsystem () {
         create_filtered_tasklist(d, baseoutpath, tasklistfn, conf_initpath)
     else:
         tasklistfn = None
+
+    if os.path.exists(builddir + '/cache/bb_unihashes.dat'):
+        bb.parse.siggen.save_unitaskhashes()
+        bb.utils.mkdirhier(os.path.join(baseoutpath, 'cache'))
+        shutil.copyfile(builddir + '/cache/bb_unihashes.dat', baseoutpath + '/cache/bb_unihashes.dat')
 
     # Add packagedata if enabled
     if d.getVar('SDK_INCLUDE_PKGDATA') == '1':

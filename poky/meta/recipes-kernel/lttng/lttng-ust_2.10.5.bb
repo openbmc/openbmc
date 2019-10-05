@@ -27,6 +27,7 @@ PE = "2"
 
 SRC_URI = "https://lttng.org/files/lttng-ust/lttng-ust-${PV}.tar.bz2 \
            file://lttng-ust-doc-examples-disable.patch \
+           file://0001-python-lttngust-Makefile.am-Add-install-lib-to-setup.patch \
           "
 
 SRC_URI[md5sum] = "f0c86a9fa7dcfd0205fb42584a310b1c"

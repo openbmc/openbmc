@@ -495,14 +495,8 @@ class Git(FetchMethod):
         runfetchcmd("%s remote set-url origin %s" % (ud.basecmd, repourl), d, workdir=destdir)
 
         if self._contains_lfs(ud, d, destdir):
-            if need_lfs:
-                path = d.getVar('PATH')
-                if path:
-                    gitlfstool = bb.utils.which(path, "git-lfs", executable=True)
-                    if not gitlfstool:
-                        raise bb.fetch2.FetchError("Repository %s has LFS content, install git-lfs on host to download (or set lfs=0 to ignore it)" % (repourl))
-                else:
-                    bb.note("Could not find 'PATH'")
+            if need_lfs and not self._find_git_lfs(d):
+                raise bb.fetch2.FetchError("Repository %s has LFS content, install git-lfs on host to download (or set lfs=0 to ignore it)" % (repourl))
             else:
                 bb.note("Repository %s has LFS content but it is not being fetched" % (repourl))
 
@@ -569,6 +563,13 @@ class Git(FetchMethod):
         except (bb.fetch2.FetchError,ValueError):
             pass
         return False
+
+    def _find_git_lfs(self, d):
+        """
+        Return True if git-lfs can be found, False otherwise.
+        """
+        import shutil
+        return shutil.which("git-lfs", path=d.getVar('PATH')) is not None
 
     def _get_repo_url(self, ud):
         """

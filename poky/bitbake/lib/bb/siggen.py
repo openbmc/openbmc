@@ -44,6 +44,7 @@ class SignatureGenerator(object):
         self.file_checksum_values = {}
         self.taints = {}
         self.unitaskhashes = {}
+        self.setscenetasks = {}
 
     def finalise(self, fn, d, varient):
         return
@@ -75,10 +76,10 @@ class SignatureGenerator(object):
         return
 
     def get_taskdata(self):
-        return (self.runtaskdeps, self.taskhash, self.file_checksum_values, self.taints, self.basehash, self.unitaskhashes)
+        return (self.runtaskdeps, self.taskhash, self.file_checksum_values, self.taints, self.basehash, self.unitaskhashes, self.setscenetasks)
 
     def set_taskdata(self, data):
-        self.runtaskdeps, self.taskhash, self.file_checksum_values, self.taints, self.basehash, self.unitaskhashes = data
+        self.runtaskdeps, self.taskhash, self.file_checksum_values, self.taints, self.basehash, self.unitaskhashes, self.setscenetasks = data
 
     def reset(self, data):
         self.__init__(data)
@@ -267,7 +268,7 @@ class SignatureGeneratorBasic(SignatureGenerator):
             sigfile = stampbase
             referencestamp = runtime[11:]
         elif runtime and tid in self.taskhash:
-            sigfile = stampbase + "." + task + ".sigdata" + "." + self.taskhash[tid]
+            sigfile = stampbase + "." + task + ".sigdata" + "." + self.get_unihash(tid)
         else:
             sigfile = stampbase + "." + task + ".sigbasedata" + "." + self.basehash[tid]
 
@@ -295,6 +296,7 @@ class SignatureGeneratorBasic(SignatureGenerator):
             for dep in data['runtaskdeps']:
                 data['runtaskhashes'][dep] = self.get_unihash(dep)
             data['taskhash'] = self.taskhash[tid]
+            data['unihash'] = self.get_unihash(tid)
 
         taint = self.read_taint(fn, task, referencestamp)
         if taint:
@@ -384,7 +386,7 @@ class SignatureGeneratorUniHashMixIn(object):
     def __get_task_unihash_key(self, tid):
         # TODO: The key only *needs* to be the taskhash, the tid is just
         # convenient
-        return '%s:%s' % (tid, self.taskhash[tid])
+        return '%s:%s' % (tid.rsplit("/", 1)[1], self.taskhash[tid])
 
     def get_stampfile_hash(self, tid):
         if tid in self.taskhash:
@@ -440,7 +442,7 @@ class SignatureGeneratorUniHashMixIn(object):
                 bb.debug((1, 2)[unihash == taskhash], 'Found unihash %s in place of %s for %s from %s' % (unihash, taskhash, tid, self.server))
             else:
                 bb.debug(2, 'No reported unihash for %s:%s from %s' % (tid, taskhash, self.server))
-        except hashserv.HashConnectionError as e:
+        except hashserv.client.HashConnectionError as e:
             bb.warn('Error contacting Hash Equivalence Server %s: %s' % (self.server, str(e)))
 
         self.unitaskhashes[key] = unihash
@@ -454,7 +456,11 @@ class SignatureGeneratorUniHashMixIn(object):
         report_taskdata = d.getVar('SSTATE_HASHEQUIV_REPORT_TASKDATA') == '1'
         tempdir = d.getVar('T')
         fn = d.getVar('BB_FILENAME')
-        key = fn + ':do_' + task + ':' + taskhash
+        tid = fn + ':do_' + task
+        key = tid.rsplit("/", 1)[1] + ':' + taskhash
+
+        if self.setscenetasks and tid not in self.setscenetasks:
+            return
 
         # Sanity checks
         cache_unihash = self.unitaskhashes.get(key, None)
@@ -504,7 +510,7 @@ class SignatureGeneratorUniHashMixIn(object):
                     bb.event.fire(bb.runqueue.taskUniHashUpdate(fn + ':do_' + task, new_unihash), d)
                 else:
                     bb.debug(1, 'Reported task %s as unihash %s to %s' % (taskhash, unihash, self.server))
-            except hashserv.HashConnectionError as e:
+            except hashserv.client.HashConnectionError as e:
                 bb.warn('Error contacting Hash Equivalence Server %s: %s' % (self.server, str(e)))
         finally:
             if sigfile:

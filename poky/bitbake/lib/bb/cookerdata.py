@@ -13,6 +13,7 @@ import logging
 import os
 import re
 import sys
+import hashlib
 from functools import wraps
 import bb
 from bb import data
@@ -267,6 +268,7 @@ class CookerDataBuilder(object):
         self.mcdata = {}
 
     def parseBaseConfiguration(self):
+        data_hash = hashlib.sha256()
         try:
             self.data = self.parseConfigurationFiles(self.prefiles, self.postfiles)
 
@@ -290,7 +292,7 @@ class CookerDataBuilder(object):
                 bb.event.fire(bb.event.ConfigParsed(), self.data)
 
             bb.parse.init_parser(self.data)
-            self.data_hash = self.data.get_hash()
+            data_hash.update(self.data.get_hash().encode('utf-8'))
             self.mcdata[''] = self.data
 
             multiconfig = (self.data.getVar("BBMULTICONFIG") or "").split()
@@ -298,9 +300,11 @@ class CookerDataBuilder(object):
                 mcdata = self.parseConfigurationFiles(self.prefiles, self.postfiles, config)
                 bb.event.fire(bb.event.ConfigParsed(), mcdata)
                 self.mcdata[config] = mcdata
+                data_hash.update(mcdata.get_hash().encode('utf-8'))
             if multiconfig:
                 bb.event.fire(bb.event.MultiConfigParsed(self.mcdata), self.data)
 
+            self.data_hash = data_hash.hexdigest()
         except (SyntaxError, bb.BBHandledException):
             raise bb.BBHandledException
         except bb.data_smart.ExpansionError as e:

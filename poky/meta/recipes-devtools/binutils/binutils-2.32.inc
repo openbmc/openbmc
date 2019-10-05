@@ -14,11 +14,8 @@ def binutils_branch_version(d):
     pvsplit = d.getVar('PV').split('.')
     return pvsplit[0] + "_" + pvsplit[1]
 
-# Actual upstream version is 2.32 (without the .0), so we have to set
-# UPSTREAM_VERSION_UNKNOWN to avoid the version check failure. The line can
-# be removed when a new version of binutils is released (if the PV is then
-# correctly set to match the upstream version tag).
-UPSTREAM_VERSION_UNKNOWN = "1"
+# When upgrading to 2.33, please make sure there is no trailing .0, so
+# that upstream version check can work correctly.
 PV = "2.32.0"
 CVE_VERSION = "2.32"
 BINUPV = "${@binutils_branch_version(d)}"

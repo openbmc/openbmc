@@ -36,16 +36,3 @@ QB_TCPSERIAL_OPT = " -device virtio-serial-device -chardev socket,id=virtcon,por
 # Add the 'virtio-rng-pci' device otherwise the guest may run out of entropy
 QB_OPT_APPEND = " -object rng-random,filename=/dev/urandom,id=rng0 -device virtio-rng-device,rng=rng0"
 
-BAD_RECOMMENDATIONS += "\
-    libcxx-dev \
-    libcxx-staticdev \
-    compiler-rt-dev \
-    compiler-rt-staticdev \
-"
-
-ASSUME_PROVIDED += "\
-    libcxx-dev \
-    libcxx-staticdev \
-    compiler-rt-dev \
-    compiler-rt-staticdev \
-"

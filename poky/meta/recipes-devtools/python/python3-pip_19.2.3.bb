@@ -25,6 +25,7 @@ RDEPENDS_${PN} = "\
   python3-setuptools \
   python3-unixadmin \
   python3-xmlrpc \
+  python3-pickle \
 "
 
 BBCLASSEXTEND = "native nativesdk"

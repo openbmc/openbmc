@@ -15,8 +15,8 @@ SRC_URI = "https://strace.io/files/${PV}/strace-${PV}.tar.xz \
            file://0001-tests-sigaction-Check-for-mips-and-alpha-before-usin.patch \
            file://ptest-spacesave.patch \
            "
-SRC_URI[md5sum] = "b9c02b07dcde5125498ce7da69b77baf"
-SRC_URI[sha256sum] = "d513bc085609a9afd64faf2ce71deb95b96faf46cd7bc86048bc655e4e4c24d2"
+SRC_URI[md5sum] = "84f5e72de813c9b1bb6057ee8ab428d8"
+SRC_URI[sha256sum] = "6c131198749656401fe3efd6b4b16a07ea867e8f530867ceae8930bbc937a047"
 
 inherit autotools ptest
 

@@ -22,6 +22,7 @@ SRC_URI += "file://touchscreen.rules \
            file://0003-implment-systemd-sysv-install-for-OE.patch \
            file://0004-rules-whitelist-hd-devices.patch \
            file://0005-rules-watch-metadata-changes-in-ide-devices.patch \
+           file://0001-unit-file.c-consider-symlink-on-filesystems-like-NFS.patch \
            file://99-default.preset \
            "
 
@@ -299,9 +300,10 @@ do_install() {
 }
 
 do_install_append () {
-       # Mips qemu is extremely slow, allow more time for the hwdb update
-       # This is a workaround until https://github.com/systemd/systemd/issues/13581 is resolved
-       sed -i -e s#TimeoutSec=90s#TimeoutSec=180s# ${D}${systemd_unitdir}/system/systemd-hwdb-update.service
+	# Mips qemu is extremely slow, allow more time for the hwdb update
+	# This is a workaround until https://github.com/systemd/systemd/issues/13581 is resolved
+	[ ! -e ${D}${systemd_unitdir}/system/systemd-hwdb-update.service ] ||
+		sed -i -e s#TimeoutSec=90s#TimeoutSec=180s# ${D}${systemd_unitdir}/system/systemd-hwdb-update.service
 }
 
 python populate_packages_prepend (){
@@ -635,7 +637,7 @@ python do_warn_musl() {
 }
 addtask warn_musl before do_configure
 
-ALTERNATIVE_${PN} = "halt reboot shutdown poweroff runlevel resolv-conf"
+ALTERNATIVE_${PN} = "halt reboot shutdown poweroff runlevel ${@bb.utils.contains('PACKAGECONFIG', 'resolved', 'resolv-conf', '', d)}"
 
 ALTERNATIVE_TARGET[resolv-conf] = "${sysconfdir}/resolv-conf.systemd"
 ALTERNATIVE_LINK_NAME[resolv-conf] = "${sysconfdir}/resolv.conf"

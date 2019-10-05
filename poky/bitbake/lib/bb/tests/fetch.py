@@ -1908,3 +1908,83 @@ class GitShallowTest(FetcherTest):
 
         dir = os.listdir(self.unpackdir + "/git/")
         self.assertIn("fstests.doap", dir)
+
+class GitLfsTest(FetcherTest):
+    def setUp(self):
+        FetcherTest.setUp(self)
+
+        self.gitdir = os.path.join(self.tempdir, 'git')
+        self.srcdir = os.path.join(self.tempdir, 'gitsource')
+        
+        self.d.setVar('WORKDIR', self.tempdir)
+        self.d.setVar('S', self.gitdir)
+        self.d.delVar('PREMIRRORS')
+        self.d.delVar('MIRRORS')
+
+        self.d.setVar('SRCREV', '${AUTOREV}')
+        self.d.setVar('AUTOREV', '${@bb.fetch2.get_autorev(d)}')
+
+        bb.utils.mkdirhier(self.srcdir)
+        self.git('init', cwd=self.srcdir)
+        with open(os.path.join(self.srcdir, '.gitattributes'), 'wt') as attrs:
+            attrs.write('*.mp3 filter=lfs -text')
+        self.git(['add', '.gitattributes'], cwd=self.srcdir)
+        self.git(['commit', '-m', "attributes", '.gitattributes'], cwd=self.srcdir)
+
+    def git(self, cmd, cwd=None):
+        if isinstance(cmd, str):
+            cmd = 'git ' + cmd
+        else:
+            cmd = ['git'] + cmd
+        if cwd is None:
+            cwd = self.gitdir
+        return bb.process.run(cmd, cwd=cwd)[0]
+
+    def fetch(self, uri=None):
+        uris = self.d.getVar('SRC_URI').split()
+        uri = uris[0]
+        d = self.d
+
+        fetcher = bb.fetch2.Fetch(uris, d)
+        fetcher.download()
+        ud = fetcher.ud[uri]
+        return fetcher, ud
+
+    def test_lfs_enabled(self):
+        import shutil
+
+        uri = 'git://%s;protocol=file;subdir=${S};lfs=1' % self.srcdir
+        self.d.setVar('SRC_URI', uri)
+
+        fetcher, ud = self.fetch()
+        self.assertIsNotNone(ud.method._find_git_lfs)
+
+        # If git-lfs can be found, the unpack should be successful
+        ud.method._find_git_lfs = lambda d: True
+        shutil.rmtree(self.gitdir, ignore_errors=True)
+        fetcher.unpack(self.d.getVar('WORKDIR'))
+
+        # If git-lfs cannot be found, the unpack should throw an error
+        with self.assertRaises(bb.fetch2.FetchError):
+            ud.method._find_git_lfs = lambda d: False
+            shutil.rmtree(self.gitdir, ignore_errors=True)
+            fetcher.unpack(self.d.getVar('WORKDIR'))
+
+    def test_lfs_disabled(self):
+        import shutil
+
+        uri = 'git://%s;protocol=file;subdir=${S};lfs=0' % self.srcdir
+        self.d.setVar('SRC_URI', uri)
+
+        fetcher, ud = self.fetch()
+        self.assertIsNotNone(ud.method._find_git_lfs)
+
+        # If git-lfs can be found, the unpack should be successful
+        ud.method._find_git_lfs = lambda d: True
+        shutil.rmtree(self.gitdir, ignore_errors=True)
+        fetcher.unpack(self.d.getVar('WORKDIR'))
+
+        # If git-lfs cannot be found, the unpack should be successful
+        ud.method._find_git_lfs = lambda d: False
+        shutil.rmtree(self.gitdir, ignore_errors=True)
+        fetcher.unpack(self.d.getVar('WORKDIR'))

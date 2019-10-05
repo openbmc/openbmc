@@ -1,25 +1,19 @@
 require ruby.inc
 
 SRC_URI += " \
-           file://ruby-CVE-2017-9226.patch \
-           file://ruby-CVE-2017-9228.patch \
+           file://0001-configure.ac-check-finite-isinf-isnan-as-macros-firs.patch \
            file://run-ptest \
            "
 
 SRC_URI[md5sum] = "7e156fb526b8f4bb1b30a3dd8a7ce400"
 SRC_URI[sha256sum] = "28a945fdf340e6ba04fc890b98648342e3cccfd6d223a48f3810572f11b2514c"
 
-# it's unknown to configure script, but then passed to extconf.rb
-# maybe it's not really needed as we're hardcoding the result with
-# 0001-socket-extconf-hardcode-wide-getaddr-info-test-outco.patch
-UNKNOWN_CONFIGURE_WHITELIST += "--enable-wide-getaddrinfo"
-
 PACKAGECONFIG ??= ""
 PACKAGECONFIG += "${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)}"
 
 PACKAGECONFIG[valgrind] = "--with-valgrind=yes, --with-valgrind=no, valgrind"
 PACKAGECONFIG[gmp] = "--with-gmp=yes, --with-gmp=no, gmp"
-PACKAGECONFIG[ipv6] = ",--enable-wide-getaddrinfo,"
+PACKAGECONFIG[ipv6] = "--enable-ipv6, --disable-ipv6,"
 
 EXTRA_AUTORECONF += "--exclude=aclocal"
 

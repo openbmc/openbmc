@@ -72,7 +72,7 @@ def compare_file(reference, test, diffutils_sysroot):
     return result
 
 class ReproducibleTests(OESelftestTestCase):
-    package_classes = ['deb']
+    package_classes = ['deb', 'ipk']
     images = ['core-image-minimal']
 
     def setUpLocal(self):

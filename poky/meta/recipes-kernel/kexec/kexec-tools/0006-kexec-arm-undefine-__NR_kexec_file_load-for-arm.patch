@@ -1,0 +1,40 @@
+From b54816eff272324320c490d62dc36b27d2838732 Mon Sep 17 00:00:00 2001
+From: Quanyang Wang <quanyang.wang@windriver.com>
+Date: Mon, 16 Sep 2019 10:49:05 +0800
+Subject: [PATCH] kexec/arm: undefine __NR_kexec_file_load for arm
+
+In the kernel upstream commit 4ab65ba7a5cb
+("ARM: add kexec_file_load system call number"),
+__NR_kexec_file_load for arm has been defined to be 401.
+This results that even if kexec_file_load isn't implemented
+for arm but the function is_kexec_file_load_implemented()
+will still return true. So undef __NR_kexec_file_load for
+arm architecture.
+
+Upstream-Status: Backport
+[https://git.kernel.org/pub/scm/utils/kernel/kexec/kexec-tools.git/commit/kexec/kexec-syscall.h?id=b54816eff272324320c490d62dc36b27d2838732]
+
+Signed-off-by: Quanyang Wang <quanyang.wang@windriver.com>
+Signed-off-by: Simon Horman <horms@verge.net.au>
+---
+ kexec/kexec-syscall.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/kexec/kexec-syscall.h b/kexec/kexec-syscall.h
+index dac1c1f..92d51d3 100644
+--- a/kexec/kexec-syscall.h
++++ b/kexec/kexec-syscall.h
+@@ -56,6 +56,10 @@
+ #endif
+ #endif /*ifndef __NR_kexec_load*/
+ 
++#ifdef __arm__
++#undef __NR_kexec_file_load
++#endif
++
+ #ifndef __NR_kexec_file_load
+ 
+ #ifdef __x86_64__
+-- 
+2.17.1
+

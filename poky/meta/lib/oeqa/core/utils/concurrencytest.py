@@ -78,29 +78,29 @@ class ProxyTestResult:
     def __init__(self, target):
         self.result = target
 
-    def _addResult(self, method, test, *args, **kwargs):
+    def _addResult(self, method, test, *args, exception = False, **kwargs):
         return method(test, *args, **kwargs)
 
-    def addError(self, test, *args, **kwargs):
-        self._addResult(self.result.addError, test, *args, **kwargs)
+    def addError(self, test, err = None, **kwargs):
+        self._addResult(self.result.addError, test, err, exception = True, **kwargs)
 
-    def addFailure(self, test, *args, **kwargs):
-        self._addResult(self.result.addFailure, test, *args, **kwargs)
+    def addFailure(self, test, err = None, **kwargs):
+        self._addResult(self.result.addFailure, test, err, exception = True, **kwargs)
 
-    def addSuccess(self, test, *args, **kwargs):
-        self._addResult(self.result.addSuccess, test, *args, **kwargs)
+    def addSuccess(self, test, **kwargs):
+        self._addResult(self.result.addSuccess, test, **kwargs)
 
-    def addExpectedFailure(self, test, *args, **kwargs):
-        self._addResult(self.result.addExpectedFailure, test, *args, **kwargs)
+    def addExpectedFailure(self, test, err = None, **kwargs):
+        self._addResult(self.result.addExpectedFailure, test, err, exception = True, **kwargs)
 
-    def addUnexpectedSuccess(self, test, *args, **kwargs):
-        self._addResult(self.result.addUnexpectedSuccess, test, *args, **kwargs)
+    def addUnexpectedSuccess(self, test, **kwargs):
+        self._addResult(self.result.addUnexpectedSuccess, test, **kwargs)
 
     def __getattr__(self, attr):
         return getattr(self.result, attr)
 
 class ExtraResultsDecoderTestResult(ProxyTestResult):
-    def _addResult(self, method, test, *args, **kwargs):
+    def _addResult(self, method, test, *args, exception = False, **kwargs):
         if "details" in kwargs and "extraresults" in kwargs["details"]:
             if isinstance(kwargs["details"]["extraresults"], Content):
                 kwargs = kwargs.copy()
@@ -114,7 +114,7 @@ class ExtraResultsDecoderTestResult(ProxyTestResult):
         return method(test, *args, **kwargs)
 
 class ExtraResultsEncoderTestResult(ProxyTestResult):
-    def _addResult(self, method, test, *args, **kwargs):
+    def _addResult(self, method, test, *args, exception = False, **kwargs):
         if hasattr(test, "extraresults"):
             extras = lambda : [json.dumps(test.extraresults).encode()]
             kwargs = kwargs.copy()
@@ -123,6 +123,11 @@ class ExtraResultsEncoderTestResult(ProxyTestResult):
             else:
                 kwargs["details"] = kwargs["details"].copy()
             kwargs["details"]["extraresults"] = Content(ContentType("application", "json", {'charset': 'utf8'}), extras)
+        # if using details, need to encode any exceptions into the details obj,
+        # testtools does not handle "err" and "details" together.
+        if "details" in kwargs and exception and (len(args) >= 1 and args[0] is not None):
+            kwargs["details"]["traceback"] = testtools.content.TracebackContent(args[0], test)
+            args = []
         return method(test, *args, **kwargs)
 
 #

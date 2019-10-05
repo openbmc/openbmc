@@ -90,8 +90,7 @@ class SignatureGeneratorOEBasic(bb.siggen.SignatureGeneratorBasic):
     def rundep_check(self, fn, recipename, task, dep, depname, dataCache = None):
         return sstate_rundepfilter(self, fn, recipename, task, dep, depname, dataCache)
 
-class SignatureGeneratorOEBasicHash(bb.siggen.SignatureGeneratorBasicHash):
-    name = "OEBasicHash"
+class SignatureGeneratorOEBasicHashMixIn(object):
     def init_rundepcheck(self, data):
         self.abisaferecipes = (data.getVar("SIGGEN_EXCLUDERECIPES_ABISAFE") or "").split()
         self.saferecipedeps = (data.getVar("SIGGEN_EXCLUDE_SAFE_RECIPE_DEPS") or "").split()
@@ -129,12 +128,11 @@ class SignatureGeneratorOEBasicHash(bb.siggen.SignatureGeneratorBasicHash):
         return sstate_rundepfilter(self, fn, recipename, task, dep, depname, dataCache)
 
     def get_taskdata(self):
-        data = super(bb.siggen.SignatureGeneratorBasicHash, self).get_taskdata()
-        return (data, self.lockedpnmap, self.lockedhashfn)
+        return (self.lockedpnmap, self.lockedhashfn, self.lockedhashes) + super().get_taskdata()
 
     def set_taskdata(self, data):
-        coredata, self.lockedpnmap, self.lockedhashfn = data
-        super(bb.siggen.SignatureGeneratorBasicHash, self).set_taskdata(coredata)
+        self.lockedpnmap, self.lockedhashfn, self.lockedhashes = data[:3]
+        super().set_taskdata(data[3:])
 
     def dump_sigs(self, dataCache, options):
         sigfile = os.getcwd() + "/locked-sigs.inc"
@@ -171,16 +169,22 @@ class SignatureGeneratorOEBasicHash(bb.siggen.SignatureGeneratorBasicHash):
                 h_locked = self.lockedsigs[recipename][task][0]
                 var = self.lockedsigs[recipename][task][1]
                 self.lockedhashes[tid] = h_locked
+                unihash = super().get_unihash(tid)
                 self.taskhash[tid] = h_locked
                 #bb.warn("Using %s %s %s" % (recipename, task, h))
 
-                if h != h_locked:
+                if h != h_locked and h_locked != unihash:
                     self.mismatch_msgs.append('The %s:%s sig is computed to be %s, but the sig is locked to %s in %s'
                                           % (recipename, task, h, h_locked, var))
 
                 return h_locked
         #bb.warn("%s %s %s" % (recipename, task, h))
         return h
+
+    def get_unihash(self, tid):
+        if tid in self.lockedhashes:
+            return self.lockedhashes[tid]
+        return super().get_unihash(tid)
 
     def dump_sigtask(self, fn, task, stampbase, runtime):
         tid = fn + ":" + task
@@ -211,7 +215,7 @@ class SignatureGeneratorOEBasicHash(bb.siggen.SignatureGeneratorBasicHash):
                     (_, _, task, fn) = bb.runqueue.split_tid_mcfn(tid)
                     if tid not in self.taskhash:
                         continue
-                    f.write("    " + self.lockedpnmap[fn] + ":" + task + ":" + self.taskhash[tid] + " \\\n")
+                    f.write("    " + self.lockedpnmap[fn] + ":" + task + ":" + self.get_unihash(tid) + " \\\n")
                 f.write('    "\n')
             f.write('SIGGEN_LOCKEDSIGS_TYPES_%s = "%s"' % (self.machine, " ".join(l)))
 
@@ -257,7 +261,10 @@ class SignatureGeneratorOEBasicHash(bb.siggen.SignatureGeneratorBasicHash):
         if error_msgs:
             bb.fatal("\n".join(error_msgs))
 
-class SignatureGeneratorOEEquivHash(bb.siggen.SignatureGeneratorUniHashMixIn, SignatureGeneratorOEBasicHash):
+class SignatureGeneratorOEBasicHash(SignatureGeneratorOEBasicHashMixIn, bb.siggen.SignatureGeneratorBasicHash):
+    name = "OEBasicHash"
+
+class SignatureGeneratorOEEquivHash(SignatureGeneratorOEBasicHashMixIn, bb.siggen.SignatureGeneratorUniHashMixIn, bb.siggen.SignatureGeneratorBasicHash):
     name = "OEEquivHash"
 
     def init_rundepcheck(self, data):

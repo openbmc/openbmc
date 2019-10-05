@@ -11,13 +11,13 @@ BBCLASSEXTEND = "native nativesdk"
 
 SRC_URI = "${APACHE_MIRROR}/apr/${BPN}-${PV}.tar.bz2 \
            file://run-ptest \
-           file://0001-build-buildcheck.sh-improve-libtool-detection.patch \
            file://0002-apr-Remove-workdir-path-references-from-installed-ap.patch \
            file://0003-Makefile.in-configure.in-support-cross-compiling.patch \
            file://0004-Fix-packet-discards-HTTP-redirect.patch \
            file://0005-configure.in-fix-LTFLAGS-to-make-it-work-with-ccache.patch \
            file://0006-apr-fix-off_t-size-doesn-t-match-in-glibc-when-cross.patch \
            file://0007-explicitly-link-libapr-against-phtread-to-make-gold-.patch \
+           file://libtoolize_check.patch \
            "
 
 SRC_URI[md5sum] = "7a14a83d664e87599ea25ff4432e48a7"
@@ -47,7 +47,8 @@ do_configure_prepend() {
 	export GREP="grep"
 
 	cd ${S}
-	libtool='${HOST_SYS}-libtool' ./buildconf
+	# The "2" means libtool version 2.
+	./buildconf 2
 }
 
 FILES_${PN}-dev += "${libdir}/apr.exp ${datadir}/build-1/*"

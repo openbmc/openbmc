@@ -73,7 +73,7 @@ def build_tid(mc, fn, taskname):
 def pending_hash_index(tid, rqdata):
     (mc, fn, taskname, taskfn) = split_tid_mcfn(tid)
     pn = rqdata.dataCaches[mc].pkg_fn[taskfn]
-    h = rqdata.runtaskentries[tid].hash
+    h = rqdata.runtaskentries[tid].unihash
     return pn + ":" + "taskname" + h
 
 class RunQueueStats:
@@ -207,6 +207,8 @@ class RunQueueScheduler(object):
 
     def newbuildable(self, task):
         self.buildable.add(task)
+        # Once tasks are running we don't need to worry about them again
+        self.buildable.difference_update(self.rq.runq_running)
 
     def removebuildable(self, task):
         self.buildable.remove(task)
@@ -1162,6 +1164,8 @@ class RunQueueData:
 
         self.init_progress_reporter.next_stage()
 
+        bb.parse.siggen.set_setscene_tasks(self.runq_setscene_tids)
+
         # Iterate over the task list and call into the siggen code
         dealtwith = set()
         todeal = set(self.runtaskentries)
@@ -1173,7 +1177,6 @@ class RunQueueData:
                     self.prepare_task_hash(tid)
 
         bb.parse.siggen.writeout_file_checksum_cache()
-        bb.parse.siggen.set_setscene_tasks(self.runq_setscene_tids)
 
         #self.dump_data()
         return len(self.runtaskentries)
@@ -1442,6 +1445,7 @@ class RunQueue:
                 self.state = runQueueComplete
             else:
                 self.state = runQueueSceneInit
+                bb.parse.siggen.save_unitaskhashes()
 
         if self.state is runQueueSceneInit:
             self.rqdata.init_progress_reporter.next_stage()
@@ -2299,10 +2303,11 @@ class RunQueueExecute:
         for tid in changed:
             if tid not in self.rqdata.runq_setscene_tids:
                 continue
-            valid = self.rq.validate_hashes(set([tid]), self.cooker.data, None, False)
-            if not valid:
-                continue
             if tid in self.runq_running:
+                continue
+            if tid in self.scenequeue_covered:
+                # Potentially risky, should we report this hash as a match?
+                logger.info("Already covered setscene for %s so ignoring rehash" % (tid))
                 continue
             if tid not in self.pending_migrations:
                 self.pending_migrations.add(tid)
@@ -2358,6 +2363,7 @@ class RunQueueExecute:
 
             logger.info("Setscene task %s now valid and being rerun" % tid)
             self.sqdone = False
+            update_scenequeue_data([tid], self.sqdata, self.rqdata, self.rq, self.cooker, self.stampcache, self)
 
         if changed:
             self.holdoff_need_update = True
@@ -2674,64 +2680,77 @@ def build_scenequeue_data(sqdata, rqdata, rq, cooker, stampcache, sqrq):
 
     rqdata.init_progress_reporter.next_stage()
 
-    multiconfigs = set()
+    sqdata.multiconfigs = set()
     for tid in sqdata.sq_revdeps:
-        multiconfigs.add(mc_from_tid(tid))
+        sqdata.multiconfigs.add(mc_from_tid(tid))
         if len(sqdata.sq_revdeps[tid]) == 0:
             sqrq.sq_buildable.add(tid)
 
     rqdata.init_progress_reporter.finish()
 
-    if rq.hashvalidate:
-        noexec = []
-        stamppresent = []
-        tocheck = set()
+    sqdata.noexec = set()
+    sqdata.stamppresent = set()
+    sqdata.valid = set()
 
+    update_scenequeue_data(sqdata.sq_revdeps, sqdata, rqdata, rq, cooker, stampcache, sqrq)
+
+def update_scenequeue_data(tids, sqdata, rqdata, rq, cooker, stampcache, sqrq):
+
+    tocheck = set()
+
+    for tid in sorted(tids):
+        if tid in sqdata.stamppresent:
+            sqdata.stamppresent.remove(tid)
+        if tid in sqdata.valid:
+            sqdata.valid.remove(tid)
+
+        (mc, fn, taskname, taskfn) = split_tid_mcfn(tid)
+
+        taskdep = rqdata.dataCaches[mc].task_deps[taskfn]
+
+        if 'noexec' in taskdep and taskname in taskdep['noexec']:
+            sqdata.noexec.add(tid)
+            sqrq.sq_task_skip(tid)
+            bb.build.make_stamp(taskname + "_setscene", rqdata.dataCaches[mc], taskfn)
+            continue
+
+        if rq.check_stamp_task(tid, taskname + "_setscene", cache=stampcache):
+            logger.debug(2, 'Setscene stamp current for task %s', tid)
+            sqdata.stamppresent.add(tid)
+            sqrq.sq_task_skip(tid)
+            continue
+
+        if rq.check_stamp_task(tid, taskname, recurse = True, cache=stampcache):
+            logger.debug(2, 'Normal stamp current for task %s', tid)
+            sqdata.stamppresent.add(tid)
+            sqrq.sq_task_skip(tid)
+            continue
+
+        tocheck.add(tid)
+
+    sqdata.valid |= rq.validate_hashes(tocheck, cooker.data, len(sqdata.stamppresent), False)
+
+    sqdata.hashes = {}
+    for mc in sorted(sqdata.multiconfigs):
         for tid in sorted(sqdata.sq_revdeps):
-            (mc, fn, taskname, taskfn) = split_tid_mcfn(tid)
-
-            taskdep = rqdata.dataCaches[mc].task_deps[taskfn]
-
-            if 'noexec' in taskdep and taskname in taskdep['noexec']:
-                noexec.append(tid)
-                sqrq.sq_task_skip(tid)
-                bb.build.make_stamp(taskname + "_setscene", rqdata.dataCaches[mc], taskfn)
-                continue
-
-            if rq.check_stamp_task(tid, taskname + "_setscene", cache=stampcache):
-                logger.debug(2, 'Setscene stamp current for task %s', tid)
-                stamppresent.append(tid)
-                sqrq.sq_task_skip(tid)
-                continue
-
-            if rq.check_stamp_task(tid, taskname, recurse = True, cache=stampcache):
-                logger.debug(2, 'Normal stamp current for task %s', tid)
-                stamppresent.append(tid)
-                sqrq.sq_task_skip(tid)
-                continue
-
-            tocheck.add(tid)
-
-        valid = rq.validate_hashes(tocheck, cooker.data, len(stamppresent), False)
-
-        valid_new = stamppresent
-        for v in valid:
-            valid_new.append(v)
-
-        hashes = {}
-        for mc in sorted(multiconfigs):
-          for tid in sorted(sqdata.sq_revdeps):
             if mc_from_tid(tid) != mc:
                 continue
-            if tid not in valid_new and tid not in noexec and tid not in sqrq.scenequeue_notcovered:
-                sqdata.outrightfail.add(tid)
+            if tid in sqdata.stamppresent:
+                continue
+            if tid in sqdata.valid:
+                continue
+            if tid in sqdata.noexec:
+                continue
+            if tid in sqrq.scenequeue_notcovered:
+                continue
+            sqdata.outrightfail.add(tid)
 
-                h = pending_hash_index(tid, rqdata)
-                if h not in hashes:
-                    hashes[h] = tid
-                else:
-                    sqrq.sq_deferred[tid] = hashes[h]
-                    bb.warn("Deferring %s after %s" % (tid, hashes[h]))
+            h = pending_hash_index(tid, rqdata)
+            if h not in sqdata.hashes:
+                sqdata.hashes[h] = tid
+            else:
+                sqrq.sq_deferred[tid] = sqdata.hashes[h]
+                bb.warn("Deferring %s after %s" % (tid, sqdata.hashes[h]))
 
 
 class TaskFailure(Exception):

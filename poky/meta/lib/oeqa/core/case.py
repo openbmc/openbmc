@@ -59,7 +59,7 @@ class OEPTestResultTestCase:
     """
     @staticmethod
     def _compress_log(log):
-        logdata = log.encode("utf-8")
+        logdata = log.encode("utf-8") if isinstance(log, str) else log
         logdata = zlib.compress(logdata)
         logdata = base64.b64encode(logdata).decode("utf-8")
         return {"compressed" : logdata}
@@ -80,7 +80,7 @@ class OEPTestResultTestCase:
         if log is not None:
             sections[section]["log"] = self._compress_log(log)
         elif logfile is not None:
-            with open(logfile, "r") as f:
+            with open(logfile, "rb") as f:
                 sections[section]["log"] = self._compress_log(f.read())
 
         if duration is not None:

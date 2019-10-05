@@ -32,9 +32,11 @@ def oe_import(d):
 
     import oe.data
     for toimport in oe.data.typed_value("OE_IMPORTS", d):
-        imported = __import__(toimport)
-        inject(toimport.split(".", 1)[0], imported)
-
+        try:
+            imported = __import__(toimport)
+            inject(toimport.split(".", 1)[0], imported)
+        except AttributeError as e:
+            bb.error("Error importing OE modules: %s" % str(e))
     return ""
 
 # We need the oe module name space early (before INHERITs get added)
