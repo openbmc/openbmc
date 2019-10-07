@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend_runbmc-nuvoton += "${THISDIR}/${PN}:"
+FILESEXTRAPATHS_prepend_runbmc-nuvoton := "${THISDIR}/${PN}:"
 
 SRC_URI_append_runbmc-nuvoton = " file://config-runbmc-nuvoton.json"
 SRC_URI_append_runbmc-nuvoton = " file://fan-full-speed.sh"
