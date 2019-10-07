@@ -14,7 +14,9 @@ DEPENDS += "virtual/libx11 virtual/libgl libxcb xcb-util-keysyms vim-native"
 
 RDEPENDS_${PN} = "libxcb xcb-util-keysyms"
 
-inherit cmake python3native
+inherit cmake python3native distro_features_check
+
+REQUIRED_DISTRO_FEATURES = "x11"
 
 python __anonymous () {
     # only works on glibc systems

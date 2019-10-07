@@ -19,7 +19,7 @@ HOMEPAGE = "http://www.zabbix.com/"
 SECTION = "Applications/Internet"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=300e938ad303147fede2294ed78fe02e"
-DEPENDS  = "openldap virtual/libiconv"
+DEPENDS  = "libevent libpcre openldap virtual/libiconv zlib"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
@@ -28,8 +28,8 @@ SRC_URI = "http://jaist.dl.sourceforge.net/project/zabbix/ZABBIX%20Latest%20Stab
     file://zabbix-agent.service \
 "
 
-SRC_URI[md5sum] = "489d21b464277c0d412155c7e5611a8f"
-SRC_URI[sha256sum] = "4445f26c025009681c29c9b350aa6c4ee7b124ddcaf1609ae36c55997bcb8cf2"
+SRC_URI[md5sum] = "6cd55cd743d416d9ffbf2e6fdee680ee"
+SRC_URI[sha256sum] = "646b1f29a768e3123a00a9afadf382b4d0dfd54e20fb31023f0d6da066da0864"
 
 inherit autotools-brokensep linux-kernel-base pkgconfig systemd useradd
 
@@ -55,8 +55,12 @@ EXTRA_OECONF = " \
     --with-unixodbc \
     --with-ssh2 \
     --with-sqlite3 \
+    --with-zlib \
+    --with-libpthread \
+    --with-libevent \
+    --with-libpcre \
 "
-CFLAGS_append = " -lldap -llber"
+CFLAGS_append = " -lldap -llber -pthread"
 
 do_configure_prepend() {
     export KERNEL_VERSION="${KERNEL_VERSION}"

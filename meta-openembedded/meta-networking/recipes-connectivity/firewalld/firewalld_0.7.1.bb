@@ -6,20 +6,20 @@ LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRC_URI = "https://github.com/${BPN}/${BPN}/releases/download/v${PV}/${BP}.tar.gz \
-           file://0001-fix-building-in-a-separate-directory-outside-the-sou.patch \
            file://firewalld.init \
 "
-SRC_URI[md5sum] = "e63bdd65a4d2f6338f60b31e91bb5525"
-SRC_URI[sha256sum] = "5a82a72fd9ad4cbbfb805bae615faa9b91a27855245de0fef3bcb06439394852"
+SRC_URI[md5sum] = "32c16df3f6cc859d0df627baf5ee8401"
+SRC_URI[sha256sum] = "88bc63a011209ac046fb5d7bfc73ddcc0bc616ddf3013bbb6bf1a421cb497f76"
 
 # glib-2.0-native is needed for GSETTINGS_RULES autoconf macro from gsettings.m4
-# xmlto-native is needed to populate /etc/xml/catalog.xml in the sysroot so that xsltproc finds the docbook xslt
-DEPENDS = "intltool-native glib-2.0-native libxslt-native docbook-xsl-stylesheets-native xmlto-native"
+DEPENDS = "intltool-native glib-2.0-native libxslt-native docbook-xsl-stylesheets-native"
 
 inherit gettext autotools bash-completion python3native gsettings systemd update-rc.d
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
-PACKAGECONFIG[systemd] = "--with-systemd-unitdir=${systemd_unitdir}/system/,--disable-systemd"
+PACKAGECONFIG[systemd] = "--with-systemd-unitdir=${systemd_system_unitdir},--disable-systemd"
+
+PACKAGES += "${PN}-zsh-completion"
 
 # iptables, ip6tables, ebtables, and ipset *should* be unnecessary
 # when the nftables backend is available, because nftables supersedes all of them.
@@ -37,10 +37,11 @@ EXTRA_OECONF = "\
     --without-ebtables \
     --without-ebtables-restore \
     --disable-sysconfig \
+    --with-xml-catalog=${STAGING_ETCDIR_NATIVE}/xml/catalog \
 "
 
 INITSCRIPT_NAME = "firewalld"
-SYSTEMD_SERVICE = "firewalld.service"
+SYSTEMD_SERVICE_${PN} = "firewalld.service"
 
 do_install_append() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
@@ -65,9 +66,11 @@ do_install_append() {
 
 FILES_${PN} += "\
     ${PYTHON_SITEPACKAGES_DIR}/firewall \
+    ${datadir}/dbus-1 \
     ${datadir}/polkit-1 \
     ${datadir}/metainfo \
 "
+FILES_${PN}-zsh-completion = "${datadir}/zsh/site-functions"
 
 RDEPENDS_${PN} = "\
     nftables \

@@ -13,7 +13,7 @@ SRC_URI = "git://github.com/jpirko/libteam \
            file://0001-team_basic_test.py-disable-RedHat-specific-test.patch \
            file://run-ptest \
            "
-SRCREV = "903950c7fcf28c32f4b62d9d1c07c0234e8378a2"
+SRCREV = "e897f02bf2403d4859a99e090e34ea768b4c0540"
 
 S = "${WORKDIR}/git"
 

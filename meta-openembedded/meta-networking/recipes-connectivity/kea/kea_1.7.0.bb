@@ -59,3 +59,5 @@ FILES_${PN}-staticdev += "${libdir}/kea/hooks/*.a ${libdir}/hooks/*.a"
 FILES_${PN} += "${libdir}/hooks/*.so"
 
 BBCLASSEXTEND += "native"
+
+PARALLEL_MAKEINST = ""
