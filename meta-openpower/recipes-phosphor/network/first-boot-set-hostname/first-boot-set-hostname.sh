@@ -81,4 +81,4 @@ sync_hostname() {
 
 sync_hostname
 
-systemctl disable first-boot-set-hostname.service
+systemctl --no-reload disable first-boot-set-hostname.service

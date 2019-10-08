@@ -79,4 +79,4 @@ fi
 
 sync_mac $1
 
-systemctl disable first-boot-set-mac@${1}.service
+systemctl --no-reload disable first-boot-set-mac@${1}.service
