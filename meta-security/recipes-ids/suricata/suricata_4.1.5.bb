@@ -4,8 +4,6 @@ require suricata.inc
 
 LIC_FILES_CHKSUM = "file://LICENSE;beginline=1;endline=2;md5=c70d8d3310941dcdfcd1e02800a1f548"
 
-SRC_URI += "file://emerging.rules.tar.gz;name=rules"
-
 SRC_URI += " \
     file://volatiles.03_suricata \
     file://suricata.yaml \
@@ -13,9 +11,6 @@ SRC_URI += " \
     file://run-ptest \
     file://0001-af-packet-fix-build-on-recent-Linux-kernels.patch \
     "
-
-SRC_URI[rules.md5sum] = "205c5e5b54e489207ed892c03ad75b33"
-SRC_URI[rules.sha256sum] = "4aa81011b246875a57181c6a0569ca887845e366904bcaf0043220f33bd69798"
 
 inherit autotools-brokensep pkgconfig python3-dir systemd ptest
 
