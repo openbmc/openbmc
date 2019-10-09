@@ -297,6 +297,19 @@ actions:
           - property
           - defevents
           - altevents
+    - name: update_default_floor
+      description: >
+          Update the default fan floor to the given speed
+      parameters:
+          - property
+          - speed
+    - name: use_events_on_state
+      description: >
+          Use a set of events when all the group properties are at a given
+          state, otherwise remove the events
+      parameters:
+          - property
+          - events
 
 events:
     - name: default_fan_floor_on_service_fail
@@ -358,6 +371,222 @@ events:
                   speed:
                       value: 10500
                       type: uint64_t
+    - name: set_speed_boundaries_based_on_ambient
+      groups:
+          - name: zone0_control_mode
+            interface: xyz.openbmc_project.Control.ThermalMode
+            property:
+                name: Current
+                type: std::string
+      triggers:
+          - name: init
+            method: getProperties
+            handler: setProperty
+          - name: signal
+            signal: propertiesChanged
+            handler: setProperty
+      actions:
+          - name: update_default_floor
+            property:
+                value: DEFAULT
+                type: std::string
+            speed:
+                value: 8000
+                type: uint64_t
+          - name: update_default_floor
+            property:
+                value: CUSTOM
+                type: std::string
+            speed:
+                value: 8000
+                type: uint64_t
+          - name: update_default_floor
+            property:
+                value: HEAVY_IO
+                type: std::string
+            speed:
+                value: 10500
+                type: uint64_t
+          - name: update_default_floor
+            property:
+                value: MAX_BASE_FAN_FLOOR
+                type: std::string
+            speed:
+                value: 10500
+                type: uint64_t
+          - name: use_events_on_state
+            property:
+                value: DEFAULT
+                type: std::string
+            events:
+                - name: default_fan_speed_boundaries
+                  groups:
+                      - name: zone0_ambient
+                        zone_conditions:
+                            - name: air_cooled_chassis
+                              zones:
+                                  - 0
+                        interface: xyz.openbmc_project.Sensor.Value
+                        property:
+                            name: Value
+                            type: int64_t
+                  triggers:
+                      - name: init
+                        method: getProperties
+                        handler: setProperty
+                      - name: signal
+                        signal: propertiesChanged
+                        handler: setProperty
+                  actions:
+                      - name: set_floor_from_average_sensor_value
+                        map:
+                            value:
+                                - 27000: 3500
+                                - 32000: 4600
+                                - 37000: 5200
+                                - 40000: 5800
+                            type: std::map<int64_t, uint64_t>
+                      - name: set_ceiling_from_average_sensor_value
+                        map:
+                            value:
+                                - 25000: 7200
+                                - 27000: 10500
+                            type: std::map<int64_t, uint64_t>
+                - name: default_fan_speed_boundaries
+                  groups:
+                      - name: zone0_ambient
+                        zone_conditions:
+                            - name: water_and_air_cooled_chassis
+                              zones:
+                                  - 0
+                        interface: xyz.openbmc_project.Sensor.Value
+                        property:
+                            name: Value
+                            type: int64_t
+                  triggers:
+                      - name: init
+                        method: getProperties
+                        handler: setProperty
+                      - name: signal
+                        signal: propertiesChanged
+                        handler: setProperty
+                  actions:
+                      - name: set_floor_from_average_sensor_value
+                        map:
+                            value:
+                                - 27000: 3000
+                                - 32000: 4300
+                                - 37000: 5000
+                                - 40000: 5800
+                            type: std::map<int64_t, uint64_t>
+                      - name: set_ceiling_from_average_sensor_value
+                        map:
+                            value:
+                                - 25000: 7200
+                                - 27000: 10500
+                            type: std::map<int64_t, uint64_t>
+          - name: use_events_on_state
+            property:
+                value: CUSTOM
+                type: std::string
+            events:
+                - name: custom_fan_speed_boundaries
+                  groups:
+                      - name: zone0_ambient
+                        interface: xyz.openbmc_project.Sensor.Value
+                        property:
+                            name: Value
+                            type: int64_t
+                  triggers:
+                      - name: init
+                        method: getProperties
+                        handler: setProperty
+                      - name: signal
+                        signal: propertiesChanged
+                        handler: setProperty
+                  actions:
+                      - name: set_floor_from_average_sensor_value
+                        map:
+                            value:
+                                - 27000: 4600
+                                - 32000: 5000
+                                - 37000: 5400
+                                - 40000: 5800
+                            type: std::map<int64_t, uint64_t>
+                      - name: set_ceiling_from_average_sensor_value
+                        map:
+                            value:
+                                - 25000: 7200
+                                - 27000: 10500
+                            type: std::map<int64_t, uint64_t>
+          - name: use_events_on_state
+            property:
+                value: HEAVY_IO
+                type: std::string
+            events:
+                - name: heavy_io_fan_speed_boundaries
+                  groups:
+                      - name: zone0_ambient
+                        interface: xyz.openbmc_project.Sensor.Value
+                        property:
+                            name: Value
+                            type: int64_t
+                  triggers:
+                      - name: init
+                        method: getProperties
+                        handler: setProperty
+                      - name: signal
+                        signal: propertiesChanged
+                        handler: setProperty
+                  actions:
+                      - name: set_floor_from_average_sensor_value
+                        map:
+                            value:
+                                - 27000: 5900
+                                - 32000: 6800
+                                - 37000: 7500
+                                - 40000: 8200
+                            type: std::map<int64_t, uint64_t>
+                      - name: set_ceiling_from_average_sensor_value
+                        map:
+                            value:
+                                - 25000: 7200
+                                - 27000: 10500
+                            type: std::map<int64_t, uint64_t>
+          - name: use_events_on_state
+            property:
+                value: MAX_BASE_FAN_FLOOR
+                type: std::string
+            events:
+                - name: max_base_fan_floor_fan_speed_boundaries
+                  groups:
+                      - name: zone0_ambient
+                        interface: xyz.openbmc_project.Sensor.Value
+                        property:
+                            name: Value
+                            type: int64_t
+                  triggers:
+                      - name: init
+                        method: getProperties
+                        handler: setProperty
+                      - name: signal
+                        signal: propertiesChanged
+                        handler: setProperty
+                  actions:
+                      - name: set_floor_from_average_sensor_value
+                        map:
+                            value:
+                                - 27000: 7200
+                                - 32000: 8800
+                                - 37000: 9600
+                                - 40000: 10500
+                            type: std::map<int64_t, uint64_t>
+                      - name: set_ceiling_from_average_sensor_value
+                        map:
+                            value:
+                                - 25000: 7200
+                                - 27000: 10500
+                            type: std::map<int64_t, uint64_t>
     - name: full_speed_at_power_on
       precondition:
           name: property_states_match
@@ -448,130 +677,6 @@ events:
                     speed:
                         value: 10500
                         type: uint64_t
-            - name: set_air_cooled_speed_boundaries_based_on_ambient
-              groups:
-                  - name: zone0_control_mode
-                    zone_conditions:
-                        - name: air_cooled_chassis
-                          zones:
-                              - 0
-                    interface: xyz.openbmc_project.Control.ThermalMode
-                    property:
-                        name: Current
-                        type: std::string
-              triggers:
-                  - name: init
-                    method: getProperties
-                    handler: setProperty
-                  - name: signal
-                    signal: propertiesChanged
-                    handler: setProperty
-              actions:
-                  - name: use_alternate_events_on_state
-                    property:
-                        value: CUSTOM
-                        type: std::string
-                    defevents:
-                        - name: default_floor_boundary
-                          groups:
-                              - name: zone0_ambient
-                                zone_conditions:
-                                    - name: air_cooled_chassis
-                                      zones:
-                                          - 0
-                                interface: xyz.openbmc_project.Sensor.Value
-                                property:
-                                    name: Value
-                                    type: int64_t
-                          triggers:
-                              - name: init
-                                method: getProperties
-                                handler: setProperty
-                              - name: signal
-                                signal: propertiesChanged
-                                handler: setProperty
-                          actions:
-                              - name: set_floor_from_average_sensor_value
-                                map:
-                                    value:
-                                        - 27000: 3500
-                                        - 32000: 4600
-                                        - 37000: 5200
-                                        - 40000: 5800
-                                    type: std::map<int64_t, uint64_t>
-                              - name: set_ceiling_from_average_sensor_value
-                                map:
-                                    value:
-                                        - 25000: 7200
-                                        - 27000: 10500
-                                    type: std::map<int64_t, uint64_t>
-                    altevents:
-                        - name: alternate_floor_boundary
-                          groups:
-                              - name: zone0_ambient
-                                zone_conditions:
-                                    - name: air_cooled_chassis
-                                      zones:
-                                          - 0
-                                interface: xyz.openbmc_project.Sensor.Value
-                                property:
-                                    name: Value
-                                    type: int64_t
-                          triggers:
-                              - name: init
-                                method: getProperties
-                                handler: setProperty
-                              - name: signal
-                                signal: propertiesChanged
-                                handler: setProperty
-                          actions:
-                              - name: set_floor_from_average_sensor_value
-                                map:
-                                    value:
-                                        - 27000: 4600
-                                        - 32000: 5000
-                                        - 37000: 5400
-                                        - 40000: 5800
-                                    type: std::map<int64_t, uint64_t>
-                              - name: set_ceiling_from_average_sensor_value
-                                map:
-                                    value:
-                                        - 25000: 7200
-                                        - 27000: 10500
-                                    type: std::map<int64_t, uint64_t>
-            - name: set_water_cooled_speed_boundaries_based_on_ambient
-              groups:
-                  - name: zone0_ambient
-                    zone_conditions:
-                        - name: water_and_air_cooled_chassis
-                          zones:
-                              - 0
-                    interface: xyz.openbmc_project.Sensor.Value
-                    property:
-                        name: Value
-                        type: int64_t
-              triggers:
-                  - name: init
-                    method: getProperties
-                    handler: setProperty
-                  - name: signal
-                    signal: propertiesChanged
-                    handler: setProperty
-              actions:
-                  - name: set_floor_from_average_sensor_value
-                    map:
-                        value:
-                            - 27000: 3000
-                            - 32000: 4300
-                            - 37000: 5000
-                            - 40000: 5800
-                        type: std::map<int64_t, uint64_t>
-                  - name: set_ceiling_from_average_sensor_value
-                    map:
-                        value:
-                            - 25000: 7200
-                            - 27000: 10500
-                        type: std::map<int64_t, uint64_t>
     - name: occ_active_speed_changes
       precondition:
           name: property_states_match
