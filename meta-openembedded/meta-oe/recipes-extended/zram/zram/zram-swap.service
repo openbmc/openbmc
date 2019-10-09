@@ -1,0 +1,10 @@
+[Unit]
+Description=Create compressed swap in memory using zram
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+TimeoutStartSec=30sec
+ExecStart=@LIBEXECDIR@/zram-swap-init /dev/zram0
+ExecStop=@LIBEXECDIR@/zram-swap-deinit /dev/zram0

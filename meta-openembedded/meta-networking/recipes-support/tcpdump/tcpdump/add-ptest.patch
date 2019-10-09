@@ -1,18 +1,19 @@
-From 8ee1ab1ac89557d48ac1ab7ddcc3c51be9b734ad Mon Sep 17 00:00:00 2001
+From 8c9c728757f89ebe6c4019114b83a63c63596f69 Mon Sep 17 00:00:00 2001
 From: "Hongjun.Yang" <hongjun.yang@windriver.com>
-Date: Wed, 22 Oct 2014 10:02:48 +0800
+Date: Wed, 2 Oct 2019 16:57:06 -0400
 Subject: [PATCH] Add ptest for tcpdump
 
 Upstream-Status: Pending
 
 Signed-off-by: Hongjun.Yang <hongjun.yang@windriver.com>
+Signed-off-by: Peiran Hong <peiran.hong@windriver.com>
 
 ---
  Makefile.in | 10 +++++++++-
  1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/Makefile.in b/Makefile.in
-index 0941f0e..3ce40c6 100644
+index 3b589184..7b10e38c 100644
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -437,9 +437,17 @@ distclean:
@@ -23,7 +24,7 @@ index 0941f0e..3ce40c6 100644
 +buildtest-TESTS: tcpdump
 +
 +runtest-PTEST:
- 	(cd tests && ./TESTrun.sh)
+	(mkdir -p tests && SRCDIR=`cd ${srcdir}; pwd` && export SRCDIR && $$SRCDIR/tests/TESTrun.sh )
  
 +install-ptest:
 +	cp -r tests                     $(DESTDIR)

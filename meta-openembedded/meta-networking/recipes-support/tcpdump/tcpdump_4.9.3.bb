@@ -6,17 +6,21 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=1d4b0366557951c84a94fabe3529f867"
 
 DEPENDS = "libpcap"
 
+RDEPENDS_${PN}-ptest += " make perl \
+	perl-module-file-basename \
+	perl-module-posix \
+	perl-module-carp"
+
 SRC_URI = " \
     http://www.tcpdump.org/release/${BP}.tar.gz \
     file://unnecessary-to-check-libpcap.patch \
     file://avoid-absolute-path-when-searching-for-libdlpi.patch \
     file://add-ptest.patch \
     file://run-ptest \
-    file://0001-CVE-2017-16808-AoE-Add-a-missing-bounds-check.patch \
 "
 
-SRC_URI[md5sum] = "9bbc1ee33dab61302411b02dd0515576"
-SRC_URI[sha256sum] = "798b3536a29832ce0cbb07fafb1ce5097c95e308a6f592d14052e1ef1505fe79"
+SRC_URI[md5sum] = "a4ead41d371f91aa0a2287f589958bae"
+SRC_URI[sha256sum] = "2cd47cb3d460b6ff75f4a9940f594317ad456cfbf2bd2c8e5151e16559db6410"
 
 inherit autotools-brokensep ptest
 
@@ -25,6 +29,8 @@ PACKAGECONFIG ?= "openssl"
 PACKAGECONFIG[libcap-ng] = "--with-cap-ng,--without-cap-ng,libcap-ng"
 PACKAGECONFIG[openssl] = "--with-crypto,--without-openssl --without-crypto,openssl"
 PACKAGECONFIG[smi] = "--with-smi,--without-smi,libsmi"
+# Note: CVE-2018-10103 (SMB - partially fixed, but SMB printing disabled)
+PACKAGECONFIG[smb] = "--enable-smb,--disable-smb"
 
 EXTRA_AUTORECONF += "-I m4"
 

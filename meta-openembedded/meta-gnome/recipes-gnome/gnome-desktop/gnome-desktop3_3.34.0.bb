@@ -14,8 +14,8 @@ inherit gnomebase pkgconfig upstream-version-is-even gobject-introspection distr
 REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
 UNKNOWN_CONFIGURE_WHITELIST_append = " introspection"
 
-SRC_URI[archive.md5sum] = "e423ed6d648c6c4f9798fa9cd9ea8d99"
-SRC_URI[archive.sha256sum] = "a6393dc5fc29fc0652ac84c73b3da205d0b0168128c4cf6d27797a08f3d07b54"
+SRC_URI[archive.md5sum] = "3149bbd12eaf6f4420b1a999131ec470"
+SRC_URI[archive.sha256sum] = "8d331ee655c1d56b2b97562a07c7a7598ff6706a11ff1cdce97423ebc6b62426"
 
 SRC_URI += " \
     file://gnome-desktop-thumbnail-don-t-assume-time_t-is-long.patch \

@@ -38,6 +38,7 @@ S = "${WORKDIR}/git"
 
 LDFLAGS_append_powerpc = " -latomic"
 LDFLAGS_append_mipsarch = " -latomic"
+LDFLAGS_append_armv5 = " -latomic"
 
 EXTRA_OECONF = " --enable-strict-dependencies \
         --with-docdir=${docdir}/freeradius-${PV} \

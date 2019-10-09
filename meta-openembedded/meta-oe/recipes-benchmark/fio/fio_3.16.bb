@@ -10,7 +10,7 @@ SECTION = "console/tests"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-DEPENDS = "libaio zlib"
+DEPENDS = "libaio zlib coreutils-native"
 RDEPENDS_${PN} = "python bash"
 
 PACKAGECONFIG_NUMA = "numa"
@@ -24,6 +24,7 @@ PACKAGECONFIG[numa] = ",--disable-numa,numactl"
 SRCREV = "92f75708b530989fdb13b50be6604f44b80d038d"
 SRC_URI = "git://git.kernel.dk/fio.git \
           file://0001-update-the-interpreter-paths.patch \
+          file://0001-arch-arm-Consider-armv7ve-arch-as-well.patch \
 "
 
 S = "${WORKDIR}/git"

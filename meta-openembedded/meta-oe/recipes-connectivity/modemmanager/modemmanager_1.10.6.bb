@@ -14,8 +14,8 @@ DEPENDS = "glib-2.0 libgudev intltool-native libxslt-native"
 SRC_URI = "http://www.freedesktop.org/software/ModemManager/ModemManager-${PV}.tar.xz \
            "
 
-SRC_URI[md5sum] = "dad80b3b4f27c1d6eae7e019542338be"
-SRC_URI[sha256sum] = "bbcf6da35da3d72f688675bde91dfed6485845c3fedd1805ae914b71d1b783f2"
+SRC_URI[md5sum] = "7452a94f0d1ca361ae51ff1d287c53f5"
+SRC_URI[sha256sum] = "3c2ca73782215664141042422759899ca9846440fc26d6223c7cf7ea4dd3c996"
 
 S = "${WORKDIR}/ModemManager-${PV}"
 

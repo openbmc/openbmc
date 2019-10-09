@@ -11,20 +11,21 @@ DEPENDS_append_class-target = " googletest grpc-native "
 DEPENDS_append_class-nativesdk = " grpc-native "
 
 S = "${WORKDIR}/git"
-SRCREV = "08fd59f039c7cf62614ab7741b3f34527af103c7"
-BRANCH = "v1.22.x"
-SRC_URI = "git://github.com/grpc/grpc.git;protocol=https;branch=${BRANCH} \
+SRCREV_grpc = "fe494ff4104b6f6a78117ab2da71d29c93053267"
+SRCREV_upb = "9effcbcb27f0a665f9f345030188c0b291e32482"
+BRANCH = "v1.24.x"
+SRC_URI = "git://github.com/grpc/grpc.git;protocol=https;name=grpc;branch=${BRANCH} \
+           git://github.com/protocolbuffers/upb;name=upb;destsuffix=git/third_party/upb \
            file://0001-CMakeLists.txt-Fix-libraries-installation-for-Linux.patch \
            "
 SRC_URI_append_class-target = " file://0001-CMakeLists.txt-Fix-grpc_cpp_plugin-path-during-cross.patch \
-                                file://0001-Define-gettid-only-for-glibc-2.30.patch \
                                "
 SRC_URI_append_class-nativesdk = " file://0001-CMakeLists.txt-Fix-grpc_cpp_plugin-path-during-cross.patch"
 
 # Fixes build with older compilers 4.8 especially on ubuntu 14.04
 CXXFLAGS_append_class-native = " -Wl,--no-as-needed"
 
-inherit cmake
+inherit cmake pkgconfig
 
 EXTRA_OECMAKE = " \
     -DgRPC_CARES_PROVIDER=package \
@@ -36,6 +37,10 @@ EXTRA_OECMAKE = " \
     -DCMAKE_CROSSCOMPILING=ON \
     -DBUILD_SHARED_LIBS=ON \
     "
+
+do_configure_prepend_mipsarch() {
+    sed -i -e "s/set(_gRPC_ALLTARGETS_LIBRARIES \${CMAKE_DL_LIBS} rt m pthread)/set(_gRPC_ALLTARGETS_LIBRARIES \${CMAKE_DL_LIBS} atomic rt m pthread)/g" ${S}/CMakeLists.txt
+}
 
 BBCLASSEXTEND = "native nativesdk"
 

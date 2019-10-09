@@ -3,8 +3,8 @@ HOMEPAGE = "http://sourceforge.net/projects/log4cpp/"
 LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=7fbc338309ac38fefcd64b04bb903e34"
 
-RC = "rc5"
-SRC_URI = "http://downloads.sourceforge.net/${BPN}/${BP}${RC}.tar.gz \
+PRC = "rc5"
+SRC_URI = "http://downloads.sourceforge.net/${BPN}/${BP}${PRC}.tar.gz \
            file://fix-pc.patch;striplevel=2 \
           "
 SRC_URI[md5sum] = "58b4591a2f3e7ef3d5e3e7cfb3a81a62"

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+for i in $(grep '^/dev/zram' /proc/swaps | awk '{ print $1 }'); do
+	swapoff "$i" && zramctl --reset "$i"
+done

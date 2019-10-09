@@ -7,6 +7,13 @@ URI: git://github.com/openembedded/openembedded-core.git
 branch: master
 revision: HEAD
 
+luajit recipe requires host compiler to be able to generate 32bit code when target is 32bit
+e.g. arm, so ensure that $CC -m32 is functional on build host, if building this recipe, needed
+packages to fullfit this might have different names on different host distributions
+e.g. on archlinux based distributions install prerequisites like below
+
+pacman -S lib32-gcc-libs lib32-glibc
+
 Send pull requests to openembedded-devel@lists.openembedded.org with '[meta-oe]' in the subject'
 
 When sending single patches, please use something like:

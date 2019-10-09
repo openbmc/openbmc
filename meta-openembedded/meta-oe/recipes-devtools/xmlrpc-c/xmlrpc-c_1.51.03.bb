@@ -15,7 +15,6 @@ SRCREV = "343a3b98e54999d67edb644bcd395aa9784fb16e"
 S = "${WORKDIR}/git/stable"
 
 DEPENDS = "libxml2"
-RDEPENDS_${PN} = "perl"
 
 inherit autotools-brokensep binconfig pkgconfig
 

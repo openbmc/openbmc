@@ -14,10 +14,10 @@ S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/pmem/pmdk.git \
            file://0001-jemalloc-jemalloc.cfg-Specify-the-host-when-building.patch \
            file://0002-Makefile-Don-t-install-the-docs.patch \
-           file://0003-Makefile-Don-t-build-the-examples.patch \
+           file://0001-os_posix-Use-__FreeBSD__-to-control-secure_getenv-de.patch \
           "
 
-SRCREV = "695e6eba28c53a69a0ef7bad3cc0f45c21ef3e00"
+SRCREV = "bc5e309485df61c452d08367e4b13ba9dfed5071"
 
 inherit autotools-brokensep pkgconfig
 
@@ -26,7 +26,7 @@ inherit autotools-brokensep pkgconfig
 # | If you meant to cross compile, use `--host'.
 #
 # Also fix #warning _FORTIFY_SOURCE requires compiling with optimization (-O) [-Werror=cpp]
-EXTRA_OEMAKE = "HOST_SYS='${HOST_SYS}' EXTRA_CFLAGS='${SELECTED_OPTIMIZATION}' LIB_PREFIX=${baselib}"
+EXTRA_OEMAKE = "BUILD_EXAMPLES='n' HOST_SYS='${HOST_SYS}' EXTRA_CFLAGS='${SELECTED_OPTIMIZATION}' LIB_PREFIX=${baselib}"
 
 # Fix the missing fts libs when using musl
 EXTRA_OEMAKE_append_libc-musl = " EXTRA_LIBS='-lfts'"

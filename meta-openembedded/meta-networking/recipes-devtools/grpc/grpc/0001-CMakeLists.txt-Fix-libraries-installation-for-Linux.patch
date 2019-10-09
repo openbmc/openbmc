@@ -29,7 +29,7 @@ Signed-off-by: Alexey Firago <alexey_firago@mentor.com>
  set(gRPC_INSTALL_BINDIR "bin" CACHE STRING "Installation directory for executables")
  set(gRPC_INSTALL_LIBDIR "lib" CACHE STRING "Installation directory for libraries")
  set(gRPC_INSTALL_INCLUDEDIR "include" CACHE STRING "Installation directory for headers")
-@@ -769,6 +778,10 @@ if(WIN32 AND MSVC)
+@@ -777,6 +786,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -51,7 +51,7 @@ Signed-off-by: Alexey Firago <alexey_firago@mentor.com>
  
  target_include_directories(gpr
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -1333,6 +1350,10 @@ if(WIN32 AND MSVC)
+@@ -1367,6 +1384,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -62,7 +62,7 @@ Signed-off-by: Alexey Firago <alexey_firago@mentor.com>
  
  target_include_directories(grpc
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -1731,6 +1752,10 @@ if(WIN32 AND MSVC)
+@@ -1782,6 +1803,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -73,7 +73,7 @@ Signed-off-by: Alexey Firago <alexey_firago@mentor.com>
  
  target_include_directories(grpc_cronet
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -2744,6 +2769,10 @@ if(WIN32 AND MSVC)
+@@ -2869,6 +2894,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -84,7 +84,7 @@ Signed-off-by: Alexey Firago <alexey_firago@mentor.com>
  
  target_include_directories(grpc_unsecure
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -3083,6 +3112,10 @@ if(WIN32 AND MSVC)
+@@ -3206,6 +3235,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -95,18 +95,7 @@ Signed-off-by: Alexey Firago <alexey_firago@mentor.com>
  
  target_include_directories(grpc++
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -3703,6 +3736,10 @@ if(WIN32 AND MSVC)
-   endif()
- endif()
- 
-+if(_gRPC_PLATFORM_LINUX)
-+  set_property(TARGET grpc++_cronet PROPERTY VERSION ${CPP_VERSION})
-+  set_property(TARGET grpc++_cronet PROPERTY SOVERSION ${CPP_VERSION_MAJOR})
-+endif()
- 
- target_include_directories(grpc++_cronet
-   PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -4013,6 +4050,11 @@ protobuf_generate_grpc_cpp(
+@@ -3589,6 +3622,11 @@ protobuf_generate_grpc_cpp(
    src/proto/grpc/status/status.proto
  )
  
@@ -118,7 +107,7 @@ Signed-off-by: Alexey Firago <alexey_firago@mentor.com>
  target_include_directories(grpc++_error_details
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
-@@ -4147,6 +4189,11 @@ protobuf_generate_grpc_cpp(
+@@ -3727,6 +3765,11 @@ protobuf_generate_grpc_cpp(
    src/proto/grpc/reflection/v1alpha/reflection.proto
  )
  
@@ -130,7 +119,18 @@ Signed-off-by: Alexey Firago <alexey_firago@mentor.com>
  target_include_directories(grpc++_reflection
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
-@@ -4704,6 +4751,10 @@ if(WIN32 AND MSVC)
+@@ -3816,6 +3859,10 @@ target_link_libraries(grpc++_test_config
+   ${_gRPC_GFLAGS_LIBRARIES}
+ )
+ 
++if(_gRPC_PLATFORM_LINUX)
++  set_property(TARGET grpc++_cronet PROPERTY VERSION ${CPP_VERSION})
++  set_property(TARGET grpc++_cronet PROPERTY SOVERSION ${CPP_VERSION_MAJOR})
++endif()
+ 
+ endif (gRPC_BUILD_TESTS)
+ if (gRPC_BUILD_TESTS)
+@@ -4307,6 +4354,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -141,7 +141,7 @@ Signed-off-by: Alexey Firago <alexey_firago@mentor.com>
  
  target_include_directories(grpc++_unsecure
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -5124,6 +5175,10 @@ if(WIN32 AND MSVC)
+@@ -4745,6 +4796,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  
@@ -152,7 +152,7 @@ Signed-off-by: Alexey Firago <alexey_firago@mentor.com>
  
  target_include_directories(grpc_plugin_support
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-@@ -5190,6 +5245,11 @@ protobuf_generate_grpc_cpp(
+@@ -4813,6 +4868,11 @@ protobuf_generate_grpc_cpp(
    src/proto/grpc/channelz/channelz.proto
  )
  
@@ -164,7 +164,7 @@ Signed-off-by: Alexey Firago <alexey_firago@mentor.com>
  target_include_directories(grpcpp_channelz
    PUBLIC $<INSTALL_INTERFACE:${gRPC_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
-@@ -5728,6 +5788,10 @@ if(WIN32 AND MSVC)
+@@ -5367,6 +5427,10 @@ if(WIN32 AND MSVC)
    endif()
  endif()
  

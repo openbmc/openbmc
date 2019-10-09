@@ -3,7 +3,7 @@ LICENSE = "SSPL-1 & Apache-2.0 & Zlib"
 LIC_FILES_CHKSUM = "file://LICENSE-Community.txt;md5=3a865f27f11f43ecbe542d9ea387dcf1 \
                     file://APACHE-2.0.txt;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
-DEPENDS = "openssl libpcre libpcap zlib boost curl python3 \
+DEPENDS = "openssl libpcap zlib boost curl python3 \
            python3-setuptools-native \
            python3-pyyaml-native python3-cheetah-native \
            python3-psutil-native python3-regex-native \
@@ -38,7 +38,7 @@ S = "${WORKDIR}/git"
 
 COMPATIBLE_HOST ?= '(x86_64|powerpc64|aarch64).*-linux'
 
-PACKAGECONFIG ??= "tcmalloc"
+PACKAGECONFIG ??= "tcmalloc system-pcre"
 # gperftools compilation fails for arm below v7 because of missing support of
 # dmb operation. So we use system-allocator instead of tcmalloc
 PACKAGECONFIG_remove_armv6 = "tcmalloc"
@@ -46,6 +46,7 @@ PACKAGECONFIG_remove_libc-musl = "tcmalloc"
 
 PACKAGECONFIG[tcmalloc] = "--use-system-tcmalloc,--allocator=system,gperftools,"
 PACKAGECONFIG[shell] = ",--js-engine=none,,"
+PACKAGECONFIG[system-pcre] = "--use-system-pcre,,libpcre,"
 
 EXTRA_OESCONS = "--prefix=${D}${prefix} \
                  LIBPATH=${STAGING_LIBDIR} \
@@ -54,7 +55,6 @@ EXTRA_OESCONS = "--prefix=${D}${prefix} \
                  TARGET_ARCH=${TARGET_ARCH} \
                  --ssl \
                  --disable-warnings-as-errors \
-                 --use-system-pcre \
                  --use-system-zlib \
                  --nostrip \
                  --endian=${@oe.utils.conditional('SITEINFO_ENDIANNESS', 'le', 'little', 'big', d)} \

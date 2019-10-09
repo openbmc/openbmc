@@ -15,15 +15,16 @@ Upstream-Status: Inappropriate [OE specific]
 
 Signed-off-by: Roy Li <rongqing.li@windriver.com>
 Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+Signed-off-by: Peiran Hong <peiran.hong@windriver.com>
 ---
- configure.in | 4 +++-
+ configure.ac | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/configure.in b/configure.in
-index b2305a5..c882909 100644
---- a/configure.in
-+++ b/configure.in
-@@ -418,7 +418,9 @@ dnl Some platforms may need -lnsl for getrpcbynumber.
+diff --git a/configure.ac b/configure.ac
+index 56e2a624..3401a7a3 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -404,7 +404,9 @@ dnl Some platforms may need -lnsl for getrpcbynumber.
  AC_SEARCH_LIBS(getrpcbynumber, nsl,
      AC_DEFINE(HAVE_GETRPCBYNUMBER, 1, [define if you have getrpcbynumber()]))
  
@@ -35,5 +36,5 @@ index b2305a5..c882909 100644
  #
  # Check for these after AC_LBL_LIBPCAP, so we link with the appropriate
 -- 
-1.9.1
+2.17.1
 
