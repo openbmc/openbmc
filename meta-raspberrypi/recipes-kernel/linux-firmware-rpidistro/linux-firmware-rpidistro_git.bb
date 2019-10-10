@@ -25,7 +25,7 @@ LICENSE = "\
 "
 LIC_FILES_CHKSUM = "\
     file://LICENCE.broadcom_bcm43xx;md5=3160c14df7228891b868060e1951dfbc \
-    file://WHENCE;md5=a9c2c217f513c20e1d16b384b3e2c12d \
+    file://WHENCE;md5=7b12b2224438186e4c97c4c7f3a5cc28 \
 "
 
 # These are not common licenses, set NO_GENERIC_LICENSE for them
@@ -33,11 +33,9 @@ LIC_FILES_CHKSUM = "\
 NO_GENERIC_LICENSE[Firmware-broadcom_bcm43xx-rpidistro] = "LICENCE.broadcom_bcm43xx"
 NO_GENERIC_LICENSE[WHENCE] = "WHENCE"
 
-SRC_URI = " \
-    git://github.com/RPi-Distro/firmware-nonfree \
-    file://0001-brcmfmac43455-sdio.txt-Follow-raspbian-change-for-bo.patch \
-    "
-SRCREV = "b518de45ced519e8f7a499f4778100173402ae43"
+SRC_URI = "git://github.com/RPi-Distro/firmware-nonfree"
+
+SRCREV = "f0ad1a42b051aa9da1d9e1dc606dd68ec2f163a5"
 PV = "0.0+git${SRCPV}"
 
 S = "${WORKDIR}/git"
@@ -45,13 +43,6 @@ S = "${WORKDIR}/git"
 inherit allarch
 
 CLEANBROKEN = "1"
-
-do_unpack_append() {
-    bb.build.exec_func('do_clean_pc', d)
-}
-do_clean_pc() {
-    rm -rf ${S}/.pc
-}
 
 do_compile() {
     :

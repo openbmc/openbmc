@@ -34,6 +34,8 @@ do_deploy() {
     touch ${DEPLOYDIR}/${PN}/${PN}-${PV}.stamp
 }
 
+do_deploy[depends] += "rpi-config:do_deploy"
+
 addtask deploy before do_build after do_install
 do_deploy[dirs] += "${DEPLOYDIR}/${PN}"
 
