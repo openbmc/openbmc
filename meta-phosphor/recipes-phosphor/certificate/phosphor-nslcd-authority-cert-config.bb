@@ -11,8 +11,10 @@ inherit allarch
 
 SRC_URI = "file://env"
 
+FILES_${PN} = "${datadir}"
+
 do_install() {
-	install -D ${WORKDIR}/env ${D}/${sysconfdir}/default/obmc/cert/authority
+	install -D ${WORKDIR}/env ${D}/${datadir}/phosphor-certificate-manager/authority
 }
 
 pkg_postinst_${PN}() {

@@ -11,8 +11,10 @@ inherit allarch
 
 SRC_URI = "file://env"
 
+FILES_${PN} = "${datadir}"
+
 do_install() {
-	install -D ${WORKDIR}/env ${D}/${sysconfdir}/default/obmc/cert/bmcweb
+	install -D ${WORKDIR}/env ${D}/${datadir}/phosphor-certificate-manager/bmcweb
 }
 
 pkg_postinst_${PN}() {
