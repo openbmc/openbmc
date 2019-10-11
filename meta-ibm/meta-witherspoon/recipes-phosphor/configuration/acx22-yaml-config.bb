@@ -50,18 +50,19 @@ do_install() {
     # generate extra-properties.yaml from the MRW for ipmi-fru-parser
     $perlbin $scriptpath/gen_fru_properties.pl -m $mrw \
         -c $op_configpath/ipmi-fru-properties-mrw.yaml \
-        -o extra-properties.yaml
+        -o extra-properties.yaml ${EXTRA_MRW_SCRIPT_ARGS}
 
     # generate fru-read.yaml from the MRW, for ipmid and ipmi-fru-parser
     $perlbin $scriptpath/gen_ipmi_fru.pl -i $mrw \
         -m $op_configpath/ipmi-hostboot-fru-mrw.yaml \
-        -o fru-read-partial.yaml
+        -o fru-read-partial.yaml ${EXTRA_MRW_SCRIPT_ARGS}
     cat fru-read-partial.yaml ${ACx22_IPMI_EXTRA_FRU_READ_YAMLS} \
         > fru-read.yaml
 
     # generate inventory-sensors.yaml from the MRW, for ipmid
     $perlbin $scriptpath/gen_ipmi_sel.pl -i $mrw \
-        -m acx22-ipmi-inventory-sensors.yaml -o inventory-sensors.yaml
+        -m acx22-ipmi-inventory-sensors.yaml -o inventory-sensors.yaml \
+        ${EXTRA_MRW_SCRIPT_ARGS}
 
     # generate sensors.yaml from the MRW, for ipmid
     cat acx22-ipmi-sensors-mrw.yaml \
@@ -69,7 +70,7 @@ do_install() {
         $op_configpath/ipmi-occ-active-sensor-mrw.yaml \
         > sensors-mrw.yaml
     $perlbin $scriptpath/gen_ipmi_sensor.pl -i $mrw -m sensors-mrw.yaml \
-        -o sensors-partial.yaml
+        -o sensors-partial.yaml ${EXTRA_MRW_SCRIPT_ARGS}
     cat sensors-partial.yaml ${ACx22_IPMI_EXTRA_SENSOR_YAMLS} \
         > sensors.yaml
 
