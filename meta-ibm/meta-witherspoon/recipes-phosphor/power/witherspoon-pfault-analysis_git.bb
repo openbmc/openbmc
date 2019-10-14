@@ -19,6 +19,7 @@ DEPENDS += " \
          sdbus++-native \
          sdeventplus \
          power-sequencer \
+         nlohmann-json \
          "
 
 EXTRA_OEMESON += "-Ducd90160-yaml=${STAGING_DIR_HOST}${datadir}/power-sequencer/ucd90160.yaml"
