@@ -14,12 +14,9 @@ LIC_FILES_CHKSUM = " \
 
 DEPENDS = "libsamplerate0 libsndfile1 readline"
 
-SRC_URI = "git://github.com/jackaudio/jack2.git \
-           file://0001-Python-3.7-fixes-2126.patch \
-           file://0001-Fix-OSX-build.patch \
-           "
-SRCREV = "c1647819eed6d11f94b21981d9c869629299f357"
-PV = "1.9.12"
+SRC_URI = "git://github.com/jackaudio/jack2.git"
+SRCREV = "37250ff470277f9947fbf3ba738f943053e30525"
+PV = "1.9.13"
 S = "${WORKDIR}/git"
 
 inherit waf pkgconfig

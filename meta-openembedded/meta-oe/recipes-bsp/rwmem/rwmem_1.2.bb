@@ -1,4 +1,13 @@
 SUMMARY = "A small tool to read/write memory"
+DESCRIPTION = "rwmem is a small tool for reading and writing device registers. \
+rwmem supports two modes: mmap mode and i2c mode. \
+\
+In mmap mode rwmem accesses a file by memory mapping it. \
+Using /dev/mem as the memory mapped file makes rwmem access memory and \
+can thus be used to access devices which have memory mapped registers. \
+\
+In i2c mode rwmem accesses an i2c peripheral by sending i2c messages to it."
+
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 

@@ -8,8 +8,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 SRC_URI = "https://github.com/${BPN}/${BPN}/releases/download/v${PV}/${BP}.tar.gz \
            file://firewalld.init \
 "
-SRC_URI[md5sum] = "32c16df3f6cc859d0df627baf5ee8401"
-SRC_URI[sha256sum] = "88bc63a011209ac046fb5d7bfc73ddcc0bc616ddf3013bbb6bf1a421cb497f76"
+SRC_URI[md5sum] = "2549c2006def07a19b4c77ec960e5aab"
+SRC_URI[sha256sum] = "fbd1b72b3c4b4d0c20659f664b2ba36175364ffbb9cebf3bdfaf9b5e6983be77"
 
 # glib-2.0-native is needed for GSETTINGS_RULES autoconf macro from gsettings.m4
 DEPENDS = "intltool-native glib-2.0-native libxslt-native docbook-xsl-stylesheets-native"

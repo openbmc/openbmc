@@ -18,8 +18,8 @@ SRC_URI = "http://mosquitto.org/files/source/mosquitto-${PV}.tar.gz \
            file://mosquitto.init \
 "
 
-SRC_URI[md5sum] = "529b6de33bac18363c2db46194d8d91c"
-SRC_URI[sha256sum] = "82676bf4201ff102be1511b56b041a9450fbbfeda40b21aa28be0fee56e8de17"
+SRC_URI[md5sum] = "ec9074c4f337f64eaa9a4320c6dab020"
+SRC_URI[sha256sum] = "bcd31a8fbbd053fee328986fadd8666d3058357ded56b9782f7d4f19931d178e"
 
 inherit systemd update-rc.d useradd
 

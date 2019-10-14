@@ -28,7 +28,7 @@ SRC_URI = " \
     file://0001-Always-enable-trivial-httpd-for-tests.patch \
     file://0002-Gate-ostree-trivial-httpd-on-BUILDOPT_TRIVIAL_HTTPD.patch \
 "
-SRCREV = "5c1697da78ebf6250a7130b8b9e6cbfbeaa34296"
+SRCREV = "9d39e7d91e8497987cad69a3fbed5c5fc91eebdc"
 
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+\.\d+)"
 

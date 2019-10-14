@@ -15,7 +15,7 @@ S = "${WORKDIR}/git"
 inherit bash-completion systemd
 
 do_install() {
-    oe_runmake install DESTDIR=${D} PREFIX=${prefix} \
+    oe_runmake install-spec DESTDIR=${D} PREFIX=${prefix} \
         UDEVDIR=${nonarch_base_libdir}/udev SYSTEMDDIR=${systemd_unitdir}
 }
 
@@ -25,5 +25,6 @@ pkg_postinst_ontarget_${PN}() {
 
 PACKAGES =+ "${PN}-dracut ${PN}-zsh-completion"
 
+FILES_${PN} += "${systemd_system_unitdir}"
 FILES_${PN}-dracut = "${libdir}/dracut/dracut.conf.d"
 FILES_${PN}-zsh-completion = "${datadir}/zsh/site-functions"

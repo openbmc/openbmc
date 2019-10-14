@@ -4,9 +4,9 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://doc/readme.html;beginline=318;endline=352;md5=60aa5cfdbd40086501778d9b6ebf29ee"
 HOMEPAGE = "http://www.lua.org/"
 
-DEPENDS = "readline"
 SRC_URI = "http://www.lua.org/ftp/lua-${PV}.tar.gz;name=tarballsrc \
            file://lua.pc.in \
+           file://0001-Allow-building-lua-without-readline-on-Linux.patch \
            "
 
 # if no test suite matches PV release of Lua exactly, download the suite for the closest Lua release.
@@ -24,18 +24,21 @@ SRC_URI[tarballtest.sha256sum] = "b80771238271c72565e5a1183292ef31bd7166414cd0d4
 
 inherit pkgconfig binconfig ptest
 
+PACKAGECONFIG ??= "readline"
+PACKAGECONFIG[readline] = ",,readline"
+
 UCLIBC_PATCHES += "file://uclibc-pthread.patch"
 SRC_URI_append_libc-uclibc = "${UCLIBC_PATCHES}"
 
 TARGET_CC_ARCH += " -fPIC ${LDFLAGS}"
-EXTRA_OEMAKE = "'CC=${CC} -fPIC' 'MYCFLAGS=${CFLAGS} -DLUA_USE_LINUX -fPIC' MYLDFLAGS='${LDFLAGS}'"
+EXTRA_OEMAKE = "'CC=${CC} -fPIC' 'MYCFLAGS=${CFLAGS} -fPIC' MYLDFLAGS='${LDFLAGS}'"
 
 do_configure_prepend() {
     sed -i -e s:/usr/local:${prefix}:g src/luaconf.h
 }
 
 do_compile () {
-    oe_runmake linux
+    oe_runmake ${@bb.utils.contains('PACKAGECONFIG', 'readline', 'linux', 'linux-no-readline', d)}
 }
 
 do_install () {

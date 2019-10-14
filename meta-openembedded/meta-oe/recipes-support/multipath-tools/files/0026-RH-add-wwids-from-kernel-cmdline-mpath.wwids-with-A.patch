@@ -1,7 +1,10 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17  00:00:00 2001 
-From: Benjamin Marzinski <bmarzins@redhat.com>
-Date: Fri, 17  Oct 2014 11:20:34 -0500
-Subject: [PATCH] RH: add wwids from kernel cmdline  mpath.wwids with -A
+From 0f54b3120ca06ff3168cdbf901a27b68c4638398 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Thu, 26 Sep 2019 16:29:48 +0800
+Subject: [PATCH] From 0000000000000000000000000000000000000000 Mon Sep 17 
+ 00:00:00 2001 From: Benjamin Marzinski <bmarzins@redhat.com> Date: Fri, 17 
+ Oct 2014 11:20:34 -0500 Subject: [PATCH] RH: add wwids from kernel cmdline 
+ mpath.wwids with -A
 
 This patch adds another option to multipath, "-A", which reads
 /proc/cmdline for mpath.wwid=<WWID> options, and adds any wwids it finds
@@ -16,7 +19,7 @@ Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
 
 Upstream-Status: Pending
 
-Update this patch to new version 0.8.0
+Update this patch to new version 0.8.2
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
@@ -28,10 +31,10 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  5 files changed, 57 insertions(+), 1 deletion(-)
 
 diff --git a/libmultipath/wwids.c b/libmultipath/wwids.c
-index 53e7951..9ba9b62 100644
+index ef74812..19c4d68 100644
 --- a/libmultipath/wwids.c
 +++ b/libmultipath/wwids.c
-@@ -443,3 +443,47 @@ int op ## _wwid(const char *wwid) \
+@@ -444,3 +444,47 @@ int op ## _wwid(const char *wwid) \
  declare_failed_wwid_op(is_failed, false)
  declare_failed_wwid_op(mark_failed, true)
  declare_failed_wwid_op(unmark_failed, true)
@@ -92,27 +95,27 @@ index 0c6ee54..e32a0b0 100644
  enum {
  	WWID_IS_NOT_FAILED = 0,
 diff --git a/multipath/main.c b/multipath/main.c
-index 5abb118..c751b31 100644
+index 96a1146..5fc65ef 100644
 --- a/multipath/main.c
 +++ b/multipath/main.c
-@@ -134,6 +134,7 @@ usage (char * progname)
- 	fprintf (stderr, VERSION_STRING);
- 	fprintf (stderr, "Usage:\n");
- 	fprintf (stderr, "  %s [-a|-c|-w|-W] [-d] [-r] [-i] [-v lvl] [-p pol] [-b fil] [-q] [dev]\n", progname);
-+	fprintf (stderr, "  %s [-a|-A|-c|-w|-W] [-d] [-r] [-i] [-v lvl] [-p pol] [-b fil] [-q] [dev]\n", progname);
- 	fprintf (stderr, "  %s -l|-ll|-f [-v lvl] [-b fil] [-R num] [dev]\n", progname);
- 	fprintf (stderr, "  %s -F [-v lvl] [-R num]\n", progname);
- 	fprintf (stderr, "  %s [-t|-T]\n", progname);
-@@ -147,6 +148,8 @@ usage (char * progname)
+@@ -139,6 +139,7 @@ usage (char * progname)
+ 	fprintf (stderr, "  %s [-v level] [-l|-ll] [device]\n", progname);
+ 	fprintf (stderr, "  %s [-v level] [-a|-w] device\n", progname);
+ 	fprintf (stderr, "  %s [-v level] -W\n", progname);
++        fprintf (stderr, "  %s [-v level] -A\n", progname);
+ 	fprintf (stderr, "  %s [-v level] [-i] [-c|-C] device\n", progname);
+ 	fprintf (stderr, "  %s [-v level] [-i] [-u|-U]\n", progname);
+ 	fprintf (stderr, "  %s [-h|-t|-T]\n", progname);
+@@ -151,6 +152,8 @@ usage (char * progname)
  		"  -f      flush a multipath device map\n"
  		"  -F      flush all multipath device maps\n"
  		"  -a      add a device wwid to the wwids file\n"
-+		"  -A      add devices from kernel command line mpath.wwids\n"
-+		"          parameters to wwids file\n"
++                "  -A      add devices from kernel command line mpath.wwids\n"
++                "          parameters to wwids file\n"
  		"  -c      check if a device should be a path in a multipath device\n"
  		"  -C      check if a multipath device has usable paths\n"
  		"  -q      allow queue_if_no_path when multipathd is not running\n"
-@@ -870,7 +873,7 @@ main (int argc, char *argv[])
+@@ -905,7 +908,7 @@ main (int argc, char *argv[])
  		exit(RTVL_FAIL);
  	multipath_conf = conf;
  	conf->retrigger_tries = 0;
@@ -121,17 +124,17 @@ index 5abb118..c751b31 100644
  		switch(arg) {
  		case 1: printf("optarg : %s\n",optarg);
  			break;
-@@ -937,6 +940,10 @@ main (int argc, char *argv[])
- 		case 't':
- 			r = dump_config(conf, NULL, NULL) ? RTVL_FAIL : RTVL_OK;
- 			goto out_free_config;
+@@ -998,6 +1001,10 @@ main (int argc, char *argv[])
+ 		case 'R':
+ 			retries = atoi(optarg);
+ 			break;
 +		case 'A':
 +			if (remember_cmdline_wwid() != 0)
 +				exit(1);
 +			exit(0);
- 		case 'T':
- 			cmd = CMD_DUMP_CONFIG;
- 			break;
+ 		case ':':
+ 			fprintf(stderr, "Missing option argument\n");
+ 			usage(argv[0]);
 diff --git a/multipath/multipath.8 b/multipath/multipath.8
 index 9cdd05a..1e120f3 100644
 --- a/multipath/multipath.8

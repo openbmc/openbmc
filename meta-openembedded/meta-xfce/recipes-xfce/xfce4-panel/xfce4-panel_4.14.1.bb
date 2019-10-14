@@ -8,11 +8,11 @@ inherit xfce gtk-doc gobject-introspection distro_features_check remove-libtool
 
 REQUIRED_DISTRO_FEATURES = "x11"
 
-SRC_URI[md5sum] = "940e8b430e28093a2e56e390055bcd51"
-SRC_URI[sha256sum] = "d5f8f3bd7e142139987e5e62cda26135a424baabb5e47aa0c23b4169d0a66ef4"
+SRC_URI[md5sum] = "3323588f1c18f04891e013243da1e355"
+SRC_URI[sha256sum] = "9c3c78b49ddfac7d42a804e6a6ad9d22ad64ec60bbe17d8724bc52d3e3f6d114"
 SRC_URI += " \
     file://0001-windowmenu-do-not-display-desktop-icon-when-no-windo.patch \
-    file://0001-use-lxdm-to-replace-dm-tool.patch \
+    file://0002-use-lxdm-to-replace-dm-tool.patch \
 "
 
 python populate_packages_prepend() {

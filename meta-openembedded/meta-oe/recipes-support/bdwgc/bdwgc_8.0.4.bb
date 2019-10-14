@@ -37,4 +37,8 @@ inherit autotools pkgconfig
 PACKAGECONFIG ??= "libatomic-ops"
 PACKAGECONFIG[libatomic-ops] = "--with-libatomic-ops=yes,--with-libatomic-ops=no,libatomic-ops"
 
+EXTRA_OECONF += "--enable-cpluscplus"
+
+CFLAGS_append_libc-musl = " -D_GNU_SOURCE -DNO_GETCONTEXT -DSEARCH_FOR_DATA_START -DUSE_MMAP -DHAVE_DL_ITERATE_PHDR"
+
 BBCLASSEXTEND = "native nativesdk"
