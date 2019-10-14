@@ -198,3 +198,13 @@
         pinID:           83
         poll:            false
         analysis:        none
+  GPIOAnalysis:
+      - type:            none
+        path:            ""
+        gpio_value:      low
+        error_function:  memGoodError
+        option_flags:    none
+        GPIODefinitions:
+            - GPIODefinition: none
+              gpio:      0
+              callout:   ""
