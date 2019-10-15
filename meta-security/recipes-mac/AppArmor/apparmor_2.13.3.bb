@@ -32,11 +32,12 @@ PARALLEL_MAKE = ""
 
 inherit pkgconfig autotools-brokensep update-rc.d python3native perlnative ptest cpan manpages systemd
 
-PACKAGECONFIG ??= "python perl"
+PACKAGECONFIG ??= "python perl aa-decode"
 PACKAGECONFIG[manpages] = "--enable-man-pages, --disable-man-pages"
 PACKAGECONFIG[python] = "--with-python, --without-python, python3 swig-native"
 PACKAGECONFIG[perl] = "--with-perl, --without-perl, perl perl-native swig-native"
 PACKAGECONFIG[apache2] = ",,apache2,"
+PACKAGECONFIG[aa-decode] = ",,,bash"
 
 PAMLIB="${@bb.utils.contains('DISTRO_FEATURES', 'pam', '1', '0', d)}"
 HTTPD="${@bb.utils.contains('PACKAGECONFIG', 'apache2', '1', '0', d)}"
@@ -95,6 +96,10 @@ do_install () {
 	# If perl is disabled this script won't be any good
 	if ! ${@bb.utils.contains('PACKAGECONFIG','perl','true','false', d)}; then
 		rm -f ${D}${sbindir}/aa-notify
+	fi
+
+	if ! ${@bb.utils.contains('PACKAGECONFIG','aa-decode','true','false', d)}; then
+		rm -f ${D}${sbindir}/aa-decode
 	fi
 
 	if test -z "${HTTPD}" ; then
@@ -161,7 +166,8 @@ PACKAGES += "mod-${PN}"
 FILES_${PN} += "/lib/apparmor/ ${sysconfdir}/apparmor ${PYTHON_SITEPACKAGES_DIR}"
 FILES_mod-${PN} = "${libdir}/apache2/modules/*"
 
-RDEPENDS_${PN} += "bash"
 RDEPENDS_${PN} += "${@bb.utils.contains('PACKAGECONFIG','python','python3-core python3-modules','', d)}"
 RDEPENDS_${PN}_remove += "${@bb.utils.contains('PACKAGECONFIG','perl','','perl', d)}"
 RDEPENDS_${PN}-ptest += "perl coreutils dbus-lib bash"
+
+PRIVATE_LIBS_${PN}-ptest = "libapparmor.so*"
