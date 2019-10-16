@@ -41,6 +41,7 @@ SRC_URI_append = "${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", " file
 S = "${WORKDIR}/git"
 
 COMPATIBLE_MACHINE = "^rpi$"
+COMPATIBLE_HOST_aarch64 = "null"
 
 def cpu(d):
     for arg in (d.getVar('TUNE_CCARGS') or '').split():
