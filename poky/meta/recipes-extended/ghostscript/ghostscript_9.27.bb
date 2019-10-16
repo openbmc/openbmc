@@ -59,7 +59,7 @@ PACKAGECONFIG[x11] = "--with-x --x-includes=${STAGING_INCDIR} --x-libraries=${ST
                       --without-x, virtual/libx11 libxext libxt gtk+3\
                       "
 
-EXTRA_OECONF = "--with-system-libtiff --without-jbig2dec \
+EXTRA_OECONF = "--without-libpaper --with-system-libtiff --without-jbig2dec \
                 --with-fontpath=${datadir}/fonts \
                 --without-libidn --with-cups-serverbin=${exec_prefix}/lib/cups \
                 --with-cups-datadir=${datadir}/cups \
@@ -71,7 +71,7 @@ EXTRA_OECONF_append_mipsarcho32 = " --with-large_color_index=0"
 # Explicity disable libtiff, fontconfig,
 # freetype, cups for ghostscript-native
 EXTRA_OECONF_class-native = "--without-x --with-system-libtiff=no \
-                             --without-jbig2dec \
+                             --without-jbig2dec --without-libpaper \
                              --with-fontpath=${datadir}/fonts \
                              --without-libidn --disable-fontconfig \
                              --disable-freetype --disable-cups"

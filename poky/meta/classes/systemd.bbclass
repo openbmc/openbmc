@@ -231,5 +231,6 @@ python rm_sysvinit_initddir (){
 
 do_install[postfuncs] += "${RMINITDIR} "
 RMINITDIR_class-target = " rm_sysvinit_initddir rm_systemd_unitdir "
+RMINITDIR_class-nativesdk = " rm_sysvinit_initddir rm_systemd_unitdir "
 RMINITDIR = ""
 

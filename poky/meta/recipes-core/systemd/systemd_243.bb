@@ -229,8 +229,6 @@ do_install() {
 	install -d ${D}${sysconfdir}/udev/rules.d/
 	install -d ${D}${sysconfdir}/tmpfiles.d
 	install -m 0644 ${WORKDIR}/*.rules ${D}${sysconfdir}/udev/rules.d/
-	install -d ${D}${libdir}/pkgconfig
-	install -m 0644 ${B}/src/udev/udev.pc ${D}${libdir}/pkgconfig/
 
 	install -m 0644 ${WORKDIR}/00-create-volatile.conf ${D}${sysconfdir}/tmpfiles.d/
 
@@ -297,13 +295,10 @@ do_install() {
 	# install default policy for presets
 	# https://www.freedesktop.org/wiki/Software/systemd/Preset/#howto
 	install -Dm 0644 ${WORKDIR}/99-default.preset ${D}${systemd_unitdir}/system-preset/99-default.preset
-}
 
-do_install_append () {
-	# Mips qemu is extremely slow, allow more time for the hwdb update
-	# This is a workaround until https://github.com/systemd/systemd/issues/13581 is resolved
-	[ ! -e ${D}${systemd_unitdir}/system/systemd-hwdb-update.service ] ||
-		sed -i -e s#TimeoutSec=90s#TimeoutSec=180s# ${D}${systemd_unitdir}/system/systemd-hwdb-update.service
+    # We use package postinsts for the hwdb update, as the update service is
+    # easily triggered for no reason and will slow down boots.
+    find ${D} -name systemd-hwdb-update.service -delete
 }
 
 python populate_packages_prepend (){

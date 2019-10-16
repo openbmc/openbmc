@@ -1,4 +1,8 @@
 SUMMARY = "An Internet printing system for Unix"
+DESCRIPTION = "The Common UNIX Printing System is a printing system and \
+general replacement for lpd and the like. It supports the Internet Printing \
+Protocol (IPP), and has its own filtering driver model for handling various \
+document types."
 HOMEPAGE = "https://www.cups.org/"
 SECTION = "console/utils"
 LICENSE = "GPLv2 & LGPLv2"

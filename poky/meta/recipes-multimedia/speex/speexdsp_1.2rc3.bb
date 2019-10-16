@@ -2,7 +2,7 @@ SUMMARY = "A patent-free DSP library"
 DESCRIPTION = "SpeexDSP is a patent-free, Open Source/Free Software DSP library."
 HOMEPAGE = "http://www.speex.org"
 SECTION = "libs"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=314649d8ba9dd7045dfb6683f298d0a8"
 
 SRC_URI = "http://downloads.xiph.org/releases/speex/speexdsp-${PV}.tar.gz \

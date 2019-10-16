@@ -1344,12 +1344,12 @@
 
         <glossentry id='var-BBMULTICONFIG'><glossterm>BBMULTICONFIG</glossterm>
             <info>
-                BBMULTICONFIG[doc] = "Specifies each separate configuration when you are building targets with multiple configurations."
+                BBMULTICONFIG[doc] = "Specifies each additional separate configuration when you are building targets with multiple configurations."
             </info>
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    Specifies each separate configuration when you are
+                    Specifies each additional separate configuration when you are
                     building targets with multiple configurations.
                     Use this variable in your
                     <filename>conf/local.conf</filename> configuration file.

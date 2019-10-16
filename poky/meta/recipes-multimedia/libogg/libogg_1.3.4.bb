@@ -5,7 +5,7 @@ necessary to codec libraries like libvorbis."
 HOMEPAGE = "http://xiph.org/"
 BUGTRACKER = "https://trac.xiph.org/newticket"
 SECTION = "libs"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=db1b7a668b2a6f47b2af88fb008ad555 \
                     file://include/ogg/ogg.h;beginline=1;endline=11;md5=eda812856f13a3b1326eb8f020cc3b0b"
 

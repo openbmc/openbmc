@@ -33,10 +33,8 @@ GTKDOC_MESON_OPTION = "gtk_doc"
 GIR_MESON_OPTION = 'introspection'
 
 LEAD_SONAME = "libpango-1.0*"
-LIBV = "1.8.0"
 
 FILES_${PN} = "${bindir}/* ${libdir}/libpango*${SOLIBS}"
-FILES_${PN}-dev += "${libdir}/pango/${LIBV}/modules/*.la"
 
 RDEPENDS_${PN}-ptest += "cantarell-fonts"
 RDEPENDS_${PN}-ptest_append_libc-glibc = " locale-base-en-us"

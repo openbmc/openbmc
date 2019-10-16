@@ -5420,26 +5420,34 @@
                             <literallayout class='monospaced'>
      BBMULTICONFIG = "x86 arm"
                             </literallayout>
+                          </para>
+
+                          <para>Please note, that a "default" configuration already exists by definition,
+                          this configuration is named: "" (empty string) and is defined by the variables
+                          coming from your local.conf file. So, the previous example actually adds two
+                          additional configurations to your build "arm" and "x86" along with "".
                             </para></listitem>
                         <listitem><para>
                             <emphasis>Launch BitBake</emphasis>:
                             Use the following BitBake command form to launch the
                             multiple configuration build:
                             <literallayout class='monospaced'>
-     $ bitbake [multiconfig:<replaceable>multiconfigname</replaceable>:]<replaceable>target</replaceable> [[[multiconfig:<replaceable>multiconfigname</replaceable>:]<replaceable>target</replaceable>] ... ]
+     $ bitbake [mc:<replaceable>multiconfigname</replaceable>:]<replaceable>target</replaceable> [[[mc:<replaceable>multiconfigname</replaceable>:]<replaceable>target</replaceable>] ... ]
                             </literallayout>
                             For the example in this section, the following
                             command applies:
                             <literallayout class='monospaced'>
-     $ bitbake multiconfig:x86:core-image-minimal multiconfig:arm:core-image-sato
+     $ bitbake mc:x86:core-image-minimal mc:arm:core-image-sato mc::core-image-base
                             </literallayout>
                             The previous BitBake command builds a
                             <filename>core-image-minimal</filename> image that
                             is configured through the
-                            <filename>x86.conf</filename> configuration file
-                            and builds a <filename>core-image-sato</filename>
+                            <filename>x86.conf</filename> configuration file,
+                            a <filename>core-image-sato</filename>
                             image that is configured through the
-                            <filename>arm.conf</filename> configuration file.
+                            <filename>arm.conf</filename> configuration file and a
+                            <filename>core-image-base</filename> that is configured
+                            through your <filename>local.conf</filename> configuration file.
                             </para></listitem>
                     </itemizedlist>
                     <note>
@@ -5479,7 +5487,7 @@
                     build, you must declare the dependencies in the recipe
                     using the following statement form:
                     <literallayout class='monospaced'>
-     <replaceable>task_or_package</replaceable>[mcdepends] = "multiconfig:<replaceable>from_multiconfig</replaceable>:<replaceable>to_multiconfig</replaceable>:<replaceable>recipe_name</replaceable>:<replaceable>task_on_which_to_depend</replaceable>"
+     <replaceable>task_or_package</replaceable>[mcdepends] = "mc:<replaceable>from_multiconfig</replaceable>:<replaceable>to_multiconfig</replaceable>:<replaceable>recipe_name</replaceable>:<replaceable>task_on_which_to_depend</replaceable>"
                     </literallayout>
                     To better show how to use this statement, consider the
                     example scenario from the first paragraph of this section.
@@ -5487,7 +5495,7 @@
                     that builds the <filename>core-image-sato</filename>
                     image:
                     <literallayout class='monospaced'>
-     do_image[mcdepends] = "multiconfig:x86:arm:core-image-minimal:do_rootfs"
+     do_image[mcdepends] = "mc:x86:arm:core-image-minimal:do_rootfs"
                     </literallayout>
                     In this example, the
                     <replaceable>from_multiconfig</replaceable> is "x86".
@@ -5502,7 +5510,7 @@
                    Once you set up this dependency, you can build the
                    "x86" multiconfig using a BitBake command as follows:
                    <literallayout class='monospaced'>
-     $ bitbake multiconfig:x86:core-image-sato
+     $ bitbake mc:x86:core-image-sato
                    </literallayout>
                    This command executes all the tasks needed to create
                    the <filename>core-image-sato</filename> image for the
@@ -5518,7 +5526,7 @@
                    Consider this change to the statement in the
                    <filename>core-image-sato</filename> recipe:
                    <literallayout class='monospaced'>
-     do_image[mcdepends] = "multiconfig:x86:arm:core-image-minimal:do_image"
+     do_image[mcdepends] = "mc:x86:arm:core-image-minimal:do_image"
                    </literallayout>
                    In this case, BitBake must create the
                    <filename>core-image-minimal</filename> image for the

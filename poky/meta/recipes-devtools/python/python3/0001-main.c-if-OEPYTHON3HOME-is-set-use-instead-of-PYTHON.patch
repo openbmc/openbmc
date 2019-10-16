@@ -1,4 +1,4 @@
-From ffe7797637f08cd6ee4c82e2d67462c5e194d30a Mon Sep 17 00:00:00 2001
+From 5ce3ac59531828ff682646fbba59b2126b28a8aa Mon Sep 17 00:00:00 2001
 From: Jaewon Lee <jaewon.lee@xilinx.com>
 Date: Thu, 25 Apr 2019 15:34:26 -0700
 Subject: [PATCH] main.c: if OEPYTHON3HOME is set use instead of PYTHONHOME
@@ -12,15 +12,16 @@ to set a different path for python3
 Signed-off-by: Jaewon Lee <jaewon.lee@xilinx.com>
 
 Upstream-Status: Inappropriate [OE specific configuration]
+
 ---
  Modules/main.c | 17 +++++++++++++----
  1 file changed, 13 insertions(+), 4 deletions(-)
 
 diff --git a/Modules/main.c b/Modules/main.c
-index a745381..b553e30 100644
+index acc59c6..407085a 100644
 --- a/Modules/main.c
 +++ b/Modules/main.c
-@@ -1855,10 +1855,19 @@ config_init_home(_PyCoreConfig *config)
+@@ -1834,10 +1834,19 @@ config_init_home(_PyCoreConfig *config)
          }
          return _Py_INIT_OK();
      }
@@ -44,6 +45,3 @@ index a745381..b553e30 100644
      }
      config->home = home;
      return _Py_INIT_OK();
--- 
-2.7.4
-

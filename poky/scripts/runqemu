@@ -457,6 +457,7 @@ class BaseConfig(object):
                     del os.environ['PKG_CONFIG_PATH']
                     del os.environ['PKG_CONFIG_DIR']
                     del os.environ['PKG_CONFIG_LIBDIR']
+                    del os.environ['PKG_CONFIG_SYSROOT_DIR']
                 except KeyError:
                     pass
                 try:
@@ -1197,12 +1198,12 @@ class BaseConfig(object):
 
                 # All branches above set vm_drive.
                 self.rootfs_options = '%s -no-reboot' % vm_drive
-            self.kernel_cmdline = 'root=%s rw highres=off' % (self.get('QB_KERNEL_ROOT'))
+            self.kernel_cmdline = 'root=%s rw' % (self.get('QB_KERNEL_ROOT'))
 
         if self.fstype == 'nfs':
             self.rootfs_options = ''
             k_root = '/dev/nfs nfsroot=%s:%s,%s' % (self.nfs_server, os.path.abspath(self.rootfs), self.unfs_opts)
-            self.kernel_cmdline = 'root=%s rw highres=off' % k_root
+            self.kernel_cmdline = 'root=%s rw' % k_root
 
         if self.fstype == 'none':
             self.rootfs_options = ''

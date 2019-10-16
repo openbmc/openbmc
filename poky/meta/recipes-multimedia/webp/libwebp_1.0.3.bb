@@ -9,7 +9,7 @@ DESCRIPTION = "WebP is a method of lossy and lossless compression that can be \
 HOMEPAGE = "https://developers.google.com/speed/webp/"
 SECTION = "libs"
 
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6e8dee932c26f2dab503abf70c96d8bb \
                     file://PATENTS;md5=c6926d0cb07d296f886ab6e0cc5a85b7"
 

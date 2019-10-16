@@ -316,6 +316,7 @@ class PartitionedImage():
         # Size of a sector used in calculations
         self.sector_size = SECTOR_SIZE
         self.native_sysroot = native_sysroot
+        num_real_partitions = len([p for p in self.partitions if not p.no_table])
 
         # calculate the real partition number, accounting for partitions not
         # in the partition table and logical partitions
@@ -325,7 +326,7 @@ class PartitionedImage():
                 part.realnum = 0
             else:
                 realnum += 1
-                if self.ptable_format == 'msdos' and realnum > 3 and len(partitions) > 4:
+                if self.ptable_format == 'msdos' and realnum > 3 and num_real_partitions > 4:
                     part.realnum = realnum + 1
                     continue
                 part.realnum = realnum

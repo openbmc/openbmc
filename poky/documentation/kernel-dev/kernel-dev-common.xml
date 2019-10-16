@@ -549,9 +549,9 @@
                     <literallayout class='monospaced'>
      FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-     SRC_URI_append += "file://<replaceable>patch-file-one</replaceable>"
-     SRC_URI_append += "file://<replaceable>patch-file-two</replaceable>"
-     SRC_URI_append += "file://<replaceable>patch-file-three</replaceable>"
+     SRC_URI_append = " file://<replaceable>patch-file-one</replaceable>"
+     SRC_URI_append = " file://<replaceable>patch-file-two</replaceable>"
+     SRC_URI_append = " file://<replaceable>patch-file-three</replaceable>"
                     </literallayout>
                     The
                     <ulink url='&YOCTO_DOCS_REF_URL;#var-FILESEXTRAPATHS'><filename>FILESEXTRAPATHS</filename></ulink>

@@ -39,3 +39,37 @@ class IncompatibleLicenseTests(OESelftestTestCase):
     # INCOMPATIBLE_LICENSE contains this license
     def test_incompatible_nonspdx_license(self):
         self.lic_test('incompatible-nonspdx-license', 'FooLicense', 'FooLicense')
+
+class IncompatibleLicensePerImageTests(OESelftestTestCase):
+    def default_config(self):
+        return """
+IMAGE_INSTALL_append = "bash"
+INCOMPATIBLE_LICENSE_pn-core-image-minimal = "GPL-3.0 LGPL-3.0"
+"""
+
+    def test_bash_default(self):
+        self.write_config(self.default_config())
+        error_msg = "ERROR: core-image-minimal-1.0-r0 do_rootfs: Package bash has an incompatible license GPLv3+ and cannot be installed into the image."
+
+        result = bitbake('core-image-minimal', ignore_status=True)
+        if error_msg not in result.output:
+            raise AssertionError(result.output)
+
+    def test_bash_and_license(self):
+        self.write_config(self.default_config() + '\nLICENSE_append_pn-bash = " & SomeLicense"')
+        error_msg = "ERROR: core-image-minimal-1.0-r0 do_rootfs: Package bash has an incompatible license GPLv3+ & SomeLicense and cannot be installed into the image."
+
+        result = bitbake('core-image-minimal', ignore_status=True)
+        if error_msg not in result.output:
+            raise AssertionError(result.output)
+
+    def test_bash_or_license(self):
+        self.write_config(self.default_config() + '\nLICENSE_append_pn-bash = " | SomeLicense"')
+
+        bitbake('core-image-minimal')
+
+    def test_bash_whitelist(self):
+        self.write_config(self.default_config() + '\nWHITELIST_GPL-3.0_pn-core-image-minimal = "bash"')
+
+        bitbake('core-image-minimal')
+

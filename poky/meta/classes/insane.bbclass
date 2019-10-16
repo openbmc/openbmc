@@ -34,7 +34,7 @@ ERROR_QA ?= "dev-so debug-deps dev-deps debug-files arch pkgconfig la \
             split-strip packages-list pkgv-undefined var-undefined \
             version-going-backwards expanded-d invalid-chars \
             license-checksum dev-elf file-rdeps configure-unsafe \
-            configure-gettext \
+            configure-gettext perllocalpod \
             "
 # Add usrmerge QA check based on distro feature
 ERROR_QA_append = "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', ' usrmerge', '', d)}"
@@ -794,6 +794,23 @@ def package_qa_check_usrmerge(pkg, d, messages):
             package_qa_add_message(messages, "usrmerge", msg)
             return False
     return True
+
+QAPKGTEST[perllocalpod] = "package_qa_check_perllocalpod"
+def package_qa_check_perllocalpod(pkg, d, messages):
+    """
+    Check that the recipe didn't ship a perlocal.pod file, which shouldn't be
+    installed in a distribution package.  cpan.bbclass sets NO_PERLLOCAL=1 to
+    handle this for most recipes.
+    """
+    import glob
+    pkgd = oe.path.join(d.getVar('PKGDEST'), pkg)
+    podpath = oe.path.join(pkgd, d.getVar("libdir"), "perl*", "*", "*", "perllocal.pod")
+
+    matches = glob.glob(podpath)
+    if matches:
+        matches = [package_qa_clean_path(path, d, pkg) for path in matches]
+        msg = "%s contains perllocal.pod (%s), should not be installed" % (pkg, " ".join(matches))
+        package_qa_add_message(messages, "perllocalpod", msg)
 
 QAPKGTEST[expanded-d] = "package_qa_check_expanded_d"
 def package_qa_check_expanded_d(package, d, messages):

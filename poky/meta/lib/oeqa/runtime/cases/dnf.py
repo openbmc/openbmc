@@ -117,6 +117,7 @@ class DnfRepoTest(DnfTest):
 
     @OETestDepends(['dnf.DnfRepoTest.test_dnf_makecache'])
     @skipIfInDataVar('DISTRO_FEATURES', 'usrmerge', 'Test run when not enable usrmerge')
+    @OEHasPackage('busybox')
     def test_dnf_installroot(self):
         rootpath = '/home/root/chroot/test'
         #Copy necessary files to avoid errors with not yet installed tools on
@@ -143,6 +144,7 @@ class DnfRepoTest(DnfTest):
 
     @OETestDepends(['dnf.DnfRepoTest.test_dnf_makecache'])
     @skipIfNotInDataVar('DISTRO_FEATURES', 'usrmerge', 'Test run when enable usrmege')
+    @OEHasPackage('busybox')
     def test_dnf_installroot_usrmerge(self):
         rootpath = '/home/root/chroot/test'
         #Copy necessary files to avoid errors with not yet installed tools on

@@ -155,3 +155,5 @@ do_install_ptest() {
 	cp -r ${B}/unit/ ${D}${PTEST_PATH}
 	rm -f ${D}${PTEST_PATH}/unit/*.o
 }
+
+RDEPENDS_${PN}-ptest_append_libc-glibc = " glibc-gconv-utf-16"

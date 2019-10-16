@@ -161,8 +161,12 @@ class ImageFeatures(OESelftestTestCase):
             sysroot = get_bb_var('STAGING_DIR_NATIVE', 'core-image-minimal')
             result = runCmd('qemu-img info --output json %s' % image_path,
                             native_sysroot=sysroot)
-            self.assertTrue(json.loads(result.output).get('format') == itype,
-                            msg="Could not parse '%s'" % result.output)
+            try:
+                data = json.loads(result.output)
+                self.assertEqual(data.get('format'), itype,
+                                 msg="Unexpected format in '%s'" % (result.output))
+            except json.decoder.JSONDecodeError:
+                self.fail("Could not parse '%ss'" % result.output)
 
     def test_long_chain_conversion(self):
         """

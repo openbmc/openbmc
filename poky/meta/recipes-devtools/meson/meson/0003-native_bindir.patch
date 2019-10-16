@@ -1,4 +1,4 @@
-From ac38495de38a1ea42e2bc09a2f23c2e945fbc22d Mon Sep 17 00:00:00 2001
+From 4a1d676522d6b56cbe9a45c3b040afaa27d37f78 Mon Sep 17 00:00:00 2001
 From: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
 Date: Wed, 15 Nov 2017 15:05:01 +0100
 Subject: [PATCH] native_bindir
@@ -22,10 +22,10 @@ Signed-off-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
  2 files changed, 14 insertions(+), 11 deletions(-)
 
 diff --git a/mesonbuild/dependencies/base.py b/mesonbuild/dependencies/base.py
-index 21da8e2..7d1ef85 100644
+index 3c55a56..eb52fd1 100644
 --- a/mesonbuild/dependencies/base.py
 +++ b/mesonbuild/dependencies/base.py
-@@ -155,7 +155,7 @@ class Dependency:
+@@ -185,7 +185,7 @@ class Dependency:
      def get_exe_args(self, compiler):
          return []
  
@@ -34,7 +34,7 @@ index 21da8e2..7d1ef85 100644
          raise DependencyException('{!r} is not a pkgconfig dependency'.format(self.name))
  
      def get_configtool_variable(self, variable_name):
-@@ -214,7 +214,7 @@ class InternalDependency(Dependency):
+@@ -248,7 +248,7 @@ class InternalDependency(Dependency):
          self.sources = sources
          self.ext_deps = ext_deps
  
@@ -43,7 +43,7 @@ index 21da8e2..7d1ef85 100644
          raise DependencyException('Method "get_pkgconfig_variable()" is '
                                    'invalid for an internal dependency')
  
-@@ -639,15 +639,18 @@ class PkgConfigDependency(ExternalDependency):
+@@ -670,15 +670,18 @@ class PkgConfigDependency(ExternalDependency):
          return s.format(self.__class__.__name__, self.name, self.is_found,
                          self.version_reqs)
  
@@ -65,7 +65,7 @@ index 21da8e2..7d1ef85 100644
          # Always copy the environment since we're going to modify it
          # with pkg-config variables
          if env is None:
-@@ -663,7 +666,7 @@ class PkgConfigDependency(ExternalDependency):
+@@ -698,7 +701,7 @@ class PkgConfigDependency(ExternalDependency):
          targs = tuple(args)
          cache = PkgConfigDependency.pkgbin_cache
          if (self.pkgbin, targs, fenv) not in cache:
@@ -74,16 +74,16 @@ index 21da8e2..7d1ef85 100644
          return cache[(self.pkgbin, targs, fenv)]
  
      def _convert_mingw_paths(self, args):
-@@ -845,7 +848,7 @@ class PkgConfigDependency(ExternalDependency):
-                                       (self.name, out_raw))
-         self.link_args, self.raw_link_args = self._search_libs(out, out_raw)
+@@ -926,7 +929,7 @@ class PkgConfigDependency(ExternalDependency):
+             mlog.warning('Could not determine complete list of dependencies for %s' % self.name)
+         self.link_args, self.raw_link_args = self._search_libs(out, out_raw, out_all)
  
 -    def get_pkgconfig_variable(self, variable_name, kwargs):
 +    def get_pkgconfig_variable(self, variable_name, kwargs, use_native=False):
          options = ['--variable=' + variable_name, self.name]
  
          if 'define_variable' in kwargs:
-@@ -858,7 +861,7 @@ class PkgConfigDependency(ExternalDependency):
+@@ -939,7 +942,7 @@ class PkgConfigDependency(ExternalDependency):
  
              options = ['--define-variable=' + '='.join(definition)] + options
  

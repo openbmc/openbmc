@@ -43,10 +43,16 @@ def write_license_files(d, license_manifest, pkg_dic, rootfs=True):
     bad_licenses = [canonical_license(d, l) for l in bad_licenses]
     bad_licenses = expand_wildcard_licenses(d, bad_licenses)
 
+    whitelist = []
+    for lic in bad_licenses:
+        whitelist.extend((d.getVar("WHITELIST_" + lic) or "").split())
+
     with open(license_manifest, "w") as license_file:
         for pkg in sorted(pkg_dic):
-            if bad_licenses:
+            if bad_licenses and pkg not in whitelist:
                 try:
+                    if incompatible_pkg_license(d, bad_licenses, pkg_dic[pkg]["LICENSE"]):
+                        bb.fatal("Package %s has an incompatible license %s and cannot be installed into the image." %(pkg, pkg_dic[pkg]["LICENSE"]))
                     (pkg_dic[pkg]["LICENSE"], pkg_dic[pkg]["LICENSES"]) = \
                         oe.license.manifest_licenses(pkg_dic[pkg]["LICENSE"],
                         bad_licenses, canonical_license, d)
@@ -56,6 +62,8 @@ def write_license_files(d, license_manifest, pkg_dic, rootfs=True):
                 pkg_dic[pkg]["LICENSES"] = re.sub(r'[|&()*]', ' ', pkg_dic[pkg]["LICENSE"])
                 pkg_dic[pkg]["LICENSES"] = re.sub(r'  *', ' ', pkg_dic[pkg]["LICENSES"])
                 pkg_dic[pkg]["LICENSES"] = pkg_dic[pkg]["LICENSES"].split()
+                if pkg in whitelist:
+                    bb.warn("Including %s with an incompatible license %s into the image, because it has been whitelisted." %(pkg, pkg_dic[pkg]["LICENSE"]))
 
             if not "IMAGE_MANIFEST" in pkg_dic[pkg]:
                 # Rootfs manifest

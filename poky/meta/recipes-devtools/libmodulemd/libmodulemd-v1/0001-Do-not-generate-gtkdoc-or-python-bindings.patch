@@ -1,0 +1,60 @@
+From 71c51206e037c0bb5759e01b307b7ce1d5934703 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 6 Sep 2019 17:07:00 +0200
+Subject: [PATCH] Do not generate gtkdoc or python bindings
+
+All of these really need a configuration option.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ meson.build          | 12 ------------
+ modulemd/meson.build |  8 --------
+ 2 files changed, 20 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 155c9e7..fe35d5e 100644
+--- a/meson.build
++++ b/meson.build
+@@ -51,25 +51,13 @@ gnome = import('gnome')
+ pkg = import('pkgconfig')
+ gobject = dependency('gobject-2.0')
+ yaml = dependency('yaml-0.1')
+-gtkdoc = dependency('gtk-doc')
+ 
+ glib_prefix = dependency('glib-2.0').get_pkgconfig_variable('prefix')
+-glib_docpath = join_paths(glib_prefix, 'share', 'gtk-doc', 'html')
+ 
+ sh = find_program('sh')
+ sed = find_program('sed')
+ test = find_program('test')
+ 
+-ret = run_command ([test, '-e', join_paths(glib_docpath, 'glib/index.html')])
+-if ret.returncode() != 0
+-  error('Missing documentation for GLib.')
+-endif
+-
+-ret = run_command ([test, '-e', join_paths(glib_docpath, 'gobject/index.html')])
+-if ret.returncode() != 0
+-  error('Missing documentation for GObject.')
+-endif
+-
+ python_name = get_option('python_name')
+ 
+ if python_name != ''
+diff --git a/modulemd/meson.build b/modulemd/meson.build
+index 9a164b5..349c982 100644
+--- a/modulemd/meson.build
++++ b/modulemd/meson.build
+@@ -523,11 +523,3 @@ configure_file(
+   configuration : xcdata
+ )
+ 
+-gnome.gtkdoc(
+-    'modulemd-1.0',
+-    install_dir: 'modulemd-1.0',
+-    src_dir : './modulemd',
+-    main_xml : 'modulemd-docs.xml',
+-    install : true,
+-)
+-

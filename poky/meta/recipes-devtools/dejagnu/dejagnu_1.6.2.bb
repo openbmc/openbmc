@@ -1,4 +1,6 @@
 SUMMARY = "GNU unit testing framework, written in Expect and Tcl"
+DESCRIPTION = "DejaGnu is a framework for testing other programs. Its purpose \
+is to provide a single front end for all tests."
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 SECTION = "devel"

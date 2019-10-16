@@ -1,4 +1,4 @@
-From 17796e353acf08acd604610f34840a4a9d2f4b54 Mon Sep 17 00:00:00 2001
+From eff903c600f4c40f5753e95ab1557126fc6e0c9c Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 31 Jan 2019 16:46:30 +0100
 Subject: [PATCH] distutils/sysconfig: append
@@ -15,10 +15,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  2 files changed, 4 insertions(+)
 
 diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
-index e07a6c8..6b8c129 100644
+index 0a034ee..3dfd0a3 100644
 --- a/Lib/distutils/sysconfig.py
 +++ b/Lib/distutils/sysconfig.py
-@@ -421,6 +421,8 @@ def _init_posix():
+@@ -439,6 +439,8 @@ def _init_posix():
          platform=sys.platform,
          multiarch=getattr(sys.implementation, '_multiarch', ''),
      ))
@@ -28,10 +28,10 @@ index e07a6c8..6b8c129 100644
      build_time_vars = _temp.build_time_vars
      global _config_vars
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index 9ee4d31..e586abd 100644
+index 87fa5e6..756a41c 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
-@@ -412,6 +412,8 @@ def _init_posix(vars):
+@@ -419,6 +419,8 @@ def _init_posix(vars):
      """Initialize the module as appropriate for POSIX systems."""
      # _sysconfigdata is generated at build time, see _generate_posix_vars()
      name = _get_sysconfigdata_name()

@@ -1,6 +1,6 @@
 SUMMARY = "Shadow utils requirements for useradd.bbclass"
-HOMEPAGE = "http://pkg-shadow.alioth.debian.org"
-BUGTRACKER = "https://alioth.debian.org/tracker/?group_id=30580"
+HOMEPAGE = "http://github.com/shadow-maint/shadow"
+BUGTRACKER = "http://github.com/shadow-maint/shadow/issues"
 SECTION = "base utils"
 LICENSE = "BSD | Artistic-1.0"
 LIC_FILES_CHKSUM = "file://login.defs_shadow-sysroot;md5=25e2f2de4dfc8f966ac5cdfce45cd7d5"
@@ -27,6 +27,6 @@ do_install() {
 SYSROOT_DIRS += "${sysconfdir}"
 
 # don't create any packages
-# otherwise: dbus-dev depends on shadow-sysroot-dev which depends on shadow-sysroot 
+# otherwise: dbus-dev depends on shadow-sysroot-dev which depends on shadow-sysroot
 # and this has another copy of /etc/login.defs already provided by shadow
 PACKAGES = ""

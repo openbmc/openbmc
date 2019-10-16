@@ -1,4 +1,4 @@
-From 2b3bce1526b538dc2c7fa223eaf9808858aa1b06 Mon Sep 17 00:00:00 2001
+From 0417a1bb08745f2bf5310d20b342c2b3b9b212d3 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 15 Nov 2018 15:10:05 +0100
 Subject: [PATCH] Port cross-compilation support to meson
@@ -13,10 +13,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  3 files changed, 68 insertions(+), 18 deletions(-)
 
 diff --git a/gir/meson.build b/gir/meson.build
-index 85ae575..327c134 100644
+index c312100..a028033 100644
 --- a/gir/meson.build
 +++ b/gir/meson.build
-@@ -36,16 +36,29 @@ gir_files = [
+@@ -41,16 +41,29 @@ gir_files = [
  typelibdir = join_paths(get_option('libdir'), 'girepository-1.0')
  install_data(gir_files, install_dir: girdir)
  
@@ -56,7 +56,7 @@ index 85ae575..327c134 100644
  
  dep_type = glib_dep.type_name()
  if dep_type == 'internal'
-@@ -58,6 +71,12 @@ if dep_type == 'internal'
+@@ -63,6 +76,12 @@ if dep_type == 'internal'
                        '--extra-library=glib-2.0', '--extra-library=gobject-2.0']
  endif
  
@@ -69,7 +69,7 @@ index 85ae575..327c134 100644
  # Take a glob and print to newlines
  globber = '''
  from glob import glob
-@@ -84,8 +103,8 @@ glib_command = scanner_command + [
+@@ -89,8 +108,8 @@ glib_command = scanner_command + [
  
  if dep_type == 'pkgconfig'
    glib_command += ['--external-library', '--pkg=glib-2.0']
@@ -80,8 +80,8 @@ index 85ae575..327c134 100644
    glib_libincdir = join_paths(glib_libdir, 'glib-2.0', 'include')
    glib_files += join_paths(glib_incdir, 'gobject', 'glib-types.h')
    glib_files += join_paths(glib_libincdir, 'glibconfig.h')
-@@ -339,7 +358,7 @@ endforeach
- if giounix_dep.found()
+@@ -345,7 +364,7 @@ if giounix_dep.found()
+   dep_type = giounix_dep.type_name()
    if dep_type == 'pkgconfig'
      gio_command += ['--pkg=gio-unix-2.0']
 -    giounix_includedir = join_paths(giounix_dep.get_pkgconfig_variable('includedir'), 'gio-unix-2.0')
@@ -89,7 +89,7 @@ index 85ae575..327c134 100644
      # Get the installed gio-unix header list
      ret = run_command(python, '-c', globber.format(join_paths(giounix_includedir, 'gio', '*.h')))
      if ret.returncode() != 0
-@@ -422,15 +441,24 @@ gir_files += custom_target('gir-girepository',
+@@ -428,15 +447,24 @@ gir_files += custom_target('gir-girepository',
  )
  
  typelibs = []
@@ -119,10 +119,10 @@ index 85ae575..327c134 100644
      install_dir: typelibdir,
    )
 diff --git a/meson.build b/meson.build
-index 95bbd2b..f7baefd 100644
+index a5e825f..a28490a 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -163,7 +163,9 @@ endif
+@@ -168,7 +168,9 @@ endif
  subdir('girepository')
  subdir('tools')
  subdir('giscanner')

@@ -2,10 +2,14 @@
 # Released under the MIT license (see packages/COPYING)
 
 SUMMARY = "Cross-platform, open-source make system"
+DESCRIPTION = "CMake is used to control the software compilation process \
+using simple platform and compiler independent configuration files. CMake \
+generates native makefiles and workspaces that can be used in the compiler \
+environment of your choice."
 HOMEPAGE = "http://www.cmake.org/"
 BUGTRACKER = "http://public.kitware.com/Bug/my_view_page.php"
 SECTION = "console/utils"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://Copyright.txt;md5=622747147b46f22e1953876a7cba3323 \
                     file://Source/cmake.h;md5=4494dee184212fc89c469c3acd555a14;beginline=1;endline=3 \
                     "

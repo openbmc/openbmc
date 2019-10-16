@@ -90,6 +90,7 @@ toolchain_shared_env_script () {
 	echo 'export RANLIB=${TARGET_PREFIX}ranlib' >> $script
 	echo 'export OBJCOPY=${TARGET_PREFIX}objcopy' >> $script
 	echo 'export OBJDUMP=${TARGET_PREFIX}objdump' >> $script
+	echo 'export READELF=${TARGET_PREFIX}readelf' >> $script
 	echo 'export AR=${TARGET_PREFIX}ar' >> $script
 	echo 'export NM=${TARGET_PREFIX}nm' >> $script
 	echo 'export M4=m4' >> $script

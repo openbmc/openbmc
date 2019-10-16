@@ -4,7 +4,7 @@ DESCRIPTION = "Tools for monitoring and filtering incoming requests for tcp \
                services."
 SECTION = "console/network"
 
-LICENSE = "BSD"
+LICENSE = "BSD-1-Clause"
 LIC_FILES_CHKSUM = "file://DISCLAIMER;md5=071bd69cb78b18888ea5e3da5c3127fa"
 PR ="r10"
 

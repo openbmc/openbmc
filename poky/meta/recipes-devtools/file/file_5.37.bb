@@ -5,7 +5,7 @@ HOMEPAGE = "http://www.darwinsys.com/file/"
 SECTION = "console/utils"
 
 # two clause BSD
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;beginline=2;md5=0251eaec1188b20d9a72c502ecfdda1b"
 
 DEPENDS = "zlib file-replacement-native"

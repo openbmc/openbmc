@@ -1,0 +1,24 @@
+Fix building with CLANG-9.0.0 
+
+Fixes
+clang-9: error: unknown argument: '-maccumulate-outgoing-args'
+
+Upstream-Status: Submitted [https://sourceforge.net/p/gnu-efi/patches/70/]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/Make.defaults
++++ b/Make.defaults
+@@ -110,10 +110,10 @@
+                             || ( [ $(GCCVERSION) -eq "4" ]      \
+                                  && [ $(GCCMINOR) -ge "7" ] ) ) \
+                           && echo 1)
+-  ifeq ($(GCCNEWENOUGH),1)
+-    CPPFLAGS += -DGNU_EFI_USE_MS_ABI -maccumulate-outgoing-args --std=c11
+-  else ifeq ($(USING_CLANG),clang)
++  ifeq ($(USING_CLANG),clang)
+     CPPFLAGS += -DGNU_EFI_USE_MS_ABI --std=c11
++  else ifeq ($(GCCNEWENOUGH),1)
++    CPPFLAGS += -DGNU_EFI_USE_MS_ABI -maccumulate-outgoing-args --std=c11
+   endif
+ 
+   CFLAGS += -mno-red-zone

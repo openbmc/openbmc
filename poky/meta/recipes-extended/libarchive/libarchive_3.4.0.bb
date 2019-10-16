@@ -2,7 +2,7 @@ SUMMARY = "Support for reading various archive formats"
 DESCRIPTION = "C library and command-line tools for reading and writing tar, cpio, zip, ISO, and other archive formats"
 HOMEPAGE = "http://www.libarchive.org/"
 SECTION = "devel"
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=fe01f5e02b1f0cc934d593a7b0ddceb6"
 
 DEPENDS = "e2fsprogs-native"

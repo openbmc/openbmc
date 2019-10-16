@@ -2,7 +2,7 @@ SUMMARY = "Client for Wi-Fi Protected Access (WPA)"
 HOMEPAGE = "http://w1.fi/wpa_supplicant/"
 BUGTRACKER = "http://w1.fi/security/"
 SECTION = "network"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=279b4f5abb9c153c285221855ddb78cc \
                     file://README;beginline=1;endline=56;md5=e7d3dbb01f75f0b9799e192731d1e1ff \
                     file://wpa_supplicant/wpa_supplicant.c;beginline=1;endline=12;md5=0a8b56d3543498b742b9c0e94cc2d18b"

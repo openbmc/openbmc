@@ -133,7 +133,5 @@ PACKAGE_BEFORE_PN += "${@bb.utils.contains('PACKAGECONFIG', 'python3', 'python3-
 FILES_python3-bind = "${sbindir}/dnssec-coverage ${sbindir}/dnssec-checkds \
                 ${sbindir}/dnssec-keymgr ${PYTHON_SITEPACKAGES_DIR}"
 
-RDEPENDS_${PN} = "bash"
-RDEPENDS_${PN}-utils = "bash"
 RDEPENDS_${PN}-dev = ""
 RDEPENDS_python3-bind = "python3-core python3-ply"

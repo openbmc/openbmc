@@ -1,4 +1,6 @@
 SUMMARY = "Timezone data"
+DESCRIPTION = "The Time Zone Database contains code and data that represent \
+the history of local time for many representative locations around the globe."
 HOMEPAGE = "http://www.iana.org/time-zones"
 SECTION = "base"
 LICENSE = "PD & BSD & BSD-3-Clause"

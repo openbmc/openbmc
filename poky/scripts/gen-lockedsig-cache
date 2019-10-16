@@ -24,6 +24,8 @@ def extract_sha(filename):
 # a map from hash to list of file with that hash
 def map_sha_to_files(dir_, prefix, sha_map):
     sstate_prefix_path = dir_ + '/' + prefix + '/'
+    if not os.path.exists(sstate_prefix_path):
+        return
     sstate_files = os.listdir(sstate_prefix_path)
     for f in sstate_files:
         try:

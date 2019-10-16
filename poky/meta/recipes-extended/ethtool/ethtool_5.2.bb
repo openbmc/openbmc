@@ -14,6 +14,8 @@ SRC_URI = "${KERNELORG_MIRROR}/software/network/ethtool/ethtool-${PV}.tar.gz \
 SRC_URI[md5sum] = "79cff0d4af62b030ad28be90414b5c4a"
 SRC_URI[sha256sum] = "8ad6cb30f6e1767d9d23a5cb5f606f3b51f83e85ebf0153c1506194f6709e90b"
 
+UPSTREAM_CHECK_URI = "https://www.kernel.org/pub/software/network/ethtool/"
+
 inherit autotools ptest bash-completion
 
 RDEPENDS_${PN}-ptest += "make"

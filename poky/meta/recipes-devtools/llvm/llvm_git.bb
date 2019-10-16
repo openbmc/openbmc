@@ -3,10 +3,10 @@
 
 DESCRIPTION = "The LLVM Compiler Infrastructure"
 HOMEPAGE = "http://llvm.org"
-LICENSE = "NCSA"
+LICENSE = "Apache-2.0-with-LLVM-exception"
 SECTION = "devel"
 
-LIC_FILES_CHKSUM = "file://LICENSE.TXT;md5=c6b766a4e85dd28301eeed54a6684648"
+LIC_FILES_CHKSUM = "file://LICENSE.TXT;md5=8a15a0759ef07f2682d2ba4b893c9afe"
 
 DEPENDS = "libffi libxml2 zlib libedit ninja-native llvm-native"
 
@@ -16,17 +16,17 @@ inherit cmake pkgconfig
 
 PROVIDES += "llvm${PV}"
 
+MAJOR_VERSION = "9"
+MINOR_VERSION = "0"
+PATCH_VERSION = "0"
+
+PV = "${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}"
+
 LLVM_RELEASE = "${PV}"
 LLVM_DIR = "llvm${LLVM_RELEASE}"
 
-SRCREV = "19a71f6bdf2dddb10764939e7f0ec2b98dba76c9"
-
 BRANCH = "release/${MAJOR_VERSION}.x"
-MAJOR_VERSION = "8"
-MINOR_VERSION = "0"
-PATCH_VERSION = "1"
-SOLIBVER = "1"
-PV = "${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}"
+SRCREV = "0399d5a9682b3cef71c653373e38890c63c4c365"
 SRC_URI = "git://github.com/llvm/llvm-project.git;branch=${BRANCH} \
            file://0006-llvm-TargetLibraryInfo-Undefine-libc-functions-if-th.patch;striplevel=2 \
            file://0007-llvm-allow-env-override-of-exe-path.patch;striplevel=2 \
@@ -45,6 +45,7 @@ def get_llvm_arch(bb, d, arch_var):
     elif re.match(r'aarch64$', a):                      return 'AArch64'
     elif re.match(r'aarch64_be$', a):                   return 'AArch64'
     elif re.match(r'mips(isa|)(32|64|)(r6|)(el|)$', a): return 'Mips'
+    elif re.match(r'riscv(32|64)(eb|)$', a):            return 'RISCV'
     elif re.match(r'p(pc|owerpc)(|64)', a):             return 'PowerPC'
     else:
         raise bb.parse.SkipRecipe("Cannot map '%s' to a supported LLVM architecture" % a)
@@ -85,8 +86,6 @@ EXTRA_OECMAKE_append_class-nativesdk = "\
                   -DLLVM_TABLEGEN=${STAGING_BINDIR_NATIVE}/llvm-tblgen${PV} \
                   -DLLVM_CONFIG_PATH=${STAGING_BINDIR_NATIVE}/llvm-config${PV} \
                  "
-
-CXXFLAGS_append_class-target_powerpc = " -mlongcall"
 
 do_configure_prepend() {
 # Fix paths in llvm-config
@@ -158,7 +157,7 @@ FILES_${PN}-liblto += "\
 "
 
 FILES_${PN}-liboptremarks += "\
-    ${libdir}/${LLVM_DIR}/libOptRemarks.so.* \
+    ${libdir}/${LLVM_DIR}/libRemarks.so.* \
 "
 
 FILES_${PN}-llvmhello = "\
@@ -167,7 +166,7 @@ FILES_${PN}-llvmhello = "\
 
 FILES_${PN}-dev += " \
     ${libdir}/${LLVM_DIR}/llvm-config \
-    ${libdir}/${LLVM_DIR}/libOptRemarks.so \
+    ${libdir}/${LLVM_DIR}/libRemarks.so \
     ${libdir}/${LLVM_DIR}/libLLVM-${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}.so \
 "
 

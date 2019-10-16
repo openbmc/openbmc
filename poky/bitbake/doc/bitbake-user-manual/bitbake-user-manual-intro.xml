@@ -791,7 +791,7 @@
                     The following statement in the
                     <filename>local.conf</filename> file both enables
                     BitBake to perform multiple configuration builds and
-                    specifies the two multiconfigs:
+                    specifies the two extra multiconfigs:
                     <literallayout class='monospaced'>
      BBMULTICONFIG = "target1 target2"
                     </literallayout>
@@ -803,13 +803,13 @@
                     builds, use the following command form to start the
                     builds:
                     <literallayout class='monospaced'>
-     $ bitbake [multiconfig:<replaceable>multiconfigname</replaceable>:]<replaceable>target</replaceable> [[[multiconfig:<replaceable>multiconfigname</replaceable>:]<replaceable>target</replaceable>] ... ]
+     $ bitbake [mc:<replaceable>multiconfigname</replaceable>:]<replaceable>target</replaceable> [[[mc:<replaceable>multiconfigname</replaceable>:]<replaceable>target</replaceable>] ... ]
                     </literallayout>
-                    Here is an example for two multiconfigs:
+                    Here is an example for two extra multiconfigs:
                     <filename>target1</filename> and
                     <filename>target2</filename>:
                     <literallayout class='monospaced'>
-     $ bitbake multiconfig:target1:<replaceable>target</replaceable> multiconfig:target2:<replaceable>target</replaceable>
+     $ bitbake mc::<replaceable>target</replaceable> mc:target1:<replaceable>target</replaceable> mc:target2:<replaceable>target</replaceable>
                     </literallayout>
                 </para>
             </section>
@@ -837,13 +837,13 @@
                     build, you must declare the dependencies in the recipe
                     using the following statement form:
                     <literallayout class='monospaced'>
-     <replaceable>task_or_package</replaceable>[mcdepends] = "multiconfig:<replaceable>from_multiconfig</replaceable>:<replaceable>to_multiconfig</replaceable>:<replaceable>recipe_name</replaceable>:<replaceable>task_on_which_to_depend</replaceable>"
+     <replaceable>task_or_package</replaceable>[mcdepends] = "mc:<replaceable>from_multiconfig</replaceable>:<replaceable>to_multiconfig</replaceable>:<replaceable>recipe_name</replaceable>:<replaceable>task_on_which_to_depend</replaceable>"
                     </literallayout>
                     To better show how to use this statement, consider an
                     example with two multiconfigs: <filename>target1</filename>
                     and <filename>target2</filename>:
                     <literallayout class='monospaced'>
-     <replaceable>image_task</replaceable>[mcdepends] = "multiconfig:target1:target2:<replaceable>image2</replaceable>:<replaceable>rootfs_task</replaceable>"
+     <replaceable>image_task</replaceable>[mcdepends] = "mc:target1:target2:<replaceable>image2</replaceable>:<replaceable>rootfs_task</replaceable>"
                     </literallayout>
                     In this example, the
                     <replaceable>from_multiconfig</replaceable> is "target1" and
@@ -859,7 +859,7 @@
                    Once you set up this dependency, you can build the
                    "target1" multiconfig using a BitBake command as follows:
                    <literallayout class='monospaced'>
-     $ bitbake multiconfig:target1:<replaceable>image1</replaceable>
+     $ bitbake mc:target1:<replaceable>image1</replaceable>
                    </literallayout>
                    This command executes all the tasks needed to create
                    <replaceable>image1</replaceable> for the "target1"
@@ -875,7 +875,7 @@
                    Consider this change to the statement in the
                    <replaceable>image1</replaceable> recipe:
                    <literallayout class='monospaced'>
-     <replaceable>image_task</replaceable>[mcdepends] = "multiconfig:target1:target2:<replaceable>image2</replaceable>:<replaceable>image_task</replaceable>"
+     <replaceable>image_task</replaceable>[mcdepends] = "mc:target1:target2:<replaceable>image2</replaceable>:<replaceable>image_task</replaceable>"
                    </literallayout>
                    In this case, BitBake must create
                    <replaceable>image2</replaceable> for the "target2"

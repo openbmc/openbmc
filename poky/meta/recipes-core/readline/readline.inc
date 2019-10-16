@@ -43,3 +43,8 @@ do_install_append () {
 BBCLASSEXTEND = "native nativesdk"
 
 CONFFILES_${PN} += "${sysconfdir}/inputrc"
+
+# OpenSuse injects versions into libreadline leading to conficits between our native one and theirs
+# see their spec file for where this is injected. Extra versioning is harmless so we just do the same.
+SRC_URI_append_class-native = " file://rl-native.map"
+LDFLAGS_append_class-native = " -Wl,--version-script=${WORKDIR}/rl-native.map"

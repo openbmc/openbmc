@@ -13,6 +13,8 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/libs/security/linux-privs/${BPN}2/${BPN}-${
 SRC_URI[md5sum] = "2e8f9fab32eb5ccb37969fe317fd17aa"
 SRC_URI[sha256sum] = "dac1792d0118bee6aae6ba7fb93ff1602c6a9bda812fd63916eee1435b9c486a"
 
+UPSTREAM_CHECK_URI = "https://www.kernel.org/pub/linux/libs/security/linux-privs/${BPN}2/"
+
 inherit lib_package
 
 # do NOT pass target cflags to host compilations

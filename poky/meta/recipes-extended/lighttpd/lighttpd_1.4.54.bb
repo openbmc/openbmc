@@ -2,7 +2,7 @@ SUMMARY = "Lightweight high-performance web server"
 HOMEPAGE = "http://www.lighttpd.net/"
 BUGTRACKER = "http://redmine.lighttpd.net/projects/lighttpd/issues"
 
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=e4dac5c6ab169aa212feb5028853a579"
 
 SECTION = "net"

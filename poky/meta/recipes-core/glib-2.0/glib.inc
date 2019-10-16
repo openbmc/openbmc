@@ -158,6 +158,8 @@ RDEPENDS_${PN}-ptest += "\
             ${PN}-locale-pl \
             ${PN}-locale-ru \
             ${PN}-locale-th \
+            python3-core \
+            python3-modules \
            "
 
 RDEPENDS_${PN}-ptest_append_libc-glibc = "\
