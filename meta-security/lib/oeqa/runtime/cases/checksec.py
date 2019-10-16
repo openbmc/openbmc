@@ -24,6 +24,7 @@ class CheckSecTest(OERuntimeTestCase):
         self.assertEqual(status, 0, msg = msg)
 
     @OETestDepends(['checksec.CheckSecTest.test_checksec_xml'])
+    @OEHasPackage(['binutils'])
     def test_checksec_fortify(self):
         status, output = self.target.run('checksec --fortify-proc 1')
         match = re.search('FORTIFY_SOURCE support:', output)

@@ -52,9 +52,6 @@ do_install_append () {
 
     oe_runmake install-conf DESTDIR=${D}
 
-    # mimic move of downloaded rules to e_sysconfrulesdir
-    cp -rf  ${WORKDIR}/rules ${D}${sysconfdir}/suricata
-
     oe_runmake install-rules DESTDIR=${D}
 
     install -d ${D}${sysconfdir}/suricata ${D}${sysconfdir}/default/volatiles
