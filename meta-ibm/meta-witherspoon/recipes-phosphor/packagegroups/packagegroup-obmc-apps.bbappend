@@ -7,5 +7,5 @@ RDEPENDS_${PN}-extras_append_rainier = " phosphor-webui"
 RDEPENDS_${PN}-extras_append_mihawk = " phosphor-webui phosphor-image-signing"
 RDEPENDS_${PN}-extras_remove_rainier = "obmc-ikvm liberation-fonts uart-render-controller"
 RDEPENDS_${PN}-extras_remove_witherspoon-tacoma = "obmc-ikvm liberation-fonts uart-render-controller"
-
+RDEPENDS_${PN}-logging_remove_rainier = "ibm-logging"
 ${PN}-software-extras_append_ibm-ac-server = " phosphor-software-manager-sync"
