@@ -1,4 +1,4 @@
-MACHINE ??= "runbmc-nuvoton"
+MACHINE ??= "olympus-nuvoton"
 DISTRO ?= "openbmc-phosphor"
 PACKAGE_CLASSES ?= "package_rpm"
 SANITY_TESTED_DISTROS_append ?= " *"

@@ -1,3 +1,3 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-nuvoton:"
 
-SRC_URI += "file://runbmc-nuvoton.cfg"
+SRC_URI += "file://olympus-nuvoton.cfg"

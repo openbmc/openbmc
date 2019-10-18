@@ -13,7 +13,7 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-nuvoton \
   ##OEROOT##/meta-quanta \
-  ##OEROOT##/meta-quanta/meta-runbmc-nuvoton \
+  ##OEROOT##/meta-quanta/meta-olympus-nuvoton \
   "
 BBLAYERS_NON_REMOVABLE ?= " \
   ##OEROOT##/meta \
@@ -23,5 +23,5 @@ BBLAYERS_NON_REMOVABLE ?= " \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-nuvoton \
   ##OEROOT##/meta-quanta \
-  ##OEROOT##/meta-quanta/meta-runbmc-nuvoton \
+  ##OEROOT##/meta-quanta/meta-olympus-nuvoton \
   "
