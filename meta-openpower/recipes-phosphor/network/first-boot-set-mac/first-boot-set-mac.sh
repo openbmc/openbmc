@@ -79,4 +79,6 @@ fi
 
 sync_mac $1
 
-systemctl --no-reload disable first-boot-set-mac@${1}.service
+# Prevent start at next boot time
+mkdir -p "/var/lib/first-boot-set-mac"
+touch "/var/lib/first-boot-set-mac/${1}"

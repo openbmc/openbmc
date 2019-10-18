@@ -81,4 +81,5 @@ sync_hostname() {
 
 sync_hostname
 
-systemctl --no-reload disable first-boot-set-hostname.service
+# Prevent start at next boot time
+touch "/var/lib/first-boot-set-hostname"
