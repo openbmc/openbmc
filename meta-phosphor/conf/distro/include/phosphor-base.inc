@@ -113,7 +113,7 @@ DISTRO_FEATURES_DEFAULT = " \
         libc-inet-anl \
         "
 
-DISTRO_FEATURES = " \
+DISTRO_FEATURES += " \
         ${DISTRO_FEATURES_DEFAULT} \
         ${DISTRO_FEATURES_LIBC} \
         ${DISTRO_FEATURES_OBMC} \
