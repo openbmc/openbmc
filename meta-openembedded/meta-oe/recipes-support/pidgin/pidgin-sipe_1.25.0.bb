@@ -5,14 +5,13 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
 DEPENDS = "pidgin gmime intltool-native glib-2.0-native"
 
-inherit pkgconfig
-inherit autotools
+inherit autotools gettext pkgconfig
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/sipe/pidgin-sipe-${PV}.tar.xz \
 "
 
-SRC_URI[md5sum] = "b91106d28c235b347a63dcb676f7b66a"
-SRC_URI[sha256sum] = "958803722b23d869131f76bd90df9da19116d4ca5a873e5253371479b7390f43"
+SRC_URI[md5sum] = "0e742f021dc8c3f17435aea05c3e0314"
+SRC_URI[sha256sum] = "738b121b11f2b3f1744150c00cb381222eb6cf67161a7742797eb4f03e64a2ba"
 
 PACKAGECONFIG ??= "nss krb5"
 PACKAGECONFIG[nss] = "--enable-nss=yes,--enable-nss=no,nss"

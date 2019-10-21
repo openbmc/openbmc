@@ -26,6 +26,7 @@ SRC_URI = "git://github.com/FreeRADIUS/freeradius-server.git;branch=v3.0.x; \
     file://freeradius-fix-quoting-for-BUILT_WITH.patch \
     file://freeradius-fix-error-for-expansion-of-macro.patch \
     file://0001-rlm_mschap-Use-includedir-instead-of-hardcoding-usr-.patch \
+    file://0001-su-to-radiusd-user-group-when-rotating-logs.patch \
     file://radiusd.service \
     file://radiusd-volatiles.conf \
 "

@@ -2,8 +2,8 @@ SUMMARY = "An implementation of JSON Schema validation for Python"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=7a60a81c146ec25599a3e1dabb8610a8"
 
-SRC_URI[md5sum] = "2b44d00dccc96d7ba3839190263152eb"
-SRC_URI[sha256sum] = "8d4a2b7b6c2237e0199c8ea1a6d3e05bf118e289ae2b9d7ba444182a2959560d"
+SRC_URI[md5sum] = "a802ab85600074a726ef6acc4e6a8148"
+SRC_URI[sha256sum] = "2fa0684276b6333ff3c0b1b27081f4b2305f0a36cf702a23db50edb141893c3f"
 
 DEPENDS += "${PYTHON_PN}-vcversioner-native ${PYTHON_PN}-setuptools-scm-native"
 

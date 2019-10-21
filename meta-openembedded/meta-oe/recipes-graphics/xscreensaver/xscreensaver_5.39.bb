@@ -1,6 +1,6 @@
 SUMMARY = "X screen saver and locker"
 
-LICENSE = "BSD"
+LICENSE = "BSD-0-Clause"
 LIC_FILES_CHKSUM = "file://driver/xscreensaver.h;endline=10;md5=e141ab5822fb2d43694e1e47b59fc0df"
 
 SRC_URI = "https://www.jwz.org/${BPN}/${BP}.tar.gz"

@@ -2,7 +2,7 @@ DESCRIPTION = "Regular expressions library. The characteristics of this \
 library is that different character encoding for every regular expression \
 object can be specified."
 HOMEPAGE = "https://web.archive.org/web/20150807014439/http://www.geocities.jp/kosako3/oniguruma/"
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0d4861b5bc0c392a5aa90d9d76ebd86f"
 
 SRC_URI = "https://web.archive.org/web/20150807014439/http://www.geocities.jp/kosako3/oniguruma/archive/${BP}.tar.gz \

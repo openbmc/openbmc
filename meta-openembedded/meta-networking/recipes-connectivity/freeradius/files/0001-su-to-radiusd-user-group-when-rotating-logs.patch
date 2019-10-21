@@ -1,0 +1,104 @@
+From 1f233773962bf1a9c2d228a180eacddb9db2d574 Mon Sep 17 00:00:00 2001
+From: Alexander Scheel <ascheel@redhat.com>
+Date: Tue, 7 May 2019 16:04:29 -0400
+Subject: [PATCH] su to radiusd user/group when rotating logs
+
+The su directive to logrotate ensures that log rotation happens under the
+owner of the logs. Otherwise, logrotate runs as root:root, potentially
+enabling privilege escalation if a RCE is discovered against the
+FreeRADIUS daemon.
+
+Signed-off-by: Alexander Scheel <ascheel@redhat.com>
+
+Upstream-Status: Backport
+[https://github.com/FreeRADIUS/freeradius-server/commit/1f233773962bf1a9c2d228a180eacddb9db2d574]
+
+CVE: CVE-2019-10143
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ debian/freeradius.logrotate  | 3 +++
+ redhat/freeradius-logrotate  | 1 +
+ scripts/logrotate/freeradius | 3 +++
+ suse/radiusd-logrotate       | 1 +
+ 4 files changed, 8 insertions(+)
+
+diff --git a/debian/freeradius.logrotate b/debian/freeradius.logrotate
+index 7d837d5..a8d29b7 100644
+--- a/debian/freeradius.logrotate
++++ b/debian/freeradius.logrotate
+@@ -9,6 +9,7 @@
+ 	notifempty
+ 
+ 	copytruncate
++	su freerad freerad
+ }
+ 
+ # (in order)
+@@ -26,6 +27,7 @@
+ 	notifempty
+ 
+ 	nocreate
++	su freerad freerad
+ }
+ 
+ # There are different detail-rotating strategies you can use.  One is
+@@ -45,4 +47,5 @@
+ 	notifempty
+ 
+ 	nocreate
++	su freerad freerad
+ }
+diff --git a/redhat/freeradius-logrotate b/redhat/freeradius-logrotate
+index 360765d..bb97ca5 100644
+--- a/redhat/freeradius-logrotate
++++ b/redhat/freeradius-logrotate
+@@ -9,6 +9,7 @@ rotate 4
+ missingok
+ compress
+ delaycompress
++su radiusd radiusd
+ 
+ #
+ #  The main server log
+diff --git a/scripts/logrotate/freeradius b/scripts/logrotate/freeradius
+index 3de435e..eecf631 100644
+--- a/scripts/logrotate/freeradius
++++ b/scripts/logrotate/freeradius
+@@ -17,6 +17,7 @@
+ 	notifempty
+ 
+ 	copytruncate
++	su radiusd radiusd
+ }
+ 
+ # (in order)
+@@ -34,6 +35,7 @@
+ 	notifempty
+ 
+ 	nocreate
++	su radiusd radiusd
+ }
+ 
+ # There are different detail-rotating strategies you can use.  One is
+@@ -53,4 +55,5 @@
+ 	notifempty
+ 
+ 	nocreate
++	su radiusd radiusd
+ }
+diff --git a/suse/radiusd-logrotate b/suse/radiusd-logrotate
+index 24d56be..be5a797 100644
+--- a/suse/radiusd-logrotate
++++ b/suse/radiusd-logrotate
+@@ -11,6 +11,7 @@ missingok
+ compress
+ delaycompress
+ notifempty
++su radiusd radiusd
+ 
+ #
+ #  The main server log
+-- 
+2.7.4
+

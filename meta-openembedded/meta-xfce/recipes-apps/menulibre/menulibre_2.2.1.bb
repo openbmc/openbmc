@@ -14,8 +14,8 @@ inherit distutils3 gtk-icon-cache distro_features_check
 REQUIRED_DISTRO_FEATURES = "x11"
 
 SRC_URI = "https://launchpad.net/menulibre/2.2/${PV}/+download/${BPN}-${PV}.tar.gz"
-SRC_URI[md5sum] = "9690848dbf9196c3f7baa574e90378d8"
-SRC_URI[sha256sum] = "546fec87f451c8f5c220d02b1f36dd850f4ce9ab607f8e9711ed8f2009e349fe"
+SRC_URI[md5sum] = "8460ea844a5998c5f722bccb5ce8627a"
+SRC_URI[sha256sum] = "5b3ef8e6073d584f6accf282fa1eb649185ee42eb22fab70231491c7377d7e8f"
 
 do_compile() {
 }

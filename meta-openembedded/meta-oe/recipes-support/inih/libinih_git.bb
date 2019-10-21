@@ -2,7 +2,7 @@ SUMMARY = "C and C++ INI Library"
 HOMEPAGE = "http://code.google.com/p/inih/"
 PV = "0.0+gitr${SRCPV}"
 PKGV = "${GITPKGVTAG}"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=dae28cbf28207425e0d0b3eb835f4bde"
 
 PR = "r3"

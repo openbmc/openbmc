@@ -7,9 +7,9 @@ ConditionPathExists=@SYSCONFDIR@/quagga/ripd.conf
 [Service]
 Type=forking
 EnvironmentFile=-@SYSCONFDIR@/default/quagga
-PIDFile=@localstatedir@/run/quagga/ripd.pid
+PIDFile=/run/quagga/ripd.pid
 ExecStart=@SBINDIR@/ripd -d $ripd_options -f @SYSCONFDIR@/quagga/ripd.conf
-ExecStopPost=@base_bindir@/rm -rf @localstatedir@/run/quagga/ripd.pid
+ExecStopPost=@base_bindir@/rm -rf /run/quagga/ripd.pid
 Restart=on-abort
 
 [Install]

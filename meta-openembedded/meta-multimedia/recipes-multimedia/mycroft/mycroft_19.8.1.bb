@@ -6,13 +6,13 @@ SECTION = "multimedia"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=79aa497b11564d1d419ee889e7b498f6"
 
-SRCREV = "4b45db34ecd95b62ef2b66a8e5180c66ca791a21"
+SRCREV = "913f29d3d550637934f9abf43a097eb2c30d76fc"
 SRC_URI = "git://github.com/MycroftAI/mycroft-core.git;branch=master \
            file://0001-Remove-python-venv.patch \
-           file://0002-pip-requirements-Remove-ones-installed-by-OE.patch \
-           file://0003-Use-python3-and-pip3-instead-of-python-and-pip.patch \
-           file://0004-dev_setup.sh-Remove-the-git-dependency.patch \
-           file://0005-dev_setup.sh-Remove-the-test-setup-dependency.patch \
+           file://0002-dev_setup.sh-Remove-the-git-dependency.patch \
+           file://0003-dev_setup.sh-Remove-the-TERM-dependency.patch \
+           file://0004-pip-requirements-Don-t-install-requirements-with-pip.patch \
+           file://0005-Use-python3-and-pip3-instead-of-python-and-pip.patch \
            file://dev_opts.json \
            file://mycroft-setup.service \
            file://mycroft.service \
@@ -24,6 +24,7 @@ inherit systemd
 
 # Mycroft installs itself on the host
 # Just copy the setup files to the rootfs
+# The mycroft-setup service will copy the files to /var/ where we run them from
 do_install() {
     install -d ${D}${libdir}/
     cp -r ${B} ${D}${libdir}/mycroft
@@ -49,19 +50,29 @@ FILES_${PN} += "${libdir}/mycroft"
 
 RDEPENDS_${PN} = "python3"
 
-# Install as many Python packages as we can.
-# We don't yet have all the packages in meta-python.
-# Install as many as we can and we will install the rest on the target with pip.
-# TODO: Add all the remaining packages and remove pip
-RDEPENDS_${PN} += "python3-pip \
-                   python3-requests python3-pillow \
+RDEPENDS_${PN} += "python3-requests python3-pillow \
                    python3-tornado python3-pyyaml \
                    python3-pyalsaaudio python3-inflection \
                    python3-pyserial python3-psutil \
                    python3-pyaudio python3-fann2 \
                    python3-pocketsphinx \
-                   python3-xxhash \
+                   python3-xxhash python3-pako \
+                   python3-six python3-cryptography \
+                   python3-requests-futures \
+                   python3-xmlrunner python3-fasteners \
+                   python3-python-vlc \
+                   python3-padatious python3-padaos \
+                   python3-petact python3-precise-runner \
+                   python3-pulsectl python3-pychromecast \
+                   python3-msm python3-msk \
+                   python3-websocket-client \
+                   python3-google-api-python-client \
                  "
+
+# These packages need to be installed on the target
+# python3-speechrecognition python3-pyee==5.0.0 python3-six==1.10.0
+# python3-websocket-client==0.54.0 python3-gtts python3-gtts-token
+# python3-python-dateutil python3-adapt-parser python3-lazy
 
 # Mycroft uses Alsa, PulseAudio and Flac
 RDEPENDS_${PN} += "alsa-utils alsa-plugins alsa-tools"

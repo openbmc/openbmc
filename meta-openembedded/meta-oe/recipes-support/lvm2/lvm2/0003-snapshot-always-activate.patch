@@ -1,0 +1,40 @@
+From 9143445478871b47ba28b41f5e88d4c415f8205b Mon Sep 17 00:00:00 2001
+From: Zdenek Kabelac <zkabelac@redhat.com>
+Date: Mon, 26 Aug 2019 15:13:55 +0200
+Subject: [PATCH 3/3] snapshot: always activate
+
+Drop the 'cluster-only' optimization so we do resume ALL device
+before we try to wait on cookie before 'removal' operation.
+
+It's more correct order of operation - alhtough possibly slightly
+less efficient - but until we have correct list of operations
+'in-progress' we can't do anything better.
+
+Upstream-Status: Backport
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ lib/metadata/snapshot_manip.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
+
+diff --git a/lib/metadata/snapshot_manip.c b/lib/metadata/snapshot_manip.c
+index 5ccf251c7..65d8dbd13 100644
+--- a/lib/metadata/snapshot_manip.c
++++ b/lib/metadata/snapshot_manip.c
+@@ -361,13 +361,7 @@ int vg_remove_snapshot(struct logical_volume *cow)
+ 			return 0;
+ 		}
+ 
+-		/*
+-		 * For merged snapshot and clustered VG activate cow LV so
+-		 * the following call to deactivate_lv() can clean-up table
+-		 * entries. For this clustered lock need to be held.
+-		 */
+-		if (vg_is_clustered(cow->vg) &&
+-		    merging_snapshot && !activate_lv(cow->vg->cmd, cow)) {
++		if (merging_snapshot && !activate_lv(cow->vg->cmd, cow)) {
+ 			log_error("Failed to activate %s.", cow->name);
+ 			return 0;
+ 		}
+-- 
+2.21.0
+

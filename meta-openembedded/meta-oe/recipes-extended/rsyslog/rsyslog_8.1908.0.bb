@@ -24,6 +24,7 @@ SRC_URI = "http://www.rsyslog.com/download/files/download/rsyslog/${BPN}-${PV}.t
            file://use-pkgconfig-to-check-libgcrypt.patch \
            file://run-ptest \
            file://0001-Out-of-bounds-issue.patch \
+           file://0001-pmaixforwardedfrom-bugfix-potential-misadressing.patch \
 "
 
 SRC_URI_append_libc-musl = " \

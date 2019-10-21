@@ -31,8 +31,8 @@ SRC_URI_append_libc-musl = " \
     file://musl/0001-Fix-build-with-musl-systemd-specific.patch \
     file://musl/0002-Fix-build-with-musl.patch \
 "
-SRC_URI[md5sum] = "ca1e6175c6ba97ca1adf65a67861ccd9"
-SRC_URI[sha256sum] = "4dd97ca974cd1f97990746527258f551f4257cbf011fecd01d10b7d74a6fa5c3"
+SRC_URI[md5sum] = "fc86588a3ae54e0d406b560a312d5a5d"
+SRC_URI[sha256sum] = "a3bd07f695b6d3529ec6adbd9a1d6385b967e9c8ae90946f51d8852b320fd05e"
 
 S = "${WORKDIR}/NetworkManager-${PV}"
 

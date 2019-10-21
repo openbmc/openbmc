@@ -34,7 +34,9 @@ do_compile() {
 }
 
 do_install() {
-    sed -i -e "s;SBIN\t\t= \$(BUILD_ROOT)/sbin;SBIN\t\t= \$(BUILD_ROOT)/$base_sbindir;" ${S}/Makefile
+    sed -i -e "s;SBIN\t\t= \$(BUILD_ROOT)/sbin;SBIN\t\t= \$(BUILD_ROOT)$base_sbindir;" \
+        -e "s;INIT\t\t= \$(BUILD_ROOT)/etc/rc.d/init.d;INIT\t\t= \$(BUILD_ROOT)${sysconfdir}/init.d;" \
+        ${S}/Makefile
     oe_runmake 'BUILD_ROOT=${D}' install
 }
 

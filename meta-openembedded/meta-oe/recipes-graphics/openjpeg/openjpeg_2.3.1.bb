@@ -1,6 +1,6 @@
 DESCRIPTION = "OpenJPEG library is an open-source JPEG 2000 codec"
 HOMEPAGE = "http://www.openjpeg.org"
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=c648878b4840d7babaade1303e7f108c"
 
 DEPENDS = "libpng tiff lcms zlib"
