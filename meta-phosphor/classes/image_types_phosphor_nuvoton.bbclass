@@ -4,17 +4,19 @@ FULL_SUFFIX = "full"
 MERGED_SUFFIX = "merged"
 UBOOT_SUFFIX_append = ".${MERGED_SUFFIX}"
 
+IGPS_DIR = "${STAGING_DIR_NATIVE}/${datadir}/npcm7xx-igps"
+
 # Prepare the Bootblock and U-Boot images using npcm7xx-bingo
 do_prepare_bootloaders() {
     local olddir="$(pwd)"
     cd ${DEPLOY_DIR_IMAGE}
-    bingo ${STAGING_DIR_NATIVE}/${bindir}/BootBlockAndHeader_EB.xml \
+    bingo ${IGPS_DIR}/BootBlockAndHeader_${IGPS_MACHINE}.xml \
             -o ${DEPLOY_DIR_IMAGE}/${BOOTBLOCK}.${FULL_SUFFIX}
 
-    bingo ${STAGING_DIR_NATIVE}/${bindir}/UbootHeader_EB.xml \
+    bingo ${IGPS_DIR}/UbootHeader_${IGPS_MACHINE}.xml \
             -o ${DEPLOY_DIR_IMAGE}/${UBOOT_BINARY}.${FULL_SUFFIX}
 
-    bingo ${STAGING_DIR_NATIVE}/${bindir}/mergedBootBlockAndUboot.xml \
+    bingo ${IGPS_DIR}/mergedBootBlockAndUboot.xml \
             -o ${DEPLOY_DIR_IMAGE}/${UBOOT_BINARY}.${MERGED_SUFFIX}
     cd "$olddir"
 }
@@ -22,6 +24,7 @@ do_prepare_bootloaders() {
 do_prepare_bootloaders[depends] += " \
     npcm7xx-bootblock:do_deploy \
     npcm7xx-bingo-native:do_populate_sysroot \
+    npcm7xx-igps-native:do_populate_sysroot \
     "
 
 addtask do_prepare_bootloaders before do_generate_static after do_generate_rwfs_static
