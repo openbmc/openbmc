@@ -11,6 +11,7 @@ inherit pythonnative
 require ${PN}.inc
 
 S = "${WORKDIR}/git"
+SRC_URI += "file://psu.json"
 
 DEPENDS += " \
          phosphor-logging \
@@ -23,6 +24,11 @@ DEPENDS += " \
          "
 
 EXTRA_OEMESON += "-Ducd90160-yaml=${STAGING_DIR_HOST}${datadir}/power-sequencer/ucd90160.yaml"
+
+do_install_append(){
+    install -D ${WORKDIR}/psu.json ${D}${datadir}/phosphor-power/psu.json
+}
+FILES_${PN} += "${datadir}/phosphor-power/psu.json"
 
 CHASSIS_ON_TGT = "obmc-chassis-poweron@0.target"
 SEQ_MONITOR_SVC = "pseq-monitor.service"
