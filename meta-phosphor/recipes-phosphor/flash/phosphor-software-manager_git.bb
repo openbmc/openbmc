@@ -58,6 +58,7 @@ FILES_${PN}-download-mgr += "${bindir}/phosphor-download-manager"
 FILES_${PN}-updater += " \
     ${bindir}/phosphor-image-updater \
     ${bindir}/obmc-flash-bmc \
+    /usr/local \
     "
 FILES_${PN}-sync += " \
     ${bindir}/phosphor-sync-software-manager \
@@ -70,6 +71,11 @@ DBUS_SERVICE_${PN}-sync += "xyz.openbmc_project.Software.Sync.service"
 
 SYSTEMD_SERVICE_${PN}-updater += " \
     obmc-flash-bmc-setenv@.service \
+    usr-local.mount \
 "
 
 S = "${WORKDIR}/git"
+
+do_install_append() {
+    install -d ${D}/usr/local
+}
