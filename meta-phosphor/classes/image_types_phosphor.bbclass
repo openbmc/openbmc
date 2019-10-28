@@ -57,6 +57,8 @@ SIGNING_KEY ?= "${STAGING_DIR_NATIVE}${datadir}/OpenBMC.priv"
 INSECURE_KEY = "${@'${SIGNING_KEY}' == '${STAGING_DIR_NATIVE}${datadir}/OpenBMC.priv'}"
 SIGNING_KEY_DEPENDS = "${@oe.utils.conditional('INSECURE_KEY', 'True', 'phosphor-insecure-signing-key-native:do_populate_sysroot', '', d)}"
 
+VERSION_PURPOSE ?= "xyz.openbmc_project.Software.Version.VersionPurpose.BMC"
+
 UBOOT_SUFFIX ?= "bin"
 
 python() {
@@ -418,10 +420,11 @@ def get_pubkey_path(d):
         'publickey')
 
 python do_generate_phosphor_manifest() {
+    purpose = d.getVar('VERSION_PURPOSE', True)
     version = do_get_version(d)
     target_machine = d.getVar('MACHINE', True)
     with open('MANIFEST', 'w') as fd:
-        fd.write('purpose=xyz.openbmc_project.Software.Version.VersionPurpose.BMC\n')
+        fd.write('purpose={}\n'.format(purpose))
         fd.write('version={}\n'.format(version.strip('"')))
         fd.write('KeyType={}\n'.format(get_pubkey_type(d)))
         fd.write('HashType=RSA-SHA256\n')
