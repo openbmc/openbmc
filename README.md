@@ -65,6 +65,12 @@ bitbake obmc-phosphor-image
 Additional details can be found in the [docs](https://github.com/openbmc/docs)
 repository.
 
+## OpenBMC Development
+
+The OpenBMC community maintains a set of tutorials new users can go through
+to get up to speed on OpenBMC development out
+[here](https://github.com/openbmc/docs/blob/master/development/README.md)
+
 ## Build Validation and Testing
 Commits submitted by members of the OpenBMC GitHub community are compiled and
 tested via our [Jenkins](https://openpower.xyz/) server.  Commits are run
