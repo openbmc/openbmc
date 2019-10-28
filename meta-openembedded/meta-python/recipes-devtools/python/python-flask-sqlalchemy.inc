@@ -1,5 +1,5 @@
 DESCRIPTION = "Adds SQLAlchemy support to your Flask application."
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=5ed1b8cc741515a835a7f6bf2f62ef4a"
 
 SRC_URI[md5sum] = "373ce61dfd03b593ad2eaba68c9fee35"

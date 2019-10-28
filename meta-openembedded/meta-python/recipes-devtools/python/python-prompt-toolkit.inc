@@ -1,5 +1,5 @@
 SUMMARY = "Library for building powerful interactive command lines in Python"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=b2cde7da89f0c1f3e49bf968d00d554f"
 
 SRC_URI[md5sum] = "8db8b8e40e91bc6dce133d8d5727a717"

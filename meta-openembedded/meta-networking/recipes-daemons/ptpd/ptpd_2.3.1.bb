@@ -5,7 +5,7 @@ and PTP Version 2 implements IEEE-1588-2008. PTP was developed to provide very p
 time coordination of LAN connected computers."
 HOMEPAGE = "http://sourceforge.net/projects/ptpd"
 SECTION = "net"
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://README;md5=0733e1b3788ab2ebbc63bf33a020da1d"
 
 DEPENDS = "libpcap"

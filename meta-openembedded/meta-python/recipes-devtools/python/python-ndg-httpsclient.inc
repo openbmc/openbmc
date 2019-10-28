@@ -1,6 +1,6 @@
 DESCRIPTION = "Provides enhanced HTTPS support for httplib and urllib2 using PyOpenSSL"
 HOMEPAGE = "http://python-requests.org"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://MANIFEST.in;md5=ce22c0cd986d2de3f7073cd6b5523ae0"
 
 SRC_URI[md5sum] = "b0fc8ea38f87d2c1ab1ed79a95c078f9"

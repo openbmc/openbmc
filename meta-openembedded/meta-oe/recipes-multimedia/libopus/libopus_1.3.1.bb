@@ -5,7 +5,7 @@ designed by the IETF Codec Working Group and incorporates \
 technology from Skype's SILK codec and Xiph.Org's CELT codec."
 HOMEPAGE = "http://www.opus-codec.org/"
 SECTION = "libs/multimedia"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=e304cdf74c2a1b0a33a5084c128a23a3"
 
 SRC_URI = "http://downloads.xiph.org/releases/opus/opus-${PV}.tar.gz"

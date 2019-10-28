@@ -5,7 +5,7 @@ DESCRIPTION = "A pure-Python implementation of SNMP/SMI MIB \
 HOMEPAGE = "https://pypi.python.org/pypi/pysmi"
 SECTION = "devel/python"
 
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.rst;md5=d8b1bbadd635f187dee74d999a8c67b8"
 
 SRC_URI[md5sum] = "3b0f71e4e9f730d211f09d8ef5371140"

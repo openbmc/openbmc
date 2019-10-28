@@ -1,7 +1,7 @@
 From 88696037af52d6a7f57bc0fb82598de1a25365cc Mon Sep 17 00:00:00 2001
 From: Alistair Francis <alistair.francis@wdc.com>
 Date: Fri, 29 Mar 2019 16:09:57 -0700
-Subject: [PATCH 2/5] dev_setup.sh: Remove the git dependency
+Subject: [PATCH 2/7] dev_setup.sh: Remove the git dependency
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Upstream-Status: Inappropriate [embedded specific]

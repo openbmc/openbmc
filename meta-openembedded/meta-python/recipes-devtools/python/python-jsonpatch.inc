@@ -1,6 +1,6 @@
 SUMMARY  = "Appling JSON patches in Python 2.6+ and 3.x"
 HOMEPAGE = "https://github.com/stefankoegl/python-json-patch"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=32b15c843b7a329130f4e266a281ebb3"
 
 inherit pypi

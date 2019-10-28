@@ -5,7 +5,7 @@ DESCRIPTION = "scsirastools were designed to add to the Serviceability of \
                maintenance or service functions. It handles SCSI, \
                Linux SW RAID, SAS, SATA, and USB devices via SCSI emulation."
 HOMEPAGE = "http://scsirastools.sourceforge.net/"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=687ea108478d26152ae46eb29d9d1545"
 
 DEPENDS += "groff-native"

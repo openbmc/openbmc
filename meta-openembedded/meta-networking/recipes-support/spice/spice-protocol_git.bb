@@ -10,7 +10,7 @@ environment - not only on its computer-server machine, but also from \
 anywhere on the Internet and using a wide variety of machine \
 architectures."
 
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b37311cb5604f3e5cc2fb0fd23527e95"
 
 PV = "0.14.0+git${SRCPV}"

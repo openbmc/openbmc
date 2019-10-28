@@ -11,7 +11,7 @@ DESCRIPTION = "Cscope is a developer's tool for browsing source code. \
 
 HOMEPAGE = "http://cscope.sourceforge.net/"
 
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d4667b67b483823043fcffa489ea343b"
 
 inherit autotools

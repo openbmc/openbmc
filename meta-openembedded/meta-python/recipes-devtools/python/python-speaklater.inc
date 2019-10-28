@@ -1,5 +1,5 @@
 DESCRIPTION = "Media asset management for Python, with glue code for various frameworks"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=b810770075a29bf44b96607440e7c801"
 
 SRC_URI[md5sum] = "e8d5dbe36e53d5a35cff227e795e8bbf"

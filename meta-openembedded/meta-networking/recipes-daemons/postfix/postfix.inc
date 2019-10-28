@@ -202,29 +202,19 @@ ALTERNATIVE_LINK_NAME[mailq.1] = "${mandir}/man1/mailq.1"
 ALTERNATIVE_LINK_NAME[newaliases.1] = "${mandir}/man1/newaliases.1"
 ALTERNATIVE_LINK_NAME[sendmail.1] = "${mandir}/man1/sendmail.1"
 
-PACKAGE_WRITE_DEPS += "postfix-native"
-pkg_postinst_${PN} () {
-    if [ "x$D" = "x" ]; then
-        touch /etc/aliases
-        newaliases
+pkg_postinst_ontarget_${PN}-cfg () {
+    touch /etc/aliases
+    newaliases
 
-        # generate virtual_alias, default is hash
-        touch /etc/postfix/virtual_alias
-        postmap /etc/postfix/virtual_alias
-    else
-        touch $D/etc/aliases
-        # This can fail depending on host setup
-        if ! newaliases -C $D/etc/postfix/main.cf -oA$D/etc/aliases; then
-            $INTERCEPT_DIR/postinst_intercept delay_to_first_boot ${PKG} mlprefix=${MLPREFIX}
-        else
-            touch $D/etc/postfix/virtual_alias
-            postmap -c $D/etc/postfix $D/etc/postfix/virtual_alias
-        fi
-
-    fi
+    # generate virtual_alias, default is hash
+    touch /etc/postfix/virtual_alias
+    postmap /etc/postfix/virtual_alias
 }
 
+PACKAGES =+ "${PN}-cfg"
+RDEPENDS_${PN}_class-target += "${PN}-cfg"
 # Exclude .debug directories from the main package
-FILES_${PN} = "${sysconfdir} ${localstatedir} ${bindir}/* ${sbindir}/* \
+FILES_${PN} = "${localstatedir} ${bindir}/* ${sbindir}/* \
                ${libexecdir}/* ${systemd_unitdir}/*"
+FILES_${PN}-cfg = "${sysconfdir}"
 FILES_${PN}-dbg += "${libexecdir}/postfix/.debug"

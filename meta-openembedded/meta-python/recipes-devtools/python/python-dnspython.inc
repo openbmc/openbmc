@@ -1,6 +1,6 @@
 DESCRIPTION = "DNS toolkit for Python"
 HOMEPAGE = "http://www.dnspython.org/"
-LICENSE = "BSD"
+LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=b9d855ee0d7bea17c8b0994d37985e1e"
 
 SRC_URI[md5sum] = "05d33ffb5d8f35ae0474bb952778a344"

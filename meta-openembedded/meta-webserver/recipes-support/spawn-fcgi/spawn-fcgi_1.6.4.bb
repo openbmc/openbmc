@@ -1,7 +1,7 @@
 SUMMARRY = "spawn-fcgi is used to spawn FastCGI applications"
 HOMEPAGE = "http://redmine.lighttpd.net/projects/spawn-fcgi"
 
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=e4dac5c6ab169aa212feb5028853a579"
 
 SRC_URI = "http://download.lighttpd.net/spawn-fcgi/releases-1.6.x/spawn-fcgi-${PV}.tar.gz \

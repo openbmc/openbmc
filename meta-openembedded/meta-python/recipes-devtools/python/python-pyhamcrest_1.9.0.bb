@@ -1,5 +1,5 @@
 SUMMARY = "Hamcrest framework for matcher objects"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=f6df1318c6071dd1707f5e3b6c11f24f"
 
 PYPI_PACKAGE = "PyHamcrest"

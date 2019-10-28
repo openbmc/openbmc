@@ -28,7 +28,7 @@ SRC_URI[sha256sum] = "ce05b4bf2a04cd2f472e77ba4b86fbfca690bfc83e51da8ce0e575804b
 
 S = "${WORKDIR}/${fd_pkgname}-${PV}"
 
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=69bdc1d97648a2d35914563fcbbb361a"
 
 PTEST_PATH = "${libdir}/${fd_pkgname}/ptest"

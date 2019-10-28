@@ -3,7 +3,7 @@ DESCRIPTION = "The BSD-licensed libvpx reference implementation provides en- and
 HOMEPAGE = "http://www.webmproject.org/code/"
 BUGTRACKER = "http://code.google.com/p/webm/issues/list"
 SECTION = "libs/multimedia"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=d5b04755015be901744a78cc30d390d4"
 

@@ -7,7 +7,8 @@ DEPENDS = "fuse libmtp"
 
 inherit autotools pkgconfig
 
+# 0.3.0
 SRC_URI = "git://github.com/phatina/simple-mtpfs.git;protocol=https;branch=master"
-SRCREV = "a7ab64c7e4d7aca155cbc7ce9412aaf68ef6e404"
+SRCREV = "c9a691fc52fafaa55d26ac629856153c0514015a"
 
 S = "${WORKDIR}/git"

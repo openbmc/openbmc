@@ -5,7 +5,7 @@ template markup and dynamic rendering logic separate from one \
 another.  See http://www.entrian.com/PyMeld for a treatise on the \
 benefits of this pattern."
 HOMEPAGE = "https://github.com/supervisor/meld3"
-LICENSE = "BSD"
+LICENSE = "BSD-4-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=9e7581cef5645475fcefebdc15ed7abf"
 
 SRC_URI[md5sum] = "3ccc78cd79cffd63a751ad7684c02c91"

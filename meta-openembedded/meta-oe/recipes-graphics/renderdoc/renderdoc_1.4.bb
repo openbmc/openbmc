@@ -16,7 +16,7 @@ RDEPENDS_${PN} = "libxcb xcb-util-keysyms"
 
 inherit cmake python3native distro_features_check
 
-REQUIRED_DISTRO_FEATURES = "x11"
+REQUIRED_DISTRO_FEATURES = "x11 opengl"
 
 python __anonymous () {
     # only works on glibc systems

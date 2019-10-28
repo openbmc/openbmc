@@ -6,7 +6,7 @@ various non-trivial examples. Of course, as all techniques, decorators \
 can be abused and you should not try to solve every problem with a \
 decorator, just because you can."
 
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=be2fd2007972bf96c08af3293d728b22"
 
 SRC_URI[md5sum] = "a565a98581c0d110bc247323e89df9b1"

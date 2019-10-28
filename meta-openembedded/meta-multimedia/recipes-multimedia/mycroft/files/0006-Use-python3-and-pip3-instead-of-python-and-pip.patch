@@ -1,0 +1,121 @@
+From 86a1d18d96f827baa0c1029c85a53fc89d436e17 Mon Sep 17 00:00:00 2001
+From: Alistair Francis <alistair.francis@wdc.com>
+Date: Tue, 19 Mar 2019 13:38:44 -0700
+Subject: [PATCH 6/7] Use python3 and pip3 instead of python and pip
+
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Upstream-Status: Inappropriate [embedded specific]
+---
+ bin/mycroft-cli-client          | 2 +-
+ bin/mycroft-pip                 | 2 +-
+ bin/mycroft-say-to              | 2 +-
+ bin/mycroft-skill-testrunner    | 4 ++--
+ bin/mycroft-speak               | 2 +-
+ dev_setup.sh                    | 6 +++---
+ scripts/install-pocketsphinx.sh | 2 +-
+ 7 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/bin/mycroft-cli-client b/bin/mycroft-cli-client
+index f40a316e3f6..de2040d9e67 100755
+--- a/bin/mycroft-cli-client
++++ b/bin/mycroft-cli-client
+@@ -21,4 +21,4 @@ DIR="$( dirname "$SOURCE" )"
+ source "$DIR/../venv-activate.sh" -q
+ 
+ # Invoke the Command Line Interface
+-python -m mycroft.client.text $@
++python3 -m mycroft.client.text $@
+diff --git a/bin/mycroft-pip b/bin/mycroft-pip
+index a42b16b847a..81bd5bfb3cf 100755
+--- a/bin/mycroft-pip
++++ b/bin/mycroft-pip
+@@ -21,4 +21,4 @@ DIR="$( dirname "$SOURCE" )"
+ source "$DIR/../venv-activate.sh" -q
+ 
+ # Install pip packages within the Mycroft venv
+-pip $@
+\ No newline at end of file
++pip3 $@
+\ No newline at end of file
+diff --git a/bin/mycroft-say-to b/bin/mycroft-say-to
+index 4ae597f3062..8bb4039996d 100755
+--- a/bin/mycroft-say-to
++++ b/bin/mycroft-say-to
+@@ -26,4 +26,4 @@ set -- "${1:-$(</dev/stdin)}" "${@:2}"
+ 
+ # Send a message to be spoken
+ data="$@"
+-output=$(python -m mycroft.messagebus.send "recognizer_loop:utterance"  "{\"utterances\": [\"$data\"], \"lang\": \"en-us\"}")
++output=$(python3 -m mycroft.messagebus.send "recognizer_loop:utterance"  "{\"utterances\": [\"$data\"], \"lang\": \"en-us\"}")
+diff --git a/bin/mycroft-skill-testrunner b/bin/mycroft-skill-testrunner
+index 9699a4d138f..282f5ca65b0 100755
+--- a/bin/mycroft-skill-testrunner
++++ b/bin/mycroft-skill-testrunner
+@@ -22,7 +22,7 @@ source "$DIR/../venv-activate.sh" -q
+ 
+ # Invoke the individual skill tester
+ if [ "$#" -eq 0 ] ; then
+-    python -m test.integrationtests.skills.runner .
++    python3 -m test.integrationtests.skills.runner .
+ else
+-    python -m test.integrationtests.skills.runner $@
++    python3 -m test.integrationtests.skills.runner $@
+ fi
+\ No newline at end of file
+diff --git a/bin/mycroft-speak b/bin/mycroft-speak
+index d80f0e75b13..9448ea3400f 100755
+--- a/bin/mycroft-speak
++++ b/bin/mycroft-speak
+@@ -24,4 +24,4 @@ source "$DIR/../venv-activate.sh" -q
+ 
+ # Send a message to be spoken
+ data="$@"
+-output=$(python -m mycroft.messagebus.send "speak"  "{\"utterance\": \"$data\"}")
++output=$(python3 -m mycroft.messagebus.send "speak"  "{\"utterance\": \"$data\"}")
+diff --git a/dev_setup.sh b/dev_setup.sh
+index be4a19de0c3..2d9e17ddfd6 100755
+--- a/dev_setup.sh
++++ b/dev_setup.sh
+@@ -48,7 +48,7 @@ param=''
+ 
+ for var in "$@" ; do
+     # Check if parameter should be read
+-    if [[ $param == 'python' ]] ; then
++    if [[ $param == 'python3' ]] ; then
+         opt_python=$var
+         param=""
+         continue
+@@ -75,7 +75,7 @@ for var in "$@" ; do
+         opt_skipmimicbuild=true
+     fi
+     if [[ $var == '-p' || $var == '--python' ]] ; then
+-        param='python'
++        param='python3'
+     fi
+ done
+ 
+@@ -349,7 +349,7 @@ else
+     fi
+ fi
+ 
+-PYTHON=$(python -c "import sys;print('python{}.{}'.format(sys.version_info[0], sys.version_info[1]))")
++PYTHON=$(python3 -c "import sys;print('python{}.{}'.format(sys.version_info[0], sys.version_info[1]))")
+ 
+ SYSMEM=$(free | awk '/^Mem:/ { print $2 }')
+ MAXCORES=$(($SYSMEM / 512000))
+diff --git a/scripts/install-pocketsphinx.sh b/scripts/install-pocketsphinx.sh
+index 44d329b7985..d45f5c22747 100755
+--- a/scripts/install-pocketsphinx.sh
++++ b/scripts/install-pocketsphinx.sh
+@@ -47,7 +47,7 @@ function install_pocketsphinx() {
+ 
+     # build and install pocketsphinx python bindings
+     cd ${TOP}/pocketsphinx-python
+-    python setup.py install
++    python3 setup.py install
+ }
+ 
+ if [ "$1" = "-q" ] ; then
+-- 
+2.23.0
+

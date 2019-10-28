@@ -1,7 +1,7 @@
 DESCRIPTION = "netkit-rwho includes, ruptime rwho and rwhod (Daemon to maintain data for rwho/ruptime)"
 HOMEPAGE = "ftp://ftp.uk.linux.org/pub/linux/Networking/netkit"
 SECTION = "net"
-LICENSE = "BSD"
+LICENSE = "BSD-4-Clause"
 LIC_FILES_CHKSUM = "file://rwho/rwho.c;beginline=2;endline=3;md5=5a85f13c0142d72fc378e00f15da5b9e"
 
 SRC_URI = "${DEBIAN_MIRROR}/main/n/netkit-rwho/netkit-rwho_${PV}.orig.tar.gz;name=archive \

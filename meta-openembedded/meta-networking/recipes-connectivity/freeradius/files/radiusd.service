@@ -4,8 +4,8 @@ After=syslog.target network.target
 
 [Service]
 Type=forking
-PIDFile=@STATEDIR@/run/radiusd/radiusd.pid
-ExecStartPre=-@BASE_BINDIR@/chown -R radiusd.radiusd @STATEDIR@/run/radiusd
+PIDFile=/run/radiusd/radiusd.pid
+ExecStartPre=-@BASE_BINDIR@/chown -R radiusd.radiusd /run/radiusd
 ExecStartPre=@SBINDIR@/radiusd -C
 ExecStart=@SBINDIR@/radiusd -d @SYSCONFDIR@/raddb
 ExecReload=@SBINDIR@/radiusd -C

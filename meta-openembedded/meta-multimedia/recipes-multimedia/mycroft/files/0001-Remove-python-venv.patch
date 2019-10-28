@@ -1,7 +1,7 @@
 From 07fce2101d83b5334de78e661ba0361c2874ebdf Mon Sep 17 00:00:00 2001
 From: Alistair Francis <alistair.francis@wdc.com>
 Date: Mon, 18 Mar 2019 16:30:45 -0700
-Subject: [PATCH 1/5] Remove python venv
+Subject: [PATCH 1/7] Remove python venv
 
 Remove the python venv requirements and instead just use the native
 python and pip pacakges.

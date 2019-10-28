@@ -9,6 +9,7 @@ inherit autotools systemd gsettings python3native gtk-icon-cache
 SRC_URI = " \
     https://github.com/blueman-project/blueman/releases/download/${PV}/blueman-${PV}.tar.xz \
     file://0001-Search-for-cython3.patch \
+    file://0002-fix-fail-to-enable-bluetooth.patch \
 "
 SRC_URI[md5sum] = "9de89abb31be45bdbf11f7884764a2dc"
 SRC_URI[sha256sum] = "f1eab2334e5a1587defa80900901048d14c2e8ffa8c0cff7240bc9937a61dbc3"

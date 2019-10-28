@@ -1,6 +1,6 @@
 SUMMARY = "MCPP is a portable C/C++ preprocessor"
 HOMEPAGE = "http://mcpp.sourceforge.net/"
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=5ca370b75ec890321888a00cea9bc1d5"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BPN}-${PV}.tar.gz \

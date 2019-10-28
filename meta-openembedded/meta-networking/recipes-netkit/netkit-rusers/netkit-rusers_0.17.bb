@@ -2,7 +2,7 @@ DESCRIPTION = "netkit-rusers includes rusers - Displays who is logged in to mach
     rusersd - Logged in users server"
 HOMEPAGE = "ftp://ftp.uk.linux.org/pub/linux/Networking/netkit"
 SECTION = "net"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://rusers/rusers.c;beginline=2;endline=3;md5=f4fc634a4ce8c569911196b72b10770e"
 DEPENDS = " tcp-wrappers libtirpc rpcbind rpcsvc-proto rpcsvc-proto-native"
 

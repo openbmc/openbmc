@@ -1,0 +1,31 @@
+From e3b6ca995caca22e65d012a54bc2aeb08eb7e9d4 Mon Sep 17 00:00:00 2001
+From: Alistair Francis <alistair.francis@wdc.com>
+Date: Tue, 15 Oct 2019 17:09:06 -0700
+Subject: [PATCH 4/7] dev_setup.sh: Ignore missing package manager
+
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Upstream-Status: Inappropriate [embedded specific]
+---
+ dev_setup.sh | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/dev_setup.sh b/dev_setup.sh
+index 72f734f36bf..0c8e11b8170 100755
+--- a/dev_setup.sh
++++ b/dev_setup.sh
+@@ -317,12 +317,6 @@ Please review the following package changes carefully."
+         echo -e "${YELLOW}Could not find package manager
+ ${YELLOW}Make sure to manually install:$BLUE git python3 python-setuptools python-venv pygobject libtool libffi libjpg openssl autoconf bison swig glib2.0 portaudio19 mpg123 flac curl fann g++ jq\n$RESET"
+ 
+-        echo 'Warning: Failed to install all dependencies. Continue? y/N'
+-        read -n1 continue
+-        if [[ $continue != 'y' ]] ; then
+-            exit 1
+-        fi
+-
+     fi
+ }
+ 
+-- 
+2.23.0
+

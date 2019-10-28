@@ -9,7 +9,7 @@ with high quality. Unlike these formats CELT imposes very little delay \
 on the signal, even less than is typical for speech centric formats \
 like Speex, GSM, or G.729."
 
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=375f60ab360d17f0172737036ff155b2"
 
 PV = "0.5.1.3+git${SRCPV}"

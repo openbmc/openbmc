@@ -1,9 +1,10 @@
 From 5ef52cdea278a1dff966a912549cb6708f2cb699 Mon Sep 17 00:00:00 2001
 From: Alistair Francis <alistair.francis@wdc.com>
 Date: Tue, 17 Sep 2019 11:31:47 -0700
-Subject: [PATCH 3/5] dev_setup.sh: Remove the TERM dependency
+Subject: [PATCH 3/7] dev_setup.sh: Remove the TERM dependency
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Upstream-Status: Inappropriate [embedded specific]
 ---
  dev_setup.sh | 12 ------------
  1 file changed, 12 deletions(-)

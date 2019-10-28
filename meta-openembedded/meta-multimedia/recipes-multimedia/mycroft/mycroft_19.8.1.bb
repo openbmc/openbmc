@@ -11,8 +11,10 @@ SRC_URI = "git://github.com/MycroftAI/mycroft-core.git;branch=master \
            file://0001-Remove-python-venv.patch \
            file://0002-dev_setup.sh-Remove-the-git-dependency.patch \
            file://0003-dev_setup.sh-Remove-the-TERM-dependency.patch \
-           file://0004-pip-requirements-Don-t-install-requirements-with-pip.patch \
-           file://0005-Use-python3-and-pip3-instead-of-python-and-pip.patch \
+           file://0004-dev_setup.sh-Ignore-missing-package-manager.patch \
+           file://0005-pip-requirements-Don-t-install-requirements-with-pip.patch \
+           file://0006-Use-python3-and-pip3-instead-of-python-and-pip.patch \
+           file://0007-mycroft.conf-Use-pocketsphinx-by-default.patch \
            file://dev_opts.json \
            file://mycroft-setup.service \
            file://mycroft.service \

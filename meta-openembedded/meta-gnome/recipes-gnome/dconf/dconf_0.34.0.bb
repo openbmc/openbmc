@@ -12,6 +12,8 @@ GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase bash-completion vala
 
+SRC_URI += "file://fix-meson-0.52.patch"
+
 # I/O error : Attempt to load network entity http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl
 EXTRA_OEMESON = "-Dman=false"
 

@@ -1,7 +1,7 @@
 SUMMARY = "dumb networking library"
 HOMEPAGE = "http://code.google.com/p/libdnet/"
 SECTION = "libs"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=0036c1b155f4e999f3e0a373490b5db9"
 
 SRC_URI = "git://github.com/dugsong/libdnet.git;nobranch=1"

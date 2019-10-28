@@ -4,7 +4,7 @@ Supervisor is a client/server system that allows its users \
 to monitorand control a number of processes on UNIX-like \
 operating systems."
 HOMEPAGE = "https://github.com/Supervisor/supervisor"
-LICENSE = "BSD"
+LICENSE = "BSD-4-Clause"
 LIC_FILES_CHKSUM = "file://LICENSES.txt;md5=5b4e3a2172bba4c47cded5885e7e507e"
 
 SRC_URI[md5sum] = "ac70dadd051dcaf1d03c467d51a3aac1"

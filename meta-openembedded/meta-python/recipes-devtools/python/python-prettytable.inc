@@ -1,6 +1,6 @@
 SUMMARY = "Python library for displaying tabular data in a ASCII table format"
 HOMEPAGE = "http://code.google.com/p/prettytable"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=3e73500ffa52de5071cff65990055282"
 
 SRC_URI[md5sum] = "0c1361104caff8b09f220748f9d69899"

@@ -1,7 +1,7 @@
 SUMMARY = "Adapter to write and run CMPI-type CIM providers"
 DESCRIPTION = "CMPI-compliant provider interface for various languages via SWIG"
 HOMEPAGE = "http://github.com/kkaempf/cmpi-bindings"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b19ee058d2d5f69af45da98051d91064"
 SECTION = "Development/Libraries"
 DEPENDS = "swig-native python3 sblim-cmpi-devel"

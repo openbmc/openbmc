@@ -1,6 +1,6 @@
 SUMMARY = "PyUSB provides USB access on the Python language"
 HOMEPAGE = "http://pyusb.sourceforge.net/"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=51691ed11cc2c7ae93e383f60ed49b0f"
 DEPENDS += "libusb1"
 

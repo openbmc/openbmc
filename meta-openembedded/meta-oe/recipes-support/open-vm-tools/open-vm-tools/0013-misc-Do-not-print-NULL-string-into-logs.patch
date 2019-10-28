@@ -14,18 +14,14 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  open-vm-tools/lib/misc/util_misc.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/open-vm-tools/lib/misc/util_misc.c b/open-vm-tools/lib/misc/util_misc.c
-index 198c23d2..0ac0a335 100644
 --- a/open-vm-tools/lib/misc/util_misc.c
 +++ b/open-vm-tools/lib/misc/util_misc.c
-@@ -719,8 +719,8 @@ Util_ExpandString(const char *fileName) // IN  file path to expand
+@@ -719,7 +719,7 @@ Util_ExpandString(const char *fileName)
        ASSERT(!freeChunk[i]);
        chunks[i] = expand;
        if (chunks[i] == NULL) {
--	 Log("%s: Cannot allocate memory to expand \"%s\" in \"%s\".\n",
--             __FUNCTION__, expand, fileName);
+-	 Log("%s: Cannot allocate memory to expand $ in \"%s\".\n",
 +	 Log("%s: Cannot allocate memory to expand in \"%s\".\n",
-+             __FUNCTION__, fileName);
+              __FUNCTION__, fileName);
  	 goto out;
        }
-       chunkSize[i] = strlen(expand);

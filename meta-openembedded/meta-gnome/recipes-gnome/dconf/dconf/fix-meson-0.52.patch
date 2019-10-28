@@ -1,0 +1,25 @@
+With meson 0.52 the build fails due to duplicate symbols. There is a fix
+to meson but the dconf build also needs tweaking.
+
+https://gitlab.gnome.org/GNOME/dconf/issues/59
+https://github.com/mesonbuild/meson/pull/5936
+
+Despite the comments there about this being incorrect, libdconf is unchanged
+between 0.51 and 0.52 and this patch.
+
+Upstream-Status: Pending [under discussion, see above links]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: dconf-0.34.0/client/meson.build
+===================================================================
+--- dconf-0.34.0.orig/client/meson.build
++++ dconf-0.34.0/client/meson.build
+@@ -28,7 +28,7 @@ libdconf_client = static_library(
+ 
+ libdconf_client_dep = declare_dependency(
+   dependencies: gio_dep,
+-  link_whole: libdconf_client,
++  link_with: libdconf_client,
+ )
+ 
+ libdconf = shared_library(

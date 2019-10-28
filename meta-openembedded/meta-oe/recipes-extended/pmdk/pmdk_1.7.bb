@@ -2,7 +2,7 @@ SUMMARY = "Persistent Memory Development Kit"
 DESCRIPTION = "Persistent Memory Development Kit"
 HOMEPAGE = "http://pmem.io"
 SECTION = "libs"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=7db1106255a1baa80391fd2e21eebab7"
 DEPENDS = "ndctl"
 

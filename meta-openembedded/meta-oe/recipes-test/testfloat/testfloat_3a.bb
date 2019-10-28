@@ -4,7 +4,7 @@ DESCRIPTION = "Berkeley TestFloat is a small collection of programs for \
 
 HOMEPAGE = "http://www.jhauser.us/arithmetic/TestFloat.html"
 
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://TestFloat-${PV}/COPYING.txt;md5=e45c175a323b5727777fb6bd4b26eafc"
 
 SRC_URI = "\

@@ -1,5 +1,5 @@
 DESCRIPTION = "A database migration tool for SQLAlchemy"
-LICENSE = "BSD"
+LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=28aaf14a6592d14dbfb2f4abd597aa27"
 
 SRC_URI[md5sum] = "6fe272274fce2641b93998ef9b702b76"

@@ -1,7 +1,7 @@
 DESCRIPTION = "A flexible forms validation and rendering library for python web development."
 HOMEPAGE = "https://pypi.python.org/pypi/WTForms"
 SECTION = "devel/python"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://PKG-INFO;md5=c4660c132770d5d0a5757541f6b79493"
 
 SRC_URI[md5sum] = "41c0008dbe7bd98892c58f7457a46a4a"

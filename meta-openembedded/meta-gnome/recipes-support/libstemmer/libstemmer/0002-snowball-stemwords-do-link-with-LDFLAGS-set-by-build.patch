@@ -1,0 +1,46 @@
+From 23eacfbcc10c777ce47283a5285455ec83c8aa41 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Sun, 6 Oct 2019 13:05:08 +0200
+Subject: [PATCH] snowball/stemwords: do link with LDFLAGS set by build
+ environment
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Some (cross-)build systems as OpeneEmbedded are picky (for certain reasons) if
+their LDFLAGS are ignored.
+
+Upstream-Status: Submitted [1]
+
+[1] https://github.com/snowballstem/snowball/pull/120
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ GNUmakefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/GNUmakefile b/GNUmakefile
+index 76f6ae9..47c6077 100644
+--- a/GNUmakefile
++++ b/GNUmakefile
+@@ -179,7 +179,7 @@ clean:
+ 	-rmdir $(js_output_dir)
+ 
+ snowball: $(COMPILER_OBJECTS)
+-	$(CC) $(CFLAGS) -o $@ $^
++	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+ 
+ $(COMPILER_OBJECTS): $(COMPILER_HEADERS)
+ 
+@@ -204,7 +204,7 @@ libstemmer.so: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
+ 	$(CC) $(CFLAGS) -shared $(LDFLAGS) -Wl,-soname,libstemmer.so.0,-version-script,libstemmer/symbol.map -o $@.0.0.0 $^
+ 
+ stemwords: $(STEMWORDS_OBJECTS) libstemmer.o
+-	$(CC) $(CFLAGS) -o $@ $^
++	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+ 
+ csharp_stemwords: $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
+ 	$(MCS) -unsafe -target:exe -out:$@ $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
+-- 
+2.21.0
+

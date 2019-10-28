@@ -1,5 +1,5 @@
 DESCRIPTION = "i18n and l10n support for Flask based on babel and pytz"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=51917f3e8e858f5ae295a7d0e2eb3cc9"
 
 SRC_URI[md5sum] = "07803453743f139309021572a799c6b3"

@@ -1,5 +1,5 @@
 SUMMARY = "A Python implementation of John Gruber's Markdown."
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=745aaad0c69c60039e638bff9ffc59ed"
 
 inherit pypi setuptools3

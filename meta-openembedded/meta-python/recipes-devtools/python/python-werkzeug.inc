@@ -7,7 +7,7 @@ HTTP utilities to handle entity tags, cache control headers, HTTP dates, \
 cookie handling, file uploads, a powerful URL routing system and a bunch \
 of community contributed addon modules."
 HOMEPAGE = "http://werkzeug.pocoo.org/"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=ed9a0b7c0254616d72dadb98b293ef1b"
 
 SRC_URI[md5sum] = "6d20b5be2d245be4ac7706cc390d130c"

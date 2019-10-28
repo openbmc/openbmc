@@ -1,7 +1,7 @@
 SUMMARY = "Opus Audio Tools"
 HOMEPAGE = "http://www.opus-codec.org/"
 
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=843a066da9f1facfcc6ea6f616ffecb1"
 
 SRC_URI = "http://downloads.xiph.org/releases/opus/opus-tools-${PV}.tar.gz"

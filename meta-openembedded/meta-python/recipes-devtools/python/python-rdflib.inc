@@ -1,5 +1,5 @@
 SUMMARY = "RDFLib is a pure Python package for working with RDF"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=68c1a3bb687bd63b8e5552f3ea249840"
 
 SRC_URI[md5sum] = "534fe35b13c5857d53fa1ac5a41eca67"

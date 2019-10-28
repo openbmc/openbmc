@@ -17,7 +17,7 @@ servers, Blade Center, and machines which export data via sysfs. \
 
 HOMEPAGE = "http://openhpi.sourceforge.net/Home"
 SECTION = "net"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=e3c772a32386888ccb5ae1c0ba95f1a4"
 
 DEPENDS = "net-snmp libxml2 ncurses openssl glib-2.0 popt e2fsprogs \

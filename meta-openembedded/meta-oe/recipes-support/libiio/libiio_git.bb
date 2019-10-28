@@ -12,7 +12,7 @@ SRC_URI = "git://github.com/analogdevicesinc/libiio.git;protocol=https"
 
 S = "${WORKDIR}/git"
 
-inherit cmake python3native systemd
+inherit cmake python3native systemd distutils3-base
 
 DEPENDS = " \
     flex-native bison-native libaio \

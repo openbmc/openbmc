@@ -5,7 +5,7 @@ including RabbitMQ’s extensions. \
 "
 SECTION = "devel/python"
 HOMEPAGE = "https://pika.readthedocs.io"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=535836bf0a5de515a7bfee026075701d"
 
 SRC_URI[md5sum] = "6002400cdd33bf85ec8680ece72910d4"
