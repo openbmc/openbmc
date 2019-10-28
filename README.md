@@ -50,9 +50,9 @@ Witherspoon| ```meta-ibm/meta-witherspoon/conf```
 Romulus| ```meta-ibm/meta-romulus/conf```
 
 
-As an example target Palmetto
+As an example target Romulus
 ```
-export TEMPLATECONF=meta-ibm/meta-palmetto/conf
+export TEMPLATECONF=meta-ibm/meta-romulus/conf
 ```
 
 ### 4) Build
