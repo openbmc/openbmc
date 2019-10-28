@@ -1,5 +1,5 @@
 DESCRIPTION = "Boot strap code that the GPU puts on memory to start running the boot loader"
-LICENSE = "Proprietary"
+LICENSE = "BSD-3-Clause"
 
 LIC_FILES_CHKSUM = "file://armstub.S;beginline=1;endline=26;md5=9888f34ac06a676129416c952a6a521e"
 
