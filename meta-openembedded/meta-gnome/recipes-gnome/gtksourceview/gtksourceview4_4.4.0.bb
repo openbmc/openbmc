@@ -10,12 +10,17 @@ PNAME = "gtksourceview"
 
 S = "${WORKDIR}/${PNAME}-${PV}"
 
-inherit gnomebase lib_package gettext distro_features_check gtk-doc gobject-introspection
+GNOMEBASEBUILDCLASS = "meson"
+
+inherit gnomebase lib_package gettext distro_features_check gtk-doc gobject-introspection vala
 
 REQUIRED_DISTRO_FEATURES = "x11"
 
-SRC_URI = "http://ftp.gnome.org/pub/gnome/sources/gtksourceview/4.2/${PNAME}-${PV}.tar.xz"
-SRC_URI[md5sum] = "c9e6913c2fd30ca2fcdd71482faf8b99"
-SRC_URI[sha256sum] = "c431eb234dc83c7819e58f77dd2af973252c7750da1c9d125ddc94268f94f675"
+SRC_URI = "http://ftp.gnome.org/pub/gnome/sources/gtksourceview/4.4/${PNAME}-${PV}.tar.xz"
+SRC_URI[md5sum] = "5c47e314517692f2622a0b724c65e628"
+SRC_URI[sha256sum] = "9ddb914aef70a29a66acd93b4f762d5681202e44094d2d6370e51c9e389e689a"
+
+GIR_MESON_OPTION = 'gir'
+GTKDOC_MESON_OPTION = "gtk_doc"
 
 FILES_${PN} += "${datadir}/gtksourceview-4"

@@ -16,7 +16,13 @@ DEPENDS = "coreutils-native fribidi libtool libgcrypt libgcrypt-native \
 # While this item does not require it, it depends on ffmpeg which does
 LICENSE_FLAGS = "commercial"
 
-SRC_URI = "http://download.videolan.org/pub/videolan/${BPN}/${PV}/${BP}.tar.xz"
+SRC_URI = "http://download.videolan.org/pub/videolan/${BPN}/${PV}/${BP}.tar.xz \
+           file://0006-make-opencv-configurable.patch \
+           file://0007-use-vorbisidec.patch \
+           file://0008-fix-luaL-checkint.patch \
+"
+SRC_URI[md5sum] = "744442ec0c145453ea1d257914c8072e"
+SRC_URI[sha256sum] = "e0149ef4a20a19b9ecd87309c2d27787ee3f47dfd47c6639644bc1f6fd95bdf6"
 
 inherit autotools gettext pkgconfig distro_features_check
 

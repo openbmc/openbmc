@@ -5,12 +5,11 @@ LIC_FILES_CHKSUM = " \
     file://COPYING.GPL;md5=eb723b61539feef013de476e68b5c50a \
 "
 
-inherit gnomebase
+inherit gnomebase itstool
 
 DEPENDS += " \
     libxslt-native \
     libxml2-native \
-    itstool-native \
     yelp-xsl \
 "
 

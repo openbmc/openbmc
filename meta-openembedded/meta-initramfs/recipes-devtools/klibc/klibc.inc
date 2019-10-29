@@ -5,9 +5,8 @@ SECTION = "libs"
 LICENSE = "BSD-3-Clause & GPL-2.0 & MIT & Zlib"
 LIC_FILES_CHKSUM = "file://usr/klibc/LICENSE;md5=d75181f10e998c21eb147f6d2e43ce8b"
 DEPENDS = "linux-libc-headers perl-native"
-SRCREV = "22b36d1ae34416bc48869619cbb0cccb2070f48f"
 
-SRC_URI = "git://git.kernel.org/pub/scm/libs/klibc/klibc.git \
+SRC_URI = "${KERNELORG_MIRROR}/linux/libs/klibc/2.0/klibc-${PV}.tar.xz \
            ${ARMPATCHES} \
            file://klcc-consider-sysroot.patch \
            file://klcc-cross-accept-clang-options.patch \
@@ -23,16 +22,18 @@ SRC_URI = "git://git.kernel.org/pub/scm/libs/klibc/klibc.git \
            file://0001-klibc-add-getrandom-syscall.patch \
            file://0001-klibc-Kbuild-Accept-EXTRA_KLIBCAFLAGS.patch \
            file://0001-Define-ulocked_-fgets-fread-fwrite-aliases.patch \
-           file://0001-Fix-missing-include-in-sys-mman.h.patch \
            "
 
 ARMPATCHES ?= ""
 
-ARMPATCHES_arm = "file://klibc-config-eabi.patch \
+ARMPATCHES_arm = " \
                   file://armv4-fix-v4bx.patch \
                  "
 
-S = "${WORKDIR}/git"
+SRC_URI[md5sum] = "712f8bc1a069e03d92584b7f5380c521"
+SRC_URI[sha256sum] = "abef2637ca823485d9c90ce9512e2b08a65047ec4da204635eeaef95a41a9122"
+
+S = "${WORKDIR}/klibc-${PV}"
 
 OPTFLAGS = "${TUNE_CCARGS} -Os"
 OPTFLAGS_append_toolchain-clang = " -fno-builtin-bcmp"

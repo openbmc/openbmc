@@ -16,7 +16,7 @@ inherit gnomebase gtk-icon-cache gtk-doc gobject-introspection upstream-version-
 # gtk-icon-cache bbclass will take care of this for us.
 EXTRA_OEMESON = "-Dicon_update=false"
 
-SRC_URI[archive.md5sum] = "5b3d66f564a5067ea154750cdb6d850d"
-SRC_URI[archive.sha256sum] = "6441cafd313af94fba28b701698074f97d693b9023788a74e8e6f16f817ba1aa"
+SRC_URI[archive.md5sum] = "0c567e124a52e8ddc31c8bed0c3e57a1"
+SRC_URI[archive.sha256sum] = "e867e67423e1dc78c56c2ea11dec066ce0254238d559e4777c80fa2935eb6baf"
 
 RDEPENDS_${PN} += "bluez5"

@@ -15,7 +15,7 @@ SRC_URI += "ftp://ftp.porcupine.org/mirrors/postfix-release/official/postfix-${P
            file://0001-makedefs-add-lnsl-and-lresolv-to-SYSLIBS-by-default.patch \
            file://0001-Fixed-build-failure-with-glibc-2.30-due-to-dropped-R.patch \
            "
-SRC_URI[md5sum] = "093109941095390562166de766d4720d"
-SRC_URI[sha256sum] = "8b2ba54f9d2a049582a0ed3ee2dbe96ba57e278feea9cb4f80e1a61844e6319f"
+SRC_URI[md5sum] = "b29ab85e8f6ef7fae132b004e777671b"
+SRC_URI[sha256sum] = "fe3253121d3ba8836a23774225518560b35e40497951ad5bec154afa8205f967"
 
 UPSTREAM_CHECK_REGEX = "postfix\-(?P<pver>3\.3(\.\d+)+).tar.gz"
