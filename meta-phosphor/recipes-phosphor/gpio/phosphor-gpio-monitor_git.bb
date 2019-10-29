@@ -5,7 +5,7 @@ PR = "r1"
 PV = "1.0+git${SRCPV}"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
-inherit autotools pkgconfig
+inherit meson pkgconfig
 inherit obmc-phosphor-dbus-service
 
 GPIO_PACKAGES = " \
@@ -23,7 +23,6 @@ RPROVIDES_${PN}-presence += "virtual/obmc-gpio-presence"
 PROVIDES += "virtual/obmc-gpio-monitor"
 PROVIDES += "virtual/obmc-gpio-presence"
 
-DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus sdbusplus-native"
 DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "libevdev"
@@ -38,5 +37,5 @@ FILES_${PN}-monitor += "${bindir}/phosphor-gpio-util"
 FILES_${PN}-presence += "${bindir}/phosphor-gpio-presence"
 
 SRC_URI += "git://github.com/openbmc/phosphor-gpio-monitor"
-SRCREV = "86d16f037350afd379d062ca17cab5d553a1c8f2"
+SRCREV = "26373abe6bf30f90f4be723993838eb8caa1bd63"
 S = "${WORKDIR}/git"
