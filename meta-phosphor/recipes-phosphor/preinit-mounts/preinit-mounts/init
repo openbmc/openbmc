@@ -1,5 +1,11 @@
 #!/bin/sh
 
+mount_overlay() {
+  if ! mount overlay /etc -t overlay -o defaults,lowerdir=/etc,upperdir=/var/persist/etc,workdir=/var/persist/etc-work; then
+    mount overlay /etc -t overlay -o defaults,lowerdir=/etc:/var/persist/etc
+  fi
+}
+
 if ! mount ubi0:rwfs /var -t ubifs -o defaults; then
   if ! mount ubi0:rwfs /var -t ubifs -o defaults,ro; then
     mount tmpfs /var -t tmpfs -o defaults
@@ -12,8 +18,32 @@ rm -rf /var/persist/etc-work/*
 # rm -rf specifically skips . and .. directories; pipe all output to null to avoid the error message
 rm -rf /var/persist/etc-work/.* > /dev/null 2>&1
 
-if ! mount overlay /etc -t overlay -o defaults,lowerdir=/etc,upperdir=/var/persist/etc,workdir=/var/persist/etc-work; then
-  mount overlay /etc -t overlay -o defaults,lowerdir=/etc:/var/persist/etc
-fi
+mount_overlay
+
+# Check if there are any issues accessing the files in /etc after mounting the
+# overlay by doing an 'ls' command
+error="/var/overlay-error"
+cd /var/persist/etc/
+for i in *; do
+  # Only check regular files at the top of the directory
+  if [[ -f $i ]]; then
+    ls -i /etc/$i >/dev/null 2>${error};
+    if [[ -s ${error} ]]; then
+      # We don't have a way to print this error to the journal, delete it
+      rm -f ${error}
+      # Attempt to re-create the overlay by moving out the overlay contents and
+      # copying them back to /etc, which would create them back in the overlay
+      cd
+      umount /etc
+      rm -rf /var/persist/etc-save
+      mv /var/persist/etc /var/persist/etc-save
+      mkdir -p /var/persist/etc
+      mount_overlay
+      cp -rp /var/persist/etc-save/* /etc/
+      rm -rf /var/persist/etc-save
+      break
+    fi
+  fi
+done
 
 exec /lib/systemd/systemd
