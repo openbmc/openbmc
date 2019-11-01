@@ -1,7 +1,7 @@
 - Device:
   index: 0
   # Linux sysfs path for this power sequencer (0xC8 8-bit address)
-  path:  /sys/bus/i2c/devices//i2c-11/11-0064
+  path:  /sys/bus/i2c/devices/i2c-11/11-0064
   RailNames:
       - "5.0VCS"
       - "12.0V"
