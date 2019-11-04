@@ -148,7 +148,7 @@ do_install_append_class-native () {
 	    OPENSSL_CONF=${libdir}/ssl-1.1/openssl.cnf \
 	    SSL_CERT_DIR=${libdir}/ssl-1.1/certs \
 	    SSL_CERT_FILE=${libdir}/ssl-1.1/cert.pem \
-	    OPENSSL_ENGINES=${libdir}/ssl-1.1/engines
+	    OPENSSL_ENGINES=${libdir}/engines-1.1
 }
 
 do_install_append_class-nativesdk () {

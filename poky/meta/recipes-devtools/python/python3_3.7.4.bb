@@ -30,6 +30,7 @@ SRC_URI = "http://www.python.org/ftp/python/${PV}/Python-${PV}.tar.xz \
            file://0001-test_locale.py-correct-the-test-output-format.patch \
            file://0017-setup.py-do-not-report-missing-dependencies-for-disa.patch \
            file://0001-bpo-34155-Dont-parse-domains-containing-GH-13079.patch \
+           file://0001-bpo-38243-xmlrpc.server-Escape-the-server_title-GH-1.patch \
            "
 
 SRC_URI_append_class-native = " \
@@ -59,9 +60,9 @@ inherit autotools pkgconfig qemu ptest multilib_header update-alternatives
 
 MULTILIB_SUFFIX = "${@d.getVar('base_libdir',1).split('/')[-1]}"
 
-ALTERNATIVE_${PN}-dev = "python-config"
-ALTERNATIVE_LINK_NAME[python-config] = "${bindir}/python${PYTHON_BINABI}-config"
-ALTERNATIVE_TARGET[python-config] = "${bindir}/python${PYTHON_BINABI}-config-${MULTILIB_SUFFIX}"
+ALTERNATIVE_${PN}-dev = "python3-config"
+ALTERNATIVE_LINK_NAME[python3-config] = "${bindir}/python${PYTHON_BINABI}-config"
+ALTERNATIVE_TARGET[python3-config] = "${bindir}/python${PYTHON_BINABI}-config-${MULTILIB_SUFFIX}"
 
 
 DEPENDS = "bzip2-replacement-native libffi bzip2 openssl sqlite3 zlib virtual/libintl xz virtual/crypt util-linux libtirpc libnsl2"
@@ -303,10 +304,13 @@ do_create_manifest[depends] += "${PN}:do_prepare_recipe_sysroot"
 do_create_manifest[depends] += "${PN}:do_patch"
 
 # manual dependency additions
-RPROVIDES_${PN}-modules = "${PN}"
 RRECOMMENDS_${PN}-core_append_class-nativesdk = " nativesdk-python3-modules"
 RRECOMMENDS_${PN}-crypt_append_class-target = " openssl ca-certificates"
 RRECOMMENDS_${PN}-crypt_append_class-nativesdk = " openssl ca-certificates"
+
+# For historical reasons PN is empty and provided by python3-modules
+FILES_${PN} = ""
+RPROVIDES_${PN}-modules = "${PN}"
 
 FILES_${PN}-pydoc += "${bindir}/pydoc${PYTHON_MAJMIN} ${bindir}/pydoc3"
 FILES_${PN}-idle += "${bindir}/idle3 ${bindir}/idle${PYTHON_MAJMIN}"

@@ -12,18 +12,9 @@ PE = "1"
 
 # We use the revision in order to avoid having to fetch it from the
 # repo during parse
-SRCREV = "e5aee22e4be75e75a854ab64503fc80598bc2004"
+SRCREV = "61ba1244b548463dbfb3c5285b6b22e7c772c5bd"
 
 SRC_URI = "git://git.denx.de/u-boot.git \
-           file://0001-CVE-2019-13103.patch \
-           file://0002-CVE-2019-13104.patch \
-           file://0003-CVE-2019-13105.patch \
-           file://0004-CVE-2019-13106.patch \
-           file://0005-CVE-2019-14192-14193-14199.patch \
-           file://0006-CVE-2019-14197-14200-14201-14202-14203-14204.patch \
-           file://0007-CVE-2019-14194-14198.patch \
-           file://0008-CVE-2019-14195.patch \
-           file://0009-CVE-2019-14196.patch \
-"
+          "
 
 S = "${WORKDIR}/git"

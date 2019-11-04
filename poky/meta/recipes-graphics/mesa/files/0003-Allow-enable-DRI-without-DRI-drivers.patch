@@ -23,7 +23,7 @@ index 0e50bb26c0a..de065c290d6 100644
  with_dri_swrast = dri_drivers.contains('swrast')
  
 -with_dri = dri_drivers.length() != 0 and dri_drivers != ['']
-+with_dri = get_option('dri') or (_drivers.length() != 0 and _drivers != [''])
++with_dri = get_option('dri') or (dri_drivers.length() != 0 and dri_drivers != [''])
  
  gallium_drivers = get_option('gallium-drivers')
  if gallium_drivers.contains('auto')

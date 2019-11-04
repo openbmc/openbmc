@@ -478,7 +478,7 @@ NAME
 SYNOPSIS
     wic write <image> <target>
     wic write <image> <target> --expand auto
-    wic write <image> <target> --expand 1:100M-2:300M
+    wic write <image> <target> --expand 1:100M,2:300M
     wic write <image> <target> --native-sysroot <path>
 
 DESCRIPTION
@@ -489,7 +489,7 @@ DESCRIPTION
     The --expand option is used to resize image partitions.
     --expand auto expands partitions to occupy all free space available on the target device.
     It's also possible to specify expansion rules in a format
-    <partition>:<size>[-<partition>:<size>...] for one or more partitions.
+    <partition>:<size>[,<partition>:<size>...] for one or more partitions.
     Specifying size 0 will keep partition unmodified.
     Note: Resizing boot partition can result in non-bootable image for non-EFI images. It is
     recommended to use size 0 for boot partition to keep image bootable.

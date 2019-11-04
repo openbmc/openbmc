@@ -113,3 +113,21 @@ class skipIfNotFeature(OETestDecorator):
         self.logger.debug(msg)
         if not has_feature(self.case.td, self.value):
             self.case.skipTest(self.msg)
+
+@registerDecorator
+class skipIfFeature(OETestDecorator):
+    """
+        Skip test based on DISTRO_FEATURES.
+
+        value must not be in distro features or it will skip the test
+        with msg as the reason.
+    """
+
+    attrs = ('value', 'msg')
+
+    def setUpDecorator(self):
+        msg = ('Checking if %s is not in DISTRO_FEATURES '
+               'or IMAGE_FEATURES' % (self.value))
+        self.logger.debug(msg)
+        if has_feature(self.case.td, self.value):
+            self.case.skipTest(self.msg)

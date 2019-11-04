@@ -124,7 +124,7 @@ class ImageFeatures(OESelftestTestCase):
 
         # check if result image is sparse
         image_stat = os.stat(image_path)
-        self.assertTrue(image_stat.st_size > image_stat.st_blocks * 512)
+        self.assertGreater(image_stat.st_size, image_stat.st_blocks * 512)
 
         # check if the resulting gzip is valid
         self.assertTrue(runCmd('gzip -t %s' % gzip_path))

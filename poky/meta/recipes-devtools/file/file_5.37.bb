@@ -21,6 +21,8 @@ S = "${WORKDIR}/git"
 
 inherit autotools update-alternatives
 
+EXTRA_OECONF += "--disable-libseccomp"
+
 ALTERNATIVE_${PN} = "file"
 ALTERNATIVE_LINK_NAME[file] = "${bindir}/file"
 

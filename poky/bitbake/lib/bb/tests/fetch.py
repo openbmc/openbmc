@@ -1863,6 +1863,26 @@ class GitShallowTest(FetcherTest):
         with self.assertRaises(bb.fetch2.FetchError):
             self.fetch()
 
+    def test_shallow_fetch_missing_revs(self):
+        self.add_empty_file('a')
+        self.add_empty_file('b')
+        fetcher, ud = self.fetch(self.d.getVar('SRC_URI'))
+        self.git('tag v0.0 master', cwd=self.srcdir)
+        self.d.setVar('BB_GIT_SHALLOW_DEPTH', '0')
+        self.d.setVar('BB_GIT_SHALLOW_REVS', 'v0.0')
+        self.fetch_shallow()
+
+    def test_shallow_fetch_missing_revs_fails(self):
+        self.add_empty_file('a')
+        self.add_empty_file('b')
+        fetcher, ud = self.fetch(self.d.getVar('SRC_URI'))
+        self.d.setVar('BB_GIT_SHALLOW_DEPTH', '0')
+        self.d.setVar('BB_GIT_SHALLOW_REVS', 'v0.0')
+
+        with self.assertRaises(bb.fetch2.FetchError), self.assertLogs("BitBake.Fetcher", level="ERROR") as cm:
+            self.fetch_shallow()
+        self.assertIn("Unable to find revision v0.0 even from upstream", cm.output[0])
+
     @skipIfNoNetwork()
     def test_bitbake(self):
         self.git('remote add --mirror=fetch origin git://github.com/openembedded/bitbake', cwd=self.srcdir)

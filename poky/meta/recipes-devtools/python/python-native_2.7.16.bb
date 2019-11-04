@@ -7,7 +7,6 @@ SRC_URI += "\
             file://10-distutils-fix-swig-parameter.patch \
             file://11-distutils-never-modify-shebang-line.patch \
             file://0001-distutils-set-the-prefix-to-be-inside-staging-direct.patch \
-            file://debug.patch \
             file://unixccompiler.patch \
             file://nohostlibs.patch \
             file://multilib.patch \

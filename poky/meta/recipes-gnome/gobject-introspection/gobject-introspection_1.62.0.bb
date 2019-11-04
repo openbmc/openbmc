@@ -1,6 +1,10 @@
 SUMMARY = "Middleware layer between GObject-using C libraries and language bindings"
+DESCRIPTION = "GObject Introspection is a project for providing machine \
+readable introspection data of the API of C libraries. This introspection \
+data can be used in several different use cases, for example automatic code \
+generation for bindings, API verification and documentation generation."
 HOMEPAGE = "https://wiki.gnome.org/action/show/Projects/GObjectIntrospection"
-BUGTRACKER = "https://bugzilla.gnome.org/"
+BUGTRACKER = "https://gitlab.gnome.org/GNOME/gobject-introspection/issues"
 SECTION = "libs"
 LICENSE = "LGPLv2+ & GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c434e8128a68bedd59b80b2ac1eb1c4a \
@@ -92,7 +96,7 @@ EOF
 
         # Write out a wrapper for g-ir-scanner itself, which will be used when building introspection files
         # for glib-based packages. This wrapper calls the native version of the scanner, and tells it to use
-        # a qemu wrapper for running transient target binaries produced by the scanner, and an include directory 
+        # a qemu wrapper for running transient target binaries produced by the scanner, and an include directory
         # from the target sysroot.
         cat > ${B}/g-ir-scanner-wrapper << EOF
 #!/bin/sh
@@ -132,7 +136,7 @@ do_compile_prepend() {
         export GIR_EXTRA_LIBS_PATH=$B/.libs
 }
 
-# Our wrappers need to be available system-wide, because they will be used 
+# Our wrappers need to be available system-wide, because they will be used
 # to build introspection files for all other gobject-based packages
 do_install_append_class-target() {
         install -d ${D}${bindir}/

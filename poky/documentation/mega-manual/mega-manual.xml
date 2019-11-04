@@ -88,9 +88,9 @@
                 <revremark>Released with the Yocto Project 2.7 Release.</revremark>
             </revision>
             <revision>
-                <revnumber>2.8</revnumber>
+                <revnumber>3.0</revnumber>
                 <date>&REL_MONTH_YEAR;</date>
-                <revremark>Released with the Yocto Project 2.8 Release.</revremark>
+                <revremark>Released with the Yocto Project 3.0 Release.</revremark>
             </revision>
        </revhistory>
 

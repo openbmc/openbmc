@@ -6,12 +6,12 @@ It is simple, straight-forward, and extensible. \
 "
 HOMEPAGE = "http://www.ruby-lang.org/"
 SECTION = "devel/ruby"
-LICENSE = "Ruby | BSD | GPLv2"
+LICENSE = "Ruby | BSD-2-Clause | BSD-3-Clause | GPLv2 | ISC | MIT"
 LIC_FILES_CHKSUM = "\
     file://COPYING;md5=340948e1882e579731841bf49cdc22c1 \
     file://BSDL;md5=19aaf65c88a40b508d17ae4be539c4b5\
     file://GPL;md5=b234ee4d69f5fce4486a80fdaf4a4263\
-    file://LEGAL;md5=23a79bb4c1a40f6cc9bcb6f4e7c39799 \
+    file://LEGAL;md5=4ac0b84d1f7f420bca282e1adefc7f99 \
 "
 
 DEPENDS = "ruby-native zlib openssl tcl libyaml gdbm readline libffi"
@@ -19,7 +19,7 @@ DEPENDS_class-native = "openssl-native libyaml-native readline-native zlib-nativ
 
 SHRT_VER = "${@oe.utils.trim_version("${PV}", 2)}"
 SRC_URI = "http://cache.ruby-lang.org/pub/ruby/${SHRT_VER}/ruby-${PV}.tar.gz \
-           file://extmk.patch \
+           file://0001-extmk-fix-cross-compilation-of-external-gems.patch \
            file://0002-Obey-LDFLAGS-for-the-link-of-libruby.patch \
            "
 UPSTREAM_CHECK_URI = "https://www.ruby-lang.org/en/downloads/"

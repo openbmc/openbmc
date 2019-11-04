@@ -51,10 +51,13 @@ do_install_append () {
       rm ${D}${libexecdir}/${PN}/stap-env
    fi
 
-   # Fix makefile hardcoded path assumptions for systemd (assumes $prefix)
-   install -d `dirname ${D}${systemd_unitdir}`
-   mv ${D}${prefix}/lib/systemd `dirname ${D}${systemd_unitdir}`
-   rmdir ${D}${prefix}/lib --ignore-fail-on-non-empty
+   if [ ${D}${prefix}/lib != `dirname ${D}${systemd_unitdir}` ]; then
+      # Fix makefile hardcoded path assumptions for systemd (assumes $prefix)
+      # without usrmerge distro feature enabled
+      install -d `dirname ${D}${systemd_unitdir}`
+      mv ${D}${prefix}/lib/systemd `dirname ${D}${systemd_unitdir}`
+      rmdir ${D}${prefix}/lib --ignore-fail-on-non-empty
+   fi
 
    # Ensure correct ownership for files copied in
    chown root:root ${D}${sysconfdir}/stap-exporter/* -R

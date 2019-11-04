@@ -121,3 +121,9 @@ class OEGitproxyTests(OESelftestTestCase):
         if dash is None:
             self.skipTest("No \"dash\" found on test system.")
         self.run_oegitproxy(custom_shell=dash)
+
+class OeRunNativeTest(OESelftestTestCase):
+    def test_oe_run_native(self):
+        bitbake("qemu-helper-native -c addto_recipe_sysroot")
+        result = runCmd("oe-run-native qemu-helper-native tunctl -h")
+        self.assertIn("Delete: tunctl -d device-name [-f tun-clone-device]", result.output)

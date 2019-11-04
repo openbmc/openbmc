@@ -107,7 +107,7 @@ stop_nfsd(){
 #FIXME: need to create the /var/lib/nfs/... directories
 case "$1" in
   start)
-	exportfs -r
+	test -r /etc/exports && exportfs -r
 	start_nfsd "$NFS_SERVERS"
 	start_mountd
 	test -r /etc/exports && exportfs -a;;

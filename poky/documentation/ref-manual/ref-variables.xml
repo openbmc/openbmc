@@ -1349,8 +1349,8 @@
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    Specifies each additional separate configuration when you are
-                    building targets with multiple configurations.
+                    Specifies each additional separate configuration when you
+                    are building targets with multiple configurations.
                     Use this variable in your
                     <filename>conf/local.conf</filename> configuration file.
                     Specify a <replaceable>multiconfigname</replaceable> for
@@ -2182,9 +2182,10 @@
 
                 <para>
                     The <filename>BUSYBOX_SPLIT_SUID</filename> variable
-                    defaults to "1", which results in a single output
+                    defaults to "1", which results in splitting the output
                     executable file.
-                    Set the variable to "0" to split the output file.
+                    Set the variable to "0" to get a single output executable
+                    file.
                 </para>
             </glossdef>
         </glossentry>

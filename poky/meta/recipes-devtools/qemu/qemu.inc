@@ -28,6 +28,7 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://0009-Fix-webkitgtk-builds.patch \
            file://0010-configure-Add-pkg-config-handling-for-libgcrypt.patch \
            file://CVE-2019-15890.patch \
+           file://CVE-2019-12068.patch \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 
@@ -94,6 +95,7 @@ do_configure_prepend_class-native() {
 do_configure() {
     ${S}/configure ${EXTRA_OECONF}
 }
+do_configure[cleandirs] += "${B}"
 
 do_install () {
 	export STRIP=""

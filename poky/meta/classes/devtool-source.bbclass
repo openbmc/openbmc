@@ -97,17 +97,15 @@ python devtool_post_unpack() {
     local_files = oe.recipeutils.get_recipe_local_files(d)
 
     if is_kernel_yocto:
-        for key in local_files.copy():
-            if key.endswith('scc'):
-                sccfile = open(local_files[key], 'r')
+        for key in [f for f in local_files if f.endswith('scc')]:
+            with open(local_files[key], 'r') as sccfile:
                 for l in sccfile:
                     line = l.split()
                     if line and line[0] in ('kconf', 'patch'):
                         cfg = os.path.join(os.path.dirname(local_files[key]), line[-1])
-                        if not cfg in local_files.values():
+                        if cfg not in local_files.values():
                             local_files[line[-1]] = cfg
                             shutil.copy2(cfg, workdir)
-                sccfile.close()
 
     # Ignore local files with subdir={BP}
     srcabspath = os.path.abspath(srcsubdir)

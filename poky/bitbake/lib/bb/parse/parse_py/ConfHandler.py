@@ -119,30 +119,30 @@ def handle(fn, data, include):
         oldfile = data.getVar('FILE', False)
 
     abs_fn = resolve_file(fn, data)
-    f = open(abs_fn, 'r')
+    with open(abs_fn, 'r') as f:
 
-    statements = ast.StatementGroup()
-    lineno = 0
-    while True:
-        lineno = lineno + 1
-        s = f.readline()
-        if not s:
-            break
-        w = s.strip()
-        # skip empty lines
-        if not w:
-            continue
-        s = s.rstrip()
-        while s[-1] == '\\':
-            s2 = f.readline().rstrip()
+        statements = ast.StatementGroup()
+        lineno = 0
+        while True:
             lineno = lineno + 1
-            if (not s2 or s2 and s2[0] != "#") and s[0] == "#" :
-                bb.fatal("There is a confusing multiline, partially commented expression on line %s of file %s (%s).\nPlease clarify whether this is all a comment or should be parsed." % (lineno, fn, s))
-            s = s[:-1] + s2
-        # skip comments
-        if s[0] == '#':
-            continue
-        feeder(lineno, s, abs_fn, statements)
+            s = f.readline()
+            if not s:
+                break
+            w = s.strip()
+            # skip empty lines
+            if not w:
+                continue
+            s = s.rstrip()
+            while s[-1] == '\\':
+                s2 = f.readline().rstrip()
+                lineno = lineno + 1
+                if (not s2 or s2 and s2[0] != "#") and s[0] == "#" :
+                    bb.fatal("There is a confusing multiline, partially commented expression on line %s of file %s (%s).\nPlease clarify whether this is all a comment or should be parsed." % (lineno, fn, s))
+                s = s[:-1] + s2
+            # skip comments
+            if s[0] == '#':
+                continue
+            feeder(lineno, s, abs_fn, statements)
 
     # DONE WITH PARSING... time to evaluate
     data.setVar('FILE', abs_fn)

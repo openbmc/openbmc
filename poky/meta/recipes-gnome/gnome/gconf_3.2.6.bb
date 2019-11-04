@@ -1,4 +1,7 @@
 SUMMARY = "GNOME configuration system"
+DESCRIPTION = "GConf is a system for storing application preferences. \
+It is intended for user preferences; not configuration of something like \
+Apache, or arbitrary data storage."
 SECTION = "x11/gnome"
 HOMEPAGE = "https://projects.gnome.org/gconf/"
 LICENSE = "LGPLv2+"

@@ -1,0 +1,60 @@
+Backport patch to fix CVE-2018-5743.
+
+Ref:
+https://security-tracker.debian.org/tracker/CVE-2018-5743
+
+CVE: CVE-2018-5743
+Upstream-Status: Backport [https://gitlab.isc.org/isc-projects/bind9/commit/ec2d50d]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+From ec2d50da8d81814640e28593d912f4b96c7efece Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Witold=20Kr=C4=99cicki?= <wpk@isc.org>
+Date: Thu, 3 Jan 2019 14:17:43 +0100
+Subject: [PATCH 1/6] fix enforcement of tcp-clients (v1)
+
+tcp-clients settings could be exceeded in some cases by
+creating more and more active TCP clients that are over
+the set quota limit, which in the end could lead to a
+DoS attack by e.g. exhaustion of file descriptors.
+
+If TCP client we're closing went over the quota (so it's
+not attached to a quota) mark it as mortal - so that it
+will be destroyed and not set up to listen for new
+connections - unless it's the last client for a specific
+interface.
+
+(cherry picked from commit f97131d21b97381cef72b971b157345c1f9b4115)
+(cherry picked from commit 9689ffc485df8f971f0ad81ab8ab1f5389493776)
+---
+ bin/named/client.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/bin/named/client.c b/bin/named/client.c
+index d482da7121..0739dd48af 100644
+--- a/bin/named/client.c
++++ b/bin/named/client.c
+@@ -421,8 +421,19 @@ exit_check(ns_client_t *client) {
+ 			isc_socket_detach(&client->tcpsocket);
+ 		}
+ 
+-		if (client->tcpquota != NULL)
++		if (client->tcpquota != NULL) {
+ 			isc_quota_detach(&client->tcpquota);
++		} else {
++			/*
++			 * We went over quota with this client, we don't
++			 * want to restart listening unless this is the
++			 * last client on this interface, which is
++			 * checked later.
++			 */
++			if (TCP_CLIENT(client)) {
++				client->mortal = true;
++			}
++		}
+ 
+ 		if (client->timerset) {
+ 			(void)isc_timer_reset(client->timer,
+-- 
+2.20.1
+

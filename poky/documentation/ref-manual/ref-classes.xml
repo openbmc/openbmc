@@ -428,6 +428,14 @@
         variable to specify additional configuration options to be passed
         using the <filename>cmake</filename> command line.
     </para>
+
+    <para>
+        On the occasion that you would be installing custom CMake toolchain
+        files supplied by the application being built, you should install them
+        to the preferred CMake Module directory:
+        <filename>${D}${datadir}/cmake/</filename> Modules during
+        <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-install'><filename>do_install</filename></ulink>.
+    </para>
 </section>
 
 <section id='ref-classes-cml1'>

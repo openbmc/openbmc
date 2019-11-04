@@ -78,19 +78,15 @@ python errorreport_handler () {
             taskdata['task'] = task
             if log:
                 try:
-                    logFile = codecs.open(log, 'r', 'utf-8')
-                    logdata = logFile.read()
-
+                    with codecs.open(log, encoding='utf-8') as logFile:
+                        logdata = logFile.read()
                     # Replace host-specific paths so the logs are cleaner
                     for d in ("TOPDIR", "TMPDIR"):
                         s = e.data.getVar(d)
                         if s:
                             logdata = logdata.replace(s, d)
-
-                    logFile.close()
                 except:
                     logdata = "Unable to read log file"
-
             else:
                 logdata = "No Log"
 

@@ -210,7 +210,10 @@
         "summary": "Python interpreter and core modules",
         "rdepends": [],
         "files": [
-            "${bindir}/python*[!-config]",
+            "${bindir}/python3",
+            "${bindir}/python${PYTHON_MAJMIN}",
+            "${bindir}/python${PYTHON_MAJMIN}.real",
+            "${bindir}/python${PYTHON_BINABI}",
             "${includedir}/python${PYTHON_BINABI}/pyconfig*.h",
             "${prefix}/lib/python${PYTHON_MAJMIN}/config*/*[!.a]",
             "${libdir}/python${PYTHON_MAJMIN}/UserDict.py",
@@ -487,7 +490,7 @@
         "files": [
             "${base_libdir}/*.a",
             "${base_libdir}/*.o",
-            "${bindir}/python*-config",
+            "${bindir}/python*-config*",
             "${datadir}/aclocal",
             "${datadir}/pkgconfig",
             "${includedir}",
@@ -498,7 +501,8 @@
             "${libdir}/pkgconfig"
         ],
         "rdepends": [
-            "core"
+            "core",
+            "distutils"
         ],
         "summary": "Python development package"
     },

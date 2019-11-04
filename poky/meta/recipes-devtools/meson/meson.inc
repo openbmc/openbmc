@@ -16,6 +16,7 @@ SRC_URI = "https://github.com/mesonbuild/meson/releases/download/${PV}/meson-${P
            file://cross-prop-default.patch \
            file://0001-mesonbuild-environment.py-check-environment-for-vari.patch \
            file://0001-modules-python.py-do-not-substitute-python-s-install.patch \
+           file://dbc9e971bd320f3df15c1ee74f54858e6792b183.patch \
            "
 SRC_URI[sha256sum] = "d60f75f0dedcc4fd249dbc7519d6f3ce6df490033d276ef1cf27453ef4938d32"
 SRC_URI[md5sum] = "7ea7772414dda8ae11072244bf7ba991"

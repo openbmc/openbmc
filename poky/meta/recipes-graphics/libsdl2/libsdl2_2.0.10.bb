@@ -14,6 +14,8 @@ PROVIDES = "virtual/libsdl2"
 
 SRC_URI = "http://www.libsdl.org/release/SDL2-${PV}.tar.gz \
            file://more-gen-depends.patch \
+           file://0001-Fixed-bug-4538-validate-image-size-when-loading-BMP-.patch \
+           file://0002-Fixed-bug-4797-SDL-fails-to-compile-with-Mesa-Master.patch \
 "
 
 S = "${WORKDIR}/SDL2-${PV}"

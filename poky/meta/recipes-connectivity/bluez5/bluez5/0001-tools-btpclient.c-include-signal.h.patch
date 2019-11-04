@@ -1,0 +1,30 @@
+From 0b1766514f6847c7367fce07f19a750ec74c11a6 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Thu, 26 Sep 2019 16:19:34 +0800
+Subject: [PATCH] tools/btpclient.c: include signal.h
+
+Fix compile failure when configure --enable-btpclient:
+btpclient.c:2834:7: error: 'SIGINT' undeclared (first use in this function)
+
+Upstream-Status: Backport [A subset of the full fix that went upstream]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ tools/btpclient.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tools/btpclient.c b/tools/btpclient.c
+index b217df5..aece7fe 100644
+--- a/tools/btpclient.c
++++ b/tools/btpclient.c
+@@ -29,6 +29,7 @@
+ #include <stdlib.h>
+ #include <assert.h>
+ #include <getopt.h>
++#include <signal.h>
+ 
+ #include <ell/ell.h>
+ 
+-- 
+2.7.4
+

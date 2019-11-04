@@ -541,7 +541,7 @@ def wic_write(args, native_sysroot):
     """
     Write image to a target device.
     """
-    disk = Disk(args.image, native_sysroot, ('fat', 'ext', 'swap'))
+    disk = Disk(args.image, native_sysroot, ('fat', 'ext', 'linux-swap'))
     disk.write(args.target, args.expand)
 
 def find_canned(scripts_path, file_name):

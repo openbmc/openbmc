@@ -3,7 +3,7 @@ HOMEPAGE = "https://sourceware.org/elfutils"
 SECTION = "base"
 LICENSE = "GPLv2 & LGPLv3+ & GPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
-DEPENDS = "bzip2 zlib virtual/libintl"
+DEPENDS = "zlib virtual/libintl"
 DEPENDS_append_libc-musl = " argp-standalone fts musl-obstack "
 # The Debian patches below are from:
 # http://ftp.de.debian.org/debian/pool/main/e/elfutils/elfutils_0.176-1.debian.tar.xz
@@ -46,8 +46,15 @@ SRC_URI[sha256sum] = "fa489deccbcae7d8c920f60d85906124c1989c591196d90e0fd668e3dc
 
 inherit autotools gettext ptest
 
-EXTRA_OECONF = "--program-prefix=eu- --without-lzma"
-EXTRA_OECONF_append_class-native = " --without-bzlib"
+EXTRA_OECONF = "--program-prefix=eu-"
+
+DEPENDS_BZIP2 = "bzip2-replacement-native"
+DEPENDS_BZIP2_class-target = "bzip2"
+
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[bzip2] = "--with-bzlib,--without-bzlib,${DEPENDS_BZIP2}"
+PACKAGECONFIG[xz] = "--with-lzma,--without-lzma,xz"
+
 RDEPENDS_${PN}-ptest += "libasm libelf bash make coreutils ${PN}-binutils"
 
 EXTRA_OECONF_append_class-target += "--disable-tests-rpath"

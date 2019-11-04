@@ -685,7 +685,9 @@ class RecipetoolAppendsrcTests(RecipetoolAppendsrcBase):
 
         self._test_appendsrcfile(testrecipe, filepath, srcdir=subdir)
         bitbake('%s:do_unpack' % testrecipe)
-        self.assertEqual(open(self.testfile, 'r').read(), open(os.path.join(srcdir, filepath), 'r').read())
+        with open(self.testfile, 'r') as testfile:
+            with open(os.path.join(srcdir, filepath), 'r') as makefilein:
+                self.assertEqual(testfile.read(), makefilein.read())
 
     def test_recipetool_appendsrcfiles_basic(self, destdir=None):
         newfiles = [self.testfile]

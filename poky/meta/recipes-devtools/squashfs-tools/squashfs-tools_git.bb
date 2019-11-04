@@ -5,13 +5,10 @@ SECTION = "base"
 LICENSE = "GPL-2"
 LIC_FILES_CHKSUM = "file://../COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-PV = "4.3+gitr${SRCPV}"
-SRCREV = "f95864afe8833fe3ad782d714b41378e860977b1"
+PV = "4.4"
+SRCREV = "52eb4c279cd283ed9802dd1ceb686560b22ffb67"
 SRC_URI = "git://github.com/plougher/squashfs-tools.git;protocol=https \
-           file://squashfs-tools-4.3-sysmacros.patch;striplevel=2 \
 "
-SRC_URI[lzma.md5sum] = "29d5ffd03a5a3e51aef6a74e9eafb759"
-SRC_URI[lzma.sha256sum] = "c935fd04dd8e0e8c688a3078f3675d699679a90be81c12686837e0880aa0fa1e"
 
 S = "${WORKDIR}/git/squashfs-tools"
 
@@ -31,13 +28,11 @@ PACKAGECONFIG[zstd] = "ZSTD_SUPPORT=1,ZSTD_SUPPORT=0,zstd"
 PACKAGECONFIG[reproducible] = "REPRODUCIBLE_DEFAULT=1,REPRODUCIBLE_DEFAULT=0,"
 
 do_compile() {
-	oe_runmake mksquashfs unsquashfs
+	oe_runmake all
 }
 
-do_install () {
-	install -d ${D}${sbindir}
-	install -m 0755 mksquashfs ${D}${sbindir}/
-	install -m 0755 unsquashfs ${D}${sbindir}/
+do_install() {
+	oe_runmake install INSTALL_DIR=${D}${sbindir}
 }
 
 ARM_INSTRUCTION_SET_armv4 = "arm"

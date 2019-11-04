@@ -20,6 +20,14 @@ SRC_URI = "https://ftp.isc.org/isc/bind9/${PV}/${BPN}-${PV}.tar.gz \
            file://0001-configure.in-remove-useless-L-use_openssl-lib.patch \
            file://0001-named-lwresd-V-and-start-log-hide-build-options.patch \
            file://0001-avoid-start-failure-with-bind-user.patch \
+           file://0001-bind-fix-CVE-2019-6471.patch \
+           file://0001-fix-enforcement-of-tcp-clients-v1.patch \
+           file://0002-tcp-clients-could-still-be-exceeded-v2.patch \
+           file://0003-use-reference-counter-for-pipeline-groups-v3.patch \
+           file://0004-better-tcpquota-accounting-and-client-mortality-chec.patch \
+           file://0005-refactor-tcpquota-and-pipeline-refs-allow-special-ca.patch \
+           file://0006-restore-allowance-for-tcp-clients-interfaces.patch \
+           file://0007-Replace-atomic-operations-in-bin-named-client.c-with.patch \
 "
 
 SRC_URI[md5sum] = "8ddab4b61fa4516fe404679c74e37960"

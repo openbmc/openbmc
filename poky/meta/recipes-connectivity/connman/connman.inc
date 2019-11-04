@@ -59,7 +59,7 @@ INITSCRIPT_NAME = "connman"
 INITSCRIPT_PARAMS = "start 05 5 2 3 . stop 22 0 1 6 ."
 
 python __anonymous () {
-    systemd_packages = "${PN}"
+    systemd_packages = "${PN} ${PN}-wait-online"
     pkgconfig = d.getVar('PACKAGECONFIG')
     if ('openvpn' or 'vpnc' or 'l2tp' or 'pptp') in pkgconfig.split():
         systemd_packages += " ${PN}-vpn"

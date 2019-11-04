@@ -622,13 +622,14 @@ def check_sanity_version_change(status, d):
     # In other words, these tests run once in a given build directory and then 
     # never again until the sanity version or host distrubution id/version changes.
 
-    # Check the python install is complete. glib-2.0-natives requries
-    # xml.parsers.expat
+    # Check the python install is complete. Examples that are often removed in
+    # minimal installations: glib-2.0-natives requries # xml.parsers.expat and icu
+    # requires distutils.sysconfig.
     try:
         import xml.parsers.expat
-    except ImportError:
-        status.addresult('Your python is not a full install. Please install the module xml.parsers.expat (python-xml on openSUSE and SUSE Linux).\n')
-    import stat
+        import distutils.sysconfig
+    except ImportError as e:
+        status.addresult('Your Python 3 is not a full install. Please install the module %s (see the Getting Started guide for further information).\n' % e.name)
 
     status.addresult(check_make_version(d))
     status.addresult(check_patch_version(d))
@@ -664,6 +665,7 @@ def check_sanity_version_change(status, d):
         status.addresult('Please use ASSUME_PROVIDED +=, not ASSUME_PROVIDED = in your local.conf\n')
 
     # Check that TMPDIR isn't on a filesystem with limited filename length (eg. eCryptFS)
+    import stat
     tmpdir = d.getVar('TMPDIR')
     status.addresult(check_create_long_filename(tmpdir, "TMPDIR"))
     tmpdirmode = os.stat(tmpdir).st_mode
@@ -797,6 +799,11 @@ def check_sanity_everybuild(status, d):
             status.addresult('Specified SDKMACHINE value is not valid\n')
         elif d.getVar('SDK_ARCH', False) == "${BUILD_ARCH}":
             status.addresult('SDKMACHINE is set, but SDK_ARCH has not been changed as a result - SDKMACHINE may have been set too late (e.g. in the distro configuration)\n')
+
+    # If SDK_VENDOR looks like "-my-sdk" then the triples are badly formed so fail early
+    sdkvendor = d.getVar("SDK_VENDOR")
+    if not (sdkvendor.startswith("-") and sdkvendor.count("-") == 1):
+        status.addresult("SDK_VENDOR should be of the form '-foosdk' with a single dash\n")
 
     check_supported_distro(d)
 

@@ -1852,7 +1852,7 @@ def status(args, config, basepath, workspace):
     return 0
 
 
-def _reset(recipes, no_clean, config, basepath, workspace):
+def _reset(recipes, no_clean, remove_work, config, basepath, workspace):
     """Reset one or more recipes"""
     import oe.path
 
@@ -1930,10 +1930,15 @@ def _reset(recipes, no_clean, config, basepath, workspace):
         srctreebase = workspace[pn]['srctreebase']
         if os.path.isdir(srctreebase):
             if os.listdir(srctreebase):
-                # We don't want to risk wiping out any work in progress
-                logger.info('Leaving source tree %s as-is; if you no '
-                            'longer need it then please delete it manually'
-                            % srctreebase)
+                    if remove_work:
+                        logger.info('-r argument used on %s, removing source tree.'
+                                    ' You will lose any unsaved work' %pn)
+                        shutil.rmtree(srctreebase)
+                    else:
+                        # We don't want to risk wiping out any work in progress
+                        logger.info('Leaving source tree %s as-is; if you no '
+                                    'longer need it then please delete it manually'
+                                    % srctreebase)
             else:
                 # This is unlikely, but if it's empty we can just remove it
                 os.rmdir(srctreebase)
@@ -1943,6 +1948,10 @@ def _reset(recipes, no_clean, config, basepath, workspace):
 def reset(args, config, basepath, workspace):
     """Entry point for the devtool 'reset' subcommand"""
     import bb
+    import shutil
+
+    recipes = ""
+
     if args.recipename:
         if args.all:
             raise DevtoolError("Recipe cannot be specified if -a/--all is used")
@@ -1957,7 +1966,7 @@ def reset(args, config, basepath, workspace):
     else:
         recipes = args.recipename
 
-    _reset(recipes, args.no_clean, config, basepath, workspace)
+    _reset(recipes, args.no_clean, args.remove_work, config, basepath, workspace)
 
     return 0
 
@@ -2009,6 +2018,7 @@ def finish(args, config, basepath, workspace):
             raise DevtoolError('Source tree is not clean:\n\n%s\nEnsure you have committed your changes or use -f/--force if you are sure there\'s nothing that needs to be committed' % dirty)
 
     no_clean = args.no_clean
+    remove_work=args.remove_work
     tinfoil = setup_tinfoil(basepath=basepath, tracking=True)
     try:
         rd = parse_recipe(config, tinfoil, args.recipename, True, False)
@@ -2160,7 +2170,7 @@ def finish(args, config, basepath, workspace):
     if args.dry_run:
         logger.info('Resetting recipe (dry-run)')
     else:
-        _reset([args.recipename], no_clean=no_clean, config=config, basepath=basepath, workspace=workspace)
+        _reset([args.recipename], no_clean=no_clean, remove_work=remove_work, config=config, basepath=basepath, workspace=workspace)
 
     return 0
 
@@ -2272,6 +2282,7 @@ def register_commands(subparsers, context):
     parser_reset.add_argument('recipename', nargs='*', help='Recipe to reset')
     parser_reset.add_argument('--all', '-a', action="store_true", help='Reset all recipes (clear workspace)')
     parser_reset.add_argument('--no-clean', '-n', action="store_true", help='Don\'t clean the sysroot to remove recipe output')
+    parser_reset.add_argument('--remove-work', '-r', action="store_true", help='Clean the sources directory along with append')
     parser_reset.set_defaults(func=reset)
 
     parser_finish = subparsers.add_parser('finish', help='Finish working on a recipe in your workspace',
@@ -2282,6 +2293,7 @@ def register_commands(subparsers, context):
     parser_finish.add_argument('--mode', '-m', choices=['patch', 'srcrev', 'auto'], default='auto', help='Update mode (where %(metavar)s is %(choices)s; default is %(default)s)', metavar='MODE')
     parser_finish.add_argument('--initial-rev', help='Override starting revision for patches')
     parser_finish.add_argument('--force', '-f', action="store_true", help='Force continuing even if there are uncommitted changes in the source tree repository')
+    parser_finish.add_argument('--remove-work', '-r', action="store_true", help='Clean the sources directory under workspace')
     parser_finish.add_argument('--no-clean', '-n', action="store_true", help='Don\'t clean the sysroot to remove recipe output')
     parser_finish.add_argument('--no-overrides', '-O', action="store_true", help='Do not handle other override branches (if they exist)')
     parser_finish.add_argument('--dry-run', '-N', action="store_true", help='Dry-run (just report changes instead of writing them)')

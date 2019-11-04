@@ -31,6 +31,7 @@ FILES_${PN}-misc = "${sbindir}/i2c-stub-from-dump \
 RDEPENDS_${PN}-misc = "${PN} perl perl-module-posix \
                        perl-module-constant perl-module-file-basename \
                        perl-module-fcntl perl-module-strict perl-module-vars \
+		       perl-module-carp \
                       "
 
 ALTERNATIVE_PRIORITY = "100"

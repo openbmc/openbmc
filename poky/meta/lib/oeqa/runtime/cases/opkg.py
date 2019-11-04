@@ -5,7 +5,7 @@
 import os
 from oeqa.utils.httpserver import HTTPService
 from oeqa.runtime.case import OERuntimeTestCase
-from oeqa.core.decorator.data import skipIfNotDataVar, skipIfNotFeature
+from oeqa.core.decorator.data import skipIfNotDataVar, skipIfNotFeature, skipIfFeature
 from oeqa.runtime.decorator.package import OEHasPackage
 
 class OpkgTest(OERuntimeTestCase):
@@ -45,6 +45,8 @@ class OpkgRepoTest(OpkgTest):
                       'Test requires package-management to be in IMAGE_FEATURES')
     @skipIfNotDataVar('IMAGE_PKGTYPE', 'ipk',
                       'IPK is not the primary package manager')
+    @skipIfFeature('read-only-rootfs',
+                   'Test does not work with read-only-rootfs in IMAGE_FEATURES')
     @OEHasPackage(['opkg'])
     def test_opkg_install_from_repo(self):
         self.setup_source_config_for_package_install()

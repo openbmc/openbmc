@@ -356,17 +356,6 @@ set_icecc_env() {
         return
     fi
 
-    # Create symlinks to icecc in the recipe-sysroot directory
-    mkdir -p ${ICE_PATH}
-    if [ -n "${KERNEL_CC}" ]; then
-        compilers="${@get_cross_kernel_cc(bb,d)}"
-    else
-        compilers="${HOST_PREFIX}gcc ${HOST_PREFIX}g++"
-    fi
-    for compiler in $compilers; do
-        ln -sf ${ICECC_BIN} ${ICE_PATH}/$compiler
-    done
-
     ICECC_CC="${@icecc_get_and_check_tool(bb, d, "gcc")}"
     ICECC_CXX="${@icecc_get_and_check_tool(bb, d, "g++")}"
     # cannot use icecc_get_and_check_tool here because it assumes as without target_sys prefix
@@ -384,6 +373,26 @@ set_icecc_env() {
         bbwarn "Cannot use icecc: invalid ICECC_ENV_EXEC"
         return
     fi
+
+    # Create symlinks to icecc and wrapper-scripts in the recipe-sysroot directory
+    mkdir -p $ICE_PATH/symlinks
+    if [ -n "${KERNEL_CC}" ]; then
+        compilers="${@get_cross_kernel_cc(bb,d)}"
+    else
+        compilers="${HOST_PREFIX}gcc ${HOST_PREFIX}g++"
+    fi
+    for compiler in $compilers; do
+        ln -sf $ICECC_BIN $ICE_PATH/symlinks/$compiler
+        rm -f $ICE_PATH/$compiler
+        cat <<-__EOF__ > $ICE_PATH/$compiler
+		#!/bin/sh -e
+		export ICECC_VERSION=$ICECC_VERSION
+		export ICECC_CC=$ICECC_CC
+		export ICECC_CXX=$ICECC_CXX
+		$ICE_PATH/symlinks/$compiler "\$@"
+		__EOF__
+        chmod 775 $ICE_PATH/$compiler
+    done
 
     ICECC_AS="`${ICECC_CC} -print-prog-name=as`"
     # for target recipes should return something like:
@@ -417,7 +426,6 @@ set_icecc_env() {
     export CCACHE_PATH="$PATH"
     export CCACHE_DISABLE="1"
 
-    export ICECC_VERSION ICECC_CC ICECC_CXX
     export PATH="$ICE_PATH:$PATH"
 
     bbnote "Using icecc path: $ICE_PATH"

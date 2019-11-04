@@ -292,10 +292,20 @@ class Git(FetchMethod):
     def clonedir_need_update(self, ud, d):
         if not os.path.exists(ud.clonedir):
             return True
+        if ud.shallow and ud.write_shallow_tarballs and self.clonedir_need_shallow_revs(ud, d):
+            return True
         for name in ud.names:
             if not self._contains_ref(ud, d, name, ud.clonedir):
                 return True
         return False
+
+    def clonedir_need_shallow_revs(self, ud, d):
+        for rev in ud.shallow_revs:
+            try:
+                runfetchcmd('%s rev-parse -q --verify %s' % (ud.basecmd, rev), d, quiet=True, workdir=ud.clonedir)
+            except bb.fetch2.FetchError:
+                return rev
+        return None
 
     def shallow_tarball_need_update(self, ud):
         return ud.shallow and ud.write_shallow_tarballs and not os.path.exists(ud.fullshallow)
@@ -339,13 +349,7 @@ class Git(FetchMethod):
             runfetchcmd(clone_cmd, d, log=progresshandler)
 
         # Update the checkout if needed
-        needupdate = False
-        for name in ud.names:
-            if not self._contains_ref(ud, d, name, ud.clonedir):
-                needupdate = True
-                break
-
-        if needupdate:
+        if self.clonedir_need_update(ud, d):
             output = runfetchcmd("%s remote" % ud.basecmd, d, quiet=True, workdir=ud.clonedir)
             if "origin" in output:
               runfetchcmd("%s remote rm origin" % ud.basecmd, d, workdir=ud.clonedir)
@@ -368,6 +372,11 @@ class Git(FetchMethod):
         for name in ud.names:
             if not self._contains_ref(ud, d, name, ud.clonedir):
                 raise bb.fetch2.FetchError("Unable to find revision %s in branch %s even from upstream" % (ud.revisions[name], ud.branches[name]))
+
+        if ud.shallow and ud.write_shallow_tarballs:
+            missing_rev = self.clonedir_need_shallow_revs(ud, d)
+            if missing_rev:
+                raise bb.fetch2.FetchError("Unable to find revision %s even from upstream" % missing_rev)
 
     def build_mirror_data(self, ud, d):
         if ud.shallow and ud.write_shallow_tarballs:

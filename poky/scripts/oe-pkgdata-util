@@ -389,21 +389,16 @@ def list_pkgs(args):
                     return False
         return True
 
+    pkglist = []
     if args.recipe:
         packages = get_recipe_pkgs(args.pkgdata_dir, args.recipe, args.unpackaged)
 
         if args.runtime:
-            pkglist = []
             runtime_pkgs = lookup_pkglist(packages, args.pkgdata_dir, False)
             for rtpkgs in runtime_pkgs.values():
                 pkglist.extend(rtpkgs)
         else:
             pkglist = packages
-
-        for pkg in pkglist:
-            if matchpkg(pkg):
-                found = True
-                print("%s" % pkg)
     else:
         if args.runtime:
             searchdir = 'runtime-reverse'
@@ -414,9 +409,13 @@ def list_pkgs(args):
             for fn in files:
                 if fn.endswith('.packaged'):
                     continue
-                if matchpkg(fn):
-                    found = True
-                    print("%s" % fn)
+                pkglist.append(fn)
+
+    for pkg in sorted(pkglist):
+        if matchpkg(pkg):
+            found = True
+            print("%s" % pkg)
+
     if not found:
         if args.pkgspec:
             logger.error("Unable to find any package matching %s" % args.pkgspec)
