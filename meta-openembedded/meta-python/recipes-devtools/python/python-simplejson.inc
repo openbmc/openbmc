@@ -21,3 +21,5 @@ FILES_${PN}-tests+= " \
     ${PYTHON_SITEPACKAGES_DIR}/simplejson/tests \
     ${PYTHON_SITEPACKAGES_DIR}/simplejson/tool.py* \
 "
+
+BBCLASSEXTEND = "native nativesdk"

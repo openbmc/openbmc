@@ -9,7 +9,7 @@ PYPI_PACKAGE := "Pint"
 
 inherit pypi
 
-SRC_URI[md5sum] = "e1f80f3f8fc4e61f68ad3912db26b3a8"
-SRC_URI[sha256sum] = "afcf31443a478c32bbac4b00337ee9026a13d0e2ac83d30c79151462513bb0d4"
+SRC_URI[md5sum] = "d0681cb7cfaca9fc68ce7edab0d08d88"
+SRC_URI[sha256sum] = "32d8a9a9d63f4f81194c0014b3b742679dce81a26d45127d9810a68a561fe4e2"
 
 BBCLASSEXTEND = "native"

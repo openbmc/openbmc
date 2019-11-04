@@ -1,0 +1,166 @@
+From cbb8f5c05fce1d56ae2e5fa9f57fc49c47bed5ab Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Sun, 12 May 2019 21:58:02 +0200
+Subject: [PATCH] Move the function cd_icc_create_from_edid to avoid udev
+ dependeny
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We do not have udev-native so it is a dependeny we cannot satisfy
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ lib/colord/cd-edid.c | 63 ++++++++++++++++++++++++++++++++++++++++++++
+ lib/colord/cd-icc.c  | 62 -------------------------------------------
+ 2 files changed, 63 insertions(+), 62 deletions(-)
+
+diff --git a/lib/colord/cd-edid.c b/lib/colord/cd-edid.c
+index a5e2328..dec509a 100644
+--- a/lib/colord/cd-edid.c
++++ b/lib/colord/cd-edid.c
+@@ -687,3 +687,66 @@ cd_edid_new (void)
+ 	edid = g_object_new (CD_TYPE_EDID, NULL);
+ 	return CD_EDID (edid);
+ }
++
++/**
++ * cd_icc_create_from_edid_data:
++ * @icc: A valid #CdIcc
++ * @edid: EDID data
++ * @error: A #GError, or %NULL
++ *
++ * Creates an ICC profile from EDID data.
++ *
++ * Return value: %TRUE for success
++ *
++ * Since: 1.1.2
++ **/
++gboolean
++cd_icc_create_from_edid_data (CdIcc *icc, CdEdid *edid, GError **error)
++{
++	CdIccPrivate *priv = GET_PRIVATE (icc);
++	const gchar *data;
++
++	/* not loaded */
++	if (priv->lcms_profile != NULL) {
++		g_set_error_literal (error,
++				     CD_ICC_ERROR,
++				     CD_ICC_ERROR_FAILED_TO_CREATE,
++				     "already loaded or generated");
++		return FALSE;
++	}
++
++	/* create from parsed object */
++	if (!cd_icc_create_from_edid (icc,
++				      cd_edid_get_gamma (edid),
++				      cd_edid_get_red (edid),
++				      cd_edid_get_green (edid),
++				      cd_edid_get_blue (edid),
++				      cd_edid_get_white (edid),
++				      error)) {
++		return FALSE;
++	}
++
++	/* set copyright */
++	cd_icc_set_copyright (icc, NULL,
++			      /* deliberately not translated */
++			      "This profile is free of known copyright restrictions.");
++
++	/* set 'ICC meta Tag for Monitor Profiles' data */
++	data = cd_edid_get_checksum (edid);
++	if (data != NULL)
++		cd_icc_add_metadata (icc, CD_PROFILE_METADATA_EDID_MD5, data);
++	data = cd_edid_get_monitor_name (edid);
++	if (data != NULL)
++		cd_icc_add_metadata (icc, CD_PROFILE_METADATA_EDID_MODEL, data);
++	data = cd_edid_get_serial_number (edid);
++	if (data != NULL)
++		cd_icc_add_metadata (icc, CD_PROFILE_METADATA_EDID_SERIAL, data);
++	data = cd_edid_get_pnp_id (edid);
++	if (data != NULL)
++		cd_icc_add_metadata (icc, CD_PROFILE_METADATA_EDID_MNFT, data);
++	data = cd_edid_get_vendor_name (edid);
++	if (data != NULL)
++		cd_icc_add_metadata (icc, CD_PROFILE_METADATA_EDID_VENDOR, data);
++	return TRUE;
++}
++
+diff --git a/lib/colord/cd-icc.c b/lib/colord/cd-icc.c
+index f231814..2c8fe77 100644
+--- a/lib/colord/cd-icc.c
++++ b/lib/colord/cd-icc.c
+@@ -3094,68 +3094,6 @@ out:
+ 	return ret;
+ }
+ 
+-/**
+- * cd_icc_create_from_edid_data:
+- * @icc: A valid #CdIcc
+- * @edid: EDID data
+- * @error: A #GError, or %NULL
+- *
+- * Creates an ICC profile from EDID data.
+- *
+- * Return value: %TRUE for success
+- *
+- * Since: 1.1.2
+- **/
+-gboolean
+-cd_icc_create_from_edid_data (CdIcc *icc, CdEdid *edid, GError **error)
+-{
+-	CdIccPrivate *priv = GET_PRIVATE (icc);
+-	const gchar *data;
+-
+-	/* not loaded */
+-	if (priv->lcms_profile != NULL) {
+-		g_set_error_literal (error,
+-				     CD_ICC_ERROR,
+-				     CD_ICC_ERROR_FAILED_TO_CREATE,
+-				     "already loaded or generated");
+-		return FALSE;
+-	}
+-
+-	/* create from parsed object */
+-	if (!cd_icc_create_from_edid (icc,
+-				      cd_edid_get_gamma (edid),
+-				      cd_edid_get_red (edid),
+-				      cd_edid_get_green (edid),
+-				      cd_edid_get_blue (edid),
+-				      cd_edid_get_white (edid),
+-				      error)) {
+-		return FALSE;
+-	}
+-
+-	/* set copyright */
+-	cd_icc_set_copyright (icc, NULL,
+-			      /* deliberately not translated */
+-			      "This profile is free of known copyright restrictions.");
+-
+-	/* set 'ICC meta Tag for Monitor Profiles' data */
+-	data = cd_edid_get_checksum (edid);
+-	if (data != NULL)
+-		cd_icc_add_metadata (icc, CD_PROFILE_METADATA_EDID_MD5, data);
+-	data = cd_edid_get_monitor_name (edid);
+-	if (data != NULL)
+-		cd_icc_add_metadata (icc, CD_PROFILE_METADATA_EDID_MODEL, data);
+-	data = cd_edid_get_serial_number (edid);
+-	if (data != NULL)
+-		cd_icc_add_metadata (icc, CD_PROFILE_METADATA_EDID_SERIAL, data);
+-	data = cd_edid_get_pnp_id (edid);
+-	if (data != NULL)
+-		cd_icc_add_metadata (icc, CD_PROFILE_METADATA_EDID_MNFT, data);
+-	data = cd_edid_get_vendor_name (edid);
+-	if (data != NULL)
+-		cd_icc_add_metadata (icc, CD_PROFILE_METADATA_EDID_VENDOR, data);
+-	return TRUE;
+-}
+-
+ /**
+  * cd_icc_create_from_edid:
+  * @icc: A valid #CdIcc
+-- 
+2.20.1
+

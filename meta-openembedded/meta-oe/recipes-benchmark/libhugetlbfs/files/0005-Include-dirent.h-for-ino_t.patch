@@ -8,12 +8,14 @@ error: unknown type name 'ino_t'; did you mean 'int'?
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
+Update for 2.22.
+Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
 ---
  tests/hugetests.h | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/tests/hugetests.h b/tests/hugetests.h
-index 8b1d8d9..056042c 100644
+index bc4e16a..fbe4dc0 100644
 --- a/tests/hugetests.h
 +++ b/tests/hugetests.h
 @@ -22,6 +22,7 @@
@@ -21,6 +23,9 @@ index 8b1d8d9..056042c 100644
  #include <errno.h>
  #include <string.h>
 +#include <dirent.h>
+ #include <unistd.h>
  
  #include "libhugetlbfs_privutils.h"
- #include "libhugetlbfs_testprobes.h"
+-- 
+2.7.4
+

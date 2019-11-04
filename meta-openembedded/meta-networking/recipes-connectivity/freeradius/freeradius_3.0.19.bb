@@ -230,3 +230,5 @@ FILES_${PN} =+ "${libdir}/rlm_*.so* ${libdir}/proto_*so*"
 
 RDEPENDS_${PN} += "perl"
 RDEPENDS_${PN}-utils = "${PN} perl"
+
+CLEANBROKEN = "1"

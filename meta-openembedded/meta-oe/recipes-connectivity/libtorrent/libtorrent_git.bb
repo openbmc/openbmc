@@ -11,9 +11,9 @@ SRC_URI = "git://github.com/rakshasa/libtorrent \
            file://0001-implement-64bit-atomic-for-mips.patch \
            file://0001-Define-64bit-atomic-helpers-for-ppc-32-bit.patch \
            "
-SRCREV = "074f6ec51a2e4bc5c6140b4dad13c9bb56f3f0dc"
+SRCREV = "756f70010779927dc0691e1e722ed433d5d295e1"
 
-PV = "0.13.7+git${SRCPV}"
+PV = "0.13.8"
 
 S = "${WORKDIR}/git"
 

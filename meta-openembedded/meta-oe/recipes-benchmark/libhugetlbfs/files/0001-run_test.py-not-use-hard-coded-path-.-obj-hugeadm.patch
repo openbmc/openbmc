@@ -10,15 +10,17 @@ Upstream-Status: Submitted
 
 Signed-off-by: Ting Liu <b28495@freescale.com>
 
+Update for 2.22.
+Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
 ---
  tests/run_tests.py | 12 +++++++++++-
  1 file changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/tests/run_tests.py b/tests/run_tests.py
-index 3c95a03..560df6b 100755
+index 018264d..0aabcd1 100755
 --- a/tests/run_tests.py
 +++ b/tests/run_tests.py
-@@ -234,9 +234,19 @@ def get_pagesizes():
+@@ -245,9 +245,19 @@ def get_pagesizes():
      Use libhugetlbfs' hugeadm utility to get a list of page sizes that have
      active mount points and at least one huge page allocated to the pool.
      """
@@ -36,6 +38,9 @@ index 3c95a03..560df6b 100755
 +        return sizes
 +    out = p.stdout.read().strip()
 +
-     if rc != 0 or out == "": return sizes
+     if rc != 0 or out == "":
+         return sizes
  
-     for size in out.split("\n"): sizes.add(int(size))
+-- 
+2.7.4
+

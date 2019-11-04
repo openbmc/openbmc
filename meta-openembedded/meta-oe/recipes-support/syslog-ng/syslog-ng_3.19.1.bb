@@ -1,15 +1,13 @@
 require syslog-ng.inc
 
-SRC_URI = "https://github.com/balabit/syslog-ng/releases/download/${BP}/${BP}.tar.gz \
-           file://syslog-ng.conf.systemd \
-           file://syslog-ng.conf.sysvinit \
-           file://initscript \
-           file://volatiles.03_syslog-ng \
-           file://configure.ac-add-option-enable-thread-tls-to-manage-.patch \
+# We only want to add stuff we need to the defaults provided in syslog-ng.inc.
+#
+SRC_URI += " \
            file://fix-config-libnet.patch \
            file://fix-invalid-ownership.patch \
            file://syslog-ng.service-the-syslog-ng-service.patch \
            file://0001-syslog-ng-fix-segment-fault-during-service-start.patch \
+           file://syslog-ng-tmp.conf \
            "
 
 SRC_URI[md5sum] = "aa79bc13d9fd925aa5fb9516e87aacd3"

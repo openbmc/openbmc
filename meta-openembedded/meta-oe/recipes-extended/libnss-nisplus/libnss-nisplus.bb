@@ -15,10 +15,9 @@ DEPENDS += "libtirpc libnsl2"
 
 PV = "1.3+git${SRCPV}"
 
-SRCREV = "c6934373c7bac91499ff7bbe7d2439599325ca63"
+SRCREV = "116219e215858f4af9370171d3ead63baca8fdb4"
 
 SRC_URI = "git://github.com/thkukuk/libnss_nisplus \
-           file://0001-nisplus-hosts-Remove-use-of-RES_USE_INET6.patch \
           "
 
 S = "${WORKDIR}/git"

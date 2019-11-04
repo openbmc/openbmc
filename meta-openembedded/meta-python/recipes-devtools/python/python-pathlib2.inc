@@ -3,7 +3,7 @@ HOMEPAGE = "https://github.com/mcmtroffaes/pathlib2"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.rst;md5=042856c23a3e903b33bf361ea1cbe29a"
 
-SRC_URI[md5sum] = "96da6398b3ea944417b84ccb25b171aa"
-SRC_URI[sha256sum] = "446014523bb9be5c28128c4d2a10ad6bb60769e78bd85658fe44a450674e0ef8"
+SRC_URI[md5sum] = "f2bd0a363eb0f8fa0556f35c1d9e66fb"
+SRC_URI[sha256sum] = "6cd9a47b597b37cc57de1c05e56fb1a1c9cc9fab04fe78c29acd090418529868"
 
 RDEPENDS_${PN} += "${PYTHON_PN}-six"

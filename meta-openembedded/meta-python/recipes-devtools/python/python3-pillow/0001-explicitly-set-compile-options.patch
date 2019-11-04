@@ -1,4 +1,4 @@
-From 9f3073bf6a7c7c51bb49d25f65c8f75cc704a5ee Mon Sep 17 00:00:00 2001
+From 862a981ce462cd83a99e3db9faeeda1f8c64983f Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Mon, 18 Mar 2019 23:23:55 -0400
 Subject: [PATCH] explicitly set compile options
@@ -10,18 +10,19 @@ explicitly set build_ext options for oe-core's
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
 ---
  setup.cfg | 12 ++++++++++++
  1 file changed, 12 insertions(+)
 
 diff --git a/setup.cfg b/setup.cfg
-index 3ab2e127..e92615f3 100644
+index 1c6ebc84..1ccc3d69 100644
 --- a/setup.cfg
 +++ b/setup.cfg
-@@ -4,3 +4,15 @@ test=pytest
- [flake8]
- extend-ignore = E203, W503
- max-line-length = 88
+@@ -13,3 +13,15 @@ multi_line_output = 3
+ 
+ [tool:pytest]
+ addopts = -rs
 +
 +[build_ext]
 +disable-platform-guessing = 1
@@ -34,6 +35,3 @@ index 3ab2e127..e92615f3 100644
 +disable-webp = 1
 +disable-webpmux = 1
 +disable-imagequant = 1
--- 
-2.20.1
-

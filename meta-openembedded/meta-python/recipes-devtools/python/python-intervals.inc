@@ -9,7 +9,7 @@ PYPI_PACKAGE := "python-intervals"
 
 inherit pypi
 
-SRC_URI[md5sum] = "a35dd44269fdb134bf19cfd80cb2c120"
-SRC_URI[sha256sum] = "a8a15b7c2fadb8465310f44aa96e384828b35a29de38ac74738cd665924cb8ac"
+SRC_URI[md5sum] = "8955317ff4e42590c90ba6247b1caaed"
+SRC_URI[sha256sum] = "0d26746eaed0be78a61dd289bb7a10721b08770bb3e807614835f490d514f2a5"
 
 BBCLASSEXTEND = "native"

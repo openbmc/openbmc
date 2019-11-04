@@ -9,5 +9,5 @@ inherit pypi
 
 PYPI_PACKAGE = "python-engineio"
 
-SRC_URI[md5sum] = "11a4f18f5b08a36d07d3c0ff85e7c047"
-SRC_URI[sha256sum] = "2a4c874aea686e79f8ea9efc30748110df581df6d577d18bb5eaa1a8f2199d12"
+SRC_URI[md5sum] = "bec3b06a112a7f09a0a9c92b627282fe"
+SRC_URI[sha256sum] = "9c9a6035b4b5e5a225f426f846afa14cf627f7571d1ae02167cb703fefd134b7"

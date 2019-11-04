@@ -42,6 +42,8 @@ RDEPENDS_packagegroup-meta-networking-connectivity = "\
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "samba", "", d)} \
     "
 
+RDEPENDS_packagegroup-meta-networking-connectivity_remove_libc-musl = "rdist"
+
 RDEPENDS_packagegroup-meta-networking-daemons = "\
     ippool radvd autofs keepalived proftpd openhpi lldpd \
     ptpd igmpproxy opensaf squid \
@@ -49,6 +51,8 @@ RDEPENDS_packagegroup-meta-networking-daemons = "\
     pure-ftpd vblade tftp-hpa ncftp \
     ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "networkd-dispatcher", "", d)} \
     "
+
+RDEPENDS_packagegroup-meta-networking-daemons_remove_libc-musl = "opensaf"
 
 RDEPENDS_packagegroup-meta-networking-devtools = "\
     python-ldap grpc \
@@ -81,12 +85,17 @@ RDEPENDS_packagegroup-meta-networking-netkit = "\
     netkit-ftp netkit-rpc \
     "
 
+RDEPENDS_packagegroup-meta-networking-netkit_remove_libc-musl = " \
+    netkit-rsh-client netkit-rsh-server netkit-telnet"
+
 RDEPENDS_packagegroup-meta-networking-protocols = "\
     tsocks freediameter xl2tpd babeld mdns net-snmp \
     quagga pptp-linux zeroconf nopoll openflow rp-pppoe \
     radiusclient-ng openl2tp usrsctp \
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "dante", "", d)} \
     "
+
+RDEPENDS_packagegroup-meta-networking-protocols_remove_libc-musl = "mdns"
 
 RDEPENDS_packagegroup-meta-networking-support = "\
     ncp ndisc6 mtr tinyproxy ssmping ntp \

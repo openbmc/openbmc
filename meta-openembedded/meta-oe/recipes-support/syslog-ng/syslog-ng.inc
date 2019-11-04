@@ -15,6 +15,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=24c0c5cb2c83d9f2ab725481e4df5240"
 # util-linux added to get libuuid
 DEPENDS = "libpcre flex glib-2.0 openssl util-linux"
 
+# We expect the recipe to add anything specific for that version to these defaults.
+#
 SRC_URI = "https://github.com/balabit/syslog-ng/releases/download/${BP}/${BP}.tar.gz \
            file://syslog-ng.conf.systemd \
            file://syslog-ng.conf.sysvinit \
@@ -74,8 +76,12 @@ do_install_append() {
     install -d ${D}/${sysconfdir}/${BPN}
     install -d ${D}/${sysconfdir}/init.d
     install -m 755 ${WORKDIR}/initscript ${D}/${sysconfdir}/init.d/syslog
+
     install -d ${D}/${sysconfdir}/default/volatiles/
     install -m 755 ${WORKDIR}/volatiles.03_syslog-ng ${D}/${sysconfdir}/default/volatiles/03_syslog-ng
+    install -d ${D}/${sysconfdir}/tmpfiles.d/
+    install -m 755 ${WORKDIR}/syslog-ng-tmp.conf ${D}/${sysconfdir}/tmpfiles.d/syslog-ng.conf
+
     install -d ${D}/${localstatedir}/lib/${BPN}
     # Remove /var/run as it is created on startup
     rm -rf ${D}${localstatedir}/run
