@@ -48,4 +48,5 @@ RDEPENDS_${PN}-flash = " \
 SUMMARY_${PN}-system = "OpenPOWER System"
 RDEPENDS_${PN}-system = " \
         pdbg \
+        croserver \
         "
