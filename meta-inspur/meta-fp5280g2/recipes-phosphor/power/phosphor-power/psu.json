@@ -1,0 +1,34 @@
+{
+  "inventoryPMBusAccessType": "Hwmon",
+  "fruConfigs": [
+    {
+      "propertyName": "PartNumber",
+      "fileName": "part_number",
+      "interface": "xyz.openbmc_project.Inventory.Decorator.Asset"
+    },
+    {
+      "propertyName": "SerialNumber",
+      "fileName": "serial_number",
+      "interface": "xyz.openbmc_project.Inventory.Decorator.Asset"
+    },
+    {
+      "propertyName": "Manufacturer",
+      "fileName": "manufacturer",
+      "interface": "xyz.openbmc_project.Inventory.Decorator.Asset"
+    },
+    {
+      "propertyName": "Model",
+      "fileName": "model",
+      "interface": "xyz.openbmc_project.Inventory.Decorator.Asset"
+    },
+    {
+      "propertyName": "Version",
+      "fileName": "fw_version",
+      "interface": "xyz.openbmc_project.Software.Version"
+    }
+  ],
+  "psuDevices": {
+    "/xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply0" : "/sys/bus/i2c/devices/11-0058",
+    "/xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply1" : "/sys/bus/i2c/devices/11-0059"
+  }
+}
