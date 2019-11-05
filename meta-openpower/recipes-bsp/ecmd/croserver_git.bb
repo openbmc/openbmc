@@ -7,6 +7,8 @@ SRC_URI = "git://github.com/open-power/eCMD.git"
 SRCREV = "6c0348b12c95b3bd6e8d8003f9ff743d25400ae2"
 DEPENDS += "python-native zlib"
 
+SRC_URI += "file://croserver.service"
+
 S = "${WORKDIR}/git"
 
 # Add the hash style option here to Work around this warning:
@@ -26,4 +28,9 @@ do_compile() {
 do_install() {
     install -d ${D}${bindir}
     install -m 0755 out_obj/lib/server1p ${D}${bindir}/croserver
+
+    install -d ${D}${systemd_system_unitdir}
+    install -m 0644 ${WORKDIR}/croserver.service ${D}${systemd_system_unitdir}/
 }
+
+FILES_${PN} += "${systemd_system_unitdir}/croserver.service"
