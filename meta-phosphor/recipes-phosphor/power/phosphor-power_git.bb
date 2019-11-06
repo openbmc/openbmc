@@ -21,6 +21,7 @@ DEPENDS += " \
          sdbus++-native \
          sdeventplus \
          nlohmann-json \
+         cli11 \
          "
 
 SEQ_MONITOR_SVC = "pseq-monitor.service"
