@@ -11,7 +11,6 @@ FSP-2: meta-fsp2
 
 BSP layer(s) for the following IBM branded servers:
 Witherspoon: meta-witherspoon
-Z: meta-z
 
 Subsequent description applies to the distro policy for IBM systems only in
 conf, classes, and recipes-*, for description of the BSP layers consult the
