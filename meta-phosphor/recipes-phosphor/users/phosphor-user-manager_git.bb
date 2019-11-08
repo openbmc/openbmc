@@ -23,8 +23,8 @@ inherit useradd
 USERADD_PACKAGES = "${PN} phosphor-ldap"
 DBUS_PACKAGES = "${USERADD_PACKAGES}"
 # add groups needed for privilege maintenance
-GROUPADD_PARAM_${PN} = "priv-admin; priv-operator; priv-user; priv-callback "
-GROUPADD_PARAM_phosphor-ldap = "priv-admin; priv-operator; priv-user; priv-callback "
+GROUPADD_PARAM_${PN} = "priv-admin; priv-operator; priv-user "
+GROUPADD_PARAM_phosphor-ldap = "priv-admin; priv-operator; priv-user "
 
 DBUS_SERVICE_${PN} += "xyz.openbmc_project.User.Manager.service"
 FILES_phosphor-ldap += " \
