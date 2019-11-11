@@ -2,8 +2,8 @@ DESCRIPTION = "SQLAlchemy database migrations for Flask applications using Alemb
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=3b69377f79f3f48c661701236d5a6a85"
 
-SRC_URI[md5sum] = "aaeee55431d0287063657122ff41a0e6"
-SRC_URI[sha256sum] = "cd1b4e6cb829eeb41c02ad9202d83bef5f4b7a036dd9fad72ce96ad1e22efb07"
+SRC_URI[md5sum] = "bedeb0366740fda6912fea683be11968"
+SRC_URI[sha256sum] = "a96ff1875a49a40bd3e8ac04fce73fdb0870b9211e6168608cbafa4eb839d502"
 
 PYPI_PACKAGE = "Flask-Migrate"
 

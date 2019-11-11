@@ -10,6 +10,7 @@ DEPENDS += "${PYTHON_PN}-vcversioner-native ${PYTHON_PN}-setuptools-scm-native"
 RDEPENDS_${PN} += " \
     ${PYTHON_PN}-attrs \
     ${PYTHON_PN}-core \
+    ${PYTHON_PN}-importlib-metadata \
     ${PYTHON_PN}-io \
     ${PYTHON_PN}-json \
     ${PYTHON_PN}-netclient \

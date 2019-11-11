@@ -1,0 +1,22 @@
+Subject: [PATCH] Add build rule for README.
+
+fix do_configure error:
+Makefile.am: required file `./README' not found
+
+Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
+---
+ Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile.am b/Makefile.am
+index 49574a3..a5a7c2a 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -26,3 +26,4 @@ libtool: $(LIBTOOL_DEPS)
+ ChangeLog:
+ 	git log --stat --decorate=short > $@
+ 
++README: README.md
+-- 
+2.7.4
+

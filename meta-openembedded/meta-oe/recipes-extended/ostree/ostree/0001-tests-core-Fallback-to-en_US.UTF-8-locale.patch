@@ -1,0 +1,42 @@
+From 4d17cd917fe4fb67d2f9e4881b6693ac7289f423 Mon Sep 17 00:00:00 2001
+From: Alex Kiernan <alex.kiernan@gmail.com>
+Date: Wed, 30 Oct 2019 07:55:41 +0000
+Subject: [PATCH 1/4] tests/core: Fallback to en_US.UTF-8 locale
+
+A number of tests expect explicit left/right single quotes in their
+messages, which will never happen in the C locale. Change so we pick a
+likely UTF-8 locale, or fail if we can't find one.
+
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+Upstream-Status: Accepted [v2019.6]
+---
+ tests/libtest-core.sh | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
+
+diff --git a/tests/libtest-core.sh b/tests/libtest-core.sh
+index f6f94288fc61..bc191332c916 100644
+--- a/tests/libtest-core.sh
++++ b/tests/libtest-core.sh
+@@ -35,15 +35,11 @@ assert_not_reached () {
+ }
+ 
+ # Some tests look for specific English strings. Use a UTF-8 version
+-# of the C (POSIX) locale if we have one, or fall back to POSIX
++# of the C (POSIX) locale if we have one, or fall back to en_US.UTF-8
+ # (https://sourceware.org/glibc/wiki/Proposals/C.UTF-8)
+-if locale -a | grep '^C.UTF-8$' >/dev/null; then
+-    export LC_ALL=C.UTF-8
+-elif locale -a | grep '^C.utf8$' >/dev/null; then
+-    export LC_ALL=C.utf8
+-else
+-    export LC_ALL=C
+-fi
++export LC_ALL=$(locale -a | grep -Ee '\.(UTF-8|utf8)' | grep -iEe '^(C|en_US)' | head -1 || true)
++if [ -z "${LC_ALL}" ]; then fatal "Can't find suitable UTF-8 locale"; fi
++
+ # A GNU extension, used whenever LC_ALL is not C
+ unset LANGUAGE
+ 
+-- 
+2.17.1
+

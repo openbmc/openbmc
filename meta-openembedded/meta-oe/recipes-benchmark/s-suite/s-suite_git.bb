@@ -19,6 +19,7 @@ do_install() {
 
     install -m0755 ${S}/def_config.sh ${D}/opt/S-suite
     install -m0755 ${S}/config_params.sh ${D}/opt/S-suite
+    install -m0755 ${S}/create_config.sh ${D}/opt/S-suite
     install -m0755 ${S}/process_config.sh ${D}/opt/S-suite
 }
 

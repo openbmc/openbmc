@@ -9,22 +9,21 @@ SRC_URI = " \
     git://repo.or.cz/r/git2cl.git;protocol=http;destsuffix=tools/git2cl;name=git2cl \
     git://repo.or.cz/r/jimtcl.git;protocol=http;destsuffix=git/jimtcl;name=jimtcl \
     git://repo.or.cz/r/libjaylink.git;protocol=http;destsuffix=git/src/jtag/drivers/libjaylink;name=libjaylink \
-    file://0001-esirisc_flash-Rename-PAGE_SIZE-to-FLASH_PAGE_SIZE.patch \
     file://0001-Do-not-include-syscrtl.h-with-glibc.patch \
 "
 
 SRCREV_FORMAT = "openocd"
-SRCREV_openocd = "7ee618692f56b0efea864890da45d73d28e393d9"
+SRCREV_openocd = "ded67990255cc1e63c77832ffd6e6bef9120873d"
 SRCREV_git2cl = "8373c9f74993e218a08819cbcdbab3f3564bbeba"
-SRCREV_jimtcl = "a9bf5975fd0f89974d689a2d9ebd0873c8d64787"
-SRCREV_libjaylink = "8645845c1abebd004e991ba9a7f808f4fd0c608b"
+SRCREV_jimtcl = "dc4ba7770d580800634f90b67a24e077b4a26d98"
+SRCREV_libjaylink = "cfccbc9d6763733f1d14dff3c2dc5b75aaef136b"
 
 PV = "0.10+gitr${SRCPV}"
 S = "${WORKDIR}/git"
 
 inherit pkgconfig autotools-brokensep gettext
 
-BBCLASSEXTEND += "nativesdk"
+BBCLASSEXTEND += "native nativesdk"
 
 EXTRA_OECONF = "--enable-ftdi --disable-doxygen-html --disable-werror"
 

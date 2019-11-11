@@ -3,8 +3,8 @@ HOMEPAGE = "https://github.com/MISP/PyMISP"
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=a3639cf5780f71b125d3e9d1dc127c20"
 
-SRC_URI[md5sum] = "6d549b36cbfa8c1a3323c5d6e299789e"
-SRC_URI[sha256sum] = "f4ed2000cbe1a314f1f88fd8a8eba4ad05974b351b96f1235c6e532158a39fe0"
+SRC_URI[md5sum] = "77aef367e57ba7dcc6f9b3d445a960ed"
+SRC_URI[sha256sum] = "de67196f6a8916b9c52a84a1c45ea967c53fa9d2b3795b070ad2c1cbc28d79d7"
 
 RDEPENDS_${PN} += " \
     ${PYTHON_PN}-dateutil \

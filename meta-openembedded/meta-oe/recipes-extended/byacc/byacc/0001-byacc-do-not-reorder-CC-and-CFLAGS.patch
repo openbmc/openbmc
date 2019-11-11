@@ -12,16 +12,19 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
 
 Update for 20190617.
 Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
+
+Update for 20191103.
+Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
 ---
  aclocal.m4 |   1 -
  configure  | 259 -------------------------------------------------------------
  2 files changed, 260 deletions(-)
 
 diff --git a/aclocal.m4 b/aclocal.m4
-index 338465f..3311057 100644
+index b90cfe6..413ea9c 100644
 --- a/aclocal.m4
 +++ b/aclocal.m4
-@@ -1231,7 +1231,6 @@ CF_GCC_VERSION
+@@ -1232,7 +1232,6 @@ CF_GCC_VERSION
  CF_ACVERSION_CHECK(2.52,
  	[AC_PROG_CC_STDC],
  	[CF_ANSI_CC_REQD])
@@ -30,20 +33,20 @@ index 338465f..3311057 100644
  dnl ---------------------------------------------------------------------------
  dnl CF_PROG_GROFF version: 3 updated: 2018/01/07 13:16:19
 diff --git a/configure b/configure
-index ebb1f0f..a56cb17 100755
+index ec77bba..234f271 100755
 --- a/configure
 +++ b/configure
-@@ -1957,265 +1957,6 @@ esac
+@@ -2059,265 +2059,6 @@ esac
  # This should have been defined by AC_PROG_CC
  : ${CC:=cc}
  
--echo "$as_me:1960: checking \$CFLAGS variable" >&5
+-echo "$as_me:2062: checking \$CFLAGS variable" >&5
 -echo $ECHO_N "checking \$CFLAGS variable... $ECHO_C" >&6
 -case "x$CFLAGS" in
 -(*-[IUD]*)
--	echo "$as_me:1964: result: broken" >&5
+-	echo "$as_me:2066: result: broken" >&5
 -echo "${ECHO_T}broken" >&6
--	{ echo "$as_me:1966: WARNING: your environment uses the CFLAGS variable to hold CPPFLAGS options" >&5
+-	{ echo "$as_me:2068: WARNING: your environment uses the CFLAGS variable to hold CPPFLAGS options" >&5
 -echo "$as_me: WARNING: your environment uses the CFLAGS variable to hold CPPFLAGS options" >&2;}
 -	cf_flags="$CFLAGS"
 -	CFLAGS=
@@ -151,18 +154,18 @@ index ebb1f0f..a56cb17 100755
 -	done
 -	;;
 -(*)
--	echo "$as_me:2074: result: ok" >&5
+-	echo "$as_me:2176: result: ok" >&5
 -echo "${ECHO_T}ok" >&6
 -	;;
 -esac
 -
--echo "$as_me:2079: checking \$CC variable" >&5
+-echo "$as_me:2181: checking \$CC variable" >&5
 -echo $ECHO_N "checking \$CC variable... $ECHO_C" >&6
 -case "$CC" in
 -(*[\ \	]-*)
--	echo "$as_me:2083: result: broken" >&5
+-	echo "$as_me:2185: result: broken" >&5
 -echo "${ECHO_T}broken" >&6
--	{ echo "$as_me:2085: WARNING: your environment uses the CC variable to hold CFLAGS/CPPFLAGS options" >&5
+-	{ echo "$as_me:2187: WARNING: your environment uses the CC variable to hold CFLAGS/CPPFLAGS options" >&5
 -echo "$as_me: WARNING: your environment uses the CC variable to hold CFLAGS/CPPFLAGS options" >&2;}
 -	# humor him...
 -	cf_prog=`echo "$CC" | sed -e 's/	/ /g' -e 's/[ ]* / /g' -e 's/[ ]*[ ]-[^ ].*//'`
@@ -279,24 +282,24 @@ index ebb1f0f..a56cb17 100755
 -	done
 -	test -n "$verbose" && echo "	resulting CC: '$CC'" 1>&6
 -
--echo "${as_me:-configure}:2202: testing resulting CC: '$CC' ..." 1>&5
+-echo "${as_me:-configure}:2304: testing resulting CC: '$CC' ..." 1>&5
 -
 -	test -n "$verbose" && echo "	resulting CFLAGS: '$CFLAGS'" 1>&6
 -
--echo "${as_me:-configure}:2206: testing resulting CFLAGS: '$CFLAGS' ..." 1>&5
+-echo "${as_me:-configure}:2308: testing resulting CFLAGS: '$CFLAGS' ..." 1>&5
 -
 -	test -n "$verbose" && echo "	resulting CPPFLAGS: '$CPPFLAGS'" 1>&6
 -
--echo "${as_me:-configure}:2210: testing resulting CPPFLAGS: '$CPPFLAGS' ..." 1>&5
+-echo "${as_me:-configure}:2312: testing resulting CPPFLAGS: '$CPPFLAGS' ..." 1>&5
 -
 -	;;
 -(*)
--	echo "$as_me:2214: result: ok" >&5
+-	echo "$as_me:2316: result: ok" >&5
 -echo "${ECHO_T}ok" >&6
 -	;;
 -esac
 -
- echo "$as_me:2219: checking whether ${MAKE-make} sets \${MAKE}" >&5
+ echo "$as_me:2321: checking whether ${MAKE-make} sets \${MAKE}" >&5
  echo $ECHO_N "checking whether ${MAKE-make} sets \${MAKE}... $ECHO_C" >&6
  set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y,./+-,__p_,'`
 -- 

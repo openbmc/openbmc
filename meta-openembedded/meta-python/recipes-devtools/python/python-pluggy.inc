@@ -7,5 +7,8 @@ SRC_URI[md5sum] = "4b8384b69cddbc2e104fdd3ff5631788"
 SRC_URI[sha256sum] = "fa5fa1622fa6dd5c030e9cad086fa19ef6a0cf6d7a2d12318e10cb49d6d68f34"
 
 DEPENDS += "${PYTHON_PN}-setuptools-scm-native"
+RDEPENDS_${PN} += "${PYTHON_PN}-importlib-metadata \
+                   ${PYTHON_PN}-more-itertools \
+"
 
 inherit pypi

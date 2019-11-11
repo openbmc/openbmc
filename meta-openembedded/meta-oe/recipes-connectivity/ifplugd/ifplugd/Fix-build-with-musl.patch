@@ -9,13 +9,14 @@ Signed-off-by: Fabio Berton <fabio.berton@ossystems.com.br>
  src/ethtool-local.h | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/src/ethtool-local.h b/src/ethtool-local.h
-index 200476b..0edc7a9 100644
 --- a/src/ethtool-local.h
 +++ b/src/ethtool-local.h
-@@ -22,9 +22,9 @@
+@@ -20,11 +20,11 @@
+  * along with ifplugd; if not, write to the Free Software Foundation,
+  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
   */
- 
+-
++#include <stdint.h>
  typedef unsigned long long u64;
 -typedef __uint32_t u32;        
 -typedef __uint16_t u16;        
@@ -26,6 +27,3 @@ index 200476b..0edc7a9 100644
  
  #include "ethtool-kernel.h"
  
--- 
-2.20.1
-

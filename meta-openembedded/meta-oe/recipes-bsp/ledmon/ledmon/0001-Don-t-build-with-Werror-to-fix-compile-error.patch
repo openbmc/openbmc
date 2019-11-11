@@ -5,7 +5,8 @@ Subject: [PATCH] Don't build with -Werror to fix compile error.
 | amd_sgpio.c: In function '_write_amd_register':
 | amd_sgpio.c:558:18: error: taking address of packed member of 'struct amd_register' may result in an unaligned pointer value [-Werror=address-of-packed-member]
 
-Upstream-Status: Pending
+Upstream-Status: Submitted
+https://github.com/intel/ledmon/pull/48/commits
 
 Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
 ---

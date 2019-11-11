@@ -17,3 +17,5 @@ do_install_append() {
     # still basic so drop it for now.
     rm ${D}${includedir}/event.h
 }
+
+BBCLASSEXTEND = "native"
