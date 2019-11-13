@@ -16,7 +16,7 @@ DEPENDS += "systemd"
 DEPENDS += "phosphor-ipmi-host"
 
 SRC_URI += "git://github.com/openbmc/phosphor-net-ipmid"
-SRCREV = "dafe36444fa438030fdf27089b0e94d8d88411dc"
+SRCREV = "8c0bf983de34e7d49cb44a6b029210296b786253"
 
 S = "${WORKDIR}/git"
 
