@@ -46,8 +46,8 @@ S = "${WORKDIR}/git"
 do_install_append() {
 
         install -d ${D}/${base_libdir}/udev/rules.d/
-        install ${WORKDIR}/70-hwmon.rules ${D}/${base_libdir}/udev/rules.d/
-        install ${WORKDIR}/70-iio.rules ${D}/${base_libdir}/udev/rules.d/
+        install -m 0644 ${WORKDIR}/70-hwmon.rules ${D}/${base_libdir}/udev/rules.d/
+        install -m 0644 ${WORKDIR}/70-iio.rules ${D}/${base_libdir}/udev/rules.d/
 
         install -d ${D}${bindir}
         install -m 0755 ${WORKDIR}/start_hwmon.sh ${D}${bindir}

@@ -24,5 +24,5 @@ S = "${WORKDIR}/git"
 
 do_install_append() {
         install -d ${D}/${base_libdir}/udev/rules.d/
-        install ${WORKDIR}/70-leds.rules ${D}/${base_libdir}/udev/rules.d/
+        install -m 0644 ${WORKDIR}/70-leds.rules ${D}/${base_libdir}/udev/rules.d/
 }
