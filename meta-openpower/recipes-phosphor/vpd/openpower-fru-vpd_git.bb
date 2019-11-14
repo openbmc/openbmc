@@ -39,5 +39,5 @@ do_install_append() {
         install ${SRC}/inventory ${DEST}
 
         install -d ${D}/${base_libdir}/udev/rules.d/
-        install ${WORKDIR}/70-op-vpd.rules ${D}/${base_libdir}/udev/rules.d/
+        install -m0644 ${WORKDIR}/70-op-vpd.rules ${D}/${base_libdir}/udev/rules.d/
 }
