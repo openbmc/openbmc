@@ -549,7 +549,7 @@ events:
                               name: Value
                               type: int64_t
                     property:
-                        value: 50000
+                        value: 55000
                         type: int64_t
                     factor:
                         value: 1000
@@ -565,10 +565,10 @@ events:
                               name: Value
                               type: int64_t
                     property:
-                        value: 47000
+                        value: 52000
                         type: int64_t
                     factor:
-                        value: 3000
+                        value: 1000
                         type: int64_t
                     delta:
                         value: 3
@@ -642,7 +642,7 @@ events:
                         value: 70000
                         type: int64_t
                     factor:
-                        value: 7000
+                        value: 4000
                         type: int64_t
                     delta:
                         value: 5
@@ -689,7 +689,7 @@ events:
                               name: Value
                               type: int64_t
                     property:
-                        value: 70
+                        value: 80
                         type: int64_t
                     factor:
                         value: 1
@@ -705,7 +705,7 @@ events:
                               name: Value
                               type: int64_t
                     property:
-                        value: 67
+                        value: 77
                         type: int64_t
                     factor:
                         value: 4
