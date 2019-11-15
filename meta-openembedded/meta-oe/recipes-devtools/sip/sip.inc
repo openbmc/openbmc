@@ -5,9 +5,9 @@ LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://LICENSE-GPL2;md5=e91355d8a6f8bd8f7c699d62863c7303"
 
 SRC_URI = "https://www.riverbankcomputing.com/static/Downloads/sip/${PV}/sip-${PV}.tar.gz \
-          "
-SRC_URI[md5sum] = "7e854b0da395ddc8fb5da82d0321994d"                           
-SRC_URI[sha256sum] = "184c790d58e9527fc6bdac2bbf8638f3d1b41dea922cad8eb83172b4ba70c620"
+"
+SRC_URI[md5sum] = "98111479309dc472410f26080d6d4a88"
+SRC_URI[sha256sum] = "5436b61a78f48c7e8078e93a6b59453ad33780f80c644e5f3af39f94be1ede44"
 
 S = "${WORKDIR}/sip-${PV}"
 

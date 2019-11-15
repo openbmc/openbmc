@@ -39,7 +39,10 @@ SRC_URI = "git://github.com/vmware/open-vm-tools.git;protocol=https \
     file://0012-Use-off64_t-instead-of-__off64_t.patch;patchdir=.. \
     file://0013-misc-Do-not-print-NULL-string-into-logs.patch;patchdir=.. \
     file://0001-GitHub-Issue-367.-Remove-references-to-deprecated-G_.patch;patchdir=.. \
+    file://0001-Make-HgfsConvertFromNtTimeNsec-aware-of-64-bit-time_.patch;patchdir=.. \
+    file://0002-hgfsServerLinux-Consider-64bit-time_t-possibility.patch;patchdir=.. \
 "
+
 SRCREV = "d3edfd142a81096f9f58aff17d84219b457f4987"
 
 S = "${WORKDIR}/git/open-vm-tools"
@@ -56,7 +59,7 @@ SYSTEMD_SERVICE_${PN} = "vmtoolsd.service"
 EXTRA_OECONF = "--without-icu --disable-multimon --disable-docs \
          --disable-tests --without-gtkmm --without-xerces --without-pam \
          --disable-vgauth --disable-deploypkg \
-         --without-root-privileges --without-kernel-modules"
+         --without-root-privileges --without-kernel-modules --with-tirpc"
 
 NO_X11_FLAGS = "--without-x --without-gtk2 --without-gtk3"
 X11_DEPENDS = "libxext libxi libxrender libxrandr libxtst gtk+ gdk-pixbuf"

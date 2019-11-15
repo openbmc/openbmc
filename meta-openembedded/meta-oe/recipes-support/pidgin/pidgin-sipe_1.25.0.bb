@@ -8,6 +8,7 @@ DEPENDS = "pidgin gmime intltool-native glib-2.0-native"
 inherit autotools gettext pkgconfig
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/sipe/pidgin-sipe-${PV}.tar.xz \
+           file://0001-sipe-consider-64bit-time_t-when-printing.patch \
 "
 
 SRC_URI[md5sum] = "0e742f021dc8c3f17435aea05c3e0314"

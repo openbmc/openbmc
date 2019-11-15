@@ -28,8 +28,8 @@ SRC_URI = "http://jaist.dl.sourceforge.net/project/zabbix/ZABBIX%20Latest%20Stab
     file://zabbix-agent.service \
 "
 
-SRC_URI[md5sum] = "9a816afd4f7984a841bed64a25ba523c"
-SRC_URI[sha256sum] = "57dbc2a95a09581b5196d2abc86ee1aaf65f3c909d6b4bc53d260dc4dd69b9c6"
+SRC_URI[md5sum] = "e9df94149790f86732f18d042b70155d"
+SRC_URI[sha256sum] = "0bf74e597dd41a558305fe17a2b1ed6fe2d77044b87696a92e4227fbf315564a"
 
 inherit autotools-brokensep linux-kernel-base pkgconfig systemd useradd
 
@@ -51,7 +51,6 @@ EXTRA_OECONF = " \
     --enable-ipv6 \
     --with-net-snmp \
     --with-ldap=${STAGING_EXECPREFIXDIR} \
-    --with-jabber \
     --with-unixodbc \
     --with-ssh2 \
     --with-sqlite3 \

@@ -1,0 +1,31 @@
+From ae6fa551907006c612cca98b87f339d4d6f45e25 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 11 Nov 2019 21:08:11 -0800
+Subject: [PATCH] sipe: consider 64bit time_t when printing
+
+This helps printing 64bit time_t on 32bit architectures
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/core/sipe-utils.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/core/sipe-utils.c b/src/core/sipe-utils.c
+index 12ff8d6..d3d4071 100644
+--- a/src/core/sipe-utils.c
++++ b/src/core/sipe-utils.c
+@@ -414,8 +414,8 @@ sipe_utils_time_to_str(time_t timestamp)
+ 	if (result)
+ 		return(result);
+ 
+-	SIPE_DEBUG_ERROR("sipe_utils_time_to_str: failed to convert %lu to ISO8601 string",
+-			 timestamp);
++	SIPE_DEBUG_ERROR("sipe_utils_time_to_str: failed to convert %lld to ISO8601 string",
++			 (long long int)timestamp);
+ 	return(g_strdup(""));
+ }
+ 
+-- 
+2.24.0
+

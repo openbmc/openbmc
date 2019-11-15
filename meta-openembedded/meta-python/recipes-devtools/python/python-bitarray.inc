@@ -1,10 +1,10 @@
 SUMMARY = "A high-level Python efficient arrays of booleans -- C extension"
 HOMEPAGE = "https://github.com/ilanschnell/bitarray"
 LICENSE = "PSF"
-LIC_FILES_CHKSUM = "file://PKG-INFO;md5=d736cf16034030b4aab4ea179d91e778"
+LIC_FILES_CHKSUM = "file://PKG-INFO;md5=00f0d12ccaf4e6b0b4fe501663621fa3"
 
-SRC_URI[md5sum] = "56f55188d8d5361834db0bc7120f8998"
-SRC_URI[sha256sum] = "3eb500f8b9cde19e14472fcbee0195dbf0fbac006f8406a03f0cfb495dff20a0"
+SRC_URI[md5sum] = "743d396a1012d6f7d791d8a526da302d"
+SRC_URI[sha256sum] = "9f578314c7808eb1416620dc7d7977d4787a65a4f61b4c9685343a860712615b"
 
 inherit pypi
 
