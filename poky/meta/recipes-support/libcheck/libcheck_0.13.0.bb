@@ -7,8 +7,8 @@ LIC_FILES_CHKSUM = "file://COPYING.LESSER;md5=2d5025d4aa3495befef8f17206a5b0a1"
 
 SRC_URI = "https://github.com/${BPN}/check/releases/download/${PV}/check-${PV}.tar.gz \
            file://not-echo-compiler-info-to-check_stdint.h.patch"
-SRC_URI[md5sum] = "31b17c6075820a434119592941186f70"
-SRC_URI[sha256sum] = "464201098bee00e90f5c4bdfa94a5d3ead8d641f9025b560a27755a83b824234"
+SRC_URI[md5sum] = "2c730c40b08482eaeb10132517970593"
+SRC_URI[sha256sum] = "c4336b31447acc7e3266854f73ec188cdb15554d0edd44739631da174a569909"
 UPSTREAM_CHECK_URI = "https://github.com/libcheck/check/releases/"
 
 S = "${WORKDIR}/check-${PV}"

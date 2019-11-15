@@ -32,7 +32,10 @@ OPKGLIBDIR ??= "${target_localstatedir}/lib"
 
 PACKAGECONFIG ??= "libsolv"
 
-PACKAGECONFIG[gpg] = "--enable-gpg,--disable-gpg,gpgme libgpg-error,gnupg"
+PACKAGECONFIG[gpg] = "--enable-gpg,--disable-gpg,\
+    gnupg gpgme libgpg-error,\
+    ${@ "gnupg" if ("native" in d.getVar("PN")) else "gnupg-gpg"}\
+    "
 PACKAGECONFIG[curl] = "--enable-curl,--disable-curl,curl"
 PACKAGECONFIG[ssl-curl] = "--enable-ssl-curl,--disable-ssl-curl,curl openssl"
 PACKAGECONFIG[openssl] = "--enable-openssl,--disable-openssl,openssl"

@@ -195,9 +195,6 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
             global worker_pipe_lock
             pipein.close()
 
-            signal.signal(signal.SIGTERM, sigterm_handler)
-            # Let SIGHUP exit as SIGTERM
-            signal.signal(signal.SIGHUP, sigterm_handler)
             bb.utils.signal_on_parent_exit("SIGTERM")
 
             # Save out the PID so that the event can include it the
@@ -212,6 +209,11 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
             # This ensures signals sent to the controlling terminal like Ctrl+C
             # don't stop the child processes.
             os.setsid()
+
+            signal.signal(signal.SIGTERM, sigterm_handler)
+            # Let SIGHUP exit as SIGTERM
+            signal.signal(signal.SIGHUP, sigterm_handler)
+
             # No stdin
             newsi = os.open(os.devnull, os.O_RDWR)
             os.dup2(newsi, sys.stdin.fileno())

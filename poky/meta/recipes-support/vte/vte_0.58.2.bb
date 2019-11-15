@@ -9,18 +9,19 @@ LIC_FILES_CHKSUM = " \
     file://COPYING.LGPL3;md5=b52f2d57d10c4f7ee67a7eb9615d5d24 \
 "
 
-DEPENDS = "glib-2.0 gtk+3 libpcre2 intltool-native libxml2-native gperf-native"
+DEPENDS = "glib-2.0 gtk+3 libpcre2 libxml2-native gperf-native"
+
+GNOMEBASEBUILDCLASS = "meson"
+GIR_MESON_OPTION = 'gir'
 
 inherit gnomebase gtk-doc distro_features_check upstream-version-is-even gobject-introspection
 
 # vapigen.m4 is required when vala is not present (but the one from vala should be used normally)
-SRC_URI += "file://0001-Don-t-enable-stack-protection-by-default.patch \
-           ${@bb.utils.contains('PACKAGECONFIG', 'vala', '', 'file://0001-Add-m4-vapigen.m4.patch', d) } \
-           file://0001-app.cc-use-old-school-asignment-to-avoid-gcc-4.8-err.patch \
-           file://0001-Add-W_EXITCODE-macro-for-non-glibc-systems.patch \
+SRC_URI += "file://0001-app.cc-use-old-school-asignment-to-avoid-gcc-4.8-err.patch \
+            file://0002-Add-W_EXITCODE-macro-for-non-glibc-systems.patch \
            "
-SRC_URI[archive.md5sum] = "adf341807861a5dad9f98e5c701c0769"
-SRC_URI[archive.sha256sum] = "17a1d4bc8848f1d2acfa4c20aaa24b9bac49f057b8909c56d3dafec2e2332648"
+SRC_URI[archive.md5sum] = "dadbf2c1d9864d3ea185738f97ab63af"
+SRC_URI[archive.sha256sum] = "33c966d2b1f2c3b0f9416dbca883fd746159b5bd040350e3b78f8104b2a42bc0"
 
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
@@ -41,14 +42,12 @@ do_compile_prepend() {
 FILES_${PN}-dev += "${datadir}/vala/vapi/*"
 
 PACKAGECONFIG ??= "gnutls"
-PACKAGECONFIG[vala] = "--enable-vala,--disable-vala,vala-native vala"
-PACKAGECONFIG[gnutls] = "--with-gnutls,--without-gnutls,gnutls"
+PACKAGECONFIG[vala] = "-Dvapi=true,-Dvapi=false,vala-native vala"
+PACKAGECONFIG[gnutls] = "-Dgnutls=true,-Dgnutls=false,gnutls"
+# vala requires gir
+PACKAGECONFIG_remove_class-native = "vala"
 
 CFLAGS += "-D_GNU_SOURCE"
-
-# libtool adds "-nostdlib" when g++ is used. This breaks PIE builds.
-# Use libtool-cross (which has a hack to prevent that) instead.
-EXTRA_OEMAKE_class-target = "LIBTOOL=${STAGING_BINDIR_CROSS}/${HOST_SYS}-libtool"
 
 PACKAGES =+ "libvte ${PN}-prompt"
 FILES_libvte = "${libdir}/*.so.* ${libdir}/girepository-1.0/*"

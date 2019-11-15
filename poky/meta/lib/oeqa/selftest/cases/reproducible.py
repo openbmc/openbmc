@@ -5,11 +5,16 @@
 
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import runCmd, bitbake, get_bb_var, get_bb_vars
+import bb.utils
 import functools
 import multiprocessing
 import textwrap
 import json
 import unittest
+import tempfile
+import shutil
+import stat
+import os
 
 MISSING = 'MISSING'
 DIFFERENT = 'DIFFERENT'
@@ -74,6 +79,7 @@ def compare_file(reference, test, diffutils_sysroot):
 class ReproducibleTests(OESelftestTestCase):
     package_classes = ['deb', 'ipk']
     images = ['core-image-minimal']
+    save_results = False
 
     def setUpLocal(self):
         super().setUpLocal()
@@ -117,8 +123,17 @@ class ReproducibleTests(OESelftestTestCase):
         self.extrasresults['reproducible']['files'].setdefault(package_class, {})[name] = [
                 {'reference': p.reference, 'test': p.test} for p in packages]
 
+    def copy_file(self, source, dest):
+        bb.utils.mkdirhier(os.path.dirname(dest))
+        shutil.copyfile(source, dest)
+
     def test_reproducible_builds(self):
         capture_vars = ['DEPLOY_DIR_' + c.upper() for c in self.package_classes]
+
+        if self.save_results:
+            save_dir = tempfile.mkdtemp(prefix='oe-reproducible-')
+            os.chmod(save_dir, stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
+            self.logger.info('Non-reproducible packages will be copied to %s', save_dir)
 
         # Build native utilities
         self.write_config('')
@@ -175,6 +190,11 @@ class ReproducibleTests(OESelftestTestCase):
                 self.write_package_list(package_class, 'missing', result.missing)
                 self.write_package_list(package_class, 'different', result.different)
                 self.write_package_list(package_class, 'same', result.same)
+
+                if self.save_results:
+                    for d in result.different:
+                        self.copy_file(d.reference, '/'.join([save_dir, d.reference]))
+                        self.copy_file(d.test, '/'.join([save_dir, d.test]))
 
                 if result.missing or result.different:
                     self.fail("The following %s packages are missing or different: %s" %

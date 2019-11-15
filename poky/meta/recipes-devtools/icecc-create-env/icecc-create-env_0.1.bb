@@ -34,3 +34,5 @@ do_install() {
 }
 
 BBCLASSEXTEND = "native nativesdk"
+
+RDEPENDS_${PN}_class-nativesdk = "patchelf"

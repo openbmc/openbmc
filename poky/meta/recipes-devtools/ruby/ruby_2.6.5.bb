@@ -5,8 +5,8 @@ SRC_URI += " \
            file://run-ptest \
            "
 
-SRC_URI[md5sum] = "49b628cdb21db967d8a3f6ca6e222583"
-SRC_URI[sha256sum] = "4fc1d8ba75505b3797020a6ffc85a8bcff6adc4dabae343b6572bf281ee17937"
+SRC_URI[md5sum] = "8754bfb36d52c2bf1fb3d3ddc7101606"
+SRC_URI[sha256sum] = "66976b716ecc1fd34f9b7c3c2b07bbd37631815377a2e3e85a5b194cfdcbed7d"
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG += "${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)}"

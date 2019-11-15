@@ -12,7 +12,7 @@ DEPENDS = "libtirpc"
 
 PV = "1.2.0+git${SRCPV}"
 
-SRCREV = "37c5ffe3038d42e9fa9ed232ad2cbca4d8f14681"
+SRCREV = "4a062cf4180d99371198951e4ea5b4550efd58a3"
 
 SRC_URI = "git://github.com/thkukuk/libnsl \
           "

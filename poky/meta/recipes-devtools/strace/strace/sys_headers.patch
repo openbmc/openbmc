@@ -1,0 +1,25 @@
+Remove configure checks for few sys/ headers
+
+sys/ipc.h, sys/sem.h, sys/shm.h, and sys/msg.h are actually wrappers
+for kernel headers in libc if available, here strace is trying to match
+traced process's APIs to syscalls kernel structures
+
+Removing the checks makes it default to right kernel UAPI headers under linux/
+
+Upstream-Status: Submitted [https://lists.strace.io/pipermail/strace-devel/2019-November/009222.html]
+Suggested-by: Rich Felker <dalias@aerifal.cx>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/configure.ac
++++ b/configure.ac
+@@ -439,11 +439,7 @@ AC_CHECK_HEADERS(m4_normalize([
+ 	sys/conf.h
+ 	sys/eventfd.h
+ 	sys/fanotify.h
+-	sys/ipc.h
+-	sys/msg.h
+ 	sys/quota.h
+-	sys/sem.h
+-	sys/shm.h
+ 	sys/signalfd.h
+ 	sys/xattr.h
+ 	ustat.h

@@ -1,4 +1,8 @@
 SUMMARY = "VirGL virtual OpenGL renderer"
+DESCRIPTION = "Virgil is a research project to investigate the possibility of \
+creating a virtual 3D GPU for use inside qemu virtual machines, that allows \
+the guest operating system to use the capabilities of the host GPU to \
+accelerate 3D rendering."
 HOMEPAGE = "https://virgil3d.github.io/"
 
 LICENSE = "MIT"

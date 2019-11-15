@@ -340,9 +340,11 @@ def package_qa_textrel(path, name, d, elf, messages):
     for line in phdrs.split("\n"):
         if textrel_re.match(line):
             sane = False
+            break
 
     if not sane:
-        package_qa_add_message(messages, "textrel", "ELF binary '%s' has relocations in .text" % path)
+        path = package_qa_clean_path(path, d, name)
+        package_qa_add_message(messages, "textrel", "%s: ELF binary %s has relocations in .text" % (name, path))
 
 QAPATHTEST[ldflags] = "package_qa_hash_style"
 def package_qa_hash_style(path, name, d, elf, messages):

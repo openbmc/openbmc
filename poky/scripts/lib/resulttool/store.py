@@ -24,6 +24,8 @@ def store(args, logger):
         configvars = resultutils.extra_configvars.copy()
         if args.executed_by:
             configvars['EXECUTED_BY'] = args.executed_by
+        if args.extra_test_env:
+            configvars['EXTRA_TEST_ENV'] = args.extra_test_env
         results = {}
         logger.info('Reading files from %s' % args.source)
         if resultutils.is_url(args.source) or os.path.isfile(args.source):
@@ -98,4 +100,5 @@ def register_commands(subparsers):
                               help='don\'t error if no results to store are found')
     parser_build.add_argument('-x', '--executed-by', default='',
                               help='add executed-by configuration to each result file')
-
+    parser_build.add_argument('-t', '--extra-test-env', default='',
+                              help='add extra test environment data to each result file configuration')

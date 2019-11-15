@@ -50,6 +50,7 @@ SRC_URI = "git://github.com/linux-test-project/ltp.git \
            file://0001-syscall-rt_sigtimedwait01-Fix-wrong-sigset-length-fo.patch \
            file://0001-cve-2017-17052-Avoid-unsafe-exits-in-threads.patch \
            file://0001-overcommit_memory-update-for-mm-fix-false-positive-O.patch \
+           file://0001-mkswap01.sh-Add-udevadm-trigger-before-swap-verifica.patch \
            "
 
 S = "${WORKDIR}/git"

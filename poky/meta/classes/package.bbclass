@@ -1731,8 +1731,6 @@ python package_do_shlibs() {
     else:
         snap_symlinks = False
 
-    use_ldconfig = bb.utils.contains('DISTRO_FEATURES', 'ldconfig', True, False, d)
-
     needed = {}
 
     shlib_provider = oe.package.read_shlib_providers(d)
@@ -1791,7 +1789,7 @@ python package_do_shlibs() {
                     if s[0] not in shlib_provider:
                         shlib_provider[s[0]] = {}
                     shlib_provider[s[0]][s[1]] = (pkg, pkgver)
-        if needs_ldconfig and use_ldconfig:
+        if needs_ldconfig:
             bb.debug(1, 'adding ldconfig call to postinst for %s' % pkg)
             postinst = d.getVar('pkg_postinst_%s' % pkg)
             if not postinst:

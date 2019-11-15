@@ -44,8 +44,6 @@ EXTRA_OECONF = " \
     --disable-static-shell \
 "
 
-CFLAGS_append = " -fPIC"
-
 # pread() is in POSIX.1-2001 so any reasonable system must surely support it
 CFLAGS_append = " -DUSE_PREAD"
 

@@ -4739,7 +4739,7 @@ id=f4d4f99cfbc2396e49c1613a7d237b9e57f06f81'>commit message</ulink>.
 
         <para>
             This section provides information about packaging changes that have
-            ocurred:
+            occurred:
             <itemizedlist>
                 <listitem><para>
                     <emphasis><filename>python3</filename> Changes:</emphasis>
@@ -6597,14 +6597,6 @@ id=f4d4f99cfbc2396e49c1613a7d237b9e57f06f81'>commit message</ulink>.
     </section>
 </section>
 
-
-
-
-
-
-
-
-
 <section id='moving-to-the-yocto-project-3.0-release'>
     <title>Moving to the Yocto Project 3.0 Release</title>
 
@@ -6613,48 +6605,41 @@ id=f4d4f99cfbc2396e49c1613a7d237b9e57f06f81'>commit message</ulink>.
         Yocto Project 3.0 Release from the prior release.
     </para>
 
+    <section id='migration-3.0-init-system-selection'>
+        <title>Init System Selection</title>
+
+        <para>
+            Changing the init system manager previously required setting a
+            number of different variables.
+            You can now change the manager by setting the
+            <filename>INIT_MANAGER</filename> variable and the corresponding
+            include files
+            (i.e. <filename>conf/distro/include/init-manager-*.conf</filename>).
+            Include files are provided for four values: "none", "sysvinit",
+            "systemd", and "mdev-busybox".
+            The default value, "none", for <filename>INIT_MANAGER</filename>
+            should allow your current settings to continue working.
+            However, it is advisable to explicitly set
+            <filename>INIT_MANAGER</filename>.
+        </para>
+    </section>
+
     <section id='migration-3.0-lsb-support-removed'>
         <title>LSB Support Removed</title>
 
         <para>
-            LSB support has been removed.
+            Linux Standard Base (LSB) as a standard is not current, and
+            is not well suited for embedded applications.
+            Support can be continued in a separate layer if needed.
+            However, presently LSB support has been removed from the core.
         </para>
-    </section>
-
-    <section id='migration-3.0-poky-lsb-replaced'>
-        <title><filename>poky-lsb</filename> Replaced</title>
 
         <para>
-            <filename>poky-lsb</filename> replaced by
-            <filename>poky-altcfg</filename> for alternate configurations to
-            be tested on the autobuilder.
-            As well as an example of subclassing a distro config.
-        </para>
-    </section>
-
-    <section id='migration-3.0-openssl-removed'>
-        <title>OpenSSL 1.0.X removed</title>
-
-        <para>
-            OpenSSL 1.0.X removed.
-        </para>
-    </section>
-
-    <section id='migration-3.0-hash-Equivalence added'>
-        <title>Hash Equivalence Added</title>
-
-        <para>
-            Hash Equivalence added.
-            See <ulink url='https://git.openembedded.org/openembedded-core/commit/?id=49b10ab3f802bf36d8a2add7db208a868f525d5b'></ulink>
-            for setup information.
-        </para>
-    </section>
-
-    <section id='migration-3.0-gnu-tests-added'>
-        <title><filename>gcc/glibc/binutls</filename> GNU Tests Added</title>
-
-        <para>
-            <filename>gcc/glibc/binutls</filename> GNU tests added.
+            As a result of this change, the <filename>poky-lsb</filename>
+            derivative distribution configuration that was also used for
+            testing alternative configurations has been replaced with a
+            <filename>poky-altcfg</filename> distribution that has LSB
+            parts removed.
         </para>
     </section>
 
@@ -6662,15 +6647,350 @@ id=f4d4f99cfbc2396e49c1613a7d237b9e57f06f81'>commit message</ulink>.
         <title>Removed Recipes</title>
 
         <para>
-            Some topic...
-         </para>
+            The following recipes have been removed.
+            <itemizedlist>
+                <listitem><para>
+                    <filename>core-image-lsb-dev</filename>: Part of removed
+                    LSB support.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>core-image-lsb</filename>: Part of removed
+                    LSB support.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>core-image-lsb-sdk</filename>: Part of removed
+                    LSB support.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>cve-check-tool</filename>: Functionally replaced
+                    by the <filename>cve-update-db</filename> recipe and
+                    <filename>cve-check</filename> class.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>eglinfo</filename>: No longer maintained.
+                    <filename>eglinfo</filename> from
+                    <filename>mesa-demos</filename> is an adequate and
+                    maintained alternative.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>gcc-8.3</filename>: Version 8.3 removed.
+                    Replaced by 9.2.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>gnome-themes-standard</filename>: Only needed
+                    by gtk+ 2.x, which has been removed.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>gtk+</filename>: GTK+ 2 is obsolete and has been
+                    replaced by gtk+3.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>irda-utils</filename>: Has become obsolete.
+                    IrDA support has been removed from the Linux kernel in
+                    version 4.17 and later.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>libnewt-python</filename>:
+                    <filename>libnewt</filename> Python support merged into
+                    main <filename>libnewt</filename> recipe.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>libsdl</filename>: Replaced by newer
+                    <filename>libsdl2</filename>.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>libx11-diet</filename>: Became obsolete.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>libxx86dga</filename>: Removed obsolete client
+                    library.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>libxx86misc</filename>: Removed. Library is
+                    redundant.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>linux-yocto</filename>: Version 5.0 removed,
+                    which is now redundant (5.2 / 4.19 present).
+                    </para></listitem>
+                <listitem><para>
+                    <filename>lsbinitscripts</filename>: Part of removed LSB
+                    support.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>lsb</filename>: Part of removed LSB support.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>lsbtest</filename>: Part of removed LSB support.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>openssl10</filename>: Replaced by newer
+                    <filename>openssl</filename> version 1.1.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>packagegroup-core-lsb</filename>: Part of removed
+                    LSB support.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>python-nose</filename>: Removed the Python 2.x
+                    version of the recipe.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>python-numpy</filename>: Removed the Python 2.x
+                    version of the recipe.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>python-scons</filename>: Removed the Python 2.x
+                    version of the recipe.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>source-highlight</filename>: No longer needed.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>stress</filename>: Replaced by
+                    <filename>stress-ng</filename>.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>vulkan</filename>: Split into
+                    <filename>vulkan-loader</filename>,
+                    <filename>vulkan-headers</filename>, and
+                    <filename>vulkan-tools</filename>.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>weston-conf</filename>: Functionality moved to
+                    <filename>weston-init</filename>.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
     </section>
 
-    <section id='migration-3.0-removed-classes'>
-        <title>Removed Classes</title>
+    <section id='migration-3.0-packaging-changes'>
+        <title>Packaging Changes</title>
 
         <para>
-            Some topic...
+            The following packaging changes have occurred.
+            <itemizedlist>
+                <listitem><para>
+                    The
+                    <ulink url='https://en.wikipedia.org/wiki/GNOME_Web'>Epiphany</ulink>
+                    browser has been dropped from
+                    <filename>packagegroup-self-hosted</filename> as it has
+                    not been needed inside
+                    <filename>build-appliance-image</filename> for
+                    quite some time and was causing resource problems.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>libcap-ng</filename> Python support has been
+                    moved to a separate <filename>libcap-ng-python</filename>
+                    recipe to streamline the build process when the Python
+                    bindings are not needed.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>libdrm</filename> now packages the file
+                    <filename>amdgpu.ids</filename> into a separate
+                    <filename>libdrm-amdgpu</filename> package.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>python3</filename>: The
+                    <filename>runpy</filename> module is now in the
+                    <filename>python3-core</filename> package as it is
+                    required to support the common "python3 -m" command usage.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>distcc</filename> now provides separate
+                    <filename>distcc-client</filename> and
+                    <filename>distcc-server</filename> packages as typically
+                    one or the other are needed, rather than both.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>python*-setuptools</filename> recipes now
+                    separately package the <filename>pkg_resources</filename>
+                    module in a <filename>python-pkg-resources</filename> /
+                    <filename>python3-pkg-resources</filename> package as
+                    the module is useful independent of the rest of the
+                    setuptools package.
+                    The main <filename>python-setuptools</filename> /
+                    <filename>python3-setuptools</filename> package depends
+                    on this new package so you should only need to update
+                    dependencies unless you want to take advantage of the
+                    increased granularity.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='migration-3.0-cve-checking'>
+        <title>CVE Checking</title>
+
+        <para>
+            <filename>cve-check-tool</filename> has been functionally replaced
+            by a new <filename>cve-update-db</filename> recipe and
+            functionality built into the <filename>cve-check</filename> class.
+            The result uses NVD JSON data feeds rather than the deprecated
+            XML feeds that <filename>cve-check-tool</filename> was using,
+            supports CVSSv3 scoring, and makes other improvements.
+        </para>
+
+        <para>
+            Additionally, the <filename>CVE_CHECK_CVE_WHITELIST</filename>
+            variable has been replaced by
+            <filename>CVE_CHECK_WHITELIST</filename>.
+        </para>
+    </section>
+
+    <section id='migration-3.0-bitbake-changes'>
+        <title>Bitbake Changes</title>
+
+        <para>
+            The following BitBake changes have occurred.
+            <itemizedlist>
+                <listitem><para>
+                    <filename>addtask</filename> statements now properly
+                    validate dependent tasks.
+                    Previously, an invalid task was silently ignored.
+                    With this change, the invalid task generates a warning.
+                    </para></listitem>
+                <listitem><para>
+                    Other invalid <filename>addtask</filename> and
+                    <filename>deltask</filename> usages now trigger these
+                    warnings: "multiple target tasks arguments with
+                    addtask / deltask", and "multiple before/after clauses".
+                    </para></listitem>
+                <listitem><para>
+                    The "multiconfig" prefix is now shortened to "mc".
+                    "multiconfig" will continue to work, however it may be
+                    removed in a future release.
+                    </para></listitem>
+                <listitem><para>
+                    The <filename>bitbake -g</filename> command no longer
+                    generates a <filename>recipe-depends.dot</filename> file
+                    as the contents (i.e. a reprocessed version of
+                    <filename>task-depends.dot</filename>) were confusing.
+                    </para></listitem>
+                <listitem><para>
+                    The <filename>bb.build.FuncFailed</filename> exception,
+                    previously raised by
+                    <filename>bb.build.exec_func()</filename> when certain
+                    other exceptions have occurred, has been removed.
+                    The real underlying exceptions will be raised instead.
+                    If you have calls to
+                    <filename>bb.build.exec_func()</filename> in custom classes
+                    or <filename>tinfoil-using</filename> scripts, any
+                    references to <filename>bb.build.FuncFailed</filename>
+                    should be cleaned up.
+                    </para></listitem>
+                <listitem><para>
+                    Additionally, the
+                    <filename>bb.build.exec_func()</filename> no longer accepts
+                    the "pythonexception" parameter.
+                    The function now always raises exceptions.
+                    Remove this argument in any calls to
+                    <filename>bb.build.exec_func()</filename> in custom classes
+                    or scripts.
+                    </para></listitem>
+                <listitem><para>
+                    The
+                    <ulink url='&YOCTO_DOCS_BB_URL;#var-bb-BB_SETSCENE_VERIFY_FUNCTION2'><filename>BB_SETSCENE_VERIFY_FUNCTION2</filename></ulink>
+                    is no longer used.
+                    In the unlikely event that you have any references to it,
+                    they should be removed.
+                    </para></listitem>
+                <listitem><para>
+                    The <filename>RunQueueExecuteScenequeue</filename> and
+                    <filename>RunQueueExecuteTasks</filename> events have been
+                    removed since setscene tasks are now executed as part of
+                    the normal runqueue.
+                    Any event handling code in custom classes or scripts that
+                    handles these two events need to be updated.
+                    </para></listitem>
+                <listitem><para>
+                    The arguments passed to functions used with
+                    <ulink url='&YOCTO_DOCS_BB_URL;#var-bb-BB_HASHCHECK_FUNCTION'><filename>BB_HASHCHECK_FUNCTION</filename></ulink>
+                    have changed.
+                    If you are using your own custom hash check function, see
+                    <ulink url='http://git.yoctoproject.org/cgit/cgit.cgi/poky/commit/?id=40a5e193c4ba45c928fccd899415ea56b5417725'></ulink>
+                    for details.
+                    </para></listitem>
+                <listitem><para>
+                    Task specifications in <filename>BB_TASKDEPDATA</filename>
+                    and class implementations used in signature generator
+                    classes now use "&lt;fn&gt;:&lt;task&gt;" everywhere rather than
+                    the "." delimiter that was being used in some places.
+                    This change makes it consistent with all areas in the code.
+                    Custom signature generator classes and code that reads
+                    <filename>BB_TASKDEPDATA</filename> need to be updated to
+                    use ':' as a separator rather than '.'.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='migration-3.0-sanity-checks'>
+        <title>Sanity Checks</title>
+
+        <para>
+            The following sanity check changes occurred.
+            <itemizedlist>
+                <listitem><para>
+                    <link linkend='var-SRC_URI'><filename>SRC_URI</filename></link>
+                    is now checked for usage of two problematic items:
+                    <itemizedlist>
+                        <listitem><para>
+                            "${PN}" prefix/suffix use - Warnings always appear
+                            if ${PN} is used.
+                            You must fix the issue regardless of whether
+                            multiconfig or anything else that would cause
+                            prefixing/suffixing to happen.
+                            </para></listitem>
+                        <listitem><para>
+                            Github archive tarballs - these are not guaranteed
+                            to be stable.
+                            Consequently, it is likely that the tarballs will
+                            be refreshed and thus the SRC_URI checksums
+                            will fail to apply.
+                            It is recommended that you fetch either an official
+                            release tarball or a specific revision from the
+                            actual Git repository instead.
+                            </para></listitem>
+                    </itemizedlist>
+                    Either one of these items now trigger a warning by default.
+                    If you wish to disable this check, remove
+                    <filename>src-uri-bad</filename> from
+                    <link linkend='var-WARN_QA'><filename>WARN_QA</filename></link>.
+                    </para></listitem>
+                <listitem><para>
+                    The <filename>file-rdeps</filename> runtime dependency
+                    check no longer expands
+                    <link linkend='var-RDEPENDS'><filename>RDEPENDS</filename></link>
+                    recursively as there is no mechanism to ensure they can be
+                    fully computed, and thus races sometimes result in errors
+                    either showing up or not.
+                    Thus, you might now see errors for missing runtime
+                    dependencies that were previously satisfied recursively.
+                    Here is an example: package A contains a shell script
+                    starting with <filename>#!/bin/bash</filename> but has no
+                    dependency on bash.
+                    However, package A depends on package B, which does depend
+                    on bash.
+                    You need to add the missing dependency or dependencies to
+                    resolve the warning.
+                    </para></listitem>
+                <listitem><para>
+                    Setting <filename>DEPENDS_${PN}</filename> anywhere
+                    (i.e. typically in a recipe) now triggers an error.
+                    The error is triggered because
+                    <link linkend='var-DEPENDS'><filename>DEPENDS</filename></link>
+                    is not a package-specific variable unlike RDEPENDS.
+                    You should set <filename>DEPENDS</filename> instead.
+                    </para></listitem>
+                <listitem><para>
+                    systemd currently does not work well with the musl C
+                    library because only upstream officially supports linking
+                    the library with glibc.
+                    Thus, a warning is shown when building systemd in
+                    conjunction with musl.
+                    </para></listitem>
+            </itemizedlist>
         </para>
     </section>
 
@@ -6678,21 +6998,102 @@ id=f4d4f99cfbc2396e49c1613a7d237b9e57f06f81'>commit message</ulink>.
         <title>Miscellaneous Changes</title>
 
         <para>
-            Some topic...
+            The following miscellaneous changes have occurred.
+            <itemizedlist>
+                <listitem><para>
+                    The <filename>gnome</filename>
+                    class has been removed because it now does very little.
+                    You should update recipes that previously inherited this
+                    class to do the following:
+                    <literallayout class='monospaced'>
+     inherit gnomebase gtk-icon-cache gconf mime
+                    </literallayout>
+                    </para></listitem>
+                <listitem><para>
+                    The
+                    <filename>meta/recipes-kernel/linux/linux-dtb.inc</filename>
+                    file has been removed.
+                    This file was previously deprecated in favor of setting
+                    <link linkend='var-KERNEL_DEVICETREE'><filename>KERNEL_DEVICETREE</filename></link>
+                    in any kernel recipe and only produced a warning.
+                    Remove any <filename>include</filename> or
+                    <filename>require</filename> statements pointing to this
+                    file.
+                    </para></listitem>
+                <listitem><para>
+                    <link linkend='var-TARGET_CFLAGS'><filename>TARGET_CFLAGS</filename></link>,
+                    <link linkend='var-TARGET_CPPFLAGS'><filename>TARGET_CPPFLAGS</filename></link>,
+                    <link linkend='var-TARGET_CXXFLAGS'><filename>TARGET_CXXFLAGS</filename></link>,
+                    and
+                    <link linkend='var-TARGET_LDFLAGS'><filename>TARGET_LDFLAGS</filename></link>
+                    are no longer exported to the external environment.
+                    This change did not require any changes to core recipes,
+                    which is a good indicator that no changes will be
+                    required.
+                    However, if for some reason the software being built by one
+                    of your recipes is expecting these variables to be set,
+                    then building the recipe will fail.
+                    In such cases, you must either export the variable or
+                    variables in the recipe or change the scripts so that
+                    exporting is not necessary.
+                    </para></listitem>
+                <listitem><para>
+                    You must change the host distro identifier used in
+                    <link linkend='var-NATIVELSBSTRING'><filename>NATIVELSBSTRING</filename></link>
+                    to use all lowercase characters even if it does not contain
+                    a version number.
+                    This change is necessary only if you are not using
+                    <filename>uninative</filename> and
+                    <link linkend='var-SANITY_TESTED_DISTROS'><filename>SANITY_TESTED_DISTROS</filename></link>.
+                    </para></listitem>
+                <listitem><para>
+                    In the <filename>base-files</filename> recipe, writing the
+                    hostname into <filename>/etc/hosts</filename> and
+                    <filename>/etc/hostname</filename> is now done within the
+                    main
+                    <link linkend='ref-tasks-install'><filename>do_install</filename></link>
+                    function rather than in the
+                    <filename>do_install_basefilesissue</filename> function.
+                    The reason for the change is because
+                    <filename>do_install_basefilesissue</filename> is more
+                    easily overridden without having to duplicate the hostname
+                    functionality.
+                    If you have done the latter (e.g. in a
+                    <filename>base-files</filename> bbappend), then you should
+                    remove it from your customized
+                    <filename>do_install_basefilesissue</filename> function.
+                    </para></listitem>
+                <listitem><para>
+                    The <filename>wic --expand</filename> command now uses
+                    commas to separate "key:value" pairs rather than hyphens.
+                    <note>
+                        The wic command-line help is not updated.
+                    </note>
+                    You must update any scripts or commands where you use
+                    <filename>wic --expand</filename> with multiple
+                    "key:value" pairs.
+                    </para></listitem>
+                <listitem><para>
+                    UEFI image variable settings have been moved from various
+                    places to a central
+                    <filename>conf/image-uefi.conf</filename>.
+                    This change should not influence any existing configuration
+                    as the <filename>meta/conf/image-uefi.conf</filename>
+                    in the core metadata sets defaults that can be overridden
+                    in the same manner as before.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>conf/distro/include/world-broken.inc</filename>
+                    has been removed.
+                    For cases where certain recipes need to be disabled when
+                    using the musl C library, these recipes now have
+                    <filename>COMPATIBLE_HOST_libc-musl</filename> set with a
+                    comment that explains why.
+                    </para></listitem>
+            </itemizedlist>
         </para>
     </section>
 </section>
-
-
-
-
-
-
-
-
-
-
-
 
 </chapter>
 <!--

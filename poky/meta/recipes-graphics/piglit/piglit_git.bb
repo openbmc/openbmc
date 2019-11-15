@@ -1,4 +1,6 @@
 SUMMARY = "OpenGL driver testing framework"
+DESCRIPTION = "Piglit is an open-source test suite for OpenGL and OpenCL \
+implementations."
 LICENSE = "MIT & LGPLv2+ & GPLv3 & GPLv2+ & BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b2beded7103a3d8a442a2a0391d607b0"
 

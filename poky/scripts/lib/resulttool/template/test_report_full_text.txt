@@ -8,7 +8,8 @@ Test Result Status Summary (Counts/Percentages sorted by testseries, ID)
 {{ report.testseries.ljust(maxlen['testseries']) }} | {{ report.result_id.ljust(maxlen['result_id']) }} | {{ (report.passed|string).ljust(maxlen['passed']) }} | {{ (report.failed|string).ljust(maxlen['failed']) }} | {{ (report.skipped|string).ljust(maxlen['skipped']) }}
 {% endfor %}
 --------------------------------------------------------------------------------------------------------------
-
+{{ 'Total'.ljust(maxlen['testseries']) }} | {{ reporttotalvalues['count'].ljust(maxlen['result_id']) }} | {{ reporttotalvalues['passed'].ljust(maxlen['passed']) }} | {{ reporttotalvalues['failed'].ljust(maxlen['failed']) }} | {{ reporttotalvalues['skipped'].ljust(maxlen['skipped']) }}
+--------------------------------------------------------------------------------------------------------------
 
 {% for machine in machines %}
 {% if ptests[machine] %}

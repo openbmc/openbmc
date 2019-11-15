@@ -12,9 +12,8 @@ inherit autotools
 
 SRC_URI = "http://www.thrysoee.dk/editline/${BP}.tar.gz \
            file://stdc-predef.patch \
-           file://0001-readline.c-fix-cannot-get-history.patch \
           "
-SRC_URI[md5sum] = "bec755c8044ad84b752dfe49a0b371d8"
-SRC_URI[sha256sum] = "ac8f0f51c1cf65492e4d1e3ed2be360bda41e54633444666422fbf393bba1bae"
+SRC_URI[md5sum] = "2d6568467080cfd75e715d045102b544"
+SRC_URI[sha256sum] = "6dff036660d478bfaa14e407fc5de26d22da1087118c897b1a3ad2e90cb7bf39"
 
 BBCLASSEXTEND = "native nativesdk"

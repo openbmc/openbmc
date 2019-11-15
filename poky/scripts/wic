@@ -495,14 +495,18 @@ def init_parser(parser):
         subparser = subparsers.add_parser(subcmd, help=subcommands[subcmd][2])
         subcommands[subcmd][3](subparser)
 
+class WicArgumentParser(argparse.ArgumentParser):
+     def format_help(self):
+         return hlp.wic_help
 
 def main(argv):
-    parser = argparse.ArgumentParser(
+    parser = WicArgumentParser(
         description="wic version %s" % __version__)
 
     init_parser(parser)
 
     args = parser.parse_args(argv)
+
     if args.debug:
         logger.setLevel(logging.DEBUG)
 
@@ -510,8 +514,6 @@ def main(argv):
         if args.command == "help":
             if args.help_topic is None:
                 parser.print_help()
-                print()
-                print("Please specify a help topic")
             elif args.help_topic in helptopics:
                 hlpt = helptopics[args.help_topic]
                 hlpt[0](hlpt[1], hlpt[2])

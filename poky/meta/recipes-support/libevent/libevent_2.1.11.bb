@@ -31,9 +31,17 @@ inherit ptest multilib_header
 
 DEPENDS = "zlib"
 
+PACKAGES_DYNAMIC = "^${PN}-.*$"
+python split_libevent_libs () {
+    do_split_packages(d, '${libdir}', r'^libevent_([a-z]*)-.*\.so\..*', '${PN}-%s', '${SUMMARY} (%s)', prepend=True, allow_links=True)
+}
+PACKAGESPLITFUNCS_prepend = "split_libevent_libs "
+
 BBCLASSEXTEND = "native nativesdk"
 
 do_install_append() {
+	rm ${D}${bindir}/event_rpcgen.py
+	rmdir ${D}${bindir}
         oe_multilib_header event2/event-config.h
 }
 

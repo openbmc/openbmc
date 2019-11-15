@@ -29,10 +29,7 @@ PARALLEL_MAKE = ""
 
 S = "${WORKDIR}/git"
 
-DEPENDS_class-native="util-linux-native iasl-native"
-DEPENDS_class-target="ovmf-native bc-native"
-
-DEPENDS_append = " nasm-native"
+DEPENDS = "nasm-native acpica-native ovmf-native util-linux-native"
 
 EDK_TOOLS_DIR="edk2_basetools"
 

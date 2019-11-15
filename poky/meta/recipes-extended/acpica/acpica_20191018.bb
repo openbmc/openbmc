@@ -9,19 +9,19 @@ ACPI tables."
 HOMEPAGE = "http://www.acpica.org/"
 SECTION = "console/tools"
 
-LICENSE = "BSD | GPLv2"
-LIC_FILES_CHKSUM = "file://generate/unix/readme.txt;md5=204407e197c1a01154a48f6c6280c3aa"
+LICENSE = "Intel | BSD | GPLv2"
+LIC_FILES_CHKSUM = "file://source/compiler/aslcompile.c;beginline=7;endline=150;md5=b5690d9ef8d54b2b1e1cc98aad64cd87"
 
 COMPATIBLE_HOST = "(i.86|x86_64|arm|aarch64).*-linux"
 
 DEPENDS = "bison flex bison-native"
 
-SRC_URI = "https://acpica.org/sites/acpica/files/acpica-unix2-${PV}.tar.gz"
-SRC_URI[md5sum] = "6a73b1e34715916fa31132dbe11008b0"
-SRC_URI[sha256sum] = "888e80f3bb77381620a5ead208e1a1be06f3ea66ddc8cfdfa62811cae5f03752"
+SRC_URI = "https://acpica.org/sites/acpica/files/acpica-unix-${PV}.tar.gz"
+SRC_URI[md5sum] = "539a0252bcb42c383ceeaeb12ae9a60d"
+SRC_URI[sha256sum] = "029db4014600e4b771b11a84276d2d76eb40fb26eabc85864852ef1f962be95f"
 UPSTREAM_CHECK_URI = "https://acpica.org/downloads"
 
-S = "${WORKDIR}/acpica-unix2-${PV}"
+S = "${WORKDIR}/acpica-unix-${PV}"
 
 inherit update-alternatives
 

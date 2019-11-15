@@ -449,6 +449,28 @@ python extend_recipe_sysroot() {
     msg_exists = []
     msg_adding = []
 
+    # Handle all removals first since files may move between recipes
+    for dep in configuredeps:
+        c = setscenedeps[dep][0]
+        if c not in installed:
+            continue
+        taskhash = setscenedeps[dep][5]
+        taskmanifest = depdir + "/" + c + "." + taskhash
+
+        if os.path.exists(depdir + "/" + c):
+            lnk = os.readlink(depdir + "/" + c)
+            if lnk == c + "." + taskhash and os.path.exists(depdir + "/" + c + ".complete"):
+                continue
+            else:
+                bb.note("%s exists in sysroot, but is stale (%s vs. %s), removing." % (c, lnk, c + "." + taskhash))
+                sstate_clean_manifest(depdir + "/" + lnk, d, workdir)
+                os.unlink(depdir + "/" + c)
+                if os.path.lexists(depdir + "/" + c + ".complete"):
+                    os.unlink(depdir + "/" + c + ".complete")
+        elif os.path.lexists(depdir + "/" + c):
+            os.unlink(depdir + "/" + c)
+
+    # Now handle installs
     for dep in configuredeps:
         c = setscenedeps[dep][0]
         if c not in installed:
@@ -461,14 +483,6 @@ python extend_recipe_sysroot() {
             if lnk == c + "." + taskhash and os.path.exists(depdir + "/" + c + ".complete"):
                 msg_exists.append(c)
                 continue
-            else:
-                bb.note("%s exists in sysroot, but is stale (%s vs. %s), removing." % (c, lnk, c + "." + taskhash))
-                sstate_clean_manifest(depdir + "/" + lnk, d, workdir)
-                os.unlink(depdir + "/" + c)
-                if os.path.lexists(depdir + "/" + c + ".complete"):
-                    os.unlink(depdir + "/" + c + ".complete")
-        elif os.path.lexists(depdir + "/" + c):
-            os.unlink(depdir + "/" + c)
 
         msg_adding.append(c)
 

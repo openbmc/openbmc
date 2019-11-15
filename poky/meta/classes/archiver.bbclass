@@ -441,9 +441,10 @@ python do_ar_recipe () {
             incfile = include_re.match(line).group(1)
         if incfile:
             incfile = d.expand(incfile)
+        if incfile:
             incfile = bb.utils.which(bbpath, incfile)
-            if incfile:
-                shutil.copy(incfile, outdir)
+        if incfile:
+            shutil.copy(incfile, outdir)
 
     create_tarball(d, outdir, 'recipe', d.getVar('ARCHIVER_OUTDIR'))
     bb.utils.remove(outdir, recurse=True)

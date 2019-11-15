@@ -1,0 +1,39 @@
+From 1b3156edd291e0882d80a695d035dd30521345d1 Mon Sep 17 00:00:00 2001
+From: Michael Olbrich <m.olbrich@pengutronix.de>
+Date: Fri, 6 Sep 2019 15:04:01 +0200
+Subject: [PATCH] pstore: fix use after free
+
+The memory is still needed in the sd_journal_sendv() after the 'if' block.
+
+(cherry picked from commit 1e19f5ac0d680a63eccae7ef1fc6ce225dca0bbf)
+
+Upstream-Status: Backport
+
+Signed-off-by: Yongxin Liu <yongxin.liu@windriver.com>
+---
+ src/pstore/pstore.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/pstore/pstore.c b/src/pstore/pstore.c
+index c760b3e899..8ffe523830 100644
+--- a/src/pstore/pstore.c
++++ b/src/pstore/pstore.c
+@@ -117,6 +117,7 @@ static int compare_pstore_entries(const void *_a, const void *_b) {
+ 
+ static int move_file(PStoreEntry *pe, const char *subdir) {
+         _cleanup_free_ char *ifd_path = NULL, *ofd_path = NULL;
++        _cleanup_free_ void *field = NULL;
+         const char *suffix, *message;
+         struct iovec iovec[2];
+         int n_iovec = 0, r;
+@@ -138,7 +139,6 @@ static int move_file(PStoreEntry *pe, const char *subdir) {
+         iovec[n_iovec++] = IOVEC_MAKE_STRING(message);
+ 
+         if (pe->content_size > 0) {
+-                _cleanup_free_ void *field = NULL;
+                 size_t field_size;
+ 
+                 field_size = strlen("FILE=") + pe->content_size;
+-- 
+2.14.4
+

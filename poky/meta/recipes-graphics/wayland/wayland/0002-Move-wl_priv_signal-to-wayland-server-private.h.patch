@@ -1,0 +1,166 @@
+From e746f3bf7c8bb2f5dcf9e93edffc23b56eff12d0 Mon Sep 17 00:00:00 2001
+From: Joshua Watt <JPEWhacker@gmail.com>
+Date: Tue, 5 Nov 2019 09:09:50 -0600
+Subject: [PATCH] Move wl_priv_signal to wayland-server-private.h
+
+Including wayland-server-core.h in wayland-private.h is problematic
+because wayland-private.h is included by wayland-scanner which should be
+able to build against non-POSIX platforms (e.g. MinGW). The only reason
+that wayland-server-core.h was included in wayland-private.h was for the
+wl_private_signal definitions, so move those to a
+wayland-server-private.h file that can be included by both
+wayland-server.c and the tests.
+
+Upstream-Status: Accepted [e7d88f35eb89cf0cc77cbddd834cacc63683a9cc]
+Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
+---
+ Makefile.am                  |  3 +-
+ src/wayland-private.h        | 22 +--------------
+ src/wayland-server-private.h | 53 ++++++++++++++++++++++++++++++++++++
+ src/wayland-server.c         |  1 +
+ tests/newsignal-test.c       |  2 +-
+ 5 files changed, 58 insertions(+), 23 deletions(-)
+ create mode 100644 src/wayland-server-private.h
+
+diff --git a/Makefile.am b/Makefile.am
+index f47d055..026d981 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -56,7 +56,8 @@ libwayland_private_la_SOURCES =			\
+ 	src/connection.c			\
+ 	src/wayland-os.c			\
+ 	src/wayland-os.h			\
+-	src/wayland-private.h
++	src/wayland-private.h			\
++	src/wayland-server-private.h
+ 
+ include_HEADERS =				\
+ 	src/wayland-util.h			\
+diff --git a/src/wayland-private.h b/src/wayland-private.h
+index 29516ec..dc7d12f 100644
+--- a/src/wayland-private.h
++++ b/src/wayland-private.h
+@@ -31,11 +31,11 @@
+ #include <stdarg.h>
+ #include <stdlib.h>
+ #include <stdint.h>
++#include <stdbool.h>
+ 
+ #define WL_HIDE_DEPRECATED 1
+ 
+ #include "wayland-util.h"
+-#include "wayland-server-core.h"
+ 
+ /* Invalid memory address */
+ #define WL_ARRAY_POISON_PTR (void *) 4
+@@ -236,26 +236,6 @@ zalloc(size_t s)
+ 	return calloc(1, s);
+ }
+ 
+-struct wl_priv_signal {
+-	struct wl_list listener_list;
+-	struct wl_list emit_list;
+-};
+-
+-void
+-wl_priv_signal_init(struct wl_priv_signal *signal);
+-
+-void
+-wl_priv_signal_add(struct wl_priv_signal *signal, struct wl_listener *listener);
+-
+-struct wl_listener *
+-wl_priv_signal_get(struct wl_priv_signal *signal, wl_notify_func_t notify);
+-
+-void
+-wl_priv_signal_emit(struct wl_priv_signal *signal, void *data);
+-
+-void
+-wl_priv_signal_final_emit(struct wl_priv_signal *signal, void *data);
+-
+ void
+ wl_connection_close_fds_in(struct wl_connection *connection, int max);
+ 
+diff --git a/src/wayland-server-private.h b/src/wayland-server-private.h
+new file mode 100644
+index 0000000..23fa458
+--- /dev/null
++++ b/src/wayland-server-private.h
+@@ -0,0 +1,53 @@
++/*
++ * Copyright © 2008-2011 Kristian Høgsberg
++ * Copyright © 2011 Intel Corporation
++ * Copyright © 2013 Jason Ekstrand
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining
++ * a copy of this software and associated documentation files (the
++ * "Software"), to deal in the Software without restriction, including
++ * without limitation the rights to use, copy, modify, merge, publish,
++ * distribute, sublicense, and/or sell copies of the Software, and to
++ * permit persons to whom the Software is furnished to do so, subject to
++ * the following conditions:
++ *
++ * The above copyright notice and this permission notice (including the
++ * next paragraph) shall be included in all copies or substantial
++ * portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
++ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
++ * NONINFRINGEMENT.  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
++ * BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
++ * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
++ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++ * SOFTWARE.
++ */
++
++#ifndef WAYLAND_SERVER_PRIVATE_H
++#define WAYLAND_SERVER_PRIVATE_H
++
++#include "wayland-server-core.h"
++
++struct wl_priv_signal {
++	struct wl_list listener_list;
++	struct wl_list emit_list;
++};
++
++void
++wl_priv_signal_init(struct wl_priv_signal *signal);
++
++void
++wl_priv_signal_add(struct wl_priv_signal *signal, struct wl_listener *listener);
++
++struct wl_listener *
++wl_priv_signal_get(struct wl_priv_signal *signal, wl_notify_func_t notify);
++
++void
++wl_priv_signal_emit(struct wl_priv_signal *signal, void *data);
++
++void
++wl_priv_signal_final_emit(struct wl_priv_signal *signal, void *data);
++
++#endif
+diff --git a/src/wayland-server.c b/src/wayland-server.c
+index 19f6a76..d6f0206 100644
+--- a/src/wayland-server.c
++++ b/src/wayland-server.c
+@@ -45,6 +45,7 @@
+ 
+ #include "wayland-util.h"
+ #include "wayland-private.h"
++#include "wayland-server-private.h"
+ #include "wayland-server.h"
+ #include "wayland-os.h"
+ 
+diff --git a/tests/newsignal-test.c b/tests/newsignal-test.c
+index 47c429b..f3a7bd9 100644
+--- a/tests/newsignal-test.c
++++ b/tests/newsignal-test.c
+@@ -26,7 +26,7 @@
+ #include <assert.h>
+ 
+ #include "test-runner.h"
+-#include "wayland-private.h"
++#include "wayland-server-private.h"
+ 
+ static void
+ signal_notify(struct wl_listener *listener, void *data)

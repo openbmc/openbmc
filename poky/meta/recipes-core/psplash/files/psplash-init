@@ -25,7 +25,7 @@ done
 
 export TMPDIR=/mnt/.psplash
 [ -d $TMPDIR ] || mkdir -p $TMPDIR
-if [ ! mountpoint -q $TMPDIR ]; then
+if ! mountpoint -q $TMPDIR; then
 	mount tmpfs -t tmpfs $TMPDIR -o,size=40k
 fi
 

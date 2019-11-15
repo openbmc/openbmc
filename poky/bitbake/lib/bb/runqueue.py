@@ -1397,7 +1397,7 @@ class RunQueue:
             cache[tid] = iscurrent
         return iscurrent
 
-    def validate_hashes(self, tocheck, data, currentcount=0, siginfo=False):
+    def validate_hashes(self, tocheck, data, currentcount=0, siginfo=False, summary=True):
         valid = set()
         if self.hashvalidate:
             sq_data = {}
@@ -1410,15 +1410,15 @@ class RunQueue:
                 sq_data['hashfn'][tid] = self.rqdata.dataCaches[mc].hashfn[taskfn]
                 sq_data['unihash'][tid] = self.rqdata.runtaskentries[tid].unihash
 
-            valid = self.validate_hash(sq_data, data, siginfo, currentcount)
+            valid = self.validate_hash(sq_data, data, siginfo, currentcount, summary)
 
         return valid
 
-    def validate_hash(self, sq_data, d, siginfo, currentcount):
-        locs = {"sq_data" : sq_data, "d" : d, "siginfo" : siginfo, "currentcount" : currentcount}
+    def validate_hash(self, sq_data, d, siginfo, currentcount, summary):
+        locs = {"sq_data" : sq_data, "d" : d, "siginfo" : siginfo, "currentcount" : currentcount, "summary" : summary}
 
         # Metadata has **kwargs so args can be added, sq_data can also gain new fields
-        call = self.hashvalidate + "(sq_data, d, siginfo=siginfo, currentcount=currentcount)"
+        call = self.hashvalidate + "(sq_data, d, siginfo=siginfo, currentcount=currentcount, summary=summary)"
 
         return bb.utils.better_eval(call, locs)
 
@@ -1605,7 +1605,7 @@ class RunQueue:
 
             tocheck.add(tid)
 
-        valid_new = self.validate_hashes(tocheck, self.cooker.data, 0, True)
+        valid_new = self.validate_hashes(tocheck, self.cooker.data, 0, True, summary=False)
 
         # Tasks which are both setscene and noexec never care about dependencies
         # We therefore find tasks which are setscene and noexec and mark their
@@ -1986,7 +1986,7 @@ class RunQueueExecute:
                             continue
                         logger.debug(1, "Task %s no longer deferred" % nexttask)
                         del self.sq_deferred[nexttask]
-                        valid = self.rq.validate_hashes(set([nexttask]), self.cooker.data, 0, False)
+                        valid = self.rq.validate_hashes(set([nexttask]), self.cooker.data, 0, False, summary=False)
                         if not valid:
                             logger.debug(1, "%s didn't become valid, skipping setscene" % nexttask)
                             self.sq_task_failoutright(nexttask)
@@ -2361,9 +2361,13 @@ class RunQueueExecute:
             if tid in self.build_stamps:
                 del self.build_stamps[tid]
 
-            logger.info("Setscene task %s now valid and being rerun" % tid)
+            origvalid = False
+            if tid in self.sqdata.valid:
+                origvalid = True
             self.sqdone = False
-            update_scenequeue_data([tid], self.sqdata, self.rqdata, self.rq, self.cooker, self.stampcache, self)
+            update_scenequeue_data([tid], self.sqdata, self.rqdata, self.rq, self.cooker, self.stampcache, self, summary=False)
+            if tid in self.sqdata.valid and not origvalid:
+                logger.info("Setscene task %s became valid" % tid)
 
         if changed:
             self.holdoff_need_update = True
@@ -2692,9 +2696,9 @@ def build_scenequeue_data(sqdata, rqdata, rq, cooker, stampcache, sqrq):
     sqdata.stamppresent = set()
     sqdata.valid = set()
 
-    update_scenequeue_data(sqdata.sq_revdeps, sqdata, rqdata, rq, cooker, stampcache, sqrq)
+    update_scenequeue_data(sqdata.sq_revdeps, sqdata, rqdata, rq, cooker, stampcache, sqrq, summary=True)
 
-def update_scenequeue_data(tids, sqdata, rqdata, rq, cooker, stampcache, sqrq):
+def update_scenequeue_data(tids, sqdata, rqdata, rq, cooker, stampcache, sqrq, summary=True):
 
     tocheck = set()
 
@@ -2728,7 +2732,7 @@ def update_scenequeue_data(tids, sqdata, rqdata, rq, cooker, stampcache, sqrq):
 
         tocheck.add(tid)
 
-    sqdata.valid |= rq.validate_hashes(tocheck, cooker.data, len(sqdata.stamppresent), False)
+    sqdata.valid |= rq.validate_hashes(tocheck, cooker.data, len(sqdata.stamppresent), False, summary=summary)
 
     sqdata.hashes = {}
     for mc in sorted(sqdata.multiconfigs):

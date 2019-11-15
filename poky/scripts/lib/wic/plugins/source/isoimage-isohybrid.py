@@ -336,19 +336,23 @@ class IsoImagePlugin(SourcePlugin):
                 (img_iso_dir, isodir)
             exec_cmd(install_cmd)
         else:
+            # Default to 100 blocks of extra space for file system overhead
+            esp_extra_blocks = int(source_params.get('esp_extra_blocks', '100'))
+
             du_cmd = "du -bks %s/EFI" % isodir
             out = exec_cmd(du_cmd)
             blocks = int(out.split()[0])
-            # Add some extra space for file system overhead
-            blocks += 100
+            blocks += esp_extra_blocks
             logger.debug("Added 100 extra blocks to %s to get to %d "
                          "total blocks", part.mountpoint, blocks)
 
             # dosfs image for EFI boot
             bootimg = "%s/efi.img" % isodir
 
-            dosfs_cmd = 'mkfs.vfat -n "EFIimg" -S 512 -C %s %d' \
-                        % (bootimg, blocks)
+            esp_label = source_params.get('esp_label', 'EFIimg')
+
+            dosfs_cmd = 'mkfs.vfat -n \'%s\' -S 512 -C %s %d' \
+                        % (esp_label, bootimg, blocks)
             exec_native_cmd(dosfs_cmd, native_sysroot)
 
             mmd_cmd = "mmd -i %s ::/EFI" % bootimg
