@@ -2,7 +2,6 @@ SUMMARY = "Fast, multi-threaded malloc() and nifty performance analysis tools"
 HOMEPAGE = "https://github.com/gperftools/gperftools"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=762732742c73dc6c7fbe8632f06c059a"
-DEPENDS += "libunwind"
 
 SRCREV = "9608fa3bcf8020d35f59fbf70cd3cbe4b015b972"
 SRC_URI = "git://github.com/gperftools/gperftools \
@@ -20,7 +19,7 @@ S = "${WORKDIR}/git"
 # On mips, we have the following error.
 #   do_page_fault(): sending SIGSEGV to ls for invalid read access from 00000008
 #   Segmentation fault (core dumped)
-COMPATIBLE_HOST_mipsarch_libc-glibc = "null"
+COMPATIBLE_HOST_mipsarch = "null"
 # Disable thumb1
 # {standard input}: Assembler messages:
 # {standard input}:434: Error: lo register required -- `ldr pc,[sp]'
@@ -28,9 +27,11 @@ COMPATIBLE_HOST_mipsarch_libc-glibc = "null"
 ARM_INSTRUCTION_SET_armv5 = "arm"
 ARM_INSTRUCTION_SET_toolchain-clang_arm = "arm"
 
-# Ensure static libs are always enabled, as they seem to be not produced by
-# default at least on ARM.
-EXTRA_OECONF_append += " --enable-static"
+PACKAGECONFIG ?= "libunwind static"
+PACKAGECONFIG_remove_arm_libc-musl = "libunwind"
+
+PACKAGECONFIG[libunwind] = "--enable-libunwind,--disable-libunwind,libunwind"
+PACKAGECONFIG[static] = "--enable-static,--disable-static,"
 
 PACKAGE_BEFORE_PN += "libtcmalloc-minimal"
 FILES_libtcmalloc-minimal = "${libdir}/libtcmalloc_minimal*${SOLIBS} ${libdir}/libtcmalloc_minimal_debug*${SOLIBS}"

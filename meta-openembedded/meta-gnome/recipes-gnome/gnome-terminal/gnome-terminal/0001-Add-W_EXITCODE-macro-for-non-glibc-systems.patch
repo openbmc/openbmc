@@ -1,0 +1,35 @@
+From f231cecc151930fd5b6309da317a8c5bc6001f38 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Sun, 17 Nov 2019 15:55:54 +0100
+Subject: [PATCH] Add W_EXITCODE macro for non-glibc systems
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ src/terminal.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/terminal.c b/src/terminal.c
+index d06ce35..6284e4c 100644
+--- a/src/terminal.c
++++ b/src/terminal.c
+@@ -47,6 +47,12 @@
+ GS_DEFINE_CLEANUP_FUNCTION0(TerminalOptions*, gs_local_options_free, terminal_options_free)
+ #define gs_free_options __attribute__ ((cleanup(gs_local_options_free)))
+ 
++/* fix for musl */
++#ifndef W_EXITCODE
++#define W_EXITCODE(ret, sig) ((ret) << 8 | (sig))
++#endif
++
++
+ /* Wait-for-exit helper */
+ 
+ typedef struct {
+-- 
+2.21.0
+

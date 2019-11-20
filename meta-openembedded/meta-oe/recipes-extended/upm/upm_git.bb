@@ -15,6 +15,8 @@ SRC_URI = "git://github.com/intel-iot-devkit/${BPN}.git;protocol=http \
            file://0001-Use-stdint-types.patch \
            "
 
+SRC_URI_append_toolchain-clang_x86 = " file://0001-nmea_gps-Link-with-latomic.patch "
+
 S = "${WORKDIR}/git"
 
 # Depends on mraa which only supports x86 and ARM for now

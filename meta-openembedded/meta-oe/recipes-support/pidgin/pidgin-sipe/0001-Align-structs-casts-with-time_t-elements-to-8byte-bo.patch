@@ -1,0 +1,50 @@
+From 1110d3036e73d0571f70f6758f3179e5048c0b5d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 16 Nov 2019 11:07:42 -0800
+Subject: [PATCH] Align structs casts with time_t elements to 8byte boundary
+
+This helps with 64bit time_t conversion, especially where these
+structures are typcasted to another struct types which have time_t
+element, that now increases the natural alignment boundary of structures
+to 8-bytes.
+
+Fixes
+../../../pidgin-sipe-1.25.0/src/core/sipe-user.c:124:43: error: cast from 'struct sipe_core_public *' to 'struct sipe_core_private *' increases required alignment from 4 to 8 [-Werror,-Wcast-align]
+        struct sipe_core_private *sipe_private = SIPE_CORE_PRIVATE;
+                                                 ^~~~~~~~~~~~~~~~~
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/api/sipe-core.h            | 2 +-
+ src/core/sipe-http-transport.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/api/sipe-core.h b/src/api/sipe-core.h
+index cde0a9c..bd818bb 100644
+--- a/src/api/sipe-core.h
++++ b/src/api/sipe-core.h
+@@ -148,7 +148,7 @@ struct sipe_core_public {
+ 
+ 	/* server information */
+ 	/* currently nothing */
+-};
++} __attribute__((aligned(8)));
+ 
+ /**
+  * Initialize & destroy functions for the SIPE core
+diff --git a/src/core/sipe-http-transport.h b/src/core/sipe-http-transport.h
+index d82cd1b..08eb150 100644
+--- a/src/core/sipe-http-transport.h
++++ b/src/core/sipe-http-transport.h
+@@ -46,7 +46,7 @@ struct sipe_http_connection_public {
+ 	gchar *host;
+ 	guint32 port;
+ 	gboolean connected;
+-};
++} __attribute__((aligned(8)));
+ 
+ /**
+  * Check if we're shutting down the HTTP stack
+-- 
+2.24.0
+
