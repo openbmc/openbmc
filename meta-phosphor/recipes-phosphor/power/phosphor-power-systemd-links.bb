@@ -8,8 +8,6 @@ inherit allarch
 
 RDEPENDS_${PN} += "phosphor-power"
 
-OBMC_POWER_SUPPLY_INSTANCES ?= "0"
-
 ALLOW_EMPTY_${PN} = "1"
 
 pkg_postinst_${PN}() {
@@ -24,7 +22,9 @@ pkg_postinst_${PN}() {
 	TARGET="../pseq-monitor-pgood.service"
 	ln -s $TARGET $LINK
 
-	for inst in $OBMC_POWER_SUPPLY_INSTANCES; do
+	[ -z "${OBMC_POWER_SUPPLY_INSTANCES}" ] && echo "No power supply instance defined" && exit 1
+
+	for inst in ${OBMC_POWER_SUPPLY_INSTANCES}; do
 		LINK="$D$systemd_system_unitdir/multi-user.target.requires/power-supply-monitor@$inst.service"
 		TARGET="../power-supply-monitor@.service"
 		ln -s $TARGET $LINK
@@ -36,7 +36,10 @@ pkg_prerm_${PN}() {
 	rm $LINK
 	LINK="$D$systemd_system_unitdir/obmc-chassis-poweron@0.target.wants/pseq-monitor-pgood.service"
 	rm $LINK
-	for inst in $OBMC_POWER_SUPPLY_INSTANCES; do
+
+	[ -z "${OBMC_POWER_SUPPLY_INSTANCES}" ] && echo "No power supply instance defined" && exit 1
+
+	for inst in ${OBMC_POWER_SUPPLY_INSTANCES}; do
 		LINK="$D$systemd_system_unitdir/multi-user.target.requires/power-supply-monitor@$inst.service"
 		rm $LINK
 	done
