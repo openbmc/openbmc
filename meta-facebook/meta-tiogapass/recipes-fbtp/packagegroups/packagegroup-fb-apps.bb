@@ -21,5 +21,6 @@ RDEPENDS_${PN}-system = " \
         fb-ipmi-oem \
         phosphor-pid-control \
         phosphor-hostlogger \
+        phosphor-sel-logger \
         ipmitool \
         "
