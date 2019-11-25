@@ -116,6 +116,29 @@
     - meta: SENSOR
       path: /xyz/openbmc_project/sensors/temperature/ambient_temp
 
+- name: gpu sensors
+  description: >
+    'Each gpu has its own temperature sensor.'
+  class: group
+  group: path
+  members:
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/gpu0
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/gpu1
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/gpu2
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/gpu3
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/gpu4
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/gpu5
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/gpu6
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/gpu7
+
 - name: core temp
   description: >
     'Monitor the temperature of each core.'
@@ -130,6 +153,17 @@
 - name: ambient temp
   description: >
     'Monitor the ambient temperature.'
+  class: group
+  group: property
+  type: int64
+  members:
+    - interface: xyz.openbmc_project.Sensor.Value
+      meta: TEMP
+      property: Value
+
+- name: gpu temp
+  description: >
+    'Monitor the temperature of each gpu core.'
   class: group
   group: property
   type: int64
@@ -155,6 +189,15 @@
   paths: ambient sensor
   properties: ambient temp
   callback: check ambient temp
+
+- name: watch gpu temps
+  description: >
+    'Trigger logic on gpu core temp changes.'
+  class: watch
+  watch: property
+  paths: gpu sensors
+  properties: gpu temp
+  callback: check gpu temps
 
 - name: check temps
   description: >
@@ -185,6 +228,20 @@
   bound: 45000
   oneshot: true
 
+- name: check gpu temps
+  description: >
+    'If the gpu temperature sensor is too hot. Shut the system down.'
+  class: condition
+  condition: count
+  paths: gpu sensors
+  properties: gpu temp
+  callback: gpu log and shutdown
+  countop: '>='
+  countbound: 1
+  op: '>='
+  bound: 92
+  oneshot: true
+
 - name: log and shutdown
   description: >
     'Shut the system down and log an event.'
@@ -204,6 +261,16 @@
     - shutdown
     - create ambient criticalhigh error
     - create ambient shutdown error
+
+- name: gpu log and shutdown
+  description: >
+    'Shut the system down and log an event.'
+  class: callback
+  callback: group
+  members:
+    - shutdown
+    - create gpu criticalhigh error
+    - create gpu shutdown error
 
 - name: shutdown
   description: >
@@ -240,6 +307,16 @@
   error: xyz::openbmc_project::Sensor::Threshold::Error::CriticalHigh
   metadata: xyz::openbmc_project::Sensor::Threshold::CriticalHigh::SENSOR_DATA
 
+- name: create gpu criticalhigh error
+  description: >
+    'Create a GPU CriticalHigh Error log.'
+  class: callback
+  callback: elog_with_metadata
+  paths: gpu sensors
+  properties: gpu temp
+  error: xyz::openbmc_project::Sensor::Threshold::Error::CriticalHigh
+  metadata: xyz::openbmc_project::Sensor::Threshold::CriticalHigh::SENSOR_DATA
+
 - name: create shutdown error
   description: >
     'Create a SystemShutdown Error log.'
@@ -257,3 +334,12 @@
   paths: ambient sensor
   properties: ambient temp
   error: xyz::openbmc_project::State::Shutdown::ThermalEvent::Error::Ambient
+
+- name: create gpu shutdown error
+  description: >
+    'Create a SystemShutdown Error log.'
+  class: callback
+  callback: elog
+  paths: gpu sensors
+  properties: gpu temp
+  error: xyz::openbmc_project::State::Shutdown::ThermalEvent::Error::GPU
