@@ -7,7 +7,7 @@ AUTHOR = "Clayton Craft and others"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=84dcc94da3adb52b53ae4fa38fe49e5d"
 
-inherit distro_features_check systemd
+inherit features_check systemd
 
 RDEPENDS_${PN} = "python3-pygobject python3-dbus"
 REQUIRED_DISTRO_FEATURES = "systemd"

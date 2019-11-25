@@ -1,6 +1,6 @@
 require ${BPN}.inc
 
-inherit meson gobject-introspection gsettings gettext bash-completion systemd distro_features_check useradd
+inherit meson gobject-introspection gsettings gettext bash-completion systemd features_check useradd
 
 # polkit and gobject-introspection are mandatory and cannot be configured
 REQUIRED_DISTRO_FEATURES = "polkit gobject-introspection-data"

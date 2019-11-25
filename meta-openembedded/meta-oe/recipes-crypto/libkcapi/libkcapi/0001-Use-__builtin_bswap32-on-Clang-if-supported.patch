@@ -1,0 +1,39 @@
+From 7b5dd67fee58f9f54c8a676abe2131776c0a3c52 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 20 Nov 2019 13:41:39 -0800
+Subject: [PATCH] Use __builtin_bswap32 on Clang if supported
+
+clang pretends to be gcc 4.2.1 so GCC_VERSION macro will decide that
+__builtin_bswap32 is not supported on clang, whereas in reality it might
+so its better to add a check for enquiring clang if it supports
+__builtin_bswap32 or not
+
+Upstream-Status: Submitted [https://github.com/smuellerDD/libkcapi/pull/83]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/kcapi-kdf.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/lib/kcapi-kdf.c b/lib/kcapi-kdf.c
+index 9e53a0b..f32fbe9 100644
+--- a/lib/kcapi-kdf.c
++++ b/lib/kcapi-kdf.c
+@@ -54,10 +54,14 @@
+ #include "kcapi.h"
+ #include "internal.h"
+ 
++#ifndef __has_builtin
++# define __has_builtin(x) 0
++#endif
++
+ #define GCC_VERSION (__GNUC__ * 10000		\
+ 		     + __GNUC_MINOR__ * 100	\
+ 		     + __GNUC_PATCHLEVEL__)
+-#if GCC_VERSION >= 40400
++#if GCC_VERSION >= 40400 || (defined(__clang__) && __has_builtin(__builtin_bswap32))
+ # define __HAVE_BUILTIN_BSWAP32__
+ #endif
+ 
+-- 
+2.24.0
+

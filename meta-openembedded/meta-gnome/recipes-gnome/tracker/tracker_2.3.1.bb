@@ -20,7 +20,7 @@ DEPENDS = " \
 
 GNOMEBASEBUILDCLASS = "meson"
 
-inherit gnomebase gobject-introspection vala gtk-doc manpages bash-completion distro_features_check
+inherit gnomebase gsettings gobject-introspection vala gtk-doc manpages bash-completion features_check
 
 SRC_URI[archive.md5sum] = "5e75b611b190c4cebf53e3de15266429"
 SRC_URI[archive.sha256sum] = "b6748726e465ad2f4d991560634b1fd0df8841f3d981b3b837c4162abedf08a1"

@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=8b32ccac3ad25e75e68478deb7780265"
 DEPENDS = "util-macros-native font-util-native bdftopcf-native"
 RDEPENDS_${PN} = "encodings font-util"
 
-inherit distro_features_check
+inherit features_check
 # depends on bdftopcf-native -> virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
 

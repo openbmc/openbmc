@@ -11,7 +11,7 @@ DEPENDS = " \
 
 GNOMEBASEBUILDCLASS = "meson"
 
-inherit gnomebase gtk-icon-cache gettext distro_features_check upstream-version-is-even
+inherit gnomebase gtk-icon-cache gettext features_check upstream-version-is-even
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

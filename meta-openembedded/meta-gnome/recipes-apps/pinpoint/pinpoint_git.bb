@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=fbc093901857fcd118f065f900982c24 \
 
 DEPENDS = "glib-2.0 gdk-pixbuf cogl-1.0 clutter-1.0 clutter-gst-3.0 librsvg"
 
-inherit autotools gettext pkgconfig distro_features_check
+inherit autotools gettext pkgconfig features_check
 
 # cogl requires opengl
 REQUIRED_DISTRO_FEATURES = "opengl"

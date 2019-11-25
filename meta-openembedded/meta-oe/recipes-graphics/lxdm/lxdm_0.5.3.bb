@@ -22,7 +22,7 @@ DEPENDS_append_libc-musl = " libexecinfo"
 # combine oe-core way with angstrom DISTRO_TYPE
 DISTRO_TYPE ?= "${@bb.utils.contains("IMAGE_FEATURES", "debug-tweaks", "debug", "",d)}"
 
-inherit autotools pkgconfig gettext systemd distro_features_check
+inherit autotools pkgconfig gettext systemd features_check
 # depends on virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
 

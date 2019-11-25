@@ -23,7 +23,7 @@ S = "${WORKDIR}/dlm-dlm-${PV}"
 
 DEPENDS = "corosync systemd"
 
-inherit pkgconfig systemd distro_features_check
+inherit pkgconfig systemd features_check
 
 PACKAGECONFIG ??= ""
 
@@ -35,6 +35,10 @@ SYSTEMD_AUTO_ENABLE = "enable"
 export EXTRA_OEMAKE = ""
 
 DONTBUILD = "${@bb.utils.contains('PACKAGECONFIG', 'pacemaker', '', 'fence', d)}"
+
+do_compile_prepend_toolchain-clang() {
+    sed -i -e "s/-fstack-clash-protection//g" ${S}/*/Makefile
+}
 
 do_compile_prepend() {
     sed -i "s/libsystemd-daemon/libsystemd/g" ${S}/dlm_controld/Makefile

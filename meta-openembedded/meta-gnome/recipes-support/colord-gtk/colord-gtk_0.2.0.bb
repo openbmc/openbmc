@@ -3,7 +3,7 @@ HOMEPAGE = "https://www.freedesktop.org/software/colord/"
 LICENSE = "LGPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=e6a600fd5e1d9cbde2d983680233ad02"
 
-inherit meson gobject-introspection gettext gtk-doc distro_features_check
+inherit meson gobject-introspection gettext gtk-doc features_check
 
 DEPENDS = " \
     gtk+3 \

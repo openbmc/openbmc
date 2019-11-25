@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = " \
     file://COPYING.GFDL;md5=a22d0be1ce2284b67950a4d1673dd1b0 \
 "
 
-inherit gnomebase gnome-help gettext itstool upstream-version-is-even
+inherit gnomebase gsettings gnome-help gettext itstool upstream-version-is-even
 
 DEPENDS = " \
     glib-2.0-native \

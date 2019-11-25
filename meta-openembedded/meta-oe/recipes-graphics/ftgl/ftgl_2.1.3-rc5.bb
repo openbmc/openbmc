@@ -3,7 +3,7 @@ HOMEPAGE = "https://sourceforge.net/projects/ftgl/"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=527a83e92c7bf363025380eec05df6e4"
 
-inherit autotools pkgconfig distro_features_check
+inherit autotools pkgconfig features_check
 
 REQUIRED_DISTRO_FEATURES = "opengl x11"
 

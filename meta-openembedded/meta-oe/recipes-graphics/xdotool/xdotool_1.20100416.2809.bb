@@ -7,7 +7,7 @@ DEPENDS = "virtual/libx11 libxtst"
 
 PR = "r1"
 
-inherit distro_features_check pkgconfig
+inherit features_check pkgconfig
 # depends on virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
 

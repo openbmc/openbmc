@@ -5,7 +5,7 @@ DEPENDS = "babl librsvg glib-2.0 gtk+ pango cairo expat zlib libpng jpeg virtual
 
 EXTRA_OECONF = "--disable-docs"
 
-inherit distro_features_check gnomebase vala gobject-introspection
+inherit features_check gnomebase vala gobject-introspection
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

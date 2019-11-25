@@ -2,12 +2,12 @@ DESCRIPTION = "XStatic base package with minimal support code"
 HOMEPAGE = "https://pypi.python.org/pypi/XStatic"
 SECTION = "devel/python"
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://README.txt;md5=36a1e7eaa71e1bd07b8d2247839f228e"
+LIC_FILES_CHKSUM = "file://README.txt;md5=1418684272f85f400cebf1b1a255c5cd"
 
 PYPI_PACKAGE = "XStatic"
 
-SRC_URI[md5sum] = "7064b5ea7fd1ee990e0ae0538301d9bc"
-SRC_URI[sha256sum] = "0ec93d7c66ebb9e0d31b664753437dc8634cb66e13310cb47c9eb1e0bc66d726"
+SRC_URI[md5sum] = "dea172b7b14b0dbcd5ed63075221af4b"
+SRC_URI[sha256sum] = "80b78dfe37bce6dee4343d64c65375a80bcf399b46dd47c0c7d56161568a23a8"
 
 DEPENDS += " \
         ${PYTHON_PN}-pip \

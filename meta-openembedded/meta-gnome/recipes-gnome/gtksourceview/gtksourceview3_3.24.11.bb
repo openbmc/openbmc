@@ -10,7 +10,7 @@ PNAME = "gtksourceview"
 
 S = "${WORKDIR}/${PNAME}-${PV}"
 
-inherit gnomebase lib_package gettext distro_features_check gtk-doc gobject-introspection upstream-version-is-even
+inherit gnomebase lib_package gettext features_check gtk-doc gobject-introspection upstream-version-is-even
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

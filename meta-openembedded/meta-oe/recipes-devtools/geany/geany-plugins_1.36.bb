@@ -24,7 +24,7 @@ DEPENDS = " \
     libgit2 \
 "
 
-inherit distro_features_check autotools pkgconfig gtk-icon-cache
+inherit features_check autotools pkgconfig gtk-icon-cache
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

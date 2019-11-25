@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 PR = "r9"
 
 # we are using a gpe-style Makefile
-inherit distro_features_check gpe
+inherit features_check gpe
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

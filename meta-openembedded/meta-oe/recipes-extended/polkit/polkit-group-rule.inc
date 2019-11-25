@@ -1,7 +1,7 @@
 # polkit must prepare polkitd group
 DEPENDS += "polkit"
 
-inherit distro_features_check
+inherit features_check
 REQUIRED_DISTRO_FEATURES = "polkit"
 
 inherit useradd

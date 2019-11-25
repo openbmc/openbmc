@@ -19,7 +19,7 @@ SRCREV = "c17fd14505f30d9e4dbad276f7aa956fd21a637b"
 
 S = "${WORKDIR}/git"
 
-inherit waf pkgconfig distro_features_check
+inherit waf pkgconfig features_check
 
 REQUIRED_DISTRO_FEATURES += "opengl"
 

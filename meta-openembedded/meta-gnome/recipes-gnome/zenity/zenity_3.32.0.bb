@@ -4,7 +4,7 @@ LICENSE = "GPLv2+"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=3bf50002aefd002f49e7bb854063f7e7"
 
-inherit gnomebase itstool gnome-help distro_features_check gettext
+inherit gnomebase itstool gnome-help features_check gettext
 
 DEPENDS = " \
     yelp-tools-native \

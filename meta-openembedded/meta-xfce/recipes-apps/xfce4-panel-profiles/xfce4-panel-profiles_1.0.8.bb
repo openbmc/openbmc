@@ -3,7 +3,7 @@ SECTION = "x11/application"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
-inherit python3native gettext distro_features_check
+inherit python3native gettext features_check
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

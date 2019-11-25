@@ -23,7 +23,7 @@ DEPENDS = "\
 	zlib \
 "
 
-inherit pkgconfig autotools distro_features_check
+inherit pkgconfig autotools features_check
 
 ANY_OF_DISTRO_FEATURES = "x11 fbdev"
 

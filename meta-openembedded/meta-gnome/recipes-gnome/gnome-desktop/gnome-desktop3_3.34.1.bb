@@ -8,7 +8,7 @@ BPN = "gnome-desktop"
 
 GNOMEBASEBUILDCLASS = "meson"
 
-inherit gnomebase itstool pkgconfig upstream-version-is-even gobject-introspection distro_features_check
+inherit gnomebase itstool pkgconfig upstream-version-is-even gobject-introspection features_check
 
 # gobject-introspection is mandatory and cannot be configured
 REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
@@ -24,7 +24,7 @@ SRC_URI += " \
 
 DEPENDS += "gsettings-desktop-schemas virtual/libx11 gtk+3 startup-notification xkeyboard-config iso-codes udev"
 
-inherit distro_features_check gtk-doc
+inherit features_check gtk-doc
 REQUIRED_DISTRO_FEATURES += "x11"
 
 GTKDOC_MESON_OPTION = "gtk_doc"

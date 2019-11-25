@@ -16,7 +16,7 @@ SRCREV = "b814567e2bf8bda07cea8de1c7a062f4aa437b65"
 
 S = "${WORKDIR}/git"
 
-inherit pkgconfig distro_features_check
+inherit pkgconfig features_check
 
 TARGET_CC_ARCH += "${LDFLAGS}"
 

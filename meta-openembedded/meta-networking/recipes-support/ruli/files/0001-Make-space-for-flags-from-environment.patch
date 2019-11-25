@@ -1,0 +1,95 @@
+From bb19a2c7e5b3142d70d3e13c2d8a92a63f2b840a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 20 Nov 2019 22:12:52 -0800
+Subject: [PATCH] Make space for flags from environment
+
+Add force option to ln cmd, so do_install can be rerun in same directory
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ sample/Makefile | 20 ++++++++++----------
+ src/Makefile    |  8 ++++----
+ 2 files changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/sample/Makefile b/sample/Makefile
+index 15cafd9..d83641f 100644
+--- a/sample/Makefile
++++ b/sample/Makefile
+@@ -35,9 +35,9 @@ ifeq ($(PLATFORM),SunOS)
+ SOLARIS_LIBS = -lresolv -lnsl -lsocket
+ endif
+ 
+-CC      = gcc
+-CFLAGS  = -O2 -pipe -Wall -g -I../src -I$(OOP_INCLUDE_DIR)
+-LDFLAGS = -L../src -L$(OOP_LIB_DIR) $(SOLARIS_LDFLAGS)
++CC      ?= gcc
++CFLAGS  += -O2 -pipe -Wall -g -I../src -I$(OOP_INCLUDE_DIR)
++LDFLAGS += -L../src -L$(OOP_LIB_DIR) $(SOLARIS_LDFLAGS)
+ UNRULI_LINK = $(CC) $(ARCH) $(LDFLAGS) -o $@ $^ $(SOLARIS_LIBS)
+ LINK = $(UNRULI_LINK) -lruli -loop
+ 
+@@ -65,13 +65,13 @@ install: $(TARGETS)
+ 	mkdir -p $(INSTALL_BIN_DIR) $(INSTALL_MAN1_DIR)
+ 	cp $(TARGETS) $(INSTALL_BIN_DIR)
+ 	cp ../doc/man/*.1 $(INSTALL_MAN1_DIR)
+-	cd $(INSTALL_MAN_DIR)/man1 && ln -s srvsearch.1 smtpsearch.1
+-	cd $(INSTALL_MAN_DIR)/man1 && ln -s srvsearch.1 httpsearch.1
+-	cd $(INSTALL_MAN_DIR)/man1 && ln -s srvsearch.1 sync_srvsearch.1
+-	cd $(INSTALL_MAN_DIR)/man1 && ln -s srvsearch.1 sync_smtpsearch.1
+-	cd $(INSTALL_MAN_DIR)/man1 && ln -s srvsearch.1 sync_httpsearch.1
+-	cd $(INSTALL_MAN_DIR)/man1 && ln -s srvsearch.1 ruli-getaddrinfo.1
+-	cd $(INSTALL_MAN_DIR)/man1 && ln -s srvsearch.1 getaddrinfo.1
++	cd $(INSTALL_MAN_DIR)/man1 && ln -sf srvsearch.1 smtpsearch.1
++	cd $(INSTALL_MAN_DIR)/man1 && ln -sf srvsearch.1 httpsearch.1
++	cd $(INSTALL_MAN_DIR)/man1 && ln -sf srvsearch.1 sync_srvsearch.1
++	cd $(INSTALL_MAN_DIR)/man1 && ln -sf srvsearch.1 sync_smtpsearch.1
++	cd $(INSTALL_MAN_DIR)/man1 && ln -sf srvsearch.1 sync_httpsearch.1
++	cd $(INSTALL_MAN_DIR)/man1 && ln -sf srvsearch.1 ruli-getaddrinfo.1
++	cd $(INSTALL_MAN_DIR)/man1 && ln -sf srvsearch.1 getaddrinfo.1
+ 
+ %.o: %.c
+ 	$(CC) $(ARCH) $(CPPFLAGS) $(CFLAGS) -c $<
+diff --git a/src/Makefile b/src/Makefile
+index 9b56b5e..39a5ea1 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -45,7 +45,7 @@ endif
+ 
+ WARN = -pedantic -ansi -Wshadow -Wpointer-arith -Wcast-qual \
+ 	-Wcast-align -Wwrite-strings -Wredundant-decls
+-CC = gcc
++CC ?= gcc
+ 
+ # gcc-specific options (not valid for g++)
+ ifeq ($(CC),gcc)
+@@ -58,7 +58,7 @@ SHARED = -fPIC
+ FLAGS = $(DEBUG) -O2 -pipe -Wall -g -shared -D_REENTRANT \
+         $(DEFINE_SOLARIS) -I. -I$(OOP_INCLUDE_DIR)
+ SOFT_CFLAGS = $(WARN) $(FLAGS)
+-CFLAGS = $(WARN) -Werror $(FLAGS)
++CFLAGS += $(WARN) -Werror $(FLAGS)
+ LIBOBJ = ruli_isaac.o ruli_mem.o ruli_rand.o ruli_util.o ruli_list.o \
+ 	ruli_addr.o ruli_sock.o ruli_txt.o ruli_msg.o ruli_fsm.o \
+ 	ruli_res.o ruli_parse.o ruli_host.o ruli_srv.o ruli_conf.o \
+@@ -66,7 +66,7 @@ LIBOBJ = ruli_isaac.o ruli_mem.o ruli_rand.o ruli_util.o ruli_list.o \
+ 	ruli_getaddrinfo.o
+ SHAREDOBJ = $(LIBOBJ:%.o=%.os)
+ SONAME = libruli.so.4
+-LDFLAGS = -L$(OOP_LIB_DIR)
++LDFLAGS += -L$(OOP_LIB_DIR)
+ 
+ COMPILE = $(CC) $(ARCH) $(CPPFLAGS) $(CFLAGS) -c
+ SHARED_COMPILE = $(CC) $(ARCH) $(CPPFLAGS) $(SHARED) $(CFLAGS) -o $@ -c
+@@ -95,7 +95,7 @@ install: ruli
+ 	cp $(SONAME) libruli.a $(INSTALL_LIB_DIR)
+ 	cp *.h $(INSTALL_INCLUDE_DIR)
+ 	cp ../doc/man/*.3 $(INSTALL_MAN3_DIR)
+-	cd $(INSTALL_LIB_DIR) && ln -s $(SONAME) libruli.so
++	cd $(INSTALL_LIB_DIR) && ln -sf $(SONAME) libruli.so
+ 	@echo
+ 	@echo "REMINDER:"
+ 	@echo "Add $(INSTALL_LIB_DIR) to your dynamic loader path:"
+-- 
+2.24.0
+

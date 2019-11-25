@@ -10,7 +10,7 @@ SRC_URI = "git://anongit.freedesktop.org/vdpau/libvdpau"
 
 S = "${WORKDIR}/git"
 
-inherit distro_features_check meson
+inherit features_check meson
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

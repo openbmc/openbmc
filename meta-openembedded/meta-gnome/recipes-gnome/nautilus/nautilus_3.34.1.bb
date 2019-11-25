@@ -15,7 +15,7 @@ DEPENDS = " \
     tracker \
 "
 
-inherit gnomebase gobject-introspection gtk-doc gettext distro_features_check
+inherit gnomebase gsettings gobject-introspection gtk-doc gettext features_check upstream-version-is-even
 
 SRC_URI[archive.md5sum] = "19e4f1d89fb9d0ff135d5b1974ce43b5"
 SRC_URI[archive.sha256sum] = "37ce2c16a610c589dcc7660f9092446465568e38e29bce6ed8c24f2e8e0077f3"

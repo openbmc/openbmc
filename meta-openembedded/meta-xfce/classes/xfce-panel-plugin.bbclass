@@ -1,4 +1,4 @@
-inherit xfce distro_features_check
+inherit xfce features_check
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

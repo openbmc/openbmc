@@ -9,7 +9,6 @@ LICENSE_${PN}-dbg = "BSD & GPLv3+"
 LICENSE_${PN}-spy = "GPLv3+"
 LICENSE_${PN}-spy-dev = "GPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=628c01ba985ecfa21677f5ee2d5202f6"
-DEPENDS = "udev"
 
 SRC_URI = "https://pcsclite.apdu.fr/files/${BP}.tar.bz2"
 SRC_URI[md5sum] = "c20650a36062ab1689f37f3302c988f2"
@@ -19,19 +18,21 @@ inherit autotools systemd pkgconfig
 
 EXTRA_OECONF = " \
     --disable-libusb \
-    --enable-libudev \
     --enable-usbdropdir=${libdir}/pcsc/drivers \
 "
 
 S = "${WORKDIR}/pcsc-lite-${PV}"
 
-PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)} udev"
+PACKAGECONFIG_class-native ??= ""
 
 PACKAGECONFIG[systemd]  = ",--disable-libsystemd,systemd,"
+PACKAGECONFIG[udev] = "--enable-libudev,--disable-libudev,udev"
 
 PACKAGES = "${PN} ${PN}-dbg ${PN}-dev ${PN}-lib ${PN}-doc ${PN}-spy ${PN}-spy-dev"
 
 RRECOMMENDS_${PN} = "ccid"
+RRECOMMENDS_${PN}_class-native = ""
 
 FILES_${PN} = "${sbindir}/pcscd"
 FILES_${PN}-lib = "${libdir}/libpcsclite*${SOLIBS}"
@@ -50,3 +51,5 @@ RREPLACES_${PN} += "${PN}-systemd"
 RCONFLICTS_${PN} += "${PN}-systemd"
 SYSTEMD_SERVICE_${PN} = "pcscd.socket"
 RDEPENDS_${PN}-spy +="python"
+
+BBCLASSEXTEND = "native"

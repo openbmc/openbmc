@@ -19,7 +19,7 @@ SRC_URI[sha256sum] = "881d7d6a90b2428479288d64233151448f8990ab4958e0ecaca7eeb3c9
 S = "${WORKDIR}/hostapd-${PV}"
 B = "${WORKDIR}/hostapd-${PV}/hostapd"
 
-inherit update-rc.d systemd pkgconfig distro_features_check
+inherit update-rc.d systemd pkgconfig features_check
 
 CONFLICT_DISTRO_FEATURES = "openssl-no-weak-ciphers"
 

@@ -19,7 +19,7 @@ DEPENDS = " \
     gtksourceview4 \
 "
 
-inherit gnomebase itstool gnome-help gobject-introspection gtk-doc vala gettext distro_features_check upstream-version-is-even
+inherit gnomebase gsettings itstool gnome-help gobject-introspection gtk-doc vala gettext features_check upstream-version-is-even
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

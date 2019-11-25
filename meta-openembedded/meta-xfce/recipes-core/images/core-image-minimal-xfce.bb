@@ -6,7 +6,7 @@ IMAGE_INSTALL = "packagegroup-core-boot \
     kernel-modules \
 "
 
-inherit distro_features_check
+inherit features_check
 REQUIRED_DISTRO_FEATURES = "x11"
 
 IMAGE_LINGUAS ?= " "

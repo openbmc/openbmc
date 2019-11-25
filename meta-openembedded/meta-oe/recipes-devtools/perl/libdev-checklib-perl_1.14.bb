@@ -11,8 +11,8 @@ LIC_FILES_CHKSUM = "file://README;md5=7911cdbb572d25c5f2e2ea17f669efc2"
 SRC_URI = "https://cpan.metacpan.org/modules/by-module/Devel/Devel-CheckLib-${PV}.tar.gz \
            file://0001-CheckLib.pm-don-t-execute-the-binary.patch \
 "
-SRC_URI[md5sum] = "930216c5abc0f016df8a7539d48c891a"
-SRC_URI[sha256sum] = "24adfd908705dfac4bb320711763f37126b75cf54b3566c2c27c7cdef9c429a8"
+SRC_URI[md5sum] = "3519cbf9fe5ec3404449d5330ee5537f"
+SRC_URI[sha256sum] = "f21c5e299ad3ce0fdc0cb0f41378dca85a70e8d6c9a7599f0e56a957200ec294"
 
 S = "${WORKDIR}/Devel-CheckLib-${PV}"
 

@@ -12,7 +12,7 @@ S = "${WORKDIR}/${PNAME}-${PV}"
 
 GNOMEBASEBUILDCLASS = "meson"
 
-inherit gnomebase lib_package gettext distro_features_check gtk-doc gobject-introspection vala
+inherit gnomebase lib_package gettext features_check gtk-doc gobject-introspection vala
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

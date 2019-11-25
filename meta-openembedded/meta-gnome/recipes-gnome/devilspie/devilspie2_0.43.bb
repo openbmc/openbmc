@@ -14,7 +14,7 @@ SRC_URI = " \
 SRC_URI[md5sum] = "26eed0b5b4af5c7e13c551eceaeab832"
 SRC_URI[sha256sum] = "ecffc17c62b41e196b72340192a90c4223329df041f135e74c0990860595f828"
 
-inherit distro_features_check pkgconfig gettext
+inherit features_check pkgconfig gettext
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

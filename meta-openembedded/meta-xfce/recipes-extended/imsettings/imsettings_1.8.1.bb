@@ -10,7 +10,7 @@ SECTION = "Applications/System"
 LICENSE = "LGPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=2d5025d4aa3495befef8f17206a5b0a1"
 
-inherit autotools gtk-doc gobject-introspection gettext distro_features_check
+inherit autotools gtk-doc gobject-introspection gettext features_check
 
 DEPENDS = "gtk+3 libnotify"
 

@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://LICENCE.TXT;md5=75b02c2872421380bbd47781d2bd75d3"
 
 S = "${WORKDIR}/git"
 
-inherit distro_features_check
+inherit features_check
 REQUIRED_DISTRO_FEATURES = "x11"
 
 inherit autotools cmake

@@ -4,7 +4,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=252890d9eee26aab7b432e8b8a616475"
 DEPENDS = "intltool-native perl-native gtk+ gtk+3 libice libsm libxfce4util xfce4-dev-tools xfconf virtual/libx11"
 
-inherit xfce gtk-doc gobject-introspection distro_features_check
+inherit xfce gtk-doc gobject-introspection features_check
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

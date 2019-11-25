@@ -10,7 +10,7 @@ S = "${WORKDIR}/git"
 
 SRC_URI = "git://github.com/rhinstaller/python-meh.git;protocol=https;branch=master \
 "
-SRCREV = "78d868d99104317ce8820f39f61d207566e61a55"
+SRCREV = "760f78a634ecf0e2380abcbd751bc233d29300ef"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 FILES_${PN} += "${datadir}/*"

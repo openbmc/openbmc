@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
 
 DEPENDS = "python libxml2 popt gtk+3 gnome-common-native"
 
-inherit distro_features_check gnomebase gettext pkgconfig gobject-introspection upstream-version-is-even
+inherit features_check gnomebase gettext pkgconfig gobject-introspection upstream-version-is-even
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

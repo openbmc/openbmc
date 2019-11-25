@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=41ab94182d94be9bb35e2a8b933f1e7d"
 
 DEPENDS = "libpam openldap"
 
-inherit distro_features_check
+inherit features_check
 REQUIRED_DISTRO_FEATURES = "pam"
 
 SRCREV = "84d7b260f1ae6857ae36e014c9a5968e8aa1cbe8"

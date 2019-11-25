@@ -56,10 +56,6 @@ FILES_${PN}-dbg += " \
 
 INSANE_SKIP_${PN} += "dev-deps"
 
-do_install_append() {
-    rm -r ${D}/${localstatedir}/run
-}
-
 do_install () {
     rm -rf ${D}
     install -d ${D}/etc
@@ -87,4 +83,6 @@ do_install () {
     install -dm 755 ${D}${localstatedir}/run/openct
     touch ${D}${localstatedir}/run/openct/status
     chmod 644 ${D}${localstatedir}/run/openct/status
+
+    rm -r ${D}/${localstatedir}/run
 }

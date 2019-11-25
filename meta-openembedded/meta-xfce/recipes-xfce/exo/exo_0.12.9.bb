@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 DEPENDS = "gtk+3 libxfce4ui virtual/libx11 liburi-perl-native cairo"
 DEPENDS_class-native = "glib-2.0-native xfce4-dev-tools-native intltool-native"
 
-inherit xfce pythonnative perlnative gtk-doc distro_features_check
+inherit xfce pythonnative perlnative gtk-doc features_check
 
 REQUIRED_DISTRO_FEATURES = "x11"
 REQUIRED_DISTRO_FEATURES_class-native = ""
@@ -20,8 +20,8 @@ SRC_URI_append_class-native = " \
     file://reduce-build-to-exo-csource-only.patch \
 "
 
-SRC_URI[md5sum] = "e618ce760a12ac7427a48a44c69f3d31"
-SRC_URI[sha256sum] = "3400a2e64aa41ede25bedaca4909bde7ea4f8698d9598d1b80f02a40ac89fcde"
+SRC_URI[md5sum] = "9730f9d270b4968a8bbebe73e6de934f"
+SRC_URI[sha256sum] = "9ba0bf0fd59aeb1cd32ae3863e7a78222655eb15eb675ba08f3b3fb933b6fbfe"
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG_class-target ??= "gtk"

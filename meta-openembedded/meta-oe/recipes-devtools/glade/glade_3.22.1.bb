@@ -9,7 +9,7 @@ DEPENDS = "gtk+ gtk+3 glib-2.0 libxml2 intltool-native \
 "
 
 
-inherit distro_features_check autotools pkgconfig gnomebase gobject-introspection
+inherit features_check autotools pkgconfig gnomebase gobject-introspection
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

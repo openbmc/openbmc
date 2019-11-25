@@ -25,7 +25,7 @@ EXTRA_OECONF += "--without-gssapi --sbindir=${bindir}"
 
 DEPENDS += "flex-native bison-native libpam"
 
-inherit autotools-brokensep distro_features_check
+inherit autotools-brokensep features_check
 
 REQUIRED_DISTRO_FEATURES = "pam"
 

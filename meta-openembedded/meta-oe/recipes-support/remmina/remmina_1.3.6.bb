@@ -18,7 +18,7 @@ SRC_URI[sha256sum] = "fbed745438bb0c21467b60cbd67c8148a9289b5ebc7482d06db443bea5
 
 S = "${WORKDIR}/Remmina-v${PV}"
 
-inherit cmake distro_features_check
+inherit cmake features_check
 
 # depends on avahi-ui with this restriction
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"

@@ -4,7 +4,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d791728a073bc009b4ffaf00b7599855"
 DEPENDS = "virtual/libx11 libxfce4ui libwnck3 libxinerama exo-native"
 
-inherit xfce update-alternatives distro_features_check
+inherit xfce update-alternatives features_check
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

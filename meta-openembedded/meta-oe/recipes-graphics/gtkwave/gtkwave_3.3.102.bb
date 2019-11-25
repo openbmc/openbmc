@@ -15,7 +15,7 @@ DEPENDS = "tcl tk gperf-native bzip2 xz pango zlib gtk+ gdk-pixbuf glib-2.0"
 RDEPENDS_${PN} = "tk-lib"
 
 # depends on gtk+ which has this restriction
-inherit distro_features_check
+inherit features_check
 ANY_OF_DISTRO_FEATURES = "${GTK2DISTROFEATURES}"
 
 EXTRA_OECONF = "--with-tcl=${STAGING_BINDIR_CROSS} --with-tk=${STAGING_BINDIR_CROSS} --with-tirpc"

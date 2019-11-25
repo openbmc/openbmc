@@ -18,10 +18,10 @@ COMPATIBLE_HOST_riscv32 = "null"
 SRC_URI = "http://nodejs.org/dist/v${PV}/node-v${PV}.tar.xz \
            file://0001-Disable-running-gyp-files-for-bundled-deps.patch \
            file://0004-Make-compatibility-with-gcc-4.8.patch \
-           file://0005-Link-atomic-library.patch \
            file://0007-v8-don-t-override-ARM-CFLAGS.patch \
            "
 SRC_URI_append_class-target = " \
+           file://0005-Link-atomic-library.patch \
            file://0002-Using-native-torque.patch \
            "
 

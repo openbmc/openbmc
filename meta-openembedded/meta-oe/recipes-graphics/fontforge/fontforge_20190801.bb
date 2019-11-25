@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = " \
 DEPENDS = "glib-2.0 pango giflib tiff libxml2 jpeg python libtool uthash gettext-native"
 DEPENDS_append_class-target = " libxi"
 
-inherit autotools pkgconfig pythonnative distro_features_check gettext gtk-icon-cache mime
+inherit autotools pkgconfig pythonnative features_check gettext gtk-icon-cache mime
 
 REQUIRED_DISTRO_FEATURES_append_class-target = " x11"
 

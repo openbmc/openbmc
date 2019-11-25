@@ -24,3 +24,5 @@ do_install_append () {
 
 FILES_${PN} += "${libdir}/engines*/pkcs11.so"
 FILES_${PN}-dev += "${libdir}/engines*/libpkcs11${SOLIBSDEV}"
+
+BBCLASSEXTEND = "native"

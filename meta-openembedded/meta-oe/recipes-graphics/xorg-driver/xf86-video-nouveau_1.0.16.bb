@@ -10,7 +10,7 @@ DEPENDS += "virtual/libx11 libxvmc drm xorgproto \
             virtual/libgl libpciaccess"
 RDEPENDS_${PN} += "xserver-xorg-module-exa"
 
-inherit distro_features_check
+inherit features_check
 REQUIRED_DISTRO_FEATURES += "opengl"
 
 COMPATIBLE_HOST = '(i.86|x86_64).*-linux'

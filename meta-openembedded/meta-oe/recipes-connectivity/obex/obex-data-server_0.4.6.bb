@@ -10,7 +10,7 @@ SRC_URI = "http://tadas.dailyda.com/software/obex-data-server-${PV}.tar.gz \
 SRC_URI[md5sum] = "961ca5db6fe9c97024e133cc6203cc4d"
 SRC_URI[sha256sum] = "b399465ddbd6d0217abedd9411d9d74a820effa0a6a142adc448268d3920094f"
 
-inherit distro_features_check autotools-brokensep pkgconfig
+inherit features_check autotools-brokensep pkgconfig
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

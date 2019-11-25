@@ -31,7 +31,7 @@ SRC_URI[sha256sum] = "f51039c997415fd0f13f8e01966b4a8ff80cbf90deb8b14c18827104a3
 
 inherit autotools pkgconfig perlnative pythonnative
 
-inherit distro_features_check
+inherit features_check
 CONFLICT_DISTRO_FEATURES_mipsarchn32 = "ld-is-gold"
 
 DEPENDS += "nspr zlib python-six-native python-pytoml-native \

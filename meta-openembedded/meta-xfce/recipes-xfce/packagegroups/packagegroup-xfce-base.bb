@@ -2,7 +2,7 @@ SUMMARY = "All packages required for a base installation of XFCE"
 SECTION = "x11/wm"
 PR = "r5"
 
-inherit packagegroup distro_features_check
+inherit packagegroup features_check
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

@@ -7,7 +7,7 @@ SRC_URI = "http://repository.maemo.org/pool/maemo/ossw/source/x/xsp/${BPN}_${PV}
            file://xsp-fix-pc.patch"
 S = "${WORKDIR}/Xsp"
 
-inherit autotools pkgconfig distro_features_check
+inherit autotools pkgconfig features_check
 # depends on virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
 

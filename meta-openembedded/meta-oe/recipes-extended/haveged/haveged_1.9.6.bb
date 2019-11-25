@@ -22,7 +22,7 @@ EXTRA_OECONF = "\
 "
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
-PACKAGECONFIG[systemd] = "--enable-init=service.redhat --enable-initdir=${systemd_system_unitdir}, --enable-init=sysv.redhat, systemd"
+PACKAGECONFIG[systemd] = "--enable-init=service.fedora --enable-initdir=${systemd_system_unitdir}, --enable-init=sysv.redhat, systemd"
 
 INITSCRIPT_PACKAGES = "${PN}"
 INITSCRIPT_NAME = "haveged"

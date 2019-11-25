@@ -25,7 +25,7 @@ DEPENDS = " \
 "
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'libxmu libxpm', '', d)}"
 
-inherit distro_features_check gnomebase gtk-icon-cache gtk-doc
+inherit features_check gnomebase gtk-icon-cache gtk-doc
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

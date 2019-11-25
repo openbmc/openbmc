@@ -141,8 +141,11 @@ do_install_append() {
 
     rm -rf ${D}/run ${D}${localstatedir}/run
 
-    # For read-only filesystem, do not create links during bootup
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+        # For read-only filesystem, do not create links during bootup
         ln -sf ../run/NetworkManager/resolv.conf ${D}${sysconfdir}/resolv-conf.NetworkManager
+
+        # systemd v210 and newer do not need this rule file
+        rm ${D}/${nonarch_base_libdir}/udev/rules.d/84-nm-drivers.rules
     fi
 }

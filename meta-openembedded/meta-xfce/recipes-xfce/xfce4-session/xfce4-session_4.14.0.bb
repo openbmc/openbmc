@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=9ac2e7cff1ddaf48b6eab6028f23ef88"
 
 DEPENDS = "libwnck3 libsm libxfce4ui virtual/libx11"
 
-inherit xfce update-alternatives distro_features_check
+inherit xfce update-alternatives features_check
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

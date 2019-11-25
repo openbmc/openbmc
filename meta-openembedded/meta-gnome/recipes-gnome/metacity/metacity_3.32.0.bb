@@ -10,7 +10,7 @@ DEPENDS = "gsettings-desktop-schemas startup-notification \
            gnome-doc-utils gdk-pixbuf-native \
            gtk+3 glib-2.0 libcanberra libgtop intltool-native"
 
-inherit autotools gettext gnomebase distro_features_check
+inherit autotools gettext gnomebase features_check
 # depends on startup-notification which depends on virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
 

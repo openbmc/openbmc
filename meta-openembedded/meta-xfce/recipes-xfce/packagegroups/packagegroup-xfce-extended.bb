@@ -3,7 +3,7 @@ SECTION = "x11/wm"
 
 PR = "r10"
 
-inherit packagegroup distro_features_check
+inherit packagegroup features_check
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

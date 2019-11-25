@@ -8,7 +8,7 @@ SRC_URI = "https://github.com/ice-wm/${BPN}/releases/download/${PV}/${BPN}-${PV}
 SRC_URI[md5sum] = "6eba94a7935a0531d2c14eeb1426aeef"
 SRC_URI[sha256sum] = "f1c1344b20a9e8635143f70ee27930b55f813c15ca61f84d77584d311b6ac027"
 
-inherit autotools pkgconfig gettext perlnative distro_features_check qemu
+inherit autotools pkgconfig gettext perlnative features_check qemu
 REQUIRED_DISTRO_FEATURES = "x11"
 
 EXTRA_OECONF += "--with-libdir=${datadir}/icewm \

@@ -8,6 +8,6 @@ SRC_URI[sha256sum] = "b1fc072c87e3766711f64caf86fd633dca393e20c8a0a37a5058dd70a2
 DEPENDS = "systemd"
 REQUIRED_DISTRO_FEATURES = "systemd"
 
-inherit pypi setuptools3 distro_features_check
+inherit pypi setuptools3 features_check
 
 BBCLASSEXTEND = "native"

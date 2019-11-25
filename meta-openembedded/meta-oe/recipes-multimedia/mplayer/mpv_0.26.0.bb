@@ -24,7 +24,7 @@ SRC_URI[waf.sha256sum] = "01bf2beab2106d1558800c8709bc2c8e496d3da4a2ca343fe091f2
 
 S = "${WORKDIR}/git"
 
-inherit waf pkgconfig pythonnative distro_features_check
+inherit waf pkgconfig pythonnative features_check
 
 LUA ?= "lua"
 LUA_mips64  = ""

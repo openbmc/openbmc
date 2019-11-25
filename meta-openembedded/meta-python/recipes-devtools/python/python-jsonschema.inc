@@ -44,6 +44,7 @@ RDEPENDS_${PN} += " \
     ${PYTHON_PN}-six \
     ${PYTHON_PN}-unittest \
     ${PYTHON_PN}-setuptools-scm \
+    ${PYTHON_PN}-zipp \
 "
 
 BBCLASSEXTEND = "native nativesdk"

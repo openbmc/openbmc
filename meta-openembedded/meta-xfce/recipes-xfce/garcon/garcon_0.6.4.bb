@@ -4,7 +4,7 @@ LICENSE = "LGPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=04a01abcbdabffae1ca26335a293276b"
 DEPENDS = "xfce4-dev-tools-native libxfce4ui intltool-native"
 
-inherit xfce gtk-doc distro_features_check
+inherit xfce gtk-doc features_check
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

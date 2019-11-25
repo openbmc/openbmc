@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552"
 
 GNOMEBASEBUILDCLASS = "meson"
 
-inherit gnomebase gobject-introspection gettext distro_features_check upstream-version-is-even
+inherit gnomebase gsettings gobject-introspection gettext features_check upstream-version-is-even
 
 SRC_URI[archive.md5sum] = "528b0b7cc2dd22c6026a9c8739c71fa7"
 SRC_URI[archive.sha256sum] = "7ce4979817866911a94ecb75b36db56797e038c0c524c5c1a81aefccafc17337"

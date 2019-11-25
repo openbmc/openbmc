@@ -5,7 +5,7 @@ LICENSE = "LGPL-2.0+"
 LIC_FILES_CHKSUM = "file://tap.c;beginline=1;endline=20;md5=71756eeb144e9eeb177c69aa672b1635"
 PR = "r4"
 
-inherit distro_features_check autotools pkgconfig
+inherit features_check autotools pkgconfig
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

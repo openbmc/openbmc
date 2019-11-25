@@ -4,7 +4,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=72cfbe4e7bd33a0a1de9630c91195c21 \
 "
 
-inherit distro_features_check autotools pkgconfig useradd systemd
+inherit features_check autotools pkgconfig useradd systemd
 
 DEPENDS = "openssl virtual/libx11 libxfixes libxrandr libpam nasm-native"
 

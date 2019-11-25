@@ -7,7 +7,7 @@ SRC_URI = "https://sourceforge.net/projects/${BPN}/files/${BPN}/${PV}/${BPN}-${P
 SRC_URI[md5sum] = "90c3ca4dd9d51cf32276bc5344ec9754"
 SRC_URI[sha256sum] = "2a43be8515b01ea82bcfa17d29ae0d40bd128342f0930cd1f375f1ff999f76a2"
 
-inherit cmake distro_features_check
+inherit cmake features_check
 
 # depends on virtual/libx11, virtual/libgl
 REQUIRED_DISTRO_FEATURES = "x11 opengl"

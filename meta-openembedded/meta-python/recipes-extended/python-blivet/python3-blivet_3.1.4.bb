@@ -25,7 +25,7 @@ SRC_URI = "git://github.com/rhinstaller/blivet;branch=3.1-release \
 
 UPSTREAM_CHECK_GITTAGREGEX = "blivet-(?P<pver>\d+(\.\d+)+)$"
 
-inherit distro_features_check
+inherit features_check
 REQUIRED_DISTRO_FEATURES = "systemd"
 
 inherit setuptools3 python3native

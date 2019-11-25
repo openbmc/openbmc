@@ -4,7 +4,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=26a8bd75d8f8498bdbbe64a27791d4ee"
 DEPENDS = "garcon exo gtk+3 cairo virtual/libx11 libxml2 libwnck3 vala-native"
 
-inherit xfce gtk-doc gobject-introspection distro_features_check remove-libtool
+inherit xfce gtk-doc gobject-introspection features_check remove-libtool
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

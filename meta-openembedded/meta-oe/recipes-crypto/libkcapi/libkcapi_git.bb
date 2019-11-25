@@ -11,6 +11,7 @@ PV = "1.1.5"
 SRC_URI = " \
     git://github.com/smuellerDD/libkcapi.git \
     file://0001-kcapi-kdf-Move-code-to-fix.patch \
+    file://0001-Use-__builtin_bswap32-on-Clang-if-supported.patch \
 "
 
 inherit autotools

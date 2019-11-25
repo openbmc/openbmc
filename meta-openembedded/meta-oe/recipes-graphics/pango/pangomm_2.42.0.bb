@@ -12,7 +12,7 @@ SRC_URI = "http://ftp.gnome.org/pub/GNOME/sources/pangomm/${SHRT_VER}/pangomm-${
 SRC_URI[md5sum] = "6cffedf2225c4e72645a7d757fb5b832"
 SRC_URI[sha256sum] = "ca6da067ff93a6445780c0b4b226eb84f484ab104b8391fb744a45cbc7edbf56"
 
-inherit distro_features_check autotools pkgconfig
+inherit features_check autotools pkgconfig
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

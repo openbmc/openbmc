@@ -17,7 +17,7 @@ PACKAGECONFIG[zlib] = "--enable-zlib,--disable-zlib,zlib,"
 PACKAGECONFIG[bzip2] = "--enable-libbz2,--disable-libbz2,bzip2,"
 PACKAGECONFIG[readline] = "--enable-libreadline,--disable-libreadline,readline,"
 
-inherit autotools-brokensep pkgconfig distro_features_check
+inherit autotools-brokensep pkgconfig features_check
 
 do_configure_prepend () {
     touch NEWS

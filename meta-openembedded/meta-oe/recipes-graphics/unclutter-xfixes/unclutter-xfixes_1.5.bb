@@ -9,7 +9,7 @@ SRC_URI = "git://github.com/Airblader/unclutter-xfixes.git \
            file://0001-build-use-autotools.patch"
 SRCREV = "10fd337bb77e4e93c3380f630a0555372778a948"
 
-inherit autotools pkgconfig distro_features_check
+inherit autotools pkgconfig features_check
 
 REQUIRED_DISTRO_FEATURES = "x11"
 
