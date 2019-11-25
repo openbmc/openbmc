@@ -25,7 +25,7 @@ PACKAGES_DYNAMIC = "^libxcb-.*"
 
 FILES_${PN} = "${libdir}/libxcb.so.*"
 
-inherit autotools pkgconfig distro_features_check
+inherit autotools pkgconfig features_check
 
 # The libxau and others requires x11 in DISTRO_FEATURES
 REQUIRED_DISTRO_FEATURES = "x11"

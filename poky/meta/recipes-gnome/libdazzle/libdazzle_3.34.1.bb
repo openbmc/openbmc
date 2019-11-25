@@ -8,7 +8,7 @@ BUGTRACKER = "https://gitlab.gnome.org/GNOME/libdazzle/issues"
 LIC_FILES_CHKSUM = "file://COPYING;md5=8f0e2cd40e05189ec81232da84bd6e1a"
 
 GNOMEBASEBUILDCLASS = "meson"
-inherit gnomebase upstream-version-is-even vala distro_features_check gobject-introspection
+inherit gnomebase upstream-version-is-even vala features_check gobject-introspection
 
 DEPENDS = "glib-2.0-native glib-2.0 gtk+3"
 

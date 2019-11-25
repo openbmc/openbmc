@@ -20,7 +20,7 @@ S = "${WORKDIR}/git"
 
 DEPENDS = "systemd libxslt-native xmlto-native docbook-xml-dtd4-native docbook-xsl-stylesheets-native intltool"
 
-inherit pkgconfig autotools systemd distro_features_check
+inherit pkgconfig autotools systemd features_check
 
 REQUIRED_DISTRO_FEATURES = "systemd"
 

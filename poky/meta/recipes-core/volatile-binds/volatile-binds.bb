@@ -11,7 +11,7 @@ SRC_URI = "\
 
 S = "${WORKDIR}"
 
-inherit allarch systemd distro_features_check
+inherit allarch systemd features_check
 
 REQUIRED_DISTRO_FEATURES = "systemd"
 

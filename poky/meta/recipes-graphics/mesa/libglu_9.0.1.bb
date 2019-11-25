@@ -21,7 +21,7 @@ S = "${WORKDIR}/glu-${PV}"
 
 DEPENDS = "virtual/libgl"
 
-inherit autotools pkgconfig distro_features_check
+inherit autotools pkgconfig features_check
 
 # Requires libGL.so which is provided by mesa when x11 in DISTRO_FEATURES
 REQUIRED_DISTRO_FEATURES = "x11 opengl"

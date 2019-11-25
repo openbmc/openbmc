@@ -23,7 +23,7 @@ SRC_URI = "http://dev.gentoo.org/~blueness/${BPN}/${BP}.tar.gz \
 SRC_URI[md5sum] = "ce166b3fdd910c2a4a840378f48fedaf"
 SRC_URI[sha256sum] = "61e4948e9e51271c3cce2bb5311a30b206dd03ef011062e6c627fb007e43f6b8"
 
-inherit autotools update-rc.d qemu pkgconfig distro_features_check
+inherit autotools update-rc.d qemu pkgconfig features_check
 
 CONFLICT_DISTRO_FEATURES = "systemd"
 

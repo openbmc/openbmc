@@ -14,7 +14,7 @@ DEPENDS = "glib-2.0 gtk+3 libpcre2 libxml2-native gperf-native"
 GNOMEBASEBUILDCLASS = "meson"
 GIR_MESON_OPTION = 'gir'
 
-inherit gnomebase gtk-doc distro_features_check upstream-version-is-even gobject-introspection
+inherit gnomebase gtk-doc features_check upstream-version-is-even gobject-introspection
 
 # vapigen.m4 is required when vala is not present (but the one from vala should be used normally)
 SRC_URI += "file://0001-app.cc-use-old-school-asignment-to-avoid-gcc-4.8-err.patch \

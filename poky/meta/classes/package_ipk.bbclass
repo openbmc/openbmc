@@ -154,7 +154,6 @@ def ipk_write_pkg(pkg, d):
                     ctrlfile.write('%s\n' % textwrap.fill(description, width=74, initial_indent=' ', subsequent_indent=' '))
             else:
                 ctrlfile.write(c % tuple(pullData(fs, localdata)))
-        # more fields
 
         custom_fields_chunk = get_package_additional_metadata("ipk", localdata)
         if custom_fields_chunk is not None:

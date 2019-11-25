@@ -8,7 +8,7 @@ PR = "r13"
 
 PACKAGE_ARCH = "${TUNE_PKGARCH}"
 
-inherit packagegroup  distro_features_check
+inherit packagegroup  features_check
 # rdepends on libx11-dev
 REQUIRED_DISTRO_FEATURES = "x11"
 

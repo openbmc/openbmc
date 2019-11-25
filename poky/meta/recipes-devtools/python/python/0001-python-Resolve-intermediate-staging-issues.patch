@@ -1,0 +1,59 @@
+From 77bcb3238b2853d511714544e0f84a37be6c79bf Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Wed, 14 Nov 2012 14:31:24 +0000
+Subject: [PATCH] python: Resolve intermediate staging issues
+
+When cross compiling python, we used to need to install the Makefile, pyconfig.h
+and the python library to their final location before being able to compile the
+rest of python. This change allows us to point python at its own source when
+building, avoiding a variety of sysroot staging issues and simplifying the main
+python recipe.
+
+Upstream-Status: Inappropriate
+RP 2012/11/13
+
+---
+ Lib/distutils/sysconfig.py | 3 +++
+ Lib/sysconfig.py           | 5 ++++-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
+index 2f4b8ca..15bceb5 100644
+--- a/Lib/distutils/sysconfig.py
++++ b/Lib/distutils/sysconfig.py
+@@ -31,6 +31,9 @@ else:
+     # sys.executable can be empty if argv[0] has been changed and Python is
+     # unable to retrieve the real program name
+     project_base = os.getcwd()
++_PYTHONBUILDDIR = os.environ.get("PYTHONBUILDDIR", None)
++if _PYTHONBUILDDIR:
++    project_base = _PYTHONBUILDDIR
+ if os.name == "nt" and "pcbuild" in project_base[-8:].lower():
+     project_base = os.path.abspath(os.path.join(project_base, os.path.pardir))
+ # PC/VS7.1
+diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
+index 9c8350d..bddbe2e 100644
+--- a/Lib/sysconfig.py
++++ b/Lib/sysconfig.py
+@@ -93,6 +93,7 @@ _PREFIX = os.path.normpath(sys.prefix)
+ _EXEC_PREFIX = os.path.normpath(sys.exec_prefix)
+ _CONFIG_VARS = None
+ _USER_BASE = None
++_PYTHONBUILDDIR = os.environ.get("PYTHONBUILDDIR", None)
+ 
+ def _safe_realpath(path):
+     try:
+@@ -100,7 +101,9 @@ def _safe_realpath(path):
+     except OSError:
+         return path
+ 
+-if sys.executable:
++if _PYTHONBUILDDIR:
++    _PROJECT_BASE = _PYTHONBUILDDIR
++elif sys.executable:
+     _PROJECT_BASE = os.path.dirname(_safe_realpath(sys.executable))
+ else:
+     # sys.executable can be empty if argv[0] has been changed and Python is
+-- 
+2.17.1
+

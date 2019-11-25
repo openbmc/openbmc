@@ -9,7 +9,7 @@ SRC_URI[sha256sum] = "d9c899f710c50cfdd00f5f4cdfeaef0687d8497362239bdde93bed6c90
 
 UPSTREAM_CHECK_URI = "http://www.waffle-gl.org/releases.html"
 
-inherit meson distro_features_check lib_package bash-completion
+inherit meson features_check lib_package bash-completion
 
 # This should be overridden per-machine to reflect the capabilities of the GL
 # stack.

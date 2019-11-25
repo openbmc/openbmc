@@ -15,7 +15,7 @@ SRC_URI[md5sum] = "e2845de8d2782b2d31c01ae8d7cd4cbb"
 SRC_URI[sha256sum] = "002958c5528321edd53440235d3c44e71b5b1e09b9177e8daf677450b6c4433d"
 UPSTREAM_CHECK_URI = "https://github.com/anholt/libepoxy/releases"
 
-inherit meson pkgconfig distro_features_check
+inherit meson pkgconfig features_check
 
 REQUIRED_DISTRO_FEATURES = "opengl"
 REQUIRED_DISTRO_FEATURES_class-native = ""

@@ -10,7 +10,7 @@ SRCREV = "3ccd7f6ebae3e1919adf837718c04feb6c2acc61"
 
 S = "${WORKDIR}/git"
 
-inherit cmake distro_features_check
+inherit cmake features_check
 ANY_OF_DISTRO_FEATURES = "x11 wayland"
 REQUIRED_DISTRO_FEATURES = "vulkan"
 

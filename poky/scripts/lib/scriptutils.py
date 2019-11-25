@@ -268,3 +268,13 @@ def is_src_url(param):
     elif param.startswith('git@') or ('@' in param and param.endswith('.git')):
         return True
     return False
+
+def filter_src_subdirs(pth):
+    """
+    Filter out subdirectories of initial unpacked source trees that we do not care about.
+    Used by devtool and recipetool.
+    """
+    dirlist = os.listdir(pth)
+    filterout = ['git.indirectionsymlink', 'source-date-epoch']
+    dirlist = [x for x in dirlist if x not in filterout]
+    return dirlist

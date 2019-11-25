@@ -13,7 +13,7 @@ SRCREV = "d953c127c1146b50d5676618299933950685dcd7"
 
 S = "${WORKDIR}/git"
 
-inherit meson pkgconfig distro_features_check
+inherit meson pkgconfig features_check
 
 
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"

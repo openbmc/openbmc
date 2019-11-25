@@ -26,7 +26,7 @@ UPSTREAM_CHECK_URI = "https://github.com/intel/libva/releases"
 
 DEPENDS = "libdrm virtual/mesa"
 
-inherit autotools pkgconfig distro_features_check
+inherit autotools pkgconfig features_check
 
 REQUIRED_DISTRO_FEATURES = "opengl"
 

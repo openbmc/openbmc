@@ -5,7 +5,7 @@ box UIs, presentations, kiosk style applications and so on."
 HOMEPAGE = "http://www.clutter-project.org/"
 LICENSE = "LGPLv2.1+"
 
-inherit clutter ptest-gnome distro_features_check upstream-version-is-even gobject-introspection
+inherit clutter ptest-gnome features_check upstream-version-is-even gobject-introspection
 # depends on cogl-1.0 which needs opengl
 REQUIRED_DISTRO_FEATURES ?= "opengl"
 

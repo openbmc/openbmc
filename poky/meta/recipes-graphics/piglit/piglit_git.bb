@@ -21,7 +21,7 @@ X11_RDEPS = "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'mesa-demos', '', d)
 
 DEPENDS = "libpng waffle libxkbcommon virtual/libgl python3-mako-native python3-numpy-native python3-six-native virtual/egl"
 
-inherit cmake pkgconfig python3native distro_features_check bash-completion
+inherit cmake pkgconfig python3native features_check bash-completion
 
 # depends on virtual/libgl
 REQUIRED_DISTRO_FEATURES += "opengl"

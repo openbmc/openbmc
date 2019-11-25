@@ -6,7 +6,7 @@ can render without stepping on each others toes."
 HOMEPAGE = "http://wiki.clutter-project.org/wiki/Cogl"
 LICENSE = "MIT"
 
-inherit clutter distro_features_check upstream-version-is-even gobject-introspection
+inherit clutter features_check upstream-version-is-even gobject-introspection
 # cogl-1.0 needs opengl to build
 REQUIRED_DISTRO_FEATURES ?= "opengl"
 

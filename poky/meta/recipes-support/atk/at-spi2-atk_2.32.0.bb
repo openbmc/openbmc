@@ -9,7 +9,7 @@ SRC_URI[archive.sha256sum] = "0b51e6d339fa2bcca3a3e3159ccea574c67b107f1ac8b00047
 DEPENDS = "dbus glib-2.0 glib-2.0-native atk at-spi2-core libxml2"
 
 GNOMEBASEBUILDCLASS = "meson"
-inherit gnomebase distro_features_check upstream-version-is-even
+inherit gnomebase features_check upstream-version-is-even
 
 PACKAGES =+ "${PN}-gnome ${PN}-gtk2"
 

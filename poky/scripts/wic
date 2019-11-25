@@ -403,6 +403,9 @@ def wic_init_parser_rm(subparser):
                         help="path: <image>:<vfat partition><path>")
     subparser.add_argument("-n", "--native-sysroot",
                         help="path to the native sysroot containing the tools")
+    subparser.add_argument("-r", dest="recursive_delete", action="store_true", default=False,
+                        help="remove directories and their contents recursively, "
+                        " this only applies to ext* partition")
 
 def expandtype(rules):
     """

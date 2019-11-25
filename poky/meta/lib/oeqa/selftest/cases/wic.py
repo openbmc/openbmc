@@ -1025,3 +1025,10 @@ class Wic2(WicTestCase):
         # check if it's removed
         result = runCmd("wic ls %s:2/etc/ -n %s" % (images[0], sysroot))
         self.assertTrue('fstab' not in [line.split()[-1] for line in result.output.split('\n') if line])
+
+        # remove non-empty directory
+        runCmd("wic rm -r %s:2/etc/ -n %s" % (images[0], sysroot))
+
+        # check if it's removed
+        result = runCmd("wic ls %s:2/ -n %s" % (images[0], sysroot))
+        self.assertTrue('etc' not in [line.split()[-1] for line in result.output.split('\n') if line])

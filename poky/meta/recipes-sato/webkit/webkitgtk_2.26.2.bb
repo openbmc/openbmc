@@ -24,7 +24,7 @@ SRC_URI = "http://www.webkitgtk.org/releases/${BPN}-${PV}.tar.xz \
 SRC_URI[md5sum] = "65e06fe73ee166447894aaea95038e3b"
 SRC_URI[sha256sum] = "6b80f0637a80818559ac8fd50db3b394f41cb61904fb9b3ed65fa51635806512"
 
-inherit cmake pkgconfig gobject-introspection perlnative distro_features_check upstream-version-is-even gtk-doc
+inherit cmake pkgconfig gobject-introspection perlnative features_check upstream-version-is-even gtk-doc
 
 REQUIRED_DISTRO_FEATURES = "x11 opengl"
 
@@ -98,8 +98,6 @@ EXTRA_OECMAKE_append_x86-x32 = " -DENABLE_JIT=OFF "
 
 SECURITY_CFLAGS_remove_aarch64 = "-fpie"
 SECURITY_CFLAGS_append_aarch64 = " -fPIE"
-
-LDFLAGS_append_toolchain-clang = " -rtlib=compiler-rt"
 
 FILES_${PN} += "${libdir}/webkit2gtk-4.0/injected-bundle/libwebkit2gtkinjectedbundle.so"
 

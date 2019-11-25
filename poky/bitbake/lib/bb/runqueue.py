@@ -2303,16 +2303,22 @@ class RunQueueExecute:
         for tid in changed:
             if tid not in self.rqdata.runq_setscene_tids:
                 continue
-            if tid in self.runq_running:
-                continue
-            if tid in self.scenequeue_covered:
-                # Potentially risky, should we report this hash as a match?
-                logger.info("Already covered setscene for %s so ignoring rehash" % (tid))
-                continue
             if tid not in self.pending_migrations:
                 self.pending_migrations.add(tid)
 
         for tid in self.pending_migrations.copy():
+            if tid in self.runq_running:
+                # Too late, task already running, not much we can do now
+                self.pending_migrations.remove(tid)
+                continue
+
+            if tid in self.scenequeue_covered or tid in self.sq_live:
+                # Already ran this setscene task or it running
+                # Potentially risky, should we report this hash as a match?
+                logger.info("Already covered setscene for %s so ignoring rehash" % (tid))
+                self.pending_migrations.remove(tid)
+                continue
+
             valid = True
             # Check no tasks this covers are running
             for dep in self.sqdata.sq_covered_tasks[tid]:

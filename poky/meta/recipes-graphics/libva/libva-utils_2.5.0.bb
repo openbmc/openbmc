@@ -25,7 +25,7 @@ UPSTREAM_CHECK_URI = "https://github.com/intel/libva-utils/releases"
 
 DEPENDS = "libva"
 
-inherit autotools pkgconfig distro_features_check
+inherit autotools pkgconfig features_check
 
 # depends on libva which requires opengl
 REQUIRED_DISTRO_FEATURES = "opengl"

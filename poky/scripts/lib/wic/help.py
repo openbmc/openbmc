@@ -422,6 +422,7 @@ NAME
 SYNOPSIS
     wic rm <src> <image>:<partition><path>
     wic rm <src> <image>:<partition><path> --native-sysroot <path>
+    wic rm -r <image>:<partition><path>
 
 DESCRIPTION
     This command removes files or directories from the vfat or ext* partition of the
@@ -456,6 +457,9 @@ DESCRIPTION
 
     The -n option is used to specify the path to the native sysroot
     containing the tools(parted and mtools) to use.
+
+    The -r option is used to remove directories and their contents
+    recursively,this only applies to ext* partition.
 """
 
 wic_write_usage = """

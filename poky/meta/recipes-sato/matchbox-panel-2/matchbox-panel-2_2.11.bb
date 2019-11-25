@@ -37,4 +37,4 @@ FILES_${PN} += "${libdir}/matchbox-panel/*.so \
                 ${datadir}/icons/"
 FILES_${PN}-dev += "${libdir}/matchbox-panel/*.la"
 
-inherit autotools pkgconfig distro_features_check gettext
+inherit autotools pkgconfig features_check gettext

@@ -1,6 +1,6 @@
 require avahi.inc
 
-inherit distro_features_check
+inherit features_check
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
 DEPENDS += "avahi"

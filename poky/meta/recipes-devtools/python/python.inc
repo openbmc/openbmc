@@ -8,16 +8,10 @@ INC_PR = "r1"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e466242989bd33c1bd2b6a526a742498"
 
 SRC_URI = "http://www.python.org/ftp/python/${PV}/Python-${PV}.tar.xz \
-           file://bpo-35907-cve-2019-9948.patch \
-           file://bpo-35907-cve-2019-9948-fix.patch \
-           file://bpo-36216-cve-2019-9636.patch \
-           file://bpo-36216-cve-2019-9636-fix.patch \
-           file://CVE-2019-9740.patch \
-           file://CVE-2018-20852.patch \
            "
 
-SRC_URI[md5sum] = "30157d85a2c0479c09ea2cbe61f2aaf5"
-SRC_URI[sha256sum] = "f222ef602647eecb6853681156d32de4450a2c39f4de93bd5b20235f2e660ed7"
+SRC_URI[md5sum] = "b3b6d2c92f42a60667814358ab9f0cfd"
+SRC_URI[sha256sum] = "4d43f033cdbd0aa7b7023c81b0e986fd11e653b5248dac9144d508f11812ba41"
 
 # python recipe is actually python 2.x
 # also, exclude pre-releases for both python 2.x and 3.x
