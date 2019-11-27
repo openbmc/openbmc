@@ -6,9 +6,6 @@
             "power_up_outs": [
                 {"name": "SOFTWARE_PGOOD", "polarity": true},
                 {"name": "BMC_POWER_UP", "polarity": true}
-            ],
-            "reset_outs": [
-                {"name": "BMC_DCM_ALL_RESET_N", "polarity": false}
             ]
         }
     },
@@ -28,11 +25,6 @@
             "name": "SYS_PWROK_BUFF",
             "pin": "R2",
             "direction": "in"
-        },
-        {
-            "name": "BMC_DCM_ALL_RESET_N",
-            "pin": "Q0",
-            "direction": "out"
         }
     ]
 }
