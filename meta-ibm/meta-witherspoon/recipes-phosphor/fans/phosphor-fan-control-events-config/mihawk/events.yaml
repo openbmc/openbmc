@@ -301,6 +301,65 @@ actions:
           - altevents
 
 events:
+    - name: default_fan_floor_on_service_fail
+      precondition:
+          name: services_missing_owner
+          groups:
+              - name: zone0_ambient
+                interface: xyz.openbmc_project.Sensor.Value
+                property:
+                    name: Value
+                    type: int64_t
+          triggers:
+              - name: init
+                method: nameHasOwner
+                handler: setService
+              - name: signal
+                signal: nameOwnerChanged
+                handler: setService
+          events:
+              - name: default_fan_floor
+                groups:
+                    - name: zone0_ambient
+                      interface: xyz.openbmc_project.Sensor.Value
+                      property:
+                          name: Value
+                          type: int64_t
+                triggers:
+                    - name: timer
+                      interval: 5000000
+                      type: oneshot
+                actions:
+                    - name: default_floor_on_missing_owner
+    - name: high_speed_on_occ_service_fails
+      groups:
+          - name: occ0_object
+            interface: org.open_power.OCC.Status
+            property:
+                name: OccActive
+                type: bool
+          - name: occ1_object
+            interface: org.open_power.OCC.Status
+            property:
+                name: OccActive
+                type: bool
+      triggers:
+          - name: init
+            method: nameHasOwner
+            handler: setService
+          - name: signal
+            signal: nameOwnerChanged
+            handler: setService
+      actions:
+          - name: call_actions_based_on_timer
+            timer:
+                interval: 5000000
+                type: oneshot
+            actions:
+                - name: set_speed_on_missing_owner
+                  speed:
+                      value: 255
+                      type: uint64_t
     - name: missing_or_fails_before_high_speed_air
       groups:
           - name: air_cooled_zone0_fans
