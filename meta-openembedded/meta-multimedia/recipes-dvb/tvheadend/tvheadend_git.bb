@@ -22,6 +22,7 @@ EXTRA_OECONF += "--arch=${TARGET_ARCH} \
                  --disable-hdhomerun_static \
                  --disable-ffmpeg_static \
                  --disable-libav \
+                 --python=python3 \
                  "
 
 CLEANBROKEN = "1"

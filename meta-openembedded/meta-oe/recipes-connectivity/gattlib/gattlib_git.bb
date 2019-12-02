@@ -1,0 +1,30 @@
+DESCRIPTION = "Bluetooth library with attribute support"
+SECTION = "libs/network"
+
+LICENSE = "GPLv2+"
+LIC_FILES_CHKSUM = "file://CMakeLists.txt;beginline=1;endline=20;md5=8d5efeb9189b60866baff80ff791bf00"
+
+DEPENDS = "bluez5 glib-2.0"
+DEPENDS += "glib-2.0-native"
+
+PV = "0.2+git${SRCPV}"
+
+SRC_URI = "git://github.com/labapart/gattlib.git"
+SRC_URI += "file://dbus-avoid-strange-chars-from-the-build-dir.patch"
+
+SRCBRANCH = "master"
+SRCREV = "c6a33252221dff904cf277e085e2ce70aced8788"
+
+S = "${WORKDIR}/git"
+
+PACKAGECONFIG[examples] = "-DGATTLIB_BUILD_EXAMPLES=ON,-DGATTLIB_BUILD_EXAMPLES=OFF"
+
+# Set this to force use of DBus API if Bluez version is older than 5.42
+PACKAGECONFIG[force-dbus] = "-DGATTLIB_FORCE_DBUS=TRUE,-DGATTLIB_FORCE_DBUS=FALSE"
+
+EXTRA_OECMAKE += "-DGATTLIB_BUILD_DOCS=OFF"
+
+inherit pkgconfig cmake
+
+FILES_${PN} = "${libdir}/* ${includedir}/*"
+FILES_${PN}-dev = "${includedir}/*"

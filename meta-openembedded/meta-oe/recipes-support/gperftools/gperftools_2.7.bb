@@ -35,5 +35,10 @@ PACKAGECONFIG[static] = "--enable-static,--disable-static,"
 
 PACKAGE_BEFORE_PN += "libtcmalloc-minimal"
 FILES_libtcmalloc-minimal = "${libdir}/libtcmalloc_minimal*${SOLIBS} ${libdir}/libtcmalloc_minimal_debug*${SOLIBS}"
+
+# pprof tool requires Getopt::long and POSIX perl5 modules.
+# Also runs `objdump` on each cpuprofile data file
+RDEPENDS_${PN} += "binutils perl-module-getopt-long perl-module-posix"
+
 RDEPENDS_${PN} += "libtcmalloc-minimal (= ${EXTENDPKGV})"
 

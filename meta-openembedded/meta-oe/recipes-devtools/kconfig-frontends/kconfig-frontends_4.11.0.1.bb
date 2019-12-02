@@ -11,7 +11,7 @@ HOMEPAGE = "https://gitlab.com/ymorin/kconfig-frontends"
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=9b8cf60ff39767ff04b671fca8302408"
 SECTION = "devel"
-DEPENDS += "ncurses flex bison gperf-native bison-native"
+DEPENDS += "ncurses flex-native gperf-native bison-native"
 RDEPENDS_${PN} += "python3 bash"
 SRC_URI = "git://gitlab.com/ymorin/kconfig-frontends.git;protocol=https;branch=4.11.x \
 	   file://0001-Makefile-ensure-frontends-exits-before-writing-into-.patch \

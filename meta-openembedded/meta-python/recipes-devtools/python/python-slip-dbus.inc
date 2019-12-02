@@ -24,6 +24,9 @@ do_compile_prepend() {
     sed -e 's/@VERSION@/${PV}/g' setup.py.in > setup.py
 }
 
+RDEPENDS_${PN} += "\
+${PYTHON_PN}-six \
+"
 # http://errors.yoctoproject.org/Errors/Details/184713/
 # python-native/python: can't open file 'setup.py': [Errno 2] No such file or directory
 CLEANBROKEN = "1"

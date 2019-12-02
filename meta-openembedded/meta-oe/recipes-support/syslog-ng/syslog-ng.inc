@@ -27,7 +27,7 @@ SRC_URI = "https://github.com/balabit/syslog-ng/releases/download/${BP}/${BP}.ta
 
 UPSTREAM_CHECK_URI = "https://github.com/balabit/syslog-ng/releases"
 
-inherit autotools gettext systemd pkgconfig update-rc.d
+inherit autotools gettext systemd pkgconfig update-rc.d multilib_header
 
 EXTRA_OECONF = " \
     --enable-dynamic-linking \
@@ -103,6 +103,8 @@ do_install_append() {
     else
         install ${WORKDIR}/syslog-ng.conf.sysvinit ${D}${sysconfdir}/${BPN}/${BPN}.conf
     fi
+
+    oe_multilib_header syslog-ng/syslog-ng-config.h
 }
 
 FILES_${PN} += "${datadir}/include/scl/ ${datadir}/xsd ${datadir}/tools ${systemd_unitdir}/system/multi-user.target.wants/*"

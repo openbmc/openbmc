@@ -257,7 +257,7 @@ RDEPENDS_packagegroup-meta-oe-support ="\
     "
 
 RDEPENDS_packagegroup-meta-oe-support_remove_arm ="numactl"
-RDEPENDS_packagegroup-meta-oe-support_remove_mipsarch_libc-glibc = "gperftools"
+RDEPENDS_packagegroup-meta-oe-support_remove_mipsarch = "gperftools"
 
 RDEPENDS_packagegroup-meta-oe-support-egl ="\
     freerdp libnice opencv \

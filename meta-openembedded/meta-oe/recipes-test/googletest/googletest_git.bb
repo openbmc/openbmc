@@ -5,6 +5,8 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://googlemock/LICENSE;md5=cbbd27594afd089daa160d3a16dd515a \
                     file://googletest/LICENSE;md5=cbbd27594afd089daa160d3a16dd515a"
 
+PV = "1.10.0"
+
 PROVIDES += "gmock gtest"
 
 S = "${WORKDIR}/git"

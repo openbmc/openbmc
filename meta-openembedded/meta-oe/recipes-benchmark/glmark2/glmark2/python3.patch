@@ -1,0 +1,12 @@
+Use Python 3 instead of Python 2.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/waf b/waf
+index 6ce2a24..de3c898 100755
+--- a/waf
++++ b/waf
+@@ -1 +1 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
