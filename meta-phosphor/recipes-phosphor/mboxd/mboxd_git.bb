@@ -17,7 +17,6 @@ S = "${WORKDIR}/git"
 SRC_URI += "git://github.com/openbmc/mboxbridge.git"
 
 SRC_URI += "file://99-aspeed-lpc-ctrl.rules"
-SRC_URI += "file://aspeed-lpc-ctrl-h.patch"
 
 SRCREV="0acc669979cc5b1b66c2c4e5d975c60779bedd81"
 
@@ -25,10 +24,6 @@ PROVIDES += "mboxctl"
 
 MBOXD_FLASH_SIZE ??= "32M"
 SYSTEMD_SUBSTITUTIONS += "FLASH_SIZE:${MBOXD_FLASH_SIZE}:${PN}.service"
-
-# Hacks because ${STAGING_KERNEL_DIR} points to the kernel source tree, not the
-# installed, pre-processed headers. Requires the aspeed-lpc-ctrl-h patch above.
-CFLAGS_append = " -I include"
 
 do_install_append() {
     install -d ${D}/lib/udev/rules.d
