@@ -15,6 +15,7 @@ SRC_URI = "git://github.com/vrtadmin/clamav-devel;branch=rel/0.99 \
     file://clamd.conf \
     file://freshclam.conf \
     file://volatiles.03_clamav \
+    file://tmpfiles.clamav \
     file://${BPN}.service \
     file://freshclam-native.conf \
     "
@@ -104,11 +105,15 @@ do_install_append_class-target () {
     install -m 666 ${S}/clamav_db/* ${D}/${localstatedir}/lib/clamav/.
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)};then
         install -D -m 0644 ${WORKDIR}/clamav.service ${D}${systemd_unitdir}/system/clamav.service
+        install -d ${D}${sysconfdir}/tmpfiles.d
+        install -m 0644 ${WORKDIR}/tmpfiles.clamav ${D}${sysconfdir}/tmpfiles.d/clamav.conf
     fi
 }
 
 pkg_postinst_ontarget_${PN} () {
-    if [ -e /etc/init.d/populate-volatile.sh ] ; then
+    if command -v systemd-tmpfiles >/dev/null; then
+        systemd-tmpfiles --create ${sysconfdir}/tmpfiles.d/clamav.conf
+    elif [ -e ${sysconfdir}/init.d/populate-volatile.sh ]; then
         ${sysconfdir}/init.d/populate-volatile.sh update
     fi
     mkdir -p ${localstatedir}/lib/clamav
@@ -140,6 +145,7 @@ FILES_${PN}-daemon = "${bindir}/clamconf ${bindir}/clamdtop ${sbindir}/clamd \
 FILES_${PN}-freshclam = "${bindir}/freshclam \
                         ${sysconfdir}/freshclam.conf*  \
                         ${sysconfdir}/clamav ${sysconfdir}/default/volatiles \
+                        ${sysconfdir}/tmpfiles.d/*.conf \
                         ${localstatedir}/lib/clamav \
                         ${docdir}/${PN}-freshclam ${mandir}/man1/freshclam.* \
                         ${mandir}/man5/freshclam.conf.* \

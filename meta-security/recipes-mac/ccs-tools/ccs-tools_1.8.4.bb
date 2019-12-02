@@ -15,7 +15,7 @@ SRC_URI[sha256sum] = "c358b80a2ea77a9dda79dc2a056dae3acaf3a72fcb8481cfb1cd1f1674
 
 S = "${WORKDIR}/${PN}"
 
-inherit distro_features_check
+inherit features_check
 
 do_make(){
     oe_runmake USRLIBDIR=${libdir} all

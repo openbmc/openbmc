@@ -17,6 +17,8 @@ S = "${WORKDIR}/git"
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[oxygen] = ",--disable-doxygen-doc, "
 
+EXTRA_OECONF += "--with-udevrulesdir=${base_prefix}/lib/udev/rules.d/"
+
 do_configure_prepend () {
        ./bootstrap
 }
@@ -74,6 +76,6 @@ FILES_libtss2-dev = " \
     ${libdir}/libtss2*so"
 FILES_libtss2-staticdev = "${libdir}/libtss*a"
 
-FILES_${PN} = "${libdir}/udev"
+FILES_${PN} = "${libdir}/udev ${base_prefix}/lib/udev"
 
 RDEPENDS_libtss2 = "libgcrypt"

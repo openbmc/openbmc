@@ -1,0 +1,23 @@
+From f3073b8e06a607677d47ad9a19533b2e33408a4f Mon Sep 17 00:00:00 2001
+From: Christopher Larson <chris_larson@mentor.com>
+Date: Wed, 5 Sep 2018 23:21:43 +0500
+Subject: [PATCH] check-setuid: use more portable find args
+
+Signed-off-by: Christopher Larson <chris_larson@mentor.com>
+---
+ plugins/check-setuid | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+Index: checksecurity-2.0.15/plugins/check-setuid
+===================================================================
+--- checksecurity-2.0.15.orig/plugins/check-setuid	2018-09-06 00:49:23.930934294 +0500
++++ checksecurity-2.0.15/plugins/check-setuid	2018-09-06 00:49:49.694934757 +0500
+@@ -99,7 +99,7 @@
+ ionice -t -c3 \
+ find `mount | grep -vE "$CHECKSECURITY_FILTER" | cut -d ' ' -f 3` \
+ 	-xdev $PATHCHK \
+-	\( -type f -perm +06000 -o \( \( -type b -o -type c \) \
++	\( -type f \( -perm -4000 -o -perm -2000 \) -o \( \( -type b -o -type c \) \
+ 	$DEVCHK \) \) \
+         -ignore_readdir_race  \
+ 	-printf "%8i %5m %3n %-10u %-10g %9s %t %h/%f\n" |

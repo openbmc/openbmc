@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;beginline=1;endline=2;md5=c70d8d3310941dcdfcd
 
 SRC_URI += " \
     file://volatiles.03_suricata \
+    file://tmpfiles.suricata \
     file://suricata.yaml \
     file://suricata.service \
     file://run-ptest \
@@ -59,14 +60,19 @@ do_install_append () {
 
     install -m 0644 ${S}/threshold.config ${D}${sysconfdir}/suricata
 
-    install -d ${D}${systemd_unitdir}/system
-    sed  -e s:/etc:${sysconfdir}:g \
-         -e s:/var/run:/run:g \
-         -e s:/var:${localstatedir}:g \
-         -e s:/usr/bin:${bindir}:g \
-         -e s:/bin/kill:${base_bindir}/kill:g \
-         -e s:/usr/lib:${libdir}:g \
-         ${WORKDIR}/suricata.service > ${D}${systemd_unitdir}/system/suricata.service
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+        install -d ${D}${sysconfdir}/tmpfiles.d
+        install -m 0644 ${WORKDIR}/tmpfiles.suricata ${D}${sysconfdir}/tmpfiles.d/suricata.conf
+
+        install -d ${D}${systemd_unitdir}/system
+        sed  -e s:/etc:${sysconfdir}:g \
+             -e s:/var/run:/run:g \
+             -e s:/var:${localstatedir}:g \
+             -e s:/usr/bin:${bindir}:g \
+             -e s:/bin/kill:${base_bindir}/kill:g \
+             -e s:/usr/lib:${libdir}:g \
+             ${WORKDIR}/suricata.service > ${D}${systemd_unitdir}/system/suricata.service
+    fi
 
     # Remove /var/run as it is created on startup
     rm -rf ${D}${localstatedir}/run
@@ -74,7 +80,9 @@ do_install_append () {
 }
 
 pkg_postinst_ontarget_${PN} () {
-if [ -e /etc/init.d/populate-volatile.sh ] ; then
+if command -v systemd-tmpfiles >/dev/null; then
+    systemd-tmpfiles --create ${sysconfdir}/tmpfiles.d/suricata.conf
+elif [ -e ${sysconfdir}/init.d/populate-volatile.sh ]; then
     ${sysconfdir}/init.d/populate-volatile.sh update
 fi
 }
@@ -82,7 +90,7 @@ fi
 SYSTEMD_PACKAGES = "${PN}"
 
 PACKAGES =+ "${PN}-socketcontrol"
-FILES_${PN} += "${systemd_unitdir}"
+FILES_${PN} += "${systemd_unitdir} ${sysconfdir}/tmpfiles.d"
 FILES_${PN}-socketcontrol = "${bindir}/suricatasc ${PYTHON_SITEPACKAGES_DIR}"
 
 CONFFILES_${PN} = "${sysconfdir}/suricata/suricata.yaml"

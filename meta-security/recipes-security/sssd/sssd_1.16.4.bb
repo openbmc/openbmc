@@ -14,7 +14,7 @@ SRC_URI = "https://releases.pagure.org/SSSD/${BPN}/${BP}.tar.gz\
 SRC_URI[md5sum] = "757bbb6f15409d8d075f4f06cb678d50"
 SRC_URI[sha256sum] = "6bb212cd6b75b918e945c24e7c3f95a486fb54d7f7d489a9334cfa1a1f3bf959"
 
-inherit autotools pkgconfig gettext python-dir distro_features_check
+inherit autotools pkgconfig gettext python-dir features_check
 
 REQUIRED_DISTRO_FEATURES = "pam"
 
