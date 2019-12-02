@@ -31,7 +31,3 @@ DEPENDS += " \
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/kcsbridge.git"
 SRCREV = "46525ae48db23333493ac927c12ed13a0e663de5"
-
-# This is how linux-libc-headers says to include custom uapi headers
-CFLAGS_append = " -I ${STAGING_KERNEL_DIR}/include/uapi"
-do_configure[depends] += "virtual/kernel:do_shared_workdir"
