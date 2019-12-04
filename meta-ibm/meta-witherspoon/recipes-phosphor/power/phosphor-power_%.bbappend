@@ -1,5 +1,7 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
+inherit obmc-phosphor-systemd
+
 SRC_URI += "file://psu.json"
 
 EXTRA_OEMESON += "-Ducd90160-yaml=${STAGING_DIR_HOST}${datadir}/power-sequencer/ucd90160.yaml"
@@ -12,4 +14,4 @@ do_install_append(){
 FILES_${PN} += "${datadir}/phosphor-power/psu.json"
 
 PSU_MONITOR_ENV_FMT = "obmc/power-supply-monitor/power-supply-monitor-{0}.conf"
-SYSTEMD_ENVIRONMENT_FILE_${PN} += "${@compose_list(d, 'PSU_MONITOR_ENV_FMT', 'OBMC_POWER_SUPPLY_INSTANCES')}"
+SYSTEMD_ENVIRONMENT_FILE_${PN}_append_ibm-ac-server += "${@compose_list(d, 'PSU_MONITOR_ENV_FMT', 'OBMC_POWER_SUPPLY_INSTANCES')}"
