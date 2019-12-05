@@ -13,6 +13,6 @@ SRC_URI += " \
 S = "${WORKDIR}/git"
 LIC_FILES_CHKSUM = "file://${S}/COPYING;md5=9aa91e13d644326bf281924212862184"
 
-EXTRA_OECONF_append = " --enable-intf-dbus DEFAULT_INTF=dbus "
+EXTRA_OECONF_append = " --disable-ipmishell --enable-intf-dbus DEFAULT_INTF=dbus "
 
 PV = "1.8.18+git${SRCPV}"
