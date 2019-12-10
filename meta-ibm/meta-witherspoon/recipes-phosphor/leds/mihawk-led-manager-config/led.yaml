@@ -146,3 +146,369 @@ LampTest:
         DutyOn: 50
         Period: 1000
         Priority: 'Blink'
+core0Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+core1Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+core2Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+core3Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+core4Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+core5Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+core6Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+core7Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+core8Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+core9Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+core10Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+core11Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+core12Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+core13Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+core14Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+core15Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+core16Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+core17Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+core18Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+core19Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+core20Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+core21Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+core22Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+core23Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+cpu0Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+cpu1Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm0Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm1Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm2Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm3Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm4Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm5Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm6Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm7Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm8Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm9Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm10Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm11Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm12Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm13Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm14Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm15Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm16Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm17Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm18Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm19Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm20Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm21Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm22Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm23Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm24Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm25Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm26Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm27Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm28Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm29Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm30Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+dimm31Fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+motherboardFault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+occFault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+systemFault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
