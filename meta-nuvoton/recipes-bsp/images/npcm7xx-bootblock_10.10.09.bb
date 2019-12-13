@@ -4,7 +4,7 @@ HOMEPAGE = "https://github.com/Nuvoton-Israel/npcm7xx-bootblock"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-FILENAME = "Poleg_bootblock.bin"
+FILENAME = "Poleg_bootblock_${PV}.bin"
 
 S = "${WORKDIR}"
 
@@ -20,7 +20,7 @@ SRC_URI[bin.sha256sum] = "05f71da6ebb7798679fcffdcc928fbada8f941bd8e7a374ebc8261
 inherit deploy
 
 do_deploy () {
-	install -D -m 644 ${WORKDIR}/${FILENAME} ${DEPLOYDIR}/
+	install -D -m 644 ${WORKDIR}/${FILENAME} ${DEPLOYDIR}/Poleg_bootblock.bin
 }
 
 addtask deploy before do_build after do_compile

@@ -1,0 +1,9 @@
+[Unit]
+Description=Shutdown Host Server
+Requires=host-gpio.service
+After=host-gpio.service
+
+[Service]
+Type=oneshot
+ExecStart=busctl set-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis RequestedPowerTransition s xyz.openbmc_project.State.Chassis.Transition.Off
+SyslogIdentifier=phosphor-watchdog
