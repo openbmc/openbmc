@@ -25,10 +25,10 @@ ZAIUS_ITEMS += " onewire2.conf"
 ZAIUS_ITEMS += " onewire3.conf"
 
 ZAIUS_OCCS = " \
-              00:00:00:06/sbefifo1-dev0/occ-hwmon.1 \
-              00:00:00:0a/fsi1/slave@01:00/01:01:00:06/sbefifo2-dev0/occ-hwmon.2 \
+              00--00--00--06/sbefifo1-dev0/occ-hwmon.1 \
+              00--00--00--0a/fsi1/slave@01--00/01--01--00--06/sbefifo2-dev0/occ-hwmon.2 \
               "
-ZAIUS_OCCSFMT = "devices/platform/gpio-fsi/fsi0/slave@00:00/{0}.conf"
+ZAIUS_OCCSFMT = "devices/platform/gpio-fsi/fsi0/slave@00--00/{0}.conf"
 ZAIUS_OCCITEMS = "${@compose_list(d, 'ZAIUS_OCCSFMT', 'ZAIUS_OCCS')}"
 
 ENVS = "obmc/hwmon/{0}"
