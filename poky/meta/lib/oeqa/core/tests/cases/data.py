@@ -5,7 +5,7 @@
 #
 
 from oeqa.core.case import OETestCase
-from oeqa.core.decorator.oetag import OETestTag
+from oeqa.core.decorator import OETestTag
 from oeqa.core.decorator.data import OETestDataDepends
 
 class DataTest(OETestCase):

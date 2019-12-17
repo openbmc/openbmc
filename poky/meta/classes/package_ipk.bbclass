@@ -14,7 +14,7 @@ OPKG_ARGS += "--force_postinstall --prefer-arch-to-version"
 OPKG_ARGS += "${@['', '--no-install-recommends'][d.getVar("NO_RECOMMENDATIONS") == "1"]}"
 OPKG_ARGS += "${@['', '--add-exclude ' + ' --add-exclude '.join((d.getVar('PACKAGE_EXCLUDE') or "").split())][(d.getVar("PACKAGE_EXCLUDE") or "").strip() != ""]}"
 
-OPKGLIBDIR = "${localstatedir}/lib"
+OPKGLIBDIR ??= "${localstatedir}/lib"
 
 python do_package_ipk () {
     workdir = d.getVar('WORKDIR')
@@ -154,7 +154,6 @@ def ipk_write_pkg(pkg, d):
                     ctrlfile.write('%s\n' % textwrap.fill(description, width=74, initial_indent=' ', subsequent_indent=' '))
             else:
                 ctrlfile.write(c % tuple(pullData(fs, localdata)))
-        # more fields
 
         custom_fields_chunk = get_package_additional_metadata("ipk", localdata)
         if custom_fields_chunk is not None:

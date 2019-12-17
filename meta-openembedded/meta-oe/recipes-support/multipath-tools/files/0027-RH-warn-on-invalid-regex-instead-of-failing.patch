@@ -1,10 +1,7 @@
-From 56d65ecb1c6d814929f6ff3159ade09dc203cc83 Mon Sep 17 00:00:00 2001
-From: Changqing Li <changqing.li@windriver.com>
-Date: Mon, 26 Nov 2018 10:31:30 +0800
-Subject: [PATCH] From 0000000000000000000000000000000000000000 Mon Sep 17
- 00:00:00 2001 From: Benjamin Marzinski <bmarzins@redhat.com> Date: Mon, 6 Nov
- 2017 21:39:28 -0600 Subject: [PATCH] RH: warn on invalid regex instead of
- failing
+From 0000000000000000000000000000000000000000 Mon Sep 17
+00:00:00 2001 From: Benjamin Marzinski <bmarzins@redhat.com> Date: Mon, 6 Nov
+2017 21:39:28 -0600 Subject: [PATCH] RH: warn on invalid regex instead of
+failing
 
 multipath.conf used to allow "*" as a match everything regular expression,
 instead of requiring ".*". Instead of erroring when the old style
@@ -15,10 +12,9 @@ Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
 
 Upstream-Status: Pending
 
-update this patch to new version
+update this patch to 0.8.2
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
-
 ---
  libmultipath/dict.c   | 29 ++++++++++++++++++++++-------
  libmultipath/parser.c | 13 +++++++++++++
@@ -26,7 +22,7 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  3 files changed, 36 insertions(+), 7 deletions(-)
 
 diff --git a/libmultipath/dict.c b/libmultipath/dict.c
-index eaad4f1..fb30577 100644
+index c6eba0f..05ed3d8 100644
 --- a/libmultipath/dict.c
 +++ b/libmultipath/dict.c
 @@ -59,6 +59,21 @@ set_str(vector strvec, void *ptr)
@@ -51,7 +47,7 @@ index eaad4f1..fb30577 100644
  set_yes_no(vector strvec, void *ptr)
  {
  	char * buff;
-@@ -1373,8 +1388,8 @@ ble_ ## option ## _handler (struct config *conf, vector strvec)		\
+@@ -1415,8 +1430,8 @@ ble_ ## option ## _handler (struct config *conf, vector strvec)		\
  									\
  	if (!conf->option)						\
  		return 1;						\
@@ -62,7 +58,7 @@ index eaad4f1..fb30577 100644
  	if (!buff)							\
  		return 1;						\
  									\
-@@ -1390,7 +1405,7 @@ ble_ ## option ## _ ## name ## _handler (struct config *conf, vector strvec) \
+@@ -1432,7 +1447,7 @@ ble_ ## option ## _ ## name ## _handler (struct config *conf, vector strvec) \
  	if (!conf->option)						\
  		return 1;						\
  									\
@@ -71,7 +67,7 @@ index eaad4f1..fb30577 100644
  	if (!buff)							\
  		return 1;						\
  									\
-@@ -1493,16 +1508,16 @@ device_handler(struct config *conf, vector strvec)
+@@ -1535,16 +1550,16 @@ device_handler(struct config *conf, vector strvec)
  	return 0;
  }
  
@@ -93,11 +89,11 @@ index eaad4f1..fb30577 100644
  
  declare_hw_handler(hwhandler, set_str)
 diff --git a/libmultipath/parser.c b/libmultipath/parser.c
-index 92ef7cf..0e2cf49 100644
+index e00c5ff..6ca5842 100644
 --- a/libmultipath/parser.c
 +++ b/libmultipath/parser.c
-@@ -384,6 +384,19 @@ set_value(vector strvec)
- 	return alloc;
+@@ -382,6 +382,19 @@ oom:
+ 	return NULL;
  }
  
 +void *
@@ -128,3 +124,6 @@ index 62906e9..b791705 100644
  extern int process_file(struct config *conf, char *conf_file);
  extern struct keyword * find_keyword(vector keywords, vector v, char * name);
  int snprint_keyword(char *buff, int len, char *fmt, struct keyword *kw,
+-- 
+2.7.4
+

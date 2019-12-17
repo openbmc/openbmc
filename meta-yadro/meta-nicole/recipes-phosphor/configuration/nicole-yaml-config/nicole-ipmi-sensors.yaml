@@ -1,0 +1,741 @@
+2:
+    entityID: 34
+    entityInstance: 1
+    interfaces:
+        xyz.openbmc_project.State.Boot.Progress:
+            BootProgress:
+                Offsets:
+                    0:
+                        set: xyz.openbmc_project.State.Boot.Progress.ProgressStages.Unspecified
+                        type: string
+                    1:
+                        set: xyz.openbmc_project.State.Boot.Progress.ProgressStages.MemoryInit
+                        type: string
+                    3:
+                        set: xyz.openbmc_project.State.Boot.Progress.ProgressStages.SecondaryProcInit
+                        type: string
+                    7:
+                        set: xyz.openbmc_project.State.Boot.Progress.ProgressStages.PCIInit
+                        type: string
+                    19:
+                        set: xyz.openbmc_project.State.Boot.Progress.ProgressStages.OSStart
+                        type: string
+                    20:
+                        set: xyz.openbmc_project.State.Boot.Progress.ProgressStages.MotherboardInit
+                        type: string
+    mutability: Mutability::Write|Mutability::Read
+    path: /xyz/openbmc_project/state/host0
+    readingType: eventdata2
+    sensorNamePattern: nameProperty
+    sensorReadingType: 111
+    sensorType: 15
+    serviceInterface: org.freedesktop.DBus.Properties
+3: &OCC_DEFAULTS
+    entityID: 210
+    entityInstance: 1
+    interfaces:
+        org.open_power.OCC.Status:
+            OccActive:
+                Offsets:
+                    0:
+                        assert: false
+                        deassert: true
+                        type: bool
+                    1:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /org/open_power/control/occ0
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 9
+    sensorType: 7
+    serviceInterface: org.freedesktop.DBus.Properties
+4:
+    <<: *OCC_DEFAULTS
+    entityInstance: 2
+    path: /org/open_power/control/occ1
+8: &CPU_DEFAULTS
+    entityID: 3
+    entityInstance: 1
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+9:
+    <<: *CPU_DEFAULTS
+    entityInstance: 2
+    path: /system/chassis/motherboard/cpu1
+11: &DIMM_FUNC_DEFAULTS
+    entityID: 32
+    entityInstance: 1
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    4:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    6:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/dimm0
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 111
+    sensorType: 12
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+12:
+    <<: *DIMM_FUNC_DEFAULTS
+    entityInstance: 2
+    path: /system/chassis/motherboard/dimm1
+13:
+    <<: *DIMM_FUNC_DEFAULTS
+    entityInstance: 3
+    path: /system/chassis/motherboard/dimm2
+14:
+    <<: *DIMM_FUNC_DEFAULTS
+    entityInstance: 4
+    path: /system/chassis/motherboard/dimm3
+15:
+    <<: *DIMM_FUNC_DEFAULTS
+    entityInstance: 5
+    path: /system/chassis/motherboard/dimm4
+16:
+    <<: *DIMM_FUNC_DEFAULTS
+    entityInstance: 6
+    path: /system/chassis/motherboard/dimm5
+17:
+    <<: *DIMM_FUNC_DEFAULTS
+    entityInstance: 7
+    path: /system/chassis/motherboard/dimm6
+18:
+    <<: *DIMM_FUNC_DEFAULTS
+    entityInstance: 8
+    path: /system/chassis/motherboard/dimm7
+19:
+    <<: *DIMM_FUNC_DEFAULTS
+    entityInstance: 9
+    path: /system/chassis/motherboard/dimm8
+20:
+    <<: *DIMM_FUNC_DEFAULTS
+    entityInstance: 10
+    path: /system/chassis/motherboard/dimm9
+21:
+    <<: *DIMM_FUNC_DEFAULTS
+    entityInstance: 11
+    path: /system/chassis/motherboard/dimm10
+22:
+    <<: *DIMM_FUNC_DEFAULTS
+    entityInstance: 12
+    path: /system/chassis/motherboard/dimm11
+23:
+    <<: *DIMM_FUNC_DEFAULTS
+    entityInstance: 13
+    path: /system/chassis/motherboard/dimm12
+24:
+    <<: *DIMM_FUNC_DEFAULTS
+    entityInstance: 14
+    path: /system/chassis/motherboard/dimm13
+25:
+    <<: *DIMM_FUNC_DEFAULTS
+    entityInstance: 15
+    path: /system/chassis/motherboard/dimm14
+26:
+    <<: *DIMM_FUNC_DEFAULTS
+    entityInstance: 16
+    path: /system/chassis/motherboard/dimm15
+27: &DIMM_TEMP_DEFAULTS
+    bExp: 0
+    entityID: 32
+    entityInstance: 17
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 5
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: 0
+    path: /xyz/openbmc_project/sensors/temperature/dimm0_temp
+    rExp: -1
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+28:
+    <<: *DIMM_TEMP_DEFAULTS
+    entityInstance: 18
+    path: /xyz/openbmc_project/sensors/temperature/dimm1_temp
+29:
+    <<: *DIMM_TEMP_DEFAULTS
+    entityInstance: 25
+    path: /xyz/openbmc_project/sensors/temperature/dimm2_temp
+30:
+    <<: *DIMM_TEMP_DEFAULTS
+    entityInstance: 26
+    path: /xyz/openbmc_project/sensors/temperature/dimm3_temp
+31:
+    <<: *DIMM_TEMP_DEFAULTS
+    entityInstance: 27
+    path: /xyz/openbmc_project/sensors/temperature/dimm4_temp
+32:
+    <<: *DIMM_TEMP_DEFAULTS
+    entityInstance: 28
+    path: /xyz/openbmc_project/sensors/temperature/dimm5_temp
+33:
+    <<: *DIMM_TEMP_DEFAULTS
+    entityInstance: 29
+    path: /xyz/openbmc_project/sensors/temperature/dimm6_temp
+34:
+    <<: *DIMM_TEMP_DEFAULTS
+    entityInstance: 30
+    path: /xyz/openbmc_project/sensors/temperature/dimm7_temp
+35:
+    <<: *DIMM_TEMP_DEFAULTS
+    entityInstance: 31
+    path: /xyz/openbmc_project/sensors/temperature/dimm8_temp
+36:
+    <<: *DIMM_TEMP_DEFAULTS
+    entityInstance: 32
+    path: /xyz/openbmc_project/sensors/temperature/dimm9_temp
+37:
+    <<: *DIMM_TEMP_DEFAULTS
+    entityInstance: 19
+    path: /xyz/openbmc_project/sensors/temperature/dimm10_temp
+38:
+    <<: *DIMM_TEMP_DEFAULTS
+    entityInstance: 20
+    path: /xyz/openbmc_project/sensors/temperature/dimm11_temp
+39:
+    <<: *DIMM_TEMP_DEFAULTS
+    entityInstance: 21
+    path: /xyz/openbmc_project/sensors/temperature/dimm12_temp
+40:
+    <<: *DIMM_TEMP_DEFAULTS
+    entityInstance: 22
+    path: /xyz/openbmc_project/sensors/temperature/dimm13_temp
+41:
+    <<: *DIMM_TEMP_DEFAULTS
+    entityInstance: 23
+    path: /xyz/openbmc_project/sensors/temperature/dimm14_temp
+42:
+    <<: *DIMM_TEMP_DEFAULTS
+    entityInstance: 24
+    path: /xyz/openbmc_project/sensors/temperature/dimm15_temp
+43: &CORE_FUNC_DEFAULTS
+    entityID: 208
+    entityInstance: 1
+    interfaces:
+        xyz.openbmc_project.Inventory.Item:
+            Present:
+                Offsets:
+                    7:
+                        assert: true
+                        deassert: false
+                        skipOn: deassert
+                        type: bool
+        xyz.openbmc_project.State.Decorator.OperationalStatus:
+            Functional:
+                Offsets:
+                    8:
+                        assert: false
+                        deassert: true
+                        type: bool
+                Prereqs:
+                    7:
+                        assert: true
+                        deassert: false
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /system/chassis/motherboard/cpu0/core0
+    readingType: assertion
+    sensorNamePattern: nameParentLeaf
+    sensorReadingType: 111
+    sensorType: 7
+    serviceInterface: xyz.openbmc_project.Inventory.Manager
+44:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 2
+    path: /system/chassis/motherboard/cpu0/core1
+45:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 3
+    path: /system/chassis/motherboard/cpu0/core2
+46:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 4
+    path: /system/chassis/motherboard/cpu0/core3
+47:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 5
+    path: /system/chassis/motherboard/cpu0/core4
+48:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 6
+    path: /system/chassis/motherboard/cpu0/core5
+49:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 7
+    path: /system/chassis/motherboard/cpu0/core6
+50:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 8
+    path: /system/chassis/motherboard/cpu0/core7
+51:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 9
+    path: /system/chassis/motherboard/cpu0/core8
+52:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 10
+    path: /system/chassis/motherboard/cpu0/core9
+53:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 11
+    path: /system/chassis/motherboard/cpu0/core10
+54:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 12
+    path: /system/chassis/motherboard/cpu0/core11
+55:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 13
+    path: /system/chassis/motherboard/cpu0/core12
+56:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 14
+    path: /system/chassis/motherboard/cpu0/core13
+57:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 15
+    path: /system/chassis/motherboard/cpu0/core14
+58:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 16
+    path: /system/chassis/motherboard/cpu0/core15
+59:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 17
+    path: /system/chassis/motherboard/cpu0/core16
+60:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 18
+    path: /system/chassis/motherboard/cpu0/core17
+61:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 19
+    path: /system/chassis/motherboard/cpu0/core18
+62:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 20
+    path: /system/chassis/motherboard/cpu0/core19
+63:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 21
+    path: /system/chassis/motherboard/cpu0/core20
+64:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 22
+    path: /system/chassis/motherboard/cpu0/core21
+65:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 23
+    path: /system/chassis/motherboard/cpu0/core22
+66:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 24
+    path: /system/chassis/motherboard/cpu0/core23
+67:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 25
+    path: /system/chassis/motherboard/cpu1/core0
+68:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 26
+    path: /system/chassis/motherboard/cpu1/core1
+69:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 27
+    path: /system/chassis/motherboard/cpu1/core2
+70:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 28
+    path: /system/chassis/motherboard/cpu1/core3
+71:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 29
+    path: /system/chassis/motherboard/cpu1/core4
+72:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 30
+    path: /system/chassis/motherboard/cpu1/core5
+73:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 31
+    path: /system/chassis/motherboard/cpu1/core6
+74:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 32
+    path: /system/chassis/motherboard/cpu1/core7
+75:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 33
+    path: /system/chassis/motherboard/cpu1/core8
+76:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 34
+    path: /system/chassis/motherboard/cpu1/core9
+77:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 35
+    path: /system/chassis/motherboard/cpu1/core10
+78:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 36
+    path: /system/chassis/motherboard/cpu1/core11
+79:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 37
+    path: /system/chassis/motherboard/cpu1/core12
+80:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 38
+    path: /system/chassis/motherboard/cpu1/core13
+81:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 39
+    path: /system/chassis/motherboard/cpu1/core14
+82:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 40
+    path: /system/chassis/motherboard/cpu1/core15
+83:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 41
+    path: /system/chassis/motherboard/cpu1/core16
+84:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 42
+    path: /system/chassis/motherboard/cpu1/core17
+85:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 43
+    path: /system/chassis/motherboard/cpu1/core18
+86:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 44
+    path: /system/chassis/motherboard/cpu1/core19
+87:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 45
+    path: /system/chassis/motherboard/cpu1/core20
+88:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 46
+    path: /system/chassis/motherboard/cpu1/core21
+89:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 47
+    path: /system/chassis/motherboard/cpu1/core22
+90:
+    <<: *CORE_FUNC_DEFAULTS
+    entityInstance: 48
+    path: /system/chassis/motherboard/cpu1/core23
+91: &CORE_TEMP_DEFAULTS
+    bExp: 0
+    entityID: 208
+    entityInstance: 49
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: int64_t
+    multiplierM: 5
+    mutability: Mutability::Write|Mutability::Read
+    offsetB: 0
+    path: /xyz/openbmc_project/sensors/temperature/p0_core0_temp
+    rExp: -1
+    readingType: readingData
+    scale: -3
+    sensorNamePattern: nameLeaf
+    sensorReadingType: 1
+    sensorType: 1
+    serviceInterface: org.freedesktop.DBus.Properties
+    unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+92:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 50
+    path: /xyz/openbmc_project/sensors/temperature/p0_core1_temp
+93:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 51
+    path: /xyz/openbmc_project/sensors/temperature/p0_core2_temp
+94:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 52
+    path: /xyz/openbmc_project/sensors/temperature/p0_core3_temp
+95:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 53
+    path: /xyz/openbmc_project/sensors/temperature/p0_core4_temp
+96:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 54
+    path: /xyz/openbmc_project/sensors/temperature/p0_core5_temp
+97:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 55
+    path: /xyz/openbmc_project/sensors/temperature/p0_core6_temp
+98:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 56
+    path: /xyz/openbmc_project/sensors/temperature/p0_core7_temp
+99:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 57
+    path: /xyz/openbmc_project/sensors/temperature/p0_core8_temp
+100:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 58
+    path: /xyz/openbmc_project/sensors/temperature/p0_core9_temp
+101:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 59
+    path: /xyz/openbmc_project/sensors/temperature/p0_core10_temp
+102:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 60
+    path: /xyz/openbmc_project/sensors/temperature/p0_core11_temp
+103:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 61
+    path: /xyz/openbmc_project/sensors/temperature/p0_core12_temp
+104:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 62
+    path: /xyz/openbmc_project/sensors/temperature/p0_core13_temp
+105:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 63
+    path: /xyz/openbmc_project/sensors/temperature/p0_core14_temp
+106:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 64
+    path: /xyz/openbmc_project/sensors/temperature/p0_core15_temp
+107:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 65
+    path: /xyz/openbmc_project/sensors/temperature/p0_core16_temp
+108:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 66
+    path: /xyz/openbmc_project/sensors/temperature/p0_core17_temp
+109:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 67
+    path: /xyz/openbmc_project/sensors/temperature/p0_core18_temp
+110:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 68
+    path: /xyz/openbmc_project/sensors/temperature/p0_core19_temp
+111:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 69
+    path: /xyz/openbmc_project/sensors/temperature/p0_core20_temp
+112:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 70
+    path: /xyz/openbmc_project/sensors/temperature/p0_core21_temp
+113:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 71
+    path: /xyz/openbmc_project/sensors/temperature/p0_core22_temp
+114:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 72
+    path: /xyz/openbmc_project/sensors/temperature/p0_core23_temp
+115:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 73
+    path: /xyz/openbmc_project/sensors/temperature/p1_core0_temp
+116:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 74
+    path: /xyz/openbmc_project/sensors/temperature/p1_core1_temp
+117:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 75
+    path: /xyz/openbmc_project/sensors/temperature/p1_core2_temp
+118:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 76
+    path: /xyz/openbmc_project/sensors/temperature/p1_core3_temp
+119:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 77
+    path: /xyz/openbmc_project/sensors/temperature/p1_core4_temp
+120:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 78
+    path: /xyz/openbmc_project/sensors/temperature/p1_core5_temp
+121:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 79
+    path: /xyz/openbmc_project/sensors/temperature/p1_core6_temp
+122:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 80
+    path: /xyz/openbmc_project/sensors/temperature/p1_core7_temp
+123:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 81
+    path: /xyz/openbmc_project/sensors/temperature/p1_core8_temp
+124:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 82
+    path: /xyz/openbmc_project/sensors/temperature/p1_core9_temp
+125:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 83
+    path: /xyz/openbmc_project/sensors/temperature/p1_core10_temp
+126:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 84
+    path: /xyz/openbmc_project/sensors/temperature/p1_core11_temp
+127:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 85
+    path: /xyz/openbmc_project/sensors/temperature/p1_core12_temp
+128:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 86
+    path: /xyz/openbmc_project/sensors/temperature/p1_core13_temp
+129:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 87
+    path: /xyz/openbmc_project/sensors/temperature/p1_core14_temp
+130:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 88
+    path: /xyz/openbmc_project/sensors/temperature/p1_core15_temp
+131:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 89
+    path: /xyz/openbmc_project/sensors/temperature/p1_core16_temp
+132:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 90
+    path: /xyz/openbmc_project/sensors/temperature/p1_core17_temp
+133:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 91
+    path: /xyz/openbmc_project/sensors/temperature/p1_core18_temp
+134:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 92
+    path: /xyz/openbmc_project/sensors/temperature/p1_core19_temp
+135:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 93
+    path: /xyz/openbmc_project/sensors/temperature/p1_core20_temp
+136:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 94
+    path: /xyz/openbmc_project/sensors/temperature/p1_core21_temp
+137:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 95
+    path: /xyz/openbmc_project/sensors/temperature/p1_core22_temp
+138:
+    <<: *CORE_TEMP_DEFAULTS
+    entityInstance: 96
+    path: /xyz/openbmc_project/sensors/temperature/p1_core23_temp
+139:
+    entityID: 34
+    entityInstance: 2
+    interfaces:
+        xyz.openbmc_project.Control.Boot.RebootAttempts:
+            AttemptsLeft:
+                Offsets:
+                    255:
+                        type: uint32_t
+    mutability: Mutability::Write|Mutability::Read
+    path: /xyz/openbmc_project/state/host0
+    readingType: readingAssertion
+    sensorNamePattern: nameProperty
+    sensorReadingType: 111
+    sensorType: 195
+    serviceInterface: org.freedesktop.DBus.Properties
+145:
+    entityID: 35
+    entityInstance: 1
+    interfaces:
+        xyz.openbmc_project.State.OperatingSystem.Status:
+            OperatingSystemState:
+                Offsets:
+                    1:
+                        assert: xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.CBoot
+                        type: string
+                    2:
+                        assert: xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.PXEBoot
+                        type: string
+                    3:
+                        assert: xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.DiagBoot
+                        type: string
+                    4:
+                        assert: xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.CDROMBoot
+                        type: string
+                    5:
+                        assert: xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.ROMBoot
+                        type: string
+                    6:
+                        assert: xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.BootComplete
+                        type: string
+    mutability: Mutability::Write|Mutability::Read
+    path: /xyz/openbmc_project/state/host0
+    readingType: assertion
+    sensorNamePattern: nameProperty
+    sensorReadingType: 111
+    sensorType: 31
+    serviceInterface: org.freedesktop.DBus.Properties

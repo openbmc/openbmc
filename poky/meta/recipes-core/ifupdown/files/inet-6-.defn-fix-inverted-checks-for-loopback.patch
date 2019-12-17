@@ -1,7 +1,7 @@
-From 7efe4676747e4e4a056b9bfb4e9424c8354e9996 Mon Sep 17 00:00:00 2001
+From 6fce99c9e42cbacde1855473b745ca1fded3fbf7 Mon Sep 17 00:00:00 2001
 From: "Maxin B. John" <maxin.john@intel.com>
 Date: Wed, 21 Dec 2016 15:32:07 +0200
-Subject: [PATCH] inet[6].defn: fix inverted checks for loopback
+Subject: [PATCH 2/2] inet[6].defn: fix inverted checks for loopback
 
 Compared to the hurd link.defn for loopback, we see these
 are inverted, meaning that you would only be able to configure
@@ -37,11 +37,11 @@ Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
 Signed-off-by: Maxin B. John <maxin.john@intel.com>
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 ---
- inet.defn | 140 +++++++++++++++++++++++++++++++-------------------------------
- 1 file changed, 70 insertions(+), 70 deletions(-)
+ inet.defn | 134 +++++++++++++++++++++++++++---------------------------
+ 1 file changed, 67 insertions(+), 67 deletions(-)
 
 diff --git a/inet.defn b/inet.defn
-index 75e6744..23c7756 100644
+index 182b56b..31067bc 100644
 --- a/inet.defn
 +++ b/inet.defn
 @@ -6,10 +6,10 @@ method loopback
@@ -103,9 +103,9 @@ index 75e6744..23c7756 100644
  
    up
 -    [[/bin/ip link set dev %iface% address %hwaddress%]]
--    /sbin/dhclient -v -pf /run/dhclient.%iface%.pid -lf /var/lib/dhcp/dhclient.%iface%.leases -I -df /var/lib/dhcp/dhclient6.%iface%.leases %iface% \
+-    /sbin/dhclient -4 -v -pf /run/dhclient.%iface%.pid -lf /var/lib/dhcp/dhclient.%iface%.leases -I -df /var/lib/dhcp/dhclient6.%iface%.leases %iface% \
 +    [[ip link set dev %iface% address %hwaddress%]]
-+    dhclient -v -pf /run/dhclient.%iface%.pid -lf /var/lib/dhcp/dhclient.%iface%.leases -I -df /var/lib/dhcp/dhclient6.%iface%.leases %iface% \
++    dhclient -4 -v -pf /run/dhclient.%iface%.pid -lf /var/lib/dhcp/dhclient.%iface%.leases -I -df /var/lib/dhcp/dhclient6.%iface%.leases %iface% \
  	[[-e IF_METRIC=%metric%]] \
          if (execable("/sbin/dhclient"))
 -    /sbin/pump -i %iface% [[-h %hostname%]] [[-l %leasehours%]] \
@@ -122,14 +122,13 @@ index 75e6744..23c7756 100644
          elsif (1)
  
    down
--    /sbin/dhclient -v -r -pf /run/dhclient.%iface%.pid -lf /var/lib/dhcp/dhclient.%iface%.leases -I -df /var/lib/dhcp/dhclient6.%iface%.leases %iface% \
-+    dhclient -v -r -pf /run/dhclient.%iface%.pid -lf /var/lib/dhcp/dhclient.%iface%.leases -I -df /var/lib/dhcp/dhclient6.%iface%.leases %iface% \
+-    /sbin/dhclient -4 -v -r -pf /run/dhclient.%iface%.pid -lf /var/lib/dhcp/dhclient.%iface%.leases -I -df /var/lib/dhcp/dhclient6.%iface%.leases %iface% \
++    dhclient -4 -v -r -pf /run/dhclient.%iface%.pid -lf /var/lib/dhcp/dhclient.%iface%.leases -I -df /var/lib/dhcp/dhclient6.%iface%.leases %iface% \
          if (execable("/sbin/dhclient"))
 -    /sbin/pump -i %iface% -r \
 +    pump -i %iface% -r \
          elsif (execable("/sbin/pump"))
--    if test -f /run/udhcpc.%iface%.pid; then kill -USR2 $(/bin/cat /run/udhcpc.%iface%.pid); kill -TERM $(/bin/cat /run/udhcpc.%iface%.pid); fi \
-+    if test -f /run/udhcpc.%iface%.pid; then kill -USR2 $(cat /run/udhcpc.%iface%.pid); kill -TERM $(cat /run/udhcpc.%iface%.pid); fi \
+     if test -f /run/udhcpc.%iface%.pid; then kill -USR2 $(/bin/cat /run/udhcpc.%iface%.pid); kill -TERM $(/bin/cat /run/udhcpc.%iface%.pid); fi \
          elsif (execable("/sbin/udhcpc"))
 -    /sbin/dhcpcd -k %iface% \
 +    dhcpcd -k %iface% \
@@ -252,9 +251,9 @@ index 75e6744..23c7756 100644
  
    up
 -    [[/sbin/ifconfig %iface% link %hwaddress%]]
--    /sbin/dhclient -v -pf /run/dhclient.%iface%.pid -lf /var/lib/dhcp/dhclient.%iface%.leases -I -df /var/lib/dhcp/dhclient6.%iface%.leases %iface% \
+-    /sbin/dhclient -4 -v -pf /run/dhclient.%iface%.pid -lf /var/lib/dhcp/dhclient.%iface%.leases -I -df /var/lib/dhcp/dhclient6.%iface%.leases %iface% \
 +    [[ifconfig %iface% link %hwaddress%]]
-+    dhclient -v -pf /run/dhclient.%iface%.pid -lf /var/lib/dhcp/dhclient.%iface%.leases -I -df /var/lib/dhcp/dhclient6.%iface%.leases %iface% \
++    dhclient -4 -v -pf /run/dhclient.%iface%.pid -lf /var/lib/dhcp/dhclient.%iface%.leases -I -df /var/lib/dhcp/dhclient6.%iface%.leases %iface% \
  	[[-e IF_METRIC=%metric%]] \
          if (execable("/sbin/dhclient"))
 -    /sbin/udhcpc -n -p /run/udhcpc.%iface%.pid -i %iface% [[-H %hostname%]] \
@@ -269,11 +268,10 @@ index 75e6744..23c7756 100644
          elsif (1)
  
    down
--    /sbin/dhclient -v -r -pf /run/dhclient.%iface%.pid -lf /var/lib/dhcp/dhclient.%iface%.leases -I -df /var/lib/dhcp/dhclient6.%iface%.leases %iface% \
-+    dhclient -v -r -pf /run/dhclient.%iface%.pid -lf /var/lib/dhcp/dhclient.%iface%.leases -I -df /var/lib/dhcp/dhclient6.%iface%.leases %iface% \
+-    /sbin/dhclient -4 -v -r -pf /run/dhclient.%iface%.pid -lf /var/lib/dhcp/dhclient.%iface%.leases -I -df /var/lib/dhcp/dhclient6.%iface%.leases %iface% \
++    dhclient -4 -v -r -pf /run/dhclient.%iface%.pid -lf /var/lib/dhcp/dhclient.%iface%.leases -I -df /var/lib/dhcp/dhclient6.%iface%.leases %iface% \
          if (execable("/sbin/dhclient"))
--    if test -f /run/udhcpc.%iface%.pid; then kill -USR2 $(/bin/cat /run/udhcpc.%iface%.pid); kill -TERM $(/bin/cat /run/udhcpc.%iface%.pid); fi \
-+    if test -f /run/udhcpc.%iface%.pid; then kill -USR2 $(cat /run/udhcpc.%iface%.pid); kill -TERM $(cat /run/udhcpc.%iface%.pid); fi \
+     if test -f /run/udhcpc.%iface%.pid; then kill -USR2 $(/bin/cat /run/udhcpc.%iface%.pid); kill -TERM $(/bin/cat /run/udhcpc.%iface%.pid); fi \
          elsif (execable("/sbin/udhcpc"))
 -    /sbin/dhcpcd -k %iface% \
 +    dhcpcd -k %iface% \
@@ -341,8 +339,8 @@ index 75e6744..23c7756 100644
  
    up
      [[Warning: Option hwaddress: %hwaddress% not yet supported]]
--    /sbin/dhclient -v -pf /run/dhclient.%iface///.%.pid -lf /var/lib/dhcp/dhclient.%iface///.%.leases -I -df /var/lib/dhcp/dhclient6.%iface///.%.leases %iface% \
-+    dhclient -v -pf /run/dhclient.%iface///.%.pid -lf /var/lib/dhcp/dhclient.%iface///.%.leases -I -df /var/lib/dhcp/dhclient6.%iface///.%.leases %iface% \
+-    /sbin/dhclient -4 -v -pf /run/dhclient.%iface///.%.pid -lf /var/lib/dhcp/dhclient.%iface///.%.leases -I -df /var/lib/dhcp/dhclient6.%iface///.%.leases %iface% \
++    dhclient -4 -v -pf /run/dhclient.%iface///.%.pid -lf /var/lib/dhcp/dhclient.%iface///.%.leases -I -df /var/lib/dhcp/dhclient6.%iface///.%.leases %iface% \
          if (execable("/sbin/dhclient"))
 -    /sbin/udhcpc -n -p /run/udhcpc.%iface///.%.pid -i %iface% [[-H %hostname%]] \
 +    udhcpc -n -p /run/udhcpc.%iface///.%.pid -i %iface% [[-H %hostname%]] \
@@ -356,11 +354,10 @@ index 75e6744..23c7756 100644
          elsif (1)
  
    down
--    /sbin/dhclient -v -r -pf /run/dhclient.%iface///.%.pid -lf /var/lib/dhcp/dhclient.%iface///.%.leases -I -df /var/lib/dhcp/dhclient6.%iface///.%.leases %iface% \
-+    dhclient -v -r -pf /run/dhclient.%iface///.%.pid -lf /var/lib/dhcp/dhclient.%iface///.%.leases -I -df /var/lib/dhcp/dhclient6.%iface///.%.leases %iface% \
+-    /sbin/dhclient -4 -v -r -pf /run/dhclient.%iface///.%.pid -lf /var/lib/dhcp/dhclient.%iface///.%.leases -I -df /var/lib/dhcp/dhclient6.%iface///.%.leases %iface% \
++    dhclient -4 -v -r -pf /run/dhclient.%iface///.%.pid -lf /var/lib/dhcp/dhclient.%iface///.%.leases -I -df /var/lib/dhcp/dhclient6.%iface///.%.leases %iface% \
          if (execable("/sbin/dhclient"))
--    if test -f /run/udhcpc.%iface///.%.pid; then kill -USR2 $(/bin/cat /run/udhcpc.%iface///.%.pid); kill -TERM $(/bin/cat /run/udhcpc.%iface///.%.pid); fi \
-+    if test -f /run/udhcpc.%iface///.%.pid; then kill -USR2 $(cat /run/udhcpc.%iface///.%.pid); kill -TERM $(cat /run/udhcpc.%iface///.%.pid); fi \
+     if test -f /run/udhcpc.%iface///.%.pid; then kill -USR2 $(/bin/cat /run/udhcpc.%iface///.%.pid); kill -TERM $(/bin/cat /run/udhcpc.%iface///.%.pid); fi \
          elsif (execable("/sbin/udhcpc"))
 -    /sbin/dhcpcd -k %iface% \
 +    dhcpcd -k %iface% \
@@ -402,5 +399,5 @@ index 75e6744..23c7756 100644
 -    /usr/sbin/avahi-autoipd --kill %iface%
 +    avahi-autoipd --kill %iface%
 -- 
-2.7.4
+2.17.1
 

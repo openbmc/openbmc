@@ -1,0 +1,29 @@
+From 798f2816130838f3618212291de6ab0ea814c868 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 29 Sep 2019 20:39:02 -0700
+Subject: [PATCH] include sys/select on non-glibc platforms
+
+musl needs sys/select.h for defining fd_set
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gdraw/gdraw.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gdraw/gdraw.c b/gdraw/gdraw.c
+index 24591b778..217c63140 100644
+--- a/gdraw/gdraw.c
++++ b/gdraw/gdraw.c
+@@ -32,7 +32,7 @@
+ #include "gkeysym.h"
+ #include "ustring.h"
+ 
+-#if __Mac || __FreeBSD__ || __NetBSD__ || __OpenBSD__ || __DragonFly__
++#if __Mac || __FreeBSD__ || __NetBSD__ || __OpenBSD__ || __DragonFly__ || !defined(__GLIBC__)
+ #  include <sys/select.h>
+ #endif
+ 
+-- 
+2.23.0
+

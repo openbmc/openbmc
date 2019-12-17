@@ -2,7 +2,7 @@ SUMMARY = "A packet dissection and creation library"
 # libnet at packetfactory.net is dead
 HOMEPAGE = "https://github.com/sam-github/libnet"
 SECTION = "libs"
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://doc/COPYING;md5=3ec839e00408b484d33b472a86b7c266"
 DEPENDS = "libpcap"
 # There are major API changes beween libnet v1.0 and libnet v1.1

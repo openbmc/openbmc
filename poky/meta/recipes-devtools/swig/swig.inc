@@ -1,4 +1,7 @@
 SUMMARY = "SWIG - Simplified Wrapper and Interface Generator"
+DESCRIPTION = "SWIG is a compiler that makes it easy to integrate C and C++ \
+code with other languages including Perl, Tcl, Ruby, Python, Java, Guile, \
+Mzscheme, Chicken, OCaml, Pike, and C#."
 HOMEPAGE = "http://swig.sourceforge.net/"
 LICENSE = "BSD & GPLv3"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e7807a6282784a7dde4c846626b08fc6 \

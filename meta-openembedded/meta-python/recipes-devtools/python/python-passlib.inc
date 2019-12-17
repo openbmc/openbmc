@@ -6,7 +6,7 @@ managing existing password hashes. It’s designed to be useful for a wide range
 tasks, from verifying a hash found in /etc/shadow, to providing full-strength password \
 hashing for multi-user applications."
 HOMEPAGE = "https://bitbucket.org/ecollins/passlib"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=73eed1a5470b969951dac411086c7036"
 
 SRC_URI[md5sum] = "254869dae3fd9f09f0746a3cb29a0b15"

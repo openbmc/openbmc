@@ -1,0 +1,26 @@
+From 08aca4816cc798fce58b6235c26585a0063fa8af Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 26 Nov 2019 10:43:49 -0800
+Subject: [PATCH] Ask for python3 specifically
+
+python2 is on its way out
+
+Upstream-Status: Submitted [https://github.com/hishamhm/htop/pull/968]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ scripts/MakeHeader.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/MakeHeader.py b/scripts/MakeHeader.py
+index 7c48fdd..7a7586d 100755
+--- a/scripts/MakeHeader.py
++++ b/scripts/MakeHeader.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ import os, sys, string, io
+ try:
+    from StringIO import StringIO
+-- 
+2.24.0
+

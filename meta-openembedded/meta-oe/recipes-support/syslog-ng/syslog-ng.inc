@@ -15,6 +15,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=24c0c5cb2c83d9f2ab725481e4df5240"
 # util-linux added to get libuuid
 DEPENDS = "libpcre flex glib-2.0 openssl util-linux"
 
+# We expect the recipe to add anything specific for that version to these defaults.
+#
 SRC_URI = "https://github.com/balabit/syslog-ng/releases/download/${BP}/${BP}.tar.gz \
            file://syslog-ng.conf.systemd \
            file://syslog-ng.conf.sysvinit \
@@ -25,7 +27,7 @@ SRC_URI = "https://github.com/balabit/syslog-ng/releases/download/${BP}/${BP}.ta
 
 UPSTREAM_CHECK_URI = "https://github.com/balabit/syslog-ng/releases"
 
-inherit autotools gettext systemd pkgconfig update-rc.d
+inherit autotools gettext systemd pkgconfig update-rc.d multilib_header
 
 EXTRA_OECONF = " \
     --enable-dynamic-linking \
@@ -74,8 +76,12 @@ do_install_append() {
     install -d ${D}/${sysconfdir}/${BPN}
     install -d ${D}/${sysconfdir}/init.d
     install -m 755 ${WORKDIR}/initscript ${D}/${sysconfdir}/init.d/syslog
+
     install -d ${D}/${sysconfdir}/default/volatiles/
     install -m 755 ${WORKDIR}/volatiles.03_syslog-ng ${D}/${sysconfdir}/default/volatiles/03_syslog-ng
+    install -d ${D}/${sysconfdir}/tmpfiles.d/
+    install -m 755 ${WORKDIR}/syslog-ng-tmp.conf ${D}/${sysconfdir}/tmpfiles.d/syslog-ng.conf
+
     install -d ${D}/${localstatedir}/lib/${BPN}
     # Remove /var/run as it is created on startup
     rm -rf ${D}${localstatedir}/run
@@ -97,6 +103,8 @@ do_install_append() {
     else
         install ${WORKDIR}/syslog-ng.conf.sysvinit ${D}${sysconfdir}/${BPN}/${BPN}.conf
     fi
+
+    oe_multilib_header syslog-ng/syslog-ng-config.h
 }
 
 FILES_${PN} += "${datadir}/include/scl/ ${datadir}/xsd ${datadir}/tools ${systemd_unitdir}/system/multi-user.target.wants/*"
@@ -117,6 +125,7 @@ RPROVIDES_${PN}-dbg += "${PN}-libs-dbg"
 FILES_${PN}-libs = "${libdir}/${BPN}/*.so ${libdir}/libsyslog-ng-*.so*"
 FILES_${PN}-libs-dev = "${libdir}/${BPN}/lib*.la"
 FILES_${PN}-staticdev += "${libdir}/${BPN}/libtest/*.a"
+FILES_${PN} += "${systemd_unitdir}/system/*.service"
 INSANE_SKIP_${PN}-libs = "dev-so"
 RDEPENDS_${PN} += "${PN}-libs"
 

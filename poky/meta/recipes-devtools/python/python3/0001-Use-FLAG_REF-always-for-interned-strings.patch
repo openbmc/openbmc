@@ -1,0 +1,35 @@
+From 6c8ea7c1dacd42f3ba00440231ec0e6b1a38300d Mon Sep 17 00:00:00 2001
+From: Inada Naoki <songofacandy@gmail.com>
+Date: Sat, 14 Jul 2018 00:46:11 +0900
+Subject: [PATCH] Use FLAG_REF always for interned strings
+
+Upstream-Status: Submitted [https://github.com/python/cpython/pull/8226]
+Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
+---
+ Python/marshal.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/Python/marshal.c b/Python/marshal.c
+index 6d06266c6a..51db2e3b2e 100644
+--- a/Python/marshal.c
++++ b/Python/marshal.c
+@@ -275,9 +275,14 @@ w_ref(PyObject *v, char *flag, WFILE *p)
+     if (p->version < 3 || p->hashtable == NULL)
+         return 0; /* not writing object references */
+ 
+-    /* if it has only one reference, it definitely isn't shared */
+-    if (Py_REFCNT(v) == 1)
++    /* If it has only one reference, it definitely isn't shared.
++     * But we use TYPE_REF always for interned string, to PYC file stable
++     * as possible.
++     */
++    if (Py_REFCNT(v) == 1 &&
++            !(PyUnicode_CheckExact(v) && PyUnicode_CHECK_INTERNED(v))) {
+         return 0;
++    }
+ 
+     entry = _Py_HASHTABLE_GET_ENTRY(p->hashtable, v);
+     if (entry != NULL) {
+-- 
+2.21.0
+

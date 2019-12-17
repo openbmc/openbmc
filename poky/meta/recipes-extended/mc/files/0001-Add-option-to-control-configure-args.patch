@@ -1,0 +1,99 @@
+From a54501d3c9541bc8600225aa2d42531f93c6def7 Mon Sep 17 00:00:00 2001
+From: Joshua Watt <JPEWhacker@gmail.com>
+Date: Sat, 9 Nov 2019 20:01:48 -0600
+Subject: [PATCH] Add option to control configure args
+
+Embedding the configure time options into the executable can lead to
+non-reproducible builds, since configure options often have embedded
+paths. Add a configure time option to control if the configure args are
+embedded so this can be disabled.
+
+Upstream-Status: Submitted [https://midnight-commander.org/ticket/4031]
+Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
+---
+ configure.ac   | 6 ++++++
+ src/args.c     | 6 ++++++
+ src/textconf.c | 2 ++
+ 3 files changed, 14 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 19d1a76be..a1948f6b9 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -544,6 +544,12 @@ dnl Clarify do we really need GModule
+ AM_CONDITIONAL([HAVE_GMODULE], [test -n "$g_module_supported" && \
+                                 test x"$textmode_x11_support" = x"yes" -o x"$enable_aspell" = x"yes"])
+ 
++AC_ARG_ENABLE([configure-args],
++    AS_HELP_STRING([--enable-configure-args], [Handle all compiler warnings as errors]))
++if test "x$enable_configure_args" != xno; then
++    AC_DEFINE([ENABLE_CONFIGURE_ARGS], 1, [Define to enable showing configure arguments in help])
++fi
++
+ AC_DEFINE_UNQUOTED([MC_CONFIGURE_ARGS], ["$ac_configure_args"], [MC configure arguments])
+ 
+ AC_CONFIG_FILES(
+diff --git a/src/args.c b/src/args.c
+index baef1a1c8..f8dc24020 100644
+--- a/src/args.c
++++ b/src/args.c
+@@ -95,7 +95,9 @@ static gboolean mc_args__nouse_subshell = FALSE;
+ #endif /* ENABLE_SUBSHELL */
+ static gboolean mc_args__show_datadirs = FALSE;
+ static gboolean mc_args__show_datadirs_extended = FALSE;
++#ifdef ENABLE_CONFIGURE_ARGS
+ static gboolean mc_args__show_configure_opts = FALSE;
++#endif
+ 
+ static GOptionGroup *main_group;
+ 
+@@ -125,6 +127,7 @@ static const GOptionEntry argument_main_table[] = {
+      NULL
+     },
+ 
++#ifdef ENABLE_CONFIGURE_ARGS
+     /* show configure options */
+     {
+      "configure-options", '\0', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE,
+@@ -132,6 +135,7 @@ static const GOptionEntry argument_main_table[] = {
+      N_("Print configure options"),
+      NULL
+     },
++#endif
+ 
+     {
+      "printwd", 'P', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_STRING,
+@@ -758,11 +762,13 @@ mc_args_show_info (void)
+         return FALSE;
+     }
+ 
++#ifdef ENABLE_CONFIGURE_ARGS
+     if (mc_args__show_configure_opts)
+     {
+         show_configure_options ();
+         return FALSE;
+     }
++#endif
+ 
+     return TRUE;
+ }
+diff --git a/src/textconf.c b/src/textconf.c
+index 1e0613e58..f39b9e028 100644
+--- a/src/textconf.c
++++ b/src/textconf.c
+@@ -232,10 +232,12 @@ show_datadirs_extended (void)
+ 
+ /* --------------------------------------------------------------------------------------------- */
+ 
++#ifdef ENABLE_CONFIGURE_ARGS
+ void
+ show_configure_options (void)
+ {
+     (void) printf ("%s\n", MC_CONFIGURE_ARGS);
+ }
++#endif
+ 
+ /* --------------------------------------------------------------------------------------------- */
+-- 
+2.23.0
+

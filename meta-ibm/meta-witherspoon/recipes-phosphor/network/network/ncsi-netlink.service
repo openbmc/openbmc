@@ -1,7 +1,6 @@
 [Unit]
 Description=Stop the ethernet link failover
-Wants=xyz.openbmc_project.Network.service
-After=xyz.openbmc_project.Network.service
+After=network.service
 
 [Service]
 Restart=no

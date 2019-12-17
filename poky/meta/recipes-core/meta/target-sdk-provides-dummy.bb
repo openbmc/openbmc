@@ -1,6 +1,6 @@
 DUMMYARCH = "sdk-provides-dummy-target"
 
-DUMMYPROVIDES = "\
+DUMMYPROVIDES_PACKAGES = "\
     busybox \
     busybox-dev \
     busybox-src \
@@ -42,14 +42,19 @@ DUMMYPROVIDES = "\
     perl-module-threads \
     perl-module-warnings \
     perl-module-warnings-register \
+    pkgconfig \
+    pkgconfig-dev \
+    pkgconfig-src \
+"
+
+DUMMYPROVIDES = "\
+    ${@' '.join([multilib_pkg_extend(d, pkg) for pkg in d.getVar('DUMMYPROVIDES_PACKAGES').split()])} \
     /bin/sh \
     /bin/bash \
     /usr/bin/env \
     /usr/bin/perl \
     libperl.so.5 \
-    pkgconfig \
-    pkgconfig-dev \
-    pkgconfig-src \
+    libperl.so.5()(64bit) \
 "
 
 require dummy-sdk-package.inc

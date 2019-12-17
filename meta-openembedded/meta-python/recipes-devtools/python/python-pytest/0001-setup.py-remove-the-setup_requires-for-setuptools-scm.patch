@@ -1,7 +1,7 @@
-From 24a901fd17926e8e05be4ed2e01b0113a2e3a852 Mon Sep 17 00:00:00 2001
-From: Derek Straka <derek@asterius.io>
-Date: Tue, 19 Dec 2017 11:36:39 -0500
-Subject: [PATCH] [PATCH 1/1] setup.py: remove the setup_requires for
+From ff784f4803ab33f5e3389e40d038d52d1e211843 Mon Sep 17 00:00:00 2001
+From: Yuan Chao <yuanc.fnst@cn.fujitsu.com>
+Date: Wed, 28 Aug 2019 16:12:27 +0900
+Subject: [PATCH] [PATCH] setup.py: remove the setup_requires for
  setuptools-scm
 
 The setup_requires argument forces the download of the egg file for setuptools-scm
@@ -12,21 +12,25 @@ file and in the release tarball it is already correctly created
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Derek Straka <derek@asterius.io>
+
+Signed-off-by: Yuan Chao <yuanc.fnst@cn.fujitsu.com>
 ---
- setup.py | 1 -
- 1 file changed, 1 deletion(-)
+ setup.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/setup.py b/setup.py
-index 3eb38ef..1163202 100644
+index adbafb5..75fdd09 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -82,7 +82,6 @@ def main():
-         keywords="test unittest",
-         cmdclass={'test': PyTest},
-         # the following should be enabled for release
--        setup_requires=['setuptools-scm'],
-         python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
-         install_requires=install_requires,
-         extras_require=extras_require,
+@@ -19,7 +19,7 @@ INSTALL_REQUIRES = [
+ def main():
+     setup(
+         use_scm_version={"write_to": "src/_pytest/_version.py"},
+-        setup_requires=["setuptools-scm", "setuptools>=40.0"],
++        setup_requires=["setuptools>=40.0"],
+         package_dir={"": "src"},
+         extras_require={
+             "testing": [
 -- 
-2.7.4
+2.17.1
+

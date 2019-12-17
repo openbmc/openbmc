@@ -5,7 +5,7 @@ PV = "1.0+git${SRCPV}"
 inherit native
 inherit phosphor-dbus-yaml
 
-require witherspoon-pfault-analysis.inc
+require recipes-phosphor/power/phosphor-power.inc
 
 S = "${WORKDIR}/git"
 

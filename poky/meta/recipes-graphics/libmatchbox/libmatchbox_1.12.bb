@@ -1,4 +1,8 @@
 SUMMARY = "Matchbox window manager core library"
+DESCRIPTION = "Matchbox is an Open Source base environment for the X Window \
+System running on non-desktop embedded platforms such as handhelds, set-top \
+boxes, kiosks and anything else for which screen space, input mechanisms or \
+system resources are limited."
 SECTION = "x11/libs"
 HOMEPAGE = "http://matchbox-project.org/"
 BUGTRACKER = "http://bugzilla.yoctoproject.com/"
@@ -17,7 +21,7 @@ SRC_URI = "git://git.yoctoproject.org/${BPN}"
 
 S = "${WORKDIR}/git"
 
-inherit autotools pkgconfig distro_features_check
+inherit autotools pkgconfig features_check
 # depends on virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
 

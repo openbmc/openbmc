@@ -6,6 +6,8 @@ DEPENDS = "gtk+ xfce4-panel libical popt"
 
 inherit xfce-app
 
+SRC_URI += "file://0001-drop-setting-is_utc-member-of-icaltimetype.patch"
+
 SRC_URI[md5sum] = "2b7f5d38cb5c6edbcc65d0f52a742e46"
 SRC_URI[sha256sum] = "3cf9aa441ae83c8688865f82217025cdf3ebaa152cce4571777b8c2aa8dd9062"
 

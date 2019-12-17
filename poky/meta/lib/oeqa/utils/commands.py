@@ -172,8 +172,11 @@ def runCmd(command, ignore_status=False, timeout=None, assert_error=True,
     if native_sysroot:
         extra_paths = "%s/sbin:%s/usr/sbin:%s/usr/bin" % \
                       (native_sysroot, native_sysroot, native_sysroot)
+        extra_libpaths = "%s/lib:%s/usr/lib" % \
+                         (native_sysroot, native_sysroot)
         nenv = dict(options.get('env', os.environ))
         nenv['PATH'] = extra_paths + ':' + nenv.get('PATH', '')
+        nenv['LD_LIBRARY_PATH'] = extra_libpaths + ':' + nenv.get('LD_LIBRARY_PATH', '')
         options['env'] = nenv
 
     cmd = Command(command, timeout=timeout, output_log=output_log, **options)
@@ -337,8 +340,8 @@ def runqemu(pn, ssh=True, runqemuparams='', image_fstype=None, launch_cmd=None, 
         qemu.deploy()
         try:
             qemu.start(params=qemuparams, ssh=ssh, runqemuparams=runqemuparams, launch_cmd=launch_cmd, discard_writes=discard_writes)
-        except bb.build.FuncFailed:
-            msg = 'Failed to start QEMU - see the logs in %s' % logdir
+        except Exception as e:
+            msg = str(e) + '\nFailed to start QEMU - see the logs in %s' % logdir
             if os.path.exists(qemu.qemurunnerlog):
                 with open(qemu.qemurunnerlog, 'r') as f:
                     msg = msg + "Qemurunner log output from %s:\n%s" % (qemu.qemurunnerlog, f.read())

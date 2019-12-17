@@ -3,7 +3,7 @@ HOMEPAGE = "http://gparted.org/index.php"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
-inherit distro_features_check autotools pkgconfig gtk-icon-cache
+inherit features_check autotools pkgconfig gtk-icon-cache
 
 REQUIRED_DISTRO_FEATURES = "x11"
 
@@ -15,7 +15,7 @@ SRC_URI = " \
 SRC_URI[md5sum] = "2f481ad34decb7021ca04ca305e79e7d"
 SRC_URI[sha256sum] = "5023b8c983f88a22e65bf6f09a12ea09369defc008981b52ee8b96a3879f81d6"
 
-DEPENDS = "glib-2.0 glib-2.0-native gtkmm parted gnome-doc-utils intltool-native"
+DEPENDS += "glib-2.0 glib-2.0-native gtkmm parted gnome-doc-utils intltool-native"
 
 do_install_append() {
     # Add a script which checks if polkit is installed.

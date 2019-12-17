@@ -19,7 +19,7 @@ UPSTREAM_CHECK_REGEX = "releaselog/(?P<pver>(\d+[\.\-_]*)+)\.html"
 
 CVE_PRODUCT = "sqlite"
 
-inherit autotools pkgconfig
+inherit autotools pkgconfig siteinfo
 
 # enable those which are enabled by default in configure
 PACKAGECONFIG ?= "fts4 fts5 json1 rtree dyn_ext"
@@ -34,6 +34,9 @@ PACKAGECONFIG[json1] = "--enable-json1,--disable-json1"
 PACKAGECONFIG[rtree] = "--enable-rtree,--disable-rtree"
 PACKAGECONFIG[session] = "--enable-session,--disable-session"
 PACKAGECONFIG[dyn_ext] = "--enable-dynamic-extensions,--disable-dynamic-extensions"
+PACKAGECONFIG[zlib] = ",,zlib"
+
+CACHED_CONFIGUREVARS += "${@bb.utils.contains('PACKAGECONFIG', 'zlib', '', 'ac_cv_search_deflate=no',d)}"
 
 EXTRA_OECONF = " \
     --enable-shared \
@@ -41,13 +44,15 @@ EXTRA_OECONF = " \
     --disable-static-shell \
 "
 
-CFLAGS_append = " -fPIC"
-
 # pread() is in POSIX.1-2001 so any reasonable system must surely support it
-CFLAGS += "-DUSE_PREAD"
+CFLAGS_append = " -DUSE_PREAD"
 
 # Provide column meta-data API
-CFLAGS += "-DSQLITE_ENABLE_COLUMN_METADATA"
+CFLAGS_append = " -DSQLITE_ENABLE_COLUMN_METADATA"
+
+# Unless SQLITE_BYTEORDER is predefined, the code falls back to build time
+# huristics, which are not always correct
+CFLAGS_append = " ${@oe.utils.conditional('SITEINFO_ENDIANNESS', 'le', '-DSQLITE_BYTEORDER=1234', '-DSQLITE_BYTEORDER=4321', d)}"
 
 PACKAGES = "lib${BPN} lib${BPN}-dev lib${BPN}-doc ${PN}-dbg lib${BPN}-staticdev ${PN}"
 

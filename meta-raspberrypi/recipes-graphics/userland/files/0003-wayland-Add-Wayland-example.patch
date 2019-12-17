@@ -1,7 +1,7 @@
-From 642110bbc9ebcb9ad497f4f1c1ccbc5a9afda753 Mon Sep 17 00:00:00 2001
+From 481a9aeba3f84371668fdf8a1380a3cb23bfc502 Mon Sep 17 00:00:00 2001
 From: Tomeu Vizoso <tomeu.vizoso@collabora.com>
 Date: Tue, 1 Oct 2013 13:19:20 +0200
-Subject: [PATCH 03/18] wayland: Add Wayland example
+Subject: [PATCH 03/19] wayland: Add Wayland example
 
 ---
  .../linux/apps/hello_pi/CMakeLists.txt        |   1 +
@@ -19,10 +19,10 @@ Subject: [PATCH 03/18] wayland: Add Wayland example
  create mode 100644 host_applications/linux/apps/hello_pi/hello_wayland/triangle.c
 
 diff --git a/host_applications/linux/apps/hello_pi/CMakeLists.txt b/host_applications/linux/apps/hello_pi/CMakeLists.txt
-index f2c6aef..0df78f7 100644
+index b28a94a..2849fad 100644
 --- a/host_applications/linux/apps/hello_pi/CMakeLists.txt
 +++ b/host_applications/linux/apps/hello_pi/CMakeLists.txt
-@@ -21,6 +21,7 @@ add_subdirectory(hello_encode)
+@@ -25,6 +25,7 @@ add_subdirectory(hello_encode)
  add_subdirectory(hello_jpeg)
  add_subdirectory(hello_videocube)
  add_subdirectory(hello_teapot)
@@ -862,5 +862,5 @@ index 8225dd5..0be6ce7 100755
 -
 +make -C hello_wayland
 -- 
-2.21.0
+2.22.0
 

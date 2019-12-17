@@ -40,6 +40,7 @@
 
 inherit packagedata
 inherit chrpath
+inherit package_pkgdata
 
 # Need the package_qa_handle_error() in insane.bbclass
 inherit insane
@@ -825,8 +826,9 @@ python fixup_perms () {
 
     # Now we actually load from the configuration files
     for conf in get_fs_perms_list(d).split():
-        if os.path.exists(conf):
-            f = open(conf)
+        if not os.path.exists(conf):
+            continue
+        with open(conf) as f:
             for line in f:
                 if line.startswith('#'):
                     continue
@@ -847,7 +849,6 @@ python fixup_perms () {
                         fs_perms_table[entry.path] = entry
                         if entry.path in fs_link_table:
                             fs_link_table.pop(entry.path)
-            f.close()
 
     # Debug -- list out in-memory table
     #for dir in fs_perms_table:
@@ -1216,7 +1217,8 @@ python populate_packages () {
                 src = os.path.join(src, p)
                 dest = os.path.join(dest, p)
                 fstat = cpath.stat(src)
-                os.mkdir(dest, fstat.st_mode)
+                os.mkdir(dest)
+                os.chmod(dest, fstat.st_mode)
                 os.chown(dest, fstat.st_uid, fstat.st_gid)
                 if p not in seen:
                     seen.append(p)
@@ -1356,12 +1358,16 @@ python emit_pkgdata() {
     import json
 
     def process_postinst_on_target(pkg, mlprefix):
+        pkgval = d.getVar('PKG_%s' % pkg)
+        if pkgval is None:
+            pkgval = pkg
+
         defer_fragment = """
 if [ -n "$D" ]; then
     $INTERCEPT_DIR/postinst_intercept delay_to_first_boot %s mlprefix=%s
     exit 0
 fi
-""" % (pkg, mlprefix)
+""" % (pkgval, mlprefix)
 
         postinst = d.getVar('pkg_postinst_%s' % pkg)
         postinst_ontarget = d.getVar('pkg_postinst_ontarget_%s' % pkg)
@@ -1418,10 +1424,9 @@ fi
     pkgdest = d.getVar('PKGDEST')
     pkgdatadir = d.getVar('PKGDESTWORK')
 
-    data_file = pkgdatadir + d.expand("/${PN}" )
-    f = open(data_file, 'w')
-    f.write("PACKAGES: %s\n" % packages)
-    f.close()
+    data_file = pkgdatadir + d.expand("/${PN}")
+    with open(data_file, 'w') as fd:
+        fd.write("PACKAGES: %s\n" % packages)
 
     pn = d.getVar('PN')
     global_variants = (d.getVar('MULTILIB_GLOBAL_VARIANTS') or "").split()
@@ -1570,10 +1575,11 @@ python package_do_filedeps() {
         d.setVar("FILERPROVIDESFLIST_" + pkg, " ".join(provides_files[pkg]))
 }
 
-SHLIBSDIRS = "${PKGDATA_DIR}/${MLPREFIX}shlibs2"
+SHLIBSDIRS = "${WORKDIR_PKGDATA}/${MLPREFIX}shlibs2"
 SHLIBSWORKDIR = "${PKGDESTWORK}/${MLPREFIX}shlibs2"
 
 python package_do_shlibs() {
+    import itertools
     import re, pipes
     import subprocess
 
@@ -1640,7 +1646,8 @@ python package_do_shlibs() {
                 prov = (this_soname, ldir, pkgver)
                 if not prov in sonames:
                     # if library is private (only used by package) then do not build shlib for it
-                    if not private_libs or this_soname not in private_libs:
+                    import fnmatch
+                    if not private_libs or len([i for i in private_libs if fnmatch.fnmatch(this_soname, i)]) == 0:
                         sonames.add(prov)
                 if libdir_re.match(os.path.dirname(file)):
                     needs_ldconfig = True
@@ -1724,14 +1731,9 @@ python package_do_shlibs() {
     else:
         snap_symlinks = False
 
-    use_ldconfig = bb.utils.contains('DISTRO_FEATURES', 'ldconfig', True, False, d)
-
     needed = {}
 
-    # Take shared lock since we're only reading, not writing
-    lf = bb.utils.lockfile(d.expand("${PACKAGELOCK}"), True)
     shlib_provider = oe.package.read_shlib_providers(d)
-    bb.utils.unlockfile(lf)
 
     for pkg in shlib_pkgs:
         private_libs = d.getVar('PRIVATE_LIBS_' + pkg) or d.getVar('PRIVATE_LIBS') or ""
@@ -1773,22 +1775,21 @@ python package_do_shlibs() {
             bb.note("Renaming %s to %s" % (old, new))
             os.rename(old, new)
             pkgfiles[pkg].remove(old)
-	    
+
         shlibs_file = os.path.join(shlibswork_dir, pkg + ".list")
         if len(sonames):
-            fd = open(shlibs_file, 'w')
-            for s in sonames:
-                if s[0] in shlib_provider and s[1] in shlib_provider[s[0]]:
-                    (old_pkg, old_pkgver) = shlib_provider[s[0]][s[1]]
-                    if old_pkg != pkg:
-                        bb.warn('%s-%s was registered as shlib provider for %s, changing it to %s-%s because it was built later' % (old_pkg, old_pkgver, s[0], pkg, pkgver))
-                bb.debug(1, 'registering %s-%s as shlib provider for %s' % (pkg, pkgver, s[0]))
-                fd.write(s[0] + ':' + s[1] + ':' + s[2] + '\n')
-                if s[0] not in shlib_provider:
-                    shlib_provider[s[0]] = {}
-                shlib_provider[s[0]][s[1]] = (pkg, pkgver)
-            fd.close()
-        if needs_ldconfig and use_ldconfig:
+            with open(shlibs_file, 'w') as fd:
+                for s in sonames:
+                    if s[0] in shlib_provider and s[1] in shlib_provider[s[0]]:
+                        (old_pkg, old_pkgver) = shlib_provider[s[0]][s[1]]
+                        if old_pkg != pkg:
+                            bb.warn('%s-%s was registered as shlib provider for %s, changing it to %s-%s because it was built later' % (old_pkg, old_pkgver, s[0], pkg, pkgver))
+                    bb.debug(1, 'registering %s-%s as shlib provider for %s' % (pkg, pkgver, s[0]))
+                    fd.write(s[0] + ':' + s[1] + ':' + s[2] + '\n')
+                    if s[0] not in shlib_provider:
+                        shlib_provider[s[0]] = {}
+                    shlib_provider[s[0]][s[1]] = (pkg, pkgver)
+        if needs_ldconfig:
             bb.debug(1, 'adding ldconfig call to postinst for %s' % pkg)
             postinst = d.getVar('pkg_postinst_%s' % pkg)
             if not postinst:
@@ -1826,20 +1827,21 @@ python package_do_shlibs() {
             # /opt/abc/lib/libfoo.so.1 and contains /usr/bin/abc depending on system library libfoo.so.1
             # but skipping it is still better alternative than providing own
             # version and then adding runtime dependency for the same system library
-            if private_libs and n[0] in private_libs:
+            import fnmatch
+            if private_libs and len([i for i in private_libs if fnmatch.fnmatch(n[0], i)]) > 0:
                 bb.debug(2, '%s: Dependency %s covered by PRIVATE_LIBS' % (pkg, n[0]))
                 continue
             if n[0] in shlib_provider.keys():
-                shlib_provider_path = []
-                for k in shlib_provider[n[0]].keys():
-                    shlib_provider_path.append(k)
-                match = None
-                for p in list(n[2]) + shlib_provider_path + libsearchpath:
-                    if p in shlib_provider[n[0]]:
-                        match = p
-                        break
-                if match:
-                    (dep_pkg, ver_needed) = shlib_provider[n[0]][match]
+                shlib_provider_map = shlib_provider[n[0]]
+                matches = set()
+                for p in itertools.chain(list(n[2]), sorted(shlib_provider_map.keys()), libsearchpath):
+                    if p in shlib_provider_map:
+                        matches.add(p)
+                if len(matches) > 1:
+                    matchpkgs = ', '.join([shlib_provider_map[match][0] for match in matches])
+                    bb.error("%s: Multiple shlib providers for %s: %s (used by files: %s)" % (pkg, n[0], matchpkgs, n[1]))
+                elif len(matches) == 1:
+                    (dep_pkg, ver_needed) = shlib_provider_map[matches.pop()]
 
                     bb.debug(2, '%s: Dependency %s requires package %s (used by files: %s)' % (pkg, n[0], dep_pkg, n[1]))
 
@@ -1858,11 +1860,10 @@ python package_do_shlibs() {
         deps_file = os.path.join(pkgdest, pkg + ".shlibdeps")
         if os.path.exists(deps_file):
             os.remove(deps_file)
-        if len(deps):
-            fd = open(deps_file, 'w')
-            for dep in sorted(deps):
-                fd.write(dep + '\n')
-            fd.close()
+        if deps:
+            with open(deps_file, 'w') as fd:
+                for dep in sorted(deps):
+                    fd.write(dep + '\n')
 }
 
 python package_do_pkgconfig () {
@@ -1892,9 +1893,8 @@ python package_do_pkgconfig () {
                     pkgconfig_provided[pkg].append(name)
                     if not os.access(file, os.R_OK):
                         continue
-                    f = open(file, 'r')
-                    lines = f.readlines()
-                    f.close()
+                    with open(file, 'r') as f:
+                        lines = f.readlines()
                     for l in lines:
                         m = var_re.match(l)
                         if m:
@@ -1912,30 +1912,23 @@ python package_do_pkgconfig () {
     for pkg in packages.split():
         pkgs_file = os.path.join(shlibswork_dir, pkg + ".pclist")
         if pkgconfig_provided[pkg] != []:
-            f = open(pkgs_file, 'w')
-            for p in pkgconfig_provided[pkg]:
-                f.write('%s\n' % p)
-            f.close()
-
-    # Take shared lock since we're only reading, not writing
-    lf = bb.utils.lockfile(d.expand("${PACKAGELOCK}"), True)
+            with open(pkgs_file, 'w') as f:
+                for p in pkgconfig_provided[pkg]:
+                    f.write('%s\n' % p)
 
     # Go from least to most specific since the last one found wins
     for dir in reversed(shlibs_dirs):
         if not os.path.exists(dir):
             continue
-        for file in os.listdir(dir):
+        for file in sorted(os.listdir(dir)):
             m = re.match(r'^(.*)\.pclist$', file)
             if m:
                 pkg = m.group(1)
-                fd = open(os.path.join(dir, file))
-                lines = fd.readlines()
-                fd.close()
+                with open(os.path.join(dir, file)) as fd:
+                    lines = fd.readlines()
                 pkgconfig_provided[pkg] = []
                 for l in lines:
                     pkgconfig_provided[pkg].append(l.rstrip())
-
-    bb.utils.unlockfile(lf)
 
     for pkg in packages.split():
         deps = []
@@ -1950,10 +1943,9 @@ python package_do_pkgconfig () {
                 bb.note("couldn't find pkgconfig module '%s' in any package" % n)
         deps_file = os.path.join(pkgdest, pkg + ".pcdeps")
         if len(deps):
-            fd = open(deps_file, 'w')
-            for dep in deps:
-                fd.write(dep + '\n')
-            fd.close()
+            with open(deps_file, 'w') as fd:
+                for dep in deps:
+                    fd.write(dep + '\n')
 }
 
 def read_libdep_files(d):
@@ -1964,9 +1956,8 @@ def read_libdep_files(d):
         for extension in ".shlibdeps", ".pcdeps", ".clilibdeps":
             depsfile = d.expand("${PKGDEST}/" + pkg + extension)
             if os.access(depsfile, os.R_OK):
-                fd = open(depsfile)
-                lines = fd.readlines()
-                fd.close()
+                with open(depsfile) as fd:
+                    lines = fd.readlines()
                 for l in lines:
                     l.rstrip()
                     deps = bb.utils.explode_dep_versions2(l)
@@ -2133,6 +2124,7 @@ def gen_packagevar(d):
 PACKAGE_PREPROCESS_FUNCS ?= ""
 # Functions for setting up PKGD
 PACKAGEBUILDPKGD ?= " \
+                package_prepare_pkgdata \
                 perform_packagecopy \
                 ${PACKAGE_PREPROCESS_FUNCS} \
                 split_and_strip_files \
@@ -2253,19 +2245,19 @@ python do_package_setscene () {
 }
 addtask do_package_setscene
 
-do_packagedata () {
-	:
+# Copy from PKGDESTWORK to tempdirectory as tempdirectory can be cleaned at both
+# do_package_setscene and do_packagedata_setscene leading to races
+python do_packagedata () {
+    src = d.expand("${PKGDESTWORK}")
+    dest = d.expand("${WORKDIR}/pkgdata-pdata-input")
+    oe.path.copyhardlinktree(src, dest)
 }
 
 addtask packagedata before do_build after do_package
 
 SSTATETASKS += "do_packagedata"
-# PACKAGELOCK protects readers of PKGDATA_DIR against writes
-# whilst code is reading in do_package
-PACKAGELOCK = "${STAGING_DIR}/package-output.lock"
-do_packagedata[sstate-inputdirs] = "${PKGDESTWORK}"
+do_packagedata[sstate-inputdirs] = "${WORKDIR}/pkgdata-pdata-input"
 do_packagedata[sstate-outputdirs] = "${PKGDATA_DIR}"
-do_packagedata[sstate-lockfile] = "${PACKAGELOCK}"
 do_packagedata[stamp-extra-info] = "${MACHINE_ARCH}"
 
 python do_packagedata_setscene () {

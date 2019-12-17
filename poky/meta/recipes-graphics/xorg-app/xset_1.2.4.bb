@@ -7,7 +7,7 @@ preference options of the display."
 
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=bea81cc9827cdf1af0e12c2b8228cf8d"
-DEPENDS += "libxext libxxf86misc libxmu libxau"
+DEPENDS += "libxext libxmu libxau"
 PE = "1"
 
 SRC_URI += "file://disable-xkb.patch"

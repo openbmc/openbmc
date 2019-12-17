@@ -10,7 +10,7 @@ DEPENDS = "libpam"
 
 S = "${WORKDIR}/git"
 
-inherit autotools distro_features_check
+inherit autotools features_check
 
 REQUIRED_DISTRO_FEATURES = "pam"
 

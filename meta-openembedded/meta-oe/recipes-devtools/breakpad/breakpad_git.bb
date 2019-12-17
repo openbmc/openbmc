@@ -42,7 +42,7 @@ SRC_URI = "git://github.com/google/breakpad;name=breakpad \
            file://0001-disable-calls-to-getcontext-with-musl.patch \
            file://0001-lss-Match-syscalls-to-match-musl.patch;patchdir=src/third_party/lss \
            file://mips_asm_sgidefs.patch;patchdir=src/third_party/lss \
-           file://dont-clobber-rsp.patch \
+           file://dont-clobber-rsp.patch;patchdir=src/third_party/lss;striplevel=4 \
 "
 S = "${WORKDIR}/git"
 

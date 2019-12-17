@@ -33,7 +33,7 @@ scriptpath.add_bitbake_lib_path()
 from oeqa.utils import load_test_components
 from oeqa.core.exception import OEQAPreRun
 
-logger = scriptutils.logger_create('oe-selftest', stream=sys.stdout)
+logger = scriptutils.logger_create('oe-selftest', stream=sys.stdout, keepalive=True)
 
 def main():
     description = "Script that runs unit tests against bitbake and other Yocto related tools. The goal is to validate tools functionality and metadata integrity. Refer to https://wiki.yoctoproject.org/wiki/Oe-selftest for more information."

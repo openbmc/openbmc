@@ -19,16 +19,14 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  tests/sigaction.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/sigaction.c b/tests/sigaction.c
-index 95be197..54819f9 100644
 --- a/tests/sigaction.c
 +++ b/tests/sigaction.c
 @@ -156,7 +156,7 @@ main(void)
  	sigdelset(mask.libc, SIGHUP);
  
  	memcpy(new_act->mask, mask.old, sizeof(mask.old));
--#ifdef SA_RESTORER
+-# ifdef SA_RESTORER
 +#if defined(SA_RESTORER) && !defined(MIPS) && !defined(ALPHA)
  	new_act->flags = SA_RESTORER;
  	new_act->restorer = (unsigned long) 0xdeadfacecafef00dULL;
- # define SA_RESTORER_FMT ", sa_flags=SA_RESTORER, sa_restorer=%#lx"
+ #  define SA_RESTORER_FMT ", sa_flags=SA_RESTORER, sa_restorer=%#lx"

@@ -115,7 +115,7 @@
         "cached": []
     },
     "asyncio": {
-        "summary": "Python Asynchronous I/",
+        "summary": "Python Asynchronous I/O",
         "rdepends": [
             "core",
             "io",
@@ -210,7 +210,10 @@
         "summary": "Python interpreter and core modules",
         "rdepends": [],
         "files": [
-            "${bindir}/python*[!-config]",
+            "${bindir}/python3",
+            "${bindir}/python${PYTHON_MAJMIN}",
+            "${bindir}/python${PYTHON_MAJMIN}.real",
+            "${bindir}/python${PYTHON_BINABI}",
             "${includedir}/python${PYTHON_BINABI}/pyconfig*.h",
             "${prefix}/lib/python${PYTHON_MAJMIN}/config*/*[!.a]",
             "${libdir}/python${PYTHON_MAJMIN}/UserDict.py",
@@ -291,6 +294,7 @@
             "${libdir}/python${PYTHON_MAJMIN}/re.py",
             "${libdir}/python${PYTHON_MAJMIN}/reprlib.py",
             "${libdir}/python${PYTHON_MAJMIN}/rlcompleter.py",
+            "${libdir}/python${PYTHON_MAJMIN}/runpy.py",
             "${libdir}/python${PYTHON_MAJMIN}/selectors.py",
             "${libdir}/python${PYTHON_MAJMIN}/signal.py",
             "${libdir}/python${PYTHON_MAJMIN}/site.py",
@@ -355,6 +359,7 @@
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/re.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/reprlib.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/rlcompleter.*.pyc",
+            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/runpy.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/selectors.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/signal.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/site.*.pyc",
@@ -485,7 +490,7 @@
         "files": [
             "${base_libdir}/*.a",
             "${base_libdir}/*.o",
-            "${bindir}/python*-config",
+            "${bindir}/python*-config*",
             "${datadir}/aclocal",
             "${datadir}/pkgconfig",
             "${includedir}",
@@ -496,7 +501,8 @@
             "${libdir}/pkgconfig"
         ],
         "rdepends": [
-            "core"
+            "core",
+            "distutils"
         ],
         "summary": "Python development package"
     },
@@ -512,17 +518,15 @@
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/difflib.*.pyc"
         ]
     },
-    "distutils-staticdev": {
-        "cached": [
-            "${libdir}/python${PYTHON_MAJMIN}/config/__pycache__/lib*.a"
-        ],
+    "distutils-windows": {
+        "cached": [],
         "files": [
-            "${libdir}/python${PYTHON_MAJMIN}/config/lib*.a"
+            "${libdir}/python${PYTHON_MAJMIN}/distutils/command/wininst-*.exe"
         ],
         "rdepends": [
             "distutils"
         ],
-        "summary": "Python distribution utilities (static libraries)"
+        "summary": "Python distribution utilities (Windows installer stubs)"
     },
     "distutils": {
         "summary": "Python Distribution Utilities",
@@ -785,7 +789,6 @@
             "profile",
             "pydoc",
             "resource",
-            "runpy",
             "shell",
             "smtpd",
             "sqlite3",
@@ -800,6 +803,9 @@
             "venv",
             "xml",
             "xmlrpc"
+        ],
+        "rrecommends": [
+            "distutils-windows"
         ],
         "summary": "All Python modules"
     },
@@ -1003,19 +1009,6 @@
             "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/resource.*.so"
         ],
         "cached": []
-    },
-    "runpy": {
-        "summary": "Python helper for locating/executing scripts in module namespace",
-        "rdepends": [
-            "core",
-            "pkgutil"
-        ],
-        "files": [
-            "${libdir}/python${PYTHON_MAJMIN}/runpy.py"
-        ],
-        "cached": [
-            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/runpy.*.pyc"
-        ]
     },
     "shell": {
         "summary": "Python shell-like functionality",

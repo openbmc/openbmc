@@ -4,6 +4,8 @@
 
 SUMMARY = "Debugging tools"
 
+PACKAGE_ARCH = "${TUNE_PKGARCH}"
+
 inherit packagegroup
 
 PR = "r3"

@@ -3,10 +3,11 @@ DESCRIPTION = "The GNU C Library is used as the system C library in most systems
 HOMEPAGE = "http://www.gnu.org/software/libc/libc.html"
 SECTION = "libs"
 LICENSE = "GPLv2 & LGPLv2.1"
-LIC_FILES_CHKSUM ?= "file://LICENSES;md5=07a394b26e0902b9ffdec03765209770 \
-      file://COPYING;md5=393a5ca445f6965873eca0259a17f833 \
+
+LIC_FILES_CHKSUM ?= "file://LICENSES;md5=cfc0ed77a9f62fa62eded042ebe31d72 \
+      file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
       file://posix/rxspencer/COPYRIGHT;md5=dc5485bb394a13b2332ec1c785f5d83a \
-      file://COPYING.LIB;md5=bbb461211a33b134d42ed5ee802b37ff "
+      file://COPYING.LIB;md5=4fbd65380cdd255951079008b364516c"
 
 CVE_PRODUCT = "glibc"
 
@@ -21,4 +22,4 @@ ARM_INSTRUCTION_SET_armv6 = "arm"
 #
 COMPATIBLE_HOST_libc-musl_class-target = "null"
 
-PV = "2.29"
+PV = "2.30"

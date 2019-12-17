@@ -1,0 +1,51 @@
+From 78a9cffb1c760466933bbbcbae7ecb9b30a3e6a5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 21 Nov 2019 13:47:42 -0800
+Subject: [PATCH] sanlock: Replace "cp -a" with "cp -R --no-dereference
+ --preserve=mode, links"
+
+Using "cp -a" leaks UID of user running the builds
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/Makefile  | 8 ++++----
+ wdmd/Makefile | 4 ++--
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index 533dd79..2fc9ba5 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -127,9 +127,9 @@ install: all
+ 	$(INSTALL) -c -m 755 $(LIBSO_CLIENT_TARGET) $(DESTDIR)/$(LIBDIR)
+ 	$(INSTALL) -c -m 644 $(LIBPC_ENTIRE_TARGET) $(DESTDIR)/$(LIBDIR)/pkgconfig
+ 	$(INSTALL) -c -m 644 $(LIBPC_CLIENT_TARGET) $(DESTDIR)/$(LIBDIR)/pkgconfig
+-	cp -a $(LIB_ENTIRE_TARGET).so $(DESTDIR)/$(LIBDIR)
+-	cp -a $(LIB_CLIENT_TARGET).so $(DESTDIR)/$(LIBDIR)
+-	cp -a $(LIB_ENTIRE_TARGET).so.$(SOMAJOR) $(DESTDIR)/$(LIBDIR)
+-	cp -a $(LIB_CLIENT_TARGET).so.$(SOMAJOR) $(DESTDIR)/$(LIBDIR)
++	cp -R --no-dereference --preserve=mode,links $(LIB_ENTIRE_TARGET).so $(DESTDIR)/$(LIBDIR)
++	cp -R --no-dereference --preserve=mode,links $(LIB_CLIENT_TARGET).so $(DESTDIR)/$(LIBDIR)
++	cp -R --no-dereference --preserve=mode,links $(LIB_ENTIRE_TARGET).so.$(SOMAJOR) $(DESTDIR)/$(LIBDIR)
++	cp -R --no-dereference --preserve=mode,links $(LIB_CLIENT_TARGET).so.$(SOMAJOR) $(DESTDIR)/$(LIBDIR)
+ 	$(INSTALL) -c -m 644 $(HEADER_TARGET) $(DESTDIR)/$(HEADIR)
+ 	$(INSTALL) -m 644 $(MAN_TARGET) $(DESTDIR)/$(MANDIR)/man8/
+diff --git a/wdmd/Makefile b/wdmd/Makefile
+index 5849efc..4894517 100644
+--- a/wdmd/Makefile
++++ b/wdmd/Makefile
+@@ -68,7 +68,7 @@ install: all
+ 	$(INSTALL) -d $(DESTDIR)/$(MANDIR)/man8
+ 	$(INSTALL) -c -m 755 $(CMD_TARGET) $(DESTDIR)/$(BINDIR)
+ 	$(INSTALL) -c -m 755 $(SHLIB_TARGET) $(DESTDIR)/$(LIBDIR)
+-	cp -a $(LIB_TARGET).so $(DESTDIR)/$(LIBDIR)
+-	cp -a $(LIB_TARGET).so.$(SOMAJOR) $(DESTDIR)/$(LIBDIR)
++	cp -R --no-dereference --preserve=mode,links $(LIB_TARGET).so $(DESTDIR)/$(LIBDIR)
++	cp -R --no-dereference --preserve=mode,links $(LIB_TARGET).so.$(SOMAJOR) $(DESTDIR)/$(LIBDIR)
+ 	$(INSTALL) -c -m 644 $(HEADER_TARGET) $(DESTDIR)/$(HEADIR)
+ 	$(INSTALL) -m 644 $(MAN_TARGET) $(DESTDIR)/$(MANDIR)/man8
+-- 
+2.24.0
+

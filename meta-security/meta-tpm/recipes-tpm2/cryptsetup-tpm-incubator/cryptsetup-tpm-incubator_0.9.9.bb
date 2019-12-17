@@ -32,7 +32,8 @@ RRECOMMENDS_${PN} = "kernel-module-aes-generic \
                      kernel-module-xts \
                     "
 
-RDEPENDS_${PN} += "lvm2"
+FILES_${PN} += "${libdir}/tmpfiles.d"
+RDEPENDS_${PN} += "lvm2 libdevmapper"
 RRECOMMENDS_${PN} += "lvm2-udevrules"
 
 RREPLACES_${PN} = "cryptsetup"

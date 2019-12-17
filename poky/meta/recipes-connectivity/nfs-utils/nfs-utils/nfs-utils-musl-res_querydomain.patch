@@ -11,30 +11,19 @@ Upstream-Status: Pending [https://github.com/alpinelinux/aports/blob/master/main
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
 
 ---
- configure.ac | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ configure.ac | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 276dec3..760238b 100644
+index 50002b4..dcadb23 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -408,7 +408,7 @@ if test "$enable_gss" = yes; then
- fi
- 
- dnl libdnsidmap specific checks
--AC_CHECK_LIB([resolv], [__res_querydomain], , AC_MSG_ERROR(res_querydomain needed))
-+AC_CHECK_LIB([resolv], [res_querydomain], , AC_MSG_ERROR(res_querydomain needed))
- 
- AC_ARG_ENABLE([ldap],
- 	[AS_HELP_STRING([--disable-ldap],[Disable support for LDAP @<:default=detect@:>@])])
-@@ -547,11 +547,11 @@ my_am_cflags="\
-  -pipe \
+@@ -582,10 +582,10 @@ my_am_cflags="\
   -Wall \
   -Wextra \
-- -Werror=strict-prototypes \
+  $rpcgen_cflags \
 - -Werror=missing-prototypes \
 - -Werror=missing-declarations \
-+ -Wstrict-prototypes \
 + -Wmissing-prototypes \
 + -Wmissing-declarations \
   -Werror=format=2 \
@@ -43,7 +32,7 @@ index 276dec3..760238b 100644
   -Werror=missing-include-dirs \
   -Werror=strict-aliasing=2 \
   -Werror=init-self \
-@@ -579,10 +579,9 @@ AC_DEFUN([CHECK_CCSUPPORT], [
+@@ -614,10 +614,9 @@ AC_DEFUN([CHECK_CCSUPPORT], [
  
  CHECK_CCSUPPORT([-Werror=format-overflow=2], [flg1])
  CHECK_CCSUPPORT([-Werror=int-conversion], [flg2])

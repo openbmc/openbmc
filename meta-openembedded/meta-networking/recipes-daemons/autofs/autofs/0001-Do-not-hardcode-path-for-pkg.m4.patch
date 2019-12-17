@@ -9,7 +9,7 @@ Upstream-Status: Pending
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
-update patch to version 5.1.5
+update patch to version 5.1.6
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
  configure.in | 2 +-
@@ -20,7 +20,7 @@ index 493b9f1..268d06b 100644
 --- a/configure.in
 +++ b/configure.in
 @@ -12,7 +12,7 @@ define([AC_CACHE_SAVE], )dnl
- AC_INIT(.autofs-5.1.5)
+ AC_INIT(.autofs-5.1.6)
  
  # for pkg-config macros
 -m4_include([/usr/share/aclocal/pkg.m4])

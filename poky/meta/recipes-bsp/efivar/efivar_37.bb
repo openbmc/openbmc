@@ -23,7 +23,10 @@ LDFLAGS += "-fuse-ld=bfd"
 
 do_compile_prepend() {
     # Remove when https://github.com/rhboot/efivar/issues/130 is fixed
-    oe_runmake CFLAGS="${BUILD_CFLAGS}" -C src makeguids
+    oe_runmake \
+        CFLAGS="${BUILD_CFLAGS}" \
+        LDFLAGS="${BUILD_LDFLAGS}" \
+        -C src makeguids
 }
 
 do_install() {

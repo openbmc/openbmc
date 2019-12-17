@@ -9,7 +9,7 @@ from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
 from oeqa.core.decorator.data import skipIfDataVar, skipIfNotDataVar
 from oeqa.runtime.decorator.package import OEHasPackage
-from oeqa.core.decorator.data import skipIfNotFeature
+from oeqa.core.decorator.data import skipIfNotFeature, skipIfFeature
 
 class SystemdTest(OERuntimeTestCase):
 
@@ -114,11 +114,25 @@ class SystemdServiceTests(SystemdTest):
         self.systemctl('is-active', 'avahi-daemon.service', verbose=True)
 
     @OETestDepends(['systemd.SystemdServiceTests.test_systemd_status'])
+    @skipIfFeature('read-only-rootfs',
+                   'Test is only meant to run without read-only-rootfs in IMAGE_FEATURES')
     def test_systemd_disable_enable(self):
         self.systemctl('disable', 'avahi-daemon.service')
         self.systemctl('is-enabled', 'avahi-daemon.service', expected=1)
         self.systemctl('enable', 'avahi-daemon.service')
         self.systemctl('is-enabled', 'avahi-daemon.service')
+
+    @OETestDepends(['systemd.SystemdServiceTests.test_systemd_status'])
+    @skipIfNotFeature('read-only-rootfs',
+                      'Test is only meant to run with read-only-rootfs in IMAGE_FEATURES')
+    def test_systemd_disable_enable_ro(self):
+        status = self.target.run('mount -orw,remount /')[0]
+        self.assertTrue(status == 0, msg='Remounting / as r/w failed')
+        try:
+            self.test_systemd_disable_enable()
+        finally:
+            status = self.target.run('mount -oro,remount /')[0]
+            self.assertTrue(status == 0, msg='Remounting / as r/o failed')
 
 class SystemdJournalTests(SystemdTest):
 

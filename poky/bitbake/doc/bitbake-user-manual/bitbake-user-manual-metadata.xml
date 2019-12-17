@@ -369,9 +369,8 @@
 
             <para>
                 These operators differ from the ":=", ".=", "=.", "+=", and "=+"
-                operators in that their effects are deferred
-                until after parsing completes rather than being immediately
-                applied.
+                operators in that their effects are applied at variable
+                expansion time rather than being immediately applied.
                 Here are some examples:
                 <literallayout class='monospaced'>
      B = "bval"
@@ -420,18 +419,22 @@
      FOO = "123 456 789 123456 123 456 123 456"
      FOO_remove = "123"
      FOO_remove = "456"
-     FOO2 = "abc def ghi abcdef abc def abc def"
-     FOO2_remove = "abc def"
+     FOO2 = " abc  def ghi abcdef abc def abc  def def"
+     FOO2_remove = " \
+         def \
+         abc \
+         ghi \
+     "
                 </literallayout>
                 The variable <filename>FOO</filename> becomes
-                "&nbsp;&nbsp;789 123456&nbsp;&nbsp;&nbsp;&nbsp;"
+                "&nbsp;&nbsp;789&nbsp;123456&nbsp;&nbsp;&nbsp;&nbsp;"
                 and <filename>FOO2</filename> becomes
-                "&nbsp;&nbsp;ghi abcdef&nbsp;&nbsp;&nbsp;&nbsp;".
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;jkl&nbsp;&nbsp;abcdef&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".
             </para>
 
             <para>
                 Like "_append" and "_prepend", "_remove"
-                is deferred until after parsing completes.
+                is applied at variable expansion time.
             </para>
         </section>
 
@@ -796,17 +799,15 @@
             <title>Key Expansion</title>
 
             <para>
-                Key expansion happens when the BitBake datastore is finalized
-                just before BitBake expands overrides.
+                Key expansion happens when the BitBake datastore is finalized.
                 To better understand this, consider the following example:
                 <literallayout class='monospaced'>
      A${B} = "X"
      B = "2"
      A2 = "Y"
                 </literallayout>
-                In this case, after all the parsing is complete, and
-                before any overrides are handled, BitBake expands
-                <filename>${B}</filename> into "2".
+                In this case, after all the parsing is complete,
+                BitBake expands <filename>${B}</filename> into "2".
                 This expansion causes <filename>A2</filename>, which was
                 set to "Y" before the expansion, to become "X".
             </para>

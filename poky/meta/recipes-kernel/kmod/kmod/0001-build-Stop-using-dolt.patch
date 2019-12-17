@@ -1,0 +1,28 @@
+From f8b8d7b330433511d19a936ddfc7b7d1af5490b5 Mon Sep 17 00:00:00 2001
+From: Adrian Bunk <bunk@kernel.org>
+Date: Wed, 20 Feb 2019 14:22:04 +0200
+Subject: build: Stop using dolt
+
+This does regress "make -12" from 0.7s to 0.9s on my
+Coffee Lake machine, but even on slower hardware this
+will not amount to a noticable slowdown.
+
+On the other hand using dolt can create problems for
+people doing cross-compilation, e.g. Yocto has two
+hacks just for dolt in kmod:
+https://git.yoctoproject.org/cgit/cgit.cgi/poky/tree/meta/recipes-kernel/kmod/kmod.inc?id=a17abae00785c76cfffe5381a22fb2c86b982e82
+
+Signed-off-by: Adrian Bunk <bunk@kernel.org>
+Upstream-Status: Backport
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -17,7 +17,6 @@ AM_MAINTAINER_MODE([enable])
+ AM_INIT_AUTOMAKE([check-news foreign 1.11 silent-rules tar-pax no-dist-gzip dist-xz subdir-objects color-tests parallel-tests])
+ AM_SILENT_RULES([yes])
+ LT_INIT([disable-static pic-only])
+-DOLT
+ 
+ AS_IF([test "x$enable_static" = "xyes"], [AC_MSG_ERROR([--enable-static is not supported by kmod])])
+ AS_IF([test "x$enable_largefile" = "xno"], [AC_MSG_ERROR([--disable-largefile is not supported by kmod])])
+

@@ -1,0 +1,46 @@
+From 603ae4ed8cd65abf0776ef7f68354a5c24a3411c Mon Sep 17 00:00:00 2001
+From: Sebastien GODARD <sysstat@users.noreply.github.com>
+Date: Tue, 15 Oct 2019 14:39:33 +0800
+Subject: [PATCH] Fix #232: Memory corruption bug due to Integer Overflow in
+ remap_struct()
+
+Try to avoid integer overflow when reading a corrupted binary datafile
+with sadf.
+
+Upstream-Status: Backport [https://github.com/sysstat/sysstat/commit/83fad9c895d1ac13f76af5883b7451b3302beef5]
+CVE: CVE-2019-16167
+
+Signed-off-by: Sebastien GODARD <sysstat@users.noreply.github.com>
+Signed-off-by: Wenlin Kang <wenlin.kang@windriver.com>
+---
+ sa_common.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/sa_common.c b/sa_common.c
+index 395c11c..cfa9007 100644
+--- a/sa_common.c
++++ b/sa_common.c
+@@ -1336,7 +1336,8 @@ int remap_struct(unsigned int gtypes_nr[], unsigned int ftypes_nr[],
+ 	/* Remap [unsigned] int fields */
+ 	d = gtypes_nr[1] - ftypes_nr[1];
+ 	if (d) {
+-		if (ftypes_nr[1] * UL_ALIGNMENT_WIDTH < ftypes_nr[1])
++		if (gtypes_nr[0] * ULL_ALIGNMENT_WIDTH +
++		    ftypes_nr[1] * UL_ALIGNMENT_WIDTH < ftypes_nr[1])
+ 			/* Overflow */
+ 			return -1;
+ 
+@@ -1365,7 +1366,9 @@ int remap_struct(unsigned int gtypes_nr[], unsigned int ftypes_nr[],
+ 	/* Remap possible fields (like strings of chars) following int fields */
+ 	d = gtypes_nr[2] - ftypes_nr[2];
+ 	if (d) {
+-		if (ftypes_nr[2] * U_ALIGNMENT_WIDTH < ftypes_nr[2])
++		if (gtypes_nr[0] * ULL_ALIGNMENT_WIDTH +
++		    gtypes_nr[1] * UL_ALIGNMENT_WIDTH +
++		    ftypes_nr[2] * U_ALIGNMENT_WIDTH < ftypes_nr[2])
+ 			/* Overflow */
+ 			return -1;
+ 
+-- 
+1.9.1
+

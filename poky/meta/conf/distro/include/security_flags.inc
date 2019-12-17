@@ -36,7 +36,7 @@ SECURITY_CFLAGS_remove_powerpc = "${SECURITY_PIE_CFLAGS}"
 SECURITY_CFLAGS_pn-libgcc_powerpc = ""
 
 SECURITY_CFLAGS_pn-glibc = ""
-SECURITY_CFLAGS_pn-glibc-initial = ""
+SECURITY_CFLAGS_pn-glibc-testsuite = ""
 SECURITY_CFLAGS_pn-gcc-runtime = ""
 SECURITY_CFLAGS_pn-grub = ""
 SECURITY_CFLAGS_pn-grub-efi = ""
@@ -60,7 +60,7 @@ TARGET_LDFLAGS_append_class-target = " ${SECURITY_LDFLAGS}"
 
 SECURITY_STACK_PROTECTOR_pn-gcc-runtime = ""
 SECURITY_STACK_PROTECTOR_pn-glibc = ""
-SECURITY_STACK_PROTECTOR_pn-glibc-initial = ""
+SECURITY_STACK_PROTECTOR_pn-glibc-testsuite = ""
 # All xorg module drivers need to be linked this way as well and are
 # handled in recipes-graphics/xorg-driver/xorg-driver-common.inc
 SECURITY_LDFLAGS_pn-xserver-xorg = "${SECURITY_X_LDFLAGS}"

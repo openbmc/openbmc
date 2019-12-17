@@ -35,17 +35,19 @@ RPI_KERNEL_DEVICETREE_OVERLAYS ?= " \
     overlays/rpi-ft5406.dtbo \
     overlays/rpi-poe.dtbo \
     overlays/vc4-kms-v3d.dtbo \
+    overlays/vc4-fkms-v3d.dtbo \
     overlays/w1-gpio-pullup.dtbo \
     overlays/w1-gpio.dtbo \
     "
 
 RPI_KERNEL_DEVICETREE ?= " \
-    bcm2708-rpi-0-w.dtb \
+    bcm2708-rpi-zero-w.dtb \
     bcm2708-rpi-b.dtb \
     bcm2708-rpi-b-plus.dtb \
     bcm2709-rpi-2-b.dtb \
     bcm2710-rpi-3-b.dtb \
     bcm2710-rpi-3-b-plus.dtb \
+    bcm2711-rpi-4-b.dtb \
     bcm2708-rpi-cm.dtb \
     bcm2710-rpi-cm3.dtb \
     "
@@ -68,7 +70,7 @@ KERNEL_IMAGETYPE_DIRECT ??= "zImage"
 KERNEL_IMAGETYPE ?= "${@bb.utils.contains('RPI_USE_U_BOOT', '1', \
         '${KERNEL_IMAGETYPE_UBOOT}', '${KERNEL_IMAGETYPE_DIRECT}', d)}"
 
-MACHINE_FEATURES += "apm usbhost keyboard vfat ext2 screen touchscreen alsa bluetooth wifi sdio"
+MACHINE_FEATURES += "apm usbhost keyboard vfat ext2 screen touchscreen alsa bluetooth wifi sdio ${@bb.utils.contains('DISABLE_VC4GRAPHICS', '1', '', 'vc4graphics', d)}"
 
 # Raspberry Pi has no hardware clock
 MACHINE_FEATURES_BACKFILL_CONSIDERED = "rtc"

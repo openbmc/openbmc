@@ -25,6 +25,7 @@ class GalculatorTest(OERuntimeTestCase):
     @OEHasPackage(['gcc'])
     @OEHasPackage(['make'])
     @OEHasPackage(['autoconf'])
+    @OEHasPackage(['gtk+3'])
     def test_galculator(self):
         self.project.download_archive()
         self.project.run_configure()

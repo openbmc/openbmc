@@ -19,6 +19,8 @@ KBUILD_DEFCONFIG_raspberrypi ?= "bcmrpi_defconfig"
 KBUILD_DEFCONFIG_raspberrypi2 ?= "bcm2709_defconfig"
 KBUILD_DEFCONFIG_raspberrypi3 ?= "bcm2709_defconfig"
 KBUILD_DEFCONFIG_raspberrypi3-64 ?= "bcmrpi3_defconfig"
+KBUILD_DEFCONFIG_raspberrypi4 ?= "bcm2711_defconfig"
+KBUILD_DEFCONFIG_raspberrypi4-64 ?= "bcm2711_defconfig"
 
 # CMDLINE for raspberrypi
 SERIAL = "${@oe.utils.conditional("ENABLE_UART", "1", "console=serial0,115200", "", d)}"
@@ -120,9 +122,11 @@ do_configure_prepend() {
     rm -f ${B}/.config.patched
 }
 
-do_compile_append_raspberrypi3-64() {
-    cc_extra=$(get_cc_option)
-    oe_runmake dtbs CC="${KERNEL_CC} $cc_extra " LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS}
+do_compile_append() {
+    if [ "${SITEINFO_BITS}" = "64" ]; then
+        cc_extra=$(get_cc_option)
+        oe_runmake dtbs CC="${KERNEL_CC} $cc_extra " LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS}
+    fi
 }
 
 do_deploy_append() {

@@ -1,0 +1,27 @@
+From 529cd5b007aa681c3ca14e5ab1e30469dd51646b Mon Sep 17 00:00:00 2001
+From: Paul Barker <paul@betafive.co.uk>
+Date: Tue, 12 Nov 2019 22:17:19 +0000
+Subject: [PATCH] Don't set uid/gid during install
+
+Signed-off-by: Paul Barker <paul@betafive.co.uk>
+Upstream-Status: Inappropriate [native]
+---
+ RULES/rules.prg | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/RULES/rules.prg b/RULES/rules.prg
+index 023555c..f70f1a7 100644
+--- a/RULES/rules.prg
++++ b/RULES/rules.prg
+@@ -94,7 +94,7 @@ INSGRP=		$(__DEFINSGRP:$(_UNIQ)%=%)
+ 
+ LD=		@echo "	==> LINKING   \"$@\""; ld
+ LOCALIZE=	@echo "	==> LOCALIZING \"$@\""; $(RM_F) $@; cp
+-INSTALL=	@echo "	==> INSTALLING \"$@\""; sh $(SRCROOT)/conf/install-sh -c -m $(INSMODEINS) -o $(INSUSR) -g $(INSGRP)
++INSTALL=	@echo "	==> INSTALLING \"$@\""; sh $(SRCROOT)/conf/install-sh -c -m $(INSMODEINS)
+ CHMOD=		@echo "	==> SETTING PERMISSIONS ON \"$@\""; chmod
+ CHOWN=		@echo "	==> SETTING OWNER ON \"$@\""; chown
+ CHGRP=		@echo "	==> SETTING GROUP ON \"$@\""; chgrp
+-- 
+2.24.0
+

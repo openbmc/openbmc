@@ -1,25 +1,27 @@
-Upstream-Status: Pending
-
-From 306e95a9818d39d3349075aac9609e062b0f19ce Mon Sep 17 00:00:00 2001
+From 6d608326970b1613633d7715ebb7d628dfcd16ee Mon Sep 17 00:00:00 2001
 From: Christopher Larson <chris_larson@mentor.com>
 Date: Thu, 5 May 2016 10:59:07 -0700
-Subject: [PATCH 2/2] Obey LDFLAGS for the link of libruby
+Subject: [PATCH 2/3] Obey LDFLAGS for the link of libruby
 
 Signed-off-by: Christopher Larson <chris_larson@mentor.com>
+Upstream-Status: Pending
 ---
  Makefile.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Index: ruby-2.5.0/Makefile.in
-===================================================================
---- ruby-2.5.0.orig/Makefile.in
-+++ ruby-2.5.0/Makefile.in
-@@ -77,7 +77,7 @@ LIBS = @LIBS@ $(EXTLIBS)
- MISSING = @LIBOBJS@ @ALLOCA@
+diff --git a/Makefile.in b/Makefile.in
+index fa1e19ef37..bbd07fa34b 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -109,7 +109,7 @@ MISSING = @LIBOBJS@ @ALLOCA@
  ENABLE_SHARED = @ENABLE_SHARED@
  LDSHARED = @LIBRUBY_LDSHARED@
+ DLDSHARED = @DLDSHARED@
 -DLDFLAGS = @LIBRUBY_DLDFLAGS@ $(XLDFLAGS) $(ARCH_FLAG)
 +DLDFLAGS = @LIBRUBY_DLDFLAGS@ @LDFLAGS@ $(XLDFLAGS) $(ARCH_FLAG)
  SOLIBS = @SOLIBS@
  ENABLE_DEBUG_ENV = @ENABLE_DEBUG_ENV@
  MAINLIBS = @MAINLIBS@
+-- 
+2.23.0.rc1
+

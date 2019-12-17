@@ -5,12 +5,12 @@ LIC_FILES_CHKSUM = "file://LGPL-2.1;md5=2d5025d4aa3495befef8f17206a5b0a1"
 
 DEPENDS = "sysfsutils"
 RDEPENDS_${PN} += "bash python python-io python-lang python-subprocess python-resource"
-RDEPENDS_${PN}-tests += "bash"
+RDEPENDS_${PN}-tests += "bash python3-core"
 
-PV = "2.21"
+PV = "2.22"
 PE = "1"
 
-SRCREV = "73d06e69108f231696e9c5c44f4b42690fc5d752"
+SRCREV = "e6499ff92b4a7dcffbd131d1f5d24933e48c3f20"
 SRC_URI = " \
     git://github.com/libhugetlbfs/libhugetlbfs.git;protocol=https \
     file://skip-checking-LIB32-and-LIB64-if-they-point-to-the-s.patch \

@@ -2349,7 +2349,7 @@
                 Most software provides some means of setting build-time
                 configuration options before compilation.
                 Typically, setting these options is accomplished by running a
-                configure script with some options, or by modifying a build
+                configure script with options, or by modifying a build
                 configuration file.
                 <note>
                     As of Yocto Project Release 1.7, some of the core recipes
@@ -2389,6 +2389,7 @@
                         software is built using Autotools.
                         If this is the case, you just need to worry about
                         modifying the configuration.</para>
+
                         <para>When using Autotools, your recipe needs to inherit
                         the
                         <ulink url='&YOCTO_DOCS_REF_URL;#ref-classes-autotools'><filename>autotools</filename></ulink>
@@ -2401,13 +2402,15 @@
                         or
                         <ulink url='&YOCTO_DOCS_REF_URL;#var-PACKAGECONFIG_CONFARGS'><filename>PACKAGECONFIG_CONFARGS</filename></ulink>
                         to pass any needed configure options that are specific
-                        to the recipe.</para></listitem>
+                        to the recipe.
+                        </para></listitem>
                     <listitem><para><emphasis>CMake:</emphasis>
                         If your source files have a
                         <filename>CMakeLists.txt</filename> file, then your
                         software is built using CMake.
                         If this is the case, you just need to worry about
                         modifying the configuration.</para>
+
                         <para>When you use CMake, your recipe needs to inherit
                         the
                         <ulink url='&YOCTO_DOCS_REF_URL;#ref-classes-cmake'><filename>cmake</filename></ulink>
@@ -2417,7 +2420,16 @@
                         You can make some adjustments by setting
                         <ulink url='&YOCTO_DOCS_REF_URL;#var-EXTRA_OECMAKE'><filename>EXTRA_OECMAKE</filename></ulink>
                         to pass any needed configure options that are specific
-                        to the recipe.</para></listitem>
+                        to the recipe.
+                        <note>
+                            If you need to install one or more custom CMake
+                            toolchain files that are supplied by the
+                            application you are building, install the files to
+                            <filename>${D}${datadir}/cmake/</filename> Modules
+                            during
+                            <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-install'><filename>do_install</filename></ulink>.
+                        </note>
+                        </para></listitem>
                     <listitem><para><emphasis>Other:</emphasis>
                         If your source files do not have a
                         <filename>configure.ac</filename> or
@@ -2779,6 +2791,14 @@
                         See
                         <ulink url='&YOCTO_DOCS_REF_URL;#var-PARALLEL_MAKEINST'><filename>PARALLEL_MAKEINST</filename></ulink>
                         for additional information.
+                        </para></listitem>
+                    <listitem><para>
+                        If you need to install one or more custom CMake
+                        toolchain files that are supplied by the
+                        application you are building, install the files to
+                        <filename>${D}${datadir}/cmake/</filename> Modules
+                        during
+                        <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-install'><filename>do_install</filename></ulink>.
                         </para></listitem>
                 </itemizedlist>
             </note>
@@ -5420,26 +5440,39 @@
                             <literallayout class='monospaced'>
      BBMULTICONFIG = "x86 arm"
                             </literallayout>
+                            <note>
+                                A "default" configuration already exists by
+                                definition.
+                                This configuration is named: "" (i.e. empty
+                                string) and is defined by the variables coming
+                                from your <filename>local.conf</filename> file.
+                                Consequently, the previous example actually
+                                adds two additional configurations to your
+                                build: "arm" and "x86" along with "".
+                            </note>
                             </para></listitem>
                         <listitem><para>
                             <emphasis>Launch BitBake</emphasis>:
                             Use the following BitBake command form to launch the
                             multiple configuration build:
                             <literallayout class='monospaced'>
-     $ bitbake [multiconfig:<replaceable>multiconfigname</replaceable>:]<replaceable>target</replaceable> [[[multiconfig:<replaceable>multiconfigname</replaceable>:]<replaceable>target</replaceable>] ... ]
+     $ bitbake [mc:<replaceable>multiconfigname</replaceable>:]<replaceable>target</replaceable> [[[mc:<replaceable>multiconfigname</replaceable>:]<replaceable>target</replaceable>] ... ]
                             </literallayout>
                             For the example in this section, the following
                             command applies:
                             <literallayout class='monospaced'>
-     $ bitbake multiconfig:x86:core-image-minimal multiconfig:arm:core-image-sato
+     $ bitbake mc:x86:core-image-minimal mc:arm:core-image-sato mc::core-image-base
                             </literallayout>
                             The previous BitBake command builds a
                             <filename>core-image-minimal</filename> image that
                             is configured through the
-                            <filename>x86.conf</filename> configuration file
-                            and builds a <filename>core-image-sato</filename>
+                            <filename>x86.conf</filename> configuration file,
+                            a <filename>core-image-sato</filename>
                             image that is configured through the
-                            <filename>arm.conf</filename> configuration file.
+                            <filename>arm.conf</filename> configuration file
+                            and a <filename>core-image-base</filename> that is
+                            configured through your
+                            <filename>local.conf</filename> configuration file.
                             </para></listitem>
                     </itemizedlist>
                     <note>
@@ -5479,7 +5512,7 @@
                     build, you must declare the dependencies in the recipe
                     using the following statement form:
                     <literallayout class='monospaced'>
-     <replaceable>task_or_package</replaceable>[mcdepends] = "multiconfig:<replaceable>from_multiconfig</replaceable>:<replaceable>to_multiconfig</replaceable>:<replaceable>recipe_name</replaceable>:<replaceable>task_on_which_to_depend</replaceable>"
+     <replaceable>task_or_package</replaceable>[mcdepends] = "mc:<replaceable>from_multiconfig</replaceable>:<replaceable>to_multiconfig</replaceable>:<replaceable>recipe_name</replaceable>:<replaceable>task_on_which_to_depend</replaceable>"
                     </literallayout>
                     To better show how to use this statement, consider the
                     example scenario from the first paragraph of this section.
@@ -5487,7 +5520,7 @@
                     that builds the <filename>core-image-sato</filename>
                     image:
                     <literallayout class='monospaced'>
-     do_image[mcdepends] = "multiconfig:x86:arm:core-image-minimal:do_rootfs"
+     do_image[mcdepends] = "mc:x86:arm:core-image-minimal:do_rootfs"
                     </literallayout>
                     In this example, the
                     <replaceable>from_multiconfig</replaceable> is "x86".
@@ -5502,7 +5535,7 @@
                    Once you set up this dependency, you can build the
                    "x86" multiconfig using a BitBake command as follows:
                    <literallayout class='monospaced'>
-     $ bitbake multiconfig:x86:core-image-sato
+     $ bitbake mc:x86:core-image-sato
                    </literallayout>
                    This command executes all the tasks needed to create
                    the <filename>core-image-sato</filename> image for the
@@ -5518,7 +5551,7 @@
                    Consider this change to the statement in the
                    <filename>core-image-sato</filename> recipe:
                    <literallayout class='monospaced'>
-     do_image[mcdepends] = "multiconfig:x86:arm:core-image-minimal:do_image"
+     do_image[mcdepends] = "mc:x86:arm:core-image-minimal:do_image"
                    </literallayout>
                    In this case, BitBake must create the
                    <filename>core-image-minimal</filename> image for the
@@ -7129,7 +7162,8 @@
             This problem is solved with the OpenEmbedded build system by
             running the code through QEMU, which allows precisely that.
             Unfortunately, QEMU does not always work perfectly as mentioned
-            in the xxx section.
+            in the
+            "<link linkend='known-issues'>Known Issues</link>" section.
         </para>
 
         <section id='enabling-the-generation-of-introspection-data'>
@@ -10808,6 +10842,47 @@
             which is a full replacement for init with
             parallel starting of services, reduced shell overhead and other
             features that are used by many distributions.
+        </para>
+
+        <para>
+            By default, the Yocto Project uses SysVinit as the initialization
+            manager.
+            However, support also exists for systemd,
+            which is a full replacement for init with
+            parallel starting of services, reduced shell overhead and other
+            features that are used by many distributions.
+        </para>
+
+        <para>
+            Within the system, SysVinit treats system components as services.
+            These services are maintained as shell scripts stored in the
+            <filename>/etc/init.d/</filename> directory.
+            Services organize into different run levels.
+            This organization is maintained by putting links to the services
+            in the <filename>/etc/rcN.d/</filename> directories, where
+            <replaceable>N/</replaceable> is one of the following options:
+            "S", "0", "1", "2", "3", "4", "5", or "6".
+            <note>
+                Each runlevel has a dependency on the previous runlevel.
+                This dependency allows the services to work properly.
+            </note>
+        </para>
+
+        <para>
+            In comparison, systemd treats components as units.
+            Using units is a broader concept as compared to using a service.
+            A unit includes several different types of entities.
+            Service is one of the types of entities.
+            The runlevel concept in SysVinit corresponds to the concept of a
+            target in systemd, where target is also a type of supported unit.
+        </para>
+
+        <para>
+            In a SysVinit-based system, services load sequentially (i.e. one
+            by one) during and parallelization is not supported.
+            With systemd, services start in parallel.
+            Needless to say, the method can have an impact on system startup
+            performance.
         </para>
 
         <para>

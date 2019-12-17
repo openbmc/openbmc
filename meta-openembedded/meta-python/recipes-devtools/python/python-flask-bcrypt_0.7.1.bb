@@ -1,5 +1,5 @@
 DESCRIPTION = "Bcrypt hashing for Flask."
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=0ee2ee5bee7fe96597770e92db5719a8"
 
 SRC_URI[md5sum] = "d345c36ac6637d3ca9fa942e238d00ca"

@@ -22,8 +22,9 @@ class TestData(TestBase):
         expectedException = "oeqa.core.exception.OEQAMissingVariable"
 
         tc = self._testLoader(modules=self.modules)
-        self.assertEqual(False, tc.runTests().wasSuccessful())
-        for test, data in tc.errors:
+        results = tc.runTests()
+        self.assertFalse(results.wasSuccessful())
+        for test, data in results.errors:
             expect = False
             if expectedException in data:
                 expect = True
@@ -35,8 +36,9 @@ class TestData(TestBase):
         d = {'IMAGE' : 'core-image-sato', 'ARCH' : 'arm'}
 
         tc = self._testLoader(d=d, modules=self.modules)
-        self.assertEqual(False, tc.runTests().wasSuccessful())
-        for test, data in tc.failures:
+        results = tc.runTests()
+        self.assertFalse(results.wasSuccessful())
+        for test, data in results.failures:
             expect = False
             if expectedError in data:
                 expect = True

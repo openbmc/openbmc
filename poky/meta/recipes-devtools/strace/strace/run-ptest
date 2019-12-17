@@ -1,2 +1,3 @@
 #!/bin/sh
+export TIMEOUT_DURATION=30
 make -B -C tests -k test-suite.log

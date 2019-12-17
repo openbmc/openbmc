@@ -13,7 +13,7 @@ def get_qemu_target_list(d):
             softmmuonly += arch + "-softmmu,"
             archs.remove(arch)
     linuxuseronly = ""
-    for arch in ['armeb', 'alpha', 'ppc64abi32', 'sparc32plus']:
+    for arch in ['armeb', 'alpha', 'ppc64abi32', 'sparc32plus', 'aarch64_be']:
         if arch in archs:
             linuxuseronly += arch + "-linux-user,"
             archs.remove(arch)

@@ -1,5 +1,6 @@
 [Unit]
 Description=Phosphor Dump core monitor.
+ConditionPathExists=/var/lib/systemd/coredump
 
 [Service]
 ExecStart=/usr/bin/env phosphor-dump-monitor

@@ -1,0 +1,19 @@
+Fix following error:
+
+netflowPlugin.c: In function 'netflowUtilsLoop':
+netflowPlugin.c:2144:1: error: no return statement in function returning non-void [-Werror=return-type]
+ 2144 | }
+      | ^
+
+Return NULL like netflowMainLoop does.
+
+--- ntop-5.0.1.orig/plugins/netflowPlugin.c	2012-03-09 17:44:17.000000000 +0000
++++ ntop-5.0.1/plugins/netflowPlugin.c	2019-08-09 10:25:40.878799852 +0000
+@@ -2141,6 +2141,7 @@
+       waitCondvar(&myGlobals.device[deviceId].netflowGlobals->ifStatsQueueCondvar);
+     }
+   }
++  return(NULL);
+ }
+ #endif
+ 

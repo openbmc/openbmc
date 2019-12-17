@@ -39,6 +39,7 @@ EXTRA_OEMAKE = '\
     CROSS_COMPILE=${TARGET_PREFIX} \
     ARCH=${ARCH} \
     CC="${CC}" \
+    CLANG="clang -fno-stack-protector" \
     AR="${AR}" \
     LD="${LD}" \
     DESTDIR="${D}" \
@@ -52,20 +53,11 @@ KERNEL_SELFTEST_SRC ?= "Makefile \
                         LICENSES \
 "
 
-python __anonymous () {
-    import re
-
-    var = d.getVar('TARGET_CC_ARCH')
-    pattern = '_FORTIFY_SOURCE=[^0]'
-
-    if re.search(pattern, var):
-        d.appendVar('TARGET_CC_ARCH', " -O")
-}
-
 do_compile() {
-    bbwarn "clang >= 6.0  with bpf support is needed with kernel 4.18+ so \
-either install it and add it to HOSTTOOLS, or add \
-clang-native from meta-clang to dependency"
+    if [ ${@bb.utils.contains('DEPENDS', 'clang-native', 'True', 'False', d)} = 'False' ]; then
+        bbwarn "clang >= 6.0 with bpf support is needed with kernel 4.18+ so
+either install it and add it to HOSTTOOLS, or add clang-native from meta-clang to dependency"
+    fi
     for i in ${TEST_LIST}
     do
         oe_runmake -C ${S}/tools/testing/selftests/${i}
@@ -121,3 +113,11 @@ FILES_${PN} += "/usr/kernel-selftest"
 RDEPENDS_${PN} += "python3"
 # tools/testing/selftests/vm/Makefile doesn't respect LDFLAGS and tools/testing/selftests/Makefile explicitly overrides to empty
 INSANE_SKIP_${PN} += "ldflags"
+
+SECURITY_CFLAGS = ""
+COMPATIBLE_HOST_libc-musl = 'null'
+
+# It has native clang/llvm dependency, poky distro is reluctant to include them as deps
+# this helps with world builds on AB
+EXCLUDE_FROM_WORLD = "1"
+

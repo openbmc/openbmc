@@ -1,0 +1,47 @@
+From 24e0f55c07080a59907c190a315e279f7b2355e5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 29 Aug 2019 14:25:02 -0700
+Subject: [PATCH 3/4] engine: Define discover(const String &path) in base class
+
+this fixes the confusion that compiler may have when inheriting two
+different classes where each of them defines discover() virtual function
+but with different signatures
+
+Remove ununsed orom_vmd
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/engine/storage_object.h | 3 +++
+ lib/engine/vmd_raid_info.h  | 2 --
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/lib/engine/storage_object.h b/lib/engine/storage_object.h
+index f1feb62..9c1d3d8 100644
+--- a/lib/engine/storage_object.h
++++ b/lib/engine/storage_object.h
+@@ -123,6 +123,9 @@ public:
+     virtual void discover() {
+         throw E_INVALID_OPERATION;
+     }
++    virtual void discover(const String &path) {
++        throw E_INVALID_OPERATION;
++    }
+     virtual void addToSession(const boost::shared_ptr<Session>& pSession) = 0;
+ };
+ 
+diff --git a/lib/engine/vmd_raid_info.h b/lib/engine/vmd_raid_info.h
+index 2bea839..cc6ffbe 100644
+--- a/lib/engine/vmd_raid_info.h
++++ b/lib/engine/vmd_raid_info.h
+@@ -53,8 +53,6 @@ public:
+         return SSI_ControllerTypeVMD;
+     }
+ 
+-private:
+-    struct orom_info orom_vmd;
+ };
+ 
+ #endif /* __VMD_RAID_INFO_H__INCLUDED__ */
+-- 
+2.23.0
+

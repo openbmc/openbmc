@@ -1,0 +1,33 @@
+From e33bc310238bba1690f2c71ad333e10b9e422ea9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Sat, 19 Oct 2019 14:23:06 +0200
+Subject: [PATCH] Use our hand-build native src-generator
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Inappropriate [oe-core specific]
+
+Signed-off-by: Andreas MÃ¼ller <schnitzeltony@gmail.com>
+---
+ src/libical-glib/CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/libical-glib/CMakeLists.txt b/src/libical-glib/CMakeLists.txt
+index f3704e6..ce9db16 100644
+--- a/src/libical-glib/CMakeLists.txt
++++ b/src/libical-glib/CMakeLists.txt
+@@ -63,8 +63,8 @@ endforeach()
+ 
+ add_custom_command (
+   OUTPUT ${LIBICAL_GLIB_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/libical-glib-private.h ${CMAKE_CURRENT_BINARY_DIR}/i-cal-forward-declarations.h
+-  COMMAND ${EXECUTABLE_OUTPUT_PATH}/src-generator "${CMAKE_CURRENT_SOURCE_DIR}/tools" "${CMAKE_CURRENT_SOURCE_DIR}/api"
+-  DEPENDS ${EXECUTABLE_OUTPUT_PATH}/src-generator ${xml_files}
++  COMMAND ${CMAKE_BINARY_DIR}/src-generator "${CMAKE_CURRENT_SOURCE_DIR}/tools" "${CMAKE_CURRENT_SOURCE_DIR}/api"
++  DEPENDS ${CMAKE_BINARY_DIR}/src-generator ${xml_files}
+ )
+ 
+ configure_file(
+-- 
+2.21.0
+

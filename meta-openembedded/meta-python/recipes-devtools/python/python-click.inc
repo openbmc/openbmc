@@ -5,7 +5,7 @@ in a composable way with as little code as necessary. It's the "Command \
 Line Interface Creation Kit". It's highly configurable but comes with \
 sensible defaults out of the box."
 HOMEPAGE = "http://click.pocoo.org/"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.rst;md5=c13ed890b210a882c1778216694c98c7"
 
 SRC_URI[md5sum] = "7f53d50f7b7373ebc7963f9ff697450a"

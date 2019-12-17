@@ -197,7 +197,7 @@ def staging_populate_sysroot_dir(targetsysroot, nativesysroot, native, d):
     for pkgarch in pkgarchs:
         for manifest in glob.glob(d.expand("${SSTATE_MANIFESTS}/manifest-%s-*.populate_sysroot" % pkgarch)):
             if manifest.endswith("-initial.populate_sysroot"):
-                # skip glibc-initial and libgcc-initial due to file overlap
+                # skip libgcc-initial due to file overlap
                 continue
             if not native and (manifest.endswith("-native.populate_sysroot") or "nativesdk-" in manifest):
                 continue
@@ -261,12 +261,10 @@ python extend_recipe_sysroot() {
     workdir = d.getVar("WORKDIR")
     #bb.warn(str(taskdepdata))
     pn = d.getVar("PN")
-    mc = d.getVar("BB_CURRENT_MC")
     stagingdir = d.getVar("STAGING_DIR")
     sharedmanifests = d.getVar("COMPONENTS_DIR") + "/manifests"
     recipesysroot = d.getVar("RECIPE_SYSROOT")
     recipesysrootnative = d.getVar("RECIPE_SYSROOT_NATIVE")
-    current_variant = d.getVar("BBEXTENDVARIANT")
 
     # Detect bitbake -b usage
     nodeps = d.getVar("BB_LIMITEDDEPS") or False
@@ -451,12 +449,29 @@ python extend_recipe_sysroot() {
     msg_exists = []
     msg_adding = []
 
+    # Handle all removals first since files may move between recipes
     for dep in configuredeps:
-        if mc != 'default':
-            # We should not care about other multiconfigs
-            depmc = dep.split(':')[1]
-            if depmc != mc:
+        c = setscenedeps[dep][0]
+        if c not in installed:
+            continue
+        taskhash = setscenedeps[dep][5]
+        taskmanifest = depdir + "/" + c + "." + taskhash
+
+        if os.path.exists(depdir + "/" + c):
+            lnk = os.readlink(depdir + "/" + c)
+            if lnk == c + "." + taskhash and os.path.exists(depdir + "/" + c + ".complete"):
                 continue
+            else:
+                bb.note("%s exists in sysroot, but is stale (%s vs. %s), removing." % (c, lnk, c + "." + taskhash))
+                sstate_clean_manifest(depdir + "/" + lnk, d, workdir)
+                os.unlink(depdir + "/" + c)
+                if os.path.lexists(depdir + "/" + c + ".complete"):
+                    os.unlink(depdir + "/" + c + ".complete")
+        elif os.path.lexists(depdir + "/" + c):
+            os.unlink(depdir + "/" + c)
+
+    # Now handle installs
+    for dep in configuredeps:
         c = setscenedeps[dep][0]
         if c not in installed:
             continue
@@ -468,14 +483,6 @@ python extend_recipe_sysroot() {
             if lnk == c + "." + taskhash and os.path.exists(depdir + "/" + c + ".complete"):
                 msg_exists.append(c)
                 continue
-            else:
-                bb.note("%s exists in sysroot, but is stale (%s vs. %s), removing." % (c, lnk, c + "." + taskhash))
-                sstate_clean_manifest(depdir + "/" + lnk, d, workdir)
-                os.unlink(depdir + "/" + c)
-                if os.path.lexists(depdir + "/" + c + ".complete"):
-                    os.unlink(depdir + "/" + c + ".complete")
-        elif os.path.lexists(depdir + "/" + c):
-            os.unlink(depdir + "/" + c)
 
         msg_adding.append(c)
 
@@ -583,17 +590,6 @@ python do_prepare_recipe_sysroot () {
     bb.build.exec_func("extend_recipe_sysroot", d)
 }
 addtask do_prepare_recipe_sysroot before do_configure after do_fetch
-
-# Clean out the recipe specific sysroots before do_fetch
-# (use a prefunc so we can order before extend_recipe_sysroot if it gets added)
-python clean_recipe_sysroot() {
-    # We remove these stamps since we're removing any content they'd have added with
-    # cleandirs. This removes the sigdata too, likely not a big deal,
-    oe.path.remove(d.getVar("STAMP") + "*addto_recipe_sysroot*")
-    return
-}
-clean_recipe_sysroot[cleandirs] += "${RECIPE_SYSROOT} ${RECIPE_SYSROOT_NATIVE}"
-do_fetch[prefuncs] += "clean_recipe_sysroot"
 
 python staging_taskhandler() {
     bbtasks = e.tasklist

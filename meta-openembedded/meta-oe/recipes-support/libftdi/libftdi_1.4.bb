@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM= "\
     file://COPYING.LIB;md5=5f30f0716dfdd0d91eb439ebec522ec2 \
 "
 
-DEPENDS = "libusb1"
+DEPENDS = "libusb1 python3"
 
 SRC_URI = "http://www.intra2net.com/en/developer/${BPN}/download/${BPN}1-${PV}.tar.bz2"
 SRC_URI[md5sum] = "0c09fb2bb19a57c839fa6845c6c780a2"
@@ -17,11 +17,17 @@ SRC_URI[sha256sum] = "ec36fb49080f834690c24008328a5ef42d3cf584ef4060f3a35aa4681c
 
 S = "${WORKDIR}/${BPN}1-${PV}"
 
-inherit cmake binconfig pkgconfig
+inherit cmake binconfig pkgconfig python3native
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[cpp-wrapper] = "-DFTDI_BUILD_CPP=on -DFTDIPP=on,-DFTDI_BUILD_CPP=off -DFTDIPP=off,boost"
 
-EXTRA_OECMAKE = "-DLIB_SUFFIX=${@d.getVar('baselib').replace('lib', '')}"
+EXTRA_OECMAKE = "-DLIB_SUFFIX=${@d.getVar('baselib').replace('lib', '')} \
+                 -DPYTHON_LIBRARY=${STAGING_LIBDIR}/lib${PYTHON_DIR}${PYTHON_ABI}.so \
+                 -DPYTHON_INCLUDE_DIR=${STAGING_INCDIR}/${PYTHON_DIR}${PYTHON_ABI}"
 
 BBCLASSEXTEND = "native nativesdk"
+
+PACKAGES += "${PN}-python"
+
+FILES_${PN}-python = "${libdir}/${PYTHON_DIR}/site-packages/"

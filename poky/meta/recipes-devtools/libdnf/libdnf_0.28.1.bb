@@ -13,7 +13,7 @@ SRCREV = "751f89045b80d58c0d05800f74357cf78cdf7e77"
 
 S = "${WORKDIR}/git"
 
-DEPENDS = "glib-2.0 libsolv libcheck librepo rpm gtk-doc libmodulemd json-c swig-native"
+DEPENDS = "glib-2.0 libsolv libcheck librepo rpm gtk-doc libmodulemd-v1 json-c swig-native"
 
 inherit gtk-doc gobject-introspection cmake pkgconfig distutils3-base
 

@@ -172,21 +172,27 @@ python multilib_virtclass_handler_global () {
     if bb.data.inherits_class('kernel', e.data) or \
             bb.data.inherits_class('module-base', e.data) or \
             d.getVar('BPN') in non_ml_recipes:
+
+            # We need to avoid expanding KERNEL_VERSION which we can do by deleting it
+            # from a copy of the datastore
+            localdata = bb.data.createCopy(d)
+            localdata.delVar("KERNEL_VERSION")
+
             variants = (e.data.getVar("MULTILIB_VARIANTS") or "").split()
 
             import oe.classextend
             clsextends = []
             for variant in variants:
-                clsextends.append(oe.classextend.ClassExtender(variant, e.data))
+                clsextends.append(oe.classextend.ClassExtender(variant, localdata))
 
             # Process PROVIDES
-            origprovs = provs = e.data.getVar("PROVIDES") or ""
+            origprovs = provs = localdata.getVar("PROVIDES") or ""
             for clsextend in clsextends:
                 provs = provs + " " + clsextend.map_variable("PROVIDES", setvar=False)
             e.data.setVar("PROVIDES", provs)
 
             # Process RPROVIDES
-            origrprovs = rprovs = e.data.getVar("RPROVIDES") or ""
+            origrprovs = rprovs = localdata.getVar("RPROVIDES") or ""
             for clsextend in clsextends:
                 rprovs = rprovs + " " + clsextend.map_variable("RPROVIDES", setvar=False)
             if rprovs.strip():
@@ -194,7 +200,7 @@ python multilib_virtclass_handler_global () {
 
             # Process RPROVIDES_${PN}...
             for pkg in (e.data.getVar("PACKAGES") or "").split():
-                origrprovs = rprovs = e.data.getVar("RPROVIDES_%s" % pkg) or ""
+                origrprovs = rprovs = localdata.getVar("RPROVIDES_%s" % pkg) or ""
                 for clsextend in clsextends:
                     rprovs = rprovs + " " + clsextend.map_variable("RPROVIDES_%s" % pkg, setvar=False)
                     rprovs = rprovs + " " + clsextend.extname + "-" + pkg
@@ -202,5 +208,4 @@ python multilib_virtclass_handler_global () {
 }
 
 addhandler multilib_virtclass_handler_global
-multilib_virtclass_handler_global[eventmask] = "bb.event.RecipeParsed"
-
+multilib_virtclass_handler_global[eventmask] = "bb.event.RecipeTaskPreProcess"

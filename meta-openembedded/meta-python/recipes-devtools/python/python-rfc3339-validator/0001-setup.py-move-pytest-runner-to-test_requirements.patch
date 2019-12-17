@@ -1,0 +1,32 @@
+From 2de281fdca88f223ace1eb6428a77b9903c69264 Mon Sep 17 00:00:00 2001
+From: Nicola Lunghi <nicola.lunghi@jci.com>
+Date: Thu, 14 Nov 2019 11:58:28 +0000
+Subject: [PATCH] setup.py: move pytest-runner to test_requirements
+
+This fixes an issue with yocto build.
+pytest-runner is only needed when running tests.
+
+Upstream-Status: Pending
+---
+ setup.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 9a50767..e3b1c6e 100644
+--- a/setup.py
++++ b/setup.py
+@@ -12,9 +12,9 @@ requirements = [
+     'six',
+ ]
+ 
+-setup_requirements = ['pytest-runner', ]
++setup_requirements = []
+ 
+-test_requirements = ['pytest>=3', ]
++test_requirements = ['pytest>=3', 'pytest-runner']
+ 
+ setup(
+     author="Nicolas Aimetti",
+-- 
+2.20.1
+

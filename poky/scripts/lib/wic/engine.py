@@ -19,6 +19,7 @@ import os
 import tempfile
 import json
 import subprocess
+import re
 
 from collections import namedtuple, OrderedDict
 from distutils.spawn import find_executable
@@ -335,25 +336,52 @@ class Disk:
         exec_cmd(cmd, as_shell=True)
         self._put_part_image(pnum)
 
-    def remove(self, pnum, path):
+    def remove_ext(self, pnum, path, recursive):
+        """
+        Remove files/dirs and their contents from the partition.
+        This only applies to ext* partition.
+        """
+        abs_path = re.sub('\/\/+', '/', path)
+        cmd = "{} {} -wR 'rm \"{}\"'".format(self.debugfs,
+                                            self._get_part_image(pnum),
+                                            abs_path)
+        out = exec_cmd(cmd , as_shell=True)
+        for line in out.splitlines():
+            if line.startswith("rm:"):
+                if "file is a directory" in line:
+                    if recursive:
+                        # loop through content and delete them one by one if
+                        # flaged with -r
+                        subdirs = iter(self.dir(pnum, abs_path).splitlines())
+                        next(subdirs)
+                        for subdir in subdirs:
+                            dir = subdir.split(':')[1].split(" ", 1)[1]
+                            if not dir == "." and not dir == "..":
+                                self.remove_ext(pnum, "%s/%s" % (abs_path, dir), recursive)
+
+                    rmdir_out = exec_cmd("{} {} -wR 'rmdir \"{}\"'".format(self.debugfs,
+                                                    self._get_part_image(pnum),
+                                                    abs_path.rstrip('/'))
+                                                    , as_shell=True)
+
+                    for rmdir_line in rmdir_out.splitlines():
+                        if "directory not empty" in rmdir_line:
+                            raise WicError("Could not complete operation: \n%s \n"
+                                            "use -r to remove non-empty directory" % rmdir_line)
+                        if rmdir_line.startswith("rmdir:"):
+                            raise WicError("Could not complete operation: \n%s "
+                                            "\n%s" % (str(line), rmdir_line))
+
+                else:
+                    raise WicError("Could not complete operation: \n%s "
+                                    "\nUnable to remove %s" % (str(line), abs_path))
+
+    def remove(self, pnum, path, recursive):
         """Remove files/dirs from the partition."""
         partimg = self._get_part_image(pnum)
         if self.partitions[pnum].fstype.startswith('ext'):
-            cmd = "{} {} -wR 'rm {}'".format(self.debugfs,
-                                                self._get_part_image(pnum),
-                                                path)
-            out = exec_cmd(cmd , as_shell=True)
-            for line in out.splitlines():
-                if line.startswith("rm:"):
-                    if "file is a directory" in line:
-                        # Try rmdir to see if this is an empty directory. This won't delete
-                        # any non empty directory so let user know about any error that this might
-                        # generate.
-                        print(exec_cmd("{} {} -wR 'rmdir {}'".format(self.debugfs,
-                                                    self._get_part_image(pnum),
-                                                    path), as_shell=True))
-                    else:
-                        raise WicError("Could not complete operation: wic %s" % str(line))
+            self.remove_ext(pnum, path, recursive)
+
         else: # fat
             cmd = "{} -i {} ::{}".format(self.mdel, partimg, path)
             try:
@@ -535,13 +563,13 @@ def wic_rm(args, native_sysroot):
     partitioned image.
     """
     disk = Disk(args.path.image, native_sysroot)
-    disk.remove(args.path.part, args.path.path)
+    disk.remove(args.path.part, args.path.path, args.recursive_delete)
 
 def wic_write(args, native_sysroot):
     """
     Write image to a target device.
     """
-    disk = Disk(args.image, native_sysroot, ('fat', 'ext', 'swap'))
+    disk = Disk(args.image, native_sysroot, ('fat', 'ext', 'linux-swap'))
     disk.write(args.target, args.expand)
 
 def find_canned(scripts_path, file_name):

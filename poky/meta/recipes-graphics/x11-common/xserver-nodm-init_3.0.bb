@@ -17,7 +17,7 @@ S = "${WORKDIR}"
 # Since we refer to ROOTLESS_X which is normally enabled per-machine
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-inherit update-rc.d systemd distro_features_check
+inherit update-rc.d systemd features_check
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

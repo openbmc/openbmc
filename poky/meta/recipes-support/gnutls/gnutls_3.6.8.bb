@@ -19,6 +19,7 @@ SHRT_VER = "${@d.getVar('PV').split('.')[0]}.${@d.getVar('PV').split('.')[1]}"
 
 SRC_URI = "https://www.gnupg.org/ftp/gcrypt/gnutls/v${SHRT_VER}/gnutls-${PV}.tar.xz \
            file://arm_eabi.patch \
+           file://posix-shell.patch \
 "
 
 SRC_URI[md5sum] = "9dcf0aa45d1a42e1b3ca5d39ec7c61a8"
@@ -46,6 +47,9 @@ EXTRA_OECONF = " \
     --with-libpthread-prefix=${STAGING_DIR_HOST}${prefix} \
     --with-default-trust-store-file=${sysconfdir}/ssl/certs/ca-certificates.crt \
 "
+
+# Otherwise the tools try and use HOSTTOOLS_DIR/bash as a shell.
+export POSIX_SHELL="${base_bindir}/sh"
 
 LDFLAGS_append_libc-musl = " -largp"
 

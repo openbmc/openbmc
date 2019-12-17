@@ -54,6 +54,8 @@ import shutil
 import bb
 from   bb.fetch2 import FetchMethod
 from   bb.fetch2 import FetchError
+from   bb.fetch2 import MissingParameterError
+from   bb.fetch2 import ParameterError
 from   bb.fetch2 import runfetchcmd
 from   bb.fetch2 import logger
 
@@ -79,7 +81,7 @@ class ClearCase(FetchMethod):
         if 'protocol' in ud.parm:
             ud.proto = ud.parm['protocol']
         if not ud.proto in ('http', 'https'):
-            raise fetch2.ParameterError("Invalid protocol type", ud.url)
+            raise ParameterError("Invalid protocol type", ud.url)
 
         ud.vob = ''
         if 'vob' in ud.parm:
@@ -143,18 +145,18 @@ class ClearCase(FetchMethod):
 
         basecmd = "%s %s" % (ud.basecmd, command)
 
-        if command is 'mkview':
+        if command == 'mkview':
             if not "rcleartool" in ud.basecmd:
                 # Cleartool needs a -snapshot view
                 options.append("-snapshot")
             options.append("-tag %s" % ud.viewname)
             options.append(ud.viewdir)
 
-        elif command is 'rmview':
+        elif command == 'rmview':
             options.append("-force")
             options.append("%s" % ud.viewdir)
 
-        elif command is 'setcs':
+        elif command == 'setcs':
             options.append("-overwrite")
             options.append(ud.configspecfile)
 

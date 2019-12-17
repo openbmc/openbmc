@@ -1,0 +1,24 @@
+Description: Correct spelling-error-in-binary s/Recieved/Received/
+Author: Michael Shuler <michael@pbandjelly.org>
+Index: ifmetric/src/ifmetric.c
+===================================================================
+--- ifmetric.orig/src/ifmetric.c	2013-09-04 18:37:59.000000000 -0500
++++ ifmetric/src/ifmetric.c	2013-09-04 19:08:38.539750778 -0500
+@@ -38,7 +38,7 @@
+             case RTA_OIF:
+ 
+                 if (RTA_PAYLOAD(a) != sizeof(int)) {
+-                    fprintf(stderr, "NETLINK: Recieved corrupt RTA_OIF payload.\n");
++                    fprintf(stderr, "NETLINK: Received corrupt RTA_OIF payload.\n");
+                     return -1;
+                 }
+                 
+@@ -102,7 +102,7 @@
+             case RTA_PRIORITY:
+ 
+                 if (RTA_PAYLOAD(a) != sizeof(int)) {
+-                    fprintf(stderr, "NETLINK: Recieved corrupt RTA_PRIORITY payload.\n");
++                    fprintf(stderr, "NETLINK: Received corrupt RTA_PRIORITY payload.\n");
+                     return NULL;
+                 }
+ 

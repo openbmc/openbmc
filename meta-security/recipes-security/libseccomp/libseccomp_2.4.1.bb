@@ -17,6 +17,8 @@ inherit autotools-brokensep pkgconfig ptest
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[python] = "--enable-python, --disable-python, python"
 
+DISABLE_STATIC = ""
+
 do_compile_ptest() {
     oe_runmake -C tests check-build
 }

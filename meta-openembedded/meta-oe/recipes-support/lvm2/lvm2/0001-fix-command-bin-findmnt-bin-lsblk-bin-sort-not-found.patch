@@ -1,0 +1,73 @@
+From 27b56cb6b5dfc75ea8ddb395dc9ef41fb7a09c93 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 2 Sep 2019 23:04:50 -0400
+Subject: [PATCH] fix command /bin/findmnt, /bin/lsblk, /bin/sort not found
+
+In oe-core (util-linux and coreutils), the commands locates in
+${bindir} rather than /bin, add BINDIR to configure it
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac                | 3 +++
+ scripts/blkdeactivate.sh.in | 7 ++++---
+ 2 files changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index d1431e2..54e5a7b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1495,6 +1495,8 @@ fi
+ 
+ SYSCONFDIR="$(eval echo $(eval echo $sysconfdir))"
+ 
++BINDIR="$(eval echo $(eval echo $bindir))"
++
+ SBINDIR="$(eval echo $(eval echo $sbindir))"
+ LVM_PATH="$SBINDIR/lvm"
+ AC_DEFINE_UNQUOTED(LVM_PATH, ["$LVM_PATH"], [Path to lvm binary.])
+@@ -1721,6 +1723,7 @@ AC_SUBST(SACKPT_CFLAGS)
+ AC_SUBST(SACKPT_LIBS)
+ AC_SUBST(SALCK_CFLAGS)
+ AC_SUBST(SALCK_LIBS)
++AC_SUBST(BINDIR)
+ AC_SUBST(SBINDIR)
+ AC_SUBST(SELINUX_LIBS)
+ AC_SUBST(SELINUX_PC)
+diff --git a/scripts/blkdeactivate.sh.in b/scripts/blkdeactivate.sh.in
+index a4b8a8f..3db4226 100644
+--- a/scripts/blkdeactivate.sh.in
++++ b/scripts/blkdeactivate.sh.in
+@@ -41,13 +41,14 @@ UMOUNT="/bin/umount"
+ 
+ sbindir="@SBINDIR@"
+ DMSETUP="$sbindir/dmsetup"
++bindir="@BINDIR@"
+ LVM="$sbindir/lvm"
+ 
+ if "$UMOUNT" --help | grep -- "--all-targets" >"$DEV_DIR/null"; then
+ 	UMOUNT_OPTS="--all-targets "
+ else
+ 	UMOUNT_OPTS=""
+-	FINDMNT="/bin/findmnt -r --noheadings -u -o TARGET"
++	FINDMNT="$bindir/findmnt -r --noheadings -u -o TARGET"
+ 	FINDMNT_READ="read -r mnt"
+ fi
+ DMSETUP_OPTS=""
+@@ -55,10 +56,10 @@ LVM_OPTS=""
+ MDADM_OPTS=""
+ MPATHD_OPTS=""
+ 
+-LSBLK="/bin/lsblk -r --noheadings -o TYPE,KNAME,NAME,MOUNTPOINT"
++LSBLK="$bindir/lsblk -r --noheadings -o TYPE,KNAME,NAME,MOUNTPOINT"
+ LSBLK_VARS="local devtype local kname local name local mnt"
+ LSBLK_READ="read -r devtype kname name mnt"
+-SORT_MNT="/bin/sort -r -u -k 4"
++SORT_MNT="$bindir/sort -r -u -k 4"
+ 
+ # Do not show tool errors by default (only done/skipping summary
+ # message provided by this script) and no verbose mode by default.
+-- 
+2.8.1
+

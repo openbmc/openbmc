@@ -12,7 +12,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384
 # This policy file will get installed as /etc/ima/ima-policy.
 # It is located via the normal file search path, so a .bbappend
 # to this recipe can just point towards one of its own files.
-IMA_POLICY ?= "ima_policy_hashed"
+IMA_POLICY ?= "ima-policy-hashed"
 
 SRC_URI = " file://ima"
 

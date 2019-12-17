@@ -11,3 +11,4 @@ SRC_URI[sha256sum] = "5f8dec765048efac5d919aded51b26a32a05397ea207aa769ff6b53c70
 
 inherit autotools pkgconfig
 
+BBCLASSEXTEND = "native"

@@ -5,9 +5,9 @@
 
 import os
 import sys
-import glob
 import shutil
 import errno
+import time
 
 def mkdir(d):
     try:
@@ -15,6 +15,38 @@ def mkdir(d):
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise e
+
+# extract the hash from past the last colon to last underscore
+def extract_sha(filename):
+    return filename.split(':')[7].split('_')[0]
+
+# get all files in a directory, extract hash and make
+# a map from hash to list of file with that hash
+def map_sha_to_files(dir_, prefix, sha_map):
+    sstate_prefix_path = dir_ + '/' + prefix + '/'
+    if not os.path.exists(sstate_prefix_path):
+        return
+    sstate_files = os.listdir(sstate_prefix_path)
+    for f in sstate_files:
+        try:
+            sha = extract_sha(f)
+            if sha not in sha_map:
+                sha_map[sha] = []
+            sha_map[sha].append(sstate_prefix_path + f)
+        except IndexError:
+            continue
+
+# given a prefix build a map of hash to list of files
+def build_sha_cache(prefix):
+    sha_map = {}
+
+    sstate_dir = sys.argv[2]
+    map_sha_to_files(sstate_dir, prefix, sha_map)
+
+    native_sstate_dir = sys.argv[2] + '/' + sys.argv[4]
+    map_sha_to_files(native_sstate_dir, prefix, sha_map)
+
+    return sha_map
 
 if len(sys.argv) < 5:
     print("Incorrect number of arguments specified")
@@ -41,12 +73,19 @@ with open(sys.argv[1]) as f:
                 sigs.append(sig)
 
 print('Gathering file list')
+start_time = time.perf_counter()
 files = set()
+sstate_content_cache = {}
 for s in sigs:
-    p = sys.argv[2] + "/" + s[:2] + "/*" + s + "*"
-    files |= set(glob.glob(p))
-    p = sys.argv[2] + "/%s/" % sys.argv[4] + s[:2] + "/*" + s + "*"
-    files |= set(glob.glob(p))
+    prefix = s[:2]
+    if prefix not in sstate_content_cache:
+        sstate_content_cache[prefix] = build_sha_cache(prefix)
+
+    for f in sstate_content_cache[prefix][s]:
+        files.add(f)
+
+elapsed = time.perf_counter() - start_time
+print("Gathering file list took %.1fs" % elapsed)
 
 print('Processing files')
 for f in files:

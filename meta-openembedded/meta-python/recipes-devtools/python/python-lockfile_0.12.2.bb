@@ -5,7 +5,7 @@ SECTION = "devel/python"
 RDEPENDS_${PN} = "python-threading"
 
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=2340dffbbfea534b58f1349984eeef72"
 
 inherit pypi setuptools
 

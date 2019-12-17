@@ -962,7 +962,8 @@ def rename_bad_checksum(ud, suffix):
 
     new_localpath = "%s_bad-checksum_%s" % (ud.localpath, suffix)
     bb.warn("Renaming %s to %s" % (ud.localpath, new_localpath))
-    bb.utils.movefile(ud.localpath, new_localpath)
+    if not bb.utils.movefile(ud.localpath, new_localpath):
+        bb.warn("Renaming %s to %s failed, grep movefile in log.do_fetch to see why" % (ud.localpath, new_localpath))
 
 
 def try_mirror_url(fetch, origud, ud, ld, check = False):
@@ -1592,7 +1593,7 @@ class Fetch(object):
         fn = d.getVar('FILE')
         mc = d.getVar('__BBMULTICONFIG') or ""
         if cache and fn and mc + fn in urldata_cache:
-            self.ud = urldata_cache[mc + fn]
+            self.ud = urldata_cache[mc + fn + str(id(d))]
 
         for url in urls:
             if url not in self.ud:
@@ -1604,7 +1605,7 @@ class Fetch(object):
                         pass
 
         if fn and cache:
-            urldata_cache[mc + fn] = self.ud
+            urldata_cache[mc + fn + str(id(d))] = self.ud
 
     def localpath(self, url):
         if url not in self.urls:

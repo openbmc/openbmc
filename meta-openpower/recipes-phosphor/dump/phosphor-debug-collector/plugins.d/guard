@@ -1,0 +1,18 @@
+#!/bin/bash
+#
+# config: 2 40
+# @brief: Collect GUARD record information.
+#
+
+. $DREPORT_INCLUDE/functions
+
+desc="GUARD Records"
+file_name="/var/lib/phosphor-software-manager/pnor/prsv/GUARD"
+
+# Check file is present and not empty.
+if [ ! -s "$file_name" ]; then
+    log_info "No $desc"
+    exit 0
+fi
+
+add_copy_file "$file_name" "$desc"

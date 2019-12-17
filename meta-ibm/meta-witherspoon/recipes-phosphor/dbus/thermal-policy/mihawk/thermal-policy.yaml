@@ -1,0 +1,345 @@
+# Mihawk thermal policy for PDM.
+#
+# Shut down the system if more than three cores
+# have a temperature greater than 95 degrees Celcius.
+# or ambient temperature greater than 45 degrees Celcius.
+
+- name: core sensors
+  description: >
+    'The machine has two processor chips with 24 cores each.'
+  class: group
+  group: path
+  members:
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p0_core0_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p0_core1_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p0_core2_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p0_core3_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p0_core4_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p0_core5_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p0_core6_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p0_core7_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p0_core8_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p0_core9_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p0_core10_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p0_core11_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p0_core12_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p0_core13_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p0_core14_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p0_core15_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p0_core16_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p0_core17_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p0_core18_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p0_core19_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p0_core20_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p0_core21_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p0_core22_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p0_core23_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p1_core0_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p1_core1_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p1_core2_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p1_core3_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p1_core4_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p1_core5_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p1_core6_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p1_core7_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p1_core8_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p1_core9_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p1_core10_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p1_core11_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p1_core12_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p1_core13_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p1_core14_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p1_core15_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p1_core16_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p1_core17_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p1_core18_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p1_core19_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p1_core20_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p1_core21_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p1_core22_temp
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/p1_core23_temp
+
+- name: ambient sensor
+  description: >
+    'The machine has one ambient temperature sensors.'
+  class: group
+  group: path
+  members:
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/ambient_temp
+
+- name: gpu sensors
+  description: >
+    'Each gpu has its own temperature sensor.'
+  class: group
+  group: path
+  members:
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/gpu0
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/gpu1
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/gpu2
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/gpu3
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/gpu4
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/gpu5
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/gpu6
+    - meta: SENSOR
+      path: /xyz/openbmc_project/sensors/temperature/gpu7
+
+- name: core temp
+  description: >
+    'Monitor the temperature of each core.'
+  class: group
+  group: property
+  type: int64
+  members:
+    - interface: xyz.openbmc_project.Sensor.Value
+      meta: TEMP
+      property: Value
+
+- name: ambient temp
+  description: >
+    'Monitor the ambient temperature.'
+  class: group
+  group: property
+  type: int64
+  members:
+    - interface: xyz.openbmc_project.Sensor.Value
+      meta: TEMP
+      property: Value
+
+- name: gpu temp
+  description: >
+    'Monitor the temperature of each gpu core.'
+  class: group
+  group: property
+  type: int64
+  members:
+    - interface: xyz.openbmc_project.Sensor.Value
+      meta: TEMP
+      property: Value
+
+- name: watch core temps
+  description: >
+    'Trigger logic on core temp changes.'
+  class: watch
+  watch: property
+  paths: core sensors
+  properties: core temp
+  callback: check temps
+
+- name: watch ambient temp
+  description: >
+    'Trigger logic on ambient temp changes.'
+  class: watch
+  watch: property
+  paths: ambient sensor
+  properties: ambient temp
+  callback: check ambient temp
+
+- name: watch gpu temps
+  description: >
+    'Trigger logic on gpu core temp changes.'
+  class: watch
+  watch: property
+  paths: gpu sensors
+  properties: gpu temp
+  callback: check gpu temps
+
+- name: check temps
+  description: >
+    'If this condition passes at least three cores are running
+    too hot.  Shut the system down.'
+  class: condition
+  condition: count
+  paths: core sensors
+  properties: core temp
+  callback: log and shutdown
+  countop: '>='
+  countbound: 3
+  op: '>='
+  bound: 95000
+  oneshot: true
+
+- name: check ambient temp
+  description: >
+    'If the ambient sensor is too hot. Shut the system down.'
+  class: condition
+  condition: count
+  paths: ambient sensor
+  properties: ambient temp
+  callback: ambient log and shutdown
+  countop: '>='
+  countbound: 1
+  op: '>='
+  bound: 45000
+  oneshot: true
+
+- name: check gpu temps
+  description: >
+    'If the gpu temperature sensor is too hot. Shut the system down.'
+  class: condition
+  condition: count
+  paths: gpu sensors
+  properties: gpu temp
+  callback: gpu log and shutdown
+  countop: '>='
+  countbound: 1
+  op: '>='
+  bound: 92
+  oneshot: true
+
+- name: log and shutdown
+  description: >
+    'Shut the system down and log an event.'
+  class: callback
+  callback: group
+  members:
+    - shutdown
+    - create criticalhigh error
+    - create shutdown error
+
+- name: ambient log and shutdown
+  description: >
+    'Shut the system down and log an event.'
+  class: callback
+  callback: group
+  members:
+    - shutdown
+    - create ambient criticalhigh error
+    - create ambient shutdown error
+
+- name: gpu log and shutdown
+  description: >
+    'Shut the system down and log an event.'
+  class: callback
+  callback: group
+  members:
+    - shutdown
+    - create gpu criticalhigh error
+    - create gpu shutdown error
+
+- name: shutdown
+  description: >
+    'Shut down the system.'
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+    - value: obmc-chassis-hard-poweroff@0.target
+      type: string
+    - value: replace
+      type: string
+
+- name: create criticalhigh error
+  description: >
+    'Create a CriticalHigh Error log.'
+  class: callback
+  callback: elog_with_metadata
+  paths: core sensors
+  properties: core temp
+  error: xyz::openbmc_project::Sensor::Threshold::Error::CriticalHigh
+  metadata: xyz::openbmc_project::Sensor::Threshold::CriticalHigh::SENSOR_DATA
+
+- name: create ambient criticalhigh error
+  description: >
+    'Create a Ambient CriticalHigh Error log.'
+  class: callback
+  callback: elog_with_metadata
+  paths: ambient sensor
+  properties: ambient temp
+  error: xyz::openbmc_project::Sensor::Threshold::Error::CriticalHigh
+  metadata: xyz::openbmc_project::Sensor::Threshold::CriticalHigh::SENSOR_DATA
+
+- name: create gpu criticalhigh error
+  description: >
+    'Create a GPU CriticalHigh Error log.'
+  class: callback
+  callback: elog_with_metadata
+  paths: gpu sensors
+  properties: gpu temp
+  error: xyz::openbmc_project::Sensor::Threshold::Error::CriticalHigh
+  metadata: xyz::openbmc_project::Sensor::Threshold::CriticalHigh::SENSOR_DATA
+
+- name: create shutdown error
+  description: >
+    'Create a SystemShutdown Error log.'
+  class: callback
+  callback: elog
+  paths: core sensors
+  properties: core temp
+  error: xyz::openbmc_project::State::Shutdown::ThermalEvent::Error::Processor
+
+- name: create ambient shutdown error
+  description: >
+    'Create a SystemShutdown Error log.'
+  class: callback
+  callback: elog
+  paths: ambient sensor
+  properties: ambient temp
+  error: xyz::openbmc_project::State::Shutdown::ThermalEvent::Error::Ambient
+
+- name: create gpu shutdown error
+  description: >
+    'Create a SystemShutdown Error log.'
+  class: callback
+  callback: elog
+  paths: gpu sensors
+  properties: gpu temp
+  error: xyz::openbmc_project::State::Shutdown::ThermalEvent::Error::GPU

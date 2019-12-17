@@ -83,6 +83,10 @@ qemux86_common = [
     'amd_nb: Cannot enumerate AMD northbridges',
     'uvesafb: 5000 ms task timeout, infinitely waiting',
     'tsc: HPET/PMTIMER calibration failed',
+    "modeset(0): Failed to initialize the DRI2 extension",
+    "uvesafb: cannot reserve video memory at",
+    "uvesafb: probe of uvesafb.0 failed with error",
+    "glamor initialization failed",
 ] + common_errors
 
 ignore_errors = {
@@ -292,7 +296,7 @@ class ParseLogsTest(OERuntimeTestCase):
         grepcmd = 'grep '
         grepcmd += '-Ei "'
         for error in errors:
-            grepcmd += error + '|'
+            grepcmd += '\<' + error + '\>' + '|'
         grepcmd = grepcmd[:-1]
         grepcmd += '" ' + str(log) + " | grep -Eiv \'"
 

@@ -88,10 +88,6 @@ class Sdk(object, metaclass=ABCMeta):
             bb.warn("cannot remove SDK dir: %s" % path)
 
     def install_locales(self, pm):
-        # This is only relevant for glibc
-        if self.d.getVar("TCLIBC") != "glibc":
-            return
-
         linguas = self.d.getVar("SDKIMAGE_LINGUAS")
         if linguas:
             import fnmatch

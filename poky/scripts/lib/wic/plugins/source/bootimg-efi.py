@@ -74,8 +74,10 @@ class BootimgEFIPlugin(SourcePlugin):
             grubefi_conf += "menuentry '%s'{\n" % (title if title else "boot")
 
             kernel = get_bitbake_var("KERNEL_IMAGETYPE")
-            if not kernel:
-                kernel = "bzImage"
+            if get_bitbake_var("INITRAMFS_IMAGE_BUNDLE") == "1":
+                if get_bitbake_var("INITRAMFS_IMAGE"):
+                    kernel = "%s-%s.bin" % \
+                        (get_bitbake_var("KERNEL_IMAGETYPE"), get_bitbake_var("INITRAMFS_LINK_NAME"))
 
             label = source_params.get('label')
             label_conf = "root=%s" % creator.rootdev
@@ -154,8 +156,10 @@ class BootimgEFIPlugin(SourcePlugin):
         if not custom_cfg:
             # Create systemd-boot configuration using parameters from wks file
             kernel = get_bitbake_var("KERNEL_IMAGETYPE")
-            if not kernel:
-                kernel = "bzImage"
+            if get_bitbake_var("INITRAMFS_IMAGE_BUNDLE") == "1":
+                if get_bitbake_var("INITRAMFS_IMAGE"):
+                    kernel = "%s-%s.bin" % \
+                        (get_bitbake_var("KERNEL_IMAGETYPE"), get_bitbake_var("INITRAMFS_LINK_NAME"))
 
             title = source_params.get('title')
 
@@ -225,8 +229,10 @@ class BootimgEFIPlugin(SourcePlugin):
         hdddir = "%s/hdd/boot" % cr_workdir
 
         kernel = get_bitbake_var("KERNEL_IMAGETYPE")
-        if not kernel:
-            kernel = "bzImage"
+        if get_bitbake_var("INITRAMFS_IMAGE_BUNDLE") == "1":
+            if get_bitbake_var("INITRAMFS_IMAGE"):
+                kernel = "%s-%s.bin" % \
+                    (get_bitbake_var("KERNEL_IMAGETYPE"), get_bitbake_var("INITRAMFS_LINK_NAME"))
 
         install_cmd = "install -m 0644 %s/%s %s/%s" % \
             (staging_kernel_dir, kernel, hdddir, kernel)

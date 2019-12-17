@@ -7,6 +7,8 @@
 #
 
 import os
+import base64
+import zlib
 import json
 import scriptpath
 import copy
@@ -117,6 +119,38 @@ def strip_ptestresults(results):
                     del newresults[res]['result']['ptestresult.sections'][i]['log']
     return newresults
 
+def decode_log(logdata):
+    if isinstance(logdata, str):
+        return logdata
+    elif isinstance(logdata, dict):
+        if "compressed" in logdata:
+            data = logdata.get("compressed")
+            data = base64.b64decode(data.encode("utf-8"))
+            data = zlib.decompress(data)
+            try:
+                return data.decode("utf-8")
+            except UnicodeDecodeError:
+                return data
+    return None
+
+def ptestresult_get_log(results, section):
+    if 'ptestresult.sections' not in results:
+        return None
+    if section not in results['ptestresult.sections']:
+        return None
+
+    ptest = results['ptestresult.sections'][section]
+    if 'log' not in ptest:
+        return None
+    return decode_log(ptest['log'])
+
+def ptestresult_get_rawlogs(results):
+    if 'ptestresult.rawlogs' not in results:
+        return None
+    if 'log' not in results['ptestresult.rawlogs']:
+        return None
+    return decode_log(results['ptestresult.rawlogs']['log'])
+
 def save_resultsdata(results, destdir, fn="testresults.json", ptestjson=False, ptestlogs=False):
     for res in results:
         if res:
@@ -131,16 +165,19 @@ def save_resultsdata(results, destdir, fn="testresults.json", ptestjson=False, p
             f.write(json.dumps(resultsout, sort_keys=True, indent=4))
         for res2 in results[res]:
             if ptestlogs and 'result' in results[res][res2]:
-                if 'ptestresult.rawlogs' in results[res][res2]['result']:
+                seriesresults = results[res][res2]['result']
+                rawlogs = ptestresult_get_rawlogs(seriesresults)
+                if rawlogs is not None:
                     with open(dst.replace(fn, "ptest-raw.log"), "w+") as f:
-                        f.write(results[res][res2]['result']['ptestresult.rawlogs']['log'])
-                if 'ptestresult.sections' in results[res][res2]['result']:
-                    for i in results[res][res2]['result']['ptestresult.sections']:
-                        if 'log' in results[res][res2]['result']['ptestresult.sections'][i]:
+                        f.write(rawlogs)
+                if 'ptestresult.sections' in seriesresults:
+                    for i in seriesresults['ptestresult.sections']:
+                        sectionlog = ptestresult_get_log(seriesresults, i)
+                        if sectionlog is not None:
                             with open(dst.replace(fn, "ptest-%s.log" % i), "w+") as f:
-                                f.write(results[res][res2]['result']['ptestresult.sections'][i]['log'])
+                                f.write(sectionlog)
 
-def git_get_result(repo, tags):
+def git_get_result(repo, tags, configmap=store_map):
     git_objs = []
     for tag in tags:
         files = repo.run_cmd(['ls-tree', "--name-only", "-r", tag]).splitlines()
@@ -163,7 +200,7 @@ def git_get_result(repo, tags):
     # Optimize by reading all data with one git command
     results = {}
     for obj in parse_json_stream(repo.run_cmd(['show'] + git_objs + ['--'])):
-        append_resultsdata(results, obj)
+        append_resultsdata(results, obj, configmap=configmap)
 
     return results
 

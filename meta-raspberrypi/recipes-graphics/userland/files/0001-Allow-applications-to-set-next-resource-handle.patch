@@ -1,7 +1,7 @@
-From e94675aa943c114ff801167c69bdd2d366d01665 Mon Sep 17 00:00:00 2001
+From ccb7f6f1a2bc491a24c0402616a2d24b85e3933a Mon Sep 17 00:00:00 2001
 From: Dom Cobley <dc4@broadcom.com>
 Date: Tue, 9 Jul 2013 09:26:26 -0400
-Subject: [PATCH 01/18] Allow applications to set next resource handle
+Subject: [PATCH 01/19] Allow applications to set next resource handle
 
 This patch adds provisions in userland to
 let apps callers set the next rendereing dispmanx resource.
@@ -204,5 +204,5 @@ index 8a5734c..51b3580 100644
  
  FN(void, eglIntGetColorData_impl, (EGL_SURFACE_ID_T s, KHRN_IMAGE_FORMAT_T format, uint32_t width, uint32_t height, int32_t stride, uint32_t y_offset, void *data))
 -- 
-2.21.0
+2.22.0
 

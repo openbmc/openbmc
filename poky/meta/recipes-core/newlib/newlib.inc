@@ -15,7 +15,7 @@ LIC_FILES_CHKSUM = " \
 		file://newlib/libc/sys/linux/linuxthreads/LICENSE;md5=73640207fbc79b198c7ffd4ad4d97aa0 \
 		"
 
-SRC_URI = "ftp://sourceware.org/pub/newlib/newlib-${PV}.tar.gz"
+SRC_URI = "https://sourceware.org/pub/newlib/newlib-${PV}.tar.gz"
 SRC_URI[md5sum] = "f84263b7d524df92a9c9fb30b79e0134"
 SRC_URI[sha256sum] = "fb4fa1cc21e9060719208300a61420e4089d6de6ef59cf533b57fe74801d102a"
 

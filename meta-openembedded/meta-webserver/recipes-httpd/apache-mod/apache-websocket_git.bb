@@ -25,9 +25,9 @@ EXTRA_OECONF = "APACHECTL=${STAGING_DIR_TARGET}${sbindir}/apachectl \
                 LIBTOOL=${STAGING_DIR_TARGET}${bindir_crossscripts}/${HOST_SYS}-libtool"
 
 do_install() {
-    install -d ${D}${libdir}/apache2/modules
-    install -m 755 ${B}/.libs/mod_websocket.so ${D}${libdir}/apache2/modules
+    install -d ${D}${libexecdir}/apache2/modules
+    install -m 755 ${B}/.libs/mod_websocket.so ${D}${libexecdir}/apache2/modules
 }
 
-FILES_${PN} += " ${libdir}/apache2/modules/* "
-FILES_${PN}-dbg += " ${libdir}/apache2/modules/.debug/* "
+FILES_${PN} += " ${libexecdir}/apache2/modules/* "
+FILES_${PN}-dbg += " ${libexecdir}/apache2/modules/.debug/* "

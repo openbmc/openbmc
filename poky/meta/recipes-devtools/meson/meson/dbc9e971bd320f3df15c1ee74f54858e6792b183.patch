@@ -1,0 +1,95 @@
+From dbc9e971bd320f3df15c1ee74f54858e6792b183 Mon Sep 17 00:00:00 2001
+From: Xavier Claessens <xavier.claessens@collabora.com>
+Date: Fri, 11 Oct 2019 11:01:22 -0400
+Subject: [PATCH] Remove duplicated object files in static libraries
+
+When a static library link_whole to a bunch of other static libraries,
+we have to extract all their objects recursively. But that could
+introduce duplicated objects. ar is dumb enough to allow this without
+error, but once the resulting static library is linked into an
+executable or shared library, the linker will complain about duplicated
+symbols.
+
+Upstream-Status: Backport
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+---
+ mesonbuild/backend/backends.py                 |  3 ++-
+ test cases/unit/69 static link/lib/func17.c    |  4 ++++
+ test cases/unit/69 static link/lib/func18.c    |  6 ++++++
+ test cases/unit/69 static link/lib/func19.c    |  7 +++++++
+ test cases/unit/69 static link/lib/meson.build | 12 ++++++++++++
+ 5 files changed, 31 insertions(+), 1 deletion(-)
+ create mode 100644 test cases/unit/69 static link/lib/func17.c
+ create mode 100644 test cases/unit/69 static link/lib/func18.c
+ create mode 100644 test cases/unit/69 static link/lib/func19.c
+
+diff --git a/mesonbuild/backend/backends.py b/mesonbuild/backend/backends.py
+index 947be1cbef..e54809657f 100644
+--- a/mesonbuild/backend/backends.py
++++ b/mesonbuild/backend/backends.py
+@@ -281,7 +281,8 @@ def relpath(self, todir, fromdir):
+                                os.path.join('dummyprefixdir', fromdir))
+ 
+     def flatten_object_list(self, target, proj_dir_to_build_root=''):
+-        return self._flatten_object_list(target, target.get_objects(), proj_dir_to_build_root)
++        obj_list = self._flatten_object_list(target, target.get_objects(), proj_dir_to_build_root)
++        return list(dict.fromkeys(obj_list))
+ 
+     def _flatten_object_list(self, target, objects, proj_dir_to_build_root):
+         obj_list = []
+diff --git a/test cases/unit/69 static link/lib/func17.c b/test cases/unit/69 static link/lib/func17.c
+new file mode 100644
+index 0000000000..d1d8ec498c
+--- /dev/null
++++ b/test cases/unit/69 static link/lib/func17.c	
+@@ -0,0 +1,4 @@
++int func17()
++{
++  return 1;
++}
+diff --git a/test cases/unit/69 static link/lib/func18.c b/test cases/unit/69 static link/lib/func18.c
+new file mode 100644
+index 0000000000..c149085ba4
+--- /dev/null
++++ b/test cases/unit/69 static link/lib/func18.c	
+@@ -0,0 +1,6 @@
++int func17();
++
++int func18()
++{
++  return func17() + 1;
++}
+diff --git a/test cases/unit/69 static link/lib/func19.c b/test cases/unit/69 static link/lib/func19.c
+new file mode 100644
+index 0000000000..69120e4bf8
+--- /dev/null
++++ b/test cases/unit/69 static link/lib/func19.c	
+@@ -0,0 +1,7 @@
++int func17();
++int func18();
++
++int func19()
++{
++  return func17() + func18();
++}
+diff --git a/test cases/unit/69 static link/lib/meson.build b/test cases/unit/69 static link/lib/meson.build
+index 5f04aab6a1..8f95fc4546 100644
+--- a/test cases/unit/69 static link/lib/meson.build	
++++ b/test cases/unit/69 static link/lib/meson.build	
+@@ -66,3 +66,15 @@ libfunc15 = static_library('func15', 'func15.c',
+ libfunc16 = static_library('func16', 'func16.c',
+   link_with : libfunc15,
+   install : true)
++
++# Verify func17.c.o gets included only once into libfunc19, otherwise
++# func19-shared would failed with duplicated symbol.
++libfunc17 = static_library('func17', 'func17.c',
++  install : false)
++libfunc18 = static_library('func18', 'func18.c',
++  link_with : libfunc17,
++  install : false)
++libfunc19 = static_library('func19', 'func19.c',
++  link_whole : [libfunc17, libfunc18],
++  install : false)
++shared_library('func19-shared', link_whole : [libfunc19])

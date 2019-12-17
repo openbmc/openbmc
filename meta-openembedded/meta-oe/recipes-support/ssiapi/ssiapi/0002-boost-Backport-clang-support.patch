@@ -1,0 +1,1409 @@
+From ef90544f8df369781a6ef094330c9cfa9f0ee1e4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 29 Aug 2019 14:09:11 -0700
+Subject: [PATCH 2/4] boost: Backport clang support
+
+backport headers from boost 1.59
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/boost/config/compiler/clang.hpp           | 272 +++++++++
+ lib/boost/config/stdlib/libcpp.hpp            |  80 +++
+ lib/boost/cstdint.hpp                         | 542 ++++++++++++++++++
+ .../detail/sp_counted_base_clang.hpp          | 140 +++++
+ 4 files changed, 1034 insertions(+)
+ create mode 100644 lib/boost/config/compiler/clang.hpp
+ create mode 100644 lib/boost/config/stdlib/libcpp.hpp
+ create mode 100644 lib/boost/cstdint.hpp
+ create mode 100644 lib/boost/smart_ptr/detail/sp_counted_base_clang.hpp
+
+--- /dev/null
++++ b/lib/boost/config/compiler/clang.hpp
+@@ -0,0 +1,272 @@
++
++// (C) Copyright Douglas Gregor 2010
++//
++//  Use, modification and distribution are subject to the
++//  Boost Software License, Version 1.0. (See accompanying file
++//  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
++
++//  See http://www.boost.org for most recent version.
++
++// Clang compiler setup.
++
++#define BOOST_HAS_PRAGMA_ONCE
++
++// Detecting `-fms-extension` compiler flag assuming that _MSC_VER defined when that flag is used.
++#if defined (_MSC_VER) && (__clang_major__ > 3 || (__clang_major__ == 3 && __clang_minor__ >= 4))
++#   define BOOST_HAS_PRAGMA_DETECT_MISMATCH
++#endif
++
++// When compiling with clang before __has_extension was defined,
++// even if one writes 'defined(__has_extension) && __has_extension(xxx)',
++// clang reports a compiler error. So the only workaround found is:
++
++#ifndef __has_extension
++#define __has_extension __has_feature
++#endif
++
++#if !__has_feature(cxx_exceptions) && !defined(BOOST_NO_EXCEPTIONS)
++#  define BOOST_NO_EXCEPTIONS
++#endif
++
++#if !__has_feature(cxx_rtti) && !defined(BOOST_NO_RTTI)
++#  define BOOST_NO_RTTI
++#endif
++
++#if !__has_feature(cxx_rtti) && !defined(BOOST_NO_TYPEID)
++#  define BOOST_NO_TYPEID
++#endif
++
++#if defined(__int64) && !defined(__GNUC__)
++#  define BOOST_HAS_MS_INT64
++#endif
++
++#define BOOST_HAS_NRVO
++
++// Branch prediction hints
++#if defined(__has_builtin)
++#if __has_builtin(__builtin_expect)
++#define BOOST_LIKELY(x) __builtin_expect(x, 1)
++#define BOOST_UNLIKELY(x) __builtin_expect(x, 0)
++#endif
++#endif
++
++// Clang supports "long long" in all compilation modes.
++#define BOOST_HAS_LONG_LONG
++
++//
++// We disable this if the compiler is really nvcc as it
++// doesn't actually support __int128 as of CUDA_VERSION=5000
++// even though it defines __SIZEOF_INT128__.
++// See https://svn.boost.org/trac/boost/ticket/10418
++// Only re-enable this for nvcc if you're absolutely sure
++// of the circumstances under which it's supported:
++//
++#if defined(__SIZEOF_INT128__) && !defined(__CUDACC__)
++#  define BOOST_HAS_INT128
++#endif
++
++
++//
++// Dynamic shared object (DSO) and dynamic-link library (DLL) support
++//
++#if !defined(_WIN32) && !defined(__WIN32__) && !defined(WIN32)
++#  define BOOST_SYMBOL_EXPORT __attribute__((__visibility__("default")))
++#  define BOOST_SYMBOL_IMPORT
++#  define BOOST_SYMBOL_VISIBLE __attribute__((__visibility__("default")))
++#endif
++
++//
++// The BOOST_FALLTHROUGH macro can be used to annotate implicit fall-through
++// between switch labels.
++//
++#if __cplusplus >= 201103L && defined(__has_warning)
++#  if __has_feature(cxx_attributes) && __has_warning("-Wimplicit-fallthrough")
++#    define BOOST_FALLTHROUGH [[clang::fallthrough]]
++#  endif
++#endif
++
++#if !__has_feature(cxx_auto_type)
++#  define BOOST_NO_CXX11_AUTO_DECLARATIONS
++#  define BOOST_NO_CXX11_AUTO_MULTIDECLARATIONS
++#endif
++
++//
++// Currently clang on Windows using VC++ RTL does not support C++11's char16_t or char32_t
++//
++#if defined(_MSC_VER) || !(defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L)
++#  define BOOST_NO_CXX11_CHAR16_T
++#  define BOOST_NO_CXX11_CHAR32_T
++#endif
++
++#if !__has_feature(cxx_constexpr)
++#  define BOOST_NO_CXX11_CONSTEXPR
++#endif
++
++#if !__has_feature(cxx_decltype)
++#  define BOOST_NO_CXX11_DECLTYPE
++#endif
++
++#if !__has_feature(cxx_decltype_incomplete_return_types)
++#  define BOOST_NO_CXX11_DECLTYPE_N3276
++#endif
++
++#if !__has_feature(cxx_defaulted_functions)
++#  define BOOST_NO_CXX11_DEFAULTED_FUNCTIONS
++#endif
++
++#if !__has_feature(cxx_deleted_functions)
++#  define BOOST_NO_CXX11_DELETED_FUNCTIONS
++#endif
++
++#if !__has_feature(cxx_explicit_conversions)
++#  define BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
++#endif
++
++#if !__has_feature(cxx_default_function_template_args)
++#  define BOOST_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
++#endif
++
++#if !__has_feature(cxx_generalized_initializers)
++#  define BOOST_NO_CXX11_HDR_INITIALIZER_LIST
++#endif
++
++#if !__has_feature(cxx_lambdas)
++#  define BOOST_NO_CXX11_LAMBDAS
++#endif
++
++#if !__has_feature(cxx_local_type_template_args)
++#  define BOOST_NO_CXX11_LOCAL_CLASS_TEMPLATE_PARAMETERS
++#endif
++
++#if !__has_feature(cxx_noexcept)
++#  define BOOST_NO_CXX11_NOEXCEPT
++#endif
++
++#if !__has_feature(cxx_nullptr)
++#  define BOOST_NO_CXX11_NULLPTR
++#endif
++
++#if !__has_feature(cxx_range_for)
++#  define BOOST_NO_CXX11_RANGE_BASED_FOR
++#endif
++
++#if !__has_feature(cxx_raw_string_literals)
++#  define BOOST_NO_CXX11_RAW_LITERALS
++#endif
++
++#if !__has_feature(cxx_reference_qualified_functions)
++#  define BOOST_NO_CXX11_REF_QUALIFIERS
++#endif
++
++#if !__has_feature(cxx_generalized_initializers)
++#  define BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX
++#endif
++
++#if !__has_feature(cxx_rvalue_references)
++#  define BOOST_NO_CXX11_RVALUE_REFERENCES
++#endif
++
++#if !__has_feature(cxx_strong_enums)
++#  define BOOST_NO_CXX11_SCOPED_ENUMS
++#endif
++
++#if !__has_feature(cxx_static_assert)
++#  define BOOST_NO_CXX11_STATIC_ASSERT
++#endif
++
++#if !__has_feature(cxx_alias_templates)
++#  define BOOST_NO_CXX11_TEMPLATE_ALIASES
++#endif
++
++#if !__has_feature(cxx_unicode_literals)
++#  define BOOST_NO_CXX11_UNICODE_LITERALS
++#endif
++
++#if !__has_feature(cxx_variadic_templates)
++#  define BOOST_NO_CXX11_VARIADIC_TEMPLATES
++#endif
++
++#if !__has_feature(cxx_user_literals)
++#  define BOOST_NO_CXX11_USER_DEFINED_LITERALS
++#endif
++
++#if !__has_feature(cxx_alignas)
++#  define BOOST_NO_CXX11_ALIGNAS
++#endif
++
++#if !__has_feature(cxx_trailing_return)
++#  define BOOST_NO_CXX11_TRAILING_RESULT_TYPES
++#endif
++
++#if !__has_feature(cxx_inline_namespaces)
++#  define BOOST_NO_CXX11_INLINE_NAMESPACES
++#endif
++
++#if !__has_feature(cxx_override_control)
++#  define BOOST_NO_CXX11_FINAL
++#endif
++
++#if !(__has_feature(__cxx_binary_literals__) || __has_extension(__cxx_binary_literals__))
++#  define BOOST_NO_CXX14_BINARY_LITERALS
++#endif
++
++#if !__has_feature(__cxx_decltype_auto__)
++#  define BOOST_NO_CXX14_DECLTYPE_AUTO
++#endif
++
++#if !__has_feature(__cxx_aggregate_nsdmi__)
++#  define BOOST_NO_CXX14_AGGREGATE_NSDMI
++#endif
++
++#if !__has_feature(__cxx_init_captures__)
++#  define BOOST_NO_CXX14_INITIALIZED_LAMBDA_CAPTURES
++#endif
++
++#if !__has_feature(__cxx_generic_lambdas__)
++#  define BOOST_NO_CXX14_GENERIC_LAMBDAS
++#endif
++
++// clang < 3.5 has a defect with dependent type, like following.
++//
++//  template <class T>
++//  constexpr typename enable_if<pred<T> >::type foo(T &)
++//  { } // error: no return statement in constexpr function
++//
++// This issue also affects C++11 mode, but C++11 constexpr requires return stmt.
++// Therefore we don't care such case.
++//
++// Note that we can't check Clang version directly as the numbering system changes depending who's
++// creating the Clang release (see https://github.com/boostorg/config/pull/39#issuecomment-59927873)
++// so instead verify that we have a feature that was introduced at the same time as working C++14
++// constexpr (generic lambda's in this case):
++//
++#if !__has_feature(__cxx_generic_lambdas__) || !__has_feature(__cxx_relaxed_constexpr__)
++#  define BOOST_NO_CXX14_CONSTEXPR
++#endif
++
++#if !__has_feature(__cxx_return_type_deduction__)
++#  define BOOST_NO_CXX14_RETURN_TYPE_DEDUCTION
++#endif
++
++#if !__has_feature(__cxx_variable_templates__)
++#  define BOOST_NO_CXX14_VARIABLE_TEMPLATES
++#endif
++
++#if __cplusplus < 201400
++// All versions with __cplusplus above this value seem to support this:
++#  define BOOST_NO_CXX14_DIGIT_SEPARATORS
++#endif
++
++
++// Unused attribute:
++#if defined(__GNUC__) && (__GNUC__ >= 4)
++#  define BOOST_ATTRIBUTE_UNUSED __attribute__((unused))
++#endif
++
++#ifndef BOOST_COMPILER
++#  define BOOST_COMPILER "Clang version " __clang_version__
++#endif
++
++// Macro used to identify the Clang compiler.
++#define BOOST_CLANG 1
++
+--- /dev/null
++++ b/lib/boost/config/stdlib/libcpp.hpp
+@@ -0,0 +1,80 @@
++//  (C) Copyright Christopher Jefferson 2011.
++//  Use, modification and distribution are subject to the
++//  Boost Software License, Version 1.0. (See accompanying file
++//  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
++
++//  See http://www.boost.org for most recent version.
++
++//  config for libc++
++//  Might need more in here later.
++
++#if !defined(_LIBCPP_VERSION)
++#  include <ciso646>
++#  if !defined(_LIBCPP_VERSION)
++#      error "This is not libc++!"
++#  endif
++#endif
++
++#define BOOST_STDLIB "libc++ version " BOOST_STRINGIZE(_LIBCPP_VERSION)
++
++#define BOOST_HAS_THREADS
++
++#ifdef _LIBCPP_HAS_NO_VARIADICS
++#    define BOOST_NO_CXX11_HDR_TUPLE
++#endif
++
++// BOOST_NO_CXX11_ALLOCATOR should imply no support for the C++11
++// allocator model. The C++11 allocator model requires a conforming
++// std::allocator_traits which is only possible with C++11 template
++// aliases since members rebind_alloc and rebind_traits require it.
++#if defined(_LIBCPP_HAS_NO_TEMPLATE_ALIASES)
++#    define BOOST_NO_CXX11_ALLOCATOR
++#endif
++
++#if __cplusplus < 201103
++#  define BOOST_NO_CXX11_HDR_ARRAY
++#  define BOOST_NO_CXX11_HDR_CODECVT
++#  define BOOST_NO_CXX11_HDR_CONDITION_VARIABLE
++#  define BOOST_NO_CXX11_HDR_FORWARD_LIST
++#  define BOOST_NO_CXX11_HDR_INITIALIZER_LIST
++#  define BOOST_NO_CXX11_HDR_MUTEX
++#  define BOOST_NO_CXX11_HDR_RANDOM
++#  define BOOST_NO_CXX11_HDR_RATIO
++#  define BOOST_NO_CXX11_HDR_REGEX
++#  define BOOST_NO_CXX11_HDR_SYSTEM_ERROR
++#  define BOOST_NO_CXX11_HDR_THREAD
++#  define BOOST_NO_CXX11_HDR_TUPLE
++#  define BOOST_NO_CXX11_HDR_TYPEINDEX
++#  define BOOST_NO_CXX11_HDR_UNORDERED_MAP
++#  define BOOST_NO_CXX11_HDR_UNORDERED_SET
++#  define BOOST_NO_CXX11_NUMERIC_LIMITS
++#  define BOOST_NO_CXX11_ALLOCATOR
++#  define BOOST_NO_CXX11_SMART_PTR
++#  define BOOST_NO_CXX11_HDR_FUNCTIONAL
++#  define BOOST_NO_CXX11_STD_ALIGN
++#  define BOOST_NO_CXX11_ADDRESSOF
++#endif
++
++//
++// These appear to be unusable/incomplete so far:
++//
++#  define BOOST_NO_CXX11_HDR_CHRONO
++#  define BOOST_NO_CXX11_HDR_FUTURE
++#  define BOOST_NO_CXX11_HDR_TYPE_TRAITS
++#  define BOOST_NO_CXX11_ATOMIC_SMART_PTR
++#  define BOOST_NO_CXX11_HDR_ATOMIC
++
++// libc++ uses a non-standard messages_base
++#define BOOST_NO_STD_MESSAGES
++
++#if defined(__has_include)
++#if !__has_include(<shared_mutex>)
++#  define BOOST_NO_CXX14_HDR_SHARED_MUTEX
++#elif __cplusplus <= 201103
++#  define BOOST_NO_CXX14_HDR_SHARED_MUTEX
++#endif
++#elif __cplusplus < 201402
++#  define BOOST_NO_CXX14_HDR_SHARED_MUTEX
++#endif
++
++//  --- end ---
+--- /dev/null
++++ b/lib/boost/cstdint.hpp
+@@ -0,0 +1,542 @@
++//  boost cstdint.hpp header file  ------------------------------------------//
++
++//  (C) Copyright Beman Dawes 1999.
++//  (C) Copyright Jens Mauer 2001
++//  (C) Copyright John Maddock 2001
++//  Distributed under the Boost
++//  Software License, Version 1.0. (See accompanying file
++//  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
++
++//  See http://www.boost.org/libs/integer for documentation.
++
++//  Revision History
++//   31 Oct 01  use BOOST_HAS_LONG_LONG to check for "long long" (Jens M.)
++//   16 Apr 01  check LONGLONG_MAX when looking for "long long" (Jens Maurer)
++//   23 Jan 01  prefer "long" over "int" for int32_t and intmax_t (Jens Maurer)
++//   12 Nov 00  Merged <boost/stdint.h> (Jens Maurer)
++//   23 Sep 00  Added INTXX_C macro support (John Maddock).
++//   22 Sep 00  Better 64-bit support (John Maddock)
++//   29 Jun 00  Reimplement to avoid including stdint.h within namespace boost
++//    8 Aug 99  Initial version (Beman Dawes)
++
++
++#ifndef BOOST_CSTDINT_HPP
++#define BOOST_CSTDINT_HPP
++
++//
++// Since we always define the INT#_C macros as per C++0x,
++// define __STDC_CONSTANT_MACROS so that <stdint.h> does the right
++// thing if possible, and so that the user knows that the macros
++// are actually defined as per C99.
++//
++#ifndef __STDC_CONSTANT_MACROS
++#  define __STDC_CONSTANT_MACROS
++#endif
++
++#include <boost/config.hpp>
++
++//
++// Note that GLIBC is a bit inconsistent about whether int64_t is defined or not
++// depending upon what headers happen to have been included first...
++// so we disable use of stdint.h when GLIBC does not define __GLIBC_HAVE_LONG_LONG.
++// See https://svn.boost.org/trac/boost/ticket/3548 and http://sources.redhat.com/bugzilla/show_bug.cgi?id=10990
++//
++#if defined(BOOST_HAS_STDINT_H)					\
++  && (!defined(__GLIBC__)					\
++      || defined(__GLIBC_HAVE_LONG_LONG)			\
++      || (defined(__GLIBC__) && ((__GLIBC__ > 2) || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 17)))))
++
++// The following #include is an implementation artifact; not part of interface.
++# ifdef __hpux
++// HP-UX has a vaguely nice <stdint.h> in a non-standard location
++#   include <inttypes.h>
++#   ifdef __STDC_32_MODE__
++      // this is triggered with GCC, because it defines __cplusplus < 199707L
++#     define BOOST_NO_INT64_T
++#   endif
++# elif defined(__FreeBSD__) || defined(__IBMCPP__) || defined(_AIX)
++#   include <inttypes.h>
++# else
++#   include <stdint.h>
++
++// There is a bug in Cygwin two _C macros
++#   if defined(__STDC_CONSTANT_MACROS) && defined(__CYGWIN__)
++#     undef INTMAX_C
++#     undef UINTMAX_C
++#     define INTMAX_C(c) c##LL
++#     define UINTMAX_C(c) c##ULL
++#   endif
++
++# endif
++
++#ifdef __QNX__
++
++// QNX (Dinkumware stdlib) defines these as non-standard names.
++// Reflect to the standard names.
++
++typedef ::intleast8_t int_least8_t;
++typedef ::intfast8_t int_fast8_t;
++typedef ::uintleast8_t uint_least8_t;
++typedef ::uintfast8_t uint_fast8_t;
++
++typedef ::intleast16_t int_least16_t;
++typedef ::intfast16_t int_fast16_t;
++typedef ::uintleast16_t uint_least16_t;
++typedef ::uintfast16_t uint_fast16_t;
++
++typedef ::intleast32_t int_least32_t;
++typedef ::intfast32_t int_fast32_t;
++typedef ::uintleast32_t uint_least32_t;
++typedef ::uintfast32_t uint_fast32_t;
++
++# ifndef BOOST_NO_INT64_T
++
++typedef ::intleast64_t int_least64_t;
++typedef ::intfast64_t int_fast64_t;
++typedef ::uintleast64_t uint_least64_t;
++typedef ::uintfast64_t uint_fast64_t;
++
++# endif
++
++#endif
++
++namespace boost
++{
++
++  using ::int8_t;
++  using ::int_least8_t;
++  using ::int_fast8_t;
++  using ::uint8_t;
++  using ::uint_least8_t;
++  using ::uint_fast8_t;
++
++  using ::int16_t;
++  using ::int_least16_t;
++  using ::int_fast16_t;
++  using ::uint16_t;
++  using ::uint_least16_t;
++  using ::uint_fast16_t;
++
++  using ::int32_t;
++  using ::int_least32_t;
++  using ::int_fast32_t;
++  using ::uint32_t;
++  using ::uint_least32_t;
++  using ::uint_fast32_t;
++
++# ifndef BOOST_NO_INT64_T
++
++  using ::int64_t;
++  using ::int_least64_t;
++  using ::int_fast64_t;
++  using ::uint64_t;
++  using ::uint_least64_t;
++  using ::uint_fast64_t;
++
++# endif
++
++  using ::intmax_t;
++  using ::uintmax_t;
++
++} // namespace boost
++
++#elif defined(__FreeBSD__) && (__FreeBSD__ <= 4) || defined(__osf__) || defined(__VMS) || defined(__SOLARIS9__) || defined(__NetBSD__)
++// FreeBSD and Tru64 have an <inttypes.h> that contains much of what we need.
++# include <inttypes.h>
++
++namespace boost {
++
++  using ::int8_t;
++  typedef int8_t int_least8_t;
++  typedef int8_t int_fast8_t;
++  using ::uint8_t;
++  typedef uint8_t uint_least8_t;
++  typedef uint8_t uint_fast8_t;
++
++  using ::int16_t;
++  typedef int16_t int_least16_t;
++  typedef int16_t int_fast16_t;
++  using ::uint16_t;
++  typedef uint16_t uint_least16_t;
++  typedef uint16_t uint_fast16_t;
++
++  using ::int32_t;
++  typedef int32_t int_least32_t;
++  typedef int32_t int_fast32_t;
++  using ::uint32_t;
++  typedef uint32_t uint_least32_t;
++  typedef uint32_t uint_fast32_t;
++
++# ifndef BOOST_NO_INT64_T
++
++  using ::int64_t;
++  typedef int64_t int_least64_t;
++  typedef int64_t int_fast64_t;
++  using ::uint64_t;
++  typedef uint64_t uint_least64_t;
++  typedef uint64_t uint_fast64_t;
++
++  typedef int64_t intmax_t;
++  typedef uint64_t uintmax_t;
++
++# else
++
++  typedef int32_t intmax_t;
++  typedef uint32_t uintmax_t;
++
++# endif
++
++} // namespace boost
++
++#else  // BOOST_HAS_STDINT_H
++
++# include <boost/limits.hpp> // implementation artifact; not part of interface
++# include <limits.h>         // needed for limits macros
++
++
++namespace boost
++{
++
++//  These are fairly safe guesses for some 16-bit, and most 32-bit and 64-bit
++//  platforms.  For other systems, they will have to be hand tailored.
++//
++//  Because the fast types are assumed to be the same as the undecorated types,
++//  it may be possible to hand tailor a more efficient implementation.  Such
++//  an optimization may be illusionary; on the Intel x86-family 386 on, for
++//  example, byte arithmetic and load/stores are as fast as "int" sized ones.
++
++//  8-bit types  ------------------------------------------------------------//
++
++# if UCHAR_MAX == 0xff
++     typedef signed char     int8_t;
++     typedef signed char     int_least8_t;
++     typedef signed char     int_fast8_t;
++     typedef unsigned char   uint8_t;
++     typedef unsigned char   uint_least8_t;
++     typedef unsigned char   uint_fast8_t;
++# else
++#    error defaults not correct; you must hand modify boost/cstdint.hpp
++# endif
++
++//  16-bit types  -----------------------------------------------------------//
++
++# if USHRT_MAX == 0xffff
++#  if defined(__crayx1)
++     // The Cray X1 has a 16-bit short, however it is not recommend
++     // for use in performance critical code.
++     typedef short           int16_t;
++     typedef short           int_least16_t;
++     typedef int             int_fast16_t;
++     typedef unsigned short  uint16_t;
++     typedef unsigned short  uint_least16_t;
++     typedef unsigned int    uint_fast16_t;
++#  else
++     typedef short           int16_t;
++     typedef short           int_least16_t;
++     typedef short           int_fast16_t;
++     typedef unsigned short  uint16_t;
++     typedef unsigned short  uint_least16_t;
++     typedef unsigned short  uint_fast16_t;
++#  endif
++# elif (USHRT_MAX == 0xffffffff) && defined(__MTA__)
++      // On MTA / XMT short is 32 bits unless the -short16 compiler flag is specified
++      // MTA / XMT does support the following non-standard integer types
++      typedef __short16           int16_t;
++      typedef __short16           int_least16_t;
++      typedef __short16           int_fast16_t;
++      typedef unsigned __short16  uint16_t;
++      typedef unsigned __short16  uint_least16_t;
++      typedef unsigned __short16  uint_fast16_t;
++# elif (USHRT_MAX == 0xffffffff) && defined(CRAY)
++     // no 16-bit types on Cray:
++     typedef short           int_least16_t;
++     typedef short           int_fast16_t;
++     typedef unsigned short  uint_least16_t;
++     typedef unsigned short  uint_fast16_t;
++# else
++#    error defaults not correct; you must hand modify boost/cstdint.hpp
++# endif
++
++//  32-bit types  -----------------------------------------------------------//
++
++# if UINT_MAX == 0xffffffff
++     typedef int             int32_t;
++     typedef int             int_least32_t;
++     typedef int             int_fast32_t;
++     typedef unsigned int    uint32_t;
++     typedef unsigned int    uint_least32_t;
++     typedef unsigned int    uint_fast32_t;
++# elif (USHRT_MAX == 0xffffffff)
++     typedef short             int32_t;
++     typedef short             int_least32_t;
++     typedef short             int_fast32_t;
++     typedef unsigned short    uint32_t;
++     typedef unsigned short    uint_least32_t;
++     typedef unsigned short    uint_fast32_t;
++# elif ULONG_MAX == 0xffffffff
++     typedef long            int32_t;
++     typedef long            int_least32_t;
++     typedef long            int_fast32_t;
++     typedef unsigned long   uint32_t;
++     typedef unsigned long   uint_least32_t;
++     typedef unsigned long   uint_fast32_t;
++# elif (UINT_MAX == 0xffffffffffffffff) && defined(__MTA__)
++      // Integers are 64 bits on the MTA / XMT
++      typedef __int32           int32_t;
++      typedef __int32           int_least32_t;
++      typedef __int32           int_fast32_t;
++      typedef unsigned __int32  uint32_t;
++      typedef unsigned __int32  uint_least32_t;
++      typedef unsigned __int32  uint_fast32_t;
++# else
++#    error defaults not correct; you must hand modify boost/cstdint.hpp
++# endif
++
++//  64-bit types + intmax_t and uintmax_t  ----------------------------------//
++
++# if defined(BOOST_HAS_LONG_LONG) && \
++   !defined(BOOST_MSVC) && !defined(__BORLANDC__) && \
++   (!defined(__GLIBCPP__) || defined(_GLIBCPP_USE_LONG_LONG)) && \
++   (defined(ULLONG_MAX) || defined(ULONG_LONG_MAX) || defined(ULONGLONG_MAX))
++#    if defined(__hpux)
++     // HP-UX's value of ULONG_LONG_MAX is unusable in preprocessor expressions
++#    elif (defined(ULLONG_MAX) && ULLONG_MAX == 18446744073709551615ULL) || (defined(ULONG_LONG_MAX) && ULONG_LONG_MAX == 18446744073709551615ULL) || (defined(ULONGLONG_MAX) && ULONGLONG_MAX == 18446744073709551615ULL)
++                                                                 // 2**64 - 1
++#    else
++#       error defaults not correct; you must hand modify boost/cstdint.hpp
++#    endif
++
++     typedef  ::boost::long_long_type            intmax_t;
++     typedef  ::boost::ulong_long_type   uintmax_t;
++     typedef  ::boost::long_long_type            int64_t;
++     typedef  ::boost::long_long_type            int_least64_t;
++     typedef  ::boost::long_long_type            int_fast64_t;
++     typedef  ::boost::ulong_long_type   uint64_t;
++     typedef  ::boost::ulong_long_type   uint_least64_t;
++     typedef  ::boost::ulong_long_type   uint_fast64_t;
++
++# elif ULONG_MAX != 0xffffffff
++
++#    if ULONG_MAX == 18446744073709551615 // 2**64 - 1
++     typedef long                 intmax_t;
++     typedef unsigned long        uintmax_t;
++     typedef long                 int64_t;
++     typedef long                 int_least64_t;
++     typedef long                 int_fast64_t;
++     typedef unsigned long        uint64_t;
++     typedef unsigned long        uint_least64_t;
++     typedef unsigned long        uint_fast64_t;
++#    else
++#       error defaults not correct; you must hand modify boost/cstdint.hpp
++#    endif
++# elif defined(__GNUC__) && defined(BOOST_HAS_LONG_LONG)
++     __extension__ typedef long long            intmax_t;
++     __extension__ typedef unsigned long long   uintmax_t;
++     __extension__ typedef long long            int64_t;
++     __extension__ typedef long long            int_least64_t;
++     __extension__ typedef long long            int_fast64_t;
++     __extension__ typedef unsigned long long   uint64_t;
++     __extension__ typedef unsigned long long   uint_least64_t;
++     __extension__ typedef unsigned long long   uint_fast64_t;
++# elif defined(BOOST_HAS_MS_INT64)
++     //
++     // we have Borland/Intel/Microsoft __int64:
++     //
++     typedef __int64             intmax_t;
++     typedef unsigned __int64    uintmax_t;
++     typedef __int64             int64_t;
++     typedef __int64             int_least64_t;
++     typedef __int64             int_fast64_t;
++     typedef unsigned __int64    uint64_t;
++     typedef unsigned __int64    uint_least64_t;
++     typedef unsigned __int64    uint_fast64_t;
++# else // assume no 64-bit integers
++#  define BOOST_NO_INT64_T
++     typedef int32_t              intmax_t;
++     typedef uint32_t             uintmax_t;
++# endif
++
++} // namespace boost
++
++
++#endif // BOOST_HAS_STDINT_H
++
++// intptr_t/uintptr_t are defined separately because they are optional and not universally available
++#if defined(BOOST_WINDOWS) && !defined(_WIN32_WCE) && !defined(BOOST_HAS_STDINT_H)
++// Older MSVC don't have stdint.h and have intptr_t/uintptr_t defined in stddef.h
++#include <stddef.h>
++#endif
++
++// PGI seems to not support intptr_t/uintptr_t properly. BOOST_HAS_STDINT_H is not defined for this compiler by Boost.Config.
++#if !defined(__PGIC__)
++
++#if (defined(BOOST_WINDOWS) && !defined(_WIN32_WCE)) \
++    || (defined(_XOPEN_UNIX) && (_XOPEN_UNIX+0 > 0) && !defined(__UCLIBC__)) \
++    || defined(__CYGWIN__) \
++    || defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__) \
++    || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(sun)
++
++namespace boost {
++    using ::intptr_t;
++    using ::uintptr_t;
++}
++#define BOOST_HAS_INTPTR_T
++
++// Clang pretends to be GCC, so it'll match this condition
++#elif defined(__GNUC__) && defined(__INTPTR_TYPE__) && defined(__UINTPTR_TYPE__)
++
++namespace boost {
++    typedef __INTPTR_TYPE__ intptr_t;
++    typedef __UINTPTR_TYPE__ uintptr_t;
++}
++#define BOOST_HAS_INTPTR_T
++
++#endif
++
++#endif // !defined(__PGIC__)
++
++#endif // BOOST_CSTDINT_HPP
++
++
++/****************************************************
++
++Macro definition section:
++
++Added 23rd September 2000 (John Maddock).
++Modified 11th September 2001 to be excluded when
++BOOST_HAS_STDINT_H is defined (John Maddock).
++Modified 11th Dec 2009 to always define the
++INT#_C macros if they're not already defined (John Maddock).
++
++******************************************************/
++
++#if !defined(BOOST__STDC_CONSTANT_MACROS_DEFINED) && \
++   (!defined(INT8_C) || !defined(INT16_C) || !defined(INT32_C) || !defined(INT64_C))
++//
++// For the following code we get several warnings along the lines of:
++//
++// boost/cstdint.hpp:428:35: error: use of C99 long long integer constant
++//
++// So we declare this a system header to suppress these warnings.
++//
++#if defined(__GNUC__) && (__GNUC__ >= 4)
++#pragma GCC system_header
++#endif
++
++#include <limits.h>
++# define BOOST__STDC_CONSTANT_MACROS_DEFINED
++# if defined(BOOST_HAS_MS_INT64)
++//
++// Borland/Intel/Microsoft compilers have width specific suffixes:
++//
++#ifndef INT8_C
++#  define INT8_C(value)     value##i8
++#endif
++#ifndef INT16_C
++#  define INT16_C(value)    value##i16
++#endif
++#ifndef INT32_C
++#  define INT32_C(value)    value##i32
++#endif
++#ifndef INT64_C
++#  define INT64_C(value)    value##i64
++#endif
++#  ifdef __BORLANDC__
++    // Borland bug: appending ui8 makes the type a signed char
++#   define UINT8_C(value)    static_cast<unsigned char>(value##u)
++#  else
++#   define UINT8_C(value)    value##ui8
++#  endif
++#ifndef UINT16_C
++#  define UINT16_C(value)   value##ui16
++#endif
++#ifndef UINT32_C
++#  define UINT32_C(value)   value##ui32
++#endif
++#ifndef UINT64_C
++#  define UINT64_C(value)   value##ui64
++#endif
++#ifndef INTMAX_C
++#  define INTMAX_C(value)   value##i64
++#  define UINTMAX_C(value)  value##ui64
++#endif
++
++# else
++//  do it the old fashioned way:
++
++//  8-bit types  ------------------------------------------------------------//
++
++#  if (UCHAR_MAX == 0xff) && !defined(INT8_C)
++#   define INT8_C(value) static_cast<boost::int8_t>(value)
++#   define UINT8_C(value) static_cast<boost::uint8_t>(value##u)
++#  endif
++
++//  16-bit types  -----------------------------------------------------------//
++
++#  if (USHRT_MAX == 0xffff) && !defined(INT16_C)
++#   define INT16_C(value) static_cast<boost::int16_t>(value)
++#   define UINT16_C(value) static_cast<boost::uint16_t>(value##u)
++#  endif
++
++//  32-bit types  -----------------------------------------------------------//
++#ifndef INT32_C
++#  if (UINT_MAX == 0xffffffff)
++#   define INT32_C(value) value
++#   define UINT32_C(value) value##u
++#  elif ULONG_MAX == 0xffffffff
++#   define INT32_C(value) value##L
++#   define UINT32_C(value) value##uL
++#  endif
++#endif
++
++//  64-bit types + intmax_t and uintmax_t  ----------------------------------//
++#ifndef INT64_C
++#  if defined(BOOST_HAS_LONG_LONG) && \
++    (defined(ULLONG_MAX) || defined(ULONG_LONG_MAX) || defined(ULONGLONG_MAX) || defined(_ULLONG_MAX) || defined(_LLONG_MAX))
++
++#    if defined(__hpux)
++        // HP-UX's value of ULONG_LONG_MAX is unusable in preprocessor expressions
++#       define INT64_C(value) value##LL
++#       define UINT64_C(value) value##uLL
++#    elif (defined(ULLONG_MAX) && ULLONG_MAX == 18446744073709551615ULL) ||  \
++        (defined(ULONG_LONG_MAX) && ULONG_LONG_MAX == 18446744073709551615ULL) ||  \
++        (defined(ULONGLONG_MAX) && ULONGLONG_MAX == 18446744073709551615ULL) || \
++        (defined(_ULLONG_MAX) && _ULLONG_MAX == 18446744073709551615ULL) || \
++        (defined(_LLONG_MAX) && _LLONG_MAX == 9223372036854775807LL)
++
++#       define INT64_C(value) value##LL
++#       define UINT64_C(value) value##uLL
++#    else
++#       error defaults not correct; you must hand modify boost/cstdint.hpp
++#    endif
++#  elif ULONG_MAX != 0xffffffff
++
++#    if ULONG_MAX == 18446744073709551615U // 2**64 - 1
++#       define INT64_C(value) value##L
++#       define UINT64_C(value) value##uL
++#    else
++#       error defaults not correct; you must hand modify boost/cstdint.hpp
++#    endif
++#  elif defined(BOOST_HAS_LONG_LONG)
++     // Usual macros not defined, work things out for ourselves:
++#    if(~0uLL == 18446744073709551615ULL)
++#       define INT64_C(value) value##LL
++#       define UINT64_C(value) value##uLL
++#    else
++#       error defaults not correct; you must hand modify boost/cstdint.hpp
++#    endif
++#  else
++#    error defaults not correct; you must hand modify boost/cstdint.hpp
++#  endif
++
++#  ifdef BOOST_NO_INT64_T
++#   define INTMAX_C(value) INT32_C(value)
++#   define UINTMAX_C(value) UINT32_C(value)
++#  else
++#   define INTMAX_C(value) INT64_C(value)
++#   define UINTMAX_C(value) UINT64_C(value)
++#  endif
++#endif
++# endif // Borland/Microsoft specific width suffixes
++
++#endif // INT#_C macros.
+--- /dev/null
++++ b/lib/boost/smart_ptr/detail/sp_counted_base_clang.hpp
+@@ -0,0 +1,140 @@
++#ifndef BOOST_SMART_PTR_DETAIL_SP_COUNTED_BASE_CLANG_HPP_INCLUDED
++#define BOOST_SMART_PTR_DETAIL_SP_COUNTED_BASE_CLANG_HPP_INCLUDED
++
++// MS compatible compilers support #pragma once
++
++#if defined(_MSC_VER) && (_MSC_VER >= 1020)
++# pragma once
++#endif
++
++//  detail/sp_counted_base_clang.hpp - __c11 clang intrinsics
++//
++//  Copyright (c) 2007, 2013, 2015 Peter Dimov
++//
++//  Distributed under the Boost Software License, Version 1.0.
++//  See accompanying file LICENSE_1_0.txt or copy at
++//  http://www.boost.org/LICENSE_1_0.txt
++
++#include <boost/detail/sp_typeinfo.hpp>
++#include <boost/cstdint.hpp>
++
++namespace boost
++{
++
++namespace detail
++{
++
++typedef _Atomic( boost::int_least32_t ) atomic_int_least32_t;
++
++inline void atomic_increment( atomic_int_least32_t * pw )
++{
++    __c11_atomic_fetch_add( pw, 1, __ATOMIC_RELAXED );
++}
++
++inline boost::int_least32_t atomic_decrement( atomic_int_least32_t * pw )
++{
++    return __c11_atomic_fetch_sub( pw, 1, __ATOMIC_ACQ_REL );
++}
++
++inline boost::int_least32_t atomic_conditional_increment( atomic_int_least32_t * pw )
++{
++    // long r = *pw;
++    // if( r != 0 ) ++*pw;
++    // return r;
++
++    boost::int_least32_t r = __c11_atomic_load( pw, __ATOMIC_RELAXED );
++
++    for( ;; )
++    {
++        if( r == 0 )
++        {
++            return r;
++        }
++
++        if( __c11_atomic_compare_exchange_weak( pw, &r, r + 1, __ATOMIC_RELAXED, __ATOMIC_RELAXED ) )
++        {
++            return r;
++        }
++    }
++}
++
++class sp_counted_base
++{
++private:
++
++    sp_counted_base( sp_counted_base const & );
++    sp_counted_base & operator= ( sp_counted_base const & );
++
++    atomic_int_least32_t use_count_;	// #shared
++    atomic_int_least32_t weak_count_;	// #weak + (#shared != 0)
++
++public:
++
++    sp_counted_base()
++    {
++        __c11_atomic_init( &use_count_, 1 );
++        __c11_atomic_init( &weak_count_, 1 );
++    }
++
++    virtual ~sp_counted_base() // nothrow
++    {
++    }
++
++    // dispose() is called when use_count_ drops to zero, to release
++    // the resources managed by *this.
++
++    virtual void dispose() = 0; // nothrow
++
++    // destroy() is called when weak_count_ drops to zero.
++
++    virtual void destroy() // nothrow
++    {
++        delete this;
++    }
++
++    virtual void * get_deleter( sp_typeinfo const & ti ) = 0;
++    virtual void * get_untyped_deleter() = 0;
++
++    void add_ref_copy()
++    {
++        atomic_increment( &use_count_ );
++    }
++
++    bool add_ref_lock() // true on success
++    {
++        return atomic_conditional_increment( &use_count_ ) != 0;
++    }
++
++    void release() // nothrow
++    {
++        if( atomic_decrement( &use_count_ ) == 1 )
++        {
++            dispose();
++            weak_release();
++        }
++    }
++
++    void weak_add_ref() // nothrow
++    {
++        atomic_increment( &weak_count_ );
++    }
++
++    void weak_release() // nothrow
++    {
++        if( atomic_decrement( &weak_count_ ) == 1 )
++        {
++            destroy();
++        }
++    }
++
++    long use_count() const // nothrow
++    {
++        return __c11_atomic_load( const_cast< atomic_int_least32_t* >( &use_count_ ), __ATOMIC_ACQUIRE );
++    }
++};
++
++} // namespace detail
++
++} // namespace boost
++
++#endif  // #ifndef BOOST_SMART_PTR_DETAIL_SP_COUNTED_BASE_CLANG_HPP_INCLUDED
+--- /dev/null
++++ b/lib/boost/smart_ptr/detail/sp_counted_base_sync.hpp
+@@ -0,0 +1,156 @@
++#ifndef BOOST_SMART_PTR_DETAIL_SP_COUNTED_BASE_SYNC_HPP_INCLUDED
++#define BOOST_SMART_PTR_DETAIL_SP_COUNTED_BASE_SYNC_HPP_INCLUDED
++
++// MS compatible compilers support #pragma once
++
++#if defined(_MSC_VER) && (_MSC_VER >= 1020)
++# pragma once
++#endif
++
++//  detail/sp_counted_base_sync.hpp - g++ 4.1+ __sync intrinsics
++//
++//  Copyright (c) 2007 Peter Dimov
++//
++//  Distributed under the Boost Software License, Version 1.0.
++//  See accompanying file LICENSE_1_0.txt or copy at
++//  http://www.boost.org/LICENSE_1_0.txt
++
++#include <boost/detail/sp_typeinfo.hpp>
++#include <limits.h>
++
++#if defined( __ia64__ ) && defined( __INTEL_COMPILER )
++# include <ia64intrin.h>
++#endif
++
++namespace boost
++{
++
++namespace detail
++{
++
++#if INT_MAX >= 2147483647
++
++typedef int sp_int32_t;
++
++#else
++
++typedef long sp_int32_t;
++
++#endif
++
++inline void atomic_increment( sp_int32_t * pw )
++{
++    __sync_fetch_and_add( pw, 1 );
++}
++
++inline sp_int32_t atomic_decrement( sp_int32_t * pw )
++{
++    return __sync_fetch_and_add( pw, -1 );
++}
++
++inline sp_int32_t atomic_conditional_increment( sp_int32_t * pw )
++{
++    // long r = *pw;
++    // if( r != 0 ) ++*pw;
++    // return r;
++
++    sp_int32_t r = *pw;
++
++    for( ;; )
++    {
++        if( r == 0 )
++        {
++            return r;
++        }
++
++        sp_int32_t r2 = __sync_val_compare_and_swap( pw, r, r + 1 );
++
++        if( r2 == r )
++        {
++            return r;
++        }
++        else
++        {
++            r = r2;
++        }
++    }
++}
++
++class sp_counted_base
++{
++private:
++
++    sp_counted_base( sp_counted_base const & );
++    sp_counted_base & operator= ( sp_counted_base const & );
++
++    sp_int32_t use_count_;        // #shared
++    sp_int32_t weak_count_;       // #weak + (#shared != 0)
++
++public:
++
++    sp_counted_base(): use_count_( 1 ), weak_count_( 1 )
++    {
++    }
++
++    virtual ~sp_counted_base() // nothrow
++    {
++    }
++
++    // dispose() is called when use_count_ drops to zero, to release
++    // the resources managed by *this.
++
++    virtual void dispose() = 0; // nothrow
++
++    // destroy() is called when weak_count_ drops to zero.
++
++    virtual void destroy() // nothrow
++    {
++        delete this;
++    }
++
++    virtual void * get_deleter( sp_typeinfo const & ti ) = 0;
++    virtual void * get_untyped_deleter() = 0;
++
++    void add_ref_copy()
++    {
++        atomic_increment( &use_count_ );
++    }
++
++    bool add_ref_lock() // true on success
++    {
++        return atomic_conditional_increment( &use_count_ ) != 0;
++    }
++
++    void release() // nothrow
++    {
++        if( atomic_decrement( &use_count_ ) == 1 )
++        {
++            dispose();
++            weak_release();
++        }
++    }
++
++    void weak_add_ref() // nothrow
++    {
++        atomic_increment( &weak_count_ );
++    }
++
++    void weak_release() // nothrow
++    {
++        if( atomic_decrement( &weak_count_ ) == 1 )
++        {
++            destroy();
++        }
++    }
++
++    long use_count() const // nothrow
++    {
++        return const_cast< sp_int32_t const volatile & >( use_count_ );
++    }
++};
++
++} // namespace detail
++
++} // namespace boost
++
++#endif  // #ifndef BOOST_SMART_PTR_DETAIL_SP_COUNTED_BASE_SYNC_HPP_INCLUDED
+--- /dev/null
++++ b/lib/boost/smart_ptr/detail/sp_counted_base_gcc_mips.hpp
+@@ -0,0 +1,182 @@
++#ifndef BOOST_DETAIL_SP_COUNTED_BASE_GCC_MIPS_HPP_INCLUDED
++#define BOOST_DETAIL_SP_COUNTED_BASE_GCC_MIPS_HPP_INCLUDED
++
++// MS compatible compilers support #pragma once
++
++#if defined(_MSC_VER) && (_MSC_VER >= 1020)
++# pragma once
++#endif
++
++//
++//  detail/sp_counted_base_gcc_mips.hpp - g++ on MIPS
++//
++//  Copyright (c) 2009, Spirent Communications, Inc.
++//
++//  Distributed under the Boost Software License, Version 1.0. (See
++//  accompanying file LICENSE_1_0.txt or copy at
++//  http://www.boost.org/LICENSE_1_0.txt)
++//
++//
++//  Lock-free algorithm by Alexander Terekhov
++//
++
++#include <boost/detail/sp_typeinfo.hpp>
++
++namespace boost
++{
++
++namespace detail
++{
++
++inline void atomic_increment( int * pw )
++{
++    // ++*pw;
++
++    int tmp;
++
++    __asm__ __volatile__
++    (
++        "0:\n\t"
++        ".set push\n\t"
++        ".set mips2\n\t"
++        "ll %0, %1\n\t"
++        "addiu %0, 1\n\t"
++        "sc %0, %1\n\t"
++        ".set pop\n\t"
++        "beqz %0, 0b":
++        "=&r"( tmp ), "=m"( *pw ):
++        "m"( *pw )
++    );
++}
++
++inline int atomic_decrement( int * pw )
++{
++    // return --*pw;
++
++    int rv, tmp;
++
++    __asm__ __volatile__
++    (
++        "0:\n\t"
++        ".set push\n\t"
++        ".set mips2\n\t"
++        "ll %1, %2\n\t"
++        "addiu %0, %1, -1\n\t"
++        "sc %0, %2\n\t"
++        ".set pop\n\t"
++        "beqz %0, 0b\n\t"
++        "addiu %0, %1, -1":
++        "=&r"( rv ), "=&r"( tmp ), "=m"( *pw ):
++        "m"( *pw ):
++        "memory"
++    );
++
++    return rv;
++}
++
++inline int atomic_conditional_increment( int * pw )
++{
++    // if( *pw != 0 ) ++*pw;
++    // return *pw;
++
++    int rv, tmp;
++
++    __asm__ __volatile__
++    (
++        "0:\n\t"
++        ".set push\n\t"
++        ".set mips2\n\t"
++        "ll %0, %2\n\t"
++        "beqz %0, 1f\n\t"
++        "addiu %1, %0, 1\n\t"
++        "sc %1, %2\n\t"
++        ".set pop\n\t"
++        "beqz %1, 0b\n\t"
++        "addiu %0, %0, 1\n\t"
++        "1:":
++        "=&r"( rv ), "=&r"( tmp ), "=m"( *pw ):
++        "m"( *pw ):
++        "memory"
++    );
++
++    return rv;
++}
++
++class sp_counted_base
++{
++private:
++
++    sp_counted_base( sp_counted_base const & );
++    sp_counted_base & operator= ( sp_counted_base const & );
++
++    int use_count_;        // #shared
++    int weak_count_;       // #weak + (#shared != 0)
++
++public:
++
++    sp_counted_base(): use_count_( 1 ), weak_count_( 1 )
++    {
++    }
++
++    virtual ~sp_counted_base() // nothrow
++    {
++    }
++
++    // dispose() is called when use_count_ drops to zero, to release
++    // the resources managed by *this.
++
++    virtual void dispose() = 0; // nothrow
++
++    // destroy() is called when weak_count_ drops to zero.
++
++    virtual void destroy() // nothrow
++    {
++        delete this;
++    }
++
++    virtual void * get_deleter( sp_typeinfo const & ti ) = 0;
++    virtual void * get_untyped_deleter() = 0;
++
++    void add_ref_copy()
++    {
++        atomic_increment( &use_count_ );
++    }
++
++    bool add_ref_lock() // true on success
++    {
++        return atomic_conditional_increment( &use_count_ ) != 0;
++    }
++
++    void release() // nothrow
++    {
++        if( atomic_decrement( &use_count_ ) == 0 )
++        {
++            dispose();
++            weak_release();
++        }
++    }
++
++    void weak_add_ref() // nothrow
++    {
++        atomic_increment( &weak_count_ );
++    }
++
++    void weak_release() // nothrow
++    {
++        if( atomic_decrement( &weak_count_ ) == 0 )
++        {
++            destroy();
++        }
++    }
++
++    long use_count() const // nothrow
++    {
++        return static_cast<int const volatile &>( use_count_ );
++    }
++};
++
++} // namespace detail
++
++} // namespace boost
++
++#endif  // #ifndef BOOST_DETAIL_SP_COUNTED_BASE_GCC_MIPS_HPP_INCLUDED

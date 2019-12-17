@@ -1,0 +1,37 @@
+From 5ef52cdea278a1dff966a912549cb6708f2cb699 Mon Sep 17 00:00:00 2001
+From: Alistair Francis <alistair.francis@wdc.com>
+Date: Tue, 17 Sep 2019 11:31:47 -0700
+Subject: [PATCH 3/7] dev_setup.sh: Remove the TERM dependency
+
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Upstream-Status: Inappropriate [embedded specific]
+---
+ dev_setup.sh | 12 ------------
+ 1 file changed, 12 deletions(-)
+
+diff --git a/dev_setup.sh b/dev_setup.sh
+index 672b27080c2..72f734f36bf 100755
+--- a/dev_setup.sh
++++ b/dev_setup.sh
+@@ -115,18 +115,6 @@ function get_YN() {
+     done
+ }
+ 
+-# If tput is available and can handle multiple colors
+-if found_exe tput ; then
+-    if [[ $(tput colors) != "-1" ]]; then
+-        GREEN=$(tput setaf 2)
+-        BLUE=$(tput setaf 4)
+-        CYAN=$(tput setaf 6)
+-        YELLOW=$(tput setaf 3)
+-        RESET=$(tput sgr0)
+-        HIGHLIGHT=$YELLOW
+-    fi
+-fi
+-
+ # Run a setup wizard the very first time that guides the user through some decisions
+ if [[ ! -f .dev_opts.json && -z $CI ]] ; then
+     echo "
+-- 
+2.23.0
+

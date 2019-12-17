@@ -18,11 +18,15 @@ EXTRA_OECONF = "--with-libesmtp=${STAGING_EXECPREFIXDIR}"
 
 inherit autotools update-alternatives
 
-ALTERNATIVE_${PN} += "sendmail mailq newaliases"
+ALTERNATIVE_${PN} = "sendmail mailq newaliases"
+# /usr/lib/sendmial is required by LSB core test
+ALTERNATIVE_${PN}_linuxstdbase = "sendmail mailq newaliases usr-lib-sendmail"
 ALTERNATIVE_TARGET[mailq] = "${bindir}/mailq"
 ALTERNATIVE_TARGET[newaliases] = "${bindir}/newaliases"
 ALTERNATIVE_LINK_NAME[sendmail] = "${sbindir}/sendmail"
 ALTERNATIVE_TARGET[sendmail] = "${bindir}/esmtp"
+ALTERNATIVE_LINK_NAME[usr-lib-sendmail] = "/usr/lib/sendmail"
+ALTERNATIVE_TARGET[usr-lib-sendmail] = "${bindir}/esmtp"
 
 ALTERNATIVE_PRIORITY = "10"
 
@@ -37,11 +41,6 @@ SRC_URI[sha256sum] = "a0d26931bf731f97514da266d079d8bc7d73c65b3499ed080576ab606b
 do_install_append() {
     # only one file /usr/lib/sendmail in ${D}${libdir}
     rm -rf ${D}${libdir}
-}
-
-pkg_postinst_${PN}_linuxstdbase () {
-    # /usr/lib/sendmial is required by LSB core test
-    [ ! -L $D/usr/lib/sendmail ] && ln -sf ${sbindir}/sendmail $D/usr/lib/
 }
 
 FILES_${PN} += "${libdir}/"

@@ -1,5 +1,5 @@
 SUMMARY = "Serial Port Support for Python"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=d476d94926db6e0008a5b3860d1f5c0d"
 
 SRC_URI[md5sum] = "ed6183b15519a0ae96675e9c3330c69b"
@@ -40,3 +40,5 @@ RDEPENDS_${PN} = "\
     ${PYTHON_PN}-stringold \
     ${PYTHON_PN}-threading \
 "
+
+BBCLASSEXTEND = "native nativesdk"

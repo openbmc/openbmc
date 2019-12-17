@@ -124,7 +124,7 @@ class ImageFeatures(OESelftestTestCase):
 
         # check if result image is sparse
         image_stat = os.stat(image_path)
-        self.assertTrue(image_stat.st_size > image_stat.st_blocks * 512)
+        self.assertGreater(image_stat.st_size, image_stat.st_blocks * 512)
 
         # check if the resulting gzip is valid
         self.assertTrue(runCmd('gzip -t %s' % gzip_path))
@@ -161,7 +161,12 @@ class ImageFeatures(OESelftestTestCase):
             sysroot = get_bb_var('STAGING_DIR_NATIVE', 'core-image-minimal')
             result = runCmd('qemu-img info --output json %s' % image_path,
                             native_sysroot=sysroot)
-            self.assertTrue(json.loads(result.output).get('format') == itype)
+            try:
+                data = json.loads(result.output)
+                self.assertEqual(data.get('format'), itype,
+                                 msg="Unexpected format in '%s'" % (result.output))
+            except json.decoder.JSONDecodeError:
+                self.fail("Could not parse '%ss'" % result.output)
 
     def test_long_chain_conversion(self):
         """

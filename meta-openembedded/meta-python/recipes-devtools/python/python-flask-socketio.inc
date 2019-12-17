@@ -9,8 +9,8 @@ inherit pypi
 
 PYPI_PACKAGE = "Flask-SocketIO"
 
-SRC_URI[md5sum] = "298965a43f6534e8a5b24d1ba1fc4186"
-SRC_URI[sha256sum] = "8d8f9f104db5ddff1b06ba322d8e158881d590144199c993fe26cf53218c7edd"
+SRC_URI[md5sum] = "b23222fb7dd2f0676d78bbe24153fd80"
+SRC_URI[sha256sum] = "2172dff1e42415ba480cee02c30c2fc833671ff326f1598ee3d69aa02cf768ec"
 
 RDEPENDS_${PN} += "\
     ${PYTHON_PN}-flask \

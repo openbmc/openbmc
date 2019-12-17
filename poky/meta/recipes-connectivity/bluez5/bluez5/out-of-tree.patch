@@ -7,7 +7,7 @@ In parallel out-of-tree builds it's possible that obexd/src/builtin.h is
 generated before the target directory has been implicitly created. Solve this by
 creating the directory before writing into it.
 
-Upstream-Status: Submitted
+Upstream-Status: Backport
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 ---
  Makefile.obexd | 1 +

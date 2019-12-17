@@ -1,0 +1,38 @@
+From 19c117c3d1388654da484e26afb3fb6c3e4181a9 Mon Sep 17 00:00:00 2001
+From: Daniel Klauer <daniel.klauer@gin.de>
+Date: Tue, 30 Jul 2019 11:39:09 +0200
+Subject: [PATCH] Build debug version of bjam
+
+bjam is stripped by default, this causes QA warning while stripping it
+from do_populate_sysroot():
+
+  WARNING: File '.../tmp/sysroots/x86_64-linux/usr/bin/bjam' \
+    from bjam-native was already stripped, \
+    this will prevent future debugging!
+
+The JAM scripts allow to build unstripped version with '--debug'. Just
+build and install the bjam.debug to stop bjam from being stripped in
+compile step.
+
+Upstream-Status: Inappropriate [configuration]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ bootstrap.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/bootstrap.sh b/bootstrap.sh
+index ca0b08d58..87f38dcf2 100755
+--- a/bootstrap.sh
++++ b/bootstrap.sh
+@@ -223,7 +223,7 @@ rm -f config.log
+ if test "x$BJAM" = x; then
+   $ECHO -n "Building Boost.Build engine with toolset $TOOLSET... "
+   pwd=`pwd`
+-  (cd "$my_dir/tools/build/src/engine" && ./build.sh "$TOOLSET") > bootstrap.log 2>&1
++  (cd "$my_dir/tools/build/src/engine" && ./build.sh "$TOOLSET" --debug) > bootstrap.log 2>&1
+   if [ $? -ne 0 ]; then
+       echo
+       echo "Failed to build Boost.Build build engine" 
+-- 
+2.17.1
+

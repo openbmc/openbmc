@@ -24,16 +24,7 @@ MESONOPTS = " --prefix ${prefix} \
               --infodir ${@noprefix('infodir', d)} \
               --sysconfdir ${sysconfdir} \
               --localstatedir ${localstatedir} \
-              --sharedstatedir ${sharedstatedir} \
-              -Dc_args='${BUILD_CPPFLAGS} ${BUILD_CFLAGS}' \
-              -Dc_link_args='${BUILD_LDFLAGS}' \
-              -Dcpp_args='${BUILD_CPPFLAGS} ${BUILD_CXXFLAGS}' \
-              -Dcpp_link_args='${BUILD_LDFLAGS}'"
-
-MESON_TOOLCHAIN_ARGS = "${HOST_CC_ARCH}${TOOLCHAIN_OPTIONS}"
-MESON_C_ARGS = "${MESON_TOOLCHAIN_ARGS} ${CFLAGS}"
-MESON_CPP_ARGS = "${MESON_TOOLCHAIN_ARGS} ${CXXFLAGS}"
-MESON_LINK_ARGS = "${MESON_TOOLCHAIN_ARGS} ${LDFLAGS}"
+              --sharedstatedir ${sharedstatedir} "
 
 EXTRA_OEMESON_append = " ${PACKAGECONFIG_CONFARGS}"
 
@@ -64,6 +55,8 @@ def meson_cpu_family(var, d):
         return 'mips64'
     elif re.match(r"i[3-6]86", arch):
         return "x86"
+    elif arch == "microblazeel" or arch == "microblazeeb":
+        return "microblaze"
     else:
         return arch
 
@@ -78,7 +71,7 @@ def meson_endian(prefix, d):
         bb.fatal("Cannot determine endianism for %s-%s" % (arch, os))
 
 addtask write_config before do_configure
-do_write_config[vardeps] += "MESON_C_ARGS MESON_CPP_ARGS MESON_LINK_ARGS CC CXX LD AR NM STRIP READELF"
+do_write_config[vardeps] += "CC CXX LD AR NM STRIP READELF CFLAGS CXXFLAGS LDFLAGS"
 do_write_config() {
     # This needs to be Py to split the args into single-element lists
     cat >${WORKDIR}/meson.cross <<EOF
@@ -91,14 +84,14 @@ ld = ${@meson_array('LD', d)}
 strip = ${@meson_array('STRIP', d)}
 readelf = ${@meson_array('READELF', d)}
 pkgconfig = 'pkg-config'
-llvm-config = 'llvm-config8.0.0'
+llvm-config = 'llvm-config${LLVMVERSION}'
 
 [properties]
 needs_exe_wrapper = true
-c_args = ${@meson_array('MESON_C_ARGS', d)}
-c_link_args = ${@meson_array('MESON_LINK_ARGS', d)}
-cpp_args = ${@meson_array('MESON_CPP_ARGS', d)}
-cpp_link_args = ${@meson_array('MESON_LINK_ARGS', d)}
+c_args = ${@meson_array('CFLAGS', d)}
+c_link_args = ${@meson_array('LDFLAGS', d)}
+cpp_args = ${@meson_array('CXXFLAGS', d)}
+cpp_link_args = ${@meson_array('LDFLAGS', d)}
 gtkdoc_exe_wrapper = '${B}/gtkdoc-qemuwrapper'
 
 [host_machine]
@@ -135,6 +128,7 @@ override_native_tools() {
     export CXX="${BUILD_CXX}"
     export LD="${BUILD_LD}"
     export AR="${BUILD_AR}"
+    export STRIP="${BUILD_STRIP}"
     # These contain *target* flags but will be used as *native* flags.  The
     # correct native flags will be passed via -Dc_args and so on, unset them so
     # they don't interfere with tools invoked by Meson (such as g-ir-scanner)

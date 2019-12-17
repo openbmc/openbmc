@@ -37,7 +37,7 @@ DEPENDS_append_class-nativesdk = "nativesdk-openssl"
 export PYTHON="${STAGING_BINDIR_NATIVE}/python-native/python"
 export PYTHONPATH="${PKG_CONFIG_SYSROOT_DIR}${libdir}/python2.7/site-packages"
 
-CFLAGS_append = " -Wno-error=address-of-packed-member"
+CFLAGS_append = " -Wno-error"
 
 PACKAGECONFIG_class-native = ""
 PACKAGECONFIG_class-nativesdk = ""

@@ -28,6 +28,7 @@ PACKAGES = " \
 SUMMARY_${PN}-bmc-state-mgmt = "BMC state management"
 RDEPENDS_${PN}-bmc-state-mgmt = " \
         ${VIRTUAL-RUNTIME_obmc-bmc-state-manager} \
+        phosphor-state-manager-systemd-target-monitor \
         "
 
 SUMMARY_${PN}-chassis-state-mgmt = "Chassis state management"
@@ -45,7 +46,6 @@ RDEPENDS_${PN}-extras = " \
         obmc-ikvm \
         phosphor-dbus-monitor \
         phosphor-systemd-policy \
-        dbus-broker \
         "
 
 SUMMARY_${PN}-extrasdev = "Development features"

@@ -49,7 +49,6 @@ class DirectPlugin(ImagerPlugin):
 
         # parse possible 'rootfs=name' items
         self.rootfs_dir = dict(rdir.split('=') for rdir in rootfs_dir.split(' '))
-        self.replaced_rootfs_paths = {}
         self.bootimg_dir = bootimg_dir
         self.kernel_dir = kernel_dir
         self.native_sysroot = native_sysroot
@@ -59,6 +58,7 @@ class DirectPlugin(ImagerPlugin):
         self.compressor = options.compressor
         self.bmap = options.bmap
         self.no_fstab_update = options.no_fstab_update
+        self.original_fstab = None
 
         self.name = "%s-%s" % (os.path.splitext(os.path.basename(wks_file))[0],
                                strftime("%Y%m%d%H%M"))
@@ -104,24 +104,13 @@ class DirectPlugin(ImagerPlugin):
 
         with open(fstab_path) as fstab:
             fstab_lines = fstab.readlines()
+            self.original_fstab = fstab_lines.copy()
 
         if self._update_fstab(fstab_lines, self.parts):
-            # copy rootfs dir to workdir to update fstab
-            # as rootfs can be used by other tasks and can't be modified
-            new_pseudo = os.path.realpath(os.path.join(self.workdir, "pseudo"))
-            from_dir = os.path.join(os.path.join(image_rootfs, ".."), "pseudo")
-            from_dir = os.path.realpath(from_dir)
-            copyhardlinktree(from_dir, new_pseudo)
-            new_rootfs = os.path.realpath(os.path.join(self.workdir, "rootfs_copy"))
-            copyhardlinktree(image_rootfs, new_rootfs)
-            fstab_path = os.path.join(new_rootfs, 'etc/fstab')
-
-            os.unlink(fstab_path)
-
             with open(fstab_path, "w") as fstab:
                 fstab.writelines(fstab_lines)
-
-            return new_rootfs
+        else:
+            self.original_fstab = None
 
     def _update_fstab(self, fstab_lines, parts):
         """Assume partition order same as in wks"""
@@ -170,14 +159,8 @@ class DirectPlugin(ImagerPlugin):
         filesystems from the artifacts directly and combine them into
         a partitioned image.
         """
-        if self.no_fstab_update:
-            new_rootfs = None
-        else:
-            new_rootfs = self._write_fstab(self.rootfs_dir.get("ROOTFS_DIR"))
-        if new_rootfs:
-            # rootfs was copied to update fstab
-            self.replaced_rootfs_paths[new_rootfs] = self.rootfs_dir['ROOTFS_DIR']
-            self.rootfs_dir['ROOTFS_DIR'] = new_rootfs
+        if not self.no_fstab_update:
+            self._write_fstab(self.rootfs_dir.get("ROOTFS_DIR"))
 
         for part in self.parts:
             # get rootfs size from bitbake variable if it's not set in .ks file
@@ -253,8 +236,6 @@ class DirectPlugin(ImagerPlugin):
             else:
                 suffix = '["%s"]:' % (part.mountpoint or part.label)
             rootdir = part.rootfs_dir
-            if rootdir in self.replaced_rootfs_paths:
-                rootdir = self.replaced_rootfs_paths[rootdir]
             msg += '  ROOTFS_DIR%s%s\n' % (suffix.ljust(20), rootdir)
 
         msg += '  BOOTIMG_DIR:                  %s\n' % self.bootimg_dir
@@ -292,6 +273,12 @@ class DirectPlugin(ImagerPlugin):
             if os.path.isfile(path):
                 shutil.move(path, os.path.join(self.outdir, fname))
 
+        #Restore original fstab
+        if self.original_fstab:
+            fstab_path = self.rootfs_dir.get("ROOTFS_DIR") + "/etc/fstab"
+            with open(fstab_path, "w") as fstab:
+                fstab.writelines(self.original_fstab)
+
         # remove work directory
         shutil.rmtree(self.workdir, ignore_errors=True)
 
@@ -313,6 +300,10 @@ class PartitionedImage():
         self.path = path  # Path to the image file
         self.numpart = 0  # Number of allocated partitions
         self.realpart = 0 # Number of partitions in the partition table
+        self.primary_part_num = 0  # Number of primary partitions (msdos)
+        self.extendedpart = 0      # Create extended partition before this logical partition (msdos)
+        self.extended_size_sec = 0 # Size of exteded partition (msdos)
+        self.logical_part_cnt = 0  # Number of total logical paritions (msdos)
         self.offset = 0   # Offset of next partition (in sectors)
         self.min_size = 0 # Minimum required disk size to fit
                           # all partitions (in bytes)
@@ -325,6 +316,7 @@ class PartitionedImage():
         # Size of a sector used in calculations
         self.sector_size = SECTOR_SIZE
         self.native_sysroot = native_sysroot
+        num_real_partitions = len([p for p in self.partitions if not p.no_table])
 
         # calculate the real partition number, accounting for partitions not
         # in the partition table and logical partitions
@@ -334,7 +326,7 @@ class PartitionedImage():
                 part.realnum = 0
             else:
                 realnum += 1
-                if self.ptable_format == 'msdos' and realnum > 3 and len(partitions) > 4:
+                if self.ptable_format == 'msdos' and realnum > 3 and num_real_partitions > 4:
                     part.realnum = realnum + 1
                     continue
                 part.realnum = realnum
@@ -404,12 +396,16 @@ class PartitionedImage():
                 # Skip one sector required for the partitioning scheme overhead
                 self.offset += overhead
 
-            if self.realpart > 3 and num_real_partitions > 4:
+            if self.ptable_format == "msdos":
+                if self.primary_part_num > 3 or \
+                   (self.extendedpart == 0 and self.primary_part_num >= 3 and num_real_partitions > 4):
+                    part.type = 'logical'
                 # Reserve a sector for EBR for every logical partition
                 # before alignment is performed.
-                if self.ptable_format == "msdos":
+                if part.type == 'logical':
                     self.offset += 1
 
+            align_sectors = 0
             if part.align:
                 # If not first partition and we do have alignment set we need
                 # to align the partition.
@@ -435,18 +431,25 @@ class PartitionedImage():
             part.start = self.offset
             self.offset += part.size_sec
 
-            part.type = 'primary'
             if not part.no_table:
                 part.num = self.realpart
             else:
                 part.num = 0
 
-            if self.ptable_format == "msdos":
-                # only count the partitions that are in partition table
-                if num_real_partitions > 4:
-                    if self.realpart > 3:
-                        part.type = 'logical'
-                        part.num = self.realpart + 1
+            if self.ptable_format == "msdos" and not part.no_table:
+                if part.type == 'logical':
+                    self.logical_part_cnt += 1
+                    part.num = self.logical_part_cnt + 4
+                    if self.extendedpart == 0:
+                        # Create extended partition as a primary partition
+                        self.primary_part_num += 1
+                        self.extendedpart = part.num
+                    else:
+                        self.extended_size_sec += align_sectors
+                    self.extended_size_sec += part.size_sec + 1
+                else:
+                    self.primary_part_num += 1
+                    part.num = self.primary_part_num
 
             logger.debug("Assigned %s to %s%d, sectors range %d-%d size %d "
                          "sectors (%d bytes).", part.mountpoint, part.disk,
@@ -496,7 +499,7 @@ class PartitionedImage():
             if part.num == 0:
                 continue
 
-            if self.ptable_format == "msdos" and part.num == 5:
+            if self.ptable_format == "msdos" and part.num == self.extendedpart:
                 # Create an extended partition (note: extended
                 # partition is described in MBR and contains all
                 # logical partitions). The logical partitions save a
@@ -510,7 +513,7 @@ class PartitionedImage():
                 # room for all logical partitions.
                 self._create_partition(self.path, "extended",
                                        None, part.start - 1,
-                                       self.offset - part.start + 1)
+                                       self.extended_size_sec)
 
             if part.fstype == "swap":
                 parted_fs_type = "linux-swap"

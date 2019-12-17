@@ -5,7 +5,7 @@ HOMEPAGE = "http://www.dest-unreach.org/socat/"
 
 SECTION = "console/network"
 
-DEPENDS = "openssl readline"
+DEPENDS = "openssl"
 
 LICENSE = "GPL-2.0-with-OpenSSL-exception"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
@@ -39,9 +39,10 @@ TERMBITS_SHIFTS_powerpc64 = "sc_cv_sys_crdly_shift=12 \
                              sc_cv_sys_tabdly_shift=10 \
                              sc_cv_sys_csize_shift=8"
 
-PACKAGECONFIG_class-target ??= "tcp-wrappers"
-PACKAGECONFIG ??= ""
+PACKAGECONFIG_class-target ??= "tcp-wrappers readline"
+PACKAGECONFIG ??= "readline"
 PACKAGECONFIG[tcp-wrappers] = "--enable-libwrap,--disable-libwrap,tcp-wrappers"
+PACKAGECONFIG[readline] = "--enable-readline,--disable-readline,readline"
 
 do_install_prepend () {
     mkdir -p ${D}${bindir}

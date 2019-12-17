@@ -212,6 +212,9 @@ def deploy(args, config, basepath, workspace):
             scp_port = "-P %s" % args.port
             ssh_port = "-p %s" % args.port
 
+        if args.key:
+            extraoptions += ' -i %s' % args.key
+
         # In order to delete previously deployed files and have the manifest file on
         # the target, we write out a shell script and then copy it to the target
         # so we can then run it (piping tar output to it).
@@ -326,6 +329,8 @@ def register_commands(subparsers, context):
     parser_deploy.add_argument('--no-check-space', help='Do not check for available space before deploying', action='store_true')
     parser_deploy.add_argument('-e', '--ssh-exec', help='Executable to use in place of ssh')
     parser_deploy.add_argument('-P', '--port', help='Specify port to use for connection to the target')
+    parser_deploy.add_argument('-I', '--key',
+                               help='Specifiy ssh private key for connection to the target')
 
     strip_opts = parser_deploy.add_mutually_exclusive_group(required=False)
     strip_opts.add_argument('-S', '--strip',
@@ -349,4 +354,7 @@ def register_commands(subparsers, context):
     parser_undeploy.add_argument('-n', '--dry-run', help='List files to be undeployed only', action='store_true')
     parser_undeploy.add_argument('-e', '--ssh-exec', help='Executable to use in place of ssh')
     parser_undeploy.add_argument('-P', '--port', help='Specify port to use for connection to the target')
+    parser_undeploy.add_argument('-I', '--key',
+                               help='Specifiy ssh private key for connection to the target')
+
     parser_undeploy.set_defaults(func=undeploy)

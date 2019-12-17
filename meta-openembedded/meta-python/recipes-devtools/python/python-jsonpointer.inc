@@ -1,6 +1,6 @@
 SUMMARY = "Resolve JSON Pointers in Python"
 HOMEPAGE = "https://github.com/stefankoegl/python-json-pointer"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=32b15c843b7a329130f4e266a281ebb3"
 
 inherit pypi

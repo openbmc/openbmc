@@ -8,8 +8,8 @@ SRCNAME = "paho-mqtt"
 
 inherit pypi
 
-SRC_URI[md5sum] = "e3ac29cd5dc247a01083a2a8f3fddd08"
-SRC_URI[sha256sum] = "e440a052b46d222e184be3be38676378722072fcd4dfd2c8f509fb861a7b0b79"
+SRC_URI[md5sum] = "45e80d9b8066a8d0ba1ecfffe271bd3d"
+SRC_URI[sha256sum] = "e3d286198baaea195c8b3bc221941d25a3ab0e1507fc1779bdb7473806394be4"
 
 DEPENDS += "${PYTHON_PN}-pytest-runner-native"
 

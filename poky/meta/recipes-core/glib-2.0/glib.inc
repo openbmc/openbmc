@@ -28,7 +28,7 @@ PACKAGES += "${PN}-codegen ${PN}-utils"
 
 LEAD_SONAME = "libglib-2.0.*"
 
-inherit meson gettext gtk-doc pkgconfig ptest-gnome upstream-version-is-even bash-completion gio-module-cache manpages distro_features_check
+inherit meson gettext gtk-doc pkgconfig ptest-gnome upstream-version-is-even bash-completion gio-module-cache manpages features_check
 
 GTKDOC_MESON_OPTION = "gtk_doc"
 
@@ -158,6 +158,8 @@ RDEPENDS_${PN}-ptest += "\
             ${PN}-locale-pl \
             ${PN}-locale-ru \
             ${PN}-locale-th \
+            python3-core \
+            python3-modules \
            "
 
 RDEPENDS_${PN}-ptest_append_libc-glibc = "\

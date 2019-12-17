@@ -1,0 +1,29 @@
+From 3f2fc79385398f213a9bd3c99616d749d699f2bb Mon Sep 17 00:00:00 2001
+From: Fabio Berton <fabio.berton@ossystems.com.br>
+Date: Thu, 14 Mar 2019 19:26:14 -0300
+Subject: [PATCH] Fix build with musl
+Organization: O.S. Systems Software LTDA.
+
+Signed-off-by: Fabio Berton <fabio.berton@ossystems.com.br>
+---
+ src/ethtool-local.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+--- a/src/ethtool-local.h
++++ b/src/ethtool-local.h
+@@ -20,11 +20,11 @@
+  * along with ifplugd; if not, write to the Free Software Foundation,
+  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+  */
+-
++#include <stdint.h>
+ typedef unsigned long long u64;
+-typedef __uint32_t u32;        
+-typedef __uint16_t u16;        
+-typedef __uint8_t u8;          
++typedef uint32_t u32;
++typedef uint16_t u16;
++typedef uint8_t u8;
+ 
+ #include "ethtool-kernel.h"
+ 

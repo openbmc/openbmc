@@ -2,13 +2,13 @@ SUMMARY = "JSON for modern C++"
 HOMEPAGE = "https://nlohmann.github.io/json/"
 SECTION = "libs"
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://LICENSE.MIT;md5=9a8ae1c2d606c432a2aa2e2de15be22a"
+LIC_FILES_CHKSUM = "file://LICENSE.MIT;md5=f5f7c71504da070bcf4f090205ce1080"
 
 SRC_URI = "git://github.com/nlohmann/json.git"
 
-PV = "3.3.0+git${SRCPV}"
+PV = "3.7.0+git${SRCPV}"
 
-SRCREV = "aafad2be1f3cd259a1e79d2f6fcf267d1ede9ec7"
+SRCREV = "ea60d40f4a60a47d3be9560d8f7bc37c163fe47b"
 
 S = "${WORKDIR}/git"
 

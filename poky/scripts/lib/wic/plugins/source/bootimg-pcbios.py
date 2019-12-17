@@ -150,8 +150,10 @@ class BootimgPcbiosPlugin(SourcePlugin):
         hdddir = "%s/hdd/boot" % cr_workdir
 
         kernel = get_bitbake_var("KERNEL_IMAGETYPE")
-        if not kernel:
-            kernel = "bzImage"
+        if get_bitbake_var("INITRAMFS_IMAGE_BUNDLE") == "1":
+            if get_bitbake_var("INITRAMFS_IMAGE"):
+                kernel = "%s-%s.bin" % \
+                    (get_bitbake_var("KERNEL_IMAGETYPE"), get_bitbake_var("INITRAMFS_LINK_NAME"))
 
         cmds = ("install -m 0644 %s/%s %s/vmlinuz" %
                 (staging_kernel_dir, kernel, hdddir),

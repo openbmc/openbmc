@@ -1,0 +1,40 @@
+From da5338e68f146efadab7c221291ba4c949d8f12f Mon Sep 17 00:00:00 2001
+From: Vaclav Haisman <vhaisman@gmail.com>
+Date: Sun, 21 Jul 2019 23:23:16 -0700
+Subject: [PATCH] Remove log4cplus version entry from ELF .comment section
+
+Reverts
+https://github.com/log4cplus/log4cplus/commit/9cb0d4ade619da4e40628c9b95ff51de3df29f1b
+
+Upstream-Status: Backport [https://github.com/log4cplus/log4cplus/commit/7e6addc70dffd2e30e902efd18eb845c5d5dd7bb]
+
+Suggested-by: Adrian Bunk <bunk@stusta.de>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/version.cxx | 12 ------------
+ 1 file changed, 12 deletions(-)
+
+diff --git a/src/version.cxx b/src/version.cxx
+index ce18212..e002de9 100644
+--- a/src/version.cxx
++++ b/src/version.cxx
+@@ -34,16 +34,4 @@ namespace log4cplus
+ unsigned const version = LOG4CPLUS_VERSION;
+ char const versionStr[] = LOG4CPLUS_VERSION_STR LOG4CPLUS_VERSION_STR_SUFFIX;
+ 
+-namespace
+-{
+-
+-#if defined (__ELF__) && (defined (__GNUC__) || defined (__clang__))
+-char const versionStrComment[]
+-    __attribute__ ((__used__, __section__ ((".comment"))))
+-    = "log4cplus " LOG4CPLUS_VERSION_STR LOG4CPLUS_VERSION_STR_SUFFIX;
+-#endif
+-
+-
+-} // namespace
+-
+ } // namespace log4cplus
+-- 
+2.22.0
+

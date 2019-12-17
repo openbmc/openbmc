@@ -1,0 +1,56 @@
+From a28e15092a298e0c73c6fc1ded0913275cf27cb0 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Fri, 28 Jun 2019 13:50:52 +0000
+Subject: [PATCH] examples/Makefile: respect CXX,LDFLAGS variables, fix build
+ with gold
+
+* move pkg-config call to separate variable, so that the final version
+  of the whole command so it's shown in log.do_compile_ptest_base
+* add ../src/google/protobuf/.libs/timestamp.pb.o when linking
+  add_person_cpp otherwise it fails to link with gold:
+  i686-oe-linux-g++  -m32 -march=core2 -mtune=core2 -msse3 -mfpmath=sse --sysroot=core2-32-oe-linux/protobuf/3.8.0-r0/recipe-sysroot -Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed add_person.cc addressbook.pb.cc -o add_person_cpp `pkg-config --cflags --libs protobuf`
+  /tmp/cccjSJQs.o:addressbook.pb.cc:scc_info_Person_addressbook_2eproto: error: undefined reference to 'scc_info_Timestamp_google_2fprotobuf_2ftimestamp_2eproto'
+  /tmp/cccjSJQs.o:addressbook.pb.cc:descriptor_table_addressbook_2eproto_deps: error: undefined reference to 'descriptor_table_google_2fprotobuf_2ftimestamp_2eproto'
+  collect2: error: ld returned 1 exit status
+  Makefile:43: recipe for target 'add_person_cpp' failed
+
+* and the same with list_people_cpp this time with pkg-config already through the variable:
+  i686-oe-linux-g++  -m32 -march=core2 -mtune=core2 -msse3 -mfpmath=sse --sysroot=core2-32-oe-linux/protobuf/3.8.0-r0/recipe-sysroot -Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed -pthread -Icore2-32-oe-linux/protobuf/3.8.0-r0/git/src -Lcore2-32-oe-linux/protobuf/3.8.0-r0/git/src/.libs -Lcore2-32-oe-linux/protobuf/3.8.0-r0/recipe-sysroot/usr/lib -lprotobuf list_people.cc addressbook.pb.cc -o list_people_cpp
+  /tmp/ccpaI5Su.o:addressbook.pb.cc:scc_info_Person_addressbook_2eproto: error: undefined reference to 'scc_info_Timestamp_google_2fprotobuf_2ftimestamp_2eproto'
+  /tmp/ccpaI5Su.o:addressbook.pb.cc:descriptor_table_addressbook_2eproto_deps: error: undefined reference to 'descriptor_table_google_2fprotobuf_2ftimestamp_2eproto'
+  collect2: error: ld returned 1 exit status
+  Makefile:49: recipe for target 'list_people_cpp' failed
+
+Upstream-Status: Pending
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ examples/Makefile | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/examples/Makefile b/examples/Makefile
+index 4ad605641..31d887639 100644
+--- a/examples/Makefile
++++ b/examples/Makefile
+@@ -2,6 +2,8 @@
+ 
+ .PHONY: all cpp java python clean
+ 
++PROTOBUF := $(shell pkg-config --cflags --libs protobuf)
++
+ all: cpp java python
+ 
+ cpp:    add_person_cpp    list_people_cpp
+@@ -41,11 +43,11 @@ protoc_middleman_dart: addressbook.proto
+ 
+ add_person_cpp: add_person.cc protoc_middleman
+ 	pkg-config --cflags protobuf  # fails if protobuf is not installed
+-	c++ add_person.cc addressbook.pb.cc -o add_person_cpp `pkg-config --cflags --libs protobuf`
++	$(CXX) $(CXXFLAGS) $(LDFLAGS) ../src/google/protobuf/.libs/timestamp.pb.o $(PROTOBUF) add_person.cc addressbook.pb.cc -o add_person_cpp
+ 
+ list_people_cpp: list_people.cc protoc_middleman
+ 	pkg-config --cflags protobuf  # fails if protobuf is not installed
+-	c++ list_people.cc addressbook.pb.cc -o list_people_cpp `pkg-config --cflags --libs protobuf`
++	$(CXX) $(CXXFLAGS) $(LDFLAGS) ../src/google/protobuf/.libs/timestamp.pb.o $(PROTOBUF) list_people.cc addressbook.pb.cc -o list_people_cpp
+ 
+ add_person_dart: add_person.dart protoc_middleman_dart
+ 

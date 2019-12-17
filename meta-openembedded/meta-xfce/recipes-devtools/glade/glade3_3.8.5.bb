@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=aabe87591cb8ae0f3c68be6977bb5522 \
                     file://COPYING.LGPL;md5=252890d9eee26aab7b432e8b8a616475"
 DEPENDS = "gtk+ gnome-doc-utils gnome-common libxml2 intltool-native"
 
-inherit distro_features_check autotools pkgconfig pythonnative gtk-icon-cache
+inherit features_check autotools pkgconfig pythonnative gtk-icon-cache
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

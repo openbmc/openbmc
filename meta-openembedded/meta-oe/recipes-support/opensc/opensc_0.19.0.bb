@@ -16,19 +16,22 @@ SRCREV = "f1691fc91fc113191c3a8aaf5facd6983334ec47"
 SRC_URI = "git://github.com/OpenSC/OpenSC \
            file://0001-Remove-redundant-logging.patch \
           "
-DEPENDS = "openct pcsc-lite virtual/libiconv openssl"
+DEPENDS = "virtual/libiconv openssl"
 
 S = "${WORKDIR}/git"
 inherit autotools pkgconfig bash-completion
 
 EXTRA_OECONF = " \
     --disable-static \
-    --enable-openct \
-    --disable-pcsc \
     --disable-ctapi \
     --disable-doc \
 "
 EXTRA_OEMAKE = "DESTDIR=${D}"
+
+PACKAGECONFIG ??= "pcsc"
+
+PACKAGECONFIG[openct] = "--enable-openct,--disable-openct,openct"
+PACKAGECONFIG[pcsc] = "--enable-pcsc,--disable-pcsc,pcsc-lite"
 
 RDEPENDS_${PN} = "readline"
 
@@ -42,3 +45,5 @@ FILES_${PN}-dev += "\
     ${libdir}/pkcs11/onepin-opensc-pkcs11.so \
     ${libdir}/pkcs11/pkcs11-spy.so \
 "
+
+BBCLASSEXTEND = "native"

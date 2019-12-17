@@ -261,13 +261,17 @@ class BuildStats(dict):
             self[pkg].aggregate(data)
 
 
-def diff_buildstats(bs1, bs2, stat_attr, min_val=None, min_absdiff=None):
+def diff_buildstats(bs1, bs2, stat_attr, min_val=None, min_absdiff=None, only_tasks=[]):
     """Compare the tasks of two buildstats"""
     tasks_diff = []
     pkgs = set(bs1.keys()).union(set(bs2.keys()))
     for pkg in pkgs:
         tasks1 = bs1[pkg].tasks if pkg in bs1 else {}
         tasks2 = bs2[pkg].tasks if pkg in bs2 else {}
+        if only_tasks:
+            tasks1 = {k: v for k, v in tasks1.items() if k in only_tasks}
+            tasks2 = {k: v for k, v in tasks2.items() if k in only_tasks}
+
         if not tasks1:
             pkg_op = '+'
         elif not tasks2:

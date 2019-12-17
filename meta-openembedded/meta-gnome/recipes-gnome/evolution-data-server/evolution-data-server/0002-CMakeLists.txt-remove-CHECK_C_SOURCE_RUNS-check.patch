@@ -1,0 +1,53 @@
+From 20bd8946a5c73290d961df151e82033171639c0d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Tue, 19 Dec 2017 16:55:13 +0100
+Subject: [PATCH 2/7] CMakeLists.txt: remove CHECK_C_SOURCE_RUNS check
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+* TRY_RUN: does not work for OE
+* HAVE_LKSTRFTIME is set by recipe as configure option
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ CMakeLists.txt | 23 -----------------------
+ 1 file changed, 23 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ed99904..9a2e99f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -579,29 +579,6 @@ CHECK_C_SOURCE_COMPILES("#include <langinfo.h>
+ CHECK_C_SOURCE_COMPILES("#include <langinfo.h>
+ 			int main(void) { char *detail = nl_langinfo (_NL_ADDRESS_COUNTRY_AB2); return 0; }" HAVE__NL_ADDRESS_COUNTRY_AB2)
+ 
+-# *******************************************************
+-# Check to see if strftime supports the use of %l and %k
+-# *******************************************************
+-
+-CHECK_C_SOURCE_RUNS("
+-	#include <stdlib.h>
+-	#include <string.h>
+-	#include <time.h>
+-	int main(int argc, char **argv)	{
+-	char buf[10];
+-	time_t rawtime;
+-	struct tm *timeinfo;
+-
+-	time(&rawtime);
+-	timeinfo=localtime(&rawtime);
+-	buf[0] = 0;
+-	strftime(buf, 10, \"%lx%k\", timeinfo);
+-
+-	if (!buf[0] || buf[0] == 'x' || strstr(buf, \"l\") || strstr(buf, \"k\"))
+-		return 1;
+-	return 0;
+-	}" HAVE_LKSTRFTIME)
+-
+ # ******************************
+ # system mail stuff
+ # ******************************
+-- 
+2.21.0
+

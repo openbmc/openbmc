@@ -21,6 +21,7 @@ import testtools
 import threading
 import time
 import io
+import json
 import subunit
 
 from queue import Queue
@@ -28,6 +29,8 @@ from itertools import cycle
 from subunit import ProtocolTestCase, TestProtocolClient
 from subunit.test_results import AutoTimingTestResultDecorator
 from testtools import ThreadsafeForwardingResult, iterate_tests
+from testtools.content import Content
+from testtools.content_type import ContentType
 from oeqa.utils.commands import get_test_layer
 
 import bb.utils
@@ -69,6 +72,63 @@ class BBThreadsafeForwardingResult(ThreadsafeForwardingResult):
         finally:
             self.semaphore.release()
         super(BBThreadsafeForwardingResult, self)._add_result_with_semaphore(method, test, *args, **kwargs)
+
+class ProxyTestResult:
+    # a very basic TestResult proxy, in order to modify add* calls
+    def __init__(self, target):
+        self.result = target
+
+    def _addResult(self, method, test, *args, exception = False, **kwargs):
+        return method(test, *args, **kwargs)
+
+    def addError(self, test, err = None, **kwargs):
+        self._addResult(self.result.addError, test, err, exception = True, **kwargs)
+
+    def addFailure(self, test, err = None, **kwargs):
+        self._addResult(self.result.addFailure, test, err, exception = True, **kwargs)
+
+    def addSuccess(self, test, **kwargs):
+        self._addResult(self.result.addSuccess, test, **kwargs)
+
+    def addExpectedFailure(self, test, err = None, **kwargs):
+        self._addResult(self.result.addExpectedFailure, test, err, exception = True, **kwargs)
+
+    def addUnexpectedSuccess(self, test, **kwargs):
+        self._addResult(self.result.addUnexpectedSuccess, test, **kwargs)
+
+    def __getattr__(self, attr):
+        return getattr(self.result, attr)
+
+class ExtraResultsDecoderTestResult(ProxyTestResult):
+    def _addResult(self, method, test, *args, exception = False, **kwargs):
+        if "details" in kwargs and "extraresults" in kwargs["details"]:
+            if isinstance(kwargs["details"]["extraresults"], Content):
+                kwargs = kwargs.copy()
+                kwargs["details"] = kwargs["details"].copy()
+                extraresults = kwargs["details"]["extraresults"]
+                data = bytearray()
+                for b in extraresults.iter_bytes():
+                    data += b
+                extraresults = json.loads(data.decode())
+                kwargs["details"]["extraresults"] = extraresults
+        return method(test, *args, **kwargs)
+
+class ExtraResultsEncoderTestResult(ProxyTestResult):
+    def _addResult(self, method, test, *args, exception = False, **kwargs):
+        if hasattr(test, "extraresults"):
+            extras = lambda : [json.dumps(test.extraresults).encode()]
+            kwargs = kwargs.copy()
+            if "details" not in kwargs:
+                kwargs["details"] = {}
+            else:
+                kwargs["details"] = kwargs["details"].copy()
+            kwargs["details"]["extraresults"] = Content(ContentType("application", "json", {'charset': 'utf8'}), extras)
+        # if using details, need to encode any exceptions into the details obj,
+        # testtools does not handle "err" and "details" together.
+        if "details" in kwargs and exception and (len(args) >= 1 and args[0] is not None):
+            kwargs["details"]["traceback"] = testtools.content.TracebackContent(args[0], test)
+            args = []
+        return method(test, *args, **kwargs)
 
 #
 # We have to patch subunit since it doesn't understand how to handle addError
@@ -116,7 +176,9 @@ class ConcurrentTestSuite(unittest.TestSuite):
             result.threadprogress = {}
             for i, (test, testnum) in enumerate(tests):
                 result.threadprogress[i] = []
-                process_result = BBThreadsafeForwardingResult(result, semaphore, i, testnum, totaltests)
+                process_result = BBThreadsafeForwardingResult(
+                        ExtraResultsDecoderTestResult(result),
+                        semaphore, i, testnum, totaltests)
                 # Force buffering of stdout/stderr so the console doesn't get corrupted by test output
                 # as per default in parent code
                 process_result.buffer = True
@@ -159,7 +221,7 @@ def removebuilddir(d):
     while delay and os.path.exists(d + "/bitbake.lock"):
         time.sleep(1)
         delay = delay - 1
-    bb.utils.prunedir(d)
+    bb.utils.prunedir(d, ionice=True)
 
 def fork_for_tests(concurrency_num, suite):
     result = []
@@ -231,7 +293,7 @@ def fork_for_tests(concurrency_num, suite):
                 # as per default in parent code
                 subunit_client.buffer = True
                 subunit_result = AutoTimingTestResultDecorator(subunit_client)
-                process_suite.run(subunit_result)
+                process_suite.run(ExtraResultsEncoderTestResult(subunit_result))
                 if ourpid != os.getpid():
                     os._exit(0)
                 if newbuilddir:

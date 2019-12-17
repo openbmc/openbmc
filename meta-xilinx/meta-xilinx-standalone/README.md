@@ -16,6 +16,8 @@ Maintainers:
 
 	Alejandro Enedino Hernandez Samaniego <alejandr@xilinx.com>
 	Manjukumar Harthikote Matha <manjukumar.harthikote-matha@xilinx.com>
+	Sai Hari Chandana Kalluri <chandana.kalluri@xilinx.com>
+	Mark Hatle <mark.hatle@xilinx.com>
 
 Dependencies
 ============

@@ -2,8 +2,8 @@ SUMMARY = "Python TUN/TAP tunnel module"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=13f7629e8e4989b66b4a913ab05a91de"
 
-SRC_URI[md5sum] = "5b35b1cf80a02cca7ec72eb95d6b0192"
-SRC_URI[sha256sum] = "07595dadf85f5176eb08c8d4d9ba5b862a180e96633f670f91437c47a1bead0d"
+SRC_URI[md5sum] = "adcaeea56d0ed06814487cdbde32d198"
+SRC_URI[sha256sum] = "5ead86b3391acef239535ebcabeb04d2cdc6b40ab14580d28c6da193c2d1fe53"
 
 PYPI_PACKAGE = "python-pytun"
 

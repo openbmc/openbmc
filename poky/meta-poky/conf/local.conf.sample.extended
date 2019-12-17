@@ -270,7 +270,7 @@ DISTRO_FEATURES_remove = "x11"
 #
 # By including the security_flags include file you enable flags
 # to the compiler and linker that cause them to generate more secure
-# code, this is enabled by default in the poky-lsb distro.
+# code.
 # This does affect compile speed slightly.
 #
 # Use the following line to enable the security compiler and linker flags to your build

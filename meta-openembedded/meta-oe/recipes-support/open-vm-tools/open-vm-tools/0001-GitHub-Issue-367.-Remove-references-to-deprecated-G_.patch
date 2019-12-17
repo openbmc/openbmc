@@ -1,0 +1,94 @@
+From 6fb28085e867d7c3ef46577d9ff193a185693bcb Mon Sep 17 00:00:00 2001
+From: Oliver Kurth <okurth@vmware.com>
+Date: Mon, 30 Sep 2019 16:24:27 -0700
+Subject: [PATCH] GitHub Issue #367. Remove references to deprecated G_INLINE_FUNC.
+
+G_INLINE_FUNC was a work-around for compilers that didn't support
+static inline.  Change uses of it to static inline.
+
+Upstream-Status: Backport
+[https://github.com/vmware/open-vm-tools/commit/89c0d444567eb525e8d083fb564c46d68e96660c]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ open-vm-tools/lib/include/vmware/tools/plugin.h     | 2 +-
+ open-vm-tools/lib/include/vmware/tools/threadPool.h | 8 ++++----
+ open-vm-tools/lib/include/vmware/tools/utils.h      | 9 ---------
+ 3 files changed, 5 insertions(+), 14 deletions(-)
+
+diff --git a/open-vm-tools/lib/include/vmware/tools/plugin.h b/open-vm-tools/lib/include/vmware/tools/plugin.h
+index f9acc6a2..deefd1f3 100644
+--- a/open-vm-tools/lib/include/vmware/tools/plugin.h
++++ b/open-vm-tools/lib/include/vmware/tools/plugin.h
+@@ -290,7 +290,7 @@ typedef struct ToolsAppCtx {
+  *
+  * @return TRUE if COM is initialized when the function returns.
+  */
+-G_INLINE_FUNC gboolean
++static inline gboolean
+ ToolsCore_InitializeCOM(ToolsAppCtx *ctx)
+ {
+    if (!ctx->comInitialized) {
+diff --git a/open-vm-tools/lib/include/vmware/tools/threadPool.h b/open-vm-tools/lib/include/vmware/tools/threadPool.h
+index 3f2082b3..5880fbcf 100644
+--- a/open-vm-tools/lib/include/vmware/tools/threadPool.h
++++ b/open-vm-tools/lib/include/vmware/tools/threadPool.h
+@@ -91,7 +91,7 @@ typedef struct ToolsCorePool {
+  *******************************************************************************
+  */
+ 
+-G_INLINE_FUNC ToolsCorePool *
++static inline ToolsCorePool *
+ ToolsCorePool_GetPool(ToolsAppCtx *ctx)
+ {
+    ToolsCorePool *pool = NULL;
+@@ -123,7 +123,7 @@ ToolsCorePool_GetPool(ToolsAppCtx *ctx)
+  *******************************************************************************
+  */
+ 
+-G_INLINE_FUNC guint
++static inline guint
+ ToolsCorePool_SubmitTask(ToolsAppCtx *ctx,
+                          ToolsCorePoolCb cb,
+                          gpointer data,
+@@ -153,7 +153,7 @@ ToolsCorePool_SubmitTask(ToolsAppCtx *ctx,
+  *******************************************************************************
+  */
+ 
+-G_INLINE_FUNC void
++static inline void
+ ToolsCorePool_CancelTask(ToolsAppCtx *ctx,
+                          guint taskId)
+ {
+@@ -197,7 +197,7 @@ ToolsCorePool_CancelTask(ToolsAppCtx *ctx,
+  *******************************************************************************
+  */
+ 
+-G_INLINE_FUNC gboolean
++static inline gboolean
+ ToolsCorePool_StartThread(ToolsAppCtx *ctx,
+                           const gchar *threadName,
+                           ToolsCorePoolCb cb,
+diff --git a/open-vm-tools/lib/include/vmware/tools/utils.h b/open-vm-tools/lib/include/vmware/tools/utils.h
+index f6574590..a3292d5c 100644
+--- a/open-vm-tools/lib/include/vmware/tools/utils.h
++++ b/open-vm-tools/lib/include/vmware/tools/utils.h
+@@ -51,15 +51,6 @@
+ #  include <sys/time.h>
+ #endif
+ 
+-
+-/* Work around a glib limitation: it doesn't set G_INLINE_FUNC on Win32. */
+-#if defined(G_PLATFORM_WIN32)
+-#  if defined(G_INLINE_FUNC)
+-#     undef G_INLINE_FUNC
+-#  endif
+-#  define G_INLINE_FUNC static __inline
+-#endif
+-
+ #ifndef ABS
+ #  define ABS(x) (((x) >= 0) ? (x) : -(x))
+ #endif
+-- 
+2.23.0
+

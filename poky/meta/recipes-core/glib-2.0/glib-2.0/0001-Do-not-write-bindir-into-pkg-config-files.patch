@@ -1,4 +1,4 @@
-From 474e59abec88de0c455836c1f53152bf2aa26c34 Mon Sep 17 00:00:00 2001
+From 60b36289ac314ad972cf81c1acd19f6f2e58ff25 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 15 Feb 2019 11:17:27 +0100
 Subject: [PATCH] Do not write $bindir into pkg-config files
@@ -9,33 +9,44 @@ rather than use target paths).
 
 Upstream-Status: Inappropriate [upstream wants the paths in .pc files]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
- gio/meson.build  | 6 +++---
- glib/meson.build | 6 +++---
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ gio/meson.build  | 16 ++++++++--------
+ glib/meson.build |  6 +++---
+ 2 files changed, 11 insertions(+), 11 deletions(-)
 
 diff --git a/gio/meson.build b/gio/meson.build
-index 85d8b14..657720a 100644
+index 71e88c4..8ce3987 100644
 --- a/gio/meson.build
 +++ b/gio/meson.build
-@@ -813,9 +813,9 @@ pkg.generate(libraries : libgio,
+@@ -831,14 +831,14 @@ pkg.generate(libgio,
                 'schemasdir=' + join_paths('${datadir}', schemas_subdir),
                 'bindir=' + join_paths('${prefix}', get_option('bindir')),
                 'giomoduledir=' + giomodulesdir,
+-               'gio=' + join_paths('${bindir}', 'gio'),
+-               'gio_querymodules=' + join_paths('${bindir}', 'gio-querymodules'),
 -               'glib_compile_schemas=' + join_paths('${bindir}', 'glib-compile-schemas'),
 -               'glib_compile_resources=' + join_paths('${bindir}', 'glib-compile-resources'),
--               'gdbus_codegen=' + join_paths('${bindir}', 'gdbus-codegen')],
+-               'gdbus=' + join_paths('${bindir}', 'gdbus'),
+-               'gdbus_codegen=' + join_paths('${bindir}', 'gdbus-codegen'),
+-               'gresource=' + join_paths('${bindir}', 'gresource'),
+-               'gsettings=' + join_paths('${bindir}', 'gsettings')],
++               'gio=gio',
++               'gio_querymodules=gio-querymodules',
 +               'glib_compile_schemas=glib-compile-schemas',
 +               'glib_compile_resources=glib-compile-resources',
-+               'gdbus_codegen=gdbus-codegen'],
++               'gdbus=gdbus',
++               'gdbus_codegen=gdbus-codegen',
++               'gresource=gresource',
++               'gsettings=gsettings'],
    version : glib_version,
    install_dir : glib_pkgconfigreldir,
    filebase : 'gio-2.0',
 diff --git a/glib/meson.build b/glib/meson.build
-index c05c694..434e8b1 100644
+index 91a48f1..978fb73 100644
 --- a/glib/meson.build
 +++ b/glib/meson.build
-@@ -261,9 +261,9 @@ pkg.generate(libraries : [libglib, libintl],
+@@ -375,9 +375,9 @@ pkg.generate(libglib,
    subdirs : ['glib-2.0'],
    extra_cflags : ['-I${libdir}/glib-2.0/include'] + win32_cflags,
    variables : ['bindir=' + join_paths('${prefix}', get_option('bindir')),

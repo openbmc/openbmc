@@ -24,7 +24,10 @@ for x in $CMDLINE; do
 done
 
 export TMPDIR=/mnt/.psplash
-mount tmpfs -t tmpfs $TMPDIR -o,size=40k
+[ -d $TMPDIR ] || mkdir -p $TMPDIR
+if ! mountpoint -q $TMPDIR; then
+	mount tmpfs -t tmpfs $TMPDIR -o,size=40k
+fi
 
 rotation=0
 if [ -e /etc/rotation ]; then

@@ -262,6 +262,24 @@ def testimage_main(d):
     # It would be better to find these modules using instrospection.
     target_kwargs['target_modules_path'] = d.getVar('BBPATH')
 
+    # hardware controlled targets might need further access
+    target_kwargs['powercontrol_cmd'] = d.getVar("TEST_POWERCONTROL_CMD") or None
+    target_kwargs['powercontrol_extra_args'] = d.getVar("TEST_POWERCONTROL_EXTRA_ARGS") or ""
+    target_kwargs['serialcontrol_cmd'] = d.getVar("TEST_SERIALCONTROL_CMD") or None
+    target_kwargs['serialcontrol_extra_args'] = d.getVar("TEST_SERIALCONTROL_EXTRA_ARGS") or ""
+
+    def export_ssh_agent(d):
+        import os
+
+        variables = ['SSH_AGENT_PID', 'SSH_AUTH_SOCK']
+        for v in variables:
+            if v not in os.environ.keys():
+                val = d.getVar(v)
+                if val is not None:
+                    os.environ[v] = val
+
+    export_ssh_agent(d)
+
     # runtime use network for download projects for build
     export_proxies(d)
 

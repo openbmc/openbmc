@@ -1,0 +1,41 @@
+From e97bb73851f5bbd94260da553a222526485cdfb1 Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Fri, 15 Nov 2019 18:24:42 +0000
+Subject: [PATCH] config.mk: Fix compiler and linker
+
+Do not set explicitly compiler and linker.
+
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+ config.mk | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/config.mk b/config.mk
+index df6e812..5deb991 100644
+--- a/config.mk
++++ b/config.mk
+@@ -15,17 +15,17 @@ GTKINC = `pkg-config --cflags gtk+-3.0 webkit2gtk-4.0`
+ GTKLIB = `pkg-config --libs gtk+-3.0 webkit2gtk-4.0`
+ 
+ # includes and libs
+-INCS = -I. -I/usr/include -I${X11INC} ${GTKINC}
+-LIBS = -L/usr/lib -lc -L${X11LIB} -lX11 ${GTKLIB} -lgthread-2.0
++INCS = ${GTKINC}
++LIBS = -lc -lX11 ${GTKLIB} -lgthread-2.0
+ 
+ # flags
+ CPPFLAGS = -DVERSION=\"${VERSION}\" -DWEBEXTDIR=\"${LIBPREFIX}\" -D_DEFAULT_SOURCE
+ CFLAGS = -std=c99 -pedantic -Wall -Os ${INCS} ${CPPFLAGS}
+-LDFLAGS = -s ${LIBS}
++LDFLAGS = ${LIBS}
+ 
+ # Solaris
+ #CFLAGS = -fast ${INCS} -DVERSION=\"${VERSION}\"
+ #LDFLAGS = ${LIBS}
+ 
+ # compiler and linker
+-CC = cc
++CC ?= cc
+-- 
+2.7.4
+

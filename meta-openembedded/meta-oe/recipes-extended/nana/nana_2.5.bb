@@ -4,7 +4,7 @@ checking (as in assert.h) and logging (printf style debugging) in \
 GNU C and C++."
 SECTION = "Development/Languages/C and C++"
 
-SRC_URI = "http://download.savannah.gnu.org/releases/${PN}/${BP}.tar.gz \
+SRC_URI = "http://download.savannah.gnu.org/releases/${BPN}/${BP}.tar.gz \
     file://change-mandir-to-DESTDIR.patch \
     file://modify-acinclude.m4-and-configure.in.patch \
 "

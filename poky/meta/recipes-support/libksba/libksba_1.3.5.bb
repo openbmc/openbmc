@@ -1,6 +1,8 @@
 SUMMARY = "Easy API to create and parse X.509 and CMS related objects"
 HOMEPAGE = "http://www.gnupg.org/related_software/libksba/"
-LICENSE = "GPLv2+ | LGPLv3+ | GPLv3+"
+LICENSE = "GPLv3+ & (GPLv2+ | LGPLv3+)"
+LICENSE_${PN} = "GPLv2+ | LGPLv3+"
+LICENSE_${PN}-doc = "GPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=fd541d83f75d038c4e0617b672ed8bda \
                     file://COPYING.GPLv2;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://COPYING.GPLv3;md5=2f31b266d3440dd7ee50f92cf67d8e6c \
@@ -25,4 +27,4 @@ do_configure_prepend () {
 	rm -f ${S}/m4/gpg-error.m4
 }
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

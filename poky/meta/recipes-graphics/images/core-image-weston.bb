@@ -4,7 +4,7 @@ IMAGE_FEATURES += "splash package-management ssh-server-dropbear hwcodecs"
 
 LICENSE = "MIT"
 
-inherit core-image distro_features_check
+inherit core-image features_check
 
 REQUIRED_DISTRO_FEATURES = "wayland"
 

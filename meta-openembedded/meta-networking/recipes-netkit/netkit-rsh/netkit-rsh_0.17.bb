@@ -103,6 +103,3 @@ RPROVIDES_${PN}-server = "rshd"
 
 RDEPENDS_${PN}-server = "xinetd"
 RDEPENDS_${PN}-server += "tcp-wrappers"
-
-# http://errors.yoctoproject.org/Errors/Details/186963/
-EXCLUDE_FROM_WORLD_libc-musl = "1"

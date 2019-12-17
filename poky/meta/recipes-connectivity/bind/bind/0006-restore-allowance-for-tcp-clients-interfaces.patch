@@ -1,0 +1,80 @@
+Backport patch to fix CVE-2018-5743.
+
+Ref:
+https://security-tracker.debian.org/tracker/CVE-2018-5743
+
+CVE: CVE-2018-5743
+Upstream-Status: Backport [https://gitlab.isc.org/isc-projects/bind9/commit/59434b9]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+From 59434b987e8eb436b08c24e559ee094c4e939daa Mon Sep 17 00:00:00 2001
+From: Evan Hunt <each@isc.org>
+Date: Fri, 5 Apr 2019 16:26:19 -0700
+Subject: [PATCH 6/6] restore allowance for tcp-clients < interfaces
+
+in the "refactor tcpquota and pipeline refs" commit, the counting
+of active interfaces was tightened in such a way that named could
+fail to listen on an interface if there were more interfaces than
+tcp-clients. when checking the quota to start accepting on an
+interface, if the number of active clients was above zero, then
+it was presumed that some other client was able to handle accepting
+new connections. this, however, ignored the fact that the current client
+could be included in that count, so if the quota was already exceeded
+before all the interfaces were listening, some interfaces would never
+listen.
+
+we now check whether the current client has been marked active; if so,
+then the number of active clients on the interface must be greater
+than 1, not 0.
+
+(cherry picked from commit 0b4e2cd4c3192ba88569dd344f542a8cc43742b5)
+(cherry picked from commit d01023aaac35543daffbdf48464e320150235d41)
+---
+ bin/named/client.c      | 8 +++++---
+ doc/arm/Bv9ARM-book.xml | 3 ++-
+ 2 files changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/bin/named/client.c b/bin/named/client.c
+index d826ab32bf..845326abc0 100644
+--- a/bin/named/client.c
++++ b/bin/named/client.c
+@@ -3464,8 +3464,9 @@ client_accept(ns_client_t *client) {
+ 		 *
+ 		 * So, we check here to see if any other clients are
+ 		 * already servicing TCP queries on this interface (whether
+-		 * accepting, reading, or processing). If we find at least
+-		 * one, then it's okay *not* to call accept - we can let this
++		 * accepting, reading, or processing). If we find that at
++		 * least one client other than this one is active, then
++		 * it's okay *not* to call accept - we can let this
+ 		 * client go inactive and another will take over when it's
+ 		 * done.
+ 		 *
+@@ -3479,7 +3480,8 @@ client_accept(ns_client_t *client) {
+ 		 * quota is tcp-clients plus the number of listening
+ 		 * interfaces plus 1.)
+ 		 */
+-		exit = (isc_atomic_xadd(&client->interface->ntcpactive, 0) > 0);
++		exit = (isc_atomic_xadd(&client->interface->ntcpactive, 0) >
++			(client->tcpactive ? 1 : 0));
+ 		if (exit) {
+ 			client->newstate = NS_CLIENTSTATE_INACTIVE;
+ 			(void)exit_check(client);
+diff --git a/doc/arm/Bv9ARM-book.xml b/doc/arm/Bv9ARM-book.xml
+index 381768d540..9c76d3cd6f 100644
+--- a/doc/arm/Bv9ARM-book.xml
++++ b/doc/arm/Bv9ARM-book.xml
+@@ -8493,7 +8493,8 @@ avoid-v6-udp-ports { 40000; range 50000 60000; };
+ 		<para>
+ 		  The number of file descriptors reserved for TCP, stdio,
+ 		  etc.  This needs to be big enough to cover the number of
+-		  interfaces <command>named</command> listens on, <command>tcp-clients</command> as well as
++		  interfaces <command>named</command> listens on plus
++		  <command>tcp-clients</command>, as well as
+ 		  to provide room for outgoing TCP queries and incoming zone
+ 		  transfers.  The default is <literal>512</literal>.
+ 		  The minimum value is <literal>128</literal> and the
+-- 
+2.20.1
+

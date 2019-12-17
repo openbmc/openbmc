@@ -3,7 +3,7 @@ LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=243b725d71bb5df4a1e5920b344b86ad"
 DEPENDS = "libxfce4util garcon xfconf libxfce4ui xfce4-panel exo vala xfce4-dev-tools-native"
 
-inherit xfce pkgconfig distro_features_check
+inherit xfce pkgconfig features_check
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

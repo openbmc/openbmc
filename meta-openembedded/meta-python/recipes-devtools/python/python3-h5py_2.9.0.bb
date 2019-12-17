@@ -1,7 +1,7 @@
 SUMMARY = "Provides both a high- and low-level interface to the HDF5 library from Python. "
 HOMEPAGE = "https://www.h5py.org/"
 SECTION = "devel/python"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://setup.py;beginline=107;endline=107;md5=795ecad0d261c998cc526c84a822dff6"
 
 SRC_URI = "git://github.com/h5py/h5py.git \

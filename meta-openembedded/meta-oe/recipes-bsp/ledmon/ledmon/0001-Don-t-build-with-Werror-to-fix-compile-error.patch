@@ -1,0 +1,30 @@
+Subject: [PATCH] Don't build with -Werror to fix compile error.
+
+|   550 |  _dump_sgpio_amd(&amd_reg->amd);
+|       |                  ^~~~~~~~~~~~~
+| amd_sgpio.c: In function '_write_amd_register':
+| amd_sgpio.c:558:18: error: taking address of packed member of 'struct amd_register' may result in an unaligned pointer value [-Werror=address-of-packed-member]
+
+Upstream-Status: Submitted
+https://github.com/intel/ledmon/pull/48/commits
+
+Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
+---
+ configure.ac | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 7bc20f8..7e01bd5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -22,7 +22,6 @@ AX_AM_CFLAGS_ADD([-Werror=format-truncation=1])
+ AX_AM_CFLAGS_ADD([-Werror=shift-negative-value])
+ AX_AM_CFLAGS_ADD([-Werror=alloca])
+ AX_AM_CFLAGS_ADD([-Werror=missing-field-initializers])
+-AX_AM_CFLAGS_ADD([-Werror])
+ AX_AM_CFLAGS_ADD([-Werror=format-signedness])
+ 
+ AC_SUBST([AM_CFLAGS])
+-- 
+2.7.4
+

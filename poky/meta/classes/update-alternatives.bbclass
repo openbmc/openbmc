@@ -284,8 +284,11 @@ python populate_packages_updatealternatives () {
 
             bb.note('adding update-alternatives calls to postinst/prerm for %s' % pkg)
             bb.note('%s' % alt_setup_links)
-            postinst = d.getVar('pkg_postinst_%s' % pkg) or '#!/bin/sh\n'
-            postinst += alt_setup_links
+            postinst = d.getVar('pkg_postinst_%s' % pkg)
+            if postinst:
+                postinst = alt_setup_links + postinst
+            else:
+                postinst = '#!/bin/sh\n' + alt_setup_links
             d.setVar('pkg_postinst_%s' % pkg, postinst)
 
             bb.note('%s' % alt_remove_links)

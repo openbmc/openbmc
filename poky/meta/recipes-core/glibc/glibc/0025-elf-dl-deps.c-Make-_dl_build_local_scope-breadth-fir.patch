@@ -1,7 +1,7 @@
-From 804b05a034bfaf4e3427243e6baf736086822cd0 Mon Sep 17 00:00:00 2001
+From 7c9ebe966bb97dd14de5719905b61311211ae3c8 Mon Sep 17 00:00:00 2001
 From: Mark Hatle <mark.hatle@windriver.com>
 Date: Thu, 18 Aug 2016 14:07:58 -0500
-Subject: [PATCH 25/30] elf/dl-deps.c: Make _dl_build_local_scope breadth first
+Subject: [PATCH 25/28] elf/dl-deps.c: Make _dl_build_local_scope breadth first
 
 According to the ELF specification:
 
@@ -52,5 +52,5 @@ index e12c353158..9234daac05 100644
  }
  
 -- 
-2.20.1
+2.22.0
 

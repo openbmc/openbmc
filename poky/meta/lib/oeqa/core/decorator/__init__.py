@@ -6,6 +6,7 @@
 
 from functools import wraps
 from abc import abstractmethod, ABCMeta
+from oeqa.core.utils.misc import strToList
 
 decoratorClasses = set()
 
@@ -63,12 +64,16 @@ class OETestDiscover(OETestDecorator):
     def discover(registry):
         return registry['cases']
 
-class OETestFilter(OETestDecorator):
+def OETestTag(*tags):
+    expandedtags = []
+    for tag in tags:
+        expandedtags += strToList(tag)
+    def decorator(item):
+        if hasattr(item, "__oeqa_testtags"):
+            # do not append, create a new list (to handle classes with inheritance)
+            item.__oeqa_testtags = list(item.__oeqa_testtags) + expandedtags
+        else:
+            item.__oeqa_testtags = expandedtags
+        return item
+    return decorator
 
-    # OETestLoader call it while loading the tests
-    # in loadTestsFromTestCase method, it needs to
-    # return a bool, True if needs to be filtered.
-    # This method must consume the filter used.
-    @abstractmethod
-    def filtrate(self, filters):
-        return False

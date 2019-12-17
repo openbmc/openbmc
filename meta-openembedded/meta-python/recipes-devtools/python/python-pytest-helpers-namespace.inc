@@ -2,9 +2,9 @@ DESCRIPTION = "This plugin does not provide any helpers to pytest, it does, howe
 HOMEPAGE = "https://github.com/saltstack/pytest-helpers-namespace"
 SECTION = "devel/python"
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://PKG-INFO;md5=71fac4dfeee99c39c51f617e9486237c"
+LIC_FILES_CHKSUM = "file://PKG-INFO;md5=cc99508c43d9d14fd51c7fac622ffd23"
 
-SRC_URI[md5sum] = "80fe3e515f640b1459709b539f6b857e"
-SRC_URI[sha256sum] = "d8bdb017c0f7271699c08850b6b12e1ce9e52913cbd4461b5febd21082a29113"
+SRC_URI[md5sum] = "04ec1d8750f9b154e782a47cf8b30736"
+SRC_URI[sha256sum] = "4eff23a19f92410c0166f6dffbfa8901d3e14a80e97d70cd08428b6d597771ce"
 
 inherit pypi

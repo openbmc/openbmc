@@ -17,18 +17,18 @@ multilibscript_rename() {
 python () {
     # Do nothing if multilib isn't being used
     if not d.getVar("MULTILIB_VARIANTS"):
-       return
+        return
     # Do nothing for native/cross
     if bb.data.inherits_class('native', d) or bb.data.inherits_class('cross', d):
-       return
+        return
 
     for entry in (d.getVar("MULTILIB_SCRIPTS", False) or "").split():
-       pkg, script = entry.split(":")
-       epkg = d.expand(pkg)
-       scriptname = os.path.basename(script)
-       d.appendVar("ALTERNATIVE_" + epkg, " " + scriptname + " ")
-       d.setVarFlag("ALTERNATIVE_LINK_NAME", scriptname, script)
-       d.setVarFlag("ALTERNATIVE_TARGET", scriptname, script + "-${MULTILIB_SUFFIX}")
-       d.appendVar("multilibscript_rename",  "\n	mv ${PKGD}" + script + " ${PKGD}" + script + "-${MULTILIB_SUFFIX}")
-       d.appendVar("FILES_" + epkg, " " + script + "-${MULTILIB_SUFFIX}")
+        pkg, script = entry.split(":")
+        epkg = d.expand(pkg)
+        scriptname = os.path.basename(script)
+        d.appendVar("ALTERNATIVE_" + epkg, " " + scriptname + " ")
+        d.setVarFlag("ALTERNATIVE_LINK_NAME", scriptname, script)
+        d.setVarFlag("ALTERNATIVE_TARGET", scriptname, script + "-${MULTILIB_SUFFIX}")
+        d.appendVar("multilibscript_rename",  "\n	mv ${PKGD}" + script + " ${PKGD}" + script + "-${MULTILIB_SUFFIX}")
+        d.appendVar("FILES_" + epkg, " " + script + "-${MULTILIB_SUFFIX}")
 }

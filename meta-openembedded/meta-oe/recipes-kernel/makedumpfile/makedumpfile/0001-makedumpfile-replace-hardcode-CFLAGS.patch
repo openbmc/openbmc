@@ -1,4 +1,4 @@
-From 8eeb1b15608ce1a9a1f0d5417938fd6da4504406 Mon Sep 17 00:00:00 2001
+From af97e2ad643334b4c7c3d66f971ce9ebb2b596af Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Thu, 21 Jul 2016 18:06:21 +0800
 Subject: [PATCH] makedumpfile: replace hardcode CFLAGS
@@ -13,30 +13,28 @@ Subject: [PATCH] makedumpfile: replace hardcode CFLAGS
 Upstream-Status: Inappropriate[oe specific]
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
-
 ---
- Makefile | 46 +++++++++++++++++++++++-----------------------
- 1 file changed, 23 insertions(+), 23 deletions(-)
+ Makefile | 45 +++++++++++++++++++++++----------------------
+ 1 file changed, 23 insertions(+), 22 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 612b9d0..f6d6265 100644
+index 1fdb628..5dce589 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -8,13 +8,6 @@ ifeq ($(strip $CC),)
+@@ -8,12 +8,6 @@ ifeq ($(strip $CC),)
  CC	= gcc
  endif
  
--CFLAGS = -g -O2 -Wall -D_FILE_OFFSET_BITS=64 \
--	  -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE \
--	  -DVERSION='"$(VERSION)"' -DRELEASE_DATE='"$(DATE)"'
--CFLAGS_ARCH	= -g -O2 -Wall -D_FILE_OFFSET_BITS=64 \
--		    -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
+-CFLAGS_BASE := $(CFLAGS) -g -O2 -Wall -D_FILE_OFFSET_BITS=64 \
+-		-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
+-CFLAGS      := $(CFLAGS_BASE) -DVERSION='"$(VERSION)"' -DRELEASE_DATE='"$(DATE)"'
+-CFLAGS_ARCH := $(CFLAGS_BASE)
 -# LDFLAGS = -L/usr/local/lib -I/usr/local/include
 -
  HOST_ARCH := $(shell uname -m)
  # Use TARGET as the target architecture if specified.
  # Defaults to uname -m
-@@ -22,29 +15,36 @@ ifeq ($(strip($TARGET)),)
+@@ -21,29 +15,36 @@ ifeq ($(strip($TARGET)),)
  TARGET := $(HOST_ARCH)
  endif
  
@@ -72,18 +70,18 @@ index 612b9d0..f6d6265 100644
  endif
  
 +CFLAGS_ARCH += $(CFLAGS) \
-+		-D_FILE_OFFSET_BITS=64 \
-+		-D_LARGEFILE_SOURCE \
-+		-D_LARGEFILE64_SOURCE
++              -D_FILE_OFFSET_BITS=64 \
++              -D_LARGEFILE_SOURCE \
++              -D_LARGEFILE64_SOURCE
 +
 +CFLAGS_COMMON = $(CFLAGS_ARCH) \
-+		-DVERSION='"$(VERSION)"' \
-+		-DRELEASE_DATE='"$(DATE)"'
++              -DVERSION='"$(VERSION)"' \
++              -DRELEASE_DATE='"$(DATE)"'
 +
  SRC_BASE = makedumpfile.c makedumpfile.h diskdump_mod.h sadump_mod.h sadump_info.h
  SRC_PART = print_info.c dwarf_info.c elf_info.c erase_info.c sadump_info.c cache.c tools.c
  OBJ_PART=$(patsubst %.c,%.o,$(SRC_PART))
-@@ -53,17 +53,17 @@ OBJ_ARCH=$(patsubst %.c,%.o,$(SRC_ARCH))
+@@ -52,17 +53,17 @@ OBJ_ARCH=$(patsubst %.c,%.o,$(SRC_ARCH))
  
  LIBS = -ldw -lbz2 -lebl -ldl -lelf -lz
  ifneq ($(LINKTYPE), dynamic)
@@ -104,7 +102,7 @@ index 612b9d0..f6d6265 100644
  endif
  
  LIBS := -lpthread $(LIBS)
-@@ -71,14 +71,14 @@ LIBS := -lpthread $(LIBS)
+@@ -82,14 +83,14 @@ LIBS := $(LIBS) $(call try-run,\
  all: makedumpfile
  
  $(OBJ_PART): $(SRC_PART)
@@ -121,7 +119,7 @@ index 612b9d0..f6d6265 100644
  	echo .TH MAKEDUMPFILE 8 \"$(DATE)\" \"makedumpfile v$(VERSION)\" \"Linux System Administrator\'s Manual\" > temp.8
  	grep -v "^.TH MAKEDUMPFILE 8" $(VPATH)makedumpfile.8 >> temp.8
  	mv temp.8 makedumpfile.8
-@@ -89,7 +89,7 @@ makedumpfile: $(SRC_BASE) $(OBJ_PART) $(OBJ_ARCH)
+@@ -100,7 +101,7 @@ makedumpfile: $(SRC_BASE) $(OBJ_PART) $(OBJ_ARCH)
  	gzip -c ./makedumpfile.conf.5 > ./makedumpfile.conf.5.gz
  
  eppic_makedumpfile.so: extension_eppic.c
@@ -130,3 +128,6 @@ index 612b9d0..f6d6265 100644
  
  clean:
  	rm -f $(OBJ) $(OBJ_PART) $(OBJ_ARCH) makedumpfile makedumpfile.8.gz makedumpfile.conf.5.gz
+-- 
+2.21.0
+

@@ -10,9 +10,9 @@ inherit autotools pkgconfig update-alternatives
 DEPENDS = "zlib e2fsprogs util-linux"
 RDEPENDS_mtd-utils-tests += "bash"
 
-PV = "2.1.0+${SRCPV}"
+PV = "2.1.1"
 
-SRCREV = "b5027be5f470830ac9543db3c52e076b13abd313"
+SRCREV = "4443221ce9b88440cd9f5bb78e6fe95621d36c8a"
 SRC_URI = "git://git.infradead.org/mtd-utils.git \
            file://add-exclusion-to-mkfs-jffs2-git-2.patch \
 "
@@ -30,6 +30,7 @@ PACKAGECONFIG[xattr] = "--with-xattr,--without-xattr,acl"
 PACKAGECONFIG[crypto] = "--with-crypto,--without-crypto,openssl"
 PACKAGECONFIG[jffs] = "--with-jffs,--without-jffs"
 PACKAGECONFIG[ubifs] = "--with-ubifs,--without-ubifs"
+PACKAGECONFIG[zstd] = "--with-zstd,--without-zstd,zstd"
 
 CPPFLAGS_append_riscv64  = " -pthread -D_REENTRANT"
 

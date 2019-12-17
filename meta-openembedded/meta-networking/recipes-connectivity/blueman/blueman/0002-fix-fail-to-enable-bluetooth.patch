@@ -1,0 +1,81 @@
+Fix fail to enable bluetooth issue
+
+When launch blueman-manager while bluetooth is disable, it may fails
+with error:
+
+  Failed to enable bluetooth
+
+Because when get bluetooth status right after change its status, the
+status may not be updated that plugin applet/KillSwitch.py sets the
+bluetooth status via method of another dbus service which doesn't return
+immediately.
+
+Provides a new dbus method for PowerManager which checks whether dbus
+method SetBluetoothStatus() has finished. Then it makes sure to get
+right bluetooth status.
+
+Upstream-Status: Inappropriate
+Send to upstream but not accepted:
+https://github.com/blueman-project/blueman/pull/1121
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ blueman/Functions.py                   | 12 +++++++++++-
+ blueman/plugins/applet/PowerManager.py |  4 ++++
+ 2 files changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/blueman/Functions.py b/blueman/Functions.py
+index 3b76271..c5eeb27 100644
+--- a/blueman/Functions.py
++++ b/blueman/Functions.py
+@@ -17,7 +17,7 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
+-from time import sleep
++from time import sleep, time
+ import re
+ import os
+ import signal
+@@ -86,6 +86,16 @@ def check_bluetooth_status(message, exitfunc):
+             return
+ 
+     applet.SetBluetoothStatus('(b)', True)
++
++    timeout = time() + 10
++    while applet.GetRequestStatus():
++        sleep(0.1)
++        if time() > timeout:
++            # timeout 5s has been set in applet/PowerManager.py
++            # so it should NOT reach timeout here
++            logging.warning('Should NOT reach timeout.')
++            break
++
+     if not applet.GetBluetoothStatus():
+         print('Failed to enable bluetooth')
+         exitfunc()
+diff --git a/blueman/plugins/applet/PowerManager.py b/blueman/plugins/applet/PowerManager.py
+index 8ec9fc4..29a0fb0 100644
+--- a/blueman/plugins/applet/PowerManager.py
++++ b/blueman/plugins/applet/PowerManager.py
+@@ -48,6 +48,7 @@ class PowerManager(AppletPlugin):
+         self._add_dbus_signal("BluetoothStatusChanged", "b")
+         self._add_dbus_method("SetBluetoothStatus", ("b",), "", self.request_power_state)
+         self._add_dbus_method("GetBluetoothStatus", (), "b", self.get_bluetooth_status)
++        self._add_dbus_method("GetRequestStatus", (), "b", self.get_request_status)
+ 
+     def on_unload(self):
+         self.parent.Plugins.Menu.unregister(self)
+@@ -182,6 +183,9 @@ class PowerManager(AppletPlugin):
+     def get_bluetooth_status(self):
+         return self.current_state
+ 
++    def get_request_status(self):
++        return self.request_in_progress
++
+     def on_adapter_property_changed(self, _path, key, value):
+         if key == "Powered":
+             if value and not self.current_state:
+-- 
+2.20.1
+

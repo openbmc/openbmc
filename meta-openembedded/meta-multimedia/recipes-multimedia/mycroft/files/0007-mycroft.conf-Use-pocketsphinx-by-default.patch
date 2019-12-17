@@ -1,0 +1,30 @@
+From b48b3d240cb0fa5e76aa5daf578e51bb8126431d Mon Sep 17 00:00:00 2001
+From: Alistair Francis <alistair.francis@wdc.com>
+Date: Wed, 16 Oct 2019 09:18:39 -0700
+Subject: [PATCH 7/7] mycroft.conf: Use pocketsphinx by default
+
+precise only works on certain architectures, to make Mycroft more
+versitle use pocketsphinx as it is architecture independent.
+
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Upstream-Status: Inappropriate [embedded specific]
+---
+ mycroft/configuration/mycroft.conf | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mycroft/configuration/mycroft.conf b/mycroft/configuration/mycroft.conf
+index 1d0be0dcd2b..d2dc75dac44 100644
+--- a/mycroft/configuration/mycroft.conf
++++ b/mycroft/configuration/mycroft.conf
+@@ -196,7 +196,7 @@
+   // Hotword configurations
+   "hotwords": {
+     "hey mycroft": {
+-        "module": "precise",
++        "module": "pocketsphinx",
+         "phonemes": "HH EY . M AY K R AO F T",
+         "threshold": 1e-90,
+         "lang": "en-us"
+-- 
+2.23.0
+

@@ -1,7 +1,7 @@
-From df7ef16afcc6ab55daa686e4f15c16e3d1280337 Mon Sep 17 00:00:00 2001
+From 73c6374ceb0c062e91210cc9ef3e0e9fa30ee514 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 2 Sep 2017 12:42:30 -0700
-Subject: [PATCH 2/4] Add a definition for the macro __ELF_NATIVE_CLASS
+Subject: [PATCH 04/10] Add a definition for the macro __ELF_NATIVE_CLASS
 
 It depends on the native arch's word size.
 
@@ -11,10 +11,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 9 insertions(+)
 
 diff --git a/src/mongo/util/stacktrace_posix.cpp b/src/mongo/util/stacktrace_posix.cpp
-index 53ab85f56f..7c458e7ef2 100644
+index 1d7b3d7..f81e329 100644
 --- a/src/mongo/util/stacktrace_posix.cpp
 +++ b/src/mongo/util/stacktrace_posix.cpp
-@@ -37,6 +37,15 @@
+@@ -39,6 +39,15 @@
  #include <string>
  #include <sys/utsname.h>
  
@@ -31,5 +31,5 @@ index 53ab85f56f..7c458e7ef2 100644
  #include "mongo/config.h"
  #include "mongo/db/jsobj.h"
 -- 
-2.14.1
+2.7.4
 

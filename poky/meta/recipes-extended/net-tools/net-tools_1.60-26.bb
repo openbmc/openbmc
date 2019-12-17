@@ -95,7 +95,7 @@ do_compile() {
 
 do_install() {
 	# We don't need COPTS or LOPTS, but let's be consistent.
-	oe_runmake COPTS="$CFLAGS" LOPTS="$LDFLAGS" 'BASEDIR=${D}' install
+	oe_runmake COPTS="$CFLAGS" LOPTS="$LDFLAGS" BASEDIR=${D} INSTALLNLSDIR=${D}${datadir}/locale mandir=${mandir} install
 
 	if [ "${base_bindir}" != "/bin" ]; then
 		mkdir -p ${D}/${base_bindir}

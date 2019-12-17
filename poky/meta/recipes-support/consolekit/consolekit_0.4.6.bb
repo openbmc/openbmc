@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552 \
 DEPENDS = "glib-2.0 glib-2.0-native dbus dbus-glib virtual/libx11"
 RDEPENDS_${PN} += "base-files"
 
-inherit autotools pkgconfig distro_features_check
+inherit autotools pkgconfig features_check
 # depends on virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
 

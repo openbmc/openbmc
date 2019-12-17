@@ -35,3 +35,5 @@ FILES_${PN}-dbg += "${libexecdir}/lowpan-tools/.debug/"
 
 PACKAGES =+ "${PN}-python"
 FILES_${PN}-python = "${libdir}/python*"
+
+PNBLACKLIST[lowpan-tools] = "WARNING these tools are deprecated! Use wpan-tools instead"

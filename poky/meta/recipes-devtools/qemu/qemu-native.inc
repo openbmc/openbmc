@@ -3,10 +3,9 @@ inherit native
 require qemu.inc
 
 SRC_URI_append = " \
-            file://0011-fix-libcap-header-issue-on-some-distro.patch \
-            file://0012-cpus.c-Add-error-messages-when-qemi_cpu_kick_thread-.patch \
+            file://0010-fix-libcap-header-issue-on-some-distro.patch \
+            file://0011-cpus.c-Add-error-messages-when-qemi_cpu_kick_thread-.patch \
             "
-EXTRA_OECONF_append = " --python=python2.7"
 
 EXTRA_OEMAKE_append = " LD='${LD}' AR='${AR}' OBJCOPY='${OBJCOPY}' LDFLAGS='${LDFLAGS}'"
 

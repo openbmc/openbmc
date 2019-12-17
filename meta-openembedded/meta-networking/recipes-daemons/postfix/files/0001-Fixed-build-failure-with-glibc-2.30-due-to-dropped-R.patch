@@ -1,0 +1,37 @@
+From 8b3792830f4930fee7fbb00c854d9766f2b74dca Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 27 Jul 2019 11:35:38 -0700
+Subject: [PATCH] Fixed build failure with glibc 2.30 due to dropped
+ RES_INSECURE1/2 macros
+
+see [1]
+
+[1] https://sourceware.org/git/?p=glibc.git;a=commit;h=333221862ecbebde60dd16e7ca17d26444e62f50
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/dns/dns_str_resflags.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/dns/dns_str_resflags.c b/src/dns/dns_str_resflags.c
+index 5f2cce5..df32345 100644
+--- a/src/dns/dns_str_resflags.c
++++ b/src/dns/dns_str_resflags.c
+@@ -60,10 +60,16 @@ static const LONG_NAME_MASK resflag_table[] = {
+     "RES_DEFNAMES", RES_DEFNAMES,
+     "RES_STAYOPEN", RES_STAYOPEN,
+     "RES_DNSRCH", RES_DNSRCH,
++#ifdef RES_INSECURE1
+     "RES_INSECURE1", RES_INSECURE1,
++#endif
++#ifdef RES_INSECURE2
+     "RES_INSECURE2", RES_INSECURE2,
++#endif
+     "RES_NOALIASES", RES_NOALIASES,
++#ifdef RES_USE_INET6
+     "RES_USE_INET6", RES_USE_INET6,
++#endif
+ #ifdef RES_ROTATE
+     "RES_ROTATE", RES_ROTATE,
+ #endif

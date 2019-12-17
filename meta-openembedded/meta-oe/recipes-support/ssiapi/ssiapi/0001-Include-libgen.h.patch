@@ -1,0 +1,32 @@
+From 258a1d128581f185a7a5070f47df06e5c29c9db8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 30 Aug 2019 13:43:32 -0700
+Subject: [PATCH] Include libgen.h
+
+Use XPG version of basename on non gnu libc systems
+ideally posix version should be used everywhere but that
+would be upstreams choice to make
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tools/ssieventmonitor.cpp | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/tools/ssieventmonitor.cpp b/tools/ssieventmonitor.cpp
+index 0d11975..af7e09c 100644
+--- a/tools/ssieventmonitor.cpp
++++ b/tools/ssieventmonitor.cpp
+@@ -39,7 +39,9 @@
+ #include <sys/select.h>
+ #include <sys/wait.h>
+ #include <sys/inotify.h>
+-
++#ifndef __GLIBC__
++#include <libgen.h>
++#endif
+ extern "C" {
+ #include "lib/safeclib/safe_str_lib.h"
+ }
+-- 
+2.23.0
+

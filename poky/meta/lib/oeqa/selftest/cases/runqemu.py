@@ -8,6 +8,7 @@ import re
 import tempfile
 import time
 import oe.types
+from oeqa.core.decorator import OETestTag
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import bitbake, runqemu, get_bb_var, runCmd
 
@@ -147,6 +148,7 @@ SYSLINUX_TIMEOUT = "10"
 # dedicated for MACHINE=qemux86-64 where it test that qemux86-64 will
 # bootup various filesystem types, including live image(iso and hddimg)
 # where live image was not supported on all qemu architecture.
+@OETestTag("machine")
 class QemuTest(OESelftestTestCase):
 
     @classmethod

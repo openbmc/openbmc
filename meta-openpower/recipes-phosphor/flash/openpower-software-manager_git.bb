@@ -15,9 +15,13 @@ inherit pythonnative
 inherit ${@bb.utils.contains('DISTRO_FEATURES', 'openpower-ubi-fs', \
                              'openpower-software-manager-ubi', \
                              'openpower-software-manager-static', d)}
+inherit ${@bb.utils.contains('DISTRO_FEATURES', 'openpower-virtual-pnor', \
+                             'openpower-software-manager-virtual-pnor', \
+                             '', d)}
 
 PACKAGECONFIG[verify_pnor_signature] = "--enable-verify_pnor_signature,--disable-verify_pnor_signature"
 PACKAGECONFIG[ubifs_layout] = "--enable-ubifs_layout,--disable-ubifs_layout,,mtd-utils-ubifs"
+PACKAGECONFIG[virtual_pnor] = "--enable-virtual_pnor,--disable-virtual_pnor"
 
 EXTRA_OECONF += " \
     PNOR_MSL="v2.0.10 v2.2" \
@@ -39,7 +43,7 @@ S = "${WORKDIR}/git"
 
 SRC_URI += "git://github.com/openbmc/openpower-pnor-code-mgmt"
 
-SRCREV = "adf91f58dac9f177a061d9b206d853a9db3db70a"
+SRCREV = "59d5657643c1cd24de579867abff1dcfa54d3803"
 
 DBUS_SERVICE_${PN} += "org.open_power.Software.Host.Updater.service"
 

@@ -45,7 +45,7 @@ python uninative_event_fetchloader() {
         tarballdir = os.path.join(d.getVar("UNINATIVE_DLDIR"), chksum)
         tarballpath = os.path.join(tarballdir, tarball)
 
-        if not os.path.exists(tarballpath):
+        if not os.path.exists(tarballpath + ".done"):
             bb.utils.mkdirhier(tarballdir)
             if d.getVar("UNINATIVE_URL") == "unset":
                 bb.fatal("Uninative selected but not configured, please set UNINATIVE_URL")

@@ -335,7 +335,7 @@
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    The minimal command and arguments used to run the
+                    Minimal command and arguments needed to run the
                     assembler.
                 </para>
             </glossdef>
@@ -1344,13 +1344,13 @@
 
         <glossentry id='var-BBMULTICONFIG'><glossterm>BBMULTICONFIG</glossterm>
             <info>
-                BBMULTICONFIG[doc] = "Specifies each separate configuration when you are building targets with multiple configurations."
+                BBMULTICONFIG[doc] = "Specifies each additional separate configuration when you are building targets with multiple configurations."
             </info>
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    Specifies each separate configuration when you are
-                    building targets with multiple configurations.
+                    Specifies each additional separate configuration when you
+                    are building targets with multiple configurations.
                     Use this variable in your
                     <filename>conf/local.conf</filename> configuration file.
                     Specify a <replaceable>multiconfigname</replaceable> for
@@ -1358,7 +1358,7 @@
                     For example, the following line specifies three
                     configuration files:
                     <literallayout class='monospaced'>
-     BBMULTIFONFIG = "configA configB configC"
+     BBMULTICONFIG = "configA configB configC"
                     </literallayout>
                     Each configuration file you use must reside in the
                     <link linkend='build-directory'>Build Directory</link>
@@ -2182,9 +2182,10 @@
 
                 <para>
                     The <filename>BUSYBOX_SPLIT_SUID</filename> variable
-                    defaults to "1", which results in a single output
+                    defaults to "1", which results in splitting the output
                     executable file.
-                    Set the variable to "0" to split the output file.
+                    Set the variable to "0" to get a single output executable
+                    file.
                 </para>
             </glossdef>
         </glossentry>
@@ -6606,6 +6607,7 @@
                     by default:
                     <literallayout class='monospaced'>
      btrfs
+     container
      cpio
      cpio.gz
      cpio.lz4
@@ -6621,13 +6623,14 @@
      ext3.gz
      ext4
      ext4.gz
-     hdddirect
+     f2fs
      hddimg
      iso
      jffs2
      jffs2.sum
      multiubi
      squashfs
+     squashfs-lz4
      squashfs-lzo
      squashfs-xz
      tar
@@ -7580,15 +7583,9 @@
                         However, providing just the <filename>.dtb</filename>
                         file is preferred.
                     </note>
-                    In order to use this variable, you must have the include
-                    files in your kernel recipe:
-                    <literallayout class='monospaced'>
-     require recipes-kernel/linux/linux-dtb.inc
-                    </literallayout>
-                    or
-                    <literallayout class='monospaced'>
-     require recipes-kernel/linux/linux-yocto.inc
-                    </literallayout>
+                    In order to use this variable, the
+                    <link linkend='ref-classes-kernel-devicetree'><filename>kernel-devicetree</filename></link>
+                    class must be inherited.
                 </para>
             </glossdef>
         </glossentry>
@@ -11694,8 +11691,7 @@
                     or
                     <link linkend='ref-classes-setuptools'><filename>setuptools</filename></link>
                     classes, specifies the major Python version being built.
-                    For Python 2.x, <filename>PYTHON_PN</filename> would
-                    be "python2".  For Python 3.x, the variable would be
+                    For Python 3.x, <filename>PYTHON_PN</filename> would be
                     "python3".
                     You do not have to set this variable as the
                     OpenEmbedded build system automatically sets it for you.

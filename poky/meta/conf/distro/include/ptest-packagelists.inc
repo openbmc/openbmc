@@ -77,3 +77,5 @@ PTESTS_SLOW = "\
     util-linux-ptest \
     valgrind-ptest \
 "
+
+PTESTS_SLOW_remove_riscv64 = "valgrind-ptest"

@@ -3,8 +3,8 @@ HOMEPAGE = "http://pyparsing.wikispaces.com/"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=657a566233888513e1f07ba13e2f47f1"
 
-SRC_URI[md5sum] = "e534c0ca755155823bf45fdd8d084922"
-SRC_URI[sha256sum] = "1873c03321fc118f4e9746baf201ff990ceb915f433f23b395f5580d1840cb2a"
+SRC_URI[md5sum] = "75dfad250d739efa82c7c0eeaacc5e68"
+SRC_URI[sha256sum] = "4ca62001be367f01bd3e92ecbb79070272a9d4964dce6a48a82ff0b8bc7e683a"
 
 inherit pypi
 

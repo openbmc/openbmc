@@ -14,18 +14,19 @@ PREFERRED_PROVIDER_virtual/${SDK_PREFIX}g++ = "gcc-crosssdk-${SDK_SYS}"
 PREFERRED_PROVIDER_virtual/${SDK_PREFIX}compilerlibs = "nativesdk-gcc-runtime"
 
 # Default libc config
-PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}libc-initial = "${TCLIBC}-initial"
-PREFERRED_PROVIDER_virtual/nativesdk-${SDK_PREFIX}libc-initial ?= "nativesdk-glibc-initial"
 PREFERRED_PROVIDER_virtual/gettext ??= "gettext"
 
 GCCVERSION ?= "9.%"
 SDKGCCVERSION ?= "${GCCVERSION}"
 BINUVERSION ?= "2.32%"
 GDBVERSION ?= "8.3%"
-GLIBCVERSION ?= "2.29%"
-LINUXLIBCVERSION ?= "5.0%"
-QEMUVERSION ?= "4.0%"
+GLIBCVERSION ?= "2.30%"
+LINUXLIBCVERSION ?= "5.2%"
+QEMUVERSION ?= "4.1%"
 GOVERSION ?= "1.12%"
+# This can not use wildcards like 8.0.% since it is also used in mesa to denote
+# llvm version being used, so always bump it with llvm recipe version bump
+LLVMVERSION ?= "9.0.0"
 
 PREFERRED_VERSION_gcc ?= "${GCCVERSION}"
 PREFERRED_VERSION_gcc-cross-${TARGET_ARCH} ?= "${GCCVERSION}"
@@ -59,8 +60,6 @@ PREFERRED_VERSION_glibc-locale             ?= "${GLIBCVERSION}"
 PREFERRED_VERSION_glibc-mtrace             ?= "${GLIBCVERSION}"
 PREFERRED_VERSION_glibc-scripts            ?= "${GLIBCVERSION}"
 PREFERRED_VERSION_nativesdk-glibc          ?= "${GLIBCVERSION}"
-PREFERRED_VERSION_glibc-initial            ?= "${GLIBCVERSION}"
-PREFERRED_VERSION_nativesdk-glibc-initial  ?= "${GLIBCVERSION}"
 PREFERRED_VERSION_cross-localedef-native   ?= "${GLIBCVERSION}"
 
 PREFERRED_VERSION_qemu ?= "${QEMUVERSION}"
@@ -76,3 +75,7 @@ PREFERRED_VERSION_go-native ?= "${GOVERSION}"
 PREFERRED_VERSION_go-runtime ?= "${GOVERSION}"
 PREFERRED_VERSION_nativesdk-go ?= "${GOVERSION}"
 PREFERRED_VERSION_nativesdk-go-runtime ?= "${GOVERSION}"
+
+PREFERRED_VERSION_llvm = "${LLVMVERSION}"
+PREFERRED_VERSION_llvm-native = "${LLVMVERSION}"
+PREFERRED_VERSION_nativesdk-llvm = "${LLVMVERSION}"

@@ -150,7 +150,7 @@ do_install() {
 	fi
 }
 
-inherit distro_features_check
+inherit features_check
 REQUIRED_DISTRO_FEATURES = "pam"
 
 BBCLASSEXTEND = "nativesdk native"
@@ -163,3 +163,5 @@ CONFFILES_${PN}-runtime += "${sysconfdir}/pam.d/common-account"
 CONFFILES_${PN}-runtime += "${sysconfdir}/security/limits.conf"
 
 UPSTREAM_CHECK_URI = "https://github.com/linux-pam/linux-pam/releases"
+
+CVE_PRODUCT = "linux-pam"

@@ -5,8 +5,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=4ad213bcca81688e94593e5f60c87477"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/python-automat:"
 
-SRC_URI[md5sum] = "b72d5b7a83c2b1bd6e9ec3614a69f9ea"
-SRC_URI[sha256sum] = "cbd78b83fa2d81fe2a4d23d258e1661dd7493c9a50ee2f1a5b2cac61c1793b0e"
+SRC_URI[md5sum] = "47e980a48201a1dabe37fa11f0187013"
+SRC_URI[sha256sum] = "269a09dfb063a3b078983f4976d83f0a0d3e6e7aaf8e27d8df1095e09dc4a484"
 
 PYPI_PACKAGE = "Automat"
 

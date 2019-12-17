@@ -2,8 +2,8 @@ SUMMARY = "Small collection of benchmarks for storage I/O"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b529aaa6a0c50f15d29f89609b5c22f3"
 
-SRCREV = "8d22ab8a4cc1484622c47ac9c5944fb9a61a5c0f"
-PV = "3.4"
+SRCREV = "f97f1ae321d1fb8111a2c638075702ed2512ff07"
+PV = "3.6"
 SRC_URI = "git://github.com/Algodev-github/S.git;protocol=https;branch=master"
 
 S = "${WORKDIR}/git"
@@ -19,6 +19,7 @@ do_install() {
 
     install -m0755 ${S}/def_config.sh ${D}/opt/S-suite
     install -m0755 ${S}/config_params.sh ${D}/opt/S-suite
+    install -m0755 ${S}/create_config.sh ${D}/opt/S-suite
     install -m0755 ${S}/process_config.sh ${D}/opt/S-suite
 }
 

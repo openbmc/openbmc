@@ -1,0 +1,28 @@
+From fd244ae648789591f0fb79e74d2b8f6c5b15d6e8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 6 Aug 2019 00:47:14 +0000
+Subject: [PATCH] ppt.c: Do not include sys/io.h
+
+newer versions of glibc has removed it
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ ppt.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/ppt.c b/ppt.c
+index 0bae2d0..0ef279f 100644
+--- a/ppt.c
++++ b/ppt.c
+@@ -5,7 +5,6 @@
+ #else
+ #include <unistd.h>
+ #include <stdlib.h>
+-#include <sys/io.h>
+ #include <linux/parport.h>
+ #include <linux/ppdev.h>
+ #include <sys/ioctl.h>
+-- 
+2.17.1
+

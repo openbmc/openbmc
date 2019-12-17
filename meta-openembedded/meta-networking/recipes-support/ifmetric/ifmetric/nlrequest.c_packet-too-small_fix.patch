@@ -1,0 +1,16 @@
+Description: Fix "NETLINK: Packet too small or truncated!" error.
+Author: Benedek László <benedekl@gmail.com>
+Bug-Debian: http://bugs.debian.org/514197
+Index: ifmetric/src/nlrequest.c
+===================================================================
+--- ifmetric.orig/src/nlrequest.c	2013-09-05 14:10:42.000000000 -0500
++++ ifmetric/src/nlrequest.c	2013-09-05 14:19:06.573420862 -0500
+@@ -44,7 +44,7 @@
+ 
+     for (;;) {
+         int bytes;
+-        char replybuf[2048];
++        char replybuf[4096];
+         struct nlmsghdr *p = (struct nlmsghdr *) replybuf;
+         
+         if ((bytes = recv(s, &replybuf, sizeof(replybuf), 0)) < 0) {

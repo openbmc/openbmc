@@ -24,4 +24,4 @@ do_install_append() {
 
 RDEPENDS_${PN} = "python-curses python-textutils \
                   python-codecs python-ctypes python-pprint \
-                  python-shell python-subprocess"
+                  python-shell python-subprocess python-core"

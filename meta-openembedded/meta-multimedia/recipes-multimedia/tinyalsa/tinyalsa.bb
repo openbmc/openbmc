@@ -6,7 +6,7 @@ SECTION = "libs/multimedia"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=dbdefe400d894b510a9de14813181d0b"
 
-SRCREV = "67b9210d344c34e8d1aa0cfe638abce71c5221ca"
+SRCREV = "8449529c7e50f432091539ba7b438e79b04059b5"
 SRC_URI = "git://github.com/tinyalsa/tinyalsa"
 PV = "1.1.1+git${SRCPV}"
 
@@ -19,6 +19,3 @@ inherit cmake
 #
 #    unresolvable R_AARCH64_ADR_PREL_PG_HI21 relocation against symbol `stderr@@GLIBC_2.17'
 CFLAGS += " -fPIC -DPIC "
-
-PACKAGES =+ "${PN}-tools"
-FILES_${PN}-tools = "${bindir}/*"

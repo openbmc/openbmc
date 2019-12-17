@@ -1,7 +1,7 @@
-From 8c4d7d70a84a69fe5e8d69539368aa11f8fe20aa Mon Sep 17 00:00:00 2001
+From e2667086bf984de4d3f1226b9467761cd5a4c39f Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 31 Dec 2015 15:15:09 -0800
-Subject: [PATCH 20/30] eglibc: Clear cache lines on ppc8xx
+Subject: [PATCH 20/28] eglibc: Clear cache lines on ppc8xx
 
 2007-06-13  Nathan Sidwell  <nathan@codesourcery.com>
             Mark Shinwell  <shinwell@codesourcery.com>
@@ -79,5 +79,5 @@ index 4fd5f70700..1a21e4675c 100644
  	break;
  #ifndef SHARED
 -- 
-2.20.1
+2.22.0
 

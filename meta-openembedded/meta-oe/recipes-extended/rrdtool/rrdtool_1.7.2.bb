@@ -32,7 +32,7 @@ am_cv_python_pyexecdir=${STAGING_LIBDIR}/python${PYTHON_BASEVERSION}/site-packag
 --disable-python,python,"
 
 PACKAGECONFIG[perl] = \
-"--enable-perl=yes --with-perl-options='INSTALLDIRS="vendor" CCFLAGS="${CFLAGS}" NO_PACKLIST=1' \
+"--enable-perl=yes --with-perl-options='INSTALLDIRS="vendor" CCFLAGS="${CFLAGS}" NO_PACKLIST=1 NO_PERLLOCAL=1' \
 ac_cv_path_PERL_CC='${CC}',  \
 --disable-perl,perl,"
 

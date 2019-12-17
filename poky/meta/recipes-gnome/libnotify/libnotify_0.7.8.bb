@@ -1,12 +1,13 @@
 SUMMARY = "Library for sending desktop notifications to a notification daemon"
-HOMEPAGE = "http://www.gnome.org"
+HOMEPAGE = "https://gitlab.gnome.org/GNOME/libnotify"
+BUGTRACKER = "https://gitlab.gnome.org/GNOME/libnotify/issues"
 SECTION = "libs"
 LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=7fbc338309ac38fefcd64b04bb903e34"
 
-DEPENDS = "dbus gtk+3 dbus-glib"
+DEPENDS = "dbus gtk+3 glib-2.0"
 
-inherit gnomebase gtk-doc distro_features_check gobject-introspection
+inherit gnomebase gtk-doc features_check gobject-introspection
 # depends on gtk+3
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 

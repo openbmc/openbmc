@@ -39,19 +39,28 @@ inherit ${@oe.utils.ifelse(d.getVar('BUILD_REPRODUCIBLE_BINARIES') == '1', 'repr
 
 SDE_DIR ="${WORKDIR}/source-date-epoch"
 SDE_FILE = "${SDE_DIR}/__source_date_epoch.txt"
+SDE_DEPLOYDIR = "${WORKDIR}/deploy-source-date-epoch"
 
 SSTATETASKS += "do_deploy_source_date_epoch"
 
 do_deploy_source_date_epoch () {
     echo "Deploying SDE to ${SDE_DIR}."
+    mkdir -p ${SDE_DEPLOYDIR}
+    if [ -e ${SDE_FILE} ]; then
+        cp -p ${SDE_FILE} ${SDE_DEPLOYDIR}/__source_date_epoch.txt
+    fi
 }
 
 python do_deploy_source_date_epoch_setscene () {
     sstate_setscene(d)
+    bb.utils.mkdirhier(d.getVar('SDE_DIR'))
+    sde_file = os.path.join(d.getVar('SDE_DEPLOYDIR'), '__source_date_epoch.txt')
+    if os.path.exists(sde_file):
+        os.rename(sde_file, d.getVar('SDE_FILE'))
 }
 
-do_deploy_source_date_epoch[dirs] = "${SDE_DIR}"
-do_deploy_source_date_epoch[sstate-plaindirs] = "${SDE_DIR}"
+do_deploy_source_date_epoch[dirs] = "${SDE_DEPLOYDIR}"
+do_deploy_source_date_epoch[sstate-plaindirs] = "${SDE_DEPLOYDIR}"
 addtask do_deploy_source_date_epoch_setscene
 addtask do_deploy_source_date_epoch before do_configure after do_patch
 

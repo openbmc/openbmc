@@ -31,10 +31,10 @@ Signed-off-by: Andreas Oberritter <obi@opendreambox.org>
  networking/udhcp/dhcpc.c                       | 29 ++++++++++++++++------
  1 file changed, 21 insertions(+), 8 deletions(-)
 
-Index: busybox-1.29.1/networking/udhcp/dhcpc.c
+Index: busybox-1.31.0/networking/udhcp/dhcpc.c
 ===================================================================
---- busybox-1.29.1.orig/networking/udhcp/dhcpc.c
-+++ busybox-1.29.1/networking/udhcp/dhcpc.c
+--- busybox-1.31.0.orig/networking/udhcp/dhcpc.c
++++ busybox-1.31.0/networking/udhcp/dhcpc.c
 @@ -48,6 +48,8 @@
  };
  #endif
@@ -42,21 +42,21 @@ Index: busybox-1.29.1/networking/udhcp/dhcpc.c
 +/* option whether to down the interface when reconfiguring */
 +static int allow_deconfig = 1;
  
- /* "struct client_config_t client_config" is in bb_common_bufsiz1 */
+ /* "struct client_data_t client_data" is in bb_common_bufsiz1 */
  
-@@ -103,8 +105,9 @@
+@@ -103,8 +105,10 @@
  	OPT_x = 1 << 18,
  	OPT_f = 1 << 19,
  	OPT_B = 1 << 20,
 +	OPT_D = 1 << 21,
  /* The rest has variable bit positions, need to be clever */
--	OPTBIT_B = 20,
+ 	OPTBIT_B = 20,
 +	OPTBIT_D = 21,
  	USE_FOR_MMU(             OPTBIT_b,)
  	IF_FEATURE_UDHCPC_ARPING(OPTBIT_a,)
  	IF_FEATURE_UDHCP_PORT(   OPTBIT_P,)
-@@ -1116,7 +1119,8 @@
- 		state = RENEW_REQUESTED;
+@@ -1124,7 +1128,8 @@
+ 		client_data.state = RENEW_REQUESTED;
  		break;
  	case RENEW_REQUESTED: /* impatient are we? fine, square 1 */
 -		udhcp_run_script(NULL, "deconfig");
@@ -65,7 +65,7 @@ Index: busybox-1.29.1/networking/udhcp/dhcpc.c
  	case REQUESTING:
  	case RELEASED:
  		change_listen_mode(LISTEN_RAW);
-@@ -1152,7 +1156,8 @@
+@@ -1160,7 +1165,8 @@
   * Users requested to be notified in all cases, even if not in one
   * of the states above.
   */
@@ -74,8 +74,8 @@ Index: busybox-1.29.1/networking/udhcp/dhcpc.c
 +		udhcp_run_script(NULL, "deconfig");
  
  	change_listen_mode(LISTEN_NONE);
- 	state = RELEASED;
-@@ -1265,7 +1270,7 @@
+ 	client_data.state = RELEASED;
+@@ -1278,7 +1284,7 @@
  	/* Parse command line */
  	opt = getopt32long(argv, "^"
  		/* O,x: list; -T,-t,-A take numeric param */
@@ -84,7 +84,7 @@ Index: busybox-1.29.1/networking/udhcp/dhcpc.c
  		USE_FOR_MMU("b")
  		IF_FEATURE_UDHCPC_ARPING("a::")
  		IF_FEATURE_UDHCP_PORT("P:")
-@@ -1376,6 +1381,10 @@
+@@ -1389,6 +1395,10 @@
  		logmode |= LOGMODE_SYSLOG;
  	}
  
@@ -92,52 +92,52 @@ Index: busybox-1.29.1/networking/udhcp/dhcpc.c
 +		allow_deconfig = 0;
 +	}
 +
- 	/* Make sure fd 0,1,2 are open */
- 	bb_sanitize_stdio();
  	/* Create pidfile */
-@@ -1388,7 +1397,8 @@
+ 	write_pidfile(client_data.pidfile);
+ 	/* Goes to stdout (unless NOMMU) and possibly syslog */
+@@ -1397,7 +1407,8 @@
  	srand(monotonic_us());
  
- 	state = INIT_SELECTING;
+ 	client_data.state = INIT_SELECTING;
 -	udhcp_run_script(NULL, "deconfig");
 +	if (allow_deconfig)
 +		udhcp_run_script(NULL, "deconfig");
  	change_listen_mode(LISTEN_RAW);
  	packet_num = 0;
  	timeout = 0;
-@@ -1555,7 +1565,8 @@
+@@ -1570,7 +1581,8 @@
  				}
  				/* Timed out, enter init state */
- 				bb_error_msg("lease lost, entering init state");
+ 				bb_info_msg("lease lost, entering init state");
 -				udhcp_run_script(NULL, "deconfig");
 +				if (allow_deconfig)
 +					udhcp_run_script(NULL, "deconfig");
- 				state = INIT_SELECTING;
- 				client_config.first_secs = 0; /* make secs field count from 0 */
+ 				client_data.state = INIT_SELECTING;
+ 				client_data.first_secs = 0; /* make secs field count from 0 */
  				/*timeout = 0; - already is */
-@@ -1748,8 +1759,10 @@
+@@ -1762,8 +1774,10 @@
  							"(got ARP reply), declining");
  						send_decline(/*xid,*/ server_addr, packet.yiaddr);
  
--						if (state != REQUESTING)
+-						if (client_data.state != REQUESTING)
 -							udhcp_run_script(NULL, "deconfig");
-+						if (state != REQUESTING) {
++						if (client_data.state != REQUESTING) {
 +							if (allow_deconfig)
 +								udhcp_run_script(NULL, "deconfig");
 +						}
  						change_listen_mode(LISTEN_RAW);
- 						state = INIT_SELECTING;
- 						client_config.first_secs = 0; /* make secs field count from 0 */
-@@ -1818,8 +1831,10 @@
+ 						client_data.state = INIT_SELECTING;
+ 						client_data.first_secs = 0; /* make secs field count from 0 */
+@@ -1832,8 +1846,10 @@
  				/* return to init state */
- 				bb_error_msg("received %s", "DHCP NAK");
+ 				bb_info_msg("received %s", "DHCP NAK");
  				udhcp_run_script(&packet, "nak");
--				if (state != REQUESTING)
+-				if (client_data.state != REQUESTING)
 -					udhcp_run_script(NULL, "deconfig");
-+				if (state != REQUESTING) {
++				if (client_data.state != REQUESTING) {
 +					if (allow_deconfig)
 +						udhcp_run_script(NULL, "deconfig");
 +				}
  				change_listen_mode(LISTEN_RAW);
  				sleep(3); /* avoid excessive network traffic */
- 				state = INIT_SELECTING;
+ 				client_data.state = INIT_SELECTING;

@@ -1,0 +1,25 @@
+#!/bin/sh
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+
+[ -r /etc/default/emlog ] && . /etc/default/emlog
+
+do_start() {
+    :
+}
+
+do_stop() {
+    nbcat /dev/emlog > /data/emlog
+}
+
+case "$1" in
+    start)
+	    do_start || exit $?
+	    ;;
+    stop)
+	    do_stop || exit $?
+	    ;;
+    *)
+	    echo "Usage: $0 {stop}" >&2
+	    exit 3
+	    ;;
+esac

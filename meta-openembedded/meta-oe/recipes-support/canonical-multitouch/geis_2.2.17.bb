@@ -13,7 +13,7 @@ LIC_FILES_CHKSUM = " \
     file://COPYING.GPL;md5=f27defe1e96c2e1ecd4e0c9be8967949 \
 "
 
-inherit autotools pkgconfig python3native lib_package distro_features_check
+inherit autotools pkgconfig python3native lib_package features_check
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

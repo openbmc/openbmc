@@ -3,7 +3,7 @@ HOMEPAGE = "http://www.clutter-project.org/"
 LICENSE = "LGPLv2+"
 
 CLUTTERBASEBUILDCLASS = "meson"
-inherit clutter distro_features_check upstream-version-is-even gobject-introspection gtk-doc
+inherit clutter features_check upstream-version-is-even gobject-introspection gtk-doc
 
 # depends on clutter-1.0 which depends on cogl-1.0
 REQUIRED_DISTRO_FEATURES ?= "opengl"

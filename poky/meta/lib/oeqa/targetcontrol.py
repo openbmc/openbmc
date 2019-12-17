@@ -175,7 +175,7 @@ class QemuTarget(BaseTarget):
             if os.path.exists(self.qemulog):
                 with open(self.qemulog, 'r') as f:
                     bb.error("Qemu log output from %s:\n%s" % (self.qemulog, f.read()))
-            raise bb.build.FuncFailed("%s - FAILED to start qemu - check the task log and the boot log" % self.pn)
+            raise RuntimeError("%s - FAILED to start qemu - check the task log and the boot log" % self.pn)
 
     def check(self):
         return self.runner.is_alive()
@@ -192,7 +192,7 @@ class QemuTarget(BaseTarget):
             self.server_ip = self.runner.server_ip
             self.connection = SSHControl(ip=self.ip, logfile=self.sshlog)
         else:
-            raise bb.build.FuncFailed("%s - FAILED to re-start qemu - check the task log and the boot log" % self.pn)
+            raise RuntimError("%s - FAILED to re-start qemu - check the task log and the boot log" % self.pn)
 
     def run_serial(self, command, timeout=60):
         return self.runner.run_serial(command, timeout=timeout)

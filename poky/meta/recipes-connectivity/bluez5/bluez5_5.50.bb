@@ -1,7 +1,5 @@
 require bluez5.inc
 
-REQUIRED_DISTRO_FEATURES = "bluez5"
-
 SRC_URI[md5sum] = "8e35c67c81a55d3ad4c9f22280dae178"
 SRC_URI[sha256sum] = "5ffcaae18bbb6155f1591be8c24898dc12f062075a40b538b745bfd477481911"
 

@@ -14,7 +14,6 @@ PV = "7.91+git${SRCPV}"
 SRCREV = "c22d359433b333937ee3d803450dc41998115685"
 
 DEPENDS = "elfutils"
-RDEPENDS_${PN} = "elfutils"
 SRC_URI = "git://github.com/sparkleholic/ltrace.git;branch=master;protocol=http \
            file://configure-allow-to-disable-selinux-support.patch \
            file://0001-replace-readdir_r-with-readdir.patch \
@@ -27,6 +26,8 @@ SRC_URI = "git://github.com/sparkleholic/ltrace.git;branch=master;protocol=http 
            file://0001-mips-plt.c-Delete-include-error.h.patch \
            file://0001-move-fprintf-into-same-block-where-modname-and-symna.patch \
            file://0001-hook-Do-not-append-int-to-std-string.patch \
+           file://include_unistd_nr.patch \
+           file://0001-Bug-fix-for-data-type-length-judgment.patch \
            "
 S = "${WORKDIR}/git"
 

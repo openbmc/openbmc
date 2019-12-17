@@ -1,10 +1,10 @@
 DESCRIPTION = "A Python SOCKS client module"
 HOMEPAGE = "http://python-requests.org"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=1d457bcffb9661b45f799d4efee72f16"
 
-SRC_URI[md5sum] = "ffea8bdc4eee054df2f9f6a9c3752567"
-SRC_URI[sha256sum] = "d9031ea45fdfacbe59a99273e9f0448ddb33c1580fe3831c1b09557c5718977c"
+SRC_URI[md5sum] = "89b1a6865c61bae67a32417517612ee6"
+SRC_URI[sha256sum] = "3f8804571ebe159c380ac6de37643bb4685970655d3bba243530d6558b799aa0"
 
 PYPI_PACKAGE = "PySocks"
 

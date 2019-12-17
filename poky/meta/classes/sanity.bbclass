@@ -523,6 +523,7 @@ def check_wsl(d):
 
 # Tar version 1.24 and onwards handle overwriting symlinks correctly
 # but earlier versions do not; this needs to work properly for sstate
+# Version 1.28 is needed so opkg-build works correctly when reproducibile builds are enabled
 def check_tar_version(sanity_data):
     from distutils.version import LooseVersion
     import subprocess
@@ -532,7 +533,9 @@ def check_tar_version(sanity_data):
         return "Unable to execute tar --version, exit code %d\n%s\n" % (e.returncode, e.output)
     version = result.split()[3]
     if LooseVersion(version) < LooseVersion("1.24"):
-        return "Your version of tar is older than 1.24 and has bugs which will break builds. Please install a newer version of tar.\n"
+        return "Your version of tar is older than 1.24 and has bugs which will break builds. Please install a newer version of tar (1.28+).\n"
+    if LooseVersion(version) < LooseVersion("1.28"):
+        return "Your version of tar is older than 1.28 and does not have the support needed to enable reproducible builds. Please install a newer version of tar (you could use the projects buildtools-tarball from our last release).\n"
     return None
 
 # We use git parameters and functionality only found in 1.7.8 or later
@@ -573,7 +576,7 @@ def sanity_check_conffiles(d):
         if check_conf_exists(conffile, d) and d.getVar(current_version) is not None and \
                 d.getVar(current_version) != d.getVar(required_version):
             try:
-                bb.build.exec_func(func, d, pythonexception=True)
+                bb.build.exec_func(func, d)
             except NotImplementedError as e:
                 bb.fatal(str(e))
             d.setVar("BB_INVALIDCONF", True)
@@ -622,13 +625,14 @@ def check_sanity_version_change(status, d):
     # In other words, these tests run once in a given build directory and then 
     # never again until the sanity version or host distrubution id/version changes.
 
-    # Check the python install is complete. glib-2.0-natives requries
-    # xml.parsers.expat
+    # Check the python install is complete. Examples that are often removed in
+    # minimal installations: glib-2.0-natives requries # xml.parsers.expat and icu
+    # requires distutils.sysconfig.
     try:
         import xml.parsers.expat
-    except ImportError:
-        status.addresult('Your python is not a full install. Please install the module xml.parsers.expat (python-xml on openSUSE and SUSE Linux).\n')
-    import stat
+        import distutils.sysconfig
+    except ImportError as e:
+        status.addresult('Your Python 3 is not a full install. Please install the module %s (see the Getting Started guide for further information).\n' % e.name)
 
     status.addresult(check_make_version(d))
     status.addresult(check_patch_version(d))
@@ -664,6 +668,7 @@ def check_sanity_version_change(status, d):
         status.addresult('Please use ASSUME_PROVIDED +=, not ASSUME_PROVIDED = in your local.conf\n')
 
     # Check that TMPDIR isn't on a filesystem with limited filename length (eg. eCryptFS)
+    import stat
     tmpdir = d.getVar('TMPDIR')
     status.addresult(check_create_long_filename(tmpdir, "TMPDIR"))
     tmpdirmode = os.stat(tmpdir).st_mode
@@ -797,6 +802,11 @@ def check_sanity_everybuild(status, d):
             status.addresult('Specified SDKMACHINE value is not valid\n')
         elif d.getVar('SDK_ARCH', False) == "${BUILD_ARCH}":
             status.addresult('SDKMACHINE is set, but SDK_ARCH has not been changed as a result - SDKMACHINE may have been set too late (e.g. in the distro configuration)\n')
+
+    # If SDK_VENDOR looks like "-my-sdk" then the triples are badly formed so fail early
+    sdkvendor = d.getVar("SDK_VENDOR")
+    if not (sdkvendor.startswith("-") and sdkvendor.count("-") == 1):
+        status.addresult("SDK_VENDOR should be of the form '-foosdk' with a single dash\n")
 
     check_supported_distro(d)
 

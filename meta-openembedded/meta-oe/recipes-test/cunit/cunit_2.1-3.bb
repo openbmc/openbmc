@@ -17,3 +17,5 @@ EXTRA_OECONF = "--enable-memtrace --enable-automated --enable-basic --enable-con
 
 FILES_${PN}-dev += "${datadir}/CUnit"
 FILES_${PN}-doc += "${docdir}"
+
+BBCLASSEXTEND = "native"

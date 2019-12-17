@@ -7,7 +7,7 @@ DEPENDS = "virtual/libx11 libxi libxrandr"
 PV = "0.7.5+git${SRCPV}"
 PR = "r6"
 
-inherit autotools pkgconfig distro_features_check
+inherit autotools pkgconfig features_check
 # depends on virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
 

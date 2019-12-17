@@ -1,8 +1,7 @@
 From 6d606f1101c1a172fb6d738d6f1865aa61849e68 Mon Sep 17 00:00:00 2001
 From: Alexey Firago <alexey_firago@mentor.com>
 Date: Fri, 20 Oct 2017 00:04:19 +0300
-Subject: [PATCH] CMakeLists.txt: Fix grpc_cpp_plugin path during
- cross-compiling or native build
+Subject: [PATCH] CMakeLists.txt: Fix grpc_cpp_plugin path during cross-compiling or native build
 
 Signed-off-by: Alexey Firago <alexey_firago@mentor.com>
 Signed-off-by: Hiram Lew <lew@avast.com>
@@ -12,11 +11,9 @@ Signed-off-by: Jan Kaisrlik <jan.kaisrlik@avast.com>
  templates/CMakeLists.txt.template | 9 ++++++++-
  2 files changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index a59fd81..cd90424 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -160,6 +160,13 @@ function(protobuf_generate_grpc_cpp)
+@@ -193,6 +193,13 @@ function(protobuf_generate_grpc_cpp)
      return()
    endif()
  
@@ -30,20 +27,9 @@ index a59fd81..cd90424 100644
    set(_protobuf_include_path -I . -I ${_gRPC_PROTOBUF_WELLKNOWN_INCLUDE_DIR})
    foreach(FIL ${ARGN})
      get_filename_component(ABS_FIL ${FIL} ABSOLUTE)
-@@ -177,7 +184,7 @@ function(protobuf_generate_grpc_cpp)
-       COMMAND ${_gRPC_PROTOBUF_PROTOC_EXECUTABLE}
-       ARGS --grpc_out=generate_mock_code=true:${_gRPC_PROTO_GENS_DIR}
-            --cpp_out=${_gRPC_PROTO_GENS_DIR}
--           --plugin=protoc-gen-grpc=$<TARGET_FILE:grpc_cpp_plugin>
-+           --plugin=protoc-gen-grpc=${gRPC_CPP_PLUGIN}
-            ${_protobuf_include_path}
-            ${REL_FIL}
-       DEPENDS ${ABS_FIL} ${_gRPC_PROTOBUF_PROTOC} grpc_cpp_plugin
-diff --git a/templates/CMakeLists.txt.template b/templates/CMakeLists.txt.template
-index de13d02..b22bd5c 100644
 --- a/templates/CMakeLists.txt.template
 +++ b/templates/CMakeLists.txt.template
-@@ -209,6 +209,13 @@
+@@ -233,6 +233,13 @@
        return()
      endif()
  
@@ -57,15 +43,3 @@ index de13d02..b22bd5c 100644
      set(_protobuf_include_path -I . -I <%text>${_gRPC_PROTOBUF_WELLKNOWN_INCLUDE_DIR}</%text>)
      foreach(FIL <%text>${ARGN}</%text>)
        get_filename_component(ABS_FIL <%text>${FIL}</%text> ABSOLUTE)
-@@ -226,7 +233,7 @@
-         COMMAND <%text>${_gRPC_PROTOBUF_PROTOC_EXECUTABLE}</%text>
-         ARGS --grpc_out=<%text>generate_mock_code=true:${_gRPC_PROTO_GENS_DIR}</%text>
-              --cpp_out=<%text>${_gRPC_PROTO_GENS_DIR}</%text>
--             --plugin=protoc-gen-grpc=$<TARGET_FILE:grpc_cpp_plugin>
-+             --plugin=protoc-gen-grpc=${gRPC_CPP_PLUGIN}
-              <%text>${_protobuf_include_path}</%text>
-              <%text>${REL_FIL}</%text>
-         DEPENDS <%text>${ABS_FIL}</%text> <%text>${_gRPC_PROTOBUF_PROTOC}</%text> grpc_cpp_plugin
--- 
-2.7.4
-

@@ -1,0 +1,41 @@
+From fe56b67a2915a8632ea30604c14241f335dd3c15 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 12 Nov 2019 10:49:46 -0800
+Subject: [PATCH] hgfsServerLinux: Consider 64bit time_t possibility
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ .../lib/hgfsServer/hgfsServerLinux.c          | 19 +++++--------------
+ 1 file changed, 5 insertions(+), 14 deletions(-)
+
+diff --git a/open-vm-tools/lib/hgfsServer/hgfsServerLinux.c b/open-vm-tools/lib/hgfsServer/hgfsServerLinux.c
+index 03175623..554da67f 100644
+--- a/open-vm-tools/lib/hgfsServer/hgfsServerLinux.c
++++ b/open-vm-tools/lib/hgfsServer/hgfsServerLinux.c
+@@ -2561,20 +2561,11 @@ HgfsStatToFileAttr(struct stat *stats,       // IN: stat information
+    LOG(4, ("%s: done, permissions %o%o%o%o, size %"FMT64"u\n", __FUNCTION__,
+            attr->specialPerms, attr->ownerPerms, attr->groupPerms,
+            attr->otherPerms, attr->size));
+-#ifdef __FreeBSD__
+-#   if !defined(VM_X86_64) && __FreeBSD_version >= 500043
+-#      define FMTTIMET ""
+-#   else
+-#      define FMTTIMET "l"
+-#   endif
+-#else
+-#   define FMTTIMET "l"
+-#endif
+-   LOG(4, ("access: %"FMTTIMET"d/%"FMT64"u \nwrite: %"FMTTIMET"d/%"FMT64"u \n"
+-           "attr: %"FMTTIMET"d/%"FMT64"u\n",
+-           stats->st_atime, attr->accessTime, stats->st_mtime, attr->writeTime,
+-           stats->st_ctime, attr->attrChangeTime));
+-#undef FMTTIMET
++   LOG(4, ("access: %jd/%"FMT64"u \nwrite: %jd/%"FMT64"u \n"
++           "attr: %jd/%"FMT64"u\n",
++           (intmax_t)stats->st_atime, attr->accessTime,
++	   (intmax_t)stats->st_mtime, attr->writeTime,
++           (intmax_t)stats->st_ctime, attr->attrChangeTime));
+ 
+    attr->userId = stats->st_uid;
+    attr->groupId = stats->st_gid;

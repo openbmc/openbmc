@@ -19,3 +19,5 @@ inherit autotools-brokensep
 
 PACKAGECONFIG ??= "zlib"
 PACKAGECONFIG[zlib] = "--with-zlib,--without-zlib,zlib"
+
+BBCLASSEXTEND += "native"

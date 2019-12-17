@@ -1,0 +1,29 @@
+From f828a89cc1e956d56498422ec158d284fc97de3f Mon Sep 17 00:00:00 2001
+From: OBATA Akio <obache@outlook.com>
+Date: Fri, 10 Aug 2018 18:38:18 +0900
+Subject: [PATCH] Fix to set libedit path from configure option properly
+
+Upstream-Status: Backport [https://github.com/uim/uim/pull/134]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 00d1b02..9c0a5ec 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1311,8 +1311,8 @@ if test "x$with_libedit" != xno; then
+   if test "x$with_libedit" = xyes; then
+     libedit_path=/usr
+   else
+-    with_libedit=yes
+     libedit_path="$with_libedit"
++    with_libedit=yes
+   fi
+ 
+   saved_CPPFLAGS=$CPPFLAGS
+-- 
+2.23.0
+

@@ -1,0 +1,24 @@
+From 95e1da77de80e38068bb2739faeaad49105700cf Mon Sep 17 00:00:00 2001
+From: Luca Palano <github@lpzone.it>
+Date: Mon, 15 Jul 2019 10:16:32 +0200
+Subject: [PATCH 2/2] Makefiles does not build contrib
+
+Signed-off-by: Luca Palano <github@lpzone.it>
+---
+ Makefile.am | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index bc928bba..ba9edc6b 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -54,7 +54,6 @@ dist_noinst_DATA= \
+ 	CHANGELOG.md \
+ 	cppcheck.sh \
+ 	configs.signatures \
+-	contrib \
+ 	netdata.cppcheck \
+ 	netdata.spec \
+ 	package.json \
+--
+2.20.1 (Apple Git-117)

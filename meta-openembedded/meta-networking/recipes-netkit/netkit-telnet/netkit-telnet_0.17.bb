@@ -2,7 +2,7 @@ DESCRIPTION = "netkit-telnet includes the telnet daemon and client."
 HOMEPAGE = "http://www.hcs.harvard.edu/~dholland/computers/netkit.html"
 SECTION = "net"
 DEPENDS = "ncurses"
-LICENSE = "BSD"
+LICENSE = "BSD-4-Clause"
 LIC_FILES_CHKSUM = "file://telnet/telnet.cc;beginline=2;endline=3;md5=780868e7b566313e70cb701560ca95ef"
 
 SRC_URI = "http://ftp.linux.org.uk/pub/linux/Networking/netkit/${BP}.tar.gz \
@@ -62,5 +62,5 @@ SRC_URI[sha256sum] = "9c80d5c7838361a328fb6b60016d503def9ce53ad3c589f3b08ff71a2b
 FILES_${PN} += "${sbindir}/in.* ${libdir}/* ${sysconfdir}/xinetd.d/*"
 
 # http://errors.yoctoproject.org/Errors/Details/186954/
-EXCLUDE_FROM_WORLD_libc-musl = "1"
+COMPATIBLE_HOST_libc-musl = 'null'
 RCONFLICTS_${PN} = "inetutils-telnetd"

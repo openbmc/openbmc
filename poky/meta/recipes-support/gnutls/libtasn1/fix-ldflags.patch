@@ -1,0 +1,31 @@
+From a6f93b7ace347bc4fe29eb4a8fe4383d786cc8d0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tim=20R=C3=BChsen?= <tim.ruehsen@gmx.de>
+Date: Tue, 23 Jul 2019 20:44:01 +0200
+Subject: [PATCH] Fix LDFLAGS to AM_LDFLAGS in src/Makefile.am
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Tim Rühsen <tim.ruehsen@gmx.de>
+Upstream-Status: Backport
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+---
+ src/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 5bf3622..4459767 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -21,7 +21,7 @@ AM_CPPFLAGS = -I$(top_builddir)/lib/includes -I$(top_srcdir)/lib/includes \
+  -I$(top_builddir)/lib/gl -I$(top_srcdir)/lib/gl $(CODE_COVERAGE_CPPFLAGS)
+ 
+ LDADD = ../lib/libtasn1.la
+-LDFLAGS = $(CODE_COVERAGE_LDFLAGS)
++AM_LDFLAGS = $(CODE_COVERAGE_LDFLAGS)
+ 
+ bin_PROGRAMS = asn1Parser asn1Coding asn1Decoding
+ 
+-- 
+2.21.0
+

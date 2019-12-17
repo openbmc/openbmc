@@ -1,25 +1,33 @@
-Add alises for arm64 which is same as aarch64
+From c9fc9e9a44b0fb764ce86a5e57f17d3c5bbfd8cd Mon Sep 17 00:00:00 2001
+From: Vincent Prince <vincent.prince.fr@gmail.com>
+Date: Mon, 16 Sep 2019 13:37:10 +0200
+Subject: [PATCH 05/10] Add alises for arm64 which is same as aarch64
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-Upstream-Status: Pending
+Signed-off-by: Vincent Prince <vincent.prince.fr@gmail.com>
+---
+ SConstruct                                      | 1 +
+ src/third_party/IntelRDFPMathLib20U1/SConscript | 2 +-
+ src/third_party/wiredtiger/SConscript           | 2 +-
+ 3 files changed, 3 insertions(+), 2 deletions(-)
 
-Index: git/SConstruct
-===================================================================
---- git.orig/SConstruct
-+++ git/SConstruct
-@@ -1055,6 +1055,7 @@ elif endian == "big":
+diff --git a/SConstruct b/SConstruct
+index e63cf15..5593c78 100644
+--- a/SConstruct
++++ b/SConstruct
+@@ -1129,6 +1129,7 @@ elif endian == "big":
  processor_macros = {
-     'arm'     : { 'endian': 'little', 'defines': ('__arm__',) },
-     'aarch64' : { 'endian': 'little', 'defines': ('__arm64__', '__aarch64__')},
-+    'arm64'   : { 'endian': 'little', 'defines': ('__arm64__', '__aarch64__')},
-     'i386'    : { 'endian': 'little', 'defines': ('__i386', '_M_IX86')},
-     'ppc64le' : { 'endian': 'little', 'defines': ('__powerpc64__',)},
-     's390x'   : { 'endian': 'big',    'defines': ('__s390x__',)},
-Index: git/src/third_party/IntelRDFPMathLib20U1/SConscript
-===================================================================
---- git.orig/src/third_party/IntelRDFPMathLib20U1/SConscript
-+++ git/src/third_party/IntelRDFPMathLib20U1/SConscript
-@@ -308,7 +308,7 @@ if processor == 'i386':
+     'arm'        : { 'endian': 'little', 'defines': ('__arm__',) },
+     'aarch64'    : { 'endian': 'little', 'defines': ('__arm64__', '__aarch64__')},
++    'arm64'      : { 'endian': 'little', 'defines': ('__arm64__', '__aarch64__')},
+     'i386'       : { 'endian': 'little', 'defines': ('__i386', '_M_IX86')},
+     'ppc64le'    : { 'endian': 'little', 'defines': ('__powerpc64__',)},
+     's390x'      : { 'endian': 'big',    'defines': ('__s390x__',)},
+diff --git a/src/third_party/IntelRDFPMathLib20U1/SConscript b/src/third_party/IntelRDFPMathLib20U1/SConscript
+index f23c071..fb82cd6 100644
+--- a/src/third_party/IntelRDFPMathLib20U1/SConscript
++++ b/src/third_party/IntelRDFPMathLib20U1/SConscript
+@@ -308,7 +308,7 @@ if processor == 'i386' or processor == 'emscripten':
  elif processor == 'arm':
      cpp_defines['IA32'] = '1'
      cpp_defines['ia32'] = '1'
@@ -28,11 +36,11 @@ Index: git/src/third_party/IntelRDFPMathLib20U1/SConscript
      cpp_defines['efi2'] = '1'
      cpp_defines['EFI2'] = '1'
  # Using 64 bit little endian
-Index: git/src/third_party/wiredtiger/SConscript
-===================================================================
---- git.orig/src/third_party/wiredtiger/SConscript
-+++ git/src/third_party/wiredtiger/SConscript
-@@ -151,7 +151,7 @@ condition_map = {
+diff --git a/src/third_party/wiredtiger/SConscript b/src/third_party/wiredtiger/SConscript
+index cdd090b..97a1b3b 100644
+--- a/src/third_party/wiredtiger/SConscript
++++ b/src/third_party/wiredtiger/SConscript
+@@ -152,7 +152,7 @@ condition_map = {
      'POSIX_HOST'   : not env.TargetOSIs('windows'),
      'WINDOWS_HOST' : env.TargetOSIs('windows'),
  
@@ -41,3 +49,6 @@ Index: git/src/third_party/wiredtiger/SConscript
      'POWERPC_HOST' : env['TARGET_ARCH'] == 'ppc64le',
      'X86_HOST'     : env['TARGET_ARCH'] == 'x86_64',
      'ZSERIES_HOST' : env['TARGET_ARCH'] == 's390x',
+-- 
+2.7.4
+

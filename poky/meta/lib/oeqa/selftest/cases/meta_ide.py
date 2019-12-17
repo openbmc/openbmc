@@ -5,9 +5,11 @@
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.sdk.utils.sdkbuildproject import SDKBuildProject
 from oeqa.utils.commands import bitbake, get_bb_vars, runCmd
+from oeqa.core.decorator import OETestTag
 import tempfile
 import shutil
 
+@OETestTag("machine")
 class MetaIDE(OESelftestTestCase):
 
     @classmethod

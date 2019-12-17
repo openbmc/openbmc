@@ -5,10 +5,16 @@
 
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import runCmd, bitbake, get_bb_var, get_bb_vars
+import bb.utils
 import functools
 import multiprocessing
 import textwrap
+import json
 import unittest
+import tempfile
+import shutil
+import stat
+import os
 
 MISSING = 'MISSING'
 DIFFERENT = 'DIFFERENT'
@@ -71,8 +77,9 @@ def compare_file(reference, test, diffutils_sysroot):
     return result
 
 class ReproducibleTests(OESelftestTestCase):
-    package_classes = ['deb']
+    package_classes = ['deb', 'ipk']
     images = ['core-image-minimal']
+    save_results = False
 
     def setUpLocal(self):
         super().setUpLocal()
@@ -81,14 +88,12 @@ class ReproducibleTests(OESelftestTestCase):
         for v in needed_vars:
             setattr(self, v.lower(), bb_vars[v])
 
-        if not hasattr(self.tc, "extraresults"):
-            self.tc.extraresults = {}
-        self.extras = self.tc.extraresults
-
-        self.extras.setdefault('reproducible.rawlogs', {})['log'] = ''
+        self.extrasresults = {}
+        self.extrasresults.setdefault('reproducible.rawlogs', {})['log'] = ''
+        self.extrasresults.setdefault('reproducible', {}).setdefault('files', {})
 
     def append_to_log(self, msg):
-        self.extras['reproducible.rawlogs']['log'] += msg
+        self.extrasresults['reproducible.rawlogs']['log'] += msg
 
     def compare_packages(self, reference_dir, test_dir, diffutils_sysroot):
         result = PackageCompareResults()
@@ -114,47 +119,84 @@ class ReproducibleTests(OESelftestTestCase):
         result.sort()
         return result
 
-    @unittest.skip("Reproducible builds do not yet pass")
+    def write_package_list(self, package_class, name, packages):
+        self.extrasresults['reproducible']['files'].setdefault(package_class, {})[name] = [
+                {'reference': p.reference, 'test': p.test} for p in packages]
+
+    def copy_file(self, source, dest):
+        bb.utils.mkdirhier(os.path.dirname(dest))
+        shutil.copyfile(source, dest)
+
     def test_reproducible_builds(self):
         capture_vars = ['DEPLOY_DIR_' + c.upper() for c in self.package_classes]
 
-        common_config = textwrap.dedent('''\
-            INHERIT += "reproducible_build"
-            PACKAGE_CLASSES = "%s"
-            ''') % (' '.join('package_%s' % c for c in self.package_classes))
-
-        # Do an initial build. It's acceptable for this build to use sstate
-        self.write_config(common_config)
-        vars_reference = get_bb_vars(capture_vars)
-        bitbake(' '.join(self.images))
+        if self.save_results:
+            save_dir = tempfile.mkdtemp(prefix='oe-reproducible-')
+            os.chmod(save_dir, stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
+            self.logger.info('Non-reproducible packages will be copied to %s', save_dir)
 
         # Build native utilities
+        self.write_config('')
         bitbake("diffutils-native -c addto_recipe_sysroot")
         diffutils_sysroot = get_bb_var("RECIPE_SYSROOT_NATIVE", "diffutils-native")
 
-        # Perform another build. This build should *not* share sstate or pull
-        # from any mirrors, but sharing a DL_DIR is fine
-        self.write_config(textwrap.dedent('''\
-            TMPDIR = "${TOPDIR}/reproducible/tmp"
+        # Reproducible builds should not pull from sstate or mirrors, but
+        # sharing DL_DIR is fine
+        common_config = textwrap.dedent('''\
+            INHERIT += "reproducible_build"
+            PACKAGE_CLASSES = "%s"
             SSTATE_DIR = "${TMPDIR}/sstate"
-            SSTATE_MIRROR = ""
-            ''') + common_config)
-        vars_test = get_bb_vars(capture_vars)
+            ''') % (' '.join('package_%s' % c for c in self.package_classes))
+
+        # Perform a build.
+        reproducibleA_tmp = os.path.join(self.topdir, 'reproducibleA', 'tmp')
+        if os.path.exists(reproducibleA_tmp):
+            bb.utils.remove(reproducibleA_tmp, recurse=True)
+
+        self.write_config((textwrap.dedent('''\
+            TMPDIR = "%s"
+            ''') % reproducibleA_tmp) + common_config)
+        vars_A = get_bb_vars(capture_vars)
         bitbake(' '.join(self.images))
 
+        # Perform another build.
+        reproducibleB_tmp = os.path.join(self.topdir, 'reproducibleB', 'tmp')
+        if os.path.exists(reproducibleB_tmp):
+            bb.utils.remove(reproducibleB_tmp, recurse=True)
+
+        self.write_config((textwrap.dedent('''\
+            SSTATE_MIRROR = ""
+            TMPDIR = "%s"
+            ''') % reproducibleB_tmp) + common_config)
+        vars_B = get_bb_vars(capture_vars)
+        bitbake(' '.join(self.images))
+
+        # NOTE: The temp directories from the reproducible build are purposely
+        # kept after the build so it can be diffed for debugging.
+
         for c in self.package_classes:
-            package_class = 'package_' + c
+            with self.subTest(package_class=c):
+                package_class = 'package_' + c
 
-            deploy_reference = vars_reference['DEPLOY_DIR_' + c.upper()]
-            deploy_test = vars_test['DEPLOY_DIR_' + c.upper()]
+                deploy_A = vars_A['DEPLOY_DIR_' + c.upper()]
+                deploy_B = vars_B['DEPLOY_DIR_' + c.upper()]
 
-            result = self.compare_packages(deploy_reference, deploy_test, diffutils_sysroot)
+                result = self.compare_packages(deploy_A, deploy_B, diffutils_sysroot)
 
-            self.logger.info('Reproducibility summary for %s: %s' % (c, result))
+                self.logger.info('Reproducibility summary for %s: %s' % (c, result))
 
-            self.append_to_log('\n'.join("%s: %s" % (r.status, r.test) for r in result.total))
+                self.append_to_log('\n'.join("%s: %s" % (r.status, r.test) for r in result.total))
 
-            if result.missing or result.different:
-                self.fail("The following %s packages are missing or different: %s" %
-                        (c, ' '.join(r.test for r in (result.missing + result.different))))
+                self.write_package_list(package_class, 'missing', result.missing)
+                self.write_package_list(package_class, 'different', result.different)
+                self.write_package_list(package_class, 'same', result.same)
+
+                if self.save_results:
+                    for d in result.different:
+                        self.copy_file(d.reference, '/'.join([save_dir, d.reference]))
+                        self.copy_file(d.test, '/'.join([save_dir, d.test]))
+
+                if result.missing or result.different:
+                    self.fail("The following %s packages are missing or different: %s" %
+                            (c, ' '.join(r.test for r in (result.missing + result.different))))
 

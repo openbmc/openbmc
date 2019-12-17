@@ -1,7 +1,7 @@
 SUMMARY = "Flask extension for sending email"
 DESCRIPTION = "A Flask extension for sending email"
 HOMEPAGE = " https://github.com/rduplain/flask-email"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=5b16dfa6d3f275ace5985bb92949f770"
 
 SRC_URI[md5sum] = "04b35a42a44ec7aa724ec8ce55e2e08e"

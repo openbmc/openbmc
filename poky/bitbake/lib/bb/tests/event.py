@@ -561,14 +561,6 @@ class EventClassesTest(unittest.TestCase):
         self.assertEqual(event.fn(1), callback(1))
         self.assertEqual(event.pid, EventClassesTest._worker_pid)
 
-    def test_StampUpdate(self):
-        targets = ["foo", "bar"]
-        stampfns = [lambda:"foobar"]
-        event = bb.event.StampUpdate(targets, stampfns)
-        self.assertEqual(event.targets, targets)
-        self.assertEqual(event.stampPrefix, stampfns)
-        self.assertEqual(event.pid, EventClassesTest._worker_pid)
-
     def test_BuildBase(self):
         """ Test base class for bitbake build events """
         name = "foo"

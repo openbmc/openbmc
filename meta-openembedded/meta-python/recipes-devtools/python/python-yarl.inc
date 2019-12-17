@@ -8,3 +8,7 @@ SRC_URI[sha256sum] = "024ecdc12bc02b321bc66b41327f930d1c2c543fa9a561b39861da9388
 
 PYPI_PACKAGE = "yarl"
 inherit pypi
+RDEPENDS_${PN} = "\
+    ${PYTHON_PN}-multidict \
+    ${PYTHON_PN}-idna \
+"

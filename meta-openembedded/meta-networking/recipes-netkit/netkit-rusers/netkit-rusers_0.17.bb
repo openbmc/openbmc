@@ -2,9 +2,9 @@ DESCRIPTION = "netkit-rusers includes rusers - Displays who is logged in to mach
     rusersd - Logged in users server"
 HOMEPAGE = "ftp://ftp.uk.linux.org/pub/linux/Networking/netkit"
 SECTION = "net"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://rusers/rusers.c;beginline=2;endline=3;md5=f4fc634a4ce8c569911196b72b10770e"
-DEPENDS = " tcp-wrappers libtirpc rpcbind"
+DEPENDS = " tcp-wrappers libtirpc rpcbind rpcsvc-proto rpcsvc-proto-native"
 
 SRC_URI = "http://http.debian.net/debian/pool/main/n/${BPN}/${BPN}_${PV}.orig.tar.gz;name=archive \
            http://http.debian.net/debian/pool/main/n/${BPN}/${BPN}_${PV}-8.diff.gz;name=patch8 \
@@ -17,16 +17,12 @@ SRC_URI[archive.sha256sum] = "f00138651865ad2dcfec5dedda0cda403cb80c4ab68efcc3bb
 SRC_URI[patch8.md5sum] = "1ff498113e0f920d92088092e5570bdc"
 SRC_URI[patch8.sha256sum] = "14882dbdda4e37baa84d55b54b46c7e063a20fc9e04d1be1a2807643cd0f3067"
 
-inherit autotools-brokensep
-
 CFLAGS += "-I${STAGING_INCDIR}/tirpc"
-LIBS += "-ltirpc"
+
+EXTRA_OEMAKE = "RUSERSX=${STAGING_INCDIR}/rpcsvc/rusers.x"
 
 do_configure () {
-    ./configure --prefix=${prefix}
-    echo "LDFLAGS=${LDFLAGS}" >> MCONFIG
-    echo "USE_GLIBC=1" >> MCONFIG
-    echo "LIBS=${LIBS}" >> MCONFIG
+    ./configure --prefix=${prefix} --installroot=${D} --with-c-compiler="${CC}"
 }
 
 do_install () {
@@ -62,9 +58,6 @@ EOF
     install rusersd.conf ${D}/${sysconfdir}/xinetd.d/rusersd
 }
 
-
-INSANE_SKIP_${PN} = "already-stripped"
-
 PACKAGES = "${PN}-client ${PN}-server ${PN}-doc ${BPN}-dbg"
 FILES_${PN}-client = "${bindir}/*"
 FILES_${PN}-server = "${sbindir}/* ${sysconfdir}"
@@ -72,7 +65,8 @@ FILES_${PN}-doc = "${mandir}"
 FILES_${PN}-dbg = "${prefix}/src/debug \
             ${bindir}/.debug ${sbindir}/.debug"
 
-RDEPENDS_${PN}-server = "tcp-wrappers xinetd rpcbind"
+RDEPENDS_${PN}-server += "tcp-wrappers xinetd rpcbind"
 
 # http://errors.yoctoproject.org/Errors/Details/186962/
-EXCLUDE_FROM_WORLD_libc-musl = "1"
+COMPATIBLE_HOST_libc-musl = 'null'
+PNBLACKLIST[netkit-rusers] = "Fails to build rup.c:51:10: fatal error: rstat.h: No such file or directory"

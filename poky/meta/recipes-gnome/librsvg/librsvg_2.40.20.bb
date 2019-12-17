@@ -1,6 +1,10 @@
 SUMMARY = "Library for rendering SVG files"
-HOMEPAGE = "http://ftp.gnome.org/pub/GNOME/sources/librsvg/"
-BUGTRACKER = "https://bugzilla.gnome.org/"
+DESCRIPTION = "A small library to render Scalable Vector Graphics (SVG), \
+associated with the GNOME Project. It renders SVG files to Cairo surfaces. \
+Cairo is the 2D, antialiased drawing library that GNOME uses to draw things to \
+the screen or to generate output for printing."
+HOMEPAGE = "https://gitlab.gnome.org/GNOME/librsvg"
+BUGTRACKER = "https://gitlab.gnome.org/GNOME/librsvg/issues"
 
 RECIPE_NO_UPDATE_REASON = "Versions from 2.41.0 requires Rust compiler to build it"
 

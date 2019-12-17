@@ -1,0 +1,41 @@
+# HG changeset patch
+# User Sylvain Becker <sylvain.becker@gmail.com>
+# Date 1570898876 -7200
+#      Sat Oct 12 18:47:56 2019 +0200
+# Node ID 369b01006eb2f6fd563f7c315d29ae3fe503c432
+# Parent  4cbaffd0083b8cd17070dbd9d4ab1ce0fa9fca2d
+Fixed bug 4797 - SDL fails to compile with Mesa Master (thanks Michael Olbrich!)
+
+fix building with Mesa 19.2
+
+With Mesa 19.2 building fails with:
+
+/include/GLES/gl.h:63:25: error: conflicting types for 'GLsizeiptr'
+
+The same type is defined in include/SDL_opengl.h for OpenGL and the two
+headers should not be included at the same time.
+This was just never noticed because the same header guard '__gl_h_' was
+used. This was changed in Mesa. The result is this error.
+
+Fix this the same way GLES2 already handles this: Don't include the GLES
+header when the OpenGL header was already included.
+(https://hg.libsdl.org/SDL/rev/a60b3c292f0f)
+
+Upstream-Status: Backport [https://hg.libsdl.org/SDL/rev/369b01006eb2]
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+
+diff --git a/src/video/SDL_video.c b/src/video/SDL_video.c
+--- a/src/video/SDL_video.c
++++ b/src/video/SDL_video.c
+@@ -37,9 +37,9 @@
+ #include "SDL_opengl.h"
+ #endif /* SDL_VIDEO_OPENGL */
+ 
+-#if SDL_VIDEO_OPENGL_ES
++#if SDL_VIDEO_OPENGL_ES && !SDL_VIDEO_OPENGL
+ #include "SDL_opengles.h"
+-#endif /* SDL_VIDEO_OPENGL_ES */
++#endif /* SDL_VIDEO_OPENGL_ES && !SDL_VIDEO_OPENGL */
+ 
+ /* GL and GLES2 headers conflict on Linux 32 bits */
+ #if SDL_VIDEO_OPENGL_ES2 && !SDL_VIDEO_OPENGL

@@ -3,8 +3,8 @@ LICENSE = "GPLv2 & Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE.GPL.v2;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://LICENSE.Apache.v2;md5=34281e312165f843a2b7d1f114fe65ce"
 
-SRC_URI[md5sum] = "2f6f951e94356ae9d224f417dc6ebed2"
-SRC_URI[sha256sum] = "42bf74495d95a0196a74dd171357f660175aba2bfc23f9b5f63e3830ccbef9ac"
+SRC_URI[md5sum] = "371683b62314211b8bc9807ac8ef1144"
+SRC_URI[sha256sum] = "963fce07da2841456d39e3b932b071f6de28d23dadfae014022d67a752916f98"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/python-pyroute2:"
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #
 # Copyright (C) 2003, 2004  Chris Larson
 # Copyright (C) 2003, 2004  Phil Blundell
@@ -255,6 +254,11 @@ class BitBakeConfigParameters(cookerdata.ConfigParameters):
                           help="Do not run any setscene tasks. sstate will be ignored and "
                                "everything needed, built.")
 
+        parser.add_option("", "--skip-setscene", action="store_true",
+                          dest="skipsetscene", default=False,
+                          help="Skip setscene tasks if they would be executed. Tasks previously "
+                               "restored from sstate will be kept, unlike --no-setscene")
+
         parser.add_option("", "--setscene-only", action="store_true",
                           dest="setsceneonly", default=False,
                           help="Only run setscene tasks, don't run any real tasks.")
@@ -448,12 +452,7 @@ def setup_bitbake(configParams, configuration, extrafeatures=None):
                             bb.utils.unlockfile(lock)
                         raise bb.server.process.ProcessTimeout("Bitbake still shutting down as socket exists but no lock?")
                 if not configParams.server_only:
-                    try:
-                        server_connection = bb.server.process.connectProcessServer(sockname, featureset)
-                    except EOFError:
-                        # The server may have been shutting down but not closed the socket yet. If that happened,
-                        # ignore it.
-                        pass
+                    server_connection = bb.server.process.connectProcessServer(sockname, featureset)
 
                 if server_connection or configParams.server_only:
                     break
@@ -464,12 +463,13 @@ def setup_bitbake(configParams, configuration, extrafeatures=None):
                     raise
                 retries -= 1
                 tryno = 8 - retries
-                if isinstance(e, (bb.server.process.ProcessTimeout, BrokenPipeError)):
+                if isinstance(e, (bb.server.process.ProcessTimeout, BrokenPipeError, EOFError)):
                     logger.info("Retrying server connection (#%d)..." % tryno)
                 else:
                     logger.info("Retrying server connection (#%d)... (%s)" % (tryno, traceback.format_exc()))
             if not retries:
-                bb.fatal("Unable to connect to bitbake server, or start one")
+                bb.fatal("Unable to connect to bitbake server, or start one (server startup failures would be in bitbake-cookerdaemon.log).")
+            bb.event.print_ui_queue()
             if retries < 5:
                 time.sleep(5)
 

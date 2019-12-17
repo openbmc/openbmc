@@ -97,7 +97,6 @@ python do_compile () {
 }
 
 do_install_append() {
-	install -d ${D}/mnt/.psplash/
 	install -d ${D}${sysconfdir}/init.d/
 	install -m 0755 ${WORKDIR}/psplash-init ${D}${sysconfdir}/init.d/psplash.sh
 	install -d ${D}${bindir}
@@ -106,8 +105,6 @@ do_install_append() {
 	done
 	rm -f ${D}${bindir}/psplash
 }
-
-FILES_${PN} += "/mnt/.psplash"
 
 INITSCRIPT_NAME = "psplash.sh"
 INITSCRIPT_PARAMS = "start 0 S . stop 20 0 1 6 ."

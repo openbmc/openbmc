@@ -1,0 +1,56 @@
+From f210d7e19b721041f31b7f258a169f89dc850303 Mon Sep 17 00:00:00 2001
+From: Jan Stancek <jstancek@redhat.com>
+Date: Thu, 4 Jul 2019 16:45:23 +0200
+Subject: [PATCH] direct_io/diotest4: drop MAP_FIXED
+
+Hongzhi reports that this test is failing on mips64 with 5.1+:
+  diotest4 10 TBROK : diotest4.c:368: can't mmap file: Invalid argument
+  diotest4 11 TBROK : diotest4.c:368: Remaining cases broken
+I could reproduce it on emulated 5kc-malta, running 5.2.0-rc7.
+
+Test is trying to map into area immediately following heap as MAP_SHARED,
+but it used wrong alignment (fixed by 'lapi/mmap.h: include config.h').
+
+Usage of MAP_FIXED seems unnecessary, so drop that too and let the kernel
+pick an address.
+
+Reported-by: Hongzhi.Song <hongzhi.song@windriver.com>
+Signed-off-by: Jan Stancek <jstancek@redhat.com>
+Acked-by: Cyril Hrubis <chrubis@suse.cz>
+
+Upstream-Status: Backport
+[https://github.com/linux-test-project/ltp/commit/f5444eeeabf252b8884b9465d277b6af853819e3]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ testcases/kernel/io/direct_io/diotest4.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/testcases/kernel/io/direct_io/diotest4.c b/testcases/kernel/io/direct_io/diotest4.c
+index e4616e4..bf200cd 100644
+--- a/testcases/kernel/io/direct_io/diotest4.c
++++ b/testcases/kernel/io/direct_io/diotest4.c
+@@ -352,18 +352,14 @@ int main(int argc, char *argv[])
+ 	total++;
+ 
+ 	/* Test-10: read, write to a mmaped file */
+-	shm_base = (char *)(((long)sbrk(0) + (shmsz - 1)) & ~(shmsz - 1));
+-	if (shm_base == NULL) {
+-		tst_brkm(TBROK, cleanup, "sbrk failed: %s", strerror(errno));
+-	}
+ 	offset = 4096;
+ 	count = bufsize;
+ 	if ((fd = open(filename, O_DIRECT | O_RDWR)) < 0) {
+ 		tst_brkm(TBROK, cleanup, "can't open %s: %s",
+ 			 filename, strerror(errno));
+ 	}
+-	shm_base = mmap(shm_base, 0x100000, PROT_READ | PROT_WRITE,
+-			MAP_SHARED | MAP_FIXED, fd, 0);
++	shm_base = mmap(0, 0x100000, PROT_READ | PROT_WRITE,
++			MAP_SHARED, fd, 0);
+ 	if (shm_base == (caddr_t) - 1) {
+ 		tst_brkm(TBROK, cleanup, "can't mmap file: %s",
+ 			 strerror(errno));
+-- 
+2.7.4
+

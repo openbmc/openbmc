@@ -9849,6 +9849,27 @@
             "UserAction": null,
             "VMMigrationFlag": null
         },
+        "xyz.openbmc_project.Certs.Error.InvalidCertificate": {
+            "AffectedLEDs": null,
+            "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
+            "BMCMessageID": "xyz.openbmc_project.Certs.Error.InvalidCertificate",
+            "CallHomeCandidate": false,
+            "CommonEventID": "FQPSPCR0075G",
+            "ComponentInstance": null,
+            "DateAdded": null,
+            "DateReviewed": null,
+            "EventType": "Firmware/Software Failure",
+            "Internal": false,
+            "LengthyDescription": "The provided certificate is not valid. The BMC will continue operating with the old certificate.",
+            "LogSource": "BMC",
+            "Message": "The provided certificate is not valid",
+            "ReferencedInventory": null,
+            "RelatedEventIDs": {},
+            "Serviceable": true,
+            "Severity": "Warning",
+            "UserAction": null,
+            "VMMigrationFlag": null
+        },
         "xyz.openbmc_project.Certs.Install.Error.InvalidCertificate": {
             "AffectedLEDs": null,
             "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
@@ -17451,6 +17472,48 @@
             "UserAction": null,
             "VMMigrationFlag": null
         },
+        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/gpio-fsi/fsi-master/fsi0/slave@00:00/00:00:00:06/sbefifo1-dev0/occ-hwmon.1": {
+            "AffectedLEDs": null,
+            "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
+            "BMCMessageID": "xyz.openbmc_project.Sensor.Device.Error.ReadFailure",
+            "CallHomeCandidate": false,
+            "CommonEventID": "FQPSPCR0063F",
+            "ComponentInstance": 0,
+            "DateAdded": null,
+            "DateReviewed": null,
+            "EventType": "Communication Failure/Timeout",
+            "Internal": false,
+            "LengthyDescription": null,
+            "LogSource": "BMC",
+            "Message": "Failed to read from the OCC on CPU 0",
+            "ReferencedInventory": "/xyz/openbmc_project/inventory/system/chassis/motherboard/cpu0",
+            "RelatedEventIDs": {},
+            "Serviceable": false,
+            "Severity": "Warning",
+            "UserAction": null,
+            "VMMigrationFlag": null
+        },
+        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/gpio-fsi/fsi-master/fsi0/slave@00:00/00:00:00:0a/fsi-master/fsi1/slave@01:00/01:01:00:06/sbefifo2-dev0/occ-hwmon.2": {
+            "AffectedLEDs": null,
+            "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
+            "BMCMessageID": "xyz.openbmc_project.Sensor.Device.Error.ReadFailure",
+            "CallHomeCandidate": false,
+            "CommonEventID": "FQPSPCR0063F",
+            "ComponentInstance": 1,
+            "DateAdded": null,
+            "DateReviewed": null,
+            "EventType": "Communication Failure/Timeout",
+            "Internal": false,
+            "LengthyDescription": null,
+            "LogSource": "BMC",
+            "Message": "Failed to read from the OCC on CPU 1",
+            "ReferencedInventory": "/xyz/openbmc_project/inventory/system/chassis/motherboard/cpu1",
+            "RelatedEventIDs": {},
+            "Serviceable": false,
+            "Severity": "Warning",
+            "UserAction": null,
+            "VMMigrationFlag": null
+        },
         "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/gpio-fsi/fsi0/slave@00:00/00:00:00:06/sbefifo1-dev0/occ-hwmon.1": {
             "AffectedLEDs": null,
             "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
@@ -22218,6 +22281,27 @@
             "UserAction": null,
             "VMMigrationFlag": null
         },
+        "xyz.openbmc_project.State.Shutdown.Power.Error.Blackout": {
+            "AffectedLEDs": null,
+            "AffectedSubsystem": "Power",
+            "BMCMessageID": "xyz.openbmc_project.State.Shutdown.Power.Error.Blackout",
+            "CallHomeCandidate": false,
+            "CommonEventID": "FQPSPPW0065F",
+            "ComponentInstance": null,
+            "DateAdded": "10/29/2019",
+            "DateReviewed": null,
+            "EventType": "Unrecoverable Hardware Failure",
+            "Internal": false,
+            "LengthyDescription": null,
+            "LogSource": "BMC",
+            "Message": "All power input was lost and caused an unexpected shutdown while the host was powered on",
+            "ReferencedInventory": null,
+            "RelatedEventIDs": {},
+            "Serviceable": false,
+            "Severity": "Warning",
+            "UserAction": null,
+            "VMMigrationFlag": null
+        },
         "xyz.openbmc_project.State.Shutdown.Power.Error.Fault": {
             "AffectedLEDs": null,
             "AffectedSubsystem": "Cooling",
@@ -22431,7 +22515,7 @@
     },
     "fileInfo": {
         "Entity": "IBM OpenBMC",
-        "Version": "1.8.3",
+        "Version": "1.8.4",
         "language": "English"
     }
 }

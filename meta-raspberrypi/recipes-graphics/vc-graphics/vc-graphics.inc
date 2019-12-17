@@ -1,5 +1,5 @@
 DESCRIPTION = "Graphics libraries for BCM2835."
-LICENSE = "Proprietary"
+LICENSE = "Broadcom-RPi"
 
 LIC_FILES_CHKSUM = "file://LICENCE;md5=86e53f5f5909ee66900418028de11780"
 
@@ -8,7 +8,7 @@ COMPATIBLE_MACHINE = "^rpi$"
 
 INHIBIT_DEFAULT_DEPS = "1"
 
-include recipes-bsp/common/firmware.inc
+include recipes-bsp/common/raspberrypi-firmware.inc
 
 SRC_URI += " \
     file://egl.pc \

@@ -57,7 +57,7 @@ class ClamavTest(OERuntimeTestCase):
                'Status and output:%s and %s' % (status, output))
             self.assertEqual(status, 1, msg = msg)
 
-    @OETestDepends(['clamav.ClamavTest.test_freshclam_download'])
+    @OETestDepends(['clamav.ClamavTest.test_ping_clamav_net'])
     def test_freshclam_check_mirrors(self):
         status, output = self.target.run('freshclam --list-mirrors')
         match = re.search('Failures: 0', output)

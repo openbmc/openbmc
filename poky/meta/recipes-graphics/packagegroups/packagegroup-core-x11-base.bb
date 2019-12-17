@@ -2,7 +2,7 @@ SUMMARY = "Basic X11 session"
 DESCRIPTION = "Packages required to set up a basic working X11 session"
 PR = "r1"
 
-inherit packagegroup distro_features_check
+inherit packagegroup features_check
 # rdepends on matchbox-wm
 REQUIRED_DISTRO_FEATURES = "x11"
 

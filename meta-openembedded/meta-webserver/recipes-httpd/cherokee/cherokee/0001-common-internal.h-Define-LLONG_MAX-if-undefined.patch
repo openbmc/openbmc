@@ -1,0 +1,47 @@
+From c73415021f3f3b2b30062ab74b25fe49c51c2242 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 10 Nov 2019 15:59:44 -0800
+Subject: [PATCH] common-internal.h: Define LLONG_MAX if undefined
+
+time_t can also be long long type, therefore check for that as fallback
+Fixes build on 32bit hosts where time_t is fixed for Y2K38
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ cherokee/common-internal.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/cherokee/common-internal.h b/cherokee/common-internal.h
+index 5c28da97..5646ec0f 100644
+--- a/cherokee/common-internal.h
++++ b/cherokee/common-internal.h
+@@ -222,6 +222,16 @@ char *strcasestr(char *s, char *find);
+ # endif
+ #endif
+ 
++/* Long Long limit
++ */
++#ifndef LLONG_MAX
++# if (__SIZEOF_LONG_LONG__ == 8)
++#  define LLONG_MAX 0x7fffffffffffffffLL
++# else
++#  error "Can't define LLONG_MAX"
++# endif
++#endif
++
+ /* time_t limit
+  */
+ #ifndef TIME_MAX
+@@ -229,6 +239,8 @@ char *strcasestr(char *s, char *find);
+ #  define TIME_MAX ((time_t)INT_MAX)
+ # elif (SIZEOF_TIME_T == SIZEOF_LONG)
+ #  define TIME_MAX ((time_t)LONG_MAX)
++# elif (SIZEOF_TIME_T == __SIZEOF_LONG_LONG__)
++#  define TIME_MAX ((time_t)LLONG_MAX)
+ # else
+ #  error "Can't define TIME_MAX"
+ # endif
+-- 
+2.24.0
+

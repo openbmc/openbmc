@@ -16,6 +16,8 @@ Upstream-Status: Denied
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+[rebased for systemd 243]
+Signed-off-by: Scott Murray <scott.murray@konsulko.com>
 ---
  units/meson.build                       | 6 ++----
  units/proc-sys-fs-binfmt_misc.automount | 3 +++
@@ -23,10 +25,10 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  3 files changed, 9 insertions(+), 4 deletions(-)
 
 diff --git a/units/meson.build b/units/meson.build
-index d695084..7b1f14a 100644
+index e1ee9f86c3..6bb7771b36 100644
 --- a/units/meson.build
 +++ b/units/meson.build
-@@ -47,8 +47,7 @@ units = [
+@@ -46,8 +46,7 @@ units = [
          ['poweroff.target',                     '',
           'runlevel0.target'],
          ['printer.target',                      ''],
@@ -36,7 +38,7 @@ index d695084..7b1f14a 100644
          ['proc-sys-fs-binfmt_misc.mount',       'ENABLE_BINFMT'],
          ['reboot.target',                       '',
           'runlevel6.target ctrl-alt-del.target'],
-@@ -134,8 +133,7 @@ in_units = [
+@@ -130,8 +129,7 @@ in_units = [
          ['systemd-ask-password-console.service', ''],
          ['systemd-ask-password-wall.service',    ''],
          ['systemd-backlight@.service',           'ENABLE_BACKLIGHT'],
@@ -45,9 +47,9 @@ index d695084..7b1f14a 100644
 +        ['systemd-binfmt.service',               'ENABLE_BINFMT'],
          ['systemd-bless-boot.service',           'ENABLE_EFI HAVE_BLKID'],
          ['systemd-boot-check-no-failures.service', ''],
-         ['systemd-coredump@.service',            'ENABLE_COREDUMP'],
+         ['systemd-boot-system-token.service',    'ENABLE_EFI',
 diff --git a/units/proc-sys-fs-binfmt_misc.automount b/units/proc-sys-fs-binfmt_misc.automount
-index 30a6bc9..4231f3b 100644
+index 30a6bc9918..4231f3b70f 100644
 --- a/units/proc-sys-fs-binfmt_misc.automount
 +++ b/units/proc-sys-fs-binfmt_misc.automount
 @@ -18,3 +18,6 @@ ConditionPathIsReadWrite=/proc/sys/
@@ -58,7 +60,7 @@ index 30a6bc9..4231f3b 100644
 +[Install]
 +WantedBy=sysinit.target
 diff --git a/units/systemd-binfmt.service.in b/units/systemd-binfmt.service.in
-index e940c7c..6be7f5c 100644
+index e940c7c9ad..6be7f5cc9b 100644
 --- a/units/systemd-binfmt.service.in
 +++ b/units/systemd-binfmt.service.in
 @@ -14,6 +14,7 @@ Documentation=https://www.kernel.org/doc/html/latest/admin-guide/binfmt-misc.htm
@@ -76,6 +78,3 @@ index e940c7c..6be7f5c 100644
 +
 +[Install]
 +WantedBy=sysinit.target
--- 
-2.7.4
-

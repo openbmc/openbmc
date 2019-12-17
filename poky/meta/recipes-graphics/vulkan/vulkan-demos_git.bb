@@ -20,8 +20,8 @@ S = "${WORKDIR}/git"
 
 REQUIRED_DISTRO_FEATURES = 'vulkan'
 
-inherit cmake distro_features_check
-DEPENDS = "vulkan assimp"
+inherit cmake features_check
+DEPENDS = "vulkan-loader assimp"
 
 do_install_append () {
     # Remove assets that have uncertain licenses

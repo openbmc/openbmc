@@ -17,7 +17,7 @@ UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>(\d+(\.\d+)+))"
 
 S = "${WORKDIR}/git"
 
-inherit autotools pkgconfig gconf distro_features_check
+inherit autotools pkgconfig gconf features_check
 
 FILES_${PN} = 	"${bindir}/* ${sysconfdir}"
 

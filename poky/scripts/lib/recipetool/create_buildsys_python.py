@@ -154,8 +154,13 @@ class PythonRecipeHandler(RecipeHandler):
         if 'buildsystem' in handled:
             return False
 
-        if not RecipeHandler.checkfiles(srctree, ['setup.py']):
-            return
+        # Check for non-zero size setup.py files
+        setupfiles = RecipeHandler.checkfiles(srctree, ['setup.py'])
+        for fn in setupfiles:
+            if os.path.getsize(fn):
+                break
+        else:
+            return False
 
         # setup.py is always parsed to get at certain required information, such as
         # distutils vs setuptools

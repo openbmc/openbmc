@@ -21,8 +21,8 @@
 
 DAEMON=@bindir@/dbus-daemon
 NAME=dbus
-DAEMONUSER=messagebus           # must match /etc/dbus-1/system.conf
-PIDFILE=/var/run/messagebus.pid # must match /etc/dbus-1/system.conf
+DAEMONUSER=messagebus           # must match /usr/share/dbus-1/system.conf
+PIDFILE=/var/run/dbus/pid # must match /usr/share/dbus-1/system.conf
 UUIDDIR=/var/lib/dbus
 DESC="system message bus"
 EVENTDIR=/etc/dbus-1/event.d

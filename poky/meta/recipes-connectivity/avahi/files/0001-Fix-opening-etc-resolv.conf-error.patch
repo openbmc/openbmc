@@ -19,6 +19,11 @@ is marked as OE specific.
 Upstream-Status: Inappropriate [OE Specific]
 
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+
+When connman installed to image, /etc/resolv.conf is link to
+/etc/resolv-conf.connman. So launch avahi-daemon after connman too.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  avahi-daemon/avahi-daemon.service.in | 1 +
  1 file changed, 1 insertion(+)
@@ -31,7 +36,7 @@ index 548c834..63e28e4 100644
  [Unit]
  Description=Avahi mDNS/DNS-SD Stack
  Requires=avahi-daemon.socket
-+After=systemd-resolved.service
++After=systemd-resolved.service connman.service
  
  [Service]
  Type=dbus

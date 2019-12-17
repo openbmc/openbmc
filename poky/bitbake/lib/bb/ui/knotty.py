@@ -660,7 +660,6 @@ def main(server, eventHandler, params, tf = TerminalFilter):
             # ignore
             if isinstance(event, (bb.event.BuildBase,
                                   bb.event.MetadataEvent,
-                                  bb.event.StampUpdate,
                                   bb.event.ConfigParsed,
                                   bb.event.MultiConfigParsed,
                                   bb.event.RecipeParsed,
@@ -690,17 +689,27 @@ def main(server, eventHandler, params, tf = TerminalFilter):
             if params.observe_only:
                 print("\nKeyboard Interrupt, exiting observer...")
                 main.shutdown = 2
-            if not params.observe_only and main.shutdown == 1:
+
+            def state_force_shutdown():
                 print("\nSecond Keyboard Interrupt, stopping...\n")
                 _, error = server.runCommand(["stateForceShutdown"])
                 if error:
                     logger.error("Unable to cleanly stop: %s" % error)
+
+            if not params.observe_only and main.shutdown == 1:
+                state_force_shutdown()
+
             if not params.observe_only and main.shutdown == 0:
                 print("\nKeyboard Interrupt, closing down...\n")
                 interrupted = True
-                _, error = server.runCommand(["stateShutdown"])
-                if error:
-                    logger.error("Unable to cleanly shutdown: %s" % error)
+                # Capture the second KeyboardInterrupt during stateShutdown is running
+                try:
+                    _, error = server.runCommand(["stateShutdown"])
+                    if error:
+                        logger.error("Unable to cleanly shutdown: %s" % error)
+                except KeyboardInterrupt:
+                    state_force_shutdown()
+
             main.shutdown = main.shutdown + 1
             pass
         except Exception as e:

@@ -1,32 +1,30 @@
-From 048e1844092cb4b3afd23f16fc2cc70dd2e122b7 Mon Sep 17 00:00:00 2001
-From: Robert Yang <liezhi.yang@windriver.com>
-Date: Mon, 24 Dec 2018 17:57:14 -0800
-Subject: [PATCH] Makefile.am: Fix a race issue for tools
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@intel.com>
 
-Fixed:
-cp ../bluez-5.50/tools/hid2hci.rules tools/97-hid2hci.rules
-cp: cannot create regular file tools/97-hid2hci.rules: No such file or directory
-make[1]: *** [tools/97-hid2hci.rules] Error 1
+From 117c41242c01e057295aed80ed973c6dc7e35fe2 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Tue, 8 Oct 2019 11:01:56 +0100
+Subject: [PATCH BlueZ] Makefile.am: add missing mkdir in rules generation
 
-Upstream-Status: Submitted[https://www.spinics.net/lists/linux-bluetooth/msg78361.html]
-
-Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+In parallel out-of-tree builds it's possible that tools/*.rules are
+generated before the target directory has been implicitly created. Solve this by
+creating the directory before writing into it.
 ---
  Makefile.am | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/Makefile.am b/Makefile.am
-index 6d1ff11..35a01f2 100644
+index 2ac28b23d..e7bcd2366 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -504,6 +504,7 @@ src/builtin.h: src/genbuiltin $(builtin_sources)
+@@ -589,6 +589,7 @@ src/builtin.h: src/genbuiltin $(builtin_sources)
  	$(AM_V_GEN)$(srcdir)/src/genbuiltin $(builtin_modules) > $@
  
  tools/%.rules:
-+	[ -e tools ] || $(MKDIR_P) tools
++	$(AM_V_at)$(MKDIR_P) tools
  	$(AM_V_GEN)cp $(srcdir)/$(subst 97-,,$@) $@
  
  $(lib_libbluetooth_la_OBJECTS): $(local_headers)
 -- 
-2.10.2
+2.20.1
 

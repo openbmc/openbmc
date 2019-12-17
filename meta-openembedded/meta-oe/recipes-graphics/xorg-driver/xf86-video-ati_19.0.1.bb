@@ -9,7 +9,7 @@ DESCRIPTION = "Open-source X.org graphics driver for ATI Radeon graphics"
 DEPENDS += "virtual/libx11 libxvmc drm \
             virtual/libgl xorgproto libpciaccess"
 
-inherit distro_features_check
+inherit features_check
 REQUIRED_DISTRO_FEATURES += "opengl"
 
 SRC_URI[md5sum] = "47eccf71823206ade9629cba69de7ef6"

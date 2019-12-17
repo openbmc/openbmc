@@ -8,7 +8,7 @@ ENC2XS_NO_COMMENTS environment variable. This allows enc2xs to produce
 reproducible output by omitting the name of the generating program.
 
 Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
-Upstream-status: Accepted [https://github.com/dankogai/p5-encode/pull/145]
+Upstream-Status: Accepted [https://github.com/dankogai/p5-encode/pull/145]
 ---
  cpan/Encode/bin/enc2xs | 1 +
  1 file changed, 1 insertion(+)

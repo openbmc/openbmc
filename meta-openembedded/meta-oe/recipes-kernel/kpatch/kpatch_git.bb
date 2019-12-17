@@ -2,9 +2,9 @@ require kpatch.inc
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-SRCREV = "7f550f01bd308cf058ae782327d29c8916cc5602"
+SRCREV = "2a29bc7dea9a7da12705c7b50315eee1acdd9156"
 
-PV = "0.6.1+git${SRCPV}"
+PV = "0.8.0"
 
 S = "${WORKDIR}/git"
 

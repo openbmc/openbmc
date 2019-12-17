@@ -20,4 +20,4 @@ fi
 path="${path//:/--}"
 path="${path//-/\\x2d}"
 
-systemctl $action 'xyz.openbmc_project.Hwmon@'$path'.service'
+systemctl --no-block $action 'xyz.openbmc_project.Hwmon@'$path'.service'

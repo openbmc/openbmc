@@ -6,7 +6,7 @@ HOMEPAGE = "http://www.unixodbc.org/"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7b37bf80a3df5a65b355433ae36d206"
 
-DEPENDS = "libtool mysql5"
+DEPENDS = "libtool readline"
 
 SRC_URI = "http://ftp.unixodbc.org/unixODBC-${PV}.tar.gz \
            file://do-not-use-libltdl-source-directory.patch \

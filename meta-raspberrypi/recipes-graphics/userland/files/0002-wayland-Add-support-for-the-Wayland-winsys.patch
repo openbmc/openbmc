@@ -1,7 +1,7 @@
-From ad6f485d9eb809b67398ce0948844dd30ea1c8e3 Mon Sep 17 00:00:00 2001
+From 7432d49ddca97b34e402d0108221d34ec69bcd66 Mon Sep 17 00:00:00 2001
 From: Tomeu Vizoso <tomeu.vizoso@collabora.com>
 Date: Tue, 1 Oct 2013 13:19:20 +0200
-Subject: [PATCH 02/18] wayland: Add support for the Wayland winsys
+Subject: [PATCH 02/19] wayland: Add support for the Wayland winsys
 
 * Adds EGL_WL_bind_wayland_display extension
 * Adds wayland-egl library
@@ -1551,12 +1551,12 @@ index 0000000..8bafc15
 +Libs: -L${libdir} -lwayland-egl
 +Cflags: -I${includedir}
 diff --git a/interface/vmcs_host/CMakeLists.txt b/interface/vmcs_host/CMakeLists.txt
-index fde18da..6718215 100755
+index a157db1..55b6ace 100755
 --- a/interface/vmcs_host/CMakeLists.txt
 +++ b/interface/vmcs_host/CMakeLists.txt
-@@ -9,13 +9,24 @@ add_definitions(-fno-strict-aliasing)
- 
- include_directories(${VMCS_TARGET}/vcfiled)
+@@ -7,13 +7,24 @@
+ # vc_vchi_gencmd.c has a type-punning problem in vc_gencmd_read_response
+ add_definitions(-fno-strict-aliasing)
  
 -add_library(vchostif
 -            ${VMCS_TARGET}/vcfilesys.c ${VMCS_TARGET}/vcmisc.c
@@ -1894,5 +1894,5 @@ index 0000000..ad90d30
 +    set(${_sources} ${${_sources}} PARENT_SCOPE)
 +endfunction()
 -- 
-2.21.0
+2.22.0
 

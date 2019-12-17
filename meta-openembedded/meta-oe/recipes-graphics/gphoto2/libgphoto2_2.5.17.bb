@@ -10,8 +10,6 @@ DEPENDS = "libtool jpeg virtual/libusb0 libexif zlib libxml2"
 # They are release specific, so please regen when adding new releases
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/gphoto/libgphoto2-${PV}.tar.bz2;name=libgphoto2 \
-           file://10-camera-libgphoto2-device.fdi \
-           file://10-camera-libgphoto2.fdi \
            file://40-libgphoto2.rules \
            file://0001-configure.ac-remove-AM_PO_SUBDIRS.patch \
 "
@@ -35,9 +33,6 @@ do_configure_append() {
 }
 
 do_install_append() {
-    install -d ${D}${datadir}/hal/fdi/information/20thirdparty
-    install -m 0644 ${WORKDIR}/*.fdi ${D}${datadir}/hal/fdi/information/20thirdparty/
-
     install -d ${D}${sysconfdir}/udev/rules.d/
     install -m 0755 ${WORKDIR}/*.rules ${D}${sysconfdir}/udev/rules.d/
 }
@@ -48,7 +43,7 @@ RRECOMMENDS_${PN} = "libgphoto2-camlibs"
 
 FILES_libgphotoport = "${libdir}/libgphoto2_port.so.*"
 
-FILES_${PN} += "${nonarch_base_libdir}/udev/* ${datadir}/hal"
+FILES_${PN} += "${nonarch_base_libdir}/udev/*"
 FILES_${PN}-dbg += "${libdir}/*/*/.debug"
 FILES_${PN}-dev += "${libdir}/*/*/*.la"
 FILES_${PN}-doc += "${datadir}/libgphoto2_port/0.12.0/vcamera/README.txt"

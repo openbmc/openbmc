@@ -1,4 +1,4 @@
-From 1cb804cf0e47116202011f3386b4739af668224a Mon Sep 17 00:00:00 2001
+From 4655dc18074e0be9d239f51dac32b61435da8549 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Thu, 27 Nov 2014 14:04:29 +0000
 Subject: [PATCH] qemu: Add missing wacom HID descriptor
@@ -19,10 +19,10 @@ Upstream-Status: Submitted
  1 file changed, 93 insertions(+), 1 deletion(-)
 
 diff --git a/hw/usb/dev-wacom.c b/hw/usb/dev-wacom.c
-index ac0bc83b..6f9b22d4 100644
+index 8c43db93..3ff8ca28 100644
 --- a/hw/usb/dev-wacom.c
 +++ b/hw/usb/dev-wacom.c
-@@ -72,6 +72,89 @@ static const USBDescStrings desc_strings = {
+@@ -74,6 +74,89 @@ static const USBDescStrings desc_strings = {
      [STR_SERIALNUMBER]     = "1",
  };
  
@@ -112,7 +112,7 @@ index ac0bc83b..6f9b22d4 100644
  static const USBDescIface desc_iface_wacom = {
      .bInterfaceNumber              = 0,
      .bNumEndpoints                 = 1,
-@@ -89,7 +172,7 @@ static const USBDescIface desc_iface_wacom = {
+@@ -91,7 +174,7 @@ static const USBDescIface desc_iface_wacom = {
                  0x00,          /*  u8  country_code */
                  0x01,          /*  u8  num_descriptors */
                  0x22,          /*  u8  type: Report */
@@ -121,7 +121,7 @@ index ac0bc83b..6f9b22d4 100644
              },
          },
      },
-@@ -269,6 +352,15 @@ static void usb_wacom_handle_control(USBDevice *dev, USBPacket *p,
+@@ -271,6 +354,15 @@ static void usb_wacom_handle_control(USBDevice *dev, USBPacket *p,
      }
  
      switch (request) {

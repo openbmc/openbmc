@@ -3,9 +3,9 @@ HOMEPAGE    = "http://www.la-samhna.de/samhain/"
 LICENSE     = "GPLv2"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=8ca43cbc842c2336e835926c2166c28b"
 
+PV = "4.3.3"
 
 SRC_URI = "http://la-samhna.de/archive/samhain_signed-${PV}.tar.gz \
-           file://samhain-cross-compile.patch \
            file://samhain-mips64-aarch64-dnmalloc-hash-fix.patch \
            file://samhain-samhainrc.patch \
            file://samhain-samhainrc-fix-files-dirs-path.patch \
@@ -19,8 +19,8 @@ SRC_URI = "http://la-samhna.de/archive/samhain_signed-${PV}.tar.gz \
            file://samhain.service \
            "
 
-SRC_URI[md5sum] = "eae4674164d7c78f5bb39c72b7029c8b"
-SRC_URI[sha256sum] = "0582864ef56ab796031e8e611ed66c48adeb3a30ec34e1a8d0088572442035fc"
+SRC_URI[md5sum] = "7be46ae7d03f53ba21afafd41cff8926"
+SRC_URI[sha256sum] = "33ad4bc3dad4699694553bd9635a6b5827939f965d1f0f05fce0b4e9cdadf21b"
 
 UPSTREAM_CHECK_URI = "https://www.la-samhna.de/samhain/archive.html"
 UPSTREAM_CHECK_REGEX = "samhain_signed-(?P<pver>(\d+(\.\d+)+))\.tar"

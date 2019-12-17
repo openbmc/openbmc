@@ -1,0 +1,31 @@
+From ca004968b8d2149f72d4edcfe029489a8c5e10ca Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 23 Sep 2019 12:31:31 -0700
+Subject: [PATCH] Mark one of strerror_r implementation glibc specific
+
+glibc has two incompatible strerror_r definitions, one of them is
+specific to glibc, mark this one so
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/mongo/util/errno_util.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/mongo/util/errno_util.cpp b/src/mongo/util/errno_util.cpp
+index 564c0071ea..4f7e1d3a38 100644
+--- a/src/mongo/util/errno_util.cpp
++++ b/src/mongo/util/errno_util.cpp
+@@ -61,7 +61,7 @@ std::string errnoWithDescription(int errNumber) {
+     char buf[kBuflen];
+     char* msg{nullptr};
+ 
+-#if defined(__GNUC__) && defined(_GNU_SOURCE) && \
++#if defined(__GNUC__) && defined(_GNU_SOURCE) && defined(__GLIBC__) && \
+     (!defined(__ANDROID_API__) || !(__ANDROID_API__ <= 22)) && !defined(EMSCRIPTEN)
+     msg = strerror_r(errNumber, buf, kBuflen);
+ #elif defined(_WIN32)
+-- 
+2.23.0
+

@@ -26,7 +26,7 @@ S = "${WORKDIR}/git"
 
 CVE_PRODUCT = "udisks"
 
-inherit autotools systemd gtk-doc gobject-introspection gettext distro_features_check
+inherit autotools systemd gtk-doc gobject-introspection gettext features_check
 
 REQUIRED_DISTRO_FEATURES = "polkit"
 

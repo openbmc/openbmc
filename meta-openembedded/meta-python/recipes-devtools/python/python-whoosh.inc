@@ -4,7 +4,7 @@ Whoosh is a fast, featureful full-text indexing and searching library \
 implemented in pure Python. Programmers can use it to easily add search \
 functionality to their applications and websites. Every part of how \
 Whoosh works can be extended or replaced to meet your needs exactly."
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=05303186defc6141143629961c7c8a60"
 
 SRC_URI[md5sum] = "893433e9c0525ac043df33e6e04caab2"

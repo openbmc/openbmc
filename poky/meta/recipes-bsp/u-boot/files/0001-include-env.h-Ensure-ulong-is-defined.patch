@@ -1,0 +1,31 @@
+From 0565a080d153d5baaaacfeb5045a832e126f4f9e Mon Sep 17 00:00:00 2001
+From: Alistair Francis <alistair.francis@wdc.com>
+Date: Mon, 14 Oct 2019 17:37:30 -0700
+Subject: [PATCH] include/env.h: Ensure ulong is defined
+
+To fix these failures when building with musl:
+   include/env.h:166:1: error: unknown type name 'ulong'; did you mean 'long'?
+ensure that ulong is defined.
+
+Upstream-Status: Pending
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ include/env.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/include/env.h b/include/env.h
+index b72239f6a5..5ca49a3456 100644
+--- a/include/env.h
++++ b/include/env.h
+@@ -13,6 +13,8 @@
+ #include <stdbool.h>
+ #include <linux/types.h>
+ 
++typedef unsigned long           ulong;
++
+ struct environment_s;
+ 
+ /* Value for environment validity */
+-- 
+2.23.0
+

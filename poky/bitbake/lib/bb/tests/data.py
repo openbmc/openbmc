@@ -381,6 +381,19 @@ class TestOverrides(unittest.TestCase):
         self.d.setVar("OVERRIDES", "foo:bar:some_val")
         self.assertEqual(self.d.getVar("TEST"), " testvalue5")
 
+    def test_append_and_override_1(self):
+        self.d.setVar("TEST_append", "testvalue2")
+        self.d.setVar("TEST_bar", "testvalue3")
+        self.assertEqual(self.d.getVar("TEST"), "testvalue3testvalue2")
+
+    def test_append_and_override_2(self):
+        self.d.setVar("TEST_append_bar", "testvalue2")
+        self.assertEqual(self.d.getVar("TEST"), "testvaluetestvalue2")
+
+    def test_append_and_override_3(self):
+        self.d.setVar("TEST_bar_append", "testvalue2")
+        self.assertEqual(self.d.getVar("TEST"), "testvalue2")
+
     # Test an override with _<numeric> in it based on a real world OE issue
     def test_underscore_override(self):
         self.d.setVar("TARGET_ARCH", "x86_64")
@@ -466,7 +479,7 @@ class TaskHash(unittest.TestCase):
             tasklist, gendeps, lookupcache = bb.data.generate_dependencies(d)
             taskdeps, basehash = bb.data.generate_dependency_hash(tasklist, gendeps, lookupcache, set(), "somefile")
             bb.warn(str(lookupcache))
-            return basehash["somefile." + taskname]
+            return basehash["somefile:" + taskname]
 
         d = bb.data.init()
         d.setVar("__BBTASKS", ["mytask"])

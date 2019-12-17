@@ -1,0 +1,27 @@
+From 73ec79432fc557a8be4f1500982b1c0f5fdf12a9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andr=C3=A9=20Draszik?= <andre.draszik@jci.com>
+Date: Thu, 7 Nov 2019 09:58:52 +0000
+Subject: [PATCH] fetch-ocsp-response: use python3
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Inappropriate [oe specific]
+Signed-off-by: André Draszik <git@andred.net>
+---
+ script/fetch-ocsp-response | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/script/fetch-ocsp-response b/script/fetch-ocsp-response
+index 0ff7461..185116b 100755
+--- a/script/fetch-ocsp-response
++++ b/script/fetch-ocsp-response
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # -*- coding: utf-8 -*-
+ 
+ # nghttp2 - HTTP/2 C Library
+-- 
+2.23.0.rc1
+

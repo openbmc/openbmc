@@ -1,0 +1,65 @@
+From eec0503cfc36f63d777f5cb3f2719cecedcb8468 Mon Sep 17 00:00:00 2001
+From: Haris Okanovic <haris.okanovic@ni.com>
+Date: Mon, 7 Jan 2019 13:22:09 -0600
+Subject: [PATCH] Workaround busybox limitation in Linux dhclient-script
+
+Busybox is a lightweight implementation of coreutils commonly used on
+space-constrained embedded Linux distributions. It's implementation of
+chown and chmod doesn't provide a "--reference" option added to
+client/scripts/linux as of commit 9261cb14. This change works around
+that limitation by using stat to read ownership and permissions flags
+and simple chown/chmod calls supported in both coreutils and busybox.
+
+    modified:   client/scripts/linux
+
+Signed-off-by: Haris Okanovic <haris.okanovic@ni.com>
+Upstream-Status: Pending [ISC-Bugs #48771]
+---
+ client/scripts/linux | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/client/scripts/linux b/client/scripts/linux
+index 0c429697..2435a44b 100755
+--- a/client/scripts/linux
++++ b/client/scripts/linux
+@@ -32,6 +32,17 @@
+ # if your system holds ip tool in a non-standard location.
+ ip=/sbin/ip
+ 
++chown_chmod_by_reference() {
++    local reference_file="$1"
++    local target_file="$2"
++
++    local owner=$(stat -c "%u:%g" "$reference_file")
++    local perm=$(stat -c "%a" "$reference_file")
++
++    chown "$owner" "$target_file"
++    chmod "$perm" "$target_file"
++}
++
+ # update /etc/resolv.conf based on received values
+ # This updated version mostly follows Debian script by Andrew Pollock et al.
+ make_resolv_conf() {
+@@ -74,8 +85,7 @@ make_resolv_conf() {
+         fi
+ 
+ 	if [ -f /etc/resolv.conf ]; then
+-	    chown --reference=/etc/resolv.conf $new_resolv_conf
+-	    chmod --reference=/etc/resolv.conf $new_resolv_conf
++	    chown_chmod_by_reference /etc/resolv.conf $new_resolv_conf
+ 	fi
+         mv -f $new_resolv_conf /etc/resolv.conf
+     # DHCPv6
+@@ -101,8 +111,7 @@ make_resolv_conf() {
+         fi
+ 
+ 	if [ -f /etc/resolv.conf ]; then
+-            chown --reference=/etc/resolv.conf $new_resolv_conf
+-            chmod --reference=/etc/resolv.conf $new_resolv_conf
++	    chown_chmod_by_reference /etc/resolv.conf $new_resolv_conf
+ 	fi
+         mv -f $new_resolv_conf /etc/resolv.conf
+     fi
+-- 
+2.20.0
+

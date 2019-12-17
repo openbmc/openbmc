@@ -12,7 +12,7 @@ SRC_URI = "http://0pointer.de/lennart/projects/nss-myhostname/nss-myhostname-${P
 SRC_URI[md5sum] = "d4ab9ac36c053ab8fb836db1cbd4a48f"
 SRC_URI[sha256sum] = "2ba744ea8d578d1c57c85884e94a3042ee17843a5294434d3a7f6c4d67e7caf2"
 
-inherit autotools distro_features_check
+inherit autotools features_check
 
 COMPATIBLE_HOST_libc-musl = 'null'
 

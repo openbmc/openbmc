@@ -1,0 +1,122 @@
+From ef170dda7fbab53682c9bc287dec93fa86130bc9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 9 Sep 2018 21:49:59 -0700
+Subject: [PATCH] add a formatting attribute check
+
+Tell Clang that parameter is a printf style format using the
+attribute flag
+
+This helps in avoiding below warnings seen with clang
+
+unarr.c:106:22: error: format string is not a string literal
+[-Werror,-Wformat-nonliteral]
+|     vfprintf(stderr, msg, args);
+|                      ^~~
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ cut-n-paste/unarr/common/unarr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/cut-n-paste/unarr/common/unarr.c
++++ b/cut-n-paste/unarr/common/unarr.c
+@@ -92,7 +92,7 @@ size_t ar_get_global_comment(ar_archive
+     return ar->get_comment(ar, buffer, count);
+ }
+ 
+-void ar_log(const char *prefix, const char *file, int line, const char *msg, ...)
++void __attribute__((__format__ (__printf__, 4, 5))) ar_log(const char *prefix, const char *file, int line, const char *msg, ...)
+ {
+     va_list args;
+     va_start(args, msg);
+--- a/cut-n-paste/synctex/synctex_parser_utils.c
++++ b/cut-n-paste/synctex/synctex_parser_utils.c
+@@ -87,11 +87,11 @@ void _synctex_free(void * ptr) {
+ #   include <syslog.h>
+ #endif
+ 
+-int _synctex_error(const char * reason, ...) __attribute__((__format__ (__printf__, 1, 2)));
+-int _synctex_log(int level, const char * prompt, const char * reason, va_list arg) __attribute__((__format__ (__printf__, 3, 0)));
+-
+-int _synctex_log(int level, const char * prompt, const char * reason,va_list arg) {
++static int _synctex_log(int level, const char * prompt, const char * reason, ...) SYNCTEX_PRINTF_FORMAT(3, 0);
++static int _synctex_log(int level, const char * prompt, const char * reason, ...) {
++	va_list arg;
+ 	int result;
++	va_start(arg, reason);
+ #	ifdef SYNCTEX_RECENT_WINDOWS
+ 	{/*	This code is contributed by William Blum.
+         As it does not work on some older computers,
+@@ -133,10 +133,10 @@ int _synctex_log(int level, const char *
+     result += vfprintf(where, reason, arg);
+     result += fprintf(where,"\n");
+ #   endif
++    va_end(arg);
+ 	return result;
+ }
+ 
+-__attribute__((__format__ (__printf__, 1, 0)))
+ int _synctex_error(const char * reason,...) {
+     va_list arg;
+     int result;
+@@ -355,6 +355,7 @@ char * _synctex_merge_strings(const char
+ 		size_t len = strlen(temp);
+ 		if(UINT_MAX-len<size) {
+ 			_synctex_error("!  _synctex_merge_strings: Capacity exceeded.");
++			va_end(arg);
+ 			return NULL;
+ 		}
+ 		size+=len;
+@@ -374,6 +375,7 @@ char * _synctex_merge_strings(const char
+ 					if(dest != strncpy(dest,temp,size)) {
+ 						_synctex_error("!  _synctex_merge_strings: Copy problem");
+ 						free(result);
++						va_end(arg);
+ 						result = NULL;
+ 						return NULL;
+ 					}
+--- a/cut-n-paste/synctex/synctex_parser.c
++++ b/cut-n-paste/synctex/synctex_parser.c
+@@ -8411,6 +8411,7 @@ struct synctex_updater_t {
+     int length;             /*  the number of chars appended */
+ };
+ 
++static int _synctex_updater_print(synctex_updater_p updater, const char * format, ...) SYNCTEX_PRINTF_FORMAT(2, 3);
+ static int _synctex_updater_print(synctex_updater_p updater, const char * format, ...) {
+     int result = 0;
+     if (updater) {
+@@ -8447,6 +8448,7 @@ static int vasprintf(char **ret,
+ /**
+  *  gzvprintf is not available until OSX 10.10
+  */
++static int _synctex_updater_print_gz(synctex_updater_p updater, const char * format, ...) SYNCTEX_PRINTF_FORMAT(2, 3);
+ static int _synctex_updater_print_gz(synctex_updater_p updater, const char * format, ...) {
+     int result = 0;
+     if (updater) {
+--- a/cut-n-paste/synctex/synctex_parser_utils.h
++++ b/cut-n-paste/synctex/synctex_parser_utils.h
+@@ -85,7 +85,11 @@ extern "C" {
+ #	else
+ #		define SYNCTEX_ARE_PATH_CHARACTERS_EQUAL(left,right) (toupper(left) != toupper(right))
+ #	endif
+-    
++#	ifdef __GNUC__
++#		define SYNCTEX_PRINTF_FORMAT(si, ftc) __attribute__ ((format (printf, si, ftc)))
++#	else
++#		define SYNCTEX_PRINTF_FORMAT(si, ftc)
++#	endif    
+ /*  This custom malloc functions initializes to 0 the newly allocated memory.
+  *  There is no bzero function on windows. */
+ void *_synctex_malloc(size_t size);
+@@ -97,8 +101,8 @@ void _synctex_free(void * ptr);
+ /*  This is used to log some informational message to the standard error stream.
+  *  On Windows, the stderr stream is not exposed and another method is used.
+  *	The return value is the number of characters printed.	*/
+-    int _synctex_error(const char * reason,...);
+-    int _synctex_debug(const char * reason,...);
++    int _synctex_error(const char * reason,...) SYNCTEX_PRINTF_FORMAT(1, 2);
++    int _synctex_debug(const char * reason,...) SYNCTEX_PRINTF_FORMAT(1, 2);
+ 
+ /*  strip the last extension of the given string, this string is modified!
+  *  This function depends on the OS because the path separator may differ.

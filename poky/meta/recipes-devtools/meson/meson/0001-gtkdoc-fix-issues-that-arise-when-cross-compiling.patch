@@ -1,4 +1,4 @@
-From 1afbf5ccff56e582229c8f673f50aedf2b24117e Mon Sep 17 00:00:00 2001
+From d3ef01a4208a801acad380a4aaceb6a21f8fa603 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 4 Aug 2017 16:16:41 +0300
 Subject: [PATCH] gtkdoc: fix issues that arise when cross-compiling
@@ -20,11 +20,11 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 4 insertions(+)
 
 diff --git a/mesonbuild/modules/gnome.py b/mesonbuild/modules/gnome.py
-index bf49770..7c5a363 100644
+index bcf77b9..6a4b472 100644
 --- a/mesonbuild/modules/gnome.py
 +++ b/mesonbuild/modules/gnome.py
-@@ -972,6 +972,10 @@ This will become a hard error in the future.''')
-                 '--mode=' + mode]
+@@ -974,6 +974,10 @@ This will become a hard error in the future.''')
+             args.append('--{}={}'.format(program_name, path))
          if namespace:
              args.append('--namespace=' + namespace)
 +        gtkdoc_exe_wrapper = state.environment.properties.host.get('gtkdoc_exe_wrapper', None)

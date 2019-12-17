@@ -1,7 +1,7 @@
-From a49fbbc6abc3d57d45011a3410d3b8f04349e424 Mon Sep 17 00:00:00 2001
+From 407ab0ed315b4c7b49d1a1dd3777d5af8e0b7e66 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 2 Apr 2016 10:37:24 -0700
-Subject: [PATCH 11/18] build shared library for vchostif
+Subject: [PATCH 11/19] build shared library for vchostif
 
 Fixes #149
 
@@ -11,10 +11,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/interface/vmcs_host/CMakeLists.txt b/interface/vmcs_host/CMakeLists.txt
-index c415176..d0cca1a 100755
+index ae52495..369758b 100755
 --- a/interface/vmcs_host/CMakeLists.txt
 +++ b/interface/vmcs_host/CMakeLists.txt
-@@ -17,7 +17,7 @@ set(VCHOSTIF_SOURCE
+@@ -15,7 +15,7 @@ set(VCHOSTIF_SOURCE
  #            ${VMCS_TARGET}/vmcs_main.c
  #  vc_vchi_haud.c
  
@@ -24,5 +24,5 @@ index c415176..d0cca1a 100755
  #add_library(bufman            vc_vchi_bufman.c            )
  
 -- 
-2.21.0
+2.22.0
 

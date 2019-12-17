@@ -8,6 +8,7 @@ After=network.target nss-lookup.target rpcbind.service
 [Service]
 EnvironmentFile=-@SYSCONFDIR@/nfs-utils.conf
 ExecStart=@SBINDIR@/rpc.statd -F $STATD_OPTS
+LimitNOFILE=@HIGH_RLIMIT_NOFILE@
 
 [Install]
 WantedBy=multi-user.target

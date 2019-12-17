@@ -486,7 +486,7 @@ def write_ld_so_conf(d):
         f.write(d.getVar("base_libdir") + '\n')
         f.write(d.getVar("libdir") + '\n')
 
-class ImageQAFailed(bb.build.FuncFailed):
+class ImageQAFailed(Exception):
     def __init__(self, description, name=None, logfile=None):
         self.description = description
         self.name = name

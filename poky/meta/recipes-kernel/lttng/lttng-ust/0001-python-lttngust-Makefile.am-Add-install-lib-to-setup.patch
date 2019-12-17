@@ -1,0 +1,31 @@
+From f79dac30af9adda12996da7f6aa6667d3b580537 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Thu, 26 Sep 2019 17:54:00 +0800
+Subject: [PATCH] python-lttngust/Makefile.am: Add --install-lib to setup.py
+
+Otherwise it may install to /usr/lib, but should be /usr/lib64 when cross
+building.
+
+Upstream-Status: Submitted [https://github.com/lttng/lttng-ust/pull/59]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ python-lttngust/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/python-lttngust/Makefile.am b/python-lttngust/Makefile.am
+index 6c0d20d..38b51b8 100644
+--- a/python-lttngust/Makefile.am
++++ b/python-lttngust/Makefile.am
+@@ -9,7 +9,7 @@ install-exec-local:
+ 	if [ "$(DESTDIR)" != "" ]; then \
+ 		opts="$$opts --root=$(DESTDIR)"; \
+ 	fi; \
+-	$(PYTHON) setup.py install $$opts;
++	$(PYTHON) setup.py install $$opts --install-lib=$(pythondir);
+ 
+ clean-local:
+ 	rm -rf $(builddir)/build
+-- 
+2.7.4
+

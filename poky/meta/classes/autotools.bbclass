@@ -25,7 +25,9 @@ inherit siteinfo
 
 # Space separated list of shell scripts with variables defined to supply test
 # results for autoconf tests we cannot run at build time.
-export CONFIG_SITE = "${@siteinfo_get_files(d)}"
+# The value of this variable is filled in in a prefunc because it depends on
+# the contents of the sysroot.
+export CONFIG_SITE
 
 acpaths ?= "default"
 EXTRA_AUTORECONF = "--exclude=autopoint"
@@ -132,6 +134,8 @@ EXTRACONFFUNCS ??= ""
 EXTRA_OECONF_append = " ${PACKAGECONFIG_CONFARGS}"
 
 do_configure[prefuncs] += "autotools_preconfigure autotools_aclocals ${EXTRACONFFUNCS}"
+do_compile[prefuncs] += "autotools_aclocals"
+do_install[prefuncs] += "autotools_aclocals"
 do_configure[postfuncs] += "autotools_postconfigure"
 
 ACLOCALDIR = "${STAGING_DATADIR}/aclocal"
@@ -140,7 +144,6 @@ ACLOCALEXTRAPATH_class-target = " -I ${STAGING_DATADIR_NATIVE}/aclocal/"
 ACLOCALEXTRAPATH_class-nativesdk = " -I ${STAGING_DATADIR_NATIVE}/aclocal/"
 
 python autotools_aclocals () {
-    # Refresh variable with cache files
     d.setVar("CONFIG_SITE", siteinfo_get_files(d, sysrootcache=True))
 }
 

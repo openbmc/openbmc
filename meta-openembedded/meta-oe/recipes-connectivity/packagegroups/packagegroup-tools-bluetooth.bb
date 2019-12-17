@@ -6,19 +6,12 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
                     file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
 SUMMARY = "Set of Bluetooth related tools for inclusion in images"
-DESCRIPTION = "Includes bluetooth specific tools for this version of BlueZ.\
-These tools are used at runtime. \
-Supports BlueZ4 and BlueZ5."
+DESCRIPTION = "Includes bluetooth specific tools for BlueZ.\
+These tools are used at runtime."
 
 inherit packagegroup
-inherit bluetooth
 
-RDEPENDS_bluez4 = " \
-    obexftp \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'libasound-module-bluez', '', d)} \
-"
-
-RDEPENDS_bluez5 = " \
+RDEPENDS_${PN} = " \
     bluez5-noinst-tools \
     bluez5-obex \
     bluez5-testtools  \

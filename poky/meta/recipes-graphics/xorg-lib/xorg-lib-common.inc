@@ -11,7 +11,7 @@ SRC_URI = "${XORG_MIRROR}/individual/lib/${XORG_PN}-${PV}.tar.bz2"
 
 S = "${WORKDIR}/${XORG_PN}-${PV}"
 
-inherit autotools distro_features_check pkgconfig
+inherit autotools features_check pkgconfig
 
 EXTRA_OECONF = "--disable-specs --without-groff --without-ps2pdf --without-fop"
 

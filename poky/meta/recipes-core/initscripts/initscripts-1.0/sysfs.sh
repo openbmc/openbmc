@@ -26,6 +26,10 @@ if [ -e /sys/kernel/config ] && grep -q configfs /proc/filesystems; then
   mount -t configfs configfs /sys/kernel/config
 fi
 
+if [ -e /sys/firmware/efi/efivars ] && grep -q efivarfs /proc/filesystems; then
+  mount -t efivarfs efivarfs /sys/firmware/efi/efivars
+fi
+
 if ! [ -e /dev/zero ] && [ -e /dev ] && grep -q devtmpfs /proc/filesystems; then
   mount -n -t devtmpfs devtmpfs /dev
 fi

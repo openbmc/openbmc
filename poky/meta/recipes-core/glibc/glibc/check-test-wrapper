@@ -1,0 +1,71 @@
+#!/usr/bin/env python3
+import sys
+import os
+import subprocess
+
+env = os.environ.copy()
+args = sys.argv[1:]
+targettype = args.pop(0)
+
+if targettype == "user":
+    qemuargs = os.environ.get("QEMU_OPTIONS", "").split()
+    if not os.path.exists(qemuargs[0]):
+        # ensure qemu args has a valid absolute path
+        for i in os.environ.get("PATH", "").split(":"):
+            if os.path.exists(os.path.join(i, qemuargs[0])):
+                qemuargs[0] = os.path.join(i, qemuargs[0])
+                break
+    sysroot = os.environ.get("QEMU_SYSROOT", None)
+    if not sysroot:
+        sys.exit(-1)
+    libpaths = [sysroot + "/usr/lib", sysroot + "/lib"]
+
+    if args[0] == "env":
+        args.pop(0)
+        if len(args) == 0:
+            args = ["env"]
+        else:
+            # process options
+            while args[0].startswith("-"):
+                opt = args.pop(0).lstrip("-")
+                if "i" in opt:
+                    env.clear()
+            # process environment vars
+            while "=" in args[0]:
+                key, val = args.pop(0).split("=", 1)
+                if key == "LD_LIBRARY_PATH":
+                    libpaths += val.split(":")
+                else:
+                    env[key] = val
+    if args[0] == "cp":
+        # ignore copies, the filesystem is the same
+        sys.exit(0)
+
+    qemuargs += ["-L", sysroot]
+    qemuargs += ["-E", "LD_LIBRARY_PATH={}".format(":".join(libpaths))]
+    command = qemuargs + args
+elif targettype == "ssh":
+    host = os.environ.get("SSH_HOST", None)
+    user = os.environ.get("SSH_HOST_USER", None)
+    port = os.environ.get("SSH_HOST_PORT", None)
+
+    command = ["ssh", "-o", "UserKnownHostsFile=/dev/null", "-o", "StrictHostKeyChecking=no"]
+    if port:
+        command += ["-p", str(port)]
+    if not host:
+        sys.exit(-1)
+    command += ["{}@{}".format(user, host) if user else host]
+
+    # wrap and replace quotes for correct transformation on ssh
+    wrapped = " ".join(["'{0}'".format(i.replace("'", r"'\''")) for i in ["cd", os.getcwd()]]) + "; "
+    wrapped += " ".join(["'{0}'".format(i.replace("'", r"'\''")) for i in args])
+    command += ["sh", "-c", "\"{}\"".format(wrapped)]
+else:
+    sys.exit(-1)
+
+try:
+    r = subprocess.run(command, timeout = 1800, env = env)
+    sys.exit(r.returncode)
+except subprocess.TimeoutExpired:
+    sys.exit(-1)
+

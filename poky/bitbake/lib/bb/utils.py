@@ -394,7 +394,7 @@ def better_exec(code, context, text = None, realfile = "<code>", pythonexception
         code = better_compile(code, realfile, realfile)
     try:
         exec(code, get_context(), context)
-    except (bb.BBHandledException, bb.parse.SkipRecipe, bb.build.FuncFailed, bb.data_smart.ExpansionError):
+    except (bb.BBHandledException, bb.parse.SkipRecipe, bb.data_smart.ExpansionError):
         # Error already shown so passthrough, no need for traceback
         raise
     except Exception as e:
@@ -520,22 +520,26 @@ def unlockfile(lf):
     fcntl.flock(lf.fileno(), fcntl.LOCK_UN)
     lf.close()
 
+def _hasher(method, filename):
+    import mmap
+
+    with open(filename, "rb") as f:
+        try:
+            with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as mm:
+                for chunk in iter(lambda: mm.read(8192), b''):
+                    method.update(chunk)
+        except ValueError:
+            # You can't mmap() an empty file so silence this exception
+            pass
+    return method.hexdigest()
+
+
 def md5_file(filename):
     """
     Return the hex string representation of the MD5 checksum of filename.
     """
-    import hashlib, mmap
-
-    with open(filename, "rb") as f:
-        m = hashlib.md5()
-        try:
-            with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as mm:
-                for chunk in iter(lambda: mm.read(8192), b''):
-                    m.update(chunk)
-        except ValueError:
-            # You can't mmap() an empty file so silence this exception
-            pass
-    return m.hexdigest()
+    import hashlib
+    return _hasher(hashlib.md5(), filename)
 
 def sha256_file(filename):
     """
@@ -543,24 +547,14 @@ def sha256_file(filename):
     filename.
     """
     import hashlib
-
-    s = hashlib.sha256()
-    with open(filename, "rb") as f:
-        for line in f:
-            s.update(line)
-    return s.hexdigest()
+    return _hasher(hashlib.sha256(), filename)
 
 def sha1_file(filename):
     """
     Return the hex string representation of the SHA1 checksum of the filename
     """
     import hashlib
-
-    s = hashlib.sha1()
-    with open(filename, "rb") as f:
-        for line in f:
-            s.update(line)
-    return s.hexdigest()
+    return _hasher(hashlib.sha1(), filename)
 
 def preserved_envvars_exported():
     """Variables which are taken from the environment and placed in and exported
@@ -677,7 +671,7 @@ def _check_unsafe_delete_path(path):
         return True
     return False
 
-def remove(path, recurse=False):
+def remove(path, recurse=False, ionice=False):
     """Equivalent to rm -f or rm -rf"""
     if not path:
         return
@@ -686,7 +680,10 @@ def remove(path, recurse=False):
             if _check_unsafe_delete_path(path):
                 raise Exception('bb.utils.remove: called with dangerous path "%s" and recurse=True, refusing to delete!' % path)
         # shutil.rmtree(name) would be ideal but its too slow
-        subprocess.check_call(['rm', '-rf'] + glob.glob(path))
+        cmd = []
+        if ionice:
+            cmd = ['ionice', '-c', '3']
+        subprocess.check_call(cmd + ['rm', '-rf'] + glob.glob(path))
         return
     for name in glob.glob(path):
         try:
@@ -695,12 +692,12 @@ def remove(path, recurse=False):
             if exc.errno != errno.ENOENT:
                 raise
 
-def prunedir(topdir):
+def prunedir(topdir, ionice=False):
     # Delete everything reachable from the directory named in 'topdir'.
     # CAUTION:  This is dangerous!
     if _check_unsafe_delete_path(topdir):
         raise Exception('bb.utils.prunedir: called with dangerous path "%s", refusing to delete!' % topdir)
-    remove(topdir, recurse=True)
+    remove(topdir, recurse=True, ionice=ionice)
 
 #
 # Could also use return re.compile("(%s)" % "|".join(map(re.escape, suffixes))).sub(lambda mo: "", var)
@@ -780,7 +777,7 @@ def movefile(src, dest, newmtime = None, sstat = None):
             os.rename(src, destpath)
             renamefailed = 0
         except Exception as e:
-            if e[0] != errno.EXDEV:
+            if e.errno != errno.EXDEV:
                 # Some random error.
                 print("movefile: Failed to move", src, "to", dest, e)
                 return None

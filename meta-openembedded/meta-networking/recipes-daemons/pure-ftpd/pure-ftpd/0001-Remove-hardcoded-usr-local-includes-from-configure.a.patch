@@ -8,30 +8,39 @@ Upstream-Status: Inappropriate [config]
 Signed-off-by: Yauhen Kharuzhy <yauhen.kharuzhy@promwad.com>
 Signed-off-by: Tudor Florea <tudor.florea@enea.com>
 
+Update for 1.0.49.
+Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
+
 ---
- configure.ac | 12 ------------
- 1 file changed, 12 deletions(-)
+ configure.ac | 15 ---------------
+ 1 file changed, 15 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 3a4209b..695ce68 100644
+index 079e6f0..9a1ec06 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -91,18 +91,6 @@ AX_CHECK_LINK_FLAG([-Wl,-z,relro], [LDFLAGS="$LDFLAGS -Wl,-z,relro"])
+@@ -96,21 +96,6 @@ AX_CHECK_LINK_FLAG([-Wl,-z,relro], [LDFLAGS="$LDFLAGS -Wl,-z,relro"])
  AX_CHECK_LINK_FLAG([-Wl,-z,now], [LDFLAGS="$LDFLAGS -Wl,-z,now"])
  AX_CHECK_LINK_FLAG([-Wl,-z,noexecstack], [LDFLAGS="$LDFLAGS -Wl,-z,noexecstack"])
  
--if test -d /usr/local/include; then
--  CPPFLAGS="$CPPFLAGS -I/usr/local/include"
--fi
--
--if test -d /usr/kerberos/include; then
--  CPPFLAGS="$CPPFLAGS -I/usr/kerberos/include"
--fi
--
--if test -d /usr/local/lib; then
--  LDFLAGS="$LDFLAGS -L/usr/local/lib"
+-if test "x$cross_compiling" != "xyes"; then
+-  for path in \
+-    /usr/kerberos \
+-    /usr/local /opt /usr/local/opt \
+-    /usr/openssl@1.1 /opt/openssl@1.1 /usr/local/opt/openssl@1.1 \
+-    /usr/openssl /opt/openssl /usr/local/opt/openssl; do
+-    if test -d $path/include; then
+-      CPPFLAGS="$CPPFLAGS -I${path}/include"
+-    fi
+-    if test -d $path/lib; then
+-      LDFLAGS="$LDFLAGS -L${path}/lib"
+-    fi
+-  done
 -fi
 -
  CPPFLAGS="$CPPFLAGS -D_FORTIFY_SOURCE=2"
  
  dnl Checks for header files
+-- 
+2.7.4
+

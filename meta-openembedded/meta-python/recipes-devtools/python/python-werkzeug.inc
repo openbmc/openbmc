@@ -7,11 +7,11 @@ HTTP utilities to handle entity tags, cache control headers, HTTP dates, \
 cookie handling, file uploads, a powerful URL routing system and a bunch \
 of community contributed addon modules."
 HOMEPAGE = "http://werkzeug.pocoo.org/"
-LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=ed9a0b7c0254616d72dadb98b293ef1b"
+LICENSE = "BSD-3-Clause"
+LIC_FILES_CHKSUM = "file://LICENSE.rst;md5=5dc88300786f1c214c1e9827a5229462"
 
-SRC_URI[md5sum] = "6d20b5be2d245be4ac7706cc390d130c"
-SRC_URI[sha256sum] = "c3fd7a7d41976d9f44db327260e263132466836cef6f91512889ed60ad26557c"
+SRC_URI[md5sum] = "5b23b4953efc4f52b1d0b33af6f7cd2d"
+SRC_URI[sha256sum] = "7280924747b5733b246fe23972186c6b348f9ae29724135a6dfc1e53cea433e7"
 
 PYPI_PACKAGE = "Werkzeug"
 

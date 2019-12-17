@@ -899,6 +899,7 @@ class FetcherNetworkTest(FetcherTest):
         if os.path.exists(os.path.join(repo_path, 'bitbake-gitsm-test1')):
             self.assertTrue(os.path.exists(os.path.join(repo_path, 'bitbake-gitsm-test1', 'bitbake')), msg='submodule of submodule missing')
 
+    @skipIfNoNetwork()
     def test_git_submodule_dbus_broker(self):
         # The following external repositories have show failures in fetch and unpack operations
         # We want to avoid regressions!
@@ -916,6 +917,7 @@ class FetcherNetworkTest(FetcherTest):
         self.assertTrue(os.path.exists(os.path.join(repo_path, '.git/modules/subprojects/c-sundry/config')), msg='Missing submodule config "subprojects/c-sundry"')
         self.assertTrue(os.path.exists(os.path.join(repo_path, '.git/modules/subprojects/c-utf8/config')), msg='Missing submodule config "subprojects/c-utf8"')
 
+    @skipIfNoNetwork()
     def test_git_submodule_CLI11(self):
         url = "gitsm://github.com/CLIUtils/CLI11;protocol=git;rev=bd4dc911847d0cde7a6b41dfa626a85aab213baf"
         fetcher = bb.fetch.Fetch([url], self.d)
@@ -929,6 +931,7 @@ class FetcherNetworkTest(FetcherTest):
         self.assertTrue(os.path.exists(os.path.join(repo_path, '.git/modules/extern/json/config')), msg='Missing submodule config "extern/json"')
         self.assertTrue(os.path.exists(os.path.join(repo_path, '.git/modules/extern/sanitizers/config')), msg='Missing submodule config "extern/sanitizers"')
 
+    @skipIfNoNetwork()
     def test_git_submodule_update_CLI11(self):
         """ Prevent regression on update detection not finding missing submodule, or modules without needed commits """
         url = "gitsm://github.com/CLIUtils/CLI11;protocol=git;rev=cf6a99fa69aaefe477cc52e3ef4a7d2d7fa40714"
@@ -948,6 +951,7 @@ class FetcherNetworkTest(FetcherTest):
         self.assertTrue(os.path.exists(os.path.join(repo_path, '.git/modules/extern/json/config')), msg='Missing submodule config "extern/json"')
         self.assertTrue(os.path.exists(os.path.join(repo_path, '.git/modules/extern/sanitizers/config')), msg='Missing submodule config "extern/sanitizers"')
 
+    @skipIfNoNetwork()
     def test_git_submodule_aktualizr(self):
         url = "gitsm://github.com/advancedtelematic/aktualizr;branch=master;protocol=git;rev=d00d1a04cc2366d1a5f143b84b9f507f8bd32c44"
         fetcher = bb.fetch.Fetch([url], self.d)
@@ -964,6 +968,7 @@ class FetcherNetworkTest(FetcherTest):
         self.assertTrue(os.path.exists(os.path.join(repo_path, '.git/modules/third_party/googletest/config')), msg='Missing submodule config "third_party/googletest/config"')
         self.assertTrue(os.path.exists(os.path.join(repo_path, '.git/modules/third_party/HdrHistogram_c/config')), msg='Missing submodule config "third_party/HdrHistogram_c/config"')
 
+    @skipIfNoNetwork()
     def test_git_submodule_iotedge(self):
         """ Prevent regression on deeply nested submodules not being checked out properly, even though they were fetched. """
 
@@ -1195,8 +1200,8 @@ class FetchLatestVersionTest(FetcherTest):
         # packages with valid UPSTREAM_CHECK_URI and UPSTREAM_CHECK_REGEX
         ("cups", "http://www.cups.org/software/1.7.2/cups-1.7.2-source.tar.bz2", "https://github.com/apple/cups/releases", "(?P<name>cups\-)(?P<pver>((\d+[\.\-_]*)+))\-source\.tar\.gz")
             : "2.0.0",
-        ("db", "http://download.oracle.com/berkeley-db/db-5.3.21.tar.gz", "http://www.oracle.com/technetwork/products/berkeleydb/downloads/index-082944.html", "http://download.oracle.com/otn/berkeley-db/(?P<name>db-)(?P<pver>((\d+[\.\-_]*)+))\.tar\.gz")
-            : "6.1.19",
+        ("db", "http://download.oracle.com/berkeley-db/db-5.3.21.tar.gz", "http://ftp.debian.org/debian/pool/main/d/db5.3/", "(?P<name>db5\.3_)(?P<pver>\d+(\.\d+)+).+\.orig\.tar\.xz")
+            : "5.3.10",
     }
 
     @skipIfNoNetwork()
@@ -1858,6 +1863,26 @@ class GitShallowTest(FetcherTest):
         with self.assertRaises(bb.fetch2.FetchError):
             self.fetch()
 
+    def test_shallow_fetch_missing_revs(self):
+        self.add_empty_file('a')
+        self.add_empty_file('b')
+        fetcher, ud = self.fetch(self.d.getVar('SRC_URI'))
+        self.git('tag v0.0 master', cwd=self.srcdir)
+        self.d.setVar('BB_GIT_SHALLOW_DEPTH', '0')
+        self.d.setVar('BB_GIT_SHALLOW_REVS', 'v0.0')
+        self.fetch_shallow()
+
+    def test_shallow_fetch_missing_revs_fails(self):
+        self.add_empty_file('a')
+        self.add_empty_file('b')
+        fetcher, ud = self.fetch(self.d.getVar('SRC_URI'))
+        self.d.setVar('BB_GIT_SHALLOW_DEPTH', '0')
+        self.d.setVar('BB_GIT_SHALLOW_REVS', 'v0.0')
+
+        with self.assertRaises(bb.fetch2.FetchError), self.assertLogs("BitBake.Fetcher", level="ERROR") as cm:
+            self.fetch_shallow()
+        self.assertIn("Unable to find revision v0.0 even from upstream", cm.output[0])
+
     @skipIfNoNetwork()
     def test_bitbake(self):
         self.git('remote add --mirror=fetch origin git://github.com/openembedded/bitbake', cwd=self.srcdir)
@@ -1903,3 +1928,83 @@ class GitShallowTest(FetcherTest):
 
         dir = os.listdir(self.unpackdir + "/git/")
         self.assertIn("fstests.doap", dir)
+
+class GitLfsTest(FetcherTest):
+    def setUp(self):
+        FetcherTest.setUp(self)
+
+        self.gitdir = os.path.join(self.tempdir, 'git')
+        self.srcdir = os.path.join(self.tempdir, 'gitsource')
+        
+        self.d.setVar('WORKDIR', self.tempdir)
+        self.d.setVar('S', self.gitdir)
+        self.d.delVar('PREMIRRORS')
+        self.d.delVar('MIRRORS')
+
+        self.d.setVar('SRCREV', '${AUTOREV}')
+        self.d.setVar('AUTOREV', '${@bb.fetch2.get_autorev(d)}')
+
+        bb.utils.mkdirhier(self.srcdir)
+        self.git('init', cwd=self.srcdir)
+        with open(os.path.join(self.srcdir, '.gitattributes'), 'wt') as attrs:
+            attrs.write('*.mp3 filter=lfs -text')
+        self.git(['add', '.gitattributes'], cwd=self.srcdir)
+        self.git(['commit', '-m', "attributes", '.gitattributes'], cwd=self.srcdir)
+
+    def git(self, cmd, cwd=None):
+        if isinstance(cmd, str):
+            cmd = 'git ' + cmd
+        else:
+            cmd = ['git'] + cmd
+        if cwd is None:
+            cwd = self.gitdir
+        return bb.process.run(cmd, cwd=cwd)[0]
+
+    def fetch(self, uri=None):
+        uris = self.d.getVar('SRC_URI').split()
+        uri = uris[0]
+        d = self.d
+
+        fetcher = bb.fetch2.Fetch(uris, d)
+        fetcher.download()
+        ud = fetcher.ud[uri]
+        return fetcher, ud
+
+    def test_lfs_enabled(self):
+        import shutil
+
+        uri = 'git://%s;protocol=file;subdir=${S};lfs=1' % self.srcdir
+        self.d.setVar('SRC_URI', uri)
+
+        fetcher, ud = self.fetch()
+        self.assertIsNotNone(ud.method._find_git_lfs)
+
+        # If git-lfs can be found, the unpack should be successful
+        ud.method._find_git_lfs = lambda d: True
+        shutil.rmtree(self.gitdir, ignore_errors=True)
+        fetcher.unpack(self.d.getVar('WORKDIR'))
+
+        # If git-lfs cannot be found, the unpack should throw an error
+        with self.assertRaises(bb.fetch2.FetchError):
+            ud.method._find_git_lfs = lambda d: False
+            shutil.rmtree(self.gitdir, ignore_errors=True)
+            fetcher.unpack(self.d.getVar('WORKDIR'))
+
+    def test_lfs_disabled(self):
+        import shutil
+
+        uri = 'git://%s;protocol=file;subdir=${S};lfs=0' % self.srcdir
+        self.d.setVar('SRC_URI', uri)
+
+        fetcher, ud = self.fetch()
+        self.assertIsNotNone(ud.method._find_git_lfs)
+
+        # If git-lfs can be found, the unpack should be successful
+        ud.method._find_git_lfs = lambda d: True
+        shutil.rmtree(self.gitdir, ignore_errors=True)
+        fetcher.unpack(self.d.getVar('WORKDIR'))
+
+        # If git-lfs cannot be found, the unpack should be successful
+        ud.method._find_git_lfs = lambda d: False
+        shutil.rmtree(self.gitdir, ignore_errors=True)
+        fetcher.unpack(self.d.getVar('WORKDIR'))

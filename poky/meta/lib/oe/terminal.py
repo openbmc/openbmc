@@ -55,7 +55,7 @@ class XTerminal(Terminal):
             raise UnsupportedTerminal(self.name)
 
 class Gnome(XTerminal):
-    command = 'gnome-terminal -t "{title}" -x {command}'
+    command = 'gnome-terminal -t "{title}" -- {command}'
     priority = 2
 
     def __init__(self, sh_cmd, title=None, env=None, d=None):

@@ -3,7 +3,7 @@ DESCRIPTION = "Customizable User Account Management for Flask; Register \
 Confirm email, Login, Change username, Change password, Forgot Password \
 and more."
 HOMEPAGE = " https://github.com/lingthio/Flask-User"
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=97de97cd9d6e23c88129d884588ce71a"
 
 SRC_URI[md5sum] = "f7965e66ca139c8436896da07e66c21f"

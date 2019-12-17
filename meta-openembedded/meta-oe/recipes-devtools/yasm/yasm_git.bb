@@ -1,5 +1,5 @@
 SUMMARY = "x86 (SSE) assembler supporting NASM and GAS-syntaxes"
-LICENSE = "BSD"
+LICENSE = "MIT"
 HOMEPAGE = "http://www.tortall.net/projects/yasm/"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=a12d8903508fb6bfd49d8d82c6170dd9"

@@ -1,4 +1,7 @@
 SUMMARY = "Package manager forked from Yum, using libsolv as a dependency resolver"
+DESCRIPTION = "Software package manager that installs, updates, and removes \
+packages on RPM-based Linux distributions. It automatically computes \
+dependencies and determines the actions required to install packages."
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://PACKAGE-LICENSING;md5=4a0548e303dbc77f067335b4d688e745 \
@@ -71,7 +74,7 @@ do_install_append_class-native() {
 do_install_append_class-nativesdk() {
         create_wrapper ${D}/${bindir}/dnf \
                 RPM_CONFIGDIR=${SDKPATHNATIVE}${libdir_nativesdk}/rpm \
-                RPM_NO_CHROOT_FOR_SCRIPTS=1 
+                RPM_NO_CHROOT_FOR_SCRIPTS=1
 }
 
 SYSTEMD_SERVICE_${PN} = "dnf-makecache.service dnf-makecache.timer \

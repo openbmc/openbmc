@@ -13,7 +13,7 @@ S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
 XILINX_RELEASE_VERSION ?= ""
-ATF_VERSION ?= "1.4"
+ATF_VERSION ?= "2.0"
 ATF_VERSION_EXTENSION ?= "-xilinx-${XILINX_RELEASE_VERSION}"
 PV = "${ATF_VERSION}${ATF_VERSION_EXTENSION}+git${SRCPV}"
 
@@ -25,9 +25,12 @@ SRC_URI = "${REPO};${BRANCHARG}"
 ATF_BASE_NAME ?= "${PN}-${PKGE}-${PKGV}-${PKGR}-${DATETIME}"
 ATF_BASE_NAME[vardepsexclude] = "DATETIME"
 
-COMPATIBLE_MACHINE = "zynqmp"
-PLATFORM_zynqmp = "zynqmp"
+COMPATIBLE_MACHINE ?= "^$"
+COMPATIBLE_MACHINE_zynqmp = ".*"
+COMPATIBLE_MACHINE_versal = ".*"
 
+PLATFORM_zynqmp = "zynqmp"
+PLATFORM_versal = "versal"
 
 # requires CROSS_COMPILE set by hand as there is no configure script
 export CROSS_COMPILE="${TARGET_PREFIX}"
@@ -40,9 +43,13 @@ LD[unexport] = "1"
 
 ATF_CONSOLE ?= ""
 ATF_CONSOLE_zynqmp = "cadence"
+ATF_CONSOLE_versal ?= "pl011"
 
 DEBUG ?= ""
+DEBUG_versal ?= "1"
+
 EXTRA_OEMAKE_zynqmp_append = "${@' ZYNQMP_CONSOLE=${ATF_CONSOLE}' if d.getVar('ATF_CONSOLE', True) != '' else ''}"
+EXTRA_OEMAKE_append_versal = "${@' VERSAL_CONSOLE=${ATF_CONSOLE}' if d.getVar('ATF_CONSOLE', True) != '' else ''}"
 EXTRA_OEMAKE_append = " ${@bb.utils.contains('DEBUG', '1', ' DEBUG=${DEBUG}', '', d)}"
 
 OUTPUT_DIR = "${@bb.utils.contains('DEBUG', '1', '${B}/${PLATFORM}/debug', '${B}/${PLATFORM}/release', d)}"
@@ -52,6 +59,9 @@ ATF_MEM_SIZE ?= ""
 
 EXTRA_OEMAKE_zynqmp_append = "${@' ZYNQMP_ATF_MEM_BASE=${ATF_MEM_BASE}' if d.getVar('ATF_MEM_BASE', True) != '' else ''}"
 EXTRA_OEMAKE_zynqmp_append = "${@' ZYNQMP_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.getVar('ATF_MEM_SIZE', True) != '' else ''}"
+
+EXTRA_OEMAKE_append_versal = "${@' VERSAL_ATF_MEM_BASE=${ATF_MEM_BASE}' if d.getVar('ATF_MEM_BASE', True) != '' else ''}"
+EXTRA_OEMAKE_append_versal = "${@' VERSAL_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.getVar('ATF_MEM_SIZE', True) != '' else ''}"
 
 do_configure() {
 	oe_runmake clean -C ${S} BUILD_BASE=${B} PLAT=${PLATFORM}

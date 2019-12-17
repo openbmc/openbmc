@@ -1,10 +1,10 @@
 SUMMARY = "Python evdev lib"
 HOMEPAGE = "https://github.com/gvalkov/python-evdev"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=18debddbb3f52c661a129724a883a8e2"
 
-SRC_URI[md5sum] = "c7e855ae9f97f869a59e75b29f05ce74"
-SRC_URI[sha256sum] = "57edafc469a414f58b51af1bfb9ee2babb9f626dd2df530d71c1176871850aa1"
+SRC_URI[md5sum] = "53e440943dfa2514f95b3c448d6a36cb"
+SRC_URI[sha256sum] = "b03f5e1be5b4a5327494a981b831d251a142b09e8778eda1a8b53eba91100166"
 
 do_compile_prepend() {
     rm -rf ${S}/evdev/ecodes.c

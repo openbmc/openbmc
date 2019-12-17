@@ -1,6 +1,7 @@
 [Unit]
 Description=NFS Mount Daemon
 DefaultDependencies=no
+After=rpcbind.socket
 Requires=proc-fs-nfsd.mount
 After=proc-fs-nfsd.mount
 After=network.target local-fs.target
@@ -10,6 +11,7 @@ ConditionPathExists=@SYSCONFDIR@/exports
 [Service]
 EnvironmentFile=-@SYSCONFDIR@/nfs-utils.conf
 ExecStart=@SBINDIR@/rpc.mountd -F $MOUNTD_OPTS
+LimitNOFILE=@HIGH_RLIMIT_NOFILE@
 
 [Install]
 WantedBy=multi-user.target

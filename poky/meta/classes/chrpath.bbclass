@@ -1,7 +1,7 @@
 CHRPATH_BIN ?= "chrpath"
 PREPROCESS_RELOCATE_DIRS ?= ""
 
-def process_file_linux(cmd, fpath, rootdir, baseprefix, tmpdir, d):
+def process_file_linux(cmd, fpath, rootdir, baseprefix, tmpdir, d, break_hardlinks = False):
     import subprocess as sub
 
     p = sub.Popen([cmd, '-l', fpath],stdout=sub.PIPE,stderr=sub.PIPE)
@@ -39,6 +39,9 @@ def process_file_linux(cmd, fpath, rootdir, baseprefix, tmpdir, d):
 
     # if we have modified some rpaths call chrpath to update the binary
     if modified:
+        if break_hardlinks:
+            bb.utils.break_hardlinks(fpath)
+
         args = ":".join(new_rpaths)
         #bb.note("Setting rpath for %s to %s" %(fpath, args))
         p = sub.Popen([cmd, '-r', args, fpath],stdout=sub.PIPE,stderr=sub.PIPE)
@@ -46,7 +49,7 @@ def process_file_linux(cmd, fpath, rootdir, baseprefix, tmpdir, d):
         if p.returncode != 0:
             bb.fatal("%s: chrpath command failed with exit code %d:\n%s%s" % (d.getVar('PN'), p.returncode, out, err))
 
-def process_file_darwin(cmd, fpath, rootdir, baseprefix, tmpdir, d):
+def process_file_darwin(cmd, fpath, rootdir, baseprefix, tmpdir, d, break_hardlinks = False):
     import subprocess as sub
 
     p = sub.Popen([d.expand("${HOST_PREFIX}otool"), '-L', fpath],stdout=sub.PIPE,stderr=sub.PIPE)
@@ -61,11 +64,14 @@ def process_file_darwin(cmd, fpath, rootdir, baseprefix, tmpdir, d):
         if baseprefix not in rpath:
             continue
 
+        if break_hardlinks:
+            bb.utils.break_hardlinks(fpath)
+
         newpath = "@loader_path/" + os.path.relpath(rpath, os.path.dirname(fpath.replace(rootdir, "/")))
         p = sub.Popen([d.expand("${HOST_PREFIX}install_name_tool"), '-change', rpath, newpath, fpath],stdout=sub.PIPE,stderr=sub.PIPE)
         out, err = p.communicate()
 
-def process_dir (rootdir, directory, d):
+def process_dir(rootdir, directory, d, break_hardlinks = False):
     import stat
 
     rootdir = os.path.normpath(rootdir)
@@ -95,7 +101,7 @@ def process_dir (rootdir, directory, d):
             continue
 
         if os.path.isdir(fpath):
-            process_dir(rootdir, fpath, d)
+            process_dir(rootdir, fpath, d, break_hardlinks = break_hardlinks)
         else:
             #bb.note("Testing %s for relocatability" % fpath)
 
@@ -108,8 +114,9 @@ def process_dir (rootdir, directory, d):
             else:
                 # Temporarily make the file writeable so we can chrpath it
                 os.chmod(fpath, perms|stat.S_IRWXU)
-            process_file(cmd, fpath, rootdir, baseprefix, tmpdir, d)
-                
+
+            process_file(cmd, fpath, rootdir, baseprefix, tmpdir, d, break_hardlinks = break_hardlinks)
+
             if perms:
                 os.chmod(fpath, perms)
 

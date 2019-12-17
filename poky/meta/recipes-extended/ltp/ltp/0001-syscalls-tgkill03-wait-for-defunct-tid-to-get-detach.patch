@@ -1,0 +1,75 @@
+From e747d0456adc080a1d31fb653bda9dc491795c80 Mon Sep 17 00:00:00 2001
+From: Jan Stancek <jstancek@redhat.com>
+Date: Sun, 16 Jun 2019 11:14:16 +0200
+Subject: [PATCH] syscalls/tgkill03: wait for defunct tid to get detached
+
+Case where defunct tid is used has been observed to sporadically fail:
+  tgkill03.c:96: FAIL: Defunct tid should have failed with ESRCH: SUCCESS
+
+glibc __pthread_timedjoin_ex() waits for CLONE_CHILD_CLEARTID to clear tid,
+and then resumes. Kernel clears it (glibc pd->tid) at:
+  do_exit
+    exit_mm
+      mm_release
+        put_user(0, tsk->clear_child_tid);
+
+but kernel tid is still valid, presumably until:
+  release_task
+    __exit_signal
+      __unhash_process
+        detach_pid
+
+To avoid race wait until /proc/<pid>/task/<tid> disappears.
+
+Signed-off-by: Jan Stancek <jstancek@redhat.com>
+Reviewed-by: Li Wang <liwang@redhat.com>
+Acked-by: Sumit Garg <sumit.garg@linaro.org>
+
+Upstream-Status: Backport
+[https://github.com/linux-test-project/ltp/commit/e747d0456adc080a1d31fb653bda9dc491795c80]
+
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ testcases/kernel/syscalls/tgkill/tgkill03.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/testcases/kernel/syscalls/tgkill/tgkill03.c b/testcases/kernel/syscalls/tgkill/tgkill03.c
+index f5bbdc5..593a217 100644
+--- a/testcases/kernel/syscalls/tgkill/tgkill03.c
++++ b/testcases/kernel/syscalls/tgkill/tgkill03.c
+@@ -7,6 +7,7 @@
+ 
+ #include <pthread.h>
+ #include <pwd.h>
++#include <stdio.h>
+ #include <sys/types.h>
+ 
+ #include "tst_safe_pthread.h"
+@@ -42,6 +43,7 @@ static void setup(void)
+ {
+ 	sigset_t sigusr1;
+ 	pthread_t defunct_thread;
++	char defunct_tid_path[PATH_MAX];
+ 
+ 	sigemptyset(&sigusr1);
+ 	sigaddset(&sigusr1, SIGUSR1);
+@@ -55,8 +57,9 @@ static void setup(void)
+ 	TST_CHECKPOINT_WAIT(0);
+ 
+ 	SAFE_PTHREAD_CREATE(&defunct_thread, NULL, defunct_thread_func, NULL);
+-
+ 	SAFE_PTHREAD_JOIN(defunct_thread, NULL);
++	sprintf(defunct_tid_path, "/proc/%d/task/%d", getpid(), defunct_tid);
++	TST_RETRY_FN_EXP_BACKOFF(access(defunct_tid_path, R_OK), -1, 15);
+ }
+ 
+ static void cleanup(void)
+@@ -108,4 +111,5 @@ static struct tst_test test = {
+ 	.setup = setup,
+ 	.cleanup = cleanup,
+ 	.test = run,
++	.timeout = 20,
+ };
+-- 
+2.7.4
+

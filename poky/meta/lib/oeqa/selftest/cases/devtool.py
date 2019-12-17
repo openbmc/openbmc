@@ -137,6 +137,7 @@ class DevtoolBase(OESelftestTestCase):
         with open(recipefile, 'r') as f:
             invar = None
             invalue = None
+            inherits = set()
             for line in f:
                 var = None
                 if invar:
@@ -158,7 +159,7 @@ class DevtoolBase(OESelftestTestCase):
                         invar = var
                         continue
                 elif line.startswith('inherit '):
-                    inherits = line.split()[1:]
+                    inherits.update(line.split()[1:])
 
                 if var and var in checkvars:
                     needvalue = checkvars.pop(var)
@@ -240,6 +241,9 @@ class DevtoolTests(DevtoolBase):
         # Check preconditions
         result = runCmd('bitbake-layers show-layers')
         self.assertTrue('\nworkspace' not in result.output, 'This test cannot be run with a workspace layer in bblayers.conf')
+        # remove conf/devtool.conf to avoid it corrupting tests
+        devtoolconf = os.path.join(self.builddir, 'conf', 'devtool.conf')
+        self.track_for_cleanup(devtoolconf)
         # Try creating a workspace layer with a specific path
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir)
@@ -515,8 +519,8 @@ class DevtoolModifyTests(DevtoolBase):
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir)
         self.track_for_cleanup(self.workspacedir)
-        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         self.add_command_to_tearDown('bitbake -c clean mdadm')
+        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         result = runCmd('devtool modify mdadm -x %s' % tempdir)
         self.assertExists(os.path.join(tempdir, 'Makefile'), 'Extracted source could not be found')
         self.assertExists(os.path.join(self.workspacedir, 'conf', 'layer.conf'), 'Workspace directory not created')
@@ -584,8 +588,8 @@ class DevtoolModifyTests(DevtoolBase):
         self.track_for_cleanup(tempdir_m4)
         self.track_for_cleanup(builddir_m4)
         self.track_for_cleanup(self.workspacedir)
-        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         self.add_command_to_tearDown('bitbake -c clean mdadm m4')
+        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         self.write_recipeinc('m4', 'EXTERNALSRC_BUILD = "%s"\ndo_clean() {\n\t:\n}\n' % builddir_m4)
         try:
             runCmd('devtool modify mdadm -x %s' % tempdir_mdadm)
@@ -601,6 +605,7 @@ class DevtoolModifyTests(DevtoolBase):
             bitbake('mdadm m4 -c buildclean')
             assertNoFile(tempdir_mdadm, 'mdadm')
             assertNoFile(builddir_m4, 'src/m4')
+            runCmd('echo "#Trigger rebuild" >> %s/Makefile' % tempdir_mdadm)
             bitbake('mdadm m4 -c compile')
             assertFile(tempdir_mdadm, 'mdadm')
             assertFile(builddir_m4, 'src/m4')
@@ -680,8 +685,8 @@ class DevtoolModifyTests(DevtoolBase):
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir)
         self.track_for_cleanup(self.workspacedir)
-        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         self.add_command_to_tearDown('bitbake -c clean %s' % testrecipe)
+        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         result = runCmd('devtool modify %s -x %s' % (testrecipe, tempdir))
         self.assertExists(os.path.join(tempdir, 'Makefile.am'), 'Extracted source could not be found')
         self.assertExists(os.path.join(self.workspacedir, 'conf', 'layer.conf'), 'Workspace directory not created. devtool output: %s' % result.output)
@@ -712,8 +717,8 @@ class DevtoolModifyTests(DevtoolBase):
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir)
         self.track_for_cleanup(self.workspacedir)
-        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         self.add_command_to_tearDown('bitbake -c clean %s' % testrecipe)
+        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         result = runCmd('devtool modify %s -x %s' % (testrecipe, tempdir))
         self.assertExists(os.path.join(tempdir, 'configure.ac'), 'Extracted source could not be found')
         self.assertExists(os.path.join(self.workspacedir, 'conf', 'layer.conf'), 'Workspace directory not created')
@@ -1243,8 +1248,8 @@ class DevtoolExtractTests(DevtoolBase):
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir)
         self.track_for_cleanup(self.workspacedir)
-        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         self.add_command_to_tearDown('bitbake -c clean %s' % testrecipe)
+        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         result = runCmd('devtool modify %s -x %s' % (testrecipe, tempdir))
         # Test that deploy-target at this point fails (properly)
         result = runCmd('devtool deploy-target -n %s root@localhost' % testrecipe, ignore_status=True)
@@ -1294,8 +1299,8 @@ class DevtoolExtractTests(DevtoolBase):
         self.assertTrue(not os.path.exists(self.workspacedir), 'This test cannot be run with a workspace directory under the build directory')
         image = 'core-image-minimal'
         self.track_for_cleanup(self.workspacedir)
-        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         self.add_command_to_tearDown('bitbake -c clean %s' % image)
+        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         bitbake('%s -c clean' % image)
         # Add target and native recipes to workspace
         recipes = ['mdadm', 'parted-native']
@@ -1492,11 +1497,13 @@ class DevtoolUpgradeTests(DevtoolBase):
         recipedir = os.path.dirname(oldrecipefile)
         olddir = os.path.join(recipedir, recipe + '-' + oldversion)
         patchfn = '0001-Add-a-note-line-to-the-quick-reference.patch'
+        backportedpatchfn = 'backported.patch'
         self.assertExists(os.path.join(olddir, patchfn), 'Original patch file does not exist')
-        return recipe, oldrecipefile, recipedir, olddir, newversion, patchfn
+        self.assertExists(os.path.join(olddir, backportedpatchfn), 'Backported patch file does not exist')
+        return recipe, oldrecipefile, recipedir, olddir, newversion, patchfn, backportedpatchfn
 
     def test_devtool_finish_upgrade_origlayer(self):
-        recipe, oldrecipefile, recipedir, olddir, newversion, patchfn = self._setup_test_devtool_finish_upgrade()
+        recipe, oldrecipefile, recipedir, olddir, newversion, patchfn, backportedpatchfn = self._setup_test_devtool_finish_upgrade()
         # Ensure the recipe is where we think it should be (so that cleanup doesn't trash things)
         self.assertIn('/meta-selftest/', recipedir)
         # Try finish to the original layer
@@ -1507,14 +1514,23 @@ class DevtoolUpgradeTests(DevtoolBase):
         self.assertNotExists(os.path.join(self.workspacedir, 'recipes', recipe), 'Recipe directory should not exist after finish')
         self.assertNotExists(oldrecipefile, 'Old recipe file should have been deleted but wasn\'t')
         self.assertNotExists(os.path.join(olddir, patchfn), 'Old patch file should have been deleted but wasn\'t')
+        self.assertNotExists(os.path.join(olddir, backportedpatchfn), 'Old backported patch file should have been deleted but wasn\'t')
         newrecipefile = os.path.join(recipedir, '%s_%s.bb' % (recipe, newversion))
         newdir = os.path.join(recipedir, recipe + '-' + newversion)
         self.assertExists(newrecipefile, 'New recipe file should have been copied into existing layer but wasn\'t')
         self.assertExists(os.path.join(newdir, patchfn), 'Patch file should have been copied into new directory but wasn\'t')
+        self.assertNotExists(os.path.join(newdir, backportedpatchfn), 'Backported patch file should not have been copied into new directory but was')
         self.assertExists(os.path.join(newdir, '0002-Add-a-comment-to-the-code.patch'), 'New patch file should have been created but wasn\'t')
+        with open(newrecipefile, 'r') as f:
+            newcontent = f.read()
+        self.assertNotIn(backportedpatchfn, newcontent, "Backported patch should have been removed from the recipe but wasn't")
+        self.assertIn(patchfn, newcontent, "Old patch should have not been removed from the recipe but was")
+        self.assertIn("0002-Add-a-comment-to-the-code.patch", newcontent, "New patch should have been added to the recipe but wasn't")
+        self.assertIn("http://www.ivarch.com/programs/sources/pv-${PV}.tar.gz", newcontent, "New recipe no longer has upstream source in SRC_URI")
+
 
     def test_devtool_finish_upgrade_otherlayer(self):
-        recipe, oldrecipefile, recipedir, olddir, newversion, patchfn = self._setup_test_devtool_finish_upgrade()
+        recipe, oldrecipefile, recipedir, olddir, newversion, patchfn, backportedpatchfn = self._setup_test_devtool_finish_upgrade()
         # Ensure the recipe is where we think it should be (so that cleanup doesn't trash things)
         self.assertIn('/meta-selftest/', recipedir)
         # Try finish to a different layer - should create a bbappend
@@ -1530,10 +1546,18 @@ class DevtoolUpgradeTests(DevtoolBase):
         self.assertNotExists(os.path.join(self.workspacedir, 'recipes', recipe), 'Recipe directory should not exist after finish')
         self.assertExists(oldrecipefile, 'Old recipe file should not have been deleted')
         self.assertExists(os.path.join(olddir, patchfn), 'Old patch file should not have been deleted')
+        self.assertExists(os.path.join(olddir, backportedpatchfn), 'Old backported patch file should not have been deleted')
         newdir = os.path.join(newrecipedir, recipe + '-' + newversion)
         self.assertExists(newrecipefile, 'New recipe file should have been copied into existing layer but wasn\'t')
         self.assertExists(os.path.join(newdir, patchfn), 'Patch file should have been copied into new directory but wasn\'t')
+        self.assertNotExists(os.path.join(newdir, backportedpatchfn), 'Backported patch file should not have been copied into new directory but was')
         self.assertExists(os.path.join(newdir, '0002-Add-a-comment-to-the-code.patch'), 'New patch file should have been created but wasn\'t')
+        with open(newrecipefile, 'r') as f:
+            newcontent = f.read()
+        self.assertNotIn(backportedpatchfn, newcontent, "Backported patch should have been removed from the recipe but wasn't")
+        self.assertIn(patchfn, newcontent, "Old patch should have not been removed from the recipe but was")
+        self.assertIn("0002-Add-a-comment-to-the-code.patch", newcontent, "New patch should have been added to the recipe but wasn't")
+        self.assertIn("http://www.ivarch.com/programs/sources/pv-${PV}.tar.gz", newcontent, "New recipe no longer has upstream source in SRC_URI")
 
     def _setup_test_devtool_finish_modify(self):
         # Check preconditions
@@ -1704,8 +1728,8 @@ class DevtoolUpgradeTests(DevtoolBase):
         self.track_for_cleanup(tempdir)
         self.track_for_cleanup(tempdir_cfg)
         self.track_for_cleanup(self.workspacedir)
-        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         self.add_command_to_tearDown('bitbake -c clean %s' % kernel_provider)
+        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         #Step 1
         #Here is just generated the config file instead of all the kernel to optimize the
         #time of executing this test case.

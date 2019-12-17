@@ -1,0 +1,73 @@
+From 8f961521add49278b48c9721fc53e05ee3543b74 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 16 Nov 2019 23:03:51 -0800
+Subject: [PATCH] kcapi-kdf: Move code to fix
+
+Fixes clang build
+unused function '_bswap32' [-Werror,-Wunused-function]
+
+Upstream-Status: Submitted [https://github.com/smuellerDD/libkcapi/pull/83]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/kcapi-kdf.c | 37 +++++++++++++++++--------------------
+ 1 file changed, 17 insertions(+), 20 deletions(-)
+
+diff --git a/lib/kcapi-kdf.c b/lib/kcapi-kdf.c
+index ea39846..9e53a0b 100644
+--- a/lib/kcapi-kdf.c
++++ b/lib/kcapi-kdf.c
+@@ -54,6 +54,20 @@
+ #include "kcapi.h"
+ #include "internal.h"
+ 
++#define GCC_VERSION (__GNUC__ * 10000		\
++		     + __GNUC_MINOR__ * 100	\
++		     + __GNUC_PATCHLEVEL__)
++#if GCC_VERSION >= 40400
++# define __HAVE_BUILTIN_BSWAP32__
++#endif
++
++/* Endian dependent byte swap operations.  */
++#if  __BYTE_ORDER__ ==  __ORDER_BIG_ENDIAN__
++# define be_bswap32(x) ((uint32_t)(x))
++#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
++# ifdef __HAVE_BUILTIN_BSWAP32__
++#  define be_bswap32(x) (uint32_t)__builtin_bswap32((uint32_t)(x))
++# else
+ static inline uint32_t rol32(uint32_t x, int n)
+ {
+ 	return ( (x << (n&(32-1))) | (x >> ((32-n)&(32-1))) );
+@@ -68,27 +82,10 @@ static inline uint32_t _bswap32(uint32_t x)
+ {
+ 	return ((rol32(x, 8) & 0x00ff00ffL) | (ror32(x, 8) & 0xff00ff00L));
+ }
+-
+-#define GCC_VERSION (__GNUC__ * 10000		\
+-		     + __GNUC_MINOR__ * 100	\
+-		     + __GNUC_PATCHLEVEL__)
+-#if GCC_VERSION >= 40400
+-# define __HAVE_BUILTIN_BSWAP32__
+-#endif
+-
+-#ifdef __HAVE_BUILTIN_BSWAP32__
+-# define _swap32(x) (uint32_t)__builtin_bswap32((uint32_t)(x))
+-#else
+-# define _swap32(x) _bswap32(x)
+-#endif
+-
+-/* Endian dependent byte swap operations.  */
+-#if __BYTE_ORDER__ ==  __ORDER_BIG_ENDIAN__
+-# define be_bswap32(x) ((uint32_t)(x))
+-#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+-# define be_bswap32(x) _swap32(x)
++#  define be_bswap32(x) _bswap32(x)
++# endif
+ #else
+-#error "Endianess not defined"
++# error "endianess not defined"
+ #endif
+ 
+ DSO_PUBLIC
+-- 
+2.24.0
+

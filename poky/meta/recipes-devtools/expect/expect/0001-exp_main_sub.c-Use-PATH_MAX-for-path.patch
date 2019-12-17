@@ -1,0 +1,55 @@
+From 1407fcad6f1dac0a4efe8041660bf6139c1cd16a Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Tue, 24 Sep 2019 13:40:10 +0800
+Subject: [PATCH] exp_main_sub.c: Use PATH_MAX for path
+
+If expect was built from a long path whose length > 200, then it couldn't run:
+$ expect -c 'puts yes'
+*** buffer overflow detected ***: expect terminated
+Aborted (core dumped)
+
+Use PATH_MAX to fix the problem.
+
+Upstream-Status: Pending [Upstream seems dead]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ exp_main_sub.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/exp_main_sub.c b/exp_main_sub.c
+index fcfaa6e..bf6c4be 100644
+--- a/exp_main_sub.c
++++ b/exp_main_sub.c
+@@ -48,6 +48,10 @@ char exp_version[] = PACKAGE_VERSION;
+ #define NEED_TCL_MAJOR		7
+ #define NEED_TCL_MINOR		5
+ 
++#ifndef PATH_MAX
++#define PATH_MAX 4096
++#endif
++
+ char *exp_argv0 = "this program";	/* default program name */
+ void (*exp_app_exit)() = 0;
+ void (*exp_event_exit)() = 0;
+@@ -901,7 +905,7 @@ int sys_rc;
+ 	int rc;
+ 
+ 	if (sys_rc) {
+-	    char file[200];
++	    char file[PATH_MAX];
+ 	    int fd;
+ 
+ 	    sprintf(file,"%s/expect.rc",SCRIPTDIR);
+@@ -917,7 +921,7 @@ int sys_rc;
+ 	    }
+ 	}
+ 	if (my_rc) {
+-	    char file[200];
++	    char file[PATH_MAX];
+ 	    char *home;
+ 	    int fd;
+ 	    char *getenv();
+-- 
+2.7.4
+

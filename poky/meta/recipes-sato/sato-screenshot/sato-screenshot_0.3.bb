@@ -16,7 +16,7 @@ UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>(\d+(\.\d+)+))"
 
 S = "${WORKDIR}/git"
 
-inherit autotools pkgconfig distro_features_check
+inherit autotools pkgconfig features_check
 
 FILES_${PN} += "${libdir}/matchbox-panel/*.so"
 

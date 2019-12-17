@@ -1,0 +1,28 @@
+Make it work with xfsprogs 5.2.0.
+
+"xfs_fsop_geom_v1_t" has changed to "struct xfs_fsop_geom_v1"
+in xfsprogs since version 5.2.0.
+
+Upstream-Status: Pending
+
+Signed-off-by: Yuan Chao <yuanc.fnst@cn.fujitsu.com>
+---
+ common/fs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/common/fs.c b/common/fs.c
+index 60cf0fd..2cc7031 100644
+--- a/common/fs.c
++++ b/common/fs.c
+@@ -204,7 +204,7 @@ fs_mounted( char *typs, char *chrs, char *mnts, uuid_t *idp )
+ int
+ fs_getid( char *mnts, uuid_t *idb )
+ {
+-	xfs_fsop_geom_v1_t geo;
++	struct xfs_fsop_geom_v1 geo;
+ 	int fd;
+ 
+ 	fd = open( mnts, O_RDONLY );
+-- 
+2.7.4
+

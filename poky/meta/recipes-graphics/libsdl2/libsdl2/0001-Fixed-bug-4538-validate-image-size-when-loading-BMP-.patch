@@ -1,0 +1,34 @@
+From 85138c1ec673e05263ae666baf61f79384daf7e0 Mon Sep 17 00:00:00 2001
+From: Sam Lantinga <slouken@libsdl.org>
+Date: Tue, 30 Jul 2019 11:00:00 -0700
+Subject: [PATCH] Fixed bug 4538 - validate image size when loading BMP files
+
+Upstream-Status: Backport
+[https://hg.libsdl.org/SDL/rev/e7ba650a643a]
+
+CVE: CVE-2019-13616
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ src/video/SDL_bmp.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/video/SDL_bmp.c b/src/video/SDL_bmp.c
+index 0b68918..a06b0c9 100644
+--- a/src/video/SDL_bmp.c
++++ b/src/video/SDL_bmp.c
+@@ -226,6 +226,11 @@ SDL_LoadBMP_RW(SDL_RWops * src, int freesrc)
+             SDL_RWseek(src, (biSize - headerSize), RW_SEEK_CUR);
+         }
+     }
++    if (biWidth <= 0 || biHeight == 0) {
++        SDL_SetError("BMP file with bad dimensions (%dx%d)", biWidth, biHeight);
++        was_error = SDL_TRUE;
++        goto done;
++    }
+     if (biHeight < 0) {
+         topDown = SDL_TRUE;
+         biHeight = -biHeight;
+-- 
+2.7.4
+

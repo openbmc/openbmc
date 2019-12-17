@@ -1,7 +1,7 @@
 DESCRIPTION = "netkit-ft includes the ftp client."
 SECTION = "net"
 HOMEPAGE="ftp://ftp.uk.linux.org/pub/linux/Networking/netkit"
-LICENSE = "BSD"
+LICENSE = "BSD-4-Clause"
 
 LIC_FILES_CHKSUM = "file://ftp/ftp.c;beginline=2;endline=3;md5=2d40a75a50d83b8f6317b3f53db72bfa"
 

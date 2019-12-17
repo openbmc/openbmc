@@ -1,7 +1,7 @@
 [Unit]
 Description=Witherspoon Fan Watchdog Daemon
-Wants=phosphor-fan-control-init@0.service
-Before=phosphor-fan-control-init@0.service
+Wants=phosphor-fan-monitor-init@0.service
+Before=phosphor-fan-monitor-init@0.service
 Conflicts=obmc-fan-watchdog-takeover.target
 
 [Service]

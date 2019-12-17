@@ -1,6 +1,3 @@
-From caeccb7bec45f65bc89efa8195b3853368328361 Mon Sep 17 00:00:00 2001
-From: Changqing Li <changqing.li@windriver.com>
-Date: Mon, 17 Sep 2018 12:49:36 +0800
 Subject: [PATCH] syslog-ng: fix segment fault during service start on arm64
 
 service start failed since segment fault on arch arm64,
@@ -17,12 +14,15 @@ https://github.com/buytenh/ivykis/issues/15
 Upstream-Status: Pending
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
+
+Update for 3.24.1.
+Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
 ---
- lib/ivykis/src/pthr.h | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+ lib/ivykis/src/pthr.h | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
 
 diff --git a/lib/ivykis/src/pthr.h b/lib/ivykis/src/pthr.h
-index a41eaf3..72c5190 100644
+index 29e4be7..5d29096 100644
 --- a/lib/ivykis/src/pthr.h
 +++ b/lib/ivykis/src/pthr.h
 @@ -24,6 +24,16 @@
@@ -47,12 +47,12 @@ index a41eaf3..72c5190 100644
  #ifdef HAVE_PRAGMA_WEAK
  
 -/*
-- * On Linux, pthread_atfork() is defined in libpthread_nonshared.a,
-- * a static library, and we want to avoid "#pragma weak" for that
-- * symbol because that causes it to be undefined even if you link
-- * libpthread_nonshared.a in explicitly.
+- * On Linux, pthread_atfork() is defined in libc_nonshared.a (for
+- * glibc >= 2.28) or libpthread_nonshared.a (for glibc <= 2.27), and
+- * we want to avoid "#pragma weak" for that symbol because that causes
+- * it to be undefined even if you link lib*_nonshared.a in explicitly.
 - */
--#ifndef HAVE_LIBPTHREAD_NONSHARED
+-#if !defined(HAVE_LIBC_NONSHARED) && !defined(HAVE_LIBPTHREAD_NONSHARED)
 -#pragma weak pthread_atfork
 -#endif
 -
@@ -60,16 +60,15 @@ index a41eaf3..72c5190 100644
  #pragma weak pthread_create
  #pragma weak pthread_detach
  #pragma weak pthread_getspecific
-@@ -73,8 +74,7 @@ static inline int
+@@ -73,7 +74,7 @@ static inline int
  pthr_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void))
  {
  	if (pthreads_available())
 -		return pthread_atfork(prepare, parent, child);
--
 +		return __register_atfork(prepare, parent, child, __dso_handle);
+ 
  	return ENOSYS;
  }
- 
 -- 
 2.7.4
 

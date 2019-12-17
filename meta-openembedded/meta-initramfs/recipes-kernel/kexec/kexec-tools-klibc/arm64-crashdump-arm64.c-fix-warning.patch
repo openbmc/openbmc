@@ -1,7 +1,7 @@
-From 6f69f489a442b3a192e4c08748ee8c4d31c75dae Mon Sep 17 00:00:00 2001
+From 3fd4db2ce1710f45eb297ae6b2c10726b33204f3 Mon Sep 17 00:00:00 2001
 From: Andrea Adami <andrea.adami@gmail.com>
 Date: Sun, 29 Apr 2018 00:46:16 +0200
-Subject: [PATCH 5/6] arm64: crashdump-arm64.c: fix warning
+Subject: [PATCH] arm64: crashdump-arm64.c: fix warning
 
                  from ../git/kexec/kexec.h:6,
                  from ../git/kexec/arch/arm64/crashdump-arm64.c:18:
@@ -11,6 +11,7 @@ ng: "__bitwise" redefined
  # define __bitwise
 
 Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+
 ---
  kexec/arch/arm64/crashdump-arm64.c | 3 +++
  1 file changed, 3 insertions(+)
@@ -29,6 +30,3 @@ index 4fd7aa8..890d88f 100644
  #include <linux/elf.h>
  
  #include "kexec.h"
--- 
-2.7.4
-

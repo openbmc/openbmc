@@ -21,7 +21,10 @@ DEPENDS += "pciutils"
 PACKAGECONFIG ?= "cleanup-delete"
 PACKAGECONFIG[cleanup-delete] = "--enable-cleanup-delete, --disable-cleanup-delete"
 # If using static-layout, reboot-update is a good option to handle updating.
+# To be able to track the update status, update-status option can be used.
+# Note that both reboot-update and update-status cannot be enabled at the same time.
 PACKAGECONFIG[reboot-update] = "--enable-reboot-update, --disable-reboot-update"
+PACKAGECONFIG[update-status] = "--enable-update-status, --disable-update-status"
 
 # Default options for supporting various flash types:
 PACKAGECONFIG[static-bmc] = "--enable-static-layout, --disable-static-layout"
@@ -32,6 +35,7 @@ PACKAGECONFIG[host-bios] = "--enable-host-bios, --disable-host-bios"
 PACKAGECONFIG[aspeed-p2a] = "--enable-aspeed-p2a, --disable-aspeed-p2a"
 PACKAGECONFIG[aspeed-lpc] = "--enable-aspeed-lpc, --disable-aspeed-lpc"
 PACKAGECONFIG[nuvoton-lpc] = "--enable-nuvoton-lpc, --disable-nuvoton-lpc"
+PACKAGECONFIG[net-bridge] = "--enable-net-bridge, --disable-net-bridge"
 
 EXTRA_OECONF = "--disable-tests --disable-build-host-tool"
 
@@ -41,7 +45,7 @@ EXTRA_OECONF_append = " MAPPED_ADDRESS=${IPMI_FLASH_BMC_ADDRESS}"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/phosphor-ipmi-flash"
-SRCREV = "e3feacfa00823773ca5db363ffeb1d537f52e9a9"
+SRCREV = "2aa55347312c400f9dd61a32c8c1e37b1691bb1c"
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} += "phosphor-ipmi-flash-bmc-prepare.target \

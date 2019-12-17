@@ -15,7 +15,7 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/utils/usb/usbutils/usbutils-${PV}.tar.gz \
 SRC_URI[md5sum] = "7484445cbcf04b3eacac892fe58f8d9f"
 SRC_URI[sha256sum] = "ae2e10aad530d95839b6f4d46cd41715eae6f0f1789310d793e9be21b3e7ae20"
 
-inherit autotools pkgconfig distro_features_check update-alternatives
+inherit autotools pkgconfig features_check update-alternatives
 
 ALTERNATIVE_${PN} = "lsusb"
 ALTERNATIVE_PRIORITY = "100"

@@ -11,12 +11,10 @@ As this block is generally pointless, disable it.
 Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 
-Index: libffi-3.2.1/configure.ac
-===================================================================
---- libffi-3.2.1.orig/configure.ac
-+++ libffi-3.2.1/configure.ac
-@@ -592,7 +592,7 @@ AC_ARG_ENABLE(purify-safety,
- 
+--- a/configure.ac
++++ b/configure.ac
+@@ -350,7 +350,7 @@ AC_ARG_ENABLE(multi-os-directory,
+                           
  # These variables are only ever used when we cross-build to X86_WIN32.
  # And we only support this with GCC, so...
 -if test "x$GCC" = "xyes"; then

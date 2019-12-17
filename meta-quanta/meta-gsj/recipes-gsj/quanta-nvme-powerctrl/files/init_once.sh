@@ -45,8 +45,8 @@ do
         CLOCK_GEN_VALUE=$(printf '0x%x\n' \
         "$(($CLOCK_GEN_VALUE | 0x$update_value))")
     else
-        set_gpio_direction "${RST_BMC_U2[$1]}" "low"
-        set_gpio_direction "${POWER_U2[$1]}" "low"
+        set_gpio_direction "${RST_BMC_U2[$i]}" "low"
+        set_gpio_direction "${POWER_U2[$i]}" "low"
 
         CLOCK_GEN_VALUE=$(printf '0x%x\n' \
         "$(($CLOCK_GEN_VALUE & ~0x$update_value))")

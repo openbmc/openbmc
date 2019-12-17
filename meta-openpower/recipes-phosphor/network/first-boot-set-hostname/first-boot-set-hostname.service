@@ -1,7 +1,6 @@
 [Unit]
 Description=Init BMC Hostname
-Wants=mapper-wait@-xyz-openbmc_project-inventory.service
-After=mapper-wait@-xyz-openbmc_project-inventory.service
+ConditionPathExists=!/var/lib/first-boot-set-hostname
 Wants=op-vpd-parser.service
 After=op-vpd-parser.service
 

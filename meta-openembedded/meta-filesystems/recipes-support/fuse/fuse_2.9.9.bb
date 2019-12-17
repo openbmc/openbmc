@@ -54,7 +54,7 @@ do_configure_prepend() {
 }
 
 do_install_append() {
-    rm -rf ${D}${base_prefix}/dev
+    rm -rf ${D}/dev
 
     # systemd class remove the sysv_initddir only if systemd_system_unitdir
     # contains anything, but it's not needed if sysvinit is not in DISTRO_FEATURES
@@ -67,6 +67,12 @@ do_install_append() {
         install -d ${D}${sysconfdir}/modules-load.d
         install -m 0644 ${WORKDIR}/fuse.conf ${D}${sysconfdir}/modules-load.d
     fi
+}
+
+do_install_append_class-nativesdk() {
+    install -d ${D}${sysconfdir}
+    mv ${D}/etc/* ${D}${sysconfdir}/
+    rmdir ${D}/etc
 }
 
 BBCLASSEXTEND = "native nativesdk"

@@ -14,21 +14,21 @@ class BitbakeLayers(OESelftestTestCase):
 
     def test_bitbakelayers_showcrossdepends(self):
         result = runCmd('bitbake-layers show-cross-depends')
-        self.assertTrue('aspell' in result.output, msg = "No dependencies were shown. bitbake-layers show-cross-depends output: %s" % result.output)
+        self.assertIn('aspell', result.output)
 
     def test_bitbakelayers_showlayers(self):
         result = runCmd('bitbake-layers show-layers')
-        self.assertTrue('meta-selftest' in result.output, msg = "No layers were shown. bitbake-layers show-layers output: %s" % result.output)
+        self.assertIn('meta-selftest', result.output)
 
     def test_bitbakelayers_showappends(self):
         recipe = "xcursor-transparent-theme"
         bb_file = self.get_recipe_basename(recipe)
         result = runCmd('bitbake-layers show-appends')
-        self.assertTrue(bb_file in result.output, msg="%s file was not recognised. bitbake-layers show-appends output: %s" % (bb_file, result.output))
+        self.assertIn(bb_file, result.output)
 
     def test_bitbakelayers_showoverlayed(self):
         result = runCmd('bitbake-layers show-overlayed')
-        self.assertTrue('aspell' in result.output, msg="aspell overlayed recipe was not recognised bitbake-layers show-overlayed %s" % result.output)
+        self.assertIn('aspell', result.output)
 
     def test_bitbakelayers_flatten(self):
         recipe = "xcursor-transparent-theme"

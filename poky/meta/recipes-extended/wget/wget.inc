@@ -1,4 +1,9 @@
 SUMMARY = "Console URL download utility supporting HTTP, FTP, etc"
+DESCRIPTION = "Wget is a network utility to retrieve files from the web using \
+HTTP(S) and FTP, the two most widely used internet protocols. It works \
+non-interactively, so it will work in the background, after having logged off. \
+The program supports recursive retrieval of web-authoring pages as well as \
+FTP sites"
 HOMEPAGE = "https://www.gnu.org/software/wget/"
 SECTION = "console/network"
 LICENSE = "GPLv3"

@@ -35,6 +35,7 @@ do_install_ptest() {
     sed -i 's|./grubby|grubby|' ${D}${PTEST_PATH}/test.sh
 }
 
+RDEPENDS_${PN} += "bash"
 RDEPENDS_${PN}-ptest = "util-linux-getopt bash"
 
 COMPATIBLE_HOST = '(x86_64.*|i.86.*)-(linux|freebsd.*)'

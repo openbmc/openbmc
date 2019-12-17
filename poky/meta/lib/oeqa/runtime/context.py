@@ -138,7 +138,7 @@ class OERuntimeTestContextExecutor(OETestContextExecutor):
         def add_controller_list(path):
             if not os.path.exists(os.path.join(path, '__init__.py')):
                 raise OSError('Controllers directory %s exists but is missing __init__.py' % path)
-            files = sorted([f for f in os.listdir(path) if f.endswith('.py') and not f.startswith('_')])
+            files = sorted([f for f in os.listdir(path) if f.endswith('.py') and not f.startswith('_') and not f.startswith('.#')])
             for f in files:
                 module = 'oeqa.controllers.' + f[:-3]
                 if module not in controllerslist:

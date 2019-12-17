@@ -1,0 +1,28 @@
+From 589a5442a841b156a1890bc2d26e7a5103e2f672 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 1 Nov 2019 17:53:50 -0700
+Subject: [PATCH] riscv: Enable double operations when using double float abi
+
+Upstream-Status: Submitted [https://github.com/pocoproject/poco/pull/2825]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Foundation/src/utils.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Foundation/src/utils.h b/Foundation/src/utils.h
+index 69cea1aca..ff7a5c9ce 100644
+--- a/Foundation/src/utils.h
++++ b/Foundation/src/utils.h
+@@ -63,7 +63,8 @@
+     defined(__SH4__) || defined(__alpha__) || \
+     defined(_MIPS_ARCH_MIPS32R2) || \
+     defined(__AARCH64EL__) || \
+-    defined(nios2) || defined(__nios2) || defined(__nios2__)
++    defined(nios2) || defined(__nios2) || defined(__nios2__) || \
++    (defined(__riscv) && defined(__riscv_float_abi_double))
+ #define DOUBLE_CONVERSION_CORRECT_DOUBLE_OPERATIONS 1
+ #elif defined(_M_IX86) || defined(__i386__) || defined(__i386)
+ #if defined(_WIN32)
+-- 
+2.23.0
+

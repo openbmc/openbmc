@@ -1,6 +1,6 @@
 SUMMARY = "This package provides a python interface to CMU Sphinxbase and Pocketsphinx libraries created with SWIG and Setuptools."
 SECTION = "devel/python"
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=826ebda787eb48e78aec2624f9faba72"
 
 SRC_URI[md5sum] = "c0f2bfd54bc4c438c3bb64825f57d575"

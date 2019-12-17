@@ -1,0 +1,31 @@
+From e3b59cb9658e1d3efa3535840939a0fa92a70a5a Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 7 Oct 2019 13:22:14 +0200
+Subject: [PATCH] setup.py: do not report missing dependencies for disabled
+ modules
+
+Reporting those missing dependencies is misleading as the modules would not
+have been built anyway. This particularly matters in oe-core's automated
+build completeness checker which relies on the report.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ setup.py | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/setup.py b/setup.py
+index 4b53668..0097643 100644
+--- a/setup.py
++++ b/setup.py
+@@ -365,6 +365,10 @@ class PyBuildExt(build_ext):
+                 print("%-*s   %-*s   %-*s" % (longest, e, longest, f,
+                                               longest, g))
+ 
++        # There is no need to report missing module dependencies,
++        # if the modules have been disabled in the first place.
++        missing = list(set(missing) - set(sysconf_dis))
++
+         if missing:
+             print()
+             print("Python build finished successfully!")

@@ -1,8 +1,12 @@
 SUMMARY = "An Internet printing system for Unix"
+DESCRIPTION = "The Common UNIX Printing System is a printing system and \
+general replacement for lpd and the like. It supports the Internet Printing \
+Protocol (IPP), and has its own filtering driver model for handling various \
+document types."
 HOMEPAGE = "https://www.cups.org/"
 SECTION = "console/utils"
 LICENSE = "GPLv2 & LGPLv2"
-DEPENDS = "gnutls libpng jpeg dbus dbus-glib zlib libusb1"
+DEPENDS = "gnutls libpng jpeg dbus zlib libusb1"
 
 SRC_URI = "https://github.com/apple/cups/releases/download/v${PV}/${BP}-source.tar.gz \
            file://use_echo_only_in_init.patch \
@@ -67,7 +71,7 @@ do_install () {
 
 	# Remove /var/run from package as cupsd will populate it on startup
 	rm -fr ${D}/${localstatedir}/run
-	rmdir ${D}/${libdir}/${BPN}/driver
+	rmdir ${D}/${libexecdir}/${BPN}/driver
 
 	# Fix the pam configuration file permissions
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'true', 'false', d)}; then

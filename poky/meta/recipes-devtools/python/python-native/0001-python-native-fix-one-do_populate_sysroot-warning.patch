@@ -1,4 +1,4 @@
-From 12292444e1b3662b994bc223d92b8338fb0895ff Mon Sep 17 00:00:00 2001
+From 6cbb7529cf7ff0da3ca649fb3486facd9620d625 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Thu, 25 Oct 2018 07:32:14 +0000
 Subject: [PATCH] python-native: fix one do_populate_sysroot warning
@@ -17,23 +17,24 @@ when do_populate_sysroot. use append to fix it.
 Upstream-Status: Inappropriate [oe-specific]
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
+
 ---
  setup.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/setup.py b/setup.py
-index 7bf13ed..6c0f29b 100644
+index a2c8127..22f9e23 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -40,7 +40,7 @@ def add_dir_to_list(dirlist, dir):
-     1) 'dir' is not already in 'dirlist'
-     2) 'dir' actually exists, and is a directory."""
-     if dir is not None and os.path.isdir(dir) and dir not in dirlist:
--        dirlist.insert(0, dir)
-+        dirlist.append(dir)
-
- def macosx_sdk_root():
-     """
+@@ -47,7 +47,7 @@ def add_dir_to_list(dirlist, dir):
+         else:
+             dir_exists = os.path.isdir(dir)
+         if dir_exists:
+-            dirlist.insert(0, dir)
++            dirlist.append(dir)
+ 
+ MACOS_SDK_ROOT = None
+ 
 -- 
-2.18.0
+2.17.1
 

@@ -66,7 +66,7 @@ concat_dtb_helper() {
 		install ${UBOOT_BINARY} ${DEPLOYDIR}/${UBOOT_IMAGE}
 	elif [ -e "${DEPLOYDIR}/${UBOOT_NODTB_IMAGE}" -a -e "$deployed_uboot_dtb_binary" ]; then
 		cd ${DEPLOYDIR}
-		cat ${UBOOT_NODTB_IMAGE} $deployed_uboot_dtb_binary | tee ${UBOOT_BINARY} > ${UBOOT_IMAGE}
+		cat ${UBOOT_NODTB_IMAGE} $deployed_uboot_dtb_binary | tee ${B}/${CONFIG_B_PATH}/${UBOOT_BINARY} > ${UBOOT_IMAGE}
 	else
 		bbwarn "Failure while adding public key to u-boot binary. Verified boot won't be available."
 	fi
@@ -77,10 +77,12 @@ concat_dtb() {
 		mkdir -p ${DEPLOYDIR}
 		if [ -n "${UBOOT_CONFIG}" ]; then
 			for config in ${UBOOT_MACHINE}; do
+				CONFIG_B_PATH="${config}"
 				cd ${B}/${config}
 				concat_dtb_helper
 			done
 		else
+			CONFIG_B_PATH=""
 			cd ${B}
 			concat_dtb_helper
 		fi

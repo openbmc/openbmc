@@ -19,6 +19,9 @@
 # AUTHORS
 # Darren Hart <dvhart@linux.intel.com>
 
+# disable pathname expansion, NO_PROXY fields could start with "*" or be it
+set -f
+
 if [ $# -lt 2 -o "$1" = '--help' -o "$1" = '-h' ] ; then
     echo 'oe-git-proxy: error: the following arguments are required: host port'
     echo 'Usage: oe-git-proxy host port'
@@ -41,10 +44,12 @@ if [ $# -lt 2 -o "$1" = '--help' -o "$1" = '-h' ] ; then
 fi
 
 # Locate the netcat binary
-SOCAT=$(which socat 2>/dev/null)
-if [ $? -ne 0 ]; then
-	echo "ERROR: socat binary not in PATH" 1>&2
-	exit 1
+if [ -z "$SOCAT" ]; then
+	SOCAT=$(which socat 2>/dev/null)
+	if [ $? -ne 0 ]; then
+		echo "ERROR: socat binary not in PATH" 1>&2
+		exit 1
+	fi
 fi
 METHOD=""
 
@@ -59,7 +64,7 @@ ipv4_val() {
 	IP="$1"
 	SHIFT=24
 	VAL=0
-	for B in ${IP//./ }; do
+	for B in $( echo "$IP" | tr '.' ' ' ); do
 		VAL=$(($VAL+$(($B<<$SHIFT))))
 		SHIFT=$(($SHIFT-8))
 	done
@@ -102,7 +107,7 @@ match_host() {
 	HOST=$1
 	GLOB=$2
 
-	if [ -z "${HOST%%$GLOB}" ]; then
+	if [ -z "${HOST%%*$GLOB}" ]; then
 		return 0
 	fi
 
@@ -132,8 +137,8 @@ if [ -z "$ALL_PROXY" ]; then
 fi
 
 # Connect directly to hosts in NO_PROXY
-for H in "${NO_PROXY//,/ }"; do
-	if match_host $1 "$H"; then
+for H in $( echo "$NO_PROXY" | tr ',' ' ' ); do
+	if match_host $1 $H; then
 		exec $SOCAT STDIO $METHOD
 	fi
 done

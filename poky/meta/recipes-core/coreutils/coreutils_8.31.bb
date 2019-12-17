@@ -49,7 +49,7 @@ bindir_progs = "arch basename chcon cksum comm csplit cut dir dircolors dirname 
                 env expand expr factor fmt fold groups head hostid id install \
                 join link logname md5sum mkfifo nl nohup nproc od paste pathchk \
                 pinky pr printf ptx readlink realpath runcon seq sha1sum sha224sum sha256sum \
-                sha384sum sha512sum shred shuf sort split stdbuf sum tac tail tee test timeout \
+                sha384sum sha512sum shred shuf sort split sum tac tail tee test timeout \
                 tr truncate tsort tty unexpand uniq unlink uptime users vdir wc who whoami yes"
 
 # hostname gets a special treatment and is not included in this
@@ -57,6 +57,10 @@ base_bindir_progs = "cat chgrp chmod chown cp date dd echo false hostname kill l
                      mknod mv pwd rm rmdir sleep stty sync touch true uname stat"
 
 sbindir_progs= "chroot"
+
+PACKAGE_BEFORE_PN_class-target += "coreutils-stdbuf"
+FILES_coreutils-stdbuf = "${bindir}/stdbuf ${libdir}/coreutils/libstdbuf.so"
+RDEPENDS_coreutils_class-target += "coreutils-stdbuf"
 
 # Let aclocal use the relative path for the m4 file rather than the
 # absolute since coreutils has a lot of m4 files, otherwise there might

@@ -32,7 +32,6 @@ python __anonymous() {
 }
 
 USERADD_PACKAGES = "${PN}"
-GROUPADD_PARAM_${PN} = "-r netdev"
 USERADD_PARAM_${PN} = "--system --home ${localstatedir}/lib/dbus \
                        --no-create-home --shell /bin/false \
                        --user-group messagebus"
@@ -92,11 +91,13 @@ pkg_postinst_dbus() {
 	fi
 }
 
+
 EXTRA_OECONF = "--disable-tests \
                 --disable-xml-docs \
                 --disable-doxygen-docs \
                 --disable-libaudit \
                 --enable-largefile \
+                --with-system-socket=/run/dbus/system_bus_socket \
                 "
 
 EXTRA_OECONF_append_class-target = " SYSTEMCTL=${base_bindir}/systemctl"

@@ -77,7 +77,14 @@ class OESelftestTestContextExecutor(OETestContextExecutor):
 
         parser.add_argument('--machine', required=False, choices=['random', 'all'],
                             help='Run tests on different machines (random/all).')
-        
+
+        parser.add_argument('-t', '--select-tag', dest="select_tags",
+                action='append', default=None,
+                help='Filter all (unhidden) tests to any that match any of the specified tag(s).')
+        parser.add_argument('-T', '--exclude-tag', dest="exclude_tags",
+                action='append', default=None,
+                help='Exclude all (unhidden) tests that match any of the specified tag(s). (exclude applies before select)')
+
         parser.set_defaults(func=self.run)
 
     def _get_available_machines(self):
@@ -148,6 +155,18 @@ class OESelftestTestContextExecutor(OETestContextExecutor):
                 self.tc_kwargs['init']['config_paths']['localconf_backup'])
         copyfile(self.tc_kwargs['init']['config_paths']['bblayers'], 
                 self.tc_kwargs['init']['config_paths']['bblayers_backup'])
+
+        def tag_filter(tags):
+            if args.exclude_tags:
+                if any(tag in args.exclude_tags for tag in tags):
+                    return True
+            if args.select_tags:
+                if not tags or not any(tag in args.select_tags for tag in tags):
+                    return True
+            return False
+
+        if args.select_tags or args.exclude_tags:
+            self.tc_kwargs['load']['tags_filter'] = tag_filter
 
         self.tc_kwargs['run']['skips'] = args.skips
         self.tc_kwargs['run']['processes'] = args.processes

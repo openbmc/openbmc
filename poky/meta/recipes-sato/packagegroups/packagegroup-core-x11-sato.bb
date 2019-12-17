@@ -7,7 +7,7 @@ PR = "r33"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-inherit packagegroup distro_features_check
+inherit packagegroup features_check
 REQUIRED_DISTRO_FEATURES = "x11"
 
 PACKAGES = "${PN} ${PN}-base ${PN}-apps ${PN}-games"

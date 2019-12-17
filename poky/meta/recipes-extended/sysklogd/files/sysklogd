@@ -90,6 +90,22 @@ running()
     return 0
 }
 
+waitpid ()
+{
+  pid=$1
+  # Give pid a chance to exit before we restart with a 5s timeout in 1s intervals
+  if [ -z "$pid" ]; then
+    return
+  fi
+  timeout=5;
+  while [ $timeout -gt 0 ]
+  do
+    timeout=$(( $timeout-1 ))
+    kill -0 $pid 2> /dev/null || break
+    sleep 1
+  done
+}
+
 case "$1" in
   start)
     log_begin_msg "Starting system log daemon..."
@@ -113,17 +129,23 @@ case "$1" in
     start-stop-daemon --stop --quiet --signal 1 --pidfile $pidfile_syslogd --name syslogd
     log_end_msg $?
     log_begin_msg "Reloading kernel log daemon..."
+    pid=`cat $pidfile_klogd 2> /dev/null`
     start-stop-daemon --stop --quiet --retry 3 --exec $binpath_klogd --pidfile $pidfile_klogd
+    waitpid $pid
     start-stop-daemon --start --quiet --pidfile $pidfile_klogd --name klogd --startas $binpath_klogd -- $KLOGD
     log_end_msg $?
     ;;
   restart)
     log_begin_msg "Restarting system log daemon..."
+    pid=`cat $pidfile_syslogd 2> /dev/null`
     start-stop-daemon --stop --retry 5 --quiet --pidfile $pidfile_syslogd --name syslogd
+    waitpid $pid
     start-stop-daemon --start --quiet --pidfile $pidfile_syslogd --name syslogd --startas $binpath_syslogd -- $SYSLOGD
     log_end_msg $?
     log_begin_msg "Reloading kernel log daemon..."
+    pid=`cat $pidfile_klogd 2> /dev/null`
     start-stop-daemon --stop --quiet --retry 3 --exec $binpath_klogd --pidfile $pidfile_klogd
+    waitpid $pid
     start-stop-daemon --start --quiet --pidfile $pidfile_klogd --name klogd --startas $binpath_klogd -- $KLOGD
     log_end_msg $?
     ;;

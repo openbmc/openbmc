@@ -2,15 +2,16 @@ SUMMARY = "multi-protocol instant messaging client"
 SECTION = "x11/network"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
-DEPENDS = "python virtual/libintl intltool-native libxml2 gconf glib-2.0-native"
+DEPENDS = "python3 virtual/libintl intltool-native libxml2 gconf glib-2.0-native"
 
-inherit autotools gettext pkgconfig gconf perlnative
+inherit autotools gettext pkgconfig gconf perlnative python3native
 
 SRC_URI = "\
     ${SOURCEFORGE_MIRROR}/pidgin/pidgin-${PV}.tar.bz2 \
     file://sanitize-configure.ac.patch \
     file://purple-OE-branding-25.patch \
     file://pidgin-cross-python-265.patch \
+    file://use_py3.patch \
 "
 
 SRC_URI[md5sum] = "423403494fe1951e47cc75231f743bb0"

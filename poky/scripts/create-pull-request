@@ -123,20 +123,12 @@ fi
 
 # Rewrite private URLs to public URLs
 # Determine the repository name for use in the WEB_URL later
-case "$REMOTE_URL" in
-*@*)
-	USER_RE="[A-Za-z0-9_.@][A-Za-z0-9_.@-]*\$\?"
-	PROTO_RE="[a-z][a-z+]*://"
-	GIT_RE="\(^\($PROTO_RE\)\?$USER_RE@\)\([^:/]*\)[:/]\(.*\)"
-	REMOTE_URL=${REMOTE_URL%.git}
-	REMOTE_REPO=$(echo $REMOTE_URL | sed "s#$GIT_RE#\4#")
-	REMOTE_URL=$(echo $REMOTE_URL | sed "s#$GIT_RE#git://\3/\4#")
-	;;
-*)
-	echo "WARNING: Unrecognized remote URL: $REMOTE_URL"
-	echo "         The pull and browse URLs will likely be incorrect"
-	;;
-esac
+USER_RE="[A-Za-z0-9_.@][A-Za-z0-9_.@-]*\$\?"
+PROTO_RE="[a-z][a-z+]*://"
+GIT_RE="\(^\($PROTO_RE\)\?\)\($USER_RE@\)\?\([^:/]*\)[:/]\(.*\)"
+REMOTE_URL=${REMOTE_URL%.git}
+REMOTE_REPO=$(echo $REMOTE_URL | sed "s#$GIT_RE#\5#")
+REMOTE_URL=$(echo $REMOTE_URL | sed "s#$GIT_RE#git://\4/\5#")
 
 if [ -z "$BRANCH" ]; then
 	BRANCH=$(git branch | grep -e "^\* " | cut -d' ' -f2)
@@ -265,7 +257,7 @@ fi
 
 # Replace the SUBJECT token with it.
 if [ -n "$SUBJECT" ]; then
-	sed -i -e "s/\*\*\* SUBJECT HERE \*\*\*/$SUBJECT/" "$CL"
+	sed -i -e "s\`\*\*\* SUBJECT HERE \*\*\*\`$SUBJECT\`" "$CL"
 fi
 
 

@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "\
 DEPENDS += "parted"
 
 # upstream only publishes releases in github archives which are discouraged
-SRCREV = "1fdb15120f35f5da1dc7ec116522f0c796a8376a"
+SRCREV = "481510c10866851844b19f3d2ffcdaa37efc0cf8"
 SRC_URI = "git://github.com/rhinstaller/pyparted.git;protocol=https"
 
 S = "${WORKDIR}/git"

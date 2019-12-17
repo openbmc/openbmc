@@ -8,8 +8,8 @@ RDEPENDS_${PN} = "python-docutils \
                   python-resource \
 "
 
-LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
+LICENSE = "Apache-2.0 & GPLv3"
+LIC_FILES_CHKSUM = "file://README;md5=2695c853a2cafc33e68a1d972889ebd2"
 
 inherit pypi setuptools
 

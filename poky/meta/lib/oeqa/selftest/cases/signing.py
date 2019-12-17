@@ -3,7 +3,7 @@
 #
 
 from oeqa.selftest.case import OESelftestTestCase
-from oeqa.utils.commands import runCmd, bitbake, get_bb_var, get_bb_vars
+from oeqa.utils.commands import runCmd, bitbake, get_bb_var, get_bb_vars, create_temp_layer
 import os
 import oe
 import glob
@@ -180,10 +180,10 @@ class LockedSignatures(OESelftestTestCase):
         AutomatedBy: Daniel Istrate <daniel.alexandrux.istrate@intel.com>
         """
 
+        import uuid
+
         test_recipe = 'ed'
         locked_sigs_file = 'locked-sigs.inc'
-
-        self.add_command_to_tearDown('rm -f %s' % os.path.join(self.builddir, locked_sigs_file))
 
         bitbake(test_recipe)
         # Generate locked sigs include file
@@ -196,21 +196,29 @@ class LockedSignatures(OESelftestTestCase):
         # Build a locked recipe
         bitbake(test_recipe)
 
-        # Make a change that should cause the locked task signature to change
-        recipe_append_file = test_recipe + '_' + get_bb_var('PV', test_recipe) + '.bbappend'
-        recipe_append_path = os.path.join(self.testlayer_path, 'recipes-test', test_recipe, recipe_append_file)
-        feature = 'SUMMARY += "test locked signature"\n'
+        templayerdir = tempfile.mkdtemp(prefix='signingqa')
+        create_temp_layer(templayerdir, 'selftestsigning')
+        runCmd('bitbake-layers add-layer %s' % templayerdir)
 
-        os.mkdir(os.path.join(self.testlayer_path, 'recipes-test', test_recipe))
+        # Make a change that should cause the locked task signature to change
+        # Use uuid so hash equivalance server isn't triggered
+        recipe_append_file = test_recipe + '_' + get_bb_var('PV', test_recipe) + '.bbappend'
+        recipe_append_path = os.path.join(templayerdir, 'recipes-test', test_recipe, recipe_append_file)
+        feature = 'SUMMARY_${PN} = "test locked signature%s"\n' % uuid.uuid4()
+
+        os.mkdir(os.path.join(templayerdir, 'recipes-test'))
+        os.mkdir(os.path.join(templayerdir, 'recipes-test', test_recipe))
         write_file(recipe_append_path, feature)
 
-        self.add_command_to_tearDown('rm -rf %s' % os.path.join(self.testlayer_path, 'recipes-test', test_recipe))
+        self.add_command_to_tearDown('bitbake-layers remove-layer %s' % templayerdir)
+        self.add_command_to_tearDown('rm -f %s' % os.path.join(self.builddir, locked_sigs_file))
+        self.add_command_to_tearDown('rm -rf %s' % templayerdir)
 
         # Build the recipe again
         ret = bitbake(test_recipe)
 
         # Verify you get the warning and that the real task *isn't* run (i.e. the locked signature has worked)
-        patt = r'WARNING: The %s:do_package sig is computed to be \S+, but the sig is locked to \S+ in SIGGEN_LOCKEDSIGS\S+' % test_recipe
+        patt = r'The %s:do_package sig is computed to be \S+, but the sig is locked to \S+ in SIGGEN_LOCKEDSIGS\S+' % test_recipe
         found_warn = re.search(patt, ret.output)
 
         self.assertIsNotNone(found_warn, "Didn't find the expected warning message. Output: %s" % ret.output)

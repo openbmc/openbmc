@@ -66,15 +66,16 @@ RDEPENDS_packagegroup-meta-oe-connectivity ="\
     modemmanager mosh  \
     paho-mqtt-c phonet-utils rabbitmq-c rfkill rtorrent \
     ser2net smstools3 telepathy-glib telepathy-idle thrift \
-    usbmuxd wvstreams zabbix zeromq \
+    usbmuxd zabbix zeromq \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "obex-data-server", "", d)} \
-    ${@bb.utils.contains("DISTRO_FEATURES", "pulseadio bluez4", "libmikmod", "", d)} \
-    ${@bb.utils.contains("DISTRO_FEATURES", "bluez4", "obexftp openobex libnet wvdial", "", d)} \
+    libmikmod \
+    obexftp openobex libnet \
     "
+RDEPENDS_packagegroup-meta-oe-connectivity_append_libc-glibc = " wvstreams wvdial"
 
 # dracut needs dracut
 RDEPENDS_packagegroup-meta-oe-core ="\
-    dbus-daemon-proxy libdbus-c++ eggdbus \
+    dbus-daemon-proxy libdbus-c++ \
     ell glibmm libsigc++-2.0 libxml++ distro-feed-configs \
     mm-common opencl-headers opencl-icd-loader \
     proxy-libintl usleep \
@@ -99,13 +100,12 @@ RDEPENDS_packagegroup-meta-oe-dbs ="\
     leveldb libdbi mariadb mariadb-native \
     mysql-python postgresql psqlodbc rocksdb soci \
     sqlite \
-    ${@bb.utils.contains("DISTRO_FEATURES", "bluez4", "mongodb", "", d)} \
     "
 
 RDEPENDS_packagegroup-meta-oe-devtools ="\
     android-tools android-tools-conf bootchart breakpad \
     capnproto cgdb cscope ctags \
-    debootstrap dejagnu dmalloc flatbuffers \
+    debootstrap dmalloc flatbuffers \
     giflib icon-slicer iptraf-ng jq jsoncpp jsonrpc json-spirit \
     kconfig-frontends lemon libedit libgee libsombok3 \
     libubox log4cplus lshw ltrace lua mcpp memstat mercurial \
@@ -139,11 +139,11 @@ RDEPENDS_packagegroup-meta-oe-extended ="\
     p7zip p8platform libfile-fnmatch-perl \
     rarpd redis rrdtool libfastjson librelp rsyslog sanlock \
     sblim-cmpi-devel sblim-sfc-common sblim-sfcc \
-    scsirastools sgpio smartmontools snappy can-isotp \
+    scsirastools sgpio smartmontools snappy \
     can-utils libsocketcan tipcutils tiptop \
     tmux uml-utilities upm vlock volume-key wipe zlog zram \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11 wayland opengl", "boinc-client", "", d)} \
-    ${@bb.utils.contains("DISTRO_FEATURES", "x11", " libgxim t1lib gnuplot libwmf gtkmathview", "", d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "x11", " libgxim gnuplot libwmf", "", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "bluez", "collectd", "", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "pam-plugin-ccreds pam-plugin-ldapdb", "", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "pam-ssh-agent-auth openwsman sblim-sfcb ", "", d)} \
@@ -182,22 +182,22 @@ RDEPENDS_packagegroup-meta-oe-graphics ="\
     "
 
 RDEPENDS_packagegroup-meta-oe-kernel ="\
-    agent-proxy bpftool broadcom-bt-firmware cpupower \
+    agent-proxy broadcom-bt-firmware cpupower \
     crash ipmitool minicoredumper oprofile \
     "
-RDEPENDS_packagegroup-meta-oe-kernel_remove_libc-musl = "bpftool crash minicoredumper"
+RDEPENDS_packagegroup-meta-oe-kernel_remove_libc-musl = "crash minicoredumper"
 
 RDEPENDS_packagegroup-meta-oe-kernel_remove_mips64 = "crash"
 RDEPENDS_packagegroup-meta-oe-kernel_remove_mips64el = "crash"
 
 RDEPENDS_packagegroup-meta-oe-multimedia ="\
-    alsa-oss audiofile cdrkit esound id3lib \
+    alsa-oss audiofile cdrkit id3lib \
     a2jmidid jack libass libburn libcdio libcdio-paranoia \
     libdvdread libmms libmodplug libopus live555 \
     mplayer-common opus-tools \
     sound-theme-freedesktop v4l-utils yavta wavpack libvpx \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "xpext pavucontrol xsp", "", d)} \
-    ${@bb.utils.contains("DISTRO_FEATURES", "pulseadio bluez4", "libmikmod", "", d)} \
+    libmikmod \
     ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "libmad faad2 mpv", "", d)} \
     "
 RDEPENDS_packagegroup-meta-oe-multimedia_remove_libc-musl = "alsa-oss"
@@ -249,15 +249,15 @@ RDEPENDS_packagegroup-meta-oe-support ="\
     vim vim-tiny websocketpp wmiconfig xdelta3 xdg-user-dirs xmlstarlet \
     zbar zile \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "geis toscoterm uim synergy utouch-mtview links-x11 fltk pidgin-otr", "", d)} \
-    ${@bb.utils.contains("DISTRO_FEATURES", "pulseadio bluez4", "libcanberra", "", d)} \
+    libcanberra \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11 pam", "xorgxrdp xrdp", "", d)} \
-    ${@bb.utils.contains("DISTRO_FEATURES", "bluez4", "procmail", "", d)} \
-    ${@bb.utils.contains("DISTRO_FEATURES", "polkit", "udisks udisks2 upower", "", d)} \
+    procmail \
+    ${@bb.utils.contains("DISTRO_FEATURES", "polkit", "udisks2 upower", "", d)} \
     ${NE10} \
     "
 
 RDEPENDS_packagegroup-meta-oe-support_remove_arm ="numactl"
-RDEPENDS_packagegroup-meta-oe-support_remove_mipsarch_libc-glibc = "gperftools"
+RDEPENDS_packagegroup-meta-oe-support_remove_mipsarch = "gperftools"
 
 RDEPENDS_packagegroup-meta-oe-support-egl ="\
     freerdp libnice opencv \
@@ -265,7 +265,7 @@ RDEPENDS_packagegroup-meta-oe-support-egl ="\
 
 RDEPENDS_packagegroup-meta-oe-test ="\
     catch2 cppunit cunit cxxtest evtest fb-test \
-    fwts gtest pm-qa stress-ng testfloat \
+    fwts googletest pm-qa stress-ng testfloat \
     "
 RDEPENDS_packagegroup-meta-oe-test_remove_libc-musl = "pm-qa"
 RDEPENDS_packagegroup-meta-oe-test_remove_arm = "fwts"

@@ -1,6 +1,6 @@
-From 24a2c47fd01dde1710f1fa66f5c30ce7010c5956 Mon Sep 17 00:00:00 2001
+From e213ed33a28704f6f538df41a91b7ce95594a4f8 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Thu, 21 Sep 2017 15:28:10 +0800
+Date: Tue, 15 Oct 2019 18:12:54 +0800
 Subject: [PATCH] start lvm2-monitor.service after tmp.mount
 
 The lvm2-monitor.service reqires the existence of locking_dir
@@ -9,18 +9,14 @@ So start lvm2-monitor.service after tmp.mount
 
 Upstream-Status: Inappropriate [oe specific]
 
+Rebase to v2_03_05
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
-
-
-Update context for lvm2 2.03.02.
-
-Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  scripts/lvm2_monitoring_systemd_red_hat.service.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/scripts/lvm2_monitoring_systemd_red_hat.service.in b/scripts/lvm2_monitoring_systemd_red_hat.service.in
-index 7ec4e4e..3282a95 100644
+index 4bf744a..46766cb 100644
 --- a/scripts/lvm2_monitoring_systemd_red_hat.service.in
 +++ b/scripts/lvm2_monitoring_systemd_red_hat.service.in
 @@ -2,7 +2,7 @@
@@ -29,9 +25,9 @@ index 7ec4e4e..3282a95 100644
  Requires=dm-event.socket
 -After=dm-event.socket dm-event.service lvm2-activation.service
 +After=dm-event.socket dm-event.service lvm2-activation.service tmp.mount
- Before=local-fs-pre.target
+ Before=local-fs-pre.target shutdown.target
  DefaultDependencies=no
  Conflicts=shutdown.target
 -- 
-1.8.3.1
+2.7.4
 

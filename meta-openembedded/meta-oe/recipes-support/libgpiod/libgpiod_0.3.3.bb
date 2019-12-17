@@ -1,7 +1,6 @@
 require libgpiod.inc
 
-# enable tools
-PACKAGECONFIG ?= "tools"
+PACKAGECONFIG ?= ""
 
 PACKAGECONFIG[tests] = "--enable-tests,--disable-tests,kmod udev"
 

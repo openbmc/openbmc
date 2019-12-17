@@ -21,7 +21,7 @@ SRC_URI = "http://ftp.isc.org/isc/dhcp/${PV}/dhcp-${PV}.tar.gz \
            file://dhcpd.service file://dhcrelay.service \
            file://dhcpd6.service \
            "
-UPSTREAM_CHECK_URI = "ftp://ftp.isc.org/isc/dhcp/"
+UPSTREAM_CHECK_URI = "http://ftp.isc.org/isc/dhcp/"
 UPSTREAM_CHECK_REGEX = "(?P<pver>\d+\.\d+\.(\d+?))/"
 
 inherit autotools-brokensep systemd useradd update-rc.d
@@ -43,7 +43,7 @@ INITSCRIPT_PACKAGES = "dhcp-server"
 INITSCRIPT_NAME_dhcp-server = "dhcp-server"
 INITSCRIPT_PARAMS_dhcp-server = "defaults"
 
-TARGET_CFLAGS += "-D_GNU_SOURCE"
+CFLAGS += "-D_GNU_SOURCE"
 EXTRA_OECONF = "--with-srv-lease-file=${localstatedir}/lib/dhcp/dhcpd.leases \
                 --with-srv6-lease-file=${localstatedir}/lib/dhcp/dhcpd6.leases \
                 --with-cli-lease-file=${localstatedir}/lib/dhcp/dhclient.leases \

@@ -25,7 +25,7 @@ LICENSE = "\
 "
 LIC_FILES_CHKSUM = "\
     file://LICENCE.broadcom_bcm43xx;md5=3160c14df7228891b868060e1951dfbc \
-    file://WHENCE;md5=a9c2c217f513c20e1d16b384b3e2c12d \
+    file://WHENCE;md5=7b12b2224438186e4c97c4c7f3a5cc28 \
 "
 
 # These are not common licenses, set NO_GENERIC_LICENSE for them
@@ -34,7 +34,8 @@ NO_GENERIC_LICENSE[Firmware-broadcom_bcm43xx-rpidistro] = "LICENCE.broadcom_bcm4
 NO_GENERIC_LICENSE[WHENCE] = "WHENCE"
 
 SRC_URI = "git://github.com/RPi-Distro/firmware-nonfree"
-SRCREV = "b518de45ced519e8f7a499f4778100173402ae43"
+
+SRCREV = "00daf85ffa373ecce7836df7543c6ebe4cf43639"
 PV = "0.0+git${SRCPV}"
 
 S = "${WORKDIR}/git"

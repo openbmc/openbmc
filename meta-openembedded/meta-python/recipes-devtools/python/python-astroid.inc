@@ -4,10 +4,12 @@ SECTION = "devel/python"
 LICENSE = "LGPL-2.1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
-SRC_URI[md5sum] = "2dd01ef0d5b5f0fc754c1ba40137b61c"
-SRC_URI[sha256sum] = "fc9b582dba0366e63540982c3944a9230cbc6f303641c51483fa547dcc22393a"
+SRC_URI[md5sum] = "5f3d73d82d1753b59bb49a6bc6046dee"
+SRC_URI[sha256sum] = "71ea07f44df9568a75d0f354c49143a4575d90645e9fead6dfb52c26a85ed13a"
 
 inherit pypi
+
+DEPENDS += "${PYTHON_PN}-pytest-runner-native"
 
 PACKAGES =+ "${PN}-tests"
 

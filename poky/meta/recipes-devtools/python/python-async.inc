@@ -1,7 +1,7 @@
 SUMMARY = "Python framework to process interdependent tasks in a pool of workers"
 HOMEPAGE = "http://github.com/gitpython-developers/async"
 SECTION = "devel/python"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://PKG-INFO;beginline=8;endline=8;md5=88df8e78b9edfd744953862179f2d14e"
 
 inherit pypi

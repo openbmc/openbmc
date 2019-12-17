@@ -1,0 +1,28 @@
+From 2af58909cd9f2862d1dc07836e201361a2cd8d5d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 5 Oct 2019 08:53:22 -0700
+Subject: [PATCH] arch-arm: Consider armv7ve arch as well
+
+Upstream-Status: Submitted []
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ arch/arch-arm.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arch-arm.h b/arch/arch-arm.h
+index 78cb2ebe..4f722967 100644
+--- a/arch/arch-arm.h
++++ b/arch/arch-arm.h
+@@ -11,7 +11,7 @@
+ #define nop             __asm__ __volatile__("mov\tr0,r0\t@ nop\n\t")
+ #define read_barrier()	__asm__ __volatile__ ("" : : : "memory")
+ #define write_barrier()	__asm__ __volatile__ ("" : : : "memory")
+-#elif defined(__ARM_ARCH_7A__) || defined(__ARM_ARCH_8A__)
++#elif defined(__ARM_ARCH_7A__) || defined(__ARM_ARCH_8A__) || defined(__ARM_ARCH_7VE__)
+ #define	nop		__asm__ __volatile__ ("nop")
+ #define read_barrier()	__sync_synchronize()
+ #define write_barrier()	__sync_synchronize()
+-- 
+2.23.0
+

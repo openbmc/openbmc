@@ -1,4 +1,4 @@
-From 12900d498bb77bcc990868a80eaf0ab257b88fff Mon Sep 17 00:00:00 2001
+From a274ba778838824efcacaba57c415b7262f779ec Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 14 May 2013 15:00:26 -0700
 Subject: [PATCH] python3: Add target and native recipes
@@ -14,36 +14,40 @@ Upstream-Status: Inappropriate [embedded specific]
 # Signed-off-by: Alejandro Hernandez <alejandro.hernandez@linux.intel.com>
 
 ---
- Lib/distutils/sysconfig.py | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ Lib/distutils/sysconfig.py | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
 diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
-index 6b8c129..3ca7f79 100644
+index 3dfd0a3..6c6b09a 100644
 --- a/Lib/distutils/sysconfig.py
 +++ b/Lib/distutils/sysconfig.py
-@@ -84,7 +84,9 @@ def get_python_inc(plat_specific=0, prefix=None):
+@@ -97,7 +97,9 @@ def get_python_inc(plat_specific=0, prefix=None):
      If 'prefix' is supplied, use it instead of sys.base_prefix or
      sys.base_exec_prefix -- i.e., ignore 'plat_specific'.
      """
 -    if prefix is None:
-+    if prefix is None and os.environ['STAGING_INCDIR'] != "":
++    if prefix is None and os.environ.get('STAGING_INCDIR', ""):
 +        prefix = os.environ['STAGING_INCDIR'].rstrip('include')
 +    elif prefix is None:
          prefix = plat_specific and BASE_EXEC_PREFIX or BASE_PREFIX
      if os.name == "posix":
          if python_build:
-@@ -122,6 +124,10 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
+@@ -140,7 +142,13 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
      If 'prefix' is supplied, use it instead of sys.base_prefix or
      sys.base_exec_prefix -- i.e., ignore 'plat_specific'.
      """
-+    lib_basename = os.environ['STAGING_LIBDIR'].split('/')[-1]
-+    if prefix is None and os.environ['STAGING_LIBDIR'] != "":
+-    if prefix is None:
++    if os.environ.get('STAGING_LIBDIR', ""):
++        lib_basename = os.environ['STAGING_LIBDIR'].split('/')[-1]
++    else:
++        lib_basename = "lib"
++    if prefix is None and os.environ.get('STAGING_LIBDIR', ""):
 +        prefix = os.environ['STAGING_LIBDIR'].rstrip(lib_basename)
-+
-     if prefix is None:
++    elif prefix is None:
          if standard_lib:
              prefix = plat_specific and BASE_EXEC_PREFIX or BASE_PREFIX
-@@ -130,7 +136,7 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
+         else:
+@@ -148,7 +156,7 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
  
      if os.name == "posix":
          libpython = os.path.join(prefix,

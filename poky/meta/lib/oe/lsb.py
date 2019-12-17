@@ -110,12 +110,12 @@ def distro_identifier(adjust_hook=None):
     if adjust_hook:
         distro_id, release = adjust_hook(distro_id, release)
     if not distro_id:
-        return "Unknown"
-    # Filter out any non-alphanumerics
-    distro_id = re.sub(r'\W', '', distro_id)
+        return "unknown"
+    # Filter out any non-alphanumerics and convert to lowercase
+    distro_id = re.sub(r'\W', '', distro_id).lower()
 
     if release:
-        id_str = '{0}-{1}'.format(distro_id.lower(), release)
+        id_str = '{0}-{1}'.format(distro_id, release)
     else:
         id_str = distro_id
     return id_str.replace(' ','-').replace('/','-')

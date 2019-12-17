@@ -29,7 +29,7 @@ APPEND_append = '${@bb.utils.contains("IMAGE_FEATURES", "read-only-rootfs", " ro
 ROOTFS_POSTPROCESS_COMMAND += "write_image_test_data ; "
 
 # Write manifest
-IMAGE_MANIFEST = "${IMGDEPLOYDIR}/${IMAGE_NAME}.rootfs.manifest"
+IMAGE_MANIFEST = "${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.manifest"
 ROOTFS_POSTUNINSTALL_COMMAND =+ "write_image_manifest ; "
 # Set default postinst log file
 POSTINST_LOGFILE ?= "${localstatedir}/log/postinstall.log"
@@ -93,6 +93,11 @@ read_only_rootfs_hook () {
 	# Tweak the mount option and fs_passno for rootfs in fstab
 	if [ -f ${IMAGE_ROOTFS}/etc/fstab ]; then
 		sed -i -e '/^[#[:space:]]*\/dev\/root/{s/defaults/ro/;s/\([[:space:]]*[[:digit:]]\)\([[:space:]]*\)[[:digit:]]$/\1\20/}' ${IMAGE_ROOTFS}/etc/fstab
+	fi
+
+	# Tweak the "mount -o remount,rw /" command in busybox-inittab inittab
+	if [ -f ${IMAGE_ROOTFS}/etc/inittab ]; then
+		sed -i 's|/bin/mount -o remount,rw /|/bin/mount -o remount,ro /|' ${IMAGE_ROOTFS}/etc/inittab
 	fi
 
 	# If we're using openssh and the /etc/ssh directory has no pre-generated keys,
@@ -260,7 +265,7 @@ python write_image_manifest () {
     with open(manifest_name, 'w+') as image_manifest:
         image_manifest.write(format_pkg_list(pkgs, "ver"))
 
-    if os.path.exists(manifest_name):
+    if os.path.exists(manifest_name) and link_name:
         manifest_link = deploy_dir + "/" + link_name + ".manifest"
         if os.path.lexists(manifest_link):
             os.remove(manifest_link)
@@ -328,7 +333,7 @@ python write_image_test_data() {
     searchString = "%s/"%(d.getVar("TOPDIR")).replace("//","/")
     export2json(d, testdata_name, searchString=searchString, replaceString="")
 
-    if os.path.exists(testdata_name):
+    if os.path.exists(testdata_name) and link_name:
         testdata_link = os.path.join(deploy_dir, "%s.testdata.json" % link_name)
         if os.path.lexists(testdata_link):
             os.remove(testdata_link)
@@ -356,7 +361,9 @@ rootfs_reproducible () {
 		echo $sformatted > ${IMAGE_ROOTFS}/etc/version
 		bbnote "rootfs_reproducible: set /etc/version to $sformatted"
 
-		find ${IMAGE_ROOTFS}/etc/gconf -name '%gconf.xml' -print0 | xargs -0r \
-		sed -i -e 's@\bmtime="[0-9][0-9]*"@mtime="'${REPRODUCIBLE_TIMESTAMP_ROOTFS}'"@g'
+		if [ -d ${IMAGE_ROOTFS}${sysconfdir}/gconf ]; then
+			find ${IMAGE_ROOTFS}${sysconfdir}/gconf -name '%gconf.xml' -print0 | xargs -0r \
+			sed -i -e 's@\bmtime="[0-9][0-9]*"@mtime="'${REPRODUCIBLE_TIMESTAMP_ROOTFS}'"@g'
+		fi
 	fi
 }

@@ -11,6 +11,10 @@ DEPENDS = "popt"
 SRC_URI = "https://download.samba.org/pub/${BPN}/src/${BP}.tar.gz \
            file://rsyncd.conf \
            file://makefile-no-rebuild.patch \
+           file://CVE-2016-9840.patch \
+           file://CVE-2016-9841.patch \
+           file://CVE-2016-9842.patch \
+           file://CVE-2016-9843.patch \
 "
 
 SRC_URI[md5sum] = "1581a588fde9d89f6bc6201e8129afaf"

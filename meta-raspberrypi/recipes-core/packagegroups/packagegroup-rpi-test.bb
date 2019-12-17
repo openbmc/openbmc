@@ -11,15 +11,14 @@ OMXPLAYER  = "${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', '', 'omxpl
 RDEPENDS_${PN} = "\
     ${OMXPLAYER} \
     bcm2835-tests \
-    wiringpi \
     rpio \
     rpi-gpio \
     pi-blaster \
-    python-rtimu \
-    python-sense-hat \
+    python3-rtimu \
+    python3-sense-hat \
     connman \
     connman-client \
-    crda \
+    wireless-regdb \
     bluez5 \
 "
 

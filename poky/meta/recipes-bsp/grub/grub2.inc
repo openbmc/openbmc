@@ -11,20 +11,16 @@ SECTION = "bootloaders"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
-SRC_URI = "https://ftp.gnu.org/gnu/grub/grub-${PV}.tar.gz \
+SRC_URI = "${GNU_MIRROR}/grub/grub-${PV}.tar.gz \
            file://0001-Disable-mfpmath-sse-as-well-when-SSE-is-disabled.patch \
-           file://0001-Unset-need_charset_alias-when-building-for-musl.patch \
            file://autogen.sh-exclude-pc.patch \
            file://grub-module-explicitly-keeps-symbole-.module_license.patch \
            file://0001-grub.d-10_linux.in-add-oe-s-kernel-name.patch \
-           file://gcc8.patch \
-           file://0001-x86-64-Treat-R_X86_64_PLT32-as-R_X86_64_PC32.patch \
-           file://0001-grub-setup-Debug-message-cleanup.patch \
 "
-SRC_URI[md5sum] = "1116d1f60c840e6dbd67abbc99acb45d"
-SRC_URI[sha256sum] = "660ee136fbcee08858516ed4de2ad87068bfe1b6b8b37896ce3529ff054a726d"
+SRC_URI[md5sum] = "5ce674ca6b2612d8939b9e6abed32934"
+SRC_URI[sha256sum] = "f10c85ae3e204dbaec39ae22fa3c5e99f0665417e91c2cb49b7e5031658ba6ea"
 
-DEPENDS = "flex-native bison-native"
+DEPENDS = "flex-native bison-native gettext-native"
 
 COMPATIBLE_HOST = '(x86_64.*|i.86.*|arm.*|aarch64.*)-(linux.*|freebsd.*)'
 COMPATIBLE_HOST_armv7a = 'null'
@@ -45,6 +41,7 @@ EXTRA_OECONF = "--with-platform=${GRUBPLATFORM} \
                 --enable-liblzma=no \
                 --enable-libzfs=no \
                 --enable-largefile \
+                --disable-werror \
 "
 
 PACKAGECONFIG ??= ""
@@ -60,15 +57,13 @@ BUILD_CFLAGS = ""
 BUILD_CXXFLAGS = ""
 BUILD_LDFLAGS = ""
 
-CFLAGS_append = " -Wno-error"
+export PYTHON = "python3"
 
 do_configure_prepend() {
-	# The grub2 configure script uses variables such as TARGET_CFLAGS etc
-	# for its own purposes. Remove the OE versions from the environment to
-	# avoid conflicts.
-	unset TARGET_CPPFLAGS TARGET_CFLAGS TARGET_CXXFLAGS TARGET_LDFLAGS
 	( cd ${S}
 	${S}/autogen.sh )
 }
 
 RDEPENDS_${PN}_class-native = ""
+
+BBCLASSEXTEND = "native"

@@ -10,16 +10,17 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
 
 DEPENDS = "libpng jpeg udev"
 
-PV = "20190205+${SRCPV}"
+PV = "20190904+${SRCPV}"
 
 COMPATIBLE_HOST_rpi  = "${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', '.*-linux*', 'null', d)}"
 
-SRC_URI = "git://github.com/glmark2/glmark2.git;protocol=https"
-SRCREV = "0c90dd48df43a6b0db1d9aabca6298240f4968f7"
+SRC_URI = "git://github.com/glmark2/glmark2.git;protocol=https \
+           file://python3.patch"
+SRCREV = "24a1139dcbfd86bd02065316eaa90559e39374e1"
 
 S = "${WORKDIR}/git"
 
-inherit waf pkgconfig distro_features_check
+inherit waf pkgconfig features_check
 
 REQUIRED_DISTRO_FEATURES += "opengl"
 

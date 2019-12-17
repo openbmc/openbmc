@@ -3,10 +3,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-# Default to avoiding the first two disks on typical Linux and Mac OS installs
-# Better safe than sorry :-)
-BLACKLIST_DEVICES="/dev/sda /dev/sdb /dev/disk1 /dev/disk2"
-
 # 1MB blocksize
 BLOCKSIZE=1048576
 
@@ -32,7 +28,6 @@ image_details() {
 }
 
 device_details() {
-	DEV=$1
 	BLOCK_SIZE=512
 
 	echo "Device details"
@@ -45,11 +40,17 @@ device_details() {
 	fi
 
 	# Default / Linux information collection
-	echo "  device: $DEVICE"
+	ACTUAL_DEVICE=`readlink -f $DEVICE`
+	DEV=`basename $ACTUAL_DEVICE`
+	if [ "$ACTUAL_DEVICE" != "$DEVICE" ] ; then
+		echo "  device: $DEVICE -> $ACTUAL_DEVICE"
+	else
+		echo "  device: $DEVICE"
+	fi
 	if [ -f "/sys/class/block/$DEV/device/vendor" ]; then
 		echo "  vendor: $(cat /sys/class/block/$DEV/device/vendor)"
 	else
-		echo "  vendor: UNKOWN"
+		echo "  vendor: UNKNOWN"
 	fi
 	if [ -f "/sys/class/block/$DEV/device/model" ]; then
 		echo "   model: $(cat /sys/class/block/$DEV/device/model)"
@@ -62,6 +63,49 @@ device_details() {
 		echo "    size: UNKNOWN"
 	fi
 	echo ""
+}
+
+check_mount_device() {
+	if cat /proc/self/mounts | awk '{ print $1 }' | grep /dev/ | grep -q -E "^$1$" ; then
+		return 0
+	fi
+	return 1
+}
+
+is_mounted() {
+	if [ "$(uname)" = "Darwin" ]; then
+		if df | awk '{ print $1 }' | grep /dev/ | grep -q -E "^$1(s[0-9]+)?$" ; then
+			return 0
+		fi
+	else
+		if check_mount_device $1 ; then
+			return 0
+		fi
+		DEV=`basename $1`
+		if [ -d /sys/class/block/$DEV/ ] ; then
+			PARENT_BLKDEV=`basename $(readlink -f "/sys/class/block/$DEV/..")`
+			if [ "$PARENT_BLKDEV" != "block" ] ; then
+				if check_mount_device $PARENT_BLKDEV ; then
+					return 0
+				fi
+			fi
+			for CHILD_BLKDEV in `find /sys/class/block/$DEV/ -mindepth  1 -maxdepth 1 -name "$DEV*" -type d`
+			do
+				if check_mount_device /dev/`basename $CHILD_BLKDEV` ; then
+					return 0
+				fi
+			done
+		fi
+	fi
+	return 1
+}
+
+is_inuse() {
+	HOLDERS_DIR="/sys/class/block/`basename $1`/holders"
+	if [ -d $HOLDERS_DIR ] && [ `ls -A $HOLDERS_DIR` ] ; then
+		return 0
+	fi
+	return 1
 }
 
 if [ $# -ne 2 ]; then
@@ -78,22 +122,37 @@ if [ ! -e "$IMAGE" ]; then
 	exit 1
 fi
 
+if [ ! -e "$DEVICE" ]; then
+	echo "ERROR: Device $DEVICE does not exist"
+	usage
+	exit 1
+fi
 
-for i in ${BLACKLIST_DEVICES}; do
-	if [ "$i" = "$DEVICE" ]; then
-		echo "ERROR: Device $DEVICE is blacklisted"
-		exit 1
-	fi
-done
+if [ "$(uname)" = "Darwin" ]; then
+	# readlink doesn't support -f on MacOS, just assume it isn't a symlink
+	ACTUAL_DEVICE=$DEVICE
+else
+	ACTUAL_DEVICE=`readlink -f $DEVICE`
+fi
+if is_mounted $ACTUAL_DEVICE ; then
+	echo "ERROR: Device $DEVICE is currently mounted - check if this is the right device, and unmount it first if so"
+	device_details
+	exit 1
+fi
+if is_inuse $ACTUAL_DEVICE ; then
+	echo "ERROR: Device $DEVICE is currently in use (possibly part of LVM) - check if this is the right device!"
+	device_details
+	exit 1
+fi
 
 if [ ! -w "$DEVICE" ]; then
-	echo "ERROR: Device $DEVICE does not exist or is not writable"
+	echo "ERROR: Device $DEVICE is not writable - possibly use sudo?"
 	usage
 	exit 1
 fi
 
 image_details $IMAGE
-device_details $(basename $DEVICE)
+device_details
 
 printf "Write $IMAGE to $DEVICE [y/N]? "
 read RESPONSE

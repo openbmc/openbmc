@@ -14,35 +14,58 @@ setup_sys_path()
 from oeqa.core.exception import OEQADependency
 from oeqa.core.utils.test import getCaseMethod, getSuiteCasesNames, getSuiteCasesIDs
 
-class TestFilterDecorator(TestBase):
-
-    def _runFilterTest(self, modules, filters, expect, msg):
-        tc = self._testLoader(modules=modules, filters=filters)
-        test_loaded = set(getSuiteCasesNames(tc.suites))
-        self.assertEqual(expect, test_loaded, msg=msg)
+class TestTagDecorator(TestBase):
+    def _runTest(self, modules, filterfn, expect):
+        tc = self._testLoader(modules = modules, tags_filter = filterfn)
+        test_loaded = set(getSuiteCasesIDs(tc.suites))
+        self.assertEqual(expect, test_loaded)
 
     def test_oetag(self):
-        # Get all cases without filtering.
-        filter_all = {}
-        test_all = {'testTagGood', 'testTagOther', 'testTagNone'}
-        msg_all = 'Failed to get all oetag cases without filtering.'
+        # get all cases without any filtering
+        self._runTest(['oetag'], None, {
+                'oetag.TagTest.testTagGood',
+                'oetag.TagTest.testTagOther',
+                'oetag.TagTest.testTagOtherMulti',
+                'oetag.TagTest.testTagNone',
+                'oetag.TagClassTest.testTagOther',
+                'oetag.TagClassTest.testTagOtherMulti',
+                'oetag.TagClassTest.testTagNone',
+                })
 
-        # Get cases with 'goodTag'.
-        filter_good = {'oetag':'goodTag'}
-        test_good = {'testTagGood'}
-        msg_good = 'Failed to get just one test filtering with "goodTag" oetag.'
+        # exclude any case with tags
+        self._runTest(['oetag'], lambda tags: tags, {
+                'oetag.TagTest.testTagNone',
+                })
 
-        # Get cases with an invalid tag.
-        filter_invalid = {'oetag':'invalidTag'}
-        test_invalid = set()
-        msg_invalid = 'Failed to filter all test using an invalid oetag.'
+        # exclude any case with otherTag
+        self._runTest(['oetag'], lambda tags: "otherTag" in tags, {
+                'oetag.TagTest.testTagGood',
+                'oetag.TagTest.testTagNone',
+                'oetag.TagClassTest.testTagNone',
+                })
 
-        tests = ((filter_all, test_all, msg_all),
-                 (filter_good, test_good, msg_good),
-                 (filter_invalid, test_invalid, msg_invalid))
+        # exclude any case with classTag
+        self._runTest(['oetag'], lambda tags: "classTag" in tags, {
+                'oetag.TagTest.testTagGood',
+                'oetag.TagTest.testTagOther',
+                'oetag.TagTest.testTagOtherMulti',
+                'oetag.TagTest.testTagNone',
+                })
 
-        for test in tests:
-            self._runFilterTest(['oetag'], test[0], test[1], test[2])
+        # include any case with classTag
+        self._runTest(['oetag'], lambda tags: "classTag" not in tags, {
+                'oetag.TagClassTest.testTagOther',
+                'oetag.TagClassTest.testTagOtherMulti',
+                'oetag.TagClassTest.testTagNone',
+                })
+
+        # include any case with classTag or no tags
+        self._runTest(['oetag'], lambda tags: tags and "classTag" not in tags, {
+                'oetag.TagTest.testTagNone',
+                'oetag.TagClassTest.testTagOther',
+                'oetag.TagClassTest.testTagOtherMulti',
+                'oetag.TagClassTest.testTagNone',
+                })
 
 class TestDependsDecorator(TestBase):
     modules = ['depends']

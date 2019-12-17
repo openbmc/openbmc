@@ -1,7 +1,7 @@
 SUMMARY = "A generic, spec-compliant, thorough implementation of the OAuth request-signing logic"
 HOMEPAGE = "https://github.com/idan/oauthlib"
 
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=5ba9ce41463615e082609806255bce1b"
 
 SRC_URI = "https://pypi.python.org/packages/a5/8a/212e9b47fb54be109f3ff0684165bb38c51117f34e175c379fce5c7df754/oauthlib-${PV}.tar.gz"

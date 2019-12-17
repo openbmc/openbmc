@@ -17,11 +17,11 @@ S = "${WORKDIR}/git"
 do_configure[noexec] = "1"
 
 do_compile_class-native() {
-	./configure.py --bootstrap
+	python3 ./configure.py --bootstrap
 }
 
 do_compile() {
-	./configure.py
+	python3 ./configure.py
 	ninja
 }
 

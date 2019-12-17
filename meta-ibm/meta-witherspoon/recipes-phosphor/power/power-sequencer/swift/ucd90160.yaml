@@ -1,7 +1,7 @@
 - Device:
   index: 0
   # Linux sysfs path for this power sequencer (0xC8 8-bit address)
-  path:  /sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a340.i2c-bus/i2c-8/8-0064
+  path:  /sys/bus/i2c/devices/i2c-8/8-0064
   RailNames:
       - "12.0V"
       - "3.3V"
@@ -52,7 +52,7 @@
   GPIOAnalysis:
       - type:            gpuPGOOD
         # The PCA9xxx chip device path and address (0xC0 8-bit = 0x60 7-bit)
-        path:            /sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a340.i2c-bus/i2c-8/8-0060
+        path:            /sys/bus/i2c/devices/i2c-8/8-0060
         gpio_value:      low # What GPIO value indicates a fault/problem?
         error_function:  gpuPGOODError # Extra analysis function to call for this type
         option_flags:    none
@@ -72,7 +72,7 @@
               callout:   /system/chassis/motherboard/gv100card3
       - type:            gpuOverTemp
         # The PCA9xxx chip device path and address (0xC0 8-bit = 0x60 7-bit)
-        path:            /sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a340.i2c-bus/i2c-8/8-0060
+        path:            /sys/bus/i2c/devices/i2c-8/8-0060
         gpio_value:      low # What GPIO value indicates a fault/problem?
         error_function:  gpuOverTempError # Extra analysis function to call for this type
         option_flags:    shutdownOnFault
@@ -92,7 +92,7 @@
               callout:   /system/chassis/motherboard/gv100card3
       - type:            memGOOD0
         # The PCA9xxx chip device path and address (0xE8 8-bit = 0x74 7-bit)
-        path:            /sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a380.i2c-bus/i2c-9/9-0074
+        path:            /sys/bus/i2c/devices/i2c-9/9-0074
         gpio_value:      low # What GPIO value indicates a fault/problem?
         error_function:  memGoodError # Extra analysis function to call for this type
         option_flags:    none
@@ -136,7 +136,7 @@
               callout:   /system/chassis/motherboard/dimm6
       - type:            memGOOD1
         # The PCA9xxx chip device path and address (0xE8 8-bit = 0x74 7-bit)
-        path:            /sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a3c0.i2c-bus/i2c-10/10-0074
+        path:            /sys/bus/i2c/devices/i2c-10/10-0074
         gpio_value:      low # What GPIO value indicates a fault/problem?
         error_function:  memGoodError # Extra analysis function to call for this type
         option_flags:    none

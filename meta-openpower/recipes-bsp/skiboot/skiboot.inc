@@ -1,14 +1,14 @@
 HOMEPAGE = "https://github.com/open-power"
 LICENSE = "Apache-2.0"
 
-SRC_URI += "git://github.com/open-power/skiboot.git"
+SRC_URI += "git://github.com/open-power/skiboot.git;branch=skiboot-6.5.x"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/skiboot:"
 
 LIC_FILES_CHKSUM = "file://${S}/LICENCE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
-SRCREV = "54811997b6d02dacaf8dd0d61cadaf3786dbabb0"
-PV = "6.3.0+git${SRCPV}"
+SRCREV = "aff9301bb341b5387228e82036a7d72e519d8855"
+PV = "6.5.1+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 

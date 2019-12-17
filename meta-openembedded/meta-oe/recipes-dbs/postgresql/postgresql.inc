@@ -18,7 +18,7 @@ DESCRIPTION = "\
     this package if you're installing the postgresql-server package. \
 "
 HOMEPAGE = "http://www.postgresql.com"
-LICENSE = "BSD"
+LICENSE = "BSD-0-Clause"
 DEPENDS = "libnsl2 zlib readline tzcode-native"
 
 ARM_INSTRUCTION_SET = "arm"

@@ -3,7 +3,7 @@ DESCRIPTION = "The sdparm utility accesses and optionally modifies \
 SCSI devices' mode page and inquiry data."
 HOMEPAGE = "http://sg.danny.cz/sg/sdparm.html"
 SECTION = "console/utils"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ecab6c36b7ba82c675581dd0afde36f7 \
                     file://lib/BSD_LICENSE;md5=1d52f4a66f1e0ed96776bf354ab7a2ed"
 DEPENDS="sg3-utils"

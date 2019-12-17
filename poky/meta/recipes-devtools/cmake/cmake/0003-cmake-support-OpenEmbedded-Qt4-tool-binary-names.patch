@@ -1,8 +1,7 @@
-From c783ceeef485c23e13c3d9f0418719cb0e0b86ee Mon Sep 17 00:00:00 2001
+From b003857d3481105c473e2e75bad4e9e2c6e70004 Mon Sep 17 00:00:00 2001
 From: Otavio Salvador <otavio@ossystems.com.br>
 Date: Thu, 12 May 2011 15:36:03 +0000
-Subject: [PATCH 3/5] cmake: support OpenEmbedded Qt4 tool binary names
-Organization: O.S. Systems Software LTDA.
+Subject: [PATCH] cmake: support OpenEmbedded Qt4 tool binary names
 
 The FindQt4 module looks for Qt4 binaries to be able to gather the
 paths used for compilation and also to be using during other processes
@@ -20,12 +19,13 @@ Instead of find_program, _find_qt4_program is now used.
 
 Signed-off-by: Moritz Blume <moritz.blume@bmw-carit.de>
 Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+
 ---
  Modules/FindQt4.cmake | 10 +++++-----
  1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/Modules/FindQt4.cmake b/Modules/FindQt4.cmake
-index 847a798af..7ad981879 100644
+index a145b46..7e18243 100644
 --- a/Modules/FindQt4.cmake
 +++ b/Modules/FindQt4.cmake
 @@ -518,7 +518,7 @@ endfunction()
@@ -54,6 +54,3 @@ index 847a798af..7ad981879 100644
    _find_qt4_program(QT_DESIGNER_EXECUTABLE Qt4::designer designer-qt4 designer4 designer)
    _find_qt4_program(QT_LINGUIST_EXECUTABLE Qt4::linguist linguist-qt4 linguist4 linguist)
  
--- 
-2.18.0
-

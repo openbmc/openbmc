@@ -7,13 +7,6 @@ database interface independent of the actual database being used. \
 HOMEPAGE = "http://search.cpan.org/dist/DBI/"
 SECTION = "libs"
 LICENSE = "Artistic-1.0 | GPL-1.0+"
-RDEPENDS_${PN}_class-target = " \
-    perl-module-carp \
-    perl-module-exporter \
-    perl-module-exporter-heavy \
-    perl-module-dynaloader \
-"
-
 LIC_FILES_CHKSUM = "file://LICENSE;md5=10982c7148e0a012c0fd80534522f5c5"
 
 SRC_URI = "http://search.cpan.org/CPAN/authors/id/T/TI/TIMB/DBI-${PV}.tar.gz"
@@ -33,5 +26,37 @@ do_install_prepend() {
 	# unclear why there are several duplicates of tests in tarball
 	rm -rf ${B}/t/z*.t
 }
+
+RDEPENDS_${PN}_class-target = " \
+    perl \
+    perl-module-carp \
+    perl-module-exporter \
+    perl-module-exporter-heavy \
+    perl-module-dynaloader \
+    perl-module-io-dir \
+    perl-module-scalar-util \
+    perl-module-universal \
+"
+
+RDEPENDS_${PN}-ptest = " \
+    ${PN} \
+    perl-module-b \
+    perl-module-benchmark \
+    perl-module-cwd \
+    perl-module-data-dumper \
+    perl-module-encode \
+    perl-module-encode-byte \
+    perl-module-encode-encoding \
+    perl-module-file-copy \
+    perl-module-file-path \
+    perl-module-lib \
+    perl-module-perlio \
+    perl-module-perlio-scalar \
+    perl-module-perlio-via \
+    perl-module-sdbm-file \
+    perl-module-storable \
+    perl-module-test-more \
+    perl-module-utf8 \
+    "
 
 BBCLASSEXTEND = "native"

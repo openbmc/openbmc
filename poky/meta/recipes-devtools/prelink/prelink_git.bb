@@ -36,6 +36,9 @@ SRC_URI = "git://git.yoctoproject.org/prelink-cross.git;branch=cross_prelink_sta
 "
 UPSTREAM_CHECK_COMMITS = "1"
 
+# error: error.h: No such file or directory
+COMPATIBLE_HOST_libc-musl = 'null'
+
 TARGET_OS_ORIG := "${TARGET_OS}"
 OVERRIDES_append = ":${TARGET_OS_ORIG}"
 

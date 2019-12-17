@@ -1,0 +1,27 @@
+From b74837184cfdefb45e48f3fdc974fc67691fc861 Mon Sep 17 00:00:00 2001
+From: Dmitry Eremin-Solenikov <dmitry_eremin-solenikov@mentor.com>
+Date: Wed, 3 Jul 2019 19:16:35 +0300
+Subject: [PATCH] configure.ac: stop inserting host directories into compile
+ path
+
+Do not insert /usr/lib and /usr/lib64 into library search path.
+
+Upstream-Status: OE specific
+Signed-off-by: Dmitry Eremin-Solenikov <dmitry_eremin-solenikov@mentor.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: git/configure.ac
+===================================================================
+--- git.orig/configure.ac
++++ git/configure.ac
+@@ -81,7 +81,7 @@ AC_ARG_WITH([efi-lds],
+             AS_HELP_STRING([--with-efi-lds=LDS_PATH],[Path to gnu-efi lds file.]),
+             [],
+             [with_efi_lds="/usr/lib/elf_${ARCH}_efi.lds"])
+-EXTRA_LDFLAGS="-L /usr/lib -L /usr/lib64 -Wl,--script=${with_efi_lds}"
++EXTRA_LDFLAGS="-Wl,--script=${with_efi_lds}"
+ 
+ # path to object file from gnu-efi
+ AC_ARG_WITH([efi-crt0],

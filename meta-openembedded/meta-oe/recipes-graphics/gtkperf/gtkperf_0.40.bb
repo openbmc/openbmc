@@ -16,7 +16,7 @@ DEPENDS = "gtk+"
 
 S = "${WORKDIR}/${BPN}"
 
-inherit distro_features_check autotools binconfig pkgconfig gettext
+inherit features_check autotools binconfig pkgconfig gettext
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

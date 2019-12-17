@@ -1,0 +1,38 @@
+From 926d9285f3367ae1bdb9ce1dce95f7de73b3a980 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 6 Aug 2019 12:42:19 -0700
+Subject: [PATCH] plugin/pango: Include freetype headers explicitly
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Do not depend on pango automatically adding these headers
+Fixes
+| gvtextlayout_pango.c:140:10: error: unknown type name ‘FT_Face’
+|          FT_Face face;
+|          ^~~~~~~
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ plugin/pango/gvtextlayout_pango.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/plugin/pango/gvtextlayout_pango.c b/plugin/pango/gvtextlayout_pango.c
+index d620b29..b0da11c 100644
+--- a/plugin/pango/gvtextlayout_pango.c
++++ b/plugin/pango/gvtextlayout_pango.c
+@@ -15,6 +15,10 @@
+ 
+ #include <stdlib.h>
+ #include <string.h>
++
++#include <ft2build.h>
++#include FT_FREETYPE_H
++
+ #include "gvplugin_render.h"
+ #include "agxbuf.h"
+ #include "utils.h"
+-- 
+2.22.0
+

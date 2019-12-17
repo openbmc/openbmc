@@ -1,21 +1,21 @@
-From 8fe468682c550606ea961a1f996a8618940eb084 Mon Sep 17 00:00:00 2001
+From 8efad9105b38985bea373416ae8fcacf21d1d129 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Fri, 16 Jul 2010 12:26:46 +0800
-Subject: [PATCH] elfutils: upgrade to version 0.148
+Date: Wed, 21 Aug 2019 15:44:18 +0800
+Subject: [PATCH] hppa backend
 
+Rebase to 0.177
 Upstream-Status: Pending [from debian]
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
-
 ---
- backends/Makefile.am      |   8 +-
+ backends/Makefile.am      |   7 +-
  backends/libebl_parisc.h  |   9 ++
- backends/parisc_init.c    |  73 +++++++++++++
- backends/parisc_regs.c    | 159 ++++++++++++++++++++++++++++
- backends/parisc_reloc.def | 128 +++++++++++++++++++++++
- backends/parisc_retval.c  | 213 ++++++++++++++++++++++++++++++++++++++
- backends/parisc_symbol.c  | 113 ++++++++++++++++++++
- libelf/elf.h              |  11 ++
- 8 files changed, 712 insertions(+), 2 deletions(-)
+ backends/parisc_init.c    |  73 ++++++++++++++++
+ backends/parisc_regs.c    | 159 ++++++++++++++++++++++++++++++++++
+ backends/parisc_reloc.def | 128 ++++++++++++++++++++++++++++
+ backends/parisc_retval.c  | 213 ++++++++++++++++++++++++++++++++++++++++++++++
+ backends/parisc_symbol.c  | 113 ++++++++++++++++++++++++
+ libelf/elf.h              |  11 +++
+ 8 files changed, 711 insertions(+), 2 deletions(-)
  create mode 100644 backends/libebl_parisc.h
  create mode 100644 backends/parisc_init.c
  create mode 100644 backends/parisc_regs.c
@@ -24,35 +24,31 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  create mode 100644 backends/parisc_symbol.c
 
 diff --git a/backends/Makefile.am b/backends/Makefile.am
-index 2126a2e..5671a32 100644
+index 175468f..91a38e2 100644
 --- a/backends/Makefile.am
 +++ b/backends/Makefile.am
-@@ -33,12 +33,13 @@ AM_CPPFLAGS += -I$(top_srcdir)/libebl -I$(top_srcdir)/libasm \
+@@ -33,16 +33,19 @@ AM_CPPFLAGS += -I$(top_srcdir)/libebl -I$(top_srcdir)/libasm \
  
  
  modules = i386 sh x86_64 ia64 alpha arm aarch64 sparc ppc ppc64 s390 \
--	  tilegx m68k bpf riscv
-+	  tilegx m68k bpf riscv parisc
+-	  tilegx m68k bpf riscv csky
++	  tilegx m68k bpf riscv csky parisc
  libebl_pic = libebl_i386_pic.a libebl_sh_pic.a libebl_x86_64_pic.a    \
  	     libebl_ia64_pic.a libebl_alpha_pic.a libebl_arm_pic.a    \
  	     libebl_aarch64_pic.a libebl_sparc_pic.a libebl_ppc_pic.a \
  	     libebl_ppc64_pic.a libebl_s390_pic.a libebl_tilegx_pic.a \
--	     libebl_m68k_pic.a libebl_bpf_pic.a libebl_riscv_pic.a
-+	     libebl_m68k_pic.a libebl_bpf_pic.a libebl_riscv_pic.a \
-+	     libebl_parisc_pic.a
+ 	     libebl_m68k_pic.a libebl_bpf_pic.a libebl_riscv_pic.a    \
+-	     libebl_csky_pic.a
++	     libebl_csky_pic.a libebl_parisc_pic.a
  noinst_LIBRARIES = $(libebl_pic)
  noinst_DATA = $(libebl_pic:_pic.a=.so)
- 
-@@ -136,6 +137,9 @@ riscv_SRCS = riscv_init.c riscv_symbol.c riscv_cfi.c riscv_regs.c \
- libebl_riscv_pic_a_SOURCES = $(riscv_SRCS)
- am_libebl_riscv_pic_a_OBJECTS = $(riscv_SRCS:.c=.os)
  
 +parisc_SRCS = parisc_init.c parisc_symbol.c parisc_regs.c parisc_retval.c
 +libebl_parisc_pic_a_SOURCES = $(parisc_SRCS)
 +am_libebl_parisc_pic_a_OBJECTS = $(parisc_SRCS:.c=.os)
  
- libebl_%.so libebl_%.map: libebl_%_pic.a $(libelf) $(libdw) $(libeu)
- 	@rm -f $(@:.so=.map)
+ libelf = ../libelf/libelf.so
+ libdw = ../libdw/libdw.so
 diff --git a/backends/libebl_parisc.h b/backends/libebl_parisc.h
 new file mode 100644
 index 0000000..f473b79
@@ -785,10 +781,10 @@ index 0000000..5754bd8
 +    }
 +}
 diff --git a/libelf/elf.h b/libelf/elf.h
-index 75043bc..6310054 100644
+index 01648bd..218ceb2 100644
 --- a/libelf/elf.h
 +++ b/libelf/elf.h
-@@ -2155,16 +2155,24 @@ enum
+@@ -2162,16 +2162,24 @@ enum
  #define R_PARISC_PCREL17F	12	/* 17 bits of rel. address.  */
  #define R_PARISC_PCREL14R	14	/* Right 14 bits of rel. address.  */
  #define R_PARISC_DPREL21L	18	/* Left 21 bits of rel. address.  */
@@ -813,7 +809,7 @@ index 75043bc..6310054 100644
  #define R_PARISC_LTOFF_FPTR32	57	/* 32 bits LT-rel. function pointer. */
  #define R_PARISC_LTOFF_FPTR21L	58	/* LT-rel. fct ptr, left 21 bits. */
  #define R_PARISC_LTOFF_FPTR14R	62	/* LT-rel. fct ptr, right 14 bits. */
-@@ -2173,6 +2181,7 @@ enum
+@@ -2180,6 +2188,7 @@ enum
  #define R_PARISC_PLABEL21L	66	/* Left 21 bits of fdesc address.  */
  #define R_PARISC_PLABEL14R	70	/* Right 14 bits of fdesc address.  */
  #define R_PARISC_PCREL64	72	/* 64 bits PC-rel. address.  */
@@ -821,7 +817,7 @@ index 75043bc..6310054 100644
  #define R_PARISC_PCREL22F	74	/* 22 bits PC-rel. address.  */
  #define R_PARISC_PCREL14WR	75	/* PC-rel. address, right 14 bits.  */
  #define R_PARISC_PCREL14DR	76	/* PC rel. address, right 14 bits.  */
-@@ -2198,6 +2207,8 @@ enum
+@@ -2205,6 +2214,8 @@ enum
  #define R_PARISC_LTOFF16WF	102	/* 16 bits LT-rel. address.  */
  #define R_PARISC_LTOFF16DF	103	/* 16 bits LT-rel. address.  */
  #define R_PARISC_SECREL64	104	/* 64 bits section rel. address.  */
@@ -830,3 +826,6 @@ index 75043bc..6310054 100644
  #define R_PARISC_SEGREL64	112	/* 64 bits segment rel. address.  */
  #define R_PARISC_PLTOFF14WR	115	/* PLT-rel. address, right 14 bits.  */
  #define R_PARISC_PLTOFF14DR	116	/* PLT-rel. address, right 14 bits.  */
+-- 
+2.7.4
+

@@ -1,0 +1,37 @@
+From c2a67c1f62175ab061bc03d10dd766f968c6a097 Mon Sep 17 00:00:00 2001
+From: Naveen Saini <naveen.kumar.saini@intel.com>
+Date: Fri, 2 Aug 2019 10:41:26 +0800
+Subject: [PATCH] configure.ac: skip running test program when cross-compiling
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Naveen Saini <naveen.kumar.saini@intel.com>
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index c5e3ca03..4b89396a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -140,7 +140,7 @@ AC_CHECK_FUNC([getloadavg],[AC_DEFINE([HAVE_GETLOADAVG2], 1, [getloadavg() is av
+ AC_FUNC_SELECT_ARGTYPES
+ 
+ AC_MSG_CHECKING([for strlcpy])
+-AC_RUN_IFELSE([AC_LANG_PROGRAM([[#include <string.h>]],[[
++AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <string.h>]],[[
+                char a[2];
+                if (strlcpy(a, "yes", 2) != 3)
+                    return 1;]])],
+@@ -156,7 +156,7 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[#include <string.h>]],[[
+               ])
+ 
+ AC_MSG_CHECKING([for strlcat])
+-AC_RUN_IFELSE([AC_LANG_PROGRAM([[#include <string.h>]],[[
++AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <string.h>]],[[
+                char a[4] = "no";
+                if (strlcat(a, "yes", 4) != 5)
+                    return 1;]])],
+-- 
+2.17.1
+

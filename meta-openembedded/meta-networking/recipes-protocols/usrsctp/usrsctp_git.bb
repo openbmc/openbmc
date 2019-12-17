@@ -2,9 +2,8 @@ DESCRIPTION = "This is a userland SCTP stack supporting FreeBSD, Linux, Mac OS X
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=ffcf846341f3856d79a483eafa18e2a5"
 
-SRCREV = "dbfc1b8c4cf1a46a4d8987ba542d5ff06bdaf14c"
+SRCREV = "a10cd498d964508c0e6ec6bd2be9dd4afcbb4d86"
 SRC_URI = "git://github.com/sctplab/usrsctp;protocol=https;branch=master \
-           file://0001-Use-foreign-switch-for-automake.patch \
           "
 
 S = "${WORKDIR}/git"

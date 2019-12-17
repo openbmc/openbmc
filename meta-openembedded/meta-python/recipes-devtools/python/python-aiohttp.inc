@@ -15,4 +15,7 @@ RDEPENDS_${PN} = "\
     ${PYTHON_PN}-idna-ssl \
     ${PYTHON_PN}-multidict \
     ${PYTHON_PN}-yarl \
+    ${PYTHON_PN}-typing \
+    ${PYTHON_PN}-misc \
+    ${PYTHON_PN}-attrs \
 "

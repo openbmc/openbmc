@@ -11,6 +11,7 @@ SRC_URI = "http://libmpeg2.sourceforge.net/files/libmpeg2-${PV}.tar.gz \
            file://0001-check-for-available-arm-optimizations.patch \
            file://0002-Set-visibility-of-global-symbols-used-in-ARM-specifi.patch \
            file://61_global-symbol-test.patch \
+           file://0001-Import-revision-1206-from-upstream-to-fix-PIE-build.patch \
            "
 
 S = "${WORKDIR}/libmpeg2-${PV}"

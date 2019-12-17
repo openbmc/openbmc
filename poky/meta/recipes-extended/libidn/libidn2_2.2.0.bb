@@ -21,6 +21,10 @@ EXTRA_OECONF += "--disable-rpath \
                  --with-libunistring-prefix=${STAGING_EXECPREFIXDIR} \
                  "
 
+do_install_append() {
+	sed -i -e 's|-L${STAGING_LIBDIR}||' ${D}${libdir}/pkgconfig/libidn2.pc
+}
+
 LICENSE_${PN} = "(GPLv2+ | LGPLv3)"
 LICENSE_${PN}-bin = "GPLv3+"
 

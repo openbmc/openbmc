@@ -59,11 +59,26 @@ do_compile() {
 
 	# Rebuild only the installer; keep precompiled bootloaders
 	# as per author's request (doc/distrib.txt)
-	oe_runmake CC="${CC} ${CFLAGS}" LD="${LD}" LDFLAGS="${LDFLAGS}" firmware="bios" installer
+	oe_runmake CC="${CC} ${CFLAGS}" \
+                   LD="${LD}" LDFLAGS="${LDFLAGS}" \
+                   OBJDUMP="${OBJDUMP}" \
+                   OBJCOPY="${OBJCOPY}" \
+                   AR="${AR}" \
+                   STRIP="${STRIP}" \
+                   NM="${NM}" \
+                   RANLIB="${RANLIB}" \
+                   firmware="bios" installer
 }
 
 do_install() {
-	oe_runmake CC="${CC} ${CFLAGS}" LD="${LD}" firmware="bios" install INSTALLROOT="${D}"
+	oe_runmake CC="${CC} ${CFLAGS}" LD="${LD}" \
+                   OBJDUMP="${OBJDUMP}" \
+                   OBJCOPY="${OBJCOPY}" \
+                   AR="${AR}" \
+                   STRIP="${STRIP}" \
+                   NM="${NM}" \
+                   RANLIB="${RANLIB}" \
+                   firmware="bios" install INSTALLROOT="${D}"
 
 	install -d ${D}${datadir}/syslinux/
 	install -m 644 ${S}/bios/core/ldlinux.sys ${D}${datadir}/syslinux/

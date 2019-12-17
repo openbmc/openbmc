@@ -24,4 +24,4 @@ do_install_append() {
     oe_multilib_header npth.h
 }
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

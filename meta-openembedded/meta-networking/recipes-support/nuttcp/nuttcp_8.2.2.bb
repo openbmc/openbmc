@@ -12,7 +12,9 @@ LIC_FILES_CHKSUM = "file://${BP}.c;beginline=4;endline=30;md5=496a7c0bb83c07ff52
 
 UPSTREAM_CHECK_URI = "https://www.nuttcp.net/nuttcp/beta/"
 
-SRC_URI = "http://nuttcp.net/${BPN}/beta/${BP}.c"
+SRC_URI = "http://nuttcp.net/${BPN}/beta/${BP}.c \
+           file://nuttcp@.service \
+           file://nuttcp.socket"
 SRC_URI[md5sum] = "d3c92c4d2f261221193c3726c1b9a42f"
 SRC_URI[sha256sum] = "8c5595bcd27c2fd66831be74c390df078cfb1870aa427f2511ac2586d236c8a1"
 
@@ -24,5 +26,13 @@ do_compile () {
 
 do_install () {
     install -d ${D}${bindir}
+    install -d ${D}${systemd_system_unitdir}
     install -m 0755 nuttcp ${D}${bindir}
+    install -m 0644 ${WORKDIR}/nuttcp@.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${WORKDIR}/nuttcp.socket ${D}${systemd_system_unitdir}
 }
+
+FILES_${PN} += " \
+    ${bindir} \
+    ${systemd_system_unitdir} \
+"

@@ -40,11 +40,11 @@ class BitbakeTests(OESelftestTestCase):
     def test_event_handler(self):
         self.write_config("INHERIT += \"test_events\"")
         result = bitbake('m4-native')
-        find_build_started = re.search(r"NOTE: Test for bb\.event\.BuildStarted(\n.*)*NOTE: Executing RunQueue Tasks", result.output)
+        find_build_started = re.search(r"NOTE: Test for bb\.event\.BuildStarted(\n.*)*NOTE: Executing.*Tasks", result.output)
         find_build_completed = re.search(r"Tasks Summary:.*(\n.*)*NOTE: Test for bb\.event\.BuildCompleted", result.output)
         self.assertTrue(find_build_started, msg = "Match failed in:\n%s"  % result.output)
         self.assertTrue(find_build_completed, msg = "Match failed in:\n%s" % result.output)
-        self.assertFalse('Test for bb.event.InvalidEvent' in result.output, msg = "\"Test for bb.event.InvalidEvent\" message found during bitbake process. bitbake output: %s" % result.output)
+        self.assertNotIn('Test for bb.event.InvalidEvent', result.output)
 
     def test_local_sstate(self):
         bitbake('m4-native')
@@ -59,7 +59,7 @@ class BitbakeTests(OESelftestTestCase):
 
     def test_bitbake_invalid_target(self):
         result = bitbake('asdf', ignore_status=True)
-        self.assertTrue("ERROR: Nothing PROVIDES 'asdf'" in result.output, msg = "Though no 'asdf' target exists, bitbake didn't output any err. message. bitbake output: %s" % result.output)
+        self.assertIn("ERROR: Nothing PROVIDES 'asdf'", result.output)
 
     def test_warnings_errors(self):
         result = bitbake('-b asdf', ignore_status=True)
@@ -75,8 +75,11 @@ class BitbakeTests(OESelftestTestCase):
         result = bitbake('man-db -c patch', ignore_status=True)
         self.delete_recipeinc('man-db')
         bitbake('-cclean man-db')
-        line = self.getline(result, "Function failed: patch_do_patch")
-        self.assertTrue(line and line.startswith("ERROR:"), msg = "Incorrectly formed patch application didn't fail. bitbake output: %s" % result.output)
+        found = False
+        for l in result.output.split('\n'):
+            if l.startswith("ERROR:") and "failed" in l and "do_patch" in l:
+                found = l
+        self.assertTrue(found and found.startswith("ERROR:"), msg = "Incorrectly formed patch application didn't fail. bitbake output: %s" % result.output)
 
     def test_force_task_1(self):
         # test 1 from bug 5875
@@ -115,11 +118,12 @@ class BitbakeTests(OESelftestTestCase):
             self.assertIn(task, result.output, msg="Couldn't find %s task.")
 
     def test_bitbake_g(self):
-        result = bitbake('-g core-image-minimal')
-        for f in ['pn-buildlist', 'recipe-depends.dot', 'task-depends.dot']:
+        recipe = 'base-files'
+        result = bitbake('-g %s' % recipe)
+        for f in ['pn-buildlist', 'task-depends.dot']:
             self.addCleanup(os.remove, f)
         self.assertTrue('Task dependencies saved to \'task-depends.dot\'' in result.output, msg = "No task dependency \"task-depends.dot\" file was generated for the given task target. bitbake output: %s" % result.output)
-        self.assertTrue('busybox' in ftools.read_file(os.path.join(self.builddir, 'task-depends.dot')), msg = "No \"busybox\" dependency found in task-depends.dot file.")
+        self.assertIn(recipe, ftools.read_file(os.path.join(self.builddir, 'task-depends.dot')))
 
     def test_image_manifest(self):
         bitbake('core-image-minimal')
@@ -143,8 +147,7 @@ INHERIT_remove = \"report-error\"
         bitbake('-ccleanall man-db')
         self.delete_recipeinc('man-db')
         self.assertEqual(result.status, 1, msg="Command succeded when it should have failed. bitbake output: %s" % result.output)
-        self.assertTrue('Fetcher failure: Unable to find file file://invalid anywhere. The paths that were searched were:' in result.output, msg = "\"invalid\" file \
-doesn't exist, yet no error message encountered. bitbake output: %s" % result.output)
+        self.assertIn('Fetcher failure: Unable to find file file://invalid anywhere. The paths that were searched were:', result.output)
         line = self.getline(result, 'Fetcher failure for URL: \'file://invalid\'. Unable to fetch URL from any source.')
         self.assertTrue(line and line.startswith("ERROR:"), msg = "\"invalid\" file \
 doesn't exist, yet fetcher didn't report any error. bitbake output: %s" % result.output)
@@ -169,7 +172,7 @@ SSTATE_DIR = \"${TOPDIR}/download-selftest\"
     def test_environment(self):
         self.write_config("TEST_ENV=\"localconf\"")
         result = runCmd('bitbake -e | grep TEST_ENV=')
-        self.assertTrue('localconf' in result.output, msg = "bitbake didn't report any value for TEST_ENV variable. To test, run 'bitbake -e | grep TEST_ENV='")
+        self.assertIn('localconf', result.output)
 
     def test_dry_run(self):
         result = runCmd('bitbake -n m4-native')
@@ -189,10 +192,10 @@ SSTATE_DIR = \"${TOPDIR}/download-selftest\"
         self.track_for_cleanup(preconf)
         ftools.write_file(preconf ,"TEST_PREFILE=\"prefile\"")
         result = runCmd('bitbake -r conf/prefile.conf -e | grep TEST_PREFILE=')
-        self.assertTrue('prefile' in result.output, "Preconfigure file \"prefile.conf\"was not taken into consideration. ")
+        self.assertIn('prefile', result.output)
         self.write_config("TEST_PREFILE=\"localconf\"")
         result = runCmd('bitbake -r conf/prefile.conf -e | grep TEST_PREFILE=')
-        self.assertTrue('localconf' in result.output, "Preconfigure file \"prefile.conf\"was not taken into consideration.")
+        self.assertIn('localconf', result.output)
 
     def test_postfile(self):
         postconf = os.path.join(self.builddir, 'conf/postfile.conf')
@@ -200,7 +203,7 @@ SSTATE_DIR = \"${TOPDIR}/download-selftest\"
         ftools.write_file(postconf , "TEST_POSTFILE=\"postfile\"")
         self.write_config("TEST_POSTFILE=\"localconf\"")
         result = runCmd('bitbake -R conf/postfile.conf -e | grep TEST_POSTFILE=')
-        self.assertTrue('postfile' in result.output, "Postconfigure file \"postfile.conf\"was not taken into consideration.")
+        self.assertIn('postfile', result.output)
 
     def test_checkuri(self):
         result = runCmd('bitbake -c checkuri m4')
@@ -241,6 +244,36 @@ INHERIT_remove = \"report-error\"
         for task in tasks:
             self.assertIn('_setscene', task, 'A task different from _setscene ran: %s.\n'
                                              'Executed tasks were: %s' % (task, str(tasks)))
+
+    def test_skip_setscene(self):
+        test_recipe = 'ed'
+
+        bitbake(test_recipe)
+        bitbake('-c clean %s' % test_recipe)
+
+        ret = bitbake('--setscene-only %s' % test_recipe)
+        tasks = re.findall(r'task\s+(do_\S+):', ret.output)
+
+        for task in tasks:
+            self.assertIn('_setscene', task, 'A task different from _setscene ran: %s.\n'
+                                             'Executed tasks were: %s' % (task, str(tasks)))
+
+        # Run without setscene. Should do nothing
+        ret = bitbake('--skip-setscene %s' % test_recipe)
+        tasks = re.findall(r'task\s+(do_\S+):', ret.output)
+
+        self.assertFalse(tasks, 'Tasks %s ran when they should not have' % (str(tasks)))
+
+        # Clean (leave sstate cache) and run with --skip-setscene. No setscene
+        # tasks should run
+        bitbake('-c clean %s' % test_recipe)
+
+        ret = bitbake('--skip-setscene %s' % test_recipe)
+        tasks = re.findall(r'task\s+(do_\S+):', ret.output)
+
+        for task in tasks:
+            self.assertNotIn('_setscene', task, 'A _setscene task ran: %s.\n'
+                                                'Executed tasks were: %s' % (task, str(tasks)))
 
     def test_bbappend_order(self):
         """ Bitbake should bbappend to recipe in a predictable order """

@@ -130,7 +130,7 @@ def log_test_header(seq_no, nr_of_tests, name):
 #-------------------------------------------------------------------------------
 
 def start_stress(*args):
-        stress_cmd         = [ "stress" ]
+        stress_cmd         = [ "stress-ng" ]
         added_stress_types = []
         req_stress_types   = set(args)
         cpu_cnt            = str(multiprocessing.cpu_count())

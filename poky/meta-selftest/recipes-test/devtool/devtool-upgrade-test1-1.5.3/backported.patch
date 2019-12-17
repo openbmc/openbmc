@@ -1,0 +1,37 @@
+commit ced2ec32b657a7f52604b2e16e5d5881041c517a
+Author: OpenEmbedded <oe.patch@oe>
+Date:   Mon Nov 18 18:43:15 2019 +0100
+
+    Backport of the NEWS file from version 1.6.0
+
+diff --git a/doc/NEWS b/doc/NEWS
+index 69793fc..fd49b1c 100644
+--- a/doc/NEWS
++++ b/doc/NEWS
+@@ -1,3 +1,26 @@
++1.6.0 - 15 March 2015
++  - fix lstat64 support when unavailable - separate patches supplied by
++    Ganael Laplanche and Peter Korsgaard
++  - (#1506) new option "-D" / "--delay-start" to only show bar after N
++    seconds (Damon Harper)
++  - new option "--fineta" / "-I" to show ETA as time of day rather than time
++    remaining - patch supplied by Erkki Seppälä (r147)
++  - (#1509) change ETA (--eta / -e) so that days are given if the hours
++    remaining are 24 or more (Jacek Wielemborek)
++  - (#1499) repeat read and write attempts on partial buffer fill/empty to
++    work around post-signal transfer rate drop reported by Ralf Ramsauer
++  - (#1507) do not try to calculate total size in line mode, due to bug
++    reported by Jacek Wielemborek and Michiel Van Herwegen
++  - cleanup: removed defunct RATS comments and unnecessary copyright notices
++  - clean up displayed lines when using --watchfd PID, when PID exits
++  - output errors on a new line to avoid overwriting transfer bar
++
++1.5.7 - 26 August 2014
++  - show KiB instead of incorrect kiB (Debian bug #706175)
++  - (#1284) do not gzip man page, for non-Linux OSes (Bob Friesenhahn)
++  - work around "awk" bug in tests/016-numeric-timer in decimal "," locales
++  - fix "make rpm" and "make srpm", extend "make release" to sign releases
++
+ 1.5.3 - 4 May 2014
+   - remove SPLICE_F_NONBLOCK to fix problem with slow splice() (Jan Seda)
+ 

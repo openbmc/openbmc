@@ -153,6 +153,7 @@ class TestImage(OESelftestTestCase):
 
         # Enable package feed signing
         self.gpg_home = tempfile.mkdtemp(prefix="oeqa-feed-sign-")
+        self.track_for_cleanup(self.gpg_home)
         signing_key_dir = os.path.join(self.testlayer_path, 'files', 'signing')
         runCmd('gpg --batch --homedir %s --import %s' % (self.gpg_home, os.path.join(signing_key_dir, 'key.secret')), native_sysroot=get_bb_var("RECIPE_SYSROOT_NATIVE", "gnupg-native"))
         features += 'INHERIT += "sign_package_feed"\n'
@@ -164,9 +165,6 @@ class TestImage(OESelftestTestCase):
         # Build core-image-sato and testimage
         bitbake('core-image-full-cmdline socat')
         bitbake('-c testimage core-image-full-cmdline')
-
-        # remove the oeqa-feed-sign temporal directory
-        shutil.rmtree(self.gpg_home, ignore_errors=True)
 
     def test_testimage_virgl_gtk(self):
         """
@@ -181,6 +179,8 @@ class TestImage(OESelftestTestCase):
         distro = oe.lsb.distro_identifier()
         if distro and distro == 'debian-8':
             self.skipTest('virgl isn\'t working with Debian 8')
+        if distro and distro == 'centos-7':
+            self.skipTest('virgl isn\'t working with Centos 7')
 
         qemu_packageconfig = get_bb_var('PACKAGECONFIG', 'qemu-system-native')
         features = 'INHERIT += "testimage"\n'
@@ -193,7 +193,7 @@ class TestImage(OESelftestTestCase):
         features += 'TEST_SUITES = "ping ssh virgl"\n'
         features += 'IMAGE_FEATURES_append = " ssh-server-dropbear"\n'
         features += 'IMAGE_INSTALL_append = " kmscube"\n'
-        features += 'TEST_RUNQEMUPARAMS = "gtk-gl"\n'
+        features += 'TEST_RUNQEMUPARAMS = "gtk gl"\n'
         self.write_config(features)
         bitbake('core-image-minimal')
         bitbake('-c testimage core-image-minimal')
@@ -321,4 +321,81 @@ class Postinst(OESelftestTestCase):
                                     "rootfs-before-failure file was not created")
                 self.assertFalse(os.path.isfile(os.path.join(hosttestdir, "rootfs-after-failure")),
                                     "rootfs-after-failure file was created")
+
+class SystemTap(OESelftestTestCase):
+        """
+        Summary:        The purpose of this test case is to verify native crosstap
+                        works while talking to a target.
+        Expected:       The script should successfully connect to the qemu machine
+                        and run some systemtap examples on a qemu machine.
+        """
+
+        @classmethod
+        def setUpClass(cls):
+            super(SystemTap, cls).setUpClass()
+            cls.image = "core-image-minimal"
+
+        def default_config(self):
+            return """
+# These aren't the actual IP addresses but testexport class needs something defined
+TEST_SERVER_IP = "192.168.7.1"
+TEST_TARGET_IP = "192.168.7.2"
+
+EXTRA_IMAGE_FEATURES += "tools-profile dbg-pkgs"
+IMAGE_FEATURES_append = " ssh-server-dropbear"
+
+# enables kernel debug symbols
+KERNEL_EXTRA_FEATURES_append = " features/debug/debug-kernel.scc"
+KERNEL_EXTRA_FEATURES_append = " features/systemtap/systemtap.scc"
+
+# add systemtap run-time into target image if it is not there yet
+IMAGE_INSTALL_append = " systemtap"
+"""
+
+        def test_crosstap_helloworld(self):
+            self.write_config(self.default_config())
+            bitbake('systemtap-native')
+            systemtap_examples = os.path.join(get_bb_var("WORKDIR","systemtap-native"), "usr/share/systemtap/examples")
+            bitbake(self.image)
+
+            with runqemu(self.image) as qemu:
+                cmd = "crosstap -r root@192.168.7.2 -s %s/general/helloworld.stp " % systemtap_examples 
+                result = runCmd(cmd)
+                self.assertEqual(0, result.status, 'crosstap helloworld returned a non 0 status:%s' % result.output)
+
+        def test_crosstap_pstree(self):
+            self.write_config(self.default_config())
+
+            bitbake('systemtap-native')
+            systemtap_examples = os.path.join(get_bb_var("WORKDIR","systemtap-native"), "usr/share/systemtap/examples")
+            bitbake(self.image)
+
+            with runqemu(self.image) as qemu:
+                cmd = "crosstap -r root@192.168.7.2 -s %s/process/pstree.stp" % systemtap_examples
+                result = runCmd(cmd)
+                self.assertEqual(0, result.status, 'crosstap pstree returned a non 0 status:%s' % result.output)
+
+        def test_crosstap_syscalls_by_proc(self):
+            self.write_config(self.default_config())
+
+            bitbake('systemtap-native')
+            systemtap_examples = os.path.join(get_bb_var("WORKDIR","systemtap-native"), "usr/share/systemtap/examples")
+            bitbake(self.image)
+
+            with runqemu(self.image) as qemu:
+                cmd = "crosstap -r root@192.168.7.2 -s %s/process/ syscalls_by_proc.stp" % systemtap_examples
+                result = runCmd(cmd)
+                self.assertEqual(0, result.status, 'crosstap  syscalls_by_proc returned a non 0 status:%s' % result.output)
+
+        def test_crosstap_syscalls_by_pid(self):
+            self.write_config(self.default_config())
+
+            bitbake('systemtap-native')
+            systemtap_examples = os.path.join(get_bb_var("WORKDIR","systemtap-native"), "usr/share/systemtap/examples")
+            bitbake(self.image)
+
+            with runqemu(self.image) as qemu:
+                cmd = "crosstap -r root@192.168.7.2 -s %s/process/ syscalls_by_pid.stp" % systemtap_examples
+                result = runCmd(cmd)
+                self.assertEqual(0, result.status, 'crosstap  syscalls_by_pid returned a non 0 status:%s' % result.output)
 

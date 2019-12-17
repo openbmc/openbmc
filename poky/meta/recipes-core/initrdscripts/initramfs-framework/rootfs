@@ -27,8 +27,18 @@ rootfs_run() {
 			fi
 
 			if [ "`echo ${bootparam_root} | cut -c1-9`" = "PARTUUID=" ]; then
-				root_uuid=`echo $bootparam_root | cut -c10-`
-				bootparam_root="/dev/disk/by-partuuid/$root_uuid"
+				root_partuuid=`echo $bootparam_root | cut -c10-`
+				bootparam_root="/dev/disk/by-partuuid/$root_partuuid"
+			fi
+
+			if [ "`echo ${bootparam_root} | cut -c1-10`" = "PARTLABEL=" ]; then
+				root_partlabel=`echo $bootparam_root | cut -c11-`
+				bootparam_root="/dev/disk/by-partlabel/$root_partlabel"
+			fi
+
+			if [ "`echo ${bootparam_root} | cut -c1-10`" = "PARTLABEL=" ]; then
+				root_partlabel=`echo $bootparam_root | cut -c11-`
+				bootparam_root="/dev/disk/by-partlabel/$root_partlabel"
 			fi
 
 			if [ "`echo ${bootparam_root} | cut -c1-6`" = "LABEL=" ]; then

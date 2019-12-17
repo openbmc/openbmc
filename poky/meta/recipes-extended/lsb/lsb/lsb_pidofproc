@@ -1,6 +1,0 @@
-#!/bin/sh
-
-. /etc/init.d/functions
-
-pidofproc $*
-exit $?

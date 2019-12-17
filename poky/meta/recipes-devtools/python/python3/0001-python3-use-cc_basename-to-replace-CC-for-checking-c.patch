@@ -63,7 +63,7 @@ index a7de901..4a3681f 100644
 +  case $cc_basename in
      *clang*)
        AC_SUBST(LLVM_AR)
-       AC_PATH_TARGET_TOOL(LLVM_AR, llvm-ar, '', ${llvm_path})
+       AC_PATH_TOOL(LLVM_AR, llvm-ar, '', ${llvm_path})
 @@ -1426,7 +1427,7 @@ then
    fi
  fi

@@ -1,4 +1,4 @@
-From f5a4b4c0579734923c9caf70944322efff57318b Mon Sep 17 00:00:00 2001
+From cfff734af6bff6a30a649f784ecf698658c01884 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 13 Feb 2019 15:32:05 +0100
 Subject: [PATCH] Set host_machine correctly when building with mingw32
@@ -14,11 +14,11 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  4 files changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/gio/tests/meson.build b/gio/tests/meson.build
-index 028b196..217ccb1 100644
+index 95aafc1..9025eb2 100644
 --- a/gio/tests/meson.build
 +++ b/gio/tests/meson.build
-@@ -12,7 +12,7 @@ test_c_args = [
-   '-DGLIB_COMPILE_SCHEMAS="@0@"'.format(glib_compile_schemas.full_path()),
+@@ -13,7 +13,7 @@ test_c_args = [
+   '-UG_DISABLE_ASSERT',
  ]
  
 -if host_machine.system() == 'windows'
@@ -26,7 +26,7 @@ index 028b196..217ccb1 100644
    common_gio_tests_deps += [iphlpapi_dep, winsock2, cc.find_library ('secur32')]
  endif
  
-@@ -119,7 +119,7 @@ if dbus1_dep.found()
+@@ -120,7 +120,7 @@ if dbus1_dep.found()
  endif
  
  #  Test programs buildable on UNIX only
@@ -35,7 +35,7 @@ index 028b196..217ccb1 100644
    gio_tests += {
      'file' : {},
      'gdbus-peer' : {
-@@ -327,7 +327,7 @@ if host_machine.system() != 'windows'
+@@ -332,7 +332,7 @@ if host_machine.system() != 'windows'
  endif # unix
  
  #  Test programs buildable on Windows only
@@ -44,7 +44,7 @@ index 028b196..217ccb1 100644
    gio_tests += {'win32-streams' : {}}
  endif
  
-@@ -392,7 +392,7 @@ if cc.get_id() != 'msvc'
+@@ -397,7 +397,7 @@ if cc.get_id() != 'msvc' and cc.get_id() != 'clang-cl'
    }
  endif
  
@@ -54,7 +54,7 @@ index 028b196..217ccb1 100644
      'gdbus-example-unix-fd-client' : {
        'install' : false,
 diff --git a/glib/tests/meson.build b/glib/tests/meson.build
-index d54fc41..a4761fe 100644
+index c47133f..cad975f 100644
 --- a/glib/tests/meson.build
 +++ b/glib/tests/meson.build
 @@ -132,7 +132,7 @@ if glib_conf.has('HAVE_EVENTFD')
@@ -67,10 +67,10 @@ index d54fc41..a4761fe 100644
      glib_tests += {
        'gpoll' : {
 diff --git a/meson.build b/meson.build
-index a745024..e87eae5 100644
+index 717d1bc..2a3beb8 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -31,6 +31,9 @@ else
+@@ -32,6 +32,9 @@ else
  endif
  
  host_system = host_machine.system()
@@ -81,7 +81,7 @@ index a745024..e87eae5 100644
  glib_version = meson.project_version()
  glib_api_version = '2.0'
 diff --git a/tests/meson.build b/tests/meson.build
-index 11075dd..cd6067b 100644
+index ce30442..5710f2c 100644
 --- a/tests/meson.build
 +++ b/tests/meson.build
 @@ -66,7 +66,7 @@ test_extra_programs = {

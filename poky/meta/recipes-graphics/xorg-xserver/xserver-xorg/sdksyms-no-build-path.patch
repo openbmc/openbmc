@@ -1,0 +1,50 @@
+Upstream-Status: Backport [https://gitlab.freedesktop.org/xorg/xserver/merge_requests/253]
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From ca832598d38ba55a001088b57d73c6d7261dc9a7 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Thu, 1 Aug 2019 15:24:51 +0100
+Subject: [PATCH] sdksyms.sh: don't embed the build path
+
+This script generates a header that has a comment containing the build path for
+no real reason.  As this source can end up deployed on targets in debug packages
+this means there is both potentially sensitive information leakage about the
+build environment, and a source of change for reproducible builds.
+---
+ hw/xfree86/sdksyms.sh | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/hw/xfree86/sdksyms.sh b/hw/xfree86/sdksyms.sh
+index 39e33711d..bdf47a71a 100755
+--- a/hw/xfree86/sdksyms.sh
++++ b/hw/xfree86/sdksyms.sh
+@@ -302,13 +302,16 @@ LC_ALL=C
+ export LC_ALL
+ ${CPP:-cpp} "$@" sdksyms.c > /dev/null || exit $?
+ ${CPP:-cpp} "$@" sdksyms.c | ${AWK:-awk} -v topdir=$topdir '
++function basename(file) {
++    sub(".*/", "", file)
++    return file
++}
+ BEGIN {
+     sdk = 0;
+     print("/*");
+     print(" * These symbols are referenced to ensure they");
+     print(" * will be available in the X Server binary.");
+     print(" */");
+-    printf("/* topdir=%s */\n", topdir);
+     print("_X_HIDDEN void *xorg_symbols[] = {");
+ 
+     printf("sdksyms.c:") > "sdksyms.dep";
+@@ -337,7 +340,7 @@ BEGIN {
+ 	# remove quotes
+ 	gsub(/"/, "", $3);
+ 	line = $2;
+-	header = $3;
++	header = basename($3);
+ 	if (! headers[$3]) {
+ 	    printf(" \\\n  %s", $3) >> "sdksyms.dep";
+ 	    headers[$3] = 1;
+-- 
+2.20.1
+

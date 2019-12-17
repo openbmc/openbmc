@@ -1,4 +1,4 @@
-From 1530138960cfafbeefb95f2a760954c00b4d0ef0 Mon Sep 17 00:00:00 2001
+From e9fa816677993e520adff8bba26cb3e71f5a6665 Mon Sep 17 00:00:00 2001
 From: Jussi Kukkonen <jussi.kukkonen@intel.com>
 Date: Wed, 29 Mar 2017 15:11:59 +0300
 Subject: [PATCH] tests: Allow different output from mv
@@ -12,18 +12,18 @@ Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/test/failbackup.test b/test/failbackup.test
-index 37046f7..fce6725 100644
+index 5f0f54f..0902b12 100644
 --- a/test/failbackup.test
 +++ b/test/failbackup.test
 @@ -16,7 +16,7 @@ What happens when refresh fails because of a permission error?
  	$ cat > test.txt
  	< This is updated test.txt.
  	$ quilt refresh --backup
--	>~ mv: cannot move [`']?%{P}test.diff'? to [`']?%{P}test.diff~'?: Permission denied
+-	>~ mv: cannot move [`']?patches/test.diff'? to [`']?patches/test.diff~'?: Permission denied
 +	>~ mv: .*: Permission denied
  	$ echo %{?}
  	> 1
  
 -- 
-2.1.4
+2.17.1
 

@@ -83,20 +83,20 @@ class CoreRecipeInfo(RecipeInfoCommon):
         self.appends = self.listvar('__BBAPPEND', metadata)
         self.nocache = self.getvar('BB_DONT_CACHE', metadata)
 
-        self.skipreason = self.getvar('__SKIPPED', metadata)
-        if self.skipreason:
-            self.pn = self.getvar('PN', metadata) or bb.parse.vars_from_file(filename,metadata)[0]
-            self.skipped = True
-            self.provides  = self.depvar('PROVIDES', metadata)
-            self.rprovides = self.depvar('RPROVIDES', metadata)
-            return
-
-        self.tasks = metadata.getVar('__BBTASKS', False)
-
-        self.pn = self.getvar('PN', metadata)
+        self.provides  = self.depvar('PROVIDES', metadata)
+        self.rprovides = self.depvar('RPROVIDES', metadata)
+        self.pn = self.getvar('PN', metadata) or bb.parse.vars_from_file(filename,metadata)[0]
         self.packages = self.listvar('PACKAGES', metadata)
         if not self.packages:
             self.packages.append(self.pn)
+        self.packages_dynamic = self.listvar('PACKAGES_DYNAMIC', metadata)
+
+        self.skipreason = self.getvar('__SKIPPED', metadata)
+        if self.skipreason:
+            self.skipped = True
+            return
+
+        self.tasks = metadata.getVar('__BBTASKS', False)
 
         self.basetaskhashes = self.taskvar('BB_BASEHASH', self.tasks, metadata)
         self.hashfilename = self.getvar('BB_HASHFILENAME', metadata)
@@ -113,11 +113,8 @@ class CoreRecipeInfo(RecipeInfoCommon):
         self.stampclean = self.getvar('STAMPCLEAN', metadata)
         self.stamp_extrainfo = self.flaglist('stamp-extra-info', self.tasks, metadata)
         self.file_checksums = self.flaglist('file-checksums', self.tasks, metadata, True)
-        self.packages_dynamic = self.listvar('PACKAGES_DYNAMIC', metadata)
         self.depends          = self.depvar('DEPENDS', metadata)
-        self.provides         = self.depvar('PROVIDES', metadata)
         self.rdepends         = self.depvar('RDEPENDS', metadata)
-        self.rprovides        = self.depvar('RPROVIDES', metadata)
         self.rrecommends      = self.depvar('RRECOMMENDS', metadata)
         self.rprovides_pkg    = self.pkgvar('RPROVIDES', self.packages, metadata)
         self.rdepends_pkg     = self.pkgvar('RDEPENDS', self.packages, metadata)
@@ -223,7 +220,7 @@ class CoreRecipeInfo(RecipeInfoCommon):
 
         cachedata.hashfn[fn] = self.hashfilename
         for task, taskhash in self.basetaskhashes.items():
-            identifier = '%s.%s' % (fn, task)
+            identifier = '%s:%s' % (fn, task)
             cachedata.basetaskhash[identifier] = taskhash
 
         cachedata.inherits[fn] = self.inherits
@@ -398,6 +395,15 @@ class Cache(NoCache):
             logger.info("Out of date cache found, rebuilding...")
         else:
             logger.debug(1, "Cache file %s not found, building..." % self.cachefile)
+
+        # We don't use the symlink, its just for debugging convinience
+        symlink = os.path.join(self.cachedir, "bb_cache.dat")
+        if os.path.exists(symlink):
+            bb.utils.remove(symlink)
+        try:
+            os.symlink(os.path.basename(self.cachefile), symlink)
+        except OSError:
+            pass
 
     def load_cachefile(self):
         cachesize = 0
@@ -875,5 +881,58 @@ class MultiProcessCache(object):
         with open(self.cachefile, "wb") as f:
             p = pickle.Pickler(f, -1)
             p.dump([data, self.__class__.CACHE_VERSION])
+
+        bb.utils.unlockfile(glf)
+
+
+class SimpleCache(object):
+    """
+    BitBake multi-process cache implementation
+
+    Used by the codeparser & file checksum caches
+    """
+
+    def __init__(self, version):
+        self.cachefile = None
+        self.cachedata = None
+        self.cacheversion = version
+
+    def init_cache(self, d, cache_file_name=None, defaultdata=None):
+        cachedir = (d.getVar("PERSISTENT_DIR") or
+                    d.getVar("CACHE"))
+        if not cachedir:
+            return defaultdata
+
+        bb.utils.mkdirhier(cachedir)
+        self.cachefile = os.path.join(cachedir,
+                                      cache_file_name or self.__class__.cache_file_name)
+        logger.debug(1, "Using cache in '%s'", self.cachefile)
+
+        glf = bb.utils.lockfile(self.cachefile + ".lock")
+
+        try:
+            with open(self.cachefile, "rb") as f:
+                p = pickle.Unpickler(f)
+                data, version = p.load()
+        except:
+            bb.utils.unlockfile(glf)
+            return defaultdata
+
+        bb.utils.unlockfile(glf)
+
+        if version != self.cacheversion:
+            return defaultdata
+
+        return data
+
+    def save(self, data):
+        if not self.cachefile:
+            return
+
+        glf = bb.utils.lockfile(self.cachefile + ".lock")
+
+        with open(self.cachefile, "wb") as f:
+            p = pickle.Pickler(f, -1)
+            p.dump([data, self.cacheversion])
 
         bb.utils.unlockfile(glf)

@@ -13,7 +13,7 @@ PR = "r9"
 
 PACKAGECONFIG ??= "scripting tui libunwind"
 PACKAGECONFIG[dwarf] = ",NO_DWARF=1"
-PACKAGECONFIG[scripting] = ",NO_LIBPERL=1 NO_LIBPYTHON=1,perl python"
+PACKAGECONFIG[scripting] = ",NO_LIBPERL=1 NO_LIBPYTHON=1,perl python3"
 # gui support was added with kernel 3.6.35
 # since 3.10 libnewt was replaced by slang
 # to cover a wide range of kernel we add both dependencies
@@ -25,6 +25,7 @@ PACKAGECONFIG[jvmti] = ",NO_JVMTI=1"
 # libaudit support would need scripting to be enabled
 PACKAGECONFIG[audit] = ",NO_LIBAUDIT=1,audit"
 PACKAGECONFIG[manpages] = ",,xmlto-native asciidoc-native"
+PACKAGECONFIG[cap] = ",,libcap"
 
 # libunwind is not yet ported for some architectures
 PACKAGECONFIG_remove_arc = "libunwind"
@@ -44,8 +45,8 @@ PROVIDES = "virtual/perf"
 inherit linux-kernel-base kernel-arch manpages
 
 # needed for building the tools/perf Python bindings
-inherit ${@bb.utils.contains('PACKAGECONFIG', 'scripting', 'pythonnative', '', d)}
-inherit python-dir
+inherit ${@bb.utils.contains('PACKAGECONFIG', 'scripting', 'python3native', '', d)}
+inherit python3-dir
 export PYTHON_SITEPACKAGES_DIR
 
 #kernel 3.1+ supports WERROR to disable warnings as errors
@@ -94,6 +95,7 @@ EXTRA_OEMAKE += "\
     'sharedir=${@os.path.relpath(datadir, prefix)}' \
     'mandir=${@os.path.relpath(mandir, prefix)}' \
     'infodir=${@os.path.relpath(infodir, prefix)}' \
+    ${@bb.utils.contains('PACKAGECONFIG', 'scripting', 'PYTHON=python3 PYTHON_CONFIG=python3-config', '', d)} \
 "
 
 # During do_configure, we might run a 'make clean'. That often breaks
@@ -104,7 +106,6 @@ EXTRA_OEMAKE += "\
 EXTRA_OEMAKE_append_task-configure = " JOBS=1"
 
 PERF_SRC ?= "Makefile \
-             include \
              tools/arch \
              tools/build \
              tools/include \
@@ -112,6 +113,8 @@ PERF_SRC ?= "Makefile \
              tools/Makefile \
              tools/perf \
              tools/scripts \
+             scripts/ \
+             arch/${ARCH}/Makefile \
 "
 
 PERF_EXTRA_LDFLAGS = ""
@@ -132,7 +135,7 @@ do_install() {
 	oe_runmake install
 	# we are checking for this make target to be compatible with older perf versions
 	if ${@bb.utils.contains('PACKAGECONFIG', 'scripting', 'true', 'false', d)} && grep -q install-python_ext ${S}/tools/perf/Makefile*; then
-		oe_runmake DESTDIR=${D} install-python_ext
+	    oe_runmake DESTDIR=${D} install-python_ext
 	fi
 }
 
@@ -150,6 +153,8 @@ python copy_perf_source_from_kernel() {
         if os.path.isdir(src):
             oe.path.copyhardlinktree(src, dest)
         else:
+            src_path = os.path.dirname(s)
+            os.makedirs(os.path.join(dest_dir,src_path),exist_ok=True)
             bb.utils.copyfile(src, dest)
 }
 
@@ -232,13 +237,16 @@ do_configure_prepend () {
     fi
 
     # use /usr/bin/env instead of version specific python
-    for s in `find ${S}/tools/perf/scripts/python/ -name '*.py'`; do
-        sed -i 's,/usr/bin/python2,/usr/bin/env python,' "${s}"
+    for s in `find ${S}/tools/perf/ -name '*.py'`; do
+        sed -i 's,/usr/bin/python,/usr/bin/env python3,' "${s}"
+        sed -i 's,/usr/bin/python2,/usr/bin/env python3,' "${s}"
+        sed -i 's,/usr/bin/env python2,/usr/bin/env python3,' "${s}"
     done
 
     # unistd.h can be out of sync between libc-headers and the captured version in the perf source
     # so we copy it from the sysroot unistd.h to the perf unistd.h
     install -D -m0644 ${STAGING_INCDIR}/asm-generic/unistd.h ${S}/tools/include/uapi/asm-generic/unistd.h
+    install -D -m0644 ${STAGING_INCDIR}/asm-generic/unistd.h ${S}/include/uapi/asm-generic/unistd.h
 }
 
 python do_package_prepend() {
@@ -252,9 +260,9 @@ PACKAGES =+ "${PN}-archive ${PN}-tests ${PN}-perl ${PN}-python"
 
 RDEPENDS_${PN} += "elfutils bash"
 RDEPENDS_${PN}-archive =+ "bash"
-RDEPENDS_${PN}-python =+ "bash python python-modules ${@bb.utils.contains('PACKAGECONFIG', 'audit', 'audit-python', '', d)}"
+RDEPENDS_${PN}-python =+ "bash python3 python3-modules ${@bb.utils.contains('PACKAGECONFIG', 'audit', 'audit-python3', '', d)}"
 RDEPENDS_${PN}-perl =+ "bash perl perl-modules"
-RDEPENDS_${PN}-tests =+ "python"
+RDEPENDS_${PN}-tests =+ "python3"
 
 RSUGGESTS_SCRIPTING = "${@bb.utils.contains('PACKAGECONFIG', 'scripting', '${PN}-perl ${PN}-python', '',d)}"
 RSUGGESTS_${PN} += "${PN}-archive ${PN}-tests ${RSUGGESTS_SCRIPTING}"

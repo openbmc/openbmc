@@ -6,7 +6,6 @@
 import os
 
 import bb
-import oe.utils
 import subprocess
 import shlex
 
@@ -89,8 +88,7 @@ class LocalSigner(object):
             (_, stderr) = job.communicate(passphrase.encode("utf-8"))
 
             if job.returncode:
-                raise bb.build.FuncFailed("GPG exited with code %d: %s" %
-                                          (job.returncode, stderr.decode("utf-8")))
+                bb.fatal("GPG exited with code %d: %s" % (job.returncode, stderr.decode("utf-8")))
 
         except IOError as e:
             bb.error("IO error (%s): %s" % (e.errno, e.strerror))
@@ -108,7 +106,7 @@ class LocalSigner(object):
             ver_str = subprocess.check_output(cmd).split()[2].decode("utf-8")
             return tuple([int(i) for i in ver_str.split("-")[0].split('.')])
         except subprocess.CalledProcessError as e:
-            raise bb.build.FuncFailed("Could not get gpg version: %s" % e)
+            bb.fatal("Could not get gpg version: %s" % e)
 
 
     def verify(self, sig_file):

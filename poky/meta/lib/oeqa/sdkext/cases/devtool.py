@@ -73,8 +73,8 @@ class DevtoolTest(OESDKExtTestCase):
             self._run('devtool reset %s' % recipe)
 
     def test_devtool_kernelmodule(self):
-        docfile = 'https://github.com/umlaeute/v4l2loopback.git'
-        recipe = 'v4l2loopback-driver'
+        docfile = 'https://git.yoctoproject.org/git/kernel-module-hello-world'
+        recipe = 'kernel-module-hello-world'
         self._run('devtool add %s %s' % (recipe, docfile) )
         try:
             self._run('devtool build %s' % recipe)

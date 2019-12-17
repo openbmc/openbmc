@@ -1,0 +1,17 @@
+BMC:
+    xyz.openbmc_project.Inventory.Decorator.Asset:
+        OPFR,VP: PartNumber
+        OPFR,VS: SerialNumber
+        OPFR,VN: Manufacturer
+    xyz.openbmc_project.Inventory.Item:
+        VINI,DR: PrettyName
+    xyz.openbmc_project.Inventory.Item.Bmc:
+ETHERNET:
+    xyz.openbmc_project.Inventory.Item.NetworkInterface:
+        VINI,B1: MACAddress
+    xyz.openbmc_project.Inventory.Item.Ethernet:
+ETHERNET1:
+    xyz.openbmc_project.Inventory.Item.NetworkInterface:
+        OPFR,B1: MACAddress
+    xyz.openbmc_project.Inventory.Item.Ethernet:
+

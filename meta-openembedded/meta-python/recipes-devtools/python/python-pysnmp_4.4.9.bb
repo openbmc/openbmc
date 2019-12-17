@@ -5,7 +5,7 @@ DESCRIPTION = "SNMP v1/v2c/v3 engine and apps written in pure-Python. \
 "
 HOMEPAGE = "https://pypi.python.org/pypi/pysnmp"
 SECTION = "devel/python"
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.rst;md5=b15d29f500f748d1c2a15709769090a8"
 
 SRCNAME = "pysnmp"

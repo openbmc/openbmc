@@ -7,7 +7,7 @@ inherit autotools pkgconfig
 
 DEPENDS = "virtual/libx11 xserver-xorg xrdp nasm-native"
 
-inherit distro_features_check
+inherit features_check
 REQUIRED_DISTRO_FEATURES = "x11 pam"
 
 SRC_URI = "git://github.com/neutrinolabs/xorgxrdp.git"

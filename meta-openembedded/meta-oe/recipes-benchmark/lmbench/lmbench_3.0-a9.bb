@@ -54,7 +54,7 @@ do_compile () {
 
 do_install () {
     install -d ${D}${sysconfdir}/default/volatiles \
-           ${D}${bindir} ${D}${mandir} ${D}${libdir}/lmbench \
+           ${D}${bindir} ${D}${mandir} \
            ${D}${datadir}/lmbench/scripts
 
     echo "d root root 0755 ${localstatedir}/run/${BPN} none" \
@@ -71,7 +71,6 @@ do_install () {
     mv ${D}${bindir}/line ${D}${bindir}/lm_line
     install -m 0755 ${WORKDIR}/lmbench-run ${D}${bindir}/
     sed -i -e 's,^SHAREDIR=.*$,SHAREDIR=${datadir}/${BPN},;' \
-           -e 's,^BINDIR=.*$,BINDIR=${libdir}/${BPN},;' \
            -e 's,^CONFIG=.*$,CONFIG=`$SCRIPTSDIR/config`,;' \
            ${D}${bindir}/lmbench-run
     install -m 0755 ${S}/scripts/lmbench ${D}${bindir}
@@ -89,4 +88,4 @@ pkg_postinst_${PN} () {
 }
 
 RDEPENDS_${PN} = "perl"
-FILES_${PN} += "${datadir}/lmbench ${libdir}/lmbench"
+FILES_${PN} += "${datadir}/lmbench"

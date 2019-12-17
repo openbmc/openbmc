@@ -1,0 +1,33 @@
+From 7d0732d69a774e28bc46b8b487d9f61bdd8afbff Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 6 Oct 2019 18:15:44 -0700
+Subject: [PATCH] os_posix: Use __FreeBSD__ to control secure_getenv definition
+
+__USE_GNU does not cover all Linux platforms, e.g. when using musl as C
+library, __USE_GNU may not be defined but it does provide secure_getenv
+so instead of narrowing the else condition, lets speicifically check for
+FreeBSD being the platform, since that seems to be the intention here
+anyway
+
+Upstream-Status: Submitted [https://github.com/pmem/pmdk/pull/3999]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/common/os_posix.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/common/os_posix.c b/src/common/os_posix.c
+index a9a37ef84..052db2383 100644
+--- a/src/common/os_posix.c
++++ b/src/common/os_posix.c
+@@ -346,7 +346,7 @@ os_setenv(const char *name, const char *value, int overwrite)
+ /*
+  * secure_getenv -- provide GNU secure_getenv for FreeBSD
+  */
+-#ifndef __USE_GNU
++#if defined(__FreeBSD__)
+ static char *
+ secure_getenv(const char *name)
+ {
+-- 
+2.23.0
+

@@ -3,10 +3,10 @@ DESCRIPTION = "PyCryptodome is a self-contained Python package of low-level\
  cryptographic primitives."
 HOMEPAGE = "http://www.pycryptodome.org"
 LICENSE = "PD & BSD-2-Clause"
-LIC_FILES_CHKSUM = "file://LICENSE.rst;md5=775fe77831c03bf82f35abc0e230d4c1"
+LIC_FILES_CHKSUM = "file://LICENSE.rst;md5=6dc0e2a13d2f25d6f123c434b761faba"
 
-SRC_URI[md5sum] = "a2587b6381b0ef4eb960cea1e7507d04"
-SRC_URI[sha256sum] = "c5dd29e9f1b733e74311bf95d0e544e91bd1d14bc0366e8f443562d8d9920b7d"
+SRC_URI[md5sum] = "c4e53f9ed33ca883b18249b9e1546251"
+SRC_URI[sha256sum] = "39ddc3c493125494572e0beefa8e8e6a43369e93c3c3e163cb871b37c1c62fba"
 
 inherit pypi
 

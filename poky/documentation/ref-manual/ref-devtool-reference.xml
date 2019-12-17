@@ -629,18 +629,18 @@
         <title>Building Your Recipe</title>
 
         <para>
-            Use the <filename>devtool build</filename> command to cause the
-            OpenEmbedded build system to build your recipe.
+            Use the <filename>devtool build</filename> command to build your
+            recipe.
             The <filename>devtool build</filename> command is equivalent to
-            <filename>bitbake -c populate_sysroot</filename>.
+            the <filename>bitbake -c populate_sysroot</filename> command.
         </para>
 
         <para>
             When you use the <filename>devtool build</filename> command,
-            you must supply the root name of the recipe (i.e. no version,
-            paths, or extensions).
+            you must supply the root name of the recipe (i.e. do not provide
+            versions, paths, or extensions).
             You can use either the "-s" or the "--disable-parallel-make"
-            option to disable parallel makes during the build.
+            options to disable parallel makes during the build.
             Here is an example:
             <literallayout class='monospaced'>
      $ devtool build <replaceable>recipe</replaceable>

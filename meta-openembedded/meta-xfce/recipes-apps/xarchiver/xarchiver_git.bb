@@ -12,7 +12,7 @@ SRCREV = "9ab958a4023b62b43972c55a3143ff0722bd88a6"
 PV = "0.5.4.14"
 S = "${WORKDIR}/git"
 
-inherit gettext pkgconfig autotools gtk-icon-cache distro_features_check
+inherit gettext pkgconfig autotools gtk-icon-cache features_check
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

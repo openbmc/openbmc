@@ -37,7 +37,7 @@ SRC_URI = "git://github.com/BOINC/boinc;protocol=https;branch=${BRANCH} \
            file://gtk-configure.patch \
 "
 
-inherit gettext autotools pkgconfig distro_features_check systemd
+inherit gettext autotools pkgconfig features_check systemd
 
 REQUIRED_DISTRO_FEATURES += "opengl"
 

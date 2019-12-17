@@ -14,7 +14,7 @@ SRC_URI[sha256sum] = "34db5e20bcf64e7071fe9ae25acaa7d72bdc4f11ab3ce59acc768ab62f
 
 S = "${WORKDIR}/SDL2_ttf-${PV}"
 
-inherit autotools pkgconfig distro_features_check
+inherit autotools pkgconfig features_check
 
 # links to libGL.so
 REQUIRED_DISTRO_FEATURES += "x11 opengl"

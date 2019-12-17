@@ -65,7 +65,7 @@ def collect_pkgs(data_dict):
     for fn in data_dict:
         pkgconfigflags = data_dict[fn].getVarFlags("PACKAGECONFIG")
         pkgconfigflags.pop('doc', None)
-        pkgname = data_dict[fn].getVar("P")
+        pkgname = data_dict[fn].getVar("PN")
         pkg_dict[pkgname] = sorted(pkgconfigflags.keys())
 
     return pkg_dict

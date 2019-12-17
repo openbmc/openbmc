@@ -8,18 +8,27 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3"
 DEPENDS = "liboop"
 
 SRC_URI = "http://download.savannah.gnu.org/releases/ruli/ruli_${PV}.orig.tar.gz \
-           file://Makefile.patch \
            file://0001-Fix-build-with-format-string-checks.patch \
            file://0001-src-ruli_addr.c-Add-missing-format-string.patch \
+           file://0001-ruli_srv-Mark-prev_addr_list_size-as-unused.patch \
+           file://0001-Make-space-for-flags-from-environment.patch \
            "
 
 SRC_URI[md5sum] = "e73fbfdeadddb68a703a70cea5271468"
 SRC_URI[sha256sum] = "11d32def5b514748fbd9ea8c88049ae99e1bb358efc74eb91a4d268a3999dbfa"
 
-do_install1() {
-    install -d ${D}${includedir}/ruli
-    install -d ${D}${libdir}
-    install -m 0644 ${S}/src/ruli*.h ${D}${includedir}/ruli
-    install -m 0644 ${S}/src/libruli.so ${D}${libdir}
-    install -m 0644 ${S}/src/libruli.so.4 ${D}${libdir}
+B = "${S}"
+
+EXTRA_OEMAKE = 'CC="${CC}" OOP_BASE_DIR="${STAGING_EXECPREFIXDIR}" INSTALL_BASE_DIR="${D}${exec_prefix}"'
+
+do_configure() {
+    touch configure-stamp
 }
+
+do_install() {
+    oe_runmake install
+}
+
+PACKAGES =+ "${PN}-bin"
+
+FILES_${PN} =+ "${bindir}"

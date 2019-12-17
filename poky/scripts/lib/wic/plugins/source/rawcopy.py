@@ -59,6 +59,9 @@ class RawCopyPlugin(SourcePlugin):
         src = os.path.join(kernel_dir, source_params['file'])
         dst = os.path.join(cr_workdir, "%s.%s" % (source_params['file'], part.lineno))
 
+        if not os.path.exists(os.path.dirname(dst)):
+            os.makedirs(os.path.dirname(dst))
+
         if 'skip' in source_params:
             sparse_copy(src, dst, skip=int(source_params['skip']))
         else:

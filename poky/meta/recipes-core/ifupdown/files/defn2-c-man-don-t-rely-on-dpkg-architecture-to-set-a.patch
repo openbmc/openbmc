@@ -1,4 +1,4 @@
-From 7af9db748974cb3a2c6ef8f9e03d7db1f9f8ee16 Mon Sep 17 00:00:00 2001
+From 40257d65b338b6e2ed9d89d6fa7c7b8701a4c311 Mon Sep 17 00:00:00 2001
 From: Paul Gortmaker <paul.gortmaker@windriver.com>
 Date: Wed, 6 Aug 2014 14:54:12 -0400
 Subject: [PATCH 1/2] defn2[c|man]: don't rely on dpkg-architecture to set arch
@@ -19,7 +19,7 @@ Upstream-Status: Pending
  2 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/defn2c.pl b/defn2c.pl
-index c449de2f3d1c..38845e374c76 100755
+index 8798dc2..f2551c7 100755
 --- a/defn2c.pl
 +++ b/defn2c.pl
 @@ -2,9 +2,9 @@
@@ -36,7 +36,7 @@ index c449de2f3d1c..38845e374c76 100755
  # declarations
  my $address_family = "";
 diff --git a/defn2man.pl b/defn2man.pl
-index 6ddcfdd4fe68..c9c4dd046597 100755
+index 6ddcfdd..c9c4dd0 100755
 --- a/defn2man.pl
 +++ b/defn2man.pl
 @@ -2,9 +2,9 @@
@@ -53,5 +53,5 @@ index 6ddcfdd4fe68..c9c4dd046597 100755
  # declarations
  my $line;
 -- 
-1.9.1
+2.17.1
 

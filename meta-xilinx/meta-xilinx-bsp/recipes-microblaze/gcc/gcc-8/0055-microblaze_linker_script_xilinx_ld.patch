@@ -1,0 +1,16 @@
+diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
+index 740b8d9..4bda9c2 100644
+--- a/gcc/config/microblaze/microblaze.h
++++ b/gcc/config/microblaze/microblaze.h
+@@ -114,8 +114,9 @@ extern enum pipeline_type microblaze_pipe;
+   %{m64:-EL --oformat=elf64-microblazeel} \
+   %{Zxl-mode-xmdstub:-defsym _TEXT_START_ADDR=0x800} \
+   %{mxl-mode-xmdstub:-defsym _TEXT_START_ADDR=0x800} \
+-  %{mxl-gp-opt:%{G*}} %{!mxl-gp-opt: -G 0} \
+-  %{!T*: -dT xilinx.ld%s}"
++  %{mxl-gp-opt:%{G*}} %{!mxl-gp-opt: -G 0}"
++
++//  %{!T*: -dT xilinx.ld%s}"
+ 
+ /* Specs for the compiler proper  */
+ 

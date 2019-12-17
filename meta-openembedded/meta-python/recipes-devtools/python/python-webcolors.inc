@@ -1,5 +1,5 @@
 SUMMARY = "Simple Python module for working with HTML/CSS color definitions."
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=197add016087e6884a012b0f185d44ad"
 
 SRC_URI[md5sum] = "40890db38b2a856e526a568864025fe6"

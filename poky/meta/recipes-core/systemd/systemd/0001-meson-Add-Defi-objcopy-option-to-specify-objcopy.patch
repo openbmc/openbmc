@@ -1,0 +1,48 @@
+From 3f37ad5e083dcad51c21c1050b2829b70d240b52 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 6 Aug 2019 03:10:20 +0000
+Subject: [PATCH] meson: Add -Defi-objcopy option to specify objcopy
+
+This helps in cross compiling for x86 target on a aarch64 host e.g.
+Fixes
+TOPDIR/build/tmp/hosttools/objcopy:src/boot/efi/systemd_boot.so: Invalid bfd target
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ meson_options.txt        | 2 ++
+ src/boot/efi/meson.build | 5 ++++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/meson_options.txt b/meson_options.txt
+index d4ec37dda2..dc1c96e112 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -296,6 +296,8 @@ option('efi-cc', type : 'array',
+        description : 'the compiler to use for EFI modules')
+ option('efi-ld', type : 'string',
+        description : 'the linker to use for EFI modules')
++option('efi-objcopy', type : 'string',
++       description : 'the objcopy to use for EFI')
+ option('efi-libdir', type : 'string',
+        description : 'path to the EFI lib directory')
+ option('efi-ldsdir', type : 'string',
+diff --git a/src/boot/efi/meson.build b/src/boot/efi/meson.build
+index 0ae3191635..5a7137bc84 100644
+--- a/src/boot/efi/meson.build
++++ b/src/boot/efi/meson.build
+@@ -88,7 +88,10 @@ if have_gnu_efi
+                 output : 'efi_config.h',
+                 configuration : efi_conf)
+ 
+-        objcopy = find_program('objcopy')
++        objcopy = get_option('efi-objcopy')
++        if objcopy == ''
++                objcopy = find_program('objcopy', required: true)
++        endif
+ 
+         efi_ldsdir = get_option('efi-ldsdir')
+         arch_lds = 'elf_@0@_efi.lds'.format(gnu_efi_path_arch)
+-- 
+2.17.1
+

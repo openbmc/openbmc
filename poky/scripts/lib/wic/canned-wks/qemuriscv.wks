@@ -1,0 +1,3 @@
+# short-description: Create qcow2 image for RISC-V QEMU machines
+
+part / --source rootfs --fstype=ext4 --label root --align 4096 --size 5G

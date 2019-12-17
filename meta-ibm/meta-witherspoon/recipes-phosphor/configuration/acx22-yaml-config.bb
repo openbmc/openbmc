@@ -1,12 +1,12 @@
 SUMMARY = "YAML configuration for ACx22 systems"
 PR = "r1"
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://${IBMBASE}/COPYING.apache-2.0;md5=34400b68072d710fecd0a2940a0d1658"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 inherit allarch
 inherit mrw-xml
 
-SRC_URI = " \
+SRC_URI_ibm-ac-server = " \
     file://acx22-ipmi-fru-bmc.yaml \
     file://acx22-ipmi-fru-not-sent-by-host.yaml \
     file://acx22-ipmi-hwmon-sensors.yaml \
@@ -14,7 +14,13 @@ SRC_URI = " \
     file://acx22-ipmi-occ-sensors.yaml \
     file://acx22-ipmi-sensors-mrw.yaml \
     "
-
+SRC_URI_mihawk = " \
+    file://acx22-ipmi-fru-bmc.yaml \
+    file://acx22-ipmi-hwmon-sensors.yaml \
+    file://acx22-ipmi-inventory-sensors.yaml \
+    file://acx22-ipmi-occ-sensors.yaml \
+    file://acx22-ipmi-sensors-mrw.yaml \
+    "
 DEPENDS = " \
     mrw-native \
     mrw-perl-tools-native \
@@ -23,9 +29,12 @@ DEPENDS = " \
 
 S = "${WORKDIR}"
 
-ACx22_IPMI_EXTRA_FRU_READ_YAMLS = " \
+ACx22_IPMI_EXTRA_FRU_READ_YAMLS_ibm-ac-server = " \
     acx22-ipmi-fru-bmc.yaml \
     acx22-ipmi-fru-not-sent-by-host.yaml \
+    "
+ACx22_IPMI_EXTRA_FRU_READ_YAMLS_mihawk = " \
+    acx22-ipmi-fru-bmc.yaml \
     "
 ACx22_IPMI_EXTRA_SENSOR_YAMLS = " \
     acx22-ipmi-hwmon-sensors.yaml \
@@ -41,18 +50,19 @@ do_install() {
     # generate extra-properties.yaml from the MRW for ipmi-fru-parser
     $perlbin $scriptpath/gen_fru_properties.pl -m $mrw \
         -c $op_configpath/ipmi-fru-properties-mrw.yaml \
-        -o extra-properties.yaml
+        -o extra-properties.yaml ${EXTRA_MRW_SCRIPT_ARGS}
 
     # generate fru-read.yaml from the MRW, for ipmid and ipmi-fru-parser
     $perlbin $scriptpath/gen_ipmi_fru.pl -i $mrw \
         -m $op_configpath/ipmi-hostboot-fru-mrw.yaml \
-        -o fru-read-partial.yaml
+        -o fru-read-partial.yaml ${EXTRA_MRW_SCRIPT_ARGS}
     cat fru-read-partial.yaml ${ACx22_IPMI_EXTRA_FRU_READ_YAMLS} \
         > fru-read.yaml
 
     # generate inventory-sensors.yaml from the MRW, for ipmid
     $perlbin $scriptpath/gen_ipmi_sel.pl -i $mrw \
-        -m acx22-ipmi-inventory-sensors.yaml -o inventory-sensors.yaml
+        -m acx22-ipmi-inventory-sensors.yaml -o inventory-sensors.yaml \
+        ${EXTRA_MRW_SCRIPT_ARGS}
 
     # generate sensors.yaml from the MRW, for ipmid
     cat acx22-ipmi-sensors-mrw.yaml \
@@ -60,7 +70,7 @@ do_install() {
         $op_configpath/ipmi-occ-active-sensor-mrw.yaml \
         > sensors-mrw.yaml
     $perlbin $scriptpath/gen_ipmi_sensor.pl -i $mrw -m sensors-mrw.yaml \
-        -o sensors-partial.yaml
+        -o sensors-partial.yaml ${EXTRA_MRW_SCRIPT_ARGS}
     cat sensors-partial.yaml ${ACx22_IPMI_EXTRA_SENSOR_YAMLS} \
         > sensors.yaml
 

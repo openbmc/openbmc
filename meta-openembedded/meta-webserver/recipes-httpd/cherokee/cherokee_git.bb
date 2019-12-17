@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
 DEPENDS = "unzip-native libpcre openssl mysql5 ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'libpam', '', d)}"
 
-SRCREV = "75f041e2255e6dd0692db2f14611c2647dbe8425"
+SRCREV = "9a75e65b876bcc376cb6b379dca1f7ce4a055c59"
 PV = "1.2.104+git${SRCPV}"
 SRC_URI = "git://github.com/cherokee/webserver \
            file://cherokee.init \
@@ -15,6 +15,7 @@ SRC_URI = "git://github.com/cherokee/webserver \
            file://cherokee-install-configured.py-once.patch \
            file://0001-configure.ac-Add-foreign-to-AM_INIT_AUTOMAKE.patch \
            file://0001-make-Do-not-build-po-files.patch \
+           file://0001-common-internal.h-Define-LLONG_MAX-if-undefined.patch \
 "
 
 S = "${WORKDIR}/git"

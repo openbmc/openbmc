@@ -12,7 +12,7 @@ S = "${WORKDIR}"
 inherit native
 
 do_compile() {
-	${CC} tunctl.c -o tunctl
+	${CC} ${CFLAGS} ${LDFLAGS} -Wall tunctl.c -o tunctl
 }
 
 do_install() {

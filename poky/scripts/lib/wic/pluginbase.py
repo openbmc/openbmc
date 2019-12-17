@@ -1,4 +1,4 @@
-#!/usr/bin/env python -tt
+#!/usr/bin/env python3
 #
 # Copyright (c) 2011 Intel, Inc.
 #

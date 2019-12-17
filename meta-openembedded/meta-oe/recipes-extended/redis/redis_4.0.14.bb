@@ -2,7 +2,7 @@ SUMMARY = "Redis key-value store"
 DESCRIPTION = "Redis is an open source, advanced key-value store."
 HOMEPAGE = "http://redis.io"
 SECTION = "libs"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=3c01b49fed4df1a79843688fa3f7b9d6"
 DEPENDS = "readline lua ncurses"
 
@@ -10,6 +10,8 @@ SRC_URI = "http://download.redis.io/releases/${BP}.tar.gz \
            file://hiredis-use-default-CC-if-it-is-set.patch \
            file://lua-update-Makefile-to-use-environment-build-setting.patch \
            file://oe-use-libc-malloc.patch \
+           file://Fixed-stack-trace-generation-on-aarch64.patch \
+           file://0001-src-Do-not-reset-FINAL_LIBS.patch \
            file://redis.conf \
            file://init-redis-server \
            file://redis.service \
@@ -24,10 +26,12 @@ SRC_URI[sha256sum] = "1e1e18420a86cfb285933123b04a82e1ebda20bfb0a289472745a08758
 
 inherit autotools-brokensep update-rc.d systemd useradd
 
+FINAL_LIBS_x86_toolchain-clang = "-latomic"
+export FINAL_LIBS
+
 USERADD_PACKAGES = "${PN}"
 USERADD_PARAM_${PN}  = "--system --home-dir /var/lib/redis -g redis --shell /bin/false redis"
 GROUPADD_PARAM_${PN} = "--system redis"
-
 
 REDIS_ON_SYSTEMD = "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}"
 

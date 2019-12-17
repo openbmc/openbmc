@@ -1,0 +1,42 @@
+From ccaf4225239c3092a51cf44f2ab0a2141b8a5fa6 Mon Sep 17 00:00:00 2001
+From: Luca Palano <github@lpzone.it>
+Date: Wed, 5 Dec 2018 10:36:52 +0100
+Subject: [PATCH 1/2] Correct of timeout issue
+
+The timeout issue has been disabled
+
+Signed-off-by: Luca Palano <github@lpzone.it>
+---
+ collectors/charts.d.plugin/charts.d.plugin.in | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/collectors/charts.d.plugin/charts.d.plugin.in b/collectors/charts.d.plugin/charts.d.plugin.in
+index 0df6c30c..63ea4506 100755
+--- a/collectors/charts.d.plugin/charts.d.plugin.in
++++ b/collectors/charts.d.plugin/charts.d.plugin.in
+@@ -156,7 +156,7 @@ restart_timeout=$((3600 * 4))
+ dryrunner=0
+ 
+ # check for timeout command
+-check_for_timeout=1
++check_for_timeout=0
+ 
+ # the default enable/disable value for all charts
+ enable_all_charts="yes"
+@@ -251,9 +251,10 @@ time_divisor=$((time_divisor))
+ # timeout command we use, providing a function that
+ # can emulate the timeout command we need:
+ # > timeout SECONDS command ...
+-if [ $check_for_timeout -eq 1 ]; then
+-	require_cmd timeout || exit 1
+-fi
++#if [ $check_for_timeout -eq 1 ]
++#    then
++#    require_cmd timeout || exit 1
++#fi
+ 
+ # -----------------------------------------------------------------------------
+ # internal checks
+-- 
+2.20.1 (Apple Git-117)
+

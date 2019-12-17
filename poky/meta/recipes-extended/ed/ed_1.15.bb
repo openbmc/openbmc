@@ -9,6 +9,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=0c7051aef9219dc7237f206c5c4179a7 \
 
 SECTION = "base"
 
+CVE_PRODUCT = "gnu:ed"
+
 # LSB states that ed should be in /bin/
 bindir = "${base_bindir}"
 

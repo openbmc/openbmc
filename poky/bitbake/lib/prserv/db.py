@@ -257,7 +257,7 @@ class PRData(object):
         self.connection=sqlite3.connect(self.filename, isolation_level="EXCLUSIVE", check_same_thread = False)
         self.connection.row_factory=sqlite3.Row
         self.connection.execute("pragma synchronous = off;")
-        self.connection.execute("PRAGMA journal_mode = WAL;")
+        self.connection.execute("PRAGMA journal_mode = MEMORY;")
         self._tables={}
 
     def disconnect(self):

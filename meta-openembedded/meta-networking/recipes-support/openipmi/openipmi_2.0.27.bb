@@ -51,6 +51,7 @@ PACKAGECONFIG ??= "gdbm"
 PACKAGECONFIG[gdbm] = "ac_cv_header_gdbm_h=yes,ac_cv_header_gdbm_h=no,gdbm,"
 
 PACKAGES += "${PN}-perl ${PN}-python"
+PRIVATE_LIBS_${PN}-perl = "libOpenIPMI.so.0"
 
 FILES_${PN}-perl = " \
     ${libdir}/perl/vendor_perl/*/OpenIPMI.pm \

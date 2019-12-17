@@ -8,7 +8,7 @@ COMPATIBLE_MACHINE = "^rpi$"
 
 inherit autotools
 
-SRCREV = "2df7b8684e2e36b080cda315d78d5ba16f8f18b0"
+SRCREV = "2eaa8b8755a550e34d07c898b90b0d9b3d66fd81"
 SRC_URI = "git://github.com/RPi-Distro/raspi-gpio.git;protocol=https;branch=master \
           "
 

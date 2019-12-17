@@ -8,7 +8,7 @@ SRC_URI[md5sum] = "4772fb4d87c26a1ab22a6161424e3cba"
 
 inherit pypi
 
-RDEPENDS_${PN} += "${PYTHON_PN}-stringold ${PYTHON_PN}-netclient"
+RDEPENDS_${PN} += "${PYTHON_PN}-stringold ${PYTHON_PN}-netclient ${PYTHON_PN}-idna"
 
 PACKAGES =. "${PN}-test "
 

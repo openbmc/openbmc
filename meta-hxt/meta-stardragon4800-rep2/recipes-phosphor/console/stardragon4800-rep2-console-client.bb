@@ -1,6 +1,6 @@
 FILESEXTRAPATHS_prepend_stardragon4800-rep2 := "${THISDIR}/${PN}:"
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://${HXTBASE}/COPYING.apache-2.0;md5=34400b68072d710fecd0a2940a0d1658"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 SRC_URI += "file://stardragon4800-rep2-console-client.sh"
 

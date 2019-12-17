@@ -98,7 +98,7 @@ class QemuRunner:
     def handleSIGCHLD(self, signum, frame):
         if self.runqemu and self.runqemu.poll():
             if self.runqemu.returncode:
-                self.logger.debug('runqemu exited with code %d' % self.runqemu.returncode)
+                self.logger.warning('runqemu exited with code %d' % self.runqemu.returncode)
                 self.logger.debug("Output from runqemu:\n%s" % self.getOutput(self.runqemu.stdout))
                 self.stop()
                 self._dump_host()
@@ -126,7 +126,7 @@ class QemuRunner:
             env["DEPLOY_DIR_IMAGE"] = self.deploy_dir_image
 
         if not launch_cmd:
-            launch_cmd = 'runqemu %s %s ' % ('snapshot' if discard_writes else '', runqemuparams)
+            launch_cmd = 'runqemu %s' % ('snapshot' if discard_writes else '')
             if self.use_kvm:
                 self.logger.debug('Using kvm for runqemu')
                 launch_cmd += ' kvm'
@@ -136,7 +136,7 @@ class QemuRunner:
                 launch_cmd += ' nographic'
             if self.use_slirp:
                 launch_cmd += ' slirp'
-            launch_cmd += ' %s %s' % (self.machine, self.rootfs)
+            launch_cmd += ' %s %s %s' % (runqemuparams, self.machine, self.rootfs)
 
         return self.launch(launch_cmd, qemuparams=qemuparams, get_ip=get_ip, extra_bootparams=extra_bootparams, env=env)
 
@@ -208,9 +208,9 @@ class QemuRunner:
             if self.runqemu.poll():
                 if self.runqemu.returncode:
                     # No point waiting any longer
-                    self.logger.debug('runqemu exited with code %d' % self.runqemu.returncode)
+                    self.logger.warning('runqemu exited with code %d' % self.runqemu.returncode)
                     self._dump_host()
-                    self.logger.debug("Output from runqemu:\n%s" % self.getOutput(output))
+                    self.logger.warning("Output from runqemu:\n%s" % self.getOutput(output))
                     self.stop()
                     return False
             time.sleep(0.5)
@@ -329,14 +329,14 @@ class QemuRunner:
 
         if not reachedlogin:
             if time.time() >= endtime:
-                self.logger.debug("Target didn't reach login banner in %d seconds (%s)" %
+                self.logger.warning("Target didn't reach login banner in %d seconds (%s)" %
                                   (self.boottime, time.strftime("%D %H:%M:%S")))
             tail = lambda l: "\n".join(l.splitlines()[-25:])
             bootlog = bootlog.decode("utf-8")
             # in case bootlog is empty, use tail qemu log store at self.msg
             lines = tail(bootlog if bootlog else self.msg)
-            self.logger.debug("Last 25 lines of text:\n%s" % lines)
-            self.logger.debug("Check full boot log: %s" % self.logfile)
+            self.logger.warning("Last 25 lines of text:\n%s" % lines)
+            self.logger.warning("Check full boot log: %s" % self.logfile)
             self._dump_host()
             self.stop()
             return False
@@ -356,11 +356,11 @@ class QemuRunner:
                     else:
                         self.logger.debug("Couldn't configure guest networking")
             else:
-                self.logger.debug("Couldn't login into serial console"
+                self.logger.warning("Couldn't login into serial console"
                             " as root using blank password")
-                self.logger.debug("The output:\n%s" % output)
+                self.logger.warning("The output:\n%s" % output)
         except:
-            self.logger.debug("Serial console failed while trying to login")
+            self.logger.warning("Serial console failed while trying to login")
         return True
 
     def stop(self):
@@ -414,7 +414,7 @@ class QemuRunner:
             self.thread.join()
 
     def restart(self, qemuparams = None):
-        self.logger.debug("Restarting qemu process")
+        self.logger.warning("Restarting qemu process")
         if self.runqemu.poll() is None:
             self.stop()
         if self.start(qemuparams):
@@ -425,13 +425,20 @@ class QemuRunner:
         if not self.runqemu or self.runqemu.poll() is not None:
             return False
         if os.path.isfile(self.qemu_pidfile):
-            f = open(self.qemu_pidfile, 'r')
-            qemu_pid = f.read()
-            f.close()
-            qemupid = int(qemu_pid)
-            if os.path.exists("/proc/" + str(qemupid)):
-                self.qemupid = qemupid
-                return True
+            # when handling pidfile, qemu creates the file, stat it, lock it and then write to it
+            # so it's possible that the file has been created but the content is empty
+            pidfile_timeout = time.time() + 3
+            while time.time() < pidfile_timeout:
+                with open(self.qemu_pidfile, 'r') as f:
+                    qemu_pid = f.read().strip()
+                # file created but not yet written contents
+                if not qemu_pid:
+                    time.sleep(0.5)
+                    continue
+                else:
+                    if os.path.exists("/proc/" + qemu_pid):
+                        self.qemupid = int(qemu_pid)
+                        return True
         return False
 
     def run_serial(self, command, raw=False, timeout=60):

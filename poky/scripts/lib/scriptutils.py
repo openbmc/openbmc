@@ -16,12 +16,51 @@ import string
 import subprocess
 import sys
 import tempfile
+import threading
 import importlib
 from importlib import machinery
 
-def logger_create(name, stream=None):
+class KeepAliveStreamHandler(logging.StreamHandler):
+    def __init__(self, keepalive=True, **kwargs):
+        super().__init__(**kwargs)
+        if keepalive is True:
+            keepalive = 5000 # default timeout
+        self._timeout = threading.Condition()
+        self._stop = False
+
+        # background thread waits on condition, if the condition does not
+        # happen emit a keep alive message
+        def thread():
+            while not self._stop:
+                with self._timeout:
+                    if not self._timeout.wait(keepalive):
+                        self.emit(logging.LogRecord("keepalive", logging.INFO,
+                            None, None, "Keepalive message", None, None))
+
+        self._thread = threading.Thread(target = thread, daemon = True)
+        self._thread.start()
+
+    def close(self):
+        # mark the thread to stop and notify it
+        self._stop = True
+        with self._timeout:
+            self._timeout.notify()
+        # wait for it to join
+        self._thread.join()
+        super().close()
+
+    def emit(self, record):
+        super().emit(record)
+        # trigger timer reset
+        with self._timeout:
+            self._timeout.notify()
+
+def logger_create(name, stream=None, keepalive=None):
     logger = logging.getLogger(name)
-    loggerhandler = logging.StreamHandler(stream=stream)
+    if keepalive is not None:
+        loggerhandler = KeepAliveStreamHandler(stream=stream, keepalive=keepalive)
+    else:
+        loggerhandler = logging.StreamHandler(stream=stream)
     loggerhandler.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
     logger.addHandler(loggerhandler)
     logger.setLevel(logging.INFO)
@@ -229,3 +268,13 @@ def is_src_url(param):
     elif param.startswith('git@') or ('@' in param and param.endswith('.git')):
         return True
     return False
+
+def filter_src_subdirs(pth):
+    """
+    Filter out subdirectories of initial unpacked source trees that we do not care about.
+    Used by devtool and recipetool.
+    """
+    dirlist = os.listdir(pth)
+    filterout = ['git.indirectionsymlink', 'source-date-epoch']
+    dirlist = [x for x in dirlist if x not in filterout]
+    return dirlist

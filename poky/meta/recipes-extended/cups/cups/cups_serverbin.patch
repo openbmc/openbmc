@@ -4,6 +4,12 @@ e.g. ppc64 where base libdir is lib64 this does not go well
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Upstream-Status: Inappropriate [OE config specific]
 
+Update on 20190904:
+Redefine CUPS_SERVERBIN to "$libexecdir/cups" which solves file confliction
+when multilib is enabled.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
 Index: cups-1.4.6/config-scripts/cups-directories.m4
 ===================================================================
 --- cups-1.4.6.orig/config-scripts/cups-directories.m4	2009-04-12 16:04:51.000000000 -0700
@@ -13,7 +19,7 @@ Index: cups-1.4.6/config-scripts/cups-directories.m4
  		# All others
  		INSTALL_SYSV="install-sysv"
 -		CUPS_SERVERBIN="$exec_prefix/lib/cups"
-+		CUPS_SERVERBIN="$libdir/cups"
++		CUPS_SERVERBIN="$libexecdir/cups"
  		;;
  esac
  
@@ -26,7 +32,7 @@ Index: cups-1.4.6/configure
  		# All others
  		INSTALL_SYSV="install-sysv"
 -		CUPS_SERVERBIN="$exec_prefix/lib/cups"
-+		CUPS_SERVERBIN="$libdir/cups"
++		CUPS_SERVERBIN="$libexecdir/cups"
  		;;
  esac
  

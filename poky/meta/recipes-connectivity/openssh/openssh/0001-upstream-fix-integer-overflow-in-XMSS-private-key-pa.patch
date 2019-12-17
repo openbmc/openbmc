@@ -1,0 +1,40 @@
+From 2014fad3d28090b59d2f8a0971166c06e5fa6da6 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 18 Oct 2019 14:56:58 +0800
+Subject: [PATCH] upstream: fix integer overflow in XMSS private key parsing.
+
+Reported by Adam Zabrocki via SecuriTeam's SSH program.
+
+Note that this code is experimental and not compiled by default.
+
+ok markus@
+
+OpenBSD-Commit-ID: cd0361896d15e8a1bac495ac583ff065ffca2be1
+
+Signed-off-by: "djm@openbsd.org" <djm@openbsd.org>
+
+Upstream-Status: Backport [https://github.com/openssh/openssh-portable/commit/a546b17bbaeb12beac4c9aeed56f74a42b18a93a]
+CVE: CVE-2019-16905
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ sshkey-xmss.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/sshkey-xmss.c b/sshkey-xmss.c
+index aaae702..c57681a 100644
+--- a/sshkey-xmss.c
++++ b/sshkey-xmss.c
+@@ -977,7 +977,8 @@ sshkey_xmss_decrypt_state(const struct sshkey *k, struct sshbuf *encoded,
+ 		goto out;
+ 	}
+ 	/* check that an appropriate amount of auth data is present */
+-	if (sshbuf_len(encoded) < encrypted_len + authlen) {
++	if (sshbuf_len(encoded) < authlen ||
++	    sshbuf_len(encoded) - authlen < encrypted_len) {
+ 		r = SSH_ERR_INVALID_FORMAT;
+ 		goto out;
+ 	}
+-- 
+2.7.4
+

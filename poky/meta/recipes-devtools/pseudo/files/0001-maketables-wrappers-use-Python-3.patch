@@ -1,0 +1,34 @@
+From dbd34b1b2af8fbf44a0d5c37abe3448405819823 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 28 Aug 2019 19:20:29 +0200
+Subject: [PATCH] maketables/wrappers: use Python 3
+
+Changelog indicates they should be compatible.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ maketables   | 2 +-
+ makewrappers | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/maketables b/maketables
+index a211772..52285e2 100755
+--- a/maketables
++++ b/maketables
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Copyright (c) 2008-2010, 2013 Wind River Systems, Inc.
+ #
+diff --git a/makewrappers b/makewrappers
+index e84607d..b34f7eb 100755
+--- a/makewrappers
++++ b/makewrappers
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Copyright (c) 2008-2011,2013 Wind River Systems, Inc.
+ #

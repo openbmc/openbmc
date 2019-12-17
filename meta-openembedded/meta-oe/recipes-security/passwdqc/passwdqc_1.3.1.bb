@@ -21,10 +21,10 @@ SECTION = "System Environment/Base"
 
 DEPENDS += "libpam"
 
-inherit distro_features_check
+inherit features_check
 REQUIRED_DISTRO_FEATURES = "pam"
 
-LICENSE = "BSD"
+LICENSE = "BSD-1-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=1b4af6f3d4ee079a38107366e93b334d"
 
 SRC_URI = "http://www.openwall.com/${BPN}/${BP}.tar.gz \

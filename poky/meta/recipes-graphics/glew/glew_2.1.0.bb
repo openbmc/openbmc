@@ -15,7 +15,7 @@ SRC_URI[sha256sum] = "04de91e7e6763039bc11940095cd9c7f880baba82196a7765f727ac05a
 UPSTREAM_CHECK_URI = "http://sourceforge.net/projects/glew/files/glew"
 UPSTREAM_CHECK_REGEX = "/glew/(?P<pver>(\d+[\.\-_]*)+)/"
 
-inherit lib_package pkgconfig distro_features_check
+inherit lib_package pkgconfig features_check
 
 REQUIRED_DISTRO_FEATURES = "opengl"
 

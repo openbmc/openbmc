@@ -6,10 +6,6 @@ RDEPENDS_phosphor-software-manager-updater-ubi += " \
     mtd-utils-ubifs \
 "
 
-FILES_${PN}-updater-ubi += " \
-    /usr/local \
-    "
-
 # Remove default configs
 EXTRA_OECONF_remove_df-obmc-ubi-fs += " \
     ACTIVE_BMC_MAX_ALLOWED=1 \
@@ -34,19 +30,18 @@ SYSTEMD_SERVICE_phosphor-software-manager-updater-ubi += " \
     reboot-guard-enable.service \
     reboot-guard-disable.service \
     force-reboot.service \
-    usr-local.mount \
 "
 
 # Name of the mtd device where the ubi volumes should be created
 BMC_RW_MTD ??= "bmc"
 BMC_RO_MTD ??= "bmc"
 BMC_KERNEL_MTD ??= "bmc"
+FLASH_SIZE ?= "32768"
+DISTROOVERRIDES .= ":flash-${FLASH_SIZE}"
 BMC_RW_SIZE ??= "0x600000"
+BMC_RW_SIZE_flash-131072 = "0x2000000"
 SYSTEMD_SUBSTITUTIONS += "RW_MTD:${BMC_RW_MTD}:obmc-flash-bmc-ubirw.service"
 SYSTEMD_SUBSTITUTIONS += "RO_MTD:${BMC_RO_MTD}:obmc-flash-bmc-ubiro@.service"
 SYSTEMD_SUBSTITUTIONS += "KERNEL_MTD:${BMC_KERNEL_MTD}:obmc-flash-bmc-ubiro@.service"
 SYSTEMD_SUBSTITUTIONS += "RW_SIZE:${BMC_RW_SIZE}:obmc-flash-bmc-ubirw.service"
 
-do_install_append() {
-    install -d ${D}/usr/local
-}

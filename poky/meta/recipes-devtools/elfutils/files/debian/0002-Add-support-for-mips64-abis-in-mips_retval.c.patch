@@ -1,18 +1,18 @@
-From 93ae9bb7d25a1adbcbab23a9b8493f370a93f0a3 Mon Sep 17 00:00:00 2001
+From fdaab18a65ed2529656baa64cb6169f34d7e507b Mon Sep 17 00:00:00 2001
 From: James Cowgill <james410@cowgill.org.uk>
 Date: Mon, 5 Jan 2015 15:17:01 +0000
-Subject: [PATCH] Add support for mips64 abis in mips_retval.c
+Subject: [PATCH 2/3] Add support for mips64 abis in mips_retval.c
 
 Signed-off-by: James Cowgill <james410@cowgill.org.uk>
+
 Upstream-Status: Pending [from debian]
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
-
 ---
- backends/mips_retval.c | 104 +++++++++++++++++++++++++++++++++++++----
+ backends/mips_retval.c | 104 ++++++++++++++++++++++++++++++++++++++++++++-----
  1 file changed, 94 insertions(+), 10 deletions(-)
 
 diff --git a/backends/mips_retval.c b/backends/mips_retval.c
-index 656cd1f..57487bb 100644
+index 33f12a7..d5c6ef0 100644
 --- a/backends/mips_retval.c
 +++ b/backends/mips_retval.c
 @@ -91,6 +91,8 @@ enum mips_abi find_mips_abi(Elf *elf)
@@ -166,3 +166,6 @@ index 656cd1f..57487bb 100644
        *locp = loc_aggregate;
        return nloc_aggregate;
      }
+-- 
+2.1.4
+

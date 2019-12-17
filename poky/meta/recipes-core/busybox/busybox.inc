@@ -128,7 +128,9 @@ do_prepare_config () {
 		${S}/.config.oe-tmp > ${S}/.config
 	fi
 	sed -i 's/CONFIG_IFUPDOWN_UDHCPC_CMD_OPTIONS="-R -n"/CONFIG_IFUPDOWN_UDHCPC_CMD_OPTIONS="-R -b"/' ${S}/.config
-	sed -i 's|${DEBUG_PREFIX_MAP}||g' ${S}/.config
+	if [ -n "${DEBUG_PREFIX_MAP}" ]; then
+		sed -i 's|${DEBUG_PREFIX_MAP}||g' ${S}/.config
+	fi
 }
 
 # returns all the elements from the src uri that are .cfg files
@@ -142,6 +144,7 @@ def find_cfgs(d):
     return sources_list
 
 do_configure () {
+	set -x
 	do_prepare_config
 	merge_config.sh -m .config ${@" ".join(find_cfgs(d))}
 	cml1_do_configure
@@ -316,8 +319,8 @@ do_install () {
 		fi
 	fi
 	if grep -q "CONFIG_INIT=y" ${B}/.config; then
-		install -D -m 0777 ${WORKDIR}/rcS ${D}${sysconfdir}/init.d/rcS
-		install -D -m 0777 ${WORKDIR}/rcK ${D}${sysconfdir}/init.d/rcK
+		install -D -m 0755 ${WORKDIR}/rcS ${D}${sysconfdir}/init.d/rcS
+		install -D -m 0755 ${WORKDIR}/rcK ${D}${sysconfdir}/init.d/rcK
 	fi
 
 	if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
@@ -392,34 +395,40 @@ python do_package_prepend () {
         set_alternative_vars("${sysconfdir}/busybox.links.suid", "${base_bindir}/busybox.suid")
 }
 
-pkg_postinst_${PN} () {
-	# This part of code is dedicated to the on target upgrade problem.
-	# It's known that if we don't make appropriate symlinks before update-alternatives calls,
-	# there will be errors indicating missing commands such as 'sed'.
-	# These symlinks will later be updated by update-alternatives calls.
-	test -n 2 > /dev/null || alias test='busybox test'
-	if test "x$D" = "x"; then
-		# Remove busybox.nosuid if it's a symlink, because this situation indicates
-		# that we're installing or upgrading to a one-binary busybox.
-		if test -h ${base_bindir}/busybox.nosuid; then
-			rm -f ${base_bindir}/busybox.nosuid
-		fi
-		for suffix in "" ".nosuid" ".suid"; do
-			if test -e ${sysconfdir}/busybox.links$suffix; then
-				while read link; do
-					if test ! -e "$link"; then
-						# we can use busybox here because even if we are using splitted busybox
-						# we've made a symlink from /bin/busybox to /bin/busybox.nosuid.
-						busybox rm -f $link
-						busybox ln -s "${base_bindir}/busybox$suffix" $link
-					fi
-				done < ${sysconfdir}/busybox.links$suffix
-			fi
-		done
-	fi
-	if grep -q "^${base_bindir}/bash$" $D${sysconfdir}/busybox.links*; then
-		grep -q "^${base_bindir}/bash$" $D${sysconfdir}/shells || echo ${base_bindir}/bash >> $D${sysconfdir}/shells
-	fi
+# This part of code is dedicated to the on target upgrade problem.  It's known
+# that if we don't make appropriate symlinks before update-alternatives calls,
+# there will be errors indicating missing commands such as 'sed'.
+# These symlinks will later be updated by update-alternatives calls.
+# The update-alternatives.bbclass' postinst script runs firstly before other
+# postinst, but this part of code needs run firstly, so add this funtion.
+python populate_packages_updatealternatives_append() {
+    postinst = """
+test -n 2 > /dev/null || alias test='busybox test'
+if test "x$D" = "x"; then
+    # Remove busybox.nosuid if it's a symlink, because this situation indicates
+    # that we're installing or upgrading to a one-binary busybox.
+    if test -h ${base_bindir}/busybox.nosuid; then
+        rm -f ${base_bindir}/busybox.nosuid
+    fi
+    for suffix in "" ".nosuid" ".suid"; do
+        if test -e ${sysconfdir}/busybox.links$suffix; then
+            while read link; do
+                if test ! -e "$link"; then
+                    # we can use busybox here because even if we are using splitted busybox
+                    # we've made a symlink from /bin/busybox to /bin/busybox.nosuid.
+                    busybox rm -f $link
+                    busybox ln -s "${base_bindir}/busybox$suffix" $link
+                fi
+            done < ${sysconfdir}/busybox.links$suffix
+        fi
+    done
+fi
+if grep -q "^${base_bindir}/bash$" $D${sysconfdir}/busybox.links*; then
+    grep -q "^${base_bindir}/bash$" $D${sysconfdir}/shells || echo ${base_bindir}/bash >> $D${sysconfdir}/shells
+fi
+
+"""
+    d.prependVar('pkg_postinst_%s' % pkg, postinst)
 }
 
 pkg_prerm_${PN} () {

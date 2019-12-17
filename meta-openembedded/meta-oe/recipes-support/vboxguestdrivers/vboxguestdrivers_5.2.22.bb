@@ -78,3 +78,6 @@ FILES_${PN} = "${base_sbindir}"
 
 # autoload if installed
 KERNEL_MODULE_AUTOLOAD += "vboxguest vboxsf vboxvideo"
+
+PNBLACKLIST[vboxguestdrivers] = "Needs forward porting to kernel 5.2+"
+

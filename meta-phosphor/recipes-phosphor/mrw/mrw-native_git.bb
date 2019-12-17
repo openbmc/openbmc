@@ -10,7 +10,7 @@ inherit native
 inherit mrw-xml
 
 PHOSPHOR_MRW_LICENSE ?= "Apache-2.0"
-PHOSPHOR_MRW_LIC_FILES_CHKSUM ?= "file://${PHOSPHORBASE}/COPYING.apache-2.0;md5=34400b68072d710fecd0a2940a0d1658"
+PHOSPHOR_MRW_LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
 PHOSPHOR_MRW_URI ?= "http://missing-mrw-uri"
 
 LICENSE = "${PHOSPHOR_MRW_LICENSE}"

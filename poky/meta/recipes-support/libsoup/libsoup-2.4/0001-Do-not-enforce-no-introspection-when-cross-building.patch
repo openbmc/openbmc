@@ -3,7 +3,7 @@ From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 15 Feb 2019 14:21:06 +0100
 Subject: [PATCH] Do not enforce no-introspection when cross-building
 
-Upstream-Status: Pending
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/libsoup/commit/7ef5ec60c33e254bcd915936bea3f04ba0fe2273]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 Signed-off-by: Alistair Francis <alistair@alistair23.me>
 ---

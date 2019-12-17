@@ -22,7 +22,7 @@ SRC_URI = "https://mesa.freedesktop.org/archive/demos/${BPN}-${PV}.tar.bz2 \
 SRC_URI[md5sum] = "6b65a02622765522176d00f553086fa3"
 SRC_URI[sha256sum] = "01e99c94a0184e63e796728af89bfac559795fb2a0d6f506fa900455ca5fff7d"
 
-inherit autotools pkgconfig distro_features_check
+inherit autotools pkgconfig features_check
 # depends on virtual/egl, virtual/libgl ...
 REQUIRED_DISTRO_FEATURES = "opengl x11"
 

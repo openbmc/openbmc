@@ -12,6 +12,8 @@ import bb.data
 import difflib
 import simplediff
 from bb.checksum import FileChecksumCache
+from bb import runqueue
+import hashserv
 
 logger = logging.getLogger('BitBake.SigGen')
 
@@ -41,15 +43,18 @@ class SignatureGenerator(object):
         self.runtaskdeps = {}
         self.file_checksum_values = {}
         self.taints = {}
+        self.unitaskhashes = {}
+        self.setscenetasks = {}
 
     def finalise(self, fn, d, varient):
         return
 
-    def get_unihash(self, task):
-        return self.taskhash[task]
+    def get_unihash(self, tid):
+        return self.taskhash[tid]
 
-    def get_taskhash(self, fn, task, deps, dataCache):
-        return "0"
+    def get_taskhash(self, tid, deps, dataCache):
+        self.taskhash[tid] = hashlib.sha256(tid.encode("utf-8")).hexdigest()
+        return self.taskhash[tid]
 
     def writeout_file_checksum_cache(self):
         """Write/update the file checksum cache onto disk"""
@@ -71,14 +76,25 @@ class SignatureGenerator(object):
         return
 
     def get_taskdata(self):
-        return (self.runtaskdeps, self.taskhash, self.file_checksum_values, self.taints, self.basehash)
+        return (self.runtaskdeps, self.taskhash, self.file_checksum_values, self.taints, self.basehash, self.unitaskhashes, self.setscenetasks)
 
     def set_taskdata(self, data):
-        self.runtaskdeps, self.taskhash, self.file_checksum_values, self.taints, self.basehash = data
+        self.runtaskdeps, self.taskhash, self.file_checksum_values, self.taints, self.basehash, self.unitaskhashes, self.setscenetasks = data
 
     def reset(self, data):
         self.__init__(data)
 
+    def get_taskhashes(self):
+        return self.taskhash, self.unitaskhashes
+
+    def set_taskhashes(self, hashes):
+        self.taskhash, self.unitaskhashes = hashes
+
+    def save_unitaskhashes(self):
+        return
+
+    def set_setscene_tasks(self, setscene_tasks):
+        return
 
 class SignatureGeneratorBasic(SignatureGenerator):
     """
@@ -94,7 +110,7 @@ class SignatureGeneratorBasic(SignatureGenerator):
         self.taints = {}
         self.gendeps = {}
         self.lookupcache = {}
-        self.pkgnameextract = re.compile(r"(?P<fn>.*)\..*")
+        self.setscenetasks = {}
         self.basewhitelist = set((data.getVar("BB_HASHBASE_WHITELIST") or "").split())
         self.taskwhitelist = None
         self.init_rundepcheck(data)
@@ -104,6 +120,9 @@ class SignatureGeneratorBasic(SignatureGenerator):
             self.checksum_cache.init_cache(data, checksum_cache_file)
         else:
             self.checksum_cache = None
+
+        self.unihash_cache = bb.cache.SimpleCache("1")
+        self.unitaskhashes = self.unihash_cache.init_cache(data, "bb_unihashes.dat", {})
 
     def init_rundepcheck(self, data):
         self.taskwhitelist = data.getVar("BB_HASHTASK_WHITELIST") or None
@@ -120,22 +139,25 @@ class SignatureGeneratorBasic(SignatureGenerator):
         taskdeps, basehash = bb.data.generate_dependency_hash(tasklist, gendeps, lookupcache, self.basewhitelist, fn)
 
         for task in tasklist:
-            k = fn + "." + task
-            if not ignore_mismatch and k in self.basehash and self.basehash[k] != basehash[k]:
-                bb.error("When reparsing %s, the basehash value changed from %s to %s. The metadata is not deterministic and this needs to be fixed." % (k, self.basehash[k], basehash[k]))
+            tid = fn + ":" + task
+            if not ignore_mismatch and tid in self.basehash and self.basehash[tid] != basehash[tid]:
+                bb.error("When reparsing %s, the basehash value changed from %s to %s. The metadata is not deterministic and this needs to be fixed." % (tid, self.basehash[tid], basehash[tid]))
                 bb.error("The following commands may help:")
                 cmd = "$ bitbake %s -c%s" % (d.getVar('PN'), task)
                 # Make sure sigdata is dumped before run printdiff
                 bb.error("%s -Snone" % cmd)
                 bb.error("Then:")
                 bb.error("%s -Sprintdiff\n" % cmd)
-            self.basehash[k] = basehash[k]
+            self.basehash[tid] = basehash[tid]
 
         self.taskdeps[fn] = taskdeps
         self.gendeps[fn] = gendeps
         self.lookupcache[fn] = lookupcache
 
         return taskdeps
+
+    def set_setscene_tasks(self, setscene_tasks):
+        self.setscenetasks = setscene_tasks
 
     def finalise(self, fn, d, variant):
 
@@ -156,7 +178,7 @@ class SignatureGeneratorBasic(SignatureGenerator):
         #    self.dump_sigtask(fn, task, d.getVar("STAMP"), False)
 
         for task in taskdeps:
-            d.setVar("BB_BASEHASH_task-%s" % task, self.basehash[fn + "." + task])
+            d.setVar("BB_BASEHASH_task-%s" % task, self.basehash[fn + ":" + task])
 
     def rundep_check(self, fn, recipename, task, dep, depname, dataCache):
         # Return True if we should keep the dependency, False to drop it
@@ -176,33 +198,26 @@ class SignatureGeneratorBasic(SignatureGenerator):
             pass
         return taint
 
-    def get_taskhash(self, fn, task, deps, dataCache):
+    def get_taskhash(self, tid, deps, dataCache):
 
-        mc = ''
-        if fn.startswith('mc:'):
-            mc = fn.split(':')[1]
-        k = fn + "." + task
+        (mc, _, task, fn) = bb.runqueue.split_tid_mcfn(tid)
 
-        data = dataCache.basetaskhash[k]
-        self.basehash[k] = data
-        self.runtaskdeps[k] = []
-        self.file_checksum_values[k] = []
+        data = dataCache.basetaskhash[tid]
+        self.basehash[tid] = data
+        self.runtaskdeps[tid] = []
+        self.file_checksum_values[tid] = []
         recipename = dataCache.pkg_fn[fn]
         for dep in sorted(deps, key=clean_basepath):
-            pkgname = self.pkgnameextract.search(dep).group('fn')
-            if mc:
-                depmc = pkgname.split(':')[1]
-                if mc != depmc:
-                    continue
-            if dep.startswith("mc:") and not mc:
+            (depmc, _, deptaskname, depfn) = bb.runqueue.split_tid_mcfn(dep)
+            if mc != depmc:
                 continue
-            depname = dataCache.pkg_fn[pkgname]
+            depname = dataCache.pkg_fn[depfn]
             if not self.rundep_check(fn, recipename, task, dep, depname, dataCache):
                 continue
             if dep not in self.taskhash:
                 bb.fatal("%s is not in taskhash, caller isn't calling in dependency order?" % dep)
             data = data + self.get_unihash(dep)
-            self.runtaskdeps[k].append(dep)
+            self.runtaskdeps[tid].append(dep)
 
         if task in dataCache.file_checksums[fn]:
             if self.checksum_cache:
@@ -210,7 +225,7 @@ class SignatureGeneratorBasic(SignatureGenerator):
             else:
                 checksums = bb.fetch2.get_file_checksums(dataCache.file_checksums[fn][task], recipename)
             for (f,cs) in checksums:
-                self.file_checksum_values[k].append((f,cs))
+                self.file_checksum_values[tid].append((f,cs))
                 if cs:
                     data = data + cs
 
@@ -220,16 +235,16 @@ class SignatureGeneratorBasic(SignatureGenerator):
             import uuid
             taint = str(uuid.uuid4())
             data = data + taint
-            self.taints[k] = "nostamp:" + taint
+            self.taints[tid] = "nostamp:" + taint
 
         taint = self.read_taint(fn, task, dataCache.stamp[fn])
         if taint:
             data = data + taint
-            self.taints[k] = taint
-            logger.warning("%s is tainted from a forced run" % k)
+            self.taints[tid] = taint
+            logger.warning("%s is tainted from a forced run" % tid)
 
         h = hashlib.sha256(data.encode("utf-8")).hexdigest()
-        self.taskhash[k] = h
+        self.taskhash[tid] = h
         #d.setVar("BB_TASKHASH_task-%s" % task, taskhash[task])
         return h
 
@@ -242,17 +257,20 @@ class SignatureGeneratorBasic(SignatureGenerator):
             bb.fetch2.fetcher_parse_save()
             bb.fetch2.fetcher_parse_done()
 
+    def save_unitaskhashes(self):
+        self.unihash_cache.save(self.unitaskhashes)
+
     def dump_sigtask(self, fn, task, stampbase, runtime):
 
-        k = fn + "." + task
+        tid = fn + ":" + task
         referencestamp = stampbase
         if isinstance(runtime, str) and runtime.startswith("customfile"):
             sigfile = stampbase
             referencestamp = runtime[11:]
-        elif runtime and k in self.taskhash:
-            sigfile = stampbase + "." + task + ".sigdata" + "." + self.taskhash[k]
+        elif runtime and tid in self.taskhash:
+            sigfile = stampbase + "." + task + ".sigdata" + "." + self.get_unihash(tid)
         else:
-            sigfile = stampbase + "." + task + ".sigbasedata" + "." + self.basehash[k]
+            sigfile = stampbase + "." + task + ".sigbasedata" + "." + self.basehash[tid]
 
         bb.utils.mkdirhier(os.path.dirname(sigfile))
 
@@ -261,7 +279,7 @@ class SignatureGeneratorBasic(SignatureGenerator):
         data['basewhitelist'] = self.basewhitelist
         data['taskwhitelist'] = self.taskwhitelist
         data['taskdeps'] = self.taskdeps[fn][task]
-        data['basehash'] = self.basehash[k]
+        data['basehash'] = self.basehash[tid]
         data['gendeps'] = {}
         data['varvals'] = {}
         data['varvals'][task] = self.lookupcache[fn][task]
@@ -271,30 +289,31 @@ class SignatureGeneratorBasic(SignatureGenerator):
             data['gendeps'][dep] = self.gendeps[fn][dep]
             data['varvals'][dep] = self.lookupcache[fn][dep]
 
-        if runtime and k in self.taskhash:
-            data['runtaskdeps'] = self.runtaskdeps[k]
-            data['file_checksum_values'] = [(os.path.basename(f), cs) for f,cs in self.file_checksum_values[k]]
+        if runtime and tid in self.taskhash:
+            data['runtaskdeps'] = self.runtaskdeps[tid]
+            data['file_checksum_values'] = [(os.path.basename(f), cs) for f,cs in self.file_checksum_values[tid]]
             data['runtaskhashes'] = {}
             for dep in data['runtaskdeps']:
                 data['runtaskhashes'][dep] = self.get_unihash(dep)
-            data['taskhash'] = self.taskhash[k]
+            data['taskhash'] = self.taskhash[tid]
+            data['unihash'] = self.get_unihash(tid)
 
         taint = self.read_taint(fn, task, referencestamp)
         if taint:
             data['taint'] = taint
 
-        if runtime and k in self.taints:
-            if 'nostamp:' in self.taints[k]:
-                data['taint'] = self.taints[k]
+        if runtime and tid in self.taints:
+            if 'nostamp:' in self.taints[tid]:
+                data['taint'] = self.taints[tid]
 
         computed_basehash = calc_basehash(data)
-        if computed_basehash != self.basehash[k]:
-            bb.error("Basehash mismatch %s versus %s for %s" % (computed_basehash, self.basehash[k], k))
-        if runtime and k in self.taskhash:
+        if computed_basehash != self.basehash[tid]:
+            bb.error("Basehash mismatch %s versus %s for %s" % (computed_basehash, self.basehash[tid], tid))
+        if runtime and tid in self.taskhash:
             computed_taskhash = calc_taskhash(data)
-            if computed_taskhash != self.taskhash[k]:
-                bb.error("Taskhash mismatch %s versus %s for %s" % (computed_taskhash, self.taskhash[k], k))
-                sigfile = sigfile.replace(self.taskhash[k], computed_taskhash)
+            if computed_taskhash != self.taskhash[tid]:
+                bb.error("Taskhash mismatch %s versus %s for %s" % (computed_taskhash, self.taskhash[tid], tid))
+                sigfile = sigfile.replace(self.taskhash[tid], computed_taskhash)
 
         fd, tmpfile = tempfile.mkstemp(dir=os.path.dirname(sigfile), prefix="sigtask.")
         try:
@@ -314,34 +333,33 @@ class SignatureGeneratorBasic(SignatureGenerator):
         if fn in self.taskdeps:
             for task in self.taskdeps[fn]:
                 tid = fn + ":" + task
-                (mc, _, _) = bb.runqueue.split_tid(tid)
-                k = fn + "." + task
-                if k not in self.taskhash:
+                mc = bb.runqueue.mc_from_tid(tid)
+                if tid not in self.taskhash:
                     continue
-                if dataCaches[mc].basetaskhash[k] != self.basehash[k]:
-                    bb.error("Bitbake's cached basehash does not match the one we just generated (%s)!" % k)
-                    bb.error("The mismatched hashes were %s and %s" % (dataCaches[mc].basetaskhash[k], self.basehash[k]))
+                if dataCaches[mc].basetaskhash[tid] != self.basehash[tid]:
+                    bb.error("Bitbake's cached basehash does not match the one we just generated (%s)!" % tid)
+                    bb.error("The mismatched hashes were %s and %s" % (dataCaches[mc].basetaskhash[tid], self.basehash[tid]))
                 self.dump_sigtask(fn, task, dataCaches[mc].stamp[fn], True)
 
 class SignatureGeneratorBasicHash(SignatureGeneratorBasic):
     name = "basichash"
 
-    def get_stampfile_hash(self, task):
-        if task in self.taskhash:
-            return self.taskhash[task]
+    def get_stampfile_hash(self, tid):
+        if tid in self.taskhash:
+            return self.taskhash[tid]
 
         # If task is not in basehash, then error
-        return self.basehash[task]
+        return self.basehash[tid]
 
     def stampfile(self, stampbase, fn, taskname, extrainfo, clean=False):
         if taskname != "do_setscene" and taskname.endswith("_setscene"):
-            k = fn + "." + taskname[:-9]
+            tid = fn + ":" + taskname[:-9]
         else:
-            k = fn + "." + taskname
+            tid = fn + ":" + taskname
         if clean:
             h = "*"
         else:
-            h = self.get_stampfile_hash(k)
+            h = self.get_stampfile_hash(tid)
 
         return ("%s.%s.%s.%s" % (stampbase, taskname, h, extrainfo)).rstrip('.')
 
@@ -351,6 +369,172 @@ class SignatureGeneratorBasicHash(SignatureGeneratorBasic):
     def invalidate_task(self, task, d, fn):
         bb.note("Tainting hash to force rebuild of task %s, %s" % (fn, task))
         bb.build.write_taint(task, d, fn)
+
+class SignatureGeneratorUniHashMixIn(object):
+    def get_taskdata(self):
+        return (self.server, self.method) + super().get_taskdata()
+
+    def set_taskdata(self, data):
+        self.server, self.method = data[:2]
+        super().set_taskdata(data[2:])
+
+    def client(self):
+        if getattr(self, '_client', None) is None:
+            self._client = hashserv.create_client(self.server)
+        return self._client
+
+    def __get_task_unihash_key(self, tid):
+        # TODO: The key only *needs* to be the taskhash, the tid is just
+        # convenient
+        return '%s:%s' % (tid.rsplit("/", 1)[1], self.taskhash[tid])
+
+    def get_stampfile_hash(self, tid):
+        if tid in self.taskhash:
+            # If a unique hash is reported, use it as the stampfile hash. This
+            # ensures that if a task won't be re-run if the taskhash changes,
+            # but it would result in the same output hash
+            unihash = self.unitaskhashes.get(self.__get_task_unihash_key(tid), None)
+            if unihash is not None:
+                return unihash
+
+        return super().get_stampfile_hash(tid)
+
+    def set_unihash(self, tid, unihash):
+        self.unitaskhashes[self.__get_task_unihash_key(tid)] = unihash
+
+    def get_unihash(self, tid):
+        taskhash = self.taskhash[tid]
+
+        # If its not a setscene task we can return
+        if self.setscenetasks and tid not in self.setscenetasks:
+            return taskhash
+
+        key = self.__get_task_unihash_key(tid)
+
+        # TODO: This cache can grow unbounded. It probably only needs to keep
+        # for each task
+        unihash = self.unitaskhashes.get(key, None)
+        if unihash is not None:
+            return unihash
+
+        # In the absence of being able to discover a unique hash from the
+        # server, make it be equivalent to the taskhash. The unique "hash" only
+        # really needs to be a unique string (not even necessarily a hash), but
+        # making it match the taskhash has a few advantages:
+        #
+        # 1) All of the sstate code that assumes hashes can be the same
+        # 2) It provides maximal compatibility with builders that don't use
+        #    an equivalency server
+        # 3) The value is easy for multiple independent builders to derive the
+        #    same unique hash from the same input. This means that if the
+        #    independent builders find the same taskhash, but it isn't reported
+        #    to the server, there is a better chance that they will agree on
+        #    the unique hash.
+        unihash = taskhash
+
+        try:
+            data = self.client().get_unihash(self.method, self.taskhash[tid])
+            if data:
+                unihash = data
+                # A unique hash equal to the taskhash is not very interesting,
+                # so it is reported it at debug level 2. If they differ, that
+                # is much more interesting, so it is reported at debug level 1
+                bb.debug((1, 2)[unihash == taskhash], 'Found unihash %s in place of %s for %s from %s' % (unihash, taskhash, tid, self.server))
+            else:
+                bb.debug(2, 'No reported unihash for %s:%s from %s' % (tid, taskhash, self.server))
+        except hashserv.client.HashConnectionError as e:
+            bb.warn('Error contacting Hash Equivalence Server %s: %s' % (self.server, str(e)))
+
+        self.unitaskhashes[key] = unihash
+        return unihash
+
+    def report_unihash(self, path, task, d):
+        import importlib
+
+        taskhash = d.getVar('BB_TASKHASH')
+        unihash = d.getVar('BB_UNIHASH')
+        report_taskdata = d.getVar('SSTATE_HASHEQUIV_REPORT_TASKDATA') == '1'
+        tempdir = d.getVar('T')
+        fn = d.getVar('BB_FILENAME')
+        tid = fn + ':do_' + task
+        key = tid.rsplit("/", 1)[1] + ':' + taskhash
+
+        if self.setscenetasks and tid not in self.setscenetasks:
+            return
+
+        # Sanity checks
+        cache_unihash = self.unitaskhashes.get(key, None)
+        if cache_unihash is None:
+            bb.fatal('%s not in unihash cache. Please report this error' % key)
+
+        if cache_unihash != unihash:
+            bb.fatal("Cache unihash %s doesn't match BB_UNIHASH %s" % (cache_unihash, unihash))
+
+        sigfile = None
+        sigfile_name = "depsig.do_%s.%d" % (task, os.getpid())
+        sigfile_link = "depsig.do_%s" % task
+
+        try:
+            sigfile = open(os.path.join(tempdir, sigfile_name), 'w+b')
+
+            locs = {'path': path, 'sigfile': sigfile, 'task': task, 'd': d}
+
+            if "." in self.method:
+                (module, method) = self.method.rsplit('.', 1)
+                locs['method'] = getattr(importlib.import_module(module), method)
+                outhash = bb.utils.better_eval('method(path, sigfile, task, d)', locs)
+            else:
+                outhash = bb.utils.better_eval(self.method + '(path, sigfile, task, d)', locs)
+
+            try:
+                extra_data = {}
+
+                owner = d.getVar('SSTATE_HASHEQUIV_OWNER')
+                if owner:
+                    extra_data['owner'] = owner
+
+                if report_taskdata:
+                    sigfile.seek(0)
+
+                    extra_data['PN'] = d.getVar('PN')
+                    extra_data['PV'] = d.getVar('PV')
+                    extra_data['PR'] = d.getVar('PR')
+                    extra_data['task'] = task
+                    extra_data['outhash_siginfo'] = sigfile.read().decode('utf-8')
+
+                data = self.client().report_unihash(taskhash, self.method, outhash, unihash, extra_data)
+                new_unihash = data['unihash']
+
+                if new_unihash != unihash:
+                    bb.debug(1, 'Task %s unihash changed %s -> %s by server %s' % (taskhash, unihash, new_unihash, self.server))
+                    bb.event.fire(bb.runqueue.taskUniHashUpdate(fn + ':do_' + task, new_unihash), d)
+                else:
+                    bb.debug(1, 'Reported task %s as unihash %s to %s' % (taskhash, unihash, self.server))
+            except hashserv.client.HashConnectionError as e:
+                bb.warn('Error contacting Hash Equivalence Server %s: %s' % (self.server, str(e)))
+        finally:
+            if sigfile:
+                sigfile.close()
+
+                sigfile_link_path = os.path.join(tempdir, sigfile_link)
+                bb.utils.remove(sigfile_link_path)
+
+                try:
+                    os.symlink(sigfile_name, sigfile_link_path)
+                except OSError:
+                    pass
+
+
+#
+# Dummy class used for bitbake-selftest
+#
+class SignatureGeneratorTestEquivHash(SignatureGeneratorUniHashMixIn, SignatureGeneratorBasicHash):
+    name = "TestEquivHash"
+    def init_rundepcheck(self, data):
+        super().init_rundepcheck(data)
+        self.server = data.getVar('BB_HASHSERVE')
+        self.method = "sstate_output_hash"
+
 
 def dump_this_task(outfile, d):
     import bb.parse
@@ -643,9 +827,9 @@ def compare_sigfiles(a, b, recursecb=None, color=False, collapsed=False):
     a_taint = a_data.get('taint', None)
     b_taint = b_data.get('taint', None)
     if a_taint != b_taint:
-        if a_taint.startswith('nostamp:'):
+        if a_taint and a_taint.startswith('nostamp:'):
             a_taint = a_taint.replace('nostamp:', 'nostamp(uuid4):')
-        if b_taint.startswith('nostamp:'):
+        if b_taint and b_taint.startswith('nostamp:'):
             b_taint = b_taint.replace('nostamp:', 'nostamp(uuid4):')
         output.append(color_format("{color_title}Taint (by forced/invalidated task) changed{color_default} from %s to %s") % (a_taint, b_taint))
 

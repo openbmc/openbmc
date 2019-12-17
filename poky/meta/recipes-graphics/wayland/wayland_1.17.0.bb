@@ -14,6 +14,8 @@ DEPENDS = "expat libxml2 libffi wayland-native"
 
 SRC_URI = "https://wayland.freedesktop.org/releases/${BPN}-${PV}.tar.xz \
 	   file://fixpathinpcfiles.patch \
+           file://0001-scanner-Add-configure-check-for-strndup.patch \
+           file://0002-Move-wl_priv_signal-to-wayland-server-private.h.patch \
            "
 SRC_URI[md5sum] = "d91f970aea11fd549eae023d06f91af3"
 SRC_URI[sha256sum] = "72aa11b8ac6e22f4777302c9251e8fec7655dc22f9d94ee676c6b276f95f91a4"

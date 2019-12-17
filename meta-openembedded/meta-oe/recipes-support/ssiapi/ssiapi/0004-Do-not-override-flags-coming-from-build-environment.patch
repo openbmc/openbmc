@@ -1,0 +1,33 @@
+From 98fad8128d0f3b65619827ee5d65f7767b080c4c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 29 Aug 2019 14:35:16 -0700
+Subject: [PATCH 4/4] Do not override flags coming from build environment
+
+e.g. we need some optimization level turned on when security flags are enabled
+without this change, the build would fail
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 34e41ea..9bd0fe3 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -16,9 +16,9 @@ AM_INIT_AUTOMAKE(ssi, ${VERSION})
+ AM_CONFIG_HEADER(config.h)
+ 
+ dnl Set the language we use
+-CPPFLAGS="-g3 -gdwarf-2 -Wall -Werror -fvisibility=hidden -D_GNU_SOURCE -O3 -fstack-protector -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -fPIC"
+-CFLAGS="-std=gnu99 -fstack-protector -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -fPIC"
+-CXXFLAGS="-std=gnu++98 -fvisibility-inlines-hidden -O3 -fstack-protector -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -fPIC"
++#CPPFLAGS="-g3 -gdwarf-2 -Wall -Werror -fvisibility=hidden -D_GNU_SOURCE -O3 -fstack-protector -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -fPIC"
++#CFLAGS="-std=gnu99 -fstack-protector -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -fPIC"
++#CXXFLAGS="-std=gnu++98 -fvisibility-inlines-hidden -O3 -fstack-protector -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -fPIC"
+ 
+ dnl Automake 1.11 - silent build rules
+ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+-- 
+2.23.0
+

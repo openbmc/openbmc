@@ -22,7 +22,6 @@ CLEANBROKEN = "1"
 # Remember on upgrades to check that no new tools have been added.
 PACKAGECONFIG ??= "as10k1 hdajacksensetest hda-verb hdsploader ld10k1 mixartloader pcxhrloader \
                    sb16_csp seq--sbiload sscape_ctl us428control usx2yloader vxloader \
-                   ${@bb.utils.contains_any('DISTRO_FEATURES', '${GTK2DISTROFEATURES}', 'echomixer envy24control rmedigicontrol', '', d)} \
                    ${@bb.utils.contains_any('DISTRO_FEATURES', '${GTK3DISTROFEATURES}', 'hdajackretask', '', d)} \
                    "
 

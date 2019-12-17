@@ -20,6 +20,8 @@ SDK_EXT_task-populate-sdk-ext = "-ext"
 SDK_EXT_TYPE ?= "full"
 SDK_INCLUDE_PKGDATA ?= "0"
 SDK_INCLUDE_TOOLCHAIN ?= "${@'1' if d.getVar('SDK_EXT_TYPE') == 'full' else '0'}"
+SDK_INCLUDE_NATIVESDK ?= "0"
+SDK_INCLUDE_BUILDTOOLS ?= '1'
 
 SDK_RECRDEP_TASKS ?= ""
 
@@ -93,6 +95,7 @@ python write_target_sdk_ext_manifest () {
     real_target_multimach = d.getVar('REAL_MULTIMACH_TARGET_SYS')
 
     pkgs = {}
+    os.makedirs(os.path.dirname(d.getVar('SDK_EXT_TARGET_MANIFEST')), exist_ok=True)
     with open(d.getVar('SDK_EXT_TARGET_MANIFEST'), 'w') as f:
         for fn in extra_info['filesizes']:
             info = fn.split(':')
@@ -378,6 +381,11 @@ python copy_buildsystem () {
             f.write('require conf/locked-sigs.inc\n')
             f.write('require conf/unlocked-sigs.inc\n')
 
+    if os.path.exists(builddir + '/cache/bb_unihashes.dat'):
+        bb.parse.siggen.save_unitaskhashes()
+        bb.utils.mkdirhier(os.path.join(baseoutpath, 'cache'))
+        shutil.copyfile(builddir + '/cache/bb_unihashes.dat', baseoutpath + '/cache/bb_unihashes.dat')
+
     # Write a templateconf.cfg
     with open(baseoutpath + '/conf/templateconf.cfg', 'w') as f:
         f.write('meta/conf\n')
@@ -401,9 +409,27 @@ python copy_buildsystem () {
     excluded_targets = get_sdk_install_targets(d, images_only=True)
     sigfile = d.getVar('WORKDIR') + '/locked-sigs.inc'
     lockedsigs_pruned = baseoutpath + '/conf/locked-sigs.inc'
+    #nativesdk-only sigfile to merge into locked-sigs.inc
+    sdk_include_nativesdk = (d.getVar("SDK_INCLUDE_NATIVESDK") == '1')
+    nativesigfile = d.getVar('WORKDIR') + '/locked-sigs_nativesdk.inc'
+    nativesigfile_pruned = d.getVar('WORKDIR') + '/locked-sigs_nativesdk_pruned.inc'
+
+    if sdk_include_nativesdk:
+        oe.copy_buildsystem.prune_lockedsigs([],
+                                             excluded_targets.split(),
+                                             nativesigfile,
+                                             True,
+                                             nativesigfile_pruned)
+
+        oe.copy_buildsystem.merge_lockedsigs([],
+                                             sigfile,
+                                             nativesigfile_pruned,
+                                             sigfile)
+
     oe.copy_buildsystem.prune_lockedsigs([],
                                          excluded_targets.split(),
                                          sigfile,
+                                         False,
                                          lockedsigs_pruned)
 
     sstate_out = baseoutpath + '/sstate-cache'
@@ -414,12 +440,17 @@ python copy_buildsystem () {
 
     sdk_include_toolchain = (d.getVar('SDK_INCLUDE_TOOLCHAIN') == '1')
     sdk_ext_type = d.getVar('SDK_EXT_TYPE')
-    if sdk_ext_type != 'minimal' or sdk_include_toolchain or derivative:
+    if (sdk_ext_type != 'minimal' or sdk_include_toolchain or derivative) and not sdk_include_nativesdk:
         # Create the filtered task list used to generate the sstate cache shipped with the SDK
         tasklistfn = d.getVar('WORKDIR') + '/tasklist.txt'
         create_filtered_tasklist(d, baseoutpath, tasklistfn, conf_initpath)
     else:
         tasklistfn = None
+
+    if os.path.exists(builddir + '/cache/bb_unihashes.dat'):
+        bb.parse.siggen.save_unitaskhashes()
+        bb.utils.mkdirhier(os.path.join(baseoutpath, 'cache'))
+        shutil.copyfile(builddir + '/cache/bb_unihashes.dat', baseoutpath + '/cache/bb_unihashes.dat')
 
     # Add packagedata if enabled
     if d.getVar('SDK_INCLUDE_PKGDATA') == '1':
@@ -506,8 +537,12 @@ def get_sdk_required_utilities(buildtools_fn, d):
     sanity_required_utilities = (d.getVar('SANITY_REQUIRED_UTILITIES') or '').split()
     sanity_required_utilities.append(d.expand('${BUILD_PREFIX}gcc'))
     sanity_required_utilities.append(d.expand('${BUILD_PREFIX}g++'))
-    buildtools_installer = os.path.join(d.getVar('SDK_DEPLOY'), buildtools_fn)
-    filelist, _ = bb.process.run('%s -l' % buildtools_installer)
+    if buildtools_fn:
+        buildtools_installer = os.path.join(d.getVar('SDK_DEPLOY'), buildtools_fn)
+        filelist, _ = bb.process.run('%s -l' % buildtools_installer)
+    else:
+        buildtools_installer = None
+        filelist = ""
     localdata = bb.data.createCopy(d)
     localdata.setVar('SDKPATH', '.')
     sdkpathnative = localdata.getVar('SDKPATHNATIVE')
@@ -550,7 +585,9 @@ install_tools() {
 	touch ${SDK_OUTPUT}/${SDKPATH}/.devtoolbase
 
 	# find latest buildtools-tarball and install it
-	install ${SDK_DEPLOY}/${SDK_BUILDTOOLS_INSTALLER} ${SDK_OUTPUT}/${SDKPATH}
+	if [ -n "${SDK_BUILDTOOLS_INSTALLER}" ]; then
+		install ${SDK_DEPLOY}/${SDK_BUILDTOOLS_INSTALLER} ${SDK_OUTPUT}/${SDKPATH}
+	fi
 
 	install -m 0644 ${COREBASE}/meta/files/ext-sdk-prepare.py ${SDK_OUTPUT}/${SDKPATH}
 }
@@ -600,16 +637,18 @@ sdk_ext_postinst() {
 	printf "\nExtracting buildtools...\n"
 	cd $target_sdk_dir
 	env_setup_script="$target_sdk_dir/environment-setup-${REAL_MULTIMACH_TARGET_SYS}"
-	printf "buildtools\ny" | ./${SDK_BUILDTOOLS_INSTALLER} > buildtools.log || { printf 'ERROR: buildtools installation failed:\n' ; cat buildtools.log ; echo "printf 'ERROR: this SDK was not fully installed and needs reinstalling\n'" >> $env_setup_script ; exit 1 ; }
+        if [ -n "${SDK_BUILDTOOLS_INSTALLER}" ]; then
+		printf "buildtools\ny" | ./${SDK_BUILDTOOLS_INSTALLER} > buildtools.log || { printf 'ERROR: buildtools installation failed:\n' ; cat buildtools.log ; echo "printf 'ERROR: this SDK was not fully installed and needs reinstalling\n'" >> $env_setup_script ; exit 1 ; }
 
-	# Delete the buildtools tar file since it won't be used again
-	rm -f ./${SDK_BUILDTOOLS_INSTALLER}
-	# We don't need the log either since it succeeded
-	rm -f buildtools.log
+		# Delete the buildtools tar file since it won't be used again
+		rm -f ./${SDK_BUILDTOOLS_INSTALLER}
+		# We don't need the log either since it succeeded
+		rm -f buildtools.log
 
-	# Make sure when the user sets up the environment, they also get
-	# the buildtools-tarball tools in their path.
-	echo ". $target_sdk_dir/buildtools/environment-setup*" >> $env_setup_script
+		# Make sure when the user sets up the environment, they also get
+		# the buildtools-tarball tools in their path.
+		echo ". $target_sdk_dir/buildtools/environment-setup*" >> $env_setup_script
+	fi
 
 	# Allow bitbake environment setup to be ran as part of this sdk.
 	echo "export OE_SKIP_SDK_CHECK=1" >> $env_setup_script
@@ -625,7 +664,7 @@ sdk_ext_postinst() {
 	# Warn if trying to use external bitbake and the ext SDK together
 	echo "(which bitbake > /dev/null 2>&1 && echo 'WARNING: attempting to use the extensible SDK in an environment set up to run bitbake - this may lead to unexpected results. Please source this script in a new shell session instead.') || true" >> $env_setup_script
 
-	if [ "$prepare_buildsystem" != "no" ]; then
+	if [ "$prepare_buildsystem" != "no" -a -n "${SDK_BUILDTOOLS_INSTALLER}" ]; then
 		printf "Preparing build system...\n"
 		# dash which is /bin/sh on Ubuntu will not preserve the
 		# current working directory when first ran, nor will it set $1 when
@@ -651,14 +690,24 @@ fakeroot python do_populate_sdk_ext() {
         bb.fatal('The extensible SDK can currently only be built for the same architecture as the machine being built on - SDK_ARCH is set to %s (likely via setting SDKMACHINE) which is different from the architecture of the build machine (%s). Unable to continue.' % (d.getVar('SDK_ARCH'), d.getVar('BUILD_ARCH')))
 
     d.setVar('SDK_INSTALL_TARGETS', get_sdk_install_targets(d))
-    buildtools_fn = get_current_buildtools(d)
+    if d.getVar('SDK_INCLUDE_BUILDTOOLS') == '1':
+        buildtools_fn = get_current_buildtools(d)
+    else:
+        buildtools_fn = None
     d.setVar('SDK_REQUIRED_UTILITIES', get_sdk_required_utilities(buildtools_fn, d))
     d.setVar('SDK_BUILDTOOLS_INSTALLER', buildtools_fn)
     d.setVar('SDKDEPLOYDIR', '${SDKEXTDEPLOYDIR}')
     # ESDKs have a libc from the buildtools so ensure we don't ship linguas twice
     d.delVar('SDKIMAGE_LINGUAS')
+    if d.getVar("SDK_INCLUDE_NATIVESDK") == '1':
+        generate_nativesdk_lockedsigs(d)
     populate_sdk_common(d)
 }
+
+def generate_nativesdk_lockedsigs(d):
+    import oe.copy_buildsystem
+    sigfile = d.getVar('WORKDIR') + '/locked-sigs_nativesdk.inc'
+    oe.copy_buildsystem.generate_locked_sigs(sigfile, d)
 
 def get_ext_sdk_depends(d):
     # Note: the deps varflag is a list not a string, so we need to specify expand=False
@@ -695,7 +744,7 @@ def get_sdk_ext_rdepends(d):
 do_populate_sdk_ext[dirs] = "${@d.getVarFlag('do_populate_sdk', 'dirs', False)}"
 
 do_populate_sdk_ext[depends] = "${@d.getVarFlag('do_populate_sdk', 'depends', False)} \
-                                buildtools-tarball:do_populate_sdk \
+                                ${@'buildtools-tarball:do_populate_sdk' if d.getVar('SDK_INCLUDE_BUILDTOOLS') == '1' else ''} \
                                 ${@'meta-world-pkgdata:do_collect_packagedata' if d.getVar('SDK_INCLUDE_PKGDATA') == '1' else ''} \
                                 ${@'meta-extsdk-toolchain:do_locked_sigs' if d.getVar('SDK_INCLUDE_TOOLCHAIN') == '1' else ''}"
 

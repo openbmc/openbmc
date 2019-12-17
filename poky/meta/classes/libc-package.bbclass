@@ -82,6 +82,9 @@ do_collect_bins_from_locale_tree() {
 	parent=$(dirname ${localedir})
 	mkdir -p ${PKGD}/$parent
 	tar -cf - -C $treedir/$parent -p $(basename ${localedir}) | tar -xf - -C ${PKGD}$parent
+
+	# Finalize tree by chaning all duplicate files into hard links
+	cross-localedef-hardlink -c -v ${WORKDIR}/locale-tree
 }
 
 inherit qemu
@@ -265,7 +268,7 @@ python package_do_split_gconvs () {
                 bb.error("locale_arch_options not found for target_arch=" + target_arch)
                 bb.fatal("unknown arch:" + target_arch + " for locale_arch_options")
 
-            localedef_opts += " --force  --no-archive --prefix=%s \
+            localedef_opts += " --force --no-hard-links --no-archive --prefix=%s \
                 --inputfile=%s/%s/i18n/locales/%s --charmap=%s %s/%s" \
                 % (treedir, treedir, datadir, locale, encoding, outputpath, name)
 
@@ -273,7 +276,7 @@ python package_do_split_gconvs () {
                 (path, i18npath, gconvpath, localedef_opts)
         else: # earlier slower qemu way 
             qemu = qemu_target_binary(d) 
-            localedef_opts = "--force --no-archive --prefix=%s \
+            localedef_opts = "--force --no-hard-links --no-archive --prefix=%s \
                 --inputfile=%s/i18n/locales/%s --charmap=%s %s" \
                 % (treedir, datadir, locale, encoding, name)
 
@@ -343,14 +346,13 @@ python package_do_split_gconvs () {
 
     if use_bin == "compile":
         makefile = oe.path.join(d.getVar("WORKDIR"), "locale-tree", "Makefile")
-        m = open(makefile, "w")
-        m.write("all: %s\n\n" % " ".join(commands.keys()))
-        total = len(commands)
-        for i, cmd in enumerate(commands):
-            m.write(cmd + ":\n")
-            m.write("\t@echo 'Progress %d/%d'\n" % (i, total))
-            m.write("\t" + commands[cmd] + "\n\n")
-        m.close()
+        with open(makefile, "w") as m:
+            m.write("all: %s\n\n" % " ".join(commands.keys()))
+            total = len(commands)
+            for i, (maketarget, makerecipe) in enumerate(commands.items()):
+                m.write(maketarget + ":\n")
+                m.write("\t@echo 'Progress %d/%d'\n" % (i, total))
+                m.write("\t" + makerecipe + "\n\n")
         d.setVar("EXTRA_OEMAKE", "-C %s ${PARALLEL_MAKE}" % (os.path.dirname(makefile)))
         d.setVarFlag("oe_runmake", "progress", "outof:Progress\s(\d+)/(\d+)")
         bb.note("Executing binary locale generation makefile")

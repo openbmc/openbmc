@@ -18,6 +18,7 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/utils/kernel/kexec/kexec-tools-${PV}.tar.gz
     file://0003-kexec-ARM-Fix-add_buffer_phys_virt-align-issue.patch \
     file://0004-x86_64-Add-support-to-build-kexec-tools-with-x32-ABI.patch \
     file://0005-Disable-PIE-during-link.patch \
+    file://0006-kexec-arm-undefine-__NR_kexec_file_load-for-arm.patch \
 "
 
 SRC_URI[md5sum] = "052458f0a35c2a3b0d2302caa3318e9f"

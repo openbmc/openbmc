@@ -195,9 +195,6 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
             global worker_pipe_lock
             pipein.close()
 
-            signal.signal(signal.SIGTERM, sigterm_handler)
-            # Let SIGHUP exit as SIGTERM
-            signal.signal(signal.SIGHUP, sigterm_handler)
             bb.utils.signal_on_parent_exit("SIGTERM")
 
             # Save out the PID so that the event can include it the
@@ -212,6 +209,11 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
             # This ensures signals sent to the controlling terminal like Ctrl+C
             # don't stop the child processes.
             os.setsid()
+
+            signal.signal(signal.SIGTERM, sigterm_handler)
+            # Let SIGHUP exit as SIGTERM
+            signal.signal(signal.SIGHUP, sigterm_handler)
+
             # No stdin
             newsi = os.open(os.devnull, os.O_RDWR)
             os.dup2(newsi, sys.stdin.fileno())
@@ -234,6 +236,8 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
                     the_data.setVar(varname, value)
 
                 bb.parse.siggen.set_taskdata(workerdata["sigdata"])
+                if "newhashes" in workerdata:
+                    bb.parse.siggen.set_taskhashes(workerdata["newhashes"])
                 ret = 0
 
                 the_data = bb_cache.loadDataFull(fn, appends)
@@ -377,6 +381,7 @@ class BitbakeWorker(object):
                 self.handle_item(b"cookerconfig", self.handle_cookercfg)
                 self.handle_item(b"extraconfigdata", self.handle_extraconfigdata)
                 self.handle_item(b"workerdata", self.handle_workerdata)
+                self.handle_item(b"newtaskhashes", self.handle_newtaskhashes)
                 self.handle_item(b"runtask", self.handle_runtask)
                 self.handle_item(b"finishnow", self.handle_finishnow)
                 self.handle_item(b"ping", self.handle_ping)
@@ -415,6 +420,10 @@ class BitbakeWorker(object):
         bb.msg.loggerDefaultDomains = self.workerdata["logdefaultdomain"]
         for mc in self.databuilder.mcdata:
             self.databuilder.mcdata[mc].setVar("PRSERV_HOST", self.workerdata["prhost"])
+            self.databuilder.mcdata[mc].setVar("BB_HASHSERVE", self.workerdata["hashservaddr"])
+
+    def handle_newtaskhashes(self, data):
+        self.workerdata["newhashes"] = pickle.loads(data)
 
     def handle_ping(self, _):
         workerlog_write("Handling ping\n")

@@ -1,25 +1,25 @@
-From f3384466475eab373c0f1cb79c61d45709913b00 Mon Sep 17 00:00:00 2001
+From 4e6fededb3d8c90694c44214c862ac216a69ecae Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Wed, 28 May 2014 16:49:57 +0800
-Subject: [PATCH] elfutils: upgrade to 0.158
+Date: Wed, 21 Aug 2019 16:50:33 +0800
+Subject: [PATCH] arm_backend
 
 Upstream-Status: Pending [from debian]
+Rebase to 0.177
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
-
 ---
- backends/arm_init.c                 |  18 +++-
- backends/arm_regs.c                 | 132 ++++++++++++++++++++++++++++
- backends/arm_retval.c               |  43 ++++++++-
- backends/libebl_arm.h               |   9 ++
+ backends/arm_init.c                 |  18 ++++-
+ backends/arm_regs.c                 | 132 ++++++++++++++++++++++++++++++++++++
+ backends/arm_retval.c               |  43 +++++++++++-
+ backends/libebl_arm.h               |   9 +++
  libelf/elf.h                        |  11 +++
- tests/run-addrcfi.sh                |  93 +++++++++++++++++++-
- tests/run-allregs.sh                |  95 +++++++++++++++++++-
+ tests/run-addrcfi.sh                |  93 ++++++++++++++++++++++++-
+ tests/run-allregs.sh                |  95 +++++++++++++++++++++++++-
  tests/run-readelf-mixed-corenote.sh |  11 ++-
  8 files changed, 400 insertions(+), 12 deletions(-)
  create mode 100644 backends/libebl_arm.h
 
 diff --git a/backends/arm_init.c b/backends/arm_init.c
-index f2b1b11..1b71f16 100644
+index af023f0..ea2bcb7 100644
 --- a/backends/arm_init.c
 +++ b/backends/arm_init.c
 @@ -35,20 +35,31 @@
@@ -53,9 +53,9 @@ index f2b1b11..1b71f16 100644
 +  }
 +
    /* We handle it.  */
-   eh->name = "ARM";
    arm_init_reloc (eh);
-@@ -60,7 +71,10 @@ arm_init (Elf *elf __attribute__ ((unused)),
+   HOOK (eh, segment_type_name);
+@@ -59,7 +70,10 @@ arm_init (Elf *elf __attribute__ ((unused)),
    HOOK (eh, core_note);
    HOOK (eh, auxv_info);
    HOOK (eh, check_object_attribute);
@@ -324,10 +324,10 @@ index 0000000..c00770c
 +
 +#endif
 diff --git a/libelf/elf.h b/libelf/elf.h
-index 6310054..5dc632b 100644
+index 01648bd..05b7e7e 100644
 --- a/libelf/elf.h
 +++ b/libelf/elf.h
-@@ -2694,6 +2694,9 @@ enum
+@@ -2690,6 +2690,9 @@ enum
  #define EF_ARM_EABI_VER4	0x04000000
  #define EF_ARM_EABI_VER5	0x05000000
  
@@ -337,7 +337,7 @@ index 6310054..5dc632b 100644
  /* Additional symbol types for Thumb.  */
  #define STT_ARM_TFUNC		STT_LOPROC /* A Thumb function.  */
  #define STT_ARM_16BIT		STT_HIPROC /* A Thumb label.  */
-@@ -2711,12 +2714,19 @@ enum
+@@ -2707,12 +2710,19 @@ enum
  
  /* Processor specific values for the Phdr p_type field.  */
  #define PT_ARM_EXIDX		(PT_LOPROC + 1)	/* ARM unwind segment.  */
@@ -357,7 +357,7 @@ index 6310054..5dc632b 100644
  
  /* AArch64 relocs.  */
  
-@@ -3009,6 +3019,7 @@ enum
+@@ -3005,6 +3015,7 @@ enum
  					   TLS block (LDR, STR).  */
  #define R_ARM_TLS_IE12GP	111	/* 12 bit GOT entry relative
  					   to GOT origin (LDR).  */
@@ -366,7 +366,7 @@ index 6310054..5dc632b 100644
  #define R_ARM_THM_TLS_DESCSEQ	129
  #define R_ARM_THM_TLS_DESCSEQ16	129
 diff --git a/tests/run-addrcfi.sh b/tests/run-addrcfi.sh
-index fd89d02..462d7c5 100755
+index 64fa24d..1c2aa4d 100755
 --- a/tests/run-addrcfi.sh
 +++ b/tests/run-addrcfi.sh
 @@ -3554,6 +3554,38 @@ dwarf_cfi_addrframe (.eh_frame): no matching address range
@@ -619,3 +619,6 @@ index c960f1d..e4bf074 100755
    CORE                 124  PRPSINFO
      state: 0, sname: R, zomb: 0, nice: 0, flag: 0x00400500
      uid: 0, gid: 0, pid: 11087, ppid: 11063, pgrp: 11087, sid: 11063
+-- 
+2.7.4
+

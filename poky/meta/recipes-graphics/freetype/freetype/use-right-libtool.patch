@@ -11,4 +11,4 @@ Signed-off-by: Ross Burton <ross.burton@intel.com>
 +++ freetype-2.6/builds/unix/unix-cc.in	2016-01-07 19:21:50.213112131 +0000
 @@ -19,1 +18,1 @@
 -LIBTOOL := $(FT_LIBTOOL_DIR)/libtool
-+LIBTOOL := $(FT_LIBTOOL_DIR)/@LIBTOOL@
++LIBTOOL := $(FT_LIBTOOL_DIR)/@LIBTOOL@ --tag CC

@@ -20,7 +20,7 @@ EXTRA_OECONF = "--enable-startup-notification --with-dbus"
 
 S = "${WORKDIR}/git"
 
-inherit autotools pkgconfig distro_features_check
+inherit autotools pkgconfig features_check
 
 # The startup-notification requires x11 in DISTRO_FEATURES
 REQUIRED_DISTRO_FEATURES = "x11"

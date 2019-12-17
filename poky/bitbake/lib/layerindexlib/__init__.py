@@ -376,7 +376,7 @@ layerBranches set.  If not, they are effectively blank.'''
                 invalid.append(name)
 
 
-        def _resolve_dependencies(layerbranches, ignores, dependencies, invalid):
+        def _resolve_dependencies(layerbranches, ignores, dependencies, invalid, processed=None):
             for layerbranch in layerbranches:
                 if ignores and layerbranch.layer.name in ignores:
                     continue
@@ -386,6 +386,13 @@ layerBranches set.  If not, they are effectively blank.'''
                     deplayerbranch = layerdependency.dependency_layerBranch
 
                     if ignores and deplayerbranch.layer.name in ignores:
+                        continue
+
+                    # Since this is depth first, we need to know what we're currently processing
+                    # in order to avoid infinite recursion on a loop.
+                    if processed and deplayerbranch.layer.name in processed:
+                        # We have found a recursion...
+                        logger.warning('Circular layer dependency found: %s -> %s' % (processed, deplayerbranch.layer.name))
                         continue
 
                     # This little block is why we can't re-use the LayerIndexObj version,
@@ -411,7 +418,17 @@ layerBranches set.  If not, they are effectively blank.'''
 
                     # New dependency, we need to resolve it now... depth-first
                     if deplayerbranch.layer.name not in dependencies:
-                        (dependencies, invalid) = _resolve_dependencies([deplayerbranch], ignores, dependencies, invalid)
+                        # Avoid recursion on this branch.
+                        # We copy so we don't end up polluting the depth-first branch with other
+                        # branches.  Duplication between individual branches IS expected and
+                        # handled by 'dependencies' processing.
+                        if not processed:
+                            local_processed = []
+                        else:
+                            local_processed = processed.copy()
+                        local_processed.append(deplayerbranch.layer.name)
+
+                        (dependencies, invalid) = _resolve_dependencies([deplayerbranch], ignores, dependencies, invalid, local_processed)
 
                     if deplayerbranch.layer.name not in dependencies:
                         dependencies[deplayerbranch.layer.name] = [deplayerbranch, layerdependency]

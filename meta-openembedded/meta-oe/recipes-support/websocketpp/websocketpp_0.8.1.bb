@@ -5,7 +5,10 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${S}/COPYING;md5=4d168d763c111f4ffc62249870e4e0ea"
 DEPENDS = "openssl boost zlib"
 
-SRC_URI = "git://github.com/zaphoyd/websocketpp.git;protocol=https;branch=master"
+SRC_URI = "git://github.com/zaphoyd/websocketpp.git;protocol=https \
+           file://0001-Replace-make_shared-with-new-in-some-cases.patch \
+           file://0002-Fix-missed-entries-fix-testing.patch \
+          "
 
 # tag 0.8.1
 SRCREV= "c6d7e295bf5a0ab9b5f896720cc1a0e0fdc397a7"

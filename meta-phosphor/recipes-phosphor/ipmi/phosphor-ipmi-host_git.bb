@@ -14,8 +14,6 @@ inherit obmc-phosphor-systemd
 inherit phosphor-ipmi-host
 inherit pythonnative
 
-SRC_URI += "file://entity.yaml"
-
 def ipmi_whitelists(d):
     whitelists = d.getVar(
         'VIRTUAL-RUNTIME_phosphor-ipmi-providers', True) or ''
@@ -56,8 +54,6 @@ inherit useradd
 USERADD_PACKAGES = "${PN}"
 # add ipmi group
 GROUPADD_PARAM_${PN} = "ipmi"
-# Add root user to ipmi group
-GROUPMEMS_PARAM_${PN} = "-g ipmi -a root"
 
 SYSTEMD_SERVICE_${PN} += "xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service phosphor-ipmi-host.service"
 
@@ -102,16 +98,6 @@ SOFT_SVC = "xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service"
 SOFT_TGTFMT = "obmc-host-shutdown@{0}.target"
 SOFT_FMT = "../${SOFT_SVC}:${SOFT_TGTFMT}.requires/${SOFT_SVC}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'SOFT_FMT', 'OBMC_HOST_INSTANCES')}"
-
-do_replace_entity_default() {
-    # The in-repo provided default is tailored to testing the ipmid code.
-    # Replace it with a reasonable default for users.
-    cp entity.yaml ${S}/scripts/entity-example.yaml
-}
-
-do_patch_append() {
-    bb.build.exec_func('do_replace_entity_default', d)
-}
 
 #Collect all hardcoded sensor yamls from different recipes and
 #merge all of them with sensor.yaml.

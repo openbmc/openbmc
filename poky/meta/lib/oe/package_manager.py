@@ -217,7 +217,7 @@ class OpkgIndexer(Indexer):
                 if not os.path.exists(pkgs_file):
                     open(pkgs_file, "w").close()
 
-                index_cmds.add('%s -r %s -p %s -m %s' %
+                index_cmds.add('%s --checksum md5 --checksum sha256 -r %s -p %s -m %s' %
                                   (opkg_index_cmd, pkgs_file, pkgs_file, pkgs_dir))
 
                 index_sign_files.add(pkgs_file)
@@ -298,7 +298,7 @@ class DpkgIndexer(Indexer):
                 release.write("Label: %s\n" % arch)
 
             cmd += "PSEUDO_UNLOAD=1 %s release . >> Release" % apt_ftparchive
-            
+
             index_cmds.append(cmd)
 
             deb_dirs_found = True
@@ -570,6 +570,8 @@ class PackageManager(object, metaclass=ABCMeta):
 
             for lang in split_linguas:
                 globs += " *-locale-%s" % lang
+                for complementary_linguas in (self.d.getVar('IMAGE_LINGUAS_COMPLEMENTARY') or "").split():
+                    globs += (" " + complementary_linguas) % lang
 
         if globs is None:
             return
@@ -655,7 +657,7 @@ def create_packages_dir(d, subrepo_dir, deploydir, taskname, filterbydependencie
     pn = d.getVar("PN")
     seendirs = set()
     multilibs = {}
-   
+
     bb.utils.remove(subrepo_dir, recurse=True)
     bb.utils.mkdirhier(subrepo_dir)
 
@@ -1006,8 +1008,8 @@ class RpmPM(PackageManager):
     def load_old_install_solution(self):
         if not os.path.exists(self.solution_manifest):
             return []
-
-        return open(self.solution_manifest, 'r').read().split()
+        with open(self.solution_manifest, 'r') as fd:
+            return fd.read().split()
 
     def _script_num_prefix(self, path):
         files = os.listdir(path)
@@ -1296,6 +1298,8 @@ class OpkgPM(OpkgDpkgPM):
 
         rootfs_config = os.path.join('%s/etc/opkg/base-feeds.conf'
                                   % self.target_rootfs)
+
+        os.makedirs('%s/etc/opkg' % self.target_rootfs, exist_ok=True)
 
         feed_uris = self.construct_uris(feed_uris.split(), feed_base_paths.split())
         archs = self.pkg_archs.split() if feed_archs is None else feed_archs.split()
