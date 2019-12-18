@@ -95,7 +95,7 @@ PACKAGECONFIG[install_scripts] = " \
 PACKAGECONFIG[openpower-pels] = " \
         --enable-openpower-pel-extension, \
         --disable-openpower-pel-extension, \
-        nlohmann-json nlohmann-fifo cli11, \
+        nlohmann-json nlohmann-fifo cli11 pldm, \
         , \
         "
 
