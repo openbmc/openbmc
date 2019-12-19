@@ -10,7 +10,6 @@ SRC_URI += " \
     file://suricata.yaml \
     file://suricata.service \
     file://run-ptest \
-    file://0001-af-packet-fix-build-on-recent-Linux-kernels.patch \
     "
 
 inherit autotools-brokensep pkgconfig python3-dir systemd ptest

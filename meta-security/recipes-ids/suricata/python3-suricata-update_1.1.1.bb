@@ -5,8 +5,8 @@ LICENSE = "GPLv2"
 
 LIC_FILES_CHKSUM = "file://LICENSE;beginline=1;endline=2;md5=c70d8d3310941dcdfcd1e02800a1f548"
 
-SRCREV = "dcd0f630e13463750efb1593ad3ccae1ae6c27d4"
-SRC_URI = "git://github.com/OISF/suricata-update;branch='master-1.0.x'"
+SRCREV = "9630630ffc493ca26299d174ee2066aa1405b2d4"
+SRC_URI = "git://github.com/OISF/suricata-update;branch='master-1.1.x'"
 
 S = "${WORKDIR}/git"
 
