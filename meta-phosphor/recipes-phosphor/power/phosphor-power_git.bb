@@ -22,6 +22,7 @@ DEPENDS += " \
          sdeventplus \
          nlohmann-json \
          cli11 \
+         i2c-tools \
          "
 
 SEQ_MONITOR_SVC = "pseq-monitor.service"
