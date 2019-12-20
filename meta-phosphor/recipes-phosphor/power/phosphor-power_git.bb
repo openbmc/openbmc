@@ -49,11 +49,13 @@ PSU_MONITOR_TMPL = "power-supply-monitor@.service"
 PSU_MONITOR_SVC = "phosphor-psu-monitor.service"
 REGS_SVC = "phosphor-regulators.service"
 REGS_CONF_SVC = "phosphor-regulators-config.service"
+REGS_MON_ENA_SVC = "phosphor-regulators-monitor-enable.service"
+REGS_MON_DIS_SVC = "phosphor-regulators-monitor-disable.service"
 
 SYSTEMD_SERVICE_${PN}-sequencer = "${SEQ_MONITOR_SVC} ${SEQ_PGOOD_SVC}"
 SYSTEMD_SERVICE_${PN}-monitor = "${PSU_MONITOR_TMPL}"
 SYSTEMD_SERVICE_${PN}-psu-monitor = "${PSU_MONITOR_SVC}"
-SYSTEMD_SERVICE_${PN}-regulators = "${REGS_SVC} ${REGS_CONF_SVC}"
+SYSTEMD_SERVICE_${PN}-regulators = "${REGS_SVC} ${REGS_CONF_SVC} ${REGS_MON_ENA_SVC} ${REGS_MON_DIS_SVC}"
 
 
 # TODO: cold-redundancy is not installed in the repo yet
