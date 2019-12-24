@@ -1,7 +1,7 @@
 [Unit]
 Description=Disable the AVS bus on the VRMs
-Wants=op-power-start@.service
-After=op-power-start@.service
+Wants=ir35221-on-unbind@%i.service
+After=ir35221-on-unbind@%i.service
 Before=avsbus-enable@%i.service
 Conflicts=obmc-chassis-poweroff@%i.target
 ConditionPathExists=!/run/openbmc/chassis@%i-on
