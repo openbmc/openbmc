@@ -147,6 +147,6 @@ do_install_append() {
 }
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
-SRCREV = "a65d30d16bad3521c3c03ccf2b5cef213e825576"
+SRCREV = "c543af24b4537aafa85482994f27539afe4a6590"
 
 S = "${WORKDIR}/git"
