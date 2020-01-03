@@ -16,4 +16,5 @@ SUMMARY_${PN}-system = "Facebook system for Yosemite platform"
 RDEPENDS_${PN}-system = " \
         entity-manager \
         dbus-sensors \
+        phosphor-pid-control \
         "
