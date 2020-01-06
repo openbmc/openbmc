@@ -43,3 +43,7 @@ FILES_${PN} = "\
     ${sysconfdir} \
     ${systemd_unitdir}/system \
 "
+
+RDEPENDS_${PN} += " \
+    udev-rules-rpi \
+"
