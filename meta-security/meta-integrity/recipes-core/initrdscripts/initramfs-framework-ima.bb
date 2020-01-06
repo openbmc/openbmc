@@ -16,6 +16,9 @@ IMA_POLICY ?= "ima-policy-hashed"
 
 SRC_URI = " file://ima"
 
+inherit features_check
+REQUIRED_DISTRO_FEATURES = "ima"
+
 do_install () {
     install -d ${D}/${sysconfdir}/ima
     install -d ${D}/init.d

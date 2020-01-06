@@ -13,7 +13,12 @@ SRC_URI = " \
 
 PV = "1.3.1"
 
-inherit autotools update-rc.d pkgconfig ptest ${@bb.utils.contains('VIRTUAL-RUNTIME_init_manager','systemd','systemd','', d)}
+inherit autotools update-rc.d pkgconfig ptest
+inherit ${@bb.utils.contains('VIRTUAL-RUNTIME_init_manager','systemd','systemd','', d)}
+inherit features_check
+
+REQUIRED_DISTRO_FEATURES = "smack"
+
 
 S = "${WORKDIR}/git"
 

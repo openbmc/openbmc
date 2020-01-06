@@ -23,7 +23,9 @@ SRC_URI += "file://command-line-apply-operation-to-all-paths.patch"
 
 S = "${WORKDIR}/git"
 
-inherit pkgconfig autotools
+inherit pkgconfig autotools features_check
+
+REQUIRED_DISTRO_FEATURES = "ima"
 
 EXTRA_OECONF_append_class-target = " --with-kernel-headers=${STAGING_KERNEL_BUILDDIR}"
 

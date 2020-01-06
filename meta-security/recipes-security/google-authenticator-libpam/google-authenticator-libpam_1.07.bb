@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 LICENSE = "Apache-2.0"
 
 SRC_URI = "git://github.com/google/google-authenticator-libpam.git"
-SRCREV = "7365ed10d54393fb4c100cac063ae8edb744eac6"
+SRCREV = "c9280f43610ce896f91eafd0f740a4eb4dcecedd"
 
 DEPENDS = "libpam"
 
