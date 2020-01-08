@@ -127,11 +127,11 @@ get faster results by using the mailing list or IRC.
 * Remote KVM
 * Hardware Simulation
 * Automated Testing
+* User management
+* Virtual media
 
 **Features In Progress**
 * OpenCompute Redfish Compliance
-* User management
-* Virtual media
 * Verified Boot
 
 **Features Requested but need help**
