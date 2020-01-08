@@ -143,6 +143,16 @@ get faster results by using the mailing list or IRC.
 Dive deeper into OpenBMC by opening the
 [docs](https://github.com/openbmc/docs) repository.
 
+## Technical Steering Committee
+
+The Technical Steering Committee (TSC) guides the project. Members are:
+
+ * Brad Bishop (chair), IBM
+ * Nancy Yuen, Google
+ * Sai Dasari, Facebook
+ * James Mihm, Intel
+ * Sagar Dharia, Microsoft
+
 ## Contact
 - Mail: openbmc@lists.ozlabs.org [https://lists.ozlabs.org/listinfo/openbmc](https://lists.ozlabs.org/listinfo/openbmc)
 - IRC: #openbmc on freenode.net
