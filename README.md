@@ -111,7 +111,8 @@ Please review the [discussion](https://meta.stackexchange.com/questions/272956/a
 on Stack Overflow licensing before posting any code.
 
 For technical discussions, please see [contact info](#contact) below for IRC and
-mailing list information.
+mailing list information. Please don't file an issue to ask a question. You'll
+get faster results by using the mailing list or IRC.
 
 ## Features of OpenBMC
 
