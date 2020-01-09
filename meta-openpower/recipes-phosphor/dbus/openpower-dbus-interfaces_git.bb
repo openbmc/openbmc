@@ -16,7 +16,7 @@ DEPENDS += "sdbus++-native"
 DEPENDS += "phosphor-dbus-interfaces"
 
 SRC_URI += "git://github.com/openbmc/openpower-dbus-interfaces"
-SRCREV = "c5191609d0a738fdc2c2887bf06b8f69824d515b"
+SRCREV = "109ded04f3fec7bbbd93f9c9956a355f4894a51f"
 
 DEPENDS_remove_class-native = "sdbus++-native"
 DEPENDS_remove_class-nativesdk = "sdbus++-native"
