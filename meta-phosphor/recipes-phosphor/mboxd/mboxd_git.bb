@@ -31,13 +31,13 @@ do_install_append() {
 }
 
 TMPL = "mboxd-reload@.service"
-TGTFMT = "obmc-chassis-poweron@{0}.target"
+TGTFMT = "obmc-host-startmin@{0}.target"
 INSTFMT = "mboxd-reload@{0}.service"
 FMT = "../${TMPL}:${TGTFMT}.wants/${INSTFMT}"
 
 SYSTEMD_SERVICE_${PN} += "mboxd.service"
 SYSTEMD_SERVICE_${PN} += "mboxd-reload@.service"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT', 'OBMC_HOST_INSTANCES')}"
 
 # Enable virtual-pnor by DISTRO_FEATURE openpower-ubi-fs.
 PACKAGECONFIG_append_df-openpower-ubi-fs = "virtual-pnor"
