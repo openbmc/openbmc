@@ -241,6 +241,7 @@ do_configure_prepend () {
         sed -i 's,/usr/bin/python,/usr/bin/env python3,' "${s}"
         sed -i 's,/usr/bin/python2,/usr/bin/env python3,' "${s}"
         sed -i 's,/usr/bin/env python2,/usr/bin/env python3,' "${s}"
+        sed -i 's,/usr/bin/python3,/usr/bin/env python3,' "${s}"
     done
 
     # unistd.h can be out of sync between libc-headers and the captured version in the perf source
