@@ -8,7 +8,6 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 SRC_URI += "file://default.network"
 SRC_URI += "file://0001-sd-bus-Don-t-automatically-add-ObjectManager.patch"
 
-RRECOMMENDS_${PN} += "obmc-targets"
 FILES_${PN} += "${systemd_unitdir}/network/default.network"
 
 do_install_append() {
