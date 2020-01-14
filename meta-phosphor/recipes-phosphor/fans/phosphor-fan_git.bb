@@ -22,6 +22,7 @@ DEPENDS += "sdeventplus"
 DEPENDS += "gpioplus"
 DEPENDS += "phosphor-logging"
 DEPENDS += "libevdev"
+DEPENDS += "nlohmann-json"
 
 # Package configuration
 FAN_PACKAGES = " \
