@@ -1,5 +1,5 @@
 [Unit]
-Description=Configure GPIOs for Host Power Control
+Description=Configure GPIOs for Tiogapass
 
 [Service]
 Restart=no

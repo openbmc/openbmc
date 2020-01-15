@@ -5,44 +5,28 @@ function usage() {
 	echo "       power-util sled-cycle"
 }
 
-GPIO_BASE=$(cat /sys/class/gpio/gpio*/base)
-PWR_GPIO=$(($GPIO_BASE + 32 + 3))
-BMC_RDY_GPIO=$(($GPIO_BASE + 144 +1))
-PWR_GOOD=$(($GPIO_BASE + 8 + 6))
-PWR_RESET=$(($GPIO_BASE + 33))
-
 power_off() {
 	echo "Shutting down Server $2"
-	echo 1 > /sys/class/gpio/gpio${PWR_GPIO}/value
-	sleep 1
-	echo 0 > /sys/class/gpio/gpio${PWR_GPIO}/value
-	sleep 6
-	echo 1 > /sys/class/gpio/gpio${PWR_GPIO}/value
+	busctl set-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis RequestedPowerTransition s xyz.openbmc_project.State.Chassis.Transition.Off
 }
 
 power_on() {
 	echo "Powering on Server $2"
-	echo 0 > /sys/class/gpio/gpio${BMC_RDY_GPIO}/value
-	echo 1 > /sys/class/gpio/gpio${PWR_GPIO}/value
-	echo 0 > /sys/class/gpio/gpio${PWR_GPIO}/value
-	sleep 1
-	echo 1 > /sys/class/gpio/gpio${PWR_GPIO}/value
+	busctl set-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis RequestedPowerTransition s xyz.openbmc_project.State.Chassis.Transition.On
 }
 
 power_status() {
-	st=$(cat /sys/class/gpio/gpio${PWR_GOOD}/value)
-	if [ "$st" == "0" ]; then
-		echo "off"
-	else
+	st=$(busctl get-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis CurrentPowerState | cut -d"." -f6)
+	if [ "$st" == "On\"" ]; then
 		echo "on"
+	else
+		echo "off"
 	fi
 }
 
 power_reset() {
 	echo "Reset on server $2"
-	echo 0 > /sys/class/gpio/gpio${PWR_RESET}/value
-  sleep 0.1
-	echo 1 > /sys/class/gpio/gpio${PWR_RESET}/value
+	busctl set-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis RequestedPowerTransition s xyz.openbmc_project.State.Chassis.Transition.Reset
 }
 
 sled_cycle() {
