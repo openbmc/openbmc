@@ -140,11 +140,6 @@ HOST_RST_RBT_ATTEMPTS_SVC_INST = "phosphor-reset-host-reboot-attempts@{0}.servic
 HOST_RST_RBT_ATTEMPTS_SVC_FMT = "../${HOST_RST_RBT_ATTEMPTS_SVC}:${HOST_START_TGTFMT}.requires/${HOST_RST_RBT_ATTEMPTS_SVC_INST}"
 SYSTEMD_LINK_${PN}-host += "${@compose_list_zip(d, 'HOST_RST_RBT_ATTEMPTS_SVC_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_HOST_INSTANCES')}"
 
-do_install_append() {
-  install -d ${D}${sysconfdir}/phosphor-systemd-target-monitor
-  install ${S}/data/phosphor-target-monitor-default.json ${D}${sysconfdir}/phosphor-systemd-target-monitor/phosphor-target-monitor-default.json
-}
-
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
 SRCREV = "4640d48e998709f1b64b97347db0f1b355b7f423"
 
