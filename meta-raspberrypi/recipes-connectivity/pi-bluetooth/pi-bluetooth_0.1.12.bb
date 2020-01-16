@@ -21,8 +21,6 @@ SYSTEMD_SERVICE_${PN} = "\
     bthelper@.service \
 "
 
-inherit allarch
-
 do_install() {
     install -d ${D}${sysconfdir}/udev/rules.d
     install -m 0644 ${S}/lib/udev/rules.d/* ${D}${sysconfdir}/udev/rules.d

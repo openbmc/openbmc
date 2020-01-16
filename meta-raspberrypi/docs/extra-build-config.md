@@ -204,6 +204,7 @@ modelname should be added as a MACHINE_FEATURES in local.conf like below:
 List of currently supported models:
 * pitft22
 * pitft28r
+* pitft28c
 * pitft35r
 
 ## Misc. display
