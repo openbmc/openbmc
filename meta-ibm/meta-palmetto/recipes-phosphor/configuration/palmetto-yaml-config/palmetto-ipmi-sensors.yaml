@@ -584,7 +584,7 @@
                         deassert: false
                         type: bool
     mutability: Mutability::Write|Mutability::Read
-    path: /system/chassis/motherboard/cpu
+    path: /system/chassis/motherboard/cpu0
     readingType: assertion
     sensorNamePattern: nameLeaf
     sensorReadingType: 111
