@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=b57e7f7720307a02d5a6598b00fe3afa"
 
 DEPENDS = "webkitgtk gtk+3 glib-2.0"
 
-REQUIRED_DISTRO_FEATURES = "x11"
+REQUIRED_DISTRO_FEATURES = "x11 opengl"
 
 SRC_URI = "git://git.suckless.org/surf;branch=surf-webkit2 \
            file://0001-config.mk-Fix-compiler-and-linker.patch \

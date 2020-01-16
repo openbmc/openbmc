@@ -1,0 +1,36 @@
+From 2a1c7103839c20df5ca9ce2fa863535d802f8f3a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Sun, 8 Dec 2019 23:42:00 +0100
+Subject: [PATCH] musl: Hack to fix configure
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ meson.build | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 4465a26..726c9fe 100644
+--- a/meson.build
++++ b/meson.build
+@@ -82,8 +82,14 @@ if cc.has_header_symbol('utmpx.h', 'WTMPX_FILENAME', prefix: '#define _GNU_SOURC
+ elif cc.has_header_symbol('paths.h', '_PATH_WTMPX')
+   config_h.set('PATH_WTMP', '_PATH_WTMPX')
+ else
+-  assert(run_command('test', '-e', '/var/log/utx.log').returncode() == 0, 'Do not know which filename to watch for wtmp changes')
+-  config_h.set_quoted('PATH_WTMP', '/var/log/utx.log')
++  # musl: This is just a build fix hack.
++  # As usual they know better, consider all other projects crap and offer zero
++  # alternatives: So wtmp is a dead stub only [1] (= /dev/null/wtmp - taken
++  # from musl sources).
++  # Maybe a hero comes along and adds utmps [2] to make accountsservice useful for musl
++  # [1] https://wiki.musl-libc.org/faq.html#Q:-Why-is-the-utmp/wtmp-functionality-only-implemented-as-stubs?
++  # [2] https://github.com/skarnet/utmps
++  config_h.set_quoted('PATH_WTMP', '/dev/null/wtmp')
+ endif
+ 
+ # compiler flags
+-- 
+2.21.0
+

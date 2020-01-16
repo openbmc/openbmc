@@ -22,6 +22,7 @@ SRC_URI = "http://${BPN}.googlecode.com/files/${BP}.tar.gz \
            file://0002-wvrules.mk-Use-_DEFAULT_SOURCE.patch \
            file://openssl-buildfix.patch \
            file://0001-Forward-port-to-OpenSSL-1.1.x.patch \
+           file://0001-Fix-narrowing-conversion-error.patch \
            "
 
 SRC_URI[md5sum] = "2760dac31a43d452a19a3147bfde571c"

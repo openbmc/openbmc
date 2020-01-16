@@ -1,0 +1,30 @@
+From 1d7612b063eb1fc7bf97bc27b13e1de596748aa1 Mon Sep 17 00:00:00 2001
+From: Sumit Garg <sumit.garg@linaro.org>
+Date: Wed, 8 Jan 2020 04:58:30 +0000
+Subject: [PATCH] Fix library LZ4 lookup.
+
+Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
+---
+ cmake/FindLZ4.cmake | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/cmake/FindLZ4.cmake b/cmake/FindLZ4.cmake
+index e97dd63e2b0..2f4694e727c 100644
+--- a/cmake/FindLZ4.cmake
++++ b/cmake/FindLZ4.cmake
+@@ -1,5 +1,10 @@
+-find_path(LZ4_INCLUDE_DIR NAMES lz4.h)
+-find_library(LZ4_LIBRARY NAMES lz4)
++find_path(LZ4_INCLUDE_DIR
++  NAMES	lz4.h
++  NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
++
++find_library(LZ4_LIBRARY
++  NAMES lz4
++  NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+ 
+ include(FindPackageHandleStandardArgs)
+ FIND_PACKAGE_HANDLE_STANDARD_ARGS(
+-- 
+2.17.1
+

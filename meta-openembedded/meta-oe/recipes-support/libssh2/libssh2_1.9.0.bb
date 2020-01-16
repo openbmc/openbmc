@@ -25,4 +25,4 @@ PACKAGECONFIG ??= "openssl"
 PACKAGECONFIG[openssl] = "--with-crypto=openssl --with-libssl-prefix=${STAGING_LIBDIR}, , openssl"
 PACKAGECONFIG[gcrypt] = "--with-crypto=libgcrypt --with-libgcrypt-prefix=${STAGING_EXECPREFIXDIR}, , libgcrypt"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

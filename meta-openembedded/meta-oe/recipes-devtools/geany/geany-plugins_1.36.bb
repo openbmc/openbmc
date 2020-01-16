@@ -16,7 +16,7 @@ DEPENDS = " \
     geany \
     libxml2 \
     libsoup-2.4 \
-    enchant \
+    enchant2 \
     intltool-native \
     libassuan \
     gpgme \

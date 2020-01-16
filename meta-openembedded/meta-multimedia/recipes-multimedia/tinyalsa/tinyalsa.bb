@@ -7,7 +7,9 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=dbdefe400d894b510a9de14813181d0b"
 
 SRCREV = "8449529c7e50f432091539ba7b438e79b04059b5"
-SRC_URI = "git://github.com/tinyalsa/tinyalsa"
+SRC_URI = "git://github.com/tinyalsa/tinyalsa \
+           file://0001-Use-CMAKE_INSTALL_-path-instead-of-hardcoding-bin-li.patch \
+          "
 PV = "1.1.1+git${SRCPV}"
 
 S = "${WORKDIR}/git"

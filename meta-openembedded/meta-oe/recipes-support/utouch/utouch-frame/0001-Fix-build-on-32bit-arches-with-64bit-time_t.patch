@@ -1,0 +1,41 @@
+From 895b6996e232700fb2a428838feaef418cc64b70 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 30 Nov 2019 22:52:13 -0800
+Subject: [PATCH] Fix build on 32bit arches with 64bit time_t
+
+time element is deprecated on new input_event structure in kernel's
+input.h [1]
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit?id=152194fe9c3f
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/frame-mtdev.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/src/frame-mtdev.c b/src/frame-mtdev.c
+index c0f15d8..42ad380 100644
+--- a/src/frame-mtdev.c
++++ b/src/frame-mtdev.c
+@@ -25,6 +25,11 @@
+ #include <errno.h>
+ #include <math.h>
+ 
++#ifndef input_event_sec
++#define input_event_sec time.tv_sec
++#define input_event_usec time.tv_usec
++#endif
++
+ static int is_pointer(const struct evemu_device *dev)
+ {
+ 	return evemu_has_event(dev, EV_REL, REL_X) ||
+@@ -200,7 +205,7 @@ static int handle_abs_event(utouch_frame_handle fh,
+ static utouch_frame_time_t get_evtime_ms(const struct input_event *syn)
+ {
+ 	static const utouch_frame_time_t ms = 1000;
+-	return syn->time.tv_usec / ms + syn->time.tv_sec * ms;
++	return syn->input_event_usec / ms + syn->input_event_sec * ms;
+ }
+ 
+ const struct utouch_frame *

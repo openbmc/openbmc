@@ -8,6 +8,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/netcat/netcat-${PV}.tar.bz2 \
            file://obsolete_autoconf_macros.patch \
            file://netcat-locale_h.patch \
            file://make-netcat_flag_count_work.patch \
+           file://gettext.patch \
 "
 
 SRC_URI[md5sum] = "0a29eff1736ddb5effd0b1ec1f6fe0ef"

@@ -19,11 +19,11 @@ PV = "1.0"
 
 SRCREV_FORMAT = "breakpad_gtest_protobuf_lss_gyp"
 
-SRCREV_breakpad = "5467393a3d1e7ab929fd01d79971701bf4e2c2c6"
-#v1.8.0
-SRCREV_gtest = "ec44c6c1675c25b9827aacd08c02433cccde7780"
+SRCREV_breakpad = "0c0e24f709288a129d665ec27d6f089189318385"
+#v1.10.0
+SRCREV_gtest = "5ec7f0c4a113e2f18ac2c6cc7df51ad6afc24081"
 SRCREV_protobuf = "cb6dd4ef5f82e41e06179dcd57d3b1d9246ad6ac"
-SRCREV_lss = "a89bf7903f3169e6bc7b8efc10a73a7571de21cf"
+SRCREV_lss = "8048ece6c16c91acfe0d36d1d3cc0890ab6e945c"
 SRCREV_gyp = "324dd166b7c0b39d513026fa52d6280ac6d56770"
 
 SRC_URI = "git://github.com/google/breakpad;name=breakpad \
@@ -42,7 +42,7 @@ SRC_URI = "git://github.com/google/breakpad;name=breakpad \
            file://0001-disable-calls-to-getcontext-with-musl.patch \
            file://0001-lss-Match-syscalls-to-match-musl.patch;patchdir=src/third_party/lss \
            file://mips_asm_sgidefs.patch;patchdir=src/third_party/lss \
-           file://dont-clobber-rsp.patch;patchdir=src/third_party/lss;striplevel=4 \
+           file://0001-Do-not-add-stack-pointer-to-clobber-list.patch;patchdir=src/third_party/lss \
 "
 S = "${WORKDIR}/git"
 
@@ -121,3 +121,5 @@ breakpad_populate_sysroot() {
 #| make: *** [src/client/linux/handler/exception_handler.o] Error 1
 ARM_INSTRUCTION_SET_armv5 = "arm"
 ARM_INSTRUCTION_SET_armv4 = "arm"
+
+TOOLCHAIN = "gcc"

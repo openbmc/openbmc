@@ -13,6 +13,8 @@ PV = "2.0.0+git${SRCPV}"
 SRC_URI = "git://github.com/intel-iot-devkit/${BPN}.git;protocol=http \
            file://0001-CMakeLists.txt-Use-SWIG_SUPPORT_FILES-to-find-the-li.patch \
            file://0001-Use-stdint-types.patch \
+           file://0001-initialize-local-variables-before-use.patch \
+           file://0001-cmake-Disable-Wno-misleading-indentation-with-clang-.patch \
            "
 
 SRC_URI_append_toolchain-clang_x86 = " file://0001-nmea_gps-Link-with-latomic.patch "

@@ -7,19 +7,14 @@ Subject: [PATCH] gstd:yocto compatibility
  gstd/Makefile.am                | 2 +-
  3 files changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/gstd/Makefile.am b/gstd/Makefile.am
-index 13c551d..11fe202 100644
 --- a/gstd/Makefile.am
 +++ b/gstd/Makefile.am
-@@ -49,7 +49,7 @@ bin_PROGRAMS = gstd
+@@ -74,7 +74,7 @@ gstd_CFLAGS = $(GST_CFLAGS)					\
+ 	      -DGSTD_LOG_STATE_DIR=\"$(gstdlogstatedir)\"	\
+ 	      -DGSTD_RUN_STATE_DIR=\"$(gstdrunstatedir)\"
  
- gstd_SOURCES = gstd.c
- gstd_CFLAGS = $(GST_CFLAGS) $(GIO_CFLAGS) $(GJSON_CFLAGS)
--gstd_LDFLAGS = $(GST_LIBS) $(GIO_LIBS) $(GJSON_LIBS) -Wl,-rpath -Wl,$(libdir)
-+gstd_LDFLAGS = $(GST_LIBS) $(GIO_LIBS) $(GJSON_LIBS)
+-gstd_LDFLAGS = $(GST_LIBS) $(GIO_LIBS) $(GIO_UNIX_LIBS) $(GJSON_LIBS) $(LIBD_LIBS) -Wl,-rpath -Wl,$(libdir)
++gstd_LDFLAGS = $(GST_LIBS) $(GIO_LIBS) $(GIO_UNIX_LIBS) $(GJSON_LIBS) $(LIBD_LIBS)
  gstd_LDADD = libgstd-core.la
  
  gstdincludedir = $(includedir)/gstd
--- 
-1.9.1
-

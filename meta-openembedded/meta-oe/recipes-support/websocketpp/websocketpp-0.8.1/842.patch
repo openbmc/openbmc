@@ -1,0 +1,30 @@
+From 7f7e2be01b4fa6580ce27f668e61adf37853ad67 Mon Sep 17 00:00:00 2001
+From: Schrijvers Luc <begasus@gmail.com>
+Date: Wed, 18 Sep 2019 11:35:43 +0200
+Subject: [PATCH] Fix "include" directory installation. the variable
+ INSTALL_INCLUDE_DIR already exists, and defaults to include if not
+ specificied otherwise. Using it allows people to customize the installation
+ from outside, fixing issues with other OS like Haiku
+
+Signed-off-by: Gianfranco Costamagna <costamagnagianfranco@yahoo.it>
+Signed-off-by: Gianfranco Costamagna <locutusofborg@debian.org>
+---
+ cmake/CMakeHelpers.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cmake/CMakeHelpers.cmake b/cmake/CMakeHelpers.cmake
+index 1478f4b..f603632 100644
+--- a/cmake/CMakeHelpers.cmake
++++ b/cmake/CMakeHelpers.cmake
+@@ -80,7 +80,7 @@ macro (final_target)
+     endif ()
+ 
+     install (DIRECTORY ${CMAKE_SOURCE_DIR}/${TARGET_NAME}
+-             DESTINATION include/
++             DESTINATION ${INSTALL_INCLUDE_DIR}/
+              FILES_MATCHING PATTERN "*.hpp*")
+ endmacro ()
+ 
+-- 
+2.17.1
+

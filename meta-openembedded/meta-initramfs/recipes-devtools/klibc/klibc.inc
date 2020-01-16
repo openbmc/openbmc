@@ -37,6 +37,7 @@ S = "${WORKDIR}/klibc-${PV}"
 
 OPTFLAGS = "${TUNE_CCARGS} -Os"
 OPTFLAGS_append_toolchain-clang = " -fno-builtin-bcmp"
+OPTFLAGS_append_toolchain-clang_mipsarch = " -no-integrated-as"
 
 PARALLEL_MAKE = ""
 EXTRA_OEMAKE = "'KLIBCARCH=${KLIBC_ARCH}' \

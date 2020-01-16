@@ -1,0 +1,37 @@
+From d4b2f0922dfdd6040e5e9f62a2565452cf855c42 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Mon, 21 Oct 2019 22:10:56 +0200
+Subject: [PATCH] Do not try to find ZONEINFO - it tries to run compiled code
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Missing configutation does not cause issues: The fallback in modules/clock/system-timezone.c
+matches our default.
+
+Inappropriate [embedded specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ configure.ac | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index c75a9fa..0c9d945 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -249,11 +249,6 @@ dnl yelp-tools stuff
+ 
+ YELP_HELP_INIT
+ 
+-dnl **************************************************************************
+-dnl Find zoneinfo directory
+-dnl **************************************************************************
+-
+-AX_ZONEINFO
+ 
+ dnl **************************************************************************
+ dnl Process .in files
+-- 
+2.21.0
+

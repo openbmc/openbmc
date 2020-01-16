@@ -1,0 +1,83 @@
+From df7190f430f30ee522f56f9714d42ee796f0d5ff Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 2 Dec 2019 22:18:41 -0800
+Subject: [PATCH] Disable webkit component
+
+It asks for enable JUCER_ENABLE_GPL_MODE
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ extras/Projucer/Builds/LinuxMakefile/Makefile | 10 +++++-----
+ extras/Projucer/JuceLibraryCode/AppConfig.h   |  4 ++--
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/extras/Projucer/Builds/LinuxMakefile/Makefile b/extras/Projucer/Builds/LinuxMakefile/Makefile
+index 25b490460..8960f5bc6 100644
+--- a/extras/Projucer/Builds/LinuxMakefile/Makefile
++++ b/extras/Projucer/Builds/LinuxMakefile/Makefile
+@@ -35,13 +35,13 @@ ifeq ($(CONFIG),Debug)
+     TARGET_ARCH := -march=native
+   endif
+ 
+-  JUCE_CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DDEBUG=1 -D_DEBUG=1 -DJUCER_LINUX_MAKE_6D53C8B4=1 -DJUCE_APP_VERSION=5.4.5 -DJUCE_APP_VERSION_HEX=0x50405 $(shell pkg-config --cflags x11 xinerama xext freetype2 webkit2gtk-4.0 gtk+-x11-3.0) -pthread -I../../JuceLibraryCode -I../../../../modules $(CPPFLAGS)
++  JUCE_CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DDEBUG=1 -D_DEBUG=1 -DJUCER_LINUX_MAKE_6D53C8B4=1 -DJUCE_APP_VERSION=5.4.5 -DJUCE_APP_VERSION_HEX=0x50405 $(shell pkg-config --cflags x11 xinerama xext freetype2) -pthread -I../../JuceLibraryCode -I../../../../modules $(CPPFLAGS)
+   JUCE_CPPFLAGS_APP := -DJucePlugin_Build_VST=0 -DJucePlugin_Build_VST3=0 -DJucePlugin_Build_AU=0 -DJucePlugin_Build_AUv3=0 -DJucePlugin_Build_RTAS=0 -DJucePlugin_Build_AAX=0 -DJucePlugin_Build_Standalone=0 -DJucePlugin_Build_Unity=0
+   JUCE_TARGET_APP := Projucer
+ 
+   JUCE_CFLAGS += $(JUCE_CPPFLAGS) $(TARGET_ARCH) -g -ggdb -O0 $(CFLAGS)
+   JUCE_CXXFLAGS += $(JUCE_CFLAGS) -std=c++11 $(CXXFLAGS)
+-  JUCE_LDFLAGS += $(TARGET_ARCH) -L$(JUCE_BINDIR) -L$(JUCE_LIBDIR) $(shell pkg-config --libs x11 xinerama xext freetype2 webkit2gtk-4.0 gtk+-x11-3.0) -lrt -ldl -lpthread $(LDFLAGS)
++  JUCE_LDFLAGS += $(TARGET_ARCH) -L$(JUCE_BINDIR) -L$(JUCE_LIBDIR) $(shell pkg-config --libs x11 xinerama xext freetype2) -lrt -ldl -lpthread $(LDFLAGS)
+ 
+   CLEANCMD = rm -rf $(JUCE_OUTDIR)/$(TARGET) $(JUCE_OBJDIR)
+ endif
+@@ -56,13 +56,13 @@ ifeq ($(CONFIG),Release)
+     TARGET_ARCH := -march=native
+   endif
+ 
+-  JUCE_CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DNDEBUG=1 -DJUCER_LINUX_MAKE_6D53C8B4=1 -DJUCE_APP_VERSION=5.4.5 -DJUCE_APP_VERSION_HEX=0x50405 $(shell pkg-config --cflags x11 xinerama xext freetype2 webkit2gtk-4.0 gtk+-x11-3.0) -pthread -I../../JuceLibraryCode -I../../../../modules $(CPPFLAGS)
++  JUCE_CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DNDEBUG=1 -DJUCER_LINUX_MAKE_6D53C8B4=1 -DJUCE_APP_VERSION=5.4.5 -DJUCE_APP_VERSION_HEX=0x50405 $(shell pkg-config --cflags x11 xinerama xext freetype2) -pthread -I../../JuceLibraryCode -I../../../../modules $(CPPFLAGS)
+   JUCE_CPPFLAGS_APP := -DJucePlugin_Build_VST=0 -DJucePlugin_Build_VST3=0 -DJucePlugin_Build_AU=0 -DJucePlugin_Build_AUv3=0 -DJucePlugin_Build_RTAS=0 -DJucePlugin_Build_AAX=0 -DJucePlugin_Build_Standalone=0 -DJucePlugin_Build_Unity=0
+   JUCE_TARGET_APP := Projucer
+ 
+   JUCE_CFLAGS += $(JUCE_CPPFLAGS) $(TARGET_ARCH) -O3 $(CFLAGS)
+   JUCE_CXXFLAGS += $(JUCE_CFLAGS) -std=c++11 $(CXXFLAGS)
+-  JUCE_LDFLAGS += $(TARGET_ARCH) -L$(JUCE_BINDIR) -L$(JUCE_LIBDIR) $(shell pkg-config --libs x11 xinerama xext freetype2 webkit2gtk-4.0 gtk+-x11-3.0) -fvisibility=hidden -lrt -ldl -lpthread $(LDFLAGS)
++  JUCE_LDFLAGS += $(TARGET_ARCH) -L$(JUCE_BINDIR) -L$(JUCE_LIBDIR) $(shell pkg-config --libs x11 xinerama xext freetype2) -fvisibility=hidden -lrt -ldl -lpthread $(LDFLAGS)
+ 
+   CLEANCMD = rm -rf $(JUCE_OUTDIR)/$(TARGET) $(JUCE_OBJDIR)
+ endif
+@@ -136,7 +136,7 @@ all : $(JUCE_OUTDIR)/$(JUCE_TARGET_APP)
+ 
+ $(JUCE_OUTDIR)/$(JUCE_TARGET_APP) : $(OBJECTS_APP) $(RESOURCES)
+ 	@command -v pkg-config >/dev/null 2>&1 || { echo >&2 "pkg-config not installed. Please, install it."; exit 1; }
+-	@pkg-config --print-errors x11 xinerama xext freetype2 webkit2gtk-4.0 gtk+-x11-3.0
++	@pkg-config --print-errors x11 xinerama xext freetype2
+ 	@echo Linking "Projucer - App"
+ 	-$(V_AT)mkdir -p $(JUCE_BINDIR)
+ 	-$(V_AT)mkdir -p $(JUCE_LIBDIR)
+diff --git a/extras/Projucer/JuceLibraryCode/AppConfig.h b/extras/Projucer/JuceLibraryCode/AppConfig.h
+index dffd5af75..53302bd24 100644
+--- a/extras/Projucer/JuceLibraryCode/AppConfig.h
++++ b/extras/Projucer/JuceLibraryCode/AppConfig.h
+@@ -32,7 +32,7 @@
+ // BEGIN SECTION A
+ 
+ #ifndef JUCER_ENABLE_GPL_MODE
+- #define JUCER_ENABLE_GPL_MODE 0
++ #define JUCER_ENABLE_GPL_MODE 1
+ #endif
+ 
+ // END SECTION A
+@@ -180,7 +180,7 @@
+ // juce_gui_extra flags:
+ 
+ #ifndef    JUCE_WEB_BROWSER
+- //#define JUCE_WEB_BROWSER 1
++ #define JUCE_WEB_BROWSER 0
+ #endif
+ 
+ #ifndef    JUCE_ENABLE_LIVE_CONSTANT_EDITOR
+-- 
+2.24.0
+

@@ -8,11 +8,9 @@ Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
  src/client/linux/handler/exception_handler.cc | 17 +++++++++++++++++
  1 file changed, 17 insertions(+)
 
-Index: git/src/client/linux/handler/exception_handler.cc
-===================================================================
---- git.orig/src/client/linux/handler/exception_handler.cc
-+++ git/src/client/linux/handler/exception_handler.cc
-@@ -495,7 +495,19 @@ bool ExceptionHandler::SimulateSignalDel
+--- a/src/client/linux/handler/exception_handler.cc
++++ b/src/client/linux/handler/exception_handler.cc
+@@ -490,7 +490,19 @@ bool ExceptionHandler::SimulateSignalDel
    siginfo.si_code = SI_USER;
    siginfo.si_pid = getpid();
    ucontext_t context;
@@ -32,7 +30,7 @@ Index: git/src/client/linux/handler/exception_handler.cc
    return HandleSignal(sig, &siginfo, &context);
  }
  
-@@ -680,9 +692,14 @@ bool ExceptionHandler::WriteMinidump() {
+@@ -675,9 +687,14 @@ bool ExceptionHandler::WriteMinidump() {
    sys_prctl(PR_SET_DUMPABLE, 1, 0, 0, 0);
  
    CrashContext context;

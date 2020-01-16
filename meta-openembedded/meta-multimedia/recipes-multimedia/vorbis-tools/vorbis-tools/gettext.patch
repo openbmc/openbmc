@@ -1,0 +1,37 @@
+Fix build with gettext 0.20.x
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -2,8 +2,8 @@
+ 
+ AUTOMAKE_OPTIONS = foreign dist-zip
+ 
+-SUBDIRS = po intl include share debian win32 @OPT_SUBDIRS@
+-DIST_SUBDIRS = po intl include share debian win32 ogg123 oggenc oggdec ogginfo \
++SUBDIRS = po include share debian win32 @OPT_SUBDIRS@
++DIST_SUBDIRS = po include share debian win32 ogg123 oggenc oggdec ogginfo \
+ 	vcut vorbiscomment m4
+ 
+ EXTRA_DIST = config.rpath README AUTHORS COPYING CHANGES vorbis-tools.spec config.h mkinstalldirs
+--- a/configure.ac
++++ b/configure.ac
+@@ -31,7 +31,7 @@ CFLAGS="$cflags_save"
+ AC_PROG_LIBTOOL
+ 
+ ALL_LINGUAS="be cs da en_GB eo es fr hr hu nl pl ro ru sk sv uk vi"
+-AM_GNU_GETTEXT
++AM_GNU_GETTEXT([external])
+ 
+ dnl --------------------------------------------------
+ dnl System checks
+@@ -383,7 +383,6 @@ AC_OUTPUT([
+ Makefile
+ m4/Makefile
+ po/Makefile.in
+-intl/Makefile
+ include/Makefile
+ share/Makefile
+ win32/Makefile

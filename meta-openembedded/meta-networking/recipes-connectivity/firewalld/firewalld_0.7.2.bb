@@ -66,6 +66,7 @@ do_install_append() {
 
 FILES_${PN} += "\
     ${PYTHON_SITEPACKAGES_DIR}/firewall \
+    ${nonarch_libdir}/firewalld \
     ${datadir}/dbus-1 \
     ${datadir}/polkit-1 \
     ${datadir}/metainfo \

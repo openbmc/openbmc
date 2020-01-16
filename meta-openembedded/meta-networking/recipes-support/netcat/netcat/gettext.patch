@@ -1,0 +1,16 @@
+Fix build with gettext 0.20.x
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -49,7 +49,7 @@ AC_SUBST(all_libraries)
+ dnl I18n support
+ ALL_LINGUAS="it sk"
+ AM_GNU_GETTEXT([external], need-ngettext)
+-AM_INTL_SUBDIR
++#AM_INTL_SUBDIR
+ 
+ dnl find resolver functions and the socket library on some broken OS
+ AC_LBL_LIBRARY_NET

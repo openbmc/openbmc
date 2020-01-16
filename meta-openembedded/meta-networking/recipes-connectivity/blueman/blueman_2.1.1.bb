@@ -15,6 +15,7 @@ SRC_URI[md5sum] = "9de89abb31be45bdbf11f7884764a2dc"
 SRC_URI[sha256sum] = "f1eab2334e5a1587defa80900901048d14c2e8ffa8c0cff7240bc9937a61dbc3"
 
 EXTRA_OECONF = " \
+    --disable-appindicator \
     --disable-runtime-deps-check \
     --disable-schemas-compile \
 "

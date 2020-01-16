@@ -11,3 +11,5 @@ SRC_URI[sha256sum] = "c192ba86648e05fdae4f08a17ec25180a9aef5008d973407b581798a83
 RDEPENDS_${PN} += " \
     ${PYTHON_PN}-json \
 "
+
+BBCLASSEXTEND = "native nativesdk"

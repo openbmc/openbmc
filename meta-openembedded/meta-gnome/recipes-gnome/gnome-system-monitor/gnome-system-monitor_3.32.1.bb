@@ -14,7 +14,7 @@ DEPENDS = " \
 
 GNOMEBASEBUILDCLASS = "meson"
 
-inherit gnomebase gnome-help itstool gtk-icon-cache features_check gettext upstream-version-is-even
+inherit gnomebase gsettings gnome-help itstool gtk-icon-cache features_check gettext upstream-version-is-even
 
 REQUIRED_DISTRO_FEATURES = "x11 polkit"
 

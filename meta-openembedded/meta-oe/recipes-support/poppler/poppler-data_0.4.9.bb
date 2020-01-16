@@ -1,6 +1,7 @@
 SUMMARY = "Encoding files for Poppler"
 DESCRIPTION = "Encoding files for use with poppler that enable poppler to \
                correctly render CJK and Cyrrilic."
+HOMEPAGE = "https://poppler.freedesktop.org/"
 LICENSE = "BSD & GPLv2 & GPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4870b98343f0bbb25fa43b9d2ba59448 \
                     file://COPYING.adobe;md5=63c6a8a9df204c00461fa5f163d8a663 \

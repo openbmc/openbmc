@@ -4,7 +4,7 @@ SECTION = "libs"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b1becf0cfa3366e0f4d854d1d264f311"
 
-SRC_URI = "http://archive.mariadb.org/${BP}/source/${BP}.tar.gz \
+SRC_URI = "https://downloads.mariadb.org/interstitial/${BP}/source/${BP}.tar.gz \
            file://my.cnf \
            file://mysqld.service \
            file://install_db.service \
@@ -18,9 +18,11 @@ SRC_URI = "http://archive.mariadb.org/${BP}/source/${BP}.tar.gz \
            file://c11_atomics.patch \
            file://clang_version_header_conflict.patch \
            file://fix-arm-atomic.patch \
+           file://0001-Fix-build-breakage-from-lock_guard-error-6161.patch \
+           file://0001-Fix-library-LZ4-lookup.patch \
           "
-SRC_URI[md5sum] = "b3524c0825c3a1c255496daea38304a0"
-SRC_URI[sha256sum] = "69456ca85bf9d96c6d28b4ade2a9f6787d79a602e27ef941f9ba4e0b55dddedc"
+SRC_URI[md5sum] = "d0de881ab8ead46928cafb7d558535c1"
+SRC_URI[sha256sum] = "4c076232b99433b09eb3c6d62f607192b3474d022703699b8f6aef4e79de3fb9"
 
 UPSTREAM_CHECK_URI = "https://github.com/MariaDB/server/releases"
 

@@ -1,0 +1,29 @@
+From c86c524f951f6e973473bfee76fd5366368b2cbc Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 25 Dec 2019 09:32:41 -0800
+Subject: [PATCH] Fix narrowing conversion error
+
+xplc/moduleloader.cc: In static member function 'static Module* Module::loadModule(const char*)':                                                                                                                                             xplc/moduleloader.cc:67:14: error: narrowing conversion of '-1' from 'int' to 'unsigned int' [-Wnarrowing]                                                                                                                                       67 |   case (int)-1:                                                                                                                                                                                                                             |              ^
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ xplc/moduleloader.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xplc/moduleloader.cc b/xplc/moduleloader.cc
+index 02dd9a4..c53f5d2 100644
+--- a/xplc/moduleloader.cc
++++ b/xplc/moduleloader.cc
+@@ -62,7 +62,7 @@ Module* Module::loadModule(const char* modulename) {
+     return NULL;
+   }
+ 
+-  switch(moduleinfo->version_major) {
++  switch((int)moduleinfo->version_major) {
+ #ifdef UNSTABLE
+   case -1:
+     /* nothing to do */
+-- 
+2.24.1
+

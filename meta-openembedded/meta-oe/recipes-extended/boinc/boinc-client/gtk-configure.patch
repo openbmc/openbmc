@@ -1,13 +1,20 @@
-Check for gtk2+ only when manager is enabled
+From d53e9617fb6446780478bb13907efd111f241cd1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 3 Nov 2016 01:20:33 -0700
+Subject: [PATCH] Check for gtk2+ only when manager is enabled
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Upstream-Status: Pending
 
-Index: boinc-client_release-7.6-7.6.33/configure.ac
-===================================================================
---- boinc-client_release-7.6-7.6.33.orig/configure.ac
-+++ boinc-client_release-7.6-7.6.33/configure.ac
-@@ -1033,6 +1033,11 @@ else
+---
+ configure.ac | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 7beeb34ae2..35234c2762 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1018,6 +1018,11 @@ else
    AM_CONDITIONAL([GUI_GTK], false)
  fi
  
@@ -19,7 +26,7 @@ Index: boinc-client_release-7.6-7.6.33/configure.ac
  dnl ---------- libNotify --------------------------------------------------
  if test "${enable_manager}" = yes ; then
    PKG_CHECK_MODULES(LIBNOTIFY, [libnotify])
-@@ -1082,7 +1087,6 @@ AM_CONDITIONAL(ENABLE_BOINCCRYPT, [test
+@@ -1069,7 +1074,6 @@ AM_CONDITIONAL(ENABLE_BOINCCRYPT, [test "x${enable_server}" = xyes  || test "x${
  AM_CONDITIONAL(INSTALL_HEADERS, [test "${enable_install_headers}" = yes])
  AM_CONDITIONAL(HAVE_CUDA_LIB, [test "${enable_client}" = yes -a -f ./coprocs/CUDA/posix/${boinc_platform}/libcudart.so])
  

@@ -7,6 +7,4 @@ EXTRA_OEMAKE += " \
     KVER=${KERNEL_VERSION} \
 "
 
-do_compile() {
-    oe_runmake modules
-}
+MAKE_TARGETS = "modules"

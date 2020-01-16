@@ -17,6 +17,11 @@ SRC_URI[sha256sum] = "5bf1906aff9ffc3eeacf32567270f4d819055d8386d98b9c8c05519012
 # Perl5 is for tests only
 EXTRA_OECONF = "--without-perl5 --with-mnttab=/proc/mounts"
 
+# use with caution - default properties are configured to trace
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[log4cplus] = "--with-log4cplus,--without-log4cplus,log4cplus"
+PACKAGECONFIG[logging] = "--enable-logging,--disable-logging,"
+
 inherit autotools pkgconfig
 
 FILES_statgrab = "${bindir}/statgrab"

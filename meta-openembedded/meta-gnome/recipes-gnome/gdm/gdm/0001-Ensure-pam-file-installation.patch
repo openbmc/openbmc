@@ -1,0 +1,48 @@
+From f7bba53adf8a26f900442a05bb98326747c392b4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Tue, 3 Dec 2019 00:24:27 +0100
+Subject: [PATCH] Ensure pam-file installation
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+All the detection magic does not work for us
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ data/Makefile.am | 12 +-----------
+ 1 file changed, 1 insertion(+), 11 deletions(-)
+
+diff --git a/data/Makefile.am b/data/Makefile.am
+index bda9160..dbc3ea3 100644
+--- a/data/Makefile.am
++++ b/data/Makefile.am
+@@ -296,22 +296,12 @@ endif
+ 		chown root:root $(DESTDIR)$(logdir) || : ; \
+ 	fi
+ 
+-	system=`uname`; \
+-	if test -f /usr/include/security/pam_appl.h; then \
+-	  if test '!' -d $(DESTDIR)$(PAM_PREFIX)/pam.d; then \
+ 		$(mkinstalldirs) $(DESTDIR)$(PAM_PREFIX)/pam.d; \
+ 		chmod 755 $(DESTDIR)$(PAM_PREFIX)/pam.d; \
+-	   fi; \
+-	   if test $$system = Linux; then \
+ 	     for pamfile in $(pam_files); do \
+ 	       bn=$$(basename $$pamfile .pam); \
+ 	       $(INSTALL_DATA) $(srcdir)/$$pamfile $(DESTDIR)$(PAM_PREFIX)/pam.d/$$bn; \
+-	     done; \
+-	   fi; \
+-	   if test $$system = SunOS; then \
+-		echo "Please add PAM authentication for gdm, gdm-autologin and gdm-welcome in $(PAM_PREFIX)/pam.conf!"; \
+-	   fi; \
+-	fi
++	     done;
+ 
+ 	if test '!' -d $(DESTDIR)$(xauthdir); then \
+ 		$(mkinstalldirs) $(DESTDIR)$(xauthdir); \
+-- 
+2.21.0
+

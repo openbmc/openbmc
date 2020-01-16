@@ -1,0 +1,38 @@
+From c7a4efb8bccb52e1714c151929c23e12bde59b82 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Wed, 4 Jul 2018 15:00:44 +0800
+Subject: [PATCH 17/24] Do not disable buffering when writing to oom_score_adj
+
+On musl, disabling buffering when writing to oom_score_adj will
+cause the following error.
+
+  Failed to adjust OOM setting: Invalid argument
+
+This error appears for systemd-udevd.service and dbus.service.
+This is because kernel receives '-' instead of the whole '-900'
+if buffering is disabled.
+
+This is libc implementation specific, as glibc does not have this issue.
+
+Upstream-Status: Inappropriate [musl specific]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+[rebased for systemd 243]
+Signed-off-by: Scott Murray <scott.murray@konsulko.com>
+---
+ src/basic/process-util.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/basic/process-util.c b/src/basic/process-util.c
+index b1c08fcade..0a7a1f7d89 100644
+--- a/src/basic/process-util.c
++++ b/src/basic/process-util.c
+@@ -1474,7 +1474,7 @@ int set_oom_score_adjust(int value) {
+         sprintf(t, "%i", value);
+ 
+         return write_string_file("/proc/self/oom_score_adj", t,
+-                                 WRITE_STRING_FILE_VERIFY_ON_FAILURE|WRITE_STRING_FILE_DISABLE_BUFFER);
++                                 WRITE_STRING_FILE_VERIFY_ON_FAILURE);
+ }
+ 
+ static const char *const ioprio_class_table[] = {

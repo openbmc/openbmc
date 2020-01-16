@@ -32,7 +32,7 @@ export SWIG_FEATURES
 #
 do_configure_prepend() {
     ${CPP} -dM - < /dev/null | grep -v '__\(STDC\|REGISTER_PREFIX\|GNUC\|STDC_HOSTED\)__' \
-    | sed 's/^\(#define \([^ ]*\) .*\)$/#undef \2\n\1/' > SWIG/gcc_macros.h
+    | sed 's/^\(#define \([^ ]*\) .*\)$/#undef \2\n\1/' > ${S}/SWIG/gcc_macros.h
 
     if [ "${SITEINFO_BITS}" = "64" ];then
         bit="64"
@@ -42,11 +42,11 @@ do_configure_prepend() {
 
     if [ -e ${STAGING_INCDIR}/openssl/opensslconf-${bit}.h ] ;then
         for i in SWIG/_ec.i SWIG/_evp.i; do
-            sed -i -e "s/opensslconf.*\./opensslconf-${bit}\./" "$i"
+            sed -i -e "s/opensslconf.*\./opensslconf-${bit}\./" "${S}/$i"
         done
     elif [ -e ${STAGING_INCDIR}/openssl/opensslconf-n${bit}.h ] ;then
         for i in SWIG/_ec.i SWIG/_evp.i; do
-            sed -i -e "s/opensslconf.*\./opensslconf-n${bit}\./" "$i"
+            sed -i -e "s/opensslconf.*\./opensslconf-n${bit}\./" "${S}/$i"
         done
     fi
 }

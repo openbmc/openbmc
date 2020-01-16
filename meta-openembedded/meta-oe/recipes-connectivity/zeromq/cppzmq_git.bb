@@ -4,8 +4,8 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=db174eaf7b55a34a7c89551197f66e94"
 DEPENDS = "zeromq"
 
-SRCREV = "f5b36e563598d48fcc0d82e589d3596afef945ae"
-PV = "4.4.1"
+SRCREV = "e67fa0e16d7964876228952f60693f5c03ea0cc1"
+PV = "4.5.0"
 
 SRC_URI = "git://github.com/zeromq/cppzmq.git"
 

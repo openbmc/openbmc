@@ -10,8 +10,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
 SRCREV = "4ca006fed80410bd9b061a1519bd5d9366bb0bc8"
 SRC_URI = "git://github.com/LibVNC/x11vnc \
            file://starting-fix.patch \
-	   file://0001-misc-Makefile.am-don-t-install-Xdummy-when-configure.patch \
-"
+           file://0001-misc-Makefile.am-don-t-install-Xdummy-when-configure.patch \
+           file://0001-Fix-build-on-32bit-arches-with-64bit-time_t.patch \
+           "
 S = "${WORKDIR}/git"
 
 DEPENDS = "\

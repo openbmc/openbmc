@@ -17,7 +17,7 @@ SRC_URI = " \
 
 S = "${WORKDIR}/git"
 
-FILES_${PN} += "${libdir}/python2.7/dist-packages ${libdir}/python3.7/site-packages"
+FILES_${PN} += "${libdir}/python2.7/dist-packages ${libdir}/python3.*/site-packages"
 
 PACKAGECONFIG ??= "python3 lvm dm kmod parted fs escrow btrfs crypto mdraid kbd mpath nvdimm"
 PACKAGECONFIG[python3] = "--with-python3, --without-python3,,python3"

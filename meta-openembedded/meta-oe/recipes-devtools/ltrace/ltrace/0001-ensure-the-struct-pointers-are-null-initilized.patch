@@ -1,0 +1,46 @@
+From 67a8fa478a4484bc4dbfb3ac74e11be1dd5af594 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 23 Dec 2019 19:35:48 -0800
+Subject: [PATCH] ensure the struct pointers are null initilized
+
+Do not delete if pointer is already null
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ expr.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/expr.c b/expr.c
+index 4059a32..5ffd0ad 100644
+--- a/expr.c
++++ b/expr.c
+@@ -189,10 +189,8 @@ int
+ expr_clone(struct expr_node *retp, const struct expr_node *node)
+ {
+ 	*retp = *node;
+-
++	struct expr_node *nlhs = 0, *nrhs = 0;
+ 	switch (node->kind) {
+-		struct expr_node *nlhs;
+-		struct expr_node *nrhs;
+ 
+ 	case EXPR_OP_ARGNO:
+ 	case EXPR_OP_SELF:
+@@ -236,8 +234,10 @@ expr_clone(struct expr_node *retp, const struct expr_node *node)
+ 		if (expr_alloc_and_clone(&nlhs, node->lhs, node->own_lhs) < 0) {
+ 			if (node->kind == EXPR_OP_CALL2
+ 			    && node->u.call.own_rhs) {
+-				expr_destroy(nrhs);
+-				free(nrhs);
++				if (nrhs) {
++					expr_destroy(nrhs);
++					free(nrhs);
++				}
+ 				return -1;
+ 			}
+ 		}
+-- 
+2.24.1
+

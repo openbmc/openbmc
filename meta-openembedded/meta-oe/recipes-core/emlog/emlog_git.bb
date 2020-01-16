@@ -19,4 +19,4 @@ do_install() {
    install -Dm 0755 ${S}/mkemlog ${D}${bindir}/mkemlog
 }
 
-RDEPENDS_${PN} += "kernel-module-emlog"
+RRECOMMENDS_${PN} += "kernel-module-emlog"

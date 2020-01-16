@@ -65,5 +65,6 @@ FILES_${PN}-dev += " \
 
 FILES_${PN}-utils = "${bindir}/*"
 
+RRECOMMENDS_${PN} += "kernel-module-sctp"
 RRECOMMENDS_${PN}-utils += "kernel-module-sctp"
 RRECOMMENDS_${PN}-ptest += "kernel-module-sctp"

@@ -11,6 +11,7 @@ SRC_URI = "hg://linuxtv.org/hg;module=dvb-apps;protocol=http \
           file://0004-Makefile-remove-test.patch \
           file://0005-libucsi-optimization-removal.patch \
           file://0006-CA_SET_PID.patch \
+          file://0001-dvbdate-Remove-Obsoleted-stime-API-calls.patch \
           "
 
 S = "${WORKDIR}/${BPN}"

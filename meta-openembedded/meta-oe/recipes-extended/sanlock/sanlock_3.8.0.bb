@@ -9,13 +9,16 @@ HOMEPAGE = "https://pagure.io/sanlock"
 SECTION = "utils"
 
 LICENSE = "LGPLv2+ & GPLv2 & GPLv2+"
-LIC_FILES_CHKSUM = "file://README.license;md5=60487bf0bf429d6b5aa72b6d37a0eb22"
+LIC_FILES_CHKSUM = "file://../README.license;md5=60487bf0bf429d6b5aa72b6d37a0eb22"
+
+PV .= "+git${SRCPV}"
 
 SRC_URI = "git://pagure.io/sanlock.git;protocol=http \
-           file://0001-sanlock-Replace-cp-a-with-cp-R-no-dereference-preser.patch \
+           file://0001-sanlock-Replace-cp-a-with-cp-R-no-dereference-preser.patch;patchdir=../ \
           "
-SRCREV = "7afe0e66f5c7f24894896fad20ffa6f39733d80f"
-S = "${WORKDIR}/git"
+SRCREV = "cff348800722f7dadf030ffe7494c2df714996e3"
+
+S = "${WORKDIR}/git/python"
 
 DEPENDS = "libaio util-linux"
 
@@ -24,15 +27,13 @@ inherit distutils3 useradd
 do_configure[noexec] = "1"
 
 do_compile_prepend () {
-    oe_runmake -C wdmd CMD_LDFLAGS="${LDFLAGS}" LIB_LDFLAGS="${LDFLAGS}"
-    oe_runmake -C src CMD_LDFLAGS="${LDFLAGS}" LIB_ENTIRE_LDFLAGS="${LDFLAGS}" LIB_CLIENT_LDFLAGS="${LDFLAGS}"
-    cd ${S}/python
+    oe_runmake -C ${S}/../wdmd CMD_LDFLAGS="${LDFLAGS}" LIB_LDFLAGS="${LDFLAGS}"
+    oe_runmake -C ${S}/../src CMD_LDFLAGS="${LDFLAGS}" LIB_ENTIRE_LDFLAGS="${LDFLAGS}" LIB_CLIENT_LDFLAGS="${LDFLAGS}"
 }
 
 do_install_prepend () {
-    oe_runmake -C wdmd DESTDIR=${D} LIBDIR=${libdir} install
-    oe_runmake -C src DESTDIR=${D} LIBDIR=${libdir} install
-    cd ${S}/python
+    oe_runmake -C ${S}/../wdmd DESTDIR=${D} LIBDIR=${libdir} install
+    oe_runmake -C ${S}/../src DESTDIR=${D} LIBDIR=${libdir} install
 }
 
 SANLOCKGROUP ?= "sanlock"

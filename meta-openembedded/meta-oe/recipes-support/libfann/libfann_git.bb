@@ -15,3 +15,5 @@ SRC_URI = "git://github.com/libfann/fann.git;branch=master \
 PV = "2.2.0+git${SRCPV}"
 
 S = "${WORKDIR}/git"
+
+EXTRA_OECMAKE = "-DLIB_SUFFIX=${@d.getVar('baselib').replace('lib', '')}"

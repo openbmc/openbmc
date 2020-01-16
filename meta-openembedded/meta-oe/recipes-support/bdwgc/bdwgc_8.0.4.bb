@@ -21,11 +21,10 @@ SECTION = "devel"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://README.QUICK;md5=81b447d779e278628c843aef92f088fa"
 
-SRCREV = "d3dede3ce4462cd82a15f161af797ca51654546a"
-SRC_URI = "git://github.com/ivmai/bdwgc.git;branch=release-8_0 \
-          "
+DEPENDS = "libatomic-ops"
 
-FILES_${PN}-doc = "${datadir}"
+SRCREV = "d3dede3ce4462cd82a15f161af797ca51654546a"
+SRC_URI = "git://github.com/ivmai/bdwgc.git;branch=release-8_0"
 
 S = "${WORKDIR}/git"
 
@@ -33,12 +32,10 @@ ARM_INSTRUCTION_SET = "arm"
 
 inherit autotools pkgconfig
 
-# by default use external libatomic-ops
-PACKAGECONFIG ??= "libatomic-ops"
-PACKAGECONFIG[libatomic-ops] = "--with-libatomic-ops=yes,--with-libatomic-ops=no,libatomic-ops"
-
 EXTRA_OECONF += "--enable-cpluscplus"
 
 CFLAGS_append_libc-musl = " -D_GNU_SOURCE -DNO_GETCONTEXT -DSEARCH_FOR_DATA_START -DUSE_MMAP -DHAVE_DL_ITERATE_PHDR"
+
+FILES_${PN}-doc = "${datadir}"
 
 BBCLASSEXTEND = "native nativesdk"

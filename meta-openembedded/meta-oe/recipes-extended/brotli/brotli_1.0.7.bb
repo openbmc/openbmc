@@ -12,3 +12,9 @@ SRCREV= "d6d98957ca8ccb1ef45922e978bb10efca0ea541"
 S = "${WORKDIR}/git"
 
 inherit cmake lib_package
+
+do_install_append () {
+	for lib in $(ls ${D}${libdir}/*-static.a); do
+		mv -v "${lib}" "$(echo ${lib} | sed s/-static//)"
+	done
+}

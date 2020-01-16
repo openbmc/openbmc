@@ -53,4 +53,5 @@ FILES_${PN} = " \
   "
 
 PACKAGECONFIG[sysfsgpio] = "--enable-sysfsgpio,--disable-sysfsgpio"
-PACKAGECONFIG ??= "sysfsgpio"
+PACKAGECONFIG[remote-bitbang] = "--enable-remote-bitbang,--disable-remote-bitbang"
+PACKAGECONFIG ??= "sysfsgpio remote-bitbang"

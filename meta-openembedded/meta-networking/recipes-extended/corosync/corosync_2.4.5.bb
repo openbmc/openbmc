@@ -9,6 +9,7 @@ inherit autotools pkgconfig systemd useradd
 
 SRC_URI = "http://build.clusterlabs.org/corosync/releases/${BP}.tar.gz \
            file://corosync.conf \
+           file://0001-configure.ac-fix-pkgconfig-issue-of-rdma.patch \
           "
 
 SRC_URI[md5sum] = "e36a056b893c313c4ec1fe0d7e6cdebd"
@@ -36,7 +37,7 @@ PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)} \
 PACKAGECONFIG[dbus] = "--enable-dbus,--disable-dbus,dbus"
 PACKAGECONFIG[qdevice] = "--enable-qdevices,--disable-qdevices"
 PACKAGECONFIG[qnetd] = "--enable-qnetd,--disable-qnetd"
-PACKAGECONFIG[rdma] = "--enable-rdma,--disable-rdma,librdmacm"
+PACKAGECONFIG[rdma] = "--enable-rdma,--disable-rdma,rdma-core"
 PACKAGECONFIG[snmp] = "--enable-snmp,--disable-snmp,net-snmp"
 PACKAGECONFIG[systemd] = "--enable-systemd --with-systemddir=${systemd_system_unitdir},--disable-systemd --without-systemddir,systemd"
 

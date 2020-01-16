@@ -1,0 +1,33 @@
+From d41e2bef1c39dcbc4896b1dd7ab168da530672b5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 30 Dec 2019 13:33:39 -0800
+Subject: [PATCH] cmake: Disable -Wno-misleading-indentation with clang-10 onwards
+
+clang also introduced this warning now
+
+Upstream-Status: Submitted [https://github.com/eclipse/upm/pull/693]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 069e4902..47c7f4c3 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -99,6 +99,11 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_
+   list (APPEND C_CXX_WARNING_FLAGS -Wno-misleading-indentation)
+ endif ()
+ 
++# clang-10 added  -Wmisleading-indentation as well, skipp it too
++if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "9")
++  list (APPEND C_CXX_WARNING_FLAGS -Wno-misleading-indentation)
++endif ()
++
+ # Warnings as errors?
+ if (WERROR)
+   list (APPEND C_CXX_WARNING_FLAGS -Werror)
+-- 
+2.24.1
+

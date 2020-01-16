@@ -1,0 +1,19 @@
+Define _GNU_SOURCE to get PTHREAD_MUTEX_INITIALIZER
+
+Fixes
+| zmalloc.c:87:37: error: 'PTHREAD_MUTEX_DEFAULT' undeclared here (not in a function)
+|    87 | pthread_mutex_t used_memory_mutex = PTHREAD_MUTEX_INITIALIZER;
+|       |                                     ^~~~~~~~~~~~~~~~~~~~~~~~~
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/src/zmalloc.c
++++ b/src/zmalloc.c
+@@ -28,6 +28,7 @@
+  * POSSIBILITY OF SUCH DAMAGE.
+  */
+ 
++#define _GNU_SOURCE
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <stdint.h>

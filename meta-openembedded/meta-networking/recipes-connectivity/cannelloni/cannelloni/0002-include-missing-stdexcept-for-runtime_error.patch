@@ -1,0 +1,32 @@
+From 1788762863cd1f657697575f6e73a22e661ccb43 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 23 Dec 2019 10:32:54 -0800
+Subject: [PATCH 2/2] include missing <stdexcept> for runtime_error
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fixes
+error: ‘runtime_error’ is not a member of ‘std’
+
+Upstream-Status: Submitted [https://github.com/mguentner/cannelloni/pull/22]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ parser.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/parser.cpp b/parser.cpp
+index 4afb9e0..5bcdbde 100644
+--- a/parser.cpp
++++ b/parser.cpp
+@@ -2,6 +2,7 @@
+ 
+ #include <arpa/inet.h>
+ #include <string.h>
++#include <stdexcept>
+ 
+ void parseFrames(uint16_t len, const uint8_t* buffer, std::function<canfd_frame*()> frameAllocator,
+         std::function<void(canfd_frame*, bool)> frameReceiver)
+-- 
+2.24.1
+

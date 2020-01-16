@@ -1,0 +1,227 @@
+Include netinet/if_ether.h
+
+Fixes
+/path/to/systemd/recipe-sysroot/usr/include/netinet/if_ether.h:101:8: error: redefinition of 'struct ethhdr'
+ struct ethhdr {
+        ^~~~~~
+
+and related arphdr, arpreq, and arpreq_old errors
+/path/to/systemd/recipe-sysroot/usr/include/net/if_arp.h:22:8: error: redefinition of 'struct arphdr'
+ struct arphdr {
+        ^~~~~~
+
+The latter requires removing some includes of net/if_arp.h to avoid
+conflicting with netinet/if_ether.h.
+
+Upstream-Status: Inappropriate [musl specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+[rebased for systemd 243]
+Signed-off-by: Scott Murray <scott.murray@konsulko.com>
+
+Upstream-Status: Inappropriate [musl specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+[rebased for systemd 243]
+Signed-off-by: Scott Murray <scott.murray@konsulko.com>
+---
+ src/libsystemd-network/sd-dhcp6-client.c  | 1 -
+ src/libsystemd/sd-netlink/netlink-types.c | 1 +
+ src/machine/machine-dbus.c                | 1 +
+ src/network/netdev/macsec.c               | 1 +
+ src/network/netdev/netdev.c               | 1 +
+ src/network/networkd-brvlan.c             | 1 +
+ src/network/networkd-dhcp-common.c        | 1 +
+ src/network/networkd-dhcp4.c              | 2 +-
+ src/network/networkd-dhcp6.c              | 2 +-
+ src/network/networkd-link.c               | 2 +-
+ src/network/networkd-network.c            | 1 +
+ src/shared/ethtool-util.c                 | 1 +
+ src/shared/ethtool-util.h                 | 1 +
+ src/udev/net/link-config.c                | 1 +
+ src/udev/udev-builtin-net_setup_link.c    | 1 +
+ 15 files changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/src/libsystemd-network/sd-dhcp6-client.c b/src/libsystemd-network/sd-dhcp6-client.c
+index d7a5349c70..68b41dfb6c 100644
+--- a/src/libsystemd-network/sd-dhcp6-client.c
++++ b/src/libsystemd-network/sd-dhcp6-client.c
+@@ -6,7 +6,6 @@
+ #include <errno.h>
+ #include <string.h>
+ #include <sys/ioctl.h>
+-#include <linux/if_arp.h>
+ #include <linux/if_infiniband.h>
+ 
+ #include "sd-dhcp6-client.h"
+diff --git a/src/libsystemd/sd-netlink/netlink-types.c b/src/libsystemd/sd-netlink/netlink-types.c
+index de9b8b21ab..f64f6500f7 100644
+--- a/src/libsystemd/sd-netlink/netlink-types.c
++++ b/src/libsystemd/sd-netlink/netlink-types.c
+@@ -3,6 +3,7 @@
+ #include <netinet/in.h>
+ #include <stdint.h>
+ #include <sys/socket.h>
++#include <netinet/if_ether.h>
+ #include <linux/can/vxcan.h>
+ #include <linux/netlink.h>
+ #include <linux/rtnetlink.h>
+diff --git a/src/machine/machine-dbus.c b/src/machine/machine-dbus.c
+index 0d58b5eb8b..01093c1f62 100644
+--- a/src/machine/machine-dbus.c
++++ b/src/machine/machine-dbus.c
+@@ -4,6 +4,7 @@
+ #include <string.h>
+ #include <sys/mount.h>
+ #include <sys/wait.h>
++#include <netinet/if_ether.h>
+ 
+ /* When we include libgen.h because we need dirname() we immediately
+  * undefine basename() since libgen.h defines it as a macro to the POSIX
+diff --git a/src/network/netdev/macsec.c b/src/network/netdev/macsec.c
+index cf281e75a6..269dc618ff 100644
+--- a/src/network/netdev/macsec.c
++++ b/src/network/netdev/macsec.c
+@@ -1,5 +1,6 @@
+ /* SPDX-License-Identifier: LGPL-2.1+ */
+ 
++#include <netinet/if_ether.h>
+ #include <netinet/in.h>
+ #include <linux/if_ether.h>
+ #include <linux/if_macsec.h>
+diff --git a/src/network/netdev/netdev.c b/src/network/netdev/netdev.c
+index 7735b455b7..ed4eda4a44 100644
+--- a/src/network/netdev/netdev.c
++++ b/src/network/netdev/netdev.c
+@@ -1,5 +1,6 @@
+ /* SPDX-License-Identifier: LGPL-2.1+ */
+ 
++#include <netinet/if_ether.h>
+ #include <net/if.h>
+ #include <netinet/in.h>
+ 
+diff --git a/src/network/networkd-brvlan.c b/src/network/networkd-brvlan.c
+index c3c5d535ac..ebea408c89 100644
+--- a/src/network/networkd-brvlan.c
++++ b/src/network/networkd-brvlan.c
+@@ -4,6 +4,7 @@
+ ***/
+ 
+ #include <netinet/in.h>
++#include <netinet/if_ether.h>
+ #include <linux/if_bridge.h>
+ #include <stdbool.h>
+ 
+diff --git a/src/network/networkd-dhcp-common.c b/src/network/networkd-dhcp-common.c
+index 626b975839..42fe92f320 100644
+--- a/src/network/networkd-dhcp-common.c
++++ b/src/network/networkd-dhcp-common.c
+@@ -1,6 +1,7 @@
+ /* SPDX-License-Identifier: LGPL-2.1+ */
+ 
+ #include "networkd-dhcp-common.h"
++#include <netinet/if_ether.h>
+ #include "networkd-network.h"
+ #include "parse-util.h"
+ #include "string-table.h"
+diff --git a/src/network/networkd-dhcp4.c b/src/network/networkd-dhcp4.c
+index 662770b50e..c6ab62a94d 100644
+--- a/src/network/networkd-dhcp4.c
++++ b/src/network/networkd-dhcp4.c
+@@ -1,8 +1,8 @@
+ /* SPDX-License-Identifier: LGPL-2.1+ */
+ 
++#include <netinet/if_ether.h>
+ #include <netinet/in.h>
+ #include <linux/if.h>
+-#include <linux/if_arp.h>
+ 
+ #include "alloc-util.h"
+ #include "hostname-util.h"
+diff --git a/src/network/networkd-dhcp6.c b/src/network/networkd-dhcp6.c
+index 8ad736a82b..f41b4d834e 100644
+--- a/src/network/networkd-dhcp6.c
++++ b/src/network/networkd-dhcp6.c
+@@ -3,9 +3,9 @@
+   Copyright © 2014 Intel Corporation. All rights reserved.
+ ***/
+ 
++#include <netinet/if_ether.h>
+ #include <netinet/in.h>
+ #include <linux/if.h>
+-#include <linux/if_arp.h>
+ #include "sd-radv.h"
+ 
+ #include "sd-dhcp6-client.h"
+diff --git a/src/network/networkd-link.c b/src/network/networkd-link.c
+index f5bb78890a..f13a36b791 100644
+--- a/src/network/networkd-link.c
++++ b/src/network/networkd-link.c
+@@ -1,8 +1,8 @@
+ /* SPDX-License-Identifier: LGPL-2.1+ */
+ 
++#include <netinet/if_ether.h>
+ #include <netinet/in.h>
+ #include <linux/if.h>
+-#include <linux/if_arp.h>
+ #include <unistd.h>
+ 
+ #include "alloc-util.h"
+diff --git a/src/network/networkd-network.c b/src/network/networkd-network.c
+index 2b8d0eb2fb..2f79ef25cd 100644
+--- a/src/network/networkd-network.c
++++ b/src/network/networkd-network.c
+@@ -1,5 +1,6 @@
+ /* SPDX-License-Identifier: LGPL-2.1+ */
+ 
++#include <netinet/if_ether.h>
+ #include <net/if.h>
+ #include <netinet/in.h>
+ #include <linux/netdevice.h>
+diff --git a/src/shared/ethtool-util.c b/src/shared/ethtool-util.c
+index b0961df72e..53fcbbd84b 100644
+--- a/src/shared/ethtool-util.c
++++ b/src/shared/ethtool-util.c
+@@ -1,5 +1,6 @@
+ /* SPDX-License-Identifier: LGPL-2.1+ */
+ 
++#include <netinet/if_ether.h>
+ #include <net/if.h>
+ #include <sys/ioctl.h>
+ #include <linux/ethtool.h>
+diff --git a/src/shared/ethtool-util.h b/src/shared/ethtool-util.h
+index 8b32b243f3..262b819976 100644
+--- a/src/shared/ethtool-util.h
++++ b/src/shared/ethtool-util.h
+@@ -2,6 +2,7 @@
+ #pragma once
+ 
+ #include <macro.h>
++#include <netinet/if_ether.h>
+ #include <linux/ethtool.h>
+ 
+ #include "conf-parser.h"
+diff --git a/src/udev/net/link-config.c b/src/udev/net/link-config.c
+index d44af64d5e..fd052f1591 100644
+--- a/src/udev/net/link-config.c
++++ b/src/udev/net/link-config.c
+@@ -1,5 +1,6 @@
+ /* SPDX-License-Identifier: LGPL-2.1+ */
+ 
++#include <netinet/if_ether.h>
+ #include <linux/netdevice.h>
+ #include <netinet/ether.h>
+ 
+diff --git a/src/udev/udev-builtin-net_setup_link.c b/src/udev/udev-builtin-net_setup_link.c
+index ee3ca9fa38..9aa4e82874 100644
+--- a/src/udev/udev-builtin-net_setup_link.c
++++ b/src/udev/udev-builtin-net_setup_link.c
+@@ -1,5 +1,6 @@
+ /* SPDX-License-Identifier: LGPL-2.1+ */
+ 
++#include <netinet/if_ether.h>
+ #include "device-util.h"
+ #include "alloc-util.h"
+ #include "link-config.h"

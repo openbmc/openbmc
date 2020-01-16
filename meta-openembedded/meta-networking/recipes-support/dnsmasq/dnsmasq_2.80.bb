@@ -5,5 +5,6 @@ SRC_URI[dnsmasq-2.80.sha256sum] = "9e4a58f816ce0033ce383c549b7d4058ad9b823968d35
 SRC_URI += "\
     file://lua.patch \
     file://0001-dnsmasq-fix-build-against-5.2-headers.patch \
+    file://0001-dnsmasq-fix-memory-leak-in-helper-c.patch \
 "
 

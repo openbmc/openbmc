@@ -1,0 +1,33 @@
+From ac3f93ea087d3a5461fe57fe021d0fe9a959e13c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 25 Dec 2019 15:25:02 -0800
+Subject: [PATCH] utilBacktrace: Ignore -Warray-bounds
+
+This is new warning with gcc10, until its fixed ignore it like gcc<10
+did
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ open-vm-tools/lib/user/utilBacktrace.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/open-vm-tools/lib/user/utilBacktrace.c b/open-vm-tools/lib/user/utilBacktrace.c
+index b72340ad..97ca53f2 100644
+--- a/open-vm-tools/lib/user/utilBacktrace.c
++++ b/open-vm-tools/lib/user/utilBacktrace.c
+@@ -517,6 +517,11 @@ Util_BacktraceWithFunc(int bugNr,                // IN:
+    } else {
+       outFunc(outFuncData, "Backtrace for bugNr=%d\n",bugNr);
+    }
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Warray-bounds"
++
+    Util_BacktraceFromPointerWithFunc(&x[-2], outFunc, outFuncData);
++#pragma GCC diagnostic pop
+ #endif
+ }
++
+-- 
+2.24.1
+

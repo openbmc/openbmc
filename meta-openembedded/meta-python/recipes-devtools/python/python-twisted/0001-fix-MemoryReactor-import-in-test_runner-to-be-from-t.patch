@@ -1,0 +1,38 @@
+From 754f21282ad2775db8ff501d40bbc497faeb17ba Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <trevor.gamblin@windriver.com>
+Date: Tue, 17 Dec 2019 15:09:22 -0500
+Subject: [PATCH] fix MemoryReactor import in test_runner to be from
+ twisted.internet.testing
+
+Upstream-Status: Backport [https://github.com/twisted/twisted/commit/754f21282ad2775db8ff501d40bbc497faeb17ba]
+
+Signed-off-by: Trevor Gamblin <trevor.gamblin@windriver.com>
+---
+ src/twisted/application/newsfragments/9746.misc    | 1 +
+ src/twisted/application/runner/test/test_runner.py | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+ create mode 100644 src/twisted/application/newsfragments/9746.misc
+
+diff --git a/src/twisted/application/newsfragments/9746.misc b/src/twisted/application/newsfragments/9746.misc
+new file mode 100644
+index 000000000..8b1378917
+--- /dev/null
++++ b/src/twisted/application/newsfragments/9746.misc
+@@ -0,0 +1 @@
++
+diff --git a/src/twisted/application/runner/test/test_runner.py b/src/twisted/application/runner/test/test_runner.py
+index 9abc3449a..cce495b12 100644
+--- a/src/twisted/application/runner/test/test_runner.py
++++ b/src/twisted/application/runner/test/test_runner.py
+@@ -15,7 +15,7 @@ from twisted.logger import (
+     LogLevel, LogPublisher, LogBeginner,
+     FileLogObserver, FilteringLogObserver, LogLevelFilterPredicate,
+ )
+-from twisted.test.proto_helpers import MemoryReactor
++from twisted.internet.testing import MemoryReactor
+ 
+ from ...runner import _runner
+ from .._exit import ExitStatus
+-- 
+2.24.1
+

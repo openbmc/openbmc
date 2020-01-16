@@ -1,0 +1,34 @@
+From 75e949bf80bf5e3e5bd8f81b258095e662b705c4 Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Thu, 9 Jan 2020 13:51:28 +0800
+Subject: [PATCH] adduser: set default shell with /sbin/nologin
+
+Shell nologin whether provided by shadow or util-linux is installed to
+/sbin/nologin in oe-core. But the default shell of adduser is
+/usr/sbin/nologin and will fail to create a new user.
+
+Set the default shell with /sbin/nologin to fix the issue.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ adduser | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/adduser b/adduser
+index 0f24cc9..ab554d0 100755
+--- a/adduser
++++ b/adduser
+@@ -431,7 +431,7 @@ if ($action eq "addsysuser") {
+     printf gtx("Adding new user `%s' (UID %d) with group `%s' ...\n"),$new_name,$new_uid,$ingroup_name
+ 	if $verbose;
+     $home_dir = $special_home || &homedir($new_name, $ingroup_name);
+-    $shell = $special_shell || '/usr/sbin/nologin';
++    $shell = $special_shell || '/sbin/nologin';
+     $undouser = $new_name;
+     my $useradd = &which('useradd');
+     &systemcall($useradd, '-d', $home_dir, '-g', $ingroup_name, '-s',
+-- 
+2.17.1
+

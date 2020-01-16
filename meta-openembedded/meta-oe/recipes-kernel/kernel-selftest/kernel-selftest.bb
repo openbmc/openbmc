@@ -33,6 +33,7 @@ S = "${WORKDIR}/${BP}"
 
 TEST_LIST = "\
     ${@bb.utils.filter('PACKAGECONFIG', 'bpf vm', d)} \
+    rtc \
 "
 
 EXTRA_OEMAKE = '\

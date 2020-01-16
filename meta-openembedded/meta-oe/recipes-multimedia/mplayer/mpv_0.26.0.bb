@@ -29,6 +29,8 @@ inherit waf pkgconfig pythonnative features_check
 LUA ?= "lua"
 LUA_mips64  = ""
 LUA_aarch64  = ""
+LUA_powerpc64  = ""
+
 # Note: both lua and libass are required to get on-screen-display (controls)
 PACKAGECONFIG ??= " \
     ${LUA} \

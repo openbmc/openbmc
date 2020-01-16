@@ -4,14 +4,16 @@ LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING.LGPLv2.1;md5=4fbd65380cdd255951079008b364516c"
 
 SRCREV = "b93deed1a231dd6dd7e39b9fe7d2abe05aa00158"
-SRC_URI = "git://github.com/foo86/dcadec.git;protocol=http"
+SRC_URI = "git://github.com/foo86/dcadec.git;protocol=https \
+           file://0001-define-BASELIB-make-variable.patch \
+          "
 
 S = "${WORKDIR}/git"
 
 inherit lib_package
 
-EXTRA_OEMAKE = "CONFIG_SHARED=1"
+EXTRA_OEMAKE = "CONFIG_SHARED=1 PREFIX=${prefix} BASELIB=${baselib}"
 
 do_install() {
-	oe_runmake install DESTDIR="${D}" PREFIX="${prefix}"
+	oe_runmake install DESTDIR="${D}"
 }

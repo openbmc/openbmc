@@ -1,0 +1,61 @@
+From ea47e53911213d71e997eb34848ae72735bacc82 Mon Sep 17 00:00:00 2001
+From: madhavank27 <madhavan.krishnan@linaro.org>
+Date: Thu, 9 Jan 2020 07:42:18 +0100
+Subject: [PATCH] meson: import python3 to use also from sysroot
+
+importing python module can provide the exact path
+which can be used in desktop build as well as from
+any build system
+
+Upstream-Status: Pending
+Signed-off-by: madhavank27 <madhavan.krishnan@linaro.org>
+---
+ include/libcamera/meson.build | 4 +++-
+ src/libcamera/meson.build     | 4 +++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/include/libcamera/meson.build b/include/libcamera/meson.build
+index 99abf06..83525e2 100644
+--- a/include/libcamera/meson.build
++++ b/include/libcamera/meson.build
+@@ -21,13 +21,15 @@ include_dir = join_paths(libcamera_include_dir, 'libcamera')
+ install_headers(libcamera_api,
+                 subdir : include_dir)
+ 
++python_mod = import('python3').find_python()
++
+ gen_controls = files('../../src/libcamera/gen-controls.py')
+ 
+ control_ids_h = custom_target('control_ids_h',
+                               input : files('../../src/libcamera/control_ids.yaml', 'control_ids.h.in'),
+                               output : 'control_ids.h',
+                               depend_files : gen_controls,
+-                              command : [gen_controls, '-o', '@OUTPUT@', '@INPUT@'],
++                              command : [python_mod, gen_controls, '-o', '@OUTPUT@', '@INPUT@'],
+                               install : true,
+                               install_dir : join_paths('include', include_dir))
+ 
+diff --git a/src/libcamera/meson.build b/src/libcamera/meson.build
+index c4f965b..243935b 100644
+--- a/src/libcamera/meson.build
++++ b/src/libcamera/meson.build
+@@ -65,13 +65,15 @@ if libudev.found()
+     ])
+ endif
+ 
++python_mod = import('python3').find_python()
++
+ gen_controls = files('gen-controls.py')
+ 
+ control_ids_cpp = custom_target('control_ids_cpp',
+                                 input : files('control_ids.yaml', 'control_ids.cpp.in'),
+                                 output : 'control_ids.cpp',
+                                 depend_files : gen_controls,
+-                                command : [gen_controls, '-o', '@OUTPUT@', '@INPUT@'])
++                                command : [python_mod, gen_controls, '-o', '@OUTPUT@', '@INPUT@'])
+ 
+ libcamera_sources += control_ids_cpp
+ libcamera_sources += control_ids_h
+-- 
+2.7.4
+

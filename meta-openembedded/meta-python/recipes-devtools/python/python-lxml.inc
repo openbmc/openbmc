@@ -18,8 +18,8 @@ LIC_FILES_CHKSUM = "file://LICENSES.txt;md5=e4c045ebad958ead4b48008f70838403 \
 
 DEPENDS += "libxml2 libxslt"
 
-SRC_URI[md5sum] = "ce976a2d3c630d7fde86d3a4c3a1c606"
-SRC_URI[sha256sum] = "c81cb40bff373ab7a7446d6bbca0190bccc5be3448b47b51d729e37799bb5692"
+SRC_URI[md5sum] = "235c1a22d97a174144e76b66ce62ae46"
+SRC_URI[sha256sum] = "eff69ddbf3ad86375c344339371168640951c302450c5d3e9936e98d6459db06"
 
 DISTUTILS_BUILD_ARGS += " \
                      --with-xslt-config='pkg-config libxslt' \
@@ -45,11 +45,6 @@ DEBUG_OPTIMIZATION_append_mipsel = " -O"
 BUILD_OPTIMIZATION_remove_mipsel = " -Og"
 BUILD_OPTIMIZATION_append_mipsel = " -O"
 
-do_configure_prepend() {
-    sed -i -e 's/--version/--modversion/' ${B}/setupinfo.py
-}
-
 BBCLASSEXTEND = "native nativesdk"
 
 RDEPENDS_${PN} += "libxml2 libxslt ${PYTHON_PN}-compression"
-RDEPENDS_${PN}_class-native = "libxml2-native libxslt-native"

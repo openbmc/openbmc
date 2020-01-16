@@ -1,0 +1,77 @@
+From 3730a38efad969fb6f8227df07eb4461a078f5a3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 13 Dec 2019 12:59:26 -0800
+Subject: [PATCH] Add configure time check for setsid
+
+Do not assume glibc == linux
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure    | 1 +
+ configure.in | 1 +
+ main.c       | 4 ++--
+ xtermcfg.hin | 1 +
+ 5 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/configure b/configure
+index 0aafefc..03e8df0 100755
+--- a/configure
++++ b/configure
+@@ -5411,6 +5411,7 @@ for ac_func in \
+ 	unsetenv \
+ 	sched_yield \
+ 	setpgid \
++	setsid \
+ 	strftime \
+ 	tcgetattr \
+ 	waitpid \
+diff --git a/configure.in b/configure.in
+index d2fee88..74d65df 100644
+--- a/configure.in
++++ b/configure.in
+@@ -99,6 +99,7 @@ AC_CHECK_FUNCS( \
+ 	unsetenv \
+ 	sched_yield \
+ 	setpgid \
++	setsid \
+ 	strftime \
+ 	tcgetattr \
+ 	waitpid \
+diff --git a/main.c b/main.c
+index 5e60589..b81d2be 100644
+--- a/main.c
++++ b/main.c
+@@ -2868,7 +2868,7 @@ main(int argc, char *argv[]ENVP_ARG)
+     }
+ }
+ 
+-#if defined(__osf__) || (defined(__GLIBC__) && !defined(USE_USG_PTYS)) || defined(__DragonFly__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__APPLE__)
++#if defined(__osf__) || (defined(__linux__) && !defined(USE_USG_PTYS)) || defined(__DragonFly__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__APPLE__)
+ #define USE_OPENPTY 1
+ static int opened_tty = -1;
+ #endif
+@@ -4040,7 +4040,7 @@ spawnXTerm(XtermWidget xw, unsigned line_speed)
+ 	    /*
+ 	     * now in child process
+ 	     */
+-#if defined(_POSIX_SOURCE) || defined(SVR4) || defined(__convex__) || defined(__SCO__) || defined(__QNX__)
++#if HAVE_SETSID
+ 	    int pgrp = setsid();	/* variable may not be used... */
+ #else
+ 	    int pgrp = getpid();
+diff --git a/xtermcfg.hin b/xtermcfg.hin
+index 1dbc3b8..4f3ff5b 100644
+--- a/xtermcfg.hin
++++ b/xtermcfg.hin
+@@ -96,6 +96,7 @@
+ #undef HAVE_PUTENV		/* AC_CHECK_FUNCS(putenv) */
+ #undef HAVE_SCHED_YIELD		/* AC_CHECK_FUNCS(sched_yield) */
+ #undef HAVE_SETPGID		/* AC_CHECK_FUNCS(setpgid) */
++#undef HAVE_SETSID		/* AC_CHECK_FUNCS(setsid) */
+ #undef HAVE_STDINT_H		/* AC_PROG_CC_STDC */
+ #undef HAVE_STDLIB_H		/* AC_CHECK_HEADERS(stdlib.h) */
+ #undef HAVE_STRFTIME		/* AC_CHECK_FUNCS(strftime) */
+-- 
+2.24.1
+
