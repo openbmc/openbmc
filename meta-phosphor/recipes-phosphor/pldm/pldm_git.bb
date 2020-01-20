@@ -8,7 +8,7 @@ inherit meson pkgconfig
 require pldm.inc
 
 DEPENDS += "systemd"
-DEPENDS += "phosphor-logging"
+DEPENDS += "sdeventplus"
 DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "nlohmann-json"
 DEPENDS += "boost"
