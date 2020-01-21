@@ -1,0 +1,41 @@
+From d07d2f9601b49bb72cd4b36838f0c238bd1b0fc1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 15 Jan 2020 18:45:09 -0800
+Subject: [PATCH] tests: add explicit permissions to open() call
+
+Fixes
+gethugepagesizes.c:227:35: error: open with O_CREAT in second argument needs 3 arguments
+|         fd = open(fname, O_WRONLY|O_CREAT);
+|                                          ^
+
+Upstream-Status: Submitted [https://groups.google.com/forum/#!topic/libhugetlbfs/anNtDXbQKro]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/gethugepagesizes.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/gethugepagesizes.c b/tests/gethugepagesizes.c
+index 9551b38..5777265 100644
+--- a/tests/gethugepagesizes.c
++++ b/tests/gethugepagesizes.c
+@@ -223,7 +223,7 @@ void setup_fake_data(long sizes[], int n_elem)
+ 		FAIL("mkdtemp: %s", strerror(errno));
+ 
+ 	sprintf(fname, "%s/meminfo-none", fake_meminfo);
+-	fd = open(fname, O_WRONLY|O_CREAT);
++	fd = open(fname, O_WRONLY|O_CREAT, 0600);
+ 	if (fd < 0)
+ 		FAIL("open: %s", strerror(errno));
+ 	if (write(fd, meminfo_base,
+@@ -233,7 +233,7 @@ void setup_fake_data(long sizes[], int n_elem)
+ 		FAIL("close: %s", strerror(errno));
+ 
+ 	sprintf(fname, "%s/meminfo-hugepages", fake_meminfo);
+-	fd = open(fname, O_WRONLY|O_CREAT);
++	fd = open(fname, O_WRONLY|O_CREAT, 0600);
+ 	if (fd < 0)
+ 		FAIL("open: %s", strerror(errno));
+ 	if (write(fd, meminfo_base,
+-- 
+2.25.0
+

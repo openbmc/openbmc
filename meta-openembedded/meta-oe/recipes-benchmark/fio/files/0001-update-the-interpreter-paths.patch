@@ -16,8 +16,7 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  tools/hist/fiologparser_hist.py | 2 +-
  tools/hist/half-bins.py         | 2 +-
  tools/plot/fio2gnuplot          | 2 +-
- t/steadystate_tests.py | 2 +-
- 7 files changed, 7 insertions(+), 7 deletions(-)
+ 6 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/tools/fio_jsonplus_clat2csv b/tools/fio_jsonplus_clat2csv
 index 78a007e5..0524b6e6 100755
@@ -79,16 +78,6 @@ index 4d1815cf..509141af 100755
  # Note: this script is python2 and python3 compatible.
  #
  #  Copyright (C) 2013 eNovance SAS <licensing@enovance.com>
-diff --git a/t/steadystate_tests.py b/t/steadystate_tests.py
-index 50254dcc..95e7dfde 100755
---- a/t/steadystate_tests.py
-+++ b/t/steadystate_tests.py
-@@ -1,4 +1,4 @@
--#!/usr/bin/python2.7
-+#!/usr/bin/env python
- # Note: this script is python2 and python 3 compatible.
- #
- # steadystate_tests.py
 -- 
 2.17.1
 

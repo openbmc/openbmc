@@ -8,6 +8,7 @@ LIC_FILES_CHKSUM = "file://iozone.c;beginline=37;endline=48;md5=7331260091868dca
 "
 SRC_URI = "http://www.iozone.org/src/current/${BPN}_${PV}.tar \
     file://parallelism.patch \
+    file://0001-let-system-headers-provide-pread64.patch \
     file://copyright.txt \
 "
 SRC_URI[md5sum] = "d60a69e44cda8436f4f94d860958efc2"

@@ -40,10 +40,16 @@
 GITPKGV = "${@get_git_pkgv(d, False)}"
 GITPKGVTAG = "${@get_git_pkgv(d, True)}"
 
-def gitpkgv_drop_tag_prefix(version):
+# This regexp is used to drop unwanted parts of the found tags. Any matching
+# groups will be concatenated to yield the final version.
+GITPKGV_TAG_REGEXP ??= "v(\d.*)"
+
+def gitpkgv_drop_tag_prefix(d, version):
     import re
-    if re.match("v\d", version):
-        return version[1:]
+
+    m = re.match(d.getVar('GITPKGV_TAG_REGEXP'), version)
+    if m:
+        return ''.join(group for group in m.groups() if group)
     else:
         return version
 
@@ -105,7 +111,7 @@ def get_git_pkgv(d, use_tags):
                         output = bb.fetch2.runfetchcmd(
                             "git --git-dir=%(repodir)s describe %(rev)s --tags --exact-match 2>/dev/null"
                             % vars, d, quiet=True).strip()
-                        ver = gitpkgv_drop_tag_prefix(output)
+                        ver = gitpkgv_drop_tag_prefix(d, output)
                     except Exception:
                         ver = "0.0-%s-g%s" % (commits, vars['rev'][:7])
                 else:

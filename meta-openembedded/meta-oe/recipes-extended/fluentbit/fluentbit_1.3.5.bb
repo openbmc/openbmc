@@ -15,6 +15,7 @@ SRC_URI = "http://fluentbit.io/releases/1.3/fluent-bit-${PV}.tar.gz \
            file://jemalloc.patch \
            file://cross-build-init-system-detection.patch \
            file://builtin-nan.patch \
+           file://0001-ppc-Fix-signature-for-co_create-API.patch \
           "
 SRC_URI[md5sum] = "6eae6dfd0a874e5dd270c36e9c68f747"
 SRC_URI[sha256sum] = "e037c76c89269c8dc4027a08e442fefd2751b0f1e0f9c38f9a4b12d781a9c789"

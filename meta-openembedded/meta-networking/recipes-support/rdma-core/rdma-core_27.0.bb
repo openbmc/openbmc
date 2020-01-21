@@ -9,6 +9,7 @@ BRANCH = "stable-v${@d.getVar('PV').split('.')[0]}"
 SRC_URI = "git://github.com/linux-rdma/rdma-core.git;branch=${BRANCH} \
            file://0001-Remove-man-files-which-cant-be-built.patch \
            file://0001-librdmacm-Use-sched_yield-instead-of-pthread_yield.patch \
+           file://0001-Use-overloadable-attribute-with-clang.patch \
            "
 SRCREV = "84caf035ae6123e2296b72006cd2cf698c65eb46"
 S = "${WORKDIR}/git"

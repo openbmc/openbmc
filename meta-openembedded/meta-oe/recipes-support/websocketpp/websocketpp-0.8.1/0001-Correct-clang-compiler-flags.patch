@@ -18,7 +18,7 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 index 2d13117..c17354a 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -148,7 +148,7 @@ if (BUILD_TESTS OR BUILD_EXAMPLES)
+@@ -150,7 +150,7 @@ if (BUILD_TESTS OR BUILD_EXAMPLES)
          endif()
          set (WEBSOCKETPP_PLATFORM_TLS_LIBS ssl crypto)
          set (WEBSOCKETPP_BOOST_LIBS system thread)

@@ -73,6 +73,7 @@ EXTRA_OEMAKE = 'MULTIPATH_VERSION=${PV} DESTDIR=${D} syslibdir=${base_libdir} \
                 bindir=${base_sbindir} \
                 LIB=${base_libdir} libdir=${base_libdir}/multipath \
                 unitdir=${systemd_system_unitdir} \
+                libudevdir=${nonarch_base_libdir}/udev \
                 ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "SYSTEMD=216", "", d)} \
                '
 
@@ -85,6 +86,9 @@ do_install() {
         install -d ${D}${sysconfdir}/init.d
         cp ${WORKDIR}/multipathd.oe ${D}${sysconfdir}/init.d/multipathd
     fi
+
+    sed -i "s:/usr/lib/udev/kpartx_id:${nonarch_base_libdir}/udev/kpartx_id:g" \
+        ${D}${nonarch_base_libdir}/udev/rules.d/11-dm-mpath.rules
 
     install -d ${D}${sysconfdir}
     install -m 0644 ${WORKDIR}/multipath.conf.example \
@@ -106,7 +110,7 @@ FILES_${PN}-dev += "${base_libdir}/pkgconfig"
 
 PACKAGES =+ "kpartx"
 FILES_kpartx = "${base_sbindir}/kpartx \
-                ${nonarch_libdir}/udev/kpartx_id \
+                ${nonarch_base_libdir}/udev/kpartx_id \
                "
 
 RDEPENDS_${PN} += "kpartx"

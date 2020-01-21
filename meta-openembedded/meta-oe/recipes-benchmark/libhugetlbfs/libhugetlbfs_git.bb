@@ -24,6 +24,7 @@ SRC_URI = " \
     file://0004-shm.c-Mark-glibc-specific-changes-so.patch \
     file://0005-Include-dirent.h-for-ino_t.patch \
     file://0006-include-limits.h-for-PATH_MAX.patch \
+    file://0001-tests-add-explicit-permissions-to-open-call.patch \
 "
 
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+(\.\d+)+)"

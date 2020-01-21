@@ -3,9 +3,8 @@ Description=Zabbix Monitor Agent
 After=syslog.target network.target
 
 [Service]
-Type=oneshot
-ExecStart=@SBINDIR@/zabbix_agentd
-RemainAfterExit=yes
+Type=simple
+ExecStart=@SBINDIR@/zabbix_agentd -f
 User=zabbix
 
 [Install]

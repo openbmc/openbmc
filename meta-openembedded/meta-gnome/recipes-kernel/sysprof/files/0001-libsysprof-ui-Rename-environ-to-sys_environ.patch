@@ -1,0 +1,63 @@
+From 4bd0d5d5dd6841fbac8385527617d18e7731244d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 15 Jan 2020 13:17:58 -0800
+Subject: [PATCH] libsysprof-ui: Rename environ to sys_environ
+
+This helps avoid namesapace conflict with glibc headers
+
+Fixes
+/usr/include/unistd.h:545:15: note: previous declaration is here
+
+extern char **environ;
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/libsysprof-ui/sysprof-profiler-assistant.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/libsysprof-ui/sysprof-profiler-assistant.c b/src/libsysprof-ui/sysprof-profiler-assistant.c
+index 22e3e24..c55d551 100644
+--- a/src/libsysprof-ui/sysprof-profiler-assistant.c
++++ b/src/libsysprof-ui/sysprof-profiler-assistant.c
+@@ -235,7 +235,7 @@ sysprof_profiler_assistant_record_clicked_cb (SysprofProfilerAssistant *self,
+     {
+       g_auto(GStrv) argv = NULL;
+       g_auto(GStrv) env = NULL;
+-      SysprofEnviron *environ;
++      SysprofEnviron *sys_environ;
+       const gchar *command;
+       gint argc;
+ 
+@@ -245,8 +245,8 @@ sysprof_profiler_assistant_record_clicked_cb (SysprofProfilerAssistant *self,
+       sysprof_profiler_set_spawn (profiler, TRUE);
+       sysprof_profiler_set_spawn_argv (profiler, (const gchar * const *)argv);
+ 
+-      environ = sysprof_environ_editor_get_environ (self->environ_editor);
+-      env = sysprof_environ_get_environ (environ);
++      sys_environ = sysprof_environ_editor_get_environ (self->environ_editor);
++      env = sysprof_environ_get_environ (sys_environ);
+       sysprof_profiler_set_spawn_env (profiler, (const gchar * const *)env);
+ 
+       sysprof_profiler_set_spawn_inherit_environ (profiler,
+@@ -405,7 +405,7 @@ sysprof_profiler_assistant_class_init (SysprofProfilerAssistantClass *klass)
+ static void
+ sysprof_profiler_assistant_init (SysprofProfilerAssistant *self)
+ {
+-  g_autoptr(SysprofEnviron) environ = sysprof_environ_new ();
++  g_autoptr(SysprofEnviron) sys_environ = sysprof_environ_new ();
+ 
+   gtk_widget_init_template (GTK_WIDGET (self));
+ 
+@@ -445,7 +445,7 @@ sysprof_profiler_assistant_init (SysprofProfilerAssistant *self)
+                            self,
+                            G_CONNECT_SWAPPED);
+ 
+-  sysprof_environ_editor_set_environ (self->environ_editor, environ);
++  sysprof_environ_editor_set_environ (self->environ_editor, sys_environ);
+ }
+ 
+ void
+-- 
+2.25.0
+

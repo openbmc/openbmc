@@ -47,8 +47,7 @@ PACKAGES =+ "\
         "
 
 FILES_${PN}-gst = "\
-	${libdir}/cups/filter/gstopxl \
-	${libdir}/cups/filter/gstoraster \
+	${libexecdir}/cups/filter/gsto* \
 	"
 
 FILES_${PN}-data = "\
@@ -56,37 +55,24 @@ FILES_${PN}-data = "\
 	"
 
 FILES_${PN}-dbg += "\
-	${libdir}/cups/filter/.debug \
-	${libdir}/cups/backend/.debug \
+	${libexecdir}/cups/backend/.debug \
+	${libexecdir}/cups/driver/.debug \
+	${libexecdir}/cups/filter/.debug \
 	"
 
 FILES_${PN} += "\
-        ${libdir}/cups/filter \
-        ${libdir}/cups/backend \
-        ${libdir}/cups/driver \
+        ${libexecdir}/cups \
+        ${datadir}/ppd/ \
         ${datadir}/cups/charsets \
         ${datadir}/cups/drv \
         ${datadir}/cups/mime \
         ${datadir}/cups/ppdc \
-        ${datadir}/ppd/cupsfilters \
-        ${datadir}/cups/braille \
         ${datadir}/cups/banners \
-        ${datadir}/cups/braille/index.sh \
-        ${datadir}/cups/braille/cups-braille.sh \
-        ${datadir}/cups/braille/indexv3.sh \
-        ${datadir}/cups/braille/indexv4.sh \
-        ${datadir}/cups/banners/topsecret \
-        ${datadir}/cups/banners/secret \
-        ${datadir}/cups/banners/confidential \
-        ${datadir}/cups/banners/unclassified \
-        ${datadir}/cups/banners/form \
-        ${datadir}/cups/banners/classified \
-        ${datadir}/cups/banners/standard \
 "
 
 do_install_append() {
-	# remove banners, braille dirs
-	rm -rf ${D}${datadir}/cups/{banners,braille}
+	# remove braille dir
+	rm -rf ${D}${datadir}/cups/braille
 
 	# remove sysroot path contamination from pkgconfig file
 	sed -i -e 's:${STAGING_DIR_TARGET}::' ${D}/${libdir}/pkgconfig/libcupsfilters.pc
