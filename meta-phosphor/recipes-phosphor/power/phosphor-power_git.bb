@@ -25,6 +25,10 @@ DEPENDS += " \
          i2c-tools \
          "
 
+PACKAGE_BEFORE_PN = "phosphor-psu-monitor"
+FILES_phosphor-psu-monitor = "${bindir}/phosphor-psu-monitor \
+                              ${systemd_system_unitdir}/phosphor-psu-monitor.service"
+
 SEQ_MONITOR_SVC = "pseq-monitor.service"
 SEQ_PGOOD_SVC = "pseq-monitor-pgood.service"
 PSU_MONITOR_TMPL = "power-supply-monitor@.service"
