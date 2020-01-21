@@ -1,0 +1,5 @@
+/xyz/openbmc_project/logging/send_event_logs_to_host:
+    - Interface: xyz.openbmc_project.Object.Enable
+      Properties:
+          Enabled:
+              Default: 'true'
