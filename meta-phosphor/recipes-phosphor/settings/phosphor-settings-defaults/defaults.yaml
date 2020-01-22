@@ -56,7 +56,7 @@
     - Interface: xyz.openbmc_project.Time.Owner
       Properties:
           TimeOwner:
-              Default: Owner::Owners::BMC
+              Default: Owner::Owners::Both
 
 /xyz/openbmc_project/time/sync_method:
     - Interface: xyz.openbmc_project.Time.Synchronization
