@@ -105,6 +105,13 @@ remove_etc_version() {
 }
 ROOTFS_POSTPROCESS_COMMAND += "remove_etc_version ; "
 
+# Disable the pager to prevent systemd injecting control characters into the
+# output stream that are not interpreted by busybox tools.
+disable_systemd_pager() {
+        echo -e "SYSTEMD_PAGER=\nexport SYSTEMD_PAGER" >> ${IMAGE_ROOTFS}${sysconfdir}/profile
+}
+ROOTFS_POSTPROCESS_COMMAND += "disable_systemd_pager ; "
+
 # The shadow recipe provides the binaries(like useradd, usermod) needed by the
 # phosphor-user-manager.
 ROOTFS_RO_UNNEEDED_remove = "shadow"
