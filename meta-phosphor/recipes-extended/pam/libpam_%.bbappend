@@ -9,6 +9,7 @@ SRC_URI += " file://pam.d/common-password \
 RDEPENDS_${PN}-runtime += "${MLPREFIX}pam-plugin-cracklib-${libpam_suffix} \
                            ${MLPREFIX}pam-plugin-tally2-${libpam_suffix} \
                            ${MLPREFIX}pam-plugin-pwhistory-${libpam_suffix} \
+                           ${MLPREFIX}pam-plugin-succeed-if-${libpam_suffix} \
                           "
 
 do_install_append() {
