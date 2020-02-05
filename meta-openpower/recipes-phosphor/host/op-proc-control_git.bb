@@ -18,6 +18,7 @@ DEPENDS += " \
         phosphor-logging \
         phosphor-dbus-interfaces \
         openpower-dbus-interfaces \
+        libgpiod \
         "
 
 # For libpdbg, provided by the pdbg package
