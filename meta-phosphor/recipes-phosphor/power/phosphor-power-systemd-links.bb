@@ -1,3 +1,7 @@
+# TODO: This is splitted into two recipes;
+#       To avoid build error, this is kept for now.
+#       Remove me when the refactor of phosphor-power recipe is finished
+
 SUMMARY = "Phosphor Power services installation"
 PR = "r1"
 
@@ -9,38 +13,3 @@ inherit allarch
 RDEPENDS_${PN} += "phosphor-power"
 
 ALLOW_EMPTY_${PN} = "1"
-
-pkg_postinst_${PN}() {
-	mkdir -p $D$systemd_system_unitdir/obmc-chassis-poweron@0.target.wants
-	mkdir -p $D$systemd_system_unitdir/multi-user.target.requires
-
-	LINK="$D$systemd_system_unitdir/obmc-chassis-poweron@0.target.wants/pseq-monitor.service"
-	TARGET="../pseq-monitor.service"
-	ln -s $TARGET $LINK
-
-	LINK="$D$systemd_system_unitdir/obmc-chassis-poweron@0.target.wants/pseq-monitor-pgood.service"
-	TARGET="../pseq-monitor-pgood.service"
-	ln -s $TARGET $LINK
-
-	[ -z "${OBMC_POWER_SUPPLY_INSTANCES}" ] && echo "No power supply instance defined" && exit 1
-
-	for inst in ${OBMC_POWER_SUPPLY_INSTANCES}; do
-		LINK="$D$systemd_system_unitdir/multi-user.target.requires/power-supply-monitor@$inst.service"
-		TARGET="../power-supply-monitor@.service"
-		ln -s $TARGET $LINK
-	done
-}
-
-pkg_prerm_${PN}() {
-	LINK="$D$systemd_system_unitdir/obmc-chassis-poweron@0.target.wants/pseq-monitor.service"
-	rm $LINK
-	LINK="$D$systemd_system_unitdir/obmc-chassis-poweron@0.target.wants/pseq-monitor-pgood.service"
-	rm $LINK
-
-	[ -z "${OBMC_POWER_SUPPLY_INSTANCES}" ] && echo "No power supply instance defined" && exit 1
-
-	for inst in ${OBMC_POWER_SUPPLY_INSTANCES}; do
-		LINK="$D$systemd_system_unitdir/multi-user.target.requires/power-supply-monitor@$inst.service"
-		rm $LINK
-	done
-}
