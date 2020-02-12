@@ -33,15 +33,17 @@ sled_cycle() {
 	i2cset -y 7 0x45 0xd9 c
 }
 
+if [ $1 == "sled-cycle" ]; then
+	echo "SLED_CYCLE starting at $(date)"
+	sled_cycle
+	exit 0;
+fi
+
 if [ $# -lt 2 ]; then
 	echo "Total number of parameter=$#"
 	echo "Insufficient parameter"
 	usage;
 	exit 0;
-fi
-
-if [ $1 == "sled-cycle" ]; then
-	sled_cycle
 fi
 
 if [ $1 != "mb" ]; then
