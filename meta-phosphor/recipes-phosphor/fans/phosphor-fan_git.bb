@@ -62,8 +62,7 @@ PACKAGECONFIG[control] = "--enable-control \
      FAN_DEF_YAML_FILE=${STAGING_DIR_HOST}${control_datadir}/fans.yaml \
      FAN_ZONE_YAML_FILE=${STAGING_DIR_HOST}${control_datadir}/zones.yaml \
      ZONE_EVENTS_YAML_FILE=${STAGING_DIR_HOST}${control_datadir}/events.yaml \
-     ZONE_CONDITIONS_YAML_FILE=${STAGING_DIR_HOST}${control_datadir}/zone_conditions.yaml \
-     FAN_ZONE_OUTPUT_DIR=${S}/control, \
+     ZONE_CONDITIONS_YAML_FILE=${STAGING_DIR_HOST}${control_datadir}/zone_conditions.yaml, \
     --disable-control, \
     virtual/phosphor-fan-control-fan-config \
     phosphor-fan-control-zone-config \
@@ -90,8 +89,7 @@ SYSTEMD_LINK_${PN}-control += "${@compose_list(d, 'FMT_CONTROL_INIT', 'OBMC_CHAS
 # --------------------------------------
 # ${PN}-monitor specific configuration
 PACKAGECONFIG[monitor] = "--enable-monitor \
-     FAN_MONITOR_YAML_FILE=${STAGING_DIR_HOST}${monitor_datadir}/monitor.yaml \
-     FAN_MONITOR_OUTPUT_DIR=${S}/monitor, \
+     FAN_MONITOR_YAML_FILE=${STAGING_DIR_HOST}${monitor_datadir}/monitor.yaml, \
     --disable-monitor, \
     phosphor-fan-monitor-config \
     , \
