@@ -217,6 +217,12 @@
 		output-low;
 		line-name = "seq_cont";
 	};
+	ncsi_cfg {
+		gpio-hog;
+		input;
+		gpios = <ASPEED_GPIO(E, 1) GPIO_ACTIVE_HIGH>;
+		line-name = "ncsi_cfg";
+	};
 };
 
 &vuart {
