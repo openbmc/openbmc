@@ -10,7 +10,7 @@ SRCREV = "4c0e8945f072f9139d0efb04e8f955663b972a84"
 
 inherit autotools
 inherit pkgconfig
-inherit pythonnative
+inherit python3native
 inherit obmc-phosphor-dbus-service
 inherit obmc-phosphor-systemd
 inherit phosphor-dbus-yaml
