@@ -7,15 +7,15 @@
 #See patchxml.py for details on the XML patch format.
 #
 
-inherit pythonnative
+inherit python3native
 inherit obmc-phosphor-utils
 do_patch[depends] = "mrw-patch-native:do_populate_sysroot"
 
 
 def find_patch_files(d):
     all_patches = listvar_to_list(d, 'SRC_URI')
-    xml_patches = filter(lambda x: x.endswith('.patch.xml') and
-                         x.startswith('file://'), all_patches)
+    xml_patches = [x for x in all_patches if x.endswith('.patch.xml') and
+                         x.startswith('file://')]
 
     return [x.lstrip('file://') for x in xml_patches]
 
