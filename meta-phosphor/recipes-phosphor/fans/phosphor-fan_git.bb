@@ -14,8 +14,8 @@ S = "${WORKDIR}/git"
 
 # Common build dependencies
 DEPENDS += "autoconf-archive-native"
-DEPENDS += "python-pyyaml-native"
-DEPENDS += "python-mako-native"
+DEPENDS += "${PYTHON_PN}-pyyaml-native"
+DEPENDS += "${PYTHON_PN}-mako-native"
 DEPENDS += "sdbusplus"
 DEPENDS += "sdbusplus-native"
 DEPENDS += "sdeventplus"
