@@ -145,6 +145,16 @@
 	clock-names = "MACCLK", "RCLK";
 };
 
+&i2c0 {
+	status = "okay";
+
+	eeprom@50 {
+		compatible = "atmel,24c256";
+		reg = <0x50>;
+		pagesize = <64>;
+	};
+};
+
 &i2c1 {
 	status = "okay";
 };
