@@ -7,7 +7,7 @@ PV = "1.0+git${SRCPV}"
 inherit autotools \
         pkgconfig \
         obmc-phosphor-dbus-service \
-        pythonnative \
+        python3native \
         phosphor-dbus-yaml
 
 require ${PN}.inc
