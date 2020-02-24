@@ -2,7 +2,7 @@ SUMMARY = "C++ bindings for systemd dbus APIs"
 DESCRIPTION = "C++ bindings for systemd dbus APIs."
 
 inherit autotools pkgconfig
-inherit obmc-phosphor-python-autotools
+inherit obmc-phosphor-python3-autotools
 
 include sdbusplus-rev.inc
 
@@ -12,6 +12,8 @@ DEPENDS += " \
         ${PYTHON_PN}-mako-native \
         ${PYTHON_PN}-pyyaml-native \
         "
+
+SRC_URI += "file://0001-sdbus-switch-to-python3.patch"
 
 PACKAGECONFIG ??= "libsdbusplus transaction"
 PACKAGECONFIG[libsdbusplus] = "--enable-libsdbusplus,--disable-libsdbusplus,systemd,libsystemd"
