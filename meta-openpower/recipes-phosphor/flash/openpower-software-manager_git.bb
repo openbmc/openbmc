@@ -29,6 +29,7 @@ EXTRA_OECONF += " \
 
 DEPENDS += " \
         autoconf-archive-native \
+        openssl \
         phosphor-dbus-interfaces \
         phosphor-logging \
         sdbusplus \
