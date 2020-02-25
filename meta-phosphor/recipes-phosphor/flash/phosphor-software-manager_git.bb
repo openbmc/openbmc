@@ -35,10 +35,11 @@ inherit ${@bb.utils.contains('DISTRO_FEATURES', 'obmc-ubi-fs', 'phosphor-softwar
 
 DEPENDS += " \
     autoconf-archive-native \
-    sdbusplus \
+    openssl \
     phosphor-dbus-interfaces \
     phosphor-logging \
     sdbus++-native \
+    sdbusplus \
 "
 
 RDEPENDS_${PN}-updater += " \
