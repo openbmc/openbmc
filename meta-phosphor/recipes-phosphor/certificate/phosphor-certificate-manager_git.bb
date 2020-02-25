@@ -16,10 +16,11 @@ inherit autotools \
         obmc-phosphor-systemd
 
 DEPENDS = " \
-        phosphor-logging \
         autoconf-archive-native \
+        openssl \
         phosphor-dbus-interfaces \
         phosphor-dbus-interfaces-native \
+        phosphor-logging \
         sdbusplus \
         sdbusplus-native \
         sdeventplus \
