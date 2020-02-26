@@ -22,6 +22,14 @@ pkg_postinst_${PN}() {
 	LINK="$D$systemd_system_unitdir/obmc-host-force-warm-reboot@0.target.requires/op-cfam-reset.service"
 	TARGET="../op-cfam-reset.service"
 	ln -s $TARGET $LINK
+
+	# Only install cfam override if p9 system
+	if [ "${@bb.utils.contains("MACHINE_FEATURES", "p9-cfam-override", "True", "False", d)}" = True ]; then
+		mkdir -p $D$systemd_system_unitdir/obmc-host-startmin@0.target.requires
+		LINK="$D$systemd_system_unitdir/obmc-host-startmin@0.target.requires/cfam_override@0.service"
+		TARGET="../cfam_override@.service"
+		ln -s $TARGET $LINK
+	fi
 }
 
 pkg_prerm_${PN}() {
@@ -29,4 +37,9 @@ pkg_prerm_${PN}() {
 	rm $LINK
 	LINK="$D$systemd_system_unitdir/obmc-host-force-warm-reboot@0.target.requires/op-cfam-reset.service"
 	rm $LINK
+	# Only uninstall cfam override if p9 system
+	if [ "${@bb.utils.contains("MACHINE_FEATURES", "p9-cfam-override", "True", "False", d)}" = True ]; then
+		LINK="$D$systemd_system_unitdir/obmc-host-startmin@0.target.requires/cfam_override@0.service"
+		rm $LINK
+	fi
 }
