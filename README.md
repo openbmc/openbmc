@@ -35,30 +35,40 @@ cd openbmc
 ```
 
 ### 3) Target your hardware
-Any build requires an environment variable known as `TEMPLATECONF` to be set
-to a hardware target.
-You can see all of the known targets with
-`find meta-* -name local.conf.sample`. Choose the hardware target and
-then move to the next step. Additional examples can be found in the
-[OpenBMC Cheatsheet](https://github.com/openbmc/docs/blob/master/cheatsheet.md)
+Any build requires an environment set up according to your hardware target.
+There is a special script in the root of this repository that can be used
+to configure the environment as needed. The script is called `setup` and
+takes the name of your hardware target as an argument.
 
-Machine | TEMPLATECONF
---------|---------
-Palmetto | ```meta-ibm/meta-palmetto/conf```
-Zaius| ```meta-ingrasys/meta-zaius/conf```
-Witherspoon| ```meta-ibm/meta-witherspoon/conf```
-Romulus| ```meta-ibm/meta-romulus/conf```
+The script needs to be sourced while in the top directory of the OpenBMC
+repository clone, and, if run without arguments, will display the list
+of supported hardware targets, see the following example:
 
-
-As an example target Romulus
 ```
-export TEMPLATECONF=meta-ibm/meta-romulus/conf
+$ . setup
+Target machine must be specified. Use one of:
+
+centriq2400-rep         nicole                     stardragon4800-rep2
+f0b                     olympus                    swift
+fp5280g2                olympus-nuvoton            tiogapass
+gsj                     on5263m5                   vesnin
+hr630                   palmetto                   witherspoon
+hr855xg2                qemuarm                    witherspoon-128
+lanyang                 quanta-q71l                witherspoon-tacoma
+mihawk                  rainier                    yosemitev2
+msn                     romulus                    zaius
+neptune                 s2600wf
+```
+
+Once you know the target (e.g. romulus), source the `setup` script as follows:
+
+```
+. setup romulus
 ```
 
 ### 4) Build
 
 ```
-. openbmc-env
 bitbake obmc-phosphor-image
 ```
 
