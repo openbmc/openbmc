@@ -37,6 +37,10 @@ DEPENDS += " \
          nlohmann-json \
          cli11 \
          i2c-tools \
+         ${PYTHON_PN}-native \
+         ${PYTHON_PN}-pyyaml-native \
+         ${PYTHON_PN}-setuptools-native \
+         ${PYTHON_PN}-mako-native \
          "
 
 SEQ_MONITOR_SVC = "pseq-monitor.service"
