@@ -23,6 +23,9 @@ DEPENDS += " \
         sdbusplus-native \
         autoconf-archive-native \
         libcereal \
+        ${PYTHON_PN}-native \
+        ${PYTHON_PN}-pyyaml-native \
+        ${PYTHON_PN}-mako-native \
         "
 
 OBMC_INVENTORY_PATH="${OBMC_DBUS_PATH_ROOT}/inventory"
