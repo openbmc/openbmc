@@ -21,5 +21,5 @@ DEPENDS = "boost \
 S = "${WORKDIR}/git/"
 inherit cmake systemd
 
-EXTRA_OECMAKE = "-DYOCTO=1 -DUSE_OVERLAYS=0"
+EXTRA_OECMAKE = "-DYOCTO=1"
 
