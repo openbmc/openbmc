@@ -28,9 +28,7 @@ DEPENDS += " \
         sdbusplus \
         sdbusplus-native \
         phosphor-logging \
-        openpower-dbus-interfaces \
         phosphor-dbus-interfaces \
-        openpower-dbus-interfaces-native \
         autoconf-archive-native \
         systemd \
         "
