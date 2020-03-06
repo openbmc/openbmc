@@ -17,7 +17,6 @@ DEPENDS += " \
         autoconf-archive-native \
         phosphor-logging \
         phosphor-dbus-interfaces \
-        openpower-dbus-interfaces \
         libgpiod \
         "
 
