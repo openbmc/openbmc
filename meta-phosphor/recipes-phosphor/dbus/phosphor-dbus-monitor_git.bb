@@ -27,6 +27,10 @@ DEPENDS += " \
         sdeventplus \
         gtest \
         phosphor-snmp \
+        ${PYTHON_PN}-native \
+        ${PYTHON_PN}-pyyaml-native \
+        ${PYTHON_PN}-setuptools-native \
+        ${PYTHON_PN}-mako-native \
         "
 
 FILES_phosphor-msl-verify = "${bindir}/phosphor-msl-verify"
