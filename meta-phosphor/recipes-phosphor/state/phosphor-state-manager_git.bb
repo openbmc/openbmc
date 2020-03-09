@@ -8,6 +8,8 @@ PV = "1.0+git${SRCPV}"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
+include phosphor-state-manager-systemd-links.inc
+
 STATE_MGR_PACKAGES = " \
     ${PN}-host \
     ${PN}-chassis \
@@ -81,102 +83,6 @@ SYSTEMD_SERVICE_${PN}-systemd-target-monitor += "phosphor-systemd-target-monitor
 
 FILES_${PN}-scheduled-host-transition = "${bindir}/phosphor-scheduled-host-transition"
 DBUS_SERVICE_${PN}-scheduled-host-transition += "xyz.openbmc_project.State.ScheduledHostTransition.service"
-
-RESET_CHECK_TMPL = "phosphor-reset-host-check@.service"
-RESET_CHECK_TGTFMT = "obmc-host-reset@{1}.target"
-RESET_CHECK_INSTFMT = "phosphor-reset-host-check@{0}.service"
-RESET_CHECK_FMT = "../${RESET_CHECK_TMPL}:${RESET_CHECK_TGTFMT}.requires/${RESET_CHECK_INSTFMT}"
-
-SENSOR_RESET_TMPL = "phosphor-reset-sensor-states@.service"
-SENSOR_RESET_TGTFMT = "obmc-host-reset@{1}.target"
-SENSOR_RESET_INSTFMT = "phosphor-reset-sensor-states@{0}.service"
-SENSOR_RESET_FMT = "../${SENSOR_RESET_TMPL}:${SENSOR_RESET_TGTFMT}.requires/${SENSOR_RESET_INSTFMT}"
-
-RESET_RUNNING_TMPL = "phosphor-reset-host-running@.service"
-RESET_RUNNING_TGTFMT = "obmc-host-reset@{1}.target"
-RESET_RUNNING_INSTFMT = "phosphor-reset-host-running@{0}.service"
-RESET_RUNNING_FMT = "../${RESET_RUNNING_TMPL}:${RESET_RUNNING_TGTFMT}.requires/${RESET_RUNNING_INSTFMT}"
-
-SYSTEMD_LINK_${PN}-host-check += "${@compose_list_zip(d, 'RESET_CHECK_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_HOST_INSTANCES')}"
-SYSTEMD_LINK_${PN}-host-check += "${@compose_list_zip(d, 'RESET_RUNNING_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_HOST_INSTANCES')}"
-
-SYSTEMD_LINK_${PN}-reset-sensor-states += "${@compose_list_zip(d, 'SENSOR_RESET_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_HOST_INSTANCES')}"
-
-# Force the standby target to run the host reset check target
-RESET_TMPL_CTRL = "obmc-host-reset@.target"
-SYSD_TGT = "multi-user.target"
-RESET_INSTFMT_CTRL = "obmc-host-reset@{0}.target"
-RESET_FMT_CTRL = "../${RESET_TMPL_CTRL}:${SYSD_TGT}.wants/${RESET_INSTFMT_CTRL}"
-SYSTEMD_LINK_${PN}-host-check += "${@compose_list_zip(d, 'RESET_FMT_CTRL', 'OBMC_HOST_INSTANCES')}"
-
-TMPL = "phosphor-discover-system-state@.service"
-INSTFMT = "phosphor-discover-system-state@{0}.service"
-FMT = "../${TMPL}:multi-user.target.wants/${INSTFMT}"
-SYSTEMD_LINK_${PN}-discover += "${@compose_list(d, 'FMT', 'OBMC_HOST_INSTANCES')}"
-
-# Force the shutdown target to run the chassis-poweroff target
-CHASSIS_STOP_TMPL = "obmc-chassis-poweroff@.target"
-HOST_STOP_TGTFMT = "obmc-host-shutdown@{1}.target"
-CHASSIS_STOP_INSTFMT = "obmc-chassis-poweroff@{0}.target"
-HOST_STOP_FMT = "../${CHASSIS_STOP_TMPL}:${HOST_STOP_TGTFMT}.requires/${CHASSIS_STOP_INSTFMT}"
-SYSTEMD_LINK_${PN}-host += "${@compose_list_zip(d, 'HOST_STOP_FMT', 'OBMC_CHASSIS_INSTANCES', 'OBMC_HOST_INSTANCES')}"
-
-# Force the host reboot target to run the shutdown target
-HOST_SHUTDOWN_TMPL = "obmc-host-shutdown@.target"
-HOST_REBOOT_TGTFMT = "obmc-host-reboot@{0}.target"
-HOST_SHUTDOWN_INSTFMT = "obmc-host-shutdown@{0}.target"
-HOST_REBOOT_FMT = "../${HOST_SHUTDOWN_TMPL}:${HOST_REBOOT_TGTFMT}.requires/${HOST_SHUTDOWN_INSTFMT}"
-SYSTEMD_LINK_${PN}-host += "${@compose_list_zip(d, 'HOST_REBOOT_FMT', 'OBMC_HOST_INSTANCES')}"
-
-# And also force the reboot target to call the host startmin service
-HOST_REBOOT_SVC = "phosphor-reboot-host@.service"
-HOST_REBOOT_SVC_INST = "phosphor-reboot-host@{0}.service"
-HOST_REBOOT_SVC_FMT = "../${HOST_REBOOT_SVC}:${HOST_REBOOT_TGTFMT}.requires/${HOST_REBOOT_SVC_INST}"
-SYSTEMD_LINK_${PN}-host += "${@compose_list_zip(d, 'HOST_REBOOT_SVC_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_HOST_INSTANCES')}"
-
-# Force the host-start target to call the host-startmin target
-HOST_STARTMIN_TMPL = "obmc-host-startmin@.target"
-HOST_START_TGTFMT = "obmc-host-start@{0}.target"
-HOST_STARTMIN_INSTFMT = "obmc-host-startmin@{0}.target"
-HOST_START_FMT = "../${HOST_STARTMIN_TMPL}:${HOST_START_TGTFMT}.requires/${HOST_STARTMIN_INSTFMT}"
-SYSTEMD_LINK_${PN}-host += "${@compose_list_zip(d, 'HOST_START_FMT', 'OBMC_HOST_INSTANCES')}"
-
-# Force the host-start target to call the reboot count reset service
-HOST_RST_RBT_ATTEMPTS_SVC = "phosphor-reset-host-reboot-attempts@.service"
-HOST_RST_RBT_ATTEMPTS_SVC_INST = "phosphor-reset-host-reboot-attempts@{0}.service"
-HOST_RST_RBT_ATTEMPTS_SVC_FMT = "../${HOST_RST_RBT_ATTEMPTS_SVC}:${HOST_START_TGTFMT}.requires/${HOST_RST_RBT_ATTEMPTS_SVC_INST}"
-SYSTEMD_LINK_${PN}-host += "${@compose_list_zip(d, 'HOST_RST_RBT_ATTEMPTS_SVC_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_HOST_INSTANCES')}"
-
-# Force warm reboot target to call soft power off
-HOST_WARM_REBOOT_TGTFMT = "obmc-host-warm-reboot@{0}.target"
-HOST_WARM_REBOOT_SOFT_SVC = "xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service"
-HOST_WARM_REBOOT_SOFT_SVC_FMT = "../${HOST_WARM_REBOOT_SOFT_SVC}:${HOST_WARM_REBOOT_TGTFMT}.requires/${HOST_WARM_REBOOT_SOFT_SVC}"
-SYSTEMD_LINK_${PN}-host += "${@compose_list_zip(d, 'HOST_WARM_REBOOT_SOFT_SVC_FMT', 'OBMC_HOST_INSTANCES')}"
-
-# Force warm reboot target to call host stop
-HOST_WARM_REBOOT_STOP_TMPL="obmc-host-stop@.target"
-HOST_WARM_REBOOT_STOP_REQUIRES="obmc-host-force-warm-reboot@{0}.target"
-HOST_WARM_REBOOT_STOP_TMPL_INST="obmc-host-stop@{0}.target"
-HOST_WARM_REBOOT_STOP_TARGET_FMT = "../${HOST_WARM_REBOOT_STOP_TMPL}:${HOST_WARM_REBOOT_STOP_REQUIRES}.requires/${HOST_WARM_REBOOT_STOP_TMPL_INST}"
-SYSTEMD_LINK_${PN}-host += "${@compose_list_zip(d, 'HOST_WARM_REBOOT_STOP_TARGET_FMT', 'OBMC_HOST_INSTANCES')}"
-
-# Force warm reboot target to call reboot host
-HOST_WARM_REBOOT_FORCE_TGTFMT = "obmc-host-force-warm-reboot@{0}.target"
-HOST_WARM_REBOOT_SVC = "phosphor-reboot-host@.service"
-HOST_WARM_REBOOT_SVC_INST = "phosphor-reboot-host@{0}.service"
-HOST_WARM_REBOOT_SVC_FMT = "../${HOST_WARM_REBOOT_SVC}:${HOST_WARM_REBOOT_FORCE_TGTFMT}.requires/${HOST_WARM_REBOOT_SVC_INST}"
-SYSTEMD_LINK_${PN}-host += "${@compose_list_zip(d, 'HOST_WARM_REBOOT_SVC_FMT', 'OBMC_HOST_INSTANCES')}"
-
-# Warm reboot to call force warm reboot
-# Warm reboot will be graceful due to to it also containing soft power off
-HOST_WARM_REBOOT_FORCE_TGT = "obmc-host-force-warm-reboot@.target"
-HOST_WARM_REBOOT_FORCE_TARGET_FMT = "../${HOST_WARM_REBOOT_FORCE_TGT}:${HOST_WARM_REBOOT_TGTFMT}.requires/${HOST_WARM_REBOOT_FORCE_TGTFMT}"
-SYSTEMD_LINK_${PN}-host += "${@compose_list_zip(d, 'HOST_WARM_REBOOT_FORCE_TARGET_FMT', 'OBMC_HOST_INSTANCES')}"
-
-# Diagnostic target to call force warm reboot target
-HOST_DIAG_TGTFMT = "obmc-host-diagnostic-mode@0.target"
-HOST_DIAG_TARGET_FMT = "../${HOST_WARM_REBOOT_FORCE_TGT}:${HOST_DIAG_TGTFMT}.requires/${HOST_WARM_REBOOT_FORCE_TGTFMT}"
-SYSTEMD_LINK_${PN}-host += "${@compose_list_zip(d, 'HOST_DIAG_TARGET_FMT', 'OBMC_HOST_INSTANCES')}"
 
 # Chassis power synchronization targets
 # - start-pre:         Services to run before we start power on process
