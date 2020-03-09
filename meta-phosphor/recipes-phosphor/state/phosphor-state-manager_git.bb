@@ -44,6 +44,7 @@ RRECOMMENDS_${PN}-host += "${PN}-obmc-targets"
 
 inherit meson pkgconfig
 inherit obmc-phosphor-dbus-service
+inherit obmc-phosphor-systemd
 
 DEPENDS += "sdbusplus"
 DEPENDS += "sdeventplus"
