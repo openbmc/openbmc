@@ -11,7 +11,7 @@ inherit autotools obmc-phosphor-utils pkgconfig
 inherit systemd
 
 SRC_URI += "git://github.com/openbmc/openpower-proc-control"
-SRCREV = "7847960506ca4357e267fe05866b38aad236708f"
+SRCREV = "aefde6902507add3891557f2b9de5d407cfadb1e"
 
 DEPENDS += " \
         autoconf-archive-native \
@@ -34,4 +34,6 @@ SYSTEMD_SERVICE_${PN} +=  " \
                          op-stop-instructions@.service \
                          op-cfam-reset.service \
                          ${@bb.utils.contains('OBMC_MACHINE_FEATURES', 'phal', 'set-spi-mux.service', '', d)} \
+                         op-continue-mpreboot@.service \
+                         op-enter-mpreboot@.service \
                          "

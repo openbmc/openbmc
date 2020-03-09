@@ -8,6 +8,7 @@ Wants=obmc-power-on@%i.target
 After=obmc-power-on@%i.target
 Conflicts=obmc-host-stop@%i.target
 ConditionPathExists=!/run/openbmc/host@%i-on
+ConditionPathExists=!/run/openbmc/mpreboot@%i
 
 [Service]
 ExecStart=/usr/bin/env openpower-proc-control startHost

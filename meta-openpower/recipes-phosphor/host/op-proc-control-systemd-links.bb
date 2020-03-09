@@ -14,6 +14,8 @@ ALLOW_EMPTY_${PN} = "1"
 pkg_postinst_${PN}() {
 	mkdir -p $D$systemd_system_unitdir/obmc-host-stop@0.target.wants
 	mkdir -p $D$systemd_system_unitdir/obmc-host-force-warm-reboot@0.target.requires
+	mkdir -p $D$systemd_system_unitdir/obmc-host-startmin@0.target.requires
+	mkdir -p $D$systemd_system_unitdir/obmc-host-diagnostic-mode@0.target.requires
 
 	LINK="$D$systemd_system_unitdir/obmc-host-stop@0.target.wants/op-stop-instructions@0.service"
 	TARGET="../op-stop-instructions@.service"
@@ -30,6 +32,14 @@ pkg_postinst_${PN}() {
 		TARGET="../cfam_override@.service"
 		ln -s $TARGET $LINK
 	fi
+
+	LINK="$D$systemd_system_unitdir/obmc-host-startmin@0.target.requires/op-continue-mpreboot@0.service"
+	TARGET="../op-continue-mpreboot@.service"
+	ln -s $TARGET $LINK
+
+	LINK="$D$systemd_system_unitdir/obmc-host-diagnostic-mode@0.target.requires/op-enter-mpreboot@0.service"
+	TARGET="../op-enter-mpreboot@.service"
+	ln -s $TARGET $LINK
 }
 
 pkg_prerm_${PN}() {
@@ -42,4 +52,8 @@ pkg_prerm_${PN}() {
 		LINK="$D$systemd_system_unitdir/obmc-host-startmin@0.target.requires/cfam_override@0.service"
 		rm $LINK
 	fi
+	LINK="$D$systemd_system_unitdir/obmc-host-startmin@0.target.requires/op-continue-mpreboot@0.service"
+	rm $LINK
+	LINK="$D$systemd_system_unitdir/obmc-host-diagnostic-mode@0.target.requires/op-enter-mpreboot@0.service"
+	rm $LINK
 }
