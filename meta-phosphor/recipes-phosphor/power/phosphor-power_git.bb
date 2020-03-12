@@ -59,7 +59,7 @@ SYSTEMD_SERVICE_${PN}-regulators = "${REGS_SVC}"
 # FILES_${PN}-cold-redundancy = "${bindir}/cold-redundancy"
 
 FILES_${PN}-monitor = "${bindir}/psu-monitor"
-FILES_${PN}-psu-monitor = "${bindir}/phosphor-psu-monitor"
+FILES_${PN}-psu-monitor = "${bindir}/phosphor-psu-monitor ${datadir}/phosphor-psu-monitor"
 FILES_${PN}-regulators = "${bindir}/phosphor-regulators ${datadir}/phosphor-regulators"
 FILES_${PN}-sequencer = "${bindir}/pseq-monitor"
 FILES_${PN}-utils = "${bindir}/psutils"
