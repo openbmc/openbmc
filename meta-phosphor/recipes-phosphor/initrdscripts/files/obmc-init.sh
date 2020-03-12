@@ -128,18 +128,25 @@ try_wget() {
 
 debug_takeover() {
 	echo "$@"
-	test -n "$@" && echo Enter password to try to manually fix.
+
+	if ! grep -w enable-initrd-debug-sh "$optfile"
+	then
+		echo "Fatal error, triggering kernel panic!"
+		exit 1
+	fi
+
+	test -n "$@" && echo Try to manually fix.
 	cat << HERE
 After fixing run exit to continue this script, or reboot -f to retry, or
 touch /takeover and exit to become PID 1 allowing editing of this script.
 HERE
 
-	while ! sulogin && ! test -f /takeover
+	while ! /bin/sh && ! test -f /takeover
 	do
-		echo getty failed, retrying
+		echo /bin/sh failed, retrying
 	done
 
-	# Touch /takeover in the above getty to become pid 1
+	# Touch /takeover in the above shell to become pid 1
 	if test -e /takeover
 	then
 		cat << HERE
@@ -208,7 +215,12 @@ echo rofs = $rofs $rofst   rwfs = $rwfs $rwfst
 
 if grep -w debug-init-sh $optfile
 then
-	debug_takeover "Debug initial shell requested by command line."
+	if grep -w enable-initrd-debug-sh "$optfile"
+	then
+		debug_takeover "Debug initial shell requested by command line."
+	else
+		echo "Need to also add enable-initrd-debug-sh for debug shell."
+	fi
 fi
 
 if test "x$consider_download_files" = xy &&
@@ -394,7 +406,7 @@ then
 
 Mounting read-write $rwdev filesystem failed.  Please fix and run
 	mount $rwdev $rwdir -t $rwfst -o $rwopts
-to to continue, or do change nothing to run from RAM for this boot.
+or perform a factory reset with the clean-rwfs-filesystem option.
 HERE
 	debug_takeover "$msg"
 fi
@@ -411,7 +423,7 @@ do
 Unable to confirm /sbin/init is an executable non-empty file
 in merged file system mounted at /root.
 
-Change Root test failed!  Invoking emergency shell.
+Change Root test failed!
 HERE
 	debug_takeover "$msg"
 done
