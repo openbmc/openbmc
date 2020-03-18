@@ -34,9 +34,11 @@ def get_block_size(file_obj):
     # the FIGETBSZ ioctl (number 2).
     try:
         binary_data = fcntl.ioctl(file_obj, 2, struct.pack('I', 0))
+        bsize = struct.unpack('I', binary_data)[0]
     except OSError:
-        raise IOError("Unable to determine block size")
-    bsize = struct.unpack('I', binary_data)[0]
+        bsize = None
+
+    # If ioctl causes OSError or give bsize to zero failback to os.fstat
     if not bsize:
         import os
         stat = os.fstat(file_obj.fileno())
