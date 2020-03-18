@@ -10,13 +10,15 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENCE;md5=a6a4edad4aed50f39a66d098d74b265b"
 
 SYSTEMD_SERVICE_${PN} = "xyz.openbmc_project.EntityManager.service \
-                         xyz.openbmc_project.FruDevice.service"
+                         ${@bb.utils.contains('DISTRO_FEATURES', 'ipmi-fru', 'xyz.openbmc_project.FruDevice.service', '', d)}"
 
 DEPENDS = "boost \
-           i2c-tools \
            nlohmann-json \
            sdbusplus \
            valijson"
 
 S = "${WORKDIR}/git/"
 inherit meson systemd
+
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'ipmi-fru', d)}"
+PACKAGECONFIG[ipmi-fru] = "-Dfru-device=true, -Dfru-device=false, i2c-tools,"
