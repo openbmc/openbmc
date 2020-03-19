@@ -15,7 +15,7 @@ DEPENDS += "sdbusplus"
 DEPENDS += "sdbusplus-native"
 DEPENDS += "phosphor-logging"
 DEPENDS += "phosphor-dbus-interfaces"
-RDEPENDS_${PN} += "${VIRTUAL-RUNTIME_obmc-settings-mgmt}"
+RDEPENDS_${PN} += "phosphor-settings-manager"
 RDEPENDS_${PN} += "phosphor-network"
 RDEPENDS_${PN} += "phosphor-mapper"
 

@@ -60,7 +60,7 @@ GROUPADD_PARAM_${PN} = "ipmi"
 
 SYSTEMD_SERVICE_${PN} += "xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service phosphor-ipmi-host.service"
 
-RRECOMMENDS_${PN} += "${VIRTUAL-RUNTIME_obmc-settings-mgmt}"
+RRECOMMENDS_${PN} += "phosphor-settings-manager"
 
 
 require ${PN}.inc
