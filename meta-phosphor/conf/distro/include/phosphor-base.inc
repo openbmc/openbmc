@@ -96,7 +96,6 @@ DISTRO_FEATURES_BACKFILL_CONSIDERED = " \
 DISTRO_FEATURES_OBMC = " \
         obmc-host-ctl \
         obmc-host-ipmi \
-        obmc-logging-mgmt \
         obmc-phosphor-chassis-mgmt \
         obmc-phosphor-fan-mgmt \
         obmc-phosphor-flash-mgmt \
