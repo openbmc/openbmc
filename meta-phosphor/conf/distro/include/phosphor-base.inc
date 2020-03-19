@@ -94,6 +94,7 @@ DISTRO_FEATURES_BACKFILL_CONSIDERED = " \
         "
 
 DISTRO_FEATURES_OBMC = " \
+        ipmi-fru \
         obmc-host-ctl \
         obmc-host-ipmi \
         obmc-phosphor-chassis-mgmt \
