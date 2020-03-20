@@ -1,0 +1,1 @@
+SUBSYSTEM=="tty", ATTRS{iomem_base}=="0xF0003000", ENV{SYSTEMD_WANTS}="obmc-console@ttyS2" SYMLINK+="ttyS2", TAG+="systemd"

@@ -1,12 +1,14 @@
-SUMMARY = "Nuvoton OpenBMC console daemon"
-DESCRIPTION = "Nuvoton Daemon to handle UART console connections"
-HOMEPAGE = "http://github.com/openbmc/obmc-console"
-PR = "r1"
+FILESEXTRAPATHS_prepend_olympus-nuvoton := "${THISDIR}/${PN}:"
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+SRC_URI_append_olympus-nuvoton = " file://80-olympus-nuvoton-sol.rules"
 
-OBMC_CONSOLE_HOST_TTY := "ttyS2"
+do_install_append_olympus-nuvoton() {
+        install -m 0755 -d ${D}${sysconfdir}/${BPN}
+        rm -f ${D}${sysconfdir}/${BPN}/server.ttyVUART0.conf
+        install -m 0644 ${WORKDIR}/${BPN}.conf ${D}${sysconfdir}/
+        ln -sr ${D}${sysconfdir}/${BPN}.conf ${D}${sysconfdir}/${BPN}/server.ttyS2.conf
 
-do_build_append() {
-        install -m 0644 ${THISDIR}/files/${PN}.conf ${WORKDIR}/${PN}.conf
+        install -d ${D}/lib/udev/rules.d
+        rm -f ${D}/lib/udev/rules.d/80-obmc-console-uart.rules
+        install -m 0644 ${WORKDIR}/80-olympus-nuvoton-sol.rules ${D}/lib/udev/rules.d
 }
