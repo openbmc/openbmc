@@ -31,7 +31,6 @@ c = @CC
 cpp = @CXX
 ar = @AR
 nm = @NM
-ld = @LD
 strip = @STRIP
 pkgconfig = 'pkg-config'
 
