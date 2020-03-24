@@ -10,4 +10,4 @@ PROVIDES += "virtual/obmc-chassis-mgmt"
 RPROVIDES_${PN} += "virtual-obmc-chassis-mgmt"
 
 S = "${WORKDIR}"
-SRC_URI += "file://${PN}.py"
+SRC_URI += "file://${BPN}.py"
