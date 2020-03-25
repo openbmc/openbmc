@@ -184,7 +184,7 @@ PACKAGECONFIG[ubifs-workaround] = " \
 "
 
 PACKAGECONFIG[host-dump-offload-pldm] = " \
-        --with-host-dump-offload-transport=pldm, \
+        --with-host-dump-offload-transport=pldm,, \
         pldm \
         "
 
