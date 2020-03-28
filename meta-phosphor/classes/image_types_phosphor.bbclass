@@ -512,14 +512,16 @@ do_generate_ubi_tar[depends] += " \
         "
 
 do_generate_ext4_tar() {
+	zstd -f -k -T0 -c ${ZSTD_COMPRESSION_LEVEL} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${FLASH_EXT4_BASETYPE} > ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${FLASH_EXT4_BASETYPE}.zst
 	ln -sf ${S}/MANIFEST MANIFEST
 	ln -sf ${S}/publickey publickey
-	make_image_links rwfs.${FLASH_EXT4_OVERLAY_BASETYPE} ${FLASH_EXT4_BASETYPE}
+	make_image_links rwfs.${FLASH_EXT4_OVERLAY_BASETYPE} ${FLASH_EXT4_BASETYPE}.zst
 	make_signatures image-u-boot image-kernel image-rofs image-rwfs MANIFEST publickey
 	make_tar_of_images ext4.mmc MANIFEST publickey ${signature_files}
 }
 do_generate_ext4_tar[dirs] = " ${S}/ext4"
 do_generate_ext4_tar[depends] += " \
+        zstd-native:do_populate_sysroot \
         ${PN}:do_image_${FLASH_EXT4_BASETYPE} \
         virtual/kernel:do_deploy \
         u-boot:do_populate_sysroot \
