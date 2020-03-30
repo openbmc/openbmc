@@ -25,12 +25,17 @@ DEPENDS += " \
         cli11 \
         "
 
+RDEPENDS_${PN} += "bash"
+
+SRC_URI += "file://of-name-to-eeprom.sh"
+
 SYSTEMD_SERVICE_${PN} += "obmc-read-eeprom@.service"
 
 S = "${WORKDIR}/git"
 
 HOSTIPMI_PROVIDER_LIBRARY += "libstrgfnhandler.so"
 
+FILES_${PN} += "${bindir}/of-name-to-eeprom.sh"
 FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
 FILES_${PN}_append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
 FILES_${PN}-dev_append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV} ${libdir}/ipmid-providers/*.la"
@@ -39,3 +44,8 @@ EXTRA_OECONF = " \
              YAML_GEN=${STAGING_DIR_NATIVE}${config_datadir}/config.yaml \
              PROP_YAML=${STAGING_DIR_NATIVE}${properties_datadir}/extra-properties.yaml \
              "
+
+do_install_append() {
+        install -d ${D}${bindir}
+        install -m 0755 ${WORKDIR}/of-name-to-eeprom.sh ${D}${bindir}
+}
