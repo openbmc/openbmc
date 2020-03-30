@@ -20,5 +20,7 @@ DEPENDS = "boost \
 S = "${WORKDIR}/git/"
 inherit meson systemd
 
+EXTRA_OEMESON = "-Dtests=disabled"
+
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'ipmi-fru', d)}"
 PACKAGECONFIG[ipmi-fru] = "-Dfru-device=true, -Dfru-device=false, i2c-tools,"
