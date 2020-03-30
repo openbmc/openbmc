@@ -20,7 +20,9 @@ DBUS_PACKAGES = "${PN}-ledmanager"
 
 SYSTEMD_PACKAGES = "${LED_MGR_PACKAGES}"
 
-DEPENDS += "python-pyyaml-native"
+DEPENDS += "${PYTHON_PN}-native"
+DEPENDS += "${PYTHON_PN}-pyyaml-native"
+DEPENDS += "${PYTHON_PN}-inflection-native"
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus sdbusplus-native"
 DEPENDS += "systemd"
