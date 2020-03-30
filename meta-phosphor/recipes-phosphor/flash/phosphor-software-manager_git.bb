@@ -30,7 +30,7 @@ PACKAGECONFIG[flash_bios] = "--enable-host_bios_upgrade"
 
 inherit autotools pkgconfig
 inherit obmc-phosphor-dbus-service
-inherit pythonnative
+inherit python3native
 inherit ${@bb.utils.contains('DISTRO_FEATURES', 'obmc-ubi-fs', 'phosphor-software-manager-ubi-fs', '', d)}
 
 DEPENDS += " \
