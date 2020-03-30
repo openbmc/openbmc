@@ -5,7 +5,7 @@ PV = "1.0+git${SRCPV}"
 
 require ${PN}.inc
 
-inherit autotools pkgconfig pythonnative
+inherit autotools pkgconfig python3native
 inherit obmc-phosphor-dbus-service obmc-phosphor-systemd
 
 LED_MGR_PACKAGES = " \
