@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 inherit native
 inherit phosphor-ipmi-host
-inherit pythonnative
+inherit python3native
 inherit mrw-xml
 
 DEPENDS += " \
@@ -13,7 +13,7 @@ DEPENDS += " \
            mrw-perl-tools-native \
            phosphor-ipmi-sensor-config-native \
            phosphor-ipmi-sensor-inventory-mrw-config-native \
-           python-pyyaml-native \
+           ${PYTHON_PN}-pyyaml-native \
            "
 
 PROVIDES += "virtual/phosphor-ipmi-sensor-inventory"

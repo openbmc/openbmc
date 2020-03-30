@@ -12,7 +12,7 @@ inherit obmc-phosphor-ipmiprovider-symlink
 inherit obmc-phosphor-sdbus-service
 inherit obmc-phosphor-systemd
 inherit phosphor-ipmi-host
-inherit pythonnative
+inherit python3native
 
 def ipmi_whitelists(d):
     whitelists = d.getVar(
