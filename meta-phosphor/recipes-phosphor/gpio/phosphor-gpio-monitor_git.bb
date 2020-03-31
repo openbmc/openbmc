@@ -23,7 +23,7 @@ RPROVIDES_${PN}-presence += "virtual/obmc-gpio-presence"
 PROVIDES += "virtual/obmc-gpio-monitor"
 PROVIDES += "virtual/obmc-gpio-presence"
 
-DEPENDS += "sdbusplus sdbusplus-native"
+DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "libevdev"
 DEPENDS += "phosphor-logging"

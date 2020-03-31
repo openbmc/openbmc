@@ -22,7 +22,6 @@ DEPENDS = " \
         phosphor-dbus-interfaces-native \
         phosphor-logging \
         sdbusplus \
-        sdbusplus-native \
         sdeventplus \
         "
 

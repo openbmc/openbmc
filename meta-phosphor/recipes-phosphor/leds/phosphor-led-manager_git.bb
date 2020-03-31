@@ -24,7 +24,7 @@ DEPENDS += "${PYTHON_PN}-native"
 DEPENDS += "${PYTHON_PN}-pyyaml-native"
 DEPENDS += "${PYTHON_PN}-inflection-native"
 DEPENDS += "autoconf-archive-native"
-DEPENDS += "sdbusplus sdbusplus-native"
+DEPENDS += "sdbusplus ${PYTHON_PN}-sdbus++-native"
 DEPENDS += "systemd"
 DEPENDS += "phosphor-logging"
 

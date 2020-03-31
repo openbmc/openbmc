@@ -38,7 +38,7 @@ DEPENDS += " \
     openssl \
     phosphor-dbus-interfaces \
     phosphor-logging \
-    sdbus++-native \
+    ${PYTHON_PN}-sdbus++-native \
     sdbusplus \
 "
 

@@ -23,7 +23,7 @@ DEPENDS += " \
         ${PN}-config \
         phosphor-logging \
         autoconf-archive-native \
-        sdbusplus-native \
+        ${PYTHON_PN}-sdbus++-native \
         sdeventplus \
         gtest \
         phosphor-snmp \

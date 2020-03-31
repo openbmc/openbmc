@@ -17,7 +17,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 DEPENDS += "\
             autoconf-archive-native \
             sdbusplus \
-            sdbusplus-native \
+            ${PYTHON_PN}-sdbus++-native \
             phosphor-dbus-interfaces \
            "
 RDEPENDS_${PN} += "obmc-console"

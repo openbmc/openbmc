@@ -14,7 +14,7 @@ inherit systemd
 
 DEPENDS += "systemd"
 DEPENDS += "autoconf-archive-native"
-DEPENDS += "sdbusplus sdbusplus-native"
+DEPENDS += "sdbusplus ${PYTHON_PN}-sdbus++-native"
 DEPENDS += "sdeventplus"
 DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
 DEPENDS += "phosphor-logging"

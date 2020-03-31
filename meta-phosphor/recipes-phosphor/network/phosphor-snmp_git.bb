@@ -18,7 +18,7 @@ DBUS_SERVICE_${PN} += "xyz.openbmc_project.Network.SNMP.service"
 
 DEPENDS += "systemd"
 DEPENDS += "autoconf-archive-native"
-DEPENDS += "sdbusplus sdbusplus-native"
+DEPENDS += "sdbusplus ${PYTHON_PN}-sdbus++-native"
 DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
 DEPENDS += "phosphor-logging"
 DEPENDS += "net-snmp"

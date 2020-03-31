@@ -33,7 +33,7 @@ DEPENDS += " \
         phosphor-dbus-interfaces-native \
         phosphor-logging \
         sdbusplus \
-        sdbusplus-native \
+        ${PYTHON_PN}-sdbus++-native \
         autoconf-archive-native \
         virtual/phosphor-debug-errors \
         ${PYTHON_PN}-native \

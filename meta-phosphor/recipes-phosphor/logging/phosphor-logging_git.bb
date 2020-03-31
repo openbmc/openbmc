@@ -18,7 +18,8 @@ DEPENDS += "systemd"
 DEPENDS += "${PYTHON_PN}-mako-native"
 DEPENDS += "${PYTHON_PN}-pyyaml-native"
 DEPENDS += "${PYTHON_PN}-native"
-DEPENDS += "sdbusplus sdbusplus-native"
+DEPENDS += "${PYTHON_PN}-sdbus++-native"
+DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
 DEPENDS += "virtual/phosphor-logging-callouts"
 DEPENDS += "phosphor-logging-error-logs-native"
@@ -63,7 +64,7 @@ S = "${WORKDIR}/git"
 # as they will not be available in host machine
 DEPENDS_remove_class-native = " \
         virtual/phosphor-logging-callouts \
-        sdbus++ \
+        sdbusplus \
         systemd \
         libcereal \
         sdeventplus \
@@ -73,7 +74,7 @@ DEPENDS_remove_class-native = " \
 # as they will not be available in host machine
 DEPENDS_remove_class-nativesdk = " \
         virtual/phosphor-logging-callouts \
-        sdbus++-native \
+        sdbusplus-native \
         libcereal \
         systemd \
         phosphor-dbus-interfaces \

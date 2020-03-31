@@ -32,7 +32,7 @@ SYSTEMD_PACKAGES = "${POWER_SERVICE_PACKAGES}"
 DEPENDS += " \
          phosphor-logging \
          openpower-dbus-interfaces \
-         sdbus++-native \
+         ${PYTHON_PN}-sdbus++-native \
          sdeventplus \
          nlohmann-json \
          cli11 \
