@@ -50,11 +50,11 @@ OCC_DISABLE = "disable"
 HOST_START = "startmin"
 HOST_STOP = "stop"
 
-# Ensure host-stop and host-startmin targets require needed occ states
+# Ensure host-stop and host-startmin targets wants needed occ states
 OCC_TMPL = "op-occ-{0}@.service"
 HOST_TGTFMT = "obmc-host-{1}@{2}.target"
 OCC_INSTFMT = "op-occ-{0}@{2}.service"
-HOST_OCC_FMT = "../${OCC_TMPL}:${HOST_TGTFMT}.requires/${OCC_INSTFMT}"
+HOST_OCC_FMT = "../${OCC_TMPL}:${HOST_TGTFMT}.wants/${OCC_INSTFMT}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'HOST_OCC_FMT', 'OCC_ENABLE', 'HOST_START', 'OBMC_HOST_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'HOST_OCC_FMT', 'OCC_DISABLE', 'HOST_STOP', 'OBMC_HOST_INSTANCES')}"
 
