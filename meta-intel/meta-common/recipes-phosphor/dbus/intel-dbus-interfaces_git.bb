@@ -8,24 +8,21 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig
-inherit pythonnative
+inherit python3native
 inherit phosphor-dbus-yaml
 
 DEPENDS += "autoconf-archive-native"
-DEPENDS += "sdbus++-native"
+DEPENDS += "${PYTHON_PN}-sdbus++-native"
 
 SRC_URI = "git://github.com/openbmc/intel-dbus-interfaces"
 SRCREV = "b5f2dd444c5d3808d005452417e4ae2ea28624ff"
-
-DEPENDS_remove_class-native = "sdbus++-native"
-DEPENDS_remove_class-nativesdk = "sdbus++-native"
 
 PACKAGECONFIG ??= "libintel_dbus"
 PACKAGECONFIG[libintel_dbus] = " \
         --enable-libintel_dbus, \
         --disable-libintel_dbus, \
         systemd sdbusplus, \
-        libsystemd sdbusplus \
+        libsystemd \
         "
 
 PACKAGECONFIG_remove_class-native = "libintel_dbus"
