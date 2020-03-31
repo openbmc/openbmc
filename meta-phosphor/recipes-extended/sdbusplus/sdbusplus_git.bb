@@ -1,13 +1,10 @@
 SUMMARY = "C++ bindings for systemd dbus APIs"
 DESCRIPTION = "C++ bindings for systemd dbus APIs."
-HOMEPAGE = "http://github.com/openbmc/sdbusplus"
-PR = "r1"
-PV = "1.0+git${SRCPV}"
-LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
 inherit autotools pkgconfig
 inherit obmc-phosphor-python-autotools
+
+include sdbusplus-rev.inc
 
 DEPENDS += " \
         autoconf-archive-native \
@@ -37,14 +34,9 @@ DEPENDS_append_class-native = " \
         ${PYTHON_PN}-pyyaml-native \
         "
 
-SRC_URI += "git://github.com/openbmc/sdbusplus"
-SRCREV = "ddc0eba2bea1f55dff275726903deecd88ac6f3d"
-
 PACKAGECONFIG ??= "libsdbusplus transaction"
 PACKAGECONFIG[libsdbusplus] = "--enable-libsdbusplus,--disable-libsdbusplus,systemd,libsystemd"
 PACKAGECONFIG[transaction] = "--enable-transaction,--disable-transaction"
-
-S = "${WORKDIR}/git"
 
 PROVIDES_prepend = "sdbus++ "
 PACKAGE_BEFORE_PN = "sdbus++"
