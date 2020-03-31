@@ -12,10 +12,10 @@ RDEPENDS_${PN} += "phosphor-state-manager-obmc-targets"
 ALLOW_EMPTY_${PN} = "1"
 
 pkg_postinst_${PN}() {
-	mkdir -p $D$systemd_system_unitdir/obmc-host-stop@0.target.requires
+	mkdir -p $D$systemd_system_unitdir/obmc-host-stop@0.target.wants
 	mkdir -p $D$systemd_system_unitdir/obmc-host-force-warm-reboot@0.target.requires
 
-	LINK="$D$systemd_system_unitdir/obmc-host-stop@0.target.requires/op-stop-instructions@0.service"
+	LINK="$D$systemd_system_unitdir/obmc-host-stop@0.target.wants/op-stop-instructions@0.service"
 	TARGET="../op-stop-instructions@.service"
 	ln -s $TARGET $LINK
 
@@ -33,7 +33,7 @@ pkg_postinst_${PN}() {
 }
 
 pkg_prerm_${PN}() {
-	LINK="$D$systemd_system_unitdir/obmc-host-stop@0.target.requires/op-stop-instructions@0.service"
+	LINK="$D$systemd_system_unitdir/obmc-host-stop@0.target.wants/op-stop-instructions@0.service"
 	rm $LINK
 	LINK="$D$systemd_system_unitdir/obmc-host-force-warm-reboot@0.target.requires/op-cfam-reset.service"
 	rm $LINK
