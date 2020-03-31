@@ -26,7 +26,7 @@ SYSTEMD_SERVICE_${PN} += "op-occ-disable@.service"
 DEPENDS += "virtual/${PN}-config-native"
 DEPENDS += " \
         sdbusplus \
-        sdbusplus-native \
+        ${PYTHON_PN}-sdbus++-native \
         phosphor-logging \
         phosphor-dbus-interfaces \
         autoconf-archive-native \

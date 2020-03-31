@@ -13,11 +13,11 @@ require ${PN}.inc
 
 DEPENDS += "phosphor-ipmi-host"
 DEPENDS += "autoconf-archive-native"
-DEPENDS += "sdbusplus sdbusplus-native"
+DEPENDS += "sdbusplus"
+DEPENDS += "${PYTHON_PN}-sdbus++-native"
 DEPENDS += "phosphor-logging"
 DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
 DEPENDS += "openpower-dbus-interfaces openpower-dbus-interfaces-native"
-DEPENDS += "sdbus++-native"
 DEPENDS += "virtual/phosphor-ipmi-inventory-sel"
 
 TARGET_CFLAGS += "-fpic"

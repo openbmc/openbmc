@@ -15,7 +15,7 @@ require ${PN}.inc
 DEPENDS += " \
         phosphor-logging \
         autoconf-archive-native \
-        sdbus++-native \
+        ${PYTHON_PN}-sdbus++-native \
         "
 S = "${WORKDIR}/git"
 
