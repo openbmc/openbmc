@@ -11,10 +11,12 @@ SRC_URI += "file://croserver.service"
 
 S = "${WORKDIR}/git"
 
-inherit pythonnative
+inherit python3native
 
 do_configure() {
-   LD="${CXX}" ${S}/config.py --without-swig --output-root ${B} --target obj --extensions "cmd cip" --build-verbose
+   LD="${CXX}" ${PYTHON} ${S}/config.py \
+       --without-swig --output-root ${B} --target obj \
+       --extensions "cmd cip" --build-verbose
 }
 
 do_compile() {
