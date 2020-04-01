@@ -7,4 +7,4 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 S = "${WORKDIR}/git"
 
 SRC_URI += "git://github.com/openbmc/sdbusplus"
-SRCREV = "ddc0eba2bea1f55dff275726903deecd88ac6f3d"
+SRCREV = "5de31846e2b03591504fcdd48efba3487a570197"

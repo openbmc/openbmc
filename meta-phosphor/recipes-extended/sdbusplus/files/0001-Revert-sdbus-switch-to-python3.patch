@@ -1,64 +1,61 @@
-From 04852662bc68139e58bb51803cb32aa2d300c605 Mon Sep 17 00:00:00 2001
+From 8729226fb79d49129c8349645e0f8ec381f14be8 Mon Sep 17 00:00:00 2001
 From: Patrick Williams <patrick@stwcx.xyz>
-Date: Fri, 31 Jan 2020 18:47:38 -0800
-Subject: [PATCH] sdbus++: switch to python3
+Date: Wed, 1 Apr 2020 08:48:05 -0500
+Subject: [PATCH] Revert "sdbus++: switch to python3"
 
-Python2 is DEAD!  Long live Python3!
-
-Signed-off-by: Patrick Williams <patrick@stwcx.xyz>
-Change-Id: Ifd46a4aeb41fb0e6db2f4310a603b727a5a2c2ff
+This reverts commit 18ce803d1e2a6a1779d38f7bf5279901b02583e0.
 ---
  configure.ac                    | 2 +-
- tools/sdbus++                   | 8 ++------
+ tools/sdbus++                   | 8 ++++++--
  tools/sdbusplus/namedelement.py | 4 ++--
- 3 files changed, 5 insertions(+), 9 deletions(-)
+ 3 files changed, 9 insertions(+), 5 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 11c189b..ec65562 100644
+index ec65562..11c189b 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -29,7 +29,7 @@ AC_PROG_INSTALL
  AC_PROG_MAKE_SET
  
  # setup sdbus++
--AM_PATH_PYTHON([2.7], [AC_SUBST([PYTHON], [echo "$PYTHON"])])
-+AM_PATH_PYTHON([3.0], [AC_SUBST([PYTHON], [echo "$PYTHON"])])
+-AM_PATH_PYTHON([3.0], [AC_SUBST([PYTHON], [echo "$PYTHON"])])
++AM_PATH_PYTHON([2.7], [AC_SUBST([PYTHON], [echo "$PYTHON"])])
  AC_SUBST([PYTHONDIR], ${pythondir})
  AS_IF([test "$PYTHON" != :], [have_python=yes], [have_python=no])
  
 diff --git a/tools/sdbus++ b/tools/sdbus++
-index 26969f3..d709c19 100755
+index fa12677..6cfcb9e 100755
 --- a/tools/sdbus++
 +++ b/tools/sdbus++
 @@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
+-#!/usr/bin/env python3
++#!/usr/bin/env python
  import sdbusplus
  import mako.lookup
  import argparse
-@@ -34,11 +34,7 @@ def main():
+@@ -35,7 +35,11 @@ def main():
  
      args = parser.parse_args()
  
--    if sys.version_info < (3, 0):
--        lookup = mako.lookup.TemplateLookup(directories=[args.templatedir],
--                                            disable_unicode=True)
--    else:
--        lookup = mako.lookup.TemplateLookup(directories=[args.templatedir])
-+    lookup = mako.lookup.TemplateLookup(directories=[args.templatedir])
+-    lookup = mako.lookup.TemplateLookup(directories=[args.templatedir])
++    if sys.version_info < (3, 0):
++        lookup = mako.lookup.TemplateLookup(directories=[args.templatedir],
++                                            disable_unicode=True)
++    else:
++        lookup = mako.lookup.TemplateLookup(directories=[args.templatedir])
  
      instance = valid_types[args.typeName].load(args.item, args.rootdir)
      function = getattr(instance, valid_processes[args.process])
 diff --git a/tools/sdbusplus/namedelement.py b/tools/sdbusplus/namedelement.py
-index 5048654..1548ef0 100644
+index 1548ef0..5048654 100644
 --- a/tools/sdbusplus/namedelement.py
 +++ b/tools/sdbusplus/namedelement.py
 @@ -7,7 +7,7 @@ class NamedElement(object):
          self.name = kwargs.pop('name', "unnamed")
          self.description = kwargs.pop('description', "")
  
--    def __getattr__(self, name):
-+    def __getattribute__(self, name):
+-    def __getattribute__(self, name):
++    def __getattr__(self, name):
          l = {'CamelCase': lambda: inflection.camelize(self.name),
               'camelCase': lambda: inflection.camelize(self.name, False),
               'snake_case': lambda: inflection.underscore(self.name)}\
@@ -66,11 +63,11 @@ index 5048654..1548ef0 100644
          if l:
              return NamedElement.__fixup_name(l())
          try:
--            return super(NamedElement, self).__getattr__(name)
-+            return super(NamedElement, self).__getattribute__(name)
+-            return super(NamedElement, self).__getattribute__(name)
++            return super(NamedElement, self).__getattr__(name)
          except:
              raise AttributeError("Attribute '%s' not found in %s.NamedElement"
                                   % (name, self.__module__))
 -- 
-2.13.5
+2.24.1
 

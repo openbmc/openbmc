@@ -13,8 +13,6 @@ DEPENDS += " \
         ${PYTHON_PN}-pyyaml-native \
         "
 
-SRC_URI += "file://0001-sdbus-switch-to-python3.patch"
-
 PACKAGECONFIG ??= "libsdbusplus transaction"
 PACKAGECONFIG[libsdbusplus] = "--enable-libsdbusplus,--disable-libsdbusplus,systemd,libsystemd"
 PACKAGECONFIG[transaction] = "--enable-transaction,--disable-transaction"
