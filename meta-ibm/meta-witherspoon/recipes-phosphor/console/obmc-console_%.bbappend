@@ -44,3 +44,21 @@ EXTRA_OECONF_append_rainier = " --enable-concurrent-servers"
 do_install_append_rainier() {
         install_concurrent_console_config
 }
+
+SRC_URI_append_witherspoon-tacoma = " file://client.2201.conf"
+SRC_URI_append_witherspoon-tacoma = " file://server.ttyVUART1.conf"
+
+REGISTERED_SERVICES_${PN}_append_witherspoon-tacoma = " obmc_console_guests:tcp:2201:"
+
+SYSTEMD_SERVICE_${PN}_append_witherspoon-tacoma = " obmc-console-ssh@2200.service \
+		obmc-console-ssh@2201.service \
+                "
+SYSTEMD_SERVICE_${PN}_remove_witherspoon-tacoma = "obmc-console-ssh.socket"
+
+FILES_${PN}_remove_witherspoon-tacoma = "/lib/systemd/system/obmc-console-ssh@.service.d/use-socket.conf"
+
+EXTRA_OECONF_append_witherspoon-tacoma = " --enable-concurrent-servers"
+
+do_install_append_witherspoon-tacoma() {
+        install_concurrent_console_config
+}
