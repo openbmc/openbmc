@@ -5,7 +5,7 @@ PR = "r1"
 PV = "0.1+git${SRCPV}"
 
 inherit autotools pkgconfig
-inherit pythonnative
+inherit python3native
 inherit obmc-phosphor-dbus-service
 
 LICENSE = "Apache-2.0"
