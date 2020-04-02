@@ -49,7 +49,9 @@ machine() {
 				fi
 				return
 			fi
-		else
+		elif test -e $tmpl/bblayers.conf.sample && \
+			grep -q "##OEROOT##/meta-phosphor" $tmpl/bblayers.conf.sample;
+		then
 			echo "${name}"
 		fi
 	done
