@@ -6,7 +6,7 @@ PV = "1.0+git${SRCPV}"
 
 require ${BPN}.inc
 
-inherit autotools pkgconfig pythonnative
+inherit autotools pkgconfig python3native
 inherit obmc-phosphor-systemd
 inherit phosphor-fan
 
