@@ -39,6 +39,6 @@ SYSTEMD_SERVICE_${PN} += "mboxd.service"
 SYSTEMD_SERVICE_${PN} += "mboxd-reload@.service"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT', 'OBMC_HOST_INSTANCES')}"
 
-# Enable virtual-pnor by DISTRO_FEATURE openpower-ubi-fs.
-PACKAGECONFIG_append_df-openpower-ubi-fs = "virtual-pnor"
+# Enable virtual-pnor by DISTRO_FEATURE openpower-virtual-pnor.
+PACKAGECONFIG_append_df-openpower-virtual-pnor = " virtual-pnor"
 PACKAGECONFIG[virtual-pnor] = "--enable-virtual-pnor,--disable-virtual-pnor"
