@@ -130,8 +130,11 @@ python() {
                 'base_bindir',
                 'bindir',
                 'sbindir',
+                'libexecdir',
                 'envfiledir',
                 'sysconfdir',
+                'localstatedir',
+                'datadir',
                 'SYSTEMD_DEFAULT_TARGET' ]:
             set_append(d, 'SYSTEMD_SUBSTITUTIONS',
                 '%s:%s:%s' % (x, d.getVar(x, True), file))
@@ -336,6 +339,9 @@ do_install_append() {
                 sed -i -e 's,@BASE_BINDIR@,${base_bindir},g' \
                         -e 's,@BINDIR@,${bindir},g' \
                         -e 's,@SBINDIR@,${sbindir},g' \
+                        -e 's,@LIBEXECDIR@,${libexecdir},g' \
+                        -e 's,@LOCALSTATEDIR@,${localstatedir},g' \
+                        -e 's,@DATADIR@,${datadir},g' \
                         ${D}${systemd_system_unitdir}/$s
         done
 }
