@@ -10,7 +10,7 @@ inherit autotools \
         pythonnative \
         phosphor-dbus-yaml
 
-require ${PN}.inc
+require ${BPN}.inc
 
 DEPENDS += " \
         phosphor-logging \

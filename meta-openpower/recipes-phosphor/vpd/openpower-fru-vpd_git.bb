@@ -8,7 +8,7 @@ inherit openpower-fru-vpd
 inherit python3native
 inherit obmc-phosphor-systemd
 
-require ${PN}.inc
+require ${BPN}.inc
 
 SRC_URI += "file://70-op-vpd.rules"
 

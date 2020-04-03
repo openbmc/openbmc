@@ -9,7 +9,7 @@ inherit autotools pkgconfig
 inherit obmc-phosphor-ipmiprovider-symlink
 inherit pythonnative
 
-require ${PN}.inc
+require ${BPN}.inc
 
 DEPENDS += "phosphor-ipmi-host"
 DEPENDS += "autoconf-archive-native"

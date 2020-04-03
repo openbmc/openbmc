@@ -10,7 +10,7 @@ inherit autotools \
         python3native \
         phosphor-dbus-yaml
 
-require ${PN}.inc
+require ${BPN}.inc
 
 SRC_URI += "file://occ-active.sh"
 do_install_append() {
