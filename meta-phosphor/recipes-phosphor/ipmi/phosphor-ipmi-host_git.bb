@@ -63,7 +63,7 @@ SYSTEMD_SERVICE_${PN} += "xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service
 RRECOMMENDS_${PN} += "phosphor-settings-manager"
 
 
-require ${PN}.inc
+require ${BPN}.inc
 
 # Setup IPMI Whitelist Conf files
 WHITELIST_CONF = " \

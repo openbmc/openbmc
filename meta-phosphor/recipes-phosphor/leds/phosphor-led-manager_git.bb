@@ -3,7 +3,7 @@ DESCRIPTION = "Daemon to cater to triggering actions on LED groups"
 PR = "r1"
 PV = "1.0+git${SRCPV}"
 
-require ${PN}.inc
+require ${BPN}.inc
 
 inherit autotools pkgconfig python3native
 inherit obmc-phosphor-dbus-service obmc-phosphor-systemd

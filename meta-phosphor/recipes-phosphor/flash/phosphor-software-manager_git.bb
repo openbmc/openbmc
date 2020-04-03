@@ -5,7 +5,7 @@ platforms."
 PR = "r1"
 PV = "1.0+git${SRCPV}"
 
-require ${PN}.inc
+require ${BPN}.inc
 
 SOFTWARE_MGR_PACKAGES = " \
     ${PN}-version \

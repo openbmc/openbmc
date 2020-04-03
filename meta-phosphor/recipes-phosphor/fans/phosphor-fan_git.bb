@@ -4,7 +4,7 @@ control applications."
 PR = "r1"
 PV = "1.0+git${SRCPV}"
 
-require ${PN}.inc
+require ${BPN}.inc
 
 inherit autotools pkgconfig pythonnative
 inherit obmc-phosphor-systemd

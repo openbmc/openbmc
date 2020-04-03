@@ -9,7 +9,7 @@ inherit pkgconfig
 inherit systemd
 inherit python3native
 
-require ${PN}.inc
+require ${BPN}.inc
 
 S = "${WORKDIR}/git"
 

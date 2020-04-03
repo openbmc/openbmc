@@ -9,7 +9,7 @@ inherit obmc-phosphor-ipmiprovider-symlink
 inherit phosphor-ipmi-fru
 inherit pythonnative
 
-require ${PN}.inc
+require ${BPN}.inc
 
 DEPENDS += " \
         virtual/phosphor-ipmi-fru-inventory \
