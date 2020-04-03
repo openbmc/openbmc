@@ -6,7 +6,7 @@ PV = "1.0+git${SRCPV}"
 
 inherit autotools
 inherit pkgconfig
-inherit pythonnative
+inherit python3native
 inherit systemd
 
 # License info
