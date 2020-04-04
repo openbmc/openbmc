@@ -7,7 +7,7 @@ inherit autotools pkgconfig
 inherit obmc-phosphor-systemd
 inherit obmc-phosphor-ipmiprovider-symlink
 inherit phosphor-ipmi-fru
-inherit pythonnative
+inherit python3native
 
 require ${BPN}.inc
 
@@ -16,8 +16,8 @@ DEPENDS += " \
         virtual/phosphor-ipmi-fru-properties \
         systemd \
         sdbusplus \
-        python-mako-native \
-        python-pyyaml-native \
+        ${PYTHON_PN}-mako-native \
+        ${PYTHON_PN}-pyyaml-native \
         phosphor-ipmi-host \
         phosphor-mapper \
         autoconf-archive-native \
