@@ -10,7 +10,6 @@ LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
 inherit autotools pkgconfig systemd
 inherit obmc-phosphor-dbus-service
-inherit python3native
 
 inherit ${@bb.utils.contains('DISTRO_FEATURES', 'openpower-ubi-fs', \
                              'openpower-software-manager-ubi', \
@@ -33,7 +32,6 @@ DEPENDS += " \
         phosphor-dbus-interfaces \
         phosphor-logging \
         sdbusplus \
-        sdbusplus-native \
         "
 
 RDEPENDS_${PN} += " \
