@@ -74,6 +74,7 @@ S = "${WORKDIR}/git"
 DEPENDS_remove_class-native = " \
         phosphor-logging \
         systemd \
+        sdbusplus \
         virtual/${PN}-config-native \
         "
 RDEPENDS_${PN}_remove_class-native += "phosphor-state-manager-obmc-targets"
@@ -82,6 +83,7 @@ RDEPENDS_${PN}_remove_class-native += "phosphor-state-manager-obmc-targets"
 DEPENDS_remove_class-nativesdk = " \
         phosphor-logging \
         systemd \
+        sdbusplus \
         virtual/${PN}-config-native \
         "
 RDEPENDS_${PN}_remove_class-nativesdk += "phosphor-state-manager-obmc-targets"
