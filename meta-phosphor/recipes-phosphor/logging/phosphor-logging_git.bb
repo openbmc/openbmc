@@ -74,7 +74,7 @@ DEPENDS_remove_class-native = " \
 # as they will not be available in host machine
 DEPENDS_remove_class-nativesdk = " \
         virtual/phosphor-logging-callouts \
-        sdbusplus-native \
+        sdbusplus \
         libcereal \
         systemd \
         phosphor-dbus-interfaces \
