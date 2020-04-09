@@ -128,6 +128,12 @@
           Enabled:
              Default: 'false'
 
+/xyz/openbmc_project/logging/settings:
+    - Interface: xyz.openbmc_project.Logging.Settings
+      Properties:
+          QuiesceOnHwError:
+             Default: 'false'
+
 /xyz/openbmc_project/software/apply_time:
     - Interface: xyz.openbmc_project.Software.ApplyTime
       Properties:
