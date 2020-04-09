@@ -4,9 +4,9 @@ inherit obmc-phosphor-systemd
 
 SRC_URI += "file://psu.json"
 
-EXTRA_OEMESON_${PN}-sequencer += "-Ducd90160-yaml=${STAGING_DIR_HOST}${datadir}/power-sequencer/ucd90160.yaml"
+EXTRA_OEMESON += "-Ducd90160-yaml=${STAGING_DIR_HOST}${datadir}/power-sequencer/ucd90160.yaml"
 
-DEPENDS_${PN}-sequencer += " power-sequencer"
+DEPENDS += " power-sequencer"
 
 do_install_append(){
     install -D ${WORKDIR}/psu.json ${D}${datadir}/phosphor-power/psu.json
