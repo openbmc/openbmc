@@ -19,7 +19,6 @@ DEPENDS += "${PYTHON_PN}-mako-native"
 DEPENDS += "${PYTHON_PN}-pyyaml-native"
 DEPENDS += "phosphor-logging"
 DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
-DEPENDS += "openpower-dbus-interfaces openpower-dbus-interfaces-native"
 DEPENDS += "virtual/phosphor-ipmi-inventory-sel"
 
 TARGET_CFLAGS += "-fpic"
