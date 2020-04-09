@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend_tiogapass := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 SRC_URI_append_tiogapass = " file://ipmb-channels.json"
 

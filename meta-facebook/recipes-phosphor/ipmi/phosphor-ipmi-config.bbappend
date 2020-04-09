@@ -1,1 +1,1 @@
-FILESEXTRAPATHS_prepend_tiogapass := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
