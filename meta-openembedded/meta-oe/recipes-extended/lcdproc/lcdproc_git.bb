@@ -7,22 +7,25 @@ LICENSE = "GPLv2+"
 DEPENDS = "ncurses lirc"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=18810669f13b87348459e611d31ab760 \
-                    file://README.md;beginline=107;md5=5c927ce1742d6d5cddc45b7ad6230f75"
+                    file://README.md;beginline=107;md5=5db392f043253a2d64b1737068ce6b58"
 
-BASEPV = "0.5.9"
-PV = "${BASEPV}+git${SRCPV}"
-SRCREV = "e08546c13a4157ed98cd4a8e9086e7acd66f93c0"
+PV = "0.5.9+git${SRCPV}"
+SRCREV = "3a3d622d9bb74c44fa67bc20573751a207514134"
 SRC_URI = "git://github.com/lcdproc/lcdproc \
            file://0001-Fix-parallel-build-fix-port-internal-make-dependenci.patch \
+           file://0002-Include-limits.h-for-PATH_MAX-definition.patch \
+           file://0003-Fix-non-x86-platforms-on-musl.patch \
            "
 
 S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig update-rc.d
 
-LCD_DRIVERS ?= "all,!irman,!svga"
-LCD_DRIVERS_append_aarch64 = ",!serialVFD"
-LCD_DRIVERS_append_arm = ",!serialVFD"
+LCD_DRIVERS ?= "all,!irman,!svga${SERIALVFD}"
+SERIALVFD ?= ""
+SERIALVFD_libc-musl = ",!serialVFD"
+SERIALVFD_libc-musl_x86 = ""
+SERIALVFD_libc-musl_x86-64 = ""
 
 LCD_DEFAULT_DRIVER ?= "curses"
 

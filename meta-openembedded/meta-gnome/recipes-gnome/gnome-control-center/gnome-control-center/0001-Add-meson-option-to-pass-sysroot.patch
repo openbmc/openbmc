@@ -1,0 +1,45 @@
+From ba8aebe1259ae3f7f5a4827e5a47bb95c568b218 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Tue, 21 May 2019 16:07:46 +0200
+Subject: [PATCH] Add meson option to pass sysroot
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We need to pass this to meson to help it finding gdesktop-enums.h:
+
+| panels/background/meson.build:38:0: ERROR: File /usr/include/gsettings-desktop-schemas/gdesktop-enums.h does not exist.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ meson_options.txt             | 1 +
+ panels/background/meson.build | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/meson_options.txt b/meson_options.txt
+index a347168..2cd8121 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -1,3 +1,4 @@
++option('oe_sysroot', type: 'string', value: '', description: 'Directory for OE-sysroot')
+ option('cheese', type: 'boolean', value: true, description: 'build with cheese webcam support')
+ option('documentation', type: 'boolean', value: false, description: 'build documentation')
+ option('gnome_session_libexecdir', type: 'string', value: '', description: 'Directory for gnome-session\'s libexecdir')
+diff --git a/panels/background/meson.build b/panels/background/meson.build
+index bb34b69..f22722e 100644
+--- a/panels/background/meson.build
++++ b/panels/background/meson.build
+@@ -36,7 +36,7 @@ common_sources = []
+ 
+ enums = 'gdesktop-enums-types'
+ enums_header = files(
+-  gsettings_desktop_dep.get_pkgconfig_variable('prefix') + '/include/gsettings-desktop-schemas/gdesktop-enums.h',
++  get_option('oe_sysroot') + gsettings_desktop_dep.get_pkgconfig_variable('prefix') + '/include/gsettings-desktop-schemas/gdesktop-enums.h',
+   'cc-background-item.h'
+ )
+ 
+-- 
+2.20.1
+

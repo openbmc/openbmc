@@ -1,0 +1,38 @@
+From 06f78ced45f6622a2e02cd09e6a2c0c22a98b89e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 25 Dec 2019 09:41:55 -0800
+Subject: [PATCH 2/2] Include <stdexcept> for runtime_error
+
+Fixes
+
+../git/src/LocateUri.cxx:65:14: error: 'runtime_error' is not a member of 'std'
+   65 |   throw std::runtime_error("Unsupported URI scheme");
+      |              ^~~~~~~~~~~~~
+
+Upstream-Status: Inappropriate [ Fixed differently upstream ]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/LocateUri.cxx      | 1 +
+ src/pcm/PcmConvert.cxx | 1 +
+ 2 files changed, 2 insertions(+)
+
+--- a/src/LocateUri.cxx
++++ b/src/LocateUri.cxx
+@@ -17,6 +17,7 @@
+  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+  */
+ 
++#include <stdexcept>
+ #include "config.h"
+ #include "LocateUri.hxx"
+ #include "client/Client.hxx"
+--- a/src/pcm/PcmConvert.cxx
++++ b/src/pcm/PcmConvert.cxx
+@@ -17,6 +17,7 @@
+  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+  */
+ 
++#include <stdexcept>
+ #include "config.h"
+ #include "PcmConvert.hxx"
+ #include "ConfiguredResampler.hxx"

@@ -1,0 +1,27 @@
+help complier to use intrinsics, clang in few cases e.g. aarch64 can not
+and then requires linking with libm, its the only function needed from libm then
+its good to avoid needing it.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/include/fluent-bit/stream_processor/flb_sp_timeseries.h
++++ b/include/fluent-bit/stream_processor/flb_sp_timeseries.h
+@@ -207,7 +207,7 @@ void cb_forecast_calc(struct timeseries
+         result = b0 + b1 * (val->f64 + *forecast->latest_x);
+         break;
+     default:
+-        result = nan("");
++        result = __builtin_nan("");
+         break;
+     }
+ 
+@@ -283,7 +283,7 @@ void cb_forecast_r_calc(struct timeserie
+             result = ((val->i64 - b0) / b1) - *forecast->latest_x;
+             break;
+         default:
+-            result = nan("");
++            result = __builtin_nan("");
+             break;
+         }
+ 

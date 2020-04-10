@@ -8,16 +8,18 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
 inherit autotools pkgconfig
-inherit pythonnative
+inherit python3native
 inherit obmc-phosphor-dbus-service
 inherit phosphor-logging
 inherit phosphor-dbus-yaml
 
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "systemd"
-DEPENDS += "python-mako-native"
-DEPENDS += "python-pyyaml-native"
-DEPENDS += "sdbusplus sdbusplus-native"
+DEPENDS += "${PYTHON_PN}-mako-native"
+DEPENDS += "${PYTHON_PN}-pyyaml-native"
+DEPENDS += "${PYTHON_PN}-native"
+DEPENDS += "${PYTHON_PN}-sdbus++-native"
+DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
 DEPENDS += "virtual/phosphor-logging-callouts"
 DEPENDS += "phosphor-logging-error-logs-native"
@@ -54,7 +56,7 @@ FILES_phosphor-rsyslog-config += " \
 "
 
 SRC_URI += "git://github.com/openbmc/phosphor-logging"
-SRCREV = "57686b65b58e247858df228de8889ae30104ecdf"
+SRCREV = "182071455a82b22e8111217d624c25f4c86dce43"
 
 S = "${WORKDIR}/git"
 
@@ -62,7 +64,7 @@ S = "${WORKDIR}/git"
 # as they will not be available in host machine
 DEPENDS_remove_class-native = " \
         virtual/phosphor-logging-callouts \
-        sdbus++ \
+        sdbusplus \
         systemd \
         libcereal \
         sdeventplus \
@@ -72,7 +74,7 @@ DEPENDS_remove_class-native = " \
 # as they will not be available in host machine
 DEPENDS_remove_class-nativesdk = " \
         virtual/phosphor-logging-callouts \
-        sdbus++-native \
+        sdbusplus-native \
         libcereal \
         systemd \
         phosphor-dbus-interfaces \
@@ -95,7 +97,7 @@ PACKAGECONFIG[install_scripts] = " \
 PACKAGECONFIG[openpower-pels] = " \
         --enable-openpower-pel-extension, \
         --disable-openpower-pel-extension, \
-        nlohmann-json cli11, \
+        nlohmann-json nlohmann-fifo cli11 pldm, \
         , \
         "
 

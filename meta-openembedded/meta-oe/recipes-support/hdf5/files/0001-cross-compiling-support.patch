@@ -14,11 +14,9 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  src/CMakeLists.txt | 23 -----------------------
  2 files changed, 6 insertions(+), 23 deletions(-)
 
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 08a65c4..9af14d5 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -817,4 +817,10 @@ endif ()
+@@ -770,4 +770,10 @@ endif ()
  #-----------------------------------------------------------------------------
  configure_file (${HDF_RESOURCES_DIR}/H5pubconf.h.in ${HDF5_BINARY_DIR}/H5pubconf.h @ONLY)
  
@@ -29,22 +27,22 @@ index 08a65c4..9af14d5 100644
 +configure_file(H5lib_settings.c H5lib_settings.c COPYONLY)
 +
  include (CMakeInstallation.cmake)
-diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index d343208..d11525b 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -613,32 +613,9 @@ set (H5_PRIVATE_HEADERS
+@@ -613,36 +613,9 @@ set (H5_PRIVATE_HEADERS
  #-----------------------------------------------------------------------------
  add_executable (H5detect ${HDF5_SRC_DIR}/H5detect.c)
  TARGET_C_PROPERTIES (H5detect STATIC " " " ")
 -if (MSVC OR MINGW)
 -  target_link_libraries (H5detect "ws2_32.lib")
 -endif ()
+-if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
+-  set_property(TARGET H5detect PROPERTY LINK_FLAGS "-O0")
+-endif ()
 -
--set (CMD $<TARGET_FILE:H5detect>)
 -add_custom_command (
 -    OUTPUT ${HDF5_BINARY_DIR}/H5Tinit.c
--    COMMAND ${CMD}
+-    COMMAND $<TARGET_FILE:H5detect>
 -    ARGS > ${HDF5_BINARY_DIR}/H5Tinit.c
 -    DEPENDS H5detect
 -)
@@ -54,11 +52,13 @@ index d343208..d11525b 100644
 -if (MSVC OR MINGW)
 -  target_link_libraries (H5make_libsettings "ws2_32.lib")
 -endif ()
+-if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
+-  set_property(TARGET H5make_libsettings PROPERTY LINK_FLAGS "-O0")
+-endif ()
 -
--set (CMD $<TARGET_FILE:H5make_libsettings>)
 -add_custom_command (
 -    OUTPUT ${HDF5_BINARY_DIR}/H5lib_settings.c
--    COMMAND ${CMD}
+-    COMMAND $<TARGET_FILE:H5make_libsettings>
 -    ARGS > ${HDF5_BINARY_DIR}/H5lib_settings.c
 -    DEPENDS H5make_libsettings
 -    WORKING_DIRECTORY ${HDF5_BINARY_DIR}
@@ -66,6 +66,3 @@ index d343208..d11525b 100644
  
  if (GENERATE_ERROR_HEADERS)
    find_package (Perl)
--- 
-2.7.4
-

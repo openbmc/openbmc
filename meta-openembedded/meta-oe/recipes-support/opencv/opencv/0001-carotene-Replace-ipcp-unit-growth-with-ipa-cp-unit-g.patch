@@ -1,0 +1,55 @@
+From 1edc925ecd7fb54d2dc78452069084475fbe2a70 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 16 Jan 2020 08:52:00 -0800
+Subject: [PATCH] carotene: Replace ipcp-unit-growth with ipa-cp-unit-growth on gcc >= 10
+
+gcc 10+ has renamed this option, therefore check for gcc version before
+deciding which name to use for opt parameter
+
+Upstream-Status: Submitted [https://github.com/opencv/opencv/pull/16369]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ 3rdparty/carotene/CMakeLists.txt     | 8 ++++++--
+ 3rdparty/carotene/hal/CMakeLists.txt | 7 ++++++-
+ 2 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/3rdparty/carotene/CMakeLists.txt b/3rdparty/carotene/CMakeLists.txt
+index bfa9368d79..1c43b85b28 100644
+--- a/3rdparty/carotene/CMakeLists.txt
++++ b/3rdparty/carotene/CMakeLists.txt
+@@ -20,8 +20,12 @@ if(CMAKE_COMPILER_IS_GNUCC)
+     # - matchTemplate about 5-10%
+     # - goodFeaturesToTrack 10-20%
+     # - cornerHarris 30% for some cases
+-
+-    set_source_files_properties(${carotene_sources} COMPILE_FLAGS "--param ipcp-unit-growth=100000 --param inline-unit-growth=100000 --param large-stack-frame-growth=5000")
++    set_source_files_properties(${carotene_sources} COMPILE_FLAGS "--param inline-unit-growth=100000 --param large-stack-frame-growth=5000")
++    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "10.0.0")
++	    set_source_files_properties(${carotene_sources} COMPILE_FLAGS "--param ipcp-unit-growth=100000 ${COMPILE_FLAGS}")
++    else()
++	    set_source_files_properties(${carotene_sources} COMPILE_FLAGS "--param ipa-cp-unit-growth=100000 ${COMPILE_FLAGS}")
++    endif()
+ endif()
+ 
+ add_library(carotene_objs OBJECT
+diff --git a/3rdparty/carotene/hal/CMakeLists.txt b/3rdparty/carotene/hal/CMakeLists.txt
+index c4b9acaedd..bbc5b11a80 100644
+--- a/3rdparty/carotene/hal/CMakeLists.txt
++++ b/3rdparty/carotene/hal/CMakeLists.txt
+@@ -90,7 +90,12 @@ set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS ${carotene_defs})
+     #   matchTemplate about 5-10%
+     #   goodFeaturesToTrack 10-20%
+     #   cornerHarris 30% for some cases
+-    set_source_files_properties(impl.cpp $<TARGET_OBJECTS:carotene_objs> COMPILE_FLAGS "--param ipcp-unit-growth=100000 --param inline-unit-growth=100000 --param large-stack-frame-growth=5000")
++    set_source_files_properties(impl.cpp $<TARGET_OBJECTS:carotene_objs> COMPILE_FLAGS "--param inline-unit-growth=100000 --param large-stack-frame-growth=5000")
++    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "10.0.0")
++      set_source_files_properties(impl.cpp $<TARGET_OBJECTS:carotene_objs> COMPILE_FLAGS "--param ipcp-unit-growth=100000 ${COMPILE_FLAGS}")
++    else()
++      set_source_files_properties(impl.cpp $<TARGET_OBJECTS:carotene_objs> COMPILE_FLAGS "--param ipa-cp-unit-growth=100000 ${COMPILE_FLAGS}")
++    endif()
+ #    set_source_files_properties(impl.cpp $<TARGET_OBJECTS:carotene_objs> COMPILE_FLAGS "--param ipcp-unit-growth=100000 --param inline-unit-growth=100000 --param large-stack-frame-growth=5000")
+   endif()
+ 
+-- 
+2.25.0
+

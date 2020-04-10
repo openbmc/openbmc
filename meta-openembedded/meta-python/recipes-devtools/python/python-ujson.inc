@@ -13,3 +13,5 @@ RDEPENDS_${PN} += "\
     ${PYTHON_PN}-datetime \
     ${PYTHON_PN}-numbers \
     "
+
+BBCLASSEXTEND = "native nativesdk"

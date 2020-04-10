@@ -7,17 +7,17 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
 S = "${WORKDIR}/git"
 
-inherit autotools obmc-phosphor-utils pkgconfig pythonnative
+inherit autotools obmc-phosphor-utils pkgconfig
 inherit systemd
 
 SRC_URI += "git://github.com/openbmc/openpower-proc-control"
-SRCREV = "22a057ed88f0f68aca521cf8e239413113b31932"
+SRCREV = "7847960506ca4357e267fe05866b38aad236708f"
 
 DEPENDS += " \
         autoconf-archive-native \
         phosphor-logging \
         phosphor-dbus-interfaces \
-        openpower-dbus-interfaces \
+        libgpiod \
         "
 
 # For libpdbg, provided by the pdbg package
@@ -31,4 +31,7 @@ SYSTEMD_SERVICE_${PN} = "${TEMPLATE} ${INSTANCES}"
 
 SYSTEMD_SERVICE_${PN} +=  " \
                          xyz.openbmc_project.Control.Host.NMI.service \
+                         op-stop-instructions@.service \
+                         op-cfam-reset.service \
+                         ${@bb.utils.contains('OBMC_MACHINE_FEATURES', 'phal', 'set-spi-mux.service', '', d)} \
                          "

@@ -1,0 +1,46 @@
+From fe4f3c2a37a81201f463ff962364f014f50c9896 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 16 Dec 2019 22:58:41 -0800
+Subject: [PATCH] Use CMAKE_INSTALL_<path> instead of hardcoding bin/lib/
+ install paths
+
+Helps fix build/packaging issues on machines where default libdir is not
+lib but say lib64
+
+Upstream-Status: Submitted [https://github.com/tinyalsa/tinyalsa/pull/143]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index cb31c58..1cc4a85 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -41,12 +41,20 @@ add_util("tinymix" "utils/tinymix.c")
+ install(FILES ${HDRS}
+     DESTINATION "include/tinyalsa")
+ 
++if(NOT DEFINED CMAKE_INSTALL_LIBDIR)
++    set(CMAKE_INSTALL_LIBDIR lib)
++endif()
++
++if(NOT DEFINED CMAKE_INSTALL_BINDIR)
++	set(CMAKE_INSTALL_BINDIR bin)
++endif()
++
+ install(TARGETS "tinyalsa"
+                 "tinyplay"
+                 "tinycap"
+                 "tinymix"
+                 "tinypcminfo"
+-    RUNTIME DESTINATION "bin"
+-    ARCHIVE DESTINATION "lib"
+-    LIBRARY DESTINATION "lib")
++    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
++    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ 
+-- 
+2.24.1
+

@@ -5,7 +5,7 @@ platforms."
 PR = "r1"
 PV = "1.0+git${SRCPV}"
 
-require ${PN}.inc
+require ${BPN}.inc
 
 SOFTWARE_MGR_PACKAGES = " \
     ${PN}-version \
@@ -26,18 +26,20 @@ SYSTEMD_PACKAGES = ""
 PACKAGECONFIG[verify_signature] = "--enable-verify_signature,--disable-verify_signature"
 PACKAGECONFIG[sync_bmc_files] = "--enable-sync_bmc_files,--disable-sync_bmc_files"
 PACKAGECONFIG[ubifs_layout] = "--enable-ubifs_layout"
+PACKAGECONFIG[flash_bios] = "--enable-host_bios_upgrade"
 
 inherit autotools pkgconfig
 inherit obmc-phosphor-dbus-service
-inherit pythonnative
+inherit python3native
 inherit ${@bb.utils.contains('DISTRO_FEATURES', 'obmc-ubi-fs', 'phosphor-software-manager-ubi-fs', '', d)}
 
 DEPENDS += " \
     autoconf-archive-native \
-    sdbusplus \
+    openssl \
     phosphor-dbus-interfaces \
     phosphor-logging \
-    sdbus++-native \
+    ${PYTHON_PN}-sdbus++-native \
+    sdbusplus \
 "
 
 RDEPENDS_${PN}-updater += " \
@@ -73,6 +75,8 @@ SYSTEMD_SERVICE_${PN}-updater += " \
     obmc-flash-bmc-setenv@.service \
     usr-local.mount \
 "
+
+SYSTEMD_SERVICE_${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'flash_bios', 'obmc-flash-host-bios@.service', '', d)}"
 
 S = "${WORKDIR}/git"
 

@@ -37,10 +37,12 @@ do_install_append() {
        # Remove .la files for loadable modules
        rm -f ${D}/${libdir}/rygel-${LIBV}/engines/*.la
        rm -f ${D}/${libdir}/rygel-${LIBV}/plugins/*.la
-       if [ -e ${D}${libdir}/systemd/user/rygel.service ]; then
+       if [ -e ${D}${nonarch_libdir}/systemd/user/rygel.service ]; then
                mkdir -p ${D}${systemd_unitdir}/system
-               mv ${D}${libdir}/systemd/user/rygel.service ${D}${systemd_unitdir}/system
-               rmdir ${D}${libdir}/systemd/user ${D}${libdir}/systemd
+               mv ${D}${nonarch_libdir}/systemd/user/rygel.service ${D}${systemd_unitdir}/system
+               rmdir --ignore-fail-on-non-empty ${D}${nonarch_libdir}/systemd/user \
+               ${D}${nonarch_libdir}/systemd \
+               ${D}${nonarch_libdir}
        fi
 }
 

@@ -56,7 +56,8 @@ EXTRA_OECONF = " \
 "
 
 # Without this, JS_Init() will fail for mips64.
-EXTRA_OECONF_append_mips64 = " --with-intl-api=build"
+EXTRA_OECONF_append_mipsarch = " --with-intl-api=build"
+EXTRA_OECONF_append_powerpc = " --with-intl-api=build"
 
 EXTRA_OECONF_append_mipsarch = " --disable-ion"
 EXTRA_OECONF_append_riscv64 = " --disable-ion"

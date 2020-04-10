@@ -10,7 +10,7 @@ inherit obmc-phosphor-ipmiprovider-symlink
 
 DEPENDS += "phosphor-ipmi-host"
 DEPENDS += "autoconf-archive-native"
-DEPENDS += "sdbusplus sdbusplus-native"
+DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-logging"
 DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
 DEPENDS += "openpower-dbus-interfaces openpower-dbus-interfaces-native"

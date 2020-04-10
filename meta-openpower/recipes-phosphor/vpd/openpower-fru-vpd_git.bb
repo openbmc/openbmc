@@ -5,10 +5,10 @@ PV = "1.0+git${SRCPV}"
 
 inherit autotools pkgconfig
 inherit openpower-fru-vpd
-inherit pythonnative
+inherit python3native
 inherit obmc-phosphor-systemd
 
-require ${PN}.inc
+require ${BPN}.inc
 
 SRC_URI += "file://70-op-vpd.rules"
 
@@ -18,8 +18,8 @@ DEPENDS += " \
         virtual/openpower-fru-properties \
         sdbusplus \
         phosphor-logging \
-        python-mako-native \
-        python-pyyaml-native \
+        ${PYTHON_PN}-mako-native \
+        ${PYTHON_PN}-pyyaml-native \
         autoconf-archive-native \
         "
 

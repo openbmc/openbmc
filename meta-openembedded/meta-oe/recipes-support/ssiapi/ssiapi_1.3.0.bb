@@ -34,3 +34,5 @@ do_configure_prepend(){
 }
 
 RDEPENDS_${PN} += "mdadm"
+
+COMPATIBLE_HOST_powerpc = 'null'

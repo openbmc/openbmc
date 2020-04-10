@@ -337,3 +337,15 @@ vrm_vdd_temp_sensor:
     sensorNamePattern: nameLeaf
     serviceInterface: org.freedesktop.DBus.Properties
     unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+clear_host_security_keys:
+    interfaces:
+        org.open_power.Control.TPM.SecurityKeys:
+            ClearHostSecurityKeys:
+                Offsets:
+                    255:
+                        type: uint8_t
+    path: /org/open_power/control/host0/ClearHostSecurityKeys
+    readingType: readingData
+    mutability: Mutability::Write|Mutability::Read
+    sensorNamePattern: nameLeaf
+    serviceInterface: org.freedesktop.DBus.Properties

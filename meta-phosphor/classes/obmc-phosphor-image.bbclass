@@ -38,7 +38,7 @@ FEATURE_PACKAGES_obmc-host-ipmi ?= "${@cf_enabled(d, 'obmc-host-ipmi', 'virtual-
 FEATURE_PACKAGES_obmc-host-state-mgmt ?= "packagegroup-obmc-apps-host-state-mgmt"
 FEATURE_PACKAGES_obmc-inventory ?= "packagegroup-obmc-apps-inventory"
 FEATURE_PACKAGES_obmc-leds ?= "packagegroup-obmc-apps-leds"
-FEATURE_PACKAGES_obmc-logging-mgmt ?= "${@df_enabled(d, 'obmc-logging-mgmt', 'packagegroup-obmc-apps-logging')}"
+FEATURE_PACKAGES_obmc-logging-mgmt ?= "packagegroup-obmc-apps-logging"
 FEATURE_PACKAGES_obmc-remote-logging-mgmt ?= "packagegroup-obmc-apps-remote-logging"
 FEATURE_PACKAGES_obmc-net-ipmi ?= "phosphor-ipmi-net"
 FEATURE_PACKAGES_obmc-sensors ?= "packagegroup-obmc-apps-sensors"
@@ -104,6 +104,14 @@ remove_etc_version() {
         rm ${IMAGE_ROOTFS}${sysconfdir}/version
 }
 ROOTFS_POSTPROCESS_COMMAND += "remove_etc_version ; "
+
+# Disable the pager to prevent systemd injecting control characters into the
+# output stream that are not interpreted by busybox tools.
+disable_systemd_pager() {
+        echo "SYSTEMD_PAGER=" >> ${IMAGE_ROOTFS}${sysconfdir}/profile
+        echo "export SYSTEMD_PAGER" >> ${IMAGE_ROOTFS}${sysconfdir}/profile
+}
+ROOTFS_POSTPROCESS_COMMAND += "disable_systemd_pager ; "
 
 # The shadow recipe provides the binaries(like useradd, usermod) needed by the
 # phosphor-user-manager.

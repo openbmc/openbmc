@@ -110,11 +110,6 @@ PREFERRED_PROVIDER_virtual/obmc-system-mgmt ??= "obmc-phosphor-sysd"
 # automatically if the MRW feature is enabled.
 VIRTUAL-RUNTIME_phosphor-hwmon-config ?= ""
 
-# obmc-settings-mgmt
-#
-# Provides a manager for user settings.
-VIRTUAL-RUNTIME_obmc-settings-mgmt ?= "phosphor-settings-manager"
-
 # obmc-network-manager
 #
 # Provide support for managing network

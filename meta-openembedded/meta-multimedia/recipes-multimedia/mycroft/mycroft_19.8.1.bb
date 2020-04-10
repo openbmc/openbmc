@@ -79,7 +79,7 @@ RDEPENDS_${PN} += "python3-requests python3-pillow \
 # Mycroft uses Alsa, PulseAudio and Flac
 RDEPENDS_${PN} += "alsa-utils alsa-plugins alsa-tools"
 RDEPENDS_${PN} += "pulseaudio pulseaudio-misc pulseaudio-server"
-RDEPENDS_${PN} += "flac"
+RDEPENDS_${PN} += "flac mpg123"
 
 # Mycroft can do this itself on the target, but it's quicker to do it here
 RDEPENDS_${PN} += "mimic"

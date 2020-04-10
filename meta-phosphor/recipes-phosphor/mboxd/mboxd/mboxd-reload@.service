@@ -1,10 +1,10 @@
 [Unit]
 Description=Reload mboxd during power on
-Wants=obmc-power-start-pre@%i.target
-Before=obmc-power-start-pre@%i.target
+Wants=obmc-host-start-pre@%i.target
+Before=obmc-host-start-pre@%i.target
 Wants=mapper-wait@-org-openbmc-mboxd.service
 After=mapper-wait@-org-openbmc-mboxd.service
-Conflicts=obmc-chassis-poweroff@%i.target
+Conflicts=obmc-host-stop@%i.target
 
 [Service]
 Type=oneshot
@@ -13,4 +13,4 @@ ExecStart=/usr/bin/env mboxctl --reset
 SyslogIdentifier=mboxctl
 
 [Install]
-WantedBy=obmc-chassis-poweron@%i.target
+WantedBy=obmc-host-startmin@%i.target

@@ -1,0 +1,39 @@
+From 8c51221f748bca1483fe1141e584867d2ff34a07 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 19 Dec 2019 16:26:39 -0800
+Subject: [PATCH] Use GNUInstallDirs instead of hard-coded path
+
+Upstream-Status: Submitted [https://github.com/CLIUtils/CLI11/pull/373]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7073a0b..5236fd2 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -120,17 +120,18 @@ endif()
+ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake/CLI11ConfigVersion.cmake.in"
+   "${CMAKE_CURRENT_BINARY_DIR}/CLI11ConfigVersion.cmake" @ONLY)
+ 
++include(GNUInstallDirs)
+ # These installs only make sense for a local project
+ if(CUR_PROJ)
+     # Make version available in the install
+     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/CLI11ConfigVersion.cmake"
+-            DESTINATION lib/cmake/CLI11)
++            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CLI11)
+ 
+     # Install the export target as a file
+     install(EXPORT CLI11Targets
+             FILE CLI11Config.cmake
+             NAMESPACE CLI11::
+-            DESTINATION lib/cmake/CLI11)
++            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CLI11)
+ 
+     # Use find_package on the installed package
+     export(TARGETS CLI11
+-- 
+2.24.1
+

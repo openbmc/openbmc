@@ -5,6 +5,7 @@ organizing data flow processing and execution."
 HOMEPAGE = "https://github.com/opencv/ade"
 
 SRC_URI = "git://github.com/opencv/ade.git \
+           file://0001-use-GNUInstallDirs-for-detecting-install-paths.patch \
            "
 
 SRCREV = "58b2595a1a95cc807be8bf6222f266a9a1f393a9"

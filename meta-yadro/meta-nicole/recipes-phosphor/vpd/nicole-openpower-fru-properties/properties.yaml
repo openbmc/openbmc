@@ -1,0 +1,7 @@
+/system/chassis/bmc:
+    xyz.openbmc_project.Inventory.Item:
+        Present: 'true'
+
+/system/chassis/ethernet:
+    xyz.openbmc_project.Inventory.Item:
+        Present: 'true'

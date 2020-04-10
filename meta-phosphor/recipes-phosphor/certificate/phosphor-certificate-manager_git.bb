@@ -9,19 +9,19 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 SRC_URI = "git://github.com/openbmc/phosphor-certificate-manager"
-SRCREV = "667286e4f7dc31a9ab786307092919901adccbb5"
+SRCREV = "c4522d2ea747e139dc97238b58c9609ac9d11776"
 
 inherit autotools \
         pkgconfig \
         obmc-phosphor-systemd
 
 DEPENDS = " \
-        phosphor-logging \
         autoconf-archive-native \
+        openssl \
         phosphor-dbus-interfaces \
         phosphor-dbus-interfaces-native \
+        phosphor-logging \
         sdbusplus \
-        sdbusplus-native \
         sdeventplus \
         "
 

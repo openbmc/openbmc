@@ -17,7 +17,8 @@ then
     fi
 fi
 
+# Needed to re-do escaping used to avoid bitbake separator conflicts
 path="${path//:/--}"
-path="${path//-/\\x2d}"
-
-systemctl --no-block $action 'xyz.openbmc_project.Hwmon@'$path'.service'
+# Needed to escape prior to being used as a unit argument
+path="$(systemd-escape "$path")"
+systemctl --no-block "$action" "xyz.openbmc_project.Hwmon@$path.service"

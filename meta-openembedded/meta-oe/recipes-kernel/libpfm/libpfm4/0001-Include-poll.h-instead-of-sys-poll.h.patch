@@ -1,0 +1,86 @@
+From f62b629c1e1e968f90aafbc0cf9116b49eea9d8e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 15 Dec 2019 16:24:37 -0800
+Subject: [PATCH] Include poll.h instead of sys/poll.h
+
+Fixes
+error: redirecting incorrect #include <sys/poll.h> to <poll.h> [-Werror,-W#warnings]
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ perf_examples/branch_smpl.c         | 2 +-
+ perf_examples/syst_smpl.c           | 2 +-
+ perf_examples/task_attach_timeout.c | 2 +-
+ perf_examples/task_smpl.c           | 2 +-
+ perf_examples/x86/bts_smpl.c        | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/perf_examples/branch_smpl.c b/perf_examples/branch_smpl.c
+index 87cd303..4d16b04 100644
+--- a/perf_examples/branch_smpl.c
++++ b/perf_examples/branch_smpl.c
+@@ -32,7 +32,7 @@
+ #include <getopt.h>
+ #include <setjmp.h>
+ #include <sys/wait.h>
+-#include <sys/poll.h>
++#include <poll.h>
+ #include <sys/mman.h>
+ #include <locale.h>
+ #include <sys/ioctl.h>
+diff --git a/perf_examples/syst_smpl.c b/perf_examples/syst_smpl.c
+index 04580fd..d059c08 100755
+--- a/perf_examples/syst_smpl.c
++++ b/perf_examples/syst_smpl.c
+@@ -33,7 +33,7 @@
+ #include <setjmp.h>
+ #include <sys/ptrace.h>
+ #include <sys/wait.h>
+-#include <sys/poll.h>
++#include <poll.h>
+ #include <sys/ioctl.h>
+ #include <sys/mman.h>
+ #include <fcntl.h>
+diff --git a/perf_examples/task_attach_timeout.c b/perf_examples/task_attach_timeout.c
+index 7fc5524..a0367c8 100644
+--- a/perf_examples/task_attach_timeout.c
++++ b/perf_examples/task_attach_timeout.c
+@@ -36,7 +36,7 @@
+ #include <stdarg.h>
+ #include <sys/wait.h>
+ #include <err.h>
+-#include <sys/poll.h>
++#include <poll.h>
+ 
+ #include "perf_util.h"
+ 
+diff --git a/perf_examples/task_smpl.c b/perf_examples/task_smpl.c
+index dcb7481..95c432c 100644
+--- a/perf_examples/task_smpl.c
++++ b/perf_examples/task_smpl.c
+@@ -37,7 +37,7 @@
+ #include <getopt.h>
+ #include <setjmp.h>
+ #include <sys/wait.h>
+-#include <sys/poll.h>
++#include <poll.h>
+ #include <sys/mman.h>
+ #include <locale.h>
+ #include <sys/ioctl.h>
+diff --git a/perf_examples/x86/bts_smpl.c b/perf_examples/x86/bts_smpl.c
+index 6498776..d66d5e6 100644
+--- a/perf_examples/x86/bts_smpl.c
++++ b/perf_examples/x86/bts_smpl.c
+@@ -41,7 +41,7 @@
+ #include <sys/time.h>
+ #include <sys/ptrace.h>
+ #include <sys/wait.h>
+-#include <sys/poll.h>
++#include <poll.h>
+ #include <sys/mman.h>
+ #include <sys/resource.h>
+ #include <err.h>
+-- 
+2.24.1
+

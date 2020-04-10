@@ -7,6 +7,7 @@ After=mapper-wait@-xyz-openbmc_project-inventory.service
 Restart=no
 Type=oneshot
 EnvironmentFile={envfiledir}/obmc/eeproms/%I
+ExecStartPre={bindir}/of-name-to-eeprom.sh {envfiledir}/obmc/eeproms/%I
 ExecStart=/usr/bin/env phosphor-read-eeprom --eeprom $SYSFS_PATH --fruid $FRUID
 SyslogIdentifier=phosphor-read-eeprom
 

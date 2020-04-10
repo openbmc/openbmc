@@ -1,56 +1,26 @@
 SUMMARY = "C++ bindings for systemd dbus APIs"
 DESCRIPTION = "C++ bindings for systemd dbus APIs."
-HOMEPAGE = "http://github.com/openbmc/sdbusplus"
-PR = "r1"
-PV = "1.0+git${SRCPV}"
-LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
 inherit autotools pkgconfig
-inherit obmc-phosphor-python-autotools
+inherit obmc-phosphor-python3-autotools
+
+include sdbusplus-rev.inc
 
 DEPENDS += " \
         autoconf-archive-native \
-        python-inflection-native \
-        python-mako-native \
-        python-pyyaml-native \
+        ${PYTHON_PN}-inflection-native \
+        ${PYTHON_PN}-mako-native \
+        ${PYTHON_PN}-pyyaml-native \
         "
-RDEPENDS_sdbus++ += " \
-        python-inflection \
-        python-mako \
-        python-pyyaml \
-        "
-
-# sdbus++ has a handful of runtime dependencies on other python packages.
-# Bitbake doesn't do anything with RDEPENDS in native context because
-# native context doesn't have packages.
-#
-# While technically sdbus++ doesn't require its runtime dependencies to be
-# installed to build, work around the above native context behavior
-# by adding a build dependency so that clients don't have to DEPEND
-# on sdbus++ runtime dependencies manually.
-
-DEPENDS_append_class-native = " \
-        python-inflection-native \
-        python-mako-native \
-        python-pyyaml-native \
-        "
-
-SRC_URI += "git://github.com/openbmc/sdbusplus"
-SRCREV = "4212292bcf136d04b38ba5116aa568b0fa312798"
 
 PACKAGECONFIG ??= "libsdbusplus transaction"
 PACKAGECONFIG[libsdbusplus] = "--enable-libsdbusplus,--disable-libsdbusplus,systemd,libsystemd"
 PACKAGECONFIG[transaction] = "--enable-transaction,--disable-transaction"
 
-S = "${WORKDIR}/git"
-
-PROVIDES_prepend = "sdbus++ "
-PACKAGE_BEFORE_PN = "sdbus++"
-FILES_sdbus++_append = " ${bindir}/sdbus++"
-PYTHON_AUTOTOOLS_PACKAGE = "sdbus++"
-
-PACKAGECONFIG_remove_class-native = "libsdbusplus"
-PACKAGECONFIG_remove_class-nativesdk = "libsdbusplus"
-
-BBCLASSEXTEND += "native nativesdk"
+# Remove unused sdbus++ contents (included in python3-sdbus++ package).
+do_install_append() {
+    rm ${D}/${bindir}/sdbus++
+    rmdir ${D}/${bindir} || true
+    rm -rf ${D}/${PYTHON_SITEPACKAGES_DIR}
+    rmdir ${D}/${libdir}/${PYTHON_DIR} || true
+}

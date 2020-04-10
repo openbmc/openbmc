@@ -14,6 +14,7 @@ SRC_URI[sha256sum] = "88900030a4762904a7880273f292e5e8ca6b15b7c6c3fb88ffa9e67ee8
 inherit autotools pkgconfig
 
 EXTRA_OECONF = "--enable-freexl=no"
+CFLAGS += "-DACCEPT_USE_OF_DEPRECATED_PROJ_API_H"
 
 # package plugins for SQLite3
 PACKAGES += "${PN}-plugin"

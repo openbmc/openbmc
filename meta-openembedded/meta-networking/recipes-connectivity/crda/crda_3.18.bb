@@ -22,7 +22,7 @@ inherit python-dir pythonnative siteinfo
 
 # Recursive make problem
 EXTRA_OEMAKE = "MAKEFLAGS= DESTDIR=${D} LIBDIR=${libdir}/crda LDLIBREG='-Wl,-rpath,${libdir}/crda -lreg' \
-                UDEV_RULE_DIR=${nonarch_libdir}/udev/rules.d/"
+                UDEV_RULE_DIR=${nonarch_base_libdir}/udev/rules.d/"
 TARGET_BITS = "${SITEINFO_BITS}"
 export TARGET_BITS
 

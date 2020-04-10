@@ -41,6 +41,8 @@ SRC_URI = "git://github.com/vmware/open-vm-tools.git;protocol=https \
     file://0001-GitHub-Issue-367.-Remove-references-to-deprecated-G_.patch;patchdir=.. \
     file://0001-Make-HgfsConvertFromNtTimeNsec-aware-of-64-bit-time_.patch;patchdir=.. \
     file://0002-hgfsServerLinux-Consider-64bit-time_t-possibility.patch;patchdir=.. \
+    file://0001-utilBacktrace-Ignore-Warray-bounds.patch;patchdir=.. \
+    file://0001-hgfsmounter-Makefile.am-support-usrmerge.patch;patchdir=.. \
 "
 
 SRCREV = "d3edfd142a81096f9f58aff17d84219b457f4987"
@@ -59,7 +61,8 @@ SYSTEMD_SERVICE_${PN} = "vmtoolsd.service"
 EXTRA_OECONF = "--without-icu --disable-multimon --disable-docs \
          --disable-tests --without-gtkmm --without-xerces --without-pam \
          --disable-vgauth --disable-deploypkg \
-         --without-root-privileges --without-kernel-modules --with-tirpc"
+         --without-root-privileges --without-kernel-modules --with-tirpc \
+         --with-udev-rules-dir=${nonarch_base_libdir}/udev/rules.d"
 
 NO_X11_FLAGS = "--without-x --without-gtk2 --without-gtk3"
 X11_DEPENDS = "libxext libxi libxrender libxrandr libxtst gtk+ gdk-pixbuf"
@@ -82,7 +85,10 @@ CONFFILES_${PN} += "${sysconfdir}/vmware-tools/tools.conf"
 RDEPENDS_${PN} = "util-linux libdnet fuse"
 
 do_install_append() {
-    ln -sf ${sbindir}/mount.vmhgfs ${D}/sbin/mount.vmhgfs
+    if ! ${@bb.utils.contains('DISTRO_FEATURES','usrmerge','true','false',d)}; then
+        install -d ${D}/sbin
+        ln -sf ${sbindir}/mount.vmhgfs ${D}/sbin/mount.vmhgfs
+    fi
     install -d ${D}${sysconfdir}/vmware-tools
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -d ${D}${systemd_unitdir}/system

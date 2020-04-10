@@ -28,8 +28,9 @@ DEPENDS += " \
 "
 
 PACKAGECONFIG ??= "python3"
-PACKAGECONFIG[python] = "--with-python,--without-python,python,python"
 PACKAGECONFIG[python3] = "--with-python3,--without-python3,python3,python3"
+
+EXTRA_OECONF = "--without-python"
 
 RDEPENDS_python3-${BPN} += "${PN}"
 

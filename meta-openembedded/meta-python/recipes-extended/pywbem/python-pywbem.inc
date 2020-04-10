@@ -14,11 +14,14 @@ It also provides a Python provider interface, and is the fastest and easiest \
 way to write providers on the planet."
 HOMEPAGE = "http://pywbem.github.io"
 LICENSE = "LGPLv2.1"
-LIC_FILES_CHKSUM = "file://pywbem/LICENSE.txt;md5=fbc093901857fcd118f065f900982c24"
-SRC_URI[md5sum] = "1465dfa92e4cbe558c773838b9b00711"
-SRC_URI[sha256sum] = "2a05f2c1a6ab4b08560a6da55fdaabd0f52f4d1e6df6e288b9ed927bf5c289ed"
+LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=fbc093901857fcd118f065f900982c24"
 
 inherit pypi 
+
+SRCREV = "b3386b3bee8876d15f0745147c0b08937d8ab18e"
+PYPI_SRC_URI = "git://github.com/pywbem/pywbem;protocol=https;branch=stable_0.15"
+
+S = "${WORKDIR}/git"
 
 DEPENDS += " \
     ${PYTHON_PN}-ply-native \

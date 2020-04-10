@@ -1,0 +1,32 @@
+From 3fbf61d54b82fc9bf21d8039bfd89dc9efc5bbcd Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Mon, 25 Feb 2019 15:44:54 +0800
+Subject: [PATCH 21/24] avoid redefinition of prctl_mm_map structure
+
+Fix the following compile failure:
+error: redefinition of 'struct prctl_mm_map'
+
+Upstream-Status: Inappropriate [musl specific]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/basic/missing_prctl.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/basic/missing_prctl.h b/src/basic/missing_prctl.h
+index f80cd17..47e4893 100644
+--- a/src/basic/missing_prctl.h
++++ b/src/basic/missing_prctl.h
+@@ -1,7 +1,9 @@
+ /* SPDX-License-Identifier: LGPL-2.1+ */
+ #pragma once
+ 
++#ifdef __GLIBC__
+ #include <linux/prctl.h>
++#endif
+ 
+ /* 58319057b7847667f0c9585b9de0e8932b0fdb08 (4.3) */
+ #ifndef PR_CAP_AMBIENT
+-- 
+2.11.0
+

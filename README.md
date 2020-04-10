@@ -111,7 +111,8 @@ Please review the [discussion](https://meta.stackexchange.com/questions/272956/a
 on Stack Overflow licensing before posting any code.
 
 For technical discussions, please see [contact info](#contact) below for IRC and
-mailing list information.
+mailing list information. Please don't file an issue to ask a question. You'll
+get faster results by using the mailing list or IRC.
 
 ## Features of OpenBMC
 
@@ -126,11 +127,11 @@ mailing list information.
 * Remote KVM
 * Hardware Simulation
 * Automated Testing
+* User management
+* Virtual media
 
 **Features In Progress**
 * OpenCompute Redfish Compliance
-* User management
-* Virtual media
 * Verified Boot
 
 **Features Requested but need help**
@@ -141,6 +142,17 @@ mailing list information.
 
 Dive deeper into OpenBMC by opening the
 [docs](https://github.com/openbmc/docs) repository.
+
+## Technical Steering Committee
+
+The Technical Steering Committee (TSC) guides the project. Members are:
+
+ * Brad Bishop (chair), IBM
+ * Nancy Yuen, Google
+ * Sai Dasari, Facebook
+ * James Mihm, Intel
+ * Sagar Dharia, Microsoft
+ * Supreeth Venkatesh, Arm
 
 ## Contact
 - Mail: openbmc@lists.ozlabs.org [https://lists.ozlabs.org/listinfo/openbmc](https://lists.ozlabs.org/listinfo/openbmc)

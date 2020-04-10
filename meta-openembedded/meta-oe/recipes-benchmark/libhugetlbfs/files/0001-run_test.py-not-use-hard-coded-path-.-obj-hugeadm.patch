@@ -12,6 +12,9 @@ Signed-off-by: Ting Liu <b28495@freescale.com>
 
 Update for 2.22.
 Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
+
+Update to work for python3
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
  tests/run_tests.py | 12 +++++++++++-
  1 file changed, 11 insertions(+), 1 deletion(-)
@@ -36,7 +39,7 @@ index 018264d..0aabcd1 100755
 +        return sizes
 +    except OSError:
 +        return sizes
-+    out = p.stdout.read().strip()
++    out = p.stdout.read().decode().strip()
 +
      if rc != 0 or out == "":
          return sizes

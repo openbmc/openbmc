@@ -11,15 +11,14 @@ HOMEPAGE ="http://sourceforge.net/projects/smbnetfs"
 DEPENDS = "fuse samba"
 DEPENDS_append_libc-musl = " libexecinfo"
 
+inherit autotools pkgconfig features_check
+
 # samba depends on libpam
-inherit features_check
 REQUIRED_DISTRO_FEATURES = "pam"
 
-inherit autotools gitpkgv pkgconfig
+PV = "0.6.1+git${SRCPV}"
 
-PKGV = "${GITPKGVTAG}"
-
-SRCREV = "bc6b94b015fdaf7c4dab56ccb996eecea8bc4373"
+SRCREV = "a117eec8de7ed7249871da73dcc350283ce72069"
 
 SRC_URI = "git://smbnetfs.git.sourceforge.net/gitroot/smbnetfs/smbnetfs;branch=master \
            file://configure.patch \

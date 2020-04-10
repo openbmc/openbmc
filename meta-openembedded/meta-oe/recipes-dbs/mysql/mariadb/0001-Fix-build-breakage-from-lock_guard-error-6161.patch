@@ -1,0 +1,32 @@
+Subject: [PATCH] Fix build breakage from lock_guard error (#6161)
+
+Summary:
+This change fixes a source issue that caused compile time error which
+breaks build for many fbcode services in that setup. The size() member
+function of channel is a const member, so member variables accessed
+within it are implicitly const as well. This caused error when clang
+fails to resolve to a constructor that takes std::mutex because the
+suitable constructor got rejected due to loss of constness for its
+argument. The fix is to add mutable modifier to the lock_ member of
+channel.
+
+Pull Request resolved: https://github.com/facebook/rocksdb/pull/6161
+
+Differential Revision: D18967685
+
+Pulled By: maysamyabandeh
+
+Upstream-Status: Backport
+
+fbshipit-source-id:698b6a5153c3c92eeacb842c467aa28cc350d432 
+--- a/storage/rocksdb/rocksdb/util/channel.h
++++ b/storage/rocksdb/rocksdb/util/channel.h
+@@ -60,7 +60,7 @@ class channel {
+ 
+  private:
+   std::condition_variable cv_;
+-  std::mutex lock_;
++  mutable std::mutex lock_;
+   std::queue<T> buffer_;
+   bool eof_;
+ };

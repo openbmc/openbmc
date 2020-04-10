@@ -13,6 +13,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRC_URI = "http://prdownloads.sourceforge.net/lirc/lirc-${PV}.tar.bz2 \
     file://pollfd.patch \
+    file://0001-Fix-build-on-32bit-arches-with-64bit-time_t.patch \
     file://lircd.service \
     file://lircd.init \
     file://lircexec.init \

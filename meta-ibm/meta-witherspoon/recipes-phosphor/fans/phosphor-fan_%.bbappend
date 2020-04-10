@@ -50,3 +50,7 @@ SYSTEMD_LINK_${PN}-control_witherspoon += "${@compose_list(d, 'FMT_CONTROL_STDBY
 # Link fan control service to also start at poweron
 FMT_CONTROL_PWRON_witherspoon = "../${TMPL_CONTROL}:${POWERON_TGT}.requires/${INSTFMT_CONTROL}"
 SYSTEMD_LINK_${PN}-control_witherspoon += "${@compose_list(d, 'FMT_CONTROL_PWRON', 'OBMC_CHASSIS_INSTANCES')}"
+
+# Enable the use of JSON on the fan applications that support it
+EXTRA_OECONF_append_witherspoon = " --enable-json"
+RDEPENDS_${PN}-presence-tach_append_witherspoon = " phosphor-fan-presence-config"

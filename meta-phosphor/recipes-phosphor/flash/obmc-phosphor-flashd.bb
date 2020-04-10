@@ -10,4 +10,4 @@ PROVIDES += "virtual/obmc-flash-mgmt"
 RPROVIDES_${PN} += "virtual-obmc-flash-mgmt"
 
 S = "${WORKDIR}"
-SRC_URI += "file://${PN}.py"
+SRC_URI += "file://${BPN}.py"

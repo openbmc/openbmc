@@ -8,11 +8,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  linux_syscall_support.h | 3 +++
  1 file changed, 3 insertions(+)
 
-Index: lss/linux_syscall_support.h
-===================================================================
---- lss.orig/linux_syscall_support.h
-+++ lss/linux_syscall_support.h
-@@ -793,6 +793,9 @@ struct kernel_statfs {
+--- a/linux_syscall_support.h
++++ b/linux_syscall_support.h
+@@ -816,6 +816,9 @@ struct kernel_statfs {
  #define FUTEX_TRYLOCK_PI_PRIVATE  (FUTEX_TRYLOCK_PI | FUTEX_PRIVATE_FLAG)
  #endif
  
@@ -22,7 +20,7 @@ Index: lss/linux_syscall_support.h
  
  #if defined(__x86_64__)
  #ifndef ARCH_SET_GS
-@@ -924,6 +927,7 @@ struct kernel_statfs {
+@@ -947,6 +950,7 @@ struct kernel_statfs {
  #ifndef __NR_fallocate
  #define __NR_fallocate          324
  #endif
@@ -30,7 +28,7 @@ Index: lss/linux_syscall_support.h
  /* End of i386 definitions                                                   */
  #elif defined(__ARM_ARCH_3__) || defined(__ARM_EABI__)
  #ifndef __NR_setresuid
-@@ -1211,6 +1215,12 @@ struct kernel_statfs {
+@@ -1239,6 +1243,12 @@ struct kernel_statfs {
  #ifndef __NR_fallocate
  #define __NR_fallocate          285
  #endif
@@ -43,3 +41,16 @@ Index: lss/linux_syscall_support.h
  /* End of x86-64 definitions                                                 */
  #elif defined(__mips__)
  #if _MIPS_SIM == _MIPS_SIM_ABI32
+@@ -1418,6 +1428,12 @@ struct kernel_statfs {
+ #ifndef __NR_ioprio_get
+ #define __NR_ioprio_get         (__NR_Linux + 274)
+ #endif
++
++#undef __NR_pread
++#define __NR_pread __NR_pread64
++#undef __NR_pwrite
++#define __NR_pwrite __NR_pwrite64
++
+ /* End of MIPS (64bit API) definitions */
+ #else
+ #ifndef __NR_setresuid

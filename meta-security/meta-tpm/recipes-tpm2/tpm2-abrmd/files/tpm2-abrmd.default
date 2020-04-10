@@ -1,1 +1,1 @@
-DAEMON_OPTS="--tcti=device --logger=syslog --max-connections=20 --max-transient-objects=20 --fail-on-loaded-trans"
+DAEMON_OPTS="--tcti=device --logger=syslog --max-connections=20 --max-transients=20 --flush-all"

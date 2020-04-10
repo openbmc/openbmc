@@ -13,6 +13,7 @@ DEPENDS = "libogg libvorbis"
 SRC_URI = "http://downloads.xiph.org/releases/vorbis/${BP}.tar.gz \
            file://0001-oggenc-Fix-large-alloca-on-bad-AIFF-input.patch \
            file://0004-Fix-format-error-blocking-compilation-with-hardening.patch \
+           file://gettext.patch \
           "
 
 SRC_URI[md5sum] = "567e0fb8d321b2cd7124f8208b8b90e6"

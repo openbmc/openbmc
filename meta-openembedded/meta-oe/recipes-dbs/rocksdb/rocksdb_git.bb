@@ -6,15 +6,13 @@ LIC_FILES_CHKSUM = "file://LICENSE.Apache;md5=3b83ef96387f14655fc854ddc3c6bd57 \
                     file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://LICENSE.leveldb;md5=fb04ff57a14f308f2eed4a9b87d45837"
 
-SRCREV = "628a7fd74b5611657106c57f724f1682b114684c"
-SRCBRANCH = "6.0.fb"
-PV = "6.0.2"
+SRCREV = "4cfbd87afd08a16df28436fb990ef6b154ee6114"
+SRCBRANCH = "6.5.fb"
+PV = "6.5.2"
 
 SRC_URI = "git://github.com/facebook/${BPN}.git;branch=${SRCBRANCH} \
-           file://0001-CMake-has-stock-FindZLIB-in-upper-case.patch \
-           file://0001-Disable-Wshadow-and-do-not-mark-default-copy-constru.patch \
-           file://0001-utilities-Fix-build-failure-with-Werror-maybe-uninit.patch \
-           file://0001-fix-Issue-5303.patch \
+           file://0001-Fix-build-breakage-from-lock_guard-error-6161.patch \
+           file://0001-db-write_thread.cc-Initialize-state.patch \
           "
 
 S = "${WORKDIR}/git"
@@ -22,9 +20,9 @@ S = "${WORKDIR}/git"
 inherit cmake
 
 PACKAGECONFIG ??= "bzip2 zlib lz4 gflags"
-PACKAGECONFIG[bzip2] = "-DWITH_BZ2=ON -DBZIP2_LIBRARIES:STRING=bz2,-DWITH_BZ2=OFF,bzip2"
-PACKAGECONFIG[lz4] = "-DWITH_LZ4=ON -DLZ4_LIBRARIES:STRING=lz4,-DWITH_LZ4=OFF,lz4"
-PACKAGECONFIG[zlib] = "-DWITH_ZLIB=ON -DZLIB_LIBRARY:STRING=z,-DWITH_ZLIB=OFF,zlib"
+PACKAGECONFIG[bzip2] = "-DWITH_BZ2=ON,-DWITH_BZ2=OFF,bzip2"
+PACKAGECONFIG[lz4] = "-DWITH_LZ4=ON,-DWITH_LZ4=OFF,lz4"
+PACKAGECONFIG[zlib] = "-DWITH_ZLIB=ON,-DWITH_ZLIB=OFF,zlib"
 PACKAGECONFIG[zstd] = "-DWITH_ZSTD=ON,-DWITH_ZSTD=OFF,zstd"
 PACKAGECONFIG[lite] = "-DROCKSDB_LITE=ON,-DROCKSDB_LITE=OFF"
 PACKAGECONFIG[gflags] = "-DWITH_GFLAGS=ON,-DWITH_GFLAGS=OFF,gflags"
@@ -34,6 +32,7 @@ EXTRA_OECMAKE = "\
     -DPORTABLE=ON \
     -DWITH_TESTS=OFF \
     -DWITH_TOOLS=OFF \
+    -DFAIL_ON_WARNINGS=OFF \
 "
 
 do_install_append() {

@@ -16,9 +16,10 @@ SRC_URI = "\
     git://git.openwrt.org/project/libubox.git \
     file://0001-version-libraries.patch \
     file://fix-libdir.patch \
+    file://0001-blobmsg-fix-array-out-of-bounds-GCC-10-warning.patch \
 "
 
-SRCREV = "155bf39896f126b1ba121b816922a88dc34c31e3"
+SRCREV = "07413cce72e19520af55dfcbc765484f5ab41dd9"
 PV = "1.0.1+git${SRCPV}"
 
 S = "${WORKDIR}/git"

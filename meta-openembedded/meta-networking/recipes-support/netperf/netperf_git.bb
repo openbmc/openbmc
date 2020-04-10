@@ -31,6 +31,8 @@ CFLAGS_append = "${@bb.utils.contains('DISTRO_FEATURES', 'largefile', \
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[sctp] = "--enable-sctp,--disable-sctp,lksctp-tools,"
+PACKAGECONFIG[intervals] = "--enable-intervals,--disable-intervals,,"
+PACKAGECONFIG[histogram] = "--enable-histogram,--disable-histogram,,"
 
 # autotools.bbclass attends to include m4 files with path depth <= 2 by
 # "find ${S} -maxdepth 2 -name \*.m4", so move m4 files from m4/m4.

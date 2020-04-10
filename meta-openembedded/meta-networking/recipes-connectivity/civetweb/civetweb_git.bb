@@ -4,7 +4,7 @@ HOMEPAGE = "https://github.com/civetweb/civetweb"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=6f28fdcba0dda735eed62bac6a397562"
 
-SRCREV = "ce8f6d38a60eb16c996afee1e5340f76ef4d0923"
+SRCREV = "6423faea4800f6cd4055750a7af2da85cdbe4e96"
 PV = "1.11+git${SRCPV}"
 SRC_URI = "git://github.com/civetweb/civetweb.git \
            file://0001-Unittest-Link-librt-and-libm-using-l-option.patch \

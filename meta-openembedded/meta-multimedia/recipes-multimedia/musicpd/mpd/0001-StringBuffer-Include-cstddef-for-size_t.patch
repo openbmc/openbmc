@@ -1,0 +1,27 @@
+From c14877071f14b218835f7fb034dea11bd1ba56f5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 25 Dec 2019 09:40:16 -0800
+Subject: [PATCH] StringBuffer: Include cstddef for size_t
+
+Fixes
+a.cpp:3:1: error: 'size_t' does not name a type
+    3 | size_t s;
+      | ^~~~~~
+a.cpp:2:1: note: 'size_t' is defined in header '<cstddef>'; did you forget to '#include <cstddef>'?
+
+Upstream-Status: Submitted [https://github.com/MusicPlayerDaemon/MPD/pull/697]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/util/StringBuffer.hxx | 1 +
+ 1 file changed, 1 insertion(+)
+
+--- a/src/util/StringBuffer.hxx
++++ b/src/util/StringBuffer.hxx
+@@ -31,6 +31,7 @@
+ #define STRING_BUFFER_HPP
+ 
+ #include <array>
++#include <cstddef>
+ 
+ /**
+  * A statically allocated string buffer.

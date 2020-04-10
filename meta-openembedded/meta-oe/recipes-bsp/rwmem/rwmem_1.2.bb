@@ -15,7 +15,7 @@ DEPENDS += "python3 python3-pybind11"
 
 PV .= "+git${SRCPV}"
 
-SRCREV_rwmem = "cc296c5366a35a4c4271cfa3cc9831f6f34bfd9d"
+SRCREV_rwmem = "3ec3e421211b58e766651c2e3a3a21acf14a1906"
 SRCREV_inih = "4b10c654051a86556dfdb634c891b6c3224c4109"
 
 SRCREV_FORMAT = "rwmem_inih"

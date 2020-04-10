@@ -12,7 +12,7 @@ inherit obmc-phosphor-ipmiprovider-symlink
 inherit obmc-phosphor-sdbus-service
 inherit obmc-phosphor-systemd
 inherit phosphor-ipmi-host
-inherit pythonnative
+inherit python3native
 
 def ipmi_whitelists(d):
     whitelists = d.getVar(
@@ -23,18 +23,21 @@ def ipmi_whitelists(d):
 
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "nlohmann-json"
-DEPENDS += "obmc-targets"
+DEPENDS += "phosphor-state-manager"
 DEPENDS += "${@ipmi_whitelists(d)}"
 DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "phosphor-logging"
 DEPENDS += "phosphor-mapper"
 DEPENDS += "sdbusplus"
-DEPENDS += "sdbus++-native"
+DEPENDS += "${PYTHON_PN}-sdbus++-native"
 DEPENDS += "virtual/phosphor-ipmi-inventory-sel"
 DEPENDS += "virtual/phosphor-ipmi-fru-merge-config"
 DEPENDS += "virtual/phosphor-ipmi-sensor-inventory"
 DEPENDS += "boost"
 DEPENDS += "sdeventplus"
+DEPENDS += "${PYTHON_PN}-native"
+DEPENDS += "${PYTHON_PN}-pyyaml-native"
+DEPENDS += "${PYTHON_PN}-mako-native"
 
 VIRTUAL-RUNTIME_ipmi-config ?= "phosphor-ipmi-config"
 
@@ -57,10 +60,10 @@ GROUPADD_PARAM_${PN} = "ipmi"
 
 SYSTEMD_SERVICE_${PN} += "xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service phosphor-ipmi-host.service"
 
-RRECOMMENDS_${PN} += "${VIRTUAL-RUNTIME_obmc-settings-mgmt}"
+RRECOMMENDS_${PN} += "phosphor-settings-manager"
 
 
-require ${PN}.inc
+require ${BPN}.inc
 
 # Setup IPMI Whitelist Conf files
 WHITELIST_CONF = " \

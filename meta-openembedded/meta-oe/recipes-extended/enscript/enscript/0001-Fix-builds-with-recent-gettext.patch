@@ -1,0 +1,24 @@
+From 771cd2a12db8b8c9a558f1a04958df8ed614f2e0 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 20 Dec 2019 14:06:50 +0100
+Subject: [PATCH] Fix builds with recent gettext
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index dedabd6..8833ac9 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -22,7 +22,7 @@
+ # along with Enscript.  If not, see <http://www.gnu.org/licenses/>.
+ #
+ 
+-SUBDIRS = intl compat afm afmlib lib scripts src po states docs w32
++SUBDIRS = compat afm afmlib lib scripts src po states docs w32
+ 
+ EXTRA_DIST = README.ESCAPES README.DOS ascii.txt			\
+ asciifise.txt asciidkno.txt 88591.txt 88592.txt 88593.txt 88594.txt	\

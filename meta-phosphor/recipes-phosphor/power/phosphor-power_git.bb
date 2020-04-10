@@ -7,24 +7,59 @@ PV = "1.0+git${SRCPV}"
 inherit meson
 inherit pkgconfig
 inherit systemd
-inherit pythonnative
+inherit python3native
 
-require ${PN}.inc
+require ${BPN}.inc
 
 S = "${WORKDIR}/git"
+
+POWER_SERVICE_PACKAGES = " \
+    ${PN}-cold-redundancy \
+    ${PN}-monitor \
+    ${PN}-psu-monitor \
+    ${PN}-regulators \
+    ${PN}-sequencer \
+"
+POWER_UTIL_PACKAGES = "${PN}-utils"
+
+PACKAGE_BEFORE_PN = "${POWER_SERVICE_PACKAGES} ${POWER_UTIL_PACKAGES}"
+ALLOW_EMPTY_${PN} = "1"
+
+SYSTEMD_PACKAGES = "${POWER_SERVICE_PACKAGES}"
 
 # TODO: in future when openpower-dbus-interfaces is removed from
 # phosphor-power, remove the dependency here.
 DEPENDS += " \
          phosphor-logging \
          openpower-dbus-interfaces \
-         sdbus++-native \
+         ${PYTHON_PN}-sdbus++-native \
          sdeventplus \
          nlohmann-json \
          cli11 \
+         i2c-tools \
+         ${PYTHON_PN}-native \
+         ${PYTHON_PN}-pyyaml-native \
+         ${PYTHON_PN}-setuptools-native \
+         ${PYTHON_PN}-mako-native \
          "
 
 SEQ_MONITOR_SVC = "pseq-monitor.service"
 SEQ_PGOOD_SVC = "pseq-monitor-pgood.service"
 PSU_MONITOR_TMPL = "power-supply-monitor@.service"
-SYSTEMD_SERVICE_${PN} += "${SEQ_MONITOR_SVC} ${SEQ_PGOOD_SVC} ${PSU_MONITOR_TMPL}"
+PSU_MONITOR_SVC = "phosphor-psu-monitor.service"
+REGS_SVC = "phosphor-regulators.service"
+
+SYSTEMD_SERVICE_${PN}-sequencer = "${SEQ_MONITOR_SVC} ${SEQ_PGOOD_SVC}"
+SYSTEMD_SERVICE_${PN}-monitor = "${PSU_MONITOR_TMPL}"
+SYSTEMD_SERVICE_${PN}-psu-monitor = "${PSU_MONITOR_SVC}"
+SYSTEMD_SERVICE_${PN}-regulators = "${REGS_SVC}"
+
+
+# TODO: cold-redundancy is not installed in the repo yet
+# FILES_${PN}-cold-redundancy = "${bindir}/cold-redundancy"
+
+FILES_${PN}-monitor = "${bindir}/psu-monitor"
+FILES_${PN}-psu-monitor = "${bindir}/phosphor-psu-monitor ${datadir}/phosphor-psu-monitor"
+FILES_${PN}-regulators = "${bindir}/phosphor-regulators ${datadir}/phosphor-regulators"
+FILES_${PN}-sequencer = "${bindir}/pseq-monitor"
+FILES_${PN}-utils = "${bindir}/psutils"

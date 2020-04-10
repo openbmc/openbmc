@@ -9,11 +9,13 @@ DEPENDS += "glib-2.0-native"
 
 PV = "0.2+git${SRCPV}"
 
-SRC_URI = "git://github.com/labapart/gattlib.git"
-SRC_URI += "file://dbus-avoid-strange-chars-from-the-build-dir.patch"
+SRC_URI = "git://github.com/labapart/gattlib.git \
+           file://dbus-avoid-strange-chars-from-the-build-dir.patch \
+           file://0001-cmake-Use-GNUInstallDirs.patch \
+           "
 
 SRCBRANCH = "master"
-SRCREV = "c6a33252221dff904cf277e085e2ce70aced8788"
+SRCREV = "5c7ee43bd70ee09a7170ddd55b9fdbdef69e9080"
 
 S = "${WORKDIR}/git"
 

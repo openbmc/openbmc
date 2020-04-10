@@ -1,0 +1,11 @@
+Index: git/src/libsystemd/libsystemd.pc.in
+===================================================================
+--- git.orig/src/libsystemd/libsystemd.pc.in
++++ git/src/libsystemd/libsystemd.pc.in
+@@ -16,5 +16,5 @@ Name: systemd
+ Description: systemd Library
+ URL: @PROJECT_URL@
+ Version: @PROJECT_VERSION@
+-Libs: -L${libdir} -lsystemd
++Libs: -L${libdir} -lsystemd -lrt -lmount -lcap
+ Cflags: -I${includedir}

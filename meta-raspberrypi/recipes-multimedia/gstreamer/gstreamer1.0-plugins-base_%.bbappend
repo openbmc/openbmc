@@ -5,6 +5,7 @@ EXTRA_OECONF_append_rpi = " CPPFLAGS='-I${STAGING_INCDIR}/interface/vcos/pthread
 
 PACKAGECONFIG_append_rpi = "${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', '', ' dispmanx', d)}"
 
-PACKAGECONFIG_GL_rpi = "egl gles2"
+PACKAGECONFIG_GL_VC4GRAPHICS = "${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'gles2 egl', '', d)}"
+PACKAGECONFIG_GL_rpi = "${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', '${PACKAGECONFIG_GL_VC4GRAPHICS}', 'egl gles2', d)}"
 
 PACKAGECONFIG[dispmanx] = "--enable-dispmanx,--disable-dispmanx,userland"

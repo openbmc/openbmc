@@ -15,8 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-if [ "$(basename -- "$0")" = "setup" ]; then
+if [ -z "$ZSH_NAME" ] && [ "$(basename -- "$0")" = "setup" ]; then
 	echo The script must be sourced, not executed
 	exit 1
 fi
@@ -50,7 +49,9 @@ machine() {
 				fi
 				return
 			fi
-		else
+		elif test -e $tmpl/bblayers.conf.sample && \
+			grep -q "##OEROOT##/meta-phosphor" $tmpl/bblayers.conf.sample;
+		then
 			echo "${name}"
 		fi
 	done

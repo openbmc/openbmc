@@ -30,7 +30,8 @@ S = "${WORKDIR}/git"
 
 PARALLEL_MAKE = ""
 
-inherit pkgconfig autotools-brokensep update-rc.d python3native perlnative ptest cpan manpages systemd
+inherit pkgconfig autotools-brokensep update-rc.d python3native perlnative ptest cpan manpages systemd features_check
+REQUIRED_DISTRO_FEATURES = "apparmor"
 
 PACKAGECONFIG ??= "python perl aa-decode"
 PACKAGECONFIG[manpages] = "--enable-man-pages, --disable-man-pages"

@@ -1,4 +1,0 @@
-[Unit]
-Description=Fan Control
-RefuseManualStart=yes
-RefuseManualStop=yes

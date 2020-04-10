@@ -7,10 +7,8 @@ DEPENDS += "${PYTHON_PN}-vcversioner-native ${PYTHON_PN}-setuptools-scm-native"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/python-jsonschema:"
 
-SRC_URI_append = " file://0001-setup.cfg-add-non-GPL-format-option.patch"
-
-SRC_URI[md5sum] = "a802ab85600074a726ef6acc4e6a8148"
-SRC_URI[sha256sum] = "2fa0684276b6333ff3c0b1b27081f4b2305f0a36cf702a23db50edb141893c3f"
+SRC_URI[md5sum] = "f1a0b5011f05a02a8dee1070cd10a26d"
+SRC_URI[sha256sum] = "c8a85b28d377cc7737e46e2d9f2b4f44ee3c0e1deac6bf46ddefc7187d30797a"
 
 PACKAGECONFIG ??= "format"
 PACKAGECONFIG[format] = ",,,\

@@ -1,4 +1,0 @@
-[Unit]
-Description=Host instance %i timed out refreshing Watchdog
-Conflicts=obmc-chassis-poweroff@%i.target
-RefuseManualStop=yes

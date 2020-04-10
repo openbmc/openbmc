@@ -13,6 +13,7 @@ RDEPENDS_${PN} += " \
     perl \
     perl-module-filehandle \
     perl-module-getopt-std \
+    perl-module-digest-md5 \
     perl-module-digest-sha \
     perl-module-constant \
     perl-module-cwd \

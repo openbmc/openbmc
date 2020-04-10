@@ -30,6 +30,9 @@ do_install () {
     oe_runmake -e install-bin DESTDIR=${D} PREFIX=${prefix}
     sed -i -e 's:${STAGING_BINDIR_NATIVE}/python3-native/python3:${USRBINPATH}/env python3:g' ${D}${bindir}/hg
 }
+PACKAGES =+ "${PN}-python"
 
 FILES_${PN} += "${PYTHON_SITEPACKAGES_DIR}"
+
+FILES_${PN}-python = "${nonarch_libdir}/${PYTHON_DIR}"
 

@@ -146,6 +146,34 @@ groups:
           - /temperature/gpu5
           - /temperature/gpu6
           - /temperature/gpu7
+    - name: zone0_nvme
+      description: Group of nvme temperature sensors for zone 0
+      type: /xyz/openbmc_project/sensors
+      members:
+          - /temperature/nvme0
+          - /temperature/nvme1
+          - /temperature/nvme2
+          - /temperature/nvme3
+          - /temperature/nvme4
+          - /temperature/nvme5
+          - /temperature/nvme6
+          - /temperature/nvme7
+          - /temperature/nvme8
+          - /temperature/nvme9
+          - /temperature/nvme10
+          - /temperature/nvme11
+          - /temperature/nvme12
+          - /temperature/nvme13
+          - /temperature/nvme14
+          - /temperature/nvme15
+          - /temperature/nvme16
+          - /temperature/nvme17
+          - /temperature/nvme18
+          - /temperature/nvme19
+          - /temperature/nvme20
+          - /temperature/nvme21
+          - /temperature/nvme22
+          - /temperature/nvme23
 matches:
     - name: propertiesChanged
       parameters:
@@ -549,6 +577,11 @@ events:
                     property:
                         name: Value
                         type: int64_t
+                  - name: zone0_nvme
+                    interface: xyz.openbmc_project.Sensor.Value
+                    property:
+                        name: Value
+                        type: int64_t
               triggers:
                   - name: init
                     method: getProperties
@@ -768,6 +801,39 @@ events:
                         type: int64_t
                     factor:
                         value: 4
+                        type: int64_t
+                    delta:
+                        value: 5
+                        type: uint64_t
+                  # Speed changes based on nvme temps
+                  - name: set_net_increase_speed
+                    groups:
+                        - name: zone0_nvme
+                          interface: xyz.openbmc_project.Sensor.Value
+                          property:
+                              name: Value
+                              type: int64_t
+                    property:
+                        value: 55
+                        type: int64_t
+                    factor:
+                        value: 1
+                        type: int64_t
+                    delta:
+                        value: 13
+                        type: uint64_t
+                  - name: set_net_decrease_speed
+                    groups:
+                        - name: zone0_nvme
+                          interface: xyz.openbmc_project.Sensor.Value
+                          property:
+                              name: Value
+                              type: int64_t
+                    property:
+                        value: 52
+                        type: int64_t
+                    factor:
+                        value: 3
                         type: int64_t
                     delta:
                         value: 5

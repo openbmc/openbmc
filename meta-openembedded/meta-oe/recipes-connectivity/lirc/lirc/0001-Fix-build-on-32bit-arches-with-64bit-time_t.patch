@@ -1,0 +1,40 @@
+From 50a48a7bd8d65a165ce2aac4ba0c1e02bded04aa Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 30 Nov 2019 12:21:31 -0800
+Subject: [PATCH] Fix build on 32bit arches with 64bit time_t
+
+time element is deprecated on new input_event structure in kernel's
+input.h [1]
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit?id=152194fe9c3f
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ plugins/devinput.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/plugins/devinput.c b/plugins/devinput.c
+index d4d733a..feb4a61 100644
+--- a/plugins/devinput.c
++++ b/plugins/devinput.c
+@@ -34,6 +34,11 @@
+ #include <linux/uinput.h>
+ #include <sys/stat.h>
+ 
++#ifndef input_event_sec
++#define input_event_sec time.tv_sec
++#define input_event_usec time.tv_usec
++#endif
++
+ #ifndef EV_SYN
+ /* previous name */
+ #define EV_SYN EV_RST
+@@ -459,7 +464,7 @@ char* devinput_rec(struct ir_remote* remotes)
+ 		return 0;
+ 	}
+ 
+-	log_trace("time %ld.%06ld  type %d  code %d  value %d", event.time.tv_sec, event.time.tv_usec, event.type,
++	log_trace("time %ld.%06ld  type %d  code %d  value %d", event.input_event_sec, event.input_event_usec, event.type,
+ 		  event.code, event.value);
+ 
+ 	value = (unsigned)event.value;

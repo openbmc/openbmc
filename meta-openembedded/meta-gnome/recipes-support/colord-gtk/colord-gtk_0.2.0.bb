@@ -18,4 +18,8 @@ EXTRA_OEMESON = "-Dman=false"
 
 # gobject-introspection is mandatory and cannot be configured
 REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
+
+# colord
+REQUIRED_DISTRO_FEATURES += "polkit"
+
 UNKNOWN_CONFIGURE_WHITELIST_append = " introspection"

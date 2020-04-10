@@ -1,0 +1,46 @@
+From d4a405f87fc215c14e610a25b5a6b14060c1ef15 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 25 Dec 2019 13:53:52 -0800
+Subject: [PATCH] allocate space for buf on heap
+
+Avoids
+| src/epggrab/module/xmltv.c:204:47: error: '%s' directive output may be truncated writing between 2 and 2147483645 bytes into a region of size 115 [-Werror=format-truncation=]
+|   204 |   snprintf(buf, sizeof(buf)-1, "ddprogid://%s/%s", mod->id, s);
+|       |                                               ^~
+
+Upstream-Status: Submitted [https://github.com/tvheadend/tvheadend/pull/1324]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/epggrab/module/xmltv.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/epggrab/module/xmltv.c b/src/epggrab/module/xmltv.c
+index 34ab05bdb..b1a956614 100644
+--- a/src/epggrab/module/xmltv.c
++++ b/src/epggrab/module/xmltv.c
+@@ -197,11 +197,12 @@ static void parse_xmltv_dd_progid
+   (epggrab_module_t *mod, const char *s, char **uri, char **suri,
+    epg_episode_num_t *epnum)
+ {
+-  char buf[128];
+   if (strlen(s) < 2) return;
+ 
++  char* buf = (char *)malloc(strlen(s) + strlen(mod->id) + 13);
++  buf[strlen(s) + strlen(mod->id) + 12] = '\0';
+   /* Raw URI */
+-  snprintf(buf, sizeof(buf)-1, "ddprogid://%s/%s", mod->id, s);
++  snprintf(buf, strlen(s) + strlen(mod->id) + 12, "ddprogid://%s/%s", mod->id, s);
+ 
+   /* SH - series without episode id so ignore */
+   if (strncmp("SH", s, 2))
+@@ -219,6 +220,7 @@ static void parse_xmltv_dd_progid
+       if (buf[e+1]) sscanf(&buf[e+1], "%hu", &(epnum->e_num));
+     }
+   }
++  free(buf);
+ }
+ 
+ /**
+-- 
+2.24.1
+

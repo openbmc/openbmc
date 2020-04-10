@@ -1,23 +1,23 @@
 BmcBooted:
-    power:
+    power-button:
         Action: 'Blink'
         DutyOn: 50
         Period: 250
         Priority: 'On'
 PowerOn:
-    power:
+    power-button:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 EnclosureFault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 EnclosureIdentify:
-    rear-id:
+    front-id:
         Action: 'On'
         DutyOn: 50
         Period: 0
@@ -28,7 +28,7 @@ Fan0Fault:
         DutyOn: 50
         Period: 0
         Priority: 'Blink'
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
@@ -39,7 +39,7 @@ Fan1Fault:
         DutyOn: 50
         Period: 1000
         Priority: 'Blink'
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
@@ -50,7 +50,7 @@ Fan2Fault:
         DutyOn: 50
         Period: 0
         Priority: 'Blink'
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
@@ -61,7 +61,7 @@ Fan3Fault:
         DutyOn: 50
         Period: 1000
         Priority: 'Blink'
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
@@ -72,7 +72,7 @@ Fan4Fault:
         DutyOn: 50
         Period: 0
         Priority: 'Blink'
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
@@ -83,35 +83,35 @@ Fan5Fault:
         DutyOn: 50
         Period: 1000
         Priority: 'Blink'
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 Powersupply0Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 Powersupply1Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 LampTest:
-    fault:
+    front-fault:
         Action: 'Blink'
         DutyOn: 50
         Period: 1000
         Priority: 'On'
-    rear-id:
+    front-id:
         Action: 'Blink'
         DutyOn: 50
         Period: 1000
         Priority: 'On'
-    power:
+    power-button:
         Action: 'Blink'
         DutyOn: 50
         Period: 1000
@@ -147,367 +147,367 @@ LampTest:
         Period: 1000
         Priority: 'Blink'
 core0Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 core1Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 core2Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 core3Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 core4Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 core5Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 core6Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 core7Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 core8Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 core9Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 core10Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 core11Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 core12Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 core13Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 core14Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 core15Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 core16Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 core17Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 core18Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 core19Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 core20Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 core21Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 core22Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 core23Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 cpu0Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 cpu1Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm0Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm1Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm2Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm3Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm4Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm5Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm6Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm7Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm8Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm9Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm10Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm11Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm12Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm13Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm14Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm15Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm16Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm17Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm18Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm19Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm20Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm21Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm22Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm23Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm24Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm25Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm26Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm27Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm28Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm29Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm30Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 dimm31Fault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 motherboardFault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 occFault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0
         Priority: 'On'
 systemFault:
-    fault:
+    front-fault:
         Action: 'On'
         DutyOn: 50
         Period: 0

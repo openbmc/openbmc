@@ -17,12 +17,13 @@ COMPATIBLE_HOST_riscv32 = "null"
 
 SRC_URI = "http://nodejs.org/dist/v${PV}/node-v${PV}.tar.xz \
            file://0001-Disable-running-gyp-files-for-bundled-deps.patch \
+           file://0003-Install-both-binaries-and-use-libdir.patch \
            file://0004-Make-compatibility-with-gcc-4.8.patch \
            file://0007-v8-don-t-override-ARM-CFLAGS.patch \
            "
 SRC_URI_append_class-target = " \
-           file://0005-Link-atomic-library.patch \
            file://0002-Using-native-torque.patch \
+           file://0005-Link-atomic-library.patch \
            "
 
 SRC_URI[md5sum] = "d5a56d0abf764a91f627f0690cd4b9f3"
@@ -57,6 +58,7 @@ PACKAGECONFIG[gyp] = ",,gyp-py2-native"
 PACKAGECONFIG[icu] = "--with-intl=system-icu,--without-intl,icu"
 PACKAGECONFIG[libuv] = "--shared-libuv,,libuv"
 PACKAGECONFIG[nghttp2] = "--shared-nghttp2,,nghttp2"
+PACKAGECONFIG[shared] = "--shared"
 PACKAGECONFIG[zlib] = "--shared-zlib,,zlib"
 
 # We don't want to cross-compile during target compile,
@@ -99,6 +101,7 @@ do_configure () {
    ./configure --prefix=${prefix} --without-snapshot --shared-openssl \
                --dest-cpu="${@map_nodejs_arch(d.getVar('TARGET_ARCH'), d)}" \
                --dest-os=linux \
+               --libdir=${D}${libdir} \
                ${ARCHFLAGS} \
                ${PACKAGECONFIG_CONFARGS}
 }

@@ -19,6 +19,8 @@ DEPENDS += " \
 SRC_URI = " \
     git://github.com/MusicPlayerDaemon/MPD;branch=v0.20.x \
     file://mpd.conf.in \
+    file://0001-StringBuffer-Include-cstddef-for-size_t.patch \
+    file://0002-Include-stdexcept-for-runtime_error.patch \
 "
 SRCREV = "9274bc15bc41bbe490fde847f8422468cc20375d"
 S = "${WORKDIR}/git"

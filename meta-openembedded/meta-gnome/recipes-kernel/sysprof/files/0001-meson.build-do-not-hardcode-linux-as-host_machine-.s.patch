@@ -1,0 +1,42 @@
+From 43c39b5685445242d071b3706af2903efa508b4a Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 14 Jan 2020 12:58:27 +0100
+Subject: [PATCH] meson.build: do not hardcode 'linux' as
+ host_machine().system() value
+
+In some build environmets such as OpenEmbedded this can be 'linux-gnueabi'
+or otherwise not exactly 'linux'.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ src/libsysprof/meson.build | 2 +-
+ src/tools/meson.build      | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/libsysprof/meson.build b/src/libsysprof/meson.build
+index 3449961..3c2d186 100644
+--- a/src/libsysprof/meson.build
++++ b/src/libsysprof/meson.build
+@@ -84,7 +84,7 @@ libsysprof_deps = [
+   polkit_dep,
+ ]
+ 
+-if host_machine.system() == 'linux'
++if host_machine.system().contains('linux')
+   libsysprof_public_sources += [
+     'sysprof-memory-source.c',
+     'sysprof-perf-counter.c',
+diff --git a/src/tools/meson.build b/src/tools/meson.build
+index 670052a..3fb7f0c 100644
+--- a/src/tools/meson.build
++++ b/src/tools/meson.build
+@@ -2,7 +2,7 @@ tools_deps = [
+   libsysprof_capture_dep,
+ ]
+ 
+-if get_option('libsysprof') and host_machine.system() == 'linux'
++if get_option('libsysprof') and host_machine.system().contains('linux')
+   polkit_agent_dep = dependency('polkit-agent-1')
+   sysprof_cli = executable('sysprof-cli', 'sysprof-cli.c',
+     dependencies: tools_deps + [libsysprof_dep, polkit_dep, polkit_agent_dep],

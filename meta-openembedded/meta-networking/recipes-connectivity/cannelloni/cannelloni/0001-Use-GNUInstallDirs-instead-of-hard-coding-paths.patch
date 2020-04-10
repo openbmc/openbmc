@@ -1,0 +1,43 @@
+From c74f04dbab4d586287347b1d5517f36e2f0c3d8e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 19 Dec 2019 15:52:34 -0800
+Subject: [PATCH] Use GNUInstallDirs instead of hard-coding paths
+
+Bump minimum cmake version to be >= 3.1
+
+Upstream-Status: Submitted [https://github.com/mguentner/cannelloni/pull/22]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 51b354f..958e0eb 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 2.6)
++cmake_minimum_required(VERSION 3.1)
+ project(cannelloni)
+ 
+ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
+@@ -60,6 +60,8 @@ set_target_properties ( cannelloni-common
+   SOVERSION 0
+ )
+ 
++include(GNUInstallDirs)
++
+ if(SCTP_SUPPORT)
+     add_library(sctpthread STATIC sctpthread.cpp)
+     target_link_libraries(sctpthread addsources sctp)
+@@ -68,5 +70,5 @@ endif(SCTP_SUPPORT)
+ set_target_properties(addsources PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+ target_link_libraries(cannelloni addsources cannelloni-common pthread)
+ 
+-install(TARGETS cannelloni DESTINATION bin)
+-install(TARGETS cannelloni-common DESTINATION lib)
++install(TARGETS cannelloni DESTINATION ${CMAKE_INSTALL_BINDIR})
++install(TARGETS cannelloni-common DESTINATION ${CMAKE_INSTALL_LIBDIR})
+-- 
+2.24.1
+

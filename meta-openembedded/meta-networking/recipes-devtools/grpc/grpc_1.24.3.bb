@@ -36,9 +36,15 @@ EXTRA_OECMAKE = " \
     -DgRPC_INSTALL=ON \
     -DCMAKE_CROSSCOMPILING=ON \
     -DBUILD_SHARED_LIBS=ON \
+    -DgRPC_INSTALL_LIBDIR=${baselib} \
+    -DgRPC_INSTALL_CMAKEDIR=${baselib}/cmake/${BPN} \
     "
 
 do_configure_prepend_mipsarch() {
+    sed -i -e "s/set(_gRPC_ALLTARGETS_LIBRARIES \${CMAKE_DL_LIBS} rt m pthread)/set(_gRPC_ALLTARGETS_LIBRARIES \${CMAKE_DL_LIBS} atomic rt m pthread)/g" ${S}/CMakeLists.txt
+}
+
+do_configure_prepend_powerpc() {
     sed -i -e "s/set(_gRPC_ALLTARGETS_LIBRARIES \${CMAKE_DL_LIBS} rt m pthread)/set(_gRPC_ALLTARGETS_LIBRARIES \${CMAKE_DL_LIBS} atomic rt m pthread)/g" ${S}/CMakeLists.txt
 }
 
@@ -48,6 +54,6 @@ do_configure_prepend_toolchain-clang_x86() {
 
 BBCLASSEXTEND = "native nativesdk"
 
-SYSROOT_DIRS_BLACKLIST_append_class-target = "${libdir}/cmake/grpc"
+SYSROOT_DIRS_BLACKLIST_append_class-target = "${baselib}/cmake/grpc"
 
 FILES_${PN}-dev += "${bindir}"

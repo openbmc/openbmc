@@ -6,7 +6,7 @@ DEPENDS = " \
     dbus db virtual/libiconv zlib libsoup-2.4 libical nss libsecret \
 "
 
-inherit gsettings gobject-introspection features_check cmake gtk-doc gettext perlnative pythonnative
+inherit gsettings gobject-introspection features_check cmake gtk-doc gettext perlnative
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

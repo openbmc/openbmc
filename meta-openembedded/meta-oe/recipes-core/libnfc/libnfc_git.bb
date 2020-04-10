@@ -8,7 +8,7 @@ SECTION = "libs"
 inherit autotools pkgconfig
 
 S = "${WORKDIR}/git"
-SRCREV = "c42e2502d4627d3ea62f83c32677b100bb3cebdc"
+SRCREV = "2d4543673e9b76c02679ca8b89259659f1afd932"
 SRC_URI = "git://github.com/nfc-tools/libnfc.git \
            file://0001-usbbus-Include-stdint.h-for-uintX_t.patch \
           "

@@ -1,4 +1,4 @@
-From 4a1d676522d6b56cbe9a45c3b040afaa27d37f78 Mon Sep 17 00:00:00 2001
+From e76726321067748362b39937bd1e663a1a948ad5 Mon Sep 17 00:00:00 2001
 From: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
 Date: Wed, 15 Nov 2017 15:05:01 +0100
 Subject: [PATCH] native_bindir
@@ -22,10 +22,10 @@ Signed-off-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
  2 files changed, 14 insertions(+), 11 deletions(-)
 
 diff --git a/mesonbuild/dependencies/base.py b/mesonbuild/dependencies/base.py
-index 3c55a56..eb52fd1 100644
+index 40e304c..4b687df 100644
 --- a/mesonbuild/dependencies/base.py
 +++ b/mesonbuild/dependencies/base.py
-@@ -185,7 +185,7 @@ class Dependency:
+@@ -184,7 +184,7 @@ class Dependency:
      def get_exe_args(self, compiler):
          return []
  
@@ -34,7 +34,7 @@ index 3c55a56..eb52fd1 100644
          raise DependencyException('{!r} is not a pkgconfig dependency'.format(self.name))
  
      def get_configtool_variable(self, variable_name):
-@@ -248,7 +248,7 @@ class InternalDependency(Dependency):
+@@ -247,7 +247,7 @@ class InternalDependency(Dependency):
          self.sources = sources
          self.ext_deps = ext_deps
  
@@ -43,7 +43,7 @@ index 3c55a56..eb52fd1 100644
          raise DependencyException('Method "get_pkgconfig_variable()" is '
                                    'invalid for an internal dependency')
  
-@@ -670,15 +670,18 @@ class PkgConfigDependency(ExternalDependency):
+@@ -673,15 +673,18 @@ class PkgConfigDependency(ExternalDependency):
          return s.format(self.__class__.__name__, self.name, self.is_found,
                          self.version_reqs)
  
@@ -54,18 +54,18 @@ index 3c55a56..eb52fd1 100644
 +            cmd = [self.pkgbin.get_command()[0] + "-native"] + args
 +        else:
 +            cmd = self.pkgbin.get_command() + args
-         p, out = Popen_safe(cmd, env=env)[0:2]
-         rc, out = p.returncode, out.strip()
+         p, out, err = Popen_safe(cmd, env=env)
+         rc, out, err = p.returncode, out.strip(), err.strip()
          call = ' '.join(cmd)
          mlog.debug("Called `{}` -> {}\n{}".format(call, rc, out))
-         return rc, out
+         return rc, out, err
  
 -    def _call_pkgbin(self, args, env=None):
 +    def _call_pkgbin(self, args, env=None, use_native=False):
          # Always copy the environment since we're going to modify it
          # with pkg-config variables
          if env is None:
-@@ -698,7 +701,7 @@ class PkgConfigDependency(ExternalDependency):
+@@ -701,7 +704,7 @@ class PkgConfigDependency(ExternalDependency):
          targs = tuple(args)
          cache = PkgConfigDependency.pkgbin_cache
          if (self.pkgbin, targs, fenv) not in cache:
@@ -73,27 +73,27 @@ index 3c55a56..eb52fd1 100644
 +            cache[(self.pkgbin, targs, fenv)] = self._call_pkgbin_real(args, env, use_native)
          return cache[(self.pkgbin, targs, fenv)]
  
-     def _convert_mingw_paths(self, args):
-@@ -926,7 +929,7 @@ class PkgConfigDependency(ExternalDependency):
-             mlog.warning('Could not determine complete list of dependencies for %s' % self.name)
-         self.link_args, self.raw_link_args = self._search_libs(out, out_raw, out_all)
+     def _convert_mingw_paths(self, args: T.List[str]) -> T.List[str]:
+@@ -907,7 +910,7 @@ class PkgConfigDependency(ExternalDependency):
+                                       (self.name, out_raw))
+         self.link_args, self.raw_link_args = self._search_libs(out, out_raw)
  
 -    def get_pkgconfig_variable(self, variable_name, kwargs):
 +    def get_pkgconfig_variable(self, variable_name, kwargs, use_native=False):
          options = ['--variable=' + variable_name, self.name]
  
          if 'define_variable' in kwargs:
-@@ -939,7 +942,7 @@ class PkgConfigDependency(ExternalDependency):
+@@ -920,7 +923,7 @@ class PkgConfigDependency(ExternalDependency):
  
              options = ['--define-variable=' + '='.join(definition)] + options
  
--        ret, out = self._call_pkgbin(options)
-+        ret, out = self._call_pkgbin(options, use_native=use_native)
+-        ret, out, err = self._call_pkgbin(options)
++        ret, out, err = self._call_pkgbin(options, use_native=use_native)
          variable = ''
          if ret != 0:
              if self.required:
 diff --git a/mesonbuild/dependencies/ui.py b/mesonbuild/dependencies/ui.py
-index 6d784e6..73a9e13 100644
+index da411ef..856506a 100644
 --- a/mesonbuild/dependencies/ui.py
 +++ b/mesonbuild/dependencies/ui.py
 @@ -330,7 +330,7 @@ class QtBaseDependency(ExternalDependency):
@@ -105,7 +105,7 @@ index 6d784e6..73a9e13 100644
              if prefix:
                  self.bindir = os.path.join(prefix, 'bin')
  
-@@ -507,7 +507,7 @@ class Qt4Dependency(QtBaseDependency):
+@@ -508,7 +508,7 @@ class Qt4Dependency(QtBaseDependency):
          applications = ['moc', 'uic', 'rcc', 'lupdate', 'lrelease']
          for application in applications:
              try:
@@ -114,7 +114,7 @@ index 6d784e6..73a9e13 100644
              except MesonException:
                  pass
  
-@@ -517,7 +517,7 @@ class Qt5Dependency(QtBaseDependency):
+@@ -518,7 +518,7 @@ class Qt5Dependency(QtBaseDependency):
          QtBaseDependency.__init__(self, 'qt5', env, kwargs)
  
      def get_pkgconfig_host_bins(self, core):

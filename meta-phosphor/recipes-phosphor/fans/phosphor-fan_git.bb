@@ -4,9 +4,9 @@ control applications."
 PR = "r1"
 PV = "1.0+git${SRCPV}"
 
-require ${PN}.inc
+require ${BPN}.inc
 
-inherit autotools pkgconfig pythonnative
+inherit autotools pkgconfig python3native
 inherit obmc-phosphor-systemd
 inherit phosphor-fan
 
@@ -14,14 +14,15 @@ S = "${WORKDIR}/git"
 
 # Common build dependencies
 DEPENDS += "autoconf-archive-native"
-DEPENDS += "python-pyyaml-native"
-DEPENDS += "python-mako-native"
+DEPENDS += "${PYTHON_PN}-pyyaml-native"
+DEPENDS += "${PYTHON_PN}-mako-native"
 DEPENDS += "sdbusplus"
-DEPENDS += "sdbusplus-native"
+DEPENDS += "${PYTHON_PN}-sdbus++-native"
 DEPENDS += "sdeventplus"
 DEPENDS += "gpioplus"
 DEPENDS += "phosphor-logging"
 DEPENDS += "libevdev"
+DEPENDS += "nlohmann-json"
 
 # Package configuration
 FAN_PACKAGES = " \
@@ -61,8 +62,7 @@ PACKAGECONFIG[control] = "--enable-control \
      FAN_DEF_YAML_FILE=${STAGING_DIR_HOST}${control_datadir}/fans.yaml \
      FAN_ZONE_YAML_FILE=${STAGING_DIR_HOST}${control_datadir}/zones.yaml \
      ZONE_EVENTS_YAML_FILE=${STAGING_DIR_HOST}${control_datadir}/events.yaml \
-     ZONE_CONDITIONS_YAML_FILE=${STAGING_DIR_HOST}${control_datadir}/zone_conditions.yaml \
-     FAN_ZONE_OUTPUT_DIR=${S}/control, \
+     ZONE_CONDITIONS_YAML_FILE=${STAGING_DIR_HOST}${control_datadir}/zone_conditions.yaml, \
     --disable-control, \
     virtual/phosphor-fan-control-fan-config \
     phosphor-fan-control-zone-config \
@@ -89,8 +89,7 @@ SYSTEMD_LINK_${PN}-control += "${@compose_list(d, 'FMT_CONTROL_INIT', 'OBMC_CHAS
 # --------------------------------------
 # ${PN}-monitor specific configuration
 PACKAGECONFIG[monitor] = "--enable-monitor \
-     FAN_MONITOR_YAML_FILE=${STAGING_DIR_HOST}${monitor_datadir}/monitor.yaml \
-     FAN_MONITOR_OUTPUT_DIR=${S}/monitor, \
+     FAN_MONITOR_YAML_FILE=${STAGING_DIR_HOST}${monitor_datadir}/monitor.yaml, \
     --disable-monitor, \
     phosphor-fan-monitor-config \
     , \

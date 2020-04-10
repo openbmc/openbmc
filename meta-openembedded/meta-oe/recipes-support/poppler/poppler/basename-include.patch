@@ -16,8 +16,8 @@ index 830c1c80..e93eb368 100644
 --- a/goo/gbasename.cc
 +++ b/goo/gbasename.cc
 @@ -46,6 +46,10 @@
- #include <stdlib.h>
- #include <string.h>
+ #include <cstdlib>
+ #include <cstring>
  
 +#if !defined(__GLIBC__)
 +#define basename(src) (strrchr(src,'/') ? strrchr(src,'/')+1 : src)

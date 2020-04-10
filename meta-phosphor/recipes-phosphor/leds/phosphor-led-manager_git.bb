@@ -3,9 +3,9 @@ DESCRIPTION = "Daemon to cater to triggering actions on LED groups"
 PR = "r1"
 PV = "1.0+git${SRCPV}"
 
-require ${PN}.inc
+require ${BPN}.inc
 
-inherit autotools pkgconfig pythonnative
+inherit autotools pkgconfig python3native
 inherit obmc-phosphor-dbus-service obmc-phosphor-systemd
 
 LED_MGR_PACKAGES = " \
@@ -20,9 +20,11 @@ DBUS_PACKAGES = "${PN}-ledmanager"
 
 SYSTEMD_PACKAGES = "${LED_MGR_PACKAGES}"
 
-DEPENDS += "python-pyyaml-native"
+DEPENDS += "${PYTHON_PN}-native"
+DEPENDS += "${PYTHON_PN}-pyyaml-native"
+DEPENDS += "${PYTHON_PN}-inflection-native"
 DEPENDS += "autoconf-archive-native"
-DEPENDS += "sdbusplus sdbusplus-native"
+DEPENDS += "sdbusplus ${PYTHON_PN}-sdbus++-native"
 DEPENDS += "systemd"
 DEPENDS += "phosphor-logging"
 

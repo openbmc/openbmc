@@ -13,7 +13,6 @@ SRC_URI = "svn://svn.openmoko.org/trunk/src/host/;module=sjf2410-linux;protocol=
 S = "${WORKDIR}/sjf2410-linux"
 
 inherit native deploy
-do_deploy[sstate-outputdirs] = "${DEPLOY_DIR_TOOLS}"
 
 CFLAGS += "-DLINUX_PPDEV"
 
@@ -31,3 +30,11 @@ do_deploy() {
 }
 
 addtask deploy before do_build after do_install
+
+do_deploy[sstate-outputdirs] = "${DEPLOY_DIR_TOOLS}"
+# cleandirs should possibly be in deploy.bbclass but we need it
+do_deploy[cleandirs] = "${DEPLOYDIR}"
+# clear stamp-extra-info since MACHINE_ARCH is normally put there by
+# deploy.bbclass
+do_deploy[stamp-extra-info] = ""
+

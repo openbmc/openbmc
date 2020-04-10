@@ -7,7 +7,7 @@ PROPERTY="Asserted"
 
 # Get current state
 object=$(busctl tree $SERVICE --list | grep identify)
-led=$(cat /sys/devices/platform/leds/leds/rear-id/brightness)
+led=$(cat /sys/devices/platform/leds/leds/front-id/brightness)
 if [ "$led" == "0" ]; then
 	busctl set-property $SERVICE $object $INTERFACE $PROPERTY b false
 else

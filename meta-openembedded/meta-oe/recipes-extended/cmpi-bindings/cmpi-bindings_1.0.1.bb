@@ -22,7 +22,9 @@ S = "${WORKDIR}/git"
 inherit cmake python3native
 
 EXTRA_OECMAKE = "-DLIB='${baselib}' \
-                 -DPYTHON_INCLUDE_PATH=${STAGING_INCDIR}/python${PYTHON_BASEVERSION}"
+                 -DPYTHON_INCLUDE_PATH=${STAGING_INCDIR}/python${PYTHON_BASEVERSION} \
+                 -DPYTHON_ABI=${PYTHON_ABI} \
+                 "
 
 # With Ninja it fails with:
 # ninja: error: build.ninja:282: bad $-escape (literal $ must be written as $$)

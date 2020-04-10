@@ -39,33 +39,8 @@
             "direction": "falling"
         },
         {
-            "name": "BMC_CP0_RESET_N",
-            "pin": "A1",
-            "direction": "out"
-        },
-        {
-            "name": "BMC_CP0_PERST_ENABLE_R",
-            "pin": "A3",
-            "direction": "out"
-        },
-        {
-            "name": "BMC_THROTTLE",
-            "pin": "J3",
-            "direction": "out"
-        },
-        {
-            "name": "IDBTN",
-            "pin": "Q7",
-            "direction": "out"
-        },
-        {
             "name": "POWER_BUTTON",
-            "pin": "I3",
-            "direction": "both"
-        },
-        {
-            "name": "RESET_BUTTON",
-            "pin": "J1",
+            "pin": "O2",
             "direction": "both"
         }
     ]

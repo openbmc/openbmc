@@ -7,6 +7,6 @@ DISTRO=openbmc-witherspoon MACHINE=swift bitbake obmc-phosphor-image
 witherspoon:
 DISTRO=openbmc-witherspoon MACHINE=witherspoon bitbake obmc-phosphor-image
 witherspoon-tacoma:
-DISTRO=openbmc-openpower MACHINE=witherspoon-tacoma bitbake aspeed-image-norootfs
+DISTRO=openbmc-openpower MACHINE=witherspoon-tacoma bitbake obmc-phosphor-image
 witherspoon-128:
 DISTRO=openbmc-witherspoon MACHINE=witherspoon-128 bitbake obmc-phosphor-image

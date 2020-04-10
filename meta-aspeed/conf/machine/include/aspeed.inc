@@ -20,7 +20,7 @@ MACHINEOVERRIDES =. "aspeed:"
 SERIAL_CONSOLES ?= "115200;ttyS4"
 
 DEFAULTTUNE_aspeed-g5 ?= "arm1176jzs"
-DEFAULTTUNE_aspeed-g6 ?= "armv7a-vfpv4d16"
+DEFAULTTUNE_aspeed-g6 ?= "armv7ahf-vfpv4d16"
 
 UBOOT_ENTRYPOINT_aspeed-g4 ?= "0x40001000"
 UBOOT_ENTRYPOINT_aspeed-g5 ?= "0x80001000"

@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=bd7b2c994af21d318bd2cd3b3f80c2d5"
 
 DEPENDS = "gtk+3 libxml-parser-perl-native python3-docutils-native intltool-native"
 
-inherit features_check autotools pkgconfig perlnative pythonnative gettext
+inherit features_check autotools pkgconfig perlnative gettext
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

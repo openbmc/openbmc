@@ -9,19 +9,22 @@ SECTION = "graphics"
 S = "${WORKDIR}/git"
 DEST_DIR = "${S}/external" 
 SRC_URI = "git://github.com/KhronosGroup/SPIRV-Tools.git;name=spirv-tools \
-	file://0001-tools-lesspipe-Allow-generic-shell.patch \
 	git://github.com/KhronosGroup/SPIRV-Headers.git;name=spirv-headers;destsuffix=${DEST_DIR}/spirv-headers \
 	git://github.com/google/effcee.git;name=effcee;destsuffix=${DEST_DIR}/effcee \
 	git://github.com/google/re2.git;name=re2;destsuffix=${DEST_DIR}/re2 \
 	git://github.com/google/googletest.git;name=googletest;destsuffix=${DEST_DIR}/googletest \
+        file://0001-Respect-CMAKE_INSTALL_LIBDIR-in-installed-CMake-file.patch \
+        file://0001-Avoid-pessimizing-std-move-3124.patch \
 "
-SRCREV_spirv-tools = "167f1270a9ee641b17c016a545741e4aadfabe86"
-SRCREV_spirv-headers = "4618b86e9e4b027a22040732dfee35e399cd2c47"
-SRCREV_effcee = "8f0a61dc95e0df18c18e0ac56d83b3fa9d2fe90b"
-SRCREV_re2 = "2cf86e5ab6dcfe045a1f510c2b9a8b012a4158cd"
-SRCREV_googletest = "150613166524c474a8a97df4c01d46b72050c495"
+SRCREV_spirv-tools = "c413b982c316b14e784f50d941814fc737b55b4a"
+SRCREV_spirv-headers = "af64a9e826bf5bb5fcd2434dd71be1e41e922563"
+SRCREV_effcee = "cd25ec17e9382f99a895b9ef53ff3c277464d07d"
+SRCREV_re2 = "5bd613749fd530b576b890283bfb6bc6ea6246cb"
+SRCREV_googletest = "f2fb48c3b3d79a75a88a99fba6576b25d42ec528"
 
 inherit cmake python3native
+
+EXTRA_OECMAKE += "-DSPIRV_WERROR=OFF"
 
 do_install_append() {
 	install -d ${D}/${includedir}/spirv

@@ -1,0 +1,39 @@
+From 67ccf77d97b76e8260c9d793ab172577e2393dbc Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 19 Dec 2019 21:33:46 -0800
+Subject: [PATCH] use GNUInstallDirs for detecting install paths
+
+This helps with multilib builds
+
+Upstream-Status: Submitted [https://github.com/opencv/ade/pull/19]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ sources/ade/CMakeLists.txt | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/sources/ade/CMakeLists.txt b/sources/ade/CMakeLists.txt
+index 2d1dd20..46415d1 100644
+--- a/sources/ade/CMakeLists.txt
++++ b/sources/ade/CMakeLists.txt
+@@ -47,12 +47,14 @@ if(BUILD_ADE_DOCUMENTATION)
+                       VERBATIM)
+ endif()
+ 
++include(GNUInstallDirs)
++
+ install(TARGETS ade COMPONENT dev
+         EXPORT adeTargets
+-        ARCHIVE DESTINATION lib
+-        LIBRARY DESTINATION lib
+-        RUNTIME DESTINATION lib
+-        INCLUDES DESTINATION include)
++	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++        RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}
++	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+ 
+ install(EXPORT adeTargets DESTINATION share/ade COMPONENT dev)
+ 
+-- 
+2.24.1
+

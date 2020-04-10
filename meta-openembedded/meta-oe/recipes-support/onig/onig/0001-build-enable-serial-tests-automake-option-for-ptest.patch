@@ -1,0 +1,36 @@
+From 8bf8189ec4a0d7ee569f66feb0e590e9602c31b6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andr=C3=A9=20Draszik?= <git@andred.net>
+Date: Mon, 6 Jan 2020 15:10:30 +0000
+Subject: [PATCH] build: enable serial-tests automake option (for ptest)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+For ptest, we need to be able to compile the tests without
+running them.
+
+Enabling the serial-tests automake option will add
+buildtest-TESTS and runtest-TESTS makefile targets, the
+former being what we want.
+
+Signed-off-by: André Draszik <git@andred.net>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index ac51e85..48e63ce 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3,7 +3,7 @@ AC_INIT(onig, 6.9.4)
+ 
+ AC_CONFIG_MACRO_DIR([m4])
+ 
+-AM_INIT_AUTOMAKE([-Wno-portability])
++AM_INIT_AUTOMAKE([-Wno-portability serial-tests])
+ AC_CONFIG_HEADERS([src/config.h])
+ 
+ 
+-- 
+2.23.0.rc1
+

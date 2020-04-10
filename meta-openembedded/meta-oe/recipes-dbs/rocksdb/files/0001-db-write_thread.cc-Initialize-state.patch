@@ -1,0 +1,31 @@
+From 49dcd22dcf1aae5995c42eac0fda68516fc1cd43 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Wed, 19 Jun 2019 17:57:24 +0800
+Subject: [PATCH] db/write_thread.cc: Initialize state
+
+Fixed an error when compiled without -O2:
+db/write_thread.cc:183:14: error: 'state' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ db/write_thread.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/db/write_thread.cc b/db/write_thread.cc
+index 835992c..6f99a11 100644
+--- a/db/write_thread.cc
++++ b/db/write_thread.cc
+@@ -59,7 +59,7 @@ uint8_t WriteThread::BlockingAwaitState(Writer* w, uint8_t goal_mask) {
+ 
+ uint8_t WriteThread::AwaitState(Writer* w, uint8_t goal_mask,
+                                 AdaptationContext* ctx) {
+-  uint8_t state;
++  uint8_t state = 0;
+ 
+   // 1. Busy loop using "pause" for 1 micro sec
+   // 2. Else SOMETIMES busy loop using "yield" for 100 micro sec (default)
+-- 
+2.7.4
+

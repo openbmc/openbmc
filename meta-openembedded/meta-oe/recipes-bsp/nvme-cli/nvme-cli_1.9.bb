@@ -27,7 +27,7 @@ pkg_postinst_ontarget_${PN}() {
 PACKAGES =+ "${PN}-dracut ${PN}-zsh-completion"
 
 FILES_${PN} += "${systemd_system_unitdir}"
-FILES_${PN}-dracut = "${libdir}/dracut/dracut.conf.d"
+FILES_${PN}-dracut = "${nonarch_libdir}/dracut/dracut.conf.d"
 FILES_${PN}-zsh-completion = "${datadir}/zsh/site-functions"
 
 RDEPENDS_${PN} = "util-linux-uuidgen"

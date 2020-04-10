@@ -1,0 +1,83 @@
+From 435e78aaf6745e4da0fe3d4455473011626c77d1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 30 Nov 2019 11:21:20 -0800
+Subject: [PATCH] Fix build on 32bit arches with 64bit time_t
+
+time element is deprecated on new input_event structure in kernel's
+input.h [1]
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit?id=152194fe9c3f
+
+Upstream-Status: Submitted [https://github.com/gvalkov/python-evdev/pull/112]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ evdev/input.c  | 13 +++++++++----
+ evdev/uinput.c |  9 ++++++++-
+ 2 files changed, 17 insertions(+), 5 deletions(-)
+
+diff --git a/evdev/input.c b/evdev/input.c
+index 67b9348..432db92 100644
+--- a/evdev/input.c
++++ b/evdev/input.c
+@@ -24,6 +24,11 @@
+ #include <linux/input.h>
+ #endif
+ 
++#ifndef input_event_sec
++#define input_event_sec time.tv_sec
++#define input_event_usec time.tv_usec
++#endif
++
+ #define MAX_NAME_SIZE 256
+ 
+ extern char*  EV_NAME[EV_CNT];
+@@ -60,8 +65,8 @@ device_read(PyObject *self, PyObject *args)
+         return NULL;
+     }
+ 
+-    PyObject* sec  = PyLong_FromLong(event.time.tv_sec);
+-    PyObject* usec = PyLong_FromLong(event.time.tv_usec);
++    PyObject* sec  = PyLong_FromLong(event.input_event_sec);
++    PyObject* usec = PyLong_FromLong(event.input_event_usec);
+     PyObject* val  = PyLong_FromLong(event.value);
+     PyObject* py_input_event = NULL;
+ 
+@@ -102,8 +107,8 @@ device_read_many(PyObject *self, PyObject *args)
+ 
+     // Construct a list of event tuples, which we'll make sense of in Python
+     for (unsigned i = 0 ; i < nread/event_size ; i++) {
+-        sec  = PyLong_FromLong(event[i].time.tv_sec);
+-        usec = PyLong_FromLong(event[i].time.tv_usec);
++        sec  = PyLong_FromLong(event[i].input_event_sec);
++        usec = PyLong_FromLong(event[i].input_event_usec);
+         val  = PyLong_FromLong(event[i].value);
+ 
+         py_input_event = Py_BuildValue("OOhhO", sec, usec, event[i].type, event[i].code, val);
+diff --git a/evdev/uinput.c b/evdev/uinput.c
+index 192568d..56fe86c 100644
+--- a/evdev/uinput.c
++++ b/evdev/uinput.c
+@@ -16,6 +16,10 @@
+ #include <linux/uinput.h>
+ #endif
+ 
++#ifndef input_event_sec
++#define input_event_sec time.tv_sec
++#define input_event_usec time.tv_usec
++#endif
+ 
+ // Workaround for installing on kernels newer than 4.4.
+ #ifndef FF_MAX_EFFECTS
+@@ -232,8 +236,11 @@ uinput_write(PyObject *self, PyObject *args)
+     if (!ret) return NULL;
+ 
+     struct input_event event;
++    struct timeval tval;
+     memset(&event, 0, sizeof(event));
+-    gettimeofday(&event.time, 0);
++    gettimeofday(&tval, 0);
++    event.input_event_usec = tval.tv_usec;
++    event.input_event_sec = tval.tv_sec;
+     event.type = type;
+     event.code = code;
+     event.value = value;

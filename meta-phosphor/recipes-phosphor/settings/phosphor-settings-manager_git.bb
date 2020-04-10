@@ -6,19 +6,19 @@ PV = "1.0+git${SRCPV}"
 
 inherit autotools
 inherit obmc-phosphor-dbus-service
-inherit pythonnative
+inherit python3native
 inherit phosphor-settings-manager
 
 require phosphor-settings-manager.inc
 
 DBUS_SERVICE_${PN} = "xyz.openbmc_project.Settings.service"
 
-DEPENDS += "python-pyyaml-native"
-DEPENDS += "python-mako-native"
+DEPENDS += "${PYTHON_PN}-pyyaml-native"
+DEPENDS += "${PYTHON_PN}-mako-native"
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "virtual/phosphor-settings-defaults"
 DEPENDS += "${@df_enabled(d, 'obmc-mrw', 'phosphor-settings-read-settings-mrw-native')}"
-DEPENDS += "sdbusplus sdbusplus-native"
+DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
 DEPENDS += "phosphor-logging"
 DEPENDS += "libcereal"

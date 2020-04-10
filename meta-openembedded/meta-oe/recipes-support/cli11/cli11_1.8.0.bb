@@ -8,6 +8,7 @@ PV .= "+git${SRCPV}"
 
 SRC_URI += "gitsm://github.com/CLIUtils/CLI11 \
             file://0001-Add-CLANG_TIDY-check.patch \
+            file://0001-Use-GNUInstallDirs-instead-of-hard-coded-path.patch \
            "
 
 S = "${WORKDIR}/git"

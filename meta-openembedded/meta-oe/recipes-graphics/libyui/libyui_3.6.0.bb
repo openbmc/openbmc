@@ -18,6 +18,8 @@ inherit cmake gettext pkgconfig
 
 DEPENDS += "boost"
 
+EXTRA_OECMAKE += "-DENABLE_WERROR=OFF"
+
 BBCLASSEXTEND = "native nativesdk"
 
 do_configure_prepend () {

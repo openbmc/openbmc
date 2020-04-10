@@ -1,0 +1,19 @@
+clarify type conversion
+
+fixes
+| ruli_rand.c:54:47: error: implicit conversion from 'unsigned int' to 'float' changes value from 4294967295 to 4294967296 [-Werror,-Wimplicit-int-float-conversion]
+|
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/src/ruli_rand.c
++++ b/src/ruli_rand.c
+@@ -51,7 +51,7 @@ int ruli_rand_next(ruli_rand_t *rand_ctx
+ 
+   u = isaac_rand(&rand_ctx->isaac_ctx);
+ 
+-  r = (int) ((float) (1.0 + max - min) *  u / ISAAC_UB4MAXVAL + min);
++  r = (int) ((float) (1.0 + max - min) *  u / (float) (ISAAC_UB4MAXVAL + min));
+ 
+   assert(min <= r);
+   assert(r <= max);

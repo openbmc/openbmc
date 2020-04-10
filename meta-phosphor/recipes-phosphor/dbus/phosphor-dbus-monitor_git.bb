@@ -7,11 +7,11 @@ HOMEPAGE = "http://github.com/openbmc/phosphor-dbus-monitor"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 SRC_URI = "git://github.com/openbmc/phosphor-dbus-monitor"
-SRCREV = "b4d69909425dac7bccb28331f2da78a0ad7092b8"
+SRCREV = "44fd7e89b5d4517c28f5a03b806373188426ee5f"
 
 inherit autotools \
         pkgconfig \
-        pythonnative \
+        python3native \
         phosphor-dbus-monitor \
         obmc-phosphor-systemd
 
@@ -23,10 +23,14 @@ DEPENDS += " \
         ${PN}-config \
         phosphor-logging \
         autoconf-archive-native \
-        sdbusplus-native \
+        ${PYTHON_PN}-sdbus++-native \
         sdeventplus \
         gtest \
         phosphor-snmp \
+        ${PYTHON_PN}-native \
+        ${PYTHON_PN}-pyyaml-native \
+        ${PYTHON_PN}-setuptools-native \
+        ${PYTHON_PN}-mako-native \
         "
 
 FILES_phosphor-msl-verify = "${bindir}/phosphor-msl-verify"

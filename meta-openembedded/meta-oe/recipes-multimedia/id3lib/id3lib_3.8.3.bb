@@ -7,12 +7,46 @@ DEPENDS = "zlib"
 PR = "r1"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/id3lib/id3lib-${PV}.tar.gz;name=archive \
-           http://ftp.de.debian.org/debian/pool/main/i/id3lib3.8.3/id3lib3.8.3_3.8.3-7.2.diff.gz;name=patch \
+           ${DEBIAN_MIRROR}/main/i/id3lib3.8.3/id3lib3.8.3_3.8.3-16.2.debian.tar.xz;name=patch;subdir=${BP} \
            file://acdefine.patch \
 "
 SRC_URI[archive.md5sum] = "19f27ddd2dda4b2d26a559a4f0f402a7"
 SRC_URI[archive.sha256sum] = "2749cc3c0cd7280b299518b1ddf5a5bcfe2d1100614519b68702230e26c7d079"
-SRC_URI[patch.md5sum] = "805c0320a2efb21c40ce06fa13cd7c4b"
-SRC_URI[patch.sha256sum] = "9f03b59ccc8826a5be55a3dcde2f889067d58bdc72bf846416a198c9b933704c"
+SRC_URI[patch.md5sum] = "997c764d3be11c9a51779d93facf1118"
+SRC_URI[patch.sha256sum] = "ac2ee23ec89ba2af51d2c6dd5b1b6bf9f8a9f813de251bc182941439a4053176"
 
 inherit autotools
+
+# Unlike other Debian packages, id3lib*.diff.gz contains another series of
+# patches maintained by quilt. So manually apply them before applying other local
+# patches. Also remove all temp files before leaving, because do_patch() will pop
+# up all previously applied patches in the start
+id3lib_do_patch() {
+    cd ${S}
+    # it's important that we only pop the existing patches when they've
+    # been applied, otherwise quilt will climb the directory tree
+    # and reverse out some completely different set of patches
+    if [ -d ${S}/patches ]; then
+        # whilst this is the default directory, doing it like this
+        # defeats the directory climbing that quilt will otherwise
+        # do; note the directory must exist to defeat this, hence
+        # the test inside which we operate
+        QUILT_PATCHES=${S}/patches quilt pop -a
+    fi
+    if [ -d ${S}/.pc-id3lib ]; then
+        rm -rf ${S}/.pc
+        mv ${S}/.pc-id3lib ${S}/.pc
+        QUILT_PATCHES=${S}/debian/patches quilt pop -a
+        rm -rf ${S}/.pc ${S}/debian
+    fi
+    QUILT_PATCHES=${S}/debian/patches quilt push -a
+    mv ${S}/.pc ${S}/.pc-id3lib
+}
+
+do_unpack[cleandirs] += "${S}"
+
+# We invoke base do_patch at end, to incorporate any local patch
+python do_patch() {
+    bb.build.exec_func('id3lib_do_patch', d)
+    bb.build.exec_func('patch_do_patch', d)
+}

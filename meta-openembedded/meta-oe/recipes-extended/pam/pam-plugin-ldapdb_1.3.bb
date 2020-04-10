@@ -11,7 +11,9 @@ inherit features_check
 REQUIRED_DISTRO_FEATURES = "pam"
 
 SRCREV = "84d7b260f1ae6857ae36e014c9a5968e8aa1cbe8"
-SRC_URI = "git://github.com/rmbreak/pam_ldapdb"
+SRC_URI = "git://github.com/rmbreak/pam_ldapdb \
+           file://0001-include-stdexcept-for-std-invalid_argument.patch \
+"
 
 S = "${WORKDIR}/git"
 

@@ -1,0 +1,163 @@
+From 1eb84534dea05d41afed1d898cba212ad7d310dd Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Mon, 25 Feb 2019 13:41:41 +0800
+Subject: [PATCH 02/24] don't use glibc-specific qsort_r
+
+Upstream-Status: Inappropriate [musl specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+[Rebased for v241]
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+[Rebased for v242]
+Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
+---
+ src/basic/sort-util.h              | 14 --------------
+ src/libsystemd/sd-hwdb/hwdb-util.c | 19 ++++++++++++++-----
+ src/shared/format-table.c          | 36 ++++++++++++++++++++++++------------
+ 3 files changed, 38 insertions(+), 31 deletions(-)
+
+diff --git a/src/basic/sort-util.h b/src/basic/sort-util.h
+index e029f8646e..27d68b341c 100644
+--- a/src/basic/sort-util.h
++++ b/src/basic/sort-util.h
+@@ -54,17 +54,3 @@ static inline void qsort_safe(void *base, size_t nmemb, size_t size, __compar_fn
+                 int (*_func_)(const typeof(p[0])*, const typeof(p[0])*) = func; \
+                 qsort_safe((p), (n), sizeof((p)[0]), (__compar_fn_t) _func_); \
+         })
+-
+-static inline void qsort_r_safe(void *base, size_t nmemb, size_t size, __compar_d_fn_t compar, void *userdata) {
+-        if (nmemb <= 1)
+-                return;
+-
+-        assert(base);
+-        qsort_r(base, nmemb, size, compar, userdata);
+-}
+-
+-#define typesafe_qsort_r(p, n, func, userdata)                          \
+-        ({                                                              \
+-                int (*_func_)(const typeof(p[0])*, const typeof(p[0])*, typeof(userdata)) = func; \
+-                qsort_r_safe((p), (n), sizeof((p)[0]), (__compar_d_fn_t) _func_, userdata); \
+-        })
+diff --git a/src/libsystemd/sd-hwdb/hwdb-util.c b/src/libsystemd/sd-hwdb/hwdb-util.c
+index c83575c7c8..72f8f3a050 100644
+--- a/src/libsystemd/sd-hwdb/hwdb-util.c
++++ b/src/libsystemd/sd-hwdb/hwdb-util.c
+@@ -128,9 +128,13 @@ static void trie_free(struct trie *trie) {
+ 
+ DEFINE_TRIVIAL_CLEANUP_FUNC(struct trie*, trie_free);
+ 
+-static int trie_values_cmp(const struct trie_value_entry *a, const struct trie_value_entry *b, struct trie *trie) {
+-        return strcmp(trie->strings->buf + a->key_off,
+-                      trie->strings->buf + b->key_off);
++static struct trie *trie_node_add_value_trie;
++static int trie_values_cmp(const void *v1, const void *v2) {
++        const struct trie_value_entry *a = v1;
++        const struct trie_value_entry *b = v2;
++
++        return strcmp(trie_node_add_value_trie->strings->buf + a->key_off,
++                      trie_node_add_value_trie->strings->buf + b->key_off);
+ }
+ 
+ static int trie_node_add_value(struct trie *trie, struct trie_node *node,
+@@ -158,7 +162,10 @@ static int trie_node_add_value(struct trie *trie, struct trie_node *node,
+                         .value_off = v,
+                 };
+ 
+-                val = typesafe_bsearch_r(&search, node->values, node->values_count, trie_values_cmp, trie);
++                trie_node_add_value_trie = trie;
++                val = bsearch(&search, node->values, node->values_count, sizeof(struct trie_value_entry), trie_values_cmp);
++                trie_node_add_value_trie = NULL;
++
+                 if (val) {
+                         /* At this point we have 2 identical properties on the same match-string.
+                          * Since we process files in order, we just replace the previous value. */
+@@ -184,7 +191,9 @@ static int trie_node_add_value(struct trie *trie, struct trie_node *node,
+                 .line_number = line_number,
+         };
+         node->values_count++;
+-        typesafe_qsort_r(node->values, node->values_count, trie_values_cmp, trie);
++        trie_node_add_value_trie = trie;
++        qsort(node->values, node->values_count, sizeof(struct trie_value_entry), trie_values_cmp);
++        trie_node_add_value_trie = NULL;
+         return 0;
+ }
+ 
+diff --git a/src/shared/format-table.c b/src/shared/format-table.c
+index a5c0a99b08..d595cbe372 100644
+--- a/src/shared/format-table.c
++++ b/src/shared/format-table.c
+@@ -850,31 +850,33 @@ static int cell_data_compare(TableData *a, size_t index_a, TableData *b, size_t
+         return CMP(index_a, index_b);
+ }
+ 
+-static int table_data_compare(const size_t *a, const size_t *b, Table *t) {
++static Table *user_table;
++static int table_data_compare(const void *x, const void *y) {
++        const size_t *a = x, *b=y;
+         size_t i;
+         int r;
+ 
+-        assert(t);
+-        assert(t->sort_map);
++        assert(user_table);
++        assert(user_table->sort_map);
+ 
+         /* Make sure the header stays at the beginning */
+-        if (*a < t->n_columns && *b < t->n_columns)
++        if (*a < user_table->n_columns && *b < user_table->n_columns)
+                 return 0;
+-        if (*a < t->n_columns)
++        if (*a < user_table->n_columns)
+                 return -1;
+-        if (*b < t->n_columns)
++        if (*b < user_table->n_columns)
+                 return 1;
+ 
+         /* Order other lines by the sorting map */
+-        for (i = 0; i < t->n_sort_map; i++) {
++        for (i = 0; i < user_table->n_sort_map; i++) {
+                 TableData *d, *dd;
+ 
+-                d = t->data[*a + t->sort_map[i]];
+-                dd = t->data[*b + t->sort_map[i]];
++                d = user_table->data[*a + user_table->sort_map[i]];
++                dd = user_table->data[*b + user_table->sort_map[i]];
+ 
+                 r = cell_data_compare(d, *a, dd, *b);
+                 if (r != 0)
+-                        return t->reverse_map && t->reverse_map[t->sort_map[i]] ? -r : r;
++                        return user_table->reverse_map && user_table->reverse_map[user_table->sort_map[i]] ? -r : r;
+         }
+ 
+         /* Order identical lines by the order there were originally added in */
+@@ -1107,7 +1109,12 @@ int table_print(Table *t, FILE *f) {
+                 for (i = 0; i < n_rows; i++)
+                         sorted[i] = i * t->n_columns;
+ 
+-                typesafe_qsort_r(sorted, n_rows, table_data_compare, t);
++                if (n_rows <= 1)
++                        return 0;
++                assert(sorted);
++                user_table = t;
++                qsort(sorted, n_rows, sizeof(size_t), table_data_compare);
++                user_table = NULL;
+         }
+ 
+         if (t->display_map)
+@@ -1534,7 +1541,12 @@ int table_to_json(Table *t, JsonVariant **ret) {
+                 for (i = 0; i < n_rows; i++)
+                         sorted[i] = i * t->n_columns;
+ 
+-                typesafe_qsort_r(sorted, n_rows, table_data_compare, t);
++                if (n_rows <= 1)
++                        return 0;
++                assert(sorted);
++                user_table = t;
++                qsort(sorted, n_rows, sizeof(size_t), table_data_compare);
++                user_table = NULL;
+         }
+ 
+         if (t->display_map)
+-- 
+2.11.0
+
