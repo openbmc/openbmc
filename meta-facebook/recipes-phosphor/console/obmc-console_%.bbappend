@@ -4,6 +4,9 @@ OBMC_CONSOLE_HOST_TTY = "ttyS2"
 SRC_URI += "file://*.conf"
 SRC_URI_remove = "file://${BPN}.conf"
 
+SYSTEMD_SERVICE_${PN}_remove_yosemitev2 = "obmc-console-ssh.socket"
+EXTRA_OECONF_append_yosemitev2 = " --enable-concurrent-servers"
+
 do_install_append() {
         # Install the server configuration
         install -m 0755 -d ${D}${sysconfdir}/${BPN}
