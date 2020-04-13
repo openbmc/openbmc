@@ -1,4 +1,7 @@
 #!/bin/sh
 
+mkdir -p /mdadm-testing-dir
 # make the test continue to execute even one fail
-./test --keep-going
+dir=. ./test --keep-going --disable-integrity
+
+rm -rf /mdadm-testing-dir/*

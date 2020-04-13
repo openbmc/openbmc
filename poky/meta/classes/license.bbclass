@@ -252,7 +252,7 @@ def canonical_license(d, license):
     """
     Return the canonical (SPDX) form of the license if available (so GPLv3
     becomes GPL-3.0), for the license named 'X+', return canonical form of
-    'X' if availabel and the tailing '+' (so GPLv3+ becomes GPL-3.0+), 
+    'X' if available and the tailing '+' (so GPLv3+ becomes GPL-3.0+),
     or the passed license if there is no canonical form.
     """
     lic = d.getVarFlag('SPDXLICENSEMAP', license) or ""
@@ -262,10 +262,29 @@ def canonical_license(d, license):
             lic += '+'
     return lic or license
 
+def available_licenses(d):
+    """
+    Return the available licenses by searching the directories specified by
+    COMMON_LICENSE_DIR and LICENSE_PATH.
+    """
+    lic_dirs = ((d.getVar('COMMON_LICENSE_DIR') or '') + ' ' +
+                (d.getVar('LICENSE_PATH') or '')).split()
+
+    licenses = []
+    for lic_dir in lic_dirs:
+        licenses += os.listdir(lic_dir)
+
+    licenses = sorted(licenses)
+    return licenses
+
+# Only determine the list of all available licenses once. This assumes that any
+# additions to LICENSE_PATH have been done before this file is parsed.
+AVAILABLE_LICENSES := "${@' '.join(available_licenses(d))}"
+
 def expand_wildcard_licenses(d, wildcard_licenses):
     """
-    Return actual spdx format license names if wildcard used. We expand
-    wildcards from SPDXLICENSEMAP flags and SRC_DISTRIBUTE_LICENSES values.
+    Return actual spdx format license names if wildcards are used. We expand
+    wildcards from SPDXLICENSEMAP flags and AVAILABLE_LICENSES.
     """
     import fnmatch
     licenses = wildcard_licenses[:]
@@ -274,7 +293,7 @@ def expand_wildcard_licenses(d, wildcard_licenses):
         spdxflags = fnmatch.filter(spdxmapkeys, wld_lic)
         licenses += [d.getVarFlag('SPDXLICENSEMAP', flag) for flag in spdxflags]
 
-    spdx_lics = (d.getVar('SRC_DISTRIBUTE_LICENSES', False) or '').split()
+    spdx_lics = d.getVar('AVAILABLE_LICENSES').split()
     for wld_lic in wildcard_licenses:
         licenses += fnmatch.filter(spdx_lics, wld_lic)
 
@@ -291,15 +310,21 @@ def incompatible_pkg_license(d, dont_want_licenses, license):
     # Handles an "or" or two license sets provided by
     # flattened_licenses(), pick one that works if possible.
     def choose_lic_set(a, b):
-        return a if all(oe.license.license_ok(canonical_license(d, lic), 
+        return a if all(oe.license.license_ok(canonical_license(d, lic),
                             dont_want_licenses) for lic in a) else b
 
     try:
         licenses = oe.license.flattened_licenses(license, choose_lic_set)
     except oe.license.LicenseError as exc:
         bb.fatal('%s: %s' % (d.getVar('P'), exc))
-    return any(not oe.license.license_ok(canonical_license(d, l), \
-               dont_want_licenses) for l in licenses)
+
+    incompatible_lic = []
+    for l in licenses:
+        license = canonical_license(d, l)
+        if not oe.license.license_ok(license, dont_want_licenses):
+            incompatible_lic.append(license)
+
+    return sorted(incompatible_lic)
 
 def incompatible_license(d, dont_want_licenses, package=None):
     """

@@ -20,7 +20,7 @@ if [ -n "$D" ] ; then
 	$INTERCEPT_DIR/postinst_intercept update_font_cache ${PKG} mlprefix=${MLPREFIX} binprefix=${MLPREFIX} \
 		'bindir="${bindir}"' \
 		'libdir="${libdir}"' \
-                'libexecdir="${libexecdir}"' \
+		'libexecdir="${libexecdir}"' \
 		'base_libdir="${base_libdir}"' \
 		'fontconfigcachedir="${FONTCONFIG_CACHE_DIR}"' \
 		'fontconfigcacheparams="${FONTCONFIG_CACHE_PARAMS}"' \

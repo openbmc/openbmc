@@ -1,0 +1,115 @@
+From b2c74f6a3dbe0aee2413800837314136947a4985 Mon Sep 17 00:00:00 2001
+From: Jan Beich <jbeich@FreeBSD.org>
+Date: Sat, 15 Feb 2020 02:03:45 +0000
+Subject: [PATCH] meson/tests: add missing dependencies on protocol headers
+
+In file included from ../tests/connection-test.c:43:
+In file included from ../tests/test-compositor.h:30:
+../src/wayland-client.h:40:10: fatal error: 'wayland-client-protocol.h' file not found
+ #include "wayland-client-protocol.h"
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from ../tests/display-test.c:45:
+In file included from ../src/wayland-server.h:104:
+src/wayland-server-protocol.h:4454:2: error: unterminated /* comment
+        /**
+        ^
+In file included from ../tests/cpp-compile-test.cpp:2:
+In file included from src/wayland-server-protocol.h:8:
+In file included from ../src/wayland-server.h:104:
+src/wayland-server-protocol.h:3:2: error: unterminated conditional directive
+ #ifndef WAYLAND_SERVER_PROTOCOL_H
+  ^
+../tests/headers-protocol-test.c:33:2: error: including wayland-server-protocol.h did not include wayland-server.h!
+ #error including wayland-server-protocol.h did not include wayland-server.h!
+  ^
+In file included from ../tests/headers-protocol-test.c:26:
+In file included from src/wayland-client-protocol.h:8:
+In file included from ../src/wayland-client.h:40:
+src/wayland-client-protocol.h:1358:2: error: unterminated conditional directive
+ #ifndef WL_SHM_FORMAT_ENUM
+  ^
+In file included from ../tests/protocol-logger-test.c:34:
+In file included from ../src/wayland-client.h:40:
+src/wayland-client-protocol.h:2613:1: error: unterminated /* comment
+/**
+^
+../tests/resources-test.c:49:36: error: use of undeclared identifier 'wl_seat_interface'
+        res = wl_resource_create(client, &wl_seat_interface, 4, 0);
+                                          ^
+Upstream-Status: Backport
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ tests/meson.build | 26 ++++++++++++++++++--------
+ 1 file changed, 18 insertions(+), 8 deletions(-)
+
+diff --git a/tests/meson.build b/tests/meson.build
+index c28a2a3..f1af7b4 100644
+--- a/tests/meson.build
++++ b/tests/meson.build
+@@ -69,7 +69,7 @@ test(
+ 	executable(
+ 		'cpp-compile-test',
+ 		'cpp-compile-test.cpp',
+-		wayland_server_protocol_core_h,
++		wayland_server_protocol_h,
+ 		include_directories: src_inc
+ 	)
+ )
+@@ -91,17 +91,25 @@ tests = {
+ 	'array-test': [],
+ 	'client-test': [ wayland_server_protocol_h ],
+ 	'display-test': [
++		wayland_client_protocol_h,
++		wayland_server_protocol_h,
+ 		tests_server_protocol_h,
+ 		tests_client_protocol_c,
+ 		tests_protocol_c,
+ 	],
+-	'connection-test': [ wayland_server_protocol_h ],
++	'connection-test': [
++		wayland_client_protocol_h,
++		wayland_server_protocol_h,
++	],
+ 	'event-loop-test': [ wayland_server_protocol_h ],
+ 	'fixed-test': [],
+ 	'interface-test': [ wayland_client_protocol_h ],
+ 	'list-test': [],
+ 	'map-test': [],
+-	'sanity-test' : [ wayland_server_protocol_h ],
++	'sanity-test' : [
++		wayland_client_protocol_h,
++		wayland_server_protocol_h,
++	],
+ 	'socket-test': [
+ 		wayland_client_protocol_h,
+ 		wayland_server_protocol_h,
+@@ -116,7 +124,7 @@ tests = {
+ 		files('../src/wayland-server.c'),
+ 		wayland_server_protocol_h,
+ 	],
+-	'resources-test': [ wayland_server_protocol_core_h ],
++	'resources-test': [ wayland_server_protocol_h ],
+ 	'message-test': [
+ 		wayland_client_protocol_h,
+ 		wayland_server_protocol_h,
+@@ -126,14 +134,16 @@ tests = {
+ 		wayland_server_protocol_h,
+ 	],
+ 	'protocol-logger-test': [
+-		wayland_server_protocol_core_h,
+-		wayland_client_protocol_core_h,
++		wayland_client_protocol_h,
++		wayland_server_protocol_h,
+ 	],
+ 	'headers-test': [
++		wayland_client_protocol_h,
++		wayland_server_protocol_h,
+ 		'headers-protocol-test.c',
+-		'headers-protocol-core-test.c',
+-		wayland_server_protocol_core_h,
+ 		wayland_client_protocol_core_h,
++		wayland_server_protocol_core_h,
++		'headers-protocol-core-test.c',
+ 	],
+ 	'os-wrappers-test': [],
+ }

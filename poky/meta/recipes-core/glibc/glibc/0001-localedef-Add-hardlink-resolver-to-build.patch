@@ -1,0 +1,52 @@
+From 56ae260ac24ade94e2e0e77c81751312372d253f Mon Sep 17 00:00:00 2001
+From: Jason Wessel <jason.wessel@windriver.com>
+Date: Sat, 7 Dec 2019 09:56:23 -0800
+Subject: [PATCH] localedef: Add hardlink resolver to build
+
+The sourcecode for this is imported from util-linux and is kept with
+glibc sources
+
+Upstream-Status: Pending
+Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile.in | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 77fbded..a87e5b2 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -40,6 +40,8 @@ WARNFLAGS	= -Wall -Wno-format
+ FULLCC		= $(CC) $(CPPFLAGS) $(CFLAGS) \
+ 		  $(DEFINES) $(INCLUDES) $(WARNFLAGS)
+ 
++CROSS_LOCALEDEF_HARDLINK_OBJS = cross-localedef-hardlink.o
++
+ LOCALEDEF_OBJS	= charmap.o charmap-dir.o ld-address.o ld-collate.o \
+ 		  ld-ctype.o ld-identification.o ld-measurement.o \
+ 		  ld-messages.o ld-monetary.o ld-name.o ld-numeric.o \
+@@ -54,11 +56,14 @@ LOCALEDEF_OBJS	= charmap.o charmap-dir.o ld-address.o ld-collate.o \
+ 		  asprintf.o getdelim.o localedef_extra.o \
+ 		  obstack_printf.o vasprintf.o
+ 
+-all:		localedef$(EXEEXT)
++all:		localedef$(EXEEXT) cross-localedef-hardlink$(EXEEXT)
+ 
+ localedef$(EXEEXT): $(LOCALEDEF_OBJS)
+ 		$(CC) -o $@ $(LOCALEDEF_OBJS) $(LIBS)
+ 
++cross-localedef-hardlink$(EXEEXT): $(CROSS_LOCALEDEF_HARDLINK_OBJS)
++		$(CC) -o $@ $(CROSS_LOCALEDEF_HARDLINK_OBJS) $(LIBS)
++
+ clean:
+ 		rm -f locale$(EXEEXT) $(LOCALEDEF_OBJS)
+ 
+@@ -77,6 +82,7 @@ clean:
+ %.o: $(srcdir)/%.c
+ 		$(FULLCC) -c -o $@ $<
+ 
++cross-localedef-hardlink.o: glibc/locale/programs/cross-localedef-hardlink.c
+ charmap.o: glibc/locale/programs/charmap.c
+ charmap-dir.o: glibc/locale/programs/charmap-dir.c
+ ld-address.o: glibc/locale/programs/ld-address.c

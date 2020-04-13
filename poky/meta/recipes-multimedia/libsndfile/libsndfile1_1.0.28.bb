@@ -32,7 +32,11 @@ PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'alsa', d)}"
 PACKAGECONFIG[alsa] = "--enable-alsa,--disable-alsa,alsa-lib"
 PACKAGECONFIG[regtest] = "--enable-sqlite,--disable-sqlite,sqlite3"
 
-inherit autotools lib_package pkgconfig
+inherit autotools lib_package pkgconfig multilib_header
+
+do_install_append() {
+    oe_multilib_header sndfile.h
+}
 
 # This can't be replicated and is just a memory leak.
 # https://github.com/erikd/libsndfile/issues/398

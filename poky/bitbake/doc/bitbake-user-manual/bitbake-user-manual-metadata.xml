@@ -5,7 +5,7 @@
     <title>Syntax and Operators</title>
 
     <para>
-        Bitbake files have their own syntax.
+        BitBake files have their own syntax.
         The syntax has similarities to several
         other languages but also has some unique features.
         This section describes the available syntax and operators
@@ -294,17 +294,20 @@
                 rather than when the variable is actually used:
                 <literallayout class='monospaced'>
      T = "123"
-     A := "${B} ${A} test ${T}"
+     A := "test ${T}"
      T = "456"
-     B = "${T} bval"
+     B := "${T} ${C}"
      C = "cval"
      C := "${C}append"
                 </literallayout>
                 In this example, <filename>A</filename> contains
-                "test 123" because <filename>${B}</filename> and
-                <filename>${A}</filename> at the time of parsing are undefined,
-                which leaves "test 123".
-                And, the variable <filename>C</filename>
+                "test 123", even though the final value of <filename>T</filename>
+                is "456".
+                The variable <filename>B</filename> will end up containing "456 cvalappend".
+                This is because references to undefined variables are preserved as is
+                during (immediate)expansion. This is in contrast to GNU Make, where undefined
+                variables expand to nothing.
+                The variable <filename>C</filename>
                 contains "cvalappend" since <filename>${C}</filename> immediately
                 expands to "cval".
             </para>
@@ -1414,7 +1417,7 @@
         </section>
 
         <section id='bitbake-style-python-functions-versus-python-functions'>
-            <title>Bitbake-Style Python Functions Versus Python Functions</title>
+            <title>BitBake-Style Python Functions Versus Python Functions</title>
 
             <para>
                 Following are some important differences between
@@ -1864,7 +1867,7 @@
                         accessing your <filename>$HOME/.ccache</filename>
                         directory.
                         The following command "whitelists" the environment variable
-                        <filename>CCACHE_DIR</filename> causing BitBack to allow that
+                        <filename>CCACHE_DIR</filename> causing BitBake to allow that
                         variable into the datastore:
                         <literallayout class='monospaced'>
      export BB_ENV_EXTRAWHITE="$BB_ENV_EXTRAWHITE CCACHE_DIR"
@@ -1895,7 +1898,7 @@
             <para>
                 Sometimes, it is useful to be able to obtain information
                 from the original execution environment.
-                Bitbake saves a copy of the original environment into
+                BitBake saves a copy of the original environment into
                 a special variable named
                 <link linkend='var-bb-BB_ORIGENV'><filename>BB_ORIGENV</filename></link>.
             </para>
@@ -2616,7 +2619,7 @@
             <para>
                 It is often necessary to access variables in the
                 BitBake datastore using Python functions.
-                The Bitbake datastore has an API that allows you this
+                The BitBake datastore has an API that allows you this
                 access.
                 Here is a list of available operations:
             </para>

@@ -14,7 +14,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=172255dee66bb0151435b2d5d709fcf7"
 SRC_URI[md5sum] = "c5fa5a86a20e3591bed6c046498d4b8f"
 SRC_URI[sha256sum] = "b289a845c189e251e0e884cc0f9269bbe97c238df3741e854ec4c17c21e473d5"
 
-SRC_URI += "file://0001-Drop-x11-dependencies.patch"
+SRC_URI += "file://0001-Drop-x11-dependencies.patch \
+            file://libx11-whitespace.patch"
 
 XORG_PN = "libX11"
 

@@ -1,0 +1,31 @@
+From f8b32901981a06a8db4169b82a704dcf7e8b6560 Mon Sep 17 00:00:00 2001
+From: Joshua Watt <JPEWhacker@gmail.com>
+Date: Wed, 20 Nov 2019 15:43:57 -0600
+Subject: [PATCH] Fix build reproducibility
+
+Changes the comment in pango-enum-types.c to reference the file basename
+instead of the full path. This ensures that the generated file is
+reproducible when it is included in source packages meant for debugging.
+
+Upstream-Status: Pending [https://gitlab.gnome.org/GNOME/pango/merge_requests/159]
+Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
+---
+ pango/pango-enum-types.c.template | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pango/pango-enum-types.c.template b/pango/pango-enum-types.c.template
+index d922c691..0d55ef74 100644
+--- a/pango/pango-enum-types.c.template
++++ b/pango/pango-enum-types.c.template
+@@ -6,7 +6,7 @@
+ /*** END file-header ***/
+ 
+ /*** BEGIN file-production ***/
+-/* enumerations from "@filename@" */
++/* enumerations from "@basename@" */
+ /*** END file-production ***/
+ 
+ /*** BEGIN value-header ***/
+-- 
+2.23.0
+

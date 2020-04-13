@@ -9,7 +9,7 @@ MACHINEOVERRIDES =. "${@bb.utils.contains('TUNE_FEATURES', 'arm1176jzs', 'armv6:
 AVAILTUNES += "arm1176jzs"
 ARMPKGARCH_tune-arm1176jzs = "arm1176jzs"
 TUNE_FEATURES_tune-arm1176jzs = "arm thumb arm1176jzs"
-PACKAGE_EXTRA_ARCHS_tune-arm1176jzs = "${PACKAGE_EXTRA_ARCHS_tune-armv6tb-novfp} arm1176jzs arm1176jzst"
+PACKAGE_EXTRA_ARCHS_tune-arm1176jzs = "${PACKAGE_EXTRA_ARCHS_tune-armv6t-novfp} arm1176jzs arm1176jzst"
 
 AVAILTUNES += "arm1176jzs-be"
 ARMPKGARCH_tune-arm1176jzs-be = "${ARMPKGARCH_tune-arm1176jzs}"

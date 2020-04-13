@@ -212,7 +212,21 @@ class ResultsTextReport(object):
                                  maxlen=maxlen)
         print(output)
 
-    def view_test_report(self, logger, source_dir, branch, commit, tag, use_regression_map, raw_test):
+    def view_test_report(self, logger, source_dir, branch, commit, tag, use_regression_map, raw_test, selected_test_case_only):
+        def print_selected_testcase_result(testresults, selected_test_case_only):
+            for testsuite in testresults:
+                for resultid in testresults[testsuite]:
+                    result = testresults[testsuite][resultid]['result']
+                    test_case_result = result.get(selected_test_case_only, {})
+                    if test_case_result.get('status'):
+                        print('Found selected test case result for %s from %s' % (selected_test_case_only,
+                                                                                           resultid))
+                        print(test_case_result['status'])
+                    else:
+                        print('Could not find selected test case result for %s from %s' % (selected_test_case_only,
+                                                                                           resultid))
+                    if test_case_result.get('log'):
+                        print(test_case_result['log'])
         test_count_reports = []
         configmap = resultutils.store_map
         if use_regression_map:
@@ -235,11 +249,17 @@ class ResultsTextReport(object):
             for testsuite in testresults:
                 result = testresults[testsuite].get(raw_test, {})
                 if result:
-                    raw_results[testsuite] = result
+                    raw_results[testsuite] = {raw_test: result}
             if raw_results:
-                print(json.dumps(raw_results, sort_keys=True, indent=4))
+                if selected_test_case_only:
+                    print_selected_testcase_result(raw_results, selected_test_case_only)
+                else:
+                    print(json.dumps(raw_results, sort_keys=True, indent=4))
             else:
                 print('Could not find raw test result for %s' % raw_test)
+            return 0
+        if selected_test_case_only:
+            print_selected_testcase_result(testresults, selected_test_case_only)
             return 0
         for testsuite in testresults:
             for resultid in testresults[testsuite]:
@@ -268,7 +288,7 @@ class ResultsTextReport(object):
 def report(args, logger):
     report = ResultsTextReport()
     report.view_test_report(logger, args.source_dir, args.branch, args.commit, args.tag, args.use_regression_map,
-                            args.raw_test_only)
+                            args.raw_test_only, args.selected_test_case_only)
     return 0
 
 def register_commands(subparsers):
@@ -287,4 +307,7 @@ def register_commands(subparsers):
                               help='instead of the default "store_map", use the "regression_map" for report')
     parser_build.add_argument('-r', '--raw_test_only', default='',
                               help='output raw test result only for the user provided test result id')
-
+    parser_build.add_argument('-s', '--selected_test_case_only', default='',
+                              help='output selected test case result for the user provided test case id, if both test '
+                                   'result id and test case id are provided then output the selected test case result '
+                                   'from the provided test result id')

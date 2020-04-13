@@ -47,6 +47,7 @@ class OERuntimeTestContextExecutor(OETestContextExecutor):
     default_data = None
     default_test_data = 'data/testdata.json'
     default_tests = ''
+    default_json_result_dir = '%s-results' % name
 
     default_target_type = 'simpleremote'
     default_manifest = 'data/manifest'
@@ -77,7 +78,7 @@ class OERuntimeTestContextExecutor(OETestContextExecutor):
 
         runtime_group.add_argument('--packages-manifest', action='store',
                 default=self.default_manifest,
-                help="Package manifest of the image under testi, default: %s" \
+                help="Package manifest of the image under test, default: %s" \
                 % self.default_manifest)
 
         runtime_group.add_argument('--extract-dir', action='store',
@@ -97,6 +98,12 @@ class OERuntimeTestContextExecutor(OETestContextExecutor):
             if len(target_ip_port) == 2:
                 target_ip = target_ip_port[0]
                 kwargs['port'] = target_ip_port[1]
+
+        if server_ip:
+            server_ip_port = server_ip.split(':')
+            if len(server_ip_port) == 2:
+                server_ip = server_ip_port[0]
+                kwargs['server_port'] = int(server_ip_port[1])
 
         if target_type == 'simpleremote':
             target = OESSHTarget(logger, target_ip, server_ip, **kwargs)
@@ -178,7 +185,7 @@ class OERuntimeTestContextExecutor(OETestContextExecutor):
         except:
             obj = None
         return obj
-        
+
     @staticmethod
     def readPackagesManifest(manifest):
         if not manifest or not os.path.exists(manifest):

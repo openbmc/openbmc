@@ -21,7 +21,7 @@ RDEPENDS_${PN}-tests += " \
 
 PACKAGES =+ "${PN}-tests"
 
-FILES_${PN}-tests += " \
+FILES_${PN}-tests = " \
     ${PYTHON_SITEPACKAGES_DIR}/Crypto/SelfTest/ \
     ${PYTHON_SITEPACKAGES_DIR}/Crypto/SelfTest/__pycache__/ \
 "

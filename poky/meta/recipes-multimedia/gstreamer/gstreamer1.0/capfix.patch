@@ -1,0 +1,37 @@
+Currently gstreamer configuration depends on whether setcap is found on the host
+system. Turn this into a configure option to make builds deterinistic.
+
+RP 2020/2/19
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+Upstream-Status: Pending
+
+Index: gstreamer-1.16.1/libs/gst/helpers/meson.build
+===================================================================
+--- gstreamer-1.16.1.orig/libs/gst/helpers/meson.build
++++ gstreamer-1.16.1/libs/gst/helpers/meson.build
+@@ -73,7 +73,12 @@ if have_ptp
+     endif
+   endif
+ 
+-  setcap = find_program('setcap', '/usr/sbin/setcap', '/sbin/setcap', required : false)
++  setcap_feature = get_option('setcap')
++  if setcap_feature.disabled()
++    setcap = find_program('dontexist', required : false)
++  else
++    setcap = find_program('setcap', '/usr/sbin/setcap', '/sbin/setcap', required : false)
++  endif
+ 
+   # user/group to change to in gst-ptp-helper
+   ptp_helper_setuid_user = get_option('ptp-helper-setuid-user')
+Index: gstreamer-1.16.1/meson_options.txt
+===================================================================
+--- gstreamer-1.16.1.orig/meson_options.txt
++++ gstreamer-1.16.1/meson_options.txt
+@@ -26,6 +26,7 @@ option('libunwind', type : 'feature', va
+ option('libdw', type : 'feature', value : 'auto', description : 'Use libdw to generate better backtraces from libunwind')
+ option('dbghelp', type : 'feature', value : 'auto', description : 'Use dbghelp to generate backtraces')
+ option('bash-completion', type : 'feature', value : 'auto', description : 'Install bash completion files')
++option('setcap', type : 'feature', value : 'auto', description : 'Use setcap')
+ 
+ # Common feature options
+ option('examples', type : 'feature', value : 'auto', yield : true)

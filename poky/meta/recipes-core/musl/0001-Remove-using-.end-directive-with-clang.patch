@@ -1,0 +1,36 @@
+From b6732f68848ecc8ff01054bf7aea70a241c37116 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 10 Apr 2020 11:23:39 -0700
+Subject: [PATCH] Remove using .end directive with clang
+
+Clang does not support this asm directive
+Fixes Issue #19
+
+Upstream-Status: Submitted [https://github.com/kaniini/libucontext/pull/20]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ arch/common/common-defs.h | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/arch/common/common-defs.h b/arch/common/common-defs.h
+index bf2fb8c..618116b 100644
+--- a/arch/common/common-defs.h
++++ b/arch/common/common-defs.h
+@@ -28,10 +28,13 @@
+ 	ENT(__proc)					\
+ __proc:							\
+ 	SETUP_FRAME(__proc)
+-
++#ifdef __clang__
++#define END(__proc)
++#else
+ #define END(__proc)					\
+ 	.end	__proc;					\
+ 	.size	__proc,.-__proc;
++#endif
+ 
+ #define ALIAS(__alias, __real)				\
+ 	.weak	__alias;				\
+-- 
+2.26.0
+

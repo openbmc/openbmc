@@ -1,0 +1,112 @@
+From ee85d3967ea09b215fcea5efdd90bbbf5e74a681 Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Wed, 19 Feb 2020 15:50:47 +0100
+Subject: [PATCH] hwclock: fix for glibc 2.31 settimeofday()
+
+glibc announce:
+  ... settimeofday can no longer be used to set the time and the offset
+  simultaneously. If both of its two arguments are non-null, the call
+  will fail (setting errno to EINVAL).
+
+It means we need to call settimeofday(NULL, tz) and settimeofday(tv, NULL).
+
+Unfortunately, settimeofday(NULL, tz) has very special warp-clock
+semantic if used as the very first settimeofday() call. It means we
+have to be sure that we do not touch warp-clock if we need only need
+to modify system TZ. So, let's always call settimeofday(NULL, 0)
+before settimeofday(NULL, tz) for UTC rtc mode when modify system TZ.
+
+Upstream-Status: Backport [https://github.com/karelzak/util-linux/commit/ee85d3967ea09b215fcea5efdd90bbbf5e74a681]
+
+CC: J William Piggott <elseifthen@gmx.com>
+Signed-off-by: Karel Zak <kzak@redhat.com>
+Addresses: https://github.com/karelzak/util-linux/issues/957
+Signed-off-by: Liwei Song <liwei.song@windriver.com>
+---
+ sys-utils/hwclock.c | 49 ++++++++++++++++++++++++++-------------------
+ 1 file changed, 28 insertions(+), 21 deletions(-)
+
+diff --git a/sys-utils/hwclock.c b/sys-utils/hwclock.c
+index e736da7179f8..16576bc186ff 100644
+--- a/sys-utils/hwclock.c
++++ b/sys-utils/hwclock.c
+@@ -658,6 +658,9 @@ display_time(struct timeval hwctime)
+  * PCIL: persistent_clock_is_local, sets the "11 minute mode" timescale.
+  * firsttime: locks the warp_clock function (initialized to 1 at boot).
+  *
++ * Note that very first settimeofday(NULL, tz) modifies warp-clock as well as
++ * system TZ.
++ *
+  * +---------------------------------------------------------------------------+
+  * |  op     | RTC scale | settimeofday calls                                  |
+  * |---------|-----------|-----------------------------------------------------|
+@@ -675,41 +678,45 @@ set_system_clock(const struct hwclock_control *ctl,
+ 	struct tm broken;
+ 	int minuteswest;
+ 	int rc = 0;
+-	const struct timezone tz_utc = { 0 };
+ 
+ 	localtime_r(&newtime.tv_sec, &broken);
+ 	minuteswest = -get_gmtoff(&broken) / 60;
+ 
+ 	if (ctl->verbose) {
+-		if (ctl->hctosys && !ctl->universal)
+-			printf(_("Calling settimeofday(NULL, %d) to set "
+-				 "persistent_clock_is_local.\n"), minuteswest);
+-		if (ctl->systz && ctl->universal)
++		if (ctl->universal)
+ 			puts(_("Calling settimeofday(NULL, 0) "
+-				"to lock the warp function."));
++			       "to lock the warp function."));
++		else
++			printf(_("Calling settimeofday(NULL, %d) to set "
++				 "persistent_clock_is_local and "
++				 "the kernel timezone.\n"), minuteswest);
++
++		if (ctl->universal && minuteswest)
++			printf(_("Calling settimeofday(NULL, %d) to set "
++				 "the kernel timezone.\n"), minuteswest);
++
+ 		if (ctl->hctosys)
+-			printf(_("Calling settimeofday(%ld.%06ld, %d)\n"),
+-			       newtime.tv_sec, newtime.tv_usec, minuteswest);
+-		else {
+-			printf(_("Calling settimeofday(NULL, %d) "), minuteswest);
+-			if (ctl->universal)
+-				 puts(_("to set the kernel timezone."));
+-			else
+-				 puts(_("to warp System time."));
+-		}
++			printf(_("Calling settimeofday(%ld.%06ld, 0) to set "
++			         "the kernel time.\n"), newtime.tv_sec, newtime.tv_usec);
+ 	}
+ 
+ 	if (!ctl->testing) {
++		const struct timezone tz_utc = { 0 };
+ 		const struct timezone tz = { minuteswest };
+ 
+-		if (ctl->hctosys && !ctl->universal)	/* set PCIL */
++		/* warp-clock */
++		if (ctl->universal)
++			rc = settimeofday(NULL, &tz_utc); /* lock to UTC */
++		else
++			rc = settimeofday(NULL, &tz);     /* set PCIL and TZ */
++
++		/* set timezone */
++		if (!rc && ctl->universal && minuteswest)
+ 			rc = settimeofday(NULL, &tz);
+-		if (ctl->systz && ctl->universal)	/* lock warp_clock */
+-			rc = settimeofday(NULL, &tz_utc);
++
++		/* set time */
+ 		if (!rc && ctl->hctosys)
+-			rc = settimeofday(&newtime, &tz);
+-		else if (!rc)
+-			rc = settimeofday(NULL, &tz);
++			rc = settimeofday(&newtime, NULL);
+ 
+ 		if (rc) {
+ 			warn(_("settimeofday() failed"));
+-- 
+2.17.1
+

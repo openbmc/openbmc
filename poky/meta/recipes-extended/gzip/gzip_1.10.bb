@@ -12,7 +12,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
 
 PROVIDES_append_class-native = " gzip-replacement-native"
 
-RDEPENDS_${PN}-ptest += "make perl perl-ptest grep diffutils"
+RDEPENDS_${PN}-ptest += "make perl grep diffutils"
 
 BBCLASSEXTEND = "native nativesdk"
 

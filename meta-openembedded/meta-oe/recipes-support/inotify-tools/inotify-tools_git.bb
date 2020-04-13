@@ -5,12 +5,12 @@ SECTION = "console/devel"
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ac6c26e52aea428ee7f56dc2c56424c6"
 
-SRCREV = "e203934e46784bb34c213078423ba1678e0c4936"
-PV = "3.20.1"
+SRCREV = "cfa93aa19f81d85b63cd64da30c7499890d4c07d"
+PV = "3.20.2.2"
 
 SRC_URI = "git://github.com/rvoicilas/${BPN} \
-           file://inotify-nosys-fix-system-call-number.patch \
-          "
+           file://0001-Makefile.am-add-build-rule-for-README.patch \
+           "
 
 S = "${WORKDIR}/git"
 

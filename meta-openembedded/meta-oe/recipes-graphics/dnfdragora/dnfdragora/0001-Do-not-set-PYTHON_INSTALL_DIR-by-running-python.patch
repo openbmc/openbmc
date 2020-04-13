@@ -9,12 +9,12 @@ Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 7c66b39..1489ef6 100644
+index 230c87b..e699e83 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -19,7 +19,7 @@ else(NOT SPHINX_EXECUTABLE-NOTFOUND)
- 	message(STATUS "Could NOT find sphinx-build.")
- endif(NOT SPHINX_EXECUTABLE-NOTFOUND)
+@@ -19,7 +19,7 @@ else(SPHINX_EXECUTABLE STREQUAL "SPHINX_EXECUTABLE-NOTFOUND")
+ 	message(STATUS "Found sphinx-build: ${SPHINX_EXECUTABLE}")
+ endif(SPHINX_EXECUTABLE STREQUAL "SPHINX_EXECUTABLE-NOTFOUND")
  
 -execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(), end='')" OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
 +#execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(), end='')" OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
@@ -22,5 +22,5 @@ index 7c66b39..1489ef6 100644
  execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; sys.stdout.write('%s.%s' % (sys.version_info.major, sys.version_info.minor))" OUTPUT_VARIABLE PYTHON_MAJOR_DOT_MINOR_VERSION)
  message(STATUS "Python install dir is ${PYTHON_INSTALL_DIR}")
 -- 
-2.7.4
+2.17.1
 

@@ -10,7 +10,7 @@ SRC_URI[sha256sum] = "1c154fef91c65dbf1cd4519af7ade70a61d85a923b6e0c0b007dc7f489
 
 S = "${WORKDIR}/cxxtest-${PV}/python"
 
-inherit distutils
+inherit distutils3
 
 do_install_append() {
     install -d ${D}${includedir}

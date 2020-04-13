@@ -16,7 +16,7 @@ DEPENDS = " \
     ${@bb.utils.contains('DISTRO_FEATURES','x11','gnome-desktop3','',d)} \
 "
 
-inherit gnomebase itstool gnome-help pkgconfig gsettings gobject-introspection upstream-version-is-even gettext features_check
+inherit gnomebase itstool gnome-help pkgconfig gsettings gobject-introspection upstream-version-is-even gettext features_check mime-xdg
 
 SRC_URI[archive.md5sum] = "9e9e82fa8f6045ad7817157d9335d185"
 SRC_URI[archive.sha256sum] = "3cc0955f11204e3a2db1c7ab99b866692749592257485b87304134ad69da0617"

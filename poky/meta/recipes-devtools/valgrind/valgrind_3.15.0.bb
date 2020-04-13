@@ -29,7 +29,6 @@ SRC_URI = "https://sourceware.org/pub/valgrind/valgrind-${PV}.tar.bz2 \
            file://0003-correct-include-directive-path-for-config.h.patch \
            file://0004-pth_atfork1.c-Define-error-API-for-musl.patch \
            file://0005-tc20_verifywrap.c-Fake-__GLIBC_PREREQ-with-musl.patch \
-           file://0006-pth_detached3.c-Dereference-pthread_t-before-adding-.patch \
            file://0001-memcheck-arm64-Define-__THROW-if-not-already-defined.patch \
            file://0002-memcheck-x86-Define-__THROW-if-not-defined.patch \
            file://0003-tests-seg_override-Replace-__modify_ldt-with-syscall.patch \
@@ -38,8 +37,11 @@ SRC_URI = "https://sourceware.org/pub/valgrind/valgrind-${PV}.tar.bz2 \
            file://0001-Make-local-functions-static-to-avoid-assembler-error.patch \
            file://0001-Return-a-valid-exit_code-from-vg_regtest.patch \
            file://0001-valgrind-filter_xml_frames-do-not-filter-usr.patch \
-           file://0002-valgrind-adjust-std_list-expected-output.patch \
            file://0001-adjust-path-filter-for-2-memcheck-tests.patch \
+           file://s390x_vec_op_t.patch \
+           file://0001-none-tests-fdleak_cmsg.stderr.exp-adjust-tmp-paths.patch \
+           file://0001-tests-Make-pthread_detatch-call-portable-across-plat.patch \
+           file://0001-memcheck-tests-Fix-timerfd-syscall-test.patch \
            "
 SRC_URI[md5sum] = "46e5fbdcbc3502a5976a317a0860a975"
 SRC_URI[sha256sum] = "417c7a9da8f60dd05698b3a7bc6002e4ef996f14c13f0ff96679a16873e78ab1"
@@ -63,7 +65,8 @@ COMPATIBLE_HOST_linux-gnun32 = 'null'
 # Disable for powerpc64 with musl
 COMPATIBLE_HOST_libc-musl_powerpc64 = 'null'
 
-inherit autotools ptest multilib_header
+# brokenseip is unfortunately required by ptests to pass
+inherit autotools-brokensep ptest multilib_header
 
 EXTRA_OECONF = "--enable-tls --without-mpicc"
 EXTRA_OECONF += "${@['--enable-only32bit','--enable-only64bit'][d.getVar('SITEINFO_BITS') != '32']}"
@@ -115,7 +118,7 @@ RDEPENDS_${PN}-ptest += " bash coreutils file \
    gdb libgomp \
    perl \
    perl-module-getopt-long perl-module-file-basename perl-module-file-glob \
-   procps sed ${PN}-dbg"
+   procps sed ${PN}-dbg ${PN}-src"
 RDEPENDS_${PN}-ptest_append_libc-glibc = " glibc-utils"
 
 # One of the tests contains a bogus interpreter path on purpose.
@@ -203,4 +206,24 @@ do_install_ptest() {
     # handle multilib
     sed -i s:@libdir@:${libdir}:g ${D}${PTEST_PATH}/run-ptest
     sed -i s:@bindir@:${bindir}:g ${D}${PTEST_PATH}/run-ptest
+
+    # This test fails on the host as well, using both 3.15 and git master (as of Jan 24 2020)
+    # https://bugs.kde.org/show_bug.cgi?id=402833
+    rm ${D}${PTEST_PATH}/memcheck/tests/overlap.vgtest
+
+    # As the binary isn't stripped or debug-splitted, the source file isn't fetched
+    # via dwarfsrcfiles either, so it needs to be installed manually.
+    mkdir -p ${D}/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}/${BP}/none/tests/
+    install ${S}/none/tests/tls.c ${D}/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}/${BP}/none/tests/
 }
+
+# avoid stripping some generated binaries otherwise some of the tests will fail
+# run-strip-reloc.sh, run-strip-strmerge.sh and so on will fail
+INHIBIT_PACKAGE_STRIP_FILES = "\
+    ${PKGD}${PTEST_PATH}/none/tests/tls \
+    ${PKGD}${PTEST_PATH}/none/tests/tls.so \
+    ${PKGD}${PTEST_PATH}/none/tests/tls2.so \
+    ${PKGD}${PTEST_PATH}/helgrind/tests/tc09_bad_unlock \
+    ${PKGD}${PTEST_PATH}/memcheck/tests/manuel1 \
+    ${PKGD}${PTEST_PATH}/drd/tests/pth_detached3 \
+"

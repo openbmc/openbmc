@@ -1,0 +1,34 @@
+From 10f3401ce356a675e2440993457ee7c8c7e9fcf8 Mon Sep 17 00:00:00 2001
+From: Jaroslav Kysela <perex@perex.cz>
+Date: Sun, 1 Dec 2019 14:26:40 +0100
+Subject: [PATCH 3/5] namehint: correct the @args check
+
+BugLink: https://github.com/alsa-project/alsa-plugins/issues/3
+Signed-off-by: Jaroslav Kysela <perex@perex.cz>
+
+Upstream-Status: Backport
+Signed-off-by: Tanu Kaskinen <tanuk@iki.fi>
+---
+ src/control/namehint.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/control/namehint.c b/src/control/namehint.c
+index 808df6b5..4927ef97 100644
+--- a/src/control/namehint.c
++++ b/src/control/namehint.c
+@@ -348,6 +348,12 @@ static int try_config(snd_config_t *config,
+ 		goto __cleanup;
+ 	if (snd_config_search(res, "@args", &cfg) >= 0) {
+ 		snd_config_for_each(i, next, cfg) {
++			/* skip the argument list */
++			snd_config_get_id(snd_config_iterator_entry(i), &str);
++			while (*str && *str >= '0' && *str <= '9') str++;
++			if (*str == '\0')
++				continue;
++			/* the argument definition must have the default */
+ 			if (snd_config_search(snd_config_iterator_entry(i),
+ 					      "default", NULL) < 0) {
+ 				err = -EINVAL;
+-- 
+2.20.1
+

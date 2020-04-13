@@ -1,4 +1,4 @@
-From 0a27144d43b70121f57f6036514d069ca9d2b971 Mon Sep 17 00:00:00 2001
+From 0cbf9c9831f773e0da66209be9a6ff28d57c2321 Mon Sep 17 00:00:00 2001
 From: "Maxin B. John" <maxin.john@intel.com>
 Date: Mon, 30 Jul 2018 17:23:29 +0300
 Subject: [PATCH] Don't build demos with questionably licensed data
@@ -33,16 +33,17 @@ Upstream-Status: Inappropriate [configuration]
 
 Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
 Signed-off-by: Maxin B. John <maxin.john@intel.com>
+
 ---
  examples/CMakeLists.txt | 14 --------------
  1 file changed, 14 deletions(-)
 
 diff --git a/examples/CMakeLists.txt b/examples/CMakeLists.txt
-index 8eee3a4..698d3b3 100644
+index e07918c..08b6e23 100644
 --- a/examples/CMakeLists.txt
 +++ b/examples/CMakeLists.txt
-@@ -47,18 +47,12 @@ set(EXAMPLES
- 	computeshader
+@@ -55,18 +55,12 @@ set(EXAMPLES
+ 	conditionalrender
  	conservativeraster
  	debugmarker
 -	deferred
@@ -57,10 +58,10 @@ index 8eee3a4..698d3b3 100644
 -	hdr
 -	imgui
 -	indirectdraw
+ 	inlineuniformblocks
  	inputattachments
  	instancing
- 	mesh
-@@ -70,8 +64,6 @@ set(EXAMPLES
+@@ -83,23 +77,16 @@ set(EXAMPLES
  	parallaxmapping
  	particlefire
  	pbrbasic
@@ -69,9 +70,8 @@ index 8eee3a4..698d3b3 100644
  	pipelines
  	pipelinestatistics
  	pushconstants
-@@ -79,15 +71,10 @@ set(EXAMPLES
+ 	pushdescriptors
  	radialblur
- 	raytracing
  	renderheadless
 -	scenerendering
  	screenshot
@@ -85,7 +85,7 @@ index 8eee3a4..698d3b3 100644
  	stencilbuffer
  	subpasses
  	terraintessellation
-@@ -101,7 +88,6 @@ set(EXAMPLES
+@@ -113,7 +100,6 @@ set(EXAMPLES
  	texturesparseresidency
  	triangle
  	viewportarray
@@ -93,6 +93,3 @@ index 8eee3a4..698d3b3 100644
  )
  
  buildExamples()
--- 
-2.4.0
-

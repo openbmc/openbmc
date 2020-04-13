@@ -4,7 +4,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=9ac2e7cff1ddaf48b6eab6028f23ef88"
 DEPENDS = "gtk+ xfce4-panel libical popt"
 
-inherit xfce-app
+inherit xfce-app mime-xdg
 
 SRC_URI += "file://0001-drop-setting-is_utc-member-of-icaltimetype.patch"
 

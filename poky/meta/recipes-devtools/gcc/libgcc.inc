@@ -9,14 +9,18 @@ do_install_append_class-target () {
 			"linux-musleabi") extra_target_os="linux-gnueabi";;
 			*) extra_target_os="linux";;
 		esac
-		ln -s ${TARGET_SYS} ${D}${libdir}/${TARGET_ARCH}${TARGET_VENDOR}-$extra_target_os
+		if [ ! -e ${D}${libdir}/${TARGET_ARCH}${TARGET_VENDOR}-$extra_target_os ]; then
+			ln -s ${TARGET_SYS} ${D}${libdir}/${TARGET_ARCH}${TARGET_VENDOR}-$extra_target_os
+		fi
 	fi
 	if [ -n "${@ bb.utils.contains('TUNE_CCARGS_MFLOAT', 'hard', 'hf', '', d)}" ]; then
 		case "${TARGET_OS}" in
 			"linux-musleabi") extra_target_os="linux-musleabihf";;
 			"linux-gnueabi") extra_target_os="linux-gnueabihf";;
 		esac
-		ln -s ${TARGET_SYS} ${D}${libdir}/${TARGET_ARCH}${TARGET_VENDOR}-$extra_target_os
+		if [ ! -e ${D}${libdir}/${TARGET_ARCH}${TARGET_VENDOR}-$extra_target_os ]; then
+			ln -s ${TARGET_SYS} ${D}${libdir}/${TARGET_ARCH}${TARGET_VENDOR}-$extra_target_os
+		fi
 	fi
 }
 

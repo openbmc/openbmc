@@ -21,6 +21,7 @@ inherit autotools
 # patches maintained by quilt. So manually apply them before applying other local
 # patches. Also remove all temp files before leaving, because do_patch() will pop
 # up all previously applied patches in the start
+do_patch[depends] += "quilt-native:do_populate_sysroot"
 id3lib_do_patch() {
     cd ${S}
     # it's important that we only pop the existing patches when they've
@@ -33,14 +34,14 @@ id3lib_do_patch() {
         # the test inside which we operate
         QUILT_PATCHES=${S}/patches quilt pop -a
     fi
-    if [ -d ${S}/.pc-id3lib ]; then
+    if [ -d ${S}/.pc-${BPN} ]; then
         rm -rf ${S}/.pc
-        mv ${S}/.pc-id3lib ${S}/.pc
+        mv ${S}/.pc-${BPN} ${S}/.pc
         QUILT_PATCHES=${S}/debian/patches quilt pop -a
         rm -rf ${S}/.pc ${S}/debian
     fi
     QUILT_PATCHES=${S}/debian/patches quilt push -a
-    mv ${S}/.pc ${S}/.pc-id3lib
+    mv ${S}/.pc ${S}/.pc-${BPN}
 }
 
 do_unpack[cleandirs] += "${S}"

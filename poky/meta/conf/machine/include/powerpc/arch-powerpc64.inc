@@ -5,7 +5,7 @@ require conf/machine/include/powerpc/arch-powerpc.inc
 TUNEVALID[m64] = "Power ELF64 standard ABI"
 TUNECONFLICTS[m64] = "m32 nf"
 TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'm64', ' -m64', '', d)}"
-TUNE_ARCH .= "${@bb.utils.contains('TUNE_FEATURES', [ 'm64' ], 'powerpc64', '', d)}"
+TUNE_ARCH .= "${@bb.utils.contains('TUNE_FEATURES', [ 'm64' ], 'powerpc64${ENDIAN_SFX}', '', d)}"
 
 # musl only supports elfv2 ABI for ppc64
 TUNE_CCARGS .= "${@['', ' -mabi=elfv2']['libc-musl' in d.getVar('OVERRIDES').split(':')]}"

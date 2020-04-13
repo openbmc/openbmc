@@ -1,0 +1,76 @@
+From: Wang Shilong <wshilong@ddn.com>
+Date: Mon, 30 Dec 2019 19:52:39 -0500
+Subject: e2fsck: fix use after free in calculate_tree()
+
+The problem is alloc_blocks() will call get_next_block() which might
+reallocate outdir->buf, and memory address could be changed after
+this.  To fix this, pointers that point into outdir->buf, such as
+int_limit and root need to be recaulated based on the new starting
+address of outdir->buf.
+
+[ Changed to correctly recalculate int_limit, and to optimize how we
+  reallocate outdir->buf.  -TYT ]
+
+Addresses-Debian-Bug: 948517
+Signed-off-by: Wang Shilong <wshilong@ddn.com>
+Signed-off-by: Theodore Ts'o <tytso@mit.edu>
+(cherry picked from commit 101e73e99ccafa0403fcb27dd7413033b587ca01)
+
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+Upstream-Status: Backport [https://git.kernel.org/pub/scm/fs/ext2/e2fsprogs.git/commit/?id=101e73e99ccafa0403fcb27dd7413033b587ca01]
+---
+ e2fsck/rehash.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/e2fsck/rehash.c b/e2fsck/rehash.c
+index 0a5888a9..2574e151 100644
+--- a/e2fsck/rehash.c
++++ b/e2fsck/rehash.c
+@@ -295,7 +295,11 @@ static errcode_t get_next_block(ext2_filsys fs, struct out_dir *outdir,
+ 	errcode_t	retval;
+ 
+ 	if (outdir->num >= outdir->max) {
+-		retval = alloc_size_dir(fs, outdir, outdir->max + 50);
++		int increment = outdir->max / 10;
++
++		if (increment < 50)
++			increment = 50;
++		retval = alloc_size_dir(fs, outdir, outdir->max + increment);
+ 		if (retval)
+ 			return retval;
+ 	}
+@@ -637,6 +641,9 @@ static int alloc_blocks(ext2_filsys fs,
+ 	if (retval)
+ 		return retval;
+ 
++	/* outdir->buf might be reallocated */
++	*prev_ent = (struct ext2_dx_entry *) (outdir->buf + *prev_offset);
++
+ 	*next_ent = set_int_node(fs, block_start);
+ 	*limit = (struct ext2_dx_countlimit *)(*next_ent);
+ 	if (next_offset)
+@@ -726,6 +733,9 @@ static errcode_t calculate_tree(ext2_filsys fs,
+ 					return retval;
+ 			}
+ 			if (c3 == 0) {
++				int delta1 = (char *)int_limit - outdir->buf;
++				int delta2 = (char *)root - outdir->buf;
++
+ 				retval = alloc_blocks(fs, &limit, &int_ent,
+ 						      &dx_ent, &int_offset,
+ 						      NULL, outdir, i, &c2,
+@@ -733,6 +743,11 @@ static errcode_t calculate_tree(ext2_filsys fs,
+ 				if (retval)
+ 					return retval;
+ 
++				/* outdir->buf might be reallocated */
++				int_limit = (struct ext2_dx_countlimit *)
++					(outdir->buf + delta1);
++				root = (struct ext2_dx_entry *)
++					(outdir->buf + delta2);
+ 			}
+ 			dx_ent->block = ext2fs_cpu_to_le32(i);
+ 			if (c3 != limit->limit)
+-- 
+2.24.1
+

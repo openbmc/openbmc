@@ -36,6 +36,17 @@ do_configure_prepend() {
         sed -i -e 's,^JH_CHECK_XML_CATALOG.*,,' ${S}/configure.ac
 }
 
+do_install_append () {
+    # configure values for python3 and pkg-config encoded in scripts
+    for fn in ${bindir}/gtkdoc-depscan \
+        ${bindir}/gtkdoc-mkhtml2 \
+        ${datadir}/gtk-doc/python/gtkdoc/config.py; do 
+        sed -e 's,${RECIPE_SYSROOT_NATIVE}/usr/bin/pkg-config,${bindir}/pkg-config,' \
+            -e 's,${HOSTTOOLS_DIR}/python3,${bindir}/python3,' \
+            -i ${D}$fn
+    done
+}
+
 FILES_${PN} += "${datadir}/sgml"
 FILES_${PN}-dev += "${libdir}/cmake"
 FILES_${PN}-doc = ""
@@ -48,3 +59,4 @@ gtkdoc_makefiles_sysroot_preprocess() {
            -e "s|GTKDOC_RUN =.*|GTKDOC_RUN = \$(top_builddir)/gtkdoc-qemuwrapper|" \
            ${SYSROOT_DESTDIR}${datadir}/gtk-doc/data/gtk-doc*make
 }
+

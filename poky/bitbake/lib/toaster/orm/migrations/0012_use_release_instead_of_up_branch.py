@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='layer_version',
             name='release',
-            field=models.ForeignKey(to='orm.Release', default=None, null=True),
+            field=models.ForeignKey(to='orm.Release', default=None, null=True, on_delete=models.CASCADE),
         ),
         migrations.RunPython(branch_to_release,
                              reverse_code=migrations.RunPython.noop),

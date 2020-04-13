@@ -1,0 +1,238 @@
+From b52dba15527380cc18635e3696e0ef87efee9a84 Mon Sep 17 00:00:00 2001
+From: Jason Wessel <jason.wessel@windriver.com>
+Date: Sat, 7 Dec 2019 10:01:37 -0800
+Subject: [PATCH] localedef: fix-ups hardlink to make it compile
+
+Upstream-Status: Pending
+Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ locale/programs/c.h                        |  2 +-
+ locale/programs/cross-localedef-hardlink.c | 79 +++++++++++-----------
+ 2 files changed, 39 insertions(+), 42 deletions(-)
+
+diff --git a/locale/programs/c.h b/locale/programs/c.h
+index d0a402e90e..1804d31c73 100644
+--- a/locale/programs/c.h
++++ b/locale/programs/c.h
+@@ -240,7 +240,7 @@ errmsg(char doexit, int excode, char adderr, const char *fmt, ...)
+ /* Don't use inline function to avoid '#include "nls.h"' in c.h
+  */
+ #define errtryhelp(eval) __extension__ ({ \
+-	fprintf(stderr, _("Try '%s --help' for more information.\n"), \
++	fprintf(stderr, ("Try '%s --help' for more information.\n"), \
+ 			program_invocation_short_name); \
+ 	exit(eval); \
+ })
+diff --git a/locale/programs/cross-localedef-hardlink.c b/locale/programs/cross-localedef-hardlink.c
+index 63615896b0..726e6dd948 100644
+--- a/locale/programs/cross-localedef-hardlink.c
++++ b/locale/programs/cross-localedef-hardlink.c
+@@ -20,6 +20,8 @@
+  * with this program; if not, write to the Free Software Foundation, Inc.,
+  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+  */
++
++#undef HAVE_PCRE
+ #include <sys/types.h>
+ #include <stdlib.h>
+ #include <getopt.h>
+@@ -38,8 +40,8 @@
+ 
+ #include "c.h"
+ #include "xalloc.h"
+-#include "nls.h"
+-#include "closestream.h"
++//#include "nls.h"
++//#include "closestream.h"
+ 
+ #define NHASH   (1<<17)  /* Must be a power of 2! */
+ #define NBUF    64
+@@ -124,33 +126,33 @@ static void print_summary(void)
+ 	if (ctl->verbose > 1 && ctl->nlinks)
+ 		fputc('\n', stdout);
+ 
+-	printf(_("Directories:   %9lld\n"), ctl->ndirs);
+-	printf(_("Objects:       %9lld\n"), ctl->nobjects);
+-	printf(_("Regular files: %9lld\n"), ctl->nregfiles);
+-	printf(_("Comparisons:   %9lld\n"), ctl->ncomp);
++	printf(("Directories:   %9lld\n"), ctl->ndirs);
++	printf(("Objects:       %9lld\n"), ctl->nobjects);
++	printf(("Regular files: %9lld\n"), ctl->nregfiles);
++	printf(("Comparisons:   %9lld\n"), ctl->ncomp);
+ 	printf(  "%s%9lld\n", (ctl->no_link ?
+-	       _("Would link:    ") :
+-	       _("Linked:        ")), ctl->nlinks);
++	       ("Would link:    ") :
++	       ("Linked:        ")), ctl->nlinks);
+ 	printf(  "%s %9lld\n", (ctl->no_link ?
+-	       _("Would save:   ") :
+-	       _("Saved:        ")), ctl->nsaved);
++	       ("Would save:   ") :
++	       ("Saved:        ")), ctl->nsaved);
+ }
+ 
+ static void __attribute__((__noreturn__)) usage(void)
+ {
+ 	fputs(USAGE_HEADER, stdout);
+-	printf(_(" %s [options] directory...\n"), program_invocation_short_name);
++	printf((" %s [options] directory...\n"), program_invocation_short_name);
+ 
+ 	fputs(USAGE_SEPARATOR, stdout);
+-	puts(_("Consolidate duplicate files using hardlinks."));
++	puts(("Consolidate duplicate files using hardlinks."));
+ 
+ 	fputs(USAGE_OPTIONS, stdout);
+-	puts(_(" -c, --content          compare only contents, ignore permission, etc."));
+-	puts(_(" -n, --dry-run          don't actually link anything"));
+-	puts(_(" -v, --verbose          print summary after hardlinking"));
+-	puts(_(" -vv                    print every hardlinked file and summary"));
+-	puts(_(" -f, --force            force hardlinking across filesystems"));
+-	puts(_(" -x, --exclude <regex>  exclude files matching pattern"));
++	puts((" -c, --content          compare only contents, ignore permission, etc."));
++	puts((" -n, --dry-run          don't actually link anything"));
++	puts((" -v, --verbose          print summary after hardlinking"));
++	puts((" -vv                    print every hardlinked file and summary"));
++	puts((" -f, --force            force hardlinking across filesystems"));
++	puts((" -x, --exclude <regex>  exclude files matching pattern"));
+ 
+ 	fputs(USAGE_SEPARATOR, stdout);
+ 	printf(USAGE_HELP_OPTIONS(16)); /* char offset to align option descriptions */
+@@ -164,7 +166,7 @@ static inline size_t add2(size_t a, size_t b)
+ 	size_t sum = a + b;
+ 
+ 	if (sum < a)
+-		errx(EXIT_FAILURE, _("integer overflow"));
++		errx(EXIT_FAILURE, ("integer overflow"));
+ 	return sum;
+ }
+ 
+@@ -193,7 +195,7 @@ static void process_path(struct hardlink_ctl *ctl, const char *name)
+ 	if (st.st_dev != ctl->dev && !ctl->force) {
+ 		if (ctl->dev)
+ 			errx(EXIT_FAILURE,
+-			     _("%s is on different filesystem than the rest "
++			     ("%s is on different filesystem than the rest "
+ 			       "(use -f option to override)."), name);
+ 		ctl->dev = st.st_dev;
+ 	}
+@@ -287,9 +289,9 @@ static void process_path(struct hardlink_ctl *ctl, const char *name)
+ 							(ssize_t) sizeof(ctl->iobuf1) : fsize;
+ 
+ 					if ((xsz = read(fd, ctl->iobuf1, rsize)) != rsize)
+-						warn(_("cannot read %s"), name);
++						warn(("cannot read %s"), name);
+ 					else if ((xsz = read(fd2, ctl->iobuf2, rsize)) != rsize)
+-						warn(_("cannot read %s"), fp2->name);
++						warn(("cannot read %s"), fp2->name);
+ 
+ 					if (xsz != rsize) {
+ 						close(fd);
+@@ -303,13 +305,13 @@ static void process_path(struct hardlink_ctl *ctl, const char *name)
+ 				if (fsize > 0)
+ 					continue;
+ 				if (lstat(name, &st3)) {
+-					warn(_("cannot stat %s"), name);
++					warn(("cannot stat %s"), name);
+ 					close(fd);
+ 					return;
+ 				}
+ 				st3.st_atime = st.st_atime;
+ 				if (stcmp(&st, &st3, 0)) {
+-					warnx(_("file %s changed underneath us"), name);
++					warnx(("file %s changed underneath us"), name);
+ 					close(fd);
+ 					return;
+ 				}
+@@ -329,18 +331,18 @@ static void process_path(struct hardlink_ctl *ctl, const char *name)
+ 					       suffixlen + 1);
+ 					/* First create a temporary link to n1 under a new name */
+ 					if (link(n1, nam2.buf)) {
+-						warn(_("failed to hardlink %s to %s (create temporary link as %s failed)"),
++						warn(("failed to hardlink %s to %s (create temporary link as %s failed)"),
+ 							n1, n2, nam2.buf);
+ 						free(nam2.buf);
+ 						continue;
+ 					}
+ 					/* Then rename into place over the existing n2 */
+ 					if (rename(nam2.buf, n2)) {
+-						warn(_("failed to hardlink %s to %s (rename temporary link to %s failed)"),
++						warn(("failed to hardlink %s to %s (rename temporary link to %s failed)"),
+ 							n1, n2, n2);
+ 						/* Something went wrong, try to remove the now redundant temporary link */
+ 						if (unlink(nam2.buf))
+-							warn(_("failed to remove temporary link %s"), nam2.buf);
++							warn(("failed to remove temporary link %s"), nam2.buf);
+ 						free(nam2.buf);
+ 						continue;
+ 					}
+@@ -351,16 +353,16 @@ static void process_path(struct hardlink_ctl *ctl, const char *name)
+ 					/* We actually did not save anything this time, since the link second argument
+ 					   had some other links as well.  */
+ 					if (ctl->verbose > 1)
+-						printf(_(" %s %s to %s\n"),
+-							(ctl->no_link ? _("Would link") : _("Linked")),
++						printf((" %s %s to %s\n"),
++							(ctl->no_link ? ("Would link") : ("Linked")),
+ 							n1, n2);
+ 				} else {
+ 					ctl->nsaved += ((st.st_size + 4095) / 4096) * 4096;
+ 					if (ctl->verbose > 1)
+-						printf(_(" %s %s to %s, %s %jd\n"),
+-							(ctl->no_link ? _("Would link") : _("Linked")),
++						printf((" %s %s to %s, %s %jd\n"),
++							(ctl->no_link ? ("Would link") : ("Linked")),
+ 							n1, n2,
+-							(ctl->no_link ? _("would save") : _("saved")),
++							(ctl->no_link ? ("would save") : ("saved")),
+ 							(intmax_t)st.st_size);
+ 				}
+ 				close(fd);
+@@ -410,11 +412,6 @@ int main(int argc, char **argv)
+ 		{ NULL, 0, NULL, 0 },
+ 	};
+ 
+-	setlocale(LC_ALL, "");
+-	bindtextdomain(PACKAGE, LOCALEDIR);
+-	textdomain(PACKAGE);
+-	close_stdout_atexit();
+-
+ 	while ((ch = getopt_long(argc, argv, "cnvfx:Vh", longopts, NULL)) != -1) {
+ 		switch (ch) {
+ 		case 'n':
+@@ -434,7 +431,7 @@ int main(int argc, char **argv)
+ 			exclude_pattern = (PCRE2_SPTR) optarg;
+ #else
+ 			errx(EXIT_FAILURE,
+-			     _("option --exclude not supported (built without pcre2)"));
++			     ("option --exclude not supported (built without pcre2)"));
+ #endif
+ 			break;
+ 		case 'V':
+@@ -447,7 +444,7 @@ int main(int argc, char **argv)
+ 	}
+ 
+ 	if (optind == argc) {
+-		warnx(_("no directory specified"));
++		warnx(("no directory specified"));
+ 		errtryhelp(EXIT_FAILURE);
+ 	}
+ 
+@@ -461,7 +458,7 @@ int main(int argc, char **argv)
+ 			PCRE2_UCHAR buffer[256];
+ 			pcre2_get_error_message(errornumber, buffer,
+ 						sizeof(buffer));
+-			errx(EXIT_FAILURE, _("pattern error at offset %d: %s"),
++			errx(EXIT_FAILURE, ("pattern error at offset %d: %s"),
+ 				(int)erroroffset, buffer);
+ 		}
+ 		match_data = pcre2_match_data_create_from_pattern(re, NULL);
+@@ -506,7 +503,7 @@ int main(int argc, char **argv)
+ 			    >=0) {
+ 				if (ctl->verbose) {
+ 					nam1.buf[nam1baselen] = 0;
+-					printf(_("Skipping %s%s\n"), nam1.buf, di->d_name);
++					printf(("Skipping %s%s\n"), nam1.buf, di->d_name);
+ 				}
+ 				continue;
+ 			}

@@ -1,0 +1,26 @@
+From 0ff7ad2c88e3a47e7e3f6fe68c28a8d2d8a71f1f Mon Sep 17 00:00:00 2001
+From: Neel Chotai <neel@chot.ai>
+Date: Fri, 14 Feb 2020 17:56:23 +0000
+Subject: [PATCH] fix musl compilation
+
+Upstream-Status: Backport [https://github.com/linux-nvme/nvme-cli/commit/0ff7ad2c88e3a47e7e3f6fe68c28a8d2d8a71f1f]
+Signed-off-by: Pierre-Jean Texier <pjtexier@koncepto.io>
+---
+ plugins/micron/micron-nvme.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/plugins/micron/micron-nvme.c b/plugins/micron/micron-nvme.c
+index 8240887..165fcf0 100644
+--- a/plugins/micron/micron-nvme.c
++++ b/plugins/micron/micron-nvme.c
+@@ -13,6 +13,7 @@
+ #include "nvme-print.h"
+ #include "nvme-ioctl.h"
+ #include <sys/ioctl.h>
++#include <limits.h>
+ 
+ #define CREATE_CMD
+ #include "micron-nvme.h"
+-- 
+2.7.4
+

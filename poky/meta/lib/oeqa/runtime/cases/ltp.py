@@ -57,9 +57,9 @@ class LtpTestBase(OERuntimeTestCase):
 
 class LtpTest(LtpTestBase):
 
-    ltp_groups = ["math", "syscalls", "dio", "io", "mm", "ipc", "sched", "nptl", "pty", "containers", "controllers", "filecaps", "cap_bounds", "fcntl-locktests", "connectors","timers", "commands", "net.ipv6_lib", "input","fs_perms_simple"]
+    ltp_groups = ["math", "syscalls", "dio", "io", "mm", "ipc", "sched", "nptl", "pty", "containers", "controllers", "filecaps", "cap_bounds", "fcntl-locktests", "connectors", "commands", "net.ipv6_lib", "input","fs_perms_simple"]
 
-    ltp_fs = ["fs", "fsx", "fs_bind", "fs_ext4"]
+    ltp_fs = ["fs", "fsx", "fs_bind"]
     # skip kernel cpuhotplug
     ltp_kernel = ["power_management_tests", "hyperthreading ", "kernel_misc", "hugetlb"]
     ltp_groups += ltp_fs

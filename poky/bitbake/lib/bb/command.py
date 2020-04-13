@@ -65,7 +65,7 @@ class Command:
             # Can run synchronous commands straight away
             command_method = getattr(self.cmds_sync, command)
             if ro_only:
-                if not hasattr(command_method, 'readonly') or False == getattr(command_method, 'readonly'):
+                if not hasattr(command_method, 'readonly') or not getattr(command_method, 'readonly'):
                     return None, "Not able to execute not readonly commands in readonly mode"
             try:
                 self.cooker.process_inotify_updates()
@@ -414,7 +414,11 @@ class CommandsSync:
     getAllAppends.readonly = True
 
     def findProviders(self, command, params):
-        return command.cooker.findProviders()
+        try:
+            mc = params[0]
+        except IndexError:
+            mc = ''
+        return command.cooker.findProviders(mc)
     findProviders.readonly = True
 
     def findBestProvider(self, command, params):
@@ -446,85 +450,44 @@ class CommandsSync:
         return all_p, best
     getRuntimeProviders.readonly = True
 
-    def dataStoreConnectorFindVar(self, command, params):
+    def dataStoreConnectorCmd(self, command, params):
         dsindex = params[0]
-        name = params[1]
-        datastore = command.remotedatastores[dsindex]
-        value, overridedata = datastore._findVar(name)
+        method = params[1]
+        args = params[2]
+        kwargs = params[3]
 
-        if value:
-            content = value.get('_content', None)
-            if isinstance(content, bb.data_smart.DataSmart):
-                # Value is a datastore (e.g. BB_ORIGENV) - need to handle this carefully
-                idx = command.remotedatastores.check_store(content, True)
-                return {'_content': DataStoreConnectionHandle(idx),
-                        '_connector_origtype': 'DataStoreConnectionHandle',
-                        '_connector_overrides': overridedata}
-            elif isinstance(content, set):
-                return {'_content': list(content),
-                        '_connector_origtype': 'set',
-                        '_connector_overrides': overridedata}
-            else:
-                value['_connector_overrides'] = overridedata
-        else:
-            value = {}
-            value['_connector_overrides'] = overridedata
-        return value
-    dataStoreConnectorFindVar.readonly = True
+        d = command.remotedatastores[dsindex]
+        ret = getattr(d, method)(*args, **kwargs)
 
-    def dataStoreConnectorGetKeys(self, command, params):
+        if isinstance(ret, bb.data_smart.DataSmart):
+            idx = command.remotedatastores.store(ret)
+            return DataStoreConnectionHandle(idx)
+
+        return ret
+
+    def dataStoreConnectorVarHistCmd(self, command, params):
         dsindex = params[0]
-        datastore = command.remotedatastores[dsindex]
-        return list(datastore.keys())
-    dataStoreConnectorGetKeys.readonly = True
+        method = params[1]
+        args = params[2]
+        kwargs = params[3]
 
-    def dataStoreConnectorGetVarHistory(self, command, params):
+        d = command.remotedatastores[dsindex].varhistory
+        return getattr(d, method)(*args, **kwargs)
+
+    def dataStoreConnectorIncHistCmd(self, command, params):
         dsindex = params[0]
-        name = params[1]
-        datastore = command.remotedatastores[dsindex]
-        return datastore.varhistory.variable(name)
-    dataStoreConnectorGetVarHistory.readonly = True
+        method = params[1]
+        args = params[2]
+        kwargs = params[3]
 
-    def dataStoreConnectorExpandPythonRef(self, command, params):
-        config_data_dict = params[0]
-        varname = params[1]
-        expr = params[2]
-
-        config_data = command.remotedatastores.receive_datastore(config_data_dict)
-
-        varparse = bb.data_smart.VariableParse(varname, config_data)
-        return varparse.python_sub(expr)
+        d = command.remotedatastores[dsindex].inchistory
+        return getattr(d, method)(*args, **kwargs)
 
     def dataStoreConnectorRelease(self, command, params):
         dsindex = params[0]
         if dsindex <= 0:
             raise CommandError('dataStoreConnectorRelease: invalid index %d' % dsindex)
         command.remotedatastores.release(dsindex)
-
-    def dataStoreConnectorSetVarFlag(self, command, params):
-        dsindex = params[0]
-        name = params[1]
-        flag = params[2]
-        value = params[3]
-        datastore = command.remotedatastores[dsindex]
-        datastore.setVarFlag(name, flag, value)
-
-    def dataStoreConnectorDelVar(self, command, params):
-        dsindex = params[0]
-        name = params[1]
-        datastore = command.remotedatastores[dsindex]
-        if len(params) > 2:
-            flag = params[2]
-            datastore.delVarFlag(name, flag)
-        else:
-            datastore.delVar(name)
-
-    def dataStoreConnectorRenameVar(self, command, params):
-        dsindex = params[0]
-        name = params[1]
-        newname = params[2]
-        datastore = command.remotedatastores[dsindex]
-        datastore.renameVar(name, newname)
 
     def parseRecipeFile(self, command, params):
         """
@@ -536,8 +499,7 @@ class CommandsSync:
         appends = params[1]
         appendlist = params[2]
         if len(params) > 3:
-            config_data_dict = params[3]
-            config_data = command.remotedatastores.receive_datastore(config_data_dict)
+            config_data = command.remotedatastores[params[3]]
         else:
             config_data = None
 

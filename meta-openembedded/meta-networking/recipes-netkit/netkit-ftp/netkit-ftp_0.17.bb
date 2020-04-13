@@ -18,6 +18,8 @@ SRC_URI[patch31.sha256sum] = "4edd46a32d70daa7ba00f0ebf0118dc5d17dff23d6e46aa21a
 
 inherit autotools-brokensep
 
+CLEANBROKEN = "1"
+
 do_configure () {
     ./configure --prefix=${prefix}
     echo "LDFLAGS=${LDFLAGS}" >> MCONFIG

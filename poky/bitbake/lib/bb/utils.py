@@ -24,7 +24,6 @@ import fnmatch
 import traceback
 import errno
 import signal
-import ast
 import collections
 import copy
 from subprocess import getstatusoutput
@@ -428,10 +427,11 @@ def fileslocked(files):
         for lockfile in files:
             locks.append(bb.utils.lockfile(lockfile))
 
-    yield
-
-    for lock in locks:
-        bb.utils.unlockfile(lock)
+    try:
+        yield
+    finally:
+        for lock in locks:
+            bb.utils.unlockfile(lock)
 
 @contextmanager
 def timeout(seconds):
@@ -555,6 +555,20 @@ def sha1_file(filename):
     """
     import hashlib
     return _hasher(hashlib.sha1(), filename)
+
+def sha384_file(filename):
+    """
+    Return the hex string representation of the SHA384 checksum of the filename
+    """
+    import hashlib
+    return _hasher(hashlib.sha384(), filename)
+
+def sha512_file(filename):
+    """
+    Return the hex string representation of the SHA512 checksum of the filename
+    """
+    import hashlib
+    return _hasher(hashlib.sha512(), filename)
 
 def preserved_envvars_exported():
     """Variables which are taken from the environment and placed in and exported
@@ -850,7 +864,7 @@ def copyfile(src, dest, newmtime = None, sstat = None):
             if destexists and not stat.S_ISDIR(dstat[stat.ST_MODE]):
                 os.unlink(dest)
             os.symlink(target, dest)
-            #os.lchown(dest,sstat[stat.ST_UID],sstat[stat.ST_GID])
+            os.lchown(dest,sstat[stat.ST_UID],sstat[stat.ST_GID])
             return os.lstat(dest)
         except Exception as e:
             logger.warning("copyfile: failed to create symlink %s to %s (%s)" % (dest, target, e))
@@ -1024,6 +1038,43 @@ def filter(variable, checkvalues, d):
     else:
         checkvalues = set(checkvalues)
     return ' '.join(sorted(checkvalues & val))
+
+
+def get_referenced_vars(start_expr, d):
+    """
+    :return: names of vars referenced in start_expr (recursively), in quasi-BFS order (variables within the same level
+    are ordered arbitrarily)
+    """
+
+    seen = set()
+    ret = []
+
+    # The first entry in the queue is the unexpanded start expression
+    queue = collections.deque([start_expr])
+    # Subsequent entries will be variable names, so we need to track whether or not entry requires getVar
+    is_first = True
+
+    empty_data = bb.data.init()
+    while queue:
+        entry = queue.popleft()
+        if is_first:
+            # Entry is the start expression - no expansion needed
+            is_first = False
+            expression = entry
+        else:
+            # This is a variable name - need to get the value
+            expression = d.getVar(entry, False)
+            ret.append(entry)
+
+        # expandWithRefs is how we actually get the referenced variables in the expression. We call it using an empty
+        # data store because we only want the variables directly used in the expression. It returns a set, which is what
+        # dooms us to only ever be "quasi-BFS" rather than full BFS.
+        new_vars = empty_data.expandWithRefs(expression, None).references - set(seen)
+
+        queue.extend(new_vars)
+        seen.update(new_vars)
+    return ret
+
 
 def cpu_count():
     return multiprocessing.cpu_count()
@@ -1560,3 +1611,29 @@ class LogCatcher(logging.Handler):
         self.messages.append(bb.build.logformatter.format(record))
     def contains(self, message):
         return (message in self.messages)
+
+def is_semver(version):
+    """
+        Is the version string following the semver semantic?
+
+        https://semver.org/spec/v2.0.0.html
+    """
+    regex = re.compile(
+    r"""
+    ^
+    (0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)
+    (?:-(
+        (?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)
+        (?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*
+    ))?
+    (?:\+(
+        [0-9a-zA-Z-]+
+        (?:\.[0-9a-zA-Z-]+)*
+    ))?
+    $
+    """, re.VERBOSE)
+
+    if regex.match(version) is None:
+        return False
+
+    return True

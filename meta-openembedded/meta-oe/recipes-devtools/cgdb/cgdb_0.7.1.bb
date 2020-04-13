@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
 DEPENDS = "flex-native readline ncurses"
 
-inherit autotools
+inherit autotools texinfo
 
 SRC_URI = "http://cgdb.me/files/${BP}.tar.gz \
            file://0001-Avoid-use-of-mips-which-is-reserved-on-mips.patch \

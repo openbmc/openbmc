@@ -1,6 +1,9 @@
 #! /bin/sh
 
 set -eux
+if id -u glib2-test; then
+   userdel glib2-test
+fi
 useradd glib2-test
 su glib2-test -c 'gnome-desktop-testing-runner glib'
 userdel glib2-test

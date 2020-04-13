@@ -11,7 +11,7 @@ SRC_URI[sha256sum] = "675e7ca96719e2f3b42a6c13421213a398f04da0f8e78f4691fa9261fd
 
 S = "${WORKDIR}/phoronix-test-suite"
 
-inherit systemd allarch
+inherit systemd allarch mime mime-xdg
 
 do_install() {
     DESTDIR=${D} ./install-sh ${exec_prefix}
@@ -29,7 +29,7 @@ do_install() {
 SYSTEMD_AUTO_ENABLE = "disable"
 SYSTEMD_SERVICE_${PN} = "phoromatic-client.service phoromatic-server.service"
 
-RDEPENDS_${PN} += "bash python php-cli util-linux-lscpu os-release lsb-release"
+RDEPENDS_${PN} += "bash python3-core php-cli util-linux-lscpu os-release lsb-release"
 
 FILES_${PN} += " \
     ${datadir}/phoronix-test-suite \

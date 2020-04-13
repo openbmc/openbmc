@@ -151,13 +151,13 @@
                     <itemizedlist>
                         <listitem><para>
                             This example starts QEMU with
-                            <replaceable>MACHINE</replaceable> set to "qemux86".
+                            <replaceable>MACHINE</replaceable> set to "qemux86-64".
                             Assuming a standard
                             <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>,
                             <filename>runqemu</filename> automatically finds the
-                            <filename>bzImage-qemux86.bin</filename> image file and
+                            <filename>bzImage-qemux86-64.bin</filename> image file and
                             the
-                            <filename>core-image-minimal-qemux86-20140707074611.rootfs.ext3</filename>
+                            <filename>core-image-minimal-qemux86-64-20200218002850.rootfs.ext4</filename>
                             (assuming the current build created a
                             <filename>core-image-minimal</filename> image).
                             <note>
@@ -166,7 +166,7 @@
                             timestamp.
                             </note>
                             <literallayout class='monospaced'>
-     $ runqemu qemux86
+     $ runqemu qemux86-64
                             </literallayout>
                             </para></listitem>
                         <listitem><para>
@@ -175,7 +175,7 @@
                             This command, however, specifically provides the image
                             and root filesystem type.
                             <literallayout class='monospaced'>
-     $ runqemu qemux86 core-image-minimal ext3
+     $ runqemu qemux86-64 core-image-minimal ext4
                             </literallayout>
                             </para></listitem>
                         <listitem><para>
@@ -188,7 +188,7 @@
                             be installed (see the previous description for the
                             <filename>audio</filename> option for more information).
                             <literallayout class='monospaced'>
-     $ runqemu qemux86 ramfs audio
+     $ runqemu qemux86-64 ramfs audio
                             </literallayout>
                             </para></listitem>
                         <listitem><para>
@@ -200,7 +200,7 @@
                             <replaceable>KERNEL</replaceable>, or
                             <replaceable>VM</replaceable> option.
                             <literallayout class='monospaced'>
-     $ runqemu ext3
+     $ runqemu ext4
                             </literallayout>
                             </para></listitem>
                         <listitem><para>
@@ -209,9 +209,9 @@
                             From the <filename>.wic.vmdk</filename>,
                             <filename>runqemu</filename> determines the QEMU
                             architecture (<replaceable>MACHINE</replaceable>) to be
-                            "qemux86" and the root filesystem type to be "vmdk".
+                            "qemux86-64" and the root filesystem type to be "vmdk".
                             <literallayout class='monospaced'>
-     $ runqemu /home/scott-lenovo/vm/core-image-minimal-qemux86.wic.vmdk
+     $ runqemu /home/scott-lenovo/vm/core-image-minimal-qemux86-64.wic.vmdk
                             </literallayout>
                             </para></listitem>
                     </itemizedlist>
@@ -296,7 +296,7 @@
                     extracts it to a directory named
                     <filename>test-nfs</filename>:
                     <literallayout class='monospaced'>
-     runqemu-extract-sdk ./tmp/deploy/images/qemux86/core-image-sato-qemux86.tar.bz2 test-nfs
+     runqemu-extract-sdk ./tmp/deploy/images/qemux86-64/core-image-sato-qemux86-64.tar.bz2 test-nfs
                     </literallayout>
                     </para></listitem>
                 <listitem><para>
@@ -310,7 +310,7 @@
                     Here is an example using the <filename>qemux86</filename>
                     image:
                     <literallayout class='monospaced'>
-     runqemu qemux86 ./test-nfs
+     runqemu qemux86-64 ./test-nfs
                     </literallayout>
                     </para></listitem>
             </orderedlist>

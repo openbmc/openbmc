@@ -1,4 +1,4 @@
-From 9473d29843579802e96b0293a3e953fed93de82c Mon Sep 17 00:00:00 2001
+From edda20fb5a6e88548f85e39d34d6c074306e15bc Mon Sep 17 00:00:00 2001
 From: Paul Gortmaker <paul.gortmaker@windriver.com>
 Date: Tue, 9 Jun 2015 11:22:00 -0400
 Subject: [PATCH] bind: ensure searching for json headers searches sysroot
@@ -27,15 +27,16 @@ to make use of the combination some day.
 
 Upstream-Status: Inappropriate [OE Specific]
 Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
+
 ---
- configure.in | 2 +-
+ configure.ac | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Index: bind-9.11.3/configure.in
-===================================================================
---- bind-9.11.3.orig/configure.in
-+++ bind-9.11.3/configure.in
-@@ -2574,7 +2574,7 @@ case "$use_libjson" in
+diff --git a/configure.ac b/configure.ac
+index 17392fd..e85a5c6 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2449,7 +2449,7 @@ case "$use_libjson" in
  		libjson_libs=""
  		;;
  	auto|yes)

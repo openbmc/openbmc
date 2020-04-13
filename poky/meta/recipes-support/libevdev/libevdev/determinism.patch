@@ -1,0 +1,34 @@
+The order of dict values is not deterministic leading to differing header file generation.
+Sort to remove this inconsistency.
+
+RP 2020/2/7
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+Upstream-Status: Pending
+
+Index: a/libevdev/make-event-names.py
+===================================================================
+--- a/libevdev/make-event-names.py
++++ b/libevdev/make-event-names.py
+@@ -67,10 +67,10 @@ def print_bits(bits, prefix):
+ 	if  not hasattr(bits, prefix):
+ 		return
+ 	print("static const char * const %s_map[%s_MAX + 1] = {" % (prefix, prefix.upper()))
+-	for val, name in list(getattr(bits, prefix).items()):
++	for val, name in sorted(list(getattr(bits, prefix).items())):
+ 		print("	[%s] = \"%s\"," % (name, name))
+ 	if prefix == "key":
+-		for val, name in list(getattr(bits, "btn").items()):
++		for val, name in sorted(list(getattr(bits, "btn").items())):
+ 			print("	[%s] = \"%s\"," % (name, name))
+ 	print("};")
+ 	print("")
+@@ -111,7 +111,7 @@ def print_lookup(bits, prefix):
+ 	if not hasattr(bits, prefix):
+ 		return
+ 
+-	names = list(getattr(bits, prefix).items())
++	names = sorted(list(getattr(bits, prefix).items()))
+ 	if prefix == "btn":
+ 		names = names + btn_additional;
+ 

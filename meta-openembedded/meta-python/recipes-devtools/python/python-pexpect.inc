@@ -4,8 +4,10 @@ SECTION = "devel/python"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=1c7a725251880af8c6a148181665385b"
 
-SRC_URI[md5sum] = "ed003242cbf308aee1b1eaecdef59e43"
-SRC_URI[sha256sum] = "9e2c1fd0e6ee3a49b28f95d4b33bc389c89b20af6a1255906e90ff1262ce62eb"
+SRC_URI += "file://0001-FSM.py-change-shebang-from-python-to-python3.patch"
+
+SRC_URI[md5sum] = "153eb25184249d6a85fde9acf4804085"
+SRC_URI[sha256sum] = "fc65a43959d153d0114afe13997d439c22823a27cefceb5ff35c2178c6784c0c"
 
 UPSTREAM_CHECK_URI = "https://pypi.python.org/pypi/pexpect"
 

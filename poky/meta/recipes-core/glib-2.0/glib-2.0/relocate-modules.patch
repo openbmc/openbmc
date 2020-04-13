@@ -1,4 +1,4 @@
-From 6325bf4e8a2f569c55c8e1a36b9439d3566f98f6 Mon Sep 17 00:00:00 2001
+From 8c623acdbea3ecc2812bbaafcfc892758fa978da Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Fri, 11 Mar 2016 15:35:55 +0000
 Subject: [PATCH] glib-2.0: relocate the GIO module directory for native builds

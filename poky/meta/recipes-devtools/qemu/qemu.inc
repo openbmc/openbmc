@@ -27,13 +27,21 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://0008-linux-user-Fix-webkitgtk-hangs-on-32-bit-x86-target.patch \
            file://0009-Fix-webkitgtk-builds.patch \
            file://0010-configure-Add-pkg-config-handling-for-libgcrypt.patch \
+           file://0011-hw-i386-pc-fix-regression-in-parsing-vga-cmdline-par.patch \
            file://CVE-2019-15890.patch \
-           file://CVE-2019-12068.patch \
-           "
+           file://CVE-2020-1711.patch \
+           file://CVE-2020-7039-1.patch \
+           file://CVE-2020-7039-2.patch \
+           file://CVE-2020-7039-3.patch \
+           file://0001-Add-enable-disable-udev.patch \
+	   file://CVE-2020-7211.patch \
+	   file://0001-qemu-Do-not-include-file-if-not-exists.patch \
+           file://CVE-2020-11102.patch \
+	   "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 
-SRC_URI[md5sum] = "cdf2b5ca52b9abac9bacb5842fa420f8"
-SRC_URI[sha256sum] = "656e60218689bdeec69903087fd7582d5d3e72238d02f4481d8dc6d79fd909c6"
+SRC_URI[md5sum] = "278eeb294e4b497e79af7a57e660cb9a"
+SRC_URI[sha256sum] = "d3481d4108ce211a053ef15be69af1bdd9dde1510fda80d92be0f6c3e98768f0"
 
 COMPATIBLE_HOST_mipsarchn32 = "null"
 COMPATIBLE_HOST_mipsarchn64 = "null"
@@ -55,10 +63,12 @@ do_install_ptest() {
 	# Don't check the file genreated by configure
 	sed -i -e '/wildcard config-host.mak/d' \
 	       -e '$ {/endif/d}' ${D}${PTEST_PATH}/tests/Makefile.include
+        sed -i -e 's,${HOSTTOOLS_DIR}/python3,${bindir}/python3,' \
+            ${D}/${PTEST_PATH}/tests/qemu-iotests/common.env 
 }
 
 # QEMU_TARGETS is overridable variable
-QEMU_TARGETS ?= "arm aarch64 i386 mips mipsel mips64 mips64el ppc ppc64 riscv32 riscv64 sh4 x86_64"
+QEMU_TARGETS ?= "arm aarch64 i386 mips mipsel mips64 mips64el ppc ppc64 ppc64le riscv32 riscv64 sh4 x86_64"
 
 EXTRA_OECONF = " \
     --prefix=${prefix} \
@@ -75,6 +85,8 @@ EXTRA_OECONF = " \
     --disable-strip \
     --disable-werror \
     --extra-cflags='${CFLAGS}' \
+    --with-git=/bin/false \
+    --disable-git-update \
     ${PACKAGECONFIG_CONFARGS} \
     "
 
@@ -135,7 +147,7 @@ PACKAGECONFIG[sdl] = "--enable-sdl,--disable-sdl,libsdl2"
 PACKAGECONFIG[virtfs] = "--enable-virtfs --enable-attr,--disable-virtfs,libcap attr,"
 PACKAGECONFIG[aio] = "--enable-linux-aio,--disable-linux-aio,libaio,"
 PACKAGECONFIG[xfs] = "--enable-xfsctl,--disable-xfsctl,xfsprogs,"
-PACKAGECONFIG[xen] = "--enable-xen,--disable-xen,xen,xen-libxenstore xen-libxenctrl xen-libxenguest"
+PACKAGECONFIG[xen] = "--enable-xen,--disable-xen,xen-tools,xen-tools-libxenstore xen-tools-libxenctrl xen-tools-libxenguest"
 PACKAGECONFIG[vnc-sasl] = "--enable-vnc --enable-vnc-sasl,--disable-vnc-sasl,cyrus-sasl,"
 PACKAGECONFIG[vnc-jpeg] = "--enable-vnc --enable-vnc-jpeg,--disable-vnc-jpeg,jpeg,"
 PACKAGECONFIG[vnc-png] = "--enable-vnc --enable-vnc-png,--disable-vnc-png,libpng,"
@@ -165,6 +177,10 @@ PACKAGECONFIG[spice] = "--enable-spice,--disable-spice,spice"
 # usbredir will be in meta-networking layer
 PACKAGECONFIG[usb-redir] = "--enable-usb-redir,--disable-usb-redir,usbredir"
 PACKAGECONFIG[snappy] = "--enable-snappy,--disable-snappy,snappy"
+PACKAGECONFIG[glusterfs] = "--enable-glusterfs,--disable-glusterfs"
+PACKAGECONFIG[xkbcommon] = "--enable-xkbcommon,--disable-xkbcommon,libxkbcommon"
+PACKAGECONFIG[libudev] = "--enable-libudev,--disable-libudev,eudev"
+PACKAGECONFIG[libxml2] = "--enable-libxml2,--disable-libxml2,libxml2"
 
 INSANE_SKIP_${PN} = "arch"
 

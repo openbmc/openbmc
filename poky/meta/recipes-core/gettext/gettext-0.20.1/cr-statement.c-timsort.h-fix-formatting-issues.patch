@@ -1,0 +1,71 @@
+From f6245ef5530fc37a6243e798df34162fbbeab6f0 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Sun, 19 Feb 2017 23:32:46 -0800
+Subject: [PATCH] cr-statement.c/timsort.h: fix formatting issues
+
+Fixed when compile with "-Wformat -Wformat-security -Werror=format-security":
+| gettext-tools/gnulib-lib/libcroco/cr-statement.c: In function 'cr_statement_dump_charset':
+| gettext-tools/gnulib-lib/libcroco/cr-statement.c:2661:17: error: format not a string literal and no format arguments [-Werror=format-security]
+|                  fprintf (a_fp, str) ;
+
+And:
+gettext-tools/gnulib-lib/libxml/timsort.h:326:80: warning: format '%lu' expects argument of type 'long unsigned int', but argument 3 has type 'unsigned int' [-Wformat=]
+       fprintf(stderr, "Error allocating temporary storage for tim sort: need %lu bytes", sizeof(SORT_TYPE) * new_size);
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+
+---
+ libtextstyle/lib/libcroco/cr-statement.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/libtextstyle/lib/libcroco/cr-statement.c b/libtextstyle/lib/libcroco/cr-statement.c
+index 617520f..100104b 100644
+--- a/libtextstyle/lib/libcroco/cr-statement.c
++++ b/libtextstyle/lib/libcroco/cr-statement.c
+@@ -2607,7 +2607,7 @@ cr_statement_dump_ruleset (CRStatement * a_this, FILE * a_fp, glong a_indent)
+         g_return_if_fail (a_fp && a_this);
+         str = cr_statement_ruleset_to_string (a_this, a_indent);
+         if (str) {
+-                fprintf (a_fp, str);
++                fprintf (a_fp, "%s", str);
+                 g_free (str);
+                 str = NULL;
+         }
+@@ -2658,7 +2658,7 @@ cr_statement_dump_charset (CRStatement * a_this, FILE * a_fp, gulong a_indent)
+         str = cr_statement_charset_to_string (a_this,
+                                               a_indent) ;
+         if (str) {
+-                fprintf (a_fp, str) ;
++                fprintf (a_fp, "%s", str) ;
+                 g_free (str) ;
+                 str = NULL ;
+         }
+@@ -2685,7 +2685,7 @@ cr_statement_dump_page (CRStatement * a_this, FILE * a_fp, gulong a_indent)
+ 
+         str = cr_statement_at_page_rule_to_string (a_this, a_indent) ;
+         if (str) {
+-                fprintf (a_fp, str);
++                fprintf (a_fp, "%s", str);
+                 g_free (str) ;
+                 str = NULL ; 
+         }
+@@ -2711,7 +2711,7 @@ cr_statement_dump_media_rule (CRStatement * a_this,
+ 
+         str = cr_statement_media_rule_to_string (a_this, a_indent) ;
+         if (str) {
+-                fprintf (a_fp, str) ;
++                fprintf (a_fp, "%s", str) ;
+                 g_free (str) ;
+                 str = NULL ;
+         }
+@@ -2737,7 +2737,7 @@ cr_statement_dump_import_rule (CRStatement * a_this, FILE * a_fp,
+ 
+         str = cr_statement_import_rule_to_string (a_this, a_indent) ;
+         if (str) {
+-                fprintf (a_fp, str) ;
++                fprintf (a_fp, "%s", str) ;
+                 g_free (str) ;
+                 str = NULL ;
+         }

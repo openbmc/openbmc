@@ -10,8 +10,6 @@ Signed-off-by: Baptiste Durand <baptiste.durand@gmail.com>
  configure.ac | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/configure.ac b/configure.ac
-index f343d21..a556b33 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -14,7 +14,7 @@
@@ -23,12 +21,12 @@ index f343d21..a556b33 100644
  #LT_INIT
  
  AC_CANONICAL_TARGET
-@@ -28,7 +28,7 @@ m4_ifdef([AC_USE_SYSTEM_EXTENSIONS], [AC_USE_SYSTEM_EXTENSIONS])
+@@ -28,7 +28,7 @@ m4_ifdef([AC_USE_SYSTEM_EXTENSIONS], [AC
  
  AM_ICONV
  AM_GNU_GETTEXT([external])
 -AM_GNU_GETTEXT_VERSION(0.18)
-+AM_GNU_GETTEXT_VERSION(0.19)
++AM_GNU_GETTEXT_VERSION(0.20)
  
  # Checks for programs.
  AC_PROG_AWK

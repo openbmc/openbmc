@@ -1,0 +1,39 @@
+From 78247d478cec254bad27f4ed97b532f4f54bf1b0 Mon Sep 17 00:00:00 2001
+From: Pierre-Jean Texier <pjtexier@koncepto.io>
+Date: Thu, 23 Jan 2020 19:14:40 +0100
+Subject: [PATCH 1/2] zck.h: fix build on musl
+
+The ssize_t type requires the <sys/types.h> header. This fixes build with musl
+libc:
+
+include/zck.h:68:1: error: unknown type name 'ssize_t'; did you mean 'size_t'?
+   68 | ssize_t zck_read(zckCtx *zck, char *dst, size_t dst_size)
+      | ^~~~~~~
+      | size_t
+include/zck.h:81:1: error: unknown type name 'ssize_t'; did you mean 'size_t'?
+   81 | ssize_t zck_write(zckCtx *zck, const char *src, const size_t src_size)
+      | ^~~~~~~
+      | size_t
+      
+Upstream-Status: Submitted [https://github.com/zchunk/zchunk/pull/23]
+
+Signed-off-by: Pierre-Jean Texier <pjtexier@koncepto.io>
+---
+ include/zck.h.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/zck.h.in b/include/zck.h.in
+index 91d2557..b847576 100644
+--- a/include/zck.h.in
++++ b/include/zck.h.in
+@@ -5,6 +5,7 @@
+ 
+ #include <stdlib.h>
+ #include <stdbool.h>
++#include <sys/types.h>
+ 
+ typedef enum zck_hash {
+     ZCK_HASH_SHA1,
+-- 
+2.7.4
+

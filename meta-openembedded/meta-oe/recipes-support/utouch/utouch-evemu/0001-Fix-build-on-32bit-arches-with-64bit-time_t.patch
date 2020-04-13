@@ -12,8 +12,8 @@ Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  src/evemu-impl.h |  5 +++++
- src/evemu.c      | 16 +++++++++-------
- 2 files changed, 14 insertions(+), 7 deletions(-)
+ src/evemu.c      | 20 ++++++++++++--------
+ 2 files changed, 17 insertions(+), 8 deletions(-)
 
 diff --git a/src/evemu-impl.h b/src/evemu-impl.h
 index acf2976..c08d861 100644
@@ -32,7 +32,7 @@ index acf2976..c08d861 100644
  #define EVPLAY_NBYTES	((EVPLAY_NBITS + 7) / 8)
  
 diff --git a/src/evemu.c b/src/evemu.c
-index 21187af..160c915 100644
+index 21187af..7489449 100644
 --- a/src/evemu.c
 +++ b/src/evemu.c
 @@ -363,7 +363,7 @@ int evemu_read(struct evemu_device *dev, FILE *fp)
@@ -55,16 +55,19 @@ index 21187af..160c915 100644
  	ev->type = type;
  	ev->code = code;
  	ev->value = value;
-@@ -411,12 +411,14 @@ int evemu_read_event_realtime(FILE *fp, struct input_event *ev,
+@@ -410,13 +411,16 @@ int evemu_read_event_realtime(FILE *fp, struct input_event *ev,
+ 		return ret;
  
  	if (evtime) {
- 		if (!evtime->tv_sec)
+-		if (!evtime->tv_sec)
 -			*evtime = ev->time;
 -		usec = 1000000L * (ev->time.tv_sec - evtime->tv_sec);
 -		usec += ev->time.tv_usec - evtime->tv_usec;
++		if (!evtime->tv_sec) {
 +			evtime->tv_sec = ev->input_event_sec;
 +			evtime->tv_usec = ev->input_event_usec;
-+		usec = 1000000L * (ev->input_event_sec - evtime->tv_sec);
++		}
++		usec = (ev->input_event_sec - evtime->tv_sec) * 1000000L;
 +		usec += ev->input_event_usec - evtime->tv_usec;
  		if (usec > 500) {
  			usleep(usec);

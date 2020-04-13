@@ -186,11 +186,11 @@ python do_addto_recipe_sysroot () {
     bb.build.exec_func("extend_recipe_sysroot", d)
 }
 addtask addto_recipe_sysroot after do_populate_sysroot
+do_addto_recipe_sysroot[deptask] = "do_populate_sysroot"
 
 inherit nopackages
 
 do_packagedata[stamp-extra-info] = ""
-do_populate_sysroot[stamp-extra-info] = ""
 
 USE_NLS = "no"
 

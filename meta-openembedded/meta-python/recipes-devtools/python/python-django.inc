@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=f09eb47206614a4954c51db8a94840fa"
 PYPI_PACKAGE = "Django"
 inherit pypi
 
-UPSTREAM_CHECK_REGEX = "(?P<pver>1(\.\d+)+)"
+UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)/"
 
 FILES_${PN} += "${datadir}/django"
 

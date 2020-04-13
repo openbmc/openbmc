@@ -1,12 +1,11 @@
-From 4149a7627a998731cc246d3f58a36808745d04c8 Mon Sep 17 00:00:00 2001
+From 14e2e74682db3bfcf057688f738fdd842a02ff2d Mon Sep 17 00:00:00 2001
 From: Carl Hurd <carl@Carls-MacBook-Pro.local>
 Date: Wed, 18 Jul 2018 09:04:32 -0400
 Subject: [PATCH] Fixed missed #ifndef for __mips_soft_float
 
 Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
----
 Upstream-Status: Submitted [https://github.com/libffi/libffi/pull/442]
-
+---
  src/mips/o32.S | 2 ++
  1 file changed, 2 insertions(+)
 
@@ -26,6 +25,3 @@ index 44e74cb..799139b 100644
  1:
  	# prepare arguments for ffi_closure_mips_inner_O32
  	REG_L	a0, 4($15)	 # cif 
--- 
-2.21.0
-

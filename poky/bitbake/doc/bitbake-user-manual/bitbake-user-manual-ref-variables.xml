@@ -539,6 +539,17 @@
             </glossdef>
         </glossentry>
 
+        <glossentry id='var-bb-BB_LOGCONFIG'><glossterm>BB_LOGCONFIG</glossterm>
+            <glossdef>
+                <para>
+                    Specifies the name of a config file that contains the user
+                    logging configuration. See
+                    <link linkend="logging">Logging</link> for additional
+                    information
+                </para>
+            </glossdef>
+        </glossentry>
+
         <glossentry id='var-bb-BB_LOGFMT'><glossterm>BB_LOGFMT</glossterm>
             <glossdef>
                 <para>
@@ -1780,7 +1791,7 @@
                 </para>
 
                 <para>
-                    Bitbake normally issues a warning when building two
+                    BitBake normally issues a warning when building two
                     different recipes where each provides the same output.
                     This scenario is usually something the user does not
                     want.

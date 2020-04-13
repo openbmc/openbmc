@@ -12,6 +12,8 @@ SRC_URI = "git://git.openwrt.org/project/relayd.git \
 SRCREV = "ad0b25ad74345d367c62311e14b279f5ccb8ef13"
 PV = "0.0.1+git${SRCPV}"
 
+UPSTREAM_CHECK_COMMITS = "1"
+
 S = "${WORKDIR}/git"
 
 inherit cmake

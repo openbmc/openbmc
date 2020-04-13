@@ -20,7 +20,7 @@ S = "${WORKDIR}/libxslt-${PV}"
 
 BINCONFIG = "${bindir}/xslt-config"
 
-inherit autotools pkgconfig binconfig-disabled lib_package
+inherit autotools pkgconfig binconfig-disabled lib_package multilib_header
 
 do_configure_prepend () {
 	# We don't DEPEND on binutils for ansidecl.h so ensure we don't use the header.
@@ -41,6 +41,10 @@ RREPLACES_${PN}-bin += "${PN}-utils"
 # This is only needed until libxml can load the relocated catalog itself
 do_install_append_class-native () {
     create_wrapper ${D}/${bindir}/xsltproc XML_CATALOG_FILES=${sysconfdir}/xml/catalog
+}
+
+do_install_append () {
+   oe_multilib_header libxslt/xsltconfig.h
 }
 
 FILES_${PN} += "${libdir}/libxslt-plugins"

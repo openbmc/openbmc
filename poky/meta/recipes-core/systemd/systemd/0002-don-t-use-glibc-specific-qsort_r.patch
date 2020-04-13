@@ -1,7 +1,7 @@
-From 1eb84534dea05d41afed1d898cba212ad7d310dd Mon Sep 17 00:00:00 2001
+From 3eb12a6ba0bce149717eaabeb1505d379b3d705a Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 13:41:41 +0800
-Subject: [PATCH 02/24] don't use glibc-specific qsort_r
+Subject: [PATCH] don't use glibc-specific qsort_r
 
 Upstream-Status: Inappropriate [musl specific]
 
@@ -10,14 +10,15 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
 [Rebased for v242]
 Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
+
 ---
- src/basic/sort-util.h              | 14 --------------
- src/libsystemd/sd-hwdb/hwdb-util.c | 19 ++++++++++++++-----
- src/shared/format-table.c          | 36 ++++++++++++++++++++++++------------
+ src/basic/sort-util.h              | 14 ------------
+ src/libsystemd/sd-hwdb/hwdb-util.c | 19 +++++++++++-----
+ src/shared/format-table.c          | 36 ++++++++++++++++++++----------
  3 files changed, 38 insertions(+), 31 deletions(-)
 
 diff --git a/src/basic/sort-util.h b/src/basic/sort-util.h
-index e029f8646e..27d68b341c 100644
+index e029f8646eb0..27d68b341cf3 100644
 --- a/src/basic/sort-util.h
 +++ b/src/basic/sort-util.h
 @@ -54,17 +54,3 @@ static inline void qsort_safe(void *base, size_t nmemb, size_t size, __compar_fn
@@ -39,7 +40,7 @@ index e029f8646e..27d68b341c 100644
 -                qsort_r_safe((p), (n), sizeof((p)[0]), (__compar_d_fn_t) _func_, userdata); \
 -        })
 diff --git a/src/libsystemd/sd-hwdb/hwdb-util.c b/src/libsystemd/sd-hwdb/hwdb-util.c
-index c83575c7c8..72f8f3a050 100644
+index d790e8fd0b19..42e0fd7c9b3c 100644
 --- a/src/libsystemd/sd-hwdb/hwdb-util.c
 +++ b/src/libsystemd/sd-hwdb/hwdb-util.c
 @@ -128,9 +128,13 @@ static void trie_free(struct trie *trie) {
@@ -83,10 +84,10 @@ index c83575c7c8..72f8f3a050 100644
  }
  
 diff --git a/src/shared/format-table.c b/src/shared/format-table.c
-index a5c0a99b08..d595cbe372 100644
+index 425013046491..33c1c5a12d43 100644
 --- a/src/shared/format-table.c
 +++ b/src/shared/format-table.c
-@@ -850,31 +850,33 @@ static int cell_data_compare(TableData *a, size_t index_a, TableData *b, size_t
+@@ -1164,31 +1164,33 @@ static int cell_data_compare(TableData *a, size_t index_a, TableData *b, size_t
          return CMP(index_a, index_b);
  }
  
@@ -130,7 +131,7 @@ index a5c0a99b08..d595cbe372 100644
          }
  
          /* Order identical lines by the order there were originally added in */
-@@ -1107,7 +1109,12 @@ int table_print(Table *t, FILE *f) {
+@@ -1690,7 +1692,12 @@ int table_print(Table *t, FILE *f) {
                  for (i = 0; i < n_rows; i++)
                          sorted[i] = i * t->n_columns;
  
@@ -144,7 +145,7 @@ index a5c0a99b08..d595cbe372 100644
          }
  
          if (t->display_map)
-@@ -1534,7 +1541,12 @@ int table_to_json(Table *t, JsonVariant **ret) {
+@@ -2236,7 +2243,12 @@ int table_to_json(Table *t, JsonVariant **ret) {
                  for (i = 0; i < n_rows; i++)
                          sorted[i] = i * t->n_columns;
  
@@ -158,6 +159,3 @@ index a5c0a99b08..d595cbe372 100644
          }
  
          if (t->display_map)
--- 
-2.11.0
-

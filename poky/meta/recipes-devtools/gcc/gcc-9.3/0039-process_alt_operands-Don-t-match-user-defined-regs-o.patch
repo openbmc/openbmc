@@ -1,0 +1,100 @@
+From e75bcc2ec4f1e7e081ce18713f0a25913ba15340 Mon Sep 17 00:00:00 2001
+From: Vladimir Makarov <vmakarov@redhat.com>
+Date: Wed, 10 Jul 2019 16:07:10 +0000
+Subject: [PATCH 39/39] process_alt_operands: Don't match user defined regs
+ only if they are early clobbers
+
+PR target/91102 (aarch64 ICE on Linux kernel with -Os starting with r270266)
+
+2019-07-10  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR target/91102
+	* lra-constraints.c (process_alt_operands): Don't match user
+	defined regs only if they are early clobbers.
+
+2019-07-10  Vladimir Makarov  <vmakarov@redhat.com>
+
+	PR target/91102
+	* gcc.target/aarch64/pr91102.c: New test.
+
+From-SVN: r273357
+Upstream-Status: Backport [https://github.com/gcc-mirror/gcc/commit/613caed2feb9cfc8158308670b59df3d031ec629]
+[takondra: dropped conflicting ChangeLog changes]
+Signed-off-by: Taras Kondratiuk <takondra@cisco.com>
+---
+ gcc/lra-constraints.c                      | 17 ++++++++++----
+ gcc/testsuite/gcc.target/aarch64/pr91102.c | 26 ++++++++++++++++++++++
+ 2 files changed, 39 insertions(+), 4 deletions(-)
+ create mode 100644 gcc/testsuite/gcc.target/aarch64/pr91102.c
+
+diff --git a/gcc/lra-constraints.c b/gcc/lra-constraints.c
+index cf33da8013e..6382dbf852b 100644
+--- a/gcc/lra-constraints.c
++++ b/gcc/lra-constraints.c
+@@ -2172,8 +2172,9 @@ process_alt_operands (int only_alternative)
+ 		    else
+ 		      {
+ 			/* Operands don't match.  If the operands are
+-			   different user defined explicit hard registers,
+-			   then we cannot make them match.  */
++			   different user defined explicit hard
++			   registers, then we cannot make them match
++			   when one is early clobber operand.  */
+ 			if ((REG_P (*curr_id->operand_loc[nop])
+ 			     || SUBREG_P (*curr_id->operand_loc[nop]))
+ 			    && (REG_P (*curr_id->operand_loc[m])
+@@ -2192,9 +2193,17 @@ process_alt_operands (int only_alternative)
+ 				&& REG_P (m_reg)
+ 				&& HARD_REGISTER_P (m_reg)
+ 				&& REG_USERVAR_P (m_reg))
+-			      break;
++			      {
++				int i;
++				
++				for (i = 0; i < early_clobbered_regs_num; i++)
++				  if (m == early_clobbered_nops[i])
++				    break;
++				if (i < early_clobbered_regs_num
++				    || early_clobber_p)
++				  break;
++			      }
+ 			  }
+-
+ 			/* Both operands must allow a reload register,
+ 			   otherwise we cannot make them match.  */
+ 			if (curr_alt[m] == NO_REGS)
+diff --git a/gcc/testsuite/gcc.target/aarch64/pr91102.c b/gcc/testsuite/gcc.target/aarch64/pr91102.c
+new file mode 100644
+index 00000000000..70b99045a48
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/aarch64/pr91102.c
+@@ -0,0 +1,26 @@
++/* PR target/91102 */
++/* { dg-do compile } */
++/* { dg-options "-O2" } */
++
++int
++foo (long d, long l)
++{
++  register long e asm ("x1") = d;
++  register long f asm("x2") = l;
++  asm ("" : : "r" (e), "r" (f));
++  return 3;
++}
++
++struct T { int i; int j; };
++union S { long h; struct T t; };
++
++void
++bar (union S b)
++{
++  while (1)
++    {
++      union S c = b;
++      c.t.j++;
++      b.h = foo (b.h, c.h);
++    }
++}
+-- 
+2.25.1
+

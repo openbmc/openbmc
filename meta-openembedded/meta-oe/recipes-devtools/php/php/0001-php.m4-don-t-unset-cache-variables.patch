@@ -1,0 +1,39 @@
+php.m4: don't unset cache variables
+
+Unsetting prevents cache variable from being passed to configure.
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+
+update this patch to 7.4.4, acinclude.m4 move to build/php.m4
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ build/php.m4 | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/build/php.m4 b/build/php.m4
+index 5c45d13..218ec47 100644
+--- a/build/php.m4
++++ b/build/php.m4
+@@ -1587,8 +1587,6 @@ dnl PHP_CHECK_FUNC_LIB
+ dnl
+ AC_DEFUN([PHP_CHECK_FUNC_LIB],[
+   ifelse($2,,:,[
+-  unset ac_cv_lib_$2[]_$1
+-  unset ac_cv_lib_$2[]___$1
+   unset found
+   AC_CHECK_LIB($2, $1, [found=yes], [
+     AC_CHECK_LIB($2, __$1, [found=yes], [found=no])
+@@ -1620,8 +1618,6 @@ dnl and as a fall back in the specified library. Defines HAVE_func and
+ dnl HAVE_library if found and adds the library to LIBS.
+ dnl
+ AC_DEFUN([PHP_CHECK_FUNC],[
+-  unset ac_cv_func_$1
+-  unset ac_cv_func___$1
+   unset found
+ 
+   AC_CHECK_FUNC($1, [found=yes],[ AC_CHECK_FUNC(__$1,[found=yes],[found=no]) ])
+-- 
+2.7.4
+

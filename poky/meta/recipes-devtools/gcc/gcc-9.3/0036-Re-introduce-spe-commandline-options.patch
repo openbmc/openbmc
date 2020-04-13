@@ -1,0 +1,41 @@
+From dc23cabac6a7b2ca85b02d2a58a8916c98f382e0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 6 Jun 2018 12:10:22 -0700
+Subject: [PATCH 36/39] Re-introduce spe commandline options
+
+This should ensure that we keep accepting
+spe options
+
+Upstream-Status: Inappropriate [SPE port is removed from rs600 port]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gcc/config/rs6000/rs6000.opt | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/gcc/config/rs6000/rs6000.opt b/gcc/config/rs6000/rs6000.opt
+index f4b5c91e11f..69869350fce 100644
+--- a/gcc/config/rs6000/rs6000.opt
++++ b/gcc/config/rs6000/rs6000.opt
+@@ -345,6 +345,18 @@ mdebug=
+ Target RejectNegative Joined
+ -mdebug=	Enable debug output.
+ 
++mspe
++Target Var(rs6000_spe) Save
++Generate SPE SIMD instructions on E500.
++
++mabi=spe
++Target RejectNegative Var(rs6000_spe_abi) Save
++Use the SPE ABI extensions.
++
++mabi=no-spe
++Target RejectNegative Var(rs6000_spe_abi, 0)
++Do not use the SPE ABI extensions.
++
+ mabi=altivec
+ Target RejectNegative Var(rs6000_altivec_abi) Save
+ Use the AltiVec ABI extensions.
+-- 
+2.25.1
+

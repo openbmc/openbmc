@@ -622,3 +622,47 @@ BBLAYERS += "/home/user/otherpath/layer6"
                                  ['/home/user/otherpath/layer6', '/home/user/path/layer3'], ['/home/user/path/layer1', '/home/user/path/layer4', '/home/user/path/layer7'],
                                  ['/home/user/path/layer3'],
                                  ['/home/user/path/layer7'])
+
+
+class GetReferencedVars(unittest.TestCase):
+    def setUp(self):
+        self.d = bb.data.init()
+
+    def check_referenced(self, expression, expected_layers):
+        vars = bb.utils.get_referenced_vars(expression, self.d)
+
+        # Do the easy check first - is every variable accounted for?
+        expected_vars = set.union(set(), *expected_layers)
+        got_vars = set(vars)
+        self.assertSetEqual(got_vars, expected_vars)
+
+        # Now test the order of the layers
+        start = 0
+        for i, expected_layer in enumerate(expected_layers):
+            got_layer = set(vars[start:len(expected_layer)+start])
+            start += len(expected_layer)
+            self.assertSetEqual(got_layer, expected_layer)
+
+    def test_no_vars(self):
+        self.check_referenced("", [])
+        self.check_referenced(" ", [])
+        self.check_referenced(" no vars here! ", [])
+
+    def test_single_layer(self):
+        self.check_referenced("${VAR}", [{"VAR"}])
+        self.check_referenced("${VAR} ${VAR}", [{"VAR"}])
+
+    def test_two_layer(self):
+        self.d.setVar("VAR", "${B}")
+        self.check_referenced("${VAR}", [{"VAR"}, {"B"}])
+        self.check_referenced("${@d.getVar('VAR')}", [{"VAR"}, {"B"}])
+
+    def test_more_complicated(self):
+        self.d["SRC_URI"] = "${QT_GIT}/${QT_MODULE}.git;name=${QT_MODULE};${QT_MODULE_BRANCH_PARAM};protocol=${QT_GIT_PROTOCOL}"
+        self.d["QT_GIT"] = "git://code.qt.io/${QT_GIT_PROJECT}"
+        self.d["QT_MODULE_BRANCH_PARAM"] = "branch=${QT_MODULE_BRANCH}"
+        self.d["QT_MODULE"] = "${BPN}"
+        self.d["BPN"] = "something to do with ${PN} and ${SPECIAL_PKGSUFFIX}"
+
+        layers = [{"SRC_URI"}, {"QT_GIT", "QT_MODULE", "QT_MODULE_BRANCH_PARAM", "QT_GIT_PROTOCOL"}, {"QT_GIT_PROJECT", "QT_MODULE_BRANCH", "BPN"}, {"PN", "SPECIAL_PKGSUFFIX"}]
+        self.check_referenced("${SRC_URI}", layers)

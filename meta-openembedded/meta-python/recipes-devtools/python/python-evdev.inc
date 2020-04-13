@@ -5,10 +5,10 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=18debddbb3f52c661a129724a883a8e2"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/python-evdev:"
 
-SRC_URI += " file://0001-Fix-build-on-32bit-arches-with-64bit-time_t.patch"
+SRC_URI = "${PYPI_SRC_URI}"
 
-SRC_URI[md5sum] = "53e440943dfa2514f95b3c448d6a36cb"
-SRC_URI[sha256sum] = "b03f5e1be5b4a5327494a981b831d251a142b09e8778eda1a8b53eba91100166"
+SRC_URI[md5sum] = "05f9e900d6e11e1674475d2dd2668f0d"
+SRC_URI[sha256sum] = "b1c649b4fed7252711011da235782b2c260b32e004058d62473471e5cd30634d"
 
 do_compile_prepend() {
     rm -rf ${S}/evdev/ecodes.c

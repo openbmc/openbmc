@@ -19,8 +19,9 @@ RDEPENDS_packagegroup-meta-webserver = "\
 "
 
 RDEPENDS_packagegroup-meta-webserver-http = "\
-    nginx monkey cherokee hiawatha nostromo apache-websocket \
+    nginx monkey hiawatha nostromo apache-websocket \
     apache2 sthttpd \
+    ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "cherokee", "", d)} \
     "
 
 RDEPENDS_packagegroup-meta-webserver-php = "\

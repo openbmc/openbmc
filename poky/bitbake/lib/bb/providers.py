@@ -92,11 +92,11 @@ def preferredVersionMatch(pe, pv, pr, preferred_e, preferred_v, preferred_r):
     Check if the version pe,pv,pr is the preferred one.
     If there is preferred version defined and ends with '%', then pv has to start with that version after removing the '%'
     """
-    if (pr == preferred_r or preferred_r == None):
-        if (pe == preferred_e or preferred_e == None):
+    if pr == preferred_r or preferred_r is None:
+        if pe == preferred_e or preferred_e is None:
             if preferred_v == pv:
                 return True
-            if preferred_v != None and preferred_v.endswith('%') and pv.startswith(preferred_v[:len(preferred_v)-1]):
+            if preferred_v is not None and preferred_v.endswith('%') and pv.startswith(preferred_v[:len(preferred_v)-1]):
                 return True
     return False
 

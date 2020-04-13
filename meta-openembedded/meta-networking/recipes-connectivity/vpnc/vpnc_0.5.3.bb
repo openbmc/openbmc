@@ -28,6 +28,8 @@ PACKAGECONFIG ?= "gnutls"
 PACKAGECONFIG[gnutls] = ",,gnutls"
 PACKAGECONFIG[openssl] = ",,openssl"
 
+PACKAGES =+ "${PN}-script"
+
 S = "${WORKDIR}/git"
 
 inherit perlnative pkgconfig
@@ -54,6 +56,8 @@ vpnc_sysroot_preprocess () {
     install -m 755 ${D}${sysconfdir}/vpnc/vpnc-script ${SYSROOT_DESTDIR}${sysconfdir}/vpnc
 }
 
+FILES_${PN}-script = "${sysconfdir}/vpnc/vpnc-script"
+
 CONFFILES_${PN} = "${sysconfdir}/vpnc/default.conf"
-RDEPENDS_${PN} = "perl-module-io-file"
+RDEPENDS_${PN} = "perl-module-io-file ${PN}-script"
 RRECOMMENDS_${PN} = "kernel-module-tun"

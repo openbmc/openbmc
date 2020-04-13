@@ -43,7 +43,7 @@ do_install () {
 
 INHIBIT_DEFAULT_DEPS = "1"
 ALLOW_EMPTY_${PN} = "1"
-DEPENDS = "gcc-runtime virtual/${TARGET_PREFIX}gcc"
+DEPENDS = "virtual/crypt gcc-runtime virtual/${TARGET_PREFIX}gcc"
 
 # used to fix ../../../../../../../../../work-shared/gcc-8.3.0-r0/gcc-8.3.0/libsanitizer/libbacktrace/../../libbacktrace/elf.c:772:21: error: 'st.st_mode' may be used uninitialized in this function [-Werror=maybe-uninitialized]
 DEBUG_OPTIMIZATION_append = " -Wno-error"

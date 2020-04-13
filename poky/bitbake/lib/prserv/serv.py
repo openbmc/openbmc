@@ -292,10 +292,9 @@ class PRServer(SimpleXMLRPCServer):
         logger.addHandler(streamhandler)
 
         # write pidfile
-        pid = str(os.getpid()) 
-        pf = open(self.pidfile, 'w')
-        pf.write("%s\n" % pid)
-        pf.close()
+        pid = str(os.getpid())
+        with open(self.pidfile, 'w') as pf:
+            pf.write("%s\n" % pid)
 
         self.work_forever()
         self.delpid()
@@ -353,9 +352,8 @@ def start_daemon(dbfile, host, port, logfile):
     ip = socket.gethostbyname(host)
     pidfile = PIDPREFIX % (ip, port)
     try:
-        pf = open(pidfile,'r')
-        pid = int(pf.readline().strip())
-        pf.close()
+        with open(pidfile) as pf:
+            pid = int(pf.readline().strip())
     except IOError:
         pid = None
 
@@ -449,29 +447,35 @@ class PRServiceConfigError(Exception):
 def auto_start(d):
     global singleton
 
-    # Shutdown any existing PR Server
-    auto_shutdown()
-
     host_params = list(filter(None, (d.getVar('PRSERV_HOST') or '').split(':')))
     if not host_params:
+        # Shutdown any existing PR Server
+        auto_shutdown()
         return None
 
     if len(host_params) != 2:
+        # Shutdown any existing PR Server
+        auto_shutdown()
         logger.critical('\n'.join(['PRSERV_HOST: incorrect format',
                 'Usage: PRSERV_HOST = "<hostname>:<port>"']))
         raise PRServiceConfigError
 
-    if is_local_special(host_params[0], int(host_params[1])) and not singleton:
+    if is_local_special(host_params[0], int(host_params[1])):
         import bb.utils
         cachedir = (d.getVar("PERSISTENT_DIR") or d.getVar("CACHE"))
         if not cachedir:
             logger.critical("Please set the 'PERSISTENT_DIR' or 'CACHE' variable")
             raise PRServiceConfigError
-        bb.utils.mkdirhier(cachedir)
         dbfile = os.path.join(cachedir, "prserv.sqlite3")
         logfile = os.path.join(cachedir, "prserv.log")
-        singleton = PRServSingleton(os.path.abspath(dbfile), os.path.abspath(logfile), ("localhost",0))
-        singleton.start()
+        if singleton:
+            if singleton.dbfile != dbfile:
+               # Shutdown any existing PR Server as doesn't match config
+               auto_shutdown()
+        if not singleton:
+            bb.utils.mkdirhier(cachedir)
+            singleton = PRServSingleton(os.path.abspath(dbfile), os.path.abspath(logfile), ("localhost",0))
+            singleton.start()
     if singleton:
         host, port = singleton.getinfo()
     else:

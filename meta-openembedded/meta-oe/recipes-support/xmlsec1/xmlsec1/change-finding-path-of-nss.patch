@@ -16,12 +16,8 @@ diff --git a/configure.ac b/configure.ac
 index 951b3eb..1fdeb0f 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -866,10 +866,10 @@ MOZILLA_MIN_VERSION="1.4"
- NSS_CRYPTO_LIB="$XMLSEC_PACKAGE-nss"
- NSPR_PACKAGE=mozilla-nspr
- NSS_PACKAGE=mozilla-nss
--NSPR_INCLUDE_MARKER="nspr/nspr.h"
-+NSPR_INCLUDE_MARKER="nspr.h"
+@@ -866,7 +866,7 @@ MOZILLA_MIN_VERSION="1.4"
+ NSPR_INCLUDE_MARKER="nspr/nspr.h"
  NSPR_LIB_MARKER="libnspr4$shrext"
  NSPR_LIBS_LIST="-lnspr4 -lplds4 -lplc4"
 -NSS_INCLUDE_MARKER="nss/nss.h"
@@ -29,39 +25,3 @@ index 951b3eb..1fdeb0f 100644
  NSS_LIB_MARKER="libnss3$shrext"
  NSS_LIBS_LIST="-lnss3 -lsmime3"
  
-@@ -898,24 +898,24 @@ fi
- dnl Priority 1: User specifies the path to installation
- if test "z$NSPR_FOUND" = "zno" -a "z$with_nspr" != "z" -a "z$with_nspr" != "zyes" ; then
-     AC_MSG_CHECKING(for nspr library installation in "$with_nspr" folder)
--    if test -f "$with_nspr/include/$NSPR_INCLUDE_MARKER" -a -f "$with_nspr/lib/$NSPR_LIB_MARKER" ; then
--        NSPR_INCLUDE_PATH="$with_nspr/include"
--        NSPR_LIB_PATH="$with_nspr/lib"
-+    if test -f "$with_nspr/usr/include/$NSPR_INCLUDE_MARKER" -a -f "$with_nspr/${libdir}/$NSPR_LIB_MARKER" ; then
-+        NSPR_INCLUDE_PATH="$with_nspr/usr/include"
-+        NSPR_LIB_PATH="$with_nspr/${libdir}"
-         NSPR_FOUND="yes"
-         AC_MSG_RESULT([yes])
-     else
--        AC_MSG_ERROR([not found: "$with_nspr/include/$NSPR_INCLUDE_MARKER" and/or "$with_nspr/lib/$NSPR_LIB_MARKER" files don't exist), typo?])
-+        AC_MSG_ERROR([not found: "$with_nspr/usr/include/$NSPR_INCLUDE_MARKER" and/or "$with_nspr/${libdir}/$NSPR_LIB_MARKER" files don't exist), typo?])
-     fi
- fi
- if test "z$NSS_FOUND" = "zno" -a "z$with_nss" != "z" -a "z$with_nss" != "zyes" ; then
-     AC_MSG_CHECKING(for nss library installation in "$with_nss" folder)
--    if test -f "$with_nss/include/$NSS_INCLUDE_MARKER" -a -f "$with_nss/lib/$NSS_LIB_MARKER" ; then
--        NSS_INCLUDE_PATH="$with_nss/include"
--        NSS_LIB_PATH="$with_nss/lib"
-+    if test -f "$with_nss/usr/include/$NSS_INCLUDE_MARKER" -a -f "$with_nss/${libdir}/$NSS_LIB_MARKER" ; then
-+        NSS_INCLUDE_PATH="$with_nss/usr/include/nss3"
-+        NSS_LIB_PATH="$with_nss/${libdir}"
-         NSS_FOUND="yes"
-         AC_MSG_RESULT([yes])
-     else
--        AC_MSG_ERROR([not found: "$with_nss/include/$NSS_INCLUDE_MARKER" and/or "$with_nss/lib/$NSS_LIB_MARKER" files don't exist), typo?])
-+        AC_MSG_ERROR([not found: "$with_nss/usr/include/$NSS_INCLUDE_MARKER" and/or "$with_nss/${libdir}/$NSS_LIB_MARKER" files don't exist), typo?])
-     fi
- fi
- 
--- 
-2.7.4
-

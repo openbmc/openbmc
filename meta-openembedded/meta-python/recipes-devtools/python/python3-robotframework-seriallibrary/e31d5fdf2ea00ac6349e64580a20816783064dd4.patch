@@ -1,0 +1,45 @@
+From e31d5fdf2ea00ac6349e64580a20816783064dd4 Mon Sep 17 00:00:00 2001
+From: Hideki Takeoka <hideki.takeoka@smartfrog.com>
+Date: Sun, 25 Aug 2019 19:25:00 +0200
+Subject: [PATCH] Update setup.py for python3.7+ support
+
+---
+ setup.py                     | 9 +++++----
+ src/SerialLibrary/version.py | 3 +++
+ 2 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 4c34705..70bb1af 100644
+--- a/setup.py
++++ b/setup.py
+@@ -1,6 +1,5 @@
+ #!/usr/bin/env python
+ 
+-from imp import load_source
+ from os.path import abspath, dirname, join
+ from sys import platform
+ 
+@@ -18,9 +17,11 @@
+ 
+ 
+ CURDIR = dirname(abspath(__file__))
+-VERSION = load_source(
+-    'version', 'version',
+-    open(join(CURDIR, 'src', 'SerialLibrary', 'version.py'))).VERSION
++
++with open(join(CURDIR, 'src', 'SerialLibrary', 'version.py')) as f:
++    exec(f.read())
++    VERSION = get_version()
++
+ README = open(join(CURDIR, 'README.rst')).read()
+ CLASSIFIERS = '\n'.join(
+     map(' :: '.join, [
+diff --git a/src/SerialLibrary/version.py b/src/SerialLibrary/version.py
+index 6ce65c4..19831bc 100644
+--- a/src/SerialLibrary/version.py
++++ b/src/SerialLibrary/version.py
+@@ -1 +1,4 @@
+ VERSION = (0, 3, 1)
++
++def get_version():
++    return VERSION;

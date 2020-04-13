@@ -14,10 +14,10 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='CustomImageRecipe',
             fields=[
-                ('recipe_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='orm.Recipe')),
+                ('recipe_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='orm.Recipe', on_delete=models.CASCADE)),
                 ('last_updated', models.DateTimeField(default=None, null=True)),
-                ('base_recipe', models.ForeignKey(related_name='based_on_recipe', to='orm.Recipe')),
-                ('project', models.ForeignKey(to='orm.Project')),
+                ('base_recipe', models.ForeignKey(related_name='based_on_recipe', to='orm.Recipe', on_delete=models.CASCADE)),
+                ('project', models.ForeignKey(to='orm.Project', on_delete=models.CASCADE)),
             ],
             bases=('orm.recipe',),
         ),

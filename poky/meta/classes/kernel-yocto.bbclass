@@ -1,7 +1,23 @@
 # remove tasks that modify the source tree in case externalsrc is inherited
-SRCTREECOVEREDTASKS += "do_kernel_configme do_validate_branches do_kernel_configcheck do_kernel_checkout do_fetch do_unpack do_patch"
+SRCTREECOVEREDTASKS += "do_validate_branches do_kernel_configcheck do_kernel_checkout do_fetch do_unpack do_patch"
 PATCH_GIT_USER_EMAIL ?= "kernel-yocto@oe"
 PATCH_GIT_USER_NAME ?= "OpenEmbedded"
+
+# The distro or local.conf should set this, but if nobody cares...
+LINUX_KERNEL_TYPE ??= "standard"
+
+# KMETA ?= ""
+KBRANCH ?= "master"
+KMACHINE ?= "${MACHINE}"
+SRCREV_FORMAT ?= "meta_machine"
+
+# LEVELS:
+#   0: no reporting
+#   1: report options that are specified, but not in the final config
+#   2: report options that are not hardware related, but set by a BSP
+KCONF_AUDIT_LEVEL ?= "1"
+KCONF_BSP_AUDIT_LEVEL ?= "0"
+KMETA_AUDIT ?= "yes"
 
 # returns local (absolute) path names for all valid patches in the
 # src_uri
@@ -31,7 +47,7 @@ def find_sccs(d):
         base, ext = os.path.splitext(os.path.basename(s))
         if ext and ext in [".scc", ".cfg"]:
             sources_list.append(s)
-        elif base and base in 'defconfig':
+        elif base and 'defconfig' in base:
             sources_list.append(s)
 
     return sources_list
@@ -81,13 +97,6 @@ do_kernel_metadata() {
 		if [ -z "${EXTERNAL_KERNEL_TOOLS}" ]; then
 			PATH=${S}/scripts/util:${PATH}
 		fi
-	fi
-
-	machine_branch="${@ get_machine_branch(d, "${KBRANCH}" )}"
-	machine_srcrev="${SRCREV_machine}"
-	if [ -z "${machine_srcrev}" ]; then
-		# fallback to SRCREV if a non machine_meta tree is being built
-		machine_srcrev="${SRCREV}"
 	fi
 
 	# In a similar manner to the kernel itself:
@@ -182,6 +191,14 @@ do_kernel_metadata() {
 		if [ $? -ne 0 ]; then
 			bbfatal_log "Could not locate BSP definition for ${KMACHINE}/${LINUX_KERNEL_TYPE} and no defconfig was provided"
 		fi
+
+		# if the bsp definition has "define KMETA_EXTERNAL_BSP t",
+		# then we need to set a flag that will instruct the next
+		# steps to use the BSP as both configuration and patches.
+		grep -q KMETA_EXTERNAL_BSP $bsp_definition
+		if [ $? -eq 0 ]; then
+		    KMETA_EXTERNAL_BSPS="t"
+		fi
 	fi
 	meta_dir=$(kgit --meta)
 
@@ -193,6 +210,13 @@ do_kernel_metadata() {
 		if [ $? -ne 0 ]; then
 			bbfatal_log "Could not generate configuration queue for ${KMACHINE}."
 		fi
+	fi
+
+	# if KMETA_EXTERNAL_BSPS has been set, or it has been detected from
+	# the bsp definition, then we inject the bsp_definition into the
+	# patch phase below.  we'll piggy back on the sccs variable.
+	if [ -n "${KMETA_EXTERNAL_BSPS}" ]; then
+		sccs="${bsp_definition} ${sccs}"
 	fi
 
 	# run2: only generate patches for elements that have been passed on the SRC_URI
@@ -293,7 +317,7 @@ do_kernel_checkout() {
 }
 do_kernel_checkout[dirs] = "${S}"
 
-addtask kernel_checkout before do_kernel_metadata after do_unpack
+addtask kernel_checkout before do_kernel_metadata after do_symlink_kernsrc
 addtask kernel_metadata after do_validate_branches do_unpack before do_patch
 do_kernel_metadata[depends] = "kern-tools-native:do_populate_sysroot"
 do_validate_branches[depends] = "kern-tools-native:do_populate_sysroot"
@@ -301,10 +325,9 @@ do_validate_branches[depends] = "kern-tools-native:do_populate_sysroot"
 do_kernel_configme[depends] += "virtual/${TARGET_PREFIX}binutils:do_populate_sysroot"
 do_kernel_configme[depends] += "virtual/${TARGET_PREFIX}gcc:do_populate_sysroot"
 do_kernel_configme[depends] += "bc-native:do_populate_sysroot bison-native:do_populate_sysroot"
+do_kernel_configme[depends] += "kern-tools-native:do_populate_sysroot"
 do_kernel_configme[dirs] += "${S} ${B}"
 do_kernel_configme() {
-	set +e
-
 	# translate the kconfig_mode into something that merge_config.sh
 	# understands
 	case ${KCONFIG_MODE} in
@@ -330,13 +353,20 @@ do_kernel_configme() {
 		bbfatal_log "Could not find configuration queue (${meta_dir}/config.queue)"
 	fi
 
-	CFLAGS="${CFLAGS} ${TOOLCHAIN_OPTIONS}"	HOSTCC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}" HOSTCPP="${BUILD_CPP}" CC="${KERNEL_CC}" ARCH=${ARCH} merge_config.sh -O ${B} ${config_flags} ${configs} > ${meta_dir}/cfg/merge_config_build.log 2>&1
-	if [ $? -ne 0 ]; then
-		bbfatal_log "Could not configure ${KMACHINE}-${LINUX_KERNEL_TYPE}"
+	CFLAGS="${CFLAGS} ${TOOLCHAIN_OPTIONS}" HOSTCC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}" HOSTCPP="${BUILD_CPP}" CC="${KERNEL_CC}" LD="${KERNEL_LD}" ARCH=${ARCH} merge_config.sh -O ${B} ${config_flags} ${configs} > ${meta_dir}/cfg/merge_config_build.log 2>&1
+	if [ $? -ne 0 -o ! -f ${B}/.config ]; then
+		bberror "Could not generate a .config for ${KMACHINE}-${LINUX_KERNEL_TYPE}"
+		if [ ${KCONF_AUDIT_LEVEL} -gt 1 ]; then
+			bbfatal_log "`cat ${meta_dir}/cfg/merge_config_build.log`"
+		else
+			bbfatal_log "Details can be found at: ${S}/${meta_dir}/cfg/merge_config_build.log"
+		fi
 	fi
 
-	echo "# Global settings from linux recipe" >> ${B}/.config
-	echo "CONFIG_LOCALVERSION="\"${LINUX_VERSION_EXTENSION}\" >> ${B}/.config
+	if [ ! -z "${LINUX_VERSION_EXTENSION}" ]; then
+		echo "# Global settings from linux recipe" >> ${B}/.config
+		echo "CONFIG_LOCALVERSION="\"${LINUX_VERSION_EXTENSION}\" >> ${B}/.config
+	fi
 }
 
 addtask kernel_configme before do_configure after do_patch
@@ -355,6 +385,7 @@ python do_kernel_configcheck() {
 
     env = os.environ.copy()
     env['PATH'] = "%s:%s%s" % (d.getVar('PATH'), s, "/scripts/util/")
+    env['LD'] = "${KERNEL_LD}"
 
     try:
         configs = subprocess.check_output(['scc', '--configs', '-o', s + '/.kernel-meta'], env=env).decode('utf-8')
@@ -458,4 +489,15 @@ python () {
     # If diffconfig is available, ensure it runs after kernel_configme
     if 'do_diffconfig' in d:
         bb.build.addtask('do_diffconfig', None, 'do_kernel_configme', d)
+
+    externalsrc = d.getVar('EXTERNALSRC')
+    if externalsrc:
+        # If we deltask do_patch, do_kernel_configme is left without
+        # dependencies and runs too early
+        d.setVarFlag('do_kernel_configme', 'deps', (d.getVarFlag('do_kernel_configme', 'deps', False) or []) + ['do_unpack'])
 }
+
+# extra tasks
+addtask kernel_version_sanity_check after do_kernel_metadata do_kernel_checkout before do_compile
+addtask validate_branches before do_patch after do_kernel_checkout
+addtask kernel_configcheck after do_configure before do_compile

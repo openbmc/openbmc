@@ -8,7 +8,7 @@
 
 from django.core.management.base import BaseCommand
 
-from orm.models import LayerSource, Layer, Release, Layer_Version
+from orm.models import Layer, Release, Layer_Version
 from orm.models import LayerVersionDependency, Machine, Recipe
 from orm.models import Distro
 from orm.models import ToasterSetting

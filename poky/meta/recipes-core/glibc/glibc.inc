@@ -1,6 +1,5 @@
 require glibc-common.inc
 require glibc-ld.inc
-require glibc-testing.inc
 
 DEPENDS = "virtual/${TARGET_PREFIX}gcc libgcc-initial linux-libc-headers"
 
@@ -10,8 +9,11 @@ inherit autotools texinfo features_check systemd
 
 LEAD_SONAME = "libc.so"
 
+# msgfmt could come from gettext-native but we don't depend on that and
+# disable for reproducibility
 CACHED_CONFIGUREVARS += " \
   ac_cv_path_BASH_SHELL=${base_bindir}/bash \
+  ac_cv_prog_MSGFMT= \
   libc_cv_slibdir=${base_libdir} \
   libc_cv_rootsbindir=${base_sbindir} \
   libc_cv_localedir=${localedir} \

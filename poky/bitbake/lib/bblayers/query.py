@@ -46,7 +46,7 @@ layer, with the preferred version first. Note that skipped recipes that
 are overlayed will also be listed, with a " (skipped)" suffix.
 """
 
-        items_listed = self.list_recipes('Overlayed recipes', None, True, args.same_version, args.filenames, False, True, None, False, None)
+        items_listed = self.list_recipes('Overlayed recipes', None, True, args.same_version, args.filenames, False, True, None, False, None, args.mc)
 
         # Check for overlayed .bbclass files
         classes = collections.defaultdict(list)
@@ -112,9 +112,9 @@ skipped recipes will also be listed, with a " (skipped)" suffix.
             title = 'Matching recipes:'
         else:
             title = 'Available recipes:'
-        self.list_recipes(title, args.pnspec, False, False, args.filenames, args.recipes_only, args.multiple, args.layer, args.bare, inheritlist)
+        self.list_recipes(title, args.pnspec, False, False, args.filenames, args.recipes_only, args.multiple, args.layer, args.bare, inheritlist, args.mc)
 
-    def list_recipes(self, title, pnspec, show_overlayed_only, show_same_ver_only, show_filenames, show_recipes_only, show_multi_provider_only, selected_layer, bare, inherits):
+    def list_recipes(self, title, pnspec, show_overlayed_only, show_same_ver_only, show_filenames, show_recipes_only, show_multi_provider_only, selected_layer, bare, inherits, mc):
         if inherits:
             bbpath = str(self.tinfoil.config_data.getVar('BBPATH'))
             for classname in inherits:
@@ -123,14 +123,18 @@ skipped recipes will also be listed, with a " (skipped)" suffix.
                     logger.error('No class named %s found in BBPATH', classfile)
                     sys.exit(1)
 
-        pkg_pn = self.tinfoil.cooker.recipecaches[''].pkg_pn
-        (latest_versions, preferred_versions) = self.tinfoil.find_providers()
-        allproviders = self.tinfoil.get_all_providers()
+        pkg_pn = self.tinfoil.cooker.recipecaches[mc].pkg_pn
+        (latest_versions, preferred_versions) = self.tinfoil.find_providers(mc)
+        allproviders = self.tinfoil.get_all_providers(mc)
 
         # Ensure we list skipped recipes
         # We are largely guessing about PN, PV and the preferred version here,
         # but we have no choice since skipped recipes are not fully parsed
         skiplist = list(self.tinfoil.cooker.skiplist.keys())
+        mcspec = 'mc:%s:' % mc
+        if mc:
+            skiplist = [s[len(mcspec):] for s in skiplist if s.startswith(mcspec)]
+
         for fn in skiplist:
             recipe_parts = os.path.splitext(os.path.basename(fn))[0].split('_')
             p = recipe_parts[0]
@@ -187,7 +191,7 @@ skipped recipes will also be listed, with a " (skipped)" suffix.
                 # We only display once per recipe, we should prefer non extended versions of the
                 # recipe if present (so e.g. in OpenEmbedded, openssl rather than nativesdk-openssl
                 # which would otherwise sort first).
-                if realfn[1] and realfn[0] in self.tinfoil.cooker.recipecaches[''].pkg_fn:
+                if realfn[1] and realfn[0] in self.tinfoil.cooker.recipecaches[mc].pkg_fn:
                     continue
 
                 if inherits:
@@ -496,6 +500,7 @@ NOTE: .bbappend files can impact the dependencies.
         parser_show_overlayed = self.add_command(sp, 'show-overlayed', self.do_show_overlayed)
         parser_show_overlayed.add_argument('-f', '--filenames', help='instead of the default formatting, list filenames of higher priority recipes with the ones they overlay indented underneath', action='store_true')
         parser_show_overlayed.add_argument('-s', '--same-version', help='only list overlayed recipes where the version is the same', action='store_true')
+        parser_show_overlayed.add_argument('--mc', help='use specified multiconfig', default='')
 
         parser_show_recipes = self.add_command(sp, 'show-recipes', self.do_show_recipes)
         parser_show_recipes.add_argument('-f', '--filenames', help='instead of the default formatting, list filenames of higher priority recipes with the ones they overlay indented underneath', action='store_true')
@@ -504,6 +509,7 @@ NOTE: .bbappend files can impact the dependencies.
         parser_show_recipes.add_argument('-i', '--inherits', help='only list recipes that inherit the named class(es) - separate multiple classes using , (without spaces)', metavar='CLASS', default='')
         parser_show_recipes.add_argument('-l', '--layer', help='only list recipes from the selected layer', default='')
         parser_show_recipes.add_argument('-b', '--bare', help='output just names without the "(skipped)" marker', action='store_true')
+        parser_show_recipes.add_argument('--mc', help='use specified multiconfig', default='')
         parser_show_recipes.add_argument('pnspec', nargs='*', help='optional recipe name specification (wildcards allowed, enclose in quotes to avoid shell expansion)')
 
         parser_show_appends = self.add_command(sp, 'show-appends', self.do_show_appends)

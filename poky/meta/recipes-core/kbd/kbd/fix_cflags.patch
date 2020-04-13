@@ -1,0 +1,25 @@
+We need to ensure our CFLAGS are preserved as well as whatever tweak configure
+tries to make. Without these, the debug prefix changes get lost and we lose
+build reproducibility, likely with other side effects.
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+Upstream-Status: Pending
+2020/1/27
+
+Index: kbd-2.2.0/configure.ac
+===================================================================
+--- kbd-2.2.0.orig/configure.ac
++++ kbd-2.2.0/configure.ac
+@@ -72,9 +72,9 @@ if test "$enable_code_coverage" = yes; t
+ fi
+ 
+ case "$GCC,$ac_cv_prog_cc_g" in
+-	yes,yes) CFLAGS="-g $CC_O_LEVEL $FORTIFY_SOURCE" ;;
+-	yes,)    CFLAGS="$CC_O_LEVEL $FORTIFY_SOURCE" ;;
+-	   ,yes) CFLAGS="-g" ;;
++	yes,yes) CFLAGS="-g $CC_O_LEVEL $FORTIFY_SOURCE $CFLAGS" ;;
++	yes,)    CFLAGS="$CC_O_LEVEL $FORTIFY_SOURCE $CFLAGS" ;;
++	   ,yes) CFLAGS="-g $CFLAGS" ;;
+ esac
+ 
+ CC_CHECK_CFLAGS_APPEND([\

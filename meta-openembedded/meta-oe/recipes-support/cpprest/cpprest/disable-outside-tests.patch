@@ -54,7 +54,7 @@ Index: cpprest/Release/tests/functional/websockets/client/authentication_tests.c
 ===================================================================
 --- cpprest.orig/Release/tests/functional/websockets/client/authentication_tests.cpp
 +++ cpprest/Release/tests/functional/websockets/client/authentication_tests.cpp
-@@ -93,6 +93,7 @@
+@@ -93,6 +93,7 @@ SUITE(authentication_tests)
          return false;
      }
  
@@ -62,46 +62,15 @@ Index: cpprest/Release/tests/functional/websockets/client/authentication_tests.c
      TEST(ssl_test)
      {
          websocket_client client;
-@@ -127,6 +128,7 @@
+@@ -127,6 +128,7 @@ SUITE(authentication_tests)
              throw;
          }
      }
 +    */
  
- // These tests are specific to our websocketpp based implementation.
- #if !defined(__cplusplus_winrt)
-@@ -159,12 +161,14 @@
-         }
-     }
- 
-+    /*
-     // Test specifically for server SignalR team hit interesting cases with.
-     TEST(sni_with_older_server_test)
-     {
-         websocket_client client;
-         sni_test_impl(client);
-     }
-+    */
- 
-     // WinRT doesn't expose option for disabling.
-     // No stable server is available to reliably test this.
-@@ -194,6 +198,7 @@
-         }
-     }
- 
-+    /*
-     // Winrt doesn't allow explicitly setting server host for SNI.
-     TEST(sni_explicit_hostname)
-     {
-@@ -204,6 +209,7 @@
-         websocket_client client(config);
-         sni_test_impl(client);
-     }
-+    */
- 
      void handshake_error_test_impl(const ::utility::string_t& host)
      {
-@@ -225,11 +231,11 @@
+@@ -148,11 +150,11 @@ SUITE(authentication_tests)
          }
      }
  
@@ -114,13 +83,13 @@ Index: cpprest/Release/tests/functional/websockets/client/authentication_tests.c
 -    TEST(cert_expired) { handshake_error_test_impl(U("wss://expired.badssl.com/")); }
 +    //TEST(cert_expired) { handshake_error_test_impl(U("wss://expired.badssl.com/")); }
  
- #endif
+ } // SUITE(authentication_tests)
  
 Index: cpprest/Release/tests/functional/http/client/connections_and_errors.cpp
 ===================================================================
 --- cpprest.orig/Release/tests/functional/http/client/connections_and_errors.cpp
 +++ cpprest/Release/tests/functional/http/client/connections_and_errors.cpp
-@@ -406,6 +406,7 @@
+@@ -408,6 +408,7 @@
      }
  #endif
  
@@ -128,7 +97,7 @@ Index: cpprest/Release/tests/functional/http/client/connections_and_errors.cpp
      // Try to connect to a server on a closed port and cancel the operation.
      TEST_FIXTURE(uri_address, cancel_bad_port)
      {
-@@ -437,6 +438,7 @@
+@@ -439,6 +440,7 @@
  
          VERIFY_THROWS_HTTP_ERROR_CODE(t.get(), std::errc::operation_canceled);
      }

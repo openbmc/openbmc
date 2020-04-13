@@ -12,8 +12,9 @@ MESON_SOURCEPATH = "${S}"
 def noprefix(var, d):
     return d.getVar(var).replace(d.getVar('prefix') + '/', '', 1)
 
+MESON_BUILDTYPE ?= "plain"
 MESONOPTS = " --prefix ${prefix} \
-              --buildtype plain \
+              --buildtype ${MESON_BUILDTYPE} \
               --bindir ${@noprefix('bindir', d)} \
               --sbindir ${@noprefix('sbindir', d)} \
               --datadir ${@noprefix('datadir', d)} \
@@ -24,7 +25,8 @@ MESONOPTS = " --prefix ${prefix} \
               --infodir ${@noprefix('infodir', d)} \
               --sysconfdir ${sysconfdir} \
               --localstatedir ${localstatedir} \
-              --sharedstatedir ${sharedstatedir} "
+              --sharedstatedir ${sharedstatedir} \
+              --wrap-mode nodownload"
 
 EXTRA_OEMESON_append = " ${PACKAGECONFIG_CONFARGS}"
 
@@ -43,7 +45,7 @@ def meson_cpu_family(var, d):
     arch = d.getVar(var)
     if arch == 'powerpc':
         return 'ppc'
-    elif arch == 'powerpc64':
+    elif arch == 'powerpc64' or arch == 'powerpc64le':
         return 'ppc64'
     elif arch == 'armeb':
         return 'arm'
@@ -55,10 +57,19 @@ def meson_cpu_family(var, d):
         return 'mips64'
     elif re.match(r"i[3-6]86", arch):
         return "x86"
-    elif arch == "microblazeel" or arch == "microblazeeb":
+    elif arch == "microblazeel":
         return "microblaze"
     else:
         return arch
+
+# Map our OS values to what Meson expects:
+# https://mesonbuild.com/Reference-tables.html#operating-system-names
+def meson_operating_system(var, d):
+    os = d.getVar(var)
+    if "mingw" in os:
+        return "windows"
+    else:
+        return os
 
 def meson_endian(prefix, d):
     arch, os = d.getVar(prefix + "_ARCH"), d.getVar(prefix + "_OS")
@@ -80,7 +91,6 @@ c = ${@meson_array('CC', d)}
 cpp = ${@meson_array('CXX', d)}
 ar = ${@meson_array('AR', d)}
 nm = ${@meson_array('NM', d)}
-ld = ${@meson_array('LD', d)}
 strip = ${@meson_array('STRIP', d)}
 readelf = ${@meson_array('READELF', d)}
 pkgconfig = 'pkg-config'
@@ -95,13 +105,13 @@ cpp_link_args = ${@meson_array('LDFLAGS', d)}
 gtkdoc_exe_wrapper = '${B}/gtkdoc-qemuwrapper'
 
 [host_machine]
-system = '${HOST_OS}'
+system = '${@meson_operating_system('HOST_OS', d)}'
 cpu_family = '${@meson_cpu_family('HOST_ARCH', d)}'
 cpu = '${HOST_ARCH}'
 endian = '${@meson_endian('HOST', d)}'
 
 [target_machine]
-system = '${TARGET_OS}'
+system = '${@meson_operating_system('TARGET_OS', d)}'
 cpu_family = '${@meson_cpu_family('TARGET_ARCH', d)}'
 cpu = '${TARGET_ARCH}'
 endian = '${@meson_endian('TARGET', d)}'
@@ -111,6 +121,10 @@ EOF
 CONFIGURE_FILES = "meson.build"
 
 meson_do_configure() {
+    # Meson requires this to be 'bfd, 'lld' or 'gold' from 0.53 onwards
+    # https://github.com/mesonbuild/meson/commit/ef9aeb188ea2bc7353e59916c18901cde90fa2b3
+    unset LD
+
     # Work around "Meson fails if /tmp is mounted with noexec #2972"
     mkdir -p "${B}/meson-private/tmp"
     export TMPDIR="${B}/meson-private/tmp"
@@ -146,6 +160,15 @@ meson_do_configure_prepend_class-nativesdk() {
 meson_do_configure_prepend_class-native() {
     export PKG_CONFIG="pkg-config-native"
 }
+
+python meson_do_qa_configure() {
+    import re
+    warn_re = re.compile(r"^WARNING: Cross property (.+) is using default value (.+)$", re.MULTILINE)
+    log = open(d.expand("${B}/meson-logs/meson-log.txt")).read()
+    for (prop, value) in warn_re.findall(log):
+        bb.warn("Meson cross property %s used without explicit assignment, defaulting to %s" % (prop, value))
+}
+do_configure[postfuncs] += "meson_do_qa_configure"
 
 do_compile[progress] = "outof:^\[(\d+)/(\d+)\]\s+"
 meson_do_compile() {

@@ -19,10 +19,12 @@ files=`ls test/test-*`
 for i in $files
 do
      #these programs are used by testcase test-bus, don't run here
+     #additionally, test-names needs to be run under X
      if [ $i = "test/test-service" ] \
         || [ $i = "test/test-shell-service" ] \
         || [ $i = "test/test-segfault" ] \
-        || [ $i = "test/test-bus" ]
+        || [ $i = "test/test-bus" ] \
+        || [ $i = "test/test-names" ]
      then
          continue
      fi

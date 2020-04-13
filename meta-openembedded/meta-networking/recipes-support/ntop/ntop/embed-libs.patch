@@ -1,0 +1,20 @@
+Use --embed option so that it can return libpython as well
+
+% ../recipe-sysroot-native/usr/bin/python3-native/python3-config --libs --embed
+-lpython3.8 -lcrypt -lpthread -ldl -lutil -lm -lm
+[kraj@apollo /mnt/b/yoe/build/tmp/work/cortexa7t2hf-neon-vfpv4-yoe-linux-gnueabi/ntop/5.0.1-r0/ntop-5.0.1]
+% ../recipe-sysroot-native/usr/bin/python3-native/python3-config --libs
+-lcrypt -lpthread -ldl -lutil -lm -lm
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/configure.in
++++ b/configure.in
+@@ -1463,7 +1463,7 @@ dnl>
+   fi
+ 
+   if test "x$PYTHON_CONFIG" != "x"; then
+-    PYTHON_LIBS="`$PYTHON_CONFIG --libs`"
++    PYTHON_LIBS="`$PYTHON_CONFIG --libs --embed`"
+     if test "x$PYTHON_LIBS" = "x"; then
+       AC_MSG_RESULT(Python[-devel] support is present but misconfigured)     
+     else   

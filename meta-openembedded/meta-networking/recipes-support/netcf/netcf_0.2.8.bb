@@ -20,7 +20,7 @@ do_configure[depends] += "${MLPREFIX}gnulib:do_populate_sysroot"
 
 S = "${WORKDIR}/git"
 
-inherit gettext autotools pkgconfig systemd
+inherit gettext autotools perlnative pkgconfig systemd
 
 EXTRA_OECONF_append_class-target = " --with-driver=redhat"
 

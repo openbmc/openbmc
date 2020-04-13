@@ -1,26 +1,37 @@
+From ca472d6866e545aaa70a70020e3226f236a8aafc Mon Sep 17 00:00:00 2001
+From: Shan Hai <shan.hai@windriver.com>
+Date: Tue, 13 Sep 2016 13:45:46 +0800
+Subject: [PATCH] shadow: use relaxed usernames
 
 The groupadd from shadow does not allow upper case group names, the
 same is true for the upstream shadow. But distributions like
 Debian/Ubuntu/CentOS has their own way to cope with this problem,
 this patch is picked up from CentOS release 7.0 to relax the usernames
 restrictions to allow the upper case group names, and the relaxation is
-POSIX compliant because POSIX indicate that usernames are composed of 
+POSIX compliant because POSIX indicate that usernames are composed of
 characters from the portable filename character set [A-Za-z0-9._-].
 
 Upstream-Status: Pending
 
-Signed-off-by: Shan Hai <shan.hai@windriver.com> 
+Signed-off-by: Shan Hai <shan.hai@windriver.com>
 
-diff -urpN a/libmisc/chkname.c b/libmisc/chkname.c
-index 5089112..f40a0da 100644
+---
+ libmisc/chkname.c  | 30 ++++++++++++++++++------------
+ man/groupadd.8.xml |  6 ------
+ man/useradd.8.xml  |  8 +-------
+ 3 files changed, 19 insertions(+), 25 deletions(-)
+
+diff --git a/libmisc/chkname.c b/libmisc/chkname.c
+index 90f185c..65762b4 100644
 --- a/libmisc/chkname.c
 +++ b/libmisc/chkname.c
-@@ -49,21 +49,28 @@
- static bool is_valid_name (const char *name)
- {
+@@ -55,22 +55,28 @@ static bool is_valid_name (const char *name)
+ 	}
+ 
  	/*
 -	 * User/group names must match [a-z_][a-z0-9_-]*[$]
 -	 */
+-
 -	if (('\0' == *name) ||
 -	    !((('a' <= *name) && ('z' >= *name)) || ('_' == *name))) {
 +         * User/group names must match gnu e-regex:
@@ -55,28 +66,28 @@ index 5089112..f40a0da 100644
  			return false;
  		}
  	}
-diff -urpN a/man/groupadd.8.xml b/man/groupadd.8.xml
-index 230fd0c..94f7807 100644
+diff --git a/man/groupadd.8.xml b/man/groupadd.8.xml
+index 1e58f09..d804b61 100644
 --- a/man/groupadd.8.xml
 +++ b/man/groupadd.8.xml
-@@ -222,12 +222,6 @@
+@@ -272,12 +272,6 @@
+ 
     <refsect1 id='caveats'>
       <title>CAVEATS</title>
-      <para>
+-     <para>
 -       Groupnames must start with a lower case letter or an underscore,
 -       followed by lower case letters, digits, underscores, or dashes.
 -       They can end with a dollar sign.
 -       In regular expression terms: [a-z_][a-z0-9_-]*[$]?
 -     </para>
--     <para>
+      <para>
         Groupnames may only be up to &GROUP_NAME_MAX_LENGTH; characters long.
       </para>
-      <para>
-diff -urpN a/man/useradd.8.xml b/man/useradd.8.xml
-index 5dec989..fe623b9 100644
+diff --git a/man/useradd.8.xml b/man/useradd.8.xml
+index a16d730..c0bd777 100644
 --- a/man/useradd.8.xml
 +++ b/man/useradd.8.xml
-@@ -336,7 +336,7 @@
+@@ -366,7 +366,7 @@
  	</term>
  	<listitem>
  	  <para>
@@ -85,16 +96,16 @@ index 5dec989..fe623b9 100644
  	    wide setting from <filename>/etc/login.defs</filename>
  	    (<option>CREATE_HOME</option>) is set to
  	    <replaceable>yes</replaceable>.
-@@ -607,12 +607,6 @@
+@@ -660,12 +660,6 @@
+       the user account creation request.
      </para>
  
-     <para>
+-    <para>
 -      Usernames must start with a lower case letter or an underscore,
 -      followed by lower case letters, digits, underscores, or dashes.
 -      They can end with a dollar sign.
 -      In regular expression terms: [a-z_][a-z0-9_-]*[$]?
 -    </para>
--    <para>
+     <para>
        Usernames may only be up to 32 characters long.
      </para>
-   </refsect1>

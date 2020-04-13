@@ -19,15 +19,16 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/ntop/ntop-${PV}.tar.gz \
            file://0001-nDPI-Include-sys-types.h.patch \
            file://0001-plugins-Makefile.am-fix-for-automake-1.16.1.patch \
            file://fix-missing-return-from-non-void-function.patch \
+           file://embed-libs.patch \
           "
 SRC_URI[md5sum] = "01710b6925a8a5ffe1a41b8b512ebd69"
 SRC_URI[sha256sum] = "7e8e84cb14d2173beaca4d4cb991a14d84a4bef84ec37b2276bc363f45c52ef8"
 
 UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/ntop/files/ntop/Stable"
 
-inherit autotools-brokensep useradd pythonnative pkgconfig systemd
+inherit autotools-brokensep useradd python3native pkgconfig systemd
 
-DEPENDS = "geoip rrdtool python zlib libpcap gdbm"
+DEPENDS = "geoip rrdtool python3 zlib libpcap gdbm"
 
 PACKAGECONFIG ??= "openssl snmp plugins"
 PACKAGECONFIG[openssl] = "--with-ssl, --without-ssl, openssl, openssl"
@@ -35,7 +36,7 @@ PACKAGECONFIG[snmp] = "--enable-snmp=yes NETSNMP=${STAGING_BINDIR_CROSS}/net-snm
 --disable-snmp,net-snmp,"
 PACKAGECONFIG[plugins] = "--enable-plugins=yes, --disable-plugins, ,"
 
-EXTRA_OECONF += "ac_cv_file_aclocal_m4=yes ac_cv_file_depcomp=no"
+EXTRA_OECONF += "ac_cv_file_aclocal_m4=yes ac_cv_file_depcomp=no PYTHON_CONFIG=python3-config"
 
 do_configure() {
     cp ${STAGING_DATADIR_NATIVE}/aclocal/libtool.m4 libtool.m4.in

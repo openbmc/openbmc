@@ -4,9 +4,6 @@ ac_cv_func_lstat_dereferences_slashed_symlink=${ac_cv_func_lstat_dereferences_sl
 ac_cv_func_lstat_empty_string_bug=${ac_cv_func_lstat_empty_string_bug=no}
 ac_cv_func_stat_empty_string_bug=${ac_cv_func_stat_empty_string_bug=no}
 ac_cv_func_stat_ignores_trailing_slash=${ac_cv_func_stat_ignores_trailing_slash=no}
-ac_cv_header_netinet_sctp_h=${ac_cv_header_netinet_sctp_h=no}
-ac_cv_header_netinet_sctp_uio_h=${ac_cv_header_netinet_sctp_uio_h=no}
-ac_cv_sctp=${ac_cv_sctp=no}
 
 # bash
 ac_cv_c_long_double=${ac_cv_c_long_double=yes}

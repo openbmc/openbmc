@@ -1,0 +1,75 @@
+From 4dfca036c96071bd2a2c80ff84719c6d37858373 Mon Sep 17 00:00:00 2001
+From: Haseeb Ashraf <Haseeb_Ashraf@mentor.com>
+Date: Fri, 17 Apr 2020 14:36:50 +0500
+Subject: [PATCH 1/1] fix: avoid race condition between test and mkdir
+
+when building in parallel the race condition, when the directory
+is tested for existence and it is created, can break the build
+
+Signed-off-by: Haseeb Ashraf <Haseeb_Ashraf@mentor.com>
+---
+ Makefile.in            | 6 +++---
+ build-aux/rockspecs.mk | 2 +-
+ local.mk               | 2 +-
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 9b51ef3..4722525 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -1637,7 +1637,7 @@ distclean-tags:
+ 
+ distdir: $(DISTFILES)
+ 	$(am__remove_distdir)
+-	test -d "$(distdir)" || mkdir "$(distdir)"
++	$(MKDIR_P) "$(distdir)"
+ 	@srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
+ 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
+ 	list='$(DISTFILES)'; \
+@@ -1975,7 +1975,7 @@ clean-local:
+ 	rm -f $(posix_submodules)
+ 
+ $(allhtml): $(EXTRA_ext_posix_posix_la_SOURCES) $(ext_posix_posix_la_SOURCES)
+-	test -d $(builddir)/doc || mkdir $(builddir)/doc
++	$(MKDIR_P) $(builddir)/doc
+ @HAVE_LDOC_TRUE@	$(LDOC) -c build-aux/config.ld -d $(abs_srcdir)/doc .
+ @HAVE_LDOC_FALSE@	$(MKDIR_P) doc
+ @HAVE_LDOC_FALSE@	touch doc/index.html doc/ldoc.css
+@@ -1983,7 +1983,7 @@ $(allhtml): $(EXTRA_ext_posix_posix_la_SOURCES) $(ext_posix_posix_la_SOURCES)
+ doc: $(allhtml)
+ 
+ $(luarocks_config): Makefile.am
+-	@test -d build-aux || mkdir build-aux
++	@$(MKDIR_P) build-aux
+ 	$(AM_V_GEN){						\
+ 	  $(set_LUA_BINDIR);					\
+ 	  echo 'rocks_trees = { "$(abs_srcdir)/luarocks" }';	\
+diff --git a/build-aux/rockspecs.mk b/build-aux/rockspecs.mk
+index ebd1dbf..c8fbdbc 100644
+--- a/build-aux/rockspecs.mk
++++ b/build-aux/rockspecs.mk
+@@ -62,7 +62,7 @@ LUA_INCDIR = `cd $$LUA_BINDIR/../include && pwd`
+ LUA_LIBDIR = `cd $$LUA_BINDIR/../lib && pwd`
+ 
+ $(luarocks_config): Makefile.am
+-	@test -d build-aux || mkdir build-aux
++	@$(MKDIR_P) build-aux
+ 	$(AM_V_GEN){						\
+ 	  $(set_LUA_BINDIR);					\
+ 	  echo 'rocks_trees = { "$(abs_srcdir)/luarocks" }';	\
+diff --git a/local.mk b/local.mk
+index d391ef7..80b22ce 100644
+--- a/local.mk
++++ b/local.mk
+@@ -255,7 +255,7 @@ dist_examples_DATA +=				\
+ allhtml = $(dist_doc_DATA) $(dist_examples_DATA) $(dist_modules_DATA) $(dist_classes_DATA)
+ 
+ $(allhtml): $(EXTRA_ext_posix_posix_la_SOURCES) $(ext_posix_posix_la_SOURCES)
+-	test -d $(builddir)/doc || mkdir $(builddir)/doc
++	$(MKDIR_P) $(builddir)/doc
+ if HAVE_LDOC
+ 	$(LDOC) -c build-aux/config.ld -d $(abs_srcdir)/doc .
+ else
+-- 
+2.17.1
+

@@ -8,7 +8,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552 \
 
 SRC_URI = "http://tuxera.com/opensource/ntfs-3g_ntfsprogs-${PV}.tgz \
            file://0001-libntfs-3g-Makefile.am-fix-install-failed-while-host.patch \
-           ${@bb.utils.contains('DISTRO_FEATURES','usrmerge','file://0001-Make-build-support-usrmerge.patch','',d)} \
 "
 S = "${WORKDIR}/ntfs-3g_ntfsprogs-${PV}"
 SRC_URI[md5sum] = "d97474ae1954f772c6d2fa386a6f462c"
@@ -35,10 +34,18 @@ FILES_ntfsprogs = "${base_sbindir}/* ${bindir}/* ${sbindir}/*"
 FILES_libntfs-3g = "${libdir}/*${SOLIBS}"
 
 do_install_append() {
-    # Standard mount will execute the program /sbin/mount.TYPE
-    # when called. Add the symbolic to let mount could find ntfs.
-    ln -sf mount.ntfs-3g ${D}/${base_sbindir}/mount.ntfs
+    # Standard mount will execute the program /sbin/mount.TYPE when called.
+    # Add a symbolic link to let mount find ntfs.
+    ln -sf mount.ntfs-3g ${D}${base_sbindir}/mount.ntfs
     rmdir ${D}${libdir}/ntfs-3g
+
+    # Handle when usrmerge is in effect. Some files are installed to /sbin
+    # regardless of the value of ${base_sbindir}.
+    if [ "${base_sbindir}" != /sbin ] && [ -d ${D}/sbin ]; then
+        mkdir -p ${D}${base_sbindir}
+        mv ${D}/sbin/* ${D}${base_sbindir}
+        rmdir ${D}/sbin
+    fi
 }
 
 # Satisfy the -dev runtime dependency

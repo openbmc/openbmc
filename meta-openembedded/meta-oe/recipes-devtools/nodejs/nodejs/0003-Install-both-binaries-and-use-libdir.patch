@@ -15,17 +15,16 @@ Stolen from [1]
 Upstream-Status: Pending
 
 Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
-
 ---
  configure.py     |  7 +++++++
  tools/install.py | 31 ++++++++++++++-----------------
  2 files changed, 21 insertions(+), 17 deletions(-)
 
 diff --git a/configure.py b/configure.py
-index cfd4207..eb26f7d 100755
+index 20cce214db..e2d78a2a51 100755
 --- a/configure.py
 +++ b/configure.py
-@@ -552,6 +552,12 @@ parser.add_option('--shared',
+@@ -559,6 +559,12 @@ parser.add_option('--shared',
      help='compile shared library for embedding node in another project. ' +
           '(This mode is not officially supported for regular applications)')
  
@@ -38,19 +37,19 @@ index cfd4207..eb26f7d 100755
  parser.add_option('--without-v8-platform',
      action='store_true',
      dest='without_v8_platform',
-@@ -1095,6 +1101,7 @@ def configure_node(o):
-   if options.code_cache_path:
-     o['variables']['node_code_cache_path'] = options.code_cache_path
+@@ -1103,6 +1109,7 @@ def configure_node(o):
+   if o['variables']['want_separate_host_toolset'] == 0:
+     o['variables']['node_code_cache'] = 'yes' # For testing
    o['variables']['node_shared'] = b(options.shared)
 +  o['variables']['libdir'] = options.libdir
    node_module_version = getmoduleversion.get_version()
  
    if sys.platform == 'darwin':
 diff --git a/tools/install.py b/tools/install.py
-index 028c32e..bf443c4 100755
+index 655802980a..fe4723bf15 100755
 --- a/tools/install.py
 +++ b/tools/install.py
-@@ -117,26 +117,23 @@ def subdir_files(path, dest, action):
+@@ -121,26 +121,23 @@ def subdir_files(path, dest, action):
  
  def files(action):
    is_windows = sys.platform == 'win32'
@@ -92,5 +91,5 @@ index 028c32e..bf443c4 100755
    if 'true' == variables.get('node_use_dtrace'):
      action(['out/Release/node.d'], 'lib/dtrace/node.d')
 -- 
-2.23.0
+2.20.1
 

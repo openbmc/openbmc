@@ -8,6 +8,7 @@ Signed-off-by: Khem Raj <raj.khem@gmai.com>
 Fixed the TCL_INCLUDE_SPEC
 
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 ---
  Makefile.in  |    2 +-
  configure    |    4 ++--
@@ -34,7 +35,7 @@ index 3e78b49..24b3f92 100755
 @@ -19134,7 +19134,7 @@ eval "TCL_LIB_FILE=libtcl${LIB_SUFFIX}"
  eval "TCL_LIB_FILE=${TCL_LIB_FILE}"
  
- TCL_LIBRARY='$(libdir)/tcl$(VERSION)'
+ test -z "$TCL_LIBRARY" && TCL_LIBRARY='$(libdir)/tcl$(VERSION)'
 -PRIVATE_INCLUDE_DIR='$(includedir)'
 +PRIVATE_INCLUDE_DIR='$(includedir)/tcl$(VERSION)'
  HTML_DIR='$(DISTDIR)/html'
@@ -56,7 +57,7 @@ index 0e28b14..62d9b41 100755
 @@ -791,7 +791,7 @@ eval "TCL_LIB_FILE=libtcl${LIB_SUFFIX}"
  eval "TCL_LIB_FILE=${TCL_LIB_FILE}"
  
- TCL_LIBRARY='$(libdir)/tcl$(VERSION)'
+ test -z "$TCL_LIBRARY" && TCL_LIBRARY='$(libdir)/tcl$(VERSION)'
 -PRIVATE_INCLUDE_DIR='$(includedir)'
 +PRIVATE_INCLUDE_DIR='$(includedir)/tcl$(VERSION)'
  HTML_DIR='$(DISTDIR)/html'

@@ -113,7 +113,7 @@ def _toaster_load_pkgdatafile(dirpath, filepath):
                 pass    # ignore lines without valid key: value pairs
     return pkgdata
 
-python toaster_package_dumpdata() {
+def _toaster_dumpdata(pkgdatadir, d):
     """
     Dumps the data about the packages created by a recipe
     """
@@ -122,16 +122,24 @@ python toaster_package_dumpdata() {
     if not d.getVar('PACKAGES'):
         return
 
-    pkgdatadir = d.getVar('PKGDESTWORK')
     lpkgdata = {}
     datadir = os.path.join(pkgdatadir, 'runtime')
 
     # scan and send data for each generated package
-    for datafile in os.listdir(datadir):
-        if not datafile.endswith('.packaged'):
-            lpkgdata = _toaster_load_pkgdatafile(datadir, datafile)
-            # Fire an event containing the pkg data
-            bb.event.fire(bb.event.MetadataEvent("SinglePackageInfo", lpkgdata), d)
+    if os.path.exists(datadir):
+        for datafile in os.listdir(datadir):
+            if not datafile.endswith('.packaged'):
+                lpkgdata = _toaster_load_pkgdatafile(datadir, datafile)
+                # Fire an event containing the pkg data
+                bb.event.fire(bb.event.MetadataEvent("SinglePackageInfo", lpkgdata), d)
+
+python toaster_package_dumpdata() {
+    _toaster_dumpdata(d.getVar('PKGDESTWORK'), d)
+}
+
+python toaster_packagedata_dumpdata() {
+    # This path needs to match do_packagedata[sstate-inputdirs]
+    _toaster_dumpdata(os.path.join(d.getVar('WORKDIR'), 'pkgdata-pdata-input'), d)
 }
 
 # 2. Dump output image files information
@@ -366,8 +374,8 @@ toaster_buildhistory_dump[eventmask] = "bb.event.BuildCompleted"
 addhandler toaster_artifacts
 toaster_artifacts[eventmask] = "bb.runqueue.runQueueTaskSkipped bb.runqueue.runQueueTaskCompleted"
 
-do_packagedata_setscene[postfuncs] += "toaster_package_dumpdata "
-do_packagedata_setscene[vardepsexclude] += "toaster_package_dumpdata "
+do_packagedata_setscene[postfuncs] += "toaster_packagedata_dumpdata "
+do_packagedata_setscene[vardepsexclude] += "toaster_packagedata_dumpdata "
 
 do_package[postfuncs] += "toaster_package_dumpdata "
 do_package[vardepsexclude] += "toaster_package_dumpdata "

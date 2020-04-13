@@ -13,7 +13,7 @@ SRC_URI = "git://github.com/yasm/yasm.git"
 
 S = "${WORKDIR}/git"
 
-inherit autotools gettext pythonnative
+inherit autotools gettext python3native
 
 CACHED_CONFIGUREVARS = "CCLD_FOR_BUILD='${CC_FOR_BUILD}'"
 

@@ -1,4 +1,4 @@
-From 7535c39951b9d15dd64c4669092a8582ba555466 Mon Sep 17 00:00:00 2001
+From 1ad771d86728ee2ed30e202e9768d8d825f96467 Mon Sep 17 00:00:00 2001
 From: Matthias Schoepfer <matthias.schoepfer@ithinx.io>
 Date: Fri, 31 May 2019 15:34:34 +0200
 Subject: [PATCH] bpo-36852: proper detection of mips architecture for soft
@@ -12,15 +12,17 @@ to do this in a more autoconf/autotools manner.
 
 Upstream-Status: Submitted [https://github.com/python/cpython/pull/13196]
 Signed-off-by: Matthias Schoepfer <matthias.schoepfer@ithinx.io>
+
+%% original patch: 0001-bpo-36852-proper-detection-of-mips-architecture-for-.patch
 ---
- configure.ac | 169 ++++++---------------------------------------------
- 1 file changed, 17 insertions(+), 152 deletions(-)
+ configure.ac | 175 +++++++--------------------------------------------
+ 1 file changed, 21 insertions(+), 154 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index a7de901e08..a73e2de51b 100644
+index ede710e..bc81b0b 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -727,158 +727,23 @@ fi
+@@ -710,160 +710,27 @@ fi
  MULTIARCH=$($CC --print-multiarch 2>/dev/null)
  AC_SUBST(MULTIARCH)
  
@@ -163,6 +165,8 @@ index a7de901e08..a73e2de51b 100644
 -        i386-gnu
 -#elif defined(__APPLE__)
 -        darwin
+-#elif defined(__VXWORKS__)
+-        vxworks
 -#else
 -# error unknown platform triplet
 -#endif
@@ -190,12 +194,16 @@ index a7de901e08..a73e2de51b 100644
 +     	PLATFORM_TRIPLET=vxworks
 +	;;
 +     *)
-+	PLATFORM_TRIPLET=${target_cpu}-${target_os}
++        if test "${target_cpu}" != "i686"; then
++		PLATFORM_TRIPLET=${target_cpu}-${target_os}
++	else
++		PLATFORM_TRIPLET=i386-${target_os}
++	fi
 +	;;
 +esac	
  
  if test x$PLATFORM_TRIPLET != x && test x$MULTIARCH != x; then
    if test x$PLATFORM_TRIPLET != x$MULTIARCH; then
 -- 
-2.21.0
+2.24.1
 

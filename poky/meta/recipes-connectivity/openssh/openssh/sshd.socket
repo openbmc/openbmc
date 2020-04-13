@@ -1,5 +1,6 @@
 [Unit]
 Conflicts=sshd.service
+Wants=sshdgenkeys.service
 
 [Socket]
 ExecStartPre=@BASE_BINDIR@/mkdir -p /var/run/sshd

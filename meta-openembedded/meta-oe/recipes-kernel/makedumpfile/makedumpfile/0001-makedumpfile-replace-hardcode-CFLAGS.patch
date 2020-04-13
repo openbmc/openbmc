@@ -83,7 +83,7 @@ index 1fdb628..5dce589 100644
  OBJ_PART=$(patsubst %.c,%.o,$(SRC_PART))
 @@ -52,17 +53,17 @@ OBJ_ARCH=$(patsubst %.c,%.o,$(SRC_ARCH))
  
- LIBS = -ldw -lbz2 -lebl -ldl -lelf -lz
+ LIBS = -ldw -lbz2 -ldl -lelf -lz
  ifneq ($(LINKTYPE), dynamic)
 -LIBS := -static $(LIBS)
 +LIBS := $(LIBS)
@@ -102,7 +102,7 @@ index 1fdb628..5dce589 100644
  endif
  
  LIBS := -lpthread $(LIBS)
-@@ -82,14 +83,14 @@ LIBS := $(LIBS) $(call try-run,\
+@@ -87,14 +88,14 @@ LIBS := $(LIBS) $(call try-run,\
  all: makedumpfile
  
  $(OBJ_PART): $(SRC_PART)
@@ -119,7 +119,7 @@ index 1fdb628..5dce589 100644
  	echo .TH MAKEDUMPFILE 8 \"$(DATE)\" \"makedumpfile v$(VERSION)\" \"Linux System Administrator\'s Manual\" > temp.8
  	grep -v "^.TH MAKEDUMPFILE 8" $(VPATH)makedumpfile.8 >> temp.8
  	mv temp.8 makedumpfile.8
-@@ -100,7 +101,7 @@ makedumpfile: $(SRC_BASE) $(OBJ_PART) $(OBJ_ARCH)
+@@ -105,7 +106,7 @@ makedumpfile: $(SRC_BASE) $(OBJ_PART) $(OBJ_ARCH)
  	gzip -c ./makedumpfile.conf.5 > ./makedumpfile.conf.5.gz
  
  eppic_makedumpfile.so: extension_eppic.c

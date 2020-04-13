@@ -36,6 +36,6 @@ RRECOMMENDS_${PN} += "libfile-slurper-perl"
 
 S = "${WORKDIR}/Config-AutoConf-${PV}"
 
-inherit cpan ptest-perl allarch
+inherit cpan ptest-perl
 
 BBCLASSEXTEND = "native nativesdk"

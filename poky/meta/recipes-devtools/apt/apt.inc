@@ -26,7 +26,7 @@ LIC_FILES_CHKSUM = "file://COPYING.GPL;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 # so we check the latest upstream from a directory that does get updated
 UPSTREAM_CHECK_URI = "${DEBIAN_MIRROR}/main/a/apt/"
 
-inherit autotools gettext useradd
+inherit autotools gettext useradd upstream-version-is-even
 
 EXTRA_AUTORECONF = "--exclude=autopoint,autoheader"
 

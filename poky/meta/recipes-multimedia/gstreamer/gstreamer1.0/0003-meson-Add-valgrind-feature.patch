@@ -1,0 +1,74 @@
+From f6c7973c03d9ba7dab60c496e768c5e6c4ee824c Mon Sep 17 00:00:00 2001
+From: Carlos Rafael Giani <crg7475@mailbox.org>
+Date: Sun, 20 Oct 2019 10:36:44 +0200
+Subject: [PATCH] meson: Add valgrind feature
+
+This allows for enabling/disabling Valgrind support. Since Valgrind is
+an external dependency, such a feature is needed by build environemnts
+such as Yocto to make sure builds are deterministic. These changes also
+add more Valgrind specific configure log output.
+
+Upstream-Status: Pending
+
+Signed-off-by: Carlos Rafael Giani <crg7475@mailbox.org>
+---
+ meson.build       | 23 ++++++++++++++++++++++-
+ meson_options.txt |  1 +
+ 2 files changed, 23 insertions(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index b55ecc5..4751761 100644
+--- a/meson.build
++++ b/meson.build
+@@ -199,7 +199,6 @@ check_headers = [
+   'sys/wait.h',
+   'ucontext.h',
+   'unistd.h',
+-  'valgrind/valgrind.h',
+   'sys/resource.h',
+ ]
+ 
+@@ -214,6 +213,28 @@ foreach h : check_headers
+   endif
+ endforeach
+ 
++valgrind_option = get_option('valgrind')
++if valgrind_option.disabled()
++  message('Valgrind support not requested; disabled.')
++else
++  valgrind_header = 'valgrind/valgrind.h'
++  has_valgrind_header = cc.has_header(valgrind_header)
++  if has_valgrind_header
++    message('Valgrind support requested, and header ' + valgrind_header + \
++        ' found. Enabled Valgrind support.')
++    define = 'HAVE_' + valgrind_header.underscorify().to_upper()
++    cdata.set(define, 1)
++  else
++    if valgrind_option.enabled()
++      error('Valgrind support requested and set as required, but header ' + \
++        valgrind_header + ' not found.')
++    else
++      message('Valgrind support requested, but header ' + valgrind_header + \
++        ' not found. Disabling Valgrind support.')
++    endif
++  endif
++endif
++
+ if cc.has_member('struct tm', 'tm_gmtoff', prefix : '#include <time.h>')
+   cdata.set('HAVE_TM_GMTOFF', 1)
+ endif
+diff --git a/meson_options.txt b/meson_options.txt
+index e7ff7ba..8afde39 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -19,6 +19,7 @@ option('memory-alignment', type: 'combo',
+ 
+ # Feature options
+ option('check', type : 'feature', value : 'auto', description : 'Build unit test libraries')
++option('valgrind', type : 'feature', value : 'auto', description : 'Enable Valgrind support')
+ option('libunwind', type : 'feature', value : 'auto', description : 'Use libunwind to generate backtraces')
+ option('libdw', type : 'feature', value : 'auto', description : 'Use libdw to generate better backtraces from libunwind')
+ option('dbghelp', type : 'feature', value : 'auto', description : 'Use dbghelp to generate backtraces')
+-- 
+2.17.1
+

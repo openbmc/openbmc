@@ -391,11 +391,10 @@ fitimage_assemble() {
 
 	if [ -n "${EXTERNAL_KERNEL_DEVICETREE}" ]; then
 		dtbcount=1
-		for DTBFILE in ${EXTERNAL_KERNEL_DEVICETREE}/*.dtb; do
-			DTB=`basename ${DTBFILE}`
+		for DTB in $(find "${EXTERNAL_KERNEL_DEVICETREE}" \( -name '*.dtb' -o -name '*.dtbo' \) -printf '%P\n' | sort); do
 			DTB=$(echo "${DTB}" | tr '/' '_')
 			DTBS="${DTBS} ${DTB}"
-			fitimage_emit_section_dtb ${1} ${DTB} ${DTBFILE}
+			fitimage_emit_section_dtb ${1} ${DTB} "${EXTERNAL_KERNEL_DEVICETREE}/${DTB}"
 		done
 	fi
 

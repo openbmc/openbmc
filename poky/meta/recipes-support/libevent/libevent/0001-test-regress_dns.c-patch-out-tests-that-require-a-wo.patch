@@ -1,0 +1,37 @@
+From 7c17967b8fd2d18b74a8934fd9bb8212ebd6a271 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 9 Jan 2020 13:22:46 +0100
+Subject: [PATCH] test/regress_dns.c: patch out tests that require a working
+ DNS
+
+This is not guaranteed for ptests under qemu, and in the absence
+of a DNS that can reach to the internet, these tests fail.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ test/regress_dns.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/test/regress_dns.c b/test/regress_dns.c
+index d2084b7..a1a8f3b 100644
+--- a/test/regress_dns.c
++++ b/test/regress_dns.c
+@@ -2394,8 +2394,6 @@ struct testcase_t dns_testcases[] = {
+ 	{ "reissue_disable_when_inactive", dns_reissue_disable_when_inactive_test,
+ 	  TT_FORK|TT_NEED_BASE|TT_NO_LOGS, &basic_setup, NULL },
+ 	{ "inflight", dns_inflight_test, TT_FORK|TT_NEED_BASE, &basic_setup, NULL },
+-	{ "bufferevent_connect_hostname", test_bufferevent_connect_hostname,
+-	  TT_FORK|TT_NEED_BASE, &basic_setup, NULL },
+ #ifdef EVENT__HAVE_SETRLIMIT
+ 	{ "bufferevent_connect_hostname_emfile", test_bufferevent_connect_hostname,
+ 	  TT_FORK|TT_NEED_BASE, &basic_setup, (char*)"emfile" },
+@@ -2405,8 +2403,6 @@ struct testcase_t dns_testcases[] = {
+ 	{ "disable_when_inactive_no_ns", dns_disable_when_inactive_no_ns_test,
+ 	  TT_FORK|TT_NEED_BASE|TT_NO_LOGS, &basic_setup, NULL },
+ 
+-	{ "initialize_nameservers", dns_initialize_nameservers_test,
+-	  TT_FORK|TT_NEED_BASE, &basic_setup, NULL },
+ #ifndef _WIN32
+ 	{ "nameservers_no_default", dns_nameservers_no_default_test,
+ 	  TT_FORK|TT_NEED_BASE, &basic_setup, NULL },

@@ -7,4 +7,4 @@ ptestdir=$(dirname "$(readlink -f "$0")")
 export SRC_PATH=$ptestdir
 
 cd $ptestdir/tests
-make -f Makefile.include -k runtest-TESTS | sed '/: OK/ s/^/PASS: /g'
+make -f Makefile.include -k runtest-TESTS | sed '/^ok /s/ok /PASS: /g'

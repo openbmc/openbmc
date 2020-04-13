@@ -4,7 +4,7 @@ PE = "1"
 
 SRC_URI = "git://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git"
 # 1.2 to 1.5 seem to be development versions
-UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>(?!1\.[2-5])(\d+(\.\d+)+))"
+UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>(?!1\.[2-6])(\d+(\.\d+)+))"
 
 S = "${WORKDIR}/git"
 

@@ -1,0 +1,60 @@
+From d26fa9ededccc7e1ec47ead7f18afc80971483a3 Mon Sep 17 00:00:00 2001
+From: Juro Bystricky <juro.bystricky@intel.com>
+Date: Mon, 19 Mar 2018 22:31:20 -0700
+Subject: [PATCH 34/39] fix segmentation fault in precompiled header generation
+
+Prevent a segmentation fault which occurs when using incorrect
+structure trying to access name of some named operators, such as
+CPP_NOT, CPP_AND etc. "token->val.node.spelling" cannot be used in
+those cases, as is may not be initialized at all.
+
+[YOCTO #11738]
+
+Upstream-Status: Pending
+
+Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libcpp/lex.c | 26 +++++++++++++++++++++-----
+ 1 file changed, 21 insertions(+), 5 deletions(-)
+
+diff --git a/libcpp/lex.c b/libcpp/lex.c
+index eedfcbb3146..15040a1b1f0 100644
+--- a/libcpp/lex.c
++++ b/libcpp/lex.c
+@@ -3280,11 +3280,27 @@ cpp_spell_token (cpp_reader *pfile, const cpp_token *token,
+     spell_ident:
+     case SPELL_IDENT:
+       if (forstring)
+-	{
+-	  memcpy (buffer, NODE_NAME (token->val.node.spelling),
+-		  NODE_LEN (token->val.node.spelling));
+-	  buffer += NODE_LEN (token->val.node.spelling);
+-	}
++        {
++          if (token->type == CPP_NAME)
++            {
++              memcpy (buffer, NODE_NAME (token->val.node.spelling),
++                    NODE_LEN (token->val.node.spelling));
++              buffer += NODE_LEN (token->val.node.spelling);
++              break;
++            }
++          /* NAMED_OP, cannot use node.spelling */
++          if (token->flags & NAMED_OP)
++            {
++              const char *str = cpp_named_operator2name (token->type);
++              if (str)
++                {
++                  size_t len = strlen(str);
++                  memcpy(buffer, str, len);
++                  buffer += len;
++                }
++              break;
++            }
++        }
+       else
+ 	buffer = _cpp_spell_ident_ucns (buffer, token->val.node.node);
+       break;
+-- 
+2.25.1
+

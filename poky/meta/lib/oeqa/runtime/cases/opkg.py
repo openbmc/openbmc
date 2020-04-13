@@ -25,7 +25,9 @@ class OpkgRepoTest(OpkgTest):
         if cls.tc.td["MULTILIB_VARIANTS"]:
             allarchfeed = cls.tc.td["TUNE_PKGARCH"]
         service_repo = os.path.join(cls.tc.td['DEPLOY_DIR_IPK'], allarchfeed)
-        cls.repo_server = HTTPService(service_repo, cls.tc.target.server_ip, logger=cls.tc.logger)
+        cls.repo_server = HTTPService(service_repo,
+                                      '0.0.0.0', port=cls.tc.target.server_port,
+                                      logger=cls.tc.logger)
         cls.repo_server.start()
 
     @classmethod

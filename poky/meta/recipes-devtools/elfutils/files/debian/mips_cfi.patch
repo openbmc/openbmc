@@ -1,33 +1,34 @@
-From 96e38289f2887ddb8e6d2fb91ea04bdbdf034ab5 Mon Sep 17 00:00:00 2001
+From 5bf6117a6eaf9007ce80adbb8b66a95ca98047a4 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Wed, 21 Aug 2019 17:00:30 +0800
-Subject: [PATCH 2/2] mips_cfi
+Subject: [PATCH] mips_cfi
 
 Upstream-Status: Pending [from debian]
 
 Rebase to 0.177
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
 ---
  backends/Makefile.am |  2 +-
- backends/mips_cfi.c  | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ backends/mips_cfi.c  | 80 ++++++++++++++++++++++++++++++++++++++++++++
  backends/mips_init.c |  1 +
  3 files changed, 82 insertions(+), 1 deletion(-)
  create mode 100644 backends/mips_cfi.c
 
 diff --git a/backends/Makefile.am b/backends/Makefile.am
-index aba8a4a..6ac0eec 100644
+index 07d45d7..dec3080 100644
 --- a/backends/Makefile.am
 +++ b/backends/Makefile.am
-@@ -145,7 +145,7 @@ csky_SRCS = csky_attrs.c csky_init.c csky_symbol.c csky_cfi.c \
- libebl_csky_pic_a_SOURCES = $(csky_SRCS)
- am_libebl_csky_pic_a_OBJECTS = $(csky_SRCS:.c=.os)
+@@ -100,7 +100,7 @@ riscv_SRCS = riscv_init.c riscv_symbol.c riscv_cfi.c riscv_regs.c \
+ csky_SRCS = csky_attrs.c csky_init.c csky_symbol.c csky_cfi.c \
+ 	    csky_regs.c csky_initreg.c csky_corenote.c
  
 -mips_SRCS = mips_init.c mips_symbol.c mips_regs.c mips_retval.c
 +mips_SRCS = mips_init.c mips_symbol.c mips_regs.c mips_retval.c mips_cfi.c
- libebl_mips_pic_a_SOURCES = $(mips_SRCS)
- am_libebl_mips_pic_a_OBJECTS = $(mips_SRCS:.c=.os)
  
+ libebl_backends_a_SOURCES = $(i386_SRCS) $(sh_SRCS) $(x86_64_SRCS) \
+ 			    $(ia64_SRCS) $(alpha_SRCS) $(arm_SRCS) \
 diff --git a/backends/mips_cfi.c b/backends/mips_cfi.c
 new file mode 100644
 index 0000000..9ffdab5
@@ -126,6 +127,3 @@ index 8482e7f..bce5abe 100644
  
    return MODVERSION;
  }
--- 
-2.7.4
-

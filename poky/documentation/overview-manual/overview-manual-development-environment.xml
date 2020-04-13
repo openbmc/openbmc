@@ -87,7 +87,7 @@
         as its operating system as your development host.
         When you have a Mac or Windows-based system, you can set it up
         as the development host by using
-        <ulink url='https://git.yoctoproject.org/cgit/cgit.cgi/crops/about/'>CROPS</ulink>,
+        <ulink url='https://github.com/crops/poky-container'>CROPS</ulink>,
         which leverages
         <ulink url='https://www.docker.com/'>Docker Containers</ulink>.
         Once you take the steps to set up a CROPS machine, you effectively

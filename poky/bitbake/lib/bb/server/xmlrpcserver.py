@@ -7,9 +7,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-import os
-import sys
-
 import hashlib
 import time
 import inspect

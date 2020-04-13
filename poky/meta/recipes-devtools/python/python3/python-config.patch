@@ -1,4 +1,7 @@
-python-config: Revert to using distutils.sysconfig
+From 07df0ae0d70cba6d1847fe1c24a71063930bec60 Mon Sep 17 00:00:00 2001
+From: Tyler Hall <tylerwhall@gmail.com>
+Date: Sun, 4 May 2014 20:06:43 -0400
+Subject: [PATCH] python-config: Revert to using distutils.sysconfig
 
 The newer sysconfig module shares some code with distutils.sysconfig, but the same modifications as in
 
@@ -12,11 +15,16 @@ Upstream-Status: Inappropriate [Embedded Specific]
 
 Signed-off-by: Tyler Hall <tylerwhall@gmail.com>
 :
-Index: Python-3.3.3/Misc/python-config.in
-===================================================================
---- Python-3.3.3.orig/Misc/python-config.in
-+++ Python-3.3.3/Misc/python-config.in
-@@ -4,7 +4,7 @@
+
+---
+ Misc/python-config.in | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/Misc/python-config.in b/Misc/python-config.in
+index 727c4a8..c702829 100644
+--- a/Misc/python-config.in
++++ b/Misc/python-config.in
+@@ -6,7 +6,7 @@
  import getopt
  import os
  import sys
@@ -24,8 +32,8 @@ Index: Python-3.3.3/Misc/python-config.in
 +from distutils import sysconfig
  
  valid_opts = ['prefix', 'exec-prefix', 'includes', 'libs', 'cflags',
-               'ldflags', 'extension-suffix', 'help', 'abiflags', 'configdir']
-@@ -32,14 +32,14 @@ if '--help' in opt_flags:
+               'ldflags', 'extension-suffix', 'help', 'abiflags', 'configdir',
+@@ -35,14 +35,14 @@ if '--help' in opt_flags:
  
  for opt in opt_flags:
      if opt == '--prefix':

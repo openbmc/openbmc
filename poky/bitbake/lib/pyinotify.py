@@ -1274,7 +1274,7 @@ class Notifier:
             basename = os.path.basename(sys.argv[0]) or 'pyinotify'
             pid_file = os.path.join(dirname, basename + '.pid')
 
-        if pid_file != False and os.path.lexists(pid_file):
+        if pid_file and os.path.lexists(pid_file):
             err = 'Cannot daemonize: pid file %s already exists.' % pid_file
             raise NotifierError(err)
 
@@ -1308,7 +1308,7 @@ class Notifier:
         fork_daemon()
 
         # Write pid
-        if pid_file != False:
+        if pid_file:
             flags = os.O_WRONLY|os.O_CREAT|os.O_NOFOLLOW|os.O_EXCL
             fd_pid = os.open(pid_file, flags, 0o0600)
             os.write(fd_pid,  bytes(str(os.getpid()) + '\n',

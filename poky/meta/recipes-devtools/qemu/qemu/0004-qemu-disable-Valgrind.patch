@@ -1,4 +1,4 @@
-From 3ad7a375015d47fdf5016e03e11fa93440d6d8bd Mon Sep 17 00:00:00 2001
+From 4127296bb1046cdf73994ba69dc913d8c02fd74f Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Tue, 20 Oct 2015 22:19:08 +0100
 Subject: [PATCH] qemu: disable Valgrind
@@ -13,10 +13,10 @@ Signed-off-by: Ross Burton <ross.burton@intel.com>
  1 file changed, 9 deletions(-)
 
 diff --git a/configure b/configure
-index 714e7fb6..dad4fc59 100755
+index 6099be1d..a766017b 100755
 --- a/configure
 +++ b/configure
-@@ -5335,15 +5335,6 @@ fi
+@@ -5390,15 +5390,6 @@ fi
  # check if we have valgrind/valgrind.h
  
  valgrind_h=no

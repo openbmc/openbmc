@@ -1,3 +1,6 @@
+From ff9f0a631c99fb6e2677c02bf572a5e69c70f5cf Mon Sep 17 00:00:00 2001
+From: Changhyeok Bae <changhyeok.bae@gmail.com>
+Date: Mon, 27 Jan 2020 22:48:03 +0100
 Subject: [PATCH] Support separation of SRCDIR and OBJDIR
 
 Typical use of VPATH to locate the sources.
@@ -11,12 +14,12 @@ Signed-off-by: Maxin B. John <maxin.john@intel.com>
  1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 33aaf6a..9030796 100644
+index 90f2251..714cdb9 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -1,5 +1,9 @@
  MAKEFLAGS += --no-print-directory
-
+ 
 +SRCDIR ?= $(dir $(lastword $(MAKEFILE_LIST)))
 +OBJDIR ?= $(PWD)
 +VPATH = $(SRCDIR)
@@ -24,19 +27,24 @@ index 33aaf6a..9030796 100644
  PREFIX ?= /usr
  SBINDIR ?= $(PREFIX)/sbin
  MANDIR ?= $(PREFIX)/share/man
-@@ -103,11 +107,11 @@ VERSION_OBJS := $(filter-out version.o, $(OBJS))
+@@ -92,7 +96,7 @@ all: $(ALL)
  version.c: version.sh $(patsubst %.o,%.c,$(VERSION_OBJS)) nl80211.h iw.h Makefile \
  		$(wildcard .git/index .git/refs/tags)
  	@$(NQ) ' GEN ' $@
 -	$(Q)./version.sh $@
 +	$(Q)cd $(SRCDIR) && ./version.sh $(OBJDIR)/$@
-
- %.o: %.c iw.h nl80211.h
+ 
+ nl80211-commands.inc: nl80211.h
+ 	@$(NQ) ' GEN ' $@
+@@ -100,7 +104,7 @@ nl80211-commands.inc: nl80211.h
+ 
+ %.o: %.c iw.h nl80211.h nl80211-commands.inc
  	@$(NQ) ' CC  ' $@
 -	$(Q)$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
 +	$(Q)$(CC) -I$(SRCDIR) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
-
+ 
  ifeq ($(IW_ANDROID_BUILD),)
  iw:	$(OBJS)
---
-2.20.1 (Apple Git-117)
+-- 
+2.23.0
+

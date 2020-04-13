@@ -1,7 +1,7 @@
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
-SRCREV = "57c9aca9f1ff32a6add10e02ecd33b7314fad499"
-PV = "4.1+git${SRCPV}"
+SRCREV = "044a0640985ef007c0b2fb6eaf660d9d51800cda"
+PV = "4.2"
 
 SRC_URI = "git://sourceware.org/git/systemtap.git \
            file://0001-Do-not-let-configure-write-a-python-location-into-th.patch \

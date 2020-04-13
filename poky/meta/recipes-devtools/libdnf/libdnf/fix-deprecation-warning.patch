@@ -1,0 +1,71 @@
+From 66d9b2ba3fbc7b04f2b5ad9d0e5371340c037b5f Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Wed, 10 Jul 2019 10:11:01 +0200
+Subject: [oe-core][PATCH 1/1] Fix Python 3.8 deprecation warning
+ (RhBug:1724244)
+
+This deprecation warning was introduced in Python 3.8 by
+https://bugs.python.org/issue36381:
+
+/usr/lib/python3.8/site-packages/dnf/package.py:57: DeprecationWarning: PY_SSIZE_T_CLEAN will be required for '#' formats
+  return super(Package, self).chksum
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1724244
+---
+ python/hawkey/package-py.cpp      | 3 ++-
+ python/hawkey/packagedelta-py.cpp | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+---
+
+Unchanged.  Appears in version 0.35.2.
+
+Upstream-Status: Backport [git://github.com/rpm-software-management/libdnf.git]
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+
+diff --git a/python/hawkey/package-py.cpp b/python/hawkey/package-py.cpp
+index 5102bba..68e03cb 100644
+--- a/python/hawkey/package-py.cpp
++++ b/python/hawkey/package-py.cpp
+@@ -18,6 +18,7 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+  */
+ 
++#define PY_SSIZE_T_CLEAN
+ #include <Python.h>
+ #include <stdio.h>
+ 
+@@ -251,7 +252,7 @@ get_chksum(_PackageObject *self, void *closure)
+ #if PY_MAJOR_VERSION < 3
+     res = Py_BuildValue("is#", type, cs, checksum_length);
+ #else
+-    res = Py_BuildValue("iy#", type, cs, checksum_length);
++    res = Py_BuildValue("iy#", type, cs, (Py_ssize_t)checksum_length);
+ #endif
+ 
+     return res;
+diff --git a/python/hawkey/packagedelta-py.cpp b/python/hawkey/packagedelta-py.cpp
+index ca1cb7d..1a64836 100644
+--- a/python/hawkey/packagedelta-py.cpp
++++ b/python/hawkey/packagedelta-py.cpp
+@@ -18,6 +18,7 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+  */
+ 
++#define PY_SSIZE_T_CLEAN
+ #include <Python.h>
+ 
+ // hawkey
+@@ -92,7 +93,7 @@ get_chksum(_PackageDeltaObject *self, void *closure)
+ #if PY_MAJOR_VERSION < 3
+     res = Py_BuildValue("is#", type, cs, checksum_length);
+ #else
+-    res = Py_BuildValue("iy#", type, cs, checksum_length);
++    res = Py_BuildValue("iy#", type, cs, (Py_ssize_t)checksum_length);
+ #endif
+ 
+     return res;
+-- 
+2.7.4
+

@@ -226,9 +226,9 @@ class CmakeRecipeHandler(RecipeHandler):
                         elif pkg == 'PkgConfig':
                             inherits.append('pkgconfig')
                         elif pkg == 'PythonInterp':
-                            inherits.append('pythonnative')
+                            inherits.append('python3native')
                         elif pkg == 'PythonLibs':
-                            inherits.append('python-dir')
+                            inherits.append('python3-dir')
                         else:
                             # Try to map via looking at installed CMake packages in pkgdata
                             dep = find_cmake_package(pkg)
@@ -417,7 +417,7 @@ class AutotoolsRecipeHandler(RecipeHandler):
                 }
         progclassmap = {'gconftool-2': 'gconf',
                 'pkg-config': 'pkgconfig',
-                'python': 'pythonnative',
+                'python': 'python3native',
                 'python3': 'python3native',
                 'perl': 'perlnative',
                 'makeinfo': 'texinfo',
@@ -566,16 +566,7 @@ class AutotoolsRecipeHandler(RecipeHandler):
             elif keyword == 'AX_PROG_XSLTPROC':
                 deps.append('libxslt-native')
             elif keyword in ['AC_PYTHON_DEVEL', 'AX_PYTHON_DEVEL', 'AM_PATH_PYTHON']:
-                pythonclass = 'pythonnative'
-                res = version_re.search(value)
-                if res:
-                    if res.group(1).startswith('3'):
-                        pythonclass = 'python3native'
-                # Avoid replacing python3native with pythonnative
-                if not pythonclass in inherits and not 'python3native' in inherits:
-                    if 'pythonnative' in inherits:
-                        inherits.remove('pythonnative')
-                    inherits.append(pythonclass)
+                pythonclass = 'python3native'
             elif keyword == 'AX_WITH_CURSES':
                 deps.append('ncurses')
             elif keyword == 'AX_PATH_BDB':

@@ -21,6 +21,7 @@ SRC_URI = " \
     file://nginx.init \
     file://nginx-volatile.conf \
     file://nginx.service \
+    file://nginx-fix-pidfile.patch \
 "
 
 inherit siteinfo update-rc.d useradd systemd

@@ -1,0 +1,24 @@
+From dc6bf2ae0835c6569b270e8e1f26a3173f3927d9 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 4 Dec 2019 13:14:01 +0100
+Subject: [PATCH] analyze.l: add missing string format
+
+Upstream-Status: Submitted [https://github.com/legionus/kbd/pull/35]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ src/libkeymap/analyze.l | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libkeymap/analyze.l b/src/libkeymap/analyze.l
+index e32ace6..de62f46 100644
+--- a/src/libkeymap/analyze.l
++++ b/src/libkeymap/analyze.l
+@@ -463,7 +463,7 @@ To                      to|To|TO
+ 
+ 					strerror_r(errno, buf, sizeof(buf));
+ 
+-					ERR(yyextra, buf);
++					ERR(yyextra, "%s", buf);
+ 					return(ERROR);
+ 				}
+ 

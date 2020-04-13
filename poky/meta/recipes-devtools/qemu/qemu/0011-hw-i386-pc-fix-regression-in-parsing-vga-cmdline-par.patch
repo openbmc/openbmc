@@ -1,0 +1,54 @@
+From a88c40f02ace88f09b2a85a64831b277b2ebc88c Mon Sep 17 00:00:00 2001
+From: Peter Wu <peter@lekensteyn.nl>
+Date: Sat, 21 Dec 2019 17:21:24 +0100
+Subject: [PATCH] hw/i386/pc: fix regression in parsing vga cmdline parameter
+
+When the 'vga=' parameter is succeeded by another parameter, QEMU 4.2.0
+would refuse to start with a rather cryptic message:
+
+    $ qemu-system-x86_64 -kernel /boot/vmlinuz-linux -append 'vga=792 quiet'
+    qemu: can't parse 'vga' parameter: Invalid argument
+
+It was not clear whether this applied to the '-vga std' parameter or the
+'-append' one. Fix the parsing regression and clarify the error.
+
+Fixes: 133ef074bd ("hw/i386/pc: replace use of strtol with qemu_strtoui in x86_load_linux()")
+Cc: Sergio Lopez <slp@redhat.com>
+Signed-off-by: Peter Wu <peter@lekensteyn.nl>
+Message-Id: <20191221162124.1159291-1-peter@lekensteyn.nl>
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Upstream-Status: Backport [https://git.qemu.org/?p=qemu.git;a=commitdiff;h=a88c40f02ace88f09b2a85a64831b277b2ebc88c]
+---
+ hw/i386/x86.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index d8bb5c2a96..9b9a4d5837 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -612,6 +612,7 @@ void x86_load_linux(X86MachineState *x86ms,
+     vmode = strstr(kernel_cmdline, "vga=");
+     if (vmode) {
+         unsigned int video_mode;
++        const char *end;
+         int ret;
+         /* skip "vga=" */
+         vmode += 4;
+@@ -622,10 +623,9 @@ void x86_load_linux(X86MachineState *x86ms,
+         } else if (!strncmp(vmode, "ask", 3)) {
+             video_mode = 0xfffd;
+         } else {
+-            ret = qemu_strtoui(vmode, NULL, 0, &video_mode);
+-            if (ret != 0) {
+-                fprintf(stderr, "qemu: can't parse 'vga' parameter: %s\n",
+-                        strerror(-ret));
++            ret = qemu_strtoui(vmode, &end, 0, &video_mode);
++            if (ret != 0 || (*end && *end != ' ')) {
++                fprintf(stderr, "qemu: invalid 'vga=' kernel parameter.\n");
+                 exit(1);
+             }
+         }
+-- 
+2.25.0
+

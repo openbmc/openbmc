@@ -5,5 +5,17 @@
 
 set -e
 
-PSEUDO_UNLOAD=1 ${binprefix}qemuwrapper -L $D $D${libexecdir}/${binprefix}udevadm hwdb --update --root $D
-chown root:root $D${sysconfdir}/udev/hwdb.bin
+case "${PREFERRED_PROVIDER_udev}" in
+	systemd)
+		UDEV_EXTRA_ARGS="--usr"
+		UDEVLIBDIR="${rootlibexecdir}"
+		;;
+
+	*)
+		UDEV_EXTRA_ARGS=""
+		UDEVLIBDIR="${sysconfdir}"
+		;;
+esac
+
+PSEUDO_UNLOAD=1 ${binprefix}qemuwrapper -L $D $D${libexecdir}/${binprefix}udevadm hwdb --update --root $D ${UDEV_EXTRA_ARGS}
+chown root:root $D${UDEVLIBDIR}/udev/hwdb.bin

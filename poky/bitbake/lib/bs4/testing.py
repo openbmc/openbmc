@@ -4,7 +4,6 @@ __license__ = "MIT"
 
 import pickle
 import copy
-import functools
 import unittest
 from unittest import TestCase
 from bs4 import BeautifulSoup

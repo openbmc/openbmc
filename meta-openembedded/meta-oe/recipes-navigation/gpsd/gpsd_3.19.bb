@@ -2,7 +2,7 @@ SUMMARY = "A TCP/IP Daemon simplifying the communication with GPS devices"
 SECTION = "console/network"
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=01764c35ae34d9521944bb6ab312af53"
-DEPENDS = "dbus ncurses python python3 pps-tools"
+DEPENDS = "dbus ncurses python3 pps-tools"
 PROVIDES = "virtual/gpsd"
 
 SRC_URI = "${SAVANNAH_GNU_MIRROR}/${BPN}/${BP}.tar.gz \
@@ -12,7 +12,7 @@ SRC_URI = "${SAVANNAH_GNU_MIRROR}/${BPN}/${BP}.tar.gz \
 SRC_URI[md5sum] = "b3bf88706794eb8e5f2c2543bf7ba87b"
 SRC_URI[sha256sum] = "27dd24d45b2ac69baab7933da2bf6ae5fb0be90130f67e753c110a3477155f39"
 
-inherit scons update-rc.d python-dir pythonnative systemd update-alternatives
+inherit scons update-rc.d python3-dir python3native systemd update-alternatives
 
 INITSCRIPT_PACKAGES = "gpsd-conf"
 INITSCRIPT_NAME = "gpsd"
@@ -84,7 +84,7 @@ do_install_append() {
     install -m 0644 ${S}/systemd/${BPN}.socket ${D}${systemd_unitdir}/system/${BPN}.socket
 }
 
-PACKAGES =+ "libgps libgpsd python-pygps gpsd-udev gpsd-conf gpsd-gpsctl gps-utils"
+PACKAGES =+ "libgps libgpsd python3-pygps gpsd-udev gpsd-conf gpsd-gpsctl gps-utils"
 
 RPROVIDES_${PN}-dbg += "python-pygps-dbg"
 
@@ -114,17 +114,17 @@ FILES_gpsd-gpsctl = "${bindir}/gpsctl"
 SUMMARY_gps-utils = "Utils used for simulating, monitoring,... a GPS"
 # Python files are required for gps/fake, required for gpsfake.
 FILES_gps-utils = "${bindir}/* ${libdir}/gps/*.py ${libdir}/gps/*.so"
-RDEPENDS_gps-utils = "python-pygps"
+RDEPENDS_gps-utils = "python3-pygps"
 
-SUMMARY_python-pygps = "Python bindings to gpsd"
-FILES_python-pygps = "${PYTHON_SITEPACKAGES_DIR}/* ${libdir}/gps/*.py ${libdir}/*.egg-info"
-RDEPENDS_python-pygps = " \
-    python-core \
-    python-io \
-    python-threading \
-    python-terminal \
+SUMMARY_python3-pygps = "Python bindings to gpsd"
+FILES_python3-pygps = "${PYTHON_SITEPACKAGES_DIR}/* ${libdir}/gps/*.py ${libdir}/*.egg-info"
+RDEPENDS_python3-pygps = " \
+    python3-core \
+    python3-io \
+    python3-threading \
+    python3-terminal \
     gpsd \
-    python-json"
+    python3-json"
 
 RPROVIDES_${PN} += "${PN}-systemd"
 RREPLACES_${PN} += "${PN}-systemd"

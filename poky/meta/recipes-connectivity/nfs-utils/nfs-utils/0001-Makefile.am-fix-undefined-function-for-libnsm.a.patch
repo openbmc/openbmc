@@ -28,10 +28,10 @@ Rebase it.
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
 ---
  support/misc/Makefile.am |   2 +-
- support/misc/file.c      | 111 ---------------------------------------------------------------------------------------------------------------
+ support/misc/file.c      | 115 ---------------------------------------------------------------------------------------------------------------
  support/misc/misc.c      | 111 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  support/nsm/Makefile.am  |   2 +-
- 4 files changed, 113 insertions(+), 113 deletions(-)
+ 4 files changed, 113 insertions(+), 117 deletions(-)
 
 diff --git a/support/misc/Makefile.am b/support/misc/Makefile.am
 index f9993e3..8b0e9db 100644
@@ -48,10 +48,10 @@ index f9993e3..8b0e9db 100644
  MAINTAINERCLEANFILES = Makefile.in
 diff --git a/support/misc/file.c b/support/misc/file.c
 deleted file mode 100644
-index e7c3819..0000000
+index 06f6bb2..0000000
 --- a/support/misc/file.c
 +++ /dev/null
-@@ -1,111 +0,0 @@
+@@ -1,115 +0,0 @@
 -/*
 - * Copyright 2009 Oracle.  All rights reserved.
 - * Copyright 2017 Red Hat, Inc.  All rights reserved.
@@ -71,6 +71,10 @@ index e7c3819..0000000
 - * You should have received a copy of the GNU General Public License
 - * along with nfs-utils.  If not, see <http://www.gnu.org/licenses/>.
 - */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
 -
 -#include <sys/stat.h>
 -

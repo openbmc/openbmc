@@ -1,4 +1,4 @@
-From 3c29a86f351ea4827dc445bb8e6cb774543c9be6 Mon Sep 17 00:00:00 2001
+From c710a3accd1fabdb671274e1a458405282d51e0c Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 6 Aug 2018 15:38:58 -0700
 Subject: [PATCH] include sys/sysmacros.h for major/minor definitions
@@ -13,10 +13,10 @@ Upstream-Status: Pending
  3 files changed, 3 insertions(+)
 
 diff --git a/src/bootlogd.c b/src/bootlogd.c
-index 570d382..68d62f3 100644
+index 787db87..8b07903 100644
 --- a/src/bootlogd.c
 +++ b/src/bootlogd.c
-@@ -35,6 +35,7 @@
+@@ -29,6 +29,7 @@
  #include <sys/types.h>
  #include <sys/time.h>
  #include <sys/stat.h>
@@ -25,7 +25,7 @@ index 570d382..68d62f3 100644
  #include <sys/utsname.h>
  #include <time.h>
 diff --git a/src/mountpoint.c b/src/mountpoint.c
-index 9e3dd9c..91f74ed 100644
+index 5f20522..94df7a1 100644
 --- a/src/mountpoint.c
 +++ b/src/mountpoint.c
 @@ -25,6 +25,7 @@
@@ -37,7 +37,7 @@ index 9e3dd9c..91f74ed 100644
  #include <stdlib.h>
  #include <string.h>
 diff --git a/src/shutdown.c b/src/shutdown.c
-index 7e997da..17de58d 100644
+index b744a2c..40b7faf 100644
 --- a/src/shutdown.c
 +++ b/src/shutdown.c
 @@ -40,6 +40,7 @@
@@ -46,5 +46,5 @@ index 7e997da..17de58d 100644
  #include <sys/stat.h>
 +#include <sys/sysmacros.h>
  #include <sys/wait.h>
- #include <time.h>
- #include <string.h>
+ #ifdef __linux__
+ #include <sys/sysmacros.h>   /* brought in my LFS patch */

@@ -315,15 +315,15 @@ def runqemu(pn, ssh=True, runqemuparams='', image_fstype=None, launch_cmd=None, 
     try:
         tinfoil.logger.setLevel(logging.WARNING)
         import oeqa.targetcontrol
-        tinfoil.config_data.setVar("TEST_LOG_DIR", "${WORKDIR}/testimage")
-        tinfoil.config_data.setVar("TEST_QEMUBOOT_TIMEOUT", "1000")
+        recipedata = tinfoil.parse_recipe(pn)
+        recipedata.setVar("TEST_LOG_DIR", "${WORKDIR}/testimage")
+        recipedata.setVar("TEST_QEMUBOOT_TIMEOUT", "1000")
         # Tell QemuTarget() whether need find rootfs/kernel or not
         if launch_cmd:
-            tinfoil.config_data.setVar("FIND_ROOTFS", '0')
+            recipedata.setVar("FIND_ROOTFS", '0')
         else:
-            tinfoil.config_data.setVar("FIND_ROOTFS", '1')
+            recipedata.setVar("FIND_ROOTFS", '1')
 
-        recipedata = tinfoil.parse_recipe(pn)
         for key, value in overrides.items():
             recipedata.setVar(key, value)
 

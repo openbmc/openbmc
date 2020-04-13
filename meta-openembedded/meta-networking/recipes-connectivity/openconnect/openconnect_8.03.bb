@@ -2,11 +2,14 @@ SUMMARY = "Open client for Cisco AnyConnect VPN"
 LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING.LGPL;md5=243b725d71bb5df4a1e5920b344b86ad"
 
-SRC_URI = "git://git.infradead.org/users/dwmw2/openconnect.git"
+SRC_URI = " \
+    git://git.infradead.org/users/dwmw2/openconnect.git \
+    file://0001-trojans-tncc-wrapper.py-convert-to-python3.patch \
+"
 SRCREV = "ea73851969ae7a6ea54fdd2d2b8c94776af24b2a"
 
 DEPENDS = "vpnc libxml2 krb5 gettext-native"
-RDEPENDS_${PN} = "bash python"
+RDEPENDS_${PN} = "bash python3-core vpnc-script"
 
 PACKAGECONFIG ??= "gnutls lz4 libproxy"
 
@@ -22,10 +25,5 @@ S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig
 
-EXTRA_OECONF += "--with-vpnc-script=${SYSROOT_DESTDIR}${sysconfdir}/vpnc/vpnc-script \
+EXTRA_OECONF += "--with-vpnc-script=${sysconfdir}/vpnc/vpnc-script \
                  --disable-static"
-
-do_configure_append() {
-    # script has /usr/bin/python2 path hardcoded
-    sed -i -e 's=python2\.*=python=g' ${S}/trojans/tncc-wrapper.py
-}

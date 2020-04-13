@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = " \
     file://COPYING;md5=6e1b9cb787e76d7e6946887a65caa754 \
 "
 
-inherit gnomebase itstool autotools-brokensep gsettings gettext gtk-doc features_check
+inherit gnomebase itstool autotools-brokensep gsettings gettext gtk-doc features_check mime-xdg
 
 # for webkitgtk
 REQUIRED_DISTRO_FEATURES = "x11"

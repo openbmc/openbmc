@@ -16,7 +16,7 @@ SRC_URI = "ftp://ftp.proftpd.org/distrib/source/${BPN}-${PV}.tar.gz \
 iSRC_URI[md5sum] = "13270911c42aac842435f18205546a1b"
 SRC_URI[sha256sum] = "91ef74b143495d5ff97c4d4770c6804072a8c8eb1ad1ecc8cc541b40e152ecaf"
 
-inherit autotools-brokensep useradd update-rc.d systemd
+inherit autotools-brokensep useradd update-rc.d systemd multilib_script
 
 PACKAGECONFIG ??= "shadow \
                    ${@bb.utils.filter('DISTRO_FEATURES', 'ipv6 pam', d)} \
@@ -110,6 +110,7 @@ do_install () {
     sed -e 's|--sysroot=${STAGING_DIR_HOST}||g' \
         -e 's|${STAGING_DIR_NATIVE}||g' \
         -e 's|-fdebug-prefix-map=[^ ]*||g' \
+        -e 's|-fmacro-prefix-map=[^ ]*||g' \
         -i ${D}/${bindir}/prxs
 
     # ftpmail perl script, which reads the proftpd log file and sends
@@ -132,6 +133,8 @@ USERADD_PACKAGES = "${PN}"
 GROUPADD_PARAM_${PN} = "--system ${FTPGROUP}"
 USERADD_PARAM_${PN} = "--system -g ${FTPGROUP} --home-dir /var/lib/${FTPUSER} --no-create-home \
                        --shell /bin/false ${FTPUSER}"
+
+MULTILIB_SCRIPTS = "${PN}:${bindir}/prxs"
 
 FILES_${PN} += "/home/${FTPUSER}"
 

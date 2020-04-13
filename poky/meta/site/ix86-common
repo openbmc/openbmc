@@ -27,10 +27,7 @@ ac_cv_func_stat_empty_string_bug=${ac_cv_func_stat_empty_string_bug=no}
 ac_cv_func_stat_ignores_trailing_slash=${ac_cv_func_stat_ignores_trailing_slash=no}
 ac_cv_va_val_copy=${ac_cv_va_val_copy=yes}
 
-ac_cv_header_netinet_sctp_h=${ac_cv_header_netinet_sctp_h=no}
-ac_cv_header_netinet_sctp_uio_h=${ac_cv_header_netinet_sctp_uio_h=no}
 ac_cv_linux_vers=${ac_cv_linux_vers=2}
-ac_cv_sctp=${ac_cv_sctp=no}
 
 ac_cv_path_ESD_CONFIG=no
 lf_cv_sane_realloc=yes

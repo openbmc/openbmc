@@ -280,7 +280,7 @@ class Disk:
     def __getattr__(self, name):
         """Get path to the executable in a lazy way."""
         if name in ("mdir", "mcopy", "mdel", "mdeltree", "sfdisk", "e2fsck",
-                    "resize2fs", "mkswap", "mkdosfs", "debugfs"):
+                    "resize2fs", "mkswap", "mkdosfs", "debugfs","blkid"):
             aname = "_%s" % name
             if aname not in self.__dict__:
                 setattr(self, aname, find_executable(name, self.paths))
@@ -291,7 +291,7 @@ class Disk:
 
     def _get_part_image(self, pnum):
         if pnum not in self.partitions:
-            raise WicError("Partition %s is not in the image")
+            raise WicError("Partition %s is not in the image" % pnum)
         part = self.partitions[pnum]
         # check if fstype is supported
         for fstype in self.fstypes:
@@ -314,6 +314,9 @@ class Disk:
                     seek=self.partitions[pnum].start)
 
     def dir(self, pnum, path):
+        if pnum not in self.partitions:
+            raise WicError("Partition %s is not in the image" % pnum)
+
         if self.partitions[pnum].fstype.startswith('ext'):
             return exec_cmd("{} {} -R 'ls -l {}'".format(self.debugfs,
                                                          self._get_part_image(pnum),
@@ -323,16 +326,31 @@ class Disk:
                                                    self._get_part_image(pnum),
                                                    path))
 
-    def copy(self, src, pnum, path):
+    def copy(self, src, dest):
         """Copy partition image into wic image."""
+        pnum =  dest.part if isinstance(src, str) else src.part
+
         if self.partitions[pnum].fstype.startswith('ext'):
-            cmd = "printf 'cd {}\nwrite {} {}\n' | {} -w {}".\
-                      format(path, src, os.path.basename(src),
+            if isinstance(src, str):
+                cmd = "printf 'cd {}\nwrite {} {}\n' | {} -w {}".\
+                      format(os.path.dirname(dest.path), src, os.path.basename(src),
                              self.debugfs, self._get_part_image(pnum))
+            else: # copy from wic
+                # run both dump and rdump to support both files and directory
+                cmd = "printf 'cd {}\ndump /{} {}\nrdump /{} {}\n' | {} {}".\
+                      format(os.path.dirname(src.path), src.path,
+                             dest, src.path, dest, self.debugfs,
+                             self._get_part_image(pnum))
         else: # fat
-            cmd = "{} -i {} -snop {} ::{}".format(self.mcopy,
+            if isinstance(src, str):
+                cmd = "{} -i {} -snop {} ::{}".format(self.mcopy,
                                                   self._get_part_image(pnum),
-                                                  src, path)
+                                                  src, dest.path)
+            else:
+                cmd = "{} -i {} -snop ::{} {}".format(self.mcopy,
+                                                  self._get_part_image(pnum),
+                                                  src.path, dest)
+
         exec_cmd(cmd, as_shell=True)
         self._put_part_image(pnum)
 
@@ -424,7 +442,7 @@ class Disk:
             outf.flush()
 
         def read_ptable(path):
-            out = exec_cmd("{} -dJ {}".format(self.sfdisk, path))
+            out = exec_cmd("{} -J {}".format(self.sfdisk, path))
             return json.loads(out)
 
         def write_ptable(parts, target):
@@ -525,7 +543,8 @@ class Disk:
                         logger.info("creating swap partition {}".format(pnum))
                         label = part.get("name")
                         label_str = "-L {}".format(label) if label else ''
-                        uuid = part.get("uuid")
+                        out = exec_cmd("{} --probe {}".format(self.blkid, self._get_part_image(pnum)))
+                        uuid = out[out.index("UUID=\"")+6:out.index("UUID=\"")+42]
                         uuid_str = "-U {}".format(uuid) if uuid else ''
                         with open(partfname, 'w') as sparse:
                             os.ftruncate(sparse.fileno(), part['size'] * self._lsector_size)
@@ -551,11 +570,15 @@ def wic_ls(args, native_sysroot):
 
 def wic_cp(args, native_sysroot):
     """
-    Copy local file or directory to the vfat partition of
+    Copy file or directory to/from the vfat/ext partition of
     partitioned image.
     """
-    disk = Disk(args.dest.image, native_sysroot)
-    disk.copy(args.src, args.dest.part, args.dest.path)
+    if isinstance(args.dest, str):
+        disk = Disk(args.src.image, native_sysroot)
+    else:
+        disk = Disk(args.dest.image, native_sysroot)
+    disk.copy(args.src, args.dest)
+
 
 def wic_rm(args, native_sysroot):
     """

@@ -1,12 +1,16 @@
 require ${BPN}.inc
 
-SRC_URI += "file://${BPN}.initd"
+SRC_URI += "file://${BPN}.initd \
+            file://0001-Remove-modules_clean-from-clean-target.patch \
+            "
 
 SRC_URI_append_libc-musl = " file://Drop-use-of-error-h.patch"
 
 inherit update-rc.d
 
 INITSCRIPT_NAME = "${BPN}"
+
+
 
 do_compile() {
     oe_runmake nbcat

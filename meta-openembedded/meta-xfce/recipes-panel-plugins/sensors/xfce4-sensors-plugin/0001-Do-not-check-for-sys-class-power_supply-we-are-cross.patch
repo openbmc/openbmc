@@ -1,0 +1,44 @@
+From 9b7e1beca872ca4a5fce8938c58379103787f79a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Sun, 23 Feb 2020 22:06:32 +0100
+Subject: [PATCH] Do not check for /sys/class/power_supply - we are cross
+ compiling
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ configure.ac | 12 +-----------
+ 1 file changed, 1 insertion(+), 11 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index c281af9..60ba0c0 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -209,19 +209,9 @@ dnl Check for interface for /sys/class/power_supply to be used
+ AC_ARG_ENABLE([sysfsacpi], [AC_HELP_STRING([--enable-sysfsacpi], [Use /sys/class/power_supply to read your battery value @<:@default=auto@:>@])],
+ [],
+ [
+-    enable_sysfsacpi=auto
++    enable_sysfsacpi=yes
+ ])
+ 
+-if test x"$enable_sysfsacpi" = x"auto"; then
+-    AC_CHECK_FILE([/sys/class/power_supply],
+-    [
+-        enable_sysfsacpi=yes
+-    ],
+-    [
+-        enable_sysfsacpi=no
+-    ])
+-fi
+-
+ if test x"$enable_sysfsacpi" = x"yes"; then
+     AC_DEFINE([HAVE_SYSFS_ACPI], [1], [Define to 1 if /sys/class/power_supply is found])
+     enable_procacpi=yes
+-- 
+2.21.0
+

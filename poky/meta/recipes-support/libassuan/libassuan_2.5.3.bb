@@ -22,11 +22,15 @@ SRC_URI[sha256sum] = "91bcb0403866b4e7c4bc1cc52ed4c364a9b5414b3994f718c70303f7f7
 
 BINCONFIG = "${bindir}/libassuan-config"
 
-inherit autotools texinfo binconfig-disabled pkgconfig
+inherit autotools texinfo binconfig-disabled pkgconfig multilib_header
 
 do_configure_prepend () {
 	# Else these could be used in preference to those in aclocal-copy
 	rm -f ${S}/m4/*.m4
+}
+
+do_install_append () {
+    oe_multilib_header assuan.h
 }
 
 BBCLASSEXTEND = "native nativesdk"

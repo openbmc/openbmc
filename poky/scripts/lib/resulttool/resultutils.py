@@ -127,10 +127,7 @@ def decode_log(logdata):
             data = logdata.get("compressed")
             data = base64.b64decode(data.encode("utf-8"))
             data = zlib.decompress(data)
-            try:
-                return data.decode("utf-8")
-            except UnicodeDecodeError:
-                return data
+            return data.decode("utf-8", errors='ignore')
     return None
 
 def ptestresult_get_log(results, section):

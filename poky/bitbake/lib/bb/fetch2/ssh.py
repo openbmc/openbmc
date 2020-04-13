@@ -32,8 +32,6 @@ IETF secsh internet draft:
 
 import re, os
 from   bb.fetch2 import FetchMethod
-from   bb.fetch2 import FetchError
-from   bb.fetch2 import logger
 from   bb.fetch2 import runfetchcmd
 
 
@@ -60,7 +58,7 @@ class SSH(FetchMethod):
     '''Class to fetch a module or modules via Secure Shell'''
 
     def supports(self, urldata, d):
-        return __pattern__.match(urldata.url) != None
+        return __pattern__.match(urldata.url) is not None
 
     def supports_checksum(self, urldata):
         return False

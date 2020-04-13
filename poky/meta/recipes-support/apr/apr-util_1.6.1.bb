@@ -28,7 +28,9 @@ EXTRA_OECONF = "--with-apr=${STAGING_BINDIR_CROSS}/apr-1-config \
 		--with-expat=${STAGING_DIR_HOST}${prefix}"
 
 
-inherit autotools lib_package binconfig
+inherit autotools lib_package binconfig multilib_script
+
+MULTILIB_SCRIPTS = "${PN}-dev:${bindir}/apu-1-config"
 
 OE_BINCONFIG_EXTRA_MANGLE = " -e 's:location=source:location=installed:'"
 

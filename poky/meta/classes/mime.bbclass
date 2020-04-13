@@ -1,46 +1,47 @@
-DEPENDS += "shared-mime-info"
+#
+# This class is used by recipes installing mime types
+#
+
+DEPENDS += "${@bb.utils.contains('BPN', 'shared-mime-info', '', 'shared-mime-info', d)}"
 PACKAGE_WRITE_DEPS += "shared-mime-info-native"
+MIMEDIR = "${datadir}/mime"
 
 mime_postinst() {
-if [ "$1" = configure ]; then
-	UPDATEMIMEDB=`which update-mime-database`
-	if [ -x "$UPDATEMIMEDB" ] ; then
-		echo "Updating MIME database... this may take a while."
-		$UPDATEMIMEDB $D${datadir}/mime
-	else
-		echo "Missing update-mime-database, update of mime database failed!"
-		exit 1
-	fi
+if [ "x$D" != "x" ]; then
+	$INTERCEPT_DIR/postinst_intercept update_mime_database ${PKG} \
+		mlprefix=${MLPREFIX} \
+		mimedir=${MIMEDIR}
+else
+	echo "Updating MIME database... this may take a while."
+	update-mime-database $D${MIMEDIR}
 fi
 }
 
 mime_postrm() {
-if [ "$1" = remove ] || [ "$1" = upgrade ]; then
-	UPDATEMIMEDB=`which update-mime-database`
-	if [ -x "$UPDATEMIMEDB" ] ; then
-		echo "Updating MIME database... this may take a while."
-		$UPDATEMIMEDB $D${datadir}/mime
-	else
-		echo "Missing update-mime-database, update of mime database failed!"
-		exit 1
-	fi
+if [ "x$D" != "x" ]; then
+	$INTERCEPT_DIR/postinst_intercept update_mime_database ${PKG} \
+		mlprefix=${MLPREFIX} \
+		mimedir=${MIMEDIR}
+else
+	echo "Updating MIME database... this may take a while."
+	update-mime-database $D${MIMEDIR}
 fi
 }
 
 python populate_packages_append () {
-    import re
     packages = d.getVar('PACKAGES').split()
     pkgdest =  d.getVar('PKGDEST')
+    mimedir = d.getVar('MIMEDIR')
 
     for pkg in packages:
-        mime_dir = '%s/%s/usr/share/mime/packages' % (pkgdest, pkg)
-        mimes = []
-        mime_re = re.compile(".*\.xml$")
-        if os.path.exists(mime_dir):
-            for f in os.listdir(mime_dir):
-                if mime_re.match(f):
-                    mimes.append(f)
-        if mimes:
+        mime_packages_dir = '%s/%s%s/packages' % (pkgdest, pkg, mimedir)
+        mimes_types_found = False
+        if os.path.exists(mime_packages_dir):
+            for f in os.listdir(mime_packages_dir):
+                if f.endswith('.xml'):
+                    mimes_types_found = True
+                    break
+        if mimes_types_found:
             bb.note("adding mime postinst and postrm scripts to %s" % pkg)
             postinst = d.getVar('pkg_postinst_%s' % pkg)
             if not postinst:
@@ -52,6 +53,7 @@ python populate_packages_append () {
                 postrm = '#!/bin/sh\n'
             postrm += d.getVar('mime_postrm')
             d.setVar('pkg_postrm_%s' % pkg, postrm)
-            bb.note("adding shared-mime-info-data dependency to %s" % pkg)
-            d.appendVar('RDEPENDS_' + pkg, " " + d.getVar('MLPREFIX')+"shared-mime-info-data")
+            if pkg != 'shared-mime-info-data':
+                bb.note("adding shared-mime-info-data dependency to %s" % pkg)
+                d.appendVar('RDEPENDS_' + pkg, " " + d.getVar('MLPREFIX')+"shared-mime-info-data")
 }

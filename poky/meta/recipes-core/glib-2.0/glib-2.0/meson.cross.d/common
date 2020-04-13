@@ -1,0 +1,3 @@
+[properties]
+# On all known supported architectures the stack grows down
+growing_stack = false

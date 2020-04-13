@@ -40,8 +40,9 @@ def opkg_query(cmd_output):
     ver = ""
     filename = ""
     dep = []
+    prov = []
     pkgarch = ""
-    for line in cmd_output.splitlines():
+    for line in cmd_output.splitlines()+['']:
         line = line.rstrip()
         if ':' in line:
             if line.startswith("Package: "):
@@ -64,6 +65,10 @@ def opkg_query(cmd_output):
                     dep.append("%s [REC]" % recommend)
             elif line.startswith("PackageArch: "):
                 pkgarch = line.split(": ")[1]
+            elif line.startswith("Provides: "):
+                provides = verregex.sub('', line.split(": ")[1])
+                for provide in provides.split(", "):
+                    prov.append(provide)
 
         # When there is a blank line save the package information
         elif not line:
@@ -72,19 +77,14 @@ def opkg_query(cmd_output):
                 filename = "%s_%s_%s.ipk" % (pkg, ver, arch)
             if pkg:
                 output[pkg] = {"arch":arch, "ver":ver,
-                        "filename":filename, "deps": dep, "pkgarch":pkgarch }
+                        "filename":filename, "deps": dep, "pkgarch":pkgarch, "provs": prov}
             pkg = ""
             arch = ""
             ver = ""
             filename = ""
             dep = []
+            prov = []
             pkgarch = ""
-
-    if pkg:
-        if not filename:
-            filename = "%s_%s_%s.ipk" % (pkg, ver, arch)
-        output[pkg] = {"arch":arch, "ver":ver,
-                "filename":filename, "deps": dep }
 
     return output
 
@@ -107,6 +107,7 @@ def generate_locale_archive(d, rootfs, target_arch, localedir):
         "sh4": ["--uint32-align=4", "--big-endian"],
         "powerpc": ["--uint32-align=4", "--big-endian"],
         "powerpc64": ["--uint32-align=4", "--big-endian"],
+        "powerpc64le": ["--uint32-align=4", "--little-endian"],
         "mips": ["--uint32-align=4", "--big-endian"],
         "mipsisa32r6": ["--uint32-align=4", "--big-endian"],
         "mips64": ["--uint32-align=4", "--big-endian"],
@@ -131,7 +132,7 @@ def generate_locale_archive(d, rootfs, target_arch, localedir):
     env = dict(os.environ)
     env["LOCALEARCHIVE"] = oe.path.join(localedir, "locale-archive")
 
-    for name in os.listdir(localedir):
+    for name in sorted(os.listdir(localedir)):
         path = os.path.join(localedir, name)
         if os.path.isdir(path):
             cmd = ["cross-localedef", "--verbose"]
@@ -360,7 +361,7 @@ class DpkgPkgsList(PkgsList):
                "--admindir=%s/var/lib/dpkg" % self.rootfs_dir,
                "-W"]
 
-        cmd.append("-f=Package: ${Package}\nArchitecture: ${PackageArch}\nVersion: ${Version}\nFile: ${Package}_${Version}_${Architecture}.deb\nDepends: ${Depends}\nRecommends: ${Recommends}\n\n")
+        cmd.append("-f=Package: ${Package}\nArchitecture: ${PackageArch}\nVersion: ${Version}\nFile: ${Package}_${Version}_${Architecture}.deb\nDepends: ${Depends}\nRecommends: ${Recommends}\nProvides: ${Provides}\n\n")
 
         try:
             cmd_output = subprocess.check_output(cmd, stderr=subprocess.STDOUT).strip().decode("utf-8")
@@ -580,6 +581,11 @@ class PackageManager(object, metaclass=ABCMeta):
         # oe-pkgdata-util reads it from a file
         with tempfile.NamedTemporaryFile(mode="w+", prefix="installed-pkgs") as installed_pkgs:
             pkgs = self.list_installed()
+
+            provided_pkgs = set()
+            for pkg in pkgs.values():
+                provided_pkgs |= set(pkg.get('provs', []))
+
             output = oe.utils.format_pkg_list(pkgs, "arch")
             installed_pkgs.write(output)
             installed_pkgs.flush()
@@ -591,10 +597,15 @@ class PackageManager(object, metaclass=ABCMeta):
             if exclude:
                 cmd.extend(['--exclude=' + '|'.join(exclude.split())])
             try:
-                bb.note("Installing complementary packages ...")
                 bb.note('Running %s' % cmd)
                 complementary_pkgs = subprocess.check_output(cmd, stderr=subprocess.STDOUT).decode("utf-8")
-                self.install(complementary_pkgs.split(), attempt_only=True)
+                complementary_pkgs = set(complementary_pkgs.split())
+                skip_pkgs = sorted(complementary_pkgs & provided_pkgs)
+                install_pkgs = sorted(complementary_pkgs - provided_pkgs)
+                bb.note("Installing complementary packages ... %s (skipped already provided packages %s)" % (
+                    ' '.join(install_pkgs),
+                    ' '.join(skip_pkgs)))
+                self.install(install_pkgs, attempt_only=True)
             except subprocess.CalledProcessError as e:
                 bb.fatal("Could not compute complementary packages list. Command "
                          "'%s' returned %d:\n%s" %
@@ -768,6 +779,8 @@ class RpmPM(PackageManager):
         # This prevents accidental matching against libsolv's built-in policies
         if len(archs) <= 1:
             archs = archs + ["bogusarch"]
+        # This architecture needs to be upfront so that packages using it are properly prioritized
+        archs = ["sdk_provides_dummy_target"] + archs
         confdir = "%s/%s" %(self.target_rootfs, "etc/dnf/vars/")
         bb.utils.mkdirhier(confdir)
         open(confdir + "arch", 'w').write(":".join(archs))
@@ -1621,7 +1634,7 @@ class DpkgPM(OpkgDpkgPM):
 
         os.environ['APT_CONFIG'] = self.apt_conf_file
 
-        cmd = "%s %s install --force-yes --allow-unauthenticated %s" % \
+        cmd = "%s %s install --force-yes --allow-unauthenticated --no-remove %s" % \
               (self.apt_get_cmd, self.apt_args, ' '.join(pkgs))
 
         try:
@@ -1783,8 +1796,7 @@ class DpkgPM(OpkgDpkgPM):
             open(os.path.join(target_dpkg_dir, "available"), "w+").close()
 
     def remove_packaging_data(self):
-        bb.utils.remove(os.path.join(self.target_rootfs,
-                                     self.d.getVar('opkglibdir')), True)
+        bb.utils.remove(self.target_rootfs + self.d.getVar('opkglibdir'), True)
         bb.utils.remove(self.target_rootfs + "/var/lib/dpkg/", True)
 
     def fix_broken_dependencies(self):

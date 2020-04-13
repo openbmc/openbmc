@@ -33,3 +33,5 @@ do_configure_prepend() {
     ( cd ${S}
     ${S}/autogen.sh )
 }
+
+BBCLASSEXTEND = "native"

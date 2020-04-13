@@ -1,0 +1,26 @@
+Filter out __has_include* compiler defines
+
+They are internal to compiler and this header is later on includes in C
+files, but newer gcc >= 10 complains about it.
+
+error in initial header file:
+| In file included from /tmp/20200124-86625-14hiju4.c:1:
+| /tmp/20200124-86625-11y6l6i.h:13849:9: error: "__has_include" cannot be used as a macro name
+| 13849 | #define __has_include __has_include
+|       |         ^~~~~~~~~~~~~
+| compilation terminated due to -Wfatal-errors.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/common.mk
++++ b/common.mk
+@@ -221,6 +221,8 @@ $(TIMESTAMPDIR)/$(MJIT_HEADER:.h=)$(MJIT
+ 		$(TIMESTAMPDIR)/$(arch)/.time
+ 	$(ECHO) building $(@F:.time=.h)
+ 	$(Q) $(CPP) -DMJIT_HEADER $(MJIT_HEADER_FLAGS) $(CFLAGS) $(XCFLAGS) $(CPPFLAGS) $(srcdir)/vm.c $(CPPOUTFLAG)$(@F:.time=.h).new
++	$(Q)sed -i -e "/#define __has_include __has_include/d" $(@F:.time=.h).new
++	$(Q)sed -i -e "/#define __has_include_next __has_include_next/d" $(@F:.time=.h).new
+ 	$(Q) $(IFCHANGE) "--timestamp=$@" $(@F:.time=.h) $(@F:.time=.h).new
+ 
+ $(MJIT_HEADER:.h=)$(MJIT_HEADER_SUFFIX).h: $(TIMESTAMPDIR)/$(MJIT_HEADER:.h=)$(MJIT_HEADER_SUFFIX).time

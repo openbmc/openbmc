@@ -113,7 +113,7 @@
         </para>
 
         <para>
-            Prior to parsing configuration files, Bitbake looks
+            Prior to parsing configuration files, BitBake looks
             at certain variables, including:
             <itemizedlist>
                 <listitem><para>
@@ -339,7 +339,7 @@
             <link linkend='var-bb-BB_HASHCONFIG_WHITELIST'><filename>BB_HASHCONFIG_WHITELIST</filename></link>)
             and then checking if the checksum matches.
             If that checksum matches what is in the cache and the recipe
-            and class files have not changed, Bitbake is able to use
+            and class files have not changed, BitBake is able to use
             the cache.
             BitBake then reloads the cached information about the recipe
             instead of reparsing it from scratch.
@@ -429,7 +429,7 @@
             The default
             <link linkend='var-bb-PREFERRED_PROVIDER'><filename>PREFERRED_PROVIDER</filename></link>
             is the provider with the same name as the target.
-            Bitbake iterates through each target it needs to build and
+            BitBake iterates through each target it needs to build and
             resolves them and their dependencies using this process.
         </para>
 
@@ -821,7 +821,7 @@
 
         <para>
             It is worth noting that BitBake's "-S" option lets you
-            debug Bitbake's processing of signatures.
+            debug BitBake's processing of signatures.
             The options passed to -S allow different debugging modes
             to be used, either using BitBake's own debug functions
             or possibly those defined in the metadata/signature handler
@@ -927,6 +927,103 @@
             You can find more information on setscene metadata in the
             "<link linkend='task-checksums-and-setscene'>Task Checksums and Setscene</link>"
             section.
+        </para>
+    </section>
+
+    <section id="logging">
+        <title>Logging</title>
+        <para>
+            In addition to the standard command line option to control how
+            verbose builds are when execute, bitbake also supports user defined
+            configuration of the
+            <ulink url='https://docs.python.org/3/library/logging.html'>Python logging</ulink>
+            facilities through the
+            <link linkend="var-bb-BB_LOGCONFIG"><filename>BB_LOGCONFIG</filename></link>
+            variable. This variable defines a json or yaml
+            <ulink url='https://docs.python.org/3/library/logging.config.html'>logging configuration</ulink>
+            that will be intelligently merged into the default configuration.
+            The logging configuration is merged using the following rules:
+            <itemizedlist>
+                <listitem><para>
+                    The user defined configuration will completely replace the default
+                    configuration if top level key
+                    <filename>bitbake_merge</filename> is set to the value
+                    <filename>False</filename>. In this case, all other rules
+                    are ignored.
+                </para></listitem>
+                <listitem><para>
+                    The user configuration must have a top level
+                    <filename>version</filename> which must match the value of
+                    the default configuration.
+                </para></listitem>
+                <listitem><para>
+                    Any keys defined in the <filename>handlers</filename>,
+                    <filename>formatters</filename>, or <filename>filters</filename>,
+                    will be merged into the same section in the default
+                    configuration, with the user specified keys taking
+                    replacing a default one if there is a conflict. In
+                    practice, this means that if both the default configuration
+                    and user configuration specify a handler named
+                    <filename>myhandler</filename>, the user defined one will
+                    replace the default. To prevent the user from inadvertently
+                    replacing a default handler, formatter, or filter, all of
+                    the default ones are named with a prefix of
+                    "<filename>BitBake.</filename>"
+                </para></listitem>
+                <listitem><para>
+                    If a logger is defined by the user with the key
+                    <filename>bitbake_merge</filename> set to
+                    <filename>False</filename>, that logger will be completely
+                    replaced by user configuration. In this case, no other
+                    rules will apply to that logger.
+                </para></listitem>
+                <listitem><para>
+                    All user defined <filename>filter</filename> and
+                    <filename>handlers</filename> properties for a given logger
+                    will be merged with corresponding properties from the
+                    default logger. For example, if the user configuration adds
+                    a filter called <filename>myFilter</filename> to the
+                    <filename>BitBake.SigGen</filename>, and the default
+                    configuration adds a filter called
+                    <filename>BitBake.defaultFilter</filename>, both filters
+                    will be applied to the logger
+                </para></listitem>
+            </itemizedlist>
+        </para>
+
+        <para>
+            As an example, consider the following user logging configuration
+            file which logs all Hash Equivalence related messages of VERBOSE or
+            higher to a file called <filename>hashequiv.log</filename>
+            <literallayout class='monospaced'>
+    {
+        "version": 1,
+        "handlers": {
+            "autobuilderlog": {
+                "class": "logging.FileHandler",
+                "formatter": "logfileFormatter",
+                "level": "DEBUG",
+                "filename": "hashequiv.log",
+                "mode": "w"
+            }
+        },
+        "formatters": {
+                "logfileFormatter": {
+                    "format": "%(name)s: %(levelname)s: %(message)s"
+                }
+        },
+        "loggers": {
+            "BitBake.SigGen.HashEquiv": {
+                "level": "VERBOSE",
+                "handlers": ["autobuilderlog"]
+            },
+            "BitBake.RunQueue.HashEquiv": {
+                "level": "VERBOSE",
+                "handlers": ["autobuilderlog"]
+            }
+        }
+    }
+            </literallayout>
         </para>
     </section>
 </chapter>

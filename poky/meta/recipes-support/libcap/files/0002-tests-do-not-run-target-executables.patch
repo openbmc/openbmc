@@ -1,0 +1,33 @@
+From 6309554225e05e76167eda4e0df383fb3d1a62c3 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 20 Dec 2019 16:54:05 +0100
+Subject: [PATCH] tests: do not run target executables
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+---
+ tests/Makefile | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/tests/Makefile b/tests/Makefile
+index 95e4ca6..7162cf0 100644
+--- a/tests/Makefile
++++ b/tests/Makefile
+@@ -19,8 +19,6 @@ sudotest: test
+ install: all
+ 
+ run_psx_test: psx_test psx_test_wrap
+-	./psx_test
+-	./psx_test_wrap
+ 
+ psx_test: psx_test.c $(DEPS)
+ 	$(CC) $(CFLAGS) $(IPATH) -DNOWRAP $< -o $@ $(LIBPSXLIB)
+@@ -29,7 +27,6 @@ psx_test_wrap: psx_test.c $(DEPS)
+ 	$(CC) $(CFLAGS) $(IPATH) $< -o $@ $(LIBPSXLIB) -Wl,-wrap,pthread_create
+ 
+ run_libcap_psx_test: libcap_psx_test
+-	./libcap_psx_test
+ 
+ libcap_psx_test: libcap_psx_test.c $(DEPS)
+ 	$(CC) $(CFLAGS) $(IPATH) $< -o $@ $(LIBCAPLIB) $(LIBPSXLIB) -Wl,-wrap,pthread_create --static

@@ -5,7 +5,7 @@ LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://../COPYING;md5=75859989545e37968a99b631ef42722e"
 SECTION = "System/Management"
 
-inherit setuptools
+inherit ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "setuptools", "", d)}
 
 DEPENDS = "python-native python-pywbem-native python-m2crypto python-pywbem"
 
@@ -17,10 +17,10 @@ SRC_URI[sha256sum] = "292b8f5f2250655a4add8183c529b73358bc980bd4f23cfa484a940953
 S = "${WORKDIR}/${BP}/cli"
 
 do_configure_prepend() {
-    sed 's/@@VERSION@@/$(VERSION)/g' setup.py.skel >setup.py
+    sed 's/@@VERSION@@/$(VERSION)/g' ${S}/setup.py.skel > ${S}/setup.py
 }
 
 python() {
-    if 'meta-python' not in d.getVar('BBFILE_COLLECTIONS').split():
-        raise bb.parse.SkipRecipe('Requires meta-python to be present.')
+    if 'meta-python2' not in d.getVar('BBFILE_COLLECTIONS').split():
+        raise bb.parse.SkipRecipe('Requires meta-python2 to be present.')
 }

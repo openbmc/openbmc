@@ -10,6 +10,8 @@ PV = "1.0.0+git${SRCPV}"
 
 SRCREV = "0dfbf5dacbb15a32c43f912a7e66a54aae39d0f9"
 
+UPSTREAM_CHECK_COMMITS = "1"
+
 S = "${WORKDIR}/git"
 
 # nlohmann-fifo is a header only C++ library, so the main package will be empty.

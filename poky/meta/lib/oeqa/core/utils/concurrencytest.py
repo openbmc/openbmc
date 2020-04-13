@@ -146,6 +146,20 @@ def outSideTestaddError(self, offset, line):
 
 subunit._OutSideTest.addError = outSideTestaddError
 
+# Like outSideTestaddError above, we need an equivalent for skips
+# happening at the setUpClass() level, otherwise we will see "UNKNOWN"
+# as a result for concurrent tests
+#
+def outSideTestaddSkip(self, offset, line):
+    """A 'skip:' directive has been read."""
+    test_name = line[offset:-1].decode('utf8')
+    self.parser._current_test = subunit.RemotedTestCase(test_name)
+    self.parser.current_test_description = test_name
+    self.parser._state = self.parser._reading_skip_details
+    self.parser._reading_skip_details.set_simple()
+    self.parser.subunitLineReceived(line)
+
+subunit._OutSideTest.addSkip = outSideTestaddSkip
 
 #
 # A dummy structure to add to io.StringIO so that the .buffer object
@@ -163,9 +177,10 @@ class dummybuf(object):
 #
 class ConcurrentTestSuite(unittest.TestSuite):
 
-    def __init__(self, suite, processes):
+    def __init__(self, suite, processes, setupfunc):
         super(ConcurrentTestSuite, self).__init__([suite])
         self.processes = processes
+        self.setupfunc = setupfunc
 
     def run(self, result):
         tests, totaltests = fork_for_tests(self.processes, self)
@@ -221,6 +236,15 @@ def removebuilddir(d):
     while delay and os.path.exists(d + "/bitbake.lock"):
         time.sleep(1)
         delay = delay - 1
+    # Deleting these directories takes a lot of time, use autobuilder
+    # clobberdir if its available
+    clobberdir = os.path.expanduser("~/yocto-autobuilder-helper/janitor/clobberdir")
+    if os.path.exists(clobberdir):
+        try:
+            subprocess.check_call([clobberdir, d])
+            return
+        except subprocess.CalledProcessError:
+            pass
     bb.utils.prunedir(d, ionice=True)
 
 def fork_for_tests(concurrency_num, suite):
@@ -249,37 +273,7 @@ def fork_for_tests(concurrency_num, suite):
                 stream = os.fdopen(c2pwrite, 'wb', 1)
                 os.close(c2pread)
 
-                # Create a new separate BUILDDIR for each group of tests
-                if 'BUILDDIR' in os.environ:
-                    builddir = os.environ['BUILDDIR']
-                    newbuilddir = builddir + "-st-" + str(ourpid)
-                    newselftestdir = newbuilddir + "/meta-selftest"
-
-                    bb.utils.mkdirhier(newbuilddir)
-                    oe.path.copytree(builddir + "/conf", newbuilddir + "/conf")
-                    oe.path.copytree(builddir + "/cache", newbuilddir + "/cache")
-                    oe.path.copytree(selftestdir, newselftestdir)
-
-                    for e in os.environ:
-                        if builddir in os.environ[e]:
-                            os.environ[e] = os.environ[e].replace(builddir, newbuilddir)
-
-                    subprocess.check_output("git init; git add *; git commit -a -m 'initial'", cwd=newselftestdir, shell=True)
-
-                    # Tried to used bitbake-layers add/remove but it requires recipe parsing and hence is too slow
-                    subprocess.check_output("sed %s/conf/bblayers.conf -i -e 's#%s#%s#g'" % (newbuilddir, selftestdir, newselftestdir), cwd=newbuilddir, shell=True)
-
-                    os.chdir(newbuilddir)
-
-                    for t in process_suite:
-                        if not hasattr(t, "tc"):
-                            continue
-                        cp = t.tc.config_paths
-                        for p in cp:
-                            if selftestdir in cp[p] and newselftestdir not in cp[p]:
-                                cp[p] = cp[p].replace(selftestdir, newselftestdir)
-                            if builddir in cp[p] and newbuilddir not in cp[p]:
-                                cp[p] = cp[p].replace(builddir, newbuilddir)
+                (builddir, newbuilddir) = suite.setupfunc("-st-" + str(ourpid), selftestdir, process_suite)
 
                 # Leave stderr and stdout open so we can see test noise
                 # Close stdin so that the child goes away if it decides to

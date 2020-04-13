@@ -4,9 +4,9 @@ fixing, configuring , and debugging ext2 filesystems."
 HOMEPAGE = "http://e2fsprogs.sourceforge.net/"
 
 LICENSE = "GPLv2 & LGPLv2 & BSD & MIT"
+LICENSE_e2fsprogs-dumpe2fs = "GPLv2"
 LICENSE_e2fsprogs-e2fsck = "GPLv2"
 LICENSE_e2fsprogs-mke2fs = "GPLv2"
-LICENSE_e2fsprogs-fsck = "GPLv2"
 LICENSE_e2fsprogs-tune2fs = "GPLv2"
 LICENSE_e2fsprogs-badblocks = "GPLv2"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=d50be0580c0b0a7fbc7a4830bbe6c12b \

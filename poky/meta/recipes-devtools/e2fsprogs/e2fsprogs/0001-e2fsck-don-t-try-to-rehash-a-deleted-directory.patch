@@ -1,0 +1,49 @@
+From 71ba13755337e19c9a826dfc874562a36e1b24d3 Mon Sep 17 00:00:00 2001
+From: Theodore Ts'o <tytso@mit.edu>
+Date: Thu, 19 Dec 2019 19:45:06 -0500
+Subject: [PATCH] e2fsck: don't try to rehash a deleted directory
+
+If directory has been deleted in pass1[bcd] processing, then we
+shouldn't try to rehash the directory in pass 3a when we try to
+rehash/reoptimize directories.
+
+Signed-off-by: Theodore Ts'o <tytso@mit.edu>
+
+Upstream-Status: Backport [https://git.kernel.org/pub/scm/fs/ext2/e2fsprogs.git/commit/?id=71ba13755337e19c9a826dfc874562a36e1b24d3]
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+---
+ e2fsck/pass1b.c | 4 ++++
+ e2fsck/rehash.c | 2 ++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/e2fsck/pass1b.c b/e2fsck/pass1b.c
+index 5693b9cf..bca701ca 100644
+--- a/e2fsck/pass1b.c
++++ b/e2fsck/pass1b.c
+@@ -705,6 +705,10 @@ static void delete_file(e2fsck_t ctx, ext2_ino_t ino,
+ 		fix_problem(ctx, PR_1B_BLOCK_ITERATE, &pctx);
+ 	if (ctx->inode_bad_map)
+ 		ext2fs_unmark_inode_bitmap2(ctx->inode_bad_map, ino);
++	if (ctx->inode_reg_map)
++		ext2fs_unmark_inode_bitmap2(ctx->inode_reg_map, ino);
++	ext2fs_unmark_inode_bitmap2(ctx->inode_dir_map, ino);
++	ext2fs_unmark_inode_bitmap2(ctx->inode_used_map, ino);
+ 	ext2fs_inode_alloc_stats2(fs, ino, -1, LINUX_S_ISDIR(dp->inode.i_mode));
+ 	quota_data_sub(ctx->qctx, &dp->inode, ino,
+ 		       pb.dup_blocks * fs->blocksize);
+diff --git a/e2fsck/rehash.c b/e2fsck/rehash.c
+index 3dd1e941..2c908be0 100644
+--- a/e2fsck/rehash.c
++++ b/e2fsck/rehash.c
+@@ -1028,6 +1028,8 @@ void e2fsck_rehash_directories(e2fsck_t ctx)
+ 			if (!ext2fs_u32_list_iterate(iter, &ino))
+ 				break;
+ 		}
++		if (!ext2fs_test_inode_bitmap2(ctx->inode_dir_map, ino))
++			continue;
+ 
+ 		pctx.dir = ino;
+ 		if (first) {
+-- 
+2.24.1
+

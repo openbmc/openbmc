@@ -6,9 +6,9 @@ HOMEPAGE = "http://www.gnu.org/software/findutils/"
 BUGTRACKER = "http://savannah.gnu.org/bugs/?group=findutils"
 SECTION = "console/utils"
 
-SRC_URI = "${GNU_MIRROR}/${BPN}/${BP}.tar.gz"
+SRC_URI = "${GNU_MIRROR}/${BPN}/${BP}.tar.xz"
 
-inherit autotools gettext texinfo update-alternatives upstream-version-is-even
+inherit autotools gettext texinfo update-alternatives
 
 ALTERNATIVE_${PN} = "find xargs"
 ALTERNATIVE_PRIORITY = "100"

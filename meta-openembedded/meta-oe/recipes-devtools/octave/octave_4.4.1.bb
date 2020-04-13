@@ -7,11 +7,11 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464"
 
 DEPENDS = "gperf-native texinfo lapack pcre readline"
 
-inherit autotools pkgconfig texinfo gettext
+inherit autotools pkgconfig texinfo gettext mime-xdg
 
 EXTRA_OECONF = "--disable-java --disable-docs"
 
-SRC_URI = "${GNU_MIRROR}/octave/${PN}-${PV}.tar.gz \
+SRC_URI = "${GNU_MIRROR}/octave/${BPN}-${PV}.tar.gz \
            file://fix-blas-library-integer-size.patch \
 "
 

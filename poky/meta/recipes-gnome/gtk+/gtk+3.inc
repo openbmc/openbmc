@@ -37,7 +37,6 @@ EXTRA_OECONF += " \
                  --disable-glibtest \
                  --disable-xinerama \
                  --enable-modules \
-                 --disable-colord \
                  ${@bb.utils.contains("DISTRO_FEATURES", "x11", "", "--disable-gtk-doc", d)} \
                  "
 
@@ -54,6 +53,8 @@ PACKAGECONFIG[opengl] = "--enable-opengl,--disable-opengl,libepoxy"
 PACKAGECONFIG[glx] = "--enable-glx,--disable-glx,,libgl"
 PACKAGECONFIG[wayland] = "--enable-wayland-backend,--disable-wayland-backend,wayland wayland-protocols libxkbcommon virtual/egl virtual/libgles2 wayland-native"
 PACKAGECONFIG[cups] = "--enable-cups,--disable-cups,cups"
+PACKAGECONFIG[cloudprint] = "--enable-cloudprint,--disable-cloudprint,rest json-glib"
+PACKAGECONFIG[colord] = "--enable-colord,--disable-colord,colord"
 
 prepare_gtk_scripts() {
     mv ${D}${bindir}/gtk-update-icon-cache ${D}${bindir}/gtk-update-icon-cache-3.0

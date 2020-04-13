@@ -11,7 +11,7 @@ SRC_URI = "git://github.com/wertarbyte/${BPN}.git;branch=debian"
 
 S = "${WORKDIR}/git"
 
-inherit autotools-brokensep pkgconfig update-rc.d systemd
+inherit autotools-brokensep pkgconfig perlnative update-rc.d systemd
 
 PACKAGECONFIG = "${@bb.utils.contains('DISTRO_FEATURES','systemd','systemd','',d)}"
 PACKAGECONFIG[systemd] = ",,systemd"

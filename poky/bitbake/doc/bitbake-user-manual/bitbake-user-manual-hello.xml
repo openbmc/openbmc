@@ -166,7 +166,7 @@
                 Having a project directory is a good way to isolate your
                 project.
                 </para></listitem>
-            <listitem><para><emphasis>Run Bitbake:</emphasis>
+            <listitem><para><emphasis>Run BitBake:</emphasis>
                 At this point, you have nothing but a project directory.
                 Run the <filename>bitbake</filename> command and see what
                 it does:
@@ -197,7 +197,7 @@
                 <link linkend='var-bb-BBPATH'><filename>BBPATH</filename></link>
                 variable is what tells BitBake where to look for those files.
                 <filename>BBPATH</filename> is not set and you need to set it.
-                Without <filename>BBPATH</filename>, Bitbake cannot
+                Without <filename>BBPATH</filename>, BitBake cannot
                 find any configuration files (<filename>.conf</filename>)
                 or recipe files (<filename>.bb</filename>) at all.
                 BitBake also cannot find the <filename>bitbake.conf</filename>
@@ -225,7 +225,7 @@
                     as the shell would.
                 </note>
                 </para></listitem>
-            <listitem><para><emphasis>Run Bitbake:</emphasis>
+            <listitem><para><emphasis>Run BitBake:</emphasis>
                 Now that you have <filename>BBPATH</filename> defined, run
                 the <filename>bitbake</filename> command again:
                 <literallayout class='monospaced'>
@@ -313,7 +313,7 @@
                 example, click on the links to take you to the definitions in
                 the glossary.
                 </para></listitem>
-            <listitem><para><emphasis>Run Bitbake:</emphasis>
+            <listitem><para><emphasis>Run BitBake:</emphasis>
                 After making sure that the <filename>conf/bitbake.conf</filename>
                 file exists, you can run the <filename>bitbake</filename>
                 command again:
@@ -364,7 +364,7 @@
                 more depending on which build environments BitBake is
                 supporting.
                 </para></listitem>
-            <listitem><para><emphasis>Run Bitbake:</emphasis>
+            <listitem><para><emphasis>Run BitBake:</emphasis>
                 After making sure that the <filename>classes/base.bbclass</filename>
                 file exists, you can run the <filename>bitbake</filename>
                 command again:
@@ -434,7 +434,7 @@
                 For more information on these variables, follow the links
                 to the glossary.
                 </para></listitem>
-            <listitem><para><emphasis>Run Bitbake With a Target:</emphasis>
+            <listitem><para><emphasis>Run BitBake With a Target:</emphasis>
                 Now that a BitBake target exists, run the command and provide
                 that target:
                 <literallayout class='monospaced'>
@@ -468,7 +468,7 @@
                 You need to provide your own information for
                 <filename>you</filename> in the file.
                 </para></listitem>
-            <listitem><para><emphasis>Run Bitbake With a Target:</emphasis>
+            <listitem><para><emphasis>Run BitBake With a Target:</emphasis>
                 Now that you have supplied the <filename>bblayers.conf</filename>
                 file, run the <filename>bitbake</filename> command and provide
                 the target:

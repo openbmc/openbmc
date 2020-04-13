@@ -1,0 +1,16 @@
+--- a/modules/packages/apt_get
++++ b/modules/packages/apt_get
+@@ -1,4 +1,4 @@
+-#!/var/cfengine/bin/python
++#!/var/cfengine/bin/python3
+ 
+ import sys
+ import os
+--- a/modules/packages/apt_get.in
++++ b/modules/packages/apt_get.in
+@@ -1,4 +1,4 @@
+-#!@bindir@/python
++#!@bindir@/python3
+ 
+ import sys
+ import os

@@ -23,6 +23,9 @@
 # Copyright 2013 (C) O.S. Systems Software LTDA.
 
 python () {
+    if d.getVar('PARSE_ALL_RECIPES', False):
+        return
+
     # Assume at least one var is set.
     distro_features = set((d.getVar('DISTRO_FEATURES') or '').split())
 

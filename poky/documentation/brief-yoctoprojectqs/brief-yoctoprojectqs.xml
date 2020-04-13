@@ -55,10 +55,18 @@
                         information.
                         </para></listitem>
                     <listitem><para>
-                        You cannot use a build host that is using the
-                        <ulink url='https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux'>Windows Subsystem for Linux</ulink>
-                        (WSL).
-                        The Yocto Project is not compatible with WSL.
+                        You may use Windows Subsystem For Linux v2 to set up a build
+                        host using Windows 10.
+                        <note>
+                          The Yocto Project is not compatible with WSLv1, it is
+                          compatible but not officially supported nor validated
+                          with WSLv2, if you still decide to use WSL please upgrade
+                          to WSLv2.
+                        </note>
+                        See the
+                        <ulink url='&YOCTO_DOCS_DEV_URL;#setting-up-to-use-wsl'>Setting Up to Use Windows Subsystem For Linux</ulink>"
+                        section in the Yocto Project Development Tasks Manual for more
+                        information.
                         </para></listitem>
                 </itemizedlist>
             </note>
@@ -99,17 +107,20 @@
                             Git 1.8.3.1 or greater
                             </para></listitem>
                         <listitem><para>
-                            tar 1.27 or greater
+                            tar 1.28 or greater
                             </para></listitem>
                         <listitem><para>
-                            Python 3.4.0 or greater.
-                            </para></listitem>
+                            Python 3.5.0 or greater.
+                        </para></listitem>
+                        <listitem><para>
+                            gcc 5.0 or greater.
+                        </para></listitem>
                     </itemizedlist>
                     If your build host does not meet any of these three listed
                     version requirements, you can take steps to prepare the
                     system so that you can still use the Yocto Project.
                     See the
-                    "<ulink url='&YOCTO_DOCS_REF_URL;#required-git-tar-and-python-versions'>Required Git, tar, and Python Versions</ulink>"
+                    "<ulink url='&YOCTO_DOCS_REF_URL;#required-git-tar-python-and-gcc-versions'>Required Git, tar, Python and gcc Versions</ulink>"
                     section in the Yocto Project Reference Manual for information.
                     </para></listitem>
             </itemizedlist>
@@ -266,7 +277,7 @@
          meta-toolchain
          meta-ide-support
 
-     You can also run generated qemu images with a command like 'runqemu qemux86'
+     You can also run generated qemu images with a command like 'runqemu qemux86-64'
                     </literallayout>
                     Among other things, the script creates the
                     <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>,
@@ -332,7 +343,7 @@
                     QEMU, which is a Quick EMUlator that ships with
                     the Yocto Project:
                     <literallayout class='monospaced'>
-     $ runqemu qemux86
+     $ runqemu qemux86-64
                     </literallayout>
                     If you want to learn more about running QEMU, see the
                     "<ulink url="&YOCTO_DOCS_DEV_URL;#dev-manual-qemu">Using the Quick EMUlator (QEMU)</ulink>"

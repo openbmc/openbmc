@@ -1,0 +1,301 @@
+From 420454f7098b5445730caa855c37b8143bfccc1b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 29 Nov 2018 17:29:35 -0800
+Subject: [PATCH] inject file assembly directives
+
+Currently, non-IA builds are not reproducibile since build paths are
+being injected into the debug symbols. These are coming from the use of
+.S assembler files during the glibc build. No STT_FILE section is added
+during the assembly but when linking, ld decides to add one to aid
+debugging and ensure references between the different object files its
+linking remain clear.
+
+We can avoid this by injecting a file header into the assembler files
+ahead of time, choosing a filename which does not contain build system
+paths.
+
+This is a bit of a workaround/hack but does significantly reduce the
+build system references in target binaries for the non-IA architectures
+which use .S files.
+
+RP
+2018/10/3
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ csu/abi-note.S                                | 2 ++
+ sysdeps/aarch64/crti.S                        | 2 ++
+ sysdeps/aarch64/crtn.S                        | 2 ++
+ sysdeps/aarch64/dl-tlsdesc.S                  | 2 ++
+ sysdeps/aarch64/dl-trampoline.S               | 2 ++
+ sysdeps/aarch64/start.S                       | 2 ++
+ sysdeps/arm/abi-note.S                        | 2 ++
+ sysdeps/arm/crti.S                            | 2 ++
+ sysdeps/arm/crtn.S                            | 2 ++
+ sysdeps/arm/dl-tlsdesc.S                      | 2 ++
+ sysdeps/arm/dl-trampoline.S                   | 2 ++
+ sysdeps/arm/start.S                           | 2 ++
+ sysdeps/mips/start.S                          | 2 ++
+ sysdeps/powerpc/powerpc32/dl-start.S          | 2 ++
+ sysdeps/powerpc/powerpc32/start.S             | 2 ++
+ sysdeps/powerpc/powerpc64/start.S             | 2 ++
+ sysdeps/unix/sysv/linux/aarch64/__read_tp.S   | 2 ++
+ sysdeps/unix/sysv/linux/arm/aeabi_read_tp.S   | 2 ++
+ sysdeps/unix/sysv/linux/arm/libc-do-syscall.S | 2 ++
+ sysdeps/unix/sysv/linux/powerpc/dl-brk.S      | 2 ++
+ 20 files changed, 40 insertions(+)
+
+diff --git a/csu/abi-note.S b/csu/abi-note.S
+index 2b4b5f8824..964843016c 100644
+--- a/csu/abi-note.S
++++ b/csu/abi-note.S
+@@ -56,6 +56,8 @@ offset	length	contents
+ #include <config.h>
+ #include <abi-tag.h>		/* OS-specific ABI tag value */
+ 
++	.file "abi-note.S"
++
+ /* The linker (GNU ld 2.8 and later) recognizes an allocated section whose
+    name begins with `.note' and creates a PT_NOTE program header entry
+    pointing at it. */
+diff --git a/sysdeps/aarch64/crti.S b/sysdeps/aarch64/crti.S
+index 1728eac37a..76a8ab590b 100644
+--- a/sysdeps/aarch64/crti.S
++++ b/sysdeps/aarch64/crti.S
+@@ -50,6 +50,8 @@
+ # define PREINIT_FUNCTION_WEAK 1
+ #endif
+ 
++    .file "crti.S"
++
+ #if PREINIT_FUNCTION_WEAK
+ 	weak_extern (PREINIT_FUNCTION)
+ #else
+diff --git a/sysdeps/aarch64/crtn.S b/sysdeps/aarch64/crtn.S
+index c3e97cc449..fc2e5c2df8 100644
+--- a/sysdeps/aarch64/crtn.S
++++ b/sysdeps/aarch64/crtn.S
+@@ -37,6 +37,8 @@
+ /* crtn.S puts function epilogues in the .init and .fini sections
+    corresponding to the prologues in crti.S. */
+ 
++	.file "crtn.S"
++
+ 	.section .init,"ax",%progbits
+ 	ldp	x29, x30, [sp], 16
+ 	RET
+diff --git a/sysdeps/aarch64/dl-tlsdesc.S b/sysdeps/aarch64/dl-tlsdesc.S
+index 557ad1d505..194a8531da 100644
+--- a/sysdeps/aarch64/dl-tlsdesc.S
++++ b/sysdeps/aarch64/dl-tlsdesc.S
+@@ -22,6 +22,8 @@
+ #include <tls.h>
+ #include "tlsdesc.h"
+ 
++	.file "dl-tlsdesc.S"
++
+ #define NSAVEDQREGPAIRS	16
+ #define SAVE_Q_REGISTERS				\
+ 	stp	q0, q1,	[sp, #-32*NSAVEDQREGPAIRS]!;	\
+diff --git a/sysdeps/aarch64/dl-trampoline.S b/sysdeps/aarch64/dl-trampoline.S
+index 94e965c096..ba18742f3e 100644
+--- a/sysdeps/aarch64/dl-trampoline.S
++++ b/sysdeps/aarch64/dl-trampoline.S
+@@ -21,6 +21,8 @@
+ 
+ #include "dl-link.h"
+ 
++	.file "dl-trampoline.S"
++
+ #define ip0 x16
+ #define ip0l PTR_REG (16)
+ #define ip1 x17
+diff --git a/sysdeps/aarch64/start.S b/sysdeps/aarch64/start.S
+index d96cf57e2d..07a523978a 100644
+--- a/sysdeps/aarch64/start.S
++++ b/sysdeps/aarch64/start.S
+@@ -18,6 +18,8 @@
+ 
+ #include <sysdep.h>
+ 
++	.file "start.S"
++
+ /* This is the canonical entry point, usually the first thing in the text
+    segment.
+ 
+diff --git a/sysdeps/arm/abi-note.S b/sysdeps/arm/abi-note.S
+index 07bd4c4619..7213b16f27 100644
+--- a/sysdeps/arm/abi-note.S
++++ b/sysdeps/arm/abi-note.S
+@@ -1,3 +1,5 @@
++	.file "abi-note.S"
++
+ /* Tag_ABI_align8_preserved: This code preserves 8-byte
+    alignment in any callee.  */
+ 	.eabi_attribute 25, 1
+diff --git a/sysdeps/arm/crti.S b/sysdeps/arm/crti.S
+index 8169783267..f56e0c85a6 100644
+--- a/sysdeps/arm/crti.S
++++ b/sysdeps/arm/crti.S
+@@ -57,6 +57,8 @@
+ 	.hidden PREINIT_FUNCTION
+ #endif
+ 
++    .file "crti.S"
++
+ #if PREINIT_FUNCTION_WEAK
+ 	.p2align 2
+ 	.type call_weak_fn, %function
+diff --git a/sysdeps/arm/crtn.S b/sysdeps/arm/crtn.S
+index d60f9f05de..1e10ec439f 100644
+--- a/sysdeps/arm/crtn.S
++++ b/sysdeps/arm/crtn.S
+@@ -37,6 +37,8 @@
+ #define NO_THUMB
+ #include <sysdep.h>
+ 
++    .file "crtn.S"
++
+ /* crtn.S puts function epilogues in the .init and .fini sections
+    corresponding to the prologues in crti.S. */
+ 
+diff --git a/sysdeps/arm/dl-tlsdesc.S b/sysdeps/arm/dl-tlsdesc.S
+index 8415e47607..29c2cb8128 100644
+--- a/sysdeps/arm/dl-tlsdesc.S
++++ b/sysdeps/arm/dl-tlsdesc.S
+@@ -21,6 +21,8 @@
+ #include <tls.h>
+ #include "tlsdesc.h"
+ 
++	.file "dl-tlsdesc.S"
++
+ 	.text
+ 	@ emit debug information with cfi
+ 	@ use arm-specific pseudos for unwinding itself
+diff --git a/sysdeps/arm/dl-trampoline.S b/sysdeps/arm/dl-trampoline.S
+index a20baf555e..2dd3bef04e 100644
+--- a/sysdeps/arm/dl-trampoline.S
++++ b/sysdeps/arm/dl-trampoline.S
+@@ -21,6 +21,8 @@
+ #include <sysdep.h>
+ #include <libc-symbols.h>
+ 
++	.file "dl-trampoline.S"
++
+ 	.text
+ 	.globl _dl_runtime_resolve
+ 	.type _dl_runtime_resolve, #function
+diff --git a/sysdeps/arm/start.S b/sysdeps/arm/start.S
+index 2ff56179d2..c118046ec6 100644
+--- a/sysdeps/arm/start.S
++++ b/sysdeps/arm/start.S
+@@ -57,6 +57,8 @@
+ 					NULL
+ */
+ 
++	.file "start.S"
++
+ /* Tag_ABI_align8_preserved: This code preserves 8-byte
+    alignment in any callee.  */
+ 	.eabi_attribute 25, 1
+diff --git a/sysdeps/mips/start.S b/sysdeps/mips/start.S
+index fabc8080df..83c6b91d7d 100644
+--- a/sysdeps/mips/start.S
++++ b/sysdeps/mips/start.S
+@@ -38,6 +38,8 @@
+ #include <sgidefs.h>
+ #include <sys/asm.h>
+ 
++	.file "start.S"
++
+ #ifndef ENTRY_POINT
+ #error ENTRY_POINT needs to be defined for start.S on MIPS/ELF.
+ #endif
+diff --git a/sysdeps/powerpc/powerpc32/dl-start.S b/sysdeps/powerpc/powerpc32/dl-start.S
+index c15242d3bc..6ca27715a4 100644
+--- a/sysdeps/powerpc/powerpc32/dl-start.S
++++ b/sysdeps/powerpc/powerpc32/dl-start.S
+@@ -18,6 +18,8 @@
+ 
+ #include <sysdep.h>
+ 
++	.file "dl-start.S"
++
+ /* Initial entry point code for the dynamic linker.
+    The C function `_dl_start' is the real entry point;
+    its return value is the user program's entry point.	*/
+diff --git a/sysdeps/powerpc/powerpc32/start.S b/sysdeps/powerpc/powerpc32/start.S
+index b7b9a133a2..8df714f81a 100644
+--- a/sysdeps/powerpc/powerpc32/start.S
++++ b/sysdeps/powerpc/powerpc32/start.S
+@@ -35,6 +35,8 @@
+ 
+ #include <sysdep.h>
+ 
++	.file "start.S"
++
+ /* We do not want .eh_frame info for crt1.o since crt1.o is linked
+    before crtbegin.o, the file defining __EH_FRAME_BEGIN__.  */
+ #undef cfi_startproc
+diff --git a/sysdeps/powerpc/powerpc64/start.S b/sysdeps/powerpc/powerpc64/start.S
+index 94bf771e83..cffb99500a 100644
+--- a/sysdeps/powerpc/powerpc64/start.S
++++ b/sysdeps/powerpc/powerpc64/start.S
+@@ -35,6 +35,8 @@
+ 
+ #include <sysdep.h>
+ 
++	.file "start.S"
++
+ /* We do not want .eh_frame info for crt1.o since crt1.o is linked
+    before crtbegin.o, the file defining __EH_FRAME_BEGIN__.  */
+ #undef cfi_startproc
+diff --git a/sysdeps/unix/sysv/linux/aarch64/__read_tp.S b/sysdeps/unix/sysv/linux/aarch64/__read_tp.S
+index 12e1131fe7..767e0d043b 100644
+--- a/sysdeps/unix/sysv/linux/aarch64/__read_tp.S
++++ b/sysdeps/unix/sysv/linux/aarch64/__read_tp.S
+@@ -18,6 +18,8 @@
+ 
+ #include <sysdep.h>
+ 
++	.file "__read_tp.S"
++
+ 	.hidden __read_tp
+ ENTRY (__read_tp)
+ 	mrs	x0, tpidr_el0
+diff --git a/sysdeps/unix/sysv/linux/arm/aeabi_read_tp.S b/sysdeps/unix/sysv/linux/arm/aeabi_read_tp.S
+index 3b0d611039..4a7e476c37 100644
+--- a/sysdeps/unix/sysv/linux/arm/aeabi_read_tp.S
++++ b/sysdeps/unix/sysv/linux/arm/aeabi_read_tp.S
+@@ -39,6 +39,8 @@
+    a normal function call) in a high page of memory; tail call to the
+    helper.  */
+ 
++	.file "aeabi_read_tp.S"
++
+ 	.hidden __aeabi_read_tp
+ ENTRY (__aeabi_read_tp)
+ #ifdef ARCH_HAS_HARD_TP
+diff --git a/sysdeps/unix/sysv/linux/arm/libc-do-syscall.S b/sysdeps/unix/sysv/linux/arm/libc-do-syscall.S
+index fb5e0c7d97..bd07bdb38b 100644
+--- a/sysdeps/unix/sysv/linux/arm/libc-do-syscall.S
++++ b/sysdeps/unix/sysv/linux/arm/libc-do-syscall.S
+@@ -27,6 +27,8 @@
+    ARM unwind tables for register to register moves, the actual opcodes
+    are not defined.  */
+ 
++      .file "libc-do-syscall.S"
++
+ #if defined(__thumb__)
+ 	.thumb
+ 	.syntax unified
+diff --git a/sysdeps/unix/sysv/linux/powerpc/dl-brk.S b/sysdeps/unix/sysv/linux/powerpc/dl-brk.S
+index eeb96544e3..da182b28f8 100644
+--- a/sysdeps/unix/sysv/linux/powerpc/dl-brk.S
++++ b/sysdeps/unix/sysv/linux/powerpc/dl-brk.S
+@@ -1 +1,3 @@
++	.file "dl-brk.S"
++
+ #include <brk.S>

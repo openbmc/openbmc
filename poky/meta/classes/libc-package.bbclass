@@ -248,6 +248,7 @@ python package_do_split_gconvs () {
                 "sh4":     " --uint32-align=4 --big-endian ",    \
                 "powerpc": " --uint32-align=4 --big-endian ",    \
                 "powerpc64": " --uint32-align=4 --big-endian ",  \
+                "powerpc64le": " --uint32-align=4 --little-endian ",  \
                 "mips":    " --uint32-align=4 --big-endian ",    \
                 "mipsisa32r6":    " --uint32-align=4 --big-endian ",    \
                 "mips64":  " --uint32-align=4 --big-endian ",    \

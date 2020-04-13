@@ -78,11 +78,15 @@ files = set()
 sstate_content_cache = {}
 for s in sigs:
     prefix = s[:2]
+    prefix2 = s[2:4]
     if prefix not in sstate_content_cache:
-        sstate_content_cache[prefix] = build_sha_cache(prefix)
+        sstate_content_cache[prefix] = {}
+    if prefix2 not in sstate_content_cache[prefix]:
+        sstate_content_cache[prefix][prefix2] = build_sha_cache(prefix + "/" + prefix2)
 
-    for f in sstate_content_cache[prefix][s]:
-        files.add(f)
+    if s in sstate_content_cache[prefix][prefix2]:
+        for f in sstate_content_cache[prefix][prefix2][s]:
+            files.add(f)
 
 elapsed = time.perf_counter() - start_time
 print("Gathering file list took %.1fs" % elapsed)

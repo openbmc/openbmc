@@ -1,4 +1,4 @@
-From b633b9a1813fcd715dce44659a89293f1c64ae8c Mon Sep 17 00:00:00 2001
+From 613166007e3b852c99caf2cd34a972e2c8460737 Mon Sep 17 00:00:00 2001
 From: Martin Jansa <martin.jansa@lge.com>
 Date: Fri, 1 Jun 2018 08:41:07 +0000
 Subject: [PATCH] Fix webkitgtk builds
@@ -18,6 +18,7 @@ This reverts commit ebf9a3630c911d0cfc9c20f7cafe9ba4f88cf583.
 
 Upstream-Status: Pending
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+
 ---
  include/exec/cpu-all.h  |  6 +-----
  include/exec/cpu_ldst.h |  5 ++++-
@@ -26,7 +27,7 @@ Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
  4 files changed, 10 insertions(+), 23 deletions(-)
 
 diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-index 536ea58f81..4c63a6a2e4 100644
+index e96781a4..a369f81a 100644
 --- a/include/exec/cpu-all.h
 +++ b/include/exec/cpu-all.h
 @@ -162,12 +162,8 @@ extern unsigned long guest_base;
@@ -44,7 +45,7 @@ index 536ea58f81..4c63a6a2e4 100644
  
  #include "exec/hwaddr.h"
 diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
-index 9151fdb042..cb2b8f329f 100644
+index fd499f7e..30575f60 100644
 --- a/include/exec/cpu_ldst.h
 +++ b/include/exec/cpu_ldst.h
 @@ -65,7 +65,10 @@ typedef uint64_t abi_ptr;
@@ -60,7 +61,7 @@ index 9151fdb042..cb2b8f329f 100644
  #define h2g_valid(x) guest_addr_valid((unsigned long)(x) - guest_base)
  
 diff --git a/linux-user/mmap.c b/linux-user/mmap.c
-index 46a6e3a761..7735465462 100644
+index 46a6e3a7..77354654 100644
 --- a/linux-user/mmap.c
 +++ b/linux-user/mmap.c
 @@ -78,7 +78,7 @@ int target_mprotect(abi_ulong start, abi_ulong len, int prot)
@@ -110,10 +111,10 @@ index 46a6e3a761..7735465462 100644
  
      if (flags & MREMAP_FIXED) {
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 8b41a03901..bc5d85de02 100644
+index 171c0cae..fc18f244 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -4031,9 +4031,6 @@ static inline abi_ulong do_shmat(CPUArchState *cpu_env,
+@@ -4138,9 +4138,6 @@ static inline abi_ulong do_shmat(CPUArchState *cpu_env,
              return -TARGET_EINVAL;
          }
      }
@@ -123,7 +124,7 @@ index 8b41a03901..bc5d85de02 100644
  
      mmap_lock();
  
-@@ -6881,7 +6878,7 @@ static int open_self_maps(void *cpu_env, int fd)
+@@ -6990,7 +6987,7 @@ static int open_self_maps(void *cpu_env, int fd)
          }
          if (h2g_valid(min)) {
              int flags = page_get_flags(h2g(min));
@@ -132,6 +133,3 @@ index 8b41a03901..bc5d85de02 100644
              if (page_check_range(h2g(min), max - min, flags) == -1) {
                  continue;
              }
--- 
-2.22.0
-

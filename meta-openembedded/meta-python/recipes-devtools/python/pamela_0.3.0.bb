@@ -7,7 +7,7 @@ SRC_URI[sha256sum] = "1e198446a6cdd87704aa0def7621d62e7c20b0e6068e2788b9a866a835
 
 PYPI_PACKAGE = "pamela"
 
-inherit pypi setuptools
+inherit pypi setuptools3
 
 RDEPENDS_${PN} = "libpam"
 

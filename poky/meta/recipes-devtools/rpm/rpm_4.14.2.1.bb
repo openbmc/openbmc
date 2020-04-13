@@ -42,6 +42,8 @@ SRC_URI = "git://github.com/rpm-software-management/rpm;branch=rpm-4.14.x \
            file://0001-rpm-rpmio.c-restrict-virtual-memory-usage-if-limit-s.patch \
            file://0016-rpmscript.c-change-logging-level-around-scriptlets-t.patch \
            file://0001-mono-find-provides-requires-do-not-use-monodis-from-.patch \
+           file://0001-Rip-out-partial-support-for-unused-MD2-and-RIPEMD160.patch \
+           file://0001-rpmplugins.c-call-dlerror-prior-to-dlsym.patch \
            "
 
 PE = "1"
@@ -49,7 +51,7 @@ SRCREV = "4a9440006398646583f0d9ae1837dad2875013aa"
 
 S = "${WORKDIR}/git"
 
-DEPENDS = "nss libarchive db file popt xz bzip2 dbus elfutils python3"
+DEPENDS = "openssl libarchive db file popt xz bzip2 dbus elfutils python3"
 DEPENDS_append_class-native = " file-replacement-native bzip2-replacement-native"
 
 inherit autotools gettext pkgconfig python3native
@@ -58,7 +60,7 @@ export PYTHON_ABI
 # OE-core patches autoreconf to additionally run gnu-configize, which fails with this recipe
 EXTRA_AUTORECONF_append = " --exclude=gnu-configize"
 
-EXTRA_OECONF_append = " --without-lua --enable-python"
+EXTRA_OECONF_append = " --without-lua --enable-python --with-crypto=openssl"
 EXTRA_OECONF_append_libc-musl = " --disable-nls"
 
 # --sysconfdir prevents rpm from attempting to access machine-specific configuration in sysroot/etc; we need to have it in rootfs

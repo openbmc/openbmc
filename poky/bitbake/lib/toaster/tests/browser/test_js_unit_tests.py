@@ -11,7 +11,7 @@
 Run the js unit tests
 """
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from tests.browser.selenium_helpers import SeleniumTestCase
 import logging
 

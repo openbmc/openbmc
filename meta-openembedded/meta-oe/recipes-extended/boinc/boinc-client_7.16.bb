@@ -29,7 +29,7 @@ DEPENDS = "curl \
            ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'gtk+ libnotify xcb-util libxscrnsaver', '', d)} \
            nettle \
 "
-SRCREV = "a432e1ccbf864f99c7b29a1645de38056915f944"
+SRCREV = "e0e033af9fca3cca84a3417ea6531ae25be73a7a"
 BRANCH = "client_release/7/${PV}"
 SRC_URI = "git://github.com/BOINC/boinc;protocol=https;branch=${BRANCH} \
            file://boinc-AM_CONDITIONAL.patch \
@@ -73,15 +73,16 @@ do_compile_prepend () {
 	sed -i -e 's|^sys_lib_dlsearch_path_spec=.*|sys_lib_dlsearch_path_spec=""|g' ${B}/${TARGET_SYS}-libtool
 	sed -i -e 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' ${B}/${TARGET_SYS}-libtool
 }
+
 do_install_append() {
 	if [ -e ${D}${nonarch_libdir}/systemd/system/boinc-client.service ]; then
-                install -d ${D}${systemd_system_unitdir}
+		install -d ${D}${systemd_system_unitdir}
 		mv \
 		${D}${nonarch_libdir}/systemd/system/boinc-client.service \
 		${D}${systemd_system_unitdir}/boinc-client.service
 		rmdir --ignore-fail-on-non-empty ${D}${nonarch_libdir}/systemd/system \
-                ${D}${nonarch_libdir}/systemd \
-                ${D}${nonarch_libdir}
+		${D}${nonarch_libdir}/systemd \
+		${D}${nonarch_libdir}
 	fi
 }
 

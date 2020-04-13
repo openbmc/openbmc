@@ -5,9 +5,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
                     file://src/sysprof/sysprof-application.c;endline=17;md5=a3de8df3b0f8876dd01e1388d2d4b607"
 
 GNOMEBASEBUILDCLASS = "meson"
-inherit gnomebase gettext systemd upstream-version-is-even gsettings
+inherit gnomebase gettext systemd upstream-version-is-even gsettings mime mime-xdg
 
-DEPENDS = "glib-2.0 libxml2-native glib-2.0-native"
+DEPENDS += "glib-2.0 libxml2-native glib-2.0-native"
 
 SRC_URI[archive.md5sum] = "cc32455277b31afb1965d627ae3e3629"
 SRC_URI[archive.sha256sum] = "844bbb8d8b65071b3bca96f8e921319ceef81f2d2c51fcc9da63a4b355c893d0"

@@ -15,7 +15,7 @@ DEPENDS = " \
     tracker \
 "
 
-inherit gnomebase gsettings gobject-introspection gtk-doc gettext features_check upstream-version-is-even
+inherit gnomebase gsettings gobject-introspection gtk-doc gettext features_check upstream-version-is-even mime-xdg
 
 SRC_URI[archive.md5sum] = "88573061544040c0ff960f934aa83719"
 SRC_URI[archive.sha256sum] = "bb06e226b965f479a0b8668c19c8e1762b9d8f039af6817961cc7a8f09e6f8a7"

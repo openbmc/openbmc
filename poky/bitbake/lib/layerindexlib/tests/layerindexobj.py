@@ -3,14 +3,8 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-import unittest
-import tempfile
-import os
-import bb
-
 from layerindexlib.tests.common import LayersTest
 
-import logging
 
 class LayerIndexObjectsTest(LayersTest):
     def setUp(self):

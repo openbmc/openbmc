@@ -10,13 +10,13 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
 
 DEPENDS = "libpng jpeg udev"
 
-PV = "20190904+${SRCPV}"
+PV = "20191226+${SRCPV}"
 
 COMPATIBLE_HOST_rpi  = "${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', '.*-linux*', 'null', d)}"
 
 SRC_URI = "git://github.com/glmark2/glmark2.git;protocol=https \
            file://python3.patch"
-SRCREV = "24a1139dcbfd86bd02065316eaa90559e39374e1"
+SRCREV = "72dabc5d72b49c6d45badeb8a941ba4d829b0bd6"
 
 S = "${WORKDIR}/git"
 

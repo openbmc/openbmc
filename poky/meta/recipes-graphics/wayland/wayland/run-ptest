@@ -1,0 +1,17 @@
+#!/bin/sh
+
+export WAYLAND_SCANNER=wayland-scanner
+export TEST_DATA_DIR=tests/data
+export TEST_OUTPUT_DIR=tests/output
+export SED=sed
+export WAYLAND_EGL_LIB=/usr/lib/libwayland-egl.so.1
+export NM=nm
+
+for i in `ls tests/*-test tests/wayland-egl-symbols-check tests/scanner-test.sh`; do
+    $i
+    if [ $? -eq 0 ]; then
+        echo "PASS: $i"
+    else
+        echo "FAIL: $i"
+    fi
+done

@@ -1,0 +1,32 @@
+gnutls detects our outer git trees and injects that revision into its objects.
+That isn't deterministic so stop it. Also ensure we're not marked as a development
+build as its git detection is faulty.
+
+RP 2020/2/6
+
+Upstream-Status: Pending
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+
+Index: libgcrypt-1.8.5/configure.ac
+===================================================================
+--- libgcrypt-1.8.5.orig/configure.ac
++++ libgcrypt-1.8.5/configure.ac
+@@ -45,7 +45,7 @@ m4_define([mym4_revision_dec],
+ m4_define([mym4_betastring],
+           m4_esyscmd_s([git describe --match 'libgcrypt-[0-9].*[0-9]' --long|\
+                         awk -F- '$3!=0{print"-beta"$3}']))
+-m4_define([mym4_isgit],m4_if(mym4_betastring,[],[no],[yes]))
++m4_define([mym4_isgit],[no])
+ m4_define([mym4_full_version],[mym4_version[]mym4_betastring])
+ 
+ AC_INIT([libgcrypt],[mym4_full_version],[http://bugs.gnupg.org])
+@@ -2575,7 +2575,7 @@ AM_CONDITIONAL([BUILD_DOC], [test "x$bui
+ #
+ # Provide information about the build.
+ #
+-BUILD_REVISION="mym4_revision"
++BUILD_REVISION="None"
+ AC_SUBST(BUILD_REVISION)
+ AC_DEFINE_UNQUOTED(BUILD_REVISION, "$BUILD_REVISION",
+                    [GIT commit id revision used to build this package])

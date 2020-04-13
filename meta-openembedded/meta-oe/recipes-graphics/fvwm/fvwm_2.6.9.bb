@@ -40,7 +40,7 @@ SRCREV = "88eab6dc16da6e5dd25fe97fbb56b96ef0d58657"
 
 S = "${WORKDIR}/git"
 
-inherit autotools gettext update-alternatives pkgconfig pythonnative perlnative features_check
+inherit autotools gettext update-alternatives pkgconfig python3native perlnative features_check
 # depends on virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
 

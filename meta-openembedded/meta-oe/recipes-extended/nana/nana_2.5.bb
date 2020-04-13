@@ -15,7 +15,7 @@ LICENSE = "BSD-2-Clause"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=16aa57f3b7fdda870cee597275bd5d11"
 
-inherit autotools-brokensep pkgconfig
+inherit autotools-brokensep pkgconfig texinfo
 
 EXTRA_OEMAKE = "DESTDIR=${D}"
 

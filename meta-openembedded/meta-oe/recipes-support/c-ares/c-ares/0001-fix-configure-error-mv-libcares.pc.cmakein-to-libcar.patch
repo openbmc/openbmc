@@ -1,0 +1,27 @@
+From f2f1e134bf5d9d0789942848e03006af8d926cf8 Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@cn.fujitsu.com>
+Date: Tue, 17 Mar 2020 12:53:35 +0800
+Subject: [PATCH] fix configure error : mv libcares.pc.cmakein to
+ libcares.pc.cmake
+
+Signed-off-by: Wang Mingyu <wangmy@cn.fujitsu.com>
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3a5878d..c2e5740 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -563,7 +563,7 @@ IF (CARES_STATIC)
+ ENDIF()
+ 
+ # Write ares_config.h configuration file.  This is used only for the build.
+-CONFIGURE_FILE (libcares.pc.cmakein ${PROJECT_BINARY_DIR}/libcares.pc @ONLY)
++CONFIGURE_FILE (libcares.pc.cmake ${PROJECT_BINARY_DIR}/libcares.pc @ONLY)
+ 
+ 
+ 
+-- 
+2.17.1
+

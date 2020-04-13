@@ -1,16 +1,12 @@
 # -*- coding: utf-8 -*-
 """Tests of Beautiful Soup as a whole."""
 
-from pdb import set_trace
 import logging
 import unittest
 import sys
 import tempfile
 
-from bs4 import (
-    BeautifulSoup,
-    BeautifulStoneSoup,
-)
+from bs4 import BeautifulSoup
 from bs4.element import (
     CharsetMetaAttributeValue,
     ContentMetaAttributeValue,

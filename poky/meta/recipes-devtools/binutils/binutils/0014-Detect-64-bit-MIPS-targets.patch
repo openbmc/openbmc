@@ -1,0 +1,47 @@
+From 2f7f2389764ef1d699f6ad32057314024b7e84e7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 31 Mar 2017 11:42:03 -0700
+Subject: [PATCH] Detect 64-bit MIPS targets
+
+Add mips64 target triplets and default to N64
+
+Upstream-Status: Submitted
+https://sourceware.org/ml/binutils/2016-08/msg00048.html
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gold/configure.tgt | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/gold/configure.tgt b/gold/configure.tgt
+index aa7ec552ae..470515062e 100644
+--- a/gold/configure.tgt
++++ b/gold/configure.tgt
+@@ -153,6 +153,13 @@ aarch64*-*)
+  targ_big_endian=false
+  targ_extra_big_endian=true
+  ;;
++mips*64*el*-*-*|mips*64*le*-*-*)
++ targ_obj=mips
++ targ_machine=EM_MIPS_RS3_LE
++ targ_size=64
++ targ_big_endian=false
++ targ_extra_big_endian=true
++ ;;
+ mips*el*-*-*|mips*le*-*-*)
+  targ_obj=mips
+  targ_machine=EM_MIPS_RS3_LE
+@@ -160,6 +167,13 @@ mips*el*-*-*|mips*le*-*-*)
+  targ_big_endian=false
+  targ_extra_big_endian=true
+  ;;
++mips*64*-*-*)
++ targ_obj=mips
++ targ_machine=EM_MIPS
++ targ_size=64
++ targ_big_endian=true
++ targ_extra_big_endian=false
++ ;;
+ mips*-*-*)
+  targ_obj=mips
+  targ_machine=EM_MIPS

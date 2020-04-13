@@ -85,9 +85,11 @@ Index: dhcp-4.4.1/relay/Makefile.am
 ===================================================================
 --- dhcp-4.4.1.orig/relay/Makefile.am
 +++ dhcp-4.4.1/relay/Makefile.am
-@@ -1,4 +1,4 @@
+@@ -1,6 +1,6 @@
+ SUBDIRS = . tests
+
 -AM_CPPFLAGS = -DLOCALSTATEDIR='"@localstatedir@"'
 +AM_CPPFLAGS = -DLOCALSTATEDIR='"@localstatedir@"' -I$(top_srcdir)/includes
- 
+
  sbin_PROGRAMS = dhcrelay
  dhcrelay_SOURCES = dhcrelay.c

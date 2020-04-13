@@ -12,9 +12,6 @@ SRC_URI = "git://github.com/plougher/squashfs-tools.git;protocol=https \
 
 S = "${WORKDIR}/git/squashfs-tools"
 
-# needs FNM_EXTMATCH
-COMPATIBLE_HOST_libc-musl = 'null'
-
 EXTRA_OEMAKE = "${PACKAGECONFIG_CONFARGS}"
 
 PACKAGECONFIG ??= "gzip xz lzo lz4 lzma xattr reproducible"

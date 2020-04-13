@@ -20,11 +20,12 @@ NOTE: Switching a SRC_URI from "git://" to "gitsm://" requires a clean of your r
 import os
 import bb
 import copy
+import shutil
+import tempfile
 from   bb.fetch2.git import Git
 from   bb.fetch2 import runfetchcmd
 from   bb.fetch2 import logger
 from   bb.fetch2 import Fetch
-from   bb.fetch2 import BBFetchException
 
 class GitSM(Git):
     def supports(self, ud, d):
@@ -131,7 +132,7 @@ class GitSM(Git):
             ld.setVar('SRCPV', d.getVar('SRCPV'))
             ld.setVar('SRCREV_FORMAT', module)
 
-            function(ud, url, module, paths[module], ld)
+            function(ud, url, module, paths[module], workdir, ld)
 
         return submodules != []
 
@@ -153,7 +154,7 @@ class GitSM(Git):
         return False
 
     def download(self, ud, d):
-        def download_submodule(ud, url, module, modpath, d):
+        def download_submodule(ud, url, module, modpath, workdir, d):
             url += ";bareclone=1;nobranch=1"
 
             # Is the following still needed?
@@ -164,16 +165,25 @@ class GitSM(Git):
                 newfetch.download()
                 # Drop a nugget to add each of the srcrevs we've fetched (used by need_update)
                 runfetchcmd("%s config --add bitbake.srcrev %s" % \
-                            (ud.basecmd, ud.revisions[ud.names[0]]), d, workdir=ud.clonedir)
+                            (ud.basecmd, ud.revisions[ud.names[0]]), d, workdir=workdir)
             except Exception as e:
                 logger.error('gitsm: submodule download failed: %s %s' % (type(e).__name__, str(e)))
                 raise
 
         Git.download(self, ud, d)
-        self.process_submodules(ud, ud.clonedir, download_submodule, d)
+
+        # If we're using a shallow mirror tarball it needs to be unpacked
+        # temporarily so that we can examine the .gitmodules file
+        if ud.shallow and os.path.exists(ud.fullshallow) and self.need_update(ud, d):
+            tmpdir = tempfile.mkdtemp(dir=d.getVar("DL_DIR"))
+            runfetchcmd("tar -xzf %s" % ud.fullshallow, d, workdir=tmpdir)
+            self.process_submodules(ud, tmpdir, download_submodule, d)
+            shutil.rmtree(tmpdir)
+        else:
+            self.process_submodules(ud, ud.clonedir, download_submodule, d)
 
     def unpack(self, ud, destdir, d):
-        def unpack_submodules(ud, url, module, modpath, d):
+        def unpack_submodules(ud, url, module, modpath, workdir, d):
             url += ";bareclone=1;nobranch=1"
 
             # Figure out where we clone over the bare submodules...

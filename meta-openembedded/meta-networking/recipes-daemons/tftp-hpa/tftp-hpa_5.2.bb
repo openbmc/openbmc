@@ -82,9 +82,14 @@ INITSCRIPT_PACKAGES = "tftp-hpa-server"
 INITSCRIPT_NAME = "tftpd-hpa"
 INITSCRIPT_PARAMS = "start 20 2 3 4 5 . stop 20 1 ."
 
+ALTERNATIVE_${PN}-doc = "tftpd.8 tftp.1"
+ALTERNATIVE_LINK_NAME[tftpd.8] = "${mandir}/man8/tftpd.8"
+ALTERNATIVE_LINK_NAME[tftp.1] = "${mandir}/man1/tftp.1"
+
 ALTERNATIVE_${PN} = "tftp"
 ALTERNATIVE_TARGET[tftp] = "${bindir}/tftp-hpa"
 ALTERNATIVE_PRIORITY = "60"
+
 
 SYSTEMD_PACKAGES = "tftp-hpa-server"
 SYSTEMD_SERVICE_tftp-hpa-server = "tftpd-hpa.socket tftpd-hpa.service"

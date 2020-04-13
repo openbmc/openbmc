@@ -1,11 +1,16 @@
 require e2fsprogs.inc
 
 SRC_URI += "file://remove.ldconfig.call.patch \
-            file://run-ptest \
-            file://ptest.patch \
-            file://mkdir_p.patch \
-            file://0001-misc-create_inode.c-set-dir-s-mode-correctly.patch \
-            "
+           file://run-ptest \
+           file://ptest.patch \
+           file://mkdir_p.patch \
+           file://0001-misc-create_inode.c-set-dir-s-mode-correctly.patch \
+           file://0001-configure.ac-correct-AM_GNU_GETTEXT.patch \
+           file://0001-intl-do-not-try-to-use-gettext-defines-that-no-longe.patch \
+           file://CVE-2019-5188.patch \
+           file://0001-e2fsck-don-t-try-to-rehash-a-deleted-directory.patch \
+           file://e2fsck-fix-use-after-free-in-calculate_tree.patch \
+           "
 
 SRC_URI_append_class-native = " file://e2fsprogs-fix-missing-check-for-permission-denied.patch \
                                 file://quiet-debugfs.patch \
@@ -80,12 +85,13 @@ do_install_append_class-target() {
 	mv ${D}${base_sbindir}/tune2fs ${D}${base_sbindir}/tune2fs.e2fsprogs
 }
 
-RDEPENDS_e2fsprogs = "e2fsprogs-badblocks"
+RDEPENDS_e2fsprogs = "e2fsprogs-badblocks e2fsprogs-dumpe2fs"
 RRECOMMENDS_e2fsprogs = "e2fsprogs-mke2fs e2fsprogs-e2fsck"
 
-PACKAGES =+ "e2fsprogs-e2fsck e2fsprogs-e2scrub e2fsprogs-mke2fs e2fsprogs-tune2fs e2fsprogs-badblocks e2fsprogs-resize2fs"
+PACKAGES =+ "e2fsprogs-badblocks e2fsprogs-dumpe2fs e2fsprogs-e2fsck e2fsprogs-e2scrub e2fsprogs-mke2fs e2fsprogs-resize2fs e2fsprogs-tune2fs"
 PACKAGES =+ "libcomerr libss libe2p libext2fs"
 
+FILES_e2fsprogs-dumpe2fs = "${base_sbindir}/dumpe2fs"
 FILES_e2fsprogs-resize2fs = "${base_sbindir}/resize2fs*"
 FILES_e2fsprogs-e2fsck = "${base_sbindir}/e2fsck ${base_sbindir}/fsck.ext*"
 FILES_e2fsprogs-e2scrub = "${base_sbindir}/e2scrub*"
@@ -115,7 +121,7 @@ ALTERNATIVE_LINK_NAME[tune2fs] = "${base_sbindir}/tune2fs"
 
 RDEPENDS_e2fsprogs-e2scrub = "bash"
 RDEPENDS_${PN}-ptest += "coreutils procps bash bzip2 diffutils perl sed"
-RDEPENDS_${PN}-ptest += "e2fsprogs-e2fsck e2fsprogs-mke2fs e2fsprogs-tune2fs e2fsprogs-badblocks e2fsprogs-resize2fs"
+RDEPENDS_${PN}-ptest += "e2fsprogs-badblocks e2fsprogs-dumpe2fs e2fsprogs-e2fsck e2fsprogs-mke2fs e2fsprogs-resize2fs e2fsprogs-tune2fs"
 
 do_compile_ptest() {
 	oe_runmake -C ${B}/tests

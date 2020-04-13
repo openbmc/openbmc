@@ -1,0 +1,84 @@
+From 12414304245cce6ef0e8b9547949be5109845353 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Tue, 24 Jul 2018 13:33:33 +0800
+Subject: [PATCH] cmake: Install libcares.pc
+
+Prepare and install libcares.pc file during cmake build, so libraries
+using pkg-config to find libcares will not fail.
+
+Signed-off-by: Alexey Firago <alexey_firago@mentor.com>
+
+update to 1.14.0, fix patch warning
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ CMakeLists.txt | 28 +++++++++++++++++++++++-----
+ 1 file changed, 23 insertions(+), 5 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index fd123e1..3a5878d 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -214,22 +214,25 @@ ADD_DEFINITIONS(${SYSFLAGS})
+ 
+ 
+ # Tell C-Ares about libraries to depend on
++# Also pass these libraries to pkg-config file
++SET(CARES_PRIVATE_LIBS_LIST)
+ IF (HAVE_LIBRESOLV)
+-	LIST (APPEND CARES_DEPENDENT_LIBS resolv)
++	LIST (APPEND CARES_PRIVATE_LIBS_LIST "-lresolv")
+ ENDIF ()
+ IF (HAVE_LIBNSL)
+-	LIST (APPEND CARES_DEPENDENT_LIBS nsl)
++	LIST (APPEND CARES_PRIVATE_LIBS_LIST "-lnsl")
+ ENDIF ()
+ IF (HAVE_LIBSOCKET)
+-	LIST (APPEND CARES_DEPENDENT_LIBS socket)
++	LIST (APPEND CARES_PRIVATE_LIBS_LIST "-lsocket")
+ ENDIF ()
+ IF (HAVE_LIBRT)
+-	LIST (APPEND CARES_DEPENDENT_LIBS rt)
++	LIST (APPEND CARES_PRIVATE_LIBS_LIST "-lrt")
+ ENDIF ()
+ IF (WIN32)
+-	LIST (APPEND CARES_DEPENDENT_LIBS ws2_32 Advapi32)
++	LIST (APPEND CARES_PRIVATE_LIBS_LIST "-lws2_32")
+ ENDIF ()
+ 
++string (REPLACE ";" " " CARES_PRIVATE_LIBS "${CARES_PRIVATE_LIBS_LIST}")
+ 
+ # When checking for symbols, we need to make sure we set the proper
+ # headers, libraries, and definitions for the detection to work properly
+@@ -554,6 +557,15 @@ CONFIGURE_FILE (ares_build.h.cmake ${PROJECT_BINARY_DIR}/ares_build.h)
+ # Write ares_config.h configuration file.  This is used only for the build.
+ CONFIGURE_FILE (ares_config.h.cmake ${PROJECT_BINARY_DIR}/ares_config.h)
+ 
++# Pass required CFLAGS to pkg-config in case of static library
++IF (CARES_STATIC)
++       SET (CPPFLAG_CARES_STATICLIB "-DCARES_STATICLIB")
++ENDIF()
++
++# Write ares_config.h configuration file.  This is used only for the build.
++CONFIGURE_FILE (libcares.pc.cmakein ${PROJECT_BINARY_DIR}/libcares.pc @ONLY)
++
++
+ 
+ # TRANSFORM_MAKEFILE_INC
+ #
+@@ -728,6 +740,12 @@ IF (CARES_INSTALL)
+ 	INSTALL (FILES "${CMAKE_CURRENT_BINARY_DIR}/libcares.pc" COMPONENT Devel DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+ ENDIF ()
+ 
++# pkg-config file
++IF (CARES_INSTALL)
++       SET (PKGCONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
++       INSTALL (FILES "${CMAKE_CURRENT_BINARY_DIR}/libcares.pc" DESTINATION ${PKGCONFIG_INSTALL_DIR})
++ENDIF ()
++
+ # Legacy chain-building variables (provided for compatibility with old code).
+ # Don't use these, external code should be updated to refer to the aliases directly (e.g., Cares::cares).
+ SET (CARES_FOUND 1 CACHE INTERNAL "CARES LIBRARY FOUND")
+-- 
+2.17.1
+

@@ -1,4 +1,4 @@
-From a274ba778838824efcacaba57c415b7262f779ec Mon Sep 17 00:00:00 2001
+From 251347fc970a397a9cd63ed3f87c5e6c52e15187 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 14 May 2013 15:00:26 -0700
 Subject: [PATCH] python3: Add target and native recipes
@@ -18,10 +18,10 @@ Upstream-Status: Inappropriate [embedded specific]
  1 file changed, 11 insertions(+), 3 deletions(-)
 
 diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
-index 3dfd0a3..6c6b09a 100644
+index 2df348c..4f8db84 100644
 --- a/Lib/distutils/sysconfig.py
 +++ b/Lib/distutils/sysconfig.py
-@@ -97,7 +97,9 @@ def get_python_inc(plat_specific=0, prefix=None):
+@@ -96,7 +96,9 @@ def get_python_inc(plat_specific=0, prefix=None):
      If 'prefix' is supplied, use it instead of sys.base_prefix or
      sys.base_exec_prefix -- i.e., ignore 'plat_specific'.
      """
@@ -32,7 +32,7 @@ index 3dfd0a3..6c6b09a 100644
          prefix = plat_specific and BASE_EXEC_PREFIX or BASE_PREFIX
      if os.name == "posix":
          if python_build:
-@@ -140,7 +142,13 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
+@@ -139,7 +141,13 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
      If 'prefix' is supplied, use it instead of sys.base_prefix or
      sys.base_exec_prefix -- i.e., ignore 'plat_specific'.
      """
@@ -47,7 +47,7 @@ index 3dfd0a3..6c6b09a 100644
          if standard_lib:
              prefix = plat_specific and BASE_EXEC_PREFIX or BASE_PREFIX
          else:
-@@ -148,7 +156,7 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
+@@ -147,7 +155,7 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
  
      if os.name == "posix":
          libpython = os.path.join(prefix,

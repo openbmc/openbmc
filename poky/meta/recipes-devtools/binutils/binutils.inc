@@ -13,17 +13,12 @@ LICENSE = "GPLv3"
 
 DEPENDS = "flex-native bison-native zlib-native gnu-config-native autoconf-native"
 
-#
-# we need chrpath > 0.14 and some distros like centos 7 still have older chrpath
-#
-DEPENDS_append_class-target = " chrpath-replacement-native"
-EXTRANATIVEPATH_append_class-target = " chrpath-native"
-
 inherit autotools gettext multilib_header texinfo
 
 FILES_${PN} = " \
 	${bindir}/${TARGET_PREFIX}* \
-	${libdir}/lib*-*.so \
+	${libdir}/lib*.so.* \
+	${libdir}/lib*-${PV}*.so \
 	${prefix}/${TARGET_SYS}/bin/* \
         ${bindir}/embedspu"
 
@@ -33,6 +28,8 @@ FILES_${PN}-dev = " \
 	${includedir} \
 	${libdir}/*.la \
 	${libdir}/libbfd.so \
+	${libdir}/libctf.so \
+	${libdir}/libctf-nobfd.so \
 	${libdir}/libopcodes.so"
 
 # Rather than duplicating multiple entries for these, make one
@@ -40,6 +37,8 @@ FILES_${PN}-dev = " \
 
 LDGOLD_ALTS ?= "ld.gold dwp"
 LDGOLD_ALTS_riscv64 = ""
+LDGOLD_ALTS_riscv32 = ""
+LDGOLD_ALTS_libc-glibc_mipsarch = ""
 
 USE_ALTERNATIVES_FOR = " \
 	addr2line \
@@ -76,12 +75,24 @@ EXTRA_OECONF = "--program-prefix=${TARGET_PREFIX} \
                 --disable-werror \
                 --enable-deterministic-archives \
                 --enable-plugins \
+                --disable-gdb \
+                --disable-gdbserver \
+                --disable-libdecnumber \
+                --disable-readline \
+                --disable-sim \
                 ${LDGOLD} \
+                ${EXTRA_TARGETS} \
                 ${@bb.utils.contains('DISTRO_FEATURES', 'multiarch', '--enable-64-bit-bfd', '', d)}"
+
+EXTRA_TARGETS = ""
+EXTRA_TARGETS_x86-64 = " --enable-targets=x86_64-pe,x86_64-pep "
+EXTRA_TARGETS_class-native = ""
 
 LDGOLD_class-native = ""
 LDGOLD_class-crosssdk = ""
+LDGOLD_libc-glibc_mipsarch = ""
 LDGOLD ?= "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', '--enable-gold=default --enable-threads', '--enable-gold --enable-ld=default --enable-threads', d)}"
+
 
 # This is necessary due to a bug in the binutils Makefiles
 # EXTRA_OEMAKE = "configure-build-libiberty all"
@@ -110,7 +121,8 @@ export CC_FOR_BUILD = "LD_LIBRARY_PATH= ${BUILD_CC}"
 MULTIARCH := "${@bb.utils.contains("DISTRO_FEATURES", "multiarch", "yes", "no", d)}"
 do_configure[vardeps] += "MULTIARCH"
 do_configure () {
-	(cd ${S}; gnu-configize) || die "Failed to run gnu-configize"
+	(cd ${S} && gnu-configize)
+
 	oe_runconf
 #
 # must prime config.cache to ensure the build of libiberty
@@ -121,10 +133,6 @@ do_configure () {
 	done
 }
 
-do_compile_append_class-target() {
-	chrpath -d ${B}/binutils/elfedit
-	chrpath -d ${B}/binutils/readelf
-}
 do_install () {
 	autotools_do_install
 
@@ -144,6 +152,11 @@ do_install () {
 	install -m 644 ${S}/include/ansidecl.h ${D}${includedir}
 	install -m 644 ${S}/include/libiberty.h ${D}${includedir}
 
+	# insall pic version of libiberty if available
+        if [ -e ${B}/libiberty/pic/libiberty.a ]; then
+		install -Dm 0644 ${B}/libiberty/pic/libiberty.a ${D}${libdir}/libiberty.a
+	fi
+
 	cd ${D}${bindir}
 
 	# Symlinks for ease of running these on the native target
@@ -156,6 +169,8 @@ do_install () {
 	done
 
 	oe_multilib_header bfd.h
+        # bfd_stdint.h encodes the compiler name in the header
+        sed -i ${D}${includedir}/bfd_stdint.h -e "s,${TARGET_PREFIX},,"
 }
 
 inherit update-alternatives
@@ -163,3 +178,8 @@ inherit update-alternatives
 ALTERNATIVE_PRIORITY = "100"
 
 ALTERNATIVE_${PN}_class-target = "${USE_ALTERNATIVES_FOR}"
+
+python () {
+    if bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', True, False, d) and bb.utils.contains_any('TARGET_ARCH', 'riscv32 riscv64', True, False, d):
+        bb.fatal("Gold linker does not _yet_ support RISC-V architecture please remove ld-is-gold from DISTRO_FEATURES")
+}

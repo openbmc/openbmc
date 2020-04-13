@@ -1,0 +1,28 @@
+From d642e60d8963f1b90569cd0ab5c29ac2c9bfe939 Mon Sep 17 00:00:00 2001
+From: Jeremy Puhlman <jpuhlman@mvista.com>
+Date: Fri, 6 Mar 2020 22:28:14 +0000
+Subject: [PATCH] Make manpage multilib identical
+
+Upstream-Status: Submitted
+
+Signed-off-by: Jeremy Puhlman <jpuhlman@mvista.com>
+---
+ man/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/man/Makefile.am b/man/Makefile.am
+index 9c6569f..608e933 100644
+--- a/man/Makefile.am
++++ b/man/Makefile.am
+@@ -12,7 +12,7 @@ MAN_SUBSTS+=	-e 's|__XSERVERNAME__|$(XSERVERNAME)|g' \
+ 		-e 's|__XCONFIGFILEMAN__|$(XCONFIGFILEMAN)|g' \
+ 		-e 's|__xinitdir__|$(XINITDIR)|g' \
+ 		-e 's|__bindir__|$(bindir)|g' \
+-		-e 's|__libdir__|$(libdir)|g' \
++		-e 's|__libdir__|$(prefix)/lib*|g' \
+ 		-e 's|__configdir__|$(XINITDIR)|g'
+ 
+ 
+-- 
+2.23.0
+

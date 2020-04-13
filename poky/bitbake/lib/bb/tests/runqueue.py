@@ -7,7 +7,6 @@
 #
 
 import unittest
-import bb
 import os
 import tempfile
 import subprocess
@@ -255,7 +254,7 @@ class RunQueueTests(unittest.TestCase):
             cmd = ["bitbake", "a1", "b1"]
             tasks = self.run_bitbakecmd(cmd, tempdir, sstatevalid, extraenv=extraenv, cleanup=True)
             expected = ['a1:populate_sysroot', 'a1:package', 'a1:package_write_rpm_setscene', 'a1:packagedata_setscene',
-                        'a1:package_write_ipk_setscene', 'a1:package_qa_setscene']
+                        'a1:package_write_ipk_setscene', 'a1:package_qa_setscene', 'a1:build']
             self.assertEqual(set(tasks), set(expected))
 
             self.shutdown(tempdir)

@@ -12,6 +12,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=18f01e7b39807bebe2b8df101a039b68"
 
 PE = "1"
 
+SRC_URI += "file://0001-Make-manpage-multilib-identical.patch"
+
 SRC_URI[md5sum] = "6d506ab2efc17a08e87778654e099d37"
 SRC_URI[sha256sum] = "de9b8f617b68a70f6caf87da01fcf0ebd2b75690cdcba9c921d0ef54fa54abb9"
 

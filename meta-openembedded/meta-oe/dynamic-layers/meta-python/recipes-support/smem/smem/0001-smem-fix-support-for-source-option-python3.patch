@@ -1,0 +1,53 @@
+From 3ff78f1f00973393d1a7ee4e467a2bacf1c807f3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andr=C3=A9=20Draszik?= <git@andred.net>
+Date: Wed, 5 Feb 2020 16:14:21 +0000
+Subject: [PATCH] smem: fix support for --source option (python3)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Using --source doesn't work without this patch:
+Traceback (most recent call last):
+  File "./smem", line 727, in <module>
+    showpids()
+  File "./smem", line 299, in showpids
+    showtable(pt.keys(), fields, columns.split(), options.sort or 'pss')
+  File "./smem", line 519, in showtable
+    mt = totalmem()
+  File "./smem", line 118, in totalmem
+    _totalmem = memory()['memtotal']
+  File "./smem", line 193, in memory
+    m = f.match(l)
+TypeError: cannot use a string pattern on a bytes-like object
+
+python3's tarfile returns bytes, whereas all of the rest of
+the code assumes str.
+
+Fix the tarfile usage to convert to str before returning the
+results.
+
+Signed-off-by: André Draszik <git@andred.net>
+Upstream-Status: Inappropriate [upstream wants to support python2 & python3]
+---
+ smem | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/smem b/smem
+index 46a3189..54d40dd 100755
+--- a/smem
++++ b/smem
+@@ -90,9 +90,9 @@ class tardata(procdata):
+                 d,f = ti.name.split('/')
+                 yield d
+     def _read(self, f):
+-        return self.tar.extractfile(f).read()
++        return self.tar.extractfile(f).read().decode()
+     def _readlines(self, f):
+-        return self.tar.extractfile(f).readlines()
++        return [l.decode() for l in self.tar.extractfile(f).readlines()]
+     def piduser(self, p):
+         t = self.tar.getmember("%d" % p)
+         if t.uname:
+-- 
+2.23.0.rc1
+

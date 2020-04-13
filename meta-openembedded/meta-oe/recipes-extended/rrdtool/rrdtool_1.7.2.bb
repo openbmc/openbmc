@@ -4,7 +4,7 @@ HOMEPAGE = "http://oss.oetiker.ch/rrdtool/"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=39df84cfd8a5e18bf988f277f7946676"
 
-DEPENDS = "libpng zlib cairo pango glib-2.0 libxml2 groff-native python-setuptools-native"
+DEPENDS = "libpng zlib cairo pango glib-2.0 libxml2 groff-native python3-setuptools-native"
 
 SRCREV = "56a83f4f52e6745cd4352f9ee008be3183a6dedf"
 PV = "1.7.2"
@@ -15,7 +15,7 @@ SRC_URI = "\
 
 S = "${WORKDIR}/git"
 
-inherit cpan autotools-brokensep gettext pythonnative python-dir systemd
+inherit cpan autotools-brokensep gettext python3native python3-dir systemd
 
 BBCLASSEXTEND = "native"
 
@@ -24,7 +24,7 @@ SYSTEMD_SERVICE_rrdcached = "rrdcached.socket rrdcached.service"
 
 EXTRA_AUTORECONF = "-I m4 --exclude=autopoint"
 
-PACKAGECONFIG ??= "python perl ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
+PACKAGECONFIG ??= "perl ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 
 PACKAGECONFIG[python] = "--enable-python=yes \
 am_cv_python_pythondir=${STAGING_LIBDIR}/python${PYTHON_BASEVERSION}/site-packages \
@@ -123,7 +123,7 @@ RDEPENDS_${PN}-perl = "perl perl-module-lib perl-module-getopt-long perl-module-
 DESCRIPTION_${PN}-python = \
 "The ${PN}-python package includes RRDtool bindings for python."
 FILES_${PN}-python = "${libdir}/python${PYTHON_BASEVERSION}/site-packages/*"
-RDEPENDS_${PN}-python = "python"
+RDEPENDS_${PN}-python = "python3"
 
 FILES_${PN}-dbg += "${libdir}/perl/vendor_perl/*/auto/RRDs/.debug \
     ${libdir}/python${PYTHON_BASEVERSION}/site-packages/.debug"

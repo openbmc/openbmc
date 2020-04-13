@@ -1,0 +1,44 @@
+###############################################################################
+## Monit control file
+###############################################################################
+##
+## Comments begin with a '#' and extend through the end of the line. Keywords
+## are case insensitive. All path's MUST BE FULLY QUALIFIED, starting with '/'.
+##
+## Below you will find examples of some frequently used statements. For
+## information about the control file and a complete list of statements and
+## options, please have a look in the Monit manual.
+##
+##
+###############################################################################
+## Global section
+###############################################################################
+##
+## Start Monit in the background (run as a daemon):
+#
+set daemon  30              # check services at 30 seconds intervals
+#   with start delay 240    # optional: delay the first check by 4-minutes (by
+#                           # default Monit check immediately after Monit start)
+#
+#
+## Set syslog logging. If you want to log to a standalone log file instead,
+## specify the full path to the log file
+#
+set log syslog
+
+set httpd port 2812
+    allow 0.0.0.0/0        # allow localhost to connect to the server and
+    allow admin:monit      # require user 'admin' with password 'monit'
+    #with ssl {            # enable SSL/TLS and set path to server certificate
+    #    pemfile: /etc/ssl/certs/monit.pem
+    #}
+
+###############################################################################
+## Includes
+###############################################################################
+##
+## It is possible to include additional configuration parts from other files or
+## directories.
+#
+include /etc/monit.d/*
+

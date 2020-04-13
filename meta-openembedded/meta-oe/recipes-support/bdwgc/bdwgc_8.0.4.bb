@@ -28,8 +28,6 @@ SRC_URI = "git://github.com/ivmai/bdwgc.git;branch=release-8_0"
 
 S = "${WORKDIR}/git"
 
-ARM_INSTRUCTION_SET = "arm"
-
 inherit autotools pkgconfig
 
 EXTRA_OECONF += "--enable-cpluscplus"

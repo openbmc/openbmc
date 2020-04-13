@@ -917,28 +917,6 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-hw.Check_if_target_can_support_EEPROM",
-            "author": [
-                {
-                    "email": "yi.zhao@windriver.com",
-                    "name": "yi.zhao@windriver.com"
-                }
-            ],
-            "execution": {
-                "1": {
-                    "action": "Check eeprom device exist in /sys/bus/i2c/devices/ ",
-                    "expected_results": "Hexdump can read data from eeprom.\n"
-                },
-                "2": {
-                    "action": "Run \"hexdump eeprom\" commandroot@mpc8315e-rdb:/sys/bus/i2c/devices/1-0051> hexdump eeprom0000000 9210 0b02 0211 0009 0b52 0108 0c00 3c000000010 6978 6930 6911 208c 7003 3c3c 00f0 8381\u2026\n",
-                    "expected_results": ""
-                }
-            },
-            "summary": "Check_if_target_can_support_EEPROM"
-        }
-    },
-    {
-        "test": {
             "@alias": "bsps-hw.bsps-hw.System_can_boot_up_via_NFS",
             "author": [
                 {
@@ -965,36 +943,6 @@
                 }
             },
             "summary": "System_can_boot_up_via_NFS"
-        }
-    },
-    {
-        "test": {
-            "@alias": "bsps-hw.bsps-hw.Boot_from_JFFS2_image",
-            "author": [
-                {
-                    "email": "yi.zhao@windriver.com",
-                    "name": "yi.zhao@windriver.com"
-                }
-            ],
-            "execution": {
-                "1": {
-                    "action": "First boot the board with NFS root. ",
-                    "expected_results": "The system can boot up without problem\n"
-                },
-                "2": {
-                    "action": "Install mtd-utils package. Erase the MTD partition which will be used as root: $ flash_eraseall /dev/mtd3 ",
-                    "expected_results": ""
-                },
-                "3": {
-                    "action": "Copy the JFFS2 image to the MTD partition: $ flashcp core-image-minimal-mpc8315e-rdb.jffs2 /dev/mtd3 ",
-                    "expected_results": ""
-                },
-                "4": {
-                    "action": "Then reboot the board and set up the environment in U-Boot: => setenv bootargs root=/dev/mtdblock3 rootfstype=jffs2 console=ttyS0,115200 ",
-                    "expected_results": ""
-                }
-            },
-            "summary": "Boot_from_JFFS2_image"
         }
     }
 ]

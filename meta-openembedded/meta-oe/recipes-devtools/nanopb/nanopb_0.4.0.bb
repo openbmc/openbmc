@@ -9,7 +9,7 @@ SRCREV = "70f0de9877b1ce12abc0229d5df84db6349fcbfc"
 
 S = "${WORKDIR}/git"
 
-inherit cmake pythonnative
+inherit cmake python3native
 
 do_install_append() {
     install -Dm 0755 ${S}/generator/nanopb_generator.py ${D}${bindir}/nanopb_generator.py
@@ -26,3 +26,5 @@ RDEPENDS_${PN} += "\
 "
 
 BBCLASSEXTEND = "native nativesdk"
+
+PNBLACKLIST[nanopb] = "Needs forward porting to use python3"

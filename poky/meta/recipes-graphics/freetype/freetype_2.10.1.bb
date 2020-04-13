@@ -27,7 +27,7 @@ AUTOTOOLS_SCRIPT_PATH = "${S}/builds/unix"
 CONFIGURE_SCRIPT = "${S}/configure"
 EXTRA_AUTORECONF += "--exclude=autoheader --exclude=automake"
 
-PACKAGECONFIG ??= "zlib"
+PACKAGECONFIG ??= "zlib pixmap"
 
 PACKAGECONFIG[bzip2] = "--with-bzip2,--without-bzip2,bzip2"
 # harfbuzz results in a circular dependency so enabling is non-trivial

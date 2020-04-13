@@ -8,7 +8,7 @@
 MACHINE_FEATURES += "screen keyboard pci usbhost ext2 ext3 x86 \
                      acpi serial usbgadget alsa"
 
-IMAGE_FSTYPES ?= "hddimg"
+IMAGE_FSTYPES ?= "wic"
 
 KERNEL_IMAGETYPE ?= "bzImage"
 
@@ -18,7 +18,7 @@ SERIAL_CONSOLES ?= "115200;ttyS0"
 # kernel-related variables
 #
 PREFERRED_PROVIDER_virtual/kernel ??= "linux-yocto"
-PREFERRED_VERSION_linux-yocto ??= "5.2%"
+PREFERRED_VERSION_linux-yocto ??= "5.4%"
 
 #
 # XSERVER subcomponents, used to build the XSERVER variable

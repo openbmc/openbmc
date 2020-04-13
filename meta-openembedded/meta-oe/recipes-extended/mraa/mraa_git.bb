@@ -3,12 +3,13 @@ HOMEPAGE = "https://github.com/intel-iot-devkit/mraa"
 SECTION = "libs"
 
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://COPYING;md5=4b92a3b497d7943042a6db40c088c3f2"
+LIC_FILES_CHKSUM = "file://COPYING;md5=91e7de50a8d3cf01057f318d72460acd"
 
-SRCREV = "967585c9ea0e1a8818d2172d2395d8502f6180a2"
-PV = "2.0.0+git${SRCPV}"
+SRCREV = "e15ce6fbc76148ba8835adc92196b0d0a3f245e7"
+PV = "2.1.0+git${SRCPV}"
 
-SRC_URI = "git://github.com/intel-iot-devkit/${BPN}.git;protocol=http \
+SRC_URI = "git://github.com/eclipse/${BPN}.git;protocol=http \
+           file://0001-cmake-Use-a-regular-expression-to-match-x86-architec.patch \
            "
 
 S = "${WORKDIR}/git"
@@ -25,6 +26,8 @@ EXTRA_OECMAKE_append = " -DINSTALLTOOLS:BOOL=ON -DFIRMATA=ON -DCMAKE_SKIP_RPATH=
                          -DPYTHON_LIBRARY=${STAGING_LIBDIR}/lib${PYTHON_DIR}${PYTHON_ABI}.so \
                          -DPYTHON_INCLUDE_DIR=${STAGING_INCDIR}/${PYTHON_DIR}${PYTHON_ABI} \
                        "
+
+CFLAGS += "-fcommon"
 
 # Prepend mraa-utils to make sure bindir ends up in there
 PACKAGES =+ "${PN}-utils"
@@ -60,3 +63,5 @@ RDEPENDS_node-${PN} += "nodejs"
 ### Include desired language bindings ###
 PACKAGES =+ "${@bb.utils.contains('BINDINGS', 'nodejs', 'node-${PN}', '', d)}"
 PACKAGES =+ "${@bb.utils.contains('BINDINGS', 'python', '${PYTHON_PN}-${PN}', '', d)}"
+
+TOOLCHAIN = "gcc"

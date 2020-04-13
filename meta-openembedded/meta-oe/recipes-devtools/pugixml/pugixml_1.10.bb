@@ -13,6 +13,8 @@ SRC_URI = "https://github.com/zeux/${BPN}/releases/download/v${PV}/${BP}.tar.gz"
 SRC_URI[md5sum] = "f97237e9908201c6d8536210747b66af"
 SRC_URI[sha256sum] = "55f399fbb470942410d348584dc953bcaec926415d3462f471ef350f29b5870a"
 
+UPSTREAM_CHECK_URI = "https://github.com/zeux/${BPN}/releases"
+
 inherit cmake
 
 EXTRA_OECMAKE += "-DBUILD_SHARED_LIBS=ON \

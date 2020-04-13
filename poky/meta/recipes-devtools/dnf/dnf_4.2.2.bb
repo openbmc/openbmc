@@ -13,6 +13,8 @@ SRC_URI = "git://github.com/rpm-software-management/dnf.git \
            file://0005-Do-not-prepend-installroot-to-logdir.patch \
            file://0029-Do-not-set-PYTHON_INSTALL_DIR-by-running-python.patch \
            file://0030-Run-python-scripts-using-env.patch \
+           file://Fix-SyntaxWarning.patch \
+           file://0001-set-python-path-for-completion_helper.patch \
            "
 
 SRCREV = "9947306a55271b8b7c9e2b6e3b7d582885b6045d"
@@ -84,3 +86,5 @@ SYSTEMD_SERVICE_${PN} = "dnf-makecache.service dnf-makecache.timer \
                          dnf-automatic-notifyonly.service dnf-automatic-notifyonly.timer \
 "
 SYSTEMD_AUTO_ENABLE ?= "disable"
+
+PNBLACKLIST[dnf] ?= "${@bb.utils.contains('PACKAGE_CLASSES', 'package_rpm', '', 'does not build without package_rpm in PACKAGE_CLASSES due disabled rpm support in libsolv', d)}"

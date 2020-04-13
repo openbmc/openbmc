@@ -1,0 +1,32 @@
+From 6bed199a73a7af39344cf8e799b665011553600c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Sat, 8 Feb 2020 14:29:52 +0100
+Subject: [PATCH] meson.build: Give note if sdl2 was found
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Configure output confused me a bit
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ meson.build | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/meson.build b/meson.build
+index 9d5b484..296b5f3 100644
+--- a/meson.build
++++ b/meson.build
+@@ -374,6 +374,7 @@ message('\n'.join(['',
+ '  OpenEXR:         @0@'.format(openexr.found()),
+ '  rsvg:            @0@'.format(librsvg.found()),
+ '  SDL:             @0@'.format(sdl1.found()),
++'  SDL2:            @0@'.format(sdl2.found()),
+ '  libraw:          @0@'.format(libraw.found()),
+ '  Jasper:          @0@'.format(jasper.found()),
+ '  av libs:         @0@'.format(avlibs_found),
+-- 
+2.21.0
+

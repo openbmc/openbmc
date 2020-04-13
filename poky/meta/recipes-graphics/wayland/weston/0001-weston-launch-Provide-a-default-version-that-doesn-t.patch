@@ -1,4 +1,4 @@
-From 682b7d79a7b81ec8e38760381104b24ad549e8c0 Mon Sep 17 00:00:00 2001
+From 5f2d71998eb77068cbaee2d468cbb296a42d5739 Mon Sep 17 00:00:00 2001
 From: Tom Hochstein <tom.hochstein@nxp.com>
 Date: Wed, 22 Feb 2017 15:53:30 +0200
 Subject: [PATCH] weston-launch: Provide a default version that doesn't require
@@ -16,6 +16,7 @@ Signed-off-by: Tom Hochstein <tom.hochstein@nxp.com>
 Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
 Signed-off-by: Denys Dmytriyenko <denys@ti.com>
 Signed-off-by: Ming Liu <ming.liu@toradex.com>
+
 ---
  libweston/meson.build     | 16 ++++++++++++----
  libweston/weston-launch.c | 21 +++++++++++++++++++++
@@ -23,10 +24,10 @@ Signed-off-by: Ming Liu <ming.liu@toradex.com>
  3 files changed, 40 insertions(+), 4 deletions(-)
 
 diff --git a/libweston/meson.build b/libweston/meson.build
-index d8d3fc0..326683f 100644
+index 08d23ec..cb9fd3f 100644
 --- a/libweston/meson.build
 +++ b/libweston/meson.build
-@@ -199,16 +199,24 @@ dep_vertex_clipping = declare_dependency(
+@@ -216,16 +216,24 @@ dep_vertex_clipping = declare_dependency(
  )
  
  if get_option('weston-launch')
@@ -52,11 +53,11 @@ index d8d3fc0..326683f 100644
  		'weston-launch.c',
 -		dependencies: [dep_pam, systemd_dep, dep_libdrm],
 +		dependencies: deps_weston_launch,
- 		include_directories: include_directories('..'),
+ 		include_directories: common_inc,
  		install: true
  	)
 diff --git a/libweston/weston-launch.c b/libweston/weston-launch.c
-index 4962bd6..fc531c5 100644
+index 8a711b4..54c567a 100644
 --- a/libweston/weston-launch.c
 +++ b/libweston/weston-launch.c
 @@ -51,7 +51,9 @@
@@ -112,7 +113,7 @@ index 4962bd6..fc531c5 100644
  
  	if (ioctl(wl->tty, KDSKBMUTE, 0) &&
  	    ioctl(wl->tty, KDSKBMODE, wl->kb_mode))
-@@ -660,6 +668,7 @@ setup_session(struct weston_launch *wl, char **child_argv)
+@@ -666,6 +674,7 @@ setup_session(struct weston_launch *wl, char **child_argv)
  	setenv("HOME", wl->pw->pw_dir, 1);
  	setenv("SHELL", wl->pw->pw_shell, 1);
  
@@ -120,7 +121,7 @@ index 4962bd6..fc531c5 100644
  	env = pam_getenvlist(wl->ph);
  	if (env) {
  		for (i = 0; env[i]; ++i) {
-@@ -668,6 +677,7 @@ setup_session(struct weston_launch *wl, char **child_argv)
+@@ -674,6 +683,7 @@ setup_session(struct weston_launch *wl, char **child_argv)
  		}
  		free(env);
  	}
@@ -128,7 +129,7 @@ index 4962bd6..fc531c5 100644
  
  	/*
  	 * We open a new session, so it makes sense
-@@ -739,8 +749,10 @@ static void
+@@ -745,8 +755,10 @@ static void
  help(const char *name)
  {
  	fprintf(stderr, "Usage: %s [args...] [-- [weston args..]]\n", name);
@@ -139,7 +140,7 @@ index 4962bd6..fc531c5 100644
  	fprintf(stderr, "  -t, --tty       Start session on alternative tty,\n"
  			"                  e.g. -t /dev/tty4, requires -u option.\n");
  	fprintf(stderr, "  -v, --verbose   Be verbose\n");
-@@ -754,7 +766,9 @@ main(int argc, char *argv[])
+@@ -760,7 +772,9 @@ main(int argc, char *argv[])
  	int i, c;
  	char *tty = NULL;
  	struct option opts[] = {
@@ -149,7 +150,7 @@ index 4962bd6..fc531c5 100644
  		{ "tty",     required_argument, NULL, 't' },
  		{ "verbose", no_argument,       NULL, 'v' },
  		{ "help",    no_argument,       NULL, 'h' },
-@@ -766,11 +780,16 @@ main(int argc, char *argv[])
+@@ -772,11 +786,16 @@ main(int argc, char *argv[])
  	while ((c = getopt_long(argc, argv, "u:t:vh", opts, &i)) != -1) {
  		switch (c) {
  		case 'u':
@@ -166,7 +167,7 @@ index 4962bd6..fc531c5 100644
  			break;
  		case 't':
  			tty = optarg;
-@@ -822,8 +841,10 @@ main(int argc, char *argv[])
+@@ -828,8 +847,10 @@ main(int argc, char *argv[])
  	if (setup_tty(&wl, tty) < 0)
  		exit(EXIT_FAILURE);
  
@@ -178,7 +179,7 @@ index 4962bd6..fc531c5 100644
  	if (setup_launcher_socket(&wl) < 0)
  		exit(EXIT_FAILURE);
 diff --git a/meson_options.txt b/meson_options.txt
-index d5bf1d5..254eb2b 100644
+index c862ecc..73ef2c3 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
 @@ -73,6 +73,13 @@ option(
@@ -195,6 +196,3 @@ index d5bf1d5..254eb2b 100644
  	'xwayland',
  	type: 'boolean',
  	value: true,
--- 
-2.7.4
-

@@ -19,7 +19,7 @@ SRCREV = "f482bab49fcedee46fc5b755da127f608325cd13"
 
 S = "${WORKDIR}/git"
 
-inherit update-rc.d autotools
+inherit update-rc.d autotools texinfo
 
 # cpu_set.patch plus _GNU_SOURCE makes src/netlib.c compile with CPU_ macros
 CFLAGS_append = " -DDO_UNIX -DDO_IPV6 -D_GNU_SOURCE"
