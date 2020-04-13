@@ -42,6 +42,7 @@ FLASH_PAGE_SIZE ?= "1"
 FLASH_NOR_UBI_OVERHEAD ?= "64"
 
 # Fixed partition offsets
+FLASH_UBOOT_SPL_SIZE ?= "64"
 FLASH_UBOOT_OFFSET ?= "0"
 FLASH_KERNEL_OFFSET ?= "512"
 FLASH_KERNEL_OFFSET_flash-131072 ?= "1024"
@@ -336,9 +337,19 @@ python do_generate_static() {
                                'if=%s' % imgpath,
                                'of=%s' % nor_image])
 
+    uboot_offset = int(d.getVar('FLASH_UBOOT_OFFSET', True))
+
+    spl_binary = d.getVar('SPL_BINARY', True)
+    if spl_binary:
+        _append_image(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
+                                   'u-boot-spl.%s' % d.getVar('UBOOT_SUFFIX',True)),
+                      int(d.getVar('FLASH_UBOOT_OFFSET', True)),
+                      int(d.getVar('FLASH_UBOOT_SPL_SIZE', True)))
+        uboot_offset += int(d.getVar('FLASH_UBOOT_SPL_SIZE', True))
+
     _append_image(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
                                'u-boot.%s' % d.getVar('UBOOT_SUFFIX',True)),
-                  int(d.getVar('FLASH_UBOOT_OFFSET', True)),
+                  uboot_offset,
                   int(d.getVar('FLASH_KERNEL_OFFSET', True)))
 
     _append_image(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
