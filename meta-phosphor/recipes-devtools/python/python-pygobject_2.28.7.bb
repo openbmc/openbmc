@@ -34,7 +34,7 @@ S = "${WORKDIR}/pygobject-${PV}"
 
 EXTRA_OECONF += "--disable-introspection"
 
-inherit autotools distutils-base pkgconfig
+inherit autotools distutils3-base pkgconfig
 
 # necessary to let the call for python-config succeed
 export BUILD_SYS
