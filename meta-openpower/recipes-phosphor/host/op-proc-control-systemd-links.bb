@@ -16,12 +16,17 @@ pkg_postinst_${PN}() {
 	mkdir -p $D$systemd_system_unitdir/obmc-host-force-warm-reboot@0.target.requires
 	mkdir -p $D$systemd_system_unitdir/obmc-host-startmin@0.target.requires
 	mkdir -p $D$systemd_system_unitdir/obmc-host-diagnostic-mode@0.target.requires
+	mkdir -p $D$systemd_system_unitdir/obmc-chassis-poweron@0.target.requires
 
 	LINK="$D$systemd_system_unitdir/obmc-host-stop@0.target.wants/op-stop-instructions@0.service"
 	TARGET="../op-stop-instructions@.service"
 	ln -s $TARGET $LINK
 
-	LINK="$D$systemd_system_unitdir/obmc-host-force-warm-reboot@0.target.requires/op-cfam-reset.service"
+	LINK="$D$systemd_system_unitdir/obmc-host-startmin@0.target.requires/op-cfam-reset.service"
+	TARGET="../op-cfam-reset.service"
+	ln -s $TARGET $LINK
+
+	LINK="$D$systemd_system_unitdir/obmc-chassis-poweron@0.target.requires/op-cfam-reset.service"
 	TARGET="../op-cfam-reset.service"
 	ln -s $TARGET $LINK
 
@@ -45,7 +50,9 @@ pkg_postinst_${PN}() {
 pkg_prerm_${PN}() {
 	LINK="$D$systemd_system_unitdir/obmc-host-stop@0.target.wants/op-stop-instructions@0.service"
 	rm $LINK
-	LINK="$D$systemd_system_unitdir/obmc-host-force-warm-reboot@0.target.requires/op-cfam-reset.service"
+	LINK="$D$systemd_system_unitdir/obmc-host-startmin@0.target.requires/op-cfam-reset.service"
+	rm $LINK
+	LINK="$D$systemd_system_unitdir/obmc-chassis-poweron@0.target.requires/op-cfam-reset.service"
 	rm $LINK
 	# Only uninstall cfam override if p9 system
 	if [ "${@bb.utils.contains("MACHINE_FEATURES", "p9-cfam-override", "True", "False", d)}" = True ]; then
