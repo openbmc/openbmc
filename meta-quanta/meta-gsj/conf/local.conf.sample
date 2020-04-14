@@ -1,5 +1,5 @@
 MACHINE ??= "gsj"
-DISTRO ?= "openbmc-phosphor"
+DISTRO ?= "openbmc-gsj"
 PACKAGE_CLASSES ?= "package_rpm"
 SANITY_TESTED_DISTROS_append ?= " *"
 EXTRA_IMAGE_FEATURES = "debug-tweaks"

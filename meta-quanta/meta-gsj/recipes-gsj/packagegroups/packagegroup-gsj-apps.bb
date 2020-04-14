@@ -28,7 +28,5 @@ RDEPENDS_${PN}-fans = ""
 
 SUMMARY_${PN}-flash = "GSJ Flash"
 RDEPENDS_${PN}-flash = " \
-        obmc-flash-bmc \
-        obmc-mgr-download \
-        obmc-control-bmc \
+        phosphor-ipmi-flash \
         "
