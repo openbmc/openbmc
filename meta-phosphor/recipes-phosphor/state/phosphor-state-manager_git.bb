@@ -17,6 +17,7 @@ STATE_MGR_PACKAGES = " \
     ${PN}-reset-sensor-states \
     ${PN}-systemd-target-monitor \
     ${PN}-obmc-targets \
+    ${PN}-scheduled-host-transition \
 "
 PACKAGE_BEFORE_PN += "${STATE_MGR_PACKAGES}"
 ALLOW_EMPTY_${PN} = "1"
@@ -77,6 +78,9 @@ FILES_${PN}-systemd-target-monitor = " \
     ${sysconfdir}/phosphor-systemd-target-monitor/phosphor-target-monitor-default.json \
     "
 SYSTEMD_SERVICE_${PN}-systemd-target-monitor += "phosphor-systemd-target-monitor.service"
+
+FILES_${PN}-scheduled-host-transition = "${bindir}/phosphor-scheduled-host-transition"
+DBUS_SERVICE_${PN}-scheduled-host-transition += "xyz.openbmc_project.State.ScheduledHostTransition.service"
 
 RESET_CHECK_TMPL = "phosphor-reset-host-check@.service"
 RESET_CHECK_TGTFMT = "obmc-host-reset@{1}.target"
@@ -262,6 +266,6 @@ SYSTEMD_LINK_${PN}-obmc-targets += "${@compose_list(d, 'FAN_LINK_FMT', 'OBMC_CHA
 SYSTEMD_LINK_${PN}-obmc-targets += "${@compose_list(d, 'QUIESCE_FMT', 'HOST_ERROR_TARGETS', 'OBMC_HOST_INSTANCES')}"
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
-SRCREV = "4ca6f3f4fe136a593df8e3a61adf6620cd4ca45c"
+SRCREV = "dc059399bca5d459fb82b6a28e7f547745a251a1"
 
 S = "${WORKDIR}/git"
