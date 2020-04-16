@@ -9,6 +9,7 @@ SRC_URI += "file://default.network"
 SRC_URI += "file://0001-sd-bus-Don-t-automatically-add-ObjectManager.patch"
 
 FILES_${PN} += "${systemd_unitdir}/network/default.network"
+EXTRA_OEMESON += "-Ddns-servers=''"
 
 do_install_append() {
         install -m 644 ${WORKDIR}/default.network ${D}${systemd_unitdir}/network/
