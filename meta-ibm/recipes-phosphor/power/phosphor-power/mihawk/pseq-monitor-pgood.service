@@ -1,0 +1,13 @@
+[Unit]
+Description=Power Sequencer Power-on Monitor
+Wants=op-power-start@0.service
+After=op-power-start@0.service
+Wants=power-workarounds@0.service
+After=power-workarounds@0.service
+Conflicts=obmc-chassis-poweroff@0.target
+ConditionPathExists=!/run/openbmc/chassis@0-on
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/env pseq-monitor -a pgood-monitor -i 10000
+SyslogIdentifier=pseq-monitor
