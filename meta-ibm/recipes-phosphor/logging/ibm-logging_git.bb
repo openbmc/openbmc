@@ -30,6 +30,9 @@ SRC_URI += "file://policyTable.json"
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[policy-interface] = "--enable-policy-interface, --disable-policy-interface,,"
 
+PACKAGECONFIG_ibm-ac-server = "policy-interface"
+PACKAGECONFIG_mihawk = "policy-interface"
+
 SERVICE = "com.ibm.Logging.service"
 DBUS_SERVICE_${PN} += "${SERVICE}"
 

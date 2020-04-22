@@ -1,0 +1,12 @@
+Sample meta-witherspoon build invocations:
+
+mihawk:
+DISTRO=openbmc-witherspoon MACHINE=mihawk bitbake obmc-phosphor-image
+swift:
+DISTRO=openbmc-witherspoon MACHINE=swift bitbake obmc-phosphor-image
+witherspoon:
+DISTRO=openbmc-witherspoon MACHINE=witherspoon bitbake obmc-phosphor-image
+witherspoon-tacoma:
+DISTRO=openbmc-openpower MACHINE=witherspoon-tacoma bitbake obmc-phosphor-image
+witherspoon-128:
+DISTRO=openbmc-witherspoon MACHINE=witherspoon-128 bitbake obmc-phosphor-image
