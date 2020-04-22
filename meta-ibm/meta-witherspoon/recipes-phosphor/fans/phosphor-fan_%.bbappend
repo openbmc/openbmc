@@ -52,3 +52,8 @@ SYSTEMD_LINK_${PN}-control_witherspoon += "${@compose_list(d, 'FMT_CONTROL_PWRON
 # Enable the use of JSON on the fan applications that support it
 EXTRA_OECONF_append_witherspoon = " --enable-json"
 RDEPENDS_${PN}-presence-tach_append_witherspoon = " phosphor-fan-presence-config"
+
+# Set the appropriate i2c address used within the overridden phosphor-fan-control@.service
+# file that's used for witherspoon type(including witherspoon-tacoma) machines
+SYSTEMD_SUBSTITUTIONS_witherspoon = "ADDR:100:phosphor-fan-control@.service"
+SYSTEMD_SUBSTITUTIONS_witherspoon-tacoma = "ADDR:200:phosphor-fan-control@.service"
