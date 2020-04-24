@@ -3,4 +3,5 @@ RDEPENDS_${PN}-extras_append = " \
     phosphor-hostlogger \
     openpower-esel-parser \
     obmc-yadro-fwupdate \
+    obmc-yadro-lssensors \
 "
