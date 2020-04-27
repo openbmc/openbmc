@@ -315,6 +315,22 @@ do_mk_static_nor_image() {
 	mk_empty_image ${IMGDEPLOYDIR}/${IMAGE_NAME}.static.mtd ${FLASH_SIZE}
 }
 
+do_generate_image_uboot_file() {
+    image_dst="$1"
+    uboot_offset=${FLASH_UBOOT_OFFSET}
+
+    if [ ! -z ${SPL_BINARY} ]; then
+        dd bs=1k conv=notrunc seek=${FLASH_UBOOT_OFFSET} \
+            if=${DEPLOY_DIR_IMAGE}/u-boot-spl.${UBOOT_SUFFIX} \
+            of=${image_dst}
+        uboot_offset=${FLASH_UBOOT_SPL_SIZE}
+    fi
+
+    dd bs=1k conv=notrunc seek=${uboot_offset} \
+        if=${DEPLOY_DIR_IMAGE}/u-boot.${UBOOT_SUFFIX} \
+        of=${image_dst}
+}
+
 python do_generate_static() {
     import subprocess
 
@@ -379,9 +395,9 @@ do_mk_static_symlinks() {
 	ln -sf ${IMAGE_NAME}.static.mtd ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.static.mtd
 
 	# Maintain non-standard legacy links
+	do_generate_image_uboot_file ${IMGDEPLOYDIR}/image-u-boot
 	ln -sf ${IMAGE_NAME}.static.mtd ${IMGDEPLOYDIR}/flash-${MACHINE}
 	ln -sf ${IMAGE_NAME}.static.mtd ${IMGDEPLOYDIR}/image-bmc
-	ln -sf u-boot.${UBOOT_SUFFIX} ${IMGDEPLOYDIR}/image-u-boot
 	ln -sf ${FLASH_KERNEL_IMAGE} ${IMGDEPLOYDIR}/image-kernel
 	ln -sf ${IMAGE_LINK_NAME}.${IMAGE_BASETYPE} ${IMGDEPLOYDIR}/image-rofs
 	ln -sf ${IMAGE_LINK_NAME}.${OVERLAY_BASETYPE} ${IMGDEPLOYDIR}/image-rwfs
@@ -437,7 +453,7 @@ make_image_links() {
 
 	# Create some links to help make the tar archive in the format
 	# expected by phosphor-bmc-code-mgmt.
-	ln -sf ${DEPLOY_DIR_IMAGE}/u-boot.${UBOOT_SUFFIX} image-u-boot
+	do_generate_image_uboot_file image-u-boot
 	ln -sf ${DEPLOY_DIR_IMAGE}/${FLASH_KERNEL_IMAGE} image-kernel
 	ln -sf ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.$rofs image-rofs
 	ln -sf ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.$rwfs image-rwfs
