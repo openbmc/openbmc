@@ -43,3 +43,5 @@
     <<: *DEFAULTS
 /system/chassis/motherboard/dimm15:
     <<: *DEFAULTS
+/system/chassis/motherboard/opfw:
+    <<: *DEFAULTS
