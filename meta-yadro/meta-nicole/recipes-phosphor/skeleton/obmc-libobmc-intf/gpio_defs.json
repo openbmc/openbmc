@@ -29,11 +29,6 @@
             "direction": "in"
         },
         {
-            "name": "BMC_WD_CLEAR_PULSE_N",
-            "pin": "N5",
-            "direction": "falling"
-        },
-        {
             "name": "CHECKSTOP",
             "pin": "J2",
             "direction": "falling"
@@ -42,6 +37,11 @@
             "name": "POWER_BUTTON",
             "pin": "O2",
             "direction": "both"
+        },
+        {
+            "name": "ID_BTN",
+            "pin": "Q7",
+            "direction": "out"
         }
     ]
 }
