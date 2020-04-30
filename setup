@@ -31,7 +31,7 @@ machine() {
 	local target=$1
 	local build_dir=$2
 	local cfg name tmpl
-	for cfg in meta-*/meta-*/conf/machine/*.conf; do
+	for cfg in meta-*/meta-*/conf/machine/*.conf meta-*/conf/machine/*.conf; do
 		name=${cfg##*/}
 		name=${name%.conf}
 		tmpl=${cfg%/machine/*.conf}
