@@ -23,6 +23,7 @@ FILES_${PN} += "/usr/share/misc/enterprise-numbers"
 do_compile_prepend() {
     # copy the SRC_URI version of enterprise-numbers
     # to the build dir to prevent a fetch
+    mkdir -p "${WORKDIR}/build"
     cp "${WORKDIR}/enterprise-numbers" "${WORKDIR}/build/enterprise-numbers"
 }
 
