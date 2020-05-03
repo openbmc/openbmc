@@ -6,13 +6,13 @@ PV = "0.1+git${SRCPV}"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
-inherit autotools pkgconfig
+inherit meson
+inherit pkgconfig
 inherit systemd
 
 PACKAGECONFIG ?= ""
-PACKAGECONFIG[7seg] = "--enable-7seg,--disable-7seg,,udev"
+PACKAGECONFIG[7seg] = "-D7seg=enabled,-D7seg=disabled,,udev"
 
-DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus"
 DEPENDS += "sdeventplus"
 DEPENDS += "phosphor-dbus-interfaces"
@@ -29,11 +29,9 @@ SERVICE_FILE = "lpcsnoop.service"
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} += "${SERVICE_FILE}"
 
-EXTRA_OECONF = " \
-  SNOOP_DEVICE="${SNOOP_DEVICE}" \
-  POST_CODE_BYTES="${POST_CODE_BYTES}" \
-  SYSTEMD_TARGET="multi-user.target" \
-"
+EXTRA_OEMESON += "-Dsnoop-device=${SNOOP_DEVICE}"
+EXTRA_OEMESON += "-Dpost-code-bytes=${POST_CODE_BYTES}"
+EXTRA_OEMESON += "-Dsystemd-target=multi-user.target"
 
 POSTCODE_SEVENSEG_DEVICE ?= "seven_seg_disp_val"
 SERVICE_FILE_7SEG = " \
