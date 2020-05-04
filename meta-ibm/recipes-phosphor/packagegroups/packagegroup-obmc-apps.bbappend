@@ -32,6 +32,6 @@ RDEPENDS_${PN}-logging_append = " ${EXTRA_IBM_LOGGING_PKGS}"
 RDEPENDS_${PN}-extras_append_rainier = " pldm"
 RDEPENDS_${PN}-extras_append_witherspoon-128 = " pldm openpower-hw-diags"
 
-RDEPENDS_${PN}-extras_append_witherspoon-tacoma = " pldm openpower-hw-diags"
+RDEPENDS_${PN}-extras_append_witherspoon-tacoma = " pldm"
 
 ${PN}-software-extras_append_ibm-ac-server = " phosphor-software-manager-sync"
