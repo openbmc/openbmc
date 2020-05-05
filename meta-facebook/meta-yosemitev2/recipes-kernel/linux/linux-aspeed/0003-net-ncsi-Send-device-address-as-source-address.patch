@@ -1,0 +1,40 @@
+From 87da89033e0025d5db80207e141544e83d9494f5 Mon Sep 17 00:00:00 2001
+From: Vijay Khemka <vijaykhemka@fb.com>
+Date: Fri, 27 Dec 2019 15:02:23 -0800
+Subject: [PATCH 3/4] net/ncsi: Send device address as source address
+
+After receiving device mac address from device, send this as
+a source address for further commands instead of broadcast
+address.
+
+This will help in multi host NIC cards.
+
+Signed-off-by: Vijay Khemka <vijaykhemka@fb.com>
+---
+ net/ncsi/ncsi-cmd.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/net/ncsi/ncsi-cmd.c b/net/ncsi/ncsi-cmd.c
+index 0187e65176c0..ba9ae482141b 100644
+--- a/net/ncsi/ncsi-cmd.c
++++ b/net/ncsi/ncsi-cmd.c
+@@ -369,7 +369,15 @@ int ncsi_xmit_cmd(struct ncsi_cmd_arg *nca)
+ 	eh = skb_push(nr->cmd, sizeof(*eh));
+ 	eh->h_proto = htons(ETH_P_NCSI);
+ 	eth_broadcast_addr(eh->h_dest);
+-	eth_broadcast_addr(eh->h_source);
++
++	/* If mac address received from device then use it for
++	 * source address as unicast address else use broadcast
++	 * address as source address
++	 */
++	if (nca->ndp->gma_flag == 1)
++		memcpy(eh->h_source, nca->ndp->ndev.dev->dev_addr, ETH_ALEN);
++	else
++		eth_broadcast_addr(eh->h_source);
+ 
+ 	/* Start the timer for the request that might not have
+ 	 * corresponding response. Given NCSI is an internal
+-- 
+2.17.1
+

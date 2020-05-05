@@ -1,0 +1,187 @@
+From 3fbdb5c7c93e6d2814e9b237c9a6a0bfd695bf11 Mon Sep 17 00:00:00 2001
+From: Vijay Khemka <vijaykhemka@fb.com>
+Date: Fri, 27 Dec 2019 15:12:35 -0800
+Subject: [PATCH 4/4] net/ncsi: Support for multi host mellanox card
+
+Multi host Mellanox cards require MAC affinity to be set
+before receiving any config commands. All config commands
+should also have unicast address for source address in
+command header.
+
+Adding GMA and SMAF(Set Mac Affinity) for Mellanox card
+and call these in channel probe state machine if it is
+defined in device tree.
+
+Signed-off-by: Vijay Khemka <vijaykhemka@fb.com>
+---
+ net/ncsi/internal.h    | 20 +++++++++++++
+ net/ncsi/ncsi-manage.c | 68 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 88 insertions(+)
+
+diff --git a/net/ncsi/internal.h b/net/ncsi/internal.h
+index 0b3f0673e1a2..77a94c2ffbdb 100644
+--- a/net/ncsi/internal.h
++++ b/net/ncsi/internal.h
+@@ -64,6 +64,17 @@ enum {
+ 	NCSI_MODE_MAX
+ };
+ 
++/* Supported media status bits for Mellanox Mac affinity command.
++ * Bit (0-2) for different protocol support; Bit 1 for RBT support,
++ * bit 1 for SMBUS support and bit 2 for PCIE support. Bit (3-5)
++ * for different protocol availability. Bit 4 for RBT, bit 4 for
++ * SMBUS and bit 5 for PCIE.
++ */
++enum {
++	MLX_MC_RBT_SUPPORT  = 0x01, /* MC supports RBT         */
++	MLX_MC_RBT_AVL      = 0x08, /* RBT medium is available */
++};
++
+ /* OEM Vendor Manufacture ID */
+ #define NCSI_OEM_MFR_MLX_ID             0x8119
+ #define NCSI_OEM_MFR_BCM_ID             0x113d
+@@ -72,9 +83,15 @@ enum {
+ /* Mellanox specific OEM Command */
+ #define NCSI_OEM_MLX_CMD_GMA            0x00   /* CMD ID for Get MAC */
+ #define NCSI_OEM_MLX_CMD_GMA_PARAM      0x1b   /* Parameter for GMA  */
++#define NCSI_OEM_MLX_CMD_SMAF           0x01   /* CMD ID for Set MC Affinity */
++#define NCSI_OEM_MLX_CMD_SMAF_PARAM     0x07   /* Parameter for SMAF         */
+ /* OEM Command payload lengths*/
+ #define NCSI_OEM_BCM_CMD_GMA_LEN        12
+ #define NCSI_OEM_MLX_CMD_GMA_LEN        8
++#define NCSI_OEM_MLX_CMD_SMAF_LEN        60
++/* Offset in OEM request */
++#define MLX_SMAF_MAC_ADDR_OFFSET         8     /* Offset for MAC in SMAF    */
++#define MLX_SMAF_MED_SUPPORT_OFFSET      14    /* Offset for medium in SMAF */
+ /* Mac address offset in OEM response */
+ #define BCM_MAC_ADDR_OFFSET             28
+ #define MLX_MAC_ADDR_OFFSET             8
+@@ -251,6 +268,8 @@ enum {
+ 	ncsi_dev_state_probe_deselect	= 0x0201,
+ 	ncsi_dev_state_probe_package,
+ 	ncsi_dev_state_probe_channel,
++	ncsi_dev_state_probe_mlx_gma,
++	ncsi_dev_state_probe_mlx_smaf,
+ 	ncsi_dev_state_probe_cis,
+ 	ncsi_dev_state_probe_gvi,
+ 	ncsi_dev_state_probe_gc,
+@@ -316,6 +335,7 @@ struct ncsi_dev_priv {
+ 	struct list_head    vlan_vids;       /* List of active VLAN IDs */
+ 
+ 	bool                multi_package;   /* Enable multiple packages   */
++	bool                mlx_multi_host;  /* Enable multi host Mellanox */
+ 	u32                 package_whitelist; /* Packages to configure    */
+ };
+ 
+diff --git a/net/ncsi/ncsi-manage.c b/net/ncsi/ncsi-manage.c
+index a7f2dee76917..a44139c87202 100644
+--- a/net/ncsi/ncsi-manage.c
++++ b/net/ncsi/ncsi-manage.c
+@@ -8,6 +8,8 @@
+ #include <linux/init.h>
+ #include <linux/netdevice.h>
+ #include <linux/skbuff.h>
++#include <linux/of.h>
++#include <linux/platform_device.h>
+ 
+ #include <net/ncsi.h>
+ #include <net/net_namespace.h>
+@@ -731,6 +733,34 @@ static int ncsi_oem_gma_handler_mlx(struct ncsi_cmd_arg *nca)
+ 	return ret;
+ }
+ 
++static int ncsi_oem_smaf_mlx(struct ncsi_cmd_arg *nca)
++{
++	union {
++		u8 data_u8[NCSI_OEM_MLX_CMD_SMAF_LEN];
++		u32 data_u32[NCSI_OEM_MLX_CMD_SMAF_LEN / sizeof(u32)];
++	} u;
++	int ret = 0;
++
++	memset(&u, 0, sizeof(u));
++	u.data_u32[0] = ntohl(NCSI_OEM_MFR_MLX_ID);
++	u.data_u8[5] = NCSI_OEM_MLX_CMD_SMAF;
++	u.data_u8[6] = NCSI_OEM_MLX_CMD_SMAF_PARAM;
++	memcpy(&u.data_u8[MLX_SMAF_MAC_ADDR_OFFSET],
++	       nca->ndp->ndev.dev->dev_addr,	ETH_ALEN);
++	u.data_u8[MLX_SMAF_MED_SUPPORT_OFFSET] =
++		(MLX_MC_RBT_AVL | MLX_MC_RBT_SUPPORT);
++
++	nca->payload = NCSI_OEM_MLX_CMD_SMAF_LEN;
++	nca->data = u.data_u8;
++
++	ret = ncsi_xmit_cmd(nca);
++	if (ret)
++		netdev_err(nca->ndp->ndev.dev,
++			   "NCSI: Failed to transmit cmd 0x%x during probe\n",
++			   nca->type);
++	return ret;
++}
++
+ /* OEM Command handlers initialization */
+ static struct ncsi_oem_gma_handler {
+ 	unsigned int	mfr_id;
+@@ -1313,8 +1343,37 @@ static void ncsi_probe_channel(struct ncsi_dev_priv *ndp)
+ 			break;
+ 		}
+ 		nd->state = ncsi_dev_state_probe_cis;
++		if (IS_ENABLED(CONFIG_NCSI_OEM_CMD_GET_MAC) && (ndp->mlx_multi_host))
++			nd->state = ncsi_dev_state_probe_mlx_gma;
++
+ 		schedule_work(&ndp->work);
+ 		break;
++#if IS_ENABLED(CONFIG_NCSI_OEM_CMD_GET_MAC)
++	case ncsi_dev_state_probe_mlx_gma:
++		ndp->pending_req_num = 1;
++
++		nca.type = NCSI_PKT_CMD_OEM;
++		nca.package = ndp->active_package->id;
++		nca.channel = 0;
++		ret = ncsi_oem_gma_handler_mlx(&nca);
++		if (ret)
++			goto error;
++
++		nd->state = ncsi_dev_state_probe_mlx_smaf;
++		break;
++	case ncsi_dev_state_probe_mlx_smaf:
++		ndp->pending_req_num = 1;
++
++		nca.type = NCSI_PKT_CMD_OEM;
++		nca.package = ndp->active_package->id;
++		nca.channel = 0;
++		ret = ncsi_oem_smaf_mlx(&nca);
++		if (ret)
++			goto error;
++
++		nd->state = ncsi_dev_state_probe_cis;
++		break;
++#endif /* CONFIG_NCSI_OEM_CMD_GET_MAC */
+ 	case ncsi_dev_state_probe_cis:
+ 		ndp->pending_req_num = NCSI_RESERVED_CHANNEL;
+ 
+@@ -1688,6 +1747,8 @@ struct ncsi_dev *ncsi_register_dev(struct net_device *dev,
+ {
+ 	struct ncsi_dev_priv *ndp;
+ 	struct ncsi_dev *nd;
++	struct platform_device *pdev;
++	struct device_node *np;
+ 	unsigned long flags;
+ 	int i;
+ 
+@@ -1739,6 +1800,13 @@ struct ncsi_dev *ncsi_register_dev(struct net_device *dev,
+ 	/* Set up generic netlink interface */
+ 	ncsi_init_netlink(dev);
+ 
++	pdev = to_platform_device(dev->dev.parent);
++	if (pdev) {
++		np = pdev->dev.of_node;
++		if (np && of_get_property(np, "mlx,multi-host", NULL))
++			ndp->mlx_multi_host = true;
++	}
++
+ 	return nd;
+ }
+ EXPORT_SYMBOL_GPL(ncsi_register_dev);
+-- 
+2.17.1
+
