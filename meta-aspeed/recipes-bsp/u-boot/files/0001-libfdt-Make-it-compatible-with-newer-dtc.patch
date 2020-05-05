@@ -1,0 +1,51 @@
+From bb61fa0d2d397213c4603da8115460addd35b39e Mon Sep 17 00:00:00 2001
+From: Alejandro Enedino Hernandez Samaniego <aehs29@gmail.com>
+Date: Sat, 6 Jul 2019 02:53:19 +0000
+Subject: [PATCH] libfdt: Make it compatible with newer dtc
+
+DTC does not use an underscore for the LIBFDT_H and
+LIBFDT_ENV_H variables, this causes an error since
+u-boot does.
+
+Remove the underscore from these variables to allow u-boot
+to compile along with dtc.
+
+Signed-off-by: Alejandro Enedino Hernandez Samaniego <aehs29@gmail.com>
+
+Upstream-status: <OE-specific>
+
+---
+ include/libfdt.h     | 4 ++--
+ include/libfdt_env.h | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/include/libfdt.h b/include/libfdt.h
+index 74b1d14..a8a6ffb 100644
+--- a/include/libfdt.h
++++ b/include/libfdt.h
+@@ -1,5 +1,5 @@
+-#ifndef _LIBFDT_H
+-#define _LIBFDT_H
++#ifndef LIBFDT_H
++#define LIBFDT_H
+ /*
+  * libfdt - Flat Device Tree manipulation
+  * Copyright (C) 2006 David Gibson, IBM Corporation.
+diff --git a/include/libfdt_env.h b/include/libfdt_env.h
+index 273b5d3..b45c962 100644
+--- a/include/libfdt_env.h
++++ b/include/libfdt_env.h
+@@ -6,8 +6,8 @@
+  * SPDX-License-Identifier:	LGPL-2.1+
+  */
+ 
+-#ifndef _LIBFDT_ENV_H
+-#define _LIBFDT_ENV_H
++#ifndef LIBFDT_ENV_H
++#define LIBFDT_ENV_H
+ 
+ #include "compiler.h"
+ #include "linux/types.h"
+-- 
+2.7.4
+
