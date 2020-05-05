@@ -149,8 +149,8 @@ index 2ac1ca4..c3ce077 100644
 +    mov   r2, r2, lsr #12
 +    tst   r2, #0x01
 +    ldr   r0, =0x1E784000
-+    moveq r1, #0x0D                              @ Baudrate 115200
-+    movne r1, #0x01                              @ Baudrate 115200, div13
++    moveq r1, #0x1A                              @ Baudrate 57600
++    movne r1, #0x02                              @ Baudrate 57600, div13
 +
 +    str   r1, [r0]
 +

@@ -1,0 +1,141 @@
+From a0f2734987bf022211fdf79180108c28cfef7a28 Mon Sep 17 00:00:00 2001
+From: Manikandan Elumalai <manikandan.hcl.ers.epl@gmail.com>
+Date: Mon, 10 Feb 2020 18:49:47 +0530
+Subject: [PATCH] spl-host-console-handle
+
+---
+ arch/arm/mach-aspeed/platform_g5.S | 68 +++++++++++++++++++++++++++++++++-----
+ 1 file changed, 60 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm/mach-aspeed/platform_g5.S b/arch/arm/mach-aspeed/platform_g5.S
+index c3ce077..b5190e7 100644
+--- a/arch/arm/mach-aspeed/platform_g5.S
++++ b/arch/arm/mach-aspeed/platform_g5.S
+@@ -315,6 +315,58 @@ orr r1, r1, #0xC
+ str r1, [r0]
+ .endm
+ 
++.macro console_slot1
++ldr r0, =0x1e780024
++ldr r1, [r0]
++orr r1, r1, #0xF
++str r1, [r0]
++
++ldr r0, =0x1e780020
++ldr r1, [r0]
++and r1, r1, #0xFFFFFFF0
++orr r1, r1, #0x0
++str r1, [r0]
++.endm
++
++.macro console_slot2
++ldr r0, =0x1e780024
++ldr r1, [r0]
++orr r1, r1, #0xF
++str r1, [r0]
++
++ldr r0, =0x1e780020
++ldr r1, [r0]
++and r1, r1, #0xFFFFFFF0
++orr r1, r1, #0x1
++str r1, [r0]
++.endm
++
++.macro console_slot3
++ldr r0, =0x1e780024
++ldr r1, [r0]
++orr r1, r1, #0xF
++str r1, [r0]
++
++ldr r0, =0x1e780020
++ldr r1, [r0]
++and r1, r1, #0xFFFFFFF0
++orr r1, r1, #0x2
++str r1, [r0]
++.endm
++
++.macro console_slot4
++ldr r0, =0x1e780024
++ldr r1, [r0]
++orr r1, r1, #0xF
++str r1, [r0]
++
++ldr r0, =0x1e780020
++ldr r1, [r0]
++and r1, r1, #0xFFFFFFF0
++orr r1, r1, #0x3
++str r1, [r0]
++.endm
++
+ .macro console_sel
+ 
+   // Disable SoL UARTs[1-4]
+@@ -354,28 +406,28 @@ dbg_card_pres\@:
+   ldr r1, =0x00
+   cmp r0, r1
+   bne case_pos2\@
+- console_bmc
++  console_slot1
+   b case_end\@
+ case_pos2\@:
+   //Test for position#2
+   ldr r1, =0x01
+   cmp r0, r1
+   bne case_pos3\@
+- console_bmc
++  console_slot2
+   b case_end\@
+ case_pos3\@:
+  //Test for position#3
+   ldr r1, =0x02
+   cmp r0, r1
+   bne case_pos4\@
+-  console_bmc
++  console_slot3
+   b case_end\@
+ case_pos4\@:
+ //Test for position#4
+   ldr r1, =0x03
+   cmp r0, r1
+   bne case_pos5\@
+-  console_bmc
++  console_slot4
+   b case_end\@
+ case_pos5\@:
+   //Test for position#5
+@@ -389,28 +441,28 @@ case_pos6\@:
+   ldr r1, =0x05
+   cmp r0, r1
+   bne case_pos7\@
+-  console_bmc
++  console_slot1
+   b case_end\@
+ case_pos7\@:
+  //Test for position#7
+    ldr r1, =0x06
+    cmp r0, r1
+    bne case_pos8\@
+-   console_bmc
++   console_slot2
+    b case_end\@
+ case_pos8\@:
+   //Test for position#8
+    ldr r1, =0x07
+    cmp r0, r1
+    bne case_pos9\@
+-   console_bmc
++   console_slot3
+    b case_end\@
+ case_pos9\@:
+     //Test for position#9
+    ldr r1, =0x08
+    cmp r0, r1
+    bne case_pos10\@
+-   console_bmc
++   console_slot4
+    b case_end\@
+ case_pos10\@:
+    //Test for position#10
+-- 
+2.7.4
+
