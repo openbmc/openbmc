@@ -1,0 +1,12 @@
+[Unit]
+Description=Shutdown Host Server
+Requires=host-gpio.service
+After=host-gpio.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/power-util 1 off
+ExecStart=/usr/sbin/power-util 2 off
+ExecStart=/usr/sbin/power-util 3 off
+ExecStart=/usr/sbin/power-util 4 off
+SyslogIdentifier=power-util

@@ -1,0 +1,163 @@
+# Copyright 2014-present Facebook. All Rights Reserved.
+
+GPIODIR="/sys/class/gpio"
+GPIOEXPORT="$GPIODIR/export"
+
+gpio_dir() {
+    echo "$GPIODIR/gpio$1"
+}
+
+gpio_name2value() {
+    local first remaining base val
+    remaining=$1
+    val=0
+    while [ -n "$remaining" ]; do
+        first=${remaining:0:1}
+        case "$first" in
+            [[:lower:]])
+                base=$(printf "%d" "'$first'")
+                base=$((base - 96))
+                val=$((val * 26 + base))
+                ;;
+            [[:upper:]])
+                base=$(printf "%d" "'$first'")
+                base=$((base - 64))
+                val=$((val * 26 + base))
+                ;;
+            *)
+                if [ $val -gt 0 ]; then
+                    val=$((val-1))
+                fi
+                val=$((val * 8 + $remaining))
+                break
+                ;;
+        esac
+        remaining=${remaining:1}
+    done
+    echo "$val"
+}
+
+gpio_export() {
+    local gpio
+    gpio=$(gpio_name2value $1)
+    gpio=$((gpio280))
+    echo $gpio
+    dir=$(gpio_dir $gpio)
+    echo $dir
+    if [ ! -d ${dir} ]; then
+        echo $gpio > $GPIOEXPORT
+    fi
+}
+
+gpio_set() {
+    local gpio
+    local val
+    gpio=$(gpio_name2value $1)
+    gpio=$((gpio+280))
+    val=$2
+    dir=$(gpio_dir $gpio)
+    if [ ! -d ${dir} ]; then
+        echo $gpio > $GPIOEXPORT
+    fi
+
+    if [ $val == 1 ]; then
+      echo high > ${dir}/direction
+    else
+      echo low > ${dir}/direction
+    fi
+}
+
+gpio_get() {
+    local gpio
+    local val
+    gpio=$(gpio_name2value $1)
+    gpio=$((gpio+280))
+    dir=$(gpio_dir $gpio)
+    if [ ! -d ${dir} ]; then
+        echo $gpio > $GPIOEXPORT
+    fi
+    echo in > ${dir}/direction
+    cat ${dir}/value
+}
+
+# Check to see if server is present in given slot or not
+is_server_prsnt() {
+  local prsnt
+
+  case $1 in
+    1)
+      prsnt=$[ $(gpio_get AA0) || $(gpio_get Z0) ]
+      ;;
+    2)
+      prsnt=$[ $(gpio_get AA1) || $(gpio_get Z1) ]
+      ;;
+    3)
+      prsnt=$[ $(gpio_get AA2) || $(gpio_get Z2) ]
+      ;;
+    4)
+      prsnt=$[ $(gpio_get AA3) || $(gpio_get Z3) ]
+      ;;
+    *)
+      prsnt=$[ $(gpio_get AA3) || $(gpio_get Z3) ]
+      ;;
+  esac
+
+  if [ $prsnt == "0" ]; then
+    echo 1
+  else
+    echo 0
+  fi
+}
+
+read_file_rertry() {
+  retries=$1
+  wait_time=$2
+  file=$3
+
+  for i in `seq 1 $retries`; do
+    value=`cat $file`
+    [ ! -z $value ] && break
+    usleep $wait_time
+  done
+
+  echo $value
+}
+
+# Get slot type (00:TwinLakes, 01:Crace Flat, 10:Glacier Point, 11:Empty Slot)
+get_slot_type() {
+  slot_file="/tmp/slot$1.bin"
+  if [ -f $slot_file ]; then
+    type=$(read_file_rertry 3 10000 $slot_file)
+    if [ -z $type ]; then
+      type=3
+    fi
+  else
+    type=3
+  fi
+
+  echo $type
+}
+
+fby2_is_server_on() {
+  local pwr_sts
+
+  case $1 in
+   1)
+    pwr_sts=$(gpio_get I0)
+    ;;
+   2)
+    pwr_sts=$(gpio_get I1)
+    ;;
+   3)
+    pwr_sts=$(gpio_get I2)
+    ;;
+   4)
+    pwr_sts=$(gpio_get I3)
+    ;;
+   *)
+    pwr_sts="0"
+    ;;
+  esac
+
+  echo $pwr_sts
+}

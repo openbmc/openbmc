@@ -1,0 +1,15 @@
+[Unit]
+Description=Poweroff Host Server
+Requires=host-gpio.service
+After=host-gpio.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/power-util 1 on
+ExecStart=/usr/sbin/power-util 2 on
+ExecStart=/usr/sbin/power-util 3 on
+ExecStart=/usr/sbin/power-util 4 on
+SyslogIdentifier=power-util
+
+[Install]
+WantedBy=basic.target
