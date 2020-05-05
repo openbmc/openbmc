@@ -1,0 +1,16 @@
+{
+  "channels": [
+    {
+      "type": "me",
+      "slave-path": "/dev/ipmb-1",
+      "bmc-addr": 32,
+      "remote-addr": 64
+    },
+    {
+      "type": "ipmb",
+      "slave-path": "/dev/ipmb-3",
+      "bmc-addr": 32,
+      "remote-addr": 64
+    }
+  ]
+}
