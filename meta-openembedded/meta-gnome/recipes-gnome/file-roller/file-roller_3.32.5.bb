@@ -13,8 +13,8 @@ DEPENDS = " \
 
 inherit gnomebase gsettings itstool gnome-help gettext upstream-version-is-even mime-xdg
 
-SRC_URI[archive.md5sum] = "21982b8d298cb2994a99494399dcb2d5"
-SRC_URI[archive.sha256sum] = "1b3b2cbfcb444e0d150bfd063add9d5181c8ab24f0593e5a8894399297214017"
+SRC_URI[archive.md5sum] = "2afc688ac66a50213f6c42ee99479a96"
+SRC_URI[archive.sha256sum] = "d53d30b4b45f61158b7e550b71a8a5556e877695f43a2ceb88be895960e54176"
 
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'packagekit', '', d)}"
 

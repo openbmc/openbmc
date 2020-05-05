@@ -41,6 +41,7 @@ EXTRA_OECONF += "--disable-generate-man-pages ap_cv_atomic_builtins=yes"
 EXTRA_OECONF += "--enable-imfile-tests"
 EXTRA_OECONF_remove_mipsarch = "ap_cv_atomic_builtins=yes"
 EXTRA_OECONF_remove_powerpc = "ap_cv_atomic_builtins=yes"
+EXTRA_OECONF_remove_riscv32 = "ap_cv_atomic_builtins=yes"
 
 # first line is default yes in configure
 PACKAGECONFIG ??= " \

@@ -22,8 +22,8 @@ GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase gsettings gobject-introspection gettext upstream-version-is-even features_check
 
-SRC_URI[archive.md5sum] = "4a16dad1d93d5e1f81d555da35faf0e9"
-SRC_URI[archive.sha256sum] = "d1d149b70ed7330771f4524886b98775fce5a11cf17f9683cba151075f2879c4"
+SRC_URI[archive.md5sum] = "20913c458406e6efa3df005a3ce48c8e"
+SRC_URI[archive.sha256sum] = "23bde87d33b8981358831cec8915bb5ff1eaf9c1de74c90cd1660b1b95883526"
 SRC_URI += "file://0001-EGL-Include-EGL-eglmesaext.h.patch"
 
 # x11 is still manadatory - see meson.build

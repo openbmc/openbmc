@@ -9,6 +9,7 @@ DEPENDS += "${PYTHON_PN}-protobuf"
 SRC_URI += "file://0001-setup.py-Do-not-mix-C-and-C-compiler-options.patch"
 SRC_URI_append_class-target = " file://ppc-boringssl-support.patch \
                                 file://riscv64_support.patch \
+                                file://0001-Fix-build-on-riscv32.patch \
 "
 SRC_URI[md5sum] = "ccaf4e7eb4f031d926fb80035d193b98"
 SRC_URI[sha256sum] = "a899725d34769a498ecd3be154021c4368dd22bdc69473f6ec46779696f626c4"

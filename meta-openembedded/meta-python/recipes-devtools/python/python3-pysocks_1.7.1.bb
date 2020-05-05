@@ -12,6 +12,7 @@ inherit pypi setuptools3
 RDEPENDS_${PN}_class-target += "\
     ${PYTHON_PN}-email \
     ${PYTHON_PN}-io \
+    ${PYTHON_PN}-logging \
     ${PYTHON_PN}-netclient \
     ${PYTHON_PN}-shell \
 "

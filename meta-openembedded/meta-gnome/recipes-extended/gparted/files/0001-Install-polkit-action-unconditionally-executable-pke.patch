@@ -1,0 +1,47 @@
+From 79fd11f1d8e4827ae8aee03420a5c92038fe4ef5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Wed, 26 Feb 2020 20:25:06 +0100
+Subject: [PATCH] Install polkit action unconditionally - executable pkexec is
+ not in our sysroot
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ configure.ac | 17 +----------------
+ 1 file changed, 1 insertion(+), 16 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 43503ac..b339ee5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -24,22 +24,7 @@ dnl======================
+ dnl Find graphical privilege escalation program
+ dnl======================
+ dnl Check for pkexec >= 0.102 for it's ability to run X11 apps.
+-AM_CONDITIONAL([INSTALL_POLKIT_ACTIONS], false)
+-PKEXEC_REQUIRED_VERSION='0.102'
+-AC_MSG_CHECKING([for pkexec >= $PKEXEC_REQUIRED_VERSION])
+-PKEXEC_REQUIRED_INT=`echo "$PKEXEC_REQUIRED_VERSION" | $AWK -F. '{print $1 * 10000 + $2}'`
+-PKEXEC_VERSION_OUTPUT=`pkexec --version 2> /dev/null` ||
+-	AC_MSG_RESULT([not found])
+-if test "x$PKEXEC_VERSION_OUTPUT" != 'x'; then
+-	PKEXEC_FOUND_VERSION=`echo "$PKEXEC_VERSION_OUTPUT" | head -1 | cut -d' ' -f3`
+-	PKEXEC_FOUND_INT=`echo "$PKEXEC_FOUND_VERSION" | $AWK -F. '{print $1 * 10000 + $2}'`
+-	AC_MSG_RESULT([$PKEXEC_FOUND_VERSION found])
+-	if test "$PKEXEC_FOUND_INT" -ge "$PKEXEC_REQUIRED_INT"; then
+-		GKSUPROG='pkexec --disable-internal-agent'
+-		AC_SUBST([GKSUPROG])
+-		AM_CONDITIONAL([INSTALL_POLKIT_ACTIONS], true)
+-	fi
+-fi
++AM_CONDITIONAL([INSTALL_POLKIT_ACTIONS], true)
+ 
+ dnl Check for alternative graphical privilege escalation programs.
+ if test "x$GKSUPROG" = 'x'; then
+-- 
+2.21.0
+
