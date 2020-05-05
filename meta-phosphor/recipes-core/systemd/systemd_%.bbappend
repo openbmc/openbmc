@@ -1,8 +1,20 @@
 FILES_${PN}-catalog-extralocales = \
             "${exec_prefix}/lib/systemd/catalog/*.*.catalog"
 PACKAGES =+ "${PN}-catalog-extralocales"
-PACKAGECONFIG = "pam hostnamed networkd randomseed resolved sysusers timedated \
-                 timesyncd xz kmod coredump"
+
+PACKAGECONFIG = " \
+        coredump \
+        hostnamed \
+        kmod \
+        networkd \
+        pam \
+        randomseed \
+        resolved \
+        sysusers \
+        timedated \
+        timesyncd \
+        xz \
+        "
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 SRC_URI += "file://0001-sd-bus-Don-t-automatically-add-ObjectManager.patch"
