@@ -3,7 +3,7 @@ KERNEL_DEVICETREE = "${KMACHINE}-bmc-facebook-${MACHINE}.dtb"
 
 UBOOT_MACHINE = "ast_g5_ncsi_config"
 
-require conf/machine/include/facebook.inc
+require conf/machine/include/facebook-compute-multihost.inc
 require conf/machine/include/ast2500.inc
 require conf/machine/include/obmc-bsp-common.inc
 
@@ -20,8 +20,6 @@ OBMC_MACHINE_FEATURES += "\
         "
 PREFERRED_PROVIDER_virtual/obmc-host-ctl ?= ""
 PREFERRED_PROVIDER_virtual/obmc-system-mgmt = "packagegroup-fb-apps"
-PREFERRED_PROVIDER_virtual/obmc-host-ipmi-hw = "phosphor-ipmi-kcs"
 FLASH_SIZE = "32768"
 VIRTUAL-RUNTIME_skeleton_workbook = "${MACHINE}-config"
-VIRTUAL-RUNTIME_obmc-host-state-manager = "x86-power-control"
-VIRTUAL-RUNTIME_obmc-chassis-state-manager = "x86-power-control"
+
