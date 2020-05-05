@@ -13,6 +13,7 @@ do_configure[noexec] = "1"
 # Other valid fields: BUILD_ID ID_LIKE ANSI_COLOR CPE_NAME
 #                     HOME_URL SUPPORT_URL BUG_REPORT_URL
 OS_RELEASE_FIELDS = "ID ID_LIKE NAME VERSION VERSION_ID PRETTY_NAME"
+OS_RELEASE_UNQUOTED_FIELDS = "ID VERSION_ID VARIANT_ID"
 
 ID = "${DISTRO}"
 NAME = "${DISTRO_NAME}"
@@ -22,8 +23,8 @@ PRETTY_NAME = "${DISTRO_NAME} ${VERSION}"
 BUILD_ID ?= "${DATETIME}"
 BUILD_ID[vardepsexclude] = "DATETIME"
 
-def sanitise_version(ver):
-    # VERSION_ID should be (from os-release(5)):
+def sanitise_value(ver):
+    # unquoted fields like VERSION_ID should be (from os-release(5)):
     #    lower-case string (mostly numeric, no spaces or other characters
     #    outside of 0-9, a-z, ".", "_" and "-")
     ret = ver.replace('+', '-').replace(' ','_')
@@ -32,11 +33,14 @@ def sanitise_version(ver):
 python do_compile () {
     with open(d.expand('${B}/os-release'), 'w') as f:
         for field in d.getVar('OS_RELEASE_FIELDS').split():
+            unquotedFields = d.getVar('OS_RELEASE_UNQUOTED_FIELDS').split()
             value = d.getVar(field)
-            if value and field == 'VERSION_ID':
-                value = sanitise_version(value)
             if value:
-                f.write('{0}="{1}"\n'.format(field, value))
+                if field in unquotedFields:
+                    value = sanitise_value(value)
+                    f.write('{0}={1}\n'.format(field, value))
+                else:
+                    f.write('{0}="{1}"\n'.format(field, value))
 }
 do_compile[vardeps] += "${OS_RELEASE_FIELDS}"
 

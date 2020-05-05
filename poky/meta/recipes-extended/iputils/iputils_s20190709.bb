@@ -14,6 +14,7 @@ SRC_URI = "git://github.com/iputils/iputils \
            file://0001-ninfod-change-variable-name-to-avoid-colliding-with-.patch \
            file://0001-ninfod-fix-systemd-Documentation-url-error.patch \
            file://0001-rarpd-rdisc-Drop-PrivateUsers.patch \
+           file://0001-iputils-Initialize-libgcrypt.patch \
            "
 SRCREV = "13e00847176aa23683d68fce1d17ffb523510946"
 

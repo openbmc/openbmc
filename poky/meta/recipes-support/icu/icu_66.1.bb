@@ -26,6 +26,7 @@ SRC_URI = "${BASE_SRC_URI};name=code \
            file://fix-install-manx.patch \
            file://0001-Fix-big-endian-build.patch;apply=no \
            file://0001-icu-Added-armeb-support.patch \
+           file://CVE-2020-10531.patch \
            "
 
 SRC_URI_append_class-target = "\

@@ -1,0 +1,55 @@
+From 8576e0c218634e6f7ed1b6ff02fa164fb0c75f86 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Wed, 29 Apr 2020 03:50:32 +0000
+Subject: [PATCH] iputils_md5dig.h: Initialize libgcrypt
+
+Initialize libgcrypt on first use otherwise
+there comes below warning when check the status
+of the ninfod.service.
+ # systemctl status ninfod.service
+ * ninfod.service - Respond to IPv6 Node Information Queries
+ Loaded: loaded (/lib/systemd/system/ninfod.service; enabled; vendor preset: enabled)
+ Active: active (running) since Wed 2020-04-29 05:18:21 UTC; 36s ago
+ Docs: man:ninfod(8)
+ Main PID: 347 (ninfod)
+ Tasks: 1 (limit: 9382)
+ Memory: 1.2M
+ CGroup: /system.slice/ninfod.service
+ `-347 /sbin/ninfod -d
+
+ Apr 29 05:18:21 intel-x86-64 systemd[1]: Started Respond to IPv6 Node Information Queries.
+ Apr 29 05:18:24 intel-x86-64 ninfod[347]: Libgcrypt warning: missing initialization - please fix the application
+
+Upstream-Status: Inappropriate [the upstream avoids linking to crypto libraries in
+                   commit 214ed83 common: copy md5 implementation to iputils project]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ iputils_md5dig.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/iputils_md5dig.h b/iputils_md5dig.h
+index bfa7f02..3cc3fbf 100644
+--- a/iputils_md5dig.h
++++ b/iputils_md5dig.h
+@@ -24,8 +24,17 @@ typedef struct {
+ 	gcry_md_hd_t dig;
+ } iputils_md5dig_ctx;
+ 
++void maybeInit()
++{
++	if (!gcry_control(GCRYCTL_INITIALIZATION_FINISHED_P))
++	{
++		gcry_control(GCRYCTL_INITIALIZATION_FINISHED, 0);
++	}
++}
++
+ static void iputils_md5dig_init(iputils_md5dig_ctx *ctx)
+ {
++	maybeInit();
+ 	if (gcry_md_open(&ctx->dig, GCRY_MD_MD5, 0) != GPG_ERR_NO_ERROR)
+ 		abort();
+ 	return;
+-- 
+2.24.1
+
