@@ -1,9 +1,9 @@
 [Unit]
-Description=Rotates the event logs
+Description=Rotate the event logs
 
 [Service]
-Type=oneshot
-ExecStart=/usr/sbin/logrotate /etc/logrotate.d/logrotate.rsyslog
+Type=simple
+ExecStart=/usr/bin/rotate-event-logs.sh
 
 [Install]
 WantedBy=multi-user.target
