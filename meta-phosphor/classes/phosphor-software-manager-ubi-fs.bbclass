@@ -6,17 +6,9 @@ RDEPENDS_phosphor-software-manager-updater-ubi += " \
     mtd-utils-ubifs \
 "
 
-# Remove default configs
-EXTRA_OECONF_remove_df-obmc-ubi-fs += " \
-    ACTIVE_BMC_MAX_ALLOWED=1 \
-    MEDIA_DIR=/run/media \
-"
-
 # Add ubi-fs configs
-EXTRA_OECONF_append_df-obmc-ubi-fs += " \
-    ACTIVE_BMC_MAX_ALLOWED=2 \
-    MEDIA_DIR=/media \
-"
+EXTRA_OEMESON += "-Dactive-bmc-max-allowed=2"
+EXTRA_OEMESON += "-Dmedia-dir='/media'"
 
 SYSTEMD_SERVICE_phosphor-software-manager-updater-ubi += " \
     obmc-flash-bmc-ubirw.service \
