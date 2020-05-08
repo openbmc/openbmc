@@ -13,5 +13,5 @@ SRCREV = "b78dd0cd94053252486951a8a63a2c57dce633bb"
 
 S = "${WORKDIR}/git"
 
-DEPENDS = "boost libgpiod pdbg phosphor-logging sdbusplus"
+DEPENDS = "boost libgpiod pdbg phosphor-logging sdbusplus openpower-libhei"
 FILES_${PN} += "${UNITDIR}/attn_handler.service"
