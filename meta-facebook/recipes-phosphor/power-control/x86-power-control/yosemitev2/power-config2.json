@@ -1,0 +1,11 @@
+{
+  "node": 1,
+  "power-out": "POWER_OUT1",
+  "reset-out": "RESET_OUT1",
+  "nmi-out": "NMI_OUT1",
+  "power-ok": "PS_PWROK1",
+  "sio-pwrgd": "SIO_POWER_GOOD1",
+  "sio-onctl": "SIO_ONCONTROL1", 
+  "sio-s5": "SIO_S51"
+}
+

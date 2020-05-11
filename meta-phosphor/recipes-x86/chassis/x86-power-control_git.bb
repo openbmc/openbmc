@@ -13,7 +13,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 inherit cmake systemd
 
-SYSTEMD_SERVICE_${PN} += "xyz.openbmc_project.Chassis.Control.Power.service"
+SYSTEMD_SERVICE_${PN} += "xyz.openbmc_project.Chassis.Control.Power@.service"
 
 DEPENDS += " \
     boost \
@@ -21,4 +21,5 @@ DEPENDS += " \
     libgpiod \
     sdbusplus \
     phosphor-logging \
+	nlohmann-json \
   "
