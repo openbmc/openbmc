@@ -15,6 +15,8 @@ PACKAGECONFIG = " \
         timesyncd \
         xz \
         "
+PACKAGECONFIG = "pam hostnamed networkd randomseed resolved sysusers timedated \
+                 timesyncd xz kmod coredump sysvinit"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 SRC_URI += "file://0001-sd-bus-Don-t-automatically-add-ObjectManager.patch"

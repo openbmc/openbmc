@@ -16,7 +16,7 @@ RDEPENDS_packagegroup-meta-perl = "\
     libtext-wrapi18n-perl liblocale-gettext-perl libdata-hexdump-perl \
     libextutils-installpaths-perl libextutils-helpers-perl libextutils-parsexs-perl \
     libextutils-config-perl libextutils-cppguess-perl libimport-into-perl \
-    libcrypt-openssl-rsa-perl libcrypt-openssl-guess libcrypt-openssl-random-perl \
+    libcrypt-openssl-rsa-perl libcrypt-openssl-guess-perl libcrypt-openssl-random-perl \
     libxml-sax-writer-perl libxml-libxml-perl libxml-filter-buffertext-perl \
     adduser \
     libauthen-sasl-perl libnet-ldap-perl libnet-dns-perl \

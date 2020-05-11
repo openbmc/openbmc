@@ -7,8 +7,6 @@ Based on the svn "Fetch" implementation.
 
 """
 
-import  os
-import  sys
 import logging
 import  bb
 from    bb.fetch2 import FetchMethod
@@ -43,7 +41,7 @@ class Osc(FetchMethod):
         else:
             pv = d.getVar("PV", False)
             rev = bb.fetch2.srcrev_internal_helper(ud, d)
-            if rev and rev != True:
+            if rev:
                 ud.revision = rev
             else:
                 ud.revision = ""

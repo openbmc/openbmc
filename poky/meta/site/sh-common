@@ -31,10 +31,6 @@ ac_cv_time_r_type=${ac_cv_time_r_type=POSIX}
 # apache
 ac_cv_sizeof_ssize_t=${ac_cv_sizeof_ssize_t=4}
 
-ac_cv_header_netinet_sctp_h=${ac_cv_header_netinet_sctp_h=no}
-ac_cv_header_netinet_sctp_uio_h=${ac_cv_header_netinet_sctp_uio_h=no}
-ac_cv_sctp=${ac_cv_sctp=no}
-
 # ssh
 ac_cv_have_space_d_name_in_struct_dirent=${ac_cv_dirent_have_space_d_name=yes}
 ac_cv_have_broken_snprintf=${ac_cv_have_broken_snprintf=no}

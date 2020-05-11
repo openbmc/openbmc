@@ -1,0 +1,29 @@
+From 067f71a381ce6626ef1179be3dd90c4ed2aa52fb Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 20 Apr 2016 21:11:00 -0700
+Subject: [PATCH] Define DUMMY_LOCALE_T if not defined
+
+This is a hack to fix building the locale bits on an older
+CentOs 5.X machine
+
+Upstream-Status: Inappropriate [other]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ locale/programs/config.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/locale/programs/config.h b/locale/programs/config.h
+index d76d9f7e8b..92b56d7df3 100644
+--- a/locale/programs/config.h
++++ b/locale/programs/config.h
+@@ -19,6 +19,9 @@
+ #ifndef _LD_CONFIG_H
+ #define _LD_CONFIG_H	1
+ 
++#ifndef DUMMY_LOCALE_T
++#define DUMMY_LOCALE_T
++#endif
+ /* Use the internal textdomain used for libc messages.  */
+ #define PACKAGE _libc_intl_domainname
+ #ifndef VERSION

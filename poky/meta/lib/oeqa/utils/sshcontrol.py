@@ -23,7 +23,7 @@ class SSHProcess(object):
             "stdin": None,
             "shell": False,
             "bufsize": -1,
-            "preexec_fn": os.setsid,
+            "start_new_session": True,
         }
         self.options = dict(self.defaultopts)
         self.options.update(options)

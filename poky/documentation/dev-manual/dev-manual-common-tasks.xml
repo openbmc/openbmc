@@ -184,6 +184,10 @@
                                 variable.
                                 </para></listitem>
                             <listitem><para>
+                                <ulink url='&YOCTO_DOCS_REF_URL;#var-LAYERDEPENDS'><filename>LAYERDEPENDS</filename></ulink>:
+                                Lists all layers on which this layer depends (if any).
+                                </para></listitem>
+                            <listitem><para>
                                 <ulink url='&YOCTO_DOCS_REF_URL;#var-LAYERSERIES_COMPAT'><filename>LAYERSERIES_COMPAT</filename></ulink>:
                                 Lists the
                                 <ulink url='&YOCTO_WIKI_URL;/wiki/Releases'>Yocto Project</ulink>
@@ -315,12 +319,26 @@
      DEPENDS_append_one = " foo"
      DEPENDS_prepend_one = "foo "
                                 </literallayout>
-                                As an actual example, here's a line from the recipe
-                                for gnutls, which adds dependencies on
-                                "argp-standalone" when building with the musl C
-                                library:
+                                As an actual example, here's a snippet from the
+                                generic kernel include file
+                                <filename>linux-yocto.inc</filename>,
+                                wherein the kernel compile and link options are
+                                adjusted in the case of a subset of the supported
+                                architectures:
                                 <literallayout class='monospaced'>
-     DEPENDS_append_libc-musl = " argp-standalone"
+     DEPENDS_append_aarch64 = " libgcc"
+     KERNEL_CC_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
+     KERNEL_LD_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
+
+     DEPENDS_append_nios2 = " libgcc"
+     KERNEL_CC_append_nios2 = " ${TOOLCHAIN_OPTIONS}"
+     KERNEL_LD_append_nios2 = " ${TOOLCHAIN_OPTIONS}"
+
+     DEPENDS_append_arc = " libgcc"
+     KERNEL_CC_append_arc = " ${TOOLCHAIN_OPTIONS}"
+     KERNEL_LD_append_arc = " ${TOOLCHAIN_OPTIONS}"
+
+     KERNEL_FEATURES_append_qemuall=" features/debug/printk.scc"
                                 </literallayout>
                                 <note>
                                     Avoiding "+=" and "=+" and using
@@ -580,9 +598,17 @@
                             <filename>bitbake -e</filename>).
                             </para></listitem>
                         <listitem><para>
+                            <filename>common.test_world</filename>:
+                            Verifies that <filename>bitbake world</filename> works.
+                            </para></listitem>
+                        <listitem><para>
                             <filename>common.test_signatures</filename>:
                             Tests to be sure that BSP and DISTRO layers do not
                             come with recipes that change signatures.
+                            </para></listitem>
+                        <listitem><para>
+                            <filename>common.test_layerseries_compat</filename>:
+                            Verifies layer compatibility is set properly.
                             </para></listitem>
                         <listitem><para>
                             <filename>bsp.test_bsp_defines_machines</filename>:
@@ -594,11 +620,22 @@
                             machine when the layer is added.
                             </para></listitem>
                         <listitem><para>
+                            <filename>bsp.test_machine_world</filename>:
+                            Verifies that <filename>bitbake world</filename>
+                            works regardless of which machine is selected.
+                            </para></listitem>
+                        <listitem><para>
+                            <filename>bsp.test_machine_signatures</filename>:
+                            Verifies that building for a particular machine
+                            affects only the signature of tasks specific to that
+                            machine.
+                            </para></listitem>
+                        <listitem><para>
                             <filename>distro.test_distro_defines_distros</filename>:
                             Tests if a DISTRO layer has distro configurations.
                             </para></listitem>
                         <listitem><para>
-                            <filename>distro.test_distro_no_set_distro</filename>:
+                            <filename>distro.test_distro_no_set_distros</filename>:
                             Tests to ensure a DISTRO layer does not set the
                             distribution when the layer is added.
                             </para></listitem>
@@ -1397,7 +1434,7 @@
                 package specified in the <filename>PACKAGES</filename>
                 statement.
                 <note>
-                    The <filename>inherit packages</filename> should be
+                    The <filename>inherit packagegroup</filename> line should be
                     located near the top of the recipe, certainly before
                     the <filename>PACKAGES</filename> statement.
                 </note>
@@ -1417,28 +1454,32 @@
 
             <para>
                 Here is a short, fabricated example showing the same basic
-                pieces:
+                pieces for a hypothetical packagegroup defined in
+                <filename>packagegroup-custom.bb</filename>, where the
+                variable <filename>PN</filename> is the standard way to
+                abbreviate the reference to the full packagegroup name
+                <filename>packagegroup-custom</filename>:
                 <literallayout class='monospaced'>
      DESCRIPTION = "My Custom Package Groups"
 
      inherit packagegroup
 
      PACKAGES = "\
-         packagegroup-custom-apps \
-         packagegroup-custom-tools \
+         ${PN}-apps \
+         ${PN}-tools \
          "
 
-     RDEPENDS_packagegroup-custom-apps = "\
+     RDEPENDS_${PN}-apps = "\
          dropbear \
          portmap \
          psplash"
 
-     RDEPENDS_packagegroup-custom-tools = "\
+     RDEPENDS_${PN}-tools = "\
          oprofile \
          oprofileui-server \
          lttng-tools"
 
-     RRECOMMENDS_packagegroup-custom-tools = "\
+     RRECOMMENDS_${PN}-tools = "\
          kernel-module-oprofile"
                 </literallayout>
             </para>
@@ -1900,9 +1941,9 @@
             <para>
                 The <filename>SRC_URI</filename> variable in your recipe must
                 define each unique location for your source files.
-                It is good practice to not hard-code pathnames in an URL used
+                It is good practice to not hard-code version numbers in a URL used
                 in <filename>SRC_URI</filename>.
-                Rather than hard-code these paths, use
+                Rather than hard-code these values, use
                 <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-PV'><filename>PV</filename></ulink><filename>}</filename>,
                 which causes the fetch process to use the version specified in
                 the recipe filename.
@@ -1913,13 +1954,13 @@
 
             <para>
                 Here is a simple example from the
-                <filename>meta/recipes-devtools/cdrtools/cdrtools-native_3.01a20.bb</filename>
+                <filename>meta/recipes-devtools/strace/strace_5.5.bb</filename>
                 recipe where the source comes from a single tarball.
                 Notice the use of the
                 <ulink url='&YOCTO_DOCS_REF_URL;#var-PV'><filename>PV</filename></ulink>
                 variable:
                 <literallayout class='monospaced'>
-     SRC_URI = "ftp://ftp.berlios.de/pub/cdrecord/alpha/cdrtools-${PV}.tar.bz2"
+     SRC_URI = "https://strace.io/files/${PV}/strace-${PV}.tar.xz \
                 </literallayout>
             </para>
 
@@ -1978,16 +2019,17 @@
                 For these cases, you provide a name for each URL as part of
                 the <filename>SRC_URI</filename> and then reference that name
                 in the subsequent checksum statements.
-                Here is an example:
+                Here is an example combining lines from the files
+                <filename>git.inc</filename> and
+                <filename>git_2.24.1.bb</filename>:
                 <literallayout class='monospaced'>
-     SRC_URI = "${DEBIAN_MIRROR}/main/a/apmd/apmd_3.2.2.orig.tar.gz;name=tarball \
-                ${DEBIAN_MIRROR}/main/a/apmd/apmd_${PV}.diff.gz;name=patch"
+     SRC_URI = "${KERNELORG_MIRROR}/software/scm/git/git-${PV}.tar.gz;name=tarball \
+                ${KERNELORG_MIRROR}/software/scm/git/git-manpages-${PV}.tar.gz;name=manpages"
 
-     SRC_URI[tarball.md5sum] = "b1e6309e8331e0f4e6efd311c2d97fa8"
-     SRC_URI[tarball.sha256sum] = "7f7d9f60b7766b852881d40b8ff91d8e39fccb0d1d913102a5c75a2dbb52332d"
-
-     SRC_URI[patch.md5sum] = "57e1b689264ea80f78353519eece0c92"
-     SRC_URI[patch.sha256sum] = "7905ff96be93d725544d0040e425c42f9c05580db3c272f11cff75b9aa89d430"
+     SRC_URI[tarball.md5sum] = "166bde96adbbc11c8843d4f8f4f9811b"
+     SRC_URI[tarball.sha256sum] = "ad5334956301c86841eb1e5b1bb20884a6bad89a10a6762c958220c7cf64da02"
+     SRC_URI[manpages.md5sum] = "31c2272a8979022497ba3d4202df145d"
+     SRC_URI[manpages.sha256sum] = "9a7ae3a093bea39770eb96ca3e5b40bff7af0b9f6123f089d7821d0e5b8e1230"
                 </literallayout>
             </para>
 
@@ -3242,8 +3284,6 @@
                 The script defined in the post-installation function is
                 called when the root filesystem is created.
                 If the script succeeds, the package is marked as installed.
-                If the script fails, the package is marked as unpacked and
-                the script is executed when the image boots again.
                 <note>
                     Any RPM post-installation script that runs on the target
                     should return a 0 exit code.
@@ -3262,7 +3302,7 @@
                 mark post installs to defer to the target.
                 You can use <filename>pkg_postinst_ontarget()</filename> or
                 call
-                <filename>postinst-intercepts defer_to_first_boot</filename>
+                <filename>postinst_intercept delay_to_first_boot</filename>
                 from <filename>pkg_postinst()</filename>.
                 Any failure of a <filename>pkg_postinst()</filename> script
                 (including exit 1) triggers an error during the
@@ -7609,7 +7649,6 @@
                 available Wic images as follows:
                 <literallayout class='monospaced'>
      $ wic list images
-       mpc8315e-rdb                  		Create SD card image for MPC8315E-RDB
        genericx86                    		Create an EFI disk image for genericx86*
        beaglebone-yocto              		Create SD card image for Beaglebone
        edgerouter                    		Create SD card image for Edgerouter
@@ -7797,7 +7836,6 @@
                 files:
                 <literallayout class='monospaced'>
      $ wic list images
-       mpc8315e-rdb                  		Create SD card image for MPC8315E-RDB
        genericx86                    		Create an EFI disk image for genericx86*
        beaglebone-yocto              		Create SD card image for Beaglebone
        edgerouter                    		Create SD card image for Edgerouter
@@ -10550,7 +10588,7 @@
                     <filename>devtool</filename> and the NPM fetcher to
                     create the recipe:
                     <literallayout class='monospaced'>
-     $ devtool add "npm://registry.npmjs.org;name=cute-files;version=1.0.2"
+     $ devtool add "npm://registry.npmjs.org;package=cute-files;version=1.0.2"
                     </literallayout>
                     The <filename>devtool add</filename> command runs
                     <filename>recipetool create</filename> and uses the
@@ -10575,25 +10613,13 @@
                 </para>
 
                 <para>
-                    <filename>recipetool</filename> creates "shrinkwrap" and
-                    "lockdown" files for your recipe.
+                    <filename>recipetool</filename> creates a "shrinkwrap" file
+                    for your recipe.
                     Shrinkwrap files capture the version of all dependent
                     modules.
                     Many packages do not provide shrinkwrap files.
                     <filename>recipetool</filename> create a shrinkwrap
                     file as it runs.
-                    You can replace the shrinkwrap file with your own file
-                    by setting the <filename>NPM_SHRINKWRAP</filename>
-                    variable.
-                </para>
-
-                <para>
-                    Lockdown files contain the checksum for each module
-                    to determine if your users download the same files when
-                    building with a recipe.
-                    Lockdown files ensure that dependencies have not been
-                    changed and that your NPM registry is still providing
-                    the same file.
                     <note>
                         A package is created for each sub-module.
                         This policy is the only practical way to have the
@@ -10608,23 +10634,26 @@
                     <literallayout class='monospaced'>
      $ devtool edit-recipe cute-files
      SUMMARY = "Turn any folder on your computer into a cute file browser, available on the local network."
-     LICENSE = "BSD-3-Clause &amp; Unknown &amp; MIT &amp; ISC"
+     LICENSE = "MIT &amp; ISC &amp; Unknown"
      LIC_FILES_CHKSUM = "file://LICENSE;md5=71d98c0a1db42956787b1909c74a86ca \
-                         file://node_modules/content-disposition/LICENSE;md5=c6e0ce1e688c5ff16db06b7259e9cd20 \
-                         file://node_modules/express/LICENSE;md5=5513c00a5c36cd361da863dd9aa8875d \
+                         file://node_modules/toidentifier/LICENSE;md5=1a261071a044d02eb6f2bb47f51a3502 \
+                         file://node_modules/debug/LICENSE;md5=ddd815a475e7338b0be7a14d8ee35a99 \
                          ...
 
-     SRC_URI = "npm://registry.npmjs.org;name=cute-files;version=${PV}"
-     NPM_SHRINKWRAP := "${THISDIR}/${PN}/npm-shrinkwrap.json"
-     NPM_LOCKDOWN := "${THISDIR}/${PN}/lockdown.json"
-     inherit npm
-     # Must be set after inherit npm since that itself sets S
-     S = "${WORKDIR}/npmpkg"
+     SRC_URI = " \
+         npm://registry.npmjs.org/;package=cute-files;version=${PV} \
+         npmsw://${THISDIR}/${BPN}/npm-shrinkwrap.json \
+     "
 
-     LICENSE_${PN}-content-disposition = "MIT"
-     ...
-     LICENSE_${PN}-express = "MIT"
+     S = "${WORKDIR}/npm"
+
+     inherit npm
+
      LICENSE_${PN} = "MIT"
+     LICENSE_${PN}-accepts = "MIT"
+     LICENSE_${PN}-array-flatten = "MIT"
+     ...
+     LICENSE_${PN}-vary = "MIT"
                     </literallayout>
                     Three key points exist in the previous example:
                     <itemizedlist>
@@ -10717,11 +10746,10 @@
                     However, the <filename>SRC_URI</filename> looks like the
                     following:
                     <literallayout class='monospaced'>
-     SRC_URI = "git://github.com/martinaglv/cute-files.git;protocol=https \
-               npm://registry.npmjs.org;name=commander;version=2.9.0;subdir=node_modules/commander \
-               npm://registry.npmjs.org;name=express;version=4.14.0;subdir=node_modules/express \
-               npm://registry.npmjs.org;name=content-disposition;version=0.3.0;subdir=node_modules/content-disposition \
-               "
+     SRC_URI = " \
+         git://github.com/martinaglv/cute-files.git;protocol=https \
+         npmsw://${THISDIR}/${BPN}/npm-shrinkwrap.json \
+         "
                     </literallayout>
                     In this example, the main module is taken from the Git
                     repository and dependents are taken from the NPM registry.
@@ -10822,7 +10850,7 @@
                 Use the following BitBake command form to fetch all the
                 necessary sources without starting the build:
                 <literallayout class='monospaced'>
-     $ bitbake -c <replaceable>target</replaceable> runall="fetch"
+     $ bitbake <replaceable>target</replaceable> --runall=fetch
                 </literallayout>
                 This variation of the BitBake command guarantees that you
                 have all the sources for that BitBake target should you
@@ -10834,15 +10862,6 @@
 
     <section id="selecting-an-initialization-manager">
         <title>Selecting an Initialization Manager</title>
-
-        <para>
-            By default, the Yocto Project uses SysVinit as the initialization
-            manager.
-            However, support also exists for systemd,
-            which is a full replacement for init with
-            parallel starting of services, reduced shell overhead and other
-            features that are used by many distributions.
-        </para>
 
         <para>
             By default, the Yocto Project uses SysVinit as the initialization
@@ -11164,18 +11183,18 @@
 
             <para>
                 To create the read-only root filesystem, simply add the
-                "read-only-rootfs" feature to your image.
-                Using either of the following statements in your
-                image recipe or from within the
-                <filename>local.conf</filename> file found in the
-                <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>
-                causes the build system to create a read-only root filesystem:
+                "read-only-rootfs" feature to your image, normally in one of two ways.
+                The first way is to add the "read-only-rootfs" image feature
+                in the image's recipe file via the
+                <filename>IMAGE_FEATURES</filename> variable:
                 <literallayout class='monospaced'>
-     IMAGE_FEATURES = "read-only-rootfs"
+     IMAGE_FEATURES += "read-only-rootfs"
                 </literallayout>
-                or
+                As an alternative, you can add the same feature from within your
+                build directory's <filename>local.conf</filename> file with the
+                associated <filename>EXTRA_IMAGE_FEATURES</filename> variable, as in:
                 <literallayout class='monospaced'>
-     EXTRA_IMAGE_FEATURES += "read-only-rootfs"
+     EXTRA_IMAGE_FEATURES = "read-only-rootfs"
                 </literallayout>
             </para>
 
@@ -12038,15 +12057,15 @@
                     In order to run tests on hardware, you need to set
                     <filename>TEST_TARGET</filename> to an appropriate value.
                     For QEMU, you do not have to change anything, the default
-                    value is "QemuTarget".
+                    value is "qemu".
                     For running tests on hardware, the following options exist:
                     <itemizedlist>
-                        <listitem><para><emphasis>"SimpleRemoteTarget":</emphasis>
-                            Choose "SimpleRemoteTarget" if you are going to
+                        <listitem><para><emphasis>"simpleremote":</emphasis>
+                            Choose "simpleremote" if you are going to
                             run tests on a target system that is already
                             running the image to be tested and is available
                             on the network.
-                            You can use "SimpleRemoteTarget" in conjunction
+                            You can use "simpleremote" in conjunction
                             with either real hardware or an image running
                             within a separately started QEMU or any
                             other virtual machine manager.
@@ -12221,7 +12240,7 @@
                 <title>Power Control</title>
 
                 <para>
-                    For most hardware targets other than SimpleRemoteTarget,
+                    For most hardware targets other than "simpleremote",
                     you can control power:
                     <itemizedlist>
                         <listitem><para>
@@ -12618,7 +12637,7 @@
                                 <listitem><para><emphasis><filename>target</filename>:</emphasis>
                                     The target controller object used to deploy
                                     and start an image on a particular target
-                                    (e.g. QemuTarget, SimpleRemote, and
+                                    (e.g. Qemu, SimpleRemote, and
                                     SystemdbootTarget).
                                     Tests usually use the following:
                                     <itemizedlist>

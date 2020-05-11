@@ -1,0 +1,26 @@
+From 1179b423cce8d119b42cebfb3daa77c540fdca43 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 15 Jan 2020 17:16:28 +0100
+Subject: [PATCH] tests: do not statically link a test
+
+This fails on e.g. centos 7
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ tests/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/Makefile b/tests/Makefile
+index 7162cf0..6af47af 100644
+--- a/tests/Makefile
++++ b/tests/Makefile
+@@ -29,7 +29,7 @@ psx_test_wrap: psx_test.c $(DEPS)
+ run_libcap_psx_test: libcap_psx_test
+ 
+ libcap_psx_test: libcap_psx_test.c $(DEPS)
+-	$(CC) $(CFLAGS) $(IPATH) $< -o $@ $(LIBCAPLIB) $(LIBPSXLIB) -Wl,-wrap,pthread_create --static
++	$(CC) $(CFLAGS) $(IPATH) $< -o $@ $(LIBCAPLIB) $(LIBPSXLIB) -Wl,-wrap,pthread_create
+ 
+ clean:
+ 	rm -f psx_test psx_test_wrap libcap_psx_test

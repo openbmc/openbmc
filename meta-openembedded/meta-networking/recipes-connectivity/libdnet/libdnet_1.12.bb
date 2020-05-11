@@ -11,8 +11,10 @@ UPSTREAM_CHECK_GITTAGREGEX = "libdnet-(?P<pver>\d+(\.\d+)+)"
 
 S = "${WORKDIR}/git"
 
-inherit autotools
+inherit autotools multilib_script
 
 acpaths = "-I ./config/"
 
 BBCLASSEXTEND = "native"
+
+MULTILIB_SCRIPTS = "${PN}:${bindir}/dnet-config"

@@ -46,7 +46,7 @@ RDEPENDS_packagegroup-meta-oe = "\
 "
 
 RDEPENDS_packagegroup-meta-oe-benchmarks = "\
-    analyze-suspend dhrystone iperf2 linpack phoronix-test-suite \
+    dhrystone iperf2 linpack phoronix-test-suite \
     tiobench bonnie++ fio iperf2 iperf3 lmbench s-suite whetstone \
     libc-bench memtester sysbench dbench iozone3 libhugetlbfs \
     nbench-byte tinymembench \
@@ -62,14 +62,15 @@ RDEPENDS_packagegroup-meta-oe-benchmarks_remove_riscv32 = "libhugetlbfs"
 RDEPENDS_packagegroup-meta-oe-connectivity ="\
     gammu hostapd irssi krb5 libev libimobiledevice \
     libmbim libmtp libndp libqmi libtorrent \
-    libuv libwebsockets linuxptp lirc loudmouth \
+    libuv libwebsockets linuxptp loudmouth \
     modemmanager mosh  \
     paho-mqtt-c phonet-utils rabbitmq-c rfkill rtorrent \
-    ser2net smstools3 telepathy-glib telepathy-idle thrift \
+    ser2net smstools3 telepathy-glib thrift \
     usbmuxd zabbix zeromq \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "obex-data-server", "", d)} \
     libmikmod \
     obexftp openobex libnet \
+    ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "telepathy-idle", "", d)} \
     "
 RDEPENDS_packagegroup-meta-oe-connectivity_append_libc-glibc = " wvstreams wvdial"
 
@@ -100,24 +101,25 @@ RDEPENDS_packagegroup-meta-oe-bsp_remove_riscv32 = "efivar efibootmgr"
 
 RDEPENDS_packagegroup-meta-oe-dbs ="\
     leveldb libdbi mariadb mariadb-native \
-    mysql-python postgresql psqlodbc rocksdb soci \
+    postgresql psqlodbc rocksdb soci \
     sqlite \
+    ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "mysql-python", "", d)} \
     "
 
 RDEPENDS_packagegroup-meta-oe-devtools ="\
     android-tools android-tools-conf bootchart breakpad \
     capnproto cgdb cscope ctags \
     debootstrap dmalloc flatbuffers \
-    giflib icon-slicer iptraf-ng jq jsoncpp jsonrpc json-spirit \
+    giflib grpc icon-slicer iptraf-ng jq jsoncpp jsonrpc json-spirit \
     kconfig-frontends lemon libedit libgee libsombok3 \
     libubox log4cplus lshw ltrace lua mcpp memstat mercurial \
-    mpich msgpack-c nlohmann-json nodejs openocd pax-utils \
+    mpich msgpack-c nlohmann-json openocd pax-utils \
     ipc-run libdbd-mysql-perl libdbi-perl libio-pty-perl php \
-    protobuf protobuf-c python3-distutils-extra \
-    python-cpuset python-distutils-extra python-futures python-pygobject \
-    rapidjson serialcheck sip3 sip tclap uftrace uw-imap valijson \
+    protobuf protobuf-c \
+    rapidjson serialcheck sip3 tclap uftrace uw-imap valijson \
     xmlrpc-c yajl yasm \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "geany geany-plugins glade tk", "", d)} \
+    ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "nodejs", "", d)} \
     "
 
 RDEPENDS_packagegroup-meta-oe-devtools_remove_armv5 = "uftrace nodejs"
@@ -127,19 +129,19 @@ RDEPENDS_packagegroup-meta-oe-devtools_remove_mips64el = "nodejs"
 RDEPENDS_packagegroup-meta-oe-devtools_remove_powerpc = "android-tools breakpad uftrace lshw"
 RDEPENDS_packagegroup-meta-oe-devtools_remove_powerpc64 = "android-tools uftrace lshw"
 RDEPENDS_packagegroup-meta-oe-devtools_remove_powerpc64le = "android-tools uftrace lshw"
-RDEPENDS_packagegroup-meta-oe-devtools_remove_riscv64 = "nodejs uftrace lshw"
-RDEPENDS_packagegroup-meta-oe-devtools_remove_riscv32 = "nodejs uftrace lshw"
+RDEPENDS_packagegroup-meta-oe-devtools_remove_riscv64 = "breakpad ltrace nodejs uftrace lshw"
+RDEPENDS_packagegroup-meta-oe-devtools_remove_riscv32 = "breakpad ltrace nodejs uftrace lshw"
 
 RDEPENDS_packagegroup-meta-oe-extended ="\
     byacc cfengine cfengine-masterfiles cmpi-bindings \
     ddrescue dialog dumb-init enscript fluentbit \
     haveged hexedit hiredis hplip hwloc indent iotop isomd5sum \
-    jansson konkretcmpi lcdproc libblockdev libcec libconfig \
+    jansson konkretcmpi libblockdev libcec libconfig \
     libdivecomputer libplist libusbmuxd \
     liblockfile liblogging liblognorm libmodbus libmodbus \
     libpwquality libqb libuio \
     lockfile-progs logwatch lprng mailx md5deep \
-    mozjs mraa nana nicstat \
+    mraa nana nicstat \
     p7zip p8platform libfile-fnmatch-perl \
     rarpd redis rrdtool libfastjson librelp rsyslog sanlock \
     sblim-cmpi-devel sblim-sfc-common sblim-sfcc \
@@ -153,7 +155,7 @@ RDEPENDS_packagegroup-meta-oe-extended ="\
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "pam-ssh-agent-auth openwsman sblim-sfcb ", "", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "polkit", "polkit polkit-group-rule-datetime ", "", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "polkit", "polkit-group-rule-network ", "", d)} \
-    ${@bb.utils.contains("BBPATH", "meta-python", "openlmi-tools", "", d)} \
+    ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "openlmi-tools", "", d)} \
     "
 RDEPENDS_packagegroup-meta-oe-extended_remove_mipsarch = "upm mraa tiptop"
 RDEPENDS_packagegroup-meta-oe-extended_remove_powerpc = "upm mraa"
@@ -161,7 +163,6 @@ RDEPENDS_packagegroup-meta-oe-extended_remove_powerpc64 = "upm mraa"
 RDEPENDS_packagegroup-meta-oe-extended_remove_powerpc64le = "upm mraa"
 RDEPENDS_packagegroup-meta-oe-extended_remove_riscv64 = "upm mraa tiptop"
 RDEPENDS_packagegroup-meta-oe-extended_remove_riscv32 = "upm mraa tiptop"
-RDEPENDS_packagegroup-meta-oe-extended_remove_libc-musl = "lcdproc"
 
 RDEPENDS_packagegroup-meta-oe-gnome ="\
     atkmm gnome-common gnome-doc-utils-stub gtkmm \
@@ -169,8 +170,9 @@ RDEPENDS_packagegroup-meta-oe-gnome ="\
     "
 
 RDEPENDS_packagegroup-meta-oe-graphics ="\
-    babl cairomm dietsplash directfb directfb-examples dnfdragora \
-    fbgrab fbida fontforge fvwm gegl gimp glm gphoto2 libgphoto2 \
+    cairomm dietsplash directfb directfb-examples \
+    ${@bb.utils.contains("PACKAGE_CLASSES", "package_rpm", "dnfdragora dnf-plugin-tui", "", d)} \
+    fbgrab fbida fontforge fvwm glm gphoto2 libgphoto2 \
     gtkperf jasper leptonica libmng libsdl2-image libsdl2-mixer libsdl2-net \
     libsdl-gfx libsdl-image libsdl-mixer libsdl-net libsdl-ttf \
     libvncserver libyui libyui-ncurses lxdm numlockx openbox openjpeg \
@@ -187,14 +189,22 @@ RDEPENDS_packagegroup-meta-oe-graphics ="\
     ${@bb.utils.contains("DISTRO_FEATURES", "opengl", "freeglut libsdl2-ttf", "", d)} \
     "
 
+
+
 RDEPENDS_packagegroup-meta-oe-kernel ="\
     agent-proxy broadcom-bt-firmware cpupower \
     crash ipmitool minicoredumper oprofile \
     "
+RDEPENDS_packagegroup-meta-oe-kernel_append_x86 = " pm-graph "
+RDEPENDS_packagegroup-meta-oe-kernel_append_x86-64 = " pm-graph "
+
 RDEPENDS_packagegroup-meta-oe-kernel_remove_libc-musl = "crash minicoredumper"
 
 RDEPENDS_packagegroup-meta-oe-kernel_remove_mips64 = "crash"
 RDEPENDS_packagegroup-meta-oe-kernel_remove_mips64el = "crash"
+
+RDEPENDS_packagegroup-meta-oe-kernel_remove_riscv64 = "crash oprofile"
+RDEPENDS_packagegroup-meta-oe-kernel_remove_riscv32 = "crash oprofile"
 
 RDEPENDS_packagegroup-meta-oe-multimedia ="\
     alsa-oss audiofile cdrkit id3lib \
@@ -230,9 +240,9 @@ NE10_armv7a = "ne10"
 NE10_armv7ve = "ne10"
 
 RDEPENDS_packagegroup-meta-oe-support ="\
-    anthy asio atop augeas avro-c bdwgc frame grail \
+    anthy asio atop augeas avro-c bdwgc frame grail c-ares \
     ccid ceres-solver ckermit cpprest ctapi-common daemonize \
-    daemontools debsums devmem2 dfu-util dfu-util-native digitemp \
+    daemontools devmem2 dfu-util dfu-util-native digitemp \
     dstat eject enca epeg espeak fbset fbset-modes \
     fftw fltk-native gd gflags glog gnulib gperftools \
     gpm gradm gsl gsoap hddtemp hidapi htop hunspell hwdata iksemel \
@@ -241,18 +251,18 @@ RDEPENDS_packagegroup-meta-oe-support ="\
     libgpiod libiio libjs-jquery libjs-sizzle liblinebreak libmicrohttpd \
     libmxml liboauth libol liboop libp11 libraw1394 libsmi libsoc libssh2 \
     libssh libtar libteam libtinyxml2 libtinyxml libusbg libusb-compat libutempter \
-    links lio-utils lockdev log4c log4cpp logwarn libdevmapper lvm2 \
+    links lockdev log4c log4cpp logwarn libdevmapper lvm2 \
     mailcap mbuffer mg minini \
     multipath-tools nano neon nmon numactl onig openct openldap \
     opensc wbxml2 p910nd pcsc-lite picocom libotr pidgin \
     pngcheck poco poppler poppler-data portaudio-v19 pps-tools \
-    pv pxaregs raptor2 rdfind read-edid rsnapshot s3c24xx-gpio s3c64xx-gpio \
-    sjf2410-linux-native satyr sdparm pty-forward-native serial-forward \
-    sg3-utils sharutils smem spitools srecord ssiapi stm32flash \
+    pv pxaregs raptor2 rdfind read-edid rsnapshot \
+    satyr sdparm pty-forward-native serial-forward \
+    sg3-utils sharutils spitools srecord ssiapi stm32flash \
     syslog-ng system-config-keyboard tbb thin-provisioning-tools tokyocabinet \
     tree uhubctl unixodbc uriparser usb-modeswitch \
-    usb-modeswitch-data usbpath uthash utouch-evemu utouch-frame \
-    vim vim-tiny websocketpp wmiconfig xdelta3 xdg-user-dirs xmlstarlet \
+    usb-modeswitch-data uthash utouch-evemu utouch-frame \
+    vim vim-tiny websocketpp xdelta3 xdg-user-dirs xmlstarlet \
     zbar zile \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "geis toscoterm uim synergy utouch-mtview links-x11 fltk pidgin-otr", "", d)} \
     libcanberra \
@@ -260,12 +270,13 @@ RDEPENDS_packagegroup-meta-oe-support ="\
     procmail \
     ${@bb.utils.contains("DISTRO_FEATURES", "polkit", "udisks2 upower", "", d)} \
     ${NE10} \
+    ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "lio-utils", "", d)} \
     "
 
 RDEPENDS_packagegroup-meta-oe-support_remove_arm ="numactl"
 RDEPENDS_packagegroup-meta-oe-support_remove_mipsarch = "gperftools"
-RDEPENDS_packagegroup-meta-oe-support_remove_riscv64 = "uim"
-RDEPENDS_packagegroup-meta-oe-support_remove_riscv32 = "uim"
+RDEPENDS_packagegroup-meta-oe-support_remove_riscv64 = "gperftools uim"
+RDEPENDS_packagegroup-meta-oe-support_remove_riscv32 = "gperftools uim"
 RDEPENDS_packagegroup-meta-oe-support_remove_powerpc = "ssiapi"
 
 RDEPENDS_packagegroup-meta-oe-support-egl ="\
@@ -296,6 +307,9 @@ RDEPENDS_packagegroup-meta-oe-ptest-packages = "\
     libee-ptest \
     poco-ptest \
     "
+RDEPENDS_packagegroup-meta-oe-ptest-packages_remove_riscv64 = "oprofile-ptest"
+RDEPENDS_packagegroup-meta-oe-ptest-packages_remove_riscv32 = "oprofile-ptest"
+
 RDEPENDS_packagegroup-meta-oe-ptest-packages_append_x86 = "\
     mcelog-ptest \
 "

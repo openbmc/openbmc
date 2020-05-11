@@ -69,7 +69,7 @@ fi
 pseudo_state_dir="$SDK_ROOTFS_DIR/../$(basename "$SDK_ROOTFS_DIR").pseudo_state"
 pseudo_state_dir="$(readlink -f $pseudo_state_dir)"
 
-debug_image="`echo $ROOTFS_TARBALL | grep '\-dbg\.tar\.'`"
+debug_image="`echo $ROOTFS_TARBALL | grep '\-dbg\.rootfs\.tar'`"
 
 if [ -e "$pseudo_state_dir" -a -z "$debug_image" ]; then
 	echo "Error: $pseudo_state_dir already exists!"

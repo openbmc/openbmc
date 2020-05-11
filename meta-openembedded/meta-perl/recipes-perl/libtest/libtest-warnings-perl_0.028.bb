@@ -24,6 +24,6 @@ SRC_URI[sha256sum] = "26fda9f8d279e943d27e43a4a3a5cea8a6592cd36e7308695f8dc66022
 
 S = "${WORKDIR}/Test-Warnings-${PV}"
 
-inherit cpan allarch ptest-perl
+inherit cpan ptest-perl
 
 BBCLASSEXTEND = "native nativesdk"

@@ -13,6 +13,10 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=428ca4d67a41fcd4fc3283dce9bbda7e \
 
 PE = "1"
 
+inherit multilib_script
+
+MULTILIB_SCRIPTS = "${PN}:${bindir}/x11perfcomp"
+
 do_install_append_class-target () {
     sed -i -e 's:${HOSTTOOLS_DIR}/::g' ${D}${bindir}/x11perfcomp
 }

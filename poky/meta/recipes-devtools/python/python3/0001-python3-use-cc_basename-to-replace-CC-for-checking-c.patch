@@ -1,4 +1,4 @@
-From 2645317fef09afe31b01bb2c1d4fe5b9afdbb11a Mon Sep 17 00:00:00 2001
+From 994783da5c21cab81b6589ed2d4275e665a946f9 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Mon, 22 Oct 2018 15:19:51 +0800
 Subject: [PATCH] python3: use cc_basename to replace CC for checking compiler
@@ -21,12 +21,13 @@ Signed-off-by: Li Zhou <li.zhou@windriver.com>
 patch originally from Li Zhou, I just rework it to new version
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
+
 ---
  configure.ac | 19 ++++++++++---------
  1 file changed, 10 insertions(+), 9 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index a7de901..4a3681f 100644
+index a189d42..0f85486 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -54,6 +54,7 @@ AC_CONFIG_HEADER(pyconfig.h)
@@ -37,7 +38,7 @@ index a7de901..4a3681f 100644
  
  # pybuilddir.txt will be created by --generate-posix-vars in the Makefile
  rm -f pybuilddir.txt
-@@ -695,7 +696,7 @@ AC_MSG_RESULT($with_cxx_main)
+@@ -671,7 +672,7 @@ AC_MSG_RESULT($with_cxx_main)
  preset_cxx="$CXX"
  if test -z "$CXX"
  then
@@ -46,7 +47,7 @@ index a7de901..4a3681f 100644
          gcc)    AC_PATH_TOOL(CXX, [g++], [g++], [notfound]) ;;
          cc)     AC_PATH_TOOL(CXX, [c++], [c++], [notfound]) ;;
          clang|*/clang)     AC_PATH_TOOL(CXX, [clang++], [clang++], [notfound]) ;;
-@@ -979,7 +980,7 @@ rmdir CaseSensitiveTestDir
+@@ -957,7 +958,7 @@ rmdir CaseSensitiveTestDir
  
  case $ac_sys_system in
  hp*|HP*)
@@ -55,7 +56,7 @@ index a7de901..4a3681f 100644
      cc|*/cc) CC="$CC -Ae";;
      esac;;
  esac
-@@ -1336,7 +1337,7 @@ else
+@@ -1335,7 +1336,7 @@ else
  fi],
  [AC_MSG_RESULT(no)])
  if test "$Py_LTO" = 'true' ; then
@@ -64,7 +65,7 @@ index a7de901..4a3681f 100644
      *clang*)
        AC_SUBST(LLVM_AR)
        AC_PATH_TOOL(LLVM_AR, llvm-ar, '', ${llvm_path})
-@@ -1426,7 +1427,7 @@ then
+@@ -1425,7 +1426,7 @@ then
    fi
  fi
  LLVM_PROF_ERR=no
@@ -73,16 +74,16 @@ index a7de901..4a3681f 100644
    *clang*)
      # Any changes made here should be reflected in the GCC+Darwin case below
      PGO_PROF_GEN_FLAG="-fprofile-instr-generate"
-@@ -1500,7 +1501,7 @@ then
-            WRAP="-fwrapv"
-         fi
+@@ -1486,7 +1487,7 @@ esac
+ # compiler and platform.  BASECFLAGS tweaks need to be made even if the
+ # user set OPT.
  
--        case $CC in
-+        case $cc_basename in
-             *clang*)
-                 cc_is_clang=1
-                 ;;
-@@ -1623,7 +1624,7 @@ yes)
+-case $CC in
++case $cc_basename in
+     *clang*)
+         cc_is_clang=1
+         ;;
+@@ -1622,7 +1623,7 @@ yes)
  
      # ICC doesn't recognize the option, but only emits a warning
      ## XXX does it emit an unused result warning and can it be disabled?
@@ -91,7 +92,7 @@ index a7de901..4a3681f 100644
      *icc*)
      ac_cv_disable_unused_result_warning=no
      ;;
-@@ -1965,7 +1966,7 @@ yes)
+@@ -1943,7 +1944,7 @@ yes)
  esac
  
  # ICC needs -fp-model strict or floats behave badly
@@ -100,7 +101,7 @@ index a7de901..4a3681f 100644
  *icc*)
      CFLAGS_NODIST="$CFLAGS_NODIST -fp-model strict"
      ;;
-@@ -2727,7 +2728,7 @@ then
+@@ -2711,7 +2712,7 @@ then
  		then
  			LINKFORSHARED="-Wl,--export-dynamic"
  		fi;;
@@ -109,7 +110,7 @@ index a7de901..4a3681f 100644
  		  *gcc*)
  		    if $CC -Xlinker --help 2>&1 | grep export-dynamic >/dev/null
  		    then
-@@ -5429,7 +5430,7 @@ if test "$have_gcc_asm_for_x87" = yes; then
+@@ -5362,7 +5363,7 @@ if test "$have_gcc_asm_for_x87" = yes; then
      # Some versions of gcc miscompile inline asm:
      # http://gcc.gnu.org/bugzilla/show_bug.cgi?id=46491
      # http://gcc.gnu.org/ml/gcc/2010-11/msg00366.html

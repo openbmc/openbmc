@@ -48,10 +48,10 @@ index 39933fc..c0258a2 100755
  	--skip-cleanup)
  		echo "Skipping cleanup"
  		SKIPCLEANUP=1
-@@ -571,7 +576,7 @@ fi
+@@ -613,7 +613,7 @@ fi
  # Don't check external file.
- # shellcheck disable=SC1091
- source /etc/os-release
+ # shellcheck disable=SC1090
+ [[ -f "$RELEASE_FILE" ]] && source "$RELEASE_FILE"
 -DISTRO="$ID"
 +DISTRO="${DISTRO:-${ID}}"
  if [[ "$DISTRO" = fedora ]] || [[ "$DISTRO" = rhel ]] || [[ "$DISTRO" = ol ]] || [[ "$DISTRO" = centos ]]; then

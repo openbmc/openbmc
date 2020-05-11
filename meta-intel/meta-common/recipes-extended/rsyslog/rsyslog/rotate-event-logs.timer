@@ -1,9 +1,0 @@
-[Unit]
-Description=Run rotate-event-logs.service every minute
-
-[Timer]
-OnActiveSec=60
-OnUnitActiveSec=60
-
-[Install]
-WantedBy=timers.target

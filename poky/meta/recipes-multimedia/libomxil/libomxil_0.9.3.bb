@@ -24,6 +24,8 @@ inherit autotools
 
 EXTRA_OECONF += "--disable-doc --disable-Werror"
 
+PROVIDES += "virtual/libomxil"
+
 #
 # The .so files under ${libdir}/bellagio are not intended to be versioned and symlinked.
 # Make sure they get packaged in the main package.

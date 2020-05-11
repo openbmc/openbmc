@@ -7,7 +7,7 @@
 <title>Setting Up to Use the Yocto Project</title>
 
 <para>
-    This chapter provides procedures related to getting set up to use the
+    This chapter provides guidance on how to prepare to use the
     Yocto Project.
     You can learn about creating a team environment that develops using the
     Yocto Project, how to set up a
@@ -24,9 +24,9 @@
         Project in a team development environment, or how to scale it for a
         large team of developers.
         You can adapt the Yocto Project to many different use cases and
-        scenarios.
-        However, this flexibility could cause difficulties if you are trying
-        to create a working setup that scales across a large team.
+        scenarios;
+        however, this flexibility could cause difficulties if you are trying
+        to create a working setup that scales effectively.
     </para>
 
     <para>
@@ -35,17 +35,17 @@
         that can help you get the results you want.
         The procedure is high-level and presents some of the project's most
         successful experiences, practices, solutions, and available
-        technologies that have proved to work well in the past.
-        Keep in mind, the procedure here is a starting point.
+        technologies that have proved to work well in the past;
+        however, keep in mind, the procedure here is simply a starting point.
         You can build off these steps and customize the procedure to fit any
         particular working environment and set of practices.
         <orderedlist>
             <listitem><para>
                 <emphasis>Determine Who is Going to be Developing:</emphasis>
-                You need to understand who is going to be doing anything
+                You first need to understand who is going to be doing anything
                 related to the Yocto Project and determine their roles.
                 Making this determination is essential to completing
-                steps two and three, which are to get your equipment together
+                subsequent steps, which are to get your equipment together
                 and set up your development environment's hardware topology.
                 </para>
 
@@ -64,8 +64,8 @@
                         <listitem><para>
                             <emphasis>Build Engineer:</emphasis>
                             This type of developer manages Autobuilders and
-                            releases.
-                            Not all environments need a Build Engineer.
+                            releases. Depending on the specifics of the environment,
+                            not all situations might need a Build Engineer.
                             </para></listitem>
                         <listitem><para>
                             <emphasis>Test Engineer:</emphasis>
@@ -88,6 +88,11 @@
                 You can help ensure efficiency by having any machines used
                 for testing or that run Autobuilders be as high performance
                 as possible.
+                <note>
+                    Given sufficient processing power, you might also consider
+                    building Yocto Project development containers to be run
+                    under Docker, which is described later.
+                </note>
                 </para></listitem>
             <listitem><para>
                 <emphasis>Understand the Hardware Topology of the Environment:</emphasis>
@@ -114,10 +119,10 @@
                 and any software you are developing under the control of an SCM
                 system that is compatible   with the OpenEmbedded build system
                 is advisable.
-                Of the SCMs BitBake supports, the Yocto Project team strongly
+                Of all of the SCMs supported by BitBake, the Yocto Project team strongly
                 recommends using
                 <ulink url='&YOCTO_DOCS_OM_URL;#git'>Git</ulink>.
-                Git is a distributed system that is easy to backup,
+                Git is a distributed system that is easy to back up,
                 allows you to work remotely, and then connects back to the
                 infrastructure.
                 <note>
@@ -302,7 +307,7 @@
                 <para>As with any development environment, it is important
                 to document the policy used as well as any main project
                 guidelines so they are understood by everyone.
-                It is also a good idea to have well structured
+                It is also a good idea to have well-structured
                 commit messages, which are usually a part of a project's
                 guidelines.
                 Good commit messages are essential when looking back in time and
@@ -394,16 +399,18 @@
         This section provides procedures to set up a system to be used as your
         <ulink url='&YOCTO_DOCS_REF_URL;#hardware-build-system-term'>build host</ulink>
         for development using the Yocto Project.
-        Your build host can be a native Linux machine (recommended) or it can
+        Your build host can be a native Linux machine (recommended), it can
         be a machine (Linux, Mac, or Windows) that uses
-        <ulink url='https://git.yoctoproject.org/cgit/cgit.cgi/crops/about/'>CROPS</ulink>,
+        <ulink url='https://github.com/crops/poky-container'>CROPS</ulink>,
         which leverages
-        <ulink url='https://www.docker.com/'>Docker Containers</ulink>.
+        <ulink url='https://www.docker.com/'>Docker Containers</ulink> or it can
+        be a Windows machine capable of running Windows Subsystem For Linux v2 (WSL).
         <note>
-            You cannot use a build host that is using the
-            <ulink url='https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux'>Windows Subsystem for Linux</ulink>
-            (WSL).
-            The Yocto Project is not compatible with WSL.
+          The Yocto Project is not compatible with
+          <ulink url='https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux'>Windows Subsystem for Linux v1</ulink>.
+          It is compatible but not officially supported nor validated with WSLv2.
+          If you still decide to use WSL please upgrade to
+          <ulink url='https://docs.microsoft.com/en-us/windows/wsl/wsl2-install'>WSLv2</ulink>.
         </note>
     </para>
 
@@ -442,7 +449,7 @@
                     You should have a reasonably current Linux-based host
                     system.
                     You will have the best results with a recent release of
-                    Fedora, openSUSE, Debian, Ubuntu, or CentOS as these
+                    Fedora, openSUSE, Debian, Ubuntu, RHEL or CentOS as these
                     releases are frequently tested against the Yocto Project
                     and officially supported.
                     For a list of the distributions under validation and their
@@ -460,23 +467,26 @@
                     <emphasis>Meet Minimal Version Requirements:</emphasis>
                     The OpenEmbedded build system should be able to run on any
                     modern distribution that has the following versions for
-                    Git, tar, and Python.
+                    Git, tar, Python and gcc.
                     <itemizedlist>
                         <listitem><para>
                             Git 1.8.3.1 or greater
                             </para></listitem>
                         <listitem><para>
-                            tar 1.27 or greater
+                            tar 1.28 or greater
                             </para></listitem>
                         <listitem><para>
-                            Python 3.4.0 or greater.
-                            </para></listitem>
+                            Python 3.5.0 or greater.
+                        </para></listitem>
+                        <listitem><para>
+                            gcc 5.0 or greater.
+                        </para></listitem>
                     </itemizedlist>
                     If your build host does not meet any of these three listed
                     version requirements, you can take steps to prepare the
                     system so that you can still use the Yocto Project.
                     See the
-                    "<ulink url='&YOCTO_DOCS_REF_URL;#required-git-tar-and-python-versions'>Required Git, tar, and Python Versions</ulink>"
+                    "<ulink url='&YOCTO_DOCS_REF_URL;#required-git-tar-python-and-gcc-versions'>Required Git, tar, Python and gcc Versions</ulink>"
                     section in the Yocto Project Reference Manual for
                     information.
                     </para></listitem>
@@ -517,7 +527,7 @@
 
         <para>
             With
-            <ulink url='https://github.com/crops/crops/blob/master/README.md'>CROPS</ulink>,
+            <ulink url='https://github.com/crops/poky-container'>CROPS</ulink>,
             which leverages
             <ulink url='https://www.docker.com/'>Docker Containers</ulink>,
             you can create a Yocto Project development environment that
@@ -654,15 +664,147 @@
             section in the Toaster User Manual.
         </para>
     </section>
+
+    <section id='setting-up-to-use-wsl'>
+        <title>Setting Up to Use Windows Subsystem For Linux (WSLv2)</title>
+
+        <para>
+            With <ulink url='https://docs.microsoft.com/en-us/windows/wsl/wsl2-about'>
+            Windows Subsystem for Linux (WSLv2)</ulink>, you can create a
+            Yocto Project development environment that allows you to build
+            on Windows. You can set up a Linux distribution inside Windows
+            in which you can develop using the Yocto Project.
+        </para>
+
+        <para>
+            Follow these general steps to prepare a Windows machine using WSLv2
+            as your Yocto Project build host:
+            <orderedlist>
+                <listitem><para>
+                    <emphasis>Make sure your Windows 10 machine is capable of running WSLv2:</emphasis>
+                  
+                    WSLv2 is only available for Windows 10 builds > 18917. To
+                    check which build version you are running, you may open a
+                    command prompt on Windows and execute the command "ver".
+                    <literallayout class='monospaced'>
+    C:\Users\myuser> ver
+
+    Microsoft Windows [Version 10.0.19041.153]
+                    </literallayout>
+                    If your build is capable of running WSLv2 you may continue,
+                    for more information on this subject or instructions on how
+                    to upgrade to WSLv2 visit <ulink url='https://docs.microsoft.com/en-us/windows/wsl/wsl2-install'>Windows 10 WSLv2</ulink>
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>Install the Linux distribution of your choice inside Windows 10:</emphasis>
+                    Once you know your version of Windows 10 supports WSLv2,
+                    you can install the distribution of your choice from the
+                    Microsoft Store.
+                    Open the Microsoft Store and search for Linux. While there
+                    are several Linux distributions available, the assumption
+                    is that your pick will be one of the distributions supported
+                    by the Yocto Project as stated on the instructions for
+                    using a native Linux host.
+                    After making your selection, simply click "Get" to download
+                    and install the distribution.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>Check your Linux distribution is using WSLv2:</emphasis>
+                    Open a Windows PowerShell and run:
+                    <literallayout class='monospaced'>
+    C:\WINDOWS\system32> wsl -l -v
+    NAME      STATE           VERSION
+    *Ubuntu    Running         2
+                    </literallayout>
+                    Note the version column which says the WSL version being used by
+                    your distribution, on compatible systems, this can be changed back
+                    at any point in time.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>Optionally Orient Yourself on WSL:</emphasis>
+                    If you are unfamiliar with WSL, you can learn more here -
+                    <ulink url='https://docs.microsoft.com/en-us/windows/wsl/wsl2-about'></ulink>.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>Launch your WSL Distibution:</emphasis>
+                    From the Windows start menu simply launch your WSL distribution
+                    just like any other application.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>Optimize your WSLv2 storage often:</emphasis>
+                    Due to the way storage is handled on WSLv2, the storage
+                    space used by the undelying Linux distribution is not
+                    reflected immedately, and since bitbake heavily uses
+                    storage, after several builds, you may be unaware you
+                    are running out of space. WSLv2 uses a VHDX file for
+                    storage, this issue can be easily avoided by manually
+                    optimizing this file often, this can be done in the
+                    following way:
+                    <orderedlist>
+                        <listitem><para>
+                            <emphasis>Find the location of your VHDX file:</emphasis>
+                            First you need to find the distro app package directory,
+                            to achieve this open a Windows Powershell as Administrator
+                            and run:
+                            <literallayout class='monospaced'>
+    C:\WINDOWS\system32> Get-AppxPackage -Name "*Ubuntu*" | Select PackageFamilyName
+    PackageFamilyName
+    -----------------
+    CanonicalGroupLimited.UbuntuonWindows_79abcdefgh
+                            </literallayout>
+                            You should now replace the <replaceable>PackageFamilyName</replaceable>
+                            and your <replaceable>user</replaceable> on the following
+                            path to find your VHDX file: <filename>C:\Users\user\AppData\Local\Packages\PackageFamilyName\LocalState\</filename>
+                            For example:
+                            <literallayout class='monospaced'>
+    ls C:\Users\myuser\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79abcdefgh\LocalState\
+    Mode                 LastWriteTime         Length Name
+    -a----         3/14/2020   9:52 PM    57418973184 ext4.vhdx                      
+                            </literallayout>
+                            Your VHDX file path is: <filename>C:\Users\myuser\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79abcdefgh\LocalState\ext4.vhdx</filename>
+                            </para></listitem>
+                        <listitem><para><emphasis>Optimize your VHDX file:</emphasis>
+                            Open a Windows Powershell as Administrator to optimize
+                            your VHDX file, shutting down WSL first:
+                            <literallayout class='monospaced'>
+    C:\WINDOWS\system32> wsl --shutdown
+    C:\WINDOWS\system32> optimize-vhd -Path C:\Users\myuser\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79abcdefgh\LocalState\ext4.vhdx -Mode full
+                            </literallayout>
+                            A progress bar should be shown while optimizing the VHDX file,
+                            and storage should now be reflected correctly on the Windows
+                            Explorer.
+                            </para></listitem>
+                    </orderedlist>
+                </para></listitem>
+            </orderedlist>
+            <note>
+              The current implementation of WSLv2 does not have out-of-the-box
+              access to external devices such as those connected through a
+              USB port, but it automatically mounts your <filename>C:</filename>
+              drive on <filename>/mnt/c/</filename> (and others), which
+              you can use to share deploy artifacts to be later flashed on
+              hardware through Windows, but your build directory should not
+              reside inside this mountpoint.
+            </note>
+            Once you have WSLv2 set up, everything is in place to
+            develop just as if you were running on a native Linux machine.
+            If you are going to use the Extensible SDK container, see the
+            "<ulink url='&YOCTO_DOCS_SDK_URL;#sdk-extensible'>Using the Extensible SDK</ulink>"
+            Chapter in the Yocto Project Application Development and the
+            Extensible Software Development Kit (eSDK) manual.
+            If you are going to use the Toaster container, see the
+            "<ulink url='&YOCTO_DOCS_TOAST_URL;#toaster-manual-setup-and-use'>Setting Up and Using Toaster</ulink>"
+            section in the Toaster User Manual.
+        </para>
+    </section>
 </section>
 
 <section id='locating-yocto-project-source-files'>
     <title>Locating Yocto Project Source Files</title>
 
     <para>
-        This section shows you how to locate and access the
-        source files that ship with the Yocto Project.
-        You establish and use these local files to work on projects.
+        This section shows you how to locate, fetch and configure the source
+        files you'll need to work with the Yocto Project.
         <note><title>Notes</title>
             <itemizedlist>
                 <listitem><para>
@@ -1019,20 +1161,18 @@
            .
            .
            .
-       remotes/origin/pyro
-       remotes/origin/pyro-next
-       remotes/origin/rocko
-       remotes/origin/rocko-next
-       remotes/origin/sumo
-       remotes/origin/sumo-next
        remotes/origin/thud
        remotes/origin/thud-next
        remotes/origin/warrior
+       remotes/origin/warrior-next
+       remotes/origin/zeus
+       remotes/origin/zeus-next
+       ... and so on ...
                     </literallayout>
                     </para></listitem>
                 <listitem><para>
-                    <emphasis>Checkout the Branch:</emphasis>
-                    Checkout the development branch in which you want to work.
+                    <emphasis>Check out the Branch:</emphasis>
+                    Check out the development branch in which you want to work.
                     For example, to access the files for the Yocto Project
                     &DISTRO; Release (&DISTRO_NAME;), use the following command:
                     <literallayout class='monospaced'>
@@ -1118,7 +1258,7 @@
                     </literallayout>
                     </para></listitem>
                 <listitem><para>
-                    <emphasis>Checkout the Branch:</emphasis>
+                    <emphasis>Check out the Branch:</emphasis>
                     <literallayout class='monospaced'>
      $ git checkout tags/&DISTRO_REL_TAG; -b my_yocto_&DISTRO;
      Switched to a new branch 'my_yocto_&DISTRO;'

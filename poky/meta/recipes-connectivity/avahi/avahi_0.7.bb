@@ -10,6 +10,16 @@ inherit update-rc.d systemd useradd
 
 PACKAGES =+ "libavahi-gobject avahi-daemon libavahi-common libavahi-core libavahi-client avahi-dnsconfd libavahi-glib avahi-autoipd avahi-utils"
 
+LICENSE_libavahi-gobject = "LGPLv2.1+"
+LICENSE_avahi-daemon = "LGPLv2.1+"
+LICENSE_libavahi-common = "LGPLv2.1+"
+LICENSE_libavahi-core = "LGPLv2.1+"
+LICENSE_avahi-client = "LGPLv2.1+"
+LICENSE_avahi-dnsconfd = "LGPLv2.1+"
+LICENSE_libavahi-glib = "LGPLv2.1+"
+LICENSE_avahi-autoipd = "LGPLv2.1+"
+LICENSE_avahi-utils = "LGPLv2.1+"
+
 # As avahi doesn't put any files into PN, clear the files list to avoid problems
 # if extra libraries appear.
 FILES_${PN} = ""

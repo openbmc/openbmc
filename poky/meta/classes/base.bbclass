@@ -127,6 +127,9 @@ def setup_hosttools_dir(dest, toolsvar, d, fatal=True):
     for tool in tools:
         desttool = os.path.join(dest, tool)
         if not os.path.exists(desttool):
+            # clean up dead symlink
+            if os.path.islink(desttool):
+                os.unlink(desttool)
             srctool = bb.utils.which(path, tool, executable=True)
             # gcc/g++ may link to ccache on some hosts, e.g.,
             # /usr/local/bin/ccache/gcc -> /usr/bin/ccache, then which(gcc)
@@ -138,11 +141,6 @@ def setup_hosttools_dir(dest, toolsvar, d, fatal=True):
                 os.symlink(srctool, desttool)
             else:
                 notfound.append(tool)
-    # Force "python" -> "python2"
-    desttool = os.path.join(dest, "python")
-    if not os.path.exists(desttool):
-        srctool = "python2"
-        os.symlink(srctool, desttool)
 
     if notfound and fatal:
         bb.fatal("The following required tools (as specified by HOSTTOOLS) appear to be unavailable in PATH, please install them in order to proceed:\n  %s" % " ".join(notfound))
@@ -395,7 +393,7 @@ python () {
     # These take the form:
     #
     # PACKAGECONFIG ??= "<default options>"
-    # PACKAGECONFIG[foo] = "--enable-foo,--disable-foo,foo_depends,foo_runtime_depends,foo_runtime_recommends"
+    # PACKAGECONFIG[foo] = "--enable-foo,--disable-foo,foo_depends,foo_runtime_depends,foo_runtime_recommends,foo_conflict_packageconfig"
     pkgconfigflags = d.getVarFlags("PACKAGECONFIG") or {}
     if pkgconfigflags:
         pkgconfig = (d.getVar('PACKAGECONFIG') or "").split()
@@ -442,8 +440,8 @@ python () {
         for flag, flagval in sorted(pkgconfigflags.items()):
             items = flagval.split(",")
             num = len(items)
-            if num > 5:
-                bb.error("%s: PACKAGECONFIG[%s] Only enable,disable,depend,rdepend,rrecommend can be specified!"
+            if num > 6:
+                bb.error("%s: PACKAGECONFIG[%s] Only enable,disable,depend,rdepend,rrecommend,conflict_packageconfig can be specified!"
                     % (d.getVar('PN'), flag))
 
             if flag in pkgconfig:
@@ -457,6 +455,20 @@ python () {
                     extraconf.append(items[0])
             elif num >= 2 and items[1]:
                     extraconf.append(items[1])
+
+            if num >= 6 and items[5]:
+                conflicts = set(items[5].split())
+                invalid = conflicts.difference(set(pkgconfigflags.keys()))
+                if invalid:
+                    bb.error("%s: PACKAGECONFIG[%s] Invalid conflict package config%s '%s' specified."
+                        % (d.getVar('PN'), flag, 's' if len(invalid) > 1 else '', ' '.join(invalid)))
+
+                if flag in pkgconfig:
+                    intersec = conflicts.intersection(set(pkgconfig))
+                    if intersec:
+                        bb.fatal("%s: PACKAGECONFIG[%s] Conflict package config%s '%s' set in PACKAGECONFIG."
+                            % (d.getVar('PN'), flag, 's' if len(intersec) > 1 else '', ' '.join(intersec)))
+
         appendVar('DEPENDS', extradeps)
         appendVar('RDEPENDS_${PN}', extrardeps)
         appendVar('RRECOMMENDS_${PN}', extrarrecs)
@@ -498,7 +510,7 @@ python () {
         d.appendVarFlag('do_devshell', 'depends', ' virtual/fakeroot-native:do_populate_sysroot')
 
     need_machine = d.getVar('COMPATIBLE_MACHINE')
-    if need_machine:
+    if need_machine and not d.getVar('PARSE_ALL_RECIPES', False):
         import re
         compat_machines = (d.getVar('MACHINEOVERRIDES') or "").split(":")
         for m in compat_machines:
@@ -507,7 +519,7 @@ python () {
         else:
             raise bb.parse.SkipRecipe("incompatible with machine %s (not in COMPATIBLE_MACHINE)" % d.getVar('MACHINE'))
 
-    source_mirror_fetch = d.getVar('SOURCE_MIRROR_FETCH', False)
+    source_mirror_fetch = d.getVar('SOURCE_MIRROR_FETCH', False) or d.getVar('PARSE_ALL_RECIPES', False)
     if not source_mirror_fetch:
         need_host = d.getVar('COMPATIBLE_HOST')
         if need_host:
@@ -531,45 +543,46 @@ python () {
             bad_licenses = expand_wildcard_licenses(d, bad_licenses)
 
             whitelist = []
-            incompatwl = []
             for lic in bad_licenses:
                 spdx_license = return_spdx(d, lic)
                 whitelist.extend((d.getVar("WHITELIST_" + lic) or "").split())
                 if spdx_license:
                     whitelist.extend((d.getVar("WHITELIST_" + spdx_license) or "").split())
+
+            if pn in whitelist:
                 '''
                 We need to track what we are whitelisting and why. If pn is
                 incompatible we need to be able to note that the image that
                 is created may infact contain incompatible licenses despite
                 INCOMPATIBLE_LICENSE being set.
                 '''
-                incompatwl.extend((d.getVar("WHITELIST_" + lic) or "").split())
-                if spdx_license:
-                    incompatwl.extend((d.getVar("WHITELIST_" + spdx_license) or "").split())
-
-            if not pn in whitelist:
+                bb.note("Including %s as buildable despite it having an incompatible license because it has been whitelisted" % pn)
+            else:
                 pkgs = d.getVar('PACKAGES').split()
-                skipped_pkgs = []
+                skipped_pkgs = {}
                 unskipped_pkgs = []
                 for pkg in pkgs:
-                    if incompatible_license(d, bad_licenses, pkg):
-                        skipped_pkgs.append(pkg)
+                    incompatible_lic = incompatible_license(d, bad_licenses, pkg)
+                    if incompatible_lic:
+                        skipped_pkgs[pkg] = incompatible_lic
                     else:
                         unskipped_pkgs.append(pkg)
-                all_skipped = skipped_pkgs and not unskipped_pkgs
                 if unskipped_pkgs:
                     for pkg in skipped_pkgs:
-                        bb.debug(1, "SKIPPING the package " + pkg + " at do_rootfs because it's " + license)
+                        bb.debug(1, "Skipping the package %s at do_rootfs because of incompatible license(s): %s" % (pkg, ' '.join(skipped_pkgs[pkg])))
                         mlprefix = d.getVar('MLPREFIX')
-                        d.setVar('LICENSE_EXCLUSION-' + mlprefix + pkg, 1)
+                        d.setVar('LICENSE_EXCLUSION-' + mlprefix + pkg, ' '.join(skipped_pkgs[pkg]))
                     for pkg in unskipped_pkgs:
-                        bb.debug(1, "INCLUDING the package " + pkg)
-                elif all_skipped or incompatible_license(d, bad_licenses):
-                    bb.debug(1, "SKIPPING recipe %s because it's %s" % (pn, license))
-                    raise bb.parse.SkipRecipe("it has an incompatible license: %s" % license)
-            elif pn in whitelist:
-                if pn in incompatwl:
-                    bb.note("INCLUDING " + pn + " as buildable despite INCOMPATIBLE_LICENSE because it has been whitelisted")
+                        bb.debug(1, "Including the package %s" % pkg)
+                else:
+                    incompatible_lic = incompatible_license(d, bad_licenses)
+                    for pkg in skipped_pkgs:
+                        incompatible_lic += skipped_pkgs[pkg]
+                    incompatible_lic = sorted(list(set(incompatible_lic)))
+
+                    if incompatible_lic:
+                        bb.debug(1, "Skipping recipe %s because of incompatible license(s): %s" % (pn, ' '.join(incompatible_lic)))
+                        raise bb.parse.SkipRecipe("it has incompatible license(s): %s" % ' '.join(incompatible_lic))
 
         # Try to verify per-package (LICENSE_<pkg>) values. LICENSE should be a
         # superset of all per-package licenses. We do not do advanced (pattern)
@@ -606,6 +619,7 @@ python () {
         # Mercurial packages should DEPEND on mercurial-native
         elif scheme == "hg":
             needsrcrev = True
+            d.appendVar("EXTRANATIVEPATH", ' python3-native ')
             d.appendVarFlag('do_fetch', 'depends', ' mercurial-native:do_populate_sysroot')
 
         # Perforce packages support SRCREV = "${AUTOREV}"

@@ -8,6 +8,7 @@ REQUIRED_DISTRO_FEATURES = "systemd"
 SRC_URI = "https://pagure.io/dlm/archive/dlm-${PV}/dlm-dlm-${PV}.tar.gz \
            file://0001-dlm-fix-compile-error-since-xml2-config-should-not-b.patch \
            file://0001-Include-sys-sysmacros.h-for-major-minor-macros-in-gl.patch \
+           file://0001-make-Replace-cp-a-with-mode-preserving-options.patch \
            "
 
 SRC_URI[md5sum] = "4c57a941a15547859cd38fd55f66388e"
@@ -21,7 +22,7 @@ LIC_FILES_CHKSUM = "file://README.license;md5=8f0bbcdd678df1bce9863492b6c8832d"
 
 S = "${WORKDIR}/dlm-dlm-${PV}"
 
-DEPENDS = "corosync systemd"
+DEPENDS += "corosync"
 
 inherit pkgconfig systemd features_check
 
@@ -40,29 +41,20 @@ do_compile_prepend_toolchain-clang() {
     sed -i -e "s/-fstack-clash-protection//g" ${S}/*/Makefile
 }
 
-do_compile_prepend() {
+do_compile() {
     sed -i "s/libsystemd-daemon/libsystemd/g" ${S}/dlm_controld/Makefile
     sed -i -e "s/ ${DONTBUILD}//g" ${S}/Makefile
-}
-
-do_compile () {
     oe_runmake 'CC=${CC}'
-}
-
-do_install_append (){
-    install -d ${D}${sysconfdir}/sysconfig/
-    install -d ${D}${sysconfdir}/init.d/
-    install -m 0644 ${S}/init/dlm.sysconfig ${D}${sysconfdir}/sysconfig/dlm
-    install -m 0644 ${S}/init/dlm.init ${D}${sysconfdir}/init.d/dlm
-
-    # install systemd unit files
-    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
-        install -d ${D}${systemd_unitdir}/system
-        install -m 0644 ${S}/init/dlm.service ${D}${systemd_unitdir}/system
-    fi
 }
 
 do_install() {
     oe_runmake install DESTDIR=${D} LIBDIR=${libdir}
+    install -Dm 0644 ${S}/init/dlm.sysconfig ${D}${sysconfdir}/sysconfig/dlm
+    install -Dm 0644 ${S}/init/dlm.init ${D}${sysconfdir}/init.d/dlm
+
+    # install systemd unit files
+    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+        install -Dm 0644 ${S}/init/dlm.service ${D}${systemd_unitdir}/system/dlm.service
+    fi
 }
 

@@ -1,0 +1,18 @@
+syslog-ng: change shebang to use python3
+
+Correct shebang for python3.  This is far from the only python file with an out of date shebang,
+but it is the only one that winds up on a target.
+
+Upstream-Status: Pending
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+
+--- a/lib/merge-grammar.py
++++ b/lib/merge-grammar.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #############################################################################
+ # Copyright (c) 2010-2017 Balabit
+ #

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 #
 
+import os
 import unittest
 import pprint
 import datetime
@@ -18,7 +19,20 @@ class PtestRunnerTest(OERuntimeTestCase):
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     @OEHasPackage(['ptest-runner'])
     @unittest.expectedFailure
-    def test_ptestrunner(self):
+    def test_ptestrunner_expectfail(self):
+        if not self.td.get('PTEST_EXPECT_FAILURE'):
+            self.skipTest('Cannot run ptests with @expectedFailure as ptests are required to pass')
+        self.do_ptestrunner()
+
+    @skipIfNotFeature('ptest', 'Test requires ptest to be in DISTRO_FEATURES')
+    @OETestDepends(['ssh.SSHTest.test_ssh'])
+    @OEHasPackage(['ptest-runner'])
+    def test_ptestrunner_expectsuccess(self):
+        if self.td.get('PTEST_EXPECT_FAILURE'):
+            self.skipTest('Cannot run ptests without @expectedFailure as ptests are expected to fail')
+        self.do_ptestrunner()
+
+    def do_ptestrunner(self):
         status, output = self.target.run('which ptest-runner', 0)
         if status != 0:
             self.skipTest("No -ptest packages are installed in the image")
@@ -35,7 +49,11 @@ class PtestRunnerTest(OERuntimeTestCase):
         ptest_log_dir = '%s.%s' % (ptest_log_dir_link, timestamp)
         ptest_runner_log = os.path.join(ptest_log_dir, 'ptest-runner.log')
 
-        status, output = self.target.run('ptest-runner', 0)
+        libdir = self.td.get('libdir', '')
+        ptest_dirs = [ '/usr/lib' ]
+        if not libdir in ptest_dirs:
+            ptest_dirs.append(libdir)
+        status, output = self.target.run('ptest-runner -d \"{}\"'.format(' '.join(ptest_dirs)), 0)
         os.makedirs(ptest_log_dir)
         with open(ptest_runner_log, 'w') as f:
             f.write(output)
@@ -67,8 +85,13 @@ class PtestRunnerTest(OERuntimeTestCase):
                 extras[testname] = {'status': result}
 
         failed_tests = {}
+
+        for section in sections:
+            if 'exitcode' in sections[section].keys():
+                failed_tests[section] = sections[section]["log"]
+
         for section in results:
-            failed_testcases = [ "_".join(test.translate(trans).split()) for test in results[section] if results[section][test] == 'fail' ]
+            failed_testcases = [ "_".join(test.translate(trans).split()) for test in results[section] if results[section][test] == 'FAILED' ]
             if failed_testcases:
                 failed_tests[section] = failed_testcases
 

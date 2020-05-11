@@ -21,8 +21,10 @@ class GccSelfTestBase(OESelftestTestCase, OEPTestResultTestCase):
     def run_check(self, *suites, ssh = None):
         targets = set()
         for s in suites:
-            if s in ["gcc", "g++"]:
-                targets.add("check-gcc")
+            if s == "gcc":
+                targets.add("check-gcc-c")
+            elif s == "g++":
+                targets.add("check-gcc-c++")
             else:
                 targets.add("check-target-{}".format(s))
 
@@ -77,7 +79,12 @@ class GccSelfTestBase(OESelftestTestCase, OEPTestResultTestCase):
 @OETestTag("toolchain-user")
 class GccCrossSelfTest(GccSelfTestBase):
     def test_cross_gcc(self):
-        self.run_check("gcc", "g++")
+        self.run_check("gcc")
+
+@OETestTag("toolchain-user")
+class GxxCrossSelfTest(GccSelfTestBase):
+    def test_cross_gxx(self):
+        self.run_check("g++")
 
 @OETestTag("toolchain-user")
 class GccLibAtomicSelfTest(GccSelfTestBase):
@@ -109,7 +116,12 @@ class GccLibItmSelfTest(GccSelfTestBase):
 @OETestTag("toolchain-system")
 class GccCrossSelfTestSystemEmulated(GccSelfTestBase):
     def test_cross_gcc(self):
-        self.run_check_emulated("gcc", "g++")
+        self.run_check_emulated("gcc")
+
+@OETestTag("toolchain-system")
+class GxxCrossSelfTestSystemEmulated(GccSelfTestBase):
+    def test_cross_gxx(self):
+        self.run_check_emulated("g++")
 
 @OETestTag("toolchain-system")
 class GccLibAtomicSelfTestSystemEmulated(GccSelfTestBase):

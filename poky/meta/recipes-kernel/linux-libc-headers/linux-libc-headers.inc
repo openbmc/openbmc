@@ -91,4 +91,4 @@ RDEPENDS_${PN}-dev = ""
 RRECOMMENDS_${PN}-dbg = "${PN}-dev (= ${EXTENDPKGV})"
 
 INHIBIT_DEFAULT_DEPS = "1"
-DEPENDS += "unifdef-native bison-native"
+DEPENDS += "unifdef-native bison-native rsync-native"

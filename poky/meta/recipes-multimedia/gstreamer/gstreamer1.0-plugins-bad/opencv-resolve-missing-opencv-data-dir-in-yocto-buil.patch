@@ -1,0 +1,49 @@
+From f41caae14b618ab815ede3c408e7482b00316e3e Mon Sep 17 00:00:00 2001
+From: Andrey Zhizhikin <andrey.z@gmail.com>
+Date: Mon, 27 Jan 2020 10:22:35 +0000
+Subject: [PATCH] opencv: resolve missing opencv data dir in yocto build
+
+When Yocto build is performed, opencv searches for data dir using simple
+'test' command, this fails because pkg-config provides an absolute
+path on the target which needs to be prepended by PKG_CONFIG_SYSROOT_DIR
+in order for the 'test' utility to pick up the absolute path.
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Andrey Zhizhikin <andrey.z@gmail.com>
+---
+ ext/opencv/meson.build | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/ext/opencv/meson.build b/ext/opencv/meson.build
+index f38b55dfe..a26403482 100644
+--- a/ext/opencv/meson.build
++++ b/ext/opencv/meson.build
+@@ -78,20 +78,21 @@ else
+ endif
+ 
+ if opencv_found
++  pkgconf_sysroot = run_command(python3, '-c', 'import os; print(os.environ.get("PKG_CONFIG_SYSROOT_DIR"))').stdout().strip()
+   opencv_prefix = opencv_dep.get_pkgconfig_variable('prefix')
+   gstopencv_cargs += ['-DOPENCV_PREFIX="' + opencv_prefix + '"']
+ 
+   # Check the data dir used by opencv for its xml data files
+   # Use prefix from pkg-config to be compatible with cross-compilation
+-  r = run_command('test', '-d', opencv_prefix + '/share/opencv')
++  r = run_command('test', '-d', pkgconf_sysroot + opencv_prefix + '/share/opencv')
+   if r.returncode() == 0
+     gstopencv_cargs += '-DOPENCV_PATH_NAME="opencv"'
+   else
+-    r = run_command('test', '-d', opencv_prefix + '/share/OpenCV')
++    r = run_command('test', '-d', pkgconf_sysroot + opencv_prefix + '/share/OpenCV')
+     if r.returncode() == 0
+       gstopencv_cargs += '-DOPENCV_PATH_NAME="OpenCV"'
+     else
+-      r = run_command('test', '-d', opencv_prefix + '/share/opencv4')
++      r = run_command('test', '-d', pkgconf_sysroot + opencv_prefix + '/share/opencv4')
+       if r.returncode() == 0
+         gstopencv_cargs += '-DOPENCV_PATH_NAME="opencv4"'
+       else
+-- 
+2.17.1
+

@@ -1,0 +1,31 @@
+From 0230e2e374bb71aed0181ccd9ebd13c0c5125a5d Mon Sep 17 00:00:00 2001
+From: Trevor Woerner <twoerner@gmail.com>
+Date: Fri, 25 Oct 2019 17:01:20 -0400
+Subject: [PATCH] configure.ac: add library if header found
+
+If the pthread.h header is found, make sure library containing
+"pthread_atfork" is added to the list of libraries against which to link.
+On some hosts (e.g. openSUSE 15.1) "-lpthread" needs to be explicitly added
+in order for the code to compile correctly.
+
+Upstream-Status: Submitted [https://github.com/stevegrubb/libcap-ng/pull/10]
+Signed-off-by: Trevor Woerner <twoerner@gmail.com>
+---
+ configure.ac | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 63088f4..639b464 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -56,7 +56,9 @@ AC_CHECK_HEADERS(sys/xattr.h, [], [
+ 	AC_CHECK_HEADERS(attr/xattr.h, [], [AC_MSG_WARN(attr/xattr.h not found, disabling file system capabilities.)])
+ 	])
+ AC_CHECK_HEADERS(linux/securebits.h, [], [])
+-AC_CHECK_HEADERS(pthread.h, [], [AC_MSG_WARN(pthread.h not found, disabling pthread_atfork.)])
++AC_CHECK_HEADERS(pthread.h,
++	[AC_SEARCH_LIBS(pthread_atfork, pthread)],
++	[AC_MSG_WARN(pthread.h not found, disabling pthread_atfork.)])
+ 
+ AC_C_CONST
+ AC_C_INLINE

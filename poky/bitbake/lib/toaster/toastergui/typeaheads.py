@@ -10,7 +10,7 @@ import subprocess
 
 from toastergui.widgets import ToasterTypeAhead
 from orm.models import Project
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.cache import cache
 
 

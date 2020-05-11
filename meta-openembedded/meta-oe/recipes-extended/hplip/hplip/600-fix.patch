@@ -1,0 +1,10 @@
+--- a/configure.in
++++ b/configure.in
+@@ -254,7 +254,6 @@ if test "$class_driver" = "yes"; then
+    test `sh ./createPPD.sh -f` == 0
+ else
+    AC_MSG_RESULT(no)
+-   test `sh ./createPPD.sh -q` == 0
+ fi
+ AM_CONDITIONAL(HPLIP_CLASS_DRIVER, test x$class_driver = xyes)
+ 

@@ -1,4 +1,4 @@
-From c7914309aeee6209ddb6995c084805a911d9cc82 Mon Sep 17 00:00:00 2001
+From e8331a76983e839a3d193446ab8ae9c1b09daa07 Mon Sep 17 00:00:00 2001
 From: Jackie Huang <jackie.huang@windriver.com>
 Date: Wed, 10 Aug 2016 11:19:44 +0800
 Subject: [PATCH] Fix missing check for permission denied.
@@ -19,7 +19,7 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/lib/support/profile.c b/lib/support/profile.c
-index 9e96673b..32d83002 100644
+index 585ed595..810dd66b 100644
 --- a/lib/support/profile.c
 +++ b/lib/support/profile.c
 @@ -335,7 +335,7 @@ profile_init(const char * const *files, profile_t *ret_profile)
@@ -31,6 +31,3 @@ index 9e96673b..32d83002 100644
  			   strcmp(*fs, default_filename))
  			goto errout;
  
--- 
-2.16.1
-

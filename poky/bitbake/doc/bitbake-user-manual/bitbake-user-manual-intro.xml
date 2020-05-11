@@ -127,7 +127,7 @@
                     (e.g. Cygwin, the BSDs, and so forth).
                     </para></listitem>
                 <listitem><para>
-                    Be self contained, rather than tightly
+                    Be self-contained, rather than tightly
                     integrated into the build machine's root
                     filesystem.
                     </para></listitem>
@@ -221,6 +221,8 @@
                         them</para></listitem>
                     <listitem><para>How to configure and compile the
                         source code</para></listitem>
+                    <listitem><para>How to assemble the generated artifacts into
+                        one or more installable packages</para></listitem>
                     <listitem><para>Where on the target machine to install the
                         package or packages created</para></listitem>
                 </itemizedlist>
@@ -229,7 +231,7 @@
             <para>
                 Within the context of BitBake, or any project utilizing BitBake
                 as its build system, files with the <filename>.bb</filename>
-                extension are referred to as recipes.
+                extension are referred to as <firstterm>recipes</firstterm>.
                 <note>
                     The term "package" is also commonly used to describe recipes.
                     However, since the same word is used to describe packaged
@@ -252,9 +254,9 @@
                 various configuration variables that govern the project's build
                 process.
                 These files fall into several areas that define
-                machine configuration options, distribution configuration
-                options, compiler tuning options, general common
-                configuration options, and user configuration options.
+                machine configuration, distribution configuration,
+                possible compiler tuning, general common
+                configuration, and user configuration.
                 The main configuration file is the sample
                 <filename>bitbake.conf</filename> file, which is
                 located within the BitBake source tree
@@ -292,7 +294,7 @@
                 Layers allow you to isolate different types of
                 customizations from each other.
                 While you might find it tempting to keep everything in one layer
-                when working on a single project, the more modular you organize
+                when working on a single project, the more modular
                 your metadata, the easier it is to cope with future changes.
             </para>
 
@@ -300,8 +302,8 @@
                 To illustrate how you can use layers to keep things modular,
                 consider customizations you might make to support a specific target machine.
                 These types of customizations typically reside in a special layer,
-                rather than a general layer, called a Board Support Package (BSP)
-                Layer.
+                rather than a general layer, called a <firstterm>Board Support Package</firstterm> (BSP)
+                layer.
                 Furthermore, the machine customizations should be isolated from
                 recipes and metadata that support a new GUI environment, for
                 example.
@@ -448,7 +450,7 @@
                 <listitem><para><emphasis>Using the BitBake that Comes With Your
                     Build Checkout:</emphasis>
                     A final possibility for getting a copy of BitBake is that it
-                    already comes with your checkout of a larger Bitbake-based build
+                    already comes with your checkout of a larger BitBake-based build
                     system, such as Poky.
                     Rather than manually checking out individual layers and
                     gluing them together yourself, you can check
@@ -692,14 +694,9 @@
                 </para>
 
                 <para>
-                    When you generate a dependency graph, BitBake writes three files
+                    When you generate a dependency graph, BitBake writes two files
                     to the current working directory:
                     <itemizedlist>
-                        <listitem><para>
-                            <emphasis><filename>recipe-depends.dot</filename>:</emphasis>
-                            Shows dependencies between recipes (i.e. a collapsed version of
-                            <filename>task-depends.dot</filename>).
-                            </para></listitem>
                         <listitem><para>
                             <emphasis><filename>task-depends.dot</filename>:</emphasis>
                             Shows dependencies between tasks.

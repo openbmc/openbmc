@@ -13,6 +13,7 @@ inherit ptest
 SRC_URI += " \
             file://run-ptest \
             file://rt_bmark.py \
+            file://0001-gzip-with-n-for-build-reproducibilty.patch \
            "
 
 # rt-tests needs PI mutex support in libc

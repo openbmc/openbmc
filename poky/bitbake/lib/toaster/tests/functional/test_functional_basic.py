@@ -7,7 +7,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-import time
 import re
 from tests.functional.functional_helpers import SeleniumFunctionalTestCase
 from orm.models import Project

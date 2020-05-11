@@ -18,3 +18,5 @@ do_install_append () {
 		mv -v "${lib}" "$(echo ${lib} | sed s/-static//)"
 	done
 }
+
+BBCLASSEXTEND = "native"

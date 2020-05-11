@@ -1,0 +1,22 @@
+It is useless to create a link to $(PREFIX)/share/locale that there is no
+reference to $(PREFIX)/share/$(APPNAME)/locale in source code.
+
+Upstream-Status: Submitted [https://bugzilla.xfce.org/show_bug.cgi?id=16693]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ Makefile.in.in | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/Makefile.in.in b/Makefile.in.in
+index c0ce866..c2f26fe 100644
+--- a/Makefile.in.in
++++ b/Makefile.in.in
+@@ -61,7 +61,6 @@ install: all xfce4-panel-profiles.1.gz
+ 	install data/metainfo/*.xml $(DESTDIR)/$(PREFIX)/share/metainfo
+ 
+ 	cp -rf locale $(DESTDIR)/$(PREFIX)/share
+-	ln -sf $(PREFIX)/share/locale $(DESTDIR)/$(PREFIX)/share/$(APPNAME)/locale
+ 
+ 	install -d $(DESTDIR)/$(PREFIX)/share/man/man1
+ 	install xfce4-panel-profiles.1.gz $(DESTDIR)/$(PREFIX)/share/man/man1

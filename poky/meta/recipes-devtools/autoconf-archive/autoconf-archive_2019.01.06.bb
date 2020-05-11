@@ -9,7 +9,7 @@ SRC_URI = "${GNU_MIRROR}/${BPN}/${BPN}-${PV}.tar.xz"
 SRC_URI[md5sum] = "d46413c8b00a125b1529bae385bbec55"
 SRC_URI[sha256sum] = "17195c833098da79de5778ee90948f4c5d90ed1a0cf8391b4ab348e2ec511e3f"
 
-inherit autotools allarch
+inherit autotools allarch texinfo
 
 PACKAGES = "${PN} ${PN}-doc"
 

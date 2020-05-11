@@ -18,9 +18,7 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 
 pidfile_syslogd=/var/run/syslogd.pid
-pidfile_klogd=/var/run/klogd.pid
-binpath_syslogd=/sbin/syslogd
-binpath_klogd=/sbin/klogd
+binpath_syslogd=/usr/sbin/syslogd
 
 test -x $binpath || exit 0
 
@@ -112,27 +110,15 @@ case "$1" in
     create_xconsole
     start-stop-daemon --start --quiet --pidfile $pidfile_syslogd --name syslogd --startas $binpath_syslogd -- $SYSLOGD
     log_end_msg $?
-    log_begin_msg "Starting kernel log daemon..."
-    start-stop-daemon --start --quiet --pidfile $pidfile_klogd --name klogd --startas $binpath_klogd -- $KLOGD
-    log_end_msg $?
     ;;
   stop)
     log_begin_msg "Stopping system log daemon..."
     start-stop-daemon --stop --quiet --pidfile $pidfile_syslogd --name syslogd
     log_end_msg $?
-    log_begin_msg "Stopping kernel log daemon..."
-    start-stop-daemon --stop --quiet --retry 3 --exec $binpath_klogd --pidfile $pidfile_klogd
-    log_end_msg $?
     ;;
   reload|force-reload)
     log_begin_msg "Reloading system log daemon..."
     start-stop-daemon --stop --quiet --signal 1 --pidfile $pidfile_syslogd --name syslogd
-    log_end_msg $?
-    log_begin_msg "Reloading kernel log daemon..."
-    pid=`cat $pidfile_klogd 2> /dev/null`
-    start-stop-daemon --stop --quiet --retry 3 --exec $binpath_klogd --pidfile $pidfile_klogd
-    waitpid $pid
-    start-stop-daemon --start --quiet --pidfile $pidfile_klogd --name klogd --startas $binpath_klogd -- $KLOGD
     log_end_msg $?
     ;;
   restart)
@@ -141,12 +127,6 @@ case "$1" in
     start-stop-daemon --stop --retry 5 --quiet --pidfile $pidfile_syslogd --name syslogd
     waitpid $pid
     start-stop-daemon --start --quiet --pidfile $pidfile_syslogd --name syslogd --startas $binpath_syslogd -- $SYSLOGD
-    log_end_msg $?
-    log_begin_msg "Reloading kernel log daemon..."
-    pid=`cat $pidfile_klogd 2> /dev/null`
-    start-stop-daemon --stop --quiet --retry 3 --exec $binpath_klogd --pidfile $pidfile_klogd
-    waitpid $pid
-    start-stop-daemon --start --quiet --pidfile $pidfile_klogd --name klogd --startas $binpath_klogd -- $KLOGD
     log_end_msg $?
     ;;
   reload-or-restart)
@@ -160,8 +140,6 @@ case "$1" in
   status)
     status syslogd
     RETVAL=$?
-    status klogd
-    rval=$?
     [ $RETVAL -eq 0 ] && exit $rval
     exit $RETVAL
     ;;

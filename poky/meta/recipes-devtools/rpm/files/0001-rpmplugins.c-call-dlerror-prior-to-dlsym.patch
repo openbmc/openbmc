@@ -1,0 +1,29 @@
+From 6878a83f9bac015c64d83cee42530a20a264cc5a Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 7 Jan 2020 12:02:06 +0100
+Subject: [PATCH] rpmplugins.c: call dlerror() prior to dlsym()
+
+This is the recommended way in the manpage; if there is
+a lingering error from an unrelated dl*() call that was
+never obtained via dlerror(), it needs to be cleared
+prior to calling dlsym().
+
+Upstream-Status: Submitted [https://github.com/rpm-software-management/rpm/pull/998]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ lib/rpmplugins.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/lib/rpmplugins.c b/lib/rpmplugins.c
+index 65e684e84..b950f85cf 100644
+--- a/lib/rpmplugins.c
++++ b/lib/rpmplugins.c
+@@ -68,6 +68,8 @@ static rpmPlugin rpmPluginNew(const char *name, const char *path,
+ 
+     /* make sure the plugin has the supported hooks flag */
+     hooks_name = rstrscat(NULL, name, "_hooks", NULL);
++    /* clear out any old errors that weren't fetched */
++    dlerror();
+     hooks = dlsym(handle, hooks_name);
+     if ((error = dlerror()) != NULL) {
+ 	rpmlog(RPMLOG_ERR, _("Failed to resolve symbol %s: %s\n"),

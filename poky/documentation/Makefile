@@ -76,6 +76,11 @@
 # example publishes the 1.2 version of the PDF and HTML YP Development Tasks Manual
 # for the 'denzil' branch.
 #
+# IN MEMORIAM: This comment is to remember Scott Rifenbark (scottrif), whom we lost
+# in January, 2020. Scott was the primary technical writer for the Yocto Project for
+# over 9 years. In that time, he contributed many thousands of patches, built this
+# documentation tree, and enabled tens of thousands of developers to succeed with
+# embedded Linux. He ran this Makefile many thousands of times. Godspeed, Dude.
 
 ifeq ($(DOC),brief-yoctoprojectqs)
 XSLTOPTS = --stringparam html.stylesheet brief-yoctoprojectqs-style.css \
@@ -414,8 +419,8 @@ publish:
             echo " "; \
             echo "******** Publishing "$(DOC)".html"; \
             echo " "; \
-            scp -r $(MANUALS) $(STYLESHEET) docs.yp:/var/www/www.yoctoproject.org-docs/$(VER)/$(DOC); \
-            cd $(DOC); scp -r $(FIGURES) docs.yp:/var/www/www.yoctoproject.org-docs/$(VER)/$(DOC); \
+            scp -r $(MANUALS) $(STYLESHEET) www.yoctoproject.org:/var/www/www.yoctoproject.org-docs/$(VER)/$(DOC); \
+            cd $(DOC); scp -r $(FIGURES) www.yoctoproject.org:/var/www/www.yoctoproject.org-docs/$(VER)/$(DOC); \
 	else \
           echo " "; \
           echo $(DOC)".html missing.  Generate the file first then try again."; \

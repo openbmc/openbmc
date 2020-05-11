@@ -1,0 +1,27 @@
+From d034239f05cfba849f6ad16eb3f1ea37efbe4f95 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 19 Nov 2019 18:34:00 +0100
+Subject: [PATCH] intl: do not try to use gettext defines that no longer exist
+
+Newer version of gettext no longer define this in m4 files,
+so patch it out until e2fsprogs upstream sorts the situation.
+
+Upstream-Status: Inappropriate [hardcodes a choice]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ intl/Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/intl/Makefile.in b/intl/Makefile.in
+index e037e23c..89a876b8 100644
+--- a/intl/Makefile.in
++++ b/intl/Makefile.in
+@@ -175,7 +175,7 @@ libgnuintl.h.msvc-static libgnuintl.h.msvc-shared README.woe32 Makefile.msvc
+ DISTFILES.obsolete = xopen-msg.sed linux-msg.sed po2tbl.sed.in cat-compat.c \
+ COPYING.LIB-2 gettext.h libgettext.h plural-eval.c libgnuintl.h
+ 
+-all: all-@USE_INCLUDED_LIBINTL@
++all:
+ all-yes: libintl.$la libintl.h charset.alias ref-add.sed ref-del.sed
+ all-no: all-no-@BUILD_INCLUDED_LIBINTL@
+ all-no-yes: libgnuintl.$la

@@ -25,13 +25,11 @@ import ast
 import sys
 import codegen
 import logging
-import pickle
 import bb.pysh as pysh
-import os.path
 import bb.utils, bb.data
 import hashlib
 from itertools import chain
-from bb.pysh import pyshyacc, pyshlex, sherrors
+from bb.pysh import pyshyacc, pyshlex
 from bb.cache import MultiProcessCache
 
 logger = logging.getLogger('BitBake.CodeParser')
@@ -58,29 +56,9 @@ def check_indent(codestr):
 
     return codestr
 
-
-# Basically pickle, in python 2.7.3 at least, does badly with data duplication 
-# upon pickling and unpickling. Combine this with duplicate objects and things
-# are a mess.
-#
-# When the sets are originally created, python calls intern() on the set keys
-# which significantly improves memory usage. Sadly the pickle/unpickle process
-# doesn't call intern() on the keys and results in the same strings being duplicated
-# in memory. This also means pickle will save the same string multiple times in
-# the cache file.
-#
-# By having shell and python cacheline objects with setstate/getstate, we force
-# the object creation through our own routine where we can call intern (via internSet).
-#
-# We also use hashable frozensets and ensure we use references to these so that
-# duplicates can be removed, both in memory and in the resulting pickled data.
-#
-# By playing these games, the size of the cache file shrinks dramatically
-# meaning faster load times and the reloaded cache files also consume much less
-# memory. Smaller cache files, faster load times and lower memory usage is good.
-#
 # A custom getstate/setstate using tuples is actually worth 15% cachesize by
 # avoiding duplication of the attribute names!
+
 
 class SetCache(object):
     def __init__(self):

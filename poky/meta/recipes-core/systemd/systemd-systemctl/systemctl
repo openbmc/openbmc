@@ -172,7 +172,7 @@ class SystemdUnit():
     def _path_for_unit(self, unit):
         for location in locations:
             path = self.root / location / "system" / unit
-            if path.exists():
+            if path.exists() or path.is_symlink():
                 return path
 
         raise SystemdUnitNotFoundError(self.root, unit)

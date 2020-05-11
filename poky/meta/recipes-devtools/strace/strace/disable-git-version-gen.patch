@@ -1,4 +1,4 @@
-From 3bc47502ab011ea8d7c9cd724b25174ecd9506bc Mon Sep 17 00:00:00 2001
+From d87a7feb5ea75da7061afdd473faba044ec8eb0f Mon Sep 17 00:00:00 2001
 From: Andre McCurdy <armccurdy@gmail.com>
 Date: Mon, 18 Jan 2016 13:33:50 -0800
 Subject: [PATCH] strace: remove need for scripts
@@ -16,7 +16,7 @@ Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 949b058..4ba989c 100644
+index dd4f13f..65f000b 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -12,12 +12,12 @@

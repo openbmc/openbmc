@@ -44,10 +44,12 @@ SDE_DEPLOYDIR = "${WORKDIR}/deploy-source-date-epoch"
 SSTATETASKS += "do_deploy_source_date_epoch"
 
 do_deploy_source_date_epoch () {
-    echo "Deploying SDE to ${SDE_DIR}."
     mkdir -p ${SDE_DEPLOYDIR}
     if [ -e ${SDE_FILE} ]; then
+        echo "Deploying SDE from ${SDE_FILE} -> ${SDE_DEPLOYDIR}."
         cp -p ${SDE_FILE} ${SDE_DEPLOYDIR}/__source_date_epoch.txt
+    else
+        echo "${SDE_FILE} not found!"
     fi
 }
 
@@ -56,7 +58,11 @@ python do_deploy_source_date_epoch_setscene () {
     bb.utils.mkdirhier(d.getVar('SDE_DIR'))
     sde_file = os.path.join(d.getVar('SDE_DEPLOYDIR'), '__source_date_epoch.txt')
     if os.path.exists(sde_file):
-        os.rename(sde_file, d.getVar('SDE_FILE'))
+        target = d.getVar('SDE_FILE')
+        bb.debug(1, "Moving setscene SDE file %s -> %s" % (sde_file, target))
+        os.rename(sde_file, target)
+    else:
+        bb.debug(1, "%s not found!" % sde_file)
 }
 
 do_deploy_source_date_epoch[dirs] = "${SDE_DEPLOYDIR}"
@@ -144,11 +150,12 @@ def fixed_source_date_epoch():
     bb.debug(1, "No tarball or git repo found to determine SOURCE_DATE_EPOCH")
     return 0
 
-python do_create_source_date_epoch_stamp() {
+python create_source_date_epoch_stamp() {
     epochfile = d.getVar('SDE_FILE')
+    # If it exists we need to regenerate as the sources may have changed
     if os.path.isfile(epochfile):
-        bb.debug(1, "Reusing SOURCE_DATE_EPOCH from: %s" % epochfile)
-        return
+        bb.debug(1, "Deleting existing SOURCE_DATE_EPOCH from: %s" % epochfile)
+        os.remove(epochfile)
 
     sourcedir = d.getVar('S')
     source_date_epoch = (
@@ -164,16 +171,32 @@ python do_create_source_date_epoch_stamp() {
         f.write(str(source_date_epoch))
 }
 
+def get_source_date_epoch_value(d):
+    cached = d.getVar('__CACHED_SOURCE_DATE_EPOCH')
+    if cached:
+        return cached
+
+    epochfile = d.getVar('SDE_FILE')
+    source_date_epoch = 0
+    if os.path.isfile(epochfile):
+        with open(epochfile, 'r') as f:
+            s = f.read()
+            try:
+                source_date_epoch = int(s)
+            except ValueError:
+                bb.warn("SOURCE_DATE_EPOCH value '%s' is invalid. Reverting to 0" % s)
+                source_date_epoch = 0
+        bb.debug(1, "SOURCE_DATE_EPOCH: %d" % source_date_epoch)
+    else:
+        bb.debug(1, "Cannot find %s. SOURCE_DATE_EPOCH will default to %d" % (epochfile, source_date_epoch))
+
+    d.setVar('__CACHED_SOURCE_DATE_EPOCH', str(source_date_epoch))
+    return str(source_date_epoch)
+
+export SOURCE_DATE_EPOCH ?= "${@get_source_date_epoch_value(d)}"
 BB_HASHBASE_WHITELIST += "SOURCE_DATE_EPOCH"
 
 python () {
     if d.getVar('BUILD_REPRODUCIBLE_BINARIES') == '1':
-        d.appendVarFlag("do_unpack", "postfuncs", " do_create_source_date_epoch_stamp")
-        epochfile = d.getVar('SDE_FILE')
-        source_date_epoch = "0"
-        if os.path.isfile(epochfile):
-            with open(epochfile, 'r') as f:
-                source_date_epoch = f.read()
-            bb.debug(1, "SOURCE_DATE_EPOCH: %s" % source_date_epoch)
-        d.setVar('SOURCE_DATE_EPOCH', source_date_epoch)
+        d.appendVarFlag("do_unpack", "postfuncs", " create_source_date_epoch_stamp")
 }

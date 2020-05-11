@@ -4,14 +4,11 @@
 #
 
 import unittest
-import tempfile
 import os
-import bb
 
 import layerindexlib
 from layerindexlib.tests.common import LayersTest
 
-import logging
 
 def skipIfNoNetwork():
     if os.environ.get("BB_SKIP_NETTESTS") == "yes":

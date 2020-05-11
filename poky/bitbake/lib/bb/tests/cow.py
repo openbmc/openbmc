@@ -7,7 +7,7 @@
 #
 
 import unittest
-import os
+
 
 class COWTestCase(unittest.TestCase):
     """

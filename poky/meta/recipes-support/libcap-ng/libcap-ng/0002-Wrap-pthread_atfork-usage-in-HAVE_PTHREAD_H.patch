@@ -1,0 +1,25 @@
+From d95c4018ad57c37f6272dbedfa5217776567c329 Mon Sep 17 00:00:00 2001
+From: Christopher Larson <chris_larson@mentor.com>
+Date: Tue, 26 Nov 2019 22:34:34 +0500
+Subject: [PATCH] Wrap pthread_atfork usage in HAVE_PTHREAD_H
+
+Upstream-Status: Pending
+Signed-off-by: Christopher Larson <chris_larson@mentor.com>
+---
+ src/cap-ng.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/cap-ng.c b/src/cap-ng.c
+index 35fcd7a..97a3dbd 100644
+--- a/src/cap-ng.c
++++ b/src/cap-ng.c
+@@ -166,7 +166,9 @@ static void deinit(void)
+ static void init_lib(void) __attribute__ ((constructor));
+ static void init_lib(void)
+ {
++#ifdef HAVE_PTHREAD_H
+ 	pthread_atfork(NULL, NULL, deinit);
++#endif
+ }
+ 
+ static void init(void)

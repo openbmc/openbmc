@@ -11,7 +11,6 @@ BitBake 'Fetch' implementation for perforce
 # Based on functions from the base bb module, Copyright 2003 Holger Schurig
 
 import os
-import logging
 import bb
 from   bb.fetch2 import FetchMethod
 from   bb.fetch2 import FetchError
@@ -105,7 +104,7 @@ class Perforce(FetchMethod):
         if command == 'changes':
             p4cmd = '%s%s changes -m 1 //%s' % (ud.basecmd, p4opt, pathnrev)
         elif command == 'print':
-            if depot_filename != None:
+            if depot_filename is not None:
                 p4cmd = '%s%s print -o "p4/%s" "%s"' % (ud.basecmd, p4opt, filename, depot_filename)
             else:
                 raise FetchError('No depot file name provided to p4 %s' % command, ud.url)

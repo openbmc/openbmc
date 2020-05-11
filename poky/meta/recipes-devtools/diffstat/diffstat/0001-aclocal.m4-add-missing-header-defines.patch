@@ -1,0 +1,24 @@
+From 004bd80d2523f538467b5ada2623eb207b55dad7 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 20 Dec 2019 15:44:28 +0100
+Subject: [PATCH] aclocal.m4: add missing header defines
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ aclocal.m4 | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/aclocal.m4 b/aclocal.m4
+index 3b19e82..c0c4acb 100644
+--- a/aclocal.m4
++++ b/aclocal.m4
+@@ -1927,3 +1927,8 @@ make an error
+ fi
+ fi # cf_cv_posix_visible
+ ])
++
++AC_DEFINE([HAVE_TCGETATTR], [], [Description])
++AC_DEFINE([HAVE_TCSETATTR], [], [Description])
++AC_DEFINE([HAVE_TERMIOS_H], [], [Description])
++

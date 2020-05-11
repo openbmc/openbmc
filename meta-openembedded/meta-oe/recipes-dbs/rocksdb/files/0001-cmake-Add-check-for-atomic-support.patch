@@ -1,0 +1,115 @@
+From ba0a0e54d9544babbd3963891f4e3200dd5583f5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 18 Mar 2020 15:10:37 -0700
+Subject: [PATCH] cmake: Add check for atomic support
+
+Detect if libatomic should be linked in or compiler and platform can
+provide the needed atomic instrinsics, this helps build on certain
+platforms like mips or clang/i386
+
+Fixes
+
+| /mnt/b/yoe/build/tmp/work/mips32r2-yoe-linux/rocksdb/6.6.4-r0/recipe-sysroot-native/usr/bin/mips-yoe-linux/mips-yoe-linux-ld: librocksdb.so.6.6.4: undefined reference to `__atomic_exchange_8'
+| /mnt/b/yoe/build/tmp/work/mips32r2-yoe-linux/rocksdb/6.6.4-r0/recipe-sysroot-native/usr/bin/mips-yoe-linux/mips-yoe-linux-ld: librocksdb.so.6.6.4: undefined reference to `__atomic_fetch_or_8'
+| /mnt/b/yoe/build/tmp/work/mips32r2-yoe-linux/rocksdb/6.6.4-r0/recipe-sysroot-native/usr/bin/mips-yoe-linux/mips-yoe-linux-ld: librocksdb.so.6.6.4: undefined reference to `__atomic_compare_exchange_8'
+| /mnt/b/yoe/build/tmp/work/mips32r2-yoe-linux/rocksdb/6.6.4-r0/recipe-sysroot-native/usr/bin/mips-yoe-linux/mips-yoe-linux-ld: librocksdb.so.6.6.4: undefined reference to `__atomic_fetch_sub_8'
+| /mnt/b/yoe/build/tmp/work/mips32r2-yoe-linux/rocksdb/6.6.4-r0/recipe-sysroot-native/usr/bin/mips-yoe-linux/mips-yoe-linux-ld: librocksdb.so.6.6.4: undefined reference to `__atomic_load_8'
+| /mnt/b/yoe/build/tmp/work/mips32r2-yoe-linux/rocksdb/6.6.4-r0/recipe-sysroot-native/usr/bin/mips-yoe-linux/mips-yoe-linux-ld: librocksdb.so.6.6.4: undefined reference to `__atomic_store_8'
+| /mnt/b/yoe/build/tmp/work/mips32r2-yoe-linux/rocksdb/6.6.4-r0/recipe-sysroot-native/usr/bin/mips-yoe-linux/mips-yoe-linux-ld: librocksdb.so.6.6.4: undefined reference to `__atomic_fetch_add_8'
+
+Upstream-Status: Submitted [https://github.com/facebook/rocksdb/pull/6555]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt                  |  6 +++
+ cmake/modules/CheckAtomic.cmake | 69 +++++++++++++++++++++++++++++++++
+ 2 files changed, 75 insertions(+)
+ create mode 100644 cmake/modules/CheckAtomic.cmake
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -780,7 +780,13 @@ if(WIN32)
+   set(SYSTEM_LIBS ${SYSTEM_LIBS} shlwapi.lib rpcrt4.lib)
+   set(LIBS ${ROCKSDB_STATIC_LIB} ${THIRDPARTY_LIBS} ${SYSTEM_LIBS})
+ else()
++  # check if linking against libatomic is necessary
++  include(CheckAtomic)
++
+   set(SYSTEM_LIBS ${CMAKE_THREAD_LIBS_INIT})
++  if(HAVE_CXX_ATOMIC_WITH_LIB OR HAVE_CXX_ATOMICS64_WITH_LIB)
++    set(SYSTEM_LIBS ${SYSTEM_LIBS} atomic)
++  endif()
+   set(LIBS ${ROCKSDB_SHARED_LIB} ${THIRDPARTY_LIBS} ${SYSTEM_LIBS})
+ 
+   add_library(${ROCKSDB_SHARED_LIB} SHARED ${SOURCES})
+--- /dev/null
++++ b/cmake/modules/CheckAtomic.cmake
+@@ -0,0 +1,69 @@
++# Checks if atomic operations are supported natively or if linking against
++# libatomic is needed.
++
++# Check inspired by LLVMs cmake/modules/CheckAtomic.cmake
++
++INCLUDE(CheckCXXSourceCompiles)
++INCLUDE(CheckLibraryExists)
++
++function(check_working_cxx_atomics varname)
++  set(OLD_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
++  set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} -std=c++11")
++  CHECK_CXX_SOURCE_COMPILES("
++#include <atomic>
++std::atomic<int> x;
++int main() {
++  return x;
++}
++" ${varname})
++  set(CMAKE_REQUIRED_FLAGS ${OLD_CMAKE_REQUIRED_FLAGS})
++endfunction(check_working_cxx_atomics)
++
++function(check_working_cxx_atomics64 varname)
++  set(OLD_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
++  set(CMAKE_REQUIRED_FLAGS "-std=c++11 ${CMAKE_REQUIRED_FLAGS}")
++  CHECK_CXX_SOURCE_COMPILES("
++#include <atomic>
++#include <cstdint>
++std::atomic<uint64_t> x (0);
++std::atomic<double> y (0);
++int main() {
++  uint64_t i = x.load(std::memory_order_relaxed);
++  return int(y);
++}
++" ${varname})
++  set(CMAKE_REQUIRED_FLAGS ${OLD_CMAKE_REQUIRED_FLAGS})
++endfunction(check_working_cxx_atomics64)
++
++# Check if atomics work without libatomic
++check_working_cxx_atomics(HAVE_CXX_ATOMICS_WITHOUT_LIB)
++
++if(NOT HAVE_CXX_ATOMICS_WITHOUT_LIB)
++  check_library_exists(atomic __atomic_fetch_add_4 "" HAVE_LIBATOMIC)
++  if( HAVE_LIBATOMIC )
++    list(APPEND CMAKE_REQUIRED_LIBRARIES "atomic")
++    check_working_cxx_atomics(HAVE_CXX_ATOMICS_WITH_LIB)
++    if (NOT HAVE_CXX_ATOMICS_WITH_LIB)
++      message(FATAL_ERROR "Host compiler must support std::atomic!")
++    endif()
++  else()
++    message(FATAL_ERROR "Host compiler appears to require libatomic, but cannot find it.")
++  endif()
++endif()
++
++# Check if 64bit atomics work without libatomic
++check_working_cxx_atomics64(HAVE_CXX_ATOMICS64_WITHOUT_LIB)
++
++if(NOT HAVE_CXX_ATOMICS64_WITHOUT_LIB)
++  check_library_exists(atomic __atomic_load_8 "" HAVE_CXX_LIBATOMICS64)
++  if(HAVE_CXX_LIBATOMICS64)
++    list(APPEND CMAKE_REQUIRED_LIBRARIES "atomic")
++    check_working_cxx_atomics64(HAVE_CXX_ATOMICS64_WITH_LIB)
++    if (NOT HAVE_CXX_ATOMICS64_WITH_LIB)
++      message(FATAL_ERROR "Host compiler must support std::atomic!")
++    endif()
++  else()
++    message(FATAL_ERROR "Host compiler appears to require libatomic, but cannot find it.")
++  endif()
++endif()
++

@@ -1,4 +1,4 @@
-From 8efad9105b38985bea373416ae8fcacf21d1d129 Mon Sep 17 00:00:00 2001
+From ffb811e18d7046d5bbe54ede5b1b7e14eaac0146 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Wed, 21 Aug 2019 15:44:18 +0800
 Subject: [PATCH] hppa backend
@@ -6,15 +6,16 @@ Subject: [PATCH] hppa backend
 Rebase to 0.177
 Upstream-Status: Pending [from debian]
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
 ---
  backends/Makefile.am      |   7 +-
  backends/libebl_parisc.h  |   9 ++
- backends/parisc_init.c    |  73 ++++++++++++++++
- backends/parisc_regs.c    | 159 ++++++++++++++++++++++++++++++++++
- backends/parisc_reloc.def | 128 ++++++++++++++++++++++++++++
- backends/parisc_retval.c  | 213 ++++++++++++++++++++++++++++++++++++++++++++++
- backends/parisc_symbol.c  | 113 ++++++++++++++++++++++++
- libelf/elf.h              |  11 +++
+ backends/parisc_init.c    |  73 +++++++++++++
+ backends/parisc_regs.c    | 159 ++++++++++++++++++++++++++++
+ backends/parisc_reloc.def | 128 +++++++++++++++++++++++
+ backends/parisc_retval.c  | 213 ++++++++++++++++++++++++++++++++++++++
+ backends/parisc_symbol.c  | 113 ++++++++++++++++++++
+ libelf/elf.h              |  11 ++
  8 files changed, 711 insertions(+), 2 deletions(-)
  create mode 100644 backends/libebl_parisc.h
  create mode 100644 backends/parisc_init.c
@@ -24,31 +25,30 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  create mode 100644 backends/parisc_symbol.c
 
 diff --git a/backends/Makefile.am b/backends/Makefile.am
-index 175468f..91a38e2 100644
+index f405212..4755f61 100644
 --- a/backends/Makefile.am
 +++ b/backends/Makefile.am
-@@ -33,16 +33,19 @@ AM_CPPFLAGS += -I$(top_srcdir)/libebl -I$(top_srcdir)/libasm \
- 
+@@ -37,7 +37,9 @@ AM_CPPFLAGS += -I$(top_srcdir)/libebl -I$(top_srcdir)/libasm \
+ noinst_LIBRARIES = libebl_backends.a libebl_backends_pic.a
  
  modules = i386 sh x86_64 ia64 alpha arm aarch64 sparc ppc ppc64 s390 \
 -	  tilegx m68k bpf riscv csky
 +	  tilegx m68k bpf riscv csky parisc
- libebl_pic = libebl_i386_pic.a libebl_sh_pic.a libebl_x86_64_pic.a    \
- 	     libebl_ia64_pic.a libebl_alpha_pic.a libebl_arm_pic.a    \
- 	     libebl_aarch64_pic.a libebl_sparc_pic.a libebl_ppc_pic.a \
- 	     libebl_ppc64_pic.a libebl_s390_pic.a libebl_tilegx_pic.a \
- 	     libebl_m68k_pic.a libebl_bpf_pic.a libebl_riscv_pic.a    \
--	     libebl_csky_pic.a
-+	     libebl_csky_pic.a libebl_parisc_pic.a
- noinst_LIBRARIES = $(libebl_pic)
- noinst_DATA = $(libebl_pic:_pic.a=.so)
- 
++
 +parisc_SRCS = parisc_init.c parisc_symbol.c parisc_regs.c parisc_retval.c
-+libebl_parisc_pic_a_SOURCES = $(parisc_SRCS)
-+am_libebl_parisc_pic_a_OBJECTS = $(parisc_SRCS:.c=.os)
  
- libelf = ../libelf/libelf.so
- libdw = ../libdw/libdw.so
+ i386_SRCS = i386_init.c i386_symbol.c i386_corenote.c i386_cfi.c \
+ 	    i386_retval.c i386_regs.c i386_auxv.c i386_syscall.c \
+@@ -102,7 +104,8 @@ libebl_backends_a_SOURCES = $(i386_SRCS) $(sh_SRCS) $(x86_64_SRCS) \
+ 			    $(ia64_SRCS) $(alpha_SRCS) $(arm_SRCS) \
+ 			    $(aarch64_SRCS) $(sparc_SRCS) $(ppc_SRCS) \
+ 			    $(ppc64_SRCS) $(s390_SRCS) $(tilegx_SRCS) \
+-			    $(m68k_SRCS) $(bpf_SRCS) $(riscv_SRCS) $(csky_SRCS)
++			    $(m68k_SRCS) $(bpf_SRCS) $(riscv_SRCS) $(csky_SRCS) \
++                            $(parisc_SRCS)
+ 
+ libebl_backends_pic_a_SOURCES =
+ am_libebl_backends_pic_a_OBJECTS = $(libebl_backends_a_SOURCES:.c=.os)
 diff --git a/backends/libebl_parisc.h b/backends/libebl_parisc.h
 new file mode 100644
 index 0000000..f473b79
@@ -826,6 +826,3 @@ index 01648bd..218ceb2 100644
  #define R_PARISC_SEGREL64	112	/* 64 bits segment rel. address.  */
  #define R_PARISC_PLTOFF14WR	115	/* PLT-rel. address, right 14 bits.  */
  #define R_PARISC_PLTOFF14DR	116	/* PLT-rel. address, right 14 bits.  */
--- 
-2.7.4
-

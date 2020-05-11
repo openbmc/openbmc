@@ -12,6 +12,8 @@ SRCREV = "c858aff8c31fa63ef4d1e0176c10e5928cde9a23"
 SRC_URI = "git://github.com/OSSystems/inih.git \
           "
 
+UPSTREAM_CHECK_COMMITS = "1"
+
 S = "${WORKDIR}/git"
 
 inherit gitpkgv cmake

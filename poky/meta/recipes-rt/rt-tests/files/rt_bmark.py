@@ -166,12 +166,12 @@ def start_stress(*args):
         log("  Command: '", stress_cmd_str, "'")
         log()
 
-        # preexec_fn=os.setsid causes stress to be executed in a separate
+        # start_new_session causes stress to be executed in a separate
         # session, => it gets a new process group (incl. children). It
         # can then be terminated using os.killpg in end_stress without
         # terminating this script.
 
-        p = subprocess.Popen(stress_cmd, preexec_fn=os.setsid)
+        p = subprocess.Popen(stress_cmd, start_new_session=True)
 
         return p
 

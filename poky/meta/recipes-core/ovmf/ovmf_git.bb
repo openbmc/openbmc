@@ -13,14 +13,14 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[secureboot] = ",,,"
 
 SRC_URI = "gitsm://github.com/tianocore/edk2.git;branch=master;protocol=git \
-	file://0002-ovmf-update-path-to-native-BaseTools.patch \
-	file://0003-BaseTools-makefile-adjust-to-build-in-under-bitbake.patch \
-	file://0004-ovmf-enable-long-path-file.patch \
-	file://no-stack-protector-all-archs.patch \
+           file://0001-ovmf-update-path-to-native-BaseTools.patch \
+           file://0002-BaseTools-makefile-adjust-to-build-in-under-bitbake.patch \
+           file://0003-ovmf-enable-long-path-file.patch \
+           file://0004-ovmf-Update-to-latest.patch \
         "
 
-PV = "edk2-stable201905"
-SRCREV="20d2e5a125e34fc8501026613a71549b2a1a3e54"
+PV = "edk2-stable201911"
+SRCREV = "bd85bf54c268204c7a698a96f3ccd96cd77952cd"
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>edk2-stable.*)"
 
 inherit deploy

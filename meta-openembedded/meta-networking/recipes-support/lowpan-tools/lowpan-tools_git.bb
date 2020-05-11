@@ -21,7 +21,7 @@ SRCREV = "1c2d8674cc6f4b1166a066e8822e295c105ae7a2"
 
 S = "${WORKDIR}/git"
 
-inherit autotools python-dir pkgconfig
+inherit autotools python3-dir pkgconfig
 
 CACHED_CONFIGUREVARS += "am_cv_python_pythondir=${PYTHON_SITEPACKAGES_DIR}/lowpan-tools"
 

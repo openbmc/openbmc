@@ -21,6 +21,7 @@ COMPATIBLE_HOST = "(i.86|x86_64|powerpc|powerpc64).*-linux*"
 inherit autotools-brokensep
 
 PLAT_powerpc64 = "ppc64"
+PLAT_powerpc64le = "ppc64"
 PLAT ?= "${HOST_ARCH}"
 
 do_configure () {

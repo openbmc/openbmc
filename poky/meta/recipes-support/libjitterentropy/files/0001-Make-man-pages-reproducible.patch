@@ -1,0 +1,30 @@
+From ce091718716400119d6be6bd637c0e3f4f6ca315 Mon Sep 17 00:00:00 2001
+From: Joshua Watt <JPEWhacker@gmail.com>
+Date: Thu, 21 Nov 2019 08:07:41 -0600
+Subject: [PATCH] Make man pages reproducible
+
+Instructs the man page to be gzip'ed without the file name or timestamp
+so that it builds reproducibly.
+
+Upstream-Status: Accepted [https://github.com/smuellerDD/jitterentropy-library/pull/14]
+Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 2e78607..860b720 100644
+--- a/Makefile
++++ b/Makefile
+@@ -60,7 +60,7 @@ cppcheck:
+ install:
+ 	install -d -m 0755 $(DESTDIR)$(PREFIX)/share/man/man3
+ 	install -m 644 doc/$(NAME).3 $(DESTDIR)$(PREFIX)/share/man/man3/
+-	gzip -f -9 $(DESTDIR)$(PREFIX)/share/man/man3/$(NAME).3
++	gzip -n -f -9 $(DESTDIR)$(PREFIX)/share/man/man3/$(NAME).3
+ 	install -d -m 0755 $(DESTDIR)$(PREFIX)/$(LIBDIR)
+ 	$(INSTALL_STRIP) -m 0755 lib$(NAME).so.$(LIBVERSION) $(DESTDIR)$(PREFIX)/$(LIBDIR)/
+ 	install -d -m 0755 $(DESTDIR)$(PREFIX)/$(INCDIR)
+-- 
+2.23.0
+

@@ -19,7 +19,7 @@ index 4a84501..52dbb8e 100644
 +++ b/configure.ac
 @@ -3,7 +3,6 @@ AC_PREREQ(2.53)
  
- AC_INIT([adwaita-icon-theme], [3.34.0],
+ AC_INIT([adwaita-icon-theme], [3.34.3],
          [http://bugzilla.gnome.org/enter_bug.cgi?product=adwaita-icon-theme])
 -AC_CANONICAL_HOST
  AC_CONFIG_MACRO_DIR([m4])

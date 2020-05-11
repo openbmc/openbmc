@@ -1,0 +1,28 @@
+From c1f1527eb30d4a5feebf9a0757582bbf7fe3eae9 Mon Sep 17 00:00:00 2001
+From: Andrea Stevanato <andrea.stevanato.95@hotmail.it>
+Date: Tue, 5 Nov 2019 19:08:30 +0000
+Subject: [PATCH] ninfod: fix systemd Documentation url error
+
+systemd[1]: /usr/lib/systemd/system/ninfod.service:3: Invalid URL, ignoring: ninfod(8)
+
+Upstream-Status: Backport [https://github.com/iputils/iputils/commit/c1f1527eb30d4a5feebf9a0757582bbf7fe3eae9]
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+---
+ systemd/ninfod.service.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/systemd/ninfod.service.in b/systemd/ninfod.service.in
+index 5ab69ca00e96..8e79fcd9238e 100644
+--- a/systemd/ninfod.service.in
++++ b/systemd/ninfod.service.in
+@@ -1,6 +1,6 @@
+ [Unit]
+ Description=Respond to IPv6 Node Information Queries
+-Documentation=ninfod(8)
++Documentation=man:ninfod(8)
+ Requires=network.target
+ After=network.target
+ 
+-- 
+2.17.1
+

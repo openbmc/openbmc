@@ -1,0 +1,74 @@
+From 04e28fdda03b545a0f7b446a784ec2fa7249cbb8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 29 Apr 2020 15:37:40 -0700
+Subject: [PATCH] Fix build on riscv32
+
+Define __NR_mmap in terms of __NR_mmap2 and __NR_futex interms of
+__NR_futex_time64 for rv32, since there calls dont exist for rv32
+
+Also recognise rv32 as a new 32bit platform
+
+Upstream-Status: Submitted [https://github.com/abseil/abseil-cpp/pull/675]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ absl/base/internal/direct_mmap.h        | 5 +++++
+ absl/base/internal/spinlock_linux.inc   | 4 ++++
+ absl/synchronization/internal/waiter.cc | 4 ++++
+ 3 files changed, 13 insertions(+)
+
+diff --git a/absl/base/internal/direct_mmap.h b/absl/base/internal/direct_mmap.h
+index 5618867..90cfeca 100644
+--- a/absl/base/internal/direct_mmap.h
++++ b/absl/base/internal/direct_mmap.h
+@@ -26,6 +26,10 @@
+ 
+ #ifdef __linux__
+ 
++#if !defined(__NR_mmap) && defined(__riscv) && __riscv_xlen == 32
++# define __NR_mmap __NR_mmap2
++#endif
++
+ #include <sys/types.h>
+ #ifdef __BIONIC__
+ #include <sys/syscall.h>
+@@ -72,6 +76,7 @@ inline void* DirectMmap(void* start, size_t length, int prot, int flags, int fd,
+ #if defined(__i386__) || defined(__ARM_ARCH_3__) || defined(__ARM_EABI__) || \
+     (defined(__mips__) && _MIPS_SIM == _MIPS_SIM_ABI32) ||                   \
+     (defined(__PPC__) && !defined(__PPC64__)) ||                             \
++    (defined(__riscv) && __riscv_xlen == 32)  ||                             \
+     (defined(__s390__) && !defined(__s390x__))
+   // On these architectures, implement mmap with mmap2.
+   static int pagesize = 0;
+diff --git a/absl/base/internal/spinlock_linux.inc b/absl/base/internal/spinlock_linux.inc
+index 323edd6..3dca444 100644
+--- a/absl/base/internal/spinlock_linux.inc
++++ b/absl/base/internal/spinlock_linux.inc
+@@ -14,6 +14,10 @@
+ //
+ // This file is a Linux-specific part of spinlock_wait.cc
+ 
++#if !defined(__NR_futex) && defined(__riscv) && __riscv_xlen == 32
++# define __NR_futex __NR_futex_time64
++#endif
++
+ #include <linux/futex.h>
+ #include <sys/syscall.h>
+ #include <unistd.h>
+diff --git a/absl/synchronization/internal/waiter.cc b/absl/synchronization/internal/waiter.cc
+index 2949f5a..7411042 100644
+--- a/absl/synchronization/internal/waiter.cc
++++ b/absl/synchronization/internal/waiter.cc
+@@ -24,6 +24,10 @@
+ #include <unistd.h>
+ #endif
+ 
++#if !defined(__NR_futex) && defined(__riscv) && __riscv_xlen == 32
++# define __NR_futex __NR_futex_time64
++#endif
++
+ #ifdef __linux__
+ #include <linux/futex.h>
+ #include <sys/syscall.h>
+-- 
+2.26.2
+

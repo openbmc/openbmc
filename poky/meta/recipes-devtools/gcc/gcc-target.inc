@@ -15,10 +15,11 @@ EXTRA_OECONF_append_linuxstdbase = " --enable-clocale=gnu"
 
 ARMFPARCHEXT ?= ""
 
-EXTRA_OECONF_append_armv6 = " --with-arch=armv6${ARMFPARCHEXT}"
-EXTRA_OECONF_append_armv7a = " --with-arch=armv7-a${ARMFPARCHEXT}"
-EXTRA_OECONF_append_armv7ve = " --with-arch=armv7ve${ARMFPARCHEXT}"
-EXTRA_OECONF_append_arc = " --with-cpu=${TUNE_PKGARCH}"
+EXTRA_OECONF_append_armv6_class-target = " --with-arch=armv6${ARMFPARCHEXT}"
+EXTRA_OECONF_append_armv7a_class-target = " --with-arch=armv7-a${ARMFPARCHEXT}"
+EXTRA_OECONF_append_armv7ve_class-target = " --with-arch=armv7ve${ARMFPARCHEXT}"
+EXTRA_OECONF_append_arc_class-target = " --with-cpu=${TUNE_PKGARCH}"
+EXTRA_OECONF_append_x86-64_class-target = " --with-arch=native"
 
 # libcc1 requres gcc_cv_objdump when cross build, but gcc_cv_objdump is
 # set in subdir gcc, so subdir libcc1 can't use it, export it here to
@@ -137,6 +138,21 @@ FILES_${PN}-doc = "\
 "
 
 do_compile () {
+	# Prevent full target sysroot path from being used in configargs.h header,
+	# as it will be rewritten when used by other sysroots preventing support
+	# for gcc plugins. Additionally the path is embeddeded into the output
+	# binary, this prevents building a reproducible binary.
+	oe_runmake configure-gcc
+	sed -i 's@${STAGING_DIR_TARGET}@/@g' ${B}/gcc/configargs.h
+	sed -i 's@${STAGING_DIR_HOST}@/@g' ${B}/gcc/configargs.h
+
+	# Prevent sysroot/workdir paths from being used in checksum-options.
+	# checksum-options is used to generate a checksum which is embedded into
+	# the output binary.
+	oe_runmake TARGET-gcc=checksum-options all-gcc
+	sed -i 's@${DEBUG_PREFIX_MAP}@@g' ${B}/gcc/checksum-options
+	sed -i 's@${STAGING_DIR_TARGET}@/@g' ${B}/gcc/checksum-options
+
 	oe_runmake all-host
 }
 
@@ -164,6 +180,10 @@ do_install () {
 	# Cleanup manpages..
 	rm -rf ${D}${mandir}/man7
 
+	# Don't package details about the build host
+	rm -f ${D}${libdir}/gcc/${TARGET_SYS}/${BINV}/plugin/include/auto-build.h
+	rm -f ${D}${libdir}/gcc/${TARGET_SYS}/${BINV}/plugin/include/bconfig.h
+
 	cd ${D}${bindir}
 
 	# We care about g++ not c++
@@ -171,10 +191,6 @@ do_install () {
 
 	# We don't care about the gcc-<version> ones for this
 	rm -f *gcc-?.?*
-
-	# We use libiberty from binutils
-	find ${D}${libdir} -name libiberty.a | xargs rm -f
-	find ${D}${libdir} -name libiberty.h | xargs rm -f
 
 	# Not sure why we end up with these but we don't want them...
 	rm -f ${TARGET_PREFIX}${TARGET_PREFIX}*

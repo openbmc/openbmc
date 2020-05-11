@@ -1,0 +1,69 @@
+# ../bin/ld: cannot find -lImageProcessor
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -590,11 +590,10 @@ hpcups_SOURCES = prnt/hpcups/HPCupsFilte
+ 	prnt/hpcups/flate_colorspace.h prnt/hpcups/RunLenEncoding.h prnt/hpcups/common_defines.h \
+ 	prnt/hpcups/genPCLm.h \
+ 	common/utils.c common/utils.h prnt/hpcups/Hbpl1_Wrapper.cpp prnt/hpcups/genPCLm.cpp \
+-	prnt/hpcups/genJPEGStrips.cpp prnt/hpcups/RunLenEncoding.cpp \
+-	prnt/hpcups/ImageProcessor.h
++	prnt/hpcups/genJPEGStrips.cpp prnt/hpcups/RunLenEncoding.cpp
+ 
+ hpcups_CXXFLAGS = $(APDK_ENDIAN_FLAG) $(DBUS_CFLAGS)
+-hpcups_LDADD = -L./prnt/hpcups/ -ljpeg -ldl -lImageProcessor -lcups -lcupsimage -lz $(DBUS_LIBS)
++hpcups_LDADD = -L./prnt/hpcups/ -ljpeg -ldl -lcups -lcupsimage -lz $(DBUS_LIBS)
+ #else
+ #hpcupsdir = $(cupsfilterdir)
+ #hpcups_PROGRAMS = hpcups
+--- a/prnt/hpcups/HPCupsFilter.cpp
++++ b/prnt/hpcups/HPCupsFilter.cpp
+@@ -637,16 +637,10 @@ int HPCupsFilter::processRasterData(cups
+ 
+ 
+     sprintf(hpPreProcessedRasterFile, "%s/hp_%s_cups_SwapedPagesXXXXXX",CUPS_TMP_DIR, m_JA.user_name);
+-    image_processor_t* imageProcessor = imageProcessorCreate();
+ 
+     while (cupsRasterReadHeader2(cups_raster, &cups_header))
+     {
+ 
+-        IMAGE_PROCESSOR_ERROR result = imageProcessorStartPage(imageProcessor, &cups_header);
+-        if (result != IPE_SUCCESS){
+-            dbglog("DEBUG: imageProcessorStartPage failed result = %d\n", result);
+-        }
+-
+         current_page_number++;
+ 
+         if (current_page_number == 1) {
+@@ -745,11 +739,6 @@ int HPCupsFilter::processRasterData(cups
+             color_raster = rgbRaster;
+             black_raster = kRaster;
+ 
+-            result = imageProcessorProcessLine(imageProcessor, m_pPrinterBuffer, cups_header.cupsBytesPerLine);
+-            if (result != IPE_SUCCESS){
+-                dbglog("DEBUG: imageProcessorProcessLine failed result = %d\n", result);
+-            }
+-
+ 
+             if ((y == 0) && !is_ljmono) {
+                 //For ljmono, make sure that first line is not a blankRaster line.Otherwise printer
+@@ -780,11 +769,6 @@ int HPCupsFilter::processRasterData(cups
+             }
+         }  // for() loop end
+ 
+-        result = imageProcessorEndPage(imageProcessor);
+-        if (result != IPE_SUCCESS){
+-                dbglog("DEBUG: imageProcessorEndPage failed result = %d\n", result);
+-        }
+-
+ 
+         m_Job.NewPage();
+         if (err != NO_ERROR) {
+@@ -800,8 +784,6 @@ int HPCupsFilter::processRasterData(cups
+         rgbRaster = NULL;
+     }
+ 
+-    imageProcessorDestroy(imageProcessor);
+-
+     unlink(hpPreProcessedRasterFile);
+     return ret_status;
+ }

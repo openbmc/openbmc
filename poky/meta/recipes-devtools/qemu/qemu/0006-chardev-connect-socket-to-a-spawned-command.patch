@@ -1,4 +1,4 @@
-From ad853601e75f6d0dd09672bcca05fbe4fac766a4 Mon Sep 17 00:00:00 2001
+From bcc63f775e265df69963a4ad7805b8678ace68f0 Mon Sep 17 00:00:00 2001
 From: Alistair Francis <alistair.francis@xilinx.com>
 Date: Thu, 21 Dec 2017 11:35:16 -0800
 Subject: [PATCH] chardev: connect socket to a spawned command
@@ -52,10 +52,10 @@ Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
  3 files changed, 109 insertions(+)
 
 diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 7ca5d97a..207fae4a 100644
+index 185fe38d..54fa4234 100644
 --- a/chardev/char-socket.c
 +++ b/chardev/char-socket.c
-@@ -1278,6 +1278,67 @@ static bool qmp_chardev_validate_socket(ChardevSocket *sock,
+@@ -1288,6 +1288,67 @@ static bool qmp_chardev_validate_socket(ChardevSocket *sock,
      return true;
  }
  
@@ -123,7 +123,7 @@ index 7ca5d97a..207fae4a 100644
  
  static void qmp_chardev_open_socket(Chardev *chr,
                                      ChardevBackend *backend,
-@@ -1286,6 +1347,9 @@ static void qmp_chardev_open_socket(Chardev *chr,
+@@ -1296,6 +1357,9 @@ static void qmp_chardev_open_socket(Chardev *chr,
  {
      SocketChardev *s = SOCKET_CHARDEV(chr);
      ChardevSocket *sock = backend->u.socket.data;
@@ -133,7 +133,7 @@ index 7ca5d97a..207fae4a 100644
      bool do_nodelay     = sock->has_nodelay ? sock->nodelay : false;
      bool is_listen      = sock->has_server  ? sock->server  : true;
      bool is_telnet      = sock->has_telnet  ? sock->telnet  : false;
-@@ -1351,6 +1415,14 @@ static void qmp_chardev_open_socket(Chardev *chr,
+@@ -1361,6 +1425,14 @@ static void qmp_chardev_open_socket(Chardev *chr,
  
      update_disconnected_filename(s);
  
@@ -148,7 +148,7 @@ index 7ca5d97a..207fae4a 100644
      if (s->is_listen) {
          if (qmp_chardev_open_socket_server(chr, is_telnet || is_tn3270,
                                             is_waitconnect, errp) < 0) {
-@@ -1370,9 +1442,26 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
+@@ -1380,9 +1452,26 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
      const char *host = qemu_opt_get(opts, "host");
      const char *port = qemu_opt_get(opts, "port");
      const char *fd = qemu_opt_get(opts, "fd");
@@ -175,7 +175,7 @@ index 7ca5d97a..207fae4a 100644
      if ((!!path + !!fd + !!host) != 1) {
          error_setg(errp,
                     "Exactly one of 'path', 'fd' or 'host' required");
-@@ -1415,12 +1504,24 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
+@@ -1425,12 +1514,24 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
      sock->has_tls_authz = qemu_opt_get(opts, "tls-authz");
      sock->tls_authz = g_strdup(qemu_opt_get(opts, "tls-authz"));
  

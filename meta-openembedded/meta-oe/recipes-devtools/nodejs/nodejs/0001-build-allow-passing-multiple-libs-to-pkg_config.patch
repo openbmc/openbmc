@@ -1,0 +1,41 @@
+From fdaa0e3bef93c5c72a7258b5f1e30718e7d81f9b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andr=C3=A9=20Draszik?= <git@andred.net>
+Date: Mon, 2 Mar 2020 12:17:09 +0000
+Subject: [PATCH 1/2] build: allow passing multiple libs to pkg_config
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Sometimes it's necessary to pass multiple library names to pkg-config,
+e.g. the brotli shared libraries can be pulled in with
+    pkg-config libbrotlienc libbrotlidec
+
+Update the code to handle both, strings (as used so far), and lists
+of strings.
+
+Signed-off-by: André Draszik <git@andred.net>
+---
+Upstream-Status: Submitted [https://github.com/nodejs/node/pull/32046]
+ configure.py | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/configure.py b/configure.py
+index beb08df088..e3f78f2fed 100755
+--- a/configure.py
++++ b/configure.py
+@@ -680,7 +680,11 @@ def pkg_config(pkg):
+   retval = ()
+   for flag in ['--libs-only-l', '--cflags-only-I',
+                '--libs-only-L', '--modversion']:
+-    args += [flag, pkg]
++    args += [flag]
++    if isinstance(pkg, list):
++      args += pkg
++    else:
++      args += [pkg]
+     try:
+       proc = subprocess.Popen(shlex.split(pkg_config) + args,
+                               stdout=subprocess.PIPE)
+-- 
+2.25.0
+

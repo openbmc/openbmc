@@ -71,7 +71,7 @@ class PRTable(object):
         data=self._execute("SELECT value FROM %s WHERE version=? AND pkgarch=? AND checksum=?;" % self.table,
                            (version, pkgarch, checksum))
         row=data.fetchone()
-        if row != None:
+        if row is not None:
             return row[0]
         else:
             #no value found, try to insert
@@ -87,7 +87,7 @@ class PRTable(object):
             data=self._execute("SELECT value FROM %s WHERE version=? AND pkgarch=? AND checksum=?;" % self.table,
                                (version, pkgarch, checksum))
             row=data.fetchone()
-            if row != None:
+            if row is not None:
                 return row[0]
             else:
                 raise prserv.NotFoundError
@@ -99,7 +99,7 @@ class PRTable(object):
                             % (self.table, self.table),
                             (version, pkgarch, checksum, version, pkgarch))
         row=data.fetchone()
-        if row != None:
+        if row is not None:
             return row[0]
         else:
             #no value found, try to insert
@@ -116,7 +116,7 @@ class PRTable(object):
             data=self._execute("SELECT value FROM %s WHERE version=? AND pkgarch=? AND checksum=?;" % self.table,
                                (version, pkgarch, checksum))
             row=data.fetchone()
-            if row != None:
+            if row is not None:
                 return row[0]
             else:
                 raise prserv.NotFoundError
@@ -132,7 +132,7 @@ class PRTable(object):
         data = self._execute("SELECT value FROM %s WHERE version=? AND pkgarch=? AND checksum=?;" % self.table,
                            (version, pkgarch, checksum))
         row = data.fetchone()
-        if row != None:
+        if row is not None:
             val=row[0]
         else:
             #no value found, try to insert
@@ -147,7 +147,7 @@ class PRTable(object):
             data = self._execute("SELECT value FROM %s WHERE version=? AND pkgarch=? AND checksum=?;" % self.table,
                            (version, pkgarch, checksum))
             row = data.fetchone()
-            if row != None:
+            if row is not None:
                 val = row[0]
         return val
 
@@ -170,7 +170,7 @@ class PRTable(object):
         data = self._execute("SELECT value FROM %s WHERE version=? AND pkgarch=? AND checksum=? AND value>=?;" % self.table,
                             (version,pkgarch,checksum,value))
         row=data.fetchone()
-        if row != None:
+        if row is not None:
             return row[0]
         else:
             return None

@@ -362,7 +362,7 @@ class TaskData:
             bb.event.fire(bb.event.NoProvider(item, dependees=self.get_dependees(item), reasons=["No eligible PROVIDERs exist for '%s'" % item]), cfgData)
             raise bb.providers.NoProvider(item)
 
-        if len(eligible) > 1 and foundUnique == False:
+        if len(eligible) > 1 and not foundUnique:
             if item not in self.consider_msgs_cache:
                 providers_list = []
                 for fn in eligible:

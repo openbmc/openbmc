@@ -3,8 +3,6 @@ LICENSE = "BSD-3-Clause"
 
 inherit pypi
 
-PYPI_PACKAGE_EXT = "zip"
-
 RDEPENDS_${PN} += "\
                    ${PYTHON_PN}-decorator \
                    "

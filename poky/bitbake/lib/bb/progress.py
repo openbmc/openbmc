@@ -7,7 +7,6 @@ BitBake progress handling code
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-import sys
 import re
 import time
 import inspect

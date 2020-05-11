@@ -1,0 +1,38 @@
+From 8309601775d9442416329a77f7dcfd8aa799e9a6 Mon Sep 17 00:00:00 2001
+From: Jens Rehsack <sno@netbsd.org>
+Date: Fri, 21 Feb 2020 17:39:56 +0100
+Subject: [PATCH 1/2] m4/getloadavg.m4: restrict AIX specific test on AIX
+
+When cross compiling for a system without getloadavg, do not try add
+additional linker paths unless it's absolutely necessary.
+
+Signed-off-by: Jens Rehsack <sno@netbsd.org>
+---
+Upstream-Status: Pending
+ m4/getloadavg.m4 | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/m4/getloadavg.m4 b/m4/getloadavg.m4
+index 3bd2a14..696c5de 100644
+--- a/m4/getloadavg.m4
++++ b/m4/getloadavg.m4
+@@ -42,6 +42,8 @@ AC_CHECK_FUNC([getloadavg], [],
+    fi
+ 
+    if test $gl_func_getloadavg_done = no; then
++     AS_CASE([$host_os],
++             [aix*], [
+      # There is a commonly available library for RS/6000 AIX.
+      # Since it is not a standard part of AIX, it might be installed locally.
+      gl_getloadavg_LIBS=$LIBS
+@@ -49,6 +51,7 @@ AC_CHECK_FUNC([getloadavg], [],
+      AC_CHECK_LIB([getloadavg], [getloadavg],
+                   [LIBS="-lgetloadavg $LIBS" gl_func_getloadavg_done=yes],
+                   [LIBS=$gl_getloadavg_LIBS])
++       ], [:])
+    fi
+ 
+    # Set up the replacement function if necessary.
+-- 
+2.17.1
+

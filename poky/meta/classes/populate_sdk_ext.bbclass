@@ -124,7 +124,7 @@ SDK_TITLE_task-populate-sdk-ext = "${@d.getVar('DISTRO_NAME') or d.getVar('DISTR
 def clean_esdk_builddir(d, sdkbasepath):
     """Clean up traces of the fake build for create_filtered_tasklist()"""
     import shutil
-    cleanpaths = 'cache conf/sanity_info tmp'.split()
+    cleanpaths = ['cache', 'tmp']
     for pth in cleanpaths:
         fullpth = os.path.join(sdkbasepath, pth)
         if os.path.isdir(fullpth):
@@ -179,7 +179,9 @@ def create_filtered_tasklist(d, sdkbasepath, tasklistfile, conf_initpath):
         # will effectively do
         clean_esdk_builddir(d, sdkbasepath)
     finally:
-        os.replace(sdkbasepath + '/conf/local.conf.bak', sdkbasepath + '/conf/local.conf')
+        localconf = sdkbasepath + '/conf/local.conf'
+        if os.path.exists(localconf + '.bak'):
+            os.replace(localconf + '.bak', localconf)
 
 python copy_buildsystem () {
     import re
@@ -386,9 +388,13 @@ python copy_buildsystem () {
         bb.utils.mkdirhier(os.path.join(baseoutpath, 'cache'))
         shutil.copyfile(builddir + '/cache/bb_unihashes.dat', baseoutpath + '/cache/bb_unihashes.dat')
 
-    # Write a templateconf.cfg
-    with open(baseoutpath + '/conf/templateconf.cfg', 'w') as f:
-        f.write('meta/conf\n')
+    # Use templateconf.cfg file from builddir if exists
+    if os.path.exists(builddir + '/conf/templateconf.cfg'):
+        shutil.copyfile(builddir + '/conf/templateconf.cfg', baseoutpath + '/conf/templateconf.cfg')
+    else:
+        # Write a templateconf.cfg
+        with open(baseoutpath + '/conf/templateconf.cfg', 'w') as f:
+            f.write('meta/conf\n')
 
     # Ensure any variables set from the external environment (by way of
     # BB_ENV_EXTRAWHITE) are set in the SDK's configuration
@@ -611,8 +617,8 @@ sdk_ext_preinst() {
 		exit 1
 	fi
 	# The relocation script used by buildtools installer requires python
-	if ! command -v python > /dev/null; then
-		echo "ERROR: The installer requires python, please install it first"
+	if ! command -v python3 > /dev/null; then
+		echo "ERROR: The installer requires python3, please install it first"
 		exit 1
 	fi
 	missing_utils=""

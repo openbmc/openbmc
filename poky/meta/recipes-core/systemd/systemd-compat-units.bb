@@ -10,6 +10,8 @@ S = "${WORKDIR}"
 
 inherit features_check
 
+INHIBIT_DEFAULT_DEPS = "1"
+
 ALLOW_EMPTY_${PN} = "1"
 
 REQUIRED_DISTRO_FEATURES = "systemd"

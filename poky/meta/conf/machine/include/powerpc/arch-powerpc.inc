@@ -15,7 +15,8 @@ TUNE_CCARGS .= "${@bb.utils.contains("TUNE_FEATURES", "bigendian", " -mbig-endia
 
 TUNEVALID[m32] = "Power ELF32 standard ABI"
 TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'm32', ' -m32', '', d)}"
-TUNE_ARCH .= "${@bb.utils.contains('TUNE_FEATURES', 'm32', 'powerpc', '', d)}"
+TUNE_ARCH .= "${@bb.utils.contains('TUNE_FEATURES', 'm32', 'powerpc${ENDIAN_SFX}', '', d)}"
+ENDIAN_SFX = "${@bb.utils.contains('TUNE_FEATURES', 'bigendian', '', 'le', d)}"
 
 TUNEVALID[fpu-hard] = "Use hardware FPU."
 TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'fpu-hard', ' -mhard-float', '', d)}"

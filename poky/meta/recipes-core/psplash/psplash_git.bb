@@ -3,14 +3,17 @@ DESCRIPTION = "PSplash is a userspace graphical boot splash screen for mainly em
 HOMEPAGE = "http://git.yoctoproject.org/cgit/cgit.cgi/psplash"
 SECTION = "base"
 LICENSE = "GPLv2+"
-LIC_FILES_CHKSUM = "file://psplash.h;beginline=1;endline=16;md5=840fb2356b10a85bed78dd09dc7745c6"
+LIC_FILES_CHKSUM = "file://psplash.h;beginline=1;endline=8;md5=8f232c1e95929eacab37f00900580224"
+DEPENDS = "gdk-pixbuf-native"
 
-SRCREV = "2015f7073e98dd9562db0936a254af5ef56356cf"
+SRCREV = "0a902f7cd875ccf018456451be369f05fa55f962"
 PV = "0.1+git${SRCPV}"
 PR = "r15"
 
 SRC_URI = "git://git.yoctoproject.org/${BPN} \
            file://psplash-init \
+           file://psplash-start.service \
+           file://psplash-systemd.service \
            ${SPLASH_IMAGES}"
 UPSTREAM_CHECK_COMMITS = "1"
 
@@ -21,7 +24,6 @@ python __anonymous() {
     splashfiles = d.getVar('SPLASH_IMAGES').split()
     pkgs = []
     localpaths = []
-    haspng = False
     for uri in splashfiles:
         fetcher = bb.fetch2.Fetch([uri], d)
         flocal = os.path.basename(fetcher.localpath(uri))
@@ -39,16 +41,11 @@ python __anonymous() {
             bb.fatal("The output name '%s' derived from the URI %s is not valid, please specify the outsuffix parameter" % (outname, uri))
         else:
             pkgs.append(outname)
-        if flocal.endswith(".png"):
-            haspng = True
         localpaths.append(flocal)
 
     # Set these so that we have less work to do in do_compile and do_install_append
     d.setVar("SPLASH_INSTALL", " ".join(pkgs))
     d.setVar("SPLASH_LOCALPATHS", " ".join(localpaths))
-
-    if haspng:
-        d.appendVar("DEPENDS", " gdk-pixbuf-native")
 
     d.prependVar("PACKAGES", "%s " % (" ".join(pkgs)))
     mlprefix = d.getVar('MLPREFIX') or ''
@@ -66,7 +63,11 @@ python __anonymous() {
 
 S = "${WORKDIR}/git"
 
-inherit autotools pkgconfig update-rc.d update-alternatives
+inherit autotools pkgconfig update-rc.d update-alternatives systemd
+
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
+
+PACKAGECONFIG[systemd] = "--with-systemd,--without-systemd,systemd"
 
 ALTERNATIVE_PRIORITY = "100"
 ALTERNATIVE_LINK_NAME[psplash] = "${bindir}/psplash"
@@ -78,7 +79,7 @@ python do_compile () {
     # Build a separate executable for each splash image
     workdir = d.getVar('WORKDIR')
     convertscript = "%s/make-image-header.sh" % d.getVar('S')
-    destfile = "%s/psplash-poky-img.h" % d.getVar('S')
+    destfile = "%s/psplash-poky-img.h" % d.getVar('B')
     localfiles = d.getVar('SPLASH_LOCALPATHS').split()
     outputfiles = d.getVar('SPLASH_INSTALL').split()
     for localfile, outputfile in zip(localfiles, outputfiles):
@@ -97,8 +98,17 @@ python do_compile () {
 }
 
 do_install_append() {
-	install -d ${D}${sysconfdir}/init.d/
-	install -m 0755 ${WORKDIR}/psplash-init ${D}${sysconfdir}/init.d/psplash.sh
+	if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
+		install -d ${D}${sysconfdir}/init.d/
+		install -m 0755 ${WORKDIR}/psplash-init ${D}${sysconfdir}/init.d/psplash.sh
+	fi
+
+	if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+		install -d ${D}${systemd_unitdir}/system
+		install -m 644 ${WORKDIR}/psplash-start.service ${D}/${systemd_unitdir}/system
+		install -m 644 ${WORKDIR}/psplash-systemd.service ${D}/${systemd_unitdir}/system
+	fi
+
 	install -d ${D}${bindir}
 	for i in ${SPLASH_INSTALL} ; do
 		install -m 0755 $i ${D}${bindir}/$i
@@ -106,15 +116,8 @@ do_install_append() {
 	rm -f ${D}${bindir}/psplash
 }
 
+SYSTEMD_PACKAGES = "${@bb.utils.contains('DISTRO_FEATURES','systemd','${PN}','',d)}"
+SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'systemd', 'psplash-start.service psplash-systemd.service', '', d)}"
+
 INITSCRIPT_NAME = "psplash.sh"
 INITSCRIPT_PARAMS = "start 0 S . stop 20 0 1 6 ."
-
-PACKAGE_WRITE_DEPS_append = " ${@bb.utils.contains('DISTRO_FEATURES','systemd','systemd-systemctl-native','',d)}"
-pkg_postinst_${PN} () {
-	if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
-		if [ -n "$D" ]; then
-			OPTS="--root=$D"
-		fi
-		systemctl $OPTS mask psplash.service
-	fi
-}

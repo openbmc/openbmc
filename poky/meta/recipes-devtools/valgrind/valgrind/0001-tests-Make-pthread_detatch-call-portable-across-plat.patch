@@ -1,0 +1,87 @@
+From 92fcf75d6d3903e45492b041bf4ad07787d2e58a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 27 Jan 2020 19:50:04 -0800
+Subject: [PATCH] drd/tests/pth_detached3: Make pthread_detach() call portable
+ across platforms
+
+pthread_t is opaque type therefore we can not apply simple arithmetic to
+variables of pthread_t type this test needs to pass a invalid pthread_t
+handle, typcasting to uintptr_t works too and is portable across glibc and
+musl
+
+Fixes
+| pth_detached3.c:24:25: error: invalid use of undefined type 'struct __pthread'
+|    24 |   pthread_detach(thread + 8);
+|       |                         ^
+
+[ bvanassche: reformatted patch description and fixed up line numbers ]
+
+Upstream-Status: Backport [https://sourceware.org/git/?p=valgrind.git;a=commit;h=92fcf75d6d3903e45492b041bf4ad07787d2e58a]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ drd/tests/pth_detached3.c           | 3 ++-
+ drd/tests/pth_detached3.stderr.exp1 | 4 ++--
+ drd/tests/pth_detached3.stderr.exp2 | 4 ++--
+ 3 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/drd/tests/pth_detached3.c b/drd/tests/pth_detached3.c
+index c02eef1..efeb15b 100644
+--- a/drd/tests/pth_detached3.c
++++ b/drd/tests/pth_detached3.c
+@@ -4,6 +4,7 @@
+ #include <errno.h>
+ #include <pthread.h>
+ #include <stdio.h>
++#include <stdint.h>
+ 
+ static void* thread_func(void* arg)
+ {
+@@ -21,7 +22,7 @@ int main(int argc, char** argv)
+   pthread_detach(thread);
+ 
+   /* Invoke pthread_detach() with an invalid thread ID. */
+-  pthread_detach(thread + 8);
++  pthread_detach((pthread_t)((uintptr_t)thread + 8));
+ 
+   fprintf(stderr, "Finished.\n");
+ 
+diff --git a/drd/tests/pth_detached3.stderr.exp1 b/drd/tests/pth_detached3.stderr.exp1
+index 58412ec..8dd58ba 100644
+--- a/drd/tests/pth_detached3.stderr.exp1
++++ b/drd/tests/pth_detached3.stderr.exp1
+@@ -1,11 +1,11 @@
+ 
+ pthread_detach(): invalid thread ID 0x........
+    at 0x........: pthread_detach (drd_pthread_intercepts.c:?)
+-   by 0x........: main (pth_detached3.c:21)
++   by 0x........: main (pth_detached3.c:22)
+ 
+ pthread_detach(): invalid thread ID 0x........
+    at 0x........: pthread_detach (drd_pthread_intercepts.c:?)
+-   by 0x........: main (pth_detached3.c:24)
++   by 0x........: main (pth_detached3.c:25)
+ 
+ Finished.
+ 
+diff --git a/drd/tests/pth_detached3.stderr.exp2 b/drd/tests/pth_detached3.stderr.exp2
+index bdc5cf8..e82dee1 100644
+--- a/drd/tests/pth_detached3.stderr.exp2
++++ b/drd/tests/pth_detached3.stderr.exp2
+@@ -2,12 +2,12 @@
+ pthread_detach(): invalid thread ID 0x........
+    at 0x........: vgDrd_set_joinable (drd_pthread_intercepts.c:?)
+    by 0x........: pthread_detach (drd_pthread_intercepts.c:?)
+-   by 0x........: main (pth_detached3.c:21)
++   by 0x........: main (pth_detached3.c:22)
+ 
+ pthread_detach(): invalid thread ID 0x........
+    at 0x........: vgDrd_set_joinable (drd_pthread_intercepts.c:?)
+    by 0x........: pthread_detach (drd_pthread_intercepts.c:?)
+-   by 0x........: main (pth_detached3.c:24)
++   by 0x........: main (pth_detached3.c:25)
+ 
+ Finished.
+ 
+-- 
+2.9.3
+

@@ -1,0 +1,19 @@
+If the resources file isn't sorted in some way then libgdk.so will differ
+depending on the inode order of the resource files.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/gdk/Makefile.am b/gdk/Makefile.am
+index e25b57ba50..26f2d57c6e 100644
+--- a/gdk/Makefile.am
++++ b/gdk/Makefile.am
+@@ -465,7 +465,7 @@ stamp-gc-h: $(top_builddir)/config.status
+ # Resources
+ #
+ 
+-glsl_sources := $(wildcard $(srcdir)/resources/glsl/*.glsl)
++glsl_sources := $(sort $(wildcard $(srcdir)/resources/glsl/*.glsl))
+ 
+ gdk.gresource.xml: Makefile.am
+ 	$(AM_V_GEN) echo "<?xml version='1.0' encoding='UTF-8'?>" > $@; \

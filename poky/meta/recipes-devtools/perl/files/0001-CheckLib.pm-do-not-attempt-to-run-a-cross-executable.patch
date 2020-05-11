@@ -1,0 +1,24 @@
+From a033c9ece12b6eead48eed63f106ccdec6159b0c Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 20 Dec 2019 16:26:55 +0100
+Subject: [PATCH] CheckLib.pm: do not attempt to run a cross executable
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ inc/Devel/CheckLib.pm | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/inc/Devel/CheckLib.pm b/inc/Devel/CheckLib.pm
+index 36a451a..b04acc1 100644
+--- a/inc/Devel/CheckLib.pm
++++ b/inc/Devel/CheckLib.pm
+@@ -330,7 +330,7 @@ sub assert_lib {
+         push @missing, $lib if $rv != 0 || !-x $exefile;
+         my $absexefile = File::Spec->rel2abs($exefile);
+         $absexefile = '"' . $absexefile . '"' if $absexefile =~ m/\s/;
+-        push @wrongresult, $lib if $rv == 0 && -x $exefile && system($absexefile) != 0;
++        push @wrongresult, $lib if $rv == 0 && -x $exefile && 0 != 0;
+         unlink $ofile if -e $ofile;
+         _cleanup_exe($exefile);
+     }

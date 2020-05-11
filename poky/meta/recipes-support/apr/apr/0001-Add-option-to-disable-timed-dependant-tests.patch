@@ -1,0 +1,69 @@
+From 2bbe20b4f69e84e7a18bc79d382486953f479328 Mon Sep 17 00:00:00 2001
+From: Jeremy Puhlman <jpuhlman@mvista.com>
+Date: Thu, 26 Mar 2020 18:30:36 +0000
+Subject: [PATCH] Add option to disable timed dependant tests
+
+The disabled tests rely on timing to pass correctly. On a virtualized 
+system under heavy load, these tests randomly fail because they miss
+a timer or other timing related issues.
+
+Upstream-Status: Pending
+Signed-off-by: Jeremy Puhlman <jpuhlman@mvista.com>
+---
+ configure.in     | 6 ++++++
+ include/apr.h.in | 1 +
+ test/testlock.c  | 4 ++--
+ 3 files changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index d9f32d6..f0c5661 100644
+--- a/configure.in
++++ b/configure.in
+@@ -2886,6 +2886,12 @@ AC_ARG_ENABLE(timedlocks,
+ )
+ AC_SUBST(apr_has_timedlocks)
+ 
++AC_ARG_ENABLE(timed-tests,
++  [  --disable-timed-tests	  Disable timed tests ],
++  [apr_has_timedtests="0"], [apr_has_timedtests="1"]
++)
++AC_SUBST(apr_has_timedtests)
++
+ # hstrerror is only needed if IPv6 is not enabled,
+ # so getaddrinfo/gai_strerror are not used.
+ if test $have_ipv6 = 0; then
+diff --git a/include/apr.h.in b/include/apr.h.in
+index ee99def..c46a5f4 100644
+--- a/include/apr.h.in
++++ b/include/apr.h.in
+@@ -298,6 +298,7 @@ extern "C" {
+ #define APR_HAS_XTHREAD_FILES     @apr_has_xthread_files@
+ #define APR_HAS_OS_UUID           @osuuid@
+ #define APR_HAS_TIMEDLOCKS        @apr_has_timedlocks@
++#define APR_HAVE_TIME_DEPENDANT_TESTS        @apr_has_timedtests@
+ 
+ #define APR_PROCATTR_USER_SET_REQUIRES_PASSWORD @apr_procattr_user_set_requires_password@
+ 
+diff --git a/test/testlock.c b/test/testlock.c
+index a43f477..6233d0b 100644
+--- a/test/testlock.c
++++ b/test/testlock.c
+@@ -396,13 +396,13 @@ abts_suite *testlock(abts_suite *suite)
+     abts_run_test(suite, threads_not_impl, NULL);
+ #else
+     abts_run_test(suite, test_thread_mutex, NULL);
+-#if APR_HAS_TIMEDLOCKS
++#if APR_HAS_TIMEDLOCKS && APR_HAVE_TIME_DEPENDANT_TESTS
+     abts_run_test(suite, test_thread_timedmutex, NULL);
+ #endif
+     abts_run_test(suite, test_thread_rwlock, NULL);
+     abts_run_test(suite, test_cond, NULL);
+     abts_run_test(suite, test_timeoutcond, NULL);
+-#if APR_HAS_TIMEDLOCKS
++#if APR_HAS_TIMEDLOCKS && APR_HAVE_TIME_DEPENDANT_TESTS
+     abts_run_test(suite, test_timeoutmutex, NULL);
+ #endif
+ #endif
+-- 
+2.23.0
+

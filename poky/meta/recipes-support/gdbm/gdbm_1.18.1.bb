@@ -16,12 +16,14 @@ SRC_URI[sha256sum] = "86e613527e5dba544e73208f42b78b7c022d4fa5a6d5498bf18c8d6f74
 inherit autotools gettext texinfo lib_package ptest
 
 # Needed for dbm python module
-EXTRA_OECONF = "-enable-libgdbm-compat"
+EXTRA_OECONF = "--enable-libgdbm-compat --without-readline"
 
 # Stop presence of dbm/nbdm on the host contaminating builds
 CACHED_CONFIGUREVARS += "ac_cv_lib_ndbm_main=no ac_cv_lib_dbm_main=no"
 
 BBCLASSEXTEND = "native nativesdk"
+
+CFLAGS += "-fcommon"
 
 do_install_append () {
     # Create a symlink to ndbm.h and gdbm.h in include/gdbm to let other packages to find

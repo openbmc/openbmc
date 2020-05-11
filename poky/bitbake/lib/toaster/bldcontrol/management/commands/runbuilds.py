@@ -168,17 +168,17 @@ class Command(BaseCommand):
         try:
             self.cleanup()
         except Exception as e:
-            logger.warn("runbuilds: cleanup exception %s" % str(e))
+            logger.warning("runbuilds: cleanup exception %s" % str(e))
 
         try:
             self.archive()
         except Exception as e:
-            logger.warn("runbuilds: archive exception %s" % str(e))
+            logger.warning("runbuilds: archive exception %s" % str(e))
 
         try:
             self.schedule()
         except Exception as e:
-            logger.warn("runbuilds: schedule exception %s" % str(e))
+            logger.warning("runbuilds: schedule exception %s" % str(e))
 
     def handle(self, **options):
         pidfile_path = os.path.join(os.environ.get("BUILDDIR", "."),

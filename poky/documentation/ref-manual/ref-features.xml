@@ -210,6 +210,12 @@
                 <listitem><para><emphasis>usbhost:</emphasis> Include USB Host
                     support (allows to connect external keyboard, mouse,
                     storage, network etc).</para></listitem>
+                <listitem><para><emphasis>usrmerge:</emphasis> Merges the 
+                    <filename>/bin</filename>, <filename>/sbin</filename>, 
+                    <filename>/lib</filename>, and <filename>/lib64</filename>       
+                    directories into their respective counterparts in the 
+                    <filename>/usr</filename> directory to provide better package 
+                   and application compatibility.</para></listitem>
                 <listitem><para><emphasis>wayland:</emphasis> Include the
                     Wayland display server protocol and the library that
                     supports it.</para></listitem>

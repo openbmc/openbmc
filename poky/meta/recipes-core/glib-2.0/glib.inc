@@ -30,6 +30,8 @@ LEAD_SONAME = "libglib-2.0.*"
 
 inherit meson gettext gtk-doc pkgconfig ptest-gnome upstream-version-is-even bash-completion gio-module-cache manpages features_check
 
+DEPENDS_append_class-target = "${@' gtk-doc' if d.getVar('GTKDOC_ENABLED') == 'True' else ''}"
+
 GTKDOC_MESON_OPTION = "gtk_doc"
 
 # This avoids the need to depend on target python3, which in case of mingw is not even possible.
@@ -42,14 +44,13 @@ PACKAGECONFIG ??= "system-pcre libmount \
                    ${@bb.utils.contains('PTEST_ENABLED', '1', 'tests', '', d)}"
 # To use the system pcre it must be configured with --enable-unicode-properties
 PACKAGECONFIG[system-pcre] = "-Dinternal_pcre=false,-Dinternal_pcre=true,libpcre"
-PACKAGECONFIG[libmount] = "-Dlibmount=true,-Dlibmount=false,util-linux"
+PACKAGECONFIG[libmount] = "-Dlibmount=enabled,-Dlibmount=disabled,util-linux"
 PACKAGECONFIG[manpages] = "-Dman=true, -Dman=false, libxslt-native xmlto-native"
 # libelf is auto-detected without a configuration option
 PACKAGECONFIG[libelf] = ",,elfutils"
 PACKAGECONFIG[tests] = "-Dinstalled_tests=true,-Dinstalled_tests=false,dbus"
 
 EXTRA_OEMESON = "-Ddtrace=false -Dfam=false -Dsystemtap=false -Dselinux=disabled"
-EXTRA_OEMESON_append_class-target = " --cross-file ${WORKDIR}/glib-meson.cross"
 
 do_configure_prepend() {
 	sed -i -e '1s,#!.*,#!${USRBINPATH}/env python3,' ${S}/gio/gdbus-2.0/codegen/gdbus-codegen.in
@@ -59,13 +60,15 @@ FILES_${PN} = "${libdir}/lib*${SOLIBS} \
                ${libdir}/gio \
                ${libexecdir}/*gio-querymodules \
                ${datadir}/glib-2.0/schemas"
+
+FILES_${PN}-utils += "${bindir}/glib-genmarshal \
+                      ${bindir}/glib-gettextize \
+                      ${bindir}/glib-mkenums \
+                      ${bindir}/glib-compile-resources"
+
 FILES_${PN}-dev += "${libdir}/glib-2.0/include \
                     ${libdir}/gio/modules/lib*${SOLIBSDEV} \
                     ${libdir}/gio/modules/*.la \
-                    ${bindir}/glib-genmarshal \
-                    ${bindir}/glib-gettextize \
-                    ${bindir}/glib-mkenums \
-                    ${bindir}/glib-compile-resources \
                     ${datadir}/glib-2.0/gettext/po/Makefile.in.in \
                     ${datadir}/glib-2.0/schemas/gschema.dtd \
                     ${datadir}/glib-2.0/valgrind/glib.supp \
@@ -127,6 +130,11 @@ do_install_append_class-target () {
 			rm ${D}${datadir}/installed-tests/glib/gdbus-serialization.test
 		fi
 	fi
+	if [ -f ${D}${datadir}/installed-tests/glib/static-link.test ]; then
+        if test "x${MLPREFIX}" != "x"; then
+                mv ${D}${datadir}/installed-tests/glib/static-link.test ${D}${datadir}/installed-tests/glib/${MLPREFIX}static-link.test
+        fi
+	fi
 }
 
 # As we do not build python3 for windows, makes no sense to ship the script that's using it
@@ -138,6 +146,8 @@ CODEGEN_PYTHON_RDEPENDS = "python3 python3-distutils python3-xml"
 CODEGEN_PYTHON_RDEPENDS_mingw32 = ""
 
 RDEPENDS_${PN}-codegen += "${CODEGEN_PYTHON_RDEPENDS}"
+
+RDEPENDS_${PN}-ptest += "${PN}-utils"
 
 RDEPENDS_${PN}-ptest += "\
             coreutils \
@@ -160,6 +170,8 @@ RDEPENDS_${PN}-ptest += "\
             ${PN}-locale-th \
             python3-core \
             python3-modules \
+            python3-dbusmock \
+            ${PN}-codegen \
            "
 
 RDEPENDS_${PN}-ptest_append_libc-glibc = "\

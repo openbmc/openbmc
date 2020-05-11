@@ -99,7 +99,22 @@ def copyhardlinktree(src, dst):
     if os.path.isdir(src) and not len(os.listdir(src)):
         return
 
-    if (os.stat(src).st_dev ==  os.stat(dst).st_dev):
+    canhard = False
+    testfile = None
+    for root, dirs, files in os.walk(src):
+        if len(files):
+            testfile = os.path.join(root, files[0])
+            break
+
+    if testfile is not None:
+        try:
+            os.link(testfile, os.path.join(dst, 'testfile'))
+            os.unlink(os.path.join(dst, 'testfile'))
+            canhard = True
+        except Exception as e:
+            bb.debug(2, "Hardlink test failed with " + str(e))
+
+    if (canhard):
         # Need to copy directories only with tar first since cp will error if two 
         # writers try and create a directory at the same time
         cmd = "cd %s; find . -type d -print | tar --xattrs --xattrs-include='*' -cf - -S -C %s -p --no-recursion --files-from - | tar --xattrs --xattrs-include='*' -xhf - -C %s" % (src, src, dst)
@@ -121,12 +136,9 @@ def copyhardlinktree(src, dst):
 def copyhardlink(src, dst):
     """Make a hard link when possible, otherwise copy."""
 
-    # We need to stat the destination directory as the destination file probably
-    # doesn't exist yet.
-    dstdir = os.path.dirname(dst)
-    if os.stat(src).st_dev == os.stat(dstdir).st_dev:
+    try:
         os.link(src, dst)
-    else:
+    except OSError:
         shutil.copy(src, dst)
 
 def remove(path, recurse=True):

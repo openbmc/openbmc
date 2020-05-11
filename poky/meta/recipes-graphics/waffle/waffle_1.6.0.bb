@@ -11,6 +11,8 @@ UPSTREAM_CHECK_URI = "http://www.waffle-gl.org/releases.html"
 
 inherit meson features_check lib_package bash-completion
 
+DEPENDS_append = " python3"
+
 # This should be overridden per-machine to reflect the capabilities of the GL
 # stack.
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'glx x11-egl', '', d)} \

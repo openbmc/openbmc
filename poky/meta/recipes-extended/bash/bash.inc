@@ -25,7 +25,6 @@ RDEPENDS_${PN} += "base-files"
 RDEPENDS_${PN}_class-nativesdk = ""
 RDEPENDS_${PN}-ptest += "make coreutils perl sed shadow util-linux-setpriv"
 
-DEPENDS_append_libc-glibc = " virtual/libc-locale"
 RDEPENDS_${PN}-ptest_append_libc-glibc = " \
 	glibc-gconv-big5hkscs \
 	glibc-gconv-iso8859-1 \

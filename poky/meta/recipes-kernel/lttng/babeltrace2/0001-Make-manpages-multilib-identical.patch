@@ -1,0 +1,28 @@
+From 56986190e4b0c10945ce6aaa7ca10d6bd8a26a39 Mon Sep 17 00:00:00 2001
+From: Jeremy Puhlman <jpuhlman@mvista.com>
+Date: Mon, 9 Mar 2020 21:10:35 +0000
+Subject: [PATCH] Make manpages multilib identical
+
+Upstream-Status: Pending
+Signed-off-by: Jeremy Puhlman <jpuhlman@mvista.com>
+---
+ doc/man/asciidoc-attrs.conf.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/doc/man/asciidoc-attrs.conf.in b/doc/man/asciidoc-attrs.conf.in
+index ad1183f1..e11c7031 100644
+--- a/doc/man/asciidoc-attrs.conf.in
++++ b/doc/man/asciidoc-attrs.conf.in
+@@ -1,7 +1,7 @@
+ [attributes]
+ # default values
+-system_plugin_path="@LIBDIR@/babeltrace2/plugins"
+-system_plugin_provider_path="@LIBDIR@/babeltrace2/plugin-providers"
++system_plugin_path="@prefix@/lib*/babeltrace2/plugins"
++system_plugin_provider_path="@prefix@/lib*/babeltrace2/plugin-providers"
+ babeltrace_version="@PACKAGE_VERSION@"
+ enable_debug_info="@ENABLE_DEBUG_INFO_VAL@"
+ defrdport=5344
+-- 
+2.24.1
+

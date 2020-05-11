@@ -11,8 +11,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c \
 DEPENDS = "glib-2.0 gssdp gupnp gupnp-av gupnp-dlna libsoup-2.4 libxml2 dleyna-core"
 RDEPENDS_${PN} = "dleyna-connector-dbus"
 
+PV .= "+git${SRCPV}"
 SRC_URI = "git://github.com/01org/${BPN}.git"
-SRCREV = "776950d5d96ac9dbf5c5c47bde8ac06f50a3cf46"
+SRCREV = "eb895ae82715e9889a948ffa810c0f828b4f4c76"
 S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig

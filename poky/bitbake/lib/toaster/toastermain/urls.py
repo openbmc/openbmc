@@ -51,7 +51,7 @@ if toastermain.settings.DEBUG_PANEL_ENABLED:
 
 urlpatterns = [
     # Uncomment the next line to enable the admin:
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
 ] + urlpatterns
 
 # Automatically discover urls.py in various apps, beside our own
@@ -69,7 +69,7 @@ for t in os.walk(os.path.dirname(currentdir)):
         # make sure we don't have this module name in
         conflict = False
         for p in urlpatterns:
-            if p.regex.pattern == '^' + modulename + '/':
+            if p.pattern.regex.pattern == '^' + modulename + '/':
                 conflict = True
         if not conflict:
             urlpatterns.insert(0, url(r'^' + modulename + '/', include ( modulename + '.urls')))

@@ -36,7 +36,7 @@ RDEPENDS_packagegroup-meta-networking-connectivity = "\
     libdnet ufw civetweb freeradius kea daq \
     mbedtls relayd snort dhcpcd rdate vlan vpnc \
     inetutils wolfssl lftp miniupnpd networkmanager \
-    networkmanager-openvpn rdist nanomsg python-networkmanager \
+    networkmanager-openvpn rdist nanomsg python3-networkmanager \
     ${@bb.utils.contains("DISTRO_FEATURES", "bluetooth x11", "blueman", "", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "samba", "", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "samba", "", d)} \
@@ -55,7 +55,7 @@ RDEPENDS_packagegroup-meta-networking-daemons = "\
 RDEPENDS_packagegroup-meta-networking-daemons_remove_libc-musl = "opensaf"
 
 RDEPENDS_packagegroup-meta-networking-devtools = "\
-    python-ldap grpc \
+    python3-ldap \
     "
 
 RDEPENDS_packagegroup-meta-networking-extended = "\
@@ -107,12 +107,12 @@ RDEPENDS_packagegroup-meta-networking-support = "\
     tunctl dovecot ipvsadm stunnel chrony spice-protocol \
     usbredir ntop wireshark tnftp lksctp-tools \
     cim-schema-docs cim-schema-final cim-schema-exper \
-    libmemcached smcroute libtevent ipcalc c-ares uftp \
+    libmemcached smcroute libtevent ipcalc uftp \
     ntimed linux-atm ssmtp openvpn rdma-core \
     iftop aoetools tcpslice tcpdump libtalloc memcached nuttcp netcat \
     netcat-openbsd fetchmail yp-tools ypbind-mt yp-tools \
     arptables macchanger nghttp2 strongswan fping \
-    dnssec-conf libesmtp cifs-utils open-isns \
+    libesmtp cifs-utils open-isns \
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "libldb", "", d)} \
     ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "non-commercial", "netperf", "", d)} \
     ${@bb.utils.contains_any("TRANSLATED_TARGET_ARCH", "i586 x86-64", "spice", "", d)} \

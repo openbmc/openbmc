@@ -11,7 +11,8 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 DEPENDS = "libaio zlib coreutils-native"
-RDEPENDS_${PN} = "python bash"
+DEPENDS += "${@bb.utils.contains('MACHINE_FEATURES', 'pmem', 'pmdk', '', d)}"
+RDEPENDS_${PN} = "python3-core bash"
 
 PACKAGECONFIG_NUMA = "numa"
 # ARM does not currently support NUMA
@@ -24,6 +25,7 @@ PACKAGECONFIG[numa] = ",--disable-numa,numactl"
 SRCREV = "08ce9dc20b8a4e55db7af6d869ddfa49b4a02d03"
 SRC_URI = "git://git.kernel.dk/fio.git \
           file://0001-update-the-interpreter-paths.patch \
+          file://python3_shebangs.patch \
 "
 
 S = "${WORKDIR}/git"
@@ -32,7 +34,7 @@ S = "${WORKDIR}/git"
 DISABLE_STATIC = ""
 
 EXTRA_OEMAKE = "CC='${CC}' LDFLAGS='${LDFLAGS}'"
-EXTRA_OECONF = "--disable-optimizations"
+EXTRA_OECONF = "${@bb.utils.contains('MACHINE_FEATURES', 'x86', '--disable-optimizations', '', d)}"
 
 do_configure() {
     ./configure ${EXTRA_OECONF}

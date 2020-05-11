@@ -1,4 +1,4 @@
-From a89c2e6d40606f563467a83fb98933e990e71377 Mon Sep 17 00:00:00 2001
+From e7ed91c48e1a07527a860637a7865eb67ce34cf3 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 Date: Tue, 2 Apr 2019 01:34:35 +0200
 Subject: [PATCH] Fix build with musl - systemd specific
@@ -12,6 +12,7 @@ for musl.
 Upstream-Status: Pending
 
 Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+
 ---
  shared/systemd/src/basic/in-addr-util.c |  1 +
  shared/systemd/src/basic/process-util.c |  9 +++++++++
@@ -22,10 +23,10 @@ Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
  6 files changed, 27 insertions(+), 23 deletions(-)
 
 diff --git a/shared/systemd/src/basic/in-addr-util.c b/shared/systemd/src/basic/in-addr-util.c
-index 5899f62..0adb248 100644
+index 91d687c..8388304 100644
 --- a/shared/systemd/src/basic/in-addr-util.c
 +++ b/shared/systemd/src/basic/in-addr-util.c
-@@ -14,6 +14,7 @@
+@@ -15,6 +15,7 @@
  #include "in-addr-util.h"
  #include "macro.h"
  #include "parse-util.h"
@@ -34,10 +35,10 @@ index 5899f62..0adb248 100644
  #include "strxcpyx.h"
  #include "util.h"
 diff --git a/shared/systemd/src/basic/process-util.c b/shared/systemd/src/basic/process-util.c
-index 7431be3..189060a 100644
+index 1456167..42f51a0 100644
 --- a/shared/systemd/src/basic/process-util.c
 +++ b/shared/systemd/src/basic/process-util.c
-@@ -21,6 +21,9 @@
+@@ -17,6 +17,9 @@
  #include <sys/wait.h>
  #include <syslog.h>
  #include <unistd.h>
@@ -47,7 +48,7 @@ index 7431be3..189060a 100644
  #if 0 /* NM_IGNORED */
  #if HAVE_VALGRIND_VALGRIND_H
  #include <valgrind/valgrind.h>
-@@ -1183,11 +1186,13 @@ void reset_cached_pid(void) {
+@@ -1123,11 +1126,13 @@ void reset_cached_pid(void) {
          cached_pid = CACHED_PID_UNSET;
  }
  
@@ -61,7 +62,7 @@ index 7431be3..189060a 100644
  
  pid_t getpid_cached(void) {
          static bool installed = false;
-@@ -1216,7 +1221,11 @@ pid_t getpid_cached(void) {
+@@ -1156,7 +1161,11 @@ pid_t getpid_cached(void) {
                           * only half-documented (glibc doesn't document it but LSB does — though only superficially)
                           * we'll check for errors only in the most generic fashion possible. */
  
@@ -74,10 +75,10 @@ index 7431be3..189060a 100644
                                  cached_pid = CACHED_PID_UNSET;
                                  return new_pid;
 diff --git a/shared/systemd/src/basic/socket-util.h b/shared/systemd/src/basic/socket-util.h
-index 15443f1..4807198 100644
+index a0886e0..da47d14 100644
 --- a/shared/systemd/src/basic/socket-util.h
 +++ b/shared/systemd/src/basic/socket-util.h
-@@ -13,6 +13,12 @@
+@@ -14,6 +14,12 @@
  #include <sys/types.h>
  #include <sys/un.h>
  
@@ -147,10 +148,10 @@ index c3b9448..e80a938 100644
  #include <stdio.h>
  #include <sys/types.h>
 diff --git a/shared/systemd/src/basic/string-util.h b/shared/systemd/src/basic/string-util.h
-index b23f4c8..8f2f6e0 100644
+index 04cc82b..2cf589a 100644
 --- a/shared/systemd/src/basic/string-util.h
 +++ b/shared/systemd/src/basic/string-util.h
-@@ -27,6 +27,11 @@
+@@ -26,6 +26,11 @@
  #define strcaseeq(a,b) (strcasecmp((a),(b)) == 0)
  #define strncaseeq(a, b, n) (strncasecmp((a), (b), (n)) == 0)
  
@@ -162,6 +163,3 @@ index b23f4c8..8f2f6e0 100644
  int strcmp_ptr(const char *a, const char *b) _pure_;
  
  static inline bool streq_ptr(const char *a, const char *b) {
--- 
-2.17.1
-

@@ -1,0 +1,32 @@
+The value for perl_archname can vary depending on the host, e.g. 
+x86_64-linux-gnu-thread-multi or x86_64-linux-thread-multi which
+makes the ptest package non-reproducible. Its unused other than 
+these references so drop it.
+
+RP 2020/2/6
+
+Upstream-Status: Pending
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: openssl-1.1.1d/Configure
+===================================================================
+--- openssl-1.1.1d.orig/Configure
++++ openssl-1.1.1d/Configure
+@@ -286,7 +286,7 @@ if (defined env($local_config_envname))
+ # Save away perl command information
+ $config{perl_cmd} = $^X;
+ $config{perl_version} = $Config{version};
+-$config{perl_archname} = $Config{archname};
++#$config{perl_archname} = $Config{archname};
+ 
+ $config{prefix}="";
+ $config{openssldir}="";
+@@ -2517,7 +2517,7 @@ _____
+                           @{$config{perlargv}}), "\n";
+         print "\nPerl information:\n\n";
+         print '    ',$config{perl_cmd},"\n";
+-        print '    ',$config{perl_version},' for ',$config{perl_archname},"\n";
++        print '    ',$config{perl_version},"\n";
+     }
+     if ($dump || $options) {
+         my $longest = 0;

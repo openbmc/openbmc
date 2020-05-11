@@ -1,0 +1,48 @@
+From 67590a44c1256491fa674426f0170d5d05377d05 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 15 Apr 2020 14:17:20 -0700
+Subject: [PATCH 16/16] Check for clang before checking gcc version
+
+Clang advertises itself to be gcc 4.2.1, so when compiling this test
+here fails since gcc < 4.4.5 did not support -static-libstdc++ but thats
+not true for clang, so its better to make an additional check for clang
+before resorting to gcc version check. This should let clang enable
+static libstdc++ linking
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure    | 2 +-
+ configure.ac | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure b/configure
+index 590b03c2da0..46f116fdb54 100755
+--- a/configure
++++ b/configure
+@@ -5140,7 +5140,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+ 
+-#if (__GNUC__ < 4) || (__GNUC__ == 4 && __GNUC_MINOR__ < 5)
++#if !defined(__clang__) && ((__GNUC__ < 4) || (__GNUC__ == 4 && __GNUC_MINOR__ < 5))
+ #error -static-libstdc++ not implemented
+ #endif
+ int main() {}
+diff --git a/configure.ac b/configure.ac
+index d3f85e6f5d5..c0eb1343121 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1309,7 +1309,7 @@ if test "$GCC" = yes; then
+   AC_MSG_CHECKING([whether g++ accepts -static-libstdc++ -static-libgcc])
+   AC_LANG_PUSH(C++)
+   AC_LINK_IFELSE([AC_LANG_SOURCE([
+-#if (__GNUC__ < 4) || (__GNUC__ == 4 && __GNUC_MINOR__ < 5)
++#if !defined(__clang__) && ((__GNUC__ < 4) || (__GNUC__ == 4 && __GNUC_MINOR__ < 5))
+ #error -static-libstdc++ not implemented
+ #endif
+ int main() {}])],
+-- 
+2.26.1
+

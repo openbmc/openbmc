@@ -12,6 +12,7 @@ deltask do_patch
 deltask do_configure
 deltask do_compile
 deltask do_install
+deltask do_populate_lic
 deltask do_populate_sysroot
 
 do_package_index[nostamp] = "1"

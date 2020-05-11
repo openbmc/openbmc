@@ -30,6 +30,7 @@ RDEPENDS_${PN}_arm = "dmidecode"
 RDEPENDS_${PN}_aarch64 = "dmidecode"
 RDEPENDS_${PN}_powerpc = "dmidecode"
 RDEPENDS_${PN}_powerpc64 = "dmidecode"
+RDEPENDS_${PN}_powerpc64le = "dmidecode"
 RDEPENDS_${PN}_append = " \
     perl \
     perl-module-file-basename \

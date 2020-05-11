@@ -1,0 +1,129 @@
+From 07a9401d84804d7f0181aa4fb0f13a54b2a1c9a8 Mon Sep 17 00:00:00 2001
+From: Nate Karstens <nate.karstens@garmin.com>
+Date: Tue, 1 Aug 2017 17:06:01 -0500
+Subject: [PATCH 07/11] Indicate loopback interface to mDNS core
+
+Tells the mDNS core if an interface is a loopback interface,
+similar to AddInterfaceToList() in the MacOS implementation.
+Also reorganizes SetupOneInterface() to use a const struct
+rather than growing its parameter list again.
+
+Upstream-Status: Submitted [dts@apple.com]
+
+Signed-off-by: Nate Karstens <nate.karstens@garmin.com>
+---
+ mDNSPosix/mDNSPosix.c | 37 ++++++++++++++++++-------------------
+ 1 file changed, 18 insertions(+), 19 deletions(-)
+
+diff --git a/mDNSPosix/mDNSPosix.c b/mDNSPosix/mDNSPosix.c
+index 3fc5451..798ab10 100644
+--- a/mDNSPosix/mDNSPosix.c
++++ b/mDNSPosix/mDNSPosix.c
+@@ -889,16 +889,14 @@ mDNSlocal void CleanRecentInterfaces(void)
+ 
+ // Creates a PosixNetworkInterface for the interface whose IP address is
+ // intfAddr and whose name is intfName and registers it with mDNS core.
+-mDNSlocal int SetupOneInterface(mDNS *const m, struct sockaddr *intfAddr, struct sockaddr *intfMask, const char *intfName, int intfIndex)
++mDNSlocal int SetupOneInterface(mDNS *const m, struct ifi_info *const ifi)
+ {
+     int err = 0;
+     PosixNetworkInterface *intf;
+     PosixNetworkInterface *alias = NULL;
+ 
+     assert(m != NULL);
+-    assert(intfAddr != NULL);
+-    assert(intfName != NULL);
+-    assert(intfMask != NULL);
++    assert(ifi != NULL);
+ 
+     // Allocate the interface structure itself.
+     intf = (PosixNetworkInterface*)calloc(1, sizeof(*intf));
+@@ -907,26 +905,27 @@ mDNSlocal int SetupOneInterface(mDNS *const m, struct sockaddr *intfAddr, struct
+     // And make a copy of the intfName.
+     if (err == 0)
+     {
+-        intf->intfName = strdup(intfName);
++        intf->intfName = strdup(ifi->ifi_name);
+         if (intf->intfName == NULL) { assert(0); err = ENOMEM; }
+     }
+ 
+     if (err == 0)
+     {
+         // Set up the fields required by the mDNS core.
+-        SockAddrTomDNSAddr(intfAddr, &intf->coreIntf.ip, NULL);
+-        SockAddrTomDNSAddr(intfMask, &intf->coreIntf.mask, NULL);
++        SockAddrTomDNSAddr(ifi->ifi_addr, &intf->coreIntf.ip, NULL);
++        SockAddrTomDNSAddr(ifi->ifi_netmask, &intf->coreIntf.mask, NULL);
+ 
+         //LogMsg("SetupOneInterface: %#a %#a",  &intf->coreIntf.ip,  &intf->coreIntf.mask);
+-        strncpy(intf->coreIntf.ifname, intfName, sizeof(intf->coreIntf.ifname));
++        strncpy(intf->coreIntf.ifname, ifi->ifi_name, sizeof(intf->coreIntf.ifname));
+         intf->coreIntf.ifname[sizeof(intf->coreIntf.ifname)-1] = 0;
+         intf->coreIntf.Advertise = m->AdvertiseLocalAddresses;
+         intf->coreIntf.McastTxRx = mDNStrue;
++        intf->coreIntf.Loopback = ((ifi->ifi_flags & IFF_LOOPBACK) != 0) ? mDNStrue : mDNSfalse;
+ 
+         // Set up the extra fields in PosixNetworkInterface.
+         assert(intf->intfName != NULL);         // intf->intfName already set up above
+-        intf->index                = intfIndex;
+-        intf->sa_family            = intfAddr->sa_family;
++        intf->index                = ifi->ifi_index;
++        intf->sa_family            = ifi->ifi_addr->sa_family;
+         intf->multicastSocket4     = -1;
+ #if HAVE_IPV6
+         intf->multicastSocket6     = -1;
+@@ -936,17 +935,17 @@ mDNSlocal int SetupOneInterface(mDNS *const m, struct sockaddr *intfAddr, struct
+         intf->coreIntf.InterfaceID = (mDNSInterfaceID)alias;
+ 
+         if (alias != intf)
+-            debugf("SetupOneInterface: %s %#a is an alias of %#a", intfName, &intf->coreIntf.ip, &alias->coreIntf.ip);
++            debugf("SetupOneInterface: %s %#a is an alias of %#a", ifi->ifi_name, &intf->coreIntf.ip, &alias->coreIntf.ip);
+     }
+ 
+     // Set up the multicast socket
+     if (err == 0)
+     {
+-        if (alias->multicastSocket4 == -1 && intfAddr->sa_family == AF_INET)
+-            err = SetupSocket(intfAddr, MulticastDNSPort, intf->index, &alias->multicastSocket4);
++        if (alias->multicastSocket4 == -1 && ifi->ifi_addr->sa_family == AF_INET)
++            err = SetupSocket(ifi->ifi_addr, MulticastDNSPort, intf->index, &alias->multicastSocket4);
+ #if HAVE_IPV6
+-        else if (alias->multicastSocket6 == -1 && intfAddr->sa_family == AF_INET6)
+-            err = SetupSocket(intfAddr, MulticastDNSPort, intf->index, &alias->multicastSocket6);
++        else if (alias->multicastSocket6 == -1 && ifi->ifi_addr->sa_family == AF_INET6)
++            err = SetupSocket(ifi->ifi_addr, MulticastDNSPort, intf->index, &alias->multicastSocket6);
+ #endif
+     }
+ 
+@@ -973,8 +972,8 @@ mDNSlocal int SetupOneInterface(mDNS *const m, struct sockaddr *intfAddr, struct
+     }
+     else
+     {
+-        // Use intfName instead of intf->intfName in the next line to avoid dereferencing NULL.
+-        debugf("SetupOneInterface: %s %#a failed to register %d", intfName, &intf->coreIntf.ip, err);
++        // Use ifi->ifi_name instead of intf->intfName in the next line to avoid dereferencing NULL.
++        debugf("SetupOneInterface: %s %#a failed to register %d", ifi->ifi_name, &intf->coreIntf.ip, err);
+         if (intf) { FreePosixNetworkInterface(intf); intf = NULL; }
+     }
+ 
+@@ -1023,7 +1022,7 @@ mDNSlocal int SetupInterfaceList(mDNS *const m)
+                 }
+                 else
+                 {
+-                    if (SetupOneInterface(m, i->ifi_addr, i->ifi_netmask, i->ifi_name, i->ifi_index) == 0)
++                    if (SetupOneInterface(m, i) == 0)
+                         if (i->ifi_addr->sa_family == AF_INET)
+                             foundav4 = mDNStrue;
+                 }
+@@ -1037,7 +1036,7 @@ mDNSlocal int SetupInterfaceList(mDNS *const m)
+         // In the interim, we skip loopback interface only if we found at least one v4 interface to use
+         // if ((m->HostInterfaces == NULL) && (firstLoopback != NULL))
+         if (!foundav4 && firstLoopback)
+-            (void) SetupOneInterface(m, firstLoopback->ifi_addr, firstLoopback->ifi_netmask, firstLoopback->ifi_name, firstLoopback->ifi_index);
++            (void) SetupOneInterface(m, firstLoopback);
+     }
+ 
+     // Clean up.
+-- 
+2.17.1
+

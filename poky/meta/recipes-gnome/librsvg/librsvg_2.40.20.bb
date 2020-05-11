@@ -20,6 +20,7 @@ inherit gnomebase gtk-doc pixbufcache upstream-version-is-even gobject-introspec
 
 SRC_URI += "file://gtk-option.patch \
             file://0001-Auto-detect-Bsymbolic-fixes-configure-on-macOS.patch \
+            file://0001-Remove-non-reproducible-SRCDIR.patch \
 "
 
 SRC_URI[archive.md5sum] = "4949d313b0c5d9161a5c259104af5568"

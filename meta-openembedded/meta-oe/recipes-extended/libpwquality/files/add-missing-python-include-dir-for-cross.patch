@@ -13,28 +13,23 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  2 files changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/python/Makefile.am b/python/Makefile.am
-index abc5cd3..e35ba71 100644
+index 1d00c0c..52816b2 100644
 --- a/python/Makefile.am
 +++ b/python/Makefile.am
-@@ -14,4 +14,4 @@ all-local:
- 	CFLAGS="${CFLAGS} -fno-strict-aliasing" @PYTHONBINARY@ setup.py build --build-lib=.
+@@ -14,7 +14,7 @@ all-local:
+ 	CFLAGS="${CFLAGS} -fno-strict-aliasing" @PYTHONBINARY@ setup.py build --build-base py$(PYTHONREV)
  
  install-exec-local:
--	CFLAGS="${CFLAGS} -fno-strict-aliasing" @PYTHONBINARY@ setup.py install --prefix=${DESTDIR}${prefix}
-+	CFLAGS="${CFLAGS} -fno-strict-aliasing" @PYTHONBINARY@ setup.py install --prefix=${DESTDIR}${prefix} --install-lib=${DESTDIR}/${PYTHONSITEDIR}
+-	CFLAGS="${CFLAGS} -fno-strict-aliasing" @PYTHONBINARY@ setup.py build --build-base py$(PYTHONREV) install --prefix=${DESTDIR}${prefix}
++	CFLAGS="${CFLAGS} -fno-strict-aliasing" @PYTHONBINARY@ setup.py build --build-base py$(PYTHONREV) install --prefix=${DESTDIR}${prefix} --install-lib=${DESTDIR}/${PYTHONSITEDIR}
+ 
+ clean-local:
+ 	rm -rf py$(PYTHONREV)
 diff --git a/python/setup.py.in b/python/setup.py.in
-index 6457595..d3db0e5 100755
+index a741b91..6759a95 100755
 --- a/python/setup.py.in
 +++ b/python/setup.py.in
-@@ -6,6 +6,7 @@
- 
- from distutils.core import setup, Extension
- from distutils.command.build_ext import build_ext as _build_ext
-+import os
- 
- class build_ext(_build_ext):
-     def genconstants(self, headerfile, outputfile):
-@@ -23,7 +24,7 @@ class build_ext(_build_ext):
+@@ -33,7 +33,7 @@ class sdist(_sdist):
  
  pwqmodule = Extension('pwquality',
              sources = ['pwquality.c'],
@@ -44,5 +39,5 @@ index 6457595..d3db0e5 100755
              libraries = ['pwquality'])
  
 -- 
-1.9.1
+2.17.1
 

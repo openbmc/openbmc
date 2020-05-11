@@ -3,15 +3,12 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-import unittest
-import tempfile
 import os
 import bb
 
 import layerindexlib
 from layerindexlib.tests.common import LayersTest
 
-import logging
 
 class LayerIndexCookerTest(LayersTest):
 

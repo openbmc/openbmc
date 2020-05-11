@@ -37,7 +37,7 @@
 
 
 import logging
-import os, sys, itertools, time, subprocess
+import os, sys, itertools, time
 
 try:
     import curses
@@ -46,7 +46,6 @@ except ImportError:
 
 import bb
 import xmlrpc.client
-from bb import ui
 from bb.ui import uihelper
 
 parsespin = itertools.cycle( r'|/-\\' )
@@ -239,7 +238,7 @@ class NCursesUI:
             if error:
                 print("Error running command '%s': %s" % (cmdline, error))
                 return
-            elif ret != True:
+            elif not ret:
                 print("Couldn't get default commandlind! %s" % ret)
                 return
         except xmlrpc.client.Fault as x:

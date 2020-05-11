@@ -39,7 +39,10 @@ set -o errexit
 
 BS_DIR="tmp/buildstats"
 N=10
+RECIPE=""
+TASKS="compile:configure:fetch:install:patch:populate_lic:populate_sysroot:unpack"
 STATS="utime"
+ACCUMULATE=""
 SUM=""
 OUTDATA_FILE="$PWD/buildstats-plot.out"
 
@@ -51,11 +54,15 @@ Usage: $CMD [-b buildstats_dir] [-t do_task]
                 (default: "$BS_DIR")
   -n N          Top N recipes to display. Ignored if -S is present
                 (default: "$N")
+  -r recipe     The recipe mask to be searched
+  -t tasks      The tasks to be computed
+                (default: "$TASKS")
   -s stats      The stats to be matched. If more that one stat, units
                 should be the same because data is plot as histogram.
                 (see buildstats.sh -h for all options) or any other defined
                 (build)stat separated by colons, i.e. stime:utime
                 (default: "$STATS")
+  -a            Accumulate all stats values for found recipes
   -S            Sum values for a particular stat for found recipes
   -o            Output data file.
                 (default: "$OUTDATA_FILE")
@@ -64,32 +71,41 @@ EOM
 }
 
 # Parse and validate arguments
-while getopts "b:n:s:o:Sh" OPT; do
-	case $OPT in
-	b)
-		BS_DIR="$OPTARG"
-		;;
-	n)
-		N="$OPTARG"
-		;;
-	s)
-	        STATS="$OPTARG"
-	        ;;
-	S)
-	        SUM="y"
-	        ;;
-	o)
-	        OUTDATA_FILE="$OPTARG"
-	        ;;
-	h)
-		usage
-		exit 0
-		;;
-	*)
-		usage
-		exit 1
-		;;
-	esac
+while getopts "b:n:r:t:s:o:aSh" OPT; do
+    case $OPT in
+    b)
+        BS_DIR="$OPTARG"
+        ;;
+    n)
+        N="$OPTARG"
+        ;;
+    r)
+        RECIPE="-r $OPTARG"
+        ;;
+    t)
+        TASKS="$OPTARG"
+        ;;
+    s)
+        STATS="$OPTARG"
+        ;;
+    a)
+        ACCUMULATE="-a"
+        ;;
+    S)
+        SUM="y"
+        ;;
+    o)
+        OUTDATA_FILE="$OPTARG"
+        ;;
+    h)
+        usage
+        exit 0
+        ;;
+    *)
+        usage
+        exit 1
+        ;;
+    esac
 done
 
 # Get number of stats
@@ -101,10 +117,10 @@ CD=$(dirname $0)
 
 # Parse buildstats recipes to produce a single table
 OUTBUILDSTATS="$PWD/buildstats.log"
-$CD/buildstats.sh -H -s "$STATS" -H > $OUTBUILDSTATS
+$CD/buildstats.sh -b "$BS_DIR" -s "$STATS" -t "$TASKS" $RECIPE $ACCUMULATE -H > $OUTBUILDSTATS
 
 # Get headers
-HEADERS=$(cat $OUTBUILDSTATS | sed -n -e '1s/ /-/g' -e '1s/:/ /gp')
+HEADERS=$(cat $OUTBUILDSTATS | sed -n -e 's/\(.*\)/"\1"/' -e '1s/ /\\\\\\\\ /g' -e 's/_/\\\\\\\\_/g' -e '1s/:/" "/gp')
 
 echo -e "set boxwidth 0.9 relative"
 echo -e "set style data histograms"
@@ -113,7 +129,7 @@ echo -e "set xtics rotate by 45 right"
 
 # Get output data
 if [ -z "$SUM" ]; then
-    cat $OUTBUILDSTATS | sed -e '1d' | sort -k3 -n -r | head -$N > $OUTDATA_FILE
+    cat $OUTBUILDSTATS | sed -e '1d' -e 's/_/\\\\_/g' | sort -k3 -n -r | head -$N > $OUTDATA_FILE
     # include task at recipe column
     sed -i -e "1i\
 ${HEADERS}" $OUTDATA_FILE
@@ -125,8 +141,8 @@ else
     declare -a sumargs
     j=0
     for i in `seq $nstats`; do
-	sumargs[j]=sum; j=$(( $j + 1 ))
-	sumargs[j]=`expr 3 + $i - 1`;  j=$(( $j + 1 ))
+        sumargs[j]=sum; j=$(( $j + 1 ))
+        sumargs[j]=`expr 3 + $i - 1`;  j=$(( $j + 1 ))
     done
 
     # Do the processing with datamash

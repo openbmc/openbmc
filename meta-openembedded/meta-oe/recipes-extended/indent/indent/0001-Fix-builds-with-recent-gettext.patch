@@ -9,8 +9,6 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  Makefile.am | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 548fea7..cf01c5e 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -1,7 +1,7 @@
@@ -18,7 +16,17 @@ index 548fea7..cf01c5e 100644
  AUTOMAKE_OPTIONS = no-texinfo.tex
  
 -SUBDIRS = intl src doc po man
-+SUBDIRS = src doc po man
++SUBDIRS = src po man
  
  BUILT_SOURCES = 
  
+--- a/configure.ac
++++ b/configure.ac
+@@ -58,7 +58,6 @@ fi
+ AC_HEADER_DIRENT
+ 
+ AC_OUTPUT([ 
+-   intl/Makefile
+    po/Makefile.in
+    Makefile
+    src/Makefile

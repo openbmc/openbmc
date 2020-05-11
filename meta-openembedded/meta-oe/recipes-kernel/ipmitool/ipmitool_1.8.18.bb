@@ -24,6 +24,12 @@ DEPENDS = "openssl readline ncurses"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/ipmitool/ipmitool-${PV}.tar.bz2 \
            file://0001-Migrate-to-openssl-1.1.patch \
+           file://0001-fru-Fix-buffer-overflow-vulnerabilities.patch \
+           file://0001-fru-Fix-buffer-overflow-in-ipmi_spd_print_fru.patch \
+           file://0002-session-Fix-buffer-overflow-in-ipmi_get_session_info.patch \
+           file://0003-channel-Fix-buffer-overflow.patch \
+           file://0004-lanp-Fix-buffer-overflows-in-get_lan_param_select.patch \
+           file://0005-fru-sdr-Fix-id_string-buffer-overflows.patch \
            "
 SRC_URI[md5sum] = "bab7ea104c7b85529c3ef65c54427aa3"
 SRC_URI[sha256sum] = "0c1ba3b1555edefb7c32ae8cd6a3e04322056bc087918f07189eeedfc8b81e01"

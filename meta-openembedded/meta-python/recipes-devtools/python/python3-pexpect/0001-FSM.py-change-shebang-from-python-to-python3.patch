@@ -1,0 +1,25 @@
+From 35462d7b778eea32fd0cc0bbc79d6e6f53d942b4 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Thu, 23 Apr 2020 08:01:42 +0000
+Subject: [PATCH] FSM.py: change shebang from python to python3
+
+Upstream-Status: Pending
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ pexpect/FSM.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pexpect/FSM.py b/pexpect/FSM.py
+index 46b392e..4e77654 100644
+--- a/pexpect/FSM.py
++++ b/pexpect/FSM.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ '''This module implements a Finite State Machine (FSM). In addition to state
+ this FSM also maintains a user defined "memory". So this FSM can be used as a
+-- 
+2.24.1
+

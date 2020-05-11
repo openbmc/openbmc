@@ -1,0 +1,99 @@
+From 3df91d1d8b9c7a01b3ef8133c4f9b9764227d583 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 3 Aug 2018 09:55:12 -0700
+Subject: [PATCH] nativesdk-glibc: Make relocatable install for locales
+
+The glibc locale path is hard-coded to the install prefix, but in SDKs we need
+to be able to relocate the binaries.  Expand the strings to 4K and put them in a
+magic segment that we can relocate at install time.
+
+Upstream-Status: Inappropriate (OE-specific)
+
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ locale/findlocale.c  | 4 ++--
+ locale/loadarchive.c | 2 +-
+ locale/localeinfo.h  | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+Index: git/locale/findlocale.c
+===================================================================
+--- git.orig/locale/findlocale.c
++++ git/locale/findlocale.c
+@@ -56,7 +56,7 @@ struct __locale_data *const _nl_C[] attr
+    which are somehow addressed.  */
+ struct loaded_l10nfile *_nl_locale_file_list[__LC_LAST];
+ 
+-const char _nl_default_locale_path[] attribute_hidden = COMPLOCALEDIR;
++char _nl_default_locale_path[4096] attribute_hidden __attribute__ ((section (".gccrelocprefix"))) = COMPLOCALEDIR;
+ 
+ /* Checks if the name is actually present, that is, not NULL and not
+    empty.  */
+@@ -166,7 +166,7 @@ _nl_find_locale (const char *locale_path
+ 
+       /* Nothing in the archive.  Set the default path to search below.  */
+       locale_path = _nl_default_locale_path;
+-      locale_path_len = sizeof _nl_default_locale_path;
++      locale_path_len = strlen(locale_path) + 1;
+     }
+   else
+     /* We really have to load some data.  First see whether the name is
+Index: git/locale/loadarchive.c
+===================================================================
+--- git.orig/locale/loadarchive.c
++++ git/locale/loadarchive.c
+@@ -42,7 +42,7 @@
+ 
+ 
+ /* Name of the locale archive file.  */
+-static const char archfname[] = COMPLOCALEDIR "/locale-archive";
++static const char archfname[4096] __attribute__ ((section (".gccrelocprefix"))) = COMPLOCALEDIR "/locale-archive";
+ 
+ /* Size of initial mapping window, optimal if large enough to
+    cover the header plus the initial locale.  */
+Index: git/locale/localeinfo.h
+===================================================================
+--- git.orig/locale/localeinfo.h
++++ git/locale/localeinfo.h
+@@ -331,7 +331,7 @@ _nl_lookup_word (locale_t l, int categor
+ }
+ 
+ /* Default search path if no LOCPATH environment variable.  */
+-extern const char _nl_default_locale_path[] attribute_hidden;
++extern char _nl_default_locale_path[4096] attribute_hidden;
+ 
+ /* Load the locale data for CATEGORY from the file specified by *NAME.
+    If *NAME is "", use environment variables as specified by POSIX, and
+Index: git/locale/programs/locale.c
+===================================================================
+--- git.orig/locale/programs/locale.c
++++ git/locale/programs/locale.c
+@@ -632,6 +632,7 @@ nameentcmp (const void *a, const void *b
+ 		  ((const struct nameent *) b)->name);
+ }
+ 
++static char _write_archive_locales_path[4096] attribute_hidden __attribute__ ((section (".gccrelocprefix"))) = ARCHIVE_NAME;
+ 
+ static int
+ write_archive_locales (void **all_datap, char *linebuf)
+@@ -645,7 +646,7 @@ write_archive_locales (void **all_datap,
+   int fd, ret = 0;
+   uint32_t cnt;
+ 
+-  fd = open64 (ARCHIVE_NAME, O_RDONLY);
++  fd = open64 (_write_archive_locales_path, O_RDONLY);
+   if (fd < 0)
+     return 0;
+ 
+@@ -700,8 +701,8 @@ write_archive_locales (void **all_datap,
+ 	  if (cnt)
+ 	    putchar_unlocked ('\n');
+ 
+-	  printf ("locale: %-15.15s archive: " ARCHIVE_NAME "\n%s\n",
+-		  names[cnt].name, linebuf);
++	  printf ("locale: %-15.15s archive: %s\n%s\n",
++		  names[cnt].name, _write_archive_locales_path, linebuf);
+ 
+ 	  locrec = (struct locrecent *) (addr + names[cnt].locrec_offset);
+ 

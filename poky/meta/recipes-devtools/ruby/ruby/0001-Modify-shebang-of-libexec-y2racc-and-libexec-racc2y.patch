@@ -1,0 +1,38 @@
+From eed7bc855fd8d232d4d203cc9027dd07cee8eca2 Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@cn.fujitsu.com>
+Date: Sat, 8 Feb 2020 15:16:14 +0800
+Subject: [PATCH] Modify shebang of libexec/y2racc and libexec/racc2y.
+
+change /usr/local/bin/ruby to /usr/bin/env ruby.
+
+Upstream-Status: Pending
+
+Signed-off-by: Wang Mingyu <wangmy@cn.fujitsu.com>
+---
+ libexec/racc2y | 2 +-
+ libexec/y2racc | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libexec/racc2y b/libexec/racc2y
+index f88d73ed2c..74e49cfa21 100755
+--- a/libexec/racc2y
++++ b/libexec/racc2y
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/ruby
++#!/usr/bin/env ruby
+ #
+ # $Id$
+ #
+diff --git a/libexec/y2racc b/libexec/y2racc
+index 7933f94153..36daf864e1 100755
+--- a/libexec/y2racc
++++ b/libexec/y2racc
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/ruby
++#!/usr/bin/env ruby
+ #
+ # $Id$
+ #
+-- 
+2.17.1
+

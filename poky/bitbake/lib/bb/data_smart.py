@@ -107,10 +107,6 @@ class VariableParse:
             else:
                 code = match.group()[3:-1]
 
-            if "_remote_data" in self.d:
-                connector = self.d["_remote_data"]
-                return connector.expandPythonRef(self.varname, code, self.d)
-
             if self.varname:
                 varname = 'Var <%s>' % self.varname
             else:
@@ -268,12 +264,7 @@ class VariableHistory(object):
             self.variables[newvar].append(i.copy())
 
     def variable(self, var):
-        remote_connector = self.dataroot.getVar('_remote_data', False)
-        if remote_connector:
-            varhistory = remote_connector.getVarHistory(var)
-        else:
-            varhistory = []
-
+        varhistory = []
         if var in self.variables:
             varhistory.extend(self.variables[var])
         return varhistory
@@ -338,11 +329,12 @@ class VariableHistory(object):
                 lines.append(line)
         return lines
 
-    def get_variable_items_files(self, var, d):
+    def get_variable_items_files(self, var):
         """
         Use variable history to map items added to a list variable and
         the files in which they were added.
         """
+        d = self.dataroot
         history = self.variable(var)
         finalitems = (d.getVar(var) or '').split()
         filemap = {}
@@ -470,10 +462,6 @@ class DataSmart(MutableMapping):
             if var in dest:
                 return dest[var], self.overridedata.get(var, None)
 
-            if "_remote_data" in dest:
-                connector = dest["_remote_data"]["_content"]
-                return connector.getVar(var)
-
             if "_data" not in dest:
                 break
             dest = dest["_data"]
@@ -497,12 +485,6 @@ class DataSmart(MutableMapping):
         parsing=False
         if 'parsing' in loginfo:
             parsing=True
-
-        if '_remote_data' in self.dict:
-            connector = self.dict["_remote_data"]["_content"]
-            res = connector.setVar(var, value)
-            if not res:
-                return
 
         if 'op' not in loginfo:
             loginfo['op'] = "set"
@@ -607,11 +589,9 @@ class DataSmart(MutableMapping):
         """
         Rename the variable key to newkey
         """
-        if '_remote_data' in self.dict:
-            connector = self.dict["_remote_data"]["_content"]
-            res = connector.renameVar(key, newkey)
-            if not res:
-                return
+        if key == newkey:
+            bb.warn("Calling renameVar with equivalent keys (%s) is invalid" % key)
+            return
 
         val = self.getVar(key, 0, parsing=True)
         if val is not None:
@@ -658,11 +638,6 @@ class DataSmart(MutableMapping):
 
     def delVar(self, var, **loginfo):
         self.expand_cache = {}
-        if '_remote_data' in self.dict:
-            connector = self.dict["_remote_data"]["_content"]
-            res = connector.delVar(var)
-            if not res:
-                return
 
         loginfo['detail'] = ""
         loginfo['op'] = 'del'
@@ -690,11 +665,6 @@ class DataSmart(MutableMapping):
 
     def setVarFlag(self, var, flag, value, **loginfo):
         self.expand_cache = {}
-        if '_remote_data' in self.dict:
-            connector = self.dict["_remote_data"]["_content"]
-            res = connector.setVarFlag(var, flag, value)
-            if not res:
-                return
 
         if 'op' not in loginfo:
             loginfo['op'] = "set"
@@ -845,11 +815,6 @@ class DataSmart(MutableMapping):
 
     def delVarFlag(self, var, flag, **loginfo):
         self.expand_cache = {}
-        if '_remote_data' in self.dict:
-            connector = self.dict["_remote_data"]["_content"]
-            res = connector.delVarFlag(var, flag)
-            if not res:
-                return
 
         local_var, _ = self._findVar(var)
         if not local_var:
@@ -967,7 +932,7 @@ class DataSmart(MutableMapping):
 
     def localkeys(self):
         for key in self.dict:
-            if key not in ['_data', '_remote_data']:
+            if key not in ['_data']:
                 yield key
 
     def __iter__(self):
@@ -976,7 +941,7 @@ class DataSmart(MutableMapping):
         def keylist(d):        
             klist = set()
             for key in d:
-                if key in ["_data", "_remote_data"]:
+                if key in ["_data"]:
                     continue
                 if key in deleted:
                     continue
@@ -989,13 +954,6 @@ class DataSmart(MutableMapping):
 
             if "_data" in d:
                 klist |= keylist(d["_data"])
-
-            if "_remote_data" in d:
-                connector = d["_remote_data"]["_content"]
-                for key in connector.getKeys():
-                    if key in deleted:
-                        continue
-                    klist.add(key)
 
             return klist
 
@@ -1042,7 +1000,10 @@ class DataSmart(MutableMapping):
                 continue
 
             value = d.getVar(key, False) or ""
-            data.update({key:value})
+            if type(value) is type(self):
+                data.update({key:value.get_hash()})
+            else:
+                data.update({key:value})
 
             varflags = d.getVarFlags(key, internalflags = True)
             if not varflags:

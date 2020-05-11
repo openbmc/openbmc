@@ -103,6 +103,8 @@ class SignatureGeneratorOEBasicHashMixIn(object):
         self.unlockedrecipes = (data.getVar("SIGGEN_UNLOCKED_RECIPES") or
                                 "").split()
         self.unlockedrecipes = { k: "" for k in self.unlockedrecipes }
+        self.buildarch = data.getVar('BUILD_ARCH')
+        self._internal = False
         pass
 
     def tasks_resolved(self, virtmap, virtpnmap, dataCache):
@@ -140,8 +142,27 @@ class SignatureGeneratorOEBasicHashMixIn(object):
         self.dump_lockedsigs(sigfile)
         return super(bb.siggen.SignatureGeneratorBasicHash, self).dump_sigs(dataCache, options)
 
+    def prep_taskhash(self, tid, deps, dataCache):
+        super().prep_taskhash(tid, deps, dataCache)
+        if hasattr(self, "extramethod"):
+            (_, _, _, fn) = bb.runqueue.split_tid_mcfn(tid)
+            inherits = " ".join(dataCache.inherits[fn])    
+            if inherits.find("/native.bbclass") != -1 or inherits.find("/cross.bbclass") != -1:
+                self.extramethod[tid] = ":" + self.buildarch
+
     def get_taskhash(self, tid, deps, dataCache):
-        h = super(bb.siggen.SignatureGeneratorBasicHash, self).get_taskhash(tid, deps, dataCache)
+        if tid in self.lockedhashes:
+            if self.lockedhashes[tid]:
+                return self.lockedhashes[tid]
+            else:
+                return super().get_taskhash(tid, deps, dataCache)
+
+        # get_taskhash will call get_unihash internally in the parent class, we 
+        # need to disable our filter of it whilst this runs else
+        # incorrect hashes can be calculated.
+        self._internal = True
+        h = super().get_taskhash(tid, deps, dataCache)
+        self._internal = False
 
         (mc, _, task, fn) = bb.runqueue.split_tid_mcfn(tid)
 
@@ -169,8 +190,9 @@ class SignatureGeneratorOEBasicHashMixIn(object):
                 h_locked = self.lockedsigs[recipename][task][0]
                 var = self.lockedsigs[recipename][task][1]
                 self.lockedhashes[tid] = h_locked
-                unihash = super().get_unihash(tid)
-                self.taskhash[tid] = h_locked
+                self._internal = True
+                unihash = self.get_unihash(tid)
+                self._internal = False
                 #bb.warn("Using %s %s %s" % (recipename, task, h))
 
                 if h != h_locked and h_locked != unihash:
@@ -178,17 +200,24 @@ class SignatureGeneratorOEBasicHashMixIn(object):
                                           % (recipename, task, h, h_locked, var))
 
                 return h_locked
+
+        self.lockedhashes[tid] = False
         #bb.warn("%s %s %s" % (recipename, task, h))
         return h
 
+    def get_stampfile_hash(self, tid):
+        if tid in self.lockedhashes and self.lockedhashes[tid]:
+            return self.lockedhashes[tid]
+        return super().get_stampfile_hash(tid)
+
     def get_unihash(self, tid):
-        if tid in self.lockedhashes:
+        if tid in self.lockedhashes and self.lockedhashes[tid] and not self._internal:
             return self.lockedhashes[tid]
         return super().get_unihash(tid)
 
     def dump_sigtask(self, fn, task, stampbase, runtime):
         tid = fn + ":" + task
-        if tid in self.lockedhashes:
+        if tid in self.lockedhashes and self.lockedhashes[tid]:
             return
         super(bb.siggen.SignatureGeneratorBasicHash, self).dump_sigtask(fn, task, stampbase, runtime)
 
@@ -448,11 +477,14 @@ def OEOuthashBasic(path, sigfile, task, d):
     h = hashlib.sha256()
     prev_dir = os.getcwd()
     include_owners = os.environ.get('PSEUDO_DISABLED') == '0'
+    extra_content = d.getVar('HASHEQUIV_HASH_VERSION')
 
     try:
         os.chdir(path)
 
         update_hash("OEOuthashBasic\n")
+        if extra_content:
+            update_hash(extra_content + "\n")
 
         # It is only currently useful to get equivalent hashes for things that
         # can be restored from sstate. Since the sstate object is named using
@@ -512,8 +544,12 @@ def OEOuthashBasic(path, sigfile, task, d):
                     add_perm(stat.S_IXOTH, 'x')
 
                 if include_owners:
-                    update_hash(" %10s" % pwd.getpwuid(s.st_uid).pw_name)
-                    update_hash(" %10s" % grp.getgrgid(s.st_gid).gr_name)
+                    try:
+                        update_hash(" %10s" % pwd.getpwuid(s.st_uid).pw_name)
+                        update_hash(" %10s" % grp.getgrgid(s.st_gid).gr_name)
+                    except KeyError:
+                        bb.warn("KeyError in %s" % path)
+                        raise
 
                 update_hash(" ")
                 if stat.S_ISBLK(s.st_mode) or stat.S_ISCHR(s.st_mode):

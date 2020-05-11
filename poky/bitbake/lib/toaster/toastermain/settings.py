@@ -189,15 +189,16 @@ TEMPLATES = [
     },
 ]
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    # Uncomment the next line for simple clickjacking protection:
-    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
-)
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+]
 
 CACHES = {
     #        'default': {
@@ -248,7 +249,7 @@ FRESH_ENABLED = False
 if os.environ.get('TOASTER_DEVEL', None) is not None:
     try:
         import fresh
-        MIDDLEWARE_CLASSES = ("fresh.middleware.FreshMiddleware",) + MIDDLEWARE_CLASSES
+        MIDDLEWARE = ["fresh.middleware.FreshMiddleware",] + MIDDLEWARE
         INSTALLED_APPS = INSTALLED_APPS + ('fresh',)
         FRESH_ENABLED = True
     except:
@@ -258,8 +259,8 @@ DEBUG_PANEL_ENABLED = False
 if os.environ.get('TOASTER_DEVEL', None) is not None:
     try:
         import debug_toolbar, debug_panel
-        MIDDLEWARE_CLASSES = ('debug_panel.middleware.DebugPanelMiddleware',) + MIDDLEWARE_CLASSES
-        #MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + ('debug_toolbar.middleware.DebugToolbarMiddleware',)
+        MIDDLEWARE = ['debug_panel.middleware.DebugPanelMiddleware',] + MIDDLEWARE
+        #MIDDLEWARE = MIDDLEWARE + ['debug_toolbar.middleware.DebugToolbarMiddleware',]
         INSTALLED_APPS = INSTALLED_APPS + ('debug_toolbar','debug_panel',)
         DEBUG_PANEL_ENABLED = True
 
@@ -351,6 +352,4 @@ def activate_synchronous_off(sender, connection, **kwargs):
         cursor.execute('PRAGMA synchronous = 0;')
 connection_created.connect(activate_synchronous_off)
 #
-
-
 

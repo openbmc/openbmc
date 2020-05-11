@@ -31,6 +31,6 @@ RDEPENDS_${PN}-ptest += "libtest-warnings-perl \
 
 S = "${WORKDIR}/File-Slurper-${PV}"
 
-inherit cpan allarch ptest-perl
+inherit cpan ptest-perl
 
 BBCLASSEXTEND = "native"

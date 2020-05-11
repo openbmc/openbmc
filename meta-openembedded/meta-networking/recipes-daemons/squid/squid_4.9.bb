@@ -40,6 +40,8 @@ inherit autotools pkgconfig useradd ptest perlnative
 
 LDFLAGS_append_mipsarch = " -latomic"
 LDFLAGS_append_powerpc = " -latomic"
+LDFLAGS_append_riscv64 = " -latomic"
+LDFLAGS_append_riscv32 = " -latomic"
 
 USERADD_PACKAGES = "${PN}"
 USERADD_PARAM_${PN} = "--system --no-create-home --home-dir /var/run/squid --shell /bin/false --user-group squid"

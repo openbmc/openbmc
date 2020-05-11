@@ -97,7 +97,7 @@ class MasterImageHardwareTarget(oeqa.targetcontrol.BaseTarget, metaclass=ABCMeta
         if self.powercontrol_cmd:
             cmd = "%s %s" % (self.powercontrol_cmd, msg)
             try:
-                commands.runCmd(cmd, assert_error=False, preexec_fn=os.setsid, env=self.origenv)
+                commands.runCmd(cmd, assert_error=False, start_new_session=True, env=self.origenv)
             except CommandError as e:
                 bb.fatal(str(e))
 

@@ -7,6 +7,8 @@ SECTION = "libs"
 
 inherit autotools pkgconfig
 
+PV = "1.7.1+git${SRCPV}"
+
 S = "${WORKDIR}/git"
 SRCREV = "2d4543673e9b76c02679ca8b89259659f1afd932"
 SRC_URI = "git://github.com/nfc-tools/libnfc.git \

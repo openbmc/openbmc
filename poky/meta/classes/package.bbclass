@@ -245,6 +245,8 @@ python () {
         deps = ""
         for dep in (d.getVar('PACKAGE_DEPENDS') or "").split():
             deps += " %s:do_populate_sysroot" % dep
+        if d.getVar('PACKAGE_MINIDEBUGINFO') == '1':
+            deps += ' xz-native:do_populate_sysroot'
         d.appendVarFlag('do_package', 'depends', deps)
 
         # shlibs requires any DEPENDS to have already packaged for the *.list files
@@ -416,6 +418,126 @@ def splitdebuginfo(file, dvar, debugdir, debuglibdir, debugappend, debugsrcdir, 
 
     return (file, sources)
 
+def splitstaticdebuginfo(file, dvar, debugstaticdir, debugstaticlibdir, debugstaticappend, debugsrcdir, d):
+    # Unlike the function above, there is no way to split a static library
+    # two components.  So to get similar results we will copy the unmodified
+    # static library (containing the debug symbols) into a new directory.
+    # We will then strip (preserving symbols) the static library in the
+    # typical location.
+    #
+    # return a mapping of files:debugsources
+
+    import stat
+    import shutil
+
+    src = file[len(dvar):]
+    dest = debugstaticlibdir + os.path.dirname(src) + debugstaticdir + "/" + os.path.basename(src) + debugstaticappend
+    debugfile = dvar + dest
+    sources = []
+
+    # Copy the file...
+    bb.utils.mkdirhier(os.path.dirname(debugfile))
+    #bb.note("Copy %s -> %s" % (file, debugfile))
+
+    dvar = d.getVar('PKGD')
+
+    newmode = None
+    if not os.access(file, os.W_OK) or os.access(file, os.R_OK):
+        origmode = os.stat(file)[stat.ST_MODE]
+        newmode = origmode | stat.S_IWRITE | stat.S_IREAD
+        os.chmod(file, newmode)
+
+    # We need to extract the debug src information here...
+    if debugsrcdir:
+        sources = source_info(file, d)
+
+    bb.utils.mkdirhier(os.path.dirname(debugfile))
+
+    # Copy the unmodified item to the debug directory
+    shutil.copy2(file, debugfile)
+
+    if newmode:
+        os.chmod(file, origmode)
+
+    return (file, sources)
+
+def inject_minidebuginfo(file, dvar, debugdir, debuglibdir, debugappend, debugsrcdir, d):
+    # Extract just the symbols from debuginfo into minidebuginfo,
+    # compress it with xz and inject it back into the binary in a .gnu_debugdata section.
+    # https://sourceware.org/gdb/onlinedocs/gdb/MiniDebugInfo.html
+
+    import subprocess
+
+    readelf = d.getVar('READELF')
+    nm = d.getVar('NM')
+    objcopy = d.getVar('OBJCOPY')
+
+    minidebuginfodir = d.expand('${WORKDIR}/minidebuginfo')
+
+    src = file[len(dvar):]
+    dest = debuglibdir + os.path.dirname(src) + debugdir + "/" + os.path.basename(src) + debugappend
+    debugfile = dvar + dest
+    minidebugfile = minidebuginfodir + src + '.minidebug'
+    bb.utils.mkdirhier(os.path.dirname(minidebugfile))
+
+    # If we didn't produce debuginfo for any reason, we can't produce minidebuginfo either
+    # so skip it.
+    if not os.path.exists(debugfile):
+        bb.debug(1, 'ELF file {} has no debuginfo, skipping minidebuginfo injection'.format(file))
+        return
+
+    # Find non-allocated PROGBITS, NOTE, and NOBITS sections in the debuginfo.
+    # We will exclude all of these from minidebuginfo to save space.
+    remove_section_names = []
+    for line in subprocess.check_output([readelf, '-W', '-S', debugfile], universal_newlines=True).splitlines():
+        fields = line.split()
+        if len(fields) < 8:
+            continue
+        name = fields[0]
+        type = fields[1]
+        flags = fields[7]
+        # .debug_ sections will be removed by objcopy -S so no need to explicitly remove them
+        if name.startswith('.debug_'):
+            continue
+        if 'A' not in flags and type in ['PROGBITS', 'NOTE', 'NOBITS']:
+            remove_section_names.append(name)
+
+    # List dynamic symbols in the binary. We can exclude these from minidebuginfo
+    # because they are always present in the binary.
+    dynsyms = set()
+    for line in subprocess.check_output([nm, '-D', file, '--format=posix', '--defined-only'], universal_newlines=True).splitlines():
+        dynsyms.add(line.split()[0])
+
+    # Find all function symbols from debuginfo which aren't in the dynamic symbols table.
+    # These are the ones we want to keep in minidebuginfo.
+    keep_symbols_file = minidebugfile + '.symlist'
+    found_any_symbols = False
+    with open(keep_symbols_file, 'w') as f:
+        for line in subprocess.check_output([nm, debugfile, '--format=sysv', '--defined-only'], universal_newlines=True).splitlines():
+            fields = line.split('|')
+            if len(fields) < 7:
+                continue
+            name = fields[0].strip()
+            type = fields[3].strip()
+            if type == 'FUNC' and name not in dynsyms:
+                f.write('{}\n'.format(name))
+                found_any_symbols = True
+
+    if not found_any_symbols:
+        bb.debug(1, 'ELF file {} contains no symbols, skipping minidebuginfo injection'.format(file))
+        return
+
+    bb.utils.remove(minidebugfile)
+    bb.utils.remove(minidebugfile + '.xz')
+
+    subprocess.check_call([objcopy, '-S'] +
+                          ['--remove-section={}'.format(s) for s in remove_section_names] +
+                          ['--keep-symbols={}'.format(keep_symbols_file), debugfile, minidebugfile])
+
+    subprocess.check_call(['xz', '--keep', minidebugfile])
+
+    subprocess.check_call([objcopy, '--add-section', '.gnu_debugdata={}.xz'.format(minidebugfile), file])
+
 def copydebugsources(debugsrcdir, sources, d):
     # The debug src information written out to sourcefile is further processed
     # and copied to the destination here.
@@ -492,7 +614,7 @@ def copydebugsources(debugsrcdir, sources, d):
 # Package data handling routines
 #
 
-def get_package_mapping (pkg, basepkg, d):
+def get_package_mapping (pkg, basepkg, d, depversions=None):
     import oe.packagedata
 
     data = oe.packagedata.read_subpkgdata(pkg, d)
@@ -503,6 +625,14 @@ def get_package_mapping (pkg, basepkg, d):
         if bb.data.inherits_class('allarch', d) and not d.getVar('MULTILIB_VARIANTS') \
             and data[key] == basepkg:
             return pkg
+        if depversions == []:
+            # Avoid returning a mapping if the renamed package rprovides its original name
+            rprovkey = "RPROVIDES_%s" % pkg
+            if rprovkey in data:
+                if pkg in bb.utils.explode_dep_versions2(data[rprovkey]):
+                    bb.note("%s rprovides %s, not replacing the latter" % (data[key], pkg))
+                    return pkg
+        # Do map to rewritten package name
         return data[key]
 
     return pkg
@@ -523,8 +653,10 @@ def runtime_mapping_rename (varname, pkg, d):
 
     new_depends = {}
     deps = bb.utils.explode_dep_versions2(d.getVar(varname) or "")
-    for depend in deps:
-        new_depend = get_package_mapping(depend, pkg, d)
+    for depend, depversions in deps.items():
+        new_depend = get_package_mapping(depend, pkg, d, depversions)
+        if depend != new_depend:
+            bb.note("package name mapping done: %s -> %s" % (depend, new_depend))
         new_depends[new_depend] = deps[depend]
 
     d.setVar(varname, bb.utils.join_deps(new_depends, commasep=False))
@@ -916,25 +1048,37 @@ python split_and_strip_files () {
     if d.getVar('PACKAGE_DEBUG_SPLIT_STYLE') == 'debug-file-directory':
         # Single debug-file-directory style debug info
         debugappend = ".debug"
+        debugstaticappend = ""
         debugdir = ""
+        debugstaticdir = ""
         debuglibdir = "/usr/lib/debug"
+        debugstaticlibdir = "/usr/lib/debug-static"
         debugsrcdir = "/usr/src/debug"
     elif d.getVar('PACKAGE_DEBUG_SPLIT_STYLE') == 'debug-without-src':
         # Original OE-core, a.k.a. ".debug", style debug info, but without sources in /usr/src/debug
         debugappend = ""
+        debugstaticappend = ""
         debugdir = "/.debug"
+        debugstaticdir = "/.debug-static"
         debuglibdir = ""
+        debugstaticlibdir = ""
         debugsrcdir = ""
     elif d.getVar('PACKAGE_DEBUG_SPLIT_STYLE') == 'debug-with-srcpkg':
         debugappend = ""
+        debugstaticappend = ""
         debugdir = "/.debug"
+        debugstaticdir = "/.debug-static"
         debuglibdir = ""
+        debugstaticlibdir = ""
         debugsrcdir = "/usr/src/debug"
     else:
         # Original OE-core, a.k.a. ".debug", style debug info
         debugappend = ""
+        debugstaticappend = ""
         debugdir = "/.debug"
+        debugstaticdir = "/.debug-static"
         debuglibdir = ""
+        debugstaticlibdir = ""
         debugsrcdir = "/usr/src/debug"
 
     #
@@ -955,12 +1099,6 @@ python split_and_strip_files () {
         for root, dirs, files in cpath.walk(dvar):
             for f in files:
                 file = os.path.join(root, f)
-                if file.endswith(".ko") and file.find("/lib/modules/") != -1:
-                    kernmods.append(file)
-                    continue
-                if oe.package.is_static_lib(file):
-                    staticlibs.append(file)
-                    continue
 
                 # Skip debug files
                 if debugappend and file.endswith(debugappend):
@@ -969,6 +1107,13 @@ python split_and_strip_files () {
                     continue
 
                 if file in skipfiles:
+                    continue
+
+                if file.endswith(".ko") and file.find("/lib/modules/") != -1:
+                    kernmods.append(file)
+                    continue
+                if oe.package.is_static_lib(file):
+                    staticlibs.append(file)
                     continue
 
                 try:
@@ -1050,8 +1195,11 @@ python split_and_strip_files () {
         results = oe.utils.multiprocess_launch(splitdebuginfo, list(elffiles), d, extraargs=(dvar, debugdir, debuglibdir, debugappend, debugsrcdir, d))
 
         if debugsrcdir and not targetos.startswith("mingw"):
-            for file in staticlibs:
-                results.extend(source_info(file, d, fatal=False))
+            if (d.getVar('PACKAGE_DEBUG_STATIC_SPLIT') == '1'):
+                results = oe.utils.multiprocess_launch(splitstaticdebuginfo, staticlibs, d, extraargs=(dvar, debugstaticdir, debugstaticlibdir, debugstaticappend, debugsrcdir, d))
+            else:
+                for file in staticlibs:
+                    results.append( (file,source_info(file, d)) )
 
         sources = set()
         for r in results:
@@ -1120,8 +1268,16 @@ python split_and_strip_files () {
             sfiles.append((file, elf_file, strip))
         for f in kernmods:
             sfiles.append((f, 16, strip))
+        if (d.getVar('PACKAGE_STRIP_STATIC') == '1' or d.getVar('PACKAGE_DEBUG_STATIC_SPLIT') == '1'):
+            for f in staticlibs:
+                sfiles.append((f, 16, strip))
 
         oe.utils.multiprocess_launch(oe.package.runstrip, sfiles, d)
+
+    # Build "minidebuginfo" and reinject it back into the stripped binaries
+    if d.getVar('PACKAGE_MINIDEBUGINFO') == '1':
+        oe.utils.multiprocess_launch(inject_minidebuginfo, list(elffiles), d,
+                                     extraargs=(dvar, debugdir, debuglibdir, debugappend, debugsrcdir, d))
 
     #
     # End of strip
@@ -1187,7 +1343,7 @@ python populate_packages () {
             dir = os.sep
         for f in (files + dirs):
             path = "." + os.path.join(dir, f)
-            if "/.debug/" in path or path.endswith("/.debug"):
+            if "/.debug/" in path or "/.debug-static/" in path or path.endswith("/.debug"):
                 debug.append(path)
 
     for pkg in packages:
@@ -1263,8 +1419,9 @@ python populate_packages () {
     # Handle LICENSE_EXCLUSION
     package_list = []
     for pkg in packages:
-        if d.getVar('LICENSE_EXCLUSION-' + pkg):
-            msg = "%s has an incompatible license. Excluding from packaging." % pkg
+        licenses = d.getVar('LICENSE_EXCLUSION-' + pkg)
+        if licenses:
+            msg = "Excluding %s from packaging as it has incompatible license(s): %s" % (pkg, licenses)
             package_qa_handle_error("incompatible-license", msg, d)
         else:
             package_list.append(pkg)
@@ -2108,10 +2265,12 @@ python package_depchains() {
 # iteration, we need to list them here:
 PACKAGEVARS = "FILES RDEPENDS RRECOMMENDS SUMMARY DESCRIPTION RSUGGESTS RPROVIDES RCONFLICTS PKG ALLOW_EMPTY pkg_postinst pkg_postrm pkg_postinst_ontarget INITSCRIPT_NAME INITSCRIPT_PARAMS DEBIAN_NOAUTONAME ALTERNATIVE PKGE PKGV PKGR USERADD_PARAM GROUPADD_PARAM CONFFILES SYSTEMD_SERVICE LICENSE SECTION pkg_preinst pkg_prerm RREPLACES GROUPMEMS_PARAM SYSTEMD_AUTO_ENABLE SKIP_FILEDEPS PRIVATE_LIBS"
 
-def gen_packagevar(d):
+def gen_packagevar(d, pkgvars="PACKAGEVARS"):
     ret = []
     pkgs = (d.getVar("PACKAGES") or "").split()
-    vars = (d.getVar("PACKAGEVARS") or "").split()
+    vars = (d.getVar(pkgvars) or "").split()
+    for v in vars:
+        ret.append(v)
     for p in pkgs:
         for v in vars:
             ret.append(v + "_" + p)

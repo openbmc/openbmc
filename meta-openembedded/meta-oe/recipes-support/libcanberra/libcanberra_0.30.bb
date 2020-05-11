@@ -11,6 +11,7 @@ inherit autotools gtk-doc
 SRC_URI = " \
     http://0pointer.de/lennart/projects/${BPN}/${BPN}-${PV}.tar.xz \
     file://0001-build-gtk-and-gtk3-version-for-canberra_gtk_play.patch \
+    file://0001-gtk-Don-t-assume-all-GdkDisplays-are-GdkX11Displays-.patch \
 "
 SRC_URI[md5sum] = "34cb7e4430afaf6f447c4ebdb9b42072"
 SRC_URI[sha256sum] = "c2b671e67e0c288a69fc33dc1b6f1b534d07882c2aceed37004bf48c601afa72"

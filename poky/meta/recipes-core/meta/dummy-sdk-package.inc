@@ -16,11 +16,16 @@ python() {
 ALLOW_EMPTY_${PN} = "1"
 
 PR[vardeps] += "DUMMYPROVIDES"
+PR[vardeps] += "DUMMYPROVIDES_PACKAGES"
+
+DUMMYPROVIDES_PACKAGES ??= ""
+DUMMYPROVIDES_PACKAGES_MULTILIB = "${@' '.join([multilib_pkg_extend(d, pkg) for pkg in d.getVar('DUMMYPROVIDES_PACKAGES').split()])}"
+DUMMYPROVIDES += "${DUMMYPROVIDES_PACKAGES_MULTILIB}"
 
 python populate_packages_prepend() {
     p = d.getVar("PN")
     d.appendVar("RPROVIDES_%s" % p, "${DUMMYPROVIDES}")
     d.appendVar("RCONFLICTS_%s" % p, "${DUMMYPROVIDES}")
-    d.appendVar("RREPLACES_%s" % p, "${DUMMYPROVIDES}")
+    d.appendVar("RREPLACES_%s" % p, "${DUMMYPROVIDES_PACKAGES_MULTILIB}")
 }
 

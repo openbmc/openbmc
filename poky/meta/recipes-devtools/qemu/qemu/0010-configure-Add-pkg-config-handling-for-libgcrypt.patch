@@ -1,7 +1,7 @@
-From 5214dd4461f2090ef0965b4d2518f49927d61cbc Mon Sep 17 00:00:00 2001
+From c207607cdf3996ad9783c3bffbcd3d65e74c0158 Mon Sep 17 00:00:00 2001
 From: He Zhe <zhe.he@windriver.com>
 Date: Wed, 28 Aug 2019 19:56:28 +0800
-Subject: [Qemu-devel] [PATCH] configure: Add pkg-config handling for libgcrypt
+Subject: [PATCH] configure: Add pkg-config handling for libgcrypt
 
 libgcrypt may also be controlled by pkg-config, this patch adds pkg-config
 handling for libgcrypt.
@@ -9,12 +9,13 @@ handling for libgcrypt.
 Upstream-Status: Denied [https://lists.nongnu.org/archive/html/qemu-devel/2019-08/msg06333.html]
 
 Signed-off-by: He Zhe <zhe.he@windriver.com>
+
 ---
  configure | 48 ++++++++++++++++++++++++++++++++++++++++--------
  1 file changed, 40 insertions(+), 8 deletions(-)
 
 diff --git a/configure b/configure
-index e44e454..0f362a7 100755
+index 72f11aca..cac271ce 100755
 --- a/configure
 +++ b/configure
 @@ -2875,6 +2875,30 @@ has_libgcrypt() {
@@ -48,7 +49,7 @@ index e44e454..0f362a7 100755
  
  if test "$nettle" != "no"; then
      pass="no"
-@@ -2902,7 +2926,14 @@ fi
+@@ -2915,7 +2939,14 @@ fi
  
  if test "$gcrypt" != "no"; then
      pass="no"
@@ -64,7 +65,7 @@ index e44e454..0f362a7 100755
          gcrypt_cflags=$(libgcrypt-config --cflags)
          gcrypt_libs=$(libgcrypt-config --libs)
          # Debian has removed -lgpg-error from libgcrypt-config
-@@ -2912,15 +2943,16 @@ if test "$gcrypt" != "no"; then
+@@ -2925,15 +2956,16 @@ if test "$gcrypt" != "no"; then
          then
              gcrypt_libs="$gcrypt_libs -lgpg-error"
          fi
@@ -88,6 +89,3 @@ index e44e454..0f362a7 100755
      if test "$pass" = "yes"; then
          gcrypt="yes"
          cat > $TMPC << EOF
--- 
-2.7.4
-

@@ -1,4 +1,4 @@
-From ef5040b4f15006a22ac63a3bacfceac36ffc2045 Mon Sep 17 00:00:00 2001
+From ee47e205255928679701a5b769bd7ae0f815119d Mon Sep 17 00:00:00 2001
 From: Gabriel Barbu <gabriel.barbu@enea.com>
 Date: Thu, 25 Jul 2013 15:28:33 +0200
 Subject: [PATCH] strace: Add ptest
@@ -14,10 +14,10 @@ Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
  1 file changed, 19 insertions(+)
 
 diff --git a/tests/Makefile.am b/tests/Makefile.am
-index 825c989..4623c48 100644
+index 8cf4c36..66162eb 100644
 --- a/tests/Makefile.am
 +++ b/tests/Makefile.am
-@@ -14,6 +14,7 @@ SIZEOF_LONG = @SIZEOF_LONG@
+@@ -15,6 +15,7 @@ SIZEOF_LONG = @SIZEOF_LONG@
  MPERS_NAME =
  MPERS_CC_FLAGS =
  ARCH_MFLAGS =
@@ -25,7 +25,7 @@ index 825c989..4623c48 100644
  AM_CFLAGS = $(WARN_CFLAGS)
  AM_CPPFLAGS = $(ARCH_MFLAGS) \
  	      -I$(builddir) \
-@@ -477,3 +478,21 @@ BUILT_SOURCES = ksysent.h
+@@ -538,3 +539,21 @@ BUILT_SOURCES = ksysent.h
  CLEANFILES = ksysent.h
  
  include ../scno.am
@@ -44,6 +44,6 @@ index 825c989..4623c48 100644
 +	done
 +	for file in $(EXTRA_DIST); do \
 +		install $(srcdir)/$$file $(DESTDIR)/$(TESTDIR); \
-+		sed -i -e 's/$${srcdir=.}/./g' $(DESTDIR)/$(TESTDIR)/$$file; \
++		#sed -i -e 's/$${srcdir=.}/./g' $(DESTDIR)/$(TESTDIR)/$$file; \
 +	done
 +	for i in net scm_rights-fd rt_sigaction; do sed -i -e 's/$$srcdir/./g' $(DESTDIR)/$(TESTDIR)/$$i.test; done

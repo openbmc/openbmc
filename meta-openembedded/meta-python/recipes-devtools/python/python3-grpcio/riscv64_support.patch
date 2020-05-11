@@ -1,0 +1,21 @@
+Add RISC-V 64bit support
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/third_party/boringssl/include/openssl/base.h
++++ b/third_party/boringssl/include/openssl/base.h
+@@ -108,6 +108,14 @@ extern "C" {
+ #elif defined(__mips__) && defined(__LP64__)
+ #define OPENSSL_64_BIT
+ #define OPENSSL_MIPS64
++#elif defined(__riscv)
++# if (__riscv_xlen == 64)
++#  define OPENSSL_64_BIT
++#  define OPENSSL_RISCV64
++# elif(__riscv_xlen == 32)
++#  define OPENSSL_32_BIT
++#  define OPENSSL_RISCV32
++# endif
+ #elif defined(__pnacl__)
+ #define OPENSSL_32_BIT
+ #define OPENSSL_PNACL

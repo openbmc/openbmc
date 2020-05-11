@@ -1,0 +1,86 @@
+From 392d474a72d37b669f53ab9f0fa913b958af93f6 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Mon, 6 Mar 2017 23:33:27 -0800
+Subject: [PATCH] sync with OE libtool changes
+
+Apply these patches from our libtool patches as not only are redundant RPATHs a
+waste of space but they can cause incorrect linking when native packages are
+restored from sstate.
+
+fix-rpath.patch:
+We don't want to add RPATHS which match default linker
+search paths, they're a waste of space. This patch
+filters libtools list and removes the ones we don't need.
+
+norm-rpath.patch:
+Libtool may be passed link paths of the form "/usr/lib/../lib", which
+fool its detection code into thinking it should be included as an
+RPATH in the generated binary.  Normalize before comparision.
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ ltmain.sh | 34 ++++++++++++++++++++++++++++------
+ 1 file changed, 28 insertions(+), 6 deletions(-)
+
+diff --git a/ltmain.sh b/ltmain.sh
+index 11ee684ccc..3b19ac1532 100644
+--- a/ltmain.sh
++++ b/ltmain.sh
+@@ -8053,8 +8053,16 @@ EOF
+ 		  esac
+ 		fi
+ 	      else
+-		eval flag=\"$hardcode_libdir_flag_spec\"
+-		func_append dep_rpath " $flag"
++                # We only want to hardcode in an rpath if it isn't in the
++                # default dlsearch path.
++                func_normal_abspath "$libdir"
++                libdir_norm=$func_normal_abspath_result
++	        case " $sys_lib_dlsearch_path " in
++	        *" $libdir_norm "*) ;;
++	        *) eval flag=\"$hardcode_libdir_flag_spec\"
++                   func_append dep_rpath " $flag"
++                   ;;
++	        esac
+ 	      fi
+ 	    elif test -n "$runpath_var"; then
+ 	      case "$perm_rpath " in
+@@ -8790,8 +8798,16 @@ EOF
+ 	      esac
+ 	    fi
+ 	  else
+-	    eval flag=\"$hardcode_libdir_flag_spec\"
+-	    func_append rpath " $flag"
++            # We only want to hardcode in an rpath if it isn't in the
++            # default dlsearch path.
++            func_normal_abspath "$libdir"
++            libdir_norm=$func_normal_abspath_result
++	    case " $sys_lib_dlsearch_path " in
++	    *" $libdir_norm "*) ;;
++	    *) eval flag=\"$hardcode_libdir_flag_spec\"
++               rpath+=" $flag"
++               ;;
++	    esac
+ 	  fi
+ 	elif test -n "$runpath_var"; then
+ 	  case "$perm_rpath " in
+@@ -8841,8 +8857,14 @@ EOF
+ 	      esac
+ 	    fi
+ 	  else
+-	    eval flag=\"$hardcode_libdir_flag_spec\"
+-	    func_append rpath " $flag"
++            # We only want to hardcode in an rpath if it isn't in the
++            # default dlsearch path.
++	    case " $sys_lib_dlsearch_path " in
++	    *" $libdir "*) ;;
++	    *) eval flag=\"$hardcode_libdir_flag_spec\"
++               func_append rpath " $flag"
++               ;;
++	    esac
+ 	  fi
+ 	elif test -n "$runpath_var"; then
+ 	  case "$finalize_perm_rpath " in

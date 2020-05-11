@@ -2,15 +2,18 @@ CHRPATH_BIN ?= "chrpath"
 PREPROCESS_RELOCATE_DIRS ?= ""
 
 def process_file_linux(cmd, fpath, rootdir, baseprefix, tmpdir, d, break_hardlinks = False):
-    import subprocess as sub
+    import subprocess, oe.qa
 
-    p = sub.Popen([cmd, '-l', fpath],stdout=sub.PIPE,stderr=sub.PIPE)
-    out, err = p.communicate()
-    # If returned successfully, process stdout for results
-    if p.returncode != 0:
+    with oe.qa.ELFFile(fpath) as elf:
+        try:
+            elf.open()
+        except oe.qa.NotELFFileError:
+            return
+
+    try:
+        out = subprocess.check_output([cmd, "-l", fpath], universal_newlines=True)
+    except subprocess.CalledProcessError:
         return
-
-    out = out.decode('utf-8')
 
     # Handle RUNPATH as well as RPATH
     out = out.replace("RUNPATH=","RPATH=")
@@ -44,10 +47,11 @@ def process_file_linux(cmd, fpath, rootdir, baseprefix, tmpdir, d, break_hardlin
 
         args = ":".join(new_rpaths)
         #bb.note("Setting rpath for %s to %s" %(fpath, args))
-        p = sub.Popen([cmd, '-r', args, fpath],stdout=sub.PIPE,stderr=sub.PIPE)
-        out, err = p.communicate()
-        if p.returncode != 0:
-            bb.fatal("%s: chrpath command failed with exit code %d:\n%s%s" % (d.getVar('PN'), p.returncode, out, err))
+        try:
+            subprocess.check_output([cmd, "-r", args, fpath],
+            stderr=subprocess.PIPE, universal_newlines=True)
+        except subprocess.CalledProcessError as e:
+            bb.fatal("chrpath command failed with exit code %d:\n%s\n%s" % (e.returncode, e.stdout, e.stderr))
 
 def process_file_darwin(cmd, fpath, rootdir, baseprefix, tmpdir, d, break_hardlinks = False):
     import subprocess as sub
@@ -72,6 +76,10 @@ def process_file_darwin(cmd, fpath, rootdir, baseprefix, tmpdir, d, break_hardli
         out, err = p.communicate()
 
 def process_dir(rootdir, directory, d, break_hardlinks = False):
+    bb.debug(2, "Checking %s for binaries to process" % directory)
+    if not os.path.exists(directory):
+        return
+
     import stat
 
     rootdir = os.path.normpath(rootdir)
@@ -79,10 +87,6 @@ def process_dir(rootdir, directory, d, break_hardlinks = False):
     tmpdir = os.path.normpath(d.getVar('TMPDIR', False))
     baseprefix = os.path.normpath(d.expand('${base_prefix}'))
     hostos = d.getVar("HOST_OS")
-
-    #bb.debug("Checking %s for binaries to process" % directory)
-    if not os.path.exists(directory):
-        return
 
     if "linux" in hostos:
         process_file = process_file_linux

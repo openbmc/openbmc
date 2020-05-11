@@ -57,7 +57,7 @@ class RawCopyPlugin(SourcePlugin):
             raise WicError("No file specified")
 
         src = os.path.join(kernel_dir, source_params['file'])
-        dst = os.path.join(cr_workdir, "%s.%s" % (source_params['file'], part.lineno))
+        dst = os.path.join(cr_workdir, "%s.%s" % (os.path.basename(source_params['file']), part.lineno))
 
         if not os.path.exists(os.path.dirname(dst)):
             os.makedirs(os.path.dirname(dst))

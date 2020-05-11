@@ -5,9 +5,15 @@ NATIVESDKLIBC ?= "libc-glibc"
 LIBCOVERRIDE = ":${NATIVESDKLIBC}"
 MACHINEOVERRIDES = ""
 PACKAGE_ARCH = "${SDK_ARCH}"
+
 python () {
     # set TUNE_PKGARCH to SDK_ARCH
     d.setVar('TUNE_PKGARCH', d.getVar('SDK_ARCH'))
+    # Set features here to prevent appends and distro features backfill
+    # from modifying nativesdk distro features
+    features = set(d.getVar("DISTRO_FEATURES_NATIVESDK").split())
+    filtered = set(bb.utils.filter("DISTRO_FEATURES", d.getVar("DISTRO_FEATURES_FILTER_NATIVESDK"), d).split())
+    d.setVar("DISTRO_FEATURES", " ".join(sorted(features | filtered)))
 }
 
 STAGING_BINDIR_TOOLCHAIN = "${STAGING_DIR_NATIVE}${bindir_native}/${TARGET_ARCH}${TARGET_VENDOR}-${TARGET_OS}"
@@ -37,7 +43,6 @@ target_prefix = "${SDKPATHNATIVE}${prefix_nativesdk}"
 target_exec_prefix = "${SDKPATHNATIVE}${prefix_nativesdk}"
 baselib = "lib"
 
-do_populate_sysroot[stamp-extra-info] = ""
 do_packagedata[stamp-extra-info] = ""
 
 # Need to force this to ensure consitency across architectures

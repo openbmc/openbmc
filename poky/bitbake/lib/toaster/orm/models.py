@@ -13,7 +13,7 @@ from django.db.models import F, Q, Sum, Count
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from django.core import validators
 from django.conf import settings
@@ -178,8 +178,8 @@ class Project(models.Model):
                              'release__branch_name']
     name = models.CharField(max_length=100)
     short_description = models.CharField(max_length=50, blank=True)
-    bitbake_version = models.ForeignKey('BitbakeVersion', null=True)
-    release = models.ForeignKey("Release", null=True)
+    bitbake_version = models.ForeignKey('BitbakeVersion', on_delete=models.CASCADE, null=True)
+    release = models.ForeignKey("Release", on_delete=models.CASCADE, null=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     # This is a horrible hack; since Toaster has no "User" model available when
@@ -469,7 +469,7 @@ class Build(models.Model):
 
     search_allowed_fields = ['machine', 'cooker_log_path', "target__target", "target__target_image_file__file_name"]
 
-    project = models.ForeignKey(Project)            # must have a project
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)            # must have a project
     machine = models.CharField(max_length=100)
     distro = models.CharField(max_length=100)
     distro_version = models.CharField(max_length=100)
@@ -777,13 +777,13 @@ class Build(models.Model):
         return "%d %s %s" % (self.id, self.project, ",".join([t.target for t in self.target_set.all()]))
 
 class ProjectTarget(models.Model):
-    project = models.ForeignKey(Project)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     target = models.CharField(max_length=100)
     task = models.CharField(max_length=100, null=True)
 
 class Target(models.Model):
     search_allowed_fields = ['target', 'file_name']
-    build = models.ForeignKey(Build)
+    build = models.ForeignKey(Build, on_delete=models.CASCADE)
     target = models.CharField(max_length=100)
     task = models.CharField(max_length=100, null=True)
     is_image = models.BooleanField(default = False)
@@ -944,7 +944,7 @@ class Target(models.Model):
 
 # kernel artifacts for a target: bzImage and modules*
 class TargetKernelFile(models.Model):
-    target = models.ForeignKey(Target)
+    target = models.ForeignKey(Target, on_delete=models.CASCADE)
     file_name = models.FilePathField()
     file_size = models.IntegerField()
 
@@ -954,7 +954,7 @@ class TargetKernelFile(models.Model):
 
 # SDK artifacts for a target: sh and manifest files
 class TargetSDKFile(models.Model):
-    target = models.ForeignKey(Target)
+    target = models.ForeignKey(Target, on_delete=models.CASCADE)
     file_name = models.FilePathField()
     file_size = models.IntegerField()
 
@@ -973,7 +973,7 @@ class Target_Image_File(models.Model):
         'ubifs', 'wic', 'wic.bz2', 'wic.gz', 'wic.lzma'
     }
 
-    target = models.ForeignKey(Target)
+    target = models.ForeignKey(Target, on_delete=models.CASCADE)
     file_name = models.FilePathField(max_length=254)
     file_size = models.IntegerField()
 
@@ -1007,15 +1007,15 @@ class Target_File(models.Model):
         ( ITYPE_BLOCK ,'block'),
         )
 
-    target = models.ForeignKey(Target)
+    target = models.ForeignKey(Target, on_delete=models.CASCADE)
     path = models.FilePathField()
     size = models.IntegerField()
     inodetype = models.IntegerField(choices = ITYPES)
     permission = models.CharField(max_length=16)
     owner = models.CharField(max_length=128)
     group = models.CharField(max_length=128)
-    directory = models.ForeignKey('Target_File', related_name="directory_set", null=True)
-    sym_target = models.ForeignKey('Target_File', related_name="symlink_set", null=True)
+    directory = models.ForeignKey('Target_File', on_delete=models.CASCADE, related_name="directory_set", null=True)
+    sym_target = models.ForeignKey('Target_File', on_delete=models.CASCADE, related_name="symlink_set", null=True)
 
 
 class Task(models.Model):
@@ -1102,13 +1102,13 @@ class Task(models.Model):
     def get_description(self):
         return self._helptext
 
-    build = models.ForeignKey(Build, related_name='task_build')
+    build = models.ForeignKey(Build, on_delete=models.CASCADE, related_name='task_build')
     order = models.IntegerField(null=True)
     task_executed = models.BooleanField(default=False) # True means Executed, False means Not/Executed
     outcome = models.IntegerField(choices=TASK_OUTCOME, default=OUTCOME_NA)
     sstate_checksum = models.CharField(max_length=100, blank=True)
     path_to_sstate_obj = models.FilePathField(max_length=500, blank=True)
-    recipe = models.ForeignKey('Recipe', related_name='tasks')
+    recipe = models.ForeignKey('Recipe', on_delete=models.CASCADE, related_name='tasks')
     task_name = models.CharField(max_length=100)
     source_url = models.FilePathField(max_length=255, blank=True)
     work_directory = models.FilePathField(max_length=255, blank=True)
@@ -1147,13 +1147,13 @@ class Task(models.Model):
 
 
 class Task_Dependency(models.Model):
-    task = models.ForeignKey(Task, related_name='task_dependencies_task')
-    depends_on = models.ForeignKey(Task, related_name='task_dependencies_depends')
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='task_dependencies_task')
+    depends_on = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='task_dependencies_depends')
 
 class Package(models.Model):
     search_allowed_fields = ['name', 'version', 'revision', 'recipe__name', 'recipe__version', 'recipe__license', 'recipe__layer_version__layer__name', 'recipe__layer_version__branch', 'recipe__layer_version__commit', 'recipe__layer_version__local_path', 'installed_name']
-    build = models.ForeignKey('Build', null=True)
-    recipe = models.ForeignKey('Recipe', null=True)
+    build = models.ForeignKey('Build', on_delete=models.CASCADE, null=True)
+    recipe = models.ForeignKey('Recipe', on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=100)
     installed_name = models.CharField(max_length=100, default='')
     version = models.CharField(max_length=100, blank=True)
@@ -1289,19 +1289,19 @@ class Package_Dependency(models.Model):
         TYPE_RCONFLICTS :   ("conflicts", "%s conflicts with %s, which will not be installed if this package is not first removed"),
     }
 
-    package = models.ForeignKey(Package, related_name='package_dependencies_source')
-    depends_on = models.ForeignKey(Package, related_name='package_dependencies_target')   # soft dependency
+    package = models.ForeignKey(Package, on_delete=models.CASCADE, related_name='package_dependencies_source')
+    depends_on = models.ForeignKey(Package, on_delete=models.CASCADE, related_name='package_dependencies_target')   # soft dependency
     dep_type = models.IntegerField(choices=DEPENDS_TYPE)
-    target = models.ForeignKey(Target, null=True)
+    target = models.ForeignKey(Target, on_delete=models.CASCADE, null=True)
     objects = Package_DependencyManager()
 
 class Target_Installed_Package(models.Model):
-    target = models.ForeignKey(Target)
-    package = models.ForeignKey(Package, related_name='buildtargetlist_package')
+    target = models.ForeignKey(Target, on_delete=models.CASCADE)
+    package = models.ForeignKey(Package, on_delete=models.CASCADE, related_name='buildtargetlist_package')
 
 
 class Package_File(models.Model):
-    package = models.ForeignKey(Package, related_name='buildfilelist_package')
+    package = models.ForeignKey(Package, on_delete=models.CASCADE, related_name='buildfilelist_package')
     path = models.FilePathField(max_length=255, blank=True)
     size = models.IntegerField()
 
@@ -1318,7 +1318,7 @@ class Recipe(models.Model):
 
     name = models.CharField(max_length=100, blank=True)
     version = models.CharField(max_length=100, blank=True)
-    layer_version = models.ForeignKey('Layer_Version',
+    layer_version = models.ForeignKey('Layer_Version', on_delete=models.CASCADE,
                                       related_name='recipe_layer_version')
     summary = models.TextField(blank=True)
     description = models.TextField(blank=True)
@@ -1356,7 +1356,7 @@ class Recipe_DependencyManager(models.Manager):
 
 class Provides(models.Model):
     name = models.CharField(max_length=100)
-    recipe = models.ForeignKey(Recipe)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
 
 class Recipe_Dependency(models.Model):
     TYPE_DEPENDS = 0
@@ -1366,9 +1366,9 @@ class Recipe_Dependency(models.Model):
         (TYPE_DEPENDS, "depends"),
         (TYPE_RDEPENDS, "rdepends"),
     )
-    recipe = models.ForeignKey(Recipe, related_name='r_dependencies_recipe')
-    depends_on = models.ForeignKey(Recipe, related_name='r_dependencies_depends')
-    via = models.ForeignKey(Provides, null=True, default=None)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='r_dependencies_recipe')
+    depends_on = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='r_dependencies_depends')
+    via = models.ForeignKey(Provides, on_delete=models.CASCADE, null=True, default=None)
     dep_type = models.IntegerField(choices=DEPENDS_TYPE)
     objects = Recipe_DependencyManager()
 
@@ -1377,7 +1377,7 @@ class Machine(models.Model):
     search_allowed_fields = ["name", "description", "layer_version__layer__name"]
     up_date = models.DateTimeField(null = True, default = None)
 
-    layer_version = models.ForeignKey('Layer_Version')
+    layer_version = models.ForeignKey('Layer_Version', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.CharField(max_length=255)
 
@@ -1408,7 +1408,7 @@ class Release(models.Model):
     """ A release is a project template, used to pre-populate Project settings with a configuration set """
     name = models.CharField(max_length=32, unique = True)
     description = models.CharField(max_length=255)
-    bitbake_version = models.ForeignKey(BitbakeVersion)
+    bitbake_version = models.ForeignKey(BitbakeVersion, on_delete=models.CASCADE)
     branch_name = models.CharField(max_length=50, default = "")
     helptext = models.TextField(null=True)
 
@@ -1419,7 +1419,7 @@ class Release(models.Model):
         return self.name
 
 class ReleaseDefaultLayer(models.Model):
-    release = models.ForeignKey(Release)
+    release = models.ForeignKey(Release, on_delete=models.CASCADE)
     layer_name = models.CharField(max_length=100, default="")
 
 
@@ -1474,10 +1474,10 @@ class Layer_Version(models.Model):
                              "layer__description", "layer__vcs_url",
                              "dirpath", "release__name", "commit", "branch"]
 
-    build = models.ForeignKey(Build, related_name='layer_version_build',
+    build = models.ForeignKey(Build, on_delete=models.CASCADE, related_name='layer_version_build',
                               default=None, null=True)
 
-    layer = models.ForeignKey(Layer, related_name='layer_version_layer')
+    layer = models.ForeignKey(Layer, on_delete=models.CASCADE, related_name='layer_version_layer')
 
     layer_source = models.IntegerField(choices=LayerSource.SOURCE_TYPE,
                                        default=0)
@@ -1485,7 +1485,7 @@ class Layer_Version(models.Model):
     up_date = models.DateTimeField(null=True, default=timezone.now)
 
     # To which metadata release does this layer version belong to
-    release = models.ForeignKey(Release, null=True, default=None)
+    release = models.ForeignKey(Release, on_delete=models.CASCADE, null=True, default=None)
 
     branch = models.CharField(max_length=80)
     commit = models.CharField(max_length=100)
@@ -1499,7 +1499,7 @@ class Layer_Version(models.Model):
     local_path = models.FilePathField(max_length=1024, default="/")
 
     # Set if this layer is restricted to a particular project
-    project = models.ForeignKey('Project', null=True, default=None)
+    project = models.ForeignKey('Project', on_delete=models.CASCADE, null=True, default=None)
 
     # code lifted, with adaptations, from the layerindex-web application
     # https://git.yoctoproject.org/cgit/cgit.cgi/layerindex-web/
@@ -1608,14 +1608,14 @@ class Layer_Version(models.Model):
 
 class LayerVersionDependency(models.Model):
 
-    layer_version = models.ForeignKey(Layer_Version,
+    layer_version = models.ForeignKey(Layer_Version, on_delete=models.CASCADE,
                                       related_name="dependencies")
-    depends_on = models.ForeignKey(Layer_Version,
+    depends_on = models.ForeignKey(Layer_Version, on_delete=models.CASCADE,
                                    related_name="dependees")
 
 class ProjectLayer(models.Model):
-    project = models.ForeignKey(Project)
-    layercommit = models.ForeignKey(Layer_Version, null=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    layercommit = models.ForeignKey(Layer_Version, on_delete=models.CASCADE, null=True)
     optional = models.BooleanField(default = True)
 
     def __unicode__(self):
@@ -1630,8 +1630,8 @@ class CustomImageRecipe(Recipe):
     LAYER_NAME = "toaster-custom-images"
 
     search_allowed_fields = ['name']
-    base_recipe = models.ForeignKey(Recipe, related_name='based_on_recipe')
-    project = models.ForeignKey(Project)
+    base_recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='based_on_recipe')
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     last_updated = models.DateTimeField(null=True, default=None)
 
     def get_last_successful_built_target(self):
@@ -1647,14 +1647,14 @@ class CustomImageRecipe(Recipe):
         """
         # Check if we're aldready up-to-date or not
         target = self.get_last_successful_built_target()
-        if target == None:
+        if target is None:
             # So we've never actually built this Custom recipe but what about
             # the recipe it's based on?
             target = \
                 Target.objects.filter(Q(build__outcome=Build.SUCCEEDED) &
                                       Q(build__project=self.project) &
                                       Q(target=self.base_recipe.name)).last()
-            if target == None:
+            if target is None:
                 return
 
         if target.build.completed_on == self.last_updated:
@@ -1784,14 +1784,14 @@ class CustomImageRecipe(Recipe):
         return recipe_contents
 
 class ProjectVariable(models.Model):
-    project = models.ForeignKey(Project)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     value = models.TextField(blank = True)
 
 class Variable(models.Model):
     search_allowed_fields = ['variable_name', 'variable_value',
                              'vhistory__file_name', "description"]
-    build = models.ForeignKey(Build, related_name='variable_build')
+    build = models.ForeignKey(Build, on_delete=models.CASCADE, related_name='variable_build')
     variable_name = models.CharField(max_length=100)
     variable_value = models.TextField(blank=True)
     changed = models.BooleanField(default=False)
@@ -1799,7 +1799,7 @@ class Variable(models.Model):
     description = models.TextField(blank=True)
 
 class VariableHistory(models.Model):
-    variable = models.ForeignKey(Variable, related_name='vhistory')
+    variable = models.ForeignKey(Variable, on_delete=models.CASCADE, related_name='vhistory')
     value   = models.TextField(blank=True)
     file_name = models.FilePathField(max_length=255)
     line_number = models.IntegerField(null=True)
@@ -1809,7 +1809,7 @@ class HelpText(models.Model):
     VARIABLE = 0
     HELPTEXT_AREA = ((VARIABLE, 'variable'), )
 
-    build = models.ForeignKey(Build, related_name='helptext_build')
+    build = models.ForeignKey(Build, on_delete=models.CASCADE, related_name='helptext_build')
     area = models.IntegerField(choices=HELPTEXT_AREA)
     key = models.CharField(max_length=100)
     text = models.TextField()
@@ -1829,8 +1829,8 @@ class LogMessage(models.Model):
         (EXCEPTION, "toaster exception")
     )
 
-    build = models.ForeignKey(Build)
-    task  = models.ForeignKey(Task, blank = True, null=True)
+    build = models.ForeignKey(Build, on_delete=models.CASCADE)
+    task  = models.ForeignKey(Task, on_delete=models.CASCADE, blank = True, null=True)
     level = models.IntegerField(choices=LOG_LEVEL, default=INFO)
     message = models.TextField(blank=True, null=True)
     pathname = models.FilePathField(max_length=255, blank=True)
@@ -1859,7 +1859,7 @@ class Distro(models.Model):
     search_allowed_fields = ["name", "description", "layer_version__layer__name"]
     up_date = models.DateTimeField(null = True, default = None)
 
-    layer_version = models.ForeignKey('Layer_Version')
+    layer_version = models.ForeignKey('Layer_Version', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.CharField(max_length=255)
 

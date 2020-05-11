@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://src/${GO_IMPORT}/LICENSE;md5=1bad315647751fab0007812f
 GO_IMPORT = "github.com/golang/dep"
 SRC_URI = "git://${GO_IMPORT} \
            file://0001-Add-support-for-mips-mips64.patch;patchdir=src/github.com/golang/dep \
+           file://0001-bolt_riscv64-Add-support-for-riscv64.patch;patchdir=src/github.com/golang/dep \
           "
 
 SRCREV = "1f7c19e5f52f49ffb9f956f64c010be14683468b"

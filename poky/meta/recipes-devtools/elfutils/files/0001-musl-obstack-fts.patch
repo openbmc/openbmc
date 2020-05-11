@@ -1,0 +1,127 @@
+From 8ccf3d92b8766b53f203df7e01b489604ef851f3 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 23 Aug 2019 10:17:25 +0800
+Subject: [PATCH 1/4] musl-obstack-fts
+
+Look for libfts and libobstack during configure, these
+libraries are external to libc when using musl, whereas
+on glibc these libraries are provided in libc itself.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Inappropriate [workaround for musl]
+
+Rebase to 0.177
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+---
+ configure.ac      | 54 +++++++++++++++++++++++++++++++++++++++++++++++
+ libdw/Makefile.am |  2 +-
+ src/Makefile.am   |  6 +++---
+ 3 files changed, 58 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index cad7b2b..6d4229b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -529,6 +529,60 @@ else
+ fi
+ AC_SUBST([argp_LDADD])
+ 
++dnl Check if we have fts available from our libc
++AC_LINK_IFELSE(
++	[AC_LANG_PROGRAM(
++		[#if !defined(__x86_64__)
++		#undef  _FILE_OFFSET_BITS
++		#define _FILE_OFFSET_BITS 32
++		#endif
++		#include <fts.h>],
++		[FTS* fts = 0; return fts_close(fts); return 0;]
++		)],
++	[libc_has_fts="true"],
++	[libc_has_fts="false"]
++)
++
++dnl If our libc doesn't provide fts, then test for libfts
++if test "$libc_has_fts" = "false" ; then
++	AC_MSG_WARN("libc does not have fts")
++	AC_CHECK_LIB([fts], [fts_close], [have_fts="true"], [have_fts="false"])
++
++	if test "$have_fts" = "false"; then
++		AC_MSG_ERROR("no libfts found")
++	else
++		fts_LDADD="-lfts"
++	fi
++else
++	fts_LDADD=""
++fi
++AC_SUBST([fts_LDADD])
++
++dnl Check if we have obstack available from our libc
++AC_LINK_IFELSE(
++	[AC_LANG_PROGRAM(
++		[#include <obstack.h>],
++		[_obstack_begin(0, 0, 0, NULL, NULL); return 0;]
++		)],
++	[libc_has_obstack="true"],
++	[libc_has_obstack="false"]
++)
++
++dnl If our libc doesn't provide obstack, then test for libobstack
++if test "$libc_has_obstack" = "false" ; then
++	AC_MSG_WARN("libc does not have obstack")
++	AC_CHECK_LIB([obstack], [_obstack_begin], [have_obstack="true"], [have_obstack="false"])
++
++	if test "$have_obstack" = "false"; then
++		AC_MSG_ERROR("no libobstack found")
++	else
++		obstack_LDADD="-lobstack"
++	fi
++else
++	obstack_LDADD=""
++fi
++AC_SUBST([obstack_LDADD])
++
+ dnl The directories with content.
+ 
+ dnl Documentation.
+diff --git a/libdw/Makefile.am b/libdw/Makefile.am
+index 33b5838..ff92e02 100644
+--- a/libdw/Makefile.am
++++ b/libdw/Makefile.am
+@@ -109,7 +109,7 @@ libdw_so_LIBS = ../libebl/libebl_pic.a ../backends/libebl_backends_pic.a \
+ 		../libcpu/libcpu_pic.a libdw_pic.a ../libdwelf/libdwelf_pic.a \
+ 		../libdwfl/libdwfl_pic.a
+ libdw_so_DEPS = ../lib/libeu.a ../libelf/libelf.so
+-libdw_so_LDLIBS = $(libdw_so_DEPS) -ldl -lz $(argp_LDADD) $(zip_LIBS) -pthread
++libdw_so_LDLIBS = $(libdw_so_DEPS) -ldl -lz $(argp_LDADD) $(fts_LDADD) $(zip_LIBS) -pthread
+ libdw_so_SOURCES =
+ libdw.so$(EXEEXT): $(srcdir)/libdw.map $(libdw_so_LIBS) $(libdw_so_DEPS)
+ 	$(AM_V_CCLD)$(LINK) $(dso_LDFLAGS) -o $@ \
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 13d9bda..d5a4f7d 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -69,7 +69,7 @@ ar_no_Wstack_usage = yes
+ unstrip_no_Wstack_usage = yes
+ 
+ readelf_LDADD = $(libdw) $(libebl) $(libelf) $(libeu) $(argp_LDADD)
+-nm_LDADD = $(libdw) $(libebl) $(libelf) $(libeu) $(argp_LDADD) \
++nm_LDADD = $(libdw) $(libebl) $(libelf) $(libeu) $(argp_LDADD) $(obstack_LDADD) \
+ 	   $(demanglelib)
+ size_LDADD = $(libelf) $(libeu) $(argp_LDADD)
+ strip_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD)
+@@ -78,9 +78,9 @@ findtextrel_LDADD = $(libdw) $(libelf) $(libeu) $(argp_LDADD)
+ addr2line_LDADD = $(libdw) $(libelf) $(libeu) $(argp_LDADD) $(demanglelib)
+ elfcmp_LDADD = $(libebl) $(libdw) $(libelf) $(libeu) $(argp_LDADD)
+ objdump_LDADD  = $(libasm) $(libebl) $(libdw) $(libelf) $(libeu) $(argp_LDADD)
+-ranlib_LDADD = libar.a $(libelf) $(libeu) $(argp_LDADD)
++ranlib_LDADD = libar.a $(libelf) $(libeu) $(argp_LDADD) $(obstack_LDADD)
+ strings_LDADD = $(libelf) $(libeu) $(argp_LDADD)
+-ar_LDADD = libar.a $(libelf) $(libeu) $(argp_LDADD)
++ar_LDADD = libar.a $(libelf) $(libeu) $(argp_LDADD) $(obstack_LDADD)
+ unstrip_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD)
+ stack_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD) $(demanglelib)
+ elfcompress_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD)
+-- 
+2.17.1
+

@@ -5,7 +5,6 @@
 #
 
 import unittest
-import tempfile
 import os
 import bb, bb.cooker
 import re

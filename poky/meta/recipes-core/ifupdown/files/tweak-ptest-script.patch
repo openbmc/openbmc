@@ -1,0 +1,49 @@
+Tweak tests of ifupdown to make it work with oe-core ptest framework.
+
+Upstream-Status: Inappropriate [oe-core specific]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+diff --git a/tests/testbuild-linux b/tests/testbuild-linux
+index 1181ea0..d5c1814 100755
+--- a/tests/testbuild-linux
++++ b/tests/testbuild-linux
+@@ -1,6 +1,7 @@
+ #!/bin/sh -e
+ 
+-dir=tests/linux
++curdir=$(dirname `readlink -f $0`)
++dir=$curdir/linux
+ 
+ result=true
+ for test in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18; do
+@@ -12,7 +13,7 @@ for test in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18; do
+         echo "Testcase $test: $args"
+ 
+ 	exitcode=0
+-        ./ifup -v --no-act-commands --force -i $dir/testcase.$test --state-dir=$dir/state.$test $args \
++        ifup -v --no-act-commands --force -i $dir/testcase.$test --state-dir=$dir/state.$test $args \
+                 >$dir/up-res-out.$test 2>$dir/up-res-err.$test || exitcode=$?
+ 
+         (echo "exit code: $exitcode";
+@@ -20,7 +21,7 @@ for test in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18; do
+          echo "====stderr===="; cat $dir/up-res-err.$test) > $dir/up-res.$test
+ 
+ 	exitcode=0
+-        ./ifdown -v --no-act-commands --force -i $dir/testcase.$test --state-dir=$dir/state.$test $args \
++        ifdown -v --no-act-commands --force -i $dir/testcase.$test --state-dir=$dir/state.$test $args \
+                >$dir/down-res-out.$test 2>$dir/down-res-err.$test || exitcode=$?
+ 
+         (echo "exit code: $exitcode";
+@@ -28,9 +29,9 @@ for test in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18; do
+          echo "====stderr===="; cat $dir/down-res-err.$test) > $dir/down-res.$test
+ 
+         if diff -ub $dir/up.$test $dir/up-res.$test && diff -ub $dir/down.$test $dir/down-res.$test; then
+-                echo "(okay)"
++                echo "PASS: $test"
+         else
+-                echo "(failed)"
++                echo "FAIL: $test"
+                 result=false
+         fi
+         echo "=========="

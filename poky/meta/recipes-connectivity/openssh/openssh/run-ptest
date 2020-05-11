@@ -1,6 +1,7 @@
 #!/bin/sh
 
 export TEST_SHELL=sh
+export SKIP_UNIT=1
 
 cd regress
 sed -i "/\t\tagent-ptrace /d" Makefile

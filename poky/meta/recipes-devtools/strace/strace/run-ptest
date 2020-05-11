@@ -1,3 +1,6 @@
 #!/bin/sh
-export TIMEOUT_DURATION=30
-make -B -C tests -k test-suite.log
+export TIMEOUT_DURATION=120
+chown nobody tests
+chown nobody tests/*
+chown nobody ../ptest
+su nobody -c "make -B -C tests -k test-suite.log"

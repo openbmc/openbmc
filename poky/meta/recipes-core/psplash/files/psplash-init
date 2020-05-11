@@ -23,10 +23,10 @@ for x in $CMDLINE; do
         esac
 done
 
-export TMPDIR=/mnt/.psplash
-[ -d $TMPDIR ] || mkdir -p $TMPDIR
-if ! mountpoint -q $TMPDIR; then
-	mount tmpfs -t tmpfs $TMPDIR -o,size=40k
+export PSPLASH_FIFO_DIR=/mnt/.psplash
+[ -d $PSPLASH_FIFO_DIR ] || mkdir -p $PSPLASH_FIFO_DIR
+if ! mountpoint -q $PSPLASH_FIFO_DIR; then
+	mount tmpfs -t tmpfs $PSPLASH_FIFO_DIR -o,size=40k
 fi
 
 rotation=0

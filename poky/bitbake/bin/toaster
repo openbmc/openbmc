@@ -8,12 +8,13 @@
 #
 
 HELP="
-Usage: source toaster start|stop [webport=<address:port>] [noweb] [nobuild] [toasterdir]
+Usage 1: source toaster start|stop [webport=<address:port>] [noweb] [nobuild] [toasterdir]
     Optional arguments:
         [nobuild] Setup the environment for capturing builds with toaster but disable managed builds
         [noweb] Setup the environment for capturing builds with toaster but don't start the web server
         [webport] Set the development server (default: localhost:8000)
         [toasterdir] Set absolute path to be used as TOASTER_DIR (default: BUILDDIR/../)
+Usage 2: source toaster manage [createsuperuser|lsupdates|migrate|makemigrations|checksettings|collectstatic|...]
 "
 
 custom_extention()
@@ -208,13 +209,21 @@ for param in $*; do
     toasterdir=*)
             TOASTERDIR="${param#*=}"
     ;;
+    manage )
+            CMD=$param
+            manage_cmd=""
+    ;;
     --help)
             echo "$HELP"
             return 0
     ;;
     *)
-            echo "$HELP"
-            return 1
+            if [ "manage" == "$CMD" ] ; then
+                manage_cmd="$manage_cmd $param"
+            else
+                echo "$HELP"
+                exit 1
+            fi
     ;;
 
     esac
@@ -305,6 +314,10 @@ case $CMD in
     stop )
         stop_system
         echo "Successful ${CMD}."
+    ;;
+    manage )
+        cd $BBBASEDIR/lib/toaster
+        $MANAGE $manage_cmd
     ;;
 esac
 custom_extention toaster_postpend $CMD $ADDR_PORT

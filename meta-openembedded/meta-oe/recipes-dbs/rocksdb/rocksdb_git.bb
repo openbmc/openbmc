@@ -6,13 +6,13 @@ LIC_FILES_CHKSUM = "file://LICENSE.Apache;md5=3b83ef96387f14655fc854ddc3c6bd57 \
                     file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://LICENSE.leveldb;md5=fb04ff57a14f308f2eed4a9b87d45837"
 
-SRCREV = "4cfbd87afd08a16df28436fb990ef6b154ee6114"
-SRCBRANCH = "6.5.fb"
-PV = "6.5.2"
+SRCREV = "551a110918493a19d11243f53408b97485de1411"
+SRCBRANCH = "6.6.fb"
+PV = "6.6.4"
 
 SRC_URI = "git://github.com/facebook/${BPN}.git;branch=${SRCBRANCH} \
-           file://0001-Fix-build-breakage-from-lock_guard-error-6161.patch \
            file://0001-db-write_thread.cc-Initialize-state.patch \
+           file://0001-cmake-Add-check-for-atomic-support.patch \
           "
 
 S = "${WORKDIR}/git"
@@ -39,3 +39,5 @@ do_install_append() {
     # fix for qa check buildpaths
     sed -i "s#${RECIPE_SYSROOT}##g" ${D}${libdir}/cmake/rocksdb/RocksDBTargets.cmake
 }
+
+LDFLAGS_append_riscv64 = " -pthread"

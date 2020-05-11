@@ -319,10 +319,17 @@ class OETestResultJSONHelper(object):
             the_file.write(file_content)
 
     def dump_testresult_file(self, write_dir, configuration, result_id, test_result):
-        bb.utils.mkdirhier(write_dir)
-        lf = bb.utils.lockfile(os.path.join(write_dir, 'jsontestresult.lock'))
+        try:
+            import bb
+            has_bb = True
+            bb.utils.mkdirhier(write_dir)
+            lf = bb.utils.lockfile(os.path.join(write_dir, 'jsontestresult.lock'))
+        except ImportError:
+            has_bb = False
+            os.makedirs(write_dir, exist_ok=True)
         test_results = self._get_existing_testresults_if_available(write_dir)
         test_results[result_id] = {'configuration': configuration, 'result': test_result}
         json_testresults = json.dumps(test_results, sort_keys=True, indent=4)
         self._write_file(write_dir, self.testresult_filename, json_testresults)
-        bb.utils.unlockfile(lf)
+        if has_bb:
+            bb.utils.unlockfile(lf)

@@ -16,6 +16,9 @@ addtask do_locked_sigs after do_populate_sysroot
 SSTATETASKS += "do_locked_sigs"
 do_locked_sigs[sstate-inputdirs] = "${LOCKED_SIGS_INDIR}"
 do_locked_sigs[sstate-outputdirs] = "${STAGING_DIR}/${PACKAGE_ARCH}/${PN}/locked-sigs"
+# If a taskhash changes we need to use the latest hash changes. With unihash we may not rebuild.
+# eSDK which uses this is nostamp anyway
+do_locked_sigs[nostamp] = "1"
 
 python do_locked_sigs() {
     import oe.copy_buildsystem

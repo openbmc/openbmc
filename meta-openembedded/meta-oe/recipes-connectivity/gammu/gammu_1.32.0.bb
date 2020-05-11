@@ -13,7 +13,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BPN}/${PV}/${BP}.tar.bz2 \
 SRC_URI[md5sum] = "8ea16c6b3cc48097a8e62311fe0e25b9"
 SRC_URI[sha256sum] = "de67caa102aa4c8fbed5300e5a0262e40411c4cc79f4379a8d34eed797968fc3"
 
-inherit distutils cmake gettext
+inherit distutils3 cmake gettext
 
 do_install_append() {
     # these files seem to only be used by symbian and trigger QA warnings

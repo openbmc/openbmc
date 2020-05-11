@@ -15,6 +15,8 @@ LIC_FILES_CHKSUM = "file://LICENCE;md5=411a48ac3c2e9e0911b8dd9aed26f754"
 SRC_URI = "git://github.com/jech/babeld.git;protocol=git"
 SRCREV = "0835d5d894ea016ab7b81562466cade2c51a12d4"
 
+UPSTREAM_CHECK_GITTAGREGEX = "babeld-(?P<pver>\d+(\.\d+)+)"
+
 S = "${WORKDIR}/git"
 
 do_compile () {

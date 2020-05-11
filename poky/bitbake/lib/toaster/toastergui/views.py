@@ -19,8 +19,8 @@ from orm.models import Target_Installed_Package, Target_File
 from orm.models import TargetKernelFile, TargetSDKFile, Target_Image_File
 from orm.models import BitbakeVersion, CustomImageRecipe
 
-from django.core.urlresolvers import reverse, resolve
-from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.urls import reverse, resolve
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponseNotFound, JsonResponse
 from django.utils import timezone
@@ -51,7 +51,7 @@ class MimeTypeFinder(object):
     def get_mimetype(self, path):
         guess = mimetypes.guess_type(path, self._strict)
         guessed_type = guess[0]
-        if guessed_type == None:
+        if guessed_type is None:
             guessed_type = 'application/octet-stream'
         return guessed_type
 
@@ -126,7 +126,7 @@ def _lv_to_dict(prj, x = None):
     return {"id": x.pk,
             "name": x.layer.name,
             "tooltip": "%s | %s" % (x.layer.vcs_url,x.get_vcs_reference()),
-            "detail": "(%s" % x.layer.vcs_url + (")" if x.release == None else " | "+x.get_vcs_reference()+")"),
+            "detail": "(%s" % x.layer.vcs_url + (")" if x.release is None else " | "+x.get_vcs_reference()+")"),
             "giturl": x.layer.vcs_url,
             "layerdetailurl" : reverse('layerdetails', args=(prj.id,x.pk)),
             "revision" : x.get_vcs_reference(),
@@ -352,7 +352,7 @@ def _get_parameters_values(request, default_count, default_order):
 # set cookies for parameters. this is usefull in case parameters are set
 # manually from the GET values of the link
 def _set_parameters_values(pagesize, orderby, request):
-    from django.core.urlresolvers import resolve
+    from django.urls import resolve
     current_url = resolve(request.path_info).url_name
     request.session['%s_count' % current_url] = pagesize
     request.session['%s_orderby' % current_url] =orderby
@@ -664,7 +664,6 @@ def recipe_packages(request, build_id, recipe_id):
     _set_parameters_values(pagesize, orderby, request)
     return response
 
-from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
 def xhr_dirinfo(request, build_id, target_id):
     top = request.GET.get('start', '/')
@@ -719,7 +718,7 @@ def _get_dir_entries(build_id, target_id, start):
                 resolved_id = o.sym_target_id
                 resolved_path = o.path
                 if target_packages.count():
-                    while resolved_id != "" and resolved_id != None:
+                    while resolved_id != "" and resolved_id is not None:
                         tf = Target_File.objects.get(pk=resolved_id)
                         resolved_path = tf.path
                         resolved_id = tf.sym_target_id
@@ -731,10 +730,10 @@ def _get_dir_entries(build_id, target_id, start):
                         entry['package_id'] = str(p.id)
                         entry['package'] = p.name
                 # don't use resolved path from above, show immediate link-to
-                if o.sym_target_id != "" and o.sym_target_id != None:
+                if o.sym_target_id != "" and o.sym_target_id is not None:
                     entry['link_to'] = Target_File.objects.get(pk=o.sym_target_id).path
             entry['size'] = filtered_filesizeformat(o.size)
-            if entry['link_to'] != None:
+            if entry['link_to'] is not None:
                 entry['permission'] = node_str[o.inodetype] + o.permission
             else:
                 entry['permission'] = node_str[o.inodetype] + o.permission
@@ -756,7 +755,7 @@ def dirinfo(request, build_id, target_id, file_path=None):
     objects = _get_dir_entries(build_id, target_id, '/')
     packages_sum = Package.objects.filter(id__in=Target_Installed_Package.objects.filter(target_id=target_id).values('package_id')).aggregate(Sum('installed_size'))
     dir_list = None
-    if file_path != None:
+    if file_path is not None:
         """
         Link from the included package detail file list page and is
         requesting opening the dir info to a specific file path.
@@ -1030,15 +1029,15 @@ def _get_package_dependency_count(package, target_id, is_installed):
 
 def _get_package_alias(package):
     alias = package.installed_name
-    if alias != None and alias != '' and alias != package.name:
+    if alias is not None and alias != '' and alias != package.name:
         return alias
     else:
         return ''
 
 def _get_fullpackagespec(package):
     r = package.name
-    version_good = package.version != None and  package.version != ''
-    revision_good = package.revision != None and package.revision != ''
+    version_good = package.version is not None and  package.version != ''
+    revision_good = package.revision is not None and package.revision != ''
     if version_good or revision_good:
         r += '_'
         if version_good:
@@ -1192,7 +1191,7 @@ def package_included_reverse_dependencies(request, build_id, target_id, package_
         return _redirect_parameters( 'package_included_reverse_dependencies', request.GET, mandatory_parameters, build_id = build_id, target_id = target_id, package_id = package_id)
     (filter_string, search_term, ordering_string) = _search_tuple(request, Package_File)
 
-    queryset = Package_Dependency.objects.select_related('depends_on__name', 'depends_on__size').filter(depends_on=package_id, target_id=target_id, dep_type=Package_Dependency.TYPE_TRDEPENDS)
+    queryset = Package_Dependency.objects.select_related('depends_on').filter(depends_on=package_id, target_id=target_id, dep_type=Package_Dependency.TYPE_TRDEPENDS)
     objects = _get_queryset(Package_Dependency, queryset, filter_string, search_term, ordering_string, 'package__name')
 
     package = Package.objects.get(pk=package_id)
@@ -1340,7 +1339,7 @@ def json_build(request,build_id):
 
 import toastermain.settings
 
-from orm.models import Project, ProjectLayer, ProjectTarget, ProjectVariable
+from orm.models import Project, ProjectLayer, ProjectVariable
 from bldcontrol.models import  BuildEnvironment
 
 # we have a set of functions if we're in managed mode, or
@@ -1349,10 +1348,8 @@ from bldcontrol.models import  BuildEnvironment
 if True:
     from django.contrib.auth.models import User
     from django.contrib.auth import authenticate, login
-    from django.contrib.auth.decorators import login_required
 
-    from orm.models import LayerSource, ToasterSetting, Release, Machine, LayerVersionDependency
-    from bldcontrol.models import BuildRequest
+    from orm.models import LayerSource, ToasterSetting, Release
 
     import traceback
 
@@ -1367,8 +1364,8 @@ if True:
 
         template = "newproject.html"
         context = {
-            'email': request.user.email if request.user.is_authenticated() else '',
-            'username': request.user.username if request.user.is_authenticated() else '',
+            'email': request.user.email if request.user.is_authenticated else '',
+            'username': request.user.username if request.user.is_authenticated else '',
             'releases': Release.objects.order_by("description"),
         }
 
@@ -1394,7 +1391,7 @@ if True:
                     # set alert for missing fields
                     raise BadParameterException("Fields missing: %s" % ", ".join(missing))
 
-                if not request.user.is_authenticated():
+                if not request.user.is_authenticated:
                     user = authenticate(username = request.POST.get('username', '_anonuser'), password = 'nopass')
                     if user is None:
                         user = User.objects.create_user(username = request.POST.get('username', '_anonuser'), email = request.POST.get('email', ''), password = "nopass")
@@ -1441,8 +1438,8 @@ if True:
         project = Project.objects.get(pk=pid)
         template = "newproject_specific.html"
         context = {
-            'email': request.user.email if request.user.is_authenticated() else '',
-            'username': request.user.username if request.user.is_authenticated() else '',
+            'email': request.user.email if request.user.is_authenticated else '',
+            'username': request.user.username if request.user.is_authenticated else '',
             'releases': Release.objects.order_by("description"),
             'projectname': project.name,
             'project_pk': project.pk,
@@ -1472,7 +1469,7 @@ if True:
                     # set alert for missing fields
                     raise BadParameterException("Fields missing: %s" % ", ".join(missing))
 
-                if not request.user.is_authenticated():
+                if not request.user.is_authenticated:
                     user = authenticate(username = request.POST.get('username', '_anonuser'), password = 'nopass')
                     if user is None:
                         user = User.objects.create_user(username = request.POST.get('username', '_anonuser'), email = request.POST.get('email', ''), password = "nopass")

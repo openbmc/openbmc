@@ -1,0 +1,27 @@
+From e738f9185ba90f2083c846ade3551234bb5a7cbc Mon Sep 17 00:00:00 2001
+From: Jeremy Puhlman <jpuhlman@mvista.com>
+Date: Sat, 7 Mar 2020 00:59:13 +0000
+Subject: [PATCH] Make manpages mulitlib identical
+
+Upstream-Status: Pending
+Signed-off-by: Jeremy Puhlman <jpuhlman@mvista.com>
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index d18c49b..6175fe9 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -917,7 +917,7 @@ SUFFIXES += .man
+ 	     -e "s|[@]MDATE[@]|`$(PERL) $(top_srcdir)/mdate.pl $<`|g" \
+ 	     -e "s|[@]OLDFONTDIR[@]|`echo $(oldfontdir) | sed -f $(makevarescape)`|g" \
+ 	     -e "s|[@]PDFDOCDIR[@]|`echo $(pdfdocdir) | sed -f $(makevarescape)`|g" \
+-	     -e "s|[@]SYSTEMMACRODIR[@]|`echo $(systemtmacdir) | sed -f $(makevarescape)`|g" \
++	     -e "s|[@]SYSTEMMACRODIR[@]|`echo $(systemtmacdir) | sed -e 's,$(libdir),$(prefix)/lib*,' | sed -f $(makevarescape)`|g" \
+ 	     -e "s|[@]TMAC_AN_PREFIX[@]|$(tmac_an_prefix)|g" \
+ 	     -e "s|[@]TMAC_M_PREFIX[@]|$(tmac_m_prefix)|g" \
+ 	     -e "s|[@]TMAC_MDIR[@]|$(tmacdir)/mm|g" \
+-- 
+2.23.0
+

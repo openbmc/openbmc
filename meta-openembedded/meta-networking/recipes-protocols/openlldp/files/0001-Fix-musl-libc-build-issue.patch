@@ -1,0 +1,26 @@
+From a64e52f9b58519aa2b8a1073fa6c04da04933428 Mon Sep 17 00:00:00 2001
+From: Jonathan Richardson <jonathan.richardson@broadcom.com>
+Date: Wed, 26 Feb 2020 12:16:38 -0800
+Subject: [PATCH] Fix musl libc build issue
+
+clif.h should include sys/types.h for the definition of pid_t. It fails
+to compile when using musl libc.
+
+Signed-off-by: Jonathan Richardson <jonathan.richardson@broadcom.com>
+
+---
+ include/clif.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/clif.h b/include/clif.h
+index 648eedf..92f4fd8 100644
+--- a/include/clif.h
++++ b/include/clif.h
+@@ -32,6 +32,7 @@
+ #ifndef CLIF_H
+ #define CLIF_H
+ 
++#include <sys/types.h>
+ #include <sys/un.h>
+ #include "clif_sock.h"
+ 

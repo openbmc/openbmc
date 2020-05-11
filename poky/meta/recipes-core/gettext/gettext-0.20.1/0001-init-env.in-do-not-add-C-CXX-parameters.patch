@@ -1,0 +1,29 @@
+From 9b912a47f790a7b282ec0c2295a188c5d8fb6a7c Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 6 Mar 2020 21:04:05 +0000
+Subject: [PATCH] init-env.in: do not add C/CXX parameters
+
+These are taken from the cross environment and include
+sysroot paths, so are not reproducible.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ gettext-tools/tests/init-env.in | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/gettext-tools/tests/init-env.in b/gettext-tools/tests/init-env.in
+index cc84ffd..b69c990 100644
+--- a/gettext-tools/tests/init-env.in
++++ b/gettext-tools/tests/init-env.in
+@@ -3,10 +3,6 @@ top_builddir=../..
+ 
+ OBJEXT="@OBJEXT@"
+ EXEEXT="@EXEEXT@"
+-CC="@CC@"
+-CFLAGS="@CFLAGS@"
+-CXX="@CXX@"
+-CXXFLAGS="@CXXFLAGS@"
+ CPPFLAGS="@CPPFLAGS@"
+ LDFLAGS="@LDFLAGS@"
+ LTLIBINTL="@LTLIBINTL@"

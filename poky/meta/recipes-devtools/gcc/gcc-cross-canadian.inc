@@ -108,12 +108,6 @@ do_install () {
 	# We don't care about the gcc-<version> copies
 	rm -f ${D}${bindir}/*gcc-?.?*
 
-	# We use libiberty from binutils
-	rm -f ${D}${prefix}/${TARGET_SYS}/lib/libiberty.a
-	# Not sure where the strange paths come from
-	rm -f ${D}${libdir}/../lib/libiberty.a
-	rm -f ${D}${libdir}/libiberty.a
-
 	# Cleanup empty directories which are not shipped
 	# we use rmdir instead of 'rm -f' to ensure the non empty directories are not deleted
 	# ${D}${libdir}/../lib only seems to appear with SDKMACHINE=i686
@@ -158,7 +152,7 @@ SYSTEMLIBS1 = "${target_libdir}/"
 EXTRA_OECONF += "--enable-poison-system-directories"
 EXTRA_OECONF_remove_elf = "--with-sysroot=/not/exist"
 EXTRA_OECONF_remove_eabi = "--with-sysroot=/not/exist"
-EXTRA_OECONF_append_elf = "--without-headers --with-newlib"
-EXTRA_OECONF_append_eabi = "--without-headers --with-newlib"
+EXTRA_OECONF_append_elf = " --without-headers --with-newlib"
+EXTRA_OECONF_append_eabi = " --without-headers --with-newlib"
 # gcc 4.7 needs -isystem
 export ARCH_FLAGS_FOR_TARGET = "--sysroot=${STAGING_DIR_TARGET} -isystem=${target_includedir}"

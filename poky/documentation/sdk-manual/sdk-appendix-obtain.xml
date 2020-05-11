@@ -297,8 +297,7 @@
 
          <replaceable>arch</replaceable> is a string representing the target architecture:
                    beaglebone-yocto, beaglebone-yocto-lsb, edgerouter, edgerouter-lsb,
-                   genericx86, genericx86-64, genericx86-64-lsb, genericx86-lsb,
-                   mpc8315e-rdb, mpc8315e-rdb-lsb, and qemu*.
+                   genericx86, genericx86-64, genericx86-64-lsb, genericx86-lsb and qemu*.
 
 <!-->
          <replaceable>date_time</replaceable> is a date and time stamp.

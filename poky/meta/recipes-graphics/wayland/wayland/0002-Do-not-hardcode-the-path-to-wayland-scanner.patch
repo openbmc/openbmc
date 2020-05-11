@@ -1,0 +1,26 @@
+From cbb28635a1079d68e62dbaa1e21791a20dbbbaf4 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 17 Feb 2020 21:46:18 +0100
+Subject: [PATCH] Do not hardcode the path to wayland-scanner
+
+This results in host contamination during builds.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ src/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/meson.build b/src/meson.build
+index 294aee0..7e410fa 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -49,7 +49,7 @@ pkgconfig.generate(
+ 		'datarootdir=' + join_paths('${prefix}', get_option('datadir')),
+ 		'pkgdatadir=' + join_paths('${datarootdir}', meson.project_name()),
+ 		'bindir=' + join_paths('${prefix}', get_option('bindir')),
+-		'wayland_scanner=${bindir}/wayland-scanner'
++		'wayland_scanner=wayland-scanner'
+ 	],
+ 	filebase: 'wayland-scanner'
+ )

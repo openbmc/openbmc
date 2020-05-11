@@ -77,7 +77,6 @@ def logger_setup_color(logger, color='auto'):
 
 
 def load_plugins(logger, plugins, pluginpath):
-    import imp
 
     def load_plugin(name):
         logger.debug('Loading plugin %s' % name)

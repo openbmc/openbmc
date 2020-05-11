@@ -105,7 +105,7 @@ def icecc_dep_prepend(d):
         return "icecc-create-env-native"
     return ""
 
-DEPENDS_prepend += "${@icecc_dep_prepend(d)} "
+DEPENDS_prepend = "${@icecc_dep_prepend(d)} "
 
 get_cross_kernel_cc[vardepsexclude] += "KERNEL_CC"
 def get_cross_kernel_cc(bb,d):

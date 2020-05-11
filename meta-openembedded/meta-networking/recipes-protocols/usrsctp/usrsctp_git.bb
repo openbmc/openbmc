@@ -8,6 +8,8 @@ SRC_URI = "git://github.com/sctplab/usrsctp;protocol=https;branch=master \
 
 S = "${WORKDIR}/git"
 
+UPSTREAM_CHECK_COMMITS = "1"
+
 inherit autotools pkgconfig
 
 DEPENDS += "openssl"

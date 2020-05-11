@@ -1,0 +1,43 @@
+From bb711b53f10d32a90a27ccf4b0dc51e4a701d862 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Fri, 7 Feb 2020 09:42:09 +0800
+Subject: [PATCH] python3: Do not hardcode "lib" for distutils
+
+Get the sys.lib from python3 itself and do not use
+hardcoded value of 'lib' for distutils.
+
+Upstream-Status: Inappropriate [oe-core specific]
+
+Signed-off-by: Li Zhou <li.zhou@windriver.com>
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ Lib/distutils/command/install.py | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/Lib/distutils/command/install.py b/Lib/distutils/command/install.py
+index c625c95..8e32f54 100644
+--- a/Lib/distutils/command/install.py
++++ b/Lib/distutils/command/install.py
+@@ -19,6 +19,8 @@ from site import USER_BASE
+ from site import USER_SITE
+ HAS_USER_SITE = True
+
++libname = sys.lib
++
+ WINDOWS_SCHEME = {
+     'purelib': '$base/Lib/site-packages',
+     'platlib': '$base/Lib/site-packages',
+@@ -29,8 +31,8 @@ WINDOWS_SCHEME = {
+
+ INSTALL_SCHEMES = {
+     'unix_prefix': {
+-        'purelib': '$base/lib/python$py_version_short/site-packages',
+-        'platlib': '$platbase/lib/python$py_version_short/site-packages',
++        'purelib': '$base/' + libname + '/python$py_version_short/site-packages',
++        'platlib': '$platbase/' + libname + '/python$py_version_short/site-packages',
+         'headers': '$base/include/python$py_version_short$abiflags/$dist_name',
+         'scripts': '$base/bin',
+         'data'   : '$base',
+--
+2.7.4
+

@@ -37,6 +37,7 @@ do_install() {
     install ${S}/netfilter/iptables_init.sh ${D}/${sysconfdir}/${BPN}
     install ${S}/netfilter/iptables_removeall.sh ${D}/${sysconfdir}/${BPN}
     install ${S}/netfilter/ip6tables_init.sh ${D}/${sysconfdir}/${BPN}
+    install ${S}/netfilter/miniupnpd_functions.sh ${D}/${sysconfdir}/${BPN}
     install ${S}/netfilter/ip6tables_removeall.sh ${D}/${sysconfdir}/${BPN}
     install -m 0644 -b ${S}/miniupnpd.conf ${D}/${sysconfdir}/${BPN}
     install -d ${D}/${sysconfdir}/init.d

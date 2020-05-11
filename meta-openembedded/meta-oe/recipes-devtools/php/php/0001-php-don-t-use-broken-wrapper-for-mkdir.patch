@@ -4,17 +4,20 @@ Date: Thu, 3 Nov 2011 14:27:15 +0100
 Subject: [PATCH 2/8] php: don't use broken wrapper for mkdir
 
 Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+
+update patch to version 7.4.4
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
 
 Upstream-Status: Inappropriate
 
- Makefile.global | 2 +-
+ build/Makefile.global | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Makefile.global b/Makefile.global
+diff --git a/build/Makefile.global b/build/Makefile.global
 index ff858c2..ae554b4 100644
---- a/Makefile.global
-+++ b/Makefile.global
+--- a/build/Makefile.global
++++ b/build/Makefile.global
 @@ -1,4 +1,4 @@
 -mkinstalldirs = $(top_srcdir)/build/shtool mkdir -p
 +mkinstalldirs = mkdir -p

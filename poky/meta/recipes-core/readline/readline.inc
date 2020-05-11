@@ -44,6 +44,12 @@ BBCLASSEXTEND = "native nativesdk"
 
 CONFFILES_${PN} += "${sysconfdir}/inputrc"
 
+inherit update-alternatives
+
+ALTERNATIVE_PRIORITY = "100"
+ALTERNATIVE_${PN}-doc = "history.3"
+ALTERNATIVE_LINK_NAME[history.3] = "${mandir}/man3/history.3"
+
 # OpenSuse injects versions into libreadline leading to conficits between our native one and theirs
 # see their spec file for where this is injected. Extra versioning is harmless so we just do the same.
 SRC_URI_append_class-native = " file://rl-native.map"

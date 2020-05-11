@@ -20,16 +20,16 @@ CLEANBROKEN = "1"
 
 BBCLASSEXTEND = "native"
 
-inherit update-rc.d useradd update-alternatives systemd
+inherit update-rc.d useradd update-alternatives systemd lib_package
 
 INITSCRIPT_NAME = "postfix"
 INITSCRIPT_PARAMS = "start 58 3 4 5 . stop 13 0 1 6 ."
-USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = \
+USERADD_PACKAGES = "${PN}-bin"
+USERADD_PARAM_${PN}-bin = \
 "-d /var/spool/postfix -r -g postfix --shell /bin/false postfix; \
  -d /var/spool/vmail -r -g vmail --shell /bin/false vmail \
 "
-GROUPADD_PARAM_${PN} = "--system postfix;--system postdrop;--system vmail"
+GROUPADD_PARAM_${PN}-bin = "--system postfix;--system postdrop;--system vmail"
 
 export SYSLIBS = "${LDFLAGS}"
 
@@ -185,9 +185,9 @@ do_install_append_class-native() {
     ln -sf ../sbin/sendmail.postfix ${D}${bindir}/mailq
 }
 
-ALTERNATIVE_${PN} = "sendmail mailq newaliases"
+ALTERNATIVE_${PN}-bin = "sendmail mailq newaliases"
 # /usr/lib/sendmial is required by LSB core test
-ALTERNATIVE_${PN}_linuxstdbase = "sendmail mailq newaliases usr-lib-sendmail"
+ALTERNATIVE_${PN}-bin_linuxstdbase = "sendmail mailq newaliases usr-lib-sendmail"
 ALTERNATIVE_TARGET[mailq] = "${bindir}/mailq"
 ALTERNATIVE_TARGET[newaliases] = "${bindir}/newaliases"
 ALTERNATIVE_TARGET[sendmail] = "${sbindir}/sendmail.postfix"
@@ -212,9 +212,11 @@ pkg_postinst_ontarget_${PN}-cfg () {
 }
 
 PACKAGES =+ "${PN}-cfg"
+RDEPENDS_${PN}-cfg_class-target += "${PN}-bin"
 RDEPENDS_${PN}_class-target += "${PN}-cfg"
 # Exclude .debug directories from the main package
-FILES_${PN} = "${localstatedir} ${bindir}/* ${sbindir}/* \
+FILES_${PN}-bin += "${localstatedir} ${bindir}/* ${sbindir}/* \
                ${libexecdir}/* ${systemd_unitdir}/*"
 FILES_${PN}-cfg = "${sysconfdir}"
 FILES_${PN}-dbg += "${libexecdir}/postfix/.debug"
+ALLOW_EMPTY_${PN} = "1"

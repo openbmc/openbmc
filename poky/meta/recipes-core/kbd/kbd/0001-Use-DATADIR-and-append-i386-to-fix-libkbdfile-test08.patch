@@ -1,0 +1,45 @@
+From 4c12f76f4177cfd560cf708a16774ebfadbd41a5 Mon Sep 17 00:00:00 2001
+From: "Mingde (Matthew) Zeng" <matthew.zeng@windriver.com>
+Date: Wed, 22 Jan 2020 11:02:17 -0500
+Subject: [PATCH] Use DATADIR and append i386 to fix libkbdfile-test08 ptest
+ failure
+
+Replace ABS_DATADIR with DATADIR and append i386 to dirpath.
+
+Upstream-Status: Inappropriate [OE specific]
+
+This OE specific patch applies to kbd v2.2.0 for now, the upstream
+made drastic changes since v2.2.0, in fact they got rid of ABS_DATADIR
+in commit 5b6df5c along with a series of other commits which may or
+may not fix this issue. We will find out in future releases.
+
+Signed-off-by: Matthew Zeng<Matthew.Zeng@windriver.com>
+---
+ tests/libkbdfile-test08.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tests/libkbdfile-test08.c b/tests/libkbdfile-test08.c
+index bf41707..5e287f1 100644
+--- a/tests/libkbdfile-test08.c
++++ b/tests/libkbdfile-test08.c
+@@ -14,14 +14,14 @@ main(int __attribute__((unused)) argc, char **argv)
+ 	if (!fp)
+ 		kbd_error(EXIT_FAILURE, 0, "unable to create kbdfile");
+
+-	const char *const dirpath[]  = { "", DATADIR "/findfile/test_0/keymaps/**", 0 };
++	const char *const dirpath[]  = { "", DATADIR "/findfile/test_0/keymaps/i386/**", 0 };
+ 	const char *const suffixes[] = { "", ".map", ".kmap", 0 };
+
+-	const char *expect = ABS_DATADIR "/findfile/test_0/keymaps/i386/qwerty/test0.map";
++	const char *expect = DATADIR "/findfile/test_0/keymaps/i386/qwerty/test0.map";
+
+ 	int rc = 0;
+
+-	rc = kbdfile_find((char *)(ABS_DATADIR "/findfile/test_0/keymaps/i386/qwerty/test0"), (char **) dirpath, (char **) suffixes, fp);
++	rc = kbdfile_find((char *)"test0", (char **) dirpath, (char **) suffixes, fp);
+
+ 	if (rc != 0)
+ 		kbd_error(EXIT_FAILURE, 0, "unable to find file");
+--
+2.24.1
+

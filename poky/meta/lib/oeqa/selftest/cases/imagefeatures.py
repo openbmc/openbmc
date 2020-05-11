@@ -208,13 +208,13 @@ class ImageFeatures(OESelftestTestCase):
         """
         image_name = 'core-image-minimal'
 
-        img_types = [itype for itype in get_bb_var("IMAGE_TYPES", image_name).split() \
-                         if itype not in ('container', 'elf', 'f2fs', 'multiubi')]
+        all_image_types = set(get_bb_var("IMAGE_TYPES", image_name).split())
+        blacklist = set(('container', 'elf', 'f2fs', 'multiubi', 'tar.zst'))
+        img_types = all_image_types - blacklist
 
         config = 'IMAGE_FSTYPES += "%s"\n'\
                  'MKUBIFS_ARGS ?= "-m 2048 -e 129024 -c 2047"\n'\
                  'UBINIZE_ARGS ?= "-m 2048 -p 128KiB -s 512"' % ' '.join(img_types)
-
         self.write_config(config)
 
         bitbake(image_name)

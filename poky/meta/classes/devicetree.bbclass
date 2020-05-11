@@ -59,7 +59,7 @@ DT_BOOT_CPU ??= "0"
 
 DTC_FLAGS ?= "-R ${DT_RESERVED_MAP} -b ${DT_BOOT_CPU}"
 DTC_PPFLAGS ?= "-nostdinc -undef -D__DTS__ -x assembler-with-cpp"
-DTC_BFLAGS ?= "-p ${DT_PADDING_SIZE}"
+DTC_BFLAGS ?= "-p ${DT_PADDING_SIZE} -@"
 DTC_OFLAGS ?= "-p 0 -@ -H epapr"
 
 python () {

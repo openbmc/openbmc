@@ -14,3 +14,6 @@ IMAGE_ROOTFS_EXTRA_SPACE = "1524288"
 
 # ptests need more memory than standard to avoid the OOM killer
 QB_MEM = "-m 1024"
+
+# Sadly at the moment the fast set of ptests is not robust enough and sporadically fails in a couple of places
+PTEST_EXPECT_FAILURE = "1"

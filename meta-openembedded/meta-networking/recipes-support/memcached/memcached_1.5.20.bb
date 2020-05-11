@@ -26,7 +26,7 @@ SRC_URI[md5sum] = "4b64296ea0eeccdee9168c035e0488ab"
 SRC_URI[sha256sum] = "cfd7b023a9cefe7ae8a67184f51d841dbbf97994ed0e8a55e31ee092320ea1e4"
 
 # set the same COMPATIBLE_HOST as libhugetlbfs
-COMPATIBLE_HOST = '(i.86|x86_64|powerpc|powerpc64|arm).*-linux'
+COMPATIBLE_HOST = "(i.86|x86_64|powerpc|powerpc64|aarch64|arm).*-linux*"
 
 python __anonymous () {
     endianness = d.getVar('SITEINFO_ENDIANNESS')

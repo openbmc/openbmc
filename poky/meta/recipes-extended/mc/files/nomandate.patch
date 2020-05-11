@@ -1,0 +1,21 @@
+The man page date can vary depending upon the host perl, e.g. in Russian
+some versions print 'июня', others 'Июнь' or Polish 'czerwca' or 'czerwiec'.
+Rather than depend upon perl-native to fix this, just remove the date from 
+the manpages.
+
+RP 2020/2/4
+
+Upstream-Status: Inappropriate [OE specficic reproducibility workaround]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: mc-4.8.23/doc/man/date-of-man-include.am
+===================================================================
+--- mc-4.8.23.orig/doc/man/date-of-man-include.am
++++ mc-4.8.23/doc/man/date-of-man-include.am
+@@ -1,5 +1,5 @@
+ SED_PARAMETERS = \
+-	-e "s/%DATE_OF_MAN_PAGE%/$${MAN_DATE}/g" \
++	-e "s/%DATE_OF_MAN_PAGE%//g" \
+ 	-e "s/%DISTR_VERSION%/@DISTR_VERSION@/g" \
+ 	-e "s{%prefix%{@prefix@{g" \
+ 	-e "s{%sysconfdir%{@sysconfdir@{g" \

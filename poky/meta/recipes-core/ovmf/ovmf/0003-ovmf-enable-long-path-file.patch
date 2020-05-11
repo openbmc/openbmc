@@ -1,0 +1,28 @@
+From 60a5f953f747e1e9e05a40157b651cba8ea57b91 Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Mon, 11 Sep 2017 02:21:55 -0400
+Subject: [PATCH 3/5] ovmf: enable long path file
+
+Upstream-Status: Pending
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+
+---
+ BaseTools/Source/C/Common/CommonLib.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/BaseTools/Source/C/Common/CommonLib.h b/BaseTools/Source/C/Common/CommonLib.h
+index e1cce985f7..d67d03c70c 100644
+--- a/BaseTools/Source/C/Common/CommonLib.h
++++ b/BaseTools/Source/C/Common/CommonLib.h
+@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
+ #include <assert.h>
+ #define PRINTED_GUID_BUFFER_SIZE  37  // including null-termination
+ 
+-#define MAX_LONG_FILE_PATH 500
++#define MAX_LONG_FILE_PATH 1023
+ 
+ #define MAX_UINT64 ((UINT64)0xFFFFFFFFFFFFFFFFULL)
+ #define MAX_UINT32 ((UINT32)0xFFFFFFFF)
+-- 
+2.17.1
+

@@ -2,11 +2,9 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-from django.core.management.base import BaseCommand, CommandError
-from django.db import transaction
+from django.core.management.base import BaseCommand
 
 from django.core.management import call_command
-from bldcontrol.bbcontroller import getBuildEnvironmentController, ShellCmdException
 from bldcontrol.models import BuildRequest, BuildEnvironment, BRError
 from orm.models import ToasterSetting, Build, Layer
 
@@ -80,7 +78,7 @@ class Command(BaseCommand):
                         template_conf = os.environ.get("TEMPLATECONF", "")
                         custom_xml_only = os.environ.get("CUSTOM_XML_ONLY")
 
-                        if ToasterSetting.objects.filter(name='CUSTOM_XML_ONLY').count() > 0 or (not custom_xml_only == None):
+                        if ToasterSetting.objects.filter(name='CUSTOM_XML_ONLY').count() > 0 or custom_xml_only is not None:
                             # only use the custom settings
                             pass
                         elif "poky" in template_conf:

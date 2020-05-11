@@ -27,7 +27,7 @@ def usage():
 class Sizes:
     def __init__(self, glob):
         self.title = glob
-        p = Popen("size -t " + str(glob), shell=True, stdout=PIPE, stderr=PIPE)
+        p = Popen("size -t " + str(glob), shell=True, stdout=PIPE, stderr=PIPE, universal_newlines=True)
         output = p.communicate()[0].splitlines()
         if len(output) > 2:
             sizes = output[-1].split()[0:4]
@@ -49,14 +49,14 @@ class Report:
         path = os.path.dirname(filename)
 
         p = Popen("ls " + str(path) + "/*.o | grep -v built-in.o",
-                  shell=True, stdout=PIPE, stderr=PIPE)
+                  shell=True, stdout=PIPE, stderr=PIPE, universal_newlines=True)
         glob = ' '.join(p.communicate()[0].splitlines())
         oreport = Report(glob, str(path) + "/*.o")
         oreport.sizes.title = str(path) + "/*.o"
         r.parts.append(oreport)
 
         if subglob:
-            p = Popen("ls " + subglob, shell=True, stdout=PIPE, stderr=PIPE)
+            p = Popen("ls " + subglob, shell=True, stdout=PIPE, stderr=PIPE, universal_newlines=True)
             for f in p.communicate()[0].splitlines():
                 path = os.path.dirname(f)
                 r.parts.append(Report.create(f, path, str(path) + "/*/built-in.o"))

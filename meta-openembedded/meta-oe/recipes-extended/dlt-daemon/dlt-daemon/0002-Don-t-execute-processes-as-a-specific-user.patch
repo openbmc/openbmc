@@ -1,0 +1,94 @@
+From bcca4c99394ba422d03a5e76f2a0023ef248824a Mon Sep 17 00:00:00 2001
+From: Andrei Gherzan <andrei.gherzan@windriver.com>
+Date: Tue, 18 Nov 2014 15:47:22 +0100
+Subject: [PATCH 2/4] Don't execute processes as a specific user.
+
+Upstream-Status: Inappropriate [Configuration Specific]
+Signed-off-by: Andrei Gherzan <andrei.gherzan@windriver.com>
+---
+ systemd/dlt-adaptor-udp.service.cmake  | 1 -
+ systemd/dlt-dbus.service.cmake         | 1 -
+ systemd/dlt-example-user.service.cmake | 1 -
+ systemd/dlt-receive.service.cmake      | 1 -
+ systemd/dlt-system.service.cmake       | 1 -
+ systemd/dlt.service.cmake              | 1 -
+ 6 files changed, 6 deletions(-)
+
+diff --git a/systemd/dlt-adaptor-udp.service.cmake b/systemd/dlt-adaptor-udp.service.cmake
+index 8dac1f2..ecf9f9e 100644
+--- a/systemd/dlt-adaptor-udp.service.cmake
++++ b/systemd/dlt-adaptor-udp.service.cmake
+@@ -21,9 +21,8 @@ Wants=dlt.service
+ 
+ [Service]
+ Type=simple
+-User=@DLT_USER@
+ ExecStart=@CMAKE_INSTALL_PREFIX@/bin/dlt-adaptor-udp -a @DLT_ADAPTOR_UDP_APPID@ -c @DLT_ADAPTOR_UDP_CTID@ -p @DLT_ADAPTOR_UDP_PORT@
+ LimitCORE=infinity
+ 
+ [Install]
+-WantedBy=multi-user.target
+\ No newline at end of file
++WantedBy=multi-user.target
+diff --git a/systemd/dlt-dbus.service.cmake b/systemd/dlt-dbus.service.cmake
+index 9baf3e9..74a7eac 100644
+--- a/systemd/dlt-dbus.service.cmake
++++ b/systemd/dlt-dbus.service.cmake
+@@ -20,7 +20,6 @@ Wants=dlt.service
+ 
+ [Service]
+ Type=simple
+-User=@DLT_USER@
+ ExecStart=@CMAKE_INSTALL_PREFIX@/bin/dlt-dbus
+ WatchdogSec=@DLT_WatchdogSec@
+ NotifyAccess=main
+diff --git a/systemd/dlt-example-user.service.cmake b/systemd/dlt-example-user.service.cmake
+index b665742..35009b0 100644
+--- a/systemd/dlt-example-user.service.cmake
++++ b/systemd/dlt-example-user.service.cmake
+@@ -21,6 +21,5 @@ Wants=dlt.service
+ 
+ [Service]
+ Type=simple
+-User=@DLT_USER@
+ ExecStart=@CMAKE_INSTALL_PREFIX@/bin/dlt-example-user "Hallo from GENIVI DLT example user application"
+-LimitCORE=infinity
+\ No newline at end of file
++LimitCORE=infinity
+diff --git a/systemd/dlt-receive.service.cmake b/systemd/dlt-receive.service.cmake
+index c07d447..8f88f00 100644
+--- a/systemd/dlt-receive.service.cmake
++++ b/systemd/dlt-receive.service.cmake
+@@ -22,6 +22,5 @@ Wants=dlt.service
+ 
+ [Service]
+ Type=simple
+-User=@DLT_USER@
+ ExecStart=@CMAKE_INSTALL_PREFIX@/bin/dlt-receive -o /tmp/dlt_receive_log.dlt localhost
+-LimitCORE=infinity
+\ No newline at end of file
++LimitCORE=infinity
+diff --git a/systemd/dlt-system.service.cmake b/systemd/dlt-system.service.cmake
+index 0e91f42..1a5b913 100755
+--- a/systemd/dlt-system.service.cmake
++++ b/systemd/dlt-system.service.cmake
+@@ -22,7 +22,6 @@ Wants=dlt.service
+ 
+ [Service]
+ Type=simple
+-User=@DLT_USER@
+ ExecStart=@CMAKE_INSTALL_PREFIX@/bin/dlt-system
+ WatchdogSec=@DLT_WatchdogSec@
+ NotifyAccess=main
+diff --git a/systemd/dlt.service.cmake b/systemd/dlt.service.cmake
+index 0b3ee2c..e4753a2 100755
+--- a/systemd/dlt.service.cmake
++++ b/systemd/dlt.service.cmake
+@@ -21,7 +21,6 @@ Documentation=man:dlt-daemon(1) man:dlt.conf(5)
+ 
+ [Service]
+ Type=simple
+-User=@DLT_USER@
+ ExecStart=@CMAKE_INSTALL_PREFIX@/bin/dlt-daemon
+ WatchdogSec=@DLT_WatchdogSec@
+ NotifyAccess=main

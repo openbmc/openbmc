@@ -367,7 +367,7 @@
 
         <glossentry id='var-ASSUME_SHLIBS'><glossterm>ASSUME_SHLIBS</glossterm>
             <info>
-                ASSUME_SHLIBS[doc] = Provides additional shlibs provider mapping information, which adds to or overwrites the information provided automatically by the system."
+                ASSUME_SHLIBS[doc] = "Provides additional shlibs provider mapping information, which adds to or overwrites the information provided automatically by the system."
             </info>
             <glossdef>
                 <para role="glossdeffirst">
@@ -492,6 +492,30 @@
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#automatically-incrementing-a-binary-package-revision-number'>Automatically Incrementing a Binary Package Revision Number</ulink>"
                     section in the Yocto Project Development Tasks Manual.
                     </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-AVAILABLE_LICENSES'><glossterm>AVAILABLE_LICENSES</glossterm>
+            <info>
+                AVAILABLE_LICENSES[doc] = "List of licenses found in the directories specified by COMMON_LICENSE_DIR and LICENSE_PATH."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+
+                    List of licenses found in the directories specified
+                    by <link linkend='var-COMMON_LICENSE_DIR'><filename>COMMON_LICENSE_DIR</filename></link>
+                    and <link linkend='var-LICENSE_PATH'><filename>LICENSE_PATH</filename></link>.
+
+                    <note>
+                        It is assumed that all changes
+                        to <filename>COMMON_LICENSE_DIR</filename>
+                        and <filename>LICENSE_PATH</filename> have been done
+                        before <filename>AVAILABLE_LICENSES</filename> is
+                        defined
+                        (in <link linkend='ref-classes-license'>license.bbclass</link>).
+                    </note>
+                </para>
             </glossdef>
         </glossentry>
 
@@ -1423,7 +1447,7 @@
                     Use the following format to export the variable to the
                     BitBake environment:
                     <literallayout class='monospaced'>
-     export BBSERVER=localhost:$port"
+     export BBSERVER=localhost:$port
                     </literallayout>
                 </para>
 
@@ -3786,7 +3810,7 @@
                     It is not intended to be user-configurable.
                     It is best to just reference the variable to see which distro features are
                     being backfilled for all distro configurations.
-                    See the <link linkend='ref-features-backfill'>Feature Backfilling</link> section for
+                    See the "<link linkend='ref-features-backfill'>Feature Backfilling</link>" section for
                     more information.
                 </para>
             </glossdef>
@@ -6614,7 +6638,6 @@
      cpio.lzma
      cpio.xz
      cramfs
-     elf
      ext2
      ext2.bz2
      ext2.gz
@@ -6638,6 +6661,7 @@
      tar.gz
      tar.lz4
      tar.xz
+     tar.zst
      ubi
      ubifs
      wic
@@ -6749,6 +6773,25 @@
                     to remove dependencies on or provide alternatives to
                     components that are required to produce a functional system
                     image.
+                </note>
+
+                <note><title>Tips</title>
+                    It is possible to define a list of licenses that are allowed
+                    to be used instead of the licenses that are excluded. To do
+                    this, define a
+                    variable <filename>COMPATIBLE_LICENSES</filename> with the
+                    names of the licences that are allowed. Then
+                    define <filename>INCOMPATIBLE_LICENSE</filename> as:
+                    <literallayout class='monospaced'>
+     INCOMPATIBLE_LICENSE = "${@' '.join(sorted(set(d.getVar('AVAILABLE_LICENSES').split()) - set(d.getVar('COMPATIBLE_LICENSES').split())))}"
+                    </literallayout>
+                    This will result
+                    in <filename>INCOMPATIBLE_LICENSE</filename> containing the
+                    names of all licences
+                    from <link linkend='var-AVAILABLE_LICENSES'><filename>AVAILABLE_LICENSES</filename></link>
+                    except the ones specified
+                    in <filename>COMPATIBLE_LICENSES</filename>, thus only
+                    allowing the latter licences to be used.
                 </note>
             </glossdef>
         </glossentry>
@@ -7428,7 +7471,6 @@
      KBRANCH_genericx86-64  = "standard/base"
      KBRANCH_edgerouter = "standard/edgerouter"
      KBRANCH_beaglebone = "standard/beaglebone"
-     KBRANCH_mpc8315e-rdb = "standard/fsl-mpc8315e-rdb"
                     </literallayout>
                         The <filename>KBRANCH</filename> statements identify
                         the kernel branch to use when building for each
@@ -8746,7 +8788,6 @@
      MACHINE ?= "genericx86"
      MACHINE ?= "genericx86-64"
      MACHINE ?= "beaglebone"
-     MACHINE ?= "mpc8315e-rdb"
      MACHINE ?= "edgerouter"
                     </literallayout>
                     The last five are Yocto Project reference hardware boards, which
@@ -10251,28 +10292,6 @@
             </glossdef>
         </glossentry>
 
-        <glossentry id='var-PACKAGE_GROUP'><glossterm>PACKAGE_GROUP</glossterm>
-            <info>
-                PACKAGE_GROUP[doc] = "Defines one or more packages to include in an image when a specific item is included in IMAGE_FEATURES."
-            </info>
-            <glossdef>
-                <para role="glossdeffirst">
-<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    The <filename>PACKAGE_GROUP</filename> variable has been
-                    renamed to
-                    <link linkend='var-FEATURE_PACKAGES'><filename>FEATURE_PACKAGES</filename></link>.
-                    See the variable description for
-                    <filename>FEATURE_PACKAGES</filename> for information.
-                </para>
-
-                <para>
-                    If if you use the <filename>PACKAGE_GROUP</filename>
-                    variable, the OpenEmbedded build system issues a warning
-                    message.
-                </para>
-            </glossdef>
-        </glossentry>
-
         <glossentry id='var-PACKAGE_INSTALL'><glossterm>PACKAGE_INSTALL</glossterm>
             <info>
                 PACKAGE_INSTALL[doc] = "List of the packages to be installed into the image. The variable is generally not user-defined and uses IMAGE_INSTALL as part of the list."
@@ -10376,12 +10395,20 @@
                     <filename>PACKAGECONFIG</filename> blocks are defined
                     in recipes when you specify features and then arguments
                     that define feature behaviors.
-                    Here is the basic block structure:
+                    Here is the basic block structure (broken over multiple
+                    lines for readability):
                     <literallayout class='monospaced'>
      PACKAGECONFIG ??= "f1 f2 f3 ..."
-     PACKAGECONFIG[f1] = "--with-f1,--without-f1,build-deps-f1,rt-deps-f1,rt-recs-f1"
-     PACKAGECONFIG[f2] = "--with-f2,--without-f2,build-deps-f2,rt-deps-f2,rt-recs-f2"
-     PACKAGECONFIG[f3] = "--with-f3,--without-f3,build-deps-f3,rt-deps-f3,rt-recs-f3"
+     PACKAGECONFIG[f1] = "\
+                          --with-f1, \
+                          --without-f1, \
+                          build-deps-for-f1, \
+                          runtime-deps-for-f1, \
+                          runtime-recommends-for-f1, \
+                          packageconfig-conflicts-for-f1 \
+                          "
+     PACKAGECONFIG[f2] = "\
+                         ... and so on and so on ...
                     </literallayout>
                 </para>
 
@@ -10390,7 +10417,7 @@
                     variable itself specifies a space-separated list of the
                     features to enable.
                     Following the features, you can determine the behavior of
-                    each feature by providing up to five order-dependent
+                    each feature by providing up to six order-dependent
                     arguments, which are separated by commas.
                     You can omit any argument you like but must retain the
                     separating commas.
@@ -10420,6 +10447,10 @@
                             (<link linkend='var-RRECOMMENDS'><filename>RRECOMMENDS</filename></link>)
                             that should be added if the feature is enabled.
                             </para></listitem>
+                        <listitem><para>Any conflicting (that is, mutually
+                            exclusive) <filename>PACKAGECONFIG</filename>
+                            settings for this feature.
+                            </para></listitem>
                     </orderedlist>
                 </para>
 
@@ -10427,25 +10458,23 @@
                     Consider the following
                     <filename>PACKAGECONFIG</filename> block taken from the
                     <filename>librsvg</filename> recipe.
-                    In this example the feature is <filename>croco</filename>,
+                    In this example the feature is <filename>gtk</filename>,
                     which has three arguments that determine the feature's
                     behavior.
                     <literallayout class='monospaced'>
-     PACKAGECONFIG ??= "croco"
-     PACKAGECONFIG[croco] = "--with-croco,--without-croco,libcroco"
+     PACKAGECONFIG[gtk] = "--with-gtk3,--without-gtk3,gtk+3"
                     </literallayout>
-                    The <filename>--with-croco</filename> and
-                    <filename>libcroco</filename> arguments apply only if
+                    The <filename>--with-gtk3</filename> and
+                    <filename>gtk+3</filename> arguments apply only if
                     the feature is enabled.
-                    In this case, <filename>--with-croco</filename> is
+                    In this case, <filename>--with-gtk3</filename> is
                     added to the configure script argument list and
-                    <filename>libcroco</filename> is added to
+                    <filename>gtk+3</filename> is added to
                     <filename>DEPENDS</filename>.
                     On the other hand, if the feature is disabled say through
                     a <filename>.bbappend</filename> file in another layer, then
-                    the second argument <filename>--without-croco</filename> is
-                    added to the configure script rather than
-                    <filename>--with-croco</filename>.
+                    the second argument <filename>--without-gtk3</filename> is
+                    added to the configure script instead.
                 </para>
 
                 <para>
@@ -11054,7 +11083,7 @@
 
         <glossentry id='var-PN'><glossterm>PN</glossterm>
             <info>
-                PN[doc] = "PN refers to a recipe name in the context of a file used by the OpenEmbedded build system as input to create a package.
+                PN[doc] = "PN refers to a recipe name in the context of a file used by the OpenEmbedded build system as input to create a package."
             </info>
             <glossdef>
                 <para role="glossdeffirst">
@@ -11501,23 +11530,35 @@
                     By default, a recipe's own
                     <filename><link linkend='var-PN'>PN</link></filename>
                     is implicitly already in its <filename>PROVIDES</filename>
-                    list.
+                    list and therefore does not need to mention that it provides itself.
                     If a recipe uses <filename>PROVIDES</filename>, the
                     additional aliases are synonyms for the recipe and can
-                    be useful satisfying dependencies of other recipes during
+                    be useful for satisfying dependencies of other recipes during
                     the build as specified by
                     <filename><link linkend='var-DEPENDS'>DEPENDS</link></filename>.
                 </para>
 
                 <para>
                     Consider the following example
-                    <filename>PROVIDES</filename> statement from a recipe
-                    file <filename>libav_0.8.11.bb</filename>:
+                    <filename>PROVIDES</filename> statement from the recipe
+                    file <filename>eudev_3.2.9.bb</filename>:
                     <literallayout class='monospaced'>
-     PROVIDES += "libpostproc"
+     PROVIDES = "udev"
                     </literallayout>
                     The <filename>PROVIDES</filename> statement results in
-                    the "libav" recipe also being known as "libpostproc".
+                    the "eudev" recipe also being available as simply "udev".
+
+                    <note>
+                        Given that a recipe's own recipe name is already
+                        implicitly in its own <filename>PROVIDES</filename> list,
+                        it is unnecessary to add aliases with the "+=" operator;
+                        using a simple assignment will be sufficient. In other
+                        words, while you could write:
+                        <literallayout class='monospaced'>
+     PROVIDES += "udev"
+                        </literallayout>
+                        in the above, the "+=" is overkill and unnecessary.
+                    </note>
                 </para>
 
                 <para>
@@ -13383,8 +13424,7 @@
 
         <glossentry id='var-SKIP_FILEDEPS'><glossterm>SKIP_FILEDEPS</glossterm>
             <info>
-                SKIP_FILEDEPS[doc] = "Enables you to remove all files from
-                the "Provides" section of an RPM package."
+                SKIP_FILEDEPS[doc] = "Enables you to remove all files from the 'Provides' section of an RPM package."
             </info>
             <glossdef>
                 <para role="glossdeffirst">
@@ -13971,7 +14011,7 @@
                 <para>
                     When pointing to sstate build artifacts on another machine
                     that uses a different GCC version for native builds,
-                    you must configure <filename>SSTATE_MIRROR</filename>
+                    you must configure <filename>SSTATE_MIRRORS</filename>
                     with a regular expression that maps local search paths
                     to server paths.
                     The paths need to take into account
@@ -15331,7 +15371,7 @@
 
         <glossentry id='var-TCLIBC'><glossterm>TCLIBC</glossterm>
             <info>
-                TCLIBC[doc] = "Specifies GNU standard C library (libc) variant to use during the build process. You can select 'glibc', 'musl' or "newlib."
+                TCLIBC[doc] = "Specifies GNU standard C library (libc) variant to use during the build process. You can select 'glibc', 'musl' or 'newlib'."
             </info>
             <glossdef>
                 <para role="glossdeffirst">
@@ -15646,9 +15686,9 @@
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
                     Specifies the target controller to use when running tests
                     against a test image.
-                    The default controller to use is "QemuTarget":
+                    The default controller to use is "qemu":
                     <literallayout class='monospaced'>
-     TEST_TARGET = "QemuTarget"
+     TEST_TARGET = "qemu"
                     </literallayout>
                 </para>
 
@@ -15667,21 +15707,21 @@
                     You can provide the following arguments with
                     <filename>TEST_TARGET</filename>:
                     <itemizedlist>
-                        <listitem><para><emphasis>"QemuTarget":</emphasis>
+                        <listitem><para><emphasis>"qemu":</emphasis>
                             Boots a QEMU image and runs the tests.
                             See the
                             "<ulink url='&YOCTO_DOCS_DEV_URL;#qemu-image-enabling-tests'>Enabling Runtime Tests on QEMU</ulink>"
                             section in the Yocto Project Development Tasks
                             Manual for more information.
                             </para></listitem>
-                        <listitem><para><emphasis>"SimpleRemoteTarget":</emphasis>
+                        <listitem><para><emphasis>"simpleremote":</emphasis>
                             Runs the tests on target hardware that is already
                             up and running.
                             The hardware can be on the network or it can be
                             a device running an image on QEMU.
                             You must also set
                             <link linkend='var-TEST_TARGET_IP'><filename>TEST_TARGET_IP</filename></link>
-                            when you use "SimpleRemoteTarget".
+                            when you use "simpleremote".
                             <note>
                                 This argument is defined in
                                 <filename>meta/lib/oeqa/controllers/simpleremote.py</filename>.
@@ -16473,7 +16513,7 @@
                     Appends a string to the name of the local version of the
                     U-Boot image.
                     For example, assuming the version of the U-Boot image
-                    built was "2013.10, the full version string reported by
+                    built was "2013.10", the full version string reported by
                     U-Boot would be "2013.10-yocto" given the following
                     statement:
                     <literallayout class='monospaced'>
@@ -16771,18 +16811,21 @@
 
         <glossentry id='var-USERADD_ERROR_DYNAMIC'><glossterm>USERADD_ERROR_DYNAMIC</glossterm>
             <info>
-               USERADD_ERROR_DYNAMIC[doc] = "If set to 'error', forces the OpenEmbedded build system to produce an error if the user identification (uid) and group identification (gid) values are not defined in files/passwd and files/group files. If set to 'warn', a warning will be issued instead."
+               USERADD_ERROR_DYNAMIC[doc] = "If set to 'error', forces the OpenEmbedded build system to produce an error if the user identification (uid) and group identification (gid) values are not defined in any of the files listed in USERADD_UID_TABLES and USERADD_GID_TABLES. If set to 'warn', a warning will be issued instead."
             </info>
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    If set to "error", forces the OpenEmbedded build system to
-                    produce an error if the user identification
-                    (<filename>uid</filename>) and group identification
-                    (<filename>gid</filename>) values are not defined
-                    in <filename>files/passwd</filename>
-                    and <filename>files/group</filename> files.
-                    If set to "warn", a warning will be issued instead.
+
+                    If set to <filename>error</filename>, forces the
+                    OpenEmbedded build system to produce an error if the user
+                    identification (<filename>uid</filename>) and group
+                    identification (<filename>gid</filename>) values are not
+                    defined in any of the files listed
+                    in <link linkend='var-USERADD_UID_TABLES'><filename>USERADD_UID_TABLES</filename></link>
+                    and <link linkend='var-USERADD_GID_TABLES'><filename>USERADD_GID_TABLES</filename></link>. If
+                    set to <filename>warn</filename>, a warning will be issued
+                    instead.
                 </para>
 
                 <para>
@@ -16809,6 +16852,20 @@
                     <link linkend='var-USERADD_GID_TABLES'><filename>USERADD_GID_TABLES</filename></link>
                     variables.
                 </para>
+
+                <note>
+                    There is a difference in behavior between
+                    setting <filename>USERADD_ERROR_DYNAMIC</filename>
+                    to <filename>error</filename> and setting it
+                    to <filename>warn</filename>. When it is set
+                    to <filename>warn</filename>, the build system will report a
+                    warning for every undefined <filename>uid</filename> and
+                    <filename>gid</filename> in any recipe. But when it is set
+                    to <filename>error</filename>, it will only report errors
+                    for recipes that are actually built. This saves you from
+                    having to add static IDs for recipes that you know will
+                    never be built.
+                </note>
             </glossdef>
         </glossentry>
 
@@ -17108,7 +17165,7 @@
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#creating-partitioned-images-using-wic'>Creating Partitioned Images Using Wic</ulink>"
                     section in the Yocto Project Development Tasks Manual.
                     For details on the kickstart file format, see the
-                    "<link linkend='ref-kickstart'>OpenEmbedded Kickstart (<filename>.wks</filename>) Reference</link>
+                    "<link linkend='ref-kickstart'>OpenEmbedded Kickstart (<filename>.wks</filename>) Reference</link>"
                     Chapter.
                 </para>
             </glossdef>
@@ -17178,8 +17235,7 @@
 
         <glossentry id='var-XSERVER'><glossterm>XSERVER</glossterm>
             <info>
-               XSERVER[doc] = "Specifies the packages that should be installed
-               to provide an X server and drivers for the current machine."
+               XSERVER[doc] = "Specifies the packages that should be installed to provide an X server and drivers for the current machine."
             </info>
             <glossdef>
                 <para role="glossdeffirst">

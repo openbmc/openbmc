@@ -10,6 +10,7 @@ import re
 import tempfile
 import shutil
 import oe.lsb
+from oeqa.core.decorator.data import skipIfNotQemu
 
 class TestExport(OESelftestTestCase):
 
@@ -166,9 +167,9 @@ class TestImage(OESelftestTestCase):
         bitbake('core-image-full-cmdline socat')
         bitbake('-c testimage core-image-full-cmdline')
 
-    def test_testimage_virgl_gtk(self):
+    def test_testimage_virgl_gtk_sdl(self):
         """
-        Summary: Check host-assisted accelerate OpenGL functionality in qemu with gtk frontend
+        Summary: Check host-assisted accelerate OpenGL functionality in qemu with gtk and SDL frontends
         Expected: 1. Check that virgl kernel driver is loaded and 3d acceleration is enabled
                   2. Check that kmscube demo runs without crashing.
         Product: oe-core
@@ -181,20 +182,31 @@ class TestImage(OESelftestTestCase):
             self.skipTest('virgl isn\'t working with Debian 8')
         if distro and distro == 'centos-7':
             self.skipTest('virgl isn\'t working with Centos 7')
+        if distro and distro == 'opensuseleap-15.0':
+            self.skipTest('virgl isn\'t working with Opensuse 15.0')
 
         qemu_packageconfig = get_bb_var('PACKAGECONFIG', 'qemu-system-native')
+        sdl_packageconfig = get_bb_var('PACKAGECONFIG', 'libsdl2-native')
         features = 'INHERIT += "testimage"\n'
         if 'gtk+' not in qemu_packageconfig:
             features += 'PACKAGECONFIG_append_pn-qemu-system-native = " gtk+"\n'
+        if 'sdl' not in qemu_packageconfig:
+            features += 'PACKAGECONFIG_append_pn-qemu-system-native = " sdl"\n'
         if 'virglrenderer' not in qemu_packageconfig:
             features += 'PACKAGECONFIG_append_pn-qemu-system-native = " virglrenderer"\n'
         if 'glx' not in qemu_packageconfig:
             features += 'PACKAGECONFIG_append_pn-qemu-system-native = " glx"\n'
+        if 'opengl' not in sdl_packageconfig:
+            features += 'PACKAGECONFIG_append_pn-libsdl2-native = " opengl"\n'
         features += 'TEST_SUITES = "ping ssh virgl"\n'
         features += 'IMAGE_FEATURES_append = " ssh-server-dropbear"\n'
         features += 'IMAGE_INSTALL_append = " kmscube"\n'
-        features += 'TEST_RUNQEMUPARAMS = "gtk gl"\n'
-        self.write_config(features)
+        features_gtk = features + 'TEST_RUNQEMUPARAMS = "gtk gl"\n'
+        self.write_config(features_gtk)
+        bitbake('core-image-minimal')
+        bitbake('-c testimage core-image-minimal')
+        features_sdl = features + 'TEST_RUNQEMUPARAMS = "sdl gl"\n'
+        self.write_config(features_sdl)
         bitbake('core-image-minimal')
         bitbake('-c testimage core-image-minimal')
 
@@ -232,7 +244,47 @@ class TestImage(OESelftestTestCase):
         bitbake('-c testimage core-image-minimal')
 
 class Postinst(OESelftestTestCase):
-    def test_postinst_rootfs_and_boot(self):
+
+    def init_manager_loop(self, init_manager):
+        import oe.path
+
+        vars = get_bb_vars(("IMAGE_ROOTFS", "sysconfdir"), "core-image-minimal")
+        rootfs = vars["IMAGE_ROOTFS"]
+        self.assertIsNotNone(rootfs)
+        sysconfdir = vars["sysconfdir"]
+        self.assertIsNotNone(sysconfdir)
+        # Need to use oe.path here as sysconfdir starts with /
+        hosttestdir = oe.path.join(rootfs, sysconfdir, "postinst-test")
+        targettestdir = os.path.join(sysconfdir, "postinst-test")
+
+        for classes in ("package_rpm", "package_deb", "package_ipk"):
+            with self.subTest(init_manager=init_manager, package_class=classes):
+                features = 'CORE_IMAGE_EXTRA_INSTALL = "postinst-delayed-b"\n'
+                features += 'IMAGE_FEATURES += "package-management empty-root-password"\n'
+                features += 'PACKAGE_CLASSES = "%s"\n' % classes
+                if init_manager == "systemd":
+                    features += 'DISTRO_FEATURES_append = " systemd"\n'
+                    features += 'VIRTUAL-RUNTIME_init_manager = "systemd"\n'
+                    features += 'DISTRO_FEATURES_BACKFILL_CONSIDERED = "sysvinit"\n'
+                    features += 'VIRTUAL-RUNTIME_initscripts = ""\n'
+                self.write_config(features)
+
+                bitbake('core-image-minimal')
+
+                self.assertTrue(os.path.isfile(os.path.join(hosttestdir, "rootfs")),
+                                "rootfs state file was not created")
+
+                with runqemu('core-image-minimal') as qemu:
+                    # Make the test echo a string and search for that as
+                    # run_serial()'s status code is useless.'
+                    for filename in ("rootfs", "delayed-a", "delayed-b"):
+                        status, output = qemu.run_serial("test -f %s && echo found" % os.path.join(targettestdir, filename))
+                        self.assertEqual(output, "found", "%s was not present on boot" % filename)
+
+
+
+    @skipIfNotQemu('qemuall', 'Test only runs in qemu')
+    def test_postinst_rootfs_and_boot_sysvinit(self):
         """
         Summary:        The purpose of this test case is to verify Post-installation
                         scripts are called when rootfs is created and also test
@@ -246,46 +298,32 @@ class Postinst(OESelftestTestCase):
                            created by postinst_boot recipe is present on image.
         Expected:       The files are successfully created during rootfs and boot
                         time for 3 different package managers: rpm,ipk,deb and
-                        for initialization managers: sysvinit and systemd.
+                        for initialization managers: sysvinit.
+
+        """
+        self.init_manager_loop("sysvinit")
+
+
+    @skipIfNotQemu('qemuall', 'Test only runs in qemu')
+    def test_postinst_rootfs_and_boot_systemd(self):
+        """
+        Summary:        The purpose of this test case is to verify Post-installation
+                        scripts are called when rootfs is created and also test
+                        that script can be delayed to run at first boot.
+        Dependencies:   NA
+        Steps:          1. Add proper configuration to local.conf file
+                        2. Build a "core-image-minimal" image
+                        3. Verify that file created by postinst_rootfs recipe is
+                           present on rootfs dir.
+                        4. Boot the image created on qemu and verify that the file
+                           created by postinst_boot recipe is present on image.
+        Expected:       The files are successfully created during rootfs and boot
+                        time for 3 different package managers: rpm,ipk,deb and
+                        for initialization managers: systemd.
 
         """
 
-        import oe.path
-
-        vars = get_bb_vars(("IMAGE_ROOTFS", "sysconfdir"), "core-image-minimal")
-        rootfs = vars["IMAGE_ROOTFS"]
-        self.assertIsNotNone(rootfs)
-        sysconfdir = vars["sysconfdir"]
-        self.assertIsNotNone(sysconfdir)
-        # Need to use oe.path here as sysconfdir starts with /
-        hosttestdir = oe.path.join(rootfs, sysconfdir, "postinst-test")
-        targettestdir = os.path.join(sysconfdir, "postinst-test")
-
-        for init_manager in ("sysvinit", "systemd"):
-            for classes in ("package_rpm", "package_deb", "package_ipk"):
-                with self.subTest(init_manager=init_manager, package_class=classes):
-                    features = 'CORE_IMAGE_EXTRA_INSTALL = "postinst-delayed-b"\n'
-                    features += 'IMAGE_FEATURES += "package-management empty-root-password"\n'
-                    features += 'PACKAGE_CLASSES = "%s"\n' % classes
-                    if init_manager == "systemd":
-                        features += 'DISTRO_FEATURES_append = " systemd"\n'
-                        features += 'VIRTUAL-RUNTIME_init_manager = "systemd"\n'
-                        features += 'DISTRO_FEATURES_BACKFILL_CONSIDERED = "sysvinit"\n'
-                        features += 'VIRTUAL-RUNTIME_initscripts = ""\n'
-                    self.write_config(features)
-
-                    bitbake('core-image-minimal')
-
-                    self.assertTrue(os.path.isfile(os.path.join(hosttestdir, "rootfs")),
-                                    "rootfs state file was not created")
-
-                    with runqemu('core-image-minimal') as qemu:
-                        # Make the test echo a string and search for that as
-                        # run_serial()'s status code is useless.'
-                        for filename in ("rootfs", "delayed-a", "delayed-b"):
-                            status, output = qemu.run_serial("test -f %s && echo found" % os.path.join(targettestdir, filename))
-                            self.assertEqual(output, "found", "%s was not present on boot" % filename)
-
+        self.init_manager_loop("systemd")
 
 
     def test_failing_postinst(self):

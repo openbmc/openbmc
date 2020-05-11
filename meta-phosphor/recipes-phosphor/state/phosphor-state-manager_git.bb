@@ -266,6 +266,6 @@ SYSTEMD_LINK_${PN}-obmc-targets += "${@compose_list(d, 'FAN_LINK_FMT', 'OBMC_CHA
 SYSTEMD_LINK_${PN}-obmc-targets += "${@compose_list(d, 'QUIESCE_FMT', 'HOST_ERROR_TARGETS', 'OBMC_HOST_INSTANCES')}"
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
-SRCREV = "dc059399bca5d459fb82b6a28e7f547745a251a1"
+SRCREV = "34b3b407d5d8dbc180c1356dd346f0b85e207ab2"
 
 S = "${WORKDIR}/git"

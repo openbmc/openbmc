@@ -55,11 +55,15 @@ common_errors = [
     "Failed to read /var/lib/nfs/statd/state: Success",
     "error retry time-out =",
     "logind: cannot setup systemd-logind helper (-61), using legacy fallback",
-    "Error changing net interface name 'eth0' to "
+    "Failed to rename network interface",
+    "Failed to process device, ignoring: Device or resource busy",
+    "Cannot find a map file",
+    "[rdrand]: Initialization Failed",
+    "[pulseaudio] authkey.c: Failed to open cookie file",
+    "[pulseaudio] authkey.c: Failed to load authentication key",
     ]
 
 video_related = [
-    "uvesafb",
 ]
 
 x86_common = [
@@ -81,11 +85,8 @@ qemux86_common = [
     "fail to add MMCONFIG information, can't access extended PCI configuration space under this bridge.",
     "can't claim BAR ",
     'amd_nb: Cannot enumerate AMD northbridges',
-    'uvesafb: 5000 ms task timeout, infinitely waiting',
     'tsc: HPET/PMTIMER calibration failed',
     "modeset(0): Failed to initialize the DRI2 extension",
-    "uvesafb: cannot reserve video memory at",
-    "uvesafb: probe of uvesafb.0 failed with error",
     "glamor initialization failed",
 ] + common_errors
 
@@ -133,6 +134,7 @@ ignore_errors = {
         '(EE) Server terminated with error (1). Closing log file.',
         'dmi: Firmware registration failed.',
         'irq: type mismatch, failed to map hwirq-27 for /intc',
+        'logind: failed to get session seat',
         ] + common_errors,
     'intel-core2-32' : [
         'ACPI: No _BQC method, cannot determine initial brightness',
@@ -183,11 +185,6 @@ ignore_errors = {
         'Failed to load module "glx"',
         'Failed to make EGL context current',
         'glamor initialization failed',
-        ] + common_errors,
-    'mpc8315e-rdb' : [
-        'of_irq_parse_pci: failed with',
-        'Fatal server error:',
-        'Server terminated with error',
         ] + common_errors,
 }
 

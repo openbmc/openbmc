@@ -8,7 +8,7 @@
 
 from django.core.management.base import BaseCommand
 
-from orm.models import LayerSource, Layer, Release, Layer_Version
+from orm.models import Layer, Release, Layer_Version
 from orm.models import LayerVersionDependency, Machine, Recipe
 from orm.models import Distro
 from orm.models import ToasterSetting
@@ -68,7 +68,7 @@ class Command(BaseCommand):
                          (what,
                           pec))
         sys.stdout.flush()
-        if int(pec) is 100:
+        if int(pec) == 100:
             sys.stdout.write("\n")
             sys.stdout.flush()
 

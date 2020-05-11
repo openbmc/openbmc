@@ -33,7 +33,7 @@
             <para id='faq-not-meeting-requirements'>
                 My development system does not meet the
                 required Git, tar, and Python versions.
-                In particular, I do not have Python 3.4.0 or greater.
+                In particular, I do not have Python 3.5.0 or greater.
                 Can I still use the Yocto Project?
             </para>
         </question>
@@ -43,7 +43,7 @@
                 system a couple different ways (i.e. building a tarball or
                 downloading a tarball).
                 See the
-                "<link linkend='required-git-tar-and-python-versions'>Required Git, tar, and Python Versions</link>"
+                "<link linkend='required-git-tar-python-and-gcc-versions'>Required Git, tar, Python and gcc Versions</link>"
                 section for steps on how to update your build tools.
             </para>
         </answer>

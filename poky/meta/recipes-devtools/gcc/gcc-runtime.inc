@@ -16,9 +16,16 @@ EXTRA_OECONF_PATHS = "\
 
 EXTRA_OECONF_append_linuxstdbase = " --enable-clocale=gnu"
 EXTRA_OECONF_append = " --cache-file=${B}/config.cache"
+EXTRA_OECONF_append_libc-newlib = " --with-newlib"
 
 # Disable ifuncs for libatomic on arm conflicts -march/-mcpu
 EXTRA_OECONF_append_arm = " libat_cv_have_ifunc=no "
+EXTRA_OECONF_append_armeb = " libat_cv_have_ifunc=no "
+
+DISABLE_STATIC_class-nativesdk ?= ""
+
+# Newlib does not support symbol versioning on libsdtcc++
+SYMVERS_CONF_libc-newlib = ""
 
 # Building with thumb enabled on armv6t fails
 ARM_INSTRUCTION_SET_armv6 = "arm"
@@ -36,6 +43,8 @@ RUNTIMELIBSSP_mingw32 ?= "libssp"
 RUNTIMETARGET = "${RUNTIMELIBSSP} libstdc++-v3 libgomp libatomic ${RUNTIMELIBITM} \
     ${@bb.utils.contains_any('FORTRAN', [',fortran',',f77'], 'libquadmath', '', d)} \
 "
+# Only build libstdc++ for newlib
+RUNTIMETARGET_libc-newlib = "libstdc++-v3"
 
 # libiberty
 # libmudflap
@@ -179,7 +188,7 @@ RRECOMMENDS_${PN}-dbg = ""
 
 # include python debugging scripts
 FILES_${PN}-dbg += "\
-    ${libdir}/libstdc++.so.*-gdb.py \
+    ${libdir}/libstdc++.*-gdb.py \
     ${datadir}/gcc-${BINV}/python/libstdcxx \
 "
 
@@ -302,10 +311,6 @@ do_check() {
 
     # HACK: this works around the configure setting CXX with -nostd* args
     sed -i 's/-nostdinc++ -nostdlib++//g' $(find ${B} -name testsuite_flags | head -1)
-    # HACK: this works around the de-stashing changes to configargs.h, as well as recipe-sysroot changing the content
-    sed -i '/static const char configuration_arguments/d' ${B}/gcc/configargs.h
-    ${CC} -v 2>&1 | grep "^Configured with:" | \
-        sed 's/Configured with: \(.*\)/static const char configuration_arguments[] = "\1";/g' >> ${B}/gcc/configargs.h
 
     if [ "${TOOLCHAIN_TEST_TARGET}" = "user" ]; then
         # qemu user has issues allocating large amounts of memory

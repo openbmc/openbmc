@@ -8,12 +8,10 @@ XML or HTML to reflect a new encoding; that's the tree builder's job.
 """
 __license__ = "MIT"
 
-from pdb import set_trace
 import codecs
 from html.entities import codepoint2name
 import re
 import logging
-import string
 
 # Import a library to autodetect character encodings.
 chardet_type = None
@@ -37,12 +35,6 @@ except ImportError:
         # No chardet available.
         def chardet_dammit(s):
             return None
-
-# Available from http://cjkpython.i18n.org/.
-try:
-    import iconv_codec
-except ImportError:
-    pass
 
 xml_encoding_re = re.compile(
     r'^<\?.*encoding=[\'"](.*?)[\'"].*\?>'.encode(), re.I)

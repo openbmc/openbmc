@@ -35,6 +35,7 @@ EXTRA_OECONF = "--enable-gettext=no \
                 INSTALL_GROUP=root \
                 ac_cv_header_aio_h=yes \
                 ac_cv_lib_rt_lio_listio=yes \
+                OPTIMIZER='${SELECTED_OPTIMIZATION}' \
 "
 
 DISABLE_STATIC = ""

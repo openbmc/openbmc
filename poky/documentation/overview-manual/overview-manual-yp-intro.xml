@@ -225,9 +225,9 @@
                         For information that helps you transition from
                         trying out the Yocto Project to using it for your
                         project, see the
-                        "<ulink url='&YOCTO_HOME_URL;/docs/what-i-wish-id-known/'>What I wish I'd Known</ulink>"
+                        "<ulink url='&YOCTO_DOCS_URL;/what-i-wish-id-known/'>What I wish I'd Known</ulink>"
                         and
-                        "<ulink url='&YOCTO_HOME_URL;/docs/transitioning-to-a-custom-environment/'>Transitioning to a Custom Environment for Systems Development</ulink>"
+                        "<ulink url='&YOCTO_DOCS_URL;/transitioning-to-a-custom-environment/'>Transitioning to a Custom Environment for Systems Development</ulink>"
                         documents on the Yocto Project website.
                         </para></listitem>
                     <listitem><para>
@@ -437,7 +437,7 @@
                 <itemizedlist>
                     <listitem><para id='gs-crops-overview'>
                         <emphasis>CROPS:</emphasis>
-                        <ulink url='https://git.yoctoproject.org/cgit/cgit.cgi/crops/about/'>CROPS</ulink>
+                        <ulink url='https://github.com/crops/poky-container/'>CROPS</ulink>
                         is an open source, cross-platform development framework
                         that leverages
                         <ulink url='https://www.docker.com/'>Docker Containers</ulink>.
@@ -883,7 +883,7 @@
                 <listitem><para>
                     <emphasis>CROss PlatformS (CROPS):</emphasis>
                     Typically, you use
-                    <ulink url='https://git.yoctoproject.org/cgit/cgit.cgi/crops/about/'>CROPS</ulink>,
+                    <ulink url='https://github.com/crops/poky-container/'>CROPS</ulink>,
                     which leverages
                     <ulink url='https://www.docker.com/'>Docker Containers</ulink>,
                     to set up a Build Host that is not running Linux (e.g.
@@ -905,6 +905,24 @@
                     <para>For information on how to set up a Build Host with
                     CROPS, see the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#setting-up-to-use-crops'>Setting Up to Use CROss PlatformS (CROPS)</ulink>"
+                    section in the Yocto Project Development Tasks Manual.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>Windows Subsystem For Linux (WSLv2):</emphasis>
+                    You may use Windows Subsystem For Linux v2 to set up a build
+                    host using Windows 10.
+                    <note>
+                      The Yocto Project is not compatible with WSLv1, it is
+                      compatible but not officially supported nor validated
+                      with WSLv2, if you still decide to use WSL please upgrade
+                      to WSLv2.
+                    </note>
+                    The Windows Subsystem For Linux allows Windows 10 to run a real
+                    Linux kernel inside of a lightweight utility virtual
+                    machine (VM) using virtualization technology.</para>
+                    <para>For information on how to set up a Build Host with
+                    WSLv2, see the
+                    "<ulink url='&YOCTO_DOCS_DEV_URL;#setting-up-to-use-wsl'>Setting Up to Use Windows Subsystem For Linux</ulink>"
                     section in the Yocto Project Development Tasks Manual.
                     </para></listitem>
                 <listitem><para>

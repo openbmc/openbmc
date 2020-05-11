@@ -100,6 +100,7 @@ do_install_append () {
 PACKAGES += "dhcp-libs dhcp-server dhcp-server-config dhcp-client dhcp-relay dhcp-omshell"
 
 PACKAGES_remove = "${PN}"
+RDEPENDS_${PN}-client += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'iproute2', '', d)}"
 RDEPENDS_${PN}-dev = ""
 RDEPENDS_${PN}-staticdev = ""
 FILES_${PN}-libs = "${libdir}/libdhcpctl.so.0* ${libdir}/libomapi.so.0* ${libdir}/libdhcp.so.0*"

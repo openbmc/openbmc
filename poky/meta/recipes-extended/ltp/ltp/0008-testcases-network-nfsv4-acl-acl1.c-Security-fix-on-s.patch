@@ -1,33 +1,34 @@
-From aa7a9185a037ad59012bd46713ac340458e95209 Mon Sep 17 00:00:00 2001
+From 4b7db094d6fc5659001ae8dc17078bb65d46b9c9 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?An=C3=ADbal=20Lim=C3=B3n?= <anibal.limon@linux.intel.com>
 Date: Fri, 13 May 2016 11:11:28 -0500
-Subject: [PATCH] testcases/network/nfsv4/acl/acl1.c: Security fix on
- string printf
+Subject: [PATCH] acl: Security fix on string printf
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Fixes:
+Fixes build error when compiled with -Werror=format-security:
 
-acl1.c: In function 'test_acl_default':
-acl1.c:317:2: error: format not a string literal and no format arguments
-[-Werror=format-security]
-  printf(cmd);
+acl1.c: In function ‘test_acl_default’:
+acl1.c:305:2: error: format not a string literal and no format arguments [-Werror=format-security]
+  305 |  printf(cmd);
+
+Patch taken from openembedded-core,
+original bug report: https://bugzilla.yoctoproject.org/9548
 
 [YOCTO #9548]
 
-Upstream-Status: Pending
-
 Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>
+Signed-off-by: Petr Vorel <pvorel@suse.cz>
+Upstream-Status: accepted in 4b7db094d6fc5659001ae8dc17078bb65d46b9c9
 ---
  testcases/network/nfsv4/acl/acl1.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/testcases/network/nfsv4/acl/acl1.c b/testcases/network/nfsv4/acl/acl1.c
-index bdf0180..898b7ca 100644
+index aae9484e5..ad778cd33 100644
 --- a/testcases/network/nfsv4/acl/acl1.c
 +++ b/testcases/network/nfsv4/acl/acl1.c
-@@ -303,7 +303,7 @@ void test_acl_default(char *dir, acl_t acl)
+@@ -302,7 +302,7 @@ void test_acl_default(char *dir, acl_t acl)
  	char *cmd = malloc(256);
  
  	strcpy(cmd, "chmod 7777 ");
@@ -37,5 +38,5 @@ index bdf0180..898b7ca 100644
  	system(cmd);
  	acl2 = acl_get_file(path, ACL_TYPE_ACCESS);
 -- 
-2.7.4
+2.25.1
 

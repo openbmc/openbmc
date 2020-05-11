@@ -1,0 +1,29 @@
+From a471cf4e4c73350e090eb2cd87ec959d138012e5 Mon Sep 17 00:00:00 2001
+From: Jeremy Puhlman <jpuhlman@mvista.com>
+Date: Thu, 19 Mar 2020 11:54:26 -0700
+Subject: [PATCH] Add enable/disable libudev
+
+Upstream-Status: Pending
+Signed-off-by: Jeremy Puhlman <jpuhlman@mvista.com>
+---
+ configure | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/configure b/configure
+index cac271c..bd116eb 100755
+--- a/configure
++++ b/configure
+@@ -1539,6 +1539,10 @@ for opt do
+   ;;
+   --disable-plugins) plugins="no"
+   ;;
++  --enable-libudev) libudev="yes"
++  ;;
++  --disable-libudev) libudev="no"
++  ;;
+   *)
+       echo "ERROR: unknown option $opt"
+       echo "Try '$0 --help' for more information"
+-- 
+1.8.3.1
+

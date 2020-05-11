@@ -16,6 +16,7 @@ INSANE_SKIP_${PN}-dbg += "libdir"
 PROVIDES += "virtual/fakeroot"
 
 MAKEOPTS = ""
+MAKEOPTS_class-native = "'RPATH=-Wl,--rpath=XORIGIN/../../../sqlite3-native/usr/lib/'"
 
 inherit siteinfo pkgconfig
 
@@ -115,6 +116,7 @@ do_install () {
 }
 
 do_install_append_class-native () {
+	chrpath ${D}${bindir}/pseudo -r `chrpath ${D}${bindir}/pseudo | cut -d = -f 2 | sed s/XORIGIN/\\$ORIGIN/`
 	install -d ${D}${sysconfdir}
 	# The fallback files should never be modified
 	install -m 444 ${WORKDIR}/fallback-passwd ${D}${sysconfdir}/passwd

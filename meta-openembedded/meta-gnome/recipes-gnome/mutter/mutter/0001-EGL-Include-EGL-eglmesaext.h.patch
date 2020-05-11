@@ -1,0 +1,72 @@
+From a444a4c5f58ea516ad3cd9d6ddc0056c3ca9bc90 Mon Sep 17 00:00:00 2001
+From: "Jan Alexander Steffens (heftig)" <jan.steffens@gmail.com>
+Date: Sun, 20 Oct 2019 12:04:31 +0200
+Subject: [PATCH] EGL: Include EGL/eglmesaext.h
+
+The eglext.h shipped by libglvnd does not include the Mesa extensions,
+unlike the header shipped in Mesa.
+
+Fixes https://gitlab.gnome.org/GNOME/mutter/issues/876
+
+Upstream-Status: Applied [1]
+
+[1] https://gitlab.gnome.org/GNOME/mutter/-/commit/a444a4c5f58ea516ad3cd9d6ddc0056c3ca9bc90
+---
+ cogl/cogl/meson.build       | 2 +-
+ src/backends/meta-egl-ext.h | 1 +
+ src/backends/meta-egl.c     | 1 +
+ src/backends/meta-egl.h     | 1 +
+ 4 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/cogl/cogl/meson.build b/cogl/cogl/meson.build
+index 261955796..b0e66bff3 100644
+--- a/cogl/cogl/meson.build
++++ b/cogl/cogl/meson.build
+@@ -48,7 +48,7 @@ cogl_gl_header_h = configure_file(
+ built_headers += [cogl_gl_header_h]
+ 
+ if have_egl
+-  cogl_egl_includes_string = '#include <EGL/egl.h>\n#include <EGL/eglext.h>'
++  cogl_egl_includes_string = '#include <EGL/egl.h>\n#include <EGL/eglext.h>\n#include <EGL/eglmesaext.h>'
+ else
+   cogl_egl_includes_string = ''
+ endif
+diff --git a/src/backends/meta-egl-ext.h b/src/backends/meta-egl-ext.h
+index 8705e7d5b..db0b74f76 100644
+--- a/src/backends/meta-egl-ext.h
++++ b/src/backends/meta-egl-ext.h
+@@ -29,6 +29,7 @@
+ 
+ #include <EGL/egl.h>
+ #include <EGL/eglext.h>
++#include <EGL/eglmesaext.h>
+ 
+ /*
+  * This is a little different to the tests shipped with EGL implementations,
+diff --git a/src/backends/meta-egl.c b/src/backends/meta-egl.c
+index 6554be935..fdeff4f77 100644
+--- a/src/backends/meta-egl.c
++++ b/src/backends/meta-egl.c
+@@ -27,6 +27,7 @@
+ 
+ #include <EGL/egl.h>
+ #include <EGL/eglext.h>
++#include <EGL/eglmesaext.h>
+ #include <gio/gio.h>
+ #include <glib.h>
+ #include <glib-object.h>
+diff --git a/src/backends/meta-egl.h b/src/backends/meta-egl.h
+index f2a816445..4591e7d85 100644
+--- a/src/backends/meta-egl.h
++++ b/src/backends/meta-egl.h
+@@ -28,6 +28,7 @@
+ 
+ #include <EGL/egl.h>
+ #include <EGL/eglext.h>
++#include <EGL/eglmesaext.h>
+ #include <glib-object.h>
+ 
+ #define META_EGL_ERROR meta_egl_error_quark ()
+-- 
+2.21.1
+

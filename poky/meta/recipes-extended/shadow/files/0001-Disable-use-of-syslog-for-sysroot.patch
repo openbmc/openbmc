@@ -1,4 +1,4 @@
-From 8cf3454d567f77233023be49a39a33e9f0836f89 Mon Sep 17 00:00:00 2001
+From fa2d9453656641002802d8165e80adb9e6a729d2 Mon Sep 17 00:00:00 2001
 From: Scott Garman <scott.a.garman@intel.com>
 Date: Thu, 14 Apr 2016 12:28:57 +0200
 Subject: [PATCH] Disable use of syslog for sysroot
@@ -12,6 +12,7 @@ Upstream-Status: Inappropriate [disable feature]
 Signed-off-by: Scott Garman <scott.a.garman@intel.com>
 Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+
 ---
  src/groupadd.c  | 3 +++
  src/groupdel.c  | 3 +++
@@ -23,7 +24,7 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  7 files changed, 21 insertions(+)
 
 diff --git a/src/groupadd.c b/src/groupadd.c
-index 63e1c48..a596c49 100644
+index 2dd8eec..e9c4bb7 100644
 --- a/src/groupadd.c
 +++ b/src/groupadd.c
 @@ -34,6 +34,9 @@
@@ -37,7 +38,7 @@ index 63e1c48..a596c49 100644
  #include <fcntl.h>
  #include <getopt.h>
 diff --git a/src/groupdel.c b/src/groupdel.c
-index 70bed01..ababd81 100644
+index f941a84..5a70056 100644
 --- a/src/groupdel.c
 +++ b/src/groupdel.c
 @@ -34,6 +34,9 @@
@@ -65,7 +66,7 @@ index fc91c8b..2842514 100644
  #include <getopt.h>
  #include <grp.h>
 diff --git a/src/groupmod.c b/src/groupmod.c
-index 72daf2c..8965f9d 100644
+index 1dca5fc..bc14438 100644
 --- a/src/groupmod.c
 +++ b/src/groupmod.c
 @@ -34,6 +34,9 @@
@@ -79,7 +80,7 @@ index 72daf2c..8965f9d 100644
  #include <fcntl.h>
  #include <getopt.h>
 diff --git a/src/useradd.c b/src/useradd.c
-index 3aaf45c..1ab9174 100644
+index 4af0f7c..1b7bf06 100644
 --- a/src/useradd.c
 +++ b/src/useradd.c
 @@ -34,6 +34,9 @@
@@ -93,7 +94,7 @@ index 3aaf45c..1ab9174 100644
  #include <ctype.h>
  #include <errno.h>
 diff --git a/src/userdel.c b/src/userdel.c
-index c8de1d3..24d3ea9 100644
+index cc951e5..153e0be 100644
 --- a/src/userdel.c
 +++ b/src/userdel.c
 @@ -34,6 +34,9 @@
@@ -107,7 +108,7 @@ index c8de1d3..24d3ea9 100644
  #include <errno.h>
  #include <fcntl.h>
 diff --git a/src/usermod.c b/src/usermod.c
-index ccfbb99..24fb60d 100644
+index 05b9871..21c6da9 100644
 --- a/src/usermod.c
 +++ b/src/usermod.c
 @@ -34,6 +34,9 @@
@@ -120,6 +121,3 @@ index ccfbb99..24fb60d 100644
  #include <assert.h>
  #include <ctype.h>
  #include <errno.h>
--- 
-2.11.0
-

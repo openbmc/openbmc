@@ -2,15 +2,6 @@ DEPENDS = "virtual/${TUNE_PKGARCH}-go go-native"
 DEPENDS_class-nativesdk = "virtual/${TARGET_PREFIX}go-crosssdk"
 PROVIDES = "virtual/${TARGET_PREFIX}go-runtime"
 
-export GOHOSTOS = "${BUILD_GOOS}"
-export GOHOSTARCH = "${BUILD_GOARCH}"
-export GOOS = "${TARGET_GOOS}"
-export GOARCH = "${TARGET_GOARCH}"
-export GOARM = "${TARGET_GOARM}"
-export GO386 = "${TARGET_GO386}"
-export GOMIPS = "${TARGET_GOMIPS}"
-export GOROOT_BOOTSTRAP = "${STAGING_LIBDIR_NATIVE}/go"
-export GOROOT_FINAL = "${libdir}/go"
 export CGO_CFLAGS = "${CFLAGS}"
 export CGO_CPPFLAGS = "${CPPFLAGS}"
 export CGO_CXXFLAGS = "${CXXFLAGS}"
@@ -29,14 +20,14 @@ do_configure_libc-musl() {
 }
 
 do_compile() {
-	export CC_FOR_${TARGET_GOOS}_${TARGET_GOARCH}="${CC}"
-	export CXX_FOR_${TARGET_GOOS}_${TARGET_GOARCH}="${CXX}"
+	export CC_FOR_${TARGET_GOTUPLE}="${CC}"
+	export CXX_FOR_${TARGET_GOTUPLE}="${CXX}"
 
 	cd src
 	./make.bash --target-only --no-banner std
 	if [ -n "${GO_DYNLINK}" ]; then
 		export GOTOOLDIR="${B}/pkg/tool/native_native"
-		CC="$CC_FOR_${TARGET_GOOS}_${TARGET_GOARCH}" GOARCH="${TARGET_GOARCH}" GOOS="${TARGET_GOOS}" GOROOT=${B} \
+		CC="$CC_FOR_${TARGET_GOTUPLE}" GOARCH="${TARGET_GOARCH}" GOOS="${TARGET_GOOS}" GOROOT=${B} \
 			$GOTOOLDIR/go_bootstrap install -linkshared -buildmode=shared ${GO_SHLIB_LDFLAGS} std
 	fi
 	cd ${B}

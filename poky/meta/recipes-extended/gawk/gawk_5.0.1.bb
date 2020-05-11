@@ -46,6 +46,8 @@ do_install_ptest() {
 	done
 	sed -i -e 's|/usr/local/bin|${bindir}|g' \
 	    -e 's|#!${base_bindir}/awk|#!${bindir}/awk|g' ${D}${PTEST_PATH}/test/*.awk
+
+        sed -i -e "s|GAWKLOCALE|LANG|g" ${D}${PTEST_PATH}/test/Maketests
 }
 
 RDEPENDS_${PN}-ptest += "make"

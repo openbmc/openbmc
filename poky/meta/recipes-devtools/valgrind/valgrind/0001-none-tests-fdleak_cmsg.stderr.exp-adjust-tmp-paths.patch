@@ -1,0 +1,34 @@
+From f405297d3382cd98391d02f397e2387da1f42879 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 24 Jan 2020 17:55:39 +0100
+Subject: [PATCH] none/tests/fdleak_cmsg.stderr.exp: adjust /tmp paths
+
+In oe-core, /tmp is linked to /var/volatile/tmp and
+valgrind output changes accordingly
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ none/tests/fdleak_cmsg.stderr.exp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/none/tests/fdleak_cmsg.stderr.exp b/none/tests/fdleak_cmsg.stderr.exp
+index 6e5a797b9..0ede1ab18 100644
+--- a/none/tests/fdleak_cmsg.stderr.exp
++++ b/none/tests/fdleak_cmsg.stderr.exp
+@@ -25,10 +25,10 @@ Open file descriptor ...: /dev/null
+ 
+ 
+ FILE DESCRIPTORS: 6 open at exit.
+-Open file descriptor ...: /tmp/data2
++Open file descriptor ...: ...
+    ...
+ 
+-Open file descriptor ...: /tmp/data1
++Open file descriptor ...: ...
+    ...
+ 
+ Open AF_UNIX socket ...: <unknown>
+-- 
+2.17.1
+

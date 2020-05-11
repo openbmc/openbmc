@@ -12,6 +12,8 @@ DEPENDS = "libtool openssl"
 SRC_URI = "git://github.com/OpenSC/libp11.git"
 SRCREV = "973d31f3f58d5549ddd8b1f822ce8f72186f9d68"
 
+UPSTREAM_CHECK_GITTAGREGEX = "libp11-(?P<pver>\d+(\.\d+)+)"
+
 S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig

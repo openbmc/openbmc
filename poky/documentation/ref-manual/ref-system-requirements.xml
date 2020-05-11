@@ -8,12 +8,12 @@
     <para>
         Welcome to the Yocto Project Reference Manual!
         This manual provides reference information for the current release
-        of the Yocto Project.
-        The manual is best used after you have an understanding
+        of the Yocto Project, and
+        is most effectively used after you have an understanding
         of the basics of the Yocto Project.
         The manual is neither meant to be read as a starting point to the
-        Yocto Project nor read from start to finish.
-        Use this manual to find variable definitions, class
+        Yocto Project, nor read from start to finish.
+        Rather, use this manual to find variable definitions, class
         descriptions, and so forth as needed during the course of using
         the Yocto Project.
     </para>
@@ -66,12 +66,15 @@
                         below.
                         </para></listitem>
                     <listitem><para>
-                        The Yocto Project is not compatible with the
-                        <ulink url='https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux'>Windows Subsystem for Linux</ulink>
-                        (WSL).
-                        You cannot use a
-                        <link linkend='hardware-build-system-term'>build host</link>
-                        that is running WSL.
+                        You may use Windows Subsystem For Linux v2 to set up a build
+                        host using Windows 10, but validation is not performed
+                        against build hosts using WSLv2.
+                        <note>
+                          The Yocto Project is not compatible with WSLv1, it is
+                          compatible but not officially supported nor validated
+                          with WSLv2, if you still decide to use WSL please upgrade
+                          to WSLv2.
+                        </note>
                         </para></listitem>
                     <listitem><para>
                         If you encounter problems, please go to
@@ -117,7 +120,7 @@
         <para>
             The list of packages you need on the host development system can
             be large when covering all build scenarios using the Yocto Project.
-            This section provides required packages according to
+            This section describes required packages according to
             Linux distribution and function.
         </para>
 
@@ -127,19 +130,29 @@
             <para>
                 The following list shows the required packages by function
                 given a supported Ubuntu or Debian Linux distribution:
-                <note>
-                    If your build system has the
-                    <filename>oss4-dev</filename> package installed, you
-                    might experience QEMU build failures due to the package
-                    installing its own custom
-                    <filename>/usr/include/linux/soundcard.h</filename> on
-                    the Debian system.
-                    If you run into this situation, either of the following
-                    solutions exist:
-                    <literallayout class='monospaced'>
+                <note><title>Notes</title>
+                    <itemizedlist>
+                        <listitem><para>
+                            If your build system has the
+                            <filename>oss4-dev</filename> package installed, you
+                            might experience QEMU build failures due to the package
+                            installing its own custom
+                            <filename>/usr/include/linux/soundcard.h</filename> on
+                            the Debian system.
+                            If you run into this situation, either of the following
+                            solutions exist:
+                            <literallayout class='monospaced'>
      $ sudo apt-get build-dep qemu
      $ sudo apt-get remove oss4-dev
-                    </literallayout>
+                            </literallayout>
+                        </para></listitem>
+                        <listitem><para>
+                            For Debian-8, <filename>python3-git</filename> and <filename>pylint3</filename> are no longer available via <filename>apt-get</filename>.
+                            <literallayout class='monospaced'>
+     $ sudo pip3 install GitPython pylint==1.9.5
+                            </literallayout>
+                        </para></listitem>
+                    </itemizedlist>
                  </note>
                 <itemizedlist>
                     <listitem><para><emphasis>Essentials:</emphasis>
@@ -205,18 +218,18 @@
             </para>
         </section>
 
-        <section id='centos-packages'>
-            <title>CentOS Packages</title>
+        <section id='centos-7-packages'>
+            <title>CentOS-7 Packages</title>
 
             <para>
                 The following list shows the required packages by function
-                given a supported CentOS Linux distribution:
+                given a supported CentOS-7 Linux distribution:
                 <itemizedlist>
                     <listitem><para><emphasis>Essentials:</emphasis>
                         Packages needed to build an image for a headless
                         system:
                         <literallayout class='monospaced'>
-     $ sudo yum install &CENTOS_HOST_PACKAGES_ESSENTIAL;
+     $ sudo yum install &CENTOS7_HOST_PACKAGES_ESSENTIAL;
                         </literallayout>
                         <note><title>Notes</title>
                             <itemizedlist>
@@ -229,29 +242,81 @@
                                     Linux by default.
                                     You need to install these packages
                                     separately.
-                                    </para></listitem>
+                                </para></listitem>
                                 <listitem><para>
                                     The <filename>makecache</filename> command
                                     consumes additional Metadata from
                                     <filename>epel-release</filename>.
-                                    </para></listitem>
+                                </para></listitem>
                             </itemizedlist>
                         </note>
-                        </para></listitem>
+                    </para></listitem>
                     <listitem><para><emphasis>Documentation:</emphasis>
                         Packages needed if you are going to build out the
                         Yocto Project documentation manuals:
                         <literallayout class='monospaced'>
      $ sudo yum install docbook-style-dsssl docbook-style-xsl \
      docbook-dtds docbook-utils fop libxslt dblatex xmlto
-                        </literallayout></para></listitem>
+                        </literallayout>
+                    </para></listitem>
+                </itemizedlist>
+            </para>
+        </section>
+
+        <section id='centos-8-packages'>
+            <title>CentOS-8 Packages</title>
+
+            <para>
+                The following list shows the required packages by function
+                given a supported CentOS-8 Linux distribution:
+                <itemizedlist>
+                    <listitem><para><emphasis>Essentials:</emphasis>
+                        Packages needed to build an image for a headless
+                        system:
+                        <literallayout class='monospaced'>
+     $ sudo dnf install &CENTOS8_HOST_PACKAGES_ESSENTIAL;
+                        </literallayout>
+                        <note><title>Notes</title>
+                            <itemizedlist>
+                                <listitem><para>
+                                    Extra Packages for Enterprise Linux
+                                    (i.e. <filename>epel-release</filename>)
+                                    is a collection of packages from Fedora
+                                    built on RHEL/CentOS for easy installation
+                                    of packages not included in enterprise
+                                    Linux by default.
+                                    You need to install these packages
+                                    separately.
+                                </para></listitem>
+                                <listitem><para>
+                                    The <filename>PowerTools</filename> repo
+                                    provides additional packages such as
+                                    <filename>rpcgen</filename> and
+                                    <filename>texinfo</filename>.
+                                </para></listitem>
+                                <listitem><para>
+                                    The <filename>makecache</filename> command
+                                    consumes additional Metadata from
+                                    <filename>epel-release</filename>.
+                                </para></listitem>
+                            </itemizedlist>
+                        </note>
+                    </para></listitem>
+                    <listitem><para><emphasis>Documentation:</emphasis>
+                        Packages needed if you are going to build out the
+                        Yocto Project documentation manuals:
+                        <literallayout class='monospaced'>
+     $ sudo dnf install docbook-style-dsssl docbook-style-xsl \
+     docbook-dtds docbook-utils fop libxslt dblatex xmlto
+                        </literallayout>
+                    </para></listitem>
                 </itemizedlist>
             </para>
         </section>
     </section>
 
-    <section id='required-git-tar-and-python-versions'>
-        <title>Required Git, tar, and Python Versions</title>
+    <section id='required-git-tar-python-and-gcc-versions'>
+        <title>Required Git, tar, Python and gcc Versions</title>
 
         <para>
             In order to use the build system, your host development system
@@ -259,8 +324,8 @@
             Python:
             <itemizedlist>
                 <listitem><para>Git 1.8.3.1 or greater</para></listitem>
-                <listitem><para>tar 1.27 or greater</para></listitem>
-                <listitem><para>Python 3.4.0 or greater</para></listitem>
+                <listitem><para>tar 1.28 or greater</para></listitem>
+                <listitem><para>Python 3.5.0 or greater</para></listitem>
             </itemizedlist>
         </para>
 
@@ -272,6 +337,89 @@
             tarball or use BitBake to build the tarball.
         </para>
 
+        <para>
+            In addition, your host development system must meet the following
+            version requirement for gcc:
+            <itemizedlist>
+                <listitem><para>gcc 5.0 or greater</para></listitem>
+            </itemizedlist>
+        </para>
+
+        <para>
+            If your host development system does not meet this requirement,
+            you can resolve this by installing a <filename>buildtools-extended</filename>
+            tarball that contains additional tools, the equivalent of <filename>buildtools-essential</filename>.
+        </para>
+        <section id='installing-a-pre-built-buildtools-tarball-with-install-buildtools-script'>
+            <title>Installing a Pre-Built <filename>buildtools</filename> Tarball with <filename>install-buildtools</filename> script</title>
+
+            <para>
+                The <filename>install-buildtools</filename> script is the easiest
+                of the three methods by which you can get these tools. It downloads
+                a pre-built buildtools installer and automatically installs the tools
+                for you:
+            <orderedlist>
+                <listitem><para>
+                    Execute the <filename>install-buildtools</filename> script.
+                    Here is an example:
+                    <literallayout class='monospaced'>
+     $ cd poky
+     $ scripts/install-buildtools --without-extended-buildtools \
+       --base-url &YOCTO_DL_URL;/releases/yocto \
+       --release yocto-&DISTRO; \
+       --installer-version &DISTRO;
+                    </literallayout>
+                    <para>
+                        During execution, the buildtools tarball will be downloaded,
+                        the checksum of the download will be verified, the installer
+                        will be run for you, and some basic checks will be run to
+                        to make sure the installation is functional.
+                    </para>
+                    <para>
+                        To avoid the need of <filename>sudo</filename> privileges,
+                        the <filename>install-buildtools</filename> script will
+                        by default tell the installer to install in:
+                        <literallayout class='monospaced'>
+     <replaceable>/path/to/</replaceable>poky/buildtools
+                        </literallayout>
+                    </para>
+                    <para>
+                        If your host development system needs the additional tools
+                        provided in the <filename>buildtools-extended</filename>
+                        tarball, you can instead execute the
+                        <filename>install-buildtools</filename> script with the
+                        default parameters:
+                        <literallayout class='monospaced'>
+     $ cd poky
+     $ scripts/install-buildtools
+                        </literallayout>
+                    </para>
+                </para></listitem>
+                <listitem><para>
+                    Source the tools environment setup script by using a
+                    command like the following:
+                    <literallayout class='monospaced'>
+     $ source <replaceable>/path/to/</replaceable>poky/buildtools/environment-setup-x86_64-pokysdk-linux
+                    </literallayout>
+                    Of course, you need to supply your installation directory and be
+                    sure to use the right file (i.e. i586 or x86_64).
+                </para>
+                <para>
+                    After you have sourced the setup script,
+                    the tools are added to <filename>PATH</filename>
+                    and any other environment variables required to run the
+                    tools are initialized.
+                    The results are working versions versions of Git, tar,
+                    Python and <filename>chrpath</filename>. And in the case of
+                    the <filename>buildtools-extended</filename> tarball, additional
+                    working versions of tools including <filename>gcc</filename>,
+                    <filename>make</filename> and the other tools included in
+                    <filename>packagegroup-core-buildessential</filename>.
+                </para></listitem>
+            </orderedlist>
+            </para>
+        </section>
+
         <section id='downloading-a-pre-built-buildtools-tarball'>
             <title>Downloading a Pre-Built <filename>buildtools</filename> Tarball</title>
 
@@ -281,13 +429,17 @@
                 <orderedlist>
                     <listitem><para>
                         Locate and download the <filename>*.sh</filename> at
-                        <ulink url='&YOCTO_DL_URL;/releases/yocto/yocto-&DISTRO;/buildtools/'></ulink>.
+                        <ulink url='&YOCTO_RELEASE_DL_URL;/buildtools/'></ulink>.
                         </para></listitem>
                     <listitem><para>
                         Execute the installation script.
-                        Here is an example:
+                        Here is an example for the traditional installer:
                         <literallayout class='monospaced'>
      $ sh ~/Downloads/x86_64-buildtools-nativesdk-standalone-&DISTRO;.sh
+                        </literallayout>
+                        Here is an example for the extended installer:
+                        <literallayout class='monospaced'>
+     $ sh ~/Downloads/x86_64-buildtools-extended-nativesdk-standalone-&DISTRO;.sh
                         </literallayout>
                         During execution, a prompt appears that allows you to
                         choose the installation directory.
@@ -311,7 +463,11 @@
                         and any other environment variables required to run the
                         tools are initialized.
                         The results are working versions versions of Git, tar,
-                        Python and <filename>chrpath</filename>.
+                        Python and <filename>chrpath</filename>. And in the case of
+                        the <filename>buildtools-extended</filename> tarball, additional
+                        working versions of tools including <filename>gcc</filename>,
+                        <filename>make</filename> and the other tools included in
+                        <filename>packagegroup-core-buildessential</filename>.
                         </para></listitem>
                 </orderedlist>
             </para>
@@ -327,7 +483,7 @@
                 <filename>.sh</filename> file and then
                 take steps to transfer and run it on a
                 machine that does not meet the minimal Git, tar, and Python
-                requirements.
+                (or gcc) requirements.
             </para>
 
             <para>
@@ -345,6 +501,10 @@
                         <literallayout class='monospaced'>
      $ bitbake buildtools-tarball
                         </literallayout>
+                        or run the BitBake command to build the extended tarball:
+                        <literallayout class='monospaced'>
+     $ bitbake buildtools-extended-tarball
+                        </literallayout>
                         <note>
                         The
                         <link linkend='var-SDKMACHINE'><filename>SDKMACHINE</filename></link>
@@ -358,20 +518,24 @@
                        subdirectory of the
                        <link linkend='build-directory'>Build Directory</link>.
                        The installer file has the string "buildtools"
-                       in the name.
+                       (or "buildtools-extended") in the name.
                        </para></listitem>
                    <listitem><para>
                        Transfer the <filename>.sh</filename> file from the
                        build host to the machine that does not meet the
-                       Git, tar, or Python requirements.
+                       Git, tar, or Python (or gcc) requirements.
                        </para></listitem>
                    <listitem><para>
                        On the machine that does not meet the requirements,
                        run the <filename>.sh</filename> file
                        to install the tools.
-                       Here is an example:
+                       Here is an example for the traditional installer:
                        <literallayout class='monospaced'>
      $ sh ~/Downloads/x86_64-buildtools-nativesdk-standalone-&DISTRO;.sh
+                       </literallayout>
+                       Here is an example for the extended installer:
+                       <literallayout class='monospaced'>
+     $ sh ~/Downloads/x86_64-buildtools-extended-nativesdk-standalone-&DISTRO;.sh
                        </literallayout>
                        During execution, a prompt appears that allows you to
                        choose the installation directory.
@@ -384,10 +548,10 @@
                         Source the tools environment setup script by using a
                         command like the following:
                         <literallayout class='monospaced'>
-     $ source /home/<replaceable>your_username</replaceable>/buildtools/environment-setup-i586-poky-linux
+     $ source /home/<replaceable>your_username</replaceable>/buildtools/environment-setup-x86_64-poky-linux
                         </literallayout>
                         Of course, you need to supply your installation directory and be
-                        sure to use the right file (i.e. i585 or x86-64).
+                        sure to use the right file (i.e. i586 or x86_64).
                         </para>
                         <para>
                         After you have sourced the setup script,
@@ -395,7 +559,11 @@
                         and any other environment variables required to run the
                         tools are initialized.
                         The results are working versions versions of Git, tar,
-                        Python and <filename>chrpath</filename>.
+                        Python and <filename>chrpath</filename>. And in the case of
+                        the <filename>buildtools-extended</filename> tarball, additional
+                        working versions of tools including <filename>gcc</filename>,
+                        <filename>make</filename> and the other tools included in
+                        <filename>packagegroup-core-buildessential</filename>.
                         </para></listitem>
                 </orderedlist>
             </para>

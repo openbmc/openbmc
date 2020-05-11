@@ -5,23 +5,14 @@ DEPENDS = "go-native"
 
 PN = "go-cross-${TUNE_PKGARCH}"
 
-export GOHOSTOS = "${BUILD_GOOS}"
-export GOHOSTARCH = "${BUILD_GOARCH}"
-export GOOS = "${TARGET_GOOS}"
-export GOARCH = "${TARGET_GOARCH}"
-export GOARM = "${TARGET_GOARM}"
-export GO386 = "${TARGET_GO386}"
-export GOMIPS = "${TARGET_GOMIPS}"
-export GOROOT_BOOTSTRAP = "${STAGING_LIBDIR_NATIVE}/go"
-export GOROOT_FINAL = "${libdir}/go"
 export GOCACHE = "${B}/.cache"
 CC = "${@d.getVar('BUILD_CC').strip()}"
 
 do_configure[noexec] = "1"
 
 do_compile() {
-	export CC_FOR_${GOOS}_${GOARCH}="${TARGET_PREFIX}gcc ${TARGET_CC_ARCH} --sysroot=${STAGING_DIR_TARGET}"
-	export CXX_FOR_${GOOS}_${GOARCh}="${TARGET_PREFIX}g++ ${TARGET_CC_ARCH} --sysroot=${STAGING_DIR_TARGET}"
+	export CC_FOR_${TARGET_GOTUPLE}="${TARGET_PREFIX}gcc ${TARGET_CC_ARCH} --sysroot=${STAGING_DIR_TARGET}"
+	export CXX_FOR_${TARGET_GOTUPLE}="${TARGET_PREFIX}g++ ${TARGET_CC_ARCH} --sysroot=${STAGING_DIR_TARGET}"
 	cd src
 	./make.bash --host-only --no-banner
 	cd ${B}

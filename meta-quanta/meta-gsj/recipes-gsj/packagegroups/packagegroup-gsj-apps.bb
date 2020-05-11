@@ -19,9 +19,7 @@ RPROVIDES_${PN}-fans += "virtual-obmc-fan-mgmt"
 RPROVIDES_${PN}-flash += "virtual-obmc-flash-mgmt"
 
 SUMMARY_${PN}-chassis = "GSJ Chassis"
-RDEPENDS_${PN}-chassis = " \
-        obmc-control-chassis \
-        "
+RDEPENDS_${PN}-chassis = ""
 
 SUMMARY_${PN}-fans = "GSJ Fans"
 RDEPENDS_${PN}-fans = ""

@@ -139,7 +139,7 @@
         </para>
 
         <para>
-            Since network accesses are slow, Bitbake maintains a
+            Since network accesses are slow, BitBake maintains a
             cache of files downloaded from the network.
             Any source files that are not local (i.e.
             downloaded from the Internet) are placed into the download

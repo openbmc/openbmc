@@ -1,4 +1,4 @@
-From eff903c600f4c40f5753e95ab1557126fc6e0c9c Mon Sep 17 00:00:00 2001
+From 7ada9c749f6beb51c13a3debc850755e911548a6 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 31 Jan 2019 16:46:30 +0100
 Subject: [PATCH] distutils/sysconfig: append
@@ -15,10 +15,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  2 files changed, 4 insertions(+)
 
 diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
-index 0a034ee..3dfd0a3 100644
+index b51629e..2df348c 100644
 --- a/Lib/distutils/sysconfig.py
 +++ b/Lib/distutils/sysconfig.py
-@@ -439,6 +439,8 @@ def _init_posix():
+@@ -438,6 +438,8 @@ def _init_posix():
          platform=sys.platform,
          multiarch=getattr(sys.implementation, '_multiarch', ''),
      ))
@@ -28,7 +28,7 @@ index 0a034ee..3dfd0a3 100644
      build_time_vars = _temp.build_time_vars
      global _config_vars
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index 87fa5e6..756a41c 100644
+index b2d790b..405273c 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
 @@ -419,6 +419,8 @@ def _init_posix(vars):

@@ -28,13 +28,14 @@ WARN_QA ?= "ldflags useless-rpaths rpaths staticdev libdir xorg-driver-abi \
             pn-overrides infodir build-deps src-uri-bad \
             unknown-configure-option symlink-to-sysroot multilib \
             invalid-packageconfig host-user-contaminated uppercase-pn patch-fuzz \
+            mime mime-xdg \
             "
 ERROR_QA ?= "dev-so debug-deps dev-deps debug-files arch pkgconfig la \
             perms dep-cmp pkgvarcheck perm-config perm-line perm-link \
             split-strip packages-list pkgv-undefined var-undefined \
             version-going-backwards expanded-d invalid-chars \
             license-checksum dev-elf file-rdeps configure-unsafe \
-            configure-gettext perllocalpod \
+            configure-gettext perllocalpod shebang-size \
             "
 # Add usrmerge QA check based on distro feature
 ERROR_QA_append = "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', ' usrmerge', '', d)}"
@@ -81,6 +82,29 @@ def package_qa_add_message(messages, section, new_msg):
         messages[section] = new_msg
     else:
         messages[section] = messages[section] + "\n" + new_msg
+
+QAPATHTEST[shebang-size] = "package_qa_check_shebang_size"
+def package_qa_check_shebang_size(path, name, d, elf, messages):
+    if os.path.islink(path) or elf:
+        return
+
+    try:
+        with open(path, 'rb') as f:
+            stanza = f.readline(130)
+    except IOError:
+        return
+
+    if stanza.startswith(b'#!'):
+        #Shebang not found
+        try:
+            stanza = stanza.decode("utf-8")
+        except UnicodeDecodeError:
+            #If it is not a text file, it is not a script
+            return
+
+        if len(stanza) > 129:
+            package_qa_add_message(messages, "shebang-size", "%s: %s maximum shebang size exceeded, the maximum size is 128." % (name, package_qa_clean_path(path, d)))
+            return
 
 QAPATHTEST[libexec] = "package_qa_check_libexec"
 def package_qa_check_libexec(path,name, d, elf, messages):
@@ -181,9 +205,49 @@ def package_qa_check_staticdev(path, name, d, elf, messages):
     libgcc.a, libgcov.a will be skipped in their packages
     """
 
-    if not name.endswith("-pic") and not name.endswith("-staticdev") and not name.endswith("-ptest") and path.endswith(".a") and not path.endswith("_nonshared.a"):
+    if not name.endswith("-pic") and not name.endswith("-staticdev") and not name.endswith("-ptest") and path.endswith(".a") and not path.endswith("_nonshared.a") and not '/usr/lib/debug-static/' in path and not '/.debug-static/' in path:
         package_qa_add_message(messages, "staticdev", "non -staticdev package contains static .a library: %s path '%s'" % \
                  (name, package_qa_clean_path(path,d)))
+
+QAPATHTEST[mime] = "package_qa_check_mime"
+def package_qa_check_mime(path, name, d, elf, messages):
+    """
+    Check if package installs mime types to /usr/share/mime/packages
+    while no inheriting mime.bbclass
+    """
+
+    if d.getVar("datadir") + "/mime/packages" in path and path.endswith('.xml') and not bb.data.inherits_class("mime", d):
+        package_qa_add_message(messages, "mime", "package contains mime types but does not inherit mime: %s path '%s'" % \
+                 (name, package_qa_clean_path(path,d)))
+
+QAPATHTEST[mime-xdg] = "package_qa_check_mime_xdg"
+def package_qa_check_mime_xdg(path, name, d, elf, messages):
+    """
+    Check if package installs desktop file containing MimeType and requires
+    mime-types.bbclass to create /usr/share/applications/mimeinfo.cache
+    """
+
+    if d.getVar("datadir") + "/applications" in path and path.endswith('.desktop') and not bb.data.inherits_class("mime-xdg", d):
+        mime_type_found = False
+        try:
+            with open(path, 'r') as f:
+                for line in f.read().split('\n'):
+                    if 'MimeType' in line:
+                        mime_type_found = True
+                        break;
+        except:
+            # At least libreoffice installs symlinks with absolute paths that are dangling here.
+            # We could implement some magic but for few (one) recipes it is not worth the effort so just warn:
+            wstr = "%s cannot open %s - is it a symlink with absolute path?\n" % (name, package_qa_clean_path(path,d))
+            wstr += "Please check if (linked) file contains key 'MimeType'.\n"
+            pkgname = name
+            if name == d.getVar('PN'):
+                pkgname = '${PN}'
+            wstr += "If yes: add \'inhert mime-xdg\' and \'MIME_XDG_PACKAGES += \"%s\"\' / if no add \'INSANE_SKIP_%s += \"mime-xdg\"\' to recipe." % (pkgname, pkgname)
+            package_qa_add_message(messages, "mime-xdg", wstr)
+        if mime_type_found:
+            package_qa_add_message(messages, "mime-xdg", "package contains desktop file with key 'MimeType' but does not inhert mime-xdg: %s path '%s'" % \
+                    (name, package_qa_clean_path(path,d)))
 
 def package_qa_check_libdir(d):
     """
@@ -373,11 +437,10 @@ def package_qa_hash_style(path, name, d, elf, messages):
     for line in phdrs.split("\n"):
         if "SYMTAB" in line:
             has_syms = True
-        if "GNU_HASH" in line:
+        if "GNU_HASH" or "DT_MIPS_XHASH" in line:
             sane = True
-        if "[mips32]" in line or "[mips64]" in line:
+        if ("[mips32]" in line or "[mips64]" in line) and d.getVar('TCLIBC') == "musl":
             sane = True
-
     if has_syms and not sane:
         package_qa_add_message(messages, "ldflags", "No GNU_HASH in the ELF binary %s, didn't pass LDFLAGS?" % path)
 
@@ -893,9 +956,9 @@ def package_qa_check_src_uri(pn, d, messages):
     if "${PN}" in d.getVar("SRC_URI", False):
         package_qa_handle_error("src-uri-bad", "%s: SRC_URI uses PN not BPN" % pn, d)
 
-    pn = d.getVar("SRC_URI")
-    if re.search(r"github\.com/.+/.+/archive/.+", pn):
-        package_qa_handle_error("src-uri-bad", "%s: SRC_URI uses unstable GitHub archives" % pn, d)
+    for url in d.getVar("SRC_URI").split():
+        if re.search(r"github\.com/.+/.+/archive/.+", url):
+            package_qa_handle_error("src-uri-bad", "%s: SRC_URI uses unstable GitHub archives" % pn, d)
 
 
 # The PACKAGE FUNC to scan each package
@@ -937,14 +1000,13 @@ python do_package_qa () {
     pkgdest = d.getVar('PKGDEST')
     packages = set((d.getVar('PACKAGES') or '').split())
 
-    cpath = oe.cachedpath.CachedPath()
     global pkgfiles
     pkgfiles = {}
     for pkg in packages:
         pkgfiles[pkg] = []
-        for walkroot, dirs, files in cpath.walk(pkgdest + "/" + pkg):
+        for walkroot, dirs, files in os.walk(os.path.join(pkgdest, pkg)):
             for file in files:
-                pkgfiles[pkg].append(walkroot + os.sep + file)
+                pkgfiles[pkg].append(os.path.join(walkroot, file))
 
     # no packages should be scanned
     if not packages:

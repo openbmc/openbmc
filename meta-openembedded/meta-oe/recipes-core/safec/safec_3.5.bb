@@ -14,6 +14,10 @@ SRC_URI = "git://github.com/rurban/safeclib.git \
 
 CPPFLAGS_append_libc-musl = " -D_GNU_SOURCE"
 
-COMPATIBLE_HOST = '(x86_64|i.86|powerpc|powerpc64|arm).*-linux'
+COMPATIBLE_HOST = '(x86_64|i.86|powerpc|powerpc64|arm|aarch64).*-linux'
 
-RDEPENDS_${PN} = "perl"
+PACKAGES =+ "${PN}-check"
+
+FILES_${PN}-check += "${bindir}/check_for_unsafe_apis"
+
+RDEPENDS_${PN}-check += "perl"

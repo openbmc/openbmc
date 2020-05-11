@@ -17,7 +17,6 @@ PACKAGECONFIG ??= " \
     pthread \
     ${@bb.utils.contains('DISTRO_FEATURES','systemd','systemd','',d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', 'ipv6', '',d)} \
-    sasl \
     sdl \
     websockets \
     zlib \

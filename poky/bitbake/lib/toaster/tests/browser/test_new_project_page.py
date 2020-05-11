@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from tests.browser.selenium_helpers import SeleniumTestCase
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import InvalidElementStateException

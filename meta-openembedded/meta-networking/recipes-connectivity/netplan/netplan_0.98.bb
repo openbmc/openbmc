@@ -19,7 +19,7 @@ SRC_URI = " \
 "
 
 DEPENDS = "glib-2.0 libyaml"
-RDEPENDS_${PN} = "python3 python3-core python3-pyyaml python3-netifaces python3-nose python3-coverage python3-pycodestyle python-pyflakes util-linux-libuuid"
+RDEPENDS_${PN} = "python3 python3-core python3-pyyaml python3-netifaces python3-nose python3-coverage python3-pycodestyle python3-pyflakes util-linux-libuuid"
 
 inherit pkgconfig systemd
 

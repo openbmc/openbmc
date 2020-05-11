@@ -73,26 +73,26 @@ do_configure_prepend() {
 }
 
 do_install_append() {
-    install -d ${D}/${sysconfdir}/${BPN}
-    install -d ${D}/${sysconfdir}/init.d
-    install -m 755 ${WORKDIR}/initscript ${D}/${sysconfdir}/init.d/syslog
+    install -d ${D}${sysconfdir}/${BPN}
+    install -d ${D}${sysconfdir}/init.d
+    install -m 755 ${WORKDIR}/initscript ${D}${sysconfdir}/init.d/syslog
 
-    install -d ${D}/${sysconfdir}/default/volatiles/
-    install -m 755 ${WORKDIR}/volatiles.03_syslog-ng ${D}/${sysconfdir}/default/volatiles/03_syslog-ng
-    install -d ${D}/${sysconfdir}/tmpfiles.d/
-    install -m 755 ${WORKDIR}/syslog-ng-tmp.conf ${D}/${sysconfdir}/tmpfiles.d/syslog-ng.conf
+    install -d ${D}${sysconfdir}/default/volatiles/
+    install -m 644 ${WORKDIR}/volatiles.03_syslog-ng ${D}${sysconfdir}/default/volatiles/03_syslog-ng
+    install -d ${D}${sysconfdir}/tmpfiles.d/
+    install -m 644 ${WORKDIR}/syslog-ng-tmp.conf ${D}${sysconfdir}/tmpfiles.d/syslog-ng.conf
 
-    install -d ${D}/${localstatedir}/lib/${BPN}
+    install -d ${D}${localstatedir}/lib/${BPN}
     # Remove /var/run as it is created on startup
     rm -rf ${D}${localstatedir}/run
 
     # support for systemd
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
-        install ${WORKDIR}/syslog-ng.conf.systemd ${D}${sysconfdir}/${BPN}/${BPN}.conf
+        install -m 644 ${WORKDIR}/syslog-ng.conf.systemd ${D}${sysconfdir}/${BPN}/${BPN}.conf
 
         install -d ${D}${systemd_unitdir}/system/
-        install -m 0644 ${S}/contrib/systemd/${BPN}@.service ${D}${systemd_unitdir}/system/${BPN}@.service
-        install -m 0644 ${S}/contrib/systemd/${BPN}@default ${D}${sysconfdir}/default/${BPN}@default
+        install -m 644 ${S}/contrib/systemd/${BPN}@.service ${D}${systemd_unitdir}/system/${BPN}@.service
+        install -m 644 ${S}/contrib/systemd/${BPN}@default ${D}${sysconfdir}/default/${BPN}@default
 
         sed -i -e 's,@SBINDIR@,${sbindir},g' ${D}${systemd_unitdir}/system/${BPN}@.service ${D}${sysconfdir}/default/${BPN}@default
         sed -i -e 's,@LOCALSTATEDIR@,${localstatedir},g' ${D}${systemd_unitdir}/system/${BPN}@.service ${D}${sysconfdir}/default/${BPN}@default
@@ -101,7 +101,7 @@ do_install_append() {
         install -d ${D}${systemd_unitdir}/system/multi-user.target.wants
         ln -sf ../${BPN}@.service ${D}${systemd_unitdir}/system/multi-user.target.wants/${BPN}@default.service
     else
-        install ${WORKDIR}/syslog-ng.conf.sysvinit ${D}${sysconfdir}/${BPN}/${BPN}.conf
+        install -m 644 ${WORKDIR}/syslog-ng.conf.sysvinit ${D}${sysconfdir}/${BPN}/${BPN}.conf
     fi
 
     oe_multilib_header syslog-ng/syslog-ng-config.h

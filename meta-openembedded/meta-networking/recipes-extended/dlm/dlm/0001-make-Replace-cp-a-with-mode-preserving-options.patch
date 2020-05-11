@@ -1,0 +1,51 @@
+From 2f72f9271b8dd61ca5092e025b0f8243c6fd68f2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 3 Mar 2020 12:38:19 -0800
+Subject: [PATCH] make: Replace cp -a with mode preserving options
+
+Helps fix permissions in staging area
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ dlm_controld/Makefile | 4 ++--
+ libdlm/Makefile       | 8 ++++----
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/dlm_controld/Makefile b/dlm_controld/Makefile
+index 6081cf8..fe71be2 100644
+--- a/dlm_controld/Makefile
++++ b/dlm_controld/Makefile
+@@ -88,8 +88,8 @@ install: all
+ 	$(INSTALL) -d $(DESTDIR)/$(PKGDIR)
+ 	$(INSTALL) -m 755 $(BIN_TARGET) $(DESTDIR)/$(BINDIR)
+ 	$(INSTALL) -m 755 $(LIB_TARGET) $(DESTDIR)/$(LIBDIR)
+-	cp -a $(LIB_SO) $(DESTDIR)/$(LIBDIR)
+-	cp -a $(LIB_SMAJOR) $(DESTDIR)/$(LIBDIR)
++	cp -R --no-dereference --preserve=mode,links $(LIB_SO) $(DESTDIR)/$(LIBDIR)
++	cp -R --no-dereference --preserve=mode,links $(LIB_SMAJOR) $(DESTDIR)/$(LIBDIR)
+ 	$(INSTALL) -m 644 $(LIB_PC) $(DESTDIR)/$(PKGDIR)
+ 	$(INSTALL) -m 644 libdlmcontrol.h $(DESTDIR)/$(HDRDIR)
+ 	$(INSTALL) -m 644 dlm_controld.8 $(DESTDIR)/$(MANDIR)/man8/
+diff --git a/libdlm/Makefile b/libdlm/Makefile
+index ab32761..8820bf8 100644
+--- a/libdlm/Makefile
++++ b/libdlm/Makefile
+@@ -125,10 +125,10 @@ install: all
+ 	$(INSTALL) -d $(DESTDIR)/$(UDEVDIR)
+ 	$(INSTALL) -c -m 755 $(LIB_TARGET) $(DESTDIR)/$(LIBDIR)
+ 	$(INSTALL) -c -m 755 $(LLT_TARGET) $(DESTDIR)/$(LIBDIR)
+-	cp -a $(LIB_SO) $(DESTDIR)/$(LIBDIR)
+-	cp -a $(LIB_SMAJOR) $(DESTDIR)/$(LIBDIR)
+-	cp -a $(LLT_SO) $(DESTDIR)/$(LIBDIR)
+-	cp -a $(LLT_SMAJOR) $(DESTDIR)/$(LIBDIR)
++	cp -R --no-dereference --preserve=mode,links $(LIB_SO) $(DESTDIR)/$(LIBDIR)
++	cp -R --no-dereference --preserve=mode,links $(LIB_SMAJOR) $(DESTDIR)/$(LIBDIR)
++	cp -R --no-dereference --preserve=mode,links $(LLT_SO) $(DESTDIR)/$(LIBDIR)
++	cp -R --no-dereference --preserve=mode,links $(LLT_SMAJOR) $(DESTDIR)/$(LIBDIR)
+ 	$(INSTALL) -m 644 $(LIB_PC) $(DESTDIR)/$(PKGDIR)
+ 	$(INSTALL) -m 644 $(LLT_PC) $(DESTDIR)/$(PKGDIR)
+ 	$(INSTALL) -c -m 644 $(HDR_TARGET) $(DESTDIR)/$(HDRDIR)
+-- 
+2.25.1
+

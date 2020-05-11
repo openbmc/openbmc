@@ -11,6 +11,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=47e508ca280fde97906eacb77892c3ac"
 
 DEPENDS += "virtual/libx11"
 
+EXTRA_OECONF += "--with-shared-memory-dir=/dev/shm"
+
 BBCLASSEXTEND = "native nativesdk"
 
 SRC_URI[md5sum] = "42dda8016943dc12aff2c03a036e0937"

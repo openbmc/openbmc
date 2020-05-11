@@ -75,7 +75,8 @@ do_compile_ptest() {
 do_install_ptest() {
 	cp -R --no-dereference --preserve=mode,links -v ${S}/tests ${D}${PTEST_PATH}/tests
 	cp ${S}/test ${D}${PTEST_PATH}
-	sed -e 's!sleep 0.*!sleep 1!g; s!/var/tmp!/!g' -i ${D}${PTEST_PATH}/test
+	sed -e 's!sleep 0.*!sleep 1!g; s!/var/tmp!/mdadm-testing-dir!g' -i ${D}${PTEST_PATH}/test
+	sed -e 's!/var/tmp!/mdadm-testing-dir!g' -i ${D}${PTEST_PATH}/tests/*
         sed -i -e '/echo -ne "$_script... "/d' \
                -e 's/echo "succeeded"/echo -e "PASS: $_script"/g' \
                -e '/save_log fail/N; /_fail=1/i\\t\t\techo -ne "FAIL: $_script"' \

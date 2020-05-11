@@ -16,7 +16,7 @@ New test files should follow this structure, should be named "test_*.py",
 and should be in the same directory as this sample.
 """
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from tests.browser.selenium_helpers import SeleniumTestCase
 
 class TestSample(SeleniumTestCase):
