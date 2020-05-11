@@ -1,1 +1,1 @@
-EXTRA_OECONF_append_rainier = " --enable-ibm-dbus-interfaces"
+EXTRA_OECONF += " --enable-ibm-dbus-interfaces"
