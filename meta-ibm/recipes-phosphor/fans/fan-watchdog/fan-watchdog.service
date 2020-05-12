@@ -1,11 +1,11 @@
 [Unit]
-Description=Witherspoon Fan Watchdog Daemon
+Description=Fan Watchdog Daemon
 Wants=phosphor-fan-monitor-init@0.service
 Before=phosphor-fan-monitor-init@0.service
 Conflicts=obmc-fan-watchdog-takeover.target
 
 [Service]
-EnvironmentFile={envfiledir}/obmc/witherspoon-fan-watchdog/fan-watchdog.conf
+EnvironmentFile={envfiledir}/obmc/fan-watchdog/fan-watchdog.conf
 ExecStart=/sbin/watchdog -T ${{TIMEOUT}} -t ${{INTERVAL}} -F ${{DEVICE}}
 KillSignal=SIGKILL
 
