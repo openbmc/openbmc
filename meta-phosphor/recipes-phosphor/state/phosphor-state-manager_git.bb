@@ -52,12 +52,12 @@ DEPENDS += "nlohmann-json"
 DEPENDS += "cli11"
 
 FILES_${PN}-host = "${bindir}/phosphor-host-state-manager"
-DBUS_SERVICE_${PN}-host += "xyz.openbmc_project.State.Host.service"
+DBUS_SERVICE_${PN}-host += "xyz.openbmc_project.State.Host@.service"
 DBUS_SERVICE_${PN}-host += "phosphor-reboot-host@.service"
 SYSTEMD_SERVICE_${PN}-host += "phosphor-reset-host-reboot-attempts@.service"
 
 FILES_${PN}-chassis = "${bindir}/phosphor-chassis-state-manager"
-DBUS_SERVICE_${PN}-chassis += "xyz.openbmc_project.State.Chassis.service"
+DBUS_SERVICE_${PN}-chassis += "xyz.openbmc_project.State.Chassis@.service"
 
 FILES_${PN}-chassis += "${bindir}/obmcutil"
 

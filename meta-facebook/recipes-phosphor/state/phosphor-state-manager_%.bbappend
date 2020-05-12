@@ -1,0 +1,10 @@
+FILESEXTRAPATHS_prepend := "${THISDIR}:"
+DBUS_SERVICE_${PN}-host += "xyz.openbmc_project.State.Host@1.service"
+DBUS_SERVICE_${PN}-host += "xyz.openbmc_project.State.Host@2.service"
+DBUS_SERVICE_${PN}-host += "xyz.openbmc_project.State.Host@3.service"
+DBUS_SERVICE_${PN}-host += "xyz.openbmc_project.State.Host@4.service"
+DBUS_SERVICE_${PN}-chassis += "xyz.openbmc_project.State.Chassis@1.service"
+DBUS_SERVICE_${PN}-chassis += "xyz.openbmc_project.State.Chassis@2.service"
+DBUS_SERVICE_${PN}-chassis += "xyz.openbmc_project.State.Chassis@3.service"
+DBUS_SERVICE_${PN}-chassis += "xyz.openbmc_project.State.Chassis@4.service"
+
