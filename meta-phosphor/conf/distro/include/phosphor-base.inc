@@ -104,16 +104,17 @@ DISTRO_FEATURES_OBMC = " \
 
 DISTRO_FEATURES_DEFAULT = " \
         avahi \
+        ipv4 \
+        ipv6 \
+        ldap \
+        libc-inet-anl \
         pam \
         slp \
         systemd \
-        ldap \
-        libc-inet-anl \
         "
 
 DISTRO_FEATURES += " \
         ${DISTRO_FEATURES_DEFAULT} \
-        ${DISTRO_FEATURES_LIBC} \
         ${DISTRO_FEATURES_OBMC} \
         "
 
