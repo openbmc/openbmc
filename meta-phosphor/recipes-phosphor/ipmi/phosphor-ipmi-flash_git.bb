@@ -45,7 +45,7 @@ EXTRA_OECONF_append = " MAPPED_ADDRESS=${IPMI_FLASH_BMC_ADDRESS}"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/phosphor-ipmi-flash"
-SRCREV = "c8445aaa291eb720a8698765421822dea265dba7"
+SRCREV = "6f61af8fd125400d064715559cfffba92afaecf6"
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} += "phosphor-ipmi-flash-bmc-prepare.target \
