@@ -1,0 +1,47 @@
+From 721a48e5397bd4ab454482041e55671eae7b189f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 11 May 2020 18:01:11 -0700
+Subject: [PATCH] examples: Initialize child_idx
+
+Assign UINT_MAX and assert it
+
+Fixes warning
+rtree_map.c:358:12: error: 'child_idx' may be used uninitialized
+in this function [-Werror=maybe-uninitialized]
+
+Upstream-Status: Submitted [https://github.com/pmem/pmdk/pull/4802]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/examples/libpmemobj/tree_map/rtree_map.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/examples/libpmemobj/tree_map/rtree_map.c b/src/examples/libpmemobj/tree_map/rtree_map.c
+index 995e22bb9..6b3ead65c 100644
+--- a/src/examples/libpmemobj/tree_map/rtree_map.c
++++ b/src/examples/libpmemobj/tree_map/rtree_map.c
+@@ -8,6 +8,7 @@
+ #include <ex_common.h>
+ #include <assert.h>
+ #include <errno.h>
++#include <limits.h>
+ #include <stdlib.h>
+ #include <stdbool.h>
+ 
+@@ -320,12 +321,13 @@ has_only_one_child(TOID(struct tree_map_node) node, unsigned *child_idx)
+ static void
+ remove_extra_node(TOID(struct tree_map_node) *node)
+ {
+-	unsigned child_idx;
++	unsigned child_idx = UINT_MAX;
+ 	TOID(struct tree_map_node) tmp, tmp_child;
+ 
+ 	/* Our node has child with only one child. */
+ 	tmp = *node;
+ 	has_only_one_child(tmp, &child_idx);
++	assert(child_idx != UINT_MAX);
+ 	tmp_child = D_RO(tmp)->slots[child_idx];
+ 
+ 	/*
+-- 
+2.26.2
+

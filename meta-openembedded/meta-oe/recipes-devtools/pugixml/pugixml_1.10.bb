@@ -17,6 +17,9 @@ UPSTREAM_CHECK_URI = "https://github.com/zeux/${BPN}/releases"
 
 inherit cmake
 
-EXTRA_OECMAKE += "-DBUILD_SHARED_LIBS=ON \
+EXTRA_OECMAKE += "-DBUILD_PKGCONFIG=ON \
+                  -DBUILD_SHARED_LIBS=ON \
                   -DCMAKE_BUILD_TYPE=Release \
                   "
+
+BBCLASSEXTEND = "native nativesdk"

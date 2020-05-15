@@ -47,6 +47,10 @@ inherit siteinfo
 TD = "${S}/tentative-dist"
 TDS = "${S}/tentative-dist-staging"
 
+# cortex-a55 is ARMv8.2-a based but libatomic explicitly asks for -march=armv8.1-a
+# which caused -march conflicts in gcc
+TUNE_CCARGS_remove = "-mcpu=cortex-a55+crc -mcpu=cortex-a55 -mcpu=cortex-a55+crc+crypto"
+
 TARGET_CC_ARCH += "${LDFLAGS}"
 
 do_configure_prepend_libc-musl () {

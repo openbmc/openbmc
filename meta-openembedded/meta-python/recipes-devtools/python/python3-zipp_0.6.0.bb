@@ -10,6 +10,8 @@ DEPENDS += "${PYTHON_PN}-setuptools-scm-native"
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += "${PYTHON_PN}-more-itertools"
+RDEPENDS_${PN} += "${PYTHON_PN}-compression \
+                   ${PYTHON_PN}-math \
+                   ${PYTHON_PN}-more-itertools"
 
 BBCLASSEXTEND = "native nativesdk"

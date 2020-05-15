@@ -11,3 +11,5 @@ DEPENDS += "${PYTHON_PN}-setuptools-scm-native"
 inherit pypi setuptools3
 
 BBCLASSEXTEND = "native nativesdk"
+
+RDEPENDS_${PN} += "${PYTHON_PN}-netclient"

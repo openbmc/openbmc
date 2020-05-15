@@ -105,3 +105,23 @@ Index: cpprest/Release/tests/functional/http/client/connections_and_errors.cpp
  
  } // SUITE(connections_and_errors)
  
+--- cpprest-2.10.16.orig/Release/tests/functional/http/client/redirect_tests.cpp
++++ cpprest-2.10.16/Release/tests/functional/http/client/redirect_tests.cpp
+@@ -159,7 +159,7 @@ SUITE(redirect_tests)
+             VERIFY_NO_THROWS(reply.get());
+         }
+     }
+-
++/*
+     TEST(does_not_follow_https_to_http_by_default)
+     {
+         handle_timeout([] {
+@@ -182,7 +182,7 @@ SUITE(redirect_tests)
+             );
+         });
+     }
+-
++*/
+     TEST_FIXTURE(uri_address, follows_permanent_redirect)
+     {
+ #if USING_WINHTTP

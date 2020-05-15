@@ -12,6 +12,7 @@ SRC_URI = "git://github.com/LibVNC/x11vnc \
            file://starting-fix.patch \
            file://0001-misc-Makefile.am-don-t-install-Xdummy-when-configure.patch \
            file://0001-Fix-build-on-32bit-arches-with-64bit-time_t.patch \
+           file://src-cursor-fix-xfc-NULL-pointer-dereference.patch \
            "
 S = "${WORKDIR}/git"
 

@@ -10,6 +10,7 @@ PV = "2.1.0+git${SRCPV}"
 
 SRC_URI = "git://github.com/eclipse/${BPN}.git;protocol=http \
            file://0001-cmake-Use-a-regular-expression-to-match-x86-architec.patch \
+           file://0001-include-Declare-gVERSION-global-as-extern.patch \
            "
 
 S = "${WORKDIR}/git"
@@ -26,8 +27,6 @@ EXTRA_OECMAKE_append = " -DINSTALLTOOLS:BOOL=ON -DFIRMATA=ON -DCMAKE_SKIP_RPATH=
                          -DPYTHON_LIBRARY=${STAGING_LIBDIR}/lib${PYTHON_DIR}${PYTHON_ABI}.so \
                          -DPYTHON_INCLUDE_DIR=${STAGING_INCDIR}/${PYTHON_DIR}${PYTHON_ABI} \
                        "
-
-CFLAGS += "-fcommon"
 
 # Prepend mraa-utils to make sure bindir ends up in there
 PACKAGES =+ "${PN}-utils"

@@ -12,5 +12,9 @@ RDEPENDS_${PN}_class-target += " \
     ${PYTHON_PN}-crypt \
     ${PYTHON_PN}-ctypes \
 "
+RDEPENDS_${PN}_class-nativesdk += " \
+    ${PYTHON_PN}-crypt \
+    ${PYTHON_PN}-ctypes \
+"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

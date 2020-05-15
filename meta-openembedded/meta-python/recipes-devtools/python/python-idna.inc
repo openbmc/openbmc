@@ -1,10 +1,10 @@
 SUMMARY = "Internationalised Domain Names in Applications"
 HOMEPAGE = "https://github.com/kjd/idna"
 LICENSE = "BSD-3-Clause & Python-2.0 & Unicode"
-LIC_FILES_CHKSUM = "file://LICENSE.rst;md5=782775b32f96098512e283fb5d4546cd"
+LIC_FILES_CHKSUM = "file://LICENSE.rst;md5=cf36c8682cc154d2d4aa57bd6246b9a1"
 
-SRC_URI[md5sum] = "2e9ae0b4a0b26d1747c6127cdb060bc1"
-SRC_URI[sha256sum] = "c357b3f628cf53ae2c4c05627ecc484553142ca23264e593d327bcde5e9c3407"
+SRC_URI[md5sum] = "870b8b80267f00f0faf1b7ba4bdbf14e"
+SRC_URI[sha256sum] = "7588d1c14ae4c77d74036e8c22ff447b26d0fde8f007354fd48a7814db15b7cb"
 
 RDEPENDS_${PN}_class-target = "\
     ${PYTHON_PN}-codecs \

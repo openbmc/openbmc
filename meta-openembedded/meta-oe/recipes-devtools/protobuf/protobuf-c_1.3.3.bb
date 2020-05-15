@@ -20,10 +20,6 @@ SRC_URI = "git://github.com/protobuf-c/protobuf-c.git \
 
 S = "${WORKDIR}/git"
 
-#make sure c++11 is used
-CXXFLAGS += "-std=c++11"
-BUILD_CXXFLAGS += "-std=c++11"
-
 inherit autotools pkgconfig
 
 PACKAGE_BEFORE_PN = "${PN}-compiler"

@@ -14,9 +14,8 @@ SRCREV = "6df40a2471737b27271bdd9b900ab5f3aec746c7"
 
 SRC_URI = "git://github.com/google/flatbuffers.git"
 
-# Make sure C++11 is used, required for example for GCC 4.9
-CXXFLAGS += "-std=c++11 -fPIC"
-BUILD_CXXFLAGS += "-std=c++11 -fPIC"
+CXXFLAGS += "-fPIC"
+BUILD_CXXFLAGS += "-fPIC"
 
 # BUILD_TYPE=Release is required, otherwise flatc is not installed
 EXTRA_OECMAKE += "\

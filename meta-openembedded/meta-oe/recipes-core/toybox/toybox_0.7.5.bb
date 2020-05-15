@@ -20,7 +20,18 @@ TOYBOX_BIN = "generated/unstripped/toybox"
 EXTRA_OEMAKE = 'HOSTCC="${BUILD_CC}" CPUS=${@oe.utils.cpu_count()}'
 
 do_configure() {
-    oe_runmake defconfig
+    # allow user to define their own defconfig in bbappend, taken from kernel.bbclass
+    if [ "${S}" != "${B}" ] && [ -f "${S}/.config" ] && [ ! -f "${B}/.config" ]; then
+        mv "${S}/.config" "${B}/.config"
+    fi
+
+    # Copy defconfig to .config if .config does not exist. This allows
+    # recipes to manage the .config themselves in do_configure_prepend().
+    if [ -f "${WORKDIR}/defconfig" ] && [ ! -f "${B}/.config" ]; then
+        cp "${WORKDIR}/defconfig" "${B}/.config"
+    fi
+
+    oe_runmake oldconfig || oe_runmake defconfig
 
     # Disable killall5 as it isn't managed by update-alternatives
     sed -e 's/CONFIG_KILLALL5=y/# CONFIG_KILLALL5 is not set/' -i .config

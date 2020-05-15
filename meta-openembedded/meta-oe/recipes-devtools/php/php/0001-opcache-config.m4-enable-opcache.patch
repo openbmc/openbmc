@@ -1,4 +1,7 @@
-opcache/config.m4: enable opcache
+From a74b42098aededd296ec6a3cd4cf5a17e59d6f29 Mon Sep 17 00:00:00 2001
+From: Claude Bing <cbing@cybernetics.com>
+Date: Fri, 8 May 2020 10:15:32 -0400
+Subject: [PATCH] opcache/config.m4: enable opcache
 
 We can't use AC_TRY_RUN to run programs in a cross compile environment.
 Set
@@ -12,15 +15,18 @@ Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
 
 update patch to version 7.4.4
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
+
+fix issue linking with librt
+Signed-off-by: Claude Bing <cbing@cybernetics.com>
 ---
- ext/opcache/config.m4 | 194 +-------------------------------------------------
- 1 file changed, 3 insertions(+), 191 deletions(-)
+ ext/opcache/config.m4 | 195 +-----------------------------------------
+ 1 file changed, 4 insertions(+), 191 deletions(-)
 
 diff --git a/ext/opcache/config.m4 b/ext/opcache/config.m4
-index 6c40caf..84ddf1e 100644
+index 6c40cafc1c..6569aa9e1c 100644
 --- a/ext/opcache/config.m4
 +++ b/ext/opcache/config.m4
-@@ -23,201 +23,13 @@ if test "$PHP_OPCACHE" != "no"; then
+@@ -23,201 +23,14 @@ if test "$PHP_OPCACHE" != "no"; then
    AC_CHECK_FUNCS([mprotect])
  
    AC_MSG_CHECKING(for sysvipc shared memory support)
@@ -222,9 +228,10 @@ index 6c40caf..84ddf1e 100644
 -    AC_MSG_RESULT([no])
 -  ])
 +  AC_DEFINE(HAVE_SHM_MMAP_POSIX, 1, [Define if you have POSIX mmap() SHM support])
++  PHP_CHECK_LIBRARY(rt, shm_unlink, [PHP_ADD_LIBRARY(rt,1,OPCACHE_SHARED_LIBADD)])
  
    PHP_NEW_EXTENSION(opcache,
  	ZendAccelerator.c \
 -- 
-2.7.4
+2.17.1
 
