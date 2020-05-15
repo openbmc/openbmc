@@ -1,0 +1,25 @@
+When calculate value of ldblibdir, it checks whether the directory of
+$ldblibdir exists. If not, it assigns ldblibdir with ${libdir}/ldb. It is not
+suitable for cross compile. Fix it that only re-assign ldblibdir when its value
+is empty.
+
+Upstream-Status: Inappropriate [cross compile specific]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ src/external/libldb.m4 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/external/libldb.m4 b/src/external/libldb.m4
+index c400add..5e5f06d 100644
+--- a/src/external/libldb.m4
++++ b/src/external/libldb.m4
+@@ -19,7 +19,7 @@ if test x"$with_ldb_lib_dir" != x; then
+     ldblibdir=$with_ldb_lib_dir
+ else
+     ldblibdir="`$PKG_CONFIG --variable=modulesdir ldb`"
+-    if ! test -d $ldblibdir; then
++    if test -z $ldblibdir; then
+         ldblibdir="${libdir}/ldb"
+     fi
+ fi

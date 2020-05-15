@@ -24,6 +24,11 @@ This layer depends on:
   revision: HEAD
   prio: default
 
+  URI: git://git.openembedded.org/meta-openembedded/meta-python
+  branch: master
+  revision: HEAD
+  prio: default
+
   URI: git://git.openembedded.org/meta-openembedded/meta-networking
   branch: master
   revision: HEAD
@@ -63,6 +68,8 @@ $ git config sendemail.to yocto@lists.yoctoproject.org
 $ git config format.subjectPrefix meta-security][PATCH
 
 Now you can just do 'git send-email origin/master' to send all local patches.
+
+For pull requests, please use create-pull-request and send-pull-request. 
 
 Maintainers:    Armin Kuster <akuster808@gmail.com>
 

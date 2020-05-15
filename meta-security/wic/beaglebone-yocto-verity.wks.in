@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: MIT
+#
+# Copyright (C) 2020 BayLibre SAS
+# Author: Bartosz Golaszewski <bgolaszewski@baylibre.com>
+#
+# A dm-verity variant of the regular wks for beaglebone black. We need to fetch
+# the partition images from the DEPLOY_DIR_IMAGE as the rootfs source plugin will
+# not recreate the exact block device corresponding with the hash tree. We must
+# not alter the label or any other setting on the image.
+#
+# This .wks only works with the dm-verity-img class.
+
+part /boot --source bootimg-partition --ondisk mmcblk0 --fstype=vfat --label boot --active --align 4 --size 16 --sourceparams="loader=u-boot" --use-uuid
+part / --source rawcopy --ondisk mmcblk0 --sourceparams="file=${DEPLOY_DIR_IMAGE}/${DM_VERITY_IMAGE}-${MACHINE}.${DM_VERITY_IMAGE_TYPE}.verity"
+bootloader --append="console=ttyS0,115200"

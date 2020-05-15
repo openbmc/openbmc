@@ -1,0 +1,26 @@
+Allow recipe to overide optimization.
+
+fixes:
+
+397 | #  warning _FORTIFY_SOURCE requires compiling with optimization (-O)
+|       |    ^~~~~~~
+| cc1: all warnings being treated as errors
+
+
+Upstream-Status: OE specific
+
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: src/makefile
+===================================================================
+--- src.orig/makefile
++++ src/makefile
+@@ -43,7 +43,7 @@ CC = /usr/bin/gcc
+ CCFLAGS = -Wall  			\
+ 	-Wmissing-declarations -Wmissing-prototypes -Wnested-externs \
+ 	-Werror -Wsign-compare \
+-	 -c -ggdb -O0 			\
++	 -c -ggdb -O 			\
+ 	-DTPM_POSIX			\
+ 	-D_POSIX_			\
+ 	-DTPM_NUVOTON

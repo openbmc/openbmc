@@ -9,13 +9,12 @@ HOMEPAGE = "http://www.fail2ban.org"
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ecabc31e90311da843753ba772885d9f"
 
-SRCREV ="aa565eb80ec6043317e8430cabcaf9c3f4e61578"
-SRC_URI = " \
-	git://github.com/fail2ban/fail2ban.git;branch=0.11 \
-	file://initd \
+SRCREV ="3befbb177017957869425c81a560edb8e27db75a"
+SRC_URI = " git://github.com/fail2ban/fail2ban.git;branch=0.11 \
+        file://initd \
         file://fail2ban_setup.py \
         file://run-ptest \
-        file://0001-To-fix-build-error-of-xrang.patch \
+        file://0001-python3-fail2ban-2-3-conversion.patch \
 "
 
 inherit update-rc.d ptest setuptools3
@@ -27,16 +26,16 @@ do_compile_prepend () {
 }
 
 do_install_append () {
-	install -d ${D}/${sysconfdir}/fail2ban
-	install -d ${D}/${sysconfdir}/init.d
-    	install -m 0755 ${WORKDIR}/initd ${D}${sysconfdir}/init.d/fail2ban-server
-	chown -R root:root ${D}/${bindir}
+    install -d ${D}/${sysconfdir}/fail2ban
+    install -d ${D}/${sysconfdir}/init.d
+    install -m 0755 ${WORKDIR}/initd ${D}${sysconfdir}/init.d/fail2ban-server
+    chown -R root:root ${D}/${bindir}
 }
 
 do_install_ptest_append () {
-        install -d ${D}${PTEST_PATH}
-        sed -i -e 's/##PYTHON##/${PYTHON_PN}/g' ${D}${PTEST_PATH}/run-ptest
-        install -D ${S}/bin/fail2ban-testcases ${D}${PTEST_PATH}
+    install -d ${D}${PTEST_PATH}
+    sed -i -e 's/##PYTHON##/${PYTHON_PN}/g' ${D}${PTEST_PATH}/run-ptest
+    install -D ${S}/bin/fail2ban-testcases ${D}${PTEST_PATH}
 }
 
 FILES_${PN} += "/run"
@@ -47,5 +46,6 @@ INITSCRIPT_PARAMS = "defaults 25"
 
 INSANE_SKIP_${PN}_append = "already-stripped"
 
-RDEPENDS_${PN} = "sysklogd iptables sqlite3 ${PYTHON_PN} ${PYTHON_PN}-pyinotify"
+RDEPENDS_${PN} = "${VIRTUAL-RUNTIME_base-utils-syslog} iptables sqlite3 python3-core python3-pyinotify"
+RDEPENDS_${PN} += " python3-logging python3-fcntl python3-json"
 RDEPENDS_${PN}-ptest = "python3-core python3-io python3-modules python3-fail2ban"

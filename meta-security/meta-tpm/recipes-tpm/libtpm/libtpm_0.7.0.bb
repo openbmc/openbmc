@@ -8,7 +8,7 @@ SRC_URI = "git://github.com/stefanberger/libtpms.git;branch=stable-${PV}"
 PE = "1"
 
 S = "${WORKDIR}/git"
-inherit autotools-brokensep pkgconfig
+inherit autotools-brokensep pkgconfig perlnative
 
 PACKAGECONFIG ?= "openssl"
 PACKAGECONFIG[openssl] = "--with-openssl, --without-openssl, openssl"

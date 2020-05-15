@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #Signed-off-by: Anne Mulhern <mulhern@yoctoproject.org>
 
@@ -83,7 +83,7 @@ def xform_file(qfile, distro, qlabel):
   @param name qlabel The question label for which the distro is to be added.
   """
   questions_in = open(qfile)
-  questions_out = tempfile.NamedTemporaryFile(delete=False)
+  questions_out = tempfile.NamedTemporaryFile(mode="w+", delete=False)
   for l in add_requires(qlabel, distro, questions_in):
     questions_out.write(l)
   questions_out.close()
