@@ -1,0 +1,32 @@
+From 4886bd9f33727f6a16aeb3b1aa3c25e459f06581 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 31 Mar 2020 11:51:02 -0700
+Subject: [PATCH] cmake: Disable format-overflow warning as error
+
+gcc10 complains about a check which could potentially be null
+
+build/inc/interface/vcos/vcos_logging.h:234:88: error: '%s' directive argument is null [-Werror=format-overflow=]
+  234 | #  define _VCOS_LOG_X(cat, _level, fmt...)   do { if (vcos_is_log_enabled(cat,_level)) vcos_log_impl(cat,_level,fmt); } while (0)
+      |                                                                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A potential fix would be to check for fmt not being null but lets leave
+that to experts
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ host_applications/linux/libs/bcm_host/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/host_applications/linux/libs/bcm_host/CMakeLists.txt
++++ b/host_applications/linux/libs/bcm_host/CMakeLists.txt
+@@ -3,7 +3,7 @@ if (WIN32)
+    set(VCOS_PLATFORM win32)
+ else ()
+    set(VCOS_PLATFORM pthreads)
+-   add_definitions(-Wall -Werror)
++   add_definitions(-Wall)
+ endif ()
+ 
+ # set this as we want all the source of vchostif to be available in libbcm_host

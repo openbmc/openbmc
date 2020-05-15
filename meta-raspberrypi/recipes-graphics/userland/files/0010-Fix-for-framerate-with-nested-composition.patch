@@ -1,7 +1,7 @@
-From ea3f7c3822efd33cec96a79eb9a345544b942d9e Mon Sep 17 00:00:00 2001
+From 0af26805c35c6a600a13ed106bbc7cf85a37ce66 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 29 Mar 2016 20:38:30 -0700
-Subject: [PATCH 10/19] Fix for framerate with nested composition
+Subject: [PATCH] Fix for framerate with nested composition
 
 frame rate appears irregular and lower than expected when using nested composition.
 
@@ -55,6 +55,3 @@ index 03fe67b..13a110c 100644
  
  #ifdef ANDROID
                 CLIENT_UNLOCK();
--- 
-2.22.0
-

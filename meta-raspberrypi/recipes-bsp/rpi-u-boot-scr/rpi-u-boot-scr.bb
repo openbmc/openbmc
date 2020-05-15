@@ -24,3 +24,5 @@ do_deploy() {
 }
 
 addtask do_deploy after do_compile before do_build
+
+PROVIDES += "u-boot-default-script"

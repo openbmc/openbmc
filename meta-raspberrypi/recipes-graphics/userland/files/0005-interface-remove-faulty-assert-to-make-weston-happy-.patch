@@ -1,8 +1,8 @@
-From 571c417c055a57cfd42c30a7a8279332397bad83 Mon Sep 17 00:00:00 2001
+From 237b9690154d2840d02aa927c56d80ef43f384b3 Mon Sep 17 00:00:00 2001
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Date: Sat, 24 Jan 2015 22:07:19 +0100
-Subject: [PATCH 05/19] interface: remove faulty assert() to make weston happy
- at runtime
+Subject: [PATCH] interface: remove faulty assert() to make weston happy at
+ runtime
 
 This was removed after a discussion on IRC with the weston guys
 ('daniels' on irc.freenode.net/#wayland).
@@ -24,6 +24,3 @@ index eab146e..29e0dee 100755
                 dispmanx_client.update_callback(handle, dispmanx_client.update_callback_param);
              }
           } else {
--- 
-2.22.0
-

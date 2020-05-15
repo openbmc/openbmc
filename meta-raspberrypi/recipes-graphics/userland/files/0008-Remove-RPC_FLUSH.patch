@@ -1,7 +1,7 @@
-From a08887086cf4418fa0999a340c574b66a5ab4412 Mon Sep 17 00:00:00 2001
+From 581742c1edf89d4ed3728a3c6d59484ced4234cc Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 6 Feb 2016 11:09:18 -0800
-Subject: [PATCH 08/19] Remove RPC_FLUSH
+Subject: [PATCH] Remove RPC_FLUSH
 
 Origins from buildroot
 
@@ -22,6 +22,3 @@ index f9b7287..b04ffef 100644
  #if EGL_BRCM_global_image
        }
  #endif
--- 
-2.22.0
-

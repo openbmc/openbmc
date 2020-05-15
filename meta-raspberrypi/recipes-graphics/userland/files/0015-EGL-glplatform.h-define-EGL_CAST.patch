@@ -1,7 +1,7 @@
-From 9568135c3e4c23e9056135a13cee58c37456aaac Mon Sep 17 00:00:00 2001
+From 8f32b772d869481f88d9b7e14feb43c39b3fc33d Mon Sep 17 00:00:00 2001
 From: Andrea Galbusera <gizero@gmail.com>
 Date: Fri, 14 Jul 2017 09:52:54 +0200
-Subject: [PATCH 15/19] EGL/glplatform.h: define EGL_CAST
+Subject: [PATCH] EGL/glplatform.h: define EGL_CAST
 
 C++ / C typecast macros for special EGL handle values: used by libepoxy code
 The definition comes from the updated version of this header in mesa.
@@ -27,6 +27,3 @@ index 1f7c930..c39d425 100644
 +#endif
 +
  #endif /* __eglplatform_h */
--- 
-2.22.0
-
