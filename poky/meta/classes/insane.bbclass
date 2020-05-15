@@ -22,11 +22,9 @@ QA_SANE = "True"
 
 # Elect whether a given type of error is a warning or error, they may
 # have been set by other files.
-WARN_QA ?= "ldflags useless-rpaths rpaths staticdev libdir xorg-driver-abi \
-            textrel already-stripped incompatible-license files-invalid \
-            installed-vs-shipped compile-host-path install-host-path \
-            pn-overrides infodir build-deps src-uri-bad \
-            unknown-configure-option symlink-to-sysroot multilib \
+WARN_QA ?= " libdir xorg-driver-abi \
+            textrel incompatible-license files-invalid \
+            infodir build-deps src-uri-bad symlink-to-sysroot multilib \
             invalid-packageconfig host-user-contaminated uppercase-pn patch-fuzz \
             mime mime-xdg \
             "
@@ -36,6 +34,9 @@ ERROR_QA ?= "dev-so debug-deps dev-deps debug-files arch pkgconfig la \
             version-going-backwards expanded-d invalid-chars \
             license-checksum dev-elf file-rdeps configure-unsafe \
             configure-gettext perllocalpod shebang-size \
+            already-stripped installed-vs-shipped ldflags compile-host-path \
+            install-host-path pn-overrides unknown-configure-option \
+            useless-rpaths rpaths staticdev \
             "
 # Add usrmerge QA check based on distro feature
 ERROR_QA_append = "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', ' usrmerge', '', d)}"

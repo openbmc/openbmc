@@ -18,7 +18,7 @@ RDEPENDS_${PN}_class-native = "font-util-native"
 inherit allarch
 
 PE = "1"
-PR = "${INC_PR}.3"
+PR = "r3"
 
 SRC_URI[md5sum] = "6d25f64796fef34b53b439c2e9efa562"
 SRC_URI[sha256sum] = "8b453b2aae1cfa8090009ca037037b8c5e333550651d5a158b7264ce1d472c9a"

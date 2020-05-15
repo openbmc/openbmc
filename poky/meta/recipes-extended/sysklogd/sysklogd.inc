@@ -12,7 +12,6 @@ inherit update-rc.d update-alternatives systemd autotools
 
 SRC_URI = "git://github.com/troglobit/sysklogd.git;nobranch=1 \
            file://sysklogd \
-           file://0001-fix-one-rarely-reproduced-parallel-build-problem.patch \
            "
 S = "${WORKDIR}/git"
 

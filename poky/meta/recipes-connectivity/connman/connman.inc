@@ -17,8 +17,6 @@ inherit autotools pkgconfig systemd update-rc.d update-alternatives
 
 DEPENDS  = "dbus glib-2.0 ppp"
 
-INC_PR = "r20"
-
 EXTRA_OECONF += "\
     ac_cv_path_WPASUPPLICANT=${sbindir}/wpa_supplicant \
     ac_cv_path_PPPD=${sbindir}/pppd \
@@ -195,7 +193,8 @@ SUMMARY_${PN}-plugin-vpn-vpnc = "A vpnc plugin for ConnMan VPN"
 DESCRIPTION_${PN}-plugin-vpn-vpnc = "The ConnMan vpnc plugin uses vpnc client \
 to create a VPN connection to Cisco3000 VPN Concentrator."
 FILES_${PN}-plugin-vpn-vpnc += "${libdir}/connman/scripts/openconnect-script \
-                                ${libdir}/connman/plugins-vpn/vpnc.so"
+                                ${libdir}/connman/plugins-vpn/vpnc.so \
+                                ${libdir}/connman/scripts/vpn-script"
 RDEPENDS_${PN}-plugin-vpn-vpnc += "${PN}-vpn"
 RRECOMMENDS_${PN} += "${@bb.utils.contains('PACKAGECONFIG','vpnc','${PN}-plugin-vpn-vpnc', '', d)}"
 

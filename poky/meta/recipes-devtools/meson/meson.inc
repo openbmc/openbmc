@@ -26,6 +26,7 @@ SRC_URI_append_class-native = " \
 "
 
 UPSTREAM_CHECK_URI = "https://github.com/mesonbuild/meson/releases"
+UPSTREAM_CHECK_REGEX = "meson-(?P<pver>\d+(\.\d+)+)\.tar"
 
 inherit setuptools3
 

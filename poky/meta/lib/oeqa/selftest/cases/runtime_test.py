@@ -180,6 +180,8 @@ class TestImage(OESelftestTestCase):
         distro = oe.lsb.distro_identifier()
         if distro and distro == 'debian-8':
             self.skipTest('virgl isn\'t working with Debian 8')
+        if distro and distro == 'debian-9':
+            self.skipTest('virgl isn\'t working with Debian 9')
         if distro and distro == 'centos-7':
             self.skipTest('virgl isn\'t working with Centos 7')
         if distro and distro == 'opensuseleap-15.0':

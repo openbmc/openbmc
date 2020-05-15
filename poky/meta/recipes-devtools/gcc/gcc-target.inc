@@ -42,6 +42,7 @@ PACKAGES = "\
 
 FILES_${PN} = "\
     ${bindir}/${TARGET_PREFIX}gcc* \
+    ${bindir}/${TARGET_PREFIX}lto* \
     ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/collect2* \
     ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/cc1plus \
     ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/lto* \

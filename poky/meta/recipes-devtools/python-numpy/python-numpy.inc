@@ -15,9 +15,6 @@ SRC_URI[sha256sum] = "93ee59ec38f3bf8f9a42d5f4301f60e6825a4a6385a145f70badcd2bf2
 UPSTREAM_CHECK_URI = "https://github.com/numpy/numpy/releases"
 UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)\.tar"
 
-# Needed for building with gcc 4.x from centos 7
-CFLAGS_append_class-native = " -std=c99"
-
 DEPENDS += "python3-cython-native"
 
 S = "${WORKDIR}/numpy-${PV}"

@@ -8,8 +8,6 @@ DEPENDS = " encodings font-alias font-util-native"
 RDEPENDS_${PN} = "encodings font-util font-alias"
 
 XORG_PN = "${BPN}"
-INC_PR = "r2"
-
 
 SRC_URI = "${XORG_MIRROR}/individual/font/${XORG_PN}-${PV}.tar.bz2"
 S = "${WORKDIR}/${XORG_PN}-${PV}"

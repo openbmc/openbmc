@@ -1,7 +1,7 @@
-From 83407aa50e06d967d0a1095a140bd7b0e5d51d27 Mon Sep 17 00:00:00 2001
+From 72065bb2b5881dc224299f302379391aebdfca3d Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 21 Nov 2018 13:09:05 +0100
-Subject: [PATCH] Add crc32.c to sources list
+Subject: [PATCH 1/2] Add crc32.c to sources list
 
 Otherwise, there is a missing symbol runtime error under musl C library.
 
@@ -13,7 +13,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/libcomps/src/python/src/CMakeLists.txt b/libcomps/src/python/src/CMakeLists.txt
-index 6ed25bb..c15c8b2 100644
+index adabb31..b9b96ab 100644
 --- a/libcomps/src/python/src/CMakeLists.txt
 +++ b/libcomps/src/python/src/CMakeLists.txt
 @@ -9,13 +9,13 @@ set (pycomps_SRCDIR ${CMAKE_CURRENT_SOURCE_DIR})
@@ -45,3 +45,6 @@ index d8f5e34..f266067 100644
  
  static uint32_t crc32_tab[] = {
  	0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f,
+-- 
+2.26.2
+

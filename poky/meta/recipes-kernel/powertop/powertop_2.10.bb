@@ -6,25 +6,22 @@ DEPENDS = "ncurses libnl pciutils"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=12f884d2ae1ff87c09e5b7ccc2c4ca7e"
 
-SRC_URI = "https://01.org/sites/default/files/downloads/powertop-v${PV}.tar.gz \
+SRC_URI = "git://github.com/fenrus75/powertop;protocol=https \
     file://0001-wakeup_xxx.h-include-limits.h.patch \
 "
+SRCREV = "e8765b5475b22b7a2b6e9e8a031c68a268a0b0b3"
 
-SRC_URI[md5sum] = "a69bd55901cf919cc564187402ea2c9c"
-SRC_URI[sha256sum] = "d3b7459eaba7d01c8841dd33a3b4d369416c01e9bd8951b0d88234cf18fe4a75"
-
-UPSTREAM_CHECK_URI = "https://01.org/powertop/downloads"
-UPSTREAM_CHECK_REGEX = "powertop-[v]?(?P<pver>\d+(\.\d+)+)\.tar"
+S = "${WORKDIR}/git"
 
 inherit autotools gettext pkgconfig
-
-S = "${WORKDIR}/${BPN}-v${PV}"
 
 # we do not want libncursesw if we can
 do_configure_prepend() {
     # configure.ac checks for delwin() in "ncursesw ncurses" so let's drop first one
     sed -i -e "s/ncursesw//g" ${S}/configure.ac
     mkdir -p ${B}/src/tuning/
+    echo "${PV}" > ${S}/version-long
+    echo "${PV}" > ${S}/version-short
 }
 
 inherit update-alternatives

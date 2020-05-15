@@ -1,0 +1,24 @@
+From a2c4cdb05d0e382101b13944c09c4375e8d7de5f Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 31 Mar 2020 13:39:28 +0200
+Subject: [PATCH] psx.c: replace pthread_yield() with standard sched_yield()
+
+This was causing failures when building with musl C library in
+particular.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+diff --git a/libcap/psx.c b/libcap/psx.c
+index 04d250f..7e4ac10 100644
+--- a/libcap/psx.c
++++ b/libcap/psx.c
+@@ -533,7 +533,7 @@ long int __psx_syscall(long int syscall_nr, ...) {
+ 	if (!waiting) {
+ 	    break;
+ 	}
+-	pthread_yield();
++	sched_yield();
+     }
+ 
+     errno = restore_errno;

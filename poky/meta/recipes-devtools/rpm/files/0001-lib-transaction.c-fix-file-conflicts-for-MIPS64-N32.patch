@@ -1,0 +1,60 @@
+From 1ed066fc6fa7d7afffe3545c4e3ea937529e6c49 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Thu, 7 May 2020 17:40:58 +0800
+Subject: [PATCH] lib/transaction.c: fix file conflicts for MIPS64 N32
+
+This patch is from:
+https://github.com/rpm-software-management/rpm/issues/193
+
+Error: Transaction check error:
+  file /sbin/ldconfig conflicts between attempted installs of
+ldconfig-2.31+git0+71f2b249a2-r0.mips64_n32 and
+lib32-ldconfig-2.31+git0+71f2b249a2-r0.mips32r2
+...
+
+This was because:
+transactions_color = 001 (ELF32) & 010 (ELF64) & 100 (ELF32 N32 MIPS64)
+FColor = Current file color (001) & transaction_color (111)
+oFcolor = Previous file color (100) & transaction_color (111)
+
+In handleColorConflict, it only deal with conditons "new preferred" or
+"old preferred". But not deal with the situation where neither is the
+preferred type. so for tri-lib system, like mips64/mips64 n32/mips(32),
+"Transaction check error" occurred.
+
+Fixed by performing a 'last-in-wins' resolution when "neither is preferred".
+
+Upstream-Status: Submitted <https://github.com/rpm-software-management/rpm/issues/193>
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ lib/transaction.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/lib/transaction.c b/lib/transaction.c
+index 67b9db5..82386b8 100644
+--- a/lib/transaction.c
++++ b/lib/transaction.c
+@@ -391,7 +391,18 @@ static int handleColorConflict(rpmts ts,
+ 		    rpmfsSetAction(ofs, ofx, FA_CREATE);
+ 		rpmfsSetAction(fs, fx, FA_SKIPCOLOR);
+ 		rConflicts = 0;
+-	    }
++	    }else {
++                /*
++                 * If neither is already skipped, we skip the old one, and
++                 * install the new one (last in wins).
++                 */
++                if (ofs && !XFA_SKIPPING(rpmfsGetAction(ofs, ofx)) &&
++                    fs && !XFA_SKIPPING(rpmfsGetAction(fs, fx))) {
++                    rpmfsSetAction(ofs, ofx, FA_SKIPCOLOR);
++                    rpmfsSetAction(fs, fx, FA_CREATE);
++                }
++                rConflicts = 0;
++            }
+ 	}
+     }
+ 
+-- 
+2.7.4
+

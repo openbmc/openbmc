@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = " \
     file://COPYING.LGPL3;md5=b52f2d57d10c4f7ee67a7eb9615d5d24 \
 "
 
-DEPENDS = "glib-2.0 gtk+3 libpcre2 libxml2-native gperf-native"
+DEPENDS = "glib-2.0 gtk+3 libpcre2 libxml2-native gperf-native icu"
 
 GNOMEBASEBUILDCLASS = "meson"
 GIR_MESON_OPTION = 'gir'
@@ -17,7 +17,7 @@ GIR_MESON_OPTION = 'gir'
 inherit gnomebase gtk-doc features_check upstream-version-is-even gobject-introspection
 
 # vapigen.m4 is required when vala is not present (but the one from vala should be used normally)
-SRC_URI += "file://0001-app.cc-use-old-school-asignment-to-avoid-gcc-4.8-err.patch \
+SRC_URI += " \
             file://0002-Add-W_EXITCODE-macro-for-non-glibc-systems.patch \
            "
 SRC_URI[archive.md5sum] = "1a0b5395915d2f3c88484511b38cc584"

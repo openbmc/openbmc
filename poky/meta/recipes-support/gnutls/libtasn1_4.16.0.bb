@@ -19,6 +19,4 @@ SRC_URI[sha256sum] = "0e0fb0903839117cb6e3b56e68222771bebf22ad7fc2295a0ed7d576e8
 
 inherit autotools texinfo lib_package gtk-doc
 
-CFLAGS_append_class-native = " -std=gnu99"
-
 BBCLASSEXTEND = "native nativesdk"

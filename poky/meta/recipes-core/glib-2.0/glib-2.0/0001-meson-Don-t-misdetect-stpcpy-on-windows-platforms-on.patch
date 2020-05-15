@@ -1,0 +1,53 @@
+From d4b1fd9cdb7ae07fa6be941ac95f97ece175fe55 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Tue, 31 Mar 2020 23:54:17 +0300
+Subject: [PATCH] meson: Don't misdetect stpcpy on windows platforms on clang
+
+See https://github.com/mesonbuild/meson/issues/3672 and
+https://github.com/mesonbuild/meson/issues/5628 for explanations
+of cases where meson misdetects functions due to clang builtins (that
+always are available, regardless of whether the platform actually
+provides them).
+
+The same also happens on GCC 10, which added support for __has_builtin.
+
+Upstream-Status: Backport [https://github.com/GNOME/glib/commit/1b94bfbd72dbbfb696fa68f3742f40998096b438]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ meson.build | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 72ca194..bbdac1c 100644
+--- a/meson.build
++++ b/meson.build
+@@ -533,13 +533,23 @@ foreach f : functions
+   endif
+ endforeach
+ 
+-# Check that stpcpy() is usable; must use header
+-if cc.has_function('stpcpy', prefix : '#include <string.h>')
++# Check that stpcpy() is usable; must use header.
++# cc.has_function() in some cases (clang, gcc 10+) assumes that if the
++# compiler provides a builtin of the same name that the function exists, while
++# it's in fact not provided by any header or library. This is true for
++# stpcpy() on Windows using clang and gcc as well as posix_memalign() using
++# gcc on Windows. Skip these checks on Windows for now to avoid false
++# positives. See https://github.com/mesonbuild/meson/pull/7116,
++# https://github.com/mesonbuild/meson/issues/3672 and
++# https://github.com/mesonbuild/meson/issues/5628.
++# FIXME: Once meson no longer returns success for stpcpy() and
++# posix_memalign() on Windows using GCC and clang we can remove this.
++if host_system != 'windows' and cc.has_function('stpcpy', prefix : '#include <string.h>')
+   glib_conf.set('HAVE_STPCPY', 1)
+ endif
+ 
+ # Check that posix_memalign() is usable; must use header
+-if cc.has_function('posix_memalign', prefix : '#include <stdlib.h>')
++if host_system != 'windows' and cc.has_function('posix_memalign', prefix : '#include <stdlib.h>')
+   glib_conf.set('HAVE_POSIX_MEMALIGN', 1)
+ endif
+ 
+-- 
+2.26.2
+

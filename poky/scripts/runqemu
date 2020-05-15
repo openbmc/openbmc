@@ -420,6 +420,23 @@ class BaseConfig(object):
             logger.error("%s not a directory valid DEPLOY_DIR_IMAGE" % deploy_dir_image)
             self.set("MACHINE", arg)
 
+    def set_dri_path(self):
+        # As runqemu can be run within bitbake (when using testimage, for example),
+        # we need to ensure that we run host pkg-config, and that it does not
+        # get mis-directed to native build paths set by bitbake.
+        try:
+            del os.environ['PKG_CONFIG_PATH']
+            del os.environ['PKG_CONFIG_DIR']
+            del os.environ['PKG_CONFIG_LIBDIR']
+            del os.environ['PKG_CONFIG_SYSROOT_DIR']
+        except KeyError:
+            pass
+        try:
+            dripath = subprocess.check_output("PATH=/bin:/usr/bin:$PATH pkg-config --variable=dridriverdir dri", shell=True)
+        except subprocess.CalledProcessError as e:
+            raise RunQemuError("Could not determine the path to dri drivers on the host via pkg-config.\nPlease install Mesa development files (particularly, dri.pc) on the host machine.")
+        os.environ['LIBGL_DRIVERS_PATH'] = dripath.decode('utf-8').strip()
+
     def check_args(self):
         for debug in ("-d", "--debug"):
             if debug in sys.argv:
@@ -431,6 +448,9 @@ class BaseConfig(object):
                 logger.setLevel(logging.ERROR)
                 sys.argv.remove(quiet)
 
+        if 'gl' not in sys.argv[1:] and 'gl-es' not in sys.argv[1:]:
+            os.environ['SDL_RENDER_DRIVER'] = 'software'
+
         unknown_arg = ""
         for arg in sys.argv[1:]:
             if arg in self.fstypes + self.vmtypes + self.wictypes:
@@ -440,15 +460,19 @@ class BaseConfig(object):
                 self.kernel_cmdline_script += ' console=ttyS0'
             elif arg == 'sdl':
                 if 'gl' in sys.argv[1:]:
+                    self.set_dri_path()
                     self.qemu_opt_script += ' -vga virtio -display sdl,gl=on'
                 elif 'gl-es' in sys.argv[1:]:
+                    self.set_dri_path()
                     self.qemu_opt_script += ' -vga virtio -display sdl,gl=es'
                 else:
                     self.qemu_opt_script += ' -display sdl'
             elif arg == 'gtk':
                 if 'gl' in sys.argv[1:]:
+                    self.set_dri_path()
                     self.qemu_opt_script += ' -vga virtio -display gtk,gl=on'
                 elif 'gl-es' in sys.argv[1:]:
+                    self.set_dri_path()
                     self.qemu_opt_script += ' -vga virtio -display gtk,gl=es'
                 else:
                     self.qemu_opt_script += ' -display gtk'
@@ -456,22 +480,8 @@ class BaseConfig(object):
                 # These args are handled inside sdl or gtk blocks above
                 pass
             elif arg == 'egl-headless':
+                self.set_dri_path()
                 self.qemu_opt_script += ' -vga virtio -display egl-headless'
-                # As runqemu can be run within bitbake (when using testimage, for example),
-                # we need to ensure that we run host pkg-config, and that it does not
-                # get mis-directed to native build paths set by bitbake.
-                try:
-                    del os.environ['PKG_CONFIG_PATH']
-                    del os.environ['PKG_CONFIG_DIR']
-                    del os.environ['PKG_CONFIG_LIBDIR']
-                    del os.environ['PKG_CONFIG_SYSROOT_DIR']
-                except KeyError:
-                    pass
-                try:
-                    dripath = subprocess.check_output("PATH=/bin:/usr/bin:$PATH pkg-config --variable=dridriverdir dri", shell=True)
-                except subprocess.CalledProcessError as e:
-                    raise RunQemuError("Could not determine the path to dri drivers on the host via pkg-config.\nPlease install Mesa development files (particularly, dri.pc) on the host machine.")
-                os.environ['LIBGL_DRIVERS_PATH'] = dripath.decode('utf-8').strip()
             elif arg == 'serial':
                 self.kernel_cmdline_script += ' console=ttyS0'
                 self.serialconsole = True
