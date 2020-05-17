@@ -4,6 +4,8 @@ SRC_URI += " file://ncsi-netlink.service"
 SYSTEMD_SERVICE_${PN} += " ncsi-netlink.service"
 FILES_${PN} += "${datadir}/network/*.json"
 
+EXTRA_OECONF += "--enable-ibm-config"
+
 install_network_configuration(){
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/ncsi-netlink.service ${D}${systemd_system_unitdir}
