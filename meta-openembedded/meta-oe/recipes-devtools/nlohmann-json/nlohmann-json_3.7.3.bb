@@ -4,7 +4,10 @@ SECTION = "libs"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.MIT;md5=f5f7c71504da070bcf4f090205ce1080"
 
-SRC_URI = "git://github.com/nlohmann/json.git;nobranch=1"
+SRC_URI = "git://github.com/nlohmann/json.git;nobranch=1 \
+           file://0001-Templatize-basic_json-ctor-from-json_ref.patch \
+           file://0001-typo-fix.patch \
+           "
 
 SRCREV = "e7b3b40b5a95bc74b9a7f662830a27c49ffc01b4"
 
