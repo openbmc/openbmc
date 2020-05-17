@@ -20,6 +20,7 @@ DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "phosphor-logging"
 DEPENDS += "libnl"
 DEPENDS += "stdplus"
+DEPENDS += "nlohmann-json"
 
 PACKAGECONFIG ??= "uboot-env"
 
