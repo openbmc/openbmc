@@ -18,9 +18,8 @@ DEPENDS += " \
         ${PYTHON_PN}-pyyaml-native \
         "
 
-PACKAGECONFIG ??= "libsdbusplus transaction"
+PACKAGECONFIG ??= "libsdbusplus"
 PACKAGECONFIG[libsdbusplus] = "--enable-libsdbusplus,--disable-libsdbusplus,systemd,libsystemd"
-PACKAGECONFIG[transaction] = "--enable-transaction,--disable-transaction"
 
 # Remove unused sdbus++ contents (included in python3-sdbus++ package).
 do_install_append() {
