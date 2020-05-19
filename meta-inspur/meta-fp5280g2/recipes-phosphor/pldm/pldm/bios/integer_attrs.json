@@ -1,0 +1,17 @@
+{
+    "entries": [
+        {
+            "attribute_name": "OUTLET",
+            "lower_bound": 0,
+            "upper_bound": 68002,
+            "scalar_increment": 1,
+            "default_value": 0,
+            "dbus": {
+                "object_path": "/xyz/openbmc_project/sensors/voltage/p3v_bat",
+                "interface": "xyz.openbmc_project.Sensor.Value",
+                "property_type": "int64_t",
+                "property_name": "Value"
+            }
+        }
+    ]
+}

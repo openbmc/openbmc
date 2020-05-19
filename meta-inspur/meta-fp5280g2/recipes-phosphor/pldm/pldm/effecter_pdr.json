@@ -1,0 +1,82 @@
+{
+  "effecterPDRs": [
+    {
+      "pdrType": 11,
+      "entries": [
+        {
+          "type": 33,
+          "instance": 0,
+          "container": 0,
+          "effecters": [
+            {
+              "set": {
+                "id": 196,
+                "size": 1,
+                "states": [
+                  1,
+                  2
+                ]
+              },
+              "dbus": {
+                "path": "/xyz/openbmc_project/state/host0",
+                "interface": "xyz.openbmc_project.State.OperatingSystem.Status",
+                "property_name": "OperatingSystemState",
+                "property_type": "string",
+                "property_values": [
+                  "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.Standby",
+                  "xyz.openbmc_project.OperatingSystem.Status.OSStatus.BootComplete"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": 45,
+          "instance": 0,
+          "container": 0,
+          "effecters": [
+            {
+              "set": {
+                "id": 260,
+                "size": 2,
+                "states": [
+                  9
+                ]
+              },
+              "dbus": {
+                "path": "/xyz/openbmc_project/state/chassis0",
+                "interface": "xyz.openbmc_project.State.Chassis",
+                "property_name": "RequestedPowerTransition",
+                "property_type": "string",
+                "property_values": [
+                  "xyz.openbmc_project.State.Chassis.Transition.Off"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pdrType": 9,
+      "entries": [
+        {
+	  "type": 32768,
+	  "instance": 0,
+          "base_unit": 21,
+          "rate_unit": 3,
+          "effecter_resolution_init": 1,
+          "effecter_data_size": 4,
+          "range_field_format": 4,
+          "dbus": {
+            "path": "/xyz/openbmc_project/control/host0/power_cap",
+            "interface": "xyz.openbmc_project.Control.Power.Cap",
+            "property_name": "PowerCap",
+            "property_type": "uint32_t"
+          }
+        }
+      ]
+    }
+  ]
+}
+
