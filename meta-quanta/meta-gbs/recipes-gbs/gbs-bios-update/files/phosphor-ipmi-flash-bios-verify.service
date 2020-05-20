@@ -1,0 +1,9 @@
+[Unit]
+Description=Phosphor-ipmi-flash verify BIOS service
+
+[Service]
+ExecStart=/usr/bin/bios-verify.sh
+Type=oneshot
+
+[Install]
+WantedBy=phosphor-ipmi-flash-bios-verify.target
