@@ -1,0 +1,3 @@
+OF_NAME=hsbp_fru
+SYSFS_PATH=/no-such-path/eeprom
+FRUID=0x01
