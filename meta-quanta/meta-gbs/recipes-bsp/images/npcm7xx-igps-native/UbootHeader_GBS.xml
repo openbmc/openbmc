@@ -1,0 +1,194 @@
+<!-- SPDX-License-Identifier: GPL-2.0
+#
+# Nuvoton IGPS: Image Generation And Programming Scripts For Poleg BMC
+#
+# Copyright (C) 2018 Nuvoton Technologies, All Rights Reserved
+#--------------------------------------------------------------------------->
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Bin_Ecc_Map>
+	<!-- BMC mandatory fields -->
+	<ImageProperties>
+		<BinSize>0</BinSize>         <!-- If 0 the binary size will be calculated by the tool -->
+		<PadValue>0xFF</PadValue>	<!-- Byte value to pad the empty areas, default is 0 -->
+	</ImageProperties>
+		
+	<BinField>
+		<!-- BootBlock tag (0x50 0x07 0x55 0xAA 0x54 0x4F 0x4F 0x42) or 
+			     uboot tag (0x55 0x42 0x4F 0x4F 0x54 0x42 0x4C 0x4B) -->
+		<name>StartTag</name>         <!-- name of field -->
+		<config>
+			<offset>0</offset>            <!-- offset in the header -->
+			<size>0x8</size>              <!-- size in the header -->
+		</config>
+		<content format='bytes'>0x55 0x42 0x4F 0x4F 0x54 0x42 0x4C 0x4B</content>  <!-- content the user should fill -->
+	</BinField>
+	
+	<BinField>
+		<!-- Code destination address, 32-bit aligned: for u-boot should be 0x80005000 so code will run in 0x80005200 as linked for -->
+		<name>DestAddr</name>         <!-- name of field -->
+		<config>
+			<offset>0x140</offset>        <!-- offset in the header -->
+			<size>0x4</size>              <!-- size in the header -->
+		</config>
+		<content format='32bit'>0x8000</content>  <!-- content the user should fill -->
+	</BinField>
+	
+	<BinField>
+		<!-- BootBlock or u-boot Code size -->
+		<name>CodeSize</name>         <!-- name of field -->
+		<config>
+			<offset>0x144</offset>        <!-- offset in the header -->
+			<size>0x4</size>              <!-- size in the header -->
+		</config>
+		<content format='FileSize'>u-boot.bin</content>	<!-- content the user should fill -->
+	</BinField>
+	
+	<BinField>
+		<!-- The BootBlock or u-boot binary file -->
+		<name>Code</name>             <!-- name of field -->
+		<config>
+			<offset>0x200</offset>        <!-- offset in the header -->
+			<size format='FileSize'>u-boot.bin</size>                 <!-- size in the header calculated by tool-->
+		</config>
+		<content format='FileContent'>u-boot.bin</content>  <!-- content the user should fill -->
+	</BinField>	
+	
+	<!-- BMC optional fields -->
+	<BinField>
+		<!-- Word contents copied by ROM code to FIU0 FIU_DRD_CFG register -->
+		<name>FIU0_DRD_CFG_Set</name>  <!-- name of field -->
+		<config>
+			<offset>0x108</offset>        <!-- offset in the header -->
+			<size>0x4</size>              <!-- size in the header -->
+		</config>
+		<content format='32bit'>0x0300100B</content>               <!-- content the user should fill 0x030032EB -->
+	</BinField>
+	
+	<BinField>
+		<!-- Defines the clock divide ratio from AHB to FIU0 clock -->
+		<name>FIU0_Clk_Divider</name>  <!-- name of field -->
+		<config>
+			<offset>0x10C</offset>        <!-- offset in the header -->
+			<size>0x1</size>              <!-- size in the header -->
+		</config>
+		<content format='bytes'>0</content>               <!-- content the user should fill -->
+	</BinField>
+	
+	<BinField>
+		<!-- Defines if FIU0 CS1 is enabled -->
+		<name>fiu0_cs1_en</name>  <!-- name of field -->
+		<config>
+			<offset>0x10D</offset>        <!-- offset in the header -->
+			<size>0x1</size>              <!-- size in the header -->
+		</config>
+		<content format='bytes'>0x0</content>               <!-- content the user should fill -->
+	</BinField>
+	
+	<BinField>
+		<!-- Defines if FIU0 CS2 is enabled -->
+		<name>fiu0_cs2_en</name>  <!-- name of field -->
+		<config>
+			<offset>0x10E</offset>        <!-- offset in the header -->
+			<size>0x1</size>              <!-- size in the header -->
+		</config>
+		<content format='bytes'>0x0</content>               <!-- content the user should fill -->
+	</BinField>
+	
+	<BinField>
+		<!-- Defines if FIU0 CS3 is enabled -->
+		<name>fiu0_cs3_en</name>  <!-- name of field -->
+		<config>
+			<offset>0x10F</offset>        <!-- offset in the header -->
+			<size>0x1</size>              <!-- size in the header -->
+		</config>
+		<content format='bytes'>0x0</content>               <!-- content the user should fill -->
+	</BinField>
+	
+	<!-- BMC optional fields -->
+	<BinField>
+		<!-- Word contents copied by ROM code to FIU3 FIU_DRD_CFG register -->
+		<name>FIU3_DRD_CFG_Set</name>  <!-- name of field -->
+		<config>
+			<offset>0x110</offset>        <!-- offset in the header -->
+			<size>0x4</size>              <!-- size in the header -->
+		</config>
+		<content format='32bit'>0x0</content>               <!-- content the user should fill -->
+	</BinField>
+	
+	<!-- BMC optional fields -->
+	<BinField>
+		<!-- Word contents copied by ROM code to FIU3 FIU_DRD_CFG register -->
+		<name>FIU3_DWR_CFG_Set</name>  <!-- name of field -->
+		<config>
+			<offset>0x114</offset>        <!-- offset in the header -->
+			<size>0x4</size>              <!-- size in the header -->
+		</config>
+		<content format='32bit'>0x0</content>               <!-- content the user should fill -->
+	</BinField>
+	
+	<BinField>
+		<!-- Defines the clock divide ratio from AHB to FIU3 clock -->
+		<name>FIU3_Clk_Divider</name>  <!-- name of field -->
+		<config>
+			<offset>0x118</offset>        <!-- offset in the header -->
+			<size>0x1</size>              <!-- size in the header -->
+		</config>
+		<content format='bytes'>0x0</content>               <!-- content the user should fill -->
+	</BinField>
+	
+
+	<BinField>
+		<!-- Defines if FIU3 CS1 is enabled -->
+		<name>fiu3_cs1_en</name>  <!-- name of field -->
+		<config>
+			<offset>0x119</offset>        <!-- offset in the header -->
+			<size>0x1</size>              <!-- size in the header -->
+		</config>
+		<content format='bytes'>0x0</content>               <!-- content the user should fill -->
+	</BinField>
+	
+	<BinField>
+		<!-- Defines if FIU3 CS2 is enabled -->
+		<name>fiu3_cs2_en</name>  <!-- name of field -->
+		<config>
+			<offset>0x11A</offset>        <!-- offset in the header -->
+			<size>0x1</size>              <!-- size in the header -->
+		</config>
+		<content format='bytes'>0x0</content>               <!-- content the user should fill -->
+	</BinField>
+	
+	<BinField>
+		<!-- Defines if FIU3 CS3 is enabled -->
+		<name>fiu3_cs3_en</name>  <!-- name of field -->
+		<config>
+			<offset>0x11B</offset>        <!-- offset in the header -->
+			<size>0x1</size>              <!-- size in the header -->
+		</config>
+		<content format='bytes'>0x0</content>               <!-- content the user should fill -->
+	</BinField>
+	
+	<BinField>
+		<!-- Version (Major.Minor) -->
+		<name>Version</name>          <!-- name of field -->
+		<config>
+			<offset>0x148</offset>        <!-- offset in the header -->
+			<size>0x4</size>              <!-- size in the header -->
+		</config>
+		<content format='32bit'>0</content>               <!-- content the user should fill -->
+	</BinField>
+	
+		<!-- BMC optional fields -->
+	<BinField>
+		<!-- Word contents copied by BB code to FIU0 FIU_DWR_CFG register -->
+		<name>FIU0_DWR_CFG_Set</name>  <!-- name of field -->
+		<config>
+			<offset>0x14C</offset>        <!-- offset in the header -->
+			<size>0x4</size>              <!-- size in the header -->
+		</config>
+		<content format='32bit'>0x03001102</content>               <!-- content the user should fill -->
+	</BinField>
+	
+	
+</Bin_Ecc_Map>
