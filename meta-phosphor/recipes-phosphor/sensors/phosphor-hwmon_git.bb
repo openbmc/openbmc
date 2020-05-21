@@ -18,6 +18,7 @@ DEPENDS += "autoconf-archive-native"
 DEPENDS += " \
         sdbusplus \
         sdeventplus \
+        stdplus \
         phosphor-dbus-interfaces \
         phosphor-logging \
         gpioplus \
