@@ -1,4 +1,4 @@
-From cf39fde2c1cfb55aa756bfb551c4087ba2fd4b6c Mon Sep 17 00:00:00 2001
+From 1c5b450a068583f2407767451ef636d0661071da Mon Sep 17 00:00:00 2001
 From: Alexander Filippov <a.filippov@yadro.com>
 Date: Tue, 7 Apr 2020 16:45:41 +0300
 Subject: [PATCH] Add system reset status support
@@ -11,27 +11,17 @@ and save the reset reasons into kernel command line,
 for applications to query.
 
 Signed-off-by: Alexander Filippov <a.filippov@yadro.com>
-
 ---
- arch/arm/include/asm/arch-aspeed/ast_g5_platform.h |  1 +
- arch/arm/include/asm/arch-aspeed/ast_scu.h         |  2 +-
- arch/arm/mach-aspeed/ast-scu.c                     |  6 +-
- board/aspeed/ast-g5/ast-g5.c                       | 98 ++++++++++++++++++++++
- 4 files changed, 105 insertions(+), 2 deletions(-)
+ arch/arm/include/asm/arch-aspeed/ast_scu.h  |   2 +-
+ arch/arm/include/asm/arch-aspeed/platform.h |   2 +
+ arch/arm/mach-aspeed/Makefile               |   1 +
+ arch/arm/mach-aspeed/ast-late-init.c        | 114 ++++++++++++++++++++
+ arch/arm/mach-aspeed/ast-scu.c              |   6 +-
+ 5 files changed, 123 insertions(+), 2 deletions(-)
+ create mode 100644 arch/arm/mach-aspeed/ast-late-init.c
 
-diff --git a/arch/arm/include/asm/arch-aspeed/ast_g5_platform.h b/arch/arm/include/asm/arch-aspeed/ast_g5_platform.h
-index 4210873..d2a4268cd 100644
---- a/arch/arm/include/asm/arch-aspeed/ast_g5_platform.h
-+++ b/arch/arm/include/asm/arch-aspeed/ast_g5_platform.h
-@@ -188,5 +188,6 @@
- #define AST_FORMATTER_MEM_SIZE		0xC00000 /* 12MB */
- #define AST_FORMATTER_MEM_BASE 		(AST_H264_MEM_BASE + AST_H264_MEM_SIZE)
- 
-+#define CONFIG_BOARD_LATE_INIT 1 /* Call board_late_init */
- 
- #endif
 diff --git a/arch/arm/include/asm/arch-aspeed/ast_scu.h b/arch/arm/include/asm/arch-aspeed/ast_scu.h
-index dcbc673..b428f38 100644
+index dcbc6730d4..b428f386d6 100644
 --- a/arch/arm/include/asm/arch-aspeed/ast_scu.h
 +++ b/arch/arm/include/asm/arch-aspeed/ast_scu.h
 @@ -29,7 +29,7 @@
@@ -43,48 +33,43 @@ index dcbc673..b428f38 100644
  extern void ast_scu_security_info(void);
  extern u32 ast_scu_revision_id(void);
  extern u32 ast_scu_get_vga_memsize(void);
-diff --git a/arch/arm/mach-aspeed/ast-scu.c b/arch/arm/mach-aspeed/ast-scu.c
-index 12de9b8..5afd379 100644
---- a/arch/arm/mach-aspeed/ast-scu.c
-+++ b/arch/arm/mach-aspeed/ast-scu.c
-@@ -482,22 +482,26 @@ void ast_scu_security_info(void)
- 	}
- }
+diff --git a/arch/arm/include/asm/arch-aspeed/platform.h b/arch/arm/include/asm/arch-aspeed/platform.h
+index 1c02914fcb..b9207c492f 100644
+--- a/arch/arm/include/asm/arch-aspeed/platform.h
++++ b/arch/arm/include/asm/arch-aspeed/platform.h
+@@ -31,4 +31,6 @@
+ #err "No define for platform.h"
+ #endif
  
--void ast_scu_sys_rest_info(void)
-+u32 ast_scu_sys_rest_info(void)
- {
- 	u32 rest = ast_scu_read(AST_SCU_SYS_CTRL);
- 
- 	if (rest & SCU_SYS_EXT_RESET_FLAG) {
- 		printf("RST : External\n");
- 		ast_scu_write(SCU_SYS_EXT_RESET_FLAG, AST_SCU_SYS_CTRL);
-+		rest = SCU_SYS_EXT_RESET_FLAG;
- 	} else if (rest & SCU_SYS_WDT_RESET_FLAG) {
- 		printf("RST : Watchdog\n");
- 		ast_scu_write(SCU_SYS_WDT_RESET_FLAG, AST_SCU_SYS_CTRL);
-+		rest = SCU_SYS_WDT_RESET_FLAG;
- 	} else if (rest & SCU_SYS_PWR_RESET_FLAG) {
- 		printf("RST : Power On\n");
- 		ast_scu_write(SCU_SYS_PWR_RESET_FLAG, AST_SCU_SYS_CTRL);
-+		rest = SCU_SYS_PWR_RESET_FLAG;
- 	} else {
- 		printf("RST : CLK en\n");
- 	}
-+	return rest;
- }
- 
- u32 ast_scu_get_vga_memsize(void)
-diff --git a/board/aspeed/ast-g5/ast-g5.c b/board/aspeed/ast-g5/ast-g5.c
-index 12496ce..42d7496 100644
---- a/board/aspeed/ast-g5/ast-g5.c
-+++ b/board/aspeed/ast-g5/ast-g5.c
-@@ -105,3 +105,104 @@ void hw_watchdog_reset(void)
- 	writel(0x4755, AST_WDT2_BASE + 0x08);
- }
- #endif /* CONFIG_WATCHDOG */
++#define CONFIG_BOARD_LATE_INIT 1 /* Call board_late_init */
 +
-+#ifdef CONFIG_BOARD_LATE_INIT
+ #endif
+diff --git a/arch/arm/mach-aspeed/Makefile b/arch/arm/mach-aspeed/Makefile
+index 7d8930beb9..4af2a7c96a 100644
+--- a/arch/arm/mach-aspeed/Makefile
++++ b/arch/arm/mach-aspeed/Makefile
+@@ -15,3 +15,4 @@ obj-y += timer.o reset.o cpuinfo.o ast-scu.o ast-ahbc.o ast-sdmc.o
+ obj-$(CONFIG_AST_SPI_NOR) += flash.o
+ obj-$(CONFIG_ARCH_AST2500) += platform_g5.o
+ obj-$(CONFIG_ARCH_AST2400) += platform_g4.o
++obj-$(CONFIG_BOARD_LATE_INIT) += ast-late-init.o
+diff --git a/arch/arm/mach-aspeed/ast-late-init.c b/arch/arm/mach-aspeed/ast-late-init.c
+new file mode 100644
+index 0000000000..5646c0e882
+--- /dev/null
++++ b/arch/arm/mach-aspeed/ast-late-init.c
+@@ -0,0 +1,114 @@
++/*
++ * SPDX-License-Identifier: Apache-2.0
++ * Copyright (C) 2020 YADRO.
++ */
++
++#include <common.h>
++
++#include <asm/arch/ast_scu.h>
++#include <asm/arch/regs-scu.h>
++#include <malloc.h>
++
 +static void update_bootargs_cmd(const char *key, const char *value)
 +{
 +    int buf_len;
@@ -158,7 +143,7 @@ index 12496ce..42d7496 100644
 +    free(buf);
 +}
 +
-+int board_late_init(void)
++static void set_reset_reason(void)
 +{
 +    u32 reset_reason = ast_scu_sys_rest_info();
 +
@@ -180,7 +165,46 @@ index 12496ce..42d7496 100644
 +        snprintf(value, sizeof(value) - 1, "0x%x", reset_reason);
 +        update_bootargs_cmd("resetreason", value);
 +    }
++}
++
++int board_late_init(void)
++{
++    set_reset_reason();
 +
 +    return 0;
 +}
-+#endif /* CONFIG_BOARD_LATE_INIT */
+diff --git a/arch/arm/mach-aspeed/ast-scu.c b/arch/arm/mach-aspeed/ast-scu.c
+index 12de9b8036..5afd3793e3 100644
+--- a/arch/arm/mach-aspeed/ast-scu.c
++++ b/arch/arm/mach-aspeed/ast-scu.c
+@@ -482,22 +482,26 @@ void ast_scu_security_info(void)
+ 	}
+ }
+ 
+-void ast_scu_sys_rest_info(void)
++u32 ast_scu_sys_rest_info(void)
+ {
+ 	u32 rest = ast_scu_read(AST_SCU_SYS_CTRL);
+ 
+ 	if (rest & SCU_SYS_EXT_RESET_FLAG) {
+ 		printf("RST : External\n");
+ 		ast_scu_write(SCU_SYS_EXT_RESET_FLAG, AST_SCU_SYS_CTRL);
++		rest = SCU_SYS_EXT_RESET_FLAG;
+ 	} else if (rest & SCU_SYS_WDT_RESET_FLAG) {
+ 		printf("RST : Watchdog\n");
+ 		ast_scu_write(SCU_SYS_WDT_RESET_FLAG, AST_SCU_SYS_CTRL);
++		rest = SCU_SYS_WDT_RESET_FLAG;
+ 	} else if (rest & SCU_SYS_PWR_RESET_FLAG) {
+ 		printf("RST : Power On\n");
+ 		ast_scu_write(SCU_SYS_PWR_RESET_FLAG, AST_SCU_SYS_CTRL);
++		rest = SCU_SYS_PWR_RESET_FLAG;
+ 	} else {
+ 		printf("RST : CLK en\n");
+ 	}
++	return rest;
+ }
+ 
+ u32 ast_scu_get_vga_memsize(void)
+-- 
+2.25.4
+
