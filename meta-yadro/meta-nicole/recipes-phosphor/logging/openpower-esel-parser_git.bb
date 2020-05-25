@@ -20,4 +20,4 @@ DEPENDS += "autoconf-archive-native \
 # Source code repository
 S = "${WORKDIR}/git"
 SRC_URI = "gitsm://github.com/YADRO-KNS/openpower-esel-parser"
-SRCREV = "c35879fa605f3aa8098fff2c0a395815d8cbfe51"
+SRCREV = "8d25ae3cf40c090dfa17eb30a95c3d844012235f"
