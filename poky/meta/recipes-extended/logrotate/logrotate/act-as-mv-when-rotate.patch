@@ -1,4 +1,4 @@
-From ef1ea905831c5bcd63e04149571c10d75ff8f028 Mon Sep 17 00:00:00 2001
+From c637948ebab5aff5641700c5cf613321ca0a6e6b Mon Sep 17 00:00:00 2001
 From: Robert Yang <liezhi.yang@windriver.com>
 Date: Tue, 17 Feb 2015 21:08:07 -0800
 Subject: [PATCH] Act as the "mv" command when rotate log
@@ -9,16 +9,15 @@ read and write.
 Upstream-Status: Pending
 
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
-
 ---
  logrotate.c | 71 ++++++++++++++++++++++++++++++++++++++++++++---------
  1 file changed, 59 insertions(+), 12 deletions(-)
 
 diff --git a/logrotate.c b/logrotate.c
-index 25902bc..afa1a90 100644
+index 54dac90..bf3ec23 100644
 --- a/logrotate.c
 +++ b/logrotate.c
-@@ -1434,6 +1434,53 @@ static int findNeedRotating(struct logInfo *log, int logNum, int force)
+@@ -1360,6 +1360,53 @@ static int findNeedRotating(struct logInfo *log, int logNum, int force)
      return 0;
  }
  
@@ -72,7 +71,7 @@ index 25902bc..afa1a90 100644
  /* find the rotated file with the highest index */
  static int findLastRotated(const struct logNames *rotNames,
                             const char *fileext, const char *compext)
-@@ -1911,15 +1958,15 @@ static int prerotateSingleLog(struct logInfo *log, int logNum,
+@@ -1800,15 +1847,15 @@ static int prerotateSingleLog(struct logInfo *log, int logNum,
              }
  
              message(MESS_DEBUG,
@@ -91,7 +90,7 @@ index 25902bc..afa1a90 100644
                              oldName, newName, strerror(errno));
                      hasErrors = 1;
                  }
-@@ -2002,10 +2049,10 @@ static int rotateSingleLog(struct logInfo *log, int logNum,
+@@ -1891,21 +1938,21 @@ static int rotateSingleLog(struct logInfo *log, int logNum,
                      return 1;
                  }
  
@@ -105,8 +104,7 @@ index 25902bc..afa1a90 100644
                              log->files[logNum], tmpFilename,
                              strerror(errno));
                      hasErrors = 1;
-@@ -2014,11 +2061,11 @@ static int rotateSingleLog(struct logInfo *log, int logNum,
-                 free(tmpFilename);
+                 }
              }
              else {
 -                message(MESS_DEBUG, "renaming %s to %s\n", log->files[logNum],
@@ -120,7 +118,7 @@ index 25902bc..afa1a90 100644
                              log->files[logNum], rotNames->finalName,
                              strerror(errno));
                      hasErrors = 1;
-@@ -2424,7 +2471,7 @@ static int rotateLogSet(struct logInfo *log, int force)
+@@ -2297,7 +2344,7 @@ static int rotateLogSet(struct logInfo *log, int force)
      return hasErrors;
  }
  
@@ -129,7 +127,7 @@ index 25902bc..afa1a90 100644
  {
      struct logState *p;
      FILE *f;
-@@ -2629,7 +2676,7 @@ static int writeState(const char *stateFilename)
+@@ -2460,7 +2507,7 @@ static int writeState(const char *stateFilename)
          fclose(f);
  
      if (error == 0) {
@@ -137,8 +135,8 @@ index 25902bc..afa1a90 100644
 +        if (mvFile(tmpFilename, stateFilename, log, prev_acl)) {
              unlink(tmpFilename);
              error = 1;
-             message(MESS_ERROR, "error renaming temp state file %s to %s\n",
-@@ -2987,7 +3034,7 @@ int main(int argc, const char **argv)
+             message(MESS_ERROR, "error renaming temp state file %s\n",
+@@ -2805,7 +2852,7 @@ int main(int argc, const char **argv)
          rc |= rotateLogSet(log, force);
  
      if (!debug)
@@ -147,3 +145,6 @@ index 25902bc..afa1a90 100644
  
      return (rc != 0);
  }
+-- 
+2.18.1
+

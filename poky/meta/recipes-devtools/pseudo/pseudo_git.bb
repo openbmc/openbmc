@@ -12,6 +12,7 @@ SRC_URI = "git://git.yoctoproject.org/pseudo \
            file://0006-xattr-adjust-for-attr-2.4.48-release.patch \
            file://seccomp.patch \
            file://0001-pseudo-On-a-DB-fixup-remove-files-that-do-not-exist-.patch \
+           file://0001-pseudo_ipc.h-Fix-enum-typedef.patch \
            "
 
 SRCREV = "060058bb29f70b244e685b3c704eb0641b736f73"

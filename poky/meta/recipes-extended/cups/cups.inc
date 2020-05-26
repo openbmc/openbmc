@@ -12,9 +12,7 @@ SRC_URI = "https://github.com/apple/cups/releases/download/v${PV}/${BP}-source.t
            file://0001-use-echo-only-in-init.patch \
            file://0002-don-t-try-to-run-generated-binaries.patch \
            file://0003-cups_1.4.6.bb-Fix-build-on-ppc64.patch \
-           file://0004-cups-fix-multilib-install-file-conflicts.patch \
-           file://volatiles.99_cups \
-           file://cups-volatiles.conf \
+           file://0004-cups-fix-multilib-install-file-conflicts.patch\
            "
 
 UPSTREAM_CHECK_URI = "https://github.com/apple/cups/releases"
@@ -69,7 +67,6 @@ do_install () {
 
 	# Remove /var/run from package as cupsd will populate it on startup
 	rm -fr ${D}/${localstatedir}/run
-	rm -fr ${D}/${localstatedir}/log
 	rmdir ${D}/${libexecdir}/${BPN}/driver
 
 	# Fix the pam configuration file permissions
@@ -81,13 +78,6 @@ do_install () {
 	if ${@bb.utils.contains('DISTRO_FEATURES','sysvinit','false','true',d)}; then
 	    rm -rf ${D}${sysconfdir}/init.d/
 	    rm -rf ${D}${sysconfdir}/rc*
-	    install -d ${D}${sysconfdir}/tmpfiles.d
-	    install -m 0644 ${WORKDIR}/cups-volatiles.conf \
-		    ${D}${sysconfdir}/tmpfiles.d/cups.conf
-	else
-	    install -d ${D}${sysconfdir}/default/volatiles
-	    install -m 0644 ${WORKDIR}/volatiles.99_cups \
-		    ${D}${sysconfdir}/default/volatiles/99_cups
 	fi
 }
 

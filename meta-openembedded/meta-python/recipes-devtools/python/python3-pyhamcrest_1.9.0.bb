@@ -8,3 +8,5 @@ SRC_URI[md5sum] = "8b833a3fa30197455df79424f30c8c3f"
 SRC_URI[sha256sum] = "8ffaa0a53da57e89de14ced7185ac746227a8894dbd5a3c718bf05ddbd1d56cd"
 
 inherit pypi setuptools3
+
+RDEPENDS_${PN} += "${PYTHON_PN}-six"

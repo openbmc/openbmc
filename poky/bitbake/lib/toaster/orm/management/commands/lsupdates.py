@@ -68,7 +68,7 @@ class Command(BaseCommand):
                          (what,
                           pec))
         sys.stdout.flush()
-        if int(pec) == 100:
+        if int(pec) is 100:
             sys.stdout.write("\n")
             sys.stdout.flush()
 

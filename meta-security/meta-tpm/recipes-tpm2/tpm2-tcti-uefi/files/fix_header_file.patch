@@ -1,0 +1,25 @@
+Error building for i386 target in cross env
+
+#include <efi/x86_64/efibind.h>
+
+ARCH is host arch, not target arch
+
+Upstream-Status: Submitted 
+
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+Index: git/src/uefi-types.h
+===================================================================
+--- git.orig/src/uefi-types.h
++++ git/src/uefi-types.h
+@@ -3,9 +3,9 @@
+ #define UEFI_TYPES_H
+ 
+ #ifndef EDK2_BUILD
+-#if ARCH == x86_64
++#if defined(__x86_64__)
+ #include <efi/x86_64/efibind.h>
+-#elif ARCH == ia32
++#elif defined(__i386__)
+ #include <efi/ia32/efibind.h>
+ #else
+ #error "Unsupported ARCH."

@@ -1,4 +1,4 @@
-From a3fdf3dbdd6ecc0f2550a765dcb9bb274bce8ea8 Mon Sep 17 00:00:00 2001
+From e47796c8e8270a3d14f0b06af8a9e916c2225514 Mon Sep 17 00:00:00 2001
 From: Robert Yang <liezhi.yang@windriver.com>
 Date: Tue, 8 Jan 2019 06:27:06 +0000
 Subject: [PATCH] Disable the check for different filesystems
@@ -9,19 +9,18 @@ disable the check for different filesystems.
 Upstream-Status: Pending
 
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
-
 ---
  config.c | 9 ---------
  1 file changed, 9 deletions(-)
 
 diff --git a/config.c b/config.c
-index f027c7e..026136c 100644
+index 633b843..99a4a3b 100644
 --- a/config.c
 +++ b/config.c
-@@ -1873,15 +1873,6 @@ duperror:
+@@ -1765,15 +1765,6 @@ duperror:
+                                     goto error;
+                                 }
                              }
- 
-                             free(ld);
 -
 -                            if (sb.st_dev != sb2.st_dev
 -                                    && !(newlog->flags & (LOG_FLAG_COPYTRUNCATE | LOG_FLAG_COPY | LOG_FLAG_TMPFILENAME))) {
@@ -34,3 +33,6 @@ index f027c7e..026136c 100644
                          }
                      }
  
+-- 
+2.18.1
+

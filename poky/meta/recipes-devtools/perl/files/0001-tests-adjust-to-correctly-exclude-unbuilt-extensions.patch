@@ -1,0 +1,27 @@
+From b0d53cfd785f64002128ac5eecc4aed0663d9c30 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 9 Jan 2020 17:26:55 +0100
+Subject: [PATCH] tests: adjust to correctly exclude unbuilt extensions
+
+Issue is reported here:
+https://github.com/arsv/perl-cross/issues/85
+
+Upstream-Status: Inappropriate [issue caused by perl-cross]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ t/TEST | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/t/TEST b/t/TEST
+index a9c844f..8d3505f 100755
+--- a/t/TEST
++++ b/t/TEST
+@@ -419,7 +419,7 @@ sub _tests_from_manifest {
+ 	while (<MANI>) {
+ 	    if (m!^((?:cpan|dist|ext)/(\S+)/+(?:[^/\s]+\.t|test\.pl)|lib/\S+?(?:\.t|test\.pl))\s!) {
+ 		my $t = $1;
+-		my $extension = $2;
++		my $extension = $1."/".$2;
+ 
+ 		# XXX Generates way too many error lines currently.  Skip for
+ 		# v5.22

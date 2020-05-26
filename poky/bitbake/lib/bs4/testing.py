@@ -15,7 +15,7 @@ from bs4.element import (
     SoupStrainer,
 )
 
-from bs4.builder._htmlparser import HTMLParserTreeBuilder
+from bs4.builder import HTMLParserTreeBuilder
 default_builder = HTMLParserTreeBuilder
 
 
@@ -56,7 +56,7 @@ class SoupTest(unittest.TestCase):
                 self.assertEqual(earlier, e.previous_element)
             earlier = e
 
-class HTMLTreeBuilderSmokeTest(SoupTest):
+class HTMLTreeBuilderSmokeTest(object):
 
     """A basic test of a treebuilder's competence.
 
@@ -541,7 +541,7 @@ Hello, world!
         data.a['foo'] = 'bar'
         self.assertEqual('<a foo="bar">text</a>', data.a.decode())
 
-class XMLTreeBuilderSmokeTest(SoupTest):
+class XMLTreeBuilderSmokeTest(object):
 
     def test_pickle_and_unpickle_identity(self):
         # Pickling a tree, then unpickling it, yields a tree identical

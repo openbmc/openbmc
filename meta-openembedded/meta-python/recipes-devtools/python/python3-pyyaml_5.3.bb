@@ -13,6 +13,7 @@ SRC_URI[sha256sum] = "e9f45bd5b92c7974e59bcd2dcc8631a6b6cc380a904725fce7bc08872e
 
 RDEPENDS_${PN} += "\
     ${PYTHON_PN}-datetime \
+    ${PYTHON_PN}-netclient \
 "
 
 BBCLASSEXTEND = "native nativesdk"

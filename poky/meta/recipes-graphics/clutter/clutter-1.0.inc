@@ -11,7 +11,7 @@ REQUIRED_DISTRO_FEATURES ?= "opengl"
 
 DEPENDS = "pango glib-2.0 json-glib atk udev cogl-1.0"
 PACKAGE_BEFORE_PN += "${PN}-examples"
-AUTOTOOLS_AUXDIR = "${S}/build-aux"
+AUTOTOOLS_AUXDIR = "${S}/build"
 
 EDEPENDS_X11 = "virtual/libx11 libxi libxfixes"
 EDEPENDS_GLX = "virtual/libgl"

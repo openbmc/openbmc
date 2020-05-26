@@ -1,4 +1,4 @@
-From 0797a40627a4cb5439a24b872edc65356dceaaf0 Mon Sep 17 00:00:00 2001
+From 60b36289ac314ad972cf81c1acd19f6f2e58ff25 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 15 Feb 2019 11:17:27 +0100
 Subject: [PATCH] Do not write $bindir into pkg-config files
@@ -16,13 +16,13 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  2 files changed, 11 insertions(+), 11 deletions(-)
 
 diff --git a/gio/meson.build b/gio/meson.build
-index 532b086..98468a3 100644
+index 71e88c4..8ce3987 100644
 --- a/gio/meson.build
 +++ b/gio/meson.build
-@@ -820,14 +820,14 @@ pkg.generate(libgio,
+@@ -831,14 +831,14 @@ pkg.generate(libgio,
                 'schemasdir=' + join_paths('${datadir}', schemas_subdir),
                 'bindir=' + join_paths('${prefix}', get_option('bindir')),
-                'giomoduledir=' + pkgconfig_giomodulesdir,
+                'giomoduledir=' + giomodulesdir,
 -               'gio=' + join_paths('${bindir}', 'gio'),
 -               'gio_querymodules=' + join_paths('${bindir}', 'gio-querymodules'),
 -               'glib_compile_schemas=' + join_paths('${bindir}', 'glib-compile-schemas'),
@@ -43,7 +43,7 @@ index 532b086..98468a3 100644
    install_dir : glib_pkgconfigreldir,
    filebase : 'gio-2.0',
 diff --git a/glib/meson.build b/glib/meson.build
-index aaf5f00..1e0992b 100644
+index 91a48f1..978fb73 100644
 --- a/glib/meson.build
 +++ b/glib/meson.build
 @@ -375,9 +375,9 @@ pkg.generate(libglib,

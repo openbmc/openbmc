@@ -690,7 +690,10 @@ def sstate_package(ss, d):
     if not os.path.exists(siginfo):
         bb.siggen.dump_this_task(siginfo, d)
     else:
-        os.utime(siginfo, None)
+        try:
+            os.utime(siginfo, None)
+        except PermissionError:
+            pass
 
     return
 
@@ -776,7 +779,7 @@ sstate_task_postfunc[dirs] = "${WORKDIR}"
 sstate_create_package () {
 	# Exit early if it already exists
 	if [ -e ${SSTATE_PKG} ]; then
-		touch ${SSTATE_PKG}
+		[ ! -w ${SSTATE_PKG} ] || touch ${SSTATE_PKG}
 		return
 	fi
 
@@ -810,7 +813,7 @@ sstate_create_package () {
 	else
 		rm $TFILE
 	fi
-	touch ${SSTATE_PKG}
+	[ ! -w ${SSTATE_PKG} ] || touch ${SSTATE_PKG}
 }
 
 python sstate_sign_package () {
@@ -1122,7 +1125,11 @@ python sstate_eventhandler() {
         if not os.path.exists(siginfo):
             bb.siggen.dump_this_task(siginfo, d)
         else:
-            os.utime(siginfo, None)
+            try:
+                os.utime(siginfo, None)
+            except PermissionError:
+                pass
+
 }
 
 SSTATE_PRUNE_OBSOLETEWORKDIR ?= "1"

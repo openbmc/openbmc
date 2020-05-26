@@ -49,11 +49,7 @@ class PtestRunnerTest(OERuntimeTestCase):
         ptest_log_dir = '%s.%s' % (ptest_log_dir_link, timestamp)
         ptest_runner_log = os.path.join(ptest_log_dir, 'ptest-runner.log')
 
-        libdir = self.td.get('libdir', '')
-        ptest_dirs = [ '/usr/lib' ]
-        if not libdir in ptest_dirs:
-            ptest_dirs.append(libdir)
-        status, output = self.target.run('ptest-runner -d \"{}\"'.format(' '.join(ptest_dirs)), 0)
+        status, output = self.target.run('ptest-runner', 0)
         os.makedirs(ptest_log_dir)
         with open(ptest_runner_log, 'w') as f:
             f.write(output)

@@ -31,7 +31,6 @@ class Partition():
         self.extra_space = args.extra_space
         self.exclude_path = args.exclude_path
         self.include_path = args.include_path
-        self.change_directory = args.change_directory
         self.fsopts = args.fsopts
         self.fstype = args.fstype
         self.label = args.label
@@ -191,7 +190,7 @@ class Partition():
                            (self.mountpoint, self.size, self.fixed_size))
 
     def prepare_rootfs(self, cr_workdir, oe_builddir, rootfs_dir,
-                       native_sysroot, real_rootfs = True, pseudo_dir = None):
+                       native_sysroot, real_rootfs = True):
         """
         Prepare content for a rootfs partition i.e. create a partition
         and fill it from a /rootfs dir.
@@ -199,14 +198,15 @@ class Partition():
         Currently handles ext2/3/4, btrfs, vfat and squashfs.
         """
         p_prefix = os.environ.get("PSEUDO_PREFIX", "%s/usr" % native_sysroot)
-        if (pseudo_dir):
-            pseudo = "export PSEUDO_PREFIX=%s;" % p_prefix
-            pseudo += "export PSEUDO_LOCALSTATEDIR=%s;" % pseudo_dir
-            pseudo += "export PSEUDO_PASSWD=%s;" % rootfs_dir
-            pseudo += "export PSEUDO_NOSYMLINKEXP=1;"
-            pseudo += "%s " % get_bitbake_var("FAKEROOTCMD")
-        else:
-            pseudo = None
+        p_localstatedir = os.environ.get("PSEUDO_LOCALSTATEDIR",
+                                         "%s/../pseudo" %  rootfs_dir)
+        p_passwd = os.environ.get("PSEUDO_PASSWD", rootfs_dir)
+        p_nosymlinkexp = os.environ.get("PSEUDO_NOSYMLINKEXP", "1")
+        pseudo = "export PSEUDO_PREFIX=%s;" % p_prefix
+        pseudo += "export PSEUDO_LOCALSTATEDIR=%s;" % p_localstatedir
+        pseudo += "export PSEUDO_PASSWD=%s;" % p_passwd
+        pseudo += "export PSEUDO_NOSYMLINKEXP=%s;" % p_nosymlinkexp
+        pseudo += "%s " % get_bitbake_var("FAKEROOTCMD")
 
         rootfs = "%s/rootfs_%s.%s.%s" % (cr_workdir, self.label,
                                          self.lineno, self.fstype)

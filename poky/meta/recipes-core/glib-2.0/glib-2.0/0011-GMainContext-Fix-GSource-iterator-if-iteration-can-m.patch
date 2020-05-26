@@ -1,0 +1,43 @@
+From ef2be42998e3fc10299055a5a01f7c791538174c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
+Date: Mon, 3 Feb 2020 15:38:28 +0200
+Subject: [PATCH] GMainContext - Fix GSource iterator if iteration can modify
+ the list
+
+We first have to ref the next source and then unref the previous one.
+This might be the last reference to the previous source, and freeing the
+previous source might unref and free the next one which would then leave
+use with a dangling pointer here.
+
+Fixes https://gitlab.gnome.org/GNOME/glib/issues/2031
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/glib/-/commit/b06c48de7554607ff3fb58d6c0510cfa5088e909]
+
+---
+ glib/gmain.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/glib/gmain.c b/glib/gmain.c
+index af979c8..a9a287d 100644
+--- a/glib/gmain.c
++++ b/glib/gmain.c
+@@ -969,13 +969,17 @@ g_source_iter_next (GSourceIter *iter, GSource **source)
+    * GSourceList to be removed from source_lists (if iter->source is
+    * the only source in its list, and it is destroyed), so we have to
+    * keep it reffed until after we advance iter->current_list, above.
++   *
++   * Also we first have to ref the next source before unreffing the
++   * previous one as unreffing the previous source can potentially
++   * free the next one.
+    */
++  if (next_source && iter->may_modify)
++    g_source_ref (next_source);
+
+   if (iter->source && iter->may_modify)
+     g_source_unref_internal (iter->source, iter->context, TRUE);
+   iter->source = next_source;
+-  if (iter->source && iter->may_modify)
+-    g_source_ref (iter->source);
+
+   *source = iter->source;
+   return *source != NULL;

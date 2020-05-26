@@ -1,0 +1,110 @@
+From 0d677a014a87b968d79eea2353ac4e342b0fd4ca Mon Sep 17 00:00:00 2001
+From: Sergei Trofimovich <slyfox@gentoo.org>
+Date: Wed, 11 Sep 2019 22:58:18 +0100
+Subject: [PATCH] Ticket #3629: configure.ac: drop bundled gettext
+
+Bundled libintl did not support linking to internal static
+libraries (libmc in our case): directly specified static
+libraries are not pulled by libtool and are not usable for
+dynamic libraries as PIC-related flags are not passed for
+compilation.
+
+This renders bundled libintl library unusable.
+
+The change drops libintl bundling support and always relies
+on external libintl (or falls back to disabled NLS).
+
+On a related note gettext-0.20 drops support for bundling
+or libintl and this change will ease migration to newer version.
+
+The change is tested on x86_64-gentoo-linux-musl: mc builds
+and links all tests successfully. A few tests fail for lack
+of NLS support.
+
+Upstream-Status: Backport [https://github.com/MidnightCommander/mc/commit/f30e6ff283f4bc86177e4360de94dad794678395]
+Signed-off-by: Sergei Trofimovich <slyfox@gentoo.org>
+Signed-off-by: Andrew Borodin <aborodin@vmail.ru>
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ Makefile.am           | 2 +-
+ configure.ac          | 5 +++--
+ doc/doxygen.cfg       | 2 +-
+ lib/Makefile.am       | 2 +-
+ m4.include/mc-i18n.m4 | 5 -----
+ 5 files changed, 6 insertions(+), 10 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index ac05a83..f86f6ed 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,7 +1,7 @@
+ ## Process this file with automake to create Makefile.in.
+ AUTOMAKE_OPTIONS = 1.5
+ 
+-SUBDIRS = intl po lib src doc contrib misc
++SUBDIRS = po lib src doc contrib misc
+ 
+ if HAVE_TESTS
+     SUBDIRS += tests
+diff --git a/configure.ac b/configure.ac
+index a1948f6..bbc9e71 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -272,7 +272,9 @@ dnl ############################################################################
+ dnl Internationalization
+ dnl ############################################################################
+ 
+-AM_GNU_GETTEXT([no-libtool], [need-ngettext])
++AC_CHECK_FUNCS([setlocale])
++
++AM_GNU_GETTEXT([external], [need-ngettext])
+ AM_GNU_GETTEXT_VERSION([0.18.1])
+ 
+ mc_I18N
+@@ -680,7 +682,6 @@ doc/hlp/pl/Makefile
+ doc/hlp/ru/Makefile
+ doc/hlp/sr/Makefile
+ 
+-intl/Makefile
+ po/Makefile.in
+ ])
+ 
+diff --git a/doc/doxygen.cfg b/doc/doxygen.cfg
+index 07bc973..1118062 100644
+--- a/doc/doxygen.cfg
++++ b/doc/doxygen.cfg
+@@ -91,7 +91,7 @@ FILE_PATTERNS          = *.c \
+ RECURSIVE              = YES
+ EXCLUDE                =
+ EXCLUDE_SYMLINKS       = NO
+-EXCLUDE_PATTERNS       = */intl/* */tests/* */.git/*
++EXCLUDE_PATTERNS       = */tests/* */.git/*
+ EXCLUDE_SYMBOLS        =
+ EXAMPLE_PATH           = $(SRCDIR)
+ EXAMPLE_PATTERNS       =
+diff --git a/lib/Makefile.am b/lib/Makefile.am
+index c448e2d..455f9dd 100644
+--- a/lib/Makefile.am
++++ b/lib/Makefile.am
+@@ -74,4 +74,4 @@ else
+     libmc_la_LIBADD += $(GLIB_LIBS)
+ endif
+ 
+-libmc_la_LIBADD += $(PCRE_LIBS) $(LIBICONV) $(LIBINTL)
++libmc_la_LIBADD += $(PCRE_LIBS)
+diff --git a/m4.include/mc-i18n.m4 b/m4.include/mc-i18n.m4
+index dd10d00..ec08324 100644
+--- a/m4.include/mc-i18n.m4
++++ b/m4.include/mc-i18n.m4
+@@ -8,11 +8,6 @@ dnl @license GPL
+ dnl @copyright Free Software Foundation, Inc.
+ 
+ AC_DEFUN([mc_I18N],[
+-
+-    if test "x$USE_INCLUDED_LIBINTL" = xyes; then
+-        CPPFLAGS="$CPPFLAGS -I\$(top_builddir)/intl -I\$(top_srcdir)/intl"
+-    fi
+-
+     dnl User visible support for charset conversion.
+     AC_ARG_ENABLE([charset],
+         AS_HELP_STRING([--enable-charset], [Support for charset selection and conversion @<:@yes@:>@]))

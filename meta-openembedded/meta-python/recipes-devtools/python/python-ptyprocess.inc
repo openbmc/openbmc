@@ -15,6 +15,9 @@ S = "${WORKDIR}/${SRCNAME}-${PV}"
 
 RDEPENDS_${PN} = "\
     ${PYTHON_PN}-core \
+    ${PYTHON_PN}-fcntl \
+    ${PYTHON_PN}-terminal \
+    ${PYTHON_PN}-resource \
 "
 
 BBCLASSEXTEND = "native nativesdk"

@@ -503,7 +503,7 @@
                         </literallayout>
                         or run the BitBake command to build the extended tarball:
                         <literallayout class='monospaced'>
-     $ bitbake buildtools-extended-tarball
+                            $ bitbake buildtools-extended-tarball
                         </literallayout>
                         <note>
                         The
@@ -535,7 +535,7 @@
                        </literallayout>
                        Here is an example for the extended installer:
                        <literallayout class='monospaced'>
-     $ sh ~/Downloads/x86_64-buildtools-extended-nativesdk-standalone-&DISTRO;.sh
+                           $ sh ~/Downloads/x86_64-buildtools-extended-nativesdk-standalone-&DISTRO;.sh
                        </literallayout>
                        During execution, a prompt appears that allows you to
                        choose the installation directory.

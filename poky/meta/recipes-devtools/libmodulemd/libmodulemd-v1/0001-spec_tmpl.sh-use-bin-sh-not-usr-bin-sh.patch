@@ -1,0 +1,22 @@
+From 4e67f6049b3f822fe6f5af46790a51ace581bf82 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 6 Nov 2018 13:41:29 +0100
+Subject: [PATCH] spec_tmpl.sh: use /bin/sh, not /usr/bin/sh
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+---
+ spec_tmpl.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/spec_tmpl.sh b/spec_tmpl.sh
+index 0238087..126853c 100755
+--- a/spec_tmpl.sh
++++ b/spec_tmpl.sh
+@@ -1,4 +1,4 @@
+-#!/usr/bin/sh
++#!/bin/sh
+ 
+ version=$1
+ template=$2

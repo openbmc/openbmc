@@ -1196,10 +1196,6 @@ class BaseConfig(object):
         else:
             self.rootfs_options = '-drive file=%s,if=virtio,format=%s' % (self.rootfs, rootfs_format)
 
-        qb_rootfs_extra_opt = self.get("QB_ROOTFS_EXTRA_OPT")
-        if qb_rootfs_extra_opt and not qb_rootfs_extra_opt.startswith(","):
-            qb_rootfs_extra_opt = "," + qb_rootfs_extra_opt
-
         if self.fstype in ('cpio.gz', 'cpio'):
             self.kernel_cmdline = 'root=/dev/ram0 rw debugshell'
             self.rootfs_options = '-initrd %s' % self.rootfs
@@ -1212,15 +1208,14 @@ class BaseConfig(object):
                     drive_type = self.get('QB_DRIVE_TYPE')
                     if drive_type.startswith("/dev/sd"):
                         logger.info('Using scsi drive')
-                        vm_drive = '-drive if=none,id=hd,file=%s,format=%s -device virtio-scsi-pci,id=scsi -device scsi-hd,drive=hd%s' \
-                                       % (self.rootfs, rootfs_format, qb_rootfs_extra_opt)
+                        vm_drive = '-drive if=none,id=hd,file=%s,format=%s -device virtio-scsi-pci,id=scsi -device scsi-hd,drive=hd' \
+                                       % (self.rootfs, rootfs_format)
                     elif drive_type.startswith("/dev/hd"):
                         logger.info('Using ide drive')
                         vm_drive = "-drive file=%s,format=%s" % (self.rootfs, rootfs_format)
                     elif drive_type.startswith("/dev/vdb"):
                         logger.info('Using block virtio drive');
-                        vm_drive = '-drive id=disk0,file=%s,if=none,format=%s -device virtio-blk-device,drive=disk0%s' \
-                                    % (self.rootfs, rootfs_format,qb_rootfs_extra_opt)
+                        vm_drive = '-drive id=disk0,file=%s,if=none,format=%s -device virtio-blk-device,drive=disk0' % (self.rootfs, rootfs_format)
                     else:
                         # virtio might have been selected explicitly (just use it), or
                         # is used as fallback (then warn about that).

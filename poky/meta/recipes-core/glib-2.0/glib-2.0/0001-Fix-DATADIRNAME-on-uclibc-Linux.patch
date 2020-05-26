@@ -1,4 +1,4 @@
-From c94e669de98a3892c699bd8d0d2b5164b2de747e Mon Sep 17 00:00:00 2001
+From 15f807481de53942525b48952c5b6bbb9fb66542 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 15 Mar 2014 22:42:29 -0700
 Subject: [PATCH] Fix DATADIRNAME on uclibc/Linux
@@ -9,7 +9,7 @@ based systems therefore lets set DATADIRNAME to "share".
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Upstream-Status: Pending
 
-
+%% original patch: uclibc_musl_translation.patch
 ---
  m4macros/glib-gettext.m4 | 4 ++++
  1 file changed, 4 insertions(+)
@@ -29,3 +29,6 @@ index df6fbf0..47db864 100644
  	    *)
  	    CATOBJEXT=.mo
              DATADIRNAME=lib
+-- 
+2.17.1
+

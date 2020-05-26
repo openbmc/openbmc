@@ -17,8 +17,8 @@ index 24578ea..216e71f 100644
 --- a/mesonbuild/envconfig.py
 +++ b/mesonbuild/envconfig.py
 @@ -36,6 +36,7 @@ _T = typing.TypeVar('_T')
-
-
+ 
+ 
  known_cpu_families = (
 +    'allarch',
      'aarch64',

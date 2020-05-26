@@ -97,6 +97,11 @@ do_start()
             return 1
     fi
 
+    mkdir -p /var/log/apache2
+    chmod -R 0755 /var/log/apache2
+    mkdir -p /var/run/apache2
+    chmod -R 0755 /var/run/apache2
+
     if apache_conftest ; then
             $APACHECTL start
             apache_wait_start $?

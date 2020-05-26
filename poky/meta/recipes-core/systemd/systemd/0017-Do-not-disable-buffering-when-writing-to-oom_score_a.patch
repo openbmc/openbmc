@@ -1,4 +1,4 @@
-From bb28a9c870bb47dcdb1ccebaa8e3a5a86730a244 Mon Sep 17 00:00:00 2001
+From a6f3359042219abaa8ae06dfcce41a4721e8c21f Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Wed, 4 Jul 2018 15:00:44 +0800
 Subject: [PATCH] Do not disable buffering when writing to oom_score_adj
@@ -25,10 +25,10 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/basic/process-util.c b/src/basic/process-util.c
-index 644f53aee005..acaf13591396 100644
+index 24fec5ecb53a..642b02443c85 100644
 --- a/src/basic/process-util.c
 +++ b/src/basic/process-util.c
-@@ -1500,7 +1500,7 @@ int set_oom_score_adjust(int value) {
+@@ -1492,7 +1492,7 @@ int set_oom_score_adjust(int value) {
          sprintf(t, "%i", value);
  
          return write_string_file("/proc/self/oom_score_adj", t,
@@ -36,4 +36,4 @@ index 644f53aee005..acaf13591396 100644
 +                                 WRITE_STRING_FILE_VERIFY_ON_FAILURE);
  }
  
- int pidfd_get_pid(int fd, pid_t *ret) {
+ static const char *const ioprio_class_table[] = {

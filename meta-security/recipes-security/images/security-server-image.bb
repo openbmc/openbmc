@@ -6,8 +6,7 @@ IMAGE_INSTALL = "\
     packagegroup-base \
     packagegroup-core-boot \
     samhain-server \
-    os-release \
-    ${ROOTFS_PKGMANAGE_BOOTSTRAP} ${CORE_IMAGE_EXTRA_INSTALL}"
+    os-release "
 
 IMAGE_LINGUAS ?= " "
 

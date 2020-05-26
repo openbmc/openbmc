@@ -1,4 +1,4 @@
-From f39c28eb52f12ae6e82db360ffd5a903ac8faca5 Mon Sep 17 00:00:00 2001
+From 87cfc0db1ed6fe381a5ed5f0016d8c3344a31a11 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 9 Jan 2017 18:52:11 +0200
 Subject: [PATCH] Do not add an unsatisfiable dependency when building rpms in
@@ -9,23 +9,25 @@ hand produces rpms that way by design.
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
 ---
  build/pack.c | 4 ----
  1 file changed, 4 deletions(-)
 
 diff --git a/build/pack.c b/build/pack.c
-index e6cec1816..810cd7351 100644
+index 1261cdbba..bb2d6f4f6 100644
 --- a/build/pack.c
 +++ b/build/pack.c
-@@ -724,10 +724,6 @@ static rpmRC packageBinary(rpmSpec spec, Package pkg, const char *cookie, int ch
- 	headerPutBin(pkg->header, RPMTAG_SOURCEPKGID, spec->sourcePkgId,16);
-     }
+@@ -595,10 +595,6 @@ rpmRC packageBinaries(rpmSpec spec, const char *cookie, int cheating)
+ 	    headerPutBin(pkg->header, RPMTAG_SOURCEPKGID, spec->sourcePkgId,16);
+ 	}
  
--    if (cheating) {
--	(void) rpmlibNeedsFeature(pkg, "ShortCircuited", "4.9.0-1");
--    }
--
-     if ((rc = getPkgFilename(pkg->header, filename)))
- 	return rc;
- 
+-	if (cheating) {
+-	    (void) rpmlibNeedsFeature(pkg, "ShortCircuited", "4.9.0-1");
+-	}
+-	
+ 	{   char *binFormat = rpmGetPath("%{_rpmfilename}", NULL);
+ 	    char *binRpm, *binDir;
+ 	    binRpm = headerFormat(pkg->header, binFormat, &errorString);
+-- 
+2.11.0
+

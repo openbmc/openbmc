@@ -23,19 +23,15 @@ SRC_URI[sha256sum] = "6c57eb642d828af2411aa38f55dc10111e8c98976dbab8fd62e4862940
 
 UPSTREAM_CHECK_URI = "https://github.com/intel/libva/releases"
 
-DEPENDS = "libdrm"
+DEPENDS = "libdrm virtual/mesa"
 
 inherit meson pkgconfig features_check
 
-PACKAGECONFIG ??= " \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'x11 opengl', 'glx', '', d)} \
-    ${@bb.utils.filter('DISTRO_FEATURES', 'x11 wayland', d)} \
-"
+REQUIRED_DISTRO_FEATURES = "opengl"
 
-PACKAGECONFIG[x11] = "-Dwith_x11=yes,-Dwith_x11=no,virtual/libx11 libxext libxfixes"
-PACKAGECONFIG[glx] = "-Dwith_glx=yes,-Dwith_glx=no,virtual/mesa"
-
-PACKAGECONFIG[wayland] = "-Dwith_wayland=yes,-Dwith_wayland=no,wayland-native wayland"
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'wayland x11', d)}"
+PACKAGECONFIG[x11] = "-Dwith_x11=yes, -Dwith_x11=no,virtual/libx11 libxext libxfixes"
+PACKAGECONFIG[wayland] = "-Dwith_wayland=yes, -Dwith_wayland=no,wayland-native wayland"
 
 PACKAGES =+ "${PN}-x11 ${PN}-glx ${PN}-wayland"
 

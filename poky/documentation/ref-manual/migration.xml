@@ -875,7 +875,8 @@
                     not work.
                     This change is intended to catch those kinds of situations.
                     Valid <filename>IMAGE_FEATURES</filename> are drawn from
-                    <filename>PACKAGE_GROUP</filename> definitions,
+                    <link linkend='var-PACKAGE_GROUP'><filename>PACKAGE_GROUP</filename></link>
+                    definitions,
                     <link linkend='var-COMPLEMENTARY_GLOB'><filename>COMPLEMENTARY_GLOB</filename></link>
                     and a new "validitems" varflag on
                     <filename>IMAGE_FEATURES</filename>.
@@ -1403,7 +1404,8 @@
 
             <para>
                 The
-                <filename>PACKAGE_GROUP</filename> variable has been renamed to
+                <link linkend='var-PACKAGE_GROUP'><filename>PACKAGE_GROUP</filename></link>
+                variable has been renamed to
                 <link linkend='var-FEATURE_PACKAGES'><filename>FEATURE_PACKAGES</filename></link>
                 to more accurately reflect its purpose.
                 You can still use <filename>PACKAGE_GROUP</filename> but

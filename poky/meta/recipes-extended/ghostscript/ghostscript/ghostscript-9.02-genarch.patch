@@ -1,0 +1,38 @@
+From c076d0fc970f190f723018258790c79b59daba2e Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Sat, 11 May 2019 21:20:27 +0800
+Subject: [PATCH] not generate objarch.h at compile time
+
+Import patch from windriver linux for cross compilation, and split
+patches into oe way under different directories such as i586, powerpc etc
+according to Richard's opinion.
+
+Upstream-Status: Pending
+
+Signed-off-by: Kang Kai <kai.kang@windriver.com>
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+
+Rebase to 9.27
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ base/lib.mak | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/base/lib.mak b/base/lib.mak
+index 3ed088a..5af2b43 100644
+--- a/base/lib.mak
++++ b/base/lib.mak
+@@ -87,8 +87,8 @@ arch_h=$(GLGEN)arch.h
+ stdpre_h=$(GLSRC)stdpre.h
+ stdint__h=$(GLSRC)stdint_.h
+ 
+-$(GLGEN)arch.h : $(GENARCH_XE)
+-	$(EXP)$(GENARCH_XE) $(GLGEN)arch.h $(TARGET_ARCH_FILE)
++##$(GLGEN)arch.h : $(GENARCH_XE)
++##	$(EXP)$(GENARCH_XE) $(GLGEN)arch.h $(TARGET_ARCH_FILE)
+ 
+ # Platform interfaces
+ 
+-- 
+2.7.4
+

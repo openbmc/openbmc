@@ -1,4 +1,4 @@
-From 62fac5e3ff0fccd329cdc49605258b6d0e573a3e Mon Sep 17 00:00:00 2001
+From 7874912817b5ac7ed7f8557359a12d9d4b2f53eb Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Wed, 28 Feb 2018 21:25:22 -0800
 Subject: [PATCH] test-sizeof.c: Disable tests for missing typedefs in musl
@@ -13,10 +13,10 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  1 file changed, 4 insertions(+)
 
 diff --git a/src/test/test-sizeof.c b/src/test/test-sizeof.c
-index 1020e0cb3153..c65062d2562c 100644
+index 7fc16a62b656..a710db5370b8 100644
 --- a/src/test/test-sizeof.c
 +++ b/src/test/test-sizeof.c
-@@ -44,8 +44,10 @@ int main(void) {
+@@ -42,8 +42,10 @@ int main(void) {
          info(unsigned);
          info(long unsigned);
          info(long long unsigned);
@@ -27,7 +27,7 @@ index 1020e0cb3153..c65062d2562c 100644
  
          info(float);
          info(double);
-@@ -63,7 +65,9 @@ int main(void) {
+@@ -61,7 +63,9 @@ int main(void) {
          info(ssize_t);
          info(time_t);
          info(usec_t);

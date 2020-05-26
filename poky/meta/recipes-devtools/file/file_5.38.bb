@@ -8,8 +8,8 @@ SECTION = "console/utils"
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;beginline=2;md5=0251eaec1188b20d9a72c502ecfdda1b"
 
-DEPENDS = "zlib file-replacement-native"
-DEPENDS_class-native = "zlib-native"
+DEPENDS = "file-replacement-native"
+DEPENDS_class-native = ""
 
 SRC_URI = "git://github.com/file/file.git"
 
@@ -17,6 +17,12 @@ SRCREV = "ec41083645689a787cdd00cb3b5bf578aa79e46c"
 S = "${WORKDIR}/git"
 
 inherit autotools update-alternatives
+
+PACKAGECONFIG ??= "zlib"
+PACKAGECONFIG_class-native ??= "zlib"
+PACKAGECONFIG[bz2] = "--enable-bzlib, --disable-bzlib, bzip2"
+PACKAGECONFIG[lzma] = "--enable-xzlib, --disable-xzlib, xz"
+PACKAGECONFIG[zlib] = "--enable-zlib, --disable-zlib, zlib"
 
 EXTRA_OECONF += "--disable-libseccomp"
 

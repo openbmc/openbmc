@@ -49,11 +49,4 @@ do_install_append() {
         -e 's,@SBINDIR@,${sbindir},g' \
         ${D}${sysconfdir}/init.d/rng-tools \
         ${D}${systemd_system_unitdir}/rngd.service
-
-    if [ "${@bb.utils.contains('PACKAGECONFIG', 'nistbeacon', 'yes', 'no', d)}" = "yes" ]; then
-        sed -i \
-            -e '/^IPAddressDeny=any/d' \
-            -e '/^RestrictAddressFamilies=/ s/$/ AF_INET AF_INET6/' \
-            ${D}${systemd_system_unitdir}/rngd.service
-    fi
 }

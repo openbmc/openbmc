@@ -45,8 +45,7 @@ NATIVE_RECIPES = {"bmaptool": "bmap-tools",
                   "parted": "parted",
                   "sfdisk": "util-linux",
                   "sgdisk": "gptfdisk",
-                  "syslinux": "syslinux",
-                  "tar": "tar"
+                  "syslinux": "syslinux"
                  }
 
 def runtool(cmdln_or_args):
@@ -113,15 +112,6 @@ def exec_cmd(cmd_and_args, as_shell=False):
     """
     return _exec_cmd(cmd_and_args, as_shell)[1]
 
-def find_executable(cmd, paths):
-    recipe = cmd
-    if recipe in NATIVE_RECIPES:
-        recipe =  NATIVE_RECIPES[recipe]
-    provided = get_bitbake_var("ASSUME_PROVIDED")
-    if provided and "%s-native" % recipe in provided:
-        return True
-
-    return spawn.find_executable(cmd, paths)
 
 def exec_native_cmd(cmd_and_args, native_sysroot, pseudo=""):
     """
@@ -146,7 +136,7 @@ def exec_native_cmd(cmd_and_args, native_sysroot, pseudo=""):
     logger.debug("exec_native_cmd: %s", native_cmd_and_args)
 
     # If the command isn't in the native sysroot say we failed.
-    if find_executable(args[0], native_paths):
+    if spawn.find_executable(args[0], native_paths):
         ret, out = _exec_cmd(native_cmd_and_args, True)
     else:
         ret = 127

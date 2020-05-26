@@ -37,7 +37,6 @@ do_install(){
 # Borrowed from meta-freertos
 inherit rootfs-postcommands
 inherit deploy
-IMGDEPLOYDIR ?= "${WORKDIR}/deploy-${PN}-image-complete"
 do_deploy[dirs] = "${DEPLOYDIR} ${DEPLOY_DIR_IMAGE}"
 do_rootfs[dirs] = "${DEPLOYDIR} ${DEPLOY_DIR_IMAGE}"
 DEPLOYDIR = "${IMGDEPLOYDIR}"

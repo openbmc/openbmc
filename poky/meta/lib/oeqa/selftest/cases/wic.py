@@ -62,12 +62,6 @@ def extract_files(debugfs_output):
     return [line.split('/')[5].strip() for line in \
             debugfs_output.strip().split('/\n')]
 
-def files_own_by_root(debugfs_output):
-    for line in debugfs_output.strip().split('/\n'):
-        if line.split('/')[3:5] != ['0', '0']:
-            print(debugfs_output)
-            return False
-    return True
 
 class WicTestCase(OESelftestTestCase):
     """Wic test class."""
@@ -90,7 +84,6 @@ class WicTestCase(OESelftestTestCase):
                 self.skipTest('wic-tools cannot be built due its (intltool|gettext)-native dependency and NLS disable')
 
             bitbake('core-image-minimal')
-            bitbake('core-image-minimal-mtdutils')
             WicTestCase.image_is_ready = True
 
         rmtree(self.resultdir, ignore_errors=True)
@@ -486,75 +479,14 @@ part /part2 --source rootfs --ondisk mmcblk0 --fstype=ext4 --include-path %s"""
             res = runCmd("debugfs -R 'ls -p' %s 2>/dev/null" % (part1))
             files = extract_files(res.output)
             self.assertNotIn('test-file', files)
-            self.assertEqual(True, files_own_by_root(res.output))
 
-            # Test partition 2, should contain 'test-file'
+            # Test partition 2, should not contain 'test-file'
             res = runCmd("debugfs -R 'ls -p' %s 2>/dev/null" % (part2))
             files = extract_files(res.output)
             self.assertIn('test-file', files)
-            self.assertEqual(True, files_own_by_root(res.output))
 
         finally:
             os.environ['PATH'] = oldpath
-
-    def test_include_path_embeded(self):
-        """Test --include-path wks option."""
-
-        oldpath = os.environ['PATH']
-        os.environ['PATH'] = get_bb_var("PATH", "wic-tools")
-
-        try:
-            include_path = os.path.join(self.resultdir, 'test-include')
-            os.makedirs(include_path)
-            with open(os.path.join(include_path, 'test-file'), 'w') as t:
-                t.write("test\n")
-            wks_file = os.path.join(include_path, 'temp.wks')
-            with open(wks_file, 'w') as wks:
-                wks.write("""
-part / --source rootfs  --fstype=ext4 --include-path %s --include-path core-image-minimal-mtdutils export/"""
-                          % (include_path))
-            runCmd("wic create %s -e core-image-minimal -o %s" \
-                                       % (wks_file, self.resultdir))
-
-            part1 = glob(os.path.join(self.resultdir, 'temp-*.direct.p1'))[0]
-
-            res = runCmd("debugfs -R 'ls -p' %s 2>/dev/null" % (part1))
-            files = extract_files(res.output)
-            self.assertIn('test-file', files)
-            self.assertEqual(True, files_own_by_root(res.output))
-
-            res = runCmd("debugfs -R 'ls -p /export/etc/' %s 2>/dev/null" % (part1))
-            files = extract_files(res.output)
-            self.assertIn('passwd', files)
-            self.assertEqual(True, files_own_by_root(res.output))
-
-        finally:
-            os.environ['PATH'] = oldpath
-
-    def test_include_path_errors(self):
-        """Test --include-path wks option error handling."""
-        wks_file = 'temp.wks'
-
-        # Absolute argument.
-        with open(wks_file, 'w') as wks:
-            wks.write("part / --source rootfs --fstype=ext4 --include-path core-image-minimal-mtdutils /export")
-        self.assertNotEqual(0, runCmd("wic create %s -e core-image-minimal -o %s" \
-                                      % (wks_file, self.resultdir), ignore_status=True).status)
-        os.remove(wks_file)
-
-        # Argument pointing to parent directory.
-        with open(wks_file, 'w') as wks:
-            wks.write("part / --source rootfs --fstype=ext4 --include-path core-image-minimal-mtdutils ././..")
-        self.assertNotEqual(0, runCmd("wic create %s -e core-image-minimal -o %s" \
-                                      % (wks_file, self.resultdir), ignore_status=True).status)
-        os.remove(wks_file)
-
-        # 3 Argument pointing to parent directory.
-        with open(wks_file, 'w') as wks:
-            wks.write("part / --source rootfs --fstype=ext4 --include-path core-image-minimal-mtdutils export/ dummy")
-        self.assertNotEqual(0, runCmd("wic create %s -e core-image-minimal -o %s" \
-                                      % (wks_file, self.resultdir), ignore_status=True).status)
-        os.remove(wks_file)
 
     def test_exclude_path_errors(self):
         """Test --exclude-path wks option error handling."""
@@ -570,89 +502,6 @@ part / --source rootfs  --fstype=ext4 --include-path %s --include-path core-imag
         # Argument pointing to parent directory.
         with open(wks_file, 'w') as wks:
             wks.write("part / --source rootfs --ondisk mmcblk0 --fstype=ext4 --exclude-path ././..")
-        self.assertNotEqual(0, runCmd("wic create %s -e core-image-minimal -o %s" \
-                                      % (wks_file, self.resultdir), ignore_status=True).status)
-        os.remove(wks_file)
-
-    def test_permissions(self):
-        """Test permissions are respected"""
-
-        oldpath = os.environ['PATH']
-        os.environ['PATH'] = get_bb_var("PATH", "wic-tools")
-
-        t_normal = """
-part / --source rootfs --fstype=ext4
-"""
-        t_exclude = """
-part / --source rootfs --fstype=ext4 --exclude-path=home
-"""
-        t_multi = """
-part / --source rootfs --ondisk sda --fstype=ext4
-part /export --source rootfs --rootfs=core-image-minimal-mtdutils --fstype=ext4
-"""
-        t_change = """
-part / --source rootfs --ondisk sda --fstype=ext4 --exclude-path=etc/   
-part /etc --source rootfs --fstype=ext4 --change-directory=etc
-"""
-        tests = [t_normal, t_exclude, t_multi, t_change]
-
-        try:
-            for test in tests:
-                include_path = os.path.join(self.resultdir, 'test-include')
-                os.makedirs(include_path)
-                wks_file = os.path.join(include_path, 'temp.wks')
-                with open(wks_file, 'w') as wks:
-                    wks.write(test)
-                runCmd("wic create %s -e core-image-minimal -o %s" \
-                                       % (wks_file, self.resultdir))
-
-                for part in glob(os.path.join(self.resultdir, 'temp-*.direct.p*')):
-                    res = runCmd("debugfs -R 'ls -p' %s 2>/dev/null" % (part))
-                    self.assertEqual(True, files_own_by_root(res.output))
-
-                rmtree(self.resultdir, ignore_errors=True)
-
-        finally:
-            os.environ['PATH'] = oldpath
-
-    def test_change_directory(self):
-        """Test --change-directory wks option."""
-
-        oldpath = os.environ['PATH']
-        os.environ['PATH'] = get_bb_var("PATH", "wic-tools")
-
-        try:
-            include_path = os.path.join(self.resultdir, 'test-include')
-            os.makedirs(include_path)
-            wks_file = os.path.join(include_path, 'temp.wks')
-            with open(wks_file, 'w') as wks:
-                wks.write("part /etc --source rootfs --fstype=ext4 --change-directory=etc")
-            runCmd("wic create %s -e core-image-minimal -o %s" \
-                                       % (wks_file, self.resultdir))
-
-            part1 = glob(os.path.join(self.resultdir, 'temp-*.direct.p1'))[0]
-
-            res = runCmd("debugfs -R 'ls -p' %s 2>/dev/null" % (part1))
-            files = extract_files(res.output)
-            self.assertIn('passwd', files)
-
-        finally:
-            os.environ['PATH'] = oldpath
-
-    def test_change_directory_errors(self):
-        """Test --change-directory wks option error handling."""
-        wks_file = 'temp.wks'
-
-        # Absolute argument.
-        with open(wks_file, 'w') as wks:
-            wks.write("part / --source rootfs --fstype=ext4 --change-directory /usr")
-        self.assertNotEqual(0, runCmd("wic create %s -e core-image-minimal -o %s" \
-                                      % (wks_file, self.resultdir), ignore_status=True).status)
-        os.remove(wks_file)
-
-        # Argument pointing to parent directory.
-        with open(wks_file, 'w') as wks:
-            wks.write("part / --source rootfs --fstype=ext4 --change-directory ././..")
         self.assertNotEqual(0, runCmd("wic create %s -e core-image-minimal -o %s" \
                                       % (wks_file, self.resultdir), ignore_status=True).status)
         os.remove(wks_file)

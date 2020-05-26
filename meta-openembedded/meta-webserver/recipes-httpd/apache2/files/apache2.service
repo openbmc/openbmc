@@ -5,6 +5,10 @@ After=network.target remote-fs.target nss-lookup.target
 [Service]
 Type=simple
 Environment=LANG=C
+ExecStartPre=mkdir -p /var/log/apache2
+ExecStartPre=mkdir -p /var/run/apache2
+ExecStartPre=chmod -R 0755 /var/log/apache2
+ExecStartPre=chmod -R 0755 /var/run/apache2
 ExecStart=@SBINDIR@/httpd -DFOREGROUND -D SSL -D PHP5 -k start
 ExecStop=@BASE_BINDIR@/kill -WINCH ${MAINPID}
 KillSignal=SIGCONT

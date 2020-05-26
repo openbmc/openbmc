@@ -1,4 +1,4 @@
-From 56fa2bbdbd29377a6ef0d0b7aadbac8b5ea8c95b Mon Sep 17 00:00:00 2001
+From e5a50db749b2b02e9e0cff9f7b639020e8ac76da Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 6 Nov 2018 13:54:43 +0100
 Subject: [PATCH] Add WITH_TESTS option
@@ -14,18 +14,18 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  2 files changed, 5 insertions(+)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 881152a..965c992 100644
+index ce88b9e3..7a99320a 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -33,6 +33,7 @@ option(WITH_MAN "Enables hawkey man page generation" ON)
- option(WITH_ZCHUNK "Build with zchunk support" ON)
+@@ -32,6 +32,7 @@ option(WITH_HTML "Enables hawkey HTML generation" ON)
+ option(WITH_MAN "Enables hawkey man page generation" ON)
  option(ENABLE_RHSM_SUPPORT "Build with Red Hat Subscription Manager support?" OFF)
  option(ENABLE_SOLV_URPMREORDER "Build with support for URPM-like solution reordering?" OFF)
 +option(WITH_TESTS "Enables unit tests" ON)
  
  
  # load pkg-config first; it's required by other modules
-@@ -165,8 +166,10 @@ endif()
+@@ -158,8 +159,10 @@ endif()
  
  
  # build tests
@@ -37,7 +37,7 @@ index 881152a..965c992 100644
      add_subdirectory(python/hawkey)
  endif()
 diff --git a/python/hawkey/CMakeLists.txt b/python/hawkey/CMakeLists.txt
-index d964534..84d1720 100644
+index d9645346..84d17204 100644
 --- a/python/hawkey/CMakeLists.txt
 +++ b/python/hawkey/CMakeLists.txt
 @@ -50,4 +50,6 @@ target_link_libraries(_hawkeymodule ${PYTHON_LIBRARY})

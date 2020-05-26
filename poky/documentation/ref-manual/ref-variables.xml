@@ -6638,6 +6638,7 @@
      cpio.lzma
      cpio.xz
      cramfs
+     elf
      ext2
      ext2.bz2
      ext2.gz
@@ -6661,7 +6662,6 @@
      tar.gz
      tar.lz4
      tar.xz
-     tar.zst
      ubi
      ubifs
      wic
@@ -10288,6 +10288,28 @@
      https://example.com/packagerepos/updates/rpm-dev/all
      https://example.com/packagerepos/updates/rpm-dev/core2-64
                     </literallayout>
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-PACKAGE_GROUP'><glossterm>PACKAGE_GROUP</glossterm>
+            <info>
+                PACKAGE_GROUP[doc] = "Defines one or more packages to include in an image when a specific item is included in IMAGE_FEATURES."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    The <filename>PACKAGE_GROUP</filename> variable has been
+                    renamed to
+                    <link linkend='var-FEATURE_PACKAGES'><filename>FEATURE_PACKAGES</filename></link>.
+                    See the variable description for
+                    <filename>FEATURE_PACKAGES</filename> for information.
+                </para>
+
+                <para>
+                    If if you use the <filename>PACKAGE_GROUP</filename>
+                    variable, the OpenEmbedded build system issues a warning
+                    message.
                 </para>
             </glossdef>
         </glossentry>
@@ -14011,7 +14033,7 @@
                 <para>
                     When pointing to sstate build artifacts on another machine
                     that uses a different GCC version for native builds,
-                    you must configure <filename>SSTATE_MIRRORS</filename>
+                    you must configure <filename>SSTATE_MIRROR</filename>
                     with a regular expression that maps local search paths
                     to server paths.
                     The paths need to take into account

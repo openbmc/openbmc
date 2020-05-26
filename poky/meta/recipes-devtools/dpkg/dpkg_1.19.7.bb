@@ -13,7 +13,6 @@ SRC_URI = "${DEBIAN_MIRROR}/main/d/${BPN}/${BPN}_${PV}.tar.xz \
            file://0007-dpkg-deb-build.c-Remove-usage-of-clamp-mtime-in-tar.patch \
            file://0001-dpkg-Support-muslx32-build.patch \
            file://pager.patch \
-           file://0001-Add-support-for-riscv32-CPU.patch \
            "
 SRC_URI_append_class-native = " \
                                 file://tweak-options-require-tar-1.27.patch \

@@ -6,8 +6,6 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=8ba06d529c955048e5ddd7c45459eb2e"
 
 DEPENDS += "python3 python3-setuptools-native"
 
-SRC_URI += "file://0001-change-shebang-to-python3.patch"
-
 SRC_URI[md5sum] = "7d42ba49b809604f0df3d55df1c3fd86"
 SRC_URI[sha256sum] = "7db0c8ea4c7ea51c8049640e8e6e7fde949de672bfa4949920675563a5a6967f"
 

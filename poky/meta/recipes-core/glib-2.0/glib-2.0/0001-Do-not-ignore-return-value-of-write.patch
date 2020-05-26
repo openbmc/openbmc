@@ -1,4 +1,4 @@
-From 658c034d92027dc8af5f784cae852123fac79b19 Mon Sep 17 00:00:00 2001
+From d250652782b65b071b7cc8f01f2db833df104e0e Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 16 Apr 2016 13:28:59 -0700
 Subject: [PATCH] Do not ignore return value of write()
@@ -16,10 +16,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/glib/tests/unix.c b/glib/tests/unix.c
-index 7639d06..f941141 100644
+index 9d55a6c..a07f945 100644
 --- a/glib/tests/unix.c
 +++ b/glib/tests/unix.c
-@@ -33,14 +33,15 @@ test_pipe (void)
+@@ -32,14 +32,15 @@ test_pipe (void)
    GError *error = NULL;
    int pipefd[2];
    char buf[1024];

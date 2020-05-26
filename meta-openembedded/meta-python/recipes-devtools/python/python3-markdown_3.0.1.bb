@@ -10,3 +10,5 @@ SRC_URI[md5sum] = "72219f46ca440b657bf227500731bdf1"
 SRC_URI[sha256sum] = "d02e0f9b04c500cde6637c11ad7c72671f359b87b9fe924b2383649d8841db7c"
 
 BBCLASSEXTEND = "native"
+
+RDEPENDS_${PN} += "${PYTHON_PN}-logging ${PYTHON_PN}-setuptools"

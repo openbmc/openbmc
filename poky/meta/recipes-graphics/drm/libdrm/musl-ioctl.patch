@@ -1,0 +1,35 @@
+Upstream-Status: Submitted
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From 46c0fd6c827a8cb4d04e067bf04fab579ac4712e Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Mon, 18 Jun 2018 15:07:03 +0100
+Subject: [PATCH] tests/nouveau/threaded: adapt ioctl signature
+
+POSIX says ioctl() has the signature (int, int, ...) but glibc has decided to
+use (int, unsigned long int, ...) instead.
+
+Use a #ifdef to adapt the replacement function as appropriate.
+---
+ tests/nouveau/threaded.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/tests/nouveau/threaded.c b/tests/nouveau/threaded.c
+index 3669bcd3..e1c27c01 100644
+--- a/tests/nouveau/threaded.c
++++ b/tests/nouveau/threaded.c
+@@ -36,7 +36,11 @@ static int failed;
+ 
+ static int import_fd;
+ 
++#ifdef __GLIBC__
+ int ioctl(int fd, unsigned long request, ...)
++#else
++int ioctl(int fd, int request, ...)
++#endif
+ {
+ 	va_list va;
+ 	int ret;
+-- 
+2.11.0
+

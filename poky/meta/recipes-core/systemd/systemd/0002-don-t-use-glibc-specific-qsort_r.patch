@@ -1,4 +1,4 @@
-From 3eb12a6ba0bce149717eaabeb1505d379b3d705a Mon Sep 17 00:00:00 2001
+From 49501c80d32c1bc5ecb07f40c324feb82af0b057 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 13:41:41 +0800
 Subject: [PATCH] don't use glibc-specific qsort_r
@@ -40,7 +40,7 @@ index e029f8646eb0..27d68b341cf3 100644
 -                qsort_r_safe((p), (n), sizeof((p)[0]), (__compar_d_fn_t) _func_, userdata); \
 -        })
 diff --git a/src/libsystemd/sd-hwdb/hwdb-util.c b/src/libsystemd/sd-hwdb/hwdb-util.c
-index d790e8fd0b19..42e0fd7c9b3c 100644
+index c83575c7c876..72f8f3a05048 100644
 --- a/src/libsystemd/sd-hwdb/hwdb-util.c
 +++ b/src/libsystemd/sd-hwdb/hwdb-util.c
 @@ -128,9 +128,13 @@ static void trie_free(struct trie *trie) {
@@ -84,10 +84,10 @@ index d790e8fd0b19..42e0fd7c9b3c 100644
  }
  
 diff --git a/src/shared/format-table.c b/src/shared/format-table.c
-index 425013046491..33c1c5a12d43 100644
+index 4617ae8badc4..17d6b9616256 100644
 --- a/src/shared/format-table.c
 +++ b/src/shared/format-table.c
-@@ -1164,31 +1164,33 @@ static int cell_data_compare(TableData *a, size_t index_a, TableData *b, size_t
+@@ -1109,31 +1109,33 @@ static int cell_data_compare(TableData *a, size_t index_a, TableData *b, size_t
          return CMP(index_a, index_b);
  }
  
@@ -131,7 +131,7 @@ index 425013046491..33c1c5a12d43 100644
          }
  
          /* Order identical lines by the order there were originally added in */
-@@ -1690,7 +1692,12 @@ int table_print(Table *t, FILE *f) {
+@@ -1533,7 +1535,12 @@ int table_print(Table *t, FILE *f) {
                  for (i = 0; i < n_rows; i++)
                          sorted[i] = i * t->n_columns;
  
@@ -145,7 +145,7 @@ index 425013046491..33c1c5a12d43 100644
          }
  
          if (t->display_map)
-@@ -2236,7 +2243,12 @@ int table_to_json(Table *t, JsonVariant **ret) {
+@@ -1997,7 +2004,12 @@ int table_to_json(Table *t, JsonVariant **ret) {
                  for (i = 0; i < n_rows; i++)
                          sorted[i] = i * t->n_columns;
  

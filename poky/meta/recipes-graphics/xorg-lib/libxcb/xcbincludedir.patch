@@ -1,0 +1,28 @@
+As pkg-config --variable doesn't respect the sysroot, add the pkg-config sysroot
+to the beginning of variables that are used later on the host.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/configure.ac b/configure.ac
+index 94da4f7..d29cd6a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -64,7 +64,7 @@ AC_SUBST(NEEDED)
+ 
+ # Find the xcb-proto protocol descriptions
+ AC_MSG_CHECKING(XCBPROTO_XCBINCLUDEDIR)
+-XCBPROTO_XCBINCLUDEDIR=`$PKG_CONFIG --variable=xcbincludedir xcb-proto`
++XCBPROTO_XCBINCLUDEDIR=$PKG_CONFIG_SYSROOT_DIR/`$PKG_CONFIG --variable=xcbincludedir xcb-proto`
+ AC_MSG_RESULT($XCBPROTO_XCBINCLUDEDIR)
+ AC_SUBST(XCBPROTO_XCBINCLUDEDIR)
+ 
+@@ -74,7 +74,7 @@ AC_SUBST(XCBPROTO_VERSION)
+ 
+ # Find the xcbgen Python package
+ AC_MSG_CHECKING(XCBPROTO_XCBPYTHONDIR)
+-XCBPROTO_XCBPYTHONDIR=`$PKG_CONFIG --variable=pythondir xcb-proto`
++XCBPROTO_XCBPYTHONDIR=$PKG_CONFIG_SYSROOT_DIR/`$PKG_CONFIG --variable=pythondir xcb-proto`
+ AC_MSG_RESULT($XCBPROTO_XCBPYTHONDIR)
+ AC_SUBST(XCBPROTO_XCBPYTHONDIR)
+ 

@@ -1,7 +1,7 @@
-From c7734e1547db967eccf242fe4b9e8a30b9ff141c Mon Sep 17 00:00:00 2001
+From 10b0d16d04b811b1ccd1f9b0cfe757bce8d876a1 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 6 Apr 2015 23:02:21 -0700
-Subject: [PATCH] resolve: musl does not implement res_ninit
+Subject: [PATCH 2/3] resolve: musl does not implement res_ninit
 
 ported from
 http://git.alpinelinux.org/cgit/aports/plain/testing/connman/libresolv.patch
@@ -9,13 +9,12 @@ http://git.alpinelinux.org/cgit/aports/plain/testing/connman/libresolv.patch
 Upstream-Status: Pending
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-
 ---
- gweb/gresolv.c | 34 +++++++++++++---------------------
- 1 file changed, 13 insertions(+), 21 deletions(-)
+ gweb/gresolv.c | 33 ++++++++++++---------------------
+ 1 file changed, 12 insertions(+), 21 deletions(-)
 
 diff --git a/gweb/gresolv.c b/gweb/gresolv.c
-index 38a554e..a9e8740 100644
+index 5cf7a9a..3ad8e70 100644
 --- a/gweb/gresolv.c
 +++ b/gweb/gresolv.c
 @@ -36,6 +36,7 @@
@@ -26,7 +25,7 @@ index 38a554e..a9e8740 100644
  
  #include "gresolv.h"
  
-@@ -877,8 +878,6 @@ GResolv *g_resolv_new(int index)
+@@ -875,8 +875,6 @@ GResolv *g_resolv_new(int index)
  	resolv->index = index;
  	resolv->nameserver_list = NULL;
  
@@ -35,7 +34,7 @@ index 38a554e..a9e8740 100644
  	return resolv;
  }
  
-@@ -918,8 +917,6 @@ void g_resolv_unref(GResolv *resolv)
+@@ -916,8 +914,6 @@ void g_resolv_unref(GResolv *resolv)
  
  	flush_nameservers(resolv);
  
@@ -44,7 +43,7 @@ index 38a554e..a9e8740 100644
  	g_free(resolv);
  }
  
-@@ -1022,24 +1019,19 @@ guint g_resolv_lookup_hostname(GResolv *resolv, const char *hostname,
+@@ -1020,24 +1016,19 @@ guint g_resolv_lookup_hostname(GResolv *resolv, const char *hostname,
  	debug(resolv, "hostname %s", hostname);
  
  	if (!resolv->nameserver_list) {
@@ -81,3 +80,6 @@ index 38a554e..a9e8740 100644
  		}
  
  		if (!resolv->nameserver_list)
+-- 
+2.5.1
+

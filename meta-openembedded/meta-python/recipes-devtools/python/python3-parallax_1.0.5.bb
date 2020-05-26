@@ -8,4 +8,6 @@ SRC_URI[sha256sum] = "e9e4dc500f1306a638df0f19d4ef976a623b260fc614c55cb1fd0d8410
 
 inherit pypi setuptools3
 
+RDEPENDS_${PN} += "${PYTHON_PN}-fcntl ${PYTHON_PN}-threading ${PYTHON_PN}-unixadmin"
+
 BBCLASSEXTEND = "native nativesdk"

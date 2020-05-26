@@ -16,12 +16,12 @@ index 0f277a7..24578ea 100644
 --- a/mesonbuild/envconfig.py
 +++ b/mesonbuild/envconfig.py
 @@ -192,7 +192,7 @@ class MachineInfo:
-
+ 
          cpu_family = literal['cpu_family']
          if cpu_family not in known_cpu_families:
 -            mlog.warning('Unknown CPU family %s, please report this at https://github.com/mesonbuild/meson/issues/new' % cpu_family)
 +            raise EnvironmentException('Unknown CPU family %s, see https://wiki.yoctoproject.org/wiki/Meson/UnknownCPU for directions.' % cpu_family)
-
+ 
          endian = literal['endian']
          if endian not in ('little', 'big'):
 diff --git a/mesonbuild/environment.py b/mesonbuild/environment.py
@@ -30,12 +30,12 @@ index dc8b14f..3aab71e 100644
 +++ b/mesonbuild/environment.py
 @@ -354,9 +354,7 @@ def detect_cpu_family(compilers: CompilersDict) -> str:
          trial = 'parisc'
-
+ 
      if trial not in known_cpu_families:
 -        mlog.warning('Unknown CPU family {!r}, please report this at '
 -                     'https://github.com/mesonbuild/meson/issues/new with the '
 -                     'output of `uname -a` and `cat /proc/cpuinfo`'.format(trial))
 +        raise EnvironmentException('Unknown CPU family %s, see https://wiki.yoctoproject.org/wiki/Meson/UnknownCPU for directions.' % trial)
-
+ 
      return trial
-
+ 

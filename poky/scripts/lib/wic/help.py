@@ -971,24 +971,14 @@ DESCRIPTION
                          has an effect with the rootfs source plugin.
 
          --include-path: This option is specific to wic. It adds the contents
-                         of the given path or a rootfs to the resulting image.
-                         The option contains two fields, the origin and the
-                         destination. When the origin is a rootfs, it follows
-                         the same logic as the rootfs-dir argument and the
-                         permissions and owners are kept. When the origin is a
-                         path, it is relative to the directory in which wic is
-                         running not the rootfs itself so use of an absolute
-                         path is recommended, and the owner and group is set to
-                         root:root. If no destination is given it is
-                         automatically set to the root of the rootfs. This
-                         option only has an effect with the rootfs source
-                         plugin.
-
-         --change-directory: This option is specific to wic. It changes to the
-                             given directory before copying the files. This
-                             option is useful when we want to split a rootfs in
-                             multiple partitions and we want to keep the right
-                             permissions and usernames in all the partitions.
+                         of the given path to the resulting image. The path is
+                         relative to the directory in which wic is running not
+                         the rootfs itself so use of an absolute path is
+                         recommended. This option is most useful when multiple
+                         copies of the rootfs are added to an image and it is
+                         required to add extra content to only one of these
+                         copies. This option only has an effect with the rootfs
+                         source plugin.
 
          --extra-space: This option is specific to wic. It adds extra
                         space after the space filled by the content

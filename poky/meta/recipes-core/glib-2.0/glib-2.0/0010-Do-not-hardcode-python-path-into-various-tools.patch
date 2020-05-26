@@ -1,11 +1,10 @@
-From 79ce7e545dd3a93f77d2146d50b6fa061fbceed9 Mon Sep 17 00:00:00 2001
+From b9160d951b9af647b97766c57295ca4f45cf9521 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 3 Oct 2017 10:45:55 +0300
-Subject: [PATCH] Do not hardcode python path into various tools
+Subject: [PATCH 10/10] Do not hardcode python path into various tools
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
 ---
  gio/gdbus-2.0/codegen/gdbus-codegen.in | 2 +-
  gobject/glib-genmarshal.in             | 2 +-
@@ -13,7 +12,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/gio/gdbus-2.0/codegen/gdbus-codegen.in b/gio/gdbus-2.0/codegen/gdbus-codegen.in
-index 67d3675..4e92a7a 100755
+index 8050981..e693ef3 100755
 --- a/gio/gdbus-2.0/codegen/gdbus-codegen.in
 +++ b/gio/gdbus-2.0/codegen/gdbus-codegen.in
 @@ -1,4 +1,4 @@
@@ -23,7 +22,7 @@ index 67d3675..4e92a7a 100755
  # GDBus - GLib D-Bus Library
  #
 diff --git a/gobject/glib-genmarshal.in b/gobject/glib-genmarshal.in
-index 7380f24..c8abeaa 100755
+index 09e8408..b2f9d99 100755
 --- a/gobject/glib-genmarshal.in
 +++ b/gobject/glib-genmarshal.in
 @@ -1,4 +1,4 @@
@@ -33,7 +32,7 @@ index 7380f24..c8abeaa 100755
  # pylint: disable=too-many-lines, missing-docstring, invalid-name
  
 diff --git a/gobject/glib-mkenums.in b/gobject/glib-mkenums.in
-index 91ad779..3ebef62 100755
+index d4bfd11..051fce4 100755
 --- a/gobject/glib-mkenums.in
 +++ b/gobject/glib-mkenums.in
 @@ -1,4 +1,4 @@
@@ -42,3 +41,6 @@ index 91ad779..3ebef62 100755
  
  # If the code below looks horrible and unpythonic, do not panic.
  #
+-- 
+2.14.1
+

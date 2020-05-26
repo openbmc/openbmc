@@ -262,3 +262,35 @@ PNBLACKLIST[busybox] = "Don't build this"
         self.write_config(config)
 
         bitbake("--graphviz core-image-sato")
+
+    def test_image_gen_debugfs(self):
+        """
+        Summary:     Check debugfs generation
+        Expected:    1. core-image-minimal can be build with IMAGE_GEN_DEBUGFS variable set
+                     2. debug filesystem is created when variable set
+                     3. debug symbols available
+        Product:     oe-core
+        Author:      Humberto Ibarra <humberto.ibarra.lopez@intel.com>
+                     Yeoh Ee Peng <ee.peng.yeoh@intel.com>
+        """
+        import glob
+        image_name = 'core-image-minimal'
+        features = 'IMAGE_GEN_DEBUGFS = "1"\n'
+        features += 'IMAGE_FSTYPES_DEBUGFS = "tar.bz2"\n'
+        features += 'MACHINE = "genericx86-64"\n'
+        self.write_config(features)
+
+        bitbake(image_name)
+        deploy_dir_image = get_bb_var('DEPLOY_DIR_IMAGE')
+        dbg_tar_file = os.path.join(deploy_dir_image, "*-dbg.rootfs.tar.bz2")
+        debug_files = glob.glob(dbg_tar_file)
+        self.assertNotEqual(len(debug_files), 0, 'debug filesystem not generated at %s' % dbg_tar_file)
+        result = runCmd('cd %s; tar xvf %s' % (deploy_dir_image, dbg_tar_file))
+        self.assertEqual(result.status, 0, msg='Failed to extract %s: %s' % (dbg_tar_file, result.output))
+        result = runCmd('find %s -name %s' % (deploy_dir_image, "udevadm"))
+        self.assertTrue("udevadm" in result.output, msg='Failed to find udevadm: %s' % result.output)
+        dbg_symbols_targets = result.output.splitlines()
+        self.assertTrue(dbg_symbols_targets, msg='Failed to split udevadm: %s' % dbg_symbols_targets)
+        for t in dbg_symbols_targets:
+            result = runCmd('objdump --syms %s | grep debug' % t)
+            self.assertTrue("debug" in result.output, msg='Failed to find debug symbol: %s' % result.output)

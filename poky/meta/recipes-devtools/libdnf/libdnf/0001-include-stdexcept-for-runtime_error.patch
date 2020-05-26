@@ -1,0 +1,65 @@
+From 5f8eee5040d7074710cd542fc50f7a40918321fc Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 23 Dec 2019 14:30:22 -0800
+Subject: [PATCH] include <stdexcept> for runtime_error
+
+Fixes
+
+error: class 'libdnf::ModulePackageContainer::Exception' does not have any field named 'runtime_error'
+         explicit Exception(const std::string &what) : runtime_error(what) {}
+                                                       ^~~~~~~~~~~~~
+
+Upstream-Status: Submitted [https://github.com/rpm-software-management/libdnf/pull/867]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libdnf/goal/Goal.hpp                     | 1 +
+ libdnf/module/ModulePackageContainer.hpp | 1 +
+ libdnf/repo/solvable/Dependency.cpp      | 3 ++-
+ 3 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/libdnf/goal/Goal.hpp b/libdnf/goal/Goal.hpp
+index f33dfa24..7b8d822c 100644
+--- a/libdnf/goal/Goal.hpp
++++ b/libdnf/goal/Goal.hpp
+@@ -22,6 +22,7 @@
+ #define __GOAL_HPP
+ 
+ #include <memory>
++#include <stdexcept>
+ 
+ #include "../dnf-types.h"
+ #include "../hy-goal.h"
+diff --git a/libdnf/module/ModulePackageContainer.hpp b/libdnf/module/ModulePackageContainer.hpp
+index 1f815fda..37a8832d 100644
+--- a/libdnf/module/ModulePackageContainer.hpp
++++ b/libdnf/module/ModulePackageContainer.hpp
+@@ -30,6 +30,7 @@
+ #include <string>
+ #include <vector>
+ #include <set>
++#include <stdexcept>
+ 
+ //class ModulePackageContainer;
+ //typedef std::shared_ptr<ModulePackageContainer> ModulePackageContainerPtr;
+diff --git a/libdnf/repo/solvable/Dependency.cpp b/libdnf/repo/solvable/Dependency.cpp
+index 6682b729..0fc8b5cd 100644
+--- a/libdnf/repo/solvable/Dependency.cpp
++++ b/libdnf/repo/solvable/Dependency.cpp
+@@ -18,6 +18,7 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+  */
+ 
++#include <stdexcept>
+ #include "Dependency.hpp"
+ #include "libdnf/utils/utils.hpp"
+ #include "libdnf/repo/DependencySplitter.hpp"
+@@ -106,4 +107,4 @@ Dependency::getReldepId(DnfSack *sack, const char * reldepStr)
+     }
+ }
+ 
+-}
+\ No newline at end of file
++}
+-- 
+2.24.1
+

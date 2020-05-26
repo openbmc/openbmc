@@ -5,7 +5,7 @@ include conf/machine/include/rpi-default-providers.inc
 SOC_FAMILY = "rpi"
 include conf/machine/include/soc-family.inc
 
-IMAGE_FSTYPES ?= "tar.bz2 ext3 rpi-sdimg"
+IMAGE_FSTYPES ?= "tar.bz2 ext3 wic.bz2 wic.bmap"
 WKS_FILE ?= "sdimage-raspberrypi.wks"
 
 XSERVER = " \
@@ -16,6 +16,7 @@ XSERVER = " \
 
 RPI_KERNEL_DEVICETREE_OVERLAYS ?= " \
     overlays/at86rf233.dtbo \
+    overlays/disable-bt.dtbo \
     overlays/dwc2.dtbo \
     overlays/gpio-key.dtbo \
     overlays/hifiberry-amp.dtbo \
@@ -25,9 +26,8 @@ RPI_KERNEL_DEVICETREE_OVERLAYS ?= " \
     overlays/i2c-rtc.dtbo \
     overlays/iqaudio-dac.dtbo \
     overlays/iqaudio-dacplus.dtbo \
+    overlays/miniuart-bt.dtbo \
     overlays/mcp2515-can0.dtbo \
-    overlays/pi3-disable-bt.dtbo \
-    overlays/pi3-miniuart-bt.dtbo \
     overlays/pitft22.dtbo \
     overlays/pitft28-resistive.dtbo \
     overlays/pitft28-capacitive.dtbo \
@@ -76,7 +76,9 @@ MACHINE_FEATURES += "apm usbhost keyboard vfat ext2 screen touchscreen alsa blue
 # Raspberry Pi has no hardware clock
 MACHINE_FEATURES_BACKFILL_CONSIDERED = "rtc"
 
-MACHINE_EXTRA_RRECOMMENDS += " kernel-modules udev-rules-rpi"
+MACHINE_EXTRA_RRECOMMENDS += "kernel-modules udev-rules-rpi"
+MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS += "${@oe.utils.conditional('ENABLE_I2C', '1', 'kernel-module-i2c-dev kernel-module-i2c-bcm2708', '', d)}"
+
 
 # Set Raspberrypi splash image
 SPLASH = "psplash-raspberrypi"

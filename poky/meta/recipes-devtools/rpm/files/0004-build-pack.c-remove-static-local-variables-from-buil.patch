@@ -1,0 +1,336 @@
+From 792693bb90768cfde4898e8dd31ee1b5de803d2f Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 8 Jun 2017 17:08:09 +0300
+Subject: [PATCH] build/pack.c: remove static local variables from buildHost()
+ and getBuildTime()
+
+Their use is causing difficult to diagnoze data races when building multiple
+packages in parallel, and is a bad idea in general, as it also makes it more
+difficult to reason about code.
+
+Upstream-Status: Submitted [https://github.com/rpm-software-management/rpm/pull/226]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+---
+ build/build.c             | 54 ++++++++++++++++++++++++++++--
+ build/pack.c              | 84 +++++++++--------------------------------------
+ build/rpmbuild_internal.h |  8 +++--
+ 3 files changed, 74 insertions(+), 72 deletions(-)
+
+diff --git a/build/build.c b/build/build.c
+index 13c3df2..b154f08 100644
+--- a/build/build.c
++++ b/build/build.c
+@@ -6,6 +6,8 @@
+ #include "system.h"
+ 
+ #include <errno.h>
++#include <netdb.h>
++#include <time.h>
+ #include <sys/wait.h>
+ 
+ #include <rpm/rpmlog.h>
+@@ -16,6 +18,50 @@
+ 
+ #include "debug.h"
+ 
++static rpm_time_t getBuildTime(void)
++{
++    rpm_time_t buildTime = 0;
++    char *srcdate;
++    time_t epoch;
++    char *endptr;
++
++    srcdate = getenv("SOURCE_DATE_EPOCH");
++    if (srcdate) {
++        errno = 0;
++        epoch = strtol(srcdate, &endptr, 10);
++        if (srcdate == endptr || *endptr || errno != 0)
++            rpmlog(RPMLOG_ERR, _("unable to parse SOURCE_DATE_EPOCH\n"));
++        else
++            buildTime = (int32_t) epoch;
++    } else
++        buildTime = (int32_t) time(NULL);
++
++    return buildTime;
++}
++
++static char * buildHost(void)
++{
++    char* hostname;
++    struct hostent *hbn;
++    char *bhMacro;
++
++    bhMacro = rpmExpand("%{?_buildhost}", NULL);
++    if (strcmp(bhMacro, "") != 0) {
++        rasprintf(&hostname, "%s", bhMacro);
++    } else {
++        hostname = rcalloc(1024, sizeof(*hostname));
++        (void) gethostname(hostname, 1024);
++        hbn = gethostbyname(hostname);
++        if (hbn)
++            strcpy(hostname, hbn->h_name);
++        else
++            rpmlog(RPMLOG_WARNING,
++                    _("Could not canonicalize hostname: %s\n"), hostname);
++    }
++    free(bhMacro);
++    return(hostname);
++}
++
+ /**
+  */
+ static rpmRC doRmSource(rpmSpec spec)
+@@ -201,6 +247,9 @@ static rpmRC buildSpec(BTA_t buildArgs, rpmSpec spec, int what)
+     rpmRC rc = RPMRC_OK;
+     int test = (what & RPMBUILD_NOBUILD);
+     char *cookie = buildArgs->cookie ? xstrdup(buildArgs->cookie) : NULL;
++    const char* host = buildHost();
++    rpm_time_t buildTime = getBuildTime();
++
+ 
+     if (rpmExpandNumeric("%{?source_date_epoch_from_changelog}") &&
+ 	getenv("SOURCE_DATE_EPOCH") == NULL) {
+@@ -269,11 +318,11 @@ static rpmRC buildSpec(BTA_t buildArgs, rpmSpec spec, int what)
+ 		goto exit;
+ 
+ 	if (((what & RPMBUILD_PACKAGESOURCE) && !test) &&
+-	    (rc = packageSources(spec, &cookie)))
++	    (rc = packageSources(spec, &cookie, buildTime, host)))
+ 		goto exit;
+ 
+ 	if (((what & RPMBUILD_PACKAGEBINARY) && !test) &&
+-	    (rc = packageBinaries(spec, cookie, (didBuild == 0))))
++	    (rc = packageBinaries(spec, cookie, (didBuild == 0), buildTime, host)))
+ 		goto exit;
+ 	
+ 	if ((what & RPMBUILD_CLEAN) &&
+@@ -293,6 +342,7 @@ static rpmRC buildSpec(BTA_t buildArgs, rpmSpec spec, int what)
+ 	(void) unlink(spec->specFile);
+ 
+ exit:
++    free(host);
+     free(cookie);
+     spec->rootDir = NULL;
+     if (rc != RPMRC_OK && rpmlogGetNrecs() > 0) {
+diff --git a/build/pack.c b/build/pack.c
+index df15876..17a4b09 100644
+--- a/build/pack.c
++++ b/build/pack.c
+@@ -6,8 +6,6 @@
+ #include "system.h"
+ 
+ #include <errno.h>
+-#include <netdb.h>
+-#include <time.h>
+ #include <sys/wait.h>
+ 
+ #include <rpm/rpmlib.h>			/* RPMSIGTAG*, rpmReadPackageFile */
+@@ -152,57 +150,6 @@ exit:
+     return rc;
+ }
+ 
+-static rpm_time_t * getBuildTime(void)
+-{
+-    static rpm_time_t buildTime[1];
+-    char *srcdate;
+-    time_t epoch;
+-    char *endptr;
+-
+-    if (buildTime[0] == 0) {
+-        srcdate = getenv("SOURCE_DATE_EPOCH");
+-        if (srcdate) {
+-            errno = 0;
+-            epoch = strtol(srcdate, &endptr, 10);
+-            if (srcdate == endptr || *endptr || errno != 0)
+-                rpmlog(RPMLOG_ERR, _("unable to parse SOURCE_DATE_EPOCH\n"));
+-            else
+-                buildTime[0] = (int32_t) epoch;
+-        } else
+-            buildTime[0] = (int32_t) time(NULL);
+-    }
+-
+-    return buildTime;
+-}
+-
+-static const char * buildHost(void)
+-{
+-    static char hostname[1024];
+-    static int oneshot = 0;
+-    struct hostent *hbn;
+-    char *bhMacro;
+-
+-    if (! oneshot) {
+-        bhMacro = rpmExpand("%{?_buildhost}", NULL);
+-        if (strcmp(bhMacro, "") != 0 && strlen(bhMacro) < 1024) {
+-            strcpy(hostname, bhMacro);
+-        } else {
+-            if (strcmp(bhMacro, "") != 0)
+-                rpmlog(RPMLOG_WARNING, _("The _buildhost macro is too long\n"));
+-            (void) gethostname(hostname, sizeof(hostname));
+-            hbn = gethostbyname(hostname);
+-            if (hbn)
+-                strcpy(hostname, hbn->h_name);
+-            else
+-                rpmlog(RPMLOG_WARNING,
+-                        _("Could not canonicalize hostname: %s\n"), hostname);
+-        }
+-        free(bhMacro);
+-        oneshot = 1;
+-    }
+-    return(hostname);
+-}
+-
+ static rpmRC processScriptFiles(rpmSpec spec, Package pkg)
+ {
+     struct TriggerFileEntry *p;
+@@ -476,7 +423,8 @@ exit:
+  * order to how the RPM format is laid on disk.
+  */
+ static rpmRC writeRPM(Package pkg, unsigned char ** pkgidp,
+-		      const char *fileName, char **cookie)
++		      const char *fileName, char **cookie,
++		      rpm_time_t buildTime, const char* buildHost)
+ {
+     FD_t fd = NULL;
+     char * rpmio_flags = NULL;
+@@ -500,7 +448,7 @@ static rpmRC writeRPM(Package pkg, unsigned char ** pkgidp,
+ 
+     /* Create and add the cookie */
+     if (cookie) {
+-	rasprintf(cookie, "%s %d", buildHost(), (int) (*getBuildTime()));
++	rasprintf(cookie, "%s %d", buildHost, buildTime);
+ 	headerPutString(pkg->header, RPMTAG_COOKIE, *cookie);
+     }
+ 
+@@ -641,7 +589,7 @@ static rpmRC checkPackages(char *pkgcheck)
+     return RPMRC_OK;
+ }
+ 
+-static rpmRC packageBinary(rpmSpec spec, Package pkg, const char *cookie, int cheating, char** filename)
++static rpmRC packageBinary(rpmSpec spec, Package pkg, const char *cookie, int cheating, char** filename, rpm_time_t buildTime, const char* buildHost)
+ {
+ 	const char *errorString;
+ 	rpmRC rc = RPMRC_OK;
+@@ -660,8 +608,8 @@ static rpmRC packageBinary(rpmSpec spec, Package pkg, const char *cookie, int ch
+ 	headerCopyTags(spec->packages->header, pkg->header, copyTags);
+ 	
+ 	headerPutString(pkg->header, RPMTAG_RPMVERSION, VERSION);
+-	headerPutString(pkg->header, RPMTAG_BUILDHOST, buildHost());
+-	headerPutUint32(pkg->header, RPMTAG_BUILDTIME, getBuildTime(), 1);
++	headerPutString(pkg->header, RPMTAG_BUILDHOST, buildHost);
++	headerPutUint32(pkg->header, RPMTAG_BUILDTIME, &buildTime, 1);
+ 
+ 	if (spec->sourcePkgId != NULL) {
+ 	    headerPutBin(pkg->header, RPMTAG_SOURCEPKGID, spec->sourcePkgId,16);
+@@ -699,7 +647,7 @@ static rpmRC packageBinary(rpmSpec spec, Package pkg, const char *cookie, int ch
+ 	    free(binRpm);
+ 	}
+ 
+-	rc = writeRPM(pkg, NULL, *filename, NULL);
++	rc = writeRPM(pkg, NULL, *filename, NULL, buildTime, buildHost);
+ 	if (rc == RPMRC_OK) {
+ 	    /* Do check each written package if enabled */
+ 	    char *pkgcheck = rpmExpand("%{?_build_pkgcheck} ", *filename, NULL);
+@@ -719,7 +667,7 @@ struct binaryPackageTaskData
+     struct binaryPackageTaskData *next;
+ };
+ 
+-static struct binaryPackageTaskData* runBinaryPackageTasks(rpmSpec spec, const char *cookie, int cheating)
++static struct binaryPackageTaskData* runBinaryPackageTasks(rpmSpec spec, const char *cookie, int cheating, rpm_time_t buildTime, char* buildHost)
+ {
+     struct binaryPackageTaskData *tasks = NULL;
+     struct binaryPackageTaskData *task = NULL;
+@@ -731,7 +679,7 @@ static struct binaryPackageTaskData* runBinaryPackageTasks(rpmSpec spec, const c
+         if (pkg == spec->packages) {
+             // the first package needs to be processed ahead of others, as they copy
+             // changelog data from it, and so otherwise data races would happen
+-            task->result = packageBinary(spec, pkg, cookie, cheating, &(task->filename));
++            task->result = packageBinary(spec, pkg, cookie, cheating, &(task->filename), buildTime, buildHost);
+             rpmlog(RPMLOG_NOTICE, _("Finished binary package job, result %d, filename %s\n"), task->result, task->filename);
+             tasks = task;
+         }
+@@ -748,7 +696,7 @@ static struct binaryPackageTaskData* runBinaryPackageTasks(rpmSpec spec, const c
+         if (task != tasks)
+         #pragma omp task
+         {
+-            task->result = packageBinary(spec, task->pkg, cookie, cheating, &(task->filename));
++            task->result = packageBinary(spec, task->pkg, cookie, cheating, &(task->filename), buildTime, buildHost);
+             rpmlog(RPMLOG_NOTICE, _("Finished binary package job, result %d, filename %s\n"), task->result, task->filename);
+         }
+     }
+@@ -766,11 +714,11 @@ static void freeBinaryPackageTasks(struct binaryPackageTaskData* tasks)
+     }
+ }
+ 
+-rpmRC packageBinaries(rpmSpec spec, const char *cookie, int cheating)
++rpmRC packageBinaries(rpmSpec spec, const char *cookie, int cheating, rpm_time_t buildTime, char* buildHost)
+ {
+     char *pkglist = NULL;
+ 
+-    struct binaryPackageTaskData *tasks = runBinaryPackageTasks(spec, cookie, cheating);
++    struct binaryPackageTaskData *tasks = runBinaryPackageTasks(spec, cookie, cheating, buildTime, buildHost);
+ 
+     for (struct binaryPackageTaskData *task = tasks; task != NULL; task = task->next) {
+         if (task->result == RPMRC_OK) {
+@@ -797,7 +745,7 @@ rpmRC packageBinaries(rpmSpec spec, const char *cookie, int cheating)
+     return RPMRC_OK;
+ }
+ 
+-rpmRC packageSources(rpmSpec spec, char **cookie)
++rpmRC packageSources(rpmSpec spec, char **cookie, rpm_time_t buildTime, char* buildHost)
+ {
+     Package sourcePkg = spec->sourcePackage;
+     rpmRC rc;
+@@ -805,8 +753,8 @@ rpmRC packageSources(rpmSpec spec, char **cookie)
+ 
+     /* Add some cruft */
+     headerPutString(sourcePkg->header, RPMTAG_RPMVERSION, VERSION);
+-    headerPutString(sourcePkg->header, RPMTAG_BUILDHOST, buildHost());
+-    headerPutUint32(sourcePkg->header, RPMTAG_BUILDTIME, getBuildTime(), 1);
++    headerPutString(sourcePkg->header, RPMTAG_BUILDHOST, buildHost);
++    headerPutUint32(sourcePkg->header, RPMTAG_BUILDTIME, &buildTime, 1);
+     headerPutUint32(sourcePkg->header, RPMTAG_SOURCEPACKAGE, &one, 1);
+ 
+     /* XXX this should be %_srpmdir */
+@@ -814,7 +762,7 @@ rpmRC packageSources(rpmSpec spec, char **cookie)
+ 	char *pkgcheck = rpmExpand("%{?_build_pkgcheck_srpm} ", fn, NULL);
+ 
+ 	spec->sourcePkgId = NULL;
+-	rc = writeRPM(sourcePkg, &spec->sourcePkgId, fn, cookie);
++	rc = writeRPM(sourcePkg, &spec->sourcePkgId, fn, cookie, buildTime, buildHost);
+ 
+ 	/* Do check SRPM package if enabled */
+ 	if (rc == RPMRC_OK && pkgcheck[0] != ' ') {
+diff --git a/build/rpmbuild_internal.h b/build/rpmbuild_internal.h
+index 439b7d3..07e8338 100644
+--- a/build/rpmbuild_internal.h
++++ b/build/rpmbuild_internal.h
+@@ -427,19 +427,23 @@ rpmRC processSourceFiles(rpmSpec spec, rpmBuildPkgFlags pkgFlags);
+  * @param spec		spec file control structure
+  * @param cookie	build identifier "cookie" or NULL
+  * @param cheating	was build shortcircuited?
++ * @param buildTime	the build timestamp that goes into packages
++ * @param buildHost	the hostname where the build is happening
+  * @return		RPMRC_OK on success
+  */
+ RPM_GNUC_INTERNAL
+-rpmRC packageBinaries(rpmSpec spec, const char *cookie, int cheating);
++rpmRC packageBinaries(rpmSpec spec, const char *cookie, int cheating, rpm_time_t buildTime, char* buildHost);
+ 
+ /** \ingroup rpmbuild
+  * Generate source package.
+  * @param spec		spec file control structure
+  * @retval cookie	build identifier "cookie" or NULL
++ * @param buildTime	the build timestamp that goes into packages
++ * @param buildHost	the hostname where the build is happening
+  * @return		RPMRC_OK on success
+  */
+ RPM_GNUC_INTERNAL
+-rpmRC packageSources(rpmSpec spec, char **cookie);
++rpmRC packageSources(rpmSpec spec, char **cookie, rpm_time_t buildTime, char* buildHost);
+ 
+ RPM_GNUC_INTERNAL
+ int addLangTag(rpmSpec spec, Header h, rpmTagVal tag,

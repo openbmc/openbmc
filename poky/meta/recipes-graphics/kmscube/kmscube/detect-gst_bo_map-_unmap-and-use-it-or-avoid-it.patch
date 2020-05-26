@@ -1,0 +1,117 @@
+From a91c588b5a4122506e7fe949c37d530621bdd997 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20D=C3=ADaz?= <daniel.diaz@linaro.org>
+Date: Tue, 11 Jul 2017 14:50:37 -0500
+Subject: [PATCH] Detect gst_bo_map/_unmap and use it (or avoid it)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Those functions are not available on libMali, thus breaking
+builds and creating havoc.
+
+Removing the specific parts of the code that deal with
+gbm_bo_map() and gbm_bo_unmap() renders the kmscube utility
+a little less useful, but still valuable.
+
+Signed-off-by: Daniel Díaz <daniel.diaz@linaro.org>
+Cc: Rob Clark <robdclark@gmail.com>
+Reviewed-by: Eric Engestrom <eric.engestrom@imgtec.com>
+
+Upstream-Status: Submitted [https://lists.freedesktop.org/archives/mesa-dev/2017-July/163020.html]
+Signed-off-by: Zoltan Kuscsik <zoltan.kuscsik@solution57.com>
+---
+ Makefile.am   | 5 ++++-
+ configure.ac  | 3 +++
+ gst-decoder.c | 7 ++++++-
+ kmscube.c     | 4 ++++
+ 4 files changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index ba064e4..3a0a50b 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -43,7 +43,6 @@ kmscube_SOURCES = \
+ 	common.c \
+ 	common.h \
+ 	cube-smooth.c \
+-	cube-tex.c \
+ 	drm-atomic.c \
+ 	drm-common.c \
+ 	drm-common.h \
+@@ -68,3 +67,7 @@ texturator_SOURCES = \
+ 	drm-common.c \
+ 	drm-legacy.c \
+ 	texturator.c
++
++if ENABLE_GBM_MAP
++kmscube_SOURCES += cube-tex.c
++endif
+diff --git a/configure.ac b/configure.ac
+index 6be6541..3d20121 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -49,5 +49,8 @@ if test "x$HAVE_GST" = "xyes"; then
+ fi
+ AM_CONDITIONAL(ENABLE_GST, [test "x$HAVE_GST" = "xyes"])
+ 
++AC_CHECK_LIB([gbm], [gbm_bo_map], [HAVE_GBM_BO_MAP=yes], [])
++AM_CONDITIONAL(ENABLE_GBM_MAP, [test "x$HAVE_GBM_BO_MAP" = "xyes"])
++
+ AC_CONFIG_FILES([Makefile])
+ AC_OUTPUT
+diff --git a/gst-decoder.c b/gst-decoder.c
+index 5431014..0aa7a55 100644
+--- a/gst-decoder.c
++++ b/gst-decoder.c
+@@ -332,6 +332,7 @@ set_last_frame(struct decoder *dec, EGLImage frame, GstSample *samp)
+ 	dec->last_samp = samp;
+ }
+ 
++#if HAVE_GBM_BO_MAP
+ // TODO this could probably be a helper re-used by cube-tex:
+ static int
+ buf_to_fd(const struct gbm *gbm, int size, void *ptr)
+@@ -357,6 +358,7 @@ buf_to_fd(const struct gbm *gbm, int size, void *ptr)
+ 
+ 	return fd;
+ }
++#endif
+ 
+ static EGLImage
+ buffer_to_image(struct decoder *dec, GstBuffer *buf)
+@@ -410,12 +412,15 @@ buffer_to_image(struct decoder *dec, GstBuffer *buf)
+ 
+ 	if (is_dmabuf_mem) {
+ 		dmabuf_fd = dup(gst_dmabuf_memory_get_fd(mem));
+-	} else {
++	}
++#if HAVE_GBM_BO_MAP
++	else {
+ 		GstMapInfo map_info;
+ 		gst_buffer_map(buf, &map_info, GST_MAP_READ);
+ 		dmabuf_fd = buf_to_fd(dec->gbm, map_info.size, map_info.data);
+ 		gst_buffer_unmap(buf, &map_info);
+ 	}
++#endif
+ 
+ 	if (dmabuf_fd < 0) {
+ 		GST_ERROR("could not obtain DMABUF FD");
+diff --git a/kmscube.c b/kmscube.c
+index 81803be..e93da67 100644
+--- a/kmscube.c
++++ b/kmscube.c
+@@ -166,7 +166,11 @@ int main(int argc, char *argv[])
+ 	else if (mode == VIDEO)
+ 		egl = init_cube_video(gbm, video, samples);
+ 	else
++#if HAVE_GBM_BO_MAP
+ 		egl = init_cube_tex(gbm, mode, samples);
++#else
++		printf("gbm_bo_map() support missing\n");
++#endif
+ 
+ 	if (!egl) {
+ 		printf("failed to initialize EGL\n");
+-- 
+2.22.0
+

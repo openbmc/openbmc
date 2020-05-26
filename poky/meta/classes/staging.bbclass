@@ -93,7 +93,6 @@ SYSROOT_PREPROCESS_FUNCS ?= ""
 SYSROOT_DESTDIR = "${WORKDIR}/sysroot-destdir"
 
 python do_populate_sysroot () {
-    # SYSROOT 'version' 2
     bb.build.exec_func("sysroot_stage_all", d)
     bb.build.exec_func("sysroot_strip", d)
     for f in (d.getVar('SYSROOT_PREPROCESS_FUNCS') or '').split():

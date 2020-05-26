@@ -1,3 +1,0 @@
-# <type> <owner> <group> <mode> <path> <linksource>
-d root root 0755 /var/run/apache2 none
-d root root 0755 /var/log/apache2 none

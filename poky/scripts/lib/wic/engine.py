@@ -280,7 +280,7 @@ class Disk:
     def __getattr__(self, name):
         """Get path to the executable in a lazy way."""
         if name in ("mdir", "mcopy", "mdel", "mdeltree", "sfdisk", "e2fsck",
-                    "resize2fs", "mkswap", "mkdosfs", "debugfs","blkid"):
+                    "resize2fs", "mkswap", "mkdosfs", "debugfs"):
             aname = "_%s" % name
             if aname not in self.__dict__:
                 setattr(self, aname, find_executable(name, self.paths))
@@ -543,8 +543,7 @@ class Disk:
                         logger.info("creating swap partition {}".format(pnum))
                         label = part.get("name")
                         label_str = "-L {}".format(label) if label else ''
-                        out = exec_cmd("{} --probe {}".format(self.blkid, self._get_part_image(pnum)))
-                        uuid = out[out.index("UUID=\"")+6:out.index("UUID=\"")+42]
+                        uuid = part.get("uuid")
                         uuid_str = "-U {}".format(uuid) if uuid else ''
                         with open(partfname, 'w') as sparse:
                             os.ftruncate(sparse.fileno(), part['size'] * self._lsector_size)

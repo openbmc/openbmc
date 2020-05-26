@@ -148,26 +148,3 @@ class PackageTests(OESelftestTestCase):
                            '/usr/libexec/hello4']:
                 if not gdbtest(qemu, binary):
                     self.fail('GDB %s failed' % binary)
-
-    def test_preserve_ownership(self):
-        import os, stat, oe.cachedpath
-        features = 'IMAGE_INSTALL_append = " selftest-chown"\n'
-        self.write_config(features)
-        bitbake("core-image-minimal")
-
-        sysconfdir = get_bb_var('sysconfdir', 'selftest-chown')
-        def check_ownership(qemu, gid, uid, path):
-            self.logger.info("Check ownership of %s", path)
-            status, output = qemu.run_serial(r'/bin/stat -c "%U %G" ' + path, timeout=60)
-            output = output.split(" ")
-            if output[0] != uid or output[1] != gid :
-                self.logger.error("Incrrect ownership %s [%s:%s]", path, output[0], output[1])
-                return False
-            return True
-
-        with runqemu('core-image-minimal') as qemu:
-            for path in [ sysconfdir + "/selftest-chown/file",
-                          sysconfdir + "/selftest-chown/dir",
-                          sysconfdir + "/selftest-chown/symlink"]:
-                if not check_ownership(qemu, "test", "test", path):
-                    self.fail('Test ownership %s failed' % path)

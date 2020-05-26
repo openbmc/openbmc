@@ -1,0 +1,30 @@
+From 95a10ab64c2dbbec2c8dad91a5ffb73a0d68474b Mon Sep 17 00:00:00 2001
+From: Jonathan Liu <net147@gmail.com>
+Date: Mon, 16 Mar 2020 20:04:06 +1100
+Subject: [PATCH] src/cursor: fix xfc NULL pointer dereference
+
+xfc->width and xfc->height for the XFixes cursor image returned from
+XFixesGetCursorImage(dpy) are accessed without first checking that xfc
+is not NULL. This can result in the server sometimes crashing when
+moving a Google Chrome window.
+
+Fixes: 37c946191a0f ("Broken cursor bugfix for 64 bit systems (#49)")
+Upstream-Status: Accepted
+Signed-off-by: Jonathan Liu <net147@gmail.com>
+---
+ src/cursor.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/cursor.c b/src/cursor.c
+index 39e73a6..74a08c6 100644
+--- a/src/cursor.c
++++ b/src/cursor.c
+@@ -1311,7 +1311,7 @@ static int get_exact_cursor(int init) {
+ 
+ 		/* retrieve the cursor info + pixels from server: */
+ 		xfc = XFixesGetCursorImage(dpy);
+-		{
++		if (xfc) {
+ 			/* 2017-07-09, Stephan Fuhrmann: This fixes an implementation flaw for 64 bit systems.
+ 			 * The XFixesCursorImage structure says xfc->pixels is (unsigned long*) in the structure, but
+ 			 * the protocol spec says it's 32 bit per pixel

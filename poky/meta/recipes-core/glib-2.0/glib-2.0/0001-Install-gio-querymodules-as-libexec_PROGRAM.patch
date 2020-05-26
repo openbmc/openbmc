@@ -1,4 +1,4 @@
-From 0015db45cd1bfefc04959dffab5dabeead93136f Mon Sep 17 00:00:00 2001
+From d29dfba67b1808eea6d428085f95b6e42cf2d1e4 Mon Sep 17 00:00:00 2001
 From: Jussi Kukkonen <jussi.kukkonen@intel.com>
 Date: Tue, 22 Mar 2016 15:14:58 +0200
 Subject: [PATCH] Install gio-querymodules as libexec_PROGRAM
@@ -14,10 +14,10 @@ Upstream-Status: Inappropriate [OE specific]
  1 file changed, 1 insertion(+)
 
 diff --git a/gio/meson.build b/gio/meson.build
-index 2ef60ed..532b086 100644
+index 4e5e021..90a741a 100644
 --- a/gio/meson.build
 +++ b/gio/meson.build
-@@ -936,6 +936,7 @@ gio_querymodules = executable('gio-querymodules', 'gio-querymodules.c', 'giomodu
+@@ -940,6 +940,7 @@ gio_querymodules = executable('gio-querymodules', 'gio-querymodules.c', 'giomodu
    c_args : gio_c_args,
    # intl.lib is not compatible with SAFESEH
    link_args : noseh_link_args,

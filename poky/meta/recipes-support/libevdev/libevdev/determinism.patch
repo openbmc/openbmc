@@ -1,8 +1,3 @@
-From 4f196323aba5b0f49979826533c65633b8a9b6a2 Mon Sep 17 00:00:00 2001
-From: Richard Purdie <richard.purdie@linuxfoundation.org>
-Date: Fri, 7 Feb 2020 12:29:56 +0000
-Subject: [PATCH] libevdev: Fix determinism issue
-
 The order of dict values is not deterministic leading to differing header file generation.
 Sort to remove this inconsistency.
 
@@ -11,33 +6,29 @@ RP 2020/2/7
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 Upstream-Status: Pending
 
----
- libevdev/make-event-names.py | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/libevdev/make-event-names.py b/libevdev/make-event-names.py
-index 88addd7..c973e2a 100755
+Index: a/libevdev/make-event-names.py
+===================================================================
 --- a/libevdev/make-event-names.py
 +++ b/libevdev/make-event-names.py
-@@ -70,10 +70,10 @@ def print_bits(bits, prefix):
-     if not hasattr(bits, prefix):
-         return
-     print("static const char * const %s_map[%s_MAX + 1] = {" % (prefix, prefix.upper()))
--    for val, name in list(getattr(bits, prefix).items()):
-+    for val, name in sorted(list(getattr(bits, prefix).items())):
-         print("    [%s] = \"%s\"," % (name, name))
-     if prefix == "key":
--        for val, name in list(getattr(bits, "btn").items()):
-+        for val, name in sorted(list(getattr(bits, "btn").items())):
-             print("    [%s] = \"%s\"," % (name, name))
-     print("};")
-     print("")
-@@ -118,7 +118,7 @@ def print_lookup(bits, prefix):
-     if not hasattr(bits, prefix):
-         return
+@@ -67,10 +67,10 @@ def print_bits(bits, prefix):
+ 	if  not hasattr(bits, prefix):
+ 		return
+ 	print("static const char * const %s_map[%s_MAX + 1] = {" % (prefix, prefix.upper()))
+-	for val, name in list(getattr(bits, prefix).items()):
++	for val, name in sorted(list(getattr(bits, prefix).items())):
+ 		print("	[%s] = \"%s\"," % (name, name))
+ 	if prefix == "key":
+-		for val, name in list(getattr(bits, "btn").items()):
++		for val, name in sorted(list(getattr(bits, "btn").items())):
+ 			print("	[%s] = \"%s\"," % (name, name))
+ 	print("};")
+ 	print("")
+@@ -111,7 +111,7 @@ def print_lookup(bits, prefix):
+ 	if not hasattr(bits, prefix):
+ 		return
  
--    names = list(getattr(bits, prefix).items())
-+    names = sorted(list(getattr(bits, prefix).items()))
-     if prefix == "btn":
-         names = names + btn_additional
+-	names = list(getattr(bits, prefix).items())
++	names = sorted(list(getattr(bits, prefix).items()))
+ 	if prefix == "btn":
+ 		names = names + btn_additional;
  

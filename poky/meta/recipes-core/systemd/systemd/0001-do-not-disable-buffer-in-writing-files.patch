@@ -1,4 +1,4 @@
-From f92fd7e77ed5aab2dda01a20e6891c37f09415d3 Mon Sep 17 00:00:00 2001
+From f4a0caaea346b70cf5064f9159a53a1b8020071e Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Fri, 1 Mar 2019 15:22:15 +0800
 Subject: [PATCH] do not disable buffer in writing files
@@ -167,10 +167,10 @@ index 7ff844c78c3a..5c5721d7c2f7 100644
                  STRV_FOREACH(f, files) {
                          k = apply_file(*f, true);
 diff --git a/src/core/main.c b/src/core/main.c
-index 3c6b66e89c8e..c39ebe56a5b3 100644
+index c24b696b1663..195be7d2df0d 100644
 --- a/src/core/main.c
 +++ b/src/core/main.c
-@@ -1312,7 +1312,7 @@ static int bump_unix_max_dgram_qlen(void) {
+@@ -1303,7 +1303,7 @@ static int bump_unix_max_dgram_qlen(void) {
          if (v >= DEFAULT_UNIX_MAX_DGRAM_QLEN)
                  return 0;
  
@@ -179,7 +179,7 @@ index 3c6b66e89c8e..c39ebe56a5b3 100644
          if (r < 0)
                  return log_full_errno(IN_SET(r, -EROFS, -EPERM, -EACCES) ? LOG_DEBUG : LOG_WARNING, r,
                                        "Failed to bump AF_UNIX datagram queue length, ignoring: %m");
-@@ -1536,7 +1536,7 @@ static void initialize_core_pattern(bool skip_setup) {
+@@ -1527,7 +1527,7 @@ static void initialize_core_pattern(bool skip_setup) {
          if (getpid_cached() != 1)
                  return;
  
@@ -228,7 +228,7 @@ index 17e7cd1a009b..87a766771663 100644
                  log_error_errno(r, "Failed to write '%s' to /sys/power/resume: %m", major_minor);
                  return EXIT_FAILURE;
 diff --git a/src/libsystemd/sd-device/sd-device.c b/src/libsystemd/sd-device/sd-device.c
-index 1f2451f8e1b4..3f676ec2841a 100644
+index f35612fe12bc..20351bf7fa70 100644
 --- a/src/libsystemd/sd-device/sd-device.c
 +++ b/src/libsystemd/sd-device/sd-device.c
 @@ -1849,7 +1849,7 @@ _public_ int sd_device_set_sysattr_value(sd_device *device, const char *sysattr,
@@ -241,10 +241,10 @@ index 1f2451f8e1b4..3f676ec2841a 100644
                  if (r == -ELOOP)
                          return -EINVAL;
 diff --git a/src/login/logind-dbus.c b/src/login/logind-dbus.c
-index 52a7ea3c77e9..9703de0dabee 100644
+index 69b59948786f..b4973c596d48 100644
 --- a/src/login/logind-dbus.c
 +++ b/src/login/logind-dbus.c
-@@ -1339,7 +1339,7 @@ static int trigger_device(Manager *m, sd_device *d) {
+@@ -1322,7 +1322,7 @@ static int trigger_device(Manager *m, sd_device *d) {
                  if (!t)
                          return -ENOMEM;
  
@@ -267,10 +267,10 @@ index f5048d9473cb..b6383ab5c97e 100644
                  log_error_errno(r, "Failed to move process: %m");
                  goto finish;
 diff --git a/src/nspawn/nspawn.c b/src/nspawn/nspawn.c
-index 734dee1130e0..71add9a055d2 100644
+index 873a76596f0b..4e496548bb94 100644
 --- a/src/nspawn/nspawn.c
 +++ b/src/nspawn/nspawn.c
-@@ -2440,7 +2440,7 @@ static int reset_audit_loginuid(void) {
+@@ -2425,7 +2425,7 @@ static int reset_audit_loginuid(void) {
          if (streq(p, "4294967295"))
                  return 0;
  
@@ -279,7 +279,7 @@ index 734dee1130e0..71add9a055d2 100644
          if (r < 0) {
                  log_error_errno(r,
                                  "Failed to reset audit login UID. This probably means that your kernel is too\n"
-@@ -3665,13 +3665,13 @@ static int setup_uid_map(pid_t pid) {
+@@ -3633,13 +3633,13 @@ static int setup_uid_map(pid_t pid) {
  
          xsprintf(uid_map, "/proc/" PID_FMT "/uid_map", pid);
          xsprintf(line, UID_FMT " " UID_FMT " " UID_FMT "\n", 0, arg_uid_shift, arg_uid_range);
@@ -318,10 +318,10 @@ index e8398cbde5ba..ba682ec0c9e7 100644
                                  log_debug_errno(r, "Failed to %s controller %s for %s (%s): %m",
                                                  FLAGS_SET(mask, bit) ? "enable" : "disable", n, p, fs);
 diff --git a/src/shared/sysctl-util.c b/src/shared/sysctl-util.c
-index 8543dbd2d05f..76162599817e 100644
+index 12fb3ef7ea0e..132ac847c091 100644
 --- a/src/shared/sysctl-util.c
 +++ b/src/shared/sysctl-util.c
-@@ -93,7 +93,7 @@ int sysctl_write_ip_property(int af, const char *ifname, const char *property, c
+@@ -87,7 +87,7 @@ int sysctl_write_ip_property(int af, const char *ifname, const char *property, c
  
          log_debug("Setting '%s' to '%s'", p, value);
  
@@ -331,28 +331,28 @@ index 8543dbd2d05f..76162599817e 100644
  
  int sysctl_read(const char *property, char **content) {
 diff --git a/src/sleep/sleep.c b/src/sleep/sleep.c
-index fbfddc0262fc..7cc2902154e9 100644
+index 89b80367f8f4..33dbb21364d0 100644
 --- a/src/sleep/sleep.c
 +++ b/src/sleep/sleep.c
-@@ -47,7 +47,7 @@ static int write_hibernate_location_info(const HibernateLocation *hibernate_loca
+@@ -45,7 +45,7 @@ static int write_hibernate_location_info(const HibernateLocation *hibernate_loca
          assert(hibernate_location->swap);
+         assert(hibernate_location->resume);
  
-         xsprintf(resume_str, "%u:%u", major(hibernate_location->devno), minor(hibernate_location->devno));
--        r = write_string_file("/sys/power/resume", resume_str, WRITE_STRING_FILE_DISABLE_BUFFER);
-+        r = write_string_file("/sys/power/resume", resume_str, 0);
+-        r = write_string_file("/sys/power/resume", hibernate_location->resume, WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file("/sys/power/resume", hibernate_location->resume, 0);
          if (r < 0)
                  return log_debug_errno(r, "Failed to write partition device to /sys/power/resume for '%s': '%s': %m",
-                                        hibernate_location->swap->device, resume_str);
-@@ -74,7 +74,7 @@ static int write_hibernate_location_info(const HibernateLocation *hibernate_loca
+                                        hibernate_location->swap->device, hibernate_location->resume);
+@@ -72,7 +72,7 @@ static int write_hibernate_location_info(const HibernateLocation *hibernate_loca
          }
  
-         xsprintf(offset_str, "%" PRIu64, hibernate_location->offset);
+         xsprintf(offset_str, "%" PRIu64, hibernate_location->resume_offset);
 -        r = write_string_file("/sys/power/resume_offset", offset_str, WRITE_STRING_FILE_DISABLE_BUFFER);
 +        r = write_string_file("/sys/power/resume_offset", offset_str, 0);
          if (r < 0)
                  return log_debug_errno(r, "Failed to write swap file offset to /sys/power/resume_offset for '%s': '%s': %m",
                                         hibernate_location->swap->device, offset_str);
-@@ -91,7 +91,7 @@ static int write_mode(char **modes) {
+@@ -89,7 +89,7 @@ static int write_mode(char **modes) {
          STRV_FOREACH(mode, modes) {
                  int k;
  
@@ -361,7 +361,7 @@ index fbfddc0262fc..7cc2902154e9 100644
                  if (k >= 0)
                          return 0;
  
-@@ -110,7 +110,7 @@ static int write_state(FILE **f, char **states) {
+@@ -108,7 +108,7 @@ static int write_state(FILE **f, char **states) {
          STRV_FOREACH(state, states) {
                  int k;
  
@@ -384,7 +384,7 @@ index 60c68b5029cf..fdca03d3d42c 100644
                          bool ignore = IN_SET(r, -ENOENT, -EACCES, -ENODEV, -EROFS);
  
 diff --git a/src/udev/udevd.c b/src/udev/udevd.c
-index ca65474f2763..38780681431a 100644
+index 7678331897f5..6871cde7aa65 100644
 --- a/src/udev/udevd.c
 +++ b/src/udev/udevd.c
 @@ -1089,7 +1089,7 @@ static int synthesize_change_one(sd_device *dev, const char *syspath) {

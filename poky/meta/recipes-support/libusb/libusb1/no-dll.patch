@@ -1,0 +1,19 @@
+As all invokes all-recursive which uses sub-makes to invoke all-am, the
+resulting makefile wants to build libusb-1.0.la twice. In non-parallel builds
+the second attempt is skipped as the target already exists, but in highly
+parallel builds it's likely that two makes will be building libusb-1.0.la at the
+same time.
+
+Solve this by removing the explicit all target, which as libusb-1.0.dll isn't
+built under Linux is redundant anyway.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/libusb/Makefile.am b/libusb/Makefile.am
+index 0cab0a0..c880213 100644
+--- a/libusb/Makefile.am
++++ b/libusb/Makefile.am
+@@ -1,2 +0,0 @@
+-all: libusb-1.0.la libusb-1.0.dll
+-

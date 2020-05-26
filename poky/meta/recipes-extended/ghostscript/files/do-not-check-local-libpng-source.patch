@@ -1,7 +1,7 @@
-From 2adaa7366064a8f18af864eda74e52877a89620c Mon Sep 17 00:00:00 2001
+From a954bf29a5f906b3151dffbecb5856e02e1565da Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Mon, 18 Jan 2016 01:00:30 -0500
-Subject: [PATCH] configure.ac: do not check local png source
+Subject: [PATCH 03/10] configure.ac: do not check local png source
 
 In oe-core, it did not need to compile local libpng
 source in ghostscript, so do not check local png
@@ -11,21 +11,28 @@ libpng library.
 Upstream-Status: Inappropriate [OE-Core specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
-
 ---
- configure.ac | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 698abd3..e65ac8b 100644
+index 9341930..80a60b1 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1241,7 +1241,7 @@ else
-   PNGDEVS=''
-   PNGDEVS_ALL='png48 png16m pnggray pngmono pngmonod png256 png16 pngalpha'
-   AC_MSG_CHECKING([for local png library source])
--  if test -f $srcdir/libpng/pngread.c; then
-+  if false; then
-           AC_MSG_RESULT([yes])
-           SHARE_LIBPNG=0
-           LIBPNGDIR=$srcdir/libpng
+@@ -1114,11 +1114,11 @@ AC_SUBST(ZLIBDIR)
+ AC_SUBST(FT_SYS_ZLIB)
+ 
+ dnl png for the png output device; it also requires zlib
+-LIBPNGDIR=src
++LIBPNGDIR=$srcdir/libpng
+ PNGDEVS=''
+ PNGDEVS_ALL='png48 png16m pnggray pngmono pngmonod png256 png16 pngalpha'
+ AC_MSG_CHECKING([for local png library source])
+-if test -f $srcdir/libpng/pngread.c; then
++if false; then
+         AC_MSG_RESULT([yes])
+         SHARE_LIBPNG=0
+         LIBPNGDIR=$srcdir/libpng
+-- 
+1.8.3.1
+

@@ -1,4 +1,4 @@
-From e9c993816077c1ae67d25d464f2ece2a090f30b8 Mon Sep 17 00:00:00 2001
+From c73a87871df31b4f8d96c9d443759c6f702935f6 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Thu, 21 Feb 2019 16:23:24 +0800
 Subject: [PATCH] binfmt: Don't install dependency links at install time for
@@ -26,10 +26,10 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
  3 files changed, 9 insertions(+), 4 deletions(-)
 
 diff --git a/units/meson.build b/units/meson.build
-index ea91f0cc9ea7..25186f88dfeb 100644
+index 6a3a0d0dea22..bbb1b78618c3 100644
 --- a/units/meson.build
 +++ b/units/meson.build
-@@ -52,8 +52,7 @@ units = [
+@@ -46,8 +46,7 @@ units = [
          ['poweroff.target',                     '',
           'runlevel0.target'],
          ['printer.target',                      ''],
@@ -39,16 +39,16 @@ index ea91f0cc9ea7..25186f88dfeb 100644
          ['proc-sys-fs-binfmt_misc.mount',       'ENABLE_BINFMT'],
          ['reboot.target',                       '',
           'runlevel6.target ctrl-alt-del.target'],
-@@ -161,8 +160,7 @@ in_units = [
-         ['rc-local.service',                     'HAVE_SYSV_COMPAT'],
-         ['rescue.service',                       ''],
+@@ -130,8 +129,7 @@ in_units = [
+         ['systemd-ask-password-console.service', ''],
+         ['systemd-ask-password-wall.service',    ''],
          ['systemd-backlight@.service',           'ENABLE_BACKLIGHT'],
 -        ['systemd-binfmt.service',               'ENABLE_BINFMT',
 -         'sysinit.target.wants/'],
 +        ['systemd-binfmt.service',               'ENABLE_BINFMT'],
          ['systemd-bless-boot.service',           'ENABLE_EFI HAVE_BLKID'],
          ['systemd-boot-check-no-failures.service', ''],
-         ['systemd-coredump@.service',            'ENABLE_COREDUMP'],
+         ['systemd-boot-system-token.service',    'ENABLE_EFI',
 diff --git a/units/proc-sys-fs-binfmt_misc.automount b/units/proc-sys-fs-binfmt_misc.automount
 index 30a6bc991844..4231f3b70fe9 100644
 --- a/units/proc-sys-fs-binfmt_misc.automount

@@ -1,4 +1,4 @@
-From 7e20a7242ba2657f73311bbf5278093da67f0721 Mon Sep 17 00:00:00 2001
+From a1d360509fa3a4aff57eedcd528cc0347a87531d Mon Sep 17 00:00:00 2001
 From: Robert Yang <liezhi.yang@windriver.com>
 Date: Tue, 16 Sep 2014 01:59:08 -0700
 Subject: [PATCH] gnulib-comp.m4: selinux/flask.h should respect to
@@ -13,20 +13,20 @@ compilation terminated.
 Upstream-Status: Pending
 
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
-
 ---
- m4/gnulib-comp.m4 | 2 +-
+ m4/gnulib-comp.m4 |    2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/m4/gnulib-comp.m4 b/m4/gnulib-comp.m4
-index dead90e..0abf0bd 100644
+index 472d3a0..5f09734 100644
 --- a/m4/gnulib-comp.m4
 +++ b/m4/gnulib-comp.m4
-@@ -1860,10 +1860,10 @@ AC_DEFUN([gl_INIT],
+@@ -1730,11 +1730,11 @@ AC_DEFUN([gl_INIT],
      AC_LIBOBJ([select])
    fi
    gl_SYS_SELECT_MODULE_INDICATOR([select])
 -  AC_CHECK_HEADERS([selinux/flask.h])
+   AC_LIBOBJ([selinux-at])
    gl_HEADERS_SELINUX_SELINUX_H
    gl_HEADERS_SELINUX_CONTEXT_H
    if test "$with_selinux" != no && test "$ac_cv_header_selinux_selinux_h" = yes; then
@@ -34,3 +34,6 @@ index dead90e..0abf0bd 100644
      AC_LIBOBJ([getfilecon])
    fi
    gl_SERVENT
+-- 
+1.7.9.5
+

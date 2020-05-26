@@ -90,7 +90,7 @@ do_install () {
         install -d ${D}${sysconfdir}/tmpfiles.d
         echo "d /run/${BPN} - - - -" \
             > ${D}${sysconfdir}/tmpfiles.d/${BPN}.conf
-        echo "d /${localstatedir}/log/${BPN} 0755 root root -" \
+        echo "d ${localstatedir}/log/${BPN} 0755 root root -" \
             >> ${D}${sysconfdir}/tmpfiles.d/${BPN}.conf
     fi
     install -d ${D}${sysconfdir}/${BPN}
@@ -139,6 +139,8 @@ do_install () {
             -e 's,@BASE_BINDIR@,${base_bindir},g' \
             ${D}${systemd_unitdir}/system/nginx.service
     fi
+
+    rm -rf ${D}${localstatedir}/log/
 }
 
 pkg_postinst_${PN} () {

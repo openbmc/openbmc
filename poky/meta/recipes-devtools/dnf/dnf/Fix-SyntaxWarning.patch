@@ -1,0 +1,34 @@
+From 23c5b15efe42e5e6ee695e54798bac248532d8d6 Mon Sep 17 00:00:00 2001
+
+Date: Tue, 28 May 2019 13:14:51 +0200
+Subject: [oe-core][PATCH 1/1] Fix SyntaxWarning: "is" with a literal. Did you
+ mean "=="?
+
+---
+ dnf/cli/commands/repoquery.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+---
+
+Unchanged.  Appears in version 4.2.7.
+
+Upstream-Status: Backport [git://github.com/rpm-software-management/dnf.git]
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+
+diff --git a/dnf/cli/commands/repoquery.py b/dnf/cli/commands/repoquery.py
+index 941a470..63fc668 100644
+--- a/dnf/cli/commands/repoquery.py
++++ b/dnf/cli/commands/repoquery.py
+@@ -611,7 +611,7 @@ class RepoQueryCommand(commands.Command):
+ 
+     def tree_seed(self, query, aquery, opts, level=-1, usedpkgs=None):
+         for pkg in sorted(set(query.run()), key=lambda p: p.name):
+-            usedpkgs = set() if usedpkgs is None or level is -1 else usedpkgs
++            usedpkgs = set() if usedpkgs is None or level == -1 else usedpkgs
+             if pkg.name.startswith("rpmlib") or pkg.name.startswith("solvable"):
+                 return
+             self.grow_tree(level, pkg, opts)
+-- 
+2.7.4
+

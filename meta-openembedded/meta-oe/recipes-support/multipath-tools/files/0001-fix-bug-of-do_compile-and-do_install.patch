@@ -1,0 +1,44 @@
+From fd90d952edaa4b27e62a29fdba7a201288d440eb Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@cn.fujitsu.com>
+Date: Sun, 10 May 2020 21:22:53 +0800
+Subject: [PATCH] fix bug of do_compile and do_install
+
+when multiple processes make run in parallel,
+because of dependency error will occur.
+
+Signed-off-by: Wang Mingyu <wangmy@cn.fujitsu.com>
+---
+ Makefile | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 1dee3680..bea0a0b2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -28,9 +28,22 @@ all:	$(BUILDDIRS)
+ $(BUILDDIRS):
+ 	$(MAKE) -C $@
+ 
+-multipath multipathd mpathpersist: libmultipath
++multipath multipathd mpathpersist libmpathpersist : libmultipath
+ mpathpersist:  libmpathpersist
+ 
++DEPS_ON_MULTIPATH := \
++	multipath \
++	libmultipath/prioritizers \
++	libmultipath/checkers \
++	libmultipath/foreign \
++	multipathd \
++	mpathpersist \
++	libmpathpersist
++
++$(DEPS_ON_MULTIPATH:=.install): libmultipath.install
++mpathpersist.install:  libmpathpersist.install
++libdmmp.install libmultipath/foreign.install:  mpathpersist.install
++
+ $(BUILDDIRS.clean):
+ 	$(MAKE) -C ${@:.clean=} clean
+ 
+-- 
+2.17.1
+

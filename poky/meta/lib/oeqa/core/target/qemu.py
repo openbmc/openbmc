@@ -20,7 +20,7 @@ class OEQemuTarget(OESSHTarget):
             port=None, machine='', rootfs='', kernel='', kvm=False, slirp=False,
             dump_dir='', dump_host_cmds='', display='', bootlog='',
             tmpdir='', dir_image='', boottime=60, serial_ports=2,
-            boot_patterns = defaultdict(str), ovmf=False, **kwargs):
+            boot_patterns = defaultdict(str), **kwargs):
 
         super(OEQemuTarget, self).__init__(logger, None, server_ip, timeout,
                 user, port)
@@ -31,7 +31,6 @@ class OEQemuTarget(OESSHTarget):
         self.rootfs = rootfs
         self.kernel = kernel
         self.kvm = kvm
-        self.ovmf = ovmf
         self.use_slirp = slirp
         self.boot_patterns = boot_patterns
 
@@ -40,8 +39,7 @@ class OEQemuTarget(OESSHTarget):
                                  logfile=bootlog, boottime=boottime,
                                  use_kvm=kvm, use_slirp=slirp, dump_dir=dump_dir,
                                  dump_host_cmds=dump_host_cmds, logger=logger,
-                                 serial_ports=serial_ports, boot_patterns = boot_patterns, 
-                                 use_ovmf=ovmf)
+                                 serial_ports=serial_ports, boot_patterns = boot_patterns)
 
     def start(self, params=None, extra_bootparams=None, runqemuparams=''):
         if self.use_slirp and not self.server_ip:

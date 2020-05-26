@@ -8,6 +8,7 @@ SRC_URI = "git://github.com/matze/pkgconfig.git"
 SRCREV ?= "8af0102346847e8873af8e76ab3f34ba9da806e2"
 
 RDEPENDS_${PN} = "pkgconfig \
+                 ${PYTHON_PN}-shell \
                  "
 
 inherit setuptools3

@@ -1,0 +1,36 @@
+From 3e9d85f1b75e2b1096d9643563d7d17380752fc7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
+Date: Tue, 11 Feb 2020 09:34:38 +0200
+Subject: [PATCH] GMainContext - Move mutex unlocking in destructor right
+ before freeing the mutex
+
+This does not have any behaviour changes but is cleaner. The mutex is
+only unlocked now after all operations on the context are done and right
+before freeing the mutex and the context itself.
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/glib/-/commit/730a75fc8e8271c38fbd5363d1f77a00876b9ddc]
+
+---
+ glib/gmain.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/glib/gmain.c b/glib/gmain.c
+index 10ba2f8..b1df470 100644
+--- a/glib/gmain.c
++++ b/glib/gmain.c
+@@ -584,7 +584,6 @@ g_main_context_unref (GMainContext *context)
+       source = s_iter->data;
+       g_source_destroy_internal (source, context, TRUE);
+     }
+-  UNLOCK_CONTEXT (context);
+
+   for (sl_iter = context->source_lists; sl_iter; sl_iter = sl_iter->next)
+     {
+@@ -595,6 +594,7 @@ g_main_context_unref (GMainContext *context)
+
+   g_hash_table_destroy (context->sources);
+
++  UNLOCK_CONTEXT (context);
+   g_mutex_clear (&context->mutex);
+
+   g_ptr_array_free (context->pending_dispatches, TRUE);

@@ -1,0 +1,50 @@
+From 59d2cbb54c012b25adeb965a94b6585d911a4539 Mon Sep 17 00:00:00 2001
+From: Joshua Watt <JPEWhacker@gmail.com>
+Date: Wed, 20 Nov 2019 09:03:47 -0600
+Subject: [PATCH] Fix build reproducibility
+
+ba744068 ("Make meson.override_find_program working on more complex use
+cases") made the build no longer reproducible by encoding a build system
+path into the output. This shouldn't be necessary anyway, since it
+should be possible to add new paths to search for gir files by setting
+the XDG_DATA_DIR environment variable.
+
+Closes #318
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/gobject-introspection/merge_requests/192]
+Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
+---
+ girepository/girparser.c | 4 ----
+ meson.build              | 1 -
+ 2 files changed, 5 deletions(-)
+
+diff --git a/girepository/girparser.c b/girepository/girparser.c
+index fb47e75c..53450baf 100644
+--- a/girepository/girparser.c
++++ b/girepository/girparser.c
+@@ -309,10 +309,6 @@ locate_gir (GIrParser  *parser,
+   if (g_file_test (path, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_REGULAR))
+     return path;
+   g_free (path);
+-  path = g_build_filename (UNINSTALLED_GIR_DIR, girname, NULL);
+-  if (g_file_test (path, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_REGULAR))
+-    return path;
+-  g_free (path);
+   return NULL;
+ }
+ 
+diff --git a/meson.build b/meson.build
+index d6231c5f..2f248579 100644
+--- a/meson.build
++++ b/meson.build
+@@ -90,7 +90,6 @@ endif
+ girdir = join_paths(gir_dir_prefix, 'gir-1.0')
+ config.set_quoted('GIR_DIR', girdir)
+ config.set_quoted('GOBJECT_INTROSPECTION_LIBDIR', join_paths(get_option('prefix'), get_option('libdir')))
+-config.set_quoted('UNINSTALLED_GIR_DIR', join_paths(meson.current_build_dir(), 'gir'))
+ 
+ foreach type : ['char', 'short', 'int', 'long']
+   size = cc.sizeof(type)
+-- 
+2.23.0
+

@@ -1,0 +1,58 @@
+From 43fbc3f53302a395463e8450ac81c53f623eec3f Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 27 Aug 2019 17:42:34 +0200
+Subject: [PATCH] mono-find-provides/requires: do not use monodis from the host
+
+There was a host contamination issue here: if monodis was installed
+on the host, do_package would use that to resolve dependencies
+of mono libraries (and often fail in that). Without monodis,
+no dependencies are resolved, which is seemingly how things
+are supposed to work.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ scripts/mono-find-provides | 8 ++++----
+ scripts/mono-find-requires | 8 ++++----
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/scripts/mono-find-provides b/scripts/mono-find-provides
+index 9348457d3..b28872ffb 100644
+--- a/scripts/mono-find-provides
++++ b/scripts/mono-find-provides
+@@ -18,11 +18,11 @@ monolist=($(printf "%s\n" "${filelist[@]}" | grep -E "\\.(exe|dll)\$"))
+ build_bindir="$2/usr/bin"
+ build_libdir="$2$3"
+ 
+-if [ -x $build_bindir/monodis ]; then
+-    monodis="$build_bindir/monodis"
++if [ -x $build_bindir/monodis.bogus ]; then
++    monodis="$build_bindir/monodis.bogus"
+     export LD_LIBRARY_PATH=$build_libdir${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+-elif [ -x /usr/bin/monodis ]; then
+-    monodis="/usr/bin/monodis"
++elif [ -x /usr/bin/monodis.bogus ]; then
++    monodis="/usr/bin/monodis.bogus"
+ else
+     exit 0;
+ fi
+diff --git a/scripts/mono-find-requires b/scripts/mono-find-requires
+index ea58cae48..d270169e1 100644
+--- a/scripts/mono-find-requires
++++ b/scripts/mono-find-requires
+@@ -18,11 +18,11 @@ monolist=($(printf "%s\n" "${filelist[@]}" | grep -E "\\.(exe|dll)\$"))
+ build_bindir="$2/usr/bin"
+ build_libdir="$2$3"
+ 
+-if [ -x $build_bindir/monodis ]; then
+-    monodis="$build_bindir/monodis"
++if [ -x $build_bindir/monodis.bogus ]; then
++    monodis="$build_bindir/monodis.bogus"
+     export LD_LIBRARY_PATH=$build_libdir${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+-elif [ -x /usr/bin/monodis ]; then
+-    monodis="/usr/bin/monodis"
++elif [ -x /usr/bin/monodis.bogus ]; then
++    monodis="/usr/bin/monodis.bogus"
+ else
+     exit 0;
+ fi

@@ -5,11 +5,17 @@
 import itertools
 
 def is_optional(feature, d):
-    return bool(d.getVarFlag("FEATURE_PACKAGES_%s" % feature, "optional"))
+    packages = d.getVar("FEATURE_PACKAGES_%s" % feature)
+    if packages:
+        return bool(d.getVarFlag("FEATURE_PACKAGES_%s" % feature, "optional"))
+    else:
+        return bool(d.getVarFlag("PACKAGE_GROUP_%s" % feature, "optional"))
 
 def packages(features, d):
     for feature in features:
         packages = d.getVar("FEATURE_PACKAGES_%s" % feature)
+        if not packages:
+            packages = d.getVar("PACKAGE_GROUP_%s" % feature)
         for pkg in (packages or "").split():
             yield pkg
 

@@ -1,4 +1,4 @@
-From 47818052121d135632f5e46c369e3e4706a0f9e0 Mon Sep 17 00:00:00 2001
+From 3932ce7f6c8ace5e1210aad20e1a141cb29329b1 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 26 Oct 2017 22:10:42 -0700
 Subject: [PATCH] Include netinet/if_ether.h
@@ -53,7 +53,7 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
  19 files changed, 18 insertions(+), 4 deletions(-)
 
 diff --git a/src/libsystemd-network/sd-dhcp6-client.c b/src/libsystemd-network/sd-dhcp6-client.c
-index eac2e725cce7..1beae7ba91cc 100644
+index 5417ba8c5feb..d3aba928dd96 100644
 --- a/src/libsystemd-network/sd-dhcp6-client.c
 +++ b/src/libsystemd-network/sd-dhcp6-client.c
 @@ -5,7 +5,6 @@
@@ -65,7 +65,7 @@ index eac2e725cce7..1beae7ba91cc 100644
  
  #include "sd-dhcp6-client.h"
 diff --git a/src/libsystemd/sd-netlink/netlink-types.c b/src/libsystemd/sd-netlink/netlink-types.c
-index e35127a4cd2e..4f6ad9ef5886 100644
+index a55460f03407..6f9cd527c800 100644
 --- a/src/libsystemd/sd-netlink/netlink-types.c
 +++ b/src/libsystemd/sd-netlink/netlink-types.c
 @@ -3,6 +3,7 @@
@@ -77,7 +77,7 @@ index e35127a4cd2e..4f6ad9ef5886 100644
  #include <linux/netlink.h>
  #include <linux/rtnetlink.h>
 diff --git a/src/machine/machine-dbus.c b/src/machine/machine-dbus.c
-index a2990452af17..5af350883c28 100644
+index 3b2ac3829859..760ccb445cd0 100644
 --- a/src/machine/machine-dbus.c
 +++ b/src/machine/machine-dbus.c
 @@ -3,6 +3,7 @@
@@ -89,7 +89,7 @@ index a2990452af17..5af350883c28 100644
  /* When we include libgen.h because we need dirname() we immediately
   * undefine basename() since libgen.h defines it as a macro to the POSIX
 diff --git a/src/network/netdev/bond.c b/src/network/netdev/bond.c
-index 8df39e35843f..8d697894f970 100644
+index 185b155440e7..dc1cd236c814 100644
 --- a/src/network/netdev/bond.c
 +++ b/src/network/netdev/bond.c
 @@ -1,5 +1,6 @@
@@ -100,7 +100,7 @@ index 8df39e35843f..8d697894f970 100644
  #include "bond.h"
  #include "conf-parser.h"
 diff --git a/src/network/netdev/bridge.c b/src/network/netdev/bridge.c
-index 6b8f9944612e..7f81ec25c407 100644
+index 59a40faef8fa..8e821a3216b3 100644
 --- a/src/network/netdev/bridge.c
 +++ b/src/network/netdev/bridge.c
 @@ -1,5 +1,6 @@
@@ -111,7 +111,7 @@ index 6b8f9944612e..7f81ec25c407 100644
  
  #include "bridge.h"
 diff --git a/src/network/netdev/macsec.c b/src/network/netdev/macsec.c
-index 7d1fec3afe6d..e948a335336d 100644
+index 25dc23ff0338..f20d11fbcf53 100644
 --- a/src/network/netdev/macsec.c
 +++ b/src/network/netdev/macsec.c
 @@ -1,5 +1,6 @@
@@ -134,7 +134,7 @@ index 09a5f4822e03..873299b1f98a 100644
  #include "bond.h"
  #include "bridge.h"
 diff --git a/src/network/netdev/netdev.c b/src/network/netdev/netdev.c
-index f8121a48ed92..437f411c61e8 100644
+index 6908c4e811b0..e0d8c459ab63 100644
 --- a/src/network/netdev/netdev.c
 +++ b/src/network/netdev/netdev.c
 @@ -1,5 +1,6 @@
@@ -145,7 +145,7 @@ index f8121a48ed92..437f411c61e8 100644
  #include <netinet/in.h>
  
 diff --git a/src/network/networkd-brvlan.c b/src/network/networkd-brvlan.c
-index 41f09287f2b7..b67ce4fc8844 100644
+index c3c5d535ac66..ebea408c89a8 100644
 --- a/src/network/networkd-brvlan.c
 +++ b/src/network/networkd-brvlan.c
 @@ -4,6 +4,7 @@
@@ -157,7 +157,7 @@ index 41f09287f2b7..b67ce4fc8844 100644
  #include <stdbool.h>
  
 diff --git a/src/network/networkd-dhcp-common.c b/src/network/networkd-dhcp-common.c
-index 8664d8cdc0d4..e9f91f74c1a1 100644
+index 6465a8cfe9c7..bd4b2cdfac15 100644
 --- a/src/network/networkd-dhcp-common.c
 +++ b/src/network/networkd-dhcp-common.c
 @@ -4,6 +4,7 @@
@@ -169,22 +169,21 @@ index 8664d8cdc0d4..e9f91f74c1a1 100644
  #include "parse-util.h"
  #include "string-table.h"
 diff --git a/src/network/networkd-dhcp4.c b/src/network/networkd-dhcp4.c
-index 13e3e32f40e8..5394399c9150 100644
+index 8ca87d99d4db..a66284896cf3 100644
 --- a/src/network/networkd-dhcp4.c
 +++ b/src/network/networkd-dhcp4.c
-@@ -1,9 +1,9 @@
+@@ -1,8 +1,8 @@
  /* SPDX-License-Identifier: LGPL-2.1+ */
  
 +#include <netinet/if_ether.h>
  #include <netinet/in.h>
- #include <netinet/ip.h>
  #include <linux/if.h>
 -#include <linux/if_arp.h>
  
  #include "alloc-util.h"
  #include "dhcp-client-internal.h"
 diff --git a/src/network/networkd-dhcp6.c b/src/network/networkd-dhcp6.c
-index 7304270c60b1..099064f64715 100644
+index 647623ac3778..325c641c6231 100644
 --- a/src/network/networkd-dhcp6.c
 +++ b/src/network/networkd-dhcp6.c
 @@ -3,9 +3,9 @@
@@ -199,7 +198,7 @@ index 7304270c60b1..099064f64715 100644
  
  #include "sd-dhcp6-client.h"
 diff --git a/src/network/networkd-link.c b/src/network/networkd-link.c
-index 99d4b29c31ec..e8b467d6ac09 100644
+index 2e60adbf7818..05aa8672d585 100644
 --- a/src/network/networkd-link.c
 +++ b/src/network/networkd-link.c
 @@ -1,8 +1,8 @@
@@ -213,7 +212,7 @@ index 99d4b29c31ec..e8b467d6ac09 100644
  
  #include "alloc-util.h"
 diff --git a/src/network/networkd-network.c b/src/network/networkd-network.c
-index 2e716b291e97..56f18cea57fe 100644
+index 6e443975f171..d1aab0ca5ba2 100644
 --- a/src/network/networkd-network.c
 +++ b/src/network/networkd-network.c
 @@ -1,5 +1,6 @@
@@ -233,7 +232,7 @@ index 25b939639775..530e4928835c 100644
  #include "dhcp6-internal.h"
  #include "dhcp6-protocol.h"
 diff --git a/src/shared/ethtool-util.c b/src/shared/ethtool-util.c
-index 00a71d64a638..4593e89120b8 100644
+index 3119b2b92e3b..927ddd067eef 100644
 --- a/src/shared/ethtool-util.c
 +++ b/src/shared/ethtool-util.c
 @@ -1,5 +1,6 @@
@@ -244,19 +243,19 @@ index 00a71d64a638..4593e89120b8 100644
  #include <sys/ioctl.h>
  #include <linux/ethtool.h>
 diff --git a/src/shared/ethtool-util.h b/src/shared/ethtool-util.h
-index c1d5d7590ef9..b3e018bf76e9 100644
+index d408bcd90a0b..7a1e399af023 100644
 --- a/src/shared/ethtool-util.h
 +++ b/src/shared/ethtool-util.h
-@@ -3,6 +3,7 @@
+@@ -2,6 +2,7 @@
+ #pragma once
  
  #include <macro.h>
- #include <net/ethernet.h>
 +#include <netinet/if_ether.h>
  #include <linux/ethtool.h>
  
  #include "conf-parser.h"
 diff --git a/src/udev/net/link-config.c b/src/udev/net/link-config.c
-index 0332e99269c9..ff3aead4a779 100644
+index 7b07e2f38fa8..18680a8e5484 100644
 --- a/src/udev/net/link-config.c
 +++ b/src/udev/net/link-config.c
 @@ -1,5 +1,6 @@

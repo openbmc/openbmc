@@ -1,4 +1,4 @@
-From 4aa91347ae975051dbe4dd2f98a1f4f459f2604f Mon Sep 17 00:00:00 2001
+From f6df7f25a6bb00d5540915216adfff8afefec2b0 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 15:12:41 +0800
 Subject: [PATCH] Use uintmax_t for handling rlim_t
@@ -28,10 +28,10 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  3 files changed, 8 insertions(+), 14 deletions(-)
 
 diff --git a/src/basic/format-util.h b/src/basic/format-util.h
-index c47fa76ea8ff..14a78d9f5fd0 100644
+index 59622508a333..779b6826d50e 100644
 --- a/src/basic/format-util.h
 +++ b/src/basic/format-util.h
-@@ -32,13 +32,7 @@ assert_cc(sizeof(gid_t) == sizeof(uint32_t));
+@@ -44,13 +44,7 @@
  #  define PRI_TIMEX "li"
  #endif
  
@@ -78,10 +78,10 @@ index 2dc13eabc30d..0633cc67f417 100644
          return 1;
  }
 diff --git a/src/core/execute.c b/src/core/execute.c
-index 9762dc57443c..4a3421bb3ee6 100644
+index f04b8ba05002..084cf1420078 100644
 --- a/src/core/execute.c
 +++ b/src/core/execute.c
-@@ -4567,9 +4567,9 @@ void exec_context_dump(const ExecContext *c, FILE* f, const char *prefix) {
+@@ -4455,9 +4455,9 @@ void exec_context_dump(const ExecContext *c, FILE* f, const char *prefix) {
          for (i = 0; i < RLIM_NLIMITS; i++)
                  if (c->rlimit[i]) {
                          fprintf(f, "%sLimit%s: " RLIM_FMT "\n",

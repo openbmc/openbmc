@@ -1,0 +1,24 @@
+In our builds Config_heavy.pl sometimes has lines:
+cwarnflags=XXX
+ccstdflags=XXX
+and sometimes does not.
+The reason is that this information is pulled from cflags by configpm and yet
+there is no dependency in the Makefile. Add one to fix this.
+
+Upstream-Status: Submitted [https://github.com/arsv/perl-cross/pull/89]
+RP 2020/2/19
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: perl-5.30.1/Makefile
+===================================================================
+--- perl-5.30.1.orig/Makefile
++++ perl-5.30.1/Makefile
+@@ -204,7 +204,7 @@ configpod: $(CONFIGPOD)
+ git_version.h lib/Config_git.pl: make_patchnum.pl | miniperl$X
+ 	./miniperl_top make_patchnum.pl
+ 
+-lib/Config.pm lib/Config_heavy.pl lib/Config.pod: config.sh \
++lib/Config.pm lib/Config_heavy.pl lib/Config.pod: config.sh cflags \
+ 		lib/Config_git.pl Porting/Glossary | miniperl$X
+ 	./miniperl_top configpm
+ 

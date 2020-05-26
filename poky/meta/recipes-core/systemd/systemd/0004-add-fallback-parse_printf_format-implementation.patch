@@ -1,4 +1,4 @@
-From 8af168cefca01f8f2da336f1c82620c284dc74f2 Mon Sep 17 00:00:00 2001
+From 142dcaef0d24a78d3c0c94168b66fdf234497e97 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 14:04:21 +0800
 Subject: [PATCH] add fallback parse_printf_format implementation
@@ -23,10 +23,10 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
  create mode 100644 src/basic/parse-printf-format.h
 
 diff --git a/meson.build b/meson.build
-index fc216d22da24..a25996803d64 100644
+index 21d6968abdf4..bab0bf84806c 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -640,6 +640,7 @@ endif
+@@ -628,6 +628,7 @@ endif
  foreach header : ['crypt.h',
                    'linux/memfd.h',
                    'linux/vm_sockets.h',
@@ -35,10 +35,10 @@ index fc216d22da24..a25996803d64 100644
                    'valgrind/memcheck.h',
                    'valgrind/valgrind.h',
 diff --git a/src/basic/meson.build b/src/basic/meson.build
-index ccb22e159505..25c77ea6bc0e 100644
+index f70d1b8bf8a0..4cd57373e10d 100644
 --- a/src/basic/meson.build
 +++ b/src/basic/meson.build
-@@ -313,6 +313,11 @@ foreach item : [['af',     af_list_txt,     'af',         ''],
+@@ -311,6 +311,11 @@ foreach item : [['af',     af_list_txt,     'af',         ''],
  endforeach
  
  basic_sources += generated_gperf_headers

@@ -1,4 +1,4 @@
-From dbe8b3ee45580defeefcac929b897c5437ffc50b Mon Sep 17 00:00:00 2001
+From 6883ffc99168056101c667c6421f8353d5ad675a Mon Sep 17 00:00:00 2001
 From: Scott Murray <scott.murray@konsulko.com>
 Date: Fri, 13 Sep 2019 19:26:27 -0400
 Subject: [PATCH] Handle __cpu_mask usage
@@ -38,7 +38,7 @@ index 27812dfd5923..0ab40731ea93 100644
  typedef struct CPUSet {
          cpu_set_t *set;
 diff --git a/src/test/test-sizeof.c b/src/test/test-sizeof.c
-index c65062d2562c..8b6eefa9cdae 100644
+index a710db5370b8..d1601ad9292d 100644
 --- a/src/test/test-sizeof.c
 +++ b/src/test/test-sizeof.c
 @@ -1,6 +1,5 @@
@@ -47,8 +47,8 @@ index c65062d2562c..8b6eefa9cdae 100644
 -#include <sched.h>
  #include <stdio.h>
  #include <string.h>
- #include <sys/types.h>
-@@ -10,6 +9,7 @@
+ 
+@@ -8,6 +7,7 @@
  #include <float.h>
  
  #include "time-util.h"

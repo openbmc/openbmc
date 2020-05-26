@@ -1,0 +1,109 @@
+From 611430a32a46d0dc806a829161e2dccf9c0196a8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
+Date: Mon, 3 Feb 2020 15:35:51 +0200
+Subject: [PATCH] GMainContext - Fix memory leaks and memory corruption when
+ freeing sources while freeing a context
+
+Instead of destroying sources directly while freeing the context, and
+potentially freeing them if this was the last reference to them, collect
+new references of all sources in a separate list before and at the same
+time invalidate their context so that they can't access it anymore. Only
+once all sources have their context invalidated, destroy them while
+still keeping a reference to them. Once all sources are destroyed we get
+rid of the additional references and free them if nothing else keeps a
+reference to them anymore.
+
+This fixes a regression introduced by 26056558be in 2012.
+
+The previous code that invalidated the context of each source and then
+destroyed it before going to the next source without keeping an
+additional reference caused memory leaks or memory corruption depending
+on the order of the sources in the sources lists.
+
+If a source was destroyed it might happen that this was the last
+reference to this source, and it would then be freed. This would cause
+the finalize function to be called, which might destroy and unref
+another source and potentially free it. This other source would then
+either
+- go through the normal free logic and change the intern linked list
+  between the sources, while other sources that are unreffed as part of
+  the main context freeing would not. As such the list would be in an
+  inconsistent state and we might dereference freed memory.
+- go through the normal destroy and free logic but because the context
+  pointer was already invalidated it would simply mark the source as
+  destroyed without actually removing it from the context. This would
+  then cause a memory leak because the reference owned by the context is
+  not freed.
+
+Fixes https://github.com/gtk-rs/glib/issues/583 while still keeping
+https://bugzilla.gnome.org/show_bug.cgi?id=661767 fixes.
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/glib/-/commit/aa20167d419c649f34fed06a9463890b41b1eba0]
+
+---
+ glib/gmain.c | 35 ++++++++++++++++++++++++++++++++++-
+ 1 file changed, 34 insertions(+), 1 deletion(-)
+
+diff --git a/glib/gmain.c b/glib/gmain.c
+index a9a287d..10ba2f8 100644
+--- a/glib/gmain.c
++++ b/glib/gmain.c
+@@ -538,6 +538,7 @@ g_main_context_unref (GMainContext *context)
+   GSourceIter iter;
+   GSource *source;
+   GList *sl_iter;
++  GSList *s_iter, *remaining_sources = NULL;
+   GSourceList *list;
+   guint i;
+
+@@ -557,10 +558,30 @@ g_main_context_unref (GMainContext *context)
+
+   /* g_source_iter_next() assumes the context is locked. */
+   LOCK_CONTEXT (context);
+-  g_source_iter_init (&iter, context, TRUE);
++
++  /* First collect all remaining sources from the sources lists and store a
++   * new reference in a separate list. Also set the context of the sources
++   * to NULL so that they can't access a partially destroyed context anymore.
++   *
++   * We have to do this first so that we have a strong reference to all
++   * sources and destroying them below does not also free them, and so that
++   * none of the sources can access the context from their finalize/dispose
++   * functions. */
++  g_source_iter_init (&iter, context, FALSE);
+   while (g_source_iter_next (&iter, &source))
+     {
+       source->context = NULL;
++      remaining_sources = g_slist_prepend (remaining_sources, g_source_ref (source));
++    }
++  g_source_iter_clear (&iter);
++
++  /* Next destroy all sources. As we still hold a reference to all of them,
++   * this won't cause any of them to be freed yet and especially prevents any
++   * source that unrefs another source from its finalize function to be freed.
++   */
++  for (s_iter = remaining_sources; s_iter; s_iter = s_iter->next)
++    {
++      source = s_iter->data;
+       g_source_destroy_internal (source, context, TRUE);
+     }
+   UNLOCK_CONTEXT (context);
+@@ -585,6 +606,18 @@ g_main_context_unref (GMainContext *context)
+   g_cond_clear (&context->cond);
+
+   g_free (context);
++
++  /* And now finally get rid of our references to the sources. This will cause
++   * them to be freed unless something else still has a reference to them. Due
++   * to setting the context pointers in the sources to NULL above, this won't
++   * ever access the context or the internal linked list inside the GSource.
++   * We already removed the sources completely from the context above. */
++  for (s_iter = remaining_sources; s_iter; s_iter = s_iter->next)
++    {
++      source = s_iter->data;
++      g_source_unref_internal (source, NULL, FALSE);
++    }
++  g_slist_free (remaining_sources);
+ }
+
+ /* Helper function used by mainloop/overflow test.

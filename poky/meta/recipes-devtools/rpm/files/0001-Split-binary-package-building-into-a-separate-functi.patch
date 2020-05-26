@@ -1,0 +1,84 @@
+From 721a660a507d6d062e7aecafad886c643970a5d5 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 25 May 2017 18:15:27 +0300
+Subject: [PATCH 1/4] Split binary package building into a separate function
+
+So that it can be run as a thread pool task.
+
+Upstream-Status: Submitted [https://github.com/rpm-software-management/rpm/pull/226]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+---
+ build/pack.c | 33 +++++++++++++++++++++------------
+ 1 file changed, 21 insertions(+), 12 deletions(-)
+
+diff --git a/build/pack.c b/build/pack.c
+index 518f4e92a..ccfd614cc 100644
+--- a/build/pack.c
++++ b/build/pack.c
+@@ -546,18 +546,13 @@ static rpmRC checkPackages(char *pkgcheck)
+     return RPMRC_OK;
+ }
+ 
+-rpmRC packageBinaries(rpmSpec spec, const char *cookie, int cheating)
++static rpmRC packageBinary(rpmSpec spec, Package pkg, const char *cookie, int cheating, char** filename)
+ {
+-    rpmRC rc;
+-    const char *errorString;
+-    Package pkg;
+-    char *pkglist = NULL;
+-
+-    for (pkg = spec->packages; pkg != NULL; pkg = pkg->next) {
+-	char *fn;
++	const char *errorString;
++	rpmRC rc = RPMRC_OK;
+ 
+ 	if (pkg->fileList == NULL)
+-	    continue;
++	    return rc;
+ 
+ 	if ((rc = processScriptFiles(spec, pkg)))
+ 	    return rc;
+@@ -587,7 +582,7 @@ rpmRC packageBinaries(rpmSpec spec, const char *cookie, int cheating)
+ 		     headerGetString(pkg->header, RPMTAG_NAME), errorString);
+ 		return RPMRC_FAIL;
+ 	    }
+-	    fn = rpmGetPath("%{_rpmdir}/", binRpm, NULL);
++	    *filename = rpmGetPath("%{_rpmdir}/", binRpm, NULL);
+ 	    if ((binDir = strchr(binRpm, '/')) != NULL) {
+ 		struct stat st;
+ 		char *dn;
+@@ -609,14 +604,28 @@ rpmRC packageBinaries(rpmSpec spec, const char *cookie, int cheating)
+ 	    free(binRpm);
+ 	}
+ 
+-	rc = writeRPM(pkg, NULL, fn, NULL);
++	rc = writeRPM(pkg, NULL, *filename, NULL);
+ 	if (rc == RPMRC_OK) {
+ 	    /* Do check each written package if enabled */
+-	    char *pkgcheck = rpmExpand("%{?_build_pkgcheck} ", fn, NULL);
++	    char *pkgcheck = rpmExpand("%{?_build_pkgcheck} ", *filename, NULL);
+ 	    if (pkgcheck[0] != ' ') {
+ 		rc = checkPackages(pkgcheck);
+ 	    }
+ 	    free(pkgcheck);
++	}
++	return rc;
++}
++
++rpmRC packageBinaries(rpmSpec spec, const char *cookie, int cheating)
++{
++    rpmRC rc;
++    Package pkg;
++    char *pkglist = NULL;
++
++    for (pkg = spec->packages; pkg != NULL; pkg = pkg->next) {
++	char *fn = NULL;
++	rc = packageBinary(spec, pkg, cookie, cheating, &fn);
++	if (rc == RPMRC_OK) {
+ 	    rstrcat(&pkglist, fn);
+ 	    rstrcat(&pkglist, " ");
+ 	}
+-- 
+2.11.0
+
