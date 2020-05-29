@@ -44,6 +44,7 @@ DEPENDS += " \
 RDEPENDS_${PN}-updater += " \
     bash \
     virtual-obmc-image-manager \
+    ${@bb.utils.contains('PACKAGECONFIG', 'verify_signature', 'phosphor-image-signing', '', d)} \
 "
 
 RPROVIDES_${PN}-version += " \
