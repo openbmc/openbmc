@@ -42,16 +42,28 @@ do_configure_prepend() {
 	mkdir -p ${S}
 	cp -r ${STAGING_KERNEL_DIR}/arch/x86/include/asm/msr-index.h ${S}
 	cp -r ${STAGING_KERNEL_DIR}/arch/x86/include/asm/intel-family.h ${S}
-	cp -r ${STAGING_KERNEL_DIR}/include/linux/bits.h ${S}
-	cp -r ${STAGING_KERNEL_DIR}/include/linux/const.h ${S}
+	if [ -f "${STAGING_KERNEL_DIR}/include/vdso/bits.h" ]; then
+		cp -r ${STAGING_KERNEL_DIR}/include/vdso/bits.h ${S}
+		cp -r ${STAGING_KERNEL_DIR}/include/vdso/const.h ${S}
+	else
+		cp -r ${STAGING_KERNEL_DIR}/include/linux/bits.h ${S}
+		cp -r ${STAGING_KERNEL_DIR}/include/linux/const.h ${S}
+	fi
 	cp -r ${STAGING_KERNEL_DIR}/tools/power/x86/turbostat/* ${S}
 	cp -r ${WORKDIR}/COPYING ${S}
 }
 
+
 do_compile() {
 	sed -i 's#<linux/bits.h>#"bits.h"#' msr-index.h
-	sed -i 's#<linux/const.h>#"const.h"#' bits.h
-	sed -i -e 's#<uapi/linux/const.h>#<linux/const.h>#' -e 's#_LINUX_CONST_H#_LINUX_CONST_H_KERNEL#' const.h
+	'TMPCHECK='grep "<vdso/const.h>" bits.h'' || true
+	if [ -n $TMPCHECK ]; then
+		sed -i 's#<vdso/const.h>#"const.h"#' bits.h
+		sed -i 's#<uapi/linux/const.h>#<linux/const.h>#' const.h
+	else
+		sed -i 's#<linux/const.h>#"const.h"#' bits.h
+		sed -i -e 's#<uapi/linux/const.h>#<linux/const.h>#' -e 's#_LINUX_CONST_H#_LINUX_CONST_H_KERNEL#' const.h
+	fi
 	sed -i 's#MSRHEADER#"msr-index.h"#' turbostat.c
 	sed -i 's#INTEL_FAMILY_HEADER#"intel-family.h"#' turbostat.c
 	sed -i 's#\$(CC) \$(CFLAGS) \$< -o \$(BUILD_OUTPUT)/\$@#\$(CC) \$(CFLAGS) \$(LDFLAGS) \$< -o \$(BUILD_OUTPUT)/\$@#' Makefile

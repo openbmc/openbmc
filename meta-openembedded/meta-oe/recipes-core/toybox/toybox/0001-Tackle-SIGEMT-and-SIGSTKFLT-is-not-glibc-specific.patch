@@ -1,0 +1,30 @@
+From 9e5b1420b89813ee3c58c2b792077fa8bb71f327 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 21 May 2020 13:53:27 -0700
+Subject: [PATCH] Tackle SIGEMT and SIGSTKFLT is not glibc specific
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/portability.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/lib/portability.c b/lib/portability.c
+index 294141c6..1c7ebc12 100644
+--- a/lib/portability.c
++++ b/lib/portability.c
+@@ -430,8 +430,11 @@ static const struct signame signames[] = {
+   // Non-POSIX signals that cause termination
+   SIGNIFY(PROF), SIGNIFY(IO),
+ #ifdef __linux__
+-# if !defined(__GLIBC__) && !defined(__mips__)
++# ifdef SIGSTKFLT
+    SIGNIFY(STKFLT),
++# endif
++# ifdef SIGEMT
++   SIGNIFY(EMT),
+ # endif
+   SIGNIFY(POLL), SIGNIFY(PWR),
+ #elif defined(__APPLE__)
+-- 
+2.26.2
+

@@ -210,7 +210,7 @@ RDEPENDS_packagegroup-meta-oe-multimedia ="\
     alsa-oss audiofile cdrkit id3lib \
     a2jmidid jack libass libburn libcdio libcdio-paranoia \
     libdvdread libmms libmodplug libopus live555 \
-    mplayer-common opus-tools \
+    opus-tools \
     sound-theme-freedesktop v4l-utils yavta wavpack libvpx \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "xpext pavucontrol xsp", "", d)} \
     libmikmod \

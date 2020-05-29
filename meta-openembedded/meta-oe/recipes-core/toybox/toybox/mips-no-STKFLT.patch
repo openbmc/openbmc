@@ -1,0 +1,25 @@
+glibc on mips is missing SIGSTKFLT
+
+Do not therefore assume it being available linuxwide
+
+Fixes
+| lib/portability.c:433:3: error: use of undeclared identifier 'SIGSTKFLT'
+|   SIGNIFY(STKFLT), SIGNIFY(POLL), SIGNIFY(PWR),
+|   ^
+
+Upstream-Status: Submitted [https://github.com/landley/toybox/pull/195]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/lib/portability.c
++++ b/lib/portability.c
+@@ -430,7 +430,10 @@ static const struct signame signames[] =
+   // Non-POSIX signals that cause termination
+   SIGNIFY(PROF), SIGNIFY(IO),
+ #ifdef __linux__
+-  SIGNIFY(STKFLT), SIGNIFY(POLL), SIGNIFY(PWR),
++# if !defined(__GLIBC__) && !defined(__mips__)
++   SIGNIFY(STKFLT),
++# endif
++  SIGNIFY(POLL), SIGNIFY(PWR),
+ #elif defined(__APPLE__)
+   SIGNIFY(EMT), SIGNIFY(INFO),
+ #endif

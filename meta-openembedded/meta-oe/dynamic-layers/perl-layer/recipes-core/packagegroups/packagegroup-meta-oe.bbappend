@@ -1,1 +1,1 @@
-RDEPENDS_packagegroup-meta-oe-support += "debsums"
+RDEPENDS_packagegroup-meta-oe-support += "debsums rasdaemon"

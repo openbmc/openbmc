@@ -1,4 +1,4 @@
-From 340f911f9e3f4ff6b01682c5341c959060782af2 Mon Sep 17 00:00:00 2001
+From 840795dcb48214b74cfde75e7ce5e8a1a6c64a46 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 2 Apr 2015 19:18:45 -0700
 Subject: [PATCH] usb.h: Include sys/types.h
@@ -8,23 +8,21 @@ We need the definitions for things like u_intX_t
 Upstream-Status: Pending
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  libusb/usb.h | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/libusb/usb.h b/libusb/usb.h
-index 84e730f..caffae2 100644
+index fa0e6c6..4e88eb8 100644
 --- a/libusb/usb.h
 +++ b/libusb/usb.h
-@@ -31,6 +31,8 @@
- 
- #include <dirent.h>
+@@ -45,6 +45,8 @@ typedef unsigned __int32  uint32_t;
+ #include <stdint.h>
+ #endif
  
 +#include <sys/types.h>
 +
  /*
   * USB spec information
   *
--- 
-2.1.4
-
