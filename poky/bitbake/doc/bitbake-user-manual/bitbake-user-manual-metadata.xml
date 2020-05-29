@@ -2526,6 +2526,9 @@
                 In the previous example, the <filename>do_packagedata</filename>
                 task of each item in <filename>RDEPENDS</filename> must have
                 completed before <filename>do_package_qa</filename> can execute.
+                Although <filename>RDEPENDS</filename> contains entries from the
+                runtime dependency namespace, BitBake knows how to map them back
+                to the build-time dependency namespace, in which the tasks are defined.
             </para>
         </section>
 

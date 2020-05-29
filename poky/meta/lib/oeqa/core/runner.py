@@ -182,8 +182,10 @@ class OETestResult(_TestResult):
             (status, log) = self._getTestResultDetails(case)
 
             t = ""
+            duration = 0
             if case.id() in self.starttime and case.id() in self.endtime:
-                t = " (" + "{0:.2f}".format(self.endtime[case.id()] - self.starttime[case.id()]) + "s)"
+                duration = self.endtime[case.id()] - self.starttime[case.id()]
+                t = " (" + "{0:.2f}".format(duration) + "s)"
 
             if status not in logs:
                 logs[status] = []
@@ -191,6 +193,8 @@ class OETestResult(_TestResult):
             report = {'status': status}
             if log:
                 report['log'] = log
+            if duration:
+                report['duration'] = duration
             if dump_streams and case.id() in self.logged_output:
                 (stdout, stderr) = self.logged_output[case.id()]
                 report['stdout'] = stdout

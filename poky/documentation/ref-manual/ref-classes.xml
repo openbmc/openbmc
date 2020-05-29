@@ -1742,6 +1742,12 @@ This check was removed for YP 2.3 release
                 </note>
                 </para></listitem>
 -->
+            <listitem><para><emphasis><filename>unlisted-pkg-lics:</filename></emphasis>
+                Checks that all declared licenses applying for a package are also
+                declared on the recipe level (i.e. any license in
+                <filename>LICENSE_*</filename> should appear in
+                <link linkend='var-LICENSE'><filename>LICENSE</filename></link>).
+                </para></listitem>
             <listitem><para><emphasis><filename>useless-rpaths:</filename></emphasis>
                 Checks for dynamic library load paths (rpaths) in the binaries that
                 by default on a standard system are searched by the linker (e.g.

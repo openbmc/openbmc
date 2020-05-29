@@ -65,7 +65,7 @@ SRC_URI = "\
            file://0035-gentypes-genmodes-Do-not-use-__LINE__-for-maintainin.patch \
            file://0036-Enable-CET-in-cross-compiler-if-possible.patch \
            file://0037-mingw32-Enable-operation_not_supported.patch \
-           file://0038-Revert-AArch64-Use-__getauxval-instead-of-getauxval-.patch \
+           file://0038-libatomic-Do-not-enforce-march-on-aarch64.patch \
 "
 SRC_URI[sha256sum] = "b6898a23844b656f1b68691c5c012036c2e694ac4b53a8918d4712ad876e7ea2"
 
@@ -87,7 +87,6 @@ EXTRA_OECONF_BASE = "\
     ${SSP} \
     --enable-libitm \
     --disable-bootstrap \
-    --disable-libmudflap \
     --with-system-zlib \
     ${@'--with-linker-hash-style=${LINKER_HASH_STYLE}' if '${LINKER_HASH_STYLE}' else ''} \
     --enable-linker-build-id \
@@ -99,7 +98,6 @@ EXTRA_OECONF_BASE = "\
 "
 
 EXTRA_OECONF_INITIAL = "\
-    --disable-libmudflap \
     --disable-libgomp \
     --disable-libitm \
     --disable-libquadmath \

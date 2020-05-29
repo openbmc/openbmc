@@ -18,10 +18,6 @@ EXTRA_OECONF_append_linuxstdbase = " --enable-clocale=gnu"
 EXTRA_OECONF_append = " --cache-file=${B}/config.cache"
 EXTRA_OECONF_append_libc-newlib = " --with-newlib"
 
-# cortex-a55 is ARMv8.2-a based but libatomic explicitly asks for -march=armv8.1-a
-# which caused -march conflicts in gcc
-TUNE_CCARGS_remove = "-mcpu=cortex-a55+crc -mcpu=cortex-a55 -mcpu=cortex-a55+crc+crypto"
-
 # Disable ifuncs for libatomic on arm conflicts -march/-mcpu
 EXTRA_OECONF_append_arm = " libat_cv_have_ifunc=no "
 EXTRA_OECONF_append_armeb = " libat_cv_have_ifunc=no "
@@ -51,7 +47,6 @@ RUNTIMETARGET = "${RUNTIMELIBSSP} libstdc++-v3 libgomp libatomic ${RUNTIMELIBITM
 RUNTIMETARGET_libc-newlib = "libstdc++-v3"
 
 # libiberty
-# libmudflap
 # libgfortran needs separate recipe due to libquadmath dependency
 
 SLIB = "${TMPDIR}/work-shared/gcc-${PV}-${PR}/gcc-${PV}"
@@ -171,9 +166,6 @@ PACKAGES = "\
     libssp \
     libssp-dev \
     libssp-staticdev \
-    libmudflap \
-    libmudflap-dev \
-    libmudflap-staticdev \
     libquadmath \
     libquadmath-dev \
     libquadmath-staticdev \
@@ -245,17 +237,6 @@ FILES_libquadmath-dev = "\
 SUMMARY_libquadmath-dev = "GNU quad-precision math library - development files"
 FILES_libquadmath-staticdev = "${libdir}/libquadmath.a"
 SUMMARY_libquadmath-staticdev = "GNU quad-precision math library - static development files"
-
-# NOTE: mudflap has been removed as of gcc 4.9 and has been superseded by the address sanitiser
-FILES_libmudflap = "${libdir}/libmudflap*.so.*"
-SUMMARY_libmudflap = "Pointer debugging library for gcc"
-FILES_libmudflap-dev = "\
-    ${libdir}/libmudflap*.so \
-    ${libdir}/libmudflap.la \
-"
-SUMMARY_libmudflap-dev = "Pointer debugging library for gcc - development files"
-FILES_libmudflap-staticdev = "${libdir}/libmudflap.a"
-SUMMARY_libmudflap-staticdev = "Pointer debugging library for gcc - static development files"
 
 FILES_libgomp = "${libdir}/libgomp*${SOLIBS}"
 SUMMARY_libgomp = "GNU OpenMP parallel programming library"

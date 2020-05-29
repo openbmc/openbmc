@@ -32,21 +32,23 @@ python __anonymous () {
     namemap["packagegroup-core-full-cmdline-sys-services"] = "packagegroup-core-sys-services"
 
     packages = d.getVar("PACKAGES").split()
+    mlprefix = d.getVar("MLPREFIX")
     for pkg in packages:
+        pkg2 = pkg[len(mlprefix):]
         if pkg.endswith('-dev'):
-            mapped = namemap.get(pkg[:-4], None)
+            mapped = namemap.get(pkg2[:-4], None)
             if mapped:
                 mapped += '-dev'
         elif pkg.endswith('-dbg'):
-            mapped = namemap.get(pkg[:-4], None)
+            mapped = namemap.get(pkg2[:-4], None)
             if mapped:
                 mapped += '-dbg'
         else:
-            mapped = namemap.get(pkg, None)
+            mapped = namemap.get(pkg2, None)
 
         if mapped:
             oldtaskname = mapped.replace("packagegroup-core", "task-core")
-            mapstr = " %s %s" % (mapped, oldtaskname)
+            mapstr = " %s%s %s%s" % (mlprefix, mapped, mlprefix, oldtaskname)
             d.appendVar("RPROVIDES_%s" % pkg, mapstr)
             d.appendVar("RREPLACES_%s" % pkg, mapstr)
             d.appendVar("RCONFLICTS_%s" % pkg, mapstr)

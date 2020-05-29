@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRC_URI = "git://github.com/intel/${BPN}"
 
-SRCREV = "db7087b883bf52cbff063ad17a41cc1cbb85104d"
+SRCREV = "a17f0e3ff8669dd3b1c44a741ae4f8162155faed"
 S = "${WORKDIR}/git"
 PV .= "+git${SRCPV}"
 

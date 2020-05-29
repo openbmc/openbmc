@@ -51,6 +51,10 @@ class Cvs(FetchMethod):
 
         ud.localfile = d.expand('%s_%s_%s_%s%s%s.tar.gz' % (ud.module.replace('/', '.'), ud.host, ud.tag, ud.date, norecurse, fullpath))
 
+        pkg = d.getVar('PN')
+        cvsdir = d.getVar("CVSDIR") or (d.getVar("DL_DIR") + "/cvs")
+        ud.pkgdir = os.path.join(cvsdir, pkg)
+
     def need_update(self, ud, d):
         if (ud.date == "now"):
             return True
@@ -106,10 +110,7 @@ class Cvs(FetchMethod):
 
         # create module directory
         logger.debug(2, "Fetch: checking for module directory")
-        pkg = d.getVar('PN')
-        cvsdir = d.getVar("CVSDIR") or (d.getVar("DL_DIR") + "/cvs")
-        pkgdir = os.path.join(cvsdir, pkg)
-        moddir = os.path.join(pkgdir, localdir)
+        moddir = os.path.join(ud.pkgdir, localdir)
         workdir = None
         if os.access(os.path.join(moddir, 'CVS'), os.R_OK):
             logger.info("Update " + ud.url)
@@ -120,8 +121,8 @@ class Cvs(FetchMethod):
         else:
             logger.info("Fetch " + ud.url)
             # check out sources there
-            bb.utils.mkdirhier(pkgdir)
-            workdir = pkgdir
+            bb.utils.mkdirhier(ud.pkgdir)
+            workdir = ud.pkgdir
             logger.debug(1, "Running %s", cvscmd)
             bb.fetch2.check_network_access(d, cvscmd, ud.url)
             cmd = cvscmd
@@ -140,7 +141,7 @@ class Cvs(FetchMethod):
         # tar them up to a defined filename
         workdir = None
         if 'fullpath' in ud.parm:
-            workdir = pkgdir
+            workdir = ud.pkgdir
             cmd = "tar %s -czf %s %s" % (tar_flags, ud.localpath, localdir)
         else:
             workdir = os.path.dirname(os.path.realpath(moddir))
@@ -151,9 +152,6 @@ class Cvs(FetchMethod):
     def clean(self, ud, d):
         """ Clean CVS Files and tarballs """
 
-        pkg = d.getVar('PN')
-        pkgdir = os.path.join(d.getVar("CVSDIR"), pkg)
-
-        bb.utils.remove(pkgdir, True)
+        bb.utils.remove(ud.pkgdir, True)
         bb.utils.remove(ud.localpath)
 

@@ -1,5 +1,5 @@
 SUMMARY = "U-Boot libraries and tools to access environment"
-DEPENDS += "mtd-utils"
+DEPENDS += "mtd-utils zlib"
 
 DESCRIPTION = "This package contains tools and libraries to read \
 and modify U-Boot environment. \

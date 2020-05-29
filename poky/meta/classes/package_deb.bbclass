@@ -283,8 +283,9 @@ def deb_write_pkg(pkg, d):
 # Otherwise allarch packages may change depending on override configuration
 deb_write_pkg[vardepsexclude] = "OVERRIDES"
 
-# Indirect references to these vars
-do_package_write_deb[vardeps] += "PKGV PKGR PKGV DESCRIPTION SECTION PRIORITY MAINTAINER DPKG_ARCH PN HOMEPAGE"
+# Have to list any variables referenced as X_<pkg> that aren't in pkgdata here
+DEBEXTRAVARS = "PKGV PKGR PKGV DESCRIPTION SECTION PRIORITY MAINTAINER DPKG_ARCH PN HOMEPAGE PACKAGE_ADD_METADATA_DEB"
+do_package_write_deb[vardeps] += "${@gen_packagevar(d, 'DEBEXTRAVARS')}"
 
 SSTATETASKS += "do_package_write_deb"
 do_package_write_deb[sstate-inputdirs] = "${PKGWRITEDIRDEB}"

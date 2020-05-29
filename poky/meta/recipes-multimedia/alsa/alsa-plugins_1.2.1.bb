@@ -167,7 +167,7 @@ FILES_${PN}-pulseaudio-conf += "\
 "
 
 RDEPENDS_${PN}-pulseaudio-conf += "\
-        libasound-module-conf-pulse \
-        libasound-module-ctl-pulse \
-        libasound-module-pcm-pulse \
+        ${MLPREFIX}libasound-module-conf-pulse \
+        ${MLPREFIX}libasound-module-ctl-pulse \
+        ${MLPREFIX}libasound-module-pcm-pulse \
 "

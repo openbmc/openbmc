@@ -9,7 +9,7 @@ LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;beginline=2;md5=0251eaec1188b20d9a72c502ecfdda1b"
 
 DEPENDS = "file-replacement-native"
-DEPENDS_class-native = ""
+DEPENDS_class-native = "bzip2-replacement-native"
 
 SRC_URI = "git://github.com/file/file.git"
 

@@ -1076,6 +1076,18 @@ def get_recipe_upgrade_status(recipes=None):
                  'RECIPE_UPSTREAM_VERSION',
                  'RECIPE_UPSTREAM_DATE',
                  'CHECK_DATE',
+                 'FETCHCMD_bzr',
+                 'FETCHCMD_ccrc',
+                 'FETCHCMD_cvs',
+                 'FETCHCMD_git',
+                 'FETCHCMD_hg',
+                 'FETCHCMD_npm',
+                 'FETCHCMD_osc',
+                 'FETCHCMD_p4',
+                 'FETCHCMD_repo',
+                 'FETCHCMD_s3',
+                 'FETCHCMD_svn',
+                 'FETCHCMD_wget',
             )
 
     with bb.tinfoil.Tinfoil() as tinfoil:

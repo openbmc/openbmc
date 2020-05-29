@@ -209,7 +209,7 @@ class ImageFeatures(OESelftestTestCase):
         image_name = 'core-image-minimal'
 
         all_image_types = set(get_bb_var("IMAGE_TYPES", image_name).split())
-        blacklist = set(('container', 'elf', 'f2fs', 'multiubi', 'tar.zst'))
+        blacklist = set(('container', 'elf', 'f2fs', 'multiubi', 'tar.zst', 'wic.zst'))
         img_types = all_image_types - blacklist
 
         config = 'IMAGE_FSTYPES += "%s"\n'\

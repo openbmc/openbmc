@@ -130,23 +130,29 @@ def decode_log(logdata):
             return data.decode("utf-8", errors='ignore')
     return None
 
-def ptestresult_get_log(results, section):
-    if 'ptestresult.sections' not in results:
+def generic_get_log(sectionname, results, section):
+    if sectionname not in results:
         return None
-    if section not in results['ptestresult.sections']:
+    if section not in results[sectionname]:
         return None
 
-    ptest = results['ptestresult.sections'][section]
+    ptest = results[sectionname][section]
     if 'log' not in ptest:
         return None
     return decode_log(ptest['log'])
 
+def ptestresult_get_log(results, section):
+    return generic_get_log('ptestresuls.sections', results, section)
+
+def generic_get_rawlogs(sectname, results):
+    if sectname not in results:
+        return None
+    if 'log' not in results[sectname]:
+        return None
+    return decode_log(results[sectname]['log'])
+
 def ptestresult_get_rawlogs(results):
-    if 'ptestresult.rawlogs' not in results:
-        return None
-    if 'log' not in results['ptestresult.rawlogs']:
-        return None
-    return decode_log(results['ptestresult.rawlogs']['log'])
+    return generic_get_rawlogs('ptestresult.rawlogs', results)
 
 def save_resultsdata(results, destdir, fn="testresults.json", ptestjson=False, ptestlogs=False):
     for res in results:

@@ -9057,6 +9057,9 @@
                 <listitem><para>
                     <link linkend='creating-node-package-manager-npm-packages'>Creating node package manager (NPM) packages</link>
                     </para></listitem>
+                <listitem><para>
+                    <link linkend='adding-custom-metadata-to-packages'>Adding custom metadata to packages</link>
+                    </para></listitem>
             </itemizedlist>
         </para>
 
@@ -10761,6 +10764,61 @@
                 </para>
             </section>
         </section>
+
+        <section id='adding-custom-metadata-to-packages'>
+            <title>Adding custom metadata to packages</title>
+
+            <para>
+                The variable <ulink url='&YOCTO_DOCS_REF_URL;#var-PACKAGE_ADD_METADATA'><filename>PACKAGE_ADD_METADATA</filename></ulink>
+                can be used to add additional metadata to packages. This is
+                reflected in the package control/spec file. To take the ipk
+                format for example, the CONTROL file stored inside would
+                contain the additional metadata as additional lines.
+            </para>
+
+            <para>
+                The variable can be used in multiple ways, including using
+                suffixes to set it for a specific package type and/or package.
+                Note that the order of precedence is the same as this list:
+                <itemizedlist>
+                    <listitem><para>
+                        <filename>PACKAGE_ADD_METADATA_&lt;PKGTYPE&gt;_&lt;PN&gt;</filename>
+                    </para></listitem>
+                    <listitem><para>
+                        <filename>PACKAGE_ADD_METADATA_&lt;PKGTYPE&gt;</filename>
+                    </para></listitem>
+                    <listitem><para>
+                        <filename>PACKAGE_ADD_METADATA_&lt;PN&gt;</filename>
+                    </para></listitem>
+                    <listitem><para>
+                        <filename>PACKAGE_ADD_METADATA</filename>
+                    </para></listitem>
+                </itemizedlist>
+                &lt;PKGTYPE&gt; is a parameter and expected to be a
+                distinct name of specific package type:
+                <itemizedlist>
+                    <listitem><para>IPK for .ipk packages</para></listitem>
+                    <listitem><para>DEB for .deb packages</para></listitem>
+                    <listitem><para>RPM for .rpm packages</para></listitem>
+                </itemizedlist>
+                &lt;PN&gt; is a parameter and expected to be a package name.
+            </para>
+
+            <para>
+                The variable can contain multiple [one-line] metadata fields
+                separated by the literal sequence '\n'. The separator can be
+                redefined using the variable flag <filename>separator</filename>.
+            </para>
+
+            <para>
+                The following is an example that adds two custom fields for
+                ipk packages:
+                <literallayout class='monospaced'>
+    PACKAGE_ADD_METADATA_IPK = "Vendor: CustomIpk\nGroup: Applications/Spreadsheets"
+                </literallayout>
+            </para>
+        </section>
+
     </section>
 
     <section id='efficiently-fetching-source-files-during-a-build'>

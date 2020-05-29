@@ -207,7 +207,10 @@ def spawn_preferred(sh_cmd, title=None, env=None, d=None):
             spawn(terminal.name, sh_cmd, title, env, d)
             break
         except UnsupportedTerminal:
-            continue
+            pass
+        except:
+            bb.warn("Terminal %s is supported but did not start" % (terminal.name))
+    # when we've run out of options
     else:
         raise NoSupportedTerminals(get_cmd_list())
 

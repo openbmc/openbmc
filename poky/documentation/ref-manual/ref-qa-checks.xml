@@ -1170,6 +1170,31 @@ can be found then it should be implemented.  I can't find one at the moment.
             </listitem>
         </itemizedlist>
     </para>
+
+    <para>
+        <itemizedlist>
+            <listitem>
+                <para id='qa-issue-unlisted-pkg-lics'>
+                    <code>
+     LICENSE_&lt;packagename&gt; includes licenses (&lt;licenses&gt;) that are not listed in LICENSE [unlisted-pkg-lics]
+                    </code>
+                </para>
+
+                <para>
+                    The <link linkend='var-LICENSE'><filename>LICENSE</filename></link>
+		    of the recipe should be a superset of all the licenses of
+		    all packages produced by this recipe.
+		    In other words, any license in <filename>LICENSE_*</filename>
+		    should also appear in
+                    <link linkend='var-LICENSE'><filename>LICENSE</filename></link>.
+                </para>
+
+                <para>
+                    &nbsp;
+                </para>
+            </listitem>
+        </itemizedlist>
+    </para>
 </section>
 
 <section id='configuring-and-disabling-qa-checks'>

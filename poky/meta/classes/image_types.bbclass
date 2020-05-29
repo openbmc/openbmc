@@ -273,7 +273,7 @@ IMAGE_TYPES = " \
     ubi ubifs multiubi \
     tar tar.gz tar.bz2 tar.xz tar.lz4 tar.zst \
     cpio cpio.gz cpio.xz cpio.lzma cpio.lz4 \
-    wic wic.gz wic.bz2 wic.lzma \
+    wic wic.gz wic.bz2 wic.lzma wic.zst \
     container \
     f2fs \
 "

@@ -338,6 +338,9 @@ def finalize(fn, d, variant = None):
         bb.event.fire(bb.event.RecipePreFinalise(fn), d)
 
         bb.data.expandKeys(d)
+
+        bb.event.fire(bb.event.RecipePostKeyExpansion(fn), d)
+
         runAnonFuncs(d)
 
         tasklist = d.getVar('__BBTASKS', False) or []

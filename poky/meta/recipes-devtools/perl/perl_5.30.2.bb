@@ -328,7 +328,7 @@ python split_perl_packages () {
 
 python() {
     if d.getVar('CLASSOVERRIDE') == "class-target":
-        d.setVar("PACKAGES_DYNAMIC", "^perl-module-.*(?<!native)$")
+        d.setVar("PACKAGES_DYNAMIC", "^${MLPREFIX}perl-module-.*(?<!native)$")
     elif d.getVar('CLASSOVERRIDE') == "class-native":
         d.setVar("PACKAGES_DYNAMIC", "^perl-module-.*-native$")
     elif d.getVar('CLASSOVERRIDE') == "class-nativesdk":

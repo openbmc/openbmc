@@ -389,6 +389,10 @@ class RecipeEvent(Event):
 class RecipePreFinalise(RecipeEvent):
     """ Recipe Parsing Complete but not yet finalised"""
 
+class RecipePostKeyExpansion(RecipeEvent):
+    """ Recipe Parsing Complete but not yet finalised"""
+
+
 class RecipeTaskPreProcess(RecipeEvent):
     """
     Recipe Tasks about to be finalised

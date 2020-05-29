@@ -22,6 +22,7 @@ SPLASH_IMAGES = "file://psplash-poky-img.h;outsuffix=default"
 python __anonymous() {
     oldpkgs = d.getVar("PACKAGES").split()
     splashfiles = d.getVar('SPLASH_IMAGES').split()
+    mlprefix = d.getVar('MLPREFIX') or ''
     pkgs = []
     localpaths = []
     for uri in splashfiles:
@@ -46,9 +47,9 @@ python __anonymous() {
     # Set these so that we have less work to do in do_compile and do_install_append
     d.setVar("SPLASH_INSTALL", " ".join(pkgs))
     d.setVar("SPLASH_LOCALPATHS", " ".join(localpaths))
+    for p in pkgs:
+        d.prependVar("PACKAGES", "%s%s " % (mlprefix, p))
 
-    d.prependVar("PACKAGES", "%s " % (" ".join(pkgs)))
-    mlprefix = d.getVar('MLPREFIX') or ''
     pn = d.getVar('PN') or ''
     for p in pkgs:
         ep = '%s%s' % (mlprefix, p)
