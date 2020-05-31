@@ -41,6 +41,7 @@ DEPENDS += " \
          ${PYTHON_PN}-pyyaml-native \
          ${PYTHON_PN}-setuptools-native \
          ${PYTHON_PN}-mako-native \
+         boost \
          "
 
 SEQ_MONITOR_SVC = "pseq-monitor.service"
