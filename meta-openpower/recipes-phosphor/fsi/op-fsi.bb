@@ -12,7 +12,7 @@ TGTFMT = "obmc-chassis-poweron@{0}.target"
 
 TMPL_SCAN = "fsi-scan@.service"
 INSTFMT_SCAN = "fsi-scan@{0}.service"
-FMT_SCAN = "../${TMPL_SCAN}:${TGTFMT}.requires/${INSTFMT_SCAN}"
+FMT_SCAN = "../${TMPL_SCAN}:${TGTFMT}.wants/${INSTFMT_SCAN}"
 
 SYSTEMD_SERVICE_${PN} += "${TMPL_SCAN} fsi-enable.service fsi-disable.service"
 
