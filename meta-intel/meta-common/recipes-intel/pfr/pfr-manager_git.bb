@@ -8,7 +8,7 @@ inherit cmake systemd
 SRC_URI = "git://github.com/openbmc/pfr-manager"
 
 PV = "0.1+git${SRCPV}"
-SRCREV = "67d184ce46b59d413302b95f1a06cfed342c4bc8"
+SRCREV = "dcf131291f145ea634e9e0c997276ac3c91aa2a0"
 
 S = "${WORKDIR}/git"
 
