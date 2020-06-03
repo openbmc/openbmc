@@ -2,7 +2,11 @@ DESCRIPTION = "Small image capable of booting a device. The kernel includes \
 the Minimal RAM-based Initial Root Filesystem (initramfs), which finds the \
 first 'init' program more efficiently."
 
-PACKAGE_INSTALL = "${VIRTUAL-RUNTIME_base-utils} base-passwd ${ROOTFS_BOOTSTRAP_INSTALL} obmc-phosphor-initfs"
+# Init scripts
+INIT_PACKAGE = "obmc-phosphor-initfs"
+INIT_PACKAGE_df-phosphor-mmc = "phosphor-mmc-init"
+
+PACKAGE_INSTALL = "${VIRTUAL-RUNTIME_base-utils} base-passwd ${ROOTFS_BOOTSTRAP_INSTALL} ${INIT_PACKAGE}"
 
 # Do not pollute the initrd image with rootfs features
 IMAGE_FEATURES = "read-only-rootfs"
