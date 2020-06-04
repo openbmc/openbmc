@@ -108,6 +108,10 @@ ${PN}-software-extras_df-obmc-ubi-fs = " \
         phosphor-software-manager-updater-ubi \
         "
 
+${PN}-software-extras_df-phosphor-mmc = " \
+        phosphor-software-manager-updater-mmc \
+        "
+
 SUMMARY_${PN}-software = "Software applications"
 RDEPENDS_${PN}-software = " \
         ${VIRTUAL-RUNTIME_obmc-bmc-download-mgr} \
