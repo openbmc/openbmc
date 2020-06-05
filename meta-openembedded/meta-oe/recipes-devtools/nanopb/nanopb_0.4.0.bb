@@ -27,4 +27,4 @@ RDEPENDS_${PN} += "\
 
 BBCLASSEXTEND = "native nativesdk"
 
-PNBLACKLIST[nanopb] = "Needs forward porting to use python3"
+PNBLACKLIST[nanopb] ?= "Needs forward porting to use python3"

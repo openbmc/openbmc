@@ -9,8 +9,8 @@ DEPENDS += "perl"
 
 SRC_URI = "http://search.cpan.org/CPAN/authors/id/N/NL/NLNETLABS/Net-DNS-${PV}.tar.gz"
 
-SRC_URI[md5sum] = "105517139b39650f78c21b2e461ac97e"
-SRC_URI[sha256sum] = "cf327f31063b96cd3421be43a1d6cb41eaa61d0595450032e57905b1bd6b2c3e"
+SRC_URI[md5sum] = "1bf07817bb272d412a737ecc2347d70b"
+SRC_URI[sha256sum] = "11a6c2ba6cb1c6640f01c9bbf2036bcbe3974232e9b939ab94985230c92cde63"
 
 UPSTREAM_CHECK_REGEX = "Net\-DNS\-(?P<pver>(\d+\.\d+))(?!_\d+).tar"
 

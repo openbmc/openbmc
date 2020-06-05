@@ -4,7 +4,7 @@ DOM-like interface with rich traversal/modification capabilities, \
 an extremely fast XML parser which constructs the DOM tree from \
 n XML file/buffer, and an XPath 1.0 implementation for complex \
 data-driven tree queries."
-HOMPAGE = "https://pugixml.org/"
+HOMEPAGE = "https://pugixml.org/"
 
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://readme.txt;beginline=29;endline=52;md5=d5ee91fb74cbb64223b3693fd64eb169"

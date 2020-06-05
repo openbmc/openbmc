@@ -32,4 +32,4 @@ DEBIAN_NOAUTONAME_libqpdf = "1"
 PACKAGES =+ "libqpdf"
 FILES_libqpdf = "${libdir}/libqpdf.so.*"
 
-RDEPEND_${PN} = "libqpdf"
+RDEPENDS_${PN} = "libqpdf"

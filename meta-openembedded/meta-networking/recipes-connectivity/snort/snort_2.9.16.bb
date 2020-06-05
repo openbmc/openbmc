@@ -13,11 +13,10 @@ SRC_URI = "https://www.snort.org/downloads/archive/snort/${BP}.tar.gz \
     file://fix-host-contamination-when-enable-static-daq.patch \
     file://disable-run-test-program-while-cross-compiling.patch \
     file://configure.in-disable-tirpc-checking-for-fedora.patch \
-    file://0001-chdeck-for-gettid-API-during-configure.patch \
 "
 
-SRC_URI[md5sum] = "b56cadfa840f706ff67d4df0256c03eb"
-SRC_URI[sha256sum] = "bfb437746446ef72a03c501db13cd6da5edd2b41f55c80c437ba288be6da7dba"
+SRC_URI[md5sum] = "1cec58babaea3420014d61a93e6e1545"
+SRC_URI[sha256sum] = "9688d8edf1da09dec6574000fb3c0e62f99c56428587616e17c60103c0bcbad7"
 
 UPSTREAM_CHECK_URI = "https://www.snort.org/downloads"
 UPSTREAM_CHECK_REGEX = "snort-(?P<pver>\d+(\.\d+)+)\.tar"

@@ -12,8 +12,8 @@ RDEPENDS_${PN} = "ncurses-terminfo-base"
 PV_MAJOR = "${@d.getVar('PV').split('.')[0]}"
 
 SRC_URI = "https://nano-editor.org/dist/v${PV_MAJOR}/nano-${PV}.tar.xz"
-SRC_URI[md5sum] = "10df0100ebf4aa7bb4806428c11751eb"
-SRC_URI[sha256sum] = "d8a25eea942ecee2d57b8e037eb4b28f030f818b78773b8fcb994ed5835d2ef6"
+SRC_URI[md5sum] = "52137a960ae8b3ca6d7dab6767fe6e5f"
+SRC_URI[sha256sum] = "6e3438f033a0ed07d3d74c30d0803cbda3d2366ba1601b7bbf9b16ac371f51b4"
 
 UPSTREAM_CHECK_URI = "https://ftp.gnu.org/gnu/nano"
 

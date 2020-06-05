@@ -1,5 +1,5 @@
 SUMMARY = "Cross-Plattform GUI Library"
-DESCRIPTIOM = "wxWidgets is a free and open source cross-platform C++ framework for writing advanced GUI applications using native controls."
+DESCRIPTION = "wxWidgets is a free and open source cross-platform C++ framework for writing advanced GUI applications using native controls."
 HOMEPAGE = "https://www.wxwidgets.org/"
 BUGTRACKER = "https://trac.wxwidgets.org/"
 

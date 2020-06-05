@@ -20,8 +20,8 @@ SRC_URI = "http://mosquitto.org/files/source/mosquitto-${PV}.tar.gz \
            file://install-protocol.patch \
 "
 
-SRC_URI[md5sum] = "52f5078ec18aaf623b14dfb121fd534b"
-SRC_URI[sha256sum] = "412979b2db0a0020bd02fa64f0a0de9e7000b84462586e32b67f29bb1f6c1685"
+SRC_URI[md5sum] = "960f963b81b7f93982d7511cd28082e5"
+SRC_URI[sha256sum] = "92d1807717f0f6d57d1ac1207ffdb952e8377e916c7b0bb4718f745239774232"
 
 inherit systemd update-rc.d useradd cmake
 

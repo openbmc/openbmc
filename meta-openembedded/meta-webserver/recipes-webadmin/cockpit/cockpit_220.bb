@@ -10,8 +10,8 @@ SRC_URI += " \
     file://0002-fix-makefile-use-copy-rule-for-unmodified-files.patch \
     file://cockpit.pam \
     "
-SRC_URI[md5sum] = "285383b8744dab93ac8814e5a23e2c3e"
-SRC_URI[sha256sum] = "111d477e54737f15467c365fa670f9ac1919be30ad0c93661692467ecd7f12fb"
+SRC_URI[md5sum] = "beb88d8e70ee1da6ebd917c956217803"
+SRC_URI[sha256sum] = "afc82acc8ef9d51e0f34265a07a2f059f5b71a1df721b299e657a40a098cbb7f"
 
 inherit gettext pkgconfig autotools systemd features_check
 
@@ -36,9 +36,14 @@ EXTRA_OECONF = " \
     --with-systemdunitdir=${systemd_system_unitdir} \
 "
 
+PACKAGECONFIG ??= " \
+    ${@bb.utils.filter('DISTRO_FEATURES', 'polkit', d)} \
+"
+
 PACKAGECONFIG[pcp] = "--enable-pcp,--disable-pcp,pcp"
 PACKAGECONFIG[dashboard] = "--enable-ssh,--disable-ssh,libssh"
 PACKAGECONFIG[storaged] = ",,,udisks2"
+PACKAGECONFIG[polkit] = "--enable-polkit,--disable-polkit,polkit"
 
 PACKAGES =+ " \
     ${PN}-pcp \

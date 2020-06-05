@@ -18,3 +18,5 @@ EXTRA_OECONF += "--with-textui \
                  --with-bot \
                  --with-perl=no \
                  --enable-true-color"
+
+FILES_${PN}-staticdev += "${libdir}/${BPN}/modules/*.a"

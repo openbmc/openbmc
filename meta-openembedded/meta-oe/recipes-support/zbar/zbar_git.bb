@@ -1,4 +1,4 @@
-DESRIPTION = "2D barcode scanner toolkit."
+DESCRIPTION = "2D barcode scanner toolkit."
 SECTION = "graphics"
 LICENSE = "LGPL-2.1"
 

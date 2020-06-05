@@ -32,4 +32,4 @@ python do_package_prepend() {
 }
 
 B = "${WORKDIR}/${BPN}-${PV}"
-PNBLACKLIST[bpftool] = "Needs forward porting to kernel 5.2+"
+PNBLACKLIST[bpftool] ?= "Needs forward porting to kernel 5.2+"
