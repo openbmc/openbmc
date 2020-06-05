@@ -1,6 +1,7 @@
 SRC_URI = "git://github.com/NixOS/patchelf;protocol=https \
            file://handle-read-only-files.patch \
            file://fix-adjusting-startPage.patch \
+           file://fix-phdrs.patch \
            "
 
 LICENSE = "GPLv3"

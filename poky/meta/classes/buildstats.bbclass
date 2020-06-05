@@ -80,8 +80,6 @@ def get_buildtimedata(var, d):
     return timediff, cpuperc
 
 def write_task_data(status, logfile, e, d):
-    bn = d.getVar('BUILDNAME')
-    bsdir = os.path.join(d.getVar('BUILDSTATS_BASE'), bn)
     with open(os.path.join(logfile), "a") as f:
         elapsedtime = get_timedata("__timedata_task", d, e.time)
         if elapsedtime:
@@ -138,7 +136,7 @@ python run_buildstats () {
                 if x:
                     f.write(x + " ")
             f.write("\n")
-            f.write("Build Started: %0.2f \n" % time.time())
+            f.write("Build Started: %0.2f \n" % d.getVar('__timedata_build', False)[0])
 
     elif isinstance(e, bb.event.BuildCompleted):
         build_time = os.path.join(bsdir, "build_stats")

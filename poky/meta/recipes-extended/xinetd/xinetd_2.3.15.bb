@@ -9,10 +9,9 @@ LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=8ad8615198542444f84d28a6cf226dd8"
 DEPENDS += "libtirpc"
 PR = "r2"
 
-# Blacklist a bogus tag in upstream check
-UPSTREAM_CHECK_GITTAGREGEX = "xinetd-(?P<pver>(?!20030122).+)"
+UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+(\.\d+)+)"
 
-SRC_URI = "git://github.com/xinetd-org/xinetd.git;protocol=https \
+SRC_URI = "git://github.com/openSUSE/xinetd.git;protocol=https \
       file://xinetd.init \
       file://xinetd.conf \
       file://xinetd.default \
@@ -23,7 +22,6 @@ SRC_URI = "git://github.com/xinetd-org/xinetd.git;protocol=https \
       file://0001-configure-Use-HAVE_SYS_RESOURCE_H-to-guard-sys-resou.patch \
       file://xinetd.service \
       "
-UPSTREAM_VERSION_UNKNOWN = "1"
 
 SRCREV = "68bb9ab9e9f214ad8a2322f28ac1d6733e70bc24"
 

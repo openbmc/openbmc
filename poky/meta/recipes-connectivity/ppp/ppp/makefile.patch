@@ -1,12 +1,27 @@
+From f7fb1d1abfa6d208fb40fca1602e0c488108f1b5 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard@openedhand.com>
+Date: Wed, 31 Aug 2005 10:45:47 +0000
+Subject: [PATCH] Initial population
+
 The patch comes from OpenEmbedded
 Rebased for ppp-2.4.5. Dongxiao Xu <dongxiao.xu@intel.com>
 
 Upstream-Status: Inappropriate [configuration]
 
-diff -ruN ppp-2.4.5-orig/chat/Makefile.linux ppp-2.4.5/chat/Makefile.linux
---- ppp-2.4.5-orig/chat/Makefile.linux	2010-06-30 15:51:12.050166398 +0800
-+++ ppp-2.4.5/chat/Makefile.linux	2010-06-30 15:51:30.450118446 +0800
-@@ -25,7 +25,7 @@
+---
+ chat/Makefile.linux                  |  2 +-
+ pppd/Makefile.linux                  |  4 ++--
+ pppd/plugins/radius/Makefile.linux   | 10 +++++-----
+ pppd/plugins/rp-pppoe/Makefile.linux |  4 ++--
+ pppdump/Makefile.linux               |  2 +-
+ pppstats/Makefile.linux              |  2 +-
+ 6 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/chat/Makefile.linux b/chat/Makefile.linux
+index 0732ec8..f082dab 100644
+--- a/chat/Makefile.linux
++++ b/chat/Makefile.linux
+@@ -25,7 +25,7 @@ chat.o:	chat.c
  
  install: chat
  	mkdir -p $(BINDIR) $(MANDIR)
@@ -15,10 +30,11 @@ diff -ruN ppp-2.4.5-orig/chat/Makefile.linux ppp-2.4.5/chat/Makefile.linux
  	$(INSTALL) -c -m 644 chat.8 $(MANDIR)
  
  clean:
-diff -ruN ppp-2.4.5-orig/pppd/Makefile.linux ppp-2.4.5/pppd/Makefile.linux
---- ppp-2.4.5-orig/pppd/Makefile.linux	2010-06-30 15:51:12.043682063 +0800
-+++ ppp-2.4.5/pppd/Makefile.linux	2010-06-30 15:52:11.214170607 +0800
-@@ -99,7 +99,7 @@
+diff --git a/pppd/Makefile.linux b/pppd/Makefile.linux
+index 9664f70..4e485a1 100644
+--- a/pppd/Makefile.linux
++++ b/pppd/Makefile.linux
+@@ -107,7 +107,7 @@ ifdef USE_SRP
  CFLAGS	+= -DUSE_SRP -DOPENSSL -I/usr/local/ssl/include
  LIBS	+= -lsrp -L/usr/local/ssl/lib -lcrypto
  TARGETS	+= srp-entry
@@ -27,7 +43,7 @@ diff -ruN ppp-2.4.5-orig/pppd/Makefile.linux ppp-2.4.5/pppd/Makefile.linux
  MANPAGES += srp-entry.8
  EXTRACLEAN += srp-entry.o
  NEEDDES=y
-@@ -200,7 +200,7 @@
+@@ -219,7 +219,7 @@ all: $(TARGETS)
  install: pppd
  	mkdir -p $(BINDIR) $(MANDIR)
  	$(EXTRAINSTALL)
@@ -36,10 +52,11 @@ diff -ruN ppp-2.4.5-orig/pppd/Makefile.linux ppp-2.4.5/pppd/Makefile.linux
  	if chgrp pppusers $(BINDIR)/pppd 2>/dev/null; then \
  	  chmod o-rx,u+s $(BINDIR)/pppd; fi
  	$(INSTALL) -c -m 444 pppd.8 $(MANDIR)
-diff -ruN ppp-2.4.5-orig/pppd/plugins/radius/Makefile.linux ppp-2.4.5/pppd/plugins/radius/Makefile.linux
---- ppp-2.4.5-orig/pppd/plugins/radius/Makefile.linux	2010-06-30 15:51:12.047676187 +0800
-+++ ppp-2.4.5/pppd/plugins/radius/Makefile.linux	2010-06-30 15:53:47.750182267 +0800
-@@ -36,11 +36,11 @@
+diff --git a/pppd/plugins/radius/Makefile.linux b/pppd/plugins/radius/Makefile.linux
+index e702263..af57ae3 100644
+--- a/pppd/plugins/radius/Makefile.linux
++++ b/pppd/plugins/radius/Makefile.linux
+@@ -36,11 +36,11 @@ all: $(PLUGIN)
  
  install: all
  	$(INSTALL) -d -m 755 $(LIBDIR)
@@ -55,11 +72,12 @@ diff -ruN ppp-2.4.5-orig/pppd/plugins/radius/Makefile.linux ppp-2.4.5/pppd/plugi
 +	$(INSTALL) -m 444 pppd-radattr.8 $(MANDIR)
  
  radius.so: radius.o libradiusclient.a
- 	$(CC) -o radius.so -shared radius.o libradiusclient.a
-diff -ruN ppp-2.4.5-orig/pppd/plugins/rp-pppoe/Makefile.linux ppp-2.4.5/pppd/plugins/rp-pppoe/Makefile.linux
---- ppp-2.4.5-orig/pppd/plugins/rp-pppoe/Makefile.linux	2010-06-30 15:51:12.047676187 +0800
-+++ ppp-2.4.5/pppd/plugins/rp-pppoe/Makefile.linux	2010-06-30 15:53:15.454486877 +0800
-@@ -43,9 +43,9 @@
+ 	$(CC) $(LDFLAGS) -o radius.so -shared radius.o libradiusclient.a
+diff --git a/pppd/plugins/rp-pppoe/Makefile.linux b/pppd/plugins/rp-pppoe/Makefile.linux
+index 749ccc2..2c93f4a 100644
+--- a/pppd/plugins/rp-pppoe/Makefile.linux
++++ b/pppd/plugins/rp-pppoe/Makefile.linux
+@@ -43,9 +43,9 @@ rp-pppoe.so: plugin.o discovery.o if.o common.o
  
  install: all
  	$(INSTALL) -d -m 755 $(LIBDIR)
@@ -71,20 +89,22 @@ diff -ruN ppp-2.4.5-orig/pppd/plugins/rp-pppoe/Makefile.linux ppp-2.4.5/pppd/plu
  
  clean:
  	rm -f *.o *.so pppoe-discovery
-diff -ruN ppp-2.4.5-orig/pppdump/Makefile.linux ppp-2.4.5/pppdump/Makefile.linux
---- ppp-2.4.5-orig/pppdump/Makefile.linux	2010-06-30 15:51:12.058183383 +0800
-+++ ppp-2.4.5/pppdump/Makefile.linux	2010-06-30 15:52:25.762183537 +0800
-@@ -17,5 +17,5 @@
+diff --git a/pppdump/Makefile.linux b/pppdump/Makefile.linux
+index cdf7ac4..0457561 100644
+--- a/pppdump/Makefile.linux
++++ b/pppdump/Makefile.linux
+@@ -17,5 +17,5 @@ clean:
  
  install:
  	mkdir -p $(BINDIR) $(MANDIR)
 -	$(INSTALL) -s -c pppdump $(BINDIR)
 +	$(INSTALL) -c pppdump $(BINDIR)
  	$(INSTALL) -c -m 444 pppdump.8 $(MANDIR)
-diff -ruN ppp-2.4.5-orig/pppstats/Makefile.linux ppp-2.4.5/pppstats/Makefile.linux
---- ppp-2.4.5-orig/pppstats/Makefile.linux	2010-06-30 15:51:12.058183383 +0800
-+++ ppp-2.4.5/pppstats/Makefile.linux	2010-06-30 15:52:42.486341081 +0800
-@@ -22,7 +22,7 @@
+diff --git a/pppstats/Makefile.linux b/pppstats/Makefile.linux
+index 71afbe6..1819370 100644
+--- a/pppstats/Makefile.linux
++++ b/pppstats/Makefile.linux
+@@ -22,7 +22,7 @@ all: pppstats
  
  install: pppstats
  	-mkdir -p $(MANDIR)

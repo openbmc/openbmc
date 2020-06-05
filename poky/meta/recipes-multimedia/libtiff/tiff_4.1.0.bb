@@ -47,4 +47,4 @@ do_install_append() {
     oe_multilib_header tiffconf.h
 }
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

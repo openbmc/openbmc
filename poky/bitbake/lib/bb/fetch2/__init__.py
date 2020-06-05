@@ -1617,6 +1617,13 @@ class FetchMethod(object):
             return True
         return False
 
+    def implicit_urldata(self, ud, d):
+        """
+        Get a list of FetchData objects for any implicit URLs that will also
+        be downloaded when we fetch the given URL.
+        """
+        return []
+
 class Fetch(object):
     def __init__(self, urls, d, cache = True, localonly = False, connection_cache = None):
         if localonly and cache:
@@ -1841,6 +1848,24 @@ class Fetch(object):
 
             if ud.lockfile:
                 bb.utils.unlockfile(lf)
+
+    def expanded_urldata(self, urls=None):
+        """
+        Get an expanded list of FetchData objects covering both the given
+        URLS and any additional implicit URLs that are added automatically by
+        the appropriate FetchMethod.
+        """
+
+        if not urls:
+            urls = self.urls
+
+        urldata = []
+        for url in urls:
+            ud = self.ud[url]
+            urldata.append(ud)
+            urldata += ud.method.implicit_urldata(ud, self.d)
+
+        return urldata
 
 class FetchConnectionCache(object):
     """

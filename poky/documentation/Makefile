@@ -1,3 +1,6 @@
+#
+# SPDX-License-Identifier: CC-BY-2.0-UK
+#
 # This is a single Makefile to handle all generated Yocto Project documents,
 # which includes the BitBake User Manual and the Toaster User Manual.
 # The Makefile needs to live in the documents directory and all figures used

@@ -1,0 +1,41 @@
+From 7be634fa9705d0367f48a91305f9acb642ff0a11 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 27 May 2020 16:43:05 +0000
+Subject: [PATCH] gnome.py: prefix g-i paths with PKG_CONFIG_SYSROOT_DIR
+
+When using sysroots for builds, the standard target paths for the
+tools need to be prefixed (pkg-config is not clever enough to
+determine when a custom variable is a path)
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ mesonbuild/modules/gnome.py | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/mesonbuild/modules/gnome.py b/mesonbuild/modules/gnome.py
+index 89d5d5d..d75f2e5 100644
+--- a/mesonbuild/modules/gnome.py
++++ b/mesonbuild/modules/gnome.py
+@@ -739,17 +739,17 @@ class GnomeModule(ExtensionModule):
+         if giscanner.found():
+             giscanner_path = giscanner.get_command()[0]
+             if not any(x in giscanner_path for x in gi_util_dirs_check):
+-                giscanner = self.gir_dep.get_pkgconfig_variable('g_ir_scanner', {})
++                giscanner = os.environ['PKG_CONFIG_SYSROOT_DIR'] + self.gir_dep.get_pkgconfig_variable('g_ir_scanner', {})
+         else:
+-            giscanner = self.gir_dep.get_pkgconfig_variable('g_ir_scanner', {})
++            giscanner = os.environ['PKG_CONFIG_SYSROOT_DIR'] + self.gir_dep.get_pkgconfig_variable('g_ir_scanner', {})
+ 
+         gicompiler = self.interpreter.find_program_impl('g-ir-compiler')
+         if gicompiler.found():
+             gicompiler_path = gicompiler.get_command()[0]
+             if not any(x in gicompiler_path for x in gi_util_dirs_check):
+-                gicompiler = self.gir_dep.get_pkgconfig_variable('g_ir_compiler', {})
++                gicompiler = os.environ['PKG_CONFIG_SYSROOT_DIR'] + self.gir_dep.get_pkgconfig_variable('g_ir_compiler', {})
+         else:
+-            gicompiler = self.gir_dep.get_pkgconfig_variable('g_ir_compiler', {})
++            gicompiler = os.environ['PKG_CONFIG_SYSROOT_DIR'] + self.gir_dep.get_pkgconfig_variable('g_ir_compiler', {})
+ 
+         ns = kwargs.pop('namespace')
+         nsversion = kwargs.pop('nsversion')

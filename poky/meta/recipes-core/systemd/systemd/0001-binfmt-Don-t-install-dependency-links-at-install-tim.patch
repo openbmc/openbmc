@@ -1,4 +1,4 @@
-From e9c993816077c1ae67d25d464f2ece2a090f30b8 Mon Sep 17 00:00:00 2001
+From 564830719be2017c4953589d50f21a9e856a4ecc Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Thu, 21 Feb 2019 16:23:24 +0800
 Subject: [PATCH] binfmt: Don't install dependency links at install time for
@@ -61,7 +61,7 @@ index 30a6bc991844..4231f3b70fe9 100644
 +[Install]
 +WantedBy=sysinit.target
 diff --git a/units/systemd-binfmt.service.in b/units/systemd-binfmt.service.in
-index 0c0f26451b67..763c4c466c16 100644
+index e54e95e11d5d..372a598614d3 100644
 --- a/units/systemd-binfmt.service.in
 +++ b/units/systemd-binfmt.service.in
 @@ -14,6 +14,7 @@ Documentation=https://www.kernel.org/doc/html/latest/admin-guide/binfmt-misc.htm
@@ -72,9 +72,9 @@ index 0c0f26451b67..763c4c466c16 100644
  After=proc-sys-fs-binfmt_misc.automount
  After=proc-sys-fs-binfmt_misc.mount
  Before=sysinit.target shutdown.target
-@@ -29,3 +30,6 @@ Type=oneshot
- RemainAfterExit=yes
+@@ -30,3 +31,6 @@ RemainAfterExit=yes
  ExecStart=@rootlibexecdir@/systemd-binfmt
+ ExecStop=@rootlibexecdir@/systemd-binfmt --unregister
  TimeoutSec=90s
 +
 +[Install]

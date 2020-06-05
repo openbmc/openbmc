@@ -9,8 +9,8 @@ SRC_URI = "https://github.com/${SRCNAME}/${SRCNAME}/releases/download/v${PV}/${S
            file://0001-Don-t-search-usr-and-so-on-for-libraries-by-default-.patch \
            file://0001-convert-shebang-from-python-to-python3.patch \
            "
-SRC_URI[md5sum] = "cd631c761f141d382b4e1b31c8232fc0"
-SRC_URI[sha256sum] = "93ee59ec38f3bf8f9a42d5f4301f60e6825a4a6385a145f70badcd2bf2a11134"
+SRC_URI[md5sum] = "70e6c294f8dffa8d630eda1b0d42ae4d"
+SRC_URI[sha256sum] = "e0781ec6627e85f2a618478ee278893343fb8b40577b4c74b2ec15c7a5b8f698"
 
 UPSTREAM_CHECK_URI = "https://github.com/numpy/numpy/releases"
 UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)\.tar"

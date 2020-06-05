@@ -12,6 +12,8 @@ ARMPKGARCH_tune-aarch64 ?= "aarch64"
 ARMPKGARCH_tune-aarch64_be ?= "aarch64_be"
 TUNE_FEATURES_tune-aarch64 = "aarch64"
 TUNE_FEATURES_tune-aarch64_be = "${TUNE_FEATURES_tune-aarch64} bigendian"
+TUNE_PKGARCH_64_tune-aarch64 = "aarch64"
+TUNE_PKGARCH_64_tune-aarch64_be = "aarch64_be"
 BASE_LIB_tune-aarch64 = "lib64"
 BASE_LIB_tune-aarch64_be = "lib64"
 
@@ -20,7 +22,7 @@ PACKAGE_EXTRA_ARCHS_tune-aarch64_be = "aarch64_be"
 
 ARMPKGSFX_ENDIAN_64 = "${@bb.utils.contains('TUNE_FEATURES', 'bigendian', '_be', '', d)}"
 TUNE_ARCH_64 = "aarch64${ARMPKGSFX_ENDIAN_64}"
-TUNE_PKGARCH_64 = "aarch64${ARMPKGSFX_ENDIAN_64}"
+TUNE_PKGARCH_64 = "${ARMPKGARCH}${ARMPKGSFX_ENDIAN_64}"
 ABIEXTENSION_64 = ""
 TARGET_FPU_64 = ""
 

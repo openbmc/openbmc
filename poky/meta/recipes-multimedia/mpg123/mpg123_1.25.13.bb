@@ -14,6 +14,8 @@ SRC_URI = "https://www.mpg123.de/download/${BP}.tar.bz2 \
 SRC_URI[md5sum] = "294a6c30546504ec3d0deac2b2ea22be"
 SRC_URI[sha256sum] = "90306848359c793fd43b9906e52201df18775742dc3c81c06ab67a806509890a"
 
+UPSTREAM_CHECK_REGEX = "mpg123-(?P<pver>\d+(\.\d+)+)\.tar"
+
 inherit autotools pkgconfig
 
 # The options should be mutually exclusive for configuration script.

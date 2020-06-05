@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://cdjpeg.h;endline=13;md5=8184bcc7c4ac7b9edc6a7bc00f231
                     file://djpeg.c;endline=11;md5=c59e19811c006cb38f82d6477134d314 \
 "
 DEPENDS_append_x86-64_class-target = " nasm-native"
-DEPENDS_append_x86_class-target    = " nasm-native"
+DEPENDS_append_x86_class-target = " nasm-native"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BPN}-${PV}.tar.gz \
            file://0001-libjpeg-turbo-fix-package_qa-error.patch \
@@ -19,7 +19,7 @@ SRC_URI[sha256sum] = "33dd8547efd5543639e890efbf2ef52d5a21df81faf41bb940657af916
 UPSTREAM_CHECK_URI = "http://sourceforge.net/projects/libjpeg-turbo/files/"
 UPSTREAM_CHECK_REGEX = "/libjpeg-turbo/files/(?P<pver>(\d+[\.\-_]*)+)/"
 
-PE= "1"
+PE = "1"
 
 # Drop-in replacement for jpeg
 PROVIDES = "jpeg"

@@ -1,0 +1,29 @@
+From b18d7aa7d71b53b86bac21cd1d8c3accabb28f2b Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 10 May 2019 16:47:38 +0200
+Subject: [PATCH] Do not init tables from dpkg configuration
+
+This would require sysroot relocation logic, and it's easier to just disable them.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+---
+ apt-pkg/init.cc | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/apt-pkg/init.cc b/apt-pkg/init.cc
+index a619368..6e5a6cf 100644
+--- a/apt-pkg/init.cc
++++ b/apt-pkg/init.cc
+@@ -281,8 +281,8 @@ bool pkgInitSystem(Configuration &Cnf,pkgSystem *&Sys)
+ 	 return _error->Error(_("Unable to determine a suitable packaging system type"));
+    }
+ 
+-   if (pkgInitArchTupleMap() == false)
+-      return false;
++//   if (pkgInitArchTupleMap() == false)
++//      return false;
+    
+    return Sys->Initialize(Cnf);
+ }

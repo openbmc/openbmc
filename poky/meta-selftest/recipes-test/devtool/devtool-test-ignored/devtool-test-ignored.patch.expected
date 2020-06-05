@@ -1,0 +1,16 @@
+From 3a286343cc5cadd83f41d524ee3606ae51df9ee7 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Thu, 28 May 2020 01:32:31 +0200
+Subject: [PATCH] meta-selftest: add test of .gitignore in tarball
+
+---
+ ignored | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ignored b/ignored
+index a579759..e3d7b43 100644
+--- a/ignored
++++ b/ignored
+@@ -1 +1 @@
+-I'm so ignored
++# I'm so ignored

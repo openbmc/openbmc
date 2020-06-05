@@ -1,4 +1,4 @@
-From 251347fc970a397a9cd63ed3f87c5e6c52e15187 Mon Sep 17 00:00:00 2001
+From 064187668fcbefdd39a8cde372bf651124c3e578 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 14 May 2013 15:00:26 -0700
 Subject: [PATCH] python3: Add target and native recipes

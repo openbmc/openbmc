@@ -1,3 +1,6 @@
+#
+# SPDX-License-Identifier: CC-BY-2.0-UK
+#
 # Process poky-ref-manual and yocto-project-qs manual (<word>-<word>-<word> style)
 # For example:
 #   "ulink" href="http://www.yoctoproject.org/docs/1.3/poky-ref-manual/poky-ref-manual.html#faq"

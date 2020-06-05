@@ -23,7 +23,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=e73e999e0c72b5ac9012424fa157ad77"
 DEPENDS = "fontconfig glib-2.0 libpng pixman zlib"
 
 SRC_URI = "http://cairographics.org/releases/cairo-${PV}.tar.xz \
-           file://cairo-get_bitmap_surface-bsc1036789-CVE-2017-7475.diff \ 
+           file://cairo-get_bitmap_surface-bsc1036789-CVE-2017-7475.diff \
            file://CVE-2018-19876.patch \
            file://CVE-2019-6461.patch \
            file://CVE-2019-6462.patch \
@@ -70,8 +70,10 @@ do_install_append () {
 	rm -rf ${D}${libdir}/cairo/cairo-sphinx*
 	rm -rf ${D}${libdir}/cairo/.debug/cairo-fdr*
 	rm -rf ${D}${libdir}/cairo/.debug/cairo-sphinx*
-	rmdir -p --ignore-fail-on-non-empty ${D}${bindir}
-	rmdir -p --ignore-fail-on-non-empty ${D}${libdir}/cairo
+	[ ! -d ${D}${bindir} ] ||
+		rmdir -p --ignore-fail-on-non-empty ${D}${bindir}
+	[ ! -d ${D}${libdir}/cairo ] ||
+		rmdir -p --ignore-fail-on-non-empty ${D}${libdir}/cairo
 }
 
 PACKAGES =+ "cairo-gobject cairo-script-interpreter cairo-perf-utils"

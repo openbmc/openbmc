@@ -106,6 +106,7 @@ FILES_${PN}_append = " ${bindir}/gtk-update-icon-cache-3.0 \
 FILES_${PN}-dev += " \
                     ${datadir}/gtk-3.0/gtkbuilder.rng \
                     ${datadir}/gtk-3.0/include \
+                    ${datadir}/gtk-3.0/valgrind \
                     ${datadir}/gettext/its \
                     ${libdir}/gtk-3.0/include \
                     ${libdir}/gtk-3.0/${LIBV}/loaders/*.la \

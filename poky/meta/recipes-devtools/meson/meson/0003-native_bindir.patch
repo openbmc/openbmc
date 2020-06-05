@@ -1,4 +1,4 @@
-From e76726321067748362b39937bd1e663a1a948ad5 Mon Sep 17 00:00:00 2001
+From da2091f6dfe978fc6140fc2d01bcafbbfae8d8db Mon Sep 17 00:00:00 2001
 From: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
 Date: Wed, 15 Nov 2017 15:05:01 +0100
 Subject: [PATCH] native_bindir
@@ -22,10 +22,10 @@ Signed-off-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
  2 files changed, 14 insertions(+), 11 deletions(-)
 
 diff --git a/mesonbuild/dependencies/base.py b/mesonbuild/dependencies/base.py
-index 40e304c..4b687df 100644
+index 50f4179..e1529d8 100644
 --- a/mesonbuild/dependencies/base.py
 +++ b/mesonbuild/dependencies/base.py
-@@ -184,7 +184,7 @@ class Dependency:
+@@ -157,7 +157,7 @@ class Dependency:
      def get_exe_args(self, compiler):
          return []
 
@@ -34,16 +34,16 @@ index 40e304c..4b687df 100644
          raise DependencyException('{!r} is not a pkgconfig dependency'.format(self.name))
 
      def get_configtool_variable(self, variable_name):
-@@ -247,7 +247,7 @@ class InternalDependency(Dependency):
-         self.sources = sources
+@@ -225,7 +225,7 @@ class InternalDependency(Dependency):
          self.ext_deps = ext_deps
+         self.variables = variables
 
 -    def get_pkgconfig_variable(self, variable_name, kwargs):
 +    def get_pkgconfig_variable(self, variable_name, kwargs, use_native=False):
          raise DependencyException('Method "get_pkgconfig_variable()" is '
                                    'invalid for an internal dependency')
 
-@@ -673,15 +673,18 @@ class PkgConfigDependency(ExternalDependency):
+@@ -633,15 +633,18 @@ class PkgConfigDependency(ExternalDependency):
          return s.format(self.__class__.__name__, self.name, self.is_found,
                          self.version_reqs)
 
@@ -65,7 +65,7 @@ index 40e304c..4b687df 100644
          # Always copy the environment since we're going to modify it
          # with pkg-config variables
          if env is None:
-@@ -701,7 +704,7 @@ class PkgConfigDependency(ExternalDependency):
+@@ -667,7 +670,7 @@ class PkgConfigDependency(ExternalDependency):
          targs = tuple(args)
          cache = PkgConfigDependency.pkgbin_cache
          if (self.pkgbin, targs, fenv) not in cache:
@@ -74,7 +74,7 @@ index 40e304c..4b687df 100644
          return cache[(self.pkgbin, targs, fenv)]
 
      def _convert_mingw_paths(self, args: T.List[str]) -> T.List[str]:
-@@ -907,7 +910,7 @@ class PkgConfigDependency(ExternalDependency):
+@@ -876,7 +879,7 @@ class PkgConfigDependency(ExternalDependency):
                                        (self.name, out_raw))
          self.link_args, self.raw_link_args = self._search_libs(out, out_raw)
 
@@ -83,7 +83,7 @@ index 40e304c..4b687df 100644
          options = ['--variable=' + variable_name, self.name]
 
          if 'define_variable' in kwargs:
-@@ -920,7 +923,7 @@ class PkgConfigDependency(ExternalDependency):
+@@ -889,7 +892,7 @@ class PkgConfigDependency(ExternalDependency):
 
              options = ['--define-variable=' + '='.join(definition)] + options
 
@@ -93,10 +93,10 @@ index 40e304c..4b687df 100644
          if ret != 0:
              if self.required:
 diff --git a/mesonbuild/dependencies/ui.py b/mesonbuild/dependencies/ui.py
-index da411ef..856506a 100644
+index 741f0b8..134dd54 100644
 --- a/mesonbuild/dependencies/ui.py
 +++ b/mesonbuild/dependencies/ui.py
-@@ -330,7 +330,7 @@ class QtBaseDependency(ExternalDependency):
+@@ -320,7 +320,7 @@ class QtBaseDependency(ExternalDependency):
          self.bindir = self.get_pkgconfig_host_bins(core)
          if not self.bindir:
              # If exec_prefix is not defined, the pkg-config file is broken
@@ -105,7 +105,7 @@ index da411ef..856506a 100644
              if prefix:
                  self.bindir = os.path.join(prefix, 'bin')
 
-@@ -508,7 +508,7 @@ class Qt4Dependency(QtBaseDependency):
+@@ -524,7 +524,7 @@ class Qt4Dependency(QtBaseDependency):
          applications = ['moc', 'uic', 'rcc', 'lupdate', 'lrelease']
          for application in applications:
              try:
@@ -114,7 +114,7 @@ index da411ef..856506a 100644
              except MesonException:
                  pass
 
-@@ -518,7 +518,7 @@ class Qt5Dependency(QtBaseDependency):
+@@ -534,7 +534,7 @@ class Qt5Dependency(QtBaseDependency):
          QtBaseDependency.__init__(self, 'qt5', env, kwargs)
 
      def get_pkgconfig_host_bins(self, core):

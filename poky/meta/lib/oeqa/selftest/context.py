@@ -10,6 +10,7 @@ import glob
 import sys
 import importlib
 import subprocess
+import unittest
 from random import choice
 
 import oeqa
@@ -22,18 +23,22 @@ from oeqa.core.exception import OEQAPreRun, OEQATestNotFound
 from oeqa.utils.commands import runCmd, get_bb_vars, get_test_layer
 
 class OESelftestTestContext(OETestContext):
-    def __init__(self, td=None, logger=None, machines=None, config_paths=None):
+    def __init__(self, td=None, logger=None, machines=None, config_paths=None, newbuilddir=None):
         super(OESelftestTestContext, self).__init__(td, logger)
 
         self.machines = machines
         self.custommachine = None
         self.config_paths = config_paths
+        self.newbuilddir = newbuilddir
 
     def setup_builddir(self, suffix, selftestdir, suite):
         builddir = os.environ['BUILDDIR']
         if not selftestdir:
             selftestdir = get_test_layer()
-        newbuilddir = builddir + suffix
+        if self.newbuilddir:
+            newbuilddir = os.path.join(self.newbuilddir, 'build' + suffix)
+        else:
+            newbuilddir = builddir + suffix
         newselftestdir = newbuilddir + "/meta-selftest"
 
         if os.path.exists(newbuilddir):
@@ -56,15 +61,24 @@ class OESelftestTestContext(OETestContext):
 
         os.chdir(newbuilddir)
 
-        for t in suite:
+        def patch_test(t):
             if not hasattr(t, "tc"):
-                continue
+                return
             cp = t.tc.config_paths
             for p in cp:
                 if selftestdir in cp[p] and newselftestdir not in cp[p]:
                     cp[p] = cp[p].replace(selftestdir, newselftestdir)
                 if builddir in cp[p] and newbuilddir not in cp[p]:
                     cp[p] = cp[p].replace(builddir, newbuilddir)
+
+        def patch_suite(s):
+            for x in s:
+                if isinstance(x, unittest.TestSuite):
+                    patch_suite(x)
+                else:
+                    patch_test(x)
+
+        patch_suite(suite)
 
         return (builddir, newbuilddir)
 
@@ -133,6 +147,8 @@ class OESelftestTestContextExecutor(OETestContextExecutor):
                 action='append', default=None,
                 help='Exclude all (unhidden) tests that match any of the specified tag(s). (exclude applies before select)')
 
+        parser.add_argument('-B', '--newbuilddir', help='New build directory to use for tests.')
+        parser.add_argument('-v', '--verbose', action='store_true')
         parser.set_defaults(func=self.run)
 
     def _get_available_machines(self):
@@ -187,6 +203,7 @@ class OESelftestTestContextExecutor(OETestContextExecutor):
         self.tc_kwargs['init']['config_paths']['builddir'] = builddir
         self.tc_kwargs['init']['config_paths']['localconf'] = os.path.join(builddir, "conf/local.conf")
         self.tc_kwargs['init']['config_paths']['bblayers'] = os.path.join(builddir, "conf/bblayers.conf")
+        self.tc_kwargs['init']['newbuilddir'] = args.newbuilddir
 
         def tag_filter(tags):
             if args.exclude_tags:

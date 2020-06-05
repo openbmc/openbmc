@@ -1,3 +1,6 @@
+#
+# SPDX-License-Identifier: CC-BY-2.0-UK
+#
 # Processes bitbake-user-manual (<word>-<word>-<word> style).
 # This style is for manual three-word folders, which currently is only the BitBake User Manual.
 # We used to have the "yocto-project-qs" and "poky-ref-manual" folders but no longer do.

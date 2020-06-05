@@ -100,7 +100,6 @@ class ClassExtender(object):
             newdeps[self.map_depends(dep)] = deps[dep]
 
         if not varname.endswith("_NONML"):
-            #if varname == "DEPENDS":
             self.d.renameVar(varname, varname + "_NONML")
             self.d.setVar(varname, "${@oe.classextend.get_depends('%s', d)}" % varname)
             self.d.appendVarFlag(varname, "vardeps", " " + varname + "_NONML")

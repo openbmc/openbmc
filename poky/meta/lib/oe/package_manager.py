@@ -1800,7 +1800,7 @@ class DpkgPM(OpkgDpkgPM):
     def fix_broken_dependencies(self):
         os.environ['APT_CONFIG'] = self.apt_conf_file
 
-        cmd = "%s %s -f install" % (self.apt_get_cmd, self.apt_args)
+        cmd = "%s %s --allow-unauthenticated -f install" % (self.apt_get_cmd, self.apt_args)
 
         try:
             subprocess.check_output(cmd.split(), stderr=subprocess.STDOUT)

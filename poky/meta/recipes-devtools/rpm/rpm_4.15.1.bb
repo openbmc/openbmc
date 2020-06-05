@@ -40,6 +40,7 @@ SRC_URI = "git://github.com/rpm-software-management/rpm;branch=rpm-4.15.x \
            file://0001-rpmplugins.c-call-dlerror-prior-to-dlsym.patch \
            file://0001-rpmfc.c-do-not-run-file-classification-in-parallel.patch \
            file://0001-lib-transaction.c-fix-file-conflicts-for-MIPS64-N32.patch \
+           file://0001-Bump-up-the-limit-of-signature-header-to-64MB.patch \
            "
 
 PE = "1"

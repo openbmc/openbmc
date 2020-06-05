@@ -12,9 +12,6 @@ SRCREV = "829b26d85e7d89a0caee03046c3bce373f04c80a"
 PV = "1.15"
 S = "${WORKDIR}/git"
 
-UPSTREAM_CHECK_GITTAGREGEX = "Release-(?P<pver>(\d+(\-\d+)+))"
-UPSTREAM_VERSION_UNKNOWN = "1"
-
 inherit autotools pkgconfig gettext python3native mime
 
 EXTRA_OECONF = "--disable-update-mimedb"

@@ -235,14 +235,14 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, srcbranch, branch, kee
         # Copy in new ones
         _copy_source_code(tmpsrctree, srctree)
 
-        (stdout,_) = __run('git ls-files --modified --others --exclude-standard')
+        (stdout,_) = __run('git ls-files --modified --others')
         filelist = stdout.splitlines()
         pbar = bb.ui.knotty.BBProgress('Adding changed files', len(filelist))
         pbar.start()
         batchsize = 100
         for i in range(0, len(filelist), batchsize):
             batch = filelist[i:i+batchsize]
-            __run('git add -A %s' % ' '.join(['"%s"' % item for item in batch]))
+            __run('git add -f -A %s' % ' '.join(['"%s"' % item for item in batch]))
             pbar.update(i)
         pbar.finish()
 

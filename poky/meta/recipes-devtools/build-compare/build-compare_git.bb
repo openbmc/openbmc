@@ -9,9 +9,9 @@ SRC_URI = "git://github.com/openSUSE/build-compare.git"
 
 # Date matches entry in build-compare.changes and date of SRCREV.
 #
-SRCREV = "28bf642fcfdab94adb9b847329338005be6f73c7"
+SRCREV = "102d844ce052c6dec6c56ee1d471bde72a1b4633"
 PE = "1"
-PV = "2020.03.31+git${SRCPV}"
+PV = "2020.05.29+git${SRCPV}"
 UPSTREAM_CHECK_COMMITS = "1"
 
 S = "${WORKDIR}/git"

@@ -52,6 +52,9 @@ CFLAGS += "-D_GNU_SOURCE"
 
 PACKAGES =+ "libvte ${PN}-prompt"
 FILES_libvte = "${libdir}/*.so.* ${libdir}/girepository-1.0/*"
-FILES_${PN}-prompt = "${sysconfdir}/profile.d"
+FILES_${PN}-prompt = " \
+    ${sysconfdir}/profile.d \
+    ${libexecdir}/vte-urlencode-cwd \
+"
 
 BBCLASSEXTEND = "native nativesdk"

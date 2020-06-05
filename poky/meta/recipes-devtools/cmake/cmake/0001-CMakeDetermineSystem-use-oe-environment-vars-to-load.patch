@@ -1,4 +1,4 @@
-From ab272d703ce77f323aa1285526559c9efbf85834 Mon Sep 17 00:00:00 2001
+From d4aa2dbdc69774ad668756586d59331ad215a2c6 Mon Sep 17 00:00:00 2001
 From: Cody P Schafer <dev@codyps.com>
 Date: Thu, 27 Apr 2017 11:35:05 -0400
 Subject: [PATCH] CMakeDetermineSystem: use oe environment vars to load default

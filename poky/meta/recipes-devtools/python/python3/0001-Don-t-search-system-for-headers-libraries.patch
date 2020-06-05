@@ -1,16 +1,17 @@
-From 85e8f86ad2b7dec0848cd55b8e810a5e2722b20a Mon Sep 17 00:00:00 2001
+From b880e78bf4a1852e260188e6df3ec6034403d2fc Mon Sep 17 00:00:00 2001
 From: Jeremy Puhlman <jpuhlman@mvista.com>
 Date: Wed, 4 Mar 2020 00:06:42 +0000
 Subject: [PATCH] Don't search system for headers/libraries
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Jeremy Puhlman <jpuhlman@mvista.com>
+
 ---
  setup.py | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/setup.py b/setup.py
-index 9da1b3a..59782c0 100644
+index 7208cd0..c0bd0ad 100644
 --- a/setup.py
 +++ b/setup.py
 @@ -674,8 +674,8 @@ class PyBuildExt(build_ext):
@@ -24,6 +25,3 @@ index 9da1b3a..59782c0 100644
          # lib_dirs and inc_dirs are used to search for files;
          # if a file is found in one of those directories, it can
          # be assumed that no additional -I,-L directives are needed.
--- 
-2.24.1
-

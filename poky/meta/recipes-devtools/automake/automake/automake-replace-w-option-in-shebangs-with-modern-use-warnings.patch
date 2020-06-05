@@ -1,4 +1,4 @@
-From 081385f4d4bba367afad3bff1fa034f5263305e6 Mon Sep 17 00:00:00 2001
+From 857c843d4bcf576467b505eb05a47f3e7d32caaa Mon Sep 17 00:00:00 2001
 From: Serhii Popovych <spopovyc@cisco.com>
 Date: Wed, 10 Feb 2016 17:07:32 +0000
 Subject: [PATCH] perl: Replace -w option in shebangs with modern "use
@@ -23,16 +23,16 @@ Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
  2 files changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/bin/aclocal.in b/bin/aclocal.in
-index b3715d9..461d453 100644
+index 9a20325..bd185d4 100644
 --- a/bin/aclocal.in
 +++ b/bin/aclocal.in
 @@ -1,4 +1,4 @@
 -#!@PERL@ -w
 +#!@PERL@
- # -*- perl -*-
+ # aclocal - create aclocal.m4 by scanning configure.ac      -*- perl -*-
  # @configure_input@
- 
-@@ -32,6 +32,7 @@ BEGIN
+ # Copyright (C) 1996-2020 Free Software Foundation, Inc.
+@@ -26,6 +26,7 @@ BEGIN
  }
  
  use strict;
@@ -41,16 +41,16 @@ index b3715d9..461d453 100644
  use Automake::Config;
  use Automake::General;
 diff --git a/bin/automake.in b/bin/automake.in
-index 8377d20..3a66965 100644
+index 5ed404a..d387b8e 100644
 --- a/bin/automake.in
 +++ b/bin/automake.in
 @@ -1,4 +1,4 @@
 -#!@PERL@ -w
 +#!@PERL@
- # -*- perl -*-
+ # automake - create Makefile.in from Makefile.am            -*- perl -*-
  # @configure_input@
- 
-@@ -28,6 +28,7 @@ eval 'case $# in 0) exec @PERL@ -S "$0";; *) exec @PERL@ -S "$0" "$@";; esac'
+ # Copyright (C) 1994-2020 Free Software Foundation, Inc.
+@@ -23,6 +23,7 @@
  package Automake;
  
  use strict;

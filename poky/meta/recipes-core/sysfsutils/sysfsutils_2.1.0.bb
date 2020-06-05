@@ -27,7 +27,5 @@ inherit autotools
 
 PACKAGES =+ "libsysfs"
 FILES_libsysfs = "${libdir}/lib*${SOLIBS}"
-FILES_libsysfs-dev = "${libdir}/lib*${SOLIBSDEV} ${includedir}"
-FILES_libsysfs-staticdev = "${libdir}/lib*.a"
 
 export libdir = "${base_libdir}"

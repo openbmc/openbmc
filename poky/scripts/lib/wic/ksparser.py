@@ -51,26 +51,31 @@ class KickStartParser(ArgumentParser):
     def error(self, message):
         raise ArgumentError(None, message)
 
-def sizetype(arg):
-    """
-    Custom type for ArgumentParser
-    Converts size string in <num>[K|k|M|G] format into the integer value
-    """
-    if arg.isdigit():
-        return int(arg) * 1024
+def sizetype(default):
+    def f(arg):
+        """
+        Custom type for ArgumentParser
+        Converts size string in <num>[K|k|M|G] format into the integer value
+        """
+        try:
+            suffix = default
+            size = int(arg)
+        except ValueError:
+            try:
+                suffix = arg[-1:]
+                size = int(arg[:-1])
+            except ValueError:
+                raise ArgumentTypeError("Invalid size: %r" % arg)
 
-    if not arg[:-1].isdigit():
+        if suffix == "k" or suffix == "K":
+            return size
+        if suffix == "M":
+            return size * 1024
+        if suffix == "G":
+            return size * 1024 * 1024
+
         raise ArgumentTypeError("Invalid size: %r" % arg)
-
-    size = int(arg[:-1])
-    if arg.endswith("k") or arg.endswith("K"):
-        return size
-    if arg.endswith("M"):
-        return size * 1024
-    if arg.endswith("G"):
-        return size * 1024 * 1024
-
-    raise ArgumentTypeError("Invalid size: %r" % arg)
+    return f
 
 def overheadtype(arg):
     """
@@ -136,6 +141,7 @@ class KickStart():
         part.add_argument('mountpoint', nargs='?')
         part.add_argument('--active', action='store_true')
         part.add_argument('--align', type=int)
+        part.add_argument('--offset', type=sizetype("K"))
         part.add_argument('--exclude-path', nargs='+')
         part.add_argument('--include-path', nargs='+', action='append')
         part.add_argument('--change-directory')
@@ -161,8 +167,8 @@ class KickStart():
         # --error, but since nesting mutually exclusive groups does not work,
         # ----extra-space/--overhead-factor are handled later
         sizeexcl = part.add_mutually_exclusive_group()
-        sizeexcl.add_argument('--size', type=sizetype, default=0)
-        sizeexcl.add_argument('--fixed-size', type=sizetype, default=0)
+        sizeexcl.add_argument('--size', type=sizetype("M"), default=0)
+        sizeexcl.add_argument('--fixed-size', type=sizetype("M"), default=0)
 
         part.add_argument('--source')
         part.add_argument('--sourceparams')

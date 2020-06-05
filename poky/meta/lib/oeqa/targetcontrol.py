@@ -182,7 +182,10 @@ class QemuTarget(BaseTarget):
         return self.runner.is_alive()
 
     def stop(self):
-        self.runner.stop()
+        try:
+            self.runner.stop()
+        except:
+            pass
         self.logger.removeHandler(self.loggerhandler)
         self.connection = None
         self.ip = None

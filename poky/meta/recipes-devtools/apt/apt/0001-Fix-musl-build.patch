@@ -1,0 +1,45 @@
+From 081c6be2f2f1cd77f399ea414f8d89c107826624 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 22 May 2020 15:29:23 +0000
+Subject: [PATCH] Fix musl build
+
+methods/connect.cc: Musl doesn't support AI_IDN flag in netdb.h
+header so define it manually.
+apt-pkg/contrib/srvrec.h: Add explicity include of sys/types.h
+to avoid errors in types u_int_SIZE.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ apt-pkg/contrib/srvrec.h | 1 +
+ methods/connect.cc       | 5 +++++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/apt-pkg/contrib/srvrec.h b/apt-pkg/contrib/srvrec.h
+index e22b7a1..b1115f5 100644
+--- a/apt-pkg/contrib/srvrec.h
++++ b/apt-pkg/contrib/srvrec.h
+@@ -9,6 +9,7 @@
+ #ifndef SRVREC_H
+ #define SRVREC_H
+ 
++#include <sys/types.h>
+ #include <string>
+ #include <vector>
+ #include <arpa/nameser.h>
+diff --git a/methods/connect.cc b/methods/connect.cc
+index 1d6f891..122df35 100644
+--- a/methods/connect.cc
++++ b/methods/connect.cc
+@@ -42,6 +42,11 @@
+ #include "connect.h"
+ #include "rfc2553emu.h"
+ #include <apti18n.h>
++
++#ifndef AI_IDN
++#define AI_IDN 0x0040
++#endif
++
+ 									/*}}}*/
+ 
+ static std::string LastHost;

@@ -1,5 +1,8 @@
 #!/bin/sh
-	
+#
+# SPDX-License-Identifier: CC-BY-2.0-UK
+#
+
 if [ -z "$1" -o -z "$2" ]; then
    echo "usage: [-v] $0 <docbook file> <templatedir>"
    echo

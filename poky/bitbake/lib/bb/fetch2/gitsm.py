@@ -223,3 +223,24 @@ class GitSM(Git):
             # up the configuration and checks out the files.  The main project config should remain
             # unmodified, and no download from the internet should occur.
             runfetchcmd("%s submodule update --recursive --no-fetch" % (ud.basecmd), d, quiet=True, workdir=ud.destdir)
+
+    def implicit_urldata(self, ud, d):
+        import shutil, subprocess, tempfile
+
+        urldata = []
+        def add_submodule(ud, url, module, modpath, workdir, d):
+            url += ";bareclone=1;nobranch=1"
+            newfetch = Fetch([url], d, cache=False)
+            urldata.extend(newfetch.expanded_urldata())
+
+        # If we're using a shallow mirror tarball it needs to be unpacked
+        # temporarily so that we can examine the .gitmodules file
+        if ud.shallow and os.path.exists(ud.fullshallow) and ud.method.need_update(ud, d):
+            tmpdir = tempfile.mkdtemp(dir=d.getVar("DL_DIR"))
+            subprocess.check_call("tar -xzf %s" % ud.fullshallow, cwd=tmpdir, shell=True)
+            self.process_submodules(ud, tmpdir, add_submodule, d)
+            shutil.rmtree(tmpdir)
+        else:
+            self.process_submodules(ud, ud.clonedir, add_submodule, d)
+
+        return urldata

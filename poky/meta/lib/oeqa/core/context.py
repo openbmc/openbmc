@@ -156,6 +156,8 @@ class OETestContextExecutor(object):
         fh = logging.FileHandler(args.output_log)
         fh.setFormatter(formatter)
         logger.addHandler(fh)
+        if getattr(args, 'verbose', False):
+            logger.setLevel('DEBUG')
 
         return logger
 

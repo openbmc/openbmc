@@ -1,4 +1,4 @@
-From 5a86c7fa987bd407f228176df2abeffd015be9ea Mon Sep 17 00:00:00 2001
+From 126994379ea75c8826874656bb55f955182ae911 Mon Sep 17 00:00:00 2001
 From: Otavio Salvador <otavio@ossystems.com.br>
 Date: Wed, 17 Jan 2018 10:02:14 -0200
 Subject: [PATCH] cmake: Prevent the detection of Qt5
@@ -25,7 +25,7 @@ Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
  7 files changed, 8 insertions(+), 9 deletions(-)
 
 diff --git a/Source/QtDialog/CMakeLists.txt b/Source/QtDialog/CMakeLists.txt
-index cb89d19..9e68981 100644
+index 98dd0e2..252302b 100644
 --- a/Source/QtDialog/CMakeLists.txt
 +++ b/Source/QtDialog/CMakeLists.txt
 @@ -3,7 +3,7 @@
@@ -38,18 +38,18 @@ index cb89d19..9e68981 100644
    include_directories(${Qt5Widgets_INCLUDE_DIRS})
    add_definitions(${Qt5Widgets_DEFINITONS})
 diff --git a/Tests/CMakeLists.txt b/Tests/CMakeLists.txt
-index 57fa7fc..d50c146 100644
+index aff7383..e220503 100644
 --- a/Tests/CMakeLists.txt
 +++ b/Tests/CMakeLists.txt
-@@ -1329,7 +1329,7 @@ ${CMake_SOURCE_DIR}/Utilities/Release/push.bash --dir dev -- '${CMake_BUILD_NIGH
+@@ -215,7 +215,7 @@ if(BUILD_TESTING)
      set(CMake_TEST_Qt5 1)
    endif()
    if(CMake_TEST_Qt5)
 -    find_package(Qt5Widgets QUIET NO_MODULE)
 +    #find_package(Qt5Widgets QUIET NO_MODULE)
    endif()
-   if(CMake_TEST_Qt5 AND Qt5Widgets_FOUND)
-     add_subdirectory(Qt5Autogen)
+ 
+   if(NOT CMake_TEST_EXTERNAL_CMAKE)
 diff --git a/Tests/Qt4And5Automoc/CMakeLists.txt b/Tests/Qt4And5Automoc/CMakeLists.txt
 index ad74961..a9dd74b 100644
 --- a/Tests/Qt4And5Automoc/CMakeLists.txt
@@ -96,10 +96,10 @@ index c08efc4..87e25d9 100644
  set(CMAKE_CXX_STANDARD 11)
  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output/bin)
 diff --git a/Tests/RunCMake/CMakeLists.txt b/Tests/RunCMake/CMakeLists.txt
-index 6b2f117..1002005 100644
+index e9f8bca..3a2da34 100644
 --- a/Tests/RunCMake/CMakeLists.txt
 +++ b/Tests/RunCMake/CMakeLists.txt
-@@ -376,7 +376,7 @@ else()
+@@ -396,7 +396,7 @@ else()
  endif()
  
  find_package(Qt4 QUIET)

@@ -1,0 +1,32 @@
+From 8dcdb3d22a66f18770e5566c0e72e86a0701aeac Mon Sep 17 00:00:00 2001
+From: Robert Scheck <robert@fedoraproject.org>
+Date: Tue, 12 May 2020 20:33:12 +0200
+Subject: Rewrite printf() due to -Werror=format-security
+
+Avoid -Werror=format-security leading to: netlink/settings.c:378:2: error:
+format not a string literal and no format arguments [-Werror=format-security]
+
+Upstream-Status: Backport
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+Signed-off-by: Robert Scheck <robert@fedoraproject.org>
+Signed-off-by: John W. Linville <linville@tuxdriver.com>
+---
+ netlink/settings.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/netlink/settings.c b/netlink/settings.c
+index c8a911d..0212465 100644
+--- a/netlink/settings.c
++++ b/netlink/settings.c
+@@ -375,7 +375,7 @@ static int dump_link_modes(struct nl_context *nlctx,
+ after:
+ 	if (first && if_none)
+ 		printf("%s", if_none);
+-	printf(after);
++	printf("%s", after);
+ 
+ 	return 0;
+ err:
+-- 
+cgit 1.2.3-1.el7
+
