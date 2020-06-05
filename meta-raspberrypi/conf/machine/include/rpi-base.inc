@@ -39,6 +39,8 @@ RPI_KERNEL_DEVICETREE_OVERLAYS ?= " \
     overlays/vc4-fkms-v3d.dtbo \
     overlays/w1-gpio-pullup.dtbo \
     overlays/w1-gpio.dtbo \
+    overlays/gpio-ir.dtbo \
+    overlays/gpio-ir-tx.dtbo \
     "
 
 RPI_KERNEL_DEVICETREE ?= " \
