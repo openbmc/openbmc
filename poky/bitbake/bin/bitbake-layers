@@ -52,7 +52,9 @@ def main():
 
     # Need to re-run logger_create with color argument
     # (will be the same logger since it has the same name)
-    bb.msg.logger_create('bitbake-layers', output=sys.stdout, color=global_args.color)
+    bb.msg.logger_create('bitbake-layers', output=sys.stdout,
+                         color=global_args.color,
+                         level=logger.getEffectiveLevel())
 
     plugins = []
     tinfoil = bb.tinfoil.Tinfoil(tracking=True)

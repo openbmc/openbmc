@@ -341,12 +341,15 @@ DESCRIPTION
 
 wic_cp_usage = """
 
- Copy files and directories to the vfat or ext* partition
+ Copy files and directories to/from the vfat or ext* partition
 
- usage: wic cp <src> <image>:<partition>[<path>] [--native-sysroot <path>]
+ usage: wic cp <src> <dest> [--native-sysroot <path>]
 
- This command  copies local files or directories to the vfat or ext* partitions
-of partitioned  image.
+ source/destination image in format <image>:<partition>[<path>]
+
+ This command copies files or directories either
+  - from local to vfat or ext* partitions of partitioned image
+  - from vfat or ext* partitions of partitioned image to local
 
  See 'wic help cp' for more detailed instructions.
 
@@ -355,16 +358,18 @@ of partitioned  image.
 wic_cp_help = """
 
 NAME
-    wic cp - copy files and directories to the vfat or ext* partitions
+    wic cp - copy files and directories to/from the vfat or ext* partitions
 
 SYNOPSIS
-    wic cp <src> <image>:<partition>
-    wic cp <src> <image>:<partition><path>
-    wic cp <src> <image>:<partition><path> --native-sysroot <path>
+    wic cp <src> <dest>:<partition>
+    wic cp <src>:<partition> <dest>
+    wic cp <src> <dest-image>:<partition><path>
+    wic cp <src> <dest-image>:<partition><path> --native-sysroot <path>
 
 DESCRIPTION
-    This command copies files and directories to the vfat or ext* partition of
-    the partitioned image.
+    This command copies files or directories either
+      - from local to vfat or ext* partitions of partitioned image
+      - from vfat or ext* partitions of partitioned image to local
 
     The first form of it copies file or directory to the root directory of
     the partition:
@@ -396,6 +401,10 @@ DESCRIPTION
        test         <DIR>     2017-05-24  21:27
                4 files                   0 bytes
                                 15 675 392 bytes free
+
+    The third form of the command copies file or directory from the specified directory
+    on the partition to local:
+       $ wic cp tmp/deploy/images/qemux86-64/core-image-minimal-qemux86-64.wic:1/vmlinuz test
 
     The -n option is used to specify the path to the native sysroot
     containing the tools(parted and mtools) to use.
@@ -527,7 +536,8 @@ DESCRIPTION
 
     Source plugins can also be implemented and added by external
     layers - any plugins found in a scripts/lib/wic/plugins/source/
-    directory in an external layer will also be made available.
+    or lib/wic/plugins/source/ directory in an external layer will
+    also be made available.
 
     When the wic implementation needs to invoke a partition-specific
     implementation, it looks for the plugin that has the same name as
@@ -959,6 +969,26 @@ DESCRIPTION
                          ends with a slash, only the content of the directory
                          is omitted, not the directory itself. This option only
                          has an effect with the rootfs source plugin.
+
+         --include-path: This option is specific to wic. It adds the contents
+                         of the given path or a rootfs to the resulting image.
+                         The option contains two fields, the origin and the
+                         destination. When the origin is a rootfs, it follows
+                         the same logic as the rootfs-dir argument and the
+                         permissions and owners are kept. When the origin is a
+                         path, it is relative to the directory in which wic is
+                         running not the rootfs itself so use of an absolute
+                         path is recommended, and the owner and group is set to
+                         root:root. If no destination is given it is
+                         automatically set to the root of the rootfs. This
+                         option only has an effect with the rootfs source
+                         plugin.
+
+         --change-directory: This option is specific to wic. It changes to the
+                             given directory before copying the files. This
+                             option is useful when we want to split a rootfs in
+                             multiple partitions and we want to keep the right
+                             permissions and usernames in all the partitions.
 
          --extra-space: This option is specific to wic. It adds extra
                         space after the space filled by the content

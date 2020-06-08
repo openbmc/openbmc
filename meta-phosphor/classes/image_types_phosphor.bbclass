@@ -42,6 +42,7 @@ FLASH_PAGE_SIZE ?= "1"
 FLASH_NOR_UBI_OVERHEAD ?= "64"
 
 # Fixed partition offsets
+FLASH_UBOOT_SPL_SIZE ?= "64"
 FLASH_UBOOT_OFFSET ?= "0"
 FLASH_KERNEL_OFFSET ?= "512"
 FLASH_KERNEL_OFFSET_flash-131072 ?= "1024"
@@ -314,6 +315,22 @@ do_mk_static_nor_image() {
 	mk_empty_image ${IMGDEPLOYDIR}/${IMAGE_NAME}.static.mtd ${FLASH_SIZE}
 }
 
+do_generate_image_uboot_file() {
+    image_dst="$1"
+    uboot_offset=${FLASH_UBOOT_OFFSET}
+
+    if [ ! -z ${SPL_BINARY} ]; then
+        dd bs=1k conv=notrunc seek=${FLASH_UBOOT_OFFSET} \
+            if=${DEPLOY_DIR_IMAGE}/u-boot-spl.${UBOOT_SUFFIX} \
+            of=${image_dst}
+        uboot_offset=${FLASH_UBOOT_SPL_SIZE}
+    fi
+
+    dd bs=1k conv=notrunc seek=${uboot_offset} \
+        if=${DEPLOY_DIR_IMAGE}/u-boot.${UBOOT_SUFFIX} \
+        of=${image_dst}
+}
+
 python do_generate_static() {
     import subprocess
 
@@ -336,9 +353,19 @@ python do_generate_static() {
                                'if=%s' % imgpath,
                                'of=%s' % nor_image])
 
+    uboot_offset = int(d.getVar('FLASH_UBOOT_OFFSET', True))
+
+    spl_binary = d.getVar('SPL_BINARY', True)
+    if spl_binary:
+        _append_image(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
+                                   'u-boot-spl.%s' % d.getVar('UBOOT_SUFFIX',True)),
+                      int(d.getVar('FLASH_UBOOT_OFFSET', True)),
+                      int(d.getVar('FLASH_UBOOT_SPL_SIZE', True)))
+        uboot_offset += int(d.getVar('FLASH_UBOOT_SPL_SIZE', True))
+
     _append_image(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
                                'u-boot.%s' % d.getVar('UBOOT_SUFFIX',True)),
-                  int(d.getVar('FLASH_UBOOT_OFFSET', True)),
+                  uboot_offset,
                   int(d.getVar('FLASH_KERNEL_OFFSET', True)))
 
     _append_image(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
@@ -368,9 +395,9 @@ do_mk_static_symlinks() {
 	ln -sf ${IMAGE_NAME}.static.mtd ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.static.mtd
 
 	# Maintain non-standard legacy links
+	do_generate_image_uboot_file ${IMGDEPLOYDIR}/image-u-boot
 	ln -sf ${IMAGE_NAME}.static.mtd ${IMGDEPLOYDIR}/flash-${MACHINE}
 	ln -sf ${IMAGE_NAME}.static.mtd ${IMGDEPLOYDIR}/image-bmc
-	ln -sf u-boot.${UBOOT_SUFFIX} ${IMGDEPLOYDIR}/image-u-boot
 	ln -sf ${FLASH_KERNEL_IMAGE} ${IMGDEPLOYDIR}/image-kernel
 	ln -sf ${IMAGE_LINK_NAME}.${IMAGE_BASETYPE} ${IMGDEPLOYDIR}/image-rofs
 	ln -sf ${IMAGE_LINK_NAME}.${OVERLAY_BASETYPE} ${IMGDEPLOYDIR}/image-rwfs
@@ -426,7 +453,7 @@ make_image_links() {
 
 	# Create some links to help make the tar archive in the format
 	# expected by phosphor-bmc-code-mgmt.
-	ln -sf ${DEPLOY_DIR_IMAGE}/u-boot.${UBOOT_SUFFIX} image-u-boot
+	do_generate_image_uboot_file image-u-boot
 	ln -sf ${DEPLOY_DIR_IMAGE}/${FLASH_KERNEL_IMAGE} image-kernel
 	ln -sf ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.$rofs image-rofs
 	ln -sf ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.$rwfs image-rwfs
@@ -485,14 +512,16 @@ do_generate_ubi_tar[depends] += " \
         "
 
 do_generate_ext4_tar() {
+	zstd -f -k -T0 -c ${ZSTD_COMPRESSION_LEVEL} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${FLASH_EXT4_BASETYPE} > ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${FLASH_EXT4_BASETYPE}.zst
 	ln -sf ${S}/MANIFEST MANIFEST
 	ln -sf ${S}/publickey publickey
-	make_image_links rwfs.${FLASH_EXT4_OVERLAY_BASETYPE} ${FLASH_EXT4_BASETYPE}
+	make_image_links rwfs.${FLASH_EXT4_OVERLAY_BASETYPE} ${FLASH_EXT4_BASETYPE}.zst
 	make_signatures image-u-boot image-kernel image-rofs image-rwfs MANIFEST publickey
 	make_tar_of_images ext4.mmc MANIFEST publickey ${signature_files}
 }
 do_generate_ext4_tar[dirs] = " ${S}/ext4"
 do_generate_ext4_tar[depends] += " \
+        zstd-native:do_populate_sysroot \
         ${PN}:do_image_${FLASH_EXT4_BASETYPE} \
         virtual/kernel:do_deploy \
         u-boot:do_populate_sysroot \

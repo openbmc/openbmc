@@ -11,8 +11,6 @@ DEPENDS = "virtual/crypt"
 UPSTREAM_CHECK_URI = "https://github.com/shadow-maint/shadow/releases"
 SRC_URI = "https://github.com/shadow-maint/shadow/releases/download/${PV}/${BP}.tar.gz \
            file://shadow-4.1.3-dots-in-usernames.patch \
-           file://0001-Make-the-sp_lstchg-shadow-field-reproducible-re.-71.patch  \
-           file://0001-configure.ac-fix-configure-error-with-dash.patch \
            ${@bb.utils.contains('PACKAGECONFIG', 'pam', '${PAM_SRC_URI}', '', d)} \
            file://shadow-relaxed-usernames.patch \
            "
@@ -24,16 +22,15 @@ SRC_URI_append_class-target = " \
 
 SRC_URI_append_class-native = " \
            file://0001-Disable-use-of-syslog-for-sysroot.patch \
-           file://allow-for-setting-password-in-clear-text.patch \
+           file://0002-Allow-for-setting-password-in-clear-text.patch \
            file://commonio.c-fix-unexpected-open-failure-in-chroot-env.patch \
-           file://0001-useradd.c-create-parent-directories-when-necessary.patch \
            "
 SRC_URI_append_class-nativesdk = " \
            file://0001-Disable-use-of-syslog-for-sysroot.patch \
            "
 
-SRC_URI[md5sum] = "36feb15665338ae3de414f2a88e434db"
-SRC_URI[sha256sum] = "4668f99bd087399c4a586084dc3b046b75f560720d83e92fd23bf7a89dda4d31"
+SRC_URI[md5sum] = "3d97f11e66bfb0b14702b115fa8be480"
+SRC_URI[sha256sum] = "3ee3081fbbcbcfea5c8916419e46bc724807bab271072104f23e7a29e9668f3a"
 
 # Additional Policy files for PAM
 PAM_SRC_URI = "file://pam.d/chfn \
@@ -53,6 +50,7 @@ EXTRA_OECONF += "--without-audit \
                  --without-selinux \
                  --with-group-name-max-length=24 \
                  --enable-subordinate-ids=yes \
+                 --without-sssd \
                  ${NSCDOPT}"
 
 NSCDOPT = ""

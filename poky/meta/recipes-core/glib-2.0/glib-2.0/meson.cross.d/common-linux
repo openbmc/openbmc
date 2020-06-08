@@ -1,0 +1,5 @@
+[properties]
+have_proc_self_cmdline = true
+
+[binaries]
+env = "/usr/bin/env"

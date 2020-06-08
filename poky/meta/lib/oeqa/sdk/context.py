@@ -136,7 +136,7 @@ class OESDKTestContextExecutor(OETestContextExecutor):
         sdk_envs = OESDKTestContextExecutor._get_sdk_environs(args.sdk_dir)
         if not sdk_envs:
             raise argparse_oe.ArgumentUsageError("No available SDK "\
-                   "enviroments found at %s" % args.sdk_dir, self.name)
+                   "environments found at %s" % args.sdk_dir, self.name)
 
         if args.list_sdk_env:
             self._display_sdk_envs(logger.info, args, sdk_envs)

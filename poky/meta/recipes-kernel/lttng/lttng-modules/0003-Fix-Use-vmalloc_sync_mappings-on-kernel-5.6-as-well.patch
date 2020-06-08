@@ -1,0 +1,88 @@
+From 23cfd7b53ec1521d3c23ceddfda49352c2d349dc Mon Sep 17 00:00:00 2001
+From: Ovidiu Panait <ovidiu.panait@windriver.com>
+Date: Thu, 14 May 2020 13:05:24 +0300
+Subject: [PATCH 3/4] Fix: Use vmalloc_sync_mappings on kernel 5.6 as well
+
+Upstream commit [1], that got rid of vmalloc_sync_all and introduced
+vmalloc_sync_mappings, is a v5.6 commit:
+$ git tag --contains 763802b53a427ed3cbd419dbba255c414fdd9e7c
+v5.6
+v5.6-rc7
+v5.7-rc1
+v5.7-rc2
+v5.7-rc3
+
+Extend the LINUX_VERSION_CODE check to v5.6 to fix the following warnings:
+...
+[  483.242037] LTTng: vmalloc_sync_all symbol lookup failed.
+[  483.257056] Page fault handler and NMI tracing might trigger faults.
+...
+
+[1] https://github.com/torvalds/linux/commit/763802b53a427ed3cbd419dbba255c414fdd9e7c
+
+Upstream-Status: Backport [https://github.com/lttng/lttng-modules/commit/da356b324dfc160e09b8966b691792037badf455]
+
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
+---
+ wrapper/vmalloc.h | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/wrapper/vmalloc.h b/wrapper/vmalloc.h
+index 5d0b389..d905f60 100644
+--- a/wrapper/vmalloc.h
++++ b/wrapper/vmalloc.h
+@@ -21,7 +21,7 @@
+ #include <linux/kallsyms.h>
+ #include <wrapper/kallsyms.h>
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0))
+ 
+ static inline
+ void wrapper_vmalloc_sync_mappings(void)
+@@ -43,7 +43,7 @@ void wrapper_vmalloc_sync_mappings(void)
+ 	}
+ }
+ 
+-#else /* #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)) */
++#else /* #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0)) */
+ 
+ /*
+  * Map vmalloc_sync_mappings to vmalloc_sync_all() on kernels before 5.7.
+@@ -68,11 +68,11 @@ void wrapper_vmalloc_sync_mappings(void)
+ 	}
+ }
+ 
+-#endif /* #else #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)) */
++#endif /* #else #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0)) */
+ 
+ #else
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0))
+ 
+ static inline
+ void wrapper_vmalloc_sync_mappings(void)
+@@ -80,7 +80,7 @@ void wrapper_vmalloc_sync_mappings(void)
+ 	return vmalloc_sync_mappings();
+ }
+ 
+-#else /* #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)) */
++#else /* #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0)) */
+ 
+ static inline
+ void wrapper_vmalloc_sync_mappings(void)
+@@ -88,7 +88,7 @@ void wrapper_vmalloc_sync_mappings(void)
+ 	return vmalloc_sync_all();
+ }
+ 
+-#endif /* #else #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)) */
++#endif /* #else #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0)) */
+ 
+ #endif
+ 
+-- 
+2.17.1
+

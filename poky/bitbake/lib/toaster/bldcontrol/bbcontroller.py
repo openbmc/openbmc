@@ -8,10 +8,8 @@
 
 import os
 import sys
-import re
-from django.db import transaction
 from django.db.models import Q
-from bldcontrol.models import BuildEnvironment, BRLayer, BRVariable, BRTarget, BRBitbake
+from bldcontrol.models import BuildEnvironment, BRLayer, BRBitbake
 
 # load Bitbake components
 path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))

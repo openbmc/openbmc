@@ -1,0 +1,28 @@
+From 582713cc9a013481eeef253195d644020f637ec4 Mon Sep 17 00:00:00 2001
+Message-Id: <582713cc9a013481eeef253195d644020f637ec4.1583403622.git.wallinux@gmail.com>
+From: Anders Wallin <wallinux@gmail.com>
+Date: Thu, 5 Mar 2020 11:20:04 +0100
+Subject: [PATCH] tests: do not run test applications from .libs
+
+Cross compile specific change
+
+Upstream-Status: Inappropriate [oe-core specific]
+
+Signed-off-by: Anders Wallin <wallinux@gmail.com>
+---
+ tests/lib/test_plugin | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/lib/test_plugin b/tests/lib/test_plugin
+index 652c90cc..1f817c50 100755
+--- a/tests/lib/test_plugin
++++ b/tests/lib/test_plugin
+@@ -26,4 +26,4 @@ fi
+ # shellcheck source=../utils/utils.sh
+ source "$UTILSSH"
+ 
+-"${BT_TESTS_BUILDDIR}/lib/plugin" "${BT_TESTS_BUILDDIR}/lib/test-plugin-plugins/.libs"
++"${BT_TESTS_BUILDDIR}/lib/plugin" "${BT_TESTS_BUILDDIR}/lib/test-plugin-plugins"
+-- 
+2.25.1
+

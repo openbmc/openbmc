@@ -28,5 +28,6 @@ do_compile_ptest() {
 }
 
 do_install_ptest() {
-    install -Dm0755 -t ${D}${PTEST_PATH}/tests/ ${B}/test/.libs/*
+    mkdir -p ${D}${PTEST_PATH}/tests
+    install -m 0755 -t ${D}${PTEST_PATH}/tests/ ${B}/test/.libs/*
 }

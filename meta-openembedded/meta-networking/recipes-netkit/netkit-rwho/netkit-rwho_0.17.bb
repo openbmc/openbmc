@@ -5,7 +5,7 @@ LICENSE = "BSD-4-Clause"
 LIC_FILES_CHKSUM = "file://rwho/rwho.c;beginline=2;endline=3;md5=5a85f13c0142d72fc378e00f15da5b9e"
 
 SRC_URI = "${DEBIAN_MIRROR}/main/n/netkit-rwho/netkit-rwho_${PV}.orig.tar.gz;name=archive \
-           ${DEBIAN_MIRROR}/main/n/netkit-rwho/netkit-rwho_${PV}-13.debian.tar.gz;name=patch13 \
+           ${DEBIAN_MIRROR}/main/n/netkit-rwho/netkit-rwho_${PV}-13.debian.tar.gz;subdir=${BP};name=patch13 \
            file://rwhod \
            file://rwhod.default \
            file://0001-Add-missing-include-path-to-I-options.patch \
@@ -20,13 +20,37 @@ inherit autotools-brokensep useradd update-rc.d update-alternatives
 
 CFLAGS += " -D_GNU_SOURCE"
 
-debian_do_patch() {
-    cd ${S}
-    while read line; do patch -p1 < ${WORKDIR}/debian/patches/$line; done < ${WORKDIR}/debian/patches/series
+# Unlike other Debian packages, net-tools *.diff.gz contains another series of
+# patches maintained by quilt. So manually apply them before applying other local
+# patches. Also remove all temp files before leaving, because do_patch() will pop
+# up all previously applied patches in the start
+do_patch[depends] += "quilt-native:do_populate_sysroot"
+netkit_do_patch() {
+        cd ${S}
+        # it's important that we only pop the existing patches when they've
+        # been applied, otherwise quilt will climb the directory tree
+        # and reverse out some completely different set of patches
+        if [ -d ${S}/patches ]; then
+                # whilst this is the default directory, doing it like this
+                # defeats the directory climbing that quilt will otherwise
+                # do; note the directory must exist to defeat this, hence
+                # the test inside which we operate
+                QUILT_PATCHES=${S}/patches quilt pop -a
+        fi
+        if [ -d ${S}/.pc-${BPN} ]; then
+                rm -rf ${S}/.pc
+                mv ${S}/.pc-${BPN} ${S}/.pc
+                QUILT_PATCHES=${S}/debian/patches quilt pop -a
+                rm -rf ${S}/.pc ${S}/debian
+        fi
+        QUILT_PATCHES=${S}/debian/patches quilt push -a
+        mv ${S}/.pc ${S}/.pc-${BPN}
 }
 
+do_unpack[cleandirs] += "${S}"
+
 python do_patch() {
-    bb.build.exec_func('debian_do_patch', d)
+    bb.build.exec_func('netkit_do_patch', d)
     bb.build.exec_func('patch_do_patch', d)
 }
 

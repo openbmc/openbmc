@@ -1,0 +1,117 @@
+From 8a204171004fa0d7d21389530c744d215e99efb0 Mon Sep 17 00:00:00 2001
+From: Joshua Watt <JPEWhacker@gmail.com>
+Date: Tue, 19 Nov 2019 12:47:30 -0600
+Subject: [PATCH 1/2] stdlib: Add strlcat
+
+Adds strlcat which can be used to safely concatenate strings
+
+Upstream-Status: Submitted [https://bugzilla.nasm.us/show_bug.cgi?id=3392635]
+Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
+---
+ Makefile.in        |  2 +-
+ configure.ac       |  2 ++
+ include/compiler.h |  4 ++++
+ stdlib/strlcat.c   | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 50 insertions(+), 1 deletion(-)
+ create mode 100644 stdlib/strlcat.c
+
+diff --git a/Makefile.in b/Makefile.in
+index 32ef3d91..ff7eb447 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -93,7 +93,7 @@ NASM =	asm/nasm.$(O)
+ NDISASM = disasm/ndisasm.$(O)
+ 
+ LIBOBJ = stdlib/snprintf.$(O) stdlib/vsnprintf.$(O) stdlib/strlcpy.$(O) \
+-	stdlib/strnlen.$(O) stdlib/strrchrnul.$(O) \
++	stdlib/strnlen.$(O) stdlib/strrchrnul.$(O) stdlib/strlcat.$(O) \
+ 	\
+ 	nasmlib/ver.$(O) \
+ 	nasmlib/crc64.$(O) nasmlib/malloc.$(O) nasmlib/errfile.$(O) \
+diff --git a/configure.ac b/configure.ac
+index 38b3b596..b4e88778 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -152,6 +152,7 @@ AC_CHECK_FUNCS([vsnprintf _vsnprintf])
+ AC_CHECK_FUNCS([snprintf _snprintf])
+ AC_CHECK_FUNCS([strlcpy])
+ AC_CHECK_FUNCS([strrchrnul])
++AC_CHECK_FUNCS([strlcat])
+ 
+ dnl These types are POSIX-specific, and Windows does it differently...
+ AC_CHECK_TYPES([struct _stati64])
+@@ -170,6 +171,7 @@ AC_CHECK_DECLS(strsep)
+ AC_CHECK_DECLS(strlcpy)
+ AC_CHECK_DECLS(strnlen)
+ AC_CHECK_DECLS(strrchrnul)
++AC_CHECK_DECLS(strlcat)
+ 
+ dnl Check for missing types
+ AC_TYPE_UINTPTR_T
+diff --git a/include/compiler.h b/include/compiler.h
+index 4178c98e..8153d297 100644
+--- a/include/compiler.h
++++ b/include/compiler.h
+@@ -159,6 +159,10 @@ size_t strlcpy(char *, const char *, size_t);
+ char *strrchrnul(const char *, int);
+ #endif
+ 
++#if !defined(HAVE_STRLCAT) || !HAVE_DECL_STRLCAT
++size_t strlcat(char *, const char *, size_t);
++#endif
++
+ #ifndef __cplusplus		/* C++ has false, true, bool as keywords */
+ # ifdef HAVE_STDBOOL_H
+ #  include <stdbool.h>
+diff --git a/stdlib/strlcat.c b/stdlib/strlcat.c
+new file mode 100644
+index 00000000..7084d460
+--- /dev/null
++++ b/stdlib/strlcat.c
+@@ -0,0 +1,43 @@
++/*
++ * Copyright (c) 2019 Garmin Ltd. or its subsidiaries
++ *
++ * Permission to use, copy, modify, and distribute this software for any
++ * purpose with or without fee is hereby granted, provided that the above
++ * copyright notice and this permission notice appear in all copies.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
++ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
++ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
++ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
++ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
++ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
++ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
++ */
++
++#include "compiler.h"
++
++/*
++ * Concatenate src string to dest of size size. The destination buffer will
++ * have no more than size-1 character when the operation finishes. Always NUL
++ * terminates, unless size == 0 or dest has no NUL terminator. Returns
++ * strlen(initial dest) + strlen(src); if retval >= size, truncation occurred.
++ */
++#ifndef HAVE_STRLCAT
++
++size_t strlcat(char *dest, const char *src, size_t size)
++{
++    size_t n;
++
++    /* find the NULL terminator in dest */
++    for (n = 0; i < size && dest[n] != '\0'; n++)
++        ;
++
++    /* destination was not NULL terminated. Return the initial size */
++    if (n == size)
++        return size;
++
++    return strlcpy(&dest[n], src, size - n) + n;
++}
++
++#endif
++
+-- 
+2.23.0
+

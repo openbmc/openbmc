@@ -13,11 +13,9 @@ DEPENDS = ""
 PR = "r6"
 
 SRC_URI = "http://www.ohse.de/uwe/releases/lrzsz-${PV}.tar.gz \
+           file://autotools-update.patch \
 	   file://autotools.patch \
 	   file://makefile.patch \
-	   file://gettext.patch \
-	   file://acdefine.patch \
-	   file://lrzsz_fix_for_automake-1.12.patch \
            file://lrzsz-check-locale.h.patch \
            file://cve-2018-10195.patch \
            file://include.patch \

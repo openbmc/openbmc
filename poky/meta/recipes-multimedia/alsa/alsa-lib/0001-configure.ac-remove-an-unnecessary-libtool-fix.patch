@@ -1,0 +1,50 @@
+From 01cd8cb6d594d7a12c67d21d689ebe0e347469c0 Mon Sep 17 00:00:00 2001
+From: Tanu Kaskinen <tanuk@iki.fi>
+Date: Fri, 20 Dec 2019 09:26:12 +0200
+Subject: [PATCH] configure.ac: remove an unnecessary libtool fix
+
+This code was added in commit 75d393a563efb578c79364a277087c6326267f52
+without explaining why. I assume it was a mistake, since it looks like
+the libtool problem should have gone away a long time ago. The referenced
+wiki page https://wiki.debian.org/RpathIssue says:
+
+    Since libtool 1.5.2 (released 2004-01-25), on Linux libtool no
+    longer sets RPATH for any directories in the dynamic linker search
+    path, so this should no longer be an issue unless upstream used a
+    really old version of libtool when creating their distribution
+    tarball.
+
+This code caused problems in OpenEmbedded, where the libtool script is
+named "x86_64-oe-linux-libtool" or similar rather than just "libtool",
+so the sed command failed with a file not found error. Rather than
+adapting the code to OpenEmbedded's peculiarities, it seems best to just
+remove the unnecessary code altogether.
+
+Upstream-Status: Submitted [https://github.com/alsa-project/alsa-lib/pull/19]
+Signed-off-by: Tanu Kaskinen <tanuk@iki.fi>
+---
+ configure.ac | 11 -----------
+ 1 file changed, 11 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 119ef600..22a4a885 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -764,14 +764,3 @@ test "$build_seq" = "yes" && echo "#include <alsa/seq.h>" >> include/asoundlib.h
+ test "$build_seq" = "yes" && echo "#include <alsa/seqmid.h>" >> include/asoundlib.h
+ test "$build_seq" = "yes" && echo "#include <alsa/seq_midi_event.h>" >> include/asoundlib.h
+ cat "$srcdir"/include/asoundlib-tail.h >> include/asoundlib.h
+-
+-dnl Taken from https://wiki.debian.org/RpathIssue
+-case $host in
+-   *-*-linux-gnu)
+-   AC_MSG_RESULT([Fixing libtool for -rpath problems.])
+-   sed < libtool > libtool-2 \
+-     's/^hardcode_libdir_flag_spec.*$'/'hardcode_libdir_flag_spec=" -D__LIBTOOL_IS_A_FOOL__ "/'
+-   mv libtool-2 libtool
+-   chmod 755 libtool
+- ;;
+-esac
+-- 
+2.20.1
+

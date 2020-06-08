@@ -1,4 +1,4 @@
-From 23cd157352ac8a53f992ddc6d6d01caadf1c79bc Mon Sep 17 00:00:00 2001
+From 7cde170afe6854d674b50e32b4c1d3b511be9abe Mon Sep 17 00:00:00 2001
 From: Jussi Kukkonen <jussi.kukkonen@intel.com>
 Date: Mon, 9 Nov 2015 11:07:27 +0200
 Subject: [PATCH] Enable more tests while cross-compiling
@@ -11,14 +11,14 @@ Upstream-Status: Inappropriate [OE specific]
 Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
 
 ---
- gio/tests/meson.build | 26 ++++++++++++++------------
- 1 file changed, 14 insertions(+), 12 deletions(-)
+ gio/tests/meson.build | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
 diff --git a/gio/tests/meson.build b/gio/tests/meson.build
-index 65f43e2..028b196 100644
+index 788cf97..dab65d2 100644
 --- a/gio/tests/meson.build
 +++ b/gio/tests/meson.build
-@@ -185,7 +185,7 @@ if host_machine.system() != 'windows'
+@@ -203,7 +203,7 @@ if host_machine.system() != 'windows'
  
    #  Test programs that need to bring up a session bus (requires dbus-daemon)
    have_dbus_daemon = find_program('dbus-daemon', required : false).found()
@@ -27,12 +27,11 @@ index 65f43e2..028b196 100644
      annotate_args = [
        '--annotate', 'org.project.Bar', 'Key1', 'Value1',
        '--annotate', 'org.project.Bar', 'org.gtk.GDBus.Internal', 'Value2',
-@@ -453,12 +453,13 @@ if installed_tests_enabled
-   install_data('static-link.py', install_dir : installed_tests_execdir)
+@@ -548,12 +548,12 @@ if installed_tests_enabled
+   endforeach
  endif
  
 -if not meson.is_cross_build() or meson.has_exe_wrapper()
-+#if not meson.is_cross_build() or meson.has_exe_wrapper()
 +if meson.is_cross_build()
  
    plugin_resources_c = custom_target('plugin-resources.c',
@@ -43,7 +42,7 @@ index 65f43e2..028b196 100644
                 '--target=@OUTPUT@',
                 '--sourcedir=' + meson.current_source_dir(),
                 '--generate-source',
-@@ -482,7 +483,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
+@@ -577,7 +577,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
    test_gresource = custom_target('test.gresource',
      input : 'test.gresource.xml',
      output : 'test.gresource',
@@ -52,7 +51,7 @@ index 65f43e2..028b196 100644
                 '--target=@OUTPUT@',
                 '--sourcedir=' + meson.current_source_dir(),
                 '--sourcedir=' + meson.current_build_dir(),
-@@ -493,7 +494,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
+@@ -588,7 +588,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
    test_resources2_c = custom_target('test_resources2.c',
      input : 'test3.gresource.xml',
      output : 'test_resources2.c',
@@ -61,7 +60,7 @@ index 65f43e2..028b196 100644
                 '--target=@OUTPUT@',
                 '--sourcedir=' + meson.current_source_dir(),
                 '--generate',
-@@ -504,7 +505,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
+@@ -599,7 +599,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
    test_resources2_h = custom_target('test_resources2.h',
      input : 'test3.gresource.xml',
      output : 'test_resources2.h',
@@ -70,7 +69,7 @@ index 65f43e2..028b196 100644
                 '--target=@OUTPUT@',
                 '--sourcedir=' + meson.current_source_dir(),
                 '--generate',
-@@ -516,7 +517,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
+@@ -611,7 +611,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
      input : 'test2.gresource.xml',
      depends : big_test_resource,
      output : 'test_resources.c',
@@ -79,7 +78,7 @@ index 65f43e2..028b196 100644
                 '--target=@OUTPUT@',
                 '--sourcedir=' + meson.current_source_dir(),
                 '--sourcedir=' + meson.current_build_dir(),
-@@ -527,7 +528,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
+@@ -622,7 +622,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
    digit_test_resources_c = custom_target('digit_test_resources.c',
      input : '111_digit_test.gresource.xml',
      output : 'digit_test_resources.c',
@@ -88,7 +87,7 @@ index 65f43e2..028b196 100644
                 '--target=@OUTPUT@',
                 '--sourcedir=' + meson.current_source_dir(),
                 '--sourcedir=' + meson.current_build_dir(),
-@@ -538,7 +539,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
+@@ -633,7 +633,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
    digit_test_resources_h = custom_target('digit_test_resources.h',
      input : '111_digit_test.gresource.xml',
      output : 'digit_test_resources.h',
@@ -97,12 +96,11 @@ index 65f43e2..028b196 100644
                 '--target=@OUTPUT@',
                 '--sourcedir=' + meson.current_source_dir(),
                 '--generate',
-@@ -565,11 +566,12 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
-   # Support for --add-symbol was added to LLVM objcopy in 2019
-   # (https://reviews.llvm.org/D58234). FIXME: This test could be enabled for
-   # LLVM once that support is in a stable release.
--  if build_machine.system() == 'linux' and cc.get_id() == 'gcc'
-+  #if build_machine.system() == 'linux' and cc.get_id() == 'gcc'
+@@ -668,11 +668,11 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
+ 
+   ld = find_program('ld', required : false)
+ 
+-  if build_machine.system() == 'linux' and cc.get_id() == 'gcc' and objcopy.found() and objcopy_supports_add_symbol and ld.found()
 +  if not meson.is_cross_build()
      test_gresource_binary = custom_target('test5.gresource',
        input : 'test5.gresource.xml',
@@ -112,7 +110,7 @@ index 65f43e2..028b196 100644
                   '--target=@OUTPUT@',
                   '--sourcedir=' + meson.current_source_dir(),
                   '--sourcedir=' + meson.current_build_dir(),
-@@ -581,7 +583,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
+@@ -684,7 +684,7 @@ if not meson.is_cross_build() or meson.has_exe_wrapper()
      test_resources_binary_c = custom_target('test_resources_binary.c',
        input : 'test5.gresource.xml',
        output : 'test_resources_binary.c',

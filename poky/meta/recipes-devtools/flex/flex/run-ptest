@@ -2,4 +2,4 @@
 
 # make would want to rebuild some files with a compiler otherwise :-/
 make FLEX=/usr/bin/flex -t check-TESTS || true
-make FLEX=/usr/bin/flex check-TESTS
+make FLEX=/usr/bin/flex abs_builddir=./ check-TESTS

@@ -1,18 +1,25 @@
 FILES_${PN}-catalog-extralocales = \
             "${exec_prefix}/lib/systemd/catalog/*.*.catalog"
 PACKAGES =+ "${PN}-catalog-extralocales"
-PACKAGECONFIG = "pam hostnamed networkd randomseed resolved sysusers timedated \
-                 timesyncd xz kmod coredump"
+PACKAGECONFIG = "\
+        coredump \
+        hostnamed \
+        kmod \
+        networkd \
+        pam \
+        randomseed \
+        resolved \
+        sysusers \
+        sysvinit \
+        timedated \
+        timesyncd \
+        xz \
+        "
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-SRC_URI += "file://default.network"
 SRC_URI += "file://0001-sd-bus-Don-t-automatically-add-ObjectManager.patch"
 
-FILES_${PN} += "${systemd_unitdir}/network/default.network"
-
-do_install_append() {
-        install -m 644 ${WORKDIR}/default.network ${D}${systemd_unitdir}/network/
-}
+EXTRA_OEMESON += "-Ddns-servers=''"
 
 ALTERNATIVE_${PN} += "init"
 ALTERNATIVE_TARGET[init] = "${rootlibexecdir}/systemd/systemd"

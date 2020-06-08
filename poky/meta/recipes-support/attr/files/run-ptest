@@ -1,5 +1,0 @@
-#!/bin/sh
-
-make -C test -k tests root-tests |sed \
- -e 's|^\[.*\] \(.*\) -- ok$|PASS: \1|' \
- -e 's|^\[.*\] \(.*\) -- failed|FAIL: \1|'

@@ -1,0 +1,79 @@
+From 34745fb066a266ae6bbb15d08466d4d2cb6a2110 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 20 Feb 2020 08:11:04 -0800
+Subject: [PATCH] Use new bfd APIs from 2.34+
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libutil++/bfd_support.cpp | 10 +++++-----
+ opjitconv/create_bfd.c    |  6 +++---
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/libutil++/bfd_support.cpp b/libutil++/bfd_support.cpp
+index fa904839..e53a1530 100644
+--- a/libutil++/bfd_support.cpp
++++ b/libutil++/bfd_support.cpp
+@@ -137,7 +137,7 @@ static bool get_build_id(bfd * ibfd, unsigned char * build_id)
+ 		}
+ 	}
+ 
+-	bfd_size_type buildid_sect_size = bfd_section_size(ibfd, sect);
++	bfd_size_type buildid_sect_size = bfd_section_size(sect);
+ 	char * contents = (char *) xmalloc(buildid_sect_size);
+ 	errno = 0;
+ 	if (!bfd_get_section_contents(ibfd, sect,
+@@ -188,7 +188,7 @@ bool get_debug_link_info(bfd * ibfd, string & filename, unsigned long & crc32)
+ 	if (sect == NULL)
+ 		return false;
+ 	
+-	bfd_size_type debuglink_size = bfd_section_size(ibfd, sect);  
++	bfd_size_type debuglink_size = bfd_section_size(sect);  
+ 	char * contents = (char *) xmalloc(debuglink_size);
+ 	cverb << vbfd
+ 	      << ".gnu_debuglink section has size " << debuglink_size << endl;
+@@ -346,7 +346,7 @@ void fixup_linenr(bfd * abfd, asection * section, asymbol ** syms,
+ 	// first restrict the search on a sensible range of vma, 16 is
+ 	// an intuitive value based on epilog code look
+ 	size_t max_search = 16;
+-	size_t section_size = bfd_section_size(abfd, section);
++	size_t section_size = bfd_section_size(section);
+ 	if (pc + max_search > section_size)
+ 		max_search = section_size - pc;
+ 
+@@ -819,10 +819,10 @@ find_nearest_line(bfd_info const & b, op_bfd_symbol const & sym,
+ 	else
+ 		pc = (sym.value() + offset) - sym.filepos();
+ 
+-	if ((bfd_get_section_flags(abfd, section) & SEC_ALLOC) == 0)
++	if ((bfd_section_flags(section) & SEC_ALLOC) == 0)
+ 		goto fail;
+ 
+-	if (pc >= bfd_section_size(abfd, section))
++	if (pc >= bfd_section_size(section))
+ 		goto fail;
+ 
+ 	ret = bfd_find_nearest_line(abfd, section, syms, pc, &cfilename,
+diff --git a/opjitconv/create_bfd.c b/opjitconv/create_bfd.c
+index 48db143b..5c0e9152 100644
+--- a/opjitconv/create_bfd.c
++++ b/opjitconv/create_bfd.c
+@@ -86,12 +86,12 @@ asection * create_section(bfd * abfd, char const * section_name,
+ 		bfd_perror("bfd_make_section");
+ 		goto error;
+ 	}
+-	bfd_set_section_vma(abfd, section, vma);
+-	if (bfd_set_section_size(abfd, section, size) == FALSE) {
++	bfd_set_section_vma(section, vma);
++	if (bfd_set_section_size(section, size) == FALSE) {
+ 		bfd_perror("bfd_set_section_size");
+ 		goto error;
+ 	}
+-	if (bfd_set_section_flags(abfd, section, flags) == FALSE) {
++	if (bfd_set_section_flags(section, flags) == FALSE) {
+ 		bfd_perror("bfd_set_section_flags");
+ 		goto error;
+ 	}
+-- 
+2.25.1
+

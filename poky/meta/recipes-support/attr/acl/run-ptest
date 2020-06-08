@@ -4,61 +4,7 @@
 
 #umask 077
 
-EXT3_IMAGE=ext3.img
-EXT3_MOUNT_POINT=/mnt/ext3
+mkdir -p /tmp/acl-ptest/test
+cp test/test.* /tmp/acl-ptest/test
 
-trap 'rm -f ${EXT3_IMAGE}' EXIT
-
-dd if=/dev/zero of=${EXT3_IMAGE} bs=1M count=1
-if [ "$?" -eq 0 ]; then
-	echo "PASS: dump ext3.img"
-else
-	echo "FAIL: dump ext3.img"
-	exit 1
-fi
-
-mkfs.ext3 -F ${EXT3_IMAGE}
-if [ "$?" -eq 0 ]; then
-	echo "PASS: mkfs.ext3 -F ext3.img"
-else
-	echo "FAIL: mkfs.ext3 -F ext3.img"
-	exit 1
-fi
-
-if [ -d $EXT3_MOUNT_POINT ]; then
-	echo "mount point exist"
-else
-	mkdir -p $EXT3_MOUNT_POINT
-fi
-
-
-mount -o loop,rw,acl  ${EXT3_IMAGE} $EXT3_MOUNT_POINT
-if [ "$?" -eq 0 ]; then
-	echo "PASS: mount ext3.img"
-else
-	echo "FAIL: mount ext3.img"
-	exit 1
-fi
-
-cp -rf ./test/ $EXT3_MOUNT_POINT
-
-cd $EXT3_MOUNT_POINT/test/
-
-if	sed -e 's!^bin:x:2:$!bin:x:2:daemon!' < /etc/group > gtmp
-then	if	cp /etc/group group.orig;
-	then	cp gtmp /etc/group
-		make  -k tests root-tests | sed \
-			-e 's|^\[.*\] \(.*\) -- ok$|PASS: \1|' \
-	  		-e 's|^\[.*\] \(.*\) -- failed|FAIL: \1|'
-		cp group.orig /etc/group
-	else	echo "FAIL: couldn't save original group file."
-		exit 1
-	fi
-else	echo "FAIL: couldn't create modified group file."
-	exit 1
-fi
-
-cd -
-umount $EXT3_MOUNT_POINT
-rm -rf $EXT3_MOUNT_POINT
-rm $EXT3_IMAGE
+make test-suite.log

@@ -15,6 +15,7 @@ LIC_FILES_CHKSUM = "\
 
 SRC_URI = "https://github.com/kergoth/tslib/releases/download/${PV}/tslib-${PV}.tar.xz;downloadfilename=tslib-${PV}.tar.xz \
            file://0001-Fix-build-on-32bit-arches-with-64bit-time_t.patch \
+           file://0001-Fix-build-error-with-input_event_sec-for-old-kernel.patch \
            file://ts.conf \
            file://tslib.sh \
 "

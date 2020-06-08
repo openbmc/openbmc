@@ -6,7 +6,7 @@ HOMEPAGE = "https://github.com/openbmc/ibm-logging"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 SRC_URI += "git://github.com/openbmc/ibm-logging"
-SRCREV = "94924b4b106024c7a09daf3ebde8e0a33e050f3f"
+SRCREV = "29c2ec6dd67df321662c906711ec95a4635b372f"
 
 inherit autotools
 inherit pkgconfig
@@ -29,6 +29,9 @@ SRC_URI += "file://policyTable.json"
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[policy-interface] = "--enable-policy-interface, --disable-policy-interface,,"
+
+PACKAGECONFIG_ibm-ac-server = "policy-interface"
+PACKAGECONFIG_mihawk = "policy-interface"
 
 SERVICE = "com.ibm.Logging.service"
 DBUS_SERVICE_${PN} += "${SERVICE}"

@@ -10,13 +10,13 @@ inherit pypi
 
 SRC_URI += "file://0001-include-sys-types.h-explicitly-for-getting-caddr_t-d.patch"
 
-inherit setuptools
+inherit setuptools3
 
 COMPATIBLE_MACHINE = "^rpi$"
 
 RDEPENDS_${PN} = "\
-    python-logging \
-    python-threading \
+    python3-logging \
+    python3-threading \
 "
 
 SRC_URI[md5sum] = "cefc45422833dcafcd59b78dffc540f4"

@@ -1,0 +1,51 @@
+From 10c9d3341d64d697f678a64ae707f6bda21565bb Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Mon, 9 Mar 2020 13:10:37 +0800
+Subject: [PATCH] sqlparse: change shebang to python3
+
+Upstream-Status: Pending
+
+Don't send upstream since upstream still support python2,
+we can only make this change after python2 is offcially
+dropped.
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ setup.py             | 2 +-
+ sqlparse/__main__.py | 2 +-
+ sqlparse/cli.py      | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 345d0ce..ce3abc3 100644
+--- a/setup.py
++++ b/setup.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2009-2018 the sqlparse authors and contributors
+diff --git a/sqlparse/__main__.py b/sqlparse/__main__.py
+index 867d75d..dd0c074 100644
+--- a/sqlparse/__main__.py
++++ b/sqlparse/__main__.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2009-2018 the sqlparse authors and contributors
+diff --git a/sqlparse/cli.py b/sqlparse/cli.py
+index 25555a5..8bf050a 100755
+--- a/sqlparse/cli.py
++++ b/sqlparse/cli.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # -*- coding: utf-8 -*-
+ #
+ # Copyright (C) 2009-2018 the sqlparse authors and contributors
+-- 
+2.7.4
+

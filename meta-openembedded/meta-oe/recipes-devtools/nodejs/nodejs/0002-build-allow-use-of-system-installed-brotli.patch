@@ -1,0 +1,66 @@
+From f0f927feee8cb1fb173835d5c3f6beb6bf7d5e54 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andr=C3=A9=20Draszik?= <git@andred.net>
+Date: Mon, 2 Mar 2020 12:17:35 +0000
+Subject: [PATCH 2/2] build: allow use of system-installed brotli
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+brotli is available as a shared library since 2016, so it makes sense
+to allow its use as a system-installed version.
+
+Some of the infrastructure was in place already (node.gyp and
+node.gypi), but some bits in the configure script here were missing.
+
+Add them, keeping the default as before, to use the bundled version.
+
+Refs: https://github.com/google/brotli/pull/421
+Signed-off-by: André Draszik <git@andred.net>
+---
+Upstream-Status: Submitted [https://github.com/nodejs/node/pull/32046]
+ configure.py | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/configure.py b/configure.py
+index e3f78f2fed..0190e31b41 100755
+--- a/configure.py
++++ b/configure.py
+@@ -301,6 +301,27 @@ shared_optgroup.add_option('--shared-zlib-libpath',
+     dest='shared_zlib_libpath',
+     help='a directory to search for the shared zlib DLL')
+ 
++shared_optgroup.add_option('--shared-brotli',
++    action='store_true',
++    dest='shared_brotli',
++    help='link to a shared brotli DLL instead of static linking')
++
++shared_optgroup.add_option('--shared-brotli-includes',
++    action='store',
++    dest='shared_brotli_includes',
++    help='directory containing brotli header files')
++
++shared_optgroup.add_option('--shared-brotli-libname',
++    action='store',
++    dest='shared_brotli_libname',
++    default='brotlidec,brotlienc',
++    help='alternative lib name to link to [default: %default]')
++
++shared_optgroup.add_option('--shared-brotli-libpath',
++    action='store',
++    dest='shared_brotli_libpath',
++    help='a directory to search for the shared brotli DLL')
++
+ shared_optgroup.add_option('--shared-cares',
+     action='store_true',
+     dest='shared_cares',
+@@ -1692,6 +1713,7 @@ configure_napi(output)
+ configure_library('zlib', output)
+ configure_library('http_parser', output)
+ configure_library('libuv', output)
++configure_library('brotli', output, pkgname=['libbrotlidec', 'libbrotlienc'])
+ configure_library('cares', output, pkgname='libcares')
+ configure_library('nghttp2', output, pkgname='libnghttp2')
+ configure_v8(output)
+-- 
+2.25.0
+

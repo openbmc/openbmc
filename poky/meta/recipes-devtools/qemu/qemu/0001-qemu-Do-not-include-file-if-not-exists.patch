@@ -1,0 +1,31 @@
+From 98c2da129db19ee63d7e21b77a0ef70822c95069 Mon Sep 17 00:00:00 2001
+From: Oleksiy Obitotskyy <oobitots@cisco.com>
+Date: Wed, 25 Mar 2020 21:21:35 +0200
+Subject: [PATCH] qemu: Do not include file if not exists
+
+Script configure checks for if_alg.h and check failed but
+if_alg.h still included.
+
+Upstream-status: Submitted [https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg07188.html]
+Signed-off-by: Oleksiy Obitotskyy <oobitots@cisco.com>
+---
+ linux-user/syscall.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index fc18f244..68d62666 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -106,7 +106,9 @@
+ #include <linux/blkpg.h>
+ #include <netpacket/packet.h>
+ #include <linux/netlink.h>
++#if defined(CONFIG_AF_ALG)
+ #include <linux/if_alg.h>
++#endif
+ #include "linux_loop.h"
+ #include "uname.h"
+ 
+-- 
+2.20.1
+

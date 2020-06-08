@@ -5,15 +5,13 @@ HOMEPAGE = "https://github.com/openSUSE/build-compare"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
-SRC_URI = "git://github.com/openSUSE/build-compare.git \
-           file://Ignore-DWARF-sections.patch;striplevel=1 \
-           "
+SRC_URI = "git://github.com/openSUSE/build-compare.git"
 
 # Date matches entry in build-compare.changes and date of SRCREV.
 #
-SRCREV = "4dfa207660776cae120afa4353aec7f1f2a998d2"
+SRCREV = "28bf642fcfdab94adb9b847329338005be6f73c7"
 PE = "1"
-PV = "2019.08.14+git${SRCPV}"
+PV = "2020.03.31+git${SRCPV}"
 UPSTREAM_CHECK_COMMITS = "1"
 
 S = "${WORKDIR}/git"

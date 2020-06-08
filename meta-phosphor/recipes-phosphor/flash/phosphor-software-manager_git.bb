@@ -72,7 +72,10 @@ DBUS_SERVICE_${PN}-updater += "xyz.openbmc_project.Software.BMC.Updater.service"
 DBUS_SERVICE_${PN}-sync += "xyz.openbmc_project.Software.Sync.service"
 
 SYSTEMD_SERVICE_${PN}-updater += " \
+    force-reboot.service \
     obmc-flash-bmc-setenv@.service \
+    reboot-guard-disable.service \
+    reboot-guard-enable.service \
     usr-local.mount \
 "
 

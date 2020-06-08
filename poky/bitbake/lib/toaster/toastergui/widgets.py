@@ -22,7 +22,7 @@ from django.utils import timezone
 from toastergui.templatetags.projecttags import sectohms, get_tasks
 from toastergui.templatetags.projecttags import json as template_json
 from django.http import JsonResponse
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 import types
 import json

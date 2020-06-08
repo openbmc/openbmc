@@ -37,4 +37,4 @@ EXTRA_OECONF = "HOST_TTY=${OBMC_CONSOLE_HOST_TTY} \
 # Source code repository
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/phosphor-hostlogger"
-SRCREV = "b8cf26fe933c7f020f5195b9575f596b9cb23719"
+SRCREV = "ea31658b6df1c51b28ed28e3e459a64fb8d13da8"

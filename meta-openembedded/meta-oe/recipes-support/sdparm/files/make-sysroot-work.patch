@@ -17,13 +17,13 @@ diff --git a/src/Makefile.am b/src/Makefile.am
 index 61dd9f8..42c911f 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
-@@ -41,7 +41,7 @@ sglib_SOURCES =		../lib/sg_lib.c \
+@@ -53,7 +53,7 @@ sglib_SOURCES =		../lib/sg_lib.c \
  			../lib/sg_pt_common.c
  
  if HAVE_SGUTILS
 -INCLUDES = -I/scsi
 +INCLUDES = -I=@includedir@/scsi
- sdparm_LDADD = @GETOPT_O_FILES@ @os_libs@ @SGUTILS_LIBS@
+ sdparm_LDADD = @GETOPT_O_FILES@ @SGUTILS_LIBS@
  sdparm_DEPENDENCIES = @GETOPT_O_FILES@
  else
 -- 

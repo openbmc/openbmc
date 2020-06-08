@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 #
-# Display details of the kernel build size, broken up by built-in.o. Sort
+# Display details of the kernel build size, broken up by built-in.[o,a]. Sort
 # the objects by size. Run from the top level kernel build directory.
 #
 # Author: Darren Hart <dvhart@linux.intel.com>
@@ -27,7 +27,7 @@ def usage():
 class Sizes:
     def __init__(self, glob):
         self.title = glob
-        p = Popen("size -t " + str(glob), shell=True, stdout=PIPE, stderr=PIPE)
+        p = Popen("size -t " + str(glob), shell=True, stdout=PIPE, stderr=PIPE, universal_newlines=True)
         output = p.communicate()[0].splitlines()
         if len(output) > 2:
             sizes = output[-1].split()[0:4]
@@ -49,17 +49,17 @@ class Report:
         path = os.path.dirname(filename)
 
         p = Popen("ls " + str(path) + "/*.o | grep -v built-in.o",
-                  shell=True, stdout=PIPE, stderr=PIPE)
+                  shell=True, stdout=PIPE, stderr=PIPE, universal_newlines=True)
         glob = ' '.join(p.communicate()[0].splitlines())
         oreport = Report(glob, str(path) + "/*.o")
         oreport.sizes.title = str(path) + "/*.o"
         r.parts.append(oreport)
 
         if subglob:
-            p = Popen("ls " + subglob, shell=True, stdout=PIPE, stderr=PIPE)
+            p = Popen("ls " + subglob, shell=True, stdout=PIPE, stderr=PIPE, universal_newlines=True)
             for f in p.communicate()[0].splitlines():
                 path = os.path.dirname(f)
-                r.parts.append(Report.create(f, path, str(path) + "/*/built-in.o"))
+                r.parts.append(Report.create(f, path, str(path) + "/*/built-in.[o,a]"))
             r.parts.sort(reverse=True)
 
         for b in r.parts:
@@ -139,7 +139,7 @@ def main():
         else:
             assert False, "unhandled option"
 
-    glob = "arch/*/built-in.o */built-in.o"
+    glob = "arch/*/built-in.[o,a] */built-in.[o,a]"
     vmlinux = Report.create("vmlinux",  "Linux Kernel", glob)
 
     vmlinux.show()

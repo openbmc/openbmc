@@ -594,7 +594,9 @@ class Git(FetchMethod):
         """
         Return a unique key for the url
         """
-        return "git:" + ud.host + ud.path.replace('/', '.') + ud.unresolvedrev[name]
+        # Collapse adjacent slashes
+        slash_re = re.compile(r"/+")
+        return "git:" + ud.host + slash_re.sub(".", ud.path) + ud.unresolvedrev[name]
 
     def _lsremote(self, ud, d, search):
         """
@@ -671,7 +673,7 @@ class Git(FetchMethod):
 
             # search for version in the line
             tag = tagregex.search(tag_head)
-            if tag == None:
+            if tag is None:
                 continue
 
             tag = tag.group('pver')

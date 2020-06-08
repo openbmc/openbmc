@@ -21,7 +21,9 @@ PACKAGECONFIG[svn] = ""
 
 EXTRA_OECONF = "--with-perl=${STAGING_BINDIR_NATIVE}/perl-native/perl \
 		--without-tcltk \
+		--without-iconv \
 "
+EXTRA_OECONF_append_class-nativesdk = " --with-gitconfig=/etc/gitconfig "
 
 # Needs brokensep as this doesn't use automake
 inherit autotools-brokensep perlnative bash-completion

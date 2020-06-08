@@ -1,21 +1,22 @@
 From f4d3fad43d67808d71325ba0df1457555b9a0086 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 18 Dec 2018 15:42:57 +0100
-Subject: [PATCH] Don't set up arch/instruction-set flags, we do that ourselves
+Subject: [PATCH] Don't set up arch/instruction-set flags, we do that
+ourselves
 
 Upstream-Status: Inappropriate
 Signed-off-by: Christopher Larson <chris_larson@mentor.com>
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 
 ---
- tools/build/src/tools/gcc.jam | 132 ----------------------------------
- 1 file changed, 132 deletions(-)
+ tools/build/src/tools/gcc.jam | 133 ----------------------------------
+ 1 file changed, 133 deletions(-)
 
 diff --git a/tools/build/src/tools/gcc.jam b/tools/build/src/tools/gcc.jam
-index b9bb9cf2a..c7e3cf3fe 100644
+index 8910a55f2..ed7e7b20c 100644
 --- a/tools/build/src/tools/gcc.jam
 +++ b/tools/build/src/tools/gcc.jam
-@@ -1180,135 +1180,3 @@ local rule cpu-flags ( toolset variable : architecture : instruction-set + :
+@@ -1195,136 +1195,3 @@ local rule cpu-flags ( toolset variable : architecture : instruction-set + :
          <architecture>$(architecture)/<instruction-set>$(instruction-set)
          : $(values) ;
  }
@@ -149,5 +150,9 @@ index b9bb9cf2a..c7e3cf3fe 100644
 -cpu-flags gcc OPTIONS : s390x : zEC12 : -march=zEC12 ;
 -cpu-flags gcc OPTIONS : s390x : z13 : -march=z13 ;
 -cpu-flags gcc OPTIONS : s390x : z14 : -march=z14 ;
+-cpu-flags gcc OPTIONS : s390x : z15 : -march=z15 ;
 -# AIX variant of RS/6000 & PowerPC
 -toolset.flags gcc AROPTIONS <address-model>64/<target-os>aix : "-X64" ;
+-- 
+2.17.1
+

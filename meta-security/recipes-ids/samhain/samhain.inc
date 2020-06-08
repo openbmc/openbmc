@@ -14,6 +14,7 @@ SRC_URI = "http://la-samhna.de/archive/samhain_signed-${PV}.tar.gz \
            file://samhain-configure-add-option-for-ps.patch \
            file://samhain-avoid-searching-host-for-postgresql.patch \
            file://samhain-add-LDFLAGS-variable-for-samhain_setpwd.patch \
+           file://fix-build-with-new-version-attr.patch \
            file://${INITSCRIPT_NAME}.init \
            file://${INITSCRIPT_NAME}.default \
            file://samhain.service \
@@ -66,6 +67,9 @@ PACKAGECONFIG[acl] = " --enable-posix-acl , --disable-posix-acl, acl"
 PACKAGECONFIG[audit] = "ac_cv_header_auparse_h=yes,ac_cv_header_auparse_h=no,audit"
 PACKAGECONFIG[ps] = "--with-ps-path=${base_bindir}/ps,,,procps"
 
+EXTRA_OEMAKE_append_aarch64 = " CPPFLAGS+=-DCONFIG_ARCH_AARCH64=1"
+EXTRA_OEMAKE_append_mips64 = " CPPFLAGS+=-DCONFIG_ARCH_MIPS64=1"
+
 do_unpack_samhain() {
     cd ${WORKDIR}
     tar -xzvf samhain-${PV}.tar.gz
@@ -117,7 +121,6 @@ do_configure () {
 	--enable-network=${SAMHAIN_MODE} \
 	--with-pid-file=${localstatedir}/run/samhain.pid \
 	--with-data-file=${localstatedir}/lib/samhain/samhain_file \
-	--disable-dnmalloc \
 	${EXTRA_OECONF}
 }
 
@@ -158,6 +161,8 @@ do_install_append () {
 	if [ -d ${D}${localstatedir}/run ]; then
 		rmdir ${D}${localstatedir}/run
 	fi
+
+	rm -rf ${D}${localstatedir}/log
 }
 
 FILES_${PN} += "${systemd_system_unitdir}"

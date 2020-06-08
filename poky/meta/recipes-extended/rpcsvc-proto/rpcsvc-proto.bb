@@ -15,9 +15,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=0daaf958d5531ab86169ec6e275e1517"
 SECTION = "libs"
 DEPENDS += "rpcsvc-proto-native"
 
-PV = "1.4+git${SRCPV}"
+PV = "1.4.1"
 
-SRCREV = "9bc3b5b785723cfff459b0c01b39d87d4bed975c"
+SRCREV = "e295c9a3b67752734995dfc057bfbf5313ed0d82"
 
 SRC_URI = "git://github.com/thkukuk/${BPN} \
            file://0001-Use-cross-compiled-rpcgen.patch \
@@ -25,9 +25,13 @@ SRC_URI = "git://github.com/thkukuk/${BPN} \
 
 S = "${WORKDIR}/git"
 
-inherit autotools
+inherit autotools gettext
 
 EXTRA_OEMAKE_class-native = " -C rpcgen"
+
+do_configure_prepend() {
+	touch ${S}/ABOUT-NLS
+}
 
 do_install_append() {
 	# They come from quota recipe

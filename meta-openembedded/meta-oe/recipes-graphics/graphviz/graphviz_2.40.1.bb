@@ -66,8 +66,8 @@ FILES_${PN}-perl += "${libdir}/perl5/*/vendor_perl/ ${libdir}/graphviz/perl/"
 FILES_${PN}-demo += "${datadir}/graphviz/demo/"
 
 RDEPENDS_${PN}-perl += "perl"
-RDEPENDS_${PN}-python += "python"
-RDEPENDS_${PN}-demo += "python perl"
+RDEPENDS_${PN}-python += "python3"
+RDEPENDS_${PN}-demo += "python3 perl"
 
 INSANE_SKIP_${PN}-perl = "dev-so"
 INSANE_SKIP_${PN}-python = "dev-so"

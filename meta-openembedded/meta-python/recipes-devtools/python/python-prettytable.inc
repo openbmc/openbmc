@@ -23,3 +23,21 @@ UPSTREAM_CHECK_URI = "https://pypi.python.org/pypi/PrettyTable/"
 UPSTREAM_CHECK_REGEX = "/PrettyTable/(?P<pver>(\d+[\.\-_]*)+)"
 
 BBCLASSEXTEND = "native nativesdk"
+inherit ptest
+
+SRC_URI += " \
+	file://run-ptest \
+"
+
+RDEPENDS_${PN} += " \
+	${PYTHON_PN}-math \
+	${PYTHON_PN}-html \
+"
+
+RDEPENDS_${PN}-ptest += " \
+	${PYTHON_PN}-pytest \
+"
+
+do_install_ptest() {
+	cp -f ${S}/prettytable_test.py ${D}${PTEST_PATH}/
+}

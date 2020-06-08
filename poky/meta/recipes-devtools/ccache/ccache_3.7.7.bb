@@ -1,0 +1,7 @@
+require ccache.inc
+
+LICENSE = "GPLv3+"
+LIC_FILES_CHKSUM = "file://LICENSE.adoc;md5=22d514dbc01fdf9a9784334b6b59417a"
+
+SRC_URI[md5sum] = "500d7bd9ebc6ee3105d7fc332c1ef395"
+SRC_URI[sha256sum] = "9b61f7fab2ec15305ee8382b03365503232dfb04b57414e7b0433768d530fa8a"

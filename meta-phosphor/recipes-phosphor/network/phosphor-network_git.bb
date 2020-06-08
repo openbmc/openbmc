@@ -20,6 +20,11 @@ DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
 DEPENDS += "phosphor-logging"
 DEPENDS += "libnl"
 
+PACKAGECONFIG ??= "uboot-env"
+
+UBOOT_ENV_RDEPENDS = "${@d.getVar('PREFERRED_PROVIDER_u-boot-fw-utils', True) or 'u-boot-fw-utils'}"
+PACKAGECONFIG[uboot-env] = "--with-uboot-env,--without-uboot-env,,${UBOOT_ENV_RDEPENDS}"
+
 S = "${WORKDIR}/git"
 
 SERVICE_FILE = "xyz.openbmc_project.Network.service"

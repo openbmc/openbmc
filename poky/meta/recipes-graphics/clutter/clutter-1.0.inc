@@ -11,7 +11,7 @@ REQUIRED_DISTRO_FEATURES ?= "opengl"
 
 DEPENDS = "pango glib-2.0 json-glib atk udev cogl-1.0"
 PACKAGE_BEFORE_PN += "${PN}-examples"
-AUTOTOOLS_AUXDIR = "${S}/build"
+AUTOTOOLS_AUXDIR = "${S}/build-aux"
 
 EDEPENDS_X11 = "virtual/libx11 libxi libxfixes"
 EDEPENDS_GLX = "virtual/libgl"
@@ -24,11 +24,11 @@ ERDEPENDS_EVDEV = "xkeyboard-config"
 # Disable pretty much everything, override in platform specific set up
 EXTRA_OECONF += "--disable-quartz-backend	\
 	     	 --disable-win32-backend	\
-	     	 --disable-gdk-backend		\
 	     	 --disable-cex100-backend	\
 	     	 --disable-tslib-input		\
 	    	"
 
+PACKAGECONFIG[gdk] = "--enable-gdk-backend,--disable-gdk-backend,gtk+3"
 PACKAGECONFIG[x11] = "--enable-x11-backend,--disable-x11-backend,${EDEPENDS_X11}"
 PACKAGECONFIG[glx] = ",,${EDEPENDS_X11} ${EDEPENDS_GLX}"
 PACKAGECONFIG[egl] = "--enable-egl-backend,--disable-egl-backend,${EDEPENDS_EGL}"
@@ -37,7 +37,7 @@ PACKAGECONFIG[wayland] = "--enable-wayland-backend,--disable-wayland-backend,${E
 PACKAGECONFIG[wayland-compositor] = "--enable-wayland-compositor,--disable-wayland-compositor,wayland"
 
 # Default configuration, distros might want to override
-PACKAGECONFIG ??= "egl \
+PACKAGECONFIG ??= "egl gdk \
                    ${@bb.utils.filter('DISTRO_FEATURES', 'wayland', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'glx x11', '', d)}"
 

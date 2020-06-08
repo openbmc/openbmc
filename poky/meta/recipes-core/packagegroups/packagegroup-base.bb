@@ -110,16 +110,16 @@ python __anonymous () {
     machine_features= set(d.getVar("MACHINE_FEATURES").split())
 
     if "bluetooth" in distro_features and not "bluetooth" in machine_features and ("pcmcia" in machine_features or "pci" in machine_features or "usbhost" in machine_features):
-        d.setVar("ADD_BT", "packagegroup-base-bluetooth")
+        d.setVar("ADD_BT", "${MLPREFIX}packagegroup-base-bluetooth")
 
     if "wifi" in distro_features and not "wifi" in machine_features and ("pcmcia" in machine_features or "pci" in machine_features or "usbhost" in machine_features):
-        d.setVar("ADD_WIFI", "packagegroup-base-wifi")
+        d.setVar("ADD_WIFI", "${MLPREFIX}packagegroup-base-wifi")
 
     if "3g" in distro_features and not "3g" in machine_features and ("pcmcia" in machine_features or "pci" in machine_features or "usbhost" in machine_features):
-        d.setVar("ADD_3G", "packagegroup-base-3g")
+        d.setVar("ADD_3G", "${MLPREFIX}packagegroup-base-3g")
 
     if "nfc" in distro_features and not "nfc" in machine_features and ("usbhost" in machine_features):
-        d.setVar("ADD_NFC", "packagegroup-base-nfc")
+        d.setVar("ADD_NFC", "${MLPREFIX}packagegroup-base-nfc")
 }
 
 #

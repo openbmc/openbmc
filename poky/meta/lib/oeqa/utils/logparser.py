@@ -25,13 +25,20 @@ class PtestParser(object):
         section_regex['exitcode'] = re.compile(r"^ERROR: Exit status is (.+)")
         section_regex['timeout'] = re.compile(r"^TIMEOUT: .*/(.+)/ptest")
 
+        # Cache markers so we don't take the re.search() hit all the time.
+        markers = ("PASS:", "FAIL:", "SKIP:", "BEGIN:", "END:", "DURATION:", "ERROR: Exit", "TIMEOUT:")
+
         def newsection():
-            return { 'name': "No-section", 'log': "" }
+            return { 'name': "No-section", 'log': [] }
 
         current_section = newsection()
 
         with open(logfile, errors='replace') as f:
             for line in f:
+                if not line.startswith(markers):
+                    current_section['log'].append(line)
+                    continue
+
                 result = section_regex['begin'].search(line)
                 if result:
                     current_section['name'] = result.group(1)
@@ -61,7 +68,7 @@ class PtestParser(object):
                         current_section[t] = result.group(1)
                         continue
 
-                current_section['log'] = current_section['log'] + line 
+                current_section['log'].append(line)
 
                 for t in test_regex:
                     result = test_regex[t].search(line)
@@ -69,6 +76,11 @@ class PtestParser(object):
                         if current_section['name'] not in self.results:
                             self.results[current_section['name']] = {}
                         self.results[current_section['name']][result.group(1).strip()] = t
+
+        # Python performance for repeatedly joining long strings is poor, do it all at once at the end.
+        # For 2.1 million lines in a log this reduces 18 hours to 12s.
+        for section in self.sections:
+            self.sections[section]['log'] = "".join(self.sections[section]['log'])
 
         return self.results, self.sections
 

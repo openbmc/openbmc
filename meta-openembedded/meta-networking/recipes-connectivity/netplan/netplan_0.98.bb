@@ -18,8 +18,9 @@ SRC_URI = " \
         git://github.com/CanonicalLtd/netplan.git \
 "
 
-DEPENDS = "glib-2.0 libyaml"
-RDEPENDS_${PN} = "python3 python3-core python3-pyyaml python3-netifaces python3-nose python3-coverage python3-pycodestyle python-pyflakes util-linux-libuuid"
+DEPENDS = "glib-2.0 libyaml ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
+
+RDEPENDS_${PN} = "python3 python3-core python3-pyyaml python3-netifaces python3-nose python3-coverage python3-pycodestyle python3-pyflakes util-linux-libuuid"
 
 inherit pkgconfig systemd
 

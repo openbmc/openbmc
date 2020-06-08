@@ -6,12 +6,15 @@ SECTION = "inputmethods"
 
 SRC_URI = "https://github.com/uim/uim/releases/download/${PV}/uim-${PV}.tar.bz2 \
     file://0001-Fix-to-set-libedit-path-from-configure-option-proper.patch \
+    file://JMP_BUF_GC_jmp_buf.patch \
 "
 SRC_URI_append_class-target = "\
     file://uim-module-manager.patch \
 "
 SRC_URI[md5sum] = "01c7bd5d0d4f3a9f6f5befe6f57a470b"
 SRC_URI[sha256sum] = "34599bbcc4e5ab87832370763e38be5100984a64237555e9234a1ea225a0fadc"
+
+UPSTREAM_CHECK_URI = "https://github.com/${BPN}/${BPN}/releases"
 
 DEPENDS = "anthy fontconfig libxft libxt glib-2.0 ncurses intltool libedit"
 DEPENDS_append_class-target = " intltool-native gtk+ gtk+3 uim-native takao-fonts"

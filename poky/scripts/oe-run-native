@@ -16,7 +16,7 @@ if [ $# -lt 1 -o "$1" = '--help' -o "$1" = '-h' ] ; then
     echo 'OpenEmbedded run-native - runs native tools'
     echo ''
     echo 'arguments:'
-    echo '  native-recipe       The recipe which provoides tool'
+    echo '  native-recipe       The recipe which provides tool'
     echo '  tool                Native tool to run'
     echo ''
     exit 2

@@ -27,9 +27,6 @@ SYSTEMD_SERVICE_phosphor-software-manager-updater-ubi += " \
     obmc-flash-bmc-updateubootvars@.service \
     obmc-flash-bmc-cleanup.service \
     obmc-flash-bmc-mirroruboot.service \
-    reboot-guard-enable.service \
-    reboot-guard-disable.service \
-    force-reboot.service \
 "
 
 # Name of the mtd device where the ubi volumes should be created

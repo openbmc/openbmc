@@ -1,0 +1,49 @@
+From f8ab2b1aaa37f6ba9d527a99cb37b6ac2171e122 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 14 Feb 2020 17:03:12 -0800
+Subject: [PATCH] mimetic: Check for MMAP_FAILED return from mmap()
+
+Avoids using greater than zero comparision on pointers
+
+Fixes
+mimetic/os/mmfile.cxx:60:14: error: ordered comparison between pointer and zero ('char *' and 'int')
+
+if(m_beg > 0)
+~~~~ ^ ~
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ mimetic/os/mmfile.cxx | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
+
+diff --git a/mimetic/os/mmfile.cxx b/mimetic/os/mmfile.cxx
+index dfc95b7..ed4ff55 100644
+--- a/mimetic/os/mmfile.cxx
++++ b/mimetic/os/mmfile.cxx
+@@ -57,15 +57,13 @@ bool MMFile::open(int mode)
+ bool MMFile::map()
+ {
+     m_beg = (char*) mmap(0, m_st.st_size, PROT_READ, MAP_SHARED,m_fd,0);
+-    if(m_beg > 0)
+-    {
+-        m_end = m_beg + m_st.st_size;
+-        #if HAVE_MADVISE
+-        madvise(m_beg, m_st.st_size, MADV_SEQUENTIAL);
+-        #endif
+-        return true;
+-    }
+-    return false;
++    if(m_beg == MAP_FAILED)
++        return false;
++    m_end = m_beg + m_st.st_size;
++    #if HAVE_MADVISE
++    madvise(m_beg, m_st.st_size, MADV_SEQUENTIAL);
++    #endif
++    return true;
+ }
+ 
+ MMFile::~MMFile()
+-- 
+2.25.0
+

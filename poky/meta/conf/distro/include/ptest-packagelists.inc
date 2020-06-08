@@ -47,30 +47,36 @@ PTESTS_FAST = "\
     quilt-ptest \
     sed-ptest \
     slang-ptest \
+    wayland-ptest \
     zlib-ptest \
 "
 
 #PTESTS_PROBLEMS = "\
 #    qemu-ptest \ # Doesn't run any tests?
 #    ruby-ptest \ # Timeout
-#    mdadm-ptest \ # Timeout
 #    clutter-1.0-ptest \ # Doesn't build due to depends on cogl-1.0
+#    lz4-ptest \ # Needs a rewrite
+#    rt-tests-ptest \ # Needs to be checked whether it runs at all
+#    bash-ptest \ # Test outcomes are non-deterministic by design
+#    ifupdown-ptest \ # Tested separately in lib/oeqa/selftest/cases/imagefeatures.py
+#    mdadm-ptest \ # Tests rely on non-deterministic sleep() amounts
 #"
 
 PTESTS_SLOW = "\
-    bash-ptest \
+    babeltrace-ptest \
+    babeltrace2-ptest \
     busybox-ptest \
+    coreutils-ptest \
     dbus-test-ptest \
     e2fsprogs-ptest \
     glib-2.0-ptest \
     gstreamer1.0-ptest \
     libevent-ptest \
+    libinput-ptest \
     lttng-tools-ptest \
-    mdadm-ptest \
     openssh-ptest \
     openssl-ptest \
     perl-ptest \
-    python-ptest \
     python3-ptest \
     strace-ptest \
     tcl-ptest \

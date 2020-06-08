@@ -11,8 +11,6 @@ AUTHOR = "ESNET <info@es.net>, Lawrence Berkeley National Laboratory <websupport
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=f9088fe7ffdccd042f7645f1012d7f70"
 
-DEPENDS = "openssl"
-
 SRC_URI = "git://github.com/esnet/iperf.git \
            file://0002-Remove-pg-from-profile_CFLAGS.patch \
            "
@@ -23,8 +21,9 @@ S = "${WORKDIR}/git"
 
 inherit autotools
 
+PACKAGECONFIG ?= "openssl"
+
 PACKAGECONFIG[lksctp] = "ac_cv_header_netinet_sctp_h=yes,ac_cv_header_netinet_sctp_h=no,lksctp-tools"
+PACKAGECONFIG[openssl] = "--with-openssl=${RECIPE_SYSROOT}${prefix},--without-openssl,openssl"
 
 CFLAGS += "-D_GNU_SOURCE"
-
-EXTRA_OECONF = "--with-openssl=${RECIPE_SYSROOT}${prefix}"

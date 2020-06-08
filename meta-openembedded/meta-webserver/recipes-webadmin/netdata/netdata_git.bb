@@ -26,6 +26,8 @@ DEPENDS += "zlib util-linux"
 inherit pkgconfig autotools-brokensep useradd systemd
 
 LIBS_toolchain-clang_x86 = "-latomic"
+LIBS_riscv64 = "-latomic"
+LIBS_riscv32 = "-latomic"
 export LIBS
 
 #systemd

@@ -9,12 +9,12 @@
 import unittest
 import hashlib
 import tempfile
-import subprocess
 import collections
 import os
 from bb.fetch2 import URI
 from bb.fetch2 import FetchMethod
 import bb
+from bb.tests.support.httpserver import HTTPService
 
 def skipIfNoNetwork():
     if os.environ.get("BB_SKIP_NETTESTS") == "yes":
@@ -1180,27 +1180,46 @@ class FetchLatestVersionTest(FetcherTest):
     }
 
     test_wget_uris = {
+        #
         # packages with versions inside directory name
-        ("util-linux", "http://kernel.org/pub/linux/utils/util-linux/v2.23/util-linux-2.24.2.tar.bz2", "", "")
+        #
+        # http://kernel.org/pub/linux/utils/util-linux/v2.23/util-linux-2.24.2.tar.bz2
+        ("util-linux", "/pub/linux/utils/util-linux/v2.23/util-linux-2.24.2.tar.bz2", "", "")
             : "2.24.2",
-        ("enchant", "http://www.abisource.com/downloads/enchant/1.6.0/enchant-1.6.0.tar.gz", "", "")
+        # http://www.abisource.com/downloads/enchant/1.6.0/enchant-1.6.0.tar.gz
+        ("enchant", "/downloads/enchant/1.6.0/enchant-1.6.0.tar.gz", "", "")
             : "1.6.0",
-        ("cmake", "http://www.cmake.org/files/v2.8/cmake-2.8.12.1.tar.gz", "", "")
+        # http://www.cmake.org/files/v2.8/cmake-2.8.12.1.tar.gz
+        ("cmake", "/files/v2.8/cmake-2.8.12.1.tar.gz", "", "")
             : "2.8.12.1",
+        #
         # packages with versions only in current directory
-        ("eglic", "http://downloads.yoctoproject.org/releases/eglibc/eglibc-2.18-svnr23787.tar.bz2", "", "")
+        #
+        # http://downloads.yoctoproject.org/releases/eglibc/eglibc-2.18-svnr23787.tar.bz2
+        ("eglic", "/releases/eglibc/eglibc-2.18-svnr23787.tar.bz2", "", "")
             : "2.19",
-        ("gnu-config", "http://downloads.yoctoproject.org/releases/gnu-config/gnu-config-20120814.tar.bz2", "", "")
+        # http://downloads.yoctoproject.org/releases/gnu-config/gnu-config-20120814.tar.bz2
+        ("gnu-config", "/releases/gnu-config/gnu-config-20120814.tar.bz2", "", "")
             : "20120814",
+        #
         # packages with "99" in the name of possible version
-        ("pulseaudio", "http://freedesktop.org/software/pulseaudio/releases/pulseaudio-4.0.tar.xz", "", "")
+        #
+        # http://freedesktop.org/software/pulseaudio/releases/pulseaudio-4.0.tar.xz
+        ("pulseaudio", "/software/pulseaudio/releases/pulseaudio-4.0.tar.xz", "", "")
             : "5.0",
-        ("xserver-xorg", "http://xorg.freedesktop.org/releases/individual/xserver/xorg-server-1.15.1.tar.bz2", "", "")
+        # http://xorg.freedesktop.org/releases/individual/xserver/xorg-server-1.15.1.tar.bz2
+        ("xserver-xorg", "/releases/individual/xserver/xorg-server-1.15.1.tar.bz2", "", "")
             : "1.15.1",
+        #
         # packages with valid UPSTREAM_CHECK_URI and UPSTREAM_CHECK_REGEX
-        ("cups", "http://www.cups.org/software/1.7.2/cups-1.7.2-source.tar.bz2", "https://github.com/apple/cups/releases", "(?P<name>cups\-)(?P<pver>((\d+[\.\-_]*)+))\-source\.tar\.gz")
+        #
+        # http://www.cups.org/software/1.7.2/cups-1.7.2-source.tar.bz2
+        # https://github.com/apple/cups/releases
+        ("cups", "/software/1.7.2/cups-1.7.2-source.tar.bz2", "/apple/cups/releases", "(?P<name>cups\-)(?P<pver>((\d+[\.\-_]*)+))\-source\.tar\.gz")
             : "2.0.0",
-        ("db", "http://download.oracle.com/berkeley-db/db-5.3.21.tar.gz", "http://ftp.debian.org/debian/pool/main/d/db5.3/", "(?P<name>db5\.3_)(?P<pver>\d+(\.\d+)+).+\.orig\.tar\.xz")
+        # http://download.oracle.com/berkeley-db/db-5.3.21.tar.gz
+        # http://ftp.debian.org/debian/pool/main/d/db5.3/
+        ("db", "/berkeley-db/db-5.3.21.tar.gz", "/debian/pool/main/d/db5.3/", "(?P<name>db5\.3_)(?P<pver>\d+(\.\d+)+).+\.orig\.tar\.xz")
             : "5.3.10",
     }
 
@@ -1217,18 +1236,28 @@ class FetchLatestVersionTest(FetcherTest):
             r = bb.utils.vercmp_string(v, verstring)
             self.assertTrue(r == -1 or r == 0, msg="Package %s, version: %s <= %s" % (k[0], v, verstring))
 
-    @skipIfNoNetwork()
     def test_wget_latest_versionstring(self):
-        for k, v in self.test_wget_uris.items():
-            self.d.setVar("PN", k[0])
-            self.d.setVar("UPSTREAM_CHECK_URI", k[2])
-            self.d.setVar("UPSTREAM_CHECK_REGEX", k[3])
-            ud = bb.fetch2.FetchData(k[1], self.d)
-            pupver = ud.method.latest_versionstring(ud, self.d)
-            verstring = pupver[0]
-            self.assertTrue(verstring, msg="Could not find upstream version for %s" % k[0])
-            r = bb.utils.vercmp_string(v, verstring)
-            self.assertTrue(r == -1 or r == 0, msg="Package %s, version: %s <= %s" % (k[0], v, verstring))
+        testdata = os.path.dirname(os.path.abspath(__file__)) + "/fetch-testdata"
+        server = HTTPService(testdata)
+        server.start()
+        port = server.port
+        try:
+            for k, v in self.test_wget_uris.items():
+                self.d.setVar("PN", k[0])
+                checkuri = ""
+                if k[2]:
+                    checkuri = "http://localhost:%s/" % port + k[2]
+                self.d.setVar("UPSTREAM_CHECK_URI", checkuri)
+                self.d.setVar("UPSTREAM_CHECK_REGEX", k[3])
+                url = "http://localhost:%s/" % port + k[1]
+                ud = bb.fetch2.FetchData(url, self.d)
+                pupver = ud.method.latest_versionstring(ud, self.d)
+                verstring = pupver[0]
+                self.assertTrue(verstring, msg="Could not find upstream version for %s" % k[0])
+                r = bb.utils.vercmp_string(v, verstring)
+                self.assertTrue(r == -1 or r == 0, msg="Package %s, version: %s <= %s" % (k[0], v, verstring))
+        finally:
+            server.stop()
 
 
 class FetchCheckStatusTest(FetcherTest):
@@ -1662,6 +1691,47 @@ class GitShallowTest(FetcherTest):
         # Verify the submodule is also shallow
         self.assertRevCount(1, cwd=os.path.join(self.gitdir, 'gitsubmodule'))
 
+    def test_shallow_submodule_mirrors(self):
+        self.add_empty_file('a')
+        self.add_empty_file('b')
+
+        smdir = os.path.join(self.tempdir, 'gitsubmodule')
+        bb.utils.mkdirhier(smdir)
+        self.git('init', cwd=smdir)
+        # Make this look like it was cloned from a remote...
+        self.git('config --add remote.origin.url "%s"' % smdir, cwd=smdir)
+        self.git('config --add remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"', cwd=smdir)
+        self.add_empty_file('asub', cwd=smdir)
+        self.add_empty_file('bsub', cwd=smdir)
+
+        self.git('submodule init', cwd=self.srcdir)
+        self.git('submodule add file://%s' % smdir, cwd=self.srcdir)
+        self.git('submodule update', cwd=self.srcdir)
+        self.git('commit -m submodule -a', cwd=self.srcdir)
+
+        uri = 'gitsm://%s;protocol=file;subdir=${S}' % self.srcdir
+
+        # Fetch once to generate the shallow tarball
+        fetcher, ud = self.fetch(uri)
+
+        # Set up the mirror
+        mirrordir = os.path.join(self.tempdir, 'mirror')
+        os.rename(self.dldir, mirrordir)
+        self.d.setVar('PREMIRRORS', 'gitsm://.*/.* file://%s/\n' % mirrordir)
+
+        # Fetch from the mirror
+        bb.utils.remove(self.dldir, recurse=True)
+        bb.utils.remove(self.gitdir, recurse=True)
+        self.fetch_and_unpack(uri)
+
+        # Verify the main repository is shallow
+        self.assertRevCount(1)
+
+        # Verify the gitsubmodule directory is present
+        assert os.listdir(os.path.join(self.gitdir, 'gitsubmodule'))
+
+        # Verify the submodule is also shallow
+        self.assertRevCount(1, cwd=os.path.join(self.gitdir, 'gitsubmodule'))
 
     if any(os.path.exists(os.path.join(p, 'git-annex')) for p in os.environ.get('PATH').split(':')):
         def test_shallow_annex(self):
@@ -2008,3 +2078,437 @@ class GitLfsTest(FetcherTest):
         ud.method._find_git_lfs = lambda d: False
         shutil.rmtree(self.gitdir, ignore_errors=True)
         fetcher.unpack(self.d.getVar('WORKDIR'))
+
+class NPMTest(FetcherTest):
+    def skipIfNoNpm():
+        import shutil
+        if not shutil.which('npm'):
+            return unittest.skip('npm not installed, tests being skipped')
+        return lambda f: f
+
+    @skipIfNoNpm()
+    @skipIfNoNetwork()
+    def test_npm(self):
+        url = 'npm://registry.npmjs.org;package=@savoirfairelinux/node-server-example;version=1.0.0'
+        fetcher = bb.fetch.Fetch([url], self.d)
+        ud = fetcher.ud[fetcher.urls[0]]
+        fetcher.download()
+        self.assertTrue(os.path.exists(ud.localpath))
+        self.assertTrue(os.path.exists(ud.localpath + '.done'))
+        self.assertTrue(os.path.exists(ud.resolvefile))
+        fetcher.unpack(self.unpackdir)
+        unpackdir = os.path.join(self.unpackdir, 'npm')
+        self.assertTrue(os.path.exists(os.path.join(unpackdir, 'package.json')))
+
+    @skipIfNoNpm()
+    @skipIfNoNetwork()
+    def test_npm_bad_checksum(self):
+        url = 'npm://registry.npmjs.org;package=@savoirfairelinux/node-server-example;version=1.0.0'
+        # Fetch once to get a tarball
+        fetcher = bb.fetch.Fetch([url], self.d)
+        ud = fetcher.ud[fetcher.urls[0]]
+        fetcher.download()
+        self.assertTrue(os.path.exists(ud.localpath))
+        # Modify the tarball
+        bad = b'bad checksum'
+        with open(ud.localpath, 'wb') as f:
+            f.write(bad)
+        # Verify that the tarball is fetched again
+        fetcher.download()
+        badsum = hashlib.sha512(bad).hexdigest()
+        self.assertTrue(os.path.exists(ud.localpath + '_bad-checksum_' + badsum))
+        self.assertTrue(os.path.exists(ud.localpath))
+
+    @skipIfNoNpm()
+    @skipIfNoNetwork()
+    def test_npm_premirrors(self):
+        url = 'npm://registry.npmjs.org;package=@savoirfairelinux/node-server-example;version=1.0.0'
+        # Fetch once to get a tarball
+        fetcher = bb.fetch.Fetch([url], self.d)
+        ud = fetcher.ud[fetcher.urls[0]]
+        fetcher.download()
+        self.assertTrue(os.path.exists(ud.localpath))
+        # Setup the mirror
+        mirrordir = os.path.join(self.tempdir, 'mirror')
+        bb.utils.mkdirhier(mirrordir)
+        os.replace(ud.localpath, os.path.join(mirrordir, os.path.basename(ud.localpath)))
+        self.d.setVar('PREMIRRORS', 'https?$://.*/.* file://%s/\n' % mirrordir)
+        self.d.setVar('BB_FETCH_PREMIRRORONLY', '1')
+        # Fetch again
+        self.assertFalse(os.path.exists(ud.localpath))
+        fetcher.download()
+        self.assertTrue(os.path.exists(ud.localpath))
+
+    @skipIfNoNpm()
+    @skipIfNoNetwork()
+    def test_npm_mirrors(self):
+        # Fetch once to get a tarball
+        url = 'npm://registry.npmjs.org;package=@savoirfairelinux/node-server-example;version=1.0.0'
+        fetcher = bb.fetch.Fetch([url], self.d)
+        ud = fetcher.ud[fetcher.urls[0]]
+        fetcher.download()
+        self.assertTrue(os.path.exists(ud.localpath))
+        # Setup the mirror
+        mirrordir = os.path.join(self.tempdir, 'mirror')
+        bb.utils.mkdirhier(mirrordir)
+        os.replace(ud.localpath, os.path.join(mirrordir, os.path.basename(ud.localpath)))
+        self.d.setVar('MIRRORS', 'https?$://.*/.* file://%s/\n' % mirrordir)
+        # Update the resolved url to an invalid url
+        with open(ud.resolvefile, 'r') as f:
+            url = f.read()
+        uri = URI(url)
+        uri.path = '/invalid'
+        with open(ud.resolvefile, 'w') as f:
+            f.write(str(uri))
+        # Fetch again
+        self.assertFalse(os.path.exists(ud.localpath))
+        fetcher.download()
+        self.assertTrue(os.path.exists(ud.localpath))
+
+    @skipIfNoNpm()
+    @skipIfNoNetwork()
+    def test_npm_destsuffix_downloadfilename(self):
+        url = 'npm://registry.npmjs.org;package=@savoirfairelinux/node-server-example;version=1.0.0;destsuffix=foo/bar;downloadfilename=foo-bar.tgz'
+        fetcher = bb.fetch.Fetch([url], self.d)
+        fetcher.download()
+        self.assertTrue(os.path.exists(os.path.join(self.dldir, 'foo-bar.tgz')))
+        fetcher.unpack(self.unpackdir)
+        unpackdir = os.path.join(self.unpackdir, 'foo', 'bar')
+        self.assertTrue(os.path.exists(os.path.join(unpackdir, 'package.json')))
+
+    def test_npm_no_network_no_tarball(self):
+        url = 'npm://registry.npmjs.org;package=@savoirfairelinux/node-server-example;version=1.0.0'
+        self.d.setVar('BB_NO_NETWORK', '1')
+        fetcher = bb.fetch.Fetch([url], self.d)
+        with self.assertRaises(bb.fetch2.NetworkAccess):
+            fetcher.download()
+
+    @skipIfNoNpm()
+    @skipIfNoNetwork()
+    def test_npm_no_network_with_tarball(self):
+        url = 'npm://registry.npmjs.org;package=@savoirfairelinux/node-server-example;version=1.0.0'
+        # Fetch once to get a tarball
+        fetcher = bb.fetch.Fetch([url], self.d)
+        fetcher.download()
+        # Disable network access
+        self.d.setVar('BB_NO_NETWORK', '1')
+        # Fetch again
+        fetcher.download()
+        fetcher.unpack(self.unpackdir)
+        unpackdir = os.path.join(self.unpackdir, 'npm')
+        self.assertTrue(os.path.exists(os.path.join(unpackdir, 'package.json')))
+
+    @skipIfNoNpm()
+    @skipIfNoNetwork()
+    def test_npm_registry_alternate(self):
+        url = 'npm://registry.freajs.org;package=@savoirfairelinux/node-server-example;version=1.0.0'
+        fetcher = bb.fetch.Fetch([url], self.d)
+        fetcher.download()
+        fetcher.unpack(self.unpackdir)
+        unpackdir = os.path.join(self.unpackdir, 'npm')
+        self.assertTrue(os.path.exists(os.path.join(unpackdir, 'package.json')))
+
+    @skipIfNoNpm()
+    @skipIfNoNetwork()
+    def test_npm_version_latest(self):
+        url = 'npm://registry.npmjs.org;package=@savoirfairelinux/node-server-example;version=latest'
+        fetcher = bb.fetch.Fetch([url], self.d)
+        fetcher.download()
+        fetcher.unpack(self.unpackdir)
+        unpackdir = os.path.join(self.unpackdir, 'npm')
+        self.assertTrue(os.path.exists(os.path.join(unpackdir, 'package.json')))
+
+    @skipIfNoNpm()
+    @skipIfNoNetwork()
+    def test_npm_registry_invalid(self):
+        url = 'npm://registry.invalid.org;package=@savoirfairelinux/node-server-example;version=1.0.0'
+        fetcher = bb.fetch.Fetch([url], self.d)
+        with self.assertRaises(bb.fetch2.FetchError):
+            fetcher.download()
+
+    @skipIfNoNpm()
+    @skipIfNoNetwork()
+    def test_npm_package_invalid(self):
+        url = 'npm://registry.npmjs.org;package=@savoirfairelinux/invalid;version=1.0.0'
+        fetcher = bb.fetch.Fetch([url], self.d)
+        with self.assertRaises(bb.fetch2.FetchError):
+            fetcher.download()
+
+    @skipIfNoNpm()
+    @skipIfNoNetwork()
+    def test_npm_version_invalid(self):
+        url = 'npm://registry.npmjs.org;package=@savoirfairelinux/node-server-example;version=invalid'
+        with self.assertRaises(bb.fetch2.ParameterError):
+            fetcher = bb.fetch.Fetch([url], self.d)
+
+    @skipIfNoNpm()
+    @skipIfNoNetwork()
+    def test_npm_registry_none(self):
+        url = 'npm://;package=@savoirfairelinux/node-server-example;version=1.0.0'
+        with self.assertRaises(bb.fetch2.MalformedUrl):
+            fetcher = bb.fetch.Fetch([url], self.d)
+
+    @skipIfNoNpm()
+    @skipIfNoNetwork()
+    def test_npm_package_none(self):
+        url = 'npm://registry.npmjs.org;version=1.0.0'
+        with self.assertRaises(bb.fetch2.MissingParameterError):
+            fetcher = bb.fetch.Fetch([url], self.d)
+
+    @skipIfNoNpm()
+    @skipIfNoNetwork()
+    def test_npm_version_none(self):
+        url = 'npm://registry.npmjs.org;package=@savoirfairelinux/node-server-example'
+        with self.assertRaises(bb.fetch2.MissingParameterError):
+            fetcher = bb.fetch.Fetch([url], self.d)
+
+    def create_shrinkwrap_file(self, data):
+        import json
+        datadir = os.path.join(self.tempdir, 'data')
+        swfile = os.path.join(datadir, 'npm-shrinkwrap.json')
+        bb.utils.mkdirhier(datadir)
+        with open(swfile, 'w') as f:
+            json.dump(data, f)
+        # Also configure the S directory
+        self.sdir = os.path.join(self.unpackdir, 'S')
+        self.d.setVar('S', self.sdir)
+        return swfile
+
+    @skipIfNoNpm()
+    @skipIfNoNetwork()
+    def test_npmsw(self):
+        swfile = self.create_shrinkwrap_file({
+            'dependencies': {
+                'array-flatten': {
+                    'version': '1.1.1',
+                    'resolved': 'https://registry.npmjs.org/array-flatten/-/array-flatten-1.1.1.tgz',
+                    'integrity': 'sha1-ml9pkFGx5wczKPKgCJaLZOopVdI=',
+                    'dependencies': {
+                        'content-type': {
+                            'version': 'https://registry.npmjs.org/content-type/-/content-type-1.0.4.tgz',
+                            'integrity': 'sha512-hIP3EEPs8tB9AT1L+NUqtwOAps4mk2Zob89MWXMHjHWg9milF/j4osnnQLXBCBFBk/tvIG/tUc9mOUJiPBhPXA==',
+                            'dependencies': {
+                                'cookie': {
+                                    'version': 'git+https://github.com/jshttp/cookie.git#aec1177c7da67e3b3273df96cf476824dbc9ae09',
+                                    'from': 'git+https://github.com/jshttp/cookie.git'
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        })
+        fetcher = bb.fetch.Fetch(['npmsw://' + swfile], self.d)
+        fetcher.download()
+        self.assertTrue(os.path.exists(os.path.join(self.dldir, 'npm2', 'array-flatten-1.1.1.tgz')))
+        self.assertTrue(os.path.exists(os.path.join(self.dldir, 'npm2', 'content-type-1.0.4.tgz')))
+        self.assertTrue(os.path.exists(os.path.join(self.dldir, 'git2', 'github.com.jshttp.cookie.git')))
+        fetcher.unpack(self.unpackdir)
+        self.assertTrue(os.path.exists(os.path.join(self.sdir, 'npm-shrinkwrap.json')))
+        self.assertTrue(os.path.exists(os.path.join(self.sdir, 'node_modules', 'array-flatten', 'package.json')))
+        self.assertTrue(os.path.exists(os.path.join(self.sdir, 'node_modules', 'array-flatten', 'node_modules', 'content-type', 'package.json')))
+        self.assertTrue(os.path.exists(os.path.join(self.sdir, 'node_modules', 'array-flatten', 'node_modules', 'content-type', 'node_modules', 'cookie', 'package.json')))
+
+    @skipIfNoNpm()
+    @skipIfNoNetwork()
+    def test_npmsw_dev(self):
+        swfile = self.create_shrinkwrap_file({
+            'dependencies': {
+                'array-flatten': {
+                    'version': '1.1.1',
+                    'resolved': 'https://registry.npmjs.org/array-flatten/-/array-flatten-1.1.1.tgz',
+                    'integrity': 'sha1-ml9pkFGx5wczKPKgCJaLZOopVdI='
+                },
+                'content-type': {
+                    'version': '1.0.4',
+                    'resolved': 'https://registry.npmjs.org/content-type/-/content-type-1.0.4.tgz',
+                    'integrity': 'sha512-hIP3EEPs8tB9AT1L+NUqtwOAps4mk2Zob89MWXMHjHWg9milF/j4osnnQLXBCBFBk/tvIG/tUc9mOUJiPBhPXA==',
+                    'dev': True
+                }
+            }
+        })
+        # Fetch with dev disabled
+        fetcher = bb.fetch.Fetch(['npmsw://' + swfile], self.d)
+        fetcher.download()
+        self.assertTrue(os.path.exists(os.path.join(self.dldir, 'npm2', 'array-flatten-1.1.1.tgz')))
+        self.assertFalse(os.path.exists(os.path.join(self.dldir, 'npm2', 'content-type-1.0.4.tgz')))
+        # Fetch with dev enabled
+        fetcher = bb.fetch.Fetch(['npmsw://' + swfile + ';dev=1'], self.d)
+        fetcher.download()
+        self.assertTrue(os.path.exists(os.path.join(self.dldir, 'npm2', 'array-flatten-1.1.1.tgz')))
+        self.assertTrue(os.path.exists(os.path.join(self.dldir, 'npm2', 'content-type-1.0.4.tgz')))
+
+    @skipIfNoNpm()
+    @skipIfNoNetwork()
+    def test_npmsw_destsuffix(self):
+        swfile = self.create_shrinkwrap_file({
+            'dependencies': {
+                'array-flatten': {
+                    'version': '1.1.1',
+                    'resolved': 'https://registry.npmjs.org/array-flatten/-/array-flatten-1.1.1.tgz',
+                    'integrity': 'sha1-ml9pkFGx5wczKPKgCJaLZOopVdI='
+                }
+            }
+        })
+        fetcher = bb.fetch.Fetch(['npmsw://' + swfile + ';destsuffix=foo/bar'], self.d)
+        fetcher.download()
+        fetcher.unpack(self.unpackdir)
+        self.assertTrue(os.path.exists(os.path.join(self.unpackdir, 'foo', 'bar', 'node_modules', 'array-flatten', 'package.json')))
+
+    def test_npmsw_no_network_no_tarball(self):
+        swfile = self.create_shrinkwrap_file({
+            'dependencies': {
+                'array-flatten': {
+                    'version': '1.1.1',
+                    'resolved': 'https://registry.npmjs.org/array-flatten/-/array-flatten-1.1.1.tgz',
+                    'integrity': 'sha1-ml9pkFGx5wczKPKgCJaLZOopVdI='
+                }
+            }
+        })
+        self.d.setVar('BB_NO_NETWORK', '1')
+        fetcher = bb.fetch.Fetch(['npmsw://' + swfile], self.d)
+        with self.assertRaises(bb.fetch2.NetworkAccess):
+            fetcher.download()
+
+    @skipIfNoNpm()
+    @skipIfNoNetwork()
+    def test_npmsw_no_network_with_tarball(self):
+        # Fetch once to get a tarball
+        fetcher = bb.fetch.Fetch(['npm://registry.npmjs.org;package=array-flatten;version=1.1.1'], self.d)
+        fetcher.download()
+        # Disable network access
+        self.d.setVar('BB_NO_NETWORK', '1')
+        # Fetch again
+        swfile = self.create_shrinkwrap_file({
+            'dependencies': {
+                'array-flatten': {
+                    'version': '1.1.1',
+                    'resolved': 'https://registry.npmjs.org/array-flatten/-/array-flatten-1.1.1.tgz',
+                    'integrity': 'sha1-ml9pkFGx5wczKPKgCJaLZOopVdI='
+                }
+            }
+        })
+        fetcher = bb.fetch.Fetch(['npmsw://' + swfile], self.d)
+        fetcher.download()
+        fetcher.unpack(self.unpackdir)
+        self.assertTrue(os.path.exists(os.path.join(self.sdir, 'node_modules', 'array-flatten', 'package.json')))
+
+    @skipIfNoNpm()
+    @skipIfNoNetwork()
+    def test_npmsw_npm_reusability(self):
+        # Fetch once with npmsw
+        swfile = self.create_shrinkwrap_file({
+            'dependencies': {
+                'array-flatten': {
+                    'version': '1.1.1',
+                    'resolved': 'https://registry.npmjs.org/array-flatten/-/array-flatten-1.1.1.tgz',
+                    'integrity': 'sha1-ml9pkFGx5wczKPKgCJaLZOopVdI='
+                }
+            }
+        })
+        fetcher = bb.fetch.Fetch(['npmsw://' + swfile], self.d)
+        fetcher.download()
+        # Disable network access
+        self.d.setVar('BB_NO_NETWORK', '1')
+        # Fetch again with npm
+        fetcher = bb.fetch.Fetch(['npm://registry.npmjs.org;package=array-flatten;version=1.1.1'], self.d)
+        fetcher.download()
+        fetcher.unpack(self.unpackdir)
+        self.assertTrue(os.path.exists(os.path.join(self.unpackdir, 'npm', 'package.json')))
+
+    @skipIfNoNpm()
+    @skipIfNoNetwork()
+    def test_npmsw_bad_checksum(self):
+        # Try to fetch with bad checksum
+        swfile = self.create_shrinkwrap_file({
+            'dependencies': {
+                'array-flatten': {
+                    'version': '1.1.1',
+                    'resolved': 'https://registry.npmjs.org/array-flatten/-/array-flatten-1.1.1.tgz',
+                    'integrity': 'sha1-gfNEp2hqgLTFKT6P3AsBYMgsBqg='
+                }
+            }
+        })
+        fetcher = bb.fetch.Fetch(['npmsw://' + swfile], self.d)
+        with self.assertRaises(bb.fetch2.FetchError):
+            fetcher.download()
+        # Fetch correctly to get a tarball
+        swfile = self.create_shrinkwrap_file({
+            'dependencies': {
+                'array-flatten': {
+                    'version': '1.1.1',
+                    'resolved': 'https://registry.npmjs.org/array-flatten/-/array-flatten-1.1.1.tgz',
+                    'integrity': 'sha1-ml9pkFGx5wczKPKgCJaLZOopVdI='
+                }
+            }
+        })
+        fetcher = bb.fetch.Fetch(['npmsw://' + swfile], self.d)
+        fetcher.download()
+        localpath = os.path.join(self.dldir, 'npm2', 'array-flatten-1.1.1.tgz')
+        self.assertTrue(os.path.exists(localpath))
+        # Modify the tarball
+        bad = b'bad checksum'
+        with open(localpath, 'wb') as f:
+            f.write(bad)
+        # Verify that the tarball is fetched again
+        fetcher.download()
+        badsum = hashlib.sha1(bad).hexdigest()
+        self.assertTrue(os.path.exists(localpath + '_bad-checksum_' + badsum))
+        self.assertTrue(os.path.exists(localpath))
+
+    @skipIfNoNpm()
+    @skipIfNoNetwork()
+    def test_npmsw_premirrors(self):
+        # Fetch once to get a tarball
+        fetcher = bb.fetch.Fetch(['npm://registry.npmjs.org;package=array-flatten;version=1.1.1'], self.d)
+        ud = fetcher.ud[fetcher.urls[0]]
+        fetcher.download()
+        self.assertTrue(os.path.exists(ud.localpath))
+        # Setup the mirror
+        mirrordir = os.path.join(self.tempdir, 'mirror')
+        bb.utils.mkdirhier(mirrordir)
+        os.replace(ud.localpath, os.path.join(mirrordir, os.path.basename(ud.localpath)))
+        self.d.setVar('PREMIRRORS', 'https?$://.*/.* file://%s/\n' % mirrordir)
+        self.d.setVar('BB_FETCH_PREMIRRORONLY', '1')
+        # Fetch again
+        self.assertFalse(os.path.exists(ud.localpath))
+        swfile = self.create_shrinkwrap_file({
+            'dependencies': {
+                'array-flatten': {
+                    'version': '1.1.1',
+                    'resolved': 'https://registry.npmjs.org/array-flatten/-/array-flatten-1.1.1.tgz',
+                    'integrity': 'sha1-ml9pkFGx5wczKPKgCJaLZOopVdI='
+                }
+            }
+        })
+        fetcher = bb.fetch.Fetch(['npmsw://' + swfile], self.d)
+        fetcher.download()
+        self.assertTrue(os.path.exists(ud.localpath))
+
+    @skipIfNoNpm()
+    @skipIfNoNetwork()
+    def test_npmsw_mirrors(self):
+        # Fetch once to get a tarball
+        fetcher = bb.fetch.Fetch(['npm://registry.npmjs.org;package=array-flatten;version=1.1.1'], self.d)
+        ud = fetcher.ud[fetcher.urls[0]]
+        fetcher.download()
+        self.assertTrue(os.path.exists(ud.localpath))
+        # Setup the mirror
+        mirrordir = os.path.join(self.tempdir, 'mirror')
+        bb.utils.mkdirhier(mirrordir)
+        os.replace(ud.localpath, os.path.join(mirrordir, os.path.basename(ud.localpath)))
+        self.d.setVar('MIRRORS', 'https?$://.*/.* file://%s/\n' % mirrordir)
+        # Fetch again with invalid url
+        self.assertFalse(os.path.exists(ud.localpath))
+        swfile = self.create_shrinkwrap_file({
+            'dependencies': {
+                'array-flatten': {
+                    'version': '1.1.1',
+                    'resolved': 'https://invalid',
+                    'integrity': 'sha1-ml9pkFGx5wczKPKgCJaLZOopVdI='
+                }
+            }
+        })
+        fetcher = bb.fetch.Fetch(['npmsw://' + swfile], self.d)
+        fetcher.download()
+        self.assertTrue(os.path.exists(ud.localpath))

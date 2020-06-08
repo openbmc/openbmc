@@ -4,7 +4,7 @@ LICENSE = "GPLv2 & LGPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://COPYING.LIB;md5=5f30f0716dfdd0d91eb439ebec522ec2"
 
-DEPENDS = "python libxml2 popt gtk+3 gnome-common-native"
+DEPENDS = "python3 libxml2 popt gtk+3 gnome-common-native"
 
 inherit features_check gnomebase gettext pkgconfig gobject-introspection upstream-version-is-even
 

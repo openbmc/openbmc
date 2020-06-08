@@ -29,7 +29,7 @@ SRC_URI = "git://github.com/DrHyde/${BPN};branch=master;protocol=git \
 
 S = "${WORKDIR}/git"
 
-inherit autotools
+inherit autotools perlnative
 
 # Fix rsnapshot.conf.default:
 # don't inject the host path into target configs.

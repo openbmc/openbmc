@@ -6,9 +6,8 @@ DEPENDS = "virtual/libgles2 virtual/egl libdrm"
 
 LIC_FILES_CHKSUM = "file://kmscube.c;beginline=1;endline=23;md5=8b309d4ee67b7315ff7381270dd631fb"
 
-SRCREV = "f632b23a528ed6b4e1fddd774db005c30ab65568"
-SRC_URI = "git://gitlab.freedesktop.org/mesa/kmscube;branch=master;protocol=https \
-    file://detect-gst_bo_map-_unmap-and-use-it-or-avoid-it.patch"
+SRCREV = "4660a7dca6512b6e658759d00cff7d4ad2a2059d"
+SRC_URI = "git://gitlab.freedesktop.org/mesa/kmscube;branch=master;protocol=https"
 UPSTREAM_CHECK_COMMITS = "1"
 
 S = "${WORKDIR}/git"

@@ -7,7 +7,7 @@
 # Copyright (C) 2013-2016 Intel Corporation
 #
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils import timezone
 from tests.browser.selenium_helpers import SeleniumTestCase
 

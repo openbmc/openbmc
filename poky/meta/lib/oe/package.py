@@ -283,36 +283,3 @@ def read_shlib_providers(d):
                         shlib_provider[s[0]] = {}
                     shlib_provider[s[0]][s[1]] = (dep_pkg, s[2])
     return shlib_provider
-
-
-def npm_split_package_dirs(pkgdir):
-    """
-    Work out the packages fetched and unpacked by BitBake's npm fetcher
-    Returns a dict of packagename -> (relpath, package.json) ordered
-    such that it is suitable for use in PACKAGES and FILES
-    """
-    from collections import OrderedDict
-    import json
-    packages = {}
-    for root, dirs, files in os.walk(pkgdir):
-        if os.path.basename(root) == 'node_modules':
-            for dn in dirs:
-                relpth = os.path.relpath(os.path.join(root, dn), pkgdir)
-                pkgitems = ['${PN}']
-                for pathitem in relpth.split('/'):
-                    if pathitem == 'node_modules':
-                        continue
-                    pkgitems.append(pathitem)
-                pkgname = '-'.join(pkgitems).replace('_', '-')
-                pkgname = pkgname.replace('@', '')
-                pkgfile = os.path.join(root, dn, 'package.json')
-                data = None
-                if os.path.exists(pkgfile):
-                    with open(pkgfile, 'r') as f:
-                        data = json.loads(f.read())
-                    packages[pkgname] = (relpth, data)
-    # We want the main package for a module sorted *after* its subpackages
-    # (so that it doesn't otherwise steal the files for the subpackage), so
-    # this is a cheap way to do that whilst still having an otherwise
-    # alphabetical sort
-    return OrderedDict((key, packages[key]) for key in sorted(packages, key=lambda pkg: pkg + '~'))

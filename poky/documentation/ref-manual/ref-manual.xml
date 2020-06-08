@@ -22,11 +22,10 @@
 
         <authorgroup>
             <author>
-                <firstname>Scott</firstname> <surname>Rifenbark</surname>
                 <affiliation>
-                    <orgname>Scotty's Documentation Services, INC</orgname>
+                    <orgname>&ORGNAME;</orgname>
                 </affiliation>
-                <email>srifenbark@gmail.com</email>
+                <email>&ORGEMAIL;</email>
             </author>
 
         </authorgroup>
@@ -34,22 +33,17 @@
         <revhistory>
             <revision>
                 <revnumber>4.0+git</revnumber>
-                <date>24 November 2010</date>
-                <revremark>Released with the Yocto Project 0.9 Release</revremark>
+                <date>November 2010</date>
+                <revremark>The initial document released with the Yocto Project 0.9 Release</revremark>
             </revision>
             <revision>
                 <revnumber>1.0</revnumber>
-                <date>6 April 2011</date>
+                <date>April 2011</date>
                 <revremark>Released with the Yocto Project 1.0 Release.</revremark>
             </revision>
             <revision>
-                <revnumber>1.0.1</revnumber>
-                <date>23 May 2011</date>
-                <revremark>Released with the Yocto Project 1.0.1 Release.</revremark>
-            </revision>
-            <revision>
                 <revnumber>1.1</revnumber>
-                <date>6 October 2011</date>
+                <date>October 2011</date>
                 <revremark>Released with the Yocto Project 1.1 Release.</revremark>
             </revision>
             <revision>
@@ -71,11 +65,6 @@
                 <revnumber>1.5</revnumber>
                 <date>October 2013</date>
                 <revremark>Released with the Yocto Project 1.5 Release.</revremark>
-            </revision>
-            <revision>
-                <revnumber>1.5.1</revnumber>
-                <date>January 2014</date>
-                <revremark>Released with the Yocto Project 1.5.1 Release.</revremark>
             </revision>
             <revision>
                 <revnumber>1.6</revnumber>
@@ -134,8 +123,13 @@
             </revision>
             <revision>
                 <revnumber>3.0</revnumber>
-                <date>&REL_MONTH_YEAR;</date>
+                <date>October 2019</date>
                 <revremark>Released with the Yocto Project 3.0 Release.</revremark>
+            </revision>
+            <revision>
+                <revnumber>3.1</revnumber>
+                <date>&REL_MONTH_YEAR;</date>
+                <revremark>Released with the Yocto Project 3.1 Release.</revremark>
             </revision>
         </revhistory>
 
@@ -158,7 +152,7 @@
                        Yocto Project.
                        To be sure you have the latest version of the manual
                        for this release, go to the
-                       <ulink url='&YOCTO_HOME_URL;/documentation'>Yocto Project documentation page</ulink>
+                       <ulink url='&YOCTO_DOCS_URL;'>Yocto Project documentation page</ulink>
                        and select the manual from that site.
                        Manuals from the site are more up-to-date than manuals
                        derived from the Yocto Project released TAR files.
@@ -175,18 +169,20 @@
                        page.
                        If you need a version of this manual for a different
                        Yocto Project release, visit the
-                       <ulink url='&YOCTO_HOME_URL;/documentation'>Yocto Project documentation page</ulink>
+                       <ulink url='&YOCTO_DOCS_URL;'>Yocto Project documentation page</ulink>
                        and select the manual set by using the
                        "ACTIVE RELEASES DOCUMENTATION" or "DOCUMENTS ARCHIVE"
                        pull-down menus.
                        </para></listitem>
-                   <listitem><para>
+                   <listitem>
+                       <para>
                        To report any inaccuracies or problems with this
-                       manual, send an email to the Yocto Project
-                       discussion group at
-                       <filename>yocto@yoctoproject.com</filename> or log into
-                       the freenode <filename>#yocto</filename> channel.
-                       </para></listitem>
+                       (or any other Yocto Project) manual, send an email to
+                       the Yocto Project documentation mailing list at
+                       <filename>docs@lists.yoctoproject.org</filename> or
+                       log into the freenode <filename>#yocto</filename> channel.
+                       </para>
+                   </listitem>
                </itemizedlist>
            </note>
     </legalnotice>

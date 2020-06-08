@@ -135,6 +135,7 @@ class BaseConfig(object):
                         'DEPLOY_DIR_IMAGE',
                         'OE_TMPDIR',
                         'OECORE_NATIVE_SYSROOT',
+                        'MULTICONFIG',
                         )
 
         self.qemu_opt = ''
@@ -164,6 +165,7 @@ class BaseConfig(object):
         self.kvm_enabled = False
         self.vhost_enabled = False
         self.slirp_enabled = False
+        self.net_bridge = None
         self.nfs_instance = 0
         self.nfs_running = False
         self.serialconsole = False
@@ -183,6 +185,8 @@ class BaseConfig(object):
         self.vmtypes = ('hddimg', 'iso')
         self.fsinfo = {}
         self.network_device = "-device e1000,netdev=net0,mac=@MAC@"
+        self.cmdline_ip_slirp = "ip=dhcp"
+        self.cmdline_ip_tap = "ip=192.168.7.@CLIENT@::192.168.7.@GATEWAY@:255.255.255.0"
         # Use different mac section for tap and slirp to avoid
         # conflicts, e.g., when one is running with tap, the other is
         # running with slirp.
@@ -401,9 +405,7 @@ class BaseConfig(object):
             self.set("MACHINE", arg)
             return
 
-        cmd = 'MACHINE=%s bitbake -e' % arg
-        logger.info('Running %s...' % cmd)
-        self.bitbake_e = subprocess.check_output(cmd, shell=True).decode('utf-8')
+        self.bitbake_e = self.run_bitbake_env(arg)
         # bitbake -e doesn't report invalid MACHINE as an error, so
         # let's check DEPLOY_DIR_IMAGE to make sure that it is a valid
         # MACHINE.
@@ -418,6 +420,23 @@ class BaseConfig(object):
             logger.error("%s not a directory valid DEPLOY_DIR_IMAGE" % deploy_dir_image)
             self.set("MACHINE", arg)
 
+    def set_dri_path(self):
+        # As runqemu can be run within bitbake (when using testimage, for example),
+        # we need to ensure that we run host pkg-config, and that it does not
+        # get mis-directed to native build paths set by bitbake.
+        try:
+            del os.environ['PKG_CONFIG_PATH']
+            del os.environ['PKG_CONFIG_DIR']
+            del os.environ['PKG_CONFIG_LIBDIR']
+            del os.environ['PKG_CONFIG_SYSROOT_DIR']
+        except KeyError:
+            pass
+        try:
+            dripath = subprocess.check_output("PATH=/bin:/usr/bin:$PATH pkg-config --variable=dridriverdir dri", shell=True)
+        except subprocess.CalledProcessError as e:
+            raise RunQemuError("Could not determine the path to dri drivers on the host via pkg-config.\nPlease install Mesa development files (particularly, dri.pc) on the host machine.")
+        os.environ['LIBGL_DRIVERS_PATH'] = dripath.decode('utf-8').strip()
+
     def check_args(self):
         for debug in ("-d", "--debug"):
             if debug in sys.argv:
@@ -429,6 +448,9 @@ class BaseConfig(object):
                 logger.setLevel(logging.ERROR)
                 sys.argv.remove(quiet)
 
+        if 'gl' not in sys.argv[1:] and 'gl-es' not in sys.argv[1:]:
+            os.environ['SDL_RENDER_DRIVER'] = 'software'
+
         unknown_arg = ""
         for arg in sys.argv[1:]:
             if arg in self.fstypes + self.vmtypes + self.wictypes:
@@ -438,15 +460,19 @@ class BaseConfig(object):
                 self.kernel_cmdline_script += ' console=ttyS0'
             elif arg == 'sdl':
                 if 'gl' in sys.argv[1:]:
+                    self.set_dri_path()
                     self.qemu_opt_script += ' -vga virtio -display sdl,gl=on'
                 elif 'gl-es' in sys.argv[1:]:
+                    self.set_dri_path()
                     self.qemu_opt_script += ' -vga virtio -display sdl,gl=es'
                 else:
                     self.qemu_opt_script += ' -display sdl'
             elif arg == 'gtk':
                 if 'gl' in sys.argv[1:]:
+                    self.set_dri_path()
                     self.qemu_opt_script += ' -vga virtio -display gtk,gl=on'
                 elif 'gl-es' in sys.argv[1:]:
+                    self.set_dri_path()
                     self.qemu_opt_script += ' -vga virtio -display gtk,gl=es'
                 else:
                     self.qemu_opt_script += ' -display gtk'
@@ -454,22 +480,8 @@ class BaseConfig(object):
                 # These args are handled inside sdl or gtk blocks above
                 pass
             elif arg == 'egl-headless':
+                self.set_dri_path()
                 self.qemu_opt_script += ' -vga virtio -display egl-headless'
-                # As runqemu can be run within bitbake (when using testimage, for example),
-                # we need to ensure that we run host pkg-config, and that it does not
-                # get mis-directed to native build paths set by bitbake.
-                try:
-                    del os.environ['PKG_CONFIG_PATH']
-                    del os.environ['PKG_CONFIG_DIR']
-                    del os.environ['PKG_CONFIG_LIBDIR']
-                    del os.environ['PKG_CONFIG_SYSROOT_DIR']
-                except KeyError:
-                    pass
-                try:
-                    dripath = subprocess.check_output("PATH=/bin:/usr/bin:$PATH pkg-config --variable=dridriverdir dri", shell=True)
-                except subprocess.CalledProcessError as e:
-                    raise RunQemuError("Could not determine the path to dri drivers on the host via pkg-config.\nPlease install Mesa development files (particularly, dri.pc) on the host machine.")
-                os.environ['LIBGL_DRIVERS_PATH'] = dripath.decode('utf-8').strip()
             elif arg == 'serial':
                 self.kernel_cmdline_script += ' console=ttyS0'
                 self.serialconsole = True
@@ -486,6 +498,8 @@ class BaseConfig(object):
                 self.vhost_enabled = True
             elif arg == 'slirp':
                 self.slirp_enabled = True
+            elif arg.startswith('bridge='):
+                self.net_bridge = '%s' % arg[len('bridge='):]
             elif arg == 'snapshot':
                 self.snapshot = True
             elif arg == 'publicvnc':
@@ -803,7 +817,7 @@ class BaseConfig(object):
     def check_and_set(self):
         """Check configs sanity and set when needed"""
         self.validate_paths()
-        if not self.slirp_enabled:
+        if not self.slirp_enabled and not self.net_bridge:
             check_tun()
         # Check audio
         if self.audio_enabled:
@@ -933,29 +947,30 @@ class BaseConfig(object):
                     self.set('STAGING_BINDIR_NATIVE', '%s/usr/bin' % self.get('STAGING_DIR_NATIVE'))
 
     def print_config(self):
-        logger.info('Continuing with the following parameters:\n')
+        logoutput = ['Continuing with the following parameters:']
         if not self.fstype in self.vmtypes:
-            print('KERNEL: [%s]' % self.kernel)
+            logoutput.append('KERNEL: [%s]' % self.kernel)
             if self.bios:
-                print('BIOS: [%s]' % self.bios)
+                logoutput.append('BIOS: [%s]' % self.bios)
             if self.dtb:
-                print('DTB: [%s]' % self.dtb)
-        print('MACHINE: [%s]' % self.get('MACHINE'))
+                logoutput.append('DTB: [%s]' % self.dtb)
+        logoutput.append('MACHINE: [%s]' % self.get('MACHINE'))
         try:
             fstype_flags = ' (' + ', '.join(self.fsinfo[self.fstype]) + ')'
         except KeyError:
             fstype_flags = ''
-        print('FSTYPE: [%s%s]' % (self.fstype, fstype_flags))
+        logoutput.append('FSTYPE: [%s%s]' % (self.fstype, fstype_flags))
         if self.fstype  == 'nfs':
-            print('NFS_DIR: [%s]' % self.rootfs)
+            logoutput.append('NFS_DIR: [%s]' % self.rootfs)
         else:
-            print('ROOTFS: [%s]' % self.rootfs)
+            logoutput.append('ROOTFS: [%s]' % self.rootfs)
         if self.ovmf_bios:
-            print('OVMF: %s' % self.ovmf_bios)
+            logoutput.append('OVMF: %s' % self.ovmf_bios)
         if (self.ovmf_secboot_pkkek1):
-            print('SECBOOT PKKEK1: [%s...]' % self.ovmf_secboot_pkkek1[0:100])
-        print('CONFFILE: [%s]' % self.qemuboot)
-        print('')
+            logoutput.append('SECBOOT PKKEK1: [%s...]' % self.ovmf_secboot_pkkek1[0:100])
+        logoutput.append('CONFFILE: [%s]' % self.qemuboot)
+        logoutput.append('')
+        logger.info('\n'.join(logoutput))
 
     def setup_nfs(self):
         if not self.nfs_server:
@@ -985,7 +1000,7 @@ class BaseConfig(object):
             # Use '%s' since they are integers
             os.putenv(k, '%s' % v)
 
-        self.unfs_opts="nfsvers=3,port=%s,udp,mountport=%s" % (nfsd_port, mountd_port)
+        self.unfs_opts="nfsvers=3,port=%s,tcp,mountport=%s" % (nfsd_port, mountd_port)
 
         # Extract .tar.bz2 or .tar.bz if no nfs dir
         if not (self.rootfs and os.path.isdir(self.rootfs)):
@@ -1020,12 +1035,18 @@ class BaseConfig(object):
 
         self.nfs_running = True
 
+    def setup_net_bridge(self):
+        self.set('NETWORK_CMD', '-netdev bridge,br=%s,id=net0,helper=%s -device virtio-net-pci,netdev=net0 ' % (
+            self.net_bridge, os.path.join(self.bindir_native, 'qemu-oe-bridge-helper')))
+
     def setup_slirp(self):
         """Setup user networking"""
 
         if self.fstype == 'nfs':
             self.setup_nfs()
-        self.kernel_cmdline_script += ' ip=dhcp'
+        netconf = " " + self.cmdline_ip_slirp
+        logger.info("Network configuration:%s", netconf)
+        self.kernel_cmdline_script += netconf
         # Port mapping
         hostfwd = ",hostfwd=tcp::2222-:22,hostfwd=tcp::2323-:23"
         qb_slirp_opt_default = "-netdev user,id=net0%s,tftp=%s" % (hostfwd, self.get('DEPLOY_DIR_IMAGE'))
@@ -1120,7 +1141,11 @@ class BaseConfig(object):
             uid = os.getuid()
             logger.info("Setting up tap interface under sudo")
             cmd = ('sudo', self.qemuifup, str(uid), str(gid), self.bindir_native)
-            tap = subprocess.check_output(cmd).decode('utf-8').strip()
+            try:
+                tap = subprocess.check_output(cmd).decode('utf-8').strip()
+            except subprocess.CalledProcessError as e:
+                logger.error('Setting up tap device failed:\n%s\nRun runqemu-gen-tapdevs to manually create one.' % str(e))
+                sys.exit(1)
             lockfile = os.path.join(lockdir, tap)
             self.taplock = lockfile + '.lock'
             self.acquire_taplock()
@@ -1129,16 +1154,18 @@ class BaseConfig(object):
 
         if not tap:
             logger.error("Failed to setup tap device. Run runqemu-gen-tapdevs to manually create.")
-            return 1
+            sys.exit(1)
         self.tap = tap
         tapnum = int(tap[3:])
         gateway = tapnum * 2 + 1
         client = gateway + 1
         if self.fstype == 'nfs':
             self.setup_nfs()
-        netconf = "192.168.7.%s::192.168.7.%s:255.255.255.0" % (client, gateway)
-        logger.info("Network configuration: %s", netconf)
-        self.kernel_cmdline_script += " ip=%s" % netconf
+        netconf = " " + self.cmdline_ip_tap
+        netconf = netconf.replace('@CLIENT@', str(client))
+        netconf = netconf.replace('@GATEWAY@', str(gateway))
+        logger.info("Network configuration:%s", netconf)
+        self.kernel_cmdline_script += netconf
         mac = "%s%02x" % (self.mac_tap, client)
         qb_tap_opt = self.get('QB_TAP_OPT')
         if qb_tap_opt:
@@ -1157,9 +1184,13 @@ class BaseConfig(object):
         if sys.stdin.isatty():
             self.saved_stty = subprocess.check_output(("stty", "-g")).decode('utf-8').strip()
         self.network_device = self.get('QB_NETWORK_DEVICE') or self.network_device
-        if self.slirp_enabled:
+        if self.net_bridge:
+            self.setup_net_bridge()
+        elif self.slirp_enabled:
+            self.cmdline_ip_slirp = self.get('QB_CMDLINE_IP_SLIRP') or self.cmdline_ip_slirp
             self.setup_slirp()
         else:
+            self.cmdline_ip_tap = self.get('QB_CMDLINE_IP_TAP') or self.cmdline_ip_tap
             self.setup_tap()
 
     def setup_rootfs(self):
@@ -1175,6 +1206,10 @@ class BaseConfig(object):
         else:
             self.rootfs_options = '-drive file=%s,if=virtio,format=%s' % (self.rootfs, rootfs_format)
 
+        qb_rootfs_extra_opt = self.get("QB_ROOTFS_EXTRA_OPT")
+        if qb_rootfs_extra_opt and not qb_rootfs_extra_opt.startswith(","):
+            qb_rootfs_extra_opt = "," + qb_rootfs_extra_opt
+
         if self.fstype in ('cpio.gz', 'cpio'):
             self.kernel_cmdline = 'root=/dev/ram0 rw debugshell'
             self.rootfs_options = '-initrd %s' % self.rootfs
@@ -1187,11 +1222,15 @@ class BaseConfig(object):
                     drive_type = self.get('QB_DRIVE_TYPE')
                     if drive_type.startswith("/dev/sd"):
                         logger.info('Using scsi drive')
-                        vm_drive = '-drive if=none,id=hd,file=%s,format=%s -device virtio-scsi-pci,id=scsi -device scsi-hd,drive=hd' \
-                                       % (self.rootfs, rootfs_format)
+                        vm_drive = '-drive if=none,id=hd,file=%s,format=%s -device virtio-scsi-pci,id=scsi -device scsi-hd,drive=hd%s' \
+                                       % (self.rootfs, rootfs_format, qb_rootfs_extra_opt)
                     elif drive_type.startswith("/dev/hd"):
                         logger.info('Using ide drive')
                         vm_drive = "-drive file=%s,format=%s" % (self.rootfs, rootfs_format)
+                    elif drive_type.startswith("/dev/vdb"):
+                        logger.info('Using block virtio drive');
+                        vm_drive = '-drive id=disk0,file=%s,if=none,format=%s -device virtio-blk-device,drive=disk0%s' \
+                                    % (self.rootfs, rootfs_format,qb_rootfs_extra_opt)
                     else:
                         # virtio might have been selected explicitly (just use it), or
                         # is used as fallback (then warn about that).
@@ -1405,10 +1444,7 @@ class BaseConfig(object):
 
         self.cleaned = True
 
-    def load_bitbake_env(self, mach=None):
-        if self.bitbake_e:
-            return
-
+    def run_bitbake_env(self, mach=None):
         bitbake = shutil.which('bitbake')
         if not bitbake:
             return
@@ -1416,14 +1452,24 @@ class BaseConfig(object):
         if not mach:
             mach = self.get('MACHINE')
 
+        multiconfig = self.get('MULTICONFIG')
+        if multiconfig:
+            multiconfig = "mc:%s" % multiconfig
+
         if mach:
-            cmd = 'MACHINE=%s bitbake -e' % mach
+            cmd = 'MACHINE=%s bitbake -e %s' % (mach, multiconfig)
         else:
-            cmd = 'bitbake -e'
+            cmd = 'bitbake -e %s' % multiconfig
 
         logger.info('Running %s...' % cmd)
+        return subprocess.check_output(cmd, shell=True).decode('utf-8')
+
+    def load_bitbake_env(self, mach=None):
+        if self.bitbake_e:
+            return
+
         try:
-            self.bitbake_e = subprocess.check_output(cmd, shell=True).decode('utf-8')
+            self.bitbake_e = self.run_bitbake_env(mach=mach)
         except subprocess.CalledProcessError as err:
             self.bitbake_e = ''
             logger.warning("Couldn't run 'bitbake -e' to gather environment information:\n%s" % err.output.decode('utf-8'))
@@ -1438,7 +1484,13 @@ class BaseConfig(object):
         if result and os.path.exists(result):
             return result
 
-        cmd = ('bitbake', 'qemu-helper-native', '-e')
+        cmd = ['bitbake', '-e']
+        multiconfig = self.get('MULTICONFIG')
+        if multiconfig:
+            cmd.append('mc:%s:qemu-helper-native' % multiconfig)
+        else:
+            cmd.append('qemu-helper-native')
+
         logger.info('Running %s...' % str(cmd))
         out = subprocess.check_output(cmd).decode('utf-8')
 

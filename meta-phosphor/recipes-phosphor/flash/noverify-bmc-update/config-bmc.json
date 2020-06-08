@@ -1,0 +1,20 @@
+[{
+	"blob": "/flash/image",
+	"handler": {
+		"type": "file",
+		"path": "/run/initramfs/bmc-image"
+	},
+	"actions": {
+		"preparation": {
+			"type": "skip"
+		},
+		"verification": {
+			"type": "systemd",
+			"unit": "noverify-bmc-verify.service"
+		},
+		"update": {
+			"type": "systemd",
+			"unit": "reboot.target"
+		}
+	}
+}]

@@ -10,7 +10,7 @@
 # same system at the same time if really necessary.
 SECTION = "libs"
 SUMMARY = "Berkeley Database v5"
-HOMEPAGE = "http://www.oracle.com/technetwork/database/database-technologies/berkeleydb/overview/index.html"
+HOMEPAGE = "https://www.oracle.com/database/technologies/related/berkeleydb.html"
 LICENSE = "Sleepycat"
 RCONFLICTS_${PN} = "db3"
 
@@ -20,12 +20,13 @@ CVE_VERSION = "11.2.${PV}"
 PR = "r1"
 PE = "1"
 
-SRC_URI = "http://download.oracle.com/berkeley-db/db-${PV}.tar.gz"
+SRC_URI = "https://download.oracle.com/berkeley-db/db-${PV}.tar.gz"
 SRC_URI += "file://fix-parallel-build.patch \
             file://0001-atomic-Rename-local-__atomic_compare_exchange-to-avo.patch \
             file://0001-configure-Add-explicit-tag-options-to-libtool-invoca.patch \
             file://sequence-type.patch \
             file://0001-Fix-libc-compatibility-by-renaming-atomic_init-API.patch \
+            file://0001-clock-Do-not-define-own-timespec.patch \
            "
 # We are not interested in official latest 6.x versions;
 # let's track what debian is using.
@@ -60,7 +61,9 @@ DB5_CONFIG ?= "--enable-o_direct --disable-cryptography --disable-queue --disabl
 
 EXTRA_OECONF = "${DB5_CONFIG} --enable-shared --enable-cxx --with-sysroot STRIP=true"
 
+PACKAGECONFIG ??= ""
 PACKAGECONFIG[verify] = "--enable-verify, --disable-verify"
+PACKAGECONFIG[dbm] = "--enable-dbm,--disable-dbm,"
 
 EXTRA_OEMAKE += "LIBTOOL='./${HOST_SYS}-libtool'"
 

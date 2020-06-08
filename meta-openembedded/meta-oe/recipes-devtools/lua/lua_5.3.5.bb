@@ -35,6 +35,7 @@ EXTRA_OEMAKE = "'CC=${CC} -fPIC' 'MYCFLAGS=${CFLAGS} -fPIC' MYLDFLAGS='${LDFLAGS
 
 do_configure_prepend() {
     sed -i -e s:/usr/local:${prefix}:g src/luaconf.h
+    sed -i -e s:lib/lua/:${baselib}/lua/:g src/luaconf.h
 }
 
 do_compile () {

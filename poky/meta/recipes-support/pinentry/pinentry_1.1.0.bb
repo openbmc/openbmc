@@ -28,7 +28,6 @@ PACKAGECONFIG[libcap] = "--with-libcap, --without-libcap, libcap"
 PACKAGECONFIG[qt] = "--enable-pinentry-qt, --disable-pinentry-qt, qtbase-native qtbase"
 PACKAGECONFIG[gtk2] = "--enable-pinentry-gtk2, --disable-pinentry-gtk2, gtk+ glib-2.0"
 
-#To use libsecret, add meta-gnome
 PACKAGECONFIG[secret] = "--enable-libsecret, --disable-libsecret, libsecret"
 
 EXTRA_OECONF = " \

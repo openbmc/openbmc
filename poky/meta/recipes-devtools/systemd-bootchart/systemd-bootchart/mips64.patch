@@ -1,0 +1,35 @@
+Recognise mips64 n32/n64
+
+These are supported in systemd now a days
+
+Upstream-Status: Backport [https://github.com/systemd/systemd/commit/caf49b95b3a6efe9455078098c729d83b08e5206]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/src/architecture.h
++++ b/src/architecture.h
+@@ -127,13 +127,22 @@ int uname_architecture(void);
+ #  define native_architecture() ARCHITECTURE_SPARC
+ #  define LIB_ARCH_TUPLE "sparc-linux-gnu"
+ #  define PROC_CPUINFO_MODEL "cpu"
+-#elif defined(__mips64__)
++#elif defined(__mips64) && defined(__LP64__)
+ #  if __BYTE_ORDER == __BIG_ENDIAN
+ #    define native_architecture() ARCHITECTURE_MIPS64
+-#    error "Missing LIB_ARCH_TUPLE for MIPS64"
++#    define LIB_ARCH_TUPLE "mips64-linux-gnuabi64"
+ #  else
+ #    define native_architecture() ARCHITECTURE_MIPS64_LE
+-#    error "Missing LIB_ARCH_TUPLE for MIPS64_LE"
++#    define LIB_ARCH_TUPLE "mips64el-linux-gnuabi64"
++#  endif
++#  define PROC_CPUINFO_MODEL "cpu model"
++#elif defined(__mips64)
++#  if __BYTE_ORDER == __BIG_ENDIAN
++#    define native_architecture() ARCHITECTURE_MIPS64
++#    define LIB_ARCH_TUPLE "mips64-linux-gnuabin32"
++#  else
++#    define native_architecture() ARCHITECTURE_MIPS64_LE
++#    define LIB_ARCH_TUPLE "mips64el-linux-gnuabin32"
+ #  endif
+ #  define PROC_CPUINFO_MODEL "cpu model"
+ #elif defined(__mips__)

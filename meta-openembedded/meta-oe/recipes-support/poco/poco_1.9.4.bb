@@ -16,6 +16,8 @@ SRC_URI = " \
    "
 SRCREV = "b95393dcc3640807838e8323b4e600e54d2e8116"
 
+UPSTREAM_CHECK_GITTAGREGEX = "poco-(?P<pver>\d+(\.\d+)+)"
+
 S = "${WORKDIR}/git"
 
 inherit cmake ptest

@@ -34,13 +34,17 @@ def log(args, logger):
         return 1
 
     for _, run_name, _, r in resultutils.test_run_results(results):
-        if args.dump_ptest and 'ptestresult.sections' in r:
-            for name, ptest in r['ptestresult.sections'].items():
-                logdata = resultutils.ptestresult_get_log(r, name)
+        if args.dump_ptest:
+            for sectname in ['ptestresult.sections', 'ltpposixresult.sections', 'ltpresult.sections']:
+             if sectname in r:
+              for name, ptest in r[sectname].items():
+                logdata = resultutils.generic_get_log(sectname, r, name)
                 if logdata is not None:
                     dest_dir = args.dump_ptest
                     if args.prepend_run:
                         dest_dir = os.path.join(dest_dir, run_name)
+                    if not sectname.startswith("ptest"):
+                        dest_dir = os.path.join(dest_dir, sectname.split(".")[0])
 
                     os.makedirs(dest_dir, exist_ok=True)
                     dest = os.path.join(dest_dir, '%s.log' % name)
@@ -49,10 +53,13 @@ def log(args, logger):
                         f.write(logdata)
 
         if args.raw_ptest:
-            rawlog = resultutils.ptestresult_get_rawlogs(r)
-            if rawlog is not None:
-                print(rawlog)
-            else:
+            found = False
+            for sectname in ['ptestresult.rawlogs', 'ltpposixresult.rawlogs', 'ltpresult.rawlogs']:
+                rawlog = resultutils.generic_get_rawlogs(sectname, r)
+                if rawlog is not None:
+                    print(rawlog)
+                    found = True
+            if not found:
                 print('Raw ptest logs not found')
                 return 1
 

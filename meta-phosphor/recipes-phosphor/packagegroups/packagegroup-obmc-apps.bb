@@ -50,7 +50,6 @@ RDEPENDS_${PN}-extras = " \
 
 SUMMARY_${PN}-extrasdev = "Development features"
 RDEPENDS_${PN}-extrasdev = " \
-        rest-dbus \
         "
 
 SUMMARY_${PN}-extrasdevtools = "Development tools"

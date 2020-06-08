@@ -1,0 +1,36 @@
+Enable uint128 on riscv64
+
+Fixes
+| verified/kremlin/kremlib/dist/minimal/LowStar_Endianness.h:29:37: error: 'load128_be' declared 'static' but never defined [-Werror=unused-function]
+|    29 | inline static FStar_UInt128_uint128 load128_be(uint8_t *x0);
+|       |                                     ^~~~~~~~~~
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/nss/lib/freebl/verified/kremlin/include/kremlin/internal/types.h
++++ b/nss/lib/freebl/verified/kremlin/include/kremlin/internal/types.h
+@@ -56,7 +56,8 @@ typedef const char *Prims_string;
+ #include <emmintrin.h>
+ typedef __m128i FStar_UInt128_uint128;
+ #elif !defined(KRML_VERIFIED_UINT128) && !defined(_MSC_VER) && \
+-    (defined(__x86_64__) || defined(__x86_64) || defined(__aarch64__))
++    (defined(__x86_64__) || defined(__x86_64) || defined(__aarch64__) || \
++     (defined(__riscv) && __riscv_xlen == 64))
+ typedef unsigned __int128 FStar_UInt128_uint128;
+ #else
+ typedef struct FStar_UInt128_uint128_s {
+--- a/nss/lib/freebl/verified/kremlin/kremlib/dist/minimal/fstar_uint128_gcc64.h
++++ b/nss/lib/freebl/verified/kremlin/kremlib/dist/minimal/fstar_uint128_gcc64.h
+@@ -23,9 +23,10 @@
+ #include "FStar_UInt128.h"
+ #include "FStar_UInt_8_16_32_64.h"
+ #include "LowStar_Endianness.h"
+-
++#include <stdint.h>
+ #if !defined(KRML_VERIFIED_UINT128) && !defined(_MSC_VER) && \
+-    (defined(__x86_64__) || defined(__x86_64) || defined(__aarch64__))
++    (defined(__x86_64__) || defined(__x86_64) || defined(__aarch64__) || \
++     (defined(__riscv) && __riscv_xlen == 64))
+ 
+ /* GCC + using native unsigned __int128 support */
+ 

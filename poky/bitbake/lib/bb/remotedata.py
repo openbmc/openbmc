@@ -17,16 +17,16 @@ class RemoteDatastores:
         self.cooker = cooker
         self.datastores = {}
         self.locked = []
+        self.datastores[0] = self.cooker.data
         self.nextindex = 1
 
     def __len__(self):
         return len(self.datastores)
 
     def __getitem__(self, key):
-        if key is None:
-            return self.cooker.data
-        else:
-            return self.datastores[key]
+        # Cooker could have changed its datastore from under us
+        self.datastores[0] = self.cooker.data
+        return self.datastores[key]
 
     def items(self):
         return self.datastores.items()
@@ -63,44 +63,3 @@ class RemoteDatastores:
             raise Exception('Tried to release locked datastore %d' % idx)
         del self.datastores[idx]
 
-    def receive_datastore(self, remote_data):
-        """Receive a datastore object sent from the client (as prepared by transmit_datastore())"""
-        dct = dict(remote_data)
-        d = bb.data_smart.DataSmart()
-        d.dict = dct
-        while True:
-            if '_remote_data' in dct:
-                dsindex = dct['_remote_data']['_content']
-                del dct['_remote_data']
-                if dsindex is None:
-                    dct['_data'] = self.cooker.data.dict
-                else:
-                    dct['_data'] = self.datastores[dsindex].dict
-                break
-            elif '_data' in dct:
-                idct = dict(dct['_data'])
-                dct['_data'] = idct
-                dct = idct
-            else:
-                break
-        return d
-
-    @staticmethod
-    def transmit_datastore(d):
-        """Prepare a datastore object for sending over IPC from the client end"""
-        # FIXME content might be a dict, need to turn that into a list as well
-        def copy_dicts(dct):
-            if '_remote_data' in dct:
-                dsindex = dct['_remote_data']['_content'].dsindex
-                newdct = dct.copy()
-                newdct['_remote_data'] = {'_content': dsindex}
-                return list(newdct.items())
-            elif '_data' in dct:
-                newdct = dct.copy()
-                newdata = copy_dicts(dct['_data'])
-                if newdata:
-                    newdct['_data'] = newdata
-                return list(newdct.items())
-            return None
-        main_dict = copy_dicts(d.dict)
-        return main_dict

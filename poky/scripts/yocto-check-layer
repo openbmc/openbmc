@@ -84,7 +84,7 @@ def main():
         logger.setLevel(logging.ERROR)
 
     if not 'BUILDDIR' in os.environ:
-        logger.error("You must source the environment before run this script.")
+        logger.error("You must source the environment before running this script.")
         logger.error("$ source oe-init-build-env")
         return 1
     builddir = os.environ['BUILDDIR']
@@ -92,7 +92,7 @@ def main():
 
     layers = detect_layers(args.layers, args.no_auto)
     if not layers:
-        logger.error("Fail to detect layers")
+        logger.error("Failed to detect layers")
         return 1
     if args.additional_layers:
         additional_layers = detect_layers(args.additional_layers, args.no_auto)
@@ -108,7 +108,7 @@ def main():
     for layer in layers:
         if layer['type'] == LayerType.ERROR_BSP_DISTRO:
             logger.error("%s: Can't be DISTRO and BSP type at the same time."\
-                     " The conf/distro and conf/machine folders was found."\
+                     " Both conf/distro and conf/machine folders were found."\
                      % layer['name'])
             layers.remove(layer)
         elif layer['type'] == LayerType.ERROR_NO_LAYER_CONF:

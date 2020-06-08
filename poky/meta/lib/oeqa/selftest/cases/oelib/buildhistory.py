@@ -45,7 +45,7 @@ class TestBlobParsing(OESelftestTestCase):
 
     def test_blob_to_dict(self):
         """
-        Test convertion of git blobs to dictionary
+        Test conversion of git blobs to dictionary
         """
         from oe.buildhistory_analysis import blob_to_dict
         valuesmap = { "foo" : "1", "bar" : "2" }

@@ -1,0 +1,32 @@
+From ad8e73306cb8293f7d32841e1599fd9048801f1f Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 20 Dec 2019 13:06:05 +0100
+Subject: [PATCH] Add more musl exclusions
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+[ pvorel: rebase for 20200515: enable accept4_01 ]
+[ pvorel: rebase for 20200120: enable fanotify13, fanotify15, setxattr03 ]
+Signed-off-by: Petr Vorel <petr.vorel@gmail.com>
+---
+ testcases/kernel/syscalls/timer_create/Makefile | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/testcases/kernel/syscalls/timer_create/Makefile b/testcases/kernel/syscalls/timer_create/Makefile
+index ada241fe1..d454b01e7 100644
+--- a/testcases/kernel/syscalls/timer_create/Makefile
++++ b/testcases/kernel/syscalls/timer_create/Makefile
+@@ -5,6 +5,10 @@ top_srcdir		?= ../../../..
+ 
+ include $(top_srcdir)/include/mk/testcases.mk
+ 
++ifeq ($(LIBC),musl)
++FILTER_OUT_MAKE_TARGETS        := timer_create01 timer_create03
++endif
++
+ CPPFLAGS		+= -D_GNU_SOURCE -I$(abs_srcdir)/../include
+ 
+ LDLIBS			+= -lpthread -lrt
+-- 
+2.26.2
+

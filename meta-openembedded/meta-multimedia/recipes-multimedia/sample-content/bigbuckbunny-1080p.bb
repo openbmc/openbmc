@@ -1,7 +1,7 @@
 SUMMARY = "Big Buck Bunny movie - 1080P"
 LICENSE = "CC-BY-3.0"
 # http://www.bigbuckbunny.org/index.php/about/
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/CC-BY-3.0;md5=dfa02b5755629022e267f10b9c0a2ab7"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/CC-BY-3.0;md5=dfa02b5755629022e267f10b9c0a2ab7"
 
 SRC_URI = "http://themazzone.com/big_buck_bunny_1080p_surround.avi"
 SRC_URI[md5sum] = "223991c8b33564eb77988a4c13c1c76a"

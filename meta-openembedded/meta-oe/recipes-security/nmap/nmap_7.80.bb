@@ -10,12 +10,14 @@ SRC_URI = "http://nmap.org/dist/${BP}.tar.bz2 \
            file://nmap-replace-shtool-mkdir-with-coreutils-mkdir-command.patch \
            file://0001-Include-time.h-header-to-pass-clang-compilation.patch \
            file://0002-Fix-building-with-libc.patch \
+           file://0001-Make-ndiff-support-python3.patch \
+           file://0001-configure.ac-make-ndiff-depend-on-python3.patch \
            "
 
 SRC_URI[md5sum] = "d37b75b06d1d40f27b76d60db420a1f5"
 SRC_URI[sha256sum] = "fcfa5a0e42099e12e4bf7a68ebe6fde05553383a682e816a7ec9256ab4773faa"
 
-inherit autotools-brokensep pkgconfig pythonnative
+inherit autotools-brokensep pkgconfig python3native
 
 PACKAGECONFIG ?= "ncat nping ndiff pcap"
 
@@ -28,7 +30,7 @@ PACKAGECONFIG[libz] = "--with-libz=${STAGING_LIBDIR}/.., --without-libz, zlib, z
 #disable/enable packages
 PACKAGECONFIG[nping] = ",--without-nping,"
 PACKAGECONFIG[ncat] = ",--without-ncat,"
-PACKAGECONFIG[ndiff] = ",--without-ndiff,python"
+PACKAGECONFIG[ndiff] = "--with-ndiff=yes,--without-ndiff,python3"
 PACKAGECONFIG[update] = ",--without-nmap-update,"
 
 EXTRA_OECONF = "--with-libdnet=included --with-liblinear=included --without-subversion --with-liblua=included"
@@ -47,6 +49,12 @@ do_configure() {
     oe_runconf
 }
 
+do_install_append() {
+    if [ -f "${D}${bindir}/ndiff" ]; then
+       sed -i 's@^#!.*$@#!/usr/bin/env python3@g'   ${D}${bindir}/ndiff
+    fi
+}
+
 FILES_${PN} += "${PYTHON_SITEPACKAGES_DIR} ${datadir}/ncat"
 
-RDEPENDS_${PN} = "python"
+RDEPENDS_${PN} += "python3-core"

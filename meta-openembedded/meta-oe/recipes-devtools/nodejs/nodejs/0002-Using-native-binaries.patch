@@ -1,0 +1,71 @@
+From 6c3ac20477a4bac643088f24df3c042e627fafa9 Mon Sep 17 00:00:00 2001
+From: Guillaume Burel <guillaume.burel@stormshield.eu>
+Date: Fri, 3 Jan 2020 11:25:54 +0100
+Subject: [PATCH] Using native binaries
+
+---
+ node.gyp                 |  4 ++--
+ tools/v8_gypfiles/v8.gyp | 11 ++++-------
+ 2 files changed, 6 insertions(+), 9 deletions(-)
+
+diff --git a/node.gyp b/node.gyp
+index 8f4dc518..d9389190 100644
+--- a/node.gyp
++++ b/node.gyp
+@@ -446,7 +446,7 @@
+                 '<(SHARED_INTERMEDIATE_DIR)/node_code_cache.cc',
+               ],
+               'action': [
+-                '<@(_inputs)',
++                'mkcodecache',
+                 '<@(_outputs)',
+               ],
+             },
+@@ -471,7 +471,7 @@
+                 '<(SHARED_INTERMEDIATE_DIR)/node_snapshot.cc',
+               ],
+               'action': [
+-                '<@(_inputs)',
++                'node_mksnapshot',
+                 '<@(_outputs)',
+               ],
+             },
+diff --git a/tools/v8_gypfiles/v8.gyp b/tools/v8_gypfiles/v8.gyp
+index a506a67d..c91f7dde 100644
+--- a/tools/v8_gypfiles/v8.gyp
++++ b/tools/v8_gypfiles/v8.gyp
+@@ -140,7 +140,8 @@
+             '<@(torque_outputs)',
+           ],
+           'action': [
+-            '<@(_inputs)',
++            'torque',
++            '<@(torque_files)',
+             '-o', '<(torque_output_root)/torque-generated',
+             '-v8-root', '<(V8_ROOT)'
+           ],
+@@ -247,9 +248,7 @@
+             '<(generate_bytecode_builtins_list_output)',
+           ],
+           'action': [
+-            'python',
+-            '<(V8_ROOT)/tools/run.py',
+-            '<@(_inputs)',
++            'bytecode_builtins_list_generator',
+             '<@(_outputs)',
+           ],
+         },
+@@ -1396,9 +1395,7 @@
+             '<(SHARED_INTERMEDIATE_DIR)/src/regexp/special-case.cc',
+           ],
+           'action': [
+-            'python',
+-            '<(V8_ROOT)/tools/run.py',
+-            '<@(_inputs)',
++            'gen-regexp-special-case',
+             '<@(_outputs)',
+           ],
+         },
+-- 
+2.20.1
+

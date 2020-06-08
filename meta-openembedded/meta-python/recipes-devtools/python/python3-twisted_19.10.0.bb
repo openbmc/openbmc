@@ -1,7 +1,7 @@
 inherit pypi setuptools3
 require python-twisted.inc
 
-FILES_${PN}-core_append += " \
+FILES_${PN}-core_append = " \
   ${libdir}/${PYTHON_DIR}/site-packages/twisted/__pycache__ \
   ${libdir}/${PYTHON_DIR}/site-packages/twisted/python/__pycache__/*pyc \
   ${libdir}/${PYTHON_DIR}/site-packages/twisted/plugins/__pycache__/__init__*.pyc \
@@ -29,7 +29,7 @@ FILES_${PN}-news_append = " \
   ${libdir}/${PYTHON_DIR}/site-packages/twisted/plugins/__pycache__/twisted_news*.pyc \
 "
 
-FILES_${PN}-protocols_append += " \
+FILES_${PN}-protocols_append = " \
   ${libdir}/${PYTHON_DIR}/site-packages/twisted/protocols/__pycache__/*pyc \
 "
 

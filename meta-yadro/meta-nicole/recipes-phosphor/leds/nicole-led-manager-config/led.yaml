@@ -1,17 +1,27 @@
+#
+# If the LED has a label in DTS like:
+#   label = "device:color:function";
+# the D-Bus name looks like:
+#   device_function_color
+#
+bmc_booted:
+    platform_power_green:
+        Action: 'Blink'
+        Priority: 'On'
 power_on:
-    power:
+    platform_power_green:
         Action: 'On'
         Priority: 'On'
 enclosure_identify:
-    identify:
+    platform_indicator_blue:
         Action: 'Blink'
         Priority: 'Blink'
 enclosure_fault: &SYS_FAULT
-    alarm_red:
+    platform_fault_red:
         Action: 'Blink'
         Priority: 'Blink'
 enclosure_warning: &FRU_FAULT
-    alarm_yellow:
+    platform_alarm_yellow:
         Action: 'Blink'
         Priority: 'Blink'
 

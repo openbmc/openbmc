@@ -1,4 +1,4 @@
-From 950867d9fd3f690e271c8c807b6eed144b2935b2 Mon Sep 17 00:00:00 2001
+From 2325a92f1896a2a7f586611686801b41fbc91b50 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Mon, 27 Aug 2018 15:00:51 +0800
 Subject: [PATCH] configure.in: remove useless `-L$use_openssl/lib'
@@ -10,15 +10,16 @@ and helpful for clean up host build path in isc-config.sh
 Upstream-Status: Inappropriate [oe-core specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
 ---
- configure.in | 2 +-
+ configure.ac | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/configure.in b/configure.in
-index 54efc55..76ac0eb 100644
---- a/configure.in
-+++ b/configure.in
-@@ -1691,7 +1691,7 @@ If you don't want OpenSSL, use --without-openssl])
+diff --git a/configure.ac b/configure.ac
+index e85a5c6..2bbfc58 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1631,7 +1631,7 @@ If you don't want OpenSSL, use --without-openssl])
  				fi
  				;;
  			*)
@@ -27,6 +28,3 @@ index 54efc55..76ac0eb 100644
  				;;
  			esac
  		fi
--- 
-2.7.4
-

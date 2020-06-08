@@ -16,7 +16,7 @@ SRCREV_FORMAT = "openocd"
 SRCREV_openocd = "ded67990255cc1e63c77832ffd6e6bef9120873d"
 SRCREV_git2cl = "8373c9f74993e218a08819cbcdbab3f3564bbeba"
 SRCREV_jimtcl = "dc4ba7770d580800634f90b67a24e077b4a26d98"
-SRCREV_libjaylink = "cfccbc9d6763733f1d14dff3c2dc5b75aaef136b"
+SRCREV_libjaylink = "3322dfa5e7aa56f5b12b7f2197e3e6b850b7b66e"
 
 PV = "0.10+gitr${SRCPV}"
 S = "${WORKDIR}/git"

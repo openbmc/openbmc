@@ -1,0 +1,86 @@
+From 976f8f62238f0d837584adc7c31035bdb29b6d6f Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Tue, 3 Dec 2019 18:27:39 +0100
+Subject: [PATCH 5/5] ucm: Do not fail to parse configs on cards with an empty
+ CardComponents lists
+
+Since the UCM profiles for all Bay- and Cherry-Trail SST cards have been
+moved over to UCM2, parsing them fails with:
+
+ALSA lib ucm_subs.c:220:(uc_mgr_get_substituted_value) variable '${CardComponents}' is not defined in this context!
+
+This completely breaks audio support on all Bay- and Cherry-Trail devices.
+
+This is caused by these non-SOF ASoC using cards having an empty
+CardComponents list. Which in itself is fine, but is rejected by
+the ucm_subs.c code. This commit changes the ucm_subs code to accept
+an empty string as a valid value for CardComponents restoring audio
+functionality on these boards.
+
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+Signed-off-by: Jaroslav Kysela <perex@perex.cz>
+
+Upstream-Status: Backport
+Signed-off-by: Tanu Kaskinen <tanuk@iki.fi>
+---
+ src/ucm/ucm_subs.c | 20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
+
+diff --git a/src/ucm/ucm_subs.c b/src/ucm/ucm_subs.c
+index 00afa9e3..90e395f0 100644
+--- a/src/ucm/ucm_subs.c
++++ b/src/ucm/ucm_subs.c
+@@ -25,6 +25,7 @@
+  */
+ 
+ #include "ucm_local.h"
++#include <stdbool.h>
+ #include <sys/stat.h>
+ #include <limits.h>
+ 
+@@ -145,10 +146,11 @@ static char *rval_sysfs(snd_use_case_mgr_t *uc_mgr ATTRIBUTE_UNUSED, const char
+ 	return strdup(path);
+ }
+ 
+-#define MATCH_VARIABLE(name, id, fcn)					\
++#define MATCH_VARIABLE(name, id, fcn, empty_ok)				\
+ 	if (strncmp((name), (id), sizeof(id) - 1) == 0) { 		\
+ 		rval = fcn(uc_mgr);					\
+ 		idsize = sizeof(id) - 1;				\
++		allow_empty = (empty_ok);				\
+ 		goto __rval;						\
+ 	}
+ 
+@@ -189,12 +191,14 @@ int uc_mgr_get_substituted_value(snd_use_case_mgr_t *uc_mgr,
+ 
+ 	while (*value) {
+ 		if (*value == '$' && *(value+1) == '{') {
+-			MATCH_VARIABLE(value, "${ConfName}", rval_conf_name);
+-			MATCH_VARIABLE(value, "${CardId}", rval_card_id);
+-			MATCH_VARIABLE(value, "${CardDriver}", rval_card_driver);
+-			MATCH_VARIABLE(value, "${CardName}", rval_card_name);
+-			MATCH_VARIABLE(value, "${CardLongName}", rval_card_longname);
+-			MATCH_VARIABLE(value, "${CardComponents}", rval_card_components);
++			bool allow_empty = false;
++
++			MATCH_VARIABLE(value, "${ConfName}", rval_conf_name, false);
++			MATCH_VARIABLE(value, "${CardId}", rval_card_id, false);
++			MATCH_VARIABLE(value, "${CardDriver}", rval_card_driver, false);
++			MATCH_VARIABLE(value, "${CardName}", rval_card_name, false);
++			MATCH_VARIABLE(value, "${CardLongName}", rval_card_longname, false);
++			MATCH_VARIABLE(value, "${CardComponents}", rval_card_components, true);
+ 			MATCH_VARIABLE2(value, "${env:", rval_env);
+ 			MATCH_VARIABLE2(value, "${sys:", rval_sysfs);
+ 			err = -EINVAL;
+@@ -208,7 +212,7 @@ int uc_mgr_get_substituted_value(snd_use_case_mgr_t *uc_mgr,
+ 			}
+ 			goto __error;
+ __rval:
+-			if (rval == NULL || rval[0] == '\0') {
++			if (rval == NULL || (!allow_empty && rval[0] == '\0')) {
+ 				free(rval);
+ 				strncpy(r, value, idsize);
+ 				r[idsize] = '\0';
+-- 
+2.20.1
+

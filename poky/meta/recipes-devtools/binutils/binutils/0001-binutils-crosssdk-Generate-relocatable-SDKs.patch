@@ -1,7 +1,7 @@
-From 5bcd884f8af5106d0fa380c42cffe07f3c993ed2 Mon Sep 17 00:00:00 2001
+From b05f0be13aadf0b26a0b39dfe7daf2c47a300338 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:58:54 +0000
-Subject: [PATCH 01/15] binutils-crosssdk: Generate relocatable SDKs
+Subject: [PATCH] binutils-crosssdk: Generate relocatable SDKs
 
 This patch will modify the ELF linker scripts so that the crosssdk
 linker will generate binaries with a 4096 bytes PT_INTERP section. When the binaries
@@ -18,35 +18,35 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/ld/genscripts.sh b/ld/genscripts.sh
-index 77ddbbc8f8..d789e77943 100755
+index 03392d265c..435689ea14 100755
 --- a/ld/genscripts.sh
 +++ b/ld/genscripts.sh
-@@ -310,6 +310,7 @@ DATA_ALIGNMENT_u="${DATA_ALIGNMENT_u-${DATA_ALIGNMENT_r}}"
+@@ -304,6 +304,7 @@ DATA_ALIGNMENT_u="${DATA_ALIGNMENT_u-${DATA_ALIGNMENT_r}}"
  LD_FLAG=r
  DATA_ALIGNMENT=${DATA_ALIGNMENT_r}
  DEFAULT_DATA_ALIGNMENT="ALIGN(${SEGMENT_SIZE})"
 +PARTIAL_LINKING=" "
- ( echo "/* Script for ld -r: link without relocation */"
-   . ${CUSTOMIZER_SCRIPT}
-   . ${srcdir}/scripttempl/${SCRIPT_NAME}.sc
-@@ -318,10 +319,12 @@ DEFAULT_DATA_ALIGNMENT="ALIGN(${SEGMENT_SIZE})"
+ ( echo "/* Script for -r */"
+   source_sh ${CUSTOMIZER_SCRIPT}
+   source_sh ${srcdir}/scripttempl/${SCRIPT_NAME}.sc
+@@ -312,10 +313,12 @@ DEFAULT_DATA_ALIGNMENT="ALIGN(${SEGMENT_SIZE})"
  LD_FLAG=u
  DATA_ALIGNMENT=${DATA_ALIGNMENT_u}
  CONSTRUCTING=" "
 +PARTIAL_LINKING=" "
- ( echo "/* Script for ld -Ur: link w/out relocation, do create constructors */"
-   . ${CUSTOMIZER_SCRIPT}
-   . ${srcdir}/scripttempl/${SCRIPT_NAME}.sc
+ ( echo "/* Script for -Ur */"
+   source_sh ${CUSTOMIZER_SCRIPT}
+   source_sh ${srcdir}/scripttempl/${SCRIPT_NAME}.sc
  ) | sed -e '/^ *$/d;s/[	 ]*$//' > ldscripts/${EMULATION_NAME}.xu
 +unset PARTIAL_LINKING
  
  DATA_ALIGNMENT=${DATA_ALIGNMENT_}
  RELOCATING=" "
 diff --git a/ld/scripttempl/elf.sc b/ld/scripttempl/elf.sc
-index bd7584120e..8bbe052d4b 100644
+index 0b8b32a440..ee6b71075d 100644
 --- a/ld/scripttempl/elf.sc
 +++ b/ld/scripttempl/elf.sc
-@@ -139,8 +139,8 @@ if test -z "$DATA_SEGMENT_ALIGN"; then
+@@ -140,8 +140,8 @@ if test -z "$DATA_SEGMENT_ALIGN"; then
      DATA_SEGMENT_RELRO_END=". = DATA_SEGMENT_RELRO_END (${SEPARATE_GOTPLT-0}, .);"
    fi
  fi
@@ -57,6 +57,3 @@ index bd7584120e..8bbe052d4b 100644
  fi
  if test -z "$PLT"; then
    IPLT=".iplt         ${RELOCATING-0} : { *(.iplt) }"
--- 
-2.20.1
-

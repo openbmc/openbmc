@@ -1,4 +1,4 @@
-From b003857d3481105c473e2e75bad4e9e2c6e70004 Mon Sep 17 00:00:00 2001
+From e528861023bf69df0ad061a59fd4e527c9dde1ce Mon Sep 17 00:00:00 2001
 From: Otavio Salvador <otavio@ossystems.com.br>
 Date: Thu, 12 May 2011 15:36:03 +0000
 Subject: [PATCH] cmake: support OpenEmbedded Qt4 tool binary names
@@ -25,7 +25,7 @@ Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
  1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/Modules/FindQt4.cmake b/Modules/FindQt4.cmake
-index a145b46..7e18243 100644
+index 3993968..b2a8585 100644
 --- a/Modules/FindQt4.cmake
 +++ b/Modules/FindQt4.cmake
 @@ -518,7 +518,7 @@ endfunction()

@@ -10,7 +10,7 @@ S = "${WORKDIR}/git"
 inherit native
 inherit mrw-rev
 
-DEPENDS += "python-native python-lxml-native"
+DEPENDS += "python3-native python3-lxml-native"
 
 SRC_URI += "${MRW_TOOLS_SRC_URI}"
 SRCREV = "${MRW_TOOLS_SRCREV}"

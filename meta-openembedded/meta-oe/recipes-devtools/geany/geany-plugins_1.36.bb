@@ -31,6 +31,7 @@ REQUIRED_DISTRO_FEATURES = "x11"
 SRC_URI = " \
     https://plugins.geany.org/${BPN}/${BP}.tar.bz2 \
     file://0001-Use-pkg-config-to-find-gpgme.patch \
+    file://0002-Make-libgit2-version-preprocessor-conditionals-compatible.patch \
 "
 SRC_URI[md5sum] = "91fb4634953702f914d9105da7048a33"
 SRC_URI[sha256sum] = "ebe18dd699292174622e8cb8745b020ada8a5be3b604ab980af36e8518df7ce6"

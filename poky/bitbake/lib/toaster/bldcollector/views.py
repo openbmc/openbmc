@@ -6,16 +6,8 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-from django.views.decorators.cache import cache_control
-from django.core.urlresolvers import reverse
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.urls import reverse
 from django.http import HttpResponseBadRequest, HttpResponse
-from django.utils import timezone
-from django.utils.html import escape
-from datetime import timedelta
-from django.utils import formats
-from toastergui.templatetags.projecttags import json as jsonfilter
-import json
 import os
 import tempfile
 import subprocess

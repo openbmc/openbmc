@@ -4,9 +4,8 @@
 
 from __future__ import unicode_literals
 from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils.encoding import force_text
-from orm.models import Project, ProjectLayer, ProjectVariable, ProjectTarget, Build, Layer_Version
+from orm.models import Project, Build, Layer_Version
 
 import logging
 logger = logging.getLogger("toaster")
@@ -86,9 +85,9 @@ class BuildRequest(models.Model):
 
     search_allowed_fields = ("brtarget__target", "build__project__name")
 
-    project     = models.ForeignKey(Project)
-    build       = models.OneToOneField(Build, null = True)     # TODO: toasterui should set this when Build is created
-    environment = models.ForeignKey(BuildEnvironment, null = True)
+    project     = models.ForeignKey(Project, on_delete=models.CASCADE)
+    build       = models.OneToOneField(Build, on_delete=models.CASCADE, null = True)     # TODO: toasterui should set this when Build is created
+    environment = models.ForeignKey(BuildEnvironment, on_delete=models.CASCADE, null = True)
     state       = models.IntegerField(choices = REQUEST_STATE, default = REQ_CREATED)
     created     = models.DateTimeField(auto_now_add = True)
     updated     = models.DateTimeField(auto_now = True)
@@ -132,32 +131,32 @@ class BuildRequest(models.Model):
 
 
 class BRLayer(models.Model):
-    req = models.ForeignKey(BuildRequest)
+    req = models.ForeignKey(BuildRequest, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     giturl = models.CharField(max_length=254, null=True)
     local_source_dir = models.CharField(max_length=254, null=True)
     commit = models.CharField(max_length=254, null=True)
     dirpath = models.CharField(max_length=254, null=True)
-    layer_version = models.ForeignKey(Layer_Version, null=True)
+    layer_version = models.ForeignKey(Layer_Version, on_delete=models.CASCADE, null=True)
 
 class BRBitbake(models.Model):
-    req         = models.OneToOneField(BuildRequest)    # only one bitbake for a request
+    req         = models.OneToOneField(BuildRequest, on_delete=models.CASCADE)    # only one bitbake for a request
     giturl      = models.CharField(max_length =254)
     commit      = models.CharField(max_length = 254)
     dirpath     = models.CharField(max_length = 254)
 
 class BRVariable(models.Model):
-    req         = models.ForeignKey(BuildRequest)
+    req         = models.ForeignKey(BuildRequest, on_delete=models.CASCADE)
     name        = models.CharField(max_length=100)
     value       = models.TextField(blank = True)
 
 class BRTarget(models.Model):
-    req         = models.ForeignKey(BuildRequest)
+    req         = models.ForeignKey(BuildRequest, on_delete=models.CASCADE)
     target      = models.CharField(max_length=100)
     task        = models.CharField(max_length=100, null=True)
 
 class BRError(models.Model):
-    req         = models.ForeignKey(BuildRequest)
+    req         = models.ForeignKey(BuildRequest, on_delete=models.CASCADE)
     errtype     = models.CharField(max_length=100)
     errmsg      = models.TextField()
     traceback   = models.TextField()

@@ -2,12 +2,10 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.core.exceptions import ObjectDoesNotExist
 from orm.models import Build
 from django.db import OperationalError
-import os
-
 
 
 class Command(BaseCommand):

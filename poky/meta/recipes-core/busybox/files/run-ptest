@@ -6,4 +6,4 @@ export PATH=$bindir/bin:$PATH
 export SKIP_KNOWN_BUGS=1
 
 cd testsuite || exit 1
-./runtest -v | sed -r 's/^(SKIPPED|UNTESTED):/SKIP:/'
+LANG=C.UTF-8 ./runtest -v | sed -r 's/^(SKIPPED|UNTESTED):/SKIP:/'

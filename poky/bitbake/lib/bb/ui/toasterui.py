@@ -176,7 +176,7 @@ def main(server, eventHandler, params):
         if error:
             logger.error("Command '%s' failed: %s" % (cmdline, error))
             return 1
-        elif ret != True:
+        elif not ret:
             logger.error("Command '%s' failed: returned %s" % (cmdline, ret))
             return 1
 

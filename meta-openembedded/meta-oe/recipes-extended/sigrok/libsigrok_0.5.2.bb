@@ -15,7 +15,7 @@ PACKAGECONFIG[hidapi] = "--with-libhidapi,--without-libhidapi,hidapi"
 
 PACKAGECONFIG ??= "serialport ftdi usb"
 
-inherit autotools pkgconfig
+inherit autotools pkgconfig mime
 
 SRC_URI = "http://sigrok.org/download/source/libsigrok/libsigrok-${PV}.tar.gz"
 

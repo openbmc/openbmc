@@ -11,6 +11,8 @@ SRC_URI = "https://github.com/tmux/tmux/releases/download/${PV}/tmux-${PV}.tar.g
 SRC_URI[md5sum] = "d541ff392249f94c4f3635793556f827"
 SRC_URI[sha256sum] = "b17cd170a94d7b58c0698752e1f4f263ab6dc47425230df7e53a6435cc7cd7e8"
 
+UPSTREAM_CHECK_URI = "https://github.com/tmux/tmux/releases"
+
 inherit autotools pkgconfig
 
 PACKAGECONFIG ??= ""

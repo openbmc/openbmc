@@ -2,9 +2,10 @@
 Description=Read %I EEPROM
 Wants=mapper-wait@-xyz-openbmc_project-inventory.service
 After=mapper-wait@-xyz-openbmc_project-inventory.service
+StartLimitBurst=10
 
 [Service]
-Restart=no
+Restart=on-failure
 Type=oneshot
 EnvironmentFile={envfiledir}/obmc/eeproms/%I
 ExecStartPre={bindir}/of-name-to-eeprom.sh {envfiledir}/obmc/eeproms/%I

@@ -446,6 +446,46 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
         self.assertCountEqual(files1, files2)
 
 
+    def test_sstate_multilib_or_not_native_samesigs(self):
+        """The sstate checksums of two native recipes (and their dependencies)
+        where the target is using multilib in one but not the other
+        should be the same. We use the qemux86copy machine to test
+        this.
+        """
+
+        self.write_config("""
+TMPDIR = \"${TOPDIR}/tmp-sstatesamehash\"
+TCLIBCAPPEND = \"\"
+MACHINE = \"qemux86\"
+require conf/multilib.conf
+MULTILIBS = "multilib:lib32"
+DEFAULTTUNE_virtclass-multilib-lib32 = "x86"
+BB_SIGNATURE_HANDLER = "OEBasicHash"
+""")
+        self.track_for_cleanup(self.topdir + "/tmp-sstatesamehash")
+        bitbake("binutils-native  -S none")
+        self.write_config("""
+TMPDIR = \"${TOPDIR}/tmp-sstatesamehash2\"
+TCLIBCAPPEND = \"\"
+MACHINE = \"qemux86copy\"
+BB_SIGNATURE_HANDLER = "OEBasicHash"
+""")
+        self.track_for_cleanup(self.topdir + "/tmp-sstatesamehash2")
+        bitbake("binutils-native -S none")
+
+        def get_files(d):
+            f = []
+            for root, dirs, files in os.walk(d):
+                for name in files:
+                    f.append(os.path.join(root, name))
+            return f
+        files1 = get_files(self.topdir + "/tmp-sstatesamehash/stamps")
+        files2 = get_files(self.topdir + "/tmp-sstatesamehash2/stamps")
+        files2 = [x.replace("tmp-sstatesamehash2", "tmp-sstatesamehash") for x in files2]
+        self.maxDiff = None
+        self.assertCountEqual(files1, files2)
+
+
     def test_sstate_noop_samesigs(self):
         """
         The sstate checksums of two builds with these variables changed or

@@ -19,7 +19,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/pcmanfm/libfm-${PV}.tar.xz \
 SRC_URI[md5sum] = "c15ecd2c9317e2c385cd3f046d0b61ba"
 SRC_URI[sha256sum] = "96b1244bde41ca0eef0332cfb5c67bb16725dfd102128f3e6f74fadc13a1cfe4"
 
-inherit autotools pkgconfig gtk-doc gettext features_check
+inherit autotools pkgconfig gtk-doc gettext features_check mime mime-xdg
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
 EXTRA_OECONF = "--with-gtk=3"

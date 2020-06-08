@@ -15,6 +15,27 @@ S = "${WORKDIR}/${SRCNAME}-${PV}"
 
 RDEPENDS_${PN} = "\
     ${PYTHON_PN}-core \
+    ${PYTHON_PN}-fcntl \
+    ${PYTHON_PN}-terminal \
+    ${PYTHON_PN}-resource \
 "
 
 BBCLASSEXTEND = "native nativesdk"
+
+inherit ptest
+
+SRC_URI += " \
+	file://run-ptest \
+"
+
+RDEPENDS_${PN}-ptest += " \
+	${PYTHON_PN}-pytest \
+	${PYTHON_PN}-fcntl \
+	${PYTHON_PN}-terminal \
+	${PYTHON_PN}-resource \
+"
+
+do_install_ptest() {
+	install -d ${D}${PTEST_PATH}/tests
+	cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
+}

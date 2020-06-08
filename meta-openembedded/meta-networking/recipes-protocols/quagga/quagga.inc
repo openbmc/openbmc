@@ -40,7 +40,7 @@ PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}"
 PACKAGECONFIG[cap] = "--enable-capabilities,--disable-capabilities,libcap"
 PACKAGECONFIG[pam] = "--with-libpam, --without-libpam, libpam"
 
-inherit autotools update-rc.d useradd systemd pkgconfig
+inherit autotools update-rc.d useradd systemd pkgconfig multilib_header
 
 SYSTEMD_PACKAGES = "${PN} ${PN}-bgpd ${PN}-isisd ${PN}-ospf6d ${PN}-ospfd ${PN}-ripd ${PN}-ripngd"
 SYSTEMD_SERVICE_${PN}-bgpd = "bgpd.service"
@@ -106,6 +106,9 @@ do_install () {
     sed -i 's!/etc/!${sysconfdir}/!g' ${D}${sysconfdir}/init.d/* ${D}${sysconfdir}/default/watchquagga
     sed -i 's!/var/!${localstatedir}/!g' ${D}${sysconfdir}/init.d/* ${D}${sysconfdir}/default/volatiles/volatiles.03_quagga
     sed -i 's!^PATH=.*!PATH=${base_sbindir}:${sbindir}:${base_bindir}:${bindir}!' ${D}${sysconfdir}/init.d/*
+    sed -i 's!--with-libtool-sysroot=[^ "]*!!' ${D}${includedir}/quagga/version.h
+
+    oe_multilib_header quagga/version.h
 
     # For PAM
     for feature in ${DISTRO_FEATURES}; do
@@ -116,9 +119,9 @@ do_install () {
     done
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-        install -d ${D}${sysconfdir}/tmpfiles.d
-        echo "d /var/run/quagga 0755 quagga quagga -" \
-        > ${D}${sysconfdir}/tmpfiles.d/${BPN}.conf
+        install -d ${D}${nonarch_libdir}/tmpfiles.d
+        echo "d /run/quagga 0755 quagga quagga -" \
+        > ${D}${nonarch_libdir}/tmpfiles.d/${BPN}.conf
     fi
 
     # Remove sysinit script if sysvinit is not in DISTRO_FEATURES
@@ -165,6 +168,8 @@ FILES_${PN}-isisd       = "${sbindir}/isisd"
 FILES_${PN}-ospfclient  = "${sbindir}/ospfclient ${libdir}/libospfapiclient.so.*"
 FILES_${PN}-watchquagga = "${sbindir}/watchquagga ${sysconfdir}/default/watchquagga \
                            ${sysconfdir}/init.d/watchquagga"
+
+FILES_${PN} += "${nonarch_libdir}/tmpfiles.d/*.conf"
 
 # Indicate that the default files are configuration files
 CONFFILES_${PN} = "${sysconfdir}/default/quagga \

@@ -13,7 +13,6 @@ PROVIDES = "virtual/xserver-xf86"
 PROVIDES += "virtual/xserver"
 
 PE = "2"
-INC_PR = "r8"
 
 XORG_PN = "xorg-server"
 SRC_URI = "${XORG_MIRROR}/individual/xserver/${XORG_PN}-${PV}.tar.bz2"
@@ -117,6 +116,7 @@ EXTRA_OECONF += "--with-fop=no \
                  --sysconfdir=/etc/X11 \
                  --localstatedir=/var \
                  --with-xkb-output=/var/lib/xkb \
+                 --with-os-name=Linux \
 "
 
 OPENGL_PKGCONFIGS = "dri glx glamor dri3 xshmfence"
@@ -151,6 +151,7 @@ PACKAGECONFIG[gcrypt] = "--with-sha1=libgcrypt,,libgcrypt"
 do_install_append () {
 	# Its assumed base-files creates this for us
 	rmdir ${D}${localstatedir}/log/
+        sed -i -e 's,${libdir}/xorg/modules,${prefix}/lib*/xorg/modules,' ${D}${mandir}/man5/xorg.conf.5
 }
 
 # Add runtime provides for the ABI versions of the video and input subsystems,

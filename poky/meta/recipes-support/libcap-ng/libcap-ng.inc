@@ -9,6 +9,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \
 
 SRC_URI = "http://people.redhat.com/sgrubb/libcap-ng/libcap-ng-${PV}.tar.gz \
            file://python.patch \
+           file://0001-configure.ac-add-library-if-header-found.patch \
+           file://0002-Wrap-pthread_atfork-usage-in-HAVE_PTHREAD_H.patch \
 "
 
 SRC_URI[md5sum] = "57dc267e2949cdecb651a929f9206572"

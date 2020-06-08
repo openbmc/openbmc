@@ -1,0 +1,61 @@
+Detect warning options during configure
+
+Certain options maybe compiler specific therefore its better
+to detect them before use.
+
+nfs_error copies the format string and appends newline to it
+but compiler can forget that it was format string since its not
+same fmt string that was passed. Ignore the warning
+
+Wdiscarded-qualifiers is gcc specific and this is no longer needed
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -599,7 +599,6 @@ my_am_cflags="\
+  -Werror=parentheses \
+  -Werror=aggregate-return \
+  -Werror=unused-result \
+- -Wno-cast-function-type \
+  -fno-strict-aliasing \
+ "
+ 
+@@ -619,9 +618,10 @@ CHECK_CCSUPPORT([-Werror=format-overflow
+ CHECK_CCSUPPORT([-Werror=int-conversion], [flg2])
+ CHECK_CCSUPPORT([-Werror=incompatible-pointer-types], [flg3])
+ CHECK_CCSUPPORT([-Werror=misleading-indentation], [flg4])
++CHECK_CCSUPPORT([-Wno-cast-function-type], [flg5])
+ AX_GCC_FUNC_ATTRIBUTE([format])
+ 
+-AC_SUBST([AM_CFLAGS], ["$my_am_cflags $flg1 $flg2 $flg3 $flg4"])
++AC_SUBST([AM_CFLAGS], ["$my_am_cflags $flg1 $flg2 $flg3 $flg4 $flg5"])
+ 
+ # Make sure that $ACLOCAL_FLAGS are used during a rebuild
+ AC_SUBST([ACLOCAL_AMFLAGS], ["-I $ac_macro_dir \$(ACLOCAL_FLAGS)"])
+--- a/support/nfs/xcommon.c
++++ b/support/nfs/xcommon.c
+@@ -98,7 +98,10 @@ nfs_error (const char *fmt, ...) {
+ 
+      fmt2 = xstrconcat2 (fmt, "\n");
+      va_start (args, fmt);
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+      vfprintf (stderr, fmt2, args);
++#pragma GCC diagnostic pop
+      va_end (args);
+      free (fmt2);
+ }
+--- a/utils/mount/stropts.c
++++ b/utils/mount/stropts.c
+@@ -1094,9 +1094,7 @@ static int nfsmount_fg(struct nfsmount_i
+ 		if (nfs_try_mount(mi))
+ 			return EX_SUCCESS;
+ 
+-#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+ 		if (errno == EBUSY && is_mountpoint(mi->node)) {
+-#pragma GCC diagnostic warning "-Wdiscarded-qualifiers"
+ 			/*
+ 			 * EBUSY can happen when mounting a filesystem that
+ 			 * is already mounted or when the context= are

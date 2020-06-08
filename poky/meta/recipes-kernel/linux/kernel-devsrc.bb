@@ -78,7 +78,7 @@ do_install() {
 	    cp Module.markers $kerneldir/build
 	fi
 
-	cp .config $kerneldir/build
+	cp -a .config $kerneldir/build
 
 	# This scripts copy blow up QA, so for now, we require a more
 	# complex 'make scripts' to restore these, versus copying them
@@ -128,11 +128,12 @@ do_install() {
 
 	    # extra files, just in case
 	    cp -a --parents tools/objtool/* $kerneldir/build/
-	    cp -a --parents tools/lib/str_error_r.c $kerneldir/build/
-	    cp -a --parents tools/lib/string.c $kerneldir/build/
+	    cp -a --parents tools/lib/* $kerneldir/build/
 	    cp -a --parents tools/lib/subcmd/* $kerneldir/build/
 
 	    cp -a --parents tools/include/* $kerneldir/build/
+
+	    cp -a --parents $(find tools/arch/${ARCH}/ -type f) $kerneldir/build/
 	fi
 
 	if [ "${ARCH}" = "arm64" ]; then
@@ -146,7 +147,7 @@ do_install() {
             cp -a --parents arch/arm64/kernel/vdso/note.S $kerneldir/build/
             cp -a --parents arch/arm64/kernel/vdso/gen_vdso_offsets.sh $kerneldir/build/
 
-            cp -a --parents arch/arm64/kernel/module.lds $kerneldir/build/
+            cp -a --parents arch/arm64/kernel/module.lds $kerneldir/build/ 2>/dev/null || :
 	fi
 
 	if [ "${ARCH}" = "powerpc" ]; then
@@ -185,19 +186,21 @@ do_install() {
 	cp -a --parents tools/include/tools/be_byteshift.h $kerneldir/build/
 
 	# required for generate missing syscalls prepare phase
-	cp -a --parents arch/x86/entry/syscalls/syscall_32.tbl $kerneldir/build
+	cp -a --parents $(find arch/x86 -type f -name "syscall_32.tbl") $kerneldir/build
+	cp -a --parents $(find arch/arm -type f -name "*.tbl") $kerneldir/build 2>/dev/null || :
 
 	if [ "${ARCH}" = "x86" ]; then
 	    # files for 'make prepare' to succeed with kernel-devel
-	    cp -a --parents arch/x86/entry/syscalls/syscall_32.tbl $kerneldir/build/
-	    cp -a --parents arch/x86/entry/syscalls/syscalltbl.sh $kerneldir/build/
-	    cp -a --parents arch/x86/entry/syscalls/syscallhdr.sh $kerneldir/build/
-	    cp -a --parents arch/x86/entry/syscalls/syscall_64.tbl $kerneldir/build/
+	    cp -a --parents $(find arch/x86 -type f -name "syscall_32.tbl") $kerneldir/build/
+	    cp -a --parents $(find arch/x86 -type f -name "syscalltbl.sh") $kerneldir/build/
+	    cp -a --parents $(find arch/x86 -type f -name "syscallhdr.sh") $kerneldir/build/
+	    cp -a --parents $(find arch/x86 -type f -name "syscall_64.tbl") $kerneldir/build/
 	    cp -a --parents arch/x86/tools/relocs_32.c $kerneldir/build/
 	    cp -a --parents arch/x86/tools/relocs_64.c $kerneldir/build/
 	    cp -a --parents arch/x86/tools/relocs.c $kerneldir/build/
 	    cp -a --parents arch/x86/tools/relocs_common.c $kerneldir/build/
 	    cp -a --parents arch/x86/tools/relocs.h $kerneldir/build/
+	    cp -a --parents arch/x86/tools/gen-insn-attr-x86.awk $kerneldir/build/ 2>/dev/null || :
 	    cp -a --parents arch/x86/purgatory/purgatory.c $kerneldir/build/
 
 	    # 4.18 + have unified the purgatory files, so we ignore any errors if
@@ -213,6 +216,10 @@ do_install() {
 	    cp -a --parents arch/x86/boot/string.c $kerneldir/build/
 	    cp -a --parents arch/x86/boot/compressed/string.c $kerneldir/build/ 2>/dev/null || :
 	    cp -a --parents arch/x86/boot/ctype.h $kerneldir/build/
+
+	    # objtool requires these files
+	    cp -a --parents arch/x86/lib/inat.c $kerneldir/build/ 2>/dev/null || :
+	    cp -a --parents arch/x86/lib/insn.c $kerneldir/build/ 2>/dev/null || :
 	fi
 
 	if [ "${ARCH}" = "mips" ]; then

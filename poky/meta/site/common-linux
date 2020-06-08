@@ -47,8 +47,13 @@ hw_cv_func_snprintf_c99=${hw_cv_func_snprintf_c99=yes}
 hw_cv_func_vsnprintf_c99=${hw_cv_func_vsnprintf_c99=yes}
 
 # coreutils
+ac_cv_func_chown_works=${ac_cv_func_chown_works=yes}
+ac_cv_func_utime_null=${ac_cv_func_utime_null=yes}
 gl_cv_func_fstatat_zero_flag=${gl_cv_func_fstatat_zero_flag=yes}
+gl_cv_func_link_follows_symlink=${gl_cv_func_link_follows_symlink=no}
+gl_cv_func_unlink_busy_text=${gl_cv_func_unlink_busy_text=yes}
 gl_cv_have_proc_uptime=${gl_cv_have_proc_uptime=yes}
+gl_cv_pipes_are_fifos=${gl_cv_pipes_are_fifos='yes (1)'}
 
 # mysql
 ac_cv_sys_restartable_syscalls=${ac_cv_sys_restartable_syscalls=yes}

@@ -1,7 +1,7 @@
-From 48c628f532f6025c2d1646b6819cd81eb789d7fb Mon Sep 17 00:00:00 2001
+From e6f871078d8d6f076c84f908fa57af15417ab87d Mon Sep 17 00:00:00 2001
 From: Andre McCurdy <armccurdy@gmail.com>
 Date: Tue, 10 Oct 2017 14:33:30 -0700
-Subject: [PATCH 15/24] don't pass AT_SYMLINK_NOFOLLOW flag to faccessat()
+Subject: [PATCH] don't pass AT_SYMLINK_NOFOLLOW flag to faccessat()
 
 Avoid using AT_SYMLINK_NOFOLLOW flag. It doesn't seem like the right
 thing to do and it's not portable (not supported by musl). See:
@@ -25,16 +25,17 @@ just historical and not actually necessary or desired behaviour?
 Upstream-Status: Inappropriate [musl specific]
 
 Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+
 ---
  src/basic/fs-util.h          | 22 +++++++++++++++++++++-
  src/shared/base-filesystem.c |  6 +++---
  2 files changed, 24 insertions(+), 4 deletions(-)
 
 diff --git a/src/basic/fs-util.h b/src/basic/fs-util.h
-index 7ad030b..d4cb1e9 100644
+index 78d68be9fd85..c5dc84d41868 100644
 --- a/src/basic/fs-util.h
 +++ b/src/basic/fs-util.h
-@@ -32,7 +32,27 @@ int fchmod_opath(int fd, mode_t m);
+@@ -40,7 +40,27 @@ int fchmod_opath(int fd, mode_t m);
  
  int fd_warn_permissions(const char *path, int fd);
  
@@ -64,10 +65,10 @@ index 7ad030b..d4cb1e9 100644
  int touch_file(const char *path, bool parents, usec_t stamp, uid_t uid, gid_t gid, mode_t mode);
  int touch(const char *path);
 diff --git a/src/shared/base-filesystem.c b/src/shared/base-filesystem.c
-index 89d7a7d..34b4ad5 100644
+index 657407da2d37..fbd5782d84fc 100644
 --- a/src/shared/base-filesystem.c
 +++ b/src/shared/base-filesystem.c
-@@ -53,7 +53,7 @@ int base_filesystem_create(const char *root, uid_t uid, gid_t gid) {
+@@ -54,7 +54,7 @@ int base_filesystem_create(const char *root, uid_t uid, gid_t gid) {
                  return log_error_errno(errno, "Failed to open root file system: %m");
  
          for (i = 0; i < ELEMENTSOF(table); i ++) {
@@ -76,7 +77,7 @@ index 89d7a7d..34b4ad5 100644
                          continue;
  
                  if (table[i].target) {
-@@ -61,7 +61,7 @@ int base_filesystem_create(const char *root, uid_t uid, gid_t gid) {
+@@ -62,7 +62,7 @@ int base_filesystem_create(const char *root, uid_t uid, gid_t gid) {
  
                          /* check if one of the targets exists */
                          NULSTR_FOREACH(s, table[i].target) {
@@ -85,7 +86,7 @@ index 89d7a7d..34b4ad5 100644
                                          continue;
  
                                  /* check if a specific file exists at the target path */
-@@ -72,7 +72,7 @@ int base_filesystem_create(const char *root, uid_t uid, gid_t gid) {
+@@ -73,7 +73,7 @@ int base_filesystem_create(const char *root, uid_t uid, gid_t gid) {
                                          if (!p)
                                                  return log_oom();
  
@@ -94,6 +95,3 @@ index 89d7a7d..34b4ad5 100644
                                                  continue;
                                  }
  
--- 
-2.7.4
-

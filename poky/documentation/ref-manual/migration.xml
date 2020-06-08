@@ -680,7 +680,7 @@
 
         <para>
             For more information on this requirement, see the
-            "<link linkend='required-git-tar-and-python-versions'>Required Git, tar, and Python Versions</link>"
+            "<link linkend='required-git-tar-python-and-gcc-versions'>Required Git, tar, Python and gcc Versions</link>"
             section.
         </para>
     </section>
@@ -875,8 +875,7 @@
                     not work.
                     This change is intended to catch those kinds of situations.
                     Valid <filename>IMAGE_FEATURES</filename> are drawn from
-                    <link linkend='var-PACKAGE_GROUP'><filename>PACKAGE_GROUP</filename></link>
-                    definitions,
+                    <filename>PACKAGE_GROUP</filename> definitions,
                     <link linkend='var-COMPLEMENTARY_GLOB'><filename>COMPLEMENTARY_GLOB</filename></link>
                     and a new "validitems" varflag on
                     <filename>IMAGE_FEATURES</filename>.
@@ -1404,8 +1403,7 @@
 
             <para>
                 The
-                <link linkend='var-PACKAGE_GROUP'><filename>PACKAGE_GROUP</filename></link>
-                variable has been renamed to
+                <filename>PACKAGE_GROUP</filename> variable has been renamed to
                 <link linkend='var-FEATURE_PACKAGES'><filename>FEATURE_PACKAGES</filename></link>
                 to more accurately reflect its purpose.
                 You can still use <filename>PACKAGE_GROUP</filename> but
@@ -1754,7 +1752,7 @@
             Git that meets this requirement, you can use the
             <filename>buildtools-tarball</filename> that does.
             See the
-            "<link linkend='required-git-tar-and-python-versions'>Required Git, tar, and Python Versions</link>"
+            "<link linkend='required-git-tar-python-and-gcc-versions'>Required Git, tar, Python and gcc Versions</link>"
             section for more information.
         </para>
     </section>
@@ -2110,7 +2108,7 @@
             such as the following:
             <literallayout class='monospaced'>
      inherit bluetooth
-     PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', '${BLUEZ}', '', d)}
+     PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', '${BLUEZ}', '', d)}"
      PACKAGECONFIG[bluez4] = "--enable-bluetooth,--disable-bluetooth,bluez4"
      PACKAGECONFIG[bluez5] = "--enable-bluez5,--disable-bluez5,bluez5"
             </literallayout>
@@ -3215,7 +3213,7 @@
                     recent version, you can install the buildtools, which
                     will provide it.
                     See the
-                    "<link linkend='required-git-tar-and-python-versions'>Required Git, tar, and Python Versions</link>"
+                    "<link linkend='required-git-tar-python-and-gcc-versions'>Required Git, tar, Python and gcc Versions</link>"
                     section for more information on the buildtools tarball.
                     </para></listitem>
                 <listitem><para>
@@ -3624,7 +3622,7 @@ $ runqemu qemux86-64 tmp/deploy/images/qemux86-64/core-image-minimal-qemux86-64.
             image types, this part of the kernel image base name as been
             removed leaving only the following:
             <literallayout class='monospaced'>
-     KERNEL_IMAGE_BASE_NAME ?= "${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}
+     KERNEL_IMAGE_BASE_NAME ?= "${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
             </literallayout>
             If you have recipes or classes that use
             <filename>KERNEL_IMAGE_BASE_NAME</filename> directly, you might
@@ -5601,7 +5599,7 @@ id=f4d4f99cfbc2396e49c1613a7d237b9e57f06f81'>commit message</ulink>.
                     creation time, use
                     <filename>pkg_postinst_ontarget()</filename>
                     or call
-                    <filename>postinst-intercepts defer_to_first_boot</filename>
+                    <filename>postinst_intercept delay_to_first_boot</filename>
                     from <filename>pkg_postinst()</filename>.
                     Any failure of a <filename>pkg_postinst()</filename>
                     script (including <filename>exit 1</filename>)
@@ -6192,7 +6190,7 @@ id=f4d4f99cfbc2396e49c1613a7d237b9e57f06f81'>commit message</ulink>.
             If you want to explicitly defer a postinstall to first boot on
             the target rather than at rootfs creation time, use
             <filename>pkg_postinst_ontarget()</filename> or call
-            <filename>postinst-intercepts defer_to_first_boot</filename> from
+            <filename>postinst_intercept delay_to_first_boot</filename> from
             <filename>pkg_postinst()</filename>.
             Any failure of a <filename>pkg_postinst()</filename> script
             (including exit 1) triggers an error during the
@@ -7094,6 +7092,207 @@ id=f4d4f99cfbc2396e49c1613a7d237b9e57f06f81'>commit message</ulink>.
         </para>
     </section>
 </section>
+
+
+<section id='moving-to-the-yocto-project-3.1-release'>
+    <title>Moving to the Yocto Project 3.1 Release</title>
+
+    <para>
+        This section provides migration information for moving to the
+        Yocto Project 3.1 Release from the prior release.
+    </para>
+
+    <section id='migration-3.1-minimum-system-requirements'>
+        <title>Minimum system requirements</title>
+
+        <para>
+            The following versions / requirements of build host components have been updated:
+            <itemizedlist>
+                <listitem><para>gcc 5.0</para></listitem>
+                <listitem><para>python 3.5</para></listitem>
+                <listitem><para>tar 1.28</para></listitem>
+                <listitem><para><filename>rpcgen</filename> is now required on the host (part of the <filename>libc-dev-bin</filename> package on Ubuntu, Debian and related distributions, and the <filename>glibc</filename> package on RPM-based distributions).</para></listitem>
+            </itemizedlist>
+            
+            Additionally, the <filename>makeinfo</filename> and <filename>pod2man</filename>
+            tools are <emphasis>no longer</emphasis> required on the host.
+        </para>
+    </section>
+
+    <section id='migration-3.1-mpc8315e-rdb-removed'>
+        <title>mpc8315e-rdb machine removed</title>
+
+        <para>
+            The MPC8315E-RDB machine is old/obsolete and unobtainable, thus given the maintenance burden
+            the <filename>mpc8315e-rdb</filename> machine configuration that supported it has been removed
+            in this release. The removal does leave a gap in official PowerPC reference hardware
+            support; this may change in future if a suitable machine with accompanying support resources
+            is found.
+        </para>
+    </section>
+    
+    <section id='migration-3.1-python-2-removed'>
+        <title>Python 2 removed</title>
+
+        <para>
+            Due to the expiration of upstream support in January 2020, support for Python 2 has now been removed; it is recommended that you use Python 3 instead. If absolutely needed there is a meta-python2 community layer containing Python 2, related classes and various Python 2-based modules, however it should not be considered as supported.
+        </para>
+    </section>
+
+    <section id='migration-3.1-reproducible-builds'>
+        <title>Reproducible builds now enabled by default</title>
+
+        <para>
+            In order to avoid unnecessary differences in output files (aiding binary reproducibility), the Poky distribution configuration (<filename><link linkend='var-DISTRO'>DISTRO</link> = "poky"</filename>) now inherits the <filename>reproducible_build</filename> class by default.
+        </para>
+    </section>
+    
+    <section id='migration-3.1-ptest-feature-impact'>
+        <title>Impact of ptest feature is now more significant</title>
+
+        <para>
+            The Poky distribution configuration (<filename><link linkend='var-DISTRO'>DISTRO</link> = "poky"</filename>) enables ptests by default to enable runtime testing of various components. In this release, a dependency needed to be added that has resulted in a significant increase in the number of components that will be built just when building a simple image such as core-image-minimal. If you do not need runtime tests enabled for core components, then it is recommended that you remove "ptest" from <link linkend='var-DISTRO_FEATURES'><filename>DISTRO_FEATURES</filename></link> to save a significant amount of build time e.g. by adding the following in your configuration:
+
+            <literallayout class='monospaced'>
+      DISTRO_FEATURES_remove = "ptest"
+            </literallayout>
+        </para>
+    </section>
+
+    <section id='migration-3.1-removed-recipes'>
+        <title>Removed recipes</title>
+
+        <para>
+            The following recipes have been removed:
+
+            <itemizedlist>
+                <listitem><para><filename>chkconfig</filename>: obsolete</para></listitem>
+                <listitem><para><filename>console-tools</filename>: obsolete</para></listitem>
+                <listitem><para><filename>enchant</filename>: replaced by <filename>enchant2</filename></para></listitem>
+                <listitem><para><filename>foomatic-filters</filename>: obsolete</para></listitem>
+                <listitem><para><filename>libidn</filename>: no longer needed, moved to meta-oe</para></listitem>
+                <listitem><para><filename>libmodulemd</filename>: replaced by <filename>libmodulemd-v1</filename></para></listitem>
+                <listitem><para><filename>linux-yocto</filename>: drop 4.19, 5.2 version recipes (5.4 now provided)</para></listitem>
+                <listitem><para><filename>nspr</filename>: no longer needed, moved to meta-oe</para></listitem>
+                <listitem><para><filename>nss</filename>: no longer needed, moved to meta-oe</para></listitem>
+                <listitem><para><filename>python</filename>: Python 2 removed (Python 3 preferred)</para></listitem>
+                <listitem><para><filename>python-setuptools</filename>: Python 2 version removed (python3-setuptools preferred)</para></listitem>
+                <listitem><para><filename>sysprof</filename>: no longer needed, moved to meta-oe</para></listitem>
+                <listitem><para><filename>texi2html</filename>: obsolete</para></listitem>
+                <listitem><para><filename>u-boot-fw-utils</filename>: functionally replaced by <filename>libubootenv</filename></para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='migration-3.1-features-check'>
+        <title>features_check class replaces distro_features_check</title>
+
+        <para>
+            The <filename>distro_features_check</filename> class has had its functionality expanded, now supporting <filename>ANY_OF_MACHINE_FEATURES</filename>, <filename>REQUIRED_MACHINE_FEATURES</filename>, <filename>CONFLICT_MACHINE_FEATURES</filename>, <filename>ANY_OF_COMBINED_FEATURES</filename>, <filename>REQUIRED_COMBINED_FEATURES</filename>, <filename>CONFLICT_COMBINED_FEATURES</filename>. As a result the class has now been renamed to <filename>features_check</filename>; the <filename>distro_features_check</filename> class still exists but generates a warning and redirects to the new class. In preparation for a future removal of the old class it is recommended that you update recipes currently inheriting <filename>distro_features_check</filename> to inherit <filename>features_check</filename> instead.
+        </para>
+    </section>
+
+    <section id='migration-3.1-removed-classes'>
+        <title>Removed classes</title>
+
+        <para>
+            The following classes have been removed:
+
+            <itemizedlist>
+                <listitem><para><filename>distutils-base</filename>: moved to meta-python2</para></listitem>
+                <listitem><para><filename>distutils</filename>: moved to meta-python2</para></listitem>
+                <listitem><para><filename>libc-common</filename>: merged into the glibc recipe as nothing else used it.</para></listitem>
+                <listitem><para><filename>python-dir</filename>: moved to meta-python2</para></listitem>
+                <listitem><para><filename>pythonnative</filename>: moved to meta-python2</para></listitem>
+                <listitem><para><filename>setuptools</filename>: moved to meta-python2</para></listitem>
+                <listitem><para><filename>tinderclient</filename>: dropped as it was obsolete.</para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='migration-3.1-src-uri-checksums'>
+        <title>SRC_URI checksum behaviour</title>
+
+        <para>
+            Previously, recipes by tradition included both SHA256 and MD5 checksums for remotely fetched files in <link linkend='var-SRC_URI'><filename>SRC_URI</filename></link>, even though only one is actually mandated. However, the MD5 checksum does not add much given its inherent weakness; thus when a checksum fails only the SHA256 sum will now be printed. The md5sum will still be verified if it is specified.
+        </para>
+    </section>
+
+
+    <section id='migration-3.1-npm'>
+        <title>npm fetcher changes</title>
+
+        <para>
+            The npm fetcher has been completely reworked in this release. The npm fetcher now only fetches the package source itself and no longer the dependencies; there is now also an npmsw fetcher which explicitly fetches the shrinkwrap file and the dependencies. This removes the slightly awkward <filename>NPM_LOCKDOWN</filename> and <filename>NPM_SHRINKWRAP</filename> variables which pointed to local files; the lockdown file is no longer needed at all. Additionally, the package name in <filename>npm://</filename> entries in <link linkend='var-SRC_URI'><filename>SRC_URI</filename></link> is now specified using a <filename>package</filename> parameter instead of the earlier <filename>name</filename> which overlapped with the generic <filename>name</filename> parameter. All recipes using the npm fetcher will need to be changed as a result. 
+        </para>
+        <para>
+            An example of the new scheme:
+            <literallayout class='monospaced'>
+SRC_URI = "npm://registry.npmjs.org;package=array-flatten;version=1.1.1 \
+           npmsw://${THISDIR}/npm-shrinkwrap.json"
+            </literallayout>
+            Another example where the sources are fetched from git rather than an npm repository:
+            <literallayout class='monospaced'>
+SRC_URI = "git://github.com/foo/bar.git;protocol=https \
+           npmsw://${THISDIR}/npm-shrinkwrap.json"
+            </literallayout>
+        </para>
+        <para>
+            devtool and recipetool have also been updated to match with the npm fetcher changes. Other than producing working and more complete recipes for npm sources, there is also a minor change to the command line for devtool: the <filename>--fetch-dev</filename> option has been renamed to <filename>--npm-dev</filename> as it is npm-specific.
+        </para>
+    </section>
+    
+    
+    <section id='migration-3.1-packaging-changes'>
+        <title>Packaging changes</title>
+
+        <para>
+            <itemizedlist>
+                <listitem><para><filename>intltool</filename> has been removed from <filename>packagegroup-core-sdk</filename> as it is rarely needed to build modern software - gettext can do most of the things it used to be needed for. <filename>intltool</filename> has also been removed from <filename>packagegroup-core-self-hosted</filename> as it is not needed to for standard builds.</para></listitem>
+                <listitem><para>git: <filename>git-am</filename>, <filename>git-difftool</filename>, <filename>git-submodule</filename>, and <filename>git-request-pull</filename> are no longer perl-based, so are now installed with the main <filename>git</filename> package instead of within <filename>git-perltools</filename>.</para></listitem>
+                <listitem><para>The <filename>ldconfig</filename> binary built as part of glibc has now been moved to its own <filename>ldconfig</filename> package (note no <filename>glibc-</filename> prefix). This package is in the <link linkend='var-RRECOMMENDS'><filename>RRECOMMENDS</filename></link> of the main <filename>glibc</filename> package if <filename>ldconfig</filename> is present in <link linkend='var-DISTRO_FEATURES'><filename>DISTRO_FEATURES</filename></link>.</para></listitem>
+                <listitem><para><filename>libevent</filename> now splits each shared library into its own package (as Debian does). Since these are shared libraries and will be pulled in through the normal shared library dependency handling, there should be no impact to existing configurations other than less unnecessary libraries being installed in some cases.</para></listitem>
+                <listitem><para>linux-firmware now has a new package for <filename>bcm4366c</filename> and includes available NVRAM config files into the <filename>bcm43340</filename>, <filename>bcm43362</filename>, <filename>bcm43430</filename> and <filename>bcm4356-pcie</filename> packages.</para></listitem>
+                <listitem><para><filename>harfbuzz</filename> now splits the new <filename>libharfbuzz-subset.so</filename> library into its own package to reduce the main package size in cases where <filename>libharfbuzz-subset.so</filename> is not needed.</para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+    
+    <section id='migration-3.1-package-qa-warnings'>
+        <title>Additional warnings</title>
+
+        <para>
+            Warnings will now be shown at <filename>do_package_qa</filename> time in the following circumstances:
+            
+            <itemizedlist>
+                <listitem><para>A recipe installs <filename>.desktop</filename> files containing <filename>MimeType</filename> keys but does not inherit the new <filename>mime-xdg</filename> class</para></listitem>
+                <listitem><para>A recipe installs <filename>.xml</filename> files into <filename>${datadir}/mime/packages</filename> but does not inherit the <filename>mime</filename> class</para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+        
+    <section id='migration-3.1-x86-live-wic'>
+        <title><filename>wic</filename> image type now used instead of <filename>live</filename> by default for x86</title>
+
+        <para>
+            <filename>conf/machine/include/x86-base.inc</filename> (inherited by most x86 machine configurations) now specifies <filename>wic</filename> instead of <filename>live</filename> by default in <link linkend='var-IMAGE_FSTYPES'><filename>IMAGE_FSTYPES</filename></link>. The <filename>live</filename> image type will likely be removed in a future release so it is recommended that you use <filename>wic</filename> instead.
+        </para>
+    </section>
+                
+    <section id='migration-3.1-misc'>
+        <title>Miscellaneous changes</title>
+
+        <para>
+            <itemizedlist>
+                <listitem><para>The undocumented <filename>SRC_DISTRIBUTE_LICENSES</filename> variable has now been removed in favour of a new <filename>AVAILABLE_LICENSES</filename> variable which is dynamically set based upon license files found in <filename>${COMMON_LICENSE_DIR}</filename> and <filename>${LICENSE_PATH}</filename>.</para></listitem>
+                <listitem><para>The tune definition for big-endian microblaze machines is now <filename>microblaze</filename> instead of <filename>microblazeeb</filename>.</para></listitem>
+                <listitem><para><filename>newlib</filename> no longer has built-in syscalls. <filename>libgloss</filename> should then provide the syscalls, <filename>crt0.o</filename> and other functions that are no longer part of <filename>newlib</filename> itself. If you are using <filename>TCLIBC = "newlib"</filename> this now means that you must link applications with both <filename>newlib</filename> and <filename>libgloss</filename>, whereas before <filename>newlib</filename> would run in many configurations by itself.</para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+</section>
+
 
 </chapter>
 <!--

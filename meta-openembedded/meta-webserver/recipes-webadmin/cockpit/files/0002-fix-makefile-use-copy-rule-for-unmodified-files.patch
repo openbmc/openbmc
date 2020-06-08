@@ -1,0 +1,47 @@
+From 1edf0756bf4fd002f5b60cf2b86d4b97a00aff20 Mon Sep 17 00:00:00 2001
+From: Michael Haener <michael.haener@siemens.com>
+Date: Wed, 25 Mar 2020 08:32:07 +0100
+Subject: [PATCH] fix(makefile): use copy rule for unmodified files
+
+---
+ pkg/Makefile.am | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+
+diff --git a/pkg/Makefile.am b/pkg/Makefile.am
+index 192b785..03b9787 100644
+--- a/pkg/Makefile.am
++++ b/pkg/Makefile.am
+@@ -13,6 +13,33 @@ playground_DATA = \
+ dist/playground/extra.de.po: pkg/playground/extra.de.po
+ 	$(COPY_RULE)
+ 
++dist/playground/hammer.gif: pkg/playground/hammer.gif
++	$(COPY_RULE)
++
++dist/sosreport/sosreport.png: pkg/sosreport/sosreport.png
++	$(COPY_RULE)
++
++dist/apps/default.png: pkg/apps/default.png
++	$(COPY_RULE)
++
++dist/storaged/images/storage-array.png: pkg/storaged/images/storage-array.png
++	$(COPY_RULE)
++
++dist/storaged/images/storage-disk.png: pkg/storaged/images/storage-disk.png
++	$(COPY_RULE)
++
++dist/shell/images/server-error.png: pkg/shell/images/server-error.png
++	$(COPY_RULE)
++
++dist/shell/images/server-large.png: pkg/shell/images/server-large.png
++	$(COPY_RULE)
++
++dist/shell/images/server-small.png: pkg/shell/images/server-small.png
++	$(COPY_RULE)
++
++dist/shell/index.html: pkg/shell/index.html
++	$(COPY_RULE)
++
+ metainfodir = ${datarootdir}/metainfo
+ metainfo_DATA = pkg/sosreport/org.cockpit-project.cockpit-sosreport.metainfo.xml \
+ 		pkg/kdump/org.cockpit-project.cockpit-kdump.metainfo.xml \

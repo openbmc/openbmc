@@ -10,11 +10,12 @@ DEPENDS = "libjpeg-turbo mraa"
 SRCREV = "5cf20df96c6b35c19d5b871ba4e319e96b4df72d"
 PV = "2.0.0+git${SRCPV}"
 
-SRC_URI = "git://github.com/intel-iot-devkit/${BPN}.git;protocol=http \
+SRC_URI = "git://github.com/eclipse/${BPN}.git;protocol=http \
            file://0001-CMakeLists.txt-Use-SWIG_SUPPORT_FILES-to-find-the-li.patch \
            file://0001-Use-stdint-types.patch \
            file://0001-initialize-local-variables-before-use.patch \
            file://0001-cmake-Disable-Wno-misleading-indentation-with-clang-.patch \
+           file://0001-cmake-Disable-using-Wno-maybe-uninitialized.patch \
            "
 
 SRC_URI_append_toolchain-clang_x86 = " file://0001-nmea_gps-Link-with-latomic.patch "
@@ -25,6 +26,8 @@ S = "${WORKDIR}/git"
 COMPATIBLE_HOST = "(x86_64.*|i.86.*|aarch64.*|arm.*)-linux"
 
 inherit distutils3-base cmake pkgconfig
+
+EXTRA_OECMAKE += "-UPYTHON_EXECUTABLE -DWERROR=off"
 
 # override this in local.conf to get needed bindings.
 # BINDINGS_pn-upm="python"

@@ -65,19 +65,6 @@ class TinfoilTests(OESelftestTestCase):
             localdata.setVar('PN', 'hello')
             self.assertEqual('hello', localdata.getVar('BPN'))
 
-    def test_parse_recipe_initial_datastore(self):
-        with bb.tinfoil.Tinfoil() as tinfoil:
-            tinfoil.prepare(config_only=False, quiet=2)
-            testrecipe = 'mdadm'
-            best = tinfoil.find_best_provider(testrecipe)
-            if not best:
-                self.fail('Unable to find recipe providing %s' % testrecipe)
-            dcopy = bb.data.createCopy(tinfoil.config_data)
-            dcopy.setVar('MYVARIABLE', 'somevalue')
-            rd = tinfoil.parse_recipe_file(best[3], config_data=dcopy)
-            # Check we can get variable values
-            self.assertEqual('somevalue', rd.getVar('MYVARIABLE'))
-
     def test_list_recipes(self):
         with bb.tinfoil.Tinfoil() as tinfoil:
             tinfoil.prepare(config_only=False, quiet=2)

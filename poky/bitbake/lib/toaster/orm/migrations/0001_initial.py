@@ -54,7 +54,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('file_name', models.FilePathField()),
                 ('file_size', models.IntegerField()),
-                ('build', models.ForeignKey(to='orm.Build')),
+                ('build', models.ForeignKey(to='orm.Build', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -64,7 +64,7 @@ class Migration(migrations.Migration):
                 ('area', models.IntegerField(choices=[(0, b'variable')])),
                 ('key', models.CharField(max_length=100)),
                 ('text', models.TextField()),
-                ('build', models.ForeignKey(related_name='helptext_build', to='orm.Build')),
+                ('build', models.ForeignKey(related_name='helptext_build', to='orm.Build', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -94,8 +94,8 @@ class Migration(migrations.Migration):
                 ('dirpath', models.CharField(default=None, max_length=255, null=True)),
                 ('priority', models.IntegerField(default=0)),
                 ('local_path', models.FilePathField(default=b'/', max_length=1024)),
-                ('build', models.ForeignKey(related_name='layer_version_build', default=None, to='orm.Build', null=True)),
-                ('layer', models.ForeignKey(related_name='layer_version_layer', to='orm.Layer')),
+                ('build', models.ForeignKey(related_name='layer_version_build', default=None, to='orm.Build', null=True, on_delete=models.CASCADE)),
+                ('layer', models.ForeignKey(related_name='layer_version_layer', to='orm.Layer', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -112,9 +112,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('up_id', models.IntegerField(default=None, null=True)),
-                ('depends_on', models.ForeignKey(related_name='dependees', to='orm.Layer_Version')),
-                ('layer_source', models.ForeignKey(default=None, to='orm.LayerSource', null=True)),
-                ('layer_version', models.ForeignKey(related_name='dependencies', to='orm.Layer_Version')),
+                ('depends_on', models.ForeignKey(related_name='dependees', to='orm.Layer_Version', on_delete=models.CASCADE)),
+                ('layer_source', models.ForeignKey(default=None, to='orm.LayerSource', null=True, on_delete=models.CASCADE)),
+                ('layer_version', models.ForeignKey(related_name='dependencies', to='orm.Layer_Version', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -125,7 +125,7 @@ class Migration(migrations.Migration):
                 ('message', models.TextField(null=True, blank=True)),
                 ('pathname', models.FilePathField(max_length=255, blank=True)),
                 ('lineno', models.IntegerField(null=True)),
-                ('build', models.ForeignKey(to='orm.Build')),
+                ('build', models.ForeignKey(to='orm.Build', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -136,8 +136,8 @@ class Migration(migrations.Migration):
                 ('up_date', models.DateTimeField(default=None, null=True)),
                 ('name', models.CharField(max_length=255)),
                 ('description', models.CharField(max_length=255)),
-                ('layer_source', models.ForeignKey(default=None, to='orm.LayerSource', null=True)),
-                ('layer_version', models.ForeignKey(to='orm.Layer_Version')),
+                ('layer_source', models.ForeignKey(default=None, to='orm.LayerSource', null=True, on_delete=models.CASCADE)),
+                ('layer_version', models.ForeignKey(to='orm.Layer_Version', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -154,7 +154,7 @@ class Migration(migrations.Migration):
                 ('installed_size', models.IntegerField(default=0)),
                 ('section', models.CharField(max_length=80, blank=True)),
                 ('license', models.CharField(max_length=80, blank=True)),
-                ('build', models.ForeignKey(to='orm.Build', null=True)),
+                ('build', models.ForeignKey(to='orm.Build', null=True, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -162,8 +162,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('dep_type', models.IntegerField(choices=[(0, b'depends'), (1, b'depends'), (3, b'recommends'), (2, b'recommends'), (4, b'suggests'), (5, b'provides'), (6, b'replaces'), (7, b'conflicts')])),
-                ('depends_on', models.ForeignKey(related_name='package_dependencies_target', to='orm.Package')),
-                ('package', models.ForeignKey(related_name='package_dependencies_source', to='orm.Package')),
+                ('depends_on', models.ForeignKey(related_name='package_dependencies_target', to='orm.Package', on_delete=models.CASCADE)),
+                ('package', models.ForeignKey(related_name='package_dependencies_source', to='orm.Package', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -172,7 +172,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('path', models.FilePathField(max_length=255, blank=True)),
                 ('size', models.IntegerField()),
-                ('package', models.ForeignKey(related_name='buildfilelist_package', to='orm.Package')),
+                ('package', models.ForeignKey(related_name='buildfilelist_package', to='orm.Package', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -185,7 +185,7 @@ class Migration(migrations.Migration):
                 ('updated', models.DateTimeField(auto_now=True)),
                 ('user_id', models.IntegerField(null=True)),
                 ('is_default', models.BooleanField(default=False)),
-                ('bitbake_version', models.ForeignKey(to='orm.BitbakeVersion', null=True)),
+                ('bitbake_version', models.ForeignKey(to='orm.BitbakeVersion', null=True, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -193,8 +193,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('optional', models.BooleanField(default=True)),
-                ('layercommit', models.ForeignKey(to='orm.Layer_Version', null=True)),
-                ('project', models.ForeignKey(to='orm.Project')),
+                ('layercommit', models.ForeignKey(to='orm.Layer_Version', null=True, on_delete=models.CASCADE)),
+                ('project', models.ForeignKey(to='orm.Project', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -203,7 +203,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('target', models.CharField(max_length=100)),
                 ('task', models.CharField(max_length=100, null=True)),
-                ('project', models.ForeignKey(to='orm.Project')),
+                ('project', models.ForeignKey(to='orm.Project', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -212,7 +212,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=100)),
                 ('value', models.TextField(blank=True)),
-                ('project', models.ForeignKey(to='orm.Project')),
+                ('project', models.ForeignKey(to='orm.Project', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -232,8 +232,8 @@ class Migration(migrations.Migration):
                 ('file_path', models.FilePathField(max_length=255)),
                 ('pathflags', models.CharField(max_length=200, blank=True)),
                 ('is_image', models.BooleanField(default=False)),
-                ('layer_source', models.ForeignKey(default=None, to='orm.LayerSource', null=True)),
-                ('layer_version', models.ForeignKey(related_name='recipe_layer_version', to='orm.Layer_Version')),
+                ('layer_source', models.ForeignKey(default=None, to='orm.LayerSource', null=True, on_delete=models.CASCADE)),
+                ('layer_version', models.ForeignKey(related_name='recipe_layer_version', to='orm.Layer_Version', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -241,8 +241,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('dep_type', models.IntegerField(choices=[(0, b'depends'), (1, b'rdepends')])),
-                ('depends_on', models.ForeignKey(related_name='r_dependencies_depends', to='orm.Recipe')),
-                ('recipe', models.ForeignKey(related_name='r_dependencies_recipe', to='orm.Recipe')),
+                ('depends_on', models.ForeignKey(related_name='r_dependencies_depends', to='orm.Recipe', on_delete=models.CASCADE)),
+                ('recipe', models.ForeignKey(related_name='r_dependencies_recipe', to='orm.Recipe', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -253,7 +253,7 @@ class Migration(migrations.Migration):
                 ('description', models.CharField(max_length=255)),
                 ('branch_name', models.CharField(default=b'', max_length=50)),
                 ('helptext', models.TextField(null=True)),
-                ('bitbake_version', models.ForeignKey(to='orm.BitbakeVersion')),
+                ('bitbake_version', models.ForeignKey(to='orm.BitbakeVersion', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -261,7 +261,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('layer_name', models.CharField(default=b'', max_length=100)),
-                ('release', models.ForeignKey(to='orm.Release')),
+                ('release', models.ForeignKey(to='orm.Release', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -269,8 +269,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('priority', models.IntegerField(default=0)),
-                ('layer_source', models.ForeignKey(to='orm.LayerSource')),
-                ('release', models.ForeignKey(to='orm.Release')),
+                ('layer_source', models.ForeignKey(to='orm.LayerSource', on_delete=models.CASCADE)),
+                ('release', models.ForeignKey(to='orm.Release', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -282,7 +282,7 @@ class Migration(migrations.Migration):
                 ('is_image', models.BooleanField(default=False)),
                 ('image_size', models.IntegerField(default=0)),
                 ('license_manifest_path', models.CharField(max_length=500, null=True)),
-                ('build', models.ForeignKey(to='orm.Build')),
+                ('build', models.ForeignKey(to='orm.Build', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -295,9 +295,9 @@ class Migration(migrations.Migration):
                 ('permission', models.CharField(max_length=16)),
                 ('owner', models.CharField(max_length=128)),
                 ('group', models.CharField(max_length=128)),
-                ('directory', models.ForeignKey(related_name='directory_set', to='orm.Target_File', null=True)),
-                ('sym_target', models.ForeignKey(related_name='symlink_set', to='orm.Target_File', null=True)),
-                ('target', models.ForeignKey(to='orm.Target')),
+                ('directory', models.ForeignKey(related_name='directory_set', to='orm.Target_File', null=True, on_delete=models.CASCADE)),
+                ('sym_target', models.ForeignKey(related_name='symlink_set', to='orm.Target_File', null=True, on_delete=models.CASCADE)),
+                ('target', models.ForeignKey(to='orm.Target', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -306,15 +306,15 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('file_name', models.FilePathField(max_length=254)),
                 ('file_size', models.IntegerField()),
-                ('target', models.ForeignKey(to='orm.Target')),
+                ('target', models.ForeignKey(to='orm.Target', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
             name='Target_Installed_Package',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('package', models.ForeignKey(related_name='buildtargetlist_package', to='orm.Package')),
-                ('target', models.ForeignKey(to='orm.Target')),
+                ('package', models.ForeignKey(related_name='buildtargetlist_package', to='orm.Package', on_delete=models.CASCADE)),
+                ('target', models.ForeignKey(to='orm.Target', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -337,8 +337,8 @@ class Migration(migrations.Migration):
                 ('sstate_result', models.IntegerField(default=0, choices=[(0, b'Not Applicable'), (1, b'File not in cache'), (2, b'Failed'), (3, b'Succeeded')])),
                 ('message', models.CharField(max_length=240)),
                 ('logfile', models.FilePathField(max_length=255, blank=True)),
-                ('build', models.ForeignKey(related_name='task_build', to='orm.Build')),
-                ('recipe', models.ForeignKey(related_name='tasks', to='orm.Recipe')),
+                ('build', models.ForeignKey(related_name='task_build', to='orm.Build', on_delete=models.CASCADE)),
+                ('recipe', models.ForeignKey(related_name='tasks', to='orm.Recipe', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('order', 'recipe'),
@@ -348,8 +348,8 @@ class Migration(migrations.Migration):
             name='Task_Dependency',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('depends_on', models.ForeignKey(related_name='task_dependencies_depends', to='orm.Task')),
-                ('task', models.ForeignKey(related_name='task_dependencies_task', to='orm.Task')),
+                ('depends_on', models.ForeignKey(related_name='task_dependencies_depends', to='orm.Task', on_delete=models.CASCADE)),
+                ('task', models.ForeignKey(related_name='task_dependencies_task', to='orm.Task', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -370,7 +370,7 @@ class Migration(migrations.Migration):
                 ('changed', models.BooleanField(default=False)),
                 ('human_readable_name', models.CharField(max_length=200)),
                 ('description', models.TextField(blank=True)),
-                ('build', models.ForeignKey(related_name='variable_build', to='orm.Build')),
+                ('build', models.ForeignKey(related_name='variable_build', to='orm.Build', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -381,28 +381,28 @@ class Migration(migrations.Migration):
                 ('file_name', models.FilePathField(max_length=255)),
                 ('line_number', models.IntegerField(null=True)),
                 ('operation', models.CharField(max_length=64)),
-                ('variable', models.ForeignKey(related_name='vhistory', to='orm.Variable')),
+                ('variable', models.ForeignKey(related_name='vhistory', to='orm.Variable', on_delete=models.CASCADE)),
             ],
         ),
         migrations.AddField(
             model_name='project',
             name='release',
-            field=models.ForeignKey(to='orm.Release', null=True),
+            field=models.ForeignKey(to='orm.Release', null=True, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='package_dependency',
             name='target',
-            field=models.ForeignKey(to='orm.Target', null=True),
+            field=models.ForeignKey(to='orm.Target', null=True, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='package',
             name='recipe',
-            field=models.ForeignKey(to='orm.Recipe', null=True),
+            field=models.ForeignKey(to='orm.Recipe', null=True, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='logmessage',
             name='task',
-            field=models.ForeignKey(blank=True, to='orm.Task', null=True),
+            field=models.ForeignKey(blank=True, to='orm.Task', null=True, on_delete=models.CASCADE),
         ),
         migrations.AlterUniqueTogether(
             name='layersource',
@@ -411,32 +411,32 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='layer_version',
             name='layer_source',
-            field=models.ForeignKey(default=None, to='orm.LayerSource', null=True),
+            field=models.ForeignKey(default=None, to='orm.LayerSource', null=True, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='layer_version',
             name='project',
-            field=models.ForeignKey(default=None, to='orm.Project', null=True),
+            field=models.ForeignKey(default=None, to='orm.Project', null=True, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='layer_version',
             name='up_branch',
-            field=models.ForeignKey(default=None, to='orm.Branch', null=True),
+            field=models.ForeignKey(default=None, to='orm.Branch', null=True, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='layer',
             name='layer_source',
-            field=models.ForeignKey(default=None, to='orm.LayerSource', null=True),
+            field=models.ForeignKey(default=None, to='orm.LayerSource', null=True, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='build',
             name='project',
-            field=models.ForeignKey(to='orm.Project'),
+            field=models.ForeignKey(to='orm.Project', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='branch',
             name='layer_source',
-            field=models.ForeignKey(default=True, to='orm.LayerSource', null=True),
+            field=models.ForeignKey(default=True, to='orm.LayerSource', null=True, on_delete=models.CASCADE),
         ),
         migrations.CreateModel(
             name='ImportedLayerSource',

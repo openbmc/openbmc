@@ -23,7 +23,7 @@ S = "${WORKDIR}/git"
 
 EXTRA_OECONF = "--with-libexpat=${STAGING_EXECPREFIXDIR} \
 		--with-ssl=${STAGING_EXECPREFIXDIR} \
-		libtool=${TARGET_PREFIX}libtool \
+		libtool=${HOST_SYS}-libtool \
 "
 		
 

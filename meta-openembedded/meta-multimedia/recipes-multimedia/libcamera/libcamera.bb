@@ -10,12 +10,11 @@ LIC_FILES_CHKSUM = "\
 
 SRC_URI = " \
         git://linuxtv.org/libcamera.git;protocol=git \
-        file://0001-meson-import-python3-to-use-also-from-sysroot.patch \
 "
 
-SRCREV = "53eab996809e826bc914e4c34c78fe74d86f8dc4"
+SRCREV = "a8be6e94e79f602d543a15afd44ef60e378b138f"
 
-PV = "201910+git${SRCPV}"
+PV = "202002+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 

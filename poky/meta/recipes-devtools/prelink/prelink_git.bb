@@ -9,7 +9,7 @@ and executables, so that far fewer relocations need to be resolved at \
 runtime and thus programs come up faster."
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c93c0550bd3173f4504b2cbd8991e50b"
-SRCREV = "a853a5d715d84eec93aa68e8f2df26b7d860f5b2"
+SRCREV = "f9975537dbfd9ade0fc813bd5cf5fcbe41753a37"
 PV = "1.0+git${SRCPV}"
 
 #
@@ -28,12 +28,12 @@ FILES_${PN}-cron = "${sysconfdir}/cron.daily ${sysconfdir}/default"
 PACKAGES =+ "${PN}-cron"
 
 SRC_URI = "git://git.yoctoproject.org/prelink-cross.git;branch=cross_prelink_staging \
+           file://0001-Add-MIPS-gnu-hash-support.patch \
            file://prelink.conf \
            file://prelink.cron.daily \
            file://prelink.default \
            file://macros.prelink \
-           file://0001-src-arch-mips.c-check-info-resolvetls-before-use-its.patch \
-"
+           "
 UPSTREAM_CHECK_COMMITS = "1"
 
 # error: error.h: No such file or directory

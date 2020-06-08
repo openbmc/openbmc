@@ -22,3 +22,6 @@ acpaths = "-I ${S}/m4 "
 PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'xattr', d)}"
 PACKAGECONFIG[xattr] = "--enable-xattr,--disable-xattr,attr,"
 
+PROVIDES_append_class-native = " patch-replacement-native"
+
+BBCLASSEXTEND = "native nativesdk"

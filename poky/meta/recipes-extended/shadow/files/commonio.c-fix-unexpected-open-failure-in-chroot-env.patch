@@ -1,3 +1,8 @@
+From 66533c7c6f347d257020675a1ed6e0c59cbbc3f0 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Thu, 17 Jul 2014 15:53:34 +0800
+Subject: [PATCH] commonio.c-fix-unexpected-open-failure-in-chroot-env
+
 Upstream-Status: Inappropriate [OE specific]
 
 commonio.c: fix unexpected open failure in chroot environment
@@ -10,15 +15,16 @@ Note that this patch doesn't change the logic in the code, it just expands
 the codes.
 
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+
 ---
- lib/commonio.c |   16 ++++++++++++----
+ lib/commonio.c | 16 ++++++++++++----
  1 file changed, 12 insertions(+), 4 deletions(-)
 
 diff --git a/lib/commonio.c b/lib/commonio.c
-index cc536bf..51cafd9 100644
+index 16fa7e7..d6bc297 100644
 --- a/lib/commonio.c
 +++ b/lib/commonio.c
-@@ -613,10 +613,18 @@ int commonio_open (struct commonio_db *db, int mode)
+@@ -632,10 +632,18 @@ int commonio_open (struct commonio_db *db, int mode)
  	db->cursor = NULL;
  	db->changed = false;
  
@@ -41,6 +47,3 @@ index cc536bf..51cafd9 100644
  	db->fp = NULL;
  	if (fd >= 0) {
  #ifdef WITH_TCB
--- 
-1.7.9.5
-

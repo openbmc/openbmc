@@ -18,12 +18,13 @@ SRC_URI = "${APACHE_MIRROR}/apr/${BPN}-${PV}.tar.bz2 \
            file://0006-apr-fix-off_t-size-doesn-t-match-in-glibc-when-cross.patch \
            file://0007-explicitly-link-libapr-against-phtread-to-make-gold-.patch \
            file://libtoolize_check.patch \
+           file://0001-Add-option-to-disable-timed-dependant-tests.patch \
            "
 
 SRC_URI[md5sum] = "7a14a83d664e87599ea25ff4432e48a7"
 SRC_URI[sha256sum] = "e2e148f0b2e99b8e5c6caa09f6d4fb4dd3e83f744aa72a952f94f5a14436f7ea"
 
-inherit autotools-brokensep lib_package binconfig multilib_header ptest
+inherit autotools-brokensep lib_package binconfig multilib_header ptest multilib_script
 
 OE_BINCONFIG_EXTRA_MANGLE = " -e 's:location=source:location=installed:'"
 
@@ -39,6 +40,7 @@ CACHED_CONFIGUREVARS += "ac_cv_file__dev_zero=yes"
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)}"
 PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"
+PACKAGECONFIG[timed-tests] = "--enable-timed-tests,--disable-timed-tests,"
 
 do_configure_prepend() {
 	# Avoid absolute paths for grep since it causes failures
@@ -50,6 +52,9 @@ do_configure_prepend() {
 	# The "2" means libtool version 2.
 	./buildconf 2
 }
+
+MULTILIB_SCRIPTS = "${PN}-dev:${bindir}/apr-1-config \
+                    ${PN}-dev:${datadir}/build-1/apr_rules.mk"
 
 FILES_${PN}-dev += "${libdir}/apr.exp ${datadir}/build-1/*"
 RDEPENDS_${PN}-dev += "bash"

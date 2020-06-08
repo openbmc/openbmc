@@ -41,11 +41,13 @@
                 That append file would match any
                 <filename>busybox_1.21.</filename><replaceable>x</replaceable><filename>.bb</filename>
                 version of the recipe.
-                So, the append file would match the following recipe names:
+                So, the append file would match any of the following recipe names:
                 <literallayout class='monospaced'>
      busybox_1.21.1.bb
      busybox_1.21.2.bb
      busybox_1.21.3.bb
+     busybox_1.21.10.bb
+     busybox_1.21.25.bb
                 </literallayout>
                 <note><title>Important</title>
                     The use of the "<filename>%</filename>" character
@@ -115,7 +117,7 @@
                         in your home directory within the existing
                         directory <filename>mybuilds</filename>:
                         <literallayout class='monospaced'>
-     $cd $HOME
+     $ cd $HOME
      $ source $HOME/poky/&OE_INIT_FILE; $HOME/mybuilds/YP-&POKYVERSION;
                         </literallayout>
                         </para></listitem>
@@ -141,7 +143,7 @@
                 The system used to build images in a Yocto Project
                 Development environment.
                 The build system is sometimes referred to as the
-                development host.
+                <firstterm>development host</firstterm>.
                 </para></listitem>
             <listitem><para>
                 <emphasis>Classes:</emphasis>
@@ -393,7 +395,7 @@
                 Poky is not a product level distro.
                 Rather, it is a good starting point for customization.
                 <note>
-                    Poky began an open-source
+                    Poky began as an open-source
                     project initially developed by OpenedHand.
                     OpenedHand developed Poky from the existing
                     OpenEmbedded build system to create a commercially

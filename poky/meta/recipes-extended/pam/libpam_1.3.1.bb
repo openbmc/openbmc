@@ -1,3 +1,4 @@
+DISABLE_STATIC = ""
 SUMMARY = "Linux-PAM (Pluggable Authentication Modules)"
 DESCRIPTION = "Linux-PAM (Pluggable Authentication Modules for Linux), a flexible mechanism for authenticating users"
 HOMEPAGE = "https://fedorahosted.org/linux-pam/"
@@ -20,7 +21,6 @@ SRC_URI = "https://github.com/linux-pam/linux-pam/releases/download/v${PV}/Linux
            file://pam.d/common-session-noninteractive \
            file://pam.d/other \
            file://libpam-xtests.patch \
-           file://fixsepbuild.patch \
            file://pam-security-abstract-securetty-handling.patch \
            file://pam-unix-nullok-secure.patch \
            file://crypt_configure.patch \
@@ -35,8 +35,7 @@ SRC_URI_append_libc-musl = " file://0001-Add-support-for-defining-missing-funcit
 
 DEPENDS = "bison-native flex flex-native cracklib libxml2-native virtual/crypt"
 
-EXTRA_OECONF = "--with-db-uniquename=_pam \
-                --includedir=${includedir}/security \
+EXTRA_OECONF = "--includedir=${includedir}/security \
                 --libdir=${base_libdir} \
                 --disable-nis \
                 --disable-regenerate-docu \
@@ -48,7 +47,9 @@ S = "${WORKDIR}/Linux-PAM-${PV}"
 
 inherit autotools gettext pkgconfig
 
+PACKAGECONFIG ??= ""
 PACKAGECONFIG[audit] = "--enable-audit,--disable-audit,audit,"
+PACKAGECONFIG[userdb] = "--enable-db=db,--enable-db=no,db,"
 
 PACKAGES += "${PN}-runtime ${PN}-xtests"
 FILES_${PN} = "${base_libdir}/lib*${SOLIBS}"

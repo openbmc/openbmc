@@ -1,4 +1,4 @@
-From 78dbd4c09d617a9cb730d796f94ee4d93840d3cc Mon Sep 17 00:00:00 2001
+From 2b5fb416aa275fd2a17a0139a2f783998bcb42cc Mon Sep 17 00:00:00 2001
 From: Peter Kjellerstedt <pkj@axis.com>
 Date: Fri, 9 Jun 2017 17:50:46 +0200
 Subject: [PATCH] Make ptest run the python tests if python is enabled
@@ -8,18 +8,19 @@ be due to the fact that the tests are forced to run with Python 3.
 
 Upstream-Status: Inappropriate [OE specific]
 Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+
 ---
  Makefile.am                  |  2 +-
  python/Makefile.am           |  9 +++++++++
- python/tests/Makefile.am     | 12 ++++++++++--
+ python/tests/Makefile.am     | 10 ++++++++++
  python/tests/tstLastError.py |  2 +-
- 4 files changed, 21 insertions(+), 4 deletions(-)
+ 4 files changed, 21 insertions(+), 2 deletions(-)
 
-Index: libxml2-2.9.7/Makefile.am
-===================================================================
---- libxml2-2.9.7.orig/Makefile.am
-+++ libxml2-2.9.7/Makefile.am
-@@ -207,9 +207,9 @@ install-ptest:
+diff --git a/Makefile.am b/Makefile.am
+index ae62274..bd1e425 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -203,9 +203,9 @@ install-ptest:
  	install $(check_PROGRAMS) $(DESTDIR))
  	cp -r $(srcdir)/test $(DESTDIR)
  	cp -r $(srcdir)/result $(DESTDIR)
@@ -30,11 +31,11 @@ Index: libxml2-2.9.7/Makefile.am
  
  runtests: runtest$(EXEEXT) testrecurse$(EXEEXT) testapi$(EXEEXT) \
            testchar$(EXEEXT) testdict$(EXEEXT) runxmlconf$(EXEEXT)
-Index: libxml2-2.9.7/python/Makefile.am
-===================================================================
---- libxml2-2.9.7.orig/python/Makefile.am
-+++ libxml2-2.9.7/python/Makefile.am
-@@ -48,7 +48,16 @@ GENERATED = libxml2class.py libxml2class
+diff --git a/python/Makefile.am b/python/Makefile.am
+index 34aed96..ba3ec6a 100644
+--- a/python/Makefile.am
++++ b/python/Makefile.am
+@@ -48,7 +48,16 @@ GENERATED = libxml2class.py libxml2class.txt $(BUILT_SOURCES)
  
  $(GENERATED): $(srcdir)/generator.py $(API_DESC)
  	$(PYTHON) $(srcdir)/generator.py $(srcdir)
@@ -51,10 +52,10 @@ Index: libxml2-2.9.7/python/Makefile.am
 +.PHONY: tests test
  tests test: all
  	cd tests && $(MAKE) tests
-Index: libxml2-2.9.7/python/tests/Makefile.am
-===================================================================
---- libxml2-2.9.7.orig/python/tests/Makefile.am
-+++ libxml2-2.9.7/python/tests/Makefile.am
+diff --git a/python/tests/Makefile.am b/python/tests/Makefile.am
+index 227e24d..021bb29 100644
+--- a/python/tests/Makefile.am
++++ b/python/tests/Makefile.am
 @@ -59,6 +59,11 @@ XMLS=		\
  CLEANFILES = core tmp.xml *.pyc
  
@@ -67,24 +68,25 @@ Index: libxml2-2.9.7/python/tests/Makefile.am
  tests: $(PYTESTS)
  	@for f in $(XMLS) ; do test -f $$f || $(LN_S) $(srcdir)/$$f . ; done
  	@echo "## running Python regression tests"
-@@ -68,8 +73,11 @@ tests: $(PYTESTS)
- 	   export LD_LIBRARY_PATH; \
- 	   for test in $(PYTESTS) ; \
- 	   do log=`$(PYTHON) $(srcdir)/$$test` ; \
--	   if [ "`echo $$log | grep OK`" = "" ] ; then \
--	   echo "-- $$test" ; echo "$$log" ; fi ; done)
-+	   if [ "`echo $$log | grep OK`" ]; then \
-+	   echo "PASS: $$test"; else \
-+	   echo "$$log"; echo "FAIL: $$test"; fi; done)
+@@ -70,9 +75,14 @@ tests: $(PYTESTS)
+ 	    if [ "$$?" -ne 0 ] ; then \
+ 	      echo "-- $$test" ; \
+ 	      echo "$$log" ; \
++              echo "FAIL: $$test"; \
+ 	      exit 1 ; \
++            else \
++              echo "PASS: $$test"; \
+ 	    fi ; \
+ 	  done)
  else
 +install-ptest:
 +
  tests:
  endif
-Index: libxml2-2.9.7/python/tests/tstLastError.py
-===================================================================
---- libxml2-2.9.7.orig/python/tests/tstLastError.py
-+++ libxml2-2.9.7/python/tests/tstLastError.py
+diff --git a/python/tests/tstLastError.py b/python/tests/tstLastError.py
+index 81d0acc..162c8db 100755
+--- a/python/tests/tstLastError.py
++++ b/python/tests/tstLastError.py
 @@ -25,7 +25,7 @@ class TestCase(unittest.TestCase):
          when the exception is raised, check the libxml2.lastError for
          expected values."""

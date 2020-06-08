@@ -43,6 +43,8 @@ EXTRA_OECMAKE += "-DFLB_SHARED_LIB=Off -DFLB_EXAMPLES=Off "
 
 EXTRA_OECMAKE += "${@bb.utils.contains('DISTRO_FEATURES','systemd','-DFLB_SYSTEMD=On','',d)}"
 
+EXTRA_OECMAKE_append_riscv64 = " -DFLB_DEPS='atomic'"
+
 # Kafka Output plugin (disabled by default): note that when
 # enabling Kafka output plugin, the backend library librdkafka
 # requires 'openssl' as a dependency.

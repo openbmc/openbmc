@@ -1,5 +1,5 @@
 SUMMARY = "Lossless compression library and tool"
-DESCRIPTIOM = "Brotli is a generic-purpose lossless compression algorithm \
+DESCRIPTION = "Brotli is a generic-purpose lossless compression algorithm \
 that it is similar in speed to deflate but offers more dense compression."
 HOMEPAGE = "https://github.com/google/brotli"
 BUGTRACKER = "https://github.com/google/brotli/issues"
@@ -18,3 +18,5 @@ do_install_append () {
 		mv -v "${lib}" "$(echo ${lib} | sed s/-static//)"
 	done
 }
+
+BBCLASSEXTEND = "native"

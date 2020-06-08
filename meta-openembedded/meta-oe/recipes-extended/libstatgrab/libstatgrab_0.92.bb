@@ -14,6 +14,8 @@ SRC_URI = "https://github.com/libstatgrab/libstatgrab/releases/download/LIBSTATG
 SRC_URI[md5sum] = "5362b2ddbec54b3901e7d70c22cda249"
 SRC_URI[sha256sum] = "5bf1906aff9ffc3eeacf32567270f4d819055d8386d98b9c8c05519012d5a196"
 
+UPSTREAM_CHECK_URI = "https://github.com/${BPN}/${BPN}/releases"
+
 # Perl5 is for tests only
 EXTRA_OECONF = "--without-perl5 --with-mnttab=/proc/mounts"
 

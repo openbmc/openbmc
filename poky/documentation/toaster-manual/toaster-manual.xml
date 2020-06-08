@@ -22,11 +22,10 @@
 
         <authorgroup>
             <author>
-                <firstname>Kristi</firstname> <surname>Rifenbark</surname>
                 <affiliation>
-                    <orgname>Scotty's Documentation Services, INC</orgname>
+                    <orgname>&ORGNAME;</orgname>
                 </affiliation>
-                <email>kristi@buzzcollectivemarketing.com</email>
+                <email>&ORGEMAIL;</email>
             </author>
         </authorgroup>
 
@@ -34,7 +33,7 @@
             <revision>
                 <revnumber>1.8</revnumber>
                 <date>April 2015</date>
-                <revremark>Released with the Yocto Project 1.8 Release.</revremark>
+                <revremark>The initial document released with the Yocto Project 1.8 Release.</revremark>
             </revision>
             <revision>
                 <revnumber>2.0</revnumber>
@@ -78,8 +77,13 @@
             </revision>
             <revision>
                 <revnumber>3.0</revnumber>
-                <date>&REL_MONTH_YEAR;</date>
+                <date>October 2019</date>
                 <revremark>Released with the Yocto Project 3.0 Release.</revremark>
+            </revision>
+            <revision>
+                <revnumber>3.1</revnumber>
+                <date>&REL_MONTH_YEAR;</date>
+                <revremark>Released with the Yocto Project 3.1 Release.</revremark>
             </revision>
        </revhistory>
 
@@ -102,7 +106,7 @@
                        Yocto Project.
                        To be sure you have the latest version of the manual
                        for this release, go to the
-                       <ulink url='&YOCTO_HOME_URL;/documentation'>Yocto Project documentation page</ulink>
+                       <ulink url='&YOCTO_DOCS_URL;'>Yocto Project documentation page</ulink>
                        and select the manual from that site.
                        Manuals from the site are more up-to-date than manuals
                        derived from the Yocto Project released TAR files.
@@ -119,18 +123,20 @@
                        page.
                        If you need a version of this manual for a different
                        Yocto Project release, visit the
-                       <ulink url='&YOCTO_HOME_URL;/documentation'>Yocto Project documentation page</ulink>
+                       <ulink url='&YOCTO_DOCS_URL;'>Yocto Project documentation page</ulink>
                        and select the manual set by using the
                        "ACTIVE RELEASES DOCUMENTATION" or "DOCUMENTS ARCHIVE"
                        pull-down menus.
                        </para></listitem>
-                   <listitem><para>
+                   <listitem>
+                       <para>
                        To report any inaccuracies or problems with this
-                       manual, send an email to the Yocto Project
-                       discussion group at
-                       <filename>yocto@yoctoproject.com</filename> or log into
-                       the freenode <filename>#yocto</filename> channel.
-                       </para></listitem>
+                       (or any other Yocto Project) manual, send an email to
+                       the Yocto Project documentation mailing list at
+                       <filename>docs@lists.yoctoproject.org</filename> or
+                       log into the freenode <filename>#yocto</filename> channel.
+                       </para>
+                   </listitem>
                </itemizedlist>
            </note>
 

@@ -100,7 +100,7 @@ def write_task_data(status, logfile, e, d):
                 f.write("rusage %s: %s\n" % (i, getattr(resources, i)))
             for i in rusages:
                 f.write("Child rusage %s: %s\n" % (i, getattr(childres, i)))
-        if status is "passed":
+        if status == "passed":
             f.write("Status: PASSED \n")
         else:
             f.write("Status: FAILED \n")

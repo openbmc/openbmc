@@ -1,0 +1,148 @@
+Upstream-Status: Submitted [https://github.com/GENIVI/dlt-daemon/pull/204]
+From 92830aff6e91041f574753d78da758c62981d9a4 Mon Sep 17 00:00:00 2001
+From: Gianfranco Costamagna <costamagnagianfranco@yahoo.it>
+Date: Sat, 25 Jan 2020 09:08:07 +0100
+Subject: [PATCH 1/3] dlt_user.h: fix build when musl is the libc
+ implementation, by adding a missing include for pthread_t reference:
+
+see https://errors.yoctoproject.org/Errors/Details/308000/ for details
+
+Thanks Khem Raj <raj.khem@gmail.com> for the report
+
+Signed-off-by: Gianfranco Costamagna <costamagnagianfranco@yahoo.it>
+Signed-off-by: Gianfranco Costamagna <locutusofborg@debian.org>
+---
+ include/dlt/dlt_user.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/dlt/dlt_user.h b/include/dlt/dlt_user.h
+index 69cb854..766d349 100644
+--- a/include/dlt/dlt_user.h
++++ b/include/dlt/dlt_user.h
+@@ -74,6 +74,7 @@
+  \{
+  */
+ #   include <mqueue.h>
++#   include <pthread.h>
+ 
+ #   if !defined (__WIN32__)
+ #      include <semaphore.h>
+
+From 5f67aba02c12b7446e63ccc86285c13bc5c7a432 Mon Sep 17 00:00:00 2001
+From: Gianfranco Costamagna <costamagnagianfranco@yahoo.it>
+Date: Sat, 25 Jan 2020 09:16:14 +0100
+Subject: [PATCH 2/3] dlt-test-init-free: fix build failure with strict
+ compiler flags, due to uint being undefined. This is actually an "int" type,
+ looking at the test implementation
+
+Signed-off-by: Gianfranco Costamagna <costamagnagianfranco@yahoo.it>
+Signed-off-by: Gianfranco Costamagna <locutusofborg@debian.org>
+---
+ src/tests/dlt-test-init-free.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/tests/dlt-test-init-free.c b/src/tests/dlt-test-init-free.c
+index 96b5245..35b8803 100644
+--- a/src/tests/dlt-test-init-free.c
++++ b/src/tests/dlt-test-init-free.c
+@@ -32,7 +32,7 @@
+ 
+ void exec(const char *cmd, char *buffer, size_t length);
+ void printMemoryUsage();
+-char *occupyMemory(uint size);
++char *occupyMemory(int size);
+ void do_example_test();
+ void do_dlt_test();
+ 
+@@ -131,7 +131,7 @@ void printMemoryUsage()
+     printf("%s", result);
+ }
+ 
+-char *occupyMemory(uint size)
++char *occupyMemory(int size)
+ {
+     char *buf = (char *)malloc(size * sizeof(char));
+ 
+
+From c790d61fad382e5d3e648ee99904087eb9bc4a77 Mon Sep 17 00:00:00 2001
+From: Gianfranco Costamagna <costamagnagianfranco@yahoo.it>
+Date: Sat, 25 Jan 2020 09:20:48 +0100
+Subject: [PATCH 3/3] sys/poll.h: deprecate old sys/poll.h include header, now
+ glibc/musl wants poll.h being included directly. This fixes a build failure
+ on musl systems with strict c hardening flags
+
+Signed-off-by: Gianfranco Costamagna <costamagnagianfranco@yahoo.it>
+Signed-off-by: Gianfranco Costamagna <locutusofborg@debian.org>
+---
+ src/console/logstorage/dlt-logstorage-ctrl.c | 2 +-
+ src/daemon/dlt_daemon_event_handler.c        | 2 +-
+ src/daemon/dlt_daemon_event_handler.h        | 2 +-
+ src/daemon/dlt_daemon_event_handler_types.h  | 2 +-
+ src/lib/dlt_user.c                           | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/console/logstorage/dlt-logstorage-ctrl.c b/src/console/logstorage/dlt-logstorage-ctrl.c
+index 525c137..6614f44 100644
+--- a/src/console/logstorage/dlt-logstorage-ctrl.c
++++ b/src/console/logstorage/dlt-logstorage-ctrl.c
+@@ -61,7 +61,7 @@
+ #include <string.h>
+ #include <getopt.h>
+ 
+-#include <sys/poll.h>
++#include <poll.h>
+ 
+ #if defined(__linux__)
+ #   include "sd-daemon.h"
+diff --git a/src/daemon/dlt_daemon_event_handler.c b/src/daemon/dlt_daemon_event_handler.c
+index 1611f7b..0d463da 100644
+--- a/src/daemon/dlt_daemon_event_handler.c
++++ b/src/daemon/dlt_daemon_event_handler.c
+@@ -30,7 +30,7 @@
+ #include <string.h>
+ #include <errno.h>
+ 
+-#include <sys/poll.h>
++#include <poll.h>
+ #include <syslog.h>
+ 
+ #include "dlt_common.h"
+diff --git a/src/daemon/dlt_daemon_event_handler.h b/src/daemon/dlt_daemon_event_handler.h
+index eb96101..bd550d3 100644
+--- a/src/daemon/dlt_daemon_event_handler.h
++++ b/src/daemon/dlt_daemon_event_handler.h
+@@ -25,7 +25,7 @@
+  * \file dlt_daemon_event_handler.h
+  */
+ 
+-#include <sys/poll.h>
++#include <poll.h>
+ 
+ #include "dlt_daemon_connection_types.h"
+ #include "dlt_daemon_event_handler_types.h"
+diff --git a/src/daemon/dlt_daemon_event_handler_types.h b/src/daemon/dlt_daemon_event_handler_types.h
+index 370e503..0b16d08 100644
+--- a/src/daemon/dlt_daemon_event_handler_types.h
++++ b/src/daemon/dlt_daemon_event_handler_types.h
+@@ -25,7 +25,7 @@
+  * \file dlt_daemon_event_handler_types.h
+  */
+ 
+-#include <sys/poll.h>
++#include <poll.h>
+ 
+ #include "dlt_daemon_connection_types.h"
+ 
+#diff --git a/src/lib/dlt_user.c b/src/lib/dlt_user.c
+#index ffa9b09..511f991 100644
+#--- a/src/lib/dlt_user.c
+#+++ b/src/lib/dlt_user.c
+#@@ -43,7 +43,7 @@
+# #include <errno.h>
+# 
+# #include <sys/uio.h> /* writev() */
+#-#include <sys/poll.h>
+#+#include <poll.h>
+# 
+# #include <limits.h>
+# #ifdef linux

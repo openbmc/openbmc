@@ -11,8 +11,6 @@ BitBake 'Fetch' implementation for svn.
 # Based on functions from the base bb module, Copyright 2003 Holger Schurig
 
 import os
-import sys
-import logging
 import bb
 import re
 from   bb.fetch2 import FetchMethod
@@ -49,7 +47,7 @@ class Svn(FetchMethod):
         svndir = d.getVar("SVNDIR") or (d.getVar("DL_DIR") + "/svn")
         relpath = self._strip_leading_slashes(ud.path)
         ud.pkgdir = os.path.join(svndir, ud.host, relpath)
-        ud.moddir = os.path.join(ud.pkgdir, ud.module)
+        ud.moddir = os.path.join(ud.pkgdir, ud.path_spec)
         # Protects the repository from concurrent updates, e.g. from two
         # recipes fetching different revisions at the same time
         ud.svnlock = os.path.join(ud.pkgdir, "svn.lock")
@@ -124,30 +122,30 @@ class Svn(FetchMethod):
 
         try:
             if os.access(os.path.join(ud.moddir, '.svn'), os.R_OK):
-                svnupdatecmd = self._buildsvncommand(ud, d, "update")
+                svncmd = self._buildsvncommand(ud, d, "update")
                 logger.info("Update " + ud.url)
                 # We need to attempt to run svn upgrade first in case its an older working format
                 try:
                     runfetchcmd(ud.basecmd + " upgrade", d, workdir=ud.moddir)
                 except FetchError:
                     pass
-                logger.debug(1, "Running %s", svnupdatecmd)
-                bb.fetch2.check_network_access(d, svnupdatecmd, ud.url)
-                runfetchcmd(svnupdatecmd, d, workdir=ud.moddir)
+                logger.debug(1, "Running %s", svncmd)
+                bb.fetch2.check_network_access(d, svncmd, ud.url)
+                runfetchcmd(svncmd, d, workdir=ud.moddir)
             else:
-                svnfetchcmd = self._buildsvncommand(ud, d, "fetch")
+                svncmd = self._buildsvncommand(ud, d, "fetch")
                 logger.info("Fetch " + ud.url)
                 # check out sources there
                 bb.utils.mkdirhier(ud.pkgdir)
-                logger.debug(1, "Running %s", svnfetchcmd)
-                bb.fetch2.check_network_access(d, svnfetchcmd, ud.url)
-                runfetchcmd(svnfetchcmd, d, workdir=ud.pkgdir)
+                logger.debug(1, "Running %s", svncmd)
+                bb.fetch2.check_network_access(d, svncmd, ud.url)
+                runfetchcmd(svncmd, d, workdir=ud.pkgdir)
 
             if not ("externals" in ud.parm and ud.parm["externals"] == "nowarn"):
                 # Warn the user if this had externals (won't catch them all)
                 output = runfetchcmd("svn propget svn:externals || true", d, workdir=ud.moddir)
                 if output:
-                    if "--ignore-externals" in svnfetchcmd.split():
+                    if "--ignore-externals" in svncmd.split():
                         bb.warn("%s contains svn:externals." % ud.url)
                         bb.warn("These should be added to the recipe SRC_URI as necessary.")
                         bb.warn("svn fetch has ignored externals:\n%s" % output)

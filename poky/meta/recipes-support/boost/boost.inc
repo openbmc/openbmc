@@ -62,12 +62,16 @@ PACKAGES = "${PN}-dbg ${BOOST_PACKAGES}"
 python __anonymous () {
     packages = []
     extras = []
+    mlprefix = d.getVar("MLPREFIX")
     for lib in d.getVar('BOOST_LIBS').split():
         extras.append("--with-%s" % lib)
-        pkg = "boost-%s" % lib.replace("_", "-")
-        packages.append(pkg)
+        pkg = "boost-%s" % (lib.replace("_", "-"))
+        packages.append(mlprefix + pkg)
         if not d.getVar("FILES_%s" % pkg):
-                d.setVar("FILES_%s" % pkg, "${libdir}/libboost_%s*.so.*" % lib)
+                d.setVar("FILES_%s%s" % (mlprefix, pkg), "${libdir}/libboost_%s*.so.*" % lib)
+        else:
+                d.setVar("FILES_%s%s" % (mlprefix, pkg), d.getVar("FILES_%s" % pkg))
+
     d.setVar("BOOST_PACKAGES", " ".join(packages))
     d.setVar("BJAM_EXTRA", " ".join(extras))
 }
@@ -201,6 +205,11 @@ do_install() {
 			ln -s libboost_${lib}.so ${D}${libdir}/libboost_${lib}-mt.so
 		fi
 	done
+
+        # Cmake files reference full paths to image
+        find ${D}${libdir}/cmake -type f | \
+             grep 'cmake$' | \
+             xargs -n 1 sed -e 's,${D}${libdir}/cmake,${libdir}/cmake,' -i
 
 }
 

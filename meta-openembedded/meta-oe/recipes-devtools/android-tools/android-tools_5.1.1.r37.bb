@@ -38,11 +38,13 @@ SRC_URI = " \
     file://core/0011-Remove-bionic-specific-calls.patch;patchdir=system/core \
     file://core/0012-Fix-implicit-declaration-of-stlcat-strlcopy-function.patch;patchdir=system/core \
     file://core/adb_libssl_11.diff;patchdir=system/core \
+    file://core/0013-adb-Support-riscv64.patch;patchdir=system/core \
     file://extras/0001-ext4_utils-remove-selinux-extensions.patch;patchdir=system/extras \
     file://extras/0002-ext4_utils-add-o-argument-to-preserve-ownership.patch;patchdir=system/extras \
     file://libselinux/0001-Remove-bionic-specific-calls.patch;patchdir=external/libselinux \
     file://libselinux/0001-libselinux-Do-not-define-gettid-if-glibc-2.30-is-use.patch;patchdir=external/libselinux \
     file://android-tools-adbd.service \
+    file://build/0001-Riscv-Add-risc-v-Android-config-header.patch;patchdir=build \
     file://gitignore \
     file://adb.mk;subdir=${BPN} \
     file://adbd.mk;subdir=${BPN} \
@@ -61,6 +63,7 @@ ARM_INSTRUCTION_SET_armv5 = "arm"
 
 COMPATIBLE_HOST_powerpc = "(null)"
 COMPATIBLE_HOST_powerpc64 = "(null)"
+COMPATIBLE_HOST_powerpc64le = "(null)"
 
 inherit systemd
 
@@ -92,6 +95,9 @@ do_compile() {
       ;;
       aarch64)
         export android_arch=linux-arm64
+      ;;
+      riscv64)
+        export android_arch=linux-riscv64
       ;;
       mips|mipsel)
         export android_arch=linux-mips

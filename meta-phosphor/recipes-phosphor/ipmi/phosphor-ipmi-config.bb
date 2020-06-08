@@ -14,6 +14,7 @@ SRC_URI = " \
     file://channel_access.json \
     file://channel_config.json \
     file://entity-map.json \
+    file://cs_privilege_levels.json \
     "
 
 FILES_${PN} = " \
@@ -25,6 +26,7 @@ FILES_${PN} = " \
     ${datadir}/ipmi-providers/channel_access.json \
     ${datadir}/ipmi-providers/channel_config.json \
     ${datadir}/ipmi-providers/entity-map.json \
+    ${datadir}/ipmi-providers/cs_privilege_levels.json \
     "
 
 do_fetch[noexec] = "1"
@@ -50,4 +52,6 @@ do_install() {
         ${D}${datadir}/ipmi-providers/channel_config.json
     install -m 0644 -D ${WORKDIR}/entity-map.json \
         ${D}${datadir}/ipmi-providers/entity-map.json
+    install -m 0644 -D ${WORKDIR}/cs_privilege_levels.json \
+        ${D}${datadir}/ipmi-providers/cs_privilege_levels.json
 }

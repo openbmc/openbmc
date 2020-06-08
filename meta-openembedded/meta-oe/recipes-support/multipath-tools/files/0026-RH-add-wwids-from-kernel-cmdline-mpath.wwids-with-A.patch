@@ -1,9 +1,12 @@
 From 0f54b3120ca06ff3168cdbf901a27b68c4638398 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Thu, 26 Sep 2019 16:29:48 +0800
-Subject: [PATCH] From 0000000000000000000000000000000000000000 Mon Sep 17 
- 00:00:00 2001 From: Benjamin Marzinski <bmarzins@redhat.com> Date: Fri, 17 
- Oct 2014 11:20:34 -0500 Subject: [PATCH] RH: add wwids from kernel cmdline 
+Subject: [PATCH] From 0000000000000000000000000000000000000000 Mon Sep
+17
+ 00:00:00 2001 From: Benjamin Marzinski <bmarzins@redhat.com> Date: Fri,
+17
+ Oct 2014 11:20:34 -0500 Subject: [PATCH] RH: add wwids from kernel
+cmdline
  mpath.wwids with -A
 
 This patch adds another option to multipath, "-A", which reads
@@ -23,18 +26,15 @@ Update this patch to new version 0.8.2
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
- libmultipath/wwids.c          | 44 +++++++++++++++++++++++++++++++++++++++++++
- libmultipath/wwids.h          |  1 +
- multipath/main.c              |  9 ++++++++-
- multipath/multipath.8         |  3 +++
- multipathd/multipathd.service |  1 +
- 5 files changed, 57 insertions(+), 1 deletion(-)
+ libmultipath/wwids.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ libmultipath/wwids.h |  1 +
+ 2 files changed, 45 insertions(+)
 
 diff --git a/libmultipath/wwids.c b/libmultipath/wwids.c
-index ef74812..19c4d68 100644
+index 28a2150d..a0bfa851 100644
 --- a/libmultipath/wwids.c
 +++ b/libmultipath/wwids.c
-@@ -444,3 +444,47 @@ int op ## _wwid(const char *wwid) \
+@@ -454,3 +454,47 @@ int op ## _wwid(const char *wwid) \
  declare_failed_wwid_op(is_failed, false)
  declare_failed_wwid_op(mark_failed, true)
  declare_failed_wwid_op(unmark_failed, true)
@@ -83,7 +83,7 @@ index ef74812..19c4d68 100644
 +       return ret;
 +}
 diff --git a/libmultipath/wwids.h b/libmultipath/wwids.h
-index 0c6ee54..e32a0b0 100644
+index 0c6ee54d..e32a0b0e 100644
 --- a/libmultipath/wwids.h
 +++ b/libmultipath/wwids.h
 @@ -17,6 +17,7 @@ int remember_wwid(char *wwid);
@@ -94,73 +94,6 @@ index 0c6ee54..e32a0b0 100644
  
  enum {
  	WWID_IS_NOT_FAILED = 0,
-diff --git a/multipath/main.c b/multipath/main.c
-index 96a1146..5fc65ef 100644
---- a/multipath/main.c
-+++ b/multipath/main.c
-@@ -139,6 +139,7 @@ usage (char * progname)
- 	fprintf (stderr, "  %s [-v level] [-l|-ll] [device]\n", progname);
- 	fprintf (stderr, "  %s [-v level] [-a|-w] device\n", progname);
- 	fprintf (stderr, "  %s [-v level] -W\n", progname);
-+        fprintf (stderr, "  %s [-v level] -A\n", progname);
- 	fprintf (stderr, "  %s [-v level] [-i] [-c|-C] device\n", progname);
- 	fprintf (stderr, "  %s [-v level] [-i] [-u|-U]\n", progname);
- 	fprintf (stderr, "  %s [-h|-t|-T]\n", progname);
-@@ -151,6 +152,8 @@ usage (char * progname)
- 		"  -f      flush a multipath device map\n"
- 		"  -F      flush all multipath device maps\n"
- 		"  -a      add a device wwid to the wwids file\n"
-+                "  -A      add devices from kernel command line mpath.wwids\n"
-+                "          parameters to wwids file\n"
- 		"  -c      check if a device should be a path in a multipath device\n"
- 		"  -C      check if a multipath device has usable paths\n"
- 		"  -q      allow queue_if_no_path when multipathd is not running\n"
-@@ -905,7 +908,7 @@ main (int argc, char *argv[])
- 		exit(RTVL_FAIL);
- 	multipath_conf = conf;
- 	conf->retrigger_tries = 0;
--	while ((arg = getopt(argc, argv, ":adcChl::FfM:v:p:b:BrR:itTquUwW")) != EOF ) {
-+	while ((arg = getopt(argc, argv, ":aAdcChl::FfM:v:p:b:BrR:itTquUwW")) != EOF ) {
- 		switch(arg) {
- 		case 1: printf("optarg : %s\n",optarg);
- 			break;
-@@ -998,6 +1001,10 @@ main (int argc, char *argv[])
- 		case 'R':
- 			retries = atoi(optarg);
- 			break;
-+		case 'A':
-+			if (remember_cmdline_wwid() != 0)
-+				exit(1);
-+			exit(0);
- 		case ':':
- 			fprintf(stderr, "Missing option argument\n");
- 			usage(argv[0]);
-diff --git a/multipath/multipath.8 b/multipath/multipath.8
-index 9cdd05a..1e120f3 100644
---- a/multipath/multipath.8
-+++ b/multipath/multipath.8
-@@ -167,6 +167,9 @@ itself doesn't attempt to do I/O on the device.
- Check if the device specified in the program environment should be
- a path in a multipath device.
- .
-+.B \-A
-+add wwids from any kernel command line mpath.wwid parameters to the wwids file
-+.
- .TP
- .B \-U
- Check if the device specified in the program environment is a multipath device
-diff --git a/multipathd/multipathd.service b/multipathd/multipathd.service
-index 17434ce..0fbcc46 100644
---- a/multipathd/multipathd.service
-+++ b/multipathd/multipathd.service
-@@ -15,6 +15,7 @@ Type=notify
- NotifyAccess=main
- LimitCORE=infinity
- ExecStartPre=-/sbin/modprobe -a scsi_dh_alua scsi_dh_emc scsi_dh_rdac dm-multipath
-+ExecStartPre=-/sbin/multipath -A
- ExecStart=/sbin/multipathd -d -s
- ExecReload=/sbin/multipathd reconfigure
- TasksMax=infinity
 -- 
-2.7.4
+2.17.1
 

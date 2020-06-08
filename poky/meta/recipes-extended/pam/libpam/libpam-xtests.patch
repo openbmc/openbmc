@@ -28,7 +28,7 @@ Index: Linux-PAM-1.3.0/xtests/Makefile.am
 +install_xtests:
 +	$(INSTALL) -d $(DESTDIR)$(pkgdatadir)/xtests
 +	for file in $(EXTRA_DIST) ; do \
-+		$(INSTALL) $$file $(DESTDIR)$(pkgdatadir)/xtests ; \
++		$(INSTALL) $(srcdir)/$$file $(DESTDIR)$(pkgdatadir)/xtests ; \
 +	done
 +	for file in $(XTESTS); do \
 +		$(INSTALL) .libs/$$file $(DESTDIR)$(pkgdatadir)/xtests ; \

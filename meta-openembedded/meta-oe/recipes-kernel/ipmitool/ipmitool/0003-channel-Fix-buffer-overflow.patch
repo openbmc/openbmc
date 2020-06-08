@@ -1,0 +1,69 @@
+From 5057761e30e3a7682edab60f98f631616392ddc6 Mon Sep 17 00:00:00 2001
+From: Chrostoper Ertl <chertl@microsoft.com>
+Date: Thu, 28 Nov 2019 16:56:38 +0000
+Subject: [PATCH 3/3] channel: Fix buffer overflow
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Partial fix for CVE-2020-5208, see
+https://github.com/ipmitool/ipmitool/security/advisories/GHSA-g659-9qxw-p7cp
+
+The `ipmi_get_channel_cipher_suites` function does not properly check
+the final response’s `data_len`, which can lead to stack buffer overflow
+on the final copy.
+
+Upstream-Status: Backport[https://github.com/ipmitool/ipmitool/commit/9452be87181a6e83cfcc768b3ed8321763db50e4]
+CVE: CVE-2020-5208
+
+[Make some changes to apply it]
+Signed-off-by: Wenlin Kang <wenlin.kang@windriver.com>
+---
+ include/ipmitool/ipmi_channel.h |  2 ++
+ lib/ipmi_channel.c              | 10 ++++++++--
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/include/ipmitool/ipmi_channel.h b/include/ipmitool/ipmi_channel.h
+index b138c26..d7cce5e 100644
+--- a/include/ipmitool/ipmi_channel.h
++++ b/include/ipmitool/ipmi_channel.h
+@@ -77,6 +77,8 @@ struct channel_access_t {
+ 	uint8_t user_level_auth;
+ };
+ 
++#define MAX_CIPHER_SUITE_DATA_LEN 0x10
++
+ /*
+  * The Get Authentication Capabilities response structure
+  * From table 22-15 of the IPMI v2.0 spec
+diff --git a/lib/ipmi_channel.c b/lib/ipmi_channel.c
+index fab2e54..76ecdcd 100644
+--- a/lib/ipmi_channel.c
++++ b/lib/ipmi_channel.c
+@@ -378,7 +378,10 @@ ipmi_get_channel_cipher_suites(struct ipmi_intf *intf, const char *payload_type,
+ 		lprintf(LOG_ERR, "Unable to Get Channel Cipher Suites");
+ 		return -1;
+ 	}
+-	if (rsp->ccode > 0) {
++	if (rsp->ccode
++	    || rsp->data_len < 1
++	    || rsp->data_len > sizeof(uint8_t) + MAX_CIPHER_SUITE_DATA_LEN)
++	{
+ 		lprintf(LOG_ERR, "Get Channel Cipher Suites failed: %s",
+ 			val2str(rsp->ccode, completion_code_vals));
+ 		return -1;
+@@ -413,7 +416,10 @@ ipmi_get_channel_cipher_suites(struct ipmi_intf *intf, const char *payload_type,
+ 			lprintf(LOG_ERR, "Unable to Get Channel Cipher Suites");
+ 			return -1;
+ 		}
+-		if (rsp->ccode > 0) {
++		if (rsp->ccode
++		    || rsp->data_len < 1
++		    || rsp->data_len > sizeof(uint8_t) + MAX_CIPHER_SUITE_DATA_LEN)
++		{
+ 			lprintf(LOG_ERR, "Get Channel Cipher Suites failed: %s",
+ 					val2str(rsp->ccode, completion_code_vals));
+ 			return -1;
+-- 
+2.18.1
+

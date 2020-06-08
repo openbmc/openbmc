@@ -14,7 +14,7 @@ SRC_URI = "\
 SRC_URI[md5sum] = "8d1a6b96760254e4dd142d7176e8fb7c"
 SRC_URI[sha256sum] = "09fc43d428ff237138733c737b29fb1a7e49d49de06d2edbed3bc4cdcee69073"
 
-inherit cmake manpages pythonnative
+inherit cmake manpages python3native
 PACKAGECONFIG[manpages] = ""
 
 # examples are never installed, and don't need to be built in the

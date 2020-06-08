@@ -1,0 +1,39 @@
+From a752857cc342ee5136c9a593037b6ee6ff8af8ee Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 31 Dec 2015 14:35:35 -0800
+Subject: [PATCH] nativesdk-glibc: Allow 64 bit atomics for x86
+
+The fix consist of allowing 64bit atomic ops for x86.
+This should be safe for i586 and newer CPUs.
+It also makes the synchronization more efficient.
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ sysdeps/x86/atomic-machine.h | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/sysdeps/x86/atomic-machine.h b/sysdeps/x86/atomic-machine.h
+index bb49648374..aa08d3c0a7 100644
+--- a/sysdeps/x86/atomic-machine.h
++++ b/sysdeps/x86/atomic-machine.h
+@@ -58,15 +58,14 @@ typedef uintmax_t uatomic_max_t;
+ #endif
+ 
+ #define USE_ATOMIC_COMPILER_BUILTINS	1
++# define __HAVE_64B_ATOMICS		1
+ 
+ #ifdef __x86_64__
+-# define __HAVE_64B_ATOMICS		1
+ # define SP_REG				"rsp"
+ # define SEG_REG			"fs"
+ # define BR_CONSTRAINT			"q"
+ # define IBR_CONSTRAINT			"iq"
+ #else
+-# define __HAVE_64B_ATOMICS		0
+ # define SP_REG				"esp"
+ # define SEG_REG			"gs"
+ # define BR_CONSTRAINT			"r"

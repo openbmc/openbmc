@@ -1,0 +1,31 @@
+From 1fa6664d5f0cc7d21edceba6695a4c28543c2cab Mon Sep 17 00:00:00 2001
+From: Jaroslav Kysela <perex@perex.cz>
+Date: Sun, 1 Dec 2019 14:30:54 +0100
+Subject: [PATCH 4/5] namehint: improve the previous patch (check the returned
+ value)
+
+Signed-off-by: Jaroslav Kysela <perex@perex.cz>
+
+Upstream-Status: Backport
+Signed-off-by: Tanu Kaskinen <tanuk@iki.fi>
+---
+ src/control/namehint.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/control/namehint.c b/src/control/namehint.c
+index 4927ef97..60c48ae3 100644
+--- a/src/control/namehint.c
++++ b/src/control/namehint.c
+@@ -349,7 +349,8 @@ static int try_config(snd_config_t *config,
+ 	if (snd_config_search(res, "@args", &cfg) >= 0) {
+ 		snd_config_for_each(i, next, cfg) {
+ 			/* skip the argument list */
+-			snd_config_get_id(snd_config_iterator_entry(i), &str);
++			if (snd_config_get_id(snd_config_iterator_entry(i), &str) < 0)
++				continue;
+ 			while (*str && *str >= '0' && *str <= '9') str++;
+ 			if (*str == '\0')
+ 				continue;
+-- 
+2.20.1
+

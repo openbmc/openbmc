@@ -21,7 +21,7 @@ SRC_URI = "git://github.com/telmich/gpm;protocol=git \
 
 S = "${WORKDIR}/git"
 
-inherit autotools-brokensep update-rc.d systemd
+inherit autotools-brokensep update-rc.d systemd texinfo
 
 INITSCRIPT_NAME = "gpm"
 INITSCRIPT_PARAMS = "defaults"

@@ -1,6 +1,5 @@
 __license__ = "MIT"
 
-from pdb import set_trace
 import collections.abc
 import re
 import sys

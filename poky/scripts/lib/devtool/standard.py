@@ -145,8 +145,8 @@ def add(args, config, basepath, workspace):
         extracmdopts += ' --src-subdir "%s"' % args.src_subdir
     if args.autorev:
         extracmdopts += ' -a'
-    if args.fetch_dev:
-        extracmdopts += ' --fetch-dev'
+    if args.npm_dev:
+        extracmdopts += ' --npm-dev'
     if args.mirrors:
         extracmdopts += ' --mirrors'
     if args.srcrev:
@@ -260,14 +260,10 @@ def add(args, config, basepath, workspace):
                 f.write('}\n')
 
             if bb.data.inherits_class('npm', rd):
-                f.write('do_install_append() {\n')
-                f.write('    # Remove files added to source dir by devtool/externalsrc\n')
-                f.write('    rm -f ${NPM_INSTALLDIR}/singletask.lock\n')
-                f.write('    rm -rf ${NPM_INSTALLDIR}/.git\n')
-                f.write('    rm -rf ${NPM_INSTALLDIR}/oe-local-files\n')
-                f.write('    for symlink in ${EXTERNALSRC_SYMLINKS} ; do\n')
-                f.write('        rm -f ${NPM_INSTALLDIR}/${symlink%%:*}\n')
-                f.write('    done\n')
+                f.write('python do_configure_append() {\n')
+                f.write('    pkgdir = d.getVar("NPM_PACKAGE")\n')
+                f.write('    lockfile = os.path.join(pkgdir, "singletask.lock")\n')
+                f.write('    bb.utils.remove(lockfile)\n')
                 f.write('}\n')
 
         # Check if the new layer provides recipes whose priorities have been
@@ -940,8 +936,10 @@ def modify(args, config, basepath, workspace):
                         '}\n')
             if rd.getVarFlag('do_menuconfig','task'):
                 f.write('\ndo_configure_append() {\n'
-                '    cp ${B}/.config ${S}/.config.baseline\n'
-                '    ln -sfT ${B}/.config ${S}/.config.new\n'
+                '    if [ ! ${DEVTOOL_DISABLE_MENUCONFIG} ]; then\n'
+                '        cp ${B}/.config ${S}/.config.baseline\n'
+                '        ln -sfT ${B}/.config ${S}/.config.new\n'
+                '    fi\n'
                 '}\n')
             if initial_rev:
                 f.write('\n# initial_rev: %s\n' % initial_rev)
@@ -2197,7 +2195,7 @@ def register_commands(subparsers, context):
     group.add_argument('--same-dir', '-s', help='Build in same directory as source', action="store_true")
     group.add_argument('--no-same-dir', help='Force build in a separate build directory', action="store_true")
     parser_add.add_argument('--fetch', '-f', help='Fetch the specified URI and extract it to create the source tree (deprecated - pass as positional argument instead)', metavar='URI')
-    parser_add.add_argument('--fetch-dev', help='For npm, also fetch devDependencies', action="store_true")
+    parser_add.add_argument('--npm-dev', help='For npm, also fetch devDependencies', action="store_true")
     parser_add.add_argument('--version', '-V', help='Version to use within recipe (PV)')
     parser_add.add_argument('--no-git', '-g', help='If fetching source, do not set up source tree as a git repository', action="store_true")
     group = parser_add.add_mutually_exclusive_group()

@@ -62,10 +62,7 @@ def check_image_features(d):
     valid_features = (d.getVarFlag('IMAGE_FEATURES', 'validitems') or "").split()
     valid_features += d.getVarFlags('COMPLEMENTARY_GLOB').keys()
     for var in d:
-       if var.startswith("PACKAGE_GROUP_"):
-           bb.warn("PACKAGE_GROUP is deprecated, please use FEATURE_PACKAGES instead")
-           valid_features.append(var[14:])
-       elif var.startswith("FEATURE_PACKAGES_"):
+       if var.startswith("FEATURE_PACKAGES_"):
            valid_features.append(var[17:])
     valid_features.sort()
 
@@ -609,6 +606,7 @@ do_patch[noexec] = "1"
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
 do_install[noexec] = "1"
+deltask do_populate_lic
 deltask do_populate_sysroot
 do_package[noexec] = "1"
 deltask do_package_qa

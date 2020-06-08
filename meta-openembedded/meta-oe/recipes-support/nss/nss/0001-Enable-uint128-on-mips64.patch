@@ -1,0 +1,48 @@
+From 8cf7afb5417e23cd3ebf8141239bf020f5dd2ac8 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Thu, 30 Apr 2020 06:56:09 +0000
+Subject: [PATCH] Enable uint128 on mips64
+
+Fix below error:
+| verified/kremlin/kremlib/dist/minimal/FStar_UInt128.h:22:1: error: 'FStar_UInt128___proj__Mkuint128__item__low' declared 'static' but never defined [-Werror=unused-function]
+|   22 | FStar_UInt128___proj__Mkuint128__item__low(FStar_UInt128_uint128 projectee);
+
+Upstream-Status: Pending
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ .../freebl/verified/kremlin/include/kremlin/internal/types.h   | 3 ++-
+ .../kremlin/kremlib/dist/minimal/fstar_uint128_gcc64.h         | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/nss/lib/freebl/verified/kremlin/include/kremlin/internal/types.h b/nss/lib/freebl/verified/kremlin/include/kremlin/internal/types.h
+index 801e78f..cdac61e 100644
+--- a/nss/lib/freebl/verified/kremlin/include/kremlin/internal/types.h
++++ b/nss/lib/freebl/verified/kremlin/include/kremlin/internal/types.h
+@@ -57,7 +57,8 @@ typedef const char *Prims_string;
+ typedef __m128i FStar_UInt128_uint128;
+ #elif !defined(KRML_VERIFIED_UINT128) && !defined(_MSC_VER) && \
+     (defined(__x86_64__) || defined(__x86_64) || defined(__aarch64__) || \
+-     (defined(__riscv) && __riscv_xlen == 64))
++     (defined(__riscv) && __riscv_xlen == 64) || \
++     defined(__mips64))
+ typedef unsigned __int128 FStar_UInt128_uint128;
+ #else
+ typedef struct FStar_UInt128_uint128_s {
+diff --git a/nss/lib/freebl/verified/kremlin/kremlib/dist/minimal/fstar_uint128_gcc64.h b/nss/lib/freebl/verified/kremlin/kremlib/dist/minimal/fstar_uint128_gcc64.h
+index f38fda3..7ca67d2 100644
+--- a/nss/lib/freebl/verified/kremlin/kremlib/dist/minimal/fstar_uint128_gcc64.h
++++ b/nss/lib/freebl/verified/kremlin/kremlib/dist/minimal/fstar_uint128_gcc64.h
+@@ -26,7 +26,8 @@
+ #include <stdint.h>
+ #if !defined(KRML_VERIFIED_UINT128) && !defined(_MSC_VER) && \
+     (defined(__x86_64__) || defined(__x86_64) || defined(__aarch64__) || \
+-     (defined(__riscv) && __riscv_xlen == 64))
++     (defined(__riscv) && __riscv_xlen == 64) || \
++     defined(__mips64))
+ 
+ /* GCC + using native unsigned __int128 support */
+ 
+-- 
+2.24.1
+

@@ -14,8 +14,6 @@ BitBake 'Fetch' implementation for bzr.
 #
 
 import os
-import sys
-import logging
 import bb
 from bb.fetch2 import FetchMethod
 from bb.fetch2 import FetchError

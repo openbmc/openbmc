@@ -1,0 +1,26 @@
+From 6f87a095f0e696bec07a50df789c9db8bdbca43d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 12 May 2020 10:39:09 -0700
+Subject: [PATCH] mingw32: Enable operation_not_supported
+
+Fixes nativesdk build errors on mingw32 gcc-runtime
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libstdc++-v3/config/os/mingw32/error_constants.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libstdc++-v3/config/os/mingw32/error_constants.h b/libstdc++-v3/config/os/mingw32/error_constants.h
+index 68ac72a78fb..71cd5815b81 100644
+--- a/libstdc++-v3/config/os/mingw32/error_constants.h
++++ b/libstdc++-v3/config/os/mingw32/error_constants.h
+@@ -107,7 +107,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+ #ifdef _GLIBCXX_HAVE_EPERM
+       operation_not_permitted = 		EPERM,
+ #endif
+-//    operation_not_supported = 		EOPNOTSUPP,
++      operation_not_supported = 		EOPNOTSUPP,
+ #ifdef _GLIBCXX_HAVE_EWOULDBLOCK
+       operation_would_block = 			EWOULDBLOCK,
+ #endif

@@ -1,0 +1,166 @@
+From 94028b16e56c8eef1aa02dcc4da268a0e471b4ea Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 23 Aug 2019 10:19:48 +0800
+Subject: [PATCH 3/4] musl-utils
+
+Provide missing defines which otherwise are available on glibc system headers
+
+Alter the error API to match posix version
+use qsort instead of qsort_r which is glibc specific API
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Inappropriate [workaround for musl]
+
+Rebase to 0.177
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+---
+ src/arlib.h       |  6 ++++++
+ src/elfcompress.c |  7 +++++++
+ src/readelf.c     | 20 ++++++++++++--------
+ src/strip.c       |  7 +++++++
+ src/unstrip.c     |  9 +++++++++
+ 5 files changed, 41 insertions(+), 8 deletions(-)
+
+diff --git a/src/arlib.h b/src/arlib.h
+index e117166..8326f6c 100644
+--- a/src/arlib.h
++++ b/src/arlib.h
+@@ -29,6 +29,12 @@
+ #include <stdint.h>
+ #include <sys/types.h>
+ 
++#if !defined(ALLPERMS)
++# define ALLPERMS (S_ISUID|S_ISGID|S_ISVTX|S_IRWXU|S_IRWXG|S_IRWXO) /* 07777 */
++#endif
++#if !defined(DEFFILEMODE)
++# define DEFFILEMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)/* 0666*/
++#endif
+ 
+ /* State of -D/-U flags.  */
+ extern bool arlib_deterministic_output;
+diff --git a/src/elfcompress.c b/src/elfcompress.c
+index 6ba6af4..0c7674b 100644
+--- a/src/elfcompress.c
++++ b/src/elfcompress.c
+@@ -37,6 +37,13 @@
+ #include "libeu.h"
+ #include "printversion.h"
+ 
++#if !defined(ALLPERMS)
++# define ALLPERMS (S_ISUID|S_ISGID|S_ISVTX|S_IRWXU|S_IRWXG|S_IRWXO) /* 07777 */
++#endif
++#if !defined(FNM_EXTMATCH)
++# define FNM_EXTMATCH (0)
++#endif
++
+ /* Name and version of program.  */
+ ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
+ 
+diff --git a/src/readelf.c b/src/readelf.c
+index 5994615..f3cc071 100644
+--- a/src/readelf.c
++++ b/src/readelf.c
+@@ -4829,10 +4829,11 @@ listptr_base (struct listptr *p)
+   return cudie_base (&cu);
+ }
+ 
++static const char *listptr_name;
++
+ static int
+-compare_listptr (const void *a, const void *b, void *arg)
++compare_listptr (const void *a, const void *b)
+ {
+-  const char *name = arg;
+   struct listptr *p1 = (void *) a;
+   struct listptr *p2 = (void *) b;
+ 
+@@ -4848,21 +4849,21 @@ compare_listptr (const void *a, const void *b, void *arg)
+ 	  p1->warned = p2->warned = true;
+ 	  error (0, 0,
+ 		 gettext ("%s %#" PRIx64 " used with different address sizes"),
+-		 name, (uint64_t) p1->offset);
++		 listptr_name, (uint64_t) p1->offset);
+ 	}
+       if (p1->dwarf64 != p2->dwarf64)
+ 	{
+ 	  p1->warned = p2->warned = true;
+ 	  error (0, 0,
+ 		 gettext ("%s %#" PRIx64 " used with different offset sizes"),
+-		 name, (uint64_t) p1->offset);
++		 listptr_name, (uint64_t) p1->offset);
+ 	}
+       if (listptr_base (p1) != listptr_base (p2))
+ 	{
+ 	  p1->warned = p2->warned = true;
+ 	  error (0, 0,
+ 		 gettext ("%s %#" PRIx64 " used with different base addresses"),
+-		 name, (uint64_t) p1->offset);
++		 listptr_name, (uint64_t) p1->offset);
+ 	}
+       if (p1->attr != p2 ->attr)
+ 	{
+@@ -4870,7 +4871,7 @@ compare_listptr (const void *a, const void *b, void *arg)
+ 	  error (0, 0,
+ 		 gettext ("%s %#" PRIx64
+ 			  " used with different attribute %s and %s"),
+-		 name, (uint64_t) p1->offset, dwarf_attr_name (p2->attr),
++		 listptr_name, (uint64_t) p1->offset, dwarf_attr_name (p2->attr),
+ 		 dwarf_attr_name (p2->attr));
+ 	}
+     }
+@@ -4942,8 +4943,11 @@ static void
+ sort_listptr (struct listptr_table *table, const char *name)
+ {
+   if (table->n > 0)
+-    qsort_r (table->table, table->n, sizeof table->table[0],
+-	     &compare_listptr, (void *) name);
++    {
++      listptr_name = name;
++      qsort (table->table, table->n, sizeof table->table[0],
++	    &compare_listptr);
++    }
+ }
+ 
+ static bool
+diff --git a/src/strip.c b/src/strip.c
+index 4054c2a..d2d2176 100644
+--- a/src/strip.c
++++ b/src/strip.c
+@@ -46,6 +46,13 @@
+ #include <system.h>
+ #include <printversion.h>
+ 
++#if !defined(ACCESSPERMS)
++# define ACCESSPERMS (S_IRWXU|S_IRWXG|S_IRWXO) /* 0777 */
++#endif
++#if !defined(FNM_EXTMATCH)
++# define FNM_EXTMATCH (0)
++#endif
++
+ typedef uint8_t GElf_Byte;
+ 
+ /* Name and version of program.  */
+diff --git a/src/unstrip.c b/src/unstrip.c
+index 9b8c09a..1fb5063 100644
+--- a/src/unstrip.c
++++ b/src/unstrip.c
+@@ -56,6 +56,15 @@
+ # define _(str) gettext (str)
+ #endif
+ 
++#ifndef strndupa
++#define strndupa(s, n) \
++       ({const char *__in = (s); \
++         size_t __len = strnlen (__in, (n)) + 1; \
++         char *__out = (char *) alloca (__len); \
++         __out[__len-1] = '\0'; \
++         (char *) memcpy (__out, __in, __len-1);})
++#endif
++
+ /* Name and version of program.  */
+ ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
+ 
+-- 
+2.17.1
+

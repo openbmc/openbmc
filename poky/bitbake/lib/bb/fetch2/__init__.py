@@ -33,6 +33,9 @@ _checksum_cache = bb.checksum.FileChecksumCache()
 
 logger = logging.getLogger("BitBake.Fetcher")
 
+CHECKSUM_LIST = [ "md5", "sha256", "sha1", "sha384", "sha512" ]
+SHOWN_CHECKSUM_LIST = ["sha256"]
+
 class BBFetchException(Exception):
     """Class all fetch exceptions inherit from"""
     def __init__(self, message):
@@ -131,10 +134,9 @@ class NonLocalMethod(Exception):
         Exception.__init__(self)
 
 class MissingChecksumEvent(bb.event.Event):
-    def __init__(self, url, md5sum, sha256sum):
+    def __init__(self, url, **checksums):
         self.url = url
-        self.checksums = {'md5sum': md5sum,
-                          'sha256sum': sha256sum}
+        self.checksums = checksums
         bb.event.Event.__init__(self)
 
 
@@ -484,17 +486,22 @@ def fetcher_init(d):
     Called to initialize the fetchers once the configuration data is known.
     Calls before this must not hit the cache.
     """
+
+    revs = bb.persist_data.persist('BB_URI_HEADREVS', d)
+    try:
+        # fetcher_init is called multiple times, so make sure we only save the
+        # revs the first time it is called.
+        if not bb.fetch2.saved_headrevs:
+            bb.fetch2.saved_headrevs = dict(revs)
+    except:
+        pass
+
     # When to drop SCM head revisions controlled by user policy
     srcrev_policy = d.getVar('BB_SRCREV_POLICY') or "clear"
     if srcrev_policy == "cache":
         logger.debug(1, "Keeping SRCREV cache due to cache policy of: %s", srcrev_policy)
     elif srcrev_policy == "clear":
         logger.debug(1, "Clearing SRCREV cache due to cache policy of: %s", srcrev_policy)
-        revs = bb.persist_data.persist('BB_URI_HEADREVS', d)
-        try:
-            bb.fetch2.saved_headrevs = revs.items()
-        except:
-            pass
         revs.clear()
     else:
         raise FetchError("Invalid SRCREV cache policy of: %s" % srcrev_policy)
@@ -513,22 +520,12 @@ def fetcher_parse_done():
 
 def fetcher_compare_revisions(d):
     """
-    Compare the revisions in the persistant cache with current values and
-    return true/false on whether they've changed.
+    Compare the revisions in the persistent cache with the saved values from
+    when bitbake was started and return true if they have changed.
     """
 
-    data = bb.persist_data.persist('BB_URI_HEADREVS', d).items()
-    data2 = bb.fetch2.saved_headrevs
-
-    changed = False
-    for key in data:
-        if key not in data2 or data2[key] != data[key]:
-            logger.debug(1, "%s changed", key)
-            changed = True
-            return True
-        else:
-            logger.debug(2, "%s did not change", key)
-    return False
+    headrevs = dict(bb.persist_data.persist('BB_URI_HEADREVS', d))
+    return headrevs != bb.fetch2.saved_headrevs
 
 def mirror_from_string(data):
     mirrors = (data or "").replace('\\n',' ').split()
@@ -552,71 +549,84 @@ def verify_checksum(ud, d, precomputed={}):
     downloading. See https://bugzilla.yoctoproject.org/show_bug.cgi?id=5571.
     """
 
-    _MD5_KEY = "md5"
-    _SHA256_KEY = "sha256"
-
     if ud.ignore_checksums or not ud.method.supports_checksum(ud):
         return {}
 
-    if _MD5_KEY in precomputed:
-        md5data = precomputed[_MD5_KEY]
-    else:
-        md5data = bb.utils.md5_file(ud.localpath)
+    def compute_checksum_info(checksum_id):
+        checksum_name = getattr(ud, "%s_name" % checksum_id)
 
-    if _SHA256_KEY in precomputed:
-        sha256data = precomputed[_SHA256_KEY]
-    else:
-        sha256data = bb.utils.sha256_file(ud.localpath)
+        if checksum_id in precomputed:
+            checksum_data = precomputed[checksum_id]
+        else:
+            checksum_data = getattr(bb.utils, "%s_file" % checksum_id)(ud.localpath)
 
-    if ud.method.recommends_checksum(ud) and not ud.md5_expected and not ud.sha256_expected:
-        # If strict checking enabled and neither sum defined, raise error
+        checksum_expected = getattr(ud, "%s_expected" % checksum_id)
+
+        return {
+            "id": checksum_id,
+            "name": checksum_name,
+            "data": checksum_data,
+            "expected": checksum_expected
+        }
+
+    checksum_infos = []
+    for checksum_id in CHECKSUM_LIST:
+        checksum_infos.append(compute_checksum_info(checksum_id))
+
+    checksum_dict = {ci["id"] : ci["data"] for ci in checksum_infos}
+    checksum_event = {"%ssum" % ci["id"] : ci["data"] for ci in checksum_infos}
+
+    for ci in checksum_infos:
+        if ci["id"] in SHOWN_CHECKSUM_LIST:
+            checksum_lines = ["SRC_URI[%s] = \"%s\"" % (ci["name"], ci["data"])]
+
+    # If no checksum has been provided
+    if ud.method.recommends_checksum(ud) and all(ci["expected"] is None for ci in checksum_infos):
+        messages = []
         strict = d.getVar("BB_STRICT_CHECKSUM") or "0"
-        if strict == "1":
-            logger.error('No checksum specified for %s, please add at least one to the recipe:\n'
-                             'SRC_URI[%s] = "%s"\nSRC_URI[%s] = "%s"' %
-                             (ud.localpath, ud.md5_name, md5data,
-                              ud.sha256_name, sha256data))
-            raise NoChecksumError('Missing SRC_URI checksum', ud.url)
 
-        bb.event.fire(MissingChecksumEvent(ud.url, md5data, sha256data), d)
+        # If strict checking enabled and neither sum defined, raise error
+        if strict == "1":
+            messages.append("No checksum specified for '%s', please add at " \
+                            "least one to the recipe:" % ud.localpath)
+            messages.extend(checksum_lines)
+            logger.error("\n".join(messages))
+            raise NoChecksumError("Missing SRC_URI checksum", ud.url)
+
+        bb.event.fire(MissingChecksumEvent(ud.url, **checksum_event), d)
 
         if strict == "ignore":
-            return {
-                _MD5_KEY: md5data,
-                _SHA256_KEY: sha256data
-            }
+            return checksum_dict
 
         # Log missing sums so user can more easily add them
-        logger.warning('Missing md5 SRC_URI checksum for %s, consider adding to the recipe:\n'
-                       'SRC_URI[%s] = "%s"',
-                       ud.localpath, ud.md5_name, md5data)
-        logger.warning('Missing sha256 SRC_URI checksum for %s, consider adding to the recipe:\n'
-                       'SRC_URI[%s] = "%s"',
-                       ud.localpath, ud.sha256_name, sha256data)
+        messages.append("Missing checksum for '%s', consider adding at " \
+                        "least one to the recipe:" % ud.localpath)
+        messages.extend(checksum_lines)
+        logger.warning("\n".join(messages))
 
     # We want to alert the user if a checksum is defined in the recipe but
     # it does not match.
-    msg = ""
-    mismatch = False
-    if ud.md5_expected and ud.md5_expected != md5data:
-        msg = msg + "\nFile: '%s' has %s checksum %s when %s was expected" % (ud.localpath, 'md5', md5data, ud.md5_expected)
-        mismatch = True;
+    messages = []
+    messages.append("Checksum mismatch!")
+    bad_checksum = None
 
-    if ud.sha256_expected and ud.sha256_expected != sha256data:
-        msg = msg + "\nFile: '%s' has %s checksum %s when %s was expected" % (ud.localpath, 'sha256', sha256data, ud.sha256_expected)
-        mismatch = True;
+    for ci in checksum_infos:
+        if ci["expected"] and ci["expected"] != ci["data"]:
+            messages.append("File: '%s' has %s checksum %s when %s was " \
+                            "expected" % (ud.localpath, ci["id"], ci["data"], ci["expected"]))
+            bad_checksum = ci["data"]
 
-    if mismatch:
-        msg = msg + '\nIf this change is expected (e.g. you have upgraded to a new version without updating the checksums) then you can use these lines within the recipe:\nSRC_URI[%s] = "%s"\nSRC_URI[%s] = "%s"\nOtherwise you should retry the download and/or check with upstream to determine if the file has become corrupted or otherwise unexpectedly modified.\n' % (ud.md5_name, md5data, ud.sha256_name, sha256data)
+    if bad_checksum:
+        messages.append("If this change is expected (e.g. you have upgraded " \
+                        "to a new version without updating the checksums) " \
+                        "then you can use these lines within the recipe:")
+        messages.extend(checksum_lines)
+        messages.append("Otherwise you should retry the download and/or " \
+                        "check with upstream to determine if the file has " \
+                        "become corrupted or otherwise unexpectedly modified.")
+        raise ChecksumError("\n".join(messages), ud.url, bad_checksum)
 
-    if len(msg):
-        raise ChecksumError('Checksum mismatch!%s' % msg, ud.url, md5data)
-
-    return {
-        _MD5_KEY: md5data,
-        _SHA256_KEY: sha256data
-    }
-
+    return checksum_dict
 
 def verify_donestamp(ud, d, origud=None):
     """
@@ -1081,7 +1091,7 @@ def try_mirrors(fetch, d, origud, mirrors, check = False):
 
     for index, uri in enumerate(uris):
         ret = try_mirror_url(fetch, origud, uds[index], ld, check)
-        if ret != False:
+        if ret:
             return ret
     return None
 
@@ -1197,14 +1207,14 @@ def get_checksum_file_list(d):
 
     return " ".join(filelist)
 
-def get_file_checksums(filelist, pn):
+def get_file_checksums(filelist, pn, localdirsexclude):
     """Get a list of the checksums for a list of local files
 
     Returns the checksums for a list of local files, caching the results as
     it proceeds
 
     """
-    return _checksum_cache.get_checksums(filelist, pn)
+    return _checksum_cache.get_checksums(filelist, pn, localdirsexclude)
 
 
 class FetchData(object):
@@ -1230,24 +1240,26 @@ class FetchData(object):
             self.pswd = self.parm["pswd"]
         self.setup = False
 
-        if "name" in self.parm:
-            self.md5_name = "%s.md5sum" % self.parm["name"]
-            self.sha256_name = "%s.sha256sum" % self.parm["name"]
-        else:
-            self.md5_name = "md5sum"
-            self.sha256_name = "sha256sum"
-        if self.md5_name in self.parm:
-            self.md5_expected = self.parm[self.md5_name]
-        elif self.type not in ["http", "https", "ftp", "ftps", "sftp", "s3"]:
-            self.md5_expected = None
-        else:
-            self.md5_expected = d.getVarFlag("SRC_URI", self.md5_name)
-        if self.sha256_name in self.parm:
-            self.sha256_expected = self.parm[self.sha256_name]
-        elif self.type not in ["http", "https", "ftp", "ftps", "sftp", "s3"]:
-            self.sha256_expected = None
-        else:
-            self.sha256_expected = d.getVarFlag("SRC_URI", self.sha256_name)
+        def configure_checksum(checksum_id):
+            if "name" in self.parm:
+                checksum_name = "%s.%ssum" % (self.parm["name"], checksum_id)
+            else:
+                checksum_name = "%ssum" % checksum_id
+
+            setattr(self, "%s_name" % checksum_id, checksum_name)
+
+            if checksum_name in self.parm:
+                checksum_expected = self.parm[checksum_name]
+            elif self.type not in ["http", "https", "ftp", "ftps", "sftp", "s3"]:
+                checksum_expected = None
+            else:
+                checksum_expected = d.getVarFlag("SRC_URI", checksum_name)
+
+            setattr(self, "%s_expected" % checksum_id, checksum_expected)
+
+        for checksum_id in CHECKSUM_LIST:
+            configure_checksum(checksum_id)
+
         self.ignore_checksums = False
 
         self.names = self.parm.get("name",'default').split(',')
@@ -1351,7 +1363,7 @@ class FetchMethod(object):
         """
 
         # We cannot compute checksums for directories
-        if os.path.isdir(urldata.localpath) == True:
+        if os.path.isdir(urldata.localpath):
             return False
         if urldata.localpath.find("*") != -1:
             return False
@@ -1364,6 +1376,18 @@ class FetchMethod(object):
         be displayed if there is no checksum)?
         """
         return False
+
+    def verify_donestamp(self, ud, d):
+        """
+        Verify the donestamp file
+        """
+        return verify_donestamp(ud, d)
+
+    def update_donestamp(self, ud, d):
+        """
+        Update the donestamp file
+        """
+        update_stamp(ud, d)
 
     def _strip_leading_slashes(self, relpath):
         """
@@ -1539,6 +1563,12 @@ class FetchMethod(object):
         """
         return True
 
+    def try_mirrors(self, fetch, urldata, d, mirrors, check=False):
+        """
+        Try to use a mirror
+        """
+        return bool(try_mirrors(fetch, d, urldata, mirrors, check))
+
     def checkstatus(self, fetch, urldata, d):
         """
         Check the status of a URL
@@ -1567,8 +1597,7 @@ class FetchMethod(object):
         return True, str(latest_rev)
 
     def generate_revision_key(self, ud, d, name):
-        key = self._revision_key(ud, d, name)
-        return "%s-%s" % (key, d.getVar("PN") or "")
+        return self._revision_key(ud, d, name)
 
     def latest_versionstring(self, ud, d):
         """
@@ -1577,6 +1606,16 @@ class FetchMethod(object):
         versions and returning the highest match as a (version, revision) pair.
         """
         return ('', '')
+
+    def done(self, ud, d):
+        """
+        Is the download done ?
+        """
+        if os.path.exists(ud.localpath):
+            return True
+        if ud.localpath.find("*") != -1:
+            return True
+        return False
 
 class Fetch(object):
     def __init__(self, urls, d, cache = True, localonly = False, connection_cache = None):
@@ -1592,8 +1631,11 @@ class Fetch(object):
 
         fn = d.getVar('FILE')
         mc = d.getVar('__BBMULTICONFIG') or ""
-        if cache and fn and mc + fn in urldata_cache:
-            self.ud = urldata_cache[mc + fn + str(id(d))]
+        key = None
+        if cache and fn:
+            key = mc + fn + str(id(d))
+        if key in urldata_cache:
+            self.ud = urldata_cache[key]
 
         for url in urls:
             if url not in self.ud:
@@ -1604,8 +1646,8 @@ class Fetch(object):
                         self.ud[url] = None
                         pass
 
-        if fn and cache:
-            urldata_cache[mc + fn + str(id(d))] = self.ud
+        if key:
+            urldata_cache[key] = self.ud
 
     def localpath(self, url):
         if url not in self.urls:
@@ -1641,7 +1683,7 @@ class Fetch(object):
             ud = self.ud[u]
             ud.setup_localpath(self.d)
             m = ud.method
-            localpath = ""
+            done = False
 
             if ud.lockfile:
                 lf = bb.utils.lockfile(ud.lockfile)
@@ -1649,28 +1691,28 @@ class Fetch(object):
             try:
                 self.d.setVar("BB_NO_NETWORK", network)
 
-                if verify_donestamp(ud, self.d) and not m.need_update(ud, self.d):
-                    localpath = ud.localpath
+                if m.verify_donestamp(ud, self.d) and not m.need_update(ud, self.d):
+                    done = True
                 elif m.try_premirror(ud, self.d):
                     logger.debug(1, "Trying PREMIRRORS")
                     mirrors = mirror_from_string(self.d.getVar('PREMIRRORS'))
-                    localpath = try_mirrors(self, self.d, ud, mirrors, False)
-                    if localpath:
+                    done = m.try_mirrors(self, ud, self.d, mirrors)
+                    if done:
                         try:
                             # early checksum verification so that if the checksum of the premirror
                             # contents mismatch the fetcher can still try upstream and mirrors
-                            update_stamp(ud, self.d)
+                            m.update_donestamp(ud, self.d)
                         except ChecksumError as e:
                             logger.warning("Checksum failure encountered with premirror download of %s - will attempt other sources." % u)
                             logger.debug(1, str(e))
-                            localpath = ""
+                            done = False
 
                 if premirroronly:
                     self.d.setVar("BB_NO_NETWORK", "1")
 
                 firsterr = None
-                verified_stamp = verify_donestamp(ud, self.d)
-                if not localpath and (not verified_stamp or m.need_update(ud, self.d)):
+                verified_stamp = m.verify_donestamp(ud, self.d)
+                if not done and (not verified_stamp or m.need_update(ud, self.d)):
                     try:
                         if not trusted_network(self.d, ud.url):
                             raise UntrustedUrl(ud.url)
@@ -1678,10 +1720,10 @@ class Fetch(object):
                         m.download(ud, self.d)
                         if hasattr(m, "build_mirror_data"):
                             m.build_mirror_data(ud, self.d)
-                        localpath = ud.localpath
+                        done = True
                         # early checksum verify, so that if checksum mismatched,
                         # fetcher still have chance to fetch from mirror
-                        update_stamp(ud, self.d)
+                        m.update_donestamp(ud, self.d)
 
                     except bb.fetch2.NetworkAccess:
                         raise
@@ -1703,14 +1745,14 @@ class Fetch(object):
                             m.clean(ud, self.d)
                         logger.debug(1, "Trying MIRRORS")
                         mirrors = mirror_from_string(self.d.getVar('MIRRORS'))
-                        localpath = try_mirrors(self, self.d, ud, mirrors)
+                        done = m.try_mirrors(self, ud, self.d, mirrors)
 
-                if not localpath or ((not os.path.exists(localpath)) and localpath.find("*") == -1):
+                if not done or not m.done(ud, self.d):
                     if firsterr:
                         logger.error(str(firsterr))
                     raise FetchError("Unable to fetch URL from any source.", u)
 
-                update_stamp(ud, self.d)
+                m.update_donestamp(ud, self.d)
 
             except IOError as e:
                 if e.errno in [errno.ESTALE]:
@@ -1741,14 +1783,14 @@ class Fetch(object):
             logger.debug(1, "Testing URL %s", u)
             # First try checking uri, u, from PREMIRRORS
             mirrors = mirror_from_string(self.d.getVar('PREMIRRORS'))
-            ret = try_mirrors(self, self.d, ud, mirrors, True)
+            ret = m.try_mirrors(self, ud, self.d, mirrors, True)
             if not ret:
                 # Next try checking from the original uri, u
                 ret = m.checkstatus(self, ud, self.d)
                 if not ret:
                     # Finally, try checking uri, u, from MIRRORS
                     mirrors = mirror_from_string(self.d.getVar('MIRRORS'))
-                    ret = try_mirrors(self, self.d, ud, mirrors, True)
+                    ret = m.try_mirrors(self, ud, self.d, mirrors, True)
 
             if not ret:
                 raise FetchError("URL %s doesn't work" % u, u)
@@ -1853,6 +1895,7 @@ from . import osc
 from . import repo
 from . import clearcase
 from . import npm
+from . import npmsw
 
 methods.append(local.Local())
 methods.append(wget.Wget())
@@ -1871,3 +1914,4 @@ methods.append(osc.Osc())
 methods.append(repo.Repo())
 methods.append(clearcase.ClearCase())
 methods.append(npm.Npm())
+methods.append(npmsw.NpmShrinkWrap())

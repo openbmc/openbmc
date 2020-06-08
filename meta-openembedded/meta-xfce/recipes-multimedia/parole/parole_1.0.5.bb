@@ -3,7 +3,7 @@ HOMEPAGE = "https://docs.xfce.org/apps/parole/start"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552"
 
-inherit xfce-app gtk-doc mime
+inherit xfce-app gtk-doc mime mime-xdg
 
 DEPENDS += " \
     dbus-glib \

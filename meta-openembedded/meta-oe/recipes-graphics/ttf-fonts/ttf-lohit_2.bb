@@ -15,7 +15,7 @@ S = "${WORKDIR}/git"
 FONT_PACKAGES = "${PN}"
 FILES_${PN} = "${datadir}"
 
-inherit pythonnative
+inherit python3native
 
 do_compile() {
     cd ${S}; make ttf;

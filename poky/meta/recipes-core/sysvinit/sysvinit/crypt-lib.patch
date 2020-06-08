@@ -1,3 +1,8 @@
+From 7276275d9a08d5ae268fb263027bbc60bc0ab2e8 Mon Sep 17 00:00:00 2001
+From: Jeff Dike <jdike@x86_64.user-mode-linux.org>
+Date: Wed, 14 Jul 2010 14:35:52 -0400
+Subject: [PATCH] sysvinit - Remove sulogin dependency on /usr/lib*/libcrypt.a
+
 Upstream-Status: Inappropriate [configuration]
 
 # The src Makefile was checking for libcrypt.a on the host, not in the
@@ -5,21 +10,27 @@ Upstream-Status: Inappropriate [configuration]
 # and uses it if it's there.
 # - jdike@linux.intel.com
 
-Index: sysvinit-2.88dsf/src/Makefile
-===================================================================
---- sysvinit-2.88dsf.orig/src/Makefile
-+++ sysvinit-2.88dsf/src/Makefile
-@@ -85,9 +85,13 @@ else
+---
+ src/Makefile | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index 1380d7f..628e77f 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -97,13 +97,8 @@ else
  endif
  
  # Additional libs for GNU libc.
+-ifneq ($(wildcard /usr/lib*/libcrypt.*),)
+-  SULOGINLIBS	+= -lcrypt
+-endif
+-
+-# Additional libs for GNU libc / multiarch on Debian based systems.
+-ifneq ($(wildcard /usr/lib/*/libcrypt.*),)
+-  SULOGINLIBS	+= -lcrypt
 +ifneq ($(LCRYPT),)
 +  SULOGINLIBS	+= $(LCRYPT)
-+else
- ifneq ($(wildcard /usr/lib*/libcrypt.a),)
-   SULOGINLIBS	+= -lcrypt
  endif
-+endif
  
  all:		$(BIN) $(SBIN) $(USRBIN)
- 

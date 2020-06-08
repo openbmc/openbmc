@@ -7,6 +7,7 @@ SRC_URI += " \
            file://fix-invalid-ownership.patch \
            file://syslog-ng.service-the-syslog-ng-service.patch \
            file://0001-syslog-ng-fix-segment-fault-during-service-start.patch \
+           file://shebang.patch \
            file://syslog-ng-tmp.conf \
            "
 

@@ -1,8 +1,8 @@
-FILESEXTRAPATHS_prepend_tiogapass := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/${MACHINE}:"
 
-SRC_URI_append_tiogapass = " file://ipmb-channels.json"
+SRC_URI_append = " file://ipmb-channels.json"
 
-do_install_append_tiogapass(){
+do_install_append() {
     install -m 0644 -D ${WORKDIR}/ipmb-channels.json \
                    ${D}/usr/share/ipmbbridge
 }

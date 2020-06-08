@@ -10,7 +10,7 @@ PACKAGECONFIG[decode] = "--with-libsigrokdecode,--without-libsigrokdecode,libsig
 
 PACKAGECONFIG ??= "decode"
 
-inherit autotools pkgconfig
+inherit autotools pkgconfig mime-xdg
 
 SRC_URI = "http://sigrok.org/download/source/sigrok-cli/sigrok-cli-${PV}.tar.gz"
 SRC_URI[md5sum] = "3f45ce664bad529d8b3f78a61b017d75"

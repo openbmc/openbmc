@@ -1,7 +1,12 @@
-From 4f000a4a19975d6aba71427e693cd1ed080abda9 Mon Sep 17 00:00:00 2001
+From 9eab96351a726e9ce6a15d158f743e35d73a8900 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 Date: Thu, 22 Mar 2018 11:08:30 +0100
 Subject: [PATCH] Do not create settings settings/property documentation
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -12,17 +17,18 @@ python. Anyway it is not necessary for us to have the settings/property docs.
 Upstream-Status: Inappropriate [OE specific]
 
 Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+
 ---
  Makefile.am  | 11 -----------
  configure.ac |  5 -----
  2 files changed, 16 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index b180466..1ab4658 100644
+index d5cbcf5..2a1819a 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -1298,9 +1298,7 @@ EXTRA_DIST += \
- if HAVE_INTROSPECTION
+@@ -1473,9 +1473,7 @@ libnm/libnm.typelib: libnm/libnm.gir
+ INTROSPECTION_GIRS += libnm/NM-1.0.gir
  
  libnm_noinst_data = \
 -	libnm/nm-property-docs.xml \
@@ -31,7 +37,7 @@ index b180466..1ab4658 100644
  	libnm/nm-settings-keyfile-docs.xml \
  	libnm/nm-settings-ifcfg-rh-docs.xml
  
-@@ -3930,18 +3928,9 @@ $(clients_common_libnmc_base_la_OBJECTS): $(libnm_lib_h_pub_mkenums)
+@@ -4236,18 +4234,9 @@ $(clients_common_libnmc_base_la_OBJECTS): $(libnm_lib_h_pub_mkenums)
  $(clients_common_libnmc_base_la_OBJECTS): clients/common/.dirstamp
  
  clients_common_settings_doc_h = clients/common/settings-docs.h
@@ -51,10 +57,10 @@ index b180466..1ab4658 100644
  	$(clients_common_settings_doc_h) \
  	$(clients_common_settings_doc_h).in
 diff --git a/configure.ac b/configure.ac
-index b914219..872c292 100644
+index ad4b0fc..0092092 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1215,11 +1215,6 @@ GTK_DOC_CHECK(1.0)
+@@ -1201,11 +1201,6 @@ GTK_DOC_CHECK(1.0)
  # check if we can build setting property documentation
  build_docs=no
  if test -n "$INTROSPECTION_MAKEFILE"; then
@@ -66,6 +72,3 @@ index b914219..872c292 100644
  	AC_PATH_PROG(PERL, perl)
  	if test -z "$PERL"; then
  		AC_MSG_ERROR([--enable-introspection requires perl])
--- 
-2.20.1
-

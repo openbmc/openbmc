@@ -21,8 +21,8 @@ SRC_URI = "https://downloads.mariadb.org/interstitial/${BP}/source/${BP}.tar.gz 
            file://0001-Fix-build-breakage-from-lock_guard-error-6161.patch \
            file://0001-Fix-library-LZ4-lookup.patch \
           "
-SRC_URI[md5sum] = "d0de881ab8ead46928cafb7d558535c1"
-SRC_URI[sha256sum] = "4c076232b99433b09eb3c6d62f607192b3474d022703699b8f6aef4e79de3fb9"
+SRC_URI[md5sum] = "97d7c0f508c04a31c138fdb24e95dbc4"
+SRC_URI[sha256sum] = "fef1e1d38aa253dd8a51006bd15aad184912fce31c446bb69434fcde735aa208"
 
 UPSTREAM_CHECK_URI = "https://github.com/MariaDB/server/releases"
 
@@ -168,6 +168,10 @@ do_install() {
     if [ -f ${D}${datadir}/doc/README ]; then
         mv ${D}${datadir}/doc/README ${D}${datadir}/doc/${PN}/
     fi
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'true', 'false', d)}; then
+        mv ${D}/lib/security ${D}/${libdir}
+        rmdir --ignore-fail-on-non-empty ${D}/lib
+    fi
 }
 
 PACKAGES = "${PN}-dbg ${PN} \
@@ -299,11 +303,14 @@ FILES_${PN}-server = "\
     ${sbindir}/ndbd \
     ${sbindir}/ndb_mgmd \
     ${libdir}/plugin/*.so \
+    ${libdir}/security/*.so \
+    ${libdir}/plugin/auth_pam_tool_dir/auth_pam_tool \
     ${datadir}/mysql/ \
     ${localstatedir}/mysql/ \
     ${sysconfdir}/init.d/mysqld \
     ${sysconfdir}/my.cnf \
     ${sysconfdir}/my.cnf.d/server.cnf \
+    ${sysconfdir}/security/user_map.conf \
     ${sysconfdir}/tmpfiles.d"
 
 DESCRIPTION_${PN}-leftovers = "unpackaged and probably unneeded files for ${PN}"

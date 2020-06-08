@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend_fp5280g2:= "${THISDIR}/${BPN}:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
 # Package configuration
 FAN_PACKAGES += " \

@@ -2,7 +2,7 @@ require ${BPN}.inc
 
 DEPENDS = "alsa-lib zlib jpeg libpng libxext libxft"
 
-inherit features_check binconfig lib_package gtk-icon-cache mime
+inherit features_check binconfig lib_package gtk-icon-cache mime mime-xdg
 REQUIRED_DISTRO_FEATURES = "x11"
 
 SRC_URI += " \

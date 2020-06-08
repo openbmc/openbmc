@@ -1,0 +1,95 @@
+From d057b215f114f6158b4010ab44a19cae9dcc8386 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Wed, 19 Feb 2020 09:51:16 -0800
+Subject: [PATCH] binutils-nativesdk: Search for alternative ld.so.conf in SDK
+ installation
+
+We need binutils to look at our ld.so.conf file within the SDK to ensure
+we search the SDK's libdirs as well as those from the host system.
+
+We therefore pass in the directory to the code using a define, then add
+it to a section we relocate in a similar way to the way we relocate the
+gcc internal paths. This ensures that ld works correctly in our buildtools
+tarball.
+
+Standard sysroot relocation doesn't work since we're not in a sysroot,
+we want to use both the host system and SDK libs.
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+2020/1/17
+Upstream-Status: Inappropriate [OE specific tweak]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ ld/Makefile.am | 3 ++-
+ ld/Makefile.in | 3 ++-
+ ld/ldelf.c     | 2 +-
+ ld/ldmain.c    | 1 +
+ ld/ldmain.h    | 1 +
+ 5 files changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/ld/Makefile.am b/ld/Makefile.am
+index 4a9b8404b7..1c132d3ce4 100644
+--- a/ld/Makefile.am
++++ b/ld/Makefile.am
+@@ -42,7 +42,8 @@ ZLIBINC = @zlibinc@
+ 
+ ELF_CLFAGS=-DELF_LIST_OPTIONS=@elf_list_options@ \
+ 	   -DELF_SHLIB_LIST_OPTIONS=@elf_shlib_list_options@ \
+-	   -DELF_PLT_UNWIND_LIST_OPTIONS=@elf_plt_unwind_list_options@
++	   -DELF_PLT_UNWIND_LIST_OPTIONS=@elf_plt_unwind_list_options@ \
++           -DSYSCONFDIR="\"$(sysconfdir)\""
+ WARN_CFLAGS = @WARN_CFLAGS@
+ NO_WERROR = @NO_WERROR@
+ AM_CFLAGS = $(WARN_CFLAGS) $(ELF_CLFAGS)
+diff --git a/ld/Makefile.in b/ld/Makefile.in
+index 46d9b14077..e453bc1b33 100644
+--- a/ld/Makefile.in
++++ b/ld/Makefile.in
+@@ -555,7 +555,8 @@ ZLIB = @zlibdir@ -lz
+ ZLIBINC = @zlibinc@
+ ELF_CLFAGS = -DELF_LIST_OPTIONS=@elf_list_options@ \
+ 	   -DELF_SHLIB_LIST_OPTIONS=@elf_shlib_list_options@ \
+-	   -DELF_PLT_UNWIND_LIST_OPTIONS=@elf_plt_unwind_list_options@
++	   -DELF_PLT_UNWIND_LIST_OPTIONS=@elf_plt_unwind_list_options@ \
++           -DSYSCONFDIR="\"$(sysconfdir)\""
+ 
+ AM_CFLAGS = $(WARN_CFLAGS) $(ELF_CLFAGS)
+ @ENABLE_PLUGINS_FALSE@PLUGIN_C = 
+diff --git a/ld/ldelf.c b/ld/ldelf.c
+index 2e27cf48a8..a095d6aac5 100644
+--- a/ld/ldelf.c
++++ b/ld/ldelf.c
+@@ -907,7 +907,7 @@ ldelf_check_ld_so_conf (const struct bfd_link_needed_list *l, int force,
+ 
+       info.path = NULL;
+       info.len = info.alloc = 0;
+-      tmppath = concat (ld_sysroot, prefix, "/etc/ld.so.conf",
++      tmppath = concat (ld_sysconfdir, "/ld.so.conf",
+ 			(const char *) NULL);
+       if (!ldelf_parse_ld_so_conf (&info, tmppath))
+ 	{
+diff --git a/ld/ldmain.c b/ld/ldmain.c
+index c4af10f4e9..da1ad17763 100644
+--- a/ld/ldmain.c
++++ b/ld/ldmain.c
+@@ -69,6 +69,7 @@ char *program_name;
+ 
+ /* The prefix for system library directories.  */
+ const char *ld_sysroot;
++char ld_sysconfdir[4096] __attribute__ ((section (".gccrelocprefix"))) = SYSCONFDIR;
+ 
+ /* The canonical representation of ld_sysroot.  */
+ char *ld_canon_sysroot;
+diff --git a/ld/ldmain.h b/ld/ldmain.h
+index 0f05821d1e..54c36a94ce 100644
+--- a/ld/ldmain.h
++++ b/ld/ldmain.h
+@@ -23,6 +23,7 @@
+ 
+ extern char *program_name;
+ extern const char *ld_sysroot;
++extern char ld_sysconfdir[4096];
+ extern char *ld_canon_sysroot;
+ extern int ld_canon_sysroot_len;
+ extern FILE *saved_script_handle;

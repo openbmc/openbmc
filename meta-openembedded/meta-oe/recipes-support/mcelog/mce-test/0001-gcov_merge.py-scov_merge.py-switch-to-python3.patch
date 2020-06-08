@@ -1,0 +1,110 @@
+From 430982376a544bbccaef5006fab94bbc2f1d1711 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Mon, 13 Apr 2020 07:12:44 +0000
+Subject: [PATCH] gcov_merge.py/scov_merge.py: switch to python3
+
+Make gcov_merge.py and scov_merge.py port to python3.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ tools/scripts/gcov_merge.py | 12 ++++++------
+ tools/scripts/scov_merge.py | 12 ++++++------
+ 2 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/tools/scripts/gcov_merge.py b/tools/scripts/gcov_merge.py
+index 0ac9bed..9f1cb8c 100644
+--- a/tools/scripts/gcov_merge.py
++++ b/tools/scripts/gcov_merge.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Merge gcov graph from several test cases. This can be used to check
+ # the coverage of several test cases.
+@@ -11,7 +11,7 @@
+ import sys
+ 
+ def die(str):
+-    print str
++    print(str)
+     sys.exit(-1)
+ 
+ def die_on(cond, str):
+@@ -55,11 +55,11 @@ def merge(gcls1, gcls2):
+         gcl1.merge(gcl2)
+ 
+ def gcov_merge(fns, of):
+-    f = file(fns[0])
++    f = open(fns[0])
+     gcls_base = parse(f)
+ 
+     for fn in fns[1:]:
+-        f = file(fn)
++        f = open(fn)
+         gcls = parse(f)
+         merge(gcls_base, gcls)
+ 
+@@ -67,10 +67,10 @@ def gcov_merge(fns, of):
+         gcl.write(of)
+ 
+ def usage():
+-    print 'Usage: %s <gcov graph files>' % (sys.argv[0])
++    print('Usage: %s <gcov graph files>' % (sys.argv[0]))
+ 
+ if __name__ == '__main__':
+     if len(sys.argv) <= 1:
+         usage()
+-        exit -1
++        sys.exit(-1)
+     gcov_merge(sys.argv[1:], sys.stdout)
+diff --git a/tools/scripts/scov_merge.py b/tools/scripts/scov_merge.py
+index f83b922..bbcf760 100644
+--- a/tools/scripts/scov_merge.py
++++ b/tools/scripts/scov_merge.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Merge mce serverity coverage file from several test cases. This can
+ # be used to check the coverage of several test cases.
+@@ -11,7 +11,7 @@
+ import sys
+ 
+ def die(str):
+-    print str
++    print(str)
+     sys.exit(-1)
+ 
+ def die_on(cond, str):
+@@ -47,11 +47,11 @@ def merge(gcls1, gcls2):
+         gcl1.merge(gcl2)
+ 
+ def scov_merge(fns, of):
+-    f = file(fns[0])
++    f = open(fns[0])
+     gcls_base = parse(f)
+ 
+     for fn in fns[1:]:
+-        f = file(fn)
++        f = open(fn)
+         gcls = parse(f)
+         merge(gcls_base, gcls)
+ 
+@@ -59,10 +59,10 @@ def scov_merge(fns, of):
+         gcl.write(of)
+ 
+ def usage():
+-    print 'Usage: %s <severities coverage files>' % (sys.argv[0])
++    print('Usage: %s <severities coverage files>' % (sys.argv[0]))
+ 
+ if __name__ == '__main__':
+     if len(sys.argv) <= 1:
+         usage()
+-        exit -1
++        sys.exit(-1)
+     scov_merge(sys.argv[1:], sys.stdout)
+-- 
+2.24.1
+

@@ -1,0 +1,26 @@
+From f907fea9ea053d5433b5199ce74008664141f753 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 19 Nov 2019 17:32:33 +0100
+Subject: [PATCH] configure.ac: correct AM_GNU_GETTEXT
+
+New version of gettext require the 'external' argument.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 654ff43d..4772b97b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -873,7 +873,7 @@ AC_SUBST(GETTEXT_PACKAGE)
+ AC_SUBST(PACKAGE)
+ AC_SUBST(VERSION)
+ 
+-AM_GNU_GETTEXT
++AM_GNU_GETTEXT([external])
+ dnl @MKDIR_P@ is expanded in AM_GNU_GETTEXT
+ AC_SUBST([mkdir_p],['$(MKDIR_P)'])
+ dnl

@@ -179,6 +179,9 @@ class SQLTable(collections.MutableMapping):
         elif not isinstance(value, str):
             raise TypeError('Only string values are supported')
 
+        # Ensure the entire transaction (including SELECT) executes under write lock
+        cursor.execute("BEGIN EXCLUSIVE")
+
         cursor.execute("SELECT * from %s where key=?;" % self.table, [key])
         row = cursor.fetchone()
         if row is not None:

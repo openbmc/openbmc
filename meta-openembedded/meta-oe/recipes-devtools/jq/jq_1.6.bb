@@ -8,8 +8,10 @@ SECTION = "utils"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=15d03e360fa7399f76d5a4359fc72cbf"
 
-SRC_URI = "https://github.com/stedolan/${BPN}/releases/download/${BP}/${BP}.tar.gz \
-"
+SRC_URI = "https://github.com/stedolan/${BPN}/releases/download/${BP}/${BP}.tar.gz"
+
+UPSTREAM_CHECK_URI = "https://github.com/stedolan/${BPN}/releases"
+UPSTREAM_CHECK_REGEX = "jq\-(?P<pver>(\d+\.\d+))(?!_\d+).tar.gz"
 
 SRC_URI[md5sum] = "e68fbd6a992e36f1ac48c99bbf825d6b"
 SRC_URI[sha256sum] = "5de8c8e29aaa3fb9cc6b47bb27299f271354ebb72514e3accadc7d38b5bbaa72"

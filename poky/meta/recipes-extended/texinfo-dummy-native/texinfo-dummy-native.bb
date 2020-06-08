@@ -9,19 +9,21 @@ SRC_URI = "file://template.py file://COPYING"
 
 S = "${WORKDIR}"
 
-NATIVE_PACKAGE_PATH_SUFFIX = "/${PN}"
-
 inherit native
 
+#
+# To avoid texinfo-dummy-native and texinfo-native conflicting we install to base_bindir
+# which is later in PATH than bindir where texinfo-native installs
+#
 do_install_name() {
-    FILENAME="${D}${bindir}/$1"
+    FILENAME="${D}${base_bindir}/$1"
     # Using ln causes problems with rm_work
     cp -T "${S}/template.py" "$FILENAME"
     chmod +x $FILENAME
 }
 
 do_install() {
-    mkdir -p "${D}${bindir}"
+    mkdir -p "${D}${base_bindir}"
     for i in makeinfo pod2texi texi2dvi pdftexi2dvi texindex texi2pdf \
              txixml2texi texi2any install-info ginstall-info \
              update-info-dir; do

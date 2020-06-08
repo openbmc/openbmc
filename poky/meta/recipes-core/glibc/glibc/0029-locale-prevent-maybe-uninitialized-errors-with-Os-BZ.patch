@@ -1,0 +1,53 @@
+From 66963ad83bdd3b075006ddca9dfe357aed181d6a Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@gmail.com>
+Date: Mon, 17 Dec 2018 21:36:18 +0000
+Subject: [PATCH] locale: prevent maybe-uninitialized errors with -Os [BZ
+ #19444]
+
+Fixes following error when building for aarch64 with -Os:
+| In file included from strcoll_l.c:43:
+| strcoll_l.c: In function '__strcoll_l':
+| ../locale/weight.h:31:26: error: 'seq2.back_us' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+|    int_fast32_t i = table[*(*cpp)++];
+|                           ^~~~~~~~~
+| strcoll_l.c:304:18: note: 'seq2.back_us' was declared here
+|    coll_seq seq1, seq2;
+|                   ^~~~
+| In file included from strcoll_l.c:43:
+| ../locale/weight.h:31:26: error: 'seq1.back_us' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+|    int_fast32_t i = table[*(*cpp)++];
+|                           ^~~~~~~~~
+| strcoll_l.c:304:12: note: 'seq1.back_us' was declared here
+|    coll_seq seq1, seq2;
+|             ^~~~
+
+        Partial fix for [BZ #19444]
+        * locale/weight.h: Fix build with -Os.
+
+Upstream-Status: Submitted [https://patchwork.ozlabs.org/patch/1014766]
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ locale/weight.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/locale/weight.h b/locale/weight.h
+index e071253f85..2889c395f1 100644
+--- a/locale/weight.h
++++ b/locale/weight.h
+@@ -28,7 +28,14 @@ findidx (const int32_t *table,
+ 	 const unsigned char *extra,
+ 	 const unsigned char **cpp, size_t len)
+ {
++  /* With GCC 8 when compiling with -Os the compiler warns that
++     seq1.back_us and seq2.back_us might be used uninitialized.
++     This uninitialized use is impossible for the same reason
++     as described in comments in locale/weightwc.h.  */
++  DIAG_PUSH_NEEDS_COMMENT;
++  DIAG_IGNORE_Os_NEEDS_COMMENT (8, "-Wmaybe-uninitialized");
+   int_fast32_t i = table[*(*cpp)++];
++  DIAG_POP_NEEDS_COMMENT;
+   const unsigned char *cp;
+   const unsigned char *usrc;
+ 

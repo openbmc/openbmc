@@ -1,0 +1,61 @@
+From e8716a7755eef93e1033bb913e1eb4faee54658f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 15 Apr 2020 18:29:26 -0700
+Subject: [PATCH] Use packageconfig to detect mmal support
+
+This needs userland graphics libraries, because distros may install it
+in different locations, therefore its best to rely on pkgconf to find
+the libs and header locations instead of assuming /opt/vc which might
+work on some distros ( like raspbian ) but not everywhere
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 31 +++++++++++--------------------
+ 1 file changed, 11 insertions(+), 20 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index d7cf692..f81b99d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3427,27 +3427,18 @@ AC_ARG_ENABLE(mmal,
+   AS_HELP_STRING([--enable-mmal],
+     [Multi-Media Abstraction Layer (MMAL) hardware plugin (default enable)]))
+ if test "${enable_mmal}" != "no"; then
+-  VLC_SAVE_FLAGS
+-  LDFLAGS="${LDFLAGS} -L/opt/vc/lib -lvchostif"
+-  CPPFLAGS="${CPPFLAGS} -isystem /opt/vc/include -isystem /opt/vc/include/interface/vcos/pthreads -isystem /opt/vc/include/interface/vmcs_host/linux"
+-  AC_CHECK_HEADERS(interface/mmal/mmal.h,
+-    [ AC_CHECK_LIB(bcm_host, vc_tv_unregister_callback_full, [
+-        have_mmal="yes"
+-        VLC_ADD_PLUGIN([mmal])
+-        VLC_ADD_LDFLAGS([mmal],[ -L/opt/vc/lib ])
+-        VLC_ADD_CFLAGS([mmal],[ -isystem /opt/vc/include -isystem /opt/vc/include/interface/vcos/pthreads -isystem /opt/vc/include/interface/vmcs_host/linux ])
+-        VLC_ADD_LIBS([mmal],[ -lbcm_host -lmmal -lmmal_core -lmmal_components -lmmal_util -lvchostif ]) ], [
+-          AS_IF([test "${enable_mmal}" = "yes"],
+-            [ AC_MSG_ERROR([Cannot find bcm library...]) ],
+-            [ AC_MSG_WARN([Cannot find bcm library...]) ])
+-          ],
+-        [])
+-    ] , [ AS_IF([test "${enable_mmal}" = "yes"],
+-      [ AC_MSG_ERROR([Cannot find development headers for mmal...]) ],
+-      [ AC_MSG_WARN([Cannot find development headers for mmal...]) ]) ])
+-  VLC_RESTORE_FLAGS
++      PKG_CHECK_MODULES(BCMHOST, [bcm_host], [
++      HAVE_BCMHOST=yes
++      AC_DEFINE(HAVE_BCMHOST, 1, [Define this if you have have userlang graphics installed])
++      VLC_ADD_LIBS([bcmhost],[$BCMHOST_LIBS])
++      VLC_ADD_CFLAGS([bcmhost],[$BCMHOST_CFLAGS])
++      ],:
++      [AC_MSG_WARN([${BCMHOST_PKG_ERRORS}: userland graphics not available.])
++      HAVE_BCMHOST=no])
++
++      AC_CHECK_HEADERS(interface/mmal/mmal.h)
+ fi
+-AM_CONDITIONAL([HAVE_MMAL], [test "${have_mmal}" = "yes"])
++AM_CONDITIONAL([HAVE_MMAL], [test "${have_bcmhost}" = "yes"])
+ 
+ dnl
+ dnl evas plugin
+-- 
+2.26.1
+

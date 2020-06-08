@@ -7,6 +7,19 @@ SRC_URI[md5sum] = "b5fa59e45965d1b2896023742df2e707"
 SRC_URI[sha256sum] = "f596bdc75d3dd93036fbfe3d04127da9f6df0c26c36e01e76da85adef4336b3c"
 
 PYPI_PACKAGE = "parse_type"
-inherit pypi
+inherit pypi ptest
 
 RDEPENDS_${PN} += "${PYTHON_PN}-parse"
+
+SRC_URI += " \
+	file://run-ptest \
+"
+
+RDEPENDS_${PN}-ptest += " \
+	${PYTHON_PN}-pytest \
+"
+
+do_install_ptest() {
+	install -d ${D}${PTEST_PATH}/tests
+	cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
+}

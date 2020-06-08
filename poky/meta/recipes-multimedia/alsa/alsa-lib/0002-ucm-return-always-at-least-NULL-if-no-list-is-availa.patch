@@ -1,0 +1,45 @@
+From 58f9dc9bd12a51efa12dbc67e200f4d85cd3da07 Mon Sep 17 00:00:00 2001
+From: Jaroslav Kysela <perex@perex.cz>
+Date: Fri, 29 Nov 2019 22:28:26 +0100
+Subject: [PATCH 2/5] ucm: return always at least NULL if no list is available
+ in snd_use_case_get_list()
+
+Signed-off-by: Jaroslav Kysela <perex@perex.cz>
+
+Upstream-Status: Backport
+Signed-off-by: Tanu Kaskinen <tanuk@iki.fi>
+---
+ src/ucm/main.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/src/ucm/main.c b/src/ucm/main.c
+index 252e50d9..b80db65f 100644
+--- a/src/ucm/main.c
++++ b/src/ucm/main.c
+@@ -1160,8 +1160,10 @@ static int get_supcon_device_list(snd_use_case_mgr_t *uc_mgr,
+ 
+ 	modifier = find_modifier(uc_mgr, verb, name, 0);
+ 	if (modifier) {
+-		if (modifier->dev_list.type != type)
++		if (modifier->dev_list.type != type) {
++			*list = NULL;
+ 			return 0;
++		}
+ 		return get_list(&modifier->dev_list.list, list,
+ 				struct dev_list_node, list,
+ 				name);
+@@ -1169,8 +1171,10 @@ static int get_supcon_device_list(snd_use_case_mgr_t *uc_mgr,
+ 
+ 	device = find_device(uc_mgr, verb, name, 0);
+ 	if (device) {
+-		if (device->dev_list.type != type)
++		if (device->dev_list.type != type) {
++			*list = NULL;
+ 			return 0;
++		}
+ 		return get_list(&device->dev_list.list, list,
+ 				struct dev_list_node, list,
+ 				name);
+-- 
+2.20.1
+

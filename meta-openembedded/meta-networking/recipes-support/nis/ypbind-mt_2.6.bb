@@ -45,7 +45,7 @@ INITSCRIPT_PARAMS = "start 44 3 5 . stop 70 0 1 2 6 ."
 
 CACHED_CONFIGUREVARS = "ac_cv_prog_STRIP=/bin/true"
 
-CFLAGS_append_libc-musl = " -I${STAGING_INCDIR}/nss3"
+CFLAGS_append = " -I${STAGING_INCDIR}/nss3 -I${STAGING_INCDIR}/nspr"
 
 do_install_append () {
     install -d ${D}${sysconfdir}/init.d

@@ -1,0 +1,110 @@
+From 05240e13668422c4f9118f2cde953ec875d0d68f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 14 Jan 2020 01:37:22 -0800
+Subject: [PATCH] Add MIPS gnu hash support
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/arch-mips.c | 1 +
+ src/prelink.c   | 1 +
+ src/prelink.h   | 5 +++++
+ 3 files changed, 7 insertions(+)
+
+--- a/src/arch-mips.c
++++ b/src/arch-mips.c
+@@ -324,6 +324,7 @@ mips_adjust_dyn (DSO *dso, int n, GElf_D
+     case DT_MIPS_BASE_ADDRESS:
+     case DT_MIPS_RLD_MAP:
+     case DT_MIPS_OPTIONS:
++    case DT_MIPS_XHASH:
+       if (dyn->d_un.d_ptr >= start)
+ 	dyn->d_un.d_ptr += adjust;
+       return 1;
+--- a/src/prelink.c
++++ b/src/prelink.c
+@@ -425,6 +425,7 @@ prelink_prepare (DSO *dso)
+ 	  {
+ 	  case SHT_HASH:
+ 	  case SHT_GNU_HASH:
++	  case SHT_MIPS_XHASH:
+ 	  case SHT_DYNSYM:
+ 	  case SHT_REL:
+ 	  case SHT_RELA:
+--- a/src/prelink.h
++++ b/src/prelink.h
+@@ -114,6 +114,11 @@ typedef uint8_t Elf64_Byte;
+ #define SHT_MIPS_ABIFLAGS       0x7000002a
+ #endif
+ 
++#ifndef SHT_MIPS_XHASH
++#define DT_MIPS_XHASH	    0x70000036
++#define SHT_MIPS_XHASH       0x7000002b
++#endif
++
+ #ifndef RSS_UNDEF
+ #define RSS_UNDEF              0
+ #endif
+--- a/src/dso.c
++++ b/src/dso.c
+@@ -109,6 +109,11 @@ read_dynamic (DSO *dso)
+ 		    dso->info_DT_GNU_HASH = dyn.d_un.d_val;
+ 		    dso->info_set_mask |= (1ULL << DT_GNU_HASH_BIT);
+ 		  }
++		else if (dyn.d_tag == DT_MIPS_XHASH)
++		  {
++		    dso->info_DT_GNU_HASH = dyn.d_un.d_val;
++		    dso->info_set_mask |= (1ULL << DT_GNU_HASH_BIT);
++		  }
+ 		else if (dyn.d_tag == DT_TLSDESC_PLT)
+ 		  {
+ 		    dso->info_DT_TLSDESC_PLT = dyn.d_un.d_val;
+@@ -1463,6 +1468,7 @@ adjust_dso (DSO *dso, GElf_Addr start, G
+ 	  break;
+ 	case SHT_HASH:
+ 	case SHT_GNU_HASH:
++	case SHT_MIPS_XHASH:
+ 	case SHT_NOBITS:
+ 	case SHT_STRTAB:
+ 	  break;
+--- a/src/space.c
++++ b/src/space.c
+@@ -61,6 +61,7 @@ print_sections (DSO *dso, GElf_Ehdr *ehd
+       { SHT_GNU_versym, "VERSYM" },
+       { SHT_GNU_LIBLIST, "LIBLIST" },
+       { SHT_GNU_HASH, "GNU_HASH" },
++      { SHT_MIPS_XHASH, "MIPS_XHASH" },
+       { 0, NULL }
+     };
+ 
+@@ -183,6 +184,7 @@ readonly_is_movable (DSO *dso, GElf_Ehdr
+     {
+     case SHT_HASH:
+     case SHT_GNU_HASH:
++    case SHT_MIPS_XHASH:
+     case SHT_DYNSYM:
+     case SHT_REL:
+     case SHT_RELA:
+@@ -558,6 +560,7 @@ find_readonly_space (DSO *dso, GElf_Shdr
+ 		    {
+ 		    case SHT_HASH:
+ 		    case SHT_GNU_HASH:
++		    case SHT_MIPS_XHASH:
+ 		    case SHT_DYNSYM:
+ 		    case SHT_STRTAB:
+ 		    case SHT_GNU_verdef:
+--- a/src/exec.c
++++ b/src/exec.c
+@@ -65,7 +65,11 @@ update_dynamic_tags (DSO *dso, GElf_Shdr
+ 	  || (dynamic_info_is_set (dso, DT_GNU_HASH_BIT)
+ 	      && dso->info_DT_GNU_HASH == old_shdr[j].sh_addr
+ 	      && old_shdr[j].sh_type == SHT_GNU_HASH
+-	      && set_dynamic (dso, DT_GNU_HASH, shdr[i].sh_addr, 1)))
++	      && set_dynamic (dso, DT_GNU_HASH, shdr[i].sh_addr, 1))
++	  || (dynamic_info_is_set (dso, DT_GNU_HASH_BIT)
++	      && dso->info_DT_GNU_HASH == old_shdr[j].sh_addr
++	      && old_shdr[j].sh_type == SHT_MIPS_XHASH
++	      && set_dynamic (dso, DT_MIPS_XHASH, shdr[i].sh_addr, 1)))
+ 	return 1;
+     }
+ 

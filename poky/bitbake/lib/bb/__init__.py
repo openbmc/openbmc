@@ -9,11 +9,11 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-__version__ = "1.44.0"
+__version__ = "1.46.0"
 
 import sys
-if sys.version_info < (3, 4, 0):
-    raise RuntimeError("Sorry, python 3.4.0 or later is required for this version of bitbake")
+if sys.version_info < (3, 5, 0):
+    raise RuntimeError("Sorry, python 3.5.0 or later is required for this version of bitbake")
 
 
 class BBHandledException(Exception):
@@ -43,7 +43,13 @@ class BBLogger(Logger):
         Logger.__init__(self, name)
 
     def bbdebug(self, level, msg, *args, **kwargs):
-        return self.log(logging.DEBUG - level + 1, msg, *args, **kwargs)
+        loglevel = logging.DEBUG - level + 1
+        if not bb.event.worker_pid:
+            if self.name in bb.msg.loggerDefaultDomains and loglevel > (bb.msg.loggerDefaultDomains[self.name]):
+                return
+            if loglevel > bb.msg.loggerDefaultLogLevel:
+                return
+        return self.log(loglevel, msg, *args, **kwargs)
 
     def plain(self, msg, *args, **kwargs):
         return self.log(logging.INFO + 1, msg, *args, **kwargs)

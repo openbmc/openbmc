@@ -12,11 +12,22 @@ SRC_URI = "git://github.com/intel/pm-graph.git \
 "
 S = "${WORKDIR}/git"
 
+# Apart from the listed RDEPENDS, analyze-suspend depends on some features
+# provided by the kernel. These options are:
+#   - CONFIG_PM_DEBUG=y
+#   - CONFIG_PM_SLEEP_DEBUG=y
+#   - CONFIG_FTRACE=y
+#   - CONFIG_FUNCTION_TRACER=y
+#   - CONFIG_FUNCTION_GRAPH_TRACER=y
+
 COMPATIBLE_HOST='(i.86|x86_64).*'
 EXTRA_OEMAKE = "PREFIX=${prefix} DESTDIR=${D} BASELIB=${baselib}"
 
 do_install() {
         oe_runmake install
+        install -Dm 0755 ${S}/analyze_suspend.py ${D}${bindir}/analyze_suspend.py
 }
 
 RDEPENDS_${PN} += "python3-core python3-threading python3-datetime python3-compression"
+RPROVIDES_${PN} = "analyze-suspend"
+BBCLASSEXTEND = "native nativesdk"

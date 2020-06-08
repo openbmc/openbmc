@@ -1,0 +1,51 @@
+From 19de26db69408f02241e232b39224589a0f630df Mon Sep 17 00:00:00 2001
+From: Nate Karstens <nate.karstens@garmin.com>
+Date: Thu, 10 Aug 2017 08:46:03 -0500
+Subject: [PATCH 11/11] Change a dynamic allocation to file-scope variable
+
+Changes a variable from being dynamically-allocated to being
+statically-allocated at the file scope. Addresses a Coverity
+issue where it appeared that the memory was being leaked.
+
+Upstream-Status: Submitted [dts@apple.com]
+
+Signed-off-by: Nate Karstens <nate.karstens@garmin.com>
+---
+ mDNSPosix/mDNSPosix.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
+
+diff --git a/mDNSPosix/mDNSPosix.c b/mDNSPosix/mDNSPosix.c
+index 84af26b..b7795ed 100644
+--- a/mDNSPosix/mDNSPosix.c
++++ b/mDNSPosix/mDNSPosix.c
+@@ -91,6 +91,7 @@ static sigset_t gEventSignalSet;                // Signals which event loop list
+ static sigset_t gEventSignals;                  // Signals which were received while inside loop
+ 
+ static PosixNetworkInterface *gRecentInterfaces;
++static IfChangeRec gChgRec;
+ 
+ // ***************************************************************************
+ // Globals (for debugging)
+@@ -1412,16 +1413,11 @@ cleanup:
+ mDNSlocal mStatus WatchForInterfaceChange(mDNS *const m)
+ {
+     mStatus err;
+-    IfChangeRec *pChgRec;
+ 
+-    pChgRec = (IfChangeRec*) mDNSPlatformMemAllocate(sizeof *pChgRec);
+-    if (pChgRec == NULL)
+-        return mStatus_NoMemoryErr;
+-
+-    pChgRec->mDNS = m;
+-    err = OpenIfNotifySocket(&pChgRec->NotifySD);
++    gChgRec.mDNS = m;
++    err = OpenIfNotifySocket(&gChgRec.NotifySD);
+     if (err == 0)
+-        err = mDNSPosixAddFDToEventLoop(pChgRec->NotifySD, InterfaceChangeCallback, pChgRec);
++        err = mDNSPosixAddFDToEventLoop(gChgRec.NotifySD, InterfaceChangeCallback, &gChgRec);
+ 
+     return err;
+ }
+-- 
+2.17.1
+

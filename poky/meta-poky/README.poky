@@ -53,11 +53,11 @@ bitbake:
 
 documentation:
     Git repository: http://git.yoctoproject.org/cgit/cgit.cgi/yocto-docs/
-    Mailing list: yocto@yoctoproject.org
+    Mailing list: docs@lists.yoctoproject.org
 
 meta-poky, meta-yocto-bsp:
     Git repository: http://git.yoctoproject.org/cgit/cgit.cgi/meta-yocto(-bsp)
-    Mailing list: poky@yoctoproject.org
+    Mailing list: poky@lists.yoctoproject.org
 
 Everything else should be sent to the OpenEmbedded Core mailing list.  If in
 doubt, check the oe-core git repository for the content you intend to modify.

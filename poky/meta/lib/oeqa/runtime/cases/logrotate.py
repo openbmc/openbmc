@@ -18,32 +18,58 @@ class LogrotateTest(OERuntimeTestCase):
     @classmethod
     def tearDownClass(cls):
         cls.tc.target.run('mv -f $HOME/wtmp.oeqabak /etc/logrotate.d/wtmp && rm -rf $HOME/logrotate_dir')
+        cls.tc.target.run('rm -rf /var/log/logrotate_testfile && rm -rf /etc/logrotate.d/logrotate_testfile')
 
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     @OEHasPackage(['logrotate'])
-    def test_1_logrotate_setup(self):
+    def test_logrotate_wtmp(self):
+
+        # /var/log/wtmp may not always exist initially, so use touch to ensure it is present
+        status, output = self.target.run('touch /var/log/wtmp')
+        msg = ('Could not create/update /var/log/wtmp with touch')
+        self.assertEqual(status, 0, msg = msg)
+
         status, output = self.target.run('mkdir $HOME/logrotate_dir')
-        msg = 'Could not create logrotate_dir. Output: %s' % output
+        msg = ('Could not create logrotate_dir. Output: %s' % output)
         self.assertEqual(status, 0, msg = msg)
 
-        cmd = ('sed -i "s#wtmp {#wtmp {\\n    olddir $HOME/logrotate_dir#"'
-               ' /etc/logrotate.d/wtmp')
-        status, output = self.target.run(cmd)
-        msg = ('Could not write to logrotate.d/wtmp file. Status and output: '
-               ' %s and %s' % (status, output))
+        status, output = self.target.run('echo "create \n olddir $HOME/logrotate_dir \n include /etc/logrotate.d/wtmp" > /tmp/logrotate-test.conf')
+        msg = ('Could not write to /tmp/logrotate-test.conf')
+        self.assertEqual(status, 0, msg = msg)
+        
+        status, output = self.target.run('echo "/var/log/logrotate_test {\\n missingok \\n monthly \\n rotate 1" > /etc/logrotate.d/logrotate_test')
+        msg = ('Could not write to /etc/logrotate.d/logrotate_test')
+        self.assertEqual(status, 0, msg = msg)
+        
+        # If logrotate fails to rotate the log, view the verbose output of logrotate to see what prevented it
+        _, logrotate_output = self.target.run('logrotate -vf /tmp/logrotate-test.conf')
+        status, _ = self.target.run('find $HOME/logrotate_dir -type f | grep wtmp.1')
+        msg = ("logrotate did not successfully rotate the wtmp log. Output from logrotate -vf: \n%s" % (logrotate_output))
+        self.assertEqual(status, 0, msg = msg)
+       
+    @OETestDepends(['logrotate.LogrotateTest.test_logrotate_wtmp'])
+    def test_logrotate_newlog(self):
+        
+        status, output = self.target.run('echo "oeqa logrotate test file" > /var/log/logrotate_testfile')
+        msg = ('Could not create logrotate test file in /var/log')
+        self.assertEqual(status, 0, msg = msg)
+        
+        status, output = self.target.run('echo "/var/log/logrotate_testfile {\n missingok \n monthly \n rotate 1" > /etc/logrotate.d/logrotate_testfile')
+        msg = ('Could not write to /etc/logrotate.d/logrotate_testfile')
         self.assertEqual(status, 0, msg = msg)
 
-    @OETestDepends(['logrotate.LogrotateTest.test_1_logrotate_setup'])
-    def test_2_logrotate(self):
-        status, output = self.target.run('echo "create \n include /etc/logrotate.d" > /tmp/logrotate-test.conf')
-        status, output = self.target.run('logrotate -f /tmp/logrotate-test.conf')
-
-        msg = ('logrotate service could not be reloaded. Status and output: '
-                '%s and %s' % (status, output))
+        status, output = self.target.run('echo "create \n olddir $HOME/logrotate_dir \n include /etc/logrotate.d/logrotate_testfile" > /tmp/logrotate-test2.conf')
+        msg = ('Could not write to /tmp/logrotate_test2.conf')
         self.assertEqual(status, 0, msg = msg)
 
-        _, output = self.target.run('ls -la $HOME/logrotate_dir/ | wc -l')
-        msg = ('new logfile could not be created. List of files within log '
-               'directory: %s' % (
-                self.target.run('ls -la $HOME/logrotate_dir')[1]))
-        self.assertTrue(int(output)>=3, msg = msg)
+        status, output = self.target.run('find $HOME/logrotate_dir -type f | grep logrotate_testfile.1')
+        msg = ('A rotated log for logrotate_testfile is already present in logrotate_dir')
+        self.assertEqual(status, 1, msg = msg)
+
+        # If logrotate fails to rotate the log, view the verbose output of logrotate instead of just listing the files in olddir
+        _, logrotate_output = self.target.run('logrotate -vf /tmp/logrotate-test2.conf')
+        status, _ = self.target.run('find $HOME/logrotate_dir -type f | grep logrotate_testfile.1')
+        msg = ('logrotate did not successfully rotate the logrotate_test log. Output from logrotate -vf: \n%s' % (logrotate_output))
+        self.assertEqual(status, 0, msg = msg)
+
+

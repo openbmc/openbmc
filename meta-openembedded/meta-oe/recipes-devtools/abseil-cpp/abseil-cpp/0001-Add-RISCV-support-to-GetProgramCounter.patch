@@ -1,0 +1,29 @@
+From 983eeae0792946fe5c090f95164c892ec6db5cc4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 16 Feb 2020 16:22:53 -0800
+Subject: [PATCH] Add RISCV support to GetProgramCounter()
+
+Identify PC register from signal context
+
+Upstream-Status: Submitted [https://github.com/abseil/abseil-cpp/pull/621]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ absl/debugging/internal/examine_stack.cc | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/absl/debugging/internal/examine_stack.cc b/absl/debugging/internal/examine_stack.cc
+index 4739fbc..fb77450 100644
+--- a/absl/debugging/internal/examine_stack.cc
++++ b/absl/debugging/internal/examine_stack.cc
+@@ -53,6 +53,8 @@ void* GetProgramCounter(void* vuc) {
+     return reinterpret_cast<void*>(context->uc_mcontext.gp_regs[32]);
+ #elif defined(__powerpc__)
+     return reinterpret_cast<void*>(context->uc_mcontext.regs->nip);
++#elif defined(__riscv)
++    return reinterpret_cast<void*>(context->uc_mcontext.__gregs[REG_PC]);
+ #elif defined(__s390__) && !defined(__s390x__)
+     return reinterpret_cast<void*>(context->uc_mcontext.psw.addr & 0x7fffffff);
+ #elif defined(__s390__) && defined(__s390x__)
+-- 
+2.25.0
+

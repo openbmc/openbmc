@@ -6,7 +6,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 from os.path import relpath
 import re
 from django import template
@@ -44,7 +44,7 @@ def json(value, default = None):
     # it manually here
     return mark_safe(JsonLib.dumps(value, indent=2, default = default, ensure_ascii=False).replace('</', '<\\/'))
 
-@register.assignment_tag
+@register.simple_tag
 def query(qs, **kwargs):
     """ template tag which allows queryset filtering. Usage:
           {% query books author=author as mybooks %}
@@ -83,7 +83,7 @@ def divide(value, arg):
 def multiply(value, arg):
     return int(value) * int(arg)
 
-@register.assignment_tag
+@register.simple_tag
 def datecompute(delta, start = timezone.now()):
     return start + timedelta(delta)
 
@@ -212,7 +212,7 @@ def filtered_installedsize(size, installed_size):
     """If package.installed_size not null and not empty return it,
        else return package.size
     """
-    return size if (installed_size == 0) or (installed_size == "") or (installed_size == None) else installed_size
+    return size if (installed_size == 0) or (installed_size == "") or (installed_size is None) else installed_size
 
 @register.filter
 def filtered_packageversion(version, revision):
@@ -228,7 +228,7 @@ def filter_sizeovertotal(package_object, total_size):
         formatted nicely.
     """
     size = package_object.installed_size
-    if size == None or size == '':
+    if size is None or size == '':
         size = package_object.size
 
     return '{:.1%}'.format(float(size)/float(total_size))

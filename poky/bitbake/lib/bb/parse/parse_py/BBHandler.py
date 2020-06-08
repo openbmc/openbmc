@@ -13,9 +13,7 @@
 #
 
 import re, bb, os
-import logging
 import bb.build, bb.utils
-from bb import data
 
 from . import ConfHandler
 from .. import resolve_file, ast, logger, ParseError

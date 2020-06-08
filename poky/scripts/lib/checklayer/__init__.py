@@ -143,6 +143,9 @@ def detect_layers(layer_directories, no_auto):
 
 def _find_layer_depends(depend, layers):
     for layer in layers:
+        if 'collections' not in layer:
+            continue
+
         for collection in layer['collections']:
             if depend == collection:
                 return layer

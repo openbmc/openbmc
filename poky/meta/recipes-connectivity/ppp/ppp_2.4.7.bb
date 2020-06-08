@@ -33,6 +33,7 @@ SRC_URI = "https://download.samba.org/pub/${BPN}/${BP}.tar.gz \
            file://0001-pppoe-include-netinet-in.h-before-linux-in.h.patch \
            file://0001-ppp-Remove-unneeded-include.patch \
            file://ppp-2.4.7-DES-openssl.patch \
+           file://0001-pppd-Fix-bounds-check-in-EAP-code.patch \
 "
 
 SRC_URI_append_libc-musl = "\

@@ -1,0 +1,33 @@
+From 42dae692b9057d03ce9a0651f061472e9dd90130 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Wed, 11 Mar 2020 08:44:42 +0000
+Subject: [PATCH] fs.c: initialize the other_entry variable
+
+Initialize the pointer other_entry to fix the below error:
+| ../../../../../git/src/plugins/ctf/fs-src/fs.c: In function 'ds_index_insert_ds_index_entry_sorted':
+| ../../../../../git/src/plugins/ctf/fs-src/fs.c:702:5: error: 'other_entry' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+|   702 |    !ds_index_entries_equal(entry, other_entry)) {
+
+Upstream-Status: Submitted [https://lists.lttng.org/pipermail/lttng-dev/2020-March/029549.html]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ src/plugins/ctf/fs-src/fs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/plugins/ctf/fs-src/fs.c b/src/plugins/ctf/fs-src/fs.c
+index e87523a3..a6b5315f 100644
+--- a/src/plugins/ctf/fs-src/fs.c
++++ b/src/plugins/ctf/fs-src/fs.c
+@@ -680,7 +680,7 @@ void ds_index_insert_ds_index_entry_sorted(
+ 	struct ctf_fs_ds_index_entry *entry)
+ {
+ 	guint i;
+-	struct ctf_fs_ds_index_entry *other_entry;
++	struct ctf_fs_ds_index_entry *other_entry = NULL;
+ 
+ 	/* Find the spot where to insert this index entry. */
+ 	for (i = 0; i < index->entries->len; i++) {
+-- 
+2.24.1
+

@@ -56,11 +56,11 @@ class SStateBase(OESelftestTestCase):
     def search_sstate(self, filename_regex, distro_specific=True, distro_nonspecific=True):
         result = []
         for root, dirs, files in os.walk(self.sstate_path):
-            if distro_specific and re.search("%s/[a-z0-9]{2}$" % self.hostdistro, root):
+            if distro_specific and re.search(r"%s/%s/[a-z0-9]{2}/[a-z0-9]{2}$" % (self.sstate_path, self.hostdistro), root):
                 for f in files:
                     if re.search(filename_regex, f):
                         result.append(f)
-            if distro_nonspecific and re.search("%s/[a-z0-9]{2}$" % self.sstate_path, root):
+            if distro_nonspecific and re.search(r"%s/[a-z0-9]{2}/[a-z0-9]{2}$" % self.sstate_path, root):
                 for f in files:
                     if re.search(filename_regex, f):
                         result.append(f)

@@ -1,0 +1,30 @@
+From a04a75f20f03aa08ce8118b3b0b3f93eb3e997c5 Mon Sep 17 00:00:00 2001
+From: Richard Leach <rich+perl@hyphen-dash-hyphen.info>
+Date: Sun, 19 May 2019 20:16:41 +0000
+Subject: [PATCH] PATCH: [perl #134117] Close DATA in loc_tools.pl
+
+This prevents unexpected text and fixes test lib/warnings.t
+
+Upstream-Status: Backport [a04a75f20f03aa08ce8118b3b0b3f93eb3e997c5]
+
+Signed-off-by: Matthew Zeng <matthew.zeng@windriver.com>
+
+---
+ t/loc_tools.pl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/t/loc_tools.pl b/t/loc_tools.pl
+index c76e29388a..beebd98d88 100644
+--- a/t/loc_tools.pl
++++ b/t/loc_tools.pl
+@@ -421,7 +421,7 @@ sub find_locales ($;$) {
+         }
+
+         # The rest of the locales are in this file.
+-        push @Data, <DATA>;
++        push @Data, <DATA>; close DATA;
+
+         foreach my $line (@Data) {
+             my ($locale_name, $language_codes, $country_codes, $encodings) =
+--
+2.25.0

@@ -23,3 +23,6 @@ EXTRA_OECONF = "--without-udev --enable-compat-symlinks"
 CFLAGS += "-D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
 
 BBCLASSEXTEND = "native"
+
+# Add codepage437 to avoid error from `dosfsck -l`
+RRECOMMENDS_${PN}_append_libc-glibc = " glibc-gconv-ibm437"

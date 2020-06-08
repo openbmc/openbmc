@@ -10,7 +10,6 @@
 #
 
 import sys, os, glob, os.path, re, time
-import atexit
 import itertools
 import logging
 import multiprocessing
@@ -18,14 +17,11 @@ import sre_constants
 import threading
 from io import StringIO, UnsupportedOperation
 from contextlib import closing
-from functools import wraps
 from collections import defaultdict, namedtuple
 import bb, bb.exceptions, bb.command
 from bb import utils, data, parse, event, cache, providers, taskdata, runqueue, build
 import queue
 import signal
-import subprocess
-import errno
 import prserv.serv
 import pyinotify
 import json
@@ -169,8 +165,8 @@ class BBCooker:
         bb.debug(1, "BBCooker pyinotify1 %s" % time.time())
         sys.stdout.flush()
 
-        self.configwatcher.bbseen = []
-        self.configwatcher.bbwatchedfiles = []
+        self.configwatcher.bbseen = set()
+        self.configwatcher.bbwatchedfiles = set()
         self.confignotifier = pyinotify.Notifier(self.configwatcher, self.config_notifications)
         bb.debug(1, "BBCooker pyinotify2 %s" % time.time())
         sys.stdout.flush()
@@ -180,8 +176,8 @@ class BBCooker:
         self.watcher = pyinotify.WatchManager()
         bb.debug(1, "BBCooker pyinotify3 %s" % time.time())
         sys.stdout.flush()
-        self.watcher.bbseen = []
-        self.watcher.bbwatchedfiles = []
+        self.watcher.bbseen = set()
+        self.watcher.bbwatchedfiles = set()
         self.notifier = pyinotify.Notifier(self.watcher, self.notifications)
 
         bb.debug(1, "BBCooker pyinotify complete %s" % time.time())
@@ -278,14 +274,14 @@ class BBCooker:
         if not watcher:
             watcher = self.watcher
         for i in deps:
-            watcher.bbwatchedfiles.append(i[0])
+            watcher.bbwatchedfiles.add(i[0])
             if dirs:
                 f = i[0]
             else:
                 f = os.path.dirname(i[0])
             if f in watcher.bbseen:
                 continue
-            watcher.bbseen.append(f)
+            watcher.bbseen.add(f)
             watchtarget = None
             while True:
                 # We try and add watches for files that don't exist but if they did, would influence
@@ -294,7 +290,7 @@ class BBCooker:
                 try:
                     watcher.add_watch(f, self.watchmask, quiet=False)
                     if watchtarget:
-                        watcher.bbwatchedfiles.append(watchtarget)
+                        watcher.bbwatchedfiles.add(watchtarget)
                     break
                 except pyinotify.WatchManagerError as e:
                     if 'ENOENT' in str(e):
@@ -302,7 +298,7 @@ class BBCooker:
                         f = os.path.dirname(f)
                         if f in watcher.bbseen:
                             break
-                        watcher.bbseen.append(f)
+                        watcher.bbseen.add(f)
                         continue
                     if 'ENOSPC' in str(e):
                         providerlog.error("No space left on device or exceeds fs.inotify.max_user_watches?")
@@ -1027,16 +1023,16 @@ class BBCooker:
             bb.event.fire(bb.event.FilesMatchingFound(filepattern, matches), self.data)
 
     def findProviders(self, mc=''):
-        return bb.providers.findProviders(self.data, self.recipecaches[mc], self.recipecaches[mc].pkg_pn)
+        return bb.providers.findProviders(self.databuilder.mcdata[mc], self.recipecaches[mc], self.recipecaches[mc].pkg_pn)
 
     def findBestProvider(self, pn, mc=''):
         if pn in self.recipecaches[mc].providers:
             filenames = self.recipecaches[mc].providers[pn]
-            eligible, foundUnique = bb.providers.filterProviders(filenames, pn, self.data, self.recipecaches[mc])
+            eligible, foundUnique = bb.providers.filterProviders(filenames, pn, self.databuilder.mcdata[mc], self.recipecaches[mc])
             filename = eligible[0]
             return None, None, None, filename
         elif pn in self.recipecaches[mc].pkg_pn:
-            return bb.providers.findBestProvider(pn, self.data, self.recipecaches[mc], self.recipecaches[mc].pkg_pn)
+            return bb.providers.findBestProvider(pn, self.databuilder.mcdata[mc], self.recipecaches[mc], self.recipecaches[mc].pkg_pn)
         else:
             return None, None, None, None
 
@@ -1208,7 +1204,7 @@ class BBCooker:
             for c in collection_list:
                 calc_layer_priority(c)
                 regex = self.data.getVar("BBFILE_PATTERN_%s" % c)
-                if regex == None:
+                if regex is None:
                     parselog.error("BBFILE_PATTERN_%s not defined" % c)
                     errors = True
                     continue
@@ -1314,7 +1310,7 @@ class BBCooker:
         self.parseConfiguration()
 
         # If we are told to do the None task then query the default task
-        if (task == None):
+        if task is None:
             task = self.configuration.cmd
         if not task.startswith("do_"):
             task = "do_%s" % task
@@ -1458,7 +1454,7 @@ class BBCooker:
         self.buildSetVars()
 
         # If we are told to do the None task then query the default task
-        if (task == None):
+        if task is None:
             task = self.configuration.cmd
 
         if not task.startswith("do_"):
@@ -1669,6 +1665,8 @@ class BBCooker:
         self.command.reset()
         self.databuilder.reset()
         self.data = self.databuilder.data
+        self.parsecache_valid = False
+        self.baseconfig_valid = False
 
 
 class CookerExit(bb.event.Event):
@@ -1691,7 +1689,7 @@ class CookerCollectFiles(object):
     def calc_bbfile_priority( self, filename, matched = None ):
         for _, _, regex, pri in self.bbfile_config_priorities:
             if regex.match(filename):
-                if matched != None:
+                if matched is not None:
                     if not regex in matched:
                         matched.add(regex)
                 return pri
@@ -1788,7 +1786,7 @@ class CookerCollectFiles(object):
                 # When constructing an older style single regex, it's possible for BBMASK
                 # to end up beginning with '|', which matches and masks _everything_.
                 if mask.startswith("|"):
-                    collectlog.warn("BBMASK contains regular expression beginning with '|', fixing: %s" % mask)
+                    collectlog.warning("BBMASK contains regular expression beginning with '|', fixing: %s" % mask)
                     mask = mask[1:]
                 try:
                     re.compile(mask)
@@ -1944,7 +1942,8 @@ class Parser(multiprocessing.Process):
                 except IndexError:
                     break
                 result = self.parse(*job)
-
+                # Clear the siggen cache after parsing to control memory usage, its huge
+                bb.parse.siggen.postparsing_clean_cache()
             try:
                 self.results.put(result, timeout=0.25)
             except queue.Full:
@@ -1952,6 +1951,7 @@ class Parser(multiprocessing.Process):
 
     def parse(self, filename, appends):
         try:
+            origfilter = bb.event.LogHandler.filter
             # Record the filename we're parsing into any events generated
             def parse_filter(self, record):
                 record.taskpid = bb.event.worker_pid
@@ -1974,6 +1974,8 @@ class Parser(multiprocessing.Process):
         # a SystemExit event for example.
         except BaseException as exc:
             return True, ParsingFailure(exc, filename)
+        finally:
+            bb.event.LogHandler.filter = origfilter
 
 class CookerParser(object):
     def __init__(self, cooker, filelist, masked):

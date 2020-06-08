@@ -1,19 +1,21 @@
-<!ENTITY DISTRO "3.0">
-<!ENTITY DISTRO_COMPRESSED "30">
-<!ENTITY DISTRO_NAME_NO_CAP "zeus">
-<!ENTITY DISTRO_NAME "Zeus">
-<!ENTITY DISTRO_NAME_NO_CAP_MINUS_ONE "warrior">
-<!ENTITY DISTRO_NAME_MINUS_ONE "Warrior">
-<!ENTITY YOCTO_DOC_VERSION "3.0">
-<!ENTITY YOCTO_DOC_VERSION_MINUS_ONE "2.7">
-<!ENTITY DISTRO_REL_TAG "yocto-3.0">
-<!ENTITY METAINTELVERSION "9.0">
-<!ENTITY REL_MONTH_YEAR "October 2019">
+<!ENTITY DISTRO "3.1">
+<!ENTITY DISTRO_COMPRESSED "31">
+<!ENTITY DISTRO_NAME_NO_CAP "dunfell">
+<!ENTITY DISTRO_NAME "Dunfell">
+<!ENTITY DISTRO_NAME_NO_CAP_MINUS_ONE "zeus">
+<!ENTITY DISTRO_NAME_MINUS_ONE "Zeus">
+<!ENTITY YOCTO_DOC_VERSION "3.1">
+<!ENTITY YOCTO_DOC_VERSION_MINUS_ONE "3.0.2">
+<!ENTITY DISTRO_REL_TAG "yocto-3.1">
+<!ENTITY METAINTELVERSION "12.0">
+<!ENTITY REL_MONTH_YEAR "April 2020">
 <!ENTITY META_INTEL_REL_TAG "&METAINTELVERSION;-&DISTRO_NAME_NO_CAP;-&YOCTO_DOC_VERSION;">
-<!ENTITY POKYVERSION "22.0.0">
-<!ENTITY POKYVERSION_COMPRESSED "2200">
+<!ENTITY POKYVERSION "23.0.0">
+<!ENTITY POKYVERSION_COMPRESSED "2300">
 <!ENTITY YOCTO_POKY "poky-&DISTRO_NAME_NO_CAP;-&POKYVERSION;">
-<!ENTITY COPYRIGHT_YEAR "2010-2019">
+<!ENTITY COPYRIGHT_YEAR "2010-2020">
+<!ENTITY ORGNAME "The Yocto Project">
+<!ENTITY ORGEMAIL "docs@lists.yoctoproject.org">
 <!ENTITY YOCTO_DL_URL "http://downloads.yoctoproject.org">
 <!ENTITY YOCTO_HOME_URL "http://www.yoctoproject.org">
 <!ENTITY YOCTO_LISTS_URL "http://lists.yoctoproject.org">
@@ -58,22 +60,30 @@
 <!ENTITY OE_INIT_PATH "&YOCTO_POKY;/oe-init-build-env">
 <!ENTITY OE_INIT_FILE "oe-init-build-env">
 <!ENTITY UBUNTU_HOST_PACKAGES_ESSENTIAL "gawk wget git-core diffstat unzip texinfo gcc-multilib \
-     build-essential chrpath socat cpio python python3 python3-pip python3-pexpect \
+     build-essential chrpath socat cpio python3 python3-pip python3-pexpect \
      xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev \
      pylint3 xterm">
 <!ENTITY FEDORA_HOST_PACKAGES_ESSENTIAL "gawk make wget tar bzip2 gzip python3 unzip perl patch \
      diffutils diffstat git cpp gcc gcc-c++ glibc-devel texinfo chrpath \
      ccache perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue perl-bignum socat \
      python3-pexpect findutils which file cpio python python3-pip xz python3-GitPython \
-     python3-jinja2 SDL-devel xterm">
+     python3-jinja2 SDL-devel xterm rpcgen">
 <!ENTITY OPENSUSE_HOST_PACKAGES_ESSENTIAL "python gcc gcc-c++ git chrpath make wget python-xml \
      diffstat makeinfo python-curses patch socat python3 python3-curses tar python3-pip \
-     python3-pexpect xz which python3-Jinja2 Mesa-libEGL1
-     $ sudo pip3 install GitPython libSDL-devel xterm">
-<!ENTITY CENTOS_HOST_PACKAGES_ESSENTIAL "-y epel-release
+     python3-pexpect xz which python3-Jinja2 Mesa-libEGL1 libSDL-devel xterm rpcgen
+     $ sudo pip3 install GitPython">
+<!ENTITY CENTOS7_HOST_PACKAGES_ESSENTIAL "-y epel-release
      $ sudo yum makecache
-     $ sudo yum install gawk make wget tar bzip2 gzip python unzip perl patch \
+     $ sudo yum install gawk make wget tar bzip2 gzip python3 unzip perl patch \
      diffutils diffstat git cpp gcc gcc-c++ glibc-devel texinfo chrpath socat \
-     perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue python34-pip xz \
+     perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue python36-pip xz \
      which SDL-devel xterm
      $ sudo pip3 install GitPython jinja2">
+<!ENTITY CENTOS8_HOST_PACKAGES_ESSENTIAL "-y epel-release
+     $ sudo dnf config-manager --set-enabled PowerTools
+     $ sudo dnf makecache
+     $ sudo dnf install gawk make wget tar bzip2 gzip python3 unzip perl patch \
+     diffutils diffstat git cpp gcc gcc-c++ glibc-devel texinfo chrpath ccache \
+     socat perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue python3-pip \
+     python3-GitPython python3-jinja2 python3-pexpect xz which SDL-devel xterm \
+     rpcgen">

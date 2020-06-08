@@ -7,15 +7,14 @@ SRC_URI = "git://github.com/manatools/dnfdragora.git \
            file://0001-disable-build-manpages.patch \
            file://0001-Do-not-set-PYTHON_INSTALL_DIR-by-running-python.patch \
            file://0001-To-fix-error-when-do_package.patch \
-           file://0001-Run-python-scripts-using-env.patch \
            "
 
-PV = "1.0.1+git${SRCPV}"
-SRCREV = "4fef4ce889b8e4fa03191d414f63bfd50796152a"
+PV = "1.1.2+git${SRCPV}"
+SRCREV = "19e123132cfd4efd860e5204261c3c228bfe80a8"
 
 S = "${WORKDIR}/git"
 
-inherit cmake gettext pkgconfig python3-dir python3native distutils3-base
+inherit cmake gettext pkgconfig python3-dir python3native distutils3-base mime-xdg
 
 DEPENDS += "dnf python3 "
 #DEPENDS_class-nativesdk += "nativesdk-python3"
@@ -27,4 +26,7 @@ EXTRA_OECMAKE = " -DWITH_MAN=OFF -DPYTHON_INSTALL_DIR=${PYTHON_SITEPACKAGES_DIR}
 
 BBCLASSEXTEND = "nativesdk"
 
-FILES_${PN} = "${PYTHON_SITEPACKAGES_DIR}/ ${datadir}/ ${bindir}/ ${sysconfdir}/dnfdragora "
+FILES_${PN} = "${PYTHON_SITEPACKAGES_DIR}/ ${datadir}/ ${bindir}/ ${sysconfdir}/dnfdragora ${sysconfdir}/xdg"
+
+PNBLACKLIST[dnfdragora] ?= "${@bb.utils.contains('PACKAGE_CLASSES', 'package_rpm', '', 'does not build correctly without package_rpm in PACKAGE_CLASSES', d)}"
+

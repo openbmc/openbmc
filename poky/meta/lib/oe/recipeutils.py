@@ -421,6 +421,8 @@ def copy_recipe_files(d, tgt_dir, whole_dir=False, download=True, all_variants=F
             # Ensure we handle class-target if we're dealing with one of the variants
             variants.append('target')
             for variant in variants:
+                if variant.startswith("devupstream"):
+                    localdata.setVar('SRCPV', 'git')
                 localdata.setVar('CLASSOVERRIDE', 'class-%s' % variant)
                 fetch_urls(localdata)
 
@@ -1059,7 +1061,6 @@ def get_recipe_upgrade_status(recipes=None):
     data_copy_list = []
     copy_vars = ('SRC_URI',
                  'PV',
-                 'GITDIR',
                  'DL_DIR',
                  'PN',
                  'CACHE',
@@ -1075,6 +1076,18 @@ def get_recipe_upgrade_status(recipes=None):
                  'RECIPE_UPSTREAM_VERSION',
                  'RECIPE_UPSTREAM_DATE',
                  'CHECK_DATE',
+                 'FETCHCMD_bzr',
+                 'FETCHCMD_ccrc',
+                 'FETCHCMD_cvs',
+                 'FETCHCMD_git',
+                 'FETCHCMD_hg',
+                 'FETCHCMD_npm',
+                 'FETCHCMD_osc',
+                 'FETCHCMD_p4',
+                 'FETCHCMD_repo',
+                 'FETCHCMD_s3',
+                 'FETCHCMD_svn',
+                 'FETCHCMD_wget',
             )
 
     with bb.tinfoil.Tinfoil() as tinfoil:

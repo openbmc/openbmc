@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=35d145429ad3cbf5308d1dc93f66376b"
 
 DEPENDS = "exo libexif libxfce4ui libxfce4util xfconf cairo file"
 
-inherit xfce-app
+inherit xfce-app mime-xdg
 
 RRECOMMENDS_${PN} += "tumbler"
 

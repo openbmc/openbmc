@@ -7,27 +7,24 @@
 #
 
 import os
-import sys
 import re
 import shutil
 import time
-from django.db import transaction
-from django.db.models import Q
-from bldcontrol.models import BuildEnvironment, BuildRequest, BRLayer, BRVariable, BRTarget, BRBitbake, Build
-from orm.models import CustomImageRecipe, Layer, Layer_Version, Project, ProjectLayer, ToasterSetting
+from bldcontrol.models import BuildEnvironment, BuildRequest, Build
+from orm.models import CustomImageRecipe, Layer, Layer_Version, Project, ToasterSetting
 from orm.models import signal_runbuilds
 import subprocess
 
 from toastermain import settings
 
-from bldcontrol.bbcontroller import BuildEnvironmentController, ShellCmdException, BuildSetupException, BitbakeController
+from bldcontrol.bbcontroller import BuildEnvironmentController, ShellCmdException, BuildSetupException
 
 import logging
 logger = logging.getLogger("toaster")
 
 install_dir = os.environ.get('TOASTER_DIR')
 
-from pprint import pprint, pformat
+from pprint import pformat
 
 class LocalhostBEController(BuildEnvironmentController):
     """ Implementation of the BuildEnvironmentController for the localhost;

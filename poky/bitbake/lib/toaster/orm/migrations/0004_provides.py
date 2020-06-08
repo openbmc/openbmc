@@ -16,12 +16,12 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=100)),
-                ('recipe', models.ForeignKey(to='orm.Recipe')),
+                ('recipe', models.ForeignKey(to='orm.Recipe', on_delete=models.CASCADE)),
             ],
         ),
         migrations.AddField(
             model_name='recipe_dependency',
             name='via',
-            field=models.ForeignKey(null=True, default=None, to='orm.Provides'),
+            field=models.ForeignKey(null=True, default=None, to='orm.Provides', on_delete=models.CASCADE),
         ),
     ]

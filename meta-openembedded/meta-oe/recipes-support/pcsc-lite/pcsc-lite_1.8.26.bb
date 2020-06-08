@@ -10,11 +10,14 @@ LICENSE_${PN}-spy = "GPLv3+"
 LICENSE_${PN}-spy-dev = "GPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=628c01ba985ecfa21677f5ee2d5202f6"
 
-SRC_URI = "https://pcsclite.apdu.fr/files/${BP}.tar.bz2"
+SRC_URI = "\
+	https://pcsclite.apdu.fr/files/${BP}.tar.bz2 \
+	file://0001-pcsc-spy-use-python3-only.patch \
+"
 SRC_URI[md5sum] = "9d36882998449daceec267c68a21ff0d"
 SRC_URI[sha256sum] = "3eb7be7d6ef618c0a444316cf5c1f2f9d7227aedba7a192f389fe3e7c0dfbbd9"
 
-inherit autotools systemd pkgconfig
+inherit autotools systemd pkgconfig perlnative
 
 EXTRA_OECONF = " \
     --disable-libusb \
@@ -50,6 +53,6 @@ RPROVIDES_${PN} += "${PN}-systemd"
 RREPLACES_${PN} += "${PN}-systemd"
 RCONFLICTS_${PN} += "${PN}-systemd"
 SYSTEMD_SERVICE_${PN} = "pcscd.socket"
-RDEPENDS_${PN}-spy +="python"
+RDEPENDS_${PN}-spy +="python3"
 
 BBCLASSEXTEND = "native"

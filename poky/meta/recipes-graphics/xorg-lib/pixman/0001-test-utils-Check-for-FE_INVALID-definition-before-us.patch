@@ -7,7 +7,7 @@ Some architectures e.g. nios2 do not support all exceptions
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
-Upstream-Status: Submitted
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/pixman/pixman/merge_requests/24]
 
  test/utils.c | 2 ++
  1 file changed, 2 insertions(+)

@@ -12,6 +12,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3"
 
 SRC_URI = "git://git.kernel.org/pub/scm/utils/cpu/mce/mce-test.git;protocol=git \
            file://makefile-remove-ldflags.patch \
+           file://0001-gcov_merge.py-scov_merge.py-switch-to-python3.patch \
           "
 SRCREV = "7643baf6c3919b3d727e6ba6c2e545dc6a653307"
 PV = "20190917+git${SRCPV}"

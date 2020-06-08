@@ -42,8 +42,9 @@ but their recipes claim otherwise by setting UPSTREAM_VERSION_UNKNOWN. Please re
 
     def test_maintainers(self):
         """
-        Summary:     Test that oe-core recipes have a maintainer
+        Summary:     Test that oe-core recipes have a maintainer and entries in maintainers list have a recipe
         Expected:    All oe-core recipes (except a few special static/testing ones) should have a maintainer listed in maintainers.inc file.
+        Expected:    All entries in maintainers list should have a recipe file that matches them
         Product:     oe-core
         Author:      Alexander Kanavin <alex.kanavin@gmail.com>
         """
@@ -54,7 +55,15 @@ but their recipes claim otherwise by setting UPSTREAM_VERSION_UNKNOWN. Please re
                      return True
             return False
 
-        feature = 'require conf/distro/include/maintainers.inc\n'
+        def is_maintainer_exception(entry):
+            exceptions = ["musl", "newlib", "linux-yocto", "linux-dummy", "mesa-gl", "libgfortran",
+                          "cve-update-db-native"]
+            for i in exceptions:
+                 if i in entry:
+                     return True
+            return False
+
+        feature = 'require conf/distro/include/maintainers.inc\nLICENSE_FLAGS_WHITELIST += " commercial"\nPARSE_ALL_RECIPES = "1"\n'
         self.write_config(feature)
 
         with bb.tinfoil.Tinfoil() as tinfoil:
@@ -62,6 +71,11 @@ but their recipes claim otherwise by setting UPSTREAM_VERSION_UNKNOWN. Please re
 
             with_maintainer_list = []
             no_maintainer_list = []
+
+            missing_recipes = []
+            recipes = []
+            prefix = "RECIPE_MAINTAINER_pn-"
+
             # We could have used all_recipes() here, but this method will find
             # every recipe if we ever move to setting RECIPE_MAINTAINER in recipe files
             # instead of maintainers.inc
@@ -71,12 +85,22 @@ but their recipes claim otherwise by setting UPSTREAM_VERSION_UNKNOWN. Please re
                     continue
                 rd = tinfoil.parse_recipe_file(fn, appends=False)
                 pn = rd.getVar('PN')
+                recipes.append(pn)
                 if is_exception(pn):
                     continue
                 if rd.getVar('RECIPE_MAINTAINER'):
                     with_maintainer_list.append((pn, fn))
                 else:
                     no_maintainer_list.append((pn, fn))
+
+            maintainers = tinfoil.config_data.keys()
+            for key in maintainers:
+                 if key.startswith(prefix):
+                     recipe = tinfoil.config_data.expand(key[len(prefix):])
+                     if is_maintainer_exception(recipe):
+                         continue
+                     if recipe not in recipes:
+                         missing_recipes.append(recipe)
 
         if no_maintainer_list:
             self.fail("""
@@ -87,3 +111,8 @@ The following recipes do not have a maintainer assigned to them. Please add an e
             self.fail("""
 The list of oe-core recipes with maintainers is empty. This may indicate that the test has regressed and needs fixing.
 """)
+
+        if missing_recipes:
+                self.fail("""
+Unable to find recipes for the following entries in maintainers.inc:
+""" + "\n".join(['%s' % i for i in missing_recipes]))

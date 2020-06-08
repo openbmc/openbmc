@@ -1,0 +1,17 @@
+# This service shall be started with two arguments:
+#  * The PSU inventory DBus object
+#  * The path of the PSU images
+# E.g.
+#  "psu-update@-xyz-openbmc_project-inventory-system-chassis-motherboard-powersupply0\x20-tmp-image-abcdefg.service"
+# expands to
+#  /usr/bin/fp5280g2-psu-update /xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply0 /tmp/image/abcdefg
+
+[Unit]
+Description=Update PSU %I
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+Environment="ARGS=%I"
+ExecStart=/usr/bin/fp5280g2-psu-update $ARGS
+SyslogIdentifier=fp5280g2-psu-update

@@ -1,5 +1,5 @@
 require u-boot-common-aspeed_${PV}.inc
-require recipes-bsp/u-boot/u-boot.inc
+require u-boot-aspeed.inc
 
 PROVIDES += "u-boot"
 DEPENDS += "dtc-native"

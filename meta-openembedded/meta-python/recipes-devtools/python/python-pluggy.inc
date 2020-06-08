@@ -11,4 +11,17 @@ RDEPENDS_${PN} += "${PYTHON_PN}-importlib-metadata \
                    ${PYTHON_PN}-more-itertools \
 "
 
-inherit pypi
+inherit pypi ptest
+
+SRC_URI += " \
+	file://run-ptest \
+"
+
+RDEPENDS_${PN}-ptest += " \
+	${PYTHON_PN}-pytest \
+"
+
+do_install_ptest() {
+	install -d ${D}${PTEST_PATH}/testing
+	cp -rf ${S}/testing/* ${D}${PTEST_PATH}/testing/
+}

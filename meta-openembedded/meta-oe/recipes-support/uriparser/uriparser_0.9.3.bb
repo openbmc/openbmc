@@ -8,6 +8,8 @@ SRC_URI = "https://github.com/${BPN}/${BPN}/releases/download/${BP}/${BP}.tar.gz
 SRC_URI[md5sum] = "9874b64f6f4ff656f3f69598e38f12b7"
 SRC_URI[sha256sum] = "6cef39d6eaf1a48504ee0264ce85f078758057dafb1edd0a898183b55ff76014"
 
+UPSTREAM_CHECK_URI = "https://github.com/${BPN}/${BPN}/releases"
+
 inherit cmake
 
 EXTRA_OECMAKE += "-DURIPARSER_BUILD_DOCS:BOOL=OFF -DURIPARSER_BUILD_TESTS:BOOL=OFF"

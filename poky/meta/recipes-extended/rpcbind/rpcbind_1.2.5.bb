@@ -13,9 +13,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b46486e4c4a416602693a711bb5bfa39 \
 SRC_URI = "${SOURCEFORGE_MIRROR}/rpcbind/rpcbind-${PV}.tar.bz2 \
            file://init.d \
            file://rpcbind.conf \
-           file://rpcbind.socket \
-           file://rpcbind.service \
            file://rpcbind_add_option_to_fix_port_number.patch \
+           file://0001-systemd-use-EnvironmentFile.patch \
           "
 SRC_URI[md5sum] = "ed46f09b9c0fa2d49015f6431bc5ea7b"
 SRC_URI[sha256sum] = "2ce360683963b35c19c43f0ee2c7f18aa5b81ef41c3fdbd15ffcb00b8bffda7a"
@@ -28,7 +27,7 @@ PACKAGECONFIG[tcp-wrappers] = "--enable-libwrap,--disable-libwrap,tcp-wrappers"
 INITSCRIPT_NAME = "rpcbind"
 INITSCRIPT_PARAMS = "start 12 2 3 4 5 . stop 60 0 1 6 ."
 
-SYSTEMD_SERVICE_${PN} = "rpcbind.service"
+SYSTEMD_SERVICE_${PN} = "rpcbind.service rpcbind.socket"
 
 inherit useradd
 
@@ -50,12 +49,4 @@ do_install_append () {
 		-e 's,/sbin/,${sbindir}/,g' \
 		${WORKDIR}/init.d > ${D}${sysconfdir}/init.d/rpcbind
 	chmod 0755 ${D}${sysconfdir}/init.d/rpcbind
-
-	install -m 0755 ${WORKDIR}/rpcbind.conf ${D}${sysconfdir}
-	install -d ${D}${systemd_unitdir}/system
-	install -m 0644 ${WORKDIR}/rpcbind.socket ${D}${systemd_unitdir}/system
-	install -m 0644 ${WORKDIR}/rpcbind.service ${D}${systemd_unitdir}/system
-	sed -i -e 's,@SBINDIR@,${sbindir},g' \
-		-e 's,@SYSCONFDIR@,${sysconfdir},g' \
-		${D}${systemd_unitdir}/system/rpcbind.service
 }

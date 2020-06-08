@@ -14,7 +14,7 @@ SECTION = "admin"
 LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING.LIB;md5=a916467b91076e631dd8edb7424769c7"
 
-DEPENDS = "libxml2 python"
+DEPENDS = "libxml2 python3"
 TOOLCHAIN = "gcc"
 
 SECURITY_CFLAGS = "${SECURITY_NO_PIE_CFLAGS}"
@@ -26,9 +26,12 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/releases/${BPN}-${PV}.tar.gz \
            file://0001-immpbe_dump.cc-Use-sys-wait.h-instead-of-wait.h.patch \
            file://0001-Add-configure-time-check-for-gettid-API.patch \
            file://0001-create_empty_library-Use-CC-variable-intead-of-hardc.patch \
+           file://0001-immom_python-convert-to-python3.patch \
            "
 SRC_URI[md5sum] = "9b61df01d1a092101c4a626692edae19"
 SRC_URI[sha256sum] = "6da9af96e8ee58d11031d305bf4804a00deb6108e12e422722882a2091bd34bd"
+
+UPSTREAM_CHECK_URI = "http://sourceforge.net/projects/opensaf/files/releases"
 
 inherit autotools useradd systemd pkgconfig
 
@@ -66,7 +69,7 @@ FILES_${PN}-staticdev += "${PKGLIBDIR}/*.a"
 
 INSANE_SKIP_${PN} = "dev-so"
 
-RDEPENDS_${PN} += "bash python"
+RDEPENDS_${PN} += "bash python3-core"
 
 # http://errors.yoctoproject.org/Errors/Details/186970/
 COMPATIBLE_HOST_libc-musl = 'null'

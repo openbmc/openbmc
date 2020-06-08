@@ -1,6 +1,6 @@
 require recipes-graphics/xorg-driver/xorg-driver-input.inc
 SUMMARY = "X.Org X server -- void input driver"
-PR = "${INC_PR}.0"
+PR = "r22"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=4be6a915bfbf111cd88706fc6a6f141b"
 

@@ -23,9 +23,9 @@ diff --git a/configure.ac b/configure.ac
 index a7eca97d..560eb988 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -6794,6 +6794,7 @@ if test "x$enable_werror" != "xno"; then
-   AM_CFLAGS="$AM_CFLAGS -Werror"
-   AM_CXXFLAGS="$AM_CXXFLAGS -Werror"
+@@ -7101,6 +7101,7 @@ if test "x$GCC" = "xyes"; then
+     AM_CXXFLAGS="$AM_CXXFLAGS -Werror"
+   fi
  fi
 +AX_CHECK_COMPILE_FLAG([-Werror -Werror=format-truncation],[AM_CFLAGS="$AM_CFLAGS -Wno-error=format-truncation" AM_CXXFLAGS="$AM_CXXFLAGS -Wno-error=format-truncation"])
  

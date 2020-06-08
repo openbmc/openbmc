@@ -27,7 +27,7 @@ RDEPENDS_${PN} += "openssh-misc"
 #
 S = "${WORKDIR}/pam_ssh_agent_auth-${PV}"
 
-inherit autotools-brokensep
+inherit autotools-brokensep perlnative
 
 # Avoid autoreconf.  Override the --libexec oe_runconf specifies so that
 # the module is put with the other pam modules.  Because it cannot, in general,

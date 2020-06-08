@@ -1,0 +1,50 @@
+From ffc829603a2c50674c8e04de5221e43f80bfc1b2 Mon Sep 17 00:00:00 2001
+From: Andrey Zhizhikin <andrey.z@gmail.com>
+Date: Mon, 27 Jan 2020 13:00:53 +0000
+Subject: [PATCH] immom_python: convert to python3
+
+Convert immom_python to use python3, python2 is EOL and is not supported
+by all distributions anymore.
+
+Upstream-Status: Pending
+
+Signed-off-by: Andrey Zhizhikin <andrey.z@gmail.com>
+---
+ samples/immsv/immom_python/immom.py         | 2 +-
+ samples/immsv/immom_python/immomexamples.py | 2 +-
+ samples/immsv/immom_python/immomtest.py     | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/samples/immsv/immom_python/immom.py b/samples/immsv/immom_python/immom.py
+index 4f68625ed..f88197000 100755
+--- a/samples/immsv/immom_python/immom.py
++++ b/samples/immsv/immom_python/immom.py
+@@ -1,4 +1,4 @@
+-#! /usr/bin/python
++#!/usr/bin/env python3
+ """
+ immom -- An IMM Object Manager in Python
+ 
+diff --git a/samples/immsv/immom_python/immomexamples.py b/samples/immsv/immom_python/immomexamples.py
+index 70c579265..bd693c25f 100755
+--- a/samples/immsv/immom_python/immomexamples.py
++++ b/samples/immsv/immom_python/immomexamples.py
+@@ -1,4 +1,4 @@
+-#! /usr/bin/env python
++#!/usr/bin/env python3
+ 
+ import immom
+ 
+diff --git a/samples/immsv/immom_python/immomtest.py b/samples/immsv/immom_python/immomtest.py
+index 4b98bea8c..ed2463ba9 100755
+--- a/samples/immsv/immom_python/immomtest.py
++++ b/samples/immsv/immom_python/immomtest.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # -*- coding: utf-8 -*-
+ 
+ import immom
+-- 
+2.17.1
+

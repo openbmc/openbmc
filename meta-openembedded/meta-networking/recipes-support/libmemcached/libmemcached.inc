@@ -6,6 +6,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=865490941c91ba790f0ea78dec93bd60"
 
 SRC_URI = "http://launchpad.net/libmemcached/1.0/${PV}/+download/libmemcached-${PV}.tar.gz"
 
+UPSTREAM_CHECK_URI = "https://launchpad.net/libmemcached"
+
 TARGET_LDFLAGS += "-luuid"
 TARGET_CFLAGS += "-D__USE_GNU -D_GNU_SOURCE"
 

@@ -1,0 +1,255 @@
+From 2512aacf023c679d86d8f40caff4f6ff412b32ff Mon Sep 17 00:00:00 2001
+From: RAGHUNATH LOLUR <raghunath.lolur@kpit.com>
+Date: Wed, 6 Dec 2017 22:52:26 -0800
+Subject: [PATCH] Fix for testsuite failure
+
+2017-11-16  Raghunath Lolur  <raghunath.lolur@kpit.com>
+
+	* gcc.dg/pr56275.c: If SSE is disabled, ensure that
+	"-mfpmath" is not set to use SSE. Set "-mfpmath=387".
+	* gcc.dg/pr68306.c: Likewise
+	* gcc.dg/pr68306-2.c: Likewise
+	* gcc.dg/pr68306-3.c: Likewise
+	* gcc.dg/pr69634.c: Likewise
+	* gcc.target/i386/amd64-abi-1.c: Likewise
+	* gcc.target/i386/funcspec-6.c: Likewise
+	* gcc.target/i386/interrupt-387-err-1.c: Likewise
+	* gcc.target/i386/isa-14.c: Likewise
+	* gcc.target/i386/pr44948-2b.c: Likewise
+	* gcc.target/i386/pr53425-1.c: Likewise
+	* gcc.target/i386/pr53425-2.c: Likewise
+	* gcc.target/i386/pr55247.c: Likewise
+	* gcc.target/i386/pr59644.c: Likewise
+	* gcc.target/i386/pr62120.c: Likewise
+	* gcc.target/i386/pr70467-1.c: Likewise
+	* gcc.target/i386/warn-vect-op-1.c: Likewise
+
+If -Wall, -Werror are used during compilation various test cases fail
+to compile.
+
+If SSE is disabled, be sure to -mfpmath=387 to resolve this.
+
+This patch removes the changes to Changelog from the original patch.
+This will help us avoid conflicts.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+---
+ gcc/testsuite/gcc.dg/pr56275.c                      | 2 +-
+ gcc/testsuite/gcc.dg/pr68306-2.c                    | 2 +-
+ gcc/testsuite/gcc.dg/pr68306-3.c                    | 2 +-
+ gcc/testsuite/gcc.dg/pr68306.c                      | 2 +-
+ gcc/testsuite/gcc.dg/pr69634.c                      | 2 +-
+ gcc/testsuite/gcc.target/i386/amd64-abi-1.c         | 2 +-
+ gcc/testsuite/gcc.target/i386/funcspec-6.c          | 1 +
+ gcc/testsuite/gcc.target/i386/interrupt-387-err-1.c | 2 +-
+ gcc/testsuite/gcc.target/i386/isa-14.c              | 2 +-
+ gcc/testsuite/gcc.target/i386/pr44948-2b.c          | 2 +-
+ gcc/testsuite/gcc.target/i386/pr53425-1.c           | 2 +-
+ gcc/testsuite/gcc.target/i386/pr53425-2.c           | 2 +-
+ gcc/testsuite/gcc.target/i386/pr55247.c             | 2 +-
+ gcc/testsuite/gcc.target/i386/pr59644.c             | 2 +-
+ gcc/testsuite/gcc.target/i386/pr62120.c             | 2 +-
+ gcc/testsuite/gcc.target/i386/pr70467-1.c           | 2 +-
+ gcc/testsuite/gcc.target/i386/warn-vect-op-1.c      | 2 +-
+ 17 files changed, 17 insertions(+), 16 deletions(-)
+
+diff --git a/gcc/testsuite/gcc.dg/pr56275.c b/gcc/testsuite/gcc.dg/pr56275.c
+index b901bb2b199..a4f6c95e1a1 100644
+--- a/gcc/testsuite/gcc.dg/pr56275.c
++++ b/gcc/testsuite/gcc.dg/pr56275.c
+@@ -1,6 +1,6 @@
+ /* { dg-do compile } */
+ /* { dg-options "-O2" } */
+-/* { dg-additional-options "-mno-sse" { target { i?86-*-* x86_64-*-* } } } */
++/* { dg-additional-options "-mno-sse -mfpmath=387" { target { i?86-*-* x86_64-*-* } } } */
+ 
+ typedef long long v2tw __attribute__ ((vector_size (2 * sizeof (long long))));
+ 
+diff --git a/gcc/testsuite/gcc.dg/pr68306-2.c b/gcc/testsuite/gcc.dg/pr68306-2.c
+index 4672ebe7987..2a368c484b6 100644
+--- a/gcc/testsuite/gcc.dg/pr68306-2.c
++++ b/gcc/testsuite/gcc.dg/pr68306-2.c
+@@ -1,6 +1,6 @@
+ /* { dg-do compile } */
+ /* { dg-options "-O3" } */
+-/* { dg-additional-options "-mno-sse -mno-mmx" { target i?86-*-* x86_64-*-* } } */
++/* { dg-additional-options "-mno-sse -mno-mmx -mfpmath=387" { target i?86-*-* x86_64-*-* } } */
+ 
+ struct {
+     int tz_minuteswest;
+diff --git a/gcc/testsuite/gcc.dg/pr68306-3.c b/gcc/testsuite/gcc.dg/pr68306-3.c
+index f5a8c102cf8..df3390c64c2 100644
+--- a/gcc/testsuite/gcc.dg/pr68306-3.c
++++ b/gcc/testsuite/gcc.dg/pr68306-3.c
+@@ -1,6 +1,6 @@
+ /* { dg-do compile } */
+ /* { dg-options "-O3" } */
+-/* { dg-additional-options "-mno-sse -mno-mmx" { target i?86-*-* x86_64-*-* } } */
++/* { dg-additional-options "-mno-sse -mno-mmx -mfpmath=387" { target i?86-*-* x86_64-*-* } } */
+ /* { dg-additional-options "-mno-altivec -mno-vsx" { target powerpc*-*-* } } */
+ 
+ extern void fn2();
+diff --git a/gcc/testsuite/gcc.dg/pr68306.c b/gcc/testsuite/gcc.dg/pr68306.c
+index 54e5b40f221..0813389e2c1 100644
+--- a/gcc/testsuite/gcc.dg/pr68306.c
++++ b/gcc/testsuite/gcc.dg/pr68306.c
+@@ -1,6 +1,6 @@
+ /* { dg-do compile } */
+ /* { dg-options "-O3" } */
+-/* { dg-additional-options "-mno-sse -mno-mmx" { target i?86-*-* x86_64-*-* } } */
++/* { dg-additional-options "-mno-sse -mno-mmx -mfpmath=387" { target i?86-*-* x86_64-*-* } } */
+ 
+ enum powerpc_pmc_type { PPC_PMC_IBM };
+ struct {
+diff --git a/gcc/testsuite/gcc.dg/pr69634.c b/gcc/testsuite/gcc.dg/pr69634.c
+index 60a56149463..bcc23f9ccd6 100644
+--- a/gcc/testsuite/gcc.dg/pr69634.c
++++ b/gcc/testsuite/gcc.dg/pr69634.c
+@@ -1,6 +1,6 @@
+ /* { dg-do compile } */
+ /* { dg-options "-O2 -fno-dce -fschedule-insns -fno-tree-vrp -fcompare-debug -Wno-psabi" } */
+-/* { dg-additional-options "-mno-sse" { target i?86-*-* x86_64-*-* } } */
++/* { dg-additional-options "-mno-sse -mfpmath=387" { target i?86-*-* x86_64-*-* } } */
+ /* { dg-require-effective-target scheduling } */
+ 
+ typedef unsigned short u16;
+diff --git a/gcc/testsuite/gcc.target/i386/amd64-abi-1.c b/gcc/testsuite/gcc.target/i386/amd64-abi-1.c
+index 69fde57bf06..7f1f1c03edf 100644
+--- a/gcc/testsuite/gcc.target/i386/amd64-abi-1.c
++++ b/gcc/testsuite/gcc.target/i386/amd64-abi-1.c
+@@ -1,5 +1,5 @@
+ /* { dg-do compile { target { ! ia32 } } } */
+-/* { dg-options "-mno-sse" } */
++/* { dg-options "-mno-sse -mfpmath=387" } */
+ /* { dg-additional-options "-mabi=sysv" { target *-*-mingw* } } */
+ 
+ double foo(void) { return 0; }	/* { dg-error "SSE disabled" } */
+diff --git a/gcc/testsuite/gcc.target/i386/funcspec-6.c b/gcc/testsuite/gcc.target/i386/funcspec-6.c
+index ea896b7ebfd..bf15569b826 100644
+--- a/gcc/testsuite/gcc.target/i386/funcspec-6.c
++++ b/gcc/testsuite/gcc.target/i386/funcspec-6.c
+@@ -1,6 +1,7 @@
+ /* Test whether all of the 64-bit function specific options are accepted
+    without error.  */
+ /* { dg-do compile { target { ! ia32 } } } */
++/* { dg-additional-options "-mfpmath=387" } */
+ 
+ #include "funcspec-56.inc"
+ 
+diff --git a/gcc/testsuite/gcc.target/i386/interrupt-387-err-1.c b/gcc/testsuite/gcc.target/i386/interrupt-387-err-1.c
+index 8561a3c26d6..6377f814645 100644
+--- a/gcc/testsuite/gcc.target/i386/interrupt-387-err-1.c
++++ b/gcc/testsuite/gcc.target/i386/interrupt-387-err-1.c
+@@ -1,5 +1,5 @@
+ /* { dg-do compile } */
+-/* { dg-options "-O2 -mgeneral-regs-only -mno-cld -mno-iamcu -m80387" } */
++/* { dg-options "-O2 -mgeneral-regs-only -mno-cld -mno-iamcu -m80387 -mfpmath=387" } */
+ 
+ typedef unsigned int uword_t __attribute__ ((mode (__word__)));
+ 
+diff --git a/gcc/testsuite/gcc.target/i386/isa-14.c b/gcc/testsuite/gcc.target/i386/isa-14.c
+index 5d49e6e77fe..1de2db92bdd 100644
+--- a/gcc/testsuite/gcc.target/i386/isa-14.c
++++ b/gcc/testsuite/gcc.target/i386/isa-14.c
+@@ -1,5 +1,5 @@
+ /* { dg-do run } */
+-/* { dg-options "-march=x86-64 -msse4a -mfma4 -mno-sse" } */
++/* { dg-options "-march=x86-64 -msse4a -mfma4 -mno-sse -mfpmath=387" } */
+ 
+ extern void abort (void);
+ 
+diff --git a/gcc/testsuite/gcc.target/i386/pr44948-2b.c b/gcc/testsuite/gcc.target/i386/pr44948-2b.c
+index fa1769b62fb..f79fb12726f 100644
+--- a/gcc/testsuite/gcc.target/i386/pr44948-2b.c
++++ b/gcc/testsuite/gcc.target/i386/pr44948-2b.c
+@@ -1,5 +1,5 @@
+ /* { dg-do compile } */
+-/* { dg-options "-O -mno-sse -Wno-psabi -mtune=generic" } */
++/* { dg-options "-O -mno-sse -Wno-psabi -mtune=generic -mfpmath=387" } */
+ 
+ struct A
+ { 
+diff --git a/gcc/testsuite/gcc.target/i386/pr53425-1.c b/gcc/testsuite/gcc.target/i386/pr53425-1.c
+index 2e89ff7d81d..6339bf6b736 100644
+--- a/gcc/testsuite/gcc.target/i386/pr53425-1.c
++++ b/gcc/testsuite/gcc.target/i386/pr53425-1.c
+@@ -1,6 +1,6 @@
+ /* PR target/53425 */
+ /* { dg-do compile { target { ! ia32 } } } */
+-/* { dg-options "-O2 -mno-sse" } */
++/* { dg-options "-O2 -mno-sse -mfpmath=387" } */
+ /* { dg-skip-if "no SSE vector" { x86_64-*-mingw* } } */
+ 
+ typedef double __v2df __attribute__ ((__vector_size__ (16)));
+diff --git a/gcc/testsuite/gcc.target/i386/pr53425-2.c b/gcc/testsuite/gcc.target/i386/pr53425-2.c
+index 61f6283dbe9..2c5a55f0ac3 100644
+--- a/gcc/testsuite/gcc.target/i386/pr53425-2.c
++++ b/gcc/testsuite/gcc.target/i386/pr53425-2.c
+@@ -1,6 +1,6 @@
+ /* PR target/53425 */
+ /* { dg-do compile { target { ! ia32 } } } */
+-/* { dg-options "-O2 -mno-sse" } */
++/* { dg-options "-O2 -mno-sse -mfpmath=387" } */
+ /* { dg-skip-if "no SSE vector" { x86_64-*-mingw* } } */
+ 
+ typedef float __v2sf __attribute__ ((__vector_size__ (8)));
+diff --git a/gcc/testsuite/gcc.target/i386/pr55247.c b/gcc/testsuite/gcc.target/i386/pr55247.c
+index 23366d0909d..9810e3abb76 100644
+--- a/gcc/testsuite/gcc.target/i386/pr55247.c
++++ b/gcc/testsuite/gcc.target/i386/pr55247.c
+@@ -1,6 +1,6 @@
+ /* { dg-do compile { target { ! ia32 } } } */
+ /* { dg-require-effective-target maybe_x32 } */
+-/* { dg-options "-O2 -mno-sse -mno-mmx -mx32 -maddress-mode=long" } */
++/* { dg-options "-O2 -mno-sse -mno-mmx -mx32 -maddress-mode=long -mfpmath=387" } */
+ 
+ typedef unsigned int uint32_t;
+ typedef uint32_t Elf32_Word;
+diff --git a/gcc/testsuite/gcc.target/i386/pr59644.c b/gcc/testsuite/gcc.target/i386/pr59644.c
+index 96006b3e338..4287e4538bf 100644
+--- a/gcc/testsuite/gcc.target/i386/pr59644.c
++++ b/gcc/testsuite/gcc.target/i386/pr59644.c
+@@ -1,6 +1,6 @@
+ /* PR target/59644 */
+ /* { dg-do run { target lp64 } } */
+-/* { dg-options "-O2 -ffreestanding -mno-sse -mpreferred-stack-boundary=3 -maccumulate-outgoing-args -mno-red-zone" } */
++/* { dg-options "-O2 -ffreestanding -mno-sse -mpreferred-stack-boundary=3 -maccumulate-outgoing-args -mno-red-zone -mfpmath=387" } */
+ 
+ /* This test uses __builtin_trap () instead of e.g. abort,
+    because due to -mpreferred-stack-boundary=3 it should not call
+diff --git a/gcc/testsuite/gcc.target/i386/pr62120.c b/gcc/testsuite/gcc.target/i386/pr62120.c
+index 28d85d37712..c93266bd4bc 100644
+--- a/gcc/testsuite/gcc.target/i386/pr62120.c
++++ b/gcc/testsuite/gcc.target/i386/pr62120.c
+@@ -1,5 +1,5 @@
+ /* { dg-do compile } */
+-/* { dg-options "-mno-sse" } */
++/* { dg-options "-mno-sse -mfpmath=387" } */
+ 
+ void foo ()
+ {
+diff --git a/gcc/testsuite/gcc.target/i386/pr70467-1.c b/gcc/testsuite/gcc.target/i386/pr70467-1.c
+index 4e112c88d07..bcfb396a68d 100644
+--- a/gcc/testsuite/gcc.target/i386/pr70467-1.c
++++ b/gcc/testsuite/gcc.target/i386/pr70467-1.c
+@@ -1,6 +1,6 @@
+ /* PR rtl-optimization/70467 */
+ /* { dg-do compile } */
+-/* { dg-options "-O2 -mno-sse" } */
++/* { dg-options "-O2 -mno-sse -mfpmath=387" } */
+ 
+ void foo (unsigned long long *);
+ 
+diff --git a/gcc/testsuite/gcc.target/i386/warn-vect-op-1.c b/gcc/testsuite/gcc.target/i386/warn-vect-op-1.c
+index 6cda1534311..26e37f5b8ba 100644
+--- a/gcc/testsuite/gcc.target/i386/warn-vect-op-1.c
++++ b/gcc/testsuite/gcc.target/i386/warn-vect-op-1.c
+@@ -1,5 +1,5 @@
+ /* { dg-do compile { target { ! ia32 } } }  */
+-/* { dg-options "-mno-sse -Wvector-operation-performance" }  */
++/* { dg-options "-mno-sse -Wvector-operation-performance -mfpmath=387" }  */
+ #define vector(elcount, type)  \
+ __attribute__((vector_size((elcount)*sizeof(type)))) type
+ 

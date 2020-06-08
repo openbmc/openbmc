@@ -184,6 +184,10 @@ When using device tree kernels, set this variable to enable I2C:
 
     ENABLE_I2C = "1"
 
+Furthermore, to auto-load I2C kernel modules set:
+
+    KERNEL_MODULE_AUTOLOAD_rpi += "i2c-dev i2c-bcm2708"
+
 ## Enable PiTFT support
 
 Basic support for using PiTFT screens can be enabled by adding below in

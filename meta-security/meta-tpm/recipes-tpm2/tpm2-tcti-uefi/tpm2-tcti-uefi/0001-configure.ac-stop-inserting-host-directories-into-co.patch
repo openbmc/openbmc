@@ -16,7 +16,18 @@ Index: git/configure.ac
 ===================================================================
 --- git.orig/configure.ac
 +++ git/configure.ac
-@@ -81,7 +81,7 @@ AC_ARG_WITH([efi-lds],
+@@ -70,10 +70,6 @@ EXTRA_CFLAGS+="-I${with_efi_includedir}
+ # compiler flags / search path
+ CFLAGS_TMP="$CFLAGS"
+ CFLAGS="$CFLAGS $EXTRA_CFLAGS"
+-AC_CHECK_HEADERS([efi.h efilib.h],
+-                 [],
+-                 [AC_MSG_ERROR([Missing gnu-efi headers.])],
+-                 [#include <efi.h>])
+ CFLAGS="$CFLAGS_TMP"
+ 
+ # path to linker script from gnu-efi
+@@ -81,7 +77,7 @@ AC_ARG_WITH([efi-lds],
              AS_HELP_STRING([--with-efi-lds=LDS_PATH],[Path to gnu-efi lds file.]),
              [],
              [with_efi_lds="/usr/lib/elf_${ARCH}_efi.lds"])

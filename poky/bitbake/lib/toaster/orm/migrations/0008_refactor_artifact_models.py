@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, verbose_name='ID', serialize=False)),
                 ('file_name', models.FilePathField()),
                 ('file_size', models.IntegerField()),
-                ('target', models.ForeignKey(to='orm.Target')),
+                ('target', models.ForeignKey(to='orm.Target', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, verbose_name='ID', serialize=False)),
                 ('file_name', models.FilePathField()),
                 ('file_size', models.IntegerField()),
-                ('target', models.ForeignKey(to='orm.Target')),
+                ('target', models.ForeignKey(to='orm.Target', on_delete=models.CASCADE)),
             ],
         ),
         migrations.RemoveField(

@@ -1,0 +1,168 @@
+From 4bf83597379523032663c8e95b3786a217c9a849 Mon Sep 17 00:00:00 2001
+From: Hugh McMaster <hugh.mcmaster@outlook.com>
+Date: Wed, 3 Apr 2019 21:36:03 +1100
+Subject: [PATCH] Add pkg-config support for building applications and
+ sub-agents
+
+The netsnmp package should be used when building Net-SNMP applications.
+The netsnmp-agent package should be used when building Net-SNMP subagents.
+
+Signed-off-by: Hugh McMaster <hugh.mcmaster@outlook.com>
+[ bvanassche: edited makefile code and .pc files; added ./configure changes ]
+
+Upstream-Status: Backport
+https://sourceforge.net/p/net-snmp/patches/_discuss/thread/a0d66e91dd/f940/attachment/0001-Add-pkg-config-support-for-building-applications-and.patch
+---
+ Makefile.in         |  2 ++
+ Makefile.rules      | 30 ++++++++++++++++++++++++++----
+ configure           |  4 ++++
+ configure.ac        |  1 +
+ netsnmp-agent.pc.in | 12 ++++++++++++
+ netsnmp.pc.in       | 12 ++++++++++++
+ 6 files changed, 57 insertions(+), 4 deletions(-)
+ create mode 100644 netsnmp-agent.pc.in
+ create mode 100644 netsnmp.pc.in
+
+diff --git a/Makefile.in b/Makefile.in
+index 9dbdde1353..ec972636c2 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -35,6 +35,7 @@ INSTALLBUILTHEADERS=include/net-snmp/net-snmp-config.h
+ INSTALLBUILTINCLUDEHEADERS=@FEATUREHEADERS@
+ INSTALLBINSCRIPTS=net-snmp-config net-snmp-create-v3-user
+ INSTALLUCDHEADERS=ucd-snmp-config.h version.h mib_module_config.h
++INSTALL_PKGCONFIG=netsnmp.pc netsnmp-agent.pc
+ 
+ #
+ # other install rules.
+@@ -275,6 +276,7 @@ configclean: makefileclean
+ 		libtool include/net-snmp/net-snmp-config.h \
+ 		net-snmp-config net-snmp-config-x configure-summary \
+ 		net-snmp-create-v3-user net-snmp-create-v3-user-x
++	rm -f *.pc
+ 	rm -f mibs/.index
+ 	rm -f include/net-snmp/agent/mib_module_config.h		\
+ 		include/net-snmp/agent/agent_module_config.h		\
+diff --git a/Makefile.rules b/Makefile.rules
+index 9e9e9009e5..e714f91e72 100644
+--- a/Makefile.rules
++++ b/Makefile.rules
+@@ -85,12 +85,14 @@ subdirs:
+ # installlibs handles local, ucd and subdir libs. need to do subdir libs
+ # before bins, sinze those libs may be needed for successful linking
+ install: installlocalheaders @installucdheaders@ \
+-         installlibs \
+-         installlocalbin      installlocalsbin   \
++         installlibs         install_pkgconfig   \
++         installlocalbin     installlocalsbin    \
+          installsubdirs      $(OTHERINSTALL)
+ 
+-uninstall: uninstalllibs uninstallbin uninstallsbin uninstallheaders \
+-           uninstallsubdirs $(OTHERUNINSTALL)
++uninstall: uninstalllibs     uninstall_pkgconfig \
++           uninstallbin      uninstallsbin       \
++           uninstallheaders                      \
++           uninstallsubdirs  $(OTHERUNINSTALL)
+ 
+ installprogs: installbin installsbin
+ 
+@@ -287,6 +289,26 @@ uninstalllibs:
+ 		done \
+ 	fi
+ 
++#
++# pkg-config files
++#
++install_pkgconfig: $(INSTALL_PKGCONFIG)
++	@if test "x$(INSTALL_PKGCONFIG)" != x; then			\
++		$(SHELL) $(top_srcdir)/mkinstalldirs $(INSTALL_PREFIX)$(libdir)/pkgconfig; \
++		for i in $(INSTALL_PKGCONFIG); do			\
++			echo "installing $$i in $(INSTALL_PREFIX)$(libdir)/pkgconfig"; \
++		done;							\
++		$(INSTALL) $(INSTALL_PKGCONFIG) $(INSTALL_PREFIX)$(libdir)/pkgconfig; \
++	fi
++
++uninstall_pkgconfig:
++	@if test "x$(INSTALL_PKGCONFIG)" != x; then			\
++		for i in $(INSTALL_PKGCONFIG); do			\
++			echo "removing $$i from $(INSTALL_PREFIX)$(libdir)/pkgconfig"; \
++			$(UNINSTALL) $(INSTALL_PREFIX)$(libdir)/pkgconfig/$$i;\
++		done;							\
++	fi
++
+ #
+ # normal bin binaries
+ #
+diff --git a/configure b/configure
+index cad6b74486..8909bffe05 100755
+--- a/configure
++++ b/configure
+@@ -31717,6 +31717,8 @@ ac_config_files="$ac_config_files net-snmp-config:net-snmp-config.in"
+ 
+ ac_config_files="$ac_config_files net-snmp-create-v3-user:net-snmp-create-v3-user.in"
+ 
++ac_config_files="$ac_config_files netsnmp.pc:netsnmp.pc.in netsnmp-agent.pc:netsnmp-agent.pc.in"
++
+ ac_config_files="$ac_config_files dist/generation-scripts/gen-variables:dist/generation-scripts/gen-variables.in"
+ 
+ ac_config_files="$ac_config_files local/snmpconf"
+@@ -32740,6 +32742,8 @@ do
+     "mibs/Makefile") CONFIG_FILES="$CONFIG_FILES mibs/Makefile:Makefile.top:mibs/Makefile.in:Makefile.rules" ;;
+     "net-snmp-config") CONFIG_FILES="$CONFIG_FILES net-snmp-config:net-snmp-config.in" ;;
+     "net-snmp-create-v3-user") CONFIG_FILES="$CONFIG_FILES net-snmp-create-v3-user:net-snmp-create-v3-user.in" ;;
++    "netsnmp.pc") CONFIG_FILES="$CONFIG_FILES netsnmp.pc:netsnmp.pc.in" ;;
++    "netsnmp-agent.pc") CONFIG_FILES="$CONFIG_FILES netsnmp-agent.pc:netsnmp-agent.pc.in" ;;
+     "dist/generation-scripts/gen-variables") CONFIG_FILES="$CONFIG_FILES dist/generation-scripts/gen-variables:dist/generation-scripts/gen-variables.in" ;;
+     "local/snmpconf") CONFIG_FILES="$CONFIG_FILES local/snmpconf" ;;
+     "default") CONFIG_COMMANDS="$CONFIG_COMMANDS default" ;;
+diff --git a/configure.ac b/configure.ac
+index 1622b7c051..898b50f368 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -118,6 +118,7 @@ AC_CONFIG_FILES([net-snmp-config:net-snmp-config.in],
+ 		[chmod +x net-snmp-config])
+ AC_CONFIG_FILES([net-snmp-create-v3-user:net-snmp-create-v3-user.in],
+ 		[chmod +x net-snmp-create-v3-user])
++AC_CONFIG_FILES([netsnmp.pc:netsnmp.pc.in netsnmp-agent.pc:netsnmp-agent.pc.in])
+ AC_CONFIG_FILES([dist/generation-scripts/gen-variables:dist/generation-scripts/gen-variables.in])
+ AC_CONFIG_FILES([local/snmpconf])
+ 
+diff --git a/netsnmp-agent.pc.in b/netsnmp-agent.pc.in
+new file mode 100644
+index 0000000000..3a1c77bbf8
+--- /dev/null
++++ b/netsnmp-agent.pc.in
+@@ -0,0 +1,12 @@
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++includedir=@includedir@
++libdir=@libdir@
++
++Name: netsnmp-agent (@PACKAGE_NAME@)
++Description: SNMP (Simple Network Management Protocol) sub-agent SDK.
++URL: http://www.net-snmp.org
++Version: @PACKAGE_VERSION@
++Cflags: -I${includedir}
++Libs: -L${libdir} -lnetsnmpmibs -lnetsnmpagent -lnetsnmp
++Libs.private: @LDFLAGS@ @LMIBLIBS@ @LAGENTLIBS@ @PERLLDOPTS_FOR_APPS@ @LNETSNMPLIBS@ @LIBS@
+diff --git a/netsnmp.pc.in b/netsnmp.pc.in
+new file mode 100644
+index 0000000000..0a1f5785a4
+--- /dev/null
++++ b/netsnmp.pc.in
+@@ -0,0 +1,12 @@
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++includedir=@includedir@
++libdir=@libdir@
++
++Name: netsnmp (@PACKAGE_NAME@)
++Description: SNMP (Simple Network Management Protocol) daemon and applications.
++URL: http://www.net-snmp.org
++Version: @PACKAGE_VERSION@
++Cflags: -I${includedir}
++Libs: -L${libdir} -lnetsnmp
++Libs.private: @LDFLAGS@ @LNETSNMPLIBS@ @LIBS@ @PERLLDOPTS_FOR_APPS@
+-- 
+2.26.2
+

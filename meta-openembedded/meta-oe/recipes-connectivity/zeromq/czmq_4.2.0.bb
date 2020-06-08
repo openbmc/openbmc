@@ -9,6 +9,8 @@ SRC_URI = "https://github.com/zeromq/czmq/releases/download/v${PV}/czmq-${PV}.ta
 SRC_URI[md5sum] = "7e09997db6ac3b25e8ed104053040722"
 SRC_URI[sha256sum] = "cfab29c2b3cc8a845749758a51e1dd5f5160c1ef57e2a41ea96e4c2dcc8feceb"
 
+UPSTREAM_CHECK_URI = "https://github.com/zeromq/${BPN}/releases"
+
 inherit cmake
 
 PACKAGES = "lib${BPN} lib${BPN}-dev lib${BPN}-staticdev ${PN} ${PN}-dbg"

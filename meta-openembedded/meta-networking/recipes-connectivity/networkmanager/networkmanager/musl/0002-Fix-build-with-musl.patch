@@ -1,7 +1,7 @@
-From 3d1307735667758f44378585482fe421db086af8 Mon Sep 17 00:00:00 2001
+From 877fbb4e848629ff57371b5bdb0d56369abe9d81 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 Date: Mon, 8 Apr 2019 23:10:43 +0200
-Subject: [PATCH 2/2] Fix build with musl
+Subject: [PATCH] Fix build with musl
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -32,6 +32,7 @@ linux-libc headers 'notoriously broken for userspace' [2] (search for
 Upstream-Status: Pending
 
 Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+
 ---
  clients/tui/nmt-device-entry.c   | 1 -
  libnm-core/nm-utils.h            | 4 ++++
@@ -41,10 +42,10 @@ Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
  5 files changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/clients/tui/nmt-device-entry.c b/clients/tui/nmt-device-entry.c
-index 43fbbc1..3eae286 100644
+index 4ab5932..915248c 100644
 --- a/clients/tui/nmt-device-entry.c
 +++ b/clients/tui/nmt-device-entry.c
-@@ -39,7 +39,6 @@
+@@ -26,7 +26,6 @@
  #include "nmt-device-entry.h"
  
  #include <sys/socket.h>
@@ -53,10 +54,10 @@ index 43fbbc1..3eae286 100644
  #include "nmtui.h"
  
 diff --git a/libnm-core/nm-utils.h b/libnm-core/nm-utils.h
-index 2b5baba..f7abab6 100644
+index 5418a1e..f492da6 100644
 --- a/libnm-core/nm-utils.h
 +++ b/libnm-core/nm-utils.h
-@@ -25,6 +25,10 @@
+@@ -10,6 +10,10 @@
  #error "Only <NetworkManager.h> can be included directly."
  #endif
  
@@ -68,10 +69,10 @@ index 2b5baba..f7abab6 100644
  
  #include <netinet/in.h>
 diff --git a/shared/nm-default.h b/shared/nm-default.h
-index 54e9916..26e9f4e 100644
+index ace6ede..25357da 100644
 --- a/shared/nm-default.h
 +++ b/shared/nm-default.h
-@@ -211,6 +211,9 @@
+@@ -182,6 +182,9 @@
  #endif
  
  #include <stdlib.h>
@@ -82,10 +83,10 @@ index 54e9916..26e9f4e 100644
  /*****************************************************************************/
  
 diff --git a/src/devices/nm-device.c b/src/devices/nm-device.c
-index bd4fbcc..f70b309 100644
+index 3bbc975..4e8a3f6 100644
 --- a/src/devices/nm-device.c
 +++ b/src/devices/nm-device.c
-@@ -24,6 +24,7 @@
+@@ -9,6 +9,7 @@
  #include "nm-device.h"
  
  #include <netinet/in.h>
@@ -93,7 +94,7 @@ index bd4fbcc..f70b309 100644
  #include <unistd.h>
  #include <sys/ioctl.h>
  #include <signal.h>
-@@ -32,7 +33,6 @@
+@@ -17,7 +18,6 @@
  #include <arpa/inet.h>
  #include <fcntl.h>
  #include <linux/if_addr.h>
@@ -102,10 +103,10 @@ index bd4fbcc..f70b309 100644
  #include <linux/pkt_sched.h>
  
 diff --git a/src/platform/nm-linux-platform.c b/src/platform/nm-linux-platform.c
-index d4b0115..22a3a90 100644
+index 7abe4df..9f53147 100644
 --- a/src/platform/nm-linux-platform.c
 +++ b/src/platform/nm-linux-platform.c
-@@ -28,7 +28,6 @@
+@@ -14,7 +14,6 @@
  #include <libudev.h>
  #include <linux/fib_rules.h>
  #include <linux/ip.h>
@@ -113,6 +114,3 @@ index d4b0115..22a3a90 100644
  #include <linux/if_bridge.h>
  #include <linux/if_link.h>
  #include <linux/if_tun.h>
--- 
-2.17.1
-

@@ -1,10 +1,19 @@
+From b6cc66ab245ceb6bca0116dff7a41f6d7677b96a Mon Sep 17 00:00:00 2001
+From: Qing He <qing.he@intel.com>
+Date: Fri, 18 Jun 2010 09:40:30 +0800
+Subject: [PATCH] sysvinit: upgrade to version 2.88dsf
+
 Upstream-Status: Pending
 
+---
+ src/Makefile | 53 +++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 30 insertions(+), 23 deletions(-)
+
 diff --git a/src/Makefile b/src/Makefile
-index e2b8028..3e11e92 100644
+index 9f9f09e..1380d7f 100644
 --- a/src/Makefile
 +++ b/src/Makefile
-@@ -65,7 +65,14 @@ else
+@@ -77,7 +77,14 @@ else
    INSTALL_DATA	= install -m 644
  endif
  INSTALL_DIR	= install -m 755 -d
@@ -20,10 +29,10 @@ index e2b8028..3e11e92 100644
  
  ifeq ($(WITH_SELINUX),yes)
    SELINUX_DEF	=  -DWITH_SELINUX
-@@ -138,39 +145,39 @@ clobber:	cleanobjs
+@@ -189,42 +196,42 @@ clobber:	cleanobjs
  distclean:	clobber
  
- install:
+ install:	all
 -		$(INSTALL_DIR) $(ROOT)/bin/ $(ROOT)/sbin/
 -		$(INSTALL_DIR) $(ROOT)/usr/bin/
 +		$(INSTALL_DIR) $(ROOT)$(base_bindir)/ $(ROOT)$(base_sbindir)/
@@ -40,16 +49,14 @@ index e2b8028..3e11e92 100644
 -			$(INSTALL_EXEC) $$i $(ROOT)/usr/bin/ ; \
 +			$(INSTALL_EXEC) $$i $(ROOT)$(bindir)/ ; \
  		done
--		# $(INSTALL_DIR) $(ROOT)/etc/
--		# $(INSTALL_EXEC) initscript.sample $(ROOT)/etc/
+ 		# $(INSTALL_DIR) $(ROOT)/etc/
+ 		# $(INSTALL_EXEC) ../doc/initscript.sample $(ROOT)/etc/
 -		ln -sf halt $(ROOT)/sbin/reboot
 -		ln -sf halt $(ROOT)/sbin/poweroff
 -		ln -sf init $(ROOT)/sbin/telinit
 -		ln -sf /sbin/killall5 $(ROOT)/bin/pidof
 -		if [ ! -f $(ROOT)/usr/bin/lastb ]; then \
 -			ln -sf last $(ROOT)/usr/bin/lastb; \
-+		# $(INSTALL_DIR) $(ROOT)$(sysconfdir)/
-+		# $(INSTALL_EXEC) initscript.sample $(ROOT)$(sysconfdir)/
 +		ln -sf halt $(ROOT)$(base_sbindir)/reboot
 +		ln -sf halt $(ROOT)$(base_sbindir)/poweroff
 +		ln -sf init $(ROOT)$(base_sbindir)/telinit
@@ -67,17 +74,23 @@ index e2b8028..3e11e92 100644
 +		$(INSTALL_DIR) $(ROOT)$(mandir)/man1/
 +		$(INSTALL_DIR) $(ROOT)$(mandir)/man5/
 +		$(INSTALL_DIR) $(ROOT)$(mandir)/man8/
- 		for i in $(MAN1); do \
--			$(INSTALL_DATA) ../man/$$i $(ROOT)$(MANDIR)/man1/; \
-+			$(INSTALL_DATA) ../man/$$i $(ROOT)$(mandir)/man1/; \
+ 		for man in $(MAN1); do \
+-			$(INSTALL_DATA) ../man/$$man $(ROOT)$(MANDIR)/man1/; \
+-			sed -i "1{ $(MANDB); }" $(ROOT)$(MANDIR)/man1/$$man ; \
++			$(INSTALL_DATA) ../man/$$man $(ROOT)$(mandir)/man1/; \
++			sed -i "1{ $(MANDB); }" $(ROOT)$(mandir)/man1/$$man ; \
  		done
- 		for i in $(MAN5); do \
--			$(INSTALL_DATA) ../man/$$i $(ROOT)$(MANDIR)/man5/; \
-+			$(INSTALL_DATA) ../man/$$i $(ROOT)$(mandir)/man5/; \
+ 		for man in $(MAN5); do \
+-			$(INSTALL_DATA) ../man/$$man $(ROOT)$(MANDIR)/man5/; \
+-			sed -i "1{ $(MANDB); }" $(ROOT)$(MANDIR)/man5/$$man ; \
++			$(INSTALL_DATA) ../man/$$man $(ROOT)$(mandir)/man5/; \
++			sed -i "1{ $(MANDB); }" $(ROOT)$(mandir)/man5/$$man ; \
  		done
- 		for i in $(MAN8); do \
--			$(INSTALL_DATA) ../man/$$i $(ROOT)$(MANDIR)/man8/; \
-+			$(INSTALL_DATA) ../man/$$i $(ROOT)$(mandir)/man8/; \
+ 		for man in $(MAN8); do \
+-			$(INSTALL_DATA) ../man/$$man $(ROOT)$(MANDIR)/man8/; \
+-			sed -i "1{ $(MANDB); }" $(ROOT)$(MANDIR)/man8/$$man ; \
++			$(INSTALL_DATA) ../man/$$man $(ROOT)$(mandir)/man8/; \
++			sed -i "1{ $(MANDB); }" $(ROOT)$(mandir)/man8/$$man ; \
  		done
  ifeq ($(ROOT),)
  		#

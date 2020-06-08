@@ -7,7 +7,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe \
 DEPENDS = " \
     bison-native \
     flex-native \
-    rrdtool \
     virtual/libiconv \
 "
 
@@ -91,7 +90,7 @@ ALLOW_EMPTY_${PN} = "1"
 RDEPENDS_${PN} += " \
     ${PN}-libsensors \
     ${PN}-sensors \
-    ${PN}-sensord \
+    ${@bb.utils.contains('PACKAGECONFIG', 'sensord', '${PN}-sensord', '', d)} \
     ${PN}-fancontrol \
     ${PN}-sensorsdetect \
     ${PN}-sensorsconfconvert \

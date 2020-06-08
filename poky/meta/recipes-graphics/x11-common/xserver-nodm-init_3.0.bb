@@ -10,6 +10,7 @@ SRC_URI = "file://xserver-nodm \
            file://gplv2-license.patch \
            file://xserver-nodm.service.in \
            file://xserver-nodm.conf.in \
+           file://capability.conf \
 "
 
 S = "${WORKDIR}"
@@ -19,7 +20,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit update-rc.d systemd features_check
 
-REQUIRED_DISTRO_FEATURES = "x11"
+REQUIRED_DISTRO_FEATURES = "x11 ${@oe.utils.conditional('ROOTLESS_X', '1', 'pam', '', d)}"
 
 PACKAGECONFIG ??= "blank"
 # dpms and screen saver will be on only if 'blank' is in PACKAGECONFIG
@@ -40,6 +41,8 @@ do_install() {
     if [ "${ROOTLESS_X}" = "1" ] ; then
         XUSER_HOME="/home/xuser"
         XUSER="xuser"
+        install -D capability.conf ${D}${sysconfdir}/security/capability.conf
+        sed -i "s:@USER@:${XUSER}:" ${D}${sysconfdir}/security/capability.conf
     else
         XUSER_HOME=${ROOT_HOME}
         XUSER="root"
@@ -60,7 +63,7 @@ do_install() {
     fi
 }
 
-RDEPENDS_${PN} = "xinit ${@oe.utils.conditional('ROOTLESS_X', '1', 'xuser-account', '', d)}"
+RDEPENDS_${PN} = "xinit ${@oe.utils.conditional('ROOTLESS_X', '1', 'xuser-account libcap libcap-bin', '', d)}"
 
 INITSCRIPT_NAME = "xserver-nodm"
 INITSCRIPT_PARAMS = "start 9 5 . stop 20 0 1 2 3 6 ."
