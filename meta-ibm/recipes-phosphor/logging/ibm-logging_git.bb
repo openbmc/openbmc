@@ -71,7 +71,6 @@ do_report[depends] = " \
                      ibm-logging:do_install \
                      phosphor-logging-error-logs-native:do_populate_sysroot \
                      phosphor-dbus-interfaces-native:do_populate_sysroot \
-                     openpower-dbus-interfaces-native:do_populate_sysroot \
                      openpower-occ-control-native:do_populate_sysroot  \
                      openpower-debug-collector-native:do_populate_sysroot \
                      "
