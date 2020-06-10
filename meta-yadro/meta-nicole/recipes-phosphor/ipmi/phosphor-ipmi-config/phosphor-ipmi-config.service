@@ -1,0 +1,12 @@
+[Unit]
+Description=Set DeviceID for ipmi-host
+Before=phosphor-ipmi-host.service
+
+[Service]
+Type=oneshot
+TimeoutSec=0
+RemainAfterExit=yes
+ExecStart=/usr/bin/env phosphor-ipmi-config-set-device-id.sh
+
+[Install]
+RequiredBy=phosphor-ipmi-host.service
