@@ -19,7 +19,7 @@ DEPENDS += "autoconf-archive-native"
 DEPENDS += "virtual/phosphor-settings-defaults"
 DEPENDS += "${@df_enabled(d, 'obmc-mrw', 'phosphor-settings-read-settings-mrw-native')}"
 DEPENDS += "sdbusplus"
-DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
+DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "phosphor-logging"
 DEPENDS += "libcereal"
 

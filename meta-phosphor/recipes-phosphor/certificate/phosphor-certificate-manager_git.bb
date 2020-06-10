@@ -19,7 +19,6 @@ DEPENDS = " \
         autoconf-archive-native \
         openssl \
         phosphor-dbus-interfaces \
-        phosphor-dbus-interfaces-native \
         phosphor-logging \
         sdbusplus \
         sdeventplus \

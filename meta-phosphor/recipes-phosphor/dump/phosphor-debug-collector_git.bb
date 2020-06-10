@@ -30,7 +30,6 @@ require phosphor-debug-collector.inc
 
 DEPENDS += " \
         phosphor-dbus-interfaces \
-        phosphor-dbus-interfaces-native \
         phosphor-logging \
         sdbusplus \
         ${PYTHON_PN}-sdbus++-native \
