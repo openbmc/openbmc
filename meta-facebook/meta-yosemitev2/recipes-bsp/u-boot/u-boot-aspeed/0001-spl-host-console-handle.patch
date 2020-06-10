@@ -1,0 +1,184 @@
+From ca2c08a7e710e4beff2fdf17bba5a74adff13db8 Mon Sep 17 00:00:00 2001
+From: Manikandan Elumalai <manikandan.hcl.ers.epl@gmail.com>
+Date: Wed, 10 Jun 2020 17:53:59 +0530
+Subject: [PATCH] spl-host-console-handle
+
+This patch adds four 1S server console through debug card
+connected to YosemiteV2 during boot.
+
+Handswitch in the adaptor card connected to AST2500 GPIOs as below,
+GPIOAA7 ---SW_ID8
+GPIOAA6 ---SW_ID4
+GPIOAA5 ---SW_ID2
+GPIOAA4 ---SW_ID1
+
+SW_ID8  SW_ID4  SW_ID2   SW_ID1   Position      Descritpion
+L	L        L        L        1		1s server slot1 select
+
+L	L        H        2        1s		server slot2 select
+
+L	L        H        L        3		1s server slot3 select
+
+L	L        H        H        4		1s server slot4 select
+
+L	H        L        L        5		BMC Debug port select
+
+L	H        L        H        6		1s server slot1 select
+
+L	H        H        L        7		1s server slot2 select
+
+L	H        H        H        8		1s server slot3 select
+
+H	L        L        L        9		1s server slot4 select
+
+H	L        L        H        10		BMC Debug port select
+
+BMC and Hosts UART control flow
+GPIOE0 --- DEBUG_UART_SEL_0
+GPIOE1 --- DEBUG_UART_SEL_1
+GPIOE2 --- DEBUG_UART_SEL_2
+GPIOE2 --- DEBUG_UART_RX_SEL_N
+
+SEL_2  SEL_1   SEL_0   RX_SEL_N  CONSOLE
+0	0	0	0	 SLOT1
+0 	0 	1 	0 	 SLOT2
+0 	1 	0 	0 	 SLOT3
+0 	1 	1 	0 	 SLOT4
+1 	0 	0 	1 	 BMC Debug
+
+Signed-off-by: Manikandan Elumalai <manikandan.hcl.ers.epl@gmail.com>
+---
+ arch/arm/mach-aspeed/platform_g5.S | 68 +++++++++++++++++++++++++++++++++-----
+ 1 file changed, 60 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm/mach-aspeed/platform_g5.S b/arch/arm/mach-aspeed/platform_g5.S
+index c3ce077..29daa7a 100644
+--- a/arch/arm/mach-aspeed/platform_g5.S
++++ b/arch/arm/mach-aspeed/platform_g5.S
+@@ -315,6 +315,58 @@ orr r1, r1, #0xC
+ str r1, [r0]
+ .endm
+
++  .macro console_slot1
++  ldr r0, =0x1e780024
++  ldr r1, [r0]
++  orr r1, r1, #0xF
++  str r1, [r0]
++
++  ldr r0, =0x1e780020
++  ldr r1, [r0]
++  and r1, r1, #0xFFFFFFF0
++  orr r1, r1, #0x0
++  str r1, [r0]
++  .endm
++
++  .macro console_slot2
++  ldr r0, =0x1e780024
++  ldr r1, [r0]
++  orr r1, r1, #0xF
++  str r1, [r0]
++
++  ldr r0, =0x1e780020
++  ldr r1, [r0]
++  and r1, r1, #0xFFFFFFF0
++  orr r1, r1, #0x1
++  str r1, [r0]
++  .endm
++
++  .macro console_slot3
++  ldr r0, =0x1e780024
++  ldr r1, [r0]
++  orr r1, r1, #0xF
++  str r1, [r0]
++
++  ldr r0, =0x1e780020
++  ldr r1, [r0]
++  and r1, r1, #0xFFFFFFF0
++  orr r1, r1, #0x2
++  str r1, [r0]
++  .endm
++
++  .macro console_slot4
++  ldr r0, =0x1e780024
++  ldr r1, [r0]
++  orr r1, r1, #0xF
++  str r1, [r0]
++
++  ldr r0, =0x1e780020
++  ldr r1, [r0]
++  and r1, r1, #0xFFFFFFF0
++  orr r1, r1, #0x3
++  str r1, [r0]
++  .endm
++
+ .macro console_sel
+
+   // Disable SoL UARTs[1-4]
+@@ -354,28 +406,28 @@ dbg_card_pres\@:
+   ldr r1, =0x00
+   cmp r0, r1
+   bne case_pos2\@
+- console_bmc
++  console_slot1
+   b case_end\@
+ case_pos2\@:
+   //Test for position#2
+   ldr r1, =0x01
+   cmp r0, r1
+   bne case_pos3\@
+- console_bmc
++  console_slot2
+   b case_end\@
+ case_pos3\@:
+  //Test for position#3
+   ldr r1, =0x02
+   cmp r0, r1
+   bne case_pos4\@
+-  console_bmc
++  console_slot3
+   b case_end\@
+ case_pos4\@:
+ //Test for position#4
+   ldr r1, =0x03
+   cmp r0, r1
+   bne case_pos5\@
+-  console_bmc
++  console_slot4
+   b case_end\@
+ case_pos5\@:
+   //Test for position#5
+@@ -389,28 +441,28 @@ case_pos6\@:
+   ldr r1, =0x05
+   cmp r0, r1
+   bne case_pos7\@
+-  console_bmc
++  console_slot1
+   b case_end\@
+ case_pos7\@:
+  //Test for position#7
+    ldr r1, =0x06
+    cmp r0, r1
+    bne case_pos8\@
+-   console_bmc
++   console_slot2
+    b case_end\@
+ case_pos8\@:
+   //Test for position#8
+    ldr r1, =0x07
+    cmp r0, r1
+    bne case_pos9\@
+-   console_bmc
++   console_slot3
+    b case_end\@
+ case_pos9\@:
+     //Test for position#9
+    ldr r1, =0x08
+    cmp r0, r1
+    bne case_pos10\@
+-   console_bmc
++   console_slot4
+    b case_end\@
+ case_pos10\@:
+    //Test for position#10
+--
+2.7.4
