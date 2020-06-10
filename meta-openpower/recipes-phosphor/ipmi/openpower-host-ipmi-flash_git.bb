@@ -12,7 +12,7 @@ DEPENDS += "phosphor-ipmi-host"
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-logging"
-DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
+DEPENDS += "phosphor-dbus-interfaces"
 
 TARGET_CFLAGS += "-fpic"
 
