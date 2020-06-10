@@ -8,7 +8,7 @@ inherit cmake systemd
 SRC_URI = "git://github.com/openbmc/service-config-manager"
 
 PV = "0.1+git${SRCPV}"
-SRCREV = "ee853eb2d865c7da9eec99cdcac04f8aee750e49"
+SRCREV = "83241c09ec5acfb894da08c10dfd574034c33ff9"
 
 S = "${WORKDIR}/git"
 
