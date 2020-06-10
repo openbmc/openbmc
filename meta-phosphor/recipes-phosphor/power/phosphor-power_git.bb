@@ -27,11 +27,8 @@ ALLOW_EMPTY_${PN} = "1"
 
 SYSTEMD_PACKAGES = "${POWER_SERVICE_PACKAGES}"
 
-# TODO: in future when openpower-dbus-interfaces is removed from
-# phosphor-power, remove the dependency here.
 DEPENDS += " \
          phosphor-logging \
-         openpower-dbus-interfaces \
          ${PYTHON_PN}-sdbus++-native \
          sdeventplus \
          nlohmann-json \
