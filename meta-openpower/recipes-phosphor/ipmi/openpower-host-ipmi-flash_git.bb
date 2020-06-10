@@ -13,7 +13,6 @@ DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-logging"
 DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
-DEPENDS += "openpower-dbus-interfaces openpower-dbus-interfaces-native"
 
 TARGET_CFLAGS += "-fpic"
 
