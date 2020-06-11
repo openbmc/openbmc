@@ -3,6 +3,9 @@ From: Daniel Mensinger <daniel@mensinger-ka.de>
 Date: Thu, 21 May 2020 13:35:27 +0200
 Subject: [PATCH] boost: Always sort shared before static (fixes #7171)
 
+Upstream-Status: Backport [https://github.com/mesonbuild/meson/commit/5862ad6965c60caa861dfdcd29e499c34c4d00da]
+
+Signed-off-by: Andrew Geissler <geissonator@gmail.com>
 ---
  mesonbuild/dependencies/boost.py | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
@@ -27,6 +30,6 @@ index 6e85c534..38497041 100644
                  not other.mt, not other.runtime_static,
                  not other.debug, other.runtime_debug, other.python_debug,
                  other.stlport, other.deprecated_iostreams,
--- 
+--
 2.26.2
 
