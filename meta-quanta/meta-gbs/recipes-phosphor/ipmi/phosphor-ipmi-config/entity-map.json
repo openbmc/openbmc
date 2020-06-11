@@ -1,0 +1,28 @@
+[
+    {
+        "id": 1,
+        "containerEntityId" : 30,
+        "containerEntityInstance" : 0,
+        "isList" : false,
+        "isLinked" : false,
+        "entities" : [
+            {"id" : 11, "instance" : 0},
+            {"id" : 11, "instance" : 1},
+            {"id" : 29, "instance" : 0},
+            {"id" : 29, "instance" : 1}
+        ]
+    },
+    {
+        "id": 2,
+        "containerEntityId" : 30,
+        "containerEntityInstance" : 1,
+        "isList" : false,
+        "isLinked" : false,
+        "entities" : [
+            {"id" : 29, "instance" : 2},
+            {"id" : 29, "instance" : 4},
+            {"id" : 0, "instance" : 0},
+            {"id" : 0, "instance" : 0}
+        ]
+    }
+]
