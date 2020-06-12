@@ -124,9 +124,6 @@ MACHINE_FEATURES += " \
 
 DISTRO_EXTRA_RDEPENDS_remove_qemuarm = "packagegroup-core-device-devel"
 
-# TODO: openbmc/openbmc#12345 - Upgrade to pygobject-3.
-PREFERRED_VERSION_python-pygobject = "2.%"
-
 include conf/distro/include/openbmc-phosphor/${MACHINE}.inc
 
 KERNEL_FEATURES_append = " phosphor-gpio-keys"
