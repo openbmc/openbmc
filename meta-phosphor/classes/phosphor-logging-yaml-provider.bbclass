@@ -1,6 +1,6 @@
 inherit phosphor-dbus-yaml
 
-LOGGING_YAML_SUBDIRS ??= "xyz/openbmc_project"
+LOGGING_YAML_SUBDIRS ??= "${OBMC_ORG_YAML_SUBDIRS}"
 
 do_install_append() {
     for yaml_d in ${LOGGING_YAML_SUBDIRS} ;
