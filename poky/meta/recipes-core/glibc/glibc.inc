@@ -5,7 +5,7 @@ DEPENDS = "virtual/${TARGET_PREFIX}gcc libgcc-initial linux-libc-headers"
 
 PROVIDES = "virtual/libc"
 PROVIDES += "virtual/libintl virtual/libiconv"
-inherit autotools texinfo features_check systemd
+inherit autotools texinfo systemd
 
 LEAD_SONAME = "libc.so"
 

@@ -25,6 +25,7 @@ SRC_URI = "git://salsa.debian.org/debian/ca-certificates.git;protocol=https \
            file://0003-update-ca-certificates-use-relative-symlinks-from-ET.patch \
            file://0001-certdata2pem.py-use-python3.patch \
            "
+UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+)"
 
 S = "${WORKDIR}/git"
 

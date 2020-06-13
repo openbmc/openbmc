@@ -20,6 +20,8 @@ deltask populate_sysroot
 python do_build_native_sysroot () {
     targetsysroot = d.getVar("STANDALONE_SYSROOT")
     nativesysroot = d.getVar("STANDALONE_SYSROOT_NATIVE")
+    import os
+    os.environ['PATH'] = "%s/bin:%s/usr/bin:%s" % (nativesysroot, nativesysroot, os.environ['PATH'])
     staging_populate_sysroot_dir(targetsysroot, nativesysroot, True, d)
 }
 do_build_native_sysroot[cleandirs] = "${STANDALONE_SYSROOT_NATIVE}"
@@ -29,6 +31,8 @@ addtask do_build_native_sysroot before do_build
 python do_build_target_sysroot () {
     targetsysroot = d.getVar("STANDALONE_SYSROOT")
     nativesysroot = d.getVar("STANDALONE_SYSROOT_NATIVE")
+    import os
+    os.environ['PATH'] = "%s/bin:%s/usr/bin:%s" % (nativesysroot, nativesysroot, os.environ['PATH'])
     staging_populate_sysroot_dir(targetsysroot, nativesysroot, False, d)
 }
 do_build_target_sysroot[cleandirs] = "${STANDALONE_SYSROOT}"

@@ -144,6 +144,7 @@ FILES_avahi-utils = "${bindir}/avahi-* ${bindir}/b* ${datadir}/applications/b*"
 
 RDEPENDS_${PN}-dev = "avahi-daemon (= ${EXTENDPKGV}) libavahi-core (= ${EXTENDPKGV})"
 RDEPENDS_${PN}-dev += "${@["", " libavahi-client (= ${EXTENDPKGV})"][bb.utils.contains('PACKAGECONFIG', 'dbus', 1, 0, d)]}"
+RDEPENDS_${PN}-dnsconfd = "${PN}-daemon"
 
 RRECOMMENDS_avahi-daemon_append_libc-glibc = " libnss-mdns"
 

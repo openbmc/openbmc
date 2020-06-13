@@ -13,7 +13,7 @@ rootfs_run() {
 	C=0
 	delay=${bootparam_rootdelay:-1}
 	timeout=${bootparam_roottimeout:-5}
-	while [ ! -d $ROOTFS_DIR/dev ]; do
+	while ! mountpoint -q $ROOTFS_DIR; do
 		if [ $(( $C * $delay )) -gt $timeout ]; then
 			fatal "root '$bootparam_root' doesn't exist or does not contain a /dev."
 		fi
@@ -61,7 +61,7 @@ rootfs_run() {
 					flags="$flags -t$bootparam_rootfstype"
 				fi
 				mount $flags $bootparam_root $ROOTFS_DIR
-				if [ -d $ROOTFS_DIR/dev ]; then
+				if mountpoint -q $ROOTFS_DIR; then
 					break
 				else
 					# It is unlikely to change, but keep trying anyway.

@@ -143,11 +143,12 @@ build results (as the layer priority order has effectively changed).
 
         applied_appends = []
         for layer in layers:
-            overlayed = []
-            for f in self.tinfoil.cooker.collection.overlayed.keys():
-                for of in self.tinfoil.cooker.collection.overlayed[f]:
-                    if of.startswith(layer):
-                        overlayed.append(of)
+            overlayed = set()
+            for mc in self.tinfoil.cooker.multiconfigs:
+                for f in self.tinfoil.cooker.collections[mc].overlayed.keys():
+                    for of in self.tinfoil.cooker.collections[mc].overlayed[f]:
+                        if of.startswith(layer):
+                            overlayed.add(of)
 
             logger.plain('Copying files from %s...' % layer )
             for root, dirs, files in os.walk(layer):
@@ -174,14 +175,21 @@ build results (as the layer priority order has effectively changed).
                                     logger.warning('Overwriting file %s', fdest)
                             bb.utils.copyfile(f1full, fdest)
                             if ext == '.bb':
-                                for append in self.tinfoil.cooker.collection.get_file_appends(f1full):
+                                appends = set()
+                                for mc in self.tinfoil.cooker.multiconfigs:
+                                    appends |= set(self.tinfoil.cooker.collections[mc].get_file_appends(f1full))
+                                for append in appends:
                                     if layer_path_match(append):
                                         logger.plain('  Applying append %s to %s' % (append, fdest))
                                         self.apply_append(append, fdest)
                                         applied_appends.append(append)
 
         # Take care of when some layers are excluded and yet we have included bbappends for those recipes
-        for b in self.tinfoil.cooker.collection.bbappends:
+        bbappends = set()
+        for mc in self.tinfoil.cooker.multiconfigs:
+            bbappends |= set(self.tinfoil.cooker.collections[mc].bbappends)
+
+        for b in bbappends:
             (recipename, appendname) = b
             if appendname not in applied_appends:
                 first_append = None

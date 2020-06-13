@@ -345,13 +345,12 @@ python do_ar_mirror() {
 
     fetcher = bb.fetch2.Fetch(src_uri, d)
 
-    for url in fetcher.urls:
-        if is_excluded(url):
-            bb.note('Skipping excluded url: %s' % (url))
+    for ud in fetcher.expanded_urldata():
+        if is_excluded(ud.url):
+            bb.note('Skipping excluded url: %s' % (ud.url))
             continue
 
-        bb.note('Archiving url: %s' % (url))
-        ud = fetcher.ud[url]
+        bb.note('Archiving url: %s' % (ud.url))
         ud.setup_localpath(d)
         localpath = None
 
@@ -367,7 +366,7 @@ python do_ar_mirror() {
         if len(ud.mirrortarballs) and not localpath:
             bb.warn('Mirror tarballs are listed for a source but none are present. ' \
                     'Falling back to original download.\n' \
-                    'SRC_URI = %s' % (url))
+                    'SRC_URI = %s' % (ud.url))
 
         # Check original download
         if not localpath:
@@ -376,7 +375,7 @@ python do_ar_mirror() {
 
         if not localpath or not os.path.exists(localpath):
             bb.fatal('Original download is missing for a source.\n' \
-                        'SRC_URI = %s' % (url))
+                        'SRC_URI = %s' % (ud.url))
 
         # We now have an appropriate localpath
         bb.note('Copying source mirror')

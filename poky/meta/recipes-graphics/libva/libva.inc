@@ -24,4 +24,4 @@ UPSTREAM_CHECK_URI = "https://github.com/intel/libva/releases"
 
 DEPENDS = "libdrm"
 
-inherit meson pkgconfig features_check
+inherit meson pkgconfig

@@ -14,6 +14,9 @@ inherit pypi setuptools3
 SRC_URI[md5sum] = "5edc6caa39cc62641850f6b1b6f284ba"
 SRC_URI[sha256sum] = "b757db2a5289ea3f1ced9e60f072965243ea43a2221430048fd8cacab17be0ce"
 
-RDEPENDS_${PN} += "file"
+RDEPENDS_${PN} += "file \
+                   ${PYTHON_PN}-ctypes \
+                   ${PYTHON_PN}-io \
+                   ${PYTHON_PN}-shell"
 
 BBCLASSEXTEND = "native"

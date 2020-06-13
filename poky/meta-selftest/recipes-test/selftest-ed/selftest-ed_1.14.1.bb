@@ -34,3 +34,5 @@ do_install() {
 		rm -f ${D}${infodir}/dir
 	fi
 }
+
+BBCLASSEXTEND = "native"

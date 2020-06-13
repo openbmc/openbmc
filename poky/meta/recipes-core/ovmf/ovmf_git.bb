@@ -19,8 +19,8 @@ SRC_URI = "gitsm://github.com/tianocore/edk2.git;branch=master;protocol=https \
            file://0001-ovmf-Update-to-latest.patch \
         "
 
-PV = "edk2-stable202002"
-SRCREV = "4c0f6e349d32cf27a7104ddd3e729d6ebc88ea70"
+PV = "edk2-stable202005"
+SRCREV = "ca407c7246bf405da6d9b1b9d93e5e7f17b4b1f9"
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>edk2-stable.*)"
 
 inherit deploy

@@ -32,6 +32,8 @@ LICENSE = "GPLv2"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 
+RECIPE_NO_UPDATE_REASON = "Recipe is updated through a separate process"
+
 python __anonymous () {
     major = d.getVar("PV").split('.')[0]
     if major == "3":

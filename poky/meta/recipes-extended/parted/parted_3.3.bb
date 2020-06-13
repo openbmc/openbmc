@@ -22,7 +22,7 @@ EXTRA_OECONF = "--disable-device-mapper"
 
 inherit autotools pkgconfig gettext texinfo ptest
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"
 
 do_compile_ptest() {
 	oe_runmake -C tests print-align print-max dup-clobber duplicate fs-resize print-flags

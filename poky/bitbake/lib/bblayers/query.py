@@ -320,12 +320,12 @@ Lists recipes with the bbappends that apply to them as subitems.
     def get_appends_for_files(self, filenames):
         appended, notappended = [], []
         for filename in filenames:
-            _, cls, _ = bb.cache.virtualfn2realfn(filename)
+            _, cls, mc = bb.cache.virtualfn2realfn(filename)
             if cls:
                 continue
 
             basename = os.path.basename(filename)
-            appends = self.tinfoil.cooker.collection.get_file_appends(basename)
+            appends = self.tinfoil.cooker.collections[mc].get_file_appends(basename)
             if appends:
                 appended.append((basename, list(appends)))
             else:

@@ -14,7 +14,7 @@ SRC_URI = "git://github.com/SaschaWillems/Vulkan.git \
            file://0001-Don-t-build-demos-with-questionably-licensed-data.patch \
            "
 UPSTREAM_CHECK_COMMITS = "1"
-SRCREV = "10a1ecaf7bbcbc316c83f7c52742baaba0ae2f45"
+SRCREV = "4818f85916bf88c1ca8c2ed1a46e0e758651489e"
 UPSTREAM_CHECK_GITTAGREGEX = "These are not the releases you're looking for"
 S = "${WORKDIR}/git"
 

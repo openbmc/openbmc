@@ -297,7 +297,7 @@ class Rootfs(object, metaclass=ABCMeta):
 
     def _run_ldconfig(self):
         if self.d.getVar('LDCONFIGDEPEND'):
-            bb.note("Executing: ldconfig -r" + self.image_rootfs + "-c new -v")
+            bb.note("Executing: ldconfig -r " + self.image_rootfs + " -c new -v")
             self._exec_shell_cmd(['ldconfig', '-r', self.image_rootfs, '-c',
                                   'new', '-v'])
 

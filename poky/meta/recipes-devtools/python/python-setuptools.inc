@@ -48,6 +48,12 @@ BBCLASSEXTEND = "native nativesdk"
 # minimal distributions.
 PACKAGES =+ "${PYTHON_PN}-pkg-resources "
 FILES_${PYTHON_PN}-pkg-resources = "${PYTHON_SITEPACKAGES_DIR}/pkg_resources/*"
+RDEPENDS_${PYTHON_PN}-pkg-resources = "\
+  ${PYTHON_PN}-compression \
+  ${PYTHON_PN}-email \
+  ${PYTHON_PN}-plistlib \
+  ${PYTHON_PN}-pprint \
+"
 # Due to the way OE-Core implemented native recipes, the native class cannot
 # have a dependency on something that is not a recipe name. Work around that by
 # manually setting RPROVIDES.

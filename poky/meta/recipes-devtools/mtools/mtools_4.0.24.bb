@@ -35,7 +35,7 @@ SRC_URI = "${GNU_MIRROR}/mtools/mtools-${PV}.tar.bz2 \
 
 SRC_URI_append_class-native = " file://disable-hardcoded-configs.patch"
 
-inherit autotools texinfo features_check
+inherit autotools texinfo
 
 EXTRA_OECONF = "--without-x"
 

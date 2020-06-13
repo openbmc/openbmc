@@ -908,6 +908,21 @@ class Wic2(WicTestCase):
             p, _ = self._get_wic_partitions(tempf.name, ignore_status=True)
             self.assertNotEqual(p.status, 0, "wic exited successfully when an error was expected:\n%s" % p.output)
 
+    def test_extra_space(self):
+        native_sysroot = get_bb_var("RECIPE_SYSROOT_NATIVE", "wic-tools")
+
+        with NamedTemporaryFile("w", suffix=".wks") as tempf:
+            tempf.write("bootloader --ptable gpt\n" \
+                        "part /     --source rootfs --ondisk hda --extra-space 200M --fstype=ext4\n")
+            tempf.flush()
+
+            _, partlns = self._get_wic_partitions(tempf.name, native_sysroot)
+            self.assertEqual(len(partlns), 1)
+            size = partlns[0].split(':')[3]
+            self.assertRegex(size, r'^[0-9]+kiB$')
+            size = int(size[:-3])
+            self.assertGreaterEqual(size, 204800)
+
     @only_for_arch(['i586', 'i686', 'x86_64'])
     def test_rawcopy_plugin_qemu(self):
         """Test rawcopy plugin in qemu"""
