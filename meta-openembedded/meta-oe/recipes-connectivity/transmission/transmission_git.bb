@@ -19,7 +19,7 @@ PV = "2.94"
 
 S = "${WORKDIR}/git"
 
-inherit autotools gettext update-rc.d systemd mime-xdg features_check
+inherit autotools gettext update-rc.d systemd mime-xdg
 
 PACKAGECONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'gtk', '', d)} \
                  ${@bb.utils.contains('DISTRO_FEATURES','systemd','systemd','',d)}"

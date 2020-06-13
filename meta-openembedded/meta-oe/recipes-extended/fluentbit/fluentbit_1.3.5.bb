@@ -52,7 +52,7 @@ EXTRA_OECMAKE_append_riscv64 = " -DFLB_DEPS='atomic'"
 # DEPENDS += "openssl "
 # EXTRA_OECMAKE += "-DFLB_OUT_KAFKA=On "
 
-inherit cmake systemd features_check
+inherit cmake systemd
 
 SYSTEMD_SERVICE_${PN} = "td-agent-bit.service"
 TARGET_CC_ARCH_append = " ${SELECTED_OPTIMIZATION}"

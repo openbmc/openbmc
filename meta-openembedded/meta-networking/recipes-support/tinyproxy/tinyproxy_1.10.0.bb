@@ -12,6 +12,8 @@ SRC_URI = "https://github.com/${BPN}/${BPN}/releases/download/${PV}/${BP}.tar.gz
 SRC_URI[md5sum] = "423047c8dc53a15e19f78e238198549c"
 SRC_URI[sha256sum] = "6020955e6a0ef0ef898ad5bb17a448c47f9e4c003c464b4ae7c4dba063272055"
 
+UPSTREAM_CHECK_URI = "https://github.com/tinyproxy/tinyproxy/releases"
+
 EXTRA_OECONF += " \
 	--enable-filter \
 	--enable-transparent \

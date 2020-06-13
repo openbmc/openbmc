@@ -10,7 +10,7 @@ SRC_URI = " \
 SRC_URI[md5sum] = "abe6acb617f11f2e8dbd9846fcf86e24"
 SRC_URI[sha256sum] = "64b5ffbfccd5bdb15d925777979a4dbee1a957f9eaeb158dc76175267eddbdef"
 
-inherit autotools pkgconfig gettext gobject-introspection systemd features_check
+inherit autotools pkgconfig gettext gobject-introspection systemd
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 PACKAGECONFIG[idevice] = "--with-idevice,--without-idevice,libimobiledevice libplist"

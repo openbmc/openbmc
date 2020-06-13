@@ -15,6 +15,8 @@ SRC_URI[sha256sum] = "eab28fd29d19d4e61ef09704e5871940e6f35fd35a3bb1285e41f20450
 
 SECTION = "base"
 
+RDEPENDS_${PN} = "${@["", "toybox-inittab"][(d.getVar('VIRTUAL-RUNTIME_init_manager') == 'toybox')]}"
+
 TOYBOX_BIN = "generated/unstripped/toybox"
 
 # Toybox is strict on what CC, CFLAGS and CROSS_COMPILE variables should contain.
@@ -52,6 +54,11 @@ do_configure() {
 
     # Disable swapon as it doesn't handle the '-a' argument used during boot
     sed -e 's/CONFIG_SWAPON=y/# CONFIG_SWAPON is not set/' -i .config
+
+    # Enable init if toybox was set as init manager
+    if [[ ${VIRTUAL-RUNTIME_init_manager} == *"toybox"* ]]; then
+        sed -e 's/# CONFIG_INIT is not set/CONFIG_INIT=y/' -i .config
+    fi
 }
 
 do_compile() {

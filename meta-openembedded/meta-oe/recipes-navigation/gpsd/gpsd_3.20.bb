@@ -8,6 +8,7 @@ PROVIDES = "virtual/gpsd"
 SRC_URI = "${SAVANNAH_GNU_MIRROR}/${BPN}/${BP}.tar.gz \
     file://0001-SConstruct-prefix-includepy-with-sysroot-and-drop-sy.patch \
     file://0001-Revert-SConstruct-Add-test-for-sizeof-time_t-result-.patch \
+    file://gpsd.init \
 "
 SRC_URI[md5sum] = "cf7fdec7ce7221d20bee1a7246362b05"
 SRC_URI[sha256sum] = "172a7805068eacb815a3c5225436fcb0be46e7e49a5001a94034eac43df85e50"
@@ -66,7 +67,7 @@ do_install() {
 
 do_install_append() {
     install -d ${D}/${sysconfdir}/init.d
-    install -m 0755 ${S}/packaging/deb/etc_init.d_gpsd ${D}/${sysconfdir}/init.d/gpsd
+    install -m 0755 ${WORKDIR}/gpsd.init ${D}/${sysconfdir}/init.d/gpsd
     install -d ${D}/${sysconfdir}/default
     install -m 0644 ${S}/packaging/deb/etc_default_gpsd ${D}/${sysconfdir}/default/gpsd.default
 

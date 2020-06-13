@@ -20,6 +20,6 @@ do_install_append() {
 }
 
 PACKAGECONFIG ??= ""
-PACKAGECONFIG += "${@bb.utils.filter('DISTRO_FEATURES', 'acl', d)}"
+PACKAGECONFIG_append = " ${@bb.utils.filter('DISTRO_FEATURES', 'acl', d)}"
 
 PACKAGECONFIG[acl] = "--enable-acl,--disable-acl,acl,"

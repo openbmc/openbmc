@@ -20,3 +20,5 @@ RDEPENDS_${PN} = "\
     ${PYTHON_PN}-netclient \
     ${PYTHON_PN}-threading \
 "
+
+BBCLASSEXTEND = "native nativesdk"

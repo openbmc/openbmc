@@ -11,6 +11,8 @@ SRC_URI = "https://github.com/appneta/tcpreplay/releases/download/v${PV}/tcprepl
 SRC_URI[md5sum] = "dfa0d1b3dfd2cd316291a7a20563b649"
 SRC_URI[sha256sum] = "4f479bd9196cafde70c58ab072ca4959ecc5278555cf1aa7cf42f7f210daa951"
 
+UPSTREAM_CHECK_URI = "https://github.com/appneta/tcpreplay/releases"
+
 DEPENDS = "libpcap"
 
 EXTRA_OECONF += "--with-libpcap=${STAGING_DIR_HOST}/usr"

@@ -7,6 +7,7 @@ inherit packagegroup features_check
 REQUIRED_DISTRO_FEATURES = "x11"
 
 RDEPENDS_${PN} = " \
+    packagegroup-core-x11 \
     xfwm4 \
     xfce4-session \
     xfconf \

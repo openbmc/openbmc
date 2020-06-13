@@ -26,7 +26,7 @@ index a347168..2cd8121 100644
 +option('oe_sysroot', type: 'string', value: '', description: 'Directory for OE-sysroot')
  option('cheese', type: 'boolean', value: true, description: 'build with cheese webcam support')
  option('documentation', type: 'boolean', value: false, description: 'build documentation')
- option('gnome_session_libexecdir', type: 'string', value: '', description: 'Directory for gnome-session\'s libexecdir')
+ option('ibus', type: 'boolean', value: true, description: 'build with IBus support')
 diff --git a/panels/background/meson.build b/panels/background/meson.build
 index bb34b69..f22722e 100644
 --- a/panels/background/meson.build

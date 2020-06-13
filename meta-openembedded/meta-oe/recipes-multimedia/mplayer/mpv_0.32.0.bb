@@ -22,7 +22,7 @@ SRC_URI = " \
 
 S = "${WORKDIR}/git"
 
-inherit waf pkgconfig features_check mime-xdg
+inherit waf pkgconfig mime-xdg
 
 LUA ?= "lua"
 LUA_mips64  = ""

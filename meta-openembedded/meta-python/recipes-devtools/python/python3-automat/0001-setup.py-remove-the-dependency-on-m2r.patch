@@ -1,4 +1,4 @@
-From 33b70266930c9093712173c4e0c419815b55e313 Mon Sep 17 00:00:00 2001
+From 4fb6bbfbc53428fe5d38ec3e04bb4fd187b2fd45 Mon Sep 17 00:00:00 2001
 From: Derek Straka <derek@asterius.io>
 Date: Fri, 22 Dec 2017 09:07:00 -0500
 Subject: [PATCH] setup.py: remove the dependency on m2r
@@ -11,13 +11,13 @@ value in this case
 Upstream-Status: Inappropriate (OE specific)
 
 Signed-off-by: Derek Straka <derek@asterius.io>
-
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
 ---
  setup.py | 10 ----------
  1 file changed, 10 deletions(-)
 
 diff --git a/setup.py b/setup.py
-index d360c64..7b4180a 100644
+index 3fb7fdb..245d69a 100644
 --- a/setup.py
 +++ b/setup.py
 @@ -4,14 +4,6 @@ Setup file for automat
@@ -47,4 +47,7 @@ index d360c64..7b4180a 100644
 -        'm2r',
      ],
      install_requires=[
-         "attrs>=16.1.0",
+         "attrs>=19.2.0",
+-- 
+2.17.1
+

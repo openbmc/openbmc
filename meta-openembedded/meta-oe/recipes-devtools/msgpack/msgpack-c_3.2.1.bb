@@ -17,3 +17,5 @@ SRCREV = "8085ab8721090a447cf98bb802d1406ad7afe420"
 S = "${WORKDIR}/git"
 
 inherit cmake pkgconfig
+
+BBCLASSEXTEND += "native nativesdk"

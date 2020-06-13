@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# Stop all init scripts in /etc/rc6.d
+# executing them in numerical order.
+#
+for i in /etc/rc6.d/K??*; do
+
+	# Ignore dangling symlinks (if any).
+	[ ! -f "$i" ] && continue
+
+	case "$i" in
+	*.sh)
+		# Source shell script for speed.
+		(
+		trap - INT QUIT TSTP
+		set stop
+		. $i
+		)
+		;;
+	*)
+		# No sh extension, so fork subprocess.
+		$i stop
+		;;
+	esac
+done
+

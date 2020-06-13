@@ -24,7 +24,6 @@ export BUILD_SYS
 export HOST_SYS
 
 EXTRA_OECMAKE = " \
-    -DENABLE_PRECOMPILED_HEADERS=OFF \
     -DBUILD_LIBRARIES=ON \
     -DBUILD_COMPILER=ON \
     -DBUILD_TESTING=OFF \
@@ -36,15 +35,12 @@ EXTRA_OECMAKE = " \
     -DWITH_STATIC_LIB=ON \
     -DWITH_SHARED_LIB=ON \
     -DWITH_OPENSSL=ON \
-    -DWITH_QT4=OFF \
     -DWITH_QT5=OFF \
-    -DWITH_BOOST_FUNCTIONAL=OFF \
 "
 
-PACKAGECONFIG ??= "libevent glib boost-smart-ptr"
+PACKAGECONFIG ??= "libevent glib"
 PACKAGECONFIG[libevent] = "-DWITH_LIBEVENT=ON,-DWITH_LIBEVENT=OFF,libevent"
 PACKAGECONFIG[glib] = "-DWITH_C_GLIB=ON,-DWITH_C_GLIB=OFF,glib-2.0"
-PACKAGECONFIG[boost-smart-ptr] = "-DWITH_BOOST_SMART_PTR=ON,-DWITH_BOOST_SMART_PTR=OFF,boost"
 
 do_install_append () {
     ln -sf thrift ${D}/${bindir}/thrift-compiler

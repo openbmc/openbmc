@@ -14,6 +14,7 @@ RDEPENDS_${PN} = " \
     ghex \
     gnome-calculator \
     gnome-font-viewer \
+    gnome-photos \
     gnome-terminal \
     libwnck3 \
     nautilus \

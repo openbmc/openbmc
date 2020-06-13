@@ -32,7 +32,7 @@ PACKAGE_BEFORE_PN = "${PN}-scripts ${PN}-udevrules"
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} = "${@bb.utils.contains('PACKAGECONFIG', 'dmeventd', 'lvm2-monitor.service dm-event.socket dm-event.service', '', d)} \
-                         blk-availability.service lvm2-pvscan@.service"
+                         blk-availability.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
 TARGET_CC_ARCH += "${LDFLAGS}"
@@ -52,7 +52,11 @@ FILES_libdevmapper = " \
     ${sbindir}/dmstats \
 "
 
-FILES_${PN} += "${libdir}/device-mapper/*.so"
+FILES_${PN} += " \
+    ${libdir}/device-mapper/*.so \
+    ${systemd_system_unitdir}/lvm2-pvscan@.service \
+"
+
 FILES_${PN}-scripts = " \
     ${sbindir}/blkdeactivate \
     ${sbindir}/fsadm \
