@@ -1,0 +1,10 @@
+[Unit]
+Description=System unit to hard reset or system reset chassis
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=i2cset -y 7 0x45 0xd9 c
+
+[Install]
+WantedBy=chassis-system-reset.target
