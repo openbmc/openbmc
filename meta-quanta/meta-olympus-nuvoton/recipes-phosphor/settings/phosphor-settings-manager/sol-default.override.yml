@@ -1,0 +1,10 @@
+---
+/xyz/openbmc_project/ipmi/sol/eth1:
+    - Interface: xyz.openbmc_project.Ipmi.SOL
+      Properties:
+          Privilege:
+              Default: 2
+          Enable:
+              Default: 'true'
+          Progress:
+              Default: 0
