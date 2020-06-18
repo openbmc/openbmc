@@ -1,0 +1,4 @@
+fruBusNum=13
+fruAddr=0x51
+numberMac=1
+mac1=eth1
