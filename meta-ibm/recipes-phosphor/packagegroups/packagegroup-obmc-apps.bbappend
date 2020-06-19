@@ -30,8 +30,8 @@ RDEPENDS_${PN}-extras_remove_rainier = "obmc-ikvm liberation-fonts uart-render-c
 RDEPENDS_${PN}-extras_remove_swift = "obmc-ikvm"
 RDEPENDS_${PN}-extras_remove_witherspoon-tacoma = "obmc-ikvm liberation-fonts uart-render-controller"
 RDEPENDS_${PN}-logging_append = " ${EXTRA_IBM_LOGGING_PKGS}"
-RDEPENDS_${PN}-extras_append_rainier = " pldm openpower-hw-diags"
+RDEPENDS_${PN}-extras_append_rainier = " pldm openpower-hw-diags srvcfg-manager"
 
-RDEPENDS_${PN}-extras_append_witherspoon-tacoma = " pldm"
+RDEPENDS_${PN}-extras_append_witherspoon-tacoma = " pldm srvcfg-manager"
 
 ${PN}-software-extras_append_ibm-ac-server = " phosphor-software-manager-sync"
