@@ -4,7 +4,7 @@ SRC_URI += " file://ncsi-netlink.service"
 SYSTEMD_SERVICE_${PN} += " ncsi-netlink.service"
 FILES_${PN} += "${datadir}/network/*.json"
 
-EXTRA_OECONF += "--enable-ibm-config"
+EXTRA_OECONF += "--enable-sync-mac"
 
 install_network_configuration(){
     install -d ${D}${systemd_system_unitdir}
