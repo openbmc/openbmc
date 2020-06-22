@@ -14,9 +14,9 @@ POWER_SERVICE_PACKAGES_RAINIER = " \
 "
 
 EXTRA_IBM_LOGGING_PKGS = ""
-# EXTRA_IBM_LOGGING_PKGS_witherspoon = "ibm-logging"
+EXTRA_IBM_LOGGING_PKGS_witherspoon = "ibm-logging"
 EXTRA_IBM_LOGGING_PKGS_witherspoon-tacoma = ""
-# EXTRA_IBM_LOGGING_PKGS_mihawk = "ibm-logging"
+EXTRA_IBM_LOGGING_PKGS_mihawk = "ibm-logging"
 
 RDEPENDS_${PN}-inventory_append_ibm-ac-server = " openpower-fru-vpd openpower-occ-control phosphor-cooling-type virtual/obmc-gpio-presence"
 RDEPENDS_${PN}-inventory_append_rainier = " openpower-fru-vpd openpower-occ-control virtual/obmc-gpio-presence"
