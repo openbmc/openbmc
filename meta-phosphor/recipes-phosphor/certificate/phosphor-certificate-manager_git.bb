@@ -28,3 +28,7 @@ S = "${WORKDIR}/git"
 
 CERT_TMPL = "phosphor-certificate-manager@.service"
 SYSTEMD_SERVICE_${PN} = "${CERT_TMPL}"
+
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[ibm-hypervisor-cert] = "--enable-ca-cert-extension,,"
+SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'ibm-hypervisor-cert', 'bmc-vmi-ca-manager.service', '', d)}"
