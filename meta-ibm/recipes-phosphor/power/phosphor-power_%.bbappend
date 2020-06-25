@@ -4,7 +4,8 @@ inherit obmc-phosphor-systemd
 
 SRC_URI += "file://psu.json"
 
-EXTRA_OEMESON += "-Ducd90160-yaml=${STAGING_DIR_HOST}${datadir}/power-sequencer/ucd90160.yaml"
+EXTRA_OEMESON_append_ibm-ac-server = " -Ducd90160-yaml=${STAGING_DIR_HOST}${datadir}/power-sequencer/ucd90160.yaml"
+EXTRA_OEMESON_append_rainier = " -Ducd90160-yaml=${STAGING_DIR_HOST}${datadir}/power-sequencer/ucd90160.yaml -Dibm-vpd=true"
 
 DEPENDS += " power-sequencer"
 
