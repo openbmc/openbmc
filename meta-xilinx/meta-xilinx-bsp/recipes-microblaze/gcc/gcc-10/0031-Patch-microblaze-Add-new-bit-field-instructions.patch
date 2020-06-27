@@ -1,0 +1,120 @@
+From 45deb5bd3ae8c3db360ef181c9873e37d2288848 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Wed, 18 Jan 2017 12:14:51 +0530
+Subject: [PATCH 31/63] [Patch, microblaze]: Add new bit-field instructions
+ This patches adds new bsefi and bsifi instructions. BSEFI- The instruction
+ shall extract a bit field from a register and place it right-adjusted in the
+ destination register. The other bits in the destination register shall be set
+ to zero BSIFI- The instruction shall insert a right-adjusted bit field from a
+ register at another position in the destination register. The rest of the
+ bits in the destination register shall be unchanged
+
+Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
+
+ChangeLog:
+  2016-02-03 Nagaraju Mekala <nmekala@xilix.com>
+
+  *microblaze.md (Update): Added new patterns
+---
+ gcc/config/microblaze/microblaze.md | 73 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 73 insertions(+)
+
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index b7c16ac..67b298a 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -982,6 +982,8 @@
+   (set_attr "mode"	"DI")
+   (set_attr "length"	"20,20,20")])
+ 
++
++
+ ;;----------------------------------------------------------------
+ ;; Data movement
+ ;;----------------------------------------------------------------
+@@ -1776,6 +1778,7 @@
+   (set_attr "length"   "28")]
+ )
+ 
++
+ ;;----------------------------------------------------------------
+ ;; Setting a register from an integer comparison. 
+ ;;----------------------------------------------------------------
+@@ -2489,4 +2492,74 @@
+   DONE;
+ }")
+ 
++(define_expand "extvsi"
++  [(set (match_operand:SI 0 "register_operand" "r")
++	(zero_extract:SI (match_operand:SI 1 "register_operand" "r")
++			 (match_operand:SI 2 "immediate_operand" "I")
++			 (match_operand:SI 3 "immediate_operand" "I")))]
++"TARGET_HAS_BITFIELD"
++"
++{
++  unsigned HOST_WIDE_INT len = UINTVAL (operands[2]);
++  unsigned HOST_WIDE_INT pos = UINTVAL (operands[3]);
++
++  if ((len == 0) || (pos + len > 32) )
++    FAIL;
++
++  ;;if (!register_operand (operands[1], VOIDmode))
++  ;;  FAIL;
++  if (operands[0] == operands[1])
++  FAIL;
++  if (GET_CODE (operands[1]) == ASHIFT)
++  FAIL;
++;;  operands[2] = GEN_INT(INTVAL(operands[2])+1 );
++ emit_insn (gen_extv_32 (operands[0], operands[1],
++			  operands[2], operands[3]));
++  DONE;
++}")
++
++(define_insn "extv_32"
++  [(set (match_operand:SI 0 "register_operand" "=r")
++	(zero_extract:SI (match_operand:SI 1 "register_operand" "r")
++			 (match_operand:SI 2 "immediate_operand" "I")
++			 (match_operand:SI 3 "immediate_operand" "I")))]
++ "TARGET_HAS_BITFIELD && (UINTVAL (operands[2]) > 0)
++   && ((UINTVAL (operands[2]) + UINTVAL (operands[3])) <= 32)"
++  "bsefi %0,%1,%2,%3"
++  [(set_attr "type" "bshift")
++   (set_attr "length" "4")])
++
++(define_expand "insvsi"
++  [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+r")
++			 (match_operand:SI 1 "immediate_operand" "I")
++			 (match_operand:SI 2 "immediate_operand" "I"))
++	(match_operand:SI 3 "register_operand" "r"))]
++ "TARGET_HAS_BITFIELD"
++  "
++{
++  unsigned HOST_WIDE_INT len = UINTVAL (operands[1]);
++  unsigned HOST_WIDE_INT pos = UINTVAL (operands[2]);
++
++  if (len <= 0 || pos + len > 32)
++    FAIL;
++
++  ;;if (!register_operand (operands[0], VOIDmode))
++  ;;  FAIL;
++
++  emit_insn (gen_insv_32 (operands[0], operands[1],
++			  operands[2], operands[3]));
++  DONE;
++}")
++
++(define_insn "insv_32"
++  [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+r")
++			 (match_operand:SI 1 "immediate_operand" "I")
++			 (match_operand:SI 2 "immediate_operand" "I"))
++	(match_operand:SI 3 "register_operand" "r"))]
++ "TARGET_HAS_BITFIELD && UINTVAL (operands[1]) > 0
++   && UINTVAL (operands[1]) + UINTVAL (operands[2]) <= 32"
++  "bsifi %0, %3, %1, %2"
++  [(set_attr "type" "bshift")
++   (set_attr "length" "4")])
++
+ (include "sync.md")
+-- 
+2.7.4
+

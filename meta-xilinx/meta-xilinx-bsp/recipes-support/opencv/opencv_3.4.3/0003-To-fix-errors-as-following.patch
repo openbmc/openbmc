@@ -1,0 +1,70 @@
+From 867caccc358266f7021f076fc8c8e41bf048782c Mon Sep 17 00:00:00 2001
+From: Huang Qiyu <huangqy.fnst@cn.fujitsu.com>
+Date: Fri, 19 May 2017 04:27:50 +0900
+Subject: [PATCH] To fix errors as following:
+
+"test_main.cpp:45: undefined reference to `parseCustomOptions(int, char**)'"
+"perf_abs.cpp:13: undefined reference to `cvtest::param_seed'"
+"test_superres.cpp:270: undefined reference to `checkIppStatus()'"
+
+Signed-off-by: Huang Qiyu <huangqy.fnst@cn.fujitsu.com>
+
+Also add the visibility changes for certain OpenCL-related functions in
+ts module.
+
+Signed-off-by: Ismo Puustinen <ismo.puustinen@intel.com>
+
+---
+ modules/ts/include/opencv2/ts.hpp          | 4 ++--
+ modules/ts/include/opencv2/ts/ocl_test.hpp | 2 +-
+ modules/ts/include/opencv2/ts/ts_ext.hpp   | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/modules/ts/include/opencv2/ts.hpp b/modules/ts/include/opencv2/ts.hpp
+index b9d6b74..f1ee7ee 100644
+--- a/modules/ts/include/opencv2/ts.hpp
++++ b/modules/ts/include/opencv2/ts.hpp
+@@ -622,7 +622,7 @@ protected:
+     }
+ };
+ 
+-extern uint64 param_seed;
++CV_EXPORTS extern uint64 param_seed;
+ 
+ struct DefaultRngAuto
+ {
+@@ -685,7 +685,7 @@ private:
+ #endif
+ #endif
+ 
+-void parseCustomOptions(int argc, char **argv);
++CV_EXPORTS void parseCustomOptions(int argc, char **argv);
+ 
+ #define CV_TEST_INIT0_NOOP (void)0
+ 
+diff --git a/modules/ts/include/opencv2/ts/ocl_test.hpp b/modules/ts/include/opencv2/ts/ocl_test.hpp
+index 11572e9..438112e 100644
+--- a/modules/ts/include/opencv2/ts/ocl_test.hpp
++++ b/modules/ts/include/opencv2/ts/ocl_test.hpp
+@@ -82,7 +82,7 @@ inline UMat ToUMat(InputArray src)
+     return dst;
+ }
+ 
+-extern int test_loop_times;
++CV_EXPORTS extern int test_loop_times;
+ 
+ #define MAX_VALUE 357
+ 
+diff --git a/modules/ts/include/opencv2/ts/ts_ext.hpp b/modules/ts/include/opencv2/ts/ts_ext.hpp
+index b5cea3e..e5b0b4b 100644
+--- a/modules/ts/include/opencv2/ts/ts_ext.hpp
++++ b/modules/ts/include/opencv2/ts/ts_ext.hpp
+@@ -9,7 +9,7 @@
+ #define OPENCV_TS_EXT_HPP
+ 
+ namespace cvtest {
+-void checkIppStatus();
++CV_EXPORTS void checkIppStatus();
+ extern bool skipUnstableTests;
+ extern bool runBigDataTests;
+ extern int testThreads;

@@ -1,0 +1,155 @@
+From 07757f455d343beb50ac04815c77b04075bf9534 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Thu, 12 Dec 2019 14:56:17 +0530
+Subject: [PATCH 41/43] [patch,MicroBlaze] : porting GDB for linux
+
+---
+ gdb/features/microblaze-linux.xml | 12 ++++++++++
+ gdb/gdbserver/Makefile.in         |  2 ++
+ gdb/gdbserver/configure.srv       |  3 ++-
+ gdb/microblaze-linux-tdep.c       | 39 ++++++++++++++++++++++++-------
+ 4 files changed, 47 insertions(+), 9 deletions(-)
+ create mode 100644 gdb/features/microblaze-linux.xml
+
+diff --git a/gdb/features/microblaze-linux.xml b/gdb/features/microblaze-linux.xml
+new file mode 100644
+index 0000000000..8983e66eb3
+--- /dev/null
++++ b/gdb/features/microblaze-linux.xml
+@@ -0,0 +1,12 @@
++<?xml version="1.0"?>
++<!-- Copyright (C) 2014-2018 Free Software Foundation, Inc.
++
++     Copying and distribution of this file, with or without modification,
++     are permitted in any medium without royalty provided the copyright
++     notice and this notice are preserved.  -->
++
++<!DOCTYPE target SYSTEM "gdb-target.dtd">
++<target>
++  <osabi>GNU/Linux</osabi>
++  <xi:include href="microblaze-core.xml"/>
++</target>
+diff --git a/gdb/gdbserver/Makefile.in b/gdb/gdbserver/Makefile.in
+index 45d95e6cab..7c8fa3c246 100644
+--- a/gdb/gdbserver/Makefile.in
++++ b/gdb/gdbserver/Makefile.in
+@@ -633,6 +633,8 @@ common/%.o: ../common/%.c
+ 
+ %-generated.c: ../regformats/rs6000/%.dat | $(regdat_sh)
+ 	$(ECHO_REGDAT) $(SHELL) $(regdat_sh) $< $@
++microblaze-linux.c : $(srcdir)/../regformats/reg-microblaze.dat $(regdat_sh)
++	$(ECHO_REGDAT) $(SHELL) $(regdat_sh) $(srcdir)/../regformats/reg-microblaze.dat microblaze-linux.c
+ 
+ #
+ # Dependency tracking.
+diff --git a/gdb/gdbserver/configure.srv b/gdb/gdbserver/configure.srv
+index c421790bd0..6ad0ac9fa6 100644
+--- a/gdb/gdbserver/configure.srv
++++ b/gdb/gdbserver/configure.srv
+@@ -210,8 +210,9 @@ case "${target}" in
+ 			srv_linux_usrregs=yes
+ 			srv_linux_thread_db=yes
+ 			;;
+-  microblaze*-*-linux*)	srv_regobj=microblaze-linux.o
++  microblaze*-*-linux*)	srv_regobj="microblaze-linux.o"
+ 			srv_tgtobj="$srv_linux_obj linux-microblaze-low.o "
++			srv_xmlfiles="microblaze-linux.xml"
+ 			srv_linux_regsets=yes
+ 			srv_linux_usrregs=yes
+ 			srv_linux_thread_db=yes
+diff --git a/gdb/microblaze-linux-tdep.c b/gdb/microblaze-linux-tdep.c
+index 011e513941..e3d2a7508d 100644
+--- a/gdb/microblaze-linux-tdep.c
++++ b/gdb/microblaze-linux-tdep.c
+@@ -41,7 +41,7 @@
+ 
+ #ifndef REGSET_H
+ #define REGSET_H 1
+-
++int MICROBLAZE_REGISTER_SIZE=4;
+ struct gdbarch;
+ struct regcache;
+ 
+@@ -115,7 +115,7 @@ microblaze_debug (const char *fmt, ...)
+        va_end (args);
+     }
+ }
+-
++#if 0
+ static int
+ microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch, 
+ 					   struct bp_target_info *bp_tgt)
+@@ -131,7 +131,7 @@ microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch,
+   bp = gdbarch_breakpoint_from_pc (gdbarch, &addr, &bplen);
+ 
+   /* Make sure we see the memory breakpoints.  */
+-  cleanup = make_show_memory_breakpoints_cleanup (1);
++  cleanup = make_scoped_restore_show_memory_breakpoints (1);
+   val = target_read_memory (addr, old_contents, bplen);
+ 
+   /* If our breakpoint is no longer at the address, this means that the
+@@ -146,6 +146,7 @@ microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch,
+   do_cleanups (cleanup);
+   return val;
+ }
++#endif
+ 
+ static void
+ microblaze_linux_sigtramp_cache (struct frame_info *next_frame,
+@@ -248,8 +249,8 @@ microblaze_linux_init_abi (struct gdbarch_info info,
+ 
+   linux_init_abi (info, gdbarch);
+ 
+-  set_gdbarch_memory_remove_breakpoint (gdbarch,
+-					microblaze_linux_memory_remove_breakpoint);
++//  set_gdbarch_memory_remove_breakpoint (gdbarch,
++//					microblaze_linux_memory_remove_breakpoint);
+ 
+   /* Shared library handling.  */
+   set_solib_svr4_fetch_link_map_offsets (gdbarch,
+@@ -261,10 +262,30 @@ microblaze_linux_init_abi (struct gdbarch_info info,
+ 
+   /* BFD target for core files.  */
+   if (gdbarch_byte_order (gdbarch) == BFD_ENDIAN_BIG)
+-    set_gdbarch_gcore_bfd_target (gdbarch, "elf32-microblaze");
++    {
++      if (info.bfd_arch_info->mach == bfd_mach_microblaze64) {
++          set_gdbarch_gcore_bfd_target (gdbarch, "elf64-microblaze");
++          MICROBLAZE_REGISTER_SIZE=8;
++        }
++      else
++        set_gdbarch_gcore_bfd_target (gdbarch, "elf32-microblaze");
++    }
+   else
+-    set_gdbarch_gcore_bfd_target (gdbarch, "elf32-microblazeel");
++    {
++      if (info.bfd_arch_info->mach == bfd_mach_microblaze64) {
++          set_gdbarch_gcore_bfd_target (gdbarch, "elf64-microblazeel");
++          MICROBLAZE_REGISTER_SIZE=8;
++        }
++      else
++        set_gdbarch_gcore_bfd_target (gdbarch, "elf32-microblazeel");
++    }
+ 
++  switch (info.bfd_arch_info->mach)
++    {
++    case bfd_mach_microblaze64:
++      set_gdbarch_ptr_bit (gdbarch, 64);
++    break;
++    }
+ 
+   /* Shared library handling.  */
+   set_gdbarch_skip_trampoline_code (gdbarch, find_solib_trampoline_target);
+@@ -278,6 +299,8 @@ microblaze_linux_init_abi (struct gdbarch_info info,
+ void
+ _initialize_microblaze_linux_tdep (void)
+ {
+-  gdbarch_register_osabi (bfd_arch_microblaze, 0, GDB_OSABI_LINUX, 
++  gdbarch_register_osabi (bfd_arch_microblaze, bfd_mach_microblaze, GDB_OSABI_LINUX, 
++			  microblaze_linux_init_abi);
++  gdbarch_register_osabi (bfd_arch_microblaze, bfd_mach_microblaze64, GDB_OSABI_LINUX, 
+ 			  microblaze_linux_init_abi);
+ }
+-- 
+2.17.1
+

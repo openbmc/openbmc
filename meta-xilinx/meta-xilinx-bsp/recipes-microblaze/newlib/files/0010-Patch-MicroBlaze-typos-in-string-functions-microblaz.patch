@@ -1,0 +1,87 @@
+From 70281e45fa433ec854f60b43fef019ebc8ca0649 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Wed, 3 Apr 2019 11:52:50 +0530
+Subject: [PATCH 10/11] [Patch,MicroBlaze] : typos in string functions
+ microblaze 64 bit port.fixed the issues.
+
+---
+ newlib/libc/machine/microblaze/strcmp.c | 12 +++++++-----
+ newlib/libc/machine/microblaze/strlen.c |  4 ++--
+ 2 files changed, 9 insertions(+), 7 deletions(-)
+
+diff --git a/newlib/libc/machine/microblaze/strcmp.c b/newlib/libc/machine/microblaze/strcmp.c
+index dac64da..acfe4cd 100644
+--- a/newlib/libc/machine/microblaze/strcmp.c
++++ b/newlib/libc/machine/microblaze/strcmp.c
+@@ -135,7 +135,7 @@ strcmp (const char *s1,
+ 
+ #ifdef __arch64__
+     asm volatile ("                                          \n\
+-        orl      r9, r0, r0               /* Index register */\n\
++        orl      r9, r0, r0               /* Index register */ \n\
+ check_alignment:                                             \n\
+         andli    r3, r5, 3                                    \n\
+         andli    r4, r6, 3                                    \n\
+@@ -161,7 +161,7 @@ end_cmp_loop:
+         beaneid   r3, end_cmp_loop        /* If reached null on one string, terminate */  \n\
+         nop					                              \n\
+ end_cmp_early:                                                                  \n\
+-        or   r3, r0, r7               /* delay slot */                        \n\
++        orl   r3, r0, r7               /* delay slot */                        \n\
+         rtsd    r15, 8                                                          \n\
+         nop		                                                         \n\
+ try_align_args:                                                                 \n\
+@@ -171,7 +171,7 @@ try_align_args:
+ align_loop:                                                                     \n\
+         lbu     r3, r5, r9                                                      \n\
+         lbu     r4, r6, r9                                                      \n\
+-        cmpu    r7, r4, r3                                                      \n\
++        cmplu    r7, r4, r3                                                      \n\
+         beanei    r7, end_cmp                                                     \n\
+         beaeqi    r3, end_cmp                                                     \n\
+         addlik   r10, r10, -1                                                    \n\
+@@ -185,10 +185,11 @@ regular_strcmp:
+         cmplu    r7, r4, r3                                                      \n\
+         beanei    r7, end_cmp                                                     \n\
+         beaeqi    r3, end_cmp                                                     \n\
+-        breaid    regular_strcmp                                                  \n\
+         addlik   r9, r9, 1                                                       \n\
++        breaid    regular_strcmp                                                  \n\
++        nop                                                  \n\
+ end_cmp:                                                                        \n\
+-        or       r3, r0, r7                                                       \n\
++        orl       r3, r0, r7                                                       \n\
+         rtsd    r15, 8                                                          \n\
+         nop              /* Return strcmp result */");
+ #else
+@@ -240,6 +241,7 @@ regular_strcmp:
+         bnei    r7, end_cmp                                                     \n\
+         beqi    r3, end_cmp                                                     \n\
+         brid    regular_strcmp                                                  \n\
++        addik   r9, r9, 1                                                       \n\
+ end_cmp:                                                                        \n\
+         rtsd    r15, 8                                                          \n\
+         or      r3, r0, r7              /* Return strcmp result */");
+diff --git a/newlib/libc/machine/microblaze/strlen.c b/newlib/libc/machine/microblaze/strlen.c
+index c04fa4f..b6f2d3c 100644
+--- a/newlib/libc/machine/microblaze/strlen.c
++++ b/newlib/libc/machine/microblaze/strlen.c
+@@ -127,13 +127,13 @@ len_loop:                                                       \n"
+ "                                                               \n\
+         pcmplbf  r4, r3, r0                                      \n\
+         beanei    r4, end_len                                     \n\
+-        addik   r9, r9, 4                                       \n\
++        addlik   r9, r9, 4                                       \n\
+         breaid    len_loop                                        \n\
+         nop		                                        \n\
+ end_len:                                                        \n\
+         lbu     r3, r5, r9                                      \n\
+         beaeqi    r3, done_len                                    \n\
+-        addik   r9, r9, 1                                       \n\
++        addlik   r9, r9, 1                                       \n\
+         breaid    end_len                                         \n\
+         nop		                                       \n\
+ done_len:                                                       \n\
+-- 
+2.7.4
+

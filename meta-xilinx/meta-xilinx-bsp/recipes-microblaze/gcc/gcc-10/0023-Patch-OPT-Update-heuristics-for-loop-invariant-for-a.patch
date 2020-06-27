@@ -1,0 +1,47 @@
+From 2c4a1d46e4f1b2342f899d6741d09dbf7cc87aa2 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 17 Jan 2017 17:33:31 +0530
+Subject: [PATCH 23/63] [Patch] OPT: Update heuristics for loop-invariant for
+ address arithme. .tic.
+
+The changes are made in the patch to update the heuristics
+for loop invariant for address arithmetic. The heuristics is
+changed to calculate the estimated register pressure cost when
+ira based register pressure is not enabled. The estimated
+register pressure cost modifies the existing calculation cost
+associated to perform the Loop invariant code motion for address
+arithmetic.
+
+ChangeLog:
+2015-06-17  Ajit Agarwal  <ajitkum@xilinx.com>
+            Nagaraju Mekala <nmekala@xilinx.com>
+
+	* loop-invariant.c (gain_for_invariant): update the
+	heuristics for estimate_reg_pressure_cost.
+
+Signed-off-by:Ajit Agarwal ajitkum@xilinx.com
+              Nagaraju Mekala nmekala@xilinx.com
+---
+ gcc/loop-invariant.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/gcc/loop-invariant.c b/gcc/loop-invariant.c
+index b880ead..fd7a019 100644
+--- a/gcc/loop-invariant.c
++++ b/gcc/loop-invariant.c
+@@ -1465,10 +1465,8 @@ gain_for_invariant (struct invariant *inv, unsigned *regs_needed,
+ 
+   if (! flag_ira_loop_pressure)
+     {
+-      size_cost = (estimate_reg_pressure_cost (new_regs[0] + regs_needed[0],
+-					       regs_used, speed, call_p)
+-		   - estimate_reg_pressure_cost (new_regs[0],
+-						 regs_used, speed, call_p));
++      size_cost = estimate_reg_pressure_cost (regs_needed[0],
++					       regs_used, speed, call_p);
+     }
+   else if (ret < 0)
+     return -1;
+-- 
+2.7.4
+

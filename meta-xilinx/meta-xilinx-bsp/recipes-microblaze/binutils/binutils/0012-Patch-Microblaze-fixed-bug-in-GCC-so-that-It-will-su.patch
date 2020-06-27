@@ -1,0 +1,33 @@
+From 2a7b66bbc0473c6cbe6653a48818962b5b411ef2 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Fri, 29 Sep 2017 18:00:23 +0530
+Subject: [PATCH 12/43] [Patch,Microblaze]: fixed bug in GCC so that It will
+ support .long 0U and .long 0u
+
+---
+ gas/expr.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/gas/expr.c b/gas/expr.c
+index ee85bda1cc..b502418b71 100644
+--- a/gas/expr.c
++++ b/gas/expr.c
+@@ -810,6 +810,15 @@ operand (expressionS *expressionP, enum expr_mode mode)
+ 	      break;
+ 	    }
+ 	}
++      if ((*input_line_pointer == 'U') || (*input_line_pointer == 'u'))
++      {
++      input_line_pointer--;
++
++      integer_constant ((NUMBERS_WITH_SUFFIX || flag_m68k_mri)
++                        ? 0 : 10,
++                        expressionP);
++      break;
++      }
+       c = *input_line_pointer;
+       switch (c)
+ 	{
+-- 
+2.17.1
+

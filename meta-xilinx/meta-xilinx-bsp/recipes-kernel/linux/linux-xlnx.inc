@@ -1,17 +1,20 @@
 # This version extension should match CONFIG_LOCALVERSION in defconfig
 XILINX_RELEASE_VERSION ?= ""
 LINUX_VERSION_EXTENSION ?= "-xilinx-${XILINX_RELEASE_VERSION}"
-PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCPV}"
+PV = "${LINUX_VERSION}+git${SRCPV}"
 
 # Sources, by default allow for the use of SRCREV pointing to orphaned tags/commits
-KBRANCH ?= ""
+KBRANCH ?= "xlnx_rebase_v5.4"
 SRCBRANCHARG = "${@['nobranch=1', 'branch=${KBRANCH}'][d.getVar('KBRANCH', True) != '']}"
 
 FILESOVERRIDES_append = ":${XILINX_RELEASE_VERSION}"
-KERNELURI ?= "git://github.com/Xilinx/linux-xlnx.git;protocol=https"
-SRC_URI = "${KERNELURI};${SRCBRANCHARG}"
+KERNELURI ?= "git://github.com/Xilinx/linux-xlnx.git;protocol=https;name=machine"
+YOCTO_META ?= "git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=meta;branch=yocto-5.4;destsuffix=yocto-kmeta"
+SRC_URI = "${KERNELURI};${SRCBRANCHARG} ${YOCTO_META}"
 
 SRCREV_machine ?= "${SRCREV}"
+SRCREV_meta ?= "93b1325e4b9bff0d1ce7a2dd85aed0b26e3e76d7"
+SRCREV_FORMAT = "machine"
 
 require recipes-kernel/linux/linux-yocto.inc
 require linux-microblaze.inc
@@ -55,9 +58,12 @@ SRC_URI_append = " file://xilinx-kmeta;type=kmeta;name=xilinx-kmeta;destsuffix=x
 # MicroBlaze BSP fragments
 KERNEL_FEATURES_append_kc705-microblazeel = " bsp/kc705-microblazeel/kc705-microblazeel.scc"
 
-KERNEL_FEATURES_append_zynqmp = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' bsp/xilinx/xen.scc', '', d)}"
+KERNEL_FEATURES_append_zynqmp = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)}"
 
 KERNEL_FEATURES_append_zynqmp = "${@' features/overlay/overlay.scc' if d.getVar('FPGA_MNGR_RECONFIG_ENABLE') == '1' else ''}"
 
-KERNEL_FEATURES_append_versal = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' bsp/xilinx/xen.scc', '', d)}"
+KERNEL_FEATURES_append_versal = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)}"
 
+KERNEL_FEATURES_append_ultra96-zynqmp = " bsp/ultra96-zynqmp/mipi-config-ultra96.scc"
+
+KERNEL_FEATURES_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', ' features/ocicontainer/ocicontainer.scc', '', d)}"

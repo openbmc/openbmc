@@ -1,0 +1,33 @@
+From 497de8b16265468cacad880f4a371756924ae0c1 Mon Sep 17 00:00:00 2001
+From: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+Date: Tue, 14 Apr 2020 15:25:13 -0700
+Subject: [xf86-video-armsoc][PATCH v2] armsoc_driver.c: Bypass the exa layer
+ to free the root pixmap
+
+Since the root pixmap was allocated through miCreateScreenResources,
+the exa layer is not aware of the pixmap resulting in the assertion
+to fail. Instead, we can directly invoke fbDestroyPixmap, thereby
+freeing the pixmap and avoiding a memory leak.
+
+Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+---
+ src/armsoc_driver.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/armsoc_driver.c b/src/armsoc_driver.c
+index 3ace3c7..a4a1ba3 100644
+--- a/src/armsoc_driver.c
++++ b/src/armsoc_driver.c
+@@ -1259,7 +1259,8 @@ ARMSOCCloseScreen(CLOSE_SCREEN_ARGS_DECL)
+ 	 * we do it here, before calling the CloseScreen chain which would just free pScreen->devPrivate in fbCloseScreen()
+ 	 */
+ 	if (pScreen->devPrivate) {
+-		(void) (*pScreen->DestroyPixmap)(pScreen->devPrivate);
++		fbDestroyPixmap (pScreen->devPrivate);
++		armsoc_bo_unreference(pARMSOC->scanout);
+ 		pScreen->devPrivate = NULL;
+ 	}
+ 
+-- 
+2.7.4
+

@@ -38,6 +38,7 @@ if (mbtype == 'PMU' and os.path.exists(PMU_rom)) or mbtype == 'PLM':
     # We need to switch tcp serial arguments (if they exist, e.g. qemurunner) to get the output correctly
     tcp_serial_ports = [i for i, s in enumerate(APU_args) if 'tcp:127.0.0.1:' in s]
 
+    #NEED TO FIX for next yocto release (dont need to switch ports anymore, they will be provided correctly upstream
     # We can only switch these if there are exactly two, otherwise we can't assume what is being executed so we leave it as is
     if len(tcp_serial_ports) == 2:
         APU_args[tcp_serial_ports[0]],APU_args[tcp_serial_ports[1]] = APU_args[tcp_serial_ports[1]],APU_args[tcp_serial_ports[0]]

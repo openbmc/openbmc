@@ -24,11 +24,11 @@ KERNEL_BOOTCMD_zynq ?= "bootm"
 KERNEL_BOOTCMD_versal ?= "booti"
 
 BOOTMODE ?= "sd"
-BOOTMODE_versal ?= "qspi"
 
 SRC_URI = " \
             file://boot.cmd.sd.zynq \
             file://boot.cmd.sd.zynqmp \
+            file://boot.cmd.sd.versal \
             file://boot.cmd.qspi.versal \
             file://pxeboot.pxe \
             "
@@ -40,10 +40,10 @@ UBOOTPXE_CONFIG ?= "pxelinux.cfg"
 UBOOTPXE_CONFIG_NAME = "${UBOOTPXE_CONFIG}-${DATETIME}"
 UBOOTPXE_CONFIG_NAME[vardepsexclude] = "DATETIME"
 
-DEVICETREE_ADDRESS_zynqmp ?= "0x4000000"
+DEVICETREE_ADDRESS_zynqmp ?= "0x100000"
 DEVICETREE_ADDRESS_zynq ?= "0x2000000"
 DEVICETREE_ADDRESS_versal ?= "0x1000"
-KERNEL_LOAD_ADDRESS_zynqmp ?= "0x80000"
+KERNEL_LOAD_ADDRESS_zynqmp ?= "0x200000"
 KERNEL_LOAD_ADDRESS_zynq ?= "0x2080000"
 KERNEL_LOAD_ADDRESS_versal ?= "0x80000"
 
@@ -65,6 +65,7 @@ do_compile() {
     mkimage -A arm -T script -C none -n "Boot script" -d "${WORKDIR}/boot.cmd" boot.scr
     sed -e 's/@@KERNEL_IMAGETYPE@@/${KERNEL_IMAGETYPE}/' \
         -e 's/@@DEVICE_TREE_NAME@@/${DEVICE_TREE_NAME}/' \
+	-e 's/@@RAMDISK_IMAGE@@/${RAMDISK_IMAGE}/' \
 	"${WORKDIR}/pxeboot.pxe" > "pxeboot.pxe"
 }
 

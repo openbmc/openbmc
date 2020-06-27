@@ -1,0 +1,35 @@
+From 70b38f8748779d57117bca3e37441e2223372293 Mon Sep 17 00:00:00 2001
+From: Peter Ogden <ogden@xilinx.com>
+Date: Tue, 3 Mar 2020 06:23:26 -0500
+Subject: [PATCH 2/3] Avoid deleteing notebooks
+
+---
+ setup.py | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index df1dada..95479e3 100644
+--- a/setup.py
++++ b/setup.py
+@@ -36,6 +36,7 @@ from setuptools.command.build_ext import build_ext
+ from distutils.dir_util import copy_tree
+ from distutils.file_util import copy_file, move_file
+ from shutil import rmtree
++import shutil
+ import glob
+ import re
+ import subprocess
+@@ -322,8 +323,8 @@ class BuildExtension(build_ext):
+             for ol in overlay_dirs:
+                 src = os.path.join(board_folder, ol)
+                 dst = os.path.join(self.build_lib, "pynq/overlays", ol)
+-                exclude_file_or_folder('notebooks', src)
+-                copy_tree(src, dst)
++                if not os.path.isdir(dst):
++                    shutil.copytree(src, dst, ignore=shutil.ignore_patterns('notebooks'))
+ 
+     def run(self):
+         if CPU_ARCH == ZYNQ_ARCH:
+-- 
+2.7.4
+

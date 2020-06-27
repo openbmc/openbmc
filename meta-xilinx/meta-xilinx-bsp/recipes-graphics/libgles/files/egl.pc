@@ -6,7 +6,7 @@ includedir=/usr/include
 Name: egl
 Description: MALI EGL library
 Requires.private:
-Version: r8p0
+Version: 17.3
 Libs: -L${libdir} -lEGL
 Libs.private: -lm -lpthread -ldl
 Cflags: -I${includedir}

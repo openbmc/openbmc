@@ -1,0 +1,36 @@
+From f30b99b5b8d3f2a8d8e4973cd155a4b9f1849039 Mon Sep 17 00:00:00 2001
+From: Nagaraju <nmekala@xilinx.com>
+Date: Thu, 14 Mar 2019 18:08:06 +0530
+Subject: [PATCH 56/57] fix the lto-wrapper issue on windows
+
+---
+ libiberty/simple-object.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/libiberty/simple-object.c b/libiberty/simple-object.c
+index 42aa6ac..d2465c6 100644
+--- a/libiberty/simple-object.c
++++ b/libiberty/simple-object.c
+@@ -44,6 +44,10 @@ Boston, MA 02110-1301, USA.  */
+ #define SEEK_SET 0
+ #endif
+ 
++#ifndef O_BINARY
++#define O_BINARY 0
++#endif
++
+ #include "simple-object-common.h"
+ 
+ /* The known object file formats.  */
+@@ -326,7 +330,7 @@ simple_object_copy_lto_debug_sections (simple_object_read *sobj,
+       return errmsg;
+     }
+ 
+-  outfd = creat (dest, 00777);
++  outfd = open (dest, O_CREAT|O_WRONLY|O_TRUNC|O_BINARY, 00777);
+   if (outfd == -1)
+     {
+       *err = errno;
+-- 
+2.7.4
+

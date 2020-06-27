@@ -1,6 +1,0 @@
-setenv bootargs $bootargs root=/dev/mmcblk0p2 rw rootwait earlycon clk_ignore_unused
-devicetree_image=@@DEVICE_TREE_NAME@@
-fatload mmc 0 ${fdt_addr_r} ${devicetree_image}
-fatload mmc $sdbootdev:$partid  ${kernel_addr_r} @@KERNEL_IMAGETYPE@@
-booti ${kernel_addr_r} - ${fdt_addr_r}
-

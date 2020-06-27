@@ -15,6 +15,6 @@ do_compile[noexec] = "1"
 SYSROOT_DIRS += "${bindir}/qemu-xilinx"
 
 do_install() {
-	install -Dm 0755 ${WORKDIR}/qemu-system-aarch64-multiarch ${D}${bindir}/qemu-xilinx/qemu-system-aarch64-multiarch
+	install -Dm 0755 ${WORKDIR}/qemu-system-aarch64-multiarch ${D}${bindir}/qemu-system-aarch64-multiarch
 }
 

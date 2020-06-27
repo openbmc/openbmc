@@ -1,0 +1,48 @@
+From 51da0572e0650378e422030b26d1258c8fc76df6 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Wed, 18 Jan 2017 13:57:48 +0530
+Subject: [PATCH 33/63] Fixing the bug in the bit-field instruction. Bit field
+ instruction should be generated only if mcpu >10.0
+
+---
+ gcc/config/microblaze/microblaze.c | 3 +++
+ gcc/config/microblaze/microblaze.h | 2 ++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+index 3f68ef0..a37f08eea 100644
+--- a/gcc/config/microblaze/microblaze.c
++++ b/gcc/config/microblaze/microblaze.c
+@@ -164,6 +164,9 @@ int microblaze_no_unsafe_delay;
+ /* Set to one if the targeted core has the CLZ insn.  */
+ int microblaze_has_clz = 0;
+ 
++/* Set to one if the targeted core has barrel-shift and cpu > 10.0 */
++int microblaze_has_bitfield = 0;
++
+ /* Which CPU pipeline do we use. We haven't really standardized on a CPU 
+    version having only a particular type of pipeline. There can still be 
+    options on the CPU to scale pipeline features up or down. :( 
+diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
+index bf7f3b4..1d05e6e 100644
+--- a/gcc/config/microblaze/microblaze.h
++++ b/gcc/config/microblaze/microblaze.h
+@@ -44,6 +44,7 @@ extern int microblaze_dbx_regno[];
+ 
+ extern int microblaze_no_unsafe_delay;
+ extern int microblaze_has_clz;
++extern int microblaze_has_bitfield;
+ extern enum pipeline_type microblaze_pipe;
+ 
+ #define OBJECT_FORMAT_ELF
+@@ -62,6 +63,7 @@ extern enum pipeline_type microblaze_pipe;
+ 
+ /* Do we have CLZ?  */
+ #define TARGET_HAS_CLZ      (TARGET_PATTERN_COMPARE && microblaze_has_clz)
++#define TARGET_HAS_BITFIELD      (TARGET_BARREL_SHIFT && microblaze_has_bitfield)
+ 
+ /* The default is to support PIC.  */
+ #define TARGET_SUPPORTS_PIC 1
+-- 
+2.7.4
+

@@ -1,0 +1,5 @@
+define KFEATURE_DESCRIPTION "Kernel Config for Ultra96 for MIPI"
+define KFEATURE_COMPATIBILITY board
+
+kconf hardware mipi-config-ultra96.cfg
+

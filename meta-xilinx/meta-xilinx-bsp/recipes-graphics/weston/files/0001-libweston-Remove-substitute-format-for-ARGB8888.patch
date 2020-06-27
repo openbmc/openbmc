@@ -1,0 +1,29 @@
+From 77afc64239199f75041ec344f8f886ee20bba0f8 Mon Sep 17 00:00:00 2001
+From: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+Date: Tue, 11 Feb 2020 19:07:45 -0800
+Subject: [PATCH] libweston: Remove substitute format for ARGB8888
+
+Xilinx DP gfx layer does not support XRGB8888. Hence, remove the same
+as opaque substitute.
+
+Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+Upstream-Status : Inappropriate [Xilinx specific]
+---
+ libweston/pixel-formats.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/libweston/pixel-formats.c b/libweston/pixel-formats.c
+index b96f3b2..e2a7715 100644
+--- a/libweston/pixel-formats.c
++++ b/libweston/pixel-formats.c
+@@ -165,7 +165,6 @@ static const struct pixel_format_info pixel_format_table[] = {
+ 	},
+ 	{
+ 		DRM_FORMAT(ARGB8888),
+-		.opaque_substitute = DRM_FORMAT_XRGB8888,
+ 		.depth = 32,
+ 		.bpp = 32,
+ 		GL_FORMAT(GL_BGRA_EXT),
+-- 
+2.7.4
+

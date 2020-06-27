@@ -1,0 +1,30 @@
+From e5af9cc9b167acc5c04d15fea03b34b70ec537c9 Mon Sep 17 00:00:00 2001
+From: Sai Hari Chandana Kalluri <chandana.kalluri@xilinx.com>
+Date: Sun, 7 Jun 2020 20:35:59 -0700
+Subject: [PATCH] Makefile:Use python3 instead of python
+
+Signed-off-by: Sai Hari Chandana Kalluri <chandana.kalluri@xilinx.com>
+---
+ Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 36b4937..efaa39a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -89,9 +89,9 @@ $(LQSPI_XIP_OUTDIR)/%.dts:	%.dts $(DTSI_FILES) $(HEADER_FILES)
+ # TODO: Add support for auto-generated dependency list
+ versal-pmc-npi.dtsi: versal-pmc-npi-nxx.dtsi
+ versal-pmc-npi-nxx.dtsi: Makefile
+-	@python -c 'for a in range(0, 54): print("\tGEN_NMU(" + str(a) + ")")' > $@
+-	@python -c 'for a in range(0, 50): print("\tGEN_NSU(" + str(a) + ")")' >> $@
+-	@python -c 'for a in range(0, 146): print("\tGEN_NPS(" + str(a) + ")")' >> $@
++	@python3 -c 'for a in range(0, 54): print("\tGEN_NMU(" + str(a) + ")")' > $@
++	@python3 -c 'for a in range(0, 50): print("\tGEN_NSU(" + str(a) + ")")' >> $@
++	@python3 -c 'for a in range(0, 146): print("\tGEN_NPS(" + str(a) + ")")' >> $@
+ 
+ clean:
+ 	$(RM) versal-pmc-npi-nxx.dtsi
+-- 
+2.7.4
+

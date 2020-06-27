@@ -1,0 +1,28 @@
+From 9659f5a1e75fc29c9879c301767bba72ecf9042a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 11 Sep 2018 00:21:18 -0700
+Subject: [PATCH] Dont use isystem
+
+clang really does not like it
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
+ cmake/OpenCVPCHSupport.cmake | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/cmake/OpenCVPCHSupport.cmake b/cmake/OpenCVPCHSupport.cmake
+index 59bc826..055dfce 100644
+--- a/cmake/OpenCVPCHSupport.cmake
++++ b/cmake/OpenCVPCHSupport.cmake
+@@ -18,6 +18,8 @@ IF(CV_GCC)
+         SET(PCHSupport_FOUND TRUE)
+     ENDIF()
+ 
++    SET(CMAKE_INCLUDE_SYSTEM_FLAG_C "-I")
++    SET(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-I")
+     SET(_PCH_include_prefix "-I")
+     SET(_PCH_isystem_prefix "-isystem")
+     SET(_PCH_define_prefix "-D")

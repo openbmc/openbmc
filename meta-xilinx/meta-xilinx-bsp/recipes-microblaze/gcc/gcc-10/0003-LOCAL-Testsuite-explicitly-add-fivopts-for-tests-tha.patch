@@ -1,0 +1,119 @@
+From fb4b4d4ecba04859d52a653d7c453df92014dc38 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Wed, 11 Jan 2017 15:28:38 +0530
+Subject: [PATCH 03/63] [LOCAL]: Testsuite - explicitly add -fivopts for tests
+ that depend on it (test gcc/testsuite/gcc.dg/tree-ssa/ivopts-lt.c doesnt
+ exist in 4.6 branch)
+
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+
+Conflicts:
+	gcc/testsuite/gcc.dg/tree-ssa/pr19210-1.c
+---
+ gcc/testsuite/g++.dg/tree-ssa/ivopts-2.C   | 2 +-
+ gcc/testsuite/g++.dg/tree-ssa/ivopts-3.C   | 2 +-
+ gcc/testsuite/gcc.dg/tree-ssa/loop-2.c     | 2 +-
+ gcc/testsuite/gcc.dg/tree-ssa/loop-4.c     | 2 +-
+ gcc/testsuite/gcc.dg/tree-ssa/loop-5.c     | 2 +-
+ gcc/testsuite/gcc.dg/tree-ssa/pr19210-1.c  | 2 +-
+ gcc/testsuite/gcc.dg/tree-ssa/pr19590.c    | 2 +-
+ gcc/testsuite/gcc.dg/tree-ssa/reassoc-19.c | 2 +-
+ 8 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/gcc/testsuite/g++.dg/tree-ssa/ivopts-2.C b/gcc/testsuite/g++.dg/tree-ssa/ivopts-2.C
+index 438db88..ede883e 100644
+--- a/gcc/testsuite/g++.dg/tree-ssa/ivopts-2.C
++++ b/gcc/testsuite/g++.dg/tree-ssa/ivopts-2.C
+@@ -1,5 +1,5 @@
+ /* { dg-do compile { target { i?86-*-* x86_64-*-*  } } } */
+-/* { dg-options "-O2 -fdump-tree-ivopts-details" } */
++/* { dg-options "-O2 -fivopts -fdump-tree-ivopts-details" } */
+ 
+ void test (int *b, int *e, int stride)
+   {
+diff --git a/gcc/testsuite/g++.dg/tree-ssa/ivopts-3.C b/gcc/testsuite/g++.dg/tree-ssa/ivopts-3.C
+index 07ff1b7..a09710c 100644
+--- a/gcc/testsuite/g++.dg/tree-ssa/ivopts-3.C
++++ b/gcc/testsuite/g++.dg/tree-ssa/ivopts-3.C
+@@ -1,5 +1,5 @@
+ // { dg-do compile }
+-// { dg-options "-O2 -fdump-tree-ivopts-details" }
++// { dg-options "-O2 -fivopts -fdump-tree-ivopts-details" }
+ 
+ class MinimalVec3
+ {
+diff --git a/gcc/testsuite/gcc.dg/tree-ssa/loop-2.c b/gcc/testsuite/gcc.dg/tree-ssa/loop-2.c
+index bda2516..22c8a5d 100644
+--- a/gcc/testsuite/gcc.dg/tree-ssa/loop-2.c
++++ b/gcc/testsuite/gcc.dg/tree-ssa/loop-2.c
+@@ -1,7 +1,7 @@
+ /* A test for strength reduction and induction variable elimination.  */
+ 
+ /* { dg-do compile } */
+-/* { dg-options "-O1 -fdump-tree-optimized" } */
++/* { dg-options "-O1 -fivopts -fdump-tree-optimized" } */
+ /* { dg-require-effective-target size32plus } */
+ 
+ /* Size of this structure should be sufficiently weird so that no memory
+diff --git a/gcc/testsuite/gcc.dg/tree-ssa/loop-4.c b/gcc/testsuite/gcc.dg/tree-ssa/loop-4.c
+index f0770ab..65d74c8 100644
+--- a/gcc/testsuite/gcc.dg/tree-ssa/loop-4.c
++++ b/gcc/testsuite/gcc.dg/tree-ssa/loop-4.c
+@@ -1,7 +1,7 @@
+ /* A test for strength reduction and induction variable elimination.  */
+ 
+ /* { dg-do compile } */
+-/* { dg-options "-O1 -fdump-tree-optimized" } */
++/* { dg-options "-O1 -fivopts -fdump-tree-optimized" } */
+ /* { dg-require-effective-target size32plus } */
+ 
+ /* Size of this structure should be sufficiently weird so that no memory
+diff --git a/gcc/testsuite/gcc.dg/tree-ssa/loop-5.c b/gcc/testsuite/gcc.dg/tree-ssa/loop-5.c
+index 5f42857..9bc86ee 100644
+--- a/gcc/testsuite/gcc.dg/tree-ssa/loop-5.c
++++ b/gcc/testsuite/gcc.dg/tree-ssa/loop-5.c
+@@ -1,7 +1,7 @@
+ /* A test for induction variable merging.  */
+ 
+ /* { dg-do compile } */
+-/* { dg-options "-O1 -fdump-tree-optimized" } */
++/* { dg-options "-O1 -fivopts -fdump-tree-optimized" } */
+ 
+ void foo(long);
+ 
+diff --git a/gcc/testsuite/gcc.dg/tree-ssa/pr19210-1.c b/gcc/testsuite/gcc.dg/tree-ssa/pr19210-1.c
+index 50d86a0..1e3eacd 100644
+--- a/gcc/testsuite/gcc.dg/tree-ssa/pr19210-1.c
++++ b/gcc/testsuite/gcc.dg/tree-ssa/pr19210-1.c
+@@ -1,5 +1,5 @@
+ /* { dg-do compile } */
+-/* { dg-options "-O2 -fopt-info-loop-missed" } */
++/* { dg-options "-O2 -fivopts -fopt-info-loop-missed" } */
+ extern void g(void);
+ 
+ void
+diff --git a/gcc/testsuite/gcc.dg/tree-ssa/pr19590.c b/gcc/testsuite/gcc.dg/tree-ssa/pr19590.c
+index 2c6cfc6..648e6e6 100644
+--- a/gcc/testsuite/gcc.dg/tree-ssa/pr19590.c
++++ b/gcc/testsuite/gcc.dg/tree-ssa/pr19590.c
+@@ -1,5 +1,5 @@
+ /* { dg-do compile } */
+-/* { dg-options "-O2 -fdump-tree-ivopts" } */
++/* { dg-options "-O2 -fivopts -fdump-tree-ivopts" } */
+ 
+ void vnum_test8(int *data) 
+ { 
+diff --git a/gcc/testsuite/gcc.dg/tree-ssa/reassoc-19.c b/gcc/testsuite/gcc.dg/tree-ssa/reassoc-19.c
+index e911bfc..5d3e7e0 100644
+--- a/gcc/testsuite/gcc.dg/tree-ssa/reassoc-19.c
++++ b/gcc/testsuite/gcc.dg/tree-ssa/reassoc-19.c
+@@ -1,5 +1,5 @@
+ /* { dg-do compile } */
+-/* { dg-options "-Os -fdump-tree-optimized" } */
++/* { dg-options "-Os -fivopts -fdump-tree-optimized" } */
+ 
+ /* Slightly changed testcase from PR middle-end/40815.  */
+ void bar(char*, char*, int);
+-- 
+2.7.4
+

@@ -1,0 +1,142 @@
+From 650cbdea7bc810e2bd0ebc5eb5647ed513498670 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Wed, 18 Jan 2017 11:08:40 +0530
+Subject: [PATCH 27/63] [Patch,rtl Optimization]: Better register pressure
+ estimate for loop . .invariant code motion
+
+Calculate the loop liveness used for regs for calculating the register pressure
+in the cost estimation.  Loop liveness is based on the following properties.
+We only need to find the set of objects that are live at the birth or the header
+of the loop. We don't need to calculate the live through the loop by considering
+live in and live out of all the basic blocks of the loop. This is based on the
+point that the set of objects that are live-in at the birth or header of the loop
+will be live-in at every node in the loop.
+
+If a v live is out at the header of the loop then the variable is live-in at every node
+in the loop. To prove this, consider a loop L with header h such that the variable v
+defined at d is live-in at h. Since v is live at h, d is not part of L. This follows i
+from the dominance property, i.e. h is strictly dominated by d. Furthermore, there
+exists a path from h to a use of v which does not go through d. For every node p in
+the loop, since the loop is strongly connected and node is a component of the CFG,
+there exists a path, consisting only of nodes of L from p to h. Concatenating these
+two paths proves that v is live-in and live-out of p.
+
+Calculate the live-out and live-in for the exit edge of the loop. This patch considers
+liveness for not only the loop latch but also the liveness outside the loops.
+
+ChangeLog:
+2016-01-22  Ajit Agarwal  <ajitkum@xilinx.com>
+
+	* loop-invariant.c
+	(find_invariants_to_move): Add the logic of regs_used based
+	on liveness.
+	* cfgloopanal.c
+	(estimate_reg_pressure_cost): Update the heuristics in presence
+	of call_p.
+
+Signed-off-by:Ajit Agarwal ajitkum@xilinx.com.
+---
+ gcc/cfgloopanal.c    |  4 +++-
+ gcc/loop-invariant.c | 63 +++++++++++++++++++++++++++++++++++++++-------------
+ 2 files changed, 50 insertions(+), 17 deletions(-)
+
+diff --git a/gcc/cfgloopanal.c b/gcc/cfgloopanal.c
+index 6dbe96f..ec5cba2 100644
+--- a/gcc/cfgloopanal.c
++++ b/gcc/cfgloopanal.c
+@@ -411,7 +411,9 @@ estimate_reg_pressure_cost (unsigned n_new, unsigned n_old, bool speed,
+   if (regs_needed + target_res_regs <= available_regs)
+     return 0;
+ 
+-  if (regs_needed <= available_regs)
++  if ((regs_needed <= available_regs)
++      || (call_p && (regs_needed <=
++          (available_regs + target_clobbered_regs))))
+     /* If we are close to running out of registers, try to preserve
+        them.  */
+     cost = target_reg_cost [speed] * n_new;
+diff --git a/gcc/loop-invariant.c b/gcc/loop-invariant.c
+index fd7a019..ad54297 100644
+--- a/gcc/loop-invariant.c
++++ b/gcc/loop-invariant.c
+@@ -1519,7 +1519,7 @@ gain_for_invariant (struct invariant *inv, unsigned *regs_needed,
+ 	size_cost = 0;
+     }
+ 
+-  return comp_cost - size_cost;
++  return comp_cost - size_cost + 1;
+ }
+ 
+ /* Finds invariant with best gain for moving.  Returns the gain, stores
+@@ -1613,22 +1613,53 @@ find_invariants_to_move (bool speed, bool call_p)
+     /* REGS_USED is actually never used when the flag is on.  */
+     regs_used = 0;
+   else
+-    /* We do not really do a good job in estimating number of
+-       registers used; we put some initial bound here to stand for
+-       induction variables etc.  that we do not detect.  */
++    /* The logic used in estimating the number of regs_used is changed.
++       Now it will be based on liveness of the loop. */
+     {
+-      unsigned int n_regs = DF_REG_SIZE (df);
+-
+-      regs_used = 2;
+-
+-      for (i = 0; i < n_regs; i++)
+-	{
+-	  if (!DF_REGNO_FIRST_DEF (i) && DF_REGNO_LAST_USE (i))
+-	    {
+-	      /* This is a value that is used but not changed inside loop.  */
+-	      regs_used++;
+-	    }
+-	}
++      int  i;
++      edge e;
++      vec<edge> edges;
++      bitmap_head regs_live;
++
++      bitmap_initialize (&regs_live, &reg_obstack);
++      edges = get_loop_exit_edges (curr_loop);
++
++      /* Loop liveness is based on the following properties.
++         We only need to find the set of objects that are live at the
++         birth or the header of the loop.
++         We don't need to calculate the live through the loop considering
++         live-in and live-out of all the basic blocks of the loop. This is
++         based on the point that the set of objects that are live-in at the
++         birth or header of the loop will be live-in at every block in the
++         loop.
++
++         If a v live out at the header of the loop then the variable is
++         live-in at every node in the Loop. To prove this, consider a loop
++         L with header h such that the variable v defined at d is live-in
++         at h. Since v is live at h, d is not part of L. This follows from
++         the dominance property, i.e. h is strictly dominated by d. Furthermore,
++         there exists a path from h to a use of v which does not go through d.
++         For every node of the loop, p, since the loop is strongly connected
++         component of the CFG, there exists a path, consisting only of nodes
++         of L from p to h. Concatenating these two paths prove that v is
++         live-in and live-out of p.  */
++
++       bitmap_ior_into (&regs_live, DF_LR_IN (curr_loop->header));
++       bitmap_ior_into (&regs_live, DF_LR_OUT (curr_loop->header));
++
++       /* Calculate the live-out and live-in for the exit edge of the loop.
++          This considers liveness for not only the loop latch but also the
++          liveness outside the loops.  */
++
++       FOR_EACH_VEC_ELT (edges, i, e)
++         {
++           bitmap_ior_into (&regs_live, DF_LR_OUT (e->src));
++           bitmap_ior_into (&regs_live, DF_LR_IN (e->dest));
++         }
++
++       regs_used = bitmap_count_bits (&regs_live) + 2;
++       bitmap_clear (&regs_live);
++       edges.release ();
+     }
+ 
+   if (! flag_ira_loop_pressure)
+-- 
+2.7.4
+

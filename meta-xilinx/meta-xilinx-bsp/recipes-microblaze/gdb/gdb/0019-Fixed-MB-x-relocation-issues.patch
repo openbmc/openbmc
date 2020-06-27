@@ -1,0 +1,115 @@
+From f190b9380c325b48697755328f4193791a758e55 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Fri, 28 Sep 2018 12:04:55 +0530
+Subject: [PATCH 19/43] -Fixed MB-x relocation issues -Added imml for required
+ MB-x instructions
+
+---
+ bfd/elf64-microblaze.c     |  68 ++++++++++++++---
+ 3 files changed, 167 insertions(+), 55 deletions(-)
+
+diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
+index 56a45f2a05..54a2461037 100644
+--- a/bfd/elf64-microblaze.c
++++ b/bfd/elf64-microblaze.c
+@@ -1476,8 +1476,17 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+ 			  relocation -= (input_section->output_section->vma
+ 					 + input_section->output_offset
+ 					 + offset + INST_WORD_SIZE);
+-			bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
++			unsigned long insn = bfd_get_32 (input_bfd, contents + offset +endian);
++    			if (insn == 0xb2000000 || insn == 0xb2ffffff)
++			  {
++        		    insn &= ~0x00ffffff;
++			    insn |= (relocation >> 16) & 0xffffff;
++			    bfd_put_32 (input_bfd, insn,
+ 			            contents + offset + endian);
++			  }
++			else
++			  bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
++			              contents + offset + endian);
+ 			bfd_put_16 (input_bfd, relocation & 0xffff,
+ 			            contents + offset + endian + INST_WORD_SIZE);
+ 		      }
+@@ -1567,11 +1576,28 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+ 		    else
+ 		      {
+ 			if (r_type == R_MICROBLAZE_64_PCREL)
+-			  relocation -= (input_section->output_section->vma
+-					 + input_section->output_offset
+-					 + offset + INST_WORD_SIZE);
+-			bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
++			  {
++			    if (!input_section->output_section->vma &&
++				 !input_section->output_offset && !offset)	
++			      relocation -= (input_section->output_section->vma
++			                     + input_section->output_offset
++					     + offset);
++			    else
++			      relocation -= (input_section->output_section->vma
++			                     + input_section->output_offset
++					     + offset + INST_WORD_SIZE);
++			  }
++			unsigned long insn = bfd_get_32 (input_bfd, contents + offset +endian);
++    			if (insn == 0xb2000000 || insn == 0xb2ffffff)
++			  {
++        		    insn &= ~0x00ffffff;
++			    insn |= (relocation >> 16) & 0xffffff;
++			    bfd_put_32 (input_bfd, insn,
+ 			            contents + offset + endian);
++			  }
++			else
++			  bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
++			              contents + offset + endian);
+ 			bfd_put_16 (input_bfd, relocation & 0xffff,
+ 			            contents + offset + endian + INST_WORD_SIZE);
+ 		      }
+@@ -1690,9 +1716,19 @@ static void
+ microblaze_bfd_write_imm_value_32 (bfd *abfd, bfd_byte *bfd_addr, bfd_vma val)
+ {
+     unsigned long instr = bfd_get_32 (abfd, bfd_addr);
+-    instr &= ~0x0000ffff;
+-    instr |= (val & 0x0000ffff);
+-    bfd_put_32 (abfd, instr, bfd_addr);
++
++    if (instr == 0xb2000000 || instr == 0xb2ffffff)
++      {
++        instr &= ~0x00ffffff;
++        instr |= (val & 0xffffff);
++        bfd_put_32 (abfd, instr, bfd_addr);
++      }
++    else
++      {
++        instr &= ~0x0000ffff;
++        instr |= (val & 0x0000ffff);
++        bfd_put_32 (abfd, instr, bfd_addr);
++      }
+ }
+ 
+ /* Read-modify-write into the bfd, an immediate value into appropriate fields of
+@@ -1704,10 +1740,18 @@ microblaze_bfd_write_imm_value_64 (bfd *abfd, bfd_byte *bfd_addr, bfd_vma val)
+     unsigned long instr_lo;
+ 
+     instr_hi = bfd_get_32 (abfd, bfd_addr);
+-    instr_hi &= ~0x0000ffff;
+-    instr_hi |= ((val >> 16) & 0x0000ffff);
+-    bfd_put_32 (abfd, instr_hi, bfd_addr);
+-
++    if (instr_hi == 0xb2000000 || instr_hi == 0xb2ffffff)
++      {
++        instr_hi &= ~0x00ffffff;
++        instr_hi |= (val >> 16) & 0xffffff;
++        bfd_put_32 (abfd, instr_hi,bfd_addr);
++      }
++    else
++      {
++        instr_hi &= ~0x0000ffff;
++        instr_hi |= ((val >> 16) & 0x0000ffff);
++        bfd_put_32 (abfd, instr_hi, bfd_addr);
++      }
+     instr_lo = bfd_get_32 (abfd, bfd_addr + INST_WORD_SIZE);
+     instr_lo &= ~0x0000ffff;
+     instr_lo |= (val & 0x0000ffff);
+-- 
+2.17.1
+

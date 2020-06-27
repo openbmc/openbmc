@@ -1,0 +1,47 @@
+From 8cf1dd43f3f25cb4afb84dfc3b0e7c02bc8f7f0c Mon Sep 17 00:00:00 2001
+From: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+Date: Mon, 24 Feb 2020 18:19:37 -0800
+Subject: [LINUX][rel-v2020.1][PATCH v1 1/3] mali_memory_secure: Kernel 5.0
+ onwards 'access_ok' API does not take 'type' as input parameter
+
+'access_ok' no longer needs 'type' as input paramter from kernel 5.0
+onwards.
+
+Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+---
+ driver/src/devicedrv/mali/linux/mali_ukk_mem.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/driver/src/devicedrv/mali/linux/mali_ukk_mem.c b/driver/src/devicedrv/mali/linux/mali_ukk_mem.c
+index 4ec57dc..270bb6d 100644
+--- linux/mali_ukk_mem.c
++++ b/linux/mali_ukk_mem.c
+@@ -207,8 +207,13 @@ int mem_write_safe_wrapper(struct mali_session_data *session_data, _mali_uk_mem_
+ 	kargs.ctx = (uintptr_t)session_data;
+ 
+ 	/* Check if we can access the buffers */
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0)
++	if (!access_ok((const void __user *)kargs.dest, kargs.size)
++	    || !access_ok((const void __user *)kargs.src, kargs.size)) {
++#else
+ 	if (!access_ok(VERIFY_WRITE, kargs.dest, kargs.size)
+ 	    || !access_ok(VERIFY_READ, kargs.src, kargs.size)) {
++#endif
+ 		return -EINVAL;
+ 	}
+ 
+@@ -266,7 +271,11 @@ int mem_dump_mmu_page_table_wrapper(struct mali_session_data *session_data, _mal
+ 		goto err_exit;
+ 
+ 	user_buffer = (void __user *)(uintptr_t)kargs.buffer;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0)
++	if (!access_ok(user_buffer, kargs.size))
++#else
+ 	if (!access_ok(VERIFY_WRITE, user_buffer, kargs.size))
++#endif
+ 		goto err_exit;
+ 
+ 	/* allocate temporary buffer (kernel side) to store mmu page table info */
+-- 
+2.7.4
+

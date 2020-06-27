@@ -1,0 +1,32 @@
+From 132b913b721f66c5db17f62dd5559bbca11bb875 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Wed, 18 Jan 2017 20:57:10 +0530
+Subject: [PATCH 34/63] [Patch, microblaze]: Macros used in Xilinx internal
+ patches has been removed in gcc 6.2 version so modified the code accordingly.
+
+---
+ gcc/config/microblaze/microblaze.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+index a37f08eea..71640e5 100644
+--- a/gcc/config/microblaze/microblaze.c
++++ b/gcc/config/microblaze/microblaze.c
+@@ -2597,11 +2597,9 @@ print_operand (FILE * file, rtx op, int letter)
+ 	    REAL_VALUE_TO_TARGET_DOUBLE (*CONST_DOUBLE_REAL_VALUE (op), val);
+ 	  else
+ 	    {
+-	      REAL_VALUE_TYPE rv;
+-	      REAL_VALUE_FROM_CONST_DOUBLE (rv, op);
+-	      REAL_VALUE_TO_TARGET_DOUBLE (rv, l);
+-	      val[1] = l[WORDS_BIG_ENDIAN == 0];
+-	      val[0] = l[WORDS_BIG_ENDIAN != 0];
++              REAL_VALUE_TO_TARGET_DOUBLE (*CONST_DOUBLE_REAL_VALUE (op), l);
++              val[1] = l[WORDS_BIG_ENDIAN == 0];
++              val[0] = l[WORDS_BIG_ENDIAN != 0];
+ 	    }
+ 	}
+       else if (code == CONST_INT)
+-- 
+2.7.4
+

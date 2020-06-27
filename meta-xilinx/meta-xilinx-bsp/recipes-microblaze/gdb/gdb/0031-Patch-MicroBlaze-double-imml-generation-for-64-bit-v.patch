@@ -1,0 +1,28 @@
+From a15e73a33b3f395f2096e252b655775ed8424c14 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Mon, 26 Aug 2019 15:29:42 +0530
+Subject: [PATCH 31/43] [Patch,MicroBlaze] : double imml generation for 64 bit
+ values.
+
+---
+ opcodes/microblaze-opc.h   |   4 +-
+ 2 files changed, 263 insertions(+), 63 deletions(-)
+
+diff --git a/opcodes/microblaze-opc.h b/opcodes/microblaze-opc.h
+index 0774f70e08..bd9d91cd57 100644
+--- a/opcodes/microblaze-opc.h
++++ b/opcodes/microblaze-opc.h
+@@ -626,8 +626,8 @@ char pvr_register_prefix[] = "rpvr";
+ #define MIN_IMM6_WIDTH  ((int) 0x00000001)
+ #define MAX_IMM6_WIDTH  ((int) 0x00000040)
+ 
+-#define MIN_IMML  ((long long) 0xffffff8000000000L)
+-#define MAX_IMML  ((long long) 0x0000007fffffffffL)
++#define MIN_IMML  ((long long) -9223372036854775808)
++#define MAX_IMML  ((long long) 9223372036854775807)
+ 
+ #endif /* MICROBLAZE_OPC */
+ 
+-- 
+2.17.1
+

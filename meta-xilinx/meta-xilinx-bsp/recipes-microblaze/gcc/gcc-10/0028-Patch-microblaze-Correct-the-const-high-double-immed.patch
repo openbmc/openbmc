@@ -1,0 +1,69 @@
+From 8f8c6cd35a2cf79449c0155fa865a665d730e541 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Wed, 18 Jan 2017 11:25:48 +0530
+Subject: [PATCH 28/63] [Patch, microblaze]: Correct the const high double
+ immediate value With this patch the loading of the DI mode immediate values
+ will be using REAL_VALUE_FROM_CONST_DOUBLE and REAL_VALUE_TO_TARGET_DOUBLE
+ functions, as CONST_DOUBLE_HIGH was returning the sign extension value even
+ of the unsigned long long constants also
+
+Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
+               Ajit Agarwal  <ajitkum@xilinx.com>
+
+ChangeLog:
+2016-02-03 Nagaraju Mekala <nmekala@xilix.com>
+           Ajit Agarwal  <ajitkum@xilinx.com>
+
+ *microblaze.c (print_operand): Use REAL_VALUE_FROM_CONST_DOUBLE &
+        REAL_VALUE_TO_TARGET_DOUBLE
+ *long.c (new): Added new testcase
+---
+ gcc/config/microblaze/microblaze.c         |  8 ++++++--
+ gcc/testsuite/gcc.target/microblaze/long.c | 10 ++++++++++
+ 2 files changed, 16 insertions(+), 2 deletions(-)
+ create mode 100644 gcc/testsuite/gcc.target/microblaze/long.c
+
+diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+index ae7d5dd..002d7a5 100644
+--- a/gcc/config/microblaze/microblaze.c
++++ b/gcc/config/microblaze/microblaze.c
+@@ -2594,14 +2594,18 @@ print_operand (FILE * file, rtx op, int letter)
+   else if (letter == 'h' || letter == 'j')
+     {
+       long val[2];
++      long l[2];
+       if (code == CONST_DOUBLE)
+ 	{
+ 	  if (GET_MODE (op) == DFmode)
+ 	    REAL_VALUE_TO_TARGET_DOUBLE (*CONST_DOUBLE_REAL_VALUE (op), val);
+ 	  else
+ 	    {
+-	      val[0] = CONST_DOUBLE_HIGH (op);
+-	      val[1] = CONST_DOUBLE_LOW (op);
++	      REAL_VALUE_TYPE rv;
++	      REAL_VALUE_FROM_CONST_DOUBLE (rv, op);
++	      REAL_VALUE_TO_TARGET_DOUBLE (rv, l);
++	      val[1] = l[WORDS_BIG_ENDIAN == 0];
++	      val[0] = l[WORDS_BIG_ENDIAN != 0];
+ 	    }
+ 	}
+       else if (code == CONST_INT)
+diff --git a/gcc/testsuite/gcc.target/microblaze/long.c b/gcc/testsuite/gcc.target/microblaze/long.c
+new file mode 100644
+index 0000000..4d45186
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/microblaze/long.c
+@@ -0,0 +1,10 @@
++/* { dg-options "-O0" } */
++#define BASEADDR 0xF0000000ULL
++int main ()
++{
++  unsigned long long start;
++  start = (unsigned long long) BASEADDR;
++  return 0;
++}
++/* { dg-final { scan-assembler "addik\tr(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r0,0x00000000" } } */
++/* { dg-final { scan-assembler "addik\tr(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r0,0xf0000000" } } */
+-- 
+2.7.4
+

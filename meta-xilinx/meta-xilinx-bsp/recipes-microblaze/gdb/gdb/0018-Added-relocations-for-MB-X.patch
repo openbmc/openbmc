@@ -1,0 +1,113 @@
+From b625d19f8b86dd81c32f21793cc3e038ca275e57 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Tue, 11 Sep 2018 17:30:17 +0530
+Subject: [PATCH 18/43] Added relocations for MB-X
+
+---
+ bfd/bfd-in2.h              | 11 +++--
+ bfd/libbfd.h               |  4 +-
+ bfd/reloc.c                | 26 ++++++-----
+ 4 files changed, 62 insertions(+), 69 deletions(-)
+
+diff --git a/bfd/bfd-in2.h b/bfd/bfd-in2.h
+index 4f777059d8..de46e78902 100644
+--- a/bfd/bfd-in2.h
++++ b/bfd/bfd-in2.h
+@@ -5872,15 +5872,20 @@ done here - only used for relaxing  */
+   BFD_RELOC_MICROBLAZE_32_NONE,
+ 
+ /* This is a 64 bit reloc that stores the 32 bit pc relative
+- *  +value in two words (with an imm instruction).  No relocation is
++ *  +value in two words (with an imml instruction).  No relocation is
+  *   +done here - only used for relaxing  */
+-    BFD_RELOC_MICROBLAZE_64_NONE,
++    BFD_RELOC_MICROBLAZE_64_PCREL,
+ 
+-/* This is a 64 bit reloc that stores the 32 bit pc relative
++/* This is a 64 bit reloc that stores the 32 bit relative
+  *  +value in two words (with an imml instruction).  No relocation is
+  *   +done here - only used for relaxing  */
+     BFD_RELOC_MICROBLAZE_64,
+ 
++/* This is a 64 bit reloc that stores the 32 bit pc relative
++ *  +value in two words (with an imm instruction).  No relocation is
++ *   +done here - only used for relaxing  */
++    BFD_RELOC_MICROBLAZE_64_NONE,
++
+ /* This is a 64 bit reloc that stores the 32 bit pc relative
+ value in two words (with an imm instruction).  The relocation is
+ PC-relative GOT offset  */
+diff --git a/bfd/libbfd.h b/bfd/libbfd.h
+index 450653f2d8..d87a183d5e 100644
+--- a/bfd/libbfd.h
++++ b/bfd/libbfd.h
+@@ -2903,14 +2903,14 @@ static const char *const bfd_reloc_code_real_names[] = { "@@uninitialized@@",
+   "BFD_RELOC_MICROBLAZE_32_SYM_OP_SYM",
+   "BFD_RELOC_MICROBLAZE_32_NONE",
+   "BFD_RELOC_MICROBLAZE_64_NONE",
+-  "BFD_RELOC_MICROBLAZE_64",
+   "BFD_RELOC_MICROBLAZE_64_GOTPC",
+-  "BFD_RELOC_MICROBLAZE_64_GPC",
+   "BFD_RELOC_MICROBLAZE_64_GOT",
+   "BFD_RELOC_MICROBLAZE_64_PLT",
+   "BFD_RELOC_MICROBLAZE_64_GOTOFF",
+   "BFD_RELOC_MICROBLAZE_32_GOTOFF",
+   "BFD_RELOC_MICROBLAZE_COPY",
++  "BFD_RELOC_MICROBLAZE_64",
++  "BFD_RELOC_MICROBLAZE_64_PCREL",
+   "BFD_RELOC_MICROBLAZE_64_TLS",
+   "BFD_RELOC_MICROBLAZE_64_TLSGD",
+   "BFD_RELOC_MICROBLAZE_64_TLSLD",
+diff --git a/bfd/reloc.c b/bfd/reloc.c
+index ccf29f54cf..861f2d48c0 100644
+--- a/bfd/reloc.c
++++ b/bfd/reloc.c
+@@ -6803,24 +6803,12 @@ ENUMDOC
+   done here - only used for relaxing
+ ENUM
+   BFD_RELOC_MICROBLAZE_64_NONE
+-ENUMDOC
+-  This is a 32 bit reloc that stores the 32 bit pc relative
+-  value in two words (with an imml instruction).  No relocation is
+-  done here - only used for relaxing
+-ENUM
+-  BFD_RELOC_MICROBLAZE_64
+ ENUMDOC
+   This is a 64 bit reloc that stores the 32 bit pc relative
+   value in two words (with an imm instruction).  No relocation is
+   done here - only used for relaxing
+ ENUM
+   BFD_RELOC_MICROBLAZE_64_GOTPC
+-ENUMDOC
+-  This is a 64 bit reloc that stores the 32 bit pc relative
+-  value in two words (with an imml instruction).  No relocation is
+-  done here - only used for relaxing
+-ENUM
+-  BFD_RELOC_MICROBLAZE_64_GPC
+ ENUMDOC
+   This is a 64 bit reloc that stores the 32 bit pc relative
+   value in two words (with an imm instruction).  The relocation is
+@@ -6906,6 +6894,20 @@ ENUMDOC
+   value in two words (with an imm instruction).  The relocation is
+   relative offset from start of TEXT.
+ 
++  This is a 64 bit reloc that stores 64-bit thread pointer relative offset
++  to two words (uses imml instruction).
++ENUM
++BFD_RELOC_MICROBLAZE_64,
++ENUMDOC
++ This is a 64 bit reloc that stores the 64 bit pc relative
++ value in two words (with an imml instruction).  No relocation is
++ done here - only used for relaxing
++ENUM
++BFD_RELOC_MICROBLAZE_64_PCREL,
++ENUMDOC
++ This is a 32 bit reloc that stores the 32 bit pc relative
++ value in two words (with an imml instruction).  No relocation is
++ done here - only used for relaxing
+ ENUM
+   BFD_RELOC_AARCH64_RELOC_START
+ ENUMDOC
+-- 
+2.17.1
+

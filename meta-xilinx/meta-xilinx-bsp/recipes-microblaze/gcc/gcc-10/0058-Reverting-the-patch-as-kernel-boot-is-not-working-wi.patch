@@ -1,0 +1,51 @@
+From 8e7d7f3d2e103c34bbb28afe1338107b9fd824f0 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 16 Apr 2019 17:20:24 +0530
+Subject: [PATCH 58/63] Reverting the patch as kernel boot is not working with
+ this patch CR-1026413 Revert "[Patch,Microblaze]:reverting the cost check
+ before propagating constants."
+
+This reverts commit 7156e379a67fa47a5fb9ede1448c0d528dbda65b.
+---
+ gcc/cprop.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/gcc/cprop.c b/gcc/cprop.c
+index 42bcc81..65c0130 100644
+--- a/gcc/cprop.c
++++ b/gcc/cprop.c
+@@ -733,7 +733,6 @@ try_replace_reg (rtx from, rtx to, rtx_insn *insn)
+   int success = 0;
+   rtx set = single_set (insn);
+ 
+-#if 0
+   bool check_rtx_costs = true;
+   bool speed = optimize_bb_for_speed_p (BLOCK_FOR_INSN (insn));
+   int old_cost = set ? set_rtx_cost (set, speed) : 0;
+@@ -745,7 +744,6 @@ try_replace_reg (rtx from, rtx to, rtx_insn *insn)
+ 	  && (GET_CODE (XEXP (note, 0)) == CONST
+ 	      || CONSTANT_P (XEXP (note, 0)))))
+     check_rtx_costs = false;
+-#endif
+ 
+   /* Usually we substitute easy stuff, so we won't copy everything.
+      We however need to take care to not duplicate non-trivial CONST
+@@ -754,7 +752,6 @@ try_replace_reg (rtx from, rtx to, rtx_insn *insn)
+ 
+   validate_replace_src_group (from, to, insn);
+ 
+-#if 0
+   /* If TO is a constant, check the cost of the set after propagation
+      to the cost of the set before the propagation.  If the cost is
+      higher, then do not replace FROM with TO.  */
+@@ -767,7 +764,6 @@ try_replace_reg (rtx from, rtx to, rtx_insn *insn)
+       return false;
+     }
+ 
+-#endif
+ 
+   if (num_changes_pending () && apply_change_group ())
+     success = 1;
+-- 
+2.7.4
+

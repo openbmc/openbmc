@@ -1,0 +1,51 @@
+From b8c4b1fa22137d18d4ada7e350948035705f402f Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Sun, 2 Dec 2018 14:49:14 +0530
+Subject: [PATCH 25/43] [Patch,MicroBlaze]: fixed Build issue which are due to
+ conflicts in patches.
+
+---
+ bfd/elf32-microblaze.c     |  1 +
+ bfd/elf64-microblaze.c     | 12 ++++++------
+ 3 files changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
+index 2d8c062a42..6a795c5069 100644
+--- a/bfd/elf32-microblaze.c
++++ b/bfd/elf32-microblaze.c
+@@ -1996,6 +1996,7 @@ microblaze_elf_relax_section (bfd *abfd,
+ 		/* This was a PC-relative instruction that was
+ 		   completely resolved.  */
+ 		int sfix, efix;
++		unsigned int val;
+ 		bfd_vma target_address;
+ 		target_address = irel->r_addend + irel->r_offset;
+ 		sfix = calc_fixup (irel->r_offset, 0, sec);
+diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
+index ef6a87062b..bed534e7dd 100644
+--- a/bfd/elf64-microblaze.c
++++ b/bfd/elf64-microblaze.c
+@@ -2854,14 +2854,14 @@ microblaze_elf_adjust_dynamic_symbol (struct bfd_link_info *info,
+   /* If this is a weak symbol, and there is a real definition, the
+      processor independent code will have arranged for us to see the
+      real definition first, and we can just use the same value.  */
+-  if (h->u.weakdef != NULL)
++  if (h->is_weakalias)
+     {
+-      BFD_ASSERT (h->u.weakdef->root.type == bfd_link_hash_defined
+-		  || h->u.weakdef->root.type == bfd_link_hash_defweak);
+-      h->root.u.def.section = h->u.weakdef->root.u.def.section;
+-      h->root.u.def.value = h->u.weakdef->root.u.def.value;
++      struct elf_link_hash_entry *def = weakdef (h);
++      BFD_ASSERT (def->root.type == bfd_link_hash_defined);
++      h->root.u.def.section = def->root.u.def.section;
++      h->root.u.def.value = def->root.u.def.value;
+       return TRUE;
+-    }
++    }  
+ 
+   /* This is a reference to a symbol defined by a dynamic object which
+      is not a function.  */
+-- 
+2.17.1
+

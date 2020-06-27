@@ -1,0 +1,25 @@
+From 65e1134505235a60013d91c8b03401b8b4062cde Mon Sep 17 00:00:00 2001
+From: Peter Ogden <ogden@xilinx.com>
+Date: Tue, 3 Mar 2020 10:32:35 -0500
+Subject: [PATCH 3/3] Use sysroot for Displayport library
+
+---
+ pynq/lib/_pynq/_displayport/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pynq/lib/_pynq/_displayport/Makefile b/pynq/lib/_pynq/_displayport/Makefile
+index 5567e34..7f1f7b7 100644
+--- a/pynq/lib/_pynq/_displayport/Makefile
++++ b/pynq/lib/_pynq/_displayport/Makefile
+@@ -2,7 +2,7 @@ CC ?= gcc
+ CXX ?= g++
+ 
+ OBJSC = displayport.o 
+-INC = -I${PYNQ_BUILD_ROOT}/usr/include/libdrm
++INC = -I=${PYNQ_BUILD_ROOT}/usr/include/libdrm
+ 
+ all:	
+ 	$(CXX) -fPIC $(INC) -c -g -std=c++11 displayport.cpp $(CFLAGS)
+-- 
+2.7.4
+

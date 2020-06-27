@@ -1,21 +1,28 @@
 meta-xilinx-standalone
 ======================
 
-This layer is meant to augment Yocto/OE functionality to provide a Baremetal/Standalone Toolchain.
+This layer is meant to augment Yocto/OE functionality to provide a 
+Baremetal/Standalone Toolchain as well as the foundation for building
+the embeddedsw components that enable non-Linux software required for
+Xilinx based FPGA/SOCs.
+
+Note, the non-Linux software components are still in development and
+this should be considered to be a preview release only.  For instance,
+some components may not be buildable, expect APIs to change on various
+parts and pieces.
 
 
 Maintainers, Mailing list, Patches
 ==================================
 
-Please send any patches, pull requests, comments or questions for this layer to
-the [meta-xilinx mailing list](https://lists.yoctoproject.org/listinfo/meta-xilinx):
+Please send any patches, pull requests, comments or questions for this 
+layer to the [meta-xilinx mailing list]
+(https://lists.yoctoproject.org/listinfo/meta-xilinx):
 
 	meta-xilinx@lists.yoctoproject.org
 
 Maintainers:
 
-	Alejandro Enedino Hernandez Samaniego <alejandr@xilinx.com>
-	Manjukumar Harthikote Matha <manjukumar.harthikote-matha@xilinx.com>
 	Sai Hari Chandana Kalluri <chandana.kalluri@xilinx.com>
 	Mark Hatle <mark.hatle@xilinx.com>
 
@@ -37,13 +44,12 @@ Usage
 
 3.- Add this layer to BBLAYERS on conf/bblayers.conf
 
-4.- Add the following to your conf/local.conf to build for the microblaze architecture:
+4.- Add the following to your conf/local.conf to build for the 
+microblaze architecture:
 
 DISTRO="xilinx-standalone"
 
-MACHINE="zynqmp-pmu"
-
-GCCVERSION="7.%"
+MACHINE="microblaze-pmu"
 
 5.- Build a package:
 

@@ -1,51 +1,43 @@
 SUMMARY = "Xilinx's fork of a fast open source processor emulator"
 HOMEPAGE = "https://github.com/xilinx/qemu/"
 
-QEMU_TARGETS = "aarch64 arm microblaze microblazeel"
-
-XILINX_RELEASE_VERSION = "v2019.1"
-XILINX_QEMU_VERSION ?= "v2.11.1"
-BRANCH ?= "branch/xilinx-v2019.1"
-SRCREV ?= "5f38ea92fb697b94ad43f01fe162f3ed6e6b0e16"
-
+# x86_64 is needed to build nativesdks
+QEMU_TARGETS = "aarch64 arm microblaze microblazeel x86_64"
 
 LIC_FILES_CHKSUM = " \
 		file://COPYING;md5=441c28d2cf86e15a37fa47e15a72fbac \
-		file://COPYING.LIB;endline=24;md5=c04def7ae38850e7d3ef548588159913 \
+		file://COPYING.LIB;endline=24;md5=8c5efda6cf1e1b03dcfd0e6c0d271c7f \
 		"
 DEPENDS = "glib-2.0 zlib pixman"
+
+XILINX_QEMU_VERSION ?= "v4.1.50"
+BRANCH ?= "branch/xilinx-v2020.1"
+SRCREV ?= "e371d99ac19b9c4f3f98e6e6a3db1ea95091a50e"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 PV = "${XILINX_QEMU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 BRANCH ?= ""
-REPO ?= "git://github.com/Xilinx/qemu.git;protocol=https"
+REPO ?= "gitsm://github.com/Xilinx/qemu.git;protocol=https"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
+
+SRC_URI_append = " file://0010-configure-Add-pkg-config-handling-for-libgcrypt.patch \
+		   file://0001-Add-enable-disable-udev.patch \
+"
 
 S = "${WORKDIR}/git"
 
 # Disable KVM completely
 PACKAGECONFIG_remove = "kvm"
-
-# Enable libgcrypt
-PACKAGECONFIG_append = " gcrypt"
+PACKAGECONFIG_append = " fdt gcrypt"
 
 DISABLE_STATIC_pn-${PN} = ""
 
 PTEST_ENABLED = ""
 
-# append a suffix dir, to allow multiple versions of QEMU to be installed
-EXTRA_OECONF_append = " \
-		--bindir=${bindir}/qemu-xilinx \
-		--libexecdir=${libexecdir}/qemu-xilinx \
-		"
-
-do_configure_prepend() {
-	# rewrite usage of 'libgcrypt-config' with 'pkg-config libgcrypt'
-	sed -r -i 's/libgcrypt-config(\s*--)/pkg-config libgcrypt\1/g' ${S}/configure
-}
+EXTRA_OECONF_append = " --with-git=/bin/false --disable-git-update"
 
 do_install_append() {
 	# Prevent QA warnings about installed ${localstatedir}/run

@@ -6,7 +6,7 @@ includedir=/usr/include
 Name: glesv1
 Description: MALI OpenGL ES 1.1 library
 Requires.private:
-Version: r8p0
+Version: 17.3
 Libs: -L${libdir} -lGLESv1_CM
 Libs.private: -lm -lpthread -ldl
 Cflags: -I${includedir}
