@@ -20,7 +20,7 @@ RDEPENDS_${PN} = "\
     python3-sense-hat \
     connman \
     connman-client \
-    wireless-regdb \
+    wireless-regdb-static \
     bluez5 \
 "
 

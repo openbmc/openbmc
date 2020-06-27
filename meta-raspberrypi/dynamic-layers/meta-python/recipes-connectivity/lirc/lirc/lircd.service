@@ -1,0 +1,11 @@
+[Unit]
+Description=LIRC Infrared Signal Decoder
+Wants=lircd-setup.service
+After=network.target lircd-setup.service
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/lircd --nodaemon
+
+[Install]
+WantedBy=multi-user.target

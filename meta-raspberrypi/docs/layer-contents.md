@@ -8,6 +8,8 @@
 * raspberrypi2
 * raspberrypi3
 * raspberrypi3-64 (64 bit kernel & userspace)
+* raspberrypi4
+* raspberrypi4-64 (64 bit kernel & userspace)
 * raspberrypi-cm (dummy alias for raspberrypi)
 * raspberrypi-cm3
 

@@ -25,6 +25,8 @@ PITFT35r="${@bb.utils.contains("MACHINE_FEATURES", "pitft35r", "1", "0", d)}"
 
 VC4GRAPHICS="${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", "1", "0", d)}"
 VC4DTBO ?= "vc4-kms-v3d"
+GPIO_IR ?= "18"
+GPIO_IR_TX ?= "17"
 
 inherit deploy nopackages
 
@@ -159,6 +161,13 @@ do_deploy() {
     if [ "${ENABLE_UART}" = "1" ]; then
         echo "# Enable UART" >>${DEPLOYDIR}/bcm2835-bootfiles/config.txt
         echo "enable_uart=1" >>${DEPLOYDIR}/bcm2835-bootfiles/config.txt
+    fi
+
+    # Infrared support
+    if [ "${ENABLE_IR}" = "1" ]; then
+        echo "# Enable infrared" >>${DEPLOYDIR}/bcm2835-bootfiles/config.txt
+        echo "dtoverlay=gpio-ir,gpio_pin=${GPIO_IR}" >>${DEPLOYDIR}/bcm2835-bootfiles/config.txt
+        echo "dtoverlay=gpio-ir-tx,gpio_pin=${GPIO_IR_TX}" >>${DEPLOYDIR}/bcm2835-bootfiles/config.txt
     fi
 
     # VC4 Graphics support
