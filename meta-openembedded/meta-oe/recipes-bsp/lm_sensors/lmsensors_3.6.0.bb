@@ -95,7 +95,7 @@ RDEPENDS_${PN} += " \
     ${PN}-sensorsdetect \
     ${PN}-sensorsconfconvert \
     ${PN}-pwmconfig \
-    ${PN}-isatools \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'x86', '${PN}-isatools', '', d)} \
 "
 
 # libsensors packages

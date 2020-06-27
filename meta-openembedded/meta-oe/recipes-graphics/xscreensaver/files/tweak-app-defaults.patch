@@ -1,5 +1,5 @@
---- xscreensaver-5.39.orig/driver/XScreenSaver.ad.in
-+++ xscreensaver-5.39/driver/XScreenSaver.ad.in
+--- xscreensaver-5.44.orig/driver/XScreenSaver.ad.in	2020-06-16 13:13:14.950970569 +0000
++++ xscreensaver-5.44/driver/XScreenSaver.ad.in	2020-06-16 13:19:35.777000937 +0000
 @@ -29,7 +29,7 @@
  ! /* (xrdb prevention kludge: whole file)
  
@@ -31,10 +31,10 @@
 +*splash:		False
  *splashDuration:	0:00:05
  *visualID:		default
- *captureStderr: 	True
-@@ -158,236 +158,8 @@
- ! screen savers interactively.
- !
+ *installColormap:	True
+@@ -343,246 +343,8 @@
+ !=============================================================================
+ 
  *programs:								      \
 -				maze -root				    \n\
 -@GL_KLUDGE@ GL: 				superquadrics -root			    \n\
@@ -138,6 +138,7 @@
 -@GL_KLUDGE@ GL: 				menger -root				    \n\
 -@GL_KLUDGE@ GL: 				molecule -root				    \n\
 -				rotzoomer -root				    \n\
+-				scooter -root				    \n\
 -				speedmine -root				    \n\
 -@GL_KLUDGE@ GL: 				starwars -root				    \n\
 -@GL_KLUDGE@ GL: 				stonerview -root			    \n\
@@ -262,12 +263,21 @@
 -@GL_KLUDGE@ GL: 				esper -root				    \n\
 -@GL_KLUDGE@ GL: 				vigilance -root				    \n\
 -@GL_KLUDGE@ GL: 				crumbler -root				    \n\
+-				filmleader -root			    \n\
+-				glitchpeg -root				    \n\
+-@GL_KLUDGE@ GL: 				handsy -root				    \n\
 -@GL_KLUDGE@ GL: 				maze3d -root				    \n\
 -@GL_KLUDGE@ GL: 				peepers -root				    \n\
--@GL_KLUDGE@ GL: 				razzledazzle -root			    \n
+-@GL_KLUDGE@ GL: 				razzledazzle -root			    \n\
+-				vfeedback -root				    \n\
+-@GL_KLUDGE@ GL: 				deepstars -root				    \n\
+-@GL_KLUDGE@ GL: 				gravitywell -root			    \n\
+-@GL_KLUDGE@ GL: 				etruscanvenus -root			    \n\
+-@GL_KLUDGE@ GL: 				gibson -root				    \n
 -
-+-				fontglide -root -program "date +'%F %H:%M %z'"				    \n\
-+				gifview --window $XSCREENSAVER_WINDOW /usr/share/logo/bosch-black.gif			    \n
- 
+-
++-				fontglide -root -program "date +'%F %H:%M %z'"
++				gifview --window $XSCREENSAVER_WINDOW /usr/share/logo/bosch-black.gif
  
  !=============================================================================
+ !

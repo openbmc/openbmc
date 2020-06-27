@@ -44,11 +44,11 @@ SRC_URI = "git://github.com/opencv/opencv.git;name=opencv \
            git://github.com/opencv/opencv_3rdparty.git;branch=contrib_xfeatures2d_vgg_20160317;destsuffix=vgg;name=vgg \
            git://github.com/opencv/opencv_3rdparty.git;branch=contrib_face_alignment_20170818;destsuffix=face;name=face \
            file://0001-3rdparty-ippicv-Use-pre-downloaded-ipp.patch \
-           file://0002-Make-opencv-ts-create-share-library-intead-of-static.patch \
            file://0003-To-fix-errors-as-following.patch \
            file://0001-Temporarliy-work-around-deprecated-ffmpeg-RAW-functi.patch \
            file://0001-Dont-use-isystem.patch \
            file://download.patch \
+           file://0001-Make-ts-module-external.patch \
            "
 PV = "4.3.0"
 

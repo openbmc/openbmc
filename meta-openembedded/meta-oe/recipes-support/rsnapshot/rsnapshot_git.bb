@@ -20,8 +20,8 @@ RDEPENDS_${PN} = "rsync \
                   perl-module-overloading \
                  "
 
-SRCREV = "27209563f924a22f510698ea225f53ea52f07cb4"
-PV = "1.4.2+git${SRCPV}"
+SRCREV = "a9e29850fc33c503c289e245c7bad350eed746d9"
+PV = "1.4.3+git${SRCPV}"
 
 SRC_URI = "git://github.com/DrHyde/${BPN};branch=master;protocol=git \
            file://configure-fix-cmd_rsync.patch \

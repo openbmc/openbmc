@@ -1,5 +1,5 @@
---- xscreensaver-5.39.orig/configure.in
-+++ xscreensaver-5.39/configure.in
+--- xscreensaver-5.44.orig/configure.in	2020-06-16 12:49:55.384675395 +0000
++++ xscreensaver-5.44/configure.in	2020-06-16 12:51:49.451826729 +0000
 @@ -14,6 +14,9 @@
  #
  ###############################################################################
@@ -10,38 +10,9 @@
  AH_TOP([
  /* config.h.in --- xscreensaver, Copyright (c) 1991-2014 Jamie Zawinski.
   *
-@@ -422,12 +425,12 @@
- 
-   OBJCC="$CC"
- 
--  AC_MSG_CHECKING([whether the compiler works on ANSI C])
--  AC_TRY_RUN([ main(int ac, char **av) { return 0; } ],
--     AC_MSG_RESULT(yes),
--     AC_MSG_RESULT(no)
--     AC_MSG_ERROR(Couldn't build even a trivial ANSI C program: check CC.),
--     AC_MSG_ERROR(Couldn't build even a trivial ANSI C program: check CC.))
-+#  AC_MSG_CHECKING([whether the compiler works on ANSI C])
-+#  AC_TRY_RUN([ main(int ac, char **av) { return 0; } ],
-+#     AC_MSG_RESULT(yes),
-+#     AC_MSG_RESULT(no)
-+#     AC_MSG_ERROR(Couldn't build even a trivial ANSI C program: check CC.),
-+#     AC_MSG_ERROR(Couldn't build even a trivial ANSI C program: check CC.))
- 
-   if test -n "$GCC"; then
-     AC_MSG_RESULT(Turning on gcc compiler warnings.)
---- xscreensaver-5.39.orig/Makefile.in
-+++ xscreensaver-5.39/Makefile.in
-@@ -6,7 +6,7 @@
- VPATH		= @srcdir@
- 
- SHELL		= /bin/sh
--SUBDIRS 	= utils jwxyz hacks/images hacks hacks/glx driver po
-+SUBDIRS 	= utils jwxyz hacks/images hacks driver
- SUBDIRS2	= $(SUBDIRS) OSX android
- TARFILES	= README README.hacking README.VMS INSTALL \
- 		  configure configure.in Makefile.in config.h.in \
---- xscreensaver-5.39.orig/driver/Makefile.in
-+++ xscreensaver-5.39/driver/Makefile.in
+diff -Naur xscreensaver-5.44.orig/driver/Makefile.in xscreensaver-5.44/driver/Makefile.in
+--- xscreensaver-5.44.orig/driver/Makefile.in	2020-06-16 12:49:55.388675365 +0000
++++ xscreensaver-5.44/driver/Makefile.in	2020-06-16 12:53:36.331038333 +0000
 @@ -10,7 +10,7 @@
  top_srcdir	= @top_srcdir@
  top_builddir	= ..
@@ -51,7 +22,7 @@
  prefix		= @prefix@
  exec_prefix	= @exec_prefix@
  bindir		= @bindir@
-@@ -221,7 +221,7 @@
+@@ -228,7 +228,7 @@
  SCRIPTS_1	= xscreensaver-getimage-file xscreensaver-getimage-video \
  		  xscreensaver-text
  SCRIPTS_OSX	= xscreensaver-getimage-desktop
@@ -60,8 +31,9 @@
  
  HDRS		= XScreenSaver_ad.h XScreenSaver_Xm_ad.h \
  		  xscreensaver.h prefs.h remote.h exec.h \
---- xscreensaver-5.39.orig/hacks/Makefile.in
-+++ xscreensaver-5.39/hacks/Makefile.in
+diff -Naur xscreensaver-5.44.orig/hacks/Makefile.in xscreensaver-5.44/hacks/Makefile.in
+--- xscreensaver-5.44.orig/hacks/Makefile.in	2020-06-16 12:49:55.532674285 +0000
++++ xscreensaver-5.44/hacks/Makefile.in	2020-06-16 12:58:54.364719996 +0000
 @@ -10,7 +10,7 @@
  top_srcdir	= @top_srcdir@
  top_builddir	= ..
@@ -71,40 +43,40 @@
  prefix		= @prefix@
  exec_prefix	= @exec_prefix@
  bindir		= @bindir@
-@@ -122,7 +122,7 @@
- 		  asm6502.c abstractile.c lcdscrub.c hexadrop.c \
+@@ -124,7 +124,7 @@
  		  tessellimage.c delaunay.c recanim.c binaryring.c \
- 		  webcollage-cocoa.m webcollage-helper-cocoa.m testx11.c
+ 		  glitchpeg.c vfeedback.c scooter.c webcollage-cocoa.m \
+ 		  webcollage-helper-cocoa.m testx11.c
 -SCRIPTS		= vidwhacker webcollage ljlatest
 +#SCRIPTS		= vidwhacker webcollage ljlatest
  
  # Programs that are mentioned in XScreenSaver.ad, and that have XML files,
  # but that are not shipped with xscreensaver itself.
-@@ -163,7 +163,13 @@
- 		  lcdscrub.o hexadrop.o tessellimage.o delaunay.o recanim.o \
- 		  binaryring.o testx11.o
+@@ -166,7 +166,13 @@
+ 		  tessellimage.o delaunay.o recanim.o binaryring.o \
+ 		  glitchpeg.o vfeedback.o scooter.o testx11.o
  
 -EXES		= attraction blitspin bouboule braid decayscreen deco \
-+EXES		= fontglide
-+JPEG_EXES	= webcollage-helper
++EXES           = fontglide
++JPEG_EXES      = webcollage-helper
 +
-+RETIRED_EXES	= ant bubbles critical flag forest hyperball hypercube laser \
-+		  lightning lisa lissie lmorph rotor sphere spiral t3d vines \
-+		  whirlygig worm xsublim juggle testx11 \
-+		  attraction blitspin bouboule braid decayscreen deco \
++RETIRED_EXES   =  ant bubbles critical flag forest hyperball hypercube laser \
++                  lightning lisa lissie lmorph rotor sphere spiral t3d vines \
++                  whirlygig worm xsublim juggle testx11 \
++                  attraction blitspin bouboule braid decayscreen deco \
  		  drift flame galaxy grav greynetic halo \
  		  helix hopalong ifs imsmap julia kaleidescope \
  		  maze moire noseguy pedal \
-@@ -179,17 +185,12 @@
+@@ -182,17 +188,12 @@
  		  speedmine vermiculate twang apollonian euler2d \
  		  polyominoes thornbird  fluidballs anemone halftone \
  		  metaballs eruption popsquares barcode piecewise cloudlife \
--		  fontglide apple2 xanalogtv pong  wormhole \
-+		  apple2 xanalogtv pong  wormhole \
+-		  fontglide apple2 xanalogtv pong filmleader wormhole \
++		  apple2 xanalogtv pong filmleader wormhole \
  		  pacman fuzzyflakes anemotaxis memscroller substrate \
  		  intermomentary fireworkx fiberlamp boxfit interaggregate \
  		  celtic cwaves m6502 abstractile lcdscrub hexadrop \
- 		  tessellimage binaryring \
+ 		  tessellimage binaryring glitchpeg vfeedback scooter \
  		  @JPEG_EXES@
 -JPEG_EXES	= webcollage-helper
 -
@@ -114,3 +86,15 @@
  
  HACK_OBJS_1	= fps.o $(UTILS_BIN)/resources.o $(UTILS_BIN)/visual.o \
  		  $(UTILS_BIN)/usleep.o $(UTILS_BIN)/yarandom.o \
+diff -Naur xscreensaver-5.44.orig/Makefile.in xscreensaver-5.44/Makefile.in
+--- xscreensaver-5.44.orig/Makefile.in	2020-06-16 12:49:55.384675395 +0000
++++ xscreensaver-5.44/Makefile.in	2020-06-16 12:52:49.395383836 +0000
+@@ -6,7 +6,7 @@
+ VPATH		= @srcdir@
+ 
+ SHELL		= /bin/sh
+-SUBDIRS 	= utils jwxyz hacks/images hacks hacks/glx driver po
++SUBDIRS         = utils jwxyz hacks/images hacks driver
+ SUBDIRS2	= $(SUBDIRS) OSX android
+ TARFILES	= README README.hacking README.VMS INSTALL \
+ 		  configure configure.in Makefile.in config.h.in \

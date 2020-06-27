@@ -9,6 +9,7 @@ SRCREV = "cf59527dc24fdd2f314ae4dcaeb3d68a117988f6"
 SRC_URI = "git://github.com/intel/pm-graph.git \
            file://0001-Makefile-fix-multilib-build-failure.patch \
            file://0001-sleepgraph.py-use-python3.patch \
+           file://0001-sleepgraph-add-support-for-RT-kernel-ftrace-flags.patch \
 "
 S = "${WORKDIR}/git"
 

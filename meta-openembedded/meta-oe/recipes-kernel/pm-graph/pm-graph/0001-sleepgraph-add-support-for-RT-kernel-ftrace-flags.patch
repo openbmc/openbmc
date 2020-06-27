@@ -1,0 +1,42 @@
+From 47a1db21f6c5d17c94c58c3fe0dcce35c623dbf4 Mon Sep 17 00:00:00 2001
+From: Liwei Song <liwei.song@windriver.com>
+Date: Tue, 23 Jun 2020 04:47:20 +0000
+Subject: [PATCH] sleepgraph: add support for RT kernel ftrace flags
+
+with PREEMPT_RT enabled in kernel, ftrace have a different
+flags format:
+
+                   _-----=> irqs-off
+                  / _----=> need-resched
+                 | / _----=> need-resched
+                 || / _---=> hardirq/softirq
+                 ||| / _--=> preempt-depth
+                 ||||/     delay
+TASK-PID   CPU#  |||||   TIMESTAMP  FUNCTION
+   | |       |   |||||      |         |
+
+add support for this.
+
+Upstream-Status: Submitted [https://github.com/intel/pm-graph/pull/18]
+
+Signed-off-by: Liwei Song <liwei.song@windriver.com>
+---
+ sleepgraph.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sleepgraph.py b/sleepgraph.py
+index cfed8e09e0e6..561f165cf9be 100755
+--- a/sleepgraph.py
++++ b/sleepgraph.py
+@@ -2689,7 +2689,7 @@ class TestProps:
+ 		'[ +!#\*@$]*(?P<dur>[0-9\.]*) .*\|  (?P<msg>.*)'
+ 	ftrace_line_fmt_nop = \
+ 		' *(?P<proc>.*)-(?P<pid>[0-9]*) *\[(?P<cpu>[0-9]*)\] *'+\
+-		'(?P<flags>.{4}) *(?P<time>[0-9\.]*): *'+\
++		'(?P<flags>.{4,7}) *(?P<time>[0-9\.]*): *'+\
+ 		'(?P<msg>.*)'
+ 	def __init__(self):
+ 		self.stamp = ''
+-- 
+2.24.1
+

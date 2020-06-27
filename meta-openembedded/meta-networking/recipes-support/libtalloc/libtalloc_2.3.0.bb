@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://talloc.h;beginline=3;endline=27;md5=a301712782cad6dd6
                     file://pytalloc.h;beginline=1;endline=18;md5=2c498cc6f2263672483237b20f46b43d"
 
 
-SRC_URI = "https://samba.org/ftp/talloc/talloc-${PV}.tar.gz \
+SRC_URI = "https://www.samba.org/ftp/talloc/talloc-${PV}.tar.gz \
            file://options-2.2.0.patch \
            file://0001-waf-add-support-of-cross_compile.patch \
 "

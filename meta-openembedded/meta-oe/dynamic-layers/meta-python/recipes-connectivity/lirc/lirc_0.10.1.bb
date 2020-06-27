@@ -82,7 +82,7 @@ do_install_append() {
 
 PACKAGES =+ "${PN}-contrib ${PN}-exec ${PN}-plugins ${PN}-python"
 
-RDEPENDS_${PN} = "bash"
+RDEPENDS_${PN} = "bash python3"
 RDEPENDS_${PN}-exec = "${PN}"
 RDEPENDS_${PN}-python = "python3-shell python3-pyyaml python3-datetime python3-netclient python3-stringold"
 

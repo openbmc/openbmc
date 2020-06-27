@@ -1,0 +1,27 @@
+From 93cec0c1d6d0be8dd3a9d01d3e7f2099f1728df7 Mon Sep 17 00:00:00 2001
+From: Orivej Desh <orivej@gmx.fr>
+Date: Fri, 22 May 2020 12:48:02 +0000
+Subject: [PATCH] Fix legacy build after #2103
+
+Upstream-Status: Backport
+Signed-of-by: Alex Kiernan <alex.kiernan@gmail.com>
+---
+ lib/legacy/zstd_v04.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/legacy/zstd_v04.c b/lib/legacy/zstd_v04.c
+index 56bf45222498..19fda8980abf 100644
+--- a/lib/legacy/zstd_v04.c
++++ b/lib/legacy/zstd_v04.c
+@@ -74,7 +74,7 @@ extern "C" {
+ /*-*************************************
+ *  Debug
+ ***************************************/
+-#include "debug.h"
++#include "../common/debug.h"
+ #ifndef assert
+ #  define assert(condition) ((void)0)
+ #endif
+-- 
+2.17.1
+

@@ -24,6 +24,8 @@ inherit pkgconfig
 
 CXXFLAGS_append = " -fpermissive -Wnodeprecated-declarations"
 
+EXTRA_OEMAKE += "INSTALL_LIB=${baselib}"
+
 do_install() {
     export D="${D}"
     oe_runmake install
