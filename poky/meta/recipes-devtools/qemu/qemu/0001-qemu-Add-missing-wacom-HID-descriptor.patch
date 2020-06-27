@@ -1,4 +1,4 @@
-From 526cb7e26f6dd96c9ee2ffa05ce0a358d3bfbfb3 Mon Sep 17 00:00:00 2001
+From 883feb43129dc39b491e492c7ccfe89aefe53c44 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Thu, 27 Nov 2014 14:04:29 +0000
 Subject: [PATCH] qemu: Add missing wacom HID descriptor
@@ -14,6 +14,8 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 Upstream-Status: Submitted
 2014/11/27
 
+[update patch context]
+Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
 ---
  hw/usb/dev-wacom.c | 94 +++++++++++++++++++++++++++++++++++++++++++++-
  1 file changed, 93 insertions(+), 1 deletion(-)
@@ -137,3 +139,6 @@ index 8ed57b3b..1502928b 100644
      case WACOM_SET_REPORT:
          if (s->mouse_grabbed) {
              qemu_remove_mouse_event_handler(s->eh_entry);
+-- 
+2.24.0
+

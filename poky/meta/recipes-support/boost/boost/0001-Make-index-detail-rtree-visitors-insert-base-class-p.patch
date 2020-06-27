@@ -1,0 +1,30 @@
+From aafbceccc76dccb75963dd4f596fd1f10ee34b03 Mon Sep 17 00:00:00 2001
+From: Jonathan Wakely <boost@kayari.org>
+Date: Fri, 5 Jun 2020 19:29:27 +0100
+Subject: [PATCH] Make index::detail::rtree::visitors::insert base class public
+
+Fixes #721
+
+Upstream-Status: Backport [https://github.com/boostorg/geometry/commit/aafbceccc76dccb75963dd4f596fd1f10ee34b03]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ boost/geometry/index/detail/rtree/visitors/insert.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/boost/geometry/index/detail/rtree/visitors/insert.hpp b/boost/geometry/index/detail/rtree/visitors/insert.hpp
+index 2d324cb7f..5709a930c 100644
+--- a/boost/geometry/index/detail/rtree/visitors/insert.hpp
++++ b/boost/geometry/index/detail/rtree/visitors/insert.hpp
+@@ -265,7 +265,7 @@ struct insert_traverse_data
+ // Default insert visitor
+ template <typename Element, typename MembersHolder>
+ class insert
+-    : MembersHolder::visitor
++    : public MembersHolder::visitor
+ {
+ protected:
+     typedef typename MembersHolder::box_type box_type;
+-- 
+2.26.2
+

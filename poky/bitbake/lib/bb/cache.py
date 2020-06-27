@@ -26,7 +26,7 @@ import re
 
 logger = logging.getLogger("BitBake.Cache")
 
-__cache_version__ = "152"
+__cache_version__ = "153"
 
 def getCacheFile(path, filename, mc, data_hash):
     mcspec = ''
@@ -727,7 +727,7 @@ class Cache(NoCache):
         if self.mc is not None:
             (fn, cls, mc) = virtualfn2realfn(filename)
             if mc:
-                self.logger.error("Unexpected multiconfig %s", virtualfn)
+                self.logger.error("Unexpected multiconfig %s", filename)
                 return
 
             vfn = realfn2virtual(fn, cls, self.mc)

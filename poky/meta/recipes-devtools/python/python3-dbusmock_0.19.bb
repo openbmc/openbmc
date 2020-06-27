@@ -12,5 +12,6 @@ inherit pypi setuptools3
 RDEPENDS_${PN} += "\
     ${PYTHON_PN}-dbus \
     ${PYTHON_PN}-pygobject \
+    ${PYTHON_PN}-unittest \
     ${PYTHON_PN}-xml \
     "

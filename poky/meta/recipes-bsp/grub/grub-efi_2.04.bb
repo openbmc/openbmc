@@ -4,8 +4,8 @@ require conf/image-uefi.conf
 
 GRUBPLATFORM = "efi"
 
-DEPENDS_append_class-target = " grub-efi-native"
-RDEPENDS_${PN}_class-target = "grub-common virtual/grub-bootconf"
+DEPENDS_append = " grub-native"
+RDEPENDS_${PN} = "grub-common virtual/grub-bootconf"
 
 SRC_URI += " \
            file://cfg \
@@ -51,22 +51,7 @@ do_mkimage() {
 
 addtask mkimage before do_install after do_compile
 
-do_mkimage_class-native() {
-	:
-}
-
-do_install_append_class-target() {
-	install -d ${D}${EFI_FILES_PATH}
-	install -m 644 ${B}/${GRUB_IMAGE_PREFIX}${GRUB_IMAGE} ${D}${EFI_FILES_PATH}/${GRUB_IMAGE}
-}
-
-do_install_class-native() {
-	install -d ${D}${bindir}
-	install -m 755 grub-mkimage ${D}${bindir}
-	install -m 755 grub-editenv ${D}${bindir}
-}
-
-do_install_class-target() {
+do_install() {
     oe_runmake 'DESTDIR=${D}' -C grub-core install
 
     # Remove build host references...
@@ -76,6 +61,9 @@ do_install_class-target() {
         -e 's|${DEBUG_PREFIX_MAP}||g' \
         -e 's:${RECIPE_SYSROOT_NATIVE}::g' \
         {} +
+
+    install -d ${D}${EFI_FILES_PATH}
+    install -m 644 ${B}/${GRUB_IMAGE_PREFIX}${GRUB_IMAGE} ${D}${EFI_FILES_PATH}/${GRUB_IMAGE}
 }
 
 do_install_append_aarch64() {
@@ -87,10 +75,6 @@ GRUB_BUILDIN ?= "boot linux ext2 fat serial part_msdos part_gpt normal \
 
 do_deploy() {
 	install -m 644 ${B}/${GRUB_IMAGE_PREFIX}${GRUB_IMAGE} ${DEPLOYDIR}
-}
-
-do_deploy_class-native() {
-	:
 }
 
 addtask deploy after do_install before do_build

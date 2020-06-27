@@ -387,10 +387,13 @@ class CookerDataBuilder(object):
                     invalid.append(entry)
                     continue
                 l, f = parts
-                if l in collections:
+                invert = l[0] == "!"
+                if invert:
+                    l = l[1:]
+                if (l in collections and not invert) or (l not in collections and invert):
                     data.appendVar("BBFILES", " " + f)
             if invalid:
-                bb.fatal("BBFILES_DYNAMIC entries must be of the form <collection name>:<filename pattern>, not:\n    %s" % "\n    ".join(invalid))
+                bb.fatal("BBFILES_DYNAMIC entries must be of the form {!}<collection name>:<filename pattern>, not:\n    %s" % "\n    ".join(invalid))
 
             layerseries = set((data.getVar("LAYERSERIES_CORENAMES") or "").split())
             collections_tmp = collections[:]

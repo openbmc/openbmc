@@ -2,7 +2,7 @@ SUMMARY = "C Library for manipulating module metadata files"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=25a3927bff3ee4f5b21bcb0ed3fcd6bb"
 
-SRC_URI = "git://github.com/fedora-modularity/libmodulemd;protocol=https \
+SRC_URI = "git://github.com/fedora-modularity/libmodulemd;protocol=https;branch=main \
            file://0001-modulemd-generate-the-manpage-only-if-the-feature-is.patch \
            "
 

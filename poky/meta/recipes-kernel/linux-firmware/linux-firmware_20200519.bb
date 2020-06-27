@@ -26,6 +26,7 @@ LICENSE = "\
     & Firmware-i2400m \
     & Firmware-i915 \
     & Firmware-ibt_firmware \
+    & Firmware-ice \
     & Firmware-it913x \
     & Firmware-iwlwifi_firmware \
     & Firmware-IntcSST2 \
@@ -155,6 +156,7 @@ NO_GENERIC_LICENSE[Firmware-hfi1_firmware] = "LICENSE.hfi1_firmware"
 NO_GENERIC_LICENSE[Firmware-i2400m] = "LICENCE.i2400m"
 NO_GENERIC_LICENSE[Firmware-i915] = "LICENSE.i915"
 NO_GENERIC_LICENSE[Firmware-ibt_firmware] = "LICENCE.ibt_firmware"
+NO_GENERIC_LICENSE[Firmware-ice] = "LICENSE.ice"
 NO_GENERIC_LICENSE[Firmware-IntcSST2] = "LICENCE.IntcSST2"
 NO_GENERIC_LICENSE[Firmware-it913x] = "LICENCE.it913x"
 NO_GENERIC_LICENSE[Firmware-iwlwifi_firmware] = "LICENCE.iwlwifi_firmware"
@@ -280,6 +282,7 @@ PACKAGES =+ "${PN}-ralink-license ${PN}-ralink \
              ${PN}-ibt-11-5 ${PN}-ibt-12-16 ${PN}-ibt-hw-37-7 ${PN}-ibt-hw-37-8 \
              ${PN}-ibt-17 \
              ${PN}-i915-license ${PN}-i915 \
+             ${PN}-ice-license ${PN}-ice \
              ${PN}-adsp-sst-license ${PN}-adsp-sst \
              ${PN}-bnx2-mips \
              ${PN}-liquidio \
@@ -827,6 +830,12 @@ LICENSE_${PN}-i915-license = "Firmware-i915"
 FILES_${PN}-i915-license = "${nonarch_base_libdir}/firmware/LICENSE.i915"
 FILES_${PN}-i915         = "${nonarch_base_libdir}/firmware/i915"
 RDEPENDS_${PN}-i915      = "${PN}-i915-license"
+
+LICENSE_${PN}-ice       = "Firmware-ice"
+LICENSE_${PN}-ice-license = "Firmware-ice"
+FILES_${PN}-ice-license = "${nonarch_base_libdir}/firmware/LICENSE.ice"
+FILES_${PN}-ice         = "${nonarch_base_libdir}/firmware/intel/ice"
+RDEPENDS_${PN}-ice      = "${PN}-ice-license"
 
 FILES_${PN}-adsp-sst-license      = "${nonarch_base_libdir}/firmware/LICENCE.adsp_sst"
 LICENSE_${PN}-adsp-sst            = "Firmware-adsp_sst"

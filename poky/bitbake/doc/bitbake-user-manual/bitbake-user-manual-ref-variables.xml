@@ -1124,6 +1124,67 @@
             </glossdef>
         </glossentry>
 
+        <glossentry id='var-BBFILES_DYNAMIC'><glossterm>BBFILES_DYNAMIC</glossterm>
+            <info>
+                BBFILES_DYNAMIC[doc] = "Activates content depending on presence of identified layers."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+                    Activates content depending on presence of identified layers.
+                    You identify the layers by the collections that the layers
+                    define.
+                </para>
+
+                <para>
+                    Use the <filename>BBFILES_DYNAMIC</filename> variable to
+                    avoid <filename>.bbappend</filename> files whose
+                    corresponding <filename>.bb</filename> file is in a layer
+                    that attempts to modify other layers through
+                    <filename>.bbappend</filename> but does not want to
+                    introduce a hard dependency on those other layers.
+                </para>
+
+                <para>
+                    Additionally you can prefix the rule with "!" to add 
+                    <filename>.bbappend</filename> and <filename>.bb</filename> files
+                    in case a layer is not present.
+                    Use this avoid hard dependency on those other layers.
+                </para>
+
+                <para>
+                    Use the following form for
+                    <filename>BBFILES_DYNAMIC</filename>:
+                    <literallayout class='monospaced'>
+                        <replaceable>collection_name</replaceable>:<replaceable>filename_pattern</replaceable>
+                    </literallayout>
+                    The following example identifies two collection names and
+                    two filename patterns:
+                    <literallayout class='monospaced'>
+                        BBFILES_DYNAMIC += "\
+                            clang-layer:${LAYERDIR}/bbappends/meta-clang/*/*/*.bbappend \
+                            core:${LAYERDIR}/bbappends/openembedded-core/meta/*/*/*.bbappend \
+                        "
+                    </literallayout>
+                    When the collection name is prefixed with "!" it will add the file pattern in case
+                    the layer is absent:
+                    <literallayout class='monospaced'>
+                        BBFILES_DYNAMIC += "\
+                            !clang-layer:${LAYERDIR}/backfill/meta-clang/*/*/*.bb \
+                        "
+                    </literallayout>
+                    
+                    This next example shows an error message that occurs
+                    because invalid entries are found, which cause parsing to
+                    abort:
+                    <literallayout class='monospaced'>
+                    ERROR: BBFILES_DYNAMIC entries must be of the form {!}&lt;collection name&gt;:&lt;filename pattern&gt;, not:
+                        /work/my-layer/bbappends/meta-security-isafw/*/*/*.bbappend
+                        /work/my-layer/bbappends/openembedded-core/meta/*/*/*.bbappend
+                    </literallayout>
+                </para>
+            </glossdef>
+        </glossentry>
+
         <glossentry id='var-bb-BBINCLUDED'><glossterm>BBINCLUDED</glossterm>
             <glossdef>
                 <para>

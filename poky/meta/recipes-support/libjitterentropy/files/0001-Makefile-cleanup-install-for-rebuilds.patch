@@ -10,7 +10,7 @@ Provide the ability to override the stripping of the shared lib for
 cases where a embedded target build may want to control stripping
 or provide cross arch tools.
 
-Upstream-Status: Accepted [060b9b4147f6e5ff386a8b017796118d783e59fa]
+Upstream-Status: Backport [060b9b4147f6e5ff386a8b017796118d783e59fa]
 Signed-off-by: Matthew Weber <matthew.weber@rockwellcollins.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>

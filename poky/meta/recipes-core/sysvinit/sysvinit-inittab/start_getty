@@ -11,7 +11,7 @@
 active_serial=$(grep "serial" /proc/tty/drivers | cut -d/ -f1 | sed "s/ *$//")
 
 # Rephrase input parameter from ttyS target index (ttyS1, ttyS2, ttyAMA0, etc).
-runtime_tty=$(echo $2 | grep -oh '[0-9]')
+runtime_tty=$(echo $2 | grep -oh '[0-9]\+')
 
 # busybox' getty does this itself, util-linux' agetty needs extra help
 getty="/sbin/getty"
@@ -36,7 +36,7 @@ for line in $active_serial; do
         then
 		# Remove all unknown entries and discard the first line (desc).
 		activetty=$(grep -v "unknown" "/proc/tty/driver/$line" \
-			    | tail -n +2 | grep -oh "^\s*\S*[0-9]")
+			    | tail -n +2 | grep -oh "^\s*\S*[0-9]\+")
 		for active in $activetty; do
 			# If indexes do match then enable the serial console.
 			if [ $active -eq $runtime_tty ]

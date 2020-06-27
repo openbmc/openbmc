@@ -16,5 +16,7 @@ SRC_URI = "${DEBIAN_MIRROR}/main/d/${BPN}/${BPN}_${PV}.tar.xz \
            file://0001-Add-support-for-riscv32-CPU.patch \
            "
 
+SRC_URI_append_class-native = " file://0001-build.c-ignore-return-of-1-from-tar-cf.patch"
+
 SRC_URI[md5sum] = "f88f077236a3ff3decae3b25c989893d"
 SRC_URI[sha256sum] = "b633cc2b0e030efb61e11029d8a3fb1123f719864c9992da2e52b471c96d0900"

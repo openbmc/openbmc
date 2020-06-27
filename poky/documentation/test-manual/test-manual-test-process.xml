@@ -1,0 +1,110 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+<!--SPDX-License-Identifier: CC-BY-2.0-UK-->
+
+<chapter id='test-manual-test-process'>
+
+<title>Project Testing and Release Process</title>
+    <section id='test-daily-devel'>
+        <title>Day to Day Development</title>
+
+        <para>This section details how the project tests changes, through automation on the
+            Autobuilder or with the assistance of QA teams, through to making releases.</para>
+
+        <para>The project aims to test changes against our test matrix before those changes are
+            merged into the master branch. As such, changes are queued up in batches either in the
+                <filename>master-next</filename> branch in the main trees, or in user trees such as
+                <filename>ross/mut</filename> in <filename>poky-contrib</filename> (Ross Burton
+            helps review and test patches and this is his testing tree).</para>
+        <para>We have two broad categories of test builds, including "full" and "quick". On the
+            Autobuilder, these can be seen as "a-quick" and "a-full", simply for ease of sorting in
+            the UI. Use our Autobuilder console view to see where me manage most test-related items,
+            available at: <link linkend=""
+                >https://autobuilder.yoctoproject.org/typhoon/#/console</link>.</para>
+        <para>Builds are triggered manually when the test branches are ready. The builds are
+            monitored by the SWAT team. For additional information, see <link linkend=""
+                >https://wiki.yoctoproject.org/wiki/Yocto_Build_Failure_Swat_Team</link>. If
+            successful, the changes would usually be merged to the <filename>master</filename>
+            branch. If not successful, someone would respond to the changes on the mailing list
+            explaining that there was a failure in testing. The choice of quick or full would depend
+            on the type of changes and the speed with which the result was required.</para>
+        <para>The Autobuilder does build the <filename>master</filename> branch once daily for
+            several reasons, in particular, to ensure the current <filename>master</filename> branch
+            does build, but also to keep <filename>yocto-testresults</filename> (<link linkend=""
+                >http://git.yoctoproject.org/cgit.cgi/yocto-testresults/</link>), buildhistory
+                (<link linkend="">http://git.yoctoproject.org/cgit.cgi/poky-buildhistory/</link>),
+            and our sstate up to date. On the weekend, there is a master-next build instead to
+            ensure the test results are updated for the less frequently run targets.</para>
+        <para>Performance builds (buildperf-* targets in the console) are triggered separately every
+            six hours and automatically push their results to the buildstats repository at: <link
+                linkend="">http://git.yoctoproject.org/cgit.cgi/yocto-buildstats/</link>. </para>
+        <para>The 'quick' targets have been selected to be the ones which catch the most failures or
+            give the most valuable data. We run 'fast' ptests in this case for example but not the
+            ones which take a long time. The quick target doesn't include *-lsb builds for all
+            architectures, some world builds and doesn't trigger performance tests or ltp testing.
+            The full build includes all these things and is slower but more comprehensive.</para>
+    </section>
+
+    <section id='test-yocto-project-autobuilder-overview'>
+        <title>Release Builds</title>
+
+        <para>The project typically has two major releases a year with a six month cadence in April
+            and October. Between these there would be a number of milestone releases (usually four)
+            with the final one being stablization only along with point releases of our stable
+            branches.</para>
+        <para>The build and release process for these project releases is similar to that in <link
+                linkend="test-daily-devel">Day to Day Development</link>, in that the a-full target
+            of the Autobuilder is used but in addition the form is configured to generate and
+            publish artefacts and the milestone number, version, release candidate number and other
+            information is entered. The box to "generate an email to QA"is also checked.</para>
+        <para>When the build completes, an email is sent out using the send-qa-email script in the
+                <filename>yocto-autobuilder-helper</filename> repository to the list of people
+            configured for that release. Release builds are placed into a directory in <link
+                linkend="">https://autobuilder.yocto.io/pub/releases</link> on the Autobuilder which
+            is included in the email. The process from here is more manual and control is
+            effectively passed to release engineering. The next steps include:<itemizedlist>
+                <listitem>
+                    <para>QA teams respond to the email saying which tests they plan to run and when
+                        the results will be available.</para>
+                </listitem>
+                <listitem>
+                    <para>QA teams run their tests and share their results in the yocto-
+                        testresults-contrib repository, along with a summary of their findings.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>Release engineering prepare the release as per their process. </para>
+                </listitem>
+                <listitem>
+                    <para>Test results from the QA teams are included into the release in separate
+                        directories and also uploaded to the yocto-testresults repository alongside
+                        the other test results for the given revision.</para>
+                </listitem>
+                <listitem>
+                    <para>The QA report in the final release is regenerated using resulttool to
+                        include the new test results and the test summaries from the teams (as
+                        headers to the generated report).</para>
+                </listitem>
+                <listitem>
+                    <para>The release is checked against the release checklist and release readiness
+                        criteria.</para>
+                </listitem>
+                <listitem>
+                    <para>A final decision on whether to release is made by the YP TSC who have
+                        final oversight on release readiness.</para>
+                </listitem>
+            </itemizedlist></para>
+    </section>
+
+
+
+
+
+
+
+
+</chapter>
+<!--
+vim: expandtab tw=80 ts=4
+-->

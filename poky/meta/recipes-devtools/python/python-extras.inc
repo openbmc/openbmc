@@ -1,5 +1,5 @@
 SUMMARY = "Useful extra bits for Python - things that should be in the standard library"
-HOMEPAGE = "https://pypi.python.org/pypi/extras/"
+HOMEPAGE = "https://pypi.org/project/extras/"
 SECTION = "devel/python"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=6d108f338b2f68fe48ac366c4650bd8b"

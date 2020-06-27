@@ -140,32 +140,10 @@ ALLPREQ = html tarball
 # This would be appropriate for "master" branch.
 #
 
-	ifeq ($(BRANCH),edison)
-TARFILES = dev-style.css dev-manual.html \
-           figures/app-dev-flow.png figures/bsp-dev-flow.png \
-           figures/dev-title.png figures/git-workflow.png \
-           figures/index-downloads.png figures/kernel-dev-flow.png \
-           figures/kernel-example-repos-edison.png \
-           figures/kernel-overview-1.png figures/kernel-overview-2.png \
-           figures/kernel-overview-3-edison.png \
-           figures/source-repos.png figures/yp-download.png \
-           figures/wip.png
-	else ifeq ($(BRANCH),denzil)
-TARFILES = dev-style.css dev-manual.html \
-           figures/app-dev-flow.png figures/bsp-dev-flow.png \
-           figures/dev-title.png figures/git-workflow.png \
-           figures/index-downloads.png figures/kernel-dev-flow.png \
-           figures/kernel-example-repos-denzil.png \
-           figures/kernel-overview-1.png figures/kernel-overview-2.png \
-           figures/kernel-overview-3-denzil.png \
-           figures/source-repos.png figures/yp-download.png \
-           figures/wip.png
-        else
 TARFILES = dev-style.css dev-manual.html figures/buildhistory-web.png \
            figures/dev-title.png figures/buildhistory.png \
            figures/recipe-workflow.png figures/bitbake-build-flow.png \
            figures/multiconfig_files.png figures/cute-files-npm-example.png
-	endif
 
 MANUALS = $(DOC)/$(DOC).html
 FIGURES = figures
@@ -181,37 +159,6 @@ XSLTOPTS = --stringparam html.stylesheet mega-style.css \
            --xinclude
 ALLPREQ = html tarball
 
-	ifeq ($(BRANCH),edison)
-TARFILES = mega-manual.html mega-style.css figures/yocto-environment.png \
-        figures/building-an-image.png  \
-	figures/using-a-pre-built-image.png \
-	figures/poky-title.png \
-	figures/adt-title.png figures/bsp-title.png \
-	figures/kernel-title.png figures/kernel-architecture-overview.png \
-	figures/app-dev-flow.png figures/bsp-dev-flow.png \
-        figures/dev-title.png figures/git-workflow.png \
-        figures/index-downloads.png figures/kernel-dev-flow.png \
-	figures/kernel-example-repos-edison.png \
-	figures/kernel-overview-1.png figures/kernel-overview-2.png \
-	figures/kernel-overview-3-edison.png \
-	figures/source-repos.png figures/yp-download.png \
-	figures/wip.png
-	else ifeq ($(BRANCH),denzil)
-TARFILES = mega-manual.html mega-style.css figures/yocto-environment.png \
-        figures/building-an-image.png  \
-	figures/using-a-pre-built-image.png \
-	figures/poky-title.png \
-	figures/adt-title.png figures/bsp-title.png \
-	figures/kernel-title.png figures/kernel-architecture-overview.png \
-	figures/app-dev-flow.png figures/bsp-dev-flow.png \
-        figures/dev-title.png figures/git-workflow.png \
-        figures/index-downloads.png figures/kernel-dev-flow.png \
-	figures/kernel-example-repos-denzil.png \
-	figures/kernel-overview-1.png figures/kernel-overview-2.png \
-	figures/kernel-overview-3-denzil.png \
-	figures/source-repos.png figures/yp-download.png \
-	figures/wip.png
-        else
 TARFILES = mega-manual.html mega-style.css \
         figures/YP-flow-diagram.png \
 	figures/using-a-pre-built-image.png \
@@ -269,7 +216,6 @@ TARFILES = mega-manual.html mega-style.css \
 	figures/sdk-devtool-upgrade-flow.png figures/bitbake-build-flow.png figures/bypqs-title.png \
 	figures/overview-manual-title.png figures/sdk-autotools-flow.png figures/sdk-makefile-flow.png \
 	figures/bb_multiconfig_files.png figures/bitbake-title.png figures/cute-files-npm-example.png
-	endif
 
 MANUALS = $(DOC)/$(DOC).html
 FIGURES = figures
@@ -357,6 +303,16 @@ FIGURES = figures
 STYLESHEET = $(DOC)/*.css
 endif
 
+
+ifeq ($(DOC),test-manual)
+XSLTOPTS = --xinclude
+ALLPREQ = html tarball
+TARFILES = test-manual.html test-manual-style.css \
+	   figures/test-manual-title.png figures/ab-test-cluster.png
+MANUALS = $(DOC)/$(DOC).html
+FIGURES = figures
+STYLESHEET = $(DOC)/*.css
+endif
 
 ##
 # These URI should be rewritten by your distribution's xml catalog to

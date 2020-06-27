@@ -736,6 +736,10 @@
                 The fetcher's temporary working directory is set by
                 <link linkend='var-bb-P4DIR'><filename>P4DIR</filename></link>,
                 which defaults to "DL_DIR/p4".
+                The fetcher does not make use of a perforce client, instead it
+                relies on <filename>p4 files</filename> to retrieve a list of
+                files and <filename>p4 print</filename> to transfer the content
+                of those files locally.
             </para>
 
             <para>
@@ -782,6 +786,62 @@
                     You should always set <filename>S</filename>
                     to <filename>"${WORKDIR}/p4"</filename> in your recipe.
                 </note>
+            </para>
+
+            <para>
+                By default, the fetcher strips the depot location from the
+                local file paths. In the above example, the content of
+                <filename>example-depot/main/source/</filename>
+                will be placed in <filename>${WORKDIR}/p4</filename>.
+                For situations where preserving parts of the remote depot paths
+                locally is desirable, the fetcher supports two parameters:
+
+                <itemizedlist>
+                    <listitem><para>
+                        <emphasis>"module":</emphasis>
+                        The top-level depot location or directory to fetch. The
+                        value of this parameter can also point to a single file
+                        within the depot, in which case the local file path will
+                        include the module path.
+                    </para></listitem>
+                    <listitem><para>
+                        <emphasis>"remotepath":</emphasis>
+                        When used with the value "<filename>keep</filename>",
+                        the fetcher will mirror the full depot paths locally
+                        for the specified location, even in combination with
+                        the <filename>module</filename> parameter.
+                    </para></listitem>
+                </itemizedlist>
+            </para>
+
+            <para>
+                Here is an example use of the the <filename>module</filename>
+                parameter:
+
+                <literallayout class='monospaced'>
+    SRC_URI = "p4://user:passwd@example-depot/main;module=source/..."
+                </literallayout>
+
+                In this case, the content of the top-level directory
+                <filename>source/</filename>  will be fetched to
+                <filename>${P4DIR}</filename>, including the directory itself.
+                The top-level directory will be accesible at
+                <filename>${P4DIR}/source/</filename>.
+            </para>
+
+            <para>
+                Here is an example use of the the <filename>remotepath</filename>
+                parameter:
+
+                <literallayout class='monospaced'>
+    SRC_URI = "p4://user:passwd@example-depot/main;module=source/...;remotepath=keep"
+                </literallayout>
+
+                In this case, the content of the top-level directory
+                <filename>source/</filename>  will be fetched to
+                <filename>${P4DIR}</filename>, but the complete depot paths will
+                be mirrored locally. The top-level directory will be accessible
+                at <filename>${P4DIR}/example-depot/main/source/</filename>.
             </para>
         </section>
 

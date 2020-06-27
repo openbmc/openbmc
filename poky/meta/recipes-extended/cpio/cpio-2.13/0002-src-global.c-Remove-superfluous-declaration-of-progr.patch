@@ -3,7 +3,7 @@ From: Sergey Poznyakoff <gray@gnu.org>
 Date: Mon, 20 Jan 2020 07:45:39 +0200
 Subject: [PATCH] src/global.c: Remove superfluous declaration of program_name
 
-Upstream-Status: Accepted (commit 641d3f4)
+Upstream-Status: Backport (commit 641d3f4)
 Signed-off-by: Richard Leitner <richard.leitner@skidata.com>
 ---
  src/global.c | 3 ---

@@ -8,7 +8,7 @@ Subject: [PATCH] binutils: drop redundant 'program_name' definition
 	* srconv.c (program_name): Likewise
 	* sysdump.c (program_name): Likewise
 
-Upstream-Status: Accepted (commit 0b398d69ac)
+Upstream-Status: Backport (commit 0b398d69ac)
 Signed-off-by: Sergei Trofimovich <siarheit@google.com>
 Signed-off-by: Richard Leitner <richard.leitner@skidata.com>
 ---

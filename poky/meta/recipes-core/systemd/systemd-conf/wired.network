@@ -6,5 +6,6 @@ KernelCommandLine=!nfsroot
 DHCP=yes
 
 [DHCP]
+UseMTU=yes
 RouteMetric=10
 ClientIdentifier=mac

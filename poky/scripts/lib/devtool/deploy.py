@@ -330,7 +330,7 @@ def register_commands(subparsers, context):
     parser_deploy.add_argument('-e', '--ssh-exec', help='Executable to use in place of ssh')
     parser_deploy.add_argument('-P', '--port', help='Specify port to use for connection to the target')
     parser_deploy.add_argument('-I', '--key',
-                               help='Specifiy ssh private key for connection to the target')
+                               help='Specify ssh private key for connection to the target')
 
     strip_opts = parser_deploy.add_mutually_exclusive_group(required=False)
     strip_opts.add_argument('-S', '--strip',
@@ -355,6 +355,6 @@ def register_commands(subparsers, context):
     parser_undeploy.add_argument('-e', '--ssh-exec', help='Executable to use in place of ssh')
     parser_undeploy.add_argument('-P', '--port', help='Specify port to use for connection to the target')
     parser_undeploy.add_argument('-I', '--key',
-                               help='Specifiy ssh private key for connection to the target')
+                               help='Specify ssh private key for connection to the target')
 
     parser_undeploy.set_defaults(func=undeploy)

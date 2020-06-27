@@ -143,12 +143,43 @@ class GitSM(Git):
         try:
             # Check for the nugget dropped by the download operation
             known_srcrevs = runfetchcmd("%s config --get-all bitbake.srcrev" % \
-                            (ud.basecmd), d, workdir=ud.clonedir)
+                                        (ud.basecmd), d, workdir=ud.clonedir)
 
-            if ud.revisions[ud.names[0]] not in known_srcrevs.split():
-                return True
+            if ud.revisions[ud.names[0]] in known_srcrevs.split():
+                return False
         except bb.fetch2.FetchError:
-            # No srcrev nuggets, so this is new and needs to be updated
+            pass
+
+        need_update_list = []
+        def need_update_submodule(ud, url, module, modpath, workdir, d):
+            url += ";bareclone=1;nobranch=1"
+
+            try:
+                newfetch = Fetch([url], d, cache=False)
+                new_ud = newfetch.ud[url]
+                if new_ud.method.need_update(new_ud, d):
+                    need_update_list.append(modpath)
+            except Exception as e:
+                logger.error('gitsm: submodule update check failed: %s %s' % (type(e).__name__, str(e)))
+                need_update_result = True
+
+        # If we're using a shallow mirror tarball it needs to be unpacked
+        # temporarily so that we can examine the .gitmodules file
+        if ud.shallow and os.path.exists(ud.fullshallow) and not os.path.exists(ud.clonedir):
+            tmpdir = tempfile.mkdtemp(dir=d.getVar("DL_DIR"))
+            runfetchcmd("tar -xzf %s" % ud.fullshallow, d, workdir=tmpdir)
+            self.process_submodules(ud, tmpdir, need_update_submodule, d)
+            shutil.rmtree(tmpdir)
+        else:
+            self.process_submodules(ud, ud.clonedir, need_update_submodule, d)
+            if len(need_update_list) == 0:
+                # We already have the required commits of all submodules. Drop
+                # a nugget so we don't need to check again.
+                runfetchcmd("%s config --add bitbake.srcrev %s" % \
+                            (ud.basecmd, ud.revisions[ud.names[0]]), d, workdir=ud.clonedir)
+
+        if len(need_update_list) > 0:
+            logger.debug(1, 'gitsm: Submodules requiring update: %s' % (' '.join(need_update_list)))
             return True
 
         return False
@@ -163,9 +194,6 @@ class GitSM(Git):
             try:
                 newfetch = Fetch([url], d, cache=False)
                 newfetch.download()
-                # Drop a nugget to add each of the srcrevs we've fetched (used by need_update)
-                runfetchcmd("%s config --add bitbake.srcrev %s" % \
-                            (ud.basecmd, ud.revisions[ud.names[0]]), d, workdir=workdir)
             except Exception as e:
                 logger.error('gitsm: submodule download failed: %s %s' % (type(e).__name__, str(e)))
                 raise
@@ -181,6 +209,9 @@ class GitSM(Git):
             shutil.rmtree(tmpdir)
         else:
             self.process_submodules(ud, ud.clonedir, download_submodule, d)
+            # Drop a nugget for the srcrev we've fetched (used by need_update)
+            runfetchcmd("%s config --add bitbake.srcrev %s" % \
+                        (ud.basecmd, ud.revisions[ud.names[0]]), d, workdir=ud.clonedir)
 
     def unpack(self, ud, destdir, d):
         def unpack_submodules(ud, url, module, modpath, workdir, d):

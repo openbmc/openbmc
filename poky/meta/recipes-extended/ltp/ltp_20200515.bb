@@ -36,6 +36,7 @@ SRC_URI = "git://github.com/linux-test-project/ltp.git \
            file://0001-Add-more-musl-exclusions.patch \
            file://0001-ptrace01-Fix-missing-format-string.patch \
            file://0001-sigwaitinfo-Do-not-run-invalid-undefined-test-cases.patch \
+           file://0001-syscalls-copy_file_range02-Expect-EFBIG-in-subcase-m.patch \
            "
 
 S = "${WORKDIR}/git"

@@ -2,8 +2,11 @@ require grub2.inc
 
 RDEPENDS_${PN}-common += "${PN}-editenv"
 RDEPENDS_${PN} += "${PN}-common"
+RDEPENDS_${PN}_class-native = ""
 
 RPROVIDES_${PN}-editenv += "${PN}-efi-editenv"
+
+PROVIDES_append_class-native = " grub-efi-native"
 
 PACKAGES =+ "${PN}-editenv ${PN}-common"
 FILES_${PN}-editenv = "${bindir}/grub-editenv"
@@ -31,3 +34,5 @@ do_install_append () {
 
 INSANE_SKIP_${PN} = "arch"
 INSANE_SKIP_${PN}-dbg = "arch"
+
+BBCLASSEXTEND = "native"

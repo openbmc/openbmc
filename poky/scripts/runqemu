@@ -461,27 +461,27 @@ class BaseConfig(object):
             elif arg == 'sdl':
                 if 'gl' in sys.argv[1:]:
                     self.set_dri_path()
-                    self.qemu_opt_script += ' -vga virtio -display sdl,gl=on'
+                    self.qemu_opt_script += ' -vga virtio -display sdl,gl=on,show-cursor=on'
                 elif 'gl-es' in sys.argv[1:]:
                     self.set_dri_path()
-                    self.qemu_opt_script += ' -vga virtio -display sdl,gl=es'
+                    self.qemu_opt_script += ' -vga virtio -display sdl,gl=es,show-cursor=on'
                 else:
-                    self.qemu_opt_script += ' -display sdl'
+                    self.qemu_opt_script += ' -display sdl,show-cursor=on'
             elif arg == 'gtk':
                 if 'gl' in sys.argv[1:]:
                     self.set_dri_path()
-                    self.qemu_opt_script += ' -vga virtio -display gtk,gl=on'
+                    self.qemu_opt_script += ' -vga virtio -display gtk,gl=on,show-cursor=on'
                 elif 'gl-es' in sys.argv[1:]:
                     self.set_dri_path()
-                    self.qemu_opt_script += ' -vga virtio -display gtk,gl=es'
+                    self.qemu_opt_script += ' -vga virtio -display gtk,gl=es,show-cursor=on'
                 else:
-                    self.qemu_opt_script += ' -display gtk'
+                    self.qemu_opt_script += ' -display gtk,show-cursor=on'
             elif arg == 'gl' or arg == 'gl-es':
                 # These args are handled inside sdl or gtk blocks above
                 pass
             elif arg == 'egl-headless':
                 self.set_dri_path()
-                self.qemu_opt_script += ' -vga virtio -display egl-headless'
+                self.qemu_opt_script += ' -vga virtio -display egl-headless,show-cursor=on'
             elif arg == 'serial':
                 self.kernel_cmdline_script += ' console=ttyS0'
                 self.serialconsole = True

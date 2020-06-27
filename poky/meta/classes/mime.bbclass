@@ -24,7 +24,18 @@ if [ "x$D" != "x" ]; then
 		mimedir=${MIMEDIR}
 else
 	echo "Updating MIME database... this may take a while."
-	update-mime-database $D${MIMEDIR}
+	# $D${MIMEDIR}/packages belong to package shared-mime-info-data,
+	# packages like libfm-mime depend on shared-mime-info-data.
+	# after shared-mime-info-data uninstalled, $D${MIMEDIR}/packages
+	# is removed, but update-mime-database need this dir to update
+	# database, workaround to create one and remove it later
+	if [ ! -d $D${MIMEDIR}/packages ]; then
+		mkdir -p $D${MIMEDIR}/packages
+		update-mime-database $D${MIMEDIR}
+		rmdir --ignore-fail-on-non-empty $D${MIMEDIR}/packages
+	else
+		update-mime-database $D${MIMEDIR}
+fi
 fi
 }
 

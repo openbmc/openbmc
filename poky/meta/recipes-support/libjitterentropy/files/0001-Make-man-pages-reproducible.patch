@@ -6,7 +6,7 @@ Subject: [PATCH] Make man pages reproducible
 Instructs the man page to be gzip'ed without the file name or timestamp
 so that it builds reproducibly.
 
-Upstream-Status: Accepted [https://github.com/smuellerDD/jitterentropy-library/pull/14]
+Upstream-Status: Backport [https://github.com/smuellerDD/jitterentropy-library/pull/14]
 Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
 ---
  Makefile | 2 +-

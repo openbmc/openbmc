@@ -64,6 +64,7 @@ python sign_rpm () {
                      d.getVar('RPM_FSK_PATH'),
                      d.getVar('RPM_FSK_PASSWORD'))
 }
+sign_rpm[vardepsexclude] += "RPM_GPG_SIGN_CHUNK"
 
 do_package_index[depends] += "signing-keys:do_deploy"
 do_rootfs[depends] += "signing-keys:do_populate_sysroot"

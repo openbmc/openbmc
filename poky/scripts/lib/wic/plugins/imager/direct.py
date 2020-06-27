@@ -436,7 +436,7 @@ class PartitionedImage():
 
                 delta = offset - self.offset
                 if delta < 0:
-                    raise WicError("Could not place %s%s at offset %dK: next free sector is %d (delta: %d)" % (part.disk, self.numpart, part.offset, offset, delta))
+                    raise WicError("Could not place %s%s at offset %dK: next free sector is %d (delta: %d)" % (part.disk, self.numpart, part.offset, self.offset, delta))
 
                 logger.debug("Skipping %d sectors to place %s%s at offset %dK",
                              delta, part.disk, self.numpart, part.offset)

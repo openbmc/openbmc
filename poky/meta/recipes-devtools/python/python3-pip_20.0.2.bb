@@ -1,5 +1,5 @@
 SUMMARY = "The PyPA recommended tool for installing Python packages"
-HOMEPAGE = "https://pypi.python.org/pypi/pip"
+HOMEPAGE = "https://pypi.org/project/pip"
 SECTION = "devel/python"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=8ba06d529c955048e5ddd7c45459eb2e"

@@ -102,8 +102,6 @@ DISTRO_PN_ALIAS_pn-gnome-desktop-testing = "Debian=gnome-desktop-testing Fedora=
 DISTRO_PN_ALIAS_pn-gnu-config = "OpenedHand"
 DISTRO_PN_ALIAS_pn-gptfdisk = "Fedora=gdisk Ubuntu=gdisk"
 DISTRO_PN_ALIAS_pn-grub-efi = "Debian=grub-efi Fedora=grub2-efi"
-DISTRO_PN_ALIAS_pn-grub-efi-i586 = "Debian=grub-efi Fedora=grub2-efi"
-DISTRO_PN_ALIAS_pn-grub-efi-x86-64 = "Debian=grub-efi Fedora=grub2-efi"
 DISTRO_PN_ALIAS_pn-gst-player = "Ubuntu=gst-player Fedora=gstreamer-player"
 DISTRO_PN_ALIAS_pn-gst-plugin-bluetooth = "Ubuntu=libgstreamer-plugins-base Fedora=gstreamer-plugins-base"
 DISTRO_PN_ALIAS_pn-gstreamer1.0 = "Debian=gstreamer1.0 Ubuntu=gstreamer1.0"

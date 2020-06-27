@@ -1,22 +1,24 @@
-From 6cdf82af2eba312b9b8da86dda28b98d3d51f4d4 Mon Sep 17 00:00:00 2001
+From 230fe5804099bdca0c9e4cae7280c9fc513cb7f5 Mon Sep 17 00:00:00 2001
 From: Stephen Arnold <sarnold@vctlabs.com>
 Date: Sun, 12 Jun 2016 18:09:56 -0700
 Subject: [PATCH] qemu-native: set ld.bfd, fix cflags, and set some environment
 
 Upstream-Status: Pending
 
+[update patch context]
+Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
 ---
  configure | 4 ----
  1 file changed, 4 deletions(-)
 
 diff --git a/configure b/configure
-index a766017b..72f11aca 100755
+index 83c65439..6bdf488c 100755
 --- a/configure
 +++ b/configure
-@@ -6085,10 +6085,6 @@ write_c_skeleton
+@@ -6251,10 +6251,6 @@ write_c_skeleton
  if test "$gcov" = "yes" ; then
-   CFLAGS="-fprofile-arcs -ftest-coverage -g $CFLAGS"
-   LDFLAGS="-fprofile-arcs -ftest-coverage $LDFLAGS"
+   QEMU_CFLAGS="-fprofile-arcs -ftest-coverage -g $QEMU_CFLAGS"
+   QEMU_LDFLAGS="-fprofile-arcs -ftest-coverage $QEMU_LDFLAGS"
 -elif test "$fortify_source" = "yes" ; then
 -  CFLAGS="-O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 $CFLAGS"
 -elif test "$debug" = "no"; then
@@ -24,3 +26,6 @@ index a766017b..72f11aca 100755
  fi
  
  if test "$have_asan" = "yes"; then
+-- 
+2.24.0
+

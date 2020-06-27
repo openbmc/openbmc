@@ -1,5 +1,5 @@
 SUMMARY = "Python implementation of subunit test streaming protocol"
-HOMEPAGE = "https://pypi.python.org/pypi/python-subunit/"
+HOMEPAGE = "https://pypi.org/project/python-subunit/"
 SECTION = "devel/python"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://README.rst;beginline=1;endline=20;md5=909c08e291647fd985fbe5d9836d51b6"

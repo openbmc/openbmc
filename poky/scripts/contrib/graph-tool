@@ -11,6 +11,13 @@
 #
 
 import sys
+import os
+import argparse
+
+scripts_lib_path = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'lib'))
+sys.path.insert(0, scripts_lib_path)
+import argparse_oe
+
 
 def get_path_networkx(dotfile, fromnode, tonode):
     try:
@@ -34,47 +41,78 @@ def get_path_networkx(dotfile, fromnode, tonode):
     return networkx.all_simple_paths(graph, source=fromnode, target=tonode)
 
 
-def find_paths(args, usage):
-    if len(args) < 3:
-        usage()
-        sys.exit(1)
-
-    fromnode = args[1]
-    tonode = args[2]
-
+def find_paths(args):
     path = None
-    for path in get_path_networkx(args[0], fromnode, tonode):
+    for path in get_path_networkx(args.dotfile, args.fromnode, args.tonode):
         print(" -> ".join(map(str, path)))
     if not path:
-        print("ERROR: no path from %s to %s in graph" % (fromnode, tonode))
-        sys.exit(1)
+        print("ERROR: no path from %s to %s in graph" % (args.fromnode, args.tonode))
+        return 1
+
+
+def filter_graph(args):
+    import fnmatch
+
+    exclude_tasks = []
+    if args.exclude_tasks:
+        for task in args.exclude_tasks.split(','):
+            if not task.startswith('do_'):
+                task = 'do_%s' % task
+            exclude_tasks.append(task)
+
+    def checkref(strval):
+        strval = strval.strip().strip('"')
+        target, taskname = strval.rsplit('.', 1)
+        if exclude_tasks:
+            for extask in exclude_tasks:
+                if fnmatch.fnmatch(taskname, extask):
+                    return False
+        if strval in args.ref or target in args.ref:
+            return True
+        return False
+
+    with open(args.infile, 'r') as f:
+        for line in f:
+            line = line.rstrip()
+            if line.startswith(('digraph', '}')):
+                print(line)
+            elif '->' in line:
+                linesplit = line.split('->')
+                if checkref(linesplit[0]) and checkref(linesplit[1]):
+                    print(line)
+            elif (not args.no_nodes) and checkref(line.split()[0]):
+                print(line)
+
 
 def main():
-    import optparse
-    parser = optparse.OptionParser(
-        usage = '''%prog [options] <command> <arguments>
+    parser = argparse_oe.ArgumentParser(description='Small utility for working with .dot graph files')
 
-Available commands:
-    find-paths <dotfile> <from> <to>
-        Find all of the paths between two nodes in a dot graph''')
+    subparsers = parser.add_subparsers(title='subcommands', metavar='<subcommand>')
+    subparsers.required = True
 
-    #parser.add_option("-d", "--debug",
-    #        help = "Report all SRCREV values, not just ones where AUTOREV has been used",
-    #        action="store_true", dest="debug", default=False)
+    parser_find_paths = subparsers.add_parser('find-paths',
+                                              help='Find all of the paths between two nodes in a dot graph',
+                                              description='Finds all of the paths between two nodes in a dot graph')
+    parser_find_paths.add_argument('dotfile', help='.dot graph to search in')
+    parser_find_paths.add_argument('fromnode', help='starting node name')
+    parser_find_paths.add_argument('tonode', help='ending node name')
+    parser_find_paths.set_defaults(func=find_paths)
 
-    options, args = parser.parse_args(sys.argv)
-    args = args[1:]
+    parser_filter = subparsers.add_parser('filter',
+                                           help='Pare down a task graph to contain only the specified references',
+                                           description='Pares down a task-depends.dot graph produced by bitbake -g to contain only the specified references')
+    parser_filter.add_argument('infile', help='Input file')
+    parser_filter.add_argument('ref', nargs='+', help='Reference to include (either recipe/target name or full target.taskname specification)')
+    parser_filter.add_argument('-n', '--no-nodes', action='store_true', help='Skip node formatting lines')
+    parser_filter.add_argument('-x', '--exclude-tasks', help='Comma-separated list of tasks to exclude (do_ prefix optional, wildcards allowed)')
+    parser_filter.set_defaults(func=filter_graph)
 
-    if len(args) < 1:
-        parser.print_help()
-        sys.exit(1)
+    args = parser.parse_args()
 
-    if args[0] == "find-paths":
-        find_paths(args[1:], parser.print_help)
-    else:
-        parser.print_help()
-        sys.exit(1)
+    ret = args.func(args)
+    return ret
 
 
 if __name__ == "__main__":
-    main()
+    ret = main()
+    sys.exit(ret)
