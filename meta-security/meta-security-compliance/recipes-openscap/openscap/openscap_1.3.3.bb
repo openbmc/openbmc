@@ -2,7 +2,7 @@ SUMARRY = "NIST Certified SCAP 1.2 toolkit"
 
 require openscap.inc
 
-SRCREV = "3a4c635691380fa990a226acc8558db35d7ebabc"
+SRCREV = "0cb55c55af6be9934d6fd0caf4563b206f289732"
 SRC_URI = "git://github.com/OpenSCAP/openscap.git;branch=maint-1.3 \
 "
 

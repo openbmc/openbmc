@@ -7,9 +7,9 @@ DEPENDS = "libtss2-dev libtss2-mu-dev gnu-efi-native gnu-efi pkgconfig autoconf-
 SRC_URI = "git://github.com/tpm2-software/tpm2-tcti-uefi.git \
            file://configure_oe_fixup.patch \
            file://0001-configure.ac-stop-inserting-host-directories-into-co.patch \
-           file://tpm2-get-caps-fixed.patch \
            file://fix_header_file.patch \
-          "
+"
+
 SRCREV = "0241b08f069f0fdb3612f5c1b938144dbe9be811"
 
 S = "${WORKDIR}/git"

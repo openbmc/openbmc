@@ -39,8 +39,7 @@ PACKAGECONFIG += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', 
 
 PACKAGECONFIG[autofs] = "--with-autofs, --with-autofs=no"
 PACKAGECONFIG[crypto] = "--with-crypto=libcrypto, , libcrypto"
-PACKAGECONFIG[curl] = "--with-secrets --with-kcm, --without-secrets --without-kcm, curl jansson"
-PACKAGECONFIG[http] = "--with-secrets, --without-secrets, apache2"
+PACKAGECONFIG[curl] = "--with-kcm, --without-kcm, curl jansson"
 PACKAGECONFIG[infopipe] = "--with-infopipe, --with-infopipe=no, "
 PACKAGECONFIG[manpages] = "--with-manpages, --with-manpages=no"
 PACKAGECONFIG[nl] = "--with-libnl, --with-libnl=no, libnl"
@@ -60,6 +59,7 @@ EXTRA_OECONF += " \
     --without-python2-bindings \
     --enable-pammoddir=${base_libdir}/security \
     --without-python2-bindings \
+    --without-secrets \
 "
 
 do_configure_prepend() {
@@ -85,6 +85,7 @@ do_install () {
     # Remove /var/run as it is created on startup
     rm -rf ${D}${localstatedir}/run
 
+    rm -f ${D}${systemd_system_unitdir}/sssd-secrets.*
 }
 
 pkg_postinst_ontarget_${PN} () {
@@ -109,8 +110,6 @@ SYSTEMD_SERVICE_${PN} = " \
     sssd-pam-priv.socket \
     sssd-pam.service \
     sssd-pam.socket \
-    sssd-secrets.service \
-    sssd-secrets.socket \
     sssd.service \
 "
 SYSTEMD_AUTO_ENABLE = "disable"
