@@ -1,0 +1,308 @@
+{
+    "sensors" : [
+        {
+            "name": "cputemp",
+            "unit": "millidegree",
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/cputemp",
+            "parameters": {
+                "type": "file",
+                "maxTemp": -1,
+                "path": "/sys/devices/platform/ahb/ahb:apb/f0082000.i2c/i2c-2/2-004c/hwmon/cpu_hwmon/temp1_max",
+                "sysLabel": "",
+                "targetTemp": -1,
+                "targetTempOffset": -10000,
+                "scalar": 1.0
+            }
+        },
+        {
+            "name": "nvme0",
+            "unit": "millidegree",
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/nvme0",
+            "parameters": {
+                "type": "",
+                "maxTemp": 70000,
+                "path": "",
+                "sysLabel": "",
+                "targetTemp": 60000,
+                "targetTempOffset": 0,
+                "scalar": 1.0
+            }
+        },
+        {
+            "name": "nvme1",
+            "unit": "millidegree",
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/nvme1",
+            "parameters": {
+                "type": "",
+                "maxTemp": 70000,
+                "path": "",
+                "sysLabel": "",
+                "targetTemp": 60000,
+                "targetTempOffset": 0,
+                "scalar": 1.0
+            }
+        },
+        {
+            "name": "nvme2",
+            "unit": "millidegree",
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/nvme2",
+            "parameters": {
+                "type": "",
+                "maxTemp": 70000,
+                "path": "",
+                "sysLabel": "",
+                "targetTemp": 60000,
+                "targetTempOffset": 0,
+                "scalar": 1.0
+            }
+        },
+        {
+            "name": "nvme3",
+            "unit": "millidegree",
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/nvme3",
+            "parameters": {
+                "type": "",
+                "maxTemp": 70000,
+                "path": "",
+                "sysLabel": "",
+                "targetTemp": 60000,
+                "targetTempOffset": 0,
+                "scalar": 1.0
+            }
+        },
+        {
+            "name": "nvme4",
+            "unit": "millidegree",
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/nvme4",
+            "parameters": {
+                "type": "",
+                "maxTemp": 70000,
+                "path": "",
+                "sysLabel": "",
+                "targetTemp": 60000,
+                "targetTempOffset": 0,
+                "scalar": 1.0
+            }
+        },
+        {
+            "name": "nvme5",
+            "unit": "millidegree",
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/nvme5",
+            "parameters": {
+                "type": "",
+                "maxTemp": 70000,
+                "path": "",
+                "sysLabel": "",
+                "targetTemp": 60000,
+                "targetTempOffset": 0,
+                "scalar": 1.0
+            }
+        },
+        {
+            "name": "nvme6",
+            "unit": "millidegree",
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/nvme6",
+            "parameters": {
+                "type": "",
+                "maxTemp": 70000,
+                "path": "",
+                "sysLabel": "",
+                "targetTemp": 60000,
+                "targetTempOffset": 0,
+                "scalar": 1.0
+            }
+        },
+        {
+            "name": "nvme7",
+            "unit": "millidegree",
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/nvme7",
+            "parameters": {
+                "type": "",
+                "maxTemp": 70000,
+                "path": "",
+                "sysLabel": "",
+                "targetTemp": 60000,
+                "targetTempOffset": 0,
+                "scalar": 1.0
+            }
+        },
+        {
+            "name": "nvme8",
+            "unit": "millidegree",
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/nvme8",
+            "parameters": {
+                "type": "",
+                "maxTemp": 70000,
+                "path": "",
+                "sysLabel": "",
+                "targetTemp": 60000,
+                "targetTempOffset": 0,
+                "scalar": 1.0
+            }
+        },
+        {
+            "name": "nvme9",
+            "unit": "millidegree",
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/nvme9",
+            "parameters": {
+                "type": "",
+                "maxTemp": 70000,
+                "path": "",
+                "sysLabel": "",
+                "targetTemp": 60000,
+                "targetTempOffset": 0,
+                "scalar": 1.0
+            }
+        },
+        {
+            "name": "nvme10",
+            "unit": "millidegree",
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/nvme10",
+            "parameters": {
+                "type": "",
+                "maxTemp": 70000,
+                "path": "",
+                "sysLabel": "",
+                "targetTemp": 60000,
+                "targetTempOffset": 0,
+                "scalar": 1.0
+            }
+        },
+        {
+            "name": "nvme11",
+            "unit": "millidegree",
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/nvme11",
+            "parameters": {
+                "type": "",
+                "maxTemp": 70000,
+                "path": "",
+                "sysLabel": "",
+                "targetTemp": 60000,
+                "targetTempOffset": 0,
+                "scalar": 1.0
+            }
+        },
+        {
+            "name": "nvme12",
+            "unit": "millidegree",
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/nvme12",
+            "parameters": {
+                "type": "",
+                "maxTemp": 70000,
+                "path": "",
+                "sysLabel": "",
+                "targetTemp": 60000,
+                "targetTempOffset": 0,
+                "scalar": 1.0
+            }
+        },
+        {
+            "name": "nvme13",
+            "unit": "millidegree",
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/nvme13",
+            "parameters": {
+                "type": "",
+                "maxTemp": 70000,
+                "path": "",
+                "sysLabel": "",
+                "targetTemp": 60000,
+                "targetTempOffset": 0,
+                "scalar": 1.0
+            }
+        },
+        {
+            "name": "nvme14",
+            "unit": "millidegree",
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/nvme14",
+            "parameters": {
+                "type": "",
+                "maxTemp": 70000,
+                "path": "",
+                "sysLabel": "",
+                "targetTemp": 60000,
+                "targetTempOffset": 0,
+                "scalar": 1.0
+            }
+        },
+        {
+            "name": "nvme15",
+            "unit": "millidegree",
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/nvme15",
+            "parameters": {
+                "type": "",
+                "maxTemp": 70000,
+                "path": "",
+                "sysLabel": "",
+                "targetTemp": 60000,
+                "targetTempOffset": 0,
+                "scalar": 1.0
+            }
+        },
+        {
+            "name": "fleeting0",
+            "unit": "millimargin",
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/extsensors/margin/fleeting0",
+            "parameters": {
+                "type": "",
+                "maxTemp": 0,
+                "path": "",
+                "sysLabel": "",
+                "targetTemp": 0,
+                "targetTempOffset": 0,
+                "scalar": 1.0
+            }
+        },
+        {
+            "name": "fleeting1",
+            "unit": "millimargin",
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/extsensors/margin/fleeting1",
+            "parameters": {
+                "type": "",
+                "maxTemp": 0,
+                "path": "",
+                "sysLabel": "",
+                "targetTemp": 0,
+                "targetTempOffset": 0,
+                "scalar": 1.0
+            }
+        }
+    ],
+    "skus" : [
+        {
+            "num": 1,
+            "zones": [
+                {
+                    "id": 0,
+                    "zoneSetpoint": 10000,
+                    "target": "/xyz/openbmc_project/extsensors/margin/real_fleeting0",
+                    "components": ["cputemp", "fleeting0"]
+                },
+                {
+                    "id": 1,
+                    "zoneSetpoint": 10000,
+                    "target": "/xyz/openbmc_project/extsensors/margin/real_fleeting1",
+                    "components": ["nvme0", "nvme1", "nvme2", "nvme3", "nvme4", "nvme5", "nvme6", "nvme7", "nvme8", "nvme9", "nvme10", "nvme11", "nvme12", "nvme13", "nvme14", "nvme15"]
+                }
+            ]
+        }
+    ]
+}
