@@ -1,0 +1,16 @@
+---
+/xyz/openbmc_project/control/host0/boot/mailbox:
+    - Interface: xyz.openbmc_project.Control.Boot.Mailbox
+      Properties:
+          Supported:
+              Default: 'true'
+          IANAEnterpriseNumber:
+              # This is IBM's IANA Enterprise number expected by petitboot
+              Default: 2
+          Data:
+              # The mailbox must be no smaller that 5 blocks. That is 80 bytes.
+              # This array does NOT include the 3-byte IANA enterprise number.
+              # So the minimum is 77 bytes. 512 bytes look enough to accomodate
+              # all boot settings, yet not too big to waste space.
+              # 512 - 3 = 509
+              Default: 'std::vector<uint8_t>(509)'
