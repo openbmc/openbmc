@@ -1,0 +1,174 @@
+{
+    "config": [
+        {
+            "NVMeDriveIndex": 0,
+            "NVMeDriveBusID": 47,
+            "NVMeDriveFaultLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_0_fault",
+            "NVMeDriveLocateLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_0_locate",
+            "NVMeDriveLocateLEDControllerBusName": "xyz.openbmc_project.LED.Controller.led_u2_0_locate",
+            "NVMeDriveLocateLEDControllerPath": "/xyz/openbmc_project/led/physical/led_u2_0_locate",
+            "NVMeDrivePresentPin": 499,
+            "NVMeDrivePwrGoodPin": 467
+        },
+        {
+            "NVMeDriveIndex": 1,
+            "NVMeDriveBusID": 46,
+            "NVMeDriveFaultLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_1_fault",
+            "NVMeDriveLocateLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_1_locate",
+            "NVMeDriveLocateLEDControllerBusName": "xyz.openbmc_project.LED.Controller.led_u2_1_locate",
+            "NVMeDriveLocateLEDControllerPath": "/xyz/openbmc_project/led/physical/led_u2_1_locate",
+            "NVMeDrivePresentPin": 498,
+            "NVMeDrivePwrGoodPin": 466
+        },
+        {
+            "NVMeDriveIndex": 2,
+            "NVMeDriveBusID": 45,
+            "NVMeDriveFaultLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_2_fault",
+            "NVMeDriveLocateLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_2_locate",
+            "NVMeDriveLocateLEDControllerBusName": "xyz.openbmc_project.LED.Controller.led_u2_2_locate",
+            "NVMeDriveLocateLEDControllerPath": "/xyz/openbmc_project/led/physical/led_u2_2_locate",
+            "NVMeDrivePresentPin": 497,
+            "NVMeDrivePwrGoodPin": 465
+        },
+        {
+            "NVMeDriveIndex": 3,
+            "NVMeDriveBusID": 44,
+            "NVMeDriveFaultLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_3_fault",
+            "NVMeDriveLocateLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_3_locate",
+            "NVMeDriveLocateLEDControllerBusName": "xyz.openbmc_project.LED.Controller.led_u2_3_locate",
+            "NVMeDriveLocateLEDControllerPath": "/xyz/openbmc_project/led/physical/led_u2_3_locate",
+            "NVMeDrivePresentPin": 496,
+            "NVMeDrivePwrGoodPin": 464
+        },
+        {
+            "NVMeDriveIndex": 4,
+            "NVMeDriveBusID": 39,
+            "NVMeDriveFaultLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_4_fault",
+            "NVMeDriveLocateLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_4_locate",
+            "NVMeDriveLocateLEDControllerBusName": "xyz.openbmc_project.LED.Controller.led_u2_4_locate",
+            "NVMeDriveLocateLEDControllerPath": "/xyz/openbmc_project/led/physical/led_u2_4_locate",
+            "NVMeDrivePresentPin": 503,
+            "NVMeDrivePwrGoodPin": 471
+        },
+        {
+            "NVMeDriveIndex": 5,
+            "NVMeDriveBusID": 38,
+            "NVMeDriveFaultLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_5_fault",
+            "NVMeDriveLocateLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_5_locate",
+            "NVMeDriveLocateLEDControllerBusName": "xyz.openbmc_project.LED.Controller.led_u2_5_locate",
+            "NVMeDriveLocateLEDControllerPath": "/xyz/openbmc_project/led/physical/led_u2_5_locate",
+            "NVMeDrivePresentPin": 502,
+            "NVMeDrivePwrGoodPin": 470
+        },
+        {
+            "NVMeDriveIndex": 6,
+            "NVMeDriveBusID": 37,
+            "NVMeDriveFaultLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_6_fault",
+            "NVMeDriveLocateLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_6_locate",
+            "NVMeDriveLocateLEDControllerBusName": "xyz.openbmc_project.LED.Controller.led_u2_6_locate",
+            "NVMeDriveLocateLEDControllerPath": "/xyz/openbmc_project/led/physical/led_u2_6_locate",
+            "NVMeDrivePresentPin": 501,
+            "NVMeDrivePwrGoodPin": 469
+        },
+        {
+            "NVMeDriveIndex": 7,
+            "NVMeDriveBusID": 36,
+            "NVMeDriveFaultLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_7_fault",
+            "NVMeDriveLocateLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_7_locate",
+            "NVMeDriveLocateLEDControllerBusName": "xyz.openbmc_project.LED.Controller.led_u2_7_locate",
+            "NVMeDriveLocateLEDControllerPath": "/xyz/openbmc_project/led/physical/led_u2_7_locate",
+            "NVMeDrivePresentPin": 500,
+            "NVMeDrivePwrGoodPin": 468
+        },
+        {
+            "NVMeDriveIndex": 8,
+            "NVMeDriveBusID": 31,
+            "NVMeDriveFaultLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_8_fault",
+            "NVMeDriveLocateLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_8_locate",
+            "NVMeDriveLocateLEDControllerBusName": "xyz.openbmc_project.LED.Controller.led_u2_8_locate",
+            "NVMeDriveLocateLEDControllerPath": "/xyz/openbmc_project/led/physical/led_u2_8_locate",
+            "NVMeDrivePresentPin": 507,
+            "NVMeDrivePwrGoodPin": 475
+        },
+        {
+            "NVMeDriveIndex": 9,
+            "NVMeDriveBusID": 30,
+            "NVMeDriveFaultLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_9_fault",
+            "NVMeDriveLocateLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_9_locate",
+            "NVMeDriveLocateLEDControllerBusName": "xyz.openbmc_project.LED.Controller.led_u2_9_locate",
+            "NVMeDriveLocateLEDControllerPath": "/xyz/openbmc_project/led/physical/led_u2_9_locate",
+            "NVMeDrivePresentPin": 506,
+            "NVMeDrivePwrGoodPin": 474
+        },
+        {
+            "NVMeDriveIndex": 10,
+            "NVMeDriveBusID": 29,
+            "NVMeDriveFaultLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_10_fault",
+            "NVMeDriveLocateLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_10_locate",
+            "NVMeDriveLocateLEDControllerBusName": "xyz.openbmc_project.LED.Controller.led_u2_10_locate",
+            "NVMeDriveLocateLEDControllerPath": "/xyz/openbmc_project/led/physical/led_u2_10_locate",
+            "NVMeDrivePresentPin": 505,
+            "NVMeDrivePwrGoodPin": 473
+        },
+        {
+            "NVMeDriveIndex": 11,
+            "NVMeDriveBusID": 28,
+            "NVMeDriveFaultLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_11_fault",
+            "NVMeDriveLocateLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_11_locate",
+            "NVMeDriveLocateLEDControllerBusName": "xyz.openbmc_project.LED.Controller.led_u2_11_locate",
+            "NVMeDriveLocateLEDControllerPath": "/xyz/openbmc_project/led/physical/led_u2_11_locate",
+            "NVMeDrivePresentPin": 504,
+            "NVMeDrivePwrGoodPin": 472
+        },
+        {
+            "NVMeDriveIndex": 12,
+            "NVMeDriveBusID": 27,
+            "NVMeDriveFaultLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_12_fault",
+            "NVMeDriveLocateLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_12_locate",
+            "NVMeDriveLocateLEDControllerBusName": "xyz.openbmc_project.LED.Controller.led_u2_12_locate",
+            "NVMeDriveLocateLEDControllerPath": "/xyz/openbmc_project/led/physical/led_u2_12_locate",
+            "NVMeDrivePresentPin": 511,
+            "NVMeDrivePwrGoodPin": 479
+        },
+        {
+            "NVMeDriveIndex": 13,
+            "NVMeDriveBusID": 26,
+            "NVMeDriveFaultLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_13_fault",
+            "NVMeDriveLocateLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_13_locate",
+            "NVMeDriveLocateLEDControllerBusName": "xyz.openbmc_project.LED.Controller.led_u2_13_locate",
+            "NVMeDriveLocateLEDControllerPath": "/xyz/openbmc_project/led/physical/led_u2_13_locate",
+            "NVMeDrivePresentPin": 510,
+            "NVMeDrivePwrGoodPin": 478
+        },
+        {
+            "NVMeDriveIndex": 14,
+            "NVMeDriveBusID": 25,
+            "NVMeDriveFaultLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_14_fault",
+            "NVMeDriveLocateLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_14_locate",
+            "NVMeDriveLocateLEDControllerBusName": "xyz.openbmc_project.LED.Controller.led_u2_14_locate",
+            "NVMeDriveLocateLEDControllerPath": "/xyz/openbmc_project/led/physical/led_u2_14_locate",
+            "NVMeDrivePresentPin": 509,
+            "NVMeDrivePwrGoodPin": 477
+        },
+        {
+            "NVMeDriveIndex": 15,
+            "NVMeDriveBusID": 24,
+            "NVMeDriveFaultLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_15_fault",
+            "NVMeDriveLocateLEDGroupPath": "/xyz/openbmc_project/led/groups/led_u2_15_locate",
+            "NVMeDriveLocateLEDControllerBusName": "xyz.openbmc_project.LED.Controller.led_u2_15_locate",
+            "NVMeDriveLocateLEDControllerPath": "/xyz/openbmc_project/led/physical/led_u2_15_locate",
+            "NVMeDrivePresentPin": 508,
+            "NVMeDrivePwrGoodPin": 476
+        }
+    ],
+    "threshold": [
+        {
+            "criticalHigh": 70,
+            "criticalLow": 0,
+            "warningHigh": 70,
+            "warningLow": 0,
+            "maxValue": 127,
+            "minValue": -128
+        }
+    ]
+}
