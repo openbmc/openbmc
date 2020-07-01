@@ -27,6 +27,7 @@ DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus ${PYTHON_PN}-sdbus++-native"
 DEPENDS += "systemd"
 DEPENDS += "phosphor-logging"
+DEPENDS += "nlohmann-json"
 
 DEPENDS += "virtual/${PN}-config-native"
 
