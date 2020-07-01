@@ -1,5 +1,6 @@
 RDEPENDS_${PN}-inventory_append = " openpower-occ-control"
 RDEPENDS_${PN}-extras_append = " \
+    obmc-yadro-backup \
     obmc-yadro-lsinventory \
     obmc-yadro-lssensors \
     obmc-yadro-netconfig \
