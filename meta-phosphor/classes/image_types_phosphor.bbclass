@@ -58,6 +58,9 @@ FLASH_UBI_RWFS_SIZE_flash-131072 ?= "32768"
 FLASH_UBI_RWFS_TXT_SIZE ?= "6MiB"
 FLASH_UBI_RWFS_TXT_SIZE_flash-131072 ?= "32MiB"
 
+# eMMC sizes in KB unless otherwise noted.
+MMC_BOOT_PARTITION_SIZE ?= "65536"
+
 SIGNING_KEY ?= "${STAGING_DIR_NATIVE}${datadir}/OpenBMC.priv"
 INSECURE_KEY = "${@'${SIGNING_KEY}' == '${STAGING_DIR_NATIVE}${datadir}/OpenBMC.priv'}"
 SIGNING_KEY_DEPENDS = "${@oe.utils.conditional('INSECURE_KEY', 'True', 'phosphor-insecure-signing-key-native:do_populate_sysroot', '', d)}"
@@ -512,10 +515,27 @@ do_generate_ubi_tar[depends] += " \
         "
 
 do_generate_ext4_tar() {
-	zstd -f -k -T0 -c ${ZSTD_COMPRESSION_LEVEL} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${FLASH_EXT4_BASETYPE} > ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${FLASH_EXT4_BASETYPE}.zst
+	# Generate the U-Boot image
+	do_generate_image_uboot_file image-u-boot
+
+	# Generate a compressed ext4 filesystem with the fitImage file in it to be
+	# flashed to the boot partition of the eMMC
+	install -d boot-image
+	install -m 644 ${DEPLOY_DIR_IMAGE}/${FLASH_KERNEL_IMAGE} boot-image/fitImage
+	mk_empty_image boot-image.${FLASH_EXT4_BASETYPE} ${MMC_BOOT_PARTITION_SIZE}
+	mkfs.ext4 -F -i 4096 -d boot-image boot-image.${FLASH_EXT4_BASETYPE}
+	# Error codes 0-3 indicate successfull operation of fsck
+	fsck.ext4 -pvfD boot-image.${FLASH_EXT4_BASETYPE} || [ $? -le 3 ]
+	zstd -f -k -T0 -c ${ZSTD_COMPRESSION_LEVEL} boot-image.${FLASH_EXT4_BASETYPE} > boot-image.${FLASH_EXT4_BASETYPE}.zst
+
+	# Generate the compressed ext4 rootfs
+	zstd -f -k -T0 -c ${ZSTD_COMPRESSION_LEVEL} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${FLASH_EXT4_BASETYPE} > ${IMAGE_LINK_NAME}.${FLASH_EXT4_BASETYPE}.zst
+
+	ln -sf boot-image.${FLASH_EXT4_BASETYPE}.zst image-kernel
+	ln -sf ${IMAGE_LINK_NAME}.${FLASH_EXT4_BASETYPE}.zst image-rofs
+	ln -sf ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.rwfs.${FLASH_EXT4_OVERLAY_BASETYPE} image-rwfs
 	ln -sf ${S}/MANIFEST MANIFEST
 	ln -sf ${S}/publickey publickey
-	make_image_links rwfs.${FLASH_EXT4_OVERLAY_BASETYPE} ${FLASH_EXT4_BASETYPE}.zst
 	make_signatures image-u-boot image-kernel image-rofs image-rwfs MANIFEST publickey
 	make_tar_of_images ext4.mmc MANIFEST publickey ${signature_files}
 }
