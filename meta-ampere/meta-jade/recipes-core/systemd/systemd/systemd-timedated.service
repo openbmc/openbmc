@@ -1,0 +1,42 @@
+#  SPDX-License-Identifier: LGPL-2.1+
+#
+#  This file is part of systemd.
+#
+#  systemd is free software; you can redistribute it and/or modify it
+#  under the terms of the GNU Lesser General Public License as published by
+#  the Free Software Foundation; either version 2.1 of the License, or
+#  (at your option) any later version.
+
+[Unit]
+Description=Time & Date Service
+Documentation=man:systemd-timedated.service(8) man:localtime(5)
+Documentation=https://www.freedesktop.org/wiki/Software/systemd/timedated
+
+[Service]
+BusName=org.freedesktop.timedate1
+CapabilityBoundingSet=CAP_SYS_TIME
+DeviceAllow=char-rtc r
+ExecStartPre=/bin/sh -c "/bin/echo acquiring rtc_lock && /usr/bin/gpioset 0 203=1 && sleep 1s"
+ExecStart=/lib/systemd/systemd-timedated
+ExecStopPost=/bin/sh -c "/bin/echo releasing rtc_lock && /usr/bin/gpioset 0 203=0"
+IPAddressDeny=any
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectControlGroups=yes
+ProtectHome=yes
+ProtectHostname=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectKernelLogs=yes
+ProtectSystem=strict
+ReadWritePaths=/etc
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+SystemCallArchitectures=native
+SystemCallErrorNumber=EPERM
+SystemCallFilter=@system-service @clock
+WatchdogSec=3min
