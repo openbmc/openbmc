@@ -83,7 +83,7 @@ to get up to speed on OpenBMC development out
 
 ## Build Validation and Testing
 Commits submitted by members of the OpenBMC GitHub community are compiled and
-tested via our [Jenkins](https://openpower.xyz/) server.  Commits are run
+tested via our [Jenkins](https://jenkins.openbmc.org/) server. Commits are run
 through two levels of testing.  At the repository level the makefile `make
 check` directive is run.  At the system level, the commit is built into a
 firmware image and run with an arm-softmmu QEMU model against a barrage of
