@@ -21,7 +21,7 @@
 
 bootloader --ptable gpt
 
-part --align 4 --fixed-size 1M --label u-boot-env
+part --align 4 --fixed-size 1M --source rawcopy --sourceparams="file=${DEPLOY_DIR_IMAGE}/u-boot-env.bin"
 part --fstype=ext4 --fixed-size 64M --source bootimg-partition --label boot-a
 part --fstype=ext4 --fixed-size 64M --source bootimg-partition --label boot-b
 part --fstype=ext4 --fixed-size 1G --source rootfs --label rofs-a
