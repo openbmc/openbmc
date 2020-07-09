@@ -1,0 +1,11 @@
+[Unit]
+Description=Detect Fan Fail Manager
+After=phosphor-pid-control.service
+
+[Service]
+ExecStart=/usr/bin/gbs-detect-fan-fail.sh
+Restart=always
+StandardOutput=syslog
+
+[Install]
+WantedBy=multi-user.target
