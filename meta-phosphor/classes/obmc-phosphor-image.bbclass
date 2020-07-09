@@ -23,18 +23,17 @@
 # - obmc-debug-collector              - OpenBMC debug collector
 
 inherit core-image
-inherit obmc-phosphor-utils
 
 LICENSE = "Apache-2.0"
 
 FEATURE_PACKAGES_obmc-bmc-state-mgmt ?= "packagegroup-obmc-apps-bmc-state-mgmt"
-FEATURE_PACKAGES_obmc-chassis-mgmt ?= "${@cf_enabled(d, 'obmc-phosphor-chassis-mgmt', 'virtual-obmc-chassis-mgmt')}"
+FEATURE_PACKAGES_obmc-chassis-mgmt ?= "${@bb.utils.contains('COMBINED_FEATURES', 'obmc-phosphor-chassis-mgmt', 'virtual-obmc-chassis-mgmt', '', d)}"
 FEATURE_PACKAGES_obmc-chassis-state-mgmt ?= "packagegroup-obmc-apps-chassis-state-mgmt"
 FEATURE_PACKAGES_obmc-fan-control ?= "packagegroup-obmc-apps-fan-control"
-FEATURE_PACKAGES_obmc-fan-mgmt ?= "${@cf_enabled(d, 'obmc-phosphor-fan-mgmt', 'virtual-obmc-fan-mgmt')}"
-FEATURE_PACKAGES_obmc-flash-mgmt ?= "${@cf_enabled(d, 'obmc-phosphor-flash-mgmt', 'virtual-obmc-flash-mgmt')}"
-FEATURE_PACKAGES_obmc-host-ctl ?= "${@cf_enabled(d, 'obmc-host-ctl', 'virtual-obmc-host-ctl')}"
-FEATURE_PACKAGES_obmc-host-ipmi ?= "${@cf_enabled(d, 'obmc-host-ipmi', 'virtual-obmc-host-ipmi-hw')}"
+FEATURE_PACKAGES_obmc-fan-mgmt ?= "${@bb.utils.contains('COMBINED_FEATURES', 'obmc-phosphor-fan-mgmt', 'virtual-obmc-fan-mgmt', '', d)}"
+FEATURE_PACKAGES_obmc-flash-mgmt ?= "${@bb.utils.contains('COMBINED_FEATURES', 'obmc-phosphor-flash-mgmt', 'virtual-obmc-flash-mgmt', '', d)}"
+FEATURE_PACKAGES_obmc-host-ctl ?= "${@bb.utils.contains('COMBINED_FEATURES', 'obmc-host-ctl', 'virtual-obmc-host-ctl', '', d)}"
+FEATURE_PACKAGES_obmc-host-ipmi ?= "${@bb.utils.contains('COMBINED_FEATURES', 'obmc-host-ipmi', 'virtual-obmc-host-ipmi-hw', '', d)}"
 FEATURE_PACKAGES_obmc-host-state-mgmt ?= "packagegroup-obmc-apps-host-state-mgmt"
 FEATURE_PACKAGES_obmc-inventory ?= "packagegroup-obmc-apps-inventory"
 FEATURE_PACKAGES_obmc-leds ?= "packagegroup-obmc-apps-leds"
@@ -43,7 +42,7 @@ FEATURE_PACKAGES_obmc-remote-logging-mgmt ?= "packagegroup-obmc-apps-remote-logg
 FEATURE_PACKAGES_obmc-net-ipmi ?= "phosphor-ipmi-net"
 FEATURE_PACKAGES_obmc-sensors ?= "packagegroup-obmc-apps-sensors"
 FEATURE_PACKAGES_obmc-software ?= "packagegroup-obmc-apps-software"
-FEATURE_PACKAGES_obmc-system-mgmt ?= "${@df_enabled(d, 'obmc-phosphor-system-mgmt', 'virtual-obmc-system-mgmt')}"
+FEATURE_PACKAGES_obmc-system-mgmt ?= "${@bb.utils.contains('DISTRO_FEATURES', 'obmc-phosphor-system-mgmt', 'virtual-obmc-system-mgmt', '', d)}"
 FEATURE_PACKAGES_obmc-debug-collector ?= "packagegroup-obmc-apps-debug-collector"
 FEATURE_PACKAGES_obmc-settings-mgmt ?= "packagegroup-obmc-apps-settings"
 FEATURE_PACKAGES_obmc-network-mgmt ?= "packagegroup-obmc-apps-network"
