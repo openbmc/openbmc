@@ -1,0 +1,92 @@
+From bb9765a926588ebfe1eb324fbbe8fc22d419eebe Mon Sep 17 00:00:00 2001
+From: Max Krummenacher <max.krummenacher@toradex.com>
+Date: Thu, 25 Jun 2020 11:27:40 +0000
+Subject: [PATCH] configure.ac: don't require eglmesaext.h
+
+E.g. the Vivante EGL implementation does not provide eglmesaext.h.
+
+The commit moves the check for header file existence outside of the
+check for existence of a egl packageconfig and makes the existence
+of eglmesaext.h optional.
+
+fixes commit fb1acfec ("Fix building against libglvnd-provided EGL headers")
+Signed-off-by: Max Krummenacher <max.krummenacher@toradex.com>
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/cogl/-/merge_requests/28]
+Signed-off-by: Max Krummenacher <max.krummenacher@toradex.com>
+---
+ configure.ac | 51 ++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 32 insertions(+), 19 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index b7ba95d..0d1d8de 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1212,22 +1212,6 @@ AS_IF([test "x$NEED_EGL" = "xyes" && test "x$EGL_CHECKED" != "xyes"],
+         PKG_CHECK_EXISTS([egl],
+           [COGL_PKG_REQUIRES="$COGL_PKG_REQUIRES egl"],
+           [
+-            AC_CHECK_HEADERS(
+-              [EGL/egl.h],
+-              [],
+-              [AC_MSG_ERROR([Unable to locate required EGL headers])])
+-            AC_CHECK_HEADERS(
+-              [EGL/eglext.h],
+-              [],
+-              [AC_MSG_ERROR([Unable to locate required EGL headers])],
+-              [#include <EGL/egl.h>])
+-            AC_CHECK_HEADERS(
+-              [EGL/eglmesaext.h],
+-              [],
+-              [AC_MSG_ERROR([Unable to locate required EGL headers])],
+-              [#include <EGL/egl.h>
+-#include <EGL/eglext.h>])
+-
+             AC_CHECK_LIB(EGL, [eglInitialize],
+               [COGL_EXTRA_LDFLAGS="$COGL_EXTRA_LDFLAGS -lEGL"],
+               [AC_MSG_ERROR([Unable to locate required EGL library])])
+@@ -1236,9 +1220,38 @@ AS_IF([test "x$NEED_EGL" = "xyes" && test "x$EGL_CHECKED" != "xyes"],
+           ]
+           )
+ 
+-        COGL_EGL_INCLUDES="#include <EGL/egl.h>
+-#include <EGL/eglext.h>
+-#include <EGL/eglmesaext.h>"
++dnl Test for the existence of egl headers.
++dnl egl*.h includes eglplatform.h which on __unix__ defaults to a X11 platform.
++dnl In that case AC_CHECK_HEADERS failes if X11 headers are not available.
++dnl Set the usual include guard define and, if the EGL implementation doesn't
++dnl use that guard fall back to USE_OZONE and EGL_NO_X11 platforms which don't
++dnl require additional headers.
++        AC_CHECK_HEADERS(
++          [EGL/egl.h],
++          [COGL_EGL_INCLUDES="#include <EGL/egl.h>"],
++          [AC_MSG_ERROR([Unable to locate required EGL headers])],
++          [#define __egl_h_
++ #define USE_OZONE
++ #define EGL_NO_X11])
++        AC_CHECK_HEADERS(
++          [EGL/eglext.h],
++          [COGL_EGL_INCLUDES="$COGL_EGL_INCLUDES
++#include <EGL/eglext.h>"],
++          [AC_MSG_ERROR([Unable to locate required EGL headers])],
++          [#define __eglext_h_
++ #define USE_OZONE
++ #define EGL_NO_X11
++$COGL_EGL_INCLUDES])
++        AC_CHECK_HEADERS(
++          [EGL/eglmesaext.h],
++          [COGL_EGL_INCLUDES="$COGL_EGL_INCLUDES
++#include <EGL/eglmesaext.h>"],
++          [],
++          [#define __eglmesaext_h_
++#define USE_OZONE
++#define EGL_NO_X11
++$COGL_EGL_INCLUDES])
++
+         AC_SUBST([COGL_EGL_INCLUDES])
+       ])
+ 
+-- 
+2.20.1
+

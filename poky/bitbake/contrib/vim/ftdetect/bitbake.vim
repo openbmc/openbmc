@@ -6,12 +6,12 @@
 "
 " This sets up the syntax highlighting for BitBake files, like .bb, .bbclass and .inc
 
-if &compatible || version < 600
+if &compatible || version < 600 || exists("b:loaded_bitbake_plugin")
     finish
 endif
 
 " .bb, .bbappend and .bbclass
-au BufNewFile,BufRead *.{bb,bbappend,bbclass}	set filetype=bitbake
+au BufNewFile,BufRead *.{bb,bbappend,bbclass}  set filetype=bitbake
 
 " .inc
 au BufNewFile,BufRead *.inc		set filetype=bitbake

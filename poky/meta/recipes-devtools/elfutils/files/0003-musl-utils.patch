@@ -1,7 +1,7 @@
-From 94028b16e56c8eef1aa02dcc4da268a0e471b4ea Mon Sep 17 00:00:00 2001
+From 6923400b777d4ba6f040c4006413bf997326460f Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 23 Aug 2019 10:19:48 +0800
-Subject: [PATCH 3/4] musl-utils
+Subject: [PATCH] musl-utils
 
 Provide missing defines which otherwise are available on glibc system headers
 
@@ -161,6 +161,3 @@ index 9b8c09a..1fb5063 100644
  /* Name and version of program.  */
  ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
  
--- 
-2.17.1
-

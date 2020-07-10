@@ -10,12 +10,9 @@ inherit pypi
 
 SRC_URI_append_class-native = " file://0001-conditionally-do-not-fetch-code-by-easy_install.patch"
 
-SRC_URI += "file://0001-change-shebang-to-python3.patch \
-            file://0001-ScriptWriter-create-more-efficient-usr-bin-wrappers-signoff-included.patch \
-            "
+SRC_URI += "file://0001-change-shebang-to-python3.patch"
 
-SRC_URI[md5sum] = "6e9de90b242fdd60ef59f497424ce13a"
-SRC_URI[sha256sum] = "145fa62b9d7bb544fce16e9b5a9bf4ab2032d2f758b7cd674af09a92736aff74"
+SRC_URI[sha256sum] = "843037738d1e34e8b326b5e061f474aca6ef9d7ece41329afbc8aac6195a3920"
 
 DEPENDS += "${PYTHON_PN}"
 

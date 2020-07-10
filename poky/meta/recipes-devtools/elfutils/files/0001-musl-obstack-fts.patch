@@ -1,7 +1,7 @@
-From 8ccf3d92b8766b53f203df7e01b489604ef851f3 Mon Sep 17 00:00:00 2001
+From 1ec7b2208803e0fbdcbe6c07b849e7dc4d9fa8a2 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 23 Aug 2019 10:17:25 +0800
-Subject: [PATCH 1/4] musl-obstack-fts
+Subject: [PATCH] musl-obstack-fts
 
 Look for libfts and libobstack during configure, these
 libraries are external to libc when using musl, whereas
@@ -20,10 +20,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  3 files changed, 58 insertions(+), 4 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index cad7b2b..6d4229b 100644
+index e9649c2..03643c8 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -529,6 +529,60 @@ else
+@@ -538,6 +538,60 @@ else
  fi
  AC_SUBST([argp_LDADD])
  
@@ -122,6 +122,3 @@ index 13d9bda..d5a4f7d 100644
  unstrip_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD)
  stack_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD) $(demanglelib)
  elfcompress_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD)
--- 
-2.17.1
-

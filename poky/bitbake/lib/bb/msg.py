@@ -280,7 +280,7 @@ def setLoggingConfig(defaultconfig, userconfigfile=None):
     logconfig = copy.deepcopy(defaultconfig)
 
     if userconfigfile:
-        with open(userconfigfile, 'r') as f:
+        with open(os.path.normpath(userconfigfile), 'r') as f:
             if userconfigfile.endswith('.yml') or userconfigfile.endswith('.yaml'):
                 import yaml
                 userconfig = yaml.load(f)

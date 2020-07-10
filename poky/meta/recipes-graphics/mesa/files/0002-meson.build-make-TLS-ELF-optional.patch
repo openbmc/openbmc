@@ -1,4 +1,4 @@
-From df835389699b32bb6610b39972502e323f8e09e5 Mon Sep 17 00:00:00 2001
+From dd1d15c75f6ff8ee96cf1e7b74e582bff3183ef6 Mon Sep 17 00:00:00 2001
 From: Alistair Francis <alistair@alistair23.me>
 Date: Thu, 14 Nov 2019 13:08:31 -0800
 Subject: [PATCH] meson.build: make TLS ELF optional
@@ -15,10 +15,10 @@ Signed-off-by: Alistair Francis <alistair@alistair23.me>
  2 files changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index 09e3759..a954118 100644
+index 261b588..311436e 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -387,7 +387,7 @@ if with_egl and not (with_platform_drm or with_platform_surfaceless or with_plat
+@@ -392,7 +392,7 @@ if with_egl and not (with_platform_drm or with_platform_surfaceless or with_plat
  endif
  
  # Android uses emutls for versions <= P/28. For USE_ELF_TLS we need ELF TLS.
@@ -28,10 +28,10 @@ index 09e3759..a954118 100644
  endif
  
 diff --git a/meson_options.txt b/meson_options.txt
-index 626baf3..637ff14 100644
+index ab43150..d7b1555 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
-@@ -341,6 +341,12 @@ option(
+@@ -355,6 +355,12 @@ option(
    value : true,
    description : 'Enable direct rendering in GLX and EGL for DRI',
  )
@@ -42,5 +42,5 @@ index 626baf3..637ff14 100644
 +  description : 'Enable TLS support in ELF',
 +)
  option(
-   'I-love-half-baked-turnips',
+   'prefer-iris',
    type : 'boolean',

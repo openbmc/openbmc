@@ -183,10 +183,11 @@ class dummybuf(object):
 #
 class ConcurrentTestSuite(unittest.TestSuite):
 
-    def __init__(self, suite, processes, setupfunc):
+    def __init__(self, suite, processes, setupfunc, removefunc):
         super(ConcurrentTestSuite, self).__init__([suite])
         self.processes = processes
         self.setupfunc = setupfunc
+        self.removefunc = removefunc
 
     def run(self, result):
         tests, totaltests = fork_for_tests(self.processes, self)
@@ -237,22 +238,6 @@ class ConcurrentTestSuite(unittest.TestSuite):
         finally:
             queue.put(test)
 
-def removebuilddir(d):
-    delay = 5
-    while delay and os.path.exists(d + "/bitbake.lock"):
-        time.sleep(1)
-        delay = delay - 1
-    # Deleting these directories takes a lot of time, use autobuilder
-    # clobberdir if its available
-    clobberdir = os.path.expanduser("~/yocto-autobuilder-helper/janitor/clobberdir")
-    if os.path.exists(clobberdir):
-        try:
-            subprocess.check_call([clobberdir, d])
-            return
-        except subprocess.CalledProcessError:
-            pass
-    bb.utils.prunedir(d, ionice=True)
-
 def fork_for_tests(concurrency_num, suite):
     result = []
     if 'BUILDDIR' in os.environ:
@@ -297,7 +282,7 @@ def fork_for_tests(concurrency_num, suite):
                 if ourpid != os.getpid():
                     os._exit(0)
                 if newbuilddir and unittest_result.wasSuccessful():
-                    removebuilddir(newbuilddir)
+                    suite.removefunc(newbuilddir)
             except:
                 # Don't do anything with process children
                 if ourpid != os.getpid():
@@ -313,7 +298,7 @@ def fork_for_tests(concurrency_num, suite):
                     sys.stderr.write(traceback.format_exc())
                 finally:
                     if newbuilddir:
-                        removebuilddir(newbuilddir)
+                        suite.removefunc(newbuilddir)
                     stream.flush()
                     os._exit(1)
             stream.flush()

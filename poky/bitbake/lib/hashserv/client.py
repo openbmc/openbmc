@@ -7,6 +7,7 @@ import json
 import logging
 import socket
 import os
+from . import chunkify, DEFAULT_MAX_CHUNK
 
 
 logger = logging.getLogger('hashserv.client')
@@ -25,6 +26,7 @@ class Client(object):
         self.reader = None
         self.writer = None
         self.mode = self.MODE_NORMAL
+        self.max_chunk = DEFAULT_MAX_CHUNK
 
     def connect_tcp(self, address, port):
         def connect_sock():
@@ -58,7 +60,7 @@ class Client(object):
             self.reader = self._socket.makefile('r', encoding='utf-8')
             self.writer = self._socket.makefile('w', encoding='utf-8')
 
-            self.writer.write('OEHASHEQUIV 1.0\n\n')
+            self.writer.write('OEHASHEQUIV 1.1\n\n')
             self.writer.flush()
 
             # Restore mode if the socket is being re-created
@@ -91,18 +93,35 @@ class Client(object):
                 count += 1
 
     def send_message(self, msg):
-        def proc():
-            self.writer.write('%s\n' % json.dumps(msg))
-            self.writer.flush()
-
-            l = self.reader.readline()
-            if not l:
+        def get_line():
+            line = self.reader.readline()
+            if not line:
                 raise HashConnectionError('Connection closed')
 
-            if not l.endswith('\n'):
+            if not line.endswith('\n'):
                 raise HashConnectionError('Bad message %r' % message)
 
-            return json.loads(l)
+            return line
+
+        def proc():
+            for c in chunkify(json.dumps(msg), self.max_chunk):
+                self.writer.write(c)
+            self.writer.flush()
+
+            l = get_line()
+
+            m = json.loads(l)
+            if 'chunk-stream' in m:
+                lines = []
+                while True:
+                    l = get_line().rstrip('\n')
+                    if not l:
+                        break
+                    lines.append(l)
+
+                m = json.loads(''.join(lines))
+
+            return m
 
         return self._send_wrapper(proc)
 
@@ -154,6 +173,14 @@ class Client(object):
         m['method'] = method
         m['unihash'] = unihash
         return self.send_message({'report-equiv': m})
+
+    def get_taskhash(self, method, taskhash, all_properties=False):
+        self._set_mode(self.MODE_NORMAL)
+        return self.send_message({'get': {
+            'taskhash': taskhash,
+            'method': method,
+            'all': all_properties
+        }})
 
     def get_stats(self):
         self._set_mode(self.MODE_NORMAL)

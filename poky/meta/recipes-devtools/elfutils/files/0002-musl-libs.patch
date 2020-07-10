@@ -1,7 +1,7 @@
-From ea908c7009de5a208383abf4bec4c6b3d9519ca3 Mon Sep 17 00:00:00 2001
+From 9a57efb0f826a70ae360aa55504ee2de656b92b6 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 23 Aug 2019 10:18:47 +0800
-Subject: [PATCH 2/4] musl-libs
+Subject: [PATCH] musl-libs
 
 Collection of fixes needed to compile libelf and other libraries
 provided by elfutils for musl targets
@@ -104,7 +104,7 @@ index 7bcf61c..11dcc8b 100644
        return elf_errmsg (error & 0xffff);
      case OTHER_ERROR (LIBDW):
 diff --git a/libdwfl/linux-kernel-modules.c b/libdwfl/linux-kernel-modules.c
-index d46ab5a..1c3faee 100644
+index 0434f1e..5afaee8 100644
 --- a/libdwfl/linux-kernel-modules.c
 +++ b/libdwfl/linux-kernel-modules.c
 @@ -50,6 +50,7 @@
@@ -116,7 +116,7 @@ index d46ab5a..1c3faee 100644
  /* If fts.h is included before config.h, its indirect inclusions may not
     give us the right LFS aliases of these functions, so map them manually.  */
 diff --git a/libelf/elf.h b/libelf/elf.h
-index bed273d..be228e6 100644
+index 197b557..8e5b94c 100644
 --- a/libelf/elf.h
 +++ b/libelf/elf.h
 @@ -21,7 +21,9 @@
@@ -130,9 +130,9 @@ index bed273d..be228e6 100644
  
  /* Standard ELF types.  */
  
-@@ -4029,6 +4031,7 @@ enum
- #define R_NDS32_TLS_TPOFF	102
- #define R_NDS32_TLS_DESC	119
+@@ -4103,6 +4105,7 @@ enum
+ #define R_ARC_TLS_LE_S9		0x4a
+ #define R_ARC_TLS_LE_32		0x4b
  
 -__END_DECLS
 -
@@ -140,6 +140,3 @@ index bed273d..be228e6 100644
 +}
 +#endif
  #endif	/* elf.h */
--- 
-2.17.1
-

@@ -59,9 +59,20 @@ base_bindir_progs = "cat chgrp chmod chown cp date dd echo false hostname kill l
 
 sbindir_progs= "chroot"
 
-PACKAGE_BEFORE_PN_class-target += "coreutils-stdbuf"
+# Split stdbuf into its own package, so one can include
+# coreutils-stdbuf without getting the rest of coreutils, but make
+# coreutils itself pull in stdbuf, so IMAGE_INSTALL += "coreutils"
+# always provides all coreutils
+PACKAGE_BEFORE_PN_class-target += "${@bb.utils.contains('PACKAGECONFIG', 'single-binary', '', 'coreutils-stdbuf', d)}"
 FILES_coreutils-stdbuf = "${bindir}/stdbuf ${libdir}/coreutils/libstdbuf.so"
-RDEPENDS_coreutils_class-target += "coreutils-stdbuf"
+RDEPENDS_coreutils_class-target += "${@bb.utils.contains('PACKAGECONFIG', 'single-binary', '', 'coreutils-stdbuf', d)}"
+
+# However, when the single-binary PACKAGECONFIG is used, stdbuf
+# functionality is built into the single coreutils binary, so there's
+# no point splitting /usr/bin/stdbuf to its own package. Instead, add
+# an RPROVIDE so that rdepending on coreutils-stdbuf will work
+# regardless of whether single-binary is in effect.
+RPROVIDES_coreutils += "${@bb.utils.contains('PACKAGECONFIG', 'single-binary', 'coreutils-stdbuf', '', d)}"
 
 # Let aclocal use the relative path for the m4 file rather than the
 # absolute since coreutils has a lot of m4 files, otherwise there might

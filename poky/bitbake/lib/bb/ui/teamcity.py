@@ -167,8 +167,6 @@ def main(server, eventHandler, params):
         forcelevel = bb.msg.BBLogFormatter.ERROR
     else:
         forcelevel = bb.msg.BBLogFormatter.WARNING
-    bb.msg.addDefaultlogFilter(console, bb.msg.BBLogFilterStdOut, forcelevel)
-    bb.msg.addDefaultlogFilter(errconsole, bb.msg.BBLogFilterStdErr)
     console.setFormatter(format)
     errconsole.setFormatter(format)
     if not bb.msg.has_console_handler(logger):

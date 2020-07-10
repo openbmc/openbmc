@@ -37,7 +37,7 @@ EDK_TOOLS_DIR="edk2_basetools"
 BUILD_OPTIMIZATION="-pipe"
 
 # OVMF supports IA only, although it could conceivably support ARM someday.
-COMPATIBLE_HOST='(i.86|x86_64).*'
+COMPATIBLE_HOST_class-target='(i.86|x86_64).*'
 
 # Additional build flags for OVMF with Secure Boot.
 # Fedora also uses "-D SMM_REQUIRE -D EXCLUDE_SHELL_FROM_FD".
@@ -220,7 +220,6 @@ do_deploy[depends] += "${DEPLOYDEP}"
 
 do_deploy() {
 }
-do_deploy[cleandirs] = "${DEPLOYDIR}"
 do_deploy_class-target() {
     # For use with "runqemu ovmf".
     for i in \

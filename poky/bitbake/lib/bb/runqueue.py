@@ -2967,7 +2967,12 @@ class runQueuePipe():
             while index != -1 and self.queue.startswith(b"<event>"):
                 try:
                     event = pickle.loads(self.queue[7:index])
-                except ValueError as e:
+                except (ValueError, pickle.UnpicklingError, AttributeError, IndexError) as e:
+                    if isinstance(e, pickle.UnpicklingError) and "truncated" in str(e):
+                        # The pickled data could contain "</event>" so search for the next occurance
+                        # unpickling again, this should be the only way an unpickle error could occur
+                        index = self.queue.find(b"</event>", index + 1)
+                        continue
                     bb.msg.fatal("RunQueue", "failed load pickle '%s': '%s'" % (e, self.queue[7:index]))
                 bb.event.fire_from_worker(event, self.d)
                 if isinstance(event, taskUniHashUpdate):
@@ -2979,7 +2984,7 @@ class runQueuePipe():
             while index != -1 and self.queue.startswith(b"<exitcode>"):
                 try:
                     task, status = pickle.loads(self.queue[10:index])
-                except ValueError as e:
+                except (ValueError, pickle.UnpicklingError, AttributeError, IndexError) as e:
                     bb.msg.fatal("RunQueue", "failed load pickle '%s': '%s'" % (e, self.queue[10:index]))
                 self.rqexec.runqueue_process_waitpid(task, status)
                 found = True

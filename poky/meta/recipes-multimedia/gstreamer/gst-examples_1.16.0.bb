@@ -15,6 +15,7 @@ S = "${WORKDIR}/git"
 
 inherit meson pkgconfig features_check
 
+UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+\.(\d*[02468])+(\.\d+)+)"
 
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 

@@ -1,7 +1,7 @@
-From 7ff8cbecde7455b530fa7894a78d2326799f2556 Mon Sep 17 00:00:00 2001
+From 48b769ab692c8f02c1ae467229fe3404f662098a Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Wed, 1 May 2019 22:15:03 +0100
-Subject: [PATCH 4/4] Fix error on musl:
+Subject: [PATCH] Fix error on musl:
 
 | ../../elfutils-0.176/tests/elfstrmerge.c: In function 'main':
 | ../../elfutils-0.176/tests/elfstrmerge.c:370:60: error: 'ALLPERMS' undeclared (first use in this function); did you mean 'EPERM'?
@@ -34,6 +34,3 @@ index ba0d68d..1d2447f 100644
  /* The original ELF file.  */
  static int fd = -1;
  static Elf *elf = NULL;
--- 
-2.17.1
-

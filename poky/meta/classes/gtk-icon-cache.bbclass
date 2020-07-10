@@ -1,6 +1,10 @@
 FILES_${PN} += "${datadir}/icons/hicolor"
 
-DEPENDS +=" ${@['hicolor-icon-theme', '']['${BPN}' == 'hicolor-icon-theme']} gtk+3-native"
+DEPENDS +=" ${@['hicolor-icon-theme', '']['${BPN}' == 'hicolor-icon-theme']} \
+            ${@['gdk-pixbuf', '']['${BPN}' == 'gdk-pixbuf']} \
+            ${@['gtk+3', '']['${BPN}' == 'gtk+3']} \
+            gtk+3-native \
+"
 
 PACKAGE_WRITE_DEPS += "gtk+3-native gdk-pixbuf-native"
 
@@ -48,9 +52,18 @@ python populate_packages_append () {
         bb.note("adding hicolor-icon-theme dependency to %s" % pkg)
         rdepends = ' ' + d.getVar('MLPREFIX', False) + "hicolor-icon-theme"
         d.appendVar('RDEPENDS_%s' % pkg, rdepends)
-    
+
+        #gtk_icon_cache_postinst depend on gdk-pixbuf and gtk+3
+        bb.note("adding gdk-pixbuf dependency to %s" % pkg)
+        rdepends = ' ' + d.getVar('MLPREFIX', False) + "gdk-pixbuf"
+        d.appendVar('RDEPENDS_%s' % pkg, rdepends)
+
+        bb.note("adding gtk+3 dependency to %s" % pkg)
+        rdepends = ' ' + d.getVar('MLPREFIX', False) + "gtk+3"
+        d.appendVar('RDEPENDS_%s' % pkg, rdepends)
+
         bb.note("adding gtk-icon-cache postinst and postrm scripts to %s" % pkg)
-        
+
         postinst = d.getVar('pkg_postinst_%s' % pkg)
         if not postinst:
             postinst = '#!/bin/sh\n'

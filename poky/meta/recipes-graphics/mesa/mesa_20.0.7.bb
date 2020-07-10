@@ -1,1 +1,0 @@
-require ${BPN}.inc

@@ -297,9 +297,9 @@ class Rootfs(object, metaclass=ABCMeta):
 
     def _run_ldconfig(self):
         if self.d.getVar('LDCONFIGDEPEND'):
-            bb.note("Executing: ldconfig -r " + self.image_rootfs + " -c new -v")
+            bb.note("Executing: ldconfig -r " + self.image_rootfs + " -c new -v -X")
             self._exec_shell_cmd(['ldconfig', '-r', self.image_rootfs, '-c',
-                                  'new', '-v'])
+                                  'new', '-v', '-X'])
 
     def _check_for_kernel_modules(self, modules_dir):
         for root, dirs, files in os.walk(modules_dir, topdown=True):

@@ -99,6 +99,29 @@ class TestHashEquivalenceServer(object):
         result = self.client.get_unihash(self.METHOD, taskhash)
         self.assertEqual(result, unihash)
 
+    def test_huge_message(self):
+        # Simple test that hashes can be created
+        taskhash = 'c665584ee6817aa99edfc77a44dd853828279370'
+        outhash = '3c979c3db45c569f51ab7626a4651074be3a9d11a84b1db076f5b14f7d39db44'
+        unihash = '90e9bc1d1f094c51824adca7f8ea79a048d68824'
+
+        result = self.client.get_unihash(self.METHOD, taskhash)
+        self.assertIsNone(result, msg='Found unexpected task, %r' % result)
+
+        siginfo = "0" * (self.client.max_chunk * 4)
+
+        result = self.client.report_unihash(taskhash, self.METHOD, outhash, unihash, {
+            'outhash_siginfo': siginfo
+        })
+        self.assertEqual(result['unihash'], unihash, 'Server returned bad unihash')
+
+        result = self.client.get_taskhash(self.METHOD, taskhash, True)
+        self.assertEqual(result['taskhash'], taskhash)
+        self.assertEqual(result['unihash'], unihash)
+        self.assertEqual(result['method'], self.METHOD)
+        self.assertEqual(result['outhash'], outhash)
+        self.assertEqual(result['outhash_siginfo'], siginfo)
+
     def test_stress(self):
         def query_server(failures):
             client = Client(self.server.address)

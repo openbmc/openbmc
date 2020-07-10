@@ -37,10 +37,6 @@ class LogrotateTest(OERuntimeTestCase):
         msg = ('Could not write to /tmp/logrotate-test.conf')
         self.assertEqual(status, 0, msg = msg)
         
-        status, output = self.target.run('echo "/var/log/logrotate_test {\\n missingok \\n monthly \\n rotate 1" > /etc/logrotate.d/logrotate_test')
-        msg = ('Could not write to /etc/logrotate.d/logrotate_test')
-        self.assertEqual(status, 0, msg = msg)
-        
         # If logrotate fails to rotate the log, view the verbose output of logrotate to see what prevented it
         _, logrotate_output = self.target.run('logrotate -vf /tmp/logrotate-test.conf')
         status, _ = self.target.run('find $HOME/logrotate_dir -type f | grep wtmp.1')

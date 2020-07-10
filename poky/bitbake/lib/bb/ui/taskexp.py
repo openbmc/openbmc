@@ -8,9 +8,16 @@
 #
 
 import sys
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk, GObject
+
+try:
+    import gi
+    gi.require_version('Gtk', '3.0')
+    from gi.repository import Gtk, Gdk, GObject
+except ValueError:
+    sys.exit("FATAL: Gtk version needs to be 3.0")
+except ImportError:
+    sys.exit("FATAL: Gtk ui could not load the required gi python module")
+
 import threading
 from xmlrpc import client
 import bb

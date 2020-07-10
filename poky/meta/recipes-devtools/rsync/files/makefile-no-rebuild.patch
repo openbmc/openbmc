@@ -1,20 +1,26 @@
+From 5ae38baadd40a996da3d19a147f37e7f1f3355bf Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Tue, 12 Apr 2016 15:51:54 +0100
+Subject: [PATCH] rsync: remove upstream's rebuild logic
+
 Remove the Makefile rules to reinvoke autoconf, they're not out-of-tree safe and
 generally overcomplicated, and we ensure that autoreconf is invoked if required.
 
 Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 
+---
+ Makefile.in | 50 --------------------------------------------------
+ 1 file changed, 50 deletions(-)
+
 diff --git a/Makefile.in b/Makefile.in
-index 151247d..8f3fdb6 100644
+index 31ddc43..41c9a93 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -141,58 +141,6 @@ gen: conf proto.h man
+@@ -167,56 +167,6 @@ gen: conf proto.h man
  gensend: gen
- 	rsync -aivzc $(GENFILES) $${SAMBA_HOST-samba.org}:/home/ftp/pub/rsync/generated-files/
+ 	rsync -aic $(GENFILES) $${SAMBA_HOST-samba.org}:/home/ftp/pub/rsync/generated-files/
  
--conf:
--	cd $(srcdir) && $(MAKE) -f prepare-source.mak conf
--
 -aclocal.m4: $(srcdir)/m4/*.m4
 -	aclocal -I $(srcdir)/m4
 -
@@ -45,6 +51,7 @@ index 151247d..8f3fdb6 100644
 -	    fi \
 -	fi
 -
+-.PHONY: reconfigure
 -reconfigure: configure.sh
 -	./config.status --recheck
 -	./config.status
@@ -64,6 +71,6 @@ index 151247d..8f3fdb6 100644
 -	    fi \
 -	fi
 -
- rsync-ssl: $(srcdir)/rsync-ssl.in Makefile
- 	sed 's;\@bindir\@;$(bindir);g' <$(srcdir)/rsync-ssl.in >rsync-ssl
- 	@chmod +x rsync-ssl
+ stunnel-rsyncd.conf: $(srcdir)/stunnel-rsyncd.conf.in Makefile
+ 	sed 's;\@bindir\@;$(bindir);g' <$(srcdir)/stunnel-rsyncd.conf.in >stunnel-rsyncd.conf
+ 

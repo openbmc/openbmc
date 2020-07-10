@@ -22,6 +22,37 @@ from oeqa.core.exception import OEQAPreRun, OEQATestNotFound
 
 from oeqa.utils.commands import runCmd, get_bb_vars, get_test_layer
 
+class NonConcurrentTestSuite(unittest.TestSuite):
+    def __init__(self, suite, processes, setupfunc, removefunc):
+        super().__init__([suite])
+        self.processes = processes
+        self.suite = suite
+        self.setupfunc = setupfunc
+        self.removefunc = removefunc
+
+    def run(self, result):
+        (builddir, newbuilddir) = self.setupfunc("-st", None, self.suite)
+        ret = super().run(result)
+        os.chdir(builddir)
+        if newbuilddir and ret.wasSuccessful():
+            self.removefunc(newbuilddir)
+
+def removebuilddir(d):
+    delay = 5
+    while delay and os.path.exists(d + "/bitbake.lock"):
+        time.sleep(1)
+        delay = delay - 1
+    # Deleting these directories takes a lot of time, use autobuilder
+    # clobberdir if its available
+    clobberdir = os.path.expanduser("~/yocto-autobuilder-helper/janitor/clobberdir")
+    if os.path.exists(clobberdir):
+        try:
+            subprocess.check_call([clobberdir, d])
+            return
+        except subprocess.CalledProcessError:
+            pass
+    bb.utils.prunedir(d, ionice=True)
+
 class OESelftestTestContext(OETestContext):
     def __init__(self, td=None, logger=None, machines=None, config_paths=None, newbuilddir=None):
         super(OESelftestTestContext, self).__init__(td, logger)
@@ -86,10 +117,9 @@ class OESelftestTestContext(OETestContext):
         if processes:
             from oeqa.core.utils.concurrencytest import ConcurrentTestSuite
 
-            return ConcurrentTestSuite(suites, processes, self.setup_builddir)
+            return ConcurrentTestSuite(suites, processes, self.setup_builddir, removebuilddir)
         else:
-            self.setup_builddir("-st", None, suites)
-            return suites
+            return NonConcurrentTestSuite(suites, processes, self.setup_builddir, removebuilddir)
 
     def runTests(self, processes=None, machine=None, skips=[]):
         if machine:

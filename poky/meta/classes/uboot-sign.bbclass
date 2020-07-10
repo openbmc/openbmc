@@ -117,15 +117,16 @@ do_install_append() {
 	fi
 }
 
+do_deploy_prepend_pn-${UBOOT_PN}() {
+	if [ "${UBOOT_SIGN_ENABLE}" = "1" -a -n "${UBOOT_DTB_BINARY}" ]; then
+		concat_dtb
+	fi
+}
+
 python () {
     if d.getVar('UBOOT_SIGN_ENABLE') == '1' and d.getVar('PN') == d.getVar('UBOOT_PN') and d.getVar('UBOOT_DTB_BINARY'):
         kernel_pn = d.getVar('PREFERRED_PROVIDER_virtual/kernel')
 
         # Make "bitbake u-boot -cdeploy" deploys the signed u-boot.dtb
         d.appendVarFlag('do_deploy', 'depends', ' %s:do_deploy' % kernel_pn)
-
-        # kernerl's do_deploy is a litle special, so we can't use
-        # do_deploy_append, otherwise it would override
-        # kernel_do_deploy.
-        d.appendVarFlag('do_deploy', 'prefuncs', ' concat_dtb')
 }

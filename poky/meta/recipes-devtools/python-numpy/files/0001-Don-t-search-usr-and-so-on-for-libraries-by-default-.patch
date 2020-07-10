@@ -1,4 +1,4 @@
-From 672a75c8417ce08db9e31fc415ec445479231d5a Mon Sep 17 00:00:00 2001
+From 27f6687e49bf555fc494d2f14bae6ecd0fa30f14 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 10 Dec 2015 13:20:30 +0200
 Subject: [PATCH] Don't search /usr and so on for libraries by default to
@@ -14,11 +14,11 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 5 insertions(+), 37 deletions(-)
 
 diff --git a/numpy/distutils/system_info.py b/numpy/distutils/system_info.py
-index ba2b1f4..f94dce1 100644
+index 3a6a7b2..6c2c3da 100644
 --- a/numpy/distutils/system_info.py
 +++ b/numpy/distutils/system_info.py
-@@ -278,45 +278,13 @@ if sys.platform == 'win32':
-             add_system_root(os.path.join(conda_dir, 'Library'))
+@@ -309,45 +309,13 @@ if sys.platform == 'win32':
+         add_system_root(os.path.join(conda_dir, 'Library'))
  
  else:
 -    default_lib_dirs = libpaths(['/usr/local/lib', '/opt/lib', '/usr/lib',
@@ -68,3 +68,6 @@ index ba2b1f4..f94dce1 100644
  
  if os.path.join(sys.prefix, 'lib') not in default_lib_dirs:
      default_lib_dirs.insert(0, os.path.join(sys.prefix, 'lib'))
+-- 
+2.17.1
+

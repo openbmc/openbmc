@@ -22,11 +22,9 @@ Upstream-Status: Pending
  tools/install.sh | 8 +++++---
  2 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 8246b78..d1dbe39 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -215,7 +215,7 @@ $(DESTDIR)$(includedir)/%: $(srcdir)/include/%
+@@ -210,7 +210,7 @@ $(DESTDIR)$(includedir)/%: $(srcdir)/inc
  	$(INSTALL) -D -m 644 $< $@
  
  $(DESTDIR)$(LDSO_PATHNAME): $(DESTDIR)$(libdir)/libc.so
@@ -35,8 +33,6 @@ index 8246b78..d1dbe39 100644
  
  install-libs: $(ALL_LIBS:lib/%=$(DESTDIR)$(libdir)/%) $(if $(SHARED_LIBS),$(DESTDIR)$(LDSO_PATHNAME),)
  
-diff --git a/tools/install.sh b/tools/install.sh
-index d913b60..b6a7f79 100755
 --- a/tools/install.sh
 +++ b/tools/install.sh
 @@ -6,18 +6,20 @@
@@ -62,7 +58,7 @@ index d913b60..b6a7f79 100755
  m) mode=$OPTARG ;;
  ?) usage ;;
  esac
-@@ -48,7 +50,7 @@ trap 'rm -f "$tmp"' EXIT INT QUIT TERM HUP
+@@ -48,7 +50,7 @@ trap 'rm -f "$tmp"' EXIT INT QUIT TERM H
  umask 077
  
  if test "$symlink" ; then
@@ -71,6 +67,3 @@ index d913b60..b6a7f79 100755
  else
  cat < "$1" > "$tmp"
  chmod "$mode" "$tmp"
--- 
-2.7.4
-

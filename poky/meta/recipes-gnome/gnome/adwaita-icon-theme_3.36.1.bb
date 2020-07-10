@@ -4,7 +4,9 @@ BUGTRACKER = "https://gitlab.gnome.org/GNOME/adwaita-icon-theme/issues"
 SECTION = "x11/gnome"
 
 LICENSE = "LGPL-3.0 | CC-BY-SA-3.0"
-LIC_FILES_CHKSUM = "file://COPYING;md5=c84cac88e46fc07647ea07e6c24eeb7c"
+LIC_FILES_CHKSUM = "file://COPYING;md5=c84cac88e46fc07647ea07e6c24eeb7c \
+                    file://COPYING_CCBYSA3;md5=96143d33de3a79321b1006c4e8ed07e7 \
+                    file://COPYING_LGPL;md5=e6a600fd5e1d9cbde2d983680233ad02"
 
 inherit allarch autotools pkgconfig gettext gtk-icon-cache upstream-version-is-even
 

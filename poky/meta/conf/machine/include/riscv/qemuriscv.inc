@@ -18,7 +18,7 @@ WKS_FILE ?= "qemuriscv.wks"
 MACHINE_EXTRA_RRECOMMENDS += " kernel-modules"
 
 EXTRA_IMAGEDEPENDS += "opensbi"
-RISCV_SBI_PLAT ?= "qemu/virt"
+RISCV_SBI_PLAT ?= "generic"
 RISCV_SBI_PAYLOAD ?= "${KERNEL_IMAGETYPE}-${MACHINE}.bin"
 
 UBOOT_ENTRYPOINT_riscv32 = "0x80400000"

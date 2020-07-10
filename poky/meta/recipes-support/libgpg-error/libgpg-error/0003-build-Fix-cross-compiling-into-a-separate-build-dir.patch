@@ -1,0 +1,43 @@
+From 6efe006e99a7e739afbf7fe8937445c82630fc8f Mon Sep 17 00:00:00 2001
+From: David Michael <fedora.dm0@gmail.com>
+Date: Mon, 1 Jun 2020 10:24:53 -0400
+Subject: [PATCH] build: Fix cross-compiling into a separate build dir.
+
+* configure.ac: Create the src directory before writing into it.
+* src/Makefile.am (EXTRA_DIST): Add gen-lock-obj.sh.
+
+--
+
+Upstream-Status: Backport
+Signed-off-by: David Michael <fedora.dm0@gmail.com>
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ configure.ac    | 1 +
+ src/Makefile.am | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index def8bba..8c0d845 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -598,6 +598,7 @@ if test x$cross_compiling = xyes; then
+   case $host in
+     *-*-linux*)
+     lock_obj_h_generated=yes
++    mkdir src
+     LOCK_ABI_VERSION=1 host=$host host_alias=$host_alias \
+         CC=$CC OBJDUMP=$host_alias-objdump \
+         ac_ext=$ac_ext ac_objext=$ac_objext \
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 2fb83c0..d773877 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -102,7 +102,7 @@ EXTRA_DIST = mkstrtable.awk err-sources.h.in err-codes.h.in \
+ 	gpg-error.vers gpg-error.def.in \
+         versioninfo.rc.in gpg-error.w32-manifest.in \
+ 	gpg-error-config-test.sh gpg-error.pc.in \
+-	$(lock_obj_pub)
++	gen-lock-obj.sh $(lock_obj_pub)
+ 
+ BUILT_SOURCES = $(srcdir)/err-sources.h $(srcdir)/err-codes.h \
+ 	code-to-errno.h code-from-errno.h \
