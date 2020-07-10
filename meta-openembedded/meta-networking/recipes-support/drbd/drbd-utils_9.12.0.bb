@@ -56,3 +56,5 @@ FILES_${PN} += "${nonarch_base_libdir}/drbd \
                 ${nonarch_libdir}/drbd \
                 ${nonarch_libdir}/tmpfiles.d"
 FILES_${PN}-dbg += "${nonarch_base_libdir}/drbd/.debug"
+
+CLEANBROKEN = "1"

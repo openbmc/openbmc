@@ -60,6 +60,10 @@ PACKAGECONFIG[libseccomp] = ",,libseccomp"
 # not yet in meta-gnome
 PACKAGECONFIG[rss]        = "-Dminer_rss=true,-Dminer_rss=false,libgrss"
 
+EXTRA_OEMESON += " \
+    -Dsystemd_user_services=${systemd_user_unitdir} \
+"
+
 FILES_${PN} += " \
     ${datadir}/dbus-1 \
     ${datadir}/tracker \

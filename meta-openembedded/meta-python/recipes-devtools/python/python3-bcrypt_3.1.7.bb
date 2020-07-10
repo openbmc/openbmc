@@ -7,7 +7,20 @@ DEPENDS += "${PYTHON_PN}-cffi-native"
 SRC_URI[md5sum] = "5d6f93b575ce52470af37a8e7dce76fe"
 SRC_URI[sha256sum] = "0b0069c752ec14172c5f78208f1863d7ad6755a6fae6fe76ec2c80d13be41e42"
 
-inherit pypi setuptools3
+inherit pypi setuptools3 ptest
+
+SRC_URI += " \
+	file://run-ptest \
+"
+
+RDEPENDS_${PN}-ptest += " \
+	${PYTHON_PN}-pytest \
+"
+
+do_install_ptest() {
+	install -d ${D}${PTEST_PATH}/tests
+	cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
+}
 
 RDEPENDS_${PN}_class-target += "\
     ${PYTHON_PN}-cffi \

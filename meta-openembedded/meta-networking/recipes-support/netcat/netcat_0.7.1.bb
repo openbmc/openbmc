@@ -16,6 +16,8 @@ SRC_URI[sha256sum] = "b55af0bbdf5acc02d1eb6ab18da2acd77a400bafd074489003f3df0967
 
 inherit autotools
 
+CVE_PRODUCT = "netcat_project:netcat"
+
 do_install_append() {
     install -d ${D}${bindir}
     mv ${D}${bindir}/nc ${D}${bindir}/nc.${BPN}

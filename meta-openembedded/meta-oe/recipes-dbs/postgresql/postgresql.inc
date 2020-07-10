@@ -310,7 +310,7 @@ FILES_libpgtypes-staticdev = "${libdir}/libpgtypes*.a"
 FILES_libpgtypes-dev = "${libdir}/libpgtypes*${SOLIBS} ${includedir}/pgtypes*.h"
 
 FILES_${PN}-contrib = " ${bindir}/oid2name ${bindir}/pg_standby \
-    ${bindir}/pgbench ${bindir}/vacuumlo \
+    ${bindir}/pgbench \
     ${S}/contrib/spi/*.example \
     ${libdir}/${BPN}/_int.so ${libdir}/${BPN}/adminpack.so \
     ${libdir}/${BPN}/autoinc.so ${libdir}/${BPN}/auto_explain.so \

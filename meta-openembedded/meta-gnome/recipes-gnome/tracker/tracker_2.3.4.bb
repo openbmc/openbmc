@@ -41,7 +41,9 @@ do_write_config_append() {
     echo "sqlite3_has_fts5 = '${@bb.utils.contains('PACKAGECONFIG', 'fts', 'true', 'false', d)}'" >> ${WORKDIR}/meson-tracker.cross
 }
 
-EXTRA_OEMESON = "--cross-file ${WORKDIR}/meson-tracker.cross"
+EXTRA_OEMESON = "--cross-file ${WORKDIR}/meson-tracker.cross \
+                 -Dsystemd_user_services=${systemd_user_unitdir} \
+"
 
 FILES_${PN} += " \
     ${datadir}/dbus-1 \

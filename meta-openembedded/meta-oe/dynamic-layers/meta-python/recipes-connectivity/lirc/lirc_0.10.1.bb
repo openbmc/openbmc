@@ -29,7 +29,7 @@ SYSTEMD_SERVICE_${PN}-exec = "irexec.service"
 SYSTEMD_AUTO_ENABLE_lirc = "enable"
 SYSTEMD_AUTO_ENABLE_lirc-exec = "enable"
 
-inherit autotools pkgconfig systemd python3native
+inherit autotools pkgconfig systemd python3native distutils-common-base
 
 PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_unitdir}/system/,--without-systemdsystemunitdir,systemd"
 PACKAGECONFIG[x11] = "--with-x,--with-x=no,libx11,"

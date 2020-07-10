@@ -117,3 +117,4 @@ FILES_kpartx = "${base_sbindir}/kpartx \
                "
 
 RDEPENDS_${PN} += "kpartx"
+PARALLEL_MAKE = ""

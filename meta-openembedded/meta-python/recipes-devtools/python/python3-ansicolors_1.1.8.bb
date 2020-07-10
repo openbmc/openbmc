@@ -7,6 +7,18 @@ SRC_URI[sha256sum] = "99f94f5e3348a0bcd43c82e5fc4414013ccc19d70bd939ad71e0133ce9
 
 PYPI_PACKAGE_EXT = "zip"
 
-inherit pypi setuptools3
+inherit pypi setuptools3 ptest
+
+SRC_URI += " \
+	file://run-ptest \
+"
+
+RDEPENDS_${PN}-ptest += " \
+	${PYTHON_PN}-pytest \
+"
+
+do_install_ptest() {
+	cp -f ${S}/test/test.py ${D}${PTEST_PATH}/
+}
 
 BBCLASSEXTEND = "native nativesdk"

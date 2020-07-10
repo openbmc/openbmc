@@ -13,7 +13,3 @@ inherit autotools-brokensep pkgconfig
 
 SRC_URI[md5sum] = "6bd98ee3a6e6b9126c82c916d7a9e690"
 SRC_URI[sha256sum] = "7c3c7a9c73ff3302084386e96f903eb62ce06953bb1666235fac74363a16fad9"
-
-FILES_${PN}_append = " \
-    ${libdir}/cmake \
-"

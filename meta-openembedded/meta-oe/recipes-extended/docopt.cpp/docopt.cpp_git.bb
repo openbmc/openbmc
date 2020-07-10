@@ -14,12 +14,11 @@ LIC_FILES_CHKSUM = "\
 "
 
 DEPENDS = "boost"
-SRCREV = "3dd23e3280f213bacefdf5fcb04857bf52e90917"
-PV = "0.6.2+git${SRCPV}"
+SRCREV = "42ebcec9dc2c99a1b3a4542787572045763ad196"
+PV = "0.6.3+git${SRCPV}"
 
 SRC_URI = "\
     git://github.com/docopt/docopt.cpp.git;protocol=https \
-    file://0001-Set-library-VERSION-and-SOVERSION.patch \
 "
 
 S = "${WORKDIR}/git"

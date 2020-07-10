@@ -1,0 +1,19 @@
+#!/bin/sh
+
+ptestdir=$(dirname "$(readlink -f "$0")")
+cd $ptestdir/tests
+./test_cunit > cunit_test_out.tmp
+
+echo "--- Test output ---"
+cat cunit_test_out.tmp
+echo ""
+echo "--- ptest result ---"
+
+grep "Failures: 0" cunit_test_out.tmp > /dev/null
+if [ $? -eq 0 ]; then
+	echo "PASS: cunit"
+else
+	echo "FAIL: cunit"
+fi
+
+rm -f cunit_test_out.tmp

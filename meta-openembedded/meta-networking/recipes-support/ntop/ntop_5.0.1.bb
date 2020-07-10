@@ -138,5 +138,5 @@ FILES_${PN}-dev = "${includedir} ${libdir}/libntop.so \
                    ${libdir}/libntopreport.so \
                    ${libdir}/libnetflowPlugin.so ${libdir}/libsflowPlugin.so \
                    ${libdir}/librrdPlugin.so \
-                   ${libdir}/*.a ${libdir}/libntopreport.a ${libdir}/*.la"
+                   ${libdir}/*.la"
 

@@ -10,4 +10,18 @@ SRC_URI = "git://github.com/libfuse/sshfs"
 SRCREV = "a7e1038203c856cc7e052d439d1da49fe131339f"
 S = "${WORKDIR}/git"
 
-inherit meson
+inherit meson ptest
+
+SRC_URI += " \
+	file://run-ptest \
+"
+
+RDEPENDS_${PN}-ptest += " \
+        ${PYTHON_PN}-pytest \
+        bash \
+"
+
+do_install_ptest() {
+        install -d ${D}${PTEST_PATH}/test
+        cp -rf ${S}/test/* ${D}${PTEST_PATH}/test/
+}

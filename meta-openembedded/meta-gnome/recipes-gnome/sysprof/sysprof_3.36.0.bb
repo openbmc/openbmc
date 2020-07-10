@@ -18,8 +18,7 @@ SRC_URI[archive.md5sum] = "3956e82b8744715006dde59e0ce8910b"
 SRC_URI[archive.sha256sum] = "8670db4dacf7b219d30c575c465b17c8ed6724dbade347f2cde9548bff039108"
 SRC_URI += " \
     file://0001-sysprof-Define-NT_GNU_BUILD_ID-if-undefined.patch \
-    file://0002-meson.build-do-not-hardcode-linux-as-host_machine-.s.patch \
-    file://0003-tests-use-G_GSIZE_FORMAT-instead-of-G_GUINT64_FORMAT.patch \
+    file://0002-tests-use-G_GSIZE_FORMAT-instead-of-G_GUINT64_FORMAT.patch \
 "
 
 PACKAGECONFIG ?= "sysprofd libsysprof ${@bb.utils.contains_any('DISTRO_FEATURES', '${GTK3DISTROFEATURES}', 'gtk', '', d)}"

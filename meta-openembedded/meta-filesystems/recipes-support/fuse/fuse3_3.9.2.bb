@@ -20,7 +20,21 @@ S = "${WORKDIR}/fuse-${PV}"
 UPSTREAM_CHECK_URI = "https://github.com/libfuse/libfuse/releases"
 UPSTREAM_CHECK_REGEX = "fuse\-(?P<pver>3(\.\d+)+).tar.xz"
 
-inherit meson pkgconfig
+inherit meson pkgconfig ptest
+
+SRC_URI += " \
+        file://run-ptest \
+"
+
+RDEPENDS_${PN}-ptest += " \
+        ${PYTHON_PN}-pytest \
+	bash \
+"
+
+do_install_ptest() {
+        install -d ${D}${PTEST_PATH}/test
+        cp -rf ${S}/test/* ${D}${PTEST_PATH}/test/
+}
 
 DEPENDS = "udev"
 

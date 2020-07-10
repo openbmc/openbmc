@@ -18,8 +18,6 @@ SRC_URI = "http://download.savannah.gnu.org/releases/ruli/ruli_${PV}.orig.tar.gz
 SRC_URI[md5sum] = "e73fbfdeadddb68a703a70cea5271468"
 SRC_URI[sha256sum] = "11d32def5b514748fbd9ea8c88049ae99e1bb358efc74eb91a4d268a3999dbfa"
 
-B = "${S}"
-
 EXTRA_OEMAKE = 'CC="${CC}" OOP_BASE_DIR="${STAGING_EXECPREFIXDIR}" \
                 INSTALL_BASE_DIR="${D}${exec_prefix}" \
                 OOP_LIB_DIR=${STAGING_EXECPREFIXDIR}/${baselib} \
@@ -34,5 +32,3 @@ do_install() {
 }
 
 PACKAGES =+ "${PN}-bin"
-
-FILES_${PN} =+ "${bindir}"
