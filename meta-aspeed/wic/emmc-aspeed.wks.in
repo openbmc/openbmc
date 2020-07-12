@@ -27,4 +27,4 @@ part --fstype=ext4 --fixed-size 64M --source bootimg-partition --label boot-b
 part --fstype=ext4 --fixed-size 1G --source rootfs --label rofs-a
 part --fstype=ext4 --fixed-size 1G --source rootfs --label rofs-b
 part --fstype=ext4 --fixed-size 7G --label rwfs
-part --fstype=ext4 --fixed-size ${WKS_HOSTFW_SIZE} --label hostfw
+part --fstype=ext4 --fixed-size ${WKS_HOSTFW_SIZE} --source rootfs --rootfs-dir=${DEPLOY_DIR_IMAGE}/hostfw/image/ --label hostfw

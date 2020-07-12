@@ -15,6 +15,7 @@ INITRAMFS_FSTYPES ?= "cpio.xz"
 
 WKS_FILE ?= "emmc-aspeed.wks.in"
 WKS_FILE_DEPENDS ?= " \
+    phosphor-hostfw-image \
     virtual/bootloader \
     virtual/kernel \
 "
