@@ -536,8 +536,16 @@ do_generate_ext4_tar() {
 	ln -sf ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.rwfs.${FLASH_EXT4_OVERLAY_BASETYPE} image-rwfs
 	ln -sf ${S}/MANIFEST MANIFEST
 	ln -sf ${S}/publickey publickey
-	make_signatures image-u-boot image-kernel image-rofs image-rwfs MANIFEST publickey
-	make_tar_of_images ext4.mmc MANIFEST publickey ${signature_files}
+
+	hostfw_update_file="${DEPLOY_DIR_IMAGE}/hostfw/update/image-hostfw"
+	if [ -e "${hostfw_update_file}" ]; then
+		ln -sf "${hostfw_update_file}" image-hostfw
+		make_signatures image-u-boot image-kernel image-rofs image-rwfs MANIFEST publickey image-hostfw
+		make_tar_of_images ext4.mmc MANIFEST publickey ${signature_files} image-hostfw
+	else
+		make_signatures image-u-boot image-kernel image-rofs image-rwfs MANIFEST publickey
+		make_tar_of_images ext4.mmc MANIFEST publickey ${signature_files}
+	fi
 }
 do_generate_ext4_tar[dirs] = " ${S}/ext4"
 do_generate_ext4_tar[depends] += " \
@@ -548,6 +556,7 @@ do_generate_ext4_tar[depends] += " \
         openssl-native:do_populate_sysroot \
         ${SIGNING_KEY_DEPENDS} \
         ${PN}:do_copy_signing_pubkey \
+        phosphor-hostfw-image:do_populate_sysroot \
         "
 
 def get_pubkey_basedir(d):
