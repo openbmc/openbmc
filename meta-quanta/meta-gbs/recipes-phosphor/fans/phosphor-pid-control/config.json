@@ -18,25 +18,25 @@
             "max": 255
         },
         {
-            "name": "fan2",
+            "name": "fb_fan0",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/fan2",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/fb_fan0",
             "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/Fan_0_To_4_Hwmon/pwm3",
             "min": 0,
             "max": 255
         },
         {
-            "name": "fan3",
+            "name": "fb_fan1",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/fan3",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/fb_fan1",
             "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/Fan_0_To_4_Hwmon/pwm4",
             "min": 0,
             "max": 255
         },
         {
-            "name": "fan4",
+            "name": "fb_fan2",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/fan4",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/fb_fan2",
             "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/Fan_0_To_4_Hwmon/pwm5",
             "min": 0,
             "max": 255
@@ -155,9 +155,9 @@
             "failsafePercent": 100.0,
             "pids": [
                 {
-                    "name": "fan2",
+                    "name": "fb_fan0",
                     "type": "fan",
-                    "inputs": ["fan2"],
+                    "inputs": ["fb_fan0"],
                     "setpoint": 0.0,
                     "pid": {
                         "samplePeriod": 0.1,
@@ -174,9 +174,9 @@
                     }
                 },
                 {
-                    "name": "fan3",
+                    "name": "fb_fan1",
                     "type": "fan",
-                    "inputs": ["fan3"],
+                    "inputs": ["fb_fan1"],
                     "setpoint": 0.0,
                     "pid": {
                         "samplePeriod": 0.1,
@@ -193,9 +193,9 @@
                     }
                 },
                 {
-                    "name": "fan4",
+                    "name": "fb_fan2",
                     "type": "fan",
-                    "inputs": ["fan4"],
+                    "inputs": ["fb_fan2"],
                     "setpoint": 0.0,
                     "pid": {
                         "samplePeriod": 0.1,

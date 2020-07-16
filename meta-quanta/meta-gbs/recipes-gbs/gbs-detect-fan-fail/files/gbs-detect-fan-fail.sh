@@ -33,9 +33,9 @@ function is_fan_fail() {
 
 fan_tach_path=( '/xyz/openbmc_project/sensors/fan_tach/fan0'
                 '/xyz/openbmc_project/sensors/fan_tach/fan1'
-                '/xyz/openbmc_project/sensors/fan_tach/fan2'
-                '/xyz/openbmc_project/sensors/fan_tach/fan3'
-                '/xyz/openbmc_project/sensors/fan_tach/fan4'
+                '/xyz/openbmc_project/sensors/fan_tach/fb_fan0'
+                '/xyz/openbmc_project/sensors/fan_tach/fb_fan1'
+                '/xyz/openbmc_project/sensors/fan_tach/fb_fan2'
                 )
 
 check_fail_flag=0

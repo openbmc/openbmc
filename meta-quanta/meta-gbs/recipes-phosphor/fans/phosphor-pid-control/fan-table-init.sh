@@ -3,9 +3,9 @@
 # wait for fan dbus
 mapper wait /xyz/openbmc_project/sensors/fan_tach/fan0
 mapper wait /xyz/openbmc_project/sensors/fan_tach/fan1
-mapper wait /xyz/openbmc_project/sensors/fan_tach/fan2
-mapper wait /xyz/openbmc_project/sensors/fan_tach/fan3
-mapper wait /xyz/openbmc_project/sensors/fan_tach/fan4
+mapper wait /xyz/openbmc_project/sensors/fan_tach/fb_fan0
+mapper wait /xyz/openbmc_project/sensors/fan_tach/fb_fan1
+mapper wait /xyz/openbmc_project/sensors/fan_tach/fb_fan2
 
 /usr/bin/fan-default-speed.sh
 

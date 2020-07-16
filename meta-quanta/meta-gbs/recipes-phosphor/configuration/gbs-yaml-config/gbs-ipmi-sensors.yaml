@@ -514,7 +514,7 @@
             type: int64_t
 
 # fan/pwm mapping
-# fan0/1 on Mobo, fan2/3/4 on fan board
+# fan0/1 on Mobo, fb_fan0/1/2 on fan board
 # PWM0 => fan tach 0
 # PWM1 => fan tach 1
 # PWM2 => fan tach 2
@@ -551,17 +551,17 @@
 0x62:
   <<: *fan_rpm_read
   entityInstance: 0x02
-  path: /xyz/openbmc_project/sensors/fan_tach/fan2
+  path: /xyz/openbmc_project/sensors/fan_tach/fb_fan0
 
 0x63:
   <<: *fan_rpm_read
   entityInstance: 0x03
-  path: /xyz/openbmc_project/sensors/fan_tach/fan3
+  path: /xyz/openbmc_project/sensors/fan_tach/fb_fan1
 
 0x64:
   <<: *fan_rpm_read
   entityInstance: 0x04
-  path: /xyz/openbmc_project/sensors/fan_tach/fan4
+  path: /xyz/openbmc_project/sensors/fan_tach/fb_fan2
 
 0x65: &fan_pwm
   entityID: 0x1D
@@ -590,17 +590,17 @@
 0x67:
   <<: *fan_pwm
   entityInstance: 0x07
-  path: /xyz/openbmc_project/sensors/fan_tach/fan2
+  path: /xyz/openbmc_project/sensors/fan_tach/fb_fan0
 
 0x68:
   <<: *fan_pwm
   entityInstance: 0x08
-  path: /xyz/openbmc_project/sensors/fan_tach/fan3
+  path: /xyz/openbmc_project/sensors/fan_tach/fb_fan1
 
 0x69:
   <<: *fan_pwm
   entityInstance: 0x09
-  path: /xyz/openbmc_project/sensors/fan_tach/fan4
+  path: /xyz/openbmc_project/sensors/fan_tach/fb_fan2
 
 # NVME SSD locate/fault LEDs
 0x71: &locateled

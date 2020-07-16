@@ -18,9 +18,9 @@
     "fan": [
         {"instance": 0, "name": "/fan0"},
         {"instance": 1, "name": "/fan1"},
-        {"instance": 2, "name": "/fan2"},
-        {"instance": 3, "name": "/fan3"},
-        {"instance": 4, "name": "/fan4"}
+        {"instance": 2, "name": "/fb_fan0"},
+        {"instance": 3, "name": "/fb_fan1"},
+        {"instance": 4, "name": "/fb_fan2"}
     ],
     "cooling_unit": [
         {"instance": 0, "name": "/ZONE0"},
