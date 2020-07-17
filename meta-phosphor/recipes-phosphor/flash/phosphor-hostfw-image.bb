@@ -11,7 +11,7 @@ HOSTFW_LIC_FILES_CHKSUM ?= "file://${COREBASE}/meta/files/common-licenses/Apache
 LICENSE = "${HOSTFW_LICENSE}"
 LIC_FILES_CHKSUM = "${HOSTFW_LIC_FILES_CHKSUM}"
 
-do_compile_prepend() {
+do_compile() {
     # The image directory can be used as the source to create a filesystem to
     # add to the BMC image.
     install -d ${B}/image
@@ -24,8 +24,8 @@ do_compile_prepend() {
 do_deploy() {
     install -d ${DEPLOYDIR}/hostfw/image
     install -d ${DEPLOYDIR}/hostfw/update
-    cp -R --no-dereference --preserve=mode,links ${B}/image/ ${DEPLOYDIR}/hostfw/image/
-    cp -R --no-dereference --preserve=mode,links ${B}/update/ ${DEPLOYDIR}/hostfw/update/
+    cp -R --no-dereference --preserve=mode,links ${B}/image/ ${DEPLOYDIR}/hostfw/
+    cp -R --no-dereference --preserve=mode,links ${B}/update/ ${DEPLOYDIR}/hostfw/
 }
 
 addtask deploy before do_build after do_compile
