@@ -2,7 +2,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += "file://led-group-config.json"
 
-EXTRA_OECONF = "--enable-use_json"
+EXTRA_OECONF += "--enable-use-json"
 
 DEPENDS += "phosphor-dbus-interfaces"
 
