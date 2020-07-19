@@ -16,6 +16,9 @@ case "$config" in
 0)
     nbd_device=/dev/nbd0
     ;;
+1)
+    nbd_device=/dev/nbd1
+    ;;
 *)
     echo "invalid config $config" >&2
     exit 1
