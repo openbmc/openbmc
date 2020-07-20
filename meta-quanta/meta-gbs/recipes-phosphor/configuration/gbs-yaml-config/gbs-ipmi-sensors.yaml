@@ -1082,8 +1082,8 @@
             type: string
             assert: xyz.openbmc_project.Memory.MemoryECC.ECCStatus.LogFull
 
-#SlimSAS Cable0~3 connection
-0xF1: &slimsas
+#GPIO present connection
+0xF1: &gpio_prsnt
   entityID: 0x1F
   entityInstance: 0
   interfaces:
@@ -1097,7 +1097,7 @@
             assert: false
             type: bool
   mutability: Mutability::Write|Mutability::Read
-  path: /xyz/openbmc_project/inventory/system/chassis/cable/ss_cab0_prsnt
+  path: /xyz/openbmc_project/inventory/system/chassis/gpios/ss_cab0_prsnt
   readingType: assertion
   sensorNamePattern: nameLeaf
   sensorReadingType: 0x6f
@@ -1105,16 +1105,46 @@
   serviceInterface: org.freedesktop.DBus.Properties
 
 0xF2:
-  <<: *slimsas
+  <<: *gpio_prsnt
   entityInstance: 1
-  path: /xyz/openbmc_project/inventory/system/chassis/cable/ss_cab1_prsnt
+  path: /xyz/openbmc_project/inventory/system/chassis/gpios/ss_cab1_prsnt
 
 0xF3:
-  <<: *slimsas
+  <<: *gpio_prsnt
   entityInstance: 2
-  path: /xyz/openbmc_project/inventory/system/chassis/cable/ss_cab2_prsnt
+  path: /xyz/openbmc_project/inventory/system/chassis/gpios/ss_cab2_prsnt
 
 0xF4:
-  <<: *slimsas
+  <<: *gpio_prsnt
   entityInstance: 3
-  path: /xyz/openbmc_project/inventory/system/chassis/cable/ss_cab3_prsnt
+  path: /xyz/openbmc_project/inventory/system/chassis/gpios/ss_cab3_prsnt
+
+0xF5:
+  <<: *gpio_prsnt
+  entityInstance: 4
+  path: /xyz/openbmc_project/inventory/system/chassis/gpios/sata0_prsnt
+
+0xF6:
+  <<: *gpio_prsnt
+  entityInstance: 5
+  path: /xyz/openbmc_project/inventory/system/chassis/gpios/hsbp_cab_prsnt
+
+0xF7:
+  <<: *gpio_prsnt
+  entityInstance: 6
+  path: /xyz/openbmc_project/inventory/system/chassis/gpios/fanbd_cab_prsnt
+
+0xF8:
+  <<: *gpio_prsnt
+  entityInstance: 7
+  path: /xyz/openbmc_project/inventory/system/chassis/gpios/bp12v_cab_prsnt
+
+0xF9:
+  <<: *gpio_prsnt
+  entityInstance: 8
+  path: /xyz/openbmc_project/inventory/system/chassis/gpios/pe_slot0_prsnt
+
+0xFA:
+  <<: *gpio_prsnt
+  entityInstance: 9
+  path: /xyz/openbmc_project/inventory/system/chassis/gpios/pe_slot1_prsnt

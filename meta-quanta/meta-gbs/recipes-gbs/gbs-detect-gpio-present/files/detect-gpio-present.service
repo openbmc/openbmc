@@ -1,10 +1,10 @@
 [Unit]
-Description=Detect SAS Cable Manager
-Wants=phosphor-gpio-presence@.service
+Description=Detect GPIO Present Manager
 After=phosphor-gpio-presence@.service
+Requires=phosphor-gpio-presence@.service
 
 [Service]
-ExecStart=/usr/bin/detect-sas-cable.sh
+ExecStart=/usr/bin/detect-gpio-present.sh
 StandardOutput=syslog
 Type=simple
 
