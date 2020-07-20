@@ -19,4 +19,5 @@ DEPENDS += " \
     phosphor-logging \
     boost \
     i2c-tools \
+    libgpiod \
     "
