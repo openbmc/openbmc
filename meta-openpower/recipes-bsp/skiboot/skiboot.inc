@@ -25,3 +25,8 @@ do_compile() {
 do_install() {
     oe_runmake -C ${SKIBOOT_SUBDIR} install DESTDIR=${D} prefix=/usr PREFIX=$prefix
 }
+
+# libflash.so is a SONAME and is strongly required in the production
+INSANE_SKIP_${PN}_append = "dev-so"
+FILES_SOLIBSDEV = ""
+FILES_${PN}_append = " ${libdir}/libflash.so"
