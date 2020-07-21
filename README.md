@@ -66,6 +66,14 @@ Once you know the target (e.g. romulus), source the `setup` script as follows:
 . setup romulus
 ```
 
+For evb-ast2500, please use the below command to specify the machine config,
+because the machine in `meta-aspeed` layer is in a BSP layer and does not
+build the openbmc image.
+
+```
+TEMPLATECONF=meta-evb/meta-evb-aspeed/meta-evb-ast2500/conf . openbmc-env
+```
+
 ### 4) Build
 
 ```
