@@ -1,7 +1,7 @@
-From 21dba61f098020d1143289017841ca76995618d4 Mon Sep 17 00:00:00 2001
+From 75eb8ab4bec3e462607214d2e14c9f2eef73435f Mon Sep 17 00:00:00 2001
 From: Tomeu Vizoso <tomeu.vizoso@collabora.com>
 Date: Tue, 1 Oct 2013 13:19:20 +0200
-Subject: [PATCH] wayland: Add support for the Wayland winsys
+Subject: [PATCH 02/21] wayland: Add support for the Wayland winsys
 
 * Adds EGL_WL_bind_wayland_display extension
 * Adds wayland-egl library
@@ -23,7 +23,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  CMakeLists.txt                                |  11 +
  README.md                                     |   4 +
  buildme                                       |  10 +-
- .../linux/apps/raspicam/CMakeLists.txt        |   3 +-
+ .../linux/apps/raspicam/CMakeLists.txt        |   2 +-
  interface/khronos/CMakeLists.txt              |  54 +++-
  interface/khronos/common/khrn_client.c        |  15 ++
  interface/khronos/common/khrn_client.h        |  10 +
@@ -49,7 +49,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  interface/vmcs_host/vc_vchi_dispmanx.h        |  15 ++
  interface/wayland/dispmanx.xml                | 123 +++++++++
  makefiles/cmake/Wayland.cmake                 |  72 +++++
- 30 files changed, 1258 insertions(+), 99 deletions(-)
+ 30 files changed, 1257 insertions(+), 99 deletions(-)
  create mode 100644 interface/khronos/common/linux/khrn_wayland.c
  copy interface/{vmcs_host/vc_vchi_dispmanx.h => khronos/common/linux/khrn_wayland.h} (56%)
  create mode 100644 interface/khronos/ext/egl_wayland.c
@@ -69,10 +69,10 @@ index 63570f1..1459436 100644
  *.mkv
 +*~
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index d8ba238..8c5bf5f 100644
+index fe67fc8..80337b2 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -20,6 +20,17 @@ include(makefiles/cmake/global_settings.cmake)
+@@ -24,6 +24,17 @@ include(makefiles/cmake/global_settings.cmake)
  include(makefiles/cmake/arm-linux.cmake)
  include(makefiles/cmake/vmcs.cmake)
  
@@ -133,19 +133,18 @@ index 9e2d405..7b8c0d6 100755
  
  	if [ "$1" != "" ]; then
 diff --git a/host_applications/linux/apps/raspicam/CMakeLists.txt b/host_applications/linux/apps/raspicam/CMakeLists.txt
-index 656a9a0..4b0a888 100644
+index eb1ef7c..5aeeb2e 100644
 --- a/host_applications/linux/apps/raspicam/CMakeLists.txt
 +++ b/host_applications/linux/apps/raspicam/CMakeLists.txt
-@@ -59,7 +59,8 @@ add_executable(raspivid   ${COMMON_SOURCES} RaspiVid.c)
+@@ -61,7 +61,7 @@ add_executable(raspivid   ${COMMON_SOURCES} RaspiVid.c)
  add_executable(raspividyuv  ${COMMON_SOURCES} RaspiVidYUV.c)
  
  set (MMAL_LIBS mmal_core mmal_util mmal_vc_client)
 -target_link_libraries(raspistill ${MMAL_LIBS} vcos bcm_host ${EGL_LIBS} m dl)
-+
 +target_link_libraries(raspistill ${MMAL_LIBS} vcos bcm_host ${EGL_LIBS} m dl ${WAYLAND_SERVER_LIBRARIES} ${WAYLAND_CLIENT_LIBRARIES})
- target_link_libraries(raspiyuv   ${MMAL_LIBS} vcos bcm_host)
- target_link_libraries(raspivid   ${MMAL_LIBS} vcos bcm_host)
- target_link_libraries(raspividyuv   ${MMAL_LIBS} vcos bcm_host)
+ target_link_libraries(raspiyuv   ${MMAL_LIBS} vcos bcm_host m)
+ target_link_libraries(raspivid   ${MMAL_LIBS} vcos bcm_host m)
+ target_link_libraries(raspividyuv   ${MMAL_LIBS} vcos bcm_host m)
 diff --git a/interface/khronos/CMakeLists.txt b/interface/khronos/CMakeLists.txt
 index 9ad615b..95c0e11 100644
 --- a/interface/khronos/CMakeLists.txt
@@ -1894,3 +1893,6 @@ index 0000000..ad90d30
 +    list(APPEND ${_sources} "${_server_header}")
 +    set(${_sources} ${${_sources}} PARENT_SCOPE)
 +endfunction()
+-- 
+2.27.0
+

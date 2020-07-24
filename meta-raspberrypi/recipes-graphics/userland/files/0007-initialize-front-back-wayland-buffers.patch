@@ -1,7 +1,7 @@
-From 9159eff795a8ef3be0b3bfd554ef1aa23340884d Mon Sep 17 00:00:00 2001
+From 7f7e5b87104134b6710985c5f1c5936a59cccc98 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 6 Feb 2016 11:11:41 -0800
-Subject: [PATCH] initialize front back wayland buffers
+Subject: [PATCH 07/21] initialize front back wayland buffers
 
 origins from metrological wayland support
 
@@ -29,3 +29,6 @@ index 1f923d9..9a9582c 100644
        resource = DISPMANX_NO_HANDLE;
     }
  #endif
+-- 
+2.27.0
+

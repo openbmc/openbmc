@@ -28,6 +28,7 @@ RPI_KERNEL_DEVICETREE_OVERLAYS ?= " \
     overlays/iqaudio-dacplus.dtbo \
     overlays/miniuart-bt.dtbo \
     overlays/mcp2515-can0.dtbo \
+    overlays/mcp2515-can1.dtbo \
     overlays/pitft22.dtbo \
     overlays/pitft28-resistive.dtbo \
     overlays/pitft28-capacitive.dtbo \
@@ -82,6 +83,7 @@ MACHINE_EXTRA_RRECOMMENDS += "kernel-modules udev-rules-rpi"
 MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS += "${@oe.utils.conditional('ENABLE_I2C', '1', 'kernel-module-i2c-dev kernel-module-i2c-bcm2708', '', d)}"
 MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS += "${@oe.utils.conditional('ENABLE_IR', '1', 'kernel-module-gpio-ir kernel-module-gpio-ir-tx', '', d)}"
 
+SERIAL_CONSOLES_CHECK ??= "${SERIAL_CONSOLES}"
 
 # Set Raspberrypi splash image
 SPLASH = "psplash-raspberrypi"

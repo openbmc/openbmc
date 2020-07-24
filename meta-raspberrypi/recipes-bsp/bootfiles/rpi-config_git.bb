@@ -198,8 +198,13 @@ do_deploy() {
         echo "dtoverlay=at86rf233,speed=3000000" >>${DEPLOYDIR}/bcm2835-bootfiles/config.txt
     fi
 
+    # ENABLE DUAL CAN
+    if [ "${ENABLE_DUAL_CAN}" = "1" ]; then
+        echo "# Enable DUAL CAN" >>${DEPLOYDIR}/bcm2835-bootfiles/config.txt
+        echo "dtoverlay=mcp2515-can0,oscillator=16000000,interrupt=25" >>${DEPLOYDIR}/bcm2835-bootfiles/config.txt
+        echo "dtoverlay=mcp2515-can1,oscillator=16000000,interrupt=24" >>${DEPLOYDIR}/bcm2835-bootfiles/config.txt
     # ENABLE CAN
-    if [ "${ENABLE_CAN}" = "1" ]; then
+    elif [ "${ENABLE_CAN}" = "1" ]; then
         echo "# Enable CAN" >>${DEPLOYDIR}/bcm2835-bootfiles/config.txt
         echo "dtoverlay=mcp2515-can0,oscillator=16000000,interrupt=25" >>${DEPLOYDIR}/bcm2835-bootfiles/config.txt
     fi

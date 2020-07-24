@@ -261,6 +261,13 @@ In order to use Pican2 CAN module, set the following variables:
 
 See: <http://skpang.co.uk/catalog/pican2-canbus-board-for-raspberry-pi-23-p-1475.html>
 
+In order to use Pican2 Duo CAN module, set the following variables:
+
+	ENABLE_SPI_BUS = "1"
+	ENABLE_DUAL_CAN = "1"
+
+See: <http://skpang.co.uk/catalog/pican2-duo-canbus-board-for-raspberry-pi-23-p-1480.html>
+
 ## Enable infrared
 
 Users who want to enable infrared support, for example for using LIRC (Linux

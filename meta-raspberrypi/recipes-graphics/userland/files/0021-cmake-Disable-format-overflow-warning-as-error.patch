@@ -1,7 +1,7 @@
-From 4886bd9f33727f6a16aeb3b1aa3c25e459f06581 Mon Sep 17 00:00:00 2001
+From ee842886f3c0589d6df5a0687973beb18a3be524 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 31 Mar 2020 11:51:02 -0700
-Subject: [PATCH] cmake: Disable format-overflow warning as error
+Subject: [PATCH 21/21] cmake: Disable format-overflow warning as error
 
 gcc10 complains about a check which could potentially be null
 
@@ -19,6 +19,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  host_applications/linux/libs/bcm_host/CMakeLists.txt | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/host_applications/linux/libs/bcm_host/CMakeLists.txt b/host_applications/linux/libs/bcm_host/CMakeLists.txt
+index a863cb6..f358135 100644
 --- a/host_applications/linux/libs/bcm_host/CMakeLists.txt
 +++ b/host_applications/linux/libs/bcm_host/CMakeLists.txt
 @@ -3,7 +3,7 @@ if (WIN32)
@@ -26,7 +28,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  else ()
     set(VCOS_PLATFORM pthreads)
 -   add_definitions(-Wall -Werror)
-+   add_definitions(-Wall)
++   add_definitions(-Wall -Werror -Wno-error=format-overflow)
  endif ()
  
  # set this as we want all the source of vchostif to be available in libbcm_host
+-- 
+2.27.0
+

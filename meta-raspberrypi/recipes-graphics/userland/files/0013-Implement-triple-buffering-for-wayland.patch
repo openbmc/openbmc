@@ -1,7 +1,7 @@
-From 2e1e3c857cdf365c5a13bcd5d09685cf12f8047c Mon Sep 17 00:00:00 2001
+From dd8017ebccfa9c439a4e8dd501872e2052016f10 Mon Sep 17 00:00:00 2001
 From: Jeff Wannamaker <jeff_wannamaker@cable.comcast.com>
 Date: Thu, 19 Jan 2017 18:56:07 +0000
-Subject: [PATCH] Implement triple buffering for wayland
+Subject: [PATCH 13/21] Implement triple buffering for wayland
 
 Change from double to triple buffering for wayland.
 This enables higher frame rates without tearing artifacts
@@ -85,3 +85,6 @@ index e328b77..58a3184 100644
     /*
        back_wl_buffer
  
+-- 
+2.27.0
+

@@ -1,7 +1,7 @@
-From 339af0cea0dc29b33773a3d851ea17c42610de7b Mon Sep 17 00:00:00 2001
+From 1112539d9fde6428c1230b4fc9ea479623e9f968 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 25 Jul 2019 23:30:27 -0700
-Subject: [PATCH] libfdt: Undefine __wordsize if already defined
+Subject: [PATCH 19/21] libfdt: Undefine __wordsize if already defined
 
 glibc 2.30+ defines __wordsize, which is same so its easier to compile
 for multiple versions of glibc even ones which does not have this define
@@ -26,3 +26,6 @@ index f4608be..5e83a27 100644
  #ifdef __CHECKER__
  #define FDT_FORCE __attribute__((force))
  #define FDT_BITWISE __attribute__((bitwise))
+-- 
+2.27.0
+

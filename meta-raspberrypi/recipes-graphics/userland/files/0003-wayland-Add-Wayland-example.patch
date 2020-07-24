@@ -1,17 +1,17 @@
-From d2fd39ea43f948feba34e895600afd801e03691f Mon Sep 17 00:00:00 2001
+From 3b568db9460c0359e8bda8256aa2161e5aafe07c Mon Sep 17 00:00:00 2001
 From: Tomeu Vizoso <tomeu.vizoso@collabora.com>
 Date: Tue, 1 Oct 2013 13:19:20 +0200
-Subject: [PATCH] wayland: Add Wayland example
+Subject: [PATCH 03/21] wayland: Add Wayland example
 
 ---
  .../linux/apps/hello_pi/CMakeLists.txt        |   1 +
+ .../linux/apps/hello_pi/Makefile              |   2 +
  .../hello_pi/hello_wayland/CMakeLists.txt     |   8 +
  .../hello_pi/hello_wayland/Djenne_128_128.raw |   3 +
  .../apps/hello_pi/hello_wayland/Makefile      |   5 +
  .../hello_wayland/cube_texture_and_coords.h   | 100 +++
  .../apps/hello_pi/hello_wayland/triangle.c    | 666 ++++++++++++++++++
- .../linux/apps/hello_pi/rebuild.sh            |   3 +-
- 7 files changed, 785 insertions(+), 1 deletion(-)
+ 7 files changed, 785 insertions(+)
  create mode 100644 host_applications/linux/apps/hello_pi/hello_wayland/CMakeLists.txt
  create mode 100644 host_applications/linux/apps/hello_pi/hello_wayland/Djenne_128_128.raw
  create mode 100644 host_applications/linux/apps/hello_pi/hello_wayland/Makefile
@@ -30,6 +30,24 @@ index b28a94a..2849fad 100644
  
  if(BUILD_FONT)
  set(VGFONT_SRCS libs/vgfont/font.c libs/vgfont/vgft.c libs/vgfont/graphics.c)
+diff --git a/host_applications/linux/apps/hello_pi/Makefile b/host_applications/linux/apps/hello_pi/Makefile
+index 4c2b2ef..d2b2555 100644
+--- a/host_applications/linux/apps/hello_pi/Makefile
++++ b/host_applications/linux/apps/hello_pi/Makefile
+@@ -24,6 +24,7 @@ apps: libs/ilclient/libilclient.a libs/vgfont/libvgfont.a libs/revision/librevis
+ 	$(MAKE) -C hello_teapot
+ 	$(MAKE) -C hello_fft
+ 	$(MAKE) -C hello_mmal_encode
++	$(MAKE) -C hello_wayland
+ 
+ clean:
+ 	$(MAKE) -C libs/ilclient clean
+@@ -43,4 +44,5 @@ clean:
+ 	$(MAKE) -C hello_teapot clean
+ 	$(MAKE) -C hello_fft clean
+ 	$(MAKE) -C hello_mmal_encode clean
++	$(MAKE) -C hello_wayland clean
+ 
 diff --git a/host_applications/linux/apps/hello_pi/hello_wayland/CMakeLists.txt b/host_applications/linux/apps/hello_pi/hello_wayland/CMakeLists.txt
 new file mode 100644
 index 0000000..9a2f75c
@@ -843,21 +861,6 @@ index 0000000..1a7bfc4
 +   return 0;
 +}
 +
-diff --git a/host_applications/linux/apps/hello_pi/rebuild.sh b/host_applications/linux/apps/hello_pi/rebuild.sh
-index 8225dd5..0be6ce7 100755
---- a/host_applications/linux/apps/hello_pi/rebuild.sh
-+++ b/host_applications/linux/apps/hello_pi/rebuild.sh
-@@ -14,6 +14,7 @@ make -C hello_videocube clean
- make -C hello_teapot clean
- make -C hello_fft clean
- make -C hello_mmal_encode clean
-+make -C hello_wayland clean
- 
- make -C libs/ilclient
- make -C libs/vgfont
-@@ -31,4 +32,4 @@ make -C hello_videocube
- make -C hello_teapot
- make -C hello_fft
- make -C hello_mmal_encode
--
-+make -C hello_wayland
+-- 
+2.27.0
+
