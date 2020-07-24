@@ -1,0 +1,38 @@
+From db772305c6baa01f6c6750be74733e4bfc1d6106 Mon Sep 17 00:00:00 2001
+From: Tobias Brunner <tobias@strongswan.org>
+Date: Tue, 14 Apr 2020 10:44:19 +0200
+Subject: [PATCH] xfrmi: Only build if libcharon is built
+
+The kernel-netlink plugin is only built if libcharon is.
+
+Closes strongswan/strongswan#167.
+
+Upstream-Status: Backport
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+---
+ src/Makefile.am | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+Index: strongswan-5.8.4/src/Makefile.am
+===================================================================
+--- strongswan-5.8.4.orig/src/Makefile.am
++++ strongswan-5.8.4/src/Makefile.am
+@@ -42,6 +42,9 @@ endif
+ 
+ if USE_LIBCHARON
+   SUBDIRS += libcharon
++if USE_KERNEL_NETLINK
++  SUBDIRS += xfrmi
++endif
+ endif
+ 
+ if USE_FILE_CONFIG
+@@ -143,7 +146,3 @@ endif
+ if USE_TPM
+   SUBDIRS += tpm_extendpcr
+ endif
+-
+-if USE_KERNEL_NETLINK
+-  SUBDIRS += xfrmi
+-endif

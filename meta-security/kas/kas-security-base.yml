@@ -1,0 +1,57 @@
+header:
+  version: 8
+
+distro: poky
+
+repos:
+  meta-security:
+    layers:
+      ../meta-security:
+      meta-tpm:
+      meta-integrity:
+      meta-security-compliance:
+
+  poky:
+    url: https://git.yoctoproject.org/git/poky
+    refspec: master
+    layers:
+      meta:
+      meta-poky:
+      meta-yocto-bsp:
+
+  meta-openembedded:
+    url: http://git.openembedded.org/meta-openembedded
+    refspec: master
+    layers:
+      meta-oe:
+      meta-perl:
+      meta-python:
+      meta-networking:
+
+local_conf_header:
+  meta-security: |
+    CONF_VERSION = "1"
+    SOURCE_MIRROR_URL = "http://downloads.yoctoproject.org/mirror/sources/"
+    SSTATE_MIRRORS = "file://.* http://sstate.yoctoproject.org/dev/PATH;downloadfilename=PATH \n"
+    SSTATE_DIR = "/home/srv/sstate/master"
+    DL_DIR = "/home/srv/downloads/master"
+    BB_HASHSERVE = "auto"
+    BB_SIGNATURE_HANDLER = "OEEquivHash"
+
+  diskmon: |
+    BB_DISKMON_DIRS = "\
+    STOPTASKS,${TMPDIR},1G,100K \
+    STOPTASKS,${DL_DIR},1G,100K \
+    STOPTASKS,${SSTATE_DIR},1G,100K \
+    STOPTASKS,/tmp,100M,100K \
+    ABORT,${TMPDIR},100M,1K \
+    ABORT,${DL_DIR},100M,1K \
+    ABORT,${SSTATE_DIR},100M,1K \
+    ABORT,/tmp,10M,1K"
+
+bblayers_conf_header:
+  meta-security: |
+    POKY_BBLAYERS_CONF_VERSION = "2"
+    BBPATH = "${TOPDIR}"
+    BBFILES ?= ""
+

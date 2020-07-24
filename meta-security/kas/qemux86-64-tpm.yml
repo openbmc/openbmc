@@ -1,0 +1,10 @@
+header:
+  version: 8
+  includes:
+    - kas-security-base.yml
+
+local_conf_header:
+  meta-security: |
+    DISTRO_FEATURES_append = " tpm"
+
+machine: qemux86-64
