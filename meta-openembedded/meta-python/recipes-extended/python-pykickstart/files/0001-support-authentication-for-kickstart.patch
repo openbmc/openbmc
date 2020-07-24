@@ -32,10 +32,10 @@ index bf08ac5..aada7aa 100644
  And some warning classes:
  
      KickstartWarning - A generic warning class.
-@@ -131,3 +134,17 @@ class KickstartDeprecationWarning(KickstartParseWarning, DeprecationWarning):
+@@ -125,3 +128,17 @@ class KickstartDeprecationWarning(KickstartParseWarning, DeprecationWarning):
+     """A class for warnings occurring during parsing related to using deprecated
         commands and options.
      """
-     pass
 +
 +class KickstartAuthError(KickstartError):
 +    """An exception for errors relating to authentication failed while
@@ -43,7 +43,7 @@ index bf08ac5..aada7aa 100644
 +    """
 +    def __init__(self, msg):
 +        """Create a new KickstartAuthError exception instance with the
-+           descriptive message val.  val should be the return value of
++           descriptive message val. val should be the return value of
 +           formatErrorMsg.
 +        """
 +        KickstartError.__init__(self, msg)
@@ -125,7 +125,7 @@ diff --git a/pykickstart/parser.py b/pykickstart/parser.py
 index d8880eb..22d14cb 100644
 --- a/pykickstart/parser.py
 +++ b/pykickstart/parser.py
-@@ -787,7 +787,7 @@ class KickstartParser(object):
+@@ -801,7 +801,7 @@ class KickstartParser(object):
          i = PutBackIterator(s.splitlines(True) + [""])
          self._stateMachine(i)
  
@@ -134,7 +134,7 @@ index d8880eb..22d14cb 100644
          """Process a kickstart file, given by the filename f."""
          if reset:
              self._reset()
-@@ -808,7 +808,7 @@ class KickstartParser(object):
+@@ -822,7 +822,7 @@ class KickstartParser(object):
          self.currentdir[self._includeDepth] = cd
  
          try:

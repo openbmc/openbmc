@@ -15,7 +15,9 @@ SRC_URI = "git://sourceware.org/git/lvm2.git \
            file://0001-Avoid-bashisms-in-init-scripts.patch \
            file://0005-do-not-build-manual.patch \
            file://0006-start-lvm2-monitor.service-after-tmp.mount.patch \
+           ${@bb.utils.contains('BUILD_REPRODUCIBLE_BINARIES','1','file://reproducible-build.patch','', d)} \
            "
+
 SRCREV = "b9391b1b9f0b73303fa21f8f92574d17ce4c2b02"
 S = "${WORKDIR}/git"
 

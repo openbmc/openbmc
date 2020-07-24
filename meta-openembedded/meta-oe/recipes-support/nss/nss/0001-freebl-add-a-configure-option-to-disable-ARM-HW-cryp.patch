@@ -1,4 +1,4 @@
-From 5595e9651aca39af945931c73eb524a0f8bd130d Mon Sep 17 00:00:00 2001
+From 8b67c22b057e158f61c9fdd5b01f37195c6f5ca4 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 18 Dec 2019 12:29:50 +0100
 Subject: [PATCH] freebl: add a configure option to disable ARM HW crypto
@@ -8,10 +8,14 @@ prior to armv8 does not.
 
 Upstream-Status: Pending
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
----
- nss/lib/freebl/Makefile | 3 +++
- 1 file changed, 3 insertions(+)
 
+---
+ nss/lib/freebl/Makefile | 4 ++++
+ nss/lib/freebl/gcm.c    | 2 ++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/nss/lib/freebl/Makefile b/nss/lib/freebl/Makefile
+index f99f769..b0ec81b 100644
 --- a/nss/lib/freebl/Makefile
 +++ b/nss/lib/freebl/Makefile
 @@ -125,6 +125,9 @@ else
@@ -22,9 +26,9 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 +ifdef NSS_USE_ARM_HW_CRYPTO
 +    DEFINES += -DNSS_USE_ARM_HW_CRYPTO
  ifeq ($(CPU_ARCH),aarch64)
-     DEFINES += -DUSE_HW_AES
-     EXTRA_SRCS += aes-armv8.c gcm-aarch64.c
-@@ -146,6 +149,7 @@ ifeq ($(CPU_ARCH),arm)
+     DEFINES += -DUSE_HW_AES -DUSE_HW_SHA2
+     EXTRA_SRCS += aes-armv8.c gcm-aarch64.c sha256-armv8.c
+@@ -148,6 +151,7 @@ endif
          endif
      endif
  endif
@@ -32,9 +36,11 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  
  ifeq ($(OS_TARGET),OSF1)
      DEFINES += -DMP_ASSEMBLY_MULTIPLY -DMP_NO_MP_WORD
+diff --git a/nss/lib/freebl/gcm.c b/nss/lib/freebl/gcm.c
+index c2cc18d..b77f573 100644
 --- a/nss/lib/freebl/gcm.c
 +++ b/nss/lib/freebl/gcm.c
-@@ -17,6 +17,7 @@
+@@ -18,6 +18,7 @@
  
  #include <limits.h>
  
@@ -42,7 +48,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  /* old gcc doesn't support some poly64x2_t intrinsic */
  #if defined(__aarch64__) && defined(IS_LITTLE_ENDIAN) && \
      (defined(__clang__) || defined(__GNUC__) && __GNUC__ > 6)
-@@ -25,6 +26,7 @@
+@@ -27,6 +28,7 @@
  /* We don't test on big endian platform, so disable this on big endian. */
  #define USE_ARM_GCM
  #endif

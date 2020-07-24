@@ -1,0 +1,24 @@
+Index: git/framework/delibs/dethread/CMakeLists.txt
+===================================================================
+--- git.orig/framework/delibs/dethread/CMakeLists.txt
++++ git/framework/delibs/dethread/CMakeLists.txt
+@@ -39,6 +39,7 @@ include_directories(
+ 
+ if (DE_OS_IS_UNIX)
+ 	add_definitions(-D_GNU_SOURCE)
++	add_definitions(-D_XOPEN_SOURCE=600)
+ 	set(DETHREAD_LIBS ${DETHREAD_LIBS} pthread)
+ endif ()
+ 
+Index: git/framework/qphelper/CMakeLists.txt
+===================================================================
+--- git.orig/framework/qphelper/CMakeLists.txt
++++ git/framework/qphelper/CMakeLists.txt
+@@ -28,6 +28,7 @@ set(QPHELPER_LIBS
+ if (DE_OS_IS_UNIX OR DE_OS_IS_QNX)
+ 	# For vsnprintf()
+ 	add_definitions(-D_XOPEN_SOURCE=600)
++	set(QPHELPER_LIBS ${QPHELPER_LIBS} execinfo)
+ endif ()
+ 
+ if (DE_OS_IS_WIN32 AND DE_COMPILER_IS_MSC)

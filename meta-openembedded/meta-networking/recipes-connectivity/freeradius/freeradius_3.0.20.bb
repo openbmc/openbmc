@@ -27,6 +27,7 @@ SRC_URI = "git://github.com/FreeRADIUS/freeradius-server.git;branch=v3.0.x;lfs=0
     file://freeradius-fix-error-for-expansion-of-macro.patch \
     file://0001-rlm_mschap-Use-includedir-instead-of-hardcoding-usr-.patch \
     file://0001-rlm_python3-add-PY_INC_DIR-in-search-dir.patch \
+    file://0001-raddb-certs-Makefile-fix-the-existed-certificate-err.patch \
     file://radiusd.service \
     file://radiusd-volatiles.conf \
 "

@@ -8,5 +8,7 @@ SRC_URI[sha256sum] = "4357f74f47b9c12db93624a82154e9b120fa8293699949152b22065d55
 
 inherit pypi setuptools3
 
+BBCLASSEXTEND = "native"
+
 DEPENDS += "${PYTHON_PN}-setuptools-scm-native"
 RDEPENDS_${PN} += "${PYTHON_PN}-six ${PYTHON_PN}-pyparsing"

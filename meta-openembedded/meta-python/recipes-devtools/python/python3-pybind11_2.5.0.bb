@@ -3,7 +3,18 @@ HOMEPAGE = "https://github.com/wjakob/pybind11"
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=beb87117af69fd10fbf9fb14c22a2e62"
 
-SRC_URI[md5sum] = "5355e1fd05c8eedef19cc9bfd3d82a77"
-SRC_URI[sha256sum] = "ea5a4e7a880112915463826f1acbec5892df36dfe102ecb249229ac514fb54ad"
+DEPENDS = "boost"
 
-inherit pypi setuptools3
+SRC_URI = "git://github.com/pybind/pybind11.git \
+           file://0001-Do-not-strip-binaries.patch \
+           file://0001-Do-not-check-pointer-size-when-cross-compiling.patch \
+          "
+SRCREV = "3b1dbebabc801c9cf6f0953a4c20b904d444f879"
+
+S = "${WORKDIR}/git"
+
+BBCLASSEXTEND = "native"
+
+EXTRA_OECMAKE =  "-DPYBIND11_TEST=OFF"
+
+inherit cmake python3native

@@ -27,6 +27,7 @@ SRC_URI = "${SAMBA_MIRROR}/stable/samba-${PV}.tar.gz \
            file://0001-lib-replace-wscript-Avoid-generating-nested-main-fun.patch \
            file://0002-util_sec.c-Move-__thread-variable-to-global-scope.patch \
            file://0001-Add-options-to-configure-the-use-of-libbsd.patch \
+           file://0001-nsswitch-nsstest.c-Avoid-nss-function-conflicts-with.patch \
            "
 SRC_URI_append_libc-musl = " \
            file://samba-pam.patch \

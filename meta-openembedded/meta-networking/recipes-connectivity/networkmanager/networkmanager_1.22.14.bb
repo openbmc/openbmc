@@ -11,7 +11,7 @@ DEPENDS = " \
     intltool-native \
     libxslt-native \
     libnl \
-    libgudev \
+    udev \
     util-linux \
     libndp \
     libnewt \
@@ -85,6 +85,7 @@ PACKAGECONFIG[qt4-x11-free] = "--enable-qt,--disable-qt,qt4-x11-free"
 PACKAGECONFIG[cloud-setup] = "--with-nm-cloud-setup=yes,--with-nm-cloud-setup=no"
 
 PACKAGES =+ " \
+  ${PN}-nmcli ${PN}-nmcli-doc \
   ${PN}-nmtui ${PN}-nmtui-doc \
   ${PN}-adsl ${PN}-cloud-setup \
 "
@@ -132,6 +133,14 @@ FILES_${PN}-dev += " \
     ${libdir}/pppd/*/*.la \
     ${libdir}/NetworkManager/*.la \
     ${libdir}/NetworkManager/${PV}/*.la \
+"
+
+FILES_${PN}-nmcli = " \
+    ${bindir}/nmcli \
+"
+
+FILES_${PN}-nmcli-doc = " \
+    ${mandir}/man1/nmcli* \
 "
 
 FILES_${PN}-nmtui = " \
