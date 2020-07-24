@@ -26,6 +26,8 @@ PACKAGECONFIG[jvmti] = ",NO_JVMTI=1"
 PACKAGECONFIG[audit] = ",NO_LIBAUDIT=1,audit"
 PACKAGECONFIG[manpages] = ",,xmlto-native asciidoc-native"
 PACKAGECONFIG[cap] = ",,libcap"
+# Arm CoreSight
+PACKAGECONFIG[coresight] = "CORESIGHT=1,,opencsd"
 
 # libunwind is not yet ported for some architectures
 PACKAGECONFIG_remove_arc = "libunwind"

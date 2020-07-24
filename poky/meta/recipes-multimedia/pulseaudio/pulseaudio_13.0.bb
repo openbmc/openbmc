@@ -4,6 +4,7 @@ SRC_URI = "http://freedesktop.org/software/pulseaudio/releases/${BP}.tar.xz \
            file://0001-client-conf-Add-allow-autospawn-for-root.patch \
            file://0002-do-not-display-CLFAGS-to-improve-reproducibility-bui.patch \
            file://0001-remap-arm-Adjust-inline-asm-constraints.patch \
+           file://0001-remap_neon-use-register-r12-instead-of-r7.patch \
            file://volatiles.04_pulse \
            "
 SRC_URI[md5sum] = "e41d606f90254ed45c90520faf83d95c"

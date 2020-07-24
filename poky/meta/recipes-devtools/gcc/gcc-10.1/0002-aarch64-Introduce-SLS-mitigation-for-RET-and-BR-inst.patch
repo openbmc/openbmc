@@ -1,0 +1,607 @@
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+From b1204d16e1ec96a4aa89e44de8990e2499ffdb22 Mon Sep 17 00:00:00 2001
+From: Matthew Malcomson <matthew.malcomson@arm.com>
+Date: Thu, 9 Jul 2020 09:11:59 +0100
+Subject: [PATCH 2/3] aarch64: Introduce SLS mitigation for RET and BR
+ instructions
+
+Instructions following RET or BR are not necessarily executed.  In order
+to avoid speculation past RET and BR we can simply append a speculation
+barrier.
+
+Since these speculation barriers will not be architecturally executed,
+they are not expected to add a high performance penalty.
+
+The speculation barrier is to be SB when targeting architectures which
+have this enabled, and DSB SY + ISB otherwise.
+
+We add tests for each of the cases where such an instruction was seen.
+
+This is implemented by modifying each machine description pattern that
+emits either a RET or a BR instruction.  We choose not to use something
+like `TARGET_ASM_FUNCTION_EPILOGUE` since it does not affect the
+`indirect_jump`, `jump`, `sibcall_insn` and `sibcall_value_insn`
+patterns and we find it preferable to implement the functionality in the
+same way for every pattern.
+
+There is one particular case which is slightly tricky.  The
+implementation of TARGET_ASM_TRAMPOLINE_TEMPLATE uses a BR which needs
+to be mitigated against.  The trampoline template is used *once* per
+compilation unit, and the TRAMPOLINE_SIZE is exposed to the user via the
+builtin macro __LIBGCC_TRAMPOLINE_SIZE__.
+In the future we may implement function specific attributes to turn on
+and off hardening on a per-function basis.
+The fixed nature of the trampoline described above implies it will be
+safer to ensure this speculation barrier is always used.
+
+Testing:
+  Bootstrap and regtest done on aarch64-none-linux
+  Used a temporary hack(1) to use these options on every test in the
+  testsuite and a script to check that the output never emitted an
+  unmitigated RET or BR.
+
+1) Temporary hack was a change to the testsuite to always use
+`-save-temps` and run a script on the assembly output of those
+compilations which produced one to ensure every RET or BR is immediately
+followed by a speculation barrier.
+
+gcc/ChangeLog:
+
+	* config/aarch64/aarch64-protos.h (aarch64_sls_barrier): New.
+	* config/aarch64/aarch64.c (aarch64_output_casesi): Emit
+	speculation barrier after BR instruction if needs be.
+	(aarch64_trampoline_init): Handle ptr_mode value & adjust size
+	of code copied.
+	(aarch64_sls_barrier): New.
+	(aarch64_asm_trampoline_template): Add needed barriers.
+	* config/aarch64/aarch64.h (AARCH64_ISA_SB): New.
+	(TARGET_SB): New.
+	(TRAMPOLINE_SIZE): Account for barrier.
+	* config/aarch64/aarch64.md (indirect_jump, *casesi_dispatch,
+	simple_return, *do_return, *sibcall_insn, *sibcall_value_insn):
+	Emit barrier if needs be, also account for possible barrier using
+	"sls_length" attribute.
+	(sls_length): New attribute.
+	(length): Determine default using any non-default sls_length
+	value.
+
+gcc/testsuite/ChangeLog:
+
+	* gcc.target/aarch64/sls-mitigation/sls-miti-retbr.c: New test.
+	* gcc.target/aarch64/sls-mitigation/sls-miti-retbr-pacret.c:
+	New test.
+	* gcc.target/aarch64/sls-mitigation/sls-mitigation.exp: New file.
+	* lib/target-supports.exp (check_effective_target_aarch64_asm_sb_ok):
+	New proc.
+---
+ gcc/config/aarch64/aarch64-protos.h                |   1 +
+ gcc/config/aarch64/aarch64.c                       |  41 ++++++-
+ gcc/config/aarch64/aarch64.h                       |  10 +-
+ gcc/config/aarch64/aarch64.md                      |  76 +++++++++----
+ .../aarch64/sls-mitigation/sls-miti-retbr-pacret.c |  21 ++++
+ .../aarch64/sls-mitigation/sls-miti-retbr.c        | 119 +++++++++++++++++++++
+ .../aarch64/sls-mitigation/sls-mitigation.exp      |  73 +++++++++++++
+ gcc/testsuite/lib/target-supports.exp              |   2 +-
+ 8 files changed, 318 insertions(+), 25 deletions(-)
+ create mode 100644 gcc/testsuite/gcc.target/aarch64/sls-mitigation/sls-miti-retbr-pacret.c
+ create mode 100644 gcc/testsuite/gcc.target/aarch64/sls-mitigation/sls-miti-retbr.c
+ create mode 100644 gcc/testsuite/gcc.target/aarch64/sls-mitigation/sls-mitigation.exp
+
+diff --git a/gcc/config/aarch64/aarch64-protos.h b/gcc/config/aarch64/aarch64-protos.h
+index eb5f4b4..ee0ffde 100644
+--- a/gcc/config/aarch64/aarch64-protos.h
++++ b/gcc/config/aarch64/aarch64-protos.h
+@@ -781,6 +781,7 @@ extern const atomic_ool_names aarch64_ool_ldeor_names;
+ 
+ tree aarch64_resolve_overloaded_builtin_general (location_t, tree, void *);
+ 
++const char *aarch64_sls_barrier (int);
+ extern bool aarch64_harden_sls_retbr_p (void);
+ extern bool aarch64_harden_sls_blr_p (void);
+ 
+diff --git a/gcc/config/aarch64/aarch64.c b/gcc/config/aarch64/aarch64.c
+index 437a9cf..44e3d1f 100644
+--- a/gcc/config/aarch64/aarch64.c
++++ b/gcc/config/aarch64/aarch64.c
+@@ -10852,8 +10852,8 @@ aarch64_return_addr (int count, rtx frame ATTRIBUTE_UNUSED)
+ static void
+ aarch64_asm_trampoline_template (FILE *f)
+ {
+-  int offset1 = 16;
+-  int offset2 = 20;
++  int offset1 = 24;
++  int offset2 = 28;
+ 
+   if (aarch64_bti_enabled ())
+     {
+@@ -10876,6 +10876,17 @@ aarch64_asm_trampoline_template (FILE *f)
+     }
+   asm_fprintf (f, "\tbr\t%s\n", reg_names [IP1_REGNUM]);
+ 
++  /* We always emit a speculation barrier.
++     This is because the same trampoline template is used for every nested
++     function.  Since nested functions are not particularly common or
++     performant we don't worry too much about the extra instructions to copy
++     around.
++     This is not yet a problem, since we have not yet implemented function
++     specific attributes to choose between hardening against straight line
++     speculation or not, but such function specific attributes are likely to
++     happen in the future.  */
++  asm_fprintf (f, "\tdsb\tsy\n\tisb\n");
++
+   /* The trampoline needs an extra padding instruction.  In case if BTI is
+      enabled the padding instruction is replaced by the BTI instruction at
+      the beginning.  */
+@@ -10890,10 +10901,14 @@ static void
+ aarch64_trampoline_init (rtx m_tramp, tree fndecl, rtx chain_value)
+ {
+   rtx fnaddr, mem, a_tramp;
+-  const int tramp_code_sz = 16;
++  const int tramp_code_sz = 24;
+ 
+   /* Don't need to copy the trailing D-words, we fill those in below.  */
+-  emit_block_move (m_tramp, assemble_trampoline_template (),
++  /* We create our own memory address in Pmode so that `emit_block_move` can
++     use parts of the backend which expect Pmode addresses.  */
++  rtx temp = convert_memory_address (Pmode, XEXP (m_tramp, 0));
++  emit_block_move (gen_rtx_MEM (BLKmode, temp),
++		   assemble_trampoline_template (),
+ 		   GEN_INT (tramp_code_sz), BLOCK_OP_NORMAL);
+   mem = adjust_address (m_tramp, ptr_mode, tramp_code_sz);
+   fnaddr = XEXP (DECL_RTL (fndecl), 0);
+@@ -11084,6 +11099,8 @@ aarch64_output_casesi (rtx *operands)
+   output_asm_insn (buf, operands);
+   output_asm_insn (patterns[index][1], operands);
+   output_asm_insn ("br\t%3", operands);
++  output_asm_insn (aarch64_sls_barrier (aarch64_harden_sls_retbr_p ()),
++		   operands);
+   assemble_label (asm_out_file, label);
+   return "";
+ }
+@@ -22924,6 +22941,22 @@ aarch64_file_end_indicate_exec_stack ()
+ #undef GNU_PROPERTY_AARCH64_FEATURE_1_BTI
+ #undef GNU_PROPERTY_AARCH64_FEATURE_1_AND
+ 
++/* Helper function for straight line speculation.
++   Return what barrier should be emitted for straight line speculation
++   mitigation.
++   When not mitigating against straight line speculation this function returns
++   an empty string.
++   When mitigating against straight line speculation, use:
++   * SB when the v8.5-A SB extension is enabled.
++   * DSB+ISB otherwise.  */
++const char *
++aarch64_sls_barrier (int mitigation_required)
++{
++  return mitigation_required
++    ? (TARGET_SB ? "sb" : "dsb\tsy\n\tisb")
++    : "";
++}
++
+ /* Target-specific selftests.  */
+ 
+ #if CHECKING_P
+diff --git a/gcc/config/aarch64/aarch64.h b/gcc/config/aarch64/aarch64.h
+index 1ce23c6..c21015f 100644
+--- a/gcc/config/aarch64/aarch64.h
++++ b/gcc/config/aarch64/aarch64.h
+@@ -281,6 +281,7 @@ extern unsigned aarch64_architecture_version;
+ #define AARCH64_ISA_F32MM	   (aarch64_isa_flags & AARCH64_FL_F32MM)
+ #define AARCH64_ISA_F64MM	   (aarch64_isa_flags & AARCH64_FL_F64MM)
+ #define AARCH64_ISA_BF16	   (aarch64_isa_flags & AARCH64_FL_BF16)
++#define AARCH64_ISA_SB  	   (aarch64_isa_flags & AARCH64_FL_SB)
+ 
+ /* Crypto is an optional extension to AdvSIMD.  */
+ #define TARGET_CRYPTO (TARGET_SIMD && AARCH64_ISA_CRYPTO)
+@@ -378,6 +379,9 @@ extern unsigned aarch64_architecture_version;
+ #define TARGET_FIX_ERR_A53_835769_DEFAULT 1
+ #endif
+ 
++/* SB instruction is enabled through +sb.  */
++#define TARGET_SB (AARCH64_ISA_SB)
++
+ /* Apply the workaround for Cortex-A53 erratum 835769.  */
+ #define TARGET_FIX_ERR_A53_835769	\
+   ((aarch64_fix_a53_err835769 == 2)	\
+@@ -1058,8 +1062,10 @@ typedef struct
+ 
+ #define RETURN_ADDR_RTX aarch64_return_addr
+ 
+-/* BTI c + 3 insns + 2 pointer-sized entries.  */
+-#define TRAMPOLINE_SIZE	(TARGET_ILP32 ? 24 : 32)
++/* BTI c + 3 insns
++   + sls barrier of DSB + ISB.
++   + 2 pointer-sized entries.  */
++#define TRAMPOLINE_SIZE	(24 + (TARGET_ILP32 ? 8 : 16))
+ 
+ /* Trampolines contain dwords, so must be dword aligned.  */
+ #define TRAMPOLINE_ALIGNMENT 64
+diff --git a/gcc/config/aarch64/aarch64.md b/gcc/config/aarch64/aarch64.md
+index 8c8be3c..dda04ee 100644
+--- a/gcc/config/aarch64/aarch64.md
++++ b/gcc/config/aarch64/aarch64.md
+@@ -407,10 +407,25 @@
+ ;; Attribute that specifies whether the alternative uses MOVPRFX.
+ (define_attr "movprfx" "no,yes" (const_string "no"))
+ 
++;; Attribute to specify that an alternative has the length of a single
++;; instruction plus a speculation barrier.
++(define_attr "sls_length" "none,retbr,casesi" (const_string "none"))
++
+ (define_attr "length" ""
+   (cond [(eq_attr "movprfx" "yes")
+            (const_int 8)
+-        ] (const_int 4)))
++
++	 (eq_attr "sls_length" "retbr")
++	   (cond [(match_test "!aarch64_harden_sls_retbr_p ()") (const_int 4)
++		  (match_test "TARGET_SB") (const_int 8)]
++		 (const_int 12))
++
++	 (eq_attr "sls_length" "casesi")
++	   (cond [(match_test "!aarch64_harden_sls_retbr_p ()") (const_int 16)
++		  (match_test "TARGET_SB") (const_int 20)]
++		 (const_int 24))
++	]
++	  (const_int 4)))
+ 
+ ;; Strictly for compatibility with AArch32 in pipeline models, since AArch64 has
+ ;; no predicated insns.
+@@ -447,8 +462,12 @@
+ (define_insn "indirect_jump"
+   [(set (pc) (match_operand:DI 0 "register_operand" "r"))]
+   ""
+-  "br\\t%0"
+-  [(set_attr "type" "branch")]
++  {
++    output_asm_insn ("br\\t%0", operands);
++    return aarch64_sls_barrier (aarch64_harden_sls_retbr_p ());
++  }
++  [(set_attr "type" "branch")
++   (set_attr "sls_length" "retbr")]
+ )
+ 
+ (define_insn "jump"
+@@ -765,7 +784,7 @@
+   "*
+   return aarch64_output_casesi (operands);
+   "
+-  [(set_attr "length" "16")
++  [(set_attr "sls_length" "casesi")
+    (set_attr "type" "branch")]
+ )
+ 
+@@ -844,18 +863,23 @@
+   [(return)]
+   ""
+   {
++    const char *ret = NULL;
+     if (aarch64_return_address_signing_enabled ()
+ 	&& TARGET_ARMV8_3
+ 	&& !crtl->calls_eh_return)
+       {
+ 	if (aarch64_ra_sign_key == AARCH64_KEY_B)
+-	  return "retab";
++	  ret = "retab";
+ 	else
+-	  return "retaa";
++	  ret = "retaa";
+       }
+-    return "ret";
++    else
++      ret = "ret";
++    output_asm_insn (ret, operands);
++    return aarch64_sls_barrier (aarch64_harden_sls_retbr_p ());
+   }
+-  [(set_attr "type" "branch")]
++  [(set_attr "type" "branch")
++   (set_attr "sls_length" "retbr")]
+ )
+ 
+ (define_expand "return"
+@@ -867,8 +891,12 @@
+ (define_insn "simple_return"
+   [(simple_return)]
+   ""
+-  "ret"
+-  [(set_attr "type" "branch")]
++  {
++    output_asm_insn ("ret", operands);
++    return aarch64_sls_barrier (aarch64_harden_sls_retbr_p ());
++  }
++  [(set_attr "type" "branch")
++   (set_attr "sls_length" "retbr")]
+ )
+ 
+ (define_insn "*cb<optab><mode>1"
+@@ -1066,10 +1094,16 @@
+    (unspec:DI [(match_operand:DI 2 "const_int_operand")] UNSPEC_CALLEE_ABI)
+    (return)]
+   "SIBLING_CALL_P (insn)"
+-  "@
+-   br\\t%0
+-   b\\t%c0"
+-  [(set_attr "type" "branch, branch")]
++  {
++    if (which_alternative == 0)
++      {
++	output_asm_insn ("br\\t%0", operands);
++	return aarch64_sls_barrier (aarch64_harden_sls_retbr_p ());
++      }
++    return "b\\t%c0";
++  }
++  [(set_attr "type" "branch, branch")
++   (set_attr "sls_length" "retbr,none")]
+ )
+ 
+ (define_insn "*sibcall_value_insn"
+@@ -1080,10 +1114,16 @@
+    (unspec:DI [(match_operand:DI 3 "const_int_operand")] UNSPEC_CALLEE_ABI)
+    (return)]
+   "SIBLING_CALL_P (insn)"
+-  "@
+-   br\\t%1
+-   b\\t%c1"
+-  [(set_attr "type" "branch, branch")]
++  {
++    if (which_alternative == 0)
++      {
++	output_asm_insn ("br\\t%1", operands);
++	return aarch64_sls_barrier (aarch64_harden_sls_retbr_p ());
++      }
++    return "b\\t%c1";
++  }
++  [(set_attr "type" "branch, branch")
++   (set_attr "sls_length" "retbr,none")]
+ )
+ 
+ ;; Call subroutine returning any type.
+diff --git a/gcc/testsuite/gcc.target/aarch64/sls-mitigation/sls-miti-retbr-pacret.c b/gcc/testsuite/gcc.target/aarch64/sls-mitigation/sls-miti-retbr-pacret.c
+new file mode 100644
+index 0000000..fa1887a
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/aarch64/sls-mitigation/sls-miti-retbr-pacret.c
+@@ -0,0 +1,21 @@
++/* Avoid ILP32 since pacret is only available for LP64 */
++/* { dg-do compile { target { ! ilp32 } } } */
++/* { dg-additional-options "-mharden-sls=retbr -mbranch-protection=pac-ret -march=armv8.3-a" } */
++
++/* Testing the do_return pattern for retaa and retab.  */
++long retbr_subcall(void);
++long retbr_do_return_retaa(void)
++{
++    return retbr_subcall()+1;
++}
++
++__attribute__((target("branch-protection=pac-ret+b-key")))
++long retbr_do_return_retab(void)
++{
++    return retbr_subcall()+1;
++}
++
++/* Ensure there are no BR or RET instructions which are not directly followed
++   by a speculation barrier.  */
++/* { dg-final { scan-assembler-not {\t(br|ret|retaa|retab)\tx[0-9][0-9]?\n\t(?!dsb\tsy\n\tisb)} } } */
++/* { dg-final { scan-assembler-not {ret\t} } } */
+diff --git a/gcc/testsuite/gcc.target/aarch64/sls-mitigation/sls-miti-retbr.c b/gcc/testsuite/gcc.target/aarch64/sls-mitigation/sls-miti-retbr.c
+new file mode 100644
+index 0000000..76b8d03
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/aarch64/sls-mitigation/sls-miti-retbr.c
+@@ -0,0 +1,119 @@
++/* We ensure that -Wpedantic is off since it complains about the trampolines
++   we explicitly want to test.  */
++/* { dg-additional-options "-mharden-sls=retbr -Wno-pedantic " } */
++/*
++   Ensure that the SLS hardening of RET and BR leaves no unprotected RET/BR
++   instructions.
++  */
++typedef int (foo) (int, int);
++typedef void (bar) (int, int);
++struct sls_testclass {
++    foo *x;
++    bar *y;
++    int left;
++    int right;
++};
++
++int
++retbr_sibcall_value_insn (struct sls_testclass x)
++{
++  return x.x(x.left, x.right);
++}
++
++void
++retbr_sibcall_insn (struct sls_testclass x)
++{
++  x.y(x.left, x.right);
++}
++
++/* Aim to test two different returns.
++   One that introduces a tail call in the middle of the function, and one that
++   has a normal return.  */
++int
++retbr_multiple_returns (struct sls_testclass x)
++{
++  int temp;
++  if (x.left % 10)
++    return x.x(x.left, 100);
++  else if (x.right % 20)
++    {
++      return x.x(x.left * x.right, 100);
++    }
++  temp = x.left % x.right;
++  temp *= 100;
++  temp /= 2;
++  return temp % 3;
++}
++
++void
++retbr_multiple_returns_void (struct sls_testclass x)
++{
++  if (x.left % 10)
++    {
++      x.y(x.left, 100);
++    }
++  else if (x.right % 20)
++    {
++      x.y(x.left * x.right, 100);
++    }
++  return;
++}
++
++/* Testing the casesi jump via register.  */
++__attribute__ ((optimize ("Os")))
++int
++retbr_casesi_dispatch (struct sls_testclass x)
++{
++  switch (x.left)
++    {
++    case -5:
++      return -2;
++    case -3:
++      return -1;
++    case 0:
++      return 0;
++    case 3:
++      return 1;
++    case 5:
++      break;
++    default:
++      __builtin_unreachable ();
++    }
++  return x.right;
++}
++
++/* Testing the BR in trampolines is mitigated against.  */
++void f1 (void *);
++void f3 (void *, void (*)(void *));
++void f2 (void *);
++
++int
++retbr_trampolines (void *a, int b)
++{
++  if (!b)
++    {
++      f1 (a);
++      return 1;
++    }
++  if (b)
++    {
++      void retbr_tramp_internal (void *c)
++      {
++	if (c == a)
++	  f2 (c);
++      }
++      f3 (a, retbr_tramp_internal);
++    }
++  return 0;
++}
++
++/* Testing the indirect_jump pattern.  */
++void
++retbr_indirect_jump (int *buf)
++{
++  __builtin_longjmp(buf, 1);
++}
++
++/* Ensure there are no BR or RET instructions which are not directly followed
++   by a speculation barrier.  */
++/* { dg-final { scan-assembler-not {\t(br|ret|retaa|retab)\tx[0-9][0-9]?\n\t(?!dsb\tsy\n\tisb|sb)} } } */
+diff --git a/gcc/testsuite/gcc.target/aarch64/sls-mitigation/sls-mitigation.exp b/gcc/testsuite/gcc.target/aarch64/sls-mitigation/sls-mitigation.exp
+new file mode 100644
+index 0000000..8122503
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/aarch64/sls-mitigation/sls-mitigation.exp
+@@ -0,0 +1,73 @@
++#  Regression driver for SLS mitigation on AArch64.
++#  Copyright (C) 2020 Free Software Foundation, Inc.
++#  Contributed by ARM Ltd.
++#
++#  This file is part of GCC.
++#
++#  GCC is free software; you can redistribute it and/or modify it
++#  under the terms of the GNU General Public License as published by
++#  the Free Software Foundation; either version 3, or (at your option)
++#  any later version.
++#
++#  GCC is distributed in the hope that it will be useful, but
++#  WITHOUT ANY WARRANTY; without even the implied warranty of
++#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++#  General Public License for more details.
++#
++#  You should have received a copy of the GNU General Public License
++#  along with GCC; see the file COPYING3.  If not see
++#  <http://www.gnu.org/licenses/>.  */
++
++# Exit immediately if this isn't an AArch64 target.
++if {![istarget aarch64*-*-*] } then {
++  return
++}
++
++# Load support procs.
++load_lib gcc-dg.exp
++load_lib torture-options.exp
++
++# If a testcase doesn't have special options, use these.
++global DEFAULT_CFLAGS
++if ![info exists DEFAULT_CFLAGS] then {
++    set DEFAULT_CFLAGS " "
++}
++
++# Initialize `dg'.
++dg-init
++torture-init
++
++# Use different architectures as well as the normal optimisation options.
++# (i.e. use both SB and DSB+ISB barriers).
++
++set save-dg-do-what-default ${dg-do-what-default}
++# Main loop.
++# Run with torture tests (i.e. a bunch of different optimisation levels) just
++# to increase test coverage.
++set dg-do-what-default assemble
++gcc-dg-runtest [lsort [glob -nocomplain $srcdir/$subdir/*.\[cCS\]]] \
++	"-save-temps" $DEFAULT_CFLAGS
++
++# Run the same tests but this time with SB extension.
++# Since not all supported assemblers will support that extension we decide
++# whether to assemble or just compile based on whether the extension is
++# supported for the available assembler.
++
++set templist {}
++foreach x $DG_TORTURE_OPTIONS {
++  lappend templist "$x -march=armv8.3-a+sb "
++  lappend templist "$x -march=armv8-a+sb "
++}
++set-torture-options $templist
++if { [check_effective_target_aarch64_asm_sb_ok] } {
++    set dg-do-what-default assemble
++} else {
++    set dg-do-what-default compile
++}
++gcc-dg-runtest [lsort [glob -nocomplain $srcdir/$subdir/*.\[cCS\]]] \
++	"-save-temps" $DEFAULT_CFLAGS
++set dg-do-what-default ${save-dg-do-what-default}
++
++# All done.
++torture-finish
++dg-finish
+diff --git a/gcc/testsuite/lib/target-supports.exp b/gcc/testsuite/lib/target-supports.exp
+index 8a186dd..9d2e093 100644
+--- a/gcc/testsuite/lib/target-supports.exp
++++ b/gcc/testsuite/lib/target-supports.exp
+@@ -9432,7 +9432,7 @@ proc check_effective_target_aarch64_tiny { } {
+ # various architecture extensions via the .arch_extension pseudo-op.
+ 
+ foreach { aarch64_ext } { "fp" "simd" "crypto" "crc" "lse" "dotprod" "sve"
+-			  "i8mm" "f32mm" "f64mm" "bf16" } {
++			  "i8mm" "f32mm" "f64mm" "bf16" "sb" } {
+     eval [string map [list FUNC $aarch64_ext] {
+ 	proc check_effective_target_aarch64_asm_FUNC_ok { } {
+ 	  if { [istarget aarch64*-*-*] } {
+-- 
+2.7.4
+

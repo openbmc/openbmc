@@ -1,0 +1,55 @@
+From dcb36fd007ddb32d8c5cfcf5e9ddb3d713d65396 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 21 Jul 2020 09:43:03 +0800
+Subject: [PATCH] fix up check for hardlinks always false if inode > 0xFFFFFFFF
+
+Since commit [382ed4a1 e2fsck: use proper types for variables][1]
+applied, it used ext2_ino_t instead of ino_t for referencing inode
+numbers, but the type of is_hardlink's `ino' should not be instead,
+The ext2_ino_t is 32bit, if inode > 0xFFFFFFFF, its value will be
+truncated.
+
+Add a debug printf to show the value of inode, when it check for hardlink
+files, it will always return false if inode > 0xFFFFFFFF
+|--- a/misc/create_inode.c
+|+++ b/misc/create_inode.c
+|@@ -605,6 +605,7 @@ static int is_hardlink(struct hdlinks_s *hdlinks, dev_t dev, ext2_ino_t ino)
+| {
+|        int i;
+|
+|+       printf("%s %d, %lX, %lX\n", __FUNCTION__, __LINE__, hdlinks->hdl[i].src_ino, ino);
+|        for (i = 0; i < hdlinks->count; i++) {
+|                if (hdlinks->hdl[i].src_dev == dev &&
+|                    hdlinks->hdl[i].src_ino == ino)
+
+Here is debug message:
+is_hardlink 608, 2913DB886, 913DB886
+
+The length of ext2_ino_t is 32bit (typedef __u32 __bitwise ext2_ino_t;),
+and ino_t is 64bit on 64bit system (such as x86-64), recover `ino' to ino_t.
+
+[1] https://git.kernel.org/pub/scm/fs/ext2/e2fsprogs.git/commit/?id=382ed4a1c2b60acb9db7631e86dda207bde6076e
+
+Upstream-Status: Submitted [https://github.com/tytso/e2fsprogs/pull/48]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ misc/create_inode.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/misc/create_inode.c b/misc/create_inode.c
+index e8d1df6b..837f3875 100644
+--- a/misc/create_inode.c
++++ b/misc/create_inode.c
+@@ -601,7 +601,7 @@ out:
+ 	return err;
+ }
+ 
+-static int is_hardlink(struct hdlinks_s *hdlinks, dev_t dev, ext2_ino_t ino)
++static int is_hardlink(struct hdlinks_s *hdlinks, dev_t dev, ino_t ino)
+ {
+ 	int i;
+ 
+-- 
+2.18.2
+

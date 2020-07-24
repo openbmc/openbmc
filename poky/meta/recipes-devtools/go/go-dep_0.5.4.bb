@@ -8,6 +8,7 @@ SRC_URI = "git://${GO_IMPORT} \
            file://0001-Add-support-for-mips-mips64.patch;patchdir=src/github.com/golang/dep \
            file://0001-bolt_riscv64-Add-support-for-riscv64.patch;patchdir=src/github.com/golang/dep \
           "
+SRC_URI_append_riscv64 = " file://0001-Update-sys-module-to-latest.patch;patchdir=src/github.com/golang/dep "
 
 SRCREV = "1f7c19e5f52f49ffb9f956f64c010be14683468b"
 

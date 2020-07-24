@@ -32,7 +32,7 @@ re_control_char = re.compile('[%s]' % re.escape("".join(control_chars)))
 class QemuRunner:
 
     def __init__(self, machine, rootfs, display, tmpdir, deploy_dir_image, logfile, boottime, dump_dir, dump_host_cmds,
-                 use_kvm, logger, use_slirp=False, serial_ports=2, boot_patterns = defaultdict(str), use_ovmf=False):
+                 use_kvm, logger, use_slirp=False, serial_ports=2, boot_patterns = defaultdict(str), use_ovmf=False, workdir=None):
 
         # Popen object for runqemu
         self.runqemu = None
@@ -63,7 +63,9 @@ class QemuRunner:
         self.boot_patterns = boot_patterns
 
         self.runqemutime = 120
-        self.qemu_pidfile = 'pidfile_'+str(os.getpid())
+        if not workdir:
+            workdir = os.getcwd()
+        self.qemu_pidfile = workdir + '/pidfile_' + str(os.getpid())
         self.host_dumper = HostDumper(dump_host_cmds, dump_dir)
         self.monitorpipe = None
 
@@ -252,8 +254,17 @@ class QemuRunner:
         if not self.is_alive():
             self.logger.error("Qemu pid didn't appear in %s seconds (%s)" %
                               (self.runqemutime, time.strftime("%D %H:%M:%S")))
+
+            qemu_pid = None
+            if os.path.isfile(self.qemu_pidfile):
+                with open(self.qemu_pidfile, 'r') as f:
+                    qemu_pid = f.read().strip()
+
+            self.logger.error("Status information, poll status: %s, pidfile exists: %s, pidfile contents %s, proc pid exists %s"
+                % (self.runqemu.poll(), os.path.isfile(self.qemu_pidfile), str(qemu_pid), os.path.exists("/proc/" + str(qemu_pid))))
+
             # Dump all processes to help us to figure out what is going on...
-            ps = subprocess.Popen(['ps', 'axww', '-o', 'pid,ppid,command '], stdout=subprocess.PIPE).communicate()[0]
+            ps = subprocess.Popen(['ps', 'axww', '-o', 'pid,ppid,pri,ni,command '], stdout=subprocess.PIPE).communicate()[0]
             processes = ps.decode("utf-8")
             self.logger.debug("Running processes:\n%s" % processes)
             self._dump_host()

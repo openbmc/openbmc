@@ -364,14 +364,14 @@ def package_qa_check_arch(path,name,d, elf, messages):
             target_os == "linux-gnu_ilp32" or re.match(r'mips64.*32', d.getVar('DEFAULTTUNE')))
     is_bpf = (oe.qa.elf_machine_to_string(elf.machine()) == "BPF")
     if not ((machine == elf.machine()) or is_32 or is_bpf):
-        package_qa_add_message(messages, "arch", "Architecture did not match (%s, expected %s) on %s" % \
-                 (oe.qa.elf_machine_to_string(elf.machine()), oe.qa.elf_machine_to_string(machine), package_qa_clean_path(path,d)))
+        package_qa_add_message(messages, "arch", "Architecture did not match (%s, expected %s) in %s" % \
+                 (oe.qa.elf_machine_to_string(elf.machine()), oe.qa.elf_machine_to_string(machine), package_qa_clean_path(path, d, name)))
     elif not ((bits == elf.abiSize()) or is_32 or is_bpf):
-        package_qa_add_message(messages, "arch", "Bit size did not match (%d to %d) %s on %s" % \
-                 (bits, elf.abiSize(), bpn, package_qa_clean_path(path,d)))
+        package_qa_add_message(messages, "arch", "Bit size did not match (%d, expected %d) in %s" % \
+                 (elf.abiSize(), bits, package_qa_clean_path(path, d, name)))
     elif not ((littleendian == elf.isLittleEndian()) or is_bpf):
-        package_qa_add_message(messages, "arch", "Endiannes did not match (%d to %d) on %s" % \
-                 (littleendian, elf.isLittleEndian(), package_qa_clean_path(path,d)))
+        package_qa_add_message(messages, "arch", "Endiannes did not match (%d, expected %d) in %s" % \
+                 (elf.isLittleEndian(), littleendian, package_qa_clean_path(path,d, name)))
 
 QAPATHTEST[desktop] = "package_qa_check_desktop"
 def package_qa_check_desktop(path, name, d, elf, messages):
@@ -457,10 +457,6 @@ def package_qa_check_buildpaths(path, name, d, elf, messages):
 
     # Ignore symlinks
     if os.path.islink(path):
-        return
-
-    # Ignore ipk and deb's CONTROL dir
-    if path.find(name + "/CONTROL/") != -1 or path.find(name + "/DEBIAN/") != -1:
         return
 
     tmpdir = bytes(d.getVar('TMPDIR'), encoding="utf-8")
@@ -1034,7 +1030,14 @@ python do_package_qa () {
     pkgfiles = {}
     for pkg in packages:
         pkgfiles[pkg] = []
-        for walkroot, dirs, files in os.walk(os.path.join(pkgdest, pkg)):
+        pkgdir = os.path.join(pkgdest, pkg)
+        for walkroot, dirs, files in os.walk(pkgdir):
+            # Don't walk into top-level CONTROL or DEBIAN directories as these
+            # are temporary directories created by do_package.
+            if walkroot == pkgdir:
+                for control in ("CONTROL", "DEBIAN"):
+                    if control in dirs:
+                        dirs.remove(control)
             for file in files:
                 pkgfiles[pkg].append(os.path.join(walkroot, file))
 

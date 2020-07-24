@@ -3190,7 +3190,7 @@
                         building an image.
                         </para></listitem>
                     <listitem><para>
-                        <filename>virtual/mesa</filename>:
+                        <filename>virtual/libgbm</filename>:
                         Provides <filename>gbm.pc</filename>.
                         </para></listitem>
                     <listitem><para>

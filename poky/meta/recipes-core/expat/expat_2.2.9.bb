@@ -8,15 +8,21 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=5b8620d98e49772d95fc1d291c26aa79"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/expat/expat-${PV}.tar.bz2 \
            file://libtool-tag.patch \
+	   file://run-ptest \
+	   file://0001-Add-output-of-tests-result.patch \
 	  "
 
 SRC_URI[md5sum] = "875a2c2ff3e8eb9e5a5cd62db2033ab5"
 SRC_URI[sha256sum] = "f1063084dc4302a427dabcca499c8312b3a32a29b7d2506653ecc8f950a9a237"
 
-inherit autotools lib_package
+EXTRA_OECMAKE_class-native += "-DEXPAT_BUILD_DOCS=OFF"
 
-do_configure_prepend () {
-	rm -f ${S}/conftools/libtool.m4
+RDEPENDS_${PN}-ptest += "bash"
+
+inherit cmake lib_package ptest
+
+do_install_ptest_class-target() {
+	install -m 755 ${B}/tests/* ${D}${PTEST_PATH}
 }
 
-BBCLASSEXTEND = "native nativesdk"
+BBCLASSEXTEND += "native nativesdk"

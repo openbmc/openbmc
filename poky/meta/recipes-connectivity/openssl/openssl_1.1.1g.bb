@@ -204,6 +204,8 @@ CONFFILES_openssl-conf = "${sysconfdir}/ssl/openssl.cnf"
 RRECOMMENDS_libcrypto += "openssl-conf"
 RDEPENDS_${PN}-ptest += "openssl-bin perl perl-modules bash"
 
+RDEPENDS_${PN}-bin += "openssl-conf"
+
 BBCLASSEXTEND = "native nativesdk"
 
 CVE_PRODUCT = "openssl:openssl"

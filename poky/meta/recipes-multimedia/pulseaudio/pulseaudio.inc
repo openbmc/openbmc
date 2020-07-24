@@ -63,14 +63,6 @@ DEPENDS += "speexdsp libxml-parser-perl-native libcap"
 
 inherit autotools bash-completion pkgconfig useradd gettext perlnative systemd manpages gsettings
 
-# When compiling for Thumb or Thumb2, frame pointers _must_ be disabled since the
-# Thumb frame pointer in r7 clashes with pulseaudio's use of inline asm to make syscalls
-# (where r7 is used for the syscall NR). In most cases, frame pointers will be
-# disabled automatically due to the optimisation level, but append an explicit
-# -fomit-frame-pointer to handle cases where optimisation is set to -O0 or frame
-# pointers have been enabled by -fno-omit-frame-pointer earlier in CFLAGS, etc.
-CFLAGS_append_arm = " ${@bb.utils.contains('TUNE_CCARGS', '-mthumb', '-fomit-frame-pointer', '', d)}"
-
 # *.desktop rules wont be generated during configure and build will fail
 # if using --disable-nls
 USE_NLS = "yes"

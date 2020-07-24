@@ -22,6 +22,7 @@ CACHED_CONFIGUREVARS = " \
 EXTRA_OECONF += " \
              ${@bb.utils.contains('DISTRO_FEATURES', 'pam', '--with-pam', '--without-pam', d)} \
              ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '--enable-tmpfiles.d=${nonarch_libdir}/tmpfiles.d', '--disable-tmpfiles.d', d)} \
+             --with-rundir=/run/sudo \
              --with-vardir=/var/lib/sudo \
              "
 
@@ -38,7 +39,7 @@ do_install_append () {
 	chmod 0440 ${D}${sysconfdir}/sudoers
 
 	# Explicitly remove the /sudo directory to avoid QA error
-	rmdir -p --ignore-fail-on-non-empty ${D}/sudo
+	rmdir -p --ignore-fail-on-non-empty ${D}/run/sudo
 }
 
 FILES_${PN} += "${nonarch_libdir}/tmpfiles.d"

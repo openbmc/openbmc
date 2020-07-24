@@ -30,4 +30,4 @@ EXTRA_OESCONS = " \
                   OPENSSL="${STAGING_EXECPREFIXDIR}" \
                   "
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

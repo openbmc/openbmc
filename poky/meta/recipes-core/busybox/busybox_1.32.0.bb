@@ -43,6 +43,7 @@ SRC_URI = "https://busybox.net/downloads/busybox-${PV}.tar.bz2;name=tarball \
            file://0001-testsuite-use-www.example.org-for-wget-test-cases.patch \
            file://0001-du-l-works-fix-to-use-145-instead-of-144.patch \
            file://0001-sysctl-ignore-EIO-of-stable_secret-below-proc-sys-ne.patch \
+           file://0001-hwclock-make-glibc-2.31-compatible.patch \
 "
 SRC_URI_append_libc-musl = " file://musl.cfg "
 

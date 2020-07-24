@@ -1039,7 +1039,7 @@ python split_and_strip_files () {
 
     dvar = d.getVar('PKGD')
     pn = d.getVar('PN')
-    targetos = d.getVar('TARGET_OS')
+    hostos = d.getVar('HOST_OS')
 
     oldcwd = os.getcwd()
     os.chdir(dvar)
@@ -1194,7 +1194,7 @@ python split_and_strip_files () {
     if (d.getVar('INHIBIT_PACKAGE_DEBUG_SPLIT') != '1'):
         results = oe.utils.multiprocess_launch(splitdebuginfo, list(elffiles), d, extraargs=(dvar, debugdir, debuglibdir, debugappend, debugsrcdir, d))
 
-        if debugsrcdir and not targetos.startswith("mingw"):
+        if debugsrcdir and not hostos.startswith("mingw"):
             if (d.getVar('PACKAGE_DEBUG_STATIC_SPLIT') == '1'):
                 results = oe.utils.multiprocess_launch(splitstaticdebuginfo, staticlibs, d, extraargs=(dvar, debugstaticdir, debugstaticlibdir, debugstaticappend, debugsrcdir, d))
             else:
@@ -1761,7 +1761,7 @@ python package_do_shlibs() {
     else:
         shlib_pkgs = packages.split()
 
-    targetos = d.getVar('TARGET_OS')
+    hostos = d.getVar('HOST_OS')
 
     workdir = d.getVar('WORKDIR')
 
@@ -1912,9 +1912,9 @@ python package_do_shlibs() {
                 soname = None
                 if cpath.islink(file):
                     continue
-                if targetos == "darwin" or targetos == "darwin8":
+                if hostos == "darwin" or hostos == "darwin8":
                     darwin_so(file, needed, sonames, renames, pkgver)
-                elif targetos.startswith("mingw"):
+                elif hostos.startswith("mingw"):
                     mingw_dll(file, needed, sonames, renames, pkgver)
                 elif os.access(file, os.X_OK) or lib_re.match(file):
                     linuxlist.append(file)

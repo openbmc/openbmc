@@ -1,0 +1,23 @@
+#!/bin/bash
+
+output=${1:-"expat_tests.log"} # default log file
+
+# logging function
+function testCheck() {
+	testExec="$1"
+	shift
+	echo && echo ${testExec} && ./${testExec} "$@"
+	error=$?
+	result=$([[ ${error} -eq 0 ]] && echo "PASS" || echo "FAIL")
+	echo "${result}: ${testExec}" && echo "============================"
+}
+
+export output
+export -f testCheck
+TIME=$(which time)
+
+echo "Architecture: $(uname -m)" > ${output}
+echo "Image: $(uname -sr)" >> ${output}
+${TIME} -f 'Execution time: %e s' bash -c "testCheck runtests -vv" |& tee -a ${output}
+${TIME} -f 'Execution time: %e s' bash -c "testCheck runtestspp -vv" |& tee -a ${output}
+echo

@@ -5,7 +5,7 @@ def autotools_dep_prepend(d):
     pn = d.getVar('PN')
     deps = ''
 
-    if pn in ['autoconf-native', 'automake-native', 'help2man-native']:
+    if pn in ['autoconf-native', 'automake-native']:
         return deps
     deps += 'autoconf-native automake-native '
 

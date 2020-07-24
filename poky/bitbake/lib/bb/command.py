@@ -396,7 +396,7 @@ class CommandsSync:
         def sortkey(x):
             vfn, _ = x
             realfn, _, mc = bb.cache.virtualfn2realfn(vfn)
-            return (-command.cooker.collections[mc].calc_bbfile_priority(realfn), vfn)
+            return (-command.cooker.collections[mc].calc_bbfile_priority(realfn)[0], vfn)
 
         skipdict = OrderedDict(sorted(command.cooker.skiplist.items(), key=sortkey))
         return list(skipdict.items())

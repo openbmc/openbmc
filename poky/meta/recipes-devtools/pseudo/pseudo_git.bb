@@ -6,7 +6,7 @@ SRC_URI = "git://git.yoctoproject.org/pseudo;branch=oe-core \
            file://fallback-group \
            "
 
-SRCREV = "067950bd9415fafcafb2bf32c0e10df4f2ac936c"
+SRCREV = "8efb082863ff0ceec7b7e46f9a44750e12f48039"
 S = "${WORKDIR}/git"
 PV = "1.9.0+git${SRCPV}"
 

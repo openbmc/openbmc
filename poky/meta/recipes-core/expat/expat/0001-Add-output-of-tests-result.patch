@@ -1,0 +1,83 @@
+From aa84835a00bfd65e784d58411e76f60658e939dc Mon Sep 17 00:00:00 2001
+From: Oleksandr Popovych <oleksandr.s.popovych@globallogic.com>
+Date: Tue, 18 Feb 2020 19:04:55 +0200
+Subject: [PATCH] Add output of tests result
+
+Added console output of testing results in form 'RESULT: TEST_NAME'.
+
+Changed verbose mode of test application set by '-v' ('--verbose')
+argument to CK_NORMAL.
+Added new supported argument '-vv' ('--extra-verbose') that changes
+verbose mode of test application to CK_VERBOSE. Results of each test
+are shown in output only if this mode is set.
+
+Upstream-Status: Denied
+
+This patch changes potentially deprecated feature that shoud be changed
+in upstream. [https://github.com/libexpat/libexpat/issues/382]
+
+Signed-off-by: Oleksandr Popovych <oleksandr.s.popovych@globallogic.com>
+---
+ tests/minicheck.c | 10 +++++++++-
+ tests/runtests.c  |  4 +++-
+ 2 files changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/expat/tests/minicheck.c b/expat/tests/minicheck.c
+index a5a1efb..94fa412 100644
+--- a/tests/minicheck.c
++++ b/tests/minicheck.c
+@@ -164,6 +164,8 @@ srunner_run_all(SRunner *runner, int verbosity) {
+       if (tc->setup != NULL) {
+         /* setup */
+         if (setjmp(env)) {
++          if (verbosity >= CK_VERBOSE)
++            printf("SKIP: %s\n", _check_current_function);
+           add_failure(runner, verbosity);
+           continue;
+         }
+@@ -171,6 +173,8 @@ srunner_run_all(SRunner *runner, int verbosity) {
+       }
+       /* test */
+       if (setjmp(env)) {
++        if (verbosity >= CK_VERBOSE)
++          printf("FAIL: %s\n", _check_current_function);
+         add_failure(runner, verbosity);
+         continue;
+       }
+@@ -178,12 +182,16 @@ srunner_run_all(SRunner *runner, int verbosity) {
+
+       /* teardown */
+       if (tc->teardown != NULL) {
+-        if (setjmp(env)) {
++        if (setjmp(env)) {
++          if (verbosity >= CK_VERBOSE)
++           printf("PASS: %s\n", _check_current_function);
+           add_failure(runner, verbosity);
+           continue;
+         }
+         tc->teardown();
+       }
++      if (verbosity >= CK_VERBOSE)
++        printf("PASS: %s\n", _check_current_function);
+     }
+     tc = tc->next_tcase;
+   }
+diff --git a/tests/runtests.c b/expat/tests/runtests.c
+index 7791fe0..75724e5 100644
+--- a/tests/runtests.c
++++ b/tests/runtests.c
+@@ -11619,9 +11619,11 @@ main(int argc, char *argv[]) {
+   for (i = 1; i < argc; ++i) {
+     char *opt = argv[i];
+     if (strcmp(opt, "-v") == 0 || strcmp(opt, "--verbose") == 0)
+-      verbosity = CK_VERBOSE;
++      verbosity = CK_NORMAL;
+     else if (strcmp(opt, "-q") == 0 || strcmp(opt, "--quiet") == 0)
+       verbosity = CK_SILENT;
++    else if (strcmp(opt, "-vv") == 0 || strcmp(opt, "--extra-verbose") == 0)
++	verbosity = CK_VERBOSE;
+     else {
+       fprintf(stderr, "runtests: unknown option '%s'\n", opt);
+       return 2;
+--
+2.17.1

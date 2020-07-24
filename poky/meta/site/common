@@ -19,3 +19,10 @@ shadow_cv_passwd_dir=${bindir}
 ac_cv_buggy_getaddrinfo=no
 
 ac_cv_path_SED=${ac_cv_path_SED=sed}
+
+# General
+ac_cv_have_decl_sys_siglist=${ac_cv_have_decl_sys_siglist=no}
+
+# bash
+bash_cv_under_sys_siglist=${bash_cv_under_sys_siglist=no}
+bash_cv_sys_siglist=${bash_cv_sys_siglist=no}

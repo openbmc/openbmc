@@ -1,0 +1,28 @@
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+From 287964d54b64bed833adba307e1d920f8fcf0cbc Mon Sep 17 00:00:00 2001
+From: Ozkan Sezer <sezero@users.sourceforge.net>
+Date: Wed, 7 Aug 2019 15:50:50 +0300
+Subject: [PATCH] fix pa_add_headers.m4 for development versions of autoconf
+ (bug 3392471)
+
+Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
+---
+ autoconf/m4/pa_add_headers.m4 | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/aclocal.m4 b/aclocal.m4
+index 1af2dd5d..6ce3e6c1 100644
+--- a/aclocal.m4
++++ b/aclocal.m4
+@@ -169,7 +169,8 @@ dnl --------------------------------------------------------------------------
+ AC_DEFUN(_PA_ADD_HEADER,
+ [AC_CHECK_HEADERS([$1],[ac_includes_default="$ac_includes_default
+ #include <$1>"
+-])])
++])
++])
+ 
+ AC_DEFUN(PA_ADD_HEADERS,
+ [m4_map_args_w([$1],[_PA_ADD_HEADER(],[)])])

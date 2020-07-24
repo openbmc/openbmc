@@ -1,0 +1,90 @@
+From c0ae3f659c6c130d151378ba4d7d861e3b7b970f Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@cn.fujitsu.com>
+Date: Wed, 8 Jul 2020 14:50:27 +0900
+Subject: [PATCH] Modied the license to GPLv2.1+ to keep with LICENSE file.
+
+Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
+Please reference to https://gitlab.com/gnutls/gnutls/-/issues/1018.
+Upstream-Status: Backport [https://gitlab.com/gnutls/gnutls/-/merge_requests/1285].
+---
+ lib/x509/krb5.c | 20 +++++++++++---------
+ lib/x509/krb5.h | 20 +++++++++++---------
+ 2 files changed, 22 insertions(+), 18 deletions(-)
+
+diff --git a/lib/x509/krb5.c b/lib/x509/krb5.c
+index 7fe84e6..d68c737 100644
+--- a/lib/x509/krb5.c
++++ b/lib/x509/krb5.c
+@@ -1,21 +1,23 @@
+ /*
+  * Copyright (C) 2015 Red Hat, Inc.
+  *
++ * Author: Nikos Mavrogiannopoulos
++ *
+  * This file is part of GnuTLS.
+  *
+- * GnuTLS is free software: you can redistribute it and/or modify it
+- * under the terms of the GNU General Public License as published by
+- * the Free Software Foundation, either version 3 of the License, or
+- * (at your option) any later version.
++ * The GnuTLS is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public License
++ * as published by the Free Software Foundation; either version 2.1 of
++ * the License, or (at your option) any later version.
+  *
+- * GnuTLS is distributed in the hope that it will be useful, but
++ * This library is distributed in the hope that it will be useful, but
+  * WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * General Public License for more details.
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with this program.  If not, see <https://www.gnu.org/licenses/>
+  *
+- * You should have received a copy of the GNU General Public License
+- * along with this program.  If not, see
+- * <https://www.gnu.org/licenses/>.
+  */
+ 
+ #include <config.h>
+diff --git a/lib/x509/krb5.h b/lib/x509/krb5.h
+index d8926af..815bb28 100644
+--- a/lib/x509/krb5.h
++++ b/lib/x509/krb5.h
+@@ -1,21 +1,23 @@
+ /*
+  * Copyright (C) 2015 Red Hat, Inc.
+  *
++ * Author: Nikos Mavrogiannopoulos
++ *
+  * This file is part of GnuTLS.
+  *
+- * GnuTLS is free software: you can redistribute it and/or modify it
+- * under the terms of the GNU General Public License as published by
+- * the Free Software Foundation, either version 3 of the License, or
+- * (at your option) any later version.
++ * The GnuTLS is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public License
++ * as published by the Free Software Foundation; either version 2.1 of
++ * the License, or (at your option) any later version.
+  *
+- * GnuTLS is distributed in the hope that it will be useful, but
++ * This library is distributed in the hope that it will be useful, but
+  * WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * General Public License for more details.
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with this program.  If not, see <https://www.gnu.org/licenses/>
+  *
+- * You should have received a copy of the GNU General Public License
+- * along with this program.  If not, see
+- * <https://www.gnu.org/licenses/>.
+  */
+ 
+ #ifndef GNUTLS_LIB_X509_KRB5_H
+-- 
+2.17.1
+

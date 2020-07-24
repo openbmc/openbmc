@@ -56,6 +56,7 @@ EXTRA_OECONF = "--with-statduser=rpcuser \
                 --disable-gss \
                 --disable-nfsdcltrack \
                 --with-statdpath=/var/lib/nfs/statd \
+                --with-rpcgen=${HOSTTOOLS_DIR}/rpcgen \
                "
 
 PACKAGECONFIG ??= "tcp-wrappers \

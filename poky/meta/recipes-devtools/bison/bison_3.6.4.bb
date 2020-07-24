@@ -27,7 +27,7 @@ EXTRA_OEMAKE_append = " -l"
 inherit autotools gettext texinfo
 
 # The automatic m4 path detection gets confused, so force the right value
-acpaths = "-I ${S}/m4"
+acpaths = "-I ./m4"
 
 do_compile_prepend() {
 	for i in mfcalc calc++ rpcalc; do mkdir -p ${B}/examples/$i; done

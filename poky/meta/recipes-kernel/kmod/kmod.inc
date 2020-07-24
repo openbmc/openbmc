@@ -31,5 +31,7 @@ EXTRA_OECONF +=" --enable-tools --with-zlib"
 PACKAGECONFIG[debug] = "--enable-debug,--disable-debug"
 PACKAGECONFIG[logging] = " --enable-logging,--disable-logging"
 PACKAGECONFIG[manpages] = "--enable-manpages, --disable-manpages, libxslt-native xmlto-native"
+PACKAGECONFIG[xz] = "--with-xz,--without-xz,xz"
+PACKAGECONFIG[openssl] = "--with-openssl,--without-openssl,openssl"
 
 GTKDOC_DOCDIR = "${S}/libkmod/docs"

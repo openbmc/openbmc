@@ -244,12 +244,14 @@ class AddTaskNode(AstNode):
         bb.build.addtask(self.func, self.before, self.after, data)
 
 class DelTaskNode(AstNode):
-    def __init__(self, filename, lineno, func):
+    def __init__(self, filename, lineno, tasks):
         AstNode.__init__(self, filename, lineno)
-        self.func = func
+        self.tasks = tasks
 
     def eval(self, data):
-        bb.build.deltask(self.func, data)
+        tasks = data.expand(self.tasks).split()
+        for task in tasks:
+            bb.build.deltask(task, data)
 
 class BBHandlerNode(AstNode):
     def __init__(self, filename, lineno, fns):
@@ -305,7 +307,7 @@ def handleAddTask(statements, filename, lineno, m):
     statements.append(AddTaskNode(filename, lineno, func, before, after))
 
 def handleDelTask(statements, filename, lineno, m):
-    func = m.group("func")
+    func = m.group(1)
     if func is None:
         return
 
