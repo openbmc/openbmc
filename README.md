@@ -45,7 +45,7 @@ repository clone, and, if run without arguments, will display the list
 of supported hardware targets, see the following example:
 
 ```
-$ . setup
+$ . setup <machine> [build_dir]
 Target machine must be specified. Use one of:
 
 centriq2400-rep         nicole                     stardragon4800-rep2
@@ -63,7 +63,7 @@ neptune                 s2600wf
 Once you know the target (e.g. romulus), source the `setup` script as follows:
 
 ```
-. setup romulus
+. setup romulus build
 ```
 
 For evb-ast2500, please use the below command to specify the machine config,
