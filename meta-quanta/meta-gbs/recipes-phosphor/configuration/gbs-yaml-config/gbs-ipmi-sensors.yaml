@@ -8,7 +8,6 @@
   offsetB: 0
   bExp: 0
   rExp: 0
-  scale: -3
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -19,7 +18,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 0x11:
   <<: *temperature
@@ -59,7 +58,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 0x16:
   <<: *nvme_temperature
@@ -159,7 +158,6 @@
   offsetB: 0
   bExp: 0
   rExp: -4
-  scale: -3
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -170,7 +168,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 0x31:
   <<: *voltage
@@ -273,7 +271,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
-  scale: -3
   rExp: -3
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -283,7 +280,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 0x3D:
   <<: *voltage
@@ -300,7 +297,6 @@
   sensorReadingType: 0x01
   multiplierM: 78
   rExp: -3
-  scale: -3
   unit: xyz.openbmc_project.Sensor.Value.Unit.Amperes
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -311,7 +307,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 0x51:
   <<: *current
@@ -500,7 +496,6 @@
   offsetB: 0
   bExp: 0
   rExp: -1
-  scale: -6
   unit: xyz.openbmc_project.Sensor.Value.Unit.Watts
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -511,7 +506,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 # fan/pwm mapping
 # fan0/1 on Mobo, fb_fan0/1/2 on fan board
@@ -530,7 +525,6 @@
   offsetB: 0
   bExp: 0
   rExp: 0
-  scale: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -541,7 +535,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 0x61:
   <<: *fan_rpm_read
@@ -580,7 +574,7 @@
       Target:
         Offsets:
           0xFF:
-            type: uint64_t
+            type: double
 
 0x66:
   <<: *fan_pwm

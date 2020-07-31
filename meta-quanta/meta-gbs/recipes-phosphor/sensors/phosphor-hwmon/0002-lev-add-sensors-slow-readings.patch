@@ -1,20 +1,21 @@
-From 61b91122b72d7a3a5c93b80b6fb6d3ac892619dc Mon Sep 17 00:00:00 2001
+From 8eafa1b0513dd2f5898182487b4524a485bf1e21 Mon Sep 17 00:00:00 2001
 From: Eddielu <Eddie.Lu@quantatw.com>
-Date: Mon, 1 Jun 2020 14:18:33 +0800
-Subject: [PATCH] add sensors slow readings
+Date: Mon, 27 Jul 2020 20:54:28 +0800
+Subject: [PATCH] Update add sensors slow readings patch.
 
 ---
- mainloop.cpp | 73 +++++++++++++++++++++++++++++++++++++++++++++++++++++----
+ mainloop.cpp | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++++++----
  mainloop.hpp |  3 +++
- sensor.cpp   | 76 +++++++++++++++++++++++++++++++++++++++++++++++++++++-------
- sensor.hpp   | 21 +++++++++++++++--
- 4 files changed, 158 insertions(+), 15 deletions(-)
+ meson.build  |  1 +
+ sensor.cpp   | 75 +++++++++++++++++++++++++++++++++++++++++++++++++++++-------
+ sensor.hpp   | 20 ++++++++++++++--
+ 5 files changed, 158 insertions(+), 14 deletions(-)
 
 diff --git a/mainloop.cpp b/mainloop.cpp
-index 1769e94..5094343 100644
+index 4789a80..98d0658 100644
 --- a/mainloop.cpp
 +++ b/mainloop.cpp
-@@ -32,6 +32,7 @@
+@@ -34,6 +34,7 @@
  #include <cassert>
  #include <cstdlib>
  #include <functional>
@@ -22,7 +23,7 @@ index 1769e94..5094343 100644
  #include <iostream>
  #include <memory>
  #include <phosphor-logging/elog-errors.hpp>
-@@ -296,7 +297,7 @@ std::optional<ObjectStateData>
+@@ -299,7 +300,7 @@ std::optional<ObjectStateData>
      {
          // Add status interface based on _fault file being present
          sensorObj->addStatus(info);
@@ -48,12 +49,12 @@ index 1769e94..5094343 100644
 +                    std::chrono::milliseconds asyncReadTimeout{
 +                        std::stoi(asyncRead)};
 +                    bool valueIsValid = false;
-+                    std::future<SensorValueType> asyncThread;
++                    std::future<int64_t> asyncThread;
 +
 +                    auto asyncIter = _timedoutMap.find(sensorSetKey);
 +                    if (asyncIter == _timedoutMap.end())
 +                    {
-+                        // If sesnor not found in timedoutMap, spawn an async
++                        // If sensor not found in timedoutMap, spawn an async
 +                        // thread
 +                        asyncThread = std::async(
 +                            std::launch::async,
@@ -110,7 +111,7 @@ index 1769e94..5094343 100644
                  statusIface->functional(true);
  
 diff --git a/mainloop.hpp b/mainloop.hpp
-index 6c5b8e0..cfe34d5 100644
+index b3de022..6803c4b 100644
 --- a/mainloop.hpp
 +++ b/mainloop.hpp
 @@ -9,6 +9,7 @@
@@ -126,15 +127,27 @@ index 6c5b8e0..cfe34d5 100644
      std::map<SensorSet::key_type, std::unique_ptr<sensor::Sensor>>
          _sensorObjects;
 +    /** @brief Store the async futures of timed out sensor objects */
-+    std::map<SensorSet::key_type, std::future<SensorValueType>> _timedoutMap;
++    std::map<SensorSet::key_type, std::future<int64_t>> _timedoutMap;
  
      /**
       * @brief Map of removed sensors
+diff --git a/meson.build b/meson.build
+index 66e6801..d6a92f8 100644
+--- a/meson.build
++++ b/meson.build
+@@ -84,6 +84,7 @@ libhwmon_all = static_library(
+         gpioplus,
+         phosphor_dbus_interfaces,
+         phosphor_logging,
++        threads,
+     ],
+     link_with: [
+         libaverage,
 diff --git a/sensor.cpp b/sensor.cpp
-index 93bbb03..7b681e1 100644
+index b1cb470..72b45f8 100644
 --- a/sensor.cpp
 +++ b/sensor.cpp
-@@ -13,6 +13,7 @@
+@@ -15,6 +15,7 @@
  #include <cmath>
  #include <cstring>
  #include <filesystem>
@@ -142,7 +155,7 @@ index 93bbb03..7b681e1 100644
  #include <phosphor-logging/elog-errors.hpp>
  #include <thread>
  #include <xyz/openbmc_project/Common/error.hpp>
-@@ -135,8 +136,9 @@ SensorValueType Sensor::adjustValue(SensorValueType value)
+@@ -125,8 +126,9 @@ SensorValueType Sensor::adjustValue(SensorValueType value)
      return value;
  }
  
@@ -150,11 +163,11 @@ index 93bbb03..7b681e1 100644
 -                                              ObjectInfo& info)
 +std::shared_ptr<ValueObject> Sensor::addValue(
 +    const RetryIO& retryIO, ObjectInfo& info,
-+    std::map<SensorSet::key_type, std::future<SensorValueType>>& timedoutMap)
++    std::map<SensorSet::key_type, std::future<int64_t>>& timedoutMap)
  {
      static constexpr bool deferSignals = true;
  
-@@ -163,13 +165,69 @@ std::shared_ptr<ValueObject> Sensor::addValue(const RetryIO& retryIO,
+@@ -153,12 +155,69 @@ std::shared_ptr<ValueObject> Sensor::addValue(const RetryIO& retryIO,
              // RAII object for GPIO unlock / lock
              auto locker = gpioUnlock(getGpio());
  
@@ -164,7 +177,6 @@ index 93bbb03..7b681e1 100644
 -                _ioAccess->read(_sensor.first, _sensor.second,
 -                                hwmon::entry::cinput, std::get<size_t>(retryIO),
 -                                std::get<std::chrono::milliseconds>(retryIO));
--
 +            // For sensors with attribute ASYNC_READ_TIMEOUT,
 +            // spawn a thread with timeout
 +            auto asyncRead = env::getEnv("ASYNC_READ_TIMEOUT", _sensor);
@@ -174,12 +186,12 @@ index 93bbb03..7b681e1 100644
 +                std::chrono::milliseconds asyncReadTimeout{
 +                    std::stoi(asyncRead)};
 +                bool valueIsValid = false;
-+                std::future<SensorValueType> asyncThread;
++                std::future<int64_t> asyncThread;
 +
 +                auto asyncIter = timedoutMap.find(_sensor);
 +                if (asyncIter == timedoutMap.end())
 +                {
-+                    // If sesnor not found in timedoutMap, spawn an async thread
++                    // If sensor not found in timedoutMap, spawn an async thread
 +                    asyncThread = std::async(
 +                        std::launch::async, &hwmonio::HwmonIOInterface::read,
 +                        _ioAccess, _sensor.first, _sensor.second,
@@ -228,11 +240,11 @@ index 93bbb03..7b681e1 100644
 +                    std::get<size_t>(retryIO),
 +                    std::get<std::chrono::milliseconds>(retryIO));
 +            }
-             val = adjustValue(val);
          }
  #ifdef UPDATE_FUNCTIONAL_ON_FAIL
+         catch (const std::system_error& e)
 diff --git a/sensor.hpp b/sensor.hpp
-index 369a252..d1d6730 100644
+index 369a252..41c0fe7 100644
 --- a/sensor.hpp
 +++ b/sensor.hpp
 @@ -4,6 +4,8 @@
@@ -262,7 +274,7 @@ index 369a252..d1d6730 100644
  /** @class Sensor
   *  @brief Sensor object based on a SensorSet container's key type
   *  @details Sensor object to create and modify an associated device's sensor
-@@ -87,10 +100,14 @@ class Sensor
+@@ -87,10 +100,13 @@ class Sensor
       *                      (number of and delay between)
       * @param[in] info - Sensor object information
       *
@@ -272,10 +284,9 @@ index 369a252..d1d6730 100644
       */
 -    std::shared_ptr<ValueObject> addValue(const RetryIO& retryIO,
 -                                          ObjectInfo& info);
-+    std::shared_ptr<ValueObject>
-+        addValue(const RetryIO& retryIO, ObjectInfo& info,
-+                 std::map<SensorSet::key_type, std::future<SensorValueType>>&
-+                     timedoutMap);
++    std::shared_ptr<ValueObject> addValue(
++        const RetryIO& retryIO, ObjectInfo& info,
++        std::map<SensorSet::key_type, std::future<int64_t>>& timedoutMap);
  
      /**
       * @brief Add status interface and functional property for sensor
