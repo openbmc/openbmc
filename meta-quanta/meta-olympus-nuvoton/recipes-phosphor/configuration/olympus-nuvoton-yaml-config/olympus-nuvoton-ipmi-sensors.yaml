@@ -8,7 +8,6 @@
   offsetB: 0
   bExp: 0
   rExp: 0
-  scale: -3
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -19,7 +18,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 2:
   <<: *temperature
@@ -63,7 +62,6 @@
   offsetB: 0
   bExp: 0
   rExp: -2
-  scale: -3
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -74,7 +72,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 10:
   <<: *voltage
@@ -148,7 +146,6 @@
   offsetB: 0
   bExp: 0
   rExp: -3
-  scale: -6
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -159,7 +156,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 24:
   <<: *power
   entityInstance: 24
@@ -203,7 +200,6 @@
   offsetB: 10
   bExp: 0
   rExp: -3
-  scale: -3
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -214,7 +210,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 33:
   <<: *current
@@ -243,7 +239,6 @@
   offsetB: 0
   bExp: 0
   rExp: 0
-  scale: -3
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -254,7 +249,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 38:
   <<: *temperature_dimm
@@ -281,7 +276,6 @@
   offsetB: 0
   bExp: 0
   rExp: -2
-  scale: -3
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -292,7 +286,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 42:
   <<: *voltage_dimm
   entityInstance: 6
@@ -318,7 +312,6 @@
   offsetB: 0
   bExp: 0
   rExp: -3
-  scale: -6
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -329,7 +322,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 46:
   <<: *power_dimm
   entityInstance: 10
@@ -375,7 +368,6 @@
   offsetB: 10
   bExp: 0
   rExp: -3
-  scale: -3
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -386,7 +378,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 54:
   <<: *current_dimm
   entityInstance: 18
@@ -432,7 +424,6 @@
   offsetB: 0
   bExp: 0
   rExp: 0
-  scale: -3
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -443,7 +434,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 62:
   <<: *voltage
   entityID: 0x0A
@@ -453,7 +444,7 @@
   offsetB: 0
   bExp: 0
   rExp: 0
-  scale: -3
+
 63:
   <<: *voltage
   entityID: 0x0A
@@ -463,7 +454,6 @@
   offsetB: 0
   bExp: 0
   rExp: -2
-  scale: -3
 
 64:
   <<: *current
@@ -484,7 +474,6 @@
   offsetB: 0
   bExp: 0
   rExp: 0
-  scale: -6
 67:
   <<: *power
   entityID: 0x0A
@@ -494,7 +483,6 @@
   offsetB: 0
   bExp: 0
   rExp: 0
-  scale: -6
 68: &fan_tach
   entityID: 0x0A
   entityInstance: 8
@@ -506,7 +494,6 @@
   bExp: 0
   rExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-  scale: 0
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
   sensorNamePattern: nameLeaf
@@ -515,7 +502,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 69:
   <<: *fan_tach
   entityID: 0x0A
