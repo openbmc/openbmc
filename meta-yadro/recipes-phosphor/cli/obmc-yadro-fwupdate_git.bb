@@ -18,5 +18,5 @@ EXTRA_OEMESON_df-openpower = " \
 "
 
 SRC_URI = "git://github.com/YADRO-KNS/obmc-yadro-fwupdate"
-SRCREV = "b922eb474447b76fb72cc615c025e3845b7c4b7e"
+SRCREV = "9ec0aeee1ed8ab573ced558120a7eb641bac399d"
 S = "${WORKDIR}/git"
