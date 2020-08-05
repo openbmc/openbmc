@@ -2,8 +2,8 @@
 Description = Initialization for GBS boot up
 Wants=mapper-wait@-xyz-openbmc_project-inventory.service
 After=mapper-wait@-xyz-openbmc_project-inventory.service
-Wants=mapper-wait@-xyz-openbmc_project-Control-Nvme-Power.service
-After=mapper-wait@-xyz-openbmc_project-Control-Nvme-Power.service
+Wants=mapper-wait@-xyz-openbmc_project-control-nvme.service
+After=mapper-wait@-xyz-openbmc_project-control-nvme.service
 
 [Service]
 Type=oneshot
