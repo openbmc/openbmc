@@ -8,7 +8,6 @@ PACKAGES = " \
         ${PN}-bmc-state-mgmt \
         ${PN}-chassis-state-mgmt \
         ${PN}-extras \
-        ${PN}-extrasdev \
         ${PN}-extrasdevtools \
         ${PN}-fan-control \
         ${PN}-host-state-mgmt \
@@ -46,10 +45,6 @@ RDEPENDS_${PN}-extras = " \
         obmc-ikvm \
         phosphor-dbus-monitor \
         phosphor-systemd-policy \
-        "
-
-SUMMARY_${PN}-extrasdev = "Development features"
-RDEPENDS_${PN}-extrasdev = " \
         "
 
 SUMMARY_${PN}-extrasdevtools = "Development tools"
