@@ -69,21 +69,11 @@ CORE_IMAGE_EXTRA_INSTALL_append = " bash \
 
 OBMC_IMAGE_EXTRA_INSTALL ?= ""
 
-# The /etc/version file is misleading and not useful.  Remove it.
-# Users should instead rely on /etc/os-release.
 remove_etc_version() {
         rm ${IMAGE_ROOTFS}${sysconfdir}/version
 }
-ROOTFS_POSTPROCESS_COMMAND += "remove_etc_version ; "
 
-# Disable the pager to prevent systemd injecting control characters into the
-# output stream that are not interpreted by busybox tools.
 disable_systemd_pager() {
         echo "SYSTEMD_PAGER=" >> ${IMAGE_ROOTFS}${sysconfdir}/profile
         echo "export SYSTEMD_PAGER" >> ${IMAGE_ROOTFS}${sysconfdir}/profile
 }
-ROOTFS_POSTPROCESS_COMMAND += "disable_systemd_pager ; "
-
-# The shadow recipe provides the binaries(like useradd, usermod) needed by the
-# phosphor-user-manager.
-ROOTFS_RO_UNNEEDED_remove = "shadow"
