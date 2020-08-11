@@ -57,7 +57,6 @@ CORE_IMAGE_EXTRA_INSTALL_append = " bash \
         i2c-tools \
         obmc-console \
         pam-plugin-access \
-        pam-ipmi \
         ${OBMC_IMAGE_EXTRA_INSTALL} \
         ffdc \
         rsync \
