@@ -349,28 +349,28 @@
 0x40:
   <<: *voltage
   entityInstance: 0x10
-  path: /xyz/openbmc_project/sensors/voltage/vddq_abcd_out
+  path: /xyz/openbmc_project/sensors/voltage/vddio_abcd_out
   multiplierM: 78
   rExp: -4
 
 0x41:
   <<: *voltage_13v5_in
   entityInstance: 0x11
-  path: /xyz/openbmc_project/sensors/voltage/vddq_abcd_in
+  path: /xyz/openbmc_project/sensors/voltage/vddio_abcd_in
   multiplierM: 55
   rExp: -3
 
 0x55:
   <<: *current
   entityInstance: 0x19
-  path: /xyz/openbmc_project/sensors/current/vddq_abcd_in
+  path: /xyz/openbmc_project/sensors/current/vddio_abcd_in
   multiplierM: 353
   rExp: -4
 
 0x54:
   <<: *current
   entityInstance: 0x18
-  path: /xyz/openbmc_project/sensors/current/vddq_abcd_out
+  path: /xyz/openbmc_project/sensors/current/vddio_abcd_out
   multiplierM: 345
   rExp: -3
 
@@ -378,28 +378,28 @@
 0x42:
   <<: *voltage
   entityInstance: 0x12
-  path: /xyz/openbmc_project/sensors/voltage/vddq_efgh_out
+  path: /xyz/openbmc_project/sensors/voltage/vddio_efgh_out
   multiplierM: 78
   rExp: -4
 
 0x43:
   <<: *voltage_13v5_in
   entityInstance: 0x13
-  path: /xyz/openbmc_project/sensors/voltage/vddq_efgh_in
+  path: /xyz/openbmc_project/sensors/voltage/vddio_efgh_in
   multiplierM: 55
   rExp: -3
 
 0x57:
   <<: *current
   entityInstance: 0x1b
-  path: /xyz/openbmc_project/sensors/current/vddq_efgh_in
+  path: /xyz/openbmc_project/sensors/current/vddio_efgh_in
   multiplierM: 353
   rExp: -4
 
 0x56:
   <<: *current
   entityInstance: 0x1a
-  path: /xyz/openbmc_project/sensors/current/vddq_efgh_out
+  path: /xyz/openbmc_project/sensors/current/vddio_efgh_out
   multiplierM: 345
   rExp: -3
 
@@ -407,28 +407,28 @@
 0x47:
   <<: *voltage
   entityInstance: 0x20
-  path: /xyz/openbmc_project/sensors/voltage/p12v_1_out
+  path: /xyz/openbmc_project/sensors/voltage/p12v_mobo_out
   multiplierM: 55
   rExp: -3
 
 0x48:
   <<: *voltage_13v5_in
   entityInstance: 0x21
-  path: /xyz/openbmc_project/sensors/voltage/p12v_1_in
+  path: /xyz/openbmc_project/sensors/voltage/p12v_mobo_in
   multiplierM: 255
   rExp: -3
 
 0x5A:
   <<: *current
   entityInstance: 0x25
-  path: /xyz/openbmc_project/sensors/current/p12v_1_in
+  path: /xyz/openbmc_project/sensors/current/p12v_mobo_in
   multiplierM: 137
   rExp: -3
 
 0x59:
   <<: *current
   entityInstance: 0x24
-  path: /xyz/openbmc_project/sensors/current/p12v_1_out
+  path: /xyz/openbmc_project/sensors/current/p12v_mobo_out
   multiplierM: 59
   rExp: -2
 
@@ -436,28 +436,28 @@
 0x49:
   <<: *voltage
   entityInstance: 0x22
-  path: /xyz/openbmc_project/sensors/voltage/p12v_2_out
+  path: /xyz/openbmc_project/sensors/voltage/p12v_fan_out
   multiplierM: 55
   rExp: -3
 
 0x4A:
   <<: *voltage_13v5_in
   entityInstance: 0x23
-  path: /xyz/openbmc_project/sensors/voltage/p12v_2_in
+  path: /xyz/openbmc_project/sensors/voltage/p12v_fan_in
   multiplierM: 255
   rExp: -3
 
 0x5C:
   <<: *current
   entityInstance: 0x27
-  path: /xyz/openbmc_project/sensors/current/p12v_2_in
+  path: /xyz/openbmc_project/sensors/current/p12v_fan_in
   multiplierM: 137
   rExp: -3
 
 0x5B:
   <<: *current
   entityInstance: 0x26
-  path: /xyz/openbmc_project/sensors/current/p12v_2_out
+  path: /xyz/openbmc_project/sensors/current/p12v_fan_out
   multiplierM: 59
   rExp: -2
 
