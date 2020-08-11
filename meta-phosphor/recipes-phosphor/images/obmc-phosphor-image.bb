@@ -8,6 +8,7 @@ IMAGE_FEATURES += " \
         obmc-bmc-state-mgmt \
         obmc-chassis-mgmt \
         obmc-chassis-state-mgmt \
+        obmc-devtools \
         obmc-fan-control \
         obmc-fan-mgmt \
         obmc-flash-mgmt \

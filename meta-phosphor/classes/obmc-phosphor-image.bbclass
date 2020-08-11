@@ -5,6 +5,7 @@
 # - obmc-bmc-state-mgmt               - OpenBMC BMC state management
 # - obmc-chassis-mgmt                 - OpenBMC chassis management
 # - obmc-chassis-state-mgmt           - OpenBMC chassis state management
+# - obmc-devtools                     - OpenBMC development and debugging tools
 # - obmc-fan-control                  - OpenBMC fan management
 # - obmc-fan-mgmt                     - Deprecated - use obmc-fan-control instead
 # - obmc-flash-mgmt                   - OpenBMC flash management
@@ -27,6 +28,7 @@ inherit core-image
 FEATURE_PACKAGES_obmc-bmc-state-mgmt ?= "packagegroup-obmc-apps-bmc-state-mgmt"
 FEATURE_PACKAGES_obmc-chassis-mgmt ?= "${@bb.utils.contains('COMBINED_FEATURES', 'obmc-phosphor-chassis-mgmt', 'virtual-obmc-chassis-mgmt', '', d)}"
 FEATURE_PACKAGES_obmc-chassis-state-mgmt ?= "packagegroup-obmc-apps-chassis-state-mgmt"
+FEATURE_PACKAGES_obmc-devtools ?= "packagegroup-obmc-apps-devtools"
 FEATURE_PACKAGES_obmc-fan-control ?= "packagegroup-obmc-apps-fan-control"
 FEATURE_PACKAGES_obmc-fan-mgmt ?= "${@bb.utils.contains('COMBINED_FEATURES', 'obmc-phosphor-fan-mgmt', 'virtual-obmc-fan-mgmt', '', d)}"
 FEATURE_PACKAGES_obmc-flash-mgmt ?= "${@bb.utils.contains('COMBINED_FEATURES', 'obmc-phosphor-flash-mgmt', 'virtual-obmc-flash-mgmt', '', d)}"
@@ -51,17 +53,13 @@ FEATURE_PACKAGES_obmc-user-mgmt ?= "packagegroup-obmc-apps-user-mgmt"
 # tree under phosphor-ipmi-host
 FEATURE_PACKAGES_obmc-net-ipmi_qemuall = ""
 
-CORE_IMAGE_EXTRA_INSTALL_append = " bash \
+CORE_IMAGE_EXTRA_INSTALL_append = " \
         packagegroup-obmc-apps-extras \
-        packagegroup-obmc-apps-extrasdevtools \
-        i2c-tools \
         obmc-console \
         pam-plugin-access \
         ${OBMC_IMAGE_EXTRA_INSTALL} \
         ffdc \
-        rsync \
         rng-tools \
-        lrzsz \
         "
 
 OBMC_IMAGE_EXTRA_INSTALL ?= ""

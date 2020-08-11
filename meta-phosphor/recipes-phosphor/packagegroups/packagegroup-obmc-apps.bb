@@ -8,7 +8,7 @@ PACKAGES = " \
         ${PN}-bmc-state-mgmt \
         ${PN}-chassis-state-mgmt \
         ${PN}-extras \
-        ${PN}-extrasdevtools \
+        ${PN}-devtools \
         ${PN}-fan-control \
         ${PN}-host-state-mgmt \
         ${PN}-inventory \
@@ -47,9 +47,13 @@ RDEPENDS_${PN}-extras = " \
         phosphor-systemd-policy \
         "
 
-SUMMARY_${PN}-extrasdevtools = "Development tools"
-RDEPENDS_${PN}-extrasdevtools = " \
+SUMMARY_${PN}-devtools = "Development tools"
+RDEPENDS_${PN}-devtools = " \
+        bash \
+        i2c-tools \
         libgpiod-tools \
+        lrzsz \
+        rsync \
         "
 
 # Use the fan control package group for applications
