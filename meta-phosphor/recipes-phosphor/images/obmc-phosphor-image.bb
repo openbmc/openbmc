@@ -8,6 +8,7 @@ IMAGE_FEATURES += " \
         obmc-bmc-state-mgmt \
         obmc-chassis-mgmt \
         obmc-chassis-state-mgmt \
+        obmc-console \
         obmc-devtools \
         obmc-fan-control \
         obmc-fan-mgmt \
@@ -19,6 +20,7 @@ IMAGE_FEATURES += " \
         obmc-leds \
         obmc-logging-mgmt \
         obmc-remote-logging-mgmt \
+        obmc-rng \
         obmc-net-ipmi \
         obmc-sensors \
         obmc-software \

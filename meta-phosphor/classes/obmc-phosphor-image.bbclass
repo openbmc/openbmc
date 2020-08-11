@@ -5,6 +5,7 @@
 # - obmc-bmc-state-mgmt               - OpenBMC BMC state management
 # - obmc-chassis-mgmt                 - OpenBMC chassis management
 # - obmc-chassis-state-mgmt           - OpenBMC chassis state management
+# - obmc-console                      - OpenBMC serial over LAN
 # - obmc-devtools                     - OpenBMC development and debugging tools
 # - obmc-fan-control                  - OpenBMC fan management
 # - obmc-fan-mgmt                     - Deprecated - use obmc-fan-control instead
@@ -16,6 +17,7 @@
 # - obmc-leds                         - OpenBMC LED support
 # - obmc-logging-mgmt                 - OpenBMC logging management
 # - obmc-remote-logging-mgmt          - OpenBMC remote logging management
+# - obmc-rng                          - OpenBMC random number generator
 # - obmc-sensors                      - OpenBMC sensor support
 # - obmc-settings-mgmt                - OpenBMC settings management
 # - obmc-software                     - OpenBMC software management
@@ -28,6 +30,7 @@ inherit core-image
 FEATURE_PACKAGES_obmc-bmc-state-mgmt ?= "packagegroup-obmc-apps-bmc-state-mgmt"
 FEATURE_PACKAGES_obmc-chassis-mgmt ?= "${@bb.utils.contains('COMBINED_FEATURES', 'obmc-phosphor-chassis-mgmt', 'virtual-obmc-chassis-mgmt', '', d)}"
 FEATURE_PACKAGES_obmc-chassis-state-mgmt ?= "packagegroup-obmc-apps-chassis-state-mgmt"
+FEATURE_PACKAGES_obmc-console ?= "packagegroup-obmc-apps-console"
 FEATURE_PACKAGES_obmc-devtools ?= "packagegroup-obmc-apps-devtools"
 FEATURE_PACKAGES_obmc-fan-control ?= "packagegroup-obmc-apps-fan-control"
 FEATURE_PACKAGES_obmc-fan-mgmt ?= "${@bb.utils.contains('COMBINED_FEATURES', 'obmc-phosphor-fan-mgmt', 'virtual-obmc-fan-mgmt', '', d)}"
@@ -39,6 +42,7 @@ FEATURE_PACKAGES_obmc-inventory ?= "packagegroup-obmc-apps-inventory"
 FEATURE_PACKAGES_obmc-leds ?= "packagegroup-obmc-apps-leds"
 FEATURE_PACKAGES_obmc-logging-mgmt ?= "packagegroup-obmc-apps-logging"
 FEATURE_PACKAGES_obmc-remote-logging-mgmt ?= "packagegroup-obmc-apps-remote-logging"
+FEATURE_PACKAGES_obmc-rng ?= "packagegroup-obmc-apps-rng"
 FEATURE_PACKAGES_obmc-net-ipmi ?= "phosphor-ipmi-net"
 FEATURE_PACKAGES_obmc-sensors ?= "packagegroup-obmc-apps-sensors"
 FEATURE_PACKAGES_obmc-software ?= "packagegroup-obmc-apps-software"
@@ -53,16 +57,16 @@ FEATURE_PACKAGES_obmc-user-mgmt ?= "packagegroup-obmc-apps-user-mgmt"
 # tree under phosphor-ipmi-host
 FEATURE_PACKAGES_obmc-net-ipmi_qemuall = ""
 
-CORE_IMAGE_EXTRA_INSTALL_append = " \
+# Add new packages to be installed to a package group in
+# packagegroup-obmc-apps, not here.
+OBMC_IMAGE_BASE_INSTALL = " \
         packagegroup-obmc-apps-extras \
-        obmc-console \
-        pam-plugin-access \
         ${OBMC_IMAGE_EXTRA_INSTALL} \
-        ffdc \
-        rng-tools \
         "
 
 OBMC_IMAGE_EXTRA_INSTALL ?= ""
+
+CORE_IMAGE_EXTRA_INSTALL += "${OBMC_IMAGE_BASE_INSTALL}"
 
 remove_etc_version() {
         rm ${IMAGE_ROOTFS}${sysconfdir}/version
