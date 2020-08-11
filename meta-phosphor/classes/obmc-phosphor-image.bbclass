@@ -3,9 +3,11 @@
 # Additional IMAGE_FEATURES available with Phosphor OpenBMC:
 #
 # - obmc-bmc-state-mgmt               - OpenBMC BMC state management
+# - obmc-bmcweb                       - OpenBMC webserver
 # - obmc-chassis-mgmt                 - OpenBMC chassis management
 # - obmc-chassis-state-mgmt           - OpenBMC chassis state management
 # - obmc-console                      - OpenBMC serial over LAN
+# - obmc-dbus-monitor                 - OpenBMC dbus monitoring
 # - obmc-devtools                     - OpenBMC development and debugging tools
 # - obmc-fan-control                  - OpenBMC fan management
 # - obmc-fan-mgmt                     - Deprecated - use obmc-fan-control instead
@@ -13,6 +15,7 @@
 # - obmc-host-ctl                     - OpenBMC host control
 # - obmc-host-ipmi                    - OpenBMC host IPMI
 # - obmc-host-state-mgmt              - OpenBMC host state management
+# - obmc-ikvm                         - OpenBMC KVM over IP
 # - obmc-inventory                    - OpenBMC inventory support
 # - obmc-leds                         - OpenBMC LED support
 # - obmc-logging-mgmt                 - OpenBMC logging management
@@ -23,14 +26,17 @@
 # - obmc-software                     - OpenBMC software management
 # - obmc-system-mgmt                  - OpenBMC system management
 # - obmc-user-mgmt                    - OpenBMC user management
+# - obmc-user-mgmt-ldap               - OpenBMC LDAP users
 # - obmc-debug-collector              - OpenBMC debug collector
 
 inherit core-image
 
 FEATURE_PACKAGES_obmc-bmc-state-mgmt ?= "packagegroup-obmc-apps-bmc-state-mgmt"
+FEATURE_PACKAGES_obmc-bmcweb ?= "packagegroup-obmc-apps-bmcweb"
 FEATURE_PACKAGES_obmc-chassis-mgmt ?= "${@bb.utils.contains('COMBINED_FEATURES', 'obmc-phosphor-chassis-mgmt', 'virtual-obmc-chassis-mgmt', '', d)}"
 FEATURE_PACKAGES_obmc-chassis-state-mgmt ?= "packagegroup-obmc-apps-chassis-state-mgmt"
 FEATURE_PACKAGES_obmc-console ?= "packagegroup-obmc-apps-console"
+FEATURE_PACKAGES_obmc-dbus-monitor ?= "packagegroup-obmc-apps-dbus-monitor"
 FEATURE_PACKAGES_obmc-devtools ?= "packagegroup-obmc-apps-devtools"
 FEATURE_PACKAGES_obmc-fan-control ?= "packagegroup-obmc-apps-fan-control"
 FEATURE_PACKAGES_obmc-fan-mgmt ?= "${@bb.utils.contains('COMBINED_FEATURES', 'obmc-phosphor-fan-mgmt', 'virtual-obmc-fan-mgmt', '', d)}"
@@ -38,6 +44,7 @@ FEATURE_PACKAGES_obmc-flash-mgmt ?= "${@bb.utils.contains('COMBINED_FEATURES', '
 FEATURE_PACKAGES_obmc-host-ctl ?= "${@bb.utils.contains('COMBINED_FEATURES', 'obmc-host-ctl', 'virtual-obmc-host-ctl', '', d)}"
 FEATURE_PACKAGES_obmc-host-ipmi ?= "${@bb.utils.contains('COMBINED_FEATURES', 'obmc-host-ipmi', 'virtual-obmc-host-ipmi-hw', '', d)}"
 FEATURE_PACKAGES_obmc-host-state-mgmt ?= "packagegroup-obmc-apps-host-state-mgmt"
+FEATURE_PACKAGES_obmc-ikvm ?= "packagegroup-obmc-apps-ikvm"
 FEATURE_PACKAGES_obmc-inventory ?= "packagegroup-obmc-apps-inventory"
 FEATURE_PACKAGES_obmc-leds ?= "packagegroup-obmc-apps-leds"
 FEATURE_PACKAGES_obmc-logging-mgmt ?= "packagegroup-obmc-apps-logging"
@@ -51,6 +58,7 @@ FEATURE_PACKAGES_obmc-debug-collector ?= "packagegroup-obmc-apps-debug-collector
 FEATURE_PACKAGES_obmc-settings-mgmt ?= "packagegroup-obmc-apps-settings"
 FEATURE_PACKAGES_obmc-network-mgmt ?= "packagegroup-obmc-apps-network"
 FEATURE_PACKAGES_obmc-user-mgmt ?= "packagegroup-obmc-apps-user-mgmt"
+FEATURE_PACKAGES_obmc-user-mgmt-ldap ?= "packagegroup-obmc-apps-user-mgmt-ldap"
 
 # FIXME: phosphor-net-ipmi depends on phosphor-ipmi-host !?!? and
 # cannot be built on core-qemu machines because of the dependency

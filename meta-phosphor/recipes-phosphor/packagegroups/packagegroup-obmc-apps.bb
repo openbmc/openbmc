@@ -6,12 +6,15 @@ inherit packagegroup
 PROVIDES = "${PACKAGES}"
 PACKAGES = " \
         ${PN}-bmc-state-mgmt \
+        ${PN}-bmcweb \
         ${PN}-chassis-state-mgmt \
         ${PN}-console \
+        ${PN}-dbus-monitor \
         ${PN}-extras \
         ${PN}-devtools \
         ${PN}-fan-control \
         ${PN}-host-state-mgmt \
+        ${PN}-ikvm \
         ${PN}-inventory \
         ${PN}-leds \
         ${PN}-logging \
@@ -24,12 +27,19 @@ PACKAGES = " \
         ${PN}-settings \
         ${PN}-network \
         ${PN}-user-mgmt \
+        ${PN}-user-mgmt-ldap \
         "
 
 SUMMARY_${PN}-bmc-state-mgmt = "BMC state management"
 RDEPENDS_${PN}-bmc-state-mgmt = " \
         ${VIRTUAL-RUNTIME_obmc-bmc-state-manager} \
         phosphor-state-manager-systemd-target-monitor \
+        "
+
+SUMMARY_${PN}-bmcweb = "bmcweb support"
+RDEPENDS_${PN}-bmcweb = " \
+        bmcweb \
+        phosphor-bmcweb-cert-config \
         "
 
 SUMMARY_${PN}-chassis-state-mgmt = "Chassis state management"
@@ -43,15 +53,9 @@ RDEPENDS_${PN}-console = " \
         obmc-console \
         "
 
+# Deprecated - add new packages to an existing packagegroup or create a new one.
 SUMMARY_${PN}-extras = "Extra features"
-RDEPENDS_${PN}-extras = " \
-        bmcweb \
-        phosphor-bmcweb-cert-config \
-        phosphor-nslcd-cert-config \
-        phosphor-nslcd-authority-cert-config \
-        obmc-ikvm \
-        phosphor-dbus-monitor \
-        "
+RDEPENDS_${PN}-extras = ""
 
 SUMMARY_${PN}-devtools = "Development tools"
 RDEPENDS_${PN}-devtools = " \
@@ -61,6 +65,11 @@ RDEPENDS_${PN}-devtools = " \
         libgpiod-tools \
         lrzsz \
         rsync \
+        "
+
+SUMMARY_${PN}-dbus-monitor = "Support for dbus monitoring"
+RDEPENDS_${PN}-dbus-monitor = " \
+        phosphor-dbus-monitor \
         "
 
 # Use the fan control package group for applications
@@ -77,6 +86,11 @@ SUMMARY_${PN}-host-state-mgmt = "Host state management"
 RDEPENDS_${PN}-host-state-mgmt = " \
         ${VIRTUAL-RUNTIME_obmc-host-state-manager} \
         ${VIRTUAL-RUNTIME_obmc-discover-system-state} \
+        "
+
+SUMMARY_${PN}-ikvm = "KVM over IP support"
+RDEPENDS_${PN}-ikvm = " \
+        obmc-ikvm \
         "
 
 SUMMARY_${PN}-inventory = "Inventory applications"
@@ -152,9 +166,16 @@ RDEPENDS_${PN}-network = " \
 SUMMARY_${PN}-user-mgmt = "User management applications"
 RDEPENDS_${PN}-user-mgmt = " \
         ${VIRTUAL-RUNTIME_obmc-user-mgmt} \
-        ${@bb.utils.contains('DISTRO_FEATURES', 'ldap', 'nss-pam-ldapd', '', d)} \
-        ${@bb.utils.contains('DISTRO_FEATURES', 'ldap', 'phosphor-ldap', '', d)} \
         "
 RRECOMMENDS_${PN}-user-mgmt = " \
         pam-plugin-access \
+        "
+
+SUMMARY_${PN}-user-mgmt-ldap = "LDAP users and groups support"
+RDEPENDS_${PN}-user-mgmt-ldap = " \
+        ${PN}-user-mgmt \
+        nss-pam-ldapd \
+        phosphor-ldap \
+        phosphor-nslcd-cert-config \
+        phosphor-nslcd-authority-cert-config \
         "
