@@ -31,6 +31,8 @@ IMAGE_FEATURES += " \
         obmc-settings-mgmt \
         "
 
+LICENSE = "Apache-2.0"
+
 inherit obmc-phosphor-image
 
 # The /etc/version file is misleading and not useful.  Remove it.

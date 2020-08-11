@@ -24,8 +24,6 @@
 
 inherit core-image
 
-LICENSE = "Apache-2.0"
-
 FEATURE_PACKAGES_obmc-bmc-state-mgmt ?= "packagegroup-obmc-apps-bmc-state-mgmt"
 FEATURE_PACKAGES_obmc-chassis-mgmt ?= "${@bb.utils.contains('COMBINED_FEATURES', 'obmc-phosphor-chassis-mgmt', 'virtual-obmc-chassis-mgmt', '', d)}"
 FEATURE_PACKAGES_obmc-chassis-state-mgmt ?= "packagegroup-obmc-apps-chassis-state-mgmt"
