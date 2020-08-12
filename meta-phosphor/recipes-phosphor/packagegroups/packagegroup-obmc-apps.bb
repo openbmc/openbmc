@@ -44,7 +44,6 @@ RDEPENDS_${PN}-extras = " \
         phosphor-nslcd-authority-cert-config \
         obmc-ikvm \
         phosphor-dbus-monitor \
-        phosphor-systemd-policy \
         "
 
 SUMMARY_${PN}-devtools = "Development tools"
