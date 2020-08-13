@@ -574,7 +574,7 @@
       Target:
         Offsets:
           0xFF:
-            type: double
+            type: uint64_t
 
 0x66:
   <<: *fan_pwm
