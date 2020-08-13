@@ -3,7 +3,7 @@ DEPENDS_append_gbs = " gbs-yaml-config"
 SRC_URI_remove_gbs = "git://github.com/openbmc/phosphor-host-ipmid"
 SRC_URI_prepend_gbs = "git://github.com/quanta-bmc/phosphor-host-ipmid.git"
 
-SRCREV_gbs = "675d587abd8b068aa1816176221237ac6172a0bc"
+SRCREV_gbs = "1670af57eee1d33018665cb1bce9ae5ed28470cd"
 
 FILESEXTRAPATHS_prepend_gbs := "${THISDIR}/${PN}:"
 SRC_URI_append_gbs = " file://gbs-ipmid-whitelist.conf \
