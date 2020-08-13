@@ -18,7 +18,7 @@ DEPENDS += "phosphor-ipmi-host"
 RRECOMMENDS_${PN} = "pam-ipmi"
 
 SRC_URI += "git://github.com/openbmc/phosphor-net-ipmid"
-SRCREV = "f6e7230d9cd45772a4237c024e6c3abf9b4cf7eb"
+SRCREV = "2b1edef0b1e395591dcf751d7ccf45a85bb58d4c"
 
 S = "${WORKDIR}/git"
 
