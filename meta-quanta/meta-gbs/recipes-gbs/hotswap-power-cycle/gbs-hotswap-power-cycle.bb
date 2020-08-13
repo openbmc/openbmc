@@ -9,11 +9,16 @@ inherit systemd
 DEPENDS += "systemd"
 RDEPENDS_${PN} += "bash"
 
-SRC_URI = " file://hotswap-power-cycle.service"
+SRC_URI = " file://hotswap-power-cycle.service \
+            file://tray_powercycle.sh \
+          "
 
 do_install() {
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/hotswap-power-cycle.service ${D}${systemd_system_unitdir}
+
+    install -d ${D}${bindir}
+    install -m 0755 ${WORKDIR}/tray_powercycle.sh ${D}${bindir}
 }
 
 SYSTEMD_PACKAGES = "${PN}"
