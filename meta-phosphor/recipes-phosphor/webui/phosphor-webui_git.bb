@@ -11,22 +11,7 @@ S = "${WORKDIR}/git"
 
 DEPENDS_prepend = "nodejs-native "
 
-# allarch is required because the files this recipe produces (html and
-# javascript) are valid for any target, regardless of architecture.  The allarch
-# class removes your compiler definitions, as it assumes that anything that
-# requires a compiler is platform specific.  Unfortunately, one of the build
-# tools uses libsass for compiling the css templates, and it needs a compiler to
-# build the library that it then uses to compress the scss into normal css.
-# Enabling allarch, then re-adding the compiler flags was the best of the bad
-# options
-
 inherit allarch
-
-export CXX = "${BUILD_CXX}"
-export CC = "${BUILD_CC}"
-export CFLAGS = "${BUILD_CFLAGS}"
-export CPPFLAGS = "${BUILD_CPPFLAGS}"
-export CXXFLAGS = "${BUILD_CXXFLAGS}"
 
 FILES_${PN} += "${datadir}/www/*"
 
