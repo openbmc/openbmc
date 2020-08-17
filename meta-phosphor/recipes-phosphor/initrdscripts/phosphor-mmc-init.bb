@@ -9,6 +9,7 @@ inherit allarch
 
 RDEPENDS_${PN} += " \
     ${VIRTUAL-RUNTIME_base-utils} \
+    e2fsprogs-e2fsck \
     gptfdisk \
     parted \
     udev \
