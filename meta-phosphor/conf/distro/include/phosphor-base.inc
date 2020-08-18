@@ -108,8 +108,6 @@ DISTRO_FEATURES_DEFAULT = " \
         avahi \
         ipv4 \
         ipv6 \
-        ldap \
-        libc-inet-anl \
         pam \
         slp \
         systemd \
