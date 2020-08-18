@@ -1,0 +1,1 @@
+MACHINEOVERRIDES =. "ibm-power-cpu:"
