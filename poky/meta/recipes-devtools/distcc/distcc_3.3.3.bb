@@ -17,6 +17,7 @@ RRECOMMENDS_${PN}-server = "avahi-daemon"
 SRC_URI = "git://github.com/distcc/distcc.git \
            file://fix-gnome.patch \
            file://separatebuilddir.patch \
+           file://0001-Fix-build-with-gcc-10-which-defaults-to-fno-common-c.patch \
            file://default \
            file://distcc \
            file://distcc.service"

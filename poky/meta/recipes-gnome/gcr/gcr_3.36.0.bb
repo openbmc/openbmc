@@ -18,6 +18,8 @@ inherit gnomebase gtk-icon-cache gtk-doc features_check upstream-version-is-even
 REQUIRED_DISTRO_FEATURES = "x11"
 
 SRC_URI += " file://0001-meson.build-correctly-set-internal-vapi-dependencies.patch"
+SRC_URI += " file://0001-meson-Make-sure-gcr-oids.h-is-built.patch"
+
 SRC_URI[archive.md5sum] = "adc65563b6b458507b9a578a8b68fb61"
 SRC_URI[archive.sha256sum] = "aaf9bed017a2263c6145c89a1a84178f9f40f238426463e4ae486694ef5f6601"
 

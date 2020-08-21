@@ -1,0 +1,34 @@
+From 13ef88cdccfe3f58c53d57806866b91e310eb272 Mon Sep 17 00:00:00 2001
+From: "Mingde (Matthew) Zeng" <matthewzmd@gmail.com>
+Date: Wed, 29 Jul 2020 08:47:09 -0400
+Subject: [PATCH] Remove OOM tests from runtest/mm
+
+Disable OOM tests, as they might cause oeqa ssh connection lost
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Mingde (Matthew) Zeng <matthew.zeng@windriver.com>
+
+---
+ runtest/mm | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/runtest/mm b/runtest/mm
+index a09f39c1e..76fa82754 100644
+--- a/runtest/mm
++++ b/runtest/mm
+@@ -73,12 +73,6 @@ ksm06 ksm06
+ ksm06_1 ksm06 -n 10
+ ksm06_2 ksm06 -n 10000
+
+-oom01 oom01
+-oom02 oom02
+-oom03 oom03
+-oom04 oom04
+-oom05 oom05
+-
+ swapping01 swapping01 -i 5
+
+ thp01 thp01 -I 120
+--
+2.27.0
+

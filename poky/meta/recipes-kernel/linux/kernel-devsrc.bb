@@ -259,10 +259,12 @@ do_install() {
     touch -r $kerneldir/build/.config $kerneldir/build/include/config/auto.conf* 2>/dev/null || :
 
     if [ -e "$kerneldir/build/include/config/auto.conf.cmd" ]; then
-        sed -i 's/ifneq "$(CC)" ".*-linux-gcc.*$/ifneq "$(CC)" "gcc"/' "$kerneldir/build/include/config/auto.conf.cmd"
-        sed -i 's/ifneq "$(LD)" ".*-linux-ld.bfd.*$/ifneq "$(LD)" "ld"/' "$kerneldir/build/include/config/auto.conf.cmd"
+        sed -i 's/ifneq "$(CC)" ".*-linux-.*gcc.*$/ifneq "$(CC)" "gcc"/' "$kerneldir/build/include/config/auto.conf.cmd"
+        sed -i 's/ifneq "$(LD)" ".*-linux-.*ld.bfd.*$/ifneq "$(LD)" "ld"/' "$kerneldir/build/include/config/auto.conf.cmd"
         sed -i 's/ifneq "$(CC_VERSION_TEXT)".*\(gcc.*\)"/ifneq "$(CC_VERSION_TEXT)" "\1"/' "$kerneldir/build/include/config/auto.conf.cmd"
         sed -i 's/ifneq "$(srctree)" ".*"/ifneq "$(srctree)" "."/' "$kerneldir/build/include/config/auto.conf.cmd"
+        # we don't build against the defconfig, so make sure it isn't the trigger for syncconfig
+        sed -i 's/ifneq "$(KBUILD_DEFCONFIG)".*"\(.*\)"/ifneq "\1" "\1"/' "$kerneldir/build/include/config/auto.conf.cmd"
     fi
 
     # make the scripts python3 safe. We won't be running these, and if they are
@@ -288,3 +290,5 @@ RDEPENDS_${PN} = "bc python3 flex bison ${TCLIBC}-utils"
 RDEPENDS_${PN} += "openssl-dev util-linux"
 # and x86 needs a bit more for 4.15+
 RDEPENDS_${PN} += "${@bb.utils.contains('ARCH', 'x86', 'elfutils', '', d)}"
+# 5.8+ needs gcc-plugins libmpc-dev
+RDEPENDS_${PN} += "gcc-plugins libmpc-dev"

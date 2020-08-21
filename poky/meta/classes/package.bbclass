@@ -1936,7 +1936,7 @@ python package_do_shlibs() {
         shlibs_file = os.path.join(shlibswork_dir, pkg + ".list")
         if len(sonames):
             with open(shlibs_file, 'w') as fd:
-                for s in sonames:
+                for s in sorted(sonames):
                     if s[0] in shlib_provider and s[1] in shlib_provider[s[0]]:
                         (old_pkg, old_pkgver) = shlib_provider[s[0]][s[1]]
                         if old_pkg != pkg:

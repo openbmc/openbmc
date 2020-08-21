@@ -229,6 +229,20 @@ def add_layers(bblayersconf, layers, logger):
                 f.write("\nBBLAYERS += \"%s\"\n" % path)
     return True
 
+def check_bblayers(bblayersconf, layer_path, logger):
+    '''
+    If layer_path found in BBLAYERS return True
+    '''
+    import bb.parse
+    import bb.data
+
+    ldata = bb.parse.handle(bblayersconf, bb.data.init(), include=True)
+    for bblayer in (ldata.getVar('BBLAYERS') or '').split():
+        if os.path.normpath(bblayer) == os.path.normpath(layer_path):
+            return True
+
+    return False
+
 def check_command(error_msg, cmd, cwd=None):
     '''
     Run a command under a shell, capture stdout and stderr in a single stream,

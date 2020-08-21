@@ -11,10 +11,10 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  src/basic/process-util.c | 7 +++++++
  1 file changed, 7 insertions(+)
 
-diff --git a/src/basic/process-util.c b/src/basic/process-util.c
-index 5de366f830e8..644f53aee005 100644
---- a/src/basic/process-util.c
-+++ b/src/basic/process-util.c
+Index: systemd-stable/src/basic/process-util.c
+===================================================================
+--- systemd-stable.orig/src/basic/process-util.c
++++ systemd-stable/src/basic/process-util.c
 @@ -18,6 +18,9 @@
  #if HAVE_VALGRIND_VALGRIND_H
  #include <valgrind/valgrind.h>
@@ -25,7 +25,7 @@ index 5de366f830e8..644f53aee005 100644
  
  #include "alloc-util.h"
  #include "architecture.h"
-@@ -1116,11 +1119,15 @@ void reset_cached_pid(void) {
+@@ -1143,11 +1146,15 @@ void reset_cached_pid(void) {
          cached_pid = CACHED_PID_UNSET;
  }
  

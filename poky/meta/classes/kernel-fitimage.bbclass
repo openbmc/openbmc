@@ -257,11 +257,20 @@ fitimage_emit_section_config() {
 	# Test if we have any DTBs at all
 	sep=""
 	conf_desc=""
+	conf_node="conf@"
 	kernel_line=""
 	fdt_line=""
 	ramdisk_line=""
 	setup_line=""
 	default_line=""
+
+	# conf node name is selected based on dtb ID if it is present,
+	# otherwise its selected based on kernel ID
+	if [ -n "${3}" ]; then
+		conf_node=$conf_node${3}
+	else
+		conf_node=$conf_node${2}
+	fi
 
 	if [ -n "${2}" ]; then
 		conf_desc="Linux kernel"
@@ -287,12 +296,18 @@ fitimage_emit_section_config() {
 	fi
 
 	if [ "${6}" = "1" ]; then
-		default_line="default = \"conf@${3}\";"
+		# default node is selected based on dtb ID if it is present,
+		# otherwise its selected based on kernel ID
+		if [ -n "${3}" ]; then
+			default_line="default = \"conf@${3}\";"
+		else
+			default_line="default = \"conf@${2}\";"
+		fi
 	fi
 
 	cat << EOF >> ${1}
                 ${default_line}
-                conf@${3} {
+                $conf_node {
 			description = "${6} ${conf_desc}";
 			${kernel_line}
 			${fdt_line}
@@ -434,6 +449,13 @@ fitimage_assemble() {
 	#
 	fitimage_emit_section_maint ${1} confstart
 
+	# kernel-fitimage.bbclass currently only supports a single kernel (no less or
+	# more) to be added to the FIT image along with 0 or more device trees and
+	# 0 or 1 ramdisk.
+	# If a device tree is to be part of the FIT image, then select
+	# the default configuration to be used is based on the dtbcount. If there is
+	# no dtb present than select the default configuation to be based on
+	# the kernelcount.
 	if [ -n "${DTBS}" ]; then
 		i=1
 		for DTB in ${DTBS}; do
@@ -445,6 +467,9 @@ fitimage_assemble() {
 			fi
 			i=`expr ${i} + 1`
 		done
+	else
+		defaultconfigcount=1
+		fitimage_emit_section_config ${1} "${kernelcount}" "" "${ramdiskcount}" "${setupcount}" "${defaultconfigcount}"
 	fi
 
 	fitimage_emit_section_maint ${1} sectend

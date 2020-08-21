@@ -107,13 +107,16 @@ class OESSHTarget(OETarget):
             scpCmd = self.scp + [localSrc, remotePath]
             return self._run(scpCmd, ignore_status=False)
 
-    def copyFrom(self, remoteSrc, localDst):
+    def copyFrom(self, remoteSrc, localDst, warn_on_failure=False):
         """
             Copy file from target.
         """
         remotePath = '%s@%s:%s' % (self.user, self.ip, remoteSrc)
         scpCmd = self.scp + [remotePath, localDst]
-        return self._run(scpCmd, ignore_status=False)
+        (status, output) = self._run(scpCmd, ignore_status=warn_on_failure)
+        if warn_on_failure and status:
+            self.logger.warning("Copy returned non-zero exit status %d:\n%s" % (status, output))
+        return (status, output)
 
     def copyDirTo(self, localSrc, remoteDst):
         """

@@ -16,7 +16,9 @@ import os
 import sys
 import logging
 import glob
+import itertools
 import time
+import re
 import stat
 import bb
 import bb.msg
@@ -303,20 +305,60 @@ def exec_func_python(func, d, runfile, cwd=None):
 
 def shell_trap_code():
     return '''#!/bin/sh\n
+__BITBAKE_LAST_LINE=0
+
 # Emit a useful diagnostic if something fails:
-bb_exit_handler() {
+bb_sh_exit_handler() {
     ret=$?
-    case $ret in
-    0)  ;;
-    *)  case $BASH_VERSION in
-        "") echo "WARNING: exit code $ret from a shell command.";;
-        *)  echo "WARNING: ${BASH_SOURCE[0]}:${BASH_LINENO[0]} exit $ret from '$BASH_COMMAND'";;
-        esac
-        exit $ret
-    esac
+    if [ "$ret" != 0 ]; then
+        echo "WARNING: exit code $ret from a shell command."
+    fi
+    exit $ret
 }
-trap 'bb_exit_handler' 0
-set -e
+
+bb_bash_exit_handler() {
+    ret=$?
+    { set +x; } > /dev/null
+    trap "" DEBUG
+    if [ "$ret" != 0 ]; then
+        echo "WARNING: ${BASH_SOURCE[0]}:${__BITBAKE_LAST_LINE} exit $ret from '$1'"
+
+        echo "WARNING: Backtrace (BB generated script): "
+        for i in $(seq 1 $((${#FUNCNAME[@]} - 1))); do
+            if [ "$i" -eq 1 ]; then
+                echo -e "\t#$((i)): ${FUNCNAME[$i]}, ${BASH_SOURCE[$((i-1))]}, line ${__BITBAKE_LAST_LINE}"
+            else
+                echo -e "\t#$((i)): ${FUNCNAME[$i]}, ${BASH_SOURCE[$((i-1))]}, line ${BASH_LINENO[$((i-1))]}"
+            fi
+        done
+    fi
+    exit $ret
+}
+
+bb_bash_debug_handler() {
+    local line=${BASH_LINENO[0]}
+    # For some reason the DEBUG trap trips with lineno=1 when scripts exit; ignore it
+    if [ "$line" -eq 1 ]; then
+        return
+    fi
+
+    # Track the line number of commands as they execute. This is so we can have access to the failing line number
+    # in the EXIT trap. See http://gnu-bash.2382.n7.nabble.com/trap-echo-quot-trap-exit-on-LINENO-quot-EXIT-gt-wrong-linenumber-td3666.html
+    if [ "${FUNCNAME[1]}" != "bb_bash_exit_handler" ]; then
+        __BITBAKE_LAST_LINE=$line
+    fi
+}
+
+case $BASH_VERSION in
+"") trap 'bb_sh_exit_handler' 0
+    set -e
+    ;;
+*)  trap 'bb_bash_exit_handler "$BASH_COMMAND"' 0
+    trap '{ bb_bash_debug_handler; } 2>/dev/null' DEBUG
+    set -e
+    shopt -s extdebug
+    ;;
+esac
 '''
 
 def create_progress_handler(func, progress, logfile, d):
@@ -346,7 +388,7 @@ def create_progress_handler(func, progress, logfile, d):
             cls_obj = functools.reduce(resolve, cls.split("."), bb.utils._context)
             if not cls_obj:
                 # Fall-back on __builtins__
-                cls_obj = functools.reduce(lambda x, y: x.get(y), cls.split("."), __builtins__)
+                cls_obj = functools.reduce(resolve, cls.split("."), __builtins__)
             if cls_obj:
                 return cls_obj(d, outfile=logfile, otherargs=otherargs)
             bb.warn('%s: unknown custom progress handler in task progress varflag value "%s", ignoring' % (func, cls))
@@ -398,7 +440,13 @@ exit $ret
 
     progress = d.getVarFlag(func, 'progress')
     if progress:
-        logfile = create_progress_handler(func, progress, logfile, d)
+        try:
+            logfile = create_progress_handler(func, progress, logfile, d)
+        except:
+            from traceback import format_exc
+            logger.error("Failed to create progress handler")
+            logger.error(format_exc())
+            raise
 
     fifobuffer = bytearray()
     def readfifo(data):
@@ -450,6 +498,62 @@ exit $ret
             bb.debug(2, "Executing shell function %s" % func)
             with open(os.devnull, 'r+') as stdin, logfile:
                 bb.process.run(cmd, shell=False, stdin=stdin, log=logfile, extrafiles=[(fifo,readfifo)])
+        except bb.process.ExecutionError as exe:
+            # Find the backtrace that the shell trap generated
+            backtrace_marker_regex = re.compile(r"WARNING: Backtrace \(BB generated script\)")
+            stdout_lines = (exe.stdout or "").split("\n")
+            backtrace_start_line = None
+            for i, line in enumerate(reversed(stdout_lines)):
+                if backtrace_marker_regex.search(line):
+                    backtrace_start_line = len(stdout_lines) - i
+                    break
+
+            # Read the backtrace frames, starting at the location we just found
+            backtrace_entry_regex = re.compile(r"#(?P<frameno>\d+): (?P<funcname>[^\s]+), (?P<file>.+?), line ("
+                                               r"?P<lineno>\d+)")
+            backtrace_frames = []
+            if backtrace_start_line:
+                for line in itertools.islice(stdout_lines, backtrace_start_line, None):
+                    match = backtrace_entry_regex.search(line)
+                    if match:
+                        backtrace_frames.append(match.groupdict())
+
+            with open(runfile, "r") as script:
+                script_lines = [line.rstrip() for line in script.readlines()]
+
+            # For each backtrace frame, search backwards in the script (from the line number called out by the frame),
+            # to find the comment that emit_vars injected when it wrote the script. This will give us the metadata
+            # filename (e.g. .bb or .bbclass) and line number where the shell function was originally defined.
+            script_metadata_comment_regex = re.compile(r"# line: (?P<lineno>\d+), file: (?P<file>.+)")
+            better_frames = []
+            # Skip the very last frame since it's just the call to the shell task in the body of the script
+            for frame in backtrace_frames[:-1]:
+                # Check whether the frame corresponds to a function defined in the script vs external script.
+                if os.path.samefile(frame["file"], runfile):
+                    # Search backwards from the frame lineno to locate the comment that BB injected
+                    i = int(frame["lineno"]) - 1
+                    while i >= 0:
+                        match = script_metadata_comment_regex.match(script_lines[i])
+                        if match:
+                            # Calculate the relative line in the function itself
+                            relative_line_in_function = int(frame["lineno"]) - i - 2
+                            # Calculate line in the function as declared in the metadata
+                            metadata_function_line = relative_line_in_function + int(match["lineno"])
+                            better_frames.append("#{frameno}: {funcname}, {file}, line {lineno}".format(
+                                frameno=frame["frameno"],
+                                funcname=frame["funcname"],
+                                file=match["file"],
+                                lineno=metadata_function_line
+                            ))
+                            break
+                        i -= 1
+                else:
+                    better_frames.append("#{frameno}: {funcname}, {file}, line {lineno}".format(**frame))
+
+            if better_frames:
+                better_frames = ("\t{0}".format(frame) for frame in better_frames)
+                exe.extra_message = "\nBacktrace (metadata-relative locations):\n{0}".format("\n".join(better_frames))
+            raise
         finally:
             os.unlink(fifopath)
 

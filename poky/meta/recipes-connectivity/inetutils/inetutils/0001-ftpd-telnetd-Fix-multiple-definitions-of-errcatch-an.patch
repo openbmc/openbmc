@@ -1,0 +1,58 @@
+From 7d39930468e272c740b0eed3c7e5b7fb3abf29e8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 5 Aug 2020 10:36:22 -0700
+Subject: [PATCH] ftpd,telnetd: Fix multiple definitions of errcatch and not42
+
+This helps fix build failures when -fno-common option is used
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ ftpd/extern.h     | 2 +-
+ ftpd/ftpcmd.c     | 1 +
+ telnetd/utility.c | 2 +-
+ 3 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/ftpd/extern.h b/ftpd/extern.h
+index ab33cf3..91dbbee 100644
+--- a/ftpd/extern.h
++++ b/ftpd/extern.h
+@@ -90,7 +90,7 @@ extern void user (const char *);
+ extern char *sgetsave (const char *);
+ 
+ /* Exported from ftpd.c.  */
+-jmp_buf errcatch;
++extern jmp_buf errcatch;
+ extern struct sockaddr_storage data_dest;
+ extern socklen_t data_dest_len;
+ extern struct sockaddr_storage his_addr;
+diff --git a/ftpd/ftpcmd.c b/ftpd/ftpcmd.c
+index beb1f06..d272e9d 100644
+--- a/ftpd/ftpcmd.c
++++ b/ftpd/ftpcmd.c
+@@ -106,6 +106,7 @@
+ #endif
+ 
+ off_t restart_point;
++jmp_buf errcatch;
+ 
+ static char cbuf[512];           /* Command Buffer.  */
+ static char *fromname;
+diff --git a/telnetd/utility.c b/telnetd/utility.c
+index e7ffb8e..46bf91e 100644
+--- a/telnetd/utility.c
++++ b/telnetd/utility.c
+@@ -63,7 +63,7 @@ static int ncc;
+ static char ptyibuf[BUFSIZ], *ptyip;
+ static int pcc;
+ 
+-int not42;
++extern int not42;
+ 
+ static int
+ readstream (int p, char *ibuf, int bufsize)
+-- 
+2.28.0
+

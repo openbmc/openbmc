@@ -1,7 +1,8 @@
-From 7806340c2accc2c51e7e861b618c29fb5609a007 Mon Sep 17 00:00:00 2001
+From 258c44e4ecffd830cb89d0016d45b2bac765f559 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:50:00 +0000
-Subject: [PATCH] nativesdk-glibc: Fix buffer overrun with a relocated SDK
+Subject: [PATCH 04/29] nativesdk-glibc: Fix buffer overrun with a relocated
+ SDK
 
 When ld-linux-*.so.2 is relocated to a path that is longer than the
 original fixed location, the dynamic loader will crash in open_path
@@ -21,10 +22,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 12 insertions(+)
 
 diff --git a/elf/dl-load.c b/elf/dl-load.c
-index 3226f2e531..7cb8a86fab 100644
+index 565b039b23..e1b3486549 100644
 --- a/elf/dl-load.c
 +++ b/elf/dl-load.c
-@@ -1773,7 +1773,19 @@ open_path (const char *name, size_t namelen, int mode,
+@@ -1860,7 +1860,19 @@ open_path (const char *name, size_t namelen, int mode,
         given on the command line when rtld is run directly.  */
      return -1;
  
@@ -44,3 +45,6 @@ index 3226f2e531..7cb8a86fab 100644
    do
      {
        struct r_search_path_elem *this_dir = *dirs;
+-- 
+2.27.0
+

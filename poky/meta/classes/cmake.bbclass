@@ -21,23 +21,6 @@ python() {
         d.setVarFlag("do_compile", "progress", r"outof:^\[(\d+)/(\d+)\]\s+")
     else:
         bb.fatal("Unknown CMake Generator %s" % generator)
-
-    # C/C++ Compiler (without cpu arch/tune arguments)
-    if not d.getVar('OECMAKE_C_COMPILER'):
-        cc_list = d.getVar('CC').split()
-        if cc_list[0] == 'ccache':
-            d.setVar('OECMAKE_C_COMPILER_LAUNCHER', cc_list[0])
-            d.setVar('OECMAKE_C_COMPILER', cc_list[1])
-        else:
-            d.setVar('OECMAKE_C_COMPILER', cc_list[0])
-
-    if not d.getVar('OECMAKE_CXX_COMPILER'):
-        cxx_list = d.getVar('CXX').split()
-        if cxx_list[0] == 'ccache':
-            d.setVar('OECMAKE_CXX_COMPILER_LAUNCHER', cxx_list[0])
-            d.setVar('OECMAKE_CXX_COMPILER', cxx_list[1])
-        else:
-            d.setVar('OECMAKE_CXX_COMPILER', cxx_list[0])
 }
 OECMAKE_AR ?= "${AR}"
 
@@ -51,8 +34,23 @@ OECMAKE_CXX_LINK_FLAGS ?= "${HOST_CC_ARCH} ${TOOLCHAIN_OPTIONS} ${CXXFLAGS} ${LD
 CXXFLAGS += "${HOST_CC_ARCH} ${TOOLCHAIN_OPTIONS}"
 CFLAGS += "${HOST_CC_ARCH} ${TOOLCHAIN_OPTIONS}"
 
-OECMAKE_C_COMPILER_LAUNCHER ?= ""
-OECMAKE_CXX_COMPILER_LAUNCHER ?= ""
+def oecmake_map_compiler(compiler, d):
+    args = d.getVar(compiler).split()
+    if args[0] == "ccache":
+        return args[1], args[0]
+    return args[0], ""
+
+# C/C++ Compiler (without cpu arch/tune arguments)
+OECMAKE_C_COMPILER ?= "${@oecmake_map_compiler('CC', d)[0]}"
+OECMAKE_C_COMPILER_LAUNCHER ?= "${@oecmake_map_compiler('CC', d)[1]}"
+OECMAKE_CXX_COMPILER ?= "${@oecmake_map_compiler('CXX', d)[0]}"
+OECMAKE_CXX_COMPILER_LAUNCHER ?= "${@oecmake_map_compiler('CXX', d)[1]}"
+
+# clear compiler vars for allarch to avoid sig hash difference
+OECMAKE_C_COMPILER_allarch = ""
+OECMAKE_C_COMPILER_LAUNCHER_allarch = ""
+OECMAKE_CXX_COMPILER_allarch = ""
+OECMAKE_CXX_COMPILER_LAUNCHER_allarch = ""
 
 OECMAKE_RPATH ?= ""
 OECMAKE_PERLNATIVE_DIR ??= ""

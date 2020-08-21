@@ -2158,7 +2158,7 @@
                     <ulink url='&YOCTO_DOCS_REF_URL;#var-IMAGE_BOOT_FILES'><filename>IMAGE_BOOT_FILES</filename></ulink>:
                     Files installed into the device's boot partition
                     when preparing the image using the Wic tool
-                    with the <filename>bootimg-partition</filename>
+                    with the <filename>bootimg-partition</filename> or <filename>bootimg-efi</filename>
                     source plugin.
                     </para></listitem>
             </itemizedlist>

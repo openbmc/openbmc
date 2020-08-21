@@ -41,7 +41,7 @@ def runcmd(args, dir = None):
         (exitstatus, output) = subprocess.getstatusoutput(cmd)
         if exitstatus != 0:
             raise CmdError(cmd, exitstatus >> 8, output)
-        if " fuzz " in output:
+        if " fuzz " in output and "Hunk " in output:
             # Drop patch fuzz info with header and footer to log file so
             # insane.bbclass can handle to throw error/warning
             bb.note("--- Patch fuzz start ---\n%s\n--- Patch fuzz end ---" % format(output))

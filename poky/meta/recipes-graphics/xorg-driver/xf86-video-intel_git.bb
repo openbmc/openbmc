@@ -15,6 +15,7 @@ S = "${WORKDIR}/git"
 
 SRC_URI = "git://anongit.freedesktop.org/xorg/driver/xf86-video-intel \
            file://0001-Sync-i915_pciids-upto-8717c6b7414f.patch \
+           file://0001-i810-Avoid-duplicate-definition-of-I810PatternROP.patch \
 "
 
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+(\.\d+)+)"

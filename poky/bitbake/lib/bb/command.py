@@ -84,7 +84,7 @@ class Command:
         if command not in CommandsAsync.__dict__:
             return None, "No such command"
         self.currentAsyncCommand = (command, commandline)
-        self.cooker.configuration.server_register_idlecallback(self.cooker.runCommands, self.cooker)
+        self.cooker.idleCallBackRegister(self.cooker.runCommands, self.cooker)
         return True, None
 
     def runAsyncCommand(self):
@@ -723,10 +723,10 @@ class CommandsAsync:
         """
         Find signature info files via the signature generator
         """
-        pn = params[0]
+        (mc, pn) = bb.runqueue.split_mc(params[0])
         taskname = params[1]
         sigs = params[2]
-        res = bb.siggen.find_siginfo(pn, taskname, sigs, command.cooker.data)
-        bb.event.fire(bb.event.FindSigInfoResult(res), command.cooker.data)
+        res = bb.siggen.find_siginfo(pn, taskname, sigs, command.cooker.databuilder.mcdata[mc])
+        bb.event.fire(bb.event.FindSigInfoResult(res), command.cooker.databuilder.mcdata[mc])
         command.finishAsyncCommand()
     findSigInfo.needcache = False

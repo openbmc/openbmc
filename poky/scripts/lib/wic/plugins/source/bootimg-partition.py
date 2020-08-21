@@ -141,7 +141,7 @@ class BootimgPartitionPlugin(SourcePlugin):
                     break
 
             if not kernel_name:
-                raise WicError('No kernel file founded')
+                raise WicError('No kernel file found')
 
             # Compose the extlinux.conf
             extlinux_conf = "default Yocto\n"

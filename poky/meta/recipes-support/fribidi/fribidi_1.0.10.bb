@@ -12,6 +12,6 @@ UPSTREAM_CHECK_URI = "https://github.com/${BPN}/${BPN}/releases"
 
 inherit meson lib_package pkgconfig
 
-CVE_PRODUCT = "gnu_fribidi"
+CVE_PRODUCT = "gnu_fribidi fribidi"
 
 BBCLASSEXTEND = "native nativesdk"

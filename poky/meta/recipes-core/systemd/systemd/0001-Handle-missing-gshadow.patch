@@ -14,10 +14,10 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  src/shared/userdb.c           |  6 ++++++
  3 files changed, 30 insertions(+)
 
-diff --git a/src/shared/group-record-nss.c b/src/shared/group-record-nss.c
-index 77924f1c4067..c64490253ff3 100644
---- a/src/shared/group-record-nss.c
-+++ b/src/shared/group-record-nss.c
+Index: systemd-stable/src/shared/group-record-nss.c
+===================================================================
+--- systemd-stable.orig/src/shared/group-record-nss.c
++++ systemd-stable/src/shared/group-record-nss.c
 @@ -19,8 +19,10 @@ int nss_group_to_group_record(
          if (isempty(grp->gr_name))
                  return -EINVAL;
@@ -45,7 +45,7 @@ index 77924f1c4067..c64490253ff3 100644
  
          r = json_build(&g->json, JSON_BUILD_OBJECT(
                                         JSON_BUILD_PAIR("groupName", JSON_BUILD_STRING(g->group_name)),
-@@ -76,6 +80,7 @@ int nss_sgrp_for_group(const struct group *grp, struct sgrp *ret_sgrp, char **re
+@@ -76,6 +80,7 @@ int nss_sgrp_for_group(const struct grou
          assert(ret_sgrp);
          assert(ret_buffer);
  
@@ -53,7 +53,7 @@ index 77924f1c4067..c64490253ff3 100644
          for (;;) {
                  _cleanup_free_ char *buf = NULL;
                  struct sgrp sgrp, *result;
-@@ -104,6 +109,9 @@ int nss_sgrp_for_group(const struct group *grp, struct sgrp *ret_sgrp, char **re
+@@ -104,6 +109,9 @@ int nss_sgrp_for_group(const struct grou
                  buflen *= 2;
                  buf = mfree(buf);
          }
@@ -62,67 +62,67 @@ index 77924f1c4067..c64490253ff3 100644
 +#endif
  }
  
- int nss_group_record_by_name(const char *name, GroupRecord **ret) {
-@@ -111,7 +119,9 @@ int nss_group_record_by_name(const char *name, GroupRecord **ret) {
+ int nss_group_record_by_name(
+@@ -115,7 +123,9 @@ int nss_group_record_by_name(
          struct group grp, *result;
          bool incomplete = false;
          size_t buflen = 4096;
 +#if ENABLE_GSHADOW
-         struct sgrp sgrp;
+         struct sgrp sgrp, *sresult = NULL;
 +#endif
          int r;
  
          assert(name);
-@@ -141,6 +151,7 @@ int nss_group_record_by_name(const char *name, GroupRecord **ret) {
+@@ -145,6 +155,7 @@ int nss_group_record_by_name(
                  buf = mfree(buf);
          }
  
 +#if ENABLE_GSHADOW
-         r = nss_sgrp_for_group(result, &sgrp, &sbuf);
-         if (r < 0) {
-                 log_debug_errno(r, "Failed to do shadow lookup for group %s, ignoring: %m", result->gr_name);
-@@ -148,6 +159,9 @@ int nss_group_record_by_name(const char *name, GroupRecord **ret) {
-         }
+         if (with_shadow) {
+                 r = nss_sgrp_for_group(result, &sgrp, &sbuf);
+                 if (r < 0) {
+@@ -156,6 +167,9 @@ int nss_group_record_by_name(
+                 incomplete = true;
  
-         r = nss_group_to_group_record(result, r >= 0 ? &sgrp : NULL, ret);
+         r = nss_group_to_group_record(result, sresult, ret);
 +#else
 +        r = nss_group_to_group_record(result, NULL, ret);
 +#endif
          if (r < 0)
                  return r;
  
-@@ -160,7 +174,9 @@ int nss_group_record_by_gid(gid_t gid, GroupRecord **ret) {
+@@ -172,7 +186,9 @@ int nss_group_record_by_gid(
          struct group grp, *result;
          bool incomplete = false;
          size_t buflen = 4096;
 +#if ENABLE_GSHADOW
-         struct sgrp sgrp;
+         struct sgrp sgrp, *sresult = NULL;
 +#endif
          int r;
  
          assert(ret);
-@@ -188,6 +204,7 @@ int nss_group_record_by_gid(gid_t gid, GroupRecord **ret) {
+@@ -200,6 +216,7 @@ int nss_group_record_by_gid(
                  buf = mfree(buf);
          }
  
 +#if ENABLE_GSHADOW
-         r = nss_sgrp_for_group(result, &sgrp, &sbuf);
-         if (r < 0) {
-                 log_debug_errno(r, "Failed to do shadow lookup for group %s, ignoring: %m", result->gr_name);
-@@ -195,6 +212,9 @@ int nss_group_record_by_gid(gid_t gid, GroupRecord **ret) {
-         }
+         if (with_shadow) {
+                 r = nss_sgrp_for_group(result, &sgrp, &sbuf);
+                 if (r < 0) {
+@@ -211,6 +228,9 @@ int nss_group_record_by_gid(
+                 incomplete = true;
  
-         r = nss_group_to_group_record(result, r >= 0 ? &sgrp : NULL, ret);
+         r = nss_group_to_group_record(result, sresult, ret);
 +#else
 +        r = nss_group_to_group_record(result, NULL, ret);
 +#endif
          if (r < 0)
                  return r;
  
-diff --git a/src/shared/group-record-nss.h b/src/shared/group-record-nss.h
-index 38b2995178ff..d7d95c44cf11 100644
---- a/src/shared/group-record-nss.h
-+++ b/src/shared/group-record-nss.h
+Index: systemd-stable/src/shared/group-record-nss.h
+===================================================================
+--- systemd-stable.orig/src/shared/group-record-nss.h
++++ systemd-stable/src/shared/group-record-nss.h
 @@ -2,7 +2,11 @@
  #pragma once
  
@@ -135,11 +135,11 @@ index 38b2995178ff..d7d95c44cf11 100644
  
  #include "group-record.h"
  
-diff --git a/src/shared/userdb.c b/src/shared/userdb.c
-index 92f8796768d7..5d912862f85c 100644
---- a/src/shared/userdb.c
-+++ b/src/shared/userdb.c
-@@ -924,13 +924,16 @@ int groupdb_iterator_get(UserDBIterator *iterator, GroupRecord **ret) {
+Index: systemd-stable/src/shared/userdb.c
+===================================================================
+--- systemd-stable.orig/src/shared/userdb.c
++++ systemd-stable/src/shared/userdb.c
+@@ -930,13 +930,16 @@ int groupdb_iterator_get(UserDBIterator
                  if (gr) {
                          _cleanup_free_ char *buffer = NULL;
                          bool incomplete = false;
@@ -156,7 +156,7 @@ index 92f8796768d7..5d912862f85c 100644
                          r = nss_sgrp_for_group(gr, &sgrp, &buffer);
                          if (r < 0) {
                                  log_debug_errno(r, "Failed to acquire shadow entry for group %s, ignoring: %m", gr->gr_name);
-@@ -938,6 +941,9 @@ int groupdb_iterator_get(UserDBIterator *iterator, GroupRecord **ret) {
+@@ -944,6 +947,9 @@ int groupdb_iterator_get(UserDBIterator
                          }
  
                          r = nss_group_to_group_record(gr, r >= 0 ? &sgrp : NULL, ret);
@@ -166,6 +166,3 @@ index 92f8796768d7..5d912862f85c 100644
                          if (r < 0)
                                  return r;
  
--- 
-2.17.1
-

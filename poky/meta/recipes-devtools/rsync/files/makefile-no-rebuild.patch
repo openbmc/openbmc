@@ -1,4 +1,4 @@
-From 5ae38baadd40a996da3d19a147f37e7f1f3355bf Mon Sep 17 00:00:00 2001
+From 1f29584e57f5fda09970c66f3b94f4720e09c1bb Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Tue, 12 Apr 2016 15:51:54 +0100
 Subject: [PATCH] rsync: remove upstream's rebuild logic
@@ -10,14 +10,14 @@ Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 
 ---
- Makefile.in | 50 --------------------------------------------------
- 1 file changed, 50 deletions(-)
+ Makefile.in | 54 -----------------------------------------------------
+ 1 file changed, 54 deletions(-)
 
 diff --git a/Makefile.in b/Makefile.in
-index 31ddc43..41c9a93 100644
+index 672fcc4..c12d8d4 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -167,56 +167,6 @@ gen: conf proto.h man
+@@ -168,60 +168,6 @@ gen: conf proto.h man
  gensend: gen
  	rsync -aic $(GENFILES) $${SAMBA_HOST-samba.org}:/home/ftp/pub/rsync/generated-files/
  
@@ -54,6 +54,10 @@ index 31ddc43..41c9a93 100644
 -.PHONY: reconfigure
 -reconfigure: configure.sh
 -	./config.status --recheck
+-	./config.status
+-
+-.PHONY: restatus
+-restatus:
 -	./config.status
 -
 -Makefile: Makefile.in config.status configure.sh config.h.in

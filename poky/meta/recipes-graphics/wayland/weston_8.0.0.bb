@@ -20,7 +20,7 @@ inherit meson pkgconfig useradd features_check
 # depends on virtual/egl
 REQUIRED_DISTRO_FEATURES = "opengl"
 
-DEPENDS = "libxkbcommon gdk-pixbuf pixman cairo glib-2.0 jpeg"
+DEPENDS = "libxkbcommon gdk-pixbuf pixman cairo glib-2.0"
 DEPENDS += "wayland wayland-protocols libinput virtual/egl pango wayland-native"
 
 WESTON_MAJOR_VERSION = "${@'.'.join(d.getVar('PV').split('.')[0:1])}"
@@ -31,7 +31,13 @@ PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'kms fbdev
                    ${@bb.utils.contains('DISTRO_FEATURES', 'x11 wayland', 'xwayland', '', d)} \
                    ${@bb.utils.filter('DISTRO_FEATURES', 'pam systemd x11', d)} \
                    ${@bb.utils.contains_any('DISTRO_FEATURES', 'wayland x11', '', 'headless', d)} \
-                   launch"
+                   launch \
+                   image-jpeg \
+                   screenshare \
+                   shell-desktop \
+                   shell-fullscreen \
+                   shell-ivi"
+
 #
 # Compositor choices
 #
@@ -67,6 +73,16 @@ PACKAGECONFIG[clients] = "-Dsimple-clients=all -Ddemo-clients=true,-Dsimple-clie
 PACKAGECONFIG[remoting] = "-Dremoting=true,-Dremoting=false,gstreamer-1.0"
 # Weston with PAM support
 PACKAGECONFIG[pam] = "-Dpam=true,-Dpam=false,libpam"
+# Weston with screen-share support
+PACKAGECONFIG[screenshare] = "-Dscreenshare=true,-Dscreenshare=false"
+# Traditional desktop shell
+PACKAGECONFIG[shell-desktop] = "-Dshell-desktop=true,-Dshell-desktop=false"
+# Fullscreen shell
+PACKAGECONFIG[shell-fullscreen] = "-Dshell-fullscreen=true,-Dshell-fullscreen=false"
+# In-Vehicle Infotainment (IVI) shell
+PACKAGECONFIG[shell-ivi] = "-Dshell-ivi=true,-Dshell-ivi=false"
+# JPEG image loading support
+PACKAGECONFIG[image-jpeg] = "-Dimage-jpeg=true,-Dimage-jpeg=false, jpeg"
 
 do_install_append() {
 	# Weston doesn't need the .la files to load modules, so wipe them

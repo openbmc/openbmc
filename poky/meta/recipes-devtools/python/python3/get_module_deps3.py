@@ -9,6 +9,7 @@
 debug=False
 
 import sys
+import os
 
 # We can get a list of the modules which are currently required to run python
 # so we run python-core and get its modules, we then import what we need
@@ -48,8 +49,19 @@ current_module =  str(sys.argv[1]).rstrip()
 if(debug==True):
     log = open('log_%s' % current_module,'w')
     log.write('Module %s generated the following dependencies:\n' % current_module)
-try: 
-    importlib.import_module('%s' % current_module)
+try:
+    m = importlib.import_module(current_module)
+    # handle python packages which may not include all modules in the __init__
+    if os.path.basename(m.__file__) == "__init__.py":
+        modulepath = os.path.dirname(m.__file__)
+        for i in os.listdir(modulepath):
+            if i.startswith("_") or not(i.endswith(".py")):
+                continue
+            submodule = "{}.{}".format(current_module, i[:-3])
+            try:
+                importlib.import_module(submodule)
+            except:
+                pass # ignore all import or other exceptions raised during import
 except ImportError as e:
     if (debug==True):
         log.write('Module was not found')
@@ -107,6 +119,8 @@ for item in dif:
         dep_path = dep_path.replace(soabi,'*')
         print (dep_path)
         continue
+    if "_sysconfigdata" in dep_path:
+        dep_path = dep_path.replace(sysconfig._get_sysconfigdata_name(), "_sysconfigdata*")
 
     if (debug==True):
         log.write(dep_path+'\n')
@@ -140,6 +154,8 @@ for item in dif:
             log.write(cached)
         cached = fix_path(cached)
         cached = cached.replace(cpython_tag,'*')
+        if "_sysconfigdata" in cached:
+            cached = cached.replace(sysconfig._get_sysconfigdata_name(), "_sysconfigdata*")
         print (cached)
 
 if debug==True:

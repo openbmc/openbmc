@@ -37,6 +37,7 @@ SRC_URI = "git://github.com/linux-test-project/ltp.git \
            file://0001-ptrace01-Fix-missing-format-string.patch \
            file://0001-sigwaitinfo-Do-not-run-invalid-undefined-test-cases.patch \
            file://0001-syscalls-copy_file_range02-Expect-EFBIG-in-subcase-m.patch \
+           file://0001-Remove-OOM-tests-from-runtest-mm.patch \
            "
 
 S = "${WORKDIR}/git"
@@ -50,7 +51,7 @@ export exec_prefix = "/opt/${PN}"
 
 PACKAGECONFIG[numa] = "--with-numa, --without-numa, numactl,"
 EXTRA_AUTORECONF += "-I ${S}/testcases/realtime/m4"
-EXTRA_OECONF = " --with-power-management-testsuite --with-realtime-testsuite --with-open-posix-testsuite "
+EXTRA_OECONF = " --with-realtime-testsuite --with-open-posix-testsuite "
 # ltp network/rpc test cases ftbfs when libtirpc is found
 EXTRA_OECONF += " --without-tirpc "
 

@@ -148,7 +148,7 @@ class BBCooker:
     Manages one bitbake build run
     """
 
-    def __init__(self, configuration, featureSet=None):
+    def __init__(self, configuration, featureSet=None, idleCallBackRegister=None):
         self.recipecaches = None
         self.skiplist = {}
         self.featureset = CookerFeatures()
@@ -157,6 +157,8 @@ class BBCooker:
                 self.featureset.setFeature(f)
 
         self.configuration = configuration
+
+        self.idleCallBackRegister = idleCallBackRegister
 
         bb.debug(1, "BBCooker starting %s" % time.time())
         sys.stdout.flush()
@@ -210,7 +212,7 @@ class BBCooker:
             cooker.process_inotify_updates()
             return 1.0
 
-        self.configuration.server_register_idlecallback(_process_inotify_updates, self)
+        self.idleCallBackRegister(_process_inotify_updates, self)
 
         # TOSTOP must not be set or our children will hang when they output
         try:
@@ -1423,7 +1425,7 @@ class BBCooker:
                 return True
             return retval
 
-        self.configuration.server_register_idlecallback(buildFileIdle, rq)
+        self.idleCallBackRegister(buildFileIdle, rq)
 
     def buildTargets(self, targets, task):
         """
@@ -1494,7 +1496,7 @@ class BBCooker:
         if 'universe' in targets:
             rq.rqdata.warn_multi_bb = True
 
-        self.configuration.server_register_idlecallback(buildTargetsIdle, rq)
+        self.idleCallBackRegister(buildTargetsIdle, rq)
 
 
     def getAllKeysWithFlags(self, flaglist):

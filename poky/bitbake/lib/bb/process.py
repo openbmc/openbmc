@@ -41,6 +41,7 @@ class ExecutionError(CmdError):
         self.exitcode = exitcode
         self.stdout = stdout
         self.stderr = stderr
+        self.extra_message = None
 
     def __str__(self):
         message = ""
@@ -51,7 +52,7 @@ class ExecutionError(CmdError):
         if message:
             message = ":\n" + message
         return (CmdError.__str__(self) +
-                " with exit code %s" % self.exitcode + message)
+                " with exit code %s" % self.exitcode + message + (self.extra_message or ""))
 
 class Popen(subprocess.Popen):
     defaults = {

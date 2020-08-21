@@ -1,4 +1,4 @@
-From 234c3da52da09b28db5b2c4d33ebe9c800c461ac Mon Sep 17 00:00:00 2001
+From 768e1f2f14c9f1b3f9bd0e017c3f6183b45616e8 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 17 Jul 2018 10:13:38 +0800
 Subject: [PATCH] conditionally do not fetch code by easy_install
@@ -9,16 +9,15 @@ internet by easy_install.
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
-
 ---
  setuptools/command/easy_install.py | 5 +++++
  1 file changed, 5 insertions(+)
 
 diff --git a/setuptools/command/easy_install.py b/setuptools/command/easy_install.py
-index 5a9576f..f5961cb 100644
+index bcbd4f58..6455afda 100644
 --- a/setuptools/command/easy_install.py
 +++ b/setuptools/command/easy_install.py
-@@ -656,6 +656,11 @@ class easy_install(Command):
+@@ -653,6 +653,11 @@ class easy_install(Command):
              os.path.exists(tmpdir) and rmtree(rmtree_safe(tmpdir))
  
      def easy_install(self, spec, deps=False):
@@ -27,6 +26,9 @@ index 5a9576f..f5961cb 100644
 +                      "Please add its native recipe to DEPENDS." % spec)
 +            return None
 +
-         if not self.editable:
-             self.install_site_py()
- 
+         with self._tmpdir() as tmpdir:
+             if not isinstance(spec, Requirement):
+                 if URL_SCHEME(spec):
+-- 
+2.25.1
+

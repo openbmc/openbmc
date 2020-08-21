@@ -87,6 +87,13 @@ def get_machine_branch(d, default):
 
 do_kernel_metadata() {
 	set +e
+
+	if [ -n "$1" ]; then
+		mode="$1"
+	else
+		mode="patch"
+	fi
+
 	cd ${S}
 	export KMETA=${KMETA}
 
@@ -120,14 +127,13 @@ do_kernel_metadata() {
 	if [ -n "${KBUILD_DEFCONFIG}" ]; then
 		if [ -f "${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG}" ]; then
 			if [ -f "${WORKDIR}/defconfig" ]; then
-				# If the two defconfig's are different, warn that we didn't overwrite the
-				# one already placed in WORKDIR by the fetcher.
+				# If the two defconfig's are different, warn that we overwrote the
+				# one already placed in WORKDIR
 				cmp "${WORKDIR}/defconfig" "${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG}"
 				if [ $? -ne 0 ]; then
-					bbwarn "defconfig detected in WORKDIR. ${KBUILD_DEFCONFIG} skipped"
-				else
-					cp -f ${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG} ${WORKDIR}/defconfig
+					bbdebug 1 "detected SRC_URI or unpatched defconfig in WORKDIR. ${KBUILD_DEFCONFIG} copied over it"
 				fi
+				cp -f ${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG} ${WORKDIR}/defconfig
 			else
 				cp -f ${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG} ${WORKDIR}/defconfig
 			fi
@@ -137,17 +143,19 @@ do_kernel_metadata() {
 		fi
 	fi
 
-	# was anyone trying to patch the kernel meta data ?, we need to do
-	# this here, since the scc commands migrate the .cfg fragments to the
-	# kernel source tree, where they'll be used later.
-	check_git_config
-	patches="${@" ".join(find_patches(d,'kernel-meta'))}"
-	for p in $patches; do
-	    (
-		cd ${WORKDIR}/kernel-meta
-		git am -s $p
-	    )
-	done
+	if [ "$mode" = "patch" ]; then
+		# was anyone trying to patch the kernel meta data ?, we need to do
+		# this here, since the scc commands migrate the .cfg fragments to the
+		# kernel source tree, where they'll be used later.
+		check_git_config
+		patches="${@" ".join(find_patches(d,'kernel-meta'))}"
+		for p in $patches; do
+		    (
+			cd ${WORKDIR}/kernel-meta
+			git am -s $p
+		    )
+		done
+	fi
 
 	sccs_from_src_uri="${@" ".join(find_sccs(d))}"
 	patches="${@" ".join(find_patches(d,''))}"
@@ -212,13 +220,40 @@ do_kernel_metadata() {
 	fi
 	meta_dir=$(kgit --meta)
 
-	# run1: pull all the configuration fragments, no matter where they come from
-	elements="`echo -n ${bsp_definition} $sccs_defconfig ${sccs} ${patches} ${KERNEL_FEATURES}`"
-	if [ -n "${elements}" ]; then
-		echo "${bsp_definition}" > ${S}/${meta_dir}/bsp_definition
-		scc --force -o ${S}/${meta_dir}:cfg,merge,meta ${includes} $sccs_defconfig $bsp_definition $sccs $patches ${KERNEL_FEATURES}
-		if [ $? -ne 0 ]; then
-			bbfatal_log "Could not generate configuration queue for ${KMACHINE}."
+	KERNEL_FEATURES_FINAL=""
+	if [ -n "${KERNEL_FEATURES}" ]; then
+		for feature in ${KERNEL_FEATURES}; do
+			feature_found=f
+			for d in $includes; do
+				path_to_check=$(echo $d | sed 's/-I//g')
+				if [ "$feature_found" = "f" ] && [ -e "$path_to_check/$feature" ]; then
+				    feature_found=t
+				fi
+			done
+			if [ "$feature_found" = "f" ]; then
+				if [ -n "${KERNEL_DANGLING_FEATURES_WARN_ONLY}" ]; then
+				    bbwarn "Feature '$feature' not found, but KERNEL_DANGLING_FEATURES_WARN_ONLY is set"
+				    bbwarn "This may cause runtime issues, dropping feature and allowing configuration to continue"
+				else
+				    bberror "Feature '$feature' not found, this will cause configuration failures."
+				    bberror "Check the SRC_URI for meta-data repositories or directories that may be missing"
+				    bbfatal_log "Set KERNEL_DANGLING_FEATURES_WARN_ONLY to ignore this issue"
+				fi
+			else
+				KERNEL_FEATURES_FINAL="$KERNEL_FEATURES_FINAL $feature"
+			fi
+		done
+        fi
+
+	if [ "$mode" = "config" ]; then
+		# run1: pull all the configuration fragments, no matter where they come from
+		elements="`echo -n ${bsp_definition} $sccs_defconfig ${sccs} ${patches} $KERNEL_FEATURES_FINAL`"
+		if [ -n "${elements}" ]; then
+			echo "${bsp_definition}" > ${S}/${meta_dir}/bsp_definition
+			scc --force -o ${S}/${meta_dir}:cfg,merge,meta ${includes} $sccs_defconfig $bsp_definition $sccs $patches $KERNEL_FEATURES_FINAL
+			if [ $? -ne 0 ]; then
+				bbfatal_log "Could not generate configuration queue for ${KMACHINE}."
+			fi
 		fi
 	fi
 
@@ -229,12 +264,14 @@ do_kernel_metadata() {
 		sccs="${bsp_definition} ${sccs}"
 	fi
 
-	# run2: only generate patches for elements that have been passed on the SRC_URI
-	elements="`echo -n ${sccs} ${patches} ${KERNEL_FEATURES}`"
-	if [ -n "${elements}" ]; then
-		scc --force -o ${S}/${meta_dir}:patch --cmds patch ${includes} ${sccs} ${patches} ${KERNEL_FEATURES}
-		if [ $? -ne 0 ]; then
-			bbfatal_log "Could not generate configuration queue for ${KMACHINE}."
+	if [ "$mode" = "patch" ]; then
+		# run2: only generate patches for elements that have been passed on the SRC_URI
+		elements="`echo -n ${sccs} ${patches} $KERNEL_FEATURES_FINAL`"
+		if [ -n "${elements}" ]; then
+			scc --force -o ${S}/${meta_dir}:patch --cmds patch ${includes} ${sccs} ${patches} $KERNEL_FEATURES_FINAL
+			if [ $? -ne 0 ]; then
+				bbfatal_log "Could not generate configuration queue for ${KMACHINE}."
+			fi
 		fi
 	fi
 }
@@ -338,6 +375,8 @@ do_kernel_configme[depends] += "bc-native:do_populate_sysroot bison-native:do_po
 do_kernel_configme[depends] += "kern-tools-native:do_populate_sysroot"
 do_kernel_configme[dirs] += "${S} ${B}"
 do_kernel_configme() {
+	do_kernel_metadata config
+
 	# translate the kconfig_mode into something that merge_config.sh
 	# understands
 	case ${KCONFIG_MODE} in
@@ -380,6 +419,67 @@ do_kernel_configme() {
 }
 
 addtask kernel_configme before do_configure after do_patch
+addtask config_analysis
+
+do_config_analysis[depends] = "virtual/kernel:do_configure"
+do_config_analysis[depends] += "kern-tools-native:do_populate_sysroot"
+
+CONFIG_AUDIT_FILE ?= "${WORKDIR}/config-audit.txt"
+CONFIG_ANALYSIS_FILE ?= "${WORKDIR}/config-analysis.txt"
+
+python do_config_analysis() {
+    import re, string, sys, subprocess
+
+    s = d.getVar('S')
+
+    env = os.environ.copy()
+    env['PATH'] = "%s:%s%s" % (d.getVar('PATH'), s, "/scripts/util/")
+    env['LD'] = d.getVar('KERNEL_LD')
+    env['CC'] = d.getVar('KERNEL_CC')
+    env['ARCH'] = d.getVar('ARCH')
+    env['srctree'] = s
+
+    # read specific symbols from the kernel recipe or from local.conf
+    # i.e.: CONFIG_ANALYSIS_pn-linux-yocto-dev = 'NF_CONNTRACK LOCALVERSION'
+    config = d.getVar( 'CONFIG_ANALYSIS' )
+    if not config:
+       config = [ "" ]
+    else:
+       config = config.split()
+
+    for c in config:
+        for action in ["analysis","audit"]:
+            if action == "analysis":
+                try:
+                    analysis = subprocess.check_output(['symbol_why.py', '--dotconfig',  '{}'.format( d.getVar('B') + '/.config' ), '--blame', c], cwd=s, env=env ).decode('utf-8')
+                except subprocess.CalledProcessError as e:
+                    bb.fatal( "config analysis failed: %s" % e.output.decode('utf-8'))
+
+                outfile = d.getVar( 'CONFIG_ANALYSIS_FILE' )
+
+            if action == "audit":
+                try:
+                    analysis = subprocess.check_output(['symbol_why.py', '--dotconfig',  '{}'.format( d.getVar('B') + '/.config' ), '--summary', '--extended', '--sanity', c], cwd=s, env=env ).decode('utf-8')
+                except subprocess.CalledProcessError as e:
+                    bb.fatal( "config analysis failed: %s" % e.output.decode('utf-8'))
+
+                outfile = d.getVar( 'CONFIG_AUDIT_FILE' )
+
+            if c:
+                outdir = os.path.dirname( outfile )
+                outname = os.path.basename( outfile )
+                outfile = outdir + '/'+ c + '-' + outname
+
+            if config and os.path.isfile(outfile):
+                os.remove(outfile)
+
+            with open(outfile, 'w+') as f:
+                f.write( analysis )
+
+            bb.warn( "Configuration {} executed, see: {} for details".format(action,outfile ))
+            if c:
+                bb.warn( analysis )
+}
 
 python do_kernel_configcheck() {
     import re, string, sys, subprocess
@@ -389,57 +489,89 @@ python do_kernel_configcheck() {
     # meta-series for processing
     kmeta = d.getVar("KMETA") or "meta"
     if not os.path.exists(kmeta):
-        kmeta = "." + kmeta
+        kmeta = subprocess.check_output(['kgit', '--meta'], cwd=d.getVar('S')).decode('utf-8').rstrip()
 
     s = d.getVar('S')
 
     env = os.environ.copy()
     env['PATH'] = "%s:%s%s" % (d.getVar('PATH'), s, "/scripts/util/")
-    env['LD'] = "${KERNEL_LD}"
+    env['LD'] = d.getVar('KERNEL_LD')
+    env['CC'] = d.getVar('KERNEL_CC')
+    env['ARCH'] = d.getVar('ARCH')
+    env['srctree'] = s
 
     try:
         configs = subprocess.check_output(['scc', '--configs', '-o', s + '/.kernel-meta'], env=env).decode('utf-8')
     except subprocess.CalledProcessError as e:
         bb.fatal( "Cannot gather config fragments for audit: %s" % e.output.decode("utf-8") )
 
-    try:
-        subprocess.check_call(['kconf_check', '--report', '-o',
-                '%s/%s/cfg' % (s, kmeta), d.getVar('B') + '/.config', s, configs], cwd=s, env=env)
-    except subprocess.CalledProcessError:
-        # The configuration gathering can return different exit codes, but
-        # we interpret them based on the KCONF_AUDIT_LEVEL variable, so we catch
-        # everything here, and let the run continue.
-        pass
-
     config_check_visibility = int(d.getVar("KCONF_AUDIT_LEVEL") or 0)
     bsp_check_visibility = int(d.getVar("KCONF_BSP_AUDIT_LEVEL") or 0)
 
-    # if config check visibility is non-zero, report dropped configuration values
-    mismatch_file = d.expand("${S}/%s/cfg/mismatch.txt" % kmeta)
-    if os.path.exists(mismatch_file):
-        if config_check_visibility:
-            with open (mismatch_file, "r") as myfile:
+    # if config check visibility is "1", that's the lowest level of audit. So
+    # we add the --classify option to the run, since classification will
+    # streamline the output to only report options that could be boot issues,
+    # or are otherwise required for proper operation.
+    extra_params = ""
+    if config_check_visibility == 1:
+       extra_params = "--classify"
+
+    # category #1: mismatches
+    try:
+        analysis = subprocess.check_output(['symbol_why.py', '--dotconfig',  '{}'.format( d.getVar('B') + '/.config' ), '--mismatches', extra_params], cwd=s, env=env ).decode('utf-8')
+    except subprocess.CalledProcessError as e:
+        bb.fatal( "config analysis failed: %s" % e.output.decode('utf-8'))
+
+    if analysis:
+        outfile = "{}/{}/cfg/mismatch.txt".format( s, kmeta )
+        if os.path.isfile(outfile):
+           os.remove(outfile)
+        with open(outfile, 'w+') as f:
+            f.write( analysis )
+
+        if config_check_visibility and os.stat(outfile).st_size > 0:
+            with open (outfile, "r") as myfile:
                 results = myfile.read()
                 bb.warn( "[kernel config]: specified values did not make it into the kernel's final configuration:\n\n%s" % results)
 
-    if bsp_check_visibility:
-        invalid_file = d.expand("${S}/%s/cfg/invalid.cfg" % kmeta)
-        if os.path.exists(invalid_file) and os.stat(invalid_file).st_size > 0:
-            with open (invalid_file, "r") as myfile:
-                results = myfile.read()
-                bb.warn( "[kernel config]: This BSP sets config options that are not offered anywhere within this kernel:\n\n%s" % results)
-        errors_file = d.expand("${S}/%s/cfg/fragment_errors.txt" % kmeta)
-        if os.path.exists(errors_file) and os.stat(errors_file).st_size > 0:
-            with open (errors_file, "r") as myfile:
-               results = myfile.read()
-               bb.warn( "[kernel config]: This BSP contains fragments with errors:\n\n%s" % results)
+    # category #2: invalid fragment elements
+    extra_params = ""
+    if bsp_check_visibility > 1:
+        extra_params = "--strict"
+    try:
+        analysis = subprocess.check_output(['symbol_why.py', '--dotconfig',  '{}'.format( d.getVar('B') + '/.config' ), '--invalid', extra_params], cwd=s, env=env ).decode('utf-8')
+    except subprocess.CalledProcessError as e:
+        bb.fatal( "config analysis failed: %s" % e.output.decode('utf-8'))
 
-    # if the audit level is greater than two, we report if a fragment has overriden
-    # a value from a base fragment. This is really only used for new kernel introduction
-    if bsp_check_visibility > 2:
-        redefinition_file = d.expand("${S}/%s/cfg/redefinition.txt" % kmeta)
-        if os.path.exists(redefinition_file) and os.stat(redefinition_file).st_size > 0:
-            with open (redefinition_file, "r") as myfile:
+    if analysis:
+        outfile = "{}/{}/cfg/invalid.txt".format(s,kmeta)
+        if os.path.isfile(outfile):
+           os.remove(outfile)
+        with open(outfile, 'w+') as f:
+            f.write( analysis )
+
+        if bsp_check_visibility and os.stat(outfile).st_size > 0:
+            with open (outfile, "r") as myfile:
+               results = myfile.read()
+               bb.warn( "[kernel config]: This BSP contains fragments with warnings:\n\n%s" % results)
+
+    # category #3: redefined options (this is pretty verbose and is debug only)
+    try:
+        analysis = subprocess.check_output(['symbol_why.py', '--dotconfig',  '{}'.format( d.getVar('B') + '/.config' ), '--sanity'], cwd=s, env=env ).decode('utf-8')
+    except subprocess.CalledProcessError as e:
+        bb.fatal( "config analysis failed: %s" % e.output.decode('utf-8'))
+
+    if analysis:
+        outfile = "{}/{}/cfg/redefinition.txt".format(s,kmeta)
+        if os.path.isfile(outfile):
+           os.remove(outfile)
+        with open(outfile, 'w+') as f:
+            f.write( analysis )
+
+        # if the audit level is greater than two, we report if a fragment has overriden
+        # a value from a base fragment. This is really only used for new kernel introduction
+        if bsp_check_visibility > 2 and os.stat(outfile).st_size > 0:
+            with open (outfile, "r") as myfile:
                 results = myfile.read()
                 bb.warn( "[kernel config]: This BSP has configuration options defined in more than one config, with differing values:\n\n%s" % results)
 }

@@ -34,12 +34,11 @@ logger = logging.getLogger('BitBake')
 class ProcessTimeout(SystemExit):
     pass
 
-class ProcessServer(multiprocessing.Process):
+class ProcessServer():
     profile_filename = "profile.log"
     profile_processed_filename = "profile.log.processed"
 
-    def __init__(self, lock, sock, sockname):
-        multiprocessing.Process.__init__(self)
+    def __init__(self, lock, sock, sockname, server_timeout, xmlrpcinterface):
         self.command_channel = False
         self.command_channel_reply = False
         self.quit = False
@@ -47,6 +46,7 @@ class ProcessServer(multiprocessing.Process):
         self.next_heartbeat = time.time()
 
         self.event_handle = None
+        self.hadanyui = False
         self.haveui = False
         self.maxuiwait = 30
         self.xmlrpc = False
@@ -56,6 +56,9 @@ class ProcessServer(multiprocessing.Process):
         self.bitbake_lock = lock
         self.sock = sock
         self.sockname = sockname
+
+        self.server_timeout = server_timeout
+        self.xmlrpcinterface = xmlrpcinterface
 
     def register_idle_function(self, function, data):
         """Register a function to be called while the server is idle"""
@@ -188,6 +191,7 @@ class ProcessServer(multiprocessing.Process):
                     self.command_channel_reply = writer
 
                     self.haveui = True
+                    self.hadanyui = True
 
                 except (EOFError, OSError):
                     disconnect_client(self, fds)
@@ -200,7 +204,7 @@ class ProcessServer(multiprocessing.Process):
             # If we don't see a UI connection within maxuiwait, its unlikely we're going to see
             # one. We have had issue with processes hanging indefinitely so timing out UI-less
             # servers is useful.
-            if not self.haveui and not self.timeout and (self.lastui + self.maxuiwait) < time.time():
+            if not self.hadanyui and not self.xmlrpc and not self.timeout and (self.lastui + self.maxuiwait) < time.time():
                 print("No UI connection within max timeout, exiting to avoid infinite loop.")
                 self.quit = True
 
@@ -242,6 +246,10 @@ class ProcessServer(multiprocessing.Process):
             pass
 
         self.cooker.post_serve()
+
+        # Flush logs before we release the lock
+        sys.stdout.flush()
+        sys.stderr.flush()
 
         # Finally release the lockfile but warn about other processes holding it open
         lock = self.bitbake_lock
@@ -465,23 +473,25 @@ class BitBakeServer(object):
         print(self.start_log_format % (os.getpid(), datetime.datetime.now().strftime(self.start_log_datetime_format)))
         sys.stdout.flush()
 
-        server = ProcessServer(self.bitbake_lock, self.sock, self.sockname)
-        self.configuration.setServerRegIdleCallback(server.register_idle_function)
-        os.close(self.readypipe)
-        writer = ConnectionWriter(self.readypipein)
         try:
-            self.cooker = bb.cooker.BBCooker(self.configuration, self.featureset)
-        except bb.BBHandledException:
-            return None
-        writer.send("r")
-        writer.close()
-        server.cooker = self.cooker
-        server.server_timeout = self.configuration.server_timeout
-        server.xmlrpcinterface = self.configuration.xmlrpcinterface
-        print("Started bitbake server pid %d" % os.getpid())
-        sys.stdout.flush()
+            server = ProcessServer(self.bitbake_lock, self.sock, self.sockname, self.configuration.server_timeout, self.configuration.xmlrpcinterface)
+            os.close(self.readypipe)
+            writer = ConnectionWriter(self.readypipein)
+            try:
+                self.cooker = bb.cooker.BBCooker(self.configuration, self.featureset, server.register_idle_function)
+            except bb.BBHandledException:
+                return None
+            writer.send("r")
+            writer.close()
+            server.cooker = self.cooker
+            print("Started bitbake server pid %d" % os.getpid())
+            sys.stdout.flush()
 
-        server.start()
+            server.run()
+        finally:
+            # Flush any ,essages/errors to the logfile before exit
+            sys.stdout.flush()
+            sys.stderr.flush()
 
 def connectProcessServer(sockname, featureset):
     # Connect to socket

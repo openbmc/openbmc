@@ -78,9 +78,10 @@ class LtpTest(LtpTestBase):
             # copy nice log from DUT
             dst = os.path.join(self.ltptest_log_dir, "%s" %  ltp_group )
             remote_src = "/opt/ltp/results/%s" % ltp_group 
-            (status, output) = self.target.copyFrom(remote_src, dst)
+            (status, output) = self.target.copyFrom(remote_src, dst, True)
             msg = 'File could not be copied. Output: %s' % output
-            self.assertEqual(status, 0, msg=msg)
+            if status:
+                self.target.logger.warning(msg)
 
             parser = LtpParser()
             results, sections  = parser.parse(dst)

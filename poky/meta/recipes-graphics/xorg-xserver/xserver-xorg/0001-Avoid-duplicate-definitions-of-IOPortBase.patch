@@ -1,0 +1,45 @@
+From fc04acfd948ac99d04a5dc08c78f3b13bc0c5c41 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 17 Aug 2020 10:50:51 -0700
+Subject: [PATCH] Avoid duplicate definitions of IOPortBase
+
+This fixed build with gcc10/-fno-common
+
+Fixes
+compiler.h:528: multiple definition of `IOPortBase';
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ hw/xfree86/common/compiler.h            | 2 +-
+ hw/xfree86/os-support/linux/lnx_video.c | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/hw/xfree86/common/compiler.h b/hw/xfree86/common/compiler.h
+index 2b2008b..c7d617e 100644
+--- a/hw/xfree86/common/compiler.h
++++ b/hw/xfree86/common/compiler.h
+@@ -525,7 +525,7 @@ xf86WriteMmio32Le(__volatile__ void *base, const unsigned long offset,
+ #define PORT_SIZE short
+ #endif
+ 
+-_X_EXPORT unsigned int IOPortBase;      /* Memory mapped I/O port area */
++extern _X_EXPORT unsigned int IOPortBase;      /* Memory mapped I/O port area */
+ 
+ static __inline__ void
+ outb(unsigned PORT_SIZE port, unsigned char val)
+diff --git a/hw/xfree86/os-support/linux/lnx_video.c b/hw/xfree86/os-support/linux/lnx_video.c
+index 04e4509..9dc7316 100644
+--- a/hw/xfree86/os-support/linux/lnx_video.c
++++ b/hw/xfree86/os-support/linux/lnx_video.c
+@@ -78,6 +78,7 @@ xf86OSInitVidMem(VidMemInfoPtr pVidMem)
+ /***************************************************************************/
+ /* I/O Permissions section                                                 */
+ /***************************************************************************/
++_X_EXPORT unsigned int IOPortBase;      /* Memory mapped I/O port area */
+ 
+ #if defined(__powerpc__)
+ volatile unsigned char *ioBase = NULL;
+-- 
+2.28.0
+

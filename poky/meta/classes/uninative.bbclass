@@ -56,12 +56,17 @@ python uninative_event_fetchloader() {
             # Our games with path manipulation of DL_DIR mean standard PREMIRRORS don't work
             # and we can't easily put 'chksum' into the url path from a url parameter with
             # the current fetcher url handling
-            ownmirror = d.getVar('SOURCE_MIRROR_URL')
-            if ownmirror:
-                localdata.appendVar("PREMIRRORS", " ${UNINATIVE_URL}${UNINATIVE_TARBALL} ${SOURCE_MIRROR_URL}/uninative/%s/${UNINATIVE_TARBALL}" % chksum)
+            premirrors = bb.fetch2.mirror_from_string(localdata.getVar("PREMIRRORS"))
+            for line in premirrors:
+                try:
+                    (find, replace) = line
+                except ValueError:
+                    continue
+                if find.startswith("http"):
+                    localdata.appendVar("PREMIRRORS", " ${UNINATIVE_URL}${UNINATIVE_TARBALL} %s/uninative/%s/${UNINATIVE_TARBALL}" % (replace, chksum))
 
             srcuri = d.expand("${UNINATIVE_URL}${UNINATIVE_TARBALL};sha256sum=%s" % chksum)
-            bb.note("Fetching uninative binary shim from %s" % srcuri)
+            bb.note("Fetching uninative binary shim %s (will check PREMIRRORS first)" % srcuri)
 
             fetcher = bb.fetch2.Fetch([srcuri], localdata, cache=False)
             fetcher.download()

@@ -1,5 +1,10 @@
 FILES_${PN} += "${datadir}/icons/hicolor"
 
+#gtk+3 reqiure GTK3DISTROFEATURES, DEPENDS on it make all the
+#recipes inherit this class require GTK3DISTROFEATURES
+inherit features_check
+ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
+
 DEPENDS +=" ${@['hicolor-icon-theme', '']['${BPN}' == 'hicolor-icon-theme']} \
             ${@['gdk-pixbuf', '']['${BPN}' == 'gdk-pixbuf']} \
             ${@['gtk+3', '']['${BPN}' == 'gtk+3']} \

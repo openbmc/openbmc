@@ -18,11 +18,11 @@ Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
  linux-user/main.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 6ff7851e..ebff0485 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -78,7 +78,7 @@ int have_guest_base;
+Index: qemu-5.1.0/linux-user/main.c
+===================================================================
+--- qemu-5.1.0.orig/linux-user/main.c
++++ qemu-5.1.0/linux-user/main.c
+@@ -92,7 +92,7 @@ static int last_log_mask;
        (TARGET_LONG_BITS == 32 || defined(TARGET_ABI32))
  /* There are a number of places where we assign reserved_va to a variable
     of type abi_ulong and expect it to fit.  Avoid the last page.  */

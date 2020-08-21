@@ -4991,6 +4991,30 @@
             </glossdef>
         </glossentry>
 
+        <glossentry id='var-FIT_HASH_ALG'><glossterm>FIT_HASH_ALG</glossterm>
+            <info>
+               FIT_HASH_ALG[doc] = "Specifies the hash algorithm used in creating the FIT Image."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+                    Specifies the hash algorithm used in creating the FIT Image.
+                    For e.g. sha256.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-FIT_SIGN_ALG'><glossterm>FIT_SIGN_ALG</glossterm>
+            <info>
+               FIT_SIGN_ALG[doc] = "Specifies the signature algorithm used in creating the FIT Image."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+                    Specifies the signature algorithm used in creating the FIT Image.
+                    For e.g. rsa2048.
+                </para>
+            </glossdef>
+        </glossentry>
+
         <glossentry id='var-FONT_EXTRA_RDEPENDS'><glossterm>FONT_EXTRA_RDEPENDS</glossterm>
             <info>
                 FONT_EXTRA_RDEPENDS[doc] = "When a recipe inherits the fontcache class, this variable specifies runtime dependencies for font packages. This variable defaults to 'fontconfig-utils'."
@@ -5703,7 +5727,7 @@
                 <para role="glossdeffirst">
                     A space-separated list of files installed into the
                     boot partition when preparing an image using the Wic tool
-                    with the <filename>bootimg-partition</filename> source
+                    with the <filename>bootimg-partition</filename> or <filename>bootimg-efi</filename> source
                     plugin.
                     By default, the files are installed under the same name as
                     the source files.
@@ -15960,6 +15984,38 @@
             </glossdef>
         </glossentry>
 
+        <glossentry id='var-UBOOT_DTB_LOADADDRESS'><glossterm>UBOOT_DTB_LOADADDRESS</glossterm>
+            <info>
+               UBOOT_DTB_LOADADDRESS[doc] = "Specifies the load address for the dtb."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+                    Specifies the load address for the dtb image used by U-boot.
+                    During FIT image creation, the
+                    <filename>UBOOT_DTB_LOADADDRESS</filename> variable is used
+                    in <filename>kernel-fitimage</filename> class to specify the
+                    load address to be used in creating the dtb sections of
+                    Image Tree Source for the FIT image.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-UBOOT_DTBO_LOADADDRESS'><glossterm>UBOOT_DTBO_LOADADDRESS</glossterm>
+            <info>
+               UBOOT_DTBO_LOADADDRESS[doc] = "Specifies the load address for the dtbo."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+                    Specifies the load address for the dtbo image used by U-boot.
+                    During FIT image creation, the
+                    <filename>UBOOT_DTBO_LOADADDRESS</filename> variable is used
+                    in <filename>kernel-fitimage</filename> class to specify the
+                    load address to be used in creating the dtbo sections of
+                    Image Tree Source for the FIT image.
+                </para>
+            </glossdef>
+        </glossentry>
+
         <glossentry id='var-UBOOT_ENTRYPOINT'><glossterm>UBOOT_ENTRYPOINT</glossterm>
             <info>
                UBOOT_ENTRYPOINT[doc] = "Specifies the entry point for the U-Boot image."
@@ -16045,6 +16101,51 @@
             </glossdef>
         </glossentry>
 
+        <glossentry id='var-UBOOT_MKIMAGE_DTCOPTS'><glossterm>UBOOT_MKIMAGE_DTCOPTS</glossterm>
+            <info>
+               UBOOT_MKIMAGE_DTCOPTS[doc] = "Options for the device tree compiler passed to mkimage '-D' feature."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+                    Options for the device tree compiler passed to mkimage '-D'
+                    feature while creating FIT image in
+                    <filename>kernel-fitimage</filename> class.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-UBOOT_RD_LOADADDRESS'><glossterm>UBOOT_RD_LOADADDRESS</glossterm>
+            <info>
+               UBOOT_RD_LOADADDRESS[doc] = "Specifies the load address for the ramdisk image."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+                    Specifies the load address for the RAM disk image.
+                    During FIT image creation, the
+                    <filename>UBOOT_RD_LOADADDRESS</filename> variable is used
+                    in <filename>kernel-fitimage</filename> class to specify the
+                    load address to be used in creating the Image Tree Source for
+                    the FIT image.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-UBOOT_RD_ENTRYPOINT'><glossterm>UBOOT_RD_ENTRYPOINT</glossterm>
+            <info>
+               UBOOT_RD_ENTRYPOINT[doc] = "Specifies the entrypoint for the ramdisk image."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+                    Specifies the entrypoint for the RAM disk image.
+                    During FIT image creation, the
+                    <filename>UBOOT_RD_ENTRYPOINT</filename> variable is used
+                    in <filename>kernel-fitimage</filename> class to specify the
+                    entrypoint to be used in creating the Image Tree Source for
+                    the FIT image.
+                </para>
+            </glossdef>
+        </glossentry>
+
         <glossentry id='var-UBOOT_SUFFIX'><glossterm>UBOOT_SUFFIX</glossterm>
             <info>
                UBOOT_SUFFIX[doc] = "Points to the generated U-Boot extension."
@@ -16059,6 +16160,47 @@
                 <para>
                     The default U-Boot extension is
                     <filename>.bin</filename>
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-UBOOT_SIGN_ENABLE'><glossterm>UBOOT_SIGN_ENABLE</glossterm>
+            <info>
+               UBOOT_SIGN_KEYDIR[doc] = "Enable signing of FIT image."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+                    Enable signing of FIT image. The default value is "0".
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-UBOOT_SIGN_KEYDIR'><glossterm>UBOOT_SIGN_KEYDIR</glossterm>
+            <info>
+               UBOOT_SIGN_KEYDIR[doc] = "Location of the directory containing the RSA key and certificate used for signing FIT image."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+                    Location of the directory containing the RSA key and
+                    certificate used for signing FIT image.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-UBOOT_SIGN_KEYNAME'><glossterm>UBOOT_SIGN_KEYNAME</glossterm>
+            <info>
+               UBOOT_SIGN_KEYNAME[doc] = "The name of keys used for signing U-boot FIT image"
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+                    The name of keys used for signing U-boot FIT image stored in
+                    <filename><link linkend='var-UBOOT_SIGN_KEYDIR'>UBOOT_SIGN_KEYDIR</link></filename>
+                    directory. For e.g. dev.key key and dev.crt certificate
+                    stored in
+                    <filename><link linkend='var-UBOOT_SIGN_KEYDIR'>UBOOT_SIGN_KEYDIR</link></filename>
+                    directory will have
+                    <filename><link linkend='var-UBOOT_SIGN_KEYNAME'>UBOOT_SIGN_KEYNAME</link></filename>
+                    set to "dev".
                 </para>
             </glossdef>
         </glossentry>

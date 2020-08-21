@@ -21,7 +21,7 @@ EDEPENDS_GL = "virtual/libgl libdrm"
 EDEPENDS_GLES2 = "virtual/libgles2"
 EDEPENDS_KMS = "libdrm virtual/egl"
 EDEPENDS_EGL = "virtual/egl"
-EDEPENDS_X11 = "virtual/libx11 libxcomposite libxfixes libxi libxrandr"
+EDEPENDS_X11 = "virtual/libx11 libxcomposite libxdamage libxfixes libxrandr"
 EDEPENDS_WAYLAND = "virtual/egl virtual/libgles2 wayland"
 
 # Extra RDEPENDS for PACKAGECONFIG

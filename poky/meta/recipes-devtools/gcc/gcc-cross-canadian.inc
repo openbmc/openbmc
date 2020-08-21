@@ -106,7 +106,7 @@ do_install () {
 	rm -f ${D}${bindir}/*c++
 
 	# We don't care about the gcc-<version> copies
-	rm -f ${D}${bindir}/*gcc-?.?*
+	rm -f ${D}${bindir}/*gcc-${BINV}*
 
 	# Cleanup empty directories which are not shipped
 	# we use rmdir instead of 'rm -f' to ensure the non empty directories are not deleted

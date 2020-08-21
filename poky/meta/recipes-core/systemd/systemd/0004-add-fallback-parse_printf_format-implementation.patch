@@ -22,11 +22,11 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
  create mode 100644 src/basic/parse-printf-format.c
  create mode 100644 src/basic/parse-printf-format.h
 
-diff --git a/meson.build b/meson.build
-index fc216d22da24..a25996803d64 100644
---- a/meson.build
-+++ b/meson.build
-@@ -640,6 +640,7 @@ endif
+Index: systemd-stable/meson.build
+===================================================================
+--- systemd-stable.orig/meson.build
++++ systemd-stable/meson.build
+@@ -638,6 +638,7 @@ endif
  foreach header : ['crypt.h',
                    'linux/memfd.h',
                    'linux/vm_sockets.h',
@@ -34,11 +34,11 @@ index fc216d22da24..a25996803d64 100644
                    'sys/auxv.h',
                    'valgrind/memcheck.h',
                    'valgrind/valgrind.h',
-diff --git a/src/basic/meson.build b/src/basic/meson.build
-index ccb22e159505..25c77ea6bc0e 100644
---- a/src/basic/meson.build
-+++ b/src/basic/meson.build
-@@ -313,6 +313,11 @@ foreach item : [['af',     af_list_txt,     'af',         ''],
+Index: systemd-stable/src/basic/meson.build
+===================================================================
+--- systemd-stable.orig/src/basic/meson.build
++++ systemd-stable/src/basic/meson.build
+@@ -317,6 +317,11 @@ foreach item : [['af',     af_list_txt,
  endforeach
  
  basic_sources += generated_gperf_headers
@@ -50,11 +50,10 @@ index ccb22e159505..25c77ea6bc0e 100644
  basic_gcrypt_sources = files(
          'gcrypt-util.c',
          'gcrypt-util.h')
-diff --git a/src/basic/parse-printf-format.c b/src/basic/parse-printf-format.c
-new file mode 100644
-index 000000000000..49437e544540
+Index: systemd-stable/src/basic/parse-printf-format.c
+===================================================================
 --- /dev/null
-+++ b/src/basic/parse-printf-format.c
++++ systemd-stable/src/basic/parse-printf-format.c
 @@ -0,0 +1,273 @@
 +/*-*- Mode: C; c-basic-offset: 8; indent-tabs-mode: nil -*-*/
 +
@@ -329,11 +328,10 @@ index 000000000000..49437e544540
 +
 +        return last;
 +}
-diff --git a/src/basic/parse-printf-format.h b/src/basic/parse-printf-format.h
-new file mode 100644
-index 000000000000..47be7522d7fa
+Index: systemd-stable/src/basic/parse-printf-format.h
+===================================================================
 --- /dev/null
-+++ b/src/basic/parse-printf-format.h
++++ systemd-stable/src/basic/parse-printf-format.h
 @@ -0,0 +1,57 @@
 +/*-*- Mode: C; c-basic-offset: 8; indent-tabs-mode: nil -*-*/
 +
@@ -392,10 +390,10 @@ index 000000000000..47be7522d7fa
 +size_t parse_printf_format(const char *fmt, size_t n, int *types);
 +
 +#endif /* HAVE_PRINTF_H */
-diff --git a/src/basic/stdio-util.h b/src/basic/stdio-util.h
-index c3b9448d4f4f..2937aa13b178 100644
---- a/src/basic/stdio-util.h
-+++ b/src/basic/stdio-util.h
+Index: systemd-stable/src/basic/stdio-util.h
+===================================================================
+--- systemd-stable.orig/src/basic/stdio-util.h
++++ systemd-stable/src/basic/stdio-util.h
 @@ -1,13 +1,13 @@
  /* SPDX-License-Identifier: LGPL-2.1+ */
  #pragma once
@@ -411,10 +409,10 @@ index c3b9448d4f4f..2937aa13b178 100644
  
  #define snprintf_ok(buf, len, fmt, ...) \
          ((size_t) snprintf(buf, len, fmt, __VA_ARGS__) < (len))
-diff --git a/src/journal/journal-send.c b/src/journal/journal-send.c
-index 912ecef73cce..43ed756bda53 100644
---- a/src/journal/journal-send.c
-+++ b/src/journal/journal-send.c
+Index: systemd-stable/src/journal/journal-send.c
+===================================================================
+--- systemd-stable.orig/src/journal/journal-send.c
++++ systemd-stable/src/journal/journal-send.c
 @@ -2,7 +2,6 @@
  
  #include <errno.h>
@@ -423,7 +421,7 @@ index 912ecef73cce..43ed756bda53 100644
  #include <stddef.h>
  #include <sys/un.h>
  #include <unistd.h>
-@@ -20,6 +19,7 @@
+@@ -21,6 +20,7 @@
  #include "stdio-util.h"
  #include "string-util.h"
  #include "tmpfile-util.h"

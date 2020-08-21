@@ -1,10 +1,4 @@
-Upstream-Status: Backport
-Signed-off-by: Ross Burton <ross.burton@arm.com>
-
-From c42de062bbdc7c31d7181c10a74202d493280ada Mon Sep 17 00:00:00 2001
-From: Explorer09 <explorer09@gmail.com>
-Date: Tue, 27 Feb 2018 09:10:12 +0800
-Subject: [PATCH] build: Move dnl comments out of AC_CHECK_FUNCS
+Subject: build: Move dnl comments out of AC_CHECK_FUNCS
 
 Due to a bug, autoheader (2.69) will treat M4 dnl comments in a quoted
 argument of AC_CHECK_FUNCS as function tokens and generate a lot of
@@ -20,28 +14,20 @@ I have reported the autoheader bug here:
 
 As a workaround, let's move comments out of AC_CHECK_FUNCS.
 
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
 Signed-off-by: Kang-Che Sung <explorer09@gmail.com>
+Signed-off-by: Zang Ruochen <zangrc.fnst@cn.fujitsu.com>
 ---
- configure.ac | 29 +++++++++++++----------------
- 1 file changed, 13 insertions(+), 16 deletions(-)
+ configure.ac | 28 +++++++++++++---------------
+ 1 file changed, 13 insertions(+), 15 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 55e774b0..d0f3b7da 100644
+index 55e774b..5ea3a93 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -166,6 +166,7 @@ strtol dnl
- AC_CHECK_FUNCS([dnl
- pow dnl           Used only by "examples/manual/expr"
- setlocale dnl     Needed only if NLS is enabled
-+reallocarr dnl    NetBSD function. Use reallocarray if not available.
- reallocarray dnl  OpenBSD function. We have replacement if not available.
- ])
- 
-diff --git a/configure.ac b/configure.ac
-index 3c977a4e..9c53590f 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -158,22 +158,19 @@ AC_FUNC_REALLOC
+@@ -153,21 +153,19 @@ AC_FUNC_REALLOC
  AS_IF([test "$cross_compiling" = yes],
     AC_MSG_WARN([result $ac_cv_func_realloc_0_nonnull guessed because of cross compilation]))
  
@@ -58,7 +44,6 @@ index 3c977a4e..9c53590f 100644
 -AC_CHECK_FUNCS([dnl
 -pow dnl           Used only by "examples/manual/expr"
 -setlocale dnl     Needed only if NLS is enabled
--reallocarr dnl    NetBSD function. Use reallocarray if not available.
 -reallocarray dnl  OpenBSD function. We have replacement if not available.
 -])
 +dnl Autoheader (<= 2.69) bug: "dnl" comments in a quoted argument of
@@ -77,3 +62,6 @@ index 3c977a4e..9c53590f 100644
  
  AC_CONFIG_FILES(
  Makefile
+-- 
+2.25.1
+

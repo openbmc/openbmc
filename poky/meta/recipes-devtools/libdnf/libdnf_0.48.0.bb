@@ -8,6 +8,7 @@ SRC_URI = "git://github.com/rpm-software-management/libdnf;branch=dnf-4-master \
            file://0001-Get-parameters-for-both-libsolv-and-libsolvext-libdn.patch \
            file://0001-Add-WITH_TESTS-option.patch \
            file://0001-Look-fo-sphinx-only-if-documentation-is-actually-ena.patch \
+           file://enable_test_data_dir_set.patch \
            "
 
 SRCREV = "46a28d0cf09277fffc11392e5e362a2eda0d53a8"

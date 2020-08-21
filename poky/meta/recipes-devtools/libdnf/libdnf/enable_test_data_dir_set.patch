@@ -1,0 +1,26 @@
+libdnf: allow reproducible binary builds
+
+Use a dummy directory for test data if not built WITH_TESTS.  Allow for overriding
+TESTDATADIR, since the default is guaranteed to be wrong for target builds.
+
+Upstream-Status: Pending
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -133,7 +133,12 @@ add_definitions(-DG_LOG_DOMAIN=\\"libdnf
+ add_definitions(-D_FILE_OFFSET_BITS=64)
+ 
+ # tests
+-add_definitions(-DTESTDATADIR=\\"${CMAKE_SOURCE_DIR}/data/tests\\")
++if(NOT WITH_TESTS)
++  set(TEST_DATA_DIR "/notests")
++elseif(NOT DEFINED TEST_DATA_DIR)
++  set(TEST_DATA_DIR "${CMAKE_SOURCE_DIR}/data/tests")
++endif()
++add_definitions(-DTESTDATADIR=\\"${TEST_DATA_DIR}\\")
+ 
+ # librhsm
+ if(ENABLE_RHSM_SUPPORT)

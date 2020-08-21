@@ -28,4 +28,4 @@ do_install() {
     install -m 0755 pbzip2 ${D}${bindir}/
 }
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

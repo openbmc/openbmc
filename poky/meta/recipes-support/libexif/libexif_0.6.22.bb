@@ -17,3 +17,5 @@ UPSTREAM_CHECK_URI = "https://github.com/libexif/libexif/releases/"
 inherit autotools gettext
 
 EXTRA_OECONF += "--disable-docs"
+
+BBCLASSEXTEND = "native nativesdk"

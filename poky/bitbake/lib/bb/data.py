@@ -161,6 +161,12 @@ def emit_var(var, o=sys.__stdout__, d = init(), all=False):
         return True
 
     if func:
+        # Write a comment indicating where the shell function came from (line number and filename) to make it easier
+        # for the user to diagnose task failures. This comment is also used by build.py to determine the metadata
+        # location of shell functions.
+        o.write("# line: {0}, file: {1}\n".format(
+            d.getVarFlag(var, "lineno", False),
+            d.getVarFlag(var, "filename", False)))
         # NOTE: should probably check for unbalanced {} within the var
         val = val.rstrip('\n')
         o.write("%s() {\n%s\n}\n" % (varExpanded, val))

@@ -10,8 +10,8 @@ SRC_URI[sha256sum] = "833f99b2cbda34e0cfef867ef1d2e6a74fe276bb7fc525a573be32077f
 inherit allarch
 
 do_install() {
-        install -d ${D}/usr/share/alsa
-        cp -r ${S}/topology ${D}/usr/share/alsa
+        install -d "${D}${datadir}/alsa"
+        cp -r "${S}/topology" "${D}${datadir}/alsa"
 }
 
 PACKAGES = "${PN}"

@@ -25,6 +25,7 @@ LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c0bf017c0fd1920e6158a333acabfd4a"
 
 SRC_URI = "git://github.com/rpm-software-management/rpm;branch=rpm-4.15.x \
+           file://environment.d-rpm.sh \
            file://0001-Do-not-add-an-unsatisfiable-dependency-when-building.patch \
            file://0001-Do-not-read-config-files-from-HOME.patch \
            file://0001-When-cross-installing-execute-package-scriptlets-wit.patch \
@@ -112,6 +113,9 @@ do_install_append_class-nativesdk() {
         done
 
         rm -rf ${D}/var
+
+        mkdir -p ${D}${SDKPATHNATIVE}/environment-setup.d
+        install -m 644 ${WORKDIR}/environment.d-rpm.sh ${D}${SDKPATHNATIVE}/environment-setup.d/rpm.sh
 }
 
 # Rpm's make install creates var/tmp which clashes with base-files packaging
@@ -129,6 +133,7 @@ do_install_append () {
 
 FILES_${PN} += "${libdir}/rpm-plugins/*.so \
                "
+FILES_${PN}_append_class-nativesdk = " ${SDKPATHNATIVE}/environment-setup.d/rpm.sh"
 
 FILES_${PN}-dev += "${libdir}/rpm-plugins/*.la \
                     "

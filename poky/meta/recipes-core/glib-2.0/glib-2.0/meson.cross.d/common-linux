@@ -2,4 +2,4 @@
 have_proc_self_cmdline = true
 
 [binaries]
-env = "/usr/bin/env"
+env = '/usr/bin/env'

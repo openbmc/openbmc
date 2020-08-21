@@ -100,8 +100,9 @@ class TinfoilTests(OESelftestTestCase):
             eventreceived = False
             commandcomplete = False
             start = time.time()
-            # Wait for 5s in total so we'd detect spurious heartbeat events for example
-            while time.time() - start < 5:
+            # Wait for 10s in total so we'd detect spurious heartbeat events for example
+            # The test is IO load sensitive too
+            while time.time() - start < 10:
                 event = tinfoil.wait_event(1)
                 if event:
                     if isinstance(event, bb.command.CommandCompleted):

@@ -15,6 +15,7 @@ SRC_URI = "${GNOME_MIRROR}/GConf/${@gnome_verdir("${PV}")}/GConf-${PV}.tar.xz;na
            file://remove_plus_from_invalid_characters_list.patch \
            file://unable-connect-dbus.patch \
            file://create_config_directory.patch \
+           file://python3.patch \
 "
 
 SRC_URI[archive.md5sum] = "2b16996d0e4b112856ee5c59130e822c"
@@ -52,6 +53,8 @@ FILES_${PN} += "${libdir}/GConf/* \
                 ${datadir}/dbus-1/services/*.service \
                 ${datadir}/dbus-1/system-services/*.service \
                "
+RDEPENDS_${PN} = "python3-xml"
+
 FILES_${PN}-dev += "${datadir}/sgml/gconf/gconf-1.0.dtd"
 
 BBCLASSEXTEND = "native"

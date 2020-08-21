@@ -478,7 +478,8 @@ class BaseConfig(object):
                     self.qemu_opt_script += ' -display gtk,show-cursor=on'
             elif arg == 'gl' or arg == 'gl-es':
                 # These args are handled inside sdl or gtk blocks above
-                pass
+                if ('gtk' not in sys.argv) and ('sdl' not in sys.argv):
+                    raise RunQemuError('Option %s also needs gtk or sdl option.' % (arg))
             elif arg == 'egl-headless':
                 self.set_dri_path()
                 self.qemu_opt_script += ' -vga virtio -display egl-headless,show-cursor=on'
@@ -585,10 +586,10 @@ class BaseConfig(object):
                 logger.error("For further help see:")
                 raise RunQemuError(yocto_paravirt_kvm_wiki)
 
-        if not os.access(dev_kvm, os.W_OK|os.R_OK):
+            if not os.access(dev_vhost, os.W_OK|os.R_OK):
                 logger.error("You have no read or write permission on /dev/vhost-net.")
                 logger.error("Please change the ownership of this file as described at:")
-                raise RunQemuError(yocto_kvm_wiki)
+                raise RunQemuError(yocto_paravirt_kvm_wiki)
 
     def check_fstype(self):
         """Check and setup FSTYPE"""

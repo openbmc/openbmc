@@ -11,6 +11,9 @@ SRC_URI = "${DEBIAN_MIRROR}/main/m/${BPN}/${BPN}_${PV}.orig.tar.gz \
            file://allow.to.disable.lockdev.patch \
            file://0001-fix-minicom-h-v-return-value-is-not-0.patch \
            file://0001-Fix-build-issus-surfaced-due-to-musl.patch \
+           file://0001-Drop-superfluous-global-variable-definitions.patch \
+           file://0002-Drop-superfluous-global-variable-definitions.patch \
+           file://0003-Drop-superfluous-global-variable-definitions.patch \
           "
 
 SRC_URI[md5sum] = "9021cb8c5445f6e6e74b2acc39962d62"

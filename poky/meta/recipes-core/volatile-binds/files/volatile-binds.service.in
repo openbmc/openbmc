@@ -10,7 +10,6 @@ ConditionPathIsReadWrite=!@where@
 [Service]
 Type=oneshot
 RemainAfterExit=Yes
-StandardOutput=syslog
 TimeoutSec=0
 ExecStart=/sbin/mount-copybind @what@ @where@
 ExecStop=/bin/umount @where@

@@ -20,11 +20,11 @@ Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
  hw/usb/dev-wacom.c | 94 +++++++++++++++++++++++++++++++++++++++++++++-
  1 file changed, 93 insertions(+), 1 deletion(-)
 
-diff --git a/hw/usb/dev-wacom.c b/hw/usb/dev-wacom.c
-index 8ed57b3b..1502928b 100644
---- a/hw/usb/dev-wacom.c
-+++ b/hw/usb/dev-wacom.c
-@@ -74,6 +74,89 @@ static const USBDescStrings desc_strings = {
+Index: qemu-5.1.0/hw/usb/dev-wacom.c
+===================================================================
+--- qemu-5.1.0.orig/hw/usb/dev-wacom.c
++++ qemu-5.1.0/hw/usb/dev-wacom.c
+@@ -74,6 +74,89 @@ static const USBDescStrings desc_strings
      [STR_SERIALNUMBER]     = "1",
  };
  
@@ -114,7 +114,7 @@ index 8ed57b3b..1502928b 100644
  static const USBDescIface desc_iface_wacom = {
      .bInterfaceNumber              = 0,
      .bNumEndpoints                 = 1,
-@@ -91,7 +174,7 @@ static const USBDescIface desc_iface_wacom = {
+@@ -91,7 +174,7 @@ static const USBDescIface desc_iface_wac
                  0x00,          /*  u8  country_code */
                  0x01,          /*  u8  num_descriptors */
                  0x22,          /*  u8  type: Report */
@@ -123,7 +123,7 @@ index 8ed57b3b..1502928b 100644
              },
          },
      },
-@@ -271,6 +354,15 @@ static void usb_wacom_handle_control(USBDevice *dev, USBPacket *p,
+@@ -271,6 +354,15 @@ static void usb_wacom_handle_control(USB
      }
  
      switch (request) {
@@ -139,6 +139,3 @@ index 8ed57b3b..1502928b 100644
      case WACOM_SET_REPORT:
          if (s->mouse_grabbed) {
              qemu_remove_mouse_event_handler(s->eh_entry);
--- 
-2.24.0
-

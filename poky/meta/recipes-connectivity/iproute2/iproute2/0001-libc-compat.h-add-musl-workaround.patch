@@ -1,4 +1,4 @@
-From b7d96340c55afb7023ded0041107c63dbd886196 Mon Sep 17 00:00:00 2001
+From c25f8d1f7a6203dfeb10b39f80ffd314bb84a58d Mon Sep 17 00:00:00 2001
 From: Baruch Siach <baruch@tkos.co.il>
 Date: Thu, 22 Dec 2016 15:26:30 +0200
 Subject: [PATCH] libc-compat.h: add musl workaround
@@ -14,15 +14,16 @@ https://git.buildroot.net/buildroot/tree/package/iproute2/0001-Add-the-musl-work
 
 Signed-off-by: Baruch Siach <baruch@tkos.co.il>
 Signed-off-by: Maxin B. John <maxin.john@intel.com>
+
 ---
  include/uapi/linux/libc-compat.h | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/include/uapi/linux/libc-compat.h b/include/uapi/linux/libc-compat.h
-index f38571d..30f0b67 100644
+index a159991..22198fa 100644
 --- a/include/uapi/linux/libc-compat.h
 +++ b/include/uapi/linux/libc-compat.h
-@@ -49,10 +49,12 @@
+@@ -50,10 +50,12 @@
  #define _LIBC_COMPAT_H
  
  /* We have included glibc headers... */
@@ -36,6 +37,3 @@ index f38571d..30f0b67 100644
  
  /* GLIBC headers included first so don't define anything
   * that would already be defined. */
--- 
-2.4.0
-

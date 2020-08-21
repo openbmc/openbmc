@@ -131,6 +131,11 @@ do_compile_prepend() {
         export GIR_EXTRA_LIBS_PATH=$B/.libs
 }
 
+do_install_prepend() {
+        # This prevents g-ir-scanner from writing cache data to $HOME
+        export GI_SCANNER_DISABLE_CACHE=1
+}
+
 # Our wrappers need to be available system-wide, because they will be used
 # to build introspection files for all other gobject-based packages
 do_install_append_class-target() {

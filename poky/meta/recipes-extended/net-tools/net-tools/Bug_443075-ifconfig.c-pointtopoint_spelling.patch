@@ -1,0 +1,26 @@
+Description: Accept "pointtopoint" as a synonym for "pointopoint"
+Bug-Debian: https://bugs.debian.org/443075
+Author: Justin Pryzby <pryzbyj@libra>
+
+Upstream-Status: Pending
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
+--- a/ifconfig.c
++++ b/ifconfig.c
+@@ -644,14 +644,14 @@
+ 	    spp++;
+ 	    continue;
+ 	}
+-	if (!strcmp(*spp, "-pointopoint")) {
++	if (!strcmp(*spp, "-pointopoint") || !strcmp(*spp, "-pointtopoint")) {
+ 	    goterr |= clr_flag(ifr.ifr_name, IFF_POINTOPOINT);
+ 	    spp++;
+ 	    if (test_flag(ifr.ifr_name, IFF_POINTOPOINT) > 0)
+ 	    	fprintf(stderr, _("Warning: Interface %s still in POINTOPOINT mode.\n"), ifr.ifr_name);
+ 	    continue;
+ 	}
+-	if (!strcmp(*spp, "pointopoint")) {
++	if (!strcmp(*spp, "pointopoint") || !strcmp(*spp, "pointtopoint")) {
+ 	    if (*(spp + 1) != NULL) {
+ 		spp++;
+ 		safe_strncpy(host, *spp, (sizeof host));

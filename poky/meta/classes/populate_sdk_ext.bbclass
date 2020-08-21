@@ -653,7 +653,10 @@ sdk_ext_postinst() {
 
 		# Make sure when the user sets up the environment, they also get
 		# the buildtools-tarball tools in their path.
+		echo "# Save and reset OECORE_NATIVE_SYSROOT as buildtools may change it" >> $env_setup_script
+		echo "SAVED=\"\$OECORE_NATIVE_SYSROOT\"" >> $env_setup_script
 		echo ". $target_sdk_dir/buildtools/environment-setup*" >> $env_setup_script
+		echo "OECORE_NATIVE_SYSROOT=\"\$SAVED\"" >> $env_setup_script
 	fi
 
 	# Allow bitbake environment setup to be ran as part of this sdk.

@@ -1,0 +1,60 @@
+gconf: use python3
+
+Convert gsettings-schema-convert to use python3.
+
+Upstream-Status: Inappropriate [gconf is deprecated]
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+
+--- a/gsettings/gsettings-schema-convert
++++ b/gsettings/gsettings-schema-convert
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # vim: set ts=4 sw=4 et: coding=UTF-8
+ #
+ # Copyright (c) 2010, Novell, Inc.
+@@ -603,7 +603,7 @@ class SimpleSchemaParser:
+             for line in lines:
+                 current_line_nb += 1
+                 self.parse_line(line)
+-        except GSettingsSchemaConvertException, e:
++        except GSettingsSchemaConvertException as e:
+             raise GSettingsSchemaConvertException('%s:%s: %s' % (os.path.basename(self.file), current_line_nb, e))
+ 
+         return self.root
+@@ -1095,7 +1095,7 @@ def main(args):
+             try:
+                 parser = GConfSchemaParser(argfile, options.gettext_domain, options.schema_id, options.keep_underscores)
+                 schema_root = parser.parse()
+-            except SyntaxError, e:
++            except SyntaxError as e:
+                 raise GSettingsSchemaConvertException('\'%s\' does not look like a valid gconf schema file: %s' % (argfile, e))
+         else:
+             # autodetect if file is XML or not
+@@ -1104,7 +1104,7 @@ def main(args):
+                 schema_root = parser.parse()
+                 if not options.simple and not options.xml:
+                     options.simple = True
+-            except SyntaxError, e:
++            except SyntaxError as e:
+                 parser = SimpleSchemaParser(argfile)
+                 schema_root = parser.parse()
+                 if not options.simple and not options.xml:
+@@ -1127,13 +1127,13 @@ def main(args):
+                 fout = open(options.output, 'w')
+                 fout.write(output)
+                 fout.close()
+-            except GSettingsSchemaConvertException, e:
++            except GSettingsSchemaConvertException as e:
+                 fout.close()
+                 if os.path.exists(options.output):
+                     os.unlink(options.output)
+                 raise e
+ 
+-    except GSettingsSchemaConvertException, e:
++    except GSettingsSchemaConvertException as e:
+         print >> sys.stderr, '%s' % e
+         return 1
+ 

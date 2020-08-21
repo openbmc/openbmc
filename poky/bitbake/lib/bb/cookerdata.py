@@ -143,16 +143,10 @@ class CookerConfiguration(object):
                 setattr(self, key, parameters.options.__dict__[key])
         self.env = parameters.environment.copy()
 
-    def setServerRegIdleCallback(self, srcb):
-        self.server_register_idlecallback = srcb
-
     def __getstate__(self):
         state = {}
         for key in self.__dict__.keys():
-            if key == "server_register_idlecallback":
-                state[key] = None
-            else:
-                state[key] = getattr(self, key)
+            state[key] = getattr(self, key)
         return state
 
     def __setstate__(self,state):

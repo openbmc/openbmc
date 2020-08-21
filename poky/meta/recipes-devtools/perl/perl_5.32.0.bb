@@ -20,6 +20,7 @@ SRC_URI = "https://www.cpan.org/src/5.0/perl-${PV}.tar.gz;name=perl \
            file://0001-configure_path.sh-do-not-hardcode-prefix-lib-as-libr.patch \
            file://0002-Constant-Fix-up-shebang.patch \
            file://determinism.patch  \
+           file://perl-cross-makefile.patch \
            "
 SRC_URI_append_class-native = " \
            file://perl-configpm-switch.patch \
@@ -138,6 +139,11 @@ do_install() {
     # Fix up shared library
     rm ${D}/${libdir}/perl5/${PV}/*/CORE/libperl.so
     ln -sf ../../../../libperl.so.${PERL_LIB_VER} $(echo ${D}/${libdir}/perl5/${PV}/*/CORE)/libperl.so
+
+    # Try to catch Bug #13946
+    if [ -e ${D}/${libdir}/perl5/${PV}/Storable.pm ]; then
+        bbfatal 'non-arch specific Storable.pm found! See https://bugzilla.yoctoproject.org/show_bug.cgi?id=13946'
+    fi
 }
 
 do_install_append_class-target() {

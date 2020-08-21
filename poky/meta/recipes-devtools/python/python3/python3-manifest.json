@@ -285,7 +285,7 @@
             "${libdir}/python${PYTHON_MAJMIN}/operator.py",
             "${libdir}/python${PYTHON_MAJMIN}/optparse.py",
             "${libdir}/python${PYTHON_MAJMIN}/os.py",
-	    "${libdir}/python${PYTHON_MAJMIN}/pathlib.py",
+            "${libdir}/python${PYTHON_MAJMIN}/pathlib.py",
             "${libdir}/python${PYTHON_MAJMIN}/pkgutil.py",
             "${libdir}/python${PYTHON_MAJMIN}/platform.py",
             "${libdir}/python${PYTHON_MAJMIN}/posixpath.py",
@@ -313,6 +313,8 @@
             "${libdir}/python${PYTHON_MAJMIN}/tokenize.py",
             "${libdir}/python${PYTHON_MAJMIN}/traceback.py",
             "${libdir}/python${PYTHON_MAJMIN}/types.py",
+            "${libdir}/python${PYTHON_MAJMIN}/urllib",
+            "${libdir}/python${PYTHON_MAJMIN}/urllib/parse.py",
             "${libdir}/python${PYTHON_MAJMIN}/warnings.py",
             "${libdir}/python${PYTHON_MAJMIN}/weakref.py",
             "${prefix}/lib/python${PYTHON_MAJMIN}/config*/*[!.a]"
@@ -324,7 +326,7 @@
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/_compression.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/_markupbase.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/_sitebuiltins.*.pyc",
-            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/_sysconfigdata.*.pyc",
+            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/_sysconfigdata*.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/_weakrefset.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/abc.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/argparse.*.pyc",
@@ -359,7 +361,7 @@
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/operator.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/optparse.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/os.*.pyc",
-	    "${libdir}/python${PYTHON_MAJMIN}/__pycache__/pathlib.*.pyc",
+            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/pathlib.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/pkgutil.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/platform.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/posixpath.*.pyc",
@@ -397,7 +399,9 @@
             "${libdir}/python${PYTHON_MAJMIN}/importlib/__pycache__",
             "${libdir}/python${PYTHON_MAJMIN}/importlib/__pycache__/abc.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/importlib/__pycache__/machinery.*.pyc",
-            "${libdir}/python${PYTHON_MAJMIN}/importlib/__pycache__/util.*.pyc"
+            "${libdir}/python${PYTHON_MAJMIN}/importlib/__pycache__/util.*.pyc",
+            "${libdir}/python${PYTHON_MAJMIN}/urllib/__pycache__",
+            "${libdir}/python${PYTHON_MAJMIN}/urllib/__pycache__/parse.*.pyc"
         ]
     },
     "crypt": {
@@ -427,7 +431,10 @@
     "ctypes": {
         "summary": "Python C types support",
         "rdepends": [
-            "core"
+            "core",
+            "crypt",
+            "io",
+            "math"
         ],
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/ctypes",
@@ -537,7 +544,10 @@
     "distutils": {
         "summary": "Python Distribution Utilities",
         "rdepends": [
-            "core"
+            "compression",
+            "core",
+            "email",
+            "stringold"
         ],
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/distutils"
@@ -548,7 +558,6 @@
         "summary": "Python framework for running examples in docstrings",
         "rdepends": [
             "asyncio",
-            "compression",
             "core",
             "debugger",
             "difflib",
@@ -577,7 +586,9 @@
             "datetime",
             "io",
             "math",
-            "netclient"
+            "mime",
+            "netclient",
+            "stringold"
         ],
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/email",
@@ -648,7 +659,6 @@
     "io": {
         "summary": "Python low-level I/O",
         "rdepends": [
-            "compression",
             "core",
             "crypt",
             "math",
@@ -690,7 +700,11 @@
         "summary": "Python logging support",
         "rdepends": [
             "core",
-            "stringold"
+            "io",
+            "netserver",
+            "pickle",
+            "stringold",
+            "threading"
         ],
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/logging"
@@ -824,11 +838,18 @@
         "summary": "Python multiprocessing support",
         "rdepends": [
             "core",
+            "crypt",
+            "ctypes",
             "io",
-            "pickle"
+            "math",
+            "mmap",
+            "netclient",
+            "pickle",
+            "threading"
         ],
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_multiprocessing.*.so",
+            "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_posixshmem.*.so",
             "${libdir}/python${PYTHON_MAJMIN}/multiprocessing"
         ],
         "cached": []
@@ -855,10 +876,9 @@
             "${libdir}/python${PYTHON_MAJMIN}/mimetypes.py",
             "${libdir}/python${PYTHON_MAJMIN}/nntplib.py",
             "${libdir}/python${PYTHON_MAJMIN}/poplib.py",
+            "${libdir}/python${PYTHON_MAJMIN}/secrets.py",
             "${libdir}/python${PYTHON_MAJMIN}/smtplib.py",
             "${libdir}/python${PYTHON_MAJMIN}/telnetlib.py",
-            "${libdir}/python${PYTHON_MAJMIN}/urllib",
-            "${libdir}/python${PYTHON_MAJMIN}/urllib/__pycache__",
             "${libdir}/python${PYTHON_MAJMIN}/uuid.py"
         ],
         "cached": [
@@ -868,6 +888,7 @@
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/mimetypes.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/nntplib.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/poplib.*.pyc",
+            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/secrets.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/smtplib.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/telnetlib.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/uuid.*.pyc"
@@ -876,7 +897,6 @@
     "netserver": {
         "summary": "Python Internet Protocol servers",
         "rdepends": [
-            "compression",
             "core",
             "crypt",
             "datetime",
@@ -992,8 +1012,7 @@
     "pydoc": {
         "summary": "Python interactive help support",
         "rdepends": [
-            "core",
-            "netclient"
+            "core"
         ],
         "files": [
             "${bindir}/pydoc*",
@@ -1017,7 +1036,6 @@
     "shell": {
         "summary": "Python shell-like functionality",
         "rdepends": [
-            "compression",
             "core",
             "stringold"
         ],
@@ -1150,7 +1168,6 @@
         "summary": "Python unit testing framework",
         "rdepends": [
             "asyncio",
-            "compression",
             "core",
             "difflib",
             "io",
@@ -1185,7 +1202,6 @@
     "venv": {
         "summary": "Provides support for creating lightweight virtual environments with their own site directories, optionally isolated from system site directories.",
         "rdepends": [
-            "compression",
             "core",
             "logging",
             "stringold"
@@ -1211,7 +1227,21 @@
     "xmlrpc": {
         "summary": "Python XML-RPC support",
         "rdepends": [
+            "compression",
             "core",
+            "crypt",
+            "datetime",
+            "email",
+            "fcntl",
+            "html",
+            "io",
+            "math",
+            "mime",
+            "netclient",
+            "netserver",
+            "numbers",
+            "pydoc",
+            "stringold",
             "xml"
         ],
         "files": [
