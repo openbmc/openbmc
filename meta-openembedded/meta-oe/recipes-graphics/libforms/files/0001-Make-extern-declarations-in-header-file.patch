@@ -1,0 +1,46 @@
+From a57c498f6c25aa297e49533c242525f2b9da7048 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Aug 2020 18:20:42 -0700
+Subject: [PATCH] Make extern declarations in header file
+
+curobj is a static object in other places as well.
+Fixes build with gcc10/-fno-common
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ fdesign/sp_spinner.c | 2 +-
+ lib/flinternal.h     | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/fdesign/sp_spinner.c b/fdesign/sp_spinner.c
+index 04f2c19..6206daa 100644
+--- a/fdesign/sp_spinner.c
++++ b/fdesign/sp_spinner.c
+@@ -29,7 +29,7 @@
+ #include "spec/spinner_spec.h"
+ 
+ static FD_spinnerattrib * spn_attrib;
+-FL_OBJECT *curobj;
++static FL_OBJECT *curobj;
+ 
+ 
+ /***************************************
+diff --git a/lib/flinternal.h b/lib/flinternal.h
+index 06d847e..577bd10 100644
+--- a/lib/flinternal.h
++++ b/lib/flinternal.h
+@@ -138,8 +138,8 @@ enum {
+ 
+ /* events.c or event related */
+ 
+-FL_OBJECT * fli_handled_obj;
+-FL_OBJECT * fli_handled_parent;
++extern FL_OBJECT * fli_handled_obj;
++extern FL_OBJECT * fli_handled_parent;
+ 
+ void fli_obj_queue_delete( void );
+ 
+-- 
+2.28.0
+

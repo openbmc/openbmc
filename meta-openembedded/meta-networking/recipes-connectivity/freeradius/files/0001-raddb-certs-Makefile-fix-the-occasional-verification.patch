@@ -1,0 +1,135 @@
+From 3eda5d35fbaf66ed6bdc86ada4320a0a18681b7e Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Wed, 5 Aug 2020 07:23:11 +0000
+Subject: [PATCH] raddb/certs/Makefile: fix the occasional verification failure
+
+Fixes:
+  # cd /etc/raddb/certs
+  # ./bootstrap
+[snip]
+chmod g+r ca.key
+openssl pkcs12 -in server.p12 -out server.pem -passin pass:'whatever' -passout pass:'whatever'
+chmod g+r server.pem
+C = FR, ST = Radius, O = Example Inc., CN = Example Server Certificate, emailAddress = admin@example.org
+error 7 at 0 depth lookup: certificate signature failure
+140066667427072:error:04067084:rsa routines:rsa_ossl_public_decrypt:data too large for modulus:../openssl-1.1.1g/crypto/rsa/rsa_ossl.c:553:
+140066667427072:error:0D0C5006:asn1 encoding routines:ASN1_item_verify:EVP lib:../openssl-1.1.1g/crypto/asn1/a_verify.c:170:
+error server.pem: verification failed
+make: *** [Makefile:107: server.vrfy] Error 2
+
+It seems the ca.pem mismatchs server.pem which results in failing to
+execute "openssl verify -CAfile ca.pem server.pem", so add to check
+the file to avoid inconsistency.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ raddb/certs/Makefile | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/raddb/certs/Makefile b/raddb/certs/Makefile
+index 77eec9baa1..3dcb63fe71 100644
+--- a/raddb/certs/Makefile
++++ b/raddb/certs/Makefile
+@@ -59,7 +59,7 @@ passwords.mk: server.cnf ca.cnf client.cnf inner-server.cnf
+ #
+ ######################################################################
+ dh:
+-	$(OPENSSL) dhparam -out dh -2 $(DH_KEY_SIZE)
++	@[ -f dh ] || $(OPENSSL) dhparam -out dh -2 $(DH_KEY_SIZE)
+ 
+ ######################################################################
+ #
+@@ -69,17 +69,17 @@ dh:
+ ca.key ca.pem: ca.cnf
+ 	@[ -f index.txt ] || $(MAKE) index.txt
+ 	@[ -f serial ] || $(MAKE) serial
+-	$(OPENSSL) req -new -x509 -keyout ca.key -out ca.pem \
++	@[ -f ca.pem ] || $(OPENSSL) req -new -x509 -keyout ca.key -out ca.pem \
+ 		-days $(CA_DEFAULT_DAYS) -config ./ca.cnf \
+ 		-passin pass:$(PASSWORD_CA) -passout pass:$(PASSWORD_CA)
+ 	chmod g+r ca.key
+ 
+ ca.der: ca.pem
+-	$(OPENSSL) x509 -inform PEM -outform DER -in ca.pem -out ca.der
++	@[ -f ca.der ] || $(OPENSSL) x509 -inform PEM -outform DER -in ca.pem -out ca.der
+ 
+ ca.crl: ca.pem
+-	$(OPENSSL) ca -gencrl -keyfile ca.key -cert ca.pem -config ./ca.cnf -out ca-crl.pem -key $(PASSWORD_CA)
+-	$(OPENSSL) crl -in ca-crl.pem -outform der -out ca.crl
++	@[ -f ca-crl.pem ] || $(OPENSSL) ca -gencrl -keyfile ca.key -cert ca.pem -config ./ca.cnf -out ca-crl.pem -key $(PASSWORD_CA)
++	@[ -f ca.crl ] || $(OPENSSL) crl -in ca-crl.pem -outform der -out ca.crl
+ 	rm ca-crl.pem
+ 
+ ######################################################################
+@@ -88,18 +88,18 @@ ca.crl: ca.pem
+ #
+ ######################################################################
+ server.csr server.key: server.cnf
+-	$(OPENSSL) req -new  -out server.csr -keyout server.key -config ./server.cnf
++	@[ -f server.csr ] || $(OPENSSL) req -new  -out server.csr -keyout server.key -config ./server.cnf
+ 	chmod g+r server.key
+ 
+ server.crt: server.csr ca.key ca.pem
+ 	@[ -f server.crt ] || $(OPENSSL) ca -batch -keyfile ca.key -cert ca.pem -in server.csr  -key $(PASSWORD_CA) -out server.crt -extensions xpserver_ext -extfile xpextensions -config ./server.cnf
+ 
+ server.p12: server.crt
+-	$(OPENSSL) pkcs12 -export -in server.crt -inkey server.key -out server.p12  -passin pass:$(PASSWORD_SERVER) -passout pass:$(PASSWORD_SERVER)
++	@[ -f server.p12 ] || $(OPENSSL) pkcs12 -export -in server.crt -inkey server.key -out server.p12  -passin pass:$(PASSWORD_SERVER) -passout pass:$(PASSWORD_SERVER)
+ 	chmod g+r server.p12
+ 
+ server.pem: server.p12
+-	$(OPENSSL) pkcs12 -in server.p12 -out server.pem -passin pass:$(PASSWORD_SERVER) -passout pass:$(PASSWORD_SERVER)
++	@[ -f server.pem ] || $(OPENSSL) pkcs12 -in server.p12 -out server.pem -passin pass:$(PASSWORD_SERVER) -passout pass:$(PASSWORD_SERVER)
+ 	chmod g+r server.pem
+ 
+ .PHONY: server.vrfy
+@@ -113,18 +113,18 @@ server.vrfy: ca.pem
+ #
+ ######################################################################
+ client.csr client.key: client.cnf
+-	$(OPENSSL) req -new  -out client.csr -keyout client.key -config ./client.cnf
++	@[ -f client.csr ] || $(OPENSSL) req -new  -out client.csr -keyout client.key -config ./client.cnf
+ 	chmod g+r client.key
+ 
+ client.crt: client.csr ca.pem ca.key
+ 	@[ -f client.crt ] || $(OPENSSL) ca -batch -keyfile ca.key -cert ca.pem -in client.csr  -key $(PASSWORD_CA) -out client.crt -extensions xpclient_ext -extfile xpextensions -config ./client.cnf
+ 
+ client.p12: client.crt
+-	$(OPENSSL) pkcs12 -export -in client.crt -inkey client.key -out client.p12  -passin pass:$(PASSWORD_CLIENT) -passout pass:$(PASSWORD_CLIENT)
++	@[ -f client.p12 ] || $(OPENSSL) pkcs12 -export -in client.crt -inkey client.key -out client.p12  -passin pass:$(PASSWORD_CLIENT) -passout pass:$(PASSWORD_CLIENT)
+ 	chmod g+r client.p12
+ 
+ client.pem: client.p12
+-	$(OPENSSL) pkcs12 -in client.p12 -out client.pem -passin pass:$(PASSWORD_CLIENT) -passout pass:$(PASSWORD_CLIENT)
++	@[ -f client.pem ] || $(OPENSSL) pkcs12 -in client.p12 -out client.pem -passin pass:$(PASSWORD_CLIENT) -passout pass:$(PASSWORD_CLIENT)
+ 	chmod g+r client.pem
+ 	cp client.pem $(USER_NAME).pem
+ 
+@@ -139,18 +139,18 @@ client.vrfy: ca.pem client.pem
+ #
+ ######################################################################
+ inner-server.csr inner-server.key: inner-server.cnf
+-	$(OPENSSL) req -new  -out inner-server.csr -keyout inner-server.key -config ./inner-server.cnf
++	@[ -f inner-server.csr] || $(OPENSSL) req -new  -out inner-server.csr -keyout inner-server.key -config ./inner-server.cnf
+ 	chmod g+r inner-server.key
+ 
+ inner-server.crt: inner-server.csr ca.key ca.pem
+-	$(OPENSSL) ca -batch -keyfile ca.key -cert ca.pem -in inner-server.csr  -key $(PASSWORD_CA) -out inner-server.crt -extensions xpserver_ext -extfile xpextensions -config ./inner-server.cnf
++	@[ -f inner-server.crt ] || $(OPENSSL) ca -batch -keyfile ca.key -cert ca.pem -in inner-server.csr  -key $(PASSWORD_CA) -out inner-server.crt -extensions xpserver_ext -extfile xpextensions -config ./inner-server.cnf
+ 
+ inner-server.p12: inner-server.crt
+-	$(OPENSSL) pkcs12 -export -in inner-server.crt -inkey inner-server.key -out inner-server.p12  -passin pass:$(PASSWORD_INNER) -passout pass:$(PASSWORD_INNER)
++	@[ -f inner-server.p12 ] || $(OPENSSL) pkcs12 -export -in inner-server.crt -inkey inner-server.key -out inner-server.p12  -passin pass:$(PASSWORD_INNER) -passout pass:$(PASSWORD_INNER)
+ 	chmod g+r inner-server.p12
+ 
+ inner-server.pem: inner-server.p12
+-	$(OPENSSL) pkcs12 -in inner-server.p12 -out inner-server.pem -passin pass:$(PASSWORD_INNER) -passout pass:$(PASSWORD_INNER)
++	@[ -f inner-server.pem ] || $(OPENSSL) pkcs12 -in inner-server.p12 -out inner-server.pem -passin pass:$(PASSWORD_INNER) -passout pass:$(PASSWORD_INNER)
+ 	chmod g+r inner-server.pem
+ 
+ .PHONY: inner-server.vrfy
+-- 
+2.26.2
+

@@ -100,7 +100,9 @@ do_configure() {
     autoconf213 --macrodir=${STAGING_DATADIR_NATIVE}/autoconf213 old-configure.in > old-configure
 
     cd ${B}
-    ${S}/js/src/configure ${EXTRA_OECONF}
+    # use of /tmp can causes problems on heavily loaded hosts
+    mkdir -p "${B}/lcl_tmp"
+    TMPDIR="${B}/lcl_tmp"  ${S}/js/src/configure ${EXTRA_OECONF}
 
     # Make standard Makefile checks pass
     touch ${S}/js/src/configure
@@ -115,6 +117,14 @@ do_compile_prepend() {
 do_install_prepend() {
     export SHELL="/bin/sh"
     export PYTHONPATH=`cat ${B}/PYTHONPATH`
+}
+
+inherit multilib_script multilib_header
+
+MULTILIB_SCRIPTS += " ${PN}-dev:${bindir}/js60-config"
+
+do_install_append() {
+       oe_multilib_header mozjs-60/js-config.h
 }
 
 PACKAGES =+ "lib${BPN}"

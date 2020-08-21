@@ -3,14 +3,15 @@ LICENSE = "GPLv2+ & LGPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=dd79f6dbbffdbc8e86b086a8f0c0ef43"
 
 DEPENDS = " \
+    glib-2.0-native \
+    libxslt-native \
     acl \
     libatasmart \
     polkit \
     libgudev \
-    dbus-glib \
     glib-2.0 \
+    dbus-glib \
     libblockdev \
-    libxslt-native \
 "
 DEPENDS += "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 
@@ -19,13 +20,13 @@ RDEPENDS_${PN} = "acl"
 SRC_URI = " \
     git://github.com/storaged-project/udisks.git;branch=master \
 "
-PV = "2.8.4+git${SRCREV}"
-SRCREV = "db5f487345da2eaa87976450ea51c2c465d9b82e"
+PV = "2.9.1"
+SRCREV = "95444ab6bf2b8d8c205b540dded4029fcb15f91b"
 S = "${WORKDIR}/git"
 
 CVE_PRODUCT = "udisks"
 
-inherit autotools systemd gtk-doc gobject-introspection gettext features_check
+inherit autotools-brokensep systemd gtk-doc gobject-introspection gettext features_check
 
 REQUIRED_DISTRO_FEATURES = "polkit"
 

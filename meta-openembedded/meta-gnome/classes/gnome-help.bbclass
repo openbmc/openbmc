@@ -9,8 +9,6 @@
 #   else
 #       pack all help files to ${PN}-help-<lingua>
 
-FILES_${PN}-help = "${datadir}/*/translations"
-
 # Dummy to get yelp build & PACKAGE_NO_HELP_SPLIT set 1
 PACKAGES_append = " ${PN}-help"
 FILES_${PN}-help = "${datadir}/help"

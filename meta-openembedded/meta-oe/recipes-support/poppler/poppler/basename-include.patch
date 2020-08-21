@@ -5,6 +5,9 @@ Subject: [PATCH 3/3] Minic GNU basename() API for non-glibc library e.g. musl
 
 Upstream-Status: Pending
 
+Rework for poppler 0.90.1
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Randy MacLeod <Randy.MacLeod@windriver.com>
 ---
@@ -12,7 +15,7 @@ Signed-off-by: Randy MacLeod <Randy.MacLeod@windriver.com>
  1 file changed, 4 insertions(+)
 
 diff --git a/goo/gbasename.cc b/goo/gbasename.cc
-index 830c1c80..e93eb368 100644
+index 69236d8..3858415 100644
 --- a/goo/gbasename.cc
 +++ b/goo/gbasename.cc
 @@ -46,6 +46,10 @@
@@ -23,9 +26,9 @@ index 830c1c80..e93eb368 100644
 +#define basename(src) (strrchr(src,'/') ? strrchr(src,'/')+1 : src)
 +#endif
 +
- std::string gbasename(const char* filename)
+ std::string gbasename(const char *filename)
  {
  #ifdef _MSC_VER
 -- 
-2.17.0
+2.21.3
 

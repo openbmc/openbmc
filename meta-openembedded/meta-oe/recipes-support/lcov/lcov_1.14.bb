@@ -9,8 +9,6 @@ LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
 RDEPENDS_${PN} += " \
-    gcov \
-    gcov-symlinks \
     libjson-perl \
     libperlio-gzip-perl \
     perl \
@@ -44,6 +42,11 @@ RDEPENDS_${PN} += " \
     perl-module-term-cap \
     perl-module-text-parsewords \
     perl-module-tie-hash \
+"
+
+RDEPENDS_${PN}_append_class-target = " \
+    gcov \
+    gcov-symlinks \
 "
 
 SRC_URI = " \

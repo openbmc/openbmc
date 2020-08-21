@@ -1,0 +1,31 @@
+It fails to produce common.o when system load is high:
+
+| In file included from common.c:57:
+| ../include/defs.h:49:10: fatal error: y.tab.h: No such file or directory
+|    49 | #include "y.tab.h"
+|       |          ^~~~~~~~~
+| compilation terminated.
+
+Make $(COMMONOBJS) which include common.o to depends on related header files
+and y.tab.h to fix the parallel build failure.
+
+Upstream-Status: Inappropriate [no upstream]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ src/Makefile.real | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/Makefile.real b/src/Makefile.real
+index e0f0dfc..53d4944 100644
+--- a/src/Makefile.real
++++ b/src/Makefile.real
+@@ -41,7 +41,7 @@ $(SERVER_BIN): $(SERVEROBJS) $(COMMONOBJS) $(MISSINGOBJS)
+ $(CLIENT_BIN): $(CLIENTOBJS) $(COMMONOBJS) $(MISSINGOBJS)
+ 	$(CC) -o $@ $(CLIENTOBJS) $(COMMONOBJS) $(MISSINGOBJS) $(LIBS) $(LDFLAGS)
+ 
+-$(CLIENTOBJS) $(SERVEROBJS): $(HFILES) y.tab.h
++$(COMMONOBJS) $(CLIENTOBJS) $(SERVEROBJS): $(HFILES) y.tab.h
+ 
+ y.tab.h: gram.c
+ 

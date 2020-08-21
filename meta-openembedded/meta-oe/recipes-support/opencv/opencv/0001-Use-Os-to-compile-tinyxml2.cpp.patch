@@ -1,0 +1,31 @@
+From 59fafe6e39759e193b5764b36b4c5a93da352123 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 18 Aug 2020 00:36:49 -0700
+Subject: [PATCH] Use -Os to compile tinyxml2.cpp
+
+This workarounds issue [1] seen on riscv with gcc
+
+[1] https://github.com/riscv/riscv-gnu-toolchain/issues/624
+
+Upstream-Status: Inappropriate [ OE-Specific ]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ modules/datasets/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/datasets/CMakeLists.txt b/modules/datasets/CMakeLists.txt
+index 56ca9e310..99b7a33f6 100644
+--- a/modules/datasets/CMakeLists.txt
++++ b/modules/datasets/CMakeLists.txt
+@@ -2,7 +2,7 @@ set(the_description "datasets framework")
+ 
+ set(filter_srcs "${CMAKE_CURRENT_LIST_DIR}/src/tinyxml2/tinyxml2.cpp")
+ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+-  ocv_append_source_files_cxx_compiler_options(filter_srcs "-Wno-suggest-override")  # GCC
++  ocv_append_source_files_cxx_compiler_options(filter_srcs "-Wno-suggest-override -Os")  # GCC
+ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+   ocv_append_source_files_cxx_compiler_options(filter_srcs "-Wno-inconsistent-missing-override")  # Clang
+ endif()
+-- 
+2.28.0
+

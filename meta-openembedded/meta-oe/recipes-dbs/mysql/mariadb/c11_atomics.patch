@@ -1,7 +1,7 @@
-Author: Vicențiu Ciorbaru <vicentiu@mariadb.org>
-Date:   Fri Dec 21 19:14:04 2018 +0200
-
-   Link with libatomic to enable C11 atomics support
+From 976468458d53d8bb71acf48ddfc852a60557acb9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Vicen=C8=9Biu=20Ciorbaru?= <vicentiu@mariadb.org>
+Date: Thu, 23 Jul 2020 00:02:21 -0700
+Subject: [PATCH] Link with libatomic to enable C11 atomics support
 
    Some architectures (mips) require libatomic to support proper
    atomic operations. Check first if support is available without
@@ -9,10 +9,18 @@ Date:   Fri Dec 21 19:14:04 2018 +0200
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ configure.cmake      | 20 +++++++++++++++++++-
+ mysys/CMakeLists.txt |  4 ++++
+ sql/CMakeLists.txt   |  4 ++++
+ 3 files changed, 27 insertions(+), 1 deletion(-)
 
+diff --git a/configure.cmake b/configure.cmake
+index a355214..6ee595f 100644
 --- a/configure.cmake
 +++ b/configure.cmake
-@@ -926,7 +926,25 @@ int main()
+@@ -865,7 +865,25 @@ int main()
    long long int *ptr= &var;
    return (int)__atomic_load_n(ptr, __ATOMIC_SEQ_CST);
  }"
@@ -39,10 +47,12 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  IF(WITH_VALGRIND)
    SET(HAVE_valgrind 1)
+diff --git a/mysys/CMakeLists.txt b/mysys/CMakeLists.txt
+index 3d8a20e..42f1441 100644
 --- a/mysys/CMakeLists.txt
 +++ b/mysys/CMakeLists.txt
-@@ -78,6 +78,10 @@ TARGET_LINK_LIBRARIES(mysys dbug strings
-  ${LIBNSL} ${LIBM} ${LIBRT} ${LIBDL} ${LIBSOCKET} ${LIBEXECINFO} ${CRC32_LIBRARY})
+@@ -129,6 +129,10 @@ TARGET_LINK_LIBRARIES(mysys dbug strings ${ZLIB_LIBRARY}
+  ${LIBNSL} ${LIBM} ${LIBRT} ${LIBDL} ${LIBSOCKET} ${LIBEXECINFO})
  DTRACE_INSTRUMENT(mysys)
  
 +IF (HAVE_GCC_C11_ATOMICS_WITH_LIBATOMIC)
@@ -52,9 +62,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  IF(HAVE_BFD_H)
    TARGET_LINK_LIBRARIES(mysys bfd)  
  ENDIF(HAVE_BFD_H)
+diff --git a/sql/CMakeLists.txt b/sql/CMakeLists.txt
+index 616017b..53575f6 100644
 --- a/sql/CMakeLists.txt
 +++ b/sql/CMakeLists.txt
-@@ -178,6 +178,10 @@ ELSE()
+@@ -219,6 +219,10 @@ ELSE()
    SET(MYSQLD_SOURCE main.cc ${DTRACE_PROBES_ALL})
  ENDIF()
  
@@ -62,6 +74,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 +  TARGET_LINK_LIBRARIES(sql atomic)
 +ENDIF()
 +
- 
- IF(MSVC AND NOT WITHOUT_DYNAMIC_PLUGINS)
- 
+ IF(MSVC)
+   SET(libs_to_export_symbols sql mysys dbug strings)
+   # Create shared library of already compiled object
+-- 
+2.17.1
+

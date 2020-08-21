@@ -1,0 +1,36 @@
+From 53a4f19887d9ae4e77f32dd6d71c8a7b516b4d5d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Mon, 10 Aug 2020 21:53:33 +0200
+Subject: [PATCH] Do not build tests when introspection is disabled/missing
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fixes:
+| ../libpeas-1.26.0/tests/libpeas/introspection/meson.build:47:0: ERROR: Unknown variable "libpeas_gir".
+
+Upstrem-Status: Submitted[https://gitlab.gnome.org/GNOME/libpeas/-/merge_requests/28]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ meson.build | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 8322fea..43fb062 100644
+--- a/meson.build
++++ b/meson.build
+@@ -254,7 +254,9 @@ subdir('loaders')
+ if build_demos == true
+   subdir('peas-demo')
+ endif
+-subdir('tests')
++if generate_gir == true
++  subdir('tests')
++endif
+ 
+ summary = [
+   '',
+-- 
+2.26.2
+

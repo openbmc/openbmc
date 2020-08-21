@@ -1,0 +1,29 @@
+From fd5251cc8b82ce7a5f907c5129969097d75609fe Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Aug 2020 17:38:59 -0700
+Subject: [PATCH] genisoimage: Add missing extern definition
+
+Fixed build with gcc10
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ genisoimage/genisoimage.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/genisoimage/genisoimage.h b/genisoimage/genisoimage.h
+index bbedfb0..82c859b 100644
+--- a/genisoimage/genisoimage.h
++++ b/genisoimage/genisoimage.h
+@@ -376,7 +376,7 @@ extern int	use_fileversion;
+ extern int	split_SL_component;
+ extern int	split_SL_field;
+ extern char	*trans_tbl;
+-char		*outfile;
++extern char	*outfile;
+ 
+ #define	JMAX		64	/* maximum Joliet file name length (spec) */
+ #define	JLONGMAX	103	/* out of spec Joliet file name length */
+-- 
+2.28.0
+

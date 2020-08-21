@@ -1,0 +1,34 @@
+From 6358561d5bad34f0003ebd415142d504fe53045a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Aug 2020 11:42:08 -0700
+Subject: [PATCH] checkpc: Do not define Mail_fd multiple times
+
+Its also defines in var.c via lp.h this is flagged when -fno-common is
+used
+
+Fixes
+TOPDIR/build/tmp/work/core2-32-yoe-linux/lprng/3.8.C-r0/recipe-sysroot-native/usr/bin/i686-yoe-linux/i686-yoe-linux-ld: vars.o:/usr/src/debug/lprng/3.8.C-r0/build/src/../../lprng-3.8.C/src/include/lp.h:72: multiple definition of `Mail_fd'; checkpc.o:/usr/src/debug/lprng/3.8.C-r0/build/src/../../lprng-3.8.C/src/common/checkpc.c:35: first defined here
+clang-11: error: linker command failed with exit code 1 (use -v to see invocation)
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/common/checkpc.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/src/common/checkpc.c b/src/common/checkpc.c
+index aa03b08..7334094 100644
+--- a/src/common/checkpc.c
++++ b/src/common/checkpc.c
+@@ -32,8 +32,6 @@ static int Remove;
+ static char *User_specified_printer;
+ static time_t Current_time;
+ static int Check_path_list( char *plist, int allow_missing );
+-int Mail_fd;
+-
+ 
+ /* pathnames of the spool directory (sd) and control directory (cd) */
+ 
+-- 
+2.28.0
+

@@ -8,8 +8,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  fileio.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/fileio.c b/fileio.c
-index 48a67a2..9b69665 100644
 --- a/fileio.c
 +++ b/fileio.c
 @@ -12,6 +12,7 @@
@@ -20,6 +18,3 @@ index 48a67a2..9b69665 100644
  #include <dirent.h>
  #include <errno.h>
  #include <fcntl.h>
--- 
-2.12.2
-

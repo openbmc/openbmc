@@ -11,11 +11,14 @@ LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 S = "${WORKDIR}/git"
-SRCREV = "1ccf7e0e3a7a91edbbe3f9f0669c8bbab8248cd1"
+SRCREV = "85134d13eb1ee5a1a7d139cd74ffa10933d73677"
 PV = "0.99+git${SRCPV}"
 
 SRC_URI = " \
         git://github.com/CanonicalLtd/netplan.git \
+        file://0001-dbus-Remove-unused-variabes.patch \
+        file://0002-Makefile-Use-first-prerquisite-only-for-target-rule.patch \
+        file://0001-src-parse.c-Initialize-key-to-NULL.patch \
 "
 
 DEPENDS = "glib-2.0 libyaml ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"

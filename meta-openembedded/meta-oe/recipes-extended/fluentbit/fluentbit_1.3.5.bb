@@ -54,5 +54,7 @@ EXTRA_OECMAKE_append_riscv64 = " -DFLB_DEPS='atomic'"
 
 inherit cmake systemd
 
+CFLAGS += "-fcommon"
+
 SYSTEMD_SERVICE_${PN} = "td-agent-bit.service"
 TARGET_CC_ARCH_append = " ${SELECTED_OPTIMIZATION}"

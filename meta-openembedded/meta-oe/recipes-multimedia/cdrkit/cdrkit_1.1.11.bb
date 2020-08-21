@@ -10,6 +10,7 @@ SRC_URI = "${DEBIAN_MIRROR}/main/c/${BPN}/${BPN}_${PV}.orig.tar.gz \
            file://0001-genisoimage-Fix-fprintf-format-errors.patch \
            file://0001-define-__THROW-to-avoid-build-issue-with-musl.patch \
            file://0002-Do-not-use-rcmd-on-build-with-musl.patch \
+           file://0001-genisoimage-Add-missing-extern-definition.patch \
            "
 SRC_URI[md5sum] = "efe08e2f3ca478486037b053acd512e9"
 SRC_URI[sha256sum] = "d1c030756ecc182defee9fe885638c1785d35a2c2a297b4604c0e0dcc78e47da"

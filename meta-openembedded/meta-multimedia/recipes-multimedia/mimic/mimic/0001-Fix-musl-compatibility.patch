@@ -1,0 +1,30 @@
+From d7d00ec681dc430192cf2192b3de7b7c30c4753d Mon Sep 17 00:00:00 2001
+From: Bart Ribbers <bribbers@disroot.org>
+Date: Sat, 9 May 2020 11:42:32 +0200
+Subject: [PATCH] Fix musl compatibility
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Backport [https://github.com/MycroftAI/mimic1/commit/5282ff075091c3d1a635fb20f2b8a35a377f4b42.patch]
+---
+ src/hts/hts_engine_API/lib/HTS_misc.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/hts/hts_engine_API/lib/HTS_misc.c b/src/hts/hts_engine_API/lib/HTS_misc.c
+index 72306cb..afcaaec 100644
+--- a/src/hts/hts_engine_API/lib/HTS_misc.c
++++ b/src/hts/hts_engine_API/lib/HTS_misc.c
+@@ -247,8 +247,10 @@ size_t HTS_ftell(HTS_File * fp)
+       fgetpos((FILE *) fp->pointer, &pos);
+ #if defined(_WIN32) || defined(__CYGWIN__) || defined(__APPLE__) || defined(__ANDROID__)
+       return (size_t) pos;
+-#else
++#elif defined(__GLIBC__)
+       return (size_t) pos.__pos;
++#else
++      return (size_t) ftell(fp->pointer);
+ #endif                          /* _WIN32 || __CYGWIN__ || __APPLE__ || __ANDROID__ */
+    } else if (fp->type == HTS_DATA) {
+       HTS_Data *d = (HTS_Data *) fp->pointer;
+-- 
+2.28.0
+

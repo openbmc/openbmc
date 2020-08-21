@@ -1,0 +1,37 @@
+From 6dd5b2b1f3ae3479647e2ef66e390d031066defe Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 12 Aug 2020 09:57:23 -0700
+Subject: [PATCH] nettest_omni: Remove duplicate variable definitions
+
+These defines are already defined in nettest_bsd.c and exported by
+nettest_bsd.h this should fix build with -fno-common
+
+Upstream-Status: Submitted [https://github.com/HewlettPackard/netperf/pull/46]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/nettest_omni.c | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/src/nettest_omni.c b/src/nettest_omni.c
+index 852eeb1..862088a 100644
+--- a/src/nettest_omni.c
++++ b/src/nettest_omni.c
+@@ -458,14 +458,6 @@ static int client_port_max = 65535;
+ 
+  /* different options for the sockets				*/
+ 
+-int
+-  loc_nodelay,		/* don't/do use NODELAY	locally		*/
+-  rem_nodelay,		/* don't/do use NODELAY remotely	*/
+-  loc_sndavoid,		/* avoid send copies locally		*/
+-  loc_rcvavoid,		/* avoid recv copies locally		*/
+-  rem_sndavoid,		/* avoid send copies remotely		*/
+-  rem_rcvavoid; 	/* avoid recv_copies remotely		*/
+-
+ extern int
+   loc_tcpcork,
+   rem_tcpcork,
+-- 
+2.28.0
+

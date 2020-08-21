@@ -1,0 +1,57 @@
+From 01f1c05702eb534271777648c976ab6402a5145b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 12 Aug 2020 23:18:30 -0700
+Subject: [PATCH] Define mword16 and mword8 once
+
+Defining them in .h meant they are defined in all .c files including
+this .h file
+
+Fixes build with gcc 10+
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests.c | 9 +++++++++
+ types.h | 9 ---------
+ 2 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/tests.c b/tests.c
+index be1b350..4305bed 100644
+--- a/tests.c
++++ b/tests.c
+@@ -27,6 +27,15 @@ char progress[] = "-\\|/";
+ #define PROGRESSOFTEN 2500
+ #define ONE 0x00000001L
+ 
++union {
++    unsigned char bytes[UL_LEN/8];
++    ul val;
++} mword8;
++
++union {
++    unsigned short u16s[UL_LEN/16];
++    ul val;
++} mword16;
+ /* Function definitions. */
+ 
+ int compare_regions(ulv *bufa, ulv *bufb, size_t count) {
+diff --git a/types.h b/types.h
+index ad7ce73..e14ea32 100644
+--- a/types.h
++++ b/types.h
+@@ -25,12 +25,3 @@ struct test {
+     int (*fp)();
+ };
+ 
+-union {
+-    unsigned char bytes[UL_LEN/8];
+-    ul val;
+-} mword8;
+-
+-union {
+-    unsigned short u16s[UL_LEN/16];
+-    ul val;
+-} mword16;
+-- 
+2.28.0
+

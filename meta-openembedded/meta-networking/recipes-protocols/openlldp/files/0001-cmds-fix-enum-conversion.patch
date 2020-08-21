@@ -1,0 +1,91 @@
+From 090854e09fe18ebf1ba428864895a690086f78ee Mon Sep 17 00:00:00 2001
+From: Aaron Conole <aconole@redhat.com>
+Date: Mon, 19 Aug 2019 11:41:13 -0400
+Subject: [PATCH 1/9] cmds: fix enum conversion
+
+Multiple modules use implicit conversion between enum types, but
+this triggers warnings with some compilers.  ex:
+
+  qbg/vdp_cmds.c:110:39: error: implicit conversion from enumeration type
+      'lldp_cmd' to different enumeration type 'cmd_status'
+      [-Werror,-Wenum-conversion]
+        cmd_status good_cmd = vdp_cmdok(cmd, cmd_gettlv);
+
+Reported-at: https://github.com/intel/openlldp/issues/53
+Signed-off-by: Aaron Conole <aconole@redhat.com>
+---
+ lldp_evb22_cmds.c | 2 +-
+ lldp_evb_cmds.c   | 2 +-
+ qbg/vdp22_cmds.c  | 2 +-
+ qbg/vdp_cmds.c    | 2 +-
+ vdptool.c         | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/lldp_evb22_cmds.c b/lldp_evb22_cmds.c
+index cebfeb2..51810bc 100644
+--- a/lldp_evb22_cmds.c
++++ b/lldp_evb22_cmds.c
+@@ -225,7 +225,7 @@ int evb22_conf_enabletx(char *ifname, enum agent_type type)
+ 				TLVID(OUI_IEEE_8021Qbg22, LLDP_EVB22_SUBTYPE));
+ }
+ 
+-static int evb22_cmdok(struct cmd *cmd, cmd_status expected)
++static int evb22_cmdok(struct cmd *cmd, int expected)
+ {
+ 	if (cmd->cmd != expected)
+ 		return cmd_invalid;
+diff --git a/lldp_evb_cmds.c b/lldp_evb_cmds.c
+index eec4f33..e6af03b 100644
+--- a/lldp_evb_cmds.c
++++ b/lldp_evb_cmds.c
+@@ -163,7 +163,7 @@ int evb_conf_enabletx(char *ifname, enum agent_type type)
+ 	return is_tlv_txenabled(ifname, type, TLVID_8021Qbg(LLDP_EVB_SUBTYPE));
+ }
+ 
+-static int evb_cmdok(struct cmd *cmd, cmd_status expected)
++static int evb_cmdok(struct cmd *cmd, int expected)
+ {
+ 	if (cmd->cmd != expected)
+ 		return cmd_invalid;
+diff --git a/qbg/vdp22_cmds.c b/qbg/vdp22_cmds.c
+index 479b1b0..2e1bbbd 100644
+--- a/qbg/vdp22_cmds.c
++++ b/qbg/vdp22_cmds.c
+@@ -296,7 +296,7 @@ int vdp22_sendevent(struct vdpnl_vsi *p)
+ 	return 0;
+ }
+ 
+-static int vdp22_cmdok(struct cmd *cmd, cmd_status expected)
++static int vdp22_cmdok(struct cmd *cmd, int expected)
+ {
+ 	if (cmd->cmd != expected)
+ 		return cmd_invalid;
+diff --git a/qbg/vdp_cmds.c b/qbg/vdp_cmds.c
+index 95bcfb1..50f2781 100644
+--- a/qbg/vdp_cmds.c
++++ b/qbg/vdp_cmds.c
+@@ -85,7 +85,7 @@ static char *print_mode(char *s, size_t length, struct vsi_profile *p)
+ 	return s;
+ }
+ 
+-static int vdp_cmdok(struct cmd *cmd, cmd_status expected)
++static int vdp_cmdok(struct cmd *cmd, int expected)
+ {
+ 	if (cmd->cmd != expected)
+ 		return cmd_invalid;
+diff --git a/vdptool.c b/vdptool.c
+index 9872348..8f36277 100644
+--- a/vdptool.c
++++ b/vdptool.c
+@@ -141,7 +141,7 @@ static char *print_status(cmd_status status)
+ 		str = "TLV does not support agent type";
+ 		break;
+ 	default:
+-		str = print_vdp_status(status);
++		str = print_vdp_status((enum vdp22_cmd_status)status);
+ 		break;
+ 	}
+ 	return str;
+-- 
+2.28.0
+

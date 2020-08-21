@@ -1,0 +1,57 @@
+From 3c078497e506bd6acb406da5cde7ce20e8896353 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 23 Jul 2020 14:13:59 -0700
+Subject: [PATCH] Makefile: Check for last line only from preprocessed output
+
+This started to fail with glibc 2.32 since glibc added additional
+attributes to functions in signal.h therefore existing regexp started to
+fail as it is not able to handle these functions e.g.
+
+extern int siginterrupt (int __sig, int __interrupt) __attribute__ ((__nothrow__ , __leaf__))
+  __attribute__ ((__deprecated__ ("Use sigaction with SA_RESTART instead")));
+
+grep -v '^\#' | grep '"' | cut -f 2 -d'"'
+bit outside of fd_set selected
+Use sigaction with SA_RESTART instead
+arm
+
+So changing it to
+tail -1 | grep '"' | cut -f 2 -d'"'
+arm
+
+Produces the expected result, this was hidden until now
+
+Upstream-Status: Submitted [https://review.coreboot.org/c/flashrom/+/43770]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Change-Id: I123a046e142d54632f12d54e2aa09b0928c02b91
+---
+ Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 803529f..3795681 100644
+--- a/Makefile
++++ b/Makefile
+@@ -106,7 +106,7 @@ endif
+ # IMPORTANT: The following line must be placed before TARGET_OS is ever used
+ # (of course), but should come after any lines setting CC because the line
+ # below uses CC itself.
+-override TARGET_OS := $(strip $(call debug_shell,$(CC) $(CPPFLAGS) -E os.h 2>/dev/null | grep -v '^\#' | grep '"' | cut -f 2 -d'"'))
++override TARGET_OS := $(strip $(call debug_shell,$(CC) $(CPPFLAGS) -E os.h 2>/dev/null | tail -1 | grep '"' | cut -f 2 -d'"'))
+ 
+ ifeq ($(TARGET_OS), Darwin)
+ override CPPFLAGS += -I/opt/local/include -I/usr/local/include
+@@ -460,8 +460,8 @@ endif
+ # IMPORTANT: The following line must be placed before ARCH is ever used
+ # (of course), but should come after any lines setting CC because the line
+ # below uses CC itself.
+-override ARCH := $(strip $(call debug_shell,$(CC) $(CPPFLAGS) -E archtest.c 2>/dev/null | grep -v '^\#' | grep '"' | cut -f 2 -d'"'))
+-override ENDIAN := $(strip $(call debug_shell,$(CC) $(CPPFLAGS) -E endiantest.c 2>/dev/null | grep -v '^\#'))
++override ARCH := $(strip $(call debug_shell,$(CC) $(CPPFLAGS) -E archtest.c 2>/dev/null | tail -1 | grep '"' | cut -f 2 -d'"'))
++override ENDIAN := $(strip $(call debug_shell,$(CC) $(CPPFLAGS) -E endiantest.c 2>/dev/null | tail -1))
+ 
+ # Disable the internal programmer on unsupported architectures (everything but x86 and mipsel)
+ ifneq ($(ARCH)-little, $(filter $(ARCH),x86 mips)-$(ENDIAN))
+-- 
+2.27.0
+

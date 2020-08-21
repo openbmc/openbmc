@@ -1,0 +1,12 @@
+--- a/Makefile
++++ b/Makefile
+@@ -40,7 +40,8 @@ NPERSHELF=16
+ CONF_SCRIPTS = aoe-discover aoe-interfaces aoe-mkshelf aoe-revalidate aoe-flush aoe-stat
+ PROGS = aoeping aoecfg aoe-sancheck
+ COMMANDS := ${CONF_SCRIPTS} aoe-mkdevs aoe-version coraid-update ${PROGS}
+-CFLAGS = -Wall -O -g
++# We could still override this on the command line.
++CFLAGS += -Wall -O -g
+ SANCHECKLIBS = -lpthread
+ 
+ AOE_PING_OBJ = aoeping.o linux.o

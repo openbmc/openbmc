@@ -9,6 +9,7 @@ SRC_URI = "http://download.savannah.nongnu.org/releases/xforms/xforms-${PV}.tar.
            file://fix-link-to-xforms-man.patch \
            file://add-absolute-path-for-include-dir.patch \
            file://fix-path-fdesign_LDADD.patch \
+           file://0001-Make-extern-declarations-in-header-file.patch \
           "
 
 SRC_URI[md5sum] = "235720a758a8b8d9e6e452dc67190e9b"

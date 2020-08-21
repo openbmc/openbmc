@@ -1,0 +1,33 @@
+From 0edb96a5f79dcec4f4467193716c2bf015fe5132 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 12 Aug 2020 10:38:07 -0700
+Subject: [PATCH 1/2] dbus: Remove unused variabes
+
+Fixes
+src/dbus.c:49:23: error: unused variable 'stdout' [-Werror,-Wunused-variable]
+g_autofree gchar *stdout = NULL;
+^
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/dbus.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/src/dbus.c b/src/dbus.c
+index cb7ec38..a057236 100644
+--- a/src/dbus.c
++++ b/src/dbus.c
+@@ -45,9 +45,6 @@ static int method_apply(sd_bus_message *m, void *userdata, sd_bus_error *ret_err
+ 
+ static int method_info(sd_bus_message *m, void *userdata, sd_bus_error *ret_error) {
+     sd_bus_message *reply = NULL;
+-    g_autoptr(GError) err = NULL;
+-    g_autofree gchar *stdout = NULL;
+-    g_autofree gchar *stderr = NULL;
+     gint exit_status = 0;
+ 
+     exit_status = sd_bus_message_new_method_return(m, &reply);
+-- 
+2.28.0
+

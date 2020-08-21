@@ -28,6 +28,8 @@ S = "${WORKDIR}/DirectFB-${PV}"
 
 LDFLAGS_append = " -lm"
 
+CXXFLAGS_append_toolchain-clang = " -Wno-error=dtor-typedef"
+
 # Workaround for linking issues seen with armv7a + gold
 LDFLAGS_append_arm = "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', ' -fuse-ld=bfd ', '', d)}"
 

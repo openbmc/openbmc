@@ -16,7 +16,9 @@ SRCREV_FORMAT = "vk-gl-cts"
 
 S = "${WORKDIR}/git"
 
-inherit pkgconfig cmake
+inherit pkgconfig cmake features_check
+
+REQUIRED_DISTRO_FEATURES += "opengl"
 
 DEPENDS += "libpng zlib virtual/libgles2 virtual/egl"
 

@@ -1,0 +1,50 @@
+From 016e08ca07f86af9e0131a908a2df116bcb9a48e Mon Sep 17 00:00:00 2001
+From: Martin Schwenke <martin@meltin.net>
+Date: Fri, 5 Jun 2020 22:05:42 +1000
+Subject: [PATCH 3/3] util: Reallocate larger buffer if getpwuid_r() returns
+ ERANGE
+
+Signed-off-by: Martin Schwenke <martin@meltin.net>
+Reviewed-by: Volker Lendecke <vl@samba.org>
+Reviewed-by: Bjoern Jacke <bjacke@samba.org>
+
+Autobuild-User(master): Martin Schwenke <martins@samba.org>
+Autobuild-Date(master): Tue Jun  9 21:07:24 UTC 2020 on sn-devel-184
+
+(cherry picked from commit ddac6b2eb4adaec8fc5e25ca07387d2b9417764c)
+
+Upstream-Status:Backport
+[https://gitlab.com/samba-team/samba/-/commit/016e08ca07f86af9e0131a908a2df116bcb9a48e]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ lib/util/util_paths.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/lib/util/util_paths.c b/lib/util/util_paths.c
+index 9bc6df37e5d..72cc0aab8de 100644
+--- a/lib/util/util_paths.c
++++ b/lib/util/util_paths.c
+@@ -86,6 +86,19 @@ static char *get_user_home_dir(TALLOC_CTX *mem_ctx)
+ 	}
+ 
+ 	rc = getpwuid_r(getuid(), &pwd, buf, len, &pwdbuf);
++	while (rc == ERANGE) {
++		size_t newlen = 2 * len;
++		if (newlen < len) {
++			/* Overflow */
++			goto done;
++		}
++		len = newlen;
++		buf = talloc_realloc_size(mem_ctx, buf, len);
++		if (buf == NULL) {
++			goto done;
++		}
++		rc = getpwuid_r(getuid(), &pwd, buf, len, &pwdbuf);
++	}
+ 	if (rc != 0 || pwdbuf == NULL ) {
+ 		const char *szPath = getenv("HOME");
+ 		if (szPath == NULL) {
+-- 
+2.17.1
+

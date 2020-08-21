@@ -1,0 +1,52 @@
+From d983161415f5f5748fbdbaa5fbd168154ccf8867 Mon Sep 17 00:00:00 2001
+From: Zang Ruochen <zangrc.fnst@cn.fujitsu.com>
+Date: Wed, 5 Aug 2020 12:31:24 +0900
+Subject: [PATCH] Fix build with libmicrohttpd 0.9.71
+
+---
+ src/jsonrpccpp/server/connectors/httpserver.cpp | 2 +-
+ src/jsonrpccpp/server/connectors/httpserver.h   | 8 +++++++-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/src/jsonrpccpp/server/connectors/httpserver.cpp b/src/jsonrpccpp/server/connectors/httpserver.cpp
+index a849615..dd3b841 100644
+--- a/src/jsonrpccpp/server/connectors/httpserver.cpp
++++ b/src/jsonrpccpp/server/connectors/httpserver.cpp
+@@ -151,7 +151,7 @@ void HttpServer::SetUrlHandler(const string &url,
+   this->SetHandler(NULL);
+ }
+ 
+-int HttpServer::callback(void *cls, MHD_Connection *connection, const char *url,
++mhd_result HttpServer::callback(void *cls, MHD_Connection *connection, const char *url,
+                          const char *method, const char *version,
+                          const char *upload_data, size_t *upload_data_size,
+                          void **con_cls) {
+diff --git a/src/jsonrpccpp/server/connectors/httpserver.h b/src/jsonrpccpp/server/connectors/httpserver.h
+index 7785edb..0dcf032 100644
+--- a/src/jsonrpccpp/server/connectors/httpserver.h
++++ b/src/jsonrpccpp/server/connectors/httpserver.h
+@@ -32,6 +32,12 @@ typedef intptr_t ssize_t;
+ #include <map>
+ #include <microhttpd.h>
+ 
++#if MHD_VERSION >= 0x00097002
++#  define mhd_result enum MHD_Result
++#else
++#  define mhd_result int
++#endif
++
+ namespace jsonrpc {
+ /**
+  * This class provides an embedded HTTP Server, based on libmicrohttpd, to
+@@ -79,7 +85,7 @@ private:
+   std::map<std::string, IClientConnectionHandler *> urlhandler;
+   struct sockaddr_in loopback_addr;
+ 
+-  static int callback(void *cls, struct MHD_Connection *connection,
++  static mhd_result callback(void *cls, struct MHD_Connection *connection,
+                       const char *url, const char *method, const char *version,
+                       const char *upload_data, size_t *upload_data_size,
+                       void **con_cls);
+-- 
+2.25.1
+

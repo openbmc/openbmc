@@ -17,4 +17,18 @@ BBCLASSEXTEND = "native"
 
 EXTRA_OECMAKE =  "-DPYBIND11_TEST=OFF"
 
-inherit cmake python3native
+inherit cmake setuptools3 python3native
+
+do_configure() {
+	cmake_do_configure
+}
+
+do_compile() {
+	distutils3_do_compile
+	cmake_do_compile
+}
+
+do_install() {
+	distutils3_do_install
+	cmake_do_install
+}

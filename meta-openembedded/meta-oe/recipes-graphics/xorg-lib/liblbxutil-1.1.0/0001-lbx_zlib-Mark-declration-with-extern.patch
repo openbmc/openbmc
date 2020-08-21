@@ -1,0 +1,36 @@
+From 95ed4b743f197e20f1884a326d5a7128187a7ba6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Aug 2020 17:56:30 -0700
+Subject: [PATCH] lbx_zlib: Mark declration with extern
+
+Fixes build with gcc10/-fno-common
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/lbx_zlib/lbx_zlib.h | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/lbx_zlib/lbx_zlib.h b/src/lbx_zlib/lbx_zlib.h
+index 8ae8956..bec3b96 100644
+--- a/src/lbx_zlib/lbx_zlib.h
++++ b/src/lbx_zlib/lbx_zlib.h
+@@ -136,9 +136,9 @@ extern void Xfree(pointer /*ptr*/);
+ #endif
+ 
+ /* lbx_zlib.c */
+-unsigned long stream_out_compressed;
+-unsigned long stream_out_uncompressed;
+-unsigned long stream_out_plain;
+-unsigned long stream_in_compressed;
+-unsigned long stream_in_uncompressed;
+-unsigned long stream_in_plain;
++extern unsigned long stream_out_compressed;
++extern unsigned long stream_out_uncompressed;
++extern unsigned long stream_out_plain;
++extern unsigned long stream_in_compressed;
++extern unsigned long stream_in_uncompressed;
++extern unsigned long stream_in_plain;
+-- 
+2.28.0
+

@@ -1,24 +1,27 @@
 SUMMARY  = "OpenCL ICD Loader"
 DESCRIPTION = "OpenCL compute ICD Loader from Khronos Group"
-LICENSE  = "Khronos"
-LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=ec724732ce73269486574c718ef0c79b"
+LICENSE  = "Apache-2.0"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 SECTION = "base"
+
+DEPENDS += "opencl-headers"
 
 inherit pkgconfig cmake
 
 S = "${WORKDIR}/git"
-SRCREV = "b342ff7b7f70a4b3f2cfc53215af8fa20adc3d86"
+PV = "2020.06.16+git${SRCPV}"
+SRCREV = "862eebe7ca733c398334a8db8481172a7d3a3c47"
 SRC_URI = "git://github.com/KhronosGroup/OpenCL-ICD-Loader.git"
 
 do_install () {
 	install -d ${D}${bindir}
-	install -m 0755 ${B}/bin/icd_loader_test ${D}${bindir}/
+	install -m 0755 ${B}/test/loader_test/icd_loader_test ${D}${bindir}/
 	chrpath -d ${D}${bindir}/icd_loader_test
 	install -d ${D}${libdir}
-	install -m 0644 ${B}/lib/libIcdLog.so ${D}${libdir}/
-	install -m 0644 ${B}/lib/libOpenCLDriverStub.so ${D}${libdir}/
+	install -m 0644 ${B}/test/log/libIcdLog.so ${D}${libdir}/
+	install -m 0644 ${B}/test/driver_stub/libOpenCLDriverStub.so ${D}${libdir}/
 	chrpath -d ${D}${libdir}/libOpenCLDriverStub.so
-	install -m 0644 ${B}/lib/libOpenCL.so.1.2 ${D}${libdir}/
+	install -m 0644 ${B}/libOpenCL.so.1.2 ${D}${libdir}/
 	cd ${D}${libdir}
 	ln -s libOpenCL.so.1.2 libOpenCL.so.1
 	ln -s libOpenCL.so.1 libOpenCL.so
@@ -41,5 +44,4 @@ FILES_${PN}-dev = " \
 FILES_libicdlog = "${libdir}/libIcdLog.so"
 FILES_libicdlog-dbg = "${libdir}/.debug/libIcdLog.so"
 
-DEPENDS = "opencl-headers"
 RDEPENDS_${PN} = "libicdlog"

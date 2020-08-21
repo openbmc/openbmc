@@ -42,6 +42,8 @@ PACKAGECONFIG[pam] = "--with-libpam, --without-libpam, libpam"
 
 inherit autotools update-rc.d useradd systemd pkgconfig multilib_header
 
+CFLAGS += "-fcommon"
+
 SYSTEMD_PACKAGES = "${PN} ${PN}-bgpd ${PN}-isisd ${PN}-ospf6d ${PN}-ospfd ${PN}-ripd ${PN}-ripngd"
 SYSTEMD_SERVICE_${PN}-bgpd = "bgpd.service"
 SYSTEMD_SERVICE_${PN}-isisd = "isisd.service"

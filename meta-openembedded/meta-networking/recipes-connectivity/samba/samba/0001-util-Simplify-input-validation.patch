@@ -1,0 +1,59 @@
+From f9d9ba6cd06aca053c747c399ba700db80b1623c Mon Sep 17 00:00:00 2001
+From: Martin Schwenke <martin@meltin.net>
+Date: Tue, 9 Jun 2020 11:52:50 +1000
+Subject: [PATCH 1/3] util: Simplify input validation
+
+It appears that snprintf(3) is being used for input validation.
+However, this seems like overkill because it causes szPath to be
+copied an extra time.  The mostly likely protections being sought
+here, according to https://cwe.mitre.org/data/definitions/20.html,
+look to be DoS attacks involving CPU and memory usage.  A simpler
+check that uses strnlen(3) can mitigate against both of these and is
+simpler.
+
+Signed-off-by: Martin Schwenke <martin@meltin.net>
+Reviewed-by: Volker Lendecke <vl@samba.org>
+Reviewed-by: Bjoern Jacke <bjacke@samba.org>
+(cherry picked from commit 922bce2668994dd2a5988c17060f977e9bb0c229)
+
+Upstream-Status:Backport
+[https://gitlab.com/samba-team/samba/-/commit/f9d9ba6cd06aca053c747c399ba700db80b1623c]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ lib/util/util_paths.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/lib/util/util_paths.c b/lib/util/util_paths.c
+index c0ee5c32c30..dec91772d9e 100644
+--- a/lib/util/util_paths.c
++++ b/lib/util/util_paths.c
+@@ -69,21 +69,20 @@ static char *get_user_home_dir(TALLOC_CTX *mem_ctx)
+ 	struct passwd pwd = {0};
+ 	struct passwd *pwdbuf = NULL;
+ 	char buf[NSS_BUFLEN_PASSWD] = {0};
++	size_t len;
+ 	int rc;
+ 
+ 	rc = getpwuid_r(getuid(), &pwd, buf, NSS_BUFLEN_PASSWD, &pwdbuf);
+ 	if (rc != 0 || pwdbuf == NULL ) {
+-		int len_written;
+ 		const char *szPath = getenv("HOME");
+ 		if (szPath == NULL) {
+ 			return NULL;
+ 		}
+-		len_written = snprintf(buf, sizeof(buf), "%s", szPath);
+-		if (len_written >= sizeof(buf) || len_written < 0) {
+-			/* Output was truncated or an error. */
++		len = strnlen(szPath, PATH_MAX);
++		if (len >= PATH_MAX) {
+ 			return NULL;
+ 		}
+-		return talloc_strdup(mem_ctx, buf);
++		return talloc_strdup(mem_ctx, szPath);
+ 	}
+ 
+ 	return talloc_strdup(mem_ctx, pwd.pw_dir);
+-- 
+2.17.1
+

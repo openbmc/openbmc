@@ -13,7 +13,16 @@ S = "${WORKDIR}/git"
 do_install() {
 	install -d ${D}/${CTSDIR}
 	cp -r ${B}/external/openglcts/modules/* ${D}/${CTSDIR}
+
+	install -m 0755 ${B}/modules/egl/deqp-egl ${D}/${CTSDIR}
+	install -m 0755 ${B}/modules/gles2/deqp-gles2 ${D}/${CTSDIR}
+	install -m 0755 ${B}/modules/gles3/deqp-gles3 ${D}/${CTSDIR}
+	install -m 0755 ${B}/modules/gles31/deqp-gles31 ${D}/${CTSDIR}
+	install -m 0755 ${B}/modules/internal/de-internal-tests ${D}/${CTSDIR}
+
 	rm -r ${D}/${CTSDIR}/*.a ${D}/${CTSDIR}/cmake_install.cmake ${D}/${CTSDIR}/CMakeFiles
 	rm -r ${D}/${CTSDIR}/*/*.a ${D}/${CTSDIR}/*/cmake_install.cmake ${D}/${CTSDIR}/*/CMakeFiles
 	rm -r ${D}/${CTSDIR}/common/subgroups/*.a ${D}/${CTSDIR}/common/subgroups/cmake_install.cmake ${D}/${CTSDIR}/common/subgroups/CMakeFiles
 }
+
+SECURITY_CFLAGS_riscv64 = "${SECURITY_NOPIE_CFLAGS}"

@@ -1,0 +1,34 @@
+From 9db49b94336f65453e06fb6a6bc4e6edf9403fea Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 17 Aug 2020 17:22:09 -0700
+Subject: [PATCH] DtaAnnotatedDump: Add typedef name to the union
+
+This is found with clang
+error: anonymous non-C-compatible type given name for linkage purposes by
+typedef declaration; add a tag name here [-Werror,-Wnon-c-typedef-for-linkage]
+| typedef union
+|              ^
+|               CAtomHeader
+
+Upstream-Status: Submitted [https://github.com/Drive-Trust-Alliance/sedutil/pull/332]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Common/DtaAnnotatedDump.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Common/DtaAnnotatedDump.h b/Common/DtaAnnotatedDump.h
+index 2749365..734c8eb 100644
+--- a/Common/DtaAnnotatedDump.h
++++ b/Common/DtaAnnotatedDump.h
+@@ -20,7 +20,7 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ #pragma pack(push,1)
+ 
+-typedef union
++typedef union CAtomHeader_t
+ {
+     // four bytes in big endian (network) byte order
+     uint8_t     all[4];
+-- 
+2.28.0
+

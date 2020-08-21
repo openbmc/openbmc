@@ -1,0 +1,35 @@
+From 1da4451fd3470e6600b027cb78526b440e296f8b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 12 Aug 2020 10:47:08 -0700
+Subject: [PATCH 2/2] Makefile: Use first prerquisite only for target rule
+
+This ensures that src/_features.h is not added to compiler cmdline which
+can confuse the compiler as it may not understand .h as valid input and
+complain
+
+| clang-11: error: cannot specify -o when generating multiple output files
+| make: *** [Makefile:50: netplan-dbus] Error 1
+| make: *** Waiting for unfinished jobs....
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 4495773..c05dea3 100644
+--- a/Makefile
++++ b/Makefile
+@@ -47,7 +47,7 @@ generate: libnetplan.so.$(NETPLAN_SOVER) nm.o networkd.o generate.o sriov.o
+ 	$(CC) $(BUILDFLAGS) $(CFLAGS) $(LDFLAGS) -o $@ $^ -L. -lnetplan `pkg-config --cflags --libs glib-2.0 gio-2.0 yaml-0.1 uuid`
+ 
+ netplan-dbus: src/dbus.c src/_features.h
+-	$(CC) $(BUILDFLAGS) $(CFLAGS) $(LDFLAGS) -o $@ $^ `pkg-config --cflags --libs libsystemd glib-2.0`
++	$(CC) $(BUILDFLAGS) $(CFLAGS) $(LDFLAGS) -o $@ $< `pkg-config --cflags --libs libsystemd glib-2.0`
+ 
+ src/_features.h: src/[^_]*.[hc]
+ 	printf "#include <stddef.h>\nstatic const char *feature_flags[] __attribute__((__unused__)) = {\n" > $@
+-- 
+2.28.0
+

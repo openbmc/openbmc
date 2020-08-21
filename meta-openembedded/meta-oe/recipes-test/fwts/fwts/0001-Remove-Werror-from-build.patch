@@ -11,8 +11,6 @@ Upstream-Status: Pending
  src/utilities/Makefile.am | 2 +-
  3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/src/Makefile.am b/src/Makefile.am
-index 62c9ba8..435ec23 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
 @@ -14,7 +14,7 @@ AM_CPPFLAGS = \
@@ -20,15 +18,13 @@ index 62c9ba8..435ec23 100644
  	`pkg-config --silence-errors --cflags json-c`	\
  	-pthread `pkg-config --cflags glib-2.0 gio-2.0` \
 -	-Wall -Werror -Wextra				\
-+	-Wall -Wextra				\
- 	-Wno-address-of-packed-member
- 
- bin_PROGRAMS = fwts
-diff --git a/src/lib/src/Makefile.am b/src/lib/src/Makefile.am
-index 6bcf9f8..de89bf1 100644
++	-Wall -Wextra					\
+ 	-Wno-address-of-packed-member			\
+ 	-Wfloat-equal -Wmissing-declarations		\
+ 	-Wno-long-long -Wredundant-decls -Wshadow	\
 --- a/src/lib/src/Makefile.am
 +++ b/src/lib/src/Makefile.am
-@@ -24,7 +24,7 @@ AM_CPPFLAGS = \
+@@ -25,7 +25,7 @@ AM_CPPFLAGS = \
  	`pkg-config --silence-errors --cflags json-c`	\
  	`pkg-config --cflags glib-2.0 gio-2.0` 		\
  	-DDATAROOTDIR=\"$(datarootdir)\"		\
@@ -37,8 +33,6 @@ index 6bcf9f8..de89bf1 100644
  	-Wno-address-of-packed-member
  
  pkglib_LTLIBRARIES = libfwts.la
-diff --git a/src/utilities/Makefile.am b/src/utilities/Makefile.am
-index 21f969e..82009a0 100644
 --- a/src/utilities/Makefile.am
 +++ b/src/utilities/Makefile.am
 @@ -16,7 +16,7 @@

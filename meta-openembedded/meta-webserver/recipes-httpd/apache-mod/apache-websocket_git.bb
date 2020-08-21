@@ -13,9 +13,9 @@ RDEPENDS_${PN} += "apache2"
 # fork contains patches from the modules ML and fixes CVE compliance issues
 SRC_URI = "git://github.com/jchampio/apache-websocket.git"
 
-SRCREV = "6968083264b90b89b1b9597a4ca03ba29e7ea2e1"
+SRCREV = "0ee34c77fc78ff08fd548706300b80a7bc7874e4"
 
-PV = "0.1.1+git${SRCPV}"
+PV = "0.1.2+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 

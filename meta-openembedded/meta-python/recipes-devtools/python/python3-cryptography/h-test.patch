@@ -1,0 +1,10 @@
+--- a/tests/hypothesis/__init__.py
++++ b/tests/hypothesis/__init__.py
+@@ -3,3 +3,7 @@
+ # for complete details.
+ 
+ from __future__ import absolute_import, division, print_function
++
++import pytest
++hypothesis = pytest.importorskip("hypothesis")
++

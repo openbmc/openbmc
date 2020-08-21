@@ -1,0 +1,17 @@
+OE configures cairo to disable EGL support, however fbida expects cairo with egl support
+this patch therefore makes it possible to set HAVE_CAIRO_GL via recipe
+
+Upstream-Status: Inappropriate [OE-Specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/GNUmakefile
++++ b/GNUmakefile
+@@ -67,7 +67,7 @@ define make-config
+ LIB		:= $(LIB)
+ RESDIR		:= $(call ac_resdir)
+ HAVE_LINUX_FB_H	:= $(call ac_header,linux/fb.h)
+-HAVE_CAIRO_GL	:= $(call ac_pkg_config,cairo-gl)
++HAVE_CAIRO_GL	?= $(call ac_pkg_config,cairo-gl)
+ HAVE_LIBPCD	:= $(call ac_lib,pcd_open,pcd)
+ HAVE_LIBGIF	:= $(call ac_lib,DGifOpenFileName,gif)
+ HAVE_LIBWEBP	:= $(call ac_pkg_config,libwebp)

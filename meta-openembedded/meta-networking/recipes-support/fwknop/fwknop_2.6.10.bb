@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552 \
 inherit autotools-brokensep
 
 SRC_URI = "http://www.cipherdyne.org/${BPN}/download/${BPN}-${PV}.tar.bz2 \
+           file://0001-Fix-compilation-with-GCC-s-fno-common-flag-fixes-305.patch \
           "
 SRC_URI[md5sum] = "47a9c7c214c40dceb5dc2aa8832e4f32"
 SRC_URI[sha256sum] = "f6c09bec97ed8e474a98ae14f9f53e1bcdda33393f20667b6af3fb6bb894ca77"

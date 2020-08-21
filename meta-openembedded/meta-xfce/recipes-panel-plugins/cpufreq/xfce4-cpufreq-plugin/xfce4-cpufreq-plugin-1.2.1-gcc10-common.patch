@@ -1,0 +1,33 @@
+Fix build with -fno-common
+
+Part of Patch from https://src.fedoraproject.org/rpms/xfce4-cpufreq-plugin/raw/master/f/xfce4-cpufreq-plugin-1.2.1-gcc10-common.patch
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/panel-plugin/xfce4-cpufreq-plugin.c
++++ b/panel-plugin/xfce4-cpufreq-plugin.c
+@@ -37,7 +37,8 @@
+ #include "xfce4-cpufreq-linux.h"
+ #endif /* __linux__ */
+ 
+-
++CpuFreqPlugin *cpuFreq;
++GtkCssProvider *currentProvider;
+ 
+ void
+ cpufreq_label_set_font (void)
+--- a/panel-plugin/xfce4-cpufreq-plugin.h
++++ b/panel-plugin/xfce4-cpufreq-plugin.h
+@@ -93,9 +93,9 @@ typedef struct
+   gint timeoutHandle;
+ } CpuFreqPlugin;
+ 
+-CpuFreqPlugin *cpuFreq;
++extern CpuFreqPlugin *cpuFreq;
+ 
+-GtkCssProvider *currentProvider;
++extern GtkCssProvider *currentProvider;
+ 
+ G_BEGIN_DECLS
+ 

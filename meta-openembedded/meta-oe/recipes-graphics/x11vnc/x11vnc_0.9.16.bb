@@ -7,12 +7,11 @@ LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://src/x11vnc.h;endline=31;md5=e871a2ad004776794b616822dcab6314"
 
-SRCREV = "4ca006fed80410bd9b061a1519bd5d9366bb0bc8"
+SRCREV = "87cd0530f438372dda3c70bb491a6fd19f09acc2"
+PV .= "+git${SRCPV}"
+
 SRC_URI = "git://github.com/LibVNC/x11vnc \
            file://starting-fix.patch \
-           file://0001-misc-Makefile.am-don-t-install-Xdummy-when-configure.patch \
-           file://0001-Fix-build-on-32bit-arches-with-64bit-time_t.patch \
-           file://src-cursor-fix-xfc-NULL-pointer-dereference.patch \
            "
 S = "${WORKDIR}/git"
 

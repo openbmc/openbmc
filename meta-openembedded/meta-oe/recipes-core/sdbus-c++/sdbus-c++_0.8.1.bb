@@ -26,7 +26,12 @@ EXTRA_OECMAKE = "-DBUILD_CODE_GEN=ON \
 
 S = "${WORKDIR}/git"
 
-FILES_${PN}_remove = "${sysconfdir}"
-FILES_${PN}-ptest += "${sysconfdir}/dbus-1/system.d/"
-FILES_${PN}-ptest += "${libdir}/${BPN}/tests"
+do_install_append() {
+    if ! ${@bb.utils.contains('PTEST_ENABLED', '1', 'true', 'false', d)}; then
+        rm -rf ${D}${sysconfdir}/dbus-1
+    fi
+}
+
+PTEST_PATH = "${libdir}/${BPN}/tests"
+FILES_${PN}-ptest =+ "${sysconfdir}/dbus-1/system.d/"
 FILES_${PN}-dev += "${bindir}/sdbus-c++-xml2cpp"

@@ -13,6 +13,7 @@ SRC_URI = "git://github.com/HewlettPackard/netperf.git \
            file://vfork.patch \
            file://init \
            file://0001-netlib.c-Move-including-sched.h-out-og-function.patch \
+           file://0001-nettest_omni-Remove-duplicate-variable-definitions.patch \
            "
 
 SRCREV = "f482bab49fcedee46fc5b755da127f608325cd13"

@@ -7,7 +7,9 @@ inherit xfce-panel-plugin
 
 SRC_URI[md5sum] = "7327c4c316ebd5d93665e77b432b8d89"
 SRC_URI[sha256sum] = "3dc6643d2c064b7718badff44b948f8d410f00f13db197820b26ae38045f5112"
-SRC_URI += "file://0001-Do-not-check-for-sys-class-power_supply-we-are-cross.patch"
+SRC_URI += "file://0001-Do-not-check-for-sys-class-power_supply-we-are-cross.patch \
+            file://0001-Fix-multiple-definition-errors-under-GCC-10.0.patch \
+           "
 
 EXTRA_OECONF = " \
     --disable-procacpi \

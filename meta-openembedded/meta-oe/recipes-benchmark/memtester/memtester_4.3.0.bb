@@ -5,9 +5,10 @@ LICENSE = "GPLv2"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3"
 
-SRC_URI = "http://pyropus.ca/software/memtester/old-versions/${BP}.tar.gz"
-SRC_URI += "file://Makefile.patch"
-
+SRC_URI = "http://pyropus.ca/software/memtester/old-versions/${BP}.tar.gz \
+           file://Makefile.patch \
+           file://0001-Define-mword16-and-mword8-once.patch \
+           "
 SRC_URI[md5sum] = "598f41b7308e1f736164bca3ab84ddbe"
 SRC_URI[sha256sum] = "f9dfe2fd737c38fad6535bbab327da9a21f7ce4ea6f18c7b3339adef6bf5fd88"
 

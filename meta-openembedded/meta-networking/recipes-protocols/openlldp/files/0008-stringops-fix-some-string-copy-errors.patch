@@ -1,0 +1,61 @@
+From 61291de03cb6dd1aea2a633eb72951f3fe453e7f Mon Sep 17 00:00:00 2001
+From: Aaron Conole <aconole@redhat.com>
+Date: Mon, 3 Aug 2020 15:33:08 -0400
+Subject: [PATCH 8/9] stringops: fix some string copy errors
+
+Reported when using gcc-10.
+
+Signed-off-by: Aaron Conole <aconole@redhat.com>
+---
+ dcb_protocol.c | 13 ++++---------
+ lldp/ports.c   |  2 +-
+ 2 files changed, 5 insertions(+), 10 deletions(-)
+
+diff --git a/dcb_protocol.c b/dcb_protocol.c
+index 75ca139..930251b 100644
+--- a/dcb_protocol.c
++++ b/dcb_protocol.c
+@@ -2257,13 +2257,8 @@ cmd_status get_bwg_descrpt(char *device_name, u8 bwgid, char **name)
+ 
+ 	if ((it != NULL) &&
+ 		(bwgid < it->second->max_pgid_desc)) {
+-		size = (int)strlen(it->second->pgid_desc[bwgid]) +
+-			sizeof(char);  /* Localization OK */
+-		*name = (char*)malloc(size);
+-		if (*name != NULL) {
+-			strncpy(*name, it->second->pgid_desc[bwgid],
+-					size); /* Localization OK */
+-		} else {
++		*name = strdup(it->second->pgid_desc[bwgid]);
++		if (*name == NULL) {
+ 			goto Error;
+ 		}
+ 	} else {
+@@ -2272,9 +2267,9 @@ cmd_status get_bwg_descrpt(char *device_name, u8 bwgid, char **name)
+ 			size = (int)strlen(
+ 				attribs.descript.pgid_desc[bwgid]) +
+ 				sizeof(char);
+-			*name = (char*)malloc(size);
++			*name = (char*)calloc(size, sizeof(char));
+ 			if (*name != NULL) {
+-				memcpy(*name, attribs.descript.pgid_desc[bwgid], size); /* Localization OK */
++				memcpy(*name, attribs.descript.pgid_desc[bwgid], size - 1); /* Localization OK */
+ 			} else {
+ 				goto Error;
+ 			}
+diff --git a/lldp/ports.c b/lldp/ports.c
+index 6384f14..9b681f7 100644
+--- a/lldp/ports.c
++++ b/lldp/ports.c
+@@ -264,7 +264,7 @@ struct port *add_port(int ifindex, const char *ifname)
+ 	memset(newport, 0, sizeof(*newport));
+ 	newport->ifindex = ifindex;
+ 	newport->next = NULL;
+-	strncpy(newport->ifname, ifname, IFNAMSIZ);
++	strncpy(newport->ifname, ifname, IFNAMSIZ - 1);
+ 
+ 	newport->bond_master = is_bond(ifname);
+ 	/* Initialize relevant port variables */
+-- 
+2.28.0
+

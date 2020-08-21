@@ -9,6 +9,7 @@ DEPENDS = "ncurses"
 SRC_URI = "http://hisham.hm/htop/releases/${PV}/${BP}.tar.gz \
            file://0001-Use-pkg-config.patch \
            file://0001-Ask-for-python3-specifically.patch \
+           file://htop-gcc10.patch \
            "
 SRC_URI[md5sum] = "0d816b6beed31edc75babcfbf863ffa8"
 SRC_URI[sha256sum] = "d9d6826f10ce3887950d709b53ee1d8c1849a70fa38e91d5896ad8cbc6ba3c57"

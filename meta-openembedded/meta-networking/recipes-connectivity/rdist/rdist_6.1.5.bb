@@ -28,6 +28,7 @@ SRC_URI += "file://rdist-6.1.5-linux.patch \
             file://rdist-6.1.5-fix-msgsndnotify-loop.patch \
             file://rdist-6.1.5-bb-build.patch \
             file://rdist-6.1.5-makefile-add-ldflags.patch \
+            file://rdist-6.1.5-fix-parallel-build.patch \
 "
 
 UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/rdist/files/rdist/"

@@ -1,0 +1,41 @@
+From 542380a13f178d97851751b57054a6b5be555d1c Mon Sep 17 00:00:00 2001
+From: Jens Rehsack <sno@netbsd.org>
+Date: Thu, 13 Aug 2020 16:16:44 +0200
+Subject: [PATCH 2/2] test/test_x509.c: fix potential overflow issue
+
+Instead of doing a memcpy() which does static overflow checking, use
+snprintf() for string copying which does the check dynamically.
+
+Fixes:
+| In file included from .../recipe-sysroot/usr/include/string.h:519,
+|                  from test/test_x509.c:27:
+| In function 'memcpy',
+|     inlined from 'parse_keyvalue' at test/test_x509.c:845:2,
+|     inlined from 'process_conf_file' at test/test_x509.c:1360:7,
+|     inlined from 'main' at test/test_x509.c:2038:2:
+| .../recipe-sysroot/usr/include/bits/string_fortified.h:34:10: warning: '__builtin_memcpy' specified bound 4294967295 exceeds maximum object size 2147483647 [-Wstringop-overflow=]
+|    34 |   return __builtin___memcpy_chk (__dest, __src, __len, __bos0 (__dest));
+|       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Signed-off-by: Jens Rehsack <sno@netbsd.org>
+---
+ test/test_x509.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/test/test_x509.c b/test/test_x509.c
+index 2c61cf5..76f6ab9 100644
+--- a/test/test_x509.c
++++ b/test/test_x509.c
+@@ -842,8 +842,7 @@ parse_keyvalue(HT *d)
+ 		return -1;
+ 	}
+ 	name = xmalloc(u + 1);
+-	memcpy(name, buf, u);
+-	name[u] = 0;
++	snprintf(name, u, "%s", buf);
+ 	if (HT_get(d, name) != NULL) {
+ 		xfree(name);
+ 		return -1;
+-- 
+2.17.1
+

@@ -1,0 +1,42 @@
+From 428f9f3c4a5be973e4c7fc1325ae9dbe41040df2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Aug 2020 17:47:35 -0700
+Subject: [PATCH] bitbang: Make bitbang_swd extern definition
+
+Fixes build with gcc10+
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/jtag/drivers/bitbang.c | 1 +
+ src/jtag/drivers/bitbang.h | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/jtag/drivers/bitbang.c b/src/jtag/drivers/bitbang.c
+index b5078c080..f8612aade 100644
+--- a/src/jtag/drivers/bitbang.c
++++ b/src/jtag/drivers/bitbang.c
+@@ -43,6 +43,7 @@ static int bitbang_stableclocks(int num_cycles);
+ static void bitbang_swd_write_reg(uint8_t cmd, uint32_t value, uint32_t ap_delay_clk);
+ 
+ struct bitbang_interface *bitbang_interface;
++const struct swd_driver bitbang_swd;
+ 
+ /* DANGER!!!! clock absolutely *MUST* be 0 in idle or reset won't work!
+  *
+diff --git a/src/jtag/drivers/bitbang.h b/src/jtag/drivers/bitbang.h
+index 577717ebd..0faf5d9ae 100644
+--- a/src/jtag/drivers/bitbang.h
++++ b/src/jtag/drivers/bitbang.h
+@@ -57,7 +57,7 @@ struct bitbang_interface {
+ 	void (*swdio_drive)(bool on);
+ };
+ 
+-const struct swd_driver bitbang_swd;
++extern const struct swd_driver bitbang_swd;
+ 
+ extern bool swd_mode;
+ 
+-- 
+2.28.0
+

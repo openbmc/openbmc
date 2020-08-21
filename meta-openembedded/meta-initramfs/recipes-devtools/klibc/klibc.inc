@@ -35,7 +35,7 @@ SRC_URI[sha256sum] = "abef2637ca823485d9c90ce9512e2b08a65047ec4da204635eeaef95a4
 
 S = "${WORKDIR}/klibc-${PV}"
 
-OPTFLAGS = "${TUNE_CCARGS} -Os"
+OPTFLAGS = "${TUNE_CCARGS} -Os -fcommon"
 OPTFLAGS_append_toolchain-clang = " -fno-builtin-bcmp"
 OPTFLAGS_append_toolchain-clang_mipsarch = " -no-integrated-as"
 
