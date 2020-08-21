@@ -85,6 +85,10 @@ MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS += "${@oe.utils.conditional('ENABLE_IR', '1'
 
 SERIAL_CONSOLES_CHECK ??= "${SERIAL_CONSOLES}"
 
+# The name of the deploy directory for raspberry pi boot files.
+# This variable is referred to by recipes fetching / generating the files.
+BOOTFILES_DIR_NAME ?= "bootfiles"
+
 # Set Raspberrypi splash image
 SPLASH = "psplash-raspberrypi"
 
@@ -111,14 +115,14 @@ def make_dtb_boot_files(d):
     return ' '.join([transform(dtb) for dtb in alldtbs.split(' ') if dtb])
 
 
-IMAGE_BOOT_FILES ?= "bcm2835-bootfiles/* \
+IMAGE_BOOT_FILES ?= "${BOOTFILES_DIR_NAME}/* \
                  ${@make_dtb_boot_files(d)} \
                  ${@bb.utils.contains('RPI_USE_U_BOOT', '1', \
                     '${KERNEL_IMAGETYPE} u-boot.bin;${SDIMG_KERNELIMAGE} boot.scr', \
                     '${KERNEL_IMAGETYPE};${SDIMG_KERNELIMAGE}', d)} \
                  "
 do_image_wic[depends] += " \
-    bcm2835-bootfiles:do_deploy \
+    bootfiles:do_deploy \
     ${@bb.utils.contains('RPI_USE_U_BOOT', '1', 'u-boot:do_deploy', '',d)} \
     "
 

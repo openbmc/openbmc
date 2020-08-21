@@ -1,7 +1,7 @@
-LINUX_VERSION ?= "5.4.51"
+LINUX_VERSION ?= "5.4.58"
 LINUX_RPI_BRANCH ?= "rpi-5.4.y"
 
-SRCREV = "95a969f451f6ed61029741411c1c9aa44023e465"
+SRCREV = "4592a094787fa6a2ac1e95e96abfe4d7124dbb3a"
 
 require linux-raspberrypi_5.4.inc
 

@@ -131,10 +131,10 @@ do_compile_append() {
 
 do_deploy_append() {
     # Deploy cmdline.txt
-    install -d ${DEPLOYDIR}/bcm2835-bootfiles
+    install -d ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}
     PITFT="${@bb.utils.contains("MACHINE_FEATURES", "pitft", "1", "0", d)}"
     if [ ${PITFT} = "1" ]; then
         PITFT_PARAMS="fbcon=map:10 fbcon=font:VGA8x8"
     fi
-    echo "${CMDLINE}${PITFT_PARAMS}" > ${DEPLOYDIR}/bcm2835-bootfiles/cmdline.txt
+    echo "${CMDLINE}${PITFT_PARAMS}" > ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/cmdline.txt
 }
