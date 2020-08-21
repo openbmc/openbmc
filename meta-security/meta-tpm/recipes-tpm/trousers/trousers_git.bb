@@ -16,6 +16,7 @@ SRC_URI = " \
     	file://tcsd.service \
         file://get-user-ps-path-use-POSIX-getpwent-instead-of-getpwe.patch \
         file://0001-build-don-t-override-localstatedir-mandir-sysconfdir.patch \
+        file://0001-Correct-multiple-security-issues-that-are-present-if.patch \
     	"
 
 S = "${WORKDIR}/git"

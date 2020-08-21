@@ -28,7 +28,7 @@ RDEPENDS_packagegroup-security-utils = "\
     python3-scapy \
     ding-libs \
     keyutils \
-    libseccomp \
+    ${@bb.utils.contains_any("TUNE_FEATURES", "riscv32 ", "", " libseccomp",d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "sssd", "",d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "pax", "pax-utils", "",d)} \
     "
@@ -37,9 +37,7 @@ SUMMARY_packagegroup-security-scanners = "Security scanners"
 RDEPENDS_packagegroup-security-scanners = "\
     nikto \
     checksecurity \
-    clamav \
-    clamav-freshclam \
-    clamav-cvd \
+    ${@bb.utils.contains_any("TUNE_FEATURES", "riscv32 riscv64", "", " clamav clamav-freshclam clamav-cvd",d)} \
     "
 
 SUMMARY_packagegroup-security-audit = "Security Audit tools "
