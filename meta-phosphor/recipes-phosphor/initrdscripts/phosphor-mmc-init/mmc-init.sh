@@ -48,7 +48,10 @@ mkdir -p $rodir
 if ! mount /dev/disk/by-partlabel/"$(get_root)" $rodir -t ext4 -o ro; then
     /bin/sh
 fi
-if ! mount /dev/disk/by-partlabel/rwfs $rodir/var -t ext4 -o rw; then
+
+rwfsdev="/dev/disk/by-partlabel/rwfs"
+fsck.ext4 -p "${rwfsdev}"
+if ! mount "${rwfsdev}" $rodir/var -t ext4 -o rw; then
     /bin/sh
 fi
 
