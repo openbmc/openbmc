@@ -19,19 +19,15 @@ FLASH_UBI_OVERLAY_BASETYPE ?= "ubifs"
 FLASH_EXT4_BASETYPE ?= "ext4"
 FLASH_EXT4_OVERLAY_BASETYPE ?= "ext4"
 
-IMAGE_TYPES += "mtd-static mtd-static-alltar mtd-static-tar mtd-ubi mtd-ubi-tar mmc-verity mmc-ext4-tar"
+IMAGE_TYPES += "mtd-static mtd-static-alltar mtd-static-tar mtd-ubi mtd-ubi-tar mmc-ext4-tar"
 
 IMAGE_TYPEDEP_mtd-static = "${IMAGE_BASETYPE}"
 IMAGE_TYPEDEP_mtd-static-tar = "${IMAGE_BASETYPE}"
 IMAGE_TYPEDEP_mtd-static-alltar = "mtd-static"
 IMAGE_TYPEDEP_mtd-ubi = "${FLASH_UBI_BASETYPE}"
 IMAGE_TYPEDEP_mtd-ubi-tar = "${FLASH_UBI_BASETYPE}"
-IMAGE_TYPEDEP_mmc-verity = "${FLASH_EXT4_BASETYPE}"
 IMAGE_TYPEDEP_mmc-ext4-tar = "${FLASH_EXT4_BASETYPE}"
-IMAGE_TYPES_MASKED += "mtd-static mtd-static-alltar mtd-static-tar mtd-ubi mtd-ubi-tar mmc-verity mmc-ext4-tar"
-
-IMAGE_BLOCK_SIZE ?= "4096"
-EXTRA_IMAGECMD_ext4 = "-b ${IMAGE_BLOCK_SIZE}"
+IMAGE_TYPES_MASKED += "mtd-static mtd-static-alltar mtd-static-tar mtd-ubi mtd-ubi-tar mmc-ext4-tar"
 
 # Flash characteristics in KB unless otherwise noted
 DISTROOVERRIDES .= ":flash-${FLASH_SIZE}"
@@ -223,95 +219,6 @@ do_make_ubi[depends] += " \
         u-boot:do_populate_sysroot \
         mtd-utils-native:do_populate_sysroot \
         "
-
-python do_generate_mmc_verity() {
-    import os
-    import subprocess
-
-    rootfs_image = os.path.join(d.getVar('IMGDEPLOYDIR', True),
-                                '%s.%s' % (
-                                    d.getVar('IMAGE_LINK_NAME', True),
-                                    d.getVar('FLASH_EXT4_BASETYPE', True)))
-
-    verity_image = 'verity-%s.%s' % (
-                            d.getVar('IMAGE_LINK_NAME', True),
-                            d.getVar('FLASH_EXT4_BASETYPE', True))
-
-    subprocess.check_call(['dd',
-                           'if=%s' % rootfs_image,
-                           'of=%s' % verity_image])
-
-    # dm-verity values
-    sector_size = 512
-    block_size = int(d.getVar('IMAGE_BLOCK_SIZE', True))
-    verity_algo = "sha256"
-    rootfs_image_size = os.stat(rootfs_image).st_size
-
-    def align_up(number, boundary):
-        return ((number + (boundary - 1)) // boundary) * boundary
-
-    # verity metadata must be aligned on the block boundary subsequent to the
-    # end of the data
-    verity_hash_offset = align_up(rootfs_image_size, block_size)
-
-    verity_hash_blocks = verity_hash_offset // block_size
-
-    # the output of 'veritysetup format' looks like:
-    # VERITY header information for obmc-phosphor-image-witherspoon.squashfs-xz
-    # UUID:                269b5934-de5b-45b0-99a3-56b219a7b544
-    # Hash type:           1
-    # Data blocks:         4523
-    # Data block size:     4096
-    # Hash block size:     4096
-    # Hash algorithm:      sha256
-    # Salt:                8fca9eff342fc0cf2964057257ea80813a223cb2e540a38458142edeb190e12e
-    # Root hash:           38ef00d23fa89300dcf66e7494d25246d03bf846b4119b34e7b1587c0b6fe1d9
-    verity_hash_file = "verity-hash-verification-data"
-    with open(verity_hash_file, 'w') as f:
-       subprocess.check_call(['veritysetup',
-                              'format',
-                              '--hash=%s'% verity_algo,
-                              '--data-block-size=%i' % block_size,
-                              '--hash-block-size=%i' % block_size,
-                              '--hash-offset=%i' % verity_hash_offset,
-                              '%s' % verity_image,
-                              '%s' % verity_image], stdout=f, stderr=f)
-
-    for line in open(verity_hash_file, "r"):
-        if "Salt" in line:
-            verity_salt = line.split()[-1]
-        if "Root" in line:
-            verity_root = line.split()[-1]
-
-    verity_image_size = os.stat(verity_image).st_size
-
-    # Make an appropriately sized image for MMC
-    mmc_image_name = "%s.mmc" % d.getVar('IMAGE_NAME', True)
-    mmc_image_path = os.path.join(d.getVar('IMGDEPLOYDIR', True),
-                                    '%s' % mmc_image_name)
-
-    # CSD size accommodates MMC limitations that are relevant to QEMU
-    csd_size = (1 << (9 + 9 - 1 + 2))
-
-    with open(mmc_image_path, 'w') as fd:
-        os.posix_fallocate(fd.fileno(), 0, align_up(verity_image_size, csd_size))
-    subprocess.check_call(['dd',
-                           'if=%s' % verity_image,
-                           'of=%s' % mmc_image_path,
-                           'conv=notrunc'])
-
-    os.chdir("%s" % d.getVar('IMGDEPLOYDIR', True))
-    mmc_link_name = os.path.join(d.getVar('IMGDEPLOYDIR', True),
-                                '%s.mmc' % d.getVar('IMAGE_LINK_NAME', True))
-    if os.path.lexists(mmc_link_name):
-        os.remove(mmc_link_name)
-    os.symlink(mmc_image_name, mmc_link_name)
-}
-do_generate_mmc_verity[dirs] = "${S}/mmc"
-do_generate_mmc_verity[depends] += " \
-    ${PN}:do_image_${FLASH_EXT4_BASETYPE} \
-    cryptsetup-native:do_populate_sysroot \
-    "
 
 do_mk_static_nor_image() {
 	# Assemble the flash image
@@ -638,10 +545,6 @@ python() {
                 'do_image_complete',
                 'do_generate_rwfs_ubi do_generate_phosphor_manifest', d)
 
-    if 'mmc-verity' in types:
-        bb.build.addtask(
-                'do_generate_mmc_verity',
-                'do_image_complete','', d)
     if 'mmc-ext4-tar' in types:
         bb.build.addtask(
                 'do_generate_ext4_tar',
