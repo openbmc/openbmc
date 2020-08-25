@@ -5,8 +5,3 @@ RDEPENDS_${PN}_remove = " \
               powertop \
               latencytop \
               "
-
-RRECOMMENDS_${PN}_remove = " \
-                 perf \
-                 trace-cmd \
-                 "
