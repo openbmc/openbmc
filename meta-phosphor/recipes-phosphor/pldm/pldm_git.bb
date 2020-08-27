@@ -17,6 +17,7 @@ DEPENDS += "cli11"
 S = "${WORKDIR}/git"
 
 SYSTEMD_SERVICE_${PN} += "pldmd.service"
+SYSTEMD_SERVICE_${PN} += "pldmSoftPowerOff.service"
 
 EXTRA_OEMESON = " \
         -Dtests=disabled \
