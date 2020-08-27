@@ -787,7 +787,7 @@
 0xB0: &present
   entityID: 0x04
   entityInstance: 0x30
-  sensorType: 0x0D
+  sensorType: 0x25
   path: /xyz/openbmc_project/inventory/system/chassis/motherboard/nvme0
   sensorReadingType: 0x6F
   mutability: Mutability::Write|Mutability::Read
@@ -799,9 +799,11 @@
       Present:
         Offsets:
           0x00:
-            type: bool
             assert: true
-            deassert: false
+            type: bool
+          0x01:
+            assert: false
+            type: bool
 
 0xB1:
   <<: *present
@@ -1114,31 +1116,63 @@
   path: /xyz/openbmc_project/inventory/system/chassis/gpios/ss_cab3_prsnt
 
 0xF5:
-  <<: *gpio_prsnt
-  entityInstance: 4
+  entityID: 0x1A
+  entityInstance: 0
+  interfaces:
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        Offsets:
+          0x00:
+            assert: true
+            type: bool
+          0x01:
+            assert: false
+            type: bool
+  mutability: Mutability::Write|Mutability::Read
   path: /xyz/openbmc_project/inventory/system/chassis/gpios/sata0_prsnt
+  readingType: assertion
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 0x6f
+  sensorType: 0x25
+  serviceInterface: org.freedesktop.DBus.Properties
 
 0xF6:
   <<: *gpio_prsnt
-  entityInstance: 5
+  entityInstance: 4
   path: /xyz/openbmc_project/inventory/system/chassis/gpios/hsbp_cab_prsnt
 
 0xF7:
   <<: *gpio_prsnt
-  entityInstance: 6
+  entityInstance: 5
   path: /xyz/openbmc_project/inventory/system/chassis/gpios/fanbd_cab_prsnt
 
 0xF8:
   <<: *gpio_prsnt
-  entityInstance: 7
+  entityInstance: 6
   path: /xyz/openbmc_project/inventory/system/chassis/gpios/bp12v_cab_prsnt
 
-0xF9:
-  <<: *gpio_prsnt
-  entityInstance: 8
+0xF9: &card_prsnt
+  entityID: 0x0B
+  entityInstance: 0
+  interfaces:
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        Offsets:
+          0x00:
+            assert: true
+            type: bool
+          0x01:
+            assert: false
+            type: bool
+  mutability: Mutability::Write|Mutability::Read
   path: /xyz/openbmc_project/inventory/system/chassis/gpios/pe_slot0_prsnt
+  readingType: assertion
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 0x6f
+  sensorType: 0x25
+  serviceInterface: org.freedesktop.DBus.Properties
 
 0xFA:
-  <<: *gpio_prsnt
-  entityInstance: 9
+  <<: *card_prsnt
+  entityInstance: 1
   path: /xyz/openbmc_project/inventory/system/chassis/gpios/pe_slot1_prsnt
