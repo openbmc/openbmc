@@ -84,3 +84,11 @@ disable_systemd_pager() {
         echo "SYSTEMD_PAGER=" >> ${IMAGE_ROOTFS}${sysconfdir}/profile
         echo "export SYSTEMD_PAGER" >> ${IMAGE_ROOTFS}${sysconfdir}/profile
 }
+
+enable_ldap_nsswitch() {
+    sed -i 's/\(\(passwd\|group\|shadow\):\s*\).*/\1files ldap/' \
+        "${IMAGE_ROOTFS}${sysconfdir}/nsswitch.conf"
+}
+
+ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('IMAGE_FEATURES', 'obmc-user-mgmt-ldap', 'enable_ldap_nsswitch ;', '', d)}"
+
