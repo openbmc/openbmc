@@ -12,7 +12,6 @@ inherit meson
 
 DEPENDS += " nlohmann-json"
 DEPENDS += " sdbusplus"
-DEPENDS += " sdbusplus-native"
 DEPENDS += " sdeventplus"
 DEPENDS += " phosphor-dbus-interfaces"
 RDEPENDS_${PN} += " bash"
