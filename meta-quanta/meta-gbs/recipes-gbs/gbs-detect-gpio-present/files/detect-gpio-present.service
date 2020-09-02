@@ -1,7 +1,7 @@
 [Unit]
 Description=Detect GPIO Present Manager
 After=phosphor-gpio-presence@.service
-Requires=phosphor-gpio-presence@.service
+Wants=phosphor-gpio-presence@.service
 
 [Service]
 ExecStart=/usr/bin/detect-gpio-present.sh

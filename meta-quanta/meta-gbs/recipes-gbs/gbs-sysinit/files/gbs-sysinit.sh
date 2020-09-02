@@ -25,12 +25,13 @@ pe_eeprom_addr=( 50 54 )
 SERVICE_NAME="xyz.openbmc_project.Inventory.Manager"
 INTERFACE_NAME="xyz.openbmc_project.Inventory.Item"
 
-PE_PRESENT_OBJPATH=("/xyz/openbmc_project/inventory/system/chassis/gpios/pe_slot0_prsnt"
-"/xyz/openbmc_project/inventory/system/chassis/gpios/pe_slot1_prsnt")
-HSBP_PRESENT_OBJPATH="/xyz/openbmc_project/inventory/system/chassis/gpios/hsbp_cab_prsnt"
-FANBD_PRESENT_OBJPATH="/xyz/openbmc_project/inventory/system/chassis/gpios/fanbd_cab_prsnt"
-BP12V_PRESENT_OBJPATH="/xyz/openbmc_project/inventory/system/chassis/gpios/bp12v_cab_prsnt"
-SATA0_PRESENT_OBJPATH="/xyz/openbmc_project/inventory/system/chassis/gpios/sata0_prsnt"
+PE_PRESENT_OBJPATH=("/xyz/openbmc_project/inventory/system/chassis/entity/pe_slot0_prsnt"
+"/xyz/openbmc_project/inventory/system/chassis/entity/pe_slot1_prsnt")
+HSBP_PRESENT_OBJPATH="/xyz/openbmc_project/inventory/system/chassis/cable/hsbp_cab_prsnt"
+FANBD_PRESENT_OBJPATH="/xyz/openbmc_project/inventory/system/chassis/cable/fanbd_cab_prsnt"
+BP12V_PRESENT_OBJPATH="/xyz/openbmc_project/inventory/system/chassis/cable/bp12v_cab_prsnt"
+SATA0_PRESENT_OBJPATH="/xyz/openbmc_project/inventory/system/chassis/entity/sata0_prsnt"
+
 
 set_gpio_persistence() {
   reg_val=$(devmem ${WD1RCR_ADDR} 32)

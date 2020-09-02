@@ -1093,7 +1093,7 @@
             assert: false
             type: bool
   mutability: Mutability::Write|Mutability::Read
-  path: /xyz/openbmc_project/inventory/system/chassis/gpios/ss_cab0_prsnt
+  path: /xyz/openbmc_project/inventory/system/chassis/cable/ss_cab0_prsnt
   readingType: assertion
   sensorNamePattern: nameLeaf
   sensorReadingType: 0x6f
@@ -1103,17 +1103,17 @@
 0xF2:
   <<: *gpio_prsnt
   entityInstance: 1
-  path: /xyz/openbmc_project/inventory/system/chassis/gpios/ss_cab1_prsnt
+  path: /xyz/openbmc_project/inventory/system/chassis/cable/ss_cab1_prsnt
 
 0xF3:
   <<: *gpio_prsnt
   entityInstance: 2
-  path: /xyz/openbmc_project/inventory/system/chassis/gpios/ss_cab2_prsnt
+  path: /xyz/openbmc_project/inventory/system/chassis/cable/ss_cab2_prsnt
 
 0xF4:
   <<: *gpio_prsnt
   entityInstance: 3
-  path: /xyz/openbmc_project/inventory/system/chassis/gpios/ss_cab3_prsnt
+  path: /xyz/openbmc_project/inventory/system/chassis/cable/ss_cab3_prsnt
 
 0xF5:
   entityID: 0x1A
@@ -1129,7 +1129,7 @@
             assert: false
             type: bool
   mutability: Mutability::Write|Mutability::Read
-  path: /xyz/openbmc_project/inventory/system/chassis/gpios/sata0_prsnt
+  path: /xyz/openbmc_project/inventory/system/chassis/entity/sata0_prsnt
   readingType: assertion
   sensorNamePattern: nameLeaf
   sensorReadingType: 0x6f
@@ -1139,17 +1139,17 @@
 0xF6:
   <<: *gpio_prsnt
   entityInstance: 4
-  path: /xyz/openbmc_project/inventory/system/chassis/gpios/hsbp_cab_prsnt
+  path: /xyz/openbmc_project/inventory/system/chassis/cable/hsbp_cab_prsnt
 
 0xF7:
   <<: *gpio_prsnt
   entityInstance: 5
-  path: /xyz/openbmc_project/inventory/system/chassis/gpios/fanbd_cab_prsnt
+  path: /xyz/openbmc_project/inventory/system/chassis/cable/fanbd_cab_prsnt
 
 0xF8:
   <<: *gpio_prsnt
   entityInstance: 6
-  path: /xyz/openbmc_project/inventory/system/chassis/gpios/bp12v_cab_prsnt
+  path: /xyz/openbmc_project/inventory/system/chassis/cable/bp12v_cab_prsnt
 
 0xF9: &card_prsnt
   entityID: 0x0B
@@ -1165,7 +1165,7 @@
             assert: false
             type: bool
   mutability: Mutability::Write|Mutability::Read
-  path: /xyz/openbmc_project/inventory/system/chassis/gpios/pe_slot0_prsnt
+  path: /xyz/openbmc_project/inventory/system/chassis/entity/pe_slot0_prsnt
   readingType: assertion
   sensorNamePattern: nameLeaf
   sensorReadingType: 0x6f
@@ -1175,4 +1175,4 @@
 0xFA:
   <<: *card_prsnt
   entityInstance: 1
-  path: /xyz/openbmc_project/inventory/system/chassis/gpios/pe_slot1_prsnt
+  path: /xyz/openbmc_project/inventory/system/chassis/entity/pe_slot1_prsnt
