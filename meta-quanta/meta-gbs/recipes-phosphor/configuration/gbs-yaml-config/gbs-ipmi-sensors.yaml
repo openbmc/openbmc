@@ -154,7 +154,7 @@
   sensorType: 0x02
   path: /xyz/openbmc_project/sensors/voltage/p1v8_stby
   sensorReadingType: 0x01
-  multiplierM: 235
+  multiplierM: 78
   offsetB: 0
   bExp: 0
   rExp: -4
@@ -295,7 +295,7 @@
   sensorType: 0x03
   path: /xyz/openbmc_project/sensors/current/vddcr_cpu_in
   sensorReadingType: 0x01
-  multiplierM: 78
+  multiplierM: 86
   rExp: -3
   unit: xyz.openbmc_project.Sensor.Value.Unit.Amperes
   mutability: Mutability::Read
@@ -313,8 +313,8 @@
   <<: *current
   entityInstance: 0x15
   path: /xyz/openbmc_project/sensors/current/vddcr_cpu_out
-  multiplierM: 98
-  rExp: -2
+  multiplierM: 1
+  rExp: 0
 
 # PVDDCR_SOC0
 0x3E:
@@ -483,7 +483,7 @@
   entityID: 0x0E
   entityInstance: 0x02
   path: /xyz/openbmc_project/sensors/current/hotswap_iout
-  multiplierM: 353
+  multiplierM: 216
   rExp: -3
 
 0x70:
@@ -883,7 +883,7 @@
 0xC0: &nvme_power
   entityID: 0x04
   entityInstance: 0x40
-  sensorType: 0x00
+  sensorType: 0xC0
   path: /xyz/openbmc_project/control/nvme/u2_0_pwr_dis
   sensorReadingType: 0x03
   mutability: Mutability::Write|Mutability::Read
