@@ -1,0 +1,31 @@
+# LAYER_CONF_VERSION is increased each time build/conf/bblayers.conf
+# changes incompatibly
+LCONF_VERSION = "8"
+
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+
+BBLAYERS ?= " \
+  ##OEROOT##/meta \
+  ##OEROOT##/meta-openembedded/meta-oe \
+  ##OEROOT##/meta-openembedded/meta-networking \
+  ##OEROOT##/meta-openembedded/meta-perl \
+  ##OEROOT##/meta-openembedded/meta-python \
+  ##OEROOT##/meta-openembedded/meta-webserver \
+  ##OEROOT##/meta-phosphor \
+  ##OEROOT##/meta-hpe/meta-gxp \
+  ##OEROOT##/meta-hpe \
+  ##OEROOT##/meta-hpe/meta-dl360poc \
+  "
+BBLAYERS_NON_REMOVABLE ?= " \
+  ##OEROOT##/meta \
+  ##OEROOT##/meta-openembedded/meta-oe \
+  ##OEROOT##/meta-openembedded/meta-networking \
+  ##OEROOT##/meta-openembedded/meta-perl \
+  ##OEROOT##/meta-openembedded/meta-python \
+  ##OEROOT##/meta-openembedded/meta-webserver \
+  ##OEROOT##/meta-phosphor \
+  ##OEROOT##/meta-hpe/meta-gxp \
+  ##OEROOT##/meta-hpe \
+  ##OEROOT##/meta-hpe/meta-dl360poc \
+  "
