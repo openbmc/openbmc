@@ -1,4 +1,4 @@
-EXTRA_OECMAKE_append_df-openpower = " \
-    -DBMCWEB_ENABLE_REDFISH_DBUS_LOG_ENTRIES=ON \
-    -DBMCWEB_HTTP_REQ_BODY_LIMIT_MB=400 \
+EXTRA_OEMESON_append_df-openpower = " \
+    -Dredfish-dbus-log=enabled \
+    -Dhttp-body-limit=400 \
     "
