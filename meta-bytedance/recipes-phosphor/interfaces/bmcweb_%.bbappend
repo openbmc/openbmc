@@ -1,1 +1,1 @@
-EXTRA_OECMAKE_append = " -DBMCWEB_ENABLE_DBUS_REST=ON"
+EXTRA_OEMESON_append = " -Drest=enabled"
