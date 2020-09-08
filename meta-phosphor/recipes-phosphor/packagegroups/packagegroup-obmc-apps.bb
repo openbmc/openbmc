@@ -13,6 +13,7 @@ PACKAGES = " \
         ${PN}-extras \
         ${PN}-devtools \
         ${PN}-fan-control \
+        ${PN}-health-monitor \
         ${PN}-host-state-mgmt \
         ${PN}-ikvm \
         ${PN}-inventory \
@@ -80,6 +81,11 @@ SUMMARY_${PN}-fan-control = "Fan control"
 RDEPENDS_${PN}-fan-control = " \
         ${VIRTUAL-RUNTIME_obmc-fan-control} \
         phosphor-fan-monitor \
+        "
+
+SUMMARY_${PN}-health-monitor = "Support for health monitoring"
+RDEPENDS_${PN}-health-monitor = " \
+        phosphor-health-monitor \
         "
 
 SUMMARY_${PN}-host-state-mgmt = "Host state management"
