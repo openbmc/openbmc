@@ -23,8 +23,3 @@ PACKAGECONFIG[libphosphor_dbus] = " \
         systemd sdbusplus, \
         libsystemd \
         "
-
-PACKAGECONFIG_remove_class-native = "libphosphor_dbus"
-PACKAGECONFIG_remove_class-nativesdk = "libphosphor_dbus"
-
-BBCLASSEXTEND += "native nativesdk"
