@@ -15,11 +15,6 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 S="${WORKDIR}/git/tools"
 
-# Provide these aliases temporarily until everyone can move over to the
-# new package name.
-PROVIDES_class-native += "sdbusplus-native"
-PROVIDES_class-nativesdk += "sdbusplus-nativesdk"
-
 DEPENDS += " \
     autoconf-archive-native \
     ${PYTHON_PN}-inflection-native \
