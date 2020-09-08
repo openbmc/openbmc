@@ -10,16 +10,12 @@ inherit autotools pkgconfig
 inherit python3native
 inherit phosphor-dbus-yaml
 
-DEPENDS += "autoconf-archive-native"
-DEPENDS += "${PYTHON_PN}-sdbus++-native"
+DEPENDS += " \
+        ${PYTHON_PN}-sdbus++-native \
+        autoconf-archive-native \
+        sdbusplus \
+        systemd \
+        "
 
 SRC_URI = "git://github.com/openbmc/phosphor-dbus-interfaces"
 SRCREV = "11699d678d4166ff4b23900f31794754f305df64"
-
-PACKAGECONFIG ??= "libphosphor_dbus"
-PACKAGECONFIG[libphosphor_dbus] = " \
-        --enable-libphosphor_dbus, \
-        --disable-libphosphor_dbus, \
-        systemd sdbusplus, \
-        libsystemd \
-        "
