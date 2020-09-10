@@ -316,6 +316,11 @@
   multiplierM: 1
   rExp: 0
 
+0x27:
+  <<: *temperature
+  entityInstance: 0x28
+  path: /xyz/openbmc_project/sensors/temperature/vddcr_cpu
+
 # PVDDCR_SOC0
 0x3E:
   <<: *voltage_13v5_in
@@ -345,7 +350,12 @@
   multiplierM: 345
   rExp: -3
 
-# PVDDQ_ABCD
+0x28:
+  <<: *temperature
+  entityInstance: 0x29
+  path: /xyz/openbmc_project/sensors/temperature/vddcr_soc
+
+# PVDDIO_ABCD
 0x40:
   <<: *voltage
   entityInstance: 0x10
@@ -374,7 +384,12 @@
   multiplierM: 345
   rExp: -3
 
-# PVDDQ_EFGH
+0x29:
+  <<: *temperature
+  entityInstance: 0x2a
+  path: /xyz/openbmc_project/sensors/temperature/vddio_abcd
+
+# PVDDIO_EFGH
 0x42:
   <<: *voltage
   entityInstance: 0x12
@@ -402,6 +417,11 @@
   path: /xyz/openbmc_project/sensors/current/vddio_efgh_out
   multiplierM: 345
   rExp: -3
+
+0x2A:
+  <<: *temperature
+  entityInstance: 0x2b
+  path: /xyz/openbmc_project/sensors/temperature/vddio_efgh
 
 # P12V_1
 0x47:
@@ -432,6 +452,11 @@
   multiplierM: 59
   rExp: -2
 
+0x2B:
+  <<: *temperature
+  entityInstance: 0x2c
+  path: /xyz/openbmc_project/sensors/temperature/p12v_mobo
+
 # P12V_2
 0x49:
   <<: *voltage
@@ -460,6 +485,11 @@
   path: /xyz/openbmc_project/sensors/current/p12v_fan_out
   multiplierM: 59
   rExp: -2
+
+0x2C:
+  <<: *temperature
+  entityInstance: 0x2d
+  path: /xyz/openbmc_project/sensors/temperature/p12v_fan
 
 # Hotswap controller
 0x44:
@@ -507,6 +537,11 @@
         Offsets:
           0xFF:
             type: double
+
+0x2D:
+  <<: *temperature
+  entityInstance: 0x2e
+  path: /xyz/openbmc_project/sensors/temperature/hotswap
 
 # fan/pwm mapping
 # fan0/1 on Mobo, fb_fan0/1/2 on fan board
