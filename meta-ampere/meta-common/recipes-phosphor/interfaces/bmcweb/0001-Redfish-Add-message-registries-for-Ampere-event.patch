@@ -1,0 +1,59 @@
+From ffe923437a592adb21cbfb7635fc6f4bd1b4dca8 Mon Sep 17 00:00:00 2001
+From: Hieu Vu <hvu@amperecomputing.com>
+Date: Thu, 10 Sep 2020 15:53:39 +0700
+Subject: [PATCH] Redfish: Add message registries for Ampere event
+
+Signed-off-by: Hieu Vu <hvu@amperecomputing.com>
+---
+ .../registries/openbmc_message_registry.hpp   | 28 ++++++++++++++++++-
+ 1 file changed, 27 insertions(+), 1 deletion(-)
+
+diff --git a/redfish-core/include/registries/openbmc_message_registry.hpp b/redfish-core/include/registries/openbmc_message_registry.hpp
+index ec0f068..97bb1e9 100644
+--- a/redfish-core/include/registries/openbmc_message_registry.hpp
++++ b/redfish-core/include/registries/openbmc_message_registry.hpp
+@@ -29,7 +29,7 @@ const Header header = {
+     "0.1.0",
+     "OpenBMC",
+ };
+-constexpr std::array<MessageEntry, 182> registry = {
++constexpr std::array<MessageEntry, 184> registry = {
+     MessageEntry{
+         "ADDDCCorrectable",
+         {
+@@ -45,6 +45,32 @@ constexpr std::array<MessageEntry, 182> registry = {
+             },
+             "None.",
+         }},
++    MessageEntry{
++        "AmpereCritical",
++        {
++            "Indicates an Ampere critical event",
++            "%1: %2",
++            "Critical",
++            2,
++            {
++                "string",
++                "string",
++            },
++            "None.",
++        }},
++    MessageEntry{
++        "AmpereWarning",
++        {
++            "Indicates an Ampere warning event",
++            "%1: %2",
++            "Warning",
++            2,
++            {
++                "string",
++                "string",
++            },
++            "None.",
++        }},
+     MessageEntry{
+         "AtScaleDebugFeatureEnabledAtHardware",
+         {
+-- 
+2.24.3 (Apple Git-128)
+
