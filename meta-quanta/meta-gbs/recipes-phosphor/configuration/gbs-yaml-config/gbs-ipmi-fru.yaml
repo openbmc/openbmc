@@ -143,14 +143,13 @@
       xyz.openbmc_project.Inventory.Decorator.Asset:
         Manufacturer:
           IPMIFruProperty: Manufacturer
-          IPMIFruSection: Board
+          IPMIFruSection: Product
         SerialNumber:
           IPMIFruProperty: Serial Number
-          IPMIFruSection: Board
-      xyz.openbmc_project.Inventory.Decorator.Revision:
-        Version:
-          IPMIFruProperty: FRU File ID
-          IPMIFruSection: Board
+          IPMIFruSection: Product
+        Model:
+          IPMIFruProperty: Model Number
+          IPMIFruSection: Product
 
 0x06:
   /system/chassis/motherboard/nvme1:
