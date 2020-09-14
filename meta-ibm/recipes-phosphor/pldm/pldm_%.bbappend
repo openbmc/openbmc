@@ -1,8 +1,7 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-EXTRA_OEMESON_append = " \
-        -Doem-ibm=enabled \
-        "
+PACKAGECONFIG += "oem-ibm"
+PACKAGECONFIG[oem-ibm] = "-Doem-ibm=enabled, -Doem-ibm=disabled, , squashfs-tools"
 
 SRC_URI += "file://fileTable.json"
 SRC_URI += "file://enum_attrs.json"
