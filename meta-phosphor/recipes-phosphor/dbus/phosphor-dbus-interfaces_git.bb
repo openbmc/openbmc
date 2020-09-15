@@ -27,5 +27,6 @@ def pdi_meson_config(d):
         '-Ddata_' + x.replace('/', '_') + '=true' \
                 for x in listvar_to_list(d, 'OBMC_ORG_YAML_SUBDIRS')
         ])
+pdi_meson_config[vardeps] = "OBMC_ORG_YAML_SUBDIRS"
 
 EXTRA_OEMESON_append = " ${@pdi_meson_config(d)}"
