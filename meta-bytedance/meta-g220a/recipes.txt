@@ -1,0 +1,2 @@
+recipes-kernel       - The kernel and generic applications/libraries with strong kernel dependencies
+recipes-phosphor     - Phosphor OpenBMC applications and configuration
