@@ -1,0 +1,16 @@
+description: >
+    GBS inventory fixups
+
+events:
+    - name: Add Chassis interface
+      description: >
+          Add the chassis interface on the chassis inventory path
+      type: startup
+      actions:
+          - name: createObjects
+            objs:
+                /system/chassis:
+                  xyz.openbmc_project.Inventory.Item.Chassis:
+                      Type:
+                          value: "RackMount"
+                          type: string
