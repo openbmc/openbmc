@@ -45,6 +45,14 @@ pkg_postinst_${PN}() {
 	LINK="$D$systemd_system_unitdir/obmc-host-diagnostic-mode@0.target.requires/op-enter-mpreboot@0.service"
 	TARGET="../op-enter-mpreboot@.service"
 	ln -s $TARGET $LINK
+
+	# Only install phal reinit service if phal enabled
+	if [ "${@bb.utils.filter('OBMC_MACHINE_FEATURES', 'phal', d)}" = phal ]; then
+		mkdir -p $D$systemd_system_unitdir/obmc-host-start@0.target.requires
+		LINK="$D$systemd_system_unitdir/obmc-host-start@0.target.requires/phal-reinit-devtree.service"
+		TARGET="../phal-reinit-devtree.service"
+		ln -s $TARGET $LINK
+	fi
 }
 
 pkg_prerm_${PN}() {
@@ -63,4 +71,10 @@ pkg_prerm_${PN}() {
 	rm $LINK
 	LINK="$D$systemd_system_unitdir/obmc-host-diagnostic-mode@0.target.requires/op-enter-mpreboot@0.service"
 	rm $LINK
+
+	# Only phal reinit service if phal enabled
+	if [ "${@bb.utils.filter('OBMC_MACHINE_FEATURES', 'phal', d)}" = phal ]; then
+		LINK="$D$systemd_system_unitdir/obmc-host-start@0.target.requires/phal-reinit-devtree.service"
+		rm $LINK
+	fi
 }
