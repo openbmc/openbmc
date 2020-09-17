@@ -1,5 +1,7 @@
 [Unit]
 Description=Wait for Power%i to turn on
+Wants=obmc-power-start-pre@%i.target
+After=obmc-power-start-pre@%i.target
 Wants=obmc-power-start@%i.target
 Before=obmc-power-start@%i.target
 Wants=mapper-wait@-org-openbmc-control-power%i.service
