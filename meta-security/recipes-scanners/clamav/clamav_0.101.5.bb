@@ -23,7 +23,7 @@ SRC_URI = "git://github.com/vrtadmin/clamav-devel;branch=rel/0.101 \
 S = "${WORKDIR}/git"
 
 LEAD_SONAME = "libclamav.so"
-SO_VER = "9.0.2"
+SO_VER = "9.0.4"
 
 inherit autotools pkgconfig useradd systemd multilib_header multilib_script
 

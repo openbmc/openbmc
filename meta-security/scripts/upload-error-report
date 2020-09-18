@@ -1,0 +1,26 @@
+#!/bin/bash
+
+ERR_REPORT_USERNAME=$1
+ERR_REPORT_EMAIL=$2
+BUILDDIR=$3
+
+shift
+shift
+shift
+
+if [ ! -e $BUILDDIR ]; then
+    exit 0
+fi
+
+cd $BUILDDIR/../poky
+
+if [ -d $BUILDDIR/tmp/log/error-report/ ]; then
+    echo "$ERR_REPORT_USERNAME" > ~/.oe-send-error
+    echo "$ERR_REPORT_EMAIL" >> ~/.oe-send-error
+
+    . ./oe-init-build-env $BUILDDIR
+
+    for x in `ls $BUILDDIR/tmp/log/error-report/ | grep error_report_`; do
+        send-error-report -y tmp/log/error-report/$x
+    done
+fi

@@ -6,7 +6,7 @@ SECTION = "security/tpm"
 
 DEPENDS = "openssl"
 
-SRCREV = "4b9a70d5789b0b74f43957a6c19ab2156a72d3e0"
+SRCREV = "e74dd1d96753b0538192143adf58d04fcd3b242b"
 PV = "0.3.14+git${SRCPV}"
 
 SRC_URI = " \
@@ -16,7 +16,6 @@ SRC_URI = " \
     	file://tcsd.service \
         file://get-user-ps-path-use-POSIX-getpwent-instead-of-getpwe.patch \
         file://0001-build-don-t-override-localstatedir-mandir-sysconfdir.patch \
-        file://0001-Correct-multiple-security-issues-that-are-present-if.patch \
     	"
 
 S = "${WORKDIR}/git"
@@ -104,6 +103,8 @@ FILES_${PN}-doc = " \
 	${mandir}/man5 \
 	${mandir}/man8 \
 	"
+
+FILES_${PN} += "${systemd_unitdir}/*" 
 
 INITSCRIPT_NAME = "trousers"
 INITSCRIPT_PARAMS = "start 99 2 3 4 5 . stop 19 0 1 6 ."

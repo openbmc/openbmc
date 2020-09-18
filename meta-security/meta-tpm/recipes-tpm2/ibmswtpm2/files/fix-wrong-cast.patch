@@ -1,0 +1,27 @@
+Fix strict aliasing issue of gcc10
+
+fixes:
+
+TpmFail.c: In function 'TpmLogFailure':
+TpmFail.c:217:23: error: dereferencing type-punned pointer will break strict-aliasing rules [-Werror=strict-aliasing]
+  217 |     s_failFunction = *(UINT32 *)&function; /* kgold */
+      |                       ^~~~~~~~~~~~~~~~~~~
+cc1: all warnings being treated as errors
+
+Upstream-Status: Submitted
+
+Signed-off-by: Jens Rehsack <sno@NetBSD.org>
+
+Index: src/TpmFail.c
+===================================================================
+--- src.orig/TpmFail.c	2020-09-10 15:43:57.085063875 +0200
++++ src/TpmFail.c	2020-09-10 15:48:35.563302634 +0200
+@@ -214,7 +214,7 @@
+     // On a 64-bit machine, this may truncate the address of the string
+     // of the function name where the error occurred.
+ #if FAIL_TRACE
+-    s_failFunction = *(UINT32 *)&function;	/* kgold */
++    memcpy(&s_failFunction, function, sizeof(uint32_t));	/* kgold */
+     s_failLine = line;
+ #else
+     s_failFunction = 0;

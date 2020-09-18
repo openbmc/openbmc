@@ -33,7 +33,6 @@ RECIPE_MAINTAINER_pn-tpm2-tcti-uefi = "Armin Kuster <akuster808@gmail.com>"
 RECIPE_MAINTAINER_pn-tpm2-tss-engine = "Armin Kuster <akuster808@gmail.com>"
 RECIPE_MAINTAINER_pn-tpm2-pkcs11 = "Armin Kuster <akuster808@gmail.com>"
 RECIPE_MAINTAINER_pn-tpm2-tss = "Armin Kuster <akuster808@gmail.com>"
-RECIPE_MAINTAINER_pn-cryptsetup-tpm-incubator = "Armin Kuster <akuster808@gmail.com>"
 RECIPE_MAINTAINER_pn-tpm2-tools = "Armin Kuster <akuster808@gmail.com>"
 RECIPE_MAINTAINER_pn-ibmswtpm2 = "Armin Kuster <akuster808@gmail.com>"
 

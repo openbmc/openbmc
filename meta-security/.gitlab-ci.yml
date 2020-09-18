@@ -5,17 +5,21 @@ stages:
   stage: build
   image: crops/poky
   before_script:
+    - echo "$ERR_REPORT_USERNAME" > ~/.oe-send-error
+    - echo "$ERR_REPORT_EMAIL" >> ~/.oe-send-error
     - export PATH=~/.local/bin:$PATH
     - wget https://bootstrap.pypa.io/get-pip.py
     - python3 get-pip.py
     - python3 -m pip install kas
-    - wget -q 'https://downloads.rclone.org/rclone-current-linux-amd64.zip'
-    - unzip -q rclone-current-linux-amd64.zip
-    - mv rclone-*-linux-amd64/rclone ~/.local/bin/
-    - rm -rf rclone-*-linux-amd64*
   after_script:
+    - cd $CI_PROJECT_DIR/poky
+    - . ./oe-init-build-env $CI_PROJECT_DIR/build
+    - for x in `ls $CI_PROJECT_DIR/build/tmp/log/error-report/ | grep error_report_`; do
+    - send-error-report -y tmp/log/error-report/$x
+    - done
+    - cd $CI_PROJECT_DIR
     - rm -rf build
-    - ./scripts/ci-cleanup.sh
+    - $CI_PROJECT_DIR/scripts/ci-cleanup.sh
   cache:
     paths:
       - layers
@@ -84,3 +88,47 @@ qemuarm64-ima:
   extends: .build
   script:
   - kas build --target integrity-image-minimal kas/$CI_JOB_NAME.yml 
+
+qemux86-64-dm-verify:
+  extends: .build
+  script:
+  - kas build --target core-image-minimal kas/qemux86-64.yml 
+  - kas build --target dm-verity-image-initramfs kas/$CI_JOB_NAME.yml 
+
+
+qemuarm64-alt:
+  extends: .build
+  script:
+  - kas build --target security-build-image kas/$CI_JOB_NAME.yml 
+
+qemuarm64-multi:
+  extends: .build
+  script:
+  - kas build --target security-build-image kas/$CI_JOB_NAME.yml 
+
+qemumips64-alt:
+  extends: .build
+  script:
+  - kas build --target security-build-image kas/$CI_JOB_NAME.yml 
+
+qemumips64-multi:
+  extends: .build
+  script:
+  - kas build --target security-build-image kas/$CI_JOB_NAME.yml 
+
+qemux86-64-alt:
+  extends: .build
+  script:
+  - kas build --target security-build-image kas/$CI_JOB_NAME.yml 
+
+qemux86-64-multi:
+  extends: .build
+  script:
+  - kas build --target security-build-image kas/$CI_JOB_NAME.yml 
+
+
+qemux86-test:
+  extends: .build
+  script:
+  - kas build --target security-test-image kas/$CI_JOB_NAME.yml 
+  - kas build -c testimage --target security-test-image kas/$CI_JOB_NAME.yml 
