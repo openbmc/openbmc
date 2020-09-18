@@ -31,7 +31,8 @@ BINCONFIG_GLOB = "mysql_config"
 
 inherit cmake gettext binconfig update-rc.d useradd systemd multilib_script
 
-MULTILIB_SCRIPTS = "${PN}-server:${bindir}/mysql_install_db ${PN}-server:${bindir}/mysqld_safe"
+MULTILIB_SCRIPTS = "${PN}-server:${bindir}/mariadbd-safe \
+                    ${PN}-server:${bindir}/mariadb-install-db"
 
 INITSCRIPT_PACKAGES = "${PN}-server ${PN}-setupdb"
 INITSCRIPT_NAME_${PN}-server = "mysqld"
@@ -243,69 +244,78 @@ FILES_libmysqld-dev = "\
 FILES_${PN}-client = "\
     ${bindir}/myisam_ftdump \
     ${bindir}/mysql \
+    ${bindir}/mariadb \
     ${bindir}/mysql_client_test \
+    ${bindir}/mariadb-client-test \
     ${bindir}/mysql_client_test_embedded \
+    ${bindir}/mariadb-client-test-embedded \
     ${bindir}/mysql_find_rows \
+    ${bindir}/mariadb-find-rows \
     ${bindir}/mysql_fix_extensions \
+    ${bindir}/mariadb-fix-extensions \
     ${bindir}/mysql_waitpid \
+    ${bindir}/mariadb-waitpid \
     ${bindir}/mysqlaccess \
+    ${bindir}/mariadb-access \
     ${bindir}/mysqladmin \
-    ${bindir}/mysqlbug \
+    ${bindir}/mariadb-admin \
     ${bindir}/mysqlcheck \
+    ${bindir}/mariadb-check \
     ${bindir}/mysqldump \
+    ${bindir}/mariadb-dump \
     ${bindir}/mysqldumpslow \
+    ${bindir}/mariadb-dumpslow \
     ${bindir}/mysqlimport \
+    ${bindir}/mariadb-import \
     ${bindir}/mysqlshow \
+    ${bindir}/mariadb-show \
     ${bindir}/mysqlslap \
+    ${bindir}/mariadb-slap \
     ${bindir}/mysqltest_embedded \
+    ${bindir}/mariadb-test-embedded \
     ${libexecdir}/mysqlmanager \
     ${sysconfdir}/my.cnf.d/mysql-clients.cnf"
 
 FILES_${PN}-server = "\
-    ${bindir}/comp_err \
-    ${bindir}/isamchk \
-    ${bindir}/isamlog \
     ${bindir}/msql2mysql \
     ${bindir}/my_print_defaults \
     ${bindir}/myisamchk \
     ${bindir}/myisamlog \
     ${bindir}/myisampack \
     ${bindir}/mysql_convert_table_format \
-    ${bindir}/mysql_fix_privilege_tables \
+    ${bindir}/mariadb-convert-table-format \
     ${bindir}/mysql_install_db \
+    ${bindir}/mariadb-install-db \
     ${bindir}/mysql_secure_installation \
+    ${bindir}/mariadb-secure-installation \
     ${bindir}/mysql_setpermission \
+    ${bindir}/mariadb-setpermission \
     ${bindir}/mysql-systemd-start \
     ${bindir}/mysql_tzinfo_to_sql \
+    ${bindir}/mariadb-tzinfo-to-sql \
     ${bindir}/mysql_upgrade \
+    ${bindir}/mariadb-upgrade \
     ${bindir}/mysql_plugin \
-    ${bindir}/mysql_zap \
+    ${bindir}/mariadb-plugin \
     ${bindir}/mysqlbinlog \
+    ${bindir}/mariadb-binlog \
     ${bindir}/mysqld_multi \
+    ${bindir}/mariadbd-multi \
+    ${bindir}/mariadbd-safe \
     ${bindir}/mysqld_safe \
     ${bindir}/mysqld_safe_helper \
+    ${bindir}/mariadbd-safe-helper \
     ${bindir}/mysqlhotcopy \
+    ${bindir}/mariadb-hotcopy \
     ${bindir}/mysqltest \
-    ${bindir}/ndb_delete_all \
-    ${bindir}/ndb_desc \
-    ${bindir}/ndb_drop_index \
-    ${bindir}/ndb_drop_table \
-    ${bindir}/ndb_mgm \
-    ${bindir}/ndb_restore \
-    ${bindir}/ndb_select_all \
-    ${bindir}/ndb_select_count \
-    ${bindir}/ndb_show_tables \
-    ${bindir}/ndb_waiter \
-    ${bindir}/pack_isam \
+    ${bindir}/mariadb-test \
     ${bindir}/perror \
     ${bindir}/replace \
     ${bindir}/resolve_stack_dump \
     ${bindir}/resolveip \
     ${libexecdir}/mysqld \
     ${sbindir}/mysqld \
-    ${sbindir}/ndb_cpcd \
-    ${sbindir}/ndbd \
-    ${sbindir}/ndb_mgmd \
+    ${sbindir}/mariadbd \
     ${libdir}/plugin/*.so \
     ${libdir}/security/*.so \
     ${libdir}/plugin/auth_pam_tool_dir/auth_pam_tool \

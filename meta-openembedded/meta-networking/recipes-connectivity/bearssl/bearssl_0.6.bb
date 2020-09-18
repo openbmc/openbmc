@@ -18,6 +18,8 @@ HOMEPAGE = "https://bearssl.org"
 
 SECTION = "libs"
 
+inherit lib_package
+
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=1fc37e1037ae673975fbcb96a98f7191"
 
@@ -25,6 +27,7 @@ SRCREV = "8ef7680081c61b486622f2d983c0d3d21e83caad"
 SRC_URI = "git://www.bearssl.org/git/BearSSL;protocol=https;nobranch=1 \
 	   file://0001-conf-Unix.mk-remove-fixed-command-definitions.patch \
 	   file://0002-test-test_x509.c-fix-potential-overflow-issue.patch \
+           file://0001-make-Pass-LDFLAGS-when-building-shared-objects.patch \
 	   "
 
 # without compile errors like 
@@ -33,3 +36,11 @@ CFLAGS += "-fPIC"
 
 S = "${WORKDIR}/git"
 B = "${S}"
+
+do_install() {
+    mkdir -p ${D}/${bindir} ${D}/${libdir}
+    install -m 0644 ${B}/build/brssl ${D}/${bindir}
+    install -m 0644 ${B}/build/libbearssl.so ${D}/${libdir}/libbearssl.so.6.0.0
+    ln -s libbearssl.so.6.0.0 ${D}/${libdir}/libbearssl.so.6
+    ln -s libbearssl.so.6.0.0 ${D}/${libdir}/libbearssl.so
+}

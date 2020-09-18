@@ -76,7 +76,7 @@ PACKAGECONFIG[mysql] = "--enable-mysql,--disable-mysql,mysql5,"
 PACKAGECONFIG[postgresql] = "--enable-pgsql,--disable-pgsql,postgresql,"
 PACKAGECONFIG[libdbi] = "--enable-libdbi,--disable-libdbi,libdbi,"
 PACKAGECONFIG[mail] = "--enable-mail,--disable-mail,,"
-PACKAGECONFIG[valgrind] = "--enable-valgrind,--disable-valgrind,valgrind,"
+PACKAGECONFIG[valgrind] = ",--without-valgrind-testbench,valgrind,"
 
 do_configure_prepend() {
     sed -i -e 's|python |python3 |g' ${S}/tests/*.sh
@@ -105,12 +105,6 @@ do_install_ptest() {
     sed -i 's,^\(top_srcdir = \).*,\1${PTEST_PATH}/tests,' ${D}${PTEST_PATH}/${TESTDIR}/Makefile
     # fix the abs_top_builddir
     sed -i 's,^\(abs_top_builddir = \).*,\1${PTEST_PATH}/,' ${D}${PTEST_PATH}/${TESTDIR}/Makefile
-
-    # valgrind is not compatible with arm and mips,
-    # so remove related test cases if there is no valgrind.
-    if [ x${VALGRIND} = x ]; then
-        sed -i '/udp-msgreduc-/d' ${D}${PTEST_PATH}/${TESTDIR}/Makefile
-    fi
 
     # install test-driver
     install -m 644 ${S}/test-driver ${D}${PTEST_PATH}

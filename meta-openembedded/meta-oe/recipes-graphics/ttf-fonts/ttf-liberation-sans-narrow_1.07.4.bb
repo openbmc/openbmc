@@ -24,6 +24,8 @@ do_install_append () {
     install -m 0644 LiberationSansNarrow*.ttf ${D}${datadir}/fonts/TTF/
     install -D -m 0644 ${WORKDIR}/30-0-liberation-sans-narrow.conf ${D}${sysconfdir}/conf.avail/30-${PN}-sans.conf
     install -D -m 0644 ${S}/License.txt ${D}${datadir}/licenses/${PN}/LICENSE
+    # normal liberation fonts come from ttf-liberation recipe so delete here
+    rm -rf ${D}${datadir}/fonts/truetype
 }
 
 PACKAGES = "${PN}"

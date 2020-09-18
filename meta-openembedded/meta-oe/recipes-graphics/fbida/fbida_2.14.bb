@@ -19,7 +19,10 @@ SRC_URI = "https://www.kraxel.org/releases/fbida/fbida-${PV}.tar.gz \
 	   "
 SRC_URI[sha256sum] = "95b7c01556cb6ef9819f358b314ddfeb8a4cbe862b521a3ed62f03d163154438"
 
-inherit pkgconfig
+inherit pkgconfig features_check
+
+# Depends on libepoxy
+REQUIRED_DISTRO_FEATURES = "opengl"
 
 EXTRA_OEMAKE = "STRIP= 'srcdir=${S}' -f ${S}/GNUmakefile"
 

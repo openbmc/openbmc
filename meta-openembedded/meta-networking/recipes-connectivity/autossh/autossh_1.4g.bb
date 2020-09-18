@@ -8,7 +8,7 @@ SRC_URI = "https://www.harding.motd.ca/autossh/${BP}.tgz"
 SRC_URI[md5sum] = "2b804bc1bf6d2f2afaa526d02df7c0a2"
 SRC_URI[sha256sum] = "5fc3cee3361ca1615af862364c480593171d0c54ec156de79fc421e31ae21277"
 
-RDEPENDS_${PN} = "openssh"
+RDEPENDS_${PN} = "ssh"
 
 CFLAGS_prepend = "-I${WORKDIR}/build "
 

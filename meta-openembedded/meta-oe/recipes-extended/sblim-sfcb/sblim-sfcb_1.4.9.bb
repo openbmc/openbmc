@@ -69,10 +69,10 @@ do_install() {
 }
 
 pkg_postinst_${PN} () {
-    if [ x"$D" != "x" ]; then
-        $INTERCEPT_DIR/postinst_intercept delay_to_first_boot ${PKG} mlprefix=${MLPREFIX}
-    fi
+    $INTERCEPT_DIR/postinst_intercept delay_to_first_boot ${PKG} mlprefix=${MLPREFIX}
+}
 
+pkg_postinst_ontarget_${PN} () {
     ${datadir}/sfcb/genSslCert.sh ${sysconfdir}/sfcb
     ${bindir}/sfcbrepos -f
 }

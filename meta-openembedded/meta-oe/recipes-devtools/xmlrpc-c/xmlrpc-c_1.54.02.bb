@@ -8,6 +8,7 @@ LIC_FILES_CHKSUM = "file://doc/COPYING;md5=aefbf81ba0750f02176b6f86752ea951"
 SRC_URI = "git://github.com/mirror/xmlrpc-c.git \
            file://0001-test-cpp-server_abyss-Fix-build-with-clang-libc.patch \
            file://0002-fix-formatting-issues.patch \
+           file://0003-src-Makefile-Fix-Makefile-macro-error.patch \
            "
 
 #Release 1.54.02

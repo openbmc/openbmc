@@ -12,7 +12,7 @@ SRC_URI = "${DEBIAN_MIRROR}/main/s/${BPN}/${BPN}_${PV}.orig.tar.bz2 \
 SRC_URI[md5sum] = "65b4e0df4934a6cd08c506cabcbe584f"
 SRC_URI[sha256sum] = "22c37dc90c871e8e052b2cab0ad219d010fa938608cd66b21c8f3c759046fa36"
 
-inherit autotools
+inherit autotools update-alternatives
 
 PACKAGECONFIG ?= "ssl ${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)}"
 
@@ -33,3 +33,16 @@ do_install_append () {
     ln -s ssmtp ${D}${sbindir}/newaliases
     ln -s ssmtp ${D}${sbindir}/mailq
 }
+
+ALTERNATIVE_PRIORITY_${PN} = "100"
+
+ALTERNATIVE_${PN} = "mailq newalias sendmail"
+ALTERNATIVE_LINK_NAME[sendmail] = "${sbindir}/sendmail"
+ALTERNATIVE_LINK_NAME[newalias] = "${sbindir}/newalias"
+ALTERNATIVE_LINK_NAME[mailq] = "${sbindir}/mailq"
+
+ALTERNATIVE_PRIORITY_${PN}-doc = "100"
+ALTERNATIVE_${PN}-doc += "mailq.1 newaliases.1 sendmail.1"
+ALTERNATIVE_LINK_NAME[mailq.1] = "${mandir}/man1/mailq.1"
+ALTERNATIVE_LINK_NAME[newaliases.1] = "${mandir}/man1/newaliases.1"
+ALTERNATIVE_LINK_NAME[sendmail.1] = "${mandir}/man1/sendmail.1"

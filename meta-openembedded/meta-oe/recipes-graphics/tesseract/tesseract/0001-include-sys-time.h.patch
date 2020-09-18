@@ -1,0 +1,34 @@
+From b47fa9532a7090d76521603dbc818bdec100085f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 15 Sep 2020 17:04:27 -0700
+Subject: [PATCH] include sys/time.h
+
+This provides missing definitions of timeval stuct
+
+Fixes
+| ../../../git/src/ccutil/ocrclass.h:154:7: error: member access into
+incomplete type 'struct timeval'
+|     tv->tv_usec = (millisecs.count() % 1000) * 1000;
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/ccutil/ocrclass.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/ccutil/ocrclass.h b/src/ccutil/ocrclass.h
+index d39a6dd6..96395c9b 100644
+--- a/src/ccutil/ocrclass.h
++++ b/src/ccutil/ocrclass.h
+@@ -28,6 +28,8 @@
+ 
+ #include <chrono>
+ #include <ctime>
++#include <sys/time.h>
++
+ #ifdef _WIN32
+ #include <winsock2.h> // for timeval
+ #endif
+-- 
+2.28.0
+

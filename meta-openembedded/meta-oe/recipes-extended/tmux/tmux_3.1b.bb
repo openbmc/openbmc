@@ -21,5 +21,5 @@ PACKAGECONFIG[utempter] = "ac_cv_header_utempter_h=yes,ac_cv_header_utempter_h=n
 do_configure_prepend() {
     # The 'compat' directory is needed for output during the build but it's
     # not automatically created when building outside the source directory.
-    mkdir ${B}/compat
+    mkdir -p ${B}/compat
 }

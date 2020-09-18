@@ -21,6 +21,11 @@ SRC_URI = "https://releases.pagure.org/${BPN}/${BP}.tar.xz"
 SRC_URI[md5sum] = "d5701a1a541383c0eda328f4a6518751"
 SRC_URI[sha256sum] = "f7381516bc1a937348efd1d0e14618e0a2afc5d59fe821dd248632d5601b59b5"
 
+inherit update-alternatives
+
 do_install() {
     oe_runmake install DESTDIR=${D} sysconfdir=${sysconfdir} mandir=${mandir}
 }
+
+ALTERNATIVE_${PN} = "mime.types"
+ALTERNATIVE_LINK_NAME[mime.types] = "${sysconfdir}/mime.types"

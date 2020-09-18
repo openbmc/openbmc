@@ -39,8 +39,8 @@ EXTRA_OECONF += "\
         --enable-foomatic-drv-install \
         --disable-foomatic-ppd-install \
         --disable-foomatic-rip-hplip-install \
-        --with-cupsbackenddir=${libdir}/cups/backend \
-        --with-cupsfilterdir=${libdir}/cups/filter \
+        --with-cupsbackenddir=${libexecdir}/cups/backend \
+        --with-cupsfilterdir=${libexecdir}/cups/filter \
 "
 
 EXTRA_OEMAKE = "rulessystemdir=${systemd_unitdir}/system/"
@@ -52,7 +52,7 @@ do_install_append() {
     sed -i -e "s|/usr/bin/python|/usr/bin/env python3|g" ${D}${datadir}/hplip/*.py
 }
 
-PACKAGES += "${PN}-ppd ${PN}-cups ${PN}-backend ${PN}-filter ${PN}-hal"
+PACKAGE_BEFORE_PN += "${PN}-ppd ${PN}-cups ${PN}-backend ${PN}-filter ${PN}-hal"
 
 RDEPENDS_${PN} += " \
         python3\
@@ -70,15 +70,15 @@ RDEPENDS_${PN}-filter += "perl"
 
 # need to snag the debug file or OE will fail on backend package
 FILES_${PN}-dbg += "\
-        ${libdir}/cups/backend/.debug \
+        ${libexecdir}/cups/backend/.debug \
         ${PYTHON_SITEPACKAGES_DIR}/.debug \
-        ${libdir}/cups/filter/.debug "
+        ${libexecdir}/cups/filter/.debug "
 
 FILES_${PN}-dev += "${PYTHON_SITEPACKAGES_DIR}/*.la"
 FILES_${PN}-ppd = "${datadir}/ppd"
 FILES_${PN}-cups = "${datadir}/cups"
-FILES_${PN}-backend = "${libdir}/cups/backend"
-FILES_${PN}-filter = "${libdir}/cups/filter"
+FILES_${PN}-backend = "${libexecdir}/cups/backend"
+FILES_${PN}-filter = "${libexecdir}/cups/filter"
 FILES_${PN}-hal = "${datadir}/hal"
 
 FILES_${PN} += "${PYTHON_SITEPACKAGES_DIR}/*.so"

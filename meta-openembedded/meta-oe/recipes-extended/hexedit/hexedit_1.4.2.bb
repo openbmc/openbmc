@@ -13,4 +13,8 @@ SRCREV = "800e4b2e6280531a84fd23ee0b48e16baeb90878"
 
 S = "${WORKDIR}/git"
 
-inherit autotools-brokensep
+inherit autotools-brokensep update-alternatives
+
+ALTERNATIVE_${PN} = "hexedit"
+ALTERNATIVE_LINK_NAME[hexedit] = "${bindir}/hexedit"
+

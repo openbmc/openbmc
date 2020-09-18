@@ -62,7 +62,7 @@ PACKAGECONFIG[samba] = "-Dsmb=true, -Dsmb=false, samba"
 PACKAGECONFIG[systemd] = "-Dsystemduserunitdir=${systemd_user_unitdir} -Dtmpfilesdir=${libdir}/tmpfiles.d, -Dsystemduserunitdir=no -Dtmpfilesdir=no, systemd"
 
 # needs meta-filesystems
-PACKAGECONFIG[fuse] = "-Dfuse=true, -Dfuse=false, fuse"
+PACKAGECONFIG[fuse] = "-Dfuse=true, -Dfuse=false, fuse3"
 
 # libcdio-paranoia recipe doesn't exist yet
 PACKAGECONFIG[cdda] = "-Dcdda=true, -Dcdda=false, libcdio-paranoia"

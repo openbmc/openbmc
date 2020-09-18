@@ -39,6 +39,7 @@ OECMAKE_GENERATOR = "Unix Makefiles"
 
 do_install_append() {
     rm -rf ${D}/run
+    rm -rf ${D}${localstatedir}/run
     install -Dm 0755 ${WORKDIR}/monkey.init ${D}${sysconfdir}/init.d/monkey
 
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then

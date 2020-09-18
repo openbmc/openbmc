@@ -20,15 +20,16 @@ SRC_URI += "file://run-ptest \
 # if you have older kernel than that you need to remove it from PACKAGECONFIG
 PACKAGECONFIG ??= "bpf firmware vm"
 PACKAGECONFIG_remove_x86 = "bpf"
-PACKAGECONFIG_remove_arm = "bpf"
+PACKAGECONFIG_remove_arm = "bpf vm"
 # host ptrace.h is used to compile BPF target but mips ptrace.h is needed
 # progs/loop1.c:21:9: error: incomplete definition of type 'struct user_pt_regs'
 # m = PT_REGS_RC(ctx);
-PACKAGECONFIG_remove_qemumips = "bpf"
+# vm tests need libhugetlbfs starting 5.8+ (https://lkml.org/lkml/2020/4/22/1654)
+PACKAGECONFIG_remove_qemumips = "bpf vm"
 
 PACKAGECONFIG[bpf] = ",,elfutils libcap libcap-ng rsync-native,"
 PACKAGECONFIG[firmware] = ",,libcap, bash"
-PACKAGECONFIG[vm] = ",,libcap,libgcc bash"
+PACKAGECONFIG[vm] = ",,libcap libhugetlbfs,libgcc bash"
 
 do_patch[depends] += "virtual/kernel:do_shared_workdir"
 
@@ -49,10 +50,13 @@ EXTRA_OEMAKE = '\
     AR="${AR}" \
     LD="${LD}" \
     DESTDIR="${D}" \
+    MACHINE="${ARCH}" \
 '
 
 KERNEL_SELFTEST_SRC ?= "Makefile \
                         include \
+                        kernel \
+                        lib \
                         tools \
                         scripts \
                         arch \

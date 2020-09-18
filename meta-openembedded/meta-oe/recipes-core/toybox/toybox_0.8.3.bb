@@ -29,6 +29,11 @@ CFLAGS += "${TOOLCHAIN_OPTIONS} ${TUNE_CCARGS}"
 COMPILER_toolchain-clang = "clang"
 COMPILER  ?= "gcc"
 
+PACKAGECONFIG ??= "no-iconv no-getconf"
+
+PACKAGECONFIG[no-iconv] = ",,"
+PACKAGECONFIG[no-getconf] = ",,"
+
 EXTRA_OEMAKE = 'CROSS_COMPILE="${HOST_PREFIX}" \
                 CC="${COMPILER}" \
                 STRIP="strip" \
@@ -56,7 +61,7 @@ do_configure() {
     sed -e 's/CONFIG_SWAPON=y/# CONFIG_SWAPON is not set/' -i .config
 
     # Enable init if toybox was set as init manager
-    if [[ ${VIRTUAL-RUNTIME_init_manager} == *"toybox"* ]]; then
+    if ${@bb.utils.contains('VIRTUAL-RUNTIME_init_manager','toybox','true','false',d)}; then
         sed -e 's/# CONFIG_INIT is not set/CONFIG_INIT=y/' -i .config
     fi
 }
@@ -67,6 +72,12 @@ do_compile() {
     # Create a list of links needed
     ${BUILD_CC} -I . scripts/install.c -o generated/instlist
     ./generated/instlist long | sed -e 's#^#/#' > toybox.links
+    if ${@bb.utils.contains('PACKAGECONFIG','no-iconv','true','false',d)}; then
+        sed -i -e '/iconv$/d' toybox.links
+    fi
+    if ${@bb.utils.contains('PACKAGECONFIG','no-getconf','true','false',d)}; then
+        sed -i -e '/getconf$/d' toybox.links
+    fi
 }
 
 do_install() {

@@ -82,8 +82,7 @@ do_install () {
     mkdir -p -m 755 ${D}${localstatedir}/spool/rwho
     chown -R rwhod ${D}${localstatedir}/spool/rwho
 }
-
-pkg_postinst_${PN}-server() {
+pkg_postinst_ontarget_${PN}-server() {
     ${sysconfdir}/init.d/rwhod start
 }
 

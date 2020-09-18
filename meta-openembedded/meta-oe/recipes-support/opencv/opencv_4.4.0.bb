@@ -199,6 +199,13 @@ RDEPENDS_python3-opencv = "python3-core python3-numpy"
 
 RDEPENDS_${PN}-apps  = "bash"
 
+do_compile_prepend() {
+    # remove the build host info to improve reproducibility
+    if [ -f ${WORKDIR}/build/modules/core/version_string.inc ]; then
+        sed -i "s#${WORKDIR}#/workdir#g" ${WORKDIR}/build/modules/core/version_string.inc
+    fi
+}
+
 do_install_append() {
     # Move Python files into correct library folder (for multilib build)
     if [ "$libdir" != "/usr/lib" -a -d ${D}/usr/lib ]; then

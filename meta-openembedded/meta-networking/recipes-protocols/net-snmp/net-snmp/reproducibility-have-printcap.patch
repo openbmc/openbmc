@@ -1,11 +1,22 @@
+From 84e362fe97f50fbad69f083bc2d8fe18f83eb2f7 Mon Sep 17 00:00:00 2001
+From: "douglas.royds" <douglas.royds@taitradio.com>
+Date: Wed, 21 Nov 2018 13:52:18 +1300
+Subject: [PATCH] net-snmp: Reproducibility: Don't check build host for
+
 Reproducible build: Don't check for /etc/printcap on the build machine when
 cross-compiling. Use AC_CHECK_FILE to set the cached variable
 ac_cv_file__etc_printcap instead. When cross-compiling, this variable should be
 set in the environment to "yes" or "no" as appropriate for the target platform.
 
---- net-snmp-5.8.original/configure.d/config_os_misc4	2018-11-20 17:05:03.986274522 +1300
-+++ net-snmp-5.8/configure.d/config_os_misc4	2018-11-20 17:08:32.250700448 +1300
-@@ -116,9 +116,9 @@
+---
+ configure.d/config_os_misc4 | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.d/config_os_misc4 b/configure.d/config_os_misc4
+index 6f23c8e..8cea75a 100644
+--- a/configure.d/config_os_misc4
++++ b/configure.d/config_os_misc4
+@@ -99,9 +99,9 @@ if test x$LPSTAT_PATH != x; then
  	[Path to the lpstat command])
      AC_DEFINE(HAVE_LPSTAT, 1, [Set if the lpstat command is available])
  fi

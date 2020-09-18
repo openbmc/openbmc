@@ -1,0 +1,714 @@
+From 44272ce47e768e090263df5cb9cb7ce17e544ad3 Mon Sep 17 00:00:00 2001
+From: Vincent Prince <vincent.prince.external@saftbatteries.com>
+Date: Tue, 15 Sep 2020 11:40:15 +0200
+Subject: [PATCH] kms-message: bump libmongocrypto to v1.0.4
+
+This fixes compilation with alpinelinux
+see https://github.com/mongodb/libmongocrypt/pull/89
+
+Upstream-Status: Pending
+
+Signed-off-by: Vincent Prince <vincent.prince.fr@gmail.com>
+---
+ .../kms-message/THIRD_PARTY_NOTICES           |  2 +-
+ src/third_party/kms-message/src/hexlify.c     | 21 +----
+ src/third_party/kms-message/src/hexlify.h     |  2 -
+ .../kms-message/src/kms_crypto_apple.c        |  5 +
+ .../kms-message/src/kms_crypto_libcrypto.c    | 94 +++++++++++++++++++
+ .../kms-message/src/kms_crypto_none.c         |  4 +
+ .../kms-message/src/kms_crypto_windows.c      |  4 +
+ .../kms-message/src/kms_decrypt_request.c     |  2 +-
+ .../kms-message/src/kms_encrypt_request.c     |  2 +-
+ src/third_party/kms-message/src/kms_kv_list.c | 11 ++-
+ .../kms-message/src/kms_message/kms_message.h |  2 +
+ .../src/kms_message/kms_message_defines.h     | 10 ++
+ src/third_party/kms-message/src/kms_port.c    | 33 +++++++
+ src/third_party/kms-message/src/kms_port.h    | 27 +++---
+ src/third_party/kms-message/src/kms_request.c | 41 +++++---
+ .../kms-message/src/kms_request_str.c         | 13 ++-
+ .../kms-message/src/kms_request_str.h         |  5 -
+ .../kms-message/src/kms_response_parser.c     | 26 ++++-
+ .../scripts/kms_message_get_sources.sh        |  2 +-
+ 19 files changed, 244 insertions(+), 62 deletions(-)
+ create mode 100644 src/third_party/kms-message/src/kms_crypto_libcrypto.c
+ create mode 100644 src/third_party/kms-message/src/kms_port.c
+
+diff --git a/src/third_party/kms-message/THIRD_PARTY_NOTICES b/src/third_party/kms-message/THIRD_PARTY_NOTICES
+index 3fc095170c..4110c1b91e 100644
+--- a/src/third_party/kms-message/THIRD_PARTY_NOTICES
++++ b/src/third_party/kms-message/THIRD_PARTY_NOTICES
+@@ -1,4 +1,4 @@
+-License notice for common-b64.c
++License notice for kms_b64.c
+ -------------------------------------------------------------------------------
+ 
+ ISC License
+diff --git a/src/third_party/kms-message/src/hexlify.c b/src/third_party/kms-message/src/hexlify.c
+index be9ee030b9..941fc93d1b 100644
+--- a/src/third_party/kms-message/src/hexlify.c
++++ b/src/third_party/kms-message/src/hexlify.c
+@@ -24,6 +24,8 @@ char *
+ hexlify (const uint8_t *buf, size_t len)
+ {
+    char *hex_chars = malloc (len * 2 + 1);
++   KMS_ASSERT (hex_chars);
++
+    char *p = hex_chars;
+    size_t i;
+ 
+@@ -35,22 +37,3 @@ hexlify (const uint8_t *buf, size_t len)
+ 
+    return hex_chars;
+ }
+-
+-uint8_t *
+-unhexlify (const char *hex_chars, size_t *len)
+-{
+-   uint8_t *buf;
+-   uint8_t *pos;
+-
+-   *len = strlen (hex_chars) / 2;
+-   buf = malloc (*len);
+-   pos = buf;
+-
+-   while (*hex_chars) {
+-      KMS_ASSERT (1 == sscanf (hex_chars, "%2hhx", pos));
+-      pos++;
+-      hex_chars += 2;
+-   }
+-
+-   return buf;
+-}
+diff --git a/src/third_party/kms-message/src/hexlify.h b/src/third_party/kms-message/src/hexlify.h
+index e0096eb6ca..a6a504ebe8 100644
+--- a/src/third_party/kms-message/src/hexlify.h
++++ b/src/third_party/kms-message/src/hexlify.h
+@@ -19,5 +19,3 @@
+ 
+ char *
+ hexlify (const uint8_t *buf, size_t len);
+-uint8_t *
+-unhexlify (const char *hex_chars, size_t *len);
+diff --git a/src/third_party/kms-message/src/kms_crypto_apple.c b/src/third_party/kms-message/src/kms_crypto_apple.c
+index 61da0a6288..a26e0d65e8 100644
+--- a/src/third_party/kms-message/src/kms_crypto_apple.c
++++ b/src/third_party/kms-message/src/kms_crypto_apple.c
+@@ -16,9 +16,12 @@
+ 
+ #include "kms_crypto.h"
+ 
++#ifdef KMS_MESSAGE_ENABLE_CRYPTO_COMMON_CRYPTO
++
+ #include <CommonCrypto/CommonDigest.h>
+ #include <CommonCrypto/CommonHMAC.h>
+ 
++
+ int
+ kms_crypto_init ()
+ {
+@@ -54,3 +57,5 @@ kms_sha256_hmac (void *unused_ctx,
+    CCHmac (kCCHmacAlgSHA256, key_input, key_len, input, len, hash_out);
+    return true;
+ }
++
++#endif /* KMS_MESSAGE_ENABLE_CRYPTO_COMMON_CRYPTO */
+diff --git a/src/third_party/kms-message/src/kms_crypto_libcrypto.c b/src/third_party/kms-message/src/kms_crypto_libcrypto.c
+new file mode 100644
+index 0000000000..6f25657fdd
+--- /dev/null
++++ b/src/third_party/kms-message/src/kms_crypto_libcrypto.c
+@@ -0,0 +1,94 @@
++/*
++ * Copyright 2018-present MongoDB, Inc.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#include "kms_crypto.h"
++
++#ifdef KMS_MESSAGE_ENABLE_CRYPTO_LIBCRYPTO
++
++#include <openssl/sha.h>
++#include <openssl/evp.h>
++#include <openssl/hmac.h>
++
++#if OPENSSL_VERSION_NUMBER < 0x10100000L || \
++   (defined(LIBRESSL_VERSION_NUMBER) && LIBRESSL_VERSION_NUMBER < 0x20700000L)
++static EVP_MD_CTX *
++EVP_MD_CTX_new (void)
++{
++   return calloc (sizeof (EVP_MD_CTX), 1);
++}
++
++static void
++EVP_MD_CTX_free (EVP_MD_CTX *ctx)
++{
++   EVP_MD_CTX_cleanup (ctx);
++   free (ctx);
++}
++#endif
++
++int
++kms_crypto_init ()
++{
++   return 0;
++}
++
++void
++kms_crypto_cleanup ()
++{
++}
++
++bool
++kms_sha256 (void *unused_ctx,
++            const char *input,
++            size_t len,
++            unsigned char *hash_out)
++{
++   EVP_MD_CTX *digest_ctxp = EVP_MD_CTX_new ();
++   bool rval = false;
++
++   if (1 != EVP_DigestInit_ex (digest_ctxp, EVP_sha256 (), NULL)) {
++      goto cleanup;
++   }
++
++   if (1 != EVP_DigestUpdate (digest_ctxp, input, len)) {
++      goto cleanup;
++   }
++
++   rval = (1 == EVP_DigestFinal_ex (digest_ctxp, hash_out, NULL));
++
++cleanup:
++   EVP_MD_CTX_free (digest_ctxp);
++
++   return rval;
++}
++
++bool
++kms_sha256_hmac (void *unused_ctx,
++                 const char *key_input,
++                 size_t key_len,
++                 const char *input,
++                 size_t len,
++                 unsigned char *hash_out)
++{
++   return HMAC (EVP_sha256 (),
++                key_input,
++                key_len,
++                (unsigned char *) input,
++                len,
++                hash_out,
++                NULL) != NULL;
++}
++
++#endif /* KMS_MESSAGE_ENABLE_CRYPTO_LIBCRYPTO */
+diff --git a/src/third_party/kms-message/src/kms_crypto_none.c b/src/third_party/kms-message/src/kms_crypto_none.c
+index 9ef2147687..94da5abd88 100644
+--- a/src/third_party/kms-message/src/kms_crypto_none.c
++++ b/src/third_party/kms-message/src/kms_crypto_none.c
+@@ -16,6 +16,8 @@
+ 
+ #include "kms_crypto.h"
+ 
++#ifndef KMS_MESSAGE_ENABLE_CRYPTO
++
+ int
+ kms_crypto_init ()
+ {
+@@ -48,3 +50,5 @@ kms_sha256_hmac (void *unused_ctx,
+    /* only gets called if hooks were mistakenly not set */
+    return false;
+ }
++
++#endif /* KMS_MESSAGE_ENABLE_CRYPTO */
+diff --git a/src/third_party/kms-message/src/kms_crypto_windows.c b/src/third_party/kms-message/src/kms_crypto_windows.c
+index ccdc7e095d..8177b0ddc0 100644
+--- a/src/third_party/kms-message/src/kms_crypto_windows.c
++++ b/src/third_party/kms-message/src/kms_crypto_windows.c
+@@ -16,6 +16,8 @@
+ 
+ #include "kms_crypto.h"
+ 
++#ifdef KMS_MESSAGE_ENABLE_CRYPTO_CNG
++
+ // tell windows.h not to include a bunch of headers we don't need:
+ #define WIN32_LEAN_AND_MEAN
+ 
+@@ -130,3 +132,5 @@ cleanup:
+ 
+    return status == STATUS_SUCCESS ? 1 : 0;
+ }
++
++#endif /* KMS_MESSAGE_ENABLE_CRYPTO_CNG */
+diff --git a/src/third_party/kms-message/src/kms_decrypt_request.c b/src/third_party/kms-message/src/kms_decrypt_request.c
+index 06faa43119..f1ca282768 100644
+--- a/src/third_party/kms-message/src/kms_decrypt_request.c
++++ b/src/third_party/kms-message/src/kms_decrypt_request.c
+@@ -48,7 +48,7 @@ kms_decrypt_request_new (const uint8_t *ciphertext_blob,
+    if (!(b64 = malloc (b64_len))) {
+       KMS_ERROR (request,
+                  "Could not allocate %d bytes for base64-encoding payload",
+-                 b64_len);
++                 (int) b64_len);
+       goto done;
+    }
+ 
+diff --git a/src/third_party/kms-message/src/kms_encrypt_request.c b/src/third_party/kms-message/src/kms_encrypt_request.c
+index b5f4d6436e..24b064d95f 100644
+--- a/src/third_party/kms-message/src/kms_encrypt_request.c
++++ b/src/third_party/kms-message/src/kms_encrypt_request.c
+@@ -47,7 +47,7 @@ kms_encrypt_request_new (const uint8_t *plaintext,
+    if (!(b64 = malloc (b64_len))) {
+       KMS_ERROR (request,
+                  "Could not allocate %d bytes for base64-encoding payload",
+-                 b64_len);
++                 (int) b64_len);
+       goto done;
+    }
+ 
+diff --git a/src/third_party/kms-message/src/kms_kv_list.c b/src/third_party/kms-message/src/kms_kv_list.c
+index 2d6845a1aa..0cff3dc2c6 100644
+--- a/src/third_party/kms-message/src/kms_kv_list.c
++++ b/src/third_party/kms-message/src/kms_kv_list.c
+@@ -17,6 +17,7 @@
+ 
+ #include "kms_kv_list.h"
+ #include "kms_message/kms_message.h"
++#include "kms_message_private.h"
+ #include "kms_request_str.h"
+ #include "kms_port.h"
+ #include "sort.h"
+@@ -39,9 +40,12 @@ kms_kv_list_t *
+ kms_kv_list_new (void)
+ {
+    kms_kv_list_t *lst = malloc (sizeof (kms_kv_list_t));
++   KMS_ASSERT (lst);
+ 
+    lst->size = 16;
+    lst->kvs = malloc (lst->size * sizeof (kms_kv_t));
++   KMS_ASSERT (lst->kvs);
++
+    lst->len = 0;
+ 
+    return lst;
+@@ -72,6 +76,7 @@ kms_kv_list_add (kms_kv_list_t *lst,
+    if (lst->len == lst->size) {
+       lst->size *= 2;
+       lst->kvs = realloc (lst->kvs, lst->size * sizeof (kms_kv_t));
++      KMS_ASSERT (lst->kvs);
+    }
+ 
+    kv_init (&lst->kvs[lst->len], key, value);
+@@ -84,7 +89,7 @@ kms_kv_list_find (const kms_kv_list_t *lst, const char *key)
+    size_t i;
+ 
+    for (i = 0; i < lst->len; i++) {
+-      if (0 == strcasecmp (lst->kvs[i].key->str, key)) {
++      if (0 == kms_strcasecmp (lst->kvs[i].key->str, key)) {
+          return &lst->kvs[i];
+       }
+    }
+@@ -119,8 +124,12 @@ kms_kv_list_dup (const kms_kv_list_t *lst)
+    }
+ 
+    dup = malloc (sizeof (kms_kv_list_t));
++   KMS_ASSERT (dup);
++
+    dup->size = dup->len = lst->len;
+    dup->kvs = malloc (lst->len * sizeof (kms_kv_t));
++   KMS_ASSERT (dup->kvs);
++
+ 
+    for (i = 0; i < lst->len; i++) {
+       kv_init (&dup->kvs[i], lst->kvs[i].key, lst->kvs[i].value);
+diff --git a/src/third_party/kms-message/src/kms_message/kms_message.h b/src/third_party/kms-message/src/kms_message/kms_message.h
+index 6ea95dd04c..8048528f2e 100644
+--- a/src/third_party/kms-message/src/kms_message/kms_message.h
++++ b/src/third_party/kms-message/src/kms_message/kms_message.h
+@@ -17,6 +17,8 @@
+ #ifndef KMS_MESSAGE_H
+ #define KMS_MESSAGE_H
+ 
++#include <sys/types.h>
++
+ #include "kms_message_defines.h"
+ #include "kms_request_opt.h"
+ #include "kms_request.h"
+diff --git a/src/third_party/kms-message/src/kms_message/kms_message_defines.h b/src/third_party/kms-message/src/kms_message/kms_message_defines.h
+index a4d019bd77..a539d531ef 100644
+--- a/src/third_party/kms-message/src/kms_message/kms_message_defines.h
++++ b/src/third_party/kms-message/src/kms_message/kms_message_defines.h
+@@ -53,4 +53,14 @@ kms_message_cleanup (void);
+ } /* extern "C" */
+ #endif
+ 
++#ifdef _MSC_VER
++#include <basetsd.h>
++#pragma warning(disable : 4142)
++#ifndef _SSIZE_T_DEFINED
++#define _SSIZE_T_DEFINED
++typedef SSIZE_T ssize_t;
++#endif
++#pragma warning(default : 4142)
++#endif
++
+ #endif /* KMS_MESSAGE_DEFINES_H */
+diff --git a/src/third_party/kms-message/src/kms_port.c b/src/third_party/kms-message/src/kms_port.c
+new file mode 100644
+index 0000000000..ee9e6ed9c9
+--- /dev/null
++++ b/src/third_party/kms-message/src/kms_port.c
+@@ -0,0 +1,33 @@
++/*
++ * Copyright 2020-present MongoDB, Inc.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#include "kms_port.h"
++#if defined(_WIN32)
++#include <stdlib.h>
++#include <string.h>
++char * kms_strndup (const char *src, size_t len)
++{
++   char *dst = (char *) malloc (len + 1);
++   if (!dst) {
++      return 0;
++   }
++
++   memcpy (dst, src, len);
++   dst[len] = '\0';
++
++   return dst;
++}
++#endif
+\ No newline at end of file
+diff --git a/src/third_party/kms-message/src/kms_port.h b/src/third_party/kms-message/src/kms_port.h
+index c3cbbac369..2123a99dc9 100644
+--- a/src/third_party/kms-message/src/kms_port.h
++++ b/src/third_party/kms-message/src/kms_port.h
+@@ -15,21 +15,18 @@
+  * limitations under the License.
+  */
+ 
+-#if defined(_WIN32)
+-#define strcasecmp _stricmp
+-
+-inline char *
+-strndup (const char *src, size_t len)
+-{
+-   char *dst = (char *) malloc (len + 1);
+-   if (!dst) {
+-      return 0;
+-   }
+-
+-   memcpy (dst, src, len);
+-   dst[len] = '\0';
++#ifndef KMS_PORT_H
++#define KMS_PORT_H
+ 
+-   return dst;
+-}
++#include <stddef.h>
+ 
++#if defined(_WIN32)
++#define kms_strcasecmp _stricmp
++char *
++kms_strndup (const char *src, size_t len);
++#else
++#define kms_strndup strndup
++#define kms_strcasecmp strcasecmp
+ #endif
++
++#endif /* KMS_PORT_H */
+\ No newline at end of file
+diff --git a/src/third_party/kms-message/src/kms_request.c b/src/third_party/kms-message/src/kms_request.c
+index fa2d487123..ac2b07ea6b 100644
+--- a/src/third_party/kms-message/src/kms_request.c
++++ b/src/third_party/kms-message/src/kms_request.c
+@@ -61,6 +61,7 @@ kms_request_new (const char *method,
+    kms_request_t *request = calloc (1, sizeof (kms_request_t));
+    const char *question_mark;
+ 
++   KMS_ASSERT (request);
+    /* parsing may set failed to true */
+    request->failed = false;
+ 
+@@ -92,10 +93,14 @@ kms_request_new (const char *method,
+    request->header_fields = kms_kv_list_new ();
+    request->auto_content_length = true;
+ 
+-   kms_request_set_date (request, NULL);
++   if (!kms_request_set_date (request, NULL)) {
++      return request;
++   }
+ 
+    if (opt && opt->connection_close) {
+-      kms_request_add_header_field (request, "Connection", "close");
++      if (!kms_request_add_header_field (request, "Connection", "close")) {
++         return request;
++      }
+    }
+ 
+    if (opt && opt->crypto.sha256) {
+@@ -164,7 +169,9 @@ kms_request_set_date (kms_request_t *request, const struct tm *tm)
+    kms_request_str_set_chars (request->date, buf, sizeof "YYYYmmDD" - 1);
+    kms_request_str_set_chars (request->datetime, buf, sizeof AMZ_DT_FORMAT - 1);
+    kms_kv_list_del (request->header_fields, "X-Amz-Date");
+-   kms_request_add_header_field (request, "X-Amz-Date", buf);
++   if (!kms_request_add_header_field (request, "X-Amz-Date", buf)) {
++      return false;
++   }
+ 
+    return true;
+ }
+@@ -309,7 +316,8 @@ append_canonical_headers (kms_kv_list_t *lst, kms_request_str_t *str)
+     * values in headers that have multiple values." */
+    for (i = 0; i < lst->len; i++) {
+       kv = &lst->kvs[i];
+-      if (previous_key && 0 == strcasecmp (previous_key->str, kv->key->str)) {
++      if (previous_key &&
++          0 == kms_strcasecmp (previous_key->str, kv->key->str)) {
+          /* duplicate header */
+          kms_request_str_append_char (str, ',');
+          kms_request_str_append_stripped (str, kv->value);
+@@ -339,12 +347,13 @@ append_signed_headers (kms_kv_list_t *lst, kms_request_str_t *str)
+ 
+    for (i = 0; i < lst->len; i++) {
+       kv = &lst->kvs[i];
+-      if (previous_key && 0 == strcasecmp (previous_key->str, kv->key->str)) {
++      if (previous_key &&
++          0 == kms_strcasecmp (previous_key->str, kv->key->str)) {
+          /* duplicate header */
+          continue;
+       }
+ 
+-      if (0 == strcasecmp (kv->key->str, "connection")) {
++      if (0 == kms_strcasecmp (kv->key->str, "connection")) {
+          continue;
+       }
+ 
+@@ -412,7 +421,8 @@ finalize (kms_request_t *request)
+ static int
+ cmp_header_field_names (const void *a, const void *b)
+ {
+-   return strcasecmp (((kms_kv_t *) a)->key->str, ((kms_kv_t *) b)->key->str);
++   return kms_strcasecmp (((kms_kv_t *) a)->key->str,
++                          ((kms_kv_t *) b)->key->str);
+ }
+ 
+ static kms_kv_list_t *
+@@ -447,6 +457,7 @@ kms_request_get_canonical (kms_request_t *request)
+    kms_request_str_append_newline (canonical);
+    normalized = kms_request_str_path_normalized (request->path);
+    kms_request_str_append_escaped (canonical, normalized, false);
++   kms_request_str_destroy (normalized);
+    kms_request_str_append_newline (canonical);
+    append_canonical_query (request, canonical);
+    kms_request_str_append_newline (canonical);
+@@ -454,12 +465,14 @@ kms_request_get_canonical (kms_request_t *request)
+    append_canonical_headers (lst, canonical);
+    kms_request_str_append_newline (canonical);
+    append_signed_headers (lst, canonical);
+-   kms_request_str_append_newline (canonical);
+-   kms_request_str_append_hashed (
+-      &request->crypto, canonical, request->payload);
+-
+-   kms_request_str_destroy (normalized);
+    kms_kv_list_destroy (lst);
++   kms_request_str_append_newline (canonical);
++   if (!kms_request_str_append_hashed (
++          &request->crypto, canonical, request->payload)) {
++      KMS_ERROR (request, "could not generate hash");
++      kms_request_str_destroy (canonical);
++      return NULL;
++   }
+ 
+    return kms_request_str_detach (canonical);
+ }
+@@ -514,6 +527,10 @@ kms_request_get_string_to_sign (kms_request_t *request)
+    kms_request_str_append_chars (sts, "/aws4_request\n", -1);
+ 
+    creq = kms_request_str_wrap (kms_request_get_canonical (request), -1);
++   if (!creq) {
++      goto done;
++   }
++
+    if (!kms_request_str_append_hashed (&request->crypto, sts, creq)) {
+       goto done;
+    }
+diff --git a/src/third_party/kms-message/src/kms_request_str.c b/src/third_party/kms-message/src/kms_request_str.c
+index 0f7c19c972..65207d2f4f 100644
+--- a/src/third_party/kms-message/src/kms_request_str.c
++++ b/src/third_party/kms-message/src/kms_request_str.c
+@@ -51,10 +51,13 @@ kms_request_str_t *
+ kms_request_str_new (void)
+ {
+    kms_request_str_t *s = malloc (sizeof (kms_request_str_t));
++   KMS_ASSERT (s);
+ 
+    s->len = 0;
+    s->size = 16;
+    s->str = malloc (s->size);
++   KMS_ASSERT (s->str);
++
+    s->str[0] = '\0';
+ 
+    return s;
+@@ -64,11 +67,15 @@ kms_request_str_t *
+ kms_request_str_new_from_chars (const char *chars, ssize_t len)
+ {
+    kms_request_str_t *s = malloc (sizeof (kms_request_str_t));
++   KMS_ASSERT (s);
++
+    size_t actual_len;
+ 
+    actual_len = len < 0 ? strlen (chars) : (size_t) len;
+    s->size = actual_len + 1;
+    s->str = malloc (s->size);
++   KMS_ASSERT (s->str);
++
+    memcpy (s->str, chars, actual_len);
+    s->str[actual_len] = '\0';
+    s->len = actual_len;
+@@ -86,6 +93,8 @@ kms_request_str_wrap (char *chars, ssize_t len)
+    }
+ 
+    s = malloc (sizeof (kms_request_str_t));
++   KMS_ASSERT (s);
++
+ 
+    s->str = chars;
+    s->len = len < 0 ? strlen (chars) : (size_t) len;
+@@ -148,8 +157,10 @@ kms_request_str_t *
+ kms_request_str_dup (kms_request_str_t *str)
+ {
+    kms_request_str_t *dup = malloc (sizeof (kms_request_str_t));
++   KMS_ASSERT (dup);
++
+ 
+-   dup->str = strndup (str->str, str->len);
++   dup->str = kms_strndup (str->str, str->len);
+    dup->len = str->len;
+    dup->size = str->len + 1;
+ 
+diff --git a/src/third_party/kms-message/src/kms_request_str.h b/src/third_party/kms-message/src/kms_request_str.h
+index f053a595aa..0898f59067 100644
+--- a/src/third_party/kms-message/src/kms_request_str.h
++++ b/src/third_party/kms-message/src/kms_request_str.h
+@@ -25,11 +25,6 @@
+ #include <stdint.h>
+ #include <string.h>
+ 
+-#if defined(_WIN32)
+-#include <basetsd.h>
+-typedef SSIZE_T ssize_t;
+-#endif // _WIN32
+-
+ typedef struct {
+    char *str;
+    size_t len;
+diff --git a/src/third_party/kms-message/src/kms_response_parser.c b/src/third_party/kms-message/src/kms_response_parser.c
+index 31e4868a68..6f86fac854 100644
+--- a/src/third_party/kms-message/src/kms_response_parser.c
++++ b/src/third_party/kms-message/src/kms_response_parser.c
+@@ -1,7 +1,7 @@
+ #include "kms_message/kms_response_parser.h"
+ #include "kms_message_private.h"
+ 
+-#include "kms_message_private.h"
++#include <errno.h>
+ #include <limits.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -24,6 +24,7 @@ _parser_init (kms_response_parser_t *parser)
+    parser->raw_response = kms_request_str_new ();
+    parser->content_length = -1;
+    parser->response = calloc (1, sizeof (kms_response_t));
++   KMS_ASSERT (parser->response);
+    parser->response->headers = kms_kv_list_new ();
+    parser->state = PARSING_STATUS_LINE;
+    parser->start = 0;
+@@ -34,6 +35,8 @@ kms_response_parser_t *
+ kms_response_parser_new (void)
+ {
+    kms_response_parser_t *parser = malloc (sizeof (kms_response_parser_t));
++   KMS_ASSERT (parser);
++
+    _parser_init (parser);
+    return parser;
+ }
+@@ -59,11 +62,26 @@ static bool
+ _parse_int (const char *str, int *result)
+ {
+    char *endptr = NULL;
++   int64_t long_result;
+ 
+-   *result = (int) strtol (str, &endptr, 10);
+-   if (*endptr) {
++   errno = 0;
++   long_result = strtol (str, &endptr, 10);
++   if (endptr == str) {
++      /* No digits were parsed. Consider this an error */
++      return false;
++   }
++   if (endptr != NULL && *endptr != '\0') {
++      /* endptr points to the first invalid character. */
++      return false;
++   }
++   if (errno == EINVAL || errno == ERANGE) {
++      return false;
++   }
++   if (long_result > INT32_MAX || long_result < INT32_MIN) {
+       return false;
+    }
++   *result = (int) long_result;
++
+    return true;
+ }
+ 
+@@ -72,6 +90,8 @@ static bool
+ _parse_int_from_view (const char *str, int start, int end, int *result)
+ {
+    char *num_str = malloc (end - start + 1);
++   KMS_ASSERT (num_str);
++
+    bool ret;
+ 
+    strncpy (num_str, str + start, end - start);
+diff --git a/src/third_party/scripts/kms_message_get_sources.sh b/src/third_party/scripts/kms_message_get_sources.sh
+index 6ad2fbb0e6..52ce21b9dd 100755
+--- a/src/third_party/scripts/kms_message_get_sources.sh
++++ b/src/third_party/scripts/kms_message_get_sources.sh
+@@ -18,7 +18,7 @@ if grep -q Microsoft /proc/version; then
+ fi
+ 
+ NAME=libmongocrypt
+-REVISION=59c8c17bbdfa1cf0fdec60cfdde73a437a868221
++REVISION=052f7fc610f0cea83a2adf3dd263a5ff04833371
+ 
+ if grep -q Microsoft /proc/version; then
+     SRC_ROOT=$(wslpath -u $(powershell.exe -Command "Get-ChildItem Env:TEMP | Get-Content | Write-Host"))
+-- 
+2.24.0
+

@@ -8,6 +8,8 @@ SRC_URI = "http://www.lua.org/ftp/lua-${PV}.tar.gz;name=tarballsrc \
            file://lua.pc.in \
            file://0001-Allow-building-lua-without-readline-on-Linux.patch \
            file://CVE-2020-15888.patch \
+           file://CVE-2020-15945.patch \
+           file://0001-Fixed-bug-barriers-cannot-be-active-during-sweep.patch \
            "
 
 # if no test suite matches PV release of Lua exactly, download the suite for the closest Lua release.

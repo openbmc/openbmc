@@ -16,20 +16,36 @@ RDEPENDS_packagegroup-meta-filesystems = "\
 "
 
 RDEPENDS_packagegroup-meta-filesystems = "\
-    ntfs-3g-ntfsprogs ifuse sshfs-fuse \
-    logfsprogs owfs simple-mtpfs \
-    unionfs-fuse fuse-exfat yaffs2-utils \
+    ifuse \
+    logfsprogs \
+    fuse-exfat \
+    owfs \
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "smbnetfs", "", d)} \
-    "
+    simple-mtpfs \
+    yaffs2-utils \
+    ntfs-3g-ntfsprogs \
+    httpfs2 \
+    unionfs-fuse \
+    sshfs-fuse \
+"
 
 RDEPENDS_packagegroup-meta-filesystems-support = "\
-    physfs fuse \
-    "
+    fuse3 \
+    fuse \
+    physfs \
+"
 
 RDEPENDS_packagegroup-meta-filesystems-utils = "\
-    xorriso aufs-util xfsprogs \
-    f2fs-tools exfat-utils udevil \
+    aufs-util \
+    exfat-utils \
+    fatcat \
     xfsdump \
-    "
+    f2fs-tools \
+    fatresize \
+    udevil \
+    ufs-utils \
+    xfsprogs \
+    xorriso \
+"
 
 EXCLUDE_FROM_WORLD = "1"

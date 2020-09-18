@@ -1,0 +1,90 @@
+From 1e6df25ac28dcd89f0324177bb55019422404b44 Mon Sep 17 00:00:00 2001
+From: Roberto Ierusalimschy <roberto@inf.puc-rio.br>
+Date: Thu, 3 Sep 2020 15:32:17 +0800
+Subject: [PATCH] Fixed bug: barriers cannot be active during sweep
+
+Barriers cannot be active during sweep, even in generational mode.
+(Although gen. mode is not incremental, it can hit a barrier when
+deleting a thread and closing its upvalues.)  The colors of objects are
+being changed during sweep and, therefore, cannot be trusted.
+
+Upstream-Status: Backport [https://github.com/lua/lua/commit/a6da1472c0c5e05ff249325f979531ad51533110]
+CVE: CVE-2020-24371
+
+[Adjust code KGC_INC -> KGC_NORMAL, refer 69371c4b84becac09c445aae01d005b49658ef82]
+Signed-off-by: Wenlin Kang <wenlin.kang@windriver.com>
+---
+ src/lgc.c | 33 ++++++++++++++++++++++++---------
+ 1 file changed, 24 insertions(+), 9 deletions(-)
+
+diff --git a/src/lgc.c b/src/lgc.c
+index 973c269..7af23d5 100644
+--- a/src/lgc.c
++++ b/src/lgc.c
+@@ -142,10 +142,17 @@ static int iscleared (global_State *g, const TValue *o) {
+ 
+ 
+ /*
+-** barrier that moves collector forward, that is, mark the white object
+-** being pointed by a black object. (If in sweep phase, clear the black
+-** object to white [sweep it] to avoid other barrier calls for this
+-** same object.)
++** Barrier that moves collector forward, that is, marks the white object
++** 'v' being pointed by the black object 'o'.  In the generational
++** mode, 'v' must also become old, if 'o' is old; however, it cannot
++** be changed directly to OLD, because it may still point to non-old
++** objects. So, it is marked as OLD0. In the next cycle it will become
++** OLD1, and in the next it will finally become OLD (regular old). By
++** then, any object it points to will also be old.  If called in the
++** incremental sweep phase, it clears the black object to white (sweep
++** it) to avoid other barrier calls for this same object. (That cannot
++** be done is generational mode, as its sweep does not distinguish
++** whites from deads.)
+ */
+ void luaC_barrier_ (lua_State *L, GCObject *o, GCObject *v) {
+   global_State *g = G(L);
+@@ -154,7 +161,8 @@ void luaC_barrier_ (lua_State *L, GCObject *o, GCObject *v) {
+     reallymarkobject(g, v);  /* restore invariant */
+   else {  /* sweep phase */
+     lua_assert(issweepphase(g));
+-    makewhite(g, o);  /* mark main obj. as white to avoid other barriers */
++    if (g->gckind == KGC_NORMAL)  /* incremental mode? */
++      makewhite(g, o);  /* mark 'o' as white to avoid other barriers */
+   }
+ }
+ 
+@@ -299,10 +307,15 @@ static void markbeingfnz (global_State *g) {
+ 
+ 
+ /*
+-** Mark all values stored in marked open upvalues from non-marked threads.
+-** (Values from marked threads were already marked when traversing the
+-** thread.) Remove from the list threads that no longer have upvalues and
+-** not-marked threads.
++** For each non-marked thread, simulates a barrier between each open
++** upvalue and its value. (If the thread is collected, the value will be
++** assigned to the upvalue, but then it can be too late for the barrier
++** to act. The "barrier" does not need to check colors: A non-marked
++** thread must be young; upvalues cannot be older than their threads; so
++** any visited upvalue must be young too.) Also removes the thread from
++** the list, as it was already visited. Removes also threads with no
++** upvalues, as they have nothing to be checked. (If the thread gets an
++** upvalue later, it will be linked in the list again.)
+ */
+ static void remarkupvals (global_State *g) {
+   lua_State *thread;
+@@ -313,9 +326,11 @@ static void remarkupvals (global_State *g) {
+       p = &thread->twups;  /* keep marked thread with upvalues in the list */
+     else {  /* thread is not marked or without upvalues */
+       UpVal *uv;
++      lua_assert(!isold(thread) || thread->openupval == NULL);
+       *p = thread->twups;  /* remove thread from the list */
+       thread->twups = thread;  /* mark that it is out of list */
+       for (uv = thread->openupval; uv != NULL; uv = uv->u.open.next) {
++        lua_assert(getage(uv) <= getage(thread));
+         if (uv->u.open.touched) {
+           markvalue(g, uv->v);  /* remark upvalue's value */
+           uv->u.open.touched = 0;
+-- 
+1.9.1
+

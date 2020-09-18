@@ -1,0 +1,85 @@
+Upstream-Status: Inappropriate  [OE-Specific]
+
+When building emacs, it builds some tools for the HOST
+that are then used to build for target, such as
+make-fingerprint and make-docfile, this needs to be
+adapted to be used by bitbake, otherwise the compiled
+executables arent compatible with the HOST.
+
+Use the above mentioned tools provided by the native
+version of the recipe instead.
+
+Signed-off-by: Alejandro Enedino Hernandez Samaniego <alejandro@enedino.org>
+
+Index: emacs-27.1/src/Makefile.in
+===================================================================
+--- emacs-27.1.orig/src/Makefile.in
++++ emacs-27.1/src/Makefile.in
+@@ -472,7 +472,7 @@ ifeq ($(CHECK_STRUCTS),true)
+ pdumper.o: dmpstruct.h
+ endif
+ dmpstruct.h: $(srcdir)/dmpstruct.awk
+-dmpstruct.h: $(libsrc)/make-fingerprint$(EXEEXT) $(dmpstruct_headers)
++dmpstruct.h:  $(dmpstruct_headers)
+ 	$(AM_V_GEN)POSIXLY_CORRECT=1 awk -f $(srcdir)/dmpstruct.awk \
+ 		$(dmpstruct_headers) > $@
+ 
+@@ -566,8 +566,7 @@ ${lispintdir}/characters.elc: ${charscri
+ ## Strictly speaking, emacs does not depend directly on all of $lisp,
+ ## since not all pieces are used on all platforms.  But DOC depends
+ ## on all of $lisp, and emacs depends on DOC, so it is ok to use $lisp here.
+-emacs$(EXEEXT): temacs$(EXEEXT) \
+-                lisp.mk $(etc)/DOC $(lisp) \
++emacs$(EXEEXT): lisp.mk $(etc)/DOC $(lisp) \
+                 $(lispsource)/international/charprop.el ${charsets}
+ ifeq ($(DUMPING),unexec)
+ 	LC_ALL=C $(RUN_TEMACS) -batch $(BUILD_DETAILS) -l loadup --temacs=dump
+@@ -596,15 +595,15 @@ endif
+ ## for the first time, this prevents any variation between configurations
+ ## in the contents of the DOC file.
+ ##
+-$(etc)/DOC: lisp.mk $(libsrc)/make-docfile$(EXEEXT) $(obj) $(lisp)
++$(etc)/DOC: lisp.mk $(obj) $(lisp)
+ 	$(AM_V_GEN)$(MKDIR_P) $(etc)
+ 	$(AM_V_at)rm -f $(etc)/DOC
+-	$(AM_V_at)$(libsrc)/make-docfile -d $(srcdir) \
++	make-docfile -d $(srcdir) \
+ 	  $(SOME_MACHINE_OBJECTS) $(obj) > $(etc)/DOC
+-	$(AM_V_at)$(libsrc)/make-docfile -a $(etc)/DOC -d $(lispsource) \
++	make-docfile -a $(etc)/DOC -d $(lispsource) \
+ 	  $(shortlisp)
+ 
+-$(libsrc)/make-docfile$(EXEEXT) $(libsrc)/make-fingerprint$(EXEEXT): \
++$(libsrc)/make-fingerprint$(EXEEXT): \
+   $(lib)/libgnu.a
+ 	$(MAKE) -C $(dir $@) $(notdir $@)
+ 
+@@ -622,8 +621,8 @@ am__v_GLOBALS_ = $(am__v_GLOBALS_@AM_DEF
+ am__v_GLOBALS_0 = @echo "  GEN     " globals.h;
+ am__v_GLOBALS_1 =
+ 
+-gl-stamp: $(libsrc)/make-docfile$(EXEEXT) $(GLOBAL_SOURCES)
+-	$(AM_V_GLOBALS)$(libsrc)/make-docfile -d $(srcdir) -g $(obj) > globals.tmp
++gl-stamp: $(GLOBAL_SOURCES)
++	make-docfile -d $(srcdir) -g $(obj) > globals.tmp
+ 	$(AM_V_at)$(top_srcdir)/build-aux/move-if-change globals.tmp globals.h
+ 	$(AM_V_at)echo timestamp > $@
+ 
+@@ -637,7 +636,7 @@ $(LIBEGNU_ARCHIVE): $(config_h)
+ 	$(MAKE) -C $(dir $@) all
+ 
+ ifeq ($(HAVE_PDUMPER),yes)
+-  MAKE_PDUMPER_FINGERPRINT = $(libsrc)/make-fingerprint$(EXEEXT)
++  MAKE_PDUMPER_FINGERPRINT = make-fingerprint
+ else
+   MAKE_PDUMPER_FINGERPRINT =
+ endif
+@@ -647,7 +646,7 @@ endif
+ ## This goes on to affect various things, and the emacs binary fails
+ ## to start if Vinstallation_directory has the wrong value.
+ temacs$(EXEEXT): $(LIBXMENU) $(ALLOBJS) $(LIBEGNU_ARCHIVE) $(EMACSRES) \
+-  $(charsets) $(charscript) $(MAKE_PDUMPER_FINGERPRINT)
++  $(charsets) $(charscript)
+ 	$(AM_V_CCLD)$(CC) -o $@.tmp \
+ 	  $(ALL_CFLAGS) $(TEMACS_LDFLAGS) $(LDFLAGS) \
+ 	  $(ALLOBJS) $(LIBEGNU_ARCHIVE) $(W32_RES_LINK) $(LIBES)

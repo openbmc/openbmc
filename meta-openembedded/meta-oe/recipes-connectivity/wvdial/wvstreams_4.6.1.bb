@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=55ca817ccb7d5b5b66355690e9abc605"
 DEPENDS = "zlib openssl (>= 0.9.8) dbus readline"
 DEPENDS_append_libc-musl = " argp-standalone libexecinfo"
 
-SRC_URI = "http://${BPN}.googlecode.com/files/${BP}.tar.gz \
+SRC_URI = "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/${BPN}/${BP}.tar.gz \
            file://04_signed_request.diff \
            file://05_gcc.diff \
            file://06_gcc-4.7.diff \

@@ -1,0 +1,145 @@
+From 72405143f9d16514e70b88bc4843c9634b88036a Mon Sep 17 00:00:00 2001
+From: Brendan Le Foll <brendan.le.foll@intel.com>
+Date: Tue, 3 Mar 2015 11:42:57 +0000
+Subject: [PATCH 2/2] mdns: cross compilation fixes for bitbake
+
+Fixes several build errors when incorrect compiler or
+compiler flags are used.
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+Signed-off-by: Mikko Rapeli <mikko.rapeli@bmw.de>
+---
+ mDNSPosix/Makefile | 44 ++++++++++++++++++++------------------------
+ 1 file changed, 20 insertions(+), 24 deletions(-)
+
+diff --git a/mDNSPosix/Makefile b/mDNSPosix/Makefile
+index 78222e0..18a3af5 100755
+--- a/mDNSPosix/Makefile
++++ b/mDNSPosix/Makefile
+@@ -50,6 +50,7 @@
+ 
+ LIBVERS = 1
+ 
++POSIXDIR = ../mDNSPosix
+ COREDIR = ../mDNSCore
+ SHAREDDIR ?= ../mDNSShared
+ DSODIR ?= ../DSO
+@@ -62,16 +63,16 @@ else ifeq ($(SYSTEM), Linux)
+   os=linux
+ endif
+ 
+-CC = cc
+-BISON = bison
+-FLEX = flex
+-ST = strip
+-LD = ld
++CC ?= cc
++BISON ?= bison
++FLEX ?= flex
++ST ?= strip
++LD ?= ld
+ SOOPTS = -shared
+ CP = cp
+ RM = rm
+ LN = ln -s -f
+-CFLAGS_COMMON = -I$(COREDIR) -I$(SHAREDDIR) -I$(DSODIR) -I$(PROXYDIR) -I$(OBJDIR) -fwrapv -W -Wall -DPID_FILE=\"/var/run/mdnsd.pid\" -DMDNS_UDS_SERVERPATH=\"/var/run/mdnsd\"
++CFLAGS_COMMON = -I$(POSIXDIR) -I$(COREDIR) -I$(SHAREDDIR) -I$(DSODIR) -I$(PROXYDIR) -I$(OBJDIR) -fwrapv -W -Wall -DPID_FILE=\"/var/run/mdnsd.pid\" -DMDNS_UDS_SERVERPATH=\"/var/run/mdnsd\"
+ CFLAGS_PTHREAD =
+ LINKOPTS =
+ LINKOPTS_PTHREAD = -lpthread
+@@ -85,6 +86,7 @@ CFLAGS_OPEN_SOURCE=
+ endif
+ 
+ # Set up diverging paths for debug vs. prod builds
++DEBUG ?= 1
+ ifeq "$(DEBUG)" "1"
+ CFLAGS_DEBUGGING = -g -DMDNS_DEBUGMSGS=2
+ OBJDIR = objects/debug
+@@ -101,8 +103,8 @@ else
+ # 1. We want to make small binaries, suitable for putting into hardware devices
+ # 2. Some of the code analysis warnings only work when some form of optimization is enabled
+ CFLAGS_DEBUGGING = -g -DMDNS_DEBUGMSGS=0
+-OBJDIR ?= objects/prod
+-BUILDDIR ?= build/prod
++OBJDIR = objects/prod
++BUILDDIR = build/prod
+ STRIP = $(ST) -S
+ endif
+ endif
+@@ -125,7 +127,7 @@ else
+ # any target that contains the string "linux"
+ ifeq ($(findstring linux,$(os)),linux)
+ CFLAGS_OS = -D_GNU_SOURCE -DHAVE_IPV6 -DNOT_HAVE_SA_LEN -DUSES_NETLINK -DHAVE_LINUX -DTARGET_OS_LINUX -ftabstop=4
+-LD = $(CC)
++LD ?= $(CC)
+ SOOPTS = -shared
+ FLEXFLAGS_OS = -l
+ JAVACFLAGS_OS += -I$(JDK)/include/linux
+@@ -276,8 +278,7 @@ Daemon: setup $(BUILDDIR)/mdnsd
+ 	@echo "Responder daemon done"
+ 
+ $(BUILDDIR)/mdnsd: $(DAEMONOBJS)
+-	$(CC) -o $@ $+ $(LINKOPTS)
+-	$(STRIP) $@
++	$(LD) -o $@ $+
+ 
+ # libdns_sd target builds the client library
+ libdns_sd: setup $(BUILDDIR)/libdns_sd.$(LDSUFFIX)
+@@ -286,13 +287,9 @@ libdns_sd: setup $(BUILDDIR)/libdns_sd.$(LDSUFFIX)
+ CLIENTLIBOBJS = $(OBJDIR)/dnssd_clientlib.c.so.o $(OBJDIR)/dnssd_clientstub.c.so.o $(OBJDIR)/dnssd_ipc.c.so.o
+ 
+ $(BUILDDIR)/libdns_sd.$(LDSUFFIX): $(CLIENTLIBOBJS)
+-	$(LD) $(SOOPTS) $(LINKOPTS) -o $@ $+
+-	$(STRIP) $@
+-
+-Clients: setup libdns_sd ../Clients/build/dns-sd
+-	@echo "Clients done"
++	$(LD) -shared $(LINKOPTS) -Wl,-soname,libdns_sd.$(LDSUFFIX).1 -o $@ $+
+ 
+-../Clients/build/dns-sd: ../Clients/dns-sd.c
++Clients: setup libdns_sd
+ 	$(MAKE) -C ../Clients DEBUG=$(DEBUG) SUPMAKE_CFLAGS="$(MDNSCFLAGS)"
+ 
+ # nss_mdns target builds the Name Service Switch module
+@@ -300,8 +297,7 @@ nss_mdns: setup $(BUILDDIR)/$(NSSLIBFILE)
+ 	@echo "Name Service Switch module done"
+ 
+ $(BUILDDIR)/$(NSSLIBFILE): $(CLIENTLIBOBJS) $(OBJDIR)/nss_mdns.c.so.o
+-	$(LD) $(SOOPTS) $(LINKOPTS) -o $@ $+
+-	$(STRIP) $@
++	$(LD) -shared $(LINKOPTS) -o $@ $+
+ 
+ #############################################################################
+ 
+@@ -494,21 +490,21 @@ dnsextd: setup $(BUILDDIR)/dnsextd
+ 	@echo "dnsextd done"
+ 
+ $(BUILDDIR)/mDNSClientPosix:         $(APPOBJ)     $(OBJDIR)/Client.c.o
+-	$(CC) $+ -o $@ $(LINKOPTS)
++	$(CC) $+ -o $@
+ 
+ $(BUILDDIR)/mDNSResponderPosix:      $(COMMONOBJ)  $(OBJDIR)/Responder.c.o
+-	$(CC) $+ -o $@ $(LINKOPTS)
++	$(CC) $+ -o $@
+ 
+ $(BUILDDIR)/mDNSProxyResponderPosix: $(COMMONOBJ)  $(OBJDIR)/ProxyResponder.c.o
+-	$(CC) $+ -o $@ $(LINKOPTS)
++	$(CC) $+ -o $@
+ 
+ $(BUILDDIR)/mDNSNetMonitor:          $(SPECIALOBJ) $(OBJDIR)/NetMonitor.c.o
+-	$(CC) $+ -o $@ $(LINKOPTS)
++	$(CC) $+ -o $@
+ 
+ $(OBJDIR)/NetMonitor.c.o:            $(COREDIR)/mDNS.c # Note: NetMonitor.c textually imports mDNS.c
+ 
+ $(BUILDDIR)/dnsextd:                 $(DNSEXTDOBJ) $(OBJDIR)/dnsextd.c.threadsafe.o
+-	$(CC) $+ -o $@ $(LINKOPTS) $(LINKOPTS_PTHREAD)
++	$(CC) $+ -o $@ $(LINKOPTS_PTHREAD)
+ 
+ #############################################################################
+ 
+-- 
+2.20.1
+

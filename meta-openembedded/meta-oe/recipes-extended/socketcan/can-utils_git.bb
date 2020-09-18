@@ -12,4 +12,8 @@ PV = "2020.02.04"
 
 S = "${WORKDIR}/git"
 
-inherit autotools pkgconfig
+inherit autotools pkgconfig update-alternatives
+
+ALTERNATIVE_${PN} = "candump cansend"
+ALTERNATIVE_LINK_NAME[candump] = "${bindir}/candump"
+ALTERNATIVE_LINK_NAME[cansend] = "${bindir}/cansend"

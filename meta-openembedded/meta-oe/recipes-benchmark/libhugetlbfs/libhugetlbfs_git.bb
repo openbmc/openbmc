@@ -7,10 +7,10 @@ DEPENDS = "sysfsutils"
 RDEPENDS_${PN} += "bash python3-core"
 RDEPENDS_${PN}-tests += "bash python3-core"
 
-PV = "2.22"
+PV = "2.23"
 PE = "1"
 
-SRCREV = "e6499ff92b4a7dcffbd131d1f5d24933e48c3f20"
+SRCREV = "6b126a4d7da9490fa40fe7e1b962edcb939feddc"
 SRC_URI = " \
     git://github.com/libhugetlbfs/libhugetlbfs.git;protocol=https \
     file://skip-checking-LIB32-and-LIB64-if-they-point-to-the-s.patch \
@@ -24,7 +24,6 @@ SRC_URI = " \
     file://0004-shm.c-Mark-glibc-specific-changes-so.patch \
     file://0005-Include-dirent.h-for-ino_t.patch \
     file://0006-include-limits.h-for-PATH_MAX.patch \
-    file://0001-tests-add-explicit-permissions-to-open-call.patch \
     file://0001-huge_page_setup_helper-use-python3-interpreter.patch \
 "
 

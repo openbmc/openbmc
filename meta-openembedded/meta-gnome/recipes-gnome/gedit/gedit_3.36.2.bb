@@ -36,3 +36,4 @@ FILES_${PN}-python += " \
     ${PYTHON_SITEPACKAGES_DIR} \
 "
 
+RRECOMMENDS_${PN} += "source-code-pro-fonts"

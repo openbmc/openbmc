@@ -12,14 +12,19 @@ SRC_URI = " \
         git://linuxtv.org/libcamera.git;protocol=git \
 "
 
-SRCREV = "5f2f9406cebc668f0d69007d1ea59ef3c56ef28c"
+SRCREV = "1e8c91b65695449c5246d17ba7dc439c8058b781"
 
-PV = "202006+git${SRCPV}"
+PV = "202008+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 
 DEPENDS = "python3-pyyaml-native udev gnutls boost chrpath-native"
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'qt', 'qtbase qtbase-native', '', d)}"
+
+PACKAGES =+ "${PN}-gst"
+
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[gst] = "-Dgstreamer=enabled,-Dgstreamer=disabled,gstreamer1.0 gstreamer1.0-plugins-base"
 
 RDEPENDS_${PN} = "${@bb.utils.contains('DISTRO_FEATURES', 'wayland qt', 'qtwayland', '', d)}"
 
@@ -44,4 +49,4 @@ do_recalculate_ipa_signatures_package() {
 
 FILES_${PN}-dev = "${includedir} ${libdir}/pkgconfig"
 FILES_${PN} += " ${libdir}/libcamera.so"
-
+FILES_${PN}-gst = "${libdir}/gstreamer-1.0/libgstlibcamera.so"

@@ -1,7 +1,8 @@
 DESCRIPTION = "OpenGL CTS"
 
 require khronos-cts.inc
-
+# opengl-es-cts-3.2.6.1
+SRCREV_vk-gl-cts = "7e023f81b4fff54b558882fe739d7c959d0a02a8"
 SRCREV_amber = "d26ee22dd7faab1845a531d410f7ec1db407402a"
 SRCREV_glslang = "c538b5d796fb24dd418fdd650c7f76e56bcc3dd8"
 SRCREV_spirv-headers = "e4322e3be589e1ddd44afb20ea842a977c1319b8"

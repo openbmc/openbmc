@@ -3,12 +3,14 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=d739bb9250a55c124a545b588fd76771"
 HOMEPAGE = "http://luajit.org"
 
-PV = "2.1.0~beta3"
-SRCREV = "0ad60ccbc3768fa8e3e726858adf261950edbc22"
 SRC_URI = "git://luajit.org/git/luajit-2.0.git;protocol=http;branch=v2.1 \
            file://0001-Do-not-strip-automatically-this-leaves-the-stripping.patch \
            file://clang.patch \
            "
+
+# Set PV to a version tag and date associated with SRCREV if it is later.
+PV = "2.1.0~beta3-200809"
+SRCREV = "94d4abcca966df2cc423e821bcacd04898f73117"
 
 S = "${WORKDIR}/git"
 

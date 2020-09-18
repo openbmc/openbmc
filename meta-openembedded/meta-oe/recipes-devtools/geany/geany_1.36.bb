@@ -16,3 +16,5 @@ SRC_URI[sha256sum] = "9184dd3dd40b7b84fca70083284bb9dbf2ee8022bf2be066bdc36592d9
 FILES_${PN} += "${datadir}/icons"
 
 EXTRA_OECONF = "--disable-html-docs"
+
+RRECOMMENDS_${PN} += "source-code-pro-fonts"

@@ -15,15 +15,16 @@ src/mongo/util/net/ssl_manager.cpp:575:79: error: invalid conversion from 'size_
   if (mongoUnsignedAddOverflow64(tagAndLengthByteCount, derLength, outLength) ||
 
 Signed-off-by: Fabrice Fontaine <fontaine.fabrice@gmail.com>
+Signed-off-by: Vincent Prince <vincent.prince.fr@gmail.com>
 ---
  src/mongo/util/net/ssl_manager.cpp | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/src/mongo/util/net/ssl_manager.cpp b/src/mongo/util/net/ssl_manager.cpp
-index b93ebe84a4a3..3511eb5d998f 100644
+index 455a1662a5..e8497bc0d1 100644
 --- a/src/mongo/util/net/ssl_manager.cpp
 +++ b/src/mongo/util/net/ssl_manager.cpp
-@@ -782,7 +782,7 @@ class DERToken {
+@@ -810,7 +810,7 @@ public:
       *
       * Returns a DERToken which consists of the (tag, length, value) tuple.
       */
@@ -32,7 +33,7 @@ index b93ebe84a4a3..3511eb5d998f 100644
  
  private:
      DERType _type{DERType::EndOfContent};
-@@ -799,7 +799,7 @@ struct DataType::Handler<DERToken> {
+@@ -827,7 +827,7 @@ struct DataType::Handler<DERToken> {
                         size_t length,
                         size_t* advanced,
                         std::ptrdiff_t debug_offset) {
@@ -41,7 +42,7 @@ index b93ebe84a4a3..3511eb5d998f 100644
  
          auto swPair = DERToken::parse(ConstDataRange(ptr, length), &outLength);
  
-@@ -844,7 +844,7 @@ StatusWith<std::string> readDERString(ConstDataRangeCursor& cdc) {
+@@ -889,7 +889,7 @@ StatusWith<DERInteger> readDERInt(ConstDataRangeCursor& cdc) {
  }
  
  
@@ -50,3 +51,6 @@ index b93ebe84a4a3..3511eb5d998f 100644
      const size_t kTagLength = 1;
      const size_t kTagLengthAndInitialLengthByteLength = kTagLength + 1;
  
+-- 
+2.24.0
+

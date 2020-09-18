@@ -1,4 +1,4 @@
-From c9fc9e9a44b0fb764ce86a5e57f17d3c5bbfd8cd Mon Sep 17 00:00:00 2001
+From 298d958148f1fb2bb7725fed15c68c09677c14c9 Mon Sep 17 00:00:00 2001
 From: Vincent Prince <vincent.prince.fr@gmail.com>
 Date: Mon, 16 Sep 2019 13:37:10 +0200
 Subject: [PATCH 05/10] Add alises for arm64 which is same as aarch64
@@ -12,10 +12,10 @@ Signed-off-by: Vincent Prince <vincent.prince.fr@gmail.com>
  3 files changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/SConstruct b/SConstruct
-index e63cf15..5593c78 100644
+index 448939bdd0..abfd816f3e 100644
 --- a/SConstruct
 +++ b/SConstruct
-@@ -1129,6 +1129,7 @@ elif endian == "big":
+@@ -1228,6 +1228,7 @@ if endian == "auto":
  processor_macros = {
      'arm'        : { 'endian': 'little', 'defines': ('__arm__',) },
      'aarch64'    : { 'endian': 'little', 'defines': ('__arm64__', '__aarch64__')},
@@ -24,10 +24,10 @@ index e63cf15..5593c78 100644
      'ppc64le'    : { 'endian': 'little', 'defines': ('__powerpc64__',)},
      's390x'      : { 'endian': 'big',    'defines': ('__s390x__',)},
 diff --git a/src/third_party/IntelRDFPMathLib20U1/SConscript b/src/third_party/IntelRDFPMathLib20U1/SConscript
-index f23c071..fb82cd6 100644
+index 58e1b7ba65..bffe83b462 100644
 --- a/src/third_party/IntelRDFPMathLib20U1/SConscript
 +++ b/src/third_party/IntelRDFPMathLib20U1/SConscript
-@@ -308,7 +308,7 @@ if processor == 'i386' or processor == 'emscripten':
+@@ -309,7 +309,7 @@ if processor == 'i386' or processor == 'emscripten':
  elif processor == 'arm':
      cpp_defines['IA32'] = '1'
      cpp_defines['ia32'] = '1'
@@ -37,7 +37,7 @@ index f23c071..fb82cd6 100644
      cpp_defines['EFI2'] = '1'
  # Using 64 bit little endian
 diff --git a/src/third_party/wiredtiger/SConscript b/src/third_party/wiredtiger/SConscript
-index cdd090b..97a1b3b 100644
+index d6bd665e23..2f1e656a19 100644
 --- a/src/third_party/wiredtiger/SConscript
 +++ b/src/third_party/wiredtiger/SConscript
 @@ -152,7 +152,7 @@ condition_map = {
@@ -50,5 +50,5 @@ index cdd090b..97a1b3b 100644
      'X86_HOST'     : env['TARGET_ARCH'] == 'x86_64',
      'ZSERIES_HOST' : env['TARGET_ARCH'] == 's390x',
 -- 
-2.7.4
+2.24.0
 

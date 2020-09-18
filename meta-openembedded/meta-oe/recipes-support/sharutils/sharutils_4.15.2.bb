@@ -4,7 +4,7 @@ SECTION = "console/utils"
 LICENSE="GPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
-inherit gettext autotools
+inherit gettext autotools update-alternatives
 
 SRC_URI = "${GNU_MIRROR}/${BPN}/${BP}.tar.gz \
            file://0001-Fix-build-with-clang.patch \
@@ -25,3 +25,7 @@ do_install_append() {
 }
 
 BBCLASSEXTEND = "native nativesdk"
+
+ALTERNATIVE_${PN} = "uudecode uuencode"
+ALTERNATIVE_LINK_NAME[uudecode] = "${bindir}/uudecode"
+ALTERNATIVE_LINK_NAME[uuencode] = "${bindir}/uuencode"

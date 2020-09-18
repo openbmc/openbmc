@@ -20,33 +20,87 @@ RDEPENDS_packagegroup-meta-multimedia = "\
 "
 
 RDEPENDS_packagegroup-meta-multimedia = "\
-    libdvbpsi libdc1394 gstd gst-shark \
-    bigbuckbunny-720p tearsofsteel-1080p bigbuckbunny-1080p bigbuckbunny-480p \
-    openal-soft dleyna-core dleyna-renderer dleyna-server dleyna-connector-dbus \
-    alsa-equal libdvdnav libmusicbrainz tinyalsa \
-    fluidsynth cdparanoia vorbis-tools tremor caps libao libavc1394 \
-    opusfile gerbera libdvdcss webrtc-audio-processing \
-    rtmpdump libopenmpt schroedinger mpd mpc libmpdclient \
-    ncmpc libmpd dcadec libiec61883 \
-    ${@bb.utils.contains("DISTRO_FEATURES", "pam", "", "", d)} \
-    ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "minidlna vlc", "", d)} \
-    ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "vo-aacenc sox libde265", "", d)} \
-    ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "streamripper", "", d)} \
-    ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "openh264 opencore-amr faac vo-amrwbenc", "", d)} \
-    "
+    alsa-equal \
+    caps \
+    cdparanoia \
+    dcadec \
+    dleyna-connector-dbus \
+    dleyna-core \
+    dleyna-renderer \
+    dleyna-server \
+    dvb-apps \
+    ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "faac", "", d)} \
+    fdk-aac \
+    gerbera \
+    libao \
+    libavc1394 \
+    libdc1394 \
+    libdvbpsi \
+    libdvdnav \
+    libiec61883 \
+    fluidsynth \
+    libmusicbrainz \
+    libmpdclient \
+    mpc \
+    mpd \
+    ncmpc \
+    libmpd \
+    ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "opencore-amr vo-aacenc vo-amrwbenc", "", d)} \
+    gst-shark \
+    gstd \
+    rtmpdump \
+    bigbuckbunny-1080p \
+    bigbuckbunny-480p \
+    bigbuckbunny-720p \
+    tearsofsteel-1080p \
+    schroedinger \
+    projucer \
+    libcamera \
+    ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "libde265 openh264", "", d)} \
+    vorbis-tools \
+    libdvbcsa \
+    libopenmpt \
+    mimic \
+    ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "minidlna", "", d)} \
+    mycroft \
+    openal-soft \
+    opusfile \
+    libdvdcss \
+    ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "vlc", "", d)} \
+    ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "sox streamripper", "", d)} \
+    tinyalsa \
+    tremor \
+    webrtc-audio-processing \
+    ${@bb.utils.contains_any("TRANSLATED_TARGET_ARCH", "i586 x86-64", "x265", "", d)} \
+"
+RDEPENDS_packagegroup-meta-multimedia_remove_libc-musl = "projucer"
 
 RDEPENDS_packagegroup-meta-multimedia-connectivity = "\
-    rygel gupnp gupnp-igd gssdp gupnp-dlna gupnp-av libupnp \
+    gssdp \
+    gupnp-av \
+    gupnp-dlna \
+    gupnp-igd \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "gupnp-tools", "", d)} \
-    "
-
+    gupnp \
+    libupnp \
+    rygel \
+"
 RDEPENDS_packagegroup-meta-multimedia-dvb = "\
-    oscam "
+    oscam \
+    tvheadend \
+"
 
 RDEPENDS_packagegroup-meta-multimedia-mkv = "\
-    libmatroska libebml \
-    "
+    libebml \
+    libmatroska \
+"
 
 RDEPENDS_packagegroup-meta-multimedia-support = "\
-    libmediaart libmediaart-2.0 gst-instruments libsrtp crossguid \
-    "
+    crossguid \
+    libmediaart-2.0 \
+    libmediaart \
+    gst-instruments \
+    libsrtp \
+"
+# devel headers/libraries only packages
+# libsquish

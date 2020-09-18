@@ -1,7 +1,7 @@
-From a3631df3d6743113e1cd63579925e15bcce85868 Mon Sep 17 00:00:00 2001
+From 0a02ac779c51a2b4af3b58cb96967bf3eff80367 Mon Sep 17 00:00:00 2001
 From: Wenlin Kang <wenlin.kang@windriver.com>
 Date: Wed, 24 May 2017 16:45:34 +0800
-Subject: [PATCH 2/4] configure: fix a cc check issue.
+Subject: [PATCH] configure: fix a cc check issue.
 
 When has "." in cc value, the expression
 $myperl -V:cc | $myperl -n -e 'print if (s/^\s*cc=.([-=\w\s\/]+).;\s*/$1/);'

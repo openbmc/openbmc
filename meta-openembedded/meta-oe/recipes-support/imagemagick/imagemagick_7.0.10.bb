@@ -46,7 +46,7 @@ BBCLASSEXTEND = "native"
 ALTERNATIVE_PRIORITY = "100"
 
 ALTERNATIVE_${PN} = "animate compare composite conjure convert display \
-    identify import mogrify montage stream"
+    identify import magick-script mogrify montage stream"
 
 ALTERNATIVE_TARGET[animate] = "${bindir}/animate.im7"
 ALTERNATIVE_TARGET[compare] = "${bindir}/compare.im7"
@@ -56,12 +56,13 @@ ALTERNATIVE_TARGET[convert] = "${bindir}/convert.im7"
 ALTERNATIVE_TARGET[display] = "${bindir}/display.im7"
 ALTERNATIVE_TARGET[identify] = "${bindir}/identify.im7"
 ALTERNATIVE_TARGET[import] = "${bindir}/import.im7"
+ALTERNATIVE_TARGET[magick-script] = "${bindir}/magick-script.im7"
 ALTERNATIVE_TARGET[mogrify] = "${bindir}/mogrify.im7"
 ALTERNATIVE_TARGET[montage] = "${bindir}/montage.im7"
 ALTERNATIVE_TARGET[stream] = "${bindir}/stream.im7"
 
 ALTERNATIVE_${PN}-doc = "animate.1 compare.1 composite.1 conjure.1 \
-    convert.1 display.1 identify.1 import.1 mogrify.1 montage.1 stream.1"
+    convert.1 display.1 identify.1 import.1 magick-script.1 mogrify.1 montage.1 stream.1"
 
 ALTERNATIVE_LINK_NAME[animate.1] = "${mandir}/man1/animate.1"
 ALTERNATIVE_TARGET[animate.1] = "${mandir}/man1/animate.im7.1"
@@ -79,6 +80,8 @@ ALTERNATIVE_LINK_NAME[identify.1] = "${mandir}/man1/identify.1"
 ALTERNATIVE_TARGET[identify.1] = "${mandir}/man1/identify.im7.1"
 ALTERNATIVE_LINK_NAME[import.1] = "${mandir}/man1/import.1"
 ALTERNATIVE_TARGET[import.1] = "${mandir}/man1/import.im7.1"
+ALTERNATIVE_LINK_NAME[magick-script.1] = "${mandir}/man1/magick-script.1"
+ALTERNATIVE_TARGET[magick-script.1] = "${mandir}/man1/magick-script.im7.1"
 ALTERNATIVE_LINK_NAME[mogrify.1] = "${mandir}/man1/mogrify.1"
 ALTERNATIVE_TARGET[mogrify.1] = "${mandir}/man1/mogrify.im7.1"
 ALTERNATIVE_LINK_NAME[montage.1] = "${mandir}/man1/montage.1"

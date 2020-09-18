@@ -1,4 +1,4 @@
-From e1f483510a1011e37540fdee8f3bc36111fa45a0 Mon Sep 17 00:00:00 2001
+From 798bfb5e984845a27874d1a244686db6e384d7b8 Mon Sep 17 00:00:00 2001
 From: Nate Karstens <nate.karstens@garmin.com>
 Date: Thu, 13 Jul 2017 09:00:00 -0500
 Subject: [PATCH 04/11] Use list for changed interfaces
@@ -15,10 +15,10 @@ Signed-off-by: Nate Karstens <nate.karstens@garmin.com>
  1 file changed, 52 insertions(+), 15 deletions(-)
 
 diff --git a/mDNSPosix/mDNSPosix.c b/mDNSPosix/mDNSPosix.c
-index 8fe22be..699855a 100644
+index 195d04b..bb883c1 100755
 --- a/mDNSPosix/mDNSPosix.c
 +++ b/mDNSPosix/mDNSPosix.c
-@@ -75,6 +75,14 @@ struct IfChangeRec
+@@ -67,6 +67,14 @@ struct IfChangeRec
  };
  typedef struct IfChangeRec IfChangeRec;
  
@@ -31,9 +31,9 @@ index 8fe22be..699855a 100644
 +typedef struct NetworkInterfaceIndex NetworkInterfaceIndex;
 +
  // Note that static data is initialized to zero in (modern) C.
- static fd_set gEventFDs;
- static int gMaxFD;                              // largest fd in gEventFDs
-@@ -1071,6 +1079,32 @@ mDNSlocal mStatus OpenIfNotifySocket(int *pFD)
+ static PosixEventSource *gEventSources;             // linked list of PosixEventSource's
+ static sigset_t gEventSignalSet;                // Signals which event loop listens for
+@@ -1458,6 +1466,32 @@ mDNSlocal mStatus OpenIfNotifySocket(int *pFD)
      return err;
  }
  
@@ -66,7 +66,7 @@ index 8fe22be..699855a 100644
  #if MDNS_DEBUGMSGS
  mDNSlocal void      PrintNetLinkMsg(const struct nlmsghdr *pNLMsg)
  {
-@@ -1098,14 +1132,13 @@ mDNSlocal void      PrintNetLinkMsg(const struct nlmsghdr *pNLMsg)
+@@ -1485,14 +1519,13 @@ mDNSlocal void      PrintNetLinkMsg(const struct nlmsghdr *pNLMsg)
  }
  #endif
  
@@ -82,7 +82,7 @@ index 8fe22be..699855a 100644
  
      // The structure here is more complex than it really ought to be because,
      // unfortunately, there's no good way to size a buffer in advance large
-@@ -1141,9 +1174,9 @@ mDNSlocal mDNSu32       ProcessRoutingNotification(int sd)
+@@ -1528,9 +1561,9 @@ mDNSlocal mDNSu32       ProcessRoutingNotification(int sd)
  
          // Process the NetLink message
          if (pNLMsg->nlmsg_type == RTM_GETLINK || pNLMsg->nlmsg_type == RTM_NEWLINK)
@@ -94,7 +94,7 @@ index 8fe22be..699855a 100644
  
          // Advance pNLMsg to the next message in the buffer
          if ((pNLMsg->nlmsg_flags & NLM_F_MULTI) != 0 && pNLMsg->nlmsg_type != NLMSG_DONE)
-@@ -1154,8 +1187,6 @@ mDNSlocal mDNSu32       ProcessRoutingNotification(int sd)
+@@ -1541,8 +1574,6 @@ mDNSlocal mDNSu32       ProcessRoutingNotification(int sd)
          else
              break;  // all done!
      }
@@ -103,7 +103,7 @@ index 8fe22be..699855a 100644
  }
  
  #else // USES_NETLINK
-@@ -1187,14 +1218,13 @@ mDNSlocal void      PrintRoutingSocketMsg(const struct ifa_msghdr *pRSMsg)
+@@ -1574,14 +1605,13 @@ mDNSlocal void      PrintRoutingSocketMsg(const struct ifa_msghdr *pRSMsg)
  }
  #endif
  
@@ -119,7 +119,7 @@ index 8fe22be..699855a 100644
  
      readCount = read(sd, buff, sizeof buff);
      if (readCount < (ssize_t) sizeof(struct ifa_msghdr))
-@@ -1209,12 +1239,10 @@ mDNSlocal mDNSu32       ProcessRoutingNotification(int sd)
+@@ -1596,12 +1626,10 @@ mDNSlocal mDNSu32       ProcessRoutingNotification(int sd)
          pRSMsg->ifam_type == RTM_IFINFO)
      {
          if (pRSMsg->ifam_type == RTM_IFINFO)
@@ -134,7 +134,7 @@ index 8fe22be..699855a 100644
  }
  
  #endif // USES_NETLINK
-@@ -1224,7 +1252,8 @@ mDNSlocal void InterfaceChangeCallback(int fd, short filter, void *context)
+@@ -1611,7 +1639,8 @@ mDNSlocal void InterfaceChangeCallback(int fd, void *context)
  {
      IfChangeRec     *pChgRec = (IfChangeRec*) context;
      fd_set readFDs;
@@ -144,7 +144,7 @@ index 8fe22be..699855a 100644
      struct timeval zeroTimeout = { 0, 0 };
  
      (void)fd; // Unused
-@@ -1233,17 +1262,25 @@ mDNSlocal void InterfaceChangeCallback(int fd, short filter, void *context)
+@@ -1619,17 +1648,25 @@ mDNSlocal void InterfaceChangeCallback(int fd, void *context)
      FD_ZERO(&readFDs);
      FD_SET(pChgRec->NotifySD, &readFDs);
  
@@ -173,5 +173,5 @@ index 8fe22be..699855a 100644
  
  // Register with either a Routing Socket or RtNetLink to listen for interface changes.
 -- 
-2.17.1
+2.20.1
 

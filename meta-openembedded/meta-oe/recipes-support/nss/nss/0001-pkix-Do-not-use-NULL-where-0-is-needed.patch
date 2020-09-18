@@ -1,0 +1,46 @@
+From 1136cad77c2dc7d8e1daa317877676733e805f29 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 26 Aug 2020 17:30:40 -0700
+Subject: [PATCH] pkix: Do not use NULL where 0 is needed
+
+Clang finds this error
+
+pkix_logger.c:316:32: error: cast to smaller integer type 'PKIX_ERRORCLASS' from 'void *' [-Werror,-Wvoid-pointer-to-enum-cast]
+        logger->logComponent = (PKIX_ERRORCLASS)NULL;
+                               ^~~~~~~~~~~~~~~~~~~~~
+pkix_logger.c:617:32: error: cast to smaller integer type 'PKIX_ERRORCLASS' from 'void *' [-Werror,-Wvoid-pointer-to-enum-cast]
+        logger->logComponent = (PKIX_ERRORCLASS)NULL;
+                               ^~~~~~~~~~~~~~~~~~~~~
+2 errors generated.
+
+Upstream-Status: Submitted [https://bugzilla.mozilla.org/show_bug.cgi?id=1661378]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ nss/lib/libpkix/pkix/util/pkix_logger.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/nss/lib/libpkix/pkix/util/pkix_logger.c b/nss/lib/libpkix/pkix/util/pkix_logger.c
+index a916e6e..10f537a 100644
+--- a/nss/lib/libpkix/pkix/util/pkix_logger.c
++++ b/nss/lib/libpkix/pkix/util/pkix_logger.c
+@@ -313,7 +313,7 @@ pkix_Logger_Destroy(
+ 
+         logger->callback = NULL;
+         PKIX_DECREF(logger->context);
+-        logger->logComponent = (PKIX_ERRORCLASS)NULL;
++        logger->logComponent = (PKIX_ERRORCLASS)0;
+ 
+ cleanup:
+ 
+@@ -614,7 +614,7 @@ PKIX_Logger_Create(
+ 
+         logger->callback = callback;
+         logger->maxLevel = 0;
+-        logger->logComponent = (PKIX_ERRORCLASS)NULL;
++        logger->logComponent = (PKIX_ERRORCLASS)0;
+ 
+         PKIX_INCREF(loggerContext);
+         logger->context = loggerContext;
+-- 
+2.28.0
+

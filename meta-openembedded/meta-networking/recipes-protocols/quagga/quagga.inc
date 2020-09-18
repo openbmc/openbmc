@@ -40,7 +40,7 @@ PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}"
 PACKAGECONFIG[cap] = "--enable-capabilities,--disable-capabilities,libcap"
 PACKAGECONFIG[pam] = "--with-libpam, --without-libpam, libpam"
 
-inherit autotools update-rc.d useradd systemd pkgconfig multilib_header
+inherit autotools update-rc.d useradd systemd pkgconfig multilib_header update-alternatives
 
 CFLAGS += "-fcommon"
 
@@ -237,3 +237,7 @@ pkg_prerm_${PN}-ripngd () {
 pkg_prerm_${PN}-isisd () {
     ${sysconfdir}/init.d/quagga stop isisd
 }
+
+ALTERNATIVE_${PN} = "pimd"
+ALTERNATIVE_LINK_NAME[pimd] = "${sbindir}/pimd"
+

@@ -1,0 +1,29 @@
+From efd79bda1b85a5a4398a71e5ea2bc00ee4b0ea46 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 15 Sep 2020 18:20:27 -0700
+Subject: [PATCH] stacktrace: Define ARCH_BITS for x86
+
+stacktrace_somap.cpp:92:33: error: 'ELFCLASSARCH_BITS' was not declared in this scope
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/mongo/util/stacktrace_somap.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/mongo/util/stacktrace_somap.cpp b/src/mongo/util/stacktrace_somap.cpp
+index f7ba66a142..2231948ce8 100644
+--- a/src/mongo/util/stacktrace_somap.cpp
++++ b/src/mongo/util/stacktrace_somap.cpp
+@@ -83,7 +83,7 @@ void addUnameToSoMap(BSONObjBuilder* soMap) {
+ #define ARCH_BITS __ELF_NATIVE_CLASS
+ #elif defined(__x86_64__) || defined(__aarch64__)
+ #define ARCH_BITS 64
+-#elif defined(__arm__)
++#elif defined(__i386__) || defined(__arm__)
+ #define ARCH_BITS 32
+ #else
+ #error Unknown target architecture.
+-- 
+2.28.0
+

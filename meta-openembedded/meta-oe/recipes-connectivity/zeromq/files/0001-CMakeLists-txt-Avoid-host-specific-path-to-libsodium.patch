@@ -1,6 +1,7 @@
+From 24ad50286a87833329213dc0b0e68c21aeeee95f Mon Sep 17 00:00:00 2001
 From: Niko Mauno <niko.mauno@vaisala.com>
-Date: Wed Apr 22 09:00:00 2020 +0300
-Subject: CMakeLists.txt: Avoid host-specific path to libsodium
+Date: Wed, 22 Apr 2020 09:00:00 +0300
+Subject: [PATCH] CMakeLists.txt: Avoid host-specific path to libsodium
 
 Avoid propagating full build host specific path to generated
 ZeroMQTargets.cmake when building with libsodium, which changes the
@@ -17,10 +18,16 @@ Upstream-Status: Pending
 
 Signed-off-by: Niko Mauno <niko.mauno@vaisala.com>
 
+---
+ CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e92141d..d0775c1 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -1210,7 +1210,7 @@
-   target_link_libraries(libzmq ${OPTIONAL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+@@ -1428,7 +1428,7 @@ if(BUILD_SHARED)
+   endif()
  
    if(SODIUM_FOUND)
 -    target_link_libraries(libzmq ${SODIUM_LIBRARIES})
@@ -28,8 +35,8 @@ Signed-off-by: Niko Mauno <niko.mauno@vaisala.com>
      # On Solaris, libsodium depends on libssp
      if(${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
        target_link_libraries(libzmq ssp)
-@@ -1240,7 +1240,7 @@
-   target_link_libraries(libzmq-static ${OPTIONAL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+@@ -1473,7 +1473,7 @@ if(BUILD_STATIC)
+   endif()
  
    if(SODIUM_FOUND)
 -    target_link_libraries(libzmq-static ${SODIUM_LIBRARIES})

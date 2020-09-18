@@ -16,7 +16,7 @@ SRC_URI[archive.sha256sum] = "3a43c0010d4e61f412563fd83769d4667d8b8e82903526d21c
 SRC_URI[patch18.md5sum] = "cb29e7a33dd85105ba6e6ec4f971e42c"
 SRC_URI[patch18.sha256sum] = "092437d27b4fa88c044ef6290372fee5ce06d223607f0e22a6e527065c8930e7"
 
-inherit autotools-brokensep
+inherit autotools-brokensep update-alternatives
 
 do_configure () {
     ./configure --prefix=${prefix}
@@ -53,3 +53,7 @@ FILES_${PN}-dbg = "${prefix}/src/debug \
     ${bindir}/.debug ${sbindir}/.debug"
 
 RDEPENDS_${PN}-server = "tcp-wrappers xinetd"
+
+ALTERNATIVE_PRIORITY = "100"
+ALTERNATIVE_${PN}-client = "tftp"
+ALTERNATIVE_LINK_NAME[tftp] = "${bindir}/tftp"
