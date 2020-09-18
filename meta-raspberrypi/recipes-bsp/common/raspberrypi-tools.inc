@@ -1,5 +1,5 @@
 SRCREV ?= "b0c869bc929587a7e1d20a98e2dc828a24ca396a"
-RPITOOLS_SRC_URI ?= "https://github.com/raspberrypi/tools/archive/${SRCREV}.tar.gz"
+RPITOOLS_SRC_URI ?= "https://github.com/raspberrypi/tools/archive/${SRCREV}.tar.gz;downloadfilename=raspberrypi-tools-${SRCREV}.tar.gz"
 RPITOOLS_S ?= "${WORKDIR}/tools-${SRCREV}"
 
 SRC_URI = "${RPITOOLS_SRC_URI}"

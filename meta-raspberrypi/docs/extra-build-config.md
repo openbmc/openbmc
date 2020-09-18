@@ -1,6 +1,6 @@
 # Optional build configuration
 
-There are a set of ways in which a user can influence different paramenters of
+There are a set of ways in which a user can influence different parameters of
 the build. We list here the ones that are closely related to this BSP or
 specific to it. For the rest please check:
 <http://www.yoctoproject.org/docs/latest/ref-manual/ref-manual.html>
@@ -37,7 +37,7 @@ By default, each machine uses `vc4` for graphics. This will in turn sets mesa as
 
 ## Add purchased license codecs
 
-To add you own licenses use variables `KEY_DECODE_MPG2` and `KEY_DECODE_WVC1` in
+To add your own licenses use variables `KEY_DECODE_MPG2` and `KEY_DECODE_WVC1` in
 local.conf. Example:
 
     KEY_DECODE_MPG2 = "12345678"
@@ -77,7 +77,7 @@ To remove (or adjust) this delay set these variables in local.conf:
 ## Set overclocking options
 
 The Raspberry Pi can be overclocked. As of now overclocking up to the "Turbo
-Mode" is officially supported by the raspbery and does not void warranty. Check
+Mode" is officially supported by the Raspberry Pi and does not void warranty. Check
 the config.txt for a detailed description of options and modes. The following
 variables are supported in local.conf: `ARM_FREQ`, `GPU_FREQ`, `CORE_FREQ`,
 `SDRAM_FREQ` and `OVER_VOLTAGE`.
@@ -249,7 +249,7 @@ Screen LCD, HDMI interface (<http://www.waveshare.com/7inch-HDMI-LCD-C.htm>) Rev
 RaspberryPi 0, 1, 2 and CM will have UART console enabled by default.
 
 RaspberryPi 0 WiFi and 3 does not have the UART enabled by default because this
-needs a fixed core frequency and enable_uart wil set it to the minimum. Certain
+needs a fixed core frequency and enable_uart will set it to the minimum. Certain
 operations - 60fps h264 decode, high quality deinterlace - which aren't
 performed on the ARM may be affected, and we wouldn't want to do that to users
 who don't want to use the serial port. Users who want serial console support on
