@@ -6,6 +6,7 @@ LICENSE = "MIT"
 TOOLCHAIN_TARGET_TASK ?= ""
 
 TOOLCHAIN_HOST_TASK ?= "\
+    nativesdk-sdk-provides-dummy \
     nativesdk-python3-core \
     nativesdk-python3-modules \
     nativesdk-python3-misc \

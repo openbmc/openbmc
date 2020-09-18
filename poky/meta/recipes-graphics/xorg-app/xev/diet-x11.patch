@@ -1,14 +1,19 @@
+From b9b2b8d1af283a13cdccea55562cf332de48dcb9 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross@openedhand.com>
+Date: Wed, 28 Mar 2007 16:10:50 +0000
+Subject: [PATCH] Add xev
+
 Upstream-Status: Inappropriate [disable feature]
 
 ---
- xev.c |   16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ xev.c | 64 +----------------------------------------------------------
+ 1 file changed, 1 insertion(+), 63 deletions(-)
 
-Index: xev-1.2.3/xev.c
-===================================================================
---- xev-1.2.3.orig/xev.c
-+++ xev-1.2.3/xev.c
-@@ -125,17 +125,6 @@ do_KeyPress(XEvent *eventp)
+diff --git a/xev.c b/xev.c
+index ea69234..6d5eb30 100644
+--- a/xev.c
++++ b/xev.c
+@@ -175,17 +175,6 @@ do_KeyPress(XEvent *eventp)
      nbytes = XLookupString(e, str, 256, &ks, NULL);
  
      /* not supposed to call XmbLookupString on a key release event */
@@ -26,24 +31,24 @@ Index: xev-1.2.3/xev.c
  
      if (ks == NoSymbol)
          ksname = "NoSymbol";
-@@ -168,16 +157,6 @@ do_KeyPress(XEvent *eventp)
+@@ -220,16 +209,6 @@ do_KeyPress(XEvent *eventp)
      }
  
      /* not supposed to call XmbLookupString on a key release event */
 -    if (e->type == KeyPress && xic) {
--        printf("    XmbLookupString gives %d bytes: ", nmbbytes);
+-        output(Indent, "XmbLookupString gives %d bytes: ", nmbbytes);
 -        if (nmbbytes > 0) {
 -            dump(buf, nmbbytes);
--            printf(" \"%s\"\n", buf);
+-            output(NewLine, " \"%s\"", buf);
 -        }
 -        else {
--            printf("\n");
+-            output_new_line();
 -        }
 -    }
  
-     printf("    XFilterEvent returns: %s\n",
+     output(Indent | NewLine, "XFilterEvent returns: %s",
             XFilterEvent(eventp, e->window) ? "True" : "False");
-@@ -1141,7 +1120,7 @@ parse_event_mask(const char *s, long eve
+@@ -1211,7 +1190,7 @@ parse_event_mask(const char *s, long event_masks[])
              if (s)
                  return True;
          }
@@ -52,7 +57,7 @@ Index: xev-1.2.3/xev.c
  
      if (s != NULL)
          fprintf(stderr, "%s: unrecognized event mask '%s'\n", ProgramName, s);
-@@ -1288,37 +1267,6 @@ main(int argc, char **argv)
+@@ -1361,37 +1340,6 @@ main(int argc, char **argv)
          fprintf(stderr, "%s:  XSetLocaleModifiers failed\n", ProgramName);
      }
  
@@ -90,7 +95,7 @@ Index: xev-1.2.3/xev.c
      screen = DefaultScreen(dpy);
  
      attr.event_mask = event_masks[EVENT_MASK_INDEX_CORE];
-@@ -1373,16 +1321,6 @@ main(int argc, char **argv)
+@@ -1446,16 +1394,6 @@ main(int argc, char **argv)
          printf("Outer window is 0x%lx, inner window is 0x%lx\n", w, subw);
      }
  

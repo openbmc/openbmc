@@ -5,17 +5,20 @@ PR = "r11"
 LICENSE = "GPLv2 & GPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe \
 		    file://COPYINGv3;md5=d32239bcb673463ab874e80d47fae504"
-SRC_URI += "file://check-automake-cross-warning.patch \
-	    file://autoreconf-exclude.patch \
-	    file://autoreconf-gnuconfigize.patch \
-            file://config_site.patch \
-            file://remove-usr-local-lib-from-m4.patch \
-            file://preferbash.patch \
-            file://autotest-automake-result-format.patch \
-            file://add_musl_config.patch \
-            file://performance.patch \
-            file://AC_HEADER_MAJOR-port-to-glibc-2.25.patch \
-            file://autoconf-replace-w-option-in-shebangs-with-modern-use-warnings.patch \
+
+SRC_URI = "${GNU_MIRROR}/autoconf/autoconf-${PV}.tar.gz \
+           file://program_prefix.patch \
+           file://check-automake-cross-warning.patch \
+           file://autoreconf-exclude.patch \
+           file://autoreconf-gnuconfigize.patch \
+           file://config_site.patch \
+           file://remove-usr-local-lib-from-m4.patch \
+           file://preferbash.patch \
+           file://autotest-automake-result-format.patch \
+           file://add_musl_config.patch \
+           file://performance.patch \
+           file://AC_HEADER_MAJOR-port-to-glibc-2.25.patch \
+           file://autoconf-replace-w-option-in-shebangs-with-modern-use-warnings.patch \
            "
 
 SRC_URI[md5sum] = "82d05e03b93e45f5a39b828dc9c6c29b"

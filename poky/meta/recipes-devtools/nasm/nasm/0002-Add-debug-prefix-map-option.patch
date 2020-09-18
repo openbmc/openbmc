@@ -1,4 +1,4 @@
-From bb4e42ad3a0cdd23a1d1797e6299c76b474867c0 Mon Sep 17 00:00:00 2001
+From 81d6519499dcfebe7d21e65e002a8885a4e8d852 Mon Sep 17 00:00:00 2001
 From: Joshua Watt <JPEWhacker@gmail.com>
 Date: Tue, 19 Nov 2019 13:12:17 -0600
 Subject: [PATCH] Add --debug-prefix-map option
@@ -11,7 +11,7 @@ Upstream-Status: Submitted [https://bugzilla.nasm.us/show_bug.cgi?id=3392635]
 Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
 
 ---
- asm/nasm.c              | 26 +++++++++++++++++++++++++-
+ asm/nasm.c              | 24 ++++++++++++++++++++++++
  include/nasmlib.h       |  9 +++++++++
  nasm.txt                |  4 ++++
  nasmlib/filename.c      | 20 ++++++++++++++++++++
@@ -23,34 +23,32 @@ Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
  stdlib/strlcat.c        |  2 +-
  test/elfdebugprefix.asm |  6 ++++++
  test/performtest.pl     | 12 ++++++++++--
- 12 files changed, 83 insertions(+), 10 deletions(-)
+ 12 files changed, 82 insertions(+), 9 deletions(-)
  create mode 100644 test/elfdebugprefix.asm
 
 diff --git a/asm/nasm.c b/asm/nasm.c
-index a0e1719..fc6c62e 100644
+index e5ae89a..7a7f8b4 100644
 --- a/asm/nasm.c
 +++ b/asm/nasm.c
-@@ -938,7 +938,8 @@ enum text_options {
-     OPT_LIMIT,
+@@ -939,6 +939,7 @@ enum text_options {
      OPT_KEEP_ALL,
      OPT_NO_LINE,
--    OPT_DEBUG
-+    OPT_DEBUG,
-+    OPT_DEBUG_PREFIX_MAP
+     OPT_DEBUG,
++    OPT_DEBUG_PREFIX_MAP,
+     OPT_REPRODUCIBLE
  };
  enum need_arg {
-     ARG_NO,
-@@ -970,6 +971,7 @@ static const struct textargs textopts[] = {
+@@ -971,6 +972,7 @@ static const struct textargs textopts[] = {
      {"keep-all", OPT_KEEP_ALL, ARG_NO, 0},
      {"no-line",  OPT_NO_LINE, ARG_NO, 0},
      {"debug",    OPT_DEBUG, ARG_MAYBE, 0},
 +    {"debug-prefix-map", OPT_DEBUG_PREFIX_MAP, true, 0},
+     {"reproducible", OPT_REPRODUCIBLE, ARG_NO, 0},
      {NULL, OPT_BOGUS, ARG_NO, 0}
  };
- 
-@@ -1332,6 +1334,26 @@ static bool process_arg(char *p, char *q, int pass)
-                 case OPT_DEBUG:
-                     debug_nasm = param ? strtoul(param, NULL, 10) : debug_nasm+1;
+@@ -1337,6 +1339,26 @@ static bool process_arg(char *p, char *q, int pass)
+                 case OPT_REPRODUCIBLE:
+                     reproducible = true;
                      break;
 +                case OPT_DEBUG_PREFIX_MAP: {
 +                    struct debug_prefix_list *d;
@@ -75,7 +73,7 @@ index a0e1719..fc6c62e 100644
                  case OPT_HELP:
                      help(stdout);
                      exit(0);
-@@ -2297,6 +2319,8 @@ static void help(FILE *out)
+@@ -2304,6 +2326,8 @@ static void help(FILE *out)
          "    -w-x          disable warning x (also -Wno-x)\n"
          "    -w[+-]error   promote all warnings to errors (also -Werror)\n"
          "    -w[+-]error=x promote warning x to errors (also -Werror=x)\n"
@@ -85,7 +83,7 @@ index a0e1719..fc6c62e 100644
  
      fprintf(out, "       %-20s %s\n",
 diff --git a/include/nasmlib.h b/include/nasmlib.h
-index e9bfbcc..98fc653 100644
+index 438178d..4c3e90d 100644
 --- a/include/nasmlib.h
 +++ b/include/nasmlib.h
 @@ -250,10 +250,19 @@ int64_t readstrnum(char *str, int length, bool *warn);
@@ -181,10 +179,10 @@ index 54b22f8..c4a412c 100644
  
  static void as86_cleanup(void)
 diff --git a/output/outcoff.c b/output/outcoff.c
-index bcd9ff3..15bfcf3 100644
+index 58fa024..14baf7b 100644
 --- a/output/outcoff.c
 +++ b/output/outcoff.c
-@@ -1095,14 +1095,14 @@ static void coff_symbol(char *name, int32_t strpos, int32_t value,
+@@ -1072,14 +1072,14 @@ static void coff_symbol(char *name, int32_t strpos, int32_t value,
  
  static void coff_write_symbols(void)
  {
@@ -215,7 +213,7 @@ index 61af020..1292958 100644
      nsects = sectlen = 0;
      syms = saa_init((int32_t)sizeof(struct elf_symbol));
 diff --git a/output/outieee.c b/output/outieee.c
-index 4cc0f0f..2468724 100644
+index 6d6d4b2..cdb8333 100644
 --- a/output/outieee.c
 +++ b/output/outieee.c
 @@ -207,7 +207,7 @@ static void ieee_unqualified_name(char *, char *);
@@ -228,10 +226,10 @@ index 4cc0f0f..2468724 100644
      fpubhead = NULL;
      fpubtail = &fpubhead;
 diff --git a/output/outobj.c b/output/outobj.c
-index 0d4d311..d8dd6a0 100644
+index 56b43f9..fefea94 100644
 --- a/output/outobj.c
 +++ b/output/outobj.c
-@@ -638,7 +638,7 @@ static enum directive_result obj_directive(enum directive, char *);
+@@ -644,7 +644,7 @@ static enum directive_result obj_directive(enum directive, char *);
  
  static void obj_init(void)
  {

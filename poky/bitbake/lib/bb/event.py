@@ -10,17 +10,17 @@ BitBake build tools.
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-import sys
-import pickle
-import logging
-import atexit
-import traceback
 import ast
+import atexit
+import collections
+import logging
+import pickle
+import sys
 import threading
+import traceback
 
-import bb.utils
-import bb.compat
 import bb.exceptions
+import bb.utils
 
 # This is the pid for which we should generate the event. This is set when
 # the runqueue forks off.
@@ -56,7 +56,7 @@ def set_class_handlers(h):
     _handlers = h
 
 def clean_class_handlers():
-    return bb.compat.OrderedDict()
+    return collections.OrderedDict()
 
 # Internal
 _handlers = clean_class_handlers()

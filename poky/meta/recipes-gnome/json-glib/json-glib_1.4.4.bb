@@ -12,9 +12,11 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=7fbc338309ac38fefcd64b04bb903e34"
 DEPENDS = "glib-2.0"
 
 GNOMEBASEBUILDCLASS = "meson"
-inherit gnomebase lib_package gobject-introspection gtk-doc gettext ptest-gnome manpages
+inherit gnomebase lib_package gobject-introspection gtk-doc gettext ptest-gnome manpages upstream-version-is-even
 
-SRC_URI += "file://run-ptest"
+SRC_URI += "file://run-ptest \
+            file://0001-scanner-use-macro-instead-of-cast-to-convert-pointer.patch \
+"
 SRC_URI[archive.md5sum] = "4d4bb9837f6d31e32d0ce658ae135f68"
 SRC_URI[archive.sha256sum] = "720c5f4379513dc11fd97dc75336eb0c0d3338c53128044d9fabec4374f4bc47"
 

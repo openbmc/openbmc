@@ -705,11 +705,7 @@ class LexerReflect(object):
 
         # Sort the functions by line number
         for f in self.funcsym.values():
-            if sys.version_info[0] < 3:
-                f.sort(lambda x,y: cmp(func_code(x[1]).co_firstlineno,func_code(y[1]).co_firstlineno))
-            else:
-                # Python 3.0
-                f.sort(key=lambda x: func_code(x[1]).co_firstlineno)
+            f.sort(key=lambda x: func_code(x[1]).co_firstlineno)
 
         # Sort the strings by regular expression length
         for s in self.strsym.values():

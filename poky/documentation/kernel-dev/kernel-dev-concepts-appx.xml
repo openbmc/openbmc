@@ -192,7 +192,7 @@
             Forward porting Linux kernel functionality into the Yocto Linux
             kernels available through the Yocto Project can be thought of as
             a "micro uprev."
-            The many “micro uprevs” produce a Yocto Linux kernel version with
+            The many "micro uprevs" produce a Yocto Linux kernel version with
             a mix of important new mainline, non-mainline, BSP developments
             and feature integrations.
             This Yocto Linux kernel gives insight into new features and

@@ -70,17 +70,17 @@
             web server. This is useful for the following:
             <itemizedlist>
                 <listitem><para>
-                    Capturing a command-line build’s statistics into
+                    Capturing a command-line build's statistics into
                     the Toaster database for examination later.
                     </para></listitem>
                 <listitem><para>
-                    Capturing a command-line build’s statistics when
+                    Capturing a command-line build's statistics when
                     the Toaster server is already running.
                     </para></listitem>
                 <listitem><para>
                     Having one instance of the Toaster web server
                     track and capture multiple command-line builds,
-                    where each build is started in its own “noweb”
+                    where each build is started in its own "noweb"
                     Toaster environment.
                     </para></listitem>
             </itemizedlist>
@@ -92,7 +92,7 @@
             minutes to ensure the complete transfer of its BitBake build
             statistics to the Toaster database.
             If you have a separate Toaster web server instance running, you
-            can watch this command-line build’s progress and examine the
+            can watch this command-line build's progress and examine the
             results as soon as they are posted:
             <literallayout class='monospaced'>
      $ source toaster start noweb
@@ -107,7 +107,7 @@
 
         <para>
             You can start a Toaster environment with the
-            “New Projects” feature disabled.
+            "New Projects" feature disabled.
             Doing so is useful for the following:
             <itemizedlist>
                 <listitem><para>
@@ -470,7 +470,7 @@
                       <filename>STATIC_ROOT</filename>.
                       </para></listitem>
                   <listitem><para>
-                      Test and/or use the Mysql integration with Toaster’s
+                      Test and/or use the Mysql integration with Toaster's
                       Django web server.
                       At this point, you can start up the normal Toaster
                       Django web server with the Toaster database in Mysql.

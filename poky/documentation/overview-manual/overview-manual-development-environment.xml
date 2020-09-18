@@ -327,7 +327,7 @@
         For the Yocto Project, a key individual called the "maintainer" is
         responsible for the integrity of the "master" branch of a given Git
         repository.
-        The "master" branch is the “upstream” repository from which final or
+        The "master" branch is the "upstream" repository from which final or
         most recent builds of a project occur.
         The maintainer is responsible for accepting changes from other
         developers and for organizing the underlying branch structure to
@@ -372,7 +372,7 @@
         might arise within files that are being worked on simultaneously by
         more than one person.
         All this work is done locally on the development host before
-        anything is pushed to a "contrib" area and examined at the maintainer’s
+        anything is pushed to a "contrib" area and examined at the maintainer's
         level.
     </para>
 
@@ -380,7 +380,7 @@
         A somewhat formal method exists by which developers commit changes
         and push them into the "contrib" area and subsequently request that
         the maintainer include them into an upstream branch.
-        This process is called “submitting a patch” or "submitting a change."
+        This process is called "submitting a patch" or "submitting a change."
         For information on submitting patches and changes, see the
         "<ulink url='&YOCTO_DOCS_DEV_URL;#how-to-submit-a-change'>Submitting a Change to the Yocto Project</ulink>"
         section in the Yocto Project Development Tasks Manual.
@@ -389,7 +389,7 @@
     <para>
         In summary, a single point of entry
         exists for changes into a "master" or development branch of the
-        Git repository, which is controlled by the project’s maintainer.
+        Git repository, which is controlled by the project's maintainer.
         And, a set of developers exist who independently develop, test, and
         submit changes to "contrib" areas for the maintainer to examine.
         The maintainer then chooses which changes are going to become a
@@ -734,7 +734,7 @@
                 <listitem><para id='git-commands-clone'>
                     <emphasis><filename>git clone</filename>:</emphasis>
                     Creates a local clone of a Git repository that is on
-                    equal footing with a fellow developer’s Git repository
+                    equal footing with a fellow developer's Git repository
                     or an upstream repository.
                     </para></listitem>
                 <listitem><para>
@@ -752,7 +752,7 @@
                     Commits are used for historical purposes, for determining
                     if a maintainer of a project will allow the change,
                     and for ultimately pushing the change from your local
-                    Git repository into the project’s upstream repository.
+                    Git repository into the project's upstream repository.
                     </para></listitem>
                 <listitem><para>
                     <emphasis><filename>git status</filename>:</emphasis>

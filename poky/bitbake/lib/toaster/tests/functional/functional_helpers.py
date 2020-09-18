@@ -75,7 +75,7 @@ class SeleniumFunctionalTestCase(SeleniumTestCaseBase):
         try:
             table_element = self.get_table_element(table_id)
             element = table_element.find_element_by_link_text(link_text)
-        except NoSuchElementException as e:
+        except self.NoSuchElementException:
             print('no element found')
             raise
         return element
@@ -86,7 +86,7 @@ class SeleniumFunctionalTestCase(SeleniumTestCaseBase):
             element_xpath = "//*[@id='" + table_id + "']"
             try:
                 element = self.driver.find_element_by_xpath(element_xpath)
-            except NoSuchElementException as e:
+            except self.NoSuchElementException:
                 raise
             return element
         row = coordinate[0]
@@ -96,7 +96,7 @@ class SeleniumFunctionalTestCase(SeleniumTestCaseBase):
             element_xpath = "//*[@id='" + table_id + "']/tbody/tr[" + str(row) + "]"
             try:
                 element = self.driver.find_element_by_xpath(element_xpath)
-            except NoSuchElementException as e:
+            except self.NoSuchElementException:
                 return False
             return element
 #now we are looking for an element with specified X and Y
@@ -105,6 +105,6 @@ class SeleniumFunctionalTestCase(SeleniumTestCaseBase):
         element_xpath = "//*[@id='" + table_id + "']/tbody/tr[" + str(row) + "]/td[" + str(column) + "]"
         try:
             element = self.driver.find_element_by_xpath(element_xpath)
-        except NoSuchElementException as e:
+        except self.NoSuchElementException:
             return False
         return element

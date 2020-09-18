@@ -22,7 +22,6 @@ import bb.taskdata
 import bb.utils
 import bb.command
 import bb.remotedata
-from bb.cookerdata import CookerConfiguration
 from bb.main import setup_bitbake, BitBakeConfigParameters
 import bb.fetch2
 
@@ -381,18 +380,13 @@ class Tinfoil:
         if not config_params:
             config_params = TinfoilConfigParameters(config_only=config_only, quiet=quiet)
 
-        cookerconfig = CookerConfiguration()
-        cookerconfig.setConfigParameters(config_params)
-
         if not config_only:
             # Disable local loggers because the UI module is going to set up its own
             for handler in self.localhandlers:
                 self.logger.handlers.remove(handler)
             self.localhandlers = []
 
-        self.server_connection, ui_module = setup_bitbake(config_params,
-                            cookerconfig,
-                            extrafeatures)
+        self.server_connection, ui_module = setup_bitbake(config_params, extrafeatures)
 
         self.ui_module = ui_module
 
@@ -738,7 +732,7 @@ class Tinfoil:
                                 continue
                             if helper.eventHandler(event):
                                 if isinstance(event, bb.build.TaskFailedSilent):
-                                    logger.warning("Logfile for failed setscene task is %s" % event.logfile)
+                                    self.logger.warning("Logfile for failed setscene task is %s" % event.logfile)
                                 elif isinstance(event, bb.build.TaskFailed):
                                     bb.ui.knotty.print_event_log(event, includelogs, loglines, termfilter)
                                 continue
@@ -812,18 +806,22 @@ class Tinfoil:
         prepare() has been called, or use a with... block when you create
         the tinfoil object which will ensure that it gets called.
         """
-        if self.server_connection:
-            self.run_command('clientComplete')
-            _server_connections.remove(self.server_connection)
-            bb.event.ui_queue = []
-            self.server_connection.terminate()
-            self.server_connection = None
+        try:
+            if self.server_connection:
+                try:
+                    self.run_command('clientComplete')
+                finally:
+                    _server_connections.remove(self.server_connection)
+                    bb.event.ui_queue = []
+                    self.server_connection.terminate()
+                    self.server_connection = None
 
-        # Restore logging handlers to how it looked when we started
-        if self.oldhandlers:
-            for handler in self.logger.handlers:
-                if handler not in self.oldhandlers:
-                    self.logger.handlers.remove(handler)
+        finally:
+            # Restore logging handlers to how it looked when we started
+            if self.oldhandlers:
+                for handler in self.logger.handlers:
+                    if handler not in self.oldhandlers:
+                        self.logger.handlers.remove(handler)
 
     def _reconvert_type(self, obj, origtypename):
         """

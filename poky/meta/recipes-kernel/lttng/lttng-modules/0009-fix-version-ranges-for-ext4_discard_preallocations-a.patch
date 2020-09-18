@@ -1,0 +1,52 @@
+From b74b25f349e92d7b5bdc8684e406d6a889f13773 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Fri, 4 Sep 2020 11:52:51 -0400
+Subject: [PATCH 09/10] fix: version ranges for ext4_discard_preallocations and
+ writeback_queue_io
+
+Upstream-Status: Backport
+
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Change-Id: Id4fa53cb2e713cbda651e1a75deed91013115592
+---
+ instrumentation/events/lttng-module/ext4.h      | 3 ++-
+ instrumentation/events/lttng-module/writeback.h | 8 +++++++-
+ 2 files changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/instrumentation/events/lttng-module/ext4.h b/instrumentation/events/lttng-module/ext4.h
+index 4476abb..b172c8d 100644
+--- a/instrumentation/events/lttng-module/ext4.h
++++ b/instrumentation/events/lttng-module/ext4.h
+@@ -460,7 +460,8 @@ LTTNG_TRACEPOINT_EVENT(ext4_mb_release_group_pa,
+ )
+ #endif
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,9,0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,9,0) || \
++	LTTNG_KERNEL_RANGE(5,8,6, 5,9,0))
+ LTTNG_TRACEPOINT_EVENT(ext4_discard_preallocations,
+ 	TP_PROTO(struct inode *inode, unsigned int len, unsigned int needed),
+ 
+diff --git a/instrumentation/events/lttng-module/writeback.h b/instrumentation/events/lttng-module/writeback.h
+index e9018dd..09637d7 100644
+--- a/instrumentation/events/lttng-module/writeback.h
++++ b/instrumentation/events/lttng-module/writeback.h
+@@ -384,7 +384,13 @@ LTTNG_TRACEPOINT_EVENT_WBC_INSTANCE(wbc_balance_dirty_wait, writeback_wbc_balanc
+ #endif
+ LTTNG_TRACEPOINT_EVENT_WBC_INSTANCE(wbc_writepage, writeback_wbc_writepage)
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,9,0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,9,0) || \
++	LTTNG_KERNEL_RANGE(5,8,6, 5,9,0) || \
++	LTTNG_KERNEL_RANGE(5,4,62, 5,5,0) || \
++	LTTNG_KERNEL_RANGE(4,19,143, 4,20,0) || \
++	LTTNG_KERNEL_RANGE(4,14,196, 4,15,0) || \
++	LTTNG_KERNEL_RANGE(4,9,235, 4,10,0) || \
++	LTTNG_KERNEL_RANGE(4,4,235, 4,5,0))
+ LTTNG_TRACEPOINT_EVENT(writeback_queue_io,
+ 	TP_PROTO(struct bdi_writeback *wb,
+ 		 struct wb_writeback_work *work,
+-- 
+2.19.1
+

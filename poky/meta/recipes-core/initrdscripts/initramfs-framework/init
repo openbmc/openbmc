@@ -88,12 +88,25 @@ fi
 
 # populate bootparam environment
 for p in `cat /proc/cmdline`; do
+	if [ -n "$quoted" ]; then
+		value="$value $p"
+		if [ "`echo $p | sed -e 's/\"$//'`" != "$p" ]; then
+			eval "bootparam_${quoted}=${value}"
+			unset quoted
+		fi
+		continue
+	fi
+
 	opt=`echo $p | cut -d'=' -f1`
 	opt=`echo $opt | sed -e 'y/.-/__/'`
 	if [ "`echo $p | cut -d'=' -f1`" = "$p" ]; then
 		eval "bootparam_${opt}=true"
 	else
 		value="`echo $p | cut -d'=' -f2-`"
+		if [ "`echo $value | sed -e 's/^\"//'`" != "$value" ]; then
+			quoted=${opt}
+			continue
+		fi
 		eval "bootparam_${opt}=\"${value}\""
 	fi
 done

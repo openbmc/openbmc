@@ -29,6 +29,9 @@ from bb import data, event, utils
 bblogger = logging.getLogger('BitBake')
 logger = logging.getLogger('BitBake.Build')
 
+verboseShellLogging = False
+verboseStdoutLogging = False
+
 __mtime_cache = {}
 
 def cached_mtime_noerror(f):
@@ -413,7 +416,7 @@ def exec_func_shell(func, d, runfile, cwd=None):
 
         bb.data.emit_func(func, script, d)
 
-        if bb.msg.loggerVerboseLogs:
+        if verboseShellLogging or bb.utils.to_boolean(d.getVar("BB_VERBOSE_LOGS", False)):
             script.write("set -x\n")
         if cwd:
             script.write("cd '%s'\n" % cwd)
@@ -433,7 +436,7 @@ exit $ret
         if fakerootcmd:
             cmd = [fakerootcmd, runfile]
 
-    if bb.msg.loggerDefaultVerbose:
+    if verboseStdoutLogging:
         logfile = LogTee(logger, StdoutNoopContextManager())
     else:
         logfile = StdoutNoopContextManager()

@@ -12,16 +12,19 @@ DEPENDS = "glib-2.0"
 SRC_URI[archive.md5sum] = "eb382907ec941fe2fb1a9676b75acf7a"
 SRC_URI[archive.sha256sum] = "937a06b124052813bfc0b0b86bff42016ff01067582e1aca65bb6dbe0845a168"
 
-PACKAGECONFIG ??= "gnutls"
+PACKAGECONFIG ??= "gnutls ${@bb.utils.contains('PTEST_ENABLED', '1', 'tests', '', d)}"
 
 PACKAGECONFIG[gnutls] = "-Dgnutls=enabled,-Dgnutls=disabled,gnutls"
 PACKAGECONFIG[openssl] = "-Dopenssl=enabled,-Dopenssl=disabled,openssl"
 PACKAGECONFIG[libproxy] = "-Dlibproxy=enabled,-Dlibproxy=disabled,libproxy"
+PACKAGECONFIG[tests] = "-Dinstalled_tests=true,-Dinstalled_tests=false"
 
 EXTRA_OEMESON = "-Dgnome_proxy=disabled"
 
 GNOMEBASEBUILDCLASS = "meson"
-inherit gnomebase gettext upstream-version-is-even gio-module-cache
+inherit gnomebase gettext upstream-version-is-even gio-module-cache ptest-gnome
+
+SRC_URI += "file://run-ptest"
 
 FILES_${PN} += "\
                 ${libdir}/gio/modules/libgio*.so \

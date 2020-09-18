@@ -9,11 +9,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \
 
 SRC_URI = "http://people.redhat.com/sgrubb/libcap-ng/libcap-ng-${PV}.tar.gz \
            file://python.patch \
-           file://0001-configure.ac-add-library-if-header-found.patch \
-           file://0002-Wrap-pthread_atfork-usage-in-HAVE_PTHREAD_H.patch \
 "
 
-SRC_URI[md5sum] = "57dc267e2949cdecb651a929f9206572"
-SRC_URI[sha256sum] = "a84ca7b4e0444283ed269b7a29f5b6187f647c82e2b876636b49b9a744f0ffbf"
+SRC_URI[md5sum] = "5883ed10b621c87e29a05cff36d2928e"
+SRC_URI[sha256sum] = "85815c711862d01a440db471f12fba462c9949e923966f5859607e652d9c0ae9"
 
 BBCLASSEXTEND = "native nativesdk"

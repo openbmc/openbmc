@@ -58,10 +58,17 @@ class ConfigParameters(object):
     def updateToServer(self, server, environment):
         options = {}
         for o in ["abort", "force", "invalidate_stamp",
-                  "verbose", "debug", "dry_run", "dump_signatures",
-                  "debug_domains", "extra_assume_provided", "profile",
-                  "prefile", "postfile", "server_timeout"]:
+                  "dry_run", "dump_signatures",
+                  "extra_assume_provided", "profile",
+                  "prefile", "postfile", "server_timeout",
+                  "nosetscene", "setsceneonly", "skipsetscene",
+                  "runall", "runonly", "writeeventlog"]:
             options[o] = getattr(self.options, o)
+
+        options['build_verbose_shell'] = self.options.verbose
+        options['build_verbose_stdout'] = self.options.verbose
+        options['default_loglevel'] = bb.msg.loggerDefaultLogLevel
+        options['debug_domains'] = bb.msg.loggerDefaultDomains
 
         ret, error = server.runCommand(["updateConfig", options, environment, sys.argv])
         if error:
@@ -111,11 +118,11 @@ class CookerConfiguration(object):
     """
 
     def __init__(self):
-        self.debug_domains = []
+        self.debug_domains = bb.msg.loggerDefaultDomains
+        self.default_loglevel = bb.msg.loggerDefaultLogLevel
         self.extra_assume_provided = []
         self.prefile = []
         self.postfile = []
-        self.debug = 0
         self.cmd = None
         self.abort = True
         self.force = False
@@ -125,23 +132,16 @@ class CookerConfiguration(object):
         self.skipsetscene = False
         self.invalidate_stamp = False
         self.dump_signatures = []
+        self.build_verbose_shell = False
+        self.build_verbose_stdout = False
         self.dry_run = False
         self.tracking = False
-        self.xmlrpcinterface = []
-        self.server_timeout = None
         self.writeeventlog = False
-        self.server_only = False
         self.limited_deps = False
         self.runall = []
         self.runonly = []
 
         self.env = {}
-
-    def setConfigParameters(self, parameters):
-        for key in self.__dict__.keys():
-            if key in parameters.options.__dict__:
-                setattr(self, key, parameters.options.__dict__[key])
-        self.env = parameters.environment.copy()
 
     def __getstate__(self):
         state = {}
@@ -164,7 +164,7 @@ def catch_parse_error(func):
             import traceback
             parselog.critical(traceback.format_exc())
             parselog.critical("Unable to parse %s: %s" % (fn, exc))
-            sys.exit(1)
+            raise bb.BBHandledException()
         except bb.data_smart.ExpansionError as exc:
             import traceback
 
@@ -176,10 +176,10 @@ def catch_parse_error(func):
                 if not fn.startswith(bbdir):
                     break
             parselog.critical("Unable to parse %s" % fn, exc_info=(exc_class, exc, tb))
-            sys.exit(1)
+            raise bb.BBHandledException()
         except bb.parse.ParseError as exc:
             parselog.critical(str(exc))
-            sys.exit(1)
+            raise bb.BBHandledException()
     return wrapped
 
 @catch_parse_error
@@ -300,13 +300,13 @@ class CookerDataBuilder(object):
 
             self.data_hash = data_hash.hexdigest()
         except (SyntaxError, bb.BBHandledException):
-            raise bb.BBHandledException
+            raise bb.BBHandledException()
         except bb.data_smart.ExpansionError as e:
             logger.error(str(e))
-            raise bb.BBHandledException
+            raise bb.BBHandledException()
         except Exception:
             logger.exception("Error parsing configuration files")
-            raise bb.BBHandledException
+            raise bb.BBHandledException()
 
         # Create a copy so we can reset at a later date when UIs disconnect
         self.origdata = self.data
@@ -355,7 +355,7 @@ class CookerDataBuilder(object):
                 for layer in broken_layers:
                     parselog.critical("   %s", layer)
                 parselog.critical("Please check BBLAYERS in %s" % (layerconf))
-                sys.exit(1)
+                raise bb.BBHandledException()
 
             for layer in layers:
                 parselog.debug(2, "Adding layer %s", layer)
@@ -427,7 +427,7 @@ class CookerDataBuilder(object):
             handlerfn = data.getVarFlag(var, "filename", False)
             if not handlerfn:
                 parselog.critical("Undefined event handler function '%s'" % var)
-                sys.exit(1)
+                raise bb.BBHandledException()
             handlerln = int(data.getVarFlag(var, "lineno", False))
             bb.event.register(var, data.getVar(var, False),  (data.getVarFlag(var, "eventmask") or "").split(), handlerfn, handlerln)
 

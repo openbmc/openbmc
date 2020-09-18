@@ -232,7 +232,9 @@ do_install() {
 
 	install -d ${D}${sysconfdir}/udev/rules.d/
 	install -d ${D}${sysconfdir}/tmpfiles.d
-	install -m 0644 ${WORKDIR}/*.rules ${D}${sysconfdir}/udev/rules.d/
+	for rule in $(find ${WORKDIR} -maxdepth 1 -type f -name "*.rules"); do
+		install -m 0644 $rule ${D}${sysconfdir}/udev/rules.d/
+	done
 
 	install -m 0644 ${WORKDIR}/00-create-volatile.conf ${D}${sysconfdir}/tmpfiles.d/
 
@@ -325,6 +327,7 @@ PACKAGE_BEFORE_PN = "\
     ${PN}-journal-upload \
     ${PN}-journal-remote \
     ${PN}-extra-utils \
+    ${PN}-udev-rules \
     udev \
     udev-hwdb \
 "
@@ -499,6 +502,13 @@ FILES_${PN}-extra-utils = "\
                         ${rootlibexecdir}/systemd/systemd-cgroups-agent \
 "
 
+FILES_${PN}-udev-rules = "\
+                        ${rootlibexecdir}/udev/rules.d/70-uaccess.rules \
+                        ${rootlibexecdir}/udev/rules.d/71-seat.rules \
+                        ${rootlibexecdir}/udev/rules.d/73-seat-late.rules \
+                        ${rootlibexecdir}/udev/rules.d/99-systemd.rules \
+"
+
 CONFFILES_${PN} = "${sysconfdir}/systemd/coredump.conf \
 	${sysconfdir}/systemd/journald.conf \
 	${sysconfdir}/systemd/logind.conf \
@@ -554,10 +564,6 @@ FILES_${PN} = " ${base_bindir}/* \
                 ${exec_prefix}/lib/sysusers.d \
                 ${exec_prefix}/lib/environment.d \
                 ${localstatedir} \
-                ${rootlibexecdir}/udev/rules.d/70-uaccess.rules \
-                ${rootlibexecdir}/udev/rules.d/71-seat.rules \
-                ${rootlibexecdir}/udev/rules.d/73-seat-late.rules \
-                ${rootlibexecdir}/udev/rules.d/99-systemd.rules \
                 ${rootlibexecdir}/modprobe.d/systemd.conf \
                 ${datadir}/dbus-1/system.d/org.freedesktop.timedate1.conf \
                 ${datadir}/dbus-1/system.d/org.freedesktop.locale1.conf \
@@ -572,7 +578,7 @@ FILES_${PN} = " ${base_bindir}/* \
 
 FILES_${PN}-dev += "${base_libdir}/security/*.la ${datadir}/dbus-1/interfaces/ ${sysconfdir}/rpm/macros.systemd"
 
-RDEPENDS_${PN} += "kmod dbus util-linux-mount util-linux-umount udev (= ${EXTENDPKGV}) util-linux-agetty util-linux-fsck"
+RDEPENDS_${PN} += "kmod dbus util-linux-mount util-linux-umount udev (= ${EXTENDPKGV}) systemd-udev-rules util-linux-agetty util-linux-fsck"
 RDEPENDS_${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'serial-getty-generator', '', 'systemd-serialgetty', d)}"
 RDEPENDS_${PN} += "volatile-binds"
 

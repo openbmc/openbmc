@@ -8,18 +8,18 @@
 <title>Understanding the Yocto Project Autobuilder</title>
     <section>
         <title>Execution Flow within the Autobuilder</title>
-        <para>The “a-full” and “a-quick” targets are the usual entry points into the Autobuilder and
+        <para>The "a-full" and "a-quick" targets are the usual entry points into the Autobuilder and
             it makes sense to follow the process through the system starting there. This is best
             visualised from the Autobuilder Console view (<link linkend=""
                 >https://autobuilder.yoctoproject.org/typhoon/#/console</link>). </para>
-        <para>Each item along the top of that view represents some “target build” and these targets
-            are all run in parallel. The ‘full’ build will trigger the majority of them, the “quick”
+        <para>Each item along the top of that view represents some "target build" and these targets
+            are all run in parallel. The 'full' build will trigger the majority of them, the "quick"
             build will trigger some subset of them. The Autobuilder effectively runs whichever
             configuration is defined for each of those targets on a seperate buildbot worker. To
             understand the configuration, you need to look at the entry on
                 <filename>config.json</filename> file within the
                 <filename>yocto-autobuilder-helper</filename> repository. The targets are defined in
-            the ‘overrides’ section, a quick example could be qemux86-64 which looks
+            the ‘overrides' section, a quick example could be qemux86-64 which looks
             like:<literallayout class="monospaced">
      "qemux86-64" : {
          "MACHINE" : "qemux86-64",
@@ -31,7 +31,7 @@
          }
      },
                     </literallayout>And
-            to expand that, you need the “arch-qemu” entry from the “templates” section, which looks
+            to expand that, you need the "arch-qemu" entry from the "templates" section, which looks
             like:<literallayout class="monospaced">
      "arch-qemu" : {
          "BUILDINFO" : true,
@@ -52,10 +52,10 @@
          }
      },
                     </literallayout>Combining
-            these two entries you can see that “qemux86-64” is a three step build where the
+            these two entries you can see that "qemux86-64" is a three step build where the
                 <filename>bitbake BBTARGETS</filename> would be run, then <filename>bitbake
                 SANITYTARGETS</filename> for each step; all for
-                <filename>MACHINE=”qemx86-64”</filename> but with differing SDKMACHINE settings. In
+                <filename>MACHINE="qemx86-64"</filename> but with differing SDKMACHINE settings. In
             step 1 an extra variable is added to the <filename>auto.conf</filename> file to enable
             wic image generation.</para>
         <para>While not every detail of this is covered here, you can see how the templating
@@ -260,7 +260,7 @@
                 <listitem>
                     <para dir="ltr">Cleanup the build directory using <link
                             linkend="test-clobberdir"><filename>clobberdir</filename></link> if the
-                        build was successful, else rename it to “build-renamed” for potential future
+                        build was successful, else rename it to "build-renamed" for potential future
                         debugging.</para>
                 </listitem>
             </orderedlist></para>

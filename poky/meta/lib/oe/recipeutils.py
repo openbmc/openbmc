@@ -563,6 +563,23 @@ def get_bbfile_path(d, destdir, extrapathhint=None):
     confdata = bb.cookerdata.parse_config_file(destlayerconf, confdata)
     pn = d.getVar('PN')
 
+    # Parse BBFILES_DYNAMIC and append to BBFILES
+    bbfiles_dynamic = (confdata.getVar('BBFILES_DYNAMIC') or "").split()
+    collections = (confdata.getVar('BBFILE_COLLECTIONS') or "").split()
+    invalid = []
+    for entry in bbfiles_dynamic:
+        parts = entry.split(":", 1)
+        if len(parts) != 2:
+            invalid.append(entry)
+            continue
+        l, f = parts
+        invert = l[0] == "!"
+        if invert:
+            l = l[1:]
+        if (l in collections and not invert) or (l not in collections and invert):
+            confdata.appendVar("BBFILES", " " + f)
+    if invalid:
+        return None
     bbfilespecs = (confdata.getVar('BBFILES') or '').split()
     if destdir == destlayerdir:
         for bbfilespec in bbfilespecs:

@@ -106,7 +106,7 @@
                     You need to be sure you have a pre-built kernel that
                     will boot in QEMU.
                     You also need the target root filesystem for your target
-                    machine’s architecture:
+                    machine's architecture:
                     <itemizedlist>
                         <listitem><para>
                             If you have previously built an image for QEMU
@@ -553,7 +553,7 @@
                     A root filesystem that has one of the following
                     filetype extensions: "ext2", "ext3", "ext4", "jffs2",
                     "nfs", or "btrfs".
-                    If the filename you provide for this option uses “nfs”, it
+                    If the filename you provide for this option uses "nfs", it
                     must provide an explicit root filesystem path.
                     </para></listitem>
                 <listitem><para>
@@ -567,7 +567,7 @@
                     <replaceable>MACHINE</replaceable>:
                     The architecture of the QEMU machine, which must be one
                     of the following: "qemux86", "qemux86-64", "qemuarm",
-                    "qemuarm64", "qemumips", “qemumips64", or "qemuppc".
+                    "qemuarm64", "qemumips", "qemumips64", or "qemuppc".
                     The <replaceable>MACHINE</replaceable> and
                     <replaceable>QEMUARCH</replaceable> options are basically
                     identical.
@@ -674,7 +674,7 @@ qemux86" or "qemux86-64".
                         <listitem><para>
                             The build host <filename>/dev/vhost-net</filename>
                             directory has to be either readable or writable
-                            and “slirp-enabled”.
+                            and "slirp-enabled".
                             </para></listitem>
                     </itemizedlist>
                     </para></listitem>

@@ -18,6 +18,7 @@ SRCREV_FORMAT ?= "meta_machine"
 KCONF_AUDIT_LEVEL ?= "1"
 KCONF_BSP_AUDIT_LEVEL ?= "0"
 KMETA_AUDIT ?= "yes"
+KMETA_AUDIT_WERROR ?= ""
 
 # returns local (absolute) path names for all valid patches in the
 # src_uri
@@ -84,6 +85,21 @@ def get_machine_branch(d, default):
                 return branches[0]
 	    
     return default
+
+# returns a list of all directories that are on FILESEXTRAPATHS (and
+# hence available to the build) that contain .scc or .cfg files
+def get_dirs_with_fragments(d):
+    extrapaths = []
+    extrafiles = []
+    extrapathsvalue = (d.getVar("FILESEXTRAPATHS") or "")
+    # Remove default flag which was used for checking
+    extrapathsvalue = extrapathsvalue.replace("__default:", "")
+    extrapaths = extrapathsvalue.split(":")
+    for path in extrapaths:
+        if path + ":True" not in extrafiles:
+            extrafiles.append(path + ":" + str(os.path.exists(path)))
+
+    return " ".join(extrafiles)
 
 do_kernel_metadata() {
 	set +e
@@ -225,7 +241,7 @@ do_kernel_metadata() {
 		for feature in ${KERNEL_FEATURES}; do
 			feature_found=f
 			for d in $includes; do
-				path_to_check=$(echo $d | sed 's/-I//g')
+				path_to_check=$(echo $d | sed 's/^-I//')
 				if [ "$feature_found" = "f" ] && [ -e "$path_to_check/$feature" ]; then
 				    feature_found=t
 				fi
@@ -367,6 +383,7 @@ do_kernel_checkout[dirs] = "${S}"
 addtask kernel_checkout before do_kernel_metadata after do_symlink_kernsrc
 addtask kernel_metadata after do_validate_branches do_unpack before do_patch
 do_kernel_metadata[depends] = "kern-tools-native:do_populate_sysroot"
+do_kernel_metadata[file-checksums] = " ${@get_dirs_with_fragments(d)}"
 do_validate_branches[depends] = "kern-tools-native:do_populate_sysroot"
 
 do_kernel_configme[depends] += "virtual/${TARGET_PREFIX}binutils:do_populate_sysroot"
@@ -507,6 +524,8 @@ python do_kernel_configcheck() {
 
     config_check_visibility = int(d.getVar("KCONF_AUDIT_LEVEL") or 0)
     bsp_check_visibility = int(d.getVar("KCONF_BSP_AUDIT_LEVEL") or 0)
+    kmeta_audit_werror = d.getVar("KMETA_AUDIT_WERROR") or ""
+    warnings_detected = False
 
     # if config check visibility is "1", that's the lowest level of audit. So
     # we add the --classify option to the run, since classification will
@@ -533,6 +552,7 @@ python do_kernel_configcheck() {
             with open (outfile, "r") as myfile:
                 results = myfile.read()
                 bb.warn( "[kernel config]: specified values did not make it into the kernel's final configuration:\n\n%s" % results)
+                warnings_detected = True
 
     # category #2: invalid fragment elements
     extra_params = ""
@@ -552,8 +572,9 @@ python do_kernel_configcheck() {
 
         if bsp_check_visibility and os.stat(outfile).st_size > 0:
             with open (outfile, "r") as myfile:
-               results = myfile.read()
-               bb.warn( "[kernel config]: This BSP contains fragments with warnings:\n\n%s" % results)
+                results = myfile.read()
+                bb.warn( "[kernel config]: This BSP contains fragments with warnings:\n\n%s" % results)
+                warnings_detected = True
 
     # category #3: redefined options (this is pretty verbose and is debug only)
     try:
@@ -574,6 +595,10 @@ python do_kernel_configcheck() {
             with open (outfile, "r") as myfile:
                 results = myfile.read()
                 bb.warn( "[kernel config]: This BSP has configuration options defined in more than one config, with differing values:\n\n%s" % results)
+                warnings_detected = True
+
+    if warnings_detected and kmeta_audit_werror:
+        bb.fatal( "configuration warnings detected, werror is set, promoting to fatal" )
 }
 
 # Ensure that the branches (BSP and meta) are on the locations specified by

@@ -37,6 +37,8 @@ do_install () {
         cp -pP "${S}/zone.tab" ${D}${datadir}/zoneinfo
         cp -pP "${S}/zone1970.tab" ${D}${datadir}/zoneinfo
         cp -pP "${S}/iso3166.tab" ${D}${datadir}/zoneinfo
+        cp -pP "${S}/leapseconds" ${D}${datadir}/zoneinfo
+        cp -pP "${S}/leap-seconds.list" ${D}${datadir}/zoneinfo
 
         # Install default timezone
         if [ -e ${D}${datadir}/zoneinfo/${DEFAULT_TIMEZONE} ]; then
@@ -145,6 +147,8 @@ RPROVIDES_tzdata-misc = "tzdata-misc"
 FILES_tzdata-core += " \
                 ${sysconfdir}/localtime                  \
                 ${sysconfdir}/timezone                   \
+                ${datadir}/zoneinfo/leapseconds          \
+                ${datadir}/zoneinfo/leap-seconds.list    \
                 ${datadir}/zoneinfo/Pacific/Honolulu     \
                 ${datadir}/zoneinfo/America/Anchorage    \
                 ${datadir}/zoneinfo/America/Los_Angeles  \

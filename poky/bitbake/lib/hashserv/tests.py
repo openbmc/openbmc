@@ -9,6 +9,7 @@ from . import create_server, create_client
 import hashlib
 import logging
 import multiprocessing
+import os
 import sys
 import tempfile
 import threading

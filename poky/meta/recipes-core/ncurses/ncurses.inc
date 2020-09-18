@@ -16,7 +16,8 @@ inherit autotools binconfig-disabled multilib_header pkgconfig
 SRC_URI = "git://salsa.debian.org/debian/ncurses.git;protocol=https"
 
 EXTRA_AUTORECONF = "-I m4"
-CONFIG_SITE =+ "${WORKDIR}/config.cache"
+
+CACHED_CONFIGUREVARS = "cf_cv_func_nanosleep=yes"
 
 EXTRASITECONFIG = "CFLAGS='${CFLAGS} -I${SYSROOT_DESTDIR}${includedir}'"
 

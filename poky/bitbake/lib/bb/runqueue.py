@@ -376,7 +376,7 @@ class RunQueueData:
 
         self.stampwhitelist = cfgData.getVar("BB_STAMP_WHITELIST") or ""
         self.multi_provider_whitelist = (cfgData.getVar("MULTI_PROVIDER_WHITELIST") or "").split()
-        self.setscenewhitelist = get_setscene_enforce_whitelist(cfgData)
+        self.setscenewhitelist = get_setscene_enforce_whitelist(cfgData, targets)
         self.setscenewhitelist_checked = False
         self.setscene_enforce = (cfgData.getVar('BB_SETSCENE_ENFORCE') == "1")
         self.init_progress_reporter = bb.progress.DummyMultiStageProcessProgressReporter()
@@ -1263,8 +1263,8 @@ class RunQueue:
             "fakerootnoenv" : self.rqdata.dataCaches[mc].fakerootnoenv,
             "sigdata" : bb.parse.siggen.get_taskdata(),
             "logdefaultlevel" : bb.msg.loggerDefaultLogLevel,
-            "logdefaultverbose" : bb.msg.loggerDefaultVerbose,
-            "logdefaultverboselogs" : bb.msg.loggerVerboseLogs,
+            "build_verbose_shell" : self.cooker.configuration.build_verbose_shell,
+            "build_verbose_stdout" : self.cooker.configuration.build_verbose_stdout,
             "logdefaultdomain" : bb.msg.loggerDefaultDomains,
             "prhost" : self.cooker.prhost,
             "buildname" : self.cfgData.getVar("BUILDNAME"),
@@ -2999,16 +2999,15 @@ class runQueuePipe():
             print("Warning, worker left partial message: %s" % self.queue)
         self.input.close()
 
-def get_setscene_enforce_whitelist(d):
+def get_setscene_enforce_whitelist(d, targets):
     if d.getVar('BB_SETSCENE_ENFORCE') != '1':
         return None
     whitelist = (d.getVar("BB_SETSCENE_ENFORCE_WHITELIST") or "").split()
     outlist = []
     for item in whitelist[:]:
         if item.startswith('%:'):
-            for target in sys.argv[1:]:
-                if not target.startswith('-'):
-                    outlist.append(target.split(':')[0] + ':' + item.split(':')[1])
+            for (mc, target, task, fn) in targets:
+                outlist.append(target + ':' + item.split(':')[1])
         else:
             outlist.append(item)
     return outlist

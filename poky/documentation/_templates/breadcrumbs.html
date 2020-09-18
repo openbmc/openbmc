@@ -1,0 +1,14 @@
+{% extends "!breadcrumbs.html" %}
+
+{% block breadcrumbs %}
+    <li>
+      <span class="doctype_switcher_placeholder">{{ doctype or 'single' }}</span>
+      <span class="version_switcher_placeholder">{{ release }}</span>
+    </li>
+    <li> &raquo;</li>
+    {% for doc in parents %}
+      <li><a href="{{ doc.link|e }}">{{ doc.title }}</a> &raquo;</li>
+    {% endfor %}
+    <li>{{ title }}</li>
+{% endblock %}
+

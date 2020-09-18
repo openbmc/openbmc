@@ -26,11 +26,8 @@ startup_progress() {
         progress=$progress_size
     fi
     #echo "PROGRESS is $progress $runlevel $first_step + ($step of $num_steps) $step_change $progress_size"
-    #if type psplash-write >/dev/null 2>&1; then
-    #    TMPDIR=/mnt/.psplash psplash-write "PROGRESS $progress" || true
-    #fi
-    if [ -e /mnt/.psplash/psplash_fifo ]; then
-        echo "PROGRESS $progress" > /mnt/.psplash/psplash_fifo
+    if type psplash-write >/dev/null 2>&1; then
+        PSPLASH_FIFO_DIR=/mnt/.psplash psplash-write "PROGRESS $progress" || true
     fi
 }
 
@@ -176,7 +173,7 @@ startup() {
 #Uncomment to cause psplash to exit manually, otherwise it exits when it sees a VC switch
 if [ "x$runlevel" != "xS" ] && [ ! -x /etc/rc${runlevel}.d/S??xserver-nodm ]; then
     if type psplash-write >/dev/null 2>&1; then
-        TMPDIR=/mnt/.psplash psplash-write "QUIT" || true
+        PSPLASH_FIFO_DIR=/mnt/.psplash psplash-write "QUIT" || true
     	umount -l /mnt/.psplash
     fi
 fi

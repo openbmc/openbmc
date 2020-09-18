@@ -54,13 +54,20 @@ class Command:
         self.cooker = cooker
         self.cmds_sync = CommandsSync()
         self.cmds_async = CommandsAsync()
-        self.remotedatastores = bb.remotedata.RemoteDatastores(cooker)
+        self.remotedatastores = None
 
         # FIXME Add lock for this
         self.currentAsyncCommand = None
 
     def runCommand(self, commandline, ro_only = False):
         command = commandline.pop(0)
+
+        # Ensure cooker is ready for commands
+        if command != "updateConfig" and command != "setFeatures":
+            self.cooker.init_configdata()
+            if not self.remotedatastores:
+                self.remotedatastores = bb.remotedata.RemoteDatastores(self.cooker)
+
         if hasattr(CommandsSync, command):
             # Can run synchronous commands straight away
             command_method = getattr(self.cmds_sync, command)
@@ -136,7 +143,8 @@ class Command:
         self.cooker.finishcommand()
 
     def reset(self):
-        self.remotedatastores = bb.remotedata.RemoteDatastores(self.cooker)
+        if self.remotedatastores:
+           self.remotedatastores = bb.remotedata.RemoteDatastores(self.cooker)
 
 class CommandsSync:
     """

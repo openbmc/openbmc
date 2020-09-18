@@ -261,6 +261,16 @@ PACKAGECONFIG_append_pn-qemu-system-native = " sdl"
 #BB_HASHSERVE = "auto"
 #BB_SIGNATURE_HANDLER = "OEEquivHash"
 
+#
+# Memory Resident Bitbake
+#
+# Bitbake's server component can stay in memory after the UI for the current command
+# has completed. This means subsequent commands can run faster since there is no need
+# for bitbake to reload cache files and so on. Number is in seconds, after which the
+# server will shut down.
+#
+#BB_SERVER_TIMEOUT = "60"
+
 # CONF_VERSION is increased each time build/conf/ changes incompatibly and is used to
 # track the version of this file when it was generated. This can safely be ignored if
 # this doesn't mean anything to you.

@@ -636,7 +636,7 @@ class Cache(NoCache):
                 # Have to be careful about spaces and colons in filenames
                 flist = self.filelist_regex.split(fl)
                 for f in flist:
-                    if not f or "*" in f:
+                    if not f:
                         continue
                     f, exist = f.split(":")
                     if (exist == "True" and not os.path.exists(f)) or (exist == "False" and os.path.exists(f)):

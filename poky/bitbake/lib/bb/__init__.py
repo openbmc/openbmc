@@ -93,7 +93,7 @@ class BBLoggerAdapter(logging.LoggerAdapter, BBLoggerMixin):
 
         def __repr__(self):
             logger = self.logger
-            level = getLevelName(logger.getEffectiveLevel())
+            level = logger.getLevelName(logger.getEffectiveLevel())
             return '<%s %s (%s)>' % (self.__class__.__name__, logger.name, level)
 
 logging.LoggerAdapter = BBLoggerAdapter

@@ -310,8 +310,9 @@ python copy_buildsystem () {
         if os.path.exists(builddir + '/conf/auto.conf'):
             with open(builddir + '/conf/auto.conf', 'r') as f:
                 oldlines += f.readlines()
-        with open(builddir + '/conf/local.conf', 'r') as f:
-            oldlines += f.readlines()
+        if os.path.exists(builddir + '/conf/local.conf'):
+            with open(builddir + '/conf/local.conf', 'r') as f:
+                oldlines += f.readlines()
         (updated, newlines) = bb.utils.edit_metadata(oldlines, varlist, handle_var)
 
         with open(baseoutpath + '/conf/local.conf', 'w') as f:

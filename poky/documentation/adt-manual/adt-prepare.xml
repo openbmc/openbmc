@@ -232,7 +232,7 @@
                 own location, you are prompted to run the installation script
                 interactively or in silent mode.
                 If you want to closely monitor the installation,
-                choose “I” for interactive mode rather than “S” for silent mode.
+                choose "I" for interactive mode rather than "S" for silent mode.
                 Follow the prompts from the script to complete the installation.
             </para>
 
@@ -765,7 +765,7 @@
         <itemizedlist>
             <listitem><para>Install the appropriate stand-alone toolchain tarball.</para></listitem>
             <listitem><para>Download the pre-built image that will boot with QEMU.
-                You need to be sure to get the QEMU image that matches your target machine’s
+                You need to be sure to get the QEMU image that matches your target machine's
                 architecture (e.g. x86, ARM, etc.).</para></listitem>
             <listitem><para>Download the filesystem image for your target machine's architecture.
                 </para></listitem>

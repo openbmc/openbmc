@@ -8,11 +8,14 @@ Based on the svn "Fetch" implementation.
 """
 
 import logging
+import os
 import  bb
 from    bb.fetch2 import FetchMethod
 from    bb.fetch2 import FetchError
 from    bb.fetch2 import MissingParameterError
 from    bb.fetch2 import runfetchcmd
+
+logger = logging.getLogger(__name__)
 
 class Osc(FetchMethod):
     """Class to fetch a module or modules from Opensuse build server

@@ -1,0 +1,47 @@
+From 58760e09eed662a72da939ff4802d605489cff8e Mon Sep 17 00:00:00 2001
+From: Denys Dmytriyenko <denys@ti.com>
+Date: Tue, 8 Sep 2020 19:37:42 -0400
+Subject: [PATCH] tests: include fcntl.h for open(), O_RDWR, O_CLOEXEC and
+ O_CREAT
+
+musl libc (unlike glibc) requires explicitly incuding fcntl.h to define open(),
+O_RDWR, O_CLOEXEC and O_CREAT. Otherwise the build fails with the errors:
+
+| ../weston-9.0.0/tests/weston-test-fixture-compositor.c: In function 'wait_for_lock':
+| ../weston-9.0.0/tests/weston-test-fixture-compositor.c:135:7: warning: implicit declaration of function 'open'; did you mean 'popen'? [-Wimplicit-function-declaration]
+|   135 |  fd = open(lock_path, O_RDWR | O_CLOEXEC | O_CREAT, 00700);
+|       |       ^~~~
+|       |       popen
+| ../weston-9.0.0/tests/weston-test-fixture-compositor.c:135:23: error: 'O_RDWR' undeclared (first use in this function)
+|   135 |  fd = open(lock_path, O_RDWR | O_CLOEXEC | O_CREAT, 00700);
+|       |                       ^~~~~~
+| ../weston-9.0.0/tests/weston-test-fixture-compositor.c:135:23: note: each undeclared identifier is reported only once for each function it appears in
+| ../weston-9.0.0/tests/weston-test-fixture-compositor.c:135:32: error: 'O_CLOEXEC' undeclared (first use in this function)
+|   135 |  fd = open(lock_path, O_RDWR | O_CLOEXEC | O_CREAT, 00700);
+|       |                                ^~~~~~~~~
+| ../weston-9.0.0/tests/weston-test-fixture-compositor.c:135:44: error: 'O_CREAT' undeclared (first use in this function)
+|   135 |  fd = open(lock_path, O_RDWR | O_CLOEXEC | O_CREAT, 00700);
+|       |                                            ^~~~~~~
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/wayland/weston/-/merge_requests/493/diffs?commit_id=b10c0e843dcb8148bbe869bb15261955b94ac98c]
+
+Signed-off-by: Denys Dmytriyenko <denys@ti.com>
+---
+ tests/weston-test-fixture-compositor.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/weston-test-fixture-compositor.c b/tests/weston-test-fixture-compositor.c
+index 0c9855f..e0e32c9 100644
+--- a/tests/weston-test-fixture-compositor.c
++++ b/tests/weston-test-fixture-compositor.c
+@@ -31,6 +31,7 @@
+ #include <unistd.h>
+ #include <sys/file.h>
+ #include <errno.h>
++#include <fcntl.h>
+ 
+ #include "shared/helpers.h"
+ #include "weston-test-fixture-compositor.h"
+-- 
+2.7.4
+

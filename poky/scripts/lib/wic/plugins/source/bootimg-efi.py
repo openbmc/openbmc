@@ -212,8 +212,8 @@ class BootimgEFIPlugin(SourcePlugin):
         except KeyError:
             raise WicError("bootimg-efi requires a loader, none specified")
 
-        if get_bitbake_var("IMAGE_BOOT_FILES") is None:
-            logger.debug('No boot files defined in IMAGE_BOOT_FILES')
+        if get_bitbake_var("IMAGE_EFI_BOOT_FILES") is None:
+            logger.debug('No boot files defined in IMAGE_EFI_BOOT_FILES')
         else:
             boot_files = None
             for (fmt, id) in (("_uuid-%s", part.uuid), ("_label-%s", part.label), (None, None)):
@@ -222,7 +222,7 @@ class BootimgEFIPlugin(SourcePlugin):
                 else:
                     var = ""
 
-                boot_files = get_bitbake_var("IMAGE_BOOT_FILES" + var)
+                boot_files = get_bitbake_var("IMAGE_EFI_BOOT_FILES" + var)
                 if boot_files:
                     break
 
@@ -292,7 +292,7 @@ class BootimgEFIPlugin(SourcePlugin):
             (staging_kernel_dir, kernel, hdddir, kernel)
         exec_cmd(install_cmd)
 
-        if get_bitbake_var("IMAGE_BOOT_FILES"):
+        if get_bitbake_var("IMAGE_EFI_BOOT_FILES"):
             for src_path, dst_path in cls.install_task:
                 install_cmd = "install -m 0644 -D %s %s" \
                               % (os.path.join(kernel_dir, src_path),

@@ -344,8 +344,6 @@ def bitbake_main(configParams, configuration):
     except:
         pass
 
-    configuration.setConfigParameters(configParams)
-
     if configParams.server_only and configParams.remote_server:
             raise BBMainException("FATAL: The '--server-only' option conflicts with %s.\n" %
                                   ("the BBSERVER environment variable" if "BBSERVER" in os.environ \
@@ -357,13 +355,13 @@ def bitbake_main(configParams, configuration):
 
     if "BBDEBUG" in os.environ:
         level = int(os.environ["BBDEBUG"])
-        if level > configuration.debug:
-            configuration.debug = level
+        if level > configParams.debug:
+            configParams.debug = level
 
-    bb.msg.init_msgconfig(configParams.verbose, configuration.debug,
-                          configuration.debug_domains)
+    bb.msg.init_msgconfig(configParams.verbose, configParams.debug,
+                          configParams.debug_domains)
 
-    server_connection, ui_module = setup_bitbake(configParams, configuration)
+    server_connection, ui_module = setup_bitbake(configParams)
     # No server connection
     if server_connection is None:
         if configParams.status_only:
@@ -390,7 +388,7 @@ def bitbake_main(configParams, configuration):
 
     return 1
 
-def setup_bitbake(configParams, configuration, extrafeatures=None):
+def setup_bitbake(configParams, extrafeatures=None):
     # Ensure logging messages get sent to the UI as events
     handler = bb.event.LogHandler()
     if not configParams.status_only:
@@ -431,11 +429,11 @@ def setup_bitbake(configParams, configuration, extrafeatures=None):
                         logger.info("bitbake server is not running.")
                         lock.close()
                         return None, None
-                    # we start a server with a given configuration
+                    # we start a server with a given featureset
                     logger.info("Starting bitbake server...")
                     # Clear the event queue since we already displayed messages
                     bb.event.ui_queue = []
-                    server = bb.server.process.BitBakeServer(lock, sockname, configuration, featureset)
+                    server = bb.server.process.BitBakeServer(lock, sockname, featureset, configParams.server_timeout, configParams.xmlrpcinterface)
 
                 else:
                     logger.info("Reconnecting to bitbake server...")

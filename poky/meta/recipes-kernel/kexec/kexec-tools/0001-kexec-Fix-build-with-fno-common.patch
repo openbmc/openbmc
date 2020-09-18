@@ -66,3 +66,13 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  int bzImage64_probe(const char *buf, off_t len)
  {
+--- a/kexec/arch/ppc/kexec-elf-ppc.c
++++ b/kexec/arch/ppc/kexec-elf-ppc.c
+@@ -33,7 +33,6 @@
+ static const int probe_debug = 0;
+ 
+ unsigned char reuse_initrd;
+-const char *ramdisk;
+ int create_flatten_tree(struct kexec_info *, unsigned char **, unsigned long *,
+ 			char *);
+ 

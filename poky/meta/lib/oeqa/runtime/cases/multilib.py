@@ -7,6 +7,8 @@ from oeqa.core.decorator.depends import OETestDepends
 from oeqa.core.decorator.data import skipIfNotInDataVar
 from oeqa.runtime.decorator.package import OEHasPackage
 
+import subprocess
+
 class MultilibTest(OERuntimeTestCase):
 
     def archtest(self, binary, arch):
@@ -14,8 +16,10 @@ class MultilibTest(OERuntimeTestCase):
         Check that ``binary`` has the ELF class ``arch`` (e.g. ELF32/ELF64).
         """
 
-        status, output = self.target.run('readelf -h %s' % binary)
-        self.assertEqual(status, 0, 'Failed to readelf %s' % binary)
+        dest = "{}/test_binary".format(self.td.get('T', ''))
+        self.target.copyFrom(binary, dest)
+        output = subprocess.check_output("readelf -h {}".format(dest), shell=True).decode()
+        os.remove(dest)
 
         l = [l.split()[1] for l in output.split('\n') if "Class:" in l]
         if l:
@@ -29,7 +33,6 @@ class MultilibTest(OERuntimeTestCase):
     @skipIfNotInDataVar('MULTILIBS', 'multilib:lib32',
                         "This isn't a multilib:lib32 image")
     @OETestDepends(['ssh.SSHTest.test_ssh'])
-    @OEHasPackage(['binutils'])
     @OEHasPackage(['lib32-libc6'])
     def test_check_multilib_libc(self):
         """
@@ -39,6 +42,6 @@ class MultilibTest(OERuntimeTestCase):
         self.archtest("/lib64/libc.so.6", "ELF64")
 
     @OETestDepends(['multilib.MultilibTest.test_check_multilib_libc'])
-    @OEHasPackage(['lib32-connman', '!connman'])
+    @OEHasPackage(['lib32-connman'])
     def test_file_connman(self):
         self.archtest("/usr/sbin/connmand", "ELF32")

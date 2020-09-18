@@ -36,7 +36,7 @@ SRC_URI = "https://sourceware.org/pub/valgrind/valgrind-${PV}.tar.bz2 \
            file://0001-Make-local-functions-static-to-avoid-assembler-error.patch \
            file://0001-Return-a-valid-exit_code-from-vg_regtest.patch \
            file://0001-valgrind-filter_xml_frames-do-not-filter-usr.patch \
-           file://0001-adjust-path-filter-for-2-memcheck-tests.patch \
+           file://0001-memcheck-vgtests-remove-fullpath-after-flags.patch \
            file://s390x_vec_op_t.patch \
            file://0001-none-tests-fdleak_cmsg.stderr.exp-adjust-tmp-paths.patch \
            file://0001-memcheck-tests-Fix-timerfd-syscall-test.patch \
@@ -46,6 +46,17 @@ SRC_URI[sha256sum] = "c91f3a2f7b02db0f3bc99479861656154d241d2fdb265614ba918cc672
 UPSTREAM_CHECK_REGEX = "valgrind-(?P<pver>\d+(\.\d+)+)\.tar"
 
 COMPATIBLE_HOST = '(i.86|x86_64|arm|aarch64|mips|powerpc|powerpc64).*-linux'
+
+# patch 0001-memcheck-vgtests-remove-fullpath-after-flags.patch removes relative path
+# argument. Change expected stderr files accordingly.
+do_patch_append() {
+    bb.build.exec_func('do_sed_paths', d)
+}
+
+do_sed_paths() {
+    sed -i -e 's|tests/||' ${S}/memcheck/tests/badfree3.stderr.exp
+    sed -i -e 's|tests/||' ${S}/memcheck/tests/varinfo5.stderr.exp
+}
 
 # valgrind supports armv7 and above
 COMPATIBLE_HOST_armv4 = 'null'
@@ -118,7 +129,8 @@ RRECOMMENDS_${PN} += "${TCLIBC}-dbg"
 RDEPENDS_${PN}-ptest += " bash coreutils file \
    gdb libgomp \
    perl \
-   perl-module-getopt-long perl-module-file-basename perl-module-file-glob \
+   perl-module-file-basename perl-module-file-glob perl-module-getopt-long \
+   perl-module-overloading \
    procps sed ${PN}-dbg ${PN}-src"
 RDEPENDS_${PN}-ptest_append_libc-glibc = " glibc-utils"
 

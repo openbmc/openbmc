@@ -5,8 +5,12 @@
 
 import logging
 import json
+import os
+
 from urllib.parse import unquote
 from urllib.parse import urlparse
+
+import bb
 
 import layerindexlib
 import layerindexlib.plugin
@@ -163,7 +167,7 @@ class RestApiPlugin(layerindexlib.plugin.IndexPlugin):
                     parsed = _get_json_response(apiurl=up_stripped.geturl(), username=username, password=password, retry=False)
                     logger.debug(1, "%s: retry successful.")
                 else:
-                    raise LayerIndexFetchError('%s: Connection reset by peer.  Is there a firewall blocking your connection?' % apiurl)
+                    raise layerindexlib.LayerIndexFetchError('%s: Connection reset by peer.  Is there a firewall blocking your connection?' % apiurl)
 
             return parsed
 

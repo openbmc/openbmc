@@ -456,6 +456,10 @@ class BaseConfig(object):
             if arg in self.fstypes + self.vmtypes + self.wictypes:
                 self.check_arg_fstype(arg)
             elif arg == 'nographic':
+                if ('sdl' in sys.argv):
+                    raise RunQemuError('Option nographic makes no sense alongside the sdl option.' % (arg))
+                if ('gtk' in sys.argv):
+                    raise RunQemuError('Option nographic makes no sense alongside the gtk option.' % (arg))
                 self.qemu_opt_script += ' -nographic'
                 self.kernel_cmdline_script += ' console=ttyS0'
             elif arg == 'sdl':
@@ -1514,6 +1518,11 @@ def main():
         return 0
     try:
         config = BaseConfig()
+
+        renice = os.path.expanduser("~/bin/runqemu-renice")
+        if os.path.exists(renice):
+            logger.info('Using %s to renice' % renice)
+            subprocess.check_call([renice, str(os.getpid())])
 
         def sigterm_handler(signum, frame):
             logger.info("SIGTERM received")

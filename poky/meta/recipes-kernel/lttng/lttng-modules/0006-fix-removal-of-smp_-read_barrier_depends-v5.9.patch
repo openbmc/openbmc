@@ -1,0 +1,391 @@
+From 57ccbfa6a8a79c7b84394c2097efaf7935607aa5 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Tue, 25 Aug 2020 10:56:29 -0400
+Subject: [PATCH 06/10] fix: removal of [smp_]read_barrier_depends (v5.9)
+
+See upstream commits:
+
+  commit 76ebbe78f7390aee075a7f3768af197ded1bdfbb
+  Author: Will Deacon <will@kernel.org>
+  Date:   Tue Oct 24 11:22:47 2017 +0100
+
+    locking/barriers: Add implicit smp_read_barrier_depends() to READ_ONCE()
+
+    In preparation for the removal of lockless_dereference(), which is the
+    same as READ_ONCE() on all architectures other than Alpha, add an
+    implicit smp_read_barrier_depends() to READ_ONCE() so that it can be
+    used to head dependency chains on all architectures.
+
+  commit 76ebbe78f7390aee075a7f3768af197ded1bdfbb
+  Author: Will Deacon <will.deacon@arm.com>
+  Date:   Tue Oct 24 11:22:47 2017 +0100
+
+    locking/barriers: Add implicit smp_read_barrier_depends() to READ_ONCE()
+
+    In preparation for the removal of lockless_dereference(), which is the
+    same as READ_ONCE() on all architectures other than Alpha, add an
+    implicit smp_read_barrier_depends() to READ_ONCE() so that it can be
+    used to head dependency chains on all architectures.
+
+Upstream-Status: Backport
+
+Change-Id: Ife8880bd9378dca2972da8838f40fc35ccdfaaac
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ instrumentation/events/lttng-module/i2c.h |  4 ++--
+ lib/ringbuffer/backend.h                  |  2 +-
+ lib/ringbuffer/backend_internal.h         |  2 +-
+ lib/ringbuffer/frontend.h                 |  4 ++--
+ lib/ringbuffer/ring_buffer_frontend.c     |  4 ++--
+ lib/ringbuffer/ring_buffer_iterator.c     |  2 +-
+ lttng-events.c                            |  8 ++++----
+ probes/lttng-kprobes.c                    |  6 +++---
+ probes/lttng-kretprobes.c                 |  6 +++---
+ probes/lttng-tracepoint-event-impl.h      | 12 ++++++------
+ probes/lttng-uprobes.c                    |  6 +++---
+ wrapper/compiler.h                        | 18 ++++++++++++++++++
+ wrapper/trace-clock.h                     | 15 +++++----------
+ 13 files changed, 51 insertions(+), 38 deletions(-)
+
+diff --git a/instrumentation/events/lttng-module/i2c.h b/instrumentation/events/lttng-module/i2c.h
+index dcbabf6..131d134 100644
+--- a/instrumentation/events/lttng-module/i2c.h
++++ b/instrumentation/events/lttng-module/i2c.h
+@@ -23,7 +23,7 @@ LTTNG_TRACEPOINT_EVENT_CODE(i2c_write,
+ 
+ 	TP_code_pre(
+ 		tp_locvar->extract_sensitive_payload =
+-			READ_ONCE(extract_sensitive_payload);
++			LTTNG_READ_ONCE(extract_sensitive_payload);
+ 	),
+ 
+ 	TP_FIELDS(
+@@ -78,7 +78,7 @@ LTTNG_TRACEPOINT_EVENT_CODE(i2c_reply,
+ 
+ 	TP_code_pre(
+ 		tp_locvar->extract_sensitive_payload =
+-			READ_ONCE(extract_sensitive_payload);
++			LTTNG_READ_ONCE(extract_sensitive_payload);
+ 	),
+ 
+ 	TP_FIELDS(
+diff --git a/lib/ringbuffer/backend.h b/lib/ringbuffer/backend.h
+index da937f2..43e1d47 100644
+--- a/lib/ringbuffer/backend.h
++++ b/lib/ringbuffer/backend.h
+@@ -156,7 +156,7 @@ size_t lib_ring_buffer_do_strcpy(const struct lib_ring_buffer_config *config,
+ 		 * Only read source character once, in case it is
+ 		 * modified concurrently.
+ 		 */
+-		c = READ_ONCE(src[count]);
++		c = LTTNG_READ_ONCE(src[count]);
+ 		if (!c)
+ 			break;
+ 		lib_ring_buffer_do_copy(config, &dest[count], &c, 1);
+diff --git a/lib/ringbuffer/backend_internal.h b/lib/ringbuffer/backend_internal.h
+index 2d6a345..1226fd8 100644
+--- a/lib/ringbuffer/backend_internal.h
++++ b/lib/ringbuffer/backend_internal.h
+@@ -367,7 +367,7 @@ void lib_ring_buffer_clear_noref(const struct lib_ring_buffer_config *config,
+ 	 * Performing a volatile access to read the sb_pages, because we want to
+ 	 * read a coherent version of the pointer and the associated noref flag.
+ 	 */
+-	id = READ_ONCE(bufb->buf_wsb[idx].id);
++	id = LTTNG_READ_ONCE(bufb->buf_wsb[idx].id);
+ 	for (;;) {
+ 		/* This check is called on the fast path for each record. */
+ 		if (likely(!subbuffer_id_is_noref(config, id))) {
+diff --git a/lib/ringbuffer/frontend.h b/lib/ringbuffer/frontend.h
+index 6f516d9..41382fe 100644
+--- a/lib/ringbuffer/frontend.h
++++ b/lib/ringbuffer/frontend.h
+@@ -79,7 +79,7 @@ void *channel_destroy(struct channel *chan);
+ #define for_each_channel_cpu(cpu, chan)					\
+ 	for ((cpu) = -1;						\
+ 		({ (cpu) = cpumask_next(cpu, (chan)->backend.cpumask);	\
+-		   smp_read_barrier_depends(); (cpu) < nr_cpu_ids; });)
++		   smp_rmb(); (cpu) < nr_cpu_ids; });)
+ 
+ extern struct lib_ring_buffer *channel_get_ring_buffer(
+ 				const struct lib_ring_buffer_config *config,
+@@ -155,7 +155,7 @@ static inline
+ int lib_ring_buffer_is_finalized(const struct lib_ring_buffer_config *config,
+ 				 struct lib_ring_buffer *buf)
+ {
+-	int finalized = READ_ONCE(buf->finalized);
++	int finalized = LTTNG_READ_ONCE(buf->finalized);
+ 	/*
+ 	 * Read finalized before counters.
+ 	 */
+diff --git a/lib/ringbuffer/ring_buffer_frontend.c b/lib/ringbuffer/ring_buffer_frontend.c
+index 3cab365..4980d20 100644
+--- a/lib/ringbuffer/ring_buffer_frontend.c
++++ b/lib/ringbuffer/ring_buffer_frontend.c
+@@ -1074,7 +1074,7 @@ int lib_ring_buffer_snapshot(struct lib_ring_buffer *buf,
+ 	int finalized;
+ 
+ retry:
+-	finalized = READ_ONCE(buf->finalized);
++	finalized = LTTNG_READ_ONCE(buf->finalized);
+ 	/*
+ 	 * Read finalized before counters.
+ 	 */
+@@ -1245,7 +1245,7 @@ int lib_ring_buffer_get_subbuf(struct lib_ring_buffer *buf,
+ 		return -EBUSY;
+ 	}
+ retry:
+-	finalized = READ_ONCE(buf->finalized);
++	finalized = LTTNG_READ_ONCE(buf->finalized);
+ 	/*
+ 	 * Read finalized before counters.
+ 	 */
+diff --git a/lib/ringbuffer/ring_buffer_iterator.c b/lib/ringbuffer/ring_buffer_iterator.c
+index d25db72..7b4f20a 100644
+--- a/lib/ringbuffer/ring_buffer_iterator.c
++++ b/lib/ringbuffer/ring_buffer_iterator.c
+@@ -46,7 +46,7 @@ restart:
+ 	switch (iter->state) {
+ 	case ITER_GET_SUBBUF:
+ 		ret = lib_ring_buffer_get_next_subbuf(buf);
+-		if (ret && !READ_ONCE(buf->finalized)
++		if (ret && !LTTNG_READ_ONCE(buf->finalized)
+ 		    && config->alloc == RING_BUFFER_ALLOC_GLOBAL) {
+ 			/*
+ 			 * Use "pull" scheme for global buffers. The reader
+diff --git a/lttng-events.c b/lttng-events.c
+index be7e389..d719294 100644
+--- a/lttng-events.c
++++ b/lttng-events.c
+@@ -1719,7 +1719,7 @@ int lttng_metadata_printf(struct lttng_session *session,
+ 	size_t len;
+ 	va_list ap;
+ 
+-	WARN_ON_ONCE(!READ_ONCE(session->active));
++	WARN_ON_ONCE(!LTTNG_READ_ONCE(session->active));
+ 
+ 	va_start(ap, fmt);
+ 	str = kvasprintf(GFP_KERNEL, fmt, ap);
+@@ -2305,7 +2305,7 @@ int _lttng_event_metadata_statedump(struct lttng_session *session,
+ {
+ 	int ret = 0;
+ 
+-	if (event->metadata_dumped || !READ_ONCE(session->active))
++	if (event->metadata_dumped || !LTTNG_READ_ONCE(session->active))
+ 		return 0;
+ 	if (chan->channel_type == METADATA_CHANNEL)
+ 		return 0;
+@@ -2377,7 +2377,7 @@ int _lttng_channel_metadata_statedump(struct lttng_session *session,
+ {
+ 	int ret = 0;
+ 
+-	if (chan->metadata_dumped || !READ_ONCE(session->active))
++	if (chan->metadata_dumped || !LTTNG_READ_ONCE(session->active))
+ 		return 0;
+ 
+ 	if (chan->channel_type == METADATA_CHANNEL)
+@@ -2604,7 +2604,7 @@ int _lttng_session_metadata_statedump(struct lttng_session *session)
+ 	struct lttng_event *event;
+ 	int ret = 0;
+ 
+-	if (!READ_ONCE(session->active))
++	if (!LTTNG_READ_ONCE(session->active))
+ 		return 0;
+ 
+ 	lttng_metadata_begin(session);
+diff --git a/probes/lttng-kprobes.c b/probes/lttng-kprobes.c
+index a44eaa1..38fb72e 100644
+--- a/probes/lttng-kprobes.c
++++ b/probes/lttng-kprobes.c
+@@ -31,11 +31,11 @@ int lttng_kprobes_handler_pre(struct kprobe *p, struct pt_regs *regs)
+ 	int ret;
+ 	unsigned long data = (unsigned long) p->addr;
+ 
+-	if (unlikely(!READ_ONCE(chan->session->active)))
++	if (unlikely(!LTTNG_READ_ONCE(chan->session->active)))
+ 		return 0;
+-	if (unlikely(!READ_ONCE(chan->enabled)))
++	if (unlikely(!LTTNG_READ_ONCE(chan->enabled)))
+ 		return 0;
+-	if (unlikely(!READ_ONCE(event->enabled)))
++	if (unlikely(!LTTNG_READ_ONCE(event->enabled)))
+ 		return 0;
+ 
+ 	lib_ring_buffer_ctx_init(&ctx, chan->chan, &lttng_probe_ctx, sizeof(data),
+diff --git a/probes/lttng-kretprobes.c b/probes/lttng-kretprobes.c
+index ab98ff2..a6bcd21 100644
+--- a/probes/lttng-kretprobes.c
++++ b/probes/lttng-kretprobes.c
+@@ -51,11 +51,11 @@ int _lttng_kretprobes_handler(struct kretprobe_instance *krpi,
+ 		unsigned long parent_ip;
+ 	} payload;
+ 
+-	if (unlikely(!READ_ONCE(chan->session->active)))
++	if (unlikely(!LTTNG_READ_ONCE(chan->session->active)))
+ 		return 0;
+-	if (unlikely(!READ_ONCE(chan->enabled)))
++	if (unlikely(!LTTNG_READ_ONCE(chan->enabled)))
+ 		return 0;
+-	if (unlikely(!READ_ONCE(event->enabled)))
++	if (unlikely(!LTTNG_READ_ONCE(event->enabled)))
+ 		return 0;
+ 
+ 	payload.ip = (unsigned long) krpi->rp->kp.addr;
+diff --git a/probes/lttng-tracepoint-event-impl.h b/probes/lttng-tracepoint-event-impl.h
+index 77b8638..72a669e 100644
+--- a/probes/lttng-tracepoint-event-impl.h
++++ b/probes/lttng-tracepoint-event-impl.h
+@@ -1132,11 +1132,11 @@ static void __event_probe__##_name(void *__data, _proto)		      \
+ 									      \
+ 	if (!_TP_SESSION_CHECK(session, __session))			      \
+ 		return;							      \
+-	if (unlikely(!READ_ONCE(__session->active)))			      \
++	if (unlikely(!LTTNG_READ_ONCE(__session->active)))		      \
+ 		return;							      \
+-	if (unlikely(!READ_ONCE(__chan->enabled)))			      \
++	if (unlikely(!LTTNG_READ_ONCE(__chan->enabled)))		      \
+ 		return;							      \
+-	if (unlikely(!READ_ONCE(__event->enabled)))			      \
++	if (unlikely(!LTTNG_READ_ONCE(__event->enabled)))		      \
+ 		return;							      \
+ 	__lf = lttng_rcu_dereference(__session->pid_tracker.p);		      \
+ 	if (__lf && likely(!lttng_id_tracker_lookup(__lf, current->tgid)))    \
+@@ -1225,11 +1225,11 @@ static void __event_probe__##_name(void *__data)			      \
+ 									      \
+ 	if (!_TP_SESSION_CHECK(session, __session))			      \
+ 		return;							      \
+-	if (unlikely(!READ_ONCE(__session->active)))			      \
++	if (unlikely(!LTTNG_READ_ONCE(__session->active)))		      \
+ 		return;							      \
+-	if (unlikely(!READ_ONCE(__chan->enabled)))			      \
++	if (unlikely(!LTTNG_READ_ONCE(__chan->enabled)))		      \
+ 		return;							      \
+-	if (unlikely(!READ_ONCE(__event->enabled)))			      \
++	if (unlikely(!LTTNG_READ_ONCE(__event->enabled)))		      \
+ 		return;							      \
+ 	__lf = lttng_rcu_dereference(__session->pid_tracker.p);		      \
+ 	if (__lf && likely(!lttng_id_tracker_lookup(__lf, current->tgid)))    \
+diff --git a/probes/lttng-uprobes.c b/probes/lttng-uprobes.c
+index bc10128..bda1d9b 100644
+--- a/probes/lttng-uprobes.c
++++ b/probes/lttng-uprobes.c
+@@ -40,11 +40,11 @@ int lttng_uprobes_handler_pre(struct uprobe_consumer *uc, struct pt_regs *regs)
+ 		unsigned long ip;
+ 	} payload;
+ 
+-	if (unlikely(!READ_ONCE(chan->session->active)))
++	if (unlikely(!LTTNG_READ_ONCE(chan->session->active)))
+ 		return 0;
+-	if (unlikely(!READ_ONCE(chan->enabled)))
++	if (unlikely(!LTTNG_READ_ONCE(chan->enabled)))
+ 		return 0;
+-	if (unlikely(!READ_ONCE(event->enabled)))
++	if (unlikely(!LTTNG_READ_ONCE(event->enabled)))
+ 		return 0;
+ 
+ 	lib_ring_buffer_ctx_init(&ctx, chan->chan, &lttng_probe_ctx,
+diff --git a/wrapper/compiler.h b/wrapper/compiler.h
+index 1496f33..b9f8c51 100644
+--- a/wrapper/compiler.h
++++ b/wrapper/compiler.h
+@@ -9,6 +9,7 @@
+ #define _LTTNG_WRAPPER_COMPILER_H
+ 
+ #include <linux/compiler.h>
++#include <linux/version.h>
+ 
+ /*
+  * Don't allow compiling with buggy compiler.
+@@ -39,4 +40,21 @@
+ # define WRITE_ONCE(x, val)	({ ACCESS_ONCE(x) = val; })
+ #endif
+ 
++/*
++ * In v4.15 a smp read barrier was added to READ_ONCE to replace
++ * lockless_dereference(), replicate this behavior on prior kernels
++ * and remove calls to smp_read_barrier_depends which was dropped
++ * in v5.9.
++ */
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,15,0))
++#define LTTNG_READ_ONCE(x)	READ_ONCE(x)
++#else
++#define LTTNG_READ_ONCE(x)			\
++({						\
++	typeof(x) __val = READ_ONCE(x);		\
++	smp_read_barrier_depends();		\
++	__val;					\
++})
++#endif
++
+ #endif /* _LTTNG_WRAPPER_COMPILER_H */
+diff --git a/wrapper/trace-clock.h b/wrapper/trace-clock.h
+index 9f4e366..187fc82 100644
+--- a/wrapper/trace-clock.h
++++ b/wrapper/trace-clock.h
+@@ -160,33 +160,30 @@ static inline void put_trace_clock(void)
+ 
+ static inline u64 trace_clock_read64(void)
+ {
+-	struct lttng_trace_clock *ltc = READ_ONCE(lttng_trace_clock);
++	struct lttng_trace_clock *ltc = LTTNG_READ_ONCE(lttng_trace_clock);
+ 
+ 	if (likely(!ltc)) {
+ 		return trace_clock_read64_monotonic();
+ 	} else {
+-		read_barrier_depends();	/* load ltc before content */
+ 		return ltc->read64();
+ 	}
+ }
+ 
+ static inline u64 trace_clock_freq(void)
+ {
+-	struct lttng_trace_clock *ltc = READ_ONCE(lttng_trace_clock);
++	struct lttng_trace_clock *ltc = LTTNG_READ_ONCE(lttng_trace_clock);
+ 
+ 	if (!ltc) {
+ 		return trace_clock_freq_monotonic();
+ 	} else {
+-		read_barrier_depends();	/* load ltc before content */
+ 		return ltc->freq();
+ 	}
+ }
+ 
+ static inline int trace_clock_uuid(char *uuid)
+ {
+-	struct lttng_trace_clock *ltc = READ_ONCE(lttng_trace_clock);
++	struct lttng_trace_clock *ltc = LTTNG_READ_ONCE(lttng_trace_clock);
+ 
+-	read_barrier_depends();	/* load ltc before content */
+ 	/* Use default UUID cb when NULL */
+ 	if (!ltc || !ltc->uuid) {
+ 		return trace_clock_uuid_monotonic(uuid);
+@@ -197,24 +194,22 @@ static inline int trace_clock_uuid(char *uuid)
+ 
+ static inline const char *trace_clock_name(void)
+ {
+-	struct lttng_trace_clock *ltc = READ_ONCE(lttng_trace_clock);
++	struct lttng_trace_clock *ltc = LTTNG_READ_ONCE(lttng_trace_clock);
+ 
+ 	if (!ltc) {
+ 		return trace_clock_name_monotonic();
+ 	} else {
+-		read_barrier_depends();	/* load ltc before content */
+ 		return ltc->name();
+ 	}
+ }
+ 
+ static inline const char *trace_clock_description(void)
+ {
+-	struct lttng_trace_clock *ltc = READ_ONCE(lttng_trace_clock);
++	struct lttng_trace_clock *ltc = LTTNG_READ_ONCE(lttng_trace_clock);
+ 
+ 	if (!ltc) {
+ 		return trace_clock_description_monotonic();
+ 	} else {
+-		read_barrier_depends();	/* load ltc before content */
+ 		return ltc->description();
+ 	}
+ }
+-- 
+2.19.1
+

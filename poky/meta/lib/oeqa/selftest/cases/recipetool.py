@@ -226,19 +226,6 @@ class RecipetoolTests(RecipetoolBase):
         _, output = self._try_recipetool_appendfile('selftest-recipetool-appendfile', '/usr/share/selftest-replaceme-subdir', self.testfile, '', expectedlines, ['testfile'])
         self.assertNotIn('WARNING: ', output)
 
-    def test_recipetool_appendfile_src_glob(self):
-        # A file that's in SRC_URI as a glob
-        expectedlines = ['FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n',
-                         '\n',
-                         'SRC_URI += "file://testfile"\n',
-                         '\n',
-                         'do_install_append() {\n',
-                         '    install -d ${D}${datadir}\n',
-                         '    install -m 0644 ${WORKDIR}/testfile ${D}${datadir}/selftest-replaceme-src-globfile\n',
-                         '}\n']
-        _, output = self._try_recipetool_appendfile('selftest-recipetool-appendfile', '/usr/share/selftest-replaceme-src-globfile', self.testfile, '', expectedlines, ['testfile'])
-        self.assertNotIn('WARNING: ', output)
-
     def test_recipetool_appendfile_inst_glob(self):
         # A file that's in do_install as a glob
         expectedlines = ['FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n',

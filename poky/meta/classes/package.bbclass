@@ -7,7 +7,7 @@
 #
 # There are the following default steps but PACKAGEFUNCS can be extended:
 #
-# a) package_get_auto_pr - get PRAUTO from remote PR service
+# a) package_convert_pr_autoinc - convert AUTOINC in PKGV to ${PRSERV_PV_AUTOINC}
 #
 # b) perform_packagecopy - Copy D into PKGD
 #
@@ -664,12 +664,20 @@ def runtime_mapping_rename (varname, pkg, d):
     #bb.note("%s after: %s" % (varname, d.getVar(varname)))
 
 #
-# Package functions suitable for inclusion in PACKAGEFUNCS
+# Used by do_packagedata (and possibly other routines post do_package)
 #
 
+package_get_auto_pr[vardepsexclude] = "BB_TASKDEPDATA"
 python package_get_auto_pr() {
     import oe.prservice
-    import re
+
+    def get_do_package_hash(pn):
+        if d.getVar("BB_RUNTASK") != "do_package":
+            taskdepdata = d.getVar("BB_TASKDEPDATA", False)
+            for dep in taskdepdata:
+                if taskdepdata[dep][1] == "do_package" and taskdepdata[dep][0] == pn:
+                    return taskdepdata[dep][6]
+        return None
 
     # Support per recipe PRSERV_HOST
     pn = d.getVar('PN')
@@ -681,15 +689,22 @@ python package_get_auto_pr() {
 
     # PR Server not active, handle AUTOINC
     if not d.getVar('PRSERV_HOST'):
-        if 'AUTOINC' in pkgv:
-            d.setVar("PKGV", pkgv.replace("AUTOINC", "0"))
+        d.setVar("PRSERV_PV_AUTOINC", "0")
         return
 
     auto_pr = None
     pv = d.getVar("PV")
     version = d.getVar("PRAUTOINX")
     pkgarch = d.getVar("PACKAGE_ARCH")
-    checksum = d.getVar("BB_TASKHASH")
+    checksum = get_do_package_hash(pn)
+
+    # If do_package isn't in the dependencies, we can't get the checksum...
+    if not checksum:
+        bb.warn('Task %s requested do_package unihash, but it was not available.' % d.getVar('BB_RUNTASK'))
+        #taskdepdata = d.getVar("BB_TASKDEPDATA", False)
+        #for dep in taskdepdata:
+        #    bb.warn('%s:%s = %s' % (taskdepdata[dep][0], taskdepdata[dep][1], taskdepdata[dep][6]))
+        return
 
     if d.getVar('PRSERV_LOCKDOWN'):
         auto_pr = d.getVar('PRAUTO_' + version + '_' + pkgarch) or d.getVar('PRAUTO_' + version) or None
@@ -707,7 +722,7 @@ python package_get_auto_pr() {
                 srcpv = bb.fetch2.get_srcrev(d)
                 base_ver = "AUTOINC-%s" % version[:version.find(srcpv)]
                 value = conn.getPR(base_ver, pkgarch, srcpv)
-                d.setVar("PKGV", pkgv.replace("AUTOINC", str(value)))
+                d.setVar("PRSERV_PV_AUTOINC", str(value))
 
             auto_pr = conn.getPR(version, pkgarch, checksum)
     except Exception as e:
@@ -715,6 +730,22 @@ python package_get_auto_pr() {
     if auto_pr is None:
         bb.fatal("Can NOT get PRAUTO from remote PR service")
     d.setVar('PRAUTO',str(auto_pr))
+}
+
+#
+# Package functions suitable for inclusion in PACKAGEFUNCS
+#
+
+python package_convert_pr_autoinc() {
+    pkgv = d.getVar("PKGV")
+
+    # Adjust pkgv as necessary...
+    if 'AUTOINC' in pkgv:
+        d.setVar("PKGV", pkgv.replace("AUTOINC", "${PRSERV_PV_AUTOINC}"))
+
+    # Change PRSERV_PV_AUTOINC and EXTENDPRAUTO usage to special values
+    d.setVar('PRSERV_PV_AUTOINC', '@PRSERV_PV_AUTOINC@')
+    d.setVar('EXTENDPRAUTO', '@EXTENDPRAUTO@')
 }
 
 LOCALEBASEPN ??= "${PN}"
@@ -1638,7 +1669,7 @@ fi
         # Symlinks needed for rprovides lookup
         rprov = d.getVar('RPROVIDES_%s' % pkg) or d.getVar('RPROVIDES')
         if rprov:
-            for p in rprov.strip().split():
+            for p in bb.utils.explode_deps(rprov):
                 subdata_sym = pkgdatadir + "/runtime-rprovides/%s/%s" % (p, pkg)
                 bb.utils.mkdirhier(os.path.dirname(subdata_sym))
                 oe.path.symlink("../../runtime/%s" % pkg, subdata_sym, True)
@@ -2335,7 +2366,7 @@ python do_package () {
         package_qa_handle_error("var-undefined", msg, d)
         return
 
-    bb.build.exec_func("package_get_auto_pr", d)
+    bb.build.exec_func("package_convert_pr_autoinc", d)
 
     ###########################################################################
     # Optimisations
@@ -2407,9 +2438,20 @@ addtask do_package_setscene
 # Copy from PKGDESTWORK to tempdirectory as tempdirectory can be cleaned at both
 # do_package_setscene and do_packagedata_setscene leading to races
 python do_packagedata () {
+    bb.build.exec_func("package_get_auto_pr", d)
+
     src = d.expand("${PKGDESTWORK}")
     dest = d.expand("${WORKDIR}/pkgdata-pdata-input")
     oe.path.copyhardlinktree(src, dest)
+
+    bb.build.exec_func("packagedata_translate_pr_autoinc", d)
+}
+
+# Translate the EXTENDPRAUTO and AUTOINC to the final values
+packagedata_translate_pr_autoinc() {
+    find ${WORKDIR}/pkgdata-pdata-input -type f | xargs --no-run-if-empty \
+        sed -e 's,@PRSERV_PV_AUTOINC@,${PRSERV_PV_AUTOINC},g' \
+            -e 's,@EXTENDPRAUTO@,${EXTENDPRAUTO},g' -i
 }
 
 addtask packagedata before do_build after do_package

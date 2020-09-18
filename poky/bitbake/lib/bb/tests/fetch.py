@@ -602,8 +602,8 @@ class FetcherLocalTest(FetcherTest):
         self.assertEqual(tree, ['a', 'dir/c'])
 
     def test_local_wildcard(self):
-        tree = self.fetchUnpack(['file://a', 'file://dir/*'])
-        self.assertEqual(tree, ['a',  'dir/c', 'dir/d', 'dir/subdir/e'])
+        with self.assertRaises(bb.fetch2.ParameterError):
+            tree = self.fetchUnpack(['file://a', 'file://dir/*'])
 
     def test_local_dir(self):
         tree = self.fetchUnpack(['file://a', 'file://dir'])
@@ -1156,7 +1156,8 @@ class FetchLatestVersionTest(FetcherTest):
         ("mtd-utils", "git://git.yoctoproject.org/mtd-utils.git", "ca39eb1d98e736109c64ff9c1aa2a6ecca222d8f", "")
             : "1.5.0",
         # version pattern "pkg_name-X.Y"
-        ("presentproto", "git://anongit.freedesktop.org/git/xorg/proto/presentproto", "24f3a56e541b0a9e6c6ee76081f441221a120ef9", "")
+        # mirror of git://anongit.freedesktop.org/git/xorg/proto/presentproto since network issues interfered with testing
+        ("presentproto", "git://git.yoctoproject.org/bbfetchtests-presentproto", "24f3a56e541b0a9e6c6ee76081f441221a120ef9", "")
             : "1.0",
         # version pattern "pkg_name-vX.Y.Z"
         ("dtc", "git://git.qemu.org/dtc.git", "65cc4d2748a2c2e6f27f1cf39e07a5dbabd80ebf", "")
@@ -1170,7 +1171,8 @@ class FetchLatestVersionTest(FetcherTest):
         ("mobile-broadband-provider-info", "git://gitlab.gnome.org/GNOME/mobile-broadband-provider-info.git;protocol=https", "4ed19e11c2975105b71b956440acdb25d46a347d", "")
             : "20120614",
         # packages with a valid UPSTREAM_CHECK_GITTAGREGEX
-        ("xf86-video-omap", "git://anongit.freedesktop.org/xorg/driver/xf86-video-omap", "ae0394e687f1a77e966cf72f895da91840dffb8f", "(?P<pver>(\d+\.(\d\.?)*))")
+                # mirror of git://anongit.freedesktop.org/xorg/driver/xf86-video-omap since network issues interfered with testing
+        ("xf86-video-omap", "git://git.yoctoproject.org/bbfetchtests-xf86-video-omap", "ae0394e687f1a77e966cf72f895da91840dffb8f", "(?P<pver>(\d+\.(\d\.?)*))")
             : "0.4.3",
         ("build-appliance-image", "git://git.yoctoproject.org/poky", "b37dd451a52622d5b570183a81583cc34c2ff555", "(?P<pver>(([0-9][\.|_]?)+[0-9]))")
             : "11.0.0",
@@ -1262,9 +1264,7 @@ class FetchLatestVersionTest(FetcherTest):
 
 
 class FetchCheckStatusTest(FetcherTest):
-    test_wget_uris = ["http://www.cups.org/software/1.7.2/cups-1.7.2-source.tar.bz2",
-                      "http://www.cups.org/",
-                      "http://downloads.yoctoproject.org/releases/sato/sato-engine-0.1.tar.gz",
+    test_wget_uris = ["http://downloads.yoctoproject.org/releases/sato/sato-engine-0.1.tar.gz",
                       "http://downloads.yoctoproject.org/releases/sato/sato-engine-0.2.tar.gz",
                       "http://downloads.yoctoproject.org/releases/sato/sato-engine-0.3.tar.gz",
                       "https://yoctoproject.org/",

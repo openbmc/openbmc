@@ -43,6 +43,7 @@ def map_kernel_arch(a, d):
     elif re.match('p(pc|owerpc)', a):               return 'ppc'
     elif re.match('p(pc64|owerpc64)', a):           return 'ppc64'
     elif re.match('riscv64$', a):                   return 'riscv64'
+    elif re.match('riscv32$', a):                   return 'riscv32'
     else:
         if not d.getVar("TARGET_OS").startswith("linux"):
             return a

@@ -651,7 +651,7 @@ reproducible_final_image_task () {
     if [ "${BUILD_REPRODUCIBLE_BINARIES}" = "1" ]; then
         if [ "$REPRODUCIBLE_TIMESTAMP_ROOTFS" = "" ]; then
             REPRODUCIBLE_TIMESTAMP_ROOTFS=`git -C "${COREBASE}" log -1 --pretty=%ct 2>/dev/null` || true
-            if [ "${REPRODUCIBLE_TIMESTAMP_ROOTFS}" = "" ]; then
+            if [ "$REPRODUCIBLE_TIMESTAMP_ROOTFS" = "" ]; then
                 REPRODUCIBLE_TIMESTAMP_ROOTFS=`stat -c%Y ${@bb.utils.which(d.getVar("BBPATH"), "conf/bitbake.conf")}`
             fi
         fi

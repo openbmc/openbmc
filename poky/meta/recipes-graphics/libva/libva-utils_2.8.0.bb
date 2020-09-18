@@ -18,7 +18,7 @@ SRC_URI = "git://github.com/intel/libva-utils.git;branch=v2.8-branch"
 SRCREV = "af101a46d24c3f71a12b9f1ddb0c63626b19b3d8"
 S = "${WORKDIR}/git"
 
-UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>(\d+(\.\d+)+))"
+UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>(\d+(\.\d+)+))$"
 
 DEPENDS = "libva"
 

@@ -124,9 +124,6 @@ DISTRO_FEATURES_remove = "x11"
 #This enable mklibs library size optimization will be for all the images.
 #MKLIBS_OPTIMIZED_IMAGES ?= "all"
 
-# Uncomment this if your host distribution provides the help2man tool.
-#ASSUME_PROVIDED += "help2man-native"
-
 # This value is currently used by pseudo to determine if the recipe should
 # build both the 32-bit and 64-bit wrapper libraries on a 64-bit build system.
 #

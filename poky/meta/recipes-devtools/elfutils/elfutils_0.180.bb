@@ -114,6 +114,8 @@ FILES_libdw  = "${libdir}/libdw-${PV}.so ${libdir}/libdw.so.* ${libdir}/elfutils
 
 # The package contains symlinks that trip up insane
 INSANE_SKIP_${MLPREFIX}libdw = "dev-so"
+# The nlist binary in the tests uses explicitly minimal compiler flags
+INSANE_SKIP_${PN}-ptest += "ldflags"
 
 # avoid stripping some generated binaries otherwise some of the tests such as test-nlist,
 # run-strip-reloc.sh, run-strip-strmerge.sh and so on will fail

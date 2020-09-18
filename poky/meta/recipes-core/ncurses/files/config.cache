@@ -1,4 +1,0 @@
-#! /bin/sh
-
-cf_cv_func_nanosleep=yes
-cf_cv_func_mkstemp=yes

@@ -21,6 +21,10 @@ def plugin_init(plugins):
 
 
 class QueryPlugin(LayerPlugin):
+    def __init__(self):
+        super(QueryPlugin, self).__init__()
+        self.collection_res = {}
+
     def do_show_layers(self, args):
         """show current configured layers."""
         logger.plain("%s  %s  %s" % ("layer".ljust(20), "path".ljust(40), "priority"))
@@ -222,7 +226,6 @@ skipped recipes will also be listed, with a " (skipped)" suffix.
                             multilayer = True
                         if prov[0] != pref[0]:
                             same_ver = False
-
                     if (multilayer or not show_overlayed_only) and (same_ver or not show_same_ver_only):
                         if not items_listed:
                             logger.plain('=== %s ===' % title)
@@ -243,8 +246,13 @@ skipped recipes will also be listed, with a " (skipped)" suffix.
         else:
             return '?'
 
+    def get_collection_res(self):
+        if not self.collection_res:
+            self.collection_res = bb.utils.get_collection_res(self.tinfoil.config_data)
+        return self.collection_res
+
     def get_file_layerdir(self, filename):
-        layer = bb.utils.get_file_layer(filename, self.tinfoil.config_data)
+        layer = bb.utils.get_file_layer(filename, self.tinfoil.config_data, self.get_collection_res())
         return self.bbfile_collections.get(layer, None)
 
     def remove_layer_prefix(self, f):

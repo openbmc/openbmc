@@ -9,7 +9,7 @@
     <para>
         The OpenEmbedded build system provides several example
         images to satisfy different needs.
-        When you issue the <filename>bitbake</filename> command you provide a “top-level” recipe
+        When you issue the <filename>bitbake</filename> command you provide a "top-level" recipe
         that essentially begins the build for the type of image you want.
     </para>
 
@@ -100,7 +100,7 @@
             <listitem><para id='images-core-image-minimal-initramfs'><filename>core-image-minimal-initramfs</filename>:
                 A <filename>core-image-minimal</filename> image that has the Minimal RAM-based
                 Initial Root Filesystem (initramfs) as part of the kernel,
-                which allows the system to find the first “init” program more efficiently.
+                which allows the system to find the first "init" program more efficiently.
                 See the
                 <link linkend='var-PACKAGE_INSTALL'><filename>PACKAGE_INSTALL</filename></link>
                 variable for additional information helpful when working with

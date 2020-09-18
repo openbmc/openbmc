@@ -365,7 +365,7 @@
                 You use package groups to hold recipes that, when built,
                 usually accomplish a single task.
                 For example, a package group could contain the recipes for a
-                company’s proprietary or value-add software.
+                company's proprietary or value-add software.
                 Or, the package group could contain the recipes that enable
                 graphics.
                 A package group is really just another recipe.

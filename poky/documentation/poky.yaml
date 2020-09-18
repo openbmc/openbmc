@@ -1,0 +1,89 @@
+DISTRO : "3.1"
+DISTRO_COMPRESSED : "31"
+DISTRO_NAME_NO_CAP : "dunfell"
+DISTRO_NAME : "Dunfell"
+DISTRO_NAME_NO_CAP_MINUS_ONE : "zeus"
+DISTRO_NAME_MINUS_ONE : "Zeus"
+YOCTO_DOC_VERSION : "3.1"
+YOCTO_DOC_VERSION_MINUS_ONE : "3.0.2"
+DISTRO_REL_TAG : "yocto-3.1"
+METAINTELVERSION : "12.0"
+REL_MONTH_YEAR : "April 2020"
+META_INTEL_REL_TAG : "&METAINTELVERSION;-&DISTRO_NAME_NO_CAP;-&YOCTO_DOC_VERSION;"
+POKYVERSION : "23.0.0"
+POKYVERSION_COMPRESSED : "2300"
+YOCTO_POKY : "poky-&DISTRO_NAME_NO_CAP;-&POKYVERSION;"
+COPYRIGHT_YEAR : "2010-2020"
+ORGNAME : "The Yocto Project"
+ORGEMAIL : "docs@lists.yoctoproject.org"
+YOCTO_DL_URL : "http://downloads.yoctoproject.org"
+YOCTO_HOME_URL : "http://www.yoctoproject.org"
+YOCTO_LISTS_URL : "http://lists.yoctoproject.org"
+YOCTO_BUGZILLA_URL : "http://bugzilla.yoctoproject.org"
+YOCTO_WIKI_URL : "https://wiki.yoctoproject.org"
+YOCTO_AB_URL : "http://autobuilder.yoctoproject.org"
+YOCTO_GIT_URL : "http://git.yoctoproject.org"
+YOCTO_ADTREPO_URL : "http://adtrepo.yoctoproject.org"
+OE_HOME_URL : "http://www.openembedded.org"
+OE_LISTS_URL : "http://lists.openembedded.org/mailman"
+OE_DOCS_URL : "http://docs.openembedded.org"
+OH_HOME_URL : "http://o-hand.com"
+BITBAKE_HOME_URL : "http://developer.berlios.de/projects/bitbake/"
+YOCTO_DOCS_URL : "&YOCTO_HOME_URL;/docs"
+YOCTO_SOURCES_URL : "&YOCTO_HOME_URL;/sources/"
+YOCTO_AB_PORT_URL : "https://autobuilder.yocto.io/"
+YOCTO_AB_NIGHTLY_URL : "&YOCTO_AB_PORT_URL;/pub/nightly/"
+YOCTO_POKY_URL : "&YOCTO_DL_URL;/releases/poky/"
+YOCTO_RELEASE_DL_URL : "&YOCTO_DL_URL;/releases/yocto/yocto-&DISTRO;"
+YOCTO_TOOLCHAIN_DL_URL : "&YOCTO_RELEASE_DL_URL;/toolchain/"
+YOCTO_ADTINSTALLER_DL_URL : "&YOCTO_RELEASE_DL_URL;/adt-installer"
+YOCTO_POKY_DL_URL : "&YOCTO_RELEASE_DL_URL;/&YOCTO_POKY;.tar.bz2"
+YOCTO_MACHINES_DL_URL : "&YOCTO_RELEASE_DL_URL;/machines"
+YOCTO_QEMU_DL_URL : "&YOCTO_MACHINES_DL_URL;/qemu"
+YOCTO_PYTHON-i686_DL_URL : "&YOCTO_DL_URL;/releases/miscsupport/python-nativesdk-standalone-i686.tar.bz2"
+YOCTO_PYTHON-x86_64_DL_URL : "&YOCTO_DL_URL;/releases/miscsupport/python-nativesdk-standalone-x86_64.tar.bz2"
+YOCTO_DOCS_QS_URL : "&YOCTO_DOCS_URL;/&YOCTO_DOC_VERSION;/yocto-project-qs/yocto-project-qs.html"
+YOCTO_DOCS_ADT_URL : "&YOCTO_DOCS_URL;/&YOCTO_DOC_VERSION;/adt-manual/adt-manual.html"
+YOCTO_DOCS_REF_URL : "&YOCTO_DOCS_URL;/&YOCTO_DOC_VERSION;/ref-manual/ref-manual.html"
+YOCTO_DOCS_BSP_URL : "&YOCTO_DOCS_URL;/&YOCTO_DOC_VERSION;/bsp-guide/bsp-guide.html"
+YOCTO_DOCS_DEV_URL : "&YOCTO_DOCS_URL;/&YOCTO_DOC_VERSION;/dev-manual/dev-manual.html"
+YOCTO_DOCS_KERNEL_DEV_URL : "&YOCTO_DOCS_URL;/&YOCTO_DOC_VERSION;/kernel-dev/kernel-dev.html"
+YOCTO_DOCS_PROF_URL : "&YOCTO_DOCS_URL;/&YOCTO_DOC_VERSION;/profile-manual/profile-manual.html"
+YOCTO_DOCS_MM_URL : "&YOCTO_DOCS_URL;/&YOCTO_DOC_VERSION;/mega-manual/mega-manual.html"
+YOCTO_DOCS_BB_URL : "&YOCTO_DOCS_URL;/&YOCTO_DOC_VERSION;/bitbake-user-manual/bitbake-user-manual.html"
+YOCTO_DOCS_TOAST_URL : "&YOCTO_DOCS_URL;/&YOCTO_DOC_VERSION;/toaster-manual/toaster-manual.html"
+YOCTO_DOCS_SDK_URL : "&YOCTO_DOCS_URL;/&YOCTO_DOC_VERSION;/sdk-manual/sdk-manual.html"
+YOCTO_DOCS_OM_URL : "&YOCTO_DOCS_URL;/&YOCTO_DOC_VERSION;/overview-manual/overview-manual.html"
+YOCTO_DOCS_BRIEF_URL : "&YOCTO_DOCS_URL;/&YOCTO_DOC_VERSION;/brief-yoctoprojectqs/brief-yoctoprojectqs.html"
+YOCTO_ADTPATH_DIR : "/opt/poky/&DISTRO;"
+YOCTO_POKY_TARBALL : "&YOCTO_POKY;.tar.bz2"
+OE_INIT_PATH : "&YOCTO_POKY;/oe-init-build-env"
+OE_INIT_FILE : "oe-init-build-env"
+UBUNTU_HOST_PACKAGES_ESSENTIAL : "gawk wget git-core diffstat unzip texinfo gcc-multilib \
+     build-essential chrpath socat cpio python3 python3-pip python3-pexpect \
+     xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev \
+     pylint3 xterm python3-subunit mesa-common-dev"
+FEDORA_HOST_PACKAGES_ESSENTIAL : "gawk make wget tar bzip2 gzip python3 unzip perl patch \
+     diffutils diffstat git cpp gcc gcc-c++ glibc-devel texinfo chrpath \
+     ccache perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue perl-bignum socat \
+     python3-pexpect findutils which file cpio python python3-pip xz python3-GitPython \
+     python3-jinja2 SDL-devel xterm rpcgen mesa-libGL-devel"
+OPENSUSE_HOST_PACKAGES_ESSENTIAL : "python gcc gcc-c++ git chrpath make wget python-xml \
+     diffstat makeinfo python-curses patch socat python3 python3-curses tar python3-pip \
+     python3-pexpect xz which python3-Jinja2 Mesa-libEGL1 libSDL-devel xterm rpcgen Mesa-dri-devel
+     $ sudo pip3 install GitPython"
+CENTOS7_HOST_PACKAGES_ESSENTIAL : "-y epel-release
+     $ sudo yum makecache
+     $ sudo yum install gawk make wget tar bzip2 gzip python3 unzip perl patch \
+     diffutils diffstat git cpp gcc gcc-c++ glibc-devel texinfo chrpath socat \
+     perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue python36-pip xz \
+     which SDL-devel xterm mesa-libGL-devel
+     $ sudo pip3 install GitPython jinja2"
+CENTOS8_HOST_PACKAGES_ESSENTIAL : "-y epel-release
+     $ sudo dnf config-manager --set-enabled PowerTools
+     $ sudo dnf makecache
+     $ sudo dnf install gawk make wget tar bzip2 gzip python3 unzip perl patch \
+     diffutils diffstat git cpp gcc gcc-c++ glibc-devel texinfo chrpath ccache \
+     socat perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue python3-pip \
+     python3-GitPython python3-jinja2 python3-pexpect xz which SDL-devel xterm \
+     rpcgen mesa-libGL-devel"

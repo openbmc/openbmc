@@ -4,8 +4,8 @@ DUMMYPROVIDES_PACKAGES = "\
     pkgconfig \
 "
 
-# Add /bin/sh?
 DUMMYPROVIDES = "\
+    /bin/sh \
     /bin/bash \
     /usr/bin/env \
     libGL.so()(64bit) \

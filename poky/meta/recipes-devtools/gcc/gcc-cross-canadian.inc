@@ -139,6 +139,29 @@ do_install () {
 	chown -R root:root ${D}
 	
 	cross_canadian_bindirlinks
+
+	for i in linux ${CANADIANEXTRAOS}
+	do
+		for v in ${CANADIANEXTRAVENDOR}
+		do
+			d=${D}${bindir}/../${TARGET_ARCH}$v-$i
+			install -d $d
+			for j in ${TARGET_PREFIX}gcc${EXEEXT} ${TARGET_PREFIX}g++${EXEEXT}
+			do
+				p=${TARGET_ARCH}$v-$i-`echo $j | sed -e s,${TARGET_PREFIX},,`
+				case $i in
+				*musl*)
+					rm -rf $d/$p
+					echo "#!/usr/bin/env sh" > $d/$p
+					echo "exec \`dirname \$0\`/../${TARGET_SYS}/$j -mmusl \$@" >> $d/$p
+					chmod 0755 $d/$p
+					;;
+				*)
+					;;
+				esac
+			done
+		done
+	done
 }
 
 ELFUTILS = "nativesdk-elfutils"

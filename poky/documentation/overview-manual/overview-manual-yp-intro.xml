@@ -459,7 +459,7 @@
                         <para>The <filename>devtool</filename> command employs
                         a number of sub-commands that allow you to add, modify,
                         and upgrade recipes.
-                        As with the OpenEmbedded build system, “recipes”
+                        As with the OpenEmbedded build system, "recipes"
                         represent software packages within
                         <filename>devtool</filename>.
                         When you use <filename>devtool add</filename>, a recipe
@@ -472,7 +472,7 @@
                         control is used in order to allow you to make changes
                         to the source as desired.
                         By default, both new recipes and the source go into
-                        a “workspace” directory under the eSDK.
+                        a "workspace" directory under the eSDK.
                         The <filename>devtool upgrade</filename> command
                         updates an existing recipe so that you can build it
                         for an updated set of source files.</para>
@@ -598,7 +598,7 @@
                         By providing an emulated runtime dynamic linker
                         (i.e. <filename>glibc</filename>-derived
                         <filename>ld.so</filename> emulation), the
-                        cross-prelink project extends the prelink software’s
+                        cross-prelink project extends the prelink software's
                         ability to prelink a sysroot environment.
                         Additionally, the cross-prelink software enables the
                         ability to work in sysroot style environments.</para>
@@ -620,7 +620,7 @@
 
                         <para>The original upstream prelink project only
                         supports running prelink on the end target device
-                        due to the reliance on the target device’s dynamic
+                        due to the reliance on the target device's dynamic
                         linker.
                         This restriction causes issues when developing a
                         cross-compiled system.
@@ -713,7 +713,7 @@
                         You can see that in this
                         <link linkend='yp-key-dev-elements'>figure</link>.
                         The Yocto Project combines various components such as
-                        BitBake, OE-Core, script “glue”, and documentation
+                        BitBake, OE-Core, script "glue", and documentation
                         for its build system.
                         </para></listitem>
                 </itemizedlist>
@@ -791,7 +791,7 @@
                         <note>
                             As best it can, opkg maintains backwards
                             compatibility with ipkg and conforms to a subset
-                            of Debian’s policy manual regarding control files.
+                            of Debian's policy manual regarding control files.
                         </note>
                         </para></listitem>
                 </itemizedlist>

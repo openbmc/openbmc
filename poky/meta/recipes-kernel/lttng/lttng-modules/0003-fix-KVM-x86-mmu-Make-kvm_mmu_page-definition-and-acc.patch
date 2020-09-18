@@ -1,0 +1,39 @@
+From f16315cc45c4c6b880de541bb092ca18a13952b7 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 10 Aug 2020 11:36:03 -0400
+Subject: [PATCH 03/10] fix: KVM: x86/mmu: Make kvm_mmu_page definition and
+ accessor internal-only (v5.9)
+
+  commit 985ab2780164698ec6e7d73fad523d50449261dd
+  Author: Sean Christopherson <sean.j.christopherson@intel.com>
+  Date:   Mon Jun 22 13:20:32 2020 -0700
+
+    KVM: x86/mmu: Make kvm_mmu_page definition and accessor internal-only
+
+    Make 'struct kvm_mmu_page' MMU-only, nothing outside of the MMU should
+    be poking into the gory details of shadow pages.
+
+Upstream-Status: Backport
+
+Change-Id: Ia5c1b9c49c2b00dad1d5b17c50c3dc730dafda20
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ probes/lttng-probe-kvm-x86-mmu.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/probes/lttng-probe-kvm-x86-mmu.c b/probes/lttng-probe-kvm-x86-mmu.c
+index 5a7ef1e..8f98186 100644
+--- a/probes/lttng-probe-kvm-x86-mmu.c
++++ b/probes/lttng-probe-kvm-x86-mmu.c
+@@ -25,6 +25,7 @@
+ #include <wrapper/tracepoint.h>
+ 
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,9,0))
++#include <../../arch/x86/kvm/mmu/mmu_internal.h>
+ #include <../../arch/x86/kvm/mmu/mmutrace.h>
+ #else
+ #include <../../arch/x86/kvm/mmutrace.h>
+-- 
+2.19.1
+

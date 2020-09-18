@@ -1,0 +1,45 @@
+From aa9e3982c1e75ad49945a62f5e262279c7a905a4 Mon Sep 17 00:00:00 2001
+From: Stefano Cappa <stefano.cappa.ks89@gmail.com>
+Date: Sun, 13 Jan 2019 01:50:52 +0100
+Subject: [PATCH] remove INCLUDEDIR to prevent build issues
+
+Upstream-Status: Pending
+
+Signed-off-by: Stefano Cappa <stefano.cappa.ks89@gmail.com>
+---
+ configure | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/configure b/configure
+index 6c81e0db..32dea2b4 100755
+--- a/configure
++++ b/configure
+@@ -20,7 +20,6 @@ BUILD=
+ HOST=
+ HOSTCC=
+ TARGET=
+-INCLUDEDIR=
+ DEBUG=
+ FORK=
+ STATIC=
+@@ -72,7 +71,6 @@ for x do
+ 	--mandir) MANDIR=$var;;
+ 	--datadir) DATADIR=$var;;
+ 	--with-ccopts|CFLAGS) CFLAGS=$var;;
+-	-I|--includedir) INCLUDEDIR="$INCLUDEDIR${INCLUDEDIR:+ }-I$var";;
+ 	CC) CC=$var;;
+ 	CPPFLAGS) CPPFLAGS=$var;;
+ 	PKG_CONFIG) PKG_CONFIG=$var;;
+@@ -309,9 +307,6 @@ if [ -n "$CPPFLAGS" ]; then
+ 	echo "CPPFLAGS=" >>$CONFIG_MK
+ 	echo "CPPFLAGS+=	$CPPFLAGS" >>$CONFIG_MK
+ fi
+-if [ -n "$INCLUDEDIR" ]; then
+-	echo "CPPFLAGS+=	$INCLUDEDIR" >>$CONFIG_MK
+-fi
+ if [ -n "$LDFLAGS" ]; then
+ 	echo "LDFLAGS=" >>$CONFIG_MK
+ 	echo "LDFLAGS+=	$LDFLAGS" >>$CONFIG_MK
+-- 
+2.17.2 (Apple Git-113)
+

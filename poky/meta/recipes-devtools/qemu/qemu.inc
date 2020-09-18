@@ -28,15 +28,20 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://0009-Fix-webkitgtk-builds.patch \
            file://0010-configure-Add-pkg-config-handling-for-libgcrypt.patch \
            file://0001-Add-enable-disable-udev.patch \
-	   file://0001-qemu-Do-not-include-file-if-not-exists.patch \
-	   file://find_datadir.patch \
-	   "
+           file://0001-qemu-Do-not-include-file-if-not-exists.patch \
+           file://find_datadir.patch \
+           file://usb-fix-setup_len-init.patch \
+           "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 
 SRC_URI[sha256sum] = "c9174eb5933d9eb5e61f541cd6d1184cd3118dfe4c5c4955bc1bdc4d390fa4e5"
 
 COMPATIBLE_HOST_mipsarchn32 = "null"
 COMPATIBLE_HOST_mipsarchn64 = "null"
+
+# Per https://lists.nongnu.org/archive/html/qemu-devel/2020-09/msg03873.html
+# upstream states qemu doesn't work without optimization
+DEBUG_BUILD = "0"
 
 do_install_append() {
     # Prevent QA warnings about installed ${localstatedir}/run

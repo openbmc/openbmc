@@ -28,10 +28,12 @@ def get_args_parser():
     %(prog)s [options] [from-revision [to-revision]]
     (if not specified, from-revision defaults to build-minus-1, and to-revision defaults to HEAD)""")
 
+    default_dir = os.path.join(os.environ.get('BUILDDIR', '.'), 'buildhistory')
+
     parser.add_argument('-p', '--buildhistory-dir',
                         action='store',
                         dest='buildhistory_dir',
-                        default='buildhistory/',
+                        default=default_dir,
                         help="Specify path to buildhistory directory (defaults to buildhistory/ under cwd)")
     parser.add_argument('-v', '--report-version',
                         action='store_true',
@@ -80,11 +82,6 @@ def main():
         parser.print_help()
 
         sys.exit(1)
-    if not os.path.exists(args.buildhistory_dir):
-        if args.buildhistory_dir == 'buildhistory/':
-            cwd = os.getcwd()
-            if os.path.basename(cwd) == 'buildhistory':
-                args.buildhistory_dir = cwd
 
     if not os.path.exists(args.buildhistory_dir):
         sys.stderr.write('Buildhistory directory "%s" does not exist\n\n' % args.buildhistory_dir)

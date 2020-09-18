@@ -1195,8 +1195,6 @@ def get_checksum_file_list(d):
             paths = ud.method.localpaths(ud, d)
             for f in paths:
                 pth = ud.decodedurl
-                if '*' in pth:
-                    f = os.path.join(os.path.abspath(f), pth)
                 if f.startswith(dl_dir):
                     # The local fetcher's behaviour is to return a path under DL_DIR if it couldn't find the file anywhere else
                     if os.path.exists(f):
@@ -1365,9 +1363,6 @@ class FetchMethod(object):
         # We cannot compute checksums for directories
         if os.path.isdir(urldata.localpath):
             return False
-        if urldata.localpath.find("*") != -1:
-            return False
-
         return True
 
     def recommends_checksum(self, urldata):
@@ -1429,11 +1424,6 @@ class FetchMethod(object):
     def unpack(self, urldata, rootdir, data):
         iterate = False
         file = urldata.localpath
-
-        # Localpath can't deal with 'dir/*' entries, so it converts them to '.',
-        # but it must be corrected back for local files copying
-        if urldata.basename == '*' and file.endswith('/.'):
-            file = '%s/%s' % (file.rstrip('/.'), urldata.path)
 
         try:
             unpack = bb.utils.to_boolean(urldata.parm.get('unpack'), True)
@@ -1612,8 +1602,6 @@ class FetchMethod(object):
         Is the download done ?
         """
         if os.path.exists(ud.localpath):
-            return True
-        if ud.localpath.find("*") != -1:
             return True
         return False
 

@@ -7,6 +7,7 @@ import signal
 import subprocess
 import errno
 import select
+import bb
 
 logger = logging.getLogger('BitBake.Process')
 
