@@ -1,7 +1,16 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/${MACHINE}:"
 OBMC_CONSOLE_HOST_TTY = "ttyS2"
 
-SRC_URI += "file://*.conf"
+SRC_URI_append_tiogapass = " file://server.ttyS2.conf"
+SRC_URI_append_yosemitev2 = " file://server.ttyS0.conf \
+                              file://server.ttyS1.conf \
+                              file://server.ttyS2.conf \
+                              file://server.ttyS3.conf \
+                              file://client.2200.conf \
+                              file://client.2201.conf \
+                              file://client.2202.conf \
+                              file://client.2203.conf"
+
 SRC_URI_remove = "file://${BPN}.conf"
 
 SYSTEMD_SERVICE_${PN}_remove_yosemitev2 = "obmc-console-ssh.socket"
