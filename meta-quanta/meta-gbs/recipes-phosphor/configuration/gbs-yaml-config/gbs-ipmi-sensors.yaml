@@ -216,21 +216,21 @@
   <<: *voltage
   entityInstance: 0x07
   path: /xyz/openbmc_project/sensors/voltage/pwrgd_pvpp
-  multiplierM: 157
+  multiplierM: 235
   rExp: -4
 
 0x38:
   <<: *voltage
   entityInstance: 0x08
   path: /xyz/openbmc_project/sensors/voltage/pwrgd_pvddio
-  multiplierM: 157
+  multiplierM: 235
   rExp: -4
 
 0x39:
   <<: *voltage
   entityInstance: 0x09
   path: /xyz/openbmc_project/sensors/voltage/pwrgd_cpuvr
-  multiplierM: 157
+  multiplierM: 235
   rExp: -4
 
 0x3A:
