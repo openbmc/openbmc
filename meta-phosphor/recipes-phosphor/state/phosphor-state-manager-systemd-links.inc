@@ -36,6 +36,11 @@ pkg_postinst_${PN}-obmc-targets_append() {
     TARGET="../phosphor-reset-sensor-states@.service"
     ln -s $TARGET $LINK
 
+    mkdir -p $D$systemd_system_unitdir/obmc-host-quiesce@0.target.wants
+    LINK="$D$systemd_system_unitdir/obmc-host-quiesce@0.target.wants/phosphor-reset-sensor-states@0.service"
+    TARGET="../phosphor-reset-sensor-states@.service"
+    ln -s $TARGET $LINK
+
     mkdir -p $D$systemd_system_unitdir/obmc-host-shutdown@0.target.requires
     LINK="$D$systemd_system_unitdir/obmc-host-shutdown@0.target.requires/obmc-chassis-poweroff@0.target"
     TARGET="../obmc-chassis-poweroff@.target"
@@ -95,6 +100,9 @@ pkg_prerm_${PN}-obmc-targets_append() {
     rm $LINK
 
     LINK="$D$systemd_system_unitdir/obmc-host-stop@0.target.wants/phosphor-reset-sensor-states@0.service"
+    rm $LINK
+
+    LINK="$D$systemd_system_unitdir/obmc-host-quiesce@0.target.wants/phosphor-reset-sensor-states@0.service"
     rm $LINK
 
     LINK="$D$systemd_system_unitdir/obmc-host-reset@0.target.requires/phosphor-reset-host-running@0.service"
