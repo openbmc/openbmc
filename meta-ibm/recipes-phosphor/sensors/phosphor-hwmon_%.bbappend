@@ -45,12 +45,12 @@ CHIPS_mihawk = " \
                bus@1e78a000/i2c-bus@140/ir35221@72 \
                bus@1e78a000/i2c-bus@180/ir35221@70 \
                bus@1e78a000/i2c-bus@180/ir35221@72 \
-               bus@1e78a000/i2c-bus@380/pca9545@70/i2c@0/tmp431@4c \
-               bus@1e78a000/i2c-bus@380/pca9545@70/i2c@1/tmp431@4c \
+               bus@1e78a000/i2c-bus@380/pca9545riser@70/i2c@0/tmp431@4c \
+               bus@1e78a000/i2c-bus@380/pca9545riser@70/i2c@1/tmp431@4c \
                bus@1e78a000/i2c-bus@380/pca9545@71/i2c@0/tmp431@4c \
                bus@1e78a000/i2c-bus@380/pca9545@71/i2c@1/tmp431@4c \
-               bus@1e78a000/i2c-bus@3c0/pca9545@70/i2c@0/tmp431@4c \
-               bus@1e78a000/i2c-bus@3c0/pca9545@70/i2c@1/tmp431@4c \
+               bus@1e78a000/i2c-bus@3c0/pca9545riser@70/i2c@0/tmp431@4c \
+               bus@1e78a000/i2c-bus@3c0/pca9545riser@70/i2c@1/tmp431@4c \
                bus@1e78a000/i2c-bus@3c0/pca9545@71/i2c@0/tmp431@4c \
                bus@1e78a000/i2c-bus@3c0/pca9545@71/i2c@1/tmp431@4c \
                bus@1e78a000/i2c-bus@400/tmp275@48 \
