@@ -1,0 +1,48 @@
+From c12fc8a0f748358f76ff5a883a390301f86f079f Mon Sep 17 00:00:00 2001
+From: John Wang <wangzhiqiang.bj@bytedance.com>
+Date: Wed, 30 Sep 2020 12:41:30 +0800
+Subject: [PATCH 4/5] ARM: dts: aspeed: Add uart-routing node
+
+Signed-off-by: John Wang <wangzhiqiang.bj@bytedance.com>
+---
+ arch/arm/boot/dts/aspeed-g5.dtsi | 6 ++++++
+ arch/arm/boot/dts/aspeed-g6.dtsi | 6 ++++++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/arch/arm/boot/dts/aspeed-g5.dtsi b/arch/arm/boot/dts/aspeed-g5.dtsi
+index 19288495f41a..de9a8fd3933f 100644
+--- a/arch/arm/boot/dts/aspeed-g5.dtsi
++++ b/arch/arm/boot/dts/aspeed-g5.dtsi
+@@ -522,6 +522,12 @@ sio_regs: regs {
+ 						compatible = "aspeed,bmc-misc";
+ 					};
+ 				};
++
++				uart_routing: uart_routing@9c {
++					compatible = "aspeed,ast2500-uart-routing";
++					reg = <0x9c 0x4>;
++					status = "disabled";
++				};
+ 			};
+ 
+ 			peci: bus@1e78b000 {
+diff --git a/arch/arm/boot/dts/aspeed-g6.dtsi b/arch/arm/boot/dts/aspeed-g6.dtsi
+index 97ca743363d7..9938b8f224f6 100644
+--- a/arch/arm/boot/dts/aspeed-g6.dtsi
++++ b/arch/arm/boot/dts/aspeed-g6.dtsi
+@@ -311,6 +311,12 @@ pinctrl: pinctrl {
+ 					compatible = "aspeed,ast2600-pinctrl";
+ 				};
+ 
++				uart_routing: uart_routing@9c {
++					compatible = "aspeed,ast2500-uart-routing";
++					reg = <0x9c 0x4>;
++					status = "disabled";
++				};
++
+ 				smp-memram@180 {
+ 					compatible = "aspeed,ast2600-smpmem";
+ 					reg = <0x180 0x40>;
+-- 
+2.25.1
+
