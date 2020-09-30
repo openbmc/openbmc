@@ -12,14 +12,14 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 DEPENDS = "phosphor-user-manager"
 RDEPENDS_${PN} = "sudo bash"
 
-# Besides executable file we also have shared help
-FILES_${PN} += "${datadir}/cli.help"
+# Directory with command handlers
+FILES_${PN} += "${datadir}/cli"
 
 # Custom installation procedure
 do_install() {
   ${B}/install.sh \
     --dir ${D} \
-    --machine ${MACHINE} \
+    --machine ${@'${MACHINE}'.split('-')[0]} \
     --admin priv-admin \
     --operator priv-operator \
     --user priv-user
@@ -28,4 +28,4 @@ do_install() {
 # Source code repository
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/YADRO-KNS/obmc-yadro-cli"
-SRCREV = "5408881b37890968b0a4ada8b35e81454df91321"
+SRCREV = "1b0347f2c638df21333c5479b4d3152cfc4b5ac1"
