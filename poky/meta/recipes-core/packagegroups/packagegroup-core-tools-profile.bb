@@ -28,6 +28,7 @@ PROFILETOOLS = "\
     "
 PERF = "perf"
 PERF_libc-musl = ""
+PERF_libc-musl_arm = "perf"
 
 # systemtap needs elfutils which is not fully buildable on some arches/libcs
 SYSTEMTAP = "systemtap"
@@ -37,6 +38,7 @@ SYSTEMTAP_riscv64 = ""
 
 LTTNGTOOLS = "lttng-tools"
 LTTNGTOOLS_arc = ""
+LTTNGTOOLS_riscv32_libc-musl = ""
 
 BABELTRACE = "babeltrace"
 BABELTRACE2 = "babeltrace2"

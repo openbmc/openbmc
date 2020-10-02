@@ -1413,7 +1413,9 @@ variables :term:`UBOOT_SIGN_ENABLE`, :term:`UBOOT_MKIMAGE_DTCOPTS`,
 :term:`UBOOT_SIGN_KEYDIR` and :term:`UBOOT_SIGN_KEYNAME` are set
 appropriately. The default values used for :term:`FIT_HASH_ALG` and
 :term:`FIT_SIGN_ALG` in ``kernel-fitimage`` are "sha256" and
-"rsa2048" respectively.
+"rsa2048" respectively. The keys for signing fitImage can be generated using
+the ``kernel-fitimage`` class when both :term:`FIT_GENERATE_KEYS` and
+:term:`UBOOT_SIGN_ENABLE` are set to "1".
 
 
 .. _ref-classes-kernel-grub:

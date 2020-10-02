@@ -81,7 +81,7 @@ available. Follow these general steps to run QEMU:
       your :term:`Build Directory`.
 
    -  If you have not built an image, you can go to the
-      :yocto_dl:`machines/qemu <releases/yocto/yocto-3.1.2/machines/qemu/>` area and download a
+      :yocto_dl:`machines/qemu </releases/yocto/yocto-3.1.2/machines/qemu/>` area and download a
       pre-built image that matches your architecture and can be run on
       QEMU.
 

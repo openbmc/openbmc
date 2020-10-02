@@ -14,10 +14,8 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  src/shared/userdb.c           |  6 ++++++
  3 files changed, 30 insertions(+)
 
-Index: systemd-stable/src/shared/group-record-nss.c
-===================================================================
---- systemd-stable.orig/src/shared/group-record-nss.c
-+++ systemd-stable/src/shared/group-record-nss.c
+--- a/src/shared/group-record-nss.c
++++ b/src/shared/group-record-nss.c
 @@ -19,8 +19,10 @@ int nss_group_to_group_record(
          if (isempty(grp->gr_name))
                  return -EINVAL;
@@ -35,7 +33,7 @@ Index: systemd-stable/src/shared/group-record-nss.c
  
 +#if ENABLE_GSHADOW
          if (sgrp) {
-                 if (hashed_password_valid(sgrp->sg_passwd)) {
+                 if (looks_like_hashed_password(sgrp->sg_passwd)) {
                          g->hashed_password = strv_new(sgrp->sg_passwd);
 @@ -51,6 +54,7 @@ int nss_group_to_group_record(
                  if (!g->administrators)
@@ -119,10 +117,8 @@ Index: systemd-stable/src/shared/group-record-nss.c
          if (r < 0)
                  return r;
  
-Index: systemd-stable/src/shared/group-record-nss.h
-===================================================================
---- systemd-stable.orig/src/shared/group-record-nss.h
-+++ systemd-stable/src/shared/group-record-nss.h
+--- a/src/shared/group-record-nss.h
++++ b/src/shared/group-record-nss.h
 @@ -2,7 +2,11 @@
  #pragma once
  
@@ -135,10 +131,8 @@ Index: systemd-stable/src/shared/group-record-nss.h
  
  #include "group-record.h"
  
-Index: systemd-stable/src/shared/userdb.c
-===================================================================
---- systemd-stable.orig/src/shared/userdb.c
-+++ systemd-stable/src/shared/userdb.c
+--- a/src/shared/userdb.c
++++ b/src/shared/userdb.c
 @@ -930,13 +930,16 @@ int groupdb_iterator_get(UserDBIterator
                  if (gr) {
                          _cleanup_free_ char *buffer = NULL;

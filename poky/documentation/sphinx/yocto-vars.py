@@ -1,9 +1,18 @@
 #!/usr/bin/env python
 import re
-import yaml
+import sys
 
 import sphinx
 from sphinx.application import Sphinx
+
+# This extension uses pyyaml, report an explicit
+# error message if it's not installed
+try:
+    import yaml
+except ImportError:
+    sys.stderr.write("The Yocto Project Sphinx documentation requires PyYAML.\
+    \nPlease make sure to install pyyaml python package.\n")
+    sys.exit(1)
 
 __version__  = '1.0'
 

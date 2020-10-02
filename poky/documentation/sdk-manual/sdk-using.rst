@@ -47,7 +47,7 @@ Host` by running the ``*.sh`` installation script.
 
 You can download a tarball installer, which includes the pre-built
 toolchain, the ``runqemu`` script, and support files from the
-appropriate :yocto_dl:`toolchain <releases/yocto/yocto-3.1.2/toolchain/>` directory within
+appropriate :yocto_dl:`toolchain </releases/yocto/yocto-3.1.2/toolchain/>` directory within
 the Index of Releases. Toolchains are available for several 32-bit and
 64-bit architectures with the ``x86_64`` directories, respectively. The
 toolchains the Yocto Project provides are based off the

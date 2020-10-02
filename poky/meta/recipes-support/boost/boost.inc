@@ -7,6 +7,9 @@ CVE_PRODUCT = "boost:boost"
 ARM_INSTRUCTION_SET_armv4 = "arm"
 ARM_INSTRUCTION_SET_armv5 = "arm"
 
+B = "${WORKDIR}/build"
+do_configure[cleandirs] = "${B}"
+
 BOOST_LIBS = "\
 	atomic \
 	chrono \
@@ -146,7 +149,7 @@ BOOST_PARALLEL_MAKE = "${@oe.utils.parallel_make_argument(d, '-j%d')}"
 BJAM_OPTS    = '${BOOST_PARALLEL_MAKE} -d+2 -q \
 		${BJAM_TOOLS} \
 		-sBOOST_BUILD_USER_CONFIG=${WORKDIR}/user-config.jam \
-		--build-dir=${S}/${TARGET_SYS} \
+		--build-dir=${B} \
 		--disable-icu \
 		${BJAM_EXTRA}'
 
@@ -161,6 +164,7 @@ BJAM_OPTS_append_arm = " abi=aapcs architecture=arm"
 BJAM_OPTS_append_aarch64 = " abi=aapcs address-model=64 architecture=arm"
 
 do_configure() {
+	cd ${S}
 	cp -f ${S}/boost/config/platform/linux.hpp ${S}/boost/config/platform/linux-gnueabi.hpp
 
 	# D2194:Fixing the failure of "error: duplicate initialization of gcc with the following parameters" during compilation.
@@ -184,8 +188,9 @@ do_configure() {
 }
 
 do_compile() {
-	rm -rf ${S}/${TARGET_SYS}
-	bjam ${BJAM_OPTS} --prefix=${prefix} \
+	cd ${S}
+	bjam ${BJAM_OPTS} \
+		--prefix=${prefix} \
 		--exec-prefix=${exec_prefix} \
 		--libdir=${libdir} \
 		--includedir=${includedir} \
@@ -193,6 +198,7 @@ do_compile() {
 }
 
 do_install() {
+	cd ${S}
 	bjam ${BJAM_OPTS} \
 		--libdir=${D}${libdir} \
 		--includedir=${D}${includedir} \

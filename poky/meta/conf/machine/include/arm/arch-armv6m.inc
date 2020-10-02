@@ -8,7 +8,7 @@ TUNECONFLICTS[armv6m] = "armv4 armv5 armv6 armv7a"
 # Use armv6s-m instead of armv6-m to avoid gcc bug "SVC is not permitted on this architecture".
 # SVC is a valid instruction.
 TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'armv6m', ' -march=armv6s-m', '', d)}"
-MACHINEOVERRIDES =. "${@bb.utils.contains('TUNE_FEATURES', 'armv6m', 'armv6m:', '' ,d)}"
+MACHINEOVERRIDES =. "${@bb.utils.contains('TUNE_FEATURES', 'armv6m', 'armv6m:', '', d)}"
 
 require conf/machine/include/arm/arch-armv5.inc
 

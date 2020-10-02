@@ -137,7 +137,7 @@ def copy_needed_files(d, tc):
                 shutil.rmtree(os.path.join(subdir, dir))
 
     # Create tar file for common parts of testexport
-    create_tarball(d, "testexport.tar.gz", d.getVar("TEST_EXPORT_DIR"))
+    testexport_create_tarball(d, "testexport.tar.gz", d.getVar("TEST_EXPORT_DIR"))
 
     # Copy packages needed for runtime testing
     package_extraction(d, tc.suites)
@@ -146,7 +146,7 @@ def copy_needed_files(d, tc):
         export_pkg_dir = os.path.join(d.getVar("TEST_EXPORT_DIR"), "packages")
         oe.path.copytree(test_pkg_dir, export_pkg_dir)
         # Create tar file for packages needed by the DUT
-        create_tarball(d, "testexport_packages_%s.tar.gz" % d.getVar("MACHINE"), export_pkg_dir)
+        testexport_create_tarball(d, "testexport_packages_%s.tar.gz" % d.getVar("MACHINE"), export_pkg_dir)
 
     # Copy SDK
     if d.getVar("TEST_EXPORT_SDK_ENABLED") == "1":
@@ -159,11 +159,11 @@ def copy_needed_files(d, tc):
         shutil.copy2(tarball_path, export_sdk_dir)
 
         # Create tar file for the sdk
-        create_tarball(d, "testexport_sdk_%s.tar.gz" % d.getVar("SDK_ARCH"), export_sdk_dir)
+        testexport_create_tarball(d, "testexport_sdk_%s.tar.gz" % d.getVar("SDK_ARCH"), export_sdk_dir)
 
     bb.plain("Exported tests to: %s" % export_path)
 
-def create_tarball(d, tar_name, src_dir):
+def testexport_create_tarball(d, tar_name, src_dir):
 
     import tarfile
 

@@ -944,6 +944,17 @@ def which(path, item, direction = 0, history = False, executable=False):
         return "", hist
     return ""
 
+@contextmanager
+def umask(new_mask):
+    """
+    Context manager to set the umask to a specific mask, and restore it afterwards.
+    """
+    current_mask = os.umask(new_mask)
+    try:
+        yield
+    finally:
+        os.umask(current_mask)
+
 def to_boolean(string, default=None):
     if not string:
         return default

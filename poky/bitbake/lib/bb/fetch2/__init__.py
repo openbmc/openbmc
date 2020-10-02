@@ -1520,7 +1520,7 @@ class FetchMethod(object):
                     if urlpath.find("/") != -1:
                         destdir = urlpath.rsplit("/", 1)[0] + '/'
                         bb.utils.mkdirhier("%s/%s" % (unpackdir, destdir))
-                cmd = 'cp -fpPRH %s %s' % (file, destdir)
+                cmd = 'cp -fpPRH "%s" "%s"' % (file, destdir)
 
         if not cmd:
             return

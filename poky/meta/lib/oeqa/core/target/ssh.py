@@ -88,6 +88,8 @@ class OESSHTarget(OETarget):
 
         status, output = self._run(sshCmd, processTimeout, True)
         self.logger.debug('Command: %s\nOutput:  %s\n' % (command, output))
+        if (status == 255) and (('No route to host') in output):
+            self.target_dumper.dump_target()
         return (status, output)
 
     def copyTo(self, localSrc, remoteDst):

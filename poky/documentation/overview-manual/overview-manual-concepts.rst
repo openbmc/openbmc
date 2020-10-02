@@ -153,7 +153,7 @@ several pieces of hardware.
 
 Many layers exist that work in the Yocto Project development
 environment. The `Yocto Project Curated Layer
-Index <https://caffelli-staging.yoctoproject.org/software-overview/layers/>`__
+Index <https://www.yoctoproject.org/software-overview/layers/>`__
 and `OpenEmbedded Layer
 Index <http://layers.openembedded.org/layerindex/branch/master/layers/>`__
 both contain layers from which you can use or leverage.

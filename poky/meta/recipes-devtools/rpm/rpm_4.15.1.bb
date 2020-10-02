@@ -49,7 +49,7 @@ SRCREV = "ab2179452c5be276a6b96c591afded485c7e58c3"
 
 S = "${WORKDIR}/git"
 
-DEPENDS = "openssl libarchive db file popt xz bzip2 dbus elfutils python3"
+DEPENDS = "openssl db file popt xz bzip2 elfutils python3"
 DEPENDS_append_class-native = " file-replacement-native bzip2-replacement-native"
 
 inherit autotools gettext pkgconfig python3native
@@ -62,18 +62,22 @@ EXTRA_OECONF_append = " --without-lua --enable-python --with-crypto=openssl"
 EXTRA_OECONF_append_libc-musl = " --disable-nls --disable-openmp"
 
 # --sysconfdir prevents rpm from attempting to access machine-specific configuration in sysroot/etc; we need to have it in rootfs
-#
 # --localstatedir prevents rpm from writing its database to native sysroot when building images
-#
-# Disable dbus for native, so that rpm doesn't attempt to inhibit shutdown via session dbus even when plugins support is enabled.
-# Also disable plugins by default for native.
+# Forcibly disable plugins for native/nativesdk, as the inhibit and prioreset
+# plugins both behave badly inside builds.
 EXTRA_OECONF_append_class-native = " --sysconfdir=/etc --localstatedir=/var --disable-plugins"
 EXTRA_OECONF_append_class-nativesdk = " --sysconfdir=/etc --disable-plugins"
 
 BBCLASSEXTEND = "native nativesdk"
 
-PACKAGECONFIG ??= ""
+PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'inhibit', '', d)}"
+# The inhibit plugin serves no purpose outside of the target
+PACKAGECONFIG_remove_class-native = "inhibit"
+PACKAGECONFIG_remove_class-nativesdk = "inhibit"
+
 PACKAGECONFIG[imaevm] = "--with-imaevm,,ima-evm-utils"
+PACKAGECONFIG[inhibit] = "--enable-inhibit-plugin,--disable-inhibit-plugin,dbus"
+PACKAGECONFIG[rpm2archive] = "--with-archive,--without-archive,libarchive"
 
 ASNEEDED = ""
 
@@ -95,7 +99,7 @@ WRAPPER_TOOLS = " \
 
 do_install_append_class-native() {
         for tool in ${WRAPPER_TOOLS}; do
-                create_wrapper ${D}$tool \
+                test -x ${D}$tool && create_wrapper ${D}$tool \
                         RPM_CONFIGDIR=${STAGING_LIBDIR_NATIVE}/rpm \
                         RPM_ETCCONFIGDIR=${STAGING_DIR_NATIVE} \
                         MAGIC=${STAGING_DIR_NATIVE}${datadir_native}/misc/magic.mgc \
@@ -105,7 +109,7 @@ do_install_append_class-native() {
 
 do_install_append_class-nativesdk() {
         for tool in ${WRAPPER_TOOLS}; do
-                create_wrapper ${D}$tool \
+                test -x ${D}$tool && create_wrapper ${D}$tool \
                         RPM_CONFIGDIR='`dirname $''realpath`'/${@os.path.relpath(d.getVar('libdir'), d.getVar('bindir'))}/rpm \
                         RPM_ETCCONFIGDIR='$'{RPM_ETCCONFIGDIR-'`dirname $''realpath`'/${@os.path.relpath(d.getVar('sysconfdir'), d.getVar('bindir'))}/..} \
                         MAGIC='`dirname $''realpath`'/${@os.path.relpath(d.getVar('datadir'), d.getVar('bindir'))}/misc/magic.mgc \

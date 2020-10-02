@@ -9,6 +9,10 @@ SOURCEDIR     = .
 BUILDDIR      = _build
 DESTDIR       = final
 
+ifeq ($(shell if which $(SPHINXBUILD) >/dev/null 2>&1; then echo 1; else echo 0; fi),0)
+$(error "The '$(SPHINXBUILD)' command was not found. Make sure you have Sphinx installed")
+endif
+
 # Put it first so that "make" without argument is like "make help".
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)

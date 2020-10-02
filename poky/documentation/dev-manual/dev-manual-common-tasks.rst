@@ -10746,14 +10746,15 @@ varies by component:
    `bitbake-devel <http://lists.openembedded.org/mailman/listinfo/bitbake-devel>`__
    mailing list.
 
--  *"meta-*" trees:* These trees contain Metadata. Use the
-   `poky <https://lists.yoctoproject.org/listinfo/poky>`__ mailing list.
+-  *"meta-\*" trees:* These trees contain Metadata. Use the
+   `poky <https://lists.yoctoproject.org/g/poky>`__ mailing list.
+
+-  *Documentation*: For changes to the Yocto Project documentation, use the `docs
+   <https://lists.yoctoproject.org/g/docs>`__ mailing list.
 
 For changes to other layers hosted in the Yocto Project source
-repositories (i.e. ``yoctoproject.org``), tools, and the Yocto Project
-documentation, use the `Yocto
-Project <https://lists.yoctoproject.org/listinfo/yocto>`__ general
-mailing list.
+repositories (i.e. ``yoctoproject.org``) and tools use the `Yocto Project
+<https://lists.yoctoproject.org/g/yocto/>`__ general mailing list.
 
 .. note::
 

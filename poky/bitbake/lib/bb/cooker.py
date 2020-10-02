@@ -1679,7 +1679,8 @@ class BBCooker:
         if self.hashserv:
             self.hashserv.process.terminate()
             self.hashserv.process.join()
-        bb.event.fire(CookerExit(), self.data)
+        if hasattr(self, "data"):
+            bb.event.fire(CookerExit(), self.data)
 
     def shutdown(self, force = False):
         if force:

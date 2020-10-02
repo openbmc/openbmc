@@ -56,7 +56,8 @@ def setUpModule():
                     if pth.startswith(canonical_layerpath):
                         if relpth.endswith('/'):
                             destdir = os.path.join(corecopydir, relpth)
-                            shutil.copytree(pth, destdir)
+                            # avoid race condition by not copying .pyc files YPBZ#13421,13803
+                            shutil.copytree(pth, destdir, ignore=ignore_patterns('*.pyc', '__pycache__'))
                         else:
                             destdir = os.path.join(corecopydir, os.path.dirname(relpth))
                             bb.utils.mkdirhier(destdir)
@@ -105,6 +106,13 @@ class DevtoolBase(OESelftestTestCase):
                         'This test cannot be run with a workspace directory '
                         'under the build directory')
         self.append_config(self.sstate_conf)
+
+    def tearDown(self):
+        # devtools tests are heavy on IO and if bitbake can't write out its caches, we see timeouts.
+        # call sync around the tests to ensure the IO queue doesn't get too large, taking any IO
+        # hit here rather than in bitbake shutdown.
+        super().tearDown()
+        os.system("sync")
 
     def _check_src_repo(self, repo_dir):
         """Check srctree git repository"""

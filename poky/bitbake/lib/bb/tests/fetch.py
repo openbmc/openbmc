@@ -223,6 +223,21 @@ class URITest(unittest.TestCase):
             'query': {},
             'relative': False
         },
+        "git://tfs-example.org:22/tfs/example%20path/example.git": {
+            'uri': 'git://tfs-example.org:22/tfs/example%20path/example.git',
+            'scheme': 'git',
+            'hostname': 'tfs-example.org',
+            'port': 22,
+            'hostport': 'tfs-example.org:22',
+            'path': '/tfs/example path/example.git',
+            'userinfo': '',
+            'userinfo': '',
+            'username': '',
+            'password': '',
+            'params': {},
+            'query': {},
+            'relative': False
+        },
         "http://somesite.net;someparam=1": {
             'uri': 'http://somesite.net;someparam=1',
             'scheme': 'http',
@@ -584,6 +599,7 @@ class FetcherLocalTest(FetcherTest):
         touch(os.path.join(self.localsrcdir, 'dir', 'd'))
         os.makedirs(os.path.join(self.localsrcdir, 'dir', 'subdir'))
         touch(os.path.join(self.localsrcdir, 'dir', 'subdir', 'e'))
+        touch(os.path.join(self.localsrcdir, r'backslash\x2dsystemd-unit.device'))
         self.d.setVar("FILESPATH", self.localsrcdir)
 
     def fetchUnpack(self, uris):
@@ -600,6 +616,10 @@ class FetcherLocalTest(FetcherTest):
     def test_local(self):
         tree = self.fetchUnpack(['file://a', 'file://dir/c'])
         self.assertEqual(tree, ['a', 'dir/c'])
+
+    def test_local_backslash(self):
+        tree = self.fetchUnpack([r'file://backslash\x2dsystemd-unit.device'])
+        self.assertEqual(tree, [r'backslash\x2dsystemd-unit.device'])
 
     def test_local_wildcard(self):
         with self.assertRaises(bb.fetch2.ParameterError):
@@ -2079,6 +2099,38 @@ class GitLfsTest(FetcherTest):
         ud.method._find_git_lfs = lambda d: False
         shutil.rmtree(self.gitdir, ignore_errors=True)
         fetcher.unpack(self.d.getVar('WORKDIR'))
+
+class GitURLWithSpacesTest(FetcherTest):
+    test_git_urls = {
+        "git://tfs-example.org:22/tfs/example%20path/example.git" : {
+            'url': 'git://tfs-example.org:22/tfs/example%20path/example.git',
+            'gitsrcname': 'tfs-example.org.22.tfs.example_path.example.git',
+            'path': '/tfs/example path/example.git'
+        },
+        "git://tfs-example.org:22/tfs/example%20path/example%20repo.git" : {
+            'url': 'git://tfs-example.org:22/tfs/example%20path/example%20repo.git',
+            'gitsrcname': 'tfs-example.org.22.tfs.example_path.example_repo.git',
+            'path': '/tfs/example path/example repo.git'
+        }
+    }
+
+    def test_urls(self):
+
+        # Set fake SRCREV to stop git fetcher from trying to contact non-existent git repo
+        self.d.setVar('SRCREV', '82ea737a0b42a8b53e11c9cde141e9e9c0bd8c40')
+
+        for test_git_url, ref in self.test_git_urls.items():
+
+            fetcher = bb.fetch.Fetch([test_git_url], self.d)
+            ud = fetcher.ud[fetcher.urls[0]]
+
+            self.assertEqual(ud.url, ref['url'])
+            self.assertEqual(ud.path, ref['path'])
+            self.assertEqual(ud.localfile, os.path.join(self.dldir, "git2", ref['gitsrcname']))
+            self.assertEqual(ud.localpath, os.path.join(self.dldir, "git2", ref['gitsrcname']))
+            self.assertEqual(ud.lockfile, os.path.join(self.dldir, "git2", ref['gitsrcname'] + '.lock'))
+            self.assertEqual(ud.clonedir, os.path.join(self.dldir, "git2", ref['gitsrcname']))
+            self.assertEqual(ud.fullmirror, os.path.join(self.dldir, "git2_" + ref['gitsrcname'] + '.tar.gz'))
 
 class NPMTest(FetcherTest):
     def skipIfNoNpm():

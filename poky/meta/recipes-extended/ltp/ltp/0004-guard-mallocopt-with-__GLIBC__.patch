@@ -7,7 +7,7 @@ mallocopt is not available on non glibc implementations
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Reviewed-by: Petr Vorel <petr.vorel@gmail.com>
-[ Upstream-Status: accepted in 967612c454aea66770b64f69287671037fe895b3 ]
+Upstream-Status: Accepted [967612c454aea66770b64f69287671037fe895b3]
 ---
  utils/benchmark/ebizzy-0.3/ebizzy.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)

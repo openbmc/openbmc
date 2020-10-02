@@ -19,7 +19,7 @@ SRC_URI = "https://roy.marples.name/downloads/${BPN}/${BPN}-${PV}.tar.xz \
 
 SRC_URI[sha256sum] = "fcb2d19672d445bbfd38678fdee4f556ef967a3ea6bd81092d10545df2cb9666"
 
-inherit pkgconfig autotools-brokensep systemd
+inherit pkgconfig autotools-brokensep systemd useradd
 
 SYSTEMD_SERVICE_${PN} = "dhcpcd.service"
 
@@ -28,12 +28,21 @@ PACKAGECONFIG ?= "udev ${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)}"
 PACKAGECONFIG[udev] = "--with-udev,--without-udev,udev,udev"
 PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6"
 
-EXTRA_OECONF = "--enable-ipv4"
+EXTRA_OECONF = "--enable-ipv4 \
+                --dbdir=${localstatedir}/lib/${BPN} \
+                --runstatedir=/run \
+               "
+
+USERADD_PACKAGES = "${PN}"
+USERADD_PARAM_${PN} = "--system -d ${localstatedir}/lib/${BPN} -M -s /bin/false -U dhcpcd"
 
 do_install_append () {
     # install systemd unit files
     install -d ${D}${systemd_unitdir}/system
     install -m 0644 ${WORKDIR}/dhcpcd*.service ${D}${systemd_unitdir}/system
+
+    chmod 700 ${D}${localstatedir}/lib/${BPN}
+    chown dhcpcd:dhcpcd ${D}${localstatedir}/lib/${BPN}
 }
 
 FILES_${PN}-dbg += "${libdir}/dhcpcd/dev/.debug"

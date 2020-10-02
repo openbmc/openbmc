@@ -10,7 +10,7 @@ case.
 
 Signed-off-by: Eric Anholt <eric@anholt.net>
 
-Upstream-status: Backport [https://github.com/freedesktop/xorg-xserver/commit/e50c85f4e]
+Upstream-Status: Backport [https://github.com/freedesktop/xorg-xserver/commit/e50c85f4e]
 Signed-off-by: Aníbal Limón <anibal.limon@linaro.org>
 ---
  hw/xfree86/common/xf86platformBus.c | 2 +-

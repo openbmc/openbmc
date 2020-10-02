@@ -380,7 +380,7 @@ as your Yocto Project build host:
    Depending on your build host, you might have to install different
    software to support Docker containers. Go to the Docker installation
    page and read about the platform requirements in "`Supported
-   Platforms <https://docs.docker.com/install/#supported-platforms>`__"
+   Platforms <https://docs.docker.com/engine/install/#supported-platforms>`__"
    your build host needs to run containers.
 
 2. *Choose What To Install:* Depending on whether or not your build host
@@ -402,11 +402,11 @@ as your Yocto Project build host:
    type of the software you need to install:
 
    -  Install `Docker CE for
-      Windows <https://docs.docker.com/docker-for-windows/install/#install-docker-for-windows-desktop-app>`__
+      Windows <https://docs.docker.com/docker-for-windows/install/#install-docker-desktop-on-windows>`__
       for Windows build hosts that meet requirements.
 
    -  Install `Docker CE for
-      Macs <https://docs.docker.com/docker-for-mac/install/#install-and-run-docker-for-mac>`__
+      MacOs <https://docs.docker.com/docker-for-mac/install/#install-and-run-docker-desktop-on-mac>`__
       for Mac build hosts that meet requirements.
 
    -  Install `Docker Toolbox for
@@ -619,7 +619,7 @@ Use the following procedure to locate the latest upstream copy of the
 
 3. *Find the URL Used to Clone the Repository:* At the bottom of the
    page, note the URL used to clone that repository
-   (e.g. :yocto_git:`/git/poky`).
+   (e.g. :yocto_git:`/cgit.cgi/poky`).
 
    .. note::
 
@@ -647,7 +647,7 @@ of a given component.
 Follow these steps to locate and download a particular tarball:
 
 1. *Access the Index of Releases:* Open a browser and go to
-   :yocto_dl:`Index of Releases <releases>`. The
+   :yocto_dl:`Index of Releases </releases>`. The
    list represents released components (e.g. ``bitbake``, ``sato``, and
    so on).
 

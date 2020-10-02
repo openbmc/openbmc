@@ -6,3 +6,4 @@ RequiresMountsFor=/var /run
 ExecStart=@LIBEXECDIR@/sshd_check_keys
 Type=oneshot
 RemainAfterExit=yes
+Nice=10

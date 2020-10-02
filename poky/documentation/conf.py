@@ -27,7 +27,7 @@ release = current_version
 
 
 # -- Project information -----------------------------------------------------
-project = 'The Yocto Project'
+project = 'The Yocto Project \xae'
 copyright = '2010-%s, The Linux Foundation' % datetime.datetime.now().year
 author = 'The Linux Foundation'
 
@@ -91,10 +91,16 @@ intersphinx_mapping = {
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
-html_theme_options = {
-    'sticky_navigation': False,
-}
+try:
+    import sphinx_rtd_theme
+    html_theme = 'sphinx_rtd_theme'
+    html_theme_options = {
+        'sticky_navigation': False,
+    }
+except ImportError:
+    sys.stderr.write("The Sphinx sphinx_rtd_theme HTML theme was not found.\
+    \nPlease make sure to install the sphinx_rtd_theme python package.\n")
+    sys.exit(1)
 
 html_logo = 'sphinx-static/YoctoProject_Logo_RGB.jpg'
 

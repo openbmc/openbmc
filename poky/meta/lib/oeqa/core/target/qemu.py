@@ -12,6 +12,7 @@ from collections import defaultdict
 
 from .ssh import OESSHTarget
 from oeqa.utils.qemurunner import QemuRunner
+from oeqa.utils.dump import TargetDumper
 
 supported_fstypes = ['ext3', 'ext4', 'cpio.gz', 'wic']
 
@@ -42,6 +43,9 @@ class OEQemuTarget(OESSHTarget):
                                  dump_host_cmds=dump_host_cmds, logger=logger,
                                  serial_ports=serial_ports, boot_patterns = boot_patterns, 
                                  use_ovmf=ovmf)
+        dump_target_cmds = kwargs.get("testimage_dump_target")
+        self.target_dumper = TargetDumper(dump_target_cmds, dump_dir, self.runner)
+        self.target_dumper.create_dir("qemu")
 
     def start(self, params=None, extra_bootparams=None, runqemuparams=''):
         if self.use_slirp and not self.server_ip:

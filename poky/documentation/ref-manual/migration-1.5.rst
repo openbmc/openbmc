@@ -185,7 +185,7 @@ been introduced. You can find some of the implications for this change
 `here <http://cgit.openembedded.org/openembedded-core/commit/?id=0e326280a15b0f2c4ef2ef4ec441f63f55b75873>`__.
 The change also means that recipes that install files to ``/var/run``
 must be changed. You can find a guide on how to make these changes
-`here <http://permalink.gmane.org/gmane.comp.handhelds.openembedded/58530>`__.
+`here <https://www.mail-archive.com/openembedded-devel@lists.openembedded.org/msg31649.html>`__.
 
 .. _migration-1.5-removal-of-package-manager-database-within-image-recipes:
 

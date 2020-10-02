@@ -4,10 +4,11 @@ Wants=network.target
 Before=network.target
 BindsTo=sys-subsystem-net-devices-%i.device
 After=sys-subsystem-net-devices-%i.device
+Conflicts=connman.service
 
 [Service]
 Type=forking
-PIDFile=/run/dhcpcd-%I.pid
+PIDFile=/run/dhcpcd/%I.pid
 ExecStart=/usr/sbin/dhcpcd -q %I
 ExecStop=/usr/sbin/dhcpcd -x %I
 

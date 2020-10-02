@@ -42,7 +42,7 @@ Following is a list of supported recipes:
    `VMware
    Workstation <http://www.vmware.com/products/workstation/overview.html>`__.
    For more information on this image, see the :yocto_home:`Build
-   Appliance <software-item/build-appliance>` page
+   Appliance </software-item/build-appliance>` page
    on the Yocto Project website.
 
 -  ``core-image-base``: A console-only image that fully supports the

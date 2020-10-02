@@ -696,7 +696,7 @@ system and gives an overview of their function and contents.
       compiler. Consequently, the syntax follows Python's Regular
       Expression (re) syntax. The expressions are compared against the full
       paths to the files. For complete syntax information, see Python's
-      documentation at http://docs.python.org/3/library/re.html#re.
+      documentation at https://docs.python.org/3/library/re.html#regular-expression-syntax.
 
       The following example uses a complete regular expression to tell
       BitBake to ignore all recipe and recipe append files in the
@@ -2585,12 +2585,35 @@ system and gives an overview of their function and contents.
       For guidance on how to create your own file permissions settings
       table file, examine the existing ``fs-perms.txt``.
 
+   FIT_GENERATE_KEYS
+      Decides whether to generate the keys for signing fitImage if they
+      don't already exist. The keys are created in ``UBOOT_SIGN_KEYDIR``.
+      The default value is 0.
+
    FIT_HASH_ALG
       Specifies the hash algorithm used in creating the FIT Image. For e.g. sha256.
+
+   FIT_KEY_GENRSA_ARGS
+      Arguments to openssl genrsa for generating RSA private key for signing
+      fitImage. The default value is "-F4". i.e. the public exponent 65537 to
+      use.
+
+   FIT_KEY_REQ_ARGS
+      Arguments to openssl req for generating certificate for signing fitImage.
+      The default value is "-batch -new". batch for non interactive mode
+      and new for generating new keys.
+
+   FIT_KEY_SIGN_PKCS
+      Format for public key ceritifcate used in signing fitImage.
+      The default value is "x509".
 
    FIT_SIGN_ALG
       Specifies the signature algorithm used in creating the FIT Image.
       For e.g. rsa2048.
+
+   FIT_SIGN_NUMBITS
+      Size of private key in number of bits used in fitImage. The default
+      value is "2048".
 
    FONT_EXTRA_RDEPENDS
       When inheriting the :ref:`fontcache <ref-classes-fontcache>` class,
@@ -2902,10 +2925,46 @@ system and gives an overview of their function and contents.
       The base name of image output files. This variable defaults to the
       recipe name (``${``\ :term:`PN`\ ``}``).
 
+   IMAGE_EFI_BOOT_FILES
+      A space-separated list of files installed into the boot partition
+      when preparing an image using the Wic tool with the
+      ``bootimg-efi`` source plugin. By default,
+      the files are
+      installed under the same name as the source files. To change the
+      installed name, separate it from the original name with a semi-colon
+      (;). Source files need to be located in
+      :term:`DEPLOY_DIR_IMAGE`. Here are two
+      examples:
+      ::
+
+         IMAGE_EFI_BOOT_FILES = "${KERNEL_IMAGETYPE};bz2"
+         IMAGE_EFI_BOOT_FILES = "${KERNEL_IMAGETYPE} microcode.cpio"
+ 
+      Alternatively, source files can be picked up using a glob pattern. In
+      this case, the destination file must have the same name as the base
+      name of the source file path. To install files into a directory
+      within the target location, pass its name after a semi-colon (;).
+      Here are two examples:
+      ::
+
+         IMAGE_EFI_BOOT_FILES = "boot/loader/*"
+         IMAGE_EFI_BOOT_FILES = "boot/loader/*;boot/"
+
+      The first example
+      installs all files from ``${DEPLOY_DIR_IMAGE}/boot/loader/``
+      into the root of the target partition. The second example installs
+      the same files into a ``boot`` directory within the target partition.
+
+      You can find information on how to use the Wic tool in the
+      ":ref:`dev-manual/dev-manual-common-tasks:creating partitioned images using wic`"
+      section of the Yocto Project Development Tasks Manual. Reference
+      material for Wic is located in the
+      ":doc:`../ref-manual/ref-kickstart`" chapter.
+
    IMAGE_BOOT_FILES
       A space-separated list of files installed into the boot partition
       when preparing an image using the Wic tool with the
-      ``bootimg-partition`` or ``bootimg-efi`` source plugin. By default,
+      ``bootimg-partition`` source plugin. By default,
       the files are
       installed under the same name as the source files. To change the
       installed name, separate it from the original name with a semi-colon
@@ -3669,7 +3728,7 @@ system and gives an overview of their function and contents.
       The value in ``INITSCRIPT_PARAMS`` is passed through to the
       ``update-rc.d`` command. For more information on valid parameters,
       please see the ``update-rc.d`` manual page at
-      http://www.tin.org/bin/man.cgi?section=8&topic=update-rc.d.
+      https://manpages.debian.org/buster/init-system-helpers/update-rc.d.8.en.html
 
    INSANE_SKIP
       Specifies the QA checks to skip for a specific package within a

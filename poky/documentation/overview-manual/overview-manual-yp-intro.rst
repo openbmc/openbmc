@@ -224,7 +224,7 @@ your Metadata, the easier it is to cope with future changes.
       possible.
 
    -  Familiarize yourself with the `Yocto Project curated layer
-      index <https://caffelli-staging.yoctoproject.org/software-overview/layers/>`__
+      index <https://www.yoctoproject.org/software-overview/layers/>`__
       or the `OpenEmbedded layer
       index <http://layers.openembedded.org/layerindex/branch/master/layers/>`__.
       The latter contains more layers but they are less universally

@@ -14,6 +14,7 @@ import sys
 import tempfile
 import threading
 import unittest
+import socket
 
 
 class TestHashEquivalenceServer(object):
@@ -163,4 +164,8 @@ class TestHashEquivalenceUnixServer(TestHashEquivalenceServer, unittest.TestCase
 
 class TestHashEquivalenceTCPServer(TestHashEquivalenceServer, unittest.TestCase):
     def get_server_addr(self):
-        return "localhost:0"
+        # Some hosts cause asyncio module to misbehave, when IPv6 is not enabled.
+        # If IPv6 is enabled, it should be safe to use localhost directly, in general
+        # case it is more reliable to resolve the IP address explicitly.
+        return socket.gethostbyname("localhost") + ":0"
+            

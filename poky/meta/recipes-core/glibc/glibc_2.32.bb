@@ -69,12 +69,14 @@ EXTRA_OECONF = "--enable-kernel=${OLDEST_KERNEL} \
                 --enable-stackguard-randomization \
                 --disable-crypt \
                 --with-default-link \
-                --enable-nscd \
                 ${@bb.utils.contains_any('SELECTED_OPTIMIZATION', '-O0 -Og', '--disable-werror', '', d)} \
                 ${GLIBCPIE} \
                 ${GLIBC_EXTRA_OECONF}"
 
 EXTRA_OECONF += "${@get_libc_fpu_setting(bb, d)}"
+
+PACKAGECONFIG ??= "nscd"
+PACKAGECONFIG[nscd] = "--enable-nscd,--disable-nscd"
 
 do_patch_append() {
     bb.build.exec_func('do_fix_readlib_c', d)

@@ -355,7 +355,7 @@ universal, the list includes them just in case:
      the Source Directory, if you do, the top-level directory name of the
      Source Directory is derived from the Yocto Project release tarball.
      For example, downloading and unpacking
-     :yocto_dl:`releases/yocto/&DISTRO_REL_TAG;/&YOCTO_POKY;.tar.bz2`
+     :yocto_dl:`/releases/yocto/&DISTRO_REL_TAG;/&YOCTO_POKY;.tar.bz2`
      results in a Source Directory whose root folder is named ``poky``.
 
      It is important to understand the differences between the Source

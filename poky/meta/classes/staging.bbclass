@@ -614,7 +614,7 @@ python staging_taskhandler() {
     bbtasks = e.tasklist
     for task in bbtasks:
         deps = d.getVarFlag(task, "depends")
-        if deps and "populate_sysroot" in deps:
+        if task == "do_configure" or (deps and "populate_sysroot" in deps):
             d.appendVarFlag(task, "prefuncs", " extend_recipe_sysroot")
 }
 staging_taskhandler[eventmask] = "bb.event.RecipeTaskPreProcess"

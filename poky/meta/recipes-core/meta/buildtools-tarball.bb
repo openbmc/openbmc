@@ -11,6 +11,7 @@ TOOLCHAIN_HOST_TASK ?= "\
     nativesdk-python3-modules \
     nativesdk-python3-misc \
     nativesdk-python3-git \
+    nativesdk-python3-jinja2 \
     nativesdk-python3-testtools \
     nativesdk-python3-subunit \
     nativesdk-ncurses-terminfo-base \
@@ -79,6 +80,9 @@ if [ -d "\$OECORE_NATIVE_SYSROOT/environment-setup.d" ]; then
 		. \$envfile
 	done
 fi
+# We have to unset this else it can confuse oe-selftest and other tools
+# which may also use the overlapping namespace.
+unset OECORE_NATIVE_SYSROOT
 EOF
 
 	if [ "${SDKMACHINE}" = "i686" ]; then

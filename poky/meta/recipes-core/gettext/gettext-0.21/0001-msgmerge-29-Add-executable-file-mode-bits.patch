@@ -1,0 +1,23 @@
+From 71988f83b69c4ed98d1b9418da80edf11a931894 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 23 Sep 2020 22:08:34 -0700
+Subject: [PATCH] msgmerge-29: Add executable file mode bits
+
+This script is installed with default mode bits and executed directly
+e.g ./msgmerge-29 when doing make check which results in
+
+/bin/bash: line 9: ./msgmerge-29: Permission denied
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gettext-tools/tests/msgmerge-29 | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ mode change 100644 => 100755 gettext-tools/tests/msgmerge-29
+
+diff --git a/gettext-tools/tests/msgmerge-29 b/gettext-tools/tests/msgmerge-29
+old mode 100644
+new mode 100755
+-- 
+2.28.0
+

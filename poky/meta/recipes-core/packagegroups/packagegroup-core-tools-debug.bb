@@ -13,9 +13,12 @@ PR = "r3"
 MTRACE = ""
 MTRACE_libc-glibc = "libc-mtrace"
 
+STRACE = "strace"
+STRACE_riscv32_libc-musl = ""
+
 RDEPENDS_${PN} = "\
     gdb \
     gdbserver \
-    strace \
     ${MTRACE} \
+    ${STRACE} \
     "

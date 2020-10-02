@@ -17,7 +17,7 @@ and then run the script to hand-install the toolchain.
 Follow these steps to locate and hand-install the toolchain:
 
 1. *Go to the Installers Directory:* Go to
-   :yocto_dl:`releases/yocto/yocto-3.1.2/toolchain/`
+   :yocto_dl:`/releases/yocto/yocto-3.1.2/toolchain/`
 
 2. *Open the Folder for Your Build Host:* Open the folder that matches
    your :term:`Build Host` (i.e.
@@ -204,7 +204,7 @@ Follow these steps to extract the root filesystem:
    Image File:* You need to find and download the root filesystem image
    file that is appropriate for your target system. These files are kept
    in machine-specific folders in the
-   :yocto_dl:`Index of Releases <releases/yocto/yocto-3.1.2/machines/>`
+   :yocto_dl:`Index of Releases </releases/yocto/yocto-3.1.2/machines/>`
    in the "machines" directory.
 
    The machine-specific folders of the "machines" directory contain
@@ -258,7 +258,7 @@ Follow these steps to extract the root filesystem:
 
    Following is an example command that extracts the root filesystem
    from a previously built root filesystem image that was downloaded
-   from the :yocto_dl:`Index of Releases <releases/yocto/yocto-3.1.2/machines/>`.
+   from the :yocto_dl:`Index of Releases </releases/yocto/yocto-3.1.2/machines/>`.
    This command extracts the root filesystem into the ``core2-64-sato``
    directory:
    ::

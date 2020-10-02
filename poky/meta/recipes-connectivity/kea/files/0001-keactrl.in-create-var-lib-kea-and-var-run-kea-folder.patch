@@ -1,0 +1,39 @@
+From 639dc25cdabc9d1846000a542c8cc19158b69994 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Fri, 18 Sep 2020 08:18:08 +0000
+Subject: [PATCH] keactrl.in: create /var/lib/kea and /var/run/kea folder
+
+Create /var/lib/kea and /var/run/kea folder to fix below error:
+ # keactrl start
+ INFO/keactrl: Starting /usr/sbin/kea-dhcp4 -c /etc/kea/kea-dhcp4.conf
+ INFO/keactrl: Starting /usr/sbin/kea-dhcp6 -c /etc/kea/kea-dhcp6.conf
+ INFO/keactrl: Starting /usr/sbin/kea-ctrl-agent -c /etc/kea/kea-ctrl-agent.conf
+ Unable to use interprocess sync lockfile (No such file or directory): /var/run/kea/logger_lockfile
+ Service failed: Launch failed: Unable to open PID file '/var/run/kea/kea-ctrl-agent.kea-ctrl-agent.pid' for write
+ [snip]
+ ERROR [kea-dhcp4.dhcp4/615.140641792751488] DHCP4_CONFIG_LOAD_FAIL configuration error using file: /etc/kea/kea-dhcp4.conf, reason: Unable to open database: unable to open '/var/lib/kea/kea-leases4.csv'
+ [snip]
+
+Upstream-Status: Inappropriate [config specific]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ src/bin/keactrl/keactrl.in | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/bin/keactrl/keactrl.in b/src/bin/keactrl/keactrl.in
+index 12b2b3f..47cf6f9 100644
+--- a/src/bin/keactrl/keactrl.in
++++ b/src/bin/keactrl/keactrl.in
+@@ -482,6 +482,8 @@ case ${command} in
+         # The variables (dhcp4_srv, dhcp6_serv, dhcp_ddns_srv etc) are set in the
+         # keactrl.conf file that shellcheck is unable to read.
+         # shellcheck disable=SC2154
++        [ -d @LOCALSTATEDIR@/run/kea ] || mkdir -p @LOCALSTATEDIR@/run/kea
++        [ -d @LOCALSTATEDIR@/lib/kea ] || mkdir -p @LOCALSTATEDIR@/lib/kea
+         run_conditional "dhcp4" "start_server ${dhcp4_srv} -c ${kea_dhcp4_config_file} ${args}" 1
+         run_conditional "dhcp6" "start_server ${dhcp6_srv} -c ${kea_dhcp6_config_file} ${args}" 1
+         # shellcheck disable=SC2154
+-- 
+2.26.2
+

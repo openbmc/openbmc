@@ -43,7 +43,7 @@ Wikipedia has a good historical description of the Open Source
 Philosophy `here <http://en.wikipedia.org/wiki/Open_source>`__. You can
 also find helpful information on how to participate in the Linux
 Community
-`here <http://ldn.linuxfoundation.org/book/how-participate-linux-community>`__.
+`here <https://www.kernel.org/doc/html/latest/process/index.html>`__.
 
 .. _gs-the-development-host:
 
@@ -185,7 +185,7 @@ development:
    see the ":ref:`dev-manual/dev-manual-start:accessing source repositories`"
    Section in the Yocto Project Development Tasks Manual.
 
--  :yocto_dl:`Index of /releases: <releases>` This is an index
+-  :yocto_dl:`Index of /releases: </releases>` This is an index
    of releases such as Poky, Pseudo, installers for cross-development
    toolchains, miscellaneous support and all released versions of Yocto
    Project in the form of images or tarballs. Downloading and extracting
@@ -205,7 +205,7 @@ development:
    through the "SOFTWARE" menu that allows you to download any Yocto
    Project release, tool, and Board Support Package (BSP) in tarball
    form. The tarballs are similar to those found in the
-   :yocto_dl:`Index of /releases: <releases>` area.
+   :yocto_dl:`Index of /releases: </releases>` area.
 
    .. image:: figures/yp-download.png
       :align: center

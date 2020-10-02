@@ -273,6 +273,11 @@ inherit update-alternatives
 ALTERNATIVE_PRIORITY = "100"
 
 ALTERNATIVE_ncurses-tools_class-target = "clear reset"
+ALTERNATIVE_ncurses-terminfo_class-target = "st st-256color"
+
+ALTERNATIVE_LINK_NAME[st] = "${datadir}/terminfo/s/st"
+
+ALTERNATIVE_LINK_NAME[st-256color] = "${datadir}/terminfo/s/st-256color"
 
 BBCLASSEXTEND = "native nativesdk"
 
