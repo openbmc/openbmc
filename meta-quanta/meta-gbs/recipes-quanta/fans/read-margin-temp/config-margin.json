@@ -6,9 +6,9 @@
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/cputemp",
             "parameters": {
-                "type": "file",
-                "maxTemp": -1,
-                "path": "/sys/devices/platform/ahb/ahb:apb/f0082000.i2c/i2c-2/2-004c/hwmon/cpu_hwmon/temp1_max",
+                "type": "",
+                "maxTemp": 95000,
+                "path": "",
                 "sysLabel": "",
                 "targetTemp": -1,
                 "targetTempOffset": -10000,
@@ -22,10 +22,10 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme0",
             "parameters": {
                 "type": "",
-                "maxTemp": 70000,
+                "maxTemp": 77000,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 60000,
+                "targetTemp": 67000,
                 "targetTempOffset": 0,
                 "scalar": 1.0
             }
@@ -37,10 +37,10 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme1",
             "parameters": {
                 "type": "",
-                "maxTemp": 70000,
+                "maxTemp": 77000,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 60000,
+                "targetTemp": 67000,
                 "targetTempOffset": 0,
                 "scalar": 1.0
             }
@@ -52,10 +52,10 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme2",
             "parameters": {
                 "type": "",
-                "maxTemp": 70000,
+                "maxTemp": 77000,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 60000,
+                "targetTemp": 67000,
                 "targetTempOffset": 0,
                 "scalar": 1.0
             }
@@ -67,10 +67,10 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme3",
             "parameters": {
                 "type": "",
-                "maxTemp": 70000,
+                "maxTemp": 77000,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 60000,
+                "targetTemp": 67000,
                 "targetTempOffset": 0,
                 "scalar": 1.0
             }
@@ -82,10 +82,10 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme4",
             "parameters": {
                 "type": "",
-                "maxTemp": 70000,
+                "maxTemp": 77000,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 60000,
+                "targetTemp": 67000,
                 "targetTempOffset": 0,
                 "scalar": 1.0
             }
@@ -97,10 +97,10 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme5",
             "parameters": {
                 "type": "",
-                "maxTemp": 70000,
+                "maxTemp": 77000,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 60000,
+                "targetTemp": 67000,
                 "targetTempOffset": 0,
                 "scalar": 1.0
             }
@@ -112,10 +112,10 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme6",
             "parameters": {
                 "type": "",
-                "maxTemp": 70000,
+                "maxTemp": 77000,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 60000,
+                "targetTemp": 67000,
                 "targetTempOffset": 0,
                 "scalar": 1.0
             }
@@ -127,10 +127,10 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme7",
             "parameters": {
                 "type": "",
-                "maxTemp": 70000,
+                "maxTemp": 77000,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 60000,
+                "targetTemp": 67000,
                 "targetTempOffset": 0,
                 "scalar": 1.0
             }
@@ -142,10 +142,10 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme8",
             "parameters": {
                 "type": "",
-                "maxTemp": 70000,
+                "maxTemp": 77000,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 60000,
+                "targetTemp": 67000,
                 "targetTempOffset": 0,
                 "scalar": 1.0
             }
@@ -157,10 +157,10 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme9",
             "parameters": {
                 "type": "",
-                "maxTemp": 70000,
+                "maxTemp": 77000,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 60000,
+                "targetTemp": 67000,
                 "targetTempOffset": 0,
                 "scalar": 1.0
             }
@@ -172,10 +172,10 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme10",
             "parameters": {
                 "type": "",
-                "maxTemp": 70000,
+                "maxTemp": 77000,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 60000,
+                "targetTemp": 67000,
                 "targetTempOffset": 0,
                 "scalar": 1.0
             }
@@ -187,10 +187,10 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme11",
             "parameters": {
                 "type": "",
-                "maxTemp": 70000,
+                "maxTemp": 77000,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 60000,
+                "targetTemp": 67000,
                 "targetTempOffset": 0,
                 "scalar": 1.0
             }
@@ -202,10 +202,10 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme12",
             "parameters": {
                 "type": "",
-                "maxTemp": 70000,
+                "maxTemp": 77000,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 60000,
+                "targetTemp": 67000,
                 "targetTempOffset": 0,
                 "scalar": 1.0
             }
@@ -217,10 +217,10 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme13",
             "parameters": {
                 "type": "",
-                "maxTemp": 70000,
+                "maxTemp": 77000,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 60000,
+                "targetTemp": 67000,
                 "targetTempOffset": 0,
                 "scalar": 1.0
             }
@@ -232,10 +232,10 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme14",
             "parameters": {
                 "type": "",
-                "maxTemp": 70000,
+                "maxTemp": 77000,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 60000,
+                "targetTemp": 67000,
                 "targetTempOffset": 0,
                 "scalar": 1.0
             }
@@ -247,40 +247,115 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme15",
             "parameters": {
                 "type": "",
-                "maxTemp": 70000,
+                "maxTemp": 77000,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 60000,
+                "targetTemp": 67000,
                 "targetTempOffset": 0,
                 "scalar": 1.0
             }
         },
         {
-            "name": "fleeting0",
-            "unit": "millimargin",
+            "name": "vddcr_cpu",
+            "unit": "millidegree",
             "type": "dbus",
-            "path": "/xyz/openbmc_project/extsensors/margin/fleeting0",
+            "path": "/xyz/openbmc_project/sensors/temperature/vddcr_cpu",
             "parameters": {
                 "type": "",
-                "maxTemp": 0,
+                "maxTemp": 100000,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 0,
+                "targetTemp": 90000,
                 "targetTempOffset": 0,
                 "scalar": 1.0
             }
         },
         {
-            "name": "fleeting1",
-            "unit": "millimargin",
+            "name": "vddcr_soc",
+            "unit": "millidegree",
             "type": "dbus",
-            "path": "/xyz/openbmc_project/extsensors/margin/fleeting1",
+            "path": "/xyz/openbmc_project/sensors/temperature/vddcr_soc",
             "parameters": {
                 "type": "",
-                "maxTemp": 0,
+                "maxTemp": 100000,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 0,
+                "targetTemp": 90000,
+                "targetTempOffset": 0,
+                "scalar": 1.0
+            }
+        },
+        {
+            "name": "vddio_abcd",
+            "unit": "millidegree",
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/vddio_abcd",
+            "parameters": {
+                "type": "",
+                "maxTemp": 100000,
+                "path": "",
+                "sysLabel": "",
+                "targetTemp": 90000,
+                "targetTempOffset": 0,
+                "scalar": 1.0
+            }
+        },
+        {
+            "name": "vddio_efgh",
+            "unit": "millidegree",
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/vddio_efgh",
+            "parameters": {
+                "type": "",
+                "maxTemp": 100000,
+                "path": "",
+                "sysLabel": "",
+                "targetTemp": 90000,
+                "targetTempOffset": 0,
+                "scalar": 1.0
+            }
+        },
+        {
+            "name": "p12v_mobo",
+            "unit": "millidegree",
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/p12v_mobo",
+            "parameters": {
+                "type": "",
+                "maxTemp": 114000,
+                "path": "",
+                "sysLabel": "",
+                "targetTemp": 90000,
+                "targetTempOffset": 0,
+                "scalar": 1.0
+            }
+        },
+        {
+            "name": "powerseq_temp",
+            "unit": "millidegree",
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/powerseq_temp",
+            "parameters": {
+                "type": "",
+                "maxTemp": 99000,
+                "path": "",
+                "sysLabel": "",
+                "targetTemp": 90000,
+                "targetTempOffset": 0,
+                "scalar": 1.0
+            }
+        },
+        {
+            "name": "p12v_fan",
+            "unit": "millidegree",
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/p12v_fan",
+            "parameters": {
+                "type": "",
+                "maxTemp": 114000,
+                "path": "",
+                "sysLabel": "",
+                "targetTemp": 90000,
                 "targetTempOffset": 0,
                 "scalar": 1.0
             }
@@ -293,14 +368,26 @@
                 {
                     "id": 0,
                     "zoneSetpoint": 10000,
-                    "target": "/xyz/openbmc_project/extsensors/margin/real_fleeting0",
-                    "components": ["cputemp", "fleeting0"]
+                    "target": "/xyz/openbmc_project/extsensors/margin/cputemp",
+                    "components": ["cputemp"]
                 },
                 {
                     "id": 1,
                     "zoneSetpoint": 10000,
-                    "target": "/xyz/openbmc_project/extsensors/margin/real_fleeting1",
+                    "target": "/xyz/openbmc_project/extsensors/margin/zone0_vr",
+                    "components": ["vddcr_cpu", "vddcr_soc", "vddio_abcd", "vddio_efgh", "p12v_mobo", "powerseq_temp"]
+                },
+                {
+                    "id": 2,
+                    "zoneSetpoint": 10000,
+                    "target": "/xyz/openbmc_project/extsensors/margin/nvme",
                     "components": ["nvme0", "nvme1", "nvme2", "nvme3", "nvme4", "nvme5", "nvme6", "nvme7", "nvme8", "nvme9", "nvme10", "nvme11", "nvme12", "nvme13", "nvme14", "nvme15"]
+                },
+                {
+                    "id": 3,
+                    "zoneSetpoint": 10000,
+                    "target": "/xyz/openbmc_project/extsensors/margin/p12v_fan",
+                    "components": ["p12v_fan"]
                 }
             ]
         }

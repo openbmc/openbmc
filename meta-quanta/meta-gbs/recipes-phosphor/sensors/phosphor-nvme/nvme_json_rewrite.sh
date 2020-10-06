@@ -202,9 +202,9 @@ cat > $TARGET_FILE_NAME << EOF1
     ],
     "threshold": [
         {
-            "criticalHigh": 70,
+            "criticalHigh": 77,
             "criticalLow": 0,
-            "warningHigh": 70,
+            "warningHigh": 77,
             "warningLow": 0,
             "maxValue": 127,
             "minValue": -128
