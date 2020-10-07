@@ -18,14 +18,12 @@ GROUP_ADMIN = "priv-admin"
 GROUP_OPERATOR = "priv-operator"
 GROUP_USER = "priv-user"
 GROUP_IPMI = "ipmi"
-GROUP_SUDO = "sudo"
 
 # Default administrative account (login: admin, password: admin)
 ADMIN_LOGIN = "admin"
 ADMIN_PASSW = "\$1\$Fze0kFe8\$sylEANC01t.osF8OewyB/1"
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "--gid ${GROUP_ADMIN} \
-                       --groups ${GROUP_ADMIN},${GROUP_OPERATOR},${GROUP_USER},${GROUP_IPMI},${GROUP_SUDO} \
+USERADD_PARAM_${PN} = "--groups ${GROUP_ADMIN},${GROUP_IPMI} \
                        --password '${ADMIN_PASSW}' \
                        ${ADMIN_LOGIN}"
 
