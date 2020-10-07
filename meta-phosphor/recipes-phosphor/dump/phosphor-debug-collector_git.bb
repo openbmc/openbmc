@@ -186,6 +186,11 @@ PACKAGECONFIG[host-dump-offload-pldm] = " \
         pldm \
         "
 
+PACKAGECONFIG[openpower-dumps-extension] = " \
+       -Dopenpower-dumps-extension=enabled, \
+       -Dopenpower-dumps-extension=disabled  \
+"
+
 do_install[postfuncs] += "install_dreport"
 do_install[postfuncs] += "install_dreport_conf_file"
 do_install[postfuncs] += "install_dreport_plugins_scripts"
