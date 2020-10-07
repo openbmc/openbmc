@@ -915,12 +915,12 @@
   entityInstance: 0x3f
   path: /xyz/openbmc_project/inventory/system/chassis/motherboard/nvme15
 
-0xC0: &nvme_power
+0xC0: &nvme_pwrdis
   entityID: 0x04
   entityInstance: 0x40
-  sensorType: 0xC0
+  sensorType: 0x21
   path: /xyz/openbmc_project/control/nvme/u2_0_pwr_dis
-  sensorReadingType: 0x03
+  sensorReadingType: 0x6F
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: assertion
@@ -929,163 +929,177 @@
     xyz.openbmc_project.Control.Nvme.Power:
       Asserted:
         Offsets:
-          0x01:
-            type: bool
-            assert: true
-            deassert: false
+          0x08:
+            type: string
+            assert: xyz.openbmc_project.Control.Nvme.Power.SlotDisabled
+            deassert: xyz.openbmc_project.Control.Nvme.Power.SlotEnabled
 
 0xC1:
-  <<: *nvme_power
+  <<: *nvme_pwrdis
   entityInstance: 0x41
   path: /xyz/openbmc_project/control/nvme/u2_1_pwr_dis
 
 0xC2:
-  <<: *nvme_power
+  <<: *nvme_pwrdis
   entityInstance: 0x42
   path: /xyz/openbmc_project/control/nvme/u2_2_pwr_dis
 
 0xC3:
-  <<: *nvme_power
+  <<: *nvme_pwrdis
   entityInstance: 0x43
   path: /xyz/openbmc_project/control/nvme/u2_3_pwr_dis
 
 0xC4:
-  <<: *nvme_power
+  <<: *nvme_pwrdis
   entityInstance: 0x44
   path: /xyz/openbmc_project/control/nvme/u2_4_pwr_dis
 
 0xC5:
-  <<: *nvme_power
+  <<: *nvme_pwrdis
   entityInstance: 0x45
   path: /xyz/openbmc_project/control/nvme/u2_5_pwr_dis
 
 0xC6:
-  <<: *nvme_power
+  <<: *nvme_pwrdis
   entityInstance: 0x46
   path: /xyz/openbmc_project/control/nvme/u2_6_pwr_dis
 
 0xC7:
-  <<: *nvme_power
+  <<: *nvme_pwrdis
   entityInstance: 0x47
   path: /xyz/openbmc_project/control/nvme/u2_7_pwr_dis
 
 0xC8:
-  <<: *nvme_power
+  <<: *nvme_pwrdis
   entityInstance: 0x48
   path: /xyz/openbmc_project/control/nvme/u2_8_pwr_dis
 
 0xC9:
-  <<: *nvme_power
+  <<: *nvme_pwrdis
   entityInstance: 0x49
   path: /xyz/openbmc_project/control/nvme/u2_9_pwr_dis
 
 0xCA:
-  <<: *nvme_power
+  <<: *nvme_pwrdis
   entityInstance: 0x4A
   path: /xyz/openbmc_project/control/nvme/u2_10_pwr_dis
 
 0xCB:
-  <<: *nvme_power
+  <<: *nvme_pwrdis
   entityInstance: 0x4B
   path: /xyz/openbmc_project/control/nvme/u2_11_pwr_dis
 
 0xCC:
-  <<: *nvme_power
+  <<: *nvme_pwrdis
   entityInstance: 0x4C
   path: /xyz/openbmc_project/control/nvme/u2_12_pwr_dis
 
 0xCD:
-  <<: *nvme_power
+  <<: *nvme_pwrdis
   entityInstance: 0x4D
   path: /xyz/openbmc_project/control/nvme/u2_13_pwr_dis
 
 0xCE:
-  <<: *nvme_power
+  <<: *nvme_pwrdis
   entityInstance: 0x4E
   path: /xyz/openbmc_project/control/nvme/u2_14_pwr_dis
 
 0xCF:
-  <<: *nvme_power
+  <<: *nvme_pwrdis
   entityInstance: 0x4F
   path: /xyz/openbmc_project/control/nvme/u2_15_pwr_dis
 
-0xD0:
-  <<: *nvme_power
+0xD0: &nvme_pwren
+  entityID: 0x04
   entityInstance: 0x50
+  sensorType: 0x21
   path: /xyz/openbmc_project/control/nvme/pwr_u2_0_en
+  sensorReadingType: 0x6F
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: assertion
+  sensorNamePattern: nameLeaf
+  interfaces:
+    xyz.openbmc_project.Control.Nvme.Power:
+      Asserted:
+        Offsets:
+          0x05:
+            type: string
+            assert: xyz.openbmc_project.Control.Nvme.Power.Off
+            deassert: xyz.openbmc_project.Control.Nvme.Power.On
 
 0xD1:
-  <<: *nvme_power
+  <<: *nvme_pwren
   entityInstance: 0x51
   path: /xyz/openbmc_project/control/nvme/pwr_u2_1_en
 
 0xD2:
-  <<: *nvme_power
+  <<: *nvme_pwren
   entityInstance: 0x52
   path: /xyz/openbmc_project/control/nvme/pwr_u2_2_en
 
 0xD3:
-  <<: *nvme_power
+  <<: *nvme_pwren
   entityInstance: 0x53
   path: /xyz/openbmc_project/control/nvme/pwr_u2_3_en
 
 0xD4:
-  <<: *nvme_power
+  <<: *nvme_pwren
   entityInstance: 0x54
   path: /xyz/openbmc_project/control/nvme/pwr_u2_4_en
 
 0xD5:
-  <<: *nvme_power
+  <<: *nvme_pwren
   entityInstance: 0x55
   path: /xyz/openbmc_project/control/nvme/pwr_u2_5_en
 
 0xD6:
-  <<: *nvme_power
+  <<: *nvme_pwren
   entityInstance: 0x56
   path: /xyz/openbmc_project/control/nvme/pwr_u2_6_en
 
 0xD7:
-  <<: *nvme_power
+  <<: *nvme_pwren
   entityInstance: 0x57
   path: /xyz/openbmc_project/control/nvme/pwr_u2_7_en
 
 0xD8:
-  <<: *nvme_power
+  <<: *nvme_pwren
   entityInstance: 0x58
   path: /xyz/openbmc_project/control/nvme/pwr_u2_8_en
 
 0xD9:
-  <<: *nvme_power
+  <<: *nvme_pwren
   entityInstance: 0x59
   path: /xyz/openbmc_project/control/nvme/pwr_u2_9_en
 
 0xDA:
-  <<: *nvme_power
+  <<: *nvme_pwren
   entityInstance: 0x5A
   path: /xyz/openbmc_project/control/nvme/pwr_u2_10_en
 
 0xDB:
-  <<: *nvme_power
+  <<: *nvme_pwren
   entityInstance: 0x5B
   path: /xyz/openbmc_project/control/nvme/pwr_u2_10_en
 
 0xDC:
-  <<: *nvme_power
+  <<: *nvme_pwren
   entityInstance: 0x5C
   path: /xyz/openbmc_project/control/nvme/pwr_u2_12_en
 
 0xDD:
-  <<: *nvme_power
+  <<: *nvme_pwren
   entityInstance: 0x5D
   path: /xyz/openbmc_project/control/nvme/pwr_u2_13_en
 
 0xDE:
-  <<: *nvme_power
+  <<: *nvme_pwren
   entityInstance: 0x5E
   path: /xyz/openbmc_project/control/nvme/pwr_u2_14_en
 
 0xDF:
-  <<: *nvme_power
+  <<: *nvme_pwren
   entityInstance: 0x5F
   path: /xyz/openbmc_project/control/nvme/pwr_u2_15_en
 
