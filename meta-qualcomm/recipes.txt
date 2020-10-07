@@ -1,0 +1,2 @@
+recipes-core         - core recipe modifications
+recipes-phospor      - phosphor recipe modifications
