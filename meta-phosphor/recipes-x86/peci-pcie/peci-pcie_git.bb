@@ -16,3 +16,5 @@ SRCREV = "5d049735e26b346394ce505a4b3c6ccabdc661ae"
 S = "${WORKDIR}/git"
 
 SYSTEMD_SERVICE_${PN} += "xyz.openbmc_project.PCIe.service"
+
+EXTRA_OECMAKE = "-DYOCTO=1"
