@@ -31,9 +31,11 @@ DEPENDS += "nlohmann-json"
 
 DEPENDS += "virtual/${PN}-config-native"
 
+RDEPENDS_${PN}-ledmanager += "bash"
+
 S = "${WORKDIR}/git"
 
-FILES_${PN}-ledmanager += "${bindir}/phosphor-ledmanager"
+FILES_${PN}-ledmanager += "${bindir}/phosphor-ledmanager ${bindir}/led-set-all-groups-asserted.sh"
 FILES_${PN}-faultmonitor += "${bindir}/phosphor-fru-fault-monitor"
 
 DBUS_SERVICE_${PN}-ledmanager += "xyz.openbmc_project.LED.GroupManager.service"
