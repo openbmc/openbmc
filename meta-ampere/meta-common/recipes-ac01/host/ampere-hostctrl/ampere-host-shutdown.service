@@ -1,0 +1,10 @@
+[Unit]
+Description=Ampere Computing LLC graceful shutdown host
+Conflicts=obmc-host-start@0.target
+OnFailure=obmc-chassis-poweroff@0.target
+
+[Service]
+RemainAfterExit=no
+Type=oneshot
+ExecStart=/usr/bin/env ampere_power_util.sh mb graceful_shutdown
+SyslogIdentifier=ampere_power_util.sh
