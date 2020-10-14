@@ -9,6 +9,8 @@ CHIPS_mtjade = " \
         bus@1e78a000/i2c-bus@100/tmp175@2b \
         bus@1e78a000/i2c-bus@100/tmp175@2c \
         bus@1e78a000/i2c-bus@100/tmp175@2d \
+        bus@1e78a000/i2c-bus@c0/smpro@4f \
+        bus@1e78a000/i2c-bus@c0/smpro@4e \
         bus@1e78a000/i2c-bus@1c0/psu@58 \
         bus@1e78a000/i2c-bus@1c0/psu@59 \
         pwm-tacho-controller@1e786000 \
