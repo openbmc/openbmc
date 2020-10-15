@@ -112,7 +112,7 @@ SYSTEMD_SERVICE_${PN}_append_ibm-ac-server = " max31785-hwmon-helper@.service"
 
 do_install_append_ibm-ac-server() {
     install -d ${D}/${base_libdir}/udev/rules.d/
-    install ${WORKDIR}/70-max31785-hwmon.rules ${D}/${base_libdir}/udev/rules.d/
+    install -m 0644 ${WORKDIR}/70-max31785-hwmon.rules ${D}/${base_libdir}/udev/rules.d/
 
     install -d ${D}${bindir}
     install -m 0755 ${WORKDIR}/start_max31785_hwmon.sh ${D}${bindir}
