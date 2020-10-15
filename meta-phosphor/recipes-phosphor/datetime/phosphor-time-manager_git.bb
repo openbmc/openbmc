@@ -18,10 +18,16 @@ DEPENDS += "phosphor-dbus-interfaces"
 RDEPENDS_${PN} += "phosphor-settings-manager"
 RDEPENDS_${PN} += "phosphor-network"
 RDEPENDS_${PN} += "phosphor-mapper"
+RDEPENDS_${PN} += "bash"
+
+FILES_${PN}+= "${bindir}/hosttimesync/SetTimeBmc"
+FILES_${PN}+= "{bindir}/hosttimesync/time-manager-bmc-set-time"
+SYSTEMD_SERVICE_${PN}+= "time-manager-bmc-set-time.service"
 
 SRC_URI += "git://github.com/openbmc/phosphor-time-manager"
-SRCREV = "c6d33972d95fd77dbbe5a249ee35ba90e25314f8"
+SRCREV = "3de9698dae2d251cba482d4ccc78d58d2a02d564"
 PV = "1.0+git${SRCPV}"
 S = "${WORKDIR}/git"
 
 DBUS_SERVICE_${PN} += "xyz.openbmc_project.Time.Manager.service"
+
