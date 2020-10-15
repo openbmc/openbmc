@@ -1,5 +1,5 @@
 {
-    "version" : "R01",
+    "version" : "R02",
     "sensors" : [
         {
             "name": "fan0",
@@ -154,7 +154,7 @@
                     "pid": {
                         "samplePeriod": 1.0,
                         "proportionalCoeff": 714.0,
-                        "integralCoeff": 18.0,
+                        "integralCoeff": 9.0,
                         "feedFwdOffsetCoeff": 0.0,
                         "feedFwdGainCoeff": 0.0,
                         "integralLimit_min": 1786.0,
