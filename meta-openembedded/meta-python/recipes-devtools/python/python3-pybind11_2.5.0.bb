@@ -32,3 +32,5 @@ do_install() {
 	distutils3_do_install
 	cmake_do_install
 }
+
+BBCLASSEXTEND = "native nativesdk"

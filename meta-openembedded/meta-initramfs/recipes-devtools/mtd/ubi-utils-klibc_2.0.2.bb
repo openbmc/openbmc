@@ -18,7 +18,7 @@ SRC_URI = "git://git.infradead.org/mtd-utils.git \
              file://0005-common.h-replace-getline-with-fgets.patch \
              "
 
-S = "${WORKDIR}/git/"
+S = "${WORKDIR}/git"
 
 EXTRA_OECONF += "--disable-tests --without-jffs --without-ubifs"
 

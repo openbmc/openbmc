@@ -36,13 +36,7 @@ do_install_append () {
 
 ALTERNATIVE_PRIORITY_${PN} = "100"
 
-ALTERNATIVE_${PN} = "mailq newalias sendmail"
+ALTERNATIVE_${PN} = "mailq newaliases sendmail"
 ALTERNATIVE_LINK_NAME[sendmail] = "${sbindir}/sendmail"
-ALTERNATIVE_LINK_NAME[newalias] = "${sbindir}/newalias"
+ALTERNATIVE_LINK_NAME[newaliases] = "${sbindir}/newaliases"
 ALTERNATIVE_LINK_NAME[mailq] = "${sbindir}/mailq"
-
-ALTERNATIVE_PRIORITY_${PN}-doc = "100"
-ALTERNATIVE_${PN}-doc += "mailq.1 newaliases.1 sendmail.1"
-ALTERNATIVE_LINK_NAME[mailq.1] = "${mandir}/man1/mailq.1"
-ALTERNATIVE_LINK_NAME[newaliases.1] = "${mandir}/man1/newaliases.1"
-ALTERNATIVE_LINK_NAME[sendmail.1] = "${mandir}/man1/sendmail.1"

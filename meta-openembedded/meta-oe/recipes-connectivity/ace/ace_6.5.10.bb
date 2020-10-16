@@ -23,7 +23,7 @@ export ACE_ROOT="${WORKDIR}/ACE_wrappers"
 inherit pkgconfig
 
 CXXFLAGS_append = " -fpermissive -Wnodeprecated-declarations"
-
+CXX_append = " -ffile-prefix-map=${WORKDIR}= -fdebug-prefix-map=${WORKDIR}= "
 EXTRA_OEMAKE += "INSTALL_LIB=${baselib}"
 
 do_install() {

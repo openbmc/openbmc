@@ -21,6 +21,7 @@ RDEPENDS_packagegroup-meta-multimedia = "\
 
 RDEPENDS_packagegroup-meta-multimedia = "\
     alsa-equal \
+    aom \
     caps \
     cdparanoia \
     dcadec \
@@ -60,6 +61,7 @@ RDEPENDS_packagegroup-meta-multimedia = "\
     vorbis-tools \
     libdvbcsa \
     libopenmpt \
+    libuvc \
     mimic \
     ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "minidlna", "", d)} \
     mycroft \

@@ -42,7 +42,6 @@ PACKAGECONFIG ??= " \
     ${@bb.utils.filter('DISTRO_FEATURES', 'opengl', d)} \
 "
 
-PACKAGECONFIG_remove_aarch64 = "lua"
 PACKAGECONFIG[x11] = "--enable-x11,--disable-x11,virtual/libx11"
 PACKAGECONFIG[xv] = "--enable-xv,--disable-xv,libxv"
 PACKAGECONFIG[opengl] = "--enable-gl,--disable-gl,virtual/libgl"

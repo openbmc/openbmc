@@ -23,3 +23,13 @@ do_install() {
 FILES_${PN} += " \
     ${datadir}/terminfo \
 "
+
+inherit update-alternatives
+
+ALTERNATIVE_PRIORITY = "50"
+
+ALTERNATIVE_${PN} = "st st-256color"
+
+ALTERNATIVE_LINK_NAME[st] = "${datadir}/terminfo/s/st"
+
+ALTERNATIVE_LINK_NAME[st-256color] = "${datadir}/terminfo/s/st-256color"

@@ -29,6 +29,12 @@ do_configure_append() {
     cp ${STAGING_DATADIR_NATIVE}/gettext/po/Makefile.in.in ${S}/libgphoto2_port/po/
     cd ${S}/libgphoto2_port/
     autoreconf -Wcross --verbose --install --force ${EXTRA_AUTORECONF} $acpaths
+
+    # remove WORKDIR information from config to improve reproducibility
+    # libgphoto2_port recheck config will set the WORKDIR info again, so dont do that
+    sed -i 's/'$(echo ${WORKDIR} | sed 's_/_\\/_g')'/../g' ${B}/config.h
+    sed -i 's/'$(echo ${WORKDIR} | sed 's_/_\\/_g')'/../g' ${B}/libgphoto2_port/config.status
+    sed -i '/config\.status/ s/\-\-recheck//' ${B}/libgphoto2_port/Makefile
     cd ${S}
 }
 

@@ -6,13 +6,13 @@ LIC_FILES_CHKSUM = "file://LICENSE.Apache;md5=3b83ef96387f14655fc854ddc3c6bd57 \
                     file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://LICENSE.leveldb;md5=fb04ff57a14f308f2eed4a9b87d45837"
 
-SRCREV = "551a110918493a19d11243f53408b97485de1411"
-SRCBRANCH = "6.6.fb"
-PV = "6.6.4"
+SRCREV = "48bfca38f6f175435052a59791922a1a453d9609"
+SRCBRANCH = "6.11.fb"
+PV = "6.11.4"
 
 SRC_URI = "git://github.com/facebook/${BPN}.git;branch=${SRCBRANCH} \
-           file://0001-db-write_thread.cc-Initialize-state.patch \
            file://0001-cmake-Add-check-for-atomic-support.patch \
+           file://0001-cmake-Use-exported-target-for-bz2.patch \
           "
 
 S = "${WORKDIR}/git"
@@ -31,6 +31,7 @@ PACKAGECONFIG[gflags] = "-DWITH_GFLAGS=ON,-DWITH_GFLAGS=OFF,gflags"
 EXTRA_OECMAKE = "\
     -DPORTABLE=ON \
     -DWITH_TESTS=OFF \
+    -DWITH_BENCHMARK_TOOLS=OFF \
     -DWITH_TOOLS=OFF \
     -DFAIL_ON_WARNINGS=OFF \
 "

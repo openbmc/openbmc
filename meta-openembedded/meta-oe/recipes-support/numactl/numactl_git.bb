@@ -10,21 +10,23 @@ inherit autotools-brokensep ptest
 
 LIC_FILES_CHKSUM = "file://README.md;beginline=19;endline=32;md5=f8ff2391624f28e481299f3f677b21bb"
 
-SRCREV = "5d9f16722e3df49dc618a9f361bd482559695db7"
-PV = "2.0.13+git${SRCPV}"
+SRCREV = "dd6de072c92c892a86e18c0fd0dfa1ba57a9a05d"
+PV = "2.0.14+git${SRCPV}"
 
 SRC_URI = "git://github.com/numactl/numactl \
     file://Fix-the-test-output-format.patch \
     file://Makefile \
     file://run-ptest \
     file://0001-define-run-test-target.patch \
-    file://0001-numademo-fix-error-on-32bit-system.patch \
 "
 
 S = "${WORKDIR}/git"
 
 # ARM does not currently support NUMA
 COMPATIBLE_HOST = "^((?!arm).*)$"
+
+LDFLAGS_append_riscv64 = " -latomic"
+LDFLAGS_append_riscv32 = " -latomic"
 
 do_install() {
     oe_runmake DESTDIR=${D} prefix=${D}/usr install

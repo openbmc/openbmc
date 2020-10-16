@@ -1,0 +1,30 @@
+From f56eeb18a07df139864a99e1967d450cc5c8c0bb Mon Sep 17 00:00:00 2001
+From: Lee Chee Yang <chee.yang.lee@intel.com>
+Date: Wed, 30 Sep 2020 16:18:35 +0800
+Subject: [PATCH] improve reproducibility
+
+remove the WORKDIR info from BUILD_COMMAND to improve reproducibility.
+also use SOURCE_DATE_EPOCH as DATETIME wherever possible.
+
+Upstream-Status: Inappropriate [sed WORKDIR does not applies to upstream]
+Signed-off-by: Lee Chee Yang <chee.yang.lee@intel.com>
+---
+ build/version_info_linux.sh | 4 +-
+ 1 file changed, 2 insertion(+), 2 deletion(-)
+
+diff --git a/build/version_info_linux.sh b/build/version_info_linux.sh
+index 793cad11..ed6f4b2a 100644
+--- a/build/version_info_linux.sh
++++ b/build/version_info_linux.sh
+@@ -25,6 +25,6 @@ echo '#N": BUILD_GCC'"\t\t"`g++ --version </dev/null 2>&1 | grep 'g++'`'" ENDL \
+ echo '#N": BUILD_LIBC'"\t"`getconf GNU_LIBC_VERSION | grep glibc | sed -e 's/^glibc //'`'" ENDL \'
+ echo '#N": BUILD_LD'"\t\t"`ld -v 2>&1 | grep 'version'`'" ENDL \'
+ echo '#N": BUILD_TARGET'"\t$arch on $runtime"'" ENDL \'
+-echo '#N": BUILD_COMMAND'"\t"$*'" ENDL \'
++echo '#N": BUILD_COMMAND'"\t"$(echo $* | sed 's#'$WORKDIR'#/workdir#g')'" ENDL \'
+ echo ""
+-echo "#define __TBB_DATETIME \""`date -u`"\""
++echo "#define __TBB_DATETIME \""`$(date -u -d "@$SOURCE_DATE_EPOCH"  2>/dev/null || date -u -r "$SOURCE_DATE_EPOCH"  2>/dev/null || date -u )`"\""
+-- 
+2.25.1
+

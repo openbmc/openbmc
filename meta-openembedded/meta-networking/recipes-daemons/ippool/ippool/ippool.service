@@ -9,7 +9,6 @@ Type=simple
 ExecStart=@SBINDIR@/ippoold -f
 # Normal output will go to syslog, so suppress stdout.
 StandardOutput=null
-StandardError=syslog
 # ExecStop is not needed. systemd will send SIGTERM
 # and ippoold will exit status 1.
 SuccessExitStatus=1

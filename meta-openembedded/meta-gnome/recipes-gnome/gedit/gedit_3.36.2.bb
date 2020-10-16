@@ -36,4 +36,5 @@ FILES_${PN}-python += " \
     ${PYTHON_SITEPACKAGES_DIR} \
 "
 
+RDEPENDS_${PN} += "gsettings-desktop-schemas"
 RRECOMMENDS_${PN} += "source-code-pro-fonts"

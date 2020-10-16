@@ -25,6 +25,7 @@ SRC_URI = " \
     file://0005-Include-dirent.h-for-ino_t.patch \
     file://0006-include-limits.h-for-PATH_MAX.patch \
     file://0001-huge_page_setup_helper-use-python3-interpreter.patch \
+    file://0001-Revert-ld.hugetlbfs-fix-Ttext-segment-argument-on-AA.patch \
 "
 
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+(\.\d+)+)"

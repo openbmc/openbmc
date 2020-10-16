@@ -1,0 +1,37 @@
+From 89f326a427c7ad13c115e2d3f2ac27807aa5a795 Mon Sep 17 00:00:00 2001
+From: Romain Naour <romain.naour@smile.fr>
+Date: Fri, 10 Jul 2020 17:08:34 +0200
+Subject: [PATCH] pyiec61850: don't break CMAKE_INSTALL_PATH by trying to find
+ python modules install path (site-packages)
+
+https://stackoverflow.com/questions/1242904/finding-python-site-packages-directory-with-cmake
+
+Signed-off-by: Romain Naour <romain.naour@smile.fr>
+---
+ pyiec61850/CMakeLists.txt | 11 ++---------
+ 1 file changed, 2 insertions(+), 9 deletions(-)
+
+diff --git a/pyiec61850/CMakeLists.txt b/pyiec61850/CMakeLists.txt
+index 159ef4b..d1732a1 100644
+--- a/pyiec61850/CMakeLists.txt
++++ b/pyiec61850/CMakeLists.txt
+@@ -31,14 +31,7 @@ endif()
+ 
+ swig_link_libraries(iec61850 ${PYTHON_LIBRARIES} ${LIBS})
+ 
+-# Finding python modules install path
+-execute_process(
+-	COMMAND ${PYTHON_EXECUTABLE} -c
+-	"from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib())"
+-	OUTPUT_VARIABLE PYTHON_SITE_DIR
+-)
+-
+-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/iec61850.py DESTINATION ${PYTHON_SITE_DIR})
+-install(TARGETS _iec61850 LIBRARY DESTINATION ${PYTHON_SITE_DIR})
++install(FILES ${CMAKE_CURRENT_BINARY_DIR}/iec61850.py DESTINATION /usr/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages)
++install(TARGETS _iec61850 LIBRARY DESTINATION /usr/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages)
+ 
+ add_test(test_pyiec61850 ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/test_pyiec61850.py)
+-- 
+2.21.3
+

@@ -5,7 +5,7 @@ RequiresMountsFor=/var
 
 [Service]
 Type=simple
-WorkingDirectory=@LOCALSTATEDIR@/run/minifi
+WorkingDirectory=@LOCALSTATEDIR@/lib/minifi
 Environment=MINIFI_HOME=@SYSCONFDIR@/minifi
 ExecStart=@BINDIR@/minifi
 

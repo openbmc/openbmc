@@ -42,6 +42,7 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-alembic \
     python3-ansi2html \
     python3-ansicolors \
+    python3-argcomplete \
     python3-argexec \
     python3-appdirs \
     python3-apply-defaults \
@@ -227,7 +228,6 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-mccabe \
     python3-kconfiglib \
     python3-grpcio-tools \
-    python3-jinja2 \
     python3-jsmin \
     python3-greenlet \
     python3-idna \
@@ -261,6 +261,7 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-pyiface \
     python3-pyjwt \
     python3-pykwalify \
+    python3-docopt \
     python3-pylint \
     python3-pynetlinux \
     python3-pickleshare \
@@ -301,6 +302,7 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-sdnotify \
     python3-pycodestyle \
     python3-pytest \
+    python3-iniconfig \
     python3-speaklater \
     python3-wtforms \
     python3-speedtest-cli \
@@ -454,6 +456,8 @@ RDEPENDS_packagegroup-meta-python3-connectivity = "\
 
 RDEPENDS_packagegroup-meta-python3-ptest = "\
     python3-cryptography-ptest \
-    "
+    python3-jinja2-ptest \
+    python3-markupsafe-ptest \
+"
 
 EXCLUDE_FROM_WORLD = "1"

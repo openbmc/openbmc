@@ -8,7 +8,7 @@ PR = "r7"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/hunkyfonts/hunkyfonts-${PV}.tar.bz2"
 
-S = "${WORKDIR}/hunkyfonts-${PV}/TTF/"
+S = "${WORKDIR}/hunkyfonts-${PV}/TTF"
 
 PACKAGES = "ttf-hunky-sans ttf-hunky-serif"
 FONT_PACKAGES = "ttf-hunky-sans ttf-hunky-serif"
