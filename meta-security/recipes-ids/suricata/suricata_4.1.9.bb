@@ -14,7 +14,7 @@ SRC_URI += " \
 
 inherit autotools-brokensep pkgconfig python3-dir systemd ptest
 
-CFLAGS += "-D_DEFAULT_SOURCE"
+CFLAGS += "-D_DEFAULT_SOURCE -fcommon"
 
 CACHED_CONFIGUREVARS = "ac_cv_header_htp_htp_h=yes ac_cv_lib_htp_htp_conn_create=yes \
                         ac_cv_path_HAVE_WGET=no ac_cv_path_HAVE_CURL=no "

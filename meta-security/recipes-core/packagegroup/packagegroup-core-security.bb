@@ -13,6 +13,7 @@ PACKAGES = "\
     packagegroup-security-hardening \
     packagegroup-security-ids  \
     packagegroup-security-mac  \
+    ${@bb.utils.contains("DISTRO_FEATURES", "ptest", "packagegroup-meta-security-ptest-packages", "", d)} \
     "
 
 RDEPENDS_packagegroup-core-security = "\
@@ -22,6 +23,7 @@ RDEPENDS_packagegroup-core-security = "\
     packagegroup-security-hardening \
     packagegroup-security-ids  \
     packagegroup-security-mac  \
+    ${@bb.utils.contains("DISTRO_FEATURES", "ptest", "packagegroup-meta-security-ptest-packages", "", d)} \
     "
 
 SUMMARY_packagegroup-security-utils = "Security utilities"
@@ -36,6 +38,9 @@ RDEPENDS_packagegroup-security-utils = "\
     python3-privacyidea \
     python3-fail2ban \
     python3-scapy \
+    softhsm \
+    libest \
+    opendnssec \
     ${@bb.utils.contains_any("TUNE_FEATURES", "riscv32 ", "", " libseccomp",d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "sssd google-authenticator-libpam", "",d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "pax", "pax-utils packctl", "",d)} \
@@ -48,6 +53,7 @@ RDEPENDS_packagegroup-security-scanners = "\
     checksecurity \
     ${@bb.utils.contains_any("TUNE_FEATURES", "riscv32 riscv64", "", " clamav clamav-freshclam clamav-cvd",d)} \
     "
+RDEPENDS_packagegroup-security-scanners_remove_libc-musl = "clamav clamav-freshclam clamav-cvd"
 
 SUMMARY_packagegroup-security-audit = "Security Audit tools "
 RDEPENDS_packagegroup-security-audit = " \
@@ -73,3 +79,14 @@ RDEPENDS_packagegroup-security-mac = " \
     ${@bb.utils.contains("DISTRO_FEATURES", "apparmor", "apparmor", "",d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "smack", "smack", "",d)} \
     "
+
+RDEPENDS_packagegroup-meta-security-ptest-packages = "\
+    ptest-runner \
+    samhain-standalone-ptest \
+    libseccomp-ptest \
+    python3-scapy-ptest \
+    suricata-ptest \
+    tripwire-ptest \
+    python3-fail2ban-ptest \
+    ${@bb.utils.contains("DISTRO_FEATURES", "smack", "smack-ptest", "",d)} \
+"

@@ -6,7 +6,9 @@ LICENSE = "GPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 DEPENDS = "openldap cyrus-sasl libtdb ding-libs libpam c-ares krb5 autoconf-archive"
-DEPENDS += "libldb dbus libtalloc libpcre glib-2.0 popt e2fsprogs libtevent"
+DEPENDS_append = " libldb dbus libtalloc libpcre glib-2.0 popt e2fsprogs libtevent"
+
+DEPENDS_append_libc-musl = " musl-nscd"
 
 # If no crypto has been selected, default to DEPEND on nss, since that's what
 # sssd will pick if no active choice is made during configure
@@ -19,10 +21,10 @@ SRC_URI = "https://releases.pagure.org/SSSD/${BPN}/${BP}.tar.gz \
            file://fix-ldblibdir.patch \
            file://0001-build-Don-t-use-AC_CHECK_FILE-when-building-manpages.patch \
            file://0001-nss-Collision-with-external-nss-symbol.patch \
+           file://0002-Provide-missing-defines-which-otherwise-are-availabl.patch \
            "
 
-SRC_URI[md5sum] = "757bbb6f15409d8d075f4f06cb678d50"
-SRC_URI[sha256sum] = "6bb212cd6b75b918e945c24e7c3f95a486fb54d7f7d489a9334cfa1a1f3bf959"
+SRC_URI[sha256sum] = "2e1a7bf036b583f686d35164f2d79bdf4857b98f51fe8b0d17aa0fa756e4d0c0"
 
 inherit autotools pkgconfig gettext python3-dir features_check systemd
 

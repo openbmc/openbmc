@@ -7,9 +7,10 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=0fc19f620a102768d6dbd1e7166e78ab"
 DEPENDS = "autoconf-archive pkgconfig dstat sqlite3 openssl libtss2-dev tpm2-tools libyaml"
 
 SRC_URI = "git://github.com/tpm2-software/tpm2-pkcs11.git;branch=1.X \
-           file://bootstrap_fixup.patch "
+           file://bootstrap_fixup.patch \
+           file://0001-remove-local-binary-checkes.patch"
 
-SRCREV = "8d8f137f65f1d61d66cc191947b59c378f23e97d"
+SRCREV = "78bbf6a0237351830d0c3923b25ba0b57ae0b7e9"
 
 S = "${WORKDIR}/git"
 
@@ -18,3 +19,5 @@ inherit autotools-brokensep pkgconfig
 do_configure_prepend () {
     ${S}/bootstrap
 }
+
+RDEPNDS_${PN} = "tpm2-tools"

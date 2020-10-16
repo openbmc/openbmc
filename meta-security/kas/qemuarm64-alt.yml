@@ -1,10 +1,6 @@
 header:
   version: 8
   includes:
-    - kas-security-base.yml
-
-local_conf_header:
-  alt: |
-      DISTRO_FEATURES_append = " apparmor pam systemd"
+    - kas-security-alt.yml
 
 machine: qemuarm64

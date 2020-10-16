@@ -45,4 +45,4 @@ do_install_ptest() {
 FILES_${PN} = "${bindir} ${libdir}/${BPN}.so*"
 FILES_${PN}-dbg += "${libdir}/${PN}/tests/.debug/* ${libdir}/${PN}/tools/.debug"
 
-RDEPENDS_${PN}-ptest = "bash"
+RDEPENDS_${PN}-ptest = "coreutils bash"

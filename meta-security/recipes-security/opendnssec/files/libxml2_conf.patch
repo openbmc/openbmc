@@ -1,0 +1,112 @@
+configure does not work with OE pkg-config for the libxml2 option
+
+Upstream-Status: OE specific
+
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: opendnssec-2.1.6/m4/acx_libxml2.m4
+===================================================================
+--- opendnssec-2.1.6.orig/m4/acx_libxml2.m4
++++ opendnssec-2.1.6/m4/acx_libxml2.m4
+@@ -1,37 +1,67 @@
++#serial 11
++AU_ALIAS([CHECK_XML2], [ACX_LIBXML2])
+ AC_DEFUN([ACX_LIBXML2],[
+-	AC_ARG_WITH(libxml2,
+-		[AS_HELP_STRING([--with-libxml2=DIR],[look for libxml2 in this dir])],
+-        	[
+-			XML2_PATH="$withval"
+-			AC_PATH_PROGS(XML2_CONFIG, xml2-config, xml2-config, $XML2_PATH/bin)
+-		],[
+-			XML2_PATH="/usr/local"
+-			AC_PATH_PROGS(XML2_CONFIG, xml2-config, xml2-config, $PATH)
+-		])
+-	if test -x "$XML2_CONFIG"
+-	then
+-		AC_MSG_CHECKING(what are the xml2 includes)
+-		XML2_INCLUDES="`$XML2_CONFIG --cflags`"
+-		AC_MSG_RESULT($XML2_INCLUDES)
+-
+-		AC_MSG_CHECKING(what are the xml2 libs)
+-		XML2_LIBS="`$XML2_CONFIG --libs`"
+-		AC_MSG_RESULT($XML2_LIBS)
+-
+-		tmp_CPPFLAGS=$CPPFLAGS
+-		tmp_LIBS=$LIBS
+-
+-		CPPFLAGS="$CPPFLAGS $XML2_INCLUDES"
+-		LIBS="$LIBS $XML2_LIBS"
+-
+-		AC_CHECK_LIB(xml2, xmlDocGetRootElement,,[AC_MSG_ERROR([Can't find libxml2 library])])
+-		
+-		CPPFLAGS=$tmp_CPPFLAGS
+-		LIBS=$tmp_LIBS
+-	else
+-		AC_MSG_ERROR([libxml2 required, but not found.])
+-	fi
++    found=false
++    AC_ARG_WITH([libxml2],
++        [AS_HELP_STRING([--with-libxml2=DIR],
++            [root of the libxml directory])],
++        [
++            case "$withval" in
++            "" | y | ye | yes | n | no)
++            AC_MSG_ERROR([Invalid --with-libxml2 value])
++              ;;
++            *) xml2dirs="$withval"
++              ;;
++            esac
++        ], [
++            # if pkg-config is installed and openssl has installed a .pc file,
++            # then use that information and don't search ssldirs
++            AC_CHECK_TOOL([PKG_CONFIG], [pkg-config])
++            if test x"$PKG_CONFIG" != x""; then
++                XML2_LDFLAGS=`$PKG_CONFIG libxml-2.0 --libs-only-L 2>/dev/null`
++                if test $? = 0; then
++                    XML2_LIBS=`$PKG_CONFIG libxml-2.0 --libs-only-l 2>/dev/null`
++                    XML2_INCLUDES=`$PKG_CONFIG libxml-2.0 --cflags-only-I 2>/dev/null`
++                    found=true
++                fi
++            fi
+ 
+-	AC_SUBST(XML2_INCLUDES)
+-	AC_SUBST(XML2_LIBS)
++            # no such luck; use some default ssldirs
++            if ! $found; then
++                xml2dirs="/usr/local/libxml /usr/lib/libxml /usr/libxml /usr/pkg /usr/local /usr"
++            fi
++        ]
++        )
++
++
++    # note that we #include <libxml/tree.h>, so the libxml2 headers have to be in
++    # an 'libxml' subdirectory
++
++    if ! $found; then
++        XML2_INCLUDES=
++        for xml2dir in $xml2dirs; do
++            AC_MSG_CHECKING([for XML2 in $xml2dir])
++            if test -f "$xml2dir/include/libxml2/libxml/tree.h"; then
++                XML2_INCLUDES="-I$xml2dir/include/libxml2"
++                XML2_LDFLAGS="-L$xml2dir/lib"
++                XML2_LIBS="-lxml2"
++                found=true
++                AC_MSG_RESULT([yes])
++                break
++            else
++                AC_MSG_RESULT([no])
++            fi
++        done
++
++        # if the file wasn't found, well, go ahead and try the link anyway -- maybe
++        # it will just work!
++    fi
++
++    LDFLAGS="$LDFLAGS $XML2_LDFLAGS"
++    LIBS="$XML2_LIBS $LIBS"
++    CPPFLAGS="$XML2_INCLUDES $CPPFLAGS"
++
++    AC_SUBST(XML2_INCLUDES)
++    AC_SUBST(XML2_LIBS)
++    AC_SUBST(XML2_LDFLAGS)
+ ])

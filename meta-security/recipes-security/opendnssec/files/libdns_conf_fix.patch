@@ -1,0 +1,217 @@
+Configure does not work with OE pkg-config for the ldns option
+
+Upstream-Status: OE specific
+
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: opendnssec-2.1.6/m4/acx_ldns.m4
+===================================================================
+--- opendnssec-2.1.6.orig/m4/acx_ldns.m4
++++ opendnssec-2.1.6/m4/acx_ldns.m4
+@@ -1,128 +1,65 @@
+-AC_DEFUN([ACX_LDNS],[
+-	AC_ARG_WITH(ldns, 
+-		[AC_HELP_STRING([--with-ldns=PATH],[specify prefix of path of ldns library to use])],
+-        	[
+-			LDNS_PATH="$withval"
+-			AC_PATH_PROGS(LDNS_CONFIG, ldns-config, ldns-config, $LDNS_PATH/bin)
+-		],[
+-			LDNS_PATH="/usr/local"
+-			AC_PATH_PROGS(LDNS_CONFIG, ldns-config, ldns-config, $PATH)
+-		])
+-
+-	if test -x "$LDNS_CONFIG"
+-	then
+-		AC_MSG_CHECKING(what are the ldns includes)
+-		LDNS_INCLUDES="`$LDNS_CONFIG --cflags`"
+-		AC_MSG_RESULT($LDNS_INCLUDES)
+-
+-		AC_MSG_CHECKING(what are the ldns libs)
+-		LDNS_LIBS="`$LDNS_CONFIG --libs`"
+-		AC_MSG_RESULT($LDNS_LIBS)
+-	else
+-		AC_MSG_CHECKING(what are the ldns includes)
+-		LDNS_INCLUDES="-I$LDNS_PATH/include"
+-		AC_MSG_RESULT($LDNS_INCLUDES)
+-
+-		AC_MSG_CHECKING(what are the ldns libs)
+-		LDNS_LIBS="-L$LDNS_PATH/lib -lldns"
+-		AC_MSG_RESULT($LDNS_LIBS)
+-	fi
+-
+-	tmp_CPPFLAGS=$CPPFLAGS
+-	tmp_LIBS=$LIBS
+-
+-	CPPFLAGS="$CPPFLAGS $LDNS_INCLUDES"
+-	LIBS="$LIBS $LDNS_LIBS"
+-
+-	AC_CHECK_LIB(ldns, ldns_rr_new,,[AC_MSG_ERROR([Can't find ldns library])])
+-	LIBS=$tmp_LIBS
+-
+-	AC_MSG_CHECKING([for ldns version])
+-	CHECK_LDNS_VERSION=m4_format(0x%02x%02x%02x, $1, $2, $3)
+-	AC_LANG_PUSH([C])
+-	AC_RUN_IFELSE([
+-		AC_LANG_SOURCE([[
+-			#include <ldns/ldns.h>
+-			int main()
+-			{
+-			#ifdef LDNS_REVISION
+-				if (LDNS_REVISION >= $CHECK_LDNS_VERSION)
+-					return 0;
+-			#endif
+-				return 1;
+-			}
+-		]])
+-	],[
+-		AC_MSG_RESULT([>= $1.$2.$3])
+-	],[
+-		AC_MSG_RESULT([< $1.$2.$3])
+-		AC_MSG_ERROR([ldns library too old ($1.$2.$3 or later required)])
+-	],[])
+-	AC_LANG_POP([C])
++#serial 11
+ 
+-	CPPFLAGS=$tmp_CPPFLAGS
+-
+-	AC_SUBST(LDNS_INCLUDES)
+-	AC_SUBST(LDNS_LIBS)
+-])
+-
+-
+-AC_DEFUN([ACX_LDNS_NOT],[
+-	AC_ARG_WITH(ldns, 
+-		[AC_HELP_STRING([--with-ldns=PATH],[specify prefix of path of ldns library to use])],
+-        	[
+-			LDNS_PATH="$withval"
+-			AC_PATH_PROGS(LDNS_CONFIG, ldns-config, ldns-config, $LDNS_PATH/bin)
+-		],[
+-			LDNS_PATH="/usr/local"
+-			AC_PATH_PROGS(LDNS_CONFIG, ldns-config, ldns-config, $PATH)
+-		])
+-
+-	if test -x "$LDNS_CONFIG"
+-	then
+-		AC_MSG_CHECKING(what are the ldns includes)
+-		LDNS_INCLUDES="`$LDNS_CONFIG --cflags`"
+-		AC_MSG_RESULT($LDNS_INCLUDES)
+-
+-		AC_MSG_CHECKING(what are the ldns libs)
+-		LDNS_LIBS="`$LDNS_CONFIG --libs`"
+-		AC_MSG_RESULT($LDNS_LIBS)
+-	else
+-		AC_MSG_CHECKING(what are the ldns includes)
+-		LDNS_INCLUDES="-I$LDNS_PATH/include"
+-		AC_MSG_RESULT($LDNS_INCLUDES)
+-
+-		AC_MSG_CHECKING(what are the ldns libs)
+-		LDNS_LIBS="-L$LDNS_PATH/lib -lldns"
+-		AC_MSG_RESULT($LDNS_LIBS)
+-	fi
+-
+-	tmp_CPPFLAGS=$CPPFLAGS
+-
+-	CPPFLAGS="$CPPFLAGS $LDNS_INCLUDES"
+-
+-	AC_MSG_CHECKING([for ldns version not $1.$2.$3])
+-	CHECK_LDNS_VERSION=m4_format(0x%02x%02x%02x, $1, $2, $3)
+-	AC_LANG_PUSH([C])
+-	AC_RUN_IFELSE([
+-	AC_LANG_SOURCE([[
+-		#include <ldns/ldns.h>
+-		int main()
+-		{
+-		#ifdef LDNS_REVISION
+-			if (LDNS_REVISION != $CHECK_LDNS_VERSION)
+-				return 0;
+-		#endif
+-			return 1;
+-		}
+-		]])
+-	],[
+-		AC_MSG_RESULT([ok])
+-	],[
+-		AC_MSG_RESULT([no])
+-		AC_MSG_ERROR([ldns version $1.$2.$3 is not compatible due to $4])
+-	],[])
+-	AC_LANG_POP([C])
+-
+-	CPPFLAGS=$tmp_CPPFLAGS
++AU_ALIAS([CHECK_LDNS], [ACX_LDNS])
++AC_DEFUN([ACX_LDNS], [
++    found=false
++    AC_ARG_WITH([ldns],
++        [AS_HELP_STRING([--with-ldns=DIR],
++            [root of the lnds directory])],
++        [
++            case "$withval" in
++            "" | y | ye | yes | n | no)
++            AC_MSG_ERROR([Invalid --with-lnds value])
++              ;;
++            *) ldnsdirs="$withval"
++              ;;
++            esac
++        ], [
++            # if pkg-config is installed and lnds has installed a .pc file,
++            # then use that information and don't search ldnsdirs
++            AC_CHECK_TOOL([PKG_CONFIG], [pkg-config])
++            if test x"$PKG_CONFIG" != x""; then
++                OPENSSL_LDFLAGS=`$PKG_CONFIG ldns --libs-only-L 2>/dev/null`
++                if test $? = 0; then
++                    LDNS_LIBS=`$PKG_CONFIG ldns --libs-only-l 2>/dev/null`
++                    LDNS_INCLUDES=`$PKG_CONFIG ldns --cflags-only-I 2>/dev/null`
++                    found=true
++                fi
++            fi
++
++            # no such luck; use some default ldnsdirs
++            if ! $found; then
++                ldnsdirs="/usr/local/ldns /usr/lib/ldns /usr/ldns  /usr/local /usr"
++            fi
++        ]
++        )
++
++
++    if ! $found; then
++        LDNS_INCLUDES=
++        for ldnsdir in $ldnsdirs; do
++            AC_MSG_CHECKING([for LDNS in $ldnsdir])
++            if test -f "$ldnsdir/include/ldns/dnssec.h"; then
++                LDNS_INCLUDES="-I$ldnsdir/include"
++                LDNS_LDFLAGS="-L$ldnsdir/lib"
++                LDNS_LIBS="-lldns"
++                found=true
++                AC_MSG_RESULT([yes])
++                break
++            else
++                AC_MSG_RESULT([no])
++            fi
++        done
++
++        # if the file wasn't found, well, go ahead and try the link anyway -- maybe
++        # it will just work!
++    fi
++
++    LDFLAGS="$LDFLAGS $OPENSSL_LDFLAGS"
++    LIBS="$LDNS_LIBS $LIBS"
++    CPPFLAGS="$LDNS_INCLUDES $CPPFLAGS"
++
++    AC_SUBST([LDNS_INCLUDES])
++    AC_SUBST([LDNS_LIBS])
++    AC_SUBST([LDNS_LDFLAGS])
+ ])
+Index: opendnssec-2.1.6/configure.ac
+===================================================================
+--- opendnssec-2.1.6.orig/configure.ac
++++ opendnssec-2.1.6/configure.ac
+@@ -138,9 +138,7 @@ AC_CHECK_MEMBER([struct sockaddr_un.sun_
+ 
+ # common dependencies
+ ACX_LIBXML2
+-ACX_LDNS(1,6,17)
+-ACX_LDNS_NOT(1,6,14, [binary incompatibility, see http://open.nlnetlabs.nl/pipermail/ldns-users/2012-October/000564.html])
+-ACX_LDNS_NOT(1,6,15, [fail to create NSEC3 bitmap for empty non-terminals, see http://www.nlnetlabs.nl/pipermail/ldns-users/2012-November/000565.html])
++ACX_LDNS(1.6.17)
+ ACX_PKCS11_MODULES
+ ACX_RT
+ ACX_LIBC

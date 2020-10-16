@@ -16,6 +16,7 @@ SRC_URI = "\
     file://ecryptfs-utils-CVE-2016-6224.patch \
     file://0001-avoid-race-condition.patch \
     file://ecryptfs.service \
+    file://define_musl_sword_type.patch \
     "
 
 SRC_URI[md5sum] = "83513228984f671930752c3518cac6fd"

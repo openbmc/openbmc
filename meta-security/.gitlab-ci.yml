@@ -126,9 +126,19 @@ qemux86-64-multi:
   script:
   - kas build --target security-build-image kas/$CI_JOB_NAME.yml 
 
+qemux86-musl:
+  extends: .build
+  script:
+  - kas build --target security-build-image kas/$CI_JOB_NAME.yml 
+
+qemuarm64-musl:
+  extends: .build
+  script:
+  - kas build --target security-build-image kas/$CI_JOB_NAME.yml 
 
 qemux86-test:
   extends: .build
+  allow_failure: true
   script:
   - kas build --target security-test-image kas/$CI_JOB_NAME.yml 
   - kas build -c testimage --target security-test-image kas/$CI_JOB_NAME.yml 
