@@ -516,8 +516,8 @@ variable.
 -  *Selecting a Variable:* The ``OVERRIDES`` variable is a
    colon-character-separated list that contains items for which you want
    to satisfy conditions. Thus, if you have a variable that is
-   conditional on “arm”, and “arm” is in ``OVERRIDES``, then the
-   “arm”-specific version of the variable is used rather than the
+   conditional on "arm", and "arm" is in ``OVERRIDES``, then the
+   "arm"-specific version of the variable is used rather than the
    non-conditional version. Here is an example: ::
 
       OVERRIDES = "architecture:os:machine"
@@ -1917,8 +1917,8 @@ This command returns the signature data in a readable
 format that allows you to examine the inputs used when the OpenEmbedded
 build system generates signatures. For example, using
 ``bitbake-dumpsigs`` allows you to examine the ``do_compile`` task's
-“sigdata” for a C application (e.g. ``bash``). Running the command also
-reveals that the “CC” variable is part of the inputs that are hashed.
+"sigdata" for a C application (e.g. ``bash``). Running the command also
+reveals that the "CC" variable is part of the inputs that are hashed.
 Any changes to this variable would invalidate the stamp and cause the
 ``do_compile`` task to run.
 

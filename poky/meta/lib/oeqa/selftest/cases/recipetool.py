@@ -409,6 +409,10 @@ class RecipetoolTests(RecipetoolBase):
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
     def test_recipetool_create_npm(self):
+        collections = get_bb_var('BBFILE_COLLECTIONS').split()
+        if "openembedded-layer" not in collections:
+            self.skipTest("Test needs meta-oe for nodejs")
+
         temprecipe = os.path.join(self.tempdir, 'recipe')
         os.makedirs(temprecipe)
         recipefile = os.path.join(temprecipe, 'savoirfairelinux-node-server-example_1.0.0.bb')

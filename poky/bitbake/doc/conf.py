@@ -73,7 +73,13 @@ rst_prolog = """
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+try:
+    import sphinx_rtd_theme
+    html_theme = 'sphinx_rtd_theme'
+except ImportError:
+    sys.stderr.write("The Sphinx sphinx_rtd_theme HTML theme was not found.\
+    \nPlease make sure to install the sphinx_rtd_theme python package.\n")
+    sys.exit(1)
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

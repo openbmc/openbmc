@@ -1,6 +1,6 @@
 # Configuration file for the Sphinx documentation builder.
 #
-# SPDX-License-Identifier: CC-BY-2.0-UK
+# SPDX-License-Identifier: CC-BY-SA-2.0-UK
 #
 # This file only contains a selection of the most common options. For a full
 # list see the documentation:

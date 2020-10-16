@@ -301,7 +301,7 @@ DISTRO_FEATURES_remove = "x11"
 # will correct this condition.
 #
 # By default the system looks in the BBPATH for files/passwd and files/group
-# the default can be overriden by spefying USERADD_UID/GID_TABLES.
+# the default can be overridden by specifying USERADD_UID/GID_TABLES.
 #
 #USERADDEXTENSION = "useradd-staticids"
 #USERADD_UID_TABLES = "files/passwd"
