@@ -1,7 +1,10 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-raspberrypi:"
 
+KMETA = "kernel-meta"
+
 SRC_URI = " \
-    git://github.com/raspberrypi/linux.git;branch=${LINUX_RPI_BRANCH} \
+    git://github.com/raspberrypi/linux.git;name=machine;branch=${LINUX_RPI_BRANCH} \
+    git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=meta;branch=yocto-5.4;destsuffix=${KMETA} \
     "
 SRC_URI_remove = "file://rpi-kernel-misc.cfg"
 
