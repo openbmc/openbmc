@@ -2,7 +2,7 @@ SUMMARY = "Xilinx HDMI Linux Kernel module"
 DESCRIPTION = "Out-of-tree HDMI kernel modules provider for MPSoC EG/EV devices"
 SECTION = "kernel/modules"
 LICENSE = "GPLv2"
-LIC_FILES_CHKSUM = "file://LICENSE.md;md5=498a38cdcb922b9e987bbbb46e8a9ee5"
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=61ac10ffd8cd46f9637586205af76cea"
 
 XLNX_HDMI_VERSION = "5.4.0"
 PV = "${XLNX_HDMI_VERSION}"

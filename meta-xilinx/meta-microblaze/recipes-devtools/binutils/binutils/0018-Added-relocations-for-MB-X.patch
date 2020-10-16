@@ -1,0 +1,300 @@
+From 90d732c25cb6b55b33837e1d23d6850e4cbe10f7 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Tue, 11 Sep 2018 17:30:17 +0530
+Subject: [PATCH 18/40] Added relocations for MB-X
+
+---
+ bfd/bfd-in2.h              | 11 +++++---
+ bfd/libbfd.h               |  4 +--
+ bfd/reloc.c                | 26 +++++++++---------
+ gas/config/tc-microblaze.c | 54 +++++++++++++++++++++++++++-----------
+ 4 files changed, 63 insertions(+), 32 deletions(-)
+
+diff --git a/bfd/bfd-in2.h b/bfd/bfd-in2.h
+index c55092c9ec7..88f89bcdbcd 100644
+--- a/bfd/bfd-in2.h
++++ b/bfd/bfd-in2.h
+@@ -5434,15 +5434,20 @@ done here - only used for relaxing  */
+   BFD_RELOC_MICROBLAZE_32_NONE,
+ 
+ /* This is a 64 bit reloc that stores the 32 bit pc relative
+-value in two words (with an imm instruction).  No relocation is
++value in two words (with an imml instruction).  No relocation is
+ done here - only used for relaxing  */
+-  BFD_RELOC_MICROBLAZE_64_NONE,
++  BFD_RELOC_MICROBLAZE_64_PCREL,
+ 
+-/* This is a 64 bit reloc that stores the 32 bit pc relative
++/* This is a 64 bit reloc that stores the 32 bit relative
+ value in two words (with an imml instruction).  No relocation is
+ done here - only used for relaxing  */
+   BFD_RELOC_MICROBLAZE_64,
+ 
++/* This is a 64 bit reloc that stores the 32 bit pc relative
++value in two words (with an imm instruction).  No relocation is
++done here - only used for relaxing  */
++  BFD_RELOC_MICROBLAZE_64_NONE,
++
+ /* This is a 64 bit reloc that stores the 32 bit pc relative
+ value in two words (with an imm instruction).  The relocation is
+ PC-relative GOT offset  */
+diff --git a/bfd/libbfd.h b/bfd/libbfd.h
+index b4aace6a70d..b4b7ee29a30 100644
+--- a/bfd/libbfd.h
++++ b/bfd/libbfd.h
+@@ -2969,14 +2969,14 @@ static const char *const bfd_reloc_code_real_names[] = { "@@uninitialized@@",
+   "BFD_RELOC_MICROBLAZE_32_SYM_OP_SYM",
+   "BFD_RELOC_MICROBLAZE_32_NONE",
+   "BFD_RELOC_MICROBLAZE_64_NONE",
+-  "BFD_RELOC_MICROBLAZE_64",
+   "BFD_RELOC_MICROBLAZE_64_GOTPC",
+-  "BFD_RELOC_MICROBLAZE_64_GPC",
+   "BFD_RELOC_MICROBLAZE_64_GOT",
+   "BFD_RELOC_MICROBLAZE_64_PLT",
+   "BFD_RELOC_MICROBLAZE_64_GOTOFF",
+   "BFD_RELOC_MICROBLAZE_32_GOTOFF",
+   "BFD_RELOC_MICROBLAZE_COPY",
++  "BFD_RELOC_MICROBLAZE_64",
++  "BFD_RELOC_MICROBLAZE_64_PCREL",
+   "BFD_RELOC_MICROBLAZE_64_TLS",
+   "BFD_RELOC_MICROBLAZE_64_TLSGD",
+   "BFD_RELOC_MICROBLAZE_64_TLSLD",
+diff --git a/bfd/reloc.c b/bfd/reloc.c
+index 0e8a24e9cb0..b5c97da3ffd 100644
+--- a/bfd/reloc.c
++++ b/bfd/reloc.c
+@@ -6866,24 +6866,12 @@ ENUMDOC
+   done here - only used for relaxing
+ ENUM
+   BFD_RELOC_MICROBLAZE_64_NONE
+-ENUMDOC
+-  This is a 32 bit reloc that stores the 32 bit pc relative
+-  value in two words (with an imml instruction).  No relocation is
+-  done here - only used for relaxing
+-ENUM
+-  BFD_RELOC_MICROBLAZE_64
+ ENUMDOC
+   This is a 64 bit reloc that stores the 32 bit pc relative
+   value in two words (with an imm instruction).  No relocation is
+   done here - only used for relaxing
+ ENUM
+   BFD_RELOC_MICROBLAZE_64_GOTPC
+-ENUMDOC
+-  This is a 64 bit reloc that stores the 32 bit pc relative
+-  value in two words (with an imml instruction).  No relocation is
+-  done here - only used for relaxing
+-ENUM
+-  BFD_RELOC_MICROBLAZE_64_GPC
+ ENUMDOC
+   This is a 64 bit reloc that stores the 32 bit pc relative
+   value in two words (with an imm instruction).  The relocation is
+@@ -6969,6 +6957,20 @@ ENUMDOC
+   value in two words (with an imm instruction).  The relocation is
+   relative offset from start of TEXT.
+ 
++  This is a 64 bit reloc that stores 64-bit thread pointer relative offset
++  to two words (uses imml instruction).
++ENUM
++BFD_RELOC_MICROBLAZE_64,
++ENUMDOC
++ This is a 64 bit reloc that stores the 64 bit pc relative
++ value in two words (with an imml instruction).  No relocation is
++ done here - only used for relaxing
++ENUM
++BFD_RELOC_MICROBLAZE_64_PCREL,
++ENUMDOC
++ This is a 32 bit reloc that stores the 32 bit pc relative
++ value in two words (with an imml instruction).  No relocation is
++ done here - only used for relaxing
+ ENUM
+   BFD_RELOC_AARCH64_RELOC_START
+ ENUMDOC
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index b8250e4cded..9c8b6284fb1 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
+@@ -95,6 +95,7 @@ const char FLT_CHARS[] = "rRsSfFdDxXpP";
+ #define TEXT_OFFSET	     17
+ #define TEXT_PC_OFFSET       18
+ #define DEFINED_64_OFFSET   19
++#define DEFINED_64_PC_OFFSET 20 
+ 
+ /* Initialize the relax table.  */
+ const relax_typeS md_relax_table[] =
+@@ -118,7 +119,8 @@ const relax_typeS md_relax_table[] =
+   { 0x7fffffff, 0x80000000, INST_WORD_SIZE*2, 0 },  /* 16: TLSTPREL_OFFSET.  */
+   { 0x7fffffff, 0x80000000, INST_WORD_SIZE*2, 0 },  /* 17: TEXT_OFFSET.  */
+   { 0x7fffffff, 0x80000000, INST_WORD_SIZE*2, 0 },  /* 18: TEXT_PC_OFFSET.  */
+-  { 0x7fffffffffffffff, 0x8000000000000000, INST_WORD_SIZE, 0 }   /* 19: DEFINED_64_OFFSET.  */
++  { 0x7fffffffffffffff, 0x8000000000000000, INST_WORD_SIZE, 0 },   /* 19: DEFINED_64_OFFSET.  */
++  { 0x7fffffffffffffff, 0x8000000000000000, INST_WORD_SIZE*2, 0 }  /* 20: DEFINED_64_PC_OFFSET.  */
+ };
+ 
+ static struct hash_control * opcode_hash_control;	/* Opcode mnemonics.  */
+@@ -1930,8 +1932,8 @@ md_assemble (char * str)
+ 
+       if (exp.X_op != O_constant)
+ 	{
+-	  char *opc = NULL;
+-	  //char *opc = str_microblaze_64;
++	  //char *opc = NULL;
++	  char *opc = strdup(str_microblaze_64);
+ 	  relax_substateT subtype;
+ 
+ 	  if (exp.X_md != 0)
+@@ -2190,13 +2192,19 @@ md_convert_frag (bfd * abfd ATTRIBUTE_UNUSED,
+       fragP->fr_fix += INST_WORD_SIZE * 2;
+       fragP->fr_var = 0;
+       break;
++    case DEFINED_64_PC_OFFSET:
++      fix_new (fragP, fragP->fr_fix, INST_WORD_SIZE, fragP->fr_symbol,
++	         fragP->fr_offset, TRUE, BFD_RELOC_MICROBLAZE_64_PCREL);
++      fragP->fr_fix += INST_WORD_SIZE * 2;
++      fragP->fr_var = 0;
++      break;
+     case DEFINED_64_OFFSET:
+       if (fragP->fr_symbol == GOT_symbol)
+         fix_new (fragP, fragP->fr_fix, INST_WORD_SIZE, fragP->fr_symbol,
+-	         fragP->fr_offset, TRUE, BFD_RELOC_MICROBLAZE_64_GPC);
++	         fragP->fr_offset, FALSE, BFD_RELOC_MICROBLAZE_64_GPC);
+       else
+         fix_new (fragP, fragP->fr_fix, INST_WORD_SIZE, fragP->fr_symbol,
+-	         fragP->fr_offset, TRUE, BFD_RELOC_MICROBLAZE_64);
++	         fragP->fr_offset, FALSE, BFD_RELOC_MICROBLAZE_64);
+       fragP->fr_fix += INST_WORD_SIZE * 2;
+       fragP->fr_var = 0;
+       break;
+@@ -2206,7 +2214,7 @@ md_convert_frag (bfd * abfd ATTRIBUTE_UNUSED,
+ 	         fragP->fr_offset, TRUE, BFD_RELOC_MICROBLAZE_64_GOTPC);
+       else
+         fix_new (fragP, fragP->fr_fix, INST_WORD_SIZE * 2, fragP->fr_symbol,
+-	         fragP->fr_offset, TRUE, BFD_RELOC_64);
++	         fragP->fr_offset, FALSE, BFD_RELOC_64);
+       fragP->fr_fix += INST_WORD_SIZE * 2;
+       fragP->fr_var = 0;
+       break;
+@@ -2425,14 +2433,17 @@ md_apply_fix (fixS *   fixP,
+ 	    }
+ 	}
+       break;
++
+     case BFD_RELOC_64_PCREL:
+     case BFD_RELOC_64:
+     case BFD_RELOC_MICROBLAZE_64_TEXTREL:
+     case BFD_RELOC_MICROBLAZE_64:
++    case BFD_RELOC_MICROBLAZE_64_PCREL:
+       /* Add an imm instruction.  First save the current instruction.  */
+       for (i = 0; i < INST_WORD_SIZE; i++)
+ 	buf[i + INST_WORD_SIZE] = buf[i];
+-      if (fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64)
++      if (fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64
++            || fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64_PCREL)
+         {
+           /* Generate the imm instruction.  */
+           opcode1 = (struct op_code_struct *) hash_find (opcode_hash_control, "imml");
+@@ -2445,6 +2456,10 @@ md_apply_fix (fixS *   fixP,
+            inst1 = opcode1->bit_sequence;
+            if (fixP->fx_addsy == NULL || S_IS_DEFINED (fixP->fx_addsy))
+ 	     inst1 |= ((val & 0xFFFFFFFFFFFF0000L) >> 16) & IMML_MASK;
++           if (fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64)
++             fixP->fx_r_type = BFD_RELOC_64; 
++           if (fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64_PCREL)
++             fixP->fx_r_type = BFD_RELOC_64_PCREL; 
+          }
+       else
+         {
+@@ -2455,7 +2470,7 @@ md_apply_fix (fixS *   fixP,
+ 	      as_bad (_("unknown opcode \"%s\""), "imm");
+ 	      return;
+ 	    }
+-     
++
+           inst1 = opcode1->bit_sequence;
+           if (fixP->fx_addsy == NULL || S_IS_DEFINED (fixP->fx_addsy))
+ 	    inst1 |= ((val & 0xFFFF0000) >> 16) & IMM_MASK;
+@@ -2502,7 +2517,7 @@ md_apply_fix (fixS *   fixP,
+         opcode1 = (struct op_code_struct *) hash_find (opcode_hash_control, "imm");
+       if (opcode1 == NULL)
+ 	{
+-      	  if (fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64_GPC)
++          if (fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64_GPC)
+ 	    as_bad (_("unknown opcode \"%s\""), "imml");
+           else
+ 	    as_bad (_("unknown opcode \"%s\""), "imm");
+@@ -2527,7 +2542,7 @@ md_apply_fix (fixS *   fixP,
+     {
+       /* This fixup has been resolved.  Create a reloc in case the linker
+ 	 moves code around due to relaxing.  */
+-      if (fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64)
++      if (fixP->fx_r_type == BFD_RELOC_64_PCREL)
+ 	fixP->fx_r_type = BFD_RELOC_MICROBLAZE_64_NONE;
+       else if (fixP->fx_r_type == BFD_RELOC_32)
+ 	fixP->fx_r_type = BFD_RELOC_MICROBLAZE_32_NONE;
+@@ -2579,21 +2594,21 @@ md_estimate_size_before_relax (fragS * fragP,
+ 	     if(streq (fragP->fr_opcode, str_microblaze_64)) 
+              {
+                /* Used as an absolute value.  */
+-              fragP->fr_subtype = DEFINED_64_OFFSET;
++              fragP->fr_subtype = DEFINED_64_PC_OFFSET;
+                /* Variable part does not change.  */
+-              fragP->fr_var = INST_WORD_SIZE;
++              fragP->fr_var = INST_WORD_SIZE*2;
+ 	     }
+ 	   else
+ 	     {
+                fragP->fr_subtype = DEFINED_PC_OFFSET;
+-      	       /* Don't know now whether we need an imm instruction.  */
++               /* Don't know now whether we need an imm instruction.  */
+                fragP->fr_var = INST_WORD_SIZE;
+ 	     }
+ 	   }  
+ 	   else
+ 	     {
+                fragP->fr_subtype = DEFINED_PC_OFFSET;
+-      	       /* Don't know now whether we need an imm instruction.  */
++               /* Don't know now whether we need an imm instruction.  */
+                fragP->fr_var = INST_WORD_SIZE;
+ 	     }
+         }
+@@ -2626,6 +2641,13 @@ md_estimate_size_before_relax (fragS * fragP,
+ 	      /* Variable part does not change.  */
+ 	      fragP->fr_var = INST_WORD_SIZE*2;
+ 	    }
++	  else if (streq (fragP->fr_opcode, str_microblaze_64))
++	    {
++              /* Used as an absolute value.  */
++              fragP->fr_subtype = DEFINED_64_OFFSET;
++              /* Variable part does not change.  */
++              fragP->fr_var = INST_WORD_SIZE;
++            }
+ 	  else if (streq (fragP->fr_opcode, str_microblaze_ro_anchor))
+ 	    {
+               /* It is accessed using the small data read only anchor.  */
+@@ -2700,6 +2722,7 @@ md_estimate_size_before_relax (fragS * fragP,
+     case TLSTPREL_OFFSET:
+     case TLSDTPREL_OFFSET:
+     case DEFINED_64_OFFSET:
++    case DEFINED_64_PC_OFFSET:
+       fragP->fr_var = INST_WORD_SIZE*2;
+       break;
+     case DEFINED_RO_SEGMENT:
+@@ -2753,7 +2776,7 @@ md_pcrel_from_section (fixS * fixp, segT sec ATTRIBUTE_UNUSED)
+   else
+     {
+       /* The case where we are going to resolve things... */
+-      if (fixp->fx_r_type == BFD_RELOC_64_PCREL || fixp->fx_r_type == BFD_RELOC_MICROBLAZE_64)
++      if (fixp->fx_r_type == BFD_RELOC_64_PCREL || fixp->fx_r_type == BFD_RELOC_MICROBLAZE_64_PCREL)
+         return  fixp->fx_where + fixp->fx_frag->fr_address + INST_WORD_SIZE;
+       else
+         return  fixp->fx_where + fixp->fx_frag->fr_address;
+@@ -2788,6 +2811,7 @@ tc_gen_reloc (asection * section ATTRIBUTE_UNUSED, fixS * fixp)
+     case BFD_RELOC_MICROBLAZE_64_GOTPC:
+     case BFD_RELOC_MICROBLAZE_64_GPC:
+     case BFD_RELOC_MICROBLAZE_64:
++    case BFD_RELOC_MICROBLAZE_64_PCREL:
+     case BFD_RELOC_MICROBLAZE_64_GOT:
+     case BFD_RELOC_MICROBLAZE_64_PLT:
+     case BFD_RELOC_MICROBLAZE_64_GOTOFF:
+-- 
+2.17.1
+

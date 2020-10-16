@@ -56,12 +56,14 @@ it easier to avoid big-endian m64, which is not supported by the toolchain.
 
 Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
 
-diff -ur gcc-9.2.0.orig/gcc/config/microblaze/t-microblaze gcc-9.2.0/gcc/config/microblaze/t-microblaze
---- gcc-9.2.0.orig/gcc/config/microblaze/t-microblaze	2020-02-07 09:46:48.286261214 -0800
-+++ gcc-9.2.0/gcc/config/microblaze/t-microblaze	2020-02-10 17:07:52.440598949 -0800
-@@ -1,16 +1,11 @@
+Index: gcc-9.2.0/gcc/config/microblaze/t-microblaze
+===================================================================
+--- gcc-9.2.0.orig/gcc/config/microblaze/t-microblaze
++++ gcc-9.2.0/gcc/config/microblaze/t-microblaze
+@@ -1,17 +1,11 @@
 -MULTILIB_OPTIONS = m64 mxl-barrel-shift mlittle-endian mno-xl-soft-mul mxl-multiply-high
--MULTILIB_DIRNAMES = m64 bs le m mh
+-#MULTILIB_DIRNAMES = m64 bs le m mh
+-MULTILIB_DIRNAMES = . . . . .
 -MULTILIB_EXCEPTIONS = *m64/mxl-multiply-high mxl-multiply-high
 -MULTILIB_EXCEPTIONS += *m64
 -MULTILIB_EXCEPTIONS += *m64/mxl-barrel-shift

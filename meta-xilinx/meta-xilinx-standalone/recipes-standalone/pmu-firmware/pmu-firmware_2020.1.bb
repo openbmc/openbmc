@@ -53,8 +53,7 @@ do_install() {
     :
 }
 
-PMU_FIRMWARE_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
-PMU_FIRMWARE_BASE_NAME[vardepsexclude] = "DATETIME"
+PMU_FIRMWARE_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
 do_deploy() {
     install -Dm 0644 ${B}/executable.elf ${DEPLOYDIR}/${PMU_FIRMWARE_BASE_NAME}.elf
@@ -65,4 +64,3 @@ do_deploy() {
 }
 
 addtask deploy before do_build after do_install
-

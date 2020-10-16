@@ -1,0 +1,44 @@
+From 04d4e164cec91078b1b1155bae6ae4b508758969 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Wed, 28 Nov 2018 14:00:29 +0530
+Subject: [PATCH 23/40] Fixed the bug in the R_MICROBLAZE_64_NONE relocation.
+ It was adjusting only lower 16bits.
+
+---
+ bfd/elf32-microblaze.c | 4 ++--
+ bfd/elf64-microblaze.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
+index e1a66f57e79..bf09c68afd9 100644
+--- a/bfd/elf32-microblaze.c
++++ b/bfd/elf32-microblaze.c
+@@ -2019,8 +2019,8 @@ microblaze_elf_relax_section (bfd *abfd,
+ 		sfix = calc_fixup (irel->r_offset + INST_WORD_SIZE, 0, sec);
+ 		efix = calc_fixup (target_address, 0, sec);
+ 		irel->r_addend -= (efix - sfix);
+-    microblaze_bfd_write_imm_value_32 (abfd, contents + irel->r_offset
+-				       + INST_WORD_SIZE, irel->r_addend);
++    microblaze_bfd_write_imm_value_64 (abfd, contents + irel->r_offset,
++                                       irel->r_addend);
+ 	      }
+ 	      break;
+ 	    }
+diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
+index cb3b40b574c..b002b414d64 100644
+--- a/bfd/elf64-microblaze.c
++++ b/bfd/elf64-microblaze.c
+@@ -2004,8 +2004,8 @@ microblaze_elf_relax_section (bfd *abfd,
+ 		sfix = calc_fixup (irel->r_offset + INST_WORD_SIZE, 0, sec);
+ 		efix = calc_fixup (target_address, 0, sec);
+ 		irel->r_addend -= (efix - sfix);
+-    microblaze_bfd_write_imm_value_32 (abfd, contents + irel->r_offset
+-                                       + INST_WORD_SIZE, irel->r_addend);
++    microblaze_bfd_write_imm_value_64 (abfd, contents + irel->r_offset,
++                                       irel->r_addend);
+ 	      }
+ 	      break;
+ 	    }
+-- 
+2.17.1
+

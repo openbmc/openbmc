@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 DEPENDS = "u-boot-mkimage-native"
 
-inherit deploy nopackages
+inherit deploy nopackages image-wic-utils
 
 INHIBIT_DEFAULT_DEPS = "1"
 
@@ -34,11 +34,9 @@ SRC_URI = " \
             "
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-UBOOTSCR_BASE_NAME ?= "${PN}-${PKGE}-${PKGV}-${PKGR}-${DATETIME}"
-UBOOTSCR_BASE_NAME[vardepsexclude] = "DATETIME"
+UBOOTSCR_BASE_NAME ?= "${PN}-${PKGE}-${PKGV}-${PKGR}${IMAGE_VERSION_SUFFIX}"
 UBOOTPXE_CONFIG ?= "pxelinux.cfg"
-UBOOTPXE_CONFIG_NAME = "${UBOOTPXE_CONFIG}-${DATETIME}"
-UBOOTPXE_CONFIG_NAME[vardepsexclude] = "DATETIME"
+UBOOTPXE_CONFIG_NAME = "${UBOOTPXE_CONFIG}${IMAGE_VERSION_SUFFIX}"
 
 DEVICETREE_ADDRESS_zynqmp ?= "0x100000"
 DEVICETREE_ADDRESS_zynq ?= "0x2000000"
@@ -50,8 +48,19 @@ KERNEL_LOAD_ADDRESS_versal ?= "0x80000"
 RAMDISK_IMAGE_ADDRESS_zynq ?= "0x4000000"
 RAMDISK_IMAGE_ADDRESS_versal ?= "0x6000000"
 
+
+SDBOOTDEV ?= "0"
+
+BITSTREAM_LOAD_ADDRESS ?= "0x100000"
+
 do_configure[noexec] = "1"
 do_install[noexec] = "1"
+
+def get_bitstream_load_type(d):
+    if boot_files_bitstream(d)[1] :
+        return "loadb"
+    else:
+        return "load"
 
 do_compile() {
     sed -e 's/@@KERNEL_IMAGETYPE@@/${KERNEL_IMAGETYPE}/' \
@@ -61,6 +70,11 @@ do_compile() {
         -e 's/@@RAMDISK_IMAGE@@/${RAMDISK_IMAGE}/' \
         -e 's/@@RAMDISK_IMAGE_ADDRESS@@/${RAMDISK_IMAGE_ADDRESS}/' \
         -e 's/@@KERNEL_BOOTCMD@@/${KERNEL_BOOTCMD}/' \
+        -e 's/@@SDBOOTDEV@@/${SDBOOTDEV}/' \	
+        -e 's/@@BITSTREAM@@/${@boot_files_bitstream(d)[0]}/g' \	
+        -e 's/@@BITSTREAM_LOAD_ADDRESS@@/${BITSTREAM_LOAD_ADDRESS}/g' \	
+        -e 's/@@BITSTREAM_IMAGE@@/${@boot_files_bitstream(d)[0]}/g' \	
+        -e 's/@@BITSTREAM_LOAD_TYPE@@/${@get_bitstream_load_type(d)}/g' \	
         "${WORKDIR}/boot.cmd.${BOOTMODE}.${SOC_FAMILY}" > "${WORKDIR}/boot.cmd"
     mkimage -A arm -T script -C none -n "Boot script" -d "${WORKDIR}/boot.cmd" boot.scr
     sed -e 's/@@KERNEL_IMAGETYPE@@/${KERNEL_IMAGETYPE}/' \

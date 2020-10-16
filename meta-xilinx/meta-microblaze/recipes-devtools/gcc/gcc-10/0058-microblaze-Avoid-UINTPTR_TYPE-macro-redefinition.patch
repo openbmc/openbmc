@@ -1,0 +1,29 @@
+From dd73d8ba32c0c24f17a54538b9bb54beb5d8d4e0 Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@kernel.crashing.org>
+Date: Thu, 13 Aug 2020 16:28:57 -0500
+Subject: [PATCH 58/58] microblaze: Avoid UINTPTR_TYPE macro redefinition
+
+Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
+---
+ gcc/config/microblaze/microblaze.h | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
+index 5eb95c2600a..4cb98bac849 100644
+--- a/gcc/config/microblaze/microblaze.h
++++ b/gcc/config/microblaze/microblaze.h
+@@ -246,11 +246,6 @@ extern enum pipeline_type microblaze_pipe;
+ #undef PTRDIFF_TYPE
+ #define PTRDIFF_TYPE (TARGET_MB_64 ? "long int" : "int")
+ 
+-/*#undef INTPTR_TYPE
+-#define INTPTR_TYPE (TARGET_MB_64 ? "long int" : "int")*/
+-#undef UINTPTR_TYPE
+-#define UINTPTR_TYPE (TARGET_MB_64 ? "long unsigned int" : "unsigned int")
+-
+ #define DATA_ALIGNMENT(TYPE, ALIGN)					\
+   ((((ALIGN) < BITS_PER_WORD)						\
+     && (TREE_CODE (TYPE) == ARRAY_TYPE					\
+-- 
+2.17.1
+

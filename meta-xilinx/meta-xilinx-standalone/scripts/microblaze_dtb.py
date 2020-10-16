@@ -12,18 +12,21 @@ import sys
 #    if is not defined
 #
 # Otherwise 'condition' and value are evaluated by type.
+#
+# If the condition is = then any value of condition_values will set it
+# If the condition is ! then no value of condition_values will set it
 
 microblaze_tune_features = {
   'microblaze' :      (None,                     None, None),
   'bigendian':        ('xlnx,endianness',        '!', 1),
   '64-bit' :          ('xlnx,data-size',         '=', 64),
   'barrel-shift':     ('xlnx,use-barrel',        '=', 1),
-  'pattern-compare':    ('xlnx,use-pcmp-instr',    '=', 1),
+  'pattern-compare':  ('xlnx,use-pcmp-instr',    '=', 1),
   'reorder'   :       ('xlnx,use-reorder-instr', '!', 0),
   'frequency-optimized': ('xlnx,area-optimized', '=', 2),
   'multiply-low':     ('xlnx,use-hw-mul',        '=', 1),
   'multiply-high':    ('xlnx,use-hw-mul',        '=', 2),
-  'divide-high':      ('xlnx,use-div',           '=', 1),
+  'divide-hard':      ('xlnx,use-div',           '=', 1),
   'fpu-soft':         ('xlnx,use-fpu',           '!', [1,2]),
   'fpu-hard':         ('xlnx,use-fpu',           '=', 1),
   'fpu-hard-extended':('xlnx,use-fpu',           '=', 2),
@@ -73,21 +76,14 @@ def processProperties(fdt, node):
             else:
                 raise TypeError('Unknown type %s' % ctype)
 
-            if cop == '!':
-                if value != val:
-                    result = True
-                else:
-                    result = False
-                continue
+            if value == val:
+                result = True
+                break
+            else:
+                result = False
 
-            if cop == '=':
-                if value == val:
-                    result = True
-                else:
-                    result = False
-                continue
-
-        if result == True:
+        if (cop == '!' and result == False) or \
+           (cop == '=' and result == True):
             TUNE_FEATURES.append(feature)
 
     return TUNE_FEATURES

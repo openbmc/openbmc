@@ -1,0 +1,40 @@
+From 501b60af6b36fc69987e1610645742f5593a6da2 Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@kernel.crashing.org>
+Date: Thu, 6 Aug 2020 15:37:52 -0500
+Subject: [PATCH 01/40] sim: Allow microblaze* architecture
+
+Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
+---
+ sim/configure     | 2 +-
+ sim/configure.tgt | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/sim/configure b/sim/configure
+index 72f95cd5c7a..9e28cc78687 100755
+--- a/sim/configure
++++ b/sim/configure
+@@ -3795,7 +3795,7 @@ subdirs="$subdirs aarch64"
+ 
+ 
+        ;;
+-   microblaze-*-*)
++   microblaze*-*-*)
+ 
+   sim_arch=microblaze
+   subdirs="$subdirs microblaze"
+diff --git a/sim/configure.tgt b/sim/configure.tgt
+index 8a8e03d96f4..f6743fe8d41 100644
+--- a/sim/configure.tgt
++++ b/sim/configure.tgt
+@@ -59,7 +59,7 @@ case "${target}" in
+    mcore-*-*)
+        SIM_ARCH(mcore)
+        ;;
+-   microblaze-*-*)
++   microblaze*-*-*)
+        SIM_ARCH(microblaze)
+        ;;
+    mips*-*-*)
+-- 
+2.17.1
+

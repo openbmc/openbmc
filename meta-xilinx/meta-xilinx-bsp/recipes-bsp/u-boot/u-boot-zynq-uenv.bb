@@ -37,6 +37,12 @@ def uboot_boot_cmd(d):
         return "booti"
     raise bb.parse.SkipRecipe("Unsupport kernel image type")
 
+def get_sdbootdev(d):
+    if d.getVar("SOC_FAMILY") in ["zynqmp"]:
+        return "${sdbootdev}"
+    else:
+        return "0"
+
 def uenv_populate(d):
     # populate the environment values
     env = {}
@@ -51,9 +57,12 @@ def uenv_populate(d):
 
     env["bootargs"] = d.getVar("KERNEL_BOOTARGS")
 
-    env["loadkernel"] = "fatload mmc 0 ${kernel_load_address} ${kernel_image}"
-    env["loaddtb"] = "fatload mmc 0 ${devicetree_load_address} ${devicetree_image}"
+    env["loadkernel"] = "fatload mmc " + get_sdbootdev(d) + " ${kernel_load_address} ${kernel_image}"
+    env["loaddtb"] = "fatload mmc  " + get_sdbootdev(d) + " ${devicetree_load_address} ${devicetree_image}"
     env["bootkernel"] = "run loadkernel && run loaddtb && " + uboot_boot_cmd(d) + " ${kernel_load_address} - ${devicetree_load_address}"
+
+    if d.getVar("SOC_FAMILY") in ["zynqmp"]:
+        env["bootkernel"] = "setenv bootargs " +  d.getVar("KERNEL_BOOTARGS") + " ; " + env["bootkernel"]
 
     # default uenvcmd does not load bitstream
     env["uenvcmd"] = "run bootkernel"
@@ -67,14 +76,14 @@ def uenv_populate(d):
         env["bitstream_type"] = "loadb" if bitstreamtype else "load"
 
         # load bitstream first with loadfpa
-        env["loadfpga"] = "fatload mmc 0 ${bitstream_load_address} ${bitstream_image} && fpga ${bitstream_type} 0 ${bitstream_load_address} ${filesize}"
+        env["loadfpga"] = "fatload mmc " + get_sdbootdev(d) + " ${bitstream_load_address} ${bitstream_image} && fpga ${bitstream_type} 0 ${bitstream_load_address} ${filesize}"
         env["uenvcmd"] = "run loadfpga && run bootkernel"
 
     return env
 
-# bootargs, default to booting with the rootfs device being partition 2 of the first mmc device
+# bootargs, default to booting with the rootfs device being partition 2
 KERNEL_BOOTARGS_zynq = "earlyprintk console=ttyPS0,115200 root=/dev/mmcblk0p2 rw rootwait"
-KERNEL_BOOTARGS_zynqmp = "earlycon clk_ignore_unused root=/dev/mmcblk0p2 rw rootwait"
+KERNEL_BOOTARGS_zynqmp = "earlycon clk_ignore_unused root=/dev/mmcblk${sdbootdev}p2 rw rootwait"
 
 KERNEL_LOAD_ADDRESS_zynq = "0x2080000"
 KERNEL_LOAD_ADDRESS_zynqmp = "0x80000"

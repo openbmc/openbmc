@@ -9,13 +9,13 @@ LIC_FILES_CHKSUM = "file://../LICENSE;md5=da5408f748bce8a9851dac18e66f4bcf \
                     file://runtime_src/core/pcie/tools/xbutil/LICENSE;md5=d273d63619c9aeaf15cdaf76422c4f87 \
                     file://runtime_src/core/edge/tools/xbutil/LICENSE;md5=d273d63619c9aeaf15cdaf76422c4f87 "
 
-BRANCH ?= "2020.1"
+BRANCH ?= "2020.1_PU1"
 REPO ?= "git://github.com/Xilinx/XRT.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
-PV = "202010.2.6.0"
-SRCREV ?= "2d6bfe4ce91051d4e5b499d38fc493586dd4859a" 
+PV = "202010.2.7.0"
+SRCREV ?= "8a4c6eb5012c57423fba468e1af8df53a293dcd5"
 
 S = "${WORKDIR}/git/src"
 
@@ -32,10 +32,11 @@ EXTRA_OECMAKE += " \
 		-DCMAKE_EXPORT_COMPILE_COMANDS=ON \
 		"
 
-EXTRA_OECMAKE_append_versal += "-DXRT_AIE_BUILD=true"
-TARGET_CXXFLAGS_append_versal += "-DXRT_ENABLE_AIE"
-DEPENDS_append_versal += " libmetal libxaiengine"
-RDEPENDS_${PN}_append_versal += " libxaiengine"
+PACKAGE_ARCH_versal-ai-core = "${SOC_VARIANT_ARCH}"
+EXTRA_OECMAKE_append_versal-ai-core += "-DXRT_AIE_BUILD=true"
+TARGET_CXXFLAGS_append_versal-ai-core += "-DXRT_ENABLE_AIE"
+DEPENDS_append_versal-ai-core += " libmetal libxaiengine"
+RDEPENDS_${PN}_append_versal-ai-core += " libxaiengine"
 
 pkg_postinst_ontarget_${PN}() {
   #!/bin/sh
