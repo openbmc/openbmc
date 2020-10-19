@@ -1,0 +1,10 @@
+[Unit]
+Description=Ampere Power Capping
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/ampere-power-cap
+Type=simple
+
+[Install]
+WantedBy=multi-user.target
