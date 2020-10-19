@@ -8,5 +8,5 @@
 #
 #https://github.com/openbmc/docs/blob/master/cpp-style-and-conventions.md#boost
 #
-BOOST_LIBS_openbmc-phosphor = "chrono thread"
+#BOOST_LIBS_openbmc-phosphor = "chrono  thread"
 
