@@ -1,5 +1,6 @@
 EXTRA_OEMESON_append = " \
     -Dinsecure-tftp-update=enabled \
+    -Dibm-management-console=enabled \
 "
 
 inherit obmc-phosphor-discovery-service
