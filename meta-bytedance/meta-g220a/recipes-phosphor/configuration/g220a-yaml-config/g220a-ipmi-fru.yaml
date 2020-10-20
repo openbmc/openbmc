@@ -1,0 +1,12 @@
+0:
+    /xyz/openbmc_project/FruDevice/G220A:
+        entityID: 7
+        entityInstance: 1
+        interfaces:
+            xyz.openbmc_project.FruDevice:
+                PRODUCT_MANUFACTURER:
+                    IPMIFruProperty: Manufacturer
+                    IPMIFruSection: Product
+                PRODUCT_PRODUCT_NAME:
+                    IPMIFruProperty: Name
+                    IPMIFruSection: Product
