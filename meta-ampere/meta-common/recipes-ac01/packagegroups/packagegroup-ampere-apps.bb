@@ -22,4 +22,7 @@ RDEPENDS_${PN}-chassis = " \
 	obmc-phosphor-buttons-handler \
 	obmc-op-control-power \
         ampere-hostctrl \
+        phosphor-hostlogger \
+        phosphor-sel-logger \
+        phosphor-logging \
         "
