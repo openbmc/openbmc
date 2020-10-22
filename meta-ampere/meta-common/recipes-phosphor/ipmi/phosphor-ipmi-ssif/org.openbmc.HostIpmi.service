@@ -1,0 +1,17 @@
+[Unit]
+Description=Phosphor IPMI SSIF DBus Bridge
+StartLimitBurst=3
+StartLimitIntervalSec=300
+
+[Service]
+Restart=always
+RestartSec=10
+TimeoutStartSec=60
+TimeoutStopSec=60
+ExecStart=/usr/bin/env ssifbridged
+SyslogIdentifier=ssifbridged
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
