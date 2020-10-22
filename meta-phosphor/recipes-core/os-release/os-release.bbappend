@@ -13,7 +13,7 @@ def run_git(d, cmd):
     except:
         pass
 
-python() {
+python do_compile_prepend() {
     version_id = run_git(d, 'describe --dirty --long')
     if version_id:
         d.setVar('VERSION_ID', version_id)
