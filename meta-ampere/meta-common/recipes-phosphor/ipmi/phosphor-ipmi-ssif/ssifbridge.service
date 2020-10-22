@@ -1,0 +1,11 @@
+[Unit]
+Description=SSIF Bridge Daemon
+
+[Service]
+Type=dbus
+BusName=org.openbmc.HostIpmi
+ExecStart=/usr/sbin/ssifbridged
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
