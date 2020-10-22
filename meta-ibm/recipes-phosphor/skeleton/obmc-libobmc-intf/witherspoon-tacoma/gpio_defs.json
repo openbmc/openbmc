@@ -6,6 +6,9 @@
             "power_up_outs": [
                 {"name": "SOFTWARE_PGOOD", "polarity": true},
                 {"name": "BMC_POWER_UP", "polarity": true}
+            ],
+            "reset_outs": [
+                {"name": "BMC_CP0_RESET_N", "polarity": false}
             ]
         }
     },
