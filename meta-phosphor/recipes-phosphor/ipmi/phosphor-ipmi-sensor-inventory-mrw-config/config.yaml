@@ -271,7 +271,7 @@ cpucore_temp_sensor:
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 dimm_temp_sensor:
   serviceInterface: org.freedesktop.DBus.Properties
@@ -289,7 +289,7 @@ dimm_temp_sensor:
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 vrm_vdd_temp_sensor:
   serviceInterface: org.freedesktop.DBus.Properties
@@ -307,7 +307,7 @@ vrm_vdd_temp_sensor:
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 gpu_temp_sensor:
   serviceInterface: org.freedesktop.DBus.Properties
@@ -325,7 +325,7 @@ gpu_temp_sensor:
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 memory_temp_sensor:
   serviceInterface: org.freedesktop.DBus.Properties
@@ -343,7 +343,7 @@ memory_temp_sensor:
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 ps_derating_sensor:
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: assertion
