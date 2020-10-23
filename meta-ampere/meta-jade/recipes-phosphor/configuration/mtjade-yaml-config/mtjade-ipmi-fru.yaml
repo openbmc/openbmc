@@ -25,7 +25,7 @@
           IPMIFruProperty: Custom Field 1
           IPMIFruSection: Board
       xyz.openbmc_project.Inventory.Decorator.VendorInformation:
-        FRUFileID:
+        CustomField1:
           IPMIFruProperty: FRU File ID
           IPMIFruSection: Board
   /system/chassis:
@@ -37,10 +37,14 @@
           IPMIFruProperty: Serial Number
           IPMIFruSection: Chassis
         PartNumber:
-          IPMIFruProperty: Custom Field 1
+          IPMIFruProperty: Part Number
           IPMIFruSection: Chassis
         Model:
           IPMIFruProperty: Type
+          IPMIFruSection: Chassis
+      xyz.openbmc_project.Inventory.Decorator.VendorInformation:
+        CustomField2:
+          IPMIFruProperty: Custom Field 1
           IPMIFruSection: Chassis
   /system:
     entityID: 7
@@ -66,9 +70,12 @@
           IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Decorator.AssetTag:
         AssetTag:
-          IPMIFruProperty: Custom Field 1
+          IPMIFruProperty: Asset Tag
           IPMIFruSection: Product
       xyz.openbmc_project.Inventory.Decorator.VendorInformation:
-        FRUFileID:
+        CustomField1:
           IPMIFruProperty: FRU File ID
+          IPMIFruSection: Product
+        CustomField2:
+          IPMIFruProperty: Custom Field 1
           IPMIFruSection: Product
