@@ -8,6 +8,7 @@ EXTRA_OECONF_mtjade = " \
     "
 FILESEXTRAPATHS_prepend_mtjade := "${THISDIR}/${PN}:"
 
+SRC_URI +="file://0001-mtjade-FRU-Implement-support-to-parse-and-populate-F.patch"
 
 EEPROM_NAMES = "motherboard"
 

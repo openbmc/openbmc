@@ -1,0 +1,170 @@
+From f2686cd4ebedd47ad576a13e03d76688e559c5c7 Mon Sep 17 00:00:00 2001
+From: Narayan Chavani <nchavani@amperecomputing.com>
+Date: Tue, 14 Jul 2020 21:44:49 +0000
+Subject: [PATCH] mtjade: FRU: Implement support to parse and populate FRU
+ binary with multi-record enabled.
+
+- Note that, this currently supports a multi-record with only one record.
+---
+ writefrudata.cpp | 85 +++++++++++++++++++++++++++++++++++++-----------
+ writefrudata.hpp |  1 +
+ 2 files changed, 67 insertions(+), 19 deletions(-)
+
+diff --git a/writefrudata.cpp b/writefrudata.cpp
+index 7507230..6cdcb3f 100644
+--- a/writefrudata.cpp
++++ b/writefrudata.cpp
+@@ -367,27 +367,36 @@ ipmi_fru_area_type getFruAreaType(uint8_t areaOffset)
+  * @param[in] data - the data to verify
+  * @param[in] len - the length of the region to verify
+  * @param[in] validateCrc - whether to validate the CRC
++ * @param[in] multirec - whether the current data being verified is multirecord
++ * or not.
+  * @return non-zero on failure
+  */
+-int verifyFruData(const uint8_t* data, const size_t len, bool validateCrc)
++int verifyFruData(const uint8_t* data, const size_t len, bool validateCrc, bool multirec)
+ {
+     uint8_t checksum = 0;
+     int rc = -1;
+
+-    // Validate for first byte to always have a value of [1]
+-    if (data[0] != IPMI_FRU_HDR_BYTE_ZERO)
++    // This check is only for non-multirecord areas since the byte-0 of
++    // multirecord is the Record Type which can range from 0x00-0xFF (0x10-0xBF
++    // reserved)
++    if (!multirec)
+     {
+-        log<level::ERR>("Invalid entry in byte-0",
+-                        entry("ENTRY=0x%X", static_cast<uint32_t>(data[0])));
+-        return rc;
+-    }
++        // Validate for first byte to always have a value of [1]
++        if (data[0] != IPMI_FRU_HDR_BYTE_ZERO)
++        {
++            log<level::ERR>("Invalid entry in byte-0",
++                            entry("ENTRY=0x%X", static_cast<uint32_t>(data[0])));
++
++            return rc;
++        }
+ #ifdef __IPMI_DEBUG__
+-    else
+-    {
+-        log<level::DEBUG>("Validated in entry_1 of fruData",
+-                          entry("ENTRY=0x%X", static_cast<uint32_t>(data[0])));
+-    }
++        else
++        {
++            log<level::DEBUG>("Validated in entry_1 of fruData",
++                              entry("ENTRY=0x%X", static_cast<uint32_t>(data[0])));
++        }
+ #endif
++    }
+
+     if (!validateCrc)
+     {
+@@ -397,9 +406,11 @@ int verifyFruData(const uint8_t* data, const size_t len, bool validateCrc)
+
+     // See if the calculated CRC matches with the embedded one.
+     // CRC to be calculated on all except the last one that is CRC itself.
+-    checksum = calculateCRC(data, len - 1);
+-    if (checksum != data[len - 1])
++    if (!multirec)
+     {
++        checksum = calculateCRC(data, len - 1);
++        if (checksum != data[len - 1])
++        {
+ #ifdef __IPMI_DEBUG__
+         log<level::ERR>(
+             "Checksum mismatch",
+@@ -407,7 +418,25 @@ int verifyFruData(const uint8_t* data, const size_t len, bool validateCrc)
+             entry("Embedded=0x%X", static_cast<uint32_t>(data[len])));
+ #endif
+         return rc;
++        }
+     }
++    else if (multirec)
++    {
++        // As per the IPMI platform spec, byte[3] is the record checksum.
++        checksum = calculateCRC(data, len);
++        if (checksum != data[3])
++        {
++#ifdef __IPMI_DEBUG__
++        log<level::ERR>(
++            "Checksum mismatch",
++            entry("Calculated=0x%X", static_cast<uint32_t>(checksum)),
++            entry("Embedded=0x%X", static_cast<uint32_t>(data[3])));
++#endif
++
++        return rc;
++        }
++    }
++
+ #ifdef __IPMI_DEBUG__
+     else
+     {
+@@ -466,13 +495,22 @@ int ipmiPopulateFruAreas(uint8_t* fruData, const size_t dataLen,
+         }
+         else if (areaOffset)
+         {
+-            // Read 2 bytes to know the actual size of area.
+-            uint8_t areaHeader[2] = {0};
++            // Read 3 bytes to know the actual size of area.
++            uint8_t areaHeader[3] = {0};
+             std::memcpy(areaHeader, &((uint8_t*)fruData)[areaOffset],
+                         sizeof(areaHeader));
+
+             // Size of this area will be the 2nd byte in the FRU area header.
+-            size_t areaLen = areaHeader[1] * IPMI_EIGHT_BYTES;
++            size_t areaLen;
++            if (fruEntry == IPMI_FRU_MULTI_OFFSET)
++            {
++                areaLen = areaHeader[2] + IPMI_FRU_MULTIREC_HDR_BYTES;
++            }
++            else
++            {
++                areaLen = areaHeader[1] * IPMI_EIGHT_BYTES;
++            }
++
+             uint8_t areaData[areaLen] = {0};
+
+             log<level::DEBUG>("FRU Data", entry("SIZE=%d", dataLen),
+@@ -495,7 +533,16 @@ int ipmiPopulateFruAreas(uint8_t* fruData, const size_t dataLen,
+             // contents beyond the first byte are not defined in the spec and
+             // it may not end with a CRC byte.
+             bool validateCrc = fruEntry != IPMI_FRU_INTERNAL_OFFSET;
+-            rc = verifyFruData(areaData, areaLen, validateCrc);
++
++            if (fruEntry == IPMI_FRU_MULTI_OFFSET)
++            {
++                rc = verifyFruData(areaData, areaLen, validateCrc, true);
++            }
++            else
++            {
++                rc = verifyFruData(areaData, areaLen, validateCrc, false);
++            }
++
+             if (rc < 0)
+             {
+                 log<level::ERR>("Err validating FRU area",
+@@ -553,7 +600,7 @@ int ipmiValidateCommonHeader(const uint8_t* fruData, const size_t dataLen)
+     }
+
+     // Verify the CRC and size
+-    rc = verifyFruData(commonHdr, sizeof(commonHdr), true);
++    rc = verifyFruData(commonHdr, sizeof(commonHdr), true, false);
+     if (rc < 0)
+     {
+         log<level::ERR>("Failed to validate common header");
+diff --git a/writefrudata.hpp b/writefrudata.hpp
+index cc5cef6..0628cdf 100644
+--- a/writefrudata.hpp
++++ b/writefrudata.hpp
+@@ -40,6 +40,7 @@ struct common_header
+ #define IPMI_FRU_MULTI_OFFSET offsetof(struct common_header, multi_offset)
+ #define IPMI_FRU_HDR_CRC_OFFSET offsetof(struct common_header, crc)
+ #define IPMI_EIGHT_BYTES 8
++#define IPMI_FRU_MULTIREC_HDR_BYTES 5
+
+ /**
+  * Validate a FRU.

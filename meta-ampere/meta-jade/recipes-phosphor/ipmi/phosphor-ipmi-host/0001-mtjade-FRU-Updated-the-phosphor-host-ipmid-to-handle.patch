@@ -1,0 +1,106 @@
+From 3d0614b957278318ead8eacdef18f4fe99f7c38b Mon Sep 17 00:00:00 2001
+From: Narayan Chavani <nchavani@amperecomputing.com>
+Date: Wed, 1 Jul 2020 16:15:50 -0400
+Subject: [PATCH] mtjade: FRU: Updated the phosphor-host-ipmid to handle the
+ following FRU fields
+
+- Part number
+- Asset Tag
+- FRU File ID
+- MAC Address
+- SKU
+---
+ ipmi_fru_info_area.cpp | 39 ++++++++++++++++++++++++++-------------
+ 1 file changed, 26 insertions(+), 13 deletions(-)
+
+diff --git a/ipmi_fru_info_area.cpp b/ipmi_fru_info_area.cpp
+index 84af95d..54eb523 100644
+--- a/ipmi_fru_info_area.cpp
++++ b/ipmi_fru_info_area.cpp
+@@ -23,6 +23,10 @@ static constexpr auto modelNumber = "Model Number";
+ static constexpr auto prettyName = "Name";
+ static constexpr auto version = "Version";
+ static constexpr auto type = "Type";
++static constexpr auto assetTag = "Asset Tag";
++static constexpr auto fruFileID = "FRU File ID";
++static constexpr auto macAddress = "Custom Field 1";
++static constexpr auto sku = "Custom Field 1";
+
+ // Board info areas
+ static constexpr auto board = "Board";
+@@ -304,12 +308,15 @@ FruAreaData buildChassisInfoArea(const PropertyMap& propMap)
+         // chassis type
+         appendChassisType(propMap, fruAreaData);
+
+-        // Chasiss part number, in config.yaml it is configured as model
+-        appendData(modelNumber, propMap, fruAreaData);
++        // Chassis part number
++        appendData(partNumber, propMap, fruAreaData);
+
+-        // Board serial number
++        // Chassis serial number
+         appendData(serialNumber, propMap, fruAreaData);
+
++        // Chassis SKU
++        appendData(sku, propMap, fruAreaData);
++
+         // Indicate End of Custom Fields
+         fruAreaData.emplace_back(endOfCustomFields);
+
+@@ -338,7 +345,7 @@ FruAreaData buildBoardInfoArea(const PropertyMap& propMap)
+         // manufacturer
+         appendData(manufacturer, propMap, fruAreaData);
+
+-        // Product name/Pretty name
++        // Board name/Pretty name
+         appendData(prettyName, propMap, fruAreaData);
+
+         // Board serial number
+@@ -347,11 +354,14 @@ FruAreaData buildBoardInfoArea(const PropertyMap& propMap)
+         // Board part number
+         appendData(partNumber, propMap, fruAreaData);
+
+-        // FRU File ID - Empty
+-        fruAreaData.emplace_back(typeLengthByteNull);
++        // Board FRU File ID
++        appendData(fruFileID, propMap, fruAreaData);
++
++	 // Board MAC Address
++        appendData(macAddress, propMap, fruAreaData);
+
+         // Empty FRU File ID bytes
+-        fruAreaData.emplace_back(recordNotPresent);
++        // fruAreaData.emplace_back(recordNotPresent);
+
+         // End of custom fields
+         fruAreaData.emplace_back(endOfCustomFields);
+@@ -387,17 +397,20 @@ FruAreaData buildProductInfoArea(const PropertyMap& propMap)
+         // Product version
+         appendData(version, propMap, fruAreaData);
+
+-        // Serial Number
++        // Product Serial Number
+         appendData(serialNumber, propMap, fruAreaData);
+
+-        // Add Asset Tag
+-        fruAreaData.emplace_back(recordNotPresent);
++        // Product Asset Tag
++        appendData(assetTag, propMap, fruAreaData);
+
+-        // FRU File ID - Empty
+-        fruAreaData.emplace_back(typeLengthByteNull);
++        // FRU File ID
++        appendData(fruFileID, propMap, fruAreaData);
+
++	 // Product SKU
++        appendData(sku, propMap, fruAreaData);
++
+         // Empty FRU File ID bytes
+-        fruAreaData.emplace_back(recordNotPresent);
++        // fruAreaData.emplace_back(recordNotPresent);
+
+         // End of custom fields
+         fruAreaData.emplace_back(endOfCustomFields);
+--
+2.17.1
+
