@@ -4,7 +4,7 @@
   path: /xyz/openbmc_project/sensors/temperature/BMC
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: -3
+  scale: 0
   offsetB: 0
   bExp: 0
   rExp: 0
@@ -24,7 +24,7 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_P0_ABCD_P1_EFGH
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: -3
+  scale: 0
   offsetB: 0
   bExp: 0
   rExp: 0
@@ -44,7 +44,7 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_P1_EFGH
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: -3
+  scale: 0
   offsetB: 0
   bExp: 0
   rExp: 0
@@ -64,7 +64,7 @@
   path: /xyz/openbmc_project/sensors/temperature/PCIe_Slots
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: -3
+  scale: 0
   offsetB: 0
   bExp: 0
   rExp: 0
@@ -84,7 +84,7 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_P0_EFGH_P1_ABCD
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: -3
+  scale: 0
   offsetB: 0
   bExp: 0
   rExp: 0
@@ -104,7 +104,7 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_P1_ABCD
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: -3
+  scale: 0
   offsetB: 0
   bExp: 0
   rExp: 0
@@ -124,7 +124,7 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_P0_EFGH
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: -3
+  scale: 0
   offsetB: 0
   bExp: 0
   rExp: 0
@@ -144,7 +144,7 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_P0_ABCD
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: -3
+  scale: 0
   offsetB: 0
   bExp: 0
   rExp: 0
@@ -163,7 +163,7 @@
   sensorType: 0x04
   path: /xyz/openbmc_project/sensors/fan_tach/P0_Fan_Speed
   sensorReadingType: 0x01
-  multiplierM: 1
+  multiplierM: 40
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
@@ -185,7 +185,7 @@
   sensorType: 0x04
   path: /xyz/openbmc_project/sensors/fan_tach/P1_Fan_Speed
   sensorReadingType: 0x01
-  multiplierM: 1
+  multiplierM: 40
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
