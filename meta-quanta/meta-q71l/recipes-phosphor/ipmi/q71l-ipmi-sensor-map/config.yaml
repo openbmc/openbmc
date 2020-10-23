@@ -16,7 +16,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 0xF0:
   sensorType: 0x01
@@ -36,7 +36,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0xF1:
   sensorType: 0x01
@@ -56,7 +56,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0xF2:
   sensorType: 0x01
@@ -75,7 +75,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0xB0:
   sensorType: 0x04
@@ -95,7 +95,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0xC0:
   sensorType: 0x04
@@ -132,7 +132,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0xC1:
   sensorType: 0x04
@@ -169,7 +169,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0xC2:
   sensorType: 0x04
@@ -206,7 +206,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0xC3:
   sensorType: 0x04
@@ -243,7 +243,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0xB5:
   sensorType: 0x04
@@ -263,7 +263,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0xB6:
   sensorType: 0x04
@@ -282,7 +282,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0xB7:
   sensorType: 0x04
@@ -302,7 +302,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0xE0:
   sensorType: 0x02
@@ -322,7 +322,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0xE1:
   sensorType: 0x02
@@ -342,7 +342,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0xE2:
   sensorType: 0x02
@@ -362,7 +362,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0xE3:
   sensorType: 0x02
@@ -381,7 +381,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0xE4:
   sensorType: 0x02
@@ -401,7 +401,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0xE5:
   sensorType: 0x02
@@ -421,7 +421,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0xE6:
   sensorType: 0x02
@@ -441,7 +441,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0xE7:
   sensorType: 0x02
@@ -460,7 +460,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0xE8:
   sensorType: 0x02
@@ -480,7 +480,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0xE9:
   sensorType: 0x02
@@ -500,7 +500,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0xEA:
   sensorType: 0x02
@@ -520,7 +520,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0xEB:
   sensorType: 0x02
@@ -540,4 +540,4 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
