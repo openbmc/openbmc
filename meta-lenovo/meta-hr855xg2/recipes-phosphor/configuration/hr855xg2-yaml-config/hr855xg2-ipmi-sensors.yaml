@@ -21,7 +21,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x02:
   entityID: 0x40
@@ -42,7 +42,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 0x03:
   sensorType: 0x01
   entityID: 0x03
@@ -1153,7 +1153,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x22:
   entityID: 0x07
@@ -1174,7 +1174,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x23:
   entityID: 0x07
@@ -1195,7 +1195,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x24:
   entityID: 0x07
@@ -1216,7 +1216,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x25:
   entityID: 0x07
@@ -1237,7 +1237,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 
 0x26:
@@ -1259,7 +1259,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x27:
   entityID: 0x07
@@ -1280,7 +1280,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x28:
   entityID: 0x07
@@ -1301,7 +1301,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x2C:
   entityID: 0x07
@@ -1322,7 +1322,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x2A:
   entityID: 0x07
@@ -1343,7 +1343,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 0x29:
   entityID: 0x07
   sensorType: 0x02
@@ -1363,7 +1363,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x2D:
   entityID: 0x07
@@ -1384,7 +1384,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x2E:
   entityID: 0x07
@@ -1405,7 +1405,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x2F:
   entityID: 0x07
@@ -1426,7 +1426,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x2B:
   entityID: 0x07
@@ -1447,7 +1447,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x30:
   entityID: 0x07
@@ -1468,7 +1468,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x40:
   entityID: 0x1D
@@ -1489,7 +1489,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 
 0x41:
@@ -1511,7 +1511,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 
 0x42:
@@ -1533,7 +1533,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 
 0x43:
@@ -1555,7 +1555,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x44:
   entityID: 0x1D
@@ -1576,7 +1576,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x45:
   entityID: 0x1D
@@ -1596,7 +1596,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x46:
   entityID: 0x1D
@@ -1617,7 +1617,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 0x47:
   entityID: 0x1D
   sensorType: 0x04
@@ -1637,7 +1637,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x48:
   entityID: 0x1D
@@ -1658,7 +1658,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 0x49:
   entityID: 0x1D
   sensorType: 0x04
@@ -1678,7 +1678,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 0x4A:
   entityID: 0x1D
   sensorType: 0x04
@@ -1698,7 +1698,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x4B:
   entityID: 0x1D
@@ -1719,7 +1719,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x4C:
   entityID: 0x1D
@@ -1740,7 +1740,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 0x4D:
   entityID: 0x1D
   sensorType: 0x04
@@ -1760,7 +1760,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x4E:
   entityID: 0x1D
@@ -1781,7 +1781,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x4F:
   entityID: 0x1D
@@ -1802,7 +1802,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x50:
   entityID: 0x1D
@@ -1823,4 +1823,4 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
