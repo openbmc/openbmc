@@ -1,0 +1,17 @@
+{
+    "PowerManagement": 1,
+    "OOBSecondaryLan": 0,
+    "SerialTMODE": 0,
+    "InBandSystemInterfaceChannel": 1,
+    "SELAutoRollOver": 1,
+    "FlushEntireSELUponRollOver": 0,
+    "RecordLevelSELFlushUponRollOver": 0,
+    "NumberOfSELEntries": 200,
+    "TempMonitoringSamplingFreq":0,
+    "PowerMgmtDeviceSlaveAddress": 0,
+    "BMCChannelNumber": 0,
+    "DeviceRivision": 0,
+    "MandatoryPrimaryLanOOBSupport": 1,
+    "OptionalSecondaryLanOOBSupport": 255,
+    "OptionalSerialOOBMTMODECapability": 255
+}
