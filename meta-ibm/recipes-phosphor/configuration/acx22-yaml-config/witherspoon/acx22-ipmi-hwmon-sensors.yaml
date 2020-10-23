@@ -7,7 +7,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 100
     offsetB: 0
     path: /xyz/openbmc_project/sensors/fan_tach/fan0_0
@@ -28,7 +28,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 100
     offsetB: 0
     path: /xyz/openbmc_project/sensors/fan_tach/fan1_0
@@ -49,7 +49,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 100
     offsetB: 0
     path: /xyz/openbmc_project/sensors/fan_tach/fan2_0
@@ -70,7 +70,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 100
     offsetB: 0
     path: /xyz/openbmc_project/sensors/fan_tach/fan3_0
@@ -91,7 +91,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 2
     offsetB: 0
     path: /xyz/openbmc_project/sensors/power/fan_disk_power
@@ -112,7 +112,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     offsetB: 0
     path: /xyz/openbmc_project/sensors/power/p0_io_power
@@ -133,7 +133,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     offsetB: 0
     path: /xyz/openbmc_project/sensors/power/p1_io_power
@@ -154,7 +154,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 2
     offsetB: 0
     path: /xyz/openbmc_project/sensors/power/p0_mem_power
@@ -175,7 +175,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 2
     offsetB: 0
     path: /xyz/openbmc_project/sensors/power/p1_mem_power
@@ -196,7 +196,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 2
     offsetB: 0
     path: /xyz/openbmc_project/sensors/power/p0_power
@@ -217,7 +217,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 2
     offsetB: 0
     path: /xyz/openbmc_project/sensors/power/p1_power
@@ -238,7 +238,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 10
     offsetB: 0
     path: /xyz/openbmc_project/sensors/power/ps0_input_power
@@ -259,7 +259,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 10
     offsetB: 0
     path: /xyz/openbmc_project/sensors/power/ps1_input_power
@@ -280,7 +280,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 20
     offsetB: 0
     path: /xyz/openbmc_project/sensors/power/total_power
@@ -301,7 +301,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 2
     offsetB: 0
     path: /xyz/openbmc_project/sensors/voltage/ps0_input_voltage
@@ -322,7 +322,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 2
     offsetB: 0
     path: /xyz/openbmc_project/sensors/voltage/ps1_input_voltage
@@ -343,7 +343,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 10
     offsetB: 0
     path: /xyz/openbmc_project/sensors/voltage/ps0_output_voltage
@@ -364,7 +364,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 10
     offsetB: 0
     path: /xyz/openbmc_project/sensors/voltage/ps1_output_voltage
@@ -385,7 +385,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     offsetB: 0
     path: /xyz/openbmc_project/sensors/current/ps0_output_current
@@ -406,7 +406,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     offsetB: 0
     path: /xyz/openbmc_project/sensors/current/ps1_output_current
@@ -427,7 +427,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 30
     offsetB: 0
     path: /xyz/openbmc_project/sensors/temperature/pcie
@@ -448,7 +448,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 20
     offsetB: 0
     path: /xyz/openbmc_project/sensors/temperature/ambient
@@ -469,7 +469,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 100
     offsetB: 0
     path: /xyz/openbmc_project/sensors/fan_tach/fan0_1
@@ -490,7 +490,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 100
     offsetB: 0
     path: /xyz/openbmc_project/sensors/fan_tach/fan1_1
@@ -511,7 +511,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 100
     offsetB: 0
     path: /xyz/openbmc_project/sensors/fan_tach/fan2_1
@@ -532,7 +532,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 100
     offsetB: 0
     path: /xyz/openbmc_project/sensors/fan_tach/fan3_1
