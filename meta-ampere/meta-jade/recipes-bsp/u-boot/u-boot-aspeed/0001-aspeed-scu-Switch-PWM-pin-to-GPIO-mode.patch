@@ -1,0 +1,87 @@
+From 58ab2f68d460a0a0c201069968930fcf44df17a1 Mon Sep 17 00:00:00 2001
+From: Chanh Nguyen <chnguyen@amperecomputing.com>
+Date: Fri, 16 Oct 2020 10:54:47 +0700
+Subject: [PATCH] aspeed/scu : Switch PWM pin to GPIO input mode
+
+In hardware design, the PWM pins will be at a high level if they are
+configured in GPIO Input mode. This commit configures all PWM function
+pins to input GPIO mode. This will allow fans to run at full speed when BMC resets or in U-boot.
+
+Signed-off-by: Chanh Nguyen <chnguyen@amperecomputing.com>
+---
+ arch/arm/include/asm/arch-aspeed/ast_scu.h  |  1 +
+ arch/arm/include/asm/arch-aspeed/regs-scu.h |  3 +++
+ arch/arm/mach-aspeed/ast-scu.c              | 17 +++++++++++++++++
+ board/aspeed/ast-g5/ast-g5.c                |  3 +++
+ 4 files changed, 24 insertions(+)
+
+diff --git a/arch/arm/include/asm/arch-aspeed/ast_scu.h b/arch/arm/include/asm/arch-aspeed/ast_scu.h
+index dcbc6730d4..d2c010a0dc 100644
+--- a/arch/arm/include/asm/arch-aspeed/ast_scu.h
++++ b/arch/arm/include/asm/arch-aspeed/ast_scu.h
+@@ -45,5 +45,6 @@ extern u32 ast_scu_get_vga_memsize(void);
+ extern void ast_scu_init_eth(u8 num);
+ extern void ast_scu_multi_func_eth(u8 num);
+ extern void ast_scu_multi_func_romcs(u8 num);
++extern void ast_scu_switch_pwm_to_gpio_mode(void);
+ 
+ #endif
+diff --git a/arch/arm/include/asm/arch-aspeed/regs-scu.h b/arch/arm/include/asm/arch-aspeed/regs-scu.h
+index c9b91795d1..d28abede52 100644
+--- a/arch/arm/include/asm/arch-aspeed/regs-scu.h
++++ b/arch/arm/include/asm/arch-aspeed/regs-scu.h
+@@ -793,6 +793,9 @@
+ #define SCU_FUN_PIN_USBP4_DP		(0x1 << 22)
+ #define SCU_FUN_PIN_USBP3_DN		(0x1 << 21)
+ #define SCU_FUN_PIN_USBP3_DP		(0x1 << 20)
++
++#define SCU_FUN_PIN_PWM(x)              (0x1 << (x))
++
+ /* Video pin */
+ #define SCU_FUN_PIN_VPIR9		(0x1 << 19)
+ #define SCU_FUN_PIN_VPIR8		(0x1 << 18)
+diff --git a/arch/arm/mach-aspeed/ast-scu.c b/arch/arm/mach-aspeed/ast-scu.c
+index 12de9b8036..68dab3f495 100644
+--- a/arch/arm/mach-aspeed/ast-scu.c
++++ b/arch/arm/mach-aspeed/ast-scu.c
+@@ -443,6 +443,23 @@ void ast_scu_multi_func_eth(u8 num)
+ 	}
+ }
+ 
++void ast_scu_switch_pwm_to_gpio_mode(void)
++{
++       /*
++        * This Function to set the PWM pin to GPIO mode
++        * After that, the pin is HIGH and the FAN SPEED is MAX
++        * Set the bit 2 -> 7 is 0x0
++        */
++       ast_scu_write(ast_scu_read(AST_SCU_FUN_PIN_CTRL3) &
++                     ~SCU_FUN_PIN_PWM(2) &
++                     ~SCU_FUN_PIN_PWM(3) &
++                     ~SCU_FUN_PIN_PWM(4) &
++                     ~SCU_FUN_PIN_PWM(5) &
++                     ~SCU_FUN_PIN_PWM(6) &
++                     ~SCU_FUN_PIN_PWM(7),
++                      AST_SCU_FUN_PIN_CTRL3);
++}
++
+ void ast_scu_multi_func_romcs(u8 num)
+ {
+ 	ast_scu_write(ast_scu_read(AST_SCU_FUN_PIN_CTRL3) |
+diff --git a/board/aspeed/ast-g5/ast-g5.c b/board/aspeed/ast-g5/ast-g5.c
+index 12496cea09..e6f7f1507a 100644
+--- a/board/aspeed/ast-g5/ast-g5.c
++++ b/board/aspeed/ast-g5/ast-g5.c
+@@ -71,6 +71,9 @@ int board_init(void)
+ 	gd->bd->bi_boot_params = CONFIG_SYS_SDRAM_BASE + 0x100;
+ 	gd->flags = 0;
+ 
++	/* Switch PWM to GPIO mode */
++	ast_scu_switch_pwm_to_gpio_mode();
++
+ 	return 0;
+ }
+ 
+-- 
+2.18.4
+
