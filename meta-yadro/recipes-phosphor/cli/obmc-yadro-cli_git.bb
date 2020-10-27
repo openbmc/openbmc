@@ -10,7 +10,19 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 # Dependencies
 DEPENDS = "phosphor-user-manager"
-RDEPENDS_${PN} = "sudo bash"
+RDEPENDS_${PN} = " \
+    ${VIRTUAL-RUNTIME_base-utils} \
+    bash \
+    obmc-console \
+    obmc-yadro-fwupdate \
+    obmc-yadro-lssensors \
+    obmc-yadro-netconfig \
+    sudo \
+    systemd \
+"
+# Some platforms also require some additional packages like
+#   ipmitool, obmc-yadro-lsinventory, obmc-yadro-backup ...
+# They should be appended by bbappend file in their layers
 
 # Directory with command handlers
 FILES_${PN} += "${datadir}/cli"
@@ -28,4 +40,4 @@ do_install() {
 # Source code repository
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/YADRO-KNS/obmc-yadro-cli"
-SRCREV = "1b0347f2c638df21333c5479b4d3152cfc4b5ac1"
+SRCREV = "9457a085c86722214d6c450397ccecd6db4a1071"
