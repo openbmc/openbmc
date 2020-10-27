@@ -14,7 +14,7 @@ DEPENDS = "boost \
            sdbusplus \
            valijson"
 
-S = "${WORKDIR}/git/"
+S = "${WORKDIR}/git"
 inherit meson systemd
 
 EXTRA_OEMESON = "-Dtests=disabled"

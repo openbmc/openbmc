@@ -22,6 +22,6 @@ SYSTEMD_SERVICE_${PN} += " xyz.openbmc_project.mcutempsensor.service"
 DEPENDS = "boost nlohmann-json sdbusplus i2c-tools libgpiod"
 inherit cmake systemd
 
-S = "${WORKDIR}/git/"
+S = "${WORKDIR}/git"
 
 EXTRA_OECMAKE = "-DYOCTO=1"

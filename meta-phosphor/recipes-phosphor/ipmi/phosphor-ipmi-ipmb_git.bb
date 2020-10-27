@@ -17,6 +17,6 @@ DEPENDS = "sdbusplus \
            boost \
            nlohmann-json"
 
-S = "${WORKDIR}/git/"
+S = "${WORKDIR}/git"
 inherit cmake systemd
 FILES_${PN} += "/usr/share/ipmbbridge/ipmb-channels.json"
