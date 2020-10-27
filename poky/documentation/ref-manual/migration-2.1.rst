@@ -9,7 +9,7 @@ Project 2.1 Release from the prior release.
 Variable Expansion in Python Functions
 --------------------------------------
 
-Variable expressions, such as ``${``\ VARNAME\ ``}`` no longer expand
+Variable expressions, such as ``${VARNAME}`` no longer expand
 automatically within Python functions. Suppressing expansion was done to
 allow Python functions to construct shell scripts or other code for
 situations in which you do not want such expressions expanded. For any
@@ -125,7 +125,7 @@ Image Generation is Now Split Out from Filesystem Generation
 Previously, for image recipes the :ref:`ref-tasks-rootfs`
 task assembled the filesystem and then from that filesystem generated
 images. With this Yocto Project release, image generation is split into
-separate ```do_image_*`` <#ref-tasks-image>`__ tasks for clarity both in
+separate :ref:`ref-tasks-image` tasks for clarity both in
 operation and in the code.
 
 For most cases, this change does not present any problems. However, if
@@ -133,7 +133,7 @@ you have made customizations that directly modify the ``do_rootfs`` task
 or that mention ``do_rootfs``, you might need to update those changes.
 In particular, if you had added any tasks after ``do_rootfs``, you
 should make edits so that those tasks are after the
-```do_image_complete`` <#ref-tasks-image-complete>`__ task rather than
+:ref:`ref-tasks-image-complete` task rather than
 after ``do_rootfs`` so that the your added tasks run at the correct
 time.
 
@@ -180,7 +180,7 @@ The following recipes have been removed in the 2.1 release:
 -  ``python-pygtk``: Recipe became obsolete.
 
 -  ``adt-installer``: Recipe became obsolete. See the "`ADT
-   Removed <#migration-2.1-adt-removed>`__" section for more
+   Removed <#adt-removed>`__" section for more
    information.
 
 .. _migration-2.1-class-changes:
@@ -287,7 +287,9 @@ The following changes have been made for the Poky distribution:
    option specified on the configure command line either because it is
    not a supported option for the configure script or because static
    libraries are needed should set the following variable:
-   DISABLE_STATIC = ""
+   ::
+
+      DISABLE_STATIC = ""
 
 -  The separate ``poky-tiny`` distribution now uses the musl C library
    instead of a heavily pared down ``glibc``. Using musl results in a
@@ -357,10 +359,9 @@ These additional changes exist:
 
 -  The minimum Git version has been increased to 1.8.3.1. If your host
    distribution does not provide a sufficiently recent version, you can
-   install the buildtools, which will provide it. See the "`Required
-   Git, tar, Python and gcc
-   Versions <#required-git-tar-python-and-gcc-versions>`__" section for
-   more information on the buildtools tarball.
+   install the buildtools, which will provide it. See the
+   :ref:`ref-manual/ref-system-requirements:required git, tar, python and gcc versions`
+   section for more information on the buildtools tarball.
 
 -  The buggy and incomplete support for the RPM version 4 package
    manager has been removed. The well-tested and maintained support for
@@ -376,8 +377,9 @@ These additional changes exist:
       base-passwd
       shadow
       update-alternatives
+      run-postinsts
 
-   run-postinsts With the Yocto Project 2.1 release, these packages are
+   With the Yocto Project 2.1 release, these packages are
    only removed if "read-only-rootfs" is in ``IMAGE_FEATURES``, since
    they might still be needed for a read-write image even in the absence
    of a package manager (e.g. if users need to be added, modified, or

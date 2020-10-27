@@ -33,10 +33,10 @@ implementation of QEMU.
 For official information and documentation on QEMU in general, see the
 following references:
 
--  `QEMU Website <http://wiki.qemu.org/Main_Page>`__\ *:* The official
+-  `QEMU Website <https://wiki.qemu.org/Main_Page>`__\ *:* The official
    website for the QEMU Open Source project.
 
--  `Documentation <http://wiki.qemu.org/Manual>`__\ *:* The QEMU user
+-  `Documentation <https://wiki.qemu.org/Manual>`__\ *:* The QEMU user
    manual.
 
 .. _qemu-running-qemu:
@@ -141,14 +141,14 @@ available. Follow these general steps to run QEMU:
 
    -  This example does not provide enough information for QEMU to
       launch. While the command does provide a root filesystem type, it
-      must also minimally provide a MACHINE, KERNEL, or VM option.
+      must also minimally provide a `MACHINE`, `KERNEL`, or `VM` option.
       ::
 
          $ runqemu ext4
 
    -  This example specifies to boot a virtual machine image
       (``.wic.vmdk`` file). From the ``.wic.vmdk``, ``runqemu``
-      determines the QEMU architecture (MACHINE) to be "qemux86-64" and
+      determines the QEMU architecture (`MACHINE`) to be "qemux86-64" and
       the root filesystem type to be "vmdk".
       ::
 
@@ -208,7 +208,8 @@ using an NFS server.
    extracts it into a location that you specify. Here is an example that
    takes a file system and extracts it to a directory named
    ``test-nfs``:
-   ::
+
+   .. code-block:: none
 
       runqemu-extract-sdk ./tmp/deploy/images/qemux86-64/core-image-sato-qemux86-64.tar.bz2 test-nfs
 
@@ -217,7 +218,8 @@ using an NFS server.
    You can then also make changes to the files within ``./test-nfs`` and
    see those changes appear in the image in real time. Here is an
    example using the ``qemux86`` image:
-   ::
+
+   .. code-block:: none
 
       runqemu qemux86-64 ./test-nfs
 
@@ -226,14 +228,20 @@ using an NFS server.
    Should you need to start, stop, or restart the NFS share, you can use
    the following commands:
 
-   -  The following command starts the NFS share: runqemu-export-rootfs
-      start file-system-location
+   -  The following command starts the NFS share:
+      ::
 
-   -  The following command stops the NFS share: runqemu-export-rootfs
-      stop file-system-location
+         runqemu-export-rootfs start file-system-location
+
+   -  The following command stops the NFS share:
+      ::
+
+         runqemu-export-rootfs stop file-system-location
 
    -  The following command restarts the NFS share:
-      runqemu-export-rootfs restart file-system-location
+      ::
+
+         runqemu-export-rootfs restart file-system-location
 
 .. _qemu-kvm-cpu-compatibility:
 
@@ -380,30 +388,29 @@ command line:
 .. note::
 
    If you do provide some "illegal" option combination or perhaps you do
-   not provide enough in the way of options,
-   runqemu
+   not provide enough in the way of options, ``runqemu``
    provides appropriate error messaging to help you correct the problem.
 
--  QEMUARCH: The QEMU machine architecture, which must be "qemuarm",
+-  `QEMUARCH`: The QEMU machine architecture, which must be "qemuarm",
    "qemuarm64", "qemumips", "qemumips64", "qemuppc", "qemux86", or
    "qemux86-64".
 
--  ``VM``: The virtual machine image, which must be a ``.wic.vmdk``
+-  `VM`: The virtual machine image, which must be a ``.wic.vmdk``
    file. Use this option when you want to boot a ``.wic.vmdk`` image.
    The image filename you provide must contain one of the following
    strings: "qemux86-64", "qemux86", "qemuarm", "qemumips64",
    "qemumips", "qemuppc", or "qemush4".
 
--  ROOTFS: A root filesystem that has one of the following filetype
+-  `ROOTFS`: A root filesystem that has one of the following filetype
    extensions: "ext2", "ext3", "ext4", "jffs2", "nfs", or "btrfs". If
    the filename you provide for this option uses "nfs", it must provide
    an explicit root filesystem path.
 
--  KERNEL: A kernel image, which is a ``.bin`` file. When you provide a
+-  `KERNEL`: A kernel image, which is a ``.bin`` file. When you provide a
    ``.bin`` file, ``runqemu`` detects it and assumes the file is a
    kernel image.
 
--  MACHINE: The architecture of the QEMU machine, which must be one of
+-  `MACHINE`: The architecture of the QEMU machine, which must be one of
    the following: "qemux86", "qemux86-64", "qemuarm", "qemuarm64",
    "qemumips", "qemumips64", or "qemuppc". The MACHINE and QEMUARCH
    options are basically identical. If you do not provide a MACHINE

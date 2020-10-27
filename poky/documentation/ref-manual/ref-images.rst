@@ -16,8 +16,7 @@ image you want.
    the GNU Affero General Public License Version 3 (AGPL-3.0) components
    is only supported for minimal and base images. Furthermore, if you
    are going to build an image using non-GPLv3 and similarly licensed
-   components, you must make the following changes in the
-   local.conf
+   components, you must make the following changes in the ``local.conf``
    file before using the BitBake command to build the minimal or base
    image:
    ::

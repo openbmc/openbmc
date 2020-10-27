@@ -110,7 +110,7 @@ upon the older ``*proto`` recipes need to be changed to depend on the
 newer ``xorgproto`` recipe instead.
 
 For names of recipes removed because of this repository change, see the
-`Removed Recipes <#migration-2.6-removed-recipes>`__ section.
+`Removed Recipes <#removed-recipes>`__ section.
 
 .. _migration-2.6-distutils-distutils3-fetching-dependencies:
 
@@ -128,18 +128,9 @@ missing from :term:`DEPENDS`).
 .. note::
 
    This change affects classes beyond just the two mentioned (i.e.
-   distutils
-   and
-   distutils3
-   ). Any recipe that inherits
-   distutils\*
-   classes are affected. For example, the
-   setuptools
-   and
-   setuptools3
-   recipes are affected since they inherit the
-   distutils\*
-   classes.
+   ``distutils`` and ``distutils3``). Any recipe that inherits ``distutils*``
+   classes are affected. For example, the ``setuptools`` and ``setuptools3``
+   recipes are affected since they inherit the ``distutils*`` classes.
 
 Fetching these types of dependencies that are not provided in the
 sysroot negatively affects the ability to reproduce builds. This type of
@@ -178,13 +169,13 @@ The following changes have been made:
 -  Several variables have changed names for consistency:
    ::
 
-      Old Variable                  Name New Variable Name
+      Old Variable Name             New Variable Name
       ========================================================
-      KERNEL_IMAGE_BASE_NAME        :term:`KERNEL_IMAGE_NAME`
-      KERNEL_IMAGE_SYMLINK_NAME     :term:`KERNEL_IMAGE_LINK_NAME`
-      MODULE_TARBALL_BASE_NAME      :term:`MODULE_TARBALL_NAME`
-      MODULE_TARBALL_SYMLINK_NAME   :term:`MODULE_TARBALL_LINK_NAME`
-      INITRAMFS_BASE_NAME           :term:`INITRAMFS_NAME`
+      KERNEL_IMAGE_BASE_NAME        KERNEL_IMAGE_NAME
+      KERNEL_IMAGE_SYMLINK_NAME     KERNEL_IMAGE_LINK_NAME
+      MODULE_TARBALL_BASE_NAME      MODULE_TARBALL_NAME
+      MODULE_TARBALL_SYMLINK_NAME   MODULE_TARBALL_LINK_NAME
+      INITRAMFS_BASE_NAME           INITRAMFS_NAME
 
 -  The ``MODULE_IMAGE_BASE_NAME`` variable has been removed. The module
    tarball name is now controlled directly with the
@@ -233,11 +224,9 @@ you replace all instances of ``SERIAL_CONSOLE`` with
 
 .. note::
 
-   The only difference in usage is that
-   SERIAL_CONSOLES
+   The only difference in usage is that ``SERIAL_CONSOLES``
    expects entries to be separated using semicolons as compared to
-   SERIAL_CONSOLE
-   , which expects spaces.
+   ``SERIAL_CONSOLE``, which expects spaces.
 
 .. _migration-2.6-poky-sets-unknown-configure-option-to-qa-error:
 
@@ -263,9 +252,7 @@ The following changes have occurred:
 
    .. note::
 
-      The
-      virtclass-multilib-
-      overrides for multilib are still valid.
+      The ``virtclass-multilib-`` overrides for multilib are still valid.
 
 -  The ``forcevariable`` Override Now Has a Higher Priority Than
    ``libc`` Overrides: The ``forcevariable`` override is documented to
@@ -447,14 +434,8 @@ The following miscellaneous changes occurred:
 
    .. note::
 
-      genericx86
-      and
-      genericx86-64
-      retain
-      kernel-modules
-      as part of the
-      RRECOMMENDS
-      variable setting.
+      ``genericx86`` and ``genericx86-64`` retain ``kernel-modules`` as part of
+      the ``RRECOMMENDS`` variable setting.
 
 -  The ``LGPLv2_WHITELIST_GPL-3.0`` variable has been removed. If you
    are setting this variable in your configuration, set or append it to

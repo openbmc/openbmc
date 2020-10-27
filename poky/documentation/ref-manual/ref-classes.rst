@@ -47,7 +47,7 @@ splitting out of debug symbols during packaging).
    even if the recipes do not produce architecture-specific output.
 
    Configuring such recipes for all architectures causes the
-   ```do_package_write_*`` tasks to
+   ``do_package_write_*`` tasks to
    have different signatures for the machines with different tunings.
    Additionally, unnecessary rebuilds occur every time an image for a
    different ``MACHINE`` is built even when the recipe never changes.
@@ -164,24 +164,18 @@ example use for this class.
 
    For RPMs and other packages that do not contain a subdirectory, you
    should specify an appropriate fetcher parameter to point to the
-   subdirectory. For example, if BitBake is using the Git fetcher (
-   git://
-   ), the "subpath" parameter limits the checkout to a specific subpath
-   of the tree. Here is an example where
-   ${BP}
-   is used so that the files are extracted into the subdirectory
-   expected by the default value of
-   S
-   :
+   subdirectory. For example, if BitBake is using the Git fetcher (``git://``),
+   the "subpath" parameter limits the checkout to a specific subpath
+   of the tree. Here is an example where ``${BP}`` is used so that the files
+   are extracted into the subdirectory expected by the default value of
+   ``S``:
    ::
 
            SRC_URI = "git://example.com/downloads/somepackage.rpm;subpath=${BP}"
 
 
-   See the "
-   Fetchers
-   " section in the BitBake User Manual for more information on
-   supported BitBake Fetchers.
+   See the ":ref:`bitbake-user-manual/bitbake-user-manual-fetching:fetchers`" section in the BitBake User Manual for
+   more information on supported BitBake Fetchers.
 
 .. _ref-classes-binconfig:
 
@@ -736,11 +730,8 @@ introspection. This functionality is only enabled if the
 .. note::
 
    This functionality is backfilled by default and, if not applicable,
-   should be disabled through
-   DISTRO_FEATURES_BACKFILL_CONSIDERED
-   or
-   MACHINE_FEATURES_BACKFILL_CONSIDERED
-   , respectively.
+   should be disabled through ``DISTRO_FEATURES_BACKFILL_CONSIDERED`` or
+   ``MACHINE_FEATURES_BACKFILL_CONSIDERED``, respectively.
 
 .. _ref-classes-grub-efi:
 
@@ -969,9 +960,8 @@ The ``image_types`` class also handles conversion and compression of images.
 .. note::
 
    To build a VMware VMDK image, you need to add "wic.vmdk" to
-   IMAGE_FSTYPES
-   . This would also be similar for Virtual Box Virtual Disk Image
-   ("vdi") and QEMU Copy On Write Version 2 ("qcow2") images.
+   ``IMAGE_FSTYPES``. This would also be similar for Virtual Box Virtual Disk
+   Image ("vdi") and QEMU Copy On Write Version 2 ("qcow2") images.
 
 .. _ref-classes-image-live:
 
@@ -1032,9 +1022,8 @@ You can configure the sanity checks so that specific test failures
 either raise a warning or an error message. Typically, failures for new
 tests generate a warning. Subsequent failures for the same test would
 then generate an error message once the metadata is in a known and good
-condition. See the "`QA Error and Warning Messages <#ref-qa-checks>`__"
-Chapter for a list of all the warning and error messages you might
-encounter using a default configuration.
+condition. See the ":doc:`ref-qa-checks`" Chapter for a list of all the warning
+and error messages you might encounter using a default configuration.
 
 Use the :term:`WARN_QA` and
 :term:`ERROR_QA` variables to control the behavior of
@@ -1275,9 +1264,9 @@ The following list shows the tests you can list with the ``WARN_QA`` and
 
 -  ``textrel:`` Checks for ELF binaries that contain relocations in
    their ``.text`` sections, which can result in a performance impact at
-   runtime. See the explanation for the
-   ```ELF binary`` <#qa-issue-textrel>`__ message for more information
-   regarding runtime performance issues.
+   runtime. See the explanation for the ``ELF binary`` message in
+   ":doc:`ref-qa-checks`" for more information regarding runtime performance
+   issues.
 
 -  ``unlisted-pkg-lics:`` Checks that all declared licenses applying
    for a package are also declared on the recipe level (i.e. any license
@@ -1399,7 +1388,7 @@ Multiple device trees can be added to the FIT image created by
 ``kernel-fitimage`` and the device tree is optional.
 The address where the device tree is to be loaded by U-boot is
 specified by :term:`UBOOT_DTBO_LOADADDRESS` for device tree overlays
-and by `:term:`UBOOT_DTB_LOADADDRESS` for device tree binaries.
+and by :term:`UBOOT_DTB_LOADADDRESS` for device tree binaries.
 
 Only a single RAM disk can be added to the FIT image created by
 ``kernel-fitimage`` and the RAM disk in FIT is optional.
@@ -1629,8 +1618,8 @@ section in the Yocto Project Development Tasks Manual.
 ==================
 
 The ``native`` class provides common functionality for recipes that
-build tools to run on the `build host <#hardware-build-system-term>`__
-(i.e. tools that use the compiler or other tools from the build host).
+build tools to run on the :term:`Build Host` (i.e. tools that use the compiler
+or other tools from the build host).
 
 You can create a recipe that builds tools that run natively on the host
 a couple different ways:
@@ -1728,8 +1717,7 @@ package manager (NPM) <https://en.wikipedia.org/wiki/Npm_(software)>`__.
 
 .. note::
 
-   Currently, recipes inheriting this class must use the
-   npm://
+   Currently, recipes inheriting this class must use the ``npm://``
    fetcher to have dependencies fetched and packaged automatically.
 
 For information on how to create NPM packages, see the
@@ -1833,9 +1821,9 @@ consider some further things about using RPM:
 You can find additional information on the effects of the package class
 at these two Yocto Project mailing list links:
 
--  https://lists.yoctoproject.org/pipermail/poky/2011-May/006362.html
+-  :yocto_lists:`/pipermail/poky/2011-May/006362.html`
 
--  https://lists.yoctoproject.org/pipermail/poky/2011-May/006363.html
+-  :yocto_lists:`/pipermail/poky/2011-May/006363.html`
 
 .. _ref-classes-package_deb:
 
@@ -1894,16 +1882,8 @@ variable in the ``local.conf`` file.
 
 .. note::
 
-   You cannot specify the
-   package_tar
-   class first using the
-   PACKAGE_CLASSES
-   variable. You must use
-   .deb
-   ,
-   .ipk
-   , or
-   .rpm
+   You cannot specify the ``package_tar`` class first using the
+   ``PACKAGE_CLASSES`` variable. You must use ``.deb``, ``.ipk``, or ``.rpm``
    file formats for your image or SDK.
 
 .. _ref-classes-packagedata:
@@ -2068,9 +2048,7 @@ The ``prexport`` class provides functionality for exporting
 .. note::
 
    This class is not intended to be used directly. Rather, it is enabled
-   when using "
-   bitbake-prserv-tool export
-   ".
+   when using "``bitbake-prserv-tool export``".
 
 .. _ref-classes-primport:
 
@@ -2083,9 +2061,7 @@ The ``primport`` class provides functionality for importing
 .. note::
 
    This class is not intended to be used directly. Rather, it is enabled
-   when using "
-   bitbake-prserv-tool import
-   ".
+   when using "``bitbake-prserv-tool import``".
 
 .. _ref-classes-prserv:
 
@@ -2204,9 +2180,7 @@ override the removal by setting ``REMOVE_LIBTOOL_LA`` to "0" as follows:
 
 .. note::
 
-   The
-   remove-libtool
-   class is not enabled by default.
+   The ``remove-libtool`` class is not enabled by default.
 
 .. _ref-classes-report-error:
 
@@ -2283,7 +2257,7 @@ The root filesystem is created from packages using one of the
 :term:`PACKAGE_CLASSES` variable.
 
 For information on how root filesystem images are created, see the
-:ref:`image-generation-dev-environment`"
+":ref:`image-generation-dev-environment`"
 section in the Yocto Project Overview and Concepts Manual.
 
 .. _ref-classes-sanity:
@@ -2380,19 +2354,6 @@ Autotools automatically picks up.
 The class also provides variables like ``SITEINFO_ENDIANNESS`` and
 ``SITEINFO_BITS`` that can be used elsewhere in the metadata.
 
-.. _ref-classes-spdx:
-
-``spdx.bbclass``
-================
-
-The ``spdx`` class integrates real-time license scanning, generation of
-SPDX standard output, and verification of license information during the
-build.
-
-.. note::
-
-   This class is currently at the prototype stage in the 1.6 release.
-
 .. _ref-classes-sstate:
 
 ``sstate.bbclass``
@@ -2442,13 +2403,12 @@ stages:
    .. note::
 
       Additionally, a recipe can customize the files further by
-      declaring a processing function in the
-      SYSROOT_PREPROCESS_FUNCS
+      declaring a processing function in the ``SYSROOT_PREPROCESS_FUNCS``
       variable.
 
    A shared state (sstate) object is built from these files and the
    files are placed into a subdirectory of
-   ```tmp/sysroots-components/`` <#structure-build-tmp-sysroots-components>`__.
+   :ref:`structure-build-tmp-sysroots-components`.
    The files are scanned for hardcoded paths to the original
    installation location. If the location is found in text files, the
    hardcoded locations are replaced by tokens and a list of the files
@@ -2597,13 +2557,8 @@ internal class and is not intended to be used directly.
 
 .. note::
 
-   The
-   systemd-boot
-   class is a result from merging the
-   gummiboot
-   class used in previous Yocto Project releases with the
-   systemd
-   project.
+   The ``systemd-boot`` class is a result from merging the ``gummiboot`` class
+   used in previous Yocto Project releases with the ``systemd`` project.
 
 Set the :term:`EFI_PROVIDER` variable to
 "systemd-boot" to use this class. Doing so creates a standalone EFI
@@ -2647,13 +2602,9 @@ steps to set up the environment.
 
 .. note::
 
-   Best practices include using
-   IMAGE_CLASSES
-   rather than
-   INHERIT
-   to inherit the
-   testimage
-   class for automated image testing.
+   Best practices include using :term:`IMAGE_CLASSES` rather than
+   :term:`INHERIT` to inherit the ``testimage`` class for automated image
+   testing.
 
 The tests are commands that run on the target system over ``ssh``. Each
 test is written in Python and makes use of the ``unittest`` module.
@@ -2686,13 +2637,9 @@ using the following:
 
 .. note::
 
-   Best practices include using
-   IMAGE_CLASSES
-   rather than
-   INHERIT
-   to inherit the
-   testsdk
-   class for automated SDK testing.
+   Best practices include using :term:`IMAGE_CLASSES` rather than
+   :term:`INHERIT` to inherit the ``testsdk`` class for automated SDK
+   testing.
 
 .. _ref-classes-texinfo:
 
@@ -2709,23 +2656,8 @@ host system.
 .. note::
 
    If you want to use the Texinfo recipe shipped with the build system,
-   you can remove "texinfo-native" from
-   ASSUME_PROVIDED
-   and makeinfo from
-   SANITY_REQUIRED_UTILITIES
-   .
-
-.. _ref-classes-tinderclient:
-
-``tinderclient.bbclass``
-========================
-
-The ``tinderclient`` class submits build results to an external
-Tinderbox instance.
-
-.. note::
-
-   This class is currently unmaintained.
+   you can remove "texinfo-native" from :term:`ASSUME_PROVIDED` and makeinfo
+   from :term:`SANITY_REQUIRED_UTILITIES`.
 
 .. _ref-classes-toaster:
 
@@ -2836,10 +2768,8 @@ file.
 
 .. note::
 
-   You can use the
-   update-alternatives
-   command directly in your recipes. However, this class simplifies
-   things in most cases.
+   You can use the ``update-alternatives`` command directly in your recipes.
+   However, this class simplifies things in most cases.
 
 .. _ref-classes-update-rc.d:
 
@@ -2905,18 +2835,10 @@ additional information.
 
 .. note::
 
-   You do not use the
-   useradd-staticids
-   class directly. You either enable or disable the class by setting the
-   USERADDEXTENSION
-   variable. If you enable or disable the class in a configured system,
-   TMPDIR
-   might contain incorrect
-   uid
-   and
-   gid
-   values. Deleting the
-   TMPDIR
+   You do not use the ``useradd-staticids`` class directly. You either enable
+   or disable the class by setting the ``USERADDEXTENSION`` variable. If you
+   enable or disable the class in a configured system, :term:`TMPDIR` might
+   contain incorrect ``uid`` and ``gid`` values. Deleting the ``TMPDIR``
    directory will correct this condition.
 
 .. _ref-classes-utility-tasks:

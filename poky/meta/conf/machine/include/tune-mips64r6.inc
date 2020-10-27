@@ -24,7 +24,7 @@ AVAILTUNES += "mipsisa64r6-nf mipsisa64r6el-nf"
 TUNE_FEATURES_tune-mipsisa64r6-nf = "bigendian r6 n64 mipsisa64r6"
 MIPSPKGSFX_VARIANT_tune-mipsisa64r6-nf = "${TUNE_ARCH}"
 BASE_LIB_tune-mipsisa64r6-nf = "lib64"
-PACKAGE_EXTRA_ARCHS_tune-mipsisa64r6-nf = "mipsisa64r6"
+PACKAGE_EXTRA_ARCHS_tune-mipsisa64r6-nf = "mipsisa64r6-nf"
 
 TUNE_FEATURES_tune-mipsisa64r6el-nf = "r6 n64 mipsisa64r6"
 MIPSPKGSFX_VARIANT_tune-mipsisa64r6el-nf = "${TUNE_ARCH}"

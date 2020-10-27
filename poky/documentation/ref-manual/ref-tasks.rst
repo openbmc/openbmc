@@ -87,33 +87,30 @@ output from ``${DEPLOYDIR}`` to ``${DEPLOY_DIR_IMAGE}``.
 
 .. note::
 
-   Do not write the output directly to
-   ${DEPLOY_DIR_IMAGE}
-   , as this causes the sstate mechanism to malfunction.
+   Do not write the output directly to ``${DEPLOY_DIR_IMAGE}``, as this causes
+   the sstate mechanism to malfunction.
 
 The ``do_deploy`` task is not added as a task by default and
 consequently needs to be added manually. If you want the task to run
 after :ref:`ref-tasks-compile`, you can add it by doing
-the following: addtask deploy after do_compile Adding ``do_deploy``
-after other tasks works the same way.
+the following:
+::
+
+      addtask deploy after do_compile
+
+Adding ``do_deploy`` after other tasks works the same way.
 
 .. note::
 
-   You do not need to add
-   before do_build
-   to the
-   addtask
-   command (though it is harmless), because the
-   base
-   class contains the following:
+   You do not need to add ``before do_build`` to the ``addtask`` command
+   (though it is harmless), because the ``base`` class contains the following:
    ::
 
            do_build[recrdeptask] += "do_deploy"
 
 
-   See the "
-   Dependencies
-   " section in the BitBake User Manual for more information.
+   See the ":ref:`bitbake-user-manual/bitbake-user-manual-execution:dependencies`"
+   section in the BitBake User Manual for more information.
 
 If the ``do_deploy`` task re-executes, any previous output is removed
 (i.e. "cleaned").
@@ -298,10 +295,8 @@ to locate and apply patch files to the source code.
 
 .. note::
 
-   The build system uses the
-   FILESPATH
-   variable to determine the default set of directories when searching
-   for patches.
+   The build system uses the :term:`FILESPATH` variable to determine the
+   default set of directories when searching for patches.
 
 Patch files, by default, are ``*.patch`` and ``*.diff`` files created
 and kept in a subdirectory of the directory holding the recipe file. For
@@ -322,13 +317,8 @@ and patch files needed to build the package.
 
 .. note::
 
-   In the case for the
-   bluez5_5.48.bb
-   recipe, the
-   SRC_URI
-   statements are from an include file
-   bluez5.inc
-   .
+   In the case for the ``bluez5_5.48.bb`` recipe, the ``SRC_URI`` statements
+   are from an include file ``bluez5.inc``.
 
 As mentioned earlier, the build system treats files whose file types are
 ``.patch`` and ``.diff`` as patch files. However, you can use the
@@ -336,9 +326,9 @@ As mentioned earlier, the build system treats files whose file types are
 file as a patch file:
 ::
 
-   SRC_URI = " \\
-       git://path_to_repo/some_package \\
-       file://file;apply=yes \\
+   SRC_URI = " \
+       git://path_to_repo/some_package \
+       file://file;apply=yes \
        "
 
 Conversely, if you have a directory full of patch files and you want to
@@ -356,7 +346,7 @@ the patch phase, you can use the "apply=no" parameter with the
 In the
 previous example, assuming all the files in the directory holding the
 patch files end with either ``.patch`` or ``.diff``, every file would be
-applied as a patch by default except for the patch_file5 patch.
+applied as a patch by default except for the ``patch_file5`` patch.
 
 You can find out more about the patching process in the
 ":ref:`patching-dev-environment`" section in
@@ -547,7 +537,7 @@ Removes all output files and shared state
 (:ref:`sstate <overview-manual/overview-manual-concepts:shared state cache>`) cache for a
 target. Essentially, the ``do_cleansstate`` task is identical to the
 :ref:`ref-tasks-clean` task with the added removal of
-shared state (`:ref:`sstate <overview-manual/overview-manual-concepts:shared state cache>`)
+shared state (:ref:`sstate <overview-manual/overview-manual-concepts:shared state cache>`)
 cache.
 
 You can run this task using BitBake as follows:
@@ -561,11 +551,9 @@ scratch is guaranteed.
 
 .. note::
 
-   The
-   do_cleansstate
-   task cannot remove sstate from a remote sstate mirror. If you need to
-   build a target from scratch using remote mirrors, use the "-f" option
-   as follows:
+   The ``do_cleansstate`` task cannot remove sstate from a remote sstate
+   mirror. If you need to build a target from scratch using remote mirrors, use
+   the "-f" option as follows:
    ::
 
       $ bitbake -f -c do_cleansstate target
@@ -605,18 +593,13 @@ Lists all defined tasks for a target.
 ``do_package_index``
 --------------------
 
-Creates or updates the index in the `:ref:`package-feeds-dev-environment` area.
+Creates or updates the index in the :ref:`package-feeds-dev-environment` area.
 
 .. note::
 
-   This task is not triggered with the
-   bitbake -c
-   command-line option as are the other tasks in this section. Because
-   this task is specifically for the
-   package-index
-   recipe, you run it using
-   bitbake package-index
-   .
+   This task is not triggered with the ``bitbake -c`` command-line option as
+   are the other tasks in this section. Because this task is specifically for
+   the ``package-index`` recipe, you run it using ``bitbake package-index``.
 
 Image-Related Tasks
 ===================
@@ -859,17 +842,3 @@ sure that the machine and metadata branches as specified by the
 branches. If these branches do not exist and
 :term:`AUTOREV` is not being used, the
 ``do_validate_branches`` task fails during the build.
-
-Miscellaneous Tasks
-===================
-
-The following sections describe miscellaneous tasks.
-
-.. _ref-tasks-spdx:
-
-``do_spdx``
------------
-
-A build stage that takes the source code and scans it on a remote
-FOSSOLOGY server in order to produce an SPDX document. This task applies
-only to the :ref:`spdx <ref-classes-spdx>` class.

@@ -181,7 +181,7 @@ to be changed as a result.
 
 An example of the new scheme: ::
 
-   SRC_URI = "npm://registry.npmjs.org;package=array-flatten;version=1.1.1 \\
+   SRC_URI = "npm://registry.npmjs.org;package=array-flatten;version=1.1.1 \
               npmsw://${THISDIR}/npm-shrinkwrap.json"
 
 Another example where the sources are fetched from git rather than an npm repository: ::

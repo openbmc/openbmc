@@ -76,9 +76,7 @@ Consider the following:
 .. note::
 
    You can find more information on how recipe-specific sysroots work in
-   the "
-   staging.bbclass
-   " section.
+   the ":ref:`ref-classes-staging`" section.
 
 .. _migration-2.3-path-variable:
 
@@ -104,9 +102,8 @@ value.
 .. note::
 
    PATH
-   is not sanitized in the same way within
-   devshell
-   . If it were, you would have difficulty running host tools for
+   is not sanitized in the same way within ``devshell``.
+   If it were, you would have difficulty running host tools for
    development and debugging within the shell.
 
 .. _migration-2.3-scripts:
@@ -123,7 +120,7 @@ The following changes to scripts took place:
       $ . oe-find-native-sysroot recipe
 
    You must now supply a recipe for recipe
-   as part of the command. Prior to the Yocto Project &DISTRO; release, it
+   as part of the command. Prior to the Yocto Project 2.3 release, it
    was not necessary to provide the script with the command.
 
 -  ``oe-run-native``: The usage for the ``oe-run-native`` script has
@@ -134,7 +131,7 @@ The following changes to scripts took place:
 
    You must
    supply the name of the native recipe and the tool you want to run as
-   part of the command. Prior to the Yocto Project DISTRO release, it
+   part of the command. Prior to the Yocto Project 2.3 release, it
    was not necessary to provide the native recipe with the command.
 
 -  ``cleanup-workdir``: The ``cleanup-workdir`` script has been
@@ -240,10 +237,8 @@ to substitute a GPLv2 version of a GPLv3 recipe, then you must add the
 
 .. note::
 
-   You can find
-   meta-gplv2
-   layer in the OpenEmbedded layer index at
-   .
+   You can ``find meta-gplv2`` layer in the OpenEmbedded layer index at
+   https://layers.openembedded.org/layerindex/branch/master/layer/meta-gplv2/.
 
 These relocated GPLv2 recipes do not receive the same level of
 maintenance as other core recipes. The recipes do not get security fixes
@@ -316,8 +311,7 @@ The following package management changes took place:
 
 -  Signing of remote package feeds using ``PACKAGE_FEED_SIGN`` is not
    currently supported. This issue will be fully addressed in a future
-   Yocto Project release. See `defect
-   11209 <https://bugzilla.yoctoproject.org/show_bug.cgi?id=11209>`__
+   Yocto Project release. See :yocto_bugs:`defect 11209 </show_bug.cgi?id=11209>`
    for more information on a solution to package feed signing with RPM
    in the Yocto Project 2.3 release.
 
@@ -329,8 +323,7 @@ The following package management changes took place:
    .. note::
 
       For further details on this change, see the
-      commit message
-      .
+      :yocto_git:`commit message </cgit/cgit.cgi/poky/commit/?id=f4d4f99cfbc2396e49c1613a7d237b9e57f06f81>`.
 
 .. _migration-2.3-removed-recipes:
 
@@ -372,9 +365,9 @@ The following changes have been made to Wic:
 
 .. note::
 
-   For more information on Wic, see the "
-   Creating Partitioned Images Using Wic
-   " section in the Yocto Project Development Tasks Manual.
+   For more information on Wic, see the
+   ":ref:`dev-manual/dev-manual-common-tasks:creating partitioned images using wic`"
+   section in the Yocto Project Development Tasks Manual.
 
 -  *Default Output Directory Changed:* Wic's default output directory is
    now the current directory by default instead of the unusual
@@ -410,8 +403,8 @@ The following QA checks have changed:
    warning, you need to address missing runtime dependencies.
 
    For additional information, see the
-   :ref:`insane <ref-classes-insane>` class and the "`Errors and
-   Warnings <#qa-errors-and-warnings>`__" section.
+   :ref:`insane <ref-classes-insane>` class and the
+   ":ref:`ref-manual/ref-qa-checks:errors and warnings`" section.
 
 .. _migration-2.3-miscellaneous-changes:
 
@@ -488,7 +481,7 @@ The following miscellaneous changes have occurred:
    following:
    ::
 
-      KERNEL_MODULE_PACKAGE_SUFFIX to ""
+      KERNEL_MODULE_PACKAGE_SUFFIX = ""
 
 -  Removal of ``libtool`` ``*.la`` files is now enabled by default. The
    ``*.la`` files are not actually needed on Linux and relocating them

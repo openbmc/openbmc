@@ -55,6 +55,8 @@ class Rootfs(object, metaclass=ABCMeta):
         excludes = [ 'log_check', r'^\+' ]
         if hasattr(self, 'log_check_expected_regexes'):
             excludes.extend(self.log_check_expected_regexes)
+        # Insert custom log_check excludes
+        excludes += [x for x in (self.d.getVar("IMAGE_LOG_CHECK_EXCLUDES") or "").split(" ") if x]
         excludes = [re.compile(x) for x in excludes]
         r = re.compile(match)
         log_path = self.d.expand("${T}/log.do_rootfs")

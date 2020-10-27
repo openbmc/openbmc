@@ -7,6 +7,8 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=e4224ccaecb14d942c71d31bef20d78c"
 SRC_URI = "git://github.com/boostorg/build;protocol=https"
 SRCREV = "632ea768f3eb225b4472c5ed6d20afee708724ad"
 
+UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>(\d+(\.\d+){2,}))"
+
 inherit native
 
 S = "${WORKDIR}/git"

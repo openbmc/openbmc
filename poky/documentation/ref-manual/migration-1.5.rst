@@ -25,8 +25,8 @@ If the Linux distribution you are using on your build host does not
 provide packages for these, you can install and use the Buildtools
 tarball, which provides an SDK-like environment containing them.
 
-For more information on this requirement, see the "`Required Git, tar,
-Python and gcc Versions <#required-git-tar-python-and-gcc-versions>`__"
+For more information on this requirement, see the
+":ref:`ref-manual/ref-system-requirements:required git, tar, python and gcc versions`"
 section.
 
 .. _migration-1.5-atom-pc-bsp:
@@ -41,9 +41,8 @@ all x86 hardware, but it will run on a wider range of systems than the
 
 .. note::
 
-   Additionally, a
-   genericx86-64
-   BSP has been added for 64-bit Atom systems.
+   Additionally, a ``genericx86-64`` BSP has been added for 64-bit Atom
+   systems.
 
 .. _migration-1.5-bitbake:
 
@@ -96,7 +95,7 @@ The following changes have been made to the package QA checks:
    this file within :ref:`ref-tasks-install` if "make
    install" is installing it.
 
--  If you are using the buildhistory class, the check for the package
+-  If you are using the ``buildhistory`` class, the check for the package
    version going backwards is now controlled using a standard QA check.
    Thus, if you have customized your ``ERROR_QA`` or ``WARN_QA`` values
    and still wish to have this check performed, you should add
@@ -299,7 +298,7 @@ Removed and Renamed Recipes
 -  ``libtool-nativesdk`` has been renamed to ``nativesdk-libtool``.
 
 -  ``tinylogin`` has been removed. It has been replaced by a suid
-   portion of Busybox. See the "`BusyBox <#migration-1.5-busybox>`__"
+   portion of Busybox. See the "`BusyBox <#busybox>`__"
    section for more information.
 
 -  ``external-python-tarball`` has been renamed to
@@ -345,8 +344,7 @@ Following is a list of short entries describing other changes:
 -  ``libpam``: Deny all services for the ``OTHER`` entries.
 
 -  ``image.bbclass``: Move ``runtime_mapping_rename`` to avoid conflict
-   with ``multilib``. See
-   `YOCTO #4993 <https://bugzilla.yoctoproject.org/show_bug.cgi?id=4993>`_
+   with ``multilib``. See :yocto_bugs:`YOCTO #4993 </show_bug.cgi?id=4993>`
    in Bugzilla for more information.
 
 -  ``linux-dtb``: Use kernel build system to generate the ``dtb`` files.

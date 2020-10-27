@@ -65,27 +65,27 @@ and announcements. To subscribe to one of the following mailing lists,
 click on the appropriate URL in the following list and follow the
 instructions:
 
--  https://lists.yoctoproject.org/g/yocto - General Yocto Project
+-  :yocto_lists:`/g/yocto` - General Yocto Project
    discussion mailing list.
 
--  https://lists.openembedded.org/g/openembedded-core - Discussion mailing
+-  :oe_lists:`/g/openembedded-core` - Discussion mailing
    list about OpenEmbedded-Core (the core metadata).
 
--  https://lists.openembedded.org/g/openembedded-devel - Discussion
+-  :oe_lists:`/g/openembedded-devel` - Discussion
    mailing list about OpenEmbedded.
 
--  https://lists.openembedded.org/g/bitbake-devel - Discussion mailing
+-  :oe_lists:`/g/bitbake-devel` - Discussion mailing
    list about the :term:`BitBake` build tool.
 
--  https://lists.yoctoproject.org/g/poky - Discussion mailing list
-   about `Poky <#poky>`__.
+-  :yocto_lists:`/g/poky` - Discussion mailing list
+   about :term:`Poky`.
 
--  https://lists.yoctoproject.org/g/yocto-announce - Mailing list to
+-  :yocto_lists:`/g/yocto-announce` - Mailing list to
    receive official Yocto Project release and milestone announcements.
 
 For more Yocto Project-related mailing lists, see the
-Yocto Project Website
-.
+:yocto_home:`Yocto Project Website <>`.
+
 .. _resources-irc:
 
 Internet Relay Chat (IRC)
@@ -113,12 +113,12 @@ Here is a list of resources you might find helpful:
    planning, release engineering, QA & automation, a reference site map,
    and other resources related to the Yocto Project.
 
--  `OpenEmbedded <http://www.openembedded.org/>`__\ *:* The build system used by the
+-  :oe_home:`OpenEmbedded <>`\ *:* The build system used by the
    Yocto Project. This project is the upstream, generic, embedded
    distribution from which the Yocto Project derives its build system
    (Poky) and to which it contributes.
 
--  `BitBake <http://www.openembedded.org/wiki/BitBake>`__\ *:* The tool
+-  :oe_home:`BitBake </wiki/BitBake>`\ *:* The tool
    used to process metadata.
 
 -  :doc:`BitBake User Manual <bitbake:index>`\ *:* A comprehensive
@@ -155,7 +155,7 @@ Here is a list of resources you might find helpful:
    manual provides reference material such as variable, task, and class
    descriptions.
 
--  `Yocto Project Mega-Manual <https://docs.yoctoproject.org/singleindex.html>`__\ *:* This manual
+-  :yocto_docs:`Yocto Project Mega-Manual </singleindex.html>`\ *:* This manual
    is simply a single HTML file comprised of the bulk of the Yocto
    Project manuals. The Mega-Manual primarily exists as a vehicle by
    which you can easily search for phrases and terms used in the Yocto
@@ -180,7 +180,7 @@ Here is a list of resources you might find helpful:
    the Yocto Project website and click on the "RELEASE INFORMATION" link
    for the appropriate release.
 
--  `Bugzilla <https://bugzilla.yoctoproject.org>`__\ *:* The bug tracking application
+-  :yocto_bugs:`Bugzilla <>`\ *:* The bug tracking application
    the Yocto Project uses. If you find problems with the Yocto Project,
    you should report them using this application.
 

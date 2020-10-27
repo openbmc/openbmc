@@ -1,4 +1,4 @@
-inherit meta image-postinst-intercepts
+inherit meta image-postinst-intercepts image-artifact-names
 
 # Wildcards specifying complementary packages to install for every package that has been explicitly
 # installed into the rootfs

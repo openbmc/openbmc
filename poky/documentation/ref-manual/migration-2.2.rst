@@ -16,8 +16,7 @@ the minimum kernel version is 3.19.
 
 .. note::
 
-   For x86 and x86_64, you can reset
-   OLDEST_KERNEL
+   For x86 and x86_64, you can reset :term:`OLDEST_KERNEL`
    to anything down to 2.6.32 if desired.
 
 .. _migration-2.2-staging-directories-in-sysroot-simplified:
@@ -79,7 +78,9 @@ particular areas of interest:
 
   - the syntax for octal values changed
 
-  - the ``iter*()`` functions changed name \* iterators now return views, not lists
+  - the ``iter*()`` functions changed name
+
+  - iterators now return views, not lists
 
   - changed names for Python modules
 
@@ -224,9 +225,7 @@ follows and run ``runqemu``:
 
 .. note::
 
-   For command-line syntax, use
-   runqemu help
-   .
+   For command-line syntax, use ``runqemu help``.
 
 ::
 
@@ -369,7 +368,7 @@ The following recipes have been removed:
 -  ``sato-icon-theme``: Became obsolete.
 
 -  ``swabber-native``: Swabber has been removed. See the `entry on
-   Swabber <#migration-2.2-swabber-has-been-removed>`__.
+   Swabber <#swabber-has-been-removed>`__.
 
 -  ``tslib``: No longer needed and has been moved to ``meta-oe``.
 
@@ -395,7 +394,7 @@ The following classes have been removed:
 -  ``sip``: Mostly unused.
 
 -  ``swabber``: See the `entry on
-   Swabber <#migration-2.2-swabber-has-been-removed>`__.
+   Swabber <#swabber-has-been-removed>`__.
 
 .. _migration-2.2-minor-packaging-changes:
 

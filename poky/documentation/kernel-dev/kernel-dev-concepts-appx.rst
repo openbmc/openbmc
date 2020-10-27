@@ -11,7 +11,7 @@ Yocto Project Kernel Development and Maintenance
 
 Kernels available through the Yocto Project (Yocto Linux kernels), like
 other kernels, are based off the Linux kernel releases from
-http://www.kernel.org. At the beginning of a major Linux kernel
+https://www.kernel.org. At the beginning of a major Linux kernel
 development cycle, the Yocto Project team chooses a Linux kernel based
 on factors such as release timing, the anticipated release timing of
 final upstream ``kernel.org`` versions, and Yocto Project feature
@@ -119,7 +119,7 @@ upstream Linux kernel development and are managed by the Yocto Project
 team's Yocto Linux kernel development strategy. It is the Yocto Project
 team's policy to not back-port minor features to the released Yocto
 Linux kernel. They only consider back-porting significant technological
-jumps DASH and, that is done after a complete gap analysis. The reason
+jumps - and, that is done after a complete gap analysis. The reason
 for this policy is that back-porting any small to medium sized change
 from an evolving Linux kernel can easily create mismatches,
 incompatibilities and very subtle errors.
@@ -129,7 +129,7 @@ cutting edge Yocto Linux kernel that mixes forward ports of existing
 Linux kernel features and significant and critical new functionality.
 Forward porting Linux kernel functionality into the Yocto Linux kernels
 available through the Yocto Project can be thought of as a "micro
-uprev." The many "micro uprevs" produce a Yocto Linux kernel version
+uprev". The many "micro uprevs" produce a Yocto Linux kernel version
 with a mix of important new mainline, non-mainline, BSP developments and
 feature integrations. This Yocto Linux kernel gives insight into new
 features and allows focused amounts of testing to be done on the kernel,
@@ -160,9 +160,8 @@ implemented by the Yocto Project team using the Source Code Manager
       but, Git continues to grow in popularity and supports many
       different work flows, front-ends and management techniques.
 
-   -  You can find documentation on Git at
-      http://git-scm.com/documentation. You can also get an
-      introduction to Git as it applies to the Yocto Project in the
+   -  You can find documentation on Git at https://git-scm.com/doc. You can
+      also get an introduction to Git as it applies to the Yocto Project in the
       ":ref:`overview-manual/overview-manual-development-environment:git`" section in the Yocto Project
       Overview and Concepts Manual. The latter reference provides an
       overview of Git and presents a minimal set of Git commands that
@@ -260,8 +259,8 @@ Yocto Linux kernel needed for any given set of requirements.
    Keep in mind the figure does not take into account all the supported
    Yocto Linux kernels, but rather shows a single generic kernel just
    for conceptual purposes. Also keep in mind that this structure
-   represents the Yocto Project
-   Source Repositories
+   represents the
+   :ref:`overview-manual/overview-manual-development-environment:yocto project source repositories`
    that are either pulled from during the build or established on the
    host development system prior to the build by either cloning a
    particular kernel's Git repository or by downloading and unpacking a

@@ -42,7 +42,11 @@ section.
 
 Once you have cloned the kernel Git repository and the cache of Metadata
 on your local machine, you can discover the branches that are available
-in the repository using the following Git command: $ git branch -a
+in the repository using the following Git command:
+::
+
+   $ git branch -a
+
 Checking out a branch allows you to work with a particular Yocto Linux
 kernel. For example, the following commands check out the
 "standard/beagleboard" branch of the Yocto Linux kernel repository and
@@ -56,10 +60,8 @@ the "yocto-4.12" branch of the ``yocto-kernel-cache`` repository:
 
 .. note::
 
-   Branches in the
-   yocto-kernel-cache
-   repository correspond to Yocto Linux kernel versions (e.g.
-   "yocto-4.12", "yocto-4.10", "yocto-4.9", and so forth).
+   Branches in the ``yocto-kernel-cache`` repository correspond to Yocto Linux
+   kernel versions (e.g. "yocto-4.12", "yocto-4.10", "yocto-4.9", and so forth).
 
 Once you have checked out and switched to appropriate branches, you can
 see a snapshot of all the kernel source files used to used to build that
@@ -105,7 +107,7 @@ patch, or BSP:
       repository organized under the "Yocto Linux Kernel" heading in the
       :yocto_git:`Yocto Project Source Repositories <>`.
 
-   -  Areas pointed to by ``SRC_URI`` statements found in kernel recipes
+   -  Areas pointed to by ``SRC_URI`` statements found in kernel recipes.
 
    For a typical build, the target of the search is a feature
    description in an ``.scc`` file whose name follows this format (e.g.
@@ -194,12 +196,10 @@ the build process before compilation starts:
    .. note::
 
       In the previous example, the "yocto-4.12" branch is checked out in
-      the
-      yocto-kernel-cache
-      repository.
+      the ``yocto-kernel-cache`` repository.
 
 The OpenEmbedded build system makes sure these conditions exist before
-attempting compilation. Other means, however, do exist, such as as
+attempting compilation. Other means, however, do exist, such as
 bootstrapping a BSP.
 
 Before building a kernel, the build process verifies the tree and

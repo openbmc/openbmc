@@ -64,7 +64,7 @@ codename are likely to be compatible and thus work together.
 Releases are given a nominal release version as well but the codename is
 used in repositories for this reason. You can find information on Yocto
 Project releases and codenames at
-https://wiki.yoctoproject.org/wiki/Releases.
+:yocto_wiki:`/wiki/Releases`.
 
 Stable Release Process
 ======================
@@ -94,7 +94,7 @@ Community LTS trees and branches exist where community members share
 patches for older releases. However, these types of patches do not go
 through the same release process as do point releases. You can find more
 information about stable branch maintenance at
-https://wiki.yoctoproject.org/wiki/Stable_branch_maintenance.
+:yocto_wiki:`/wiki/Stable_branch_maintenance`.
 
 Testing and Quality Assurance
 =============================
@@ -145,18 +145,16 @@ consists of the following pieces:
 
    .. note::
 
-      Running
-      oe-selftest
-      requires host packages beyond the "Essential" grouping. See the "
-      Required Packages for the Build Host
-      " section for more information.
+      Running ``oe-selftest`` requires host packages beyond the "Essential"
+      grouping. See the :ref:`ref-manual/ref-system-requirements:required packages for the build host`
+      section for more information.
 
 Originally, much of this testing was done manually. However, significant
 effort has been made to automate the tests so that more people can use
 them and the Yocto Project development team can run them faster and more
 efficiently.
 
-The Yocto Project's main Autobuilder (https://autobuilder.yoctoproject.org/)
+The Yocto Project's main Autobuilder (&YOCTO_AB_URL;)
 publicly tests each Yocto Project release's code in the
 :term:`OpenEmbedded-Core (OE-Core)`, Poky, and BitBake repositories. The testing
 occurs for both the current state of the "master" branch and also for

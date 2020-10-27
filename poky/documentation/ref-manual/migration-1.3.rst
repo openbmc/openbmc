@@ -121,11 +121,11 @@ further details.
 IMAGE_FEATURES
 ~~~~~~~~~~~~~~
 
-Image recipes that previously included "apps-console-core" in
-:term:`IMAGE_FEATURES` should now include "splash"
+Image recipes that previously included ``apps-console-core`` in
+:term:`IMAGE_FEATURES` should now include ``splash``
 instead to enable the boot-up splash screen. Retaining
-"apps-console-core" will still include the splash screen but generates a
-warning. The "apps-x11-core" and "apps-x11-games" ``IMAGE_FEATURES``
+``apps-console-core`` will still include the splash screen but generates a
+warning. The ``apps-x11-core`` and ``apps-x11-games`` ``IMAGE_FEATURES``
 features have been removed.
 
 .. _migration-1.3-removed-recipes:
@@ -173,7 +173,7 @@ the OpenEmbedded community layers such as ``meta-oe`` and
 ``meta-gnome``. For the remainder, you can now find them in the
 ``meta-extras`` repository, which is in the
 :yocto_git:`Source Repositories <>` at
-http://git.yoctoproject.org/cgit/cgit.cgi/meta-extras/.
+:yocto_git:`/cgit/cgit.cgi/meta-extras/`.
 
 .. _1.3-linux-kernel-naming:
 

@@ -12,7 +12,7 @@ BitBake
 Differences include the following:
 
 -  *Comment Continuation:* If a comment ends with a line continuation
-   (\) character, then the next line must also be a comment. Any
+   (\\) character, then the next line must also be a comment. Any
    instance where this is not the case, now triggers a warning. You must
    either remove the continuation character, or be sure the next line is
    a comment.
@@ -61,7 +61,7 @@ Differences include the following:
    the :term:`MACHINEOVERRIDES` or
    :term:`DISTROOVERRIDES` variables, as
    appropriate. For more related changes, see the
-   "`Variables <#migration-1.4-variables>`__" section.
+   ":ref:`ref-manual/migration-1.4:variables`" section.
 
 .. _migration-1.4-proxies-and-fetching-source:
 
@@ -124,8 +124,8 @@ The following variables have changed:
    :term:`SRC_URI`. If you have a recipe that relied upon
    these directories, which would be unusual, then you will need to add
    the appropriate paths within the recipe or, alternatively, rearrange
-   the files. The most common locations are still covered by ``${BP}``,
-   ``${BPN}``, and "files", which all remain in the default value of
+   the files. The most common locations are still covered by ``${``\ :term:`BP`\ ``}``,
+   ``${``\ :term:`BPN`\ ``}``, and "files", which all remain in the default value of
    :term:`FILESPATH`.
 
 .. _migration-target-package-management-with-rpm:

@@ -55,15 +55,14 @@ must also provide one of the ``--ondrive``, ``--ondisk``, or
 .. note::
 
    The mount program must understand the PARTUUID syntax you use with
-   --use-uuid
-   and non-root
-   mountpoint
-   , including swap. The busybox versions of these application are
-   currently excluded.
+   ``--use-uuid`` and non-root *mountpoint*, including swap. The busybox
+   versions of these application are currently excluded.
 
 Here is an example that uses "/" as the mountpoint. The command uses
-``--ondisk`` to force the partition onto the ``sdb`` disk: part /
---source rootfs --ondisk sdb --fstype=ext3 --label platform --align 1024
+``--ondisk`` to force the partition onto the ``sdb`` disk:
+::
+
+      part / --source rootfs --ondisk sdb --fstype=ext3 --label platform --align 1024
 
 Here is a list that describes other supported options you can use with
 the ``part`` and ``partition`` commands:
@@ -134,6 +133,11 @@ the ``part`` and ``partition`` commands:
 
 -  ``--align (in KBytes)``: This option is a Wic-specific option that
    says to start partitions on boundaries given x KBytes.
+
+-  ``--offset (in KBytes)``: This option is a Wic-specific option that
+   says to place a partition at exactly the specified offset. If the
+   partition cannot be placed at the specified offset, the image build
+   will fail.
 
 -  ``--no-table``: This option is a Wic-specific option. Using the
    option reserves space for the partition and causes it to become

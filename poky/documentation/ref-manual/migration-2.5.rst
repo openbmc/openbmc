@@ -179,8 +179,8 @@ or ::
 
 The earlier build-time provides behavior was a quirk of the
 way the Python manifest file was created. For more information on this
-change please see `this
-commit <http://git.yoctoproject.org/cgit/cgit.cgi/poky/commit/?id=8d94b9db221d1def42f091b991903faa2d1651ce>`__.
+change please see :yocto_git:`this commit
+</cgit/cgit.cgi/poky/commit/?id=8d94b9db221d1def42f091b991903faa2d1651ce>`.
 
 .. _migration-2.5-miscellaneous-changes:
 

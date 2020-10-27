@@ -31,9 +31,9 @@ version required on the
 build host is now 1.7.8 because the ``--list`` option is now required by
 BitBake's Git fetcher. As always, if your host distribution does not
 provide a version of Git that meets this requirement, you can use the
-``buildtools-tarball`` that does. See the "`Required Git, tar, Python
-and gcc Versions <#required-git-tar-python-and-gcc-versions>`__" section
-for more information.
+``buildtools-tarball`` that does. See the
+":ref:`ref-manual/ref-system-requirements:required git, tar, python and gcc versions`"
+section for more information.
 
 .. _migration-1.7-autotools-class-changes:
 
@@ -157,7 +157,7 @@ The following changes have occurred to the QA check process:
    added in order to verify that file dependencies are satisfied (e.g.
    package contains a script requiring ``/bin/bash``) and build-time
    dependencies are declared, respectively. For more information, please
-   see the "`QA Error and Warning Messages <#ref-qa-checks>`__" chapter.
+   see the ":doc:`ref-qa-checks`" chapter.
 
 -  Package QA checks are now performed during a new
    :ref:`ref-tasks-package_qa` task rather than being
@@ -202,9 +202,7 @@ The following recipes have been removed:
    for version 3.17 has been added.
 
 -  ``eglibc`` has been removed in favor of ``glibc``. See the
-   "```eglibc 2.19`` Replaced with
-   ``glibc 2.20`` <#migration-1.7-glibc-replaces-eglibc>`__" section for
-   more information.
+   ":ref:`migration-1.7-glibc-replaces-eglibc`" section for more information.
 
 .. _migration-1.7-miscellaneous-changes:
 

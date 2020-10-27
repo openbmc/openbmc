@@ -164,7 +164,7 @@ Cloning repositories from scratch each time they are required was slow
 on the Autobuilder. We therefore have a stash of commonly used
 repositories pre-cloned on the Workers. Data is fetched from these
 during clones first, then "topped up" with later revisions from any
-upstream when necesary. The cache is maintained by the Autobuilder
+upstream when necessary. The cache is maintained by the Autobuilder
 Worker Janitor. See :ref:`test-manual/test-manual-understand-autobuilder:Autobuilder Worker Janitor`.
 
 .. _test-autobuilder-worker-janitor:

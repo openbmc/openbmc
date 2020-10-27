@@ -692,7 +692,7 @@ def main(server, eventHandler, params, tf = TerminalFilter):
                 if not parseprogress:
                     continue
                 parseprogress.finish()
-                pasreprogress = None
+                parseprogress = None
                 if params.options.quiet == 0:
                     print(("Parsing of %d .bb files complete (%d cached, %d parsed). %d targets, %d skipped, %d masked, %d errors."
                         % ( event.total, event.cached, event.parsed, event.virtuals, event.skipped, event.masked, event.errors)))

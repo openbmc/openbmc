@@ -1,0 +1,46 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          kea-dhcp-ddns-server
+# Required-Start:    $local_fs $network $remote_fs $syslog
+# Required-Stop:     $local_fs $network $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: ISC KEA DHCP IPv6 Server
+### END INIT INFO
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+DESC="kea-dhcp-ddns-server"
+NAME=kea-dhcp-ddns
+DAEMON=/usr/sbin/keactrl
+DAEMON_ARGS=" -s dhcp_ddns"
+
+set -e
+
+# Exit if the package is not installed
+[ -x "$DAEMON" ] || exit 0
+
+# Source function library.
+. /etc/init.d/functions
+
+case "$1" in
+  start)
+        echo -n "Starting $DESC: "
+        start-stop-daemon -S -b -n $NAME -x $DAEMON -- start $DAEMON_ARGS
+        echo "done."
+        ;;
+  stop)
+        echo -n "Stopping $DESC: "
+        kpid=`pidof $NAME`
+        kill $kpid
+        echo "done."
+        ;;
+  restart|force-reload)
+        #
+        $0 stop
+        $0 start
+        ;;
+  *)
+        echo "Usage: $SCRIPTNAME {start|stop|restart|force-reload}" >&2
+        exit 1
+        ;;
+esac

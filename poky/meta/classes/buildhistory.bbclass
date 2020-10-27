@@ -116,6 +116,7 @@ python buildhistory_emit_pkghistory() {
             self.srcrev = ""
             self.layer = ""
             self.config = ""
+            self.src_uri = ""
 
 
     class PackageInfo:
@@ -258,6 +259,7 @@ python buildhistory_emit_pkghistory() {
     rcpinfo.packages = packages
     rcpinfo.layer = layer
     rcpinfo.config = sortlist(oe.utils.squashspaces(d.getVar('PACKAGECONFIG') or ""))
+    rcpinfo.src_uri = oe.utils.squashspaces(d.getVar('SRC_URI') or "")
     write_recipehistory(rcpinfo, d)
 
     bb.build.exec_func("read_subpackage_metadata", d)
@@ -368,6 +370,7 @@ def write_recipehistory(rcpinfo, d):
         f.write(u"PACKAGES = %s\n" %  rcpinfo.packages)
         f.write(u"LAYER = %s\n" %  rcpinfo.layer)
         f.write(u"CONFIG = %s\n" %  rcpinfo.config)
+        f.write(u"SRC_URI = %s\n" %  rcpinfo.src_uri)
 
     write_latest_srcrev(d, pkghistdir)
 

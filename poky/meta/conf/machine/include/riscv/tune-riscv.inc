@@ -24,10 +24,10 @@ PACKAGE_EXTRA_ARCHS_tune-riscv32 = "riscv32"
 # No float
 TUNE_FEATURES_tune-riscv64nf = "${TUNE_FEATURES_tune-riscv64} riscv64nf"
 TUNE_ARCH_tune-riscv64nf = "riscv64"
-TUNE_PKGARCH_tune-riscv64nf = "riscv64"
+TUNE_PKGARCH_tune-riscv64nf = "riscv64nf"
 PACKAGE_EXTRA_ARCHS_tune-riscv64nf = "riscv64nf"
 
 TUNE_FEATURES_tune-riscv32nf = "${TUNE_FEATURES_tune-riscv32} riscv32nf"
 TUNE_ARCH_tune-riscv32nf = "riscv32"
-TUNE_PKGARCH_tune-riscv32nf = "riscv32"
+TUNE_PKGARCH_tune-riscv32nf = "riscv32nf"
 PACKAGE_EXTRA_ARCHS_tune-riscv32nf = "riscv32nf"

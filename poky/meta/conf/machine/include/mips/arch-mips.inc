@@ -135,7 +135,7 @@ PACKAGE_EXTRA_ARCHS_tune-mips64-o32 = "mips mips64-o32"
 TUNE_FEATURES_tune-mips64el-o32 = "o32 fpu-hard"
 BASE_LIB_tune-mips64el-o32 = "lib"
 MIPSPKGSFX_VARIANT_tune-mips64el-o32 = "${TUNE_ARCH}"
-PACKAGE_EXTRA_ARCHS_tune-mips64el-o32 = "mipsel mips64el-o32 mips64el-o32"
+PACKAGE_EXTRA_ARCHS_tune-mips64el-o32 = "mipsel mips64el-o32"
 
 # MIPS 64 o32 and Soft Float
 AVAILTUNES += "mips64-nf-o32 mips64el-nf-o32"

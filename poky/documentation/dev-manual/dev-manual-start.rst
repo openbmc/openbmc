@@ -88,12 +88,10 @@ particular working environment and set of practices.
     .. note::
 
        For information about BitBake, see the
-       BitBake User Manual
-       .
+       :doc:`bitbake:index`.
 
     It is relatively easy to set up Git services and create
-    infrastructure like
-    :yocto_git:`http://git.yoctoproject.org <>`, which is based on
+    infrastructure like :yocto_git:`/`, which is based on
     server software called ``gitolite`` with ``cgit`` being used to
     generate the web interface that lets you view the repositories. The
     ``gitolite`` software identifies users using SSH keys and allows
@@ -106,10 +104,7 @@ particular working environment and set of practices.
        However, sites such as the following exist that describe how to
        perform setup:
 
-       -  `Git documentation <http://git-scm.com/book/ch4-8.html>`__:
-          Describes how to install ``gitolite`` on the server.
-
-       -  `Gitolite <http://gitolite.com>`__: Information for
+       -  `Gitolite <https://gitolite.com>`__: Information for
           ``gitolite``.
 
        -  `Interfaces, frontends, and
@@ -161,8 +156,7 @@ particular working environment and set of practices.
     integration" style testing of software components and regression
     identification and tracking.
 
-    See "`Yocto Project
-    Autobuilder <http://autobuilder.yoctoproject.org>`__" for more
+    See ":yocto_ab:`Yocto Project Autobuilder <>`" for more
     information and links to buildbot. The Yocto Project team has found
     this implementation works well in this role. A public example of
     this is the Yocto Project Autobuilders, which the Yocto Project team
@@ -207,8 +201,7 @@ particular working environment and set of practices.
 
     .. note::
 
-       You can also use a more collective push model. The
-       gitolite
+       You can also use a more collective push model. The ``gitolite``
        software supports both the push and pull models quite easily.
 
     As with any development environment, it is important to document the
@@ -285,11 +278,10 @@ v2 (WSL).
 .. note::
 
    The Yocto Project is not compatible with
-   Windows Subsystem for Linux v1
-   . It is compatible but not officially supported nor validated with
+   `Windows Subsystem for Linux v1 <https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux>`__.
+   It is compatible but not officially supported nor validated with
    WSLv2. If you still decide to use WSL please upgrade to
-   WSLv2
-   .
+   `WSLv2 <https://docs.microsoft.com/en-us/windows/wsl/install-win10>`__.
 
 Once your build host is set up to use the Yocto Project, further steps
 are necessary depending on what you want to accomplish. See the
@@ -453,9 +445,9 @@ as your Yocto Project build host:
 
 Once you have a container set up, everything is in place to develop just
 as if you were running on a native Linux machine. If you are going to
-use the Poky container, see the "`Cloning the ``poky``
-Repository <#cloning-the-poky-repository>`__" section. If you are going
-to use the Extensible SDK container, see the
+use the Poky container, see the
+":ref:`dev-manual/dev-manual-start:cloning the \`\`poky\`\` repository`"
+section. If you are going to use the Extensible SDK container, see the
 ":doc:`../sdk-manual/sdk-extensible`" Chapter in the Yocto
 Project Application Development and the Extensible Software Development
 Kit (eSDK) manual. If you are going to use the Toaster container, see
@@ -566,10 +558,7 @@ your Yocto Project build host:
 
    The current implementation of WSLv2 does not have out-of-the-box
    access to external devices such as those connected through a USB
-   port, but it automatically mounts your
-   C:
-   drive on
-   /mnt/c/
+   port, but it automatically mounts your ``C:`` drive on ``/mnt/c/``
    (and others), which you can use to share deploy artifacts to be later
    flashed on hardware through Windows, but your build directory should
    not reside inside this mountpoint.
@@ -623,11 +612,8 @@ Use the following procedure to locate the latest upstream copy of the
 
    .. note::
 
-      For information on cloning a repository, see the "
-      Cloning the
-      poky
-      Repository
-      " section.
+      For information on cloning a repository, see the
+      ":ref:`dev-manual/dev-manual-start:cloning the \`\`poky\`\` repository`" section.
 
 Accessing Index of Releases
 ---------------------------
@@ -653,12 +639,10 @@ Follow these steps to locate and download a particular tarball:
 
    .. note::
 
-      The
-      yocto
-      directory contains the full array of released Poky tarballs. The
-      poky
-      directory in the Index of Releases was historically used for very
-      early releases and exists now only for retroactive completeness.
+      The ``yocto`` directory contains the full array of released Poky
+      tarballs. The ``poky`` directory in the Index of Releases was
+      historically used for very early releases and exists now only for
+      retroactive completeness.
 
 2. *Select a Component:* Click on any released component in which you
    are interested (e.g. ``yocto``).
@@ -702,8 +686,7 @@ Releases <#accessing-index-of-releases>`__" section.
    .. note::
 
       For a "map" of Yocto Project releases to version numbers, see the
-      Releases
-      wiki page.
+      :yocto_wiki:`Releases </wiki/Releases>` wiki page.
 
    You can use the "RELEASE ARCHIVE" link to reveal a menu of all Yocto
    Project releases.
@@ -825,8 +808,9 @@ and then specifically check out that development branch.
 
 1. *Switch to the Poky Directory:* If you have a local poky Git
    repository, switch to that directory. If you do not have the local
-   copy of poky, see the "`Cloning the ``poky``
-   Repository <#cloning-the-poky-repository>`__" section.
+   copy of poky, see the
+   ":ref:`dev-manual/dev-manual-start:cloning the \`\`poky\`\` repository`"
+   section.
 
 2. *Determine Existing Branch Names:*
    ::
@@ -854,13 +838,13 @@ and then specifically check out that development branch.
    &DISTRO; Release (&DISTRO_NAME;), use the following command:
    ::
 
-      $ git checkout -b &DISTRO_NAME; origin/&DISTRO_NAME;
-      Branch &DISTRO_NAME; set up to track remote branch &DISTRO_NAME; from origin.
-      Switched to a new branch '&DISTRO_NAME;'
+      $ git checkout -b &DISTRO_NAME_NO_CAP; origin/&DISTRO_NAME_NO_CAP;
+      Branch &DISTRO_NAME_NO_CAP; set up to track remote branch &DISTRO_NAME_NO_CAP; from origin.
+      Switched to a new branch '&DISTRO_NAME_NO_CAP;'
 
-   The previous command checks out the "&DISTRO_NAME;" development
+   The previous command checks out the "&DISTRO_NAME_NO_CAP;" development
    branch and reports that the branch is tracking the upstream
-   "origin/&DISTRO_NAME;" branch.
+   "origin/&DISTRO_NAME_NO_CAP;" branch.
 
    The following command displays the branches that are now part of your
    local poky repository. The asterisk character indicates the branch
@@ -868,8 +852,8 @@ and then specifically check out that development branch.
    ::
 
       $ git branch
-        master *
-        &DISTRO_NAME;
+        master
+        * &DISTRO_NAME_NO_CAP;
 
 .. _checkout-out-by-tag-in-poky:
 
@@ -889,8 +873,9 @@ similar to checking out by branch name except you use tag names.
 
 1. *Switch to the Poky Directory:* If you have a local poky Git
    repository, switch to that directory. If you do not have the local
-   copy of poky, see the "`Cloning the ``poky``
-   Repository <#cloning-the-poky-repository>`__" section.
+   copy of poky, see the
+   ":ref:`dev-manual/dev-manual-start:cloning the \`\`poky\`\` repository`"
+   section.
 
 2. *Fetch the Tag Names:* To checkout the branch based on a tag name,
    you need to fetch the upstream tags into your local repository:

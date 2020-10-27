@@ -85,7 +85,7 @@ python () {
             if task.endswith("_setscene"):
                 # sstate is never going to work for external source trees, disable it
                 bb.build.deltask(task, d)
-            else:
+            elif os.path.realpath(d.getVar('S')) == os.path.realpath(d.getVar('B')):
                 # Since configure will likely touch ${S}, ensure only we lock so one task has access at a time
                 d.appendVarFlag(task, "lockfiles", " ${S}/singletask.lock")
 

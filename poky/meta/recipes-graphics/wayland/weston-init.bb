@@ -15,6 +15,10 @@ SRC_URI = "file://init \
 
 S = "${WORKDIR}"
 
+PACKAGECONFIG ??= ""
+
+PACKAGECONFIG[no-idle-timeout] = ",,"
+
 DEFAULTBACKEND ??= ""
 DEFAULTBACKEND_qemuall ?= "fbdev"
 DEFAULTBACKEND_qemuarm64 = "drm"
@@ -44,6 +48,10 @@ do_install() {
 	sed -i 's,@LOCALSTATEDIR@,${localstatedir},g' ${D}${bindir}/weston-start
         if [ -n "${DEFAULTBACKEND}" ]; then
 		sed -i -e "/^\[core\]/a backend=${DEFAULTBACKEND}-backend.so" ${D}${sysconfdir}/xdg/weston/weston.ini
+	fi
+
+	if [ "${@bb.utils.contains('PACKAGECONFIG', 'no-idle-timeout', 'yes', 'no', d)}" = "yes" ]; then
+		echo "idle-time=0" >> ${D}${sysconfdir}/xdg/weston/weston.ini
 	fi
 }
 

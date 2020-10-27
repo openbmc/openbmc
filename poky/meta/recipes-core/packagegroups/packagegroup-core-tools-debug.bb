@@ -14,7 +14,7 @@ MTRACE = ""
 MTRACE_libc-glibc = "libc-mtrace"
 
 STRACE = "strace"
-STRACE_riscv32_libc-musl = ""
+STRACE_riscv32 = ""
 
 RDEPENDS_${PN} = "\
     gdb \

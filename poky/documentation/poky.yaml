@@ -16,17 +16,17 @@ YOCTO_POKY : "poky-&DISTRO_NAME_NO_CAP;-&POKYVERSION;"
 COPYRIGHT_YEAR : "2010-2020"
 ORGNAME : "The Yocto Project"
 ORGEMAIL : "docs@lists.yoctoproject.org"
-YOCTO_DL_URL : "http://downloads.yoctoproject.org"
-YOCTO_HOME_URL : "http://www.yoctoproject.org"
-YOCTO_LISTS_URL : "http://lists.yoctoproject.org"
-YOCTO_BUGZILLA_URL : "http://bugzilla.yoctoproject.org"
+YOCTO_DL_URL : "https://downloads.yoctoproject.org"
+YOCTO_HOME_URL : "https://www.yoctoproject.org"
+YOCTO_LISTS_URL : "https://lists.yoctoproject.org"
+YOCTO_BUGZILLA_URL : "https://bugzilla.yoctoproject.org"
 YOCTO_WIKI_URL : "https://wiki.yoctoproject.org"
-YOCTO_AB_URL : "http://autobuilder.yoctoproject.org"
-YOCTO_GIT_URL : "http://git.yoctoproject.org"
+YOCTO_AB_URL : "https://autobuilder.yoctoproject.org"
+YOCTO_GIT_URL : "https://git.yoctoproject.org"
 YOCTO_ADTREPO_URL : "http://adtrepo.yoctoproject.org"
-OE_HOME_URL : "http://www.openembedded.org"
-OE_LISTS_URL : "http://lists.openembedded.org/mailman"
-OE_DOCS_URL : "http://docs.openembedded.org"
+OE_HOME_URL : "https://www.openembedded.org"
+OE_LISTS_URL : "https://lists.openembedded.org"
+OE_DOCS_URL : "https://docs.openembedded.org"
 OH_HOME_URL : "http://o-hand.com"
 BITBAKE_HOME_URL : "http://developer.berlios.de/projects/bitbake/"
 YOCTO_DOCS_URL : "&YOCTO_HOME_URL;/docs"
@@ -58,7 +58,6 @@ YOCTO_DOCS_BRIEF_URL : "&YOCTO_DOCS_URL;/&YOCTO_DOC_VERSION;/brief-yoctoprojectq
 YOCTO_ADTPATH_DIR : "/opt/poky/&DISTRO;"
 YOCTO_POKY_TARBALL : "&YOCTO_POKY;.tar.bz2"
 OE_INIT_PATH : "&YOCTO_POKY;/oe-init-build-env"
-OE_INIT_FILE : "oe-init-build-env"
 UBUNTU_HOST_PACKAGES_ESSENTIAL : "gawk wget git-core diffstat unzip texinfo gcc-multilib \
      build-essential chrpath socat cpio python3 python3-pip python3-pexpect \
      xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev \
@@ -71,19 +70,20 @@ FEDORA_HOST_PACKAGES_ESSENTIAL : "gawk make wget tar bzip2 gzip python3 unzip pe
 OPENSUSE_HOST_PACKAGES_ESSENTIAL : "python gcc gcc-c++ git chrpath make wget python-xml \
      diffstat makeinfo python-curses patch socat python3 python3-curses tar python3-pip \
      python3-pexpect xz which python3-Jinja2 Mesa-libEGL1 libSDL-devel xterm rpcgen Mesa-dri-devel
-     $ sudo pip3 install GitPython"
+     \n\      $ sudo pip3 install GitPython"
 CENTOS7_HOST_PACKAGES_ESSENTIAL : "-y epel-release
-     $ sudo yum makecache
-     $ sudo yum install gawk make wget tar bzip2 gzip python3 unzip perl patch \
+     \n\      $ sudo yum makecache
+     \n\      $ sudo yum install gawk make wget tar bzip2 gzip python3 unzip perl patch \
      diffutils diffstat git cpp gcc gcc-c++ glibc-devel texinfo chrpath socat \
      perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue python36-pip xz \
      which SDL-devel xterm mesa-libGL-devel
-     $ sudo pip3 install GitPython jinja2"
+     \n\      $ sudo pip3 install GitPython jinja2"
 CENTOS8_HOST_PACKAGES_ESSENTIAL : "-y epel-release
-     $ sudo dnf config-manager --set-enabled PowerTools
-     $ sudo dnf makecache
-     $ sudo dnf install gawk make wget tar bzip2 gzip python3 unzip perl patch \
+     \n\      $ sudo dnf config-manager --set-enabled PowerTools
+     \n\      $ sudo dnf makecache
+     \n\      $ sudo dnf install gawk make wget tar bzip2 gzip python3 unzip perl patch \
      diffutils diffstat git cpp gcc gcc-c++ glibc-devel texinfo chrpath ccache \
      socat perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue python3-pip \
      python3-GitPython python3-jinja2 python3-pexpect xz which SDL-devel xterm \
      rpcgen mesa-libGL-devel"
+PIP3_HOST_PACKAGES_DOC : "$ sudo pip3 install sphinx sphinx_rtd_theme pyyaml"

@@ -4,7 +4,7 @@
 FAQ
 ***
 
-**Q:** How does Poky differ from `OpenEmbedded <http://www.openembedded.org/>`__?
+**Q:** How does Poky differ from :oe_home:`OpenEmbedded <>`?
 
 **A:** The term ``Poky`` refers to the specific reference build
 system that the Yocto Project provides. Poky is based on
@@ -21,9 +21,9 @@ Can I still use the Yocto Project?
 
 **A:** You can get the required tools on your host development system a
 couple different ways (i.e. building a tarball or downloading a
-tarball). See the "`Required Git, tar, Python and gcc
-Versions <#required-git-tar-python-and-gcc-versions>`__" section for
-steps on how to update your build tools.
+tarball). See the
+":ref:`ref-manual/ref-system-requirements:required git, tar, python and gcc versions`"
+section for steps on how to update your build tools.
 
 **Q:** How can you claim Poky / OpenEmbedded-Core is stable?
 
@@ -370,7 +370,7 @@ redirect requests through proxy servers.
 **A:** Yes - you can easily do this. When you use BitBake to build an
 image, all the build output goes into the directory created when you run
 the build environment setup script (i.e.
-````` <#structure-core-script>`__). By default, this :term:`Build Directory`
+:ref:`structure-core-script`). By default, this :term:`Build Directory`
 is named ``build`` but can be named
 anything you want.
 
@@ -414,7 +414,14 @@ that program is never installed directly to the build machine's root
 file system. Consequently, the build system uses paths within the Build
 Directory for ``DESTDIR``, ``bindir`` and related variables. To better
 understand this, consider the following two paths where the first is
-relatively normal and the second is not: ::
+relatively normal and the second is not:
+
+.. note::
+
+   Due to these lengthy examples, the paths are artificially broken
+   across lines for readability.
+
+::
 
    /home/maxtothemax/poky-bootchart2/build/tmp/work/i586-poky-linux/zlib/
       1.2.8-r0/sysroot-destdir/usr/bin
@@ -422,11 +429,6 @@ relatively normal and the second is not: ::
    /home/maxtothemax/poky-bootchart2/build/tmp/work/x86_64-linux/
       zlib-native/1.2.8-r0/sysroot-destdir/home/maxtothemax/poky-bootchart2/
       build/tmp/sysroots/x86_64-linux/usr/bin
-
-.. note::
-
-   Due to these lengthy examples, the paths are artificially broken
-   across lines for readability.
 
 Even if the paths look unusual,
 they both are correct - the first for a target and the second for a

@@ -107,13 +107,6 @@ class DevtoolBase(OESelftestTestCase):
                         'under the build directory')
         self.append_config(self.sstate_conf)
 
-    def tearDown(self):
-        # devtools tests are heavy on IO and if bitbake can't write out its caches, we see timeouts.
-        # call sync around the tests to ensure the IO queue doesn't get too large, taking any IO
-        # hit here rather than in bitbake shutdown.
-        super().tearDown()
-        os.system("sync")
-
     def _check_src_repo(self, repo_dir):
         """Check srctree git repository"""
         self.assertTrue(os.path.isdir(os.path.join(repo_dir, '.git')),

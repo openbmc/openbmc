@@ -131,7 +131,7 @@ The following figure shows the workspace structure:
    :align: center
    :scale: 70%
 
-::
+.. code-block:: none
 
    attic - A directory created if devtool believes it must preserve
            anything when you run "devtool reset".  For example, if you
@@ -223,7 +223,7 @@ specify these options when using the ``devtool add`` command:
 .. note::
 
    If you prefer to use the latest revision every time the recipe is
-   built, use the options --autorev or -a.
+   built, use the options ``--autorev`` or ``-a``.
 
 .. _devtool-extracting-the-source-for-an-existing-recipe:
 
@@ -261,7 +261,7 @@ Modifying an Existing Recipe
 
 Use the ``devtool modify`` command to begin modifying the source of an
 existing recipe. This command is very similar to the
-```add`` <#devtool-adding-a-new-recipe-to-the-workspace>`__ command
+:ref:`add <devtool-adding-a-new-recipe-to-the-workspace>` command
 except that it does not physically create the recipe in the workspace
 layer because the recipe already exists in an another layer.
 
@@ -303,7 +303,7 @@ Updating a Recipe
 Use the ``devtool update-recipe`` command to update your recipe with
 patches that reflect changes you make to the source files. For example,
 if you know you are going to work on some code, you could first use the
-```devtool modify`` <#devtool-modifying-a-recipe>`__ command to extract
+:ref:`devtool modify <devtool-modifying-a-recipe>` command to extract
 the code and set up the workspace. After which, you could modify,
 compile, and test the code.
 
@@ -386,15 +386,21 @@ satisfied.
 .. note::
 
    When a reason for not upgrading displays, the reason is usually
-   written into the recipe using the RECIPE_NO_UPDATE_REASON
-   variable. See the base-passwd.bb recipe for an example.
+   written into the recipe using the ``RECIPE_NO_UPDATE_REASON``
+   variable. See the
+   :yocto_git:`base-passwd.bb </cgit/cgit.cgi/poky/tree/meta/recipes-core/base-passwd/base-passwd_3.5.29.bb>`
+   recipe for an example.
 
 ::
 
-   $ devtool check-upgrade-status ...
+   $ devtool check-upgrade-status
+   ...
    NOTE: acpid 2.0.30 2.0.31 Ross Burton <ross.burton@intel.com>
    NOTE: u-boot-fw-utils 2018.11 2019.01 Marek Vasut <marek.vasut@gmail.com> d3689267f92c5956e09cc7d1baa4700141662bff
-   NOTE: u-boot-tools 2018.11 2019.01 Marek Vasut <marek.vasut@gmail.com> d3689267f92c5956e09cc7d1baa4700141662bff . . .
+   NOTE: u-boot-tools 2018.11 2019.01 Marek Vasut <marek.vasut@gmail.com> d3689267f92c5956e09cc7d1baa4700141662bff
+   .
+   .
+   .
    NOTE: base-passwd 3.5.29 3.5.45 Anuj Mittal <anuj.mittal@intel.com> cannot be updated due to: Version 3.5.38 requires cdebconf for update-passwd utility
    NOTE: busybox 1.29.2 1.30.0 Andrej Valek <andrej.valek@siemens.com>
    NOTE: dbus-test 1.12.10 1.12.12 Chen Qi <Qi.Chen@windriver.com>
@@ -607,8 +613,8 @@ Following is sample output after using
 to create and add the ``mtr_0.86.bb`` recipe to the ``workspace`` directory:
 ::
 
-   $ devtool status mtr
-   :/home/scottrif/poky/build/workspace/sources/mtr (/home/scottrif/poky/build/workspace/recipes/mtr/mtr_0.86.bb)
+   $ devtool status
+   mtr:/home/scottrif/poky/build/workspace/sources/mtr (/home/scottrif/poky/build/workspace/recipes/mtr/mtr_0.86.bb)
    $
 
 .. _devtool-search-for-available-target-recipes:

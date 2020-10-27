@@ -27,9 +27,7 @@ and conceptual information in the :doc:`../overview-manual/overview-manual`.
 .. note::
 
    For more information about the Yocto Project Documentation set, see
-   the "
-   Links and Related Documentation
-   " section.
+   the :ref:`ref-manual/resources:links and related documentation` section.
 
 .. _detailed-supported-distros:
 
@@ -91,8 +89,8 @@ distributions:
       compatible but not officially supported nor validated with
       WSLv2, if you still decide to use WSL please upgrade to WSLv2.
 
-   -  If you encounter problems, please go to `Yocto Project
-      Bugzilla <http://bugzilla.yoctoproject.org>`__ and submit a bug. We are
+   -  If you encounter problems, please go to :yocto_bugs:`Yocto Project
+      Bugzilla <>` and submit a bug. We are
       interested in hearing about your experience. For information on
       how to submit a bug, see the Yocto Project
       :yocto_wiki:`Bugzilla wiki page </wiki/Bugzilla_Configuration_and_Bug_Tracking>`
@@ -143,7 +141,14 @@ supported Ubuntu or Debian Linux distribution:
    Yocto Project documentation manuals:
    ::
 
-      $ sudo apt-get install make xsltproc docbook-utils fop dblatex xmlto
+      $ sudo apt-get install make python3-pip
+      &PIP3_HOST_PACKAGES_DOC;
+
+   .. note::
+
+      It is currently not possible to build out documentation from Debian 8
+      (Jessie) because of outdated ``pip3`` and ``python3``. ``python3-sphinx``
+      is too outdated.
 
 Fedora Packages
 ---------------
@@ -161,8 +166,8 @@ supported Fedora Linux distribution:
    Yocto Project documentation manuals:
    ::
 
-      $ sudo dnf install  docbook-style-dsssl docbook-style-xsl \
-      docbook-dtds docbook-utils fop libxslt dblatex xmlto
+      $ sudo dnf install make python3-pip which
+      &PIP3_HOST_PACKAGES_DOC;
 
 openSUSE Packages
 -----------------
@@ -177,8 +182,12 @@ supported openSUSE Linux distribution:
       $ sudo zypper install &OPENSUSE_HOST_PACKAGES_ESSENTIAL;
 
 -  *Documentation:* Packages needed if you are going to build out the
-   Yocto Project documentation manuals: $ sudo zypper install dblatex
-   xmlto
+   Yocto Project documentation manuals:
+   ::
+
+      $ sudo zypper install make python3-pip which
+      &PIP3_HOST_PACKAGES_DOC;
+
 
 CentOS-7 Packages
 -----------------
@@ -206,8 +215,8 @@ supported CentOS-7 Linux distribution:
    Yocto Project documentation manuals:
    ::
 
-      $ sudo yum install docbook-style-dsssl docbook-style-xsl \
-      docbook-dtds docbook-utils fop libxslt dblatex xmlto
+      $ sudo yum install make python3-pip which
+      &PIP3_HOST_PACKAGES_DOC;
 
 CentOS-8 Packages
 -----------------
@@ -238,8 +247,8 @@ supported CentOS-8 Linux distribution:
    Yocto Project documentation manuals:
    ::
 
-      $ sudo dnf install docbook-style-dsssl docbook-style-xsl \\
-      docbook-dtds docbook-utils fop libxslt dblatex xmlto
+      $ sudo dnf install make python3-pip which
+      &PIP3_HOST_PACKAGES_DOC;
 
 Required Git, tar, Python and gcc Versions
 ==========================================
@@ -279,7 +288,7 @@ installer and automatically installs the tools for you:
 
       $ cd poky
       $ scripts/install-buildtools --without-extended-buildtools \
-        --base-url https://downloads.yoctoproject.org/releases/yocto \
+        --base-url &YOCTO_DL_URL;/releases/yocto \
         --release yocto-&DISTRO; \
         --installer-version &DISTRO;
 
@@ -340,7 +349,7 @@ of the two methods by which you can get these tools:
 
    During execution, a prompt appears that allows you to choose the
    installation directory. For example, you could choose the following:
-   /home/your-username/buildtools
+   ``/home/your-username/buildtools``
 
 3. Source the tools environment setup script by using a command like the
    following:
@@ -388,12 +397,8 @@ installer:
 
    .. note::
 
-      The
-      SDKMACHINE
-      variable in your
-      local.conf
-      file determines whether you build tools for a 32-bit or 64-bit
-      system.
+      The :term:`SDKMACHINE` variable in your ``local.conf`` file determines
+      whether you build tools for a 32-bit or 64-bit system.
 
    Once the build completes, you can find the ``.sh`` file that installs
    the tools in the ``tmp/deploy/sdk`` subdirectory of the
@@ -417,7 +422,7 @@ installer:
 
    During execution, a prompt appears that allows you to choose the
    installation directory. For example, you could choose the following:
-   /home/your_username/buildtools
+   ``/home/your_username/buildtools``
 
 5. Source the tools environment setup script by using a command like the
    following:

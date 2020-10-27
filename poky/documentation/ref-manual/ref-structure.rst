@@ -188,7 +188,7 @@ your choice. For example, the following command creates a Build
 Directory named ``mybuilds/`` that is outside of the :term:`Source Directory`:
 ::
 
-   $ source OE_INIT_FILE ~/mybuilds
+   $ source oe-init-build-env ~/mybuilds
 
 The OpenEmbedded build system uses the template configuration files, which
 are found by default in the ``meta-poky/conf/`` directory in the Source
@@ -200,8 +200,7 @@ information.
 .. note::
 
    The OpenEmbedded build system does not support file or directory
-   names that contain spaces. If you attempt to run the
-   OE_INIT_FILE
+   names that contain spaces. If you attempt to run the ``oe-init-build-env``
    script from a Source Directory that contains spaces in either the
    filenames or directory names, the script returns an error indicating
    no such file or directory. Be sure to use a Source Directory free of
@@ -282,17 +281,10 @@ file, it uses ``sed`` to substitute final
 
 .. note::
 
-   You can see how the
-   TEMPLATECONF
-   variable is used by looking at the
-   scripts/oe-setup-builddir
-   script in the
-   Source Directory
-   . You can find the Yocto Project version of the
-   local.conf.sample
-   file in the
-   meta-poky/conf
-   directory.
+   You can see how the ``TEMPLATECONF`` variable is used by looking at the
+   ``scripts/oe-setup-builddir``` script in the :term:`Source Directory`.
+   You can find the Yocto Project version of the ``local.conf.sample`` file in
+   the ``meta-poky/conf`` directory.
 
 .. _structure-build-conf-bblayers.conf:
 
@@ -327,16 +319,9 @@ Once the build process gets the sample file, it uses ``sed`` to substitute final
 
 .. note::
 
-   You can see how the
-   TEMPLATECONF
-   variable
-   scripts/oe-setup-builddir
-   script in the
-   Source Directory
-   . You can find the Yocto Project version of the
-   bblayers.conf.sample
-   file in the
-   meta-poky/conf/
+   You can see how the ``TEMPLATECONF`` variable ``scripts/oe-setup-builddir``
+   script in the :term:`Source Directory`. You can find the Yocto Project
+   version of the ``bblayers.conf.sample`` file in the ``meta-poky/conf/``
    directory.
 
 .. _structure-build-conf-sanity_info:
@@ -531,19 +516,16 @@ should be automatic, and recipes should not directly reference
 
 Previous versions of the OpenEmbedded build system used to create a
 global shared sysroot per machine along with a native sysroot. Beginning
-with the DISTRO version of the Yocto Project, sysroots exist in
+with the 2.3 version of the Yocto Project, sysroots exist in
 recipe-specific :term:`WORKDIR` directories. Thus, the
 ``build/tmp/sysroots/`` directory is unused.
 
 .. note::
 
-   The
-   build/tmp/sysroots/
-   directory can still be populated using the
-   bitbake build-sysroots
-   command and can be used for compatibility in some cases. However, in
-   general it is not recommended to populate this directory. Individual
-   recipe-specific sysroots should be used.
+   The ``build/tmp/sysroots/`` directory can still be populated using the
+   ``bitbake build-sysroots`` command and can be used for compatibility in some
+   cases. However, in general it is not recommended to populate this directory.
+   Individual recipe-specific sysroots should be used.
 
 .. _structure-build-tmp-stamps:
 
@@ -554,8 +536,11 @@ This directory holds information that BitBake uses for accounting
 purposes to track what tasks have run and when they have run. The
 directory is sub-divided by architecture, package name, and version.
 Following is an example:
-stamps/all-poky-linux/distcc-config/1.0-r0.do_build-2fdd....2do Although
-the files in the directory are empty of data, BitBake uses the filenames
+::
+
+      stamps/all-poky-linux/distcc-config/1.0-r0.do_build-2fdd....2do
+
+Although the files in the directory are empty of data, BitBake uses the filenames
 and timestamps for tracking purposes.
 
 For information on how BitBake uses stamp files to determine if a task
@@ -613,13 +598,12 @@ install" places its output that is then split into sub-packages within
 The recipe work directory - ``${WORKDIR}``.
 
 As described earlier in the
-"```build/tmp/sysroots/`` <#structure-build-tmp-sysroots>`__" section,
-beginning with the DISTRO release of the Yocto Project, the OpenEmbedded
+":ref:`structure-build-tmp-sysroots`" section,
+beginning with the 2.3 release of the Yocto Project, the OpenEmbedded
 build system builds each recipe in its own work directory (i.e.
 :term:`WORKDIR`). The path to the work directory is
 constructed using the architecture of the given build (e.g.
-:term:`TUNE_PKGARCH`,
-:term:`MACHINE_ARCH`, or "allarch"), the recipe
+:term:`TUNE_PKGARCH`, :term:`MACHINE_ARCH`, or "allarch"), the recipe
 name, and the version of the recipe (i.e.
 :term:`PE`\ ``:``\ :term:`PV`\ ``-``\ :term:`PR`).
 

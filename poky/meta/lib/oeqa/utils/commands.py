@@ -167,7 +167,7 @@ class Result(object):
     pass
 
 
-def runCmd(command, ignore_status=False, timeout=None, assert_error=True,
+def runCmd(command, ignore_status=False, timeout=None, assert_error=True, sync=True,
           native_sysroot=None, limit_exc_output=0, output_log=None, **options):
     result = Result()
 
@@ -183,6 +183,12 @@ def runCmd(command, ignore_status=False, timeout=None, assert_error=True,
 
     cmd = Command(command, timeout=timeout, output_log=output_log, **options)
     cmd.run()
+
+    # tests can be heavy on IO and if bitbake can't write out its caches, we see timeouts.
+    # call sync around the tests to ensure the IO queue doesn't get too large, taking any IO
+    # hit here rather than in bitbake shutdown.
+    if sync:
+        os.system("sync")
 
     result.command = command
     result.status = cmd.status

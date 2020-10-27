@@ -1,0 +1,31 @@
+The changes in 0001-drd-Port-to-Fedora-33.patch break builds on musl. These
+need a __GLIBC__ guard to ensure musl builds continue to work.
+
+Upstream-Status: Pending
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: valgrind-3.16.1/drd/drd_pthread_intercepts.c
+===================================================================
+--- valgrind-3.16.1.orig/drd/drd_pthread_intercepts.c
++++ valgrind-3.16.1/drd/drd_pthread_intercepts.c
+@@ -180,6 +180,7 @@ static int never_true;
+  * functions in both libc and libpthread. Older glibc versions only have an
+  * implementation of the pthread functions in libpthread.
+  */
++#ifdef __GLIBC__
+ #define PTH_FUNC(ret_ty, zf, implf, argl_decl, argl)                    \
+    ret_ty VG_WRAP_FUNCTION_ZZ(VG_Z_LIBC_SONAME,zf) argl_decl;           \
+    ret_ty VG_WRAP_FUNCTION_ZZ(VG_Z_LIBC_SONAME,zf) argl_decl            \
+@@ -187,6 +188,12 @@ static int never_true;
+    ret_ty VG_WRAP_FUNCTION_ZZ(VG_Z_LIBPTHREAD_SONAME,zf) argl_decl;     \
+    ret_ty VG_WRAP_FUNCTION_ZZ(VG_Z_LIBPTHREAD_SONAME,zf) argl_decl      \
+    { return implf argl; }
++#else
++#define PTH_FUNC(ret_ty, zf, implf, argl_decl, argl)                    \
++   ret_ty VG_WRAP_FUNCTION_ZZ(VG_Z_LIBPTHREAD_SONAME,zf) argl_decl;     \
++   ret_ty VG_WRAP_FUNCTION_ZZ(VG_Z_LIBPTHREAD_SONAME,zf) argl_decl      \
++   { return implf argl; }
++#endif
+ #endif
+ 
+ /**

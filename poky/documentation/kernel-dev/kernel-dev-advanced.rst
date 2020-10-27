@@ -44,9 +44,7 @@ linux-yocto recipe.
 .. note::
 
    A Linux kernel recipe that contains kernel Metadata (e.g. inherits
-   from the
-   linux-yocto.inc
-   file) is said to be a "linux-yocto style" recipe.
+   from the ``linux-yocto.inc`` file) is said to be a "linux-yocto style" recipe.
 
 Every linux-yocto style recipe must define the
 :term:`KMACHINE` variable. This
@@ -70,12 +68,8 @@ to indicate the branch.
 
 .. note::
 
-   You can use the
-   KBRANCH
-   value to define an alternate branch typically with a machine override
-   as shown here from the
-   meta-yocto-bsp
-   layer:
+   You can use the ``KBRANCH`` value to define an alternate branch typically
+   with a machine override as shown here from the ``meta-yocto-bsp`` layer:
    ::
 
            KBRANCH_edgerouter = "standard/edgerouter"
@@ -101,7 +95,7 @@ section for more information on kernel types.
 During the build, the kern-tools search for the BSP description file
 that most closely matches the ``KMACHINE`` and ``LINUX_KERNEL_TYPE``
 variables passed in from the recipe. The tools use the first BSP
-description it finds that match both variables. If the tools cannot find
+description they find that matches both variables. If the tools cannot find
 a match, they issue a warning.
 
 The tools first search for the ``KMACHINE`` and then for the
@@ -251,8 +245,7 @@ two files: ``smp.scc`` and ``smp.cfg``. You can find these files in the
       CONFIG_X86_BIGSMP=y
 
 You can find general information on configuration
-fragment files in the "`Creating Configuration
-Fragments <#creating-config-fragments>`__" section.
+fragment files in the ":ref:`creating-config-fragments`" section.
 
 Within the ``smp.scc`` file, the
 :term:`KFEATURE_DESCRIPTION`
@@ -269,13 +262,12 @@ non-hardware fragment.
 
 .. note::
 
-   The description file can include multiple
-   kconf
-   statements, one per fragment.
+   The description file can include multiple ``kconf`` statements, one per
+   fragment.
 
-As described in the "`Validating
-Configuration <#validating-configuration>`__" section, you can use the
-following BitBake command to audit your configuration:
+As described in the
+":ref:`kernel-dev/kernel-dev-common:validating configuration`" section, you can
+use the following BitBake command to audit your configuration:
 ::
 
    $ bitbake linux-yocto -c kernel_configcheck -f
@@ -335,10 +327,8 @@ for the five patches in the directory.
 
 You can create a typical ``.patch`` file using ``diff -Nurp`` or
 ``git format-patch`` commands. For information on how to create patches,
-see the "`Using ``devtool`` to Patch the
-Kernel <#using-devtool-to-patch-the-kernel>`__" and "`Using Traditional
-Kernel Development to Patch the
-Kernel <#using-traditional-kernel-development-to-patch-the-kernel>`__"
+see the ":ref:`kernel-dev/kernel-dev-common:using \`\`devtool\`\` to patch the kernel`"
+and ":ref:`kernel-dev/kernel-dev-common:using traditional kernel development to patch the kernel`"
 sections.
 
 Features
@@ -397,15 +387,11 @@ type as follows:
 
 .. note::
 
-   You can find kernel recipes in the
-   meta/recipes-kernel/linux
-   directory of the
-   Source Directory
-   (e.g.
-   poky/meta/recipes-kernel/linux/linux-yocto_4.12.bb
-   ). See the "
-   Using Kernel Metadata in a Recipe
-   " section for more information.
+   You can find kernel recipes in the ``meta/recipes-kernel/linux`` directory
+   of the :ref:`overview-manual/overview-manual-development-environment:yocto project source repositories`
+   (e.g. ``poky/meta/recipes-kernel/linux/linux-yocto_4.12.bb``). See the
+   ":ref:`kernel-dev/kernel-dev-advanced:using kernel metadata in a recipe`"
+   section for more information.
 
 Three kernel types ("standard", "tiny", and "preempt-rt") are supported
 for Linux Yocto kernels:
@@ -466,16 +452,11 @@ and ``patch`` commands, respectively.
 
 .. note::
 
-   It is not strictly necessary to create a kernel type
-   .scc
+   It is not strictly necessary to create a kernel type ``.scc``
    file. The Board Support Package (BSP) file can implicitly define the
-   kernel type using a
-   define
-   KTYPE
-   myktype
-   line. See the "
-   BSP Descriptions
-   " section for more information.
+   kernel type using a ``define`` :term:`KTYPE` ``myktype`` line. See the
+   ":ref:`kernel-dev/kernel-dev-advanced:bsp descriptions`" section for more
+   information.
 
 BSP Descriptions
 ----------------
@@ -488,13 +469,9 @@ supported kernel type.
 .. note::
 
    For BSPs supported by the Yocto Project, the BSP description files
-   are located in the
-   bsp
-   directory of the
-   yocto-kernel-cache
+   are located in the ``bsp`` directory of the ``yocto-kernel-cache``
    repository organized under the "Yocto Linux Kernel" heading in the
-   Yocto Project Source Repositories
-   .
+   :yocto_git:`Yocto Project Source Repositories </>`.
 
 This section overviews the BSP description structure, the aggregation
 concepts, and presents a detailed example using a BSP supported by the
@@ -571,7 +548,7 @@ policy. See the "`Kernel Types <#kernel-types>`__" section for more
 information.
 
 To aggregate common configurations and features specific to the kernel
-for mybsp, use the following:
+for `mybsp`, use the following:
 ::
 
    include mybsp.scc
@@ -582,8 +559,7 @@ You can see that in the BeagleBone example with the following:
    include beaglebone.scc
 
 For information on how to break a complete ``.config`` file into the various
-configuration fragments, see the "`Creating Configuration
-Fragments <#creating-config-fragments>`__" section.
+configuration fragments, see the ":ref:`creating-config-fragments`" section.
 
 Finally, if you have any configurations specific to the hardware that
 are not in a ``*.scc`` file, you can include them as follows:
@@ -653,7 +629,7 @@ found on the machine. This ``minnow.scc`` description file is then
 included in each of the three "minnow" description files for the
 supported kernel types (i.e. "standard", "preempt-rt", and "tiny").
 Consider the "minnow" description for the "standard" kernel type (i.e.
-``minnow-standard.scc``:
+``minnow-standard.scc``):
 ::
 
    define KMACHINE minnow
@@ -725,8 +701,8 @@ others, the recipe-space method is recommended. This method is also a
 good approach if you are working with Linux kernel sources you do not
 control or if you just do not want to maintain a Linux kernel Git
 repository on your own. For partial information on how you can define
-kernel Metadata in the recipe-space, see the "`Modifying an Existing
-Recipe <#modifying-an-existing-recipe>`__" section.
+kernel Metadata in the recipe-space, see the
+":ref:`kernel-dev/kernel-dev-common:modifying an existing recipe`" section.
 
 Conversely, if you are actively developing a kernel and are already
 maintaining a Linux kernel Git repository of your own, you might find it
@@ -746,8 +722,8 @@ modifying
 ``oe-core/meta-skeleton/recipes-kernel/linux/linux-yocto-custom.bb`` to
 a recipe in your layer, ``FILESEXTRAPATHS`` is typically set to
 ``${``\ :term:`THISDIR`\ ``}/${``\ :term:`PN`\ ``}``.
-See the "`Modifying an Existing
-Recipe <#modifying-an-existing-recipe>`__" section for more information.
+See the ":ref:`kernel-dev/kernel-dev-common:modifying an existing recipe`"
+section for more information.
 
 Here is an example that shows a trivial tree of kernel Metadata stored
 in recipe-space within a BSP layer:
@@ -849,7 +825,7 @@ best for your development model.
 Encapsulating Patches
 ---------------------
 
-if you are reusing patches from an external tree and are not working on
+If you are reusing patches from an external tree and are not working on
 the patches, you might find the encapsulated feature to be appropriate.
 Given this scenario, you do not need to create any branches in the
 source repository. Rather, you just take the static patches you need and
@@ -881,6 +857,7 @@ new branch as the ``KBRANCH`` to use for the board as follows:
 
 Another method is to use the ``branch`` command in the BSP
 description:
+::
 
    mybsp.scc:
       define KMACHINE mybsp
@@ -902,7 +879,7 @@ repositories use:
 If you had two kernel types, "standard" and "small" for instance, three
 machines, and common as ``mydir``, the branches in your Git repository
 might look like this:
-:
+::
 
    mydir/base
    mydir/standard/base
@@ -922,11 +899,8 @@ appropriate for the other branches.
 
    The "base" branches are an artifact of the way Git manages its data
    internally on the filesystem: Git will not allow you to use
-   mydir/standard
-   and
-   mydir/standard/machine_a
-   because it would have to create a file and a directory named
-   "standard".
+   ``mydir/standard`` and ``mydir/standard/machine_a`` because it would have to
+   create a file and a directory named "standard".
 
 Feature Branches
 ----------------

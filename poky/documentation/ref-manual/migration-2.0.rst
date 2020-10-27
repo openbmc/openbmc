@@ -96,8 +96,8 @@ changes in behavior exist:
 
       $ bitbake -e
 
--  ``d.delVar('``\ VARNAME\ ``')`` and
-   ``d.setVar('``\ VARNAME\ ``', None)`` result in the variable and all
+-  ``d.delVar('VARNAME')`` and
+   ``d.setVar('VARNAME', None)`` result in the variable and all
    of its overrides being cleared out. Before the change, only the
    non-overridden values were cleared.
 

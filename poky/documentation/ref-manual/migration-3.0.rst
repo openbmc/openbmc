@@ -197,8 +197,7 @@ The following BitBake changes have occurred.
 -  The arguments passed to functions used with
    :term:`bitbake:BB_HASHCHECK_FUNCTION`
    have changed. If you are using your own custom hash check function,
-   see
-   http://git.yoctoproject.org/cgit/cgit.cgi/poky/commit/?id=40a5e193c4ba45c928fccd899415ea56b5417725
+   see :yocto_git:`/cgit/cgit.cgi/poky/commit/?id=40a5e193c4ba45c928fccd899415ea56b5417725`
    for details.
 
 -  Task specifications in ``BB_TASKDEPDATA`` and class implementations

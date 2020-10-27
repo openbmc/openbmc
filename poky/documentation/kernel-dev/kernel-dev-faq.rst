@@ -38,7 +38,7 @@ How do I install/not-install the kernel image on the rootfs?
 The kernel image (e.g. ``vmlinuz``) is provided by the
 ``kernel-image`` package. Image recipes depend on ``kernel-base``. To
 specify whether or not the kernel image is installed in the generated
-root filesystem, override ``RDEPENDS_kernel-base`` to include or not
+root filesystem, override ``RDEPENDS_${KERNEL_PACKAGE_NAME}-base`` to include or not
 include "kernel-image". See the
 ":ref:`dev-manual/dev-manual-common-tasks:using .bbappend files in your layer`"
 section in the
@@ -50,13 +50,13 @@ How do I install a specific kernel module?
 
 Linux kernel modules are packaged individually. To ensure a
 specific kernel module is included in an image, include it in the
-appropriate machine
-:term:`RRECOMMENDS` variable.
+appropriate machine :term:`RRECOMMENDS` variable.
 These other variables are useful for installing specific modules:
-:term:`MACHINE_ESSENTIAL_EXTRA_RDEPENDS`
-:term:`MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS`
-:term:`MACHINE_EXTRA_RDEPENDS`
-:term:`MACHINE_EXTRA_RRECOMMENDS`
+- :term:`MACHINE_ESSENTIAL_EXTRA_RDEPENDS`
+- :term:`MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS`
+- :term:`MACHINE_EXTRA_RDEPENDS`
+- :term:`MACHINE_EXTRA_RRECOMMENDS`
+
 For example, set the following in the ``qemux86.conf`` file to include
 the ``ab123`` kernel modules with images built for the ``qemux86``
 machine:
@@ -64,9 +64,8 @@ machine:
 
    MACHINE_EXTRA_RRECOMMENDS += "kernel-module-ab123"
 
-For more
-information, see the "`Incorporating Out-of-Tree
-Modules <#incorporating-out-of-tree-modules>`__" section.
+For more information, see the
+":ref:`kernel-dev/kernel-dev-common:incorporating out-of-tree modules`" section.
 
 How do I change the Linux kernel command line?
 ----------------------------------------------

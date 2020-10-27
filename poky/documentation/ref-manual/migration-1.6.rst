@@ -53,9 +53,12 @@ Matching Branch Requirement for Git Fetching
 When fetching source from a Git repository using
 :term:`SRC_URI`, BitBake will now validate the
 :term:`SRCREV` value against the branch. You can specify
-the branch using the following form: SRC_URI =
-"git://server.name/repository;branch=branchname" If you do not specify a
-branch, BitBake looks in the default "master" branch.
+the branch using the following form:
+::
+
+      SRC_URI = "git://server.name/repository;branch=branchname"
+
+If you do not specify a branch, BitBake looks in the default "master" branch.
 
 Alternatively, if you need to bypass this check (e.g. if you are
 fetching a revision corresponding to a tag that is not on any branch),
@@ -123,8 +126,7 @@ Changes to Variables
 --------------------
 
 The following variables have changed. For information on the
-OpenEmbedded build system variables, see the "`Variables
-Glossary <#ref-variables-glos>`__" Chapter.
+OpenEmbedded build system variables, see the ":doc:`ref-variables`" Chapter.
 
 .. _migration-1.6-variable-changes-TMPDIR:
 
@@ -254,11 +256,8 @@ default. The following additional lines are needed in your
 
 .. note::
 
-   The default
-   local.conf
-   contains these statements. Consequently, if you are building a
-   headless system and using a default
-   local.conf
+   The default ``local.conf`` contains these statements. Consequently, if you
+   are building a headless system and using a default ``local.conf``
    file, you will need comment these two lines out.
 
 .. _migration-1.6-core-image-basic:
@@ -412,6 +411,6 @@ The previous reference BSPs for the ``beagleboard`` and
 ``routerstationpro`` machines are still available in a new
 ``meta-yocto-bsp-old`` layer in the
 :yocto_git:`Source Repositories <>` at
-http://git.yoctoproject.org/cgit/cgit.cgi/meta-yocto-bsp-old/.
+:yocto_git:`/cgit/cgit.cgi/meta-yocto-bsp-old/`.
 
 

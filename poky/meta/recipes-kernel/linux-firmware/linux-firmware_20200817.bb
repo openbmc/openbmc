@@ -218,8 +218,8 @@ PACKAGES =+ "${PN}-ralink-license ${PN}-ralink \
              ${PN}-mt7601u-license ${PN}-mt7601u \
              ${PN}-radeon-license ${PN}-radeon \
              ${PN}-marvell-license ${PN}-pcie8897 ${PN}-pcie8997 \
-             ${PN}-sd8686 ${PN}-sd8688 ${PN}-sd8787 ${PN}-sd8797 ${PN}-sd8801 ${PN}-sd8887 ${PN}-sd8897 \
-             ${PN}-usb8997 \
+             ${PN}-sd8686 ${PN}-sd8688 ${PN}-sd8787 ${PN}-sd8797 ${PN}-sd8801 \
+             ${PN}-sd8887 ${PN}-sd8897 ${PN}-sd8997 ${PN}-usb8997 \
              ${PN}-ti-connectivity-license ${PN}-wlcommon ${PN}-wl12xx ${PN}-wl18xx \
              ${PN}-vt6656-license ${PN}-vt6656 \
              ${PN}-rtl-license ${PN}-rtl8188 ${PN}-rtl8192cu ${PN}-rtl8192ce ${PN}-rtl8192su ${PN}-rtl8723 ${PN}-rtl8821 \
@@ -288,12 +288,16 @@ PACKAGES =+ "${PN}-ralink-license ${PN}-ralink \
              ${PN}-adsp-sst-license ${PN}-adsp-sst \
              ${PN}-bnx2-mips \
              ${PN}-liquidio \
+             ${PN}-nvidia-license \
+             ${PN}-nvidia-tegra-k1 ${PN}-nvidia-tegra \
+             ${PN}-nvidia-gpu \
              ${PN}-netronome-license ${PN}-netronome \
              ${PN}-qat ${PN}-qat-license \
              ${PN}-qcom-license \
              ${PN}-qcom-venus-1.8 ${PN}-qcom-venus-4.2 ${PN}-qcom-venus-5.2 ${PN}-qcom-venus-5.4 \
              ${PN}-qcom-adreno-a3xx ${PN}-qcom-adreno-a530 ${PN}-qcom-adreno-a630 \
              ${PN}-qcom-sdm845-audio ${PN}-qcom-sdm845-compute ${PN}-qcom-sdm845-modem \
+             ${PN}-amlogic-vdec-license ${PN}-amlogic-vdec \
              ${PN}-whence-license \
              ${PN}-license \
              "
@@ -403,6 +407,7 @@ LICENSE_${PN}-sd8797 = "Firmware-Marvell"
 LICENSE_${PN}-sd8801 = "Firmware-Marvell"
 LICENSE_${PN}-sd8887 = "Firmware-Marvell"
 LICENSE_${PN}-sd8897 = "Firmware-Marvell"
+LICENSE_${PN}-sd8997 = "Firmware-Marvell"
 LICENSE_${PN}-usb8997 = "Firmware-Marvell"
 LICENSE_${PN}-marvell-license = "Firmware-Marvell"
 
@@ -438,6 +443,15 @@ FILES_${PN}-sd8887 = " \
 FILES_${PN}-sd8897 = " \
   ${nonarch_base_libdir}/firmware/mrvl/sd8897_uapsta.bin \
 "
+do_install_append() {
+    # The kernel 5.6.x driver still uses the old name, provide a symlink for
+    # older kernels
+    ln -fs sdsd8997_combo_v4.bin ${D}${nonarch_base_libdir}/firmware/mrvl/sd8997_uapsta.bin
+}
+FILES_${PN}-sd8997 = " \
+  ${nonarch_base_libdir}/firmware/mrvl/sd8997_uapsta.bin \
+  ${nonarch_base_libdir}/firmware/mrvl/sdsd8997_combo_v4.bin \
+"
 FILES_${PN}-usb8997 = " \
   ${nonarch_base_libdir}/firmware/mrvl/usbusb8997_combo_v4.bin \
 "
@@ -449,6 +463,7 @@ RDEPENDS_${PN}-sd8797 += "${PN}-marvell-license"
 RDEPENDS_${PN}-sd8801 += "${PN}-marvell-license"
 RDEPENDS_${PN}-sd8887 += "${PN}-marvell-license"
 RDEPENDS_${PN}-sd8897 += "${PN}-marvell-license"
+RDEPENDS_${PN}-sd8997 += "${PN}-marvell-license"
 RDEPENDS_${PN}-usb8997 += "${PN}-marvell-license"
 
 # For netronome
@@ -465,6 +480,27 @@ FILES_${PN}-netronome = " \
 "
 
 RDEPENDS_${PN}-netronome += "${PN}-netronome-license"
+
+# For Nvidia
+LICENSE_${PN}-nvidia-gpu = "Firmware-nvidia"
+LICENSE_${PN}-nvidia-tegra = "Firmware-nvidia"
+LICENSE_${PN}-nvidia-tegra-k1 = "Firmware-nvidia"
+LICENSE_${PN}-nvidia-license = "Firmware-nvidia"
+
+FILES_${PN}-nvidia-gpu = "${nonarch_base_libdir}/firmware/nvidia"
+FILES_${PN}-nvidia-tegra = " \
+  ${nonarch_base_libdir}/firmware/nvidia/tegra* \
+  ${nonarch_base_libdir}/firmware/nvidia/gm20b \
+  ${nonarch_base_libdir}/firmware/nvidia/gp10b \
+"
+FILES_${PN}-nvidia-tegra-k1 = " \
+  ${nonarch_base_libdir}/firmware/nvidia/tegra124 \
+  ${nonarch_base_libdir}/firmware/nvidia/gk20a \
+"
+FILES_${PN}-nvidia-license = "${nonarch_base_libdir}/firmware/LICENCE.nvidia"
+
+RDEPENDS_${PN}-nvidia-gpu += "${PN}-nvidia-license"
+RDEPENDS_${PN}-nvidia-tegra += "${PN}-nvidia-license"
 
 # For rtl
 LICENSE_${PN}-rtl8188 = "Firmware-rtlwifi_firmware"
@@ -881,6 +917,12 @@ RDEPENDS_${PN}-qcom-sdm845-modem = "${PN}-qcom-license"
 
 FILES_${PN}-liquidio = "${nonarch_base_libdir}/firmware/liquidio"
 
+# For Amlogic VDEC
+LICENSE_${PN}-amlogic-vdec = "Firmware-amlogic_vdec"
+FILES_${PN}-amlogic-vdec-license = "${nonarch_base_libdir}/firmware/LICENSE.amlogic_vdec"
+FILES_${PN}-amlogic-vdec = "${nonarch_base_libdir}/firmware/meson/vdec/*"
+RDEPENDS_${PN}-amlogic-vdec = "${PN}-amlogic-vdec-license"
+
 # For other firmwares
 # Maybe split out to separate packages when needed.
 LICENSE_${PN} = "\
@@ -888,6 +930,7 @@ LICENSE_${PN} = "\
     & Firmware-agere \
     & Firmware-amdgpu \
     & Firmware-amd-ucode \
+    & Firmware-amlogic_vdec \
     & Firmware-atmel \
     & Firmware-ca0132 \
     & Firmware-cavium \

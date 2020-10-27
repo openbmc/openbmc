@@ -13,11 +13,18 @@ SRC_URI = "\
     file://kea-dhcp4.service \
     file://kea-dhcp6.service \
     file://kea-dhcp-ddns.service \
+    file://kea-dhcp4-server \
+    file://kea-dhcp6-server \
+    file://kea-dhcp-ddns-server \
     file://fix-multilib-conflict.patch \
+    file://fix_pid_keactrl.patch \
 "
 SRC_URI[sha256sum] = "4e121f0e58b175a827581c69cb1d60778647049fa47f142940dddc9ce58f3c82"
 
-inherit autotools systemd
+inherit autotools systemd update-rc.d
+
+INITSCRIPT_NAME = "kea-dhcp4-server"
+INITSCRIPT_PARAMS = "defaults 30"
 
 SYSTEMD_SERVICE_${PN} = "kea-dhcp4.service kea-dhcp6.service kea-dhcp-ddns.service"
 SYSTEMD_AUTO_ENABLE = "disable"
@@ -44,8 +51,11 @@ do_configure_prepend() {
 }
 
 do_install_append() {
+    install -d ${D}${sysconfdir}/init.d
     install -d ${D}${systemd_system_unitdir}
+
     install -m 0644 ${WORKDIR}/kea-dhcp*service ${D}${systemd_system_unitdir}
+    install -m 0755 ${WORKDIR}/kea-*-server ${D}${sysconfdir}/init.d
     sed -i -e 's,@SBINDIR@,${sbindir},g' -e 's,@BASE_BINDIR@,${base_bindir},g' \
            -e 's,@LOCALSTATEDIR@,${localstatedir},g' -e 's,@SYSCONFDIR@,${sysconfdir},g' \
            ${D}${systemd_system_unitdir}/kea-dhcp*service ${D}${sbindir}/keactrl
@@ -54,6 +64,8 @@ do_install_append() {
 do_install_append() {
     rm -rf "${D}${localstatedir}"
 }
+
+CONFFILES_${PN} = "${sysconfdir}/kea/keactrl.conf"
 
 FILES_${PN}-staticdev += "${libdir}/kea/hooks/*.a ${libdir}/hooks/*.a"
 FILES_${PN} += "${libdir}/hooks/*.so"

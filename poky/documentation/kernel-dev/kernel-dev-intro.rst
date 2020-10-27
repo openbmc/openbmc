@@ -23,7 +23,7 @@ Each Yocto Project release has a set of Yocto Linux kernel recipes,
 whose Git repositories you can view in the Yocto
 :yocto_git:`Source Repositories <>` under the "Yocto Linux Kernel"
 heading. New recipes for the release track the latest Linux kernel
-upstream developments from http://www.kernel.org> and introduce
+upstream developments from https://www.kernel.org and introduce
 newly-supported platforms. Previous recipes in the release are refreshed
 and supported for at least one additional Yocto Project release. As they
 align, these previous releases are updated to include the latest from
@@ -37,8 +37,8 @@ upstream Yocto Linux kernel development and kernel Metadata development.
 
 .. note::
 
-   For more on Yocto Linux kernels, see the "
-   Yocto Project Kernel Development and Maintenance
+   For more on Yocto Linux kernels, see the
+   ":ref:`Yocto Project Kernel Development and Maintenance <kernel-big-picture>`"
    section.
 
 The Yocto Project also provides a powerful set of kernel tools for
@@ -75,7 +75,7 @@ tools with your own kernel sources.
 The remainder of this manual provides instructions for completing
 specific Linux kernel development tasks. These instructions assume you
 are comfortable working with
-`BitBake <http://openembedded.org/wiki/Bitbake>`__ recipes and basic
+`BitBake <https://openembedded.org/wiki/Bitbake>`__ recipes and basic
 open-source development tools. Understanding these concepts will
 facilitate the process of working with the kernel recipes. If you find
 you need some additional background, please be sure to review and
@@ -158,8 +158,7 @@ general information and references for further information.
 
    .. note::
 
-      Try to resist the temptation to directly edit an existing
-      .config
+      Try to resist the temptation to directly edit an existing ``.config``
       file, which is found in the Build Directory among the source code
       used for the build. Doing so, can produce unexpected results when
       the OpenEmbedded build system regenerates the configuration file.
@@ -167,9 +166,9 @@ general information and references for further information.
    Once you are satisfied with the configuration changes made using
    ``menuconfig`` and you have saved them, you can directly compare the
    resulting ``.config`` file against an existing original and gather
-   those changes into a `configuration fragment
-   file <#creating-config-fragments>`__ to be referenced from within the
-   kernel's ``.bbappend`` file.
+   those changes into a
+   :ref:`configuration fragment file <creating-config-fragments>` to be
+   referenced from within the kernel's ``.bbappend`` file.
 
    Additionally, if you are working in a BSP layer and need to modify
    the BSP's kernel's configuration, you can use ``menuconfig``.

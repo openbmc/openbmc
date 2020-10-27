@@ -177,7 +177,7 @@ an entire Linux distribution, including the toolchain, from source.
    .. code-block:: shell
 
       $ cd ~/poky
-      $ source &OE_INIT_FILE;
+      $ source oe-init-build-env
       You had no conf/local.conf file. This configuration file has therefore been
       created for you with some default values. You may wish to edit it to, for
       example, select a different MACHINE (target hardware). See conf/local.conf

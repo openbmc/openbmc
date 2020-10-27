@@ -454,9 +454,8 @@ Errors and Warnings
 
       Disabling stripping here does not mean that the final packaged
       binaries will be unstripped. Once the OpenEmbedded build system
-      splits out debug symbols to the
-      -dbg
-      package, it will then strip the symbols from the binaries.
+      splits out debug symbols to the ``-dbg`` package, it will then
+      strip the symbols from the binaries.
 
     
 

@@ -456,15 +456,17 @@ def setup_bitbake(configParams, extrafeatures=None):
                     break
             except BBMainFatal:
                 raise
-            except (Exception, bb.server.process.ProcessTimeout) as e:
+            except (Exception, bb.server.process.ProcessTimeout, SystemExit) as e:
+                # SystemExit does not inherit from the Exception class, needs to be included explicitly
                 if not retries:
                     raise
                 retries -= 1
                 tryno = 8 - retries
-                if isinstance(e, (bb.server.process.ProcessTimeout, BrokenPipeError, EOFError)):
+                if isinstance(e, (bb.server.process.ProcessTimeout, BrokenPipeError, EOFError, SystemExit)):
                     logger.info("Retrying server connection (#%d)..." % tryno)
                 else:
                     logger.info("Retrying server connection (#%d)... (%s)" % (tryno, traceback.format_exc()))
+                
             if not retries:
                 bb.fatal("Unable to connect to bitbake server, or start one (server startup failures would be in bitbake-cookerdaemon.log).")
             bb.event.print_ui_queue()

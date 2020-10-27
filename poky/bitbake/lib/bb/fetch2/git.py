@@ -63,6 +63,7 @@ import errno
 import fnmatch
 import os
 import re
+import shlex
 import subprocess
 import tempfile
 import bb
@@ -342,7 +343,7 @@ class Git(FetchMethod):
             # We do this since git will use a "-l" option automatically for local urls where possible
             if repourl.startswith("file://"):
                 repourl = repourl[7:]
-            clone_cmd = "LANG=C %s clone --bare --mirror \"%s\" %s --progress" % (ud.basecmd, repourl, ud.clonedir)
+            clone_cmd = "LANG=C %s clone --bare --mirror %s %s --progress" % (ud.basecmd, shlex.quote(repourl), ud.clonedir)
             if ud.proto.lower() != 'file':
                 bb.fetch2.check_network_access(d, clone_cmd, ud.url)
             progresshandler = GitProgressHandler(d)
@@ -354,8 +355,8 @@ class Git(FetchMethod):
             if "origin" in output:
               runfetchcmd("%s remote rm origin" % ud.basecmd, d, workdir=ud.clonedir)
 
-            runfetchcmd("%s remote add --mirror=fetch origin \"%s\"" % (ud.basecmd, repourl), d, workdir=ud.clonedir)
-            fetch_cmd = "LANG=C %s fetch -f --progress \"%s\" refs/*:refs/*" % (ud.basecmd, repourl)
+            runfetchcmd("%s remote add --mirror=fetch origin %s" % (ud.basecmd, shlex.quote(repourl)), d, workdir=ud.clonedir)
+            fetch_cmd = "LANG=C %s fetch -f --progress %s refs/*:refs/*" % (ud.basecmd, shlex.quote(repourl))
             if ud.proto.lower() != 'file':
                 bb.fetch2.check_network_access(d, fetch_cmd, ud.url)
             progresshandler = GitProgressHandler(d)
@@ -504,7 +505,7 @@ class Git(FetchMethod):
             raise bb.fetch2.UnpackError("No up to date source found: " + "; ".join(source_error), ud.url)
 
         repourl = self._get_repo_url(ud)
-        runfetchcmd("%s remote set-url origin \"%s\"" % (ud.basecmd, repourl), d, workdir=destdir)
+        runfetchcmd("%s remote set-url origin %s" % (ud.basecmd, shlex.quote(repourl)), d, workdir=destdir)
 
         if self._contains_lfs(ud, d, destdir):
             if need_lfs and not self._find_git_lfs(d):
@@ -623,8 +624,8 @@ class Git(FetchMethod):
         d.setVar('_BB_GIT_IN_LSREMOTE', '1')
         try:
             repourl = self._get_repo_url(ud)
-            cmd = "%s ls-remote \"%s\" %s" % \
-                (ud.basecmd, repourl, search)
+            cmd = "%s ls-remote %s %s" % \
+                (ud.basecmd, shlex.quote(repourl), search)
             if ud.proto.lower() != 'file':
                 bb.fetch2.check_network_access(d, cmd, repourl)
             output = runfetchcmd(cmd, d, True)
