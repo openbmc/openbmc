@@ -1,0 +1,147 @@
+From bbf0eaee0c22f422bc9314dc5f71f7b2198d4980 Mon Sep 17 00:00:00 2001
+From: Thu B Nguyen <tbnguyen@amperecomputing.com>
+Date: Thu, 22 Oct 2020 09:20:33 +0700
+Subject: [PATCH] sensor: create the concerned host sensors list _hostSensors
+
+There are some sensors which are deactivated when host is off.
+They are CPU sensors or on-board sensors that are part of host power domain.
+
+phosphor-hwmon does not support any sensor configuration to identify
+these kind of sensors. It still reads these sensors when the host is off
+and keep retrying to read them even when the reading fails.
+
+This commit supports new option named "POWERON_" in sensor configuration.
+For any sensor with this option is set to 1, phosphor-hwmon will detect
+it as host sensor and adds it to _hostSensors list.
+
+phosphor-hwmon will remove all host sensors when it detects the host is off.
+It adds these sensors back when host is on.
+
+Testing:
+	1. Add POWERON_ configuration for one sensors.
+	   Ex:
+		LABEL_in1=3V3_SB
+		POWERON_in1=1
+		GAIN_in1=3
+		CRITHI_in1=3960
+		CRITLO_in1=2320
+	2. Make sure the sensors is added to _hostSensors list.
+Signed-off-by: Thu B Nguyen <tbnguyen@amperecomputing.com>
+---
+ mainloop.cpp | 10 ++++++++--
+ mainloop.hpp |  6 ++++++
+ sensor.cpp   | 14 ++++++++++++++
+ sensor.hpp   | 13 +++++++++++++
+ 4 files changed, 41 insertions(+), 2 deletions(-)
+
+diff --git a/mainloop.cpp b/mainloop.cpp
+index 3e7e0bf..fa95034 100644
+--- a/mainloop.cpp
++++ b/mainloop.cpp
+@@ -185,6 +185,11 @@ std::optional<ObjectStateData>
+     auto sensorObj =
+         std::make_unique<sensor::Sensor>(sensorSetKey, _ioAccess, _devPath);
+ 
++    /* Add the concerned host sensors to _hostSensors list */
++    if (sensorObj->isHostSensor() &&
++        _hostSensors.find(sensorSetKey) == _hostSensors.end())
++        _hostSensors[std::move(sensorSetKey)] = std::move(sensorAttrs);
++
+     // Get list of return codes for removing sensors on device
+     auto devRmRCs = env::getEnv("REMOVERCS");
+     // Add sensor removal return codes defined at the device level
+@@ -198,7 +203,8 @@ std::optional<ObjectStateData>
+ 
+     ObjectInfo info(&_bus, std::move(objectPath), InterfaceMap());
+     RetryIO retryIO(hwmonio::retries, hwmonio::delay);
+-    if (_rmSensors.find(sensorSetKey) != _rmSensors.end())
++    if ((_rmSensors.find(sensorSetKey) != _rmSensors.end()) ||
++        sensorObj->isHostSensor())
+     {
+         // When adding a sensor that was purposely removed,
+         // don't retry on errors when reading its value
+@@ -363,7 +369,7 @@ void MainLoop::init()
+     }
+ 
+     /* If there are no sensors specified by labels, exit. */
+-    if (0 == _state.size())
++    if (0 == (_state.size() + _hostSensors.size()))
+     {
+         exit(0);
+     }
+diff --git a/mainloop.hpp b/mainloop.hpp
+index b3de022..3130322 100644
+--- a/mainloop.hpp
++++ b/mainloop.hpp
+@@ -122,6 +122,12 @@ class MainLoop
+      */
+     std::map<SensorSet::key_type, SensorSet::mapped_type> _rmSensors;
+ 
++    /**
++     * @brief Map of the concerned host sensors
++     */
++    std::map<SensorSet::key_type, SensorSet::mapped_type> _hostSensors;
++
++
+     /** @brief Object of class Average, to handle with average related process
+      */
+     Average _average;
+diff --git a/sensor.cpp b/sensor.cpp
+index 09aeca6..5e88867 100644
+--- a/sensor.cpp
++++ b/sensor.cpp
+@@ -46,6 +46,20 @@ Sensor::Sensor(const SensorSet::key_type& sensor,
+         }
+     }
+ 
++    auto sPower = env::getEnv("POWERON", sensor);
++    /*
++     * only set _hostSensor to true
++     * when POWERON_<type>* equal 1
++     */
++    if (!sPower.empty() && std::stoi(sPower) == 1)
++    {
++        _hostSensor = true;
++    }
++    else
++    {
++        _hostSensor = false;
++    }
++
+     auto gain = env::getEnv("GAIN", sensor);
+     if (!gain.empty())
+     {
+diff --git a/sensor.hpp b/sensor.hpp
+index 4b2d281..4d09f9c 100644
+--- a/sensor.hpp
++++ b/sensor.hpp
+@@ -135,6 +135,16 @@ class Sensor
+         return _hasFaultFile;
+     }
+ 
++    /**
++     * @brief Get whether the concerned host sensor.
++     *
++     * @return - Boolean on whether the concerned host sensor.
++     */
++    inline bool isHostSensor(void) const
++    {
++        return _hostSensor;
++    }
++
+   private:
+     /** @brief Sensor object's identifiers */
+     SensorSet::key_type _sensor;
+@@ -145,6 +155,9 @@ class Sensor
+     /** @brief Physical device sysfs path. */
+     const std::string& _devPath;
+ 
++    /** @brief Read when the host power is On. */
++    bool _hostSensor;
++
+     /** @brief Structure for storing sensor adjustments */
+     valueAdjust _sensorAdjusts;
+ 
+-- 
+2.17.1
+
