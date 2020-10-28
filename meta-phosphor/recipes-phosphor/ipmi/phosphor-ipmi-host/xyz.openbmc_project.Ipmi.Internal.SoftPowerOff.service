@@ -6,6 +6,7 @@ Wants=obmc-host-stopping@0.target
 Before=obmc-host-stopping@0.target
 Conflicts=obmc-host-start@0.target
 ConditionPathExists=!/run/openbmc/host@0-request
+ConditionPathExists=!/lib/systemd/system/pldmSoftPowerOff.service
 
 [Service]
 Restart=no
