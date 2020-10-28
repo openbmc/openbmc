@@ -2,6 +2,10 @@ FILESEXTRAPATHS_append_mtjade := "${THISDIR}/${PN}:"
 
 EXTRA_OECONF_append_mtjade = " --enable-negative-errno-on-fail"
 
+SRC_URI += " \
+        file://0001-sensor-create-the-concerned-host-sensors-list.patch \
+        "
+
 CHIPS_mtjade = " \
         bus@1e78a000/i2c-bus@100/tmp175@28 \
         bus@1e78a000/i2c-bus@100/tmp175@29 \
