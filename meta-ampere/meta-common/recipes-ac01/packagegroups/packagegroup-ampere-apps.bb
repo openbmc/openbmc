@@ -9,15 +9,18 @@ PACKAGES = " \
         ${PN}-chassis \
         ${PN}-flash \
         ${PN}-system \
+        ${PN}-fans \
         "
 
 PROVIDES += "virtual/obmc-chassis-mgmt"
 PROVIDES += "virtual/obmc-flash-mgmt"
 PROVIDES += "virtual/obmc-system-mgmt"
+PROVIDES += "virtual/obmc-fan-mgmt"
 
 RPROVIDES_${PN}-chassis += "virtual-obmc-chassis-mgmt"
 RPROVIDES_${PN}-flash += "virtual-obmc-flash-mgmt"
 RPROVIDES_${PN}-system += "virtual-obmc-system-mgmt"
+RPROVIDES_${PN}-fans += "virtual-obmc-fan-mgmt"
 
 SUMMARY_${PN}-chassis = "Ampere Chassis"
 RDEPENDS_${PN}-chassis = " \
@@ -33,4 +36,7 @@ RDEPENDS_${PN}-chassis = " \
 SUMMARY_${PN}-flash = "Ampere Flash"
 RDEPENDS_${PN}-flash = " \
         ampere-flash-utils \
+        "
+SUMMARY_${PN}-fans = "Ampere Fans"
+RDEPENDS_${PN}-fans = " \
         "

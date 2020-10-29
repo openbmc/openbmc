@@ -1,0 +1,83 @@
+- name: FAN3_1
+  path: /system/chassis/motherboard/FAN3_1
+  methods:
+    - type: tach
+      sensors:
+        - FAN3_1
+
+- name: FAN3_2
+  path: /system/chassis/motherboard/FAN3_2
+  methods:
+    - type: tach
+      sensors:
+        - FAN3_2
+
+- name: FAN4_1
+  path: /system/chassis/motherboard/FAN4_1
+  methods:
+    - type: tach
+      sensors:
+        - FAN4_1
+
+- name: FAN4_2
+  path: /system/chassis/motherboard/FAN4_2
+  methods:
+    - type: tach
+      sensors:
+        - FAN4_2
+
+- name: FAN5_1
+  path: /system/chassis/motherboard/FAN5_1
+  methods:
+    - type: tach
+      sensors:
+        - FAN5_1
+
+- name: FAN5_2
+  path: /system/chassis/motherboard/FAN5_2
+  methods:
+    - type: tach
+      sensors:
+        - FAN5_2
+
+- name: FAN6_1
+  path: /system/chassis/motherboard/FAN6_1
+  methods:
+    - type: tach
+      sensors:
+        - FAN6_1
+
+- name: FAN6_2
+  path: /system/chassis/motherboard/FAN6_2
+  methods:
+    - type: tach
+      sensors:
+        - FAN6_2
+
+- name: FAN7_1
+  path: /system/chassis/motherboard/FAN7_1
+  methods:
+    - type: tach
+      sensors:
+        - FAN7_1
+
+- name: FAN7_2
+  path: /system/chassis/motherboard/FAN7_2
+  methods:
+    - type: tach
+      sensors:
+        - FAN7_2
+
+- name: FAN8_1
+  path: /system/chassis/motherboard/FAN8_1
+  methods:
+    - type: tach
+      sensors:
+        - FAN8_1
+
+- name: FAN8_2
+  path: /system/chassis/motherboard/FAN8_2
+  methods:
+    - type: tach
+      sensors:
+        - FAN8_2
