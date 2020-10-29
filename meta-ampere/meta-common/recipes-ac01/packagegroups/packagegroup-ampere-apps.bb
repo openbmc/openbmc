@@ -7,13 +7,16 @@ inherit obmc-phosphor-utils
 PROVIDES = "${PACKAGES}"
 PACKAGES = " \
         ${PN}-chassis \
+        ${PN}-flash \
         ${PN}-system \
         "
 
 PROVIDES += "virtual/obmc-chassis-mgmt"
+PROVIDES += "virtual/obmc-flash-mgmt"
 PROVIDES += "virtual/obmc-system-mgmt"
 
 RPROVIDES_${PN}-chassis += "virtual-obmc-chassis-mgmt"
+RPROVIDES_${PN}-flash += "virtual-obmc-flash-mgmt"
 RPROVIDES_${PN}-system += "virtual-obmc-system-mgmt"
 
 SUMMARY_${PN}-chassis = "Ampere Chassis"
@@ -25,4 +28,9 @@ RDEPENDS_${PN}-chassis = " \
         phosphor-hostlogger \
         phosphor-sel-logger \
         phosphor-logging \
+        "
+
+SUMMARY_${PN}-flash = "Ampere Flash"
+RDEPENDS_${PN}-flash = " \
+        ampere-flash-utils \
         "
