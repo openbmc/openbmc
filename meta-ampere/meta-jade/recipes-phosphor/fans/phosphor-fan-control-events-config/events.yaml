@@ -1,0 +1,351 @@
+groups:
+    - name: air_cooled_zone0_fans
+      description: Group of fan inventory objects for air cooled zone 0
+      type: /xyz/openbmc_project/inventory
+      members:
+          - /system/chassis/motherboard/FAN3_1
+          - /system/chassis/motherboard/FAN3_2
+          - /system/chassis/motherboard/FAN4_1
+          - /system/chassis/motherboard/FAN4_2
+          - /system/chassis/motherboard/FAN5_1
+          - /system/chassis/motherboard/FAN5_2
+          - /system/chassis/motherboard/FAN6_1
+          - /system/chassis/motherboard/FAN6_2
+          - /system/chassis/motherboard/FAN7_1
+          - /system/chassis/motherboard/FAN7_2
+          - /system/chassis/motherboard/FAN8_1
+          - /system/chassis/motherboard/FAN8_2
+    - name: zone0_ambient
+      description: Group of ambient temperature sensors for zone 0
+      type: /xyz/openbmc_project/sensors
+      members:
+          - /temperature/TS4_Temp
+    - name: zone0_cores
+      description: Group of core temperature sensors for zone 0
+      type: /xyz/openbmc_project/sensors
+      members:
+          - /temperature/S0_SOC_Temp
+          - /temperature/S1_SOC_Temp
+    - name: zone0_dimms
+      description: Group of core temperature sensors for zone 0
+      type: /xyz/openbmc_project/sensors
+      members:
+          - /temperature/S0_DIMMG0_Temp
+          - /temperature/S0_DIMM_VRD_Temp
+          - /temperature/S1_DIMMG0_Temp
+          - /temperature/S1_DIMM_VRD_Temp
+
+matches:
+    - name: propertiesChanged
+      parameters:
+          - object
+          - interface
+    - name: interfacesAdded
+      parameters:
+          - object
+    - name: nameOwnerChanged
+      parameters:
+          - object
+          - interface
+
+signals:
+    - name: propertiesChanged
+      description: >
+          A property changed match
+      parameters:
+          - type
+          - object
+          - interface
+          - property
+      match: propertiesChanged
+    - name: interfacesAdded
+      description: >
+          An interfaces added match
+      parameters:
+          - type
+          - object
+          - interface
+          - property
+      match: interfacesAdded
+    - name: nameOwnerChanged
+      description: >
+          A name owner changed match
+      parameters:
+      match: nameOwnerChanged
+
+methods:
+    - name: getProperties
+      description: >
+          Get the property values of the given group members
+          by performing a `GetProperty` method call on each
+      parameters:
+          - type
+    - name: nameHasOwner
+      description: >
+          A NameHasOwner method call to be performed on all event group members
+      parameters:
+
+handlers:
+    - name: setProperty
+      description: >
+          Sets a value for the given object/interface/property
+      parameters:
+          - type
+    - name: setService
+      description: >
+          Sets the service name and ownership status for the given group
+      parameters:
+          - group
+
+preconditions:
+    - name: property_states_match
+      description: >
+          All defined properties must match the values given to
+          enable a set speed event otherwise fan speeds are set to full
+      parameters:
+          - groups
+    - name: services_missing_owner
+      description: >
+          Any services missing an owner enable the events given otherwise
+          the events are removed/disabled
+      parameters:
+
+actions:
+    - name: call_actions_based_on_timer
+      description: >
+          Sets up a list of actions to be invoked when the defined timer
+          expires (or for each expiration of a repeating timer)
+      parameters:
+          - timer
+          - actions
+    - name: default_floor_on_missing_owner
+      description: >
+          Set the fan floor to the default floor
+    - name: set_speed_on_missing_owner
+      description: >
+          Set fans to the given speed when any service within the group
+          no longer exists
+      parameters:
+          - speed
+    - name: set_request_speed_base_with_max
+      description: >
+          Set the base request speed of a zone to the max value of a group for
+          calculating a new target speed
+    - name: count_state_before_speed
+      description: Set the speed when a number of properties at a state
+      parameters:
+          - count
+          - property
+          - speed
+    - name: set_floor_from_average_sensor_value
+      description: Set floor speed from first entry with average less than key
+      parameters:
+          - map
+    - name: set_ceiling_from_average_sensor_value
+      description: Set ceiling speed based on key transition values with average
+      parameters:
+          - map
+    - name: set_net_increase_speed
+      description: >
+          Set the speed increase delta based on a factor applied to
+          the delta increase size times the given value and property's
+          value difference
+      parameters:
+          - property
+          - factor
+          - delta
+    - name: set_net_decrease_speed
+      description: >
+          Set the speed decrease delta based on a factor applied to
+          the delta decrease size times the given value and property's
+          value difference
+      parameters:
+          - property
+          - factor
+          - delta
+    - name: set_speed_from_max_sensor_value
+      description: Set speed from max sensor value
+      parameters:
+          - map
+          - neg_hysteresis
+          - pos_hysteresis
+          - target
+
+events:
+    - name: default_fan_floor_on_service_fail
+      precondition:
+          name: services_missing_owner
+          groups:
+              - name: zone0_ambient
+                interface: xyz.openbmc_project.Sensor.Value
+                property:
+                    name: Value
+                    type: int64_t
+          triggers:
+              - name: init
+                method: nameHasOwner
+                handler: setService
+              - name: signal
+                signal: nameOwnerChanged
+                handler: setService
+          events:
+              - name: default_fan_floor
+                groups:
+                    - name: zone0_ambient
+                      interface: xyz.openbmc_project.Sensor.Value
+                      property:
+                          name: Value
+                          type: int64_t
+                triggers:
+                    - name: timer
+                      interval: 5000000
+                      type: oneshot
+                actions:
+                    - name: default_floor_on_missing_owner
+    - name: missing_or_fails_before_high_speed_air
+      groups:
+          - name: air_cooled_zone0_fans
+            interface: xyz.openbmc_project.Inventory.Item
+            property:
+                name: Present
+                type: bool
+          - name: air_cooled_zone0_fans
+            interface: xyz.openbmc_project.State.Decorator.OperationalStatus
+            property:
+                name: Functional
+                type: bool
+      triggers:
+          - name: init
+            method: getProperties
+            handler: setProperty
+          - name: signal
+            signal: propertiesChanged
+            handler: setProperty
+      actions:
+          - name: count_state_before_speed
+            count: 1
+            property:
+                value: false
+                type: bool
+            speed:
+                value: 255
+                type: uint64_t
+
+    - name: set_wiwynn_algo_on_ts_temp
+      groups:
+          - name: zone0_ambient
+            interface: xyz.openbmc_project.Sensor.Value
+            property:
+                name: Value
+                type: int64_t
+      triggers:
+          - name: init
+            method: getProperties
+            handler: setProperty
+          - name: signal
+            signal: propertiesChanged
+            handler: setProperty
+      actions:
+          - name: set_speed_from_max_sensor_value
+            map:
+                value:
+                    - 1000: 64
+                    - 40000: 64
+                    - 41000: 77
+                    - 49000: 77
+                    - 50000: 128
+                type: std::map<int64_t, uint64_t>
+            neg_hysteresis:
+                value: 1000
+                type: int64_t
+            pos_hysteresis:
+                value: 0
+                type: int64_t
+            target:
+                value: 0
+                type: int
+
+    - name: set_wiwynn_algo_on_soc_temp
+      groups:
+          - name: zone0_cores
+            interface: xyz.openbmc_project.Sensor.Value
+            property:
+                name: Value
+                type: int64_t
+      triggers:
+          - name: init
+            method: getProperties
+            handler: setProperty
+          - name: signal
+            signal: propertiesChanged
+            handler: setProperty
+      actions:
+          - name: set_speed_from_max_sensor_value
+            map:
+                value:
+                    - 1000: 64
+                    - 60000: 64
+                    - 64000: 64
+                    - 65000: 102
+                    - 66000: 115
+                    - 67000: 128
+                    - 68000: 141
+                    - 69000: 153
+                    - 70000: 166
+                    - 71000: 179
+                    - 72000: 192
+                    - 73000: 204
+                    - 74000: 216
+                    - 75000: 216
+                    - 80000: 230
+                    - 85000: 243
+                    - 90000: 255
+                type: std::map<int64_t, uint64_t>
+            neg_hysteresis:
+                value: 2000
+                type: int64_t
+            pos_hysteresis:
+                value: 0
+                type: int64_t
+            target:
+                value: 1
+                type: int
+
+    - name: set_wiwynn_algo_on_dimms_temp
+      groups:
+          - name: zone0_dimms
+            interface: xyz.openbmc_project.Sensor.Value
+            property:
+                name: Value
+                type: int64_t
+      triggers:
+          - name: init
+            method: getProperties
+            handler: setProperty
+          - name: signal
+            signal: propertiesChanged
+            handler: setProperty
+      actions:
+          - name: set_speed_from_max_sensor_value
+            map:
+                value:
+                    - 1000: 64
+                    - 50000: 64
+                    - 59000: 64
+                    - 60000: 128
+                    - 69000: 128
+                    - 70000: 153
+                    - 80000: 179
+                    - 81000: 204
+                    - 82000: 230
+                    - 83000: 255
+                type: std::map<int64_t, uint64_t>
+            neg_hysteresis:
+                value: 2000
+                type: int64_t
+            pos_hysteresis:
+                value: 2000
+                type: int64_t
+            target:
+                value: 2
+                type: int

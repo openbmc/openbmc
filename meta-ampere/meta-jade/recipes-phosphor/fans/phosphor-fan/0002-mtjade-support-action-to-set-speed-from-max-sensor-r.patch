@@ -1,0 +1,169 @@
+From c49e93debb9b942b01a47963e3ab0ddc04878c3e Mon Sep 17 00:00:00 2001
+From: Tung Nguyen <tung.nguyen@amperecomputing.com>
+Date: Thu, 15 Oct 2020 10:32:52 +0700
+Subject: [PATCH 2/3] mtjade: support action to set speed from max sensor
+ reading value
+
+This patch expands the phosphor-fan action class, to handle the
+event based on the maximum sensor reading values, and set the speed
+based on as mapping table
+
+Signed-off-by: Tung Nguyen <tung.nguyen@amperecomputing.com>
+
+%% original patch: 0003-mtjade-support-action-to-set-speed-from-max-sensor-r.patch
+---
+ control/actions.hpp | 124 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 124 insertions(+)
+
+diff --git a/control/actions.hpp b/control/actions.hpp
+index 53e2efe..ff41172 100644
+--- a/control/actions.hpp
++++ b/control/actions.hpp
+@@ -6,6 +6,7 @@
+ 
+ #include <algorithm>
+ #include <numeric>
++#include <iostream>
+ 
+ namespace phosphor
+ {
+@@ -15,6 +16,18 @@ namespace control
+ {
+ namespace action
+ {
++const size_t MAX_GROUP = 4;
++
++/* store all groups max speed */
++static uint64_t max_speeds[MAX_GROUP] = { 0 };
++
++/* store all groups current max temp */
++static std::map<int, int64_t> temp_map = {
++    {0, 0},
++    {1, 0},
++    {2, 0},
++    {3, 0}
++};
+ 
+ /**
+  * @brief An action that wraps a list of actions with a timer
+@@ -635,6 +648,117 @@ auto use_events_on_state(T&& state, std::vector<SetSpeedEvent>&& events)
+     };
+ }
+ 
++/**
++ * @brief An action to set the speed on a zone
++ * @details Based on the maximum of the defined sensor group values, the
++ * speed is selected from the map key transition point that the maximum
++ * sensor value falls within depending on the key values direction from what
++ * was previously read.
++ *
++ * @param[in] val_to_speed - Ordered map of sensor value-to-speed transitions
++ * @param[in] neg_hysteresis - The negative hysteresis applicable for the group
++ * @param[in] pos_hysteresis - The positive hysteresis applicable for the group
++ * @param[in] target - The group index
++ *
++ * @return Action lambda function
++ *     An Action function to set the zone's speed when the maximum of
++ *     property values within the group is above(increasing) or
++ *     below(decreasing) the key transition point
++ */
++template <typename T>
++Action set_speed_from_max_sensor_value(
++    std::map<T, uint64_t> &&val_to_speed, int64_t neg_hysteresis, int64_t pos_hysteresis, int target)
++{
++  return [val_to_speed = std::move(val_to_speed), neg_hysteresis, pos_hysteresis, target](Zone &zone, const Group &group)
++  {
++    auto count = 0;
++    auto speed = max_speeds[target];
++
++    if (group.size() != 0) {
++      // get max temp of the group
++      int64_t maxValue = 0;
++      std::for_each(group.begin(), group.end(),
++          [&maxValue, &count, &zone](auto const &entry)
++      {
++        try {
++          T eValue = zone.template getPropertyValue<T>(std::get<pathPos>(entry),
++                                                       std::get<intfPos>(entry),
++                                                       std::get<propPos>(entry));
++          maxValue = std::max(static_cast<int64_t>(eValue), maxValue);
++        } catch (const std::out_of_range &oore) {
++          count++;
++        }
++      });
++
++      if ((group.size() - count) > 0) {
++        // Get previous temp
++        auto prevValue = temp_map[target];
++        // Only check if previous and new values differ
++        if (maxValue != prevValue) {
++          // Value is decreasing from previous  && greater than positive hysteresis
++          if ((maxValue < prevValue) && (prevValue - maxValue > pos_hysteresis)) {
++            for (auto it = val_to_speed.rbegin(); it != val_to_speed.rend(); ++it) {
++              if (it == val_to_speed.rbegin() && maxValue >= it->first) {
++                // Value is at/above last map key, set speed to the last map key's value
++                speed = it->second;
++                break;
++              } else if (std::next(it, 1) == val_to_speed.rend() && maxValue <= it->first) {
++                // Value is at/below first map key, set speed to the first map key's value
++                speed = it->second;
++                break;
++              }
++              if (maxValue < it->first && it->first <= prevValue) {
++                // Value decreased & transitioned across a map key, update speed to this
++                // map key's value when new value is below map's key and the key is at/below the
++                // previous value
++                speed = it->second;
++              }
++            }
++
++            // Save current max temp & speed
++            temp_map[target] = maxValue;
++            max_speeds[target] = speed;
++
++            // get the max speed and update
++            speed = *std::max_element(max_speeds, max_speeds + MAX_GROUP);
++
++            zone.setSpeed(speed);
++          } else { // Value is increasing from previous
++            if (maxValue - prevValue > neg_hysteresis) {
++              for (auto it = val_to_speed.begin(); it != val_to_speed.end(); ++it) {
++                if (it == val_to_speed.begin() && maxValue <= it->first) {
++                  // Value is at/below first map key, set speed to the first map key's value
++                  speed = it->second;
++                  break;
++                } else if (std::next(it, 1) == val_to_speed.end() && maxValue >= it->first) {
++                  // Value is at/above last map key, set speed to the last map key's value
++                  speed = it->second;
++                  break;
++                }
++                if (maxValue > it->first && it->first >= prevValue) {
++                  // Value increased & transitioned across a map key, update speed to this
++                  // map key's value when new value is above map's key and the key is at/above the
++                  // previous value
++                  speed = it->second;
++                }
++              }
++
++              // Save current max temp & speed
++              temp_map[target] = maxValue;
++              max_speeds[target] = speed;
++
++              // get the max speed and update
++              speed = *std::max_element(max_speeds, max_speeds + MAX_GROUP);
++
++              zone.setSpeed(speed);
++            }
++          }
++        }
++      }
++    }
++  };
++}
++
+ } // namespace action
+ } // namespace control
+ } // namespace fan
+-- 
+2.17.1
+
