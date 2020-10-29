@@ -1,0 +1,12 @@
+[Unit]
+Description=Ampere Host State verifying and updating
+Wants=xyz.openbmc_project.State.Host.service
+After=xyz.openbmc_project.State.Host.service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/ampere-host-state
+Type=simple
+
+[Install]
+WantedBy=multi-user.target
