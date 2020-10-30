@@ -43,6 +43,9 @@ SRC_URI = "\
     file://0020-openmaxil-add-pkg-config-file.patch \
     file://0021-cmake-Disable-format-overflow-warning-as-error.patch \
 "
+
+SRC_URI_remove_toolchain-clang = "file://0021-cmake-Disable-format-overflow-warning-as-error.patch"
+
 S = "${WORKDIR}/git"
 
 inherit cmake pkgconfig
