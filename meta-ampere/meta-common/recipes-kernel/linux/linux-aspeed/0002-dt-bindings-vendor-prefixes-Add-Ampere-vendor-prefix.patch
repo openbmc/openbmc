@@ -1,0 +1,28 @@
+From c4211e2625e2a479a54e7e0414c293ebaa76c177 Mon Sep 17 00:00:00 2001
+From: Thu B Nguyen <tbnguyen@amperecomputing.com>
+Date: Wed, 14 Oct 2020 05:22:55 +0700
+Subject: [PATCH 2/9] dt-bindings: vendor-prefixes: Add Ampere vendor prefix
+
+Add prefix for Ampere Computing LLC.
+
+Signed-off-by: Thu B Nguyen <tbnguyen@amperecomputing.com>
+---
+ Documentation/devicetree/bindings/vendor-prefixes.yaml | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/vendor-prefixes.yaml b/Documentation/devicetree/bindings/vendor-prefixes.yaml
+index 9aeab66be85f..2f4c429ccf38 100644
+--- a/Documentation/devicetree/bindings/vendor-prefixes.yaml
++++ b/Documentation/devicetree/bindings/vendor-prefixes.yaml
+@@ -89,6 +89,8 @@ patternProperties:
+     description: Anvo-Systems Dresden GmbH
+   "^apm,.*":
+     description: Applied Micro Circuits Corporation (APM)
++  "^ampere,.*":
++    description: Ampere Computing LLC
+   "^aptina,.*":
+     description: Aptina Imaging
+   "^arasan,.*":
+-- 
+2.18.4
+
