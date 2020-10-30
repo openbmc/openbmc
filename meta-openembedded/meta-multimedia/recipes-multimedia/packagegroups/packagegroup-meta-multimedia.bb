@@ -30,8 +30,7 @@ RDEPENDS_packagegroup-meta-multimedia = "\
     dleyna-renderer \
     dleyna-server \
     dvb-apps \
-    ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "faac", "", d)} \
-    fdk-aac \
+    ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "faac fdk-aac mpd", "", d)} \
     gerbera \
     libao \
     libavc1394 \
@@ -43,7 +42,6 @@ RDEPENDS_packagegroup-meta-multimedia = "\
     libmusicbrainz \
     libmpdclient \
     mpc \
-    mpd \
     ncmpc \
     libmpd \
     ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "opencore-amr vo-aacenc vo-amrwbenc", "", d)} \

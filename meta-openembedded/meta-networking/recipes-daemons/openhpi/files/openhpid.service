@@ -4,7 +4,7 @@ After=syslog.target
 
 [Service]
 Type=forking
-PIDFile=/var/run/openhpid.pid
+PIDFile=/run/openhpid.pid
 ExecStart=@SBINDIR@/openhpid -c @SYSCONFDIR@/openhpi/openhpi.conf
 
 [Install]

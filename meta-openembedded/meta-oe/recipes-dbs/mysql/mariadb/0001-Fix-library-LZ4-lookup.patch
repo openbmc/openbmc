@@ -14,12 +14,12 @@ index e97dd63e2b0..2f4694e727c 100644
 +++ b/cmake/FindLZ4.cmake
 @@ -1,5 +1,10 @@
 -find_path(LZ4_INCLUDE_DIR NAMES lz4.h)
--find_library(LZ4_LIBRARY NAMES lz4)
+-find_library(LZ4_LIBRARIES NAMES lz4)
 +find_path(LZ4_INCLUDE_DIR
 +  NAMES	lz4.h
 +  NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
 +
-+find_library(LZ4_LIBRARY
++find_library(LZ4_LIBRARIES
 +  NAMES lz4
 +  NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
  

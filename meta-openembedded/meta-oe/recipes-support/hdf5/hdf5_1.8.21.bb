@@ -1,4 +1,5 @@
-SUMMARY = "Unique technology suite that makes possible the management of \
+SUMMARY = "Management suite for extremely large and complex data collections"
+DESCRIPTION = "Unique technology suite that makes possible the management of \
 extremely large and complex data collections"
 HOMEPAGE = "https://www.hdfgroup.org/"
 SECTION = "libs"

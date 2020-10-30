@@ -2,20 +2,19 @@ DESCRIPTION = "Transmission is a fast, easy, and free BitTorrent client"
 SECTION = "network"
 HOMEPAGE = "https://transmissionbt.com/"
 LICENSE = "GPL-2.0"
-LIC_FILES_CHKSUM = "file://COPYING;md5=0dd9fcdc1416ff123c41c785192a1895"
+LIC_FILES_CHKSUM = "file://COPYING;md5=73f535ddffcf2a0d3af4f381f84f9b33"
 
 DEPENDS = "curl libevent gnutls openssl libtool intltool-native glib-2.0-native"
 RDEPENDS_${PN}-web = "${PN}"
 
 SRC_URI = " \
-	git://github.com/transmission/transmission \
-	file://0001-configure.ac-Fix-no-libsystemd-daemon.patch \
+	gitsm://github.com/transmission/transmission \
 	file://transmission-daemon \
 "
 
-# Transmission release 2.94
-SRCREV = "d8e60ee44f4295935bd98bf741f85ed19f5a7dfb"
-PV = "2.94"
+# Transmission release 3.00
+SRCREV = "bb6b5a062ee594dfd4b7a12a6b6e860c43849bfd"
+PV = "3.00"
 
 S = "${WORKDIR}/git"
 
@@ -25,7 +24,7 @@ PACKAGECONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'gtk', '', d)} \
                  ${@bb.utils.contains('DISTRO_FEATURES','systemd','systemd','',d)}"
 
 PACKAGECONFIG[gtk] = " --with-gtk,--without-gtk,gtk+3,"
-PACKAGECONFIG[systemd] = "--with-systemd-daemon,--without-systemd-daemon,systemd,"
+PACKAGECONFIG[systemd] = "--with-systemd,--without-systemd,systemd,"
 
 # Weak default values for transmission user and group
 # Change them in bbappend if needed
@@ -62,7 +61,7 @@ PACKAGES += "${PN}-gtk ${PN}-client ${PN}-web"
 FILES_${PN}-client = "${bindir}/transmission-remote ${bindir}/transmission-cli ${bindir}/transmission-create ${bindir}/transmission-show ${bindir}/transmission-edit"
 FILES_${PN}-gtk += "${bindir}/transmission-gtk ${datadir}/icons ${datadir}/applications ${datadir}/pixmaps"
 FILES_${PN}-web = "${datadir}/transmission/web"
-FILES_${PN} = "${bindir}/transmission-daemon ${sysconfdir}/init.d/transmission-daemon"
+FILES_${PN} = "${bindir}/transmission-daemon ${sysconfdir}/init.d/transmission-daemon ${datadir}/appdata"
 
 SYSTEMD_SERVICE_${PN} = "transmission-daemon.service"
 

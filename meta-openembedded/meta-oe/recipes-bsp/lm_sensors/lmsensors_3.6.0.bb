@@ -13,6 +13,7 @@ DEPENDS = " \
 SRC_URI = "git://github.com/lm-sensors/lm-sensors.git;protocol=https \
            file://fancontrol.init \
            file://sensord.init \
+           file://0001-Change-PIDFile-path-from-var-run-to-run.patch \
 "
 SRCREV = "1667b850a1ce38151dae17156276f981be6fb557"
 

@@ -13,7 +13,9 @@ SECTION = "net"
 
 DEPENDS = "openssl"
 
-SRC_URI = "git://github.com/open-iscsi/open-isns"
+SRC_URI = "git://github.com/open-iscsi/open-isns \
+           file://0001-isnsd.socket-use-run-instead-of-var-run.patch \
+           "
 
 SRCREV = "cfdbcff867ee580a71bc9c18c3a38a6057df0150"
 

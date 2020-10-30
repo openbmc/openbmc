@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
-PIDFile=/var/run/freediameter.pid
+PIDFile=/run/freediameter.pid
 ExecStart=@BINDIR@/freeDiameterd
 
 [Install]

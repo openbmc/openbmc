@@ -10,22 +10,24 @@ Upstream-Status: Pending
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 
 ---
- nss/lib/freebl/Makefile | 4 ++++
+ nss/lib/freebl/Makefile | 3 +++
  nss/lib/freebl/gcm.c    | 2 ++
- 2 files changed, 6 insertions(+)
+ 2 files changed, 5 insertions(+)
 
+diff --git a/nss/lib/freebl/Makefile b/nss/lib/freebl/Makefile
+index fe8c526..922f67c 100644
 --- a/nss/lib/freebl/Makefile
 +++ b/nss/lib/freebl/Makefile
-@@ -126,6 +126,8 @@ else
+@@ -125,6 +125,8 @@ else
+         DEFINES += -DNSS_X86
  endif
  endif
- ifdef NS_USE_GCC
 +ifdef NSS_USE_ARM_HW_CRYPTO
 +    DEFINES += -DNSS_USE_ARM_HW_CRYPTO
  ifeq ($(CPU_ARCH),aarch64)
-     DEFINES += -DUSE_HW_AES -DUSE_HW_SHA1 -DUSE_HW_SHA2
-     EXTRA_SRCS += aes-armv8.c gcm-aarch64.c sha1-armv8.c sha256-armv8.c
-@@ -150,6 +152,7 @@ endif
+     ifdef CC_IS_CLANG
+         DEFINES += -DUSE_HW_AES -DUSE_HW_SHA1 -DUSE_HW_SHA2
+@@ -166,6 +168,7 @@ endif
          endif
      endif
  endif
@@ -33,15 +35,23 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  
  ifeq ($(OS_TARGET),OSF1)
      DEFINES += -DMP_ASSEMBLY_MULTIPLY -DMP_NO_MP_WORD
+diff --git a/nss/lib/freebl/gcm.c b/nss/lib/freebl/gcm.c
+index c2cc18d..b77f573 100644
 --- a/nss/lib/freebl/gcm.c
 +++ b/nss/lib/freebl/gcm.c
-@@ -21,7 +21,9 @@
+@@ -18,6 +18,7 @@
+ 
+ #include <limits.h>
+ 
++#ifdef NSS_USE_ARM_HW_CRYPTO
  /* old gcc doesn't support some poly64x2_t intrinsic */
  #if defined(__aarch64__) && defined(IS_LITTLE_ENDIAN) && \
      (defined(__clang__) || defined(__GNUC__) && __GNUC__ > 6)
-+# ifdef NSS_USE_ARM_HW_CRYPTO
- #define USE_ARM_GCM
-+# endif
- #elif defined(__arm__) && defined(IS_LITTLE_ENDIAN) && \
-     !defined(NSS_DISABLE_ARM32_NEON)
+@@ -27,6 +28,7 @@
  /* We don't test on big endian platform, so disable this on big endian. */
+ #define USE_ARM_GCM
+ #endif
++#endif
+ 
+ /* Forward declarations */
+ SECStatus gcm_HashInit_hw(gcmHashContext *ghash);

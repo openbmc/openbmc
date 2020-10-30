@@ -177,6 +177,7 @@ FILES_${PN}-minimal = " \
     ${datadir}/${BPN}/${PV}/lisp/international/uni*.el \
     ${datadir}/${BPN}/${PV}/lisp/emacs-lisp/vc/warnings.elc \
     ${datadir}/${BPN}/${PV}/etc/charsets/ \
+    ${datadir}/${BPN}/${PV}/lisp/disp-table.elc \
     ${bindir}/emacs* \
     ${prefix}/libexec \
 "

@@ -186,6 +186,7 @@ RDEPENDS_packagegroup-meta-oe-core_remove_riscv32 = "safec"
 RDEPENDS_packagegroup-meta-oe-crypto ="\
     botan \
     cryptsetup \
+    fsverity-utils \
     libkcapi \
     libmcrypt \
     libsodium \
@@ -206,6 +207,7 @@ RDEPENDS_packagegroup-meta-oe-dbs ="\
 
 RDEPENDS_packagegroup-meta-oe-devtools ="\
     abseil-cpp \
+    apitrace \
     breakpad \
     bootchart \
     android-tools-conf \
@@ -273,6 +275,7 @@ RDEPENDS_packagegroup-meta-oe-devtools ="\
     python3-distutils-extra \
     rapidjson \
     sip3 \
+    squashfs-tools-ng \
     uftrace \
     libxerces-c \
     xerces-c-samples \
@@ -839,6 +842,7 @@ RDEPENDS_packagegroup-meta-oe-support ="\
     tbb \
     satyr \
     pcsc-lite \
+    pcsc-tools \
     sharutils \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "toscoterm", "", d)} \
     sg3-utils \

@@ -15,6 +15,7 @@ SRC_URI = "http://download.redis.io/releases/${BP}.tar.gz \
            file://oe-use-libc-malloc.patch \
            file://0001-src-Do-not-reset-FINAL_LIBS.patch \
            file://GNU_SOURCE.patch \
+           file://riscv32.patch \
            "
 
 SRC_URI[md5sum] = "70113b4b8ea7ee4c7e148be62b5d1e0b"
@@ -23,6 +24,7 @@ SRC_URI[sha256sum] = "04fa1fddc39bd1aecb6739dd5dd73858a3515b427acd1e2947a66dadce
 inherit autotools-brokensep update-rc.d systemd useradd
 
 FINAL_LIBS_x86_toolchain-clang = "-latomic"
+FINAL_LIBS_riscv32_toolchain-clang = "-latomic"
 FINAL_LIBS_mips = "-latomic"
 FINAL_LIBS_arm = "-latomic"
 FINAL_LIBS_powerpc = "-latomic"

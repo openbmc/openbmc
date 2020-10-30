@@ -28,6 +28,7 @@ DEPENDS += "${PYTHON_PN}-setuptools-scm-native"
 RDEPENDS_${PN} += " \
 	${PYTHON_PN}-math \
 	${PYTHON_PN}-html \
+	${PYTHON_PN}-wcwidth \
 "
 
 RDEPENDS_${PN}-ptest += " \

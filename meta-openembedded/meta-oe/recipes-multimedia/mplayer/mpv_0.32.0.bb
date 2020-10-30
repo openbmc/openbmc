@@ -18,7 +18,9 @@ LICENSE_FLAGS = "commercial"
 SRCREV_mpv = "70b991749df389bcc0a4e145b5687233a03b4ed7"
 SRC_URI = " \
     git://github.com/mpv-player/mpv;name=mpv \
+    https://waf.io/waf-2.0.20;name=waf;subdir=git \
 "
+SRC_URI[waf.sha256sum] = "bf971e98edc2414968a262c6aa6b88541a26c3cd248689c89f4c57370955ee7f"
 
 S = "${WORKDIR}/git"
 
@@ -100,14 +102,10 @@ EXTRA_OECONF = " \
     ${PACKAGECONFIG_CONFARGS} \
 "
 
-do_patch[postfuncs] += "get_waf"
-
-get_waf() {
-    cd ${S}
-    ./bootstrap.py
-    sed -i -e 's|/usr/bin/env python|/usr/bin/env python3|g' ${S}/waf
-    cd -
+link_waf() {
+    ln -s waf-2.0.20 ${S}/waf
 }
+do_unpack[postfuncs] += "link_waf"
 
 FILES_${PN} += " \
     ${datadir}/icons \

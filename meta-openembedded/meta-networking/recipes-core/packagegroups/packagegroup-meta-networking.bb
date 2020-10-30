@@ -250,6 +250,7 @@ RDEPENDS_packagegroup-meta-networking-support = "\
     tinyproxy \
     uftp \
     unbound \
+    vnstat \
     wpan-tools \
     ettercap \
 "

@@ -19,9 +19,8 @@ SRC_URI = "https://downloads.mariadb.org/interstitial/${BP}/source/${BP}.tar.gz 
            file://clang_version_header_conflict.patch \
            file://fix-arm-atomic.patch \
            file://0001-Fix-library-LZ4-lookup.patch \
-           file://0001-MDEV-23137-RocksDB-undefined-reference-to-crc32c_arm.patch \
           "
-SRC_URI[sha256sum] = "26db2becc9cec37e99a4e73390bd2eaa74568e21f9cf110359f4f68b37154c72"
+SRC_URI[sha256sum] = "ff05dd69e9f6992caf1053242db704f04eda6f9accbcc98b74edfaf6013c45c4"
 
 UPSTREAM_CHECK_URI = "https://github.com/MariaDB/server/releases"
 
