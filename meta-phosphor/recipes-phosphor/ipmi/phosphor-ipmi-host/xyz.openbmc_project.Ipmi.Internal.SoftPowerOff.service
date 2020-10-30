@@ -2,8 +2,8 @@
 Description=Soft power off of the host
 Wants=mapper-wait@-org-openbmc-HostIpmi-1.service
 After=mapper-wait@-org-openbmc-HostIpmi-1.service
-Wants=obmc-host-stopping@0.target
-Before=obmc-host-stopping@0.target
+Wants=obmc-host-stop-pre@0.target
+Before=obmc-host-stop-pre@0.target
 Conflicts=obmc-host-start@0.target
 ConditionPathExists=!/run/openbmc/host@0-request
 ConditionPathExists=!/lib/systemd/system/pldmSoftPowerOff.service
