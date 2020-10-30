@@ -136,6 +136,16 @@ qemuarm64-musl:
   script:
   - kas build --target security-build-image kas/$CI_JOB_NAME.yml 
 
+qemux86-harden:
+  extends: .build
+  script:
+  - kas build --target harden-image-minimal kas/$CI_JOB_NAME.yml 
+
+qemux86-comp:
+  extends: .build
+  script:
+  - kas build --target security-build-image kas/$CI_JOB_NAME.yml 
+
 qemux86-test:
   extends: .build
   allow_failure: true

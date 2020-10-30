@@ -10,6 +10,7 @@ repos:
       meta-tpm:
       meta-integrity:
       meta-security-compliance:
+      meta-hardening:
 
   poky:
     url: https://git.yoctoproject.org/git/poky
