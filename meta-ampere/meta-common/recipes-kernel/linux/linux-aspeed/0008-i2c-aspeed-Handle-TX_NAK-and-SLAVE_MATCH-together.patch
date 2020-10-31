@@ -1,0 +1,36 @@
+From 42a6db50467157dcab9baa130d17737780b507ac Mon Sep 17 00:00:00 2001
+From: "Thang Q. Nguyen" <thang@os.amperecomputing.com>
+Date: Wed, 14 Oct 2020 04:10:32 +0000
+Subject: [PATCH 8/9] i2c: aspeed: Handle TX_NAK and SLAVE_MATCH together
+
+The i2c-aspeed.c driver expects interrupt bits are set one by one but there
+are also a lot of other cases that Aspeed I2C IP sends multiple interrupt
+bits in a single interrupt call. Sometimes, TX_NAK and SLAVE_MATCH happens
+at the same time, and i2c-aspeed driver will ignore TX_NAK. This causes
+errors in i2c bus. This patch will handle TX_NAK then SLAVE_MATCH if both of
+them occur together.
+
+Signed-off-by: Hieu Vu <hieu@os.amperecomputing.com>
+---
+ drivers/i2c/busses/i2c-aspeed.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/i2c/busses/i2c-aspeed.c b/drivers/i2c/busses/i2c-aspeed.c
+index 1ad74efcab37..55b8f7484bee 100644
+--- a/drivers/i2c/busses/i2c-aspeed.c
++++ b/drivers/i2c/busses/i2c-aspeed.c
+@@ -254,6 +254,11 @@ static u32 aspeed_i2c_slave_irq(struct aspeed_i2c_bus *bus, u32 irq_status)
+ 
+ 	/* Slave was requested, restart state machine. */
+ 	if (irq_status & ASPEED_I2CD_INTR_SLAVE_MATCH) {
++		if (irq_status & ASPEED_I2CD_INTR_TX_NAK &&
++			bus->slave_state == ASPEED_I2C_SLAVE_READ_PROCESSED) {
++			irq_handled |= ASPEED_I2CD_INTR_TX_NAK;
++			i2c_slave_event(slave, I2C_SLAVE_STOP, &value);
++		}
+ 		irq_handled |= ASPEED_I2CD_INTR_SLAVE_MATCH;
+ 		bus->slave_state = ASPEED_I2C_SLAVE_START;
+ 	}
+-- 
+2.18.4
+

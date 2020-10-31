@@ -7,4 +7,6 @@ SRC_URI += " \
     file://0004-hwmon-smpro-Add-Ampere-SMpro-hwmon-driver.patch \
     file://0005-bindings-ipmi-Add-binding-for-Aspeed-SSIF-BMC-driver.patch \
     file://0007-drivers-char-ipmi-Add-Aspeed-BMC-SSIF-driver.patch \
+    file://0008-i2c-aspeed-Handle-TX_NAK-and-SLAVE_MATCH-together.patch \
+    file://0009-i2c-aspeed-workaround-for-slave-s-Unexpected-Ack-on-.patch \
 "
