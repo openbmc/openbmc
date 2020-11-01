@@ -11,3 +11,10 @@ power_on:
         DutyOn: 50
         Period: 0
         Priority: 'On'
+
+systemFault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'Blink'
