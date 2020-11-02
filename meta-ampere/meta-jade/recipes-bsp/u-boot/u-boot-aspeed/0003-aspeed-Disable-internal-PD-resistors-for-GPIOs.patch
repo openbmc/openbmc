@@ -1,0 +1,40 @@
+From 9604432cd8faa80d3c92a3ba07d194bbce78f23b Mon Sep 17 00:00:00 2001
+From: "Thang Q. Nguyen" <thang@os.amperecomputing.com>
+Date: Mon, 2 Nov 2020 07:50:31 +0000
+Subject: [PATCH] aspeed: Disable internal PD resistors for GPIOs
+
+Configure SCU8C - Multi-function pin control 4 to disable internal pull
+down resistors for GPIOJ, GPIOG/GPIOAB, GPIOD/GPIOY, GPIOC/GPIOS as
+external resistors are already installed.
+
+Signed-off-by: Thang Q. Nguyen <thang@os.amperecomputing.com>
+---
+ board/aspeed/ast-g5/ast-g5.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/board/aspeed/ast-g5/ast-g5.c b/board/aspeed/ast-g5/ast-g5.c
+index f708de3278..c4b322d1fa 100644
+--- a/board/aspeed/ast-g5/ast-g5.c
++++ b/board/aspeed/ast-g5/ast-g5.c
+@@ -26,6 +26,18 @@ int board_init(void)
+ 	/* Switch PWM to GPIO mode */
+ 	ast_scu_switch_pwm_to_gpio_mode();
+ 
++	/*
++	 * Disable internal pull down resistor for GPIOJ,
++	 * GPIOG/GPIOAB, GPIOD/GPIOY, GPIOC/GPIOS as external pull up/down
++	 * resistors are installed already. Unlock SCU regs before writing.
++	 */
++	writel(SCU_PROTECT_UNLOCK, AST_SCU_BASE);
++	val = readl(AST_SCU_BASE + AST_SCU_FUN_PIN_CTRL4) | 0x024C0000;
++	writel(val, AST_SCU_BASE + AST_SCU_FUN_PIN_CTRL4);
++#ifdef CONFIG_AST_SCU_LOCK
++	writel(0xaa, AST_SCU_BASE);
++#endif
++
+ 	return 0;
+ }
+ 
+-- 
+2.25.1
+
