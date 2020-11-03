@@ -17,7 +17,7 @@ SRC_URI = "git://git.infradead.org/mtd-utils.git \
            file://add-exclusion-to-mkfs-jffs2-git-2.patch \
            "
 
-S = "${WORKDIR}/git"
+S = "${WORKDIR}/git/"
 
 EXTRA_OECONF += "--enable-install-tests"
 

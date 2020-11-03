@@ -461,16 +461,7 @@ class Tinfoil:
         commandline = [command]
         if params:
             commandline.extend(params)
-        try:
-            result = self.server_connection.connection.runCommand(commandline)
-        finally:
-            while True:
-                event = self.wait_event()
-                if not event:
-                    break
-                if isinstance(event, logging.LogRecord):
-                    if event.taskpid == 0 or event.levelno > logging.INFO:
-                        self.logger.handle(event)
+        result = self.server_connection.connection.runCommand(commandline)
         if result[1]:
             raise TinfoilCommandFailed(result[1])
         return result[0]

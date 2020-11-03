@@ -8,7 +8,7 @@ PV = "0.1+git${SRCPV}"
 
 SRC_URI = "git://github.com/aehs29/baremetal-helloqemu.git;protocol=https;branch=master"
 
-S = "${WORKDIR}/git"
+S = "${WORKDIR}/git/"
 
 # The following variables should be set to accomodate each application
 BAREMETAL_BINNAME ?= "hello_baremetal_${MACHINE}"

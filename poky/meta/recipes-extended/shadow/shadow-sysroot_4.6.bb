@@ -27,5 +27,3 @@ SYSROOT_DIRS += "${sysconfdir}"
 # otherwise: dbus-dev depends on shadow-sysroot-dev which depends on shadow-sysroot
 # and this has another copy of /etc/login.defs already provided by shadow
 PACKAGES = ""
-
-inherit nopackages

@@ -1,0 +1,281 @@
+/* Feuille de style DocBook du projet Traduc.org                */
+/* DocBook CSS stylesheet of the Traduc.org project             */
+
+/* (c) Jean-Philippe Guérard - 14 août 2004                     */
+/* (c) Jean-Philippe Guérard - 14 August 2004                   */
+
+/* Cette feuille de style est libre, vous pouvez la             */
+/* redistribuer et la modifier selon les termes de la Licence   */
+/* Art Libre. Vous trouverez un exemplaire de cette Licence sur */
+/* http://tigreraye.org/Petit-guide-du-traducteur.html#licence-art-libre */
+
+/* This work of art is free, you can redistribute it and/or     */
+/* modify it according to terms of the Free Art license. You    */
+/* will find a specimen of this license on the Copyleft         */
+/* Attitude web site: http://artlibre.org as well as on other   */
+/* sites.                                                       */
+/* Please note that the French version of this licence as shown */
+/* on http://tigreraye.org/Petit-guide-du-traducteur.html#licence-art-libre */
+/* is only official licence of this document. The English       */
+/* is only provided to help you understand this licence.        */
+
+/* La dernière version de cette feuille de style est toujours   */
+/* disponible sur : http://tigreraye.org/style.css              */
+/* Elle est également disponible sur :                          */
+/* http://www.traduc.org/docs/HOWTO/lecture/style.css           */
+
+/* The latest version of this stylesheet is available from:     */
+/* http://tigreraye.org/style.css                               */
+/* It is also available on:                                     */
+/* http://www.traduc.org/docs/HOWTO/lecture/style.css           */
+
+/* N'hésitez pas à envoyer vos commentaires et corrections à    */
+/* Jean-Philippe Guérard <jean-philippe.guerard@tigreraye.org>  */
+
+/* Please send feedback and bug reports to                      */
+/* Jean-Philippe Guérard <jean-philippe.guerard@tigreraye.org>  */
+
+/* $Id: style.css,v 1.14 2004/09/10 20:12:09 fevrier Exp fevrier $ */
+
+/* Présentation générale du document */
+/* Overall document presentation */
+
+body {
+    /*
+    font-family: Apolline, "URW Palladio L", Garamond, jGaramond,
+                 "Bitstream Cyberbit", "Palatino Linotype", serif;
+     */
+    margin: 7%;
+    background-color: white;
+}
+
+/* Taille du texte */
+/* Text size */
+
+* { font-size: 100%; }
+
+/* Gestion des textes mis en relief imbriqués */
+/* Embedded emphasis */
+
+em { font-style: italic; }
+em em { font-style: normal; }
+em em em { font-style: italic; }
+
+/* Titres */
+/* Titles */
+
+h1 { font-size: 200%; font-weight: 900; }
+h2 { font-size: 160%; font-weight: 900; }
+h3 { font-size: 130%; font-weight: bold; }
+h4 { font-size: 115%; font-weight: bold; }
+h5 { font-size: 108%; font-weight: bold; }
+h6 {                  font-weight: bold; }
+
+/* Nom de famille en petites majuscules (uniquement en français) */
+/* Last names in small caps (for French only) */
+
+*[class~="surname"]:lang(fr) { font-variant: small-caps; }
+
+/* Blocs de citation */
+/* Quotation blocs */
+
+div[class~="blockquote"] {
+  border: solid 2px #AAA;
+  padding: 5px;
+  margin: 5px;
+}
+
+div[class~="blockquote"] > table {
+  border: none;
+}
+
+/* Blocs litéraux : fond gris clair */
+/* Literal blocs: light gray background */
+
+*[class~="literallayout"] {
+  background: #f0f0f0;
+  padding: 5px;
+  margin: 5px;
+}
+
+/* Programmes et captures texte : fond bleu clair */
+/* Listing and text screen snapshots: light blue background */
+
+*[class~="programlisting"], *[class~="screen"] {
+  background: #f0f0ff;
+  padding: 5px;
+  margin: 5px;
+}
+
+/* Les textes à remplacer sont surlignés en vert pâle */
+/* Replaceable text in highlighted in pale green */
+
+*[class~="replaceable"] { 
+    background-color: #98fb98;
+    font-style: normal; }
+
+/* Tables : fonds gris clair & bords simples */
+/* Tables: light gray background and solid borders */
+
+*[class~="table"] *[class~="title"] { width:100%; border: 0px; }
+
+table {
+    border: 1px solid #aaa;
+    border-collapse: collapse;
+    padding: 2px;
+    margin: 5px;
+}
+
+/* Listes simples en style table */
+/* Simples lists in table presentation */
+
+table[class~="simplelist"] {
+    background-color: #F0F0F0;
+    margin: 5px;
+    border: solid 1px #AAA;
+}
+
+table[class~="simplelist"] td {
+    border: solid 1px #AAA;
+}
+
+/* Les tables */
+/* Tables */
+
+*[class~="table"] table {
+    background-color: #F0F0F0;
+    border: solid 1px #AAA;
+}
+*[class~="informaltable"] table { background-color: #F0F0F0; }
+
+th,td {
+    vertical-align: baseline;
+    text-align: left;
+    padding: 0.1em 0.3em;
+    empty-cells: show; 
+}
+
+/* Alignement des colonnes */
+/* Colunms alignment */
+
+td[align=center] ,  th[align=center]  { text-align: center; }
+td[align=right] ,   th[align=right]   { text-align: right; }
+td[align=left] ,    th[align=left]    { text-align: left; }
+td[align=justify] , th[align=justify] { text-align: justify; }
+
+/* Pas de marge autour des images */
+/* No inside margins for images */
+
+img { border: 0; }
+
+/* Les liens ne sont pas soulignés */
+/* No underlines for links */
+
+:link , :visited , :active { text-decoration: none; }
+
+/* Prudence : cadre jaune et fond jaune clair */
+/* Caution: yellow border and light yellow background */
+
+*[class~="caution"] {
+    border: solid 2px yellow;
+    background-color: #ffffe0;
+    padding: 1em 6px 1em ;
+    margin: 5px;
+}
+
+*[class~="caution"] th {
+    vertical-align: middle
+}
+
+*[class~="caution"] table {
+    background-color: #ffffe0;
+    border: none;
+}
+
+/* Note importante : cadre jaune et fond jaune clair */
+/* Important: yellow border and light yellow background */
+
+*[class~="important"] {
+    border: solid 2px yellow;
+    background-color: #ffffe0;
+    padding: 1em 6px 1em;
+    margin: 5px;
+}
+
+*[class~="important"] th {
+    vertical-align: middle
+}
+
+*[class~="important"] table  {
+    background-color: #ffffe0;
+    border: none;
+}
+
+/* Mise en évidence : texte légèrement plus grand */
+/* Highlights: slightly larger texts */
+
+*[class~="highlights"] {
+    font-size:  110%;
+}
+
+/* Note : cadre bleu et fond bleu clair */
+/* Notes: blue border and light blue background */
+
+*[class~="note"]   {
+    border: solid 2px #7099C5;
+    background-color: #f0f0ff;
+    padding: 1em 6px 1em ;
+    margin: 5px;
+}
+
+*[class~="note"] th {
+    vertical-align: middle
+}
+
+*[class~="note"] table {
+    background-color: #f0f0ff;
+    border: none;
+}
+
+/* Astuce : cadre vert et fond vert clair */
+/* Tip: green border and light green background */
+
+*[class~="tip"] {
+    border: solid 2px #00ff00;
+    background-color: #f0ffff;
+    padding: 1em 6px 1em ;
+    margin: 5px;
+}
+
+*[class~="tip"] th {
+    vertical-align: middle;
+}
+
+*[class~="tip"] table {
+    background-color: #f0ffff;
+    border: none;
+}
+
+/* Avertissement : cadre rouge et fond rouge clair */
+/* Warning: red border and light red background */
+
+*[class~="warning"] {
+    border: solid 2px #ff0000;
+    background-color: #fff0f0; 
+    padding: 1em 6px 1em ;
+    margin: 5px;
+}
+
+*[class~="warning"] th {
+    vertical-align: middle;
+}
+                    
+
+*[class~="warning"] table {
+    background-color: #fff0f0;
+    border: none;
+}
+
+/* Fin */
+/* The End */
+

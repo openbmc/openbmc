@@ -350,7 +350,7 @@ The supported parameters are as follows:
 
 -  *"rev":* The revision of the source code to checkout.
 
--  *"scmdata":* Causes the ".svn" directories to be available during
+-  *"scmdata":* Causes the “.svn” directories to be available during
    compile-time when set to "keep". By default, these directories are
    removed.
 

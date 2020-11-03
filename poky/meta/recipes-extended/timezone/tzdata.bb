@@ -15,18 +15,18 @@ DEFAULT_TIMEZONE ?= "Universal"
 INSTALL_TIMEZONE_FILE ?= "1"
 
 TZONES= "africa antarctica asia australasia europe northamerica southamerica  \
-         factory etcetera backward \
+         factory etcetera backward systemv \
         "
 # pacificnew 
 
 do_compile () {
         for zone in ${TZONES}; do \
             ${STAGING_BINDIR_NATIVE}/zic -d ${WORKDIR}${datadir}/zoneinfo -L /dev/null \
-                ${S}/${zone} ; \
+                -y ${S}/yearistype.sh ${S}/${zone} ; \
             ${STAGING_BINDIR_NATIVE}/zic -d ${WORKDIR}${datadir}/zoneinfo/posix -L /dev/null \
-                ${S}/${zone} ; \
+                -y ${S}/yearistype.sh ${S}/${zone} ; \
             ${STAGING_BINDIR_NATIVE}/zic -d ${WORKDIR}${datadir}/zoneinfo/right -L ${S}/leapseconds \
-                ${S}/${zone} ; \
+                -y ${S}/yearistype.sh ${S}/${zone} ; \
         done
 }
 

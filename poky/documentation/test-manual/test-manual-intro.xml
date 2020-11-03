@@ -1,0 +1,624 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+<!--SPDX-License-Identifier: CC-BY-2.0-UK-->
+
+<chapter id='test-manual-intro'>
+
+<title>The Yocto Project Test Environment Manual</title>
+    <section id='test-welcome'>
+        <title>Welcome</title>
+
+        <para> Welcome to the Yocto Project Test Environment Manual! This manual is a work in
+            progress. The manual contains information about the testing environment used by the
+            Yocto Project to make sure each major and minor release works as intended. All the
+            project's testing infrastructure and processes are publicly visible and available so
+            that the community can see what testing is being performed, how it's being done and the
+            current status of the tests and the project at any given time. It is intended that Other
+            organizations can leverage off the process and testing environment used by the Yocto
+            Project to create their own automated, production test environment, building upon the
+            foundations from the project core. </para>
+
+        <para> Currently, the Yocto Project Test Environment Manual has no projected release date.
+            This manual is a work-in-progress and is being initially loaded with information from
+            the <ulink url="">README</ulink> files and notes from key engineers: <itemizedlist>
+                <listitem>
+                    <para>
+                        <emphasis><filename>yocto-autobuilder2</filename>:</emphasis> This <ulink
+                            url="http://git.yoctoproject.org/clean/cgit.cgi/yocto-autobuilder2/tree/README.md"
+                                ><filename>README.md</filename></ulink> is the main README which
+                        detials how to set up the Yocto Project Autobuilder. The
+                            <filename>yocto-autobuilder2</filename> repository represents the Yocto
+                        Project's console UI plugin to Buildbot and the configuration necessary to
+                        configure Buildbot to perform the testing the project requires. </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <emphasis><filename>yocto-autobuilder-helper</filename>:</emphasis> This
+                            <ulink
+                            url="http://git.yoctoproject.org/clean/cgit.cgi/yocto-autobuilder-helper/tree/README"
+                                ><filename>README</filename></ulink> and repository contains Yocto
+                        Project Autobuilder Helper scripts and configuration. The
+                            <filename>yocto-autobuilder-helper</filename> repository contains the
+                        "glue" logic that defines which tests to run and how to run them. As a
+                        result, it can be used by any Continuous Improvement (CI) system to run
+                        builds, support getting the correct code revisions, configure builds and
+                        layers, run builds, and collect results. The code is independent of any CI
+                        system, which means the code can work Buildbot, Jenkins, or others. This
+                        repository has a branch per release of the project defining the tests to run
+                        on a per release basis.</para>
+                </listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='test-yocto-project-autobuilder-overview'>
+        <title>Yocto Project Autobuilder Overview</title>
+
+        <para>The Yocto Project Autobuilder collectively refers to the software, tools, scripts, and
+            procedures used by the Yocto Project to test released software across supported hardware
+            in an automated and regular fashion. Basically, during the development of a Yocto
+            Project release, the Autobuilder tests if things work. The Autobuilder builds all test
+            targets and runs all the tests. </para>
+
+        <para>The Yocto Project uses now uses standard upstream  <ulink
+                url="https://docs.buildbot.net/0.9.15.post1/">Buildbot</ulink> (version 9) to drive
+            its integration and testing. Buildbot Nine has a plug-in interface that the Yocto
+            Project customizes using code from the <filename>yocto-autobuilder2</filename>
+            repository, adding its own console UI plugin. The resulting UI plug-in allows you to
+            visualize builds in a way suited to the project's needs.</para>
+
+        <para>A <filename>helper</filename> layer provides configuration and job management through
+            scripts found in the <filename>yocto-autobuilder-helper</filename> repository. The
+                <filename>helper</filename> layer contains the bulk of the build configuration
+            information and is release-specific, which makes it highly customizable on a per-project
+            basis. The layer is CI system-agnostic and contains a number of Helper scripts that can
+            generate build configurations from simple JSON files. <note>
+                <para>The project uses Buildbot for historical reasons but also because many of the
+                    project developers have knowledge of python. It is possible to use the outer
+                    layers from another Continuous Integration (CI) system such as <ulink
+                        url="https://en.wikipedia.org/wiki/Jenkins_(software)">Jenkins</ulink>
+                    instead of Buildbot. </para>
+            </note>
+        </para>
+
+        <para> The following figure shows the Yocto Project Autobuilder stack with a topology that
+            includes a controller and a cluster of workers: <imagedata
+                fileref="figures/ab-test-cluster.png" width="4.6in" depth="4.35in" align="center"
+                scalefit="1"/>
+        </para>
+    </section>
+
+    <section id='test-project-tests'>
+        <title>Yocto Project Tests - Types of Testing Overview</title>
+
+        <para>The Autobuilder tests different elements of the project by using thefollowing types of
+            tests: <itemizedlist>
+                <listitem>
+                    <para>
+                        <emphasis>Build Testing:</emphasis> Tests whether specific configurations
+                        build by varying <ulink url="&YOCTO_DOCS_REF_URL;#var-MACHINE"
+                                ><filename>MACHINE</filename></ulink>, <ulink
+                            url="&YOCTO_DOCS_REF_URL;#var-DISTRO"
+                            ><filename>DISTRO</filename></ulink>, other configuration options, and
+                        the specific target images being built (or world). Used to trigger builds of
+                        all the different test configurations on the Autobuilder. Builds usually
+                        cover many different targets for different architectures, machines, and
+                        distributions, as well as different configurations, such as different init
+                        systems. The Autobuilder tests literally hundreds of configurations and
+                        targets. <itemizedlist>
+                            <listitem>
+                                <para>
+                                    <emphasis>Sanity Checks During the Build Process:</emphasis>
+                                    Tests initiated through the <ulink
+                                        url="&YOCTO_DOCS_REF_URL;#ref-classes-insane"
+                                            ><filename>insane</filename></ulink> class. These checks
+                                    ensure the output of the builds are correct. For example, does
+                                    the ELF architecture in the generated binaries match the target
+                                    system? ARM binaries would not work in a MIPS system! </para>
+                            </listitem>
+                        </itemizedlist></para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <emphasis>Build Performance Testing:</emphasis> Tests whether or not
+                        commonly used steps during builds work efficiently and avoid regressions.
+                        Tests to time commonly used usage scenarios are run through
+                            <filename>oe-build-perf-test</filename>. These tests are run on isolated
+                        machines so that the time measurements of the tests are accurate and no
+                        other processes interfere with the timing results. The project currently
+                        tests performance on two different distributions, Fedora and Ubuntu, to
+                        ensure we have no single point of failure and can ensure the different
+                        distros work effectively. </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <emphasis>eSDK Testing:</emphasis> Image tests initiated through the
+                        following command:
+                        <literallayout class="monospaced">
+     $ bitbake <replaceable>image</replaceable> -c testsdkext
+                    </literallayout>
+                        The tests utilize the <filename>testsdkext</filename> class and the
+                            <filename>do_testsdkext</filename> task. </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <emphasis>Feature Testing:</emphasis> Various scenario-based tests are run
+                        through the <ulink url="&YOCTO_DOCS_REF_URL;#testing-and-quality-assurance"
+                            >OpenEmbedded Self-Test</ulink> (oe-selftest). We test oe-selftest on
+                        each of the main distrubutions we support. </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <emphasis>Image Testing:</emphasis> Image tests initiated through the
+                        following command:
+                        <literallayout class="monospaced">
+     $ bitbake <replaceable>image</replaceable> -c testimage
+                    </literallayout>
+                        The tests utilize the <ulink
+                            url="&YOCTO_DOCS_REF_URL;#ref-classes-testimage*"
+                                ><filename>testimage*</filename></ulink> classes and the <ulink
+                            url="&YOCTO_DOCS_REF_URL;#ref-tasks-testimage"
+                                ><filename>do_testimage</filename></ulink> task. </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <emphasis>Layer Testing:</emphasis> The Autobuilder has the possibility to
+                        test whether specific layers work with the test of the system. The layers
+                        tested may be selected by members of the project. Some key community layers
+                        are also tested periodically.</para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <emphasis>Package Testing:</emphasis> A Package Test (ptest) runs tests
+                        against packages built by the OpenEmbedded build system on the target
+                        machine. See the "<ulink
+                            url="&YOCTO_DOCS_DEV_URL;#testing-packages-with-ptest">Testing Packages
+                            With ptest</ulink>" section in the Yocto Project Development Tasks
+                        Manual and the "<ulink url="&YOCTO_WIKI_URL;/wiki/Ptest">Ptest</ulink>" Wiki
+                        page for more information on Ptest. </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <emphasis>SDK Testing:</emphasis> Image tests initiated through the
+                        following command:
+                        <literallayout class="monospaced">
+     $ bitbake <replaceable>image</replaceable> -c testsdk
+                    </literallayout>
+                        The tests utilize the <ulink url="&YOCTO_DOCS_REF_URL;#ref-classes-testsdk"
+                                ><filename>testsdk</filename></ulink> class and the
+                            <filename>do_testsdk</filename> task. </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <emphasis>Unit Testing:</emphasis> Unit tests on various components of the
+                        system run through <filename>oe-selftest</filename> and <ulink
+                            url="&YOCTO_DOCS_REF_URL;#testing-and-quality-assurance"
+                                ><filename>bitbake-selftest</filename></ulink>. </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <emphasis>Automatic Upgrade Helper:</emphasis> This target tests whether new
+                        versions of software are available and whether we can automatically upgrade
+                        to those new versions. If so, this target emails the maintainers with a
+                        patch to let them know this is possible.</para>
+                </listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='test-test-mapping'>
+        <title>How Tests Map to Areas of Code</title>
+
+        <para>
+            Tests map into the codebase as follows:
+            <itemizedlist>
+                <listitem><para>
+                        <emphasis>bitbake-selftest</emphasis>: </para>
+                    <para>These tests are self-contained and test BitBake as well as its APIs, which
+                        include the fetchers. The tests are located in
+                            <filename>bitbake/lib/*/tests</filename>. </para>
+                    <para>From within the BitBake repository, run the following:
+                        <literallayout class="monospaced">
+     $ bitbake-selftest
+                            </literallayout>
+                    </para>
+                    <para>To skip tests that access the Internet, use the
+                            <filename>BB_SKIP_NETTEST</filename> variable when running
+                        "bitbake-selftest" as follows:
+                        <literallayout class="monospaced">
+     $ BB_SKIP_NETTEST=yes bitbake-selftest
+                            </literallayout></para>
+                    <para>The default output is quiet and just prints a summary of what was run. To
+                        see more information, there is a verbose
+                        option:<literallayout class="monospaced">
+     $ bitbake-selftest -v
+                             </literallayout></para>
+                    <para>Use this option when you wish to skip tests that access the network, which
+                        are mostly necessary to test the fetcher modules. To specify individual test
+                        modules to run, append the test module name to the "bitbake-selftest"
+                        command. For example, to specify the tests for the bb.data.module, run:
+                        <literallayout class="monospaced">
+     $ bitbake-selftest bb.test.data.module
+                            </literallayout>You
+                        can also specify individual tests by defining the full name and module plus
+                        the class path of the test, for example:
+                        <literallayout class="monospaced">
+     $ bitbake-selftest bb.tests.data.TestOverrides.test_one_override
+                             </literallayout></para>
+                    <para>The tests are based on <ulink
+                            url="https://docs.python.org/3/library/unittest.html">Python
+                            unittest</ulink>. </para></listitem>
+                <listitem><para>
+                        <emphasis>oe-selftest</emphasis>: <itemizedlist>
+                            <listitem>
+                                <para>These tests use OE to test the workflows, which include
+                                    testing specific features, behaviors of tasks, and API unit
+                                    tests. </para>
+                            </listitem>
+                            <listitem>
+                                <para>The tests can take advantage of parallelism through the "-j"
+                                    option, which can specify a number of threads to spread the
+                                    tests across. Note that all tests from a given class of tests
+                                    will run in the same thread. To parallelize large numbers of
+                                    tests you can split the class into multiple units.</para>
+                            </listitem>
+                            <listitem>
+                                <para>The tests are based on Python unittest. </para>
+                            </listitem>
+                            <listitem>
+                                <para>The code for the tests resides in
+                                        <filename>meta/lib/oeqa/selftest/cases/</filename>. </para>
+                            </listitem>
+                            <listitem>
+                                <para>To run all the tests, enter the following command:
+                                    <literallayout class="monospaced">
+     $ oe-selftest -a
+                            </literallayout>
+                                </para>
+                            </listitem>
+                            <listitem>
+                                <para>To run a specific test, use the following command form where
+                                        <replaceable>testname</replaceable> is the name of the
+                                    specific test:
+                                    <literallayout class="monospaced">
+     $ oe-selftest -r <replaceable>testname</replaceable>
+                            </literallayout>
+                                    For example, the following command would run the tinfoil getVar
+                                    API
+                                    test:<literallayout class="monospaced">
+     $ oe-selftest -r tinfoil.TinfoilTests.test_getvar
+                            </literallayout>It
+                                    is also possible to run a set of tests. For example the
+                                    following command will run all of the tinfoil
+                                    tests:<literallayout class="monospaced">
+     $ oe-selftest -r  tinfoil
+                            </literallayout></para>
+                            </listitem>
+                        </itemizedlist>
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>testimage:</emphasis>
+                    <itemizedlist>
+                        <listitem><para>
+                            These tests build an image, boot it, and run tests
+                            against the image's content.
+                            </para></listitem>
+                        <listitem><para> The code for these tests resides in <filename>meta/lib/oeqa/runtime/cases/</filename>. </para></listitem>
+                        <listitem><para>
+                            You need to set the
+                            <ulink url='&YOCTO_DOCS_REF_URL;#var-IMAGE_CLASSES'><filename>IMAGE_CLASSES</filename></ulink>
+                            variable as follows:
+                            <literallayout class='monospaced'>
+     IMAGE_CLASSES += "testimage"
+                            </literallayout>
+                            </para></listitem>
+                        <listitem><para>
+                            Run the tests using the following command form:
+                            <literallayout class='monospaced'>
+     $ bitbake <replaceable>image</replaceable> -c testimage
+                            </literallayout>
+                            </para></listitem>
+                    </itemizedlist>
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>testsdk:</emphasis>
+                    <itemizedlist>
+                        <listitem><para>These tests build an SDK, install it, and then run tests against that SDK. </para></listitem>
+                        <listitem><para>The code for these tests resides in <filename>meta/lib/oeqa/sdk/cases/</filename>. </para></listitem>
+                        <listitem><para>Run the test using the following command form:
+                                    <literallayout class="monospaced">
+     $ bitbake <replaceable>image</replaceable> -c testsdk
+                            </literallayout>
+                                </para></listitem>
+                    </itemizedlist>
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>testsdk_ext:</emphasis>
+                    <itemizedlist>
+                        <listitem><para>These tests build an extended SDK (eSDK), install that eSDK, and run tests against the eSDK. </para></listitem>
+                        <listitem><para>The code for these tests resides in <filename>meta/lib/oeqa/esdk</filename>. </para></listitem>
+                        <listitem><para>To run the tests, use the following command form:
+                                    <literallayout class="monospaced">
+     $ bitbake <replaceable>image</replaceable> -c testsdkext
+                            </literallayout>
+                                </para></listitem>
+                    </itemizedlist>
+                    </para></listitem>
+
+
+                <listitem><para>
+                    <emphasis>oe-build-perf-test:</emphasis>
+                    <itemizedlist>
+                        <listitem><para>These tests run through commonly used usage scenarios and measure the performance times. </para></listitem>
+                        <listitem><para>The code for these tests resides in <filename>meta/lib/oeqa/buildperf</filename>. </para></listitem>
+                        <listitem><para>To run the tests, use the following command form:
+                                    <literallayout class="monospaced">
+    $ oe-build-perf-test <replaceable>options</replaceable>
+                            </literallayout>The
+                                    command takes a number of options, such as where to place the
+                                    test results. The Autobuilder Helper Scripts include the
+                                        <filename>build-perf-test-wrapper</filename> script with
+                                    examples of how to use the oe-build-perf-test from the command
+                                    line.</para>
+                                <para>Use the <filename>oe-git-archive</filename> command to store
+                                    test results into a Git repository. </para>
+                                <para>Use the <filename>oe-build-perf-report</filename> command to
+                                    generate text reports and HTML reports with graphs of the
+                                    performance data. For examples, see <link linkend=""
+                                        >http://downloads.yoctoproject.org/releases/yocto/yocto-2.7/testresults/buildperf-centos7/perf-centos7.yoctoproject.org_warrior_20190414204758_0e39202.html</link>
+                                    and <link linkend=""
+                                        >http://downloads.yoctoproject.org/releases/yocto/yocto-2.7/testresults/buildperf-centos7/perf-centos7.yoctoproject.org_warrior_20190414204758_0e39202.txt</link>.</para></listitem>
+                            <listitem>
+                                <para>The tests are contained in
+                                        <filename>lib/oeqa/buildperf/test_basic.py</filename>.</para>
+                            </listitem>
+                    </itemizedlist>
+                    </para></listitem>
+
+
+
+
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='test-examples'>
+        <title>Test Examples</title>
+
+        <para>This section provides example tests for each of the tests listed in the <link
+                linkend="test-test-mapping">How Tests Map to Areas of Code</link> section. </para>
+        <para>For oeqa tests, testcases for each area reside in the main test directory at
+                <filename>meta/lib/oeqa/selftest/cases</filename> directory.</para>
+        <para>For oe-selftest. bitbake testcases reside in the <filename>lib/bb/tests/</filename>
+            directory. </para>
+
+        <section id='bitbake-selftest-example'>
+            <title><filename>bitbake-selftest</filename></title>
+
+            <para>A simple test example from <filename>lib/bb/tests/data.py</filename> is:
+                <literallayout class="monospaced">
+     class DataExpansions(unittest.TestCase):
+         def setUp(self):
+             self.d = bb.data.init()
+             self.d["foo"] = "value_of_foo"
+             self.d["bar"] = "value_of_bar"       
+             self.d["value_of_foo"] = "value_of_'value_of_foo'"
+           
+          def test_one_var(self):
+             val =  self.d.expand("${foo}")
+             self.assertEqual(str(val), "value_of_foo")
+                     </literallayout>
+            </para>
+            <para>In this example, a <ulink url=""><filename>DataExpansions</filename></ulink> class
+                of tests is created, derived from standard python unittest. The class has a common
+                    <filename>setUp</filename> function which is shared by all the tests in the
+                class. A simple test is then added to test that when a variable is expanded, the
+                correct value is found.</para>
+            <para>Bitbake selftests are straightforward python unittest. Refer to the Python
+                unittest documentation for additional information on writing these tests at: <link
+                    linkend="">https://docs.python.org/3/library/unittest.html</link>.</para>
+        </section>
+
+        <section id='oe-selftest-example'>
+            <title><filename>oe-selftest</filename></title>
+
+            <para>These tests are more complex due to the setup required behind the scenes for full
+                builds. Rather than directly using Python's unittest, the code wraps most of the
+                standard objects. The tests can be simple, such as testing a command from within the
+                OE build environment using the following
+                example:<literallayout class="monospaced">
+     class BitbakeLayers(OESelftestTestCase):
+          def test_bitbakelayers_showcrossdepends(self):
+             result = runCmd('bitbake-layers show-cross-depends')       
+             self.assertTrue('aspell' in result.output, msg = "No dependencies 
+     were shown. bitbake-layers show-cross-depends output:
+           %s"% result.output)
+                   </literallayout></para>
+            <para>This example, taken from
+                    <filename>meta/lib/oeqa/selftest/cases/bblayers.py</filename>, creates a
+                testcase from the <ulink url=""><filename>OESelftestTestCase</filename></ulink>
+                class, derived from <filename>unittest.TestCase</filename>, which runs the
+                    <filename>bitbake-layers</filename> command and checks the output to ensure it
+                contains something we know should be here.</para>
+            <para>The <filename>oeqa.utils.commands</filename> module contains Helpers which can
+                assist with common tasks, including:<itemizedlist>
+                    <listitem>
+                        <para><emphasis>Obtaining the value of a bitbake variable:</emphasis> Use
+                                <filename>oeqa.utils.commands.get_bb_var()</filename> or use
+                                <filename>oeqa.utils.commands.get_bb_vars()</filename> for more than
+                            one variable</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis>Running a bitbake invocation for a build:</emphasis> Use
+                                <filename>oeqa.utils.commands.bitbake()</filename></para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis>Running a command:</emphasis> Use
+                                <filename>oeqa.utils.commandsrunCmd()</filename></para>
+                    </listitem>
+                </itemizedlist></para>
+            <para>There is also a <filename>oeqa.utils.commands.runqemu()</filename> function for
+                launching the <filename>runqemu</filename> command for testing things within a
+                running, virtualized image.</para>
+            <para>You can run these tests in parallel. Parallelism works per test class, so tests
+                within a given test class should always run in the same build, while  tests in
+                different classes or modules may be split into different builds. There is no data
+                store available for these tests since the tests launch the
+                    <filename>bitbake</filename> command and exist outside of its context. As a
+                result, common bitbake library functions (bb.*) are also unavailable.</para>
+        </section>
+
+        <section id='testimage-example'>
+            <title><filename>testimage</filename></title>
+
+            <para>These tests are run once an image is up and running, either on target hardware or
+                under QEMU. As a result, they are assumed to be running in a target image
+                environment, as opposed to a host build environment. A simple example from
+                    <filename>meta/lib/oeqa/runtime/cases/python.py</filename> contains the
+                following:<literallayout class="monospaced">
+     class PythonTest(OERuntimeTestCase):
+         @OETestDepends(['ssh.SSHTest.test_ssh'])
+         @OEHasPackage(['python3-core'])
+         def test_python3(self):
+             cmd = "python3 -c \"import codecs; print(codecs.encode('Uryyb,
+     jbeyq', 'rot13'))\""
+             status, output = self.target.run(cmd)
+             msg = 'Exit status was not 0. Output: %s' % output
+             self.assertEqual(status, 0, msg=msg)
+                    </literallayout></para>
+            <para>In this example, the <ulink url=""><filename>OERuntimeTestCase</filename></ulink>
+                class wraps <filename>unittest.TestCase</filename>. Within the test,
+                    <filename>self.target</filename> represents the target system, where commands
+                can be run on it using the <filename>run()</filename> method. </para>
+            <para>To ensure certain test or package dependencies are met, you can use the
+                    <filename>OETestDepends</filename> and <filename>OEHasPackage</filename>
+                decorators. For example, the test in this example would only make sense if
+                python3-core is installed in the image.</para>
+        </section>
+
+        <section id='testsdk_ext-example'>
+            <title><filename>testsdk_ext</filename></title>
+
+            <para>These tests are run against built extensible SDKs (eSDKs). The tests can assume
+                that the eSDK environment has already been setup. An example from
+                    <filename>meta/lib/oeqa/sdk/cases/devtool.py</filename> contains the
+                following:<literallayout class="monospaced">
+     class DevtoolTest(OESDKExtTestCase):
+          @classmethod
+          def setUpClass(cls):
+          myapp_src = os.path.join(cls.tc.esdk_files_dir, "myapp")
+          cls.myapp_dst = os.path.join(cls.tc.sdk_dir, "myapp")
+          shutil.copytree(myapp_src, cls.myapp_dst)
+          subprocess.check_output(['git', 'init', '.'], cwd=cls.myapp_dst)
+          subprocess.check_output(['git', 'add', '.'], cwd=cls.myapp_dst)
+          subprocess.check_output(['git', 'commit', '-m', "'test commit'"], cwd=cls.myapp_dst)
+
+         @classmethod
+         def tearDownClass(cls):
+         shutil.rmtree(cls.myapp_dst)
+         def _test_devtool_build(self, directory):
+         self._run('devtool add myapp %s' % directory)
+         try:
+         self._run('devtool build myapp')
+         finally:
+         self._run('devtool reset myapp')
+         def test_devtool_build_make(self):
+         self._test_devtool_build(self.myapp_dst)
+                    </literallayout>In
+                this example, the <filename>devtool</filename> command is tested to see whether a
+                sample application can be built with the <filename>devtool build</filename> command
+                within the eSDK.</para>
+        </section>
+
+        <section id='testsdk-example'>
+            <title><filename>testsdk</filename></title>
+
+            <para>These tests are run against built SDKs. The tests can assume that an SDK has
+                already been extracted and its environment file has been sourced. A simple example
+                from <filename>meta/lib/oeqa/sdk/cases/python2.py</filename> contains the
+                following:<literallayout class="monospaced">
+     class Python3Test(OESDKTestCase):
+         def setUp(self):
+             if not (self.tc.hasHostPackage("nativesdk-python3-core") or
+                     self.tc.hasHostPackage("python3-core-native")):
+                 raise unittest.SkipTest("No python3 package in the SDK")
+
+         def test_python3(self):
+             cmd = "python3 -c \"import codecs; print(codecs.encode('Uryyb, jbeyq', 'rot13'))\""
+             output = self._run(cmd)
+             self.assertEqual(output, "Hello, world\n")
+                    </literallayout>In
+                this example, if nativesdk-python3-core has been installed into the SDK, the code
+                runs the python3 interpreter with a basic command to check it is working correctly.
+                The test would only run if python3 is installed in the SDK.</para>
+        </section>
+
+        <section id='oe-build-perf-test-example'>
+            <title><filename>oe-build-perf-test</filename></title>
+
+            <para>The performance tests usually measure how long operations take and the resource
+                utilisation as that happens. An example from
+                    <filename>meta/lib/oeqa/buildperf/test_basic.py</filename> contains the
+                following:<literallayout class="monospaced">
+     class Test3(BuildPerfTestCase):
+
+       def test3(self):
+           """Bitbake parsing (bitbake -p)"""
+           # Drop all caches and parse
+           self.rm_cache()
+           oe.path.remove(os.path.join(self.bb_vars['TMPDIR'], 'cache'), True)
+           self.measure_cmd_resources(['bitbake', '-p'], 'parse_1',
+                                      'bitbake -p (no caches)')
+           # Drop tmp/cache
+           oe.path.remove(os.path.join(self.bb_vars['TMPDIR'], 'cache'), True)
+           self.measure_cmd_resources(['bitbake', '-p'], 'parse_2',
+                                      'bitbake -p (no tmp/cache)')
+           # Parse with fully cached data
+           self.measure_cmd_resources(['bitbake', '-p'], 'parse_3',
+                                      'bitbake -p (cached)')
+                    </literallayout>This
+                example shows how three specific parsing timings are measured, with and without
+                various caches, to show how BitBake's parsing performance trends over time.</para>
+        </section>
+    </section>
+    <section id='test-writing-considerations'>
+        <title>Considerations When Writing Tests</title>
+        <para>When writing good tests, there are several things to keep in mind. Since things
+            running on the Autobuilder are accessed concurrently by multiple workers, consider the
+            following:</para>
+        <formalpara>
+            <title>Running "cleanall" is not permitted</title>
+            <para>This can delete files from DL_DIR which would potentially break other builds
+                running in parallel. If this is required, DL_DIR must be set to an isolated
+                directory.</para>
+        </formalpara>
+        <formalpara>
+            <title>Running "cleansstate" is not permitted</title>
+            <para>This can delete files from SSTATE_DIR which would potentially break other builds
+                running in parallel. If this is required, SSTATE_DIR must be set to an isolated
+                directory. Alternatively, you can use the "-f" option with the
+                    <filename>bitbake</filename> command to "taint" tasks by changing the sstate
+                checksums to ensure sstate cache items will not be reused.</para>
+        </formalpara>
+        <formalpara>
+            <title>Tests should not change the metadata</title>
+            <para>This is particularly true for oe-selftests since these can run in parallel and
+                changing metadata leads to changing checksums, which confuses BitBake while running
+                in parallel. If this is necessary, copy layers to a temporary location and modify
+                them. Some tests need to change metadata, such as the devtool tests. To prevent the
+                metadate from changes, set up temporary copies of that data first.</para>
+        </formalpara>
+    </section>
+
+
+
+
+
+
+
+
+</chapter>
+<!--
+vim: expandtab tw=80 ts=4
+-->

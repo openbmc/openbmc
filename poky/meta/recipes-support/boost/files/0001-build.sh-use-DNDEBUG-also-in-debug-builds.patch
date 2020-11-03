@@ -1,0 +1,27 @@
+From 2afd025997a57794ce24e07e914b461dfea6ba5f Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 26 Aug 2019 16:04:16 +0200
+Subject: [PATCH] build.sh: use -DNDEBUG also in debug builds
+
+Without it, there is a significant performance regression
+when running 'bjam install'.
+
+Upstream-Status: Inappropriate [configuration]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ tools/build/src/engine/build.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/build/src/engine/build.sh b/tools/build/src/engine/build.sh
+index a1e4cd335..64e0a4c80 100755
+--- a/tools/build/src/engine/build.sh
++++ b/tools/build/src/engine/build.sh
+@@ -436,7 +436,7 @@ case $B2_OS in
+     ;;
+ esac
+ 
+-if check_debug_build "$@" ; then B2_CXXFLAGS="${B2_CXXFLAGS_DEBUG}"
++if check_debug_build "$@" ; then B2_CXXFLAGS="${B2_CXXFLAGS_DEBUG} -DNDEBUG"
+ else B2_CXXFLAGS="${B2_CXXFLAGS_RELEASE} -DNDEBUG"
+ fi
+ echo_run ${B2_CXX} ${CXXFLAGS} ${B2_CXXFLAGS} ${B2_SOURCES} -o b2

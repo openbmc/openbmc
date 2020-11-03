@@ -1,0 +1,104 @@
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+<!--SPDX-License-Identifier: CC-BY-2.0-UK-->
+
+<book id='test-manual' lang='en'
+      xmlns:xi="http://www.w3.org/2003/XInclude"
+      xmlns="http://docbook.org/ns/docbook"
+      >
+    <bookinfo>
+
+        <mediaobject>
+            <imageobject>
+                <imagedata fileref='figures/test-manual-title.png'
+                    format='SVG'
+                    align='left' scalefit='1' width='100%'/>
+            </imageobject>
+        </mediaobject>
+
+        <title>
+            Yocto Project Test Environment Manual
+        </title>
+
+        <authorgroup>
+            <author>
+                <affiliation>
+                    <orgname>&ORGNAME;</orgname>
+                </affiliation>
+                <email>&ORGEMAIL;</email>
+            </author>
+        </authorgroup>
+
+        <revhistory>
+            <revision>
+                <revnumber>3.1.1</revnumber>
+                <date>TBD</date>
+                <revremark>DRAFT - Work-in-Progress - posted June 16, 2020</revremark>
+            </revision>
+        </revhistory>
+
+    <copyright>
+     <year>&COPYRIGHT_YEAR;</year>
+      <holder>Linux Foundation</holder>
+    </copyright>
+
+    <legalnotice>
+      <para>
+          Permission is granted to copy, distribute and/or modify this document under
+          the terms of the <ulink type="http" url="http://creativecommons.org/licenses/by-sa/2.0/uk/">
+          Creative Commons Attribution-Share Alike 2.0 UK: England &amp; Wales</ulink> as published by
+          Creative Commons.
+      </para>
+           <note><title>Manual Notes</title>
+               <itemizedlist>
+                   <listitem><para>
+                       This version of the
+                       <emphasis>Yocto Project Test Environment Manual</emphasis>
+                       is for the &YOCTO_DOC_VERSION; release of the
+                       Yocto Project.
+                       To be sure you have the latest version of the manual
+                       for this release, go to the
+                       <ulink url='&YOCTO_HOME_URL;/documentation'>Yocto Project documentation page</ulink>
+                       and select the manual from that site.
+                       Manuals from the site are more up-to-date than manuals
+                       derived from the Yocto Project released TAR files.
+                       </para></listitem>
+                   <listitem><para>
+                       If you located this manual through a web search, the
+                       version of the manual might not be the one you want
+                       (e.g. the search might have returned a manual much
+                       older than the Yocto Project version with which you
+                       are working).
+                       You can see all Yocto Project major releases by
+                       visiting the
+                       <ulink url='&YOCTO_WIKI_URL;/wiki/Releases'>Releases</ulink>
+                       page.
+                       If you need a version of this manual for a different
+                       Yocto Project release, visit the
+                       <ulink url='&YOCTO_HOME_URL;/documentation'>Yocto Project documentation page</ulink>
+                       and select the manual set by using the
+                       "ACTIVE RELEASES DOCUMENTATION" or "DOCUMENTS ARCHIVE"
+                       pull-down menus.
+                       </para></listitem>
+                   <listitem><para>
+                       To report any inaccuracies or problems with this
+                       manual, send an email to the Yocto Project
+                       discussion group at
+                       <filename>yocto@yoctoproject.com</filename> or log into
+                       the freenode <filename>#yocto</filename> channel.
+                       </para></listitem>
+               </itemizedlist>
+           </note>
+    </legalnotice>
+
+    </bookinfo>
+
+    <xi:include href="test-manual-intro.xml"/>
+    <xi:include href="test-manual-test-process.xml"/>
+    <xi:include href="test-manual-understand-autobuilder.xml"/>
+   
+</book>
+<!--
+vim: expandtab tw=80 ts=4
+-->

@@ -1,0 +1,51 @@
+<!ENTITY DISTRO "1.4">
+<!ENTITY DISTRO_NAME "tbd">
+<!ENTITY YOCTO_DOC_VERSION "1.4">
+<!ENTITY POKYVERSION "8.0">
+<!ENTITY YOCTO_POKY "poky-&DISTRO_NAME;-&POKYVERSION;">
+<!ENTITY COPYRIGHT_YEAR "2010-2013">
+<!ENTITY YOCTO_DL_URL "http://downloads.yoctoproject.org">
+<!ENTITY YOCTO_HOME_URL "http://www.yoctoproject.org">
+<!ENTITY YOCTO_LISTS_URL "http://lists.yoctoproject.org">
+<!ENTITY YOCTO_BUGZILLA_URL "http://bugzilla.yoctoproject.org">
+<!ENTITY YOCTO_WIKI_URL "https://wiki.yoctoproject.org">
+<!ENTITY YOCTO_AB_URL "http://autobuilder.yoctoproject.org">
+<!ENTITY YOCTO_GIT_URL "http://git.yoctoproject.org">
+<!ENTITY YOCTO_ADTREPO_URL "http://adtrepo.yoctoproject.org">
+<!ENTITY OE_HOME_URL "http://www.openembedded.org">
+<!ENTITY OE_LISTS_URL "http://lists.linuxtogo.org/cgi-bin/mailman">
+<!ENTITY OE_DOCS_URL "http://docs.openembedded.org">
+<!ENTITY OH_HOME_URL "http://o-hand.com">
+<!ENTITY BITBAKE_HOME_URL "http://developer.berlios.de/projects/bitbake/">
+<!ENTITY YOCTO_DOCS_URL "&YOCTO_HOME_URL;/docs">
+<!ENTITY YOCTO_SOURCES_URL "&YOCTO_HOME_URL;/sources/">
+<!ENTITY YOCTO_AB_PORT_URL "&YOCTO_AB_URL;:8010">
+<!ENTITY YOCTO_AB_NIGHTLY_URL "&YOCTO_AB_URL;/nightly/">
+<!ENTITY YOCTO_POKY_URL "&YOCTO_DL_URL;/releases/poky/">
+<!ENTITY YOCTO_RELEASE_DL_URL "&YOCTO_DL_URL;/releases/yocto/yocto-&DISTRO;">
+<!ENTITY YOCTO_TOOLCHAIN_DL_URL "&YOCTO_RELEASE_DL_URL;/toolchain/">
+<!ENTITY YOCTO_ADTINSTALLER_DL_URL "&YOCTO_RELEASE_DL_URL;/adt_installer">
+<!ENTITY YOCTO_POKY_DL_URL "&YOCTO_RELEASE_DL_URL;/&YOCTO_POKY;.tar.bz2">
+<!ENTITY YOCTO_MACHINES_DL_URL "&YOCTO_RELEASE_DL_URL;/machines">
+<!ENTITY YOCTO_QEMU_DL_URL "&YOCTO_MACHINES_DL_URL;/qemu">
+<!ENTITY YOCTO_PYTHON-i686_DL_URL "&YOCTO_DL_URL;/releases/miscsupport/python-nativesdk-standalone-i686.tar.bz2">
+<!ENTITY YOCTO_PYTHON-x86_64_DL_URL "&YOCTO_DL_URL;/releases/miscsupport/python-nativesdk-standalone-x86_64.tar.bz2">
+<!ENTITY YOCTO_DOCS_QS_URL "&YOCTO_DOCS_URL;/&YOCTO_DOC_VERSION;/yocto-project-qs/yocto-project-qs.html">
+<!ENTITY YOCTO_DOCS_ADT_URL "&YOCTO_DOCS_URL;/&YOCTO_DOC_VERSION;/adt-manual/adt-manual.html">
+<!ENTITY YOCTO_DOCS_REF_URL "&YOCTO_DOCS_URL;/&YOCTO_DOC_VERSION;/ref-manual/ref-manual.html">
+<!ENTITY YOCTO_DOCS_BSP_URL "&YOCTO_DOCS_URL;/&YOCTO_DOC_VERSION;/bsp-guide/bsp-guide.html">
+<!ENTITY YOCTO_DOCS_DEV_URL "&YOCTO_DOCS_URL;/&YOCTO_DOC_VERSION;/dev-manual/dev-manual.html">
+<!ENTITY YOCTO_DOCS_KERNEL_URL "&YOCTO_DOCS_URL;/&YOCTO_DOC_VERSION;/kernel-manual/kernel-manual.html">
+<!ENTITY YOCTO_ADTPATH_DIR "/opt/poky/&DISTRO;">
+<!ENTITY YOCTO_POKY_TARBALL "&YOCTO_POKY;.tar.bz2">
+<!ENTITY OE_INIT_PATH "&YOCTO_POKY;/oe-init-build-env">
+<!ENTITY OE_INIT_FILE "oe-init-build-env">
+<!ENTITY UBUNTU_HOST_PACKAGES_ESSENTIAL "gawk wget git-core diffstat unzip texinfo \
+     build-essential chrpath">
+<!ENTITY FEDORA_HOST_PACKAGES_ESSENTIAL "gawk make wget tar bzip2 gzip python unzip perl patch \
+     diffutils diffstat git cpp gcc gcc-c++ eglibc-devel texinfo chrpath \
+     ccache">
+<!ENTITY OPENSUSE_HOST_PACKAGES_ESSENTIAL "python gcc gcc-c++ git chrpath make wget python-xml \
+     diffstat texinfo python-curses">
+<!ENTITY CENTOS_HOST_PACKAGES_ESSENTIAL "gawk make wget tar bzip2 gzip python unzip perl patch \
+     diffutils diffstat git cpp gcc gcc-c++ glibc-devel texinfo chrpath">

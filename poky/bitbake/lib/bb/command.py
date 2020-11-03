@@ -81,12 +81,8 @@ class Command:
                 result = command_method(self, commandline)
             except CommandError as exc:
                 return None, exc.args[0]
-            except (Exception, SystemExit) as exc:
+            except (Exception, SystemExit):
                 import traceback
-                if isinstance(exc, bb.BBHandledException):
-                    # We need to start returning real exceptions here. Until we do, we can't
-                    # tell if an exception is an instance of bb.BBHandledException
-                    return None, "bb.BBHandledException()\n" + traceback.format_exc()
                 return None, traceback.format_exc()
             else:
                 return result, None
