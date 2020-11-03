@@ -3,9 +3,16 @@ Description=Sync time from ME
 Wants=ipmb.service
 After=ipmb.service
 
+#ipmb may not ready for communication when
+#me-time-sync start, add some retry
 [Service]
-Type=oneshot
+Type=simple
+Restart=always
+StartLimitInterval=90
+StartLimitBurst=5
 ExecStart=/usr/bin/me-time-sync.sh
+RemainAfterExit=yes
+
 
 [Install]
 WantedBy=multi-user.target
