@@ -1,0 +1,443 @@
+From ad41a029e1b6f615880a2f068ec2c081fbe14df3 Mon Sep 17 00:00:00 2001
+From: Thu B Nguyen <tbnguyen@amperecomputing.com>
+Date: Tue, 27 Oct 2020 16:15:23 +0700
+Subject: [PATCH] mainloop: activate/deactivate the host sensors base on host
+ status
+
+This commit adds support removing the sensors in _hostSensors from
+the reading list. The phosphor-hwmon will bypass the host sensors.
+These removed sensors will be added back when the host is on.
+
+Because the host sensors is bypassed so the properties of them in dbus object
+are also out update. These properties can be value, warning, errors state.
+The user should not be confused because those invalid properties.
+So these sensors also removed from dbus objects.
+
+Testing:
+	1. Turn off host.
+	2. Make sure the host sensors is removed from dbus.
+	3. The host sensors is removed from the reading list.
+	4. Turn on host.
+	5. Make sure the host sensors is added back to dbus.
+	6. The host sensors is added to the reading list.
+
+Signed-off-by: Thu B Nguyen <tbnguyen@amperecomputing.com>
+---
+ mainloop.cpp | 235 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ mainloop.hpp |  84 ++++++++++++++++++
+ 2 files changed, 319 insertions(+)
+
+diff --git a/mainloop.cpp b/mainloop.cpp
+index fa95034..05b6907 100644
+--- a/mainloop.cpp
++++ b/mainloop.cpp
+@@ -41,6 +41,8 @@
+ #include <string>
+ #include <unordered_set>
+ #include <xyz/openbmc_project/Sensor/Device/error.hpp>
++#include <boost/algorithm/string.hpp>
++#include <boost/container/flat_map.hpp>
+ 
+ using namespace phosphor::logging;
+ 
+@@ -314,10 +316,75 @@ void MainLoop::shutdown() noexcept
+     _event.exit(0);
+ }
+ 
++
++std::unique_ptr<sdbusplus::bus::match::match>
++    MainLoop::startHostPropSignal()
++{
++    return std::make_unique<sdbusplus::bus::match::match>(
++        _bus,
++        "type='signal',interface='" + std::string(properties::interface)
++            + "',path='" + std::string(hoststate::hostPath) + "',arg0='"
++            + std::string(hoststate::hostStateIntf) + "'",
++        [this](sdbusplus::message::message& message) {
++            std::string objectName;
++            boost::container::flat_map<std::string, std::variant<std::string>>
++                values;
++            message.read(objectName, values);
++            auto findState = values.find(hoststate::hostStateProp);
++            if (findState != values.end()) {
++                curHostState = std::get<std::string>(findState->second);
++                haveHostTrans = 0;
++                haveChassisTrans = 0;
++                return;
++            }
++            findState = values.find(hoststate::hostTransProp);
++            if (findState != values.end()) {
++                haveHostTrans = 1;
++                return;
++            }
++        });
++}
++
++std::unique_ptr<sdbusplus::bus::match::match>
++    MainLoop::startChassisPropSignal()
++{
++    return std::make_unique<sdbusplus::bus::match::match>(
++        _bus,
++        "type='signal',interface='" + std::string(properties::interface)
++            + "',path='" + std::string(hoststate::chassisPath) + "',arg0='"
++            + std::string(hoststate::chassisStateIntf) + "'",
++        [this](sdbusplus::message::message& message) {
++            std::string objectName;
++            boost::container::flat_map<std::string, std::variant<std::string>>
++                values;
++            message.read(objectName, values);
++            auto findState = values.find(hoststate::chassisTransProp);
++            if (findState != values.end()) {
++                haveChassisTrans = 1;
++                return;
++            }
++        });
++}
++
+ void MainLoop::run()
+ {
+     init();
+ 
++    if (haveHostSensors) {
++        /*
++         * Create the callback to signal CurrentHostState and
++         * RequestHostStateTransition.
++         */
++        std::unique_ptr<sdbusplus::bus::match::match> stateMonitor =
++            startHostPropSignal();
++        matches.emplace_back(std::move(stateMonitor));
++        /*
++         * Create the callback to signal RequestedPowerTransition
++         */
++        stateMonitor = startChassisPropSignal();
++        matches.emplace_back(std::move(stateMonitor));
++    }
++
+     std::function<void()> callback(std::bind(&MainLoop::read, this));
+     try
+     {
+@@ -390,6 +457,85 @@ void MainLoop::init()
+             _interval = std::strtoull(interval.c_str(), NULL, 10);
+         }
+     }
++
++    if (_hostSensors.size() != 0)
++    {
++        haveHostSensors = true;
++        /*
++         * The service will start with none host sensors
++         */
++        removeHostSensors();
++        removedHostSensors = true;
++    }
++}
++
++bool MainLoop::isHostOn()
++{
++    std::string state = "";
++    std::vector<std::string> result;
++
++    boost::split(result, curHostState, boost::is_any_of("."));
++    if (result.size() > 0)
++        state = result[result.size() -1];
++
++    if (std::strcmp(state.c_str(), "") == 0 ||
++        std::strcmp(state.c_str(), hoststate::HOST_OFF_STR) == 0)
++            return false;
++
++    return true;
++}
++
++void MainLoop::verifyHostState()
++{
++    bool hostOn = isHostOn();
++    /*
++     * Remove all host sensors when the host is off or going to off
++     */
++    if (haveHostTrans || haveChassisTrans || !hostOn) {
++        /* reset count down when remove the host sensors */
++        countDown = DELAY_INTERVAL;
++        /*
++         * The host sensors is removed from reading list
++         */
++        if (removedHostSensors)
++            return;
++
++        if (haveHostTrans)
++            log<level::INFO>("The host state is changing."\
++            "Removing the host sensors");
++        else if (haveChassisTrans)
++            log<level::INFO>("The chassis state is changing."\
++            "Removing the host sensors");
++        else
++            log<level::INFO>("The host is off."\
++            "Removing the host sensors");
++        haveHostTrans = 0;
++        haveChassisTrans = 0;
++
++        removeHostSensors();
++        removedHostSensors = true;
++        return;
++    }
++
++    /* Host changed state from Off to On */
++    if (hostOn && removedHostSensors) {
++        /*
++         * Prevent the glitch in CurrentHostState
++         * Apply the count down DELAY_INTERVAL seconds before add
++         * the host sensors back to the reading list.
++         */
++        if (countDown > 0)
++        {
++            countDown--;
++            return;
++        }
++        log<level::INFO>("The host is already on. "\
++            "Adding back the host sensors");
++        addDroppedHostSensors();
++        removedHostSensors = false;
++        return;
++    }
++    return;
+ }
+ 
+ void MainLoop::read()
+@@ -397,6 +543,10 @@ void MainLoop::read()
+     // TODO: Issue#3 - Need to make calls to the dbus sensor cache here to
+     //       ensure the objects all exist?
+ 
++    if (haveHostSensors)
++        /* Verify the host state to add/remove the host sensors */
++        verifyHostState();
++
+     // Iterate through all the sensors.
+     for (auto& [sensorSetKey, sensorStateTuple] : _state)
+     {
+@@ -426,6 +576,14 @@ void MainLoop::read()
+         auto& obj = std::get<InterfaceMap>(objInfo);
+         std::unique_ptr<sensor::Sensor>& sensor = _sensorObjects[sensorSetKey];
+ 
++        /*
++         * Check host state before read the host sensors
++         */
++        if (sensor->isHostSensor() && !isHostOn())
++        {
++            continue;
++        }
++
+         auto& statusIface = std::any_cast<std::shared_ptr<StatusObject>&>(
+             obj[InterfaceType::STATUS]);
+         // As long as addStatus is called before addValue, statusIface
+@@ -455,6 +613,13 @@ void MainLoop::read()
+                 // or has a transient error.
+                 value = _ioAccess->read(sensorSysfsType, sensorSysfsNum, input,
+                                         hwmonio::retries, hwmonio::delay);
++
++                /* Read the host sensors when it starts off */
++                if (value < 0 && sensor->isHostSensor() &&
++                    !isHostOn())
++                {
++                    continue;
++                }
+                 // Set functional property to true if we could read sensor
+                 statusIface->functional(true);
+ 
+@@ -622,4 +787,74 @@ void MainLoop::addDroppedSensors()
+     }
+ }
+ 
++void MainLoop::removeHostSensors()
++{
++    // Remove any host sensors when the host is Off
++    for (const auto& i : _hostSensors)
++    {
++        // Remove sensor object from dbus using emit_object_removed()
++        auto& objInfo = std::get<ObjectInfo>(_state[i.first]);
++        auto& objPath = std::get<std::string>(objInfo);
++
++        _bus.emit_object_removed(objPath.c_str());
++
++        // Erase sensor object info
++        _state.erase(i.first);
++    }
++}
++
++void MainLoop::addDroppedHostSensors()
++{
++    // Attempt to add the host sensors when the host is ON
++    std::map<SensorSet::key_type, SensorSet::mapped_type> listSensors;
++
++    listSensors = _hostSensors;
++    auto it = listSensors.begin();
++    while (it != listSensors.end())
++    {
++        if (_state.find(it->first) == _state.end())
++        {
++            SensorSet::container_t::value_type ssValueType =
++                std::make_pair(it->first, it->second);
++
++            auto object = getObject(ssValueType);
++            if (object)
++            {
++                // Construct the SensorSet value
++                // std::tuple<SensorSet::mapped_type,
++                //            std::string(Sensor Label),
++                //            ObjectInfo>
++                auto value = std::make_tuple(std::move(ssValueType.second),
++                                             std::move((*object).first),
++                                             std::move((*object).second));
++
++                _state[std::move(ssValueType.first)] = std::move(value);
++
++                std::string input = hwmon::entry::input;
++                // If type is power and AVERAGE_power* is true in env, use
++                // average instead of input
++                if ((it->first.first == hwmon::type::power) &&
++                    (phosphor::utility::isAverageEnvSet(it->first)))
++                {
++                    input = hwmon::entry::average;
++                }
++                // Sensor object added, erase entry from removal list
++                auto file =
++                    sysfs::make_sysfs_path(_ioAccess->path(), it->first.first,
++                                           it->first.second, input);
++                it = listSensors.erase(it);
++            }
++            else
++            {
++                ++it;
++            }
++        }
++        else
++        {
++            // Sanity check to remove sensors that were re-added
++            it = listSensors.erase(it);
++        }
++    }
++}
++
+ // vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
+diff --git a/mainloop.hpp b/mainloop.hpp
+index 3130322..bed6f4b 100644
+--- a/mainloop.hpp
++++ b/mainloop.hpp
+@@ -19,11 +19,39 @@
+ #include <vector>
+ 
+ static constexpr auto default_interval = 1000000;
++static constexpr int DELAY_INTERVAL  = 5;
+ 
+ static constexpr auto sensorID = 0;
+ static constexpr auto sensorLabel = 1;
+ using SensorIdentifiers = std::tuple<std::string, std::string>;
+ 
++namespace properties
++{
++  constexpr const char* interface = "org.freedesktop.DBus.Properties";
++  constexpr const char* get = "Get";
++} // namespace properties
++
++namespace hoststate
++{
++  /* Host state */
++  const static constexpr char* HOST_OFF_STR       = "Off";
++  const static constexpr char* HOST_RUNNING_STR   = "Running";
++
++  const static constexpr char* hostPath      =
++                                "/xyz/openbmc_project/state/host0";
++  const static constexpr char* hostStateIntf =
++                                "xyz.openbmc_project.State.Host";
++  const static constexpr char* hostStateProp = "CurrentHostState";
++  const static constexpr char* hostTransProp = "RequestedHostTransition";
++
++  const static constexpr char* chassisPath      =
++                                "/xyz/openbmc_project/state/chassis0";
++  const static constexpr char* chassisStateIntf =
++                                "xyz.openbmc_project.State.Chassis";
++  const static constexpr char* chassisTransProp = "RequestedPowerTransition";
++
++}
++
+ /** @class MainLoop
+  *  @brief hwmon-readd main application loop.
+  */
+@@ -76,6 +104,16 @@ class MainLoop
+      */
+     void addDroppedSensors();
+ 
++    /**
++     * @brief Remove Host sensors slated for removal.
++     */
++    void removeHostSensors();
++
++    /**
++     * @brief Attempt to add Host sensors back that had been removed.
++     */
++    void addDroppedHostSensors();
++
+   private:
+     using mapped_type =
+         std::tuple<SensorSet::mapped_type, std::string, ObjectInfo>;
+@@ -87,6 +125,18 @@ class MainLoop
+     /** @brief Set up D-Bus object state */
+     void init();
+ 
++    /** @brief Check if the host is on */
++    bool isHostOn();
++
++    /** @brief Verify the host state, add/remove the host sensors */
++    void verifyHostState();
++
++    /** @brief Add dbus signal to monitor the host properties */
++    std::unique_ptr<sdbusplus::bus::match::match> startHostPropSignal();
++
++    /** @brief Add dbus signal to monitor the chassis properties */
++    std::unique_ptr<sdbusplus::bus::match::match> startChassisPropSignal();
++
+     /** @brief sdbusplus bus client connection. */
+     sdbusplus::bus::bus _bus;
+     /** @brief sdbusplus freedesktop.ObjectManager storage. */
+@@ -121,6 +171,40 @@ class MainLoop
+      * @brief Map of removed sensors
+      */
+     std::map<SensorSet::key_type, SensorSet::mapped_type> _rmSensors;
++    /**
++     * @brief Map the debus signals
++     */
++    std::vector<std::unique_ptr<sdbusplus::bus::match::match>> matches;
++
++    /**
++     * @brief Have the host sensors is removed from Dbus
++     */
++    bool removedHostSensors = false;
++
++    /**
++     * @brief Have host sensors
++     */
++    bool haveHostSensors  = false;
++
++    /**
++     * @brief have request host state transition
++     */
++    bool haveHostTrans = 0;
++
++    /**
++     * @brief have request chassis state transition
++     */
++    bool haveChassisTrans = 0;
++
++    /**
++     * @brief latest current host state
++     */
++    std::string curHostState = "";
++
++    /**
++     * @brief count down before add the host sensors to the reading list
++     */
++    u_int8_t countDown = DELAY_INTERVAL;
+ 
+     /**
+      * @brief Map of the concerned host sensors
+-- 
+2.17.1
+
