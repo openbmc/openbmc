@@ -46,7 +46,5 @@ START OF MAINTAINERS LIST
 # @openbmc and is synced by the maintainer using git-subtree. Please submit
 # changes against @openbmc.
 M:  Gilbert Chen <gilbert.chen@hpe.com>
-M:  John Chung <john.chung@hpe.com>
 M:  Jorge Cisneros <jorge.cisneros@hpe.com>
 M:  Mike Garrett <mike.garrett@hpe.com>
-M:  Edward Newman <edward.newman@hpe.com>
