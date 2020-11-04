@@ -1,1 +1,4 @@
-EXTRA_OEMESON_append = " -Drest=enabled"
+EXTRA_OEMESON_append = " \
+    -Drest=enabled \
+    -Dhttp-body-limit=65 \
+    "
