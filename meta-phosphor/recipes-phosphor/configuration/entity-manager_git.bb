@@ -10,6 +10,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENCE;md5=a6a4edad4aed50f39a66d098d74b265b"
 
 DEPENDS = "boost \
+           dbus \
            nlohmann-json \
            sdbusplus \
            valijson"
@@ -32,6 +33,9 @@ do_install_append() {
     install -D ${WORKDIR}/blocklist.json ${D}${datadir}/${BPN}/blacklist.json
 }
 
+FILES_${PN} += " \
+    ${datadir}/dbus-1/system-services/xyz.openbmc_project.EntityManager.service \
+    "
 FILES_fru-device = "${bindir}/fru-device ${datadir}/${BPN}/blacklist.json"
 
 SYSTEMD_PACKAGES = "${PN} ${EXTRA_ENTITY_MANAGER_PACKAGES}"
