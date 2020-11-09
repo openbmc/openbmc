@@ -122,7 +122,7 @@ set_hdd_prsnt() {
     return 1
   fi
   # sata_prsnt_n is active low => value "true" means low
-  if [[ ${sata_prsnt_n} == "true" ]]; then
+  if [[ ${sata_prsnt_n} == "b true" ]]; then
     set_gpio_direction 'HDD_PRSNT_N' low
   else
     set_gpio_direction 'HDD_PRSNT_N' high
