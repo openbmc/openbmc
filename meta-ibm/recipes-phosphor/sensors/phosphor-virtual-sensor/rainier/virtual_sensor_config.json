@@ -1,0 +1,24 @@
+[
+    {
+        "Desc":
+        {
+            "Name": "Ambient_Virtual_Temp",
+            "SensorType": "temperature"
+        },
+        "Params":
+        {
+            "DbusParam":
+            [
+                {
+                    "ParamName": "T0",
+                    "Desc":
+                    {
+                        "Name": "Ambient_0_Temp",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "T0"
+    }
+]
