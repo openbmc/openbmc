@@ -5,6 +5,13 @@
             "Name": "Ambient_Virtual_Temp",
             "SensorType": "temperature"
         },
+        "Threshold" :
+        {
+            "CriticalHigh": 100,
+            "CriticalLow": 0,
+            "WarningHigh": 100,
+            "WarningLow": 0
+        },
         "Params":
         {
             "DbusParam":
