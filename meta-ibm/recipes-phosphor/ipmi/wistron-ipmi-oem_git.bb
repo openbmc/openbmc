@@ -14,7 +14,7 @@ DEPENDS += "autoconf-archive-native"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/wistron-ipmi-oem"
-SRCREV = "44cee319dd113335a7885a1ff63a287dc7706682"
+SRCREV = "ba89a1ea570cb010c2e929ac11ada3714878ca7d"
 
 FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
 FILES_${PN}_append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
