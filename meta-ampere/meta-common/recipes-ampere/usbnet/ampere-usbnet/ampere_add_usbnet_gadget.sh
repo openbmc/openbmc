@@ -24,6 +24,9 @@ MANUFACTURER=Aspeed
 FUNCTION=ecm.usb0
 
 if [ ! -d ${GADGET_CONFIG_SYSPATH} ]; then
+	# GADGET_CONFIG_SYSPATH is not exist
+	# Return 1 so that systemd knows the service failed to start
+	echo "ERROR: ${GADGET_CONFIG_SYSPATH} : doesn't exist!"
 	exit 1
 fi
 
@@ -31,38 +34,45 @@ find_free_vhub_port(){
 	for ((i=1;i<=${NUM_PORT_USB_HUB};i++))
 	do
 		state=$(cat ${UDC_SYSPATH}/${VHUB_DEVICE}${i}/state)
-		if [ "${state}" == "not attached" ]; then
+		func=$(cat ${UDC_SYSPATH}/${VHUB_DEVICE}${i}/function)
+		if [ "${state}" == "not attached" -a "${func}" == "" ]; then
 			FREEUDC=${VHUB_DEVICE}${i}
 			break
 		fi
 	done
 	if [ ${i} -eq 6 ]; then
-		# Can't find a free port, exit
+		# Can't find a free port
+		# Return 1 so that systemd knows the service failed to start
+		echo "ERROR: Can't find a free port !"
 		exit 1
 	fi
 }
 
-# Create the gadget
-mkdir ${GADGET_CONFIG_SYSPATH}/${USBNET}
-cd ${GADGET_CONFIG_SYSPATH}/${USBNET}
+if [ -d ${GADGET_CONFIG_SYSPATH}/${USBNET} ]; then
+	cd ${GADGET_CONFIG_SYSPATH}/${USBNET}
+else
+	# Create the gadget
+	mkdir ${GADGET_CONFIG_SYSPATH}/${USBNET}
+	cd ${GADGET_CONFIG_SYSPATH}/${USBNET}
 
-# Configure the gadget
-echo ${VENDORID} > idVendor
-echo ${PRODUCTID} > idProduct
-mkdir strings/${LANGUAGEID}
-echo ${SERIALNUMBER} > strings/${LANGUAGEID}/serialnumber
-echo ${MANUFACTURER} > strings/${LANGUAGEID}/manufacturer
-echo ${USBNET} > strings/${LANGUAGEID}/product
+	# Configure the gadget
+	echo ${VENDORID} > idVendor
+	echo ${PRODUCTID} > idProduct
+	mkdir strings/${LANGUAGEID}
+	echo ${SERIALNUMBER} > strings/${LANGUAGEID}/serialnumber
+	echo ${MANUFACTURER} > strings/${LANGUAGEID}/manufacturer
+	echo ${USBNET} > strings/${LANGUAGEID}/product
 
-# Create the configuration
-mkdir configs/c.1
-mkdir configs/c.1/strings/${LANGUAGEID}
+	# Create the configuration
+	mkdir configs/c.1
+	mkdir configs/c.1/strings/${LANGUAGEID}
 
-# Create the function
-mkdir functions/${FUNCTION}
+	# Create the function
+	mkdir functions/${FUNCTION}
 
-# Associate the function with its configuration
-ln -s functions/${FUNCTION} configs/c.1
+	# Associate the function with its configuration
+	ln -s functions/${FUNCTION} configs/c.1
+fi
 
 # Find an available virtual hub port
 find_free_vhub_port
@@ -70,5 +80,14 @@ find_free_vhub_port
 # Enable the gadget
 echo ${FREEUDC} > UDC
 
+if [[ $? -ne 0 ]]; then
+	# End
+	cd - > /dev/null
+	# Virtual HUB is not available
+	# Return 1 so that systemd knows the service failed to start
+	exit 1
+fi
+
 # End
 cd - > /dev/null
+
