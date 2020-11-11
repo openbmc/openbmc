@@ -1,0 +1,5 @@
+DEVPATH=/dev/input/by-path/platform-gpio-keys-event
+KEY=133
+POLARITY=1
+TARGET=id-button-pressed.service
+EXTRA_ARGS=--continue
