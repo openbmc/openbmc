@@ -55,6 +55,7 @@ FLASH_UBI_RWFS_TXT_SIZE ?= "6MiB"
 FLASH_UBI_RWFS_TXT_SIZE_flash-131072 ?= "32MiB"
 
 # eMMC sizes in KB unless otherwise noted.
+MMC_UBOOT_SIZE ?= "1024"
 MMC_BOOT_PARTITION_SIZE ?= "65536"
 
 SIGNING_KEY ?= "${STAGING_DIR_NATIVE}${datadir}/OpenBMC.priv"
@@ -102,6 +103,12 @@ mk_empty_image() {
 	image_size_kb=$2
 	dd if=/dev/zero bs=1k count=$image_size_kb \
 		| tr '\000' '\377' > $image_dst
+}
+
+mk_empty_image_zeros() {
+	image_dst="$1"
+	image_size_kb=$2
+	dd if=/dev/zero of=$image_dst bs=1k count=$image_size_kb
 }
 
 clean_rwfs() {
@@ -423,13 +430,14 @@ do_generate_ubi_tar[depends] += " \
 
 do_generate_ext4_tar() {
 	# Generate the U-Boot image
+	mk_empty_image_zeros image-u-boot ${MMC_UBOOT_SIZE}
 	do_generate_image_uboot_file image-u-boot
 
 	# Generate a compressed ext4 filesystem with the fitImage file in it to be
 	# flashed to the boot partition of the eMMC
 	install -d boot-image
 	install -m 644 ${DEPLOY_DIR_IMAGE}/${FLASH_KERNEL_IMAGE} boot-image/fitImage
-	mk_empty_image boot-image.${FLASH_EXT4_BASETYPE} ${MMC_BOOT_PARTITION_SIZE}
+	mk_empty_image_zeros boot-image.${FLASH_EXT4_BASETYPE} ${MMC_BOOT_PARTITION_SIZE}
 	mkfs.ext4 -F -i 4096 -d boot-image boot-image.${FLASH_EXT4_BASETYPE}
 	# Error codes 0-3 indicate successfull operation of fsck
 	fsck.ext4 -pvfD boot-image.${FLASH_EXT4_BASETYPE} || [ $? -le 3 ]
