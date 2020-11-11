@@ -11,3 +11,7 @@ PV = "0.1+git${SRCPV}"
 SRCREV = "abc51c2b6fca6ed704c6fd70426faf0038f2e807"
 
 S = "${WORKDIR}/git"
+
+inherit perlnative
+
+DEPENDS += "libxml2-native libxml-simple-perl-native"

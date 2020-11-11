@@ -15,3 +15,6 @@ S = "${WORKDIR}/git"
 
 DEPENDS = "boost libgpiod pdbg phosphor-logging sdbusplus openpower-libhei"
 FILES_${PN} += "${UNITDIR}/attn_handler.service"
+
+# This is required so that libhei is installed with the chip data files.
+RDEPENDS_${PN} += "openpower-libhei"
