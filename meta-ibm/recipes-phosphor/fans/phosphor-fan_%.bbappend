@@ -1,3 +1,5 @@
+SRCREV = "8e1b382122fed73e788d44f3a67cecbfbcc6972e"
+
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
 # Package configuration
@@ -56,7 +58,7 @@ FMT_CONTROL_PWRON_witherspoon = "../${TMPL_CONTROL}:${POWERON_TGT}.requires/${IN
 SYSTEMD_LINK_${PN}-control_witherspoon += "${@compose_list(d, 'FMT_CONTROL_PWRON', 'OBMC_CHASSIS_INSTANCES')}"
 
 # Enable the use of JSON on the fan applications that support it
-EXTRA_OECONF_append_witherspoon = " --enable-json"
+EXTRA_OECONF_append_witherspoon = " --enable-json --disable-json-control"
 RDEPENDS_${PN}-presence-tach_append_witherspoon = " phosphor-fan-presence-config"
 RDEPENDS_${PN}-monitor_append_witherspoon = " phosphor-fan-monitor-config"
 
