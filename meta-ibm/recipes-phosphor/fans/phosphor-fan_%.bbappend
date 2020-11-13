@@ -1,5 +1,3 @@
-SRCREV = "8e1b382122fed73e788d44f3a67cecbfbcc6972e"
-
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
 # Package configuration
