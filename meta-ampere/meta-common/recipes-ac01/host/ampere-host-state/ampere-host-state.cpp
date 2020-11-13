@@ -42,13 +42,14 @@ namespace host
 /* const */
 constexpr const char* profInterface = "org.freedesktop.DBus.Properties";
 constexpr const char* getMethod = "Get";
-const static constexpr char* chassisService =
-                            "xyz.openbmc_project.State.Chassis";
-const static constexpr char* chassisPath    =
-                            "/xyz/openbmc_project/state/chassis0";
-const static constexpr char* powerStateIntf =
-                            "xyz.openbmc_project.State.Chassis";
-const static constexpr char* powerState     = "CurrentPowerState";
+
+const static constexpr char* powerSService =
+                            "org.openbmc.control.Power";
+const static constexpr char* powerPath      =
+                            "/org/openbmc/control/power0";
+const static constexpr char* powerPGoodIntf =
+                            "org.openbmc.control.Power";
+const static constexpr char* powerPGoodProp = "pgood";
 
 const static constexpr char* hostService   = "xyz.openbmc_project.State.Host";
 const static constexpr char* hostPath    = "/xyz/openbmc_project/state/host0";
@@ -63,31 +64,72 @@ const static constexpr char* HOST_STATE_QUIESCED =
 const static constexpr char* HOST_STATE_DIAG =
     "xyz.openbmc_project.State.Host.HostState.DiagnosticMode";
 
+const static constexpr char* HOST_RUNNING_FILE =
+    "/run/openbmc/host@0-on";
+/*
+ * Time out to check the FW_BOOT_OK after GPIO PGOOD go high.
+ * 120 seconds is enough to cover failover case.
+ */
+const static constexpr int POWERON_TIME_OUT = 120;
+
 /* gpio lines define */
 static gpiod::line S0_FW_BOOT_OK;
-
-/* variables definition */
-static std::string retPropState;
 
 // connection to sdbus
 static boost::asio::io_service io;
 static std::shared_ptr<sdbusplus::asio::connection> conn;
 
+static void createHostOnIndicateFile()
+{
+    // Create file for host instance and create in filesystem to indicate
+    // to services that host is running
+    auto size = std::snprintf(nullptr, 0, HOST_RUNNING_FILE, 0);
+    size++; // null
+    std::unique_ptr<char[]> buf(new char[size]);
+    std::snprintf(buf.get(), size, HOST_RUNNING_FILE, 0);
+    std::ofstream outfile(buf.get());
+    outfile.close();
+    return;
+}
+
+static std::string getDbusProperty(
+    std::shared_ptr<sdbusplus::asio::connection>& conn,
+    const char* service, const char* path, const char* intf,
+    const char* prop)
+{
+    auto method = conn->new_method_call(service, path,
+                    profInterface, "Get");
+    method.append(intf, prop);
+    try
+    {
+        std::variant<std::string> values;
+        auto reply = conn->call(method);
+        reply.read(values);
+        return std::get<std::string>(values);
+    }
+    catch (const sdbusplus::exception::SdBusError& e)
+    {
+        // If property is not found simply return empty value
+    }
+    return "";
+}
+
 static void setPropertyInString(
     std::shared_ptr<sdbusplus::asio::connection>& conn,
-    std::string objService, std::string objPath, std::string intf,
-    std::string prof, std::string state)
+    const char* objService, const char* objPath, const char* intf,
+    const char* prof, const char* state)
 {
     conn->async_method_call(
         [](const boost::system::error_code ec) {
             if (ec)
-                std::cerr << "Set: Dbus error: " << ec;
+                log<level::ERR>("Set: Dbus error: ");
         },
         objService,
         objPath,
         profInterface, "Set",
         intf, prof,
         std::variant<std::string>(state));
+    return;
 }
 
 static bool requestGPIOInput(const std::string &name, gpiod::line &gpioLine)
@@ -114,16 +156,12 @@ static void updateHostState(
     std::shared_ptr<sdbusplus::asio::connection>& conn,
     int state)
 {
-    char buff[128];
     if (state) {
-        sprintf(buff, "Updating %s to %s\n", hostStatePro, HOST_STATE_RUNNING);
-        log<level::INFO>(buff);
+        createHostOnIndicateFile();
         setPropertyInString(conn, hostService, hostPath,
             hostStateIntf, hostStatePro, HOST_STATE_RUNNING);
     }
     else {
-        sprintf(buff, "Updating %s to %s\n", hostStatePro, HOST_STATE_OFF);
-        log<level::INFO>(buff);
         setPropertyInString(conn, hostService, hostPath,
             hostStateIntf, hostStatePro, HOST_STATE_OFF);
     }
@@ -133,6 +171,7 @@ static void updateHostState(
 static void hostStateChangeCheckFwBootOk(
     std::shared_ptr<sdbusplus::asio::connection>& conn, int isHostOn)
 {
+    int countDown = 10;
 next:
     try
     {
@@ -140,11 +179,7 @@ next:
         requestGPIOInput("S0_FW_BOOT_OK", S0_FW_BOOT_OK);
         int s0_fw_boot_ok = (bool)S0_FW_BOOT_OK.get_value();
         /*
-        * host state change, if not match with FW_BOOT_OK
-        * rechange and exit.
-        * phosphor-state-manager will confirm about changing
-        * if the update state is the same with current state in dbus.
-        * It will bypass.
+        * Change the CurrentHostState base on S0_FW_BOOT_OK
         */
         if (isHostOn != s0_fw_boot_ok)
             updateHostState(conn, s0_fw_boot_ok);
@@ -154,133 +189,104 @@ next:
     }
     catch (std::exception &e)
     {
-        /* retry if failed to request GPIO */
+        /* Retry if failed to request GPIO. The retry times is 10 */
         sleep(10);
+        countDown--;
         log<level::ERR>("Exception when read gpio\n");
-        goto next;
+        if (countDown > 0)
+            goto next;
     }
     return;
 }
 
-static void powerOnCheckFwBootOk(
+static void pgoodChangeUpdateHostState(
     std::shared_ptr<sdbusplus::asio::connection>& conn, int isPowerOn)
 {
     int s0_fw_boot_ok = -1;
-    int last_fw_boot_state = -1;
     bool contCheck = true;
-    char buff[128];
     int retry = 0;
-    /*
-     * After PowerOn, verify S0_FW_BOOT_OK in 10 seconds
-     * If this pin still low, set CurrentHostState to Off
-     * Else set to Running.
-     */
-    while (contCheck)
+    int isCurStateOn = -1;
+    std::string state;
+    /* Pgood go low. Power off */
+    if (!isPowerOn)
+    {
+        contCheck = false;
+        updateHostState(conn, 0);
+        return;
+    }
+
+    while (contCheck && (retry < POWERON_TIME_OUT))
     {
         contCheck = true;
         try
         {
+            state = getDbusProperty(conn, hostService,
+                hostPath, hostStateIntf, hostStatePro);
+            if (boost::ends_with(state, "Off"))
+                isCurStateOn = 0;
+            else
+                isCurStateOn = 1;
+
             /* Request S0_FW_BOOT_OK GPIO */
             requestGPIOInput("S0_FW_BOOT_OK", S0_FW_BOOT_OK);
             s0_fw_boot_ok = S0_FW_BOOT_OK.get_value();
             /*
-             * the last state not match with FW_BOOT_OK state
+             * The last state does not match with FW_BOOT_OK state
              */
-            if (s0_fw_boot_ok != last_fw_boot_state) {
+            if (s0_fw_boot_ok != isCurStateOn) {
                 updateHostState(conn, s0_fw_boot_ok);
-                last_fw_boot_state = s0_fw_boot_ok;
             }
-            /* power on and host is on */
+            /* Power on and the host is already on */
             if (s0_fw_boot_ok)
                 contCheck = false;
             else {
                 retry ++;
-                if (retry == 5)
+                if (retry >= POWERON_TIME_OUT)
                     contCheck = false;
             }
-
             /* Release requested GPIOs */
             S0_FW_BOOT_OK.release();
             if (contCheck)
-                sleep(2);
-
+                sleep(1);
         }
         catch (std::exception &e)
         {
             log<level::ERR>("Exception when read gpio\n");
-            goto next;
+            try
+            {
+                // Release requested GPIOs
+                S0_FW_BOOT_OK.release();
+            }
+            catch (std::exception &e)
+            {
+                log<level::ERR>("Exeption when release gpio\n");
+                // Do nothing
+            }
+            retry ++;
+            sleep(10);
         }
-next:
-        try
-        {
-            // Release requested GPIOs
-            S0_FW_BOOT_OK.release();
-        }
-        catch (std::exception &e)
-        {
-            log<level::ERR>("Exeption when release gpio\n");
-            // Do nothing
-        }
-        sleep(10);
     }
     return;
 }
 
-static std::unique_ptr<sdbusplus::bus::match::match> startPowerStateMonitor()
+static std::unique_ptr<sdbusplus::bus::match::match> signalPGoodState()
 {
     return std::make_unique<sdbusplus::bus::match::match>(
         *conn,
         "type='signal',interface='" + std::string(profInterface)
-            + "',path='" + std::string(chassisPath) + "',arg0='"
-            + std::string(powerStateIntf) + "'",
+            + "',path='" + std::string(powerPath) + "',arg0='"
+            + std::string(powerPGoodIntf) + "'",
         [](sdbusplus::message::message& message) {
             std::string objectName;
-            boost::container::flat_map<std::string, std::variant<std::string>>
+            boost::container::flat_map<std::string, std::variant<int>>
                 values;
             message.read(objectName, values);
-            auto findState = values.find(powerState);
-            if (findState == values.end()) {
+            auto findState = values.find(powerPGoodProp);
+            if (findState != values.end()) {
+                pgoodChangeUpdateHostState(conn,
+                    std::get<int>(findState->second));
                 return;
             }
-            bool powerStatusOff = boost::ends_with(
-                    std::get<std::string>(findState->second), "Off");
-            /*
-             * When power on the host phosphor-state-manager
-             * will change CurrentPowerState to On when psgood is high.
-             * When this state is changed. Start check FW_BOOT_OK.
-             */
-            if (!powerStatusOff)
-                powerOnCheckFwBootOk(conn, !powerStatusOff);
-        });
-}
-
-static std::unique_ptr<sdbusplus::bus::match::match> startHostStateMonitor()
-{
-    return std::make_unique<sdbusplus::bus::match::match>(
-        *conn,
-        "type='signal',interface='" + std::string(profInterface)
-            + "',path='" + std::string(hostPath) + "',arg0='"
-            + std::string(hostStateIntf) + "'",
-        [](sdbusplus::message::message& message) {
-            std::string objectName;
-            boost::container::flat_map<std::string, std::variant<std::string>>
-                values;
-            message.read(objectName, values);
-            auto findState = values.find(hostStatePro);
-            if (findState == values.end()) {
-                return;
-            }
-            bool powerStatusOff = boost::ends_with(
-                    std::get<std::string>(findState->second), "Off");
-            /*
-             * Compare CurrentHostState with FW_BOOT_OK when CurrentHostState
-             * is changed.
-             * It can cause phosphor-state-manager change state or User call 
-             * "busctrl set-property ..." to change state.
-             * If the host is on, but the user try to set property to Off,
-             * force CurrentHostState to correct state base on S0_FW_BOOT_OK.
-             */
-            hostStateChangeCheckFwBootOk(conn, !powerStatusOff);
         });
 }
 
@@ -298,15 +304,10 @@ int main(int argc, char** argv)
             "xyz.openbmc_project.Ampere.hostStateMonitor");
 
     std::vector<std::unique_ptr<sdbusplus::bus::match::match>> matches;
-    // Start tracking host state
+    // Start tracking power state
     std::unique_ptr<sdbusplus::bus::match::match> powerMonitor =
-        ampere::host::startPowerStateMonitor();
+        ampere::host::signalPGoodState();
     matches.emplace_back(std::move(powerMonitor));
-    //Start tracking power state
-    std::unique_ptr<sdbusplus::bus::match::match> hostMonitor =
-        ampere::host::startHostStateMonitor();
-    matches.emplace_back(std::move(hostMonitor));
-
     /*
      * Synchronize CurrentHostState base on S0_BOOT_FW_OK when start
      */
