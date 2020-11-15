@@ -8,7 +8,7 @@ PV = "1.0+git${SRCPV}"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
-inherit autotools pkgconfig systemd
+inherit meson pkgconfig systemd
 inherit obmc-phosphor-dbus-service
 
 # Static configuration. This is the default if no other layout is specified.
@@ -31,17 +31,16 @@ inherit ${@bb.utils.contains('DISTRO_FEATURES', 'openpower-virtual-pnor', \
                              'openpower-software-manager-virtual-pnor', \
                              '', d)}
 
-PACKAGECONFIG[verify_pnor_signature] = "--enable-verify_pnor_signature,--disable-verify_pnor_signature"
-PACKAGECONFIG[ubifs_layout] = "--enable-ubifs_layout,--disable-ubifs_layout,,mtd-utils-ubifs"
-PACKAGECONFIG[mmc_layout] = "--enable-mmc_layout,--disable-mmc_layout"
-PACKAGECONFIG[virtual_pnor] = "--enable-virtual_pnor,--disable-virtual_pnor"
+PACKAGECONFIG[verify_pnor_signature] = "-Dverify-signature=enabled, -Dverify-signature=disabled"
+PACKAGECONFIG[ubifs_layout] = "-Ddevice-type=ubi,,,mtd-utils-ubifs"
+PACKAGECONFIG[mmc_layout] = "-Ddevice-type=mmc"
+PACKAGECONFIG[virtual_pnor] = "-Dvpnor=enabled, -Dvpnor=disabled"
 
-EXTRA_OECONF += " \
-    PNOR_MSL="v2.0.10 v2.2" \
+EXTRA_OEMESON += " \
+    -Dmsl="v2.0.10 v2.2" \
     "
 
 DEPENDS += " \
-        autoconf-archive-native \
         openssl \
         phosphor-dbus-interfaces \
         phosphor-logging \
