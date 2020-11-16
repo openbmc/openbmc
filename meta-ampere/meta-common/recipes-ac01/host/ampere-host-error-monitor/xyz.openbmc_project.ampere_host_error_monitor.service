@@ -1,0 +1,10 @@
+[Unit]
+Description=Ampere Host Error Monitor
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/ampere-host-error-monitor
+Type=simple
+
+[Install]
+WantedBy=multi-user.target
