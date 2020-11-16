@@ -1,0 +1,7 @@
+[Unit]
+Description=Ampere Computing LLC Overtemp event
+
+[Service]
+Restart=no
+ExecStartPost=/bin/systemctl start obmc-chassis-poweroff@0.target
+ExecStart=/usr/bin/templog_monitor overtemp
