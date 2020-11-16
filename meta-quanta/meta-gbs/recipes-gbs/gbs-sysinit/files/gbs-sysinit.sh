@@ -116,11 +116,10 @@ set_uart_en_low() {
 set_hdd_prsnt() {
   # On PVT need to forward SATA0_PRSNT_N to HDD_PRSNT_N
   # The signal is safe to set on DVT boards so just set universally.
+  mapper wait ${SATA0_PRESENT_OBJPATH}
   sata_prsnt_n="$(busctl get-property $SERVICE_NAME ${SATA0_PRESENT_OBJPATH} \
                  $INTERFACE_NAME Present)"
-  if [[ "$?" == "0" && ${sata_prsnt_n} == "b false" ]]; then
-    return 1
-  fi
+
   # sata_prsnt_n is active low => value "true" means low
   if [[ ${sata_prsnt_n} == "b true" ]]; then
     set_gpio_direction 'HDD_PRSNT_N' low
@@ -185,10 +184,11 @@ parse_pe_fru() {
   pe_fruid=3
   for i in {1..2};
   do
+     mapper wait ${PE_PRESENT_OBJPATH[$(($i-1))]}
      pe_prsnt_n="$(busctl get-property $SERVICE_NAME ${PE_PRESENT_OBJPATH[$(($i-1))]} \
                   $INTERFACE_NAME Present)"
 
-     if [[ "$?" == "0" && ${pe_prsnt_n} == "b false" ]]; then
+     if [[ ${pe_prsnt_n} == "b false" ]]; then
          pe_fruid=$(($pe_fruid+1))
          continue
      fi
@@ -238,8 +238,6 @@ main() {
 
   check_board_sku
 
-  set_hdd_prsnt
-
   reset_phy
 
   if [[ $(check_power_status) != \
@@ -263,6 +261,7 @@ main() {
     echo "Host is already running, doing nothing!" >&2
   fi
 
+  set_hdd_prsnt
   parse_pe_fru
 }
 
