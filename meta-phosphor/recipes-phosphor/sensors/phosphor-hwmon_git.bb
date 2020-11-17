@@ -8,11 +8,17 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=fa818a259cbed7ce8bc2a22d35a464fc"
 inherit autotools pkgconfig
 inherit obmc-phosphor-systemd
 
+PACKAGECONFIG ??= ""
+# Autotools configure option to enable/disable max31785-msl
+PACKAGECONFIG[max31785-msl] = "--enable-max31785-msl, --disable-max31785-msl"
+# Meson configure option to enable/disable max31785-msl
+# PACKAGECONFIG[max31785-msl] = "-Denable-max31785-msl=true, -Denable-max31785-msl=false"
+
 PACKAGE_BEFORE_PN = "max31785-msl"
 SYSTEMD_PACKAGES = "${PN} max31785-msl"
 
 SYSTEMD_SERVICE_${PN} = "xyz.openbmc_project.Hwmon@.service"
-SYSTEMD_SERVICE_max31785-msl = "phosphor-max31785-msl@.service"
+SYSTEMD_SERVICE_max31785-msl = "${@bb.utils.contains('PACKAGECONFIG', 'max31785-msl', 'phosphor-max31785-msl@.service', '', d)}"
 
 DEPENDS += "autoconf-archive-native"
 DEPENDS += " \
