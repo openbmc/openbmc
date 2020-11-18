@@ -315,7 +315,7 @@ any ``DEFAULT_PREFERENCE`` setting. ``DEFAULT_PREFERENCE`` is often used
 to mark newer and more experimental recipe versions until they have
 undergone sufficient testing to be considered stable.
 
-When there are multiple “versions” of a given recipe, BitBake defaults
+When there are multiple "versions" of a given recipe, BitBake defaults
 to selecting the most recent version, unless otherwise specified. If the
 recipe in question has a
 :term:`DEFAULT_PREFERENCE` set lower than
@@ -325,7 +325,7 @@ to specify their preference for the default selected version.
 Additionally, the user can specify their preferred version.
 
 If the first recipe is named ``a_1.1.bb``, then the
-:term:`PN` variable will be set to “a”, and the
+:term:`PN` variable will be set to "a", and the
 :term:`PV` variable will be set to 1.1.
 
 Thus, if a recipe named ``a_1.2.bb`` exists, BitBake will choose 1.2 by

@@ -531,7 +531,6 @@ def _extract_source(srctree, keep_temp, devbranch, sync, config, basepath, works
 
     initial_rev = None
 
-    appendexisted = False
     recipefile = d.getVar('FILE')
     appendfile = recipe_to_append(recipefile, config)
     is_kernel_yocto = bb.data.inherits_class('kernel-yocto', d)

@@ -121,7 +121,7 @@ To install all required packages run:
 To build the documentation locally, run:
 
  $ cd documentation
- $ make -f Makefile.sphinx html
+ $ make html
 
 The resulting HTML index page will be _build/html/index.html, and you
 can browse your own copy of the locally generated documentation with

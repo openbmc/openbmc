@@ -1,4 +1,4 @@
-.. SPDX-License-Identifier: CC-BY-2.0-UK
+.. SPDX-License-Identifier: CC-BY-SA-2.0-UK
 
 .. The Yocto Project documentation master file, created by
    sphinx-quickstart on Mon Apr 13 09:38:33 2020.

@@ -5,6 +5,8 @@
 
 set -e
 
+rm -f $D${fontconfigcachedir}/CACHEDIR.TAG
+
 PSEUDO_UNLOAD=1 ${binprefix}qemuwrapper -L $D -E ${fontconfigcacheenv} $D${libexecdir}/${binprefix}fc-cache --sysroot=$D --system-only ${fontconfigcacheparams}
 
 chown -R root:root $D${fontconfigcachedir}

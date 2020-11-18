@@ -12,6 +12,7 @@ SRC_URI = "\
     git://github.com/nhorman/rng-tools.git \
     file://a4b6d9ce64f132e463b9091d0536913ddaf11516.patch \
     file://dab16a5fd4efde8ef569b358e19b1fcbc7d0d938.patch \
+    file://0001-rngd-fix-debug-to-also-filter-syslog-calls.patch \
     file://init \
     file://default \
     file://rngd.service \

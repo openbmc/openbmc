@@ -465,7 +465,7 @@ Executing a Task Against a Single Recipe
 Executing tasks for a single recipe file is relatively simple. You
 specify the file in question, and BitBake parses it and executes the
 specified task. If you do not specify a task, BitBake executes the
-default task, which is "build”. BitBake obeys inter-task dependencies
+default task, which is "build". BitBake obeys inter-task dependencies
 when doing so.
 
 The following command runs the build task, which is the default task, on

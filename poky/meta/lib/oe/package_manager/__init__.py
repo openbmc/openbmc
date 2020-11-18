@@ -397,12 +397,13 @@ class PackageManager(object, metaclass=ABCMeta):
                          "'%s' returned %d:\n%s" %
                          (' '.join(cmd), e.returncode, e.output.decode("utf-8")))
 
-        target_arch = self.d.getVar('TARGET_ARCH')
-        localedir = oe.path.join(self.target_rootfs, self.d.getVar("libdir"), "locale")
-        if os.path.exists(localedir) and os.listdir(localedir):
-            generate_locale_archive(self.d, self.target_rootfs, target_arch, localedir)
-            # And now delete the binary locales
-            self.remove(fnmatch.filter(self.list_installed(), "glibc-binary-localedata-*"), False)
+        if self.d.getVar('IMAGE_LOCALES_ARCHIVE') == '1':
+            target_arch = self.d.getVar('TARGET_ARCH')
+            localedir = oe.path.join(self.target_rootfs, self.d.getVar("libdir"), "locale")
+            if os.path.exists(localedir) and os.listdir(localedir):
+                generate_locale_archive(self.d, self.target_rootfs, target_arch, localedir)
+                # And now delete the binary locales
+                self.remove(fnmatch.filter(self.list_installed(), "glibc-binary-localedata-*"), False)
 
     def deploy_dir_lock(self):
         if self.deploy_dir is None:

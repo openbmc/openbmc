@@ -5,6 +5,11 @@ B = "${WORKDIR}/build"
 
 EXTRA_OECONF_append = " ${PACKAGECONFIG_CONFARGS}"
 
+EXTRA_OEWAF_BUILD ??= ""
+# In most cases, you want to pass the same arguments to `waf build` and `waf
+# install`, but you can override it if necessary
+EXTRA_OEWAF_INSTALL ??= "${EXTRA_OEWAF_BUILD}"
+
 def waflock_hash(d):
     # Calculates the hash used for the waf lock file. This should include
     # all of the user controllable inputs passed to waf configure. Note
@@ -55,11 +60,11 @@ waf_do_configure() {
 
 do_compile[progress] = "outof:^\[\s*(\d+)/\s*(\d+)\]\s+"
 waf_do_compile()  {
-	(cd ${S} && ./waf build ${@oe.utils.parallel_make_argument(d, '-j%d', limit=64)})
+	(cd ${S} && ./waf build ${@oe.utils.parallel_make_argument(d, '-j%d', limit=64)} ${EXTRA_OEWAF_BUILD})
 }
 
 waf_do_install() {
-	(cd ${S} && ./waf install --destdir=${D})
+	(cd ${S} && ./waf install --destdir=${D} ${EXTRA_OEWAF_INSTALL})
 }
 
 EXPORT_FUNCTIONS do_configure do_compile do_install

@@ -353,7 +353,7 @@ def print_html_report(data, id_comp, buildstats):
             bs_key = test + '.' + meas
             rev = str(metadata['commit_num']['value'])
             comp_rev = str(metadata['commit_num']['value_old'])
-            if (rev in buildstats and bs_key in buildstats[rev] and
+            if (buildstats and rev in buildstats and bs_key in buildstats[rev] and
                     comp_rev in buildstats and bs_key in buildstats[comp_rev]):
                 new_meas['buildstats'] = BSSummary(buildstats[comp_rev][bs_key],
                                                    buildstats[rev][bs_key])
@@ -509,7 +509,7 @@ def main(argv=None):
 
     revs = gitarchive.get_test_revs(log, repo, args.tag_name, hostname=args.hostname,
                                     branch=args.branch, machine=args.machine)
-    if args.branch2:
+    if args.branch2 and args.branch2 != args.branch:
         revs2 = gitarchive.get_test_revs(log, repo, args.tag_name, hostname=args.hostname,
                                          branch=args.branch2, machine=args.machine)
         if not len(revs2):
@@ -533,7 +533,7 @@ def main(argv=None):
     else:
         index1 = len(revs) - 1
 
-    if args.branch2:
+    if args.branch2 and args.branch2 != args.branch:
         revs2.append(revs[index1])
         index1 = len(revs2) - 1
         revs = revs2

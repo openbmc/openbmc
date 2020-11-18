@@ -520,6 +520,10 @@ class DevtoolAddTests(DevtoolBase):
         self._test_recipe_contents(recipefile, checkvars, [])
 
     def test_devtool_add_npm(self):
+        collections = get_bb_var('BBFILE_COLLECTIONS').split()
+        if "openembedded-layer" not in collections:
+            self.skipTest("Test needs meta-oe for nodejs")
+
         pn = 'savoirfairelinux-node-server-example'
         pv = '1.0.0'
         url = 'npm://registry.npmjs.org;package=@savoirfairelinux/node-server-example;version=' + pv
@@ -779,6 +783,26 @@ class DevtoolModifyTests(DevtoolBase):
         # Check git repo
         self._check_src_repo(tempdir)
         # This is probably sufficient
+
+    def test_devtool_modify_overrides(self):
+        # Try modifying a recipe with patches in overrides
+        tempdir = tempfile.mkdtemp(prefix='devtoolqa')
+        self.track_for_cleanup(tempdir)
+        self.track_for_cleanup(self.workspacedir)
+        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
+        result = runCmd('devtool modify devtool-patch-overrides -x %s' % (tempdir))
+
+        self._check_src_repo(tempdir)
+        source = os.path.join(tempdir, "source")
+        def check(branch, expected):
+            runCmd('git -C %s checkout %s' % (tempdir, branch))
+            with open(source, "rt") as f:
+                content = f.read()
+            self.assertEquals(content, expected)
+        check('devtool', 'This is a test for something\n')
+        check('devtool-no-overrides', 'This is a test for something\n')
+        check('devtool-override-qemuarm', 'This is a test for qemuarm\n')
+        check('devtool-override-qemux86', 'This is a test for qemux86\n')
 
 class DevtoolUpdateTests(DevtoolBase):
 

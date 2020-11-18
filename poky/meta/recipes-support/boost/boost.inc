@@ -1,6 +1,6 @@
 SUMMARY = "Free peer-reviewed portable C++ source libraries"
 SECTION = "libs"
-DEPENDS = "bjam-native zlib bzip2"
+DEPENDS = "boost-build-native zlib bzip2"
 
 CVE_PRODUCT = "boost:boost"
 
@@ -14,11 +14,15 @@ BOOST_LIBS = "\
 	atomic \
 	chrono \
 	container \
+	context \
 	contract \
+	coroutine \
 	date_time \
 	exception \
+	fiber \
 	filesystem \
 	graph \
+	headers \
 	iostreams \
 	log \
 	math \
@@ -27,22 +31,12 @@ BOOST_LIBS = "\
 	regex \
 	serialization \
 	system \
-	timer \
 	test \
 	thread \
+	timer \
+	type_erasure \
 	wave \
 	"
-
-# only supported by x86 and powerpc
-BOOST_LIBS_append_x86 = " context coroutine"
-BOOST_LIBS_append_x86-64 = " context coroutine"
-BOOST_LIBS_append_powerpc = " context coroutine"
-BOOST_LIBS_append_arm = " context coroutine"
-BOOST_LIBS_append_aarch64 = " context coroutine"
-# need consistent settings for native builds (x86 override not applied for native)
-BOOST_LIBS_remove_class-native = " context coroutine"
-# does not compile
-BOOST_LIBS_remove_mips16e = "wave"
 
 # optional libraries
 PACKAGECONFIG ??= "locale python"
@@ -169,7 +163,7 @@ do_configure() {
 
 	# D2194:Fixing the failure of "error: duplicate initialization of gcc with the following parameters" during compilation.
 	rm -f ${WORKDIR}/user-config.jam
-	echo 'using gcc : 4.3.1 : ${CXX} : <cflags>"${CFLAGS}" <cxxflags>"${CXXFLAGS}" <linkflags>"${LDFLAGS}" ;' >> ${WORKDIR}/user-config.jam
+	echo 'using gcc : : ${CXX} : <cflags>"${CFLAGS}" <cxxflags>"${CXXFLAGS}" <linkflags>"${LDFLAGS}" ;' >> ${WORKDIR}/user-config.jam
 
 	# If we want Python then we need to tell Boost *exactly* where to find it
 	if ${@bb.utils.contains('BOOST_LIBS', 'python', 'true', 'false', d)}; then
@@ -180,7 +174,7 @@ do_configure() {
 		echo "using mpi : : <find-shared-library>mpi ;" >> ${WORKDIR}/user-config.jam
 	fi
 
-	CC="${BUILD_CC}" CFLAGS="${BUILD_CFLAGS}" ./bootstrap.sh --with-bjam=bjam --with-toolset=gcc
+	CC="${BUILD_CC}" CFLAGS="${BUILD_CFLAGS}" ./bootstrap.sh --with-bjam=b2 --with-toolset=gcc
 
 	# Boost can't be trusted to find Python on it's own, so remove any mention
 	# of it from the boost configuration
@@ -189,7 +183,7 @@ do_configure() {
 
 do_compile() {
 	cd ${S}
-	bjam ${BJAM_OPTS} \
+	b2 ${BJAM_OPTS} \
 		--prefix=${prefix} \
 		--exec-prefix=${exec_prefix} \
 		--libdir=${libdir} \
@@ -199,7 +193,7 @@ do_compile() {
 
 do_install() {
 	cd ${S}
-	bjam ${BJAM_OPTS} \
+	b2 ${BJAM_OPTS} \
 		--libdir=${D}${libdir} \
 		--includedir=${D}${includedir} \
 		install

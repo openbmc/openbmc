@@ -482,6 +482,8 @@ def OEOuthashBasic(path, sigfile, task, d):
     h = hashlib.sha256()
     prev_dir = os.getcwd()
     include_owners = os.environ.get('PSEUDO_DISABLED') == '0'
+    if "package_write_" in task or task == "package_qa":
+        include_owners = False
     extra_content = d.getVar('HASHEQUIV_HASH_VERSION')
 
     try:
