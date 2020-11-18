@@ -8,9 +8,11 @@
 def run_git(d, cmd):
     try:
         oeroot = d.getVar('COREBASE', True)
-        return bb.process.run("git --work-tree %s --git-dir %s/.git %s"
+        return bb.process.run(("export PSEUDO_DISABLED=1; " +
+                               "git --work-tree %s --git-dir %s/.git %s")
             % (oeroot, oeroot, cmd))[0].strip('\n')
-    except:
+    except Exception as e:
+        bb.warn("Unexpected exception from 'git' call: %s" % e)
         pass
 
 VERSION_ID := "${@run_git(d, 'describe --dirty --long')}"
