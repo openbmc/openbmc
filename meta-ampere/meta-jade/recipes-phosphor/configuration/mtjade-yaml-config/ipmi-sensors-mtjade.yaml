@@ -50,7 +50,7 @@
     path: /xyz/openbmc_project/sensors/temperature/PSU1_TEMP
 
 37: &FAN_DEFAULTS
-  entityID: 28
+  entityID: 29
   entityInstance: 13
   sensorType: 4
   path: /xyz/openbmc_project/sensors/fan_tach/FAN3_1
@@ -505,7 +505,7 @@
 169: &current
     sensorType: 0x03
     path: /xyz/openbmc_project/sensors/current/S0_Core_VRD_Curr
-    entityID: 13
+    entityID: 19
     entityInstance: 67
     sensorReadingType: 0x01
     multiplierM: 80
