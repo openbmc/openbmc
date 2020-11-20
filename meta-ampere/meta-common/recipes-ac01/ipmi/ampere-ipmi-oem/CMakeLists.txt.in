@@ -1,0 +1,31 @@
+cmake_minimum_required (VERSION 3.5)
+
+include (ExternalProject)
+
+file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/prefix)
+file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/prefix/include)
+
+# requires apt install autoconf-archive and autoconf
+
+externalproject_add (
+    host-ipmid PREFIX ${CMAKE_BINARY_DIR}/phosphor-host-ipmid GIT_REPOSITORY
+    https://github.com/openbmc/phosphor-host-ipmid SOURCE_DIR
+    ${CMAKE_BINARY_DIR}/phosphor-ipmi-host-src BINARY_DIR
+    ${CMAKE_BINARY_DIR}/phosphor-ipmi-host-build CONFIGURE_COMMAND cd
+    ${CMAKE_BINARY_DIR}/phosphor-ipmi-host-src && export
+    PYTHONPATH=${CMAKE_BINARY_DIR}/prefix/lib/python2.7/site-packages:$ENV{PYTHONPATH}
+    && export PATH=${CMAKE_BINARY_DIR}/prefix/bin:$ENV{PATH} && export
+    PKG_CONFIG_PATH=${CMAKE_BINARY_DIR}/prefix/lib/pkgconfig && ./bootstrap.sh
+    && ./configure --prefix=${CMAKE_BINARY_DIR}/prefix
+    CPPFLAGS=-I${CMAKE_BINARY_DIR}/prefix/include/
+    CXXFLAGS=-Wno-error=unused-result LDFLAGS=-L${CMAKE_BINARY_DIR}/prefix/lib/
+    BUILD_COMMAND cd ${CMAKE_BINARY_DIR}/phosphor-ipmi-host-src && export
+    PYTHONPATH=${CMAKE_BINARY_DIR}/prefix/lib/python2.7/site-packages:$ENV{PYTHONPATH}
+    && export PATH=${CMAKE_BINARY_DIR}/prefix/bin:$ENV{PATH} && export
+    PKG_CONFIG_PATH=${CMAKE_BINARY_DIR}/prefix/lib/pkgconfig && make -j
+    verbose=1 INSTALL_COMMAND cd ${CMAKE_BINARY_DIR}/phosphor-ipmi-host-src &&
+    make install && mkdir -p
+    "${CMAKE_BINARY_DIR}/prefix/include/ipmid" && cp include/ipmid/api.h
+    "${CMAKE_BINARY_DIR}/prefix/include/ipmid/" LOG_DOWNLOAD ON
+)
+
