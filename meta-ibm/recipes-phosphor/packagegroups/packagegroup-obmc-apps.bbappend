@@ -35,5 +35,8 @@ RDEPENDS_${PN}-logging_append = " ${EXTRA_IBM_LOGGING_PKGS}"
 RDEPENDS_${PN}-extras_append_rainier = " pldm openpower-hw-diags srvcfg-manager"
 RDEPENDS_${PN}-leds_remove_rainier = "phosphor-led-manager-faultmonitor"
 RDEPENDS_${PN}-leds_remove_witherspoon-tacoma = "phosphor-led-manager-faultmonitor"
+RDEPENDS_${PN}-health-monitor_remove_ibm-ac-server = "phosphor-health-monitor"
+RDEPENDS_${PN}-health-monitor_remove_rainier = "phosphor-health-monitor"
+RDEPENDS_${PN}-health-monitor_remove_witherspoon-tacoma = "phosphor-health-monitor"
 
 ${PN}-software-extras_append_ibm-ac-server = " phosphor-software-manager-sync"
