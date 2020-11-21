@@ -60,32 +60,202 @@ namespace ras
 
     struct ErrorData {
         u_int16_t socket;
+        u_int8_t intErrorType;
         const char* label;
         u_int8_t errType;
         u_int8_t errNum;
         const char* errName;
+        const char* redFishMsgID;
+    };
+    /* Error type index of RAS Errors */
+    enum ErrorTypes{
+        errors_core_ue,
+        errors_mem_ue,
+        errors_pcie_ue,
+        errors_other_ue,
+        errors_core_ce,
+        errors_mem_ce,
+        errors_pcie_ce,
+        errors_other_ce,
     };
 
     ErrorData errorTypeTable[] = {
-        {0, "errors_core_ue", TYPE_CORE, UE_CORE_IERR, "UE_CPU_IError"},
-        {0, "errors_mem_ue", TYPE_MEM, UE_MEM_IERR, "UE_Memory_IErr"},
-        {0, "errors_pcie_ue", TYPE_PCIE, UE_PCIE_IERR, "UE_PCIE_IErr"},
-        {0, "errors_other_ue", TYPE_OTHER, UE_OTHER_IERR, "UE_SoC_IErr"},
-        {1, "errors_core_ue", TYPE_CORE, UE_CORE_IERR, "UE_CPU_IError"},
-        {1, "errors_mem_ue", TYPE_MEM, UE_MEM_IERR, "UE_Memory_IErr"},
-        {1, "errors_pcie_ue", TYPE_PCIE, UE_PCIE_IERR, "UE_PCIE_IErr"},
-        {1, "errors_other_ue", TYPE_OTHER, UE_OTHER_IERR, "UE_SoC_IErr"},
-        {0, "errors_core_ce", TYPE_CORE, CE_CORE_IERR, "CE_CPU_IError"},
-        {0, "errors_mem_ce", TYPE_MEM, CE_MEM_IERR, "CE_Memory_IErr"},
-        {0, "errors_pcie_ce", TYPE_PCIE, CE_PCIE_IERR, "CE_PCIE_IErr"},
-        {0, "errors_other_ce", TYPE_OTHER, CE_OTHER_IERR, "CE_SoC_IErr"},
-        {1, "errors_core_ce", TYPE_CORE, CE_CORE_IERR, "CE_CPU_IError"},
-        {1, "errors_mem_ce", TYPE_MEM, CE_MEM_IERR, "CE_Memory_IErr"},
-        {1, "errors_pcie_ce", TYPE_PCIE, CE_PCIE_IERR, "CE_PCIE_IErr"},
-        {1, "errors_other_ce", TYPE_OTHER, CE_OTHER_IERR, "CE_SoC_IErr"},
+        {0, errors_core_ue, "errors_core_ue", TYPE_CORE, UE_CORE_IERR,
+            "UE_CPU_IError", "CPUError"},
+        {0, errors_mem_ue, "errors_mem_ue", TYPE_MEM, UE_MEM_IERR,
+            "UE_Memory_IErr", "MemoryECCUncorrectable"},
+        {0, errors_pcie_ue, "errors_pcie_ue", TYPE_PCIE, UE_PCIE_IERR,
+            "UE_PCIE_IErr", "PCIeFatalUncorrectableInternal"},
+        {0, errors_other_ue, "errors_other_ue", TYPE_OTHER, UE_OTHER_IERR,
+            "UE_SoC_IErr", "AmpereCritical"},
+        {1, errors_core_ue, "errors_core_ue", TYPE_CORE, UE_CORE_IERR,
+            "UE_CPU_IError", "CPUError"},
+        {1, errors_mem_ue, "errors_mem_ue", TYPE_MEM, UE_MEM_IERR,
+            "UE_Memory_IErr", "MemoryECCUncorrectable"},
+        {1, errors_pcie_ue, "errors_pcie_ue", TYPE_PCIE, UE_PCIE_IERR,
+            "UE_PCIE_IErr", "PCIeFatalUncorrectableInternal"},
+        {1, errors_other_ue, "errors_other_ue", TYPE_OTHER, UE_OTHER_IERR,
+            "UE_SoC_IErr", "AmpereCritical"},
+        {0, errors_core_ce, "errors_core_ce", TYPE_CORE, CE_CORE_IERR,
+            "CE_CPU_IError", "CPUError"},
+        {0, errors_mem_ce, "errors_mem_ce", TYPE_MEM, CE_MEM_IERR,
+            "CE_Memory_IErr", "MemoryECCCorrectable"},
+        {0, errors_pcie_ce, "errors_pcie_ce", TYPE_PCIE, CE_PCIE_IERR,
+            "CE_PCIE_IErr", "PCIeFatalECRCError"},
+        {0, errors_other_ce, "errors_other_ce", TYPE_OTHER, CE_OTHER_IERR,
+            "CE_SoC_IErr", "AmpereCritical"},
+        {1, errors_core_ce, "errors_core_ce", TYPE_CORE, CE_CORE_IERR,
+            "CE_CPU_IError", "CPUError"},
+        {1, errors_mem_ce, "errors_mem_ce", TYPE_MEM, CE_MEM_IERR,
+            "CE_Memory_IErr", "MemoryECCCorrectable"},
+        {1, errors_pcie_ce, "errors_pcie_ce", TYPE_PCIE, CE_PCIE_IERR,
+            "CE_PCIE_IErr", "PCIeFatalECRCError"},
+        {1, errors_other_ce, "errors_other_ce", TYPE_OTHER, CE_OTHER_IERR,
+            "CE_SoC_IErr", "AmpereCritical"},
     };
+
     const static constexpr u_int8_t NUMBER_OF_ERRORS    =
             sizeof(errorTypeTable) / sizeof(ErrorData);
+
+    struct ErrorInfo {
+        u_int8_t errType;
+        u_int8_t subType;
+        u_int8_t numPars;
+        const char* errName;
+        const char* errMsgFormat;
+    };
+    
+    std::map<u_int16_t, ErrorInfo> mapOfOccur = {
+        {0x0000, {0, 0, 2, "CPM Snoop-Logic", "Socket%s CPM%s"}},
+        {0x0001, {0, 1, 2, "CPM Core 0", "Socket%s CPM%s"}},
+        {0x0002, {0, 2, 2, "CPM Core 1", "Socket%s CPM%s"}},
+        {0x0101, {1, 1, 2, "MCU ERR Record 1 (DRAM CE)", "Socket%s MCU%s"}},
+        {0x0102, {1, 2, 2, "MCU ERR Record 2 (DRAM UE)", "Socket%s MCU%s"}},
+        {0x0103, {1, 3, 2, "MCU ERR Record 3 (CHI Fault)", "Socket%s MCU%s"}},
+        {0x0104, {1, 4, 2, "MCU ERR Record 4 (SRAM CE)", "Socket%s MCU%s"}},
+        {0x0105, {1, 5, 2, "MCU ERR 5 (SRAM UE)", "Socket%s MCU%s"}},
+        {0x0106, {1, 6, 2, "MCU ERR 6 (DMC recovery)", "Socket%s MCU%s"}},
+        {0x0107, {1, 7, 2, "MCU Link ERR", "Socket%s MCU%s"}},
+        {0x0200, {2, 0, 2, "Mesh XP", "Socket%s instance:%s"}},
+        {0x0201, {2, 1, 2, "Mesh HNI", "Socket%s instance:%s"}},
+        {0x0202, {2, 2, 2, "Mesh HNF", "Socket%s instance:%s"}},
+        {0x0204, {2, 4, 2, "Mesh CXG", "Socket%s instance:%s"}},
+        {0x0300, {3, 0, 2, "2P CCIX ERR", "Socket%s Link%s"}},
+        {0x0400, {4, 0, 2, "2P ALI ERR", "Socket%s Link%s"}},
+        {0x0500, {5, 0, 1, "GIC ERR 0", "Socket%s"}},
+        {0x0501, {5, 1, 1, "GIC ERR 1", "Socket%s"}},
+        {0x0502, {5, 2, 1, "GIC ERR 2", "Socket%s"}},
+        {0x0503, {5, 3, 1, "GIC ERR 3", "Socket%s"}},
+        {0x0504, {5, 4, 1, "GIC ERR 4", "Socket%s"}},
+        {0x0505, {5, 5, 1, "GIC ERR 5", "Socket%s"}},
+        {0x0506, {5, 6, 1, "GIC ERR 6", "Socket%s"}},
+        {0x0507, {5, 7, 1, "GIC ERR 7", "Socket%s"}},
+        {0x0508, {5, 8, 1, "GIC ERR 8", "Socket%s"}},
+        {0x0509, {5, 9, 1, "GIC ERR 9", "Socket%s"}},
+        {0x050a, {5, 10, 1, "GIC ERR 10", "Socket%s"}},
+        {0x050b, {5, 11, 1, "GIC ERR 11", "Socket%s"}},
+        {0x050c, {5, 12, 1, "GIC ERR 12", "Socket%s"}},
+        {0x0600, {6, 0, 2, "SMMU TBU0", "Socket%s Root complex:%s"}},
+        {0x0601, {6, 1, 2, "SMMU TBU1", "Socket%s Root complex:%s"}},
+        {0x0602, {6, 2, 2, "SMMU TBU2", "Socket%s Root complex:%s"}},
+        {0x0603, {6, 3, 2, "SMMU TBU3", "Socket%s Root complex:%s"}},
+        {0x0604, {6, 4, 2, "SMMU TBU4", "Socket%s Root complex:%s"}},
+        {0x0605, {6, 5, 2, "SMMU TBU5", "Socket%s Root complex:%s"}},
+        {0x0606, {6, 6, 2, "SMMU TBU6", "Socket%s Root complex:%s"}},
+        {0x0607, {6, 7, 2, "SMMU TBU7", "Socket%s Root complex:%s"}},
+        {0x0608, {6, 8, 2, "SMMU TBU8", "Socket%s Root complex:%s"}},
+        {0x0609, {6, 9, 2, "SMMU TBU9", "Socket%s Root complex:%s"}},
+        {0x0664, {6, 100, 2, "SMMU TCU", "Socket%s Root complex:%s"}},
+        {0x0700, {7, 0, 2, "PCIe AER Root Port", "Socket%s Root complex:%s"}},
+        {0x0701, {7, 1, 2, "PCIe AER Device", "Socket%s Root complex:%s"}},
+        {0x0800, {8, 0, 2, "PCIe HB RCA", "Socket%s Root complex:%s"}},
+        {0x0801, {8, 1, 2, "PCIe HB RCA", "Socket%s Root complex:%s"}},
+        {0x0808, {8, 8, 2, "PCIe RASDP Error ", "Socket%s Root complex:%s"}},
+        {0x0900, {9, 0, 1, "OCM ERR 0 (ECC Fault)", "Socket%s"}},
+        {0x0901, {9, 1, 1, "OCM ERR 1 (ERR Recovery)", "Socket%s"}},
+        {0x0902, {9, 2, 1, "OCM ERR 2 (Data Poisoned)", "Socket%s"}},
+        {0x0a00, {10, 0, 1, "SMpro ERR 0 (ECC Fault)", "Socket%s"}},
+        {0x0a01, {10, 1, 1, "SMpro ERR 1 (ERR Recovery)", "Socket%s"}},
+        {0x0a02, {10, 2, 1, "SMpro MPA_ERR", "Socket%s"}},
+        {0x0b00, {11, 0, 1, "PMpro ERR 0 (ECC Fault)", "Socket%s"}},
+        {0x0b01, {11, 1, 1, "PMpro ERR 1 (ERR Recovery)", "Socket%s"}},
+        {0x0b02, {11, 2, 1, "PMpro MPA_ERR", "Socket%s"}},
+        {0x0c00, {12, 0, 1, "ATF firmware EL3", "Socket%s"}},
+        {0x0c01, {12, 1, 1, "ATF firmware SPM", "Socket%s"}},
+        {0x0c02, {12, 2, 1, "ATF firmware Secure Partition ", "Socket%s"}},
+        {0x0d00, {13, 0, 1, "SMpro firmware RAS_MSG_ERR", "Socket%s"}},
+        {0x0e00, {14, 0, 1, "PMpro firmware RAS_MSG_ERR", "Socket%s"}},
+        {0x3f00, {63, 0, 1, "BERT Default", "Socket%s"}},
+        {0x3f01, {63, 1, 1, "BERT Watchdog", "Socket%s"}},
+        {0x3f02, {63, 2, 1, "BERT ATF Fatal", "Socket%s"}},
+        {0x3f03, {63, 3, 1, "BERT SMpro Fatal", "Socket%s"}},
+        {0x3f04, {63, 4, 1, "BERT PMpro Fatal", "Socket%s"}},
+    };
+
+    const static constexpr u_int16_t MCU_ERR_1_TYPE    = 0x0101;
+    const static constexpr u_int16_t MCU_ERR_2_TYPE    = 0x0102;
+
+    static int logErrorToRedfish(ErrorData data, ErrorFields eFields)
+    {
+        char redFishMsgID[MAX_MSG_LEN] = {'\0'};
+        char redFishMsg[MAX_MSG_LEN] = {'\0'};
+        char redFishComp[MAX_MSG_LEN] = {'\0'};
+        u_int8_t socket = (eFields.instance & 0xc000) >> 14;
+        u_int16_t inst_13_0 = eFields.instance & 0x3fff;
+        u_int8_t apiIdx = data.intErrorType;
+        u_int16_t temp;
+        ErrorInfo eInfo;
+
+        snprintf(redFishMsgID, MAX_MSG_LEN,
+            "OpenBMC.0.1.%s.Critical", data.redFishMsgID);
+        temp = (eFields.errType << 8) + eFields.subType;
+        if (mapOfOccur.size() != 0 && mapOfOccur.count(temp) > 0) {
+            eInfo = mapOfOccur[temp];
+            char str1[4] = {'\0'};
+            char str2[4] = {'\0'};
+            snprintf(str1, 4, "%d", socket);
+            snprintf(str2, 4, "%d", inst_13_0);
+
+            if (eInfo.numPars == 1)
+                snprintf(redFishMsg, MAX_MSG_LEN, eInfo.errMsgFormat, str1);
+            else if (eInfo.numPars == 2)
+                snprintf(redFishMsg, MAX_MSG_LEN, eInfo.errMsgFormat, str1,
+                            str2);
+            snprintf(redFishComp, MAX_MSG_LEN, "%s", eInfo.errName);
+        }
+
+        if (apiIdx == errors_core_ue || apiIdx == errors_core_ce) {
+            char sTemp[MAX_MSG_LEN] = {'\0'};
+            snprintf(sTemp, MAX_MSG_LEN, "%s: %s %s", data.errName,
+                        redFishComp, redFishMsg);
+            sd_journal_send("REDFISH_MESSAGE_ID=%s", redFishMsgID,
+                        "REDFISH_MESSAGE_ARGS=%s", sTemp, NULL);
+        } else if (apiIdx == errors_mem_ue || apiIdx == errors_mem_ce) {
+            char dimCh[MAX_MSG_LEN] = {'\0'};
+            snprintf(dimCh, MAX_MSG_LEN, "%x", (inst_13_0 & 0x7ff));
+            /* Only detect DIMM Idx for MCU_ERROR_1 or MCU_ERROR_2 Type */
+            if (temp == MCU_ERR_1_TYPE || temp == MCU_ERR_2_TYPE)
+                sd_journal_send("REDFISH_MESSAGE_ID=%s", redFishMsgID,
+                        "REDFISH_MESSAGE_ARGS=%d,%s,%d,%d", socket,
+                        dimCh, (inst_13_0 & 0x3800) >> 11,
+                        (u_int8_t) ((eFields.address >> 20) & 0xF) , NULL);
+            else
+                sd_journal_send("REDFISH_MESSAGE_ID=%s", redFishMsgID,
+                        "REDFISH_MESSAGE_ARGS=%d,%s,%d,%d", socket,
+                        dimCh, 0xff, 0xff, NULL);
+            
+        } else if (apiIdx == errors_pcie_ue || apiIdx == errors_pcie_ce) {
+            sd_journal_send("REDFISH_MESSAGE_ID=%s", redFishMsgID,
+                        "REDFISH_MESSAGE_ARGS=%d,%d,%d", socket,
+                        inst_13_0, 0, NULL);
+        } else if (apiIdx == errors_other_ue || apiIdx == errors_other_ce) {
+            char comp[MAX_MSG_LEN] = {'\0'};
+            snprintf(comp, MAX_MSG_LEN, "%s: %s", data.errName, redFishComp);
+            sd_journal_send("REDFISH_MESSAGE_ID=%s", redFishMsgID,
+                        "REDFISH_MESSAGE_ARGS=%s,%s", comp, redFishMsg, NULL);
+        }
+        return 1;
+    }
 
     static int logErrorToIpmiSEL(ErrorData data, ErrorFields eFields)
     {
@@ -125,6 +295,9 @@ namespace ras
 
         /* Add Ipmi SEL log*/
         logErrorToIpmiSEL(data, errFields);
+
+        /* Add Redfish log */
+        logErrorToRedfish(data, errFields);
 
         return 1;
     }
