@@ -10,6 +10,7 @@ SRC_URI += " \
                 file://LICENSE \
                 file://include/selUtils.hpp \
                 file://include/utils.hpp \
+                file://include/internalErrors.hpp \
                 file://ampere-host-error-monitor.cpp \
                 file://CMakeLists.txt \
                 file://xyz.openbmc_project.ampere_host_error_monitor.service \

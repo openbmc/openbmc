@@ -26,6 +26,7 @@
 #include <gpiod.hpp>
 #include "utils.hpp"
 #include "selUtils.hpp"
+#include "internalErrors.hpp"
 #include <map>
 #include <ctime>
 #include <chrono>
@@ -41,6 +42,7 @@ namespace ras
     const static constexpr u_int8_t TYPE_MEM        = 0x0C;
     const static constexpr u_int8_t TYPE_CORE       = 0x07;
     const static constexpr u_int8_t TYPE_PCIE       = 0x13;
+    const static constexpr u_int8_t TYPE_SMPM       = 0xCA;
     const static constexpr u_int8_t CE_CORE_IERR    = 139;
     const static constexpr u_int8_t UE_CORE_IERR    = 140;
     const static constexpr u_int8_t CE_OTHER_IERR   = 141;
@@ -49,6 +51,20 @@ namespace ras
     const static constexpr u_int8_t UE_MEM_IERR     = 168;
     const static constexpr u_int8_t CE_PCIE_IERR    = 191;
     const static constexpr u_int8_t UE_PCIE_IERR    = 202;
+    const static constexpr u_int8_t SMPRO_IERR     = 147;
+    const static constexpr u_int8_t PMPRO_IERR     = 148;
+    /* Direction of RAS Internal errors */
+    const static constexpr u_int8_t  DIR_ENTER      = 0;
+    const static constexpr u_int8_t  DIR_EXIT       = 1;
+    /* Sub types of RAS Internal errors */
+    const static constexpr u_int8_t  SMPMPRO_WARNING       = 1;
+    const static constexpr u_int8_t  SMPMPRO_ERROR         = 2;
+    const static constexpr u_int8_t  SMPMPRO_ERROR_DATA    = 4;
+    /* Type of RAS Internal errors */
+    const static constexpr u_int8_t  SMPRO_IERR_TYPE        = 0;
+    const static constexpr u_int8_t  PMPRO_IERR_TYPE        = 1;
+
+    const static constexpr u_int8_t IERR_SENSOR_SPECIFIC     = 0x71;
 
     struct ErrorFields {
         u_int8_t errType;
@@ -56,6 +72,16 @@ namespace ras
         u_int16_t instance;
         u_int32_t status;
         u_int64_t address;
+    };
+
+    struct InternalFields {
+        u_int8_t errType;
+        u_int8_t subType;
+        u_int8_t imageCode;
+        u_int8_t dir;
+        u_int8_t location;
+        u_int16_t errCode;
+        u_int32_t data;
     };
 
     struct ErrorData {
@@ -77,6 +103,8 @@ namespace ras
         errors_mem_ce,
         errors_pcie_ce,
         errors_other_ce,
+        errors_smpro,
+        errors_pmpro
     };
 
     ErrorData errorTypeTable[] = {
@@ -112,6 +140,14 @@ namespace ras
             "CE_PCIE_IErr", "PCIeFatalECRCError"},
         {1, errors_other_ce, "errors_other_ce", TYPE_OTHER, CE_OTHER_IERR,
             "CE_SoC_IErr", "AmpereCritical"},
+        {0, errors_smpro, "errors_smpro", TYPE_SMPM, SMPRO_IERR,
+            "SMPRO_IErr", "AmpereCritical"},
+        {0, errors_pmpro, "errors_pmpro", TYPE_SMPM, PMPRO_IERR,
+            "PMPRO_IErr", "AmpereCritical"},
+        {1, errors_smpro, "errors_smpro", TYPE_SMPM, SMPRO_IERR,
+            "SMPRO_IErr", "AmpereCritical"},
+        {1, errors_pmpro, "errors_pmpro", TYPE_SMPM, PMPRO_IERR,
+            "PMPRO_IErr", "AmpereCritical"},
     };
 
     const static constexpr u_int8_t NUMBER_OF_ERRORS    =
@@ -194,6 +230,120 @@ namespace ras
 
     const static constexpr u_int16_t MCU_ERR_1_TYPE    = 0x0101;
     const static constexpr u_int16_t MCU_ERR_2_TYPE    = 0x0102;
+
+    static int logInternalErrorToIpmiSEL(ErrorData data,
+                                        InternalFields eFields)
+    {
+        std::vector<uint8_t> eventData(
+            ampere::sel::SEL_OEM_DATA_MAX_SIZE, 0xFF);
+
+        eventData[0] = 0x3A;
+        eventData[1] = 0xCD;
+        eventData[2] = 0x00;
+        eventData[3] = data.errType;
+        eventData[4] = data.errNum;
+        eventData[5] = (eFields.dir << 7) | IERR_SENSOR_SPECIFIC;
+        eventData[6] = ((data.socket & 0x1) << 7) |
+            ((eFields.subType & 0x7) << 4) | (eFields.imageCode & 0xf);
+        eventData[7] = eFields.location & 0xff;
+        eventData[8] = eFields.errCode & 0xff;
+        eventData[9] = (eFields.errCode & 0xff00) >> 8;
+        eventData[10] = eFields.data & 0xff;
+        eventData[11] = (eFields.data & 0xff00) >> 8;
+
+        ampere::sel::addSelOem("OEM RAS error:", eventData);
+
+        return 1;
+    }
+
+    static int logInternalErrorToRedfish(ErrorData data,
+                                        InternalFields eFields)
+    {
+        char redfishMsgID[MAX_MSG_LEN] = {'\0'};
+        char redfishMsg[MAX_MSG_LEN] = {'\0'};
+        char sLocation[MAX_MSG_LEN] = "Unknown location";
+        char sErrorCode[MAX_MSG_LEN] = "Unknown Error";
+        char sImage[MAX_MSG_LEN] = "Unknown Image";
+        char sDir[MAX_MSG_LEN] = "Unknown Action";
+        char redfishComp[MAX_MSG_LEN] = {'\0'};
+
+        if (eFields.location < ampere::internalErrors::NUM_LOCAL_CODES)
+            snprintf(sLocation, MAX_MSG_LEN,
+                ampere::internalErrors::localCodes[eFields.location]);
+
+        if (eFields.imageCode < ampere::internalErrors::NUM_IMAGE_CODES)
+            snprintf(sImage, MAX_MSG_LEN,
+                ampere::internalErrors::imageCodes[eFields.imageCode]);
+
+        if (eFields.errCode < ampere::internalErrors::NUM_ERROR_CODES)
+            snprintf(sErrorCode, MAX_MSG_LEN,
+                ampere::internalErrors::errorCodes[eFields.errCode]\
+                    .description);
+
+        if (eFields.dir < ampere::internalErrors::NUM_DIRS)
+            snprintf(sDir, MAX_MSG_LEN,
+                ampere::internalErrors::directions[eFields.dir]);
+
+        snprintf(redfishComp, MAX_MSG_LEN, "S%d_%s: %s %s %s with",
+            data.socket, data.errName, sImage, sDir, sLocation);
+
+        if (eFields.subType == SMPMPRO_WARNING)
+        {
+            snprintf(redfishMsgID, MAX_MSG_LEN,
+                "OpenBMC.0.1.%s.Warning", data.redFishMsgID);
+            snprintf(redfishMsg, MAX_MSG_LEN, "Warning %s.", sErrorCode);
+        }
+        else
+        {
+           snprintf(redfishMsgID, MAX_MSG_LEN,
+                "OpenBMC.0.1.%s.Critical", data.redFishMsgID);
+            if (eFields.subType == SMPMPRO_ERROR)
+                snprintf(redfishMsg, MAX_MSG_LEN, "Error %s.", sErrorCode);
+            else
+                snprintf(redfishMsg, MAX_MSG_LEN, "Error %s, data 0x%08x.",
+                    sErrorCode, eFields.data);
+        }
+
+        if (data.intErrorType == errors_smpro ||
+                data.intErrorType == errors_pmpro) {
+            sd_journal_send("REDFISH_MESSAGE_ID=%s", redfishMsgID,
+                        "REDFISH_MESSAGE_ARGS=%s,%s", redfishComp,
+                        redfishMsg, NULL);
+        }
+        return 1;
+    }
+
+    static int parseAndLogInternalErrors(ErrorData data, std::string errLine)
+    {
+        InternalFields errFields;
+        std::vector<std::string> result;
+
+        errLine.erase(std::remove(errLine.begin(), errLine.end(), '\n'),
+            errLine.end());
+        boost::split(result, errLine, boost::is_any_of(" "));
+        if (result.size() < 6)
+            return 0;
+
+        if (data.intErrorType == errors_smpro)
+            errFields.errType = SMPRO_IERR_TYPE;
+        else
+            errFields.errType = PMPRO_IERR_TYPE;
+
+        errFields.subType = ampere::utils::parseHexStrToUInt8(result[0]);
+        errFields.imageCode = ampere::utils::parseHexStrToUInt8(result[1]);
+        errFields.dir = ampere::utils::parseHexStrToUInt8(result[2]);
+        errFields.location = ampere::utils::parseHexStrToUInt8(result[3]);
+        errFields.errCode = ampere::utils::parseHexStrToUInt16(result[4]);
+        errFields.data = ampere::utils::parseHexStrToUInt32(result[5]);
+
+        /* Add SEL log */
+        logInternalErrorToIpmiSEL(data, errFields);
+
+        /* Add Redfish log */
+        logInternalErrorToRedfish(data, errFields);
+
+        return 1;
+    }
 
     static int logErrorToRedfish(ErrorData data, ErrorFields eFields)
     {
@@ -313,7 +463,11 @@ namespace ras
 
         size_t len = 0;
         while ((getline(&line, &len, fp)) != -1) {
-            parseAndLogErrors(data, line);
+            if (data.intErrorType == errors_smpro ||
+                    data.intErrorType == errors_pmpro)
+                parseAndLogInternalErrors(data, line);
+            else
+                parseAndLogErrors(data, line);
         }
 
         fclose(fp);
