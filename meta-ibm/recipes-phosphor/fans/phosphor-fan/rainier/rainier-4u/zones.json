@@ -1,0 +1,9 @@
+[
+    {
+        "name": "0",
+        "full_speed": 6000,
+        "default_floor": 6000,
+        "increase_delay": 5,
+        "decrease_interval": 30
+    }
+]
