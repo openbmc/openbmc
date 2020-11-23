@@ -1,0 +1,167 @@
+{
+   "fans": [
+      {
+         "inventory": "/system/chassis/motherboard/fan0",
+         "functional_delay": 5,
+         "allowed_out_of_range_time": 30,
+         "deviation": 15,
+         "num_sensors_nonfunc_for_fan_nonfunc": 1,
+         "sensors": [
+            {
+               "name": "fan0_0",
+               "has_target": true
+            },
+            {
+               "name": "fan0_1",
+               "has_target": false,
+               "factor": 1.45,
+               "offset": -909
+            }
+         ]
+      },
+      {
+         "inventory": "/system/chassis/motherboard/fan1",
+         "functional_delay": 5,
+         "allowed_out_of_range_time": 30,
+         "deviation": 15,
+         "num_sensors_nonfunc_for_fan_nonfunc": 1,
+         "sensors": [
+            {
+               "name": "fan1_0",
+               "has_target": true
+            },
+            {
+               "name": "fan1_1",
+               "has_target": false,
+               "factor": 1.45,
+               "offset": -909
+            }
+         ]
+      },
+      {
+         "inventory": "/system/chassis/motherboard/fan2",
+         "functional_delay": 5,
+         "allowed_out_of_range_time": 30,
+         "deviation": 15,
+         "num_sensors_nonfunc_for_fan_nonfunc": 1,
+         "sensors": [
+            {
+               "name": "fan2_0",
+               "has_target": true
+            },
+            {
+               "name": "fan2_1",
+               "has_target": false,
+               "factor": 1.45,
+               "offset": -909
+            }
+         ]
+      },
+      {
+         "inventory": "/system/chassis/motherboard/fan3",
+         "functional_delay": 5,
+         "allowed_out_of_range_time": 30,
+         "deviation": 15,
+         "num_sensors_nonfunc_for_fan_nonfunc": 1,
+         "sensors": [
+            {
+               "name": "fan3_0",
+               "has_target": true
+            },
+            {
+               "name": "fan3_1",
+               "has_target": false,
+               "factor": 1.45,
+               "offset": -909
+            }
+         ]
+      },
+      {
+         "inventory": "/system/chassis/motherboard/fan4",
+         "functional_delay": 5,
+         "allowed_out_of_range_time": 30,
+         "deviation": 15,
+         "num_sensors_nonfunc_for_fan_nonfunc": 1,
+         "sensors": [
+            {
+               "name": "fan4_0",
+               "has_target": true
+            },
+            {
+               "name": "fan4_1",
+               "has_target": false,
+               "factor": 1.45,
+               "offset": -909
+            }
+         ]
+      },
+      {
+         "inventory": "/system/chassis/motherboard/fan5",
+         "functional_delay": 5,
+         "allowed_out_of_range_time": 30,
+         "deviation": 15,
+         "num_sensors_nonfunc_for_fan_nonfunc": 1,
+         "sensors": [
+            {
+               "name": "fan5_0",
+               "has_target": true
+            },
+            {
+               "name": "fan5_1",
+               "has_target": false,
+               "factor": 1.45,
+               "offset": -909
+            }
+         ]
+      }
+   ],
+   "sensor_trust_groups": [
+      {
+         "class": "NonzeroSpeed",
+         "group": [
+            {
+               "name": "fan0_1"
+            },
+            {
+               "name": "fan1_1"
+            },
+            {
+               "name": "fan2_1"
+            },
+            {
+               "name": "fan3_1"
+            },
+            {
+               "name": "fan4_1"
+            },
+            {
+               "name": "fan5_1"
+            },
+            {
+               "name": "fan0_0",
+               "in_trust": false
+            },
+            {
+               "name": "fan1_0",
+               "in_trust": false
+            },
+            {
+               "name": "fan2_0",
+               "in_trust": false
+            },
+            {
+               "name": "fan3_0",
+               "in_trust": false
+            },
+            {
+               "name": "fan4_0",
+               "in_trust": false
+            },
+            {
+               "name": "fan5_0",
+               "in_trust": false
+            }
+         ]
+      }
+   ]
+}
