@@ -1,0 +1,128 @@
+[
+   {
+      "name": "fan0",
+      "path": "/system/chassis/motherboard/fan0",
+      "methods": [
+         {
+            "type": "gpio",
+            "key": 6,
+            "physpath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a400.i2c-bus/i2c-7/7-0061",
+            "devpath": "/dev/input/by-path/platform-gpio-keys-polled-event"
+         },
+         {
+            "type": "tach",
+            "sensors": [
+               "fan0_0"
+            ]
+         }
+      ],
+      "rpolicy": {
+         "type": "anyof"
+      }
+   },
+   {
+      "name": "fan1",
+      "path": "/system/chassis/motherboard/fan1",
+      "methods": [
+         {
+            "type": "gpio",
+            "key": 7,
+            "physpath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a400.i2c-bus/i2c-7/7-0061",
+            "devpath": "/dev/input/by-path/platform-gpio-keys-polled-event"
+         },
+         {
+            "type": "tach",
+            "sensors": [
+               "fan1_0"
+            ]
+         }
+      ],
+      "rpolicy": {
+         "type": "anyof"
+      }
+   },
+   {
+      "name": "fan2",
+      "path": "/system/chassis/motherboard/fan2",
+      "methods": [
+         {
+            "type": "gpio",
+            "key": 8,
+            "physpath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a400.i2c-bus/i2c-7/7-0061",
+            "devpath": "/dev/input/by-path/platform-gpio-keys-polled-event"
+         },
+         {
+            "type": "tach",
+            "sensors": [
+               "fan2_0"
+            ]
+         }
+      ],
+      "rpolicy": {
+         "type": "anyof"
+      }
+   },
+   {
+      "name": "fan3",
+      "path": "/system/chassis/motherboard/fan3",
+      "methods": [
+         {
+            "type": "gpio",
+            "key": 9,
+            "physpath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a400.i2c-bus/i2c-7/7-0061",
+            "devpath": "/dev/input/by-path/platform-gpio-keys-polled-event"
+         },
+         {
+            "type": "tach",
+            "sensors": [
+               "fan3_0"
+            ]
+         }
+      ],
+      "rpolicy": {
+         "type": "anyof"
+      }
+   },
+   {
+      "name": "fan4",
+      "path": "/system/chassis/motherboard/fan4",
+      "methods": [
+         {
+            "type": "gpio",
+            "key": 10,
+            "physpath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a400.i2c-bus/i2c-7/7-0061",
+            "devpath": "/dev/input/by-path/platform-gpio-keys-polled-event"
+         },
+         {
+            "type": "tach",
+            "sensors": [
+               "fan4_0"
+            ]
+         }
+      ],
+      "rpolicy": {
+         "type": "anyof"
+      }
+   },
+   {
+      "name": "fan5",
+      "path": "/system/chassis/motherboard/fan5",
+      "methods": [
+         {
+            "type": "gpio",
+            "key": 11,
+            "physpath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a400.i2c-bus/i2c-7/7-0061",
+            "devpath": "/dev/input/by-path/platform-gpio-keys-polled-event"
+         },
+         {
+            "type": "tach",
+            "sensors": [
+               "fan5_0"
+            ]
+         }
+      ],
+      "rpolicy": {
+         "type": "anyof"
+      }
+   }
+]
