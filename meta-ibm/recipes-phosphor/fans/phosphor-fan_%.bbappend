@@ -60,6 +60,45 @@ EXTRA_OECONF_append_witherspoon = " --enable-json --disable-json-control"
 RDEPENDS_${PN}-presence-tach_append_witherspoon = " phosphor-fan-presence-config"
 RDEPENDS_${PN}-monitor_append_witherspoon = " phosphor-fan-monitor-config"
 
+EXTRA_OECONF_append_rainier = " --enable-json"
+RDEPENDS_${PN}-presence-tach_append_rainier = " phosphor-fan-presence-config"
+RDEPENDS_${PN}-monitor_append_rainier = " phosphor-fan-monitor-config"
+
+# Install fan control JSON config files
+SRC_URI_append_rainier = " \
+    file://manager.json \
+    file://rainier/fans.json \
+    file://rainier-2u/zones.json \
+    file://rainier-4u/zones.json \
+    file://everest/fans.json \
+    file://everest/zones.json"
+do_install_append_rainier() {
+    # Install fan control manager config file
+    install -d ${D}/${datadir}/phosphor-fan-presence/control/
+    install -m 0644 ${WORKDIR}/manager.json ${D}/${datadir}/phosphor-fan-presence/control/
+
+    # Install Rainier-2U/4U fan config files
+    install -d ${D}/${datadir}/phosphor-fan-presence/control/ibm,rainier
+    install -m 0644 ${WORKDIR}/rainier/fans.json ${D}/${datadir}/phosphor-fan-presence/control/ibm,rainier/
+
+    install -d ${D}/${datadir}/phosphor-fan-presence/control/ibm,rainier-2u/
+    install -d ${D}/${datadir}/phosphor-fan-presence/control/ibm,rainier-4u/
+    install -m 0644 ${WORKDIR}/rainier-2u/zones.json ${D}/${datadir}/phosphor-fan-presence/control/ibm,rainier-2u/
+    install -m 0644 ${WORKDIR}/rainier-4u/zones.json ${D}/${datadir}/phosphor-fan-presence/control/ibm,rainier-4u/
+
+    # Install Everest fan config files
+    install -d ${D}/${datadir}/phosphor-fan-presence/control/ibm,everest
+    install -m 0644 ${WORKDIR}/everest/fans.json ${D}/${datadir}/phosphor-fan-presence/control/ibm,everest/
+    install -m 0644 ${WORKDIR}/everest/zones.json ${D}/${datadir}/phosphor-fan-presence/control/ibm,everest/
+}
+FILES_${PN}-control_append_rainier = " \
+    ${datadir}/phosphor-fan-presence/control/manager.json \
+    ${datadir}/phosphor-fan-presence/control/ibm,rainier/fans.json \
+    ${datadir}/phosphor-fan-presence/control/ibm,rainier-2u/zones.json \
+    ${datadir}/phosphor-fan-presence/control/ibm,rainier-4u/zones.json \
+    ${datadir}/phosphor-fan-presence/control/ibm,everest/fans.json \
+    ${datadir}/phosphor-fan-presence/control/ibm,everest/zones.json"
+
 # Set the appropriate i2c address used within the overridden phosphor-fan-control@.service
 # file that's used for witherspoon type(including witherspoon-tacoma) machines
 SYSTEMD_SUBSTITUTIONS_witherspoon = "ADDR:100:phosphor-fan-control@.service"
