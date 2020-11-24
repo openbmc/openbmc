@@ -14,7 +14,7 @@ Description of section entries:
 
     Section entries are structured according to the following scheme:
 
-    X:  NAME <EMAIL_USERNAME@DOMAIN> <IRC_USERNAME!>
+    X:  NAME <EMAIL_USERNAME@DOMAIN> <DISCORD_USERNAME!>
     X:  ...
     .
     .
@@ -24,10 +24,10 @@ Description of section entries:
     organization; FILE_PATH is a file path within the repository, possibly with
     wildcards; X is a tag of one of the following types:
 
-    M:  Denotes maintainer; has fields NAME <EMAIL_USERNAME@DOMAIN> <IRC_USERNAME!>;
+    M:  Denotes maintainer; has fields NAME <EMAIL_USERNAME@DOMAIN> <DISCORD_USERNAME!>;
         if omitted from an entry, assume one of the maintainers from the
         MAINTAINERS entry.
-    R:  Denotes reviewer; has fields NAME <EMAIL_USERNAME@DOMAIN> <IRC_USERNAME!>;
+    R:  Denotes reviewer; has fields NAME <EMAIL_USERNAME@DOMAIN> <DISCORD_USERNAME!>;
         these people are to be added as reviewers for a change matching the repo
         path.
     F:  Denotes forked from an external repository; has fields URL.

@@ -9,7 +9,7 @@ assignees: ''
 
 **Note on Bugs**
 Please note that questions or feature requests should be discussed on the
-mailing list or IRC. Please see https://github.com/openbmc/openbmc#contact
+mailing list or Discord. Please see https://github.com/openbmc/openbmc#contact
 for info on how to contact us. Github Issues in openbmc/openbmc are for bugs
 only. Please remove this section when opening a bug.
 
