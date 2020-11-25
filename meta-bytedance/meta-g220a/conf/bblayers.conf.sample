@@ -13,7 +13,6 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-openembedded/meta-python \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-aspeed \
-  ##OEROOT##/meta-x86 \
   ##OEROOT##/meta-bytedance \
   ##OEROOT##/meta-bytedance/meta-g220a \
   "
@@ -25,7 +24,6 @@ BBLAYERS_NON_REMOVABLE ?= " \
   ##OEROOT##/meta-openembedded/meta-python \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-aspeed \
-  ##OEROOT##/meta-x86 \
   ##OEROOT##/meta-bytedance \
   ##OEROOT##/meta-bytedance/meta-g220a \
   "
