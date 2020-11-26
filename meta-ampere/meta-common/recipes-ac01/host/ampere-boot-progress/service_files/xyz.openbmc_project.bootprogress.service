@@ -1,0 +1,17 @@
+[Unit]
+Description=Host Monitor
+Wants=obmc-power-on@0.target
+After=obmc-power-on@0.target
+Wants=obmc-host-reset@0.target
+After=obmc-host-reset@0.target
+Conflicts=obmc-chassis-powered-off@0.target
+
+[Service]
+Restart=on-failure
+ExecStart=/usr/bin/env ampere-boot-progress
+SyslogIdentifier=ampere-boot-progress
+RemainAfterExit=yes
+
+[Install]
+WantedBy=obmc-chassis-poweron@0.target
+
