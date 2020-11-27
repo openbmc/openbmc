@@ -11,7 +11,7 @@ inherit obmc-phosphor-systemd
 OBMC_HOST_MONITOR_INSTANCES = "shutdown_ack reboot_ack"
 SYSTEMD_ENVIRONMENT_FILE_${PN} +="obmc/gpio/shutdown_ack obmc/gpio/reboot_ack"
 
-S = "${WORKDIR}/"
+S = "${WORKDIR}"
 
 SRC_URI = "file://ampere-host-shutdown.service \
           file://ampere-host-reset.service \

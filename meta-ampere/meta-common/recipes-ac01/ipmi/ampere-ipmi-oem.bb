@@ -22,8 +22,14 @@ SRC_URI += " \
   file://generate-whitelist.py \
   file://ipmi-whitelist.conf \
   file://cmake-format.json \
-  file://src/* \
-  file://include/* \
+  file://src/ipmi_to_redfish_hooks.cpp \
+  file://src/storagecommands.cpp \
+  file://src/whitelist-filter.cpp \
+  file://include/commandutils.hpp \
+  file://include/ipmi_to_redfish_hooks.hpp \
+  file://include/sdrutils.hpp \
+  file://include/storagecommands.hpp \
+  file://include/types.hpp \
   "
 
 HOSTIPMI_PROVIDER_LIBRARY += "${LIBRARY_NAMES}"
