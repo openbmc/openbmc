@@ -17,25 +17,11 @@ DEPENDS += "autoconf-archive-native"
 DEPENDS += "systemd"
 RDEPENDS_${PN} += "libsystemd"
 
-S = "${WORKDIR}"
-
-SRC_URI += "                                        \
-                file://org.openbmc.HostIpmi.service \
-                file://Makefile.am                  \
-                file://README.md                    \
-                file://bootstrap.sh                 \
-                file://configure.ac                 \
-                file://org.openbmc.HostIpmi.conf    \
-                file://ssifbridge.service           \
-                file://ssifbridged.c                \
-                "
-
-do_make_setup() {
-        ${S}/bootstrap.sh
-}
-
-addtask make_setup after do_patch before do_configure
+S = "${WORKDIR}/git"
+SRC_URI = "git://github.com/ampere-openbmc/ssifbridge;protocol=git;branch=main"
+SRCREV="4465e3c6ab400dc84909f07ce68e009d808eabf6"
 
 # This is how linux-libc-headers says to include custom uapi headers
 CFLAGS_append = " -I ${STAGING_KERNEL_DIR}/include/uapi"
 do_configure[depends] += "virtual/kernel:do_shared_workdir"
+
