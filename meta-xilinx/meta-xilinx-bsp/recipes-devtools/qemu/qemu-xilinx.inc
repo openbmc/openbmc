@@ -10,14 +10,13 @@ LIC_FILES_CHKSUM = " \
 		"
 DEPENDS = "glib-2.0 zlib pixman"
 
-XILINX_QEMU_VERSION ?= "v4.1.50"
+XILINX_QEMU_VERSION ?= "v5.1.0"
 BRANCH ?= "master"
 SRCREV ?= "${AUTOREV}"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 PV = "${XILINX_QEMU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
-BRANCH ?= ""
 REPO ?= "gitsm://github.com/Xilinx/qemu.git;protocol=https"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"

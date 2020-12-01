@@ -9,13 +9,15 @@ LIC_FILES_CHKSUM = "file://../LICENSE;md5=da5408f748bce8a9851dac18e66f4bcf \
                     file://runtime_src/core/pcie/tools/xbutil/LICENSE;md5=d273d63619c9aeaf15cdaf76422c4f87 \
                     file://runtime_src/core/edge/tools/xbutil/LICENSE;md5=d273d63619c9aeaf15cdaf76422c4f87 "
 
-BRANCH ?= "2020.1_PU1"
+BRANCH ?= "2020.2"
 REPO ?= "git://github.com/Xilinx/XRT.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
-PV = "202010.2.7.0"
-SRCREV ?= "8a4c6eb5012c57423fba468e1af8df53a293dcd5"
+FILESEXTRAPATHS_prepend := "${THISDIR}/xrt:"
+SRC_URI_append = " file://0001-Replace-boost-detail-endian.hpp-with-boost-predef-ot.patch"
+PV = "202020.2.8.0"
+SRCREV ?= "f19a872233fbfe2eb933f25fa3d9a780ced774e5"
 
 S = "${WORKDIR}/git/src"
 
@@ -37,6 +39,13 @@ EXTRA_OECMAKE_append_versal-ai-core += "-DXRT_AIE_BUILD=true"
 TARGET_CXXFLAGS_append_versal-ai-core += "-DXRT_ENABLE_AIE"
 DEPENDS_append_versal-ai-core += " libmetal libxaiengine"
 RDEPENDS_${PN}_append_versal-ai-core += " libxaiengine"
+
+FILES_SOLIBSDEV = ""
+FILES_${PN} += "\
+    ${libdir}/lib*.so \
+    ${libdir}/lib*.so.* \
+    /lib/*.so* "
+INSANE_SKIP_${PN} += "dev-so"
 
 pkg_postinst_ontarget_${PN}() {
   #!/bin/sh

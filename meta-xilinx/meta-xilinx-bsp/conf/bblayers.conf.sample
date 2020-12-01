@@ -27,6 +27,7 @@ BBLAYERS ?= " \
     ##OEROOT##/../meta-virtualization \
     ##OEROOT##/../meta-openamp \
     ##OEROOT##/../meta-jupyter \
+    ##OEROOT##/../meta-python2 \
 "
 
 BBLAYERS_NON_REMOVABLE ?= " \

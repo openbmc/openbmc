@@ -1,0 +1,80 @@
+From aa556b2142b8d6c62c457f82f4470430e9fe80e7 Mon Sep 17 00:00:00 2001
+From: Sai Hari Chandana Kalluri <chandana.kalluri@xilinx.com>
+Date: Thu, 29 Oct 2020 15:28:06 -0700
+Subject: [PATCH] Replace boost/detail/endian.hpp with
+ boost/predef/other/endian.h
+
+The use of BOOST_*_ENDIAN and BOOST_BYTE_ORDER is deprecated. Include
+<boost/predef/other/endian.h> and use __BYTE_ORDER and1234
+
+Signed-off-by: Sai Hari Chandana Kalluri <chandana.kalluri@xilinx.com>
+---
+ runtime_src/core/common/api/xrt_kernel.cpp | 8 ++++----
+ runtime_src/xocl/core/kernel.cpp           | 4 ++--
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/runtime_src/core/common/api/xrt_kernel.cpp b/runtime_src/core/common/api/xrt_kernel.cpp
+index 1025e9d..1fb7caf 100644
+--- a/runtime_src/core/common/api/xrt_kernel.cpp
++++ b/runtime_src/core/common/api/xrt_kernel.cpp
+@@ -48,7 +48,7 @@
+ #include <cstdlib>
+ using namespace std::chrono_literals;
+ 
+-#include <boost/detail/endian.hpp>
++#include <boost/predef/other/endian.h>
+ 
+ #ifdef _WIN32
+ # pragma warning( disable : 4244 4267 4996)
+@@ -464,7 +464,7 @@ class argument
+     virtual std::vector<uint32_t>
+     get_value(std::va_list* args) const
+     {
+-      static_assert(BOOST_BYTE_ORDER==1234,"Big endian detected");
++      static_assert(__BYTE_ORDER==1234,"Big endian detected");
+ 
+       HostType value = va_arg(*args, VaArgType);
+       return value_to_uint32_vector(value);
+@@ -485,7 +485,7 @@ class argument
+     virtual std::vector<uint32_t>
+     get_value(std::va_list* args) const
+     {
+-      static_assert(BOOST_BYTE_ORDER==1234,"Big endian detected");
++      static_assert(__BYTE_ORDER==1234,"Big endian detected");
+ 
+       HostType* value = va_arg(*args, VaArgType*);
+       return value_to_uint32_vector(value, size);
+@@ -507,7 +507,7 @@ class argument
+     virtual std::vector<uint32_t>
+     get_value(std::va_list* args) const
+     {
+-      static_assert(BOOST_BYTE_ORDER==1234,"Big endian detected");
++      static_assert(__BYTE_ORDER==1234,"Big endian detected");
+       if (xrt_core::config::get_xrt_bo()) {
+         auto bo = va_arg(*args, xrtBufferHandle);
+         return value_to_uint32_vector(xrt_core::bo::address(bo));
+diff --git a/runtime_src/xocl/core/kernel.cpp b/runtime_src/xocl/core/kernel.cpp
+index f4f7edf..ec71c7e 100644
+--- a/runtime_src/xocl/core/kernel.cpp
++++ b/runtime_src/xocl/core/kernel.cpp
+@@ -21,7 +21,7 @@
+ #include "compute_unit.h"
+ #include "core/common/xclbin_parser.h"
+ 
+-#include <boost/detail/endian.hpp>
++#include <boost/predef/other/endian.h>
+ 
+ #include <sstream>
+ #include <iostream>
+@@ -130,7 +130,7 @@ void
+ kernel::scalar_argument::
+ set(size_t size, const void* cvalue)
+ {
+-  static_assert(BOOST_BYTE_ORDER==1234,"Big endian detected");
++  static_assert(__BYTE_ORDER==1234,"Big endian detected");
+ 
+   if (size != m_sz)
+     throw error(CL_INVALID_ARG_SIZE,"Invalid scalar argument size, expected "
+-- 
+2.7.4
+

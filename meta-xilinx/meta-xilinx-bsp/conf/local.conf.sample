@@ -201,13 +201,13 @@ BB_DISKMON_DIRS = "\
 #file://.* http://someserver.tld/share/sstate/PATH;downloadfilename=PATH \n \
 #file://.* file:///some/local/dir/sstate/PATH"
 
-XILINX_VER_MAIN = "2020.1"
+XILINX_VER_MAIN = "2020.2"
 
 # Uncomment below lines to provide path for custom xsct trim
 # This is required for building Versal based devices, please fetch the
 # xsct-trim from Xilinx lounge area
 #
-#EXTERNAL_XSCT_TARBALL = "/proj/yocto/xsct-trim/2020.1_xsct_daily_latest"
+#EXTERNAL_XSCT_TARBALL = "/proj/yocto/xsct-trim/2020.2_xsct_daily_latest"
 #VALIDATE_XSCT_CHECKSUM = '0'
 
 # XILINX_VIVADO_DESIGN_SUIT should point to the Vivado installation directly if you are using xilinx-mcs recipe in meta-xilinx-tools
