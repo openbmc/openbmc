@@ -7,12 +7,15 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=9bf479a145bcaff8489e743da58afeee"
 SECTION = "utils"
 
+DEPENDS += "flex-native bison-native flex bison"
+
 PV = "1.0.2"
 
-CFLAGS += "-fcommon"
-
-SRCREV = "8f278675e1b6a3a02c8ee1b8ca000f80570dc5d6"
-SRC_URI = "git://github.com/pikhq/musl-nscd"
+SRCREV = "af581482a3e1059458f3c8b20a56f82807ca3bd4"
+SRC_URI = "git://github.com/pikhq/musl-nscd \
+           file://0001-Fix-build-under-GCC-fno-common.patch \
+           file://0001-configure-Check-for-flex-if-lex-is-not-found.patch \
+          "
 
 UPSTREAM_CHECK_COMMITS = "1"
 

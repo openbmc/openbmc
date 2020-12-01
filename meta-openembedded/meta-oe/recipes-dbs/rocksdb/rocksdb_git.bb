@@ -6,13 +6,14 @@ LIC_FILES_CHKSUM = "file://LICENSE.Apache;md5=3b83ef96387f14655fc854ddc3c6bd57 \
                     file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://LICENSE.leveldb;md5=fb04ff57a14f308f2eed4a9b87d45837"
 
-SRCREV = "48bfca38f6f175435052a59791922a1a453d9609"
-SRCBRANCH = "6.11.fb"
-PV = "6.11.4"
+SRCREV = "f3e33549c151f30ac4eb7c22356c6d0331f37652"
+SRCBRANCH = "6.12.fb"
+PV = "6.12.7"
 
 SRC_URI = "git://github.com/facebook/${BPN}.git;branch=${SRCBRANCH} \
            file://0001-cmake-Add-check-for-atomic-support.patch \
            file://0001-cmake-Use-exported-target-for-bz2.patch \
+           file://0001-folly-Use-SYS_futex-for-syscall.patch \
           "
 
 S = "${WORKDIR}/git"

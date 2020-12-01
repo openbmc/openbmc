@@ -27,6 +27,10 @@ PACKAGECONFIG_remove_arm = "bpf vm"
 # vm tests need libhugetlbfs starting 5.8+ (https://lkml.org/lkml/2020/4/22/1654)
 PACKAGECONFIG_remove_qemumips = "bpf vm"
 
+# riscv does not support libhugetlbfs yet
+PACKAGECONFIG_remove_riscv64 = "vm"
+PACKAGECONFIG_remove_riscv32 = "vm"
+
 PACKAGECONFIG[bpf] = ",,elfutils libcap libcap-ng rsync-native,"
 PACKAGECONFIG[firmware] = ",,libcap, bash"
 PACKAGECONFIG[vm] = ",,libcap libhugetlbfs,libgcc bash"

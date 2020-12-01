@@ -11,7 +11,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1676,7 +1676,7 @@ AC_ARG_ENABLE(tcl,
+@@ -1540,7 +1540,7 @@ AC_ARG_ENABLE(tcl,
    [], [enable_tcl=yes])
  
  if test "x$enable_tcl" != "xyes"; then

@@ -18,6 +18,7 @@ Upstream-Status: Submitted [1]
 [1] https://bugzilla.xfce.org/attachment.cgi?id=8492
 
 Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+
 ---
  panel-plugin/xfce4-cpufreq-configure.c |  4 ++++
  panel-plugin/xfce4-cpufreq-plugin.c    | 13 +++++++++++--
@@ -109,13 +110,12 @@ index a6895e4..6338698 100644
 +++ b/panel-plugin/xfce4-cpufreq-plugin.h
 @@ -95,6 +95,8 @@ typedef struct
  
- CpuFreqPlugin *cpuFreq;
+ extern CpuFreqPlugin *cpuFreq;
  
 +GtkCssProvider *currentProvider;
 +
  G_BEGIN_DECLS
  
  void
--- 
+---
 2.20.1
-

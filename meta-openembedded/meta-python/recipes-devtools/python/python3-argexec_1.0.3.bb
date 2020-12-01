@@ -9,7 +9,6 @@ SRC_URI[sha256sum] = "61f9ae9322e38ae64996848421afbdb018239a99c4e796fe064f172d6c
 
 DEPENDS += "python3-setuptools-scm-native"
 RDEPENDS_${PN} += "\
-  python3-typing \
   python3-dynamic-dispatch \
   python3-typeguard \
 "

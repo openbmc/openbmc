@@ -1,0 +1,29 @@
+From 4d09032741475c4e9d3de62c8187597f3f72f934 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 22 Nov 2020 12:32:01 -0800
+Subject: [PATCH] configure: Check for flex if lex is not found
+
+lex is already checked by this time, therefore check should be to find
+flex
+Upstream-Status: Submitted [https://github.com/pikhq/musl-nscd/pull/12]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index 256824a..4c94568 100755
+--- a/configure
++++ b/configure
+@@ -249,7 +249,7 @@ printf "checking for lex... "
+ trylex ${CROSS_COMPILE}lex
+ trylex lex
+ trylex ${CROSS_COMPILE}flex
+-trylex lex
++trylex flex
+ printf "%s\n" "$LEX"
+ test -n "$LEX" || echo "$0: cannot find lex. Will try to use pre-provided source."
+ 
+-- 
+2.29.2
+

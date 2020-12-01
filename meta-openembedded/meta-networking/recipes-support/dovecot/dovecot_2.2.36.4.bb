@@ -44,6 +44,10 @@ CACHED_CONFIGUREVARS += "i_cv_signed_size_t=no \
 EXTRA_OECONF = " --with-ioloop=epoll \
                  --with-systemdsystemunitdir=${systemd_unitdir}/system"
 
+# Uses hidden symbols
+# libssl_iostream_openssl.so: undefined reference to `ssl_iostream_handshake'
+LTO = ""
+
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} = "dovecot.service dovecot.socket"
 SYSTEMD_AUTO_ENABLE = "disable"

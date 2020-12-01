@@ -34,6 +34,7 @@ EXTRA_OEMAKE = "V=1 JUCE_ARCH_LABEL=${TARGET_ARCH} TARGET_ARCH='-g'"
 LDFLAGS_append_mipsarcho32 = " -latomic"
 LDFLAGS_append_powerpc = " -latomic"
 LDFLAGS_append_riscv64 = " -latomic"
+LDFLAGS_append_riscv32 = " -latomic"
 LDFLAGS_append_armv5 = " -latomic"
 
 do_configure() {

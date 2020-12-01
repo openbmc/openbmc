@@ -38,9 +38,12 @@ RDEPENDS_${PN} = "\
     python3-pytz \
 "
 
+ENABLELTO_toolchain-clang_riscv64 = "echo enable_lto = False >> ${S}/setup.cfg"
+ENABLELTO_toolchain-clang_riscv32 = "echo enable_lto = False >> ${S}/setup.cfg"
 do_compile_prepend() {
     echo [libs] > ${S}/setup.cfg
     echo system_freetype = true >> ${S}/setup.cfg
+    ${ENABLELTO}
 }
 
 BBCLASSEXTEND = "native"

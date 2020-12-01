@@ -12,7 +12,6 @@ PYPI_PACKAGE = "dynamic_dispatch"
 
 DEPENDS += "python3-setuptools-scm-native"
 RDEPENDS_${PN} += "\
-  python3-typing \
   python3-typeguard \
 "
 

@@ -7,7 +7,7 @@ SECTION = "devel"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 S = "${WORKDIR}/git"
 
-SRC_URI = "git://github.com/jthornber/thin-provisioning-tools \
+SRC_URI = "git://github.com/jthornber/thin-provisioning-tools;branch=main \
            file://0001-do-not-strip-pdata_tools-at-do_install.patch \
            file://use-sh-on-path.patch \
 "

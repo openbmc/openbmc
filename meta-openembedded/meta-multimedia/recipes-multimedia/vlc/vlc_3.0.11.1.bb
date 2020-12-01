@@ -14,6 +14,7 @@ DEPENDS = "coreutils-native fribidi libtool libgcrypt libgcrypt-native \
    tiff"
 
 LDFLAGS_append_riscv64 = " -latomic"
+LDFLAGS_append_riscv32 = " -latomic"
 
 # While this item does not require it, it depends on ffmpeg which does
 LICENSE_FLAGS = "commercial"
@@ -24,6 +25,7 @@ SRC_URI = "http://download.videolan.org/pub/videolan/${BPN}/${PV}/${BP}.tar.xz \
            file://0003-fix-luaL-checkint.patch \
            file://0004-Use-packageconfig-to-detect-mmal-support.patch \
            file://0005-Fix-build-with-Qt-5.15.patch \
+           file://0001-linux-thread-Use-SYS_futex-instead-of-__NR_futex.patch \
 "
 SRC_URI[sha256sum] = "189311d28aa814f106a7b3645211ac52c0b3e2b9f4b348de2f63bab3218086b8"
 

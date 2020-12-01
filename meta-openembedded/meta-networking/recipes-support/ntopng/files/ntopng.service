@@ -1,0 +1,13 @@
+[Unit]
+Description=ntopng - High-Speed Web-based Traffic Analysis and Flow Collection Tool
+After=network.target
+
+[Service]
+Type=forking
+StandardOutput=syslog
+StandardError=inherit
+ExecStart=/usr/bin/ntopng -e -w 3000
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

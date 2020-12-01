@@ -21,7 +21,7 @@ DEPENDS += "boost libyui ncurses"
 BBCLASSEXTEND = "nativesdk"
 
 EXTRA_OECMAKE += "-DCMAKE_BUILD_TYPE=RELWITHDEBINFO"
-EXTRA_OECMAKE_append_toolchain-clang = "-DENABLE_WERROR=OFF"
+EXTRA_OECMAKE_append_toolchain-clang = " -DENABLE_WERROR=OFF"
 
 do_configure_prepend () {
     cd ${S}

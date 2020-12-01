@@ -10,6 +10,7 @@ SRC_URI = "git://github.com/gperftools/gperftools \
            file://0001-disbale-heap-checkers-and-debug-allocator-on-musl.patch \
            file://disable_libunwind_aarch64.patch \
            file://sgidef.patch \
+           file://0001-profile-handler-Specify-libc-specific-thread_id.patch \
            "
 
 inherit autotools

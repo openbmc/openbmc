@@ -1,0 +1,152 @@
+{
+    "host": "127.0.0.1",
+    "port": "5000",
+    "mapping":[
+      {
+        "endpoint": "/device1",
+        "HTTPMethods": [
+          "POST"
+        ],
+        "security":
+        {
+          "type": "basic",
+          "username": "user",
+          "password": "passwd"
+        },
+        "converter": {
+          "type": "json",
+          "deviceNameExpression": "Device ${name}",
+          "deviceTypeExpression": "default",
+          "attributes": [
+            {
+              "type": "string",
+              "key": "model",
+              "value": "${sensorModel}"
+            }
+          ],
+          "timeseries": [
+            {
+              "type": "double",
+              "key": "${sensorModel}",
+              "value": "${temp}"
+            },
+            {
+              "type": "double",
+              "key": "humidity",
+              "value": "${hum}"
+            }
+          ]
+        }
+      },
+      {
+        "endpoint": "/anon1",
+        "HTTPMethods": [
+          "GET",
+          "POST"
+        ],
+        "security":
+        {
+          "type": "anonymous"
+        },
+        "converter": {
+          "type": "json",
+          "deviceNameExpression": "Device 2",
+          "deviceTypeExpression": "default",
+          "attributes": [
+            {
+              "type": "string",
+              "key": "model",
+              "value": "Model2"
+            }
+          ],
+          "timeseries": [
+            {
+              "type": "double",
+              "key": "temperature",
+              "value": "${temp}"
+            },
+            {
+              "type": "double",
+              "key": "humidity",
+              "value": "${hum}"
+            }
+          ]
+        }
+      },
+      {
+        "endpoint": "/anon2",
+        "HTTPMethods": [
+          "POST"
+        ],
+        "security":
+        {
+          "type": "anonymous"
+        },
+        "converter": {
+          "type": "custom",
+          "deviceNameExpression": "SuperAnonDevice",
+          "deviceTypeExpression": "default",
+          "extension": "CustomRestUplinkConverter",
+          "extension-config": [
+            {
+            "key": "Totaliser",
+            "datatype": "float",
+            "fromByte": 0,
+            "toByte": 4,
+            "byteorder": "big",
+            "signed": true,
+            "multiplier": 1
+            }]
+        }
+      }
+    ],
+    "attributeUpdates": [
+        {
+          "HTTPMethod": "POST",
+          "SSLVerify": false,
+          "httpHeaders": {
+            "CONTENT-TYPE": "application/json"
+          },
+          "security": {
+            "type": "basic",
+            "username": "user",
+            "password": "passwd"
+          },
+          "timeout": 0.5,
+          "tries": 3,
+          "allowRedirects": true,
+          "deviceNameFilter": ".*REST$",
+          "attributeFilter": "data",
+          "requestUrlExpression": "sensor/${deviceName}/${attributeKey}",
+          "valueExpression": "{\"${attributeKey}\":\"${attributeValue}\"}"
+        }
+    ],
+    "serverSideRpc": [
+      {
+        "deviceNameFilter": ".*",
+        "methodFilter": "echo",
+        "requestUrlExpression": "http://127.0.0.1:5001/${deviceName}",
+        "responseTimeout": 1,
+        "HTTPMethod": "GET",
+        "valueExpression": "${params}",
+        "timeout": 0.5,
+        "tries": 3,
+        "httpHeaders": {
+          "Content-Type": "application/json"
+        },
+        "security": {
+          "type": "anonymous"
+        }
+      },
+      {
+        "deviceNameFilter": ".*",
+        "methodFilter": "no-reply",
+        "requestUrlExpression": "sensor/${deviceName}/request/${methodName}/${requestId}",
+        "HTTPMethod": "POST",
+        "valueExpression": "${params}",
+        "httpHeaders": {
+          "Content-Type": "application/json"
+        }
+      }
+    ]
+  }

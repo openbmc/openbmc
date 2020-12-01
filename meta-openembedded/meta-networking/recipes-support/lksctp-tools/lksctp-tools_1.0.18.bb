@@ -8,20 +8,13 @@ LIC_FILES_CHKSUM = " \
     file://COPYING;md5=0c56db0143f4f80c369ee3af7425af6e \
 "
 
-SRCREV = "1b077af62d83d53c34b1bde8bad6648149d5edf9"
+SRCREV = "12c74404e09755561dee40cf194954f7ff5afd60"
 
 PV .= "+git${SRCPV}"
 LK_REL = "1.0.18"
 
 SRC_URI = " \
     git://github.com/sctp/lksctp-tools.git \
-    file://0001-withsctp-use-PACKAGE_VERSION-in-withsctp.h.patch \
-    file://0001-configure.ac-add-CURRENT-REVISION-and-AGE-for-libsct.patch \
-    file://0001-build-fix-netinet-sctp.h-not-to-be-installed.patch \
-    file://0001-build-remove-v4.12-secondary-defines-in-favor-of-HAV.patch \
-    file://0001-build-fix-probing-for-HAVE_SCTP_SENDV.patch \
-    file://0001-build-0b0dce7a36fb-actually-belongs-to-v4.19.patch \
-    file://0001-test_1_to_1_events.c-initialize-event-properly.patch \
     file://run-ptest \
     file://v4test.sh \
     file://v6test.sh \

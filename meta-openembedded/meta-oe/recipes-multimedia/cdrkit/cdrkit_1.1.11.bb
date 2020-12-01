@@ -18,8 +18,40 @@ SRC_URI[sha256sum] = "d1c030756ecc182defee9fe885638c1785d35a2c2a297b4604c0e0dcc7
 inherit cmake
 
 DEPENDS = "libcap file bzip2"
-RDEPENDS_${PN} = "perl"
+RDEPENDS_dirsplit = "perl"
+
+PACKAGES =+ "dirsplit genisoimage icedax wodim"
+
+FILES_dirsplit = " \
+    ${bindir}/dirsplit \
+"
+
+FILES_genisoimage = " \
+    ${bindir}/devdump \
+    ${bindir}/genisoimage \
+    ${bindir}/isodebug \
+    ${bindir}/isodump \
+    ${bindir}/isoinfo \
+    ${bindir}/isovfy \
+    ${bindir}/mkisofs \
+"
+
+FILES_icedax = " \
+    ${bindir}/cdda2mp3 \
+    ${bindir}/cdda2ogg \
+    ${bindir}/icedax \
+    ${bindir}/pitchplay \
+    ${bindir}/readmult \
+"
+
+FILES_wodim = " \
+    ${bindir}/readom \
+    ${bindir}/wodim \
+    ${sbindir}/netscsid \
+"
 
 do_install_append() {
     ln -sf ${bindir}/genisoimage ${D}${bindir}/mkisofs
 }
+
+BBCLASSEXTEND = "native"

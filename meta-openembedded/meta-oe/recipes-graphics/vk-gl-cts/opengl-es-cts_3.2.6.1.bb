@@ -27,3 +27,5 @@ do_install() {
 }
 
 SECURITY_CFLAGS_riscv64 = "${SECURITY_NOPIE_CFLAGS}"
+LTO = ""
+

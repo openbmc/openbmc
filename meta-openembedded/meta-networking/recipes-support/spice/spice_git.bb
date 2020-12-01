@@ -32,7 +32,7 @@ S = "${WORKDIR}/git"
 inherit autotools gettext python3native python3-dir pkgconfig
 
 DEPENDS += "spice-protocol jpeg pixman alsa-lib glib-2.0 python3-pyparsing-native python3-six-native glib-2.0-native"
-DEPENDS_append_class-nativesdk = "nativesdk-openssl"
+DEPENDS_append_class-nativesdk = " nativesdk-openssl"
 
 export PYTHON="${STAGING_BINDIR_NATIVE}/python3-native/python3"
 

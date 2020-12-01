@@ -425,6 +425,13 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-pycurl \
     gyp \
     python3-jsonref \
+    python3-transitions \
+    python3-dill \
+    python3-cerberus \
+    python3-cvxopt \
+    python3-sortedcontainers \
+    python3-hypothesis \
+    python3-jsonpath-rw \
 "
 
 RDEPENDS_packagegroup-meta-python3-extended = "\
@@ -444,7 +451,6 @@ RDEPENDS_packagegroup-meta-python3-connectivity = "\
     python3-h2 \
     python3-hpack \
     python3-hyperframe \
-    python3-mprpc \
     python3-priority \
     python3-pyconnman \
     python3-pyro4 \

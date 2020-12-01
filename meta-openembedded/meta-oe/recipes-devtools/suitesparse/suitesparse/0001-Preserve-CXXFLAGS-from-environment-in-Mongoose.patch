@@ -1,0 +1,43 @@
+From 83628b471a1a79dae50bb158fca9448b668dd3a6 Mon Sep 17 00:00:00 2001
+From: Gregory Anders <greg@gpanders.com>
+Date: Wed, 21 Oct 2020 10:43:16 -0600
+Subject: [PATCH] Preserve CXXFLAGS from environment in Mongoose
+
+This allows CXXFLAGS set in the environment to also be used in the CMake
+build process, instead of overwriting them. This is useful in a cross
+compile context where the CXXFLAGS variable might contain necessary
+flags for cross compiling.
+---
+ Mongoose/CMakeLists.txt | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Mongoose/CMakeLists.txt b/Mongoose/CMakeLists.txt
+index 7e134ab..91a7f70 100644
+--- a/Mongoose/CMakeLists.txt
++++ b/Mongoose/CMakeLists.txt
+@@ -321,14 +321,14 @@ add_test(Unit_Test_EdgeSep ./tests/mongoose_unit_test_edgesep)
+ message(STATUS "CMAKE_CXX_COMPILER: " ${BoldBlue} ${CMAKE_CXX_COMPILER_ID} ${ColourReset})
+ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+     # using Clang
+-    SET(CMAKE_CXX_FLAGS "-O3 -fwrapv")
++    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fwrapv")
+     # Debug flags for Clang
+     SET(CMAKE_CXX_FLAGS_DEBUG "--coverage -g -fwrapv")
+     SET(CMAKE_C_FLAGS_DEBUG "--coverage -g")
+     SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "--coverage -g")
+ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+     # using GCC
+-    SET(CMAKE_CXX_FLAGS "-O3 -fwrapv")
++    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fwrapv")
+     # Debug flags for GCC
+     if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.6")
+         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+@@ -339,7 +339,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+     SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "-fprofile-arcs -ftest-coverage")
+ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+     # using Intel C++
+-    SET(CMAKE_CXX_FLAGS "-O3 -no-prec-div -xHOST -ipo -fwrapv")
++    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -no-prec-div -xHOST -ipo -fwrapv")
+     # Debug flags for Intel
+     SET(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -fwrapv")
+     SET(CMAKE_C_FLAGS_DEBUG "-g -O0 -Wall")

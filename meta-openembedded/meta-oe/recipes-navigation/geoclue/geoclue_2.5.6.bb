@@ -12,9 +12,10 @@ DEPENDS = "glib-2.0 dbus json-glib libsoup-2.4 intltool-native"
 
 inherit meson pkgconfig gtk-doc gobject-introspection vala
 
-SRC_URI = "https://gitlab.freedesktop.org/geoclue/geoclue/-/archive/${PV}/geoclue-${PV}.tar"
+SRCREV = "555d676a91494b98ad0d52639590608a9594a8d3"
+SRC_URI = "git://gitlab.freedesktop.org/geoclue/geoclue.git;protocol=https;nobranch=1"
 
-SRC_URI[sha256sum] = "76494f1262fd90faea05116aface7f580b9b50f7c525bc86ccf33409cea95e8d"
+S = "${WORKDIR}/git"
 
 # Without this line, package is declared a library and named libgeoclue*
 AUTO_LIBNAME_PKGS = ""

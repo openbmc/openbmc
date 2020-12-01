@@ -192,6 +192,7 @@ RDEPENDS_packagegroup-meta-oe-crypto ="\
     libsodium \
     pkcs11-helper \
 "
+RDEPENDS_packagegroup-meta-oe-crypto_remove_riscv32 = "botan"
 
 RDEPENDS_packagegroup-meta-oe-dbs ="\
     leveldb \
@@ -226,6 +227,7 @@ RDEPENDS_packagegroup-meta-oe-devtools ="\
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "geany-plugins geany", "", d)} \
     lemon \
     flatbuffers \
+    heaptrack \
     libubox \
     ltrace \
     lua \
@@ -281,7 +283,7 @@ RDEPENDS_packagegroup-meta-oe-devtools ="\
     xerces-c-samples \
     xmlrpc-c \
     yasm \
-    json-schema-validator \    
+    json-schema-validator \
 "
 RDEPENDS_packagegroup-meta-oe-devtools_append_x86 = " cpuid msr-tools pmtools"
 RDEPENDS_packagegroup-meta-oe-devtools_append_x86-64 = " cpuid msr-tools pcimem pmtools"
@@ -297,8 +299,8 @@ RDEPENDS_packagegroup-meta-oe-devtools_remove_mips64el = "luajit nodejs"
 RDEPENDS_packagegroup-meta-oe-devtools_remove_powerpc = "android-tools breakpad lshw luajit uftrace"
 RDEPENDS_packagegroup-meta-oe-devtools_remove_powerpc64 = "android-tools lshw luajit uftrace"
 RDEPENDS_packagegroup-meta-oe-devtools_remove_powerpc64le = "android-tools lshw luajit uftrace"
-RDEPENDS_packagegroup-meta-oe-devtools_remove_riscv64 = "breakpad concurrencykit lshw ltrace luajit nodejs ply uftrace"
-RDEPENDS_packagegroup-meta-oe-devtools_remove_riscv32 = "breakpad concurrencykit lshw ltrace luajit nodejs ply uftrace"
+RDEPENDS_packagegroup-meta-oe-devtools_remove_riscv64 = "breakpad concurrencykit heaptrack lshw ltrace luajit nodejs ply uftrace"
+RDEPENDS_packagegroup-meta-oe-devtools_remove_riscv32 = "breakpad concurrencykit heaptrack lshw ltrace luajit nodejs ply uftrace"
 RDEPENDS_packagegroup-meta-oe-devtools_remove_aarch64 = "${@bb.utils.contains("TUNE_FEATURES", "crypto", "", "abseil-cpp", d)} concurrencykit"
 RDEPENDS_packagegroup-meta-oe-devtools_remove_x86-64 = "${@bb.utils.contains("TUNE_FEATURES", "corei7", "", "abseil-cpp", d)}"
 RDEPENDS_packagegroup-meta-oe-devtools_remove_x86 = "ply"
@@ -613,7 +615,10 @@ RDEPENDS_packagegroup-meta-oe-kernel_remove_riscv32 = "crash makedumpfile oprofi
 RDEPENDS_packagegroup-meta-oe-multimedia ="\
     alsa-oss \
     ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "faad2", "", d)} \
-    cdrkit \
+    dirsplit \
+    genisoimage \
+    icedax \
+    wodim \
     id3lib \
     audiofile \
     a2jmidid \
@@ -935,6 +940,7 @@ RDEPENDS_packagegroup-meta-oe-ptest-packages_remove_arm = "numactl-ptest"
 RDEPENDS_packagegroup-meta-oe-fortran-packages = "\
     lapack \
     octave \
+    suitesparse \
 "
 # library-only or headers-only packages
 # They wont be built as part of images but might be interesting to include
@@ -943,9 +949,8 @@ RDEPENDS_packagegroup-meta-oe-fortran-packages = "\
 # opencl-headers sdbus-c++-libsystemd boost-url nlohmann-fifo sqlite-orm
 # nlohmann-json exprtk liblightmodbus p8platform gnome-doc-utils-stub
 # glm ttf-mplus xbitmaps ceres-solver cli11 fftw gnulib libeigen ade
-# spdlog span-lite uthash websocketpp catch2 properties-cpp
+# spdlog span-lite uthash websocketpp catch2 properties-cpp cpp-netlib
 
 # rsyslog conflicts with syslog-ng so its not included here
 
 EXCLUDE_FROM_WORLD = "1"
-

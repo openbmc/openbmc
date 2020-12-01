@@ -28,7 +28,9 @@ PACKAGECONFIG[gcrypt] = "--with-crypto=libgcrypt --with-libgcrypt-prefix=${STAGI
 
 BBCLASSEXTEND = "native nativesdk"
 
-RDEPENDS_${PN}-ptest = "bash"
+# required for ptest on documentation
+RDEPENDS_${PN}-ptest = "man-db"
+RDEPENDS_${PN}-ptest_append_libc-glibc = " locale-base-en-us"
 
 do_compile_ptest() {
 	sed -i "/\$(MAKE) \$(AM_MAKEFLAGS) check-TESTS/d" tests/Makefile
@@ -40,4 +42,6 @@ do_install_ptest() {
 	install -m 0755 ${B}/tests/.libs/simple ${D}${PTEST_PATH}/tests/
 	install -m 0755 ${S}/tests/mansyntax.sh ${D}${PTEST_PATH}/tests/
 	install -m 0755 ${S}/test-driver ${D}${PTEST_PATH}/
+	mkdir -p ${D}${PTEST_PATH}/docs
+	cp -r ${S}/docs/* ${D}${PTEST_PATH}/docs/
 }

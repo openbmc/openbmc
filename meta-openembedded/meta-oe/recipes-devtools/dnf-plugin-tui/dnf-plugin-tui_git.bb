@@ -4,10 +4,10 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRC_URI = "git://github.com/ubinux/dnf-plugin-tui.git;branch=master "
-SRCREV = "95f3c6ab36840fb1e0f4935f34dbf8f708b7780c"
+SRCREV = "6d3fab9b9559b6a483fe668e39c29126cdbb58d8"
 PV = "1.2"
 
-SRC_URI_append_class-target = "file://oe-remote.repo.sample"
+SRC_URI_append_class-target = " file://oe-remote.repo.sample"
 
 inherit distutils3-base
 

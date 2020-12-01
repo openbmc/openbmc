@@ -6,17 +6,19 @@ HOMEPAGE = "https://cmocka.org/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
-SRCREV = "56eb3a183fc222120f86d0c54fd033992c30135e"
+SRCREV = "a4fc3dd7705c277e3a57432895e9852ea105dac9"
+PV .= "+git${SRCPV}"
 SRC_URI = "git://git.cryptomilk.org/projects/cmocka.git \
            file://run-ptest \
-           file://cmocka-uintptr_t.patch \
           "
 
 S = "${WORKDIR}/git"
 
 inherit cmake ptest
 
-EXTRA_OECMAKE = "${@bb.utils.contains('PTEST_ENABLED', '1', '-DCMAKE_BUILD_TYPE=Debug -DUNIT_TESTING=ON', '', d)}"
+EXTRA_OECMAKE += "${@bb.utils.contains('PTEST_ENABLED', '1', '-DCMAKE_BUILD_TYPE=Debug -DUNIT_TESTING=ON', '', d)}"
+# Use -Wl,wrap linker flag, which does not work with LTO
+LTO = ""
 
 do_install_append () {
     install -d ${D}${datadir}/${BPN}/example
@@ -27,6 +29,7 @@ do_install_append () {
     install -m 0755 ${B}/example/mock/chef_wrap/waiter_test_wrap ${D}/${datadir}/${BPN}/example/mock/chef_wrap
     install -m 0755 ${B}/example/mock/uptime/uptime ${D}/${datadir}/${BPN}/example/mock/uptime
     install -m 0755 ${B}/example/mock/uptime/test_uptime ${D}/${datadir}/${BPN}/example/mock/uptime
+    install -m 0644 ${B}/example/mock/uptime/libproc_uptime.so ${D}/${datadir}/${BPN}/example/mock/libproc_uptime.so
 }
 
 do_install_ptest () {
@@ -37,3 +40,4 @@ do_install_ptest () {
 PACKAGE_BEFORE_PN += "${PN}-examples"
 
 FILES_${PN}-examples = "${datadir}/${BPN}/example"
+INSANE_SKIP_${PN}-examples = "libdir"

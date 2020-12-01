@@ -1,0 +1,36 @@
+From 90f81c1fb3e560cfc99ee7ab9a48a1736e3929cd Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 15 Nov 2020 13:22:31 -0800
+Subject: [PATCH] Use correct printf format for __fsblkcnt_t
+
+This depends on time_t size and on some 32bit architectures e.g. riscv32
+this would be a 64bit value
+
+Fixes
+os_defs.c:920:40: error: format '%ld' expects argument of type 'long int', but argument 3 has type '__fsblkcnt_t' {aka 'long long unsigned int'} [-Werror=format=]
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/base/os_defs.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/base/os_defs.c b/src/base/os_defs.c
+index 83458c2..655c190 100644
+--- a/src/base/os_defs.c
++++ b/src/base/os_defs.c
+@@ -917,7 +917,11 @@ uint32_t ncs_os_posix_shm(NCS_OS_POSIX_SHM_REQ_INFO *req)
+ 			    ((statsvfs.f_bfree - 1) * statsvfs.f_frsize)) {
+ 				syslog(
+ 				    LOG_ERR,
++#if __TIMESIZE == 64 && __WORDSIZE == 32
++				    "Insufficient shared memory (%lld) to write the data of size: %" PRId64
++#else
+ 				    "Insufficient shared memory (%ld) to write the data of size: %" PRId64
++#endif
+ 				    "\n",
+ 				    (statsvfs.f_bfree * statsvfs.f_frsize),
+ 				    req->info.write.i_write_size);
+-- 
+2.29.2
+

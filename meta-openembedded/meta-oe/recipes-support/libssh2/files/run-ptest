@@ -1,7 +1,8 @@
 #!/bin/sh
 
 ptestdir=$(dirname "$(readlink -f "$0")")
-for test in $(ls $ptestdir/tests)
+cd tests
+for test in $(ls)
 do
-	./test-driver --test-name $test --log-file $test.log --trs-file $test.trs --color-tests no --enable-hard-errors yes --expect-failure no -- ./tests/$test
+	./../test-driver --test-name $test --log-file ../$test.log --trs-file ../$test.trs --color-tests no --enable-hard-errors yes --expect-failure no -- ./$test
 done

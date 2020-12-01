@@ -5,26 +5,34 @@ Part of Patch from https://src.fedoraproject.org/rpms/xfce4-cpufreq-plugin/raw/m
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
+Refresh for xfce4-cpufreq-plugin 1.2.2.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+---
+ panel-plugin/xfce4-cpufreq-plugin.c | 1 +
+ panel-plugin/xfce4-cpufreq-plugin.h | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/panel-plugin/xfce4-cpufreq-plugin.c b/panel-plugin/xfce4-cpufreq-plugin.c
+index 1e33492..ce9e302 100644
 --- a/panel-plugin/xfce4-cpufreq-plugin.c
 +++ b/panel-plugin/xfce4-cpufreq-plugin.c
-@@ -37,7 +37,8 @@
- #include "xfce4-cpufreq-linux.h"
+@@ -38,6 +38,7 @@
  #endif /* __linux__ */
  
--
-+CpuFreqPlugin *cpuFreq;
+ CpuFreqPlugin *cpuFreq;
 +GtkCssProvider *currentProvider;
  
  void
  cpufreq_label_set_font (void)
+diff --git a/panel-plugin/xfce4-cpufreq-plugin.h b/panel-plugin/xfce4-cpufreq-plugin.h
+index 8cd0d33..7dbccef 100644
 --- a/panel-plugin/xfce4-cpufreq-plugin.h
 +++ b/panel-plugin/xfce4-cpufreq-plugin.h
-@@ -93,9 +93,9 @@ typedef struct
-   gint timeoutHandle;
- } CpuFreqPlugin;
+@@ -95,7 +95,7 @@ typedef struct
  
--CpuFreqPlugin *cpuFreq;
-+extern CpuFreqPlugin *cpuFreq;
+ extern CpuFreqPlugin *cpuFreq;
  
 -GtkCssProvider *currentProvider;
 +extern GtkCssProvider *currentProvider;

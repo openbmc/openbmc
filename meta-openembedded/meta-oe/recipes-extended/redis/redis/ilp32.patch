@@ -1,0 +1,29 @@
+__ILP32__ is defined for all 32bit architectures with clang e.g.
+which is right but it is causing issues on non-x86 architectures
+where this condition becomes true and wrongly starts using this
+code, this issue is hidden with gcc becuase gcc does not define
+__ILP32__ for all 32bit architectures but for selected 64bit arches
+who choose to use 32bit ABI e.g. x32
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/src/debug.c
++++ b/src/debug.c
+@@ -944,7 +944,7 @@ static void *getMcontextEip(ucontext_t *
+     /* Linux */
+     #if defined(__riscv) && __riscv_xlen == 32
+     return (void*) uc->uc_mcontext.__gregs[REG_PC];
+-    #elif defined(__i386__) || defined(__ILP32__)
++    #elif defined(__i386__) || (defined(__X86_64__) && defined(__ILP32__))
+     return (void*) uc->uc_mcontext.gregs[14]; /* Linux 32 */
+     #elif defined(__X86_64__) || defined(__x86_64__)
+     return (void*) uc->uc_mcontext.gregs[16]; /* Linux 64 */
+@@ -1125,7 +1125,7 @@ void logRegisters(ucontext_t *uc) {
+     );
+     logStackContent((void**)uc->uc_mcontext.__gregs[REG_SP]);
+     /* Linux x86 */
+-    #elif defined(__i386__) || defined(__ILP32__)
++    #elif defined(__i386__) || ( defined(__X86_64__) && defined(__ILP32__))
+     serverLog(LL_WARNING,
+     "\n"
+     "EAX:%08lx EBX:%08lx ECX:%08lx EDX:%08lx\n"
