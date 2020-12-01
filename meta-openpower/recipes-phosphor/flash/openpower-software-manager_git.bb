@@ -41,6 +41,7 @@ EXTRA_OEMESON += " \
     "
 
 DEPENDS += " \
+        cli11 \
         openssl \
         phosphor-dbus-interfaces \
         phosphor-logging \
@@ -55,7 +56,7 @@ S = "${WORKDIR}/git"
 
 SRC_URI += "git://github.com/openbmc/openpower-pnor-code-mgmt"
 
-SRCREV = "7c053c3f496c73b73e7677713f3e22fb1d3e56ab"
+SRCREV = "847f54c033075af5fb4aa34864d2c07585073794"
 
 DBUS_SERVICE_${PN} += "org.open_power.Software.Host.Updater.service"
 
