@@ -6,16 +6,16 @@ import glob
 from oe.utils import execute_pre_post_process
 from oe.sdk import Sdk
 from oe.manifest import Manifest
+from oe.package_manager.rpm.manifest import PkgManifest
 from oe.package_manager.rpm import RpmPM
 
-class RpmSdk(Sdk):
+class PkgSdk(Sdk):
     def __init__(self, d, manifest_dir=None, rpm_workdir="oe-sdk-repo"):
-        super(RpmSdk, self).__init__(d, manifest_dir)
+        super(PkgSdk, self).__init__(d, manifest_dir)
 
-        from oe.package_manager.rpm.manifest import RpmManifest
-        self.target_manifest = RpmManifest(d, self.manifest_dir,
+        self.target_manifest = PkgManifest(d, self.manifest_dir,
                                            Manifest.MANIFEST_TYPE_SDK_TARGET)
-        self.host_manifest = RpmManifest(d, self.manifest_dir,
+        self.host_manifest = PkgManifest(d, self.manifest_dir,
                                          Manifest.MANIFEST_TYPE_SDK_HOST)
 
         rpm_repo_workdir = "oe-sdk-repo"

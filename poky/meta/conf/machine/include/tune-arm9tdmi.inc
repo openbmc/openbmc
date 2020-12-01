@@ -10,4 +10,4 @@ AVAILTUNES += "arm9tdmi"
 ARMPKGARCH_tune-arm9tdmi = "arm9tdmi"
 # mcpu is used so don't use armv4t as we don't want march
 TUNE_FEATURES_tune-arm9tdmi = "arm thumb arm9tdmi"
-PACKAGE_EXTRA_ARCHS_tune-arm9tdmi = "${PACKAGE_EXTRA_ARCHS_tune-armv4t} arm9tdmit"
+PACKAGE_EXTRA_ARCHS_tune-arm9tdmi = "${PACKAGE_EXTRA_ARCHS_tune-armv4t} arm9tdmi arm9tdmit"

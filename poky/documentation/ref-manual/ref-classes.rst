@@ -501,21 +501,6 @@ Support for other version control systems such as Subversion is limited
 due to BitBake's automatic fetch dependencies (e.g.
 ``subversion-native``).
 
-.. _ref-classes-distro_features_check:
-
-``distro_features_check.bbclass``
-=================================
-
-The ``distro_features_check`` class allows individual recipes to check
-for required and conflicting
-:term:`DISTRO_FEATURES`.
-
-This class provides support for the
-:term:`REQUIRED_DISTRO_FEATURES` and
-:term:`CONFLICT_DISTRO_FEATURES`
-variables. If any conditions specified in the recipe using the above
-variables are not met, the recipe will be skipped.
-
 .. _ref-classes-distutils:
 
 ``distutils*.bbclass``
@@ -655,6 +640,32 @@ Finally, here is an example that sets the root password to "1876*18":
    EXTRA_USERS_PARAMS = "\
        usermod -P 1876*18 root; \
        "
+
+.. _ref-classes-features_check:
+
+``features_check.bbclass``
+=================================
+
+The ``features_check`` class allows individual recipes to check
+for required and conflicting
+:term:`DISTRO_FEATURES`, :term:`MACHINE_FEATURES` or :term:`COMBINED_FEATURES`.
+
+This class provides support for the following variables:
+
+- :term:`REQUIRED_DISTRO_FEATURES`
+- :term:`CONFLICT_DISTRO_FEATURES`
+- :term:`ANY_OF_DISTRO_FEATURES`
+- ``REQUIRED_MACHINE_FEATURES``
+- ``CONFLICT_MACHINE_FEATURES``
+- ``ANY_OF_MACHINE_FEATURES``
+- ``REQUIRED_COMBINED_FEATURES``
+- ``CONFLICT_COMBINED_FEATURES``
+- ``ANY_OF_COMBINED_FEATURES``
+
+If any conditions specified in the recipe using the above
+variables are not met, the recipe will be skipped, and if the
+build system attempts to build the recipe then an error will be
+triggered.
 
 .. _ref-classes-fontcache:
 

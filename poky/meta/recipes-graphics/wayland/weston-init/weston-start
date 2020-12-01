@@ -33,6 +33,10 @@ if [ -n "$WESTON_USER" ]; then
 		echo "ERROR: If you have WESTON_USER variable set, you also need WESTON_TTY."
 		exit 1
 	fi
+	if [ -z "$WESTON_GROUP" ]; then
+		# no explicit WESTON_GROUP given, therefore use WESTON_USER
+		export WESTON_GROUP="${WESTON_USER}"
+	fi
 	weston_args_user="-u $WESTON_USER -t $WESTON_TTY"
 fi
 
@@ -75,7 +79,7 @@ if test -z "$XDG_RUNTIME_DIR"; then
 	fi
 	if [ -n "$WESTON_USER" ]
 	then
-		chown $WESTON_USER:$WESTON_USER $XDG_RUNTIME_DIR
+		chown $WESTON_USER:$WESTON_GROUP $XDG_RUNTIME_DIR
 	fi
 fi
 

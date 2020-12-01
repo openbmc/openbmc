@@ -122,8 +122,7 @@
             "logging",
             "netclient",
             "numbers",
-            "stringold",
-            "typing"
+            "stringold"
         ],
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/asyncio",
@@ -173,10 +172,12 @@
         ],
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/compileall.py",
+            "${libdir}/python${PYTHON_MAJMIN}/filecmp.py",
             "${libdir}/python${PYTHON_MAJMIN}/py_compile.py"
         ],
         "cached": [
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/compileall.*.pyc",
+            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/filecmp.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/py_compile.*.pyc"
         ]
     },
@@ -313,6 +314,7 @@
             "${libdir}/python${PYTHON_MAJMIN}/tokenize.py",
             "${libdir}/python${PYTHON_MAJMIN}/traceback.py",
             "${libdir}/python${PYTHON_MAJMIN}/types.py",
+            "${libdir}/python${PYTHON_MAJMIN}/typing.py",
             "${libdir}/python${PYTHON_MAJMIN}/urllib",
             "${libdir}/python${PYTHON_MAJMIN}/urllib/parse.py",
             "${libdir}/python${PYTHON_MAJMIN}/warnings.py",
@@ -388,6 +390,7 @@
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/tokenize.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/traceback.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/types.*.pyc",
+            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/typing.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/warnings.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/weakref.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/collections/__pycache__",
@@ -557,18 +560,12 @@
     "doctest": {
         "summary": "Python framework for running examples in docstrings",
         "rdepends": [
-            "asyncio",
             "core",
             "debugger",
             "difflib",
-            "io",
-            "logging",
-            "netclient",
-            "numbers",
             "pprint",
             "shell",
             "stringold",
-            "typing",
             "unittest"
         ],
         "files": [
@@ -822,7 +819,6 @@
             "terminal",
             "threading",
             "tkinter",
-            "typing",
             "unittest",
             "unixadmin",
             "venv",
@@ -999,12 +995,14 @@
         ],
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/cProfile.py",
+            "${libdir}/python${PYTHON_MAJMIN}/dataclasses.py",
             "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_lsprof.*.so",
             "${libdir}/python${PYTHON_MAJMIN}/profile.py",
             "${libdir}/python${PYTHON_MAJMIN}/pstats.py"
         ],
         "cached": [
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/cProfile.*.pyc",
+            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/dataclasses.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/profile.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/pstats.*.pyc"
         ]
@@ -1130,13 +1128,11 @@
             "core"
         ],
         "files": [
-            "${libdir}/python${PYTHON_MAJMIN}/_dummy_thread.py",
             "${libdir}/python${PYTHON_MAJMIN}/_threading_local.py",
             "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_queue.*.so",
             "${libdir}/python${PYTHON_MAJMIN}/queue.py"
         ],
         "cached": [
-            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/_dummy_thread.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/_threading_local.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/queue.*.pyc"
         ]
@@ -1147,22 +1143,10 @@
             "core"
         ],
         "files": [
-            "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_tkinter.*.so",
+	    "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_tkinter.*.so",
             "${libdir}/python${PYTHON_MAJMIN}/tkinter"
         ],
         "cached": []
-    },
-    "typing": {
-        "summary": "Python typing support",
-        "rdepends": [
-            "core"
-        ],
-        "files": [
-            "${libdir}/python${PYTHON_MAJMIN}/typing.py"
-        ],
-        "cached": [
-            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/typing.*.pyc"
-        ]
     },
     "unittest": {
         "summary": "Python unit testing framework",
@@ -1175,8 +1159,7 @@
             "netclient",
             "numbers",
             "pprint",
-            "stringold",
-            "typing"
+            "stringold"
         ],
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/unittest",

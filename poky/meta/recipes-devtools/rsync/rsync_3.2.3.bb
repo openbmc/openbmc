@@ -55,4 +55,4 @@ do_install_append() {
 	install -m 0644 ${WORKDIR}/rsyncd.conf ${D}${sysconfdir}
 }
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

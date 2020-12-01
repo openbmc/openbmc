@@ -1,0 +1,29 @@
+From 9fea099d0a3ece37d80ad70d32ebb8a93f8f3280 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 30 Oct 2020 13:48:45 +0800
+Subject: [PATCH] connman.service: stop systemd-networkd when using connman
+
+Stop systemd-networkd service when we use connman as network manager.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ src/connman.service.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/connman.service.in b/src/connman.service.in
+index 79e75d6..014eafe 100644
+--- a/src/connman.service.in
++++ b/src/connman.service.in
+@@ -6,6 +6,7 @@ RequiresMountsFor=@localstatedir@/lib/connman
+ After=dbus.service network-pre.target systemd-sysusers.service
+ Before=network.target multi-user.target shutdown.target
+ Wants=network.target
++Conflicts=systemd-networkd.service systemd-networkd.socket
+ Conflicts=systemd-resolved.service
+ 
+ [Service]
+-- 
+2.17.1
+

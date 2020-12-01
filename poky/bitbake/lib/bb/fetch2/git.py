@@ -595,6 +595,11 @@ class Git(FetchMethod):
         """
         Return the repository URL
         """
+        # Note that we do not support passwords directly in the git urls. There are several
+        # reasons. SRC_URI can be written out to things like buildhistory and people don't
+        # want to leak passwords like that. Its also all too easy to share metadata without 
+        # removing the password. ssh keys, ~/.netrc and ~/.ssh/config files can be used as
+        # alternatives so we will not take patches adding password support here.
         if ud.user:
             username = ud.user + '@'
         else:

@@ -7,10 +7,11 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b2beded7103a3d8a442a2a0391d607b0"
 SRC_URI = "git://gitlab.freedesktop.org/mesa/piglit.git;protocol=https \
            file://0001-cmake-install-bash-completions-in-the-right-place.patch \
            file://0001-cmake-use-proper-WAYLAND_INCLUDE_DIRS-variable.patch \
+           file://0001-Add-a-missing-include-for-htobe32-definition.patch \
            "
 UPSTREAM_CHECK_COMMITS = "1"
 
-SRCREV = "2a6a8f954dcd3f748055f28e019d2eca64635332"
+SRCREV = "59e695c16fdcdd4ea4f16365f0e397a93cef7b80"
 # (when PV goes above 1.0 remove the trailing r)
 PV = "1.0+gitr${SRCPV}"
 

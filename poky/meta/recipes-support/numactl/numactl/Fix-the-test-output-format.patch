@@ -1,0 +1,64 @@
+From 59fd750a84bbe5874dec936d2bee9ef11a1b6505 Mon Sep 17 00:00:00 2001
+From: Li xin <lixin.fnst@cn.fujitsu.com>
+Date: Tue, 21 Jul 2015 02:01:22 +0900
+Subject: [PATCH] Fix the test output format
+
+Upstream-Status: Pending
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
+---
+ test/regress  |  6 +++---
+ test/regress2 | 11 +++++------
+ 2 files changed, 8 insertions(+), 9 deletions(-)
+
+diff --git a/test/regress b/test/regress
+index 2ce1705..d086a47 100755
+--- a/test/regress
++++ b/test/regress
+@@ -74,6 +74,7 @@ probe_hardware()
+ 	if [ $numnodes -lt 2 ] ; then
+ 	    echo "need at least two nodes with at least $NEEDPAGES each of"
+ 	    echo "free memory for mempolicy regression tests"
++	    echo "FAIL: numa regress"
+	    exit 77  # Skip test
+ 	fi
+ }
+@@ -207,10 +208,9 @@ main()
+ 	rm A B
+ 
+ 	if [ "$EXIT" = 0 ] ; then
+-		echo '========SUCCESS'
++		echo 'PASS: numactl regress'
+ 	else
+-		echo '========FAILURE'
+-		exit 1
++		echo 'FAIL: numactl regress'
+ 	fi
+ }
+ 
+diff --git a/test/regress2 b/test/regress2
+index aa6ea41..450c510 100755
+--- a/test/regress2
++++ b/test/regress2
+@@ -9,12 +9,11 @@ testdir=`dirname "$0"`
+ export PATH=${builddir}:$PATH
+ 
+ T() {
+-       echo "$@" 
+-       if ! $VALGRIND "$@" ;  then
+-	  echo	$1 FAILED!!!!
+-	  exit 1
+-       fi
+-       echo
++	if ! $VALGRIND "$@" 2>&1 1>/dev/null;  then
++	   echo  "FAIL: $1"
++	else
++	   echo "PASS: $1"
++	fi
+ }
+ 
+ # still broken
+-- 
+1.8.4.2
+

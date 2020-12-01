@@ -241,8 +241,6 @@ section.
    the script runs, your current working directory is set to the ``build``
    directory.
 
-.. _bsp-filelayout:
-
 Example Filesystem Layout
 =========================
 
@@ -451,8 +449,6 @@ the :yocto_git:`Source Respositories <>`:
 
 The following sections describe each part of the proposed BSP format.
 
-.. _bsp-filelayout-license:
-
 License Files
 -------------
 
@@ -471,8 +467,6 @@ developer. For information on how to maintain license compliance, see
 the ":ref:`dev-manual/dev-manual-common-tasks:maintaining open source license compliance during your product's lifecycle`"
 section in the Yocto Project Development Tasks Manual.
 
-.. _bsp-filelayout-readme:
-
 README File
 -----------
 
@@ -487,8 +481,6 @@ also provides information needed for building the image.
 At a minimum, the ``README`` file must contain a list of dependencies,
 such as the names of any other layers on which the BSP depends and the
 name of the BSP maintainer with his or her contact information.
-
-.. _bsp-filelayout-readme-sources:
 
 README.sources File
 -------------------
@@ -508,8 +500,6 @@ used to generate the images that ship with the BSP.
 
    If the BSP's ``binary`` directory is missing or the directory has no images, an
    existing ``README.sources`` file is meaningless and usually does not exist.
-
-.. _bsp-filelayout-binary:
 
 Pre-built User Binaries
 -----------------------
@@ -533,8 +523,6 @@ hardware. Additionally, the
 :ref:`README.sources <bsp-guide/bsp:readme.sources file>` file should be
 present to locate the sources used to build the images and provide
 information on the Metadata.
-
-.. _bsp-filelayout-layer:
 
 Layer Configuration File
 ------------------------
@@ -586,8 +574,6 @@ This file simply makes :term:`BitBake` aware of the recipes and configuration
 directories. The file must exist so that the OpenEmbedded build system can
 recognize the BSP.
 
-.. _bsp-filelayout-machine:
-
 Hardware Configuration Options
 ------------------------------
 
@@ -626,8 +612,6 @@ configuration file. For example, the Raspberry Pi BSP
 
    include conf/machine/include/rpi-base.inc
 
-.. _bsp-filelayout-misc-recipes:
-
 Miscellaneous BSP-Specific Recipe Files
 ---------------------------------------
 
@@ -658,8 +642,6 @@ directory. Here is the ``machconfig`` file for the Raspberry Pi BSP: ::
    ``meta/recipes-bsp/formfactor/formfactor_0.0.bb``, which is found in
    the :term:`Source Directory`.
 
-.. _bsp-filelayout-recipes-graphics:
-
 Display Support Files
 ---------------------
 
@@ -670,8 +652,6 @@ You can find these files in the BSP Layer at: ::
 This optional directory contains recipes for the BSP if it has special
 requirements for graphics support. All files that are needed for the BSP
 to support a display are kept here.
-
-.. _bsp-filelayout-kernel:
 
 Linux Kernel Configuration
 --------------------------

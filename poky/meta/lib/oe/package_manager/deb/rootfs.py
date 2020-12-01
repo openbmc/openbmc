@@ -7,7 +7,7 @@ import shutil
 from oe.rootfs import Rootfs
 from oe.manifest import Manifest
 from oe.utils import execute_pre_post_process
-from oe.package_manager.deb.manifest import DpkgManifest
+from oe.package_manager.deb.manifest import PkgManifest
 from oe.package_manager.deb import DpkgPM
 
 class DpkgOpkgRootfs(Rootfs):
@@ -120,9 +120,9 @@ class DpkgOpkgRootfs(Rootfs):
 
             num += 1
 
-class DpkgRootfs(DpkgOpkgRootfs):
+class PkgRootfs(DpkgOpkgRootfs):
     def __init__(self, d, manifest_dir, progress_reporter=None, logcatcher=None):
-        super(DpkgRootfs, self).__init__(d, progress_reporter, logcatcher)
+        super(PkgRootfs, self).__init__(d, progress_reporter, logcatcher)
         self.log_check_regex = '^E:'
         self.log_check_expected_regexes = \
         [
@@ -131,7 +131,7 @@ class DpkgRootfs(DpkgOpkgRootfs):
 
         bb.utils.remove(self.image_rootfs, True)
         bb.utils.remove(self.d.getVar('MULTILIB_TEMP_ROOTFS'), True)
-        self.manifest = DpkgManifest(d, manifest_dir)
+        self.manifest = PkgManifest(d, manifest_dir)
         self.pm = DpkgPM(d, d.getVar('IMAGE_ROOTFS'),
                          d.getVar('PACKAGE_ARCHS'),
                          d.getVar('DPKG_ARCH'))

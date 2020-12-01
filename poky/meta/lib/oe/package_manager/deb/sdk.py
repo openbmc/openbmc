@@ -8,19 +8,19 @@ from oe.utils import execute_pre_post_process
 from oe.sdk import Sdk
 from oe.manifest import Manifest
 from oe.package_manager.deb import DpkgPM
+from oe.package_manager.deb.manifest import PkgManifest
 
-class DpkgSdk(Sdk):
+class PkgSdk(Sdk):
     def __init__(self, d, manifest_dir=None):
-        super(DpkgSdk, self).__init__(d, manifest_dir)
+        super(PkgSdk, self).__init__(d, manifest_dir)
 
         self.target_conf_dir = os.path.join(self.d.getVar("APTCONF_TARGET"), "apt")
         self.host_conf_dir = os.path.join(self.d.getVar("APTCONF_TARGET"), "apt-sdk")
 
-        from oe.package_manager.deb.manifest import DpkgManifest
 
-        self.target_manifest = DpkgManifest(d, self.manifest_dir,
+        self.target_manifest = PkgManifest(d, self.manifest_dir,
                                             Manifest.MANIFEST_TYPE_SDK_TARGET)
-        self.host_manifest = DpkgManifest(d, self.manifest_dir,
+        self.host_manifest = PkgManifest(d, self.manifest_dir,
                                           Manifest.MANIFEST_TYPE_SDK_HOST)
 
         deb_repo_workdir = "oe-sdk-repo"

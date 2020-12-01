@@ -1301,8 +1301,6 @@ created to hold the configuration changes.
 For more information on configuring the kernel, see the "`Changing the
 Configuration <#changing-the-configuration>`__" section.
 
-.. _creating-config-fragments:
-
 Creating Configuration Fragments
 --------------------------------
 

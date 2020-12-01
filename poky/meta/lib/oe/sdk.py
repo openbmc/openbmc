@@ -115,33 +115,18 @@ def sdk_list_installed_packages(d, target, rootfs_dir=None):
 
         rootfs_dir = [sdk_output, os.path.join(sdk_output, target_path)][target is True]
 
-    from oe.package_manager.rpm import RpmPkgsList
-    from oe.package_manager.ipk import OpkgPkgsList
-    from oe.package_manager.deb import DpkgPkgsList
     img_type = d.getVar('IMAGE_PKGTYPE')
-    if img_type == "rpm":
-        arch_var = ["SDK_PACKAGE_ARCHS", None][target is True]
-        os_var = ["SDK_OS", None][target is True]
-        return RpmPkgsList(d, rootfs_dir).list_pkgs()
-    elif img_type == "ipk":
-        conf_file_var = ["IPKGCONF_SDK", "IPKGCONF_TARGET"][target is True]
-        return OpkgPkgsList(d, rootfs_dir, d.getVar(conf_file_var)).list_pkgs()
-    elif img_type == "deb":
-        return DpkgPkgsList(d, rootfs_dir).list_pkgs()
+    import importlib
+    cls = importlib.import_module('oe.package_manager.' + img_type)
+    return cls.PMPkgsList(d, rootfs_dir).list_pkgs()
 
 def populate_sdk(d, manifest_dir=None):
     env_bkp = os.environ.copy()
 
     img_type = d.getVar('IMAGE_PKGTYPE')
-    from oe.package_manager.rpm.sdk import RpmSdk
-    from oe.package_manager.ipk.sdk import OpkgSdk
-    from oe.package_manager.deb.sdk import DpkgSdk
-    if img_type == "rpm":
-        RpmSdk(d, manifest_dir).populate()
-    elif img_type == "ipk":
-        OpkgSdk(d, manifest_dir).populate()
-    elif img_type == "deb":
-        DpkgSdk(d, manifest_dir).populate()
+    import importlib
+    cls = importlib.import_module('oe.package_manager.' + img_type + '.sdk')
+    cls.PkgSdk(d, manifest_dir).populate()
 
     os.environ.clear()
     os.environ.update(env_bkp)

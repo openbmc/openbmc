@@ -1,0 +1,25 @@
+From ef5446af0ddad6a341b47957097ac40c6cb5e6d3 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 20 Oct 2020 22:40:14 +0200
+Subject: [PATCH] meson.build: exclude girepo_dep if introspection data is
+ disabled
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/gobject-introspection/-/merge_requests/248]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 14af2b1..a3c27c3 100644
+--- a/meson.build
++++ b/meson.build
+@@ -283,7 +283,7 @@ pkg.generate(
+ # FIXME: meson.override_dependency() and declare_dependency()'s variable arguments
+ # are new in Meson 0.54.0, older versions of Meson won't be able to use g-i as
+ # subproject anyway
+-if meson.version().version_compare('>=0.54.0')
++if meson.version().version_compare('>=0.54.0') and get_option('build_introspection_data') == true
+   girepo_dep = declare_dependency(
+     sources: typelibs,
+     dependencies: girepo_dep,

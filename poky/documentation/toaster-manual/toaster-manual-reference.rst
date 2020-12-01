@@ -47,8 +47,6 @@ Metadata Index.
    You do not have to use a layer source to use Toaster. Tying into a
    layer source is optional.
 
-.. _layer-source-using-with-toaster:
-
 Setting Up and Using a Layer Source
 -----------------------------------
 
@@ -72,8 +70,6 @@ For general information on layers, see the
 section in the Yocto Project Overview and Concepts Manual. For information on how
 to create layers, see the ":ref:`dev-manual/dev-manual-common-tasks:understanding and creating layers`"
 section in the Yocto Project Development Tasks Manual.
-
-.. _configuring-toaster-to-hook-into-your-layer-source:
 
 Configuring Toaster to Hook Into Your Layer Index
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -143,8 +139,6 @@ Toaster database by running the following command:
 If Toaster can reach the API URL, you should see a message telling you that
 Toaster is updating the layer source information.
 
-.. _toaster-releases:
-
 Releases
 ========
 
@@ -156,8 +150,6 @@ with releases that correspond to Yocto Project release branches.
 However, you can modify, delete, and create new releases according to
 your needs. This section provides some background information on
 releases.
-
-.. _toaster-releases-supported:
 
 Pre-Configured Releases
 -----------------------
@@ -294,8 +286,6 @@ release selection:
       <field type="CharField" name="branch">&DISTRO_NAME_NO_CAP;</field>
       <field type="CharField" name="dirpath">bitbake</field>
    </object>
-
-.. _defining-releases:
 
 Defining Release
 ~~~~~~~~~~~~~~~~
@@ -518,8 +508,6 @@ build:
 The JSON data for this query is returned in a single line. In the
 previous example the line has been artificially split for readability.
 
-.. _toaster-useful-commands:
-
 Useful Commands
 ===============
 
@@ -547,8 +535,6 @@ tasks. You can locate these commands in the
       can use ``manage.py`` commands from a directory other than the
       Build Directory. To do so, the ``toastermain/settings.py`` file
       must be configured to point to the correct database backend.
-
-.. _toaster-command-buildslist:
 
 ``buildslist``
 --------------
@@ -580,8 +566,6 @@ command would return something like the following::
 
    1: qemux86 poky core-image-minimal
 
-.. _toaster-command-builddelete:
-
 ``builddelete``
 ---------------
 
@@ -600,8 +584,6 @@ Prior to running the ``builddelete`` command, you need to get the ID
 associated with builds by using the
 :ref:`toaster-manual/toaster-manual-reference:\`\`buildslist\`\`` command.
 
-.. _toaster-command-perf:
-
 ``perf``
 --------
 
@@ -614,8 +596,6 @@ follows:
 
 The command is a sanity check that returns page loading times in order to
 identify performance problems.
-
-.. _toaster-command-checksettings:
 
 ``checksettings``
 -----------------
@@ -643,8 +623,6 @@ ready, you can run the following:
    $ bitbake/lib/toaster/manage.py migrate bldcontrol
 
 After running these commands, you can run the ``checksettings`` command.
-
-.. _toaster-command-runbuilds:
 
 ``runbuilds``
 -------------

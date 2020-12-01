@@ -1,4 +1,4 @@
-From 1ec7b2208803e0fbdcbe6c07b849e7dc4d9fa8a2 Mon Sep 17 00:00:00 2001
+From 1a62bb8e8f2cb0f180c749946a48114e8f391b55 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 23 Aug 2019 10:17:25 +0800
 Subject: [PATCH] musl-obstack-fts
@@ -20,7 +20,7 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  3 files changed, 58 insertions(+), 4 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index e9649c2..03643c8 100644
+index ab9c751..b057d86 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -538,6 +538,60 @@ else

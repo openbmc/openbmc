@@ -1,0 +1,229 @@
+From f587861bbe12ad0b10370f835592746aafedbf56 Mon Sep 17 00:00:00 2001
+From: Mingke Wang <mingke.wang@freescale.com>
+Date: Thu, 19 Mar 2015 14:17:10 +0800
+Subject: [PATCH 2/4] ssaparse: enhance SSA text lines parsing.
+
+some parser will pass in the original ssa text line which starts with "Dialog:"
+and there's are maybe multiple Dialog lines in one input buffer.
+
+Upstream-Status: Submitted [https://bugzilla.gnome.org/show_bug.cgi?id=747496]
+
+Signed-off-by: Mingke Wang <mingke.wang@freescale.com>
+---
+ gst/subparse/gstssaparse.c | 150 +++++++++++++++++++++++++++++++++----
+ 1 file changed, 134 insertions(+), 16 deletions(-)
+ mode change 100644 => 100755 gst/subparse/gstssaparse.c
+
+diff --git a/gst/subparse/gstssaparse.c b/gst/subparse/gstssaparse.c
+old mode 100644
+new mode 100755
+index c849c08..4b9636c
+--- a/gst/subparse/gstssaparse.c
++++ b/gst/subparse/gstssaparse.c
+@@ -262,6 +262,7 @@ gst_ssa_parse_remove_override_codes (GstSsaParse * parse, gchar * txt)
+  * gst_ssa_parse_push_line:
+  * @parse: caller element
+  * @txt: text to push
++ * @size: text size need to be parse
+  * @start: timestamp for the buffer
+  * @duration: duration for the buffer
+  *
+@@ -271,27 +272,133 @@ gst_ssa_parse_remove_override_codes (GstSsaParse * parse, gchar * txt)
+  * Returns: result of the push of the created buffer
+  */
+ static GstFlowReturn
+-gst_ssa_parse_push_line (GstSsaParse * parse, gchar * txt,
++gst_ssa_parse_push_line (GstSsaParse * parse, gchar * txt, gint size,
+     GstClockTime start, GstClockTime duration)
+ {
+   GstFlowReturn ret;
+   GstBuffer *buf;
+-  gchar *t, *escaped;
++  gchar *t, *text, *p, *escaped, *p_start, *p_end;
+   gint num, i, len;
++  GstClockTime start_time = G_MAXUINT64, end_time = 0;
+ 
+-  num = atoi (txt);
+-  GST_LOG_OBJECT (parse, "Parsing line #%d at %" GST_TIME_FORMAT,
+-      num, GST_TIME_ARGS (start));
+-
+-  /* skip all non-text fields before the actual text */
++  p = text = g_malloc(size + 1);
++  *p = '\0';
+   t = txt;
+-  for (i = 0; i < 8; ++i) {
+-    t = strchr (t, ',');
++
++  /* there are may have multiple dialogue lines at a time */
++  while (*t) {
++    /* ignore leading white space characters */
++    while (isspace(*t))
++      t++;
++
++    /* ignore Format: and Style: lines */
++    if (strncmp(t, "Format:", 7) == 0 || strncmp(t, "Style:", 6) == 0) {
++      while (*t != '\0' && *t != '\n') {
++        t++;
++      }
++    }
++
++    if (*t == '\0')
++      break;
++
++    /* continue with next line */
++    if (*t == '\n') {
++      t++;
++      continue;
++    }
++
++    if(strncmp(t, "Dialogue:", 9) != 0) {
++      /* not started with "Dialogue:", it must be a line trimmed by demuxer */
++      num = atoi (t);
++      GST_LOG_OBJECT (parse, "Parsing line #%d at %" GST_TIME_FORMAT,
++          num, GST_TIME_ARGS (start));
++
++      /* skip all non-text fields before the actual text */
++      for (i = 0; i < 8; ++i) {
++        t = strchr (t, ',');
++        if (t == NULL)
++          break;
++        ++t;
++      }
++    } else {
++      /* started with "Dialogue:", update timestamp and duration */
++      /* time format are like Dialog:Mark,0:00:01.02,0:00:03.04,xx,xxx,... */
++      guint hour, min, sec, msec, len;
++      GstClockTime tmp;
++      gchar t_str[12] = {0};
++
++      /* find the first ',' */
++      p_start = strchr (t, ',');
++      if (p_start)
++        p_end = strchr (++p_start, ',');
++
++      if (p_start && p_end) {
++        /* copy text between first ',' and second ',' */
++        strncpy(t_str, p_start, p_end - p_start);
++        if (sscanf (t_str, "%u:%u:%u.%u", &hour, &min, &sec, &msec) == 4) {
++          tmp = ((hour*3600) + (min*60) + sec) * GST_SECOND + msec*GST_MSECOND;
++          GST_DEBUG_OBJECT (parse, "Get start time:%02d:%02d:%02d:%03d\n",
++              hour, min, sec, msec);
++          if (start_time > tmp)
++            start_time = tmp;
++        } else {
++          GST_WARNING_OBJECT (parse,
++              "failed to parse ssa start timestamp string :%s", t_str);
++        }
++
++        p_start = p_end;
++        p_end = strchr (++p_start, ',');
++        if (p_end) {
++          /* copy text between second ',' and third ',' */
++          strncpy(t_str, p_start, p_end - p_start);
++          if (sscanf (t_str, "%u:%u:%u.%u", &hour, &min, &sec, &msec) == 4) {
++            tmp = ((hour*3600) + (min*60) + sec)*GST_SECOND + msec*GST_MSECOND;
++            GST_DEBUG_OBJECT(parse, "Get end time:%02d:%02d:%02d:%03d\n",
++                hour, min, sec, msec);
++            if (end_time < tmp)
++              end_time = tmp;
++          } else {
++            GST_WARNING_OBJECT (parse,
++                "failed to parse ssa end timestamp string :%s", t_str);
++          }
++        }
++      }
++
++      /* now skip all non-text fields before the actual text */
++      for (i = 0; i <= 8; ++i) {
++        t = strchr (t, ',');
++        if (t == NULL)
++          break;
++        ++t;
++      }
++    }
++
++    /* line end before expected number of ',', not a Dialogue line */
+     if (t == NULL)
+-      return GST_FLOW_ERROR;
+-    ++t;
++      break;
++
++    /* if not the first line, and the last character of previous line is '\0',
++     * then replace it with '\N' */
++    if (p != text && *p == '\0') {
++      *p++ = '\\';
++      *p++ = 'N';
++    }
++
++    /* copy all actual text of this line */
++    while ((*t != '\0') && (*t != '\n'))
++      *p++ = *t++;
++
++    /* add a terminator at the end */
++    *p = '\0';
++  }
++
++  /* not valid text found in this buffer return OK to let caller unref buffer */
++  if (strlen(text) <= 0) {
++    GST_WARNING_OBJECT (parse, "Not valid text found in this buffer\n");
++    return GST_FLOW_ERROR;
+   }
+ 
++  t = text;
+   GST_LOG_OBJECT (parse, "Text : %s", t);
+ 
+   if (gst_ssa_parse_remove_override_codes (parse, t)) {
+@@ -309,13 +416,22 @@ gst_ssa_parse_push_line (GstSsaParse * parse, gchar * txt,
+   gst_buffer_fill (buf, 0, escaped, len + 1);
+   gst_buffer_set_size (buf, len);
+   g_free (escaped);
++  g_free(t);
++
++  if (start_time != G_MAXUINT64)
++    GST_BUFFER_TIMESTAMP (buf) = start_time;
++  else
++    GST_BUFFER_TIMESTAMP (buf) = start;
+ 
+-  GST_BUFFER_TIMESTAMP (buf) = start;
+-  GST_BUFFER_DURATION (buf) = duration;
++  if (end_time > start_time)
++    GST_BUFFER_DURATION (buf) = end_time - start_time;
++  else
++    GST_BUFFER_DURATION (buf) = duration;
+ 
+   GST_LOG_OBJECT (parse, "Pushing buffer with timestamp %" GST_TIME_FORMAT
+-      " and duration %" GST_TIME_FORMAT, GST_TIME_ARGS (start),
+-      GST_TIME_ARGS (duration));
++      " and duration %" GST_TIME_FORMAT,
++      GST_TIME_ARGS (GST_BUFFER_TIMESTAMP (buf)),
++      GST_TIME_ARGS (GST_BUFFER_DURATION (buf)));
+ 
+   ret = gst_pad_push (parse->srcpad, buf);
+ 
+@@ -335,6 +451,7 @@ gst_ssa_parse_chain (GstPad * sinkpad, GstObject * parent, GstBuffer * buf)
+   GstClockTime ts;
+   gchar *txt;
+   GstMapInfo map;
++  gint size;
+ 
+   if (G_UNLIKELY (!parse->framed))
+     goto not_framed;
+@@ -352,13 +469,14 @@ gst_ssa_parse_chain (GstPad * sinkpad, GstObject * parent, GstBuffer * buf)
+   /* make double-sure it's 0-terminated and all */
+   gst_buffer_map (buf, &map, GST_MAP_READ);
+   txt = g_strndup ((gchar *) map.data, map.size);
++  size = map.size;
+   gst_buffer_unmap (buf, &map);
+ 
+   if (txt == NULL)
+     goto empty_text;
+ 
+   ts = GST_BUFFER_TIMESTAMP (buf);
+-  ret = gst_ssa_parse_push_line (parse, txt, ts, GST_BUFFER_DURATION (buf));
++  ret = gst_ssa_parse_push_line (parse, txt, size, ts, GST_BUFFER_DURATION (buf));
+ 
+   if (ret != GST_FLOW_OK && GST_CLOCK_TIME_IS_VALID (ts)) {
+     GstSegment segment;
+-- 
+2.28.0
+

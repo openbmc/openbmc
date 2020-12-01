@@ -34,7 +34,7 @@ class WestonTest(OERuntimeTestCase):
         return 'export XDG_RUNTIME_DIR=/run/user/0; export WAYLAND_DISPLAY=wayland-0; %s' % cmd
 
     def run_weston_init(self):
-        if 'systemd' in self.tc.td['DISTRO_FEATURES']:
+        if 'systemd' in self.tc.td['VIRTUAL-RUNTIME_init_manager']:
             self.target.run('systemd-run --collect --unit=weston-ptest.service --uid=0 -p PAMName=login -p TTYPath=/dev/tty6 -E XDG_RUNTIME_DIR=/tmp -E WAYLAND_DISPLAY=wayland-0 /usr/bin/weston --socket=wayland-1 --log=%s' % self.weston_log_file)
         else:
             self.target.run(self.get_weston_command('openvt -- weston --socket=wayland-1 --log=%s' % self.weston_log_file))
@@ -51,10 +51,10 @@ class WestonTest(OERuntimeTestCase):
 
         return new_wl_processes, try_cnt
 
-    @OEHasPackage(['weston'])
-    def test_weston_info(self):
-        status, output = self.target.run(self.get_weston_command('weston-info'))
-        self.assertEqual(status, 0, msg='weston-info error: %s' % output)
+    @OEHasPackage(['wayland-utils'])
+    def test_wayland_info(self):
+        status, output = self.target.run(self.get_weston_command('wayland-info'))
+        self.assertEqual(status, 0, msg='wayland-info error: %s' % output)
 
     @OEHasPackage(['weston'])
     def test_weston_can_initialize_new_wayland_compositor(self):
@@ -66,7 +66,7 @@ class WestonTest(OERuntimeTestCase):
         new_wl_processes, try_cnt = self.get_new_wayland_processes(existing_wl_processes)
         existing_and_new_weston_processes = self.get_processes_of('weston', 'existing and new')
         new_weston_processes = [x for x in existing_and_new_weston_processes if x not in existing_weston_processes]
-        if 'systemd' in self.tc.td['DISTRO_FEATURES']:
+        if 'systemd' in self.tc.td['VIRTUAL-RUNTIME_init_manager']:
             self.target.run('systemctl stop weston-ptest.service')
         else:
             for w in new_weston_processes:

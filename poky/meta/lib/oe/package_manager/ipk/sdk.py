@@ -6,20 +6,20 @@ import glob
 import shutil
 from oe.utils import execute_pre_post_process
 from oe.sdk import Sdk
+from oe.package_manager.ipk.manifest import PkgManifest
 from oe.manifest import Manifest
 from oe.package_manager.ipk import OpkgPM
 
-class OpkgSdk(Sdk):
+class PkgSdk(Sdk):
     def __init__(self, d, manifest_dir=None):
-        super(OpkgSdk, self).__init__(d, manifest_dir)
+        super(PkgSdk, self).__init__(d, manifest_dir)
 
         self.target_conf = self.d.getVar("IPKGCONF_TARGET")
         self.host_conf = self.d.getVar("IPKGCONF_SDK")
 
-        from oe.package_manager.ipk.manifest import OpkgManifest
-        self.target_manifest = OpkgManifest(d, self.manifest_dir,
+        self.target_manifest = PkgManifest(d, self.manifest_dir,
                                             Manifest.MANIFEST_TYPE_SDK_TARGET)
-        self.host_manifest = OpkgManifest(d, self.manifest_dir,
+        self.host_manifest = PkgManifest(d, self.manifest_dir,
                                           Manifest.MANIFEST_TYPE_SDK_HOST)
 
         ipk_repo_workdir = "oe-sdk-repo"

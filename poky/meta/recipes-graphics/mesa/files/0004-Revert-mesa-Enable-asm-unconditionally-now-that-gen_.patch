@@ -1,4 +1,4 @@
-From 41cd8836d785c79381764e7de59319f87959a5cf Mon Sep 17 00:00:00 2001
+From 43d9e40db7357f27e91002b2bb7688b6775ebb43 Mon Sep 17 00:00:00 2001
 From: Alistair Francis <alistair@alistair23.me>
 Date: Thu, 14 Nov 2019 09:06:02 -0800
 Subject: [PATCH] Revert "mesa: Enable asm unconditionally, now that
@@ -15,18 +15,18 @@ Signed-off-by: Alistair Francis <alistair@alistair23.me>
  2 files changed, 67 insertions(+), 33 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index 62864c6..b53be8d 100644
+index e7dc599..e2fc934 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -49,6 +49,7 @@ with_vulkan_icd_dir = get_option('vulkan-icd-dir')
+@@ -52,6 +52,7 @@ pre_args = [
+ with_vulkan_icd_dir = get_option('vulkan-icd-dir')
  with_tests = get_option('build-tests')
- with_valgrind = get_option('valgrind')
- with_libunwind = get_option('libunwind')
+ with_aco_tests = get_option('build-aco-tests')
 +with_asm = get_option('asm')
  with_glx_read_only_text = get_option('glx-read-only-text')
  with_glx_direct = get_option('glx-direct')
  with_osmesa = get_option('osmesa')
-@@ -1093,41 +1094,68 @@ dep_ws2_32 = cc.find_library('ws2_32', required : with_platform_windows)
+@@ -1154,41 +1155,68 @@ dep_ws2_32 = cc.find_library('ws2_32', required : with_platform_windows)
  
  # TODO: shared/static? Is this even worth doing?
  
@@ -129,10 +129,10 @@ index 62864c6..b53be8d 100644
  endif
  
 diff --git a/meson_options.txt b/meson_options.txt
-index 700c34c..62e8472 100644
+index 147cccb..562b059 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
-@@ -241,6 +241,12 @@ option(
+@@ -254,6 +254,12 @@ option(
    value : false,
    description : 'Enable GLVND support.'
  )

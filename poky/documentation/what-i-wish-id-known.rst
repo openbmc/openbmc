@@ -135,7 +135,7 @@ contact us with other suggestions.
    valuable links: :ref:`dev-manual/dev-manual-common-tasks:Using a Development
    Shell` for information on how to build and run a specific task using
    devshell. Also, the :ref:`SDK manual shows how to build out a specific recipe
-   <sdk-devtool-use-devtool-modify-to-modify-the-source-of-an-existing-component>`.
+   <sdk-manual/sdk-extensible:use \`\`devtool modify\`\` to modify the source of an existing component>`.
 
 #. **An ambiguous definition: Package vs Recipe:**
    A recipe contains instructions the build system uses to create

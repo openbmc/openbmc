@@ -145,3 +145,21 @@ perform_usermod () {
 	fi
 	set -e
 }
+
+perform_passwd_expire () {
+	local rootdir="$1"
+	local opts="$2"
+	bbnote "${PN}: Performing equivalent of passwd --expire with [$opts]"
+	# Directly set sp_lstchg to 0 without using the passwd command: Only root can do that
+	local username=`echo "$opts" | awk '{ print $NF }'`
+	local user_exists="`grep "^$username:" $rootdir/etc/passwd || true`"
+	if test "x$user_exists" != "x"; then
+		eval flock -x $rootdir${sysconfdir} -c \"$PSEUDO sed -i \''s/^\('$username':[^:]*\):[^:]*:/\1:0:/'\' $rootdir/etc/shadow \" || true
+		local passwd_lastchanged="`grep "^$username:" $rootdir/etc/shadow | cut -d: -f3`"
+		if test "x$passwd_lastchanged" != "x0"; then
+			bbfatal "${PN}: passwd --expire operation did not succeed."
+		fi
+	else
+		bbnote "${PN}: user $username doesn't exist, not expiring its password"
+	fi
+}

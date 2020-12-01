@@ -19,8 +19,6 @@ You can use a standard SDK to work on Makefile and Autotools-based
 projects. See the "`Using the SDK Toolchain
 Directly <#sdk-working-projects>`__" chapter for more information.
 
-.. _sdk-standard-sdk-intro:
-
 Why use the Standard SDK and What is in It?
 ===========================================
 
@@ -36,8 +34,6 @@ configuration files, and host and target root filesystems to support
 usage. You can see the directory structure in the "`Installed Standard
 SDK Directory
 Structure <#sdk-installed-standard-sdk-directory-structure>`__" section.
-
-.. _sdk-installing-the-sdk:
 
 Installing the SDK
 ==================
@@ -128,8 +124,6 @@ Again, reference the "`Installed Standard SDK Directory
 Structure <#sdk-installed-standard-sdk-directory-structure>`__" section
 for more details on the resulting directory structure of the installed
 SDK.
-
-.. _sdk-running-the-sdk-environment-setup-script:
 
 Running the SDK Environment Setup Script
 ========================================

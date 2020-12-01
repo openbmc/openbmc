@@ -1,5 +1,5 @@
 SUMMARY = "A suite of basic system administration utilities"
-HOMEPAGE = "http://userweb.kernel.org/~kzak/util-linux/"
+HOMEPAGE = "https://en.wikipedia.org/wiki/Util-linux"
 DESCRIPTION = "Util-linux includes a suite of basic system administration utilities \
 commonly found on most Linux systems.  Some of the more important utilities include \
 disk partitioning, kernel message management, filesystem creation, and system login."
@@ -129,7 +129,7 @@ EXTRA_OECONF_append = " --disable-hwclock-gplv3"
 #
 PACKAGECONFIG ?= "pcre2"
 PACKAGECONFIG_class-target ?= "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}"
-# inherit manpages requires this to be present, however util-linux does not have 
+# inherit manpages requires this to be present, however util-linux does not have
 # configuration options, and installs manpages always
 PACKAGECONFIG[manpages] = ""
 PACKAGECONFIG[pam] = "--enable-su --enable-runuser,--disable-su --disable-runuser, libpam,"

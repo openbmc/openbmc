@@ -1515,27 +1515,24 @@ cross-compiler that is used internally within BitBake only.
    gcc-cross
    .
 
-The chain of events that occurs when ``gcc-cross`` is bootstrapped is as
-follows:
+The chain of events that occurs when the standard toolchain is bootstrapped:
 ::
 
-   gcc -> binutils-cross -> gcc-cross-initial -> linux-libc-headers -> glibc-initial -> glibc -> gcc-cross -> gcc-runtime
+   binutils-cross -> linux-libc-headers -> gcc-cross -> libgcc-initial -> glibc -> libgcc -> gcc-runtime
 
--  ``gcc``: The build host's GNU Compiler Collection (GCC).
+-  ``gcc``: The compiler, GNU Compiler Collection (GCC).
 
--  ``binutils-cross``: The bare minimum binary utilities needed in order
-   to run the ``gcc-cross-initial`` phase of the bootstrap operation.
+-  ``binutils-cross``: The binary utilities needed in order
+   to run the ``gcc-cross`` phase of the bootstrap operation and build the
+   headers for the C library.
 
--  ``gcc-cross-initial``: An early stage of the bootstrap process for
-   creating the cross-compiler. This stage builds enough of the
-   ``gcc-cross``, the C library, and other pieces needed to finish
-   building the final cross-compiler in later stages. This tool is a
-   "native" package (i.e. it is designed to run on the build host).
+-  ``linux-libc-headers``: Headers needed for the cross-compiler and C library build.
 
--  ``linux-libc-headers``: Headers needed for the cross-compiler.
+-  ``libgcc-initial``: An initial version of the gcc support library needed
+   to bootstrap ``glibc``.
 
--  ``glibc-initial``: An initial version of the Embedded GNU C Library
-   (GLIBC) needed to bootstrap ``glibc``.
+-  ``libgcc``: The final version of the gcc support library which
+   can only be built once there is a C library to link against.
 
 -  ``glibc``: The GNU C Library.
 
@@ -1543,14 +1540,7 @@ follows:
    cross-compiler. This stage results in the actual cross-compiler that
    BitBake uses when it builds an image for a targeted device.
 
-   .. note::
-
-      If you are replacing this cross compiler toolchain with a custom
-      version, you must replace
-      gcc-cross
-      .
-
-   This tool is also a "native" package (i.e. it is designed to run on
+   This tool is a "native" tool (i.e. it is designed to run on
    the build host).
 
 -  ``gcc-runtime``: Runtime libraries resulting from the toolchain

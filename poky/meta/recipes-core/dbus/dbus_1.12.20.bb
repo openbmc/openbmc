@@ -11,6 +11,8 @@ RDEPENDS_dbus_class-nativesdk = ""
 PACKAGES += "${@bb.utils.contains('DISTRO_FEATURES', 'ptest', '${PN}-ptest', '', d)}"
 ALLOW_EMPTY_dbus-ptest = "1"
 RDEPENDS_dbus-ptest_class-target = "dbus-test-ptest"
+RDEPENDS_${PN} += "${PN}-common ${PN}-tools"
+RDEPENDS_${PN}_class-native = ""
 
 inherit useradd update-rc.d
 
@@ -31,7 +33,7 @@ CONFFILES_${PN} = "${sysconfdir}/dbus-1/system.conf ${sysconfdir}/dbus-1/session
 
 DEBIANNAME_${PN} = "dbus-1"
 
-PACKAGES =+ "${PN}-lib"
+PACKAGES =+ "${PN}-lib ${PN}-common ${PN}-tools"
 
 OLDPKGNAME = "dbus-x11"
 OLDPKGNAME_class-nativesdk = ""
@@ -41,31 +43,37 @@ RPROVIDES_${PN} = "${OLDPKGNAME}"
 RREPLACES_${PN} += "${OLDPKGNAME}"
 
 FILES_${PN} = "${bindir}/dbus-daemon* \
-               ${bindir}/dbus-uuidgen \
                ${bindir}/dbus-cleanup-sockets \
-               ${bindir}/dbus-send \
-               ${bindir}/dbus-monitor \
                ${bindir}/dbus-launch \
                ${bindir}/dbus-run-session \
-               ${bindir}/dbus-update-activation-environment \
                ${libexecdir}/dbus* \
                ${sysconfdir} \
                ${localstatedir} \
-               ${datadir}/dbus-1/services \
-               ${datadir}/dbus-1/system-services \
-               ${datadir}/dbus-1/session.d \
-               ${datadir}/dbus-1/session.conf \
-               ${datadir}/dbus-1/system.d \
-               ${datadir}/dbus-1/system.conf \
-               ${datadir}/xml/dbus-1 \
                ${systemd_system_unitdir} \
                ${systemd_user_unitdir} \
-               ${nonarch_libdir}/sysusers.d/dbus.conf \
                ${nonarch_libdir}/tmpfiles.d/dbus.conf \
+"
+FILES_${PN}-common = "${sysconfdir}/dbus-1 \
+                      ${datadir}/dbus-1/services \
+                      ${datadir}/dbus-1/system-services \
+                      ${datadir}/dbus-1/session.d \
+                      ${datadir}/dbus-1/session.conf \
+                      ${datadir}/dbus-1/system.d \
+                      ${datadir}/dbus-1/system.conf \
+                      ${systemd_system_unitdir}/dbus.socket \
+                      ${systemd_system_unitdir}/sockets.target.wants \
+                      ${systemd_user_unitdir}/dbus.socket \
+                      ${systemd_user_unitdir}/sockets.target.wants \
+                      ${nonarch_libdir}/sysusers.d/dbus.conf \
+"
+FILES_${PN}-tools = "${bindir}/dbus-uuidgen \
+                     ${bindir}/dbus-send \
+                     ${bindir}/dbus-monitor \
+                     ${bindir}/dbus-update-activation-environment \
 "
 FILES_${PN}-lib = "${libdir}/lib*.so.*"
 RRECOMMENDS_${PN}-lib = "${PN}"
-FILES_${PN}-dev += "${libdir}/dbus-1.0/include ${libdir}/cmake/DBus1 ${bindir}/dbus-test-tool"
+FILES_${PN}-dev += "${libdir}/dbus-1.0/include ${libdir}/cmake/DBus1 ${bindir}/dbus-test-tool ${datadir}/xml/dbus-1"
 
 PACKAGE_WRITE_DEPS += "${@bb.utils.contains('DISTRO_FEATURES','systemd sysvinit','systemd-systemctl-native','',d)}"
 pkg_postinst_dbus() {

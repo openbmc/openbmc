@@ -13,7 +13,7 @@
 #
 
 import re, bb, os
-import bb.build, bb.utils
+import bb.build, bb.utils, bb.data_smart
 
 from . import ConfHandler
 from .. import resolve_file, ast, logger, ParseError
@@ -233,6 +233,10 @@ def feeder(lineno, s, fn, root, statements, eof=False):
             if taskexpression.count(word) > 1:
                 logger.warning("addtask contained multiple '%s' keywords, only one is supported" % word)
 
+        # Check and warn for having task with exprssion as part of task name
+        for te in taskexpression:
+            if any( ( "%s_" % keyword ) in te for keyword in bb.data_smart.__setvar_keyword__ ):
+                raise ParseError("Task name '%s' contains a keyword which is not recommended/supported.\nPlease rename the task not to include the keyword.\n%s" % (te, ("\n".join(map(str, bb.data_smart.__setvar_keyword__)))), fn)
         ast.handleAddTask(statements, fn, lineno, m)
         return
 

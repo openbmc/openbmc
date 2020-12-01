@@ -43,7 +43,7 @@ class RpmSubdirIndexer(RpmIndexer):
                         self.do_write_index(dir_path)
 
 
-class RpmPkgsList(PkgsList):
+class PMPkgsList(PkgsList):
     def list_pkgs(self):
         return RpmPM(self.d, self.rootfs_dir, self.d.getVar('TARGET_VENDOR'), needfeed=False).list_installed()
 

@@ -10,12 +10,6 @@ import shutil
 import os
 import subprocess
 import re
-from oe.package_manager.rpm.manifest import RpmManifest
-from oe.package_manager.ipk.manifest import OpkgManifest
-from oe.package_manager.deb.manifest import DpkgManifest
-from oe.package_manager.rpm import RpmPkgsList
-from oe.package_manager.ipk import OpkgPkgsList
-from oe.package_manager.deb import DpkgPkgsList
 
 class Rootfs(object, metaclass=ABCMeta):
     """
@@ -360,12 +354,9 @@ class Rootfs(object, metaclass=ABCMeta):
 
 
 def get_class_for_type(imgtype):
-    from oe.package_manager.rpm.rootfs import RpmRootfs
-    from oe.package_manager.ipk.rootfs import OpkgRootfs
-    from oe.package_manager.deb.rootfs import DpkgRootfs
-    return {"rpm": RpmRootfs,
-            "ipk": OpkgRootfs,
-            "deb": DpkgRootfs}[imgtype]
+    import importlib
+    mod = importlib.import_module('oe.package_manager.' + imgtype + '.rootfs')
+    return mod.PkgRootfs
 
 def variable_depends(d, manifest_dir=None):
     img_type = d.getVar('IMAGE_PKGTYPE')
@@ -375,17 +366,10 @@ def variable_depends(d, manifest_dir=None):
 def create_rootfs(d, manifest_dir=None, progress_reporter=None, logcatcher=None):
     env_bkp = os.environ.copy()
 
-    from oe.package_manager.rpm.rootfs import RpmRootfs
-    from oe.package_manager.ipk.rootfs import OpkgRootfs
-    from oe.package_manager.deb.rootfs import DpkgRootfs
     img_type = d.getVar('IMAGE_PKGTYPE')
-    if img_type == "rpm":
-        RpmRootfs(d, manifest_dir, progress_reporter, logcatcher).create()
-    elif img_type == "ipk":
-        OpkgRootfs(d, manifest_dir, progress_reporter, logcatcher).create()
-    elif img_type == "deb":
-        DpkgRootfs(d, manifest_dir, progress_reporter, logcatcher).create()
 
+    cls = get_class_for_type(img_type)
+    cls(d, manifest_dir, progress_reporter, logcatcher).create()
     os.environ.clear()
     os.environ.update(env_bkp)
 
@@ -395,12 +379,10 @@ def image_list_installed_packages(d, rootfs_dir=None):
         rootfs_dir = d.getVar('IMAGE_ROOTFS')
 
     img_type = d.getVar('IMAGE_PKGTYPE')
-    if img_type == "rpm":
-        return RpmPkgsList(d, rootfs_dir).list_pkgs()
-    elif img_type == "ipk":
-        return OpkgPkgsList(d, rootfs_dir, d.getVar("IPKGCONF_TARGET")).list_pkgs()
-    elif img_type == "deb":
-        return DpkgPkgsList(d, rootfs_dir).list_pkgs()
+
+    import importlib
+    cls = importlib.import_module('oe.package_manager.' + img_type)
+    return cls.PMPkgsList(d, rootfs_dir).list_pkgs()
 
 if __name__ == "__main__":
     """

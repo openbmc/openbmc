@@ -21,7 +21,7 @@ SRC_URI = "\
 "
 SRC_URI[sha256sum] = "4e121f0e58b175a827581c69cb1d60778647049fa47f142940dddc9ce58f3c82"
 
-inherit autotools systemd update-rc.d
+inherit autotools systemd update-rc.d upstream-version-is-even
 
 INITSCRIPT_NAME = "kea-dhcp4-server"
 INITSCRIPT_PARAMS = "defaults 30"

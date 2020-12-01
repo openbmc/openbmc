@@ -1,0 +1,24 @@
+Since
+https://github.com/WebKit/webkit/commit/acd3f32cd43c363be032f93ede3aa10c4ee97fa4
+it uses XVisualInfo which is defined in Xutil.h
+
+Without this the build fails with:
+webkitgtk-2.30.2/Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp:132:5: error: 'XVisualInfo' was not declared in this scope; did you mean 'VisualID'?
+  132 |     XVisualInfo visualTemplate;
+      |     ^~~~~~~~~~~
+      |     VisualID
+
+Upstream-Status: Pending
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
+diff -uNr webkitgtk-2.30.2.orig/Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp webkitgtk-2.30.2/Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp
+--- webkitgtk-2.30.2.orig/Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp	2020-08-12 09:17:55.000000000 +0000
++++ webkitgtk-2.30.2/Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp	2020-11-06 03:11:40.379913528 +0000
+@@ -30,6 +30,7 @@
+ 
+ #if PLATFORM(X11)
+ #include <X11/Xlib.h>
++#include <X11/Xutil.h>
+ #include <X11/extensions/Xcomposite.h>
+ #if PLATFORM(GTK)
+ #include <X11/extensions/Xdamage.h>

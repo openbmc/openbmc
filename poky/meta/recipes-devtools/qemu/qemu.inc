@@ -32,6 +32,7 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://find_datadir.patch \
            file://usb-fix-setup_len-init.patch \
            file://0001-target-mips-Increase-number-of-TLB-entries-on-the-34.patch \
+           file://CVE-2020-24352.patch \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 

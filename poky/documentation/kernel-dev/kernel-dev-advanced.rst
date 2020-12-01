@@ -4,8 +4,6 @@
 Working with Advanced Metadata (``yocto-kernel-cache``)
 *******************************************************
 
-.. _kernel-dev-advanced-overview:
-
 Overview
 ========
 
@@ -245,7 +243,7 @@ two files: ``smp.scc`` and ``smp.cfg``. You can find these files in the
       CONFIG_X86_BIGSMP=y
 
 You can find general information on configuration
-fragment files in the ":ref:`creating-config-fragments`" section.
+fragment files in the ":ref:`kernel-dev/kernel-dev-common:creating configuration fragments`" section.
 
 Within the ``smp.scc`` file, the
 :term:`KFEATURE_DESCRIPTION`
@@ -478,8 +476,6 @@ concepts, and presents a detailed example using a BSP supported by the
 Yocto Project (i.e. BeagleBone Board). For complete information on BSP
 layer file hierarchy, see the :doc:`../bsp-guide/bsp-guide`.
 
-.. _bsp-description-file-overview:
-
 Description Overview
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -559,7 +555,7 @@ You can see that in the BeagleBone example with the following:
    include beaglebone.scc
 
 For information on how to break a complete ``.config`` file into the various
-configuration fragments, see the ":ref:`creating-config-fragments`" section.
+configuration fragments, see the ":ref:`kernel-dev/kernel-dev-common:creating configuration fragments`" section.
 
 Finally, if you have any configurations specific to the hardware that
 are not in a ``*.scc`` file, you can include them as follows:
@@ -582,8 +578,6 @@ types of configurations. However, the Malta 32-bit board does
 
    include mti-malta32.scc
    kconf hardware mti-malta32-le.cfg
-
-.. _bsp-description-file-example-minnow:
 
 Example
 ~~~~~~~
@@ -924,8 +918,6 @@ after any ``branch`` commands:
       git merge myfeature
 
       include mybsp-hw.scc
-
-.. _scc-reference:
 
 SCC Description File Reference
 ==============================

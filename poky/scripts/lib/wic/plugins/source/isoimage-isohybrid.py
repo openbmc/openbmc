@@ -216,6 +216,18 @@ class IsoImagePlugin(SourcePlugin):
             creator.name = source_params['image_name'].strip()
             logger.debug("The name of the image is: %s", creator.name)
 
+    @staticmethod
+    def _install_payload(source_params, iso_dir):
+        """
+        Copies contents of payload directory (as specified in 'payload_dir' param) into iso_dir
+        """
+
+        if source_params.get('payload_dir'):
+            payload_dir = source_params['payload_dir']
+
+            logger.debug("Payload directory: %s", payload_dir)
+            shutil.copytree(payload_dir, iso_dir, symlinks=True, dirs_exist_ok=True)
+
     @classmethod
     def do_prepare_partition(cls, part, source_params, creator, cr_workdir,
                              oe_builddir, bootimg_dir, kernel_dir,
@@ -227,6 +239,8 @@ class IsoImagePlugin(SourcePlugin):
         """
 
         isodir = "%s/ISO" % cr_workdir
+
+        cls._install_payload(source_params, isodir)
 
         if part.rootfs_dir is None:
             if not 'ROOTFS_DIR' in rootfs_dir:

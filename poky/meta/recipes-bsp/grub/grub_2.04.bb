@@ -35,4 +35,4 @@ do_install_append () {
 INSANE_SKIP_${PN} = "arch"
 INSANE_SKIP_${PN}-dbg = "arch"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

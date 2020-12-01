@@ -81,14 +81,13 @@ S = "${TMPDIR}/work-shared/gcc-${PV}-${PR}/gcc-${PV}"
 FORTRAN = ""
 JAVA = ""
 
-LTO = "--enable-lto"
 SSP ?= "--disable-libssp"
 SSP_mingw32 = "--enable-libssp"
 
 EXTRA_OECONF_BASE = "\
-    ${LTO} \
     ${SSP} \
     --enable-libitm \
+    --enable-lto \
     --disable-bootstrap \
     --with-system-zlib \
     ${@'--with-linker-hash-style=${LINKER_HASH_STYLE}' if '${LINKER_HASH_STYLE}' else ''} \

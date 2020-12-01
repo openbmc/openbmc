@@ -9,8 +9,8 @@ Conflicts=connman.service
 [Service]
 Type=forking
 PIDFile=/run/dhcpcd/%I.pid
-ExecStart=/usr/sbin/dhcpcd -q %I
-ExecStop=/usr/sbin/dhcpcd -x %I
+ExecStart=/sbin/dhcpcd -q %I
+ExecStop=/sbin/dhcpcd -x %I
 
 [Install]
 WantedBy=multi-user.target

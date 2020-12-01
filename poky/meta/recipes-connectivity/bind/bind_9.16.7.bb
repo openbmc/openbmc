@@ -1,5 +1,5 @@
 SUMMARY = "ISC Internet Domain Name Server"
-HOMEPAGE = "http://www.isc.org/sw/bind/"
+HOMEPAGE = "https://www.isc.org/bind/"
 SECTION = "console/network"
 
 LICENSE = "MPL-2.0"

@@ -1,4 +1,4 @@
-From 0048ae2d225d25cc58f378718ca6f9ddb1a228f9 Mon Sep 17 00:00:00 2001
+From 3725c254f1d1d8204fa299e71c1e2bfd0ff6a634 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 31 Jan 2018 15:50:38 +0200
 Subject: [PATCH] help/meson.build: disable the use of yelp
@@ -13,11 +13,11 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/help/meson.build b/help/meson.build
-index fddcf4c..f7d76c6 100644
+index 484860c..d9b2e80 100644
 --- a/help/meson.build
 +++ b/help/meson.build
 @@ -32,7 +32,7 @@ help_media = [
-   'media/web-browser.png'
+   'media/epiphany-private-3-36.png'
  ]
  
 -gnome.yelp(meson.project_name(),

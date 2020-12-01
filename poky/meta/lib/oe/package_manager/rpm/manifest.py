@@ -4,7 +4,7 @@
 
 from oe.manifest import Manifest
 
-class RpmManifest(Manifest):
+class PkgManifest(Manifest):
     """
     Returns a dictionary object with mip and mlp packages.
     """

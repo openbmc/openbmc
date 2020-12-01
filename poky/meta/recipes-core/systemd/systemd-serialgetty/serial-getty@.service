@@ -29,7 +29,7 @@ Conflicts=rescue.service
 Before=rescue.service
 
 [Service]
-Environment="TERM=xterm"
+Environment="TERM=@TERM@"
 ExecStart=-/sbin/agetty -8 -L %I @BAUDRATE@ $TERM
 Type=idle
 Restart=always

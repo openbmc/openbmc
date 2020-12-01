@@ -1,4 +1,4 @@
-From bb1f359e34649516e61305e9748534cce7e0ee70 Mon Sep 17 00:00:00 2001
+From 702daf2e9cb97337e0e594fcd435b1b61a917d14 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 7 Dec 2015 23:39:54 +0000
 Subject: [PATCH] handle sysroot support for nativesdk-gcc
@@ -321,7 +321,7 @@ index 9098ab044ab..bfad4ebe382 100644
  	      str = update_path (ostr, p->component);
  	      free (ostr);
 diff --git a/gcc/prefix.c b/gcc/prefix.c
-index 1a403e535bd..3257ed3cd3e 100644
+index 1a403e535bd..c26d07bde12 100644
 --- a/gcc/prefix.c
 +++ b/gcc/prefix.c
 @@ -72,7 +72,9 @@ License along with GCC; see the file COPYING3.  If not see
@@ -329,9 +329,9 @@ index 1a403e535bd..3257ed3cd3e 100644
  #include "common/common-target.h"
  
 -static const char *std_prefix = PREFIX;
-+static const char PREFIXVAR[4096] __attribute__ ((section (".gccrelocprefix"))) = PREFIX;
++char PREFIXVAR1[4096] __attribute__ ((section (".gccrelocprefix"))) = PREFIX;
 +
-+static const char *std_prefix = PREFIXVAR;
++static const char *std_prefix = PREFIXVAR1;
  
  static const char *get_key_value (char *);
  static char *translate_name (char *);
@@ -340,7 +340,10 @@ index 1a403e535bd..3257ed3cd3e 100644
  
        if (prefix == 0)
 -	prefix = PREFIX;
-+	prefix = PREFIXVAR;
++	prefix = PREFIXVAR1;
  
        /* We used to strip trailing DIR_SEPARATORs here, but that can
  	 sometimes yield a result with no separator when one was coded
+-- 
+2.29.2
+

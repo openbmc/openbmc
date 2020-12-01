@@ -1,4 +1,4 @@
-From 1ad21140787a6b8b0f774f75b50444d2c30a56f6 Mon Sep 17 00:00:00 2001
+From 96d23fc57d1ff9c851d563d6d6a6c4752dc4f1b6 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 21 May 2020 20:28:12 +0000
 Subject: [PATCH] Do not configure packages on installation

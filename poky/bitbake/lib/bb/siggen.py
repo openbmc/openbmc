@@ -311,13 +311,7 @@ class SignatureGeneratorBasic(SignatureGenerator):
 
         data = self.basehash[tid]
         for dep in self.runtaskdeps[tid]:
-            if dep in self.unihash:
-                if self.unihash[dep] is None:
-                    data = data + self.taskhash[dep]
-                else:
-                    data = data + self.unihash[dep]
-            else:
-                data = data + self.get_unihash(dep)
+            data = data + self.get_unihash(dep)
 
         for (f, cs) in self.file_checksum_values[tid]:
             if cs:

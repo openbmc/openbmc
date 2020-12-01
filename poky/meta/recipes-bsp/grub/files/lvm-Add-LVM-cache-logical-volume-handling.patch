@@ -1,0 +1,287 @@
+From 8eb02bcb5897b238b29ff762402bb0c3028f0eab Mon Sep 17 00:00:00 2001
+From: Michael Chang <mchang@suse.com>
+Date: Thu, 19 Mar 2020 13:56:13 +0800
+Subject: [PATCH 3/9] lvm: Add LVM cache logical volume handling
+
+The LVM cache logical volume is the logical volume consisting of the original
+and the cache pool logical volume. The original is usually on a larger and
+slower storage device while the cache pool is on a smaller and faster one. The
+performance of the original volume can be improved by storing the frequently
+used data on the cache pool to utilize the greater performance of faster
+device.
+
+The default cache mode "writethrough" ensures that any data written will be
+stored both in the cache and on the origin LV, therefore grub can be straight
+to read the original lv as no data loss is guarenteed.
+
+The second cache mode is "writeback", which delays writing from the cache pool
+back to the origin LV to have increased performance. The drawback is potential
+data loss if losing the associated cache device.
+
+During the boot time grub reads the LVM offline i.e. LVM volumes are not
+activated and mounted, hence it should be fine to read directly from original
+lv since all cached data should have been flushed back in the process of taking
+it offline.
+
+It is also not much helpful to the situation by adding fsync calls to the
+install code. The fsync did not force to write back dirty cache to the original
+device and rather it would update associated cache metadata to complete the
+write transaction with the cache device. IOW the writes to cached blocks still
+go only to the cache device.
+
+To write back dirty cache, as LVM cache did not support dirty cache flush per
+block range, there'no way to do it for file. On the other hand the "cleaner"
+policy is implemented and can be used to write back "all" dirty blocks in a
+cache, which effectively drain all dirty cache gradually to attain and last in
+the "clean" state, which can be useful for shrinking or decommissioning a
+cache. The result and effect is not what we are looking for here.
+
+In conclusion, as it seems no way to enforce file writes to the original
+device, grub may suffer from power failure as it cannot assemble the cache
+device and read the dirty data from it. However since the case is only
+applicable to writeback mode which is sensitive to data lost in nature, I'd
+still like to propose my (relatively simple) patch and treat reading dirty
+cache as improvement.
+
+Upstream-Status: Backport [commit 0454b0445393aafc5600e92ef0c39494e333b135
+from https://git.savannah.gnu.org/git/grub.git]
+
+Signed-off-by: Michael Chang <mchang@suse.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+Signed-off-by: Yongxin Liu <yongxin.liu@windriver.com>
+---
+ grub-core/disk/lvm.c | 190 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 190 insertions(+)
+
+diff --git a/grub-core/disk/lvm.c b/grub-core/disk/lvm.c
+index 7b265c7..dc6b83b 100644
+--- a/grub-core/disk/lvm.c
++++ b/grub-core/disk/lvm.c
+@@ -33,6 +33,14 @@
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
++struct cache_lv
++{
++  struct grub_diskfilter_lv *lv;
++  char *cache_pool;
++  char *origin;
++  struct cache_lv *next;
++};
++
+ 
+ /* Go the string STR and return the number after STR.  *P will point
+    at the number.  In case STR is not found, *P will be NULL and the
+@@ -95,6 +103,34 @@ grub_lvm_check_flag (char *p, const char *str, const char *flag)
+     }
+ }
+ 
++static void
++grub_lvm_free_cache_lvs (struct cache_lv *cache_lvs)
++{
++  struct cache_lv *cache;
++
++  while ((cache = cache_lvs))
++    {
++      cache_lvs = cache_lvs->next;
++
++      if (cache->lv)
++	{
++	  unsigned int i;
++
++	  for (i = 0; i < cache->lv->segment_count; ++i)
++	    if (cache->lv->segments)
++	      grub_free (cache->lv->segments[i].nodes);
++	  grub_free (cache->lv->segments);
++	  grub_free (cache->lv->fullname);
++	  grub_free (cache->lv->idname);
++	  grub_free (cache->lv->name);
++	}
++      grub_free (cache->lv);
++      grub_free (cache->origin);
++      grub_free (cache->cache_pool);
++      grub_free (cache);
++    }
++}
++
+ static struct grub_diskfilter_vg * 
+ grub_lvm_detect (grub_disk_t disk,
+ 		 struct grub_diskfilter_pv_id *id,
+@@ -242,6 +278,8 @@ grub_lvm_detect (grub_disk_t disk,
+ 
+   if (! vg)
+     {
++      struct cache_lv *cache_lvs = NULL;
++
+       /* First time we see this volume group. We've to create the
+ 	 whole volume group structure. */
+       vg = grub_malloc (sizeof (*vg));
+@@ -671,6 +709,106 @@ grub_lvm_detect (grub_disk_t disk,
+ 			  seg->nodes[seg->node_count - 1].name = tmp;
+ 			}
+ 		    }
++		  else if (grub_memcmp (p, "cache\"",
++				   sizeof ("cache\"") - 1) == 0)
++		    {
++		      struct cache_lv *cache = NULL;
++
++		      char *p2, *p3;
++		      grub_size_t sz;
++
++		      cache = grub_zalloc (sizeof (*cache));
++		      if (!cache)
++			goto cache_lv_fail;
++		      cache->lv = grub_zalloc (sizeof (*cache->lv));
++		      if (!cache->lv)
++			goto cache_lv_fail;
++		      grub_memcpy (cache->lv, lv, sizeof (*cache->lv));
++
++		      if (lv->fullname)
++			{
++			  cache->lv->fullname = grub_strdup (lv->fullname);
++			  if (!cache->lv->fullname)
++			    goto cache_lv_fail;
++			}
++		      if (lv->idname)
++			{
++			  cache->lv->idname = grub_strdup (lv->idname);
++			  if (!cache->lv->idname)
++			    goto cache_lv_fail;
++			}
++		      if (lv->name)
++			{
++			  cache->lv->name = grub_strdup (lv->name);
++			  if (!cache->lv->name)
++			    goto cache_lv_fail;
++			}
++
++		      skip_lv = 1;
++
++		      p2 = grub_strstr (p, "cache_pool = \"");
++		      if (!p2)
++			goto cache_lv_fail;
++
++		      p2 = grub_strchr (p2, '"');
++		      if (!p2)
++			goto cache_lv_fail;
++
++		      p3 = ++p2;
++		      p3 = grub_strchr (p3, '"');
++		      if (!p3)
++			goto cache_lv_fail;
++
++		      sz = p3 - p2;
++
++		      cache->cache_pool = grub_malloc (sz + 1);
++		      if (!cache->cache_pool)
++			goto cache_lv_fail;
++		      grub_memcpy (cache->cache_pool, p2, sz);
++		      cache->cache_pool[sz] = '\0';
++
++		      p2 = grub_strstr (p, "origin = \"");
++		      if (!p2)
++			goto cache_lv_fail;
++
++		      p2 = grub_strchr (p2, '"');
++		      if (!p2)
++			goto cache_lv_fail;
++
++		      p3 = ++p2;
++		      p3 = grub_strchr (p3, '"');
++		      if (!p3)
++			goto cache_lv_fail;
++
++		      sz = p3 - p2;
++
++		      cache->origin = grub_malloc (sz + 1);
++		      if (!cache->origin)
++			goto cache_lv_fail;
++		      grub_memcpy (cache->origin, p2, sz);
++		      cache->origin[sz] = '\0';
++
++		      cache->next = cache_lvs;
++		      cache_lvs = cache;
++		      break;
++
++		    cache_lv_fail:
++		      if (cache)
++			{
++			  grub_free (cache->origin);
++			  grub_free (cache->cache_pool);
++			  if (cache->lv)
++			    {
++			      grub_free (cache->lv->fullname);
++			      grub_free (cache->lv->idname);
++			      grub_free (cache->lv->name);
++			    }
++			  grub_free (cache->lv);
++			  grub_free (cache);
++			}
++		      grub_lvm_free_cache_lvs (cache_lvs);
++		      goto fail4;
++		    }
+ 		  else
+ 		    {
+ #ifdef GRUB_UTIL
+@@ -747,6 +885,58 @@ grub_lvm_detect (grub_disk_t disk,
+ 	      }
+ 	
+       }
++
++      {
++	struct cache_lv *cache;
++
++	for (cache = cache_lvs; cache; cache = cache->next)
++	  {
++	    struct grub_diskfilter_lv *lv;
++
++	    for (lv = vg->lvs; lv; lv = lv->next)
++	      if (grub_strcmp (lv->name, cache->origin) == 0)
++		break;
++	    if (lv)
++	      {
++		cache->lv->segments = grub_malloc (lv->segment_count * sizeof (*lv->segments));
++		if (!cache->lv->segments)
++		  {
++		    grub_lvm_free_cache_lvs (cache_lvs);
++		    goto fail4;
++		  }
++		grub_memcpy (cache->lv->segments, lv->segments, lv->segment_count * sizeof (*lv->segments));
++
++		for (i = 0; i < lv->segment_count; ++i)
++		  {
++		    struct grub_diskfilter_node *nodes = lv->segments[i].nodes;
++		    grub_size_t node_count = lv->segments[i].node_count;
++
++		    cache->lv->segments[i].nodes = grub_malloc (node_count * sizeof (*nodes));
++		    if (!cache->lv->segments[i].nodes)
++		      {
++			for (j = 0; j < i; ++j)
++			  grub_free (cache->lv->segments[j].nodes);
++			grub_free (cache->lv->segments);
++			cache->lv->segments = NULL;
++			grub_lvm_free_cache_lvs (cache_lvs);
++			goto fail4;
++		      }
++		    grub_memcpy (cache->lv->segments[i].nodes, nodes, node_count * sizeof (*nodes));
++		  }
++
++		if (cache->lv->segments)
++		  {
++		    cache->lv->segment_count = lv->segment_count;
++		    cache->lv->vg = vg;
++		    cache->lv->next = vg->lvs;
++		    vg->lvs = cache->lv;
++		    cache->lv = NULL;
++		  }
++	      }
++	  }
++      }
++
++      grub_lvm_free_cache_lvs (cache_lvs);
+       if (grub_diskfilter_vg_register (vg))
+ 	goto fail4;
+     }
+-- 
+2.14.4
+

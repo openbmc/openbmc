@@ -30,6 +30,10 @@ REQUIRED_DISTRO_FEATURES = "x11"
 
 export PYTHON = "python3"
 
+do_install_append () {
+	chown root.root ${D}${datadir}/doc/${BPN}/tutorial -R
+}
+
 python populate_packages_prepend () {
     do_split_packages(d, '${libdir}', r'^libxcb-(.*)\.so\..*$', 'libxcb-%s', 'XCB library module for %s', allow_links=True)
 }

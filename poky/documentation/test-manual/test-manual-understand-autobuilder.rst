@@ -73,8 +73,6 @@ The ``config.json`` file is processed by the scripts in the Helper
 repository in the ``scripts`` directory. The following section details
 how this works.
 
-.. _test-autobuilder-target-exec-overview:
-
 Autobuilder Target Execution Overview
 =====================================
 
@@ -135,15 +133,11 @@ roughly consist of:
    This is another call into the Helper scripts where its expected that
    the main functionality of this target will be executed.
 
-.. _test-autobuilder-tech:
-
 Autobuilder Technology
 ======================
 
 The Autobuilder has Yocto Project-specific functionality to allow builds
 to operate with increased efficiency and speed.
-
-.. _test-clobberdir:
 
 clobberdir
 ----------
@@ -155,8 +149,6 @@ which is run under ``ionice -c 3``. For example, the deletion only
 happens when there is idle IO capacity on the Worker. The Autobuilder
 Worker Janitor runs this deletion. See :ref:`test-manual/test-manual-understand-autobuilder:Autobuilder Worker Janitor`.
 
-.. _test-autobuilder-clone-cache:
-
 Autobuilder Clone Cache
 -----------------------
 
@@ -167,8 +159,6 @@ during clones first, then "topped up" with later revisions from any
 upstream when necessary. The cache is maintained by the Autobuilder
 Worker Janitor. See :ref:`test-manual/test-manual-understand-autobuilder:Autobuilder Worker Janitor`.
 
-.. _test-autobuilder-worker-janitor:
-
 Autobuilder Worker Janitor
 --------------------------
 
@@ -176,8 +166,6 @@ This is a process running on each Worker that performs two basic
 operations, including background file deletion at IO idle (see :ref:`test-manual/test-manual-understand-autobuilder:Autobuilder Target Execution Overview`: Run clobberdir) and
 maintainenance of a cache of cloned repositories to improve the speed
 the system can checkout repositories.
-
-.. _test-shared-dl-dir:
 
 Shared DL_DIR
 -------------
@@ -187,8 +175,6 @@ between them. This reduces network accesses from the system and allows
 the build to be sped up. Usage of the directory within the build system
 is designed to be able to be shared over NFS.
 
-.. _test-shared-sstate-cache:
-
 Shared SSTATE_DIR
 -----------------
 
@@ -196,8 +182,6 @@ The Workers are all connected over NFS which allows the ``sstate``
 directory to be shared between them. This means once a Worker has built
 an artifact, all the others can benefit from it. Usage of the directory
 within the directory is designed for sharing over NFS.
-
-.. _test-resulttool:
 
 Resulttool
 ----------
@@ -212,8 +196,6 @@ json results files. It has the ability to merge files together, display
 reports of the test results and compare different result files.
 
 For details, see :yocto_wiki:`/wiki/Resulttool`.
-
-.. _test-run-config-tgt-execution:
 
 run-config Target Execution
 ===========================
@@ -263,8 +245,6 @@ of post-build steps, including:
 #. Cleanup the build directory using
    :ref:`test-manual/test-manual-understand-autobuilder:clobberdir` if the build was successful,
    else rename it to "build-renamed" for potential future debugging.
-
-.. _test-deploying-yp-autobuilder:
 
 Deploying Yocto Autobuilder
 ===========================

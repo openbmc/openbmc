@@ -25,7 +25,7 @@ index 7691258..ec3f2a4 100644
  
 +        # There is no need to report missing module dependencies,
 +        # if the modules have been disabled in the first place.
-+        self.missing = list(set(self.missing) - set(sysconf_dis))
++        self.missing = list(set(self.missing) - set(mods_disabled))
 +
          if self.missing:
              print()

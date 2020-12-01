@@ -4,8 +4,6 @@
 Introduction
 ************
 
-.. _sdk-manual-intro:
-
 eSDK Introduction
 =================
 
@@ -126,8 +124,6 @@ functionality. This toolchain is created by running a SDK installer
 script or through a :term:`Build Directory` that is based on
 your metadata configuration or extension for your targeted device. The
 cross-toolchain works with a matching target sysroot.
-
-.. _sysroot:
 
 Sysroots
 --------

@@ -1,0 +1,49 @@
+From 1c01a5bc9ac7f8aaa484b1a8e0e74aa5f8899d0e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 8 Nov 2020 11:17:59 -0800
+Subject: [PATCH] malloc: Check for excessive values to malloc
+
+with whole program optimizers like lto smalloc()
+is inlined the excessive constant argument is propagated to
+malloc() and ultimately triggers the warning.
+
+malloc.c:15:9: error: argument 1 range [18446744065119617024, 18446744073709551580] exceeds maximum object size 9223372036854775807 [-Werror=alloc-size-larger-than=]
+
+therefore add a check before excessive constant argument before calling
+malloc
+
+Note that this will not happen with normal compile since they happen to
+be in different translation units and compiler can not semantically
+analyze as much
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ malloc.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/malloc.c b/malloc.c
+index a7fa7c5..520377c 100644
+--- a/malloc.c
++++ b/malloc.c
+@@ -2,6 +2,7 @@
+  * malloc.c: safe wrappers around malloc, realloc, free, strdup
+  */
+ 
++#include <stdint.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include "puzzles.h"
+@@ -12,6 +13,8 @@
+  */
+ void *smalloc(size_t size) {
+     void *p;
++    if (size > PTRDIFF_MAX)
++	fatal("exceeds maximum object size");
+     p = malloc(size);
+     if (!p)
+ 	fatal("out of memory");
+-- 
+2.29.2
+

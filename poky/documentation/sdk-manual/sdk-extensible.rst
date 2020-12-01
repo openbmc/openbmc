@@ -24,8 +24,6 @@ alternatively make use of the toolchain directly, for example from
 Makefile and Autotools. See the "`Using the SDK Toolchain
 Directly <#sdk-working-projects>`__" chapter for more information.
 
-.. _sdk-extensible-sdk-intro:
-
 Why use the Extensible SDK and What is in It?
 =============================================
 
@@ -39,8 +37,6 @@ The installed extensible SDK consists of several files and directories.
 Basically, it contains an SDK environment setup script, some
 configuration files, an internal build system, and the ``devtool``
 functionality.
-
-.. _sdk-installing-the-extensible-sdk:
 
 Installing the Extensible SDK
 =============================
@@ -138,8 +134,6 @@ architecture. The example assumes the SDK installer is located in
    Each time you wish to use the SDK in a new shell session, you need to source the environment setup script e.g.
     $ . /home/scottrif/poky_sdk/environment-setup-core2-64-poky-linux
 
-.. _sdk-running-the-extensible-sdk-environment-setup-script:
-
 Running the Extensible SDK Environment Setup Script
 ===================================================
 
@@ -224,8 +218,6 @@ recipes and the source go into a "workspace" directory under the SDK.
 
 The remainder of this section presents the ``devtool add``,
 ``devtool modify``, and ``devtool upgrade`` workflows.
-
-.. _sdk-use-devtool-to-add-an-application:
 
 Use ``devtool add`` to Add an Application
 -----------------------------------------
@@ -400,8 +392,6 @@ command:
       command to put things back should you decide you do not want to
       proceed with your work. If you do use this command, realize that
       the source tree is preserved.
-
-.. _sdk-devtool-use-devtool-modify-to-modify-the-source-of-an-existing-component:
 
 Use ``devtool modify`` to Modify the Source of an Existing Component
 --------------------------------------------------------------------
@@ -613,8 +603,6 @@ command:
       proceed with your work. If you do use this command, realize that
       the source tree is preserved.
 
-.. _sdk-devtool-use-devtool-upgrade-to-create-a-version-of-the-recipe-that-supports-a-newer-version-of-the-software:
-
 Use ``devtool upgrade`` to Create a Version of the Recipe that Supports a Newer Version of the Software
 -------------------------------------------------------------------------------------------------------
 
@@ -783,8 +771,6 @@ The following diagram shows the common development flow used with the
       proceed with your work. If you do use this command, realize that
       the source tree is preserved.
 
-.. _sdk-a-closer-look-at-devtool-add:
-
 A Closer Look at ``devtool add``
 ================================
 
@@ -826,8 +812,6 @@ the source tree is assumed to be using CMake and is treated accordingly.
 The remainder of this section covers specifics regarding how parts of
 the recipe are generated.
 
-.. _sdk-name-and-version:
-
 Name and Version
 ----------------
 
@@ -850,8 +834,6 @@ incorrect. For such a case, you must reset the recipe:
 
 After running the ``devtool reset`` command, you need to
 run ``devtool add`` again and provide the name or the version.
-
-.. _sdk-dependency-detection-and-mapping:
 
 Dependency Detection and Mapping
 --------------------------------
@@ -887,8 +869,6 @@ following to your recipe:
    dependency with an option that disables the associated functionality
    passed to the configure script.
 
-.. _sdk-license-detection:
-
 License Detection
 -----------------
 
@@ -919,8 +899,6 @@ If the ``devtool add`` command cannot determine licensing information,
 with development even though the settings are unlikely to be correct in
 all cases. You should check the documentation or source files for the
 software you are building to determine the actual license.
-
-.. _sdk-adding-makefile-only-software:
 
 Adding Makefile-Only Software
 -----------------------------
@@ -981,8 +959,6 @@ mind:
    ``ldconfig``. For such cases, you might be able to apply patches that
    remove these commands from the Makefile.
 
-.. _sdk-adding-native-tools:
-
 Adding Native Tools
 -------------------
 
@@ -1008,8 +984,6 @@ following methods when you run ``devtool add``:
    the same compilation process. Realize though that with the
    "DASHDASHalso-native" option, you can add the tool using just one
    recipe file.
-
-.. _sdk-adding-node-js-modules:
 
 Adding Node.js Modules
 ----------------------
@@ -1053,8 +1027,6 @@ fetches the specified Git repository, detects the code as Node.js code,
 fetches dependencies using ``npm``, and sets
 :term:`SRC_URI` accordingly.
 
-.. _sdk-working-with-recipes:
-
 Working With Recipes
 ====================
 
@@ -1093,8 +1065,6 @@ that most recipes typically need.
 The remainder of this section presents information useful when working
 with recipes.
 
-.. _sdk-finding-logs-and-work-files:
-
 Finding Logs and Work Files
 ---------------------------
 
@@ -1127,8 +1097,6 @@ links created within the source tree:
 You can use these links to get more information on what is happening at
 each build step.
 
-.. _sdk-setting-configure-arguments:
-
 Setting Configure Arguments
 ---------------------------
 
@@ -1155,8 +1123,6 @@ arguments specified through ``EXTRA_OECONF`` or
 the output of the configure script's "DASHDASHhelp" option as a
 reference.
 
-.. _sdk-sharing-files-between-recipes:
-
 Sharing Files Between Recipes
 -----------------------------
 
@@ -1178,8 +1144,6 @@ for this limitation is that almost all files that go into the sysroot
 are cataloged in manifests in order to ensure they can be removed later
 when a recipe is modified or removed. Thus, the sysroot is able to
 remain free from stale files.
-
-.. _sdk-packaging:
 
 Packaging
 ---------
@@ -1221,8 +1185,6 @@ you do not even need to set these variables in your recipe unless the
 software the recipe is building installs files into non-standard
 locations.
 
-.. _sdk-restoring-the-target-device-to-its-original-state:
-
 Restoring the Target Device to its Original State
 =================================================
 
@@ -1263,8 +1225,6 @@ target machine.
    and package manager operations on the target device. Doing so could
    result in a conflicting set of files.
 
-.. _sdk-installing-additional-items-into-the-extensible-sdk:
-
 Installing Additional Items Into the Extensible SDK
 ===================================================
 
@@ -1298,8 +1258,6 @@ takes significantly longer than installing the pre-built artifact. Also,
 if no recipe exists for the item you want to add to the SDK, you must
 instead add the item using the ``devtool add`` command.
 
-.. _sdk-applying-updates-to-an-installed-extensible-sdk:
-
 Applying Updates to an Installed Extensible SDK
 ===============================================
 
@@ -1326,8 +1284,6 @@ path_to_update_directory
 
    The URL needs to point specifically to a published SDK and not to an
    SDK installer that you would download and install.
-
-.. _sdk-creating-a-derivative-sdk-with-additional-components:
 
 Creating a Derivative SDK With Additional Components
 ====================================================

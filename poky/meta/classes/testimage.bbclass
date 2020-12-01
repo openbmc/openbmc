@@ -367,6 +367,7 @@ def testimage_main(d):
     package_extraction(d, tc.suites)
 
     results = None
+    complete = False
     orig_sigterm_handler = signal.signal(signal.SIGTERM, sigterm_exception)
     try:
         # We need to check if runqemu ends unexpectedly
@@ -378,6 +379,7 @@ def testimage_main(d):
         except ValueError:
             pass
         results = tc.runTests()
+        complete = True
     except (KeyboardInterrupt, BlockingIOError) as err:
         if isinstance(err, KeyboardInterrupt):
             bb.error('testimage interrupted, shutting down...')
@@ -385,20 +387,21 @@ def testimage_main(d):
             bb.error('runqemu failed, shutting down...')
         if results:
             results.stop()
-            results = None
+        results = tc.results
     finally:
         signal.signal(signal.SIGTERM, orig_sigterm_handler)
         tc.target.stop()
 
     # Show results (if we have them)
-    if not results:
+    if results:
+        configuration = get_testimage_configuration(d, 'runtime', machine)
+        results.logDetails(get_testimage_json_result_dir(d),
+                        configuration,
+                        get_testimage_result_id(configuration),
+                        dump_streams=d.getVar('TESTREPORT_FULLLOGS'))
+        results.logSummary(pn)
+    if not results or not complete:
         bb.fatal('%s - FAILED - tests were interrupted during execution' % pn, forcelog=True)
-    configuration = get_testimage_configuration(d, 'runtime', machine)
-    results.logDetails(get_testimage_json_result_dir(d),
-                       configuration,
-                       get_testimage_result_id(configuration),
-                       dump_streams=d.getVar('TESTREPORT_FULLLOGS'))
-    results.logSummary(pn)
     if not results.wasSuccessful():
         bb.fatal('%s - FAILED - check the task log and the ssh log' % pn, forcelog=True)
 

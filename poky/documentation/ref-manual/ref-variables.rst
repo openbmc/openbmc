@@ -132,6 +132,18 @@ system and gives an overview of their function and contents.
       ":ref:`update-alternatives.bbclass <ref-classes-update-alternatives>`"
       section.
 
+   :term:`ANY_OF_DISTRO_FEATURES`
+      When inheriting the
+      :ref:`features_check <ref-classes-features_check>`
+      class, this variable identifies a list of distribution features where
+      at least one must be enabled in the current configuration in order
+      for the OpenEmbedded build system to build the recipe. In other words,
+      if none of the features listed in ``ANY_OF_DISTRO_FEATURES``
+      appear in ``DISTRO_FEATURES`` within the current configuration, then
+      the recipe will be skipped, and if the build system attempts to build
+      the recipe then an error will be triggered.
+      
+
    :term:`APPEND`
       An override list of append strings for each target specified with
       :term:`LABELS`.
@@ -1300,12 +1312,13 @@ system and gives an overview of their function and contents.
 
    :term:`CONFLICT_DISTRO_FEATURES`
       When inheriting the
-      :ref:`distro_features_check <ref-classes-distro_features_check>`
+      :ref:`features_check <ref-classes-features_check>`
       class, this variable identifies distribution features that would be
       in conflict should the recipe be built. In other words, if the
       ``CONFLICT_DISTRO_FEATURES`` variable lists a feature that also
-      appears in ``DISTRO_FEATURES`` within the current configuration, an
-      error occurs and the build stops.
+      appears in ``DISTRO_FEATURES`` within the current configuration, then
+      the recipe will be skipped, and if the build system attempts to build
+      the recipe then an error will be triggered.
 
    :term:`COPYLEFT_LICENSE_EXCLUDE`
       A space-separated list of licenses to exclude from the source
@@ -3085,6 +3098,17 @@ system and gives an overview of their function and contents.
       See the :term:`GLIBC_GENERATE_LOCALES`
       variable for information on generating GLIBC locales.
 
+
+   :term:`IMAGE_LINK_NAME`
+      The name of the output image symlink (which does not include
+      the version part as :term:`IMAGE_NAME` does). The default value
+      is derived using the :term:`IMAGE_BASENAME` and :term:`MACHINE`
+      variables:
+      ::
+
+         IMAGE_LINK_NAME ?= "${IMAGE_BASENAME}-${MACHINE}"
+
+
    :term:`IMAGE_MANIFEST`
       The manifest file for the image. This file lists all the installed
       packages that make up the image. The file contains package
@@ -3108,11 +3132,18 @@ system and gives an overview of their function and contents.
    :term:`IMAGE_NAME`
       The name of the output image files minus the extension. This variable
       is derived using the :term:`IMAGE_BASENAME`,
-      :term:`MACHINE`, and :term:`DATETIME`
+      :term:`MACHINE`, and :term:`IMAGE_VERSION_SUFFIX`
       variables:
       ::
 
-         IMAGE_NAME = "${IMAGE_BASENAME}-${MACHINE}-${DATETIME}"
+         IMAGE_NAME ?= "${IMAGE_BASENAME}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
+
+   :term:`IMAGE_NAME_SUFFIX`
+      Suffix used for the image output file name - defaults to ``".rootfs"``
+      to distinguish the image file from other files created during image
+      building; however if this suffix is redundant or not desired you can
+      clear the value of this variable (set the value to ""). For example,
+      this is typically cleared in initramfs image recipes.
 
    :term:`IMAGE_OVERHEAD_FACTOR`
       Defines a multiplier that the build system applies to the initial
@@ -3315,6 +3346,14 @@ system and gives an overview of their function and contents.
 
       For more information about these types of images, see
       ``meta/classes/image_types*.bbclass`` in the :term:`Source Directory`.
+
+   :term:`IMAGE_VERSION_SUFFIX`
+      Version suffix that is part of the default :term:`IMAGE_NAME` and
+      :term:`KERNEL_ARTIFACT_NAME` values.
+      Defaults to ``"-${DATETIME}"``, however you could set this to a
+      version string that comes from your external build environment if
+      desired, and this suffix would then be used consistently across
+      the build artifacts.
 
    :term:`INC_PR`
       Helps define the recipe revision for recipes that share a common
@@ -3774,12 +3813,8 @@ system and gives an overview of their function and contents.
 
          KERNEL_ARTIFACT_NAME ?= "${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
-      See the :term:`PKGE`, :term:`PKGV`, :term:`PKGR`, and :term:`MACHINE`
-      variables for additional information.
-
-      .. note::
-
-         The ``IMAGE_VERSION_SUFFIX`` variable is set to :term:`DATETIME`.
+      See the :term:`PKGE`, :term:`PKGV`, :term:`PKGR`, :term:`MACHINE`
+      and :term:`IMAGE_VERSION_SUFFIX` variables for additional information.
 
    :term:`KERNEL_CLASSES`
       A list of classes defining kernel image types that the
@@ -5104,7 +5139,7 @@ system and gives an overview of their function and contents.
 
       .. note::
 
-         You can use the ``PACKAGE_FEEDS_ARCHS``
+         You can use the ``PACKAGE_FEED_ARCHS``
          variable to whitelist specific package architectures. If you do
          not need to whitelist specific architectures, which is a common
          case, you can omit this variable. Omitting the variable results in
@@ -5919,6 +5954,15 @@ system and gives an overview of their function and contents.
       service <dev-manual/dev-manual-common-tasks:working with a pr service>`. You can
       set ``PRSERV_HOST`` to other values to use a remote PR service.
 
+
+   :term:`PSEUDO_IGNORE_PATHS`
+      A comma-separated (without spaces) list of path prefixes that should be ignored
+      by pseudo when monitoring and recording file operations, in order to avoid
+      problems with files being written to outside of the pseudo context and
+      reduce pseudo's overhead. A path is ignored if it matches any prefix in the list
+      and can include partial directory (or file) names.
+
+
    :term:`PTEST_ENABLED`
       Specifies whether or not :ref:`Package
       Test <dev-manual/dev-manual-common-tasks:testing packages with ptest>` (ptest)
@@ -6122,13 +6166,14 @@ system and gives an overview of their function and contents.
 
    :term:`REQUIRED_DISTRO_FEATURES`
       When inheriting the
-      :ref:`distro_features_check <ref-classes-distro_features_check>`
+      :ref:`features_check <ref-classes-features_check>`
       class, this variable identifies distribution features that must exist
       in the current configuration in order for the OpenEmbedded build
       system to build the recipe. In other words, if the
       ``REQUIRED_DISTRO_FEATURES`` variable lists a feature that does not
-      appear in ``DISTRO_FEATURES`` within the current configuration, an
-      error occurs and the build stops.
+      appear in ``DISTRO_FEATURES`` within the current configuration, then
+      the recipe will be skipped, and if the build system attempts to build
+      the recipe then an error will be triggered.
 
    :term:`RM_WORK_EXCLUDE`
       With ``rm_work`` enabled, this variable specifies a list of recipes

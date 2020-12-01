@@ -23,8 +23,8 @@ logger      = logging.getLogger("BitBake")
 parselog    = logging.getLogger("BitBake.Parsing")
 
 class ConfigParameters(object):
-    def __init__(self, argv=sys.argv):
-        self.options, targets = self.parseCommandLine(argv)
+    def __init__(self, argv=None):
+        self.options, targets = self.parseCommandLine(argv or sys.argv)
         self.environment = self.parseEnvironment()
 
         self.options.pkgs_to_build = targets or []
@@ -209,7 +209,7 @@ def findConfigFile(configfile, data):
     return None
 
 #
-# We search for a conf/bblayers.conf under an entry in BBPATH or in cwd working 
+# We search for a conf/bblayers.conf under an entry in BBPATH or in cwd working
 # up to /. If that fails, we search for a conf/bitbake.conf in BBPATH.
 #
 

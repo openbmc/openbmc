@@ -43,7 +43,7 @@
 #                          QB_NETWORK_DEVICE_prepend might be used, since Qemu enumerates the eth*
 #                          devices in reverse order to -device arguments.
 #
-# QB_TAP_OPT: netowrk option for 'tap' mode, e.g.,
+# QB_TAP_OPT: network option for 'tap' mode, e.g.,
 #             "-netdev tap,id=net0,ifname=@TAP@,script=no,downscript=no"
 #              Note, runqemu will replace "@TAP@" with the one which is used, such as tap0, tap1 ...
 #

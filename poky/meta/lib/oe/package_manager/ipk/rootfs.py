@@ -8,7 +8,7 @@ import shutil
 from oe.rootfs import Rootfs
 from oe.manifest import Manifest
 from oe.utils import execute_pre_post_process
-from oe.package_manager.ipk.manifest import OpkgManifest
+from oe.package_manager.ipk.manifest import PkgManifest
 from oe.package_manager.ipk import OpkgPM
 
 class DpkgOpkgRootfs(Rootfs):
@@ -121,12 +121,12 @@ class DpkgOpkgRootfs(Rootfs):
 
             num += 1
 
-class OpkgRootfs(DpkgOpkgRootfs):
+class PkgRootfs(DpkgOpkgRootfs):
     def __init__(self, d, manifest_dir, progress_reporter=None, logcatcher=None):
-        super(OpkgRootfs, self).__init__(d, progress_reporter, logcatcher)
+        super(PkgRootfs, self).__init__(d, progress_reporter, logcatcher)
         self.log_check_regex = '(exit 1|Collected errors)'
 
-        self.manifest = OpkgManifest(d, manifest_dir)
+        self.manifest = PkgManifest(d, manifest_dir)
         self.opkg_conf = self.d.getVar("IPKGCONF_TARGET")
         self.pkg_archs = self.d.getVar("ALL_MULTILIB_PACKAGE_ARCHS")
 

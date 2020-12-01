@@ -4,8 +4,6 @@
 The Yocto Project Test Environment Manual
 *****************************************
 
-.. _test-welcome:
-
 Welcome
 =======
 
@@ -44,8 +42,6 @@ engineers:
    independent of any CI system, which means the code can work `Buildbot <https://docs.buildbot.net/0.9.15.post1/>`__,
    Jenkins, or others. This repository has a branch per release of the
    project defining the tests to run on a per release basis.
-
-.. _test-yocto-project-autobuilder-overview:
 
 Yocto Project Autobuilder Overview
 ==================================
@@ -87,8 +83,6 @@ topology that includes a controller and a cluster of workers:
 
 .. image:: figures/ab-test-cluster.png
    :align: center
-
-.. _test-project-tests:
 
 Yocto Project Tests - Types of Testing Overview
 ===============================================
@@ -168,8 +162,6 @@ thefollowing types of tests:
    software are available and whether we can automatically upgrade to
    those new versions. If so, this target emails the maintainers with a
    patch to let them know this is possible.
-
-.. _test-test-mapping:
 
 How Tests Map to Areas of Code
 ==============================
@@ -326,8 +318,6 @@ directory at ``meta/lib/oeqa/selftest/cases`` directory.
 For oe-selftest. bitbake testcases reside in the ``lib/bb/tests/``
 directory.
 
-.. _bitbake-selftest-example:
-
 ``bitbake-selftest``
 --------------------
 
@@ -353,8 +343,6 @@ is found.
 Bitbake selftests are straightforward python unittest. Refer to the
 Python unittest documentation for additional information on writing
 these tests at: https://docs.python.org/3/library/unittest.html.
-
-.. _oe-selftest-example:
 
 ``oe-selftest``
 ---------------
@@ -399,8 +387,6 @@ builds. There is no data store available for these tests since the tests
 launch the ``bitbake`` command and exist outside of its context. As a
 result, common bitbake library functions (bb.\*) are also unavailable.
 
-.. _testimage-example:
-
 ``testimage``
 -------------
 
@@ -428,8 +414,6 @@ To ensure certain test or package dependencies are met, you can use the
 ``OETestDepends`` and ``OEHasPackage`` decorators. For example, the test
 in this example would only make sense if python3-core is installed in
 the image.
-
-.. _testsdk_ext-example:
 
 ``testsdk_ext``
 ---------------
@@ -463,8 +447,6 @@ In this example, the ``devtool``
 command is tested to see whether a sample application can be built with
 the ``devtool build`` command within the eSDK.
 
-.. _testsdk-example:
-
 ``testsdk``
 -----------
 
@@ -487,8 +469,6 @@ following::
 In this example, if nativesdk-python3-core has been installed into the SDK, the code runs
 the python3 interpreter with a basic command to check it is working
 correctly. The test would only run if python3 is installed in the SDK.
-
-.. _oe-build-perf-test-example:
 
 ``oe-build-perf-test``
 ----------------------
@@ -516,8 +496,6 @@ resource utilisation as that happens. An example from
 This example shows how three specific parsing timings are
 measured, with and without various caches, to show how BitBake's parsing
 performance trends over time.
-
-.. _test-writing-considerations:
 
 Considerations When Writing Tests
 =================================

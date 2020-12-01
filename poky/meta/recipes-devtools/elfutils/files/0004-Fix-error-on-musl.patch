@@ -1,4 +1,4 @@
-From 48b769ab692c8f02c1ae467229fe3404f662098a Mon Sep 17 00:00:00 2001
+From d3dc5f98f653342af97ebfbdf3479ee1f0d0cf38 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Wed, 1 May 2019 22:15:03 +0100
 Subject: [PATCH] Fix error on musl:

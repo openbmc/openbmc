@@ -449,9 +449,7 @@ class Cache(NoCache):
         return cachesize
 
     def load_cachefile(self, progress):
-        cachesize = self.cachesize()
         previous_progress = 0
-        previous_percent = 0
 
         for cache_class in self.caches_array:
             cachefile = self.getCacheFile(cache_class.cachefile)
@@ -815,10 +813,6 @@ class MulticonfigCache(Mapping):
     def __iter__(self):
         for k in self.__caches:
             yield k
-
-    def keys(self):
-        return self.__caches[key]
-
 
 def init(cooker):
     """

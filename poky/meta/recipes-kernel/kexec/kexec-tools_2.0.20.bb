@@ -21,6 +21,7 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/utils/kernel/kexec/kexec-tools-${PV}.tar.gz
            file://0006-kexec-arm-undefine-__NR_kexec_file_load-for-arm.patch \
            file://0007-kexec-un-break-the-build-on-32-bit-x86.patch \
            file://0001-kexec-Fix-build-with-fno-common.patch \
+           file://0001-arm64-kexec-disabled-check-if-kaslr-seed-dtb-propert.patch \
            "
 
 SRC_URI[md5sum] = "46724b67f32501c5d3e778161347cad9"

@@ -1,0 +1,27 @@
+From ffb6ebdb42590cb9f7d3f5177b7b820a9edc4c81 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Sun, 18 Oct 2020 23:40:42 +0200
+Subject: [PATCH] src/compress.c: correct header define for xz/lzma
+
+Upstream-Status: Submitted [https://github.com/file/file/pull/98]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ src/compress.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/compress.c b/src/compress.c
+index 67f21583..9670b72c 100644
+--- a/src/compress.c
++++ b/src/compress.c
+@@ -71,7 +71,7 @@ typedef void (*sig_t)(int);
+ #include <bzlib.h>
+ #endif
+ 
+-#if defined(HAVE_XZLIB_H) && defined(XZLIBSUPPORT)
++#if defined(HAVE_LZMA_H) && defined(XZLIBSUPPORT)
+ #define BUILTIN_XZLIB
+ #include <lzma.h>
+ #endif
+-- 
+2.28.0
+

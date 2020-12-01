@@ -4,8 +4,6 @@
 Yocto Project Profiling and Tracing Manual
 ******************************************
 
-.. _profile-intro:
-
 Introduction
 ============
 
@@ -29,8 +27,6 @@ please see the documentation and/or websites listed for each tool.
 The final section of this 'HOWTO' is a collection of real-world examples
 which we'll be continually adding to as we solve more problems using the
 tools - feel free to add your own examples to the list!
-
-.. _profile-manual-general-setup:
 
 General Setup
 =============

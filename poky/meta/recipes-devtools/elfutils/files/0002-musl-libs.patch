@@ -1,4 +1,4 @@
-From 9a57efb0f826a70ae360aa55504ee2de656b92b6 Mon Sep 17 00:00:00 2001
+From 2e1f8ca0b67c1d1991c14d509938c347e09bae94 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 23 Aug 2019 10:18:47 +0800
 Subject: [PATCH] musl-libs

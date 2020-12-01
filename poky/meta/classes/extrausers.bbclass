@@ -46,6 +46,9 @@ set_user_group () {
 			usermod)
 				perform_usermod "${IMAGE_ROOTFS}" "-R ${IMAGE_ROOTFS} $opts"
 				;;
+			passwd-expire)
+				perform_passwd_expire "${IMAGE_ROOTFS}" "$opts"
+				;;
 			groupmod)
 				perform_groupmod "${IMAGE_ROOTFS}" "-R ${IMAGE_ROOTFS} $opts"
 				;;

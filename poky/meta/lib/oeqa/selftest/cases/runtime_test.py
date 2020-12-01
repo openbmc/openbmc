@@ -384,7 +384,7 @@ KERNEL_EXTRA_FEATURES_append = " features/debug/debug-kernel.scc"
 KERNEL_EXTRA_FEATURES_append = " features/systemtap/systemtap.scc"
 
 # add systemtap run-time into target image if it is not there yet
-IMAGE_INSTALL_append = " systemtap"
+IMAGE_INSTALL_append = " systemtap-runtime"
 """
 
         def test_crosstap_helloworld(self):

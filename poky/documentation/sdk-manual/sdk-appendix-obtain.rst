@@ -4,8 +4,6 @@
 Obtaining the SDK
 *****************
 
-.. _sdk-locating-pre-built-sdk-installers:
-
 Locating Pre-Built SDK Installers
 =================================
 
@@ -248,7 +246,7 @@ Follow these steps to extract the root filesystem:
    installed the toolchain (e.g. ``poky_sdk``).
 
    Following is an example based on the toolchain installed in the
-   ":ref:`sdk-locating-pre-built-sdk-installers`" section:
+   ":ref:`sdk-manual/sdk-appendix-obtain:locating pre-built sdk installers`" section:
    ::
 
       $ source ~/poky_sdk/environment-setup-core2-64-poky-linux

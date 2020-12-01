@@ -1,0 +1,81 @@
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+From 52d603212173d4502800bf746436a93f806a8898 Mon Sep 17 00:00:00 2001
+From: Allen Winter <allen.winter@kdab.com>
+Date: Sat, 31 Oct 2020 17:38:01 -0400
+Subject: [PATCH] Fix build with icu-68.1
+
+Use stdbool.h to define true and false when possible
+
+Issue#448
+---
+ ConfigureChecks.cmake   |  1 +
+ config.h.cmake          |  3 +++
+ src/libical/icalrecur.c | 10 ++++++++--
+ 3 files changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/ConfigureChecks.cmake b/ConfigureChecks.cmake
+index e4d0e2ec..bba33fa9 100644
+--- a/ConfigureChecks.cmake
++++ b/ConfigureChecks.cmake
+@@ -10,6 +10,7 @@ check_include_files(sys/utsname.h HAVE_SYS_UTSNAME_H)
+ check_include_files(fcntl.h HAVE_FCNTL_H)
+ check_include_files(unistd.h HAVE_UNISTD_H)
+ check_include_files(wctype.h HAVE_WCTYPE_H)
++check_include_files(stdbool.h HAVE_STDBOOL_H)
+ 
+ include(CheckFunctionExists)
+ if(WIN32 AND MSVC)
+diff --git a/config.h.cmake b/config.h.cmake
+index 8fd3421b..c8008692 100644
+--- a/config.h.cmake
++++ b/config.h.cmake
+@@ -39,6 +39,9 @@
+ /* Define to 1 if you have the <dirent.h> header file. */
+ #cmakedefine HAVE_DIRENT_H 1
+ 
++/* Define to 1 if you have the <stdbool.h> header file. */
++#cmakedefine HAVE_STDBOOL_H 1
++
+ /* Define if we have pthread. */
+ #cmakedefine HAVE_PTHREAD_ATTR_GET_NP 1
+ #cmakedefine HAVE_PTHREAD_GETATTR_NP 1
+diff --git a/src/libical/icalrecur.c b/src/libical/icalrecur.c
+index 73178450..b3f054b8 100644
+--- a/src/libical/icalrecur.c
++++ b/src/libical/icalrecur.c
+@@ -145,6 +145,12 @@
+ #if defined(HAVE_LIBICU)
+ #include <unicode/ucal.h>
+ #include <unicode/ustring.h>
++#if defined(HAVE_STDBOOL_H)
++#include <stdbool.h>
++#else
++#define false 0
++#define true 1
++#endif
+ #define RSCALE_IS_SUPPORTED 1
+ #else
+ #define RSCALE_IS_SUPPORTED 0
+@@ -1018,7 +1024,7 @@ icalarray *icalrecurrencetype_rscale_supported_calendars(void)
+ 
+     calendars = icalarray_new(sizeof(const char **), 20);
+ 
+-    en = ucal_getKeywordValuesForLocale("calendar", NULL, FALSE, &status);
++    en = ucal_getKeywordValuesForLocale("calendar", NULL, false, &status);
+     while ((cal = uenum_next(en, NULL, &status))) {
+         cal = icalmemory_tmp_copy(cal);
+         icalarray_append(calendars, &cal);
+@@ -1411,7 +1417,7 @@ static int initialize_rscale(icalrecur_iterator *impl)
+         }
+ 
+         /* Check if specified calendar is supported */
+-        en = ucal_getKeywordValuesForLocale("calendar", NULL, FALSE, &status);
++        en = ucal_getKeywordValuesForLocale("calendar", NULL, false, &status);
+         while ((cal = uenum_next(en, NULL, &status))) {
+             if (!strcmp(cal, rule.rscale)) {
+                 is_hebrew = !strcmp(rule.rscale, "hebrew");
+-- 
+2.25.1
+

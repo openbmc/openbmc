@@ -1,4 +1,4 @@
-From 8ee7806ad2d5606967f7a1529a113fb9d1a386de Mon Sep 17 00:00:00 2001
+From b145ab4273c59f4f908cdaff9e267241bd970e93 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 3 Feb 2020 17:06:27 -0800
 Subject: [PATCH] Enable THREADS_PREFER_PTHREAD_FLAG
@@ -13,26 +13,26 @@ missing atomic primitives.
 
 Upstream-Status: Submitted [https://trac.webkit.org/changeset/231843/webkit]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
- Source/cmake/OptionsGTK.cmake     | 2 ++
+ Source/cmake/OptionsGTK.cmake     | 1 +
  Source/cmake/OptionsJSCOnly.cmake | 1 +
- 2 files changed, 3 insertions(+)
+ 2 files changed, 2 insertions(+)
 
 diff --git a/Source/cmake/OptionsGTK.cmake b/Source/cmake/OptionsGTK.cmake
-index d3beef19..6a92856f 100644
+index 8732e935..9b4fbae7 100644
 --- a/Source/cmake/OptionsGTK.cmake
 +++ b/Source/cmake/OptionsGTK.cmake
-@@ -17,6 +17,8 @@ set(WEBKITGTK_HEADER_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}/webkitgtk-${WEBKIT
- set(INTROSPECTION_INSTALL_GIRDIR "${CMAKE_INSTALL_FULL_DATADIR}/gir-1.0")
- set(INTROSPECTION_INSTALL_TYPELIBDIR "${LIB_INSTALL_DIR}/girepository-1.0")
- 
+@@ -32,6 +32,7 @@ set(USER_AGENT_BRANDING "" CACHE STRING "Branding to add to user agent string")
+ if (USER_AGENT_BRANDING)
+     add_definitions(-DUSER_AGENT_BRANDING="${USER_AGENT_BRANDING}")
+ endif ()
 +set(THREADS_PREFER_PTHREAD_FLAG ON)
-+
+ 
  find_package(Cairo 1.14.0 REQUIRED)
  find_package(Fontconfig 2.8.0 REQUIRED)
- find_package(Freetype 2.4.2 REQUIRED)
 diff --git a/Source/cmake/OptionsJSCOnly.cmake b/Source/cmake/OptionsJSCOnly.cmake
-index b2e87418..326ade23 100644
+index 316c6240..2f712602 100644
 --- a/Source/cmake/OptionsJSCOnly.cmake
 +++ b/Source/cmake/OptionsJSCOnly.cmake
 @@ -1,3 +1,4 @@
@@ -40,6 +40,3 @@ index b2e87418..326ade23 100644
  find_package(Threads REQUIRED)
  
  if (MSVC)
--- 
-2.25.0
-

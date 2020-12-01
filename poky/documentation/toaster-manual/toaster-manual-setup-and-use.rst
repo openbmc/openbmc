@@ -121,8 +121,6 @@ can set the ``TOASTER_DIR`` environment variable, which takes precedence
 over your current working directory. Setting this environment variable
 causes Toaster to create and use ``$TOASTER_DIR./_toaster_clones``.
 
-.. _toaster-the-build-directory:
-
 The Build Directory
 ===================
 
@@ -134,8 +132,6 @@ directories to be in a particular location, you can set the
 ``TOASTER_DIR`` environment variable, which takes precedence over your
 current working directory. Setting this environment variable causes
 Toaster to use ``$TOASTER_DIR/build`` as the build directory.
-
-.. _toaster-creating-a-django-super-user:
 
 Creating a Django Superuser
 ===========================
@@ -186,8 +182,6 @@ You can use the Django administration interface to set Toaster configuration
 parameters such as the build directory, layer sources, default variable
 values, and BitBake versions.
 
-.. _toaster-setting-up-a-production-instance-of-toaster:
-
 Setting Up a Production Instance of Toaster
 ===========================================
 
@@ -196,8 +190,6 @@ instance with remote users, multiple users, or both. The production
 instance is also the setup that can handle heavier loads on the web
 service. Use the instructions in the following sections to set up
 Toaster to run builds through the Toaster web interface.
-
-.. _toaster-production-instance-requirements:
 
 Requirements
 ------------
@@ -229,8 +221,6 @@ Be sure you meet the following requirements:
 -  If you are using openSUSE, run the following::
 
       $ sudo zypper install apache2 apache2-mod_wsgi-python3 python3-pip mariadb mariadb-client python3-devel
-
-.. _toaster-installation-steps:
 
 Installation
 ------------
@@ -504,8 +494,6 @@ The Toaster web interface allows you to do the following:
 -  See performance information such as build time, task time, CPU usage,
    and disk I/O.
 
-.. _web-interface-videos:
-
 Toaster Web Interface Videos
 ----------------------------
 
@@ -550,8 +538,6 @@ Following are several videos that show how to use the Toaster GUI:
 -  *Performance Data:* This
    `video <https://www.youtube.com/watch?v=qWGMrJoqusQ>`__ shows the
    build performance data provided by Toaster.
-
-.. _a-note-on-the-local-yocto-project-release:
 
 Additional Information About the Local Yocto Project Release
 ------------------------------------------------------------
@@ -603,8 +589,6 @@ them into your Toaster project, using the "Import layer" page.
 .. image:: figures/import-layer.png
    :align: center
    :scale: 75%
-
-.. _toaster-web-interface-preferred-version:
 
 Building a Specific Recipe Given Multiple Versions
 --------------------------------------------------
