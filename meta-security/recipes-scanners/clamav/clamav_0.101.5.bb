@@ -86,7 +86,7 @@ do_install_append_class-target () {
 
     install -m 644 ${WORKDIR}/clamd.conf ${D}/${sysconfdir}
     install -m 644 ${WORKDIR}/freshclam.conf ${D}/${sysconfdir}
-    install -m 0644 ${WORKDIR}/volatiles.03_clamav  ${D}${sysconfdir}/default/volatiles/volatiles.03_clamav
+    install -m 0644 ${WORKDIR}/volatiles.03_clamav  ${D}${sysconfdir}/default/volatiles/03_clamav
     sed -i -e 's#${STAGING_DIR_HOST}##g' ${D}${libdir}/pkgconfig/libclamav.pc
     rm ${D}/${libdir}/libclamav.so
     if [ "${INSTALL_CLAMAV_CVD}" = "1" ]; then

@@ -34,7 +34,6 @@ local_conf_header:
     CONF_VERSION = "1"
     SOURCE_MIRROR_URL = "http://downloads.yoctoproject.org/mirror/sources/"
     SSTATE_MIRRORS = "file://.* http://sstate.yoctoproject.org/dev/PATH;downloadfilename=PATH \n"
-    SSTATE_DIR = "/home/srv/sstate/master"
     DL_DIR = "/home/srv/downloads/master"
     BB_HASHSERVE = "auto"
     BB_SIGNATURE_HANDLER = "OEEquivHash"
