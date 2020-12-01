@@ -10,6 +10,8 @@ inherit setuptools3 gnomebase gobject-introspection
 
 DEPENDS += "lcms"
 
+CFLAGS_append_class-native = " -std=gnu99"
+
 # https://bugs.llvm.org/show_bug.cgi?id=45555
 CFLAGS_append_toolchain-clang_mipsarch = " -ffp-exception-behavior=ignore "
 CFLAGS_append_toolchain-clang_riscv64 = " -ffp-exception-behavior=ignore "

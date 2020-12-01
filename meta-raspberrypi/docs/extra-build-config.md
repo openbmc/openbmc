@@ -1,6 +1,6 @@
 # Optional build configuration
 
-There are a set of ways in which a user can influence different paramenters of
+There are a set of ways in which a user can influence different parameters of
 the build. We list here the ones that are closely related to this BSP or
 specific to it. For the rest please check:
 <http://www.yoctoproject.org/docs/latest/ref-manual/ref-manual.html>
@@ -37,7 +37,7 @@ By default, each machine uses `vc4` for graphics. This will in turn sets mesa as
 
 ## Add purchased license codecs
 
-To add you own licenses use variables `KEY_DECODE_MPG2` and `KEY_DECODE_WVC1` in
+To add your own licenses use variables `KEY_DECODE_MPG2` and `KEY_DECODE_WVC1` in
 local.conf. Example:
 
     KEY_DECODE_MPG2 = "12345678"
@@ -77,7 +77,7 @@ To remove (or adjust) this delay set these variables in local.conf:
 ## Set overclocking options
 
 The Raspberry Pi can be overclocked. As of now overclocking up to the "Turbo
-Mode" is officially supported by the raspbery and does not void warranty. Check
+Mode" is officially supported by the Raspberry Pi and does not void warranty. Check
 the config.txt for a detailed description of options and modes. The following
 variables are supported in local.conf: `ARM_FREQ`, `GPU_FREQ`, `CORE_FREQ`,
 `SDRAM_FREQ` and `OVER_VOLTAGE`.
@@ -172,6 +172,31 @@ To build an initramfs image:
   - `INITRAMFS_MAXSIZE = "315400"`
   - `IMAGE_FSTYPES_pn-${INITRAMFS_IMAGE} = "${INITRAMFS_FSTYPES}"`
 
+## Including additional files in the SD card image boot partition
+
+The SD card image class supports adding extra files into the boot
+partition, where the files are copied from either the image root
+partition or from the build image deploy directory.
+
+To copy files that are present in the root partition into boot,
+FATPAYLOAD is a simple space-separated list of files to be copied:
+
+    FATPAYLOAD = "/boot/example1 /boot/example2"
+
+To copy files from the image deploy directory, the files should be
+listed in the DEPLOYPAYLOAD as a space-separated list of entries.
+Each entry lists a file to be copied, and an optional destination
+filename can be specified by supplying it after a colon separator.
+
+    DEPLOYPAYLOAD = "example1-${MACHINE}:example1 example2"
+
+Files that are to be included from the deploy directory will be produced
+by tasks that image building task must depend upon, to ensure that the
+files are available when they are needed, so these component deploy
+tasks must be added to: RPI_SDIMG_EXTRA_DEPENDS.
+
+    RPI_SDIMG_EXTRA_DEPENDS_append = " example:do_deploy"
+
 ## Enable SPI bus
 
 When using device tree kernels, set this variable to enable the SPI bus:
@@ -224,7 +249,7 @@ Screen LCD, HDMI interface (<http://www.waveshare.com/7inch-HDMI-LCD-C.htm>) Rev
 RaspberryPi 0, 1, 2 and CM will have UART console enabled by default.
 
 RaspberryPi 0 WiFi and 3 does not have the UART enabled by default because this
-needs a fixed core frequency and enable_uart wil set it to the minimum. Certain
+needs a fixed core frequency and enable_uart will set it to the minimum. Certain
 operations - 60fps h264 decode, high quality deinterlace - which aren't
 performed on the ARM may be affected, and we wouldn't want to do that to users
 who don't want to use the serial port. Users who want serial console support on
@@ -252,14 +277,39 @@ When using device tree kernels, set this variable to enable the 802.15.4 hat:
 
 See: <https://openlabs.co/OSHW/Raspberry-Pi-802.15.4-radio>
 
-## Enable CAN with Pican2
+## Enable CAN
 
-In order to use Pican2 CAN module, set the following variables:
+In order to use CAN with an MCP2515-based module, set the following variables:
 
 	ENABLE_SPI_BUS = "1"
 	ENABLE_CAN = "1"
 
-See: <http://skpang.co.uk/catalog/pican2-canbus-board-for-raspberry-pi-23-p-1475.html>
+In case of dual CAN module (e.g. PiCAN2 Duo), set following variables instead:
+
+    ENABLE_SPI_BUS = "1"
+	ENABLE_DUAL_CAN = "1"
+
+Some modules may require setting the frequency of the crystal oscillator used on the particular board. The frequency is usually marked on the package of the crystal. By default, it is set to 16 MHz. To change that to 8 MHz, the following variable also has to be set:
+
+    CAN_OSCILLATOR="8000000"
+
+Tested modules:
+
+* PiCAN2 (16 MHz crystal): <http://skpang.co.uk/catalog/pican2-canbus-board-for-raspberry-pi-23-p-1475.html>
+* WaveShare RS485 CAN HAT (8 MHz or 12 MHz crystal): <https://www.waveshare.com/rs485-can-hat.htm>
+* PiCAN2 Duo (16 MHz crystal): <http://skpang.co.uk/catalog/pican2-duo-canbus-board-for-raspberry-pi-23-p-1480.html>
+
+## Enable infrared
+
+Users who want to enable infrared support, for example for using LIRC (Linux
+Infrared Remote Control), have to explicitly set in local.conf:
+
+    ENABLE_IR = "1"
+
+This will add device tree overlays gpio-ir and gpio-ir-tx to config.txt.
+Appropriate kernel modules will be also included in the image. By default the
+GPIO pin for gpio-ir is set to 18 and the pin for gpio-ir-tx is 17. Both pins
+can be easily changed by modifying variables `GPIO_IR` and `GPIO_IR_TX`.
 
 ## Manual additions to config.txt
 

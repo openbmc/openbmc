@@ -9,13 +9,6 @@ DEPENDS="coreutils popt"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-# When updating logrotate to latest upstream, SRC_URI should point to
-# a proper release tarball from https://github.com/logrotate/logrotate/releases
-# and we have to take the snapshot for now because there is no such
-# tarball available for 3.9.1.
-
-S = "${WORKDIR}/${BPN}-${PV}"
-
 UPSTREAM_CHECK_URI = "https://github.com/${BPN}/${BPN}/releases"
 UPSTREAM_CHECK_REGEX = "logrotate-(?P<pver>\d+(\.\d+)+).tar"
 

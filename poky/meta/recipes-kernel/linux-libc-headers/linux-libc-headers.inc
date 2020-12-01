@@ -16,7 +16,7 @@ LICENSE = "GPLv2"
 # and have a machine specific libc.
 #
 # But you have some kernel headers you need for some driver? That is fine
-# but get them from STAGING_KERNEL_DIR where the kernel installs itself.
+# but get them from STAGING_KERNEL_BUILDDIR where the kernel installs itself.
 # This will make the package using them machine specific but this is much
 # better than having a machine specific C library. This does mean your
 # recipe needs a

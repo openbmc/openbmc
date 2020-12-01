@@ -31,8 +31,8 @@ index 1007abd..5380982 100644
  #endif
  #include <glib/gstdio.h>
  
-@@ -1158,7 +1160,15 @@ get_gio_module_dir (void)
- #endif
+@@ -1149,7 +1151,15 @@ get_gio_module_dir (void)
+                                      NULL);
        g_free (install_dir);
  #else
 -      module_dir = g_strdup (GIO_MODULE_DIR);

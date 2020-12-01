@@ -4,7 +4,7 @@
 SUMMARY = "Tools for managing Linux kernel modules"
 DESCRIPTION = "kmod is a set of tools to handle common tasks with Linux kernel modules like \
                insert, remove, list, check properties, resolve dependencies and aliases."
-HOMEPAGE = "http://packages.profusion.mobi/kmod/"
+HOMEPAGE = "http://kernel.org/pub/linux/utils/kernel/kmod/"
 LICENSE = "GPL-2.0+ & LGPL-2.1+"
 LICENSE_libkmod = "LGPL-2.1+"
 SECTION = "base"

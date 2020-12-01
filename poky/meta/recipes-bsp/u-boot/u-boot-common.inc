@@ -15,6 +15,7 @@ PE = "1"
 SRCREV = "303f8fed261020c1cb7da32dad63b610bf6873dd"
 
 SRC_URI = "git://git.denx.de/u-boot.git \
+           file://remove-redundant-yyloc-global.patch \
           "
 
 S = "${WORKDIR}/git"

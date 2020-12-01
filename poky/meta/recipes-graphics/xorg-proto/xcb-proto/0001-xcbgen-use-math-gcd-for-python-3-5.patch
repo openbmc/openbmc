@@ -1,0 +1,40 @@
+From 426ae35bee1fa0fdb8b5120b1dcd20cee6e34512 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Bj=C3=B6rn=20Esser?= <besser82@fedoraproject.org>
+Date: Mon, 1 Jun 2020 12:24:16 +0200
+Subject: [PATCH] xcbgen: Use math.gcd() for Python >= 3.5.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+fractions.gcd() has been deprecated since Python 3.5, and
+was finally dropped in Python 3.9.  It is recommended to
+use math.gcd() instead.
+
+Signed-off-by: Björn Esser <besser82@fedoraproject.org>
+Upstream-Status: Backport [https://gitlab.freedesktop.org/xorg/proto/xcbproto/-/commit/426ae35bee1fa0fdb8b5120b1dcd20cee6e34512]
+Signed-off-by: Richard Leitner <richard.leitner@skidata.com>
+---
+ xcbgen/align.py | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/xcbgen/align.py b/xcbgen/align.py
+index d4c12ee..5c4f517 100644
+--- a/xcbgen/align.py
++++ b/xcbgen/align.py
+@@ -2,7 +2,12 @@
+ This module contains helper classes for alignment arithmetic and checks
+ '''
+ 
+-from fractions import gcd
++from sys import version_info
++
++if version_info[:2] >= (3, 5):
++    from math import gcd
++else:
++    from fractions import gcd
+ 
+ class Alignment(object):
+ 
+-- 
+GitLab
+

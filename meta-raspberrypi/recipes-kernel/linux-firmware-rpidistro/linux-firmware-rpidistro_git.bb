@@ -35,8 +35,8 @@ NO_GENERIC_LICENSE[WHENCE] = "WHENCE"
 
 SRC_URI = "git://github.com/RPi-Distro/firmware-nonfree"
 
-SRCREV = "616fc2dd4df421e3974179d9e46d45e7006aeb28"
-PV = "20190114-1+rpt6"
+SRCREV = "98e815735e2c805d65994ccc608f399595b74438"
+PV = "20190114-1+rpt8"
 
 S = "${WORKDIR}/git"
 
@@ -59,6 +59,11 @@ do_install() {
     for fw in brcmfmac43430-sdio brcmfmac43455-sdio ; do
         install -m 0644 brcm/${fw}.* ${D}${nonarch_base_libdir}/firmware/brcm/
     done
+    # add compat links. Fixes errors like
+    # brcmfmac mmc1:0001:1: Direct firmware load for brcm/brcmfmac43455-sdio.raspberrypi,4-model-b.txt failed with error -2
+    ln -s brcmfmac43455-sdio.txt ${D}${nonarch_base_libdir}/firmware/brcm/brcmfmac43455-sdio.raspberrypi,4-model-b.txt
+    ln -s brcmfmac43455-sdio.txt ${D}${nonarch_base_libdir}/firmware/brcm/brcmfmac43455-sdio.raspberrypi,3-model-b-plus.txt
+    ln -s brcmfmac43430-sdio.txt ${D}${nonarch_base_libdir}/firmware/brcm/brcmfmac43430-sdio.raspberrypi,3-model-b.txt
 }
 
 PACKAGES = "\

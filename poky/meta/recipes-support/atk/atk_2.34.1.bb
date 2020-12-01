@@ -1,6 +1,6 @@
 SUMMARY = "Accessibility toolkit for GNOME"
-HOMEPAGE = "http://live.gnome.org/GAP/"
-BUGTRACKER = "https://bugzilla.gnome.org/"
+HOMEPAGE = "https://wiki.gnome.org/Accessibility"
+BUGTRACKER = "https://gitlab.gnome.org/GNOME/atk/-/issues"
 SECTION = "x11/libs"
 
 LICENSE = "GPLv2+ & LGPLv2+"
@@ -18,4 +18,3 @@ SRC_URI[archive.md5sum] = "f60bbaf8bdd08b93d98736b54b2fc8e9"
 SRC_URI[archive.sha256sum] = "d4f0e3b3d21265fcf2bc371e117da51c42ede1a71f6db1c834e6976bb20997cb"
 
 BBCLASSEXTEND = "native nativesdk"
-

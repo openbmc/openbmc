@@ -34,6 +34,7 @@ SRC_URI = "https://download.tuxfamily.org/chrony/chrony-${PV}.tar.gz \
     file://chrony.conf \
     file://chronyd \
     file://arm_eabi.patch \
+    file://CVE-2020-14367.patch \
 "
 
 SRC_URI_append_libc-musl = " \

@@ -191,7 +191,9 @@ PACKAGES =+ "libcrypto libssl openssl-conf ${PN}-engines ${PN}-misc"
 
 FILES_libcrypto = "${libdir}/libcrypto${SOLIBS}"
 FILES_libssl = "${libdir}/libssl${SOLIBS}"
-FILES_openssl-conf = "${sysconfdir}/ssl/openssl.cnf"
+FILES_openssl-conf = "${sysconfdir}/ssl/openssl.cnf \
+                      ${libdir}/ssl-1.1/openssl.cnf* \
+                      "
 FILES_${PN}-engines = "${libdir}/engines-1.1"
 FILES_${PN}-misc = "${libdir}/ssl-1.1/misc"
 FILES_${PN} =+ "${libdir}/ssl-1.1/*"
@@ -201,6 +203,8 @@ CONFFILES_openssl-conf = "${sysconfdir}/ssl/openssl.cnf"
 
 RRECOMMENDS_libcrypto += "openssl-conf"
 RDEPENDS_${PN}-ptest += "openssl-bin perl perl-modules bash"
+
+RDEPENDS_${PN}-bin += "openssl-conf"
 
 BBCLASSEXTEND = "native nativesdk"
 

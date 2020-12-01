@@ -1,0 +1,83 @@
+From 19a6baf0b79346deb383bbd2b5b825d59add7d5d Mon Sep 17 00:00:00 2001
+From: Sakib Sajal <sakib.sajal@windriver.com>
+Date: Fri, 17 Jul 2020 17:27:21 +0000
+Subject: [PATCH] hwclock: make glibc 2.31 compatible
+
+NEWS for glibc version 2.31
+===========================
+
+Deprecated and removed features, and other changes affecting compatibility:
+
+* The settimeofday function can still be used to set a system-wide
+  time zone when the operating system supports it.  This is because
+  the Linux kernel reused the API, on some architectures, to describe
+  a system-wide time-zone-like offset between the software clock
+  maintained by the kernel, and the "RTC" clock that keeps time when
+  the system is shut down.
+
+  However, to reduce the odds of this offset being set by accident,
+  settimeofday can no longer be used to set the time and the offset
+  simultaneously.  If both of its two arguments are non-null, the call
+  will fail (setting errno to EINVAL).
+
+  Callers attempting to set this offset should also be prepared for
+  the call to fail and set errno to ENOSYS; this already happens on
+  the Hurd and on some Linux architectures.  The Linux kernel
+  maintainers are discussing a more principled replacement for the
+  reused API.  After a replacement becomes available, we will change
+  settimeofday to fail with ENOSYS on all platforms when its 'tzp'
+  argument is not a null pointer.
+
+  settimeofday itself is obsolescent according to POSIX.  Programs
+  that set the system time should use clock_settime and/or the adjtime
+  family of functions instead.  We may cease to make settimeofday
+  available to newly linked binaries after there is a replacement for
+  Linux's time-zone-like offset API.
+
+hwclock had two calls to settimeofday, in functions to_sys_clock and
+set_system_clock_timezone, where both the arguments to settimeofday
+were valid (non-null).
+Therefore, split the call, once for timezone and once for timeval.
+
+Fixes #12756
+
+Upstream-Status: Pending
+
+Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
+---
+ util-linux/hwclock.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/util-linux/hwclock.c b/util-linux/hwclock.c
+index 29f5102..088ab3b 100644
+--- a/util-linux/hwclock.c
++++ b/util-linux/hwclock.c
+@@ -131,8 +131,10 @@ static void to_sys_clock(const char **pp_rtcname, int utc)
+ 
+ 	tv.tv_sec = read_rtc(pp_rtcname, NULL, utc);
+ 	tv.tv_usec = 0;
+-	if (settimeofday(&tv, &tz))
+-		bb_perror_msg_and_die("settimeofday");
++	if (settimeofday(NULL, &tz))
++		bb_perror_msg_and_die("settimeofday: timezone");
++	if (settimeofday(&tv, NULL))
++		bb_perror_msg_and_die("settimeofday: timeval");
+ }
+ 
+ static void from_sys_clock(const char **pp_rtcname, int utc)
+@@ -283,8 +285,10 @@ static void set_system_clock_timezone(int utc)
+ 	gettimeofday(&tv, NULL);
+ 	if (!utc)
+ 		tv.tv_sec += tz.tz_minuteswest * 60;
+-	if (settimeofday(&tv, &tz))
+-		bb_perror_msg_and_die("settimeofday");
++	if (settimeofday(NULL, &tz))
++		bb_perror_msg_and_die("settimeofday: timezone");
++	if (settimeofday(&tv, NULL))
++		bb_perror_msg_and_die("settimeofday: timeval");
+ }
+ 
+ //usage:#define hwclock_trivial_usage
+-- 
+2.27.0
+

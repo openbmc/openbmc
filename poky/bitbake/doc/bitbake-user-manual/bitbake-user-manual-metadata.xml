@@ -432,7 +432,7 @@
                 The variable <filename>FOO</filename> becomes
                 "&nbsp;&nbsp;789&nbsp;123456&nbsp;&nbsp;&nbsp;&nbsp;"
                 and <filename>FOO2</filename> becomes
-                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;jkl&nbsp;&nbsp;abcdef&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;abcdef&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".
             </para>
 
             <para>
@@ -2526,6 +2526,9 @@
                 In the previous example, the <filename>do_packagedata</filename>
                 task of each item in <filename>RDEPENDS</filename> must have
                 completed before <filename>do_package_qa</filename> can execute.
+                Although <filename>RDEPENDS</filename> contains entries from the
+                runtime dependency namespace, BitBake knows how to map them back
+                to the build-time dependency namespace, in which the tasks are defined.
             </para>
         </section>
 
@@ -2562,15 +2565,17 @@
             </para>
 
             <para>
-                You might want to not only have BitBake look for
-                dependencies of those tasks, but also have BitBake look
-                for build-time and runtime dependencies of the dependent
-                tasks as well.
-                If that is the case, you need to reference the task name
-                itself in the task list:
+                BitBake allows a task to recursively depend on itself by
+                referencing itself in the task list:
                 <literallayout class='monospaced'>
      do_a[recrdeptask] = "do_a do_b"
                 </literallayout>
+                In the same way as before, this means that the <filename>do_a</filename>
+                and <filename>do_b</filename> tasks of the current recipe and all
+                recipes reachable (by way of dependencies) from the recipe
+                must run before the <filename>do_a</filename> task can run. In this
+                case BitBake will ignore the current recipe's <filename>do_a</filename>
+                task circular dependency on itself.
             </para>
         </section>
 

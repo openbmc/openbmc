@@ -11,4 +11,5 @@ inherit pypi setuptools3
 
 RDEPENDS_${PN} += "\
     ${PYTHON_PN}-datetime \
+    ${PYTHON_PN}-cryptography \
 "

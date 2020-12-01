@@ -62,6 +62,6 @@ pkg_postinst_${PN} () {
 	fi
 }
 
-FILES_${PN} += "${systemd_system_unitdir}"
+FILES_${PN} += "${systemd_system_unitdir} ${nonarch_base_libdir}/systemd"
 
 TARGET_CC_ARCH += "${LDFLAGS}"

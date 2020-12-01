@@ -8,4 +8,5 @@ SRC_URI += "file://arm-intrinsics.patch \
            file://0001-Don-t-set-up-arch-instruction-set-flags-we-do-that-o.patch \
            file://0001-dont-setup-compiler-flags-m32-m64.patch \
            file://0001-revert-cease-dependence-on-range.patch \
+           file://0001-added-typedef-executor_type.patch \
            "

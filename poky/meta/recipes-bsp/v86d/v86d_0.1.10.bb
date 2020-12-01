@@ -1,5 +1,5 @@
 SUMMARY = "User support binary for the uvesafb kernel module"
-HOMEPAGE = "http://dev.gentoo.org/~spock/projects/uvesafb/"
+HOMEPAGE = "https://tracker.debian.org/pkg/v86d"
 
 # the copyright info is at the bottom of README, expect break
 LICENSE = "GPLv2"

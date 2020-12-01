@@ -9,12 +9,12 @@ Dependencies
 This layer depends on:
 
   URI: git://git.openembedded.org/openembedded-core
-  branch: master
+  branch: dunfell
   revision: HEAD
   prio: default
 
   URI: git://git.openembedded.org/meta-openembedded/meta-oe
-  branch: master
+  branch: dunfell
   revision: HEAD
   prio: default
 
@@ -41,12 +41,12 @@ Maintenance
 Send pull requests, patches, comments or questions to yocto@yoctoproject.org
 
 When sending single patches, please using something like:
-'git send-email -1 --to yocto@yoctoproject.org --subject-prefix=meta-security][PATCH'
+'git send-email -1 --to yocto@yoctoproject.org --subject-prefix=meta-security][dunfell][PATCH'
 
 These values can be set as defaults for this repository:
 
 $ git config sendemail.to yocto@yoctoproject.org
-$ git config format.subjectPrefix meta-security][PATCH
+$ git config format.subjectPrefix meta-security][dunfell][PATCH
 
 Now you can just do 'git send-email origin/master' to send all local patches.
 

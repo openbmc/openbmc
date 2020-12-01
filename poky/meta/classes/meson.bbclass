@@ -68,6 +68,9 @@ def meson_operating_system(var, d):
     os = d.getVar(var)
     if "mingw" in os:
         return "windows"
+    # avoid e.g 'linux-gnueabi'
+    elif "linux" in os:
+        return "linux"
     else:
         return os
 

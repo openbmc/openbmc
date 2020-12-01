@@ -1,7 +1,7 @@
 SUMMARY = "Documentation generator for glib-based software"
 DESCRIPTION = "Gtk-doc is a set of scripts that extract specially formatted comments \
                from glib-based software and produce a set of html documentation files from them"
-HOMEPAGE = "http://www.gtk.org/gtk-doc/"
+HOMEPAGE = "https://www.gtk.org/docs/"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
@@ -59,4 +59,3 @@ gtkdoc_makefiles_sysroot_preprocess() {
            -e "s|GTKDOC_RUN =.*|GTKDOC_RUN = \$(top_builddir)/gtkdoc-qemuwrapper|" \
            ${SYSROOT_DESTDIR}${datadir}/gtk-doc/data/gtk-doc*make
 }
-

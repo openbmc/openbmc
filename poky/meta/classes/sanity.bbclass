@@ -769,8 +769,8 @@ def check_sanity_everybuild(status, d):
 
     # Check the Python version, we now have a minimum of Python 3.4
     import sys
-    if sys.hexversion < 0x03040000:
-        status.addresult('The system requires at least Python 3.4 to run. Please update your Python interpreter.\n')
+    if sys.hexversion < 0x030500F0:
+        status.addresult('The system requires at least Python 3.5 to run. Please update your Python interpreter.\n')
 
     # Check the bitbake version meets minimum requirements
     from distutils.version import LooseVersion
@@ -783,6 +783,12 @@ def check_sanity_everybuild(status, d):
     paths = d.getVar('PATH').split(":")
     if "." in paths or "./" in paths or "" in paths:
         status.addresult("PATH contains '.', './' or '' (empty element), which will break the build, please remove this.\nParsed PATH is " + str(paths) + "\n")
+
+    # Check whether 'inherit' directive is found (used for a class to inherit)
+    # in conf file it's supposed to be uppercase INHERIT
+    inherit = d.getVar('inherit')
+    if inherit:
+        status.addresult("Please don't use inherit directive in your local.conf. The directive is supposed to be used in classes and recipes only to inherit of bbclasses. Here INHERIT should be used.\n")
 
     # Check that the DISTRO is valid, if set
     # need to take into account DISTRO renaming DISTRO

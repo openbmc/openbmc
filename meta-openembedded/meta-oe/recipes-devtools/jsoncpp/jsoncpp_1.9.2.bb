@@ -8,6 +8,8 @@ HOMEPAGE = "https://github.com/open-source-parsers/jsoncpp"
 
 SECTION = "libs"
 
+PE = "1"
+
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=fa2a23dd1dc6c139f35105379d76df2b"
 

@@ -28,7 +28,7 @@ RDEPENDS_packagegroup-security-utils = "\
     python3-scapy \
     ding-libs \
     keyutils \
-    libseccomp \
+    ${@bb.utils.contains_any("TUNE_FEATURES", "riscv32 riscv64", "", " libseccomp",d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "sssd", "",d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "pax", "pax-utils", "",d)} \
     "
@@ -37,10 +37,9 @@ SUMMARY_packagegroup-security-scanners = "Security scanners"
 RDEPENDS_packagegroup-security-scanners = "\
     nikto \
     checksecurity \
-    clamav \
-    clamav-freshclam \
-    clamav-cvd \
+    ${@bb.utils.contains_any("TUNE_FEATURES", "riscv32 riscv64", "", " clamav clamav-freshclam clamav-cvd",d)} \
     "
+RDEPENDS_packagegroup-security-scanners_remove_libc-musl = "clamav clamav-freshclam clamav-cvd"
 
 SUMMARY_packagegroup-security-audit = "Security Audit tools "
 RDEPENDS_packagegroup-security-audit = " \
@@ -57,7 +56,7 @@ SUMMARY_packagegroup-security-ids = "Security Intrusion Detection systems"
 RDEPENDS_packagegroup-security-ids = " \
     tripwire \
     samhain-standalone \
-    suricata \
+    ${@bb.utils.contains_any("TUNE_FEATURES", "ppc7400 riscv32 riscv64", "", " suricata",d)} \
     "
 
 SUMMARY_packagegroup-security-mac = "Security Mandatory Access Control systems"

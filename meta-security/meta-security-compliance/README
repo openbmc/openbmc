@@ -9,16 +9,16 @@ Dependencies
 This layer depends on:
 
   URI: git://git.openembedded.org/bitbake
-  branch: master
+  branch: 1.48 
 
   URI: git://git.openembedded.org/openembedded-core
   layers: meta
-  branch: master
+  branch: dunfell
 
 or
 
   URI: git://git.yoctoproject.org/poky
-  branch: master
+  branch: dunfell
 
 
 
@@ -28,7 +28,7 @@ Maintenance
 Send pull requests, patches, comments or questions to yocto@yoctoproject.org
 
 When sending single patches, please using something like:
-'git send-email -1 --to yocto@yoctoproject.org --subject-prefix=meta-security-compliance][PATCH'
+'git send-email -1 --to yocto@yoctoproject.org --subject-prefix=meta-security-compliance][dunfell][PATCH'
 
 Layer Maintainer: Armin Kuster <akuster808@gmail.com>
 

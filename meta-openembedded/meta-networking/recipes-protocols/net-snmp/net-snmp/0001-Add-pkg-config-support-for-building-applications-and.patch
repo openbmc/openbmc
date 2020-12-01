@@ -1,4 +1,4 @@
-From aea8c2f0bf8004c8da8ca9acb04ab07798cd8068 Mon Sep 17 00:00:00 2001
+From 4bf83597379523032663c8e95b3786a217c9a849 Mon Sep 17 00:00:00 2001
 From: Hugh McMaster <hugh.mcmaster@outlook.com>
 Date: Wed, 3 Apr 2019 21:36:03 +1100
 Subject: [PATCH] Add pkg-config support for building applications and
@@ -10,10 +10,8 @@ The netsnmp-agent package should be used when building Net-SNMP subagents.
 Signed-off-by: Hugh McMaster <hugh.mcmaster@outlook.com>
 [ bvanassche: edited makefile code and .pc files; added ./configure changes ]
 
-
 Upstream-Status: Backport
 https://sourceforge.net/p/net-snmp/patches/_discuss/thread/a0d66e91dd/f940/attachment/0001-Add-pkg-config-support-for-building-applications-and.patch
-
 ---
  Makefile.in         |  2 ++
  Makefile.rules      | 30 ++++++++++++++++++++++++++----
@@ -26,7 +24,7 @@ https://sourceforge.net/p/net-snmp/patches/_discuss/thread/a0d66e91dd/f940/attac
  create mode 100644 netsnmp.pc.in
 
 diff --git a/Makefile.in b/Makefile.in
-index 9dbdde1353b1..ec972636c279 100644
+index 9dbdde1353..ec972636c2 100644
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -35,6 +35,7 @@ INSTALLBUILTHEADERS=include/net-snmp/net-snmp-config.h
@@ -46,7 +44,7 @@ index 9dbdde1353b1..ec972636c279 100644
  	rm -f include/net-snmp/agent/mib_module_config.h		\
  		include/net-snmp/agent/agent_module_config.h		\
 diff --git a/Makefile.rules b/Makefile.rules
-index 9e9e9009e5d2..e714f91e725e 100644
+index 9e9e9009e5..e714f91e72 100644
 --- a/Makefile.rules
 +++ b/Makefile.rules
 @@ -85,12 +85,14 @@ subdirs:
@@ -96,10 +94,10 @@ index 9e9e9009e5d2..e714f91e725e 100644
  # normal bin binaries
  #
 diff --git a/configure b/configure
-index 5ec44f5ce082..5103a4dc9d88 100755
+index cad6b74486..8909bffe05 100755
 --- a/configure
 +++ b/configure
-@@ -30422,6 +30422,8 @@ ac_config_files="$ac_config_files net-snmp-config:net-snmp-config.in"
+@@ -31717,6 +31717,8 @@ ac_config_files="$ac_config_files net-snmp-config:net-snmp-config.in"
  
  ac_config_files="$ac_config_files net-snmp-create-v3-user:net-snmp-create-v3-user.in"
  
@@ -108,7 +106,7 @@ index 5ec44f5ce082..5103a4dc9d88 100755
  ac_config_files="$ac_config_files dist/generation-scripts/gen-variables:dist/generation-scripts/gen-variables.in"
  
  ac_config_files="$ac_config_files local/snmpconf"
-@@ -31445,6 +31447,8 @@ do
+@@ -32740,6 +32742,8 @@ do
      "mibs/Makefile") CONFIG_FILES="$CONFIG_FILES mibs/Makefile:Makefile.top:mibs/Makefile.in:Makefile.rules" ;;
      "net-snmp-config") CONFIG_FILES="$CONFIG_FILES net-snmp-config:net-snmp-config.in" ;;
      "net-snmp-create-v3-user") CONFIG_FILES="$CONFIG_FILES net-snmp-create-v3-user:net-snmp-create-v3-user.in" ;;
@@ -118,10 +116,10 @@ index 5ec44f5ce082..5103a4dc9d88 100755
      "local/snmpconf") CONFIG_FILES="$CONFIG_FILES local/snmpconf" ;;
      "default") CONFIG_COMMANDS="$CONFIG_COMMANDS default" ;;
 diff --git a/configure.ac b/configure.ac
-index 4c4dce09d488..d62a02da5d88 100644
+index 1622b7c051..898b50f368 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -136,6 +136,7 @@ AC_CONFIG_FILES([net-snmp-config:net-snmp-config.in],
+@@ -118,6 +118,7 @@ AC_CONFIG_FILES([net-snmp-config:net-snmp-config.in],
  		[chmod +x net-snmp-config])
  AC_CONFIG_FILES([net-snmp-create-v3-user:net-snmp-create-v3-user.in],
  		[chmod +x net-snmp-create-v3-user])
@@ -131,7 +129,7 @@ index 4c4dce09d488..d62a02da5d88 100644
  
 diff --git a/netsnmp-agent.pc.in b/netsnmp-agent.pc.in
 new file mode 100644
-index 000000000000..3a1c77bbf814
+index 0000000000..3a1c77bbf8
 --- /dev/null
 +++ b/netsnmp-agent.pc.in
 @@ -0,0 +1,12 @@
@@ -149,7 +147,7 @@ index 000000000000..3a1c77bbf814
 +Libs.private: @LDFLAGS@ @LMIBLIBS@ @LAGENTLIBS@ @PERLLDOPTS_FOR_APPS@ @LNETSNMPLIBS@ @LIBS@
 diff --git a/netsnmp.pc.in b/netsnmp.pc.in
 new file mode 100644
-index 000000000000..0a1f5785a4f4
+index 0000000000..0a1f5785a4
 --- /dev/null
 +++ b/netsnmp.pc.in
 @@ -0,0 +1,12 @@
@@ -166,5 +164,5 @@ index 000000000000..0a1f5785a4f4
 +Libs: -L${libdir} -lnetsnmp
 +Libs.private: @LDFLAGS@ @LNETSNMPLIBS@ @LIBS@ @PERLLDOPTS_FOR_APPS@
 -- 
-2.21.0.196.g041f5ea1cf98
+2.26.2
 

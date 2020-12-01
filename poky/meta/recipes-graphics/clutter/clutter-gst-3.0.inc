@@ -6,6 +6,8 @@ inherit clutter features_check upstream-version-is-even gobject-introspection
 # depends on clutter-1.0 which depends on cogl-1.0
 REQUIRED_DISTRO_FEATURES ?= "opengl"
 
+export GST_PLUGIN_SCANNER_1_0="${S}/gst-plugin-scanner-dummy"
+
 SRC_URI += "file://0001-Install-example-binary-needed-for-core-image-clutter.patch"
 
 DEPENDS = "gstreamer1.0-plugins-base gstreamer1.0-plugins-bad clutter-1.0 libgudev"

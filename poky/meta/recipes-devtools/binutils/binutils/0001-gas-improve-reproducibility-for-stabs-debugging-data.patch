@@ -1,0 +1,32 @@
+From 96882eb9263b6b1c953e33a6764a83f4a87a9a41 Mon Sep 17 00:00:00 2001
+From: Denys Zagorui <dzagorui@cisco.com>
+Date: Mon, 9 Nov 2020 15:39:10 +0000
+Subject: [PATCH] gas: improve reproducibility for stabs debugging data format
+
+	* config/obj-elf (obj_elf_init_stab_section): Improve
+	reproducibility for stabs debugging data format
+
+Upstream-Status: Backport [https://sourceware.org/git/?p=binutils-gdb.git;a=commit;h=0541201782c006c09d029d18a45c6e743cfea906]
+---
+ gas/config/obj-elf.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/gas/config/obj-elf.c b/gas/config/obj-elf.c
+index 7cf921c051..92b55e06c2 100644
+--- a/gas/config/obj-elf.c
++++ b/gas/config/obj-elf.c
+@@ -2186,12 +2186,13 @@ obj_elf_init_stab_section (segT seg)
+   p = frag_more (12);
+   /* Zero it out.  */
+   memset (p, 0, 12);
+-  file = as_where (NULL);
++  file = remap_debug_filename (as_where (NULL));
+   stabstr_name = concat (segment_name (seg), "str", (char *) NULL);
+   stroff = get_stab_string_offset (file, stabstr_name, TRUE);
+   know (stroff == 1 || (stroff == 0 && file[0] == '\0'));
+   md_number_to_chars (p, stroff, 4);
+   seg_info (seg)->stabu.p = p;
++  xfree ((char *) file);
+ }
+ 
+ #endif

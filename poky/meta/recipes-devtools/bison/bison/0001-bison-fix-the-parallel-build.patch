@@ -1,0 +1,63 @@
+From e0dbcee6e25b3c0cb11a627bbfe3af45ef67ec30 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Thu, 14 May 2020 15:23:16 +0800
+Subject: [PATCH] bison: fix the parallel build
+
+Explicitly make the BUILT_SOURCES which
+are the generated headers such as stdio.h,
+fcntl.h and etc to be the dependencies of
+the gl_LIBOBJS such as libbison_a-sprintf.o,
+libbison_a-printf.o and etc to guarantee the
+BUILT_SOURCES is generated before begin to
+compile EXTRA_lib_libbison_a_SOURCES such as
+fprintf.c in parallel builid, otherwise there
+may come below error:
+ | muscle-tab.c:(.text+0x77a): undefined reference to `rpl_sprintf'
+
+It does the same for src_bison_OBJECTS and
+lib_libbison_a_OBJECTS to make sure BUILT_SOURCES
+generated before begin to compile src_bison_SOURCES
+which contains AnnotationList.c and etc.
+
+BTW, the MOSTLYCLEANFILES also contains the
+generated header needs to be created early
+in the build process, so add it also in to
+avoid below error:
+ | ./lib/uniwidth/width.c:21:10: fatal error: uniwidth.h: No such file or directory
+
+Upstream-Status: Submitted [bison-patches@gnu.org maillist]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ lib/gnulib.mk | 2 ++
+ src/local.mk  | 1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/lib/gnulib.mk b/lib/gnulib.mk
+index c21c656..27fb3dc 100644
+--- a/lib/gnulib.mk
++++ b/lib/gnulib.mk
+@@ -120,6 +120,8 @@ lib_libbison_a_SOURCES =
+ lib_libbison_a_LIBADD = $(gl_LIBOBJS)
+ lib_libbison_a_DEPENDENCIES = $(gl_LIBOBJS)
+ EXTRA_lib_libbison_a_SOURCES =
++$(lib_libbison_a_OBJECTS): $(BUILT_SOURCES) $(MOSTLYCLEANFILES:%.h)
++$(gl_LIBOBJS): $(BUILT_SOURCES) $(MOSTLYCLEANFILES:%.h)
+ 
+ lib_libbison_a_CPPFLAGS = $(AM_CPPFLAGS) -DDEFAULT_TEXT_DOMAIN=\"bison-gnulib\"
+ 
+diff --git a/src/local.mk b/src/local.mk
+index 61dc573..b5b9079 100644
+--- a/src/local.mk
++++ b/src/local.mk
+@@ -24,6 +24,7 @@ if RELOCATABLE_VIA_LD
+   src_bison_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(bindir)`
+ endif
+ 
++$(src_bison_OBJECTS): $(BUILT_SOURCES) $(MOSTLYCLEANFILES:%.h)
+ src_bison_CFLAGS = $(AM_CFLAGS) $(WERROR_CFLAGS)
+ src_bison_SOURCES =                             \
+   src/AnnotationList.c                          \
+-- 
+2.17.1
+

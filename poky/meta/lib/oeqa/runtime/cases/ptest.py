@@ -42,6 +42,10 @@ class PtestRunnerTest(OERuntimeTestCase):
         # testdata.json is generated.
         if not test_log_dir:
             test_log_dir = os.path.join(self.td.get('WORKDIR', ''), 'testimage')
+        # Make the test output path absolute, otherwise the output content will be
+        # created relative to current directory
+        if not os.path.isabs(test_log_dir):
+            test_log_dir = os.path.join(self.td.get('TOPDIR', ''), test_log_dir)
         # Don't use self.td.get('DATETIME'), it's from testdata.json, not
         # up-to-date, and may cause "File exists" when re-reun.
         timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')

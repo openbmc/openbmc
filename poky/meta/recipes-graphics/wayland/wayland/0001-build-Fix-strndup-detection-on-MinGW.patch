@@ -17,8 +17,6 @@ Upstream-Status: Submitted [https://gitlab.freedesktop.org/wayland/wayland/merge
  meson.build | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/meson.build b/meson.build
-index 26b084f..c05d019 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -36,11 +36,11 @@ have_funcs = [
@@ -30,10 +28,7 @@ index 26b084f..c05d019 100644
  foreach f: have_funcs
  	config_h.set('HAVE_' + f.underscorify().to_upper(), cc.has_function(f))
  endforeach
-+config_h.set('HAVE_STRNDUP', cc.has_function('strndup', prefix:'#include <string.h>'))
++config_h.set('HAVE_STRNDUP', cc.has_function('strndup') and cc.has_header_symbol('string.h', 'strndup'))
  
  if get_option('libraries')
  	ffi_dep = dependency('libffi')
--- 
-2.17.1
-

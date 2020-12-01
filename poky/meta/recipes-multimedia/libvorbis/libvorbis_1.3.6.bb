@@ -2,8 +2,8 @@ SUMMARY = "Ogg Vorbis Audio Codec"
 DESCRIPTION = "Ogg Vorbis is a high-quality lossy audio codec \
 that is free of intellectual property restrictions. libvorbis \
 is the main vorbis codec library."
-HOMEPAGE = "http://www.vorbis.com/"
-BUGTRACKER = "https://trac.xiph.org"
+HOMEPAGE = "https://xiph.org/vorbis/"
+BUGTRACKER = "https://gitlab.xiph.org/xiph/vorbis/-/issues"
 SECTION = "libs"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=70c7063491d2d9f76a098d62ed5134f1 \

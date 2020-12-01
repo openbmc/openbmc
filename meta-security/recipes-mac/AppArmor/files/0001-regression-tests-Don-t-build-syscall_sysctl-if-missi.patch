@@ -1,0 +1,96 @@
+From 7a7c7fb346ded6f017c8df44486778a5f032d41a Mon Sep 17 00:00:00 2001
+From: John Johansen <john.johansen@canonical.com>
+Date: Tue, 29 Sep 2020 03:05:22 -0700
+Subject: [PATCH] regression tests: Don't build syscall_sysctl if missing
+ kernel headers
+
+sys/sysctl.h is not guaranteed to exist anymore since
+https://sourceware.org/pipermail/glibc-cvs/2020q2/069366.html
+
+which is a follow on to the kernel commit
+61a47c1ad3a4 sysctl: Remove the sysctl system call
+
+While the syscall_sysctl currently checks if the kernel supports
+sysctrs before running the tests. The tests can't even build if the
+kernel headers don't have the sysctl defines.
+
+Fixes: https://gitlab.com/apparmor/apparmor/-/issues/119
+Fixes: https://bugs.launchpad.net/apparmor/+bug/1897288
+MR: https://gitlab.com/apparmor/apparmor/-/merge_requests/637
+Signed-off-by: John Johansen <john.johansen@canonical.com>
+Acked-by: Steve Beattie <steve.beattie@canonical.com>
+(cherry picked from commit 2e5a266eb715fc7e526520235a6450444775791f)
+
+Upstream-Status: Backport
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+---
+ tests/regression/apparmor/Makefile          | 10 +++++++++-
+ tests/regression/apparmor/syscall_sysctl.sh | 15 +++++++++++----
+ 2 files changed, 20 insertions(+), 5 deletions(-)
+
+diff --git a/tests/regression/apparmor/Makefile b/tests/regression/apparmor/Makefile
+index 198ca421..c3d0cfb7 100644
+--- a/tests/regression/apparmor/Makefile
++++ b/tests/regression/apparmor/Makefile
+@@ -69,6 +69,9 @@ endif # USE_SYSTEM
+ 
+ CFLAGS += -g -O0 -Wall -Wstrict-prototypes
+ 
++USE_SYSCTL:=$(shell echo "#include <sys/sysctl.h>" | cpp -dM >/dev/null 2>/dev/null && echo true)
++
++
+ SRC=access.c \
+     at_secure.c \
+     introspect.c \
+@@ -130,7 +133,6 @@ SRC=access.c \
+     syscall_sethostname.c \
+     syscall_setdomainname.c \
+     syscall_setscheduler.c \
+-    syscall_sysctl.c \
+     sysctl_proc.c \
+     tcp.c \
+     transition.c \
+@@ -146,6 +148,12 @@ ifneq (,$(findstring $(shell uname -i),i386 i486 i586 i686 x86 x86_64))
+ SRC+=syscall_ioperm.c syscall_iopl.c
+ endif
+ 
++#only do sysctl syscall test if defines installed and OR supported by the
++# kernel
++ifeq ($(USE_SYSCTL),true)
++SRC+=syscall_sysctl.c
++endif
++
+ #only do dbus if proper libs are installl
+ ifneq (,$(shell pkg-config --exists dbus-1 && echo TRUE))
+ SRC+=dbus_eavesdrop.c dbus_message.c dbus_service.c dbus_unrequested_reply.c
+diff --git a/tests/regression/apparmor/syscall_sysctl.sh b/tests/regression/apparmor/syscall_sysctl.sh
+index f93946f3..5f856984 100644
+--- a/tests/regression/apparmor/syscall_sysctl.sh
++++ b/tests/regression/apparmor/syscall_sysctl.sh
+@@ -148,11 +148,18 @@ test_sysctl_proc()
+ # check if the kernel supports CONFIG_SYSCTL_SYSCALL
+ # generally we want to encourage kernels to disable it, but if it's
+ # enabled we want to test against it
+-settest syscall_sysctl
+-if ! res="$(${test} ro 2>&1)" && [ "$res" = "FAIL: sysctl read failed - Function not implemented" ] ; then
+-    echo "	WARNING: syscall sysctl not implemented, skipping tests ..."
++# In addition test that sysctl exists in the kernel headers, if it does't
++# then we can't even built the syscall_sysctl test
++if  echo "#include <sys/sysctl.h>" | cpp -dM >/dev/null 2>/dev/null ; then
++    settest syscall_sysctl
++
++    if ! res="$(${test} ro 2>&1)" && [ "$res" = "FAIL: sysctl read failed - Function not implemented" ] ; then
++	echo "	WARNING: syscall sysctl not implemented, skipping tests ..."
++    else
++	test_syscall_sysctl
++    fi
+ else
+-    test_syscall_sysctl
++    echo "	WARNING: syscall sysctl not supported by kernel headers, skipping tests ..."
+ fi
+ 
+ # now test /proc/sys/ paths
+-- 
+2.17.1
+

@@ -28,6 +28,7 @@ PROFILETOOLS = "\
     "
 PERF = "perf"
 PERF_libc-musl = ""
+PERF_libc-musl_arm = "perf"
 
 # systemtap needs elfutils which is not fully buildable on some arches/libcs
 SYSTEMTAP = "systemtap"
@@ -41,6 +42,7 @@ LTTNGUST_arc = ""
 
 LTTNGTOOLS = "lttng-tools"
 LTTNGTOOLS_arc = ""
+LTTNGTOOLS_riscv32_libc-musl = ""
 
 LTTNGMODULES = "lttng-modules"
 LTTNGMODULES_arc = ""

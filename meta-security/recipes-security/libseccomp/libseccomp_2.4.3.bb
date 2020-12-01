@@ -10,6 +10,9 @@ SRC_URI = "git://github.com/seccomp/libseccomp.git;branch=release-2.4 \
            file://run-ptest \
 "
 
+COMPATIBLE_HOST_riscv64 = "null"
+COMPATIBLE_HOST_riscv32 = "null"
+
 S = "${WORKDIR}/git"
 
 inherit autotools-brokensep pkgconfig ptest

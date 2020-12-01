@@ -74,18 +74,26 @@ do_install(){
          -e 's@[^ ]*-fdebug-prefix-map=[^ "]*@@g' \
          -e 's@[^ ]*-fmacro-prefix-map=[^ "]*@@g' \
          -e 's@[^ ]*--sysroot=[^ "]*@@g' 
+
+    # The controllers memcg_stree test seems to cause us hangs and takes 900s
+    # (maybe we expect more regular output?), anyhow, skip it
+    sed -e '/^memcg_stress/d' -i ${D}${prefix}/runtest/controllers
 }
 
 RDEPENDS_${PN} = "\
     attr \
     bash \
+    bc \
+    coreutils \
     cpio \
     cronie \
     curl \
+    e2fsprogs \
     e2fsprogs-mke2fs \
     expect \
     file \
     gawk \
+    gdb \
     gzip \
     iproute2 \
     ldd \

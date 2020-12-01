@@ -12,6 +12,10 @@ inherit pypi setuptools3
 SRC_URI[md5sum] = "083bd2cb0043c1e22a52cb9a05e31532"
 SRC_URI[sha256sum] = "9919344cec203f5db6596a29b5bc26b07ba9662925a05e24980b84709232ef60"
 
-RDEPENDS_${PN} += "libarchive"
+RDEPENDS_${PN} += "\
+  libarchive \
+  ${PYTHON_PN}-ctypes \
+  ${PYTHON_PN}-mmap \
+"
 
 BBCLASSEXTEND = "native"

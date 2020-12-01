@@ -109,6 +109,9 @@ do_install_append() {
 	fi
 
 	chown -R root:root ${D}
+	if ${@bb.utils.contains('PACKAGECONFIG', 'verify', 'false', 'true', d)}; then
+		rm -f ${D}${bindir}/db_verify
+	fi
 }
 
 INSANE_SKIP_${PN} = "dev-so"

@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=de54b60fbbc35123ba193fea8ee216f2"
 
 SRC_URI = "https://s3.amazonaws.com/json-c_releases/releases/${BP}.tar.gz \
            file://add-disable-werror-option-to-configure.patch \
+           file://CVE-2020-12762.patch \
            "
 SRC_URI[md5sum] = "04969ad59cc37bddd83741a08b98f350"
 SRC_URI[sha256sum] = "b87e608d4d3f7bfdd36ef78d56d53c74e66ab278d318b71e6002a369d36f4873"

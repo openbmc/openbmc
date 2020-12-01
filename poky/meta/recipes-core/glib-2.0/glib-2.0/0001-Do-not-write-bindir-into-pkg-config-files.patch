@@ -22,7 +22,7 @@ index 71e88c4..8ce3987 100644
 @@ -831,14 +831,14 @@ pkg.generate(libgio,
                 'schemasdir=' + join_paths('${datadir}', schemas_subdir),
                 'bindir=' + join_paths('${prefix}', get_option('bindir')),
-                'giomoduledir=' + giomodulesdir,
+                'giomoduledir=' + pkgconfig_giomodulesdir,
 -               'gio=' + join_paths('${bindir}', 'gio'),
 -               'gio_querymodules=' + join_paths('${bindir}', 'gio-querymodules'),
 -               'glib_compile_schemas=' + join_paths('${bindir}', 'glib-compile-schemas'),

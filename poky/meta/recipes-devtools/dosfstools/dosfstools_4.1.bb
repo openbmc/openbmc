@@ -16,7 +16,7 @@ SRC_URI[sha256sum] = "e6b2aca70ccc3fe3687365009dd94a2e18e82b688ed4e260e04b741247
 
 UPSTREAM_CHECK_URI = "https://github.com/dosfstools/dosfstools/releases"
 
-inherit autotools pkgconfig
+inherit autotools pkgconfig update-alternatives
 
 EXTRA_OECONF = "--without-udev --enable-compat-symlinks"
 
@@ -26,3 +26,7 @@ BBCLASSEXTEND = "native"
 
 # Add codepage437 to avoid error from `dosfsck -l`
 RRECOMMENDS_${PN}_append_libc-glibc = " glibc-gconv-ibm437"
+
+ALTERNATIVE_PRIORITY = "100"
+ALTERNATIVE_${PN} = "mkfs.vfat"
+ALTERNATIVE_LINK_NAME[mkfs.vfat] = "${sbindir}/mkfs.vfat"

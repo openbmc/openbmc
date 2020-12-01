@@ -7,6 +7,7 @@ inherit packagegroup
 
 PACKAGES = "${PN}"
 
+PREFERRED_PROVIDER_cryptsetup ?= "cryptsetup-tpm-incubator"
 SUMMARY_packagegroup-security-tpm2 = "Security TPM 2.0 support"
 RDEPENDS_packagegroup-security-tpm2 = " \
     tpm2-tools \
@@ -19,5 +20,5 @@ RDEPENDS_packagegroup-security-tpm2 = " \
     tpm2-abrmd \
     tpm2-pkcs11 \
     ibmswtpm2 \
-    cryptsetup-tpm-incubator \
+    ${PREFERRED_PROVIDER_cryptsetup} \
     "

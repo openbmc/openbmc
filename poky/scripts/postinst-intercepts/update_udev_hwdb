@@ -17,5 +17,6 @@ case "${PREFERRED_PROVIDER_udev}" in
 		;;
 esac
 
+rm -f $D${UDEVLIBDIR}/udev/hwdb.bin
 PSEUDO_UNLOAD=1 ${binprefix}qemuwrapper -L $D $D${libexecdir}/${binprefix}udevadm hwdb --update --root $D ${UDEV_EXTRA_ARGS}
 chown root:root $D${UDEVLIBDIR}/udev/hwdb.bin

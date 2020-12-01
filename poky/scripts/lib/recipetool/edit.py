@@ -34,7 +34,7 @@ def edit(args):
     recipe_path = tinfoil.get_recipe_file(args.target)
     appends = tinfoil.get_file_appends(recipe_path)
 
-    return scriptutils.run_editor([recipe_path] + appends, logger)
+    return scriptutils.run_editor([recipe_path] + list(appends), logger)
 
 
 def register_commands(subparsers):

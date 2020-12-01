@@ -10,7 +10,7 @@ Subject: [PATCH 1/9] linux/syslinux: support ext2/3/4 device
 * The ext2/3/4 support doesn't require root privileges since it doesn't need
   mount (but write permission is required).
 
-Upstream-Status: Submitted
+Upstream-Status: Submitted [https://www.syslinux.org/archives/2015-January/023039.html]
 
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
 Tested-by: Du Dolpher <dolpher.du@intel.com>

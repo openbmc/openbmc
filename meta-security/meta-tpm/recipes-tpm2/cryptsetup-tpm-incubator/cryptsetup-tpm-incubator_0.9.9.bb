@@ -36,7 +36,12 @@ FILES_${PN} += "${libdir}/tmpfiles.d"
 RDEPENDS_${PN} += "lvm2 libdevmapper"
 RRECOMMENDS_${PN} += "lvm2-udevrules"
 
+RPROVIDES_${PN} = "cryptsetup"
 RREPLACES_${PN} = "cryptsetup"
 RCONFLICTS_${PN}  ="cryptsetup"
+
+RPROVIDES_${PN}-dev = "cryptsetup-dev"
+RREPLACES_${PN}-dev = "cryptsetup-dev"
+RCONFLICTS_${PN}-dev  ="cryptsetup-dev"
 
 BBCLASSEXTEND = "native nativesdk"

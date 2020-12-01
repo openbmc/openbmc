@@ -10,15 +10,11 @@ Dependencies
 This layer depends on:
 
     URI: git://git.openembedded.org/bitbake
-    branch: master
+    branch: dunfell
 
     URI: git://git.openembedded.org/openembedded-core
     layers: meta
-    branch: master
-
-    URI: git://github.com/01org/meta-security/meta-integrate
-    layers: security-framework
-    branch: master
+    branch: dunfell
 
 
 Patches

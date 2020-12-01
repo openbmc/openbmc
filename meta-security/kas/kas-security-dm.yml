@@ -1,0 +1,13 @@
+header:
+    version: 9
+    includes: 
+        - kas-security-base.yml
+
+local_conf_header:
+    dm-verify: |
+        DM_VERITY_IMAGE = "core-image-minimal"
+        DM_VERITY_IMAGE_TYPE = "ext4"
+        IMAGE_CLASSES += "dm-verity-img"
+        INITRAMFS_IMAGE_BUNDLE = "1"
+        INITRAMFS_IMAGE = "dm-verity-image-initramfs"
+

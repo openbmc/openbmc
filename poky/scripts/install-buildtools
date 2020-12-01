@@ -35,6 +35,7 @@
 import argparse
 import logging
 import os
+import platform
 import re
 import shutil
 import shlex
@@ -56,9 +57,9 @@ logger = scriptutils.logger_create(PROGNAME, stream=sys.stdout)
 
 DEFAULT_INSTALL_DIR = os.path.join(os.path.split(scripts_path)[0],'buildtools')
 DEFAULT_BASE_URL = 'http://downloads.yoctoproject.org/releases/yocto'
-DEFAULT_RELEASE = 'yocto-3.1'
-DEFAULT_INSTALLER_VERSION = '3.1'
-DEFAULT_BUILDDATE = ''
+DEFAULT_RELEASE = 'yocto-3.2_M1'
+DEFAULT_INSTALLER_VERSION = '3.1+snapshot'
+DEFAULT_BUILDDATE = '20200617'
 
 # Python version sanity check
 if not (sys.version_info.major == 3 and sys.version_info.minor >= 4):
@@ -112,6 +113,7 @@ def main():
     release = ""
     buildtools_url = ""
     install_dir = ""
+    arch = platform.machine()
 
     parser = argparse.ArgumentParser(
         description="Buildtools installation helper",
@@ -194,19 +196,19 @@ def main():
                     logger.error("Milestone installers require --build-date")
                 else:
                     if args.with_extended_buildtools:
-                        filename = "x86_64-buildtools-extended-nativesdk-standalone-%s-%s.sh" % (
-                            args.installer_version, args.build_date)
+                        filename = "%s-buildtools-extended-nativesdk-standalone-%s-%s.sh" % (
+                            arch, args.installer_version, args.build_date)
                     else:
-                        filename = "x86_64-buildtools-nativesdk-standalone-%s-%s.sh" % (
-                            args.installer_version, args.build_date)
+                        filename = "%s-buildtools-nativesdk-standalone-%s-%s.sh" % (
+                            arch, args.installer_version, args.build_date)
                     safe_filename = quote(filename)
                     buildtools_url = "%s/milestones/%s/buildtools/%s" % (base_url, args.release, safe_filename)
             # regular release SDK
             else:
                 if args.with_extended_buildtools:
-                    filename = "x86_64-buildtools-extended-nativesdk-standalone-%s.sh" % args.installer_version
+                    filename = "%s-buildtools-extended-nativesdk-standalone-%s.sh" % (arch, args.installer_version)
                 else:
-                    filename = "x86_64-buildtools-nativesdk-standalone-%s.sh" % args.installer_version
+                    filename = "%s-buildtools-nativesdk-standalone-%s.sh" % (arch, args.installer_version)
                 safe_filename = quote(filename)
                 buildtools_url = "%s/%s/buildtools/%s" % (base_url, args.release, safe_filename)
 
@@ -225,7 +227,7 @@ def main():
         if args.check:
             logger.info("Fetching buildtools installer checksum")
             checksum_type = ""
-            for checksum_type in ["md5sum", "sha256"]:
+            for checksum_type in ["md5sum", "sha256sum"]:
                 check_url = "{}.{}".format(buildtools_url, checksum_type)
                 checksum_filename = "{}.{}".format(filename, checksum_type)
                 tmpbuildtools_checksum = os.path.join(tmpsdk_dir, checksum_filename)
@@ -237,7 +239,7 @@ def main():
                 if ret != 0:
                     logger.error("Could not download file from %s" % check_url)
                     return ret
-            regex = re.compile(r"^(?P<checksum>[0-9a-f]+)\s\s(?P<path>.*/)?(?P<filename>.*)$")
+            regex = re.compile(r"^(?P<checksum>[0-9a-f]+)\s+(?P<path>.*/)?(?P<filename>.*)$")
             with open(tmpbuildtools_checksum, 'rb') as f:
                 original = f.read()
                 m = re.search(regex, original.decode("utf-8"))
@@ -258,6 +260,7 @@ def main():
             else:
                 logger.error("Checksum %s expected. Actual checksum is %s." %
                              (checksum, checksum_value))
+                return 1
 
         # Make installer executable
         logger.info("Making installer executable")
@@ -273,12 +276,13 @@ def main():
             ret = subprocess.call("%s -y" % tmpbuildtools, shell=True)
         if ret != 0:
             logger.error("Could not run buildtools installer")
+            return ret
 
         # Setup the environment
         logger.info("Setting up the environment")
         regex = re.compile(r'^(?P<export>export )?(?P<env_var>[A-Z_]+)=(?P<env_val>.+)$')
-        with open("%s/environment-setup-x86_64-pokysdk-linux" %
-                  install_dir, 'rb') as f:
+        with open("%s/environment-setup-%s-pokysdk-linux" %
+                  (install_dir, arch), 'rb') as f:
             for line in f:
                 match = regex.search(line.decode('utf-8'))
                 logger.debug("export regex: %s" % match)

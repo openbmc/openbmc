@@ -4,7 +4,7 @@ executables that bash(1) would execute when the passed \
 program names would have been entered on the shell prompt. \
 It does this by using the exact same algorithm as bash."
 SECTION = "libs"
-HOMEPAGE = "http://carlo17.home.xs4all.nl/which/"
+HOMEPAGE = "https://carlowood.github.io/which/"
 
 LICENSE = "GPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504\

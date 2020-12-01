@@ -6,12 +6,20 @@
 from contextlib import closing
 import re
 import sqlite3
+import itertools
+import json
 
 UNIX_PREFIX = "unix://"
 
 ADDR_TYPE_UNIX = 0
 ADDR_TYPE_TCP = 1
 
+# The Python async server defaults to a 64K receive buffer, so we hardcode our
+# maximum chunk size. It would be better if the client and server reported to
+# each other what the maximum chunk sizes were, but that will slow down the
+# connection setup with a round trip delay so I'd rather not do that unless it
+# is necessary
+DEFAULT_MAX_CHUNK = 32 * 1024
 
 def setup_database(database, sync=True):
     db = sqlite3.connect(database)
@@ -64,6 +72,20 @@ def parse_address(addr):
             host, port = addr.split(':')
 
         return (ADDR_TYPE_TCP, (host, int(port)))
+
+
+def chunkify(msg, max_chunk):
+    if len(msg) < max_chunk - 1:
+        yield ''.join((msg, "\n"))
+    else:
+        yield ''.join((json.dumps({
+                'chunk-stream': None
+            }), "\n"))
+
+        args = [iter(msg)] * (max_chunk - 1)
+        for m in map(''.join, itertools.zip_longest(*args, fillvalue='')):
+            yield ''.join(itertools.chain(m, "\n"))
+        yield "\n"
 
 
 def create_server(addr, dbname, *, sync=True):

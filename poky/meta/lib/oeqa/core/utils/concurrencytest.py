@@ -77,14 +77,17 @@ class ProxyTestResult:
     # a very basic TestResult proxy, in order to modify add* calls
     def __init__(self, target):
         self.result = target
+        self.failed_tests = 0
 
     def _addResult(self, method, test, *args, exception = False, **kwargs):
         return method(test, *args, **kwargs)
 
     def addError(self, test, err = None, **kwargs):
+        self.failed_tests += 1
         self._addResult(self.result.addError, test, err, exception = True, **kwargs)
 
     def addFailure(self, test, err = None, **kwargs):
+        self.failed_tests += 1
         self._addResult(self.result.addFailure, test, err, exception = True, **kwargs)
 
     def addSuccess(self, test, **kwargs):
@@ -95,6 +98,9 @@ class ProxyTestResult:
 
     def addUnexpectedSuccess(self, test, **kwargs):
         self._addResult(self.result.addUnexpectedSuccess, test, **kwargs)
+
+    def wasSuccessful(self):
+        return self.failed_tests == 0
 
     def __getattr__(self, attr):
         return getattr(self.result, attr)
@@ -177,10 +183,11 @@ class dummybuf(object):
 #
 class ConcurrentTestSuite(unittest.TestSuite):
 
-    def __init__(self, suite, processes, setupfunc):
+    def __init__(self, suite, processes, setupfunc, removefunc):
         super(ConcurrentTestSuite, self).__init__([suite])
         self.processes = processes
         self.setupfunc = setupfunc
+        self.removefunc = removefunc
 
     def run(self, result):
         tests, totaltests = fork_for_tests(self.processes, self)
@@ -231,22 +238,6 @@ class ConcurrentTestSuite(unittest.TestSuite):
         finally:
             queue.put(test)
 
-def removebuilddir(d):
-    delay = 5
-    while delay and os.path.exists(d + "/bitbake.lock"):
-        time.sleep(1)
-        delay = delay - 1
-    # Deleting these directories takes a lot of time, use autobuilder
-    # clobberdir if its available
-    clobberdir = os.path.expanduser("~/yocto-autobuilder-helper/janitor/clobberdir")
-    if os.path.exists(clobberdir):
-        try:
-            subprocess.check_call([clobberdir, d])
-            return
-        except subprocess.CalledProcessError:
-            pass
-    bb.utils.prunedir(d, ionice=True)
-
 def fork_for_tests(concurrency_num, suite):
     result = []
     if 'BUILDDIR' in os.environ:
@@ -287,11 +278,11 @@ def fork_for_tests(concurrency_num, suite):
                 # as per default in parent code
                 subunit_client.buffer = True
                 subunit_result = AutoTimingTestResultDecorator(subunit_client)
-                process_suite.run(ExtraResultsEncoderTestResult(subunit_result))
+                unittest_result = process_suite.run(ExtraResultsEncoderTestResult(subunit_result))
                 if ourpid != os.getpid():
                     os._exit(0)
-                if newbuilddir:
-                    removebuilddir(newbuilddir)
+                if newbuilddir and unittest_result.wasSuccessful():
+                    suite.removefunc(newbuilddir)
             except:
                 # Don't do anything with process children
                 if ourpid != os.getpid():
@@ -307,7 +298,7 @@ def fork_for_tests(concurrency_num, suite):
                     sys.stderr.write(traceback.format_exc())
                 finally:
                     if newbuilddir:
-                        removebuilddir(newbuilddir)
+                        suite.removefunc(newbuilddir)
                     stream.flush()
                     os._exit(1)
             stream.flush()

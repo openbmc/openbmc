@@ -14,6 +14,7 @@ import simplediff
 from bb.checksum import FileChecksumCache
 from bb import runqueue
 import hashserv
+import hashserv.client
 
 logger = logging.getLogger('BitBake.SigGen')
 hashequiv_logger = logging.getLogger('BitBake.SigGen.HashEquiv')
@@ -705,7 +706,7 @@ def clean_basepath(a):
         _, mc, a = a.split(":", 2)
     b = a.rsplit("/", 2)[1] + '/' + a.rsplit("/", 2)[2]
     if a.startswith("virtual:"):
-        b = b + ":" + a.rsplit(":", 1)[0]
+        b = b + ":" + a.rsplit(":", 2)[0]
     if mc:
         b = b + ":mc:" + mc
     return b

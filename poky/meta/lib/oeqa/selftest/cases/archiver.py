@@ -126,6 +126,7 @@ class Archiver(OESelftestTestCase):
 
         features = 'INHERIT += "archiver"\n'
         features += 'ARCHIVER_MODE[srpm] = "1"\n'
+        features += 'PACKAGE_CLASSES = "package_rpm"\n'
         self.write_config(features)
 
         bitbake('-n core-image-sato')

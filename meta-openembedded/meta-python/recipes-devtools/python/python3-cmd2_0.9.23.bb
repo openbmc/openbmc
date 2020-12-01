@@ -14,7 +14,6 @@ RDEPENDS_${PN} += "\
     ${PYTHON_PN}-attrs \
     ${PYTHON_PN}-colorama \
     ${PYTHON_PN}-pyperclip \
-    ${PYTHON_PN}-colorama \
     ${PYTHON_PN}-wcwidth \
 "
 

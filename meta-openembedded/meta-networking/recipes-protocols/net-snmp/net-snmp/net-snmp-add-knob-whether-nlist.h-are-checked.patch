@@ -1,4 +1,7 @@
-net-snmp: add knob whether nlist.h are checked
+From a1134a31d417cc05a1fdb094f613a00a7a5e7ac5 Mon Sep 17 00:00:00 2001
+From: Chong Lu <Chong.Lu@windriver.com>
+Date: Thu, 28 May 2020 09:46:34 -0500
+Subject: [PATCH] net-snmp: add knob whether nlist.h are checked
 
 Previously, it still was checked when there was no nlish.h in sysroots directory.
 Add knob to decide whether nlist.h are checked or not.
@@ -7,14 +10,14 @@ Upstream-status: Pending
 
 Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
 ---
- configure.d/config_os_headers |    2 ++
+ configure.d/config_os_headers | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/configure.d/config_os_headers b/configure.d/config_os_headers
-index d903f58..a05d30e 100644
+index 2fdb5a35d6..af997461d5 100644
 --- a/configure.d/config_os_headers
 +++ b/configure.d/config_os_headers
-@@ -31,6 +31,7 @@ AC_CHECK_HEADERS([getopt.h   pthread.h  regex.h      ] dnl
+@@ -32,6 +32,7 @@ AC_CHECK_HEADERS([getopt.h   pthread.h  regex.h      ] dnl
                   [sys/un.h           ])
  
  #  Library and Agent:
@@ -22,7 +25,7 @@ index d903f58..a05d30e 100644
  AC_CHECK_HEADERS([nlist.h],,,[
  AC_INCLUDES_DEFAULT
  [
-@@ -38,6 +39,7 @@ AC_INCLUDES_DEFAULT
+@@ -39,6 +40,7 @@ AC_INCLUDES_DEFAULT
  #define LIBBSD_DISABLE_DEPRECATED 1
  #endif
  ]])
@@ -31,5 +34,5 @@ index d903f58..a05d30e 100644
  #  Library:
  AC_CHECK_HEADERS([fcntl.h    io.h       kstat.h                 ] dnl
 -- 
-1.7.9.5
+2.26.2
 

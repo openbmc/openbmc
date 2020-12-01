@@ -13,7 +13,7 @@ SRCREV = "16a0d44f1725eaa93096eaa0e086f42ef4c2712c"
 
 PR .= "+git${SRCPV}"
 
-SRC_URI = "git://git.linuxfoundation.org/diamon/minicoredumper.git;protocol=http \
+SRC_URI = "git://github.com/diamon/minicoredumper;protocol=https \
            file://minicoredumper.service \
            file://minicoredumper.init \
            "

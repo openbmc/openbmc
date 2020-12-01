@@ -192,7 +192,6 @@ do_stash_locale () {
 	fi
 
 	cp -fpPR ${D}${datadir}/* $dest${datadir}
-	rm -rf ${D}${datadir}/locale/
 	cp -fpPR ${WORKDIR}/SUPPORTED $dest
 
 	target=$dest/scripts

@@ -1592,7 +1592,7 @@ class BBCooker:
             raise NothingToBuild
 
         ignore = (self.data.getVar("ASSUME_PROVIDED") or "").split()
-        for pkg in pkgs_to_build:
+        for pkg in pkgs_to_build.copy():
             if pkg in ignore:
                 parselog.warning("Explicit target \"%s\" is in ASSUME_PROVIDED, ignoring" % pkg)
             if pkg.startswith("multiconfig:"):

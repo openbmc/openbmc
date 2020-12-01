@@ -5,6 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 SRC_URI = "http://sourceforge.net/projects/linuxptp/files/v${PV}/linuxptp-${PV}.tgz \
            file://build-Allow-CC-and-prefix-to-be-overriden.patch \
            file://no-incdefs-using-host-headers.patch \
+           file://time_t_maybe_long_long.patch \
            "
 
 SRC_URI[md5sum] = "d8bb7374943bb747db7786ac26f17f11"

@@ -1,0 +1,37 @@
+When running patchelf on some existing patchelf'd binaries to change to longer 
+RPATHS, ldd would report the binaries as invalid. The output of objdump -x on 
+those libraryies should show the top of the .dynamic section is getting trashed,
+something like:
+
+0x600000001 0x0000000000429000
+0x335000 0x0000000000335000
+0xc740 0x000000000000c740
+0x1000 0x0000000000009098
+SONAME libglib-2.0.so.0
+
+(which should be RPATH and DT_NEEDED entries)
+
+This was tracked down to the code which injects the PT_LOAD section.
+
+The issue is that if the program headers were previously relocated to the end 
+of the file which was how patchelf operated previously, the relocation code 
+wouldn't work properly on a second run as it now assumes they're located after 
+the elf header. This change forces them back to immediately follow the elf
+header which is where the code has made space for them.
+
+Upstream-Status: Submitted [https://github.com/NixOS/patchelf/pull/202]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+RP 2020/6/2
+
+Index: git/src/patchelf.cc
+===================================================================
+--- git.orig/src/patchelf.cc
++++ git/src/patchelf.cc
+@@ -762,6 +762,7 @@ void ElfFile<ElfFileParamNames>::rewrite
+     }
+ 
+     /* Add a segment that maps the replaced sections into memory. */
++    wri(hdr->e_phoff, sizeof(Elf_Ehdr));
+     phdrs.resize(rdi(hdr->e_phnum) + 1);
+     wri(hdr->e_phnum, rdi(hdr->e_phnum) + 1);
+     Elf_Phdr & phdr = phdrs[rdi(hdr->e_phnum) - 1];

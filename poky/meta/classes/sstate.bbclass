@@ -355,6 +355,9 @@ def sstate_installpkg(ss, d):
     d.setVar('SSTATE_INSTDIR', sstateinst)
 
     if bb.utils.to_boolean(d.getVar("SSTATE_VERIFY_SIG"), False):
+        if not os.path.isfile(sstatepkg + '.sig'):
+            bb.warn("No signature file for sstate package %s, skipping acceleration..." % sstatepkg)
+            return False
         signer = get_signer(d, 'local')
         if not signer.verify(sstatepkg + '.sig'):
             bb.warn("Cannot verify signature on sstate package %s, skipping acceleration..." % sstatepkg)
@@ -733,10 +736,11 @@ def pstaging_fetch(sstatefetch, d):
         localdata.setVar('SRC_URI', srcuri)
         try:
             fetcher = bb.fetch2.Fetch([srcuri], localdata, cache=False)
+            fetcher.checkstatus()
             fetcher.download()
 
         except bb.fetch2.BBFetchException:
-            break
+            pass
 
 def sstate_setscene(d):
     shared_state = sstate_state_fromvars(d)
@@ -843,7 +847,7 @@ python sstate_report_unihash() {
 sstate_unpack_package () {
 	tar -xvzf ${SSTATE_PKG}
 	# update .siginfo atime on local/NFS mirror
-	[ -w ${SSTATE_PKG}.siginfo ] && [ -h ${SSTATE_PKG}.siginfo ] && touch -a ${SSTATE_PKG}.siginfo
+	[ -O ${SSTATE_PKG}.siginfo ] && [ -w ${SSTATE_PKG}.siginfo ] && [ -h ${SSTATE_PKG}.siginfo ] && touch -a ${SSTATE_PKG}.siginfo
 	# Use "! -w ||" to return true for read only files
 	[ ! -w ${SSTATE_PKG} ] || touch --no-dereference ${SSTATE_PKG}
 	[ ! -w ${SSTATE_PKG}.sig ] || [ ! -e ${SSTATE_PKG}.sig ] || touch --no-dereference ${SSTATE_PKG}.sig

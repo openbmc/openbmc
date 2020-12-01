@@ -52,6 +52,7 @@ do_install () {
     install -m 0644 ${S}/man/man4/* ${D}${mandir}/man4
     install -m 0644 ${S}/man/man5/* ${D}${mandir}/man5
     install -m 0644 ${S}/man/man8/* ${D}${mandir}/man8
+    rm ${D}${mandir}/man*/Makefile*
     install -m 0644 ${S}/policy/templates/* ${D}${docdir}/${BPN}/templates
     install -m 0644 ${S}/policy/*txt ${D}${docdir}/${BPN}
     install -m 0644 ${S}/COPYING ${D}${docdir}/${BPN}

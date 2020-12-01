@@ -96,7 +96,6 @@ class ResultsTextReport(object):
         if 'ltpresult.sections' in result and suite not in result['ltpresult.sections']:
             try:
                 _, suite, suite1, test = k.split(".", 3)
-                print("split2: %s %s %s" % (suite, suite1, test))
                 if suite + "." + suite1 in result['ltpresult.sections']:
                     suite = suite + "." + suite1
             except ValueError:

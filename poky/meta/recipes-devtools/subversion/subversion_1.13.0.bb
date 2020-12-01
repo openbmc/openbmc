@@ -60,4 +60,4 @@ PARALLEL_MAKEINST = ""
 
 RDEPENDS_${PN} = "serf"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

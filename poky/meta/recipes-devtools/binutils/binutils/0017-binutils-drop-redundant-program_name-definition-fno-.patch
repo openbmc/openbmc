@@ -1,0 +1,61 @@
+From 57a3e055605b28a9449b1b27eda7125737c42b00 Mon Sep 17 00:00:00 2001
+From: Sergei Trofimovich <siarheit@google.com>
+Date: Sat, 1 Feb 2020 23:16:11 +0000
+Subject: [PATCH] binutils: drop redundant 'program_name' definition
+ (-fno-common)
+
+	* coffdump.c (program_name): Drop redundant definition.
+	* srconv.c (program_name): Likewise
+	* sysdump.c (program_name): Likewise
+
+Upstream-Status: Accepted (commit 0b398d69ac)
+Signed-off-by: Sergei Trofimovich <siarheit@google.com>
+Signed-off-by: Richard Leitner <richard.leitner@skidata.com>
+---
+ binutils/coffdump.c | 2 --
+ binutils/srconv.c   | 2 --
+ binutils/sysdump.c  | 2 --
+ 3 files changed, 6 deletions(-)
+
+diff --git a/binutils/coffdump.c b/binutils/coffdump.c
+index 531a4e46c3..336da57ca2 100644
+--- a/binutils/coffdump.c
++++ b/binutils/coffdump.c
+@@ -456,8 +456,6 @@ coff_dump (struct coff_ofile *ptr)
+     dump_coff_section (ptr->sections + i);
+ }
+ 
+-char * program_name;
+-
+ static void
+ show_usage (FILE *file, int status)
+ {
+diff --git a/binutils/srconv.c b/binutils/srconv.c
+index 5742b16759..f071794f0a 100644
+--- a/binutils/srconv.c
++++ b/binutils/srconv.c
+@@ -1687,8 +1687,6 @@ prescan (struct coff_ofile *otree)
+     }
+ }
+ 
+-char *program_name;
+-
+ ATTRIBUTE_NORETURN static void
+ show_usage (FILE *ffile, int status)
+ {
+diff --git a/binutils/sysdump.c b/binutils/sysdump.c
+index d433e71ed9..7eebbd61d3 100644
+--- a/binutils/sysdump.c
++++ b/binutils/sysdump.c
+@@ -633,8 +633,6 @@ module (void)
+     }
+ }
+ 
+-char *program_name;
+-
+ ATTRIBUTE_NORETURN static void
+ show_usage (FILE *ffile, int status)
+ {
+-- 
+2.26.2
+

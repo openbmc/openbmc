@@ -68,8 +68,10 @@ do_install_append () {
 	rm -rf ${D}${libdir}/cairo/cairo-sphinx*
 	rm -rf ${D}${libdir}/cairo/.debug/cairo-fdr*
 	rm -rf ${D}${libdir}/cairo/.debug/cairo-sphinx*
-	rmdir -p --ignore-fail-on-non-empty ${D}${bindir}
-	rmdir -p --ignore-fail-on-non-empty ${D}${libdir}/cairo
+	[ ! -d ${D}${bindir} ] ||
+		rmdir -p --ignore-fail-on-non-empty ${D}${bindir}
+	[ ! -d ${D}${libdir}/cairo ] ||
+		rmdir -p --ignore-fail-on-non-empty ${D}${libdir}/cairo
 }
 
 PACKAGES =+ "cairo-gobject cairo-script-interpreter cairo-perf-utils"

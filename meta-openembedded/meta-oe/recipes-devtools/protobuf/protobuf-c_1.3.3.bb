@@ -26,6 +26,11 @@ BUILD_CXXFLAGS += "-std=c++11"
 
 inherit autotools pkgconfig
 
+# After several fix attempts there is still a race between generating
+# t.test-full.pb.h and compiling cxx_generate_packed_data.c despite
+# BUILT_SOURCES and explicit dependencies.
+PARALLEL_MAKE = ""
+
 PACKAGE_BEFORE_PN = "${PN}-compiler"
 
 FILES_${PN}-compiler = "${bindir}"

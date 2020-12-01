@@ -52,7 +52,7 @@ FILES_${PN} = ""
 ALLOW_EMPTY_${PN} = "1"
 
 do_install_append() {
-	rm ${D}${libdir}/alsa-lib/*.la
+	rm -f ${D}${libdir}/alsa-lib/*.la
 
 	if [ "${@bb.utils.contains('PACKAGECONFIG', 'pulseaudio', 'yes', 'no', d)}" = "yes" ]; then
 		# We use the example as is. Upstream installs the file under

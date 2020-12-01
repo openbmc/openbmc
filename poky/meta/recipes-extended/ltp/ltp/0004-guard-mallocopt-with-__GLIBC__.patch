@@ -5,7 +5,7 @@ Subject: [PATCH] guard mallocopt() with __GLIBC__
 
 mallocopt is not available on non glibc implementations
 
-Upstream-Status: Pending
+Upstream-Status: Accepted [967612c454aea66770b64f69287671037fe895b3]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---

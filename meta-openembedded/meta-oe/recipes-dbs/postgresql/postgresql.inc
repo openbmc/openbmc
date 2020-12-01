@@ -29,7 +29,6 @@ SRC_URI = "http://ftp.postgresql.org/pub/source/v${PV}/${BP}.tar.bz2 \
     file://postgresql.pam \
     file://postgresql-setup \
     file://postgresql.service \
-    file://0001-Use-pkg-config-for-libxml2-detection.patch \
 "
 
 LEAD_SONAME = "libpq.so"
@@ -248,10 +247,8 @@ FILES_${PN} += "${sysconfdir}/init.d/${BPN}-server \
 
 FILES_${PN}-client = "${bindir}/clusterdb \
     ${bindir}/createdb \
-    ${bindir}/createlang \
     ${bindir}/createuser \
     ${bindir}/dropdb \
-    ${bindir}/droplang \
     ${bindir}/dropuser \
     ${bindir}/pg_dump \
     ${bindir}/pg_dumpall \
@@ -333,7 +330,7 @@ FILES_${PN}-contrib = " ${bindir}/oid2name ${bindir}/pg_standby \
     ${libdir}/${BPN}/sslinfo.so \
     ${libdir}/${BPN}/tablefunc.so \
     ${libdir}/${BPN}/test_parser.so ${libdir}/${BPN}/timetravel.so \
-    ${libdir}/${BPN}/tsearch2.so ${libdir}/${BPN}/uuid-ossp.so \
+    ${libdir}/${BPN}/uuid-ossp.so \
     ${libdir}/${BPN}/pgxml.so ${libdir}/${BPN}/passwordcheck.so \
     ${libdir}/${BPN}/pg_upgrade_support.so ${libdir}/${BPN}/.so \
     ${libdir}/${BPN}/unaccent.so \

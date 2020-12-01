@@ -46,7 +46,7 @@ ValueError: semaphore or lock released too many times
 
 And the semaphore issue also caused multiprocessing.Queue().put() hung.
 
-Upstream-Status: Pensing
+Upstream-Status: Pending
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>

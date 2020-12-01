@@ -1,0 +1,27 @@
+From ec6982cc8b3fccc35dbd5df3c4e22ab94709c66d Mon Sep 17 00:00:00 2001
+From: Vlad Banea <vlb@xiphos.ca>
+Date: Tue, 31 Dec 2019 15:35:41 -0500
+Subject: plugins/wacom: Fix build without WAYLAND
+
+Upstream-Status: Backport
+Signed-off-by: Adrian Bunk <bunk@stusta.de>
+---
+ plugins/wacom/gsd-wacom-manager.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/plugins/wacom/gsd-wacom-manager.c b/plugins/wacom/gsd-wacom-manager.c
+index e1c8eaa7..92fd96c3 100644
+--- a/plugins/wacom/gsd-wacom-manager.c
++++ b/plugins/wacom/gsd-wacom-manager.c
+@@ -190,7 +190,7 @@ gsd_wacom_manager_class_init (GsdWacomManagerClass *klass)
+ static gchar *
+ get_device_path (GdkDevice *device)
+ {
+-#ifdef HAVE_WAYLAND
++#if HAVE_WAYLAND
+         if (gnome_settings_is_wayland ())
+                 return g_strdup (gdk_wayland_device_get_node_path (device));
+         else
+-- 
+2.20.1
+

@@ -1,5 +1,5 @@
 SUMMARY = "Ninja is a small build system with a focus on speed."
-HOMEPAGE = "http://martine.github.com/ninja/"
+HOMEPAGE = "https://ninja-build.org/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=a81586a64ad4e476c791cda7e2f2c52e"
 

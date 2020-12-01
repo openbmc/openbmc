@@ -1,7 +1,7 @@
-From d1a9839c6e4b4d187382baf341d25b3d023242cd Mon Sep 17 00:00:00 2001
+From 488916a6b366bfa5da2907b5892798eb2306a17d Mon Sep 17 00:00:00 2001
 From: Martin Jansa <martin.jansa@lge.com>
 Date: Wed, 13 Jun 2018 18:22:22 +0000
-Subject: [PATCH] openmaxil: add pkg-config file
+Subject: [PATCH 20/21] openmaxil: add pkg-config file
 
 ---
  CMakeLists.txt            |  2 +-
@@ -10,10 +10,10 @@ Subject: [PATCH] openmaxil: add pkg-config file
  create mode 100644 pkgconfig/openmaxil.pc.in
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 8c5bf5f..9f4165a 100644
+index 80337b2..3e3c90e 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -131,7 +131,7 @@ include_directories("${PROJECT_BINARY_DIR}")
+@@ -133,7 +133,7 @@ include_directories("${PROJECT_BINARY_DIR}")
  include(FindPkgConfig QUIET)
  if(PKG_CONFIG_FOUND)
  	# Produce a pkg-config file
@@ -38,3 +38,6 @@ index 0000000..8793a61
 +Version: 1
 +Libs: -L${libdir} -lopenmaxil -lvcos -lvchiq_arm -pthread
 +Cflags: -I${includedir} -I${includedir}/IL -I${includedir}/interface/vmcs_host/linux -I${includedir}/interface/vcos/pthreads -DUSE_VCHIQ_ARM
+-- 
+2.27.0
+

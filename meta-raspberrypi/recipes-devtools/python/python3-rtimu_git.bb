@@ -10,6 +10,6 @@ SRC_URI = "git://github.com/RPi-Distro/RTIMULib.git;protocol=http;branch=master 
           "
 SRCREV = "b949681af69b45f0f7f4bb53b6770037b5b02178"
 
-S = "${WORKDIR}/git/Linux/python/"
+S = "${WORKDIR}/git/Linux/python"
 
 inherit setuptools3

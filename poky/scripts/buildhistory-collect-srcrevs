@@ -59,6 +59,7 @@ def main():
 
     all_srcrevs = collections.defaultdict(list)
     for root, dirs, files in os.walk(options.buildhistory_dir):
+        dirs.sort()
         if '.git' in dirs:
             dirs.remove('.git')
         for fn in files:

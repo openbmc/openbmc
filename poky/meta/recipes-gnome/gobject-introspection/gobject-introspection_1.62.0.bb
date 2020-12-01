@@ -22,6 +22,7 @@ SRC_URI = "${GNOME_MIRROR}/${BPN}/${@oe.utils.trim_version("${PV}", 2)}/${BPN}-$
            file://0001-Port-cross-compilation-support-to-meson.patch \
            file://0001-meson.build-disable-tests-when-cross-compiling.patch \
            file://0001-Fix-build-reproducibility.patch \
+           file://0001-gir-add-a-dependency-for-g-ir-compiler-for-building-.patch \
            "
 
 SRC_URI[md5sum] = "37278eab3704e42234b6080b8cf241f1"

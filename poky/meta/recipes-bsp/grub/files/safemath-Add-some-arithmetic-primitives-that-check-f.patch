@@ -1,0 +1,94 @@
+From 06c361a71c4998635493610e5d76d0d223925251 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 15 Jun 2020 10:58:42 -0400
+Subject: [PATCH 5/9] safemath: Add some arithmetic primitives that check for
+ overflow
+
+This adds a new header, include/grub/safemath.h, that includes easy to
+use wrappers for __builtin_{add,sub,mul}_overflow() declared like:
+
+  bool OP(a, b, res)
+
+where OP is grub_add, grub_sub or grub_mul. OP() returns true in the
+case where the operation would overflow and res is not modified.
+Otherwise, false is returned and the operation is executed.
+
+These arithmetic primitives require newer compiler versions. So, bump
+these requirements in the INSTALL file too.
+
+Upstream-Status: Backport [commit 68708c4503018d61dbcce7ac11cbb511d6425f4d
+from https://git.savannah.gnu.org/git/grub.git]
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+[YL: omit the change to INSTALL from original patch]
+Signed-off-by: Yongxin Liu <yongxin.liu@windriver.com>
+---
+ include/grub/compiler.h |  8 ++++++++
+ include/grub/safemath.h | 37 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 45 insertions(+)
+ create mode 100644 include/grub/safemath.h
+
+diff --git a/include/grub/compiler.h b/include/grub/compiler.h
+index c9e1d7a..8f3be3a 100644
+--- a/include/grub/compiler.h
++++ b/include/grub/compiler.h
+@@ -48,4 +48,12 @@
+ #  define WARN_UNUSED_RESULT
+ #endif
+ 
++#if defined(__clang__) && defined(__clang_major__) && defined(__clang_minor__)
++#  define CLANG_PREREQ(maj,min) \
++          ((__clang_major__ > (maj)) || \
++	   (__clang_major__ == (maj) && __clang_minor__ >= (min)))
++#else
++#  define CLANG_PREREQ(maj,min) 0
++#endif
++
+ #endif /* ! GRUB_COMPILER_HEADER */
+diff --git a/include/grub/safemath.h b/include/grub/safemath.h
+new file mode 100644
+index 0000000..c17b89b
+--- /dev/null
++++ b/include/grub/safemath.h
+@@ -0,0 +1,37 @@
++/*
++ *  GRUB  --  GRand Unified Bootloader
++ *  Copyright (C) 2020  Free Software Foundation, Inc.
++ *
++ *  GRUB is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  GRUB is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++ *
++ *  Arithmetic operations that protect against overflow.
++ */
++
++#ifndef GRUB_SAFEMATH_H
++#define GRUB_SAFEMATH_H 1
++
++#include <grub/compiler.h>
++
++/* These appear in gcc 5.1 and clang 3.8. */
++#if GNUC_PREREQ(5, 1) || CLANG_PREREQ(3, 8)
++
++#define grub_add(a, b, res)	__builtin_add_overflow(a, b, res)
++#define grub_sub(a, b, res)	__builtin_sub_overflow(a, b, res)
++#define grub_mul(a, b, res)	__builtin_mul_overflow(a, b, res)
++
++#else
++#error gcc 5.1 or newer or clang 3.8 or newer is required
++#endif
++
++#endif /* GRUB_SAFEMATH_H */
+-- 
+2.14.4
+

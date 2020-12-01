@@ -2,7 +2,7 @@ SUMMARY = "nl80211 based CLI configuration utility for wireless devices"
 DESCRIPTION = "iw is a new nl80211 based CLI configuration utility for \
 wireless devices. It supports almost all new drivers that have been added \
 to the kernel recently. "
-HOMEPAGE = "http://wireless.kernel.org/en/users/Documentation/iw"
+HOMEPAGE = "https://wireless.wiki.kernel.org/en/users/documentation/iw"
 SECTION = "base"
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=878618a5c4af25e9b93ef0be1a93f774"

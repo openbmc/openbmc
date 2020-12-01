@@ -1,0 +1,12 @@
+header:
+  version: 8
+  includes:
+    - kas-security-base.yml
+
+local_conf_header:
+  multi: |
+    require conf/multilib.conf
+    MULTILIBS = "multilib:lib32"
+    DEFAULTTUNE_virtclass-multilib-lib32 = "armv7athf-neon"
+
+machine: qemuarm64

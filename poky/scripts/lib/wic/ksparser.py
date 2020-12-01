@@ -51,26 +51,39 @@ class KickStartParser(ArgumentParser):
     def error(self, message):
         raise ArgumentError(None, message)
 
-def sizetype(arg):
-    """
-    Custom type for ArgumentParser
-    Converts size string in <num>[K|k|M|G] format into the integer value
-    """
-    if arg.isdigit():
-        return int(arg) * 1024
+def sizetype(default, size_in_bytes=False):
+    def f(arg):
+        """
+        Custom type for ArgumentParser
+        Converts size string in <num>[S|s|K|k|M|G] format into the integer value
+        """
+        try:
+            suffix = default
+            size = int(arg)
+        except ValueError:
+            try:
+                suffix = arg[-1:]
+                size = int(arg[:-1])
+            except ValueError:
+                raise ArgumentTypeError("Invalid size: %r" % arg)
 
-    if not arg[:-1].isdigit():
+
+        if size_in_bytes:
+            if suffix == 's' or suffix == 'S':
+                return size * 512
+            mult = 1024
+        else:
+            mult = 1
+
+        if suffix == "k" or suffix == "K":
+            return size * mult
+        if suffix == "M":
+            return size * mult * 1024
+        if suffix == "G":
+            return size * mult * 1024 * 1024
+
         raise ArgumentTypeError("Invalid size: %r" % arg)
-
-    size = int(arg[:-1])
-    if arg.endswith("k") or arg.endswith("K"):
-        return size
-    if arg.endswith("M"):
-        return size * 1024
-    if arg.endswith("G"):
-        return size * 1024 * 1024
-
-    raise ArgumentTypeError("Invalid size: %r" % arg)
+    return f
 
 def overheadtype(arg):
     """
@@ -136,9 +149,10 @@ class KickStart():
         part.add_argument('mountpoint', nargs='?')
         part.add_argument('--active', action='store_true')
         part.add_argument('--align', type=int)
+        part.add_argument('--offset', type=sizetype("K", True))
         part.add_argument('--exclude-path', nargs='+')
         part.add_argument('--include-path', nargs='+')
-        part.add_argument("--extra-space", type=sizetype)
+        part.add_argument("--extra-space", type=sizetype("M"))
         part.add_argument('--fsoptions', dest='fsopts')
         part.add_argument('--fstype', default='vfat',
                           choices=('ext2', 'ext3', 'ext4', 'btrfs',
@@ -160,8 +174,8 @@ class KickStart():
         # --error, but since nesting mutually exclusive groups does not work,
         # ----extra-space/--overhead-factor are handled later
         sizeexcl = part.add_mutually_exclusive_group()
-        sizeexcl.add_argument('--size', type=sizetype, default=0)
-        sizeexcl.add_argument('--fixed-size', type=sizetype, default=0)
+        sizeexcl.add_argument('--size', type=sizetype("M"), default=0)
+        sizeexcl.add_argument('--fixed-size', type=sizetype("M"), default=0)
 
         part.add_argument('--source')
         part.add_argument('--sourceparams')

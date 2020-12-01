@@ -25,3 +25,10 @@ PACKAGECONFIG_remove_riscv32 = "unwind"
 
 PACKAGECONFIG[unwind] = "-DWITH_UNWIND=ON,-DWITH_UNWIND=OFF,libunwind,libunwind"
 PACKAGECONFIG[shared] = "-DBUILD_SHARED_LIBS=ON,-DBUILD_SHARED_LIBS=OFF,,"
+
+do_configure_append() {
+    # remove WORKDIR info to improve reproducibility
+    if [ -f  "${B}/config.h" ] ; then
+        sed -i 's/'$(echo ${WORKDIR} | sed 's_/_\\/_g')'/../g' ${B}/config.h
+    fi
+}

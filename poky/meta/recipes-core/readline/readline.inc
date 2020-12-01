@@ -4,7 +4,7 @@ command lines as they are typed in. Both Emacs and vi editing modes are availabl
 additional functions to maintain a list of previously-entered command lines, to recall and perhaps reedit those   \
 lines, and perform csh-like history expansion on previous commands."
 SECTION = "libs"
-HOMEPAGE = "https://cnswww.cns.cwru.edu/php/chet/readline/rltop.html"
+HOMEPAGE = "https://tiswww.case.edu/php/chet/readline/rltop.html"
 
 # GPLv2+ (< 6.0), GPLv3+ (>= 6.0)
 LICENSE = "GPLv3+"

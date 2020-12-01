@@ -16,6 +16,8 @@ SRC_URI[sha512sum] = "ff0b9e5f0d0070eb572b23641f7a0e70a8bc65cbf4b59dca1778be3bb0
 
 S = "${WORKDIR}/src"
 
+INSANE_SKIP_${PN} += "ldflags"
+
 do_compile () {
    make CC='${CC}'
 }
@@ -24,4 +26,3 @@ do_install () {
    install -d ${D}/${bindir}
    install -m 0755 tpm_server  ${D}/${bindir}
 }
-

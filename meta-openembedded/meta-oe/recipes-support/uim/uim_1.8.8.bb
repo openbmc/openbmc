@@ -6,6 +6,7 @@ SECTION = "inputmethods"
 
 SRC_URI = "https://github.com/uim/uim/releases/download/${PV}/uim-${PV}.tar.bz2 \
     file://0001-Fix-to-set-libedit-path-from-configure-option-proper.patch \
+    file://JMP_BUF_GC_jmp_buf.patch \
 "
 SRC_URI_append_class-target = "\
     file://uim-module-manager.patch \

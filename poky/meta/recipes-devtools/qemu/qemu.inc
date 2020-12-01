@@ -37,6 +37,20 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
 	   file://CVE-2020-7211.patch \
 	   file://0001-qemu-Do-not-include-file-if-not-exists.patch \
            file://CVE-2020-11102.patch \
+	   file://CVE-2020-11869.patch \
+	   file://CVE-2020-13361.patch \
+	   file://CVE-2020-10761.patch \
+	   file://CVE-2020-10702.patch \
+	   file://CVE-2020-13659.patch \
+	   file://CVE-2020-13800.patch \
+	   file://CVE-2020-13362.patch \
+	   file://CVE-2020-15863.patch \
+	   file://CVE-2020-14364.patch \
+	   file://CVE-2020-14415.patch \
+	   file://CVE-2020-16092.patch \
+	   file://0001-target-mips-Increase-number-of-TLB-entries-on-the-34.patch \
+	   file://CVE-2019-20175.patch \
+	   file://CVE-2020-24352.patch \
 	   "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 

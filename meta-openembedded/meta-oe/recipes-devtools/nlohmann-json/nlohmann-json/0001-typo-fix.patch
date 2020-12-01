@@ -1,0 +1,43 @@
+From 70be9751cd60e622ce6463f41d47c02fc2d83cbc Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Art=C3=B6m=20Bakri=20Al-Sarmini?= <3sz3tt+git@gmail.com>
+Date: Sun, 12 Apr 2020 23:42:26 +0300
+Subject: [PATCH] typo fix
+
+Upstream-Status: Backport [https://github.com/nlohmann/json/commit/70be9751cd60e622ce6463f41d47c02fc2d83cbc]
+
+Signed-off-by: Andrew Geissler <geissonator@gmail.com>
+
+---
+ include/nlohmann/detail/meta/type_traits.hpp | 2 +-
+ single_include/nlohmann/json.hpp             | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/nlohmann/detail/meta/type_traits.hpp b/include/nlohmann/detail/meta/type_traits.hpp
+index dd0b3084..13e92cb4 100644
+--- a/include/nlohmann/detail/meta/type_traits.hpp
++++ b/include/nlohmann/detail/meta/type_traits.hpp
+@@ -42,7 +42,7 @@ NLOHMANN_BASIC_JSON_TPL_DECLARATION
+ struct is_basic_json<NLOHMANN_BASIC_JSON_TPL> : std::true_type {};
+
+ //////////////////////
+-// jspn_ref helpers //
++// json_ref helpers //
+ //////////////////////
+
+ template <typename>
+diff --git a/single_include/nlohmann/json.hpp b/single_include/nlohmann/json.hpp
+index 8927180e..294e7509 100644
+--- a/single_include/nlohmann/json.hpp
++++ b/single_include/nlohmann/json.hpp
+@@ -2795,7 +2795,7 @@ NLOHMANN_BASIC_JSON_TPL_DECLARATION
+ struct is_basic_json<NLOHMANN_BASIC_JSON_TPL> : std::true_type {};
+
+ //////////////////////
+-// jspn_ref helpers //
++// json_ref helpers //
+ //////////////////////
+
+ template <typename>
+--
+2.21.0 (Apple Git-122)
+

@@ -30,7 +30,7 @@ inherit autotools features_check gettext pkgconfig mime-xdg
 
 REQUIRED_DISTRO_FEATURES = "x11"
 
-export BUILDCC = "${BUILD_CC}"
+export BUILDCC = "${BUILD_CC} -std=c99"
 EXTRA_OECONF = "\
     --enable-run-as-root \
     --enable-xvideo \

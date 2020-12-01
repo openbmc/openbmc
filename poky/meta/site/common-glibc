@@ -1,5 +1,4 @@
 # general
-ac_cv_have_decl_sys_siglist=${ac_cv_have_decl_sys_siglist=yes}
 ac_cv_func_calloc_0_nonnull=${ac_cv_func_calloc_0_nonnull=yes}
 ac_cv_func_realloc_works=${ac_cv_func_realloc_works=yes}
 ac_cv_func_realloc_0_nonnull=${ac_cv_func_realloc_0_nonnull=yes}
@@ -18,8 +17,6 @@ ac_cv_func_getaddrinfo=${ac_cv_func_getaddrinfo=yes}
 ac_cv_func_strtod=${ac_cv_func_strtod=yes}
 
 # bash
-bash_cv_under_sys_siglist=${bash_cv_under_sys_siglist=yes}
-bash_cv_sys_siglist=${bash_cv_sys_siglist=yes}
 bash_cv_getcwd_malloc=${bash_cv_getcwd_malloc=yes}
 
 # clamav

@@ -1,0 +1,33 @@
+From 56ba5656258b82dbc069ab3a61e597c931a16a83 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 17 Jun 2020 11:43:16 +0200
+Subject: [PATCH] gir: add a dependency for g-ir-compiler for building .girs
+
+meson inserts the dependency if the compiler is used directly, but
+fails to do so if the compiler is run through a wrapper. This leads
+to build race errors between building the compiler and using it.
+
+Fix provided by Quentin Schulz <quentin.schulz@streamunlimited.com>
+
+Upstream-Status: Accepted [https://gitlab.gnome.org/GNOME/gobject-introspection/-/merge_requests/228]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ gir/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gir/meson.build b/gir/meson.build
+index b37fdb81..557e5517 100644
+--- a/gir/meson.build
++++ b/gir/meson.build
+@@ -448,7 +448,7 @@ foreach gir : gir_files
+   typelibs += custom_target('generate-typelib-@0@'.format(gir).underscorify(),
+     input: gir,
+     output: '@BASENAME@.typelib',
+-    depends: [gobject_gir, ],
++    depends: [gobject_gir, gircompiler, ],
+     command: gircompiler_command,
+     install: true,
+     install_dir: typelibdir,
+-- 
+2.27.0
+

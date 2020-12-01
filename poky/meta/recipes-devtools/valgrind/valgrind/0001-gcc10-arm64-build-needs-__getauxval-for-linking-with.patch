@@ -1,0 +1,144 @@
+From abbc0761fa0349d49b10dc8c0f10af6bc0578c40 Mon Sep 17 00:00:00 2001
+From: Mark Wielaard <mark@klomp.org>
+Date: Tue, 12 May 2020 16:58:36 +0200
+Subject: [PATCH 1/2] gcc10 arm64 build needs __getauxval for linking with
+ libgcc
+
+Provide a new library libgcc-sup-<platform>.a that contains symbols
+needed by libgcc. This needs to be linked after -lgcc to provide
+any symbols missing which would normally be provided by glibc.
+At the moment this only provides __getauxval on arm64 linux.
+
+https://bugs.kde.org/show_bug.cgi?id=421321
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Backport [https://sourceware.org/git/?p=valgrind.git;a=commit;h=abbc0761fa0349d49b10dc8c0f10af6bc0578c40]
+
+---
+ Makefile.tool.am         |  3 +-
+ coregrind/Makefile.am    | 26 +++++++++++++++++
+ coregrind/m_libgcc_sup.c | 61 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 89 insertions(+), 1 deletion(-)
+ create mode 100644 coregrind/m_libgcc_sup.c
+
+diff --git a/Makefile.tool.am b/Makefile.tool.am
+index cc2fa0ee6..2bf90de5d 100644
+--- a/Makefile.tool.am
++++ b/Makefile.tool.am
+@@ -17,7 +17,8 @@ TOOL_DEPENDENCIES_@VGCONF_PLATFORM_SEC_CAPS@ = \
+ endif
+ 
+ 
+-TOOL_LDADD_COMMON = -lgcc
++TOOL_LDADD_COMMON = -lgcc \
++	$(top_builddir)/coregrind/libgcc-sup-@VGCONF_ARCH_PRI@-@VGCONF_OS@.a
+ TOOL_LDADD_@VGCONF_PLATFORM_PRI_CAPS@ = \
+ 	$(TOOL_DEPENDENCIES_@VGCONF_PLATFORM_PRI_CAPS@) $(TOOL_LDADD_COMMON)
+ if VGCONF_HAVE_PLATFORM_SEC
+diff --git a/coregrind/Makefile.am b/coregrind/Makefile.am
+index 6a1a925fb..1753fb633 100644
+--- a/coregrind/Makefile.am
++++ b/coregrind/Makefile.am
+@@ -542,6 +542,32 @@ libcoregrind_@VGCONF_ARCH_SEC@_@VGCONF_OS@_a_DEPENDENCIES = \
+     libnolto_coregrind-@VGCONF_ARCH_SEC@-@VGCONF_OS@.a
+ endif
+ 
++#----------------------------------------------------------------------------
++# libgcc-sup-<platform>.a
++# Special supplemental library for functions normally supplied by glibc
++# used by libgcc.
++#----------------------------------------------------------------------------
++
++pkglib_LIBRARIES  += libgcc-sup-@VGCONF_ARCH_PRI@-@VGCONF_OS@.a
++if VGCONF_HAVE_PLATFORM_SEC
++pkglib_LIBRARIES += libgcc-sup-@VGCONF_ARCH_SEC@-@VGCONF_OS@.a
++endif
++
++libgcc_sup_@VGCONF_ARCH_PRI@_@VGCONF_OS@_a_SOURCES = \
++	m_libgcc_sup.c
++libgcc_sup_@VGCONF_ARCH_PRI@_@VGCONF_OS@_a_CPPFLAGS = \
++	$(AM_CPPFLAGS_@VGCONF_PLATFORM_PRI_CAPS@)
++libgcc_sup_@VGCONF_ARCH_PRI@_@VGCONF_OS@_a_CFLAGS = \
++	$(AM_CFLAGS_PSO_@VGCONF_PLATFORM_PRI_CAPS@)
++if VGCONF_HAVE_PLATFORM_SEC
++libgcc_sup_@VGCONF_ARCH_SEC@_@VGCONF_OS@_a_SOURCES = \
++	m_libgcc_sup.c
++libgcc_sup_@VGCONF_ARCH_SEC@_@VGCONF_OS@_a_CPPFLAGS = \
++	$(AM_CPPFLAGS_@VGCONF_PLATFORM_SEC_CAPS@)
++libgcc_sup_@VGCONF_ARCH_SEC@_@VGCONF_OS@_a_CFLAGS = \
++	$(AM_CFLAGS_PSO_@VGCONF_PLATFORM_SEC_CAPS@)
++endif
++
+ #----------------------------------------------------------------------------
+ # libreplacemalloc_toolpreload-<platform>.a
+ #----------------------------------------------------------------------------
+diff --git a/coregrind/m_libgcc_sup.c b/coregrind/m_libgcc_sup.c
+new file mode 100644
+index 000000000..e29325459
+--- /dev/null
++++ b/coregrind/m_libgcc_sup.c
+@@ -0,0 +1,61 @@
++/* -*- mode: C; c-basic-offset: 3; -*- */
++
++/*--------------------------------------------------------------------*/
++/*--- Supplemental functions for libgcc normally provided by glibc ---*/
++/*--------------------------------------------------------------------*/
++
++/*
++   This file is part of Valgrind, a dynamic binary instrumentation
++   framework.
++
++   Copyright (C) 2020 Mark Wielaard
++      mark@klomp.org
++
++   This program is free software; you can redistribute it and/or
++   modify it under the terms of the GNU General Public License as
++   published by the Free Software Foundation; either version 2 of the
++   License, or (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program; if not, see <http://www.gnu.org/licenses/>.
++
++   The GNU General Public License is contained in the file COPYING.
++*/
++
++#include "config.h"
++#include "pub_core_basics.h"
++#include "pub_core_clientstate.h"
++
++/*====================================================================*/
++/*=== arm64 libgcc support function for init_have_lse_atomics      ===*/
++/*====================================================================*/
++
++#if defined(VGP_arm64_linux)
++struct auxv
++{
++   Word a_type;
++   union {
++      void *a_ptr;
++      Word a_val;
++   } u;
++};
++#define AT_NULL 0
++
++unsigned long int __getauxval (unsigned long int type);
++unsigned long int __getauxval (unsigned long int type)
++{
++   struct auxv *p;
++   for (p = (struct auxv *) VG_(client_auxv);
++        p != NULL && p->a_type != AT_NULL;
++        p++)
++      if (p->a_type == type)
++         return p->u.a_val;
++
++   return 0;
++}
++#endif
+-- 
+2.26.2
+

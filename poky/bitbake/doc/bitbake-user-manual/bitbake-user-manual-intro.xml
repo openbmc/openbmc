@@ -694,14 +694,9 @@
                 </para>
 
                 <para>
-                    When you generate a dependency graph, BitBake writes three files
+                    When you generate a dependency graph, BitBake writes two files
                     to the current working directory:
                     <itemizedlist>
-                        <listitem><para>
-                            <emphasis><filename>recipe-depends.dot</filename>:</emphasis>
-                            Shows dependencies between recipes (i.e. a collapsed version of
-                            <filename>task-depends.dot</filename>).
-                            </para></listitem>
                         <listitem><para>
                             <emphasis><filename>task-depends.dot</filename>:</emphasis>
                             Shows dependencies between tasks.

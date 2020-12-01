@@ -1,0 +1,89 @@
+From ce0528cb48666843fed2ad10ece5ecb0ac0b8cf8 Mon Sep 17 00:00:00 2001
+From: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
+Date: Fri, 15 May 2020 12:38:49 +0900
+Subject: [PATCH] change dstat to python3.
+
+Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
+---
+ dstat               | 2 +-
+ examples/curstest   | 2 +-
+ examples/devtest.py | 2 +-
+ examples/mmpipe.py  | 2 +-
+ examples/mstat.py   | 2 +-
+ examples/read.py    | 2 +-
+ examples/tdbtest    | 2 +-
+ 7 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/dstat b/dstat
+index 9359965..f250f06 100755
+--- a/dstat
++++ b/dstat
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ ### This program is free software; you can redistribute it and/or
+ ### modify it under the terms of the GNU General Public License
+diff --git a/examples/curstest b/examples/curstest
+index afc4e70..d720cca 100755
+--- a/examples/curstest
++++ b/examples/curstest
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
+ import curses, sys
+ 
+ #c = curses.wrapper(s)
+diff --git a/examples/devtest.py b/examples/devtest.py
+index 0e9e969..e53babd 100755
+--- a/examples/devtest.py
++++ b/examples/devtest.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
+ 
+ import sys
+ sys.path.insert(0, '/usr/share/dstat/')
+diff --git a/examples/mmpipe.py b/examples/mmpipe.py
+index 5c93567..f91515f 100755
+--- a/examples/mmpipe.py
++++ b/examples/mmpipe.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
+ import select, sys, os
+ 
+ def readpipe(file, tmout = 0.001):
+diff --git a/examples/mstat.py b/examples/mstat.py
+index abf4d07..ac157e4 100755
+--- a/examples/mstat.py
++++ b/examples/mstat.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
+ 
+ ### Example2: simple sub-second monitor (ministat)
+ 
+diff --git a/examples/read.py b/examples/read.py
+index 556b7ae..a925109 100755
+--- a/examples/read.py
++++ b/examples/read.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
+ 
+ ### Example 1: Direct accessing stats
+ ### This is a quick example showing how you can access dstat data
+diff --git a/examples/tdbtest b/examples/tdbtest
+index 528a8ea..ae7fef9 100755
+--- a/examples/tdbtest
++++ b/examples/tdbtest
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
+ import sys, tdb
+ 
+ db = tdb.tdb('/var/cache/samba/connections.tdb')
+-- 
+2.17.1
+
