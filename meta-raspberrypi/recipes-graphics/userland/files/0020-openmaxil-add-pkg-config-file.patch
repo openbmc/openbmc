@@ -1,7 +1,7 @@
-From 488916a6b366bfa5da2907b5892798eb2306a17d Mon Sep 17 00:00:00 2001
+From 372b3b75945300604c9b7b012ecb25c0548a1495 Mon Sep 17 00:00:00 2001
 From: Martin Jansa <martin.jansa@lge.com>
 Date: Wed, 13 Jun 2018 18:22:22 +0000
-Subject: [PATCH 20/21] openmaxil: add pkg-config file
+Subject: [PATCH] openmaxil: add pkg-config file
 
 ---
  CMakeLists.txt            |  2 +-
@@ -38,6 +38,3 @@ index 0000000..8793a61
 +Version: 1
 +Libs: -L${libdir} -lopenmaxil -lvcos -lvchiq_arm -pthread
 +Cflags: -I${includedir} -I${includedir}/IL -I${includedir}/interface/vmcs_host/linux -I${includedir}/interface/vcos/pthreads -DUSE_VCHIQ_ARM
--- 
-2.27.0
-

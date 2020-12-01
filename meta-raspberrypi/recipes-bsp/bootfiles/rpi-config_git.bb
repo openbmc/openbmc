@@ -178,6 +178,12 @@ do_deploy() {
         echo "dtoverlay=${VC4DTBO}" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
     fi
 
+    # Choose Camera Sensor to be used, default imx219 sensor
+    if [ "${RASPBERRYPI_CAMERA_V2}" = "1" ]; then
+        echo "# Enable Sony RaspberryPi Camera" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        echo "dtoverlay=imx219" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+    fi
+
     # Waveshare "C" 1024x600 7" Rev2.1 IPS capacitive touch (http://www.waveshare.com/7inch-HDMI-LCD-C.htm)
     if [ "${WAVESHARE_1024X600_C_2_1}" = "1" ]; then
         echo "# Waveshare \"C\" 1024x600 7\" Rev2.1 IPS capacitive touch screen" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt

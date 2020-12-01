@@ -1,7 +1,7 @@
-From 75eb8ab4bec3e462607214d2e14c9f2eef73435f Mon Sep 17 00:00:00 2001
+From 3c1566e9c3b356cfcd8327fed0e537ed978c8e78 Mon Sep 17 00:00:00 2001
 From: Tomeu Vizoso <tomeu.vizoso@collabora.com>
 Date: Tue, 1 Oct 2013 13:19:20 +0200
-Subject: [PATCH 02/21] wayland: Add support for the Wayland winsys
+Subject: [PATCH] wayland: Add support for the Wayland winsys
 
 * Adds EGL_WL_bind_wayland_display extension
 * Adds wayland-egl library
@@ -43,13 +43,13 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  .../khronos/wayland-egl/wayland-egl-priv.h    |  53 ++++
  interface/khronos/wayland-egl/wayland-egl.c   |  59 +++++
  .../khronos/wayland-egl/wayland-egl.pc.in     |  10 +
- interface/vmcs_host/CMakeLists.txt            |  21 +-
+ interface/vmcs_host/CMakeLists.txt            |  13 +-
  interface/vmcs_host/vc_dispmanx.h             |  10 +
  interface/vmcs_host/vc_vchi_dispmanx.c        |  42 +++
  interface/vmcs_host/vc_vchi_dispmanx.h        |  15 ++
  interface/wayland/dispmanx.xml                | 123 +++++++++
  makefiles/cmake/Wayland.cmake                 |  72 +++++
- 30 files changed, 1257 insertions(+), 99 deletions(-)
+ 30 files changed, 1253 insertions(+), 95 deletions(-)
  create mode 100644 interface/khronos/common/linux/khrn_wayland.c
  copy interface/{vmcs_host/vc_vchi_dispmanx.h => khronos/common/linux/khrn_wayland.h} (56%)
  create mode 100644 interface/khronos/ext/egl_wayland.c
@@ -1551,7 +1551,7 @@ index 0000000..8bafc15
 +Libs: -L${libdir} -lwayland-egl
 +Cflags: -I${includedir}
 diff --git a/interface/vmcs_host/CMakeLists.txt b/interface/vmcs_host/CMakeLists.txt
-index 4a914a7..c202204 100755
+index cbef80c..552312a 100755
 --- a/interface/vmcs_host/CMakeLists.txt
 +++ b/interface/vmcs_host/CMakeLists.txt
 @@ -7,13 +7,24 @@
@@ -1559,15 +1559,11 @@ index 4a914a7..c202204 100755
  add_definitions(-fno-strict-aliasing)
  
 -add_library(vchostif
--            ${VMCS_TARGET}/vcfilesys.c ${VMCS_TARGET}/vcmisc.c
--            vc_vchi_gencmd.c vc_vchi_filesys.c vc_vchi_gpuserv.c
--            vc_vchi_tvservice.c vc_vchi_cecservice.c
--            vc_vchi_dispmanx.c vc_service_common.c)
 +set(VCHOSTIF_SOURCE
-+    ${VMCS_TARGET}/vcfilesys.c ${VMCS_TARGET}/vcmisc.c
-+    vc_vchi_gencmd.c vc_vchi_filesys.c vc_vchi_gpuserv.c
-+    vc_vchi_tvservice.c vc_vchi_cecservice.c
-+    vc_vchi_dispmanx.c vc_service_common.c)
+             ${VMCS_TARGET}/vcmisc.c
+             vc_vchi_gencmd.c vc_vchi_gpuserv.c
+             vc_vchi_tvservice.c vc_vchi_cecservice.c
+             vc_vchi_dispmanx.c vc_service_common.c)
  #            ${VMCS_TARGET}/vmcs_main.c
  #  vc_vchi_haud.c
 +
@@ -1893,6 +1889,3 @@ index 0000000..ad90d30
 +    list(APPEND ${_sources} "${_server_header}")
 +    set(${_sources} ${${_sources}} PARENT_SCOPE)
 +endfunction()
--- 
-2.27.0
-

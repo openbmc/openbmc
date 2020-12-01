@@ -9,4 +9,4 @@ SRC_URI_append_rpi = " \
              file://0005-Don-t-abort-gst_omx_video_dec_set_format-if-there-s-.patch \
 "
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/gstreamer1.0-omx-1.16:"
+FILESEXTRAPATHS_prepend_rpi := "${THISDIR}/gstreamer1.0-omx-1.18:"

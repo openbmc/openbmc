@@ -20,5 +20,5 @@ DEPENDS += " \
 RDEPENDS_${PN} += " \
     ${PYTHON_PN}-numpy \
     ${PYTHON_PN}-rtimu \
-    ${PYTHON_PN}-imaging \
+    ${PYTHON_PN}-pillow \
     "

@@ -1,7 +1,7 @@
-From afe3917b1a236c08b1ed01053e3da9ab283db1ec Mon Sep 17 00:00:00 2001
+From 4624c934d1a783968306e61ded4389c153e3d009 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 10 May 2017 06:39:34 +0000
-Subject: [PATCH 14/21] GLES2/gl2ext.h: Define GL_R8_EXT and GL_RG8_EXT
+Subject: [PATCH] GLES2/gl2ext.h: Define GL_R8_EXT and GL_RG8_EXT
 
 weston code uses these defines
 Upstream-Status: Pending
@@ -30,6 +30,3 @@ index 4eacf7f..b1acc9f 100644
  /* GL_EXT_texture_type_2_10_10_10_REV */
  #ifndef GL_EXT_texture_type_2_10_10_10_REV
  #define GL_UNSIGNED_INT_2_10_10_10_REV_EXT                      0x8368
--- 
-2.27.0
-

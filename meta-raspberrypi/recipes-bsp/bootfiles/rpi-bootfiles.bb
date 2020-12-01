@@ -9,7 +9,7 @@ include recipes-bsp/common/raspberrypi-firmware.inc
 
 INHIBIT_DEFAULT_DEPS = "1"
 
-DEPENDS = "rpi-config"
+DEPENDS = "rpi-config rpi-cmdline"
 
 COMPATIBLE_MACHINE = "^rpi$"
 
@@ -18,26 +18,26 @@ S = "${RPIFW_S}/boot"
 PR = "r3"
 
 do_deploy() {
-    install -d ${DEPLOYDIR}/${PN}
+    install -d ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}
 
     for i in ${S}/*.elf ; do
-        cp $i ${DEPLOYDIR}/${PN}
+        cp $i ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}
     done
     for i in ${S}/*.dat ; do
-        cp $i ${DEPLOYDIR}/${PN}
+        cp $i ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}
     done
     for i in ${S}/*.bin ; do
-        cp $i ${DEPLOYDIR}/${PN}
+        cp $i ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}
     done
 
     # Add stamp in deploy directory
-    touch ${DEPLOYDIR}/${PN}/${PN}-${PV}.stamp
+    touch ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/${PN}-${PV}.stamp
 }
 
-do_deploy[depends] += "rpi-config:do_deploy"
+do_deploy[depends] += "rpi-config:do_deploy rpi-cmdline:do_deploy"
 
 addtask deploy before do_build after do_install
-do_deploy[dirs] += "${DEPLOYDIR}/${PN}"
+do_deploy[dirs] += "${DEPLOYDIR}/${BOOTFILES_DIR_NAME}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 

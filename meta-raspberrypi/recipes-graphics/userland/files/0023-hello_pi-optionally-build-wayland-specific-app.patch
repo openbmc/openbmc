@@ -1,0 +1,28 @@
+From 5f4324a0008c2e8e1f511432f98bf85c9fffd35c Mon Sep 17 00:00:00 2001
+From: Trevor Woerner <twoerner@gmail.com>
+Date: Fri, 27 Nov 2020 03:18:50 -0500
+Subject: [PATCH] hello_pi: optionally build wayland-specific app
+
+Only build the wayland-specific hello_pi app when building for wayland.
+
+Upstream-status: inappropriate [the wayland example is not part of upstream]
+Signed-off-by: Trevor Woerner <twoerner@gmail.com>
+---
+ host_applications/linux/apps/hello_pi/CMakeLists.txt | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/host_applications/linux/apps/hello_pi/CMakeLists.txt b/host_applications/linux/apps/hello_pi/CMakeLists.txt
+index 2849fad..7de3265 100644
+--- a/host_applications/linux/apps/hello_pi/CMakeLists.txt
++++ b/host_applications/linux/apps/hello_pi/CMakeLists.txt
+@@ -25,7 +25,9 @@ add_subdirectory(hello_encode)
+ add_subdirectory(hello_jpeg)
+ add_subdirectory(hello_videocube)
+ add_subdirectory(hello_teapot)
+-add_subdirectory(hello_wayland)
++if (BUILD_WAYLAND)
++    add_subdirectory(hello_wayland)
++endif()
+ 
+ if(BUILD_FONT)
+ set(VGFONT_SRCS libs/vgfont/font.c libs/vgfont/vgft.c libs/vgfont/graphics.c)
