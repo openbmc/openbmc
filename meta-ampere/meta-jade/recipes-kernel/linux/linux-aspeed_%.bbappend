@@ -1,10 +1,7 @@
 FILESEXTRAPATHS_prepend_mtjade := "${THISDIR}/${PN}:"
 
-SRC_URI += " \
-    file://${MACHINE}.cfg \
-"
+SRC_URI = "git://github.com/ampere-openbmc/linux;protocol=git;branch=ampere"
+SRC_URI += " file://defconfig"
+SRC_URI += " file://${MACHINE}.cfg"
 
-# Merge source tree by original project with our layer of additional files
-do_kernel_checkout_append_mtjade () {
-    cp -r "${WORKDIR}/arch" "${STAGING_KERNEL_DIR}"
-}
+SRCREV="f81dd4c54e85662bc7cbbdb3d1ef6bb1aba50384"
