@@ -12,6 +12,6 @@ python() {
         versionList = version_id.split('-')
 
         # Override with tag name only, if built at tag.
-        if 'dirty' not in version_id and versionList[1] == '0':
-            d.setVar('VERSION_ID', versionList[0].split('_')[-1])
+        if 'dirty' not in version_id and versionList[1] == 'ampere':
+            d.setVar('VERSION_ID', versionList[0].split('v')[-1])
 }
