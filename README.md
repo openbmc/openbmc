@@ -88,7 +88,6 @@ To install SCP firmware, need to copy it (in *.slim format) into the BMC via scp
 ```
 # scp 10.38.12.53:/tftpboot/altra/altra_scp_1.01.20201019.slim /tmp
 ```
->>>>>>> meta-ampere: Initial commit of Ampere Computing repository
 
 Then, use the ampere_firmware_upgrade.sh utility to flash the firmware into the Boot EEPROM:
 
