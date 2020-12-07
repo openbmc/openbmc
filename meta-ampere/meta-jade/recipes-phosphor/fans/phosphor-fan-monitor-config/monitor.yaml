@@ -1,7 +1,7 @@
 fans:
   - inventory: /system/chassis/motherboard/FAN3_1
-    allowed_out_of_range_time: 30
-    deviation: 15
+    allowed_out_of_range_time: 10
+    deviation: 25
     num_sensors_nonfunc_for_fan_nonfunc: 1
     sensors:
       - name: FAN3_1
@@ -11,8 +11,8 @@ fans:
         offset: 0
 
   - inventory: /system/chassis/motherboard/FAN3_2
-    allowed_out_of_range_time: 30
-    deviation: 15
+    allowed_out_of_range_time: 10
+    deviation: 25
     num_sensors_nonfunc_for_fan_nonfunc: 1
     sensors:
       - name: FAN3_2
@@ -22,8 +22,8 @@ fans:
         offset: 0
 
   - inventory: /system/chassis/motherboard/FAN4_1
-    allowed_out_of_range_time: 30
-    deviation: 15
+    allowed_out_of_range_time: 10
+    deviation: 25
     num_sensors_nonfunc_for_fan_nonfunc: 1
     sensors:
       - name: FAN4_1
@@ -33,8 +33,8 @@ fans:
         offset: 0
 
   - inventory: /system/chassis/motherboard/FAN4_2
-    allowed_out_of_range_time: 30
-    deviation: 15
+    allowed_out_of_range_time: 10
+    deviation: 25
     num_sensors_nonfunc_for_fan_nonfunc: 1
     sensors:
       - name: FAN4_2
@@ -44,8 +44,8 @@ fans:
         offset: 0
 
   - inventory: /system/chassis/motherboard/FAN5_1
-    allowed_out_of_range_time: 30
-    deviation: 15
+    allowed_out_of_range_time: 10
+    deviation: 25
     num_sensors_nonfunc_for_fan_nonfunc: 1
     sensors:
       - name: FAN5_1
@@ -55,8 +55,8 @@ fans:
         offset: 0
 
   - inventory: /system/chassis/motherboard/FAN5_2
-    allowed_out_of_range_time: 30
-    deviation: 15
+    allowed_out_of_range_time: 10
+    deviation: 25
     num_sensors_nonfunc_for_fan_nonfunc: 1
     sensors:
       - name: FAN5_2
@@ -66,8 +66,8 @@ fans:
         offset: 0
 
   - inventory: /system/chassis/motherboard/FAN6_1
-    allowed_out_of_range_time: 30
-    deviation: 15
+    allowed_out_of_range_time: 10
+    deviation: 25
     num_sensors_nonfunc_for_fan_nonfunc: 1
     sensors:
       - name: FAN6_1
@@ -77,8 +77,8 @@ fans:
         offset: 0
 
   - inventory: /system/chassis/motherboard/FAN6_2
-    allowed_out_of_range_time: 30
-    deviation: 15
+    allowed_out_of_range_time: 10
+    deviation: 25
     num_sensors_nonfunc_for_fan_nonfunc: 1
     sensors:
       - name: FAN6_2
@@ -88,8 +88,8 @@ fans:
         offset: 0
 
   - inventory: /system/chassis/motherboard/FAN7_1
-    allowed_out_of_range_time: 30
-    deviation: 15
+    allowed_out_of_range_time: 10
+    deviation: 25
     num_sensors_nonfunc_for_fan_nonfunc: 1
     sensors:
       - name: FAN7_1
@@ -99,8 +99,8 @@ fans:
         offset: 0
 
   - inventory: /system/chassis/motherboard/FAN7_2
-    allowed_out_of_range_time: 30
-    deviation: 15
+    allowed_out_of_range_time: 10
+    deviation: 25
     num_sensors_nonfunc_for_fan_nonfunc: 1
     sensors:
       - name: FAN7_2
@@ -110,8 +110,8 @@ fans:
         offset: 0
 
   - inventory: /system/chassis/motherboard/FAN8_1
-    allowed_out_of_range_time: 30
-    deviation: 15
+    allowed_out_of_range_time: 10
+    deviation: 25
     num_sensors_nonfunc_for_fan_nonfunc: 1
     sensors:
       - name: FAN8_1
@@ -121,8 +121,8 @@ fans:
         offset: 0
 
   - inventory: /system/chassis/motherboard/FAN8_2
-    allowed_out_of_range_time: 30
-    deviation: 15
+    allowed_out_of_range_time: 10
+    deviation: 25
     num_sensors_nonfunc_for_fan_nonfunc: 1
     sensors:
       - name: FAN8_2
