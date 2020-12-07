@@ -369,25 +369,53 @@
                     "id": 0,
                     "zoneSetpoint": 10000,
                     "target": "/xyz/openbmc_project/extsensors/margin/cputemp",
-                    "components": ["cputemp"]
+                    "components": [
+                        "cputemp"
+                    ]
                 },
                 {
                     "id": 1,
                     "zoneSetpoint": 10000,
                     "target": "/xyz/openbmc_project/extsensors/margin/zone0_vr",
-                    "components": ["vddcr_cpu", "vddcr_soc", "vddio_abcd", "vddio_efgh", "p12v_mobo", "powerseq_temp"]
+                    "components": [
+                        "vddcr_cpu",
+                        "vddcr_soc",
+                        "vddio_abcd",
+                        "vddio_efgh",
+                        "p12v_mobo",
+                        "powerseq_temp"
+                    ]
                 },
                 {
                     "id": 2,
                     "zoneSetpoint": 10000,
                     "target": "/xyz/openbmc_project/extsensors/margin/nvme",
-                    "components": ["nvme0", "nvme1", "nvme2", "nvme3", "nvme4", "nvme5", "nvme6", "nvme7", "nvme8", "nvme9", "nvme10", "nvme11", "nvme12", "nvme13", "nvme14", "nvme15"]
+                    "components": [
+                        "nvme0",
+                        "nvme1",
+                        "nvme2",
+                        "nvme3",
+                        "nvme4",
+                        "nvme5",
+                        "nvme6",
+                        "nvme7",
+                        "nvme8",
+                        "nvme9",
+                        "nvme10",
+                        "nvme11",
+                        "nvme12",
+                        "nvme13",
+                        "nvme14",
+                        "nvme15"
+                    ]
                 },
                 {
                     "id": 3,
                     "zoneSetpoint": 10000,
                     "target": "/xyz/openbmc_project/extsensors/margin/p12v_fan",
-                    "components": ["p12v_fan"]
+                    "components": [
+                        "p12v_fan"
+                    ]
                 }
             ]
         }

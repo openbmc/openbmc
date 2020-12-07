@@ -1,5 +1,5 @@
 {
-    "version" : "R02",
+    "version": "R03",
     "sensors" : [
         {
             "name": "fan0",
@@ -111,7 +111,9 @@
                 {
                     "name": "fan0",
                     "type": "fan",
-                    "inputs": ["fan0"],
+                    "inputs": [
+                        "fan0"
+                    ],
                     "setpoint": 0.0,
                     "pid": {
                         "samplePeriod": 0.1,
@@ -121,7 +123,7 @@
                         "feedFwdGainCoeff": 0.0056,
                         "integralLimit_min": 0.0,
                         "integralLimit_max": 0.0,
-                        "outLim_min": 10.0,
+                        "outLim_min": 15.0,
                         "outLim_max": 100.0,
                         "slewNeg": 0.0,
                         "slewPos": 0.0
@@ -130,7 +132,9 @@
                 {
                     "name": "fan1",
                     "type": "fan",
-                    "inputs": ["fan1"],
+                    "inputs": [
+                        "fan1"
+                    ],
                     "setpoint": 0.0,
                     "pid": {
                         "samplePeriod": 0.1,
@@ -140,7 +144,7 @@
                         "feedFwdGainCoeff": 0.0056,
                         "integralLimit_min": 0.0,
                         "integralLimit_max": 0.0,
-                        "outLim_min": 10.0,
+                        "outLim_min": 15.0,
                         "outLim_max": 100.0,
                         "slewNeg": 0.0,
                         "slewPos": 0.0
@@ -149,7 +153,9 @@
                 {
                     "name": "cputemp",
                     "type": "margin",
-                    "inputs": ["cputemp"],
+                    "inputs": [
+                        "cputemp"
+                    ],
                     "setpoint": 10.0,
                     "pid": {
                         "samplePeriod": 1.0,
@@ -157,9 +163,9 @@
                         "integralCoeff": 9.0,
                         "feedFwdOffsetCoeff": 0.0,
                         "feedFwdGainCoeff": 0.0,
-                        "integralLimit_min": 1786.0,
+                        "integralLimit_min": 2679.0,
                         "integralLimit_max": 18000.0,
-                        "outLim_min": 1786.0,
+                        "outLim_min": 2679.0,
                         "outLim_max": 18000.0,
                         "slewNeg": 0.0,
                         "slewPos": 0.0,
@@ -170,7 +176,9 @@
                 {
                     "name": "zone0_vr",
                     "type": "margin",
-                    "inputs": ["zone0_vr"],
+                    "inputs": [
+                        "zone0_vr"
+                    ],
                     "setpoint": 10.0,
                     "pid": {
                         "samplePeriod": 1.0,
@@ -178,9 +186,9 @@
                         "integralCoeff": 9.0,
                         "feedFwdOffsetCoeff": 0.0,
                         "feedFwdGainCoeff": 0.0,
-                        "integralLimit_min": 1786.0,
+                        "integralLimit_min": 2679.0,
                         "integralLimit_max": 18000.0,
-                        "outLim_min": 1786.0,
+                        "outLim_min": 2679.0,
                         "outLim_max": 18000.0,
                         "slewNeg": 0.0,
                         "slewPos": 0.0,
@@ -191,7 +199,9 @@
                 {
                     "name": "fleeting0",
                     "type": "margin",
-                    "inputs": ["fleeting0"],
+                    "inputs": [
+                        "fleeting0"
+                    ],
                     "setpoint": 10.0,
                     "pid": {
                         "samplePeriod": 1.0,
@@ -199,9 +209,9 @@
                         "integralCoeff": 9.0,
                         "feedFwdOffsetCoeff": 0.0,
                         "feedFwdGainCoeff": 0.0,
-                        "integralLimit_min": 1786.0,
+                        "integralLimit_min": 2679.0,
                         "integralLimit_max": 18000.0,
-                        "outLim_min": 1786.0,
+                        "outLim_min": 2679.0,
                         "outLim_max": 18000.0,
                         "slewNeg": 0.0,
                         "slewPos": 0.0,
@@ -212,7 +222,9 @@
                 {
                     "name": "fleeting1",
                     "type": "margin",
-                    "inputs": ["fleeting1"],
+                    "inputs": [
+                        "fleeting1"
+                    ],
                     "setpoint": 10.0,
                     "pid": {
                         "samplePeriod": 1.0,
@@ -220,9 +232,9 @@
                         "integralCoeff": 18.0,
                         "feedFwdOffsetCoeff": 0.0,
                         "feedFwdGainCoeff": 0.0,
-                        "integralLimit_min": 1786.0,
+                        "integralLimit_min": 2679.0,
                         "integralLimit_max": 18000.0,
-                        "outLim_min": 1786.0,
+                        "outLim_min": 2679.0,
                         "outLim_max": 18000.0,
                         "slewNeg": 0.0,
                         "slewPos": 0.0,
@@ -240,7 +252,9 @@
                 {
                     "name": "fb_fan0",
                     "type": "fan",
-                    "inputs": ["fb_fan0"],
+                    "inputs": [
+                        "fb_fan0"
+                    ],
                     "setpoint": 0.0,
                     "pid": {
                         "samplePeriod": 0.1,
@@ -250,7 +264,7 @@
                         "feedFwdGainCoeff": 0.0056,
                         "integralLimit_min": 0.0,
                         "integralLimit_max": 0.0,
-                        "outLim_min": 10.0,
+                        "outLim_min": 15.0,
                         "outLim_max": 100.0,
                         "slewNeg": 0.0,
                         "slewPos": 0.0
@@ -259,7 +273,9 @@
                 {
                     "name": "fb_fan1",
                     "type": "fan",
-                    "inputs": ["fb_fan1"],
+                    "inputs": [
+                        "fb_fan1"
+                    ],
                     "setpoint": 0.0,
                     "pid": {
                         "samplePeriod": 0.1,
@@ -269,7 +285,7 @@
                         "feedFwdGainCoeff": 0.0056,
                         "integralLimit_min": 0.0,
                         "integralLimit_max": 0.0,
-                        "outLim_min": 10.0,
+                        "outLim_min": 15.0,
                         "outLim_max": 100.0,
                         "slewNeg": 0.0,
                         "slewPos": 0.0
@@ -278,7 +294,9 @@
                 {
                     "name": "fb_fan2",
                     "type": "fan",
-                    "inputs": ["fb_fan2"],
+                    "inputs": [
+                        "fb_fan2"
+                    ],
                     "setpoint": 0.0,
                     "pid": {
                         "samplePeriod": 0.1,
@@ -288,7 +306,7 @@
                         "feedFwdGainCoeff": 0.0056,
                         "integralLimit_min": 0.0,
                         "integralLimit_max": 0.0,
-                        "outLim_min": 10.0,
+                        "outLim_min": 15.0,
                         "outLim_max": 100.0,
                         "slewNeg": 0.0,
                         "slewPos": 0.0
@@ -297,17 +315,19 @@
                 {
                     "name": "nvme",
                     "type": "margin",
-                    "inputs": ["nvme"],
+                    "inputs": [
+                        "nvme"
+                    ],
                     "setpoint": 10.0,
                     "pid": {
                         "samplePeriod": 1.0,
-                        "proportionalCoeff": 1786.0,
-                        "integralCoeff": 36.0,
+                        "proportionalCoeff": 1250.0,
+                        "integralCoeff": 12.0,
                         "feedFwdOffsetCoeff": 0.0,
                         "feedFwdGainCoeff": 0.0,
-                        "integralLimit_min": 1786.0,
+                        "integralLimit_min": 2679.0,
                         "integralLimit_max": 18000.0,
-                        "outLim_min": 1786.0,
+                        "outLim_min": 2679.0,
                         "outLim_max": 18000.0,
                         "slewNeg": 0.0,
                         "slewPos": 0.0,
@@ -318,7 +338,9 @@
                 {
                     "name": "p12v_fan",
                     "type": "margin",
-                    "inputs": ["p12v_fan"],
+                    "inputs": [
+                        "p12v_fan"
+                    ],
                     "setpoint": 10.0,
                     "pid": {
                         "samplePeriod": 1.0,
@@ -326,9 +348,9 @@
                         "integralCoeff": 4.0,
                         "feedFwdOffsetCoeff": 0.0,
                         "feedFwdGainCoeff": 0.0,
-                        "integralLimit_min": 1786.0,
+                        "integralLimit_min": 2679.0,
                         "integralLimit_max": 18000.0,
-                        "outLim_min": 1786.0,
+                        "outLim_min": 2679.0,
                         "outLim_max": 18000.0,
                         "slewNeg": 0.0,
                         "slewPos": 0.0,
