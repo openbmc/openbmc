@@ -1,7 +1,7 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
-PACKAGECONFIG_append_rainier = " host-dump-offload-pldm"
-PACKAGECONFIG_append_witherspoon-tacoma = " host-dump-offload-pldm"
+PACKAGECONFIG_append_rainier = " host-dump-transport-pldm"
+PACKAGECONFIG_append_witherspoon-tacoma = " host-dump-transport-pldm"
 
 PACKAGECONFIG_append_rainier = " openpower-dumps-extension"
 PACKAGECONFIG_append_witherspoon-tacoma = " openpower-dumps-extension"
