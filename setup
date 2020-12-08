@@ -31,7 +31,19 @@ machine() {
 	local target=$1
 	local build_dir=$2
 	local cfg name tmpl
-	for cfg in meta-*/meta-*/conf/machine/*.conf meta-*/conf/machine/*.conf; do
+	local configs
+
+	# zsh requires wordsplit so that variable expansion behaves like bash
+	if [ -n "$ZSH_NAME" ]; then
+		setopt local_options shwordsplit
+	fi
+	if which find > /dev/null 2>&1; then
+		configs=$(find meta-* -path "*/conf/machine/*.conf")
+	else
+		configs=$(ls -1 meta-*/meta-*/conf/machine/*.conf meta-*/conf/machine/*.conf)
+	fi
+
+	for cfg in $configs; do
 		name=${cfg##*/}
 		name=${name%.conf}
 		tmpl=${cfg%/machine/*.conf}
