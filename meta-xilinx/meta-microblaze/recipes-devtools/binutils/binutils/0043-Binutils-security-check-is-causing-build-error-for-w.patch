@@ -1,0 +1,41 @@
+From 27c8f7f202ea66cd0f4745ca3a77b4f33b6f5990 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Mon, 11 Mar 2019 13:57:42 +0530
+Subject: [PATCH 43/52] Binutils security check is causing build error for
+ windows builds.commenting for now.
+
+---
+ bfd/elf-attrs.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/bfd/elf-attrs.c b/bfd/elf-attrs.c
+index 070104c273..b135ac8f11 100644
+--- a/bfd/elf-attrs.c
++++ b/bfd/elf-attrs.c
+@@ -436,12 +436,15 @@ _bfd_elf_parse_attributes (bfd *abfd, Elf_Internal_Shdr * hdr)
+   bfd_byte *p_end;
+   bfd_vma len;
+   const char *std_sec;
++#if 0
+   ufile_ptr filesize;
++#endif
+ 
+   /* PR 17512: file: 2844a11d.  */
+   if (hdr->sh_size == 0)
+     return;
+ 
++#if 0
+   filesize = bfd_get_file_size (abfd);
+   if (filesize != 0 && hdr->sh_size > filesize)
+     {
+@@ -451,6 +454,7 @@ _bfd_elf_parse_attributes (bfd *abfd, Elf_Internal_Shdr * hdr)
+       bfd_set_error (bfd_error_invalid_operation);
+       return;
+     }
++#endif
+ 
+   contents = (bfd_byte *) bfd_malloc (hdr->sh_size + 1);
+   if (!contents)
+-- 
+2.17.1
+

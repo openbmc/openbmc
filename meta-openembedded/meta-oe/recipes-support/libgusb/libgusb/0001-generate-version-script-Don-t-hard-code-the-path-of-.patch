@@ -1,0 +1,53 @@
+From 76c23503ed1002d3aad0118795006fe2128006ae Mon Sep 17 00:00:00 2001
+From: Ting-Wei Lan <lantw@src.gnome.org>
+Date: Sat, 21 Mar 2020 22:13:57 +0800
+Subject: [PATCH] generate-version-script: Don't hard-code the path of python3
+
+Python can be installed in different directories on different operating
+systems, so we can't hard-code the path of it. Instead, use meson to
+find it to avoid 'no such file or directory' error on the bad path.
+
+Upstream-Status: Backport [https://github.com/hughsie/libgusb/pull/36]
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+---
+ contrib/generate-version-script.py | 1 -
+ gusb/meson.build                   | 4 ++++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+ mode change 100755 => 100644 contrib/generate-version-script.py
+
+diff --git a/contrib/generate-version-script.py b/contrib/generate-version-script.py
+old mode 100755
+new mode 100644
+index c4ee238ab0ab..0fe2b24e47e3
+--- a/contrib/generate-version-script.py
++++ b/contrib/generate-version-script.py
+@@ -1,4 +1,3 @@
+-#!/usr/bin/python3
+ # pylint: disable=invalid-name,missing-docstring
+ #
+ # Copyright (C) 2017 Richard Hughes <richard@hughsie.com>
+diff --git a/gusb/meson.build b/gusb/meson.build
+index 10a6f537a642..28ca3c63e595 100644
+--- a/gusb/meson.build
++++ b/gusb/meson.build
+@@ -142,6 +142,9 @@ libgusb_girtarget = gnome.generate_gir(gusb,
+ libgusb_gir = libgusb_girtarget[0]
+ libgusb_typelib = libgusb_girtarget[1]
+ 
++pymod = import('python')
++py_installation = pymod.find_installation('python3')
++
+ # Verify the map file is correct -- note we can't actually use the generated
+ # file for two reasons:
+ #
+@@ -154,6 +157,7 @@ mapfile_target = custom_target('gusb_mapfile',
+   input: libgusb_girtarget[0],
+   output: 'libgusb.ver',
+   command: [
++    py_installation,
+     join_paths(meson.source_root(), 'contrib', 'generate-version-script.py'),
+     'LIBGUSB',
+     '@INPUT@',
+-- 
+2.17.1
+

@@ -1,0 +1,261 @@
+From e98a2f325e1a90dfd6911d124889f0760d663b5c Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 8 Nov 2016 11:54:08 +0530
+Subject: [PATCH 04/52] [LOCAL]: Fix relaxation of assembler resolved
+ references,Fixup debug_loc sections after linker relaxation Adds a new
+ reloctype R_MICROBLAZE_32_NONE, used for passing reloc info from the
+ assembler to the linker when the linker manages to fully resolve a local
+ symbol reference.
+
+This is a workaround for design flaws in the assembler to
+linker interface with regards to linker relaxation.
+
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
+
+Conflicts:
+	bfd/elf32-microblaze.c
+	binutils/readelf.c
+	include/elf/microblaze.h
+---
+ bfd/bfd-in2.h              |   5 ++
+ bfd/elf32-microblaze.c     | 126 ++++++++++++++++++++++++++++---------
+ bfd/libbfd.h               |   1 +
+ bfd/reloc.c                |   6 ++
+ binutils/readelf.c         |   4 ++
+ gas/config/tc-microblaze.c |   4 ++
+ include/elf/microblaze.h   |   2 +
+ 7 files changed, 119 insertions(+), 29 deletions(-)
+
+Index: gdb-9.2/bfd/bfd-in2.h
+===================================================================
+--- gdb-9.2.orig/bfd/bfd-in2.h
++++ gdb-9.2/bfd/bfd-in2.h
+@@ -5363,6 +5363,11 @@ value relative to the read-write small d
+ expressions of the form "Symbol Op Symbol"  */
+   BFD_RELOC_MICROBLAZE_32_SYM_OP_SYM,
+ 
++/* This is a 32 bit reloc that stores the 32 bit pc relative
++value in two words (with an imm instruction).No relocation is 
++done here - only used for relaxing  */
++  BFD_RELOC_MICROBLAZE_32_NONE,
++
+ /* This is a 64 bit reloc that stores the 32 bit pc relative
+ value in two words (with an imm instruction).  No relocation is
+ done here - only used for relaxing  */
+Index: gdb-9.2/bfd/elf32-microblaze.c
+===================================================================
+--- gdb-9.2.orig/bfd/elf32-microblaze.c
++++ gdb-9.2/bfd/elf32-microblaze.c
+@@ -177,6 +177,20 @@ static reloc_howto_type microblaze_elf_h
+ 	  FALSE),		/* PC relative offset?  */
+ 
+    /* This reloc does nothing.	Used for relaxation.  */
++   HOWTO (R_MICROBLAZE_32_NONE,	/* Type.  */
++          0,			/* Rightshift.  */
++          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
++          32,			/* Bitsize.  */
++          TRUE,			/* PC_relative.  */
++          0,			/* Bitpos.  */
++          complain_overflow_bitfield,  /* Complain on overflow.  */
++          NULL,                  /* Special Function.  */
++          "R_MICROBLAZE_32_NONE",/* Name.  */
++          FALSE,		/* Partial Inplace.  */
++          0,			/* Source Mask.  */
++          0,			/* Dest Mask.  */
++          FALSE),		/* PC relative offset?  */
++
+    HOWTO (R_MICROBLAZE_64_NONE,	/* Type.  */
+ 	  0,			/* Rightshift.  */
+ 	  3,			/* Size (0 = byte, 1 = short, 2 = long).  */
+@@ -562,7 +576,10 @@ microblaze_elf_reloc_type_lookup (bfd *
+     case BFD_RELOC_NONE:
+       microblaze_reloc = R_MICROBLAZE_NONE;
+       break;
+-    case BFD_RELOC_MICROBLAZE_64_NONE:
++    case BFD_RELOC_MICROBLAZE_32_NONE:
++      microblaze_reloc = R_MICROBLAZE_32_NONE;
++      break;
++     case BFD_RELOC_MICROBLAZE_64_NONE:
+       microblaze_reloc = R_MICROBLAZE_64_NONE;
+       break;
+     case BFD_RELOC_32:
+@@ -1918,18 +1935,26 @@ microblaze_elf_relax_section (bfd *abfd,
+ 		}
+ 	      break;
+ 	    case R_MICROBLAZE_NONE:
++	    case R_MICROBLAZE_32_NONE:
+ 	      {
+ 		/* This was a PC-relative instruction that was
+ 		   completely resolved.  */
+ 		int sfix, efix;
++                unsigned int val;
+ 		bfd_vma target_address;
+ 		target_address = irel->r_addend + irel->r_offset;
+ 		sfix = calc_fixup (irel->r_offset, 0, sec);
+ 		efix = calc_fixup (target_address, 0, sec);
+-		irel->r_addend -= (efix - sfix);
+-		/* Should use HOWTO.  */
+-		microblaze_bfd_write_imm_value_32 (abfd, contents + irel->r_offset,
+-						   irel->r_addend);
++
++                /* Validate the in-band val.  */
++                val = bfd_get_32 (abfd, contents + irel->r_offset);
++                if (val != irel->r_addend && ELF32_R_TYPE (irel->r_info) == R_MICROBLAZE_32_NONE) {
++                    fprintf(stderr, "%d: CORRUPT relax reloc %x %lx\n", __LINE__, val, irel->r_addend);
++                }
++	        irel->r_addend -= (efix - sfix);
++	        /* Should use HOWTO.  */
++	        microblaze_bfd_write_imm_value_32 (abfd, contents + irel->r_offset,
++	                                           irel->r_addend);
+ 	      }
+ 	      break;
+ 	    case R_MICROBLAZE_64_NONE:
+@@ -1973,30 +1998,73 @@ microblaze_elf_relax_section (bfd *abfd,
+ 	  irelscanend = irelocs + o->reloc_count;
+ 	  for (irelscan = irelocs; irelscan < irelscanend; irelscan++)
+ 	    {
+-	      if (ELF32_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32)
+-		{
+-		  isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
++              if (1 && ELF32_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32_NONE)
++                {
++                  unsigned int val;
++
++                  isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
++
++                  /* hax: We only do the following fixup for debug location lists.  */
++                  if (strcmp(".debug_loc", o->name))
++                    continue;
++
++                  /* This was a PC-relative instruction that was completely resolved.  */
++                  if (ocontents == NULL)
++                    {
++		      if (elf_section_data (o)->this_hdr.contents != NULL)
++		          ocontents = elf_section_data (o)->this_hdr.contents;
++		      else
++		        {
++		          /* We always cache the section contents.
++			     Perhaps, if info->keep_memory is FALSE, we
++			     should free them, if we are permitted to.  */
++
++		          if (o->rawsize == 0)
++			      o->rawsize = o->size;
++		          ocontents = (bfd_byte *) bfd_malloc (o->rawsize);
++		          if (ocontents == NULL)
++			      goto error_return;
++		          if (!bfd_get_section_contents (abfd, o, ocontents,
++                                                         (file_ptr) 0,
++                                                         o->rawsize))
++                              goto error_return;
++		          elf_section_data (o)->this_hdr.contents = ocontents;
++		        }
++		    }
+ 
+-		  /* Look at the reloc only if the value has been resolved.  */
+-		  if (isym->st_shndx == shndx
+-		      && (ELF32_ST_TYPE (isym->st_info) == STT_SECTION))
+-		    {
+-		      if (ocontents == NULL)
+-			{
+-			  if (elf_section_data (o)->this_hdr.contents != NULL)
+-			    ocontents = elf_section_data (o)->this_hdr.contents;
+-			  else
+-			    {
+-			      /* We always cache the section contents.
+-				 Perhaps, if info->keep_memory is FALSE, we
+-				 should free them, if we are permitted to.  */
+-			      if (o->rawsize == 0)
+-				o->rawsize = o->size;
+-			      ocontents = (bfd_byte *) bfd_malloc (o->rawsize);
+-			      if (ocontents == NULL)
+-				goto error_return;
+-			      if (!bfd_get_section_contents (abfd, o, ocontents,
+-							     (file_ptr) 0,
++                  val = bfd_get_32 (abfd, ocontents + irelscan->r_offset);
++                  if (val != irelscan->r_addend) {
++			fprintf(stderr, "%d: CORRUPT relax reloc! %x %lx\n", __LINE__, val, irelscan->r_addend);
++                  }
++
++                  irelscan->r_addend -= calc_fixup (irelscan->r_addend, 0, sec);
++                  microblaze_bfd_write_imm_value_32 (abfd, ocontents + irelscan->r_offset,
++                                                     irelscan->r_addend);
++              }
++              if (ELF32_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32)
++                {
++	          isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
++
++                  /* Look at the reloc only if the value has been resolved.  */
++                  if (isym->st_shndx == shndx
++                      && (ELF32_ST_TYPE (isym->st_info) == STT_SECTION))
++                    {
++                      if (ocontents == NULL)
++                        {
++                          if (elf_section_data (o)->this_hdr.contents != NULL)
++                            ocontents = elf_section_data (o)->this_hdr.contents;
++                          else
++                            {
++                              /* We always cache the section contents.
++                                 Perhaps, if info->keep_memory is FALSE, we
++                                 should free them, if we are permitted to.  */
++		              if (o->rawsize == 0)
++			        o->rawsize = o->size;
++                              ocontents = (bfd_byte *) bfd_malloc (o->rawsize);
++                              if (ocontents == NULL)
++                                goto error_return;
++                              if (!bfd_get_section_contents (abfd, o, ocontents,
++                                                             (file_ptr) 0,
+ 							     o->rawsize))
+ 				goto error_return;
+ 			      elf_section_data (o)->this_hdr.contents = ocontents;
+@@ -2032,7 +2100,7 @@ microblaze_elf_relax_section (bfd *abfd,
+ 			      elf_section_data (o)->this_hdr.contents = ocontents;
+ 			    }
+ 			}
+-		      irelscan->r_addend -= calc_fixup (irel->r_addend
++		      irelscan->r_addend -= calc_fixup (irelscan->r_addend
+ 							+ isym->st_value,
+ 							0,
+ 							sec);
+Index: gdb-9.2/bfd/libbfd.h
+===================================================================
+--- gdb-9.2.orig/bfd/libbfd.h
++++ gdb-9.2/bfd/libbfd.h
+@@ -2903,6 +2903,7 @@ static const char *const bfd_reloc_code_
+   "BFD_RELOC_MICROBLAZE_32_ROSDA",
+   "BFD_RELOC_MICROBLAZE_32_RWSDA",
+   "BFD_RELOC_MICROBLAZE_32_SYM_OP_SYM",
++  "BFD_RELOC_MICROBLAZE_32_NONE",
+   "BFD_RELOC_MICROBLAZE_64_NONE",
+   "BFD_RELOC_MICROBLAZE_64_GOTPC",
+   "BFD_RELOC_MICROBLAZE_64_GOT",
+Index: gdb-9.2/bfd/reloc.c
+===================================================================
+--- gdb-9.2.orig/bfd/reloc.c
++++ gdb-9.2/bfd/reloc.c
+@@ -6807,6 +6807,12 @@ ENUMDOC
+   This is a 32 bit reloc for the microblaze to handle
+   expressions of the form "Symbol Op Symbol"
+ ENUM
++  BFD_RELOC_MICROBLAZE_32_NONE
++ENUMDOC
++  This is a 32 bit reloc that stores the 32 bit pc relative
++  value in two words (with an imm instruction).  No relocation is
++  done here - only used for relaxing
++ENUM
+   BFD_RELOC_MICROBLAZE_64_NONE
+ ENUMDOC
+   This is a 64 bit reloc that stores the 32 bit pc relative
+Index: gdb-9.2/include/elf/microblaze.h
+===================================================================
+--- gdb-9.2.orig/include/elf/microblaze.h
++++ gdb-9.2/include/elf/microblaze.h
+@@ -61,6 +61,8 @@ START_RELOC_NUMBERS (elf_microblaze_relo
+   RELOC_NUMBER (R_MICROBLAZE_TEXTPCREL_64, 30)  /* PC-relative TEXT offset.  */
+   RELOC_NUMBER (R_MICROBLAZE_TEXTREL_64, 31)    /* TEXT Entry offset 64-bit.  */
+   RELOC_NUMBER (R_MICROBLAZE_TEXTREL_32_LO, 32) /* TEXT Entry offset 32-bit.  */
++  RELOC_NUMBER (R_MICROBLAZE_32_NONE, 33)
++   
+ END_RELOC_NUMBERS (R_MICROBLAZE_max)
+ 
+ /* Global base address names.  */

@@ -1,4 +1,4 @@
-From eab8d664224d134b2c4d638d9c6bebb84ae777ad Mon Sep 17 00:00:00 2001
+From 5040f7d8abb79bf4240d0b446e2d33d26680d9fc Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 11 Sep 2018 14:32:20 +0530
 Subject: [PATCH 07/11] [Patch, Microblaze]: newlib port for microblaze m64
@@ -13,23 +13,23 @@ Conflicts:
  libgloss/microblaze/_interrupt_handler.S    |   7 +-
  libgloss/microblaze/_program_clean.S        |   6 +-
  libgloss/microblaze/_program_init.S         |   6 +-
- libgloss/microblaze/crt0.S                  |  53 ++++++++++--
- libgloss/microblaze/crt1.S                  |  54 +++++++++++--
- libgloss/microblaze/crt2.S                  |  52 ++++++++++--
- libgloss/microblaze/crt3.S                  |  32 +++++++-
- libgloss/microblaze/crt4.S                  |  37 +++++++--
- libgloss/microblaze/crtinit.S               | 120 ++++++++++++++++++++--------
- libgloss/microblaze/linux-crt0.S            |  60 +++++++++++---
- libgloss/microblaze/linux-syscalls.S        |  15 +++-
- libgloss/microblaze/pgcrtinit.S             |  59 +++++++++++++-
- libgloss/microblaze/sim-crtinit.S           |  31 +++++++
- libgloss/microblaze/sim-pgcrtinit.S         |  31 +++++++
- newlib/libc/machine/microblaze/longjmp.S    |  45 +++++++++--
- newlib/libc/machine/microblaze/setjmp.S     |  33 +++++++-
+ libgloss/microblaze/crt0.S                  |  53 ++++++++-
+ libgloss/microblaze/crt1.S                  |  54 +++++++--
+ libgloss/microblaze/crt2.S                  |  52 +++++++--
+ libgloss/microblaze/crt3.S                  |  32 +++++-
+ libgloss/microblaze/crt4.S                  |  37 +++++-
+ libgloss/microblaze/crtinit.S               | 120 ++++++++++++++------
+ libgloss/microblaze/linux-crt0.S            |  60 ++++++++--
+ libgloss/microblaze/linux-syscalls.S        |  15 ++-
+ libgloss/microblaze/pgcrtinit.S             |  59 +++++++++-
+ libgloss/microblaze/sim-crtinit.S           |  31 +++++
+ libgloss/microblaze/sim-pgcrtinit.S         |  31 +++++
+ newlib/libc/machine/microblaze/longjmp.S    |  45 ++++++--
+ newlib/libc/machine/microblaze/setjmp.S     |  33 +++++-
  18 files changed, 563 insertions(+), 91 deletions(-)
 
 diff --git a/libgloss/microblaze/_exception_handler.S b/libgloss/microblaze/_exception_handler.S
-index 7a91a78..0fdff3f 100644
+index 7a91a781e..0fdff3fec 100644
 --- a/libgloss/microblaze/_exception_handler.S
 +++ b/libgloss/microblaze/_exception_handler.S
 @@ -30,7 +30,11 @@
@@ -46,7 +46,7 @@ index 7a91a78..0fdff3f 100644
  	.ent _exception_handler
  	.type _exception_handler, @function
 diff --git a/libgloss/microblaze/_hw_exception_handler.S b/libgloss/microblaze/_hw_exception_handler.S
-index 47df945..b951a63 100644
+index 47df945c4..b951a6325 100644
 --- a/libgloss/microblaze/_hw_exception_handler.S
 +++ b/libgloss/microblaze/_hw_exception_handler.S
 @@ -32,8 +32,11 @@
@@ -64,7 +64,7 @@ index 47df945..b951a63 100644
  	rted    r17, 0
  	nop
 diff --git a/libgloss/microblaze/_interrupt_handler.S b/libgloss/microblaze/_interrupt_handler.S
-index 5bb7329..a0ef92d 100644
+index 5bb7329cc..a0ef92df0 100644
 --- a/libgloss/microblaze/_interrupt_handler.S
 +++ b/libgloss/microblaze/_interrupt_handler.S
 @@ -32,8 +32,11 @@
@@ -82,7 +82,7 @@ index 5bb7329..a0ef92d 100644
  	rtid    r14, 0
  	nop
 diff --git a/libgloss/microblaze/_program_clean.S b/libgloss/microblaze/_program_clean.S
-index c460594..0d55d8a 100644
+index c46059434..0d55d8ab8 100644
 --- a/libgloss/microblaze/_program_clean.S
 +++ b/libgloss/microblaze/_program_clean.S
 @@ -33,7 +33,11 @@
@@ -99,7 +99,7 @@ index c460594..0d55d8a 100644
  	.ent	_program_clean
  _program_clean:
 diff --git a/libgloss/microblaze/_program_init.S b/libgloss/microblaze/_program_init.S
-index 0daa42e..862ef78 100644
+index 0daa42e14..862ef786b 100644
 --- a/libgloss/microblaze/_program_init.S
 +++ b/libgloss/microblaze/_program_init.S
 @@ -32,7 +32,11 @@
@@ -116,7 +116,7 @@ index 0daa42e..862ef78 100644
  	.ent	_program_init
  _program_init:
 diff --git a/libgloss/microblaze/crt0.S b/libgloss/microblaze/crt0.S
-index 865a8c2..e4df73b 100644
+index 865a8c269..e4df73b66 100644
 --- a/libgloss/microblaze/crt0.S
 +++ b/libgloss/microblaze/crt0.S
 @@ -54,7 +54,11 @@
@@ -222,7 +222,7 @@ index 865a8c2..e4df73b 100644
 +#endif
  	.end _exit        
 diff --git a/libgloss/microblaze/crt1.S b/libgloss/microblaze/crt1.S
-index a8bf749..b24eeb5 100644
+index a8bf74937..b24eeb531 100644
 --- a/libgloss/microblaze/crt1.S
 +++ b/libgloss/microblaze/crt1.S
 @@ -53,36 +53,67 @@
@@ -321,7 +321,7 @@ index a8bf749..b24eeb5 100644
  	.end _exit        
 -
 diff --git a/libgloss/microblaze/crt2.S b/libgloss/microblaze/crt2.S
-index 34d9f95..ae4c89e 100644
+index 34d9f951d..ae4c89ee0 100644
 --- a/libgloss/microblaze/crt2.S
 +++ b/libgloss/microblaze/crt2.S
 @@ -51,26 +51,56 @@
@@ -415,7 +415,7 @@ index 34d9f95..ae4c89e 100644
 +#endif
  	.end _exit        
 diff --git a/libgloss/microblaze/crt3.S b/libgloss/microblaze/crt3.S
-index ebcf207..a8bc783 100644
+index ebcf207f5..a8bc7839b 100644
 --- a/libgloss/microblaze/crt3.S
 +++ b/libgloss/microblaze/crt3.S
 @@ -53,10 +53,26 @@
@@ -476,7 +476,7 @@ index ebcf207..a8bc783 100644
 +#endif
  	.end _exit        
 diff --git a/libgloss/microblaze/crt4.S b/libgloss/microblaze/crt4.S
-index 4cf0b01..54ba473 100644
+index 4cf0b01a4..54ba473ea 100644
 --- a/libgloss/microblaze/crt4.S
 +++ b/libgloss/microblaze/crt4.S
 @@ -53,10 +53,27 @@
@@ -542,7 +542,7 @@ index 4cf0b01..54ba473 100644
 +#endif
  	.end _exit        
 diff --git a/libgloss/microblaze/crtinit.S b/libgloss/microblaze/crtinit.S
-index 86c6dfc..8541175 100644
+index 86c6dfcb0..854117536 100644
 --- a/libgloss/microblaze/crtinit.S
 +++ b/libgloss/microblaze/crtinit.S
 @@ -29,59 +29,115 @@
@@ -694,7 +694,7 @@ index 86c6dfc..8541175 100644
  	.end _crtinit
  
 diff --git a/libgloss/microblaze/linux-crt0.S b/libgloss/microblaze/linux-crt0.S
-index 8650bb5..503439b 100644
+index 8650bb5d2..503439b2e 100644
 --- a/libgloss/microblaze/linux-crt0.S
 +++ b/libgloss/microblaze/linux-crt0.S
 @@ -18,26 +18,50 @@
@@ -789,7 +789,7 @@ index 8650bb5..503439b 100644
  	sw      r15, r0, r1
 +#endif
 diff --git a/libgloss/microblaze/linux-syscalls.S b/libgloss/microblaze/linux-syscalls.S
-index 506de78..8594f13 100644
+index 506de78fd..8594f136e 100644
 --- a/libgloss/microblaze/linux-syscalls.S
 +++ b/libgloss/microblaze/linux-syscalls.S
 @@ -20,8 +20,9 @@
@@ -823,7 +823,7 @@ index 506de78..8594f13 100644
  SYSCALL(exit)
  SYSCALL(read)
 diff --git a/libgloss/microblaze/pgcrtinit.S b/libgloss/microblaze/pgcrtinit.S
-index 2593082..638dbd3 100644
+index 25930821c..638dbd383 100644
 --- a/libgloss/microblaze/pgcrtinit.S
 +++ b/libgloss/microblaze/pgcrtinit.S
 @@ -29,10 +29,66 @@
@@ -904,7 +904,7 @@ index 2593082..638dbd3 100644
  	.end _crtinit
  
 diff --git a/libgloss/microblaze/sim-crtinit.S b/libgloss/microblaze/sim-crtinit.S
-index 74586d9..9892cb0 100644
+index 74586d9a7..9892cb0bd 100644
 --- a/libgloss/microblaze/sim-crtinit.S
 +++ b/libgloss/microblaze/sim-crtinit.S
 @@ -35,10 +35,39 @@
@@ -958,7 +958,7 @@ index 74586d9..9892cb0 100644
  	.end _crtinit
  
 diff --git a/libgloss/microblaze/sim-pgcrtinit.S b/libgloss/microblaze/sim-pgcrtinit.S
-index 82ebcca..939f537 100644
+index 82ebccad4..939f5372f 100644
 --- a/libgloss/microblaze/sim-pgcrtinit.S
 +++ b/libgloss/microblaze/sim-pgcrtinit.S
 @@ -35,10 +35,40 @@
@@ -1010,7 +1010,7 @@ index 82ebcca..939f537 100644
  	.end _crtinit
  
 diff --git a/newlib/libc/machine/microblaze/longjmp.S b/newlib/libc/machine/microblaze/longjmp.S
-index f972bbd..5ed1c26 100644
+index f972bbd88..5ed1c2626 100644
 --- a/newlib/libc/machine/microblaze/longjmp.S
 +++ b/newlib/libc/machine/microblaze/longjmp.S
 @@ -51,16 +51,46 @@
@@ -1082,7 +1082,7 @@ index f972bbd..5ed1c26 100644
 +#endif
  .end longjmp    
 diff --git a/newlib/libc/machine/microblaze/setjmp.S b/newlib/libc/machine/microblaze/setjmp.S
-index cdd87c7..971862b 100644
+index cdd87c76f..971862bcb 100644
 --- a/newlib/libc/machine/microblaze/setjmp.S
 +++ b/newlib/libc/machine/microblaze/setjmp.S
 @@ -50,9 +50,39 @@
@@ -1133,5 +1133,5 @@ index cdd87c7..971862b 100644
 +#endif
  .end setjmp    
 -- 
-2.7.4
+2.17.1
 

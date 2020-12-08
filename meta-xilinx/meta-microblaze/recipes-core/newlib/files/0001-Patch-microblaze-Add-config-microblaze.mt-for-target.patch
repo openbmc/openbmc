@@ -1,4 +1,4 @@
-From 4926aec8897dc574d442e5a87b2576ab80046b10 Mon Sep 17 00:00:00 2001
+From 3be7340059deb6fd74873978ee4e435c84a15b8b Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 23 Jan 2017 15:27:25 +0530
 Subject: [PATCH 01/11] [Patch, microblaze]: Add config/microblaze.mt for
@@ -26,7 +26,7 @@ Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
 
 diff --git a/libgloss/config/microblaze.mt b/libgloss/config/microblaze.mt
 new file mode 100644
-index 0000000..e8fb922
+index 000000000..e8fb922dd
 --- /dev/null
 +++ b/libgloss/config/microblaze.mt
 @@ -0,0 +1,30 @@
@@ -61,7 +61,7 @@ index 0000000..e8fb922
 +write.o: ${srcdir}/../write.c
 +	$(CC) $(CFLAGS_FOR_TARGET) -O2 $(INCLUDES) -c $(CFLAGS) $?
 diff --git a/libgloss/microblaze/configure b/libgloss/microblaze/configure
-index 9b2bc7a..01f0fb2 100644
+index 9b2bc7ab4..01f0fb29d 100644
 --- a/libgloss/microblaze/configure
 +++ b/libgloss/microblaze/configure
 @@ -2020,7 +2020,7 @@ LIB_AM_PROG_AS
@@ -74,7 +74,7 @@ index 9b2bc7a..01f0fb2 100644
  host_makefile_frag_path=$host_makefile_frag
  
 diff --git a/libgloss/microblaze/configure.in b/libgloss/microblaze/configure.in
-index 77aa769..5d179fd 100644
+index 77aa769d4..5d179fdfc 100644
 --- a/libgloss/microblaze/configure.in
 +++ b/libgloss/microblaze/configure.in
 @@ -35,7 +35,7 @@ LIB_AM_PROG_AS
@@ -87,5 +87,5 @@ index 77aa769..5d179fd 100644
  dnl We have to assign the same value to other variables because autoconf
  dnl doesn't provide a mechanism to substitute a replacement keyword with
 -- 
-2.7.4
+2.17.1
 

@@ -4,6 +4,8 @@
 Project Testing and Release Process
 ***********************************
 
+.. _test-daily-devel:
+
 Day to Day Development
 ======================
 

@@ -1,0 +1,60 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+print_function	contrib/oe-stylize.py	/^from __future__ import print_function $/;"	i
+fileinput	contrib/oe-stylize.py	/^import fileinput$/;"	i
+string	contrib/oe-stylize.py	/^import string$/;"	i
+re	contrib/oe-stylize.py	/^import re$/;"	i
+__author__	contrib/oe-stylize.py	/^__author__ = "Cyril Romain <cyril.romain@gmail.com>"$/;"	v
+__version__	contrib/oe-stylize.py	/^__version__ = "$Revision: 0.5 $"$/;"	v
+OE_vars	contrib/oe-stylize.py	/^OE_vars = [$/;"	v
+varRegexp	contrib/oe-stylize.py	/^varRegexp = r'^([a-zA-Z_0-9${}-]*)([ \\t]*)([+.:]?=[+.]?)([ \\t]*)([^\\t]+)'$/;"	v
+routineRegexp	contrib/oe-stylize.py	/^routineRegexp = r'^([a-zA-Z0-9_ ${}-]+?)\\('$/;"	v
+seen_vars	contrib/oe-stylize.py	/^seen_vars = {}$/;"	v
+respect_rule0	contrib/oe-stylize.py	/^def respect_rule0(line): $/;"	f
+conformTo_rule0	contrib/oe-stylize.py	/^def conformTo_rule0(line): $/;"	f
+respect_rule1	contrib/oe-stylize.py	/^def respect_rule1(line):$/;"	f
+conformTo_rule1	contrib/oe-stylize.py	/^def conformTo_rule1(line):$/;"	f
+respect_rule2	contrib/oe-stylize.py	/^def respect_rule2(line):$/;"	f
+conformTo_rule2	contrib/oe-stylize.py	/^def conformTo_rule2(line):$/;"	f
+respect_rule3	contrib/oe-stylize.py	/^def respect_rule3(line):$/;"	f
+conformTo_rule3	contrib/oe-stylize.py	/^def conformTo_rule3(line):$/;"	f
+respect_rule4	contrib/oe-stylize.py	/^def respect_rule4(line):$/;"	f
+conformTo_rule4	contrib/oe-stylize.py	/^def conformTo_rule4(line):$/;"	f
+respect_rule5	contrib/oe-stylize.py	/^def respect_rule5(line):$/;"	f
+conformTo_rule5	contrib/oe-stylize.py	/^def conformTo_rule5(line):$/;"	f
+respect_rule6	contrib/oe-stylize.py	/^def respect_rule6(line):$/;"	f
+conformTo_rule6	contrib/oe-stylize.py	/^def conformTo_rule6(line):$/;"	f
+respect_rule7	contrib/oe-stylize.py	/^def respect_rule7(line):$/;"	f
+conformTo_rule7	contrib/oe-stylize.py	/^def conformTo_rule7(line):$/;"	f
+rules	contrib/oe-stylize.py	/^rules = ($/;"	v
+follow_rule	contrib/oe-stylize.py	/^def follow_rule(i, line):$/;"	f
+lines	contrib/oe-stylize.py	/^    lines = []$/;"	v
+line	contrib/oe-stylize.py	/^            line = line.expandtabs().rstrip()$/;"	v
+var	contrib/oe-stylize.py	/^    var = ""$/;"	v
+in_routine	contrib/oe-stylize.py	/^    in_routine = False$/;"	v
+commentBloc	contrib/oe-stylize.py	/^    commentBloc = []$/;"	v
+olines	contrib/oe-stylize.py	/^    olines = []$/;"	v
+originalLine	contrib/oe-stylize.py	/^        originalLine = line$/;"	v
+line	contrib/oe-stylize.py	/^        line = line.rstrip()$/;"	v
+line	contrib/oe-stylize.py	/^        line = follow_rule(2, line)$/;"	v
+line	contrib/oe-stylize.py	/^        line = follow_rule(1, line)$/;"	v
+line	contrib/oe-stylize.py	/^        line = follow_rule(6, line)$/;"	v
+commentBloc	contrib/oe-stylize.py	/^            commentBloc = []$/;"	v
+in_routine	contrib/oe-stylize.py	/^            in_routine=False$/;"	v
+keep	contrib/oe-stylize.py	/^        keep = line.endswith('\\\\') or in_routine$/;"	v
+line	contrib/oe-stylize.py	/^                line = follow_rule(3, line)$/;"	v
+commentBloc	contrib/oe-stylize.py	/^            commentBloc = []$/;"	v
+var	contrib/oe-stylize.py	/^                    var = k$/;"	v
+in_routine	contrib/oe-stylize.py	/^                in_routine=True$/;"	v
+line	contrib/oe-stylize.py	/^                line = follow_rule(0, line)$/;"	v
+line	contrib/oe-stylize.py	/^                line = follow_rule(0, line)$/;"	v
+line	contrib/oe-stylize.py	/^                line = follow_rule(4, line)$/;"	v
+line	contrib/oe-stylize.py	/^                line = follow_rule(5, line)$/;"	v
+var	contrib/oe-stylize.py	/^                var = 'others'$/;"	v
+commentBloc	contrib/oe-stylize.py	/^            commentBloc = []$/;"	v
+addEmptyLine	contrib/oe-stylize.py	/^    addEmptyLine = False$/;"	v
+previourVarPrefix	contrib/oe-stylize.py	/^    previourVarP

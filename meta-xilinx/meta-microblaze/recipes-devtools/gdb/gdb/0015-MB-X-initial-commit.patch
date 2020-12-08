@@ -1,0 +1,359 @@
+From 070b7b1f35dedc41b1ba9a228d701485b2239ac0 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Sun, 30 Sep 2018 16:31:26 +0530
+Subject: [PATCH 15/52] MB-X initial commit code cleanup is needed.
+
+Conflicts:
+	bfd/elf32-microblaze.c
+	gas/config/tc-microblaze.c
+	opcodes/microblaze-opcm.h
+---
+ bfd/bfd-in2.h              |  10 +++
+ bfd/elf32-microblaze.c     |  59 +++++++++++++-
+ bfd/elf64-microblaze.c     |  61 ++++++++++++++-
+ bfd/libbfd.h               |   2 +
+ bfd/reloc.c                |  12 +++
+ gas/config/tc-microblaze.c | 154 ++++++++++++++++++++++++++++++-------
+ include/elf/microblaze.h   |   2 +
+ opcodes/microblaze-opc.h   |  10 +--
+ opcodes/microblaze-opcm.h  |   4 +-
+ 9 files changed, 278 insertions(+), 36 deletions(-)
+
+Index: gdb-9.2/bfd/bfd-in2.h
+===================================================================
+--- gdb-9.2.orig/bfd/bfd-in2.h
++++ gdb-9.2/bfd/bfd-in2.h
+@@ -5374,11 +5374,21 @@ done here - only used for relaxing  */
+   BFD_RELOC_MICROBLAZE_64_NONE,
+ 
+ /* This is a 64 bit reloc that stores the 32 bit pc relative
++ *  +value in two words (with an imml instruction).  No relocation is
++ *   +done here - only used for relaxing  */
++    BFD_RELOC_MICROBLAZE_64,
++
++/* This is a 64 bit reloc that stores the 32 bit pc relative
+ value in two words (with an imm instruction).  The relocation is
+ PC-relative GOT offset  */
+   BFD_RELOC_MICROBLAZE_64_GOTPC,
+ 
+ /* This is a 64 bit reloc that stores the 32 bit pc relative
++value in two words (with an imml instruction).  The relocation is
++PC-relative GOT offset  */
++  BFD_RELOC_MICROBLAZE_64_GPC,
++
++/* This is a 64 bit reloc that stores the 32 bit pc relative
+ value in two words (with an imm instruction).  The relocation is
+ GOT offset  */
+   BFD_RELOC_MICROBLAZE_64_GOT,
+Index: gdb-9.2/bfd/elf32-microblaze.c
+===================================================================
+--- gdb-9.2.orig/bfd/elf32-microblaze.c
++++ gdb-9.2/bfd/elf32-microblaze.c
+@@ -116,6 +116,20 @@ static reloc_howto_type microblaze_elf_h
+ 	  0x0000ffff,		/* Dest Mask.  */
+ 	  TRUE),		/* PC relative offset?  */
+ 
++   HOWTO (R_MICROBLAZE_IMML_64,     	/* Type.  */
++          0,			/* Rightshift.  */
++          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
++          16,			/* Bitsize.  */
++          TRUE,		/* PC_relative.  */
++          0,			/* Bitpos.  */
++          complain_overflow_dont, /* Complain on overflow.  */
++          bfd_elf_generic_reloc,/* Special Function.  */
++          "R_MICROBLAZE_IMML_64",   	/* Name.  */
++          FALSE,		/* Partial Inplace.  */
++          0,			/* Source Mask.  */
++          0x0000ffff,		/* Dest Mask.  */
++          FALSE), 		/* PC relative offset?  */
++
+    /* A 64 bit relocation.  Table entry not really used.  */
+    HOWTO (R_MICROBLAZE_64,	/* Type.  */
+ 	  0,			/* Rightshift.  */
+@@ -280,6 +294,21 @@ static reloc_howto_type microblaze_elf_h
+ 	  0x0000ffff,		/* Dest Mask.  */
+ 	  TRUE),		/* PC relative offset?  */
+ 
++   /* A 64 bit GOTPC relocation.  Table-entry not really used.  */
++   HOWTO (R_MICROBLAZE_GPC_64,   	/* Type.  */
++          0,			/* Rightshift.  */
++          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
++          16,			/* Bitsize.  */
++          TRUE,			/* PC_relative.  */
++          0,			/* Bitpos.  */
++          complain_overflow_dont, /* Complain on overflow.  */
++          bfd_elf_generic_reloc,	/* Special Function.  */
++          "R_MICROBLAZE_GPC_64", 	/* Name.  */
++          FALSE,		/* Partial Inplace.  */
++          0,			/* Source Mask.  */
++          0x0000ffff,		/* Dest Mask.  */
++          TRUE), 		/* PC relative offset?  */
++
+    /* A 64 bit GOT relocation.  Table-entry not really used.  */
+    HOWTO (R_MICROBLAZE_GOT_64,  /* Type.  */
+ 	  0,			/* Rightshift.  */
+@@ -619,9 +648,15 @@ microblaze_elf_reloc_type_lookup (bfd *
+     case BFD_RELOC_VTABLE_ENTRY:
+       microblaze_reloc = R_MICROBLAZE_GNU_VTENTRY;
+       break;
++    case BFD_RELOC_MICROBLAZE_64:
++      microblaze_reloc = R_MICROBLAZE_IMML_64;
++      break;
+     case BFD_RELOC_MICROBLAZE_64_GOTPC:
+       microblaze_reloc = R_MICROBLAZE_GOTPC_64;
+       break;
++    case BFD_RELOC_MICROBLAZE_64_GPC:
++      microblaze_reloc = R_MICROBLAZE_GPC_64;
++      break;
+     case BFD_RELOC_MICROBLAZE_64_GOT:
+       microblaze_reloc = R_MICROBLAZE_GOT_64;
+       break;
+@@ -1467,7 +1502,7 @@ microblaze_elf_relocate_section (bfd *ou
+ 		if (r_symndx == STN_UNDEF || (input_section->flags & SEC_ALLOC) == 0)
+ 		  {
+ 		    relocation += addend;
+-		    if (r_type == R_MICROBLAZE_32)
++		    if (r_type == R_MICROBLAZE_32)// || r_type == R_MICROBLAZE_IMML_64)
+ 		      bfd_put_32 (input_bfd, relocation, contents + offset);
+ 		    else
+ 		      {
+@@ -1933,6 +1968,28 @@ microblaze_elf_relax_section (bfd *abfd,
+ 		    irel->r_addend -= calc_fixup (irel->r_addend, 0, sec);
+ 		}
+ 	      break;
++	    case R_MICROBLAZE_IMML_64:
++	      {
++	        /* This was a PC-relative instruction that was
++ 		   completely resolved.  */
++	        int sfix, efix;
++            unsigned int val;
++	        bfd_vma target_address;
++	        target_address = irel->r_addend + irel->r_offset;
++	        sfix = calc_fixup (irel->r_offset, 0, sec);
++	        efix = calc_fixup (target_address, 0, sec);
++
++            /* Validate the in-band val.  */
++            val = bfd_get_32 (abfd, contents + irel->r_offset);
++            if (val != irel->r_addend && ELF64_R_TYPE (irel->r_info) == R_MICROBLAZE_32_NONE) {
++               fprintf(stderr, "%d: CORRUPT relax reloc %x %lx\n", __LINE__, val, irel->r_addend);
++            }
++	        irel->r_addend -= (efix - sfix);
++	        /* Should use HOWTO.  */
++	        microblaze_bfd_write_imm_value_64 (abfd, contents + irel->r_offset,
++	                                           irel->r_addend);
++	      }
++	      break;
+ 	    case R_MICROBLAZE_NONE:
+ 	    case R_MICROBLAZE_32_NONE:
+ 	      {
+Index: gdb-9.2/bfd/elf64-microblaze.c
+===================================================================
+--- gdb-9.2.orig/bfd/elf64-microblaze.c
++++ gdb-9.2/bfd/elf64-microblaze.c
+@@ -117,6 +117,21 @@ static reloc_howto_type microblaze_elf_h
+           TRUE), 		/* PC relative offset?  */
+ 
+    /* A 64 bit relocation.  Table entry not really used.  */
++   HOWTO (R_MICROBLAZE_IMML_64,     	/* Type.  */
++          0,			/* Rightshift.  */
++          4,			/* Size (0 = byte, 1 = short, 2 = long).  */
++          64,			/* Bitsize.  */
++          TRUE,		/* PC_relative.  */
++          0,			/* Bitpos.  */
++          complain_overflow_dont, /* Complain on overflow.  */
++          bfd_elf_generic_reloc,/* Special Function.  */
++          "R_MICROBLAZE_IMML_64",   	/* Name.  */
++          FALSE,		/* Partial Inplace.  */
++          0,			/* Source Mask.  */
++          0x0000ffff,		/* Dest Mask.  */
++          TRUE), 		/* PC relative offset?  */
++
++   /* A 64 bit relocation.  Table entry not really used.  */
+    HOWTO (R_MICROBLAZE_64,     	/* Type.  */
+           0,			/* Rightshift.  */
+           2,			/* Size (0 = byte, 1 = short, 2 = long).  */
+@@ -265,6 +280,21 @@ static reloc_howto_type microblaze_elf_h
+           0x0000ffff,		/* Dest Mask.  */
+           TRUE), 		/* PC relative offset?  */
+ 
++   /* A 64 bit GOTPC relocation.  Table-entry not really used.  */
++   HOWTO (R_MICROBLAZE_GPC_64,   	/* Type.  */
++          0,			/* Rightshift.  */
++          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
++          16,			/* Bitsize.  */
++          TRUE,			/* PC_relative.  */
++          0,			/* Bitpos.  */
++          complain_overflow_dont, /* Complain on overflow.  */
++          bfd_elf_generic_reloc,	/* Special Function.  */
++          "R_MICROBLAZE_GPC_64", 	/* Name.  */
++          FALSE,		/* Partial Inplace.  */
++          0,			/* Source Mask.  */
++          0x0000ffff,		/* Dest Mask.  */
++          TRUE), 		/* PC relative offset?  */
++
+    /* A 64 bit GOT relocation.  Table-entry not really used.  */
+    HOWTO (R_MICROBLAZE_GOT_64,  /* Type.  */
+           0,			/* Rightshift.  */
+@@ -589,9 +619,15 @@ microblaze_elf_reloc_type_lookup (bfd *
+     case BFD_RELOC_VTABLE_ENTRY:
+       microblaze_reloc = R_MICROBLAZE_GNU_VTENTRY;
+       break;
++    case BFD_RELOC_MICROBLAZE_64:
++      microblaze_reloc = R_MICROBLAZE_IMML_64;
++      break;
+     case BFD_RELOC_MICROBLAZE_64_GOTPC:
+       microblaze_reloc = R_MICROBLAZE_GOTPC_64;
+       break;
++    case BFD_RELOC_MICROBLAZE_64_GPC:
++      microblaze_reloc = R_MICROBLAZE_GPC_64;
++      break;
+     case BFD_RELOC_MICROBLAZE_64_GOT:
+       microblaze_reloc = R_MICROBLAZE_GOT_64;
+       break;
+@@ -1172,6 +1208,7 @@ microblaze_elf_relocate_section (bfd *ou
+ 	      break; /* Do nothing.  */
+ 
+ 	    case (int) R_MICROBLAZE_GOTPC_64:
++	    case (int) R_MICROBLAZE_GPC_64:
+ 	      relocation = htab->sgotplt->output_section->vma
+ 		+ htab->sgotplt->output_offset;
+ 	      relocation -= (input_section->output_section->vma
+@@ -1443,7 +1480,7 @@ microblaze_elf_relocate_section (bfd *ou
+ 		if (r_symndx == STN_UNDEF || (input_section->flags & SEC_ALLOC) == 0)
+ 		  {
+ 		    relocation += addend;
+-		    if (r_type == R_MICROBLAZE_32)
++		    if (r_type == R_MICROBLAZE_32)// || r_type == R_MICROBLAZE_IMML_64)
+ 		      bfd_put_32 (input_bfd, relocation, contents + offset);
+ 		    else
+ 		      {
+@@ -1889,6 +1926,28 @@ microblaze_elf_relax_section (bfd *abfd,
+ 		    irel->r_addend -= calc_fixup (irel->r_addend, 0, sec);
+ 	        }
+ 	      break;
++	    case R_MICROBLAZE_IMML_64:
++	      {
++	        /* This was a PC-relative instruction that was
++ 		   completely resolved.  */
++	        int sfix, efix;
++            unsigned int val;
++	        bfd_vma target_address;
++	        target_address = irel->r_addend + irel->r_offset;
++	        sfix = calc_fixup (irel->r_offset, 0, sec);
++	        efix = calc_fixup (target_address, 0, sec);
++
++            /* Validate the in-band val.  */
++            val = bfd_get_32 (abfd, contents + irel->r_offset);
++            if (val != irel->r_addend && ELF64_R_TYPE (irel->r_info) == R_MICROBLAZE_32_NONE) {
++               fprintf(stderr, "%d: CORRUPT relax reloc %x %lx\n", __LINE__, val, irel->r_addend);
++            }
++	        irel->r_addend -= (efix - sfix);
++	        /* Should use HOWTO.  */
++	        microblaze_bfd_write_imm_value_64 (abfd, contents + irel->r_offset,
++	                                           irel->r_addend);
++	      }
++	      break;
+ 	    case R_MICROBLAZE_NONE:
+ 	    case R_MICROBLAZE_32_NONE:
+ 	      {
+Index: gdb-9.2/bfd/libbfd.h
+===================================================================
+--- gdb-9.2.orig/bfd/libbfd.h
++++ gdb-9.2/bfd/libbfd.h
+@@ -2905,7 +2905,9 @@ static const char *const bfd_reloc_code_
+   "BFD_RELOC_MICROBLAZE_32_SYM_OP_SYM",
+   "BFD_RELOC_MICROBLAZE_32_NONE",
+   "BFD_RELOC_MICROBLAZE_64_NONE",
++  "BFD_RELOC_MICROBLAZE_64",
+   "BFD_RELOC_MICROBLAZE_64_GOTPC",
++  "BFD_RELOC_MICROBLAZE_64_GPC",
+   "BFD_RELOC_MICROBLAZE_64_GOT",
+   "BFD_RELOC_MICROBLAZE_64_PLT",
+   "BFD_RELOC_MICROBLAZE_64_GOTOFF",
+Index: gdb-9.2/bfd/reloc.c
+===================================================================
+--- gdb-9.2.orig/bfd/reloc.c
++++ gdb-9.2/bfd/reloc.c
+@@ -6815,6 +6815,12 @@ ENUMDOC
+ ENUM
+   BFD_RELOC_MICROBLAZE_64_NONE
+ ENUMDOC
++  This is a 32 bit reloc that stores the 32 bit pc relative
++  value in two words (with an imml instruction).  No relocation is
++  done here - only used for relaxing
++ENUM
++  BFD_RELOC_MICROBLAZE_64
++ENUMDOC
+   This is a 64 bit reloc that stores the 32 bit pc relative
+   value in two words (with an imm instruction).  No relocation is
+   done here - only used for relaxing
+@@ -6822,6 +6828,12 @@ ENUM
+   BFD_RELOC_MICROBLAZE_64_GOTPC
+ ENUMDOC
+   This is a 64 bit reloc that stores the 32 bit pc relative
++  value in two words (with an imml instruction).  No relocation is
++  done here - only used for relaxing
++ENUM
++  BFD_RELOC_MICROBLAZE_64_GPC
++ENUMDOC
++  This is a 64 bit reloc that stores the 32 bit pc relative
+   value in two words (with an imm instruction).  The relocation is
+   PC-relative GOT offset
+ ENUM
+Index: gdb-9.2/include/elf/microblaze.h
+===================================================================
+--- gdb-9.2.orig/include/elf/microblaze.h
++++ gdb-9.2/include/elf/microblaze.h
+@@ -62,6 +62,8 @@ START_RELOC_NUMBERS (elf_microblaze_relo
+   RELOC_NUMBER (R_MICROBLAZE_TEXTREL_64, 31)    /* TEXT Entry offset 64-bit.  */
+   RELOC_NUMBER (R_MICROBLAZE_TEXTREL_32_LO, 32) /* TEXT Entry offset 32-bit.  */
+   RELOC_NUMBER (R_MICROBLAZE_32_NONE, 33)
++  RELOC_NUMBER (R_MICROBLAZE_IMML_64, 34)
++  RELOC_NUMBER (R_MICROBLAZE_GPC_64, 35)    /* GOT entry offset.  */
+    
+ END_RELOC_NUMBERS (R_MICROBLAZE_max)
+ 
+Index: gdb-9.2/opcodes/microblaze-opc.h
+===================================================================
+--- gdb-9.2.orig/opcodes/microblaze-opc.h
++++ gdb-9.2/opcodes/microblaze-opc.h
+@@ -282,10 +282,10 @@ struct op_code_struct
+   {"smi",   INST_TYPE_RD_R1_IMM, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xF8000000, OPCODE_MASK_H, invalid_inst, memory_store_inst },
+   {"msrset",INST_TYPE_RD_IMM15, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x94100000, OPCODE_MASK_H23N, msrset, special_inst },
+   {"msrclr",INST_TYPE_RD_IMM15, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x94110000, OPCODE_MASK_H23N, msrclr, special_inst },
+-  {"fadd",  INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000000, OPCODE_MASK_H4, fadd, arithmetic_inst },
++  {"fadd",  INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000000, OPCODE_MASK_H4, mbi_fadd, arithmetic_inst },
+   {"frsub",  INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000080, OPCODE_MASK_H4, frsub, arithmetic_inst },
+-  {"fmul",  INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000100, OPCODE_MASK_H4, fmul, arithmetic_inst },
+-  {"fdiv",  INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000180, OPCODE_MASK_H4, fdiv, arithmetic_inst },
++  {"fmul",  INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000100, OPCODE_MASK_H4, mbi_fmul, arithmetic_inst },
++  {"fdiv",  INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000180, OPCODE_MASK_H4, mbi_fdiv, arithmetic_inst },
+   {"fcmp.lt", INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000210, OPCODE_MASK_H4, fcmp_lt, arithmetic_inst },
+   {"fcmp.eq", INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000220, OPCODE_MASK_H4, fcmp_eq, arithmetic_inst },
+   {"fcmp.le", INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000230, OPCODE_MASK_H4, fcmp_le, arithmetic_inst },
+@@ -538,8 +538,8 @@ struct op_code_struct
+   {"llr",     INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xC8000300, OPCODE_MASK_H4, llr, memory_load_inst },
+   {"sl",      INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xD8000100, OPCODE_MASK_H4, sl, memory_store_inst },
+   {"slr",     INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xD8000300, OPCODE_MASK_H4, slr, memory_store_inst },
+-  {"lli",     INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xE8000000, OPCODE_MASK_H, invalid_inst, memory_load_inst },  /* Identical to 32-bit */
+-  {"sli",     INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xF8000000, OPCODE_MASK_H, invalid_inst, memory_store_inst }, /* Identical to 32-bit */
++  {"lli",     INST_TYPE_RD_R1_IMM, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xEC000000, OPCODE_MASK_H, invalid_inst, memory_load_inst },  /* Identical to 32-bit */
++  {"sli",     INST_TYPE_RD_R1_IMM, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xFC000000, OPCODE_MASK_H, invalid_inst, memory_store_inst }, /* Identical to 32-bit */
+   {"lla",     INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x30000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst },   /* lla translates to addlik */
+   {"dadd",    INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000400, OPCODE_MASK_H4, dadd, arithmetic_inst },
+   {"drsub",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000480, OPCODE_MASK_H4, drsub, arithmetic_inst },
+Index: gdb-9.2/opcodes/microblaze-opcm.h
+===================================================================
+--- gdb-9.2.orig/opcodes/microblaze-opcm.h
++++ gdb-9.2/opcodes/microblaze-opcm.h
+@@ -40,8 +40,8 @@ enum microblaze_instr
+   imm, rtsd, rtid, rtbd, rted, bri, brid, brlid, brai, braid, bralid,
+   brki, beqi, beqid, bnei, bneid, blti, bltid, blei, bleid, bgti,
+   bgtid, bgei, bgeid, lbu, lbuea, lbur, lhu, lhuea, lhur, lw, lwea, lwr, lwx,
+-  sb, sbea, sbr, sh, shea, shr, sw, swea, swr, swx, lbui, lhui, lwi,
+-  sbi, shi, swi, msrset, msrclr, tuqula, mbi_fadd, frsub, mbi_fmul, mbi_fdiv,
++  sb, sbea, sbr, sh, shea, shr, sw, swea, swr, swx, lbui, lhui, lwi, lli,
++  sbi, shi, swi, sli, msrset, msrclr, tuqula, mbi_fadd, frsub, mbi_fmul, mbi_fdiv,
+   fcmp_lt, fcmp_eq, fcmp_le, fcmp_gt, fcmp_ne, fcmp_ge, fcmp_un, flt,
+   fint, fsqrt,
+   tget, tcget, tnget, tncget, tput, tcput, tnput, tncput,

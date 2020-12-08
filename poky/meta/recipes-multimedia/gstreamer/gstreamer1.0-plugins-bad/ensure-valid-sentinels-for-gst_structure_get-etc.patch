@@ -1,0 +1,85 @@
+From 2262ba4b686d5cc0d3e894707fe1d31619a3a8f1 Mon Sep 17 00:00:00 2001
+From: Andre McCurdy <armccurdy@gmail.com>
+Date: Tue, 9 Feb 2016 14:00:00 -0800
+Subject: [PATCH] ensure valid sentinals for gst_structure_get() etc
+
+For GStreamer functions declared with G_GNUC_NULL_TERMINATED,
+ie __attribute__((__sentinel__)), gcc will generate a warning if the
+last parameter passed to the function is not NULL (where a valid NULL
+in this context is defined as zero with any pointer type).
+
+The C callers to such functions within gst-plugins-bad use the C NULL
+definition (ie ((void*)0)), which is a valid sentinel.
+
+However the C++ NULL definition (ie 0L), is not a valid sentinel
+without an explicit cast to a pointer type.
+
+Upstream-Status: Pending
+
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+---
+ sys/decklink/gstdecklink.cpp          | 10 +++++-----
+ sys/decklink/gstdecklinkaudiosrc.cpp  |  2 +-
+ sys/decklink/gstdecklinkvideosink.cpp |  2 +-
+ 3 files changed, 7 insertions(+), 7 deletions(-)
+
+Index: gst-plugins-bad-1.10.2/sys/decklink/gstdecklink.cpp
+===================================================================
+--- gst-plugins-bad-1.10.2.orig/sys/decklink/gstdecklink.cpp
++++ gst-plugins-bad-1.10.2/sys/decklink/gstdecklink.cpp
+@@ -617,7 +617,7 @@ gst_decklink_mode_get_structure (GstDeck
+       "pixel-aspect-ratio", GST_TYPE_FRACTION, mode->par_n, mode->par_d,
+       "interlace-mode", G_TYPE_STRING,
+       mode->interlaced ? "interleaved" : "progressive",
+-      "framerate", GST_TYPE_FRACTION, mode->fps_n, mode->fps_d, NULL);
++      "framerate", GST_TYPE_FRACTION, mode->fps_n, mode->fps_d, (void*)NULL);
+ 
+   if (input && mode->interlaced) {
+     if (mode->tff)
+@@ -632,16 +632,16 @@ gst_decklink_mode_get_structure (GstDeck
+     case bmdFormat8BitYUV:     /* '2vuy' */
+       gst_structure_set (s, "format", G_TYPE_STRING, "UYVY",
+           "colorimetry", G_TYPE_STRING, mode->colorimetry,
+-          "chroma-site", G_TYPE_STRING, "mpeg2", NULL);
++          "chroma-site", G_TYPE_STRING, "mpeg2", (void*)NULL);
+       break;
+     case bmdFormat10BitYUV:    /* 'v210' */
+-      gst_structure_set (s, "format", G_TYPE_STRING, "v210", NULL);
++      gst_structure_set (s, "format", G_TYPE_STRING, "v210", (void*)NULL);
+       break;
+     case bmdFormat8BitARGB:    /* 'ARGB' */
+-      gst_structure_set (s, "format", G_TYPE_STRING, "ARGB", NULL);
++      gst_structure_set (s, "format", G_TYPE_STRING, "ARGB", (void*)NULL);
+       break;
+     case bmdFormat8BitBGRA:    /* 'BGRA' */
+-      gst_structure_set (s, "format", G_TYPE_STRING, "BGRA", NULL);
++      gst_structure_set (s, "format", G_TYPE_STRING, "BGRA", (void*)NULL);
+       break;
+     case bmdFormat10BitRGB:    /* 'r210' Big-endian RGB 10-bit per component with SMPTE video levels (64-960). Packed as 2:10:10:10 */
+     case bmdFormat12BitRGB:    /* 'R12B' Big-endian RGB 12-bit per component with full range (0-4095). Packed as 12-bit per component */
+Index: gst-plugins-bad-1.10.2/sys/decklink/gstdecklinkaudiosrc.cpp
+===================================================================
+--- gst-plugins-bad-1.10.2.orig/sys/decklink/gstdecklinkaudiosrc.cpp
++++ gst-plugins-bad-1.10.2/sys/decklink/gstdecklinkaudiosrc.cpp
+@@ -387,7 +387,7 @@ gst_decklink_audio_src_set_caps (GstBase
+       g_mutex_unlock (&self->input->lock);
+ 
+       if (videosrc) {
+-        g_object_get (videosrc, "connection", &vconn, NULL);
++        g_object_get (videosrc, "connection", &vconn, (void *) NULL);
+         gst_object_unref (videosrc);
+ 
+         switch (vconn) {
+Index: gst-plugins-bad-1.10.2/sys/decklink/gstdecklinkvideosink.cpp
+===================================================================
+--- gst-plugins-bad-1.10.2.orig/sys/decklink/gstdecklinkvideosink.cpp
++++ gst-plugins-bad-1.10.2/sys/decklink/gstdecklinkvideosink.cpp
+@@ -285,7 +285,7 @@ reset_framerate (GstCapsFeatures * featu
+     gpointer user_data)
+ {
+   gst_structure_set (structure, "framerate", GST_TYPE_FRACTION_RANGE, 0, 1,
+-      G_MAXINT, 1, NULL);
++      G_MAXINT, 1, (void *) NULL);
+ 
+   return TRUE;
+ }

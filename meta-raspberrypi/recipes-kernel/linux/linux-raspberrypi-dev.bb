@@ -5,27 +5,19 @@ python __anonymous() {
         raise bb.parse.SkipRecipe(msg)
 }
 
-LINUX_VERSION ?= "5.10.y"
-LINUX_RPI_BRANCH ?= "rpi-5.10.y"
+FILESEXTRAPATHS_prepend := "${THISDIR}/linux-raspberrypi:"
 
-SRCREV_machine = "${AUTOREV}"
-SRCREV_meta = "${AUTOREV}"
+LINUX_VERSION ?= "4.19"
+LINUX_RPI_BRANCH ?= "rpi-4.19.y"
 
-KMETA = "kernel-meta"
-
+SRCREV = "${AUTOREV}"
 SRC_URI = " \
-    git://github.com/raspberrypi/linux.git;name=machine;protocol=git;branch=${LINUX_RPI_BRANCH} \
-    git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=meta;branch=master;destsuffix=${KMETA} \
-    file://powersave.cfg \
-    file://android-drivers.cfg \
+    git://github.com/raspberrypi/linux.git;protocol=git;branch=${LINUX_RPI_BRANCH} \
     "
-
 require linux-raspberrypi.inc
-
-LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
-
-KERNEL_EXTRA_ARGS += "DTC_FLAGS='-@ -H epapr'"
 
 # Disable version check so that we don't have to edit this recipe every time
 # upstream bumps the version
 KERNEL_VERSION_SANITY_SKIP = "1"
+
+LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"

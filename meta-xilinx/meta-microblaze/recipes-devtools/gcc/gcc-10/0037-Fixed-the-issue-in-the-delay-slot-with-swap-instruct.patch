@@ -1,0 +1,37 @@
+From 2feba7c8902be8d5c4cc99feca0581472c16de0c Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Fri, 12 Oct 2018 16:07:36 +0530
+Subject: [PATCH 37/54] Fixed the issue in the delay slot with swap
+ instructions
+
+---
+ gcc/config/microblaze/microblaze.md | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index 1401d6b77ff..a91108cf0e5 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -443,6 +443,9 @@
+         (bswap:SI (match_operand:SI 1 "register_operand" "r")))]
+   "TARGET_REORDER"
+   "swapb %0, %1"
++  [(set_attr "type"	"no_delay_arith")
++   (set_attr "mode"	"SI")
++   (set_attr "length"	"4")]
+ )
+ 
+ (define_insn "bswaphi2"
+@@ -451,6 +454,9 @@
+   "TARGET_REORDER"
+   "swapb %0, %1
+    swaph %0, %0"
++  [(set_attr "type"	"no_delay_arith")
++   (set_attr "mode"	"SI")
++   (set_attr "length"	"8")]
+ )
+ 
+ ;;----------------------------------------------------------------
+-- 
+2.17.1
+

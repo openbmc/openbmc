@@ -16,7 +16,7 @@ import os
 import sys
 import datetime
 
-current_version = "dev"
+current_version = "3.2.1"
 
 # String used in sidebar
 version = 'Version: ' + current_version
@@ -78,12 +78,11 @@ extlinks = {
     'yocto_git': ('https://git.yoctoproject.org%s', None),
     'oe_home': ('https://www.openembedded.org%s', None),
     'oe_lists': ('https://lists.openembedded.org%s', None),
-    'oe_git': ('https://git.openembedded.org%s', None),
 }
 
 # Intersphinx config to use cross reference with Bitbake user manual
 intersphinx_mapping = {
-    'bitbake': ('https://docs.yoctoproject.org/bitbake/', None)
+    'bitbake': ('https://docs.yoctoproject.org/bitbake/1.48', None)
 }
 
 # -- Options for HTML output -------------------------------------------------
@@ -125,8 +124,3 @@ html_last_updated_fmt = '%b %d, %Y'
 
 # Remove the trailing 'dot' in section numbers
 html_secnumber_suffix = " "
-
-latex_elements = {
-    'passoptionstopackages': '\PassOptionsToPackage{bookmarksdepth=5}{hyperref}',
-    'preamble': '\setcounter{tocdepth}{2}',
-}

@@ -1,6 +1,6 @@
 SUMMARY = "Programmable Completion for Bash 4"
-HOMEPAGE = "https://github.com/scop/bash-completion"
-BUGTRACKER = "https://github.com/scop/bash-completion/issues"
+HOMEPAGE = "http://bash-completion.alioth.debian.org/"
+BUGTRACKER = "https://alioth.debian.org/projects/bash-completion/"
 
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"

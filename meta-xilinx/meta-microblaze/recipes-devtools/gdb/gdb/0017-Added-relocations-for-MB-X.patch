@@ -1,0 +1,113 @@
+From eccbce1a31ed29dc38fb9ab15b6badcf9412bdb8 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Tue, 11 Sep 2018 17:30:17 +0530
+Subject: [PATCH 17/52] Added relocations for MB-X
+
+Conflicts:
+	bfd/bfd-in2.h
+	gas/config/tc-microblaze.c
+---
+ bfd/bfd-in2.h              |  9 +++-
+ bfd/libbfd.h               |  4 +-
+ bfd/reloc.c                | 26 ++++++-----
+ gas/config/tc-microblaze.c | 90 ++++++++++++++++----------------------
+ 4 files changed, 61 insertions(+), 68 deletions(-)
+
+Index: gdb-9.2/bfd/bfd-in2.h
+===================================================================
+--- gdb-9.2.orig/bfd/bfd-in2.h
++++ gdb-9.2/bfd/bfd-in2.h
+@@ -5371,14 +5371,19 @@ done here - only used for relaxing  */
+ /* This is a 64 bit reloc that stores the 32 bit pc relative
+ value in two words (with an imm instruction).  No relocation is
+ done here - only used for relaxing  */
+-  BFD_RELOC_MICROBLAZE_64_NONE,
++  BFD_RELOC_MICROBLAZE_64_PCREL,
+ 
+-/* This is a 64 bit reloc that stores the 32 bit pc relative
++/* This is a 64 bit reloc that stores the 32 bit relative
+  *  +value in two words (with an imml instruction).  No relocation is
+  *   +done here - only used for relaxing  */
+     BFD_RELOC_MICROBLAZE_64,
+ 
+ /* This is a 64 bit reloc that stores the 32 bit pc relative
++ *  +value in two words (with an imm instruction).  No relocation is
++ *   +done here - only used for relaxing  */
++    BFD_RELOC_MICROBLAZE_64_NONE,
++
++/* This is a 64 bit reloc that stores the 32 bit pc relative
+ value in two words (with an imm instruction).  The relocation is
+ PC-relative GOT offset  */
+   BFD_RELOC_MICROBLAZE_64_GOTPC,
+Index: gdb-9.2/bfd/libbfd.h
+===================================================================
+--- gdb-9.2.orig/bfd/libbfd.h
++++ gdb-9.2/bfd/libbfd.h
+@@ -2905,14 +2905,14 @@ static const char *const bfd_reloc_code_
+   "BFD_RELOC_MICROBLAZE_32_SYM_OP_SYM",
+   "BFD_RELOC_MICROBLAZE_32_NONE",
+   "BFD_RELOC_MICROBLAZE_64_NONE",
+-  "BFD_RELOC_MICROBLAZE_64",
+   "BFD_RELOC_MICROBLAZE_64_GOTPC",
+-  "BFD_RELOC_MICROBLAZE_64_GPC",
+   "BFD_RELOC_MICROBLAZE_64_GOT",
+   "BFD_RELOC_MICROBLAZE_64_PLT",
+   "BFD_RELOC_MICROBLAZE_64_GOTOFF",
+   "BFD_RELOC_MICROBLAZE_32_GOTOFF",
+   "BFD_RELOC_MICROBLAZE_COPY",
++  "BFD_RELOC_MICROBLAZE_64",
++  "BFD_RELOC_MICROBLAZE_64_PCREL",
+   "BFD_RELOC_MICROBLAZE_64_TLS",
+   "BFD_RELOC_MICROBLAZE_64_TLSGD",
+   "BFD_RELOC_MICROBLAZE_64_TLSLD",
+Index: gdb-9.2/bfd/reloc.c
+===================================================================
+--- gdb-9.2.orig/bfd/reloc.c
++++ gdb-9.2/bfd/reloc.c
+@@ -6815,12 +6815,6 @@ ENUMDOC
+ ENUM
+   BFD_RELOC_MICROBLAZE_64_NONE
+ ENUMDOC
+-  This is a 32 bit reloc that stores the 32 bit pc relative
+-  value in two words (with an imml instruction).  No relocation is
+-  done here - only used for relaxing
+-ENUM
+-  BFD_RELOC_MICROBLAZE_64
+-ENUMDOC
+   This is a 64 bit reloc that stores the 32 bit pc relative
+   value in two words (with an imm instruction).  No relocation is
+   done here - only used for relaxing
+@@ -6828,12 +6822,6 @@ ENUM
+   BFD_RELOC_MICROBLAZE_64_GOTPC
+ ENUMDOC
+   This is a 64 bit reloc that stores the 32 bit pc relative
+-  value in two words (with an imml instruction).  No relocation is
+-  done here - only used for relaxing
+-ENUM
+-  BFD_RELOC_MICROBLAZE_64_GPC
+-ENUMDOC
+-  This is a 64 bit reloc that stores the 32 bit pc relative
+   value in two words (with an imm instruction).  The relocation is
+   PC-relative GOT offset
+ ENUM
+@@ -6917,6 +6905,20 @@ ENUMDOC
+   value in two words (with an imm instruction).  The relocation is
+   relative offset from start of TEXT.
+ 
++  This is a 64 bit reloc that stores 64-bit thread pointer relative offset
++  to two words (uses imml instruction).
++ENUM
++BFD_RELOC_MICROBLAZE_64,
++ENUMDOC
++ This is a 64 bit reloc that stores the 64 bit pc relative
++ value in two words (with an imml instruction).  No relocation is
++ done here - only used for relaxing
++ENUM
++BFD_RELOC_MICROBLAZE_64_PCREL,
++ENUMDOC
++ This is a 32 bit reloc that stores the 32 bit pc relative
++ value in two words (with an imml instruction).  No relocation is
++ done here - only used for relaxing
+ ENUM
+   BFD_RELOC_AARCH64_RELOC_START
+ ENUMDOC

@@ -1,0 +1,36 @@
+From 7349def8102c09fd09e735daa9fc890bee323e79 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Wed, 18 Jan 2017 11:49:58 +0530
+Subject: [PATCH 22/54] [Fix, microblaze]: Fix internal compiler error with
+ msmall-divides This patch will fix the internal error
+ microblaze_expand_divide function which comes because of rtx PLUS where the
+ mem_rtx is of type SI and the operand is of type QImode. This patch modifies
+ the mem_rtx as QImode and Plus as QImode to fix the error.
+
+Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
+               Ajit Agarwal  <ajitkum@xilinx.com>
+ChangeLog:
+  2016-02-23 Nagaraju Mekala <nmekala@xilix.com>
+             Ajit Agarwal  <ajitkum@xilinx.com>
+
+                                  *microblaze.c (microblaze_expand_divide): Update
+---
+ gcc/config/microblaze/microblaze.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+index 5d395f047f7..29b2f6b016b 100644
+--- a/gcc/config/microblaze/microblaze.c
++++ b/gcc/config/microblaze/microblaze.c
+@@ -3767,7 +3767,7 @@ microblaze_expand_divide (rtx operands[])
+   emit_insn (gen_ashlsi3_bshift (regt1, operands[1], GEN_INT(4)));
+   emit_insn (gen_addsi3 (regt1, regt1, operands[2]));
+   mem_rtx = gen_rtx_MEM (QImode,
+-                            gen_rtx_PLUS (Pmode, regt1, div_table_rtx));
++                            gen_rtx_PLUS (QImode, regt1, div_table_rtx));
+ 
+   insn = emit_insn (gen_zero_extendqisi2(operands[0],mem_rtx));
+   jump = emit_jump_insn_after (gen_jump (div_end_label), insn); 
+-- 
+2.17.1
+

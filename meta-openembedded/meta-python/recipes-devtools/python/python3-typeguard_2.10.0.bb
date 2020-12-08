@@ -28,4 +28,6 @@ DEPENDS += "\
     python3-setuptools-scm-native \
 "
 
+RDEPENDS_${PN} += "python3-typing"
+
 BBCLASSEXTEND = "native nativesdk"

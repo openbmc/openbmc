@@ -1,0 +1,49 @@
+From a1b41b2b2493069365a8274c6a544e6799a5a8df Mon Sep 17 00:00:00 2001
+From: Matthew Waters <matthew@centricular.com>
+Date: Mon, 20 Jul 2020 17:08:32 +1000
+Subject: [PATCH] gst/bufferpool: only resize in reset when maxsize is larger
+
+Only resize the buffer if the maxsize is larger then the configued pool
+size.
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/570>
+
+Upstream-Status: Backport [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/a1b41b2b2493069365a8274c6a544e6799a5a8df]
+
+Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
+---
+ gst/gstbufferpool.c | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
+
+diff --git a/gst/gstbufferpool.c b/gst/gstbufferpool.c
+index 8ae868cf2c7..a8167d017d6 100644
+--- a/gst/gstbufferpool.c
++++ b/gst/gstbufferpool.c
+@@ -1223,9 +1223,21 @@ default_reset_buffer (GstBufferPool * pool, GstBuffer * buffer)
+ 
+   /* if the memory is intact reset the size to the full size */
+   if (!GST_BUFFER_FLAG_IS_SET (buffer, GST_BUFFER_FLAG_TAG_MEMORY)) {
+-    gsize offset;
+-    gst_buffer_get_sizes (buffer, &offset, NULL);
+-    gst_buffer_resize (buffer, -offset, pool->priv->size);
++    gsize offset, maxsize;
++    gst_buffer_get_sizes (buffer, &offset, &maxsize);
++    /* check if we can resize to at least the pool configured size.  If not,
++     * then this will fail internally in gst_buffer_resize().
++     * default_release_buffer() will drop the buffer from the pool if the
++     * sizes don't match */
++    if (maxsize >= pool->priv->size) {
++      gst_buffer_resize (buffer, -offset, pool->priv->size);
++    } else {
++      GST_WARNING_OBJECT (pool, "Buffer %p without the memory tag has "
++          "maxsize (%" G_GSIZE_FORMAT ") that is smaller than the "
++          "configured buffer pool size (%u). The buffer will be not be "
++          "reused. This is most likely a bug in this GstBufferPool subclass",
++          buffer, maxsize, pool->priv->size);
++    }
+   }
+ 
+   /* remove all metadata without the POOLED flag */
+-- 
+GitLab
+

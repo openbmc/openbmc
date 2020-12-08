@@ -1,4 +1,4 @@
-From f8cb818ca96fc2a45a04448a51f25a277ec183db Mon Sep 17 00:00:00 2001
+From 76b8a389268275cc13f3b4e61394d40b24ec56f1 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 15 Jan 2020 20:21:58 -0800
 Subject: [PATCH] example-clients: Use c++ compiler for jack_simdtests
@@ -12,26 +12,22 @@ x86_64-yoe-linux-ld: example-clients/simdtests.cpp.28.o: undefined reference to 
 Upstream-Status: Submitted [https://github.com/jackaudio/jack2/pull/536]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- example-clients/wscript | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ example-clients/wscript | 2 ++
+ 1 file changed, 2 insertions(+)
 
+diff --git a/example-clients/wscript b/example-clients/wscript
+index a8857aa7..df9435aa 100644
 --- a/example-clients/wscript
 +++ b/example-clients/wscript
-@@ -49,10 +49,15 @@ def build(bld):
-         else:
-             use = ['clientlib']
+@@ -69,6 +69,8 @@ def build(bld):
  
-+        if example_program == 'jack_simdtests':
-+            ftrs = 'cxx cxxprogram'
-+        else:
-+            ftrs = 'c cprogram'
-+
          if bld.env['IS_MACOSX']:
--            prog = bld(features='c cprogram', framework = ['Foundation'])
-+            prog = bld(features = ftrs, framework = ['Foundation'])
+             prog = bld(features='c cprogram', framework = ['Foundation'])
++        elif example_program == 'jack_simdtests':
++            prog = bld(features='cxx cxxprogram')
          else:
--            prog = bld(features='c cprogram')
-+            prog = bld(features = ftrs)
+             prog = bld(features='c cprogram')
          prog.includes = os_incdir + ['../common/jack', '../common']
-         prog.source = example_program_source
-         prog.use = use
+-- 
+2.25.0
+

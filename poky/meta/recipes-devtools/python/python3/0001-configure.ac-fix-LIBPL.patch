@@ -1,0 +1,35 @@
+From acce3d441e7eadadd2d3ce38654155dc43f1f607 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Fri, 7 Feb 2020 09:36:25 +0800
+Subject: [PATCH] configure.ac: fix LIBPL
+
+Use LIBDIR rather than prefix/lib, so that it would work when lib64.
+
+Upstream-Status: Inappropriate [oe-core specific]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+Signed-off-by: Li Zhou <li.zhou@windriver.c>
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index ce04258..915f475 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -4532,9 +4532,9 @@ fi
+ dnl define LIBPL after ABIFLAGS and LDVERSION is defined.
+ AC_SUBST(PY_ENABLE_SHARED)
+ if test x$PLATFORM_TRIPLET = x; then
+-  LIBPL='$(prefix)'"/lib/python${VERSION}/config-${LDVERSION}"
++  LIBPL='$(LIBDIR)'"/python${VERSION}/config-${LDVERSION}"
+ else
+-  LIBPL='$(prefix)'"/lib/python${VERSION}/config-${LDVERSION}-${PLATFORM_TRIPLET}"
++  LIBPL='$(LIBDIR)'"/python${VERSION}/config-${LDVERSION}-${PLATFORM_TRIPLET}"
+ fi
+ AC_SUBST(LIBPL)
+
+--
+2.7.4
+

@@ -4,6 +4,8 @@
 Kernel Development FAQ
 **********************
 
+.. _kernel-dev-faq-section:
+
 Common Questions and Solutions
 ==============================
 

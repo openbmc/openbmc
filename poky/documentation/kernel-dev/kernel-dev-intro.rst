@@ -4,6 +4,8 @@
 Introduction
 ************
 
+.. _kernel-dev-overview:
+
 Overview
 ========
 
@@ -26,8 +28,8 @@ newly-supported platforms. Previous recipes in the release are refreshed
 and supported for at least one additional Yocto Project release. As they
 align, these previous releases are updated to include the latest from
 the Long Term Support Initiative (LTSI) project. You can learn more
-about Yocto Linux kernels and LTSI in the
-":ref:`kernel-dev/kernel-dev-concepts-appx:yocto project kernel development and maintenance`" section.
+about Yocto Linux kernels and LTSI in the ":ref:`Yocto Project Kernel
+Development and Maintenance <kernel-big-picture>`" section.
 
 Also included is a Yocto Linux kernel development recipe
 (``linux-yocto-dev.bb``) should you want to work with the very latest in
@@ -36,7 +38,7 @@ upstream Yocto Linux kernel development and kernel Metadata development.
 .. note::
 
    For more on Yocto Linux kernels, see the
-   ":ref:`kernel-dev/kernel-dev-concepts-appx:yocto project kernel development and maintenance`"
+   ":ref:`Yocto Project Kernel Development and Maintenance <kernel-big-picture>`"
    section.
 
 The Yocto Project also provides a powerful set of kernel tools for
@@ -165,7 +167,7 @@ general information and references for further information.
    ``menuconfig`` and you have saved them, you can directly compare the
    resulting ``.config`` file against an existing original and gather
    those changes into a
-   :ref:`configuration fragment file <kernel-dev/kernel-dev-common:creating configuration fragments>` to be
+   :ref:`configuration fragment file <creating-config-fragments>` to be
    referenced from within the kernel's ``.bbappend`` file.
 
    Additionally, if you are working in a BSP layer and need to modify

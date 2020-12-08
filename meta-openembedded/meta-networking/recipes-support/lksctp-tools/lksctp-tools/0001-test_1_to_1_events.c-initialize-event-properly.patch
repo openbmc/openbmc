@@ -1,0 +1,44 @@
+From e1e670defb84d51efdd124e5f3fa166a1a4b7c1d Mon Sep 17 00:00:00 2001
+From: Mingli Yu <Mingli.Yu@windriver.com>
+Date: Tue, 25 Sep 2018 11:39:43 +0800
+Subject: [PATCH] test_1_to_1_events.c: initialize event properly
+
+Initialize event properly to avoid below
+Segmentation fault when run below test
+related to AUTH_NO_AUTH.
+
+ # ./test_1_to_1_events
+test_1_to_1_events.c 1 PASS : COMM_UP notification on client socket - SUCCESS
+test_1_to_1_events.c 2 PASS : COMM_UP notification on server socket - SUCCESS
+test_1_to_1_events.c 3 BROK : Got a datamsg, expecting notification
+DUMP_CORE sctputil.c: 187
+[ 1468.733938] test_1_to_1_eve[2376]: segfault at 0 ip 0000561a4a3d5079 sp 00007ffd49101580 error 6 in test_1_to_1_events[561a4a3d4000+2000]
+[ 1468.734479] Code: ff bf 0a 00 00 00 e8 e6 ef ff ff b9 c9 00 00 00 48 8d 15 61 13 00 00 bf 01 00 00 00 31 c0 48 8d 35 c7 0f 00 00 e8 97 f0
+Segmentation fault
+
+Upstream-Status: Pending
+
+Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
+---
+ src/func_tests/test_1_to_1_events.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/func_tests/test_1_to_1_events.c b/src/func_tests/test_1_to_1_events.c
+index 46439bf..a086832 100644
+--- a/src/func_tests/test_1_to_1_events.c
++++ b/src/func_tests/test_1_to_1_events.c
+@@ -92,9 +92,11 @@ main(int argc, char *argv[])
+ 	/* Create the client socket.  */
+ 	clt_sk = test_socket(AF_INET, SOCK_STREAM, IPPROTO_SCTP);
+ 
++	memset(&event, 0, sizeof(event));
+ 	event.sctp_data_io_event = 1;
+ 	event.sctp_association_event = 1;
+ 	event.sctp_shutdown_event = 1;
++	event.sctp_authentication_event = 1;
+ 	len = sizeof(struct sctp_event_subscribe);
+ 	test_setsockopt(svr_sk, SCTP_EVENTS, &event, len);
+ 	test_setsockopt(clt_sk, SCTP_EVENTS, &event, len);
+-- 
+2.7.4
+

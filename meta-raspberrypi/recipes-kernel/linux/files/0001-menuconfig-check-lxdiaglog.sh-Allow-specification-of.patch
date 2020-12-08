@@ -1,0 +1,62 @@
+From e6ebc8e654bba53f28af5229a1069fc74fa58b7b Mon Sep 17 00:00:00 2001
+From: Jason Wessel <jason.wessel@windriver.com>
+Date: Thu, 25 Sep 2014 11:26:49 -0700
+Subject: [PATCH] menuconfig,check-lxdiaglog.sh: Allow specification of ncurses
+ location
+
+In some cross build environments such as the Yocto Project build
+environment it provides an ncurses library that is compiled
+differently than the host's version.  This causes display corruption
+problems when the host's curses includes are used instead of the
+includes from the provided compiler are overridden.  There is a second
+case where there is no curses libraries at all on the host system and
+menuconfig will just fail entirely.
+
+The solution is simply to allow an override variable in
+check-lxdialog.sh for environments such as the Yocto Project.  Adding
+a CROSS_CURSES_LIB and CROSS_CURSES_INC solves the issue and allowing
+compiling and linking against the right headers and libraries.
+
+Upstream-Status: submitted [https://lkml.org/lkml/2013/3/3/103]
+
+Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
+cc: Michal Marek <mmarek@suse.cz>
+cc: linux-kbuild@vger.kernel.org
+Signed-off-by: Bruce Ashfield <bruce.ashfield@windriver.com>
+Signed-off-by: California Sullivan <california.l.sullivan@intel.com>
+---
+ scripts/kconfig/lxdialog/check-lxdialog.sh | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+ mode change 100755 => 100644 scripts/kconfig/lxdialog/check-lxdialog.sh
+
+diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig/lxdialog/check-lxdialog.sh
+old mode 100755
+new mode 100644
+index 5075ebf2d3b9..ba9242101190
+--- a/scripts/kconfig/lxdialog/check-lxdialog.sh
++++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
+@@ -4,6 +4,10 @@
+ # What library to link
+ ldflags()
+ {
++	if [ "$CROSS_CURSES_LIB" != "" ]; then
++		echo "$CROSS_CURSES_LIB"
++		exit
++	fi
+ 	pkg-config --libs ncursesw 2>/dev/null && exit
+ 	pkg-config --libs ncurses 2>/dev/null && exit
+ 	for ext in so a dll.a dylib ; do
+@@ -21,6 +25,10 @@ ldflags()
+ # Where is ncurses.h?
+ ccflags()
+ {
++	if [ x"$CROSS_CURSES_INC" != x ]; then
++		echo "$CROSS_CURSES_INC"
++		exit
++	fi
+ 	if pkg-config --cflags ncursesw 2>/dev/null; then
+ 		echo '-DCURSES_LOC="<ncurses.h>" -DNCURSES_WIDECHAR=1'
+ 	elif pkg-config --cflags ncurses 2>/dev/null; then
+-- 
+2.14.3
+

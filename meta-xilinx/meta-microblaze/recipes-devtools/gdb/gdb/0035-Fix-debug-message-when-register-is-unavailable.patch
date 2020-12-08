@@ -1,0 +1,37 @@
+From c6da374fbce33b35b060a07ee446aaf1803b1e1d Mon Sep 17 00:00:00 2001
+From: Nathan Rossi <nathan.rossi@petalogix.com>
+Date: Tue, 8 May 2012 18:11:17 +1000
+Subject: [PATCH 35/52] Fix debug message when register is unavailable
+
+Signed-off-by: Nathan Rossi <nathan.rossi@petalogix.com>
+---
+ gdb/frame.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
+
+Index: gdb-9.2/gdb/frame.c
+===================================================================
+--- gdb-9.2.orig/gdb/frame.c
++++ gdb-9.2/gdb/frame.c
+@@ -1255,12 +1255,19 @@ frame_unwind_register_value (frame_info
+ 	  else
+ 	    {
+ 	      int i;
+-	      const gdb_byte *buf = value_contents (value);
++	      const gdb_byte *buf = NULL;
++	      if (value_entirely_available(value)) {
++	        buf = value_contents (value);
++	      }
+ 
+ 	      fprintf_unfiltered (gdb_stdlog, " bytes=");
+ 	      fprintf_unfiltered (gdb_stdlog, "[");
+-	      for (i = 0; i < register_size (gdbarch, regnum); i++)
+-		fprintf_unfiltered (gdb_stdlog, "%02x", buf[i]);
++	      if (buf != NULL) {
++	        for (i = 0; i < register_size (gdbarch, regnum); i++)
++		  fprintf_unfiltered (gdb_stdlog, "%02x", buf[i]);
++	      } else {
++	        fprintf_unfiltered (gdb_stdlog, "unavailable");
++	      }
+ 	      fprintf_unfiltered (gdb_stdlog, "]");
+ 	    }
+ 	}

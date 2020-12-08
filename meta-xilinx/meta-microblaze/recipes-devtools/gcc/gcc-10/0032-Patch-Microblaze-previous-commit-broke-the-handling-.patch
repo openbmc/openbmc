@@ -1,0 +1,28 @@
+From 410348f4fd9b641afa24e6c6b6a62a4c74d18862 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Wed, 8 Aug 2018 17:37:26 +0530
+Subject: [PATCH 32/54] [Patch,Microblaze] :  previous commit broke the
+ handling of SI Branch compare for Microblaze 32-bit..
+
+---
+ gcc/config/microblaze/microblaze.md | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index cfe9e5312d1..592757baf2f 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -2227,8 +2227,8 @@ else
+ (define_expand "cbranchsi4"
+   [(set (pc)
+         (if_then_else (match_operator 0 "ordered_comparison_operator"
+-                       [(match_operand 1 "register_operand")
+-                        (match_operand 2 "arith_operand" "I,i")])
++                       [(match_operand:SI 1 "register_operand")
++                        (match_operand:SI 2 "arith_operand" "I,i")])
+                       (label_ref (match_operand 3 ""))
+                       (pc)))]
+   ""
+-- 
+2.17.1
+

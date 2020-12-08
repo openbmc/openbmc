@@ -127,13 +127,6 @@ The resulting HTML index page will be _build/html/index.html, and you
 can browse your own copy of the locally generated documentation with
 your browser.
 
-Alternatively, you can use Pipenv to automatically install all required
-dependencies in a virtual environment:
-
- $ cd documentation
- $ pipenv install
- $ pipenv run make html
-
 Sphinx theme and CSS customization
 ==================================
 
@@ -325,9 +318,3 @@ References to the bitbake manual can be done like this:
   See the ":ref:`-D <bitbake:bitbake-user-manual/bitbake-user-manual-intro:usage and syntax>`" option
 or
   :term:`bitbake:BB_NUMBER_PARSE_THREADS`
-
-Submitting documentation changes
-================================
-
-Please see the top level README file in this repository for details of where
-to send patches.

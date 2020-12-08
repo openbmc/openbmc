@@ -1,0 +1,45 @@
+From b61446add7ae1c041266c2fa5ba2f51cb3b65d35 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 31 Dec 2015 06:44:07 +0000
+Subject: [PATCH 2/6] backtrace: Use only with glibc and uclibc
+
+backtrace API is glibc specific not linux specific
+so make it behave so.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/test-coredump-unwind.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/tests/test-coredump-unwind.c b/tests/test-coredump-unwind.c
+index 5349823..3b153cb 100644
+--- a/tests/test-coredump-unwind.c
++++ b/tests/test-coredump-unwind.c
+@@ -57,7 +57,9 @@
+ #include <grp.h>
+ 
+ /* For SIGSEGV handler code */
++#ifdef __GLIBC__
+ #include <execinfo.h>
++#endif
+ #include <sys/ucontext.h>
+ 
+ #include <libunwind-coredump.h>
+@@ -238,11 +240,11 @@ void handle_sigsegv(int sig, siginfo_t *info, void *ucontext)
+ 			ip);
+ 
+   {
++#ifdef __GLIBC__
+     /* glibc extension */
+     void *array[50];
+     int size;
+     size = backtrace(array, 50);
+-#ifdef __linux__
+     backtrace_symbols_fd(array, size, 2);
+ #endif
+   }
+-- 
+2.20.1
+

@@ -1,0 +1,98 @@
+From 663d51cd31fd98411e25f37aaf52b591d9639bf5 Mon Sep 17 00:00:00 2001
+From: "Maxin B. John" <maxin.john@intel.com>
+Date: Mon, 30 Jul 2018 17:23:29 +0300
+Subject: [PATCH] Don't build demos with questionably licensed data
+
+Some of the models don't have open source compatible licenses:
+don't build demos using those. Also don't build demos that need
+resources that are not included.
+
+ssao:
+scenerendering:
+        Sibenik model, no license found
+
+deferred:
+deferredmultisampling:
+deferredshadows:
+        armor model, CC-BY-3.0
+
+vulkanscene:
+imgui:
+shadowmapping:
+        vulkanscene model, no license found
+
+indirectdraw:
+        plant model, no license found
+
+hdr:
+pbribl:
+pbrtexture:
+        Require external Vulkan Asset Pack
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Signed-off-by: Maxin B. John <maxin.john@intel.com>
+---
+ examples/CMakeLists.txt | 14 --------------
+ 1 file changed, 14 deletions(-)
+
+diff --git a/examples/CMakeLists.txt b/examples/CMakeLists.txt
+index a53c834..71a12e7 100644
+--- a/examples/CMakeLists.txt
++++ b/examples/CMakeLists.txt
+@@ -55,9 +55,6 @@ set(EXAMPLES
+ 	conditionalrender
+ 	conservativeraster
+ 	debugmarker
+-	deferred
+-	deferredmultisampling
+-	deferredshadows
+ 	descriptorsets
+ 	displacement
+ 	distancefieldfonts
+@@ -65,9 +62,6 @@ set(EXAMPLES
+ 	gears
+ 	geometryshader
+ 	gltfscene
+-	hdr
+-	imgui
+-	indirectdraw
+ 	inlineuniformblocks
+ 	inputattachments
+ 	instancing
+@@ -83,23 +77,16 @@ set(EXAMPLES
+ 	parallaxmapping
+ 	particlefire
+ 	pbrbasic
+-	pbribl
+-	pbrtexture
+ 	pipelines
+ 	pipelinestatistics
+ 	pushconstants
+ 	pushdescriptors
+ 	radialblur
+ 	renderheadless
+-	scenerendering
+ 	screenshot
+-	shadowmapping
+-	shadowmappingomni
+-	shadowmappingcascade
+ 	skeletalanimation
+ 	specializationconstants
+ 	sphericalenvmapping
+-	ssao
+ 	stencilbuffer
+ 	subpasses
+ 	terraintessellation
+@@ -113,7 +100,6 @@ set(EXAMPLES
+ 	texturesparseresidency
+ 	triangle
+ 	viewportarray
+-	vulkanscene
+ )
+ 
+ buildExamples()
+-- 
+2.17.1
+

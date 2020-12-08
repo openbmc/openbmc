@@ -17,8 +17,8 @@ index d1be65b..90f3573 100644
 --- a/mesonbuild/envconfig.py
 +++ b/mesonbuild/envconfig.py
 @@ -36,6 +36,7 @@ _T = T.TypeVar('_T')
-
-
+ 
+ 
  known_cpu_families = (
 +    'allarch',
      'aarch64',

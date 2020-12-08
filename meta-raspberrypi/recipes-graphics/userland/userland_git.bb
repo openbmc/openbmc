@@ -13,11 +13,11 @@ COMPATIBLE_MACHINE = "^rpi$"
 
 SRCBRANCH = "master"
 SRCFORK = "raspberrypi"
-SRCREV = "9f3f9054a692e53b60fca54221a402414e030335"
+SRCREV = "188d3bfe4a0ac36b119a2cee35a6be8d0c68e09e"
 
 # Use the date of the above commit as the package version. Update this when
 # SRCREV is changed.
-PV = "20201027"
+PV = "20200624"
 
 SRC_URI = "\
     git://github.com/${SRCFORK}/userland.git;protocol=git;branch=${SRCBRANCH} \
@@ -42,8 +42,6 @@ SRC_URI = "\
     file://0019-libfdt-Undefine-__wordsize-if-already-defined.patch \
     file://0020-openmaxil-add-pkg-config-file.patch \
     file://0021-cmake-Disable-format-overflow-warning-as-error.patch \
-    file://0022-all-host_applications-remove-non-existent-projects.patch \
-    file://0023-hello_pi-optionally-build-wayland-specific-app.patch \
 "
 
 SRC_URI_remove_toolchain-clang = "file://0021-cmake-Disable-format-overflow-warning-as-error.patch"
@@ -54,10 +52,8 @@ inherit cmake pkgconfig
 
 ASNEEDED = ""
 
-ALLAPPS = "${@bb.utils.contains('PACKAGECONFIG', 'allapps', '-DALL_APPS=true', '', d)}"
 EXTRA_OECMAKE = "-DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS='-Wl,--no-as-needed' \
                  -DVMCS_INSTALL_PREFIX=${exec_prefix} \
-                 ${ALLAPPS} \
 "
 
 EXTRA_OECMAKE_append_aarch64 = " -DARM64=ON "

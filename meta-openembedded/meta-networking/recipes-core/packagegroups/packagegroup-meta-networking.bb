@@ -220,7 +220,6 @@ RDEPENDS_packagegroup-meta-networking-support = "\
     macchanger \
     nbdkit \
     ssmping \
-    libmaxminddb \
     libowfat \
     ncp \
     strongswan \
@@ -233,8 +232,7 @@ RDEPENDS_packagegroup-meta-networking-support = "\
     traceroute \
     tunctl \
     wireshark \
-    ndpi \
-    ntopng \
+    ntop \
     nuttcp \
     nvmetcli \
     open-isns \

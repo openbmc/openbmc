@@ -1,0 +1,74 @@
+From d22ddc73f00ed056032a635ee8379305ec83bf81 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Wed, 11 Jul 2018 12:02:50 +0800
+Subject: [PATCH] plugins/Makefile.am: fix for automake 1.16.1
+
+Fixed:
+| i586-poky-linux-gcc: error: netflowPlugin.o: No such file or directory
+| i586-poky-linux-gcc: error: unrecognized command line option '-flat_namespace'; did you mean '-Wnamespaces'?
+| i586-poky-linux-gcc: fatal error: no input files
+
+The previous code make things complicated, but we don't have to, let libtool do
+most of the things can fix the problem.
+
+Upstream-Status: Pending [ntop is not longer maintained any more, we need consider moving to ntopng]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ plugins/Makefile.am | 34 ++++++----------------------------
+ 1 file changed, 6 insertions(+), 28 deletions(-)
+
+diff --git a/plugins/Makefile.am b/plugins/Makefile.am
+index 64492e0..bcd0c10 100644
+--- a/plugins/Makefile.am
++++ b/plugins/Makefile.am
+@@ -69,40 +69,18 @@ libsflowPlugin_la_CFLAGS = $(AM_CFLAGS)
+ # by default ntop looks for plugins in the plugins/ subdirectory
+ #
+ 
+-
+-.libs/libnetflowPlugin.so@SO_VERSION_PATCH@:
+-	@if test -f libnetflowPlugin_la-netflowPlugin.o; then \
+-	$(CC) @MAKE_SHARED_LIBRARY_PARM@ -o .libs/libnetflowPlugin.so@SO_VERSION_PATCH@ libnetflowPlugin_la-netflowPlugin.o; \
+-	else \
+-	$(CC) @MAKE_SHARED_LIBRARY_PARM@ -o .libs/libnetflowPlugin.so@SO_VERSION_PATCH@ netflowPlugin.o; \
+-	fi
+-
+-netflowPlugin.so$(EXEEXT): .libs/libnetflowPlugin.so@SO_VERSION_PATCH@
+-	@$(LN_S) .libs/libnetflowPlugin.so netflowPlugin.so
++netflowPlugin.so$(EXEEXT): libnetflowPlugin.la
++	@$(LN_S) -f .libs/libnetflowPlugin.so netflowPlugin.so
+ 
+ ###############
+ 
+-.libs/librrdPlugin.so@SO_VERSION_PATCH@:
+-	@if test -f librrdPlugin_la-rrdPlugin.o; then \
+-	$(CC) @MAKE_SHARED_LIBRARY_PARM@ -o .libs/librrdPlugin.so@SO_VERSION_PATCH@ librrdPlugin_la-rrdPlugin.o; \
+-	else \
+-	$(CC) @MAKE_SHARED_LIBRARY_PARM@ -o .libs/librrdPlugin.so@SO_VERSION_PATCH@ rrdPlugin.o; \
+-	fi
+-
+-rrdPlugin.so$(EXEEXT): .libs/librrdPlugin.so@SO_VERSION_PATCH@
+-	@$(LN_S) .libs/librrdPlugin.so rrdPlugin.so
++rrdPlugin.so$(EXEEXT): librrdPlugin.la
++	@$(LN_S) -f .libs/librrdPlugin.so rrdPlugin.so
+ 
+ ###############
+ 
+-.libs/libsflowPlugin.so@SO_VERSION_PATCH@:
+-	@if test -f libsflowPlugin_la-sflowPlugin.o; then \
+-	$(CC) @MAKE_SHARED_LIBRARY_PARM@ -o .libs/libsflowPlugin.so@SO_VERSION_PATCH@ libsflowPlugin_la-sflowPlugin.o; \
+-	else \
+-	$(CC) @MAKE_SHARED_LIBRARY_PARM@ -o .libs/libsflowPlugin.so@SO_VERSION_PATCH@ sflowPlugin.o; \
+-	fi
+-
+-sflowPlugin.so$(EXEEXT): .libs/libsflowPlugin.so@SO_VERSION_PATCH@
+-	@$(LN_S) .libs/libsflowPlugin.so sflowPlugin.so
++sflowPlugin.so$(EXEEXT): libsflowPlugin.la
++	@$(LN_S) -f .libs/libsflowPlugin.so sflowPlugin.so
+ 
+ ###############
+ 
+-- 
+2.7.4
+

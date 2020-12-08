@@ -1,0 +1,15 @@
+[Unit]
+Description=A network traffic probe similar to the UNIX top command
+Requires=network.target
+
+ConditionPathExists=@SYSCONFDIR@/ntop.conf
+After=syslog.target network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=@LIBEXECDIR@/ntop-helper start
+ExecStop=@LIBEXECDIR@/ntop-helper stop
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,46 @@
+From 7eaa21a79ce6d6e92f6bf98c28b68e3fcb4d7874 Mon Sep 17 00:00:00 2001
+From: Fabio Berton <fabio.berton@ossystems.com.br>
+Date: Wed, 12 Jun 2019 14:18:31 -0300
+Subject: [PATCH] Allow enable DRI without DRI drivers
+
+Upstream-Status: Pending
+
+Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
+Signed-off-by: Fabio Berton <fabio.berton@ossystems.com.br>
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+
+---
+ meson.build       | 2 +-
+ meson_options.txt | 6 ++++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index a954118..62864c6 100644
+--- a/meson.build
++++ b/meson.build
+@@ -154,7 +154,7 @@ with_dri_r200 = dri_drivers.contains('r200')
+ with_dri_nouveau = dri_drivers.contains('nouveau')
+ with_dri_swrast = dri_drivers.contains('swrast')
+ 
+-with_dri = dri_drivers.length() != 0 and dri_drivers != ['']
++with_dri = get_option('dri') or (dri_drivers.length() != 0 and dri_drivers != [''])
+ 
+ gallium_drivers = get_option('gallium-drivers')
+ if gallium_drivers.contains('auto')
+diff --git a/meson_options.txt b/meson_options.txt
+index 637ff14..700c34c 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -35,6 +35,12 @@ option(
+   choices : ['auto', 'true', 'false'],
+   description : 'enable support for dri3'
+ )
++option(
++  'dri',
++  type : 'boolean',
++  value : false,
++  description : 'enable support for dri'
++)
+ option(
+   'dri-drivers',
+   type : 'array',

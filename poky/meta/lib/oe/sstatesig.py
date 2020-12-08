@@ -162,7 +162,12 @@ class SignatureGeneratorOEBasicHashMixIn(object):
             else:
                 return super().get_taskhash(tid, deps, dataCaches)
 
+        # get_taskhash will call get_unihash internally in the parent class, we
+        # need to disable our filter of it whilst this runs else
+        # incorrect hashes can be calculated.
+        self._internal = True
         h = super().get_taskhash(tid, deps, dataCaches)
+        self._internal = False
 
         (mc, _, task, fn) = bb.runqueue.split_tid_mcfn(tid)
 
@@ -434,7 +439,7 @@ def find_sstate_manifest(taskdata, taskdata2, taskname, d, multilibcache):
         d2 = multilibcache[variant]
 
     if taskdata.endswith("-native"):
-        pkgarchs = ["${BUILD_ARCH}", "${BUILD_ARCH}_${ORIGNATIVELSBSTRING}"]
+        pkgarchs = ["${BUILD_ARCH}"]
     elif taskdata.startswith("nativesdk-"):
         pkgarchs = ["${SDK_ARCH}_${SDK_OS}", "allarch"]
     elif "-cross-canadian" in taskdata:

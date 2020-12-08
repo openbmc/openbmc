@@ -33,7 +33,7 @@ SRC_URI[sha256sum] = "f10c85ae3e204dbaec39ae22fa3c5e99f0665417e91c2cb49b7e503165
 
 DEPENDS = "flex-native bison-native gettext-native"
 
-COMPATIBLE_HOST = '(x86_64.*|i.86.*|arm.*|aarch64.*|riscv.*)-(linux.*|freebsd.*)'
+COMPATIBLE_HOST = '(x86_64.*|i.86.*|arm.*|aarch64.*)-(linux.*|freebsd.*)'
 COMPATIBLE_HOST_armv7a = 'null'
 COMPATIBLE_HOST_armv7ve = 'null'
 
@@ -42,8 +42,6 @@ COMPATIBLE_HOST_armv7ve = 'null'
 
 GRUBPLATFORM_arm = "efi"
 GRUBPLATFORM_aarch64 = "efi"
-GRUBPLATFORM_riscv32 = "efi"
-GRUBPLATFORM_riscv64 = "efi"
 GRUBPLATFORM ??= "pc"
 
 inherit autotools gettext texinfo pkgconfig

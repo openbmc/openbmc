@@ -4,6 +4,12 @@
  Current Release Manuals
 =========================
 
+*******************************
+3.2 'gatesgarth' Release Series
+*******************************
+
+- :yocto_docs:`3.2 Documentation </3.2>`
+
 ****************************
 3.1 'dunfell' Release Series
 ****************************

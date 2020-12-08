@@ -10,7 +10,6 @@ DEPENDS = "libpcre zlib"
 
 SRC_URI = " \
     git://github.com/pocoproject/poco.git;branch=poco-${PV} \
-    file://0001-Add-support-of-arch-riscv32.patch \
     file://run-ptest \
    "
 SRCREV = "a3d827d80eb7f3329c58e73eb2906cb7ba829019"

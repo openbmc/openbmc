@@ -125,11 +125,11 @@ class Command(object):
 
     def stop(self):
         for thread in self.threads:
-            if thread.is_alive():
+            if thread.isAlive():
                 self.process.terminate()
             # let's give it more time to terminate gracefully before killing it
             thread.join(5)
-            if thread.is_alive():
+            if thread.isAlive():
                 self.process.kill()
                 thread.join()
 

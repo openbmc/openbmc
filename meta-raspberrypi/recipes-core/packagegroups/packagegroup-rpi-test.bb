@@ -17,6 +17,7 @@ RDEPENDS_${PN} = "\
     rpi-gpio \
     pi-blaster \
     python3-rtimu \
+    python3-sense-hat \
     connman \
     connman-client \
     wireless-regdb-static \

@@ -22,7 +22,6 @@ inherit autotools pkgconfig
 RDEPENDS_${PN} += "iproute2"
 
 ALTERNATIVE_PRIORITY = "90"
-ALTERNATIVE_${PN} = "candump cansend cansequence"
+ALTERNATIVE_${PN} = "candump cansend"
 ALTERNATIVE_LINK_NAME[candump] = "${bindir}/candump"
 ALTERNATIVE_LINK_NAME[cansend] = "${bindir}/cansend"
-ALTERNATIVE_LINK_NAME[cansequence] = "${bindir}/cansequence"

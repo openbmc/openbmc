@@ -1,0 +1,35 @@
+From bed4cf4aaa6aad4172ec9942e9039fb8e1ef68a4 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 29 Feb 2016 18:13:39 +0200
+Subject: [PATCH] OptionsGTK.cmake: drop the hardcoded introspection/gtkdoc
+ disabling when cross-compiling
+
+This was not possible to override from the command line and in OpenEmbedded
+(one of the most prominent cross-compilation frameworks) introspection does work fine,
+through the use of qemu target emulation.
+
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+Upstream-Status: Pending
+
+---
+ Source/cmake/OptionsGTK.cmake | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/Source/cmake/OptionsGTK.cmake b/Source/cmake/OptionsGTK.cmake
+index 661b40e..404441b 100644
+--- a/Source/cmake/OptionsGTK.cmake
++++ b/Source/cmake/OptionsGTK.cmake
+@@ -352,12 +352,6 @@ if (ENABLED_COMPILER_SANITIZERS)
+     set(ENABLE_INTROSPECTION OFF)
+ endif ()
+ 
+-# Override the cached variables, gtk-doc and gobject-introspection do not really work when cross-building.
+-if (CMAKE_CROSSCOMPILING)
+-    set(ENABLE_GTKDOC OFF)
+-    set(ENABLE_INTROSPECTION OFF)
+-endif ()
+-
+ # Override the cached variable, gtk-doc does not really work when building on Mac.
+ if (APPLE)
+     set(ENABLE_GTKDOC OFF)

@@ -6,7 +6,8 @@ LIC_FILES_CHKSUM = "file://../../../../license.txt;md5=39ab6ab638f4d1836ba994ec6
 SRCREV = "e8db5fb118229fdc621e0ec7848641a23bf60998"
 PV = "${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
-SRC_URI = "git://github.com/Xilinx/embeddedsw.git;protocol=https;nobranch=1"
+SRC_URI = "git://github.com/Xilinx/embeddedsw.git;protocol=https;nobranch=1 \
+	   file://fix-zynqmp-assert.patch;pnum=5"
 
 COMPATIBLE_HOST = "microblaze.*-elf"
 COMPATIBLE_MACHINE = "microblaze-pmu"

@@ -4,6 +4,8 @@
 Advanced Kernel Concepts
 ************************
 
+.. _kernel-big-picture:
+
 Yocto Project Kernel Development and Maintenance
 ================================================
 

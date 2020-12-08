@@ -1,0 +1,62 @@
+From aabf518e2e61a882b925f9d2ac53dafa7a041a0a Mon Sep 17 00:00:00 2001
+From: Jeremy Puhlman <jpuhlman@mvista.com>
+Date: Tue, 25 Feb 2020 22:58:59 +0000
+Subject: [PATCH] gzip with -n for build reproducibilty
+
+The date can get encoded in the header of the gz file, which
+causes the binary files between two different builds of the
+same data to be different. Add -n for reproducibilty
+
+Signed-off-by: Jeremy Puhlman <jpuhlman@mvista.com>
+
+Upstream-Status: Submitted [mailinglist]
+
+---
+ Makefile | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index a54d82b..e9f0d5a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -168,17 +168,17 @@ install: all install_hwlatdetect
+ 	cp $(TARGETS) "$(DESTDIR)$(bindir)"
+ 	install -D -m 644 src/backfire/backfire.c "$(DESTDIR)$(srcdir)/backfire/backfire.c"
+ 	install -m 644 src/backfire/Makefile "$(DESTDIR)$(srcdir)/backfire/Makefile"
+-	gzip -c src/backfire/backfire.4 >"$(DESTDIR)$(mandir)/man4/backfire.4.gz"
+-	gzip -c src/cyclictest/cyclictest.8 >"$(DESTDIR)$(mandir)/man8/cyclictest.8.gz"
+-	gzip -c src/pi_tests/pi_stress.8 >"$(DESTDIR)$(mandir)/man8/pi_stress.8.gz"
+-	gzip -c src/ptsematest/ptsematest.8 >"$(DESTDIR)$(mandir)/man8/ptsematest.8.gz"
+-	gzip -c src/rt-migrate-test/rt-migrate-test.8 >"$(DESTDIR)$(mandir)/man8/rt-migrate-test.8.gz"
+-	gzip -c src/sigwaittest/sigwaittest.8 >"$(DESTDIR)$(mandir)/man8/sigwaittest.8.gz"
+-	gzip -c src/svsematest/svsematest.8 >"$(DESTDIR)$(mandir)/man8/svsematest.8.gz"
+-	gzip -c src/pmqtest/pmqtest.8 >"$(DESTDIR)$(mandir)/man8/pmqtest.8.gz"
+-	gzip -c src/backfire/sendme.8 >"$(DESTDIR)$(mandir)/man8/sendme.8.gz"
+-	gzip -c src/hackbench/hackbench.8 >"$(DESTDIR)$(mandir)/man8/hackbench.8.gz"
+-	gzip -c src/signaltest/signaltest.8 >"$(DESTDIR)$(mandir)/man8/signaltest.8.gz"
++	gzip -nc src/backfire/backfire.4 >"$(DESTDIR)$(mandir)/man4/backfire.4.gz"
++	gzip -nc src/cyclictest/cyclictest.8 >"$(DESTDIR)$(mandir)/man8/cyclictest.8.gz"
++	gzip -nc src/pi_tests/pi_stress.8 >"$(DESTDIR)$(mandir)/man8/pi_stress.8.gz"
++	gzip -nc src/ptsematest/ptsematest.8 >"$(DESTDIR)$(mandir)/man8/ptsematest.8.gz"
++	gzip -nc src/rt-migrate-test/rt-migrate-test.8 >"$(DESTDIR)$(mandir)/man8/rt-migrate-test.8.gz"
++	gzip -nc src/sigwaittest/sigwaittest.8 >"$(DESTDIR)$(mandir)/man8/sigwaittest.8.gz"
++	gzip -nc src/svsematest/svsematest.8 >"$(DESTDIR)$(mandir)/man8/svsematest.8.gz"
++	gzip -nc src/pmqtest/pmqtest.8 >"$(DESTDIR)$(mandir)/man8/pmqtest.8.gz"
++	gzip -nc src/backfire/sendme.8 >"$(DESTDIR)$(mandir)/man8/sendme.8.gz"
++	gzip -nc src/hackbench/hackbench.8 >"$(DESTDIR)$(mandir)/man8/hackbench.8.gz"
++	gzip -nc src/signaltest/signaltest.8 >"$(DESTDIR)$(mandir)/man8/signaltest.8.gz"
+ 
+ .PHONY: install_hwlatdetect
+ install_hwlatdetect: hwlatdetect
+@@ -187,7 +187,7 @@ install_hwlatdetect: hwlatdetect
+ 		install -D -m 755 src/hwlatdetect/hwlatdetect.py $(DESTDIR)$(PYLIB)/hwlatdetect.py ; \
+ 		rm -f "$(DESTDIR)$(bindir)/hwlatdetect" ; \
+ 		ln -s $(PYLIB)/hwlatdetect.py "$(DESTDIR)$(bindir)/hwlatdetect" ; \
+-		gzip -c src/hwlatdetect/hwlatdetect.8 >"$(DESTDIR)$(mandir)/man8/hwlatdetect.8.gz" ; \
++		gzip -nc src/hwlatdetect/hwlatdetect.8 >"$(DESTDIR)$(mandir)/man8/hwlatdetect.8.gz" ; \
+ 	fi
+ 
+ .PHONY: tarball
+-- 
+2.23.0
+

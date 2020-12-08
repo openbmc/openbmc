@@ -1,0 +1,29 @@
+From 61be4b342d470aeb7ad1c0cc5e90f5afdc906c00 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Tue, 16 Oct 2018 07:55:46 +0530
+Subject: [PATCH 40/54] fixing the typo errors in umodsi3 file
+
+---
+ libgcc/config/microblaze/umodsi3.S | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/libgcc/config/microblaze/umodsi3.S b/libgcc/config/microblaze/umodsi3.S
+index 30bd8c20b58..2dd72aef68e 100644
+--- a/libgcc/config/microblaze/umodsi3.S
++++ b/libgcc/config/microblaze/umodsi3.S
+@@ -47,9 +47,9 @@ __umodsi3:
+ 	.frame	r1,0,r15	
+ 
+ 	addik	r1,r1,-24
+-	swi	r29,r1,0
+-	swi	r30,r1,8
+-	swi	r31,r1,16
++	sli	r29,r1,0
++	sli	r30,r1,8
++	sli	r31,r1,16
+ #else
+ __umodsi3:
+ 	.frame	r1,0,r15	
+-- 
+2.17.1
+

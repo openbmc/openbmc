@@ -21,7 +21,6 @@ EXTRA_OECONF = "--without-random \
 EXTRA_OEMAKE_class-target = "LIBTOOL=${HOST_SYS}-libtool"
 
 LDFLAGS_append_mipsarch = " -latomic"
-LDFLAGS_append_riscv32 = " -latomic"
 
 S="${WORKDIR}/${BPN}-${PV}"
 

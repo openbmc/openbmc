@@ -59,10 +59,9 @@ class OpkgIndexer(Indexer):
                                    self.d.getVar('PACKAGE_FEED_GPG_PASSPHRASE_FILE'),
                                    armor=is_ascii_sig)
 
-class PMPkgsList(PkgsList):
-    def __init__(self, d, rootfs_dir):
-        super(PMPkgsList, self).__init__(d, rootfs_dir)
-        config_file = d.getVar("IPKGCONF_TARGET")
+class OpkgPkgsList(PkgsList):
+    def __init__(self, d, rootfs_dir, config_file):
+        super(OpkgPkgsList, self).__init__(d, rootfs_dir)
 
         self.opkg_cmd = bb.utils.which(os.getenv('PATH'), "opkg")
         self.opkg_args = "-f %s -o %s " % (config_file, rootfs_dir)
@@ -417,7 +416,7 @@ class OpkgPM(OpkgDpkgPM):
             bb.utils.remove(os.path.join(self.opkg_dir, "lists"), True)
 
     def list_installed(self):
-        return PMPkgsList(self.d, self.target_rootfs).list_pkgs()
+        return OpkgPkgsList(self.d, self.target_rootfs, self.config_file).list_pkgs()
 
     def dummy_install(self, pkgs):
         """

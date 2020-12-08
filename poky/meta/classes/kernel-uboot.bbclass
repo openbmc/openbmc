@@ -1,7 +1,3 @@
-# fitImage kernel compression algorithm
-FIT_KERNEL_COMP_ALG ?= "gzip"
-FIT_KERNEL_COMP_ALG_EXTENSION ?= ".gz"
-
 uboot_prep_kimage() {
 	if [ -e arch/${ARCH}/boot/compressed/vmlinux ]; then
 		vmlinux_path="arch/${ARCH}/boot/compressed/vmlinux"
@@ -15,8 +11,8 @@ uboot_prep_kimage() {
 		linux_comp="none"
 	else
 		vmlinux_path="vmlinux"
-		linux_suffix="${FIT_KERNEL_COMP_ALG_EXTENSION}"
-		linux_comp="${FIT_KERNEL_COMP_ALG}"
+		linux_suffix=".gz"
+		linux_comp="gzip"
 	fi
 
 	[ -n "${vmlinux_path}" ] && ${OBJCOPY} -O binary -R .note -R .comment -S "${vmlinux_path}" linux.bin

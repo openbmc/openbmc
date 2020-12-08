@@ -1,0 +1,33 @@
+From 42e58c4c3e95a4a78ee8294f9b3901726bbbabe4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Sat, 11 May 2019 00:21:11 +0200
+Subject: [PATCH] Do not skip gir installation for cross compiling
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We are cool and can handle cross gobject-introspection.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ headers/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/headers/meson.build b/headers/meson.build
+index 3ce8b61..1132695 100644
+--- a/headers/meson.build
++++ b/headers/meson.build
+@@ -19,7 +19,7 @@ enums_xml = custom_target(
+   install: true,
+   install_dir: schemasdir)
+ 
+-if not meson.is_cross_build() and get_option('introspection')
++if get_option('introspection')
+   noinst_lib = shared_library('noinst',
+                               headers,
+                               install: false)
+-- 
+2.20.1
+

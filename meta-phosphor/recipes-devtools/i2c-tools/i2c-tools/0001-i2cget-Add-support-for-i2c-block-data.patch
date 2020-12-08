@@ -1,4 +1,4 @@
-From 095558dd36c300bc0f4796a6d55c026a5066ceca Mon Sep 17 00:00:00 2001
+From b5e7f70c9c43d9a0f819ac2f9942cefca5a79875 Mon Sep 17 00:00:00 2001
 From: Crestez Dan Leonard <leonard.crestez@intel.com>
 Date: Fri, 13 May 2016 21:54:25 +0300
 Subject: [PATCH] i2cget: Add support for i2c block data
@@ -17,7 +17,7 @@ Signed-off-by: Brad Bishop <bradleyb@fuzziesquirrel.com>
  1 file changed, 51 insertions(+), 10 deletions(-)
 
 diff --git a/tools/i2cget.c b/tools/i2cget.c
-index 1db4f39..f2c6423 100644
+index d2ed56a..83e57f7 100644
 --- a/tools/i2cget.c
 +++ b/tools/i2cget.c
 @@ -41,14 +41,16 @@ static void help(void) __attribute__ ((noreturn));
@@ -27,7 +27,7 @@ index 1db4f39..f2c6423 100644
 -		"Usage: i2cget [-f] [-y] [-a] I2CBUS CHIP-ADDRESS [DATA-ADDRESS [MODE]]\n"
 +		"Usage: i2cget [-f] [-y] [-a] I2CBUS CHIP-ADDRESS [DATA-ADDRESS [MODE] [LENGTH]]\n"
  		"  I2CBUS is an integer or an I2C bus name\n"
- 		"  ADDRESS is an integer (0x08 - 0x77, or 0x00 - 0x7f if -a is given)\n"
+ 		"  ADDRESS is an integer (0x03 - 0x77, or 0x00 - 0x7f if -a is given)\n"
  		"  MODE is one of:\n"
  		"    b (read byte data, default)\n"
  		"    w (read word data)\n"
@@ -157,5 +157,5 @@ index 1db4f39..f2c6423 100644
  	exit(0);
  }
 -- 
-2.26.2
+2.20.1
 

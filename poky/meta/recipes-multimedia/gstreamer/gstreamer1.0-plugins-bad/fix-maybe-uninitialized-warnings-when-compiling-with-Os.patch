@@ -1,0 +1,28 @@
+From a67781000e82bd9ae3813da29401e8c0c852328a Mon Sep 17 00:00:00 2001
+From: Andre McCurdy <armccurdy@gmail.com>
+Date: Tue, 26 Jan 2016 15:16:01 -0800
+Subject: [PATCH] fix maybe-uninitialized warnings when compiling with -Os
+
+Upstream-Status: Pending
+
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+---
+ gst-libs/gst/codecparsers/gstvc1parser.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gst-libs/gst/codecparsers/gstvc1parser.c b/gst-libs/gst/codecparsers/gstvc1parser.c
+index fd16ee0..ddb890c 100644
+--- a/gst-libs/gst/codecparsers/gstvc1parser.c
++++ b/gst-libs/gst/codecparsers/gstvc1parser.c
+@@ -1730,7 +1730,7 @@ gst_vc1_parse_sequence_layer (const guint8 * data, gsize size,
+     GstVC1SeqLayer * seqlayer)
+ {
+   guint32 tmp;
+-  guint8 tmp8;
++  guint8 tmp8 = 0;
+   guint8 structA[8] = { 0, };
+   guint8 structB[12] = { 0, };
+   GstBitReader br;
+-- 
+1.9.1
+

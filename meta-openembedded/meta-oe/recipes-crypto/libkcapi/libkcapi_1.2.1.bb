@@ -7,9 +7,7 @@ DEPENDS = "libtool"
 
 S = "${WORKDIR}/git"
 SRCREV = "d41284525ec8960e9a828979cfe269012b7df8db"
-SRC_URI = "git://github.com/smuellerDD/libkcapi.git \
-           file://0001-Disable-use-of-__NR_io_getevents-when-not-defined.patch \
-           "
+SRC_URI = "git://github.com/smuellerDD/libkcapi.git"
 
 inherit autotools
 

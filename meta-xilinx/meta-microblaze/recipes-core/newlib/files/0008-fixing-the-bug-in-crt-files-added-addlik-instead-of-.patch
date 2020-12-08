@@ -1,4 +1,4 @@
-From 1c7a9150b63089baf3f63c64bf3dbb4d73c814f5 Mon Sep 17 00:00:00 2001
+From 000cfdc6f16009e62c236267ce7123a9ef2380e9 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Fri, 28 Sep 2018 12:07:43 +0530
 Subject: [PATCH 08/11] fixing the bug in crt files, added addlik instead of
@@ -13,7 +13,7 @@ Subject: [PATCH 08/11] fixing the bug in crt files, added addlik instead of
  5 files changed, 15 insertions(+), 15 deletions(-)
 
 diff --git a/libgloss/microblaze/crt0.S b/libgloss/microblaze/crt0.S
-index e4df73b..25e7c4a 100644
+index e4df73b66..25e7c4af3 100644
 --- a/libgloss/microblaze/crt0.S
 +++ b/libgloss/microblaze/crt0.S
 @@ -106,9 +106,9 @@ _vector_hw_exception:
@@ -30,7 +30,7 @@ index e4df73b..25e7c4a 100644
          nop
          addlik   r5, r3, 0
 diff --git a/libgloss/microblaze/crt1.S b/libgloss/microblaze/crt1.S
-index b24eeb5..38440c9 100644
+index b24eeb531..38440c957 100644
 --- a/libgloss/microblaze/crt1.S
 +++ b/libgloss/microblaze/crt1.S
 @@ -94,9 +94,9 @@ _vector_hw_exception:
@@ -47,7 +47,7 @@ index b24eeb5..38440c9 100644
          brealid   r15, _crtinit               /* Initialize BSS and run program */
  	nop
 diff --git a/libgloss/microblaze/crt2.S b/libgloss/microblaze/crt2.S
-index ae4c89e..352927d 100644
+index ae4c89ee0..352927dab 100644
 --- a/libgloss/microblaze/crt2.S
 +++ b/libgloss/microblaze/crt2.S
 @@ -92,9 +92,9 @@ _vector_hw_exception:
@@ -64,7 +64,7 @@ index ae4c89e..352927d 100644
          nop
  	addlik	r5, r3, 0
 diff --git a/libgloss/microblaze/crt3.S b/libgloss/microblaze/crt3.S
-index a8bc783..bc32cda 100644
+index a8bc7839b..bc32cda86 100644
 --- a/libgloss/microblaze/crt3.S
 +++ b/libgloss/microblaze/crt3.S
 @@ -62,9 +62,9 @@
@@ -81,7 +81,7 @@ index a8bc783..bc32cda 100644
          brealid	r15, _crtinit               /* Initialize BSS and run program */
          nop
 diff --git a/libgloss/microblaze/crt4.S b/libgloss/microblaze/crt4.S
-index 54ba473..a25c847 100644
+index 54ba473ea..a25c84734 100644
 --- a/libgloss/microblaze/crt4.S
 +++ b/libgloss/microblaze/crt4.S
 @@ -63,9 +63,9 @@
@@ -98,5 +98,5 @@ index 54ba473..a25c847 100644
          brealid	r15, _crtinit               /* Initialize BSS and run program */
  	nop
 -- 
-2.7.4
+2.17.1
 

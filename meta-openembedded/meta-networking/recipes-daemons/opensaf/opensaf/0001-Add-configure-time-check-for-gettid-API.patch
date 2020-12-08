@@ -1,0 +1,67 @@
+From 91c7362834ccd88d1432b3e6c5c51748b72b10ad Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 27 Jul 2019 07:21:16 -0700
+Subject: [PATCH] Add configure time check for gettid API
+
+glibc 2.30 has added syscalls wrapper for gettid
+it should now be checked during configure if C library provides
+this API then do not define local function
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac         | 4 ++++
+ src/base/logtrace.cc | 3 +++
+ src/osaf/config.h.in | 3 +++
+ 3 files changed, 10 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 22ab936..90f3da4 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -480,6 +480,10 @@ fi
+ 
+ AC_SUBST([localstatedir])
+ 
++#############################################
++# Checks for functions.
++#############################################
++AC_CHECK_FUNCS([ gettid ])
+ 
+ #############################################
+ # Checks for programs.
+diff --git a/src/base/logtrace.cc b/src/base/logtrace.cc
+index 8908c1f..fe87e8d 100644
+--- a/src/base/logtrace.cc
++++ b/src/base/logtrace.cc
+@@ -31,6 +31,7 @@
+ #include "base/logtrace_client.h"
+ #include "base/logtrace_buffer.h"
+ #include "base/ncsgl_defs.h"
++#include "osaf/config.h"
+ 
+ namespace global {
+ 
+@@ -58,7 +59,9 @@ std::once_flag init_flag;
+ thread_local LogTraceBuffer gl_thread_buffer{gl_local_thread_trace,
+   global::thread_trace_buffer_size};
+ 
++#ifndef HAVE_GETTID
+ static pid_t gettid() { return syscall(SYS_gettid); }
++#endif
+ 
+ /**
+  * USR2 signal handler to enable/disable trace (toggle)
+diff --git a/src/osaf/config.h.in b/src/osaf/config.h.in
+index d1f6d1a..0a3f27d 100644
+--- a/src/osaf/config.h.in
++++ b/src/osaf/config.h.in
+@@ -18,6 +18,9 @@
+ /* Define if experimental code is enabled */
+ #undef HAVE_EXPERIMENTAL
+ 
++/* Define to 1 if you have the `gettid' function. */
++#undef HAVE_GETTID
++
+ /* SAHPI_INTERFACE_VERSION == A01 */
+ #undef HAVE_HPI_A01
+ 

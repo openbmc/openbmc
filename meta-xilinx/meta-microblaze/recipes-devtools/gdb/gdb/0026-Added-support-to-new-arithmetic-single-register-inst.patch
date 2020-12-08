@@ -1,0 +1,169 @@
+From b8128385902d88414c354b772828eefe3b59fb06 Mon Sep 17 00:00:00 2001
+From: Nagaraju <nmekala@xilinx.com>
+Date: Fri, 23 Aug 2019 16:18:43 +0530
+Subject: [PATCH 26/52] Added support to new arithmetic single register
+ instructions
+
+Conflicts:
+	opcodes/microblaze-dis.c
+---
+ gas/config/tc-microblaze.c | 147 ++++++++++++++++++++++++++++++++++++-
+ opcodes/microblaze-dis.c   |  13 +++-
+ opcodes/microblaze-opc.h   |  43 ++++++++++-
+ opcodes/microblaze-opcm.h  |   5 +-
+ 4 files changed, 201 insertions(+), 7 deletions(-)
+
+Index: gdb-9.2/opcodes/microblaze-dis.c
+===================================================================
+--- gdb-9.2.orig/opcodes/microblaze-dis.c
++++ gdb-9.2/opcodes/microblaze-dis.c
+@@ -130,9 +130,17 @@ get_field_imm15 (struct string_buf *buf,
+   return p;
+ }
+ 
++get_field_imm16 (struct string_buf *buf, long instr)
++{
++  char *p = strbuf (buf);
++
++  sprintf (p, "%d", (short)((instr & IMM16_MASK) >> IMM_LOW));
++  return p;
++}
++
+ static char *
+ get_field_special (struct string_buf *buf, long instr,
+-		   struct op_code_struct *op)
++                   struct op_code_struct *op)
+ {
+   char *p = strbuf (buf);
+   char *spr;
+@@ -454,6 +462,9 @@ print_insn_microblaze (bfd_vma memaddr,
+ 	  /* For mbar 16 or sleep insn.  */
+ 	case INST_TYPE_NONE:
+ 	  break;
++	case INST_TYPE_RD_IMML:
++	  print_func (stream, "\t%s, %s", get_field_rd (&buf, inst), get_field_imm16 (&buf, inst));
++          break;
+         /* For bit field insns.  */
+ 	case INST_TYPE_RD_R1_IMMW_IMMS:
+           print_func (stream, "\t%s, %s, %s, %s", get_field_rd (&buf, inst),get_field_r1(&buf, inst),get_field_immw (&buf, inst), get_field_imms (&buf, inst));
+Index: gdb-9.2/opcodes/microblaze-opc.h
+===================================================================
+--- gdb-9.2.orig/opcodes/microblaze-opc.h
++++ gdb-9.2/opcodes/microblaze-opc.h
+@@ -69,6 +69,7 @@
+ #define INST_TYPE_RD_R1_IMMW_IMMS  21
+ 
+ #define INST_TYPE_NONE 25
++#define INST_TYPE_RD_IMML 26
+ 
+ 
+ 
+@@ -84,6 +85,7 @@
+ #define IMMVAL_MASK_MFS 0x0000
+ 
+ #define OPCODE_MASK_H   0xFC000000  /* High 6 bits only.  */
++#define OPCODE_MASK_LIMM 0xFC1F0000 /* High 6 bits and 12-16 bits */
+ #define OPCODE_MASK_H1  0xFFE00000  /* High 11 bits.  */
+ #define OPCODE_MASK_H2  0xFC1F0000  /* High 6 and bits 20-16.  */
+ #define OPCODE_MASK_H12 0xFFFF0000  /* High 16.  */
+@@ -106,6 +108,33 @@
+ #define OPCODE_MASK_H34C 0xFC0007E0 /* High 6 bits and bits 21-26.  */
+ #define OPCODE_MASK_H8  0xFF000000  /* High 8 bits only.  */
+ 
++/*Defines to identify 64-bit single reg instructions */
++#define ADDLI_ONE_REG_MASK 0x68000000
++#define ADDLIC_ONE_REG_MASK 0x68020000
++#define ADDLIK_ONE_REG_MASK 0x68040000
++#define ADDLIKC_ONE_REG_MASK 0x68060000
++#define RSUBLI_ONE_REG_MASK 0x68010000
++#define RSUBLIC_ONE_REG_MASK 0x68030000
++#define RSUBLIK_ONE_REG_MASK 0x68050000
++#define RSUBLIKC_ONE_REG_MASK 0x68070000
++#define ORLI_ONE_REG_MASK 0x68100000
++#define ANDLI_ONE_REG_MASK 0x68110000
++#define XORLI_ONE_REG_MASK 0x68120000
++#define ANDLNI_ONE_REG_MASK 0x68130000
++#define ADDLI_MASK 0x20000000
++#define ADDLIC_MASK 0x28000000
++#define ADDLIK_MASK 0x30000000
++#define ADDLIKC_MASK 0x38000000
++#define RSUBLI_MASK 0x24000000
++#define RSUBLIC_MASK 0x2C000000
++#define RSUBLIK_MASK 0x34000000
++#define RSUBLIKC_MASK 0x3C000000
++#define ANDLI_MASK 0xA4000000
++#define ANDLNI_MASK 0xAC000000
++#define ORLI_MASK 0xA0000000
++#define XORLI_MASK 0xA8000000
++
++
+ /* New Mask for msrset, msrclr insns.  */
+ #define OPCODE_MASK_H23N  0xFC1F8000 /* High 6 and bits 11 - 16.  */
+ /* Mask for mbar insn.  */
+@@ -114,7 +143,7 @@
+ #define DELAY_SLOT 1
+ #define NO_DELAY_SLOT 0
+ 
+-#define MAX_OPCODES 412
++#define MAX_OPCODES 424
+ 
+ struct op_code_struct
+ {
+@@ -444,13 +473,21 @@ struct op_code_struct
+   {"cmpl",    INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x14000101, OPCODE_MASK_H4, cmpl, arithmetic_inst },
+   {"cmplu",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x14000103, OPCODE_MASK_H4, cmplu, arithmetic_inst },
+   {"addli",   INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x20000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst },   /* Identical to 32-bit */
++  {"addli", INST_TYPE_RD_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL,0x68000000, OPCODE_MASK_LIMM, addli, arithmetic_inst },
+   {"rsubli",  INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x24000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst },   /* Identical to 32-bit */
++  {"rsubli", INST_TYPE_RD_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL,0x68010000, OPCODE_MASK_LIMM, rsubli, arithmetic_inst },
+   {"addlic",  INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x28000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst },   /* Identical to 32-bit */
++  {"addlic", INST_TYPE_RD_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL,0x68020000, OPCODE_MASK_LIMM, addlic, arithmetic_inst },
+   {"rsublic", INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x2C000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst },   /* Identical to 32-bit */
++    {"rsublic", INST_TYPE_RD_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL,0x68030000, OPCODE_MASK_LIMM, rsublic, arithmetic_inst },
+   {"addlik",  INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x30000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst },   /* Identical to 32-bit */
++  {"addlik", INST_TYPE_RD_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL,0x68040000, OPCODE_MASK_LIMM, addlik, arithmetic_inst },
+   {"rsublik", INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x34000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst },   /* Identical to 32-bit */
++  {"rsublik", INST_TYPE_RD_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL,0x68050000, OPCODE_MASK_LIMM, rsublik, arithmetic_inst },
+   {"addlikc", INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x38000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst },   /* Identical to 32-bit */
++  {"addlikc", INST_TYPE_RD_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL,0x68060000, OPCODE_MASK_LIMM, addlikc, arithmetic_inst },
+   {"rsublikc",INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x3C000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst },  /* Identical to 32-bit */
++  {"rsublikc", INST_TYPE_RD_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL,0x68070000, OPCODE_MASK_LIMM, rsublikc, arithmetic_inst },
+   {"mull",    INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x40000100, OPCODE_MASK_H4, mull, mult_inst },
+   {"bslll",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x44000500, OPCODE_MASK_H3, bslll, barrel_shift_inst },
+   {"bslra",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x44000300, OPCODE_MASK_H3, bslra, barrel_shift_inst },
+@@ -501,9 +538,13 @@ struct op_code_struct
+   {"beaged",  INST_TYPE_R1_R2, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9FA00000, OPCODE_MASK_H14, beaged, branch_inst },
+   {"bealged", INST_TYPE_R1_R2, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9FA00100, OPCODE_MASK_H14, bealged, branch_inst },
+   {"orli",    INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xA0000000, OPCODE_MASK_H, invalid_inst, logical_inst },      /* Identical to 32-bit */
++  {"orli", INST_TYPE_RD_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL,0x68100000, OPCODE_MASK_LIMM, orli, arithmetic_inst },
+   {"andli",   INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xA4000000, OPCODE_MASK_H, invalid_inst, logical_inst },      /* Identical to 32-bit */
++  {"andli", INST_TYPE_RD_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL,0x68110000, OPCODE_MASK_LIMM, andli, arithmetic_inst },
+   {"xorli",   INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xA8000000, OPCODE_MASK_H, invalid_inst, logical_inst },      /* Identical to 32-bit */
++  {"xorli", INST_TYPE_RD_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL,0x68120000, OPCODE_MASK_LIMM, xorli, arithmetic_inst },
+   {"andnli",  INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xAC000000, OPCODE_MASK_H, invalid_inst, logical_inst },      /* Identical to 32-bit */
++  {"andnli", INST_TYPE_RD_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL,0x68130000, OPCODE_MASK_LIMM, andnli, arithmetic_inst },
+   {"imml",    INST_TYPE_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xB2000000, OPCODE_MASK_H8, imml, immediate_inst },
+   {"breai",   INST_TYPE_IMM, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xB8010000, OPCODE_MASK_H12, breai, branch_inst },
+   {"breaid",  INST_TYPE_IMM, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xB8110000, OPCODE_MASK_H12, breaid, branch_inst },
+Index: gdb-9.2/opcodes/microblaze-opcm.h
+===================================================================
+--- gdb-9.2.orig/opcodes/microblaze-opcm.h
++++ gdb-9.2/opcodes/microblaze-opcm.h
+@@ -61,7 +61,9 @@ enum microblaze_instr
+   eaputd, teaputd, ecaputd, tecaputd, neaputd, tneaputd, necaputd, tnecaputd,
+ 
+   /* 64-bit instructions */
+-  addl, rsubl, addlc, rsublc, addlk, rsublk, addlkc, rsublkc, cmpl, cmplu, mull,
++  addl, addli, addlic, addlik, addlikc, rsubl, rsubli, rsublic, rsublik, rsublikc,
++  addlc, rsublc, addlk, rsublk, addlkc, rsublkc, cmpl, cmplu, mull,
++  andli, andnli, orli, xorli,
+   bslll, bslra, bslrl, bsllli, bslrai, bslrli, bslefi, bslifi, orl, andl, xorl,
+   andnl, pcmplbf, pcmpleq, pcmplne, srla, srlc, srll, sextl8, sextl16, sextl32,
+   brea, bread, breald, beaeq, bealeq, beaeqd, bealeqd, beane, bealne, beaned,
+@@ -166,5 +168,6 @@ enum microblaze_instr_type
+ 
+ /* Imm mask for msrset, msrclr instructions.  */
+ #define  IMM15_MASK 0x00007FFF
++#define IMM16_MASK 0x0000FFFF
+ 
+ #endif /* MICROBLAZE-OPCM */

@@ -1,0 +1,52 @@
+From 2645e0aa9c17c2c966a0533e52ad00510311483e Mon Sep 17 00:00:00 2001
+From: Adam Jackson <ajax@redhat.com>
+Date: Wed, 29 Aug 2018 11:04:23 -0400
+Subject: [PATCH] Refuse to run on UEFI machines
+
+No possible good can come of this.
+
+v2: Check for .../efi-framebuffer.0 ("is there an EFI framebuffer")
+instead of /sys/firmware/efi ("is this an EFI machine"). Suggested by
+Peter Jones.
+
+Upstream-Status: Backport [https://gitlab.freedesktop.org/xorg/driver/xf86-video-vesa]
+
+Reviewed-by: Peter Jones <pjones@redhat.com>
+Signed-off-by: Adam Jackson <ajax@redhat.com>
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
+---
+ src/vesa.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/src/vesa.c b/src/vesa.c
+index 9b65b9b..af750e2 100644
+--- a/src/vesa.c
++++ b/src/vesa.c
+@@ -43,7 +43,7 @@
+ #endif
+ 
+ #include <string.h>
+-
++#include <unistd.h>
+ #include "vesa.h"
+ 
+ /* All drivers initialising the SW cursor need this */
+@@ -450,7 +450,14 @@ VESAPciProbe(DriverPtr drv, int entity_num, struct pci_device *dev,
+ 	     intptr_t match_data)
+ {
+     ScrnInfoPtr pScrn;
+-    
++
++#ifdef __linux__
++    if (access("/sys/devices/platform/efi-framebuffer.0", F_OK) == 0) {
++        ErrorF("vesa: Refusing to run on UEFI\n");
++        return FALSE;
++    }
++#endif
++
+     pScrn = xf86ConfigPciEntity(NULL, 0, entity_num, NULL, 
+ 				NULL, NULL, NULL, NULL, NULL);
+     if (pScrn != NULL) {
+-- 
+2.20.1
+

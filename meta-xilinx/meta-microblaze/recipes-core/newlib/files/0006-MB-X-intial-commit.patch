@@ -1,4 +1,4 @@
-From bb9e95aa1da6c1f8974702685db9b8486210ac5c Mon Sep 17 00:00:00 2001
+From f5f363cd879ea60cc8fb5507e8a01533fd0c55a9 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Fri, 27 Jul 2018 16:10:36 +0530
 Subject: [PATCH 06/11] MB-X intial commit
@@ -17,7 +17,7 @@ Subject: [PATCH 06/11] MB-X intial commit
  10 files changed, 17 insertions(+), 17 deletions(-)
 
 diff --git a/libgloss/microblaze/crt0.S b/libgloss/microblaze/crt0.S
-index b39ea90..865a8c2 100644
+index b39ea90b3..865a8c269 100644
 --- a/libgloss/microblaze/crt0.S
 +++ b/libgloss/microblaze/crt0.S
 @@ -84,7 +84,7 @@ _vector_hw_exception:
@@ -30,7 +30,7 @@ index b39ea90..865a8c2 100644
  	brlid	r15, _crtinit               /* Initialize BSS and run program */
  	nop
 diff --git a/libgloss/microblaze/crt1.S b/libgloss/microblaze/crt1.S
-index 20323ff..a8bf749 100644
+index 20323ff6d..a8bf74937 100644
 --- a/libgloss/microblaze/crt1.S
 +++ b/libgloss/microblaze/crt1.S
 @@ -75,7 +75,7 @@ _vector_hw_exception:
@@ -43,7 +43,7 @@ index 20323ff..a8bf749 100644
  	brlid	r15, _crtinit               /* Initialize BSS and run program */
  	nop
 diff --git a/libgloss/microblaze/crt2.S b/libgloss/microblaze/crt2.S
-index e3fb15b..34d9f95 100644
+index e3fb15b26..34d9f951d 100644
 --- a/libgloss/microblaze/crt2.S
 +++ b/libgloss/microblaze/crt2.S
 @@ -73,7 +73,7 @@ _vector_hw_exception:
@@ -56,7 +56,7 @@ index e3fb15b..34d9f95 100644
  	brlid	r15, _crtinit               /* Initialize BSS and run program */
  	nop
 diff --git a/libgloss/microblaze/crt3.S b/libgloss/microblaze/crt3.S
-index 452ea52..ebcf207 100644
+index 452ea5265..ebcf207f5 100644
 --- a/libgloss/microblaze/crt3.S
 +++ b/libgloss/microblaze/crt3.S
 @@ -59,7 +59,7 @@
@@ -69,7 +69,7 @@ index 452ea52..ebcf207 100644
  	brlid	r15, _crtinit               /* Initialize BSS and run program */
  	nop
 diff --git a/libgloss/microblaze/crt4.S b/libgloss/microblaze/crt4.S
-index 475acec..4cf0b01 100644
+index 475acecfd..4cf0b01a4 100644
 --- a/libgloss/microblaze/crt4.S
 +++ b/libgloss/microblaze/crt4.S
 @@ -59,7 +59,7 @@
@@ -82,7 +82,7 @@ index 475acec..4cf0b01 100644
  	brlid	r15, _crtinit               /* Initialize BSS and run program */
  	nop
 diff --git a/libgloss/microblaze/crtinit.S b/libgloss/microblaze/crtinit.S
-index 78eb76d..86c6dfc 100644
+index 78eb76df6..86c6dfcb0 100644
 --- a/libgloss/microblaze/crtinit.S
 +++ b/libgloss/microblaze/crtinit.S
 @@ -33,7 +33,7 @@
@@ -103,7 +103,7 @@ index 78eb76d..86c6dfc 100644
  	.end _crtinit
  
 diff --git a/libgloss/microblaze/pgcrtinit.S b/libgloss/microblaze/pgcrtinit.S
-index fca1bc4..2593082 100644
+index fca1bc45e..25930821c 100644
 --- a/libgloss/microblaze/pgcrtinit.S
 +++ b/libgloss/microblaze/pgcrtinit.S
 @@ -33,7 +33,7 @@
@@ -124,7 +124,7 @@ index fca1bc4..2593082 100644
  	.end _crtinit
  
 diff --git a/libgloss/microblaze/sim-crtinit.S b/libgloss/microblaze/sim-crtinit.S
-index d2f59fe..74586d9 100644
+index d2f59fe6d..74586d9a7 100644
 --- a/libgloss/microblaze/sim-crtinit.S
 +++ b/libgloss/microblaze/sim-crtinit.S
 @@ -39,7 +39,7 @@
@@ -145,7 +145,7 @@ index d2f59fe..74586d9 100644
  	.end _crtinit
  
 diff --git a/libgloss/microblaze/sim-pgcrtinit.S b/libgloss/microblaze/sim-pgcrtinit.S
-index 3c6ba83..82ebcca 100644
+index 3c6ba8371..82ebccad4 100644
 --- a/libgloss/microblaze/sim-pgcrtinit.S
 +++ b/libgloss/microblaze/sim-pgcrtinit.S
 @@ -39,7 +39,7 @@
@@ -166,7 +166,7 @@ index 3c6ba83..82ebcca 100644
  	.end _crtinit
  
 diff --git a/newlib/libc/machine/microblaze/strcmp.c b/newlib/libc/machine/microblaze/strcmp.c
-index 434195e..3119d82 100644
+index 434195e2c..3119d82c5 100644
 --- a/newlib/libc/machine/microblaze/strcmp.c
 +++ b/newlib/libc/machine/microblaze/strcmp.c
 @@ -96,15 +96,15 @@ strcmp (const char *s1,
@@ -190,5 +190,5 @@ index 434195e..3119d82 100644
          {
            /* To get here, *a1 == *a2, thus if we find a null in *a1,
 -- 
-2.7.4
+2.17.1
 

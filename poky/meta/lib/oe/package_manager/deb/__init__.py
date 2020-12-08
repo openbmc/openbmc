@@ -79,7 +79,7 @@ class DpkgIndexer(Indexer):
         if self.d.getVar('PACKAGE_FEED_SIGN') == '1':
             raise NotImplementedError('Package feed signing not implementd for dpkg')
 
-class PMPkgsList(PkgsList):
+class DpkgPkgsList(PkgsList):
 
     def list_pkgs(self):
         cmd = [bb.utils.which(os.getenv('PATH'), "dpkg-query"),
@@ -312,8 +312,6 @@ class DpkgPM(OpkgDpkgPM):
         if not pkgs:
             return
 
-        os.environ['INTERCEPT_DIR'] = self.intercepts_dir
-
         if with_dependencies:
             os.environ['APT_CONFIG'] = self.apt_conf_file
             cmd = "%s purge %s" % (self.apt_get_cmd, ' '.join(pkgs))
@@ -461,7 +459,7 @@ class DpkgPM(OpkgDpkgPM):
                      "returned %d:\n%s" % (cmd, e.returncode, e.output.decode("utf-8")))
 
     def list_installed(self):
-        return PMPkgsList(self.d, self.target_rootfs).list_pkgs()
+        return DpkgPkgsList(self.d, self.target_rootfs).list_pkgs()
 
     def package_info(self, pkg):
         """

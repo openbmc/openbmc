@@ -1143,7 +1143,7 @@ necessary when adding a recipe to build a new piece of software to be
 included in a build.
 
 You can find a complete description of the ``devtool add`` command in
-the ":ref:`sdk-manual/sdk-extensible:a closer look at \`\`devtool add\`\``" section
+the ":ref:`sdk-a-closer-look-at-devtool-add`" section
 in the Yocto Project Application Development and the Extensible Software
 Development Kit (eSDK) manual.
 
@@ -1819,7 +1819,7 @@ Here are some common issues that cause failures.
    For cases where improper paths are detected for configuration files
    or for when libraries/headers cannot be found, be sure you are using
    the more robust ``pkg-config``. See the note in section
-   ":ref:`dev-manual/dev-manual-common-tasks:Configuring the Recipe`" for additional information.
+   ":ref:`new-recipe-configuring-the-recipe`" for additional information.
 
 -  *Parallel build failures:* These failures manifest themselves as
    intermittent errors, or errors reporting that a file or directory
@@ -3048,7 +3048,7 @@ The following steps describe how to set up the AUH utility:
 1. *Be Sure the Development Host is Set Up:* You need to be sure that
    your development host is set up to use the Yocto Project. For
    information on how to set up your host, see the
-   ":ref:`dev-manual/dev-manual-start:Preparing the Build Host`" section.
+   ":ref:`dev-preparing-the-build-host`" section.
 
 2. *Make Sure Git is Configured:* The AUH utility requires Git to be
    configured because AUH uses Git to save upgrades. Thus, you must have
@@ -3216,7 +3216,7 @@ As mentioned earlier, an alternative method for upgrading recipes to
 newer versions is to use
 :doc:`devtool upgrade <../ref-manual/ref-devtool-reference>`.
 You can read about ``devtool upgrade`` in general in the
-":ref:`sdk-manual/sdk-extensible:use \`\`devtool upgrade\`\` to create a version of the recipe that supports a newer version of the software`"
+":ref:`sdk-devtool-use-devtool-upgrade-to-create-a-version-of-the-recipe-that-supports-a-newer-version-of-the-software`"
 section in the Yocto Project Application Development and the Extensible
 Software Development Kit (eSDK) Manual.
 
@@ -3356,8 +3356,7 @@ Manually Upgrading a Recipe
 ---------------------------
 
 If for some reason you choose not to upgrade recipes using
-:ref:`dev-manual/dev-manual-common-tasks:Using the Auto Upgrade Helper (AUH)` or
-by :ref:`dev-manual/dev-manual-common-tasks:Using \`\`devtool upgrade\`\``,
+:ref:`gs-using-the-auto-upgrade-helper` or by :ref:`gs-using-devtool-upgrade`,
 you can manually edit the recipe files to upgrade the versions.
 
 .. note::
@@ -4197,7 +4196,7 @@ view file dependencies in a human-readable form:
    directory.
 
    For more information on configuration fragments, see the
-   ":ref:`kernel-dev/kernel-dev-common:creating configuration fragments`"
+   ":ref:`creating-config-fragments`"
    section in the Yocto Project Linux Kernel Development Manual.
 
 -  ``bitbake -u taskexp -g bitbake_target``: Using the BitBake command
@@ -8144,7 +8143,7 @@ associated ``EXTRA_IMAGE_FEATURES`` variable, as in:
    EXTRA_IMAGE_FEATURES = "read-only-rootfs"
 
 For more information on how to use these variables, see the
-":ref:`dev-manual/dev-manual-common-tasks:Customizing Images Using Custom \`\`IMAGE_FEATURES\`\` and \`\`EXTRA_IMAGE_FEATURES\`\``"
+":ref:`usingpoky-extend-customimage-imagefeatures`"
 section. For information on the variables, see
 :term:`IMAGE_FEATURES` and
 :term:`EXTRA_IMAGE_FEATURES`.
@@ -10666,34 +10665,44 @@ to a contribution repository that is upstream. See the ":ref:`gs-git-workflows-a
 section in the Yocto Project Overview and Concepts Manual for additional
 concepts on working in the Yocto Project development environment.
 
-Maintainers commonly use ``-next`` branches to test submissions prior to
-merging patches. Thus, you can get an idea of the status of a patch based on
-whether the patch has been merged into one of these branches. The commonly
-used testing branches for OpenEmbedded-Core are as follows:
+Two commonly used testing repositories exist for OpenEmbedded-Core:
 
--  *openembedded-core "master-next" branch:* This branch is part of the
-   :oe_git:`openembedded-core </openembedded-core/>` repository and contains
-   proposed changes to the core metadata.
+-  *"ross/mut" branch:* The "mut" (master-under-test) tree exists in the
+   ``poky-contrib`` repository in the
+   :yocto_git:`Yocto Project source repositories <>`.
 
--  *poky "master-next" branch:* This branch is part of the
-   :yocto_git:`poky </cgit/cgit.cgi/poky/>` repository and combines proposed
-   changes to bitbake, the core metadata and the poky distro.
+-  *"master-next" branch:* This branch is part of the main "poky"
+   repository in the Yocto Project source repositories.
 
-Similarly, stable branches maintained by the project may have corresponding
-``-next`` branches which collect proposed changes. For example,
-``&DISTRO_NAME_NO_CAP;-next`` and ``&DISTRO_NAME_NO_CAP_MINUS_ONE;-next``
-branches in both the "openembdedded-core" and "poky" repositories.
+Maintainers use these branches to test submissions prior to merging
+patches. Thus, you can get an idea of the status of a patch based on
+whether the patch has been merged into one of these branches.
 
-Other layers may have similar testing branches but there is no formal
-requirement or standard for these so please check the documentation for the
-layers you are contributing to.
+.. note::
+
+   This system is imperfect and changes can sometimes get lost in the
+   flow. Asking about the status of a patch or change is reasonable if
+   the change has been idle for a while with no feedback. The Yocto
+   Project does have plans to use
+   `Patchwork <https://en.wikipedia.org/wiki/Patchwork_(software)>`__
+   to track the status of patches and also to automatically preview
+   patches.
 
 The following sections provide procedures for submitting a change.
 
-.. _preparing-changes-for-submissions:
+.. _pushing-a-change-upstream:
 
-Preparing Changes for Submission
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Using Scripts to Push a Change Upstream and Request a Pull
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Follow this procedure to push a change to an upstream "contrib" Git
+repository:
+
+.. note::
+
+   You can find general Git information on how to push a change upstream
+   in the
+   `Git Community Book <https://git-scm.com/book/en/v2/Distributed-Git-Distributed-Workflows>`__.
 
 1. *Make Your Changes Locally:* Make your changes in your local Git
    repository. You should make small, controlled, isolated changes.
@@ -10775,121 +10784,7 @@ Preparing Changes for Submission
 
          detailed description of change
 
-.. _submitting-a-patch:
-
-Using Email to Submit a Patch
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Depending on the components changed, you need to submit the email to a
-specific mailing list. For some guidance on which mailing list to use,
-see the `list <#figuring-out-the-mailing-list-to-use>`__ at the
-beginning of this section. For a description of all the available
-mailing lists, see the ":ref:`Mailing Lists <resources-mailinglist>`" section in the
-Yocto Project Reference Manual.
-
-Here is the general procedure on how to submit a patch through email
-without using the scripts once the steps in
-:ref:`preparing-changes-for-submissions` have been followed:
-
-1. *Format the Commit:* Format the commit into an email message. To
-   format commits, use the ``git format-patch`` command. When you
-   provide the command, you must include a revision list or a number of
-   patches as part of the command. For example, either of these two
-   commands takes your most recent single commit and formats it as an
-   email message in the current directory:
-   ::
-
-      $ git format-patch -1
-
-   or ::
-
-      $ git format-patch HEAD~
-
-   After the command is run, the current directory contains a numbered
-   ``.patch`` file for the commit.
-
-   If you provide several commits as part of the command, the
-   ``git format-patch`` command produces a series of numbered files in
-   the current directory – one for each commit. If you have more than
-   one patch, you should also use the ``--cover`` option with the
-   command, which generates a cover letter as the first "patch" in the
-   series. You can then edit the cover letter to provide a description
-   for the series of patches. For information on the
-   ``git format-patch`` command, see ``GIT_FORMAT_PATCH(1)`` displayed
-   using the ``man git-format-patch`` command.
-
-   .. note::
-
-      If you are or will be a frequent contributor to the Yocto Project
-      or to OpenEmbedded, you might consider requesting a contrib area
-      and the necessary associated rights.
-
-2. *Send the patches via email:* Send the patches to the recipients and
-   relevant mailing lists by using the ``git send-email`` command.
-
-   .. note::
-
-      In order to use ``git send-email``, you must have the proper Git packages
-      installed on your host.
-      For Ubuntu, Debian, and Fedora the package is ``git-email``.
-
-   The ``git send-email`` command sends email by using a local or remote
-   Mail Transport Agent (MTA) such as ``msmtp``, ``sendmail``, or
-   through a direct ``smtp`` configuration in your Git ``~/.gitconfig``
-   file. If you are submitting patches through email only, it is very
-   important that you submit them without any whitespace or HTML
-   formatting that either you or your mailer introduces. The maintainer
-   that receives your patches needs to be able to save and apply them
-   directly from your emails. A good way to verify that what you are
-   sending will be applicable by the maintainer is to do a dry run and
-   send them to yourself and then save and apply them as the maintainer
-   would.
-
-   The ``git send-email`` command is the preferred method for sending
-   your patches using email since there is no risk of compromising
-   whitespace in the body of the message, which can occur when you use
-   your own mail client. The command also has several options that let
-   you specify recipients and perform further editing of the email
-   message. For information on how to use the ``git send-email``
-   command, see ``GIT-SEND-EMAIL(1)`` displayed using the
-   ``man git-send-email`` command.
-
-The Yocto Project uses a `Patchwork instance <https://patchwork.openembedded.org/>`__
-to track the status of patches submitted to the various mailing lists and to
-support automated patch testing. Each submitted patch is checked for common
-mistakes and deviations from the expected patch format and submitters are
-notified by patchtest if such mistakes are found. This process helps to
-reduce the burden of patch review on maintainers.
-
-.. note::
-
-   This system is imperfect and changes can sometimes get lost in the flow.
-   Asking about the status of a patch or change is reasonable if the change
-   has been idle for a while with no feedback.
-
-.. _pushing-a-change-upstream:
-
-Using Scripts to Push a Change Upstream and Request a Pull
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-For larger patch series it is preferable to send a pull request which not
-only includes the patch but also a pointer to a branch that can be pulled
-from. This involves making a local branch for your changes, pushing this
-branch to an accessible repository and then using the ``create-pull-request``
-and ``send-pull-request`` scripts from openembedded-core to create and send a
-patch series with a link to the branch for review.
-
-Follow this procedure to push a change to an upstream "contrib" Git
-repository once the steps in :ref:`preparing-changes-for-submissions` have
-been followed:
-
-.. note::
-
-   You can find general Git information on how to push a change upstream
-   in the
-   `Git Community Book <https://git-scm.com/book/en/v2/Distributed-Git-Distributed-Workflows>`__.
-
-1. *Push Your Commits to a "Contrib" Upstream:* If you have arranged for
+4. *Push Your Commits to a "Contrib" Upstream:* If you have arranged for
    permissions to push to an upstream contrib repository, push the
    change to that repository:
    ::
@@ -10906,7 +10801,7 @@ been followed:
 
       $ git push meta-intel-contrib your_name/README
 
-2. *Determine Who to Notify:* Determine the maintainer or the mailing
+5. *Determine Who to Notify:* Determine the maintainer or the mailing
    list that you need to notify for the change.
 
    Before submitting any change, you need to be sure who the maintainer
@@ -10935,7 +10830,7 @@ been followed:
       lists <resources-mailinglist>`" section in
       the Yocto Project Reference Manual.
 
-3. *Make a Pull Request:* Notify the maintainer or the mailing list that
+6. *Make a Pull Request:* Notify the maintainer or the mailing list that
    you have pushed a change by making a pull request.
 
    The Yocto Project provides two scripts that conveniently let you
@@ -10984,84 +10879,108 @@ been followed:
               $ poky/scripts/create-pull-request -h
               $ poky/scripts/send-pull-request -h
 
-Responding to Patch Review
-~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You may get feedback on your submitted patches from other community members
-or from the automated patchtest service. If issues are identified in your
-patch then it is usually necessary to address these before the patch will be
-accepted into the project. In this case you should amend the patch according
-to the feedback and submit an updated version to the relevant mailing list,
-copying in the reviewers who provided feedback to the previous version of the
-patch.
+.. _submitting-a-patch:
 
-The patch should be amended using ``git commit --amend`` or perhaps ``git
-rebase`` for more expert git users. You should also modify the ``[PATCH]``
-tag in the email subject line when sending the revised patch to mark the new
-iteration as ``[PATCH v2]``, ``[PATCH v3]``, etc as appropriate. This can be
-done by passing the ``-v`` argument to ``git format-patch`` with a version
-number.
+Using Email to Submit a Patch
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Lastly please ensure that you also test your revised changes. In particular
-please don't just edit the patch file written out by ``git format-patch`` and
-resend it.
+You can submit patches without using the ``create-pull-request`` and
+``send-pull-request`` scripts described in the previous section.
+However, keep in mind, the preferred method is to use the scripts.
 
-Submitting Changes to Stable Release Branches
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Depending on the components changed, you need to submit the email to a
+specific mailing list. For some guidance on which mailing list to use,
+see the `list <#figuring-out-the-mailing-list-to-use>`__ at the
+beginning of this section. For a description of all the available
+mailing lists, see the ":ref:`Mailing Lists <resources-mailinglist>`" section in the
+Yocto Project Reference Manual.
 
-The process for proposing changes to a Yocto Project stable branch differs
-from the steps described above. Changes to a stable branch must address
-identified bugs or CVEs and should be made carefully in order to avoid the
-risk of introducing new bugs or breaking backwards compatibility. Typically
-bug fixes must already be accepted into the master branch before they can be
-backported to a stable branch unless the bug in question does not affect the
-master branch or the fix on the master branch is unsuitable for backporting.
+Here is the general procedure on how to submit a patch through email
+without using the scripts:
 
-The list of stable branches along with the status and maintainer for each
-branch can be obtained from the
-:yocto_wiki:`Releases wiki page </wiki/Releases>`.
+1. *Make Your Changes Locally:* Make your changes in your local Git
+   repository. You should make small, controlled, isolated changes.
+   Keeping changes small and isolated aids review, makes
+   merging/rebasing easier and keeps the change history clean should
+   anyone need to refer to it in future.
 
-.. note::
+2. *Stage Your Changes:* Stage your changes by using the ``git add``
+   command on each file you changed.
 
-   Changes will not typically be accepted for branches which are marked as
-   End-Of-Life (EOL).
+3. *Commit Your Changes:* Commit the change by using the
+   ``git commit --signoff`` command. Using the ``--signoff`` option
+   identifies you as the person making the change and also satisfies the
+   Developer's Certificate of Origin (DCO) shown earlier.
 
-With this in mind, the steps to submit a change for a stable branch are as
-follows:
+   When you form a commit, you must follow certain standards established
+   by the Yocto Project development team. See :ref:`Step 3
+   <dev-manual/dev-manual-common-tasks:using scripts to push a change upstream and request a pull>`
+   in the previous section for information on how to provide commit information
+   that meets Yocto Project commit message standards.
 
-1. *Identify the bug or CVE to be fixed:* This information should be
-   collected so that it can be included in your submission.
+4. *Format the Commit:* Format the commit into an email message. To
+   format commits, use the ``git format-patch`` command. When you
+   provide the command, you must include a revision list or a number of
+   patches as part of the command. For example, either of these two
+   commands takes your most recent single commit and formats it as an
+   email message in the current directory:
+   ::
 
-2. *Check if the fix is already present in the master branch:* This will
-   result in the most straightforward path into the stable branch for the
-   fix.
+      $ git format-patch -1
 
-   a. *If the fix is present in the master branch - Submit a backport request
-      by email:* You should send an email to the relevant stable branch
-      maintainer and the mailing list with details of the bug or CVE to be
-      fixed, the commit hash on the master branch that fixes the issue and
-      the stable branches which you would like this fix to be backported to.
+   or ::
 
-   b. *If the fix is not present in the master branch - Submit the fix to the
-      master branch first:* This will ensure that the fix passes through the
-      project's usual patch review and test processes before being accepted.
-      It will also ensure that bugs are not left unresolved in the master
-      branch itself. Once the fix is accepted in the master branch a backport
-      request can be submitted as above.
+      $ git format-patch HEAD~
 
-   c. *If the fix is unsuitable for the master branch - Submit a patch
-      directly for the stable branch:* This method should be considered as a
-      last resort. It is typically necessary when the master branch is using
-      a newer version of the software which includes an upstream fix for the
-      issue or when the issue has been fixed on the master branch in a way
-      that introduces backwards incompatible changes. In this case follow the
-      steps in :ref:`preparing-changes-for-submissions` and
-      :ref:`submitting-a-patch` but modify the subject header of your patch
-      email to include the name of the stable branch which you are
-      targetting. This can be done using the ``--subject-prefix`` argument to
-      ``git format-patch``, for example to submit a patch to the dunfell
-      branch use
-      ``git format-patch --subject-prefix='&DISTRO_NAME_NO_CAP_MINUS_ONE;][PATCH' ...``.
+   After the command is run, the current directory contains a numbered
+   ``.patch`` file for the commit.
+
+   If you provide several commits as part of the command, the
+   ``git format-patch`` command produces a series of numbered files in
+   the current directory – one for each commit. If you have more than
+   one patch, you should also use the ``--cover`` option with the
+   command, which generates a cover letter as the first "patch" in the
+   series. You can then edit the cover letter to provide a description
+   for the series of patches. For information on the
+   ``git format-patch`` command, see ``GIT_FORMAT_PATCH(1)`` displayed
+   using the ``man git-format-patch`` command.
+
+   .. note::
+
+      If you are or will be a frequent contributor to the Yocto Project
+      or to OpenEmbedded, you might consider requesting a contrib area
+      and the necessary associated rights.
+
+5. *Import the Files Into Your Mail Client:* Import the files into your
+   mail client by using the ``git send-email`` command.
+
+   .. note::
+
+      In order to use ``git send-email``, you must have the proper Git packages
+      installed on your host.
+      For Ubuntu, Debian, and Fedora the package is ``git-email``.
+
+   The ``git send-email`` command sends email by using a local or remote
+   Mail Transport Agent (MTA) such as ``msmtp``, ``sendmail``, or
+   through a direct ``smtp`` configuration in your Git ``~/.gitconfig``
+   file. If you are submitting patches through email only, it is very
+   important that you submit them without any whitespace or HTML
+   formatting that either you or your mailer introduces. The maintainer
+   that receives your patches needs to be able to save and apply them
+   directly from your emails. A good way to verify that what you are
+   sending will be applicable by the maintainer is to do a dry run and
+   send them to yourself and then save and apply them as the maintainer
+   would.
+
+   The ``git send-email`` command is the preferred method for sending
+   your patches using email since there is no risk of compromising
+   whitespace in the body of the message, which can occur when you use
+   your own mail client. The command also has several options that let
+   you specify recipients and perform further editing of the email
+   message. For information on how to use the ``git send-email``
+   command, see ``GIT-SEND-EMAIL(1)`` displayed using the
+   ``man git-send-email`` command.
 
 Working With Licenses
 =====================

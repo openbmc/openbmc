@@ -1,4 +1,4 @@
-From 829dcc7967bd2a99b583fba1129ae71dbe8335ff Mon Sep 17 00:00:00 2001
+From cf8c0c5d167386aa3f8bee6feb531b451461f99c Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 23 Jan 2017 15:39:45 +0530
 Subject: [PATCH 03/11] [LOCAL]: Add missing declarations for xil_printf to
@@ -10,7 +10,7 @@ Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
  1 file changed, 3 insertions(+)
 
 diff --git a/newlib/libc/include/stdio.h b/newlib/libc/include/stdio.h
-index 164d95b..7bb729c 100644
+index 164d95bca..7bb729c11 100644
 --- a/newlib/libc/include/stdio.h
 +++ b/newlib/libc/include/stdio.h
 @@ -245,6 +245,9 @@ int	sprintf (char *__restrict, const char *__restrict, ...)
@@ -24,5 +24,5 @@ index 164d95b..7bb729c 100644
  int	_rename (const char *, const char *);
  #endif
 -- 
-2.7.4
+2.17.1
 

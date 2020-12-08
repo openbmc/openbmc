@@ -1,0 +1,58 @@
+From af01da22797795408d45dcf03076dc8153c7029e Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Mon, 9 Nov 2020 21:14:54 +0530
+Subject: [PATCH 21/54] [Patch, microblaze]: Correct the const high double
+ immediate value with this patch the loading of the DI mode immediate values
+ will be using REAL_VALUE_FROM_CONST_DOUBLE and REAL_VALUE_TO_TARGET_DOUBLE
+ functions, as CONST_DOUBLE_HIGH was returning the sign extension value even
+ of the unsigned long long constants also
+
+Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
+               Ajit Agarwal  <ajitkum@xilinx.com>
+---
+ gcc/config/microblaze/microblaze.c                | 6 ++++--
+ gcc/testsuite/gcc.target/microblaze/others/long.c | 9 +++++++++
+ 2 files changed, 13 insertions(+), 2 deletions(-)
+ create mode 100644 gcc/testsuite/gcc.target/microblaze/others/long.c
+
+diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+index 0dc96e481b7..5d395f047f7 100644
+--- a/gcc/config/microblaze/microblaze.c
++++ b/gcc/config/microblaze/microblaze.c
+@@ -2452,14 +2452,16 @@ print_operand (FILE * file, rtx op, int letter)
+   else if (letter == 'h' || letter == 'j')
+     {
+       long val[2];
++      long l[2];
+       if (code == CONST_DOUBLE)
+ 	{
+ 	  if (GET_MODE (op) == DFmode)
+ 	    REAL_VALUE_TO_TARGET_DOUBLE (*CONST_DOUBLE_REAL_VALUE (op), val);
+ 	  else
+ 	    {
+-	      val[0] = CONST_DOUBLE_HIGH (op);
+-	      val[1] = CONST_DOUBLE_LOW (op);
++	      REAL_VALUE_TO_TARGET_DOUBLE (*CONST_DOUBLE_REAL_VALUE (op), l);
++	      val[1] = l[WORDS_BIG_ENDIAN == 0];
++	      val[0] = l[WORDS_BIG_ENDIAN != 0];
+ 	    }
+ 	}
+       else if (code == CONST_INT)
+diff --git a/gcc/testsuite/gcc.target/microblaze/others/long.c b/gcc/testsuite/gcc.target/microblaze/others/long.c
+new file mode 100644
+index 00000000000..b6b55d5ad65
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/microblaze/others/long.c
+@@ -0,0 +1,9 @@
++#define BASEADDR 0xF0000000ULL
++int main ()
++{
++  unsigned long long start;
++  start = (unsigned long long) BASEADDR;
++  return 0;
++}
++/* { dg-final { scan-assembler "addik\tr(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r0,0x00000000" } } */
++/* { dg-final { scan-assembler "addik\tr(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r0,0xf0000000" } } */
+-- 
+2.17.1
+

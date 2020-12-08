@@ -1,0 +1,25 @@
+From 5780b5e5f9b5fe64d5172cd99399366e42c67b64 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Sun, 30 Sep 2018 17:06:58 +0530
+Subject: [PATCH 19/52] Fixing the branch related issues
+
+Conflicts:
+	bfd/elf64-microblaze.c
+---
+ bfd/elf64-microblaze.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+Index: gdb-9.2/bfd/elf64-microblaze.c
+===================================================================
+--- gdb-9.2.orig/bfd/elf64-microblaze.c
++++ gdb-9.2/bfd/elf64-microblaze.c
+@@ -2545,6 +2545,9 @@ microblaze_elf_check_relocs (bfd * abfd,
+ 	  while (h->root.type == bfd_link_hash_indirect
+ 		 || h->root.type == bfd_link_hash_warning)
+ 	    h = (struct elf_link_hash_entry *) h->root.u.i.link;
++	  /* PR15323, ref flags aren't set for references in the same
++	     object.  */
++	  h->root.non_ir_ref_regular = 1;
+ 	}
+ 
+       switch (r_type)

@@ -1,0 +1,23 @@
+Disable the tests meant to run when compiling natively
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: webkitgtk-2.14.5/Source/cmake/OptionsCommon.cmake
+===================================================================
+--- webkitgtk-2.14.5.orig/Source/cmake/OptionsCommon.cmake
++++ webkitgtk-2.14.5/Source/cmake/OptionsCommon.cmake
+@@ -67,8 +67,11 @@ endif ()
+ # Detect Cortex-A53 core if CPU is ARM64 and OS is Linux.
+ # Query /proc/cpuinfo for each available core and check reported CPU part number: 0xd03 signals Cortex-A53.
+ # (see Main ID Register in ARM Cortex-A53 MPCore Processor Technical Reference Manual)
+-set(WTF_CPU_ARM64_CORTEXA53_INITIALVALUE OFF)
+-if (WTF_CPU_ARM64 AND (${CMAKE_SYSTEM_NAME} STREQUAL "Linux"))
++if( NOT WTF_CPU_ARM64_CORTEXA53_INITIALVALUE)
++    set(WTF_CPU_ARM64_CORTEXA53_INITIALVALUE OFF)
++endif(WTF_CPU_ARM64_CORTEXA53_INITIALVALUE)
++
++if (WTF_CPU_ARM64 AND NOT CMAKE_CROSSCOMPILING AND (${CMAKE_SYSTEM_NAME} STREQUAL "Linux"))
+     execute_process(COMMAND nproc OUTPUT_VARIABLE PROC_COUNT)
+     math(EXPR PROC_MAX ${PROC_COUNT}-1)
+     foreach (PROC_ID RANGE ${PROC_MAX})

@@ -1,0 +1,10 @@
+[Unit]
+Description=Weston Wayland socket
+After=user-runtime-dir@1000.service
+
+[Socket]
+ListenStream=/run/user/1000/wayland-%I
+
+[Install]
+WantedBy=sockets.target
+

@@ -1,0 +1,114 @@
+From 3450d1fcfe8a8f84553ab299cd96ae0705ddffbe Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 5 Mar 2020 11:48:28 -0800
+Subject: [PATCH] remap/arm: Adjust inline asm constraints
+
+gcc10 can effectively emit single precision registers if right
+operand modifier constraint is not in use
+
+This results in assembler rejecting the code
+
+/tmp/ccEG4QpI.s:646: Error: VFP/Neon double precision register expected -- `vtbl.8 d3,{d0,d1},s8'
+/tmp/ccEG4QpI.s:678: Error: invalid instruction shape -- `vmul.f32 d0,d0,s8'
+
+Therefore add %P qualifier to request double registers sinece 'w' could
+mean variable could be stored in s0..s14 and GCC defaults to printing out s0..s14.
+Note those registers map to d0..d7 also.
+
+Output generated is exactly same with gcc9, and it also now compiles
+with gcc10
+
+Its not documented well in gcc docs and there is a ticket for that
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=84343
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/merge_requests/261]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/pulsecore/remap_neon.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/src/pulsecore/remap_neon.c b/src/pulsecore/remap_neon.c
+index 41208986d..ca3b95b48 100644
+--- a/src/pulsecore/remap_neon.c
++++ b/src/pulsecore/remap_neon.c
+@@ -189,7 +189,7 @@ static void remap_ch4_to_mono_float32ne_neon(pa_remap_t *m, float *dst, const fl
+             "vadd.f32   d0, d0, d1              \n\t"
+             "vadd.f32   d2, d2, d3              \n\t"
+             "vadd.f32   d0, d0, d2              \n\t"
+-            "vmul.f32   d0, d0, %[quart]        \n\t"
++            "vmul.f32   d0, d0, %P[quart]       \n\t"
+             "vst1.32    {d0}, [%[dst]]!         \n\t"
+             : [dst] "+r" (dst), [src] "+r" (src) /* output operands */
+             : [quart] "w" (quart) /* input operands */
+@@ -276,7 +276,7 @@ static void remap_arrange_stereo_s16ne_neon(pa_remap_t *m, int16_t *dst, const i
+     for (; n >= 2; n -= 2) {
+         __asm__ __volatile__ (
+             "vld1.s16   d0, [%[src]]!           \n\t"
+-            "vtbl.8     d0, {d0}, %[t]          \n\t"
++            "vtbl.8     d0, {d0}, %P[t]         \n\t"
+             "vst1.s16   d0, [%[dst]]!           \n\t"
+             : [dst] "+r" (dst), [src] "+r" (src) /* output operands */
+             : [t] "w" (t) /* input operands */
+@@ -287,7 +287,7 @@ static void remap_arrange_stereo_s16ne_neon(pa_remap_t *m, int16_t *dst, const i
+     if (n > 0) {
+         __asm__ __volatile__ (
+             "vld1.32   d0[0], [%[src]]!         \n\t"
+-            "vtbl.8    d0, {d0}, %[t]           \n\t"
++            "vtbl.8    d0, {d0}, %P[t]          \n\t"
+             "vst1.32   d0[0], [%[dst]]!         \n\t"
+             : [dst] "+r" (dst), [src] "+r" (src) /* output operands */
+             : [t] "w" (t) /* input operands */
+@@ -302,8 +302,8 @@ static void remap_arrange_ch2_ch4_s16ne_neon(pa_remap_t *m, int16_t *dst, const
+     for (; n > 0; n--) {
+         __asm__ __volatile__ (
+             "vld1.32    d0[0], [%[src]]!           \n\t"
+-            "vtbl.8     d0, {d0}, %[t]          \n\t"
+-            "vst1.s16   d0, [%[dst]]!           \n\t"
++            "vtbl.8     d0, {d0}, %P[t]            \n\t"
++            "vst1.s16   d0, [%[dst]]!              \n\t"
+             : [dst] "+r" (dst), [src] "+r" (src) /* output operands */
+             : [t] "w" (t) /* input operands */
+             : "memory", "d0" /* clobber list */
+@@ -317,7 +317,7 @@ static void remap_arrange_ch4_s16ne_neon(pa_remap_t *m, int16_t *dst, const int1
+     for (; n > 0; n--) {
+         __asm__ __volatile__ (
+             "vld1.s16   d0, [%[src]]!           \n\t"
+-            "vtbl.8     d0, {d0}, %[t]          \n\t"
++            "vtbl.8     d0, {d0}, %P[t]         \n\t"
+             "vst1.s16   d0, [%[dst]]!           \n\t"
+             : [dst] "+r" (dst), [src] "+r" (src) /* output operands */
+             : [t] "w" (t) /* input operands */
+@@ -332,7 +332,7 @@ static void remap_arrange_stereo_float32ne_neon(pa_remap_t *m, float *dst, const
+     for (; n > 0; n--) {
+         __asm__ __volatile__ (
+             "vld1.f32   d0, [%[src]]!           \n\t"
+-            "vtbl.8     d0, {d0}, %[t]          \n\t"
++            "vtbl.8     d0, {d0}, %P[t]         \n\t"
+             "vst1.s16   {d0}, [%[dst]]!         \n\t"
+             : [dst] "+r" (dst), [src] "+r" (src) /* output operands */
+             : [t] "w" (t) /* input operands */
+@@ -349,8 +349,8 @@ static void remap_arrange_ch2_ch4_any32ne_neon(pa_remap_t *m, float *dst, const
+     for (; n > 0; n--) {
+         __asm__ __volatile__ (
+             "vld1.f32   d0, [%[src]]!           \n\t"
+-            "vtbl.8     d1, {d0}, %[t0]         \n\t"
+-            "vtbl.8     d2, {d0}, %[t1]         \n\t"
++            "vtbl.8     d1, {d0}, %P[t0]        \n\t"
++            "vtbl.8     d2, {d0}, %P[t1]        \n\t"
+             "vst1.s16   {d1,d2}, [%[dst]]!      \n\t"
+             : [dst] "+r" (dst), [src] "+r" (src) /* output operands */
+             : [t0] "w" (t0), [t1] "w" (t1) /* input operands */
+@@ -366,8 +366,8 @@ static void remap_arrange_ch4_float32ne_neon(pa_remap_t *m, float *dst, const fl
+     for (; n > 0; n--) {
+         __asm__ __volatile__ (
+             "vld1.f32   {d0,d1}, [%[src]]!      \n\t"
+-            "vtbl.8     d2, {d0,d1}, %[t0]      \n\t"
+-            "vtbl.8     d3, {d0,d1}, %[t1]      \n\t"
++            "vtbl.8     d2, {d0,d1}, %P[t0]     \n\t"
++            "vtbl.8     d3, {d0,d1}, %P[t1]     \n\t"
+             "vst1.s16   {d2,d3}, [%[dst]]!      \n\t"
+             : [dst] "+r" (dst), [src] "+r" (src) /* output operands */
+             : [t0] "w" (t0), [t1] "w" (t1) /* input operands */
+-- 
+2.25.1
+

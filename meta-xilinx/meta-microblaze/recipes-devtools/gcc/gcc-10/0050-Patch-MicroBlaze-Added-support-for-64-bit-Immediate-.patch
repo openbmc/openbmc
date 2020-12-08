@@ -1,0 +1,44 @@
+From 797697692635d4c536181cb007b3b0d63d2431c1 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Mon, 26 Aug 2019 15:55:22 +0530
+Subject: [PATCH 50/54] [Patch,MicroBlaze] : Added support for 64 bit Immediate
+ values.
+
+---
+ gcc/config/microblaze/constraints.md | 4 ++--
+ gcc/config/microblaze/microblaze.md  | 3 +--
+ 2 files changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/gcc/config/microblaze/constraints.md b/gcc/config/microblaze/constraints.md
+index 89db511c453..9ad2b099310 100644
+--- a/gcc/config/microblaze/constraints.md
++++ b/gcc/config/microblaze/constraints.md
+@@ -53,9 +53,9 @@
+        (match_test "ival > 0 && ival < 0x10000")))
+ 
+ (define_constraint "K"
+-  "A constant in the range 0xffffff8000000000L  to 0x0000007fffffffffL (inclusive)."
++  "A constant in the range  -9223372036854775808 to 9223372036854775807 (inclusive)."
+   (and (match_code "const_int")
+-       (match_test "ival > (long long)-549755813888 && ival < (long long)549755813887")))
++       (match_test "ival > (long long)-9223372036854775808  && ival < (long long)9223372036854775807")))
+ 
+ 
+ ;; Define floating point constraints
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index 1ad139cbd44..93de8d831fd 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -1334,8 +1334,7 @@
+   [(set (match_operand:DI 0 "nonimmediate_operand" "=d,d,d")
+ 	(match_operand:DI 1 "immediate_operand" "J,I,Mnis"))]
+   "TARGET_MB_64 && (register_operand (operands[0], DImode) && 
+-           (GET_CODE (operands[1]) == CONST_INT && 
+-                 (INTVAL (operands[1]) <= (long long)549755813887 && INTVAL (operands[1]) >= (long long)-549755813888)))"  
++           (GET_CODE (operands[1]) == CONST_INT))"
+   "@
+    addlk\t%0,r0,r0\t
+    addlik\t%0,r0,%1\t #N1 %X1
+-- 
+2.17.1
+

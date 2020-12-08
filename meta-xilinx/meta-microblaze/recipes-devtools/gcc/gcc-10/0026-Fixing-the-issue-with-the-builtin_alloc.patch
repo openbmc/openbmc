@@ -1,0 +1,44 @@
+From fdb2f23a69182da516c7bf89a9e0011e55120f94 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Thu, 23 Feb 2017 17:09:04 +0530
+Subject: [PATCH 26/54] Fixing the issue with the builtin_alloc. register r18
+ was not properly handling the stack pattern which was resolved by using free
+ available register
+
+signed-off-by:nagaraju mekala <nmekala@xilinx.com>
+---
+ gcc/config/microblaze/microblaze.md | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index 3e6e2b9276d..d938efcd762 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -2078,10 +2078,10 @@
+   ""
+   { 
+     rtx retaddr = gen_rtx_MEM (Pmode, stack_pointer_rtx);
+-    rtx rtmp    = gen_rtx_REG (SImode, R_TMP);
++    rtx reg = gen_reg_rtx (Pmode);
+     rtx neg_op0;
+ 
+-    emit_move_insn (rtmp, retaddr);
++    emit_move_insn (reg, retaddr);
+     if (GET_CODE (operands[1]) != CONST_INT)
+     {
+         neg_op0 = gen_reg_rtx (Pmode);
+@@ -2090,9 +2090,9 @@
+         neg_op0 = GEN_INT (- INTVAL (operands[1]));
+ 
+     emit_insn (gen_addsi3 (stack_pointer_rtx, stack_pointer_rtx, neg_op0));
+-    emit_move_insn (gen_rtx_MEM (Pmode, stack_pointer_rtx), rtmp);
++    emit_move_insn (gen_rtx_MEM (Pmode, stack_pointer_rtx), reg);
+     emit_move_insn (operands[0], virtual_stack_dynamic_rtx);
+-    emit_insn (gen_rtx_CLOBBER (SImode, rtmp));
++    emit_insn (gen_rtx_CLOBBER (SImode, reg));
+     DONE;
+   }
+ )
+-- 
+2.17.1
+

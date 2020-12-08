@@ -101,7 +101,6 @@ RDEPENDS_packagegroup-meta-multimedia-support = "\
     libmediaart \
     gst-instruments \
     libsrtp \
-    srt \
 "
 # devel headers/libraries only packages
 # libsquish

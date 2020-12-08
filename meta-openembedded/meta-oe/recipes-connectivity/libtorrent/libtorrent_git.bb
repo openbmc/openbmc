@@ -19,7 +19,6 @@ PACKAGECONFIG ??= "instrumentation"
 
 PACKAGECONFIG_remove_mipsarch = "instrumentation"
 PACKAGECONFIG_remove_powerpc = "instrumentation"
-PACKAGECONFIG_remove_riscv32 = "instrumentation"
 
 PACKAGECONFIG[instrumentation] = "--enable-instrumentation,--disable-instrumentation,"
 

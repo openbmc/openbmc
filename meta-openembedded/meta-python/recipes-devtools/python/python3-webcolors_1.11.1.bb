@@ -9,6 +9,7 @@ inherit pypi setuptools3 ptest
 
 RDEPENDS_${PN}_class-target = "\
     ${PYTHON_PN}-stringold \
+    ${PYTHON_PN}-typing \
 "
 
 SRC_URI += " \

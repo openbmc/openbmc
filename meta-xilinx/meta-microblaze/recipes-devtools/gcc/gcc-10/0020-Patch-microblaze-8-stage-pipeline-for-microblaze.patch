@@ -1,0 +1,178 @@
+From bfdb38133201f7df01d09dc7e7ee3043a35c1d3e Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Mon, 9 Nov 2020 19:54:39 +0530
+Subject: [PATCH 20/54] [Patch, microblaze]: 8-stage pipeline for microblaze
+
+This patch adds the support for the 8-stage pipeline. The new 8-stage
+pipeline reduces the latencies of float & integer division drastically
+
+Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
+---
+ gcc/config/microblaze/microblaze.c   | 11 ++++
+ gcc/config/microblaze/microblaze.h   |  3 +-
+ gcc/config/microblaze/microblaze.md  | 79 +++++++++++++++++++++++++++-
+ gcc/config/microblaze/microblaze.opt |  4 ++
+ 4 files changed, 94 insertions(+), 3 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+index 0a4619eec0c..0dc96e481b7 100644
+--- a/gcc/config/microblaze/microblaze.c
++++ b/gcc/config/microblaze/microblaze.c
+@@ -1840,6 +1840,17 @@ microblaze_option_override (void)
+ 		   "%<-mcpu=v8.30.a%>");
+         TARGET_REORDER = 0;
+     }
++  ver = microblaze_version_to_int("v10.0");
++  if (ver < 0)
++    {
++        if (TARGET_AREA_OPTIMIZED_2)
++          warning (0, "-mxl-frequency can be used only with -mcpu=v10.0 or greater");
++    }
++  else
++    {
++        if (TARGET_AREA_OPTIMIZED_2)
++          microblaze_pipe = MICROBLAZE_PIPE_8;
++    }
+ 
+   if (TARGET_MULTIPLY_HIGH && TARGET_SOFT_MUL)
+     error ("%<-mxl-multiply-high%> requires %<-mno-xl-soft-mul%>");
+diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
+index 8aa3f155790..8a668278337 100644
+--- a/gcc/config/microblaze/microblaze.h
++++ b/gcc/config/microblaze/microblaze.h
+@@ -27,7 +27,8 @@
+ enum pipeline_type
+ {
+   MICROBLAZE_PIPE_3 = 0,
+-  MICROBLAZE_PIPE_5 = 1
++  MICROBLAZE_PIPE_5 = 1,
++  MICROBLAZE_PIPE_8 = 2
+ };
+ 
+ #define MICROBLAZE_MASK_NO_UNSAFE_DELAY         0x00000001
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index be8bbda2bfb..c407a81c51e 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -35,6 +35,7 @@
+   (R_GOT      20)       ;; GOT ptr reg
+   (MB_PIPE_3   0)       ;; Microblaze 3-stage pipeline 
+   (MB_PIPE_5   1)       ;; Microblaze 5-stage pipeline 
++  (MB_PIPE_8   2)       ;; Microblaze 8-stage pipeline
+   (UNSPEC_SET_GOT       101)    ;;
+   (UNSPEC_GOTOFF        102)    ;; GOT offset
+   (UNSPEC_PLT           103)    ;; jump table
+@@ -82,7 +83,7 @@
+ ;; bshift 	Shift operations
+ 
+ (define_attr "type"
+-  "unknown,branch,jump,call,load,store,move,arith,darith,imul,idiv,icmp,multi,nop,no_delay_arith,no_delay_load,no_delay_store,no_delay_imul,no_delay_move,bshift,fadd,frsub,fmul,fdiv,fcmp,fsl,fsqrt,fcvt,trap"
++  "unknown,branch,jump,call,load,store,move,arith,darith,imul,idiv,icmp,multi,nop,no_delay_arith,no_delay_load,no_delay_store,no_delay_imul,no_delay_move,bshift,fadd,frsub,fmul,fdiv,fcmp,fsl,fsqrt,fcvt,fint,trap"
+   (const_string "unknown"))
+ 
+ ;; Main data type used by the insn
+@@ -224,6 +225,80 @@
+ ;;-----------------------------------------------------------------
+ 
+ 
++
++;;----------------------------------------------------------------
++;; Microblaze 8-stage pipeline description (v10.0 and later)
++;;----------------------------------------------------------------
++
++(define_automaton   "mbpipe_8")
++(define_cpu_unit    "mb8_issue,mb8_iu,mb8_wb,mb8_fpu,mb8_fpu_2,mb8_mul,mb8_mul_2,mb8_div,mb8_div_2,mb8_bs,mb8_bs_2" "mbpipe_8")
++
++(define_insn_reservation "mb8-integer" 1
++  (and (eq_attr "type" "branch,jump,call,arith,darith,icmp,nop,no_delay_arith")
++       (eq (symbol_ref  "microblaze_pipe") (const_int MB_PIPE_8)))
++  "mb8_issue,mb8_iu,mb8_wb")
++
++(define_insn_reservation "mb8-special-move" 2
++  (and (eq_attr "type" "move")
++       (eq (symbol_ref  "microblaze_pipe") (const_int MB_PIPE_8)))
++  "mb8_issue,mb8_iu*2,mb8_wb")
++
++(define_insn_reservation "mb8-mem-load" 3
++  (and (eq_attr "type" "load,no_delay_load")
++       (eq (symbol_ref  "microblaze_pipe") (const_int MB_PIPE_8)))
++  "mb8_issue,mb8_iu,mb8_wb")
++
++(define_insn_reservation "mb8-mem-store" 1
++  (and (eq_attr "type" "store,no_delay_store")
++       (eq (symbol_ref  "microblaze_pipe") (const_int MB_PIPE_8)))
++  "mb8_issue,mb8_iu,mb8_wb")
++
++(define_insn_reservation "mb8-mul" 3
++  (and (eq_attr "type" "imul,no_delay_imul")
++       (eq (symbol_ref  "microblaze_pipe") (const_int MB_PIPE_8)))
++  "mb8_issue,mb8_mul,mb8_mul_2*2,mb8_wb")
++
++(define_insn_reservation "mb8-div" 30
++  (and (eq_attr "type" "idiv")
++       (eq (symbol_ref  "microblaze_pipe") (const_int MB_PIPE_8)))
++    "mb8_issue,mb8_div,mb8_div_2*29,mb8_wb")
++
++(define_insn_reservation "mb8-bs" 2
++  (and (eq_attr "type" "bshift")
++       (eq (symbol_ref  "microblaze_pipe") (const_int MB_PIPE_8)))
++   "mb8_issue,mb8_bs,mb8_bs_2,mb8_wb")
++
++(define_insn_reservation "mb8-fpu-add-sub-mul" 1
++  (and (eq_attr "type" "fadd,frsub,fmul")
++       (eq (symbol_ref  "microblaze_pipe") (const_int MB_PIPE_8)))
++  "mb8_issue,mb8_fpu,mb8_wb")
++
++(define_insn_reservation "mb8-fpu-fcmp" 3
++  (and (eq_attr "type" "fcmp")
++       (eq (symbol_ref  "microblaze_pipe") (const_int MB_PIPE_8)))
++  "mb8_issue,mb8_fpu,mb8_fpu*2,mb8_wb")
++
++(define_insn_reservation "mb8-fpu-div" 24
++  (and (eq_attr "type" "fdiv")
++       (eq (symbol_ref  "microblaze_pipe") (const_int MB_PIPE_8)))
++  "mb8_issue,mb8_fpu,mb8_fpu_2*23,mb8_wb")
++
++(define_insn_reservation "mb8-fpu-sqrt" 23
++  (and (eq_attr "type" "fsqrt")
++       (eq (symbol_ref  "microblaze_pipe") (const_int MB_PIPE_8)))
++  "mb8_issue,mb8_fpu,mb8_fpu_2*22,mb8_wb")
++
++(define_insn_reservation "mb8-fpu-fcvt" 1
++  (and (eq_attr "type" "fcvt")
++       (eq (symbol_ref  "microblaze_pipe") (const_int MB_PIPE_8)))
++  "mb8_issue,mb8_fpu,mb8_wb")
++
++(define_insn_reservation "mb8-fpu-fint" 2
++  (and (eq_attr "type" "fint")
++       (eq (symbol_ref  "microblaze_pipe") (const_int MB_PIPE_8)))
++  "mb8_issue,mb8_fpu,mb8_wb")
++
++
+ ;;----------------------------------------------------------------
+ ;; Microblaze 5-stage pipeline description (v5.00.a and later)
+ ;;----------------------------------------------------------------                 
+@@ -470,7 +545,7 @@
+         (fix:SI (match_operand:SF 1 "register_operand" "d")))]
+   "TARGET_HARD_FLOAT && TARGET_FLOAT_CONVERT"
+   "fint\t%0,%1"
+-  [(set_attr "type"     "fcvt")
++  [(set_attr "type"     "fint")
+   (set_attr "mode"      "SF")
+   (set_attr "length"    "4")])
+ 
+diff --git a/gcc/config/microblaze/microblaze.opt b/gcc/config/microblaze/microblaze.opt
+index 725c2fab52a..a29c6f8df90 100644
+--- a/gcc/config/microblaze/microblaze.opt
++++ b/gcc/config/microblaze/microblaze.opt
+@@ -133,3 +133,7 @@ Data referenced by offset from start of text instead of GOT (with -fPIC/-fPIE).
+ 
+ mxl-mode-xilkernel
+ Target
++
++mxl-frequency
++Target Mask(AREA_OPTIMIZED_2)
++Use 8 stage pipeline (frequency optimization)
+-- 
+2.17.1
+

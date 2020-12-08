@@ -6,15 +6,14 @@ DEPENDS = "libsocketcan"
 
 SRC_URI = "git://github.com/linux-can/${BPN}.git;protocol=git"
 
-SRCREV = "856d0a662a02dd2dc0b83a7ad1de9fd120e82c4b"
+SRCREV = "da65fdfe0d1986625ee00af0b56ae17ec132e700"
 
-PV = "2020.11.0"
+PV = "2020.02.04"
 
 S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig update-alternatives
 
-ALTERNATIVE_${PN} = "candump cansend cansequence"
+ALTERNATIVE_${PN} = "candump cansend"
 ALTERNATIVE_LINK_NAME[candump] = "${bindir}/candump"
 ALTERNATIVE_LINK_NAME[cansend] = "${bindir}/cansend"
-ALTERNATIVE_LINK_NAME[cansequence] = "${bindir}/cansequence"

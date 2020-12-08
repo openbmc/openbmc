@@ -1,0 +1,2459 @@
+From 53799d63bd26a04265a55f68ca57e3462ed6eeb7 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Fri, 27 Jul 2018 15:23:41 +0530
+Subject: [PATCH 30/54] Intial commit for 64bit-MB sources. Need to cleanup the
+ code later.
+
+---
+ gcc/config/microblaze/constraints.md    |   2 +-
+ gcc/config/microblaze/microblaze-c.c    |   6 +
+ gcc/config/microblaze/microblaze.c      | 218 ++++++---
+ gcc/config/microblaze/microblaze.h      |  63 ++-
+ gcc/config/microblaze/microblaze.md     | 606 ++++++++++++++++++------
+ gcc/config/microblaze/t-microblaze      |   3 +-
+ libgcc/config/microblaze/crti.S         |   4 +-
+ libgcc/config/microblaze/crtn.S         |   4 +-
+ libgcc/config/microblaze/divdi3.S       |  98 ++++
+ libgcc/config/microblaze/divdi3_table.c |  62 +++
+ libgcc/config/microblaze/moddi3.S       |  97 ++++
+ libgcc/config/microblaze/muldi3.S       |  73 +++
+ libgcc/config/microblaze/t-microblaze   |  11 +-
+ libgcc/config/microblaze/udivdi3.S      | 107 +++++
+ libgcc/config/microblaze/umoddi3.S      | 110 +++++
+ 15 files changed, 1230 insertions(+), 234 deletions(-)
+ create mode 100644 libgcc/config/microblaze/divdi3.S
+ create mode 100644 libgcc/config/microblaze/divdi3_table.c
+ create mode 100644 libgcc/config/microblaze/moddi3.S
+ create mode 100644 libgcc/config/microblaze/muldi3.S
+ create mode 100644 libgcc/config/microblaze/udivdi3.S
+ create mode 100644 libgcc/config/microblaze/umoddi3.S
+
+diff --git a/gcc/config/microblaze/constraints.md b/gcc/config/microblaze/constraints.md
+index 123395717e0..b8ef1650f92 100644
+--- a/gcc/config/microblaze/constraints.md
++++ b/gcc/config/microblaze/constraints.md
+@@ -55,7 +55,7 @@
+ (define_constraint "K"
+   "A constant in the range 0xffffff8000000000L  to 0x0000007fffffffffL (inclusive)."
+   (and (match_code "const_int")
+-       (match_test "ival > (long)0xffffff8000000000L && ival < (long)0x0000007fffffffffL")))
++       (match_test "ival > (long)-549755813888 && ival < (long)549755813887")))
+ 
+ 
+ ;; Define floating point constraints
+diff --git a/gcc/config/microblaze/microblaze-c.c b/gcc/config/microblaze/microblaze-c.c
+index d8c88e510e5..dbcd21fc6ee 100644
+--- a/gcc/config/microblaze/microblaze-c.c
++++ b/gcc/config/microblaze/microblaze-c.c
+@@ -100,4 +100,10 @@ microblaze_cpp_define (cpp_reader *pfile)
+         builtin_define ("HAVE_HW_FPU_SQRT");
+       builtin_define ("__HAVE_HW_FPU_SQRT__");
+     }
++  if (TARGET_MB_64)
++    {
++      builtin_define ("__arch64__");
++      builtin_define ("__microblaze64__");
++      builtin_define ("__MICROBLAZE64__");
++    }
+ }  
+diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+index 99a1cd5c0be..3c815444574 100644
+--- a/gcc/config/microblaze/microblaze.c
++++ b/gcc/config/microblaze/microblaze.c
+@@ -383,10 +383,10 @@ simple_memory_operand (rtx op, machine_mode mode ATTRIBUTE_UNUSED)
+ 	{
+ 	  return 1;
+ 	}
+-      else if (GET_CODE (plus0) == REG && GET_CODE (plus1) == REG)
++      /*else if (GET_CODE (plus0) == REG && GET_CODE (plus1) == REG)
+ 	{
+ 	  return 1;
+-	}
++	}*/
+       else
+ 	return 0;
+ 
+@@ -434,7 +434,7 @@ double_memory_operand (rtx op, machine_mode mode)
+     return 1;
+ 
+   return memory_address_p ((GET_MODE_CLASS (mode) == MODE_INT
+-			    ? E_SImode : E_SFmode),
++			    ? Pmode : E_SFmode),
+ 			   plus_constant (Pmode, addr, 4));
+ }
+ 
+@@ -681,7 +681,7 @@ microblaze_legitimize_tls_address(rtx x, rtx reg)
+          /* Load the addend.  */
+          addend = gen_rtx_UNSPEC (Pmode, gen_rtvec (2, x, GEN_INT (TLS_DTPREL)),
+ 				  UNSPEC_TLS);
+-         addend = force_reg (SImode, gen_rtx_CONST (SImode, addend));
++         addend = force_reg (Pmode, gen_rtx_CONST (Pmode, addend));
+          dest = gen_rtx_PLUS (Pmode, dest, addend);
+          break;
+ 
+@@ -699,7 +699,7 @@ microblaze_classify_unspec (struct microblaze_address_info *info, rtx x)
+ 
+   if (XINT (x, 1) == UNSPEC_GOTOFF)
+     {
+-      info->regA = gen_rtx_REG (SImode, PIC_OFFSET_TABLE_REGNUM);
++      info->regA = gen_rtx_REG (Pmode, PIC_OFFSET_TABLE_REGNUM);
+       info->type = ADDRESS_GOTOFF;
+     }
+   else if (XINT (x, 1) == UNSPEC_PLT)
+@@ -1302,8 +1302,16 @@ microblaze_block_move_loop (rtx dest, rtx src, HOST_WIDE_INT length)
+   emit_move_insn (dest_reg, plus_constant (Pmode, dest_reg, MAX_MOVE_BYTES));
+ 
+   /* Emit the test & branch.  */
+-  emit_insn (gen_cbranchsi4 (gen_rtx_NE (SImode, src_reg, final_src),
++
++  if (TARGET_MB_64) {
++    emit_insn (gen_cbranchdi4 (gen_rtx_NE (Pmode, src_reg, final_src),
++			     src_reg, final_src, label));
++    }
++  else {
++    emit_insn (gen_cbranchsi4 (gen_rtx_NE (Pmode, src_reg, final_src),
+ 			     src_reg, final_src, label));
++  
++    }
+ 
+   /* Mop up any left-over bytes.  */
+   if (leftover)
+@@ -1633,14 +1641,20 @@ microblaze_function_arg_advance (cumulative_args_t cum_v,
+       break;
+ 
+     case E_DFmode:
+-      cum->arg_words += 2;
++      if (TARGET_MB_64)
++       cum->arg_words++;
++      else
++       cum->arg_words += 2;
+       if (!cum->gp_reg_found && cum->arg_number <= 2)
+ 	cum->fp_code += 2 << ((cum->arg_number - 1) * 2);
+       break;
+ 
+     case E_DImode:
+       cum->gp_reg_found = 1;
+-      cum->arg_words += 2;
++      if (TARGET_MB_64)
++       cum->arg_words++;
++      else
++       cum->arg_words += 2;
+       break;
+ 
+     case E_QImode:
+@@ -2155,7 +2169,7 @@ compute_frame_size (HOST_WIDE_INT size)
+ 
+ 	  if (regno != MB_ABI_SUB_RETURN_ADDR_REGNUM)
+ 	    /* Don't account for link register. It is accounted specially below.  */
+-	    gp_reg_size += GET_MODE_SIZE (SImode);
++	    gp_reg_size += GET_MODE_SIZE (Pmode);
+ 
+ 	  mask |= (1L << (regno - GP_REG_FIRST));
+ 	}
+@@ -2424,7 +2438,7 @@ print_operand (FILE * file, rtx op, int letter)
+ 
+       if ((letter == 'M' && !WORDS_BIG_ENDIAN)
+ 	  || (letter == 'L' && WORDS_BIG_ENDIAN) || letter == 'D')
+-	regnum++;
++	regnum++; 
+ 
+       fprintf (file, "%s", reg_names[regnum]);
+     }
+@@ -2450,6 +2464,7 @@ print_operand (FILE * file, rtx op, int letter)
+   else if (letter == 'h' || letter == 'j')
+     {
+       long val[2];
++      int val1[2];
+       long l[2];
+       if (code == CONST_DOUBLE)
+ 	{
+@@ -2462,12 +2477,12 @@ print_operand (FILE * file, rtx op, int letter)
+ 	      val[0] = l[WORDS_BIG_ENDIAN != 0];
+ 	    }
+ 	}
+-      else if (code == CONST_INT)
++      else if (code == CONST_INT || code == CONST)// || code == SYMBOL_REF ||code == LABEL_REF)
+         {
+-	  val[0] = (INTVAL (op) & 0xffffffff00000000LL) >> 32;
+-	  val[1] = INTVAL (op) & 0x00000000ffffffffLL;
++	  val1[0] = (INTVAL (op) & 0xffffffff00000000LL) >> 32;
++	  val1[1] = INTVAL (op) & 0x00000000ffffffffLL;
+         }
+-      fprintf (file, "0x%8.8lx", (letter == 'h') ? val[0] : val[1]);
++      fprintf (file, "0x%8.8lx", (letter == 'h') ? val1[0] : val1[1]);
+     }
+   else if (code == CONST_DOUBLE)
+     {
+@@ -2661,7 +2676,10 @@ microblaze_asm_constructor (rtx symbol ATTRIBUTE_UNUSED, int priority)
+ 
+     switch_to_section (get_section (section, 0, NULL));
+     assemble_align (POINTER_SIZE);
+-    fputs ("\t.word\t", asm_out_file);
++    if (TARGET_MB_64)
++      fputs ("\t.dword\t", asm_out_file);
++    else
++      fputs ("\t.word\t", asm_out_file);
+     output_addr_const (asm_out_file, symbol);
+     fputs ("\n", asm_out_file);
+ }
+@@ -2684,7 +2702,10 @@ microblaze_asm_destructor (rtx symbol, int priority)
+ 
+     switch_to_section (get_section (section, 0, NULL));
+     assemble_align (POINTER_SIZE);
+-    fputs ("\t.word\t", asm_out_file);
++    if (TARGET_MB_64)
++      fputs ("\t.dword\t", asm_out_file);
++    else
++     fputs ("\t.word\t", asm_out_file);
+     output_addr_const (asm_out_file, symbol);
+     fputs ("\n", asm_out_file);
+ }
+@@ -2750,7 +2771,7 @@ save_restore_insns (int prologue)
+   /* For interrupt_handlers, need to save/restore the MSR.  */
+   if (microblaze_is_interrupt_variant ())
+     {
+-      isr_mem_rtx = gen_rtx_MEM (SImode,
++      isr_mem_rtx = gen_rtx_MEM (Pmode,
+ 				 gen_rtx_PLUS (Pmode, base_reg_rtx,
+ 					       GEN_INT (current_frame_info.
+ 							gp_offset -
+@@ -2758,8 +2779,8 @@ save_restore_insns (int prologue)
+ 
+       /* Do not optimize in flow analysis.  */
+       MEM_VOLATILE_P (isr_mem_rtx) = 1;
+-      isr_reg_rtx = gen_rtx_REG (SImode, MB_ABI_MSR_SAVE_REG);
+-      isr_msr_rtx = gen_rtx_REG (SImode, ST_REG);
++      isr_reg_rtx = gen_rtx_REG (Pmode, MB_ABI_MSR_SAVE_REG);
++      isr_msr_rtx = gen_rtx_REG (Pmode, ST_REG);
+     }
+ 
+   if (microblaze_is_interrupt_variant () && !prologue)
+@@ -2767,8 +2788,8 @@ save_restore_insns (int prologue)
+       emit_move_insn (isr_reg_rtx, isr_mem_rtx);
+       emit_move_insn (isr_msr_rtx, isr_reg_rtx);
+       /* Do not optimize in flow analysis.  */
+-      emit_insn (gen_rtx_USE (SImode, isr_reg_rtx));
+-      emit_insn (gen_rtx_USE (SImode, isr_msr_rtx));
++      emit_insn (gen_rtx_USE (Pmode, isr_reg_rtx));
++      emit_insn (gen_rtx_USE (Pmode, isr_msr_rtx));
+     }
+ 
+   for (regno = GP_REG_FIRST; regno <= GP_REG_LAST; regno++)
+@@ -2779,9 +2800,9 @@ save_restore_insns (int prologue)
+ 	    /* Don't handle here. Already handled as the first register.  */
+ 	    continue;
+ 
+-	  reg_rtx = gen_rtx_REG (SImode, regno);
++	  reg_rtx = gen_rtx_REG (Pmode, regno);
+ 	  insn = gen_rtx_PLUS (Pmode, base_reg_rtx, GEN_INT (gp_offset));
+-	  mem_rtx = gen_rtx_MEM (SImode, insn);
++	  mem_rtx = gen_rtx_MEM (Pmode, insn);
+ 	  if (microblaze_is_interrupt_variant () || save_volatiles)
+ 	    /* Do not optimize in flow analysis.  */
+ 	    MEM_VOLATILE_P (mem_rtx) = 1;
+@@ -2796,7 +2817,7 @@ save_restore_insns (int prologue)
+ 	      insn = emit_move_insn (reg_rtx, mem_rtx);
+ 	    }
+ 
+-	  gp_offset += GET_MODE_SIZE (SImode);
++	  gp_offset += GET_MODE_SIZE (Pmode);
+ 	}
+     }
+ 
+@@ -2806,8 +2827,8 @@ save_restore_insns (int prologue)
+       emit_move_insn (isr_mem_rtx, isr_reg_rtx);
+ 
+       /* Do not optimize in flow analysis.  */
+-      emit_insn (gen_rtx_USE (SImode, isr_reg_rtx));
+-      emit_insn (gen_rtx_USE (SImode, isr_msr_rtx));
++      emit_insn (gen_rtx_USE (Pmode, isr_reg_rtx));
++      emit_insn (gen_rtx_USE (Pmode, isr_msr_rtx));
+     }
+ 
+   /* Done saving and restoring */
+@@ -2897,7 +2918,10 @@ microblaze_elf_asm_cdtor (rtx symbol, int priority, bool is_ctor)
+ 
+   switch_to_section (s);
+   assemble_align (POINTER_SIZE);
+-  fputs ("\t.word\t", asm_out_file);
++  if (TARGET_MB_64)
++    fputs ("\t.dword\t", asm_out_file);
++  else
++    fputs ("\t.word\t", asm_out_file);
+   output_addr_const (asm_out_file, symbol);
+   fputs ("\n", asm_out_file);
+ }
+@@ -3041,10 +3065,10 @@ microblaze_expand_prologue (void)
+ 	{
+ 	  if (offset != 0)
+ 	    ptr = gen_rtx_PLUS (Pmode, stack_pointer_rtx, GEN_INT (offset));
+-	  emit_move_insn (gen_rtx_MEM (SImode, ptr),
+-			  gen_rtx_REG (SImode, regno));
++	  emit_move_insn (gen_rtx_MEM (Pmode, ptr),
++			  gen_rtx_REG (Pmode, regno));
+ 
+-	  offset += GET_MODE_SIZE (SImode);
++	  offset += GET_MODE_SIZE (Pmode);
+ 	}
+     }
+ 
+@@ -3053,15 +3077,23 @@ microblaze_expand_prologue (void)
+       rtx fsiz_rtx = GEN_INT (fsiz);
+ 
+       rtx_insn *insn = NULL;
+-      insn = emit_insn (gen_subsi3 (stack_pointer_rtx, stack_pointer_rtx,
++         if (TARGET_MB_64)
++           {
++              
++             insn = emit_insn (gen_subdi3 (stack_pointer_rtx, stack_pointer_rtx,
+ 				    fsiz_rtx));
++           }
++         else { 
++             insn = emit_insn (gen_subsi3 (stack_pointer_rtx, stack_pointer_rtx,
++				    fsiz_rtx));
++           }
+       if (insn)
+ 	RTX_FRAME_RELATED_P (insn) = 1;
+ 
+       /* Handle SUB_RETURN_ADDR_REGNUM specially at first.  */
+       if (!crtl->is_leaf || interrupt_handler)
+ 	{
+-	  mem_rtx = gen_rtx_MEM (SImode,
++	  mem_rtx = gen_rtx_MEM (Pmode,
+ 				 gen_rtx_PLUS (Pmode, stack_pointer_rtx,
+ 					       const0_rtx));
+ 
+@@ -3069,7 +3101,7 @@ microblaze_expand_prologue (void)
+ 	    /* Do not optimize in flow analysis.  */
+ 	    MEM_VOLATILE_P (mem_rtx) = 1;
+ 
+-	  reg_rtx = gen_rtx_REG (SImode, MB_ABI_SUB_RETURN_ADDR_REGNUM);
++	  reg_rtx = gen_rtx_REG (Pmode, MB_ABI_SUB_RETURN_ADDR_REGNUM);
+ 	  insn = emit_move_insn (mem_rtx, reg_rtx);
+ 	  RTX_FRAME_RELATED_P (insn) = 1;
+ 	}
+@@ -3179,12 +3211,12 @@ microblaze_expand_epilogue (void)
+       if (!crtl->is_leaf || interrupt_handler)
+ 	{
+ 	  mem_rtx =
+-	    gen_rtx_MEM (SImode,
++	    gen_rtx_MEM (Pmode,
+ 			 gen_rtx_PLUS (Pmode, stack_pointer_rtx, const0_rtx));
+ 	  if (interrupt_handler)
+ 	    /* Do not optimize in flow analysis.  */
+ 	    MEM_VOLATILE_P (mem_rtx) = 1;
+-	  reg_rtx = gen_rtx_REG (SImode, MB_ABI_SUB_RETURN_ADDR_REGNUM);
++	  reg_rtx = gen_rtx_REG (Pmode, MB_ABI_SUB_RETURN_ADDR_REGNUM);
+ 	  emit_move_insn (reg_rtx, mem_rtx);
+ 	}
+ 
+@@ -3200,15 +3232,25 @@ microblaze_expand_epilogue (void)
+       /* _restore_ registers for epilogue.  */
+       save_restore_insns (0);
+       emit_insn (gen_blockage ());
+-      emit_insn (gen_addsi3 (stack_pointer_rtx, stack_pointer_rtx, fsiz_rtx));
++      if (TARGET_MB_64)
++        emit_insn (gen_adddi3 (stack_pointer_rtx, stack_pointer_rtx, fsiz_rtx));
++      else
++        emit_insn (gen_addsi3 (stack_pointer_rtx, stack_pointer_rtx, fsiz_rtx));
+     }
+ 
+   if (crtl->calls_eh_return)
+-    emit_insn (gen_addsi3 (stack_pointer_rtx,
++      if (TARGET_MB_64) {
++          emit_insn (gen_adddi3 (stack_pointer_rtx,
+                            stack_pointer_rtx,
+-                           gen_raw_REG (SImode,
++                           gen_raw_REG (Pmode,
+ 					MB_EH_STACKADJ_REGNUM)));
+-
++        }
++      else {
++          emit_insn (gen_addsi3 (stack_pointer_rtx,
++                           stack_pointer_rtx,
++                           gen_raw_REG (Pmode,
++					MB_EH_STACKADJ_REGNUM)));
++        }
+   emit_jump_insn (gen_return_internal (gen_rtx_REG (Pmode, GP_REG_FIRST +
+ 						    MB_ABI_SUB_RETURN_ADDR_REGNUM)));
+ }
+@@ -3375,9 +3417,14 @@ microblaze_asm_output_mi_thunk (FILE *file, tree thunk_fndecl ATTRIBUTE_UNUSED,
+   else
+     this_rtx = gen_rtx_REG (Pmode, MB_ABI_FIRST_ARG_REGNUM);
+ 
+-  /* Apply the constant offset, if required.  */
++  /* Apply the constant offset, if required. */ 
+   if (delta)
+-    emit_insn (gen_addsi3 (this_rtx, this_rtx, GEN_INT (delta)));
++    {
++      if (TARGET_MB_64)
++        emit_insn (gen_adddi3 (this_rtx, this_rtx, GEN_INT (delta))); 
++      else
++        emit_insn (gen_addsi3 (this_rtx, this_rtx, GEN_INT (delta)));
++    } 
+ 
+   /* Apply the offset from the vtable, if required.  */
+   if (vcall_offset)
+@@ -3390,7 +3437,10 @@ microblaze_asm_output_mi_thunk (FILE *file, tree thunk_fndecl ATTRIBUTE_UNUSED,
+     rtx loc = gen_rtx_PLUS (Pmode, temp1, vcall_offset_rtx);
+     emit_move_insn (temp1, gen_rtx_MEM (Pmode, loc));
+ 
+-    emit_insn (gen_addsi3 (this_rtx, this_rtx, temp1));
++    if (TARGET_MB_64)
++      emit_insn (gen_adddi3 (this_rtx, this_rtx, temp1));
++    else
++      emit_insn (gen_addsi3 (this_rtx, this_rtx, temp1));
+   }
+ 
+   /* Generate a tail call to the target function.  */
+@@ -3566,7 +3616,7 @@ microblaze_eh_return (rtx op0)
+ /* Queue an .ident string in the queue of top-level asm statements.
+    If the string size is below the threshold, put it into .sdata2.
+    If the front-end is done, we must be being called from toplev.c.
+-   In that case, do nothing.  */
++   In that case, do nothing. */ 
+ void 
+ microblaze_asm_output_ident (const char *string)
+ {
+@@ -3621,9 +3671,9 @@ microblaze_trampoline_init (rtx m_tramp, tree fndecl, rtx chain_value)
+   emit_block_move (m_tramp, assemble_trampoline_template (),
+ 		   GEN_INT (6*UNITS_PER_WORD), BLOCK_OP_NORMAL);
+ 
+-  mem = adjust_address (m_tramp, SImode, 16);
++  mem = adjust_address (m_tramp, Pmode, 16);
+   emit_move_insn (mem, chain_value);
+-  mem = adjust_address (m_tramp, SImode, 20);
++  mem = adjust_address (m_tramp, Pmode, 20);
+   emit_move_insn (mem, fnaddr);
+ }
+ 
+@@ -3647,7 +3697,7 @@ microblaze_expand_conditional_branch (machine_mode mode, rtx operands[])
+     {
+       comp_reg = cmp_op0;
+       condition = gen_rtx_fmt_ee (signed_condition (code), mode, comp_reg, const0_rtx);
+-      if (mode == SImode)
++      if (mode == Pmode)
+         emit_jump_insn (gen_condjump (condition, label1));
+       else
+         emit_jump_insn (gen_long_condjump (condition, label1));
+@@ -3766,7 +3816,7 @@ microblaze_expand_conditional_branch_sf (rtx operands[])
+   rtx comp_reg = gen_reg_rtx (SImode);
+ 
+   emit_insn (gen_cstoresf4 (comp_reg, operands[0], cmp_op0, cmp_op1));
+-  condition = gen_rtx_NE (SImode, comp_reg, const0_rtx);
++  condition = gen_rtx_NE (Pmode, comp_reg, const0_rtx);
+   emit_jump_insn (gen_condjump (condition, operands[3]));
+ }
+ 
+@@ -3776,10 +3826,10 @@ microblaze_expand_conditional_branch_df (rtx operands[])
+   rtx condition;
+   rtx cmp_op0 = XEXP (operands[0], 0);
+   rtx cmp_op1 = XEXP (operands[0], 1);
+-  rtx comp_reg = gen_reg_rtx (DImode);
++  rtx comp_reg = gen_reg_rtx (Pmode);
+ 
+   emit_insn (gen_cstoredf4 (comp_reg, operands[0], cmp_op0, cmp_op1));
+-  condition = gen_rtx_NE (DImode, comp_reg, const0_rtx);
++  condition = gen_rtx_NE (Pmode, comp_reg, const0_rtx);
+   emit_jump_insn (gen_long_condjump (condition, operands[3]));
+ }
+ 
+@@ -3800,8 +3850,8 @@ microblaze_expand_divide (rtx operands[])
+ {
+   /* Table lookup software divides. Works for all (nr/dr) where (0 <= nr,dr <= 15).  */
+ 
+-  rtx regt1 = gen_reg_rtx (SImode); 
+-  rtx reg18 = gen_rtx_REG (SImode, R_TMP);
++  rtx regt1 = gen_reg_rtx (Pmode); 
++  rtx reg18 = gen_rtx_REG (Pmode, R_TMP);
+   rtx regqi = gen_reg_rtx (QImode);
+   rtx_code_label *div_label = gen_label_rtx ();
+   rtx_code_label *div_end_label = gen_label_rtx ();
+@@ -3809,17 +3859,31 @@ microblaze_expand_divide (rtx operands[])
+   rtx mem_rtx;
+   rtx ret;
+   rtx_insn *jump, *cjump, *insn;
+-
+-  insn = emit_insn (gen_iorsi3 (regt1, operands[1], operands[2]));
+-  cjump = emit_jump_insn_after (gen_cbranchsi4 (
+-					gen_rtx_GTU (SImode, regt1, GEN_INT (15)), 
++ 
++  if (TARGET_MB_64) {
++      insn = emit_insn (gen_iordi3 (regt1, operands[1], operands[2]));
++      cjump = emit_jump_insn_after (gen_cbranchdi4 (
++					gen_rtx_GTU (Pmode, regt1, GEN_INT (15)), 
++					regt1, GEN_INT (15), div_label), insn);
++    }
++  else {
++      insn = emit_insn (gen_iorsi3 (regt1, operands[1], operands[2]));
++      cjump = emit_jump_insn_after (gen_cbranchsi4 (
++					gen_rtx_GTU (Pmode, regt1, GEN_INT (15)), 
+ 					regt1, GEN_INT (15), div_label), insn);
++    }
+   LABEL_NUSES (div_label) = 1; 
+   JUMP_LABEL (cjump) = div_label;
+-  emit_insn (gen_rtx_CLOBBER (SImode, reg18));
++  emit_insn (gen_rtx_CLOBBER (Pmode, reg18));
+ 
+-  emit_insn (gen_ashlsi3_bshift (regt1, operands[1], GEN_INT(4)));
+-  emit_insn (gen_addsi3 (regt1, regt1, operands[2]));
++  if (TARGET_MB_64) {
++      emit_insn (gen_ashldi3_long (regt1, operands[1], GEN_INT(4)));
++      emit_insn (gen_adddi3 (regt1, regt1, operands[2]));
++    }
++  else  {
++      emit_insn (gen_ashlsi3_bshift (regt1, operands[1], GEN_INT(4)));
++      emit_insn (gen_addsi3 (regt1, regt1, operands[2]));
++    }
+   mem_rtx = gen_rtx_MEM (QImode,
+                             gen_rtx_PLUS (QImode, regt1, div_table_rtx));
+ 
+@@ -3966,7 +4030,7 @@ insert_wic_for_ilb_runout (rtx_insn *first)
+               {
+                 insn =
+                   emit_insn_before (gen_iprefetch
+-                                    (gen_int_mode (addr_offset, SImode)),
++                                    (gen_int_mode (addr_offset, Pmode)),
+                                     before_4);
+                 recog_memoized (insn);
+                 INSN_LOCATION (insn) = INSN_LOCATION (before_4);
+@@ -3976,7 +4040,27 @@ insert_wic_for_ilb_runout (rtx_insn *first)
+            }
+        }
+ }
+-
++  
++/* Set the names for various arithmetic operations according to the
++ *    MICROBLAZE ABI.  */
++static void
++microblaze_init_libfuncs (void)
++{ 
++  set_optab_libfunc (smod_optab,     SImode, "__modsi3");
++  set_optab_libfunc (sdiv_optab,     SImode, "__divsi3");
++  set_optab_libfunc (smul_optab,     SImode, "__mulsi3");
++  set_optab_libfunc (umod_optab,     SImode, "__umodsi3");
++  set_optab_libfunc (udiv_optab,     SImode, "__udivsi3");
++  
++  if (TARGET_MB_64)
++    {
++      set_optab_libfunc (smod_optab,     DImode, "__moddi3");
++      set_optab_libfunc (sdiv_optab,     DImode, "__divdi3");
++      set_optab_libfunc (smul_optab,     DImode, "__muldi3");
++      set_optab_libfunc (umod_optab,     DImode, "__umoddi3");
++      set_optab_libfunc (udiv_optab,     DImode, "__udivdi3");
++    }
++}       
+ /* Insert instruction prefetch instruction at the fall
+    through path of the function call.  */
+ 
+@@ -4129,6 +4213,17 @@ microblaze_starting_frame_offset (void)
+ #undef TARGET_LRA_P
+ #define TARGET_LRA_P hook_bool_void_false
+ 
++#ifdef TARGET_MB_64
++#undef TARGET_ASM_ALIGNED_DI_OP
++#define TARGET_ASM_ALIGNED_DI_OP "\t.dword\t"
++
++#undef TARGET_ASM_ALIGNED_HI_OP
++#define TARGET_ASM_ALIGNED_HI_OP "\t.hword\t"
++
++#undef TARGET_ASM_ALIGNED_SI_OP
++#define TARGET_ASM_ALIGNED_SI_OP "\t.word\t"
++#endif
++
+ #undef TARGET_FRAME_POINTER_REQUIRED
+ #define TARGET_FRAME_POINTER_REQUIRED	microblaze_frame_pointer_required
+ 
+@@ -4138,6 +4233,9 @@ microblaze_starting_frame_offset (void)
+ #undef  TARGET_TRAMPOLINE_INIT
+ #define TARGET_TRAMPOLINE_INIT		microblaze_trampoline_init
+ 
++#undef TARGET_INIT_LIBFUNCS
++#define TARGET_INIT_LIBFUNCS microblaze_init_libfuncs
++
+ #undef  TARGET_PROMOTE_FUNCTION_MODE
+ #define TARGET_PROMOTE_FUNCTION_MODE 	default_promote_function_mode_always_promote
+ 
+diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
+index c0358603380..f6ad4d9fc21 100644
+--- a/gcc/config/microblaze/microblaze.h
++++ b/gcc/config/microblaze/microblaze.h
+@@ -173,7 +173,6 @@ extern enum pipeline_type microblaze_pipe;
+ 
+ /* Generate DWARF exception handling info.  */
+ #define DWARF2_UNWIND_INFO 1
+-
+ /* Don't generate .loc operations.  */
+ #define DWARF2_ASM_LINE_DEBUG_INFO 0
+ 
+@@ -206,38 +205,51 @@ extern enum pipeline_type microblaze_pipe;
+   ((flag_pic || GLOBAL) ? DW_EH_PE_aligned : DW_EH_PE_absptr)
+ 
+ /* Use DWARF 2 debugging information by default.  */
+-#define DWARF2_DEBUGGING_INFO
++#define DWARF2_DEBUGGING_INFO 1
+ #define PREFERRED_DEBUGGING_TYPE DWARF2_DEBUG
++#define DWARF2_ADDR_SIZE 4
+ 
+ /* Target machine storage layout */
+ 
+ #define BITS_BIG_ENDIAN 0
+ #define BYTES_BIG_ENDIAN (TARGET_LITTLE_ENDIAN == 0)
+ #define WORDS_BIG_ENDIAN (BYTES_BIG_ENDIAN)
+-#define BITS_PER_WORD           32
+-#define UNITS_PER_WORD          4
++//#define BITS_PER_WORD           64
++//Revisit
++#define MAX_BITS_PER_WORD	64
++#define UNITS_PER_WORD          (TARGET_MB_64 ? 8 : 4)
++//#define MIN_UNITS_PER_WORD      (TARGET_MB_64 ? 8 : 4)
++//#define UNITS_PER_WORD          4
+ #define MIN_UNITS_PER_WORD      4
+ #define INT_TYPE_SIZE           32
+ #define SHORT_TYPE_SIZE         16
+-#define LONG_TYPE_SIZE          64
++#define LONG_TYPE_SIZE (TARGET_MB_64 ? 64 : 32)
+ #define LONG_LONG_TYPE_SIZE     64
+ #define FLOAT_TYPE_SIZE         32
+ #define DOUBLE_TYPE_SIZE        64
+ #define LONG_DOUBLE_TYPE_SIZE   64
+-#define POINTER_SIZE            32
+-#define PARM_BOUNDARY           32
+-#define FUNCTION_BOUNDARY       32
+-#define EMPTY_FIELD_BOUNDARY    32
++#define POINTER_SIZE            (TARGET_MB_64 ? 64 : 32)
++//#define WIDEST_HARDWARE_FP_SIZE 64
++//#define POINTERS_EXTEND_UNSIGNED 1
++#define PARM_BOUNDARY           (TARGET_MB_64 ? 64 : 32)
++#define FUNCTION_BOUNDARY       (TARGET_MB_64 ? 64 : 32)
++#define EMPTY_FIELD_BOUNDARY    (TARGET_MB_64 ? 64 : 32)
+ #define STRUCTURE_SIZE_BOUNDARY 8
+-#define BIGGEST_ALIGNMENT       32
++#define BIGGEST_ALIGNMENT       (TARGET_MB_64 ? 64 : 32) 
+ #define STRICT_ALIGNMENT        1
+ #define PCC_BITFIELD_TYPE_MATTERS 1
+ 
++//#define MAX_FIXED_MODE_SIZE GET_MODE_BITSIZE (TARGET_MB_64 ? TImode : DImode)
+ #undef SIZE_TYPE
+-#define SIZE_TYPE "unsigned int"
++#define SIZE_TYPE (TARGET_MB_64 ? "long unsigned int" : "unsigned int")
+ 
+ #undef PTRDIFF_TYPE
+-#define PTRDIFF_TYPE "int"
++#define PTRDIFF_TYPE (TARGET_MB_64 ? "long int" : "int")
++
++/*#undef INTPTR_TYPE
++#define INTPTR_TYPE (TARGET_MB_64 ? "long int" : "int")*/
++#undef UINTPTR_TYPE
++#define UINTPTR_TYPE (TARGET_MB_64 ? "long unsigned int" : "unsigned int")
+ 
+ #define DATA_ALIGNMENT(TYPE, ALIGN)					\
+   ((((ALIGN) < BITS_PER_WORD)						\
+@@ -253,12 +265,12 @@ extern enum pipeline_type microblaze_pipe;
+ #define WORD_REGISTER_OPERATIONS 1
+ 
+ #define LOAD_EXTEND_OP(MODE)  ZERO_EXTEND
+-
++/*
+ #define PROMOTE_MODE(MODE, UNSIGNEDP, TYPE)	\
+   if (GET_MODE_CLASS (MODE) == MODE_INT		\
+-      && GET_MODE_SIZE (MODE) < 4)		\
+-    (MODE) = SImode;
+-
++      && GET_MODE_SIZE (MODE) < (TARGET_MB_64 ? 8 : 4)) \
++    (MODE) = TARGET_MB_64 ? DImode : SImode;
++*/
+ /* Standard register usage.  */
+ 
+ /* On the MicroBlaze, we have 32 integer registers */
+@@ -438,13 +450,16 @@ extern struct microblaze_frame_info current_frame_info;
+ #define FIRST_PARM_OFFSET(FNDECL)		(UNITS_PER_WORD)
+ 
+ #define ARG_POINTER_CFA_OFFSET(FNDECL)		0
++#define DWARF_CIE_DATA_ALIGNMENT -1
+ 
+ #define REG_PARM_STACK_SPACE(FNDECL)  		(MAX_ARGS_IN_REGISTERS * UNITS_PER_WORD)
+ 
+ #define OUTGOING_REG_PARM_STACK_SPACE(FNTYPE)	1
+ 
+-#define STACK_BOUNDARY				32
++#define STACK_BOUNDARY				(TARGET_MB_64 ? 64 : 32)
+ 
++#define PREFERRED_STACK_BOUNDARY		(TARGET_MB_64 ? 64 : 32)
++ 
+ #define NUM_OF_ARGS				6
+ 
+ #define GP_RETURN				(GP_REG_FIRST + MB_ABI_INT_RETURN_VAL_REGNUM)
+@@ -455,12 +470,15 @@ extern struct microblaze_frame_info current_frame_info;
+ #define MAX_ARGS_IN_REGISTERS			MB_ABI_MAX_ARG_REGS
+ 
+ #define LIBCALL_VALUE(MODE)						\
++  gen_rtx_REG (MODE,GP_RETURN)
++								
++/*#define LIBCALL_VALUE(MODE)						\
+   gen_rtx_REG (								\
+ 	   ((GET_MODE_CLASS (MODE) != MODE_INT				\
+ 	     || GET_MODE_SIZE (MODE) >= 4)				\
+ 	    ? (MODE)							\
+ 	    : SImode), GP_RETURN)
+-
++*/
+ /* 1 if N is a possible register number for a function value.
+    On the MicroBlaze, R2 R3 are the only register thus used.
+    Currently, R2 are only implemented  here (C has no complex type)  */
+@@ -500,7 +518,7 @@ typedef struct microblaze_args
+ /* 4 insns + 2 words of data.  */
+ #define TRAMPOLINE_SIZE				(6 * 4)
+ 
+-#define TRAMPOLINE_ALIGNMENT			32
++#define TRAMPOLINE_ALIGNMENT			64
+ 
+ #define REGNO_OK_FOR_BASE_P(regno)		microblaze_regno_ok_for_base_p ((regno), 1)
+ 
+@@ -529,13 +547,13 @@ typedef struct microblaze_args
+    addresses which require two reload registers.  */
+ #define LEGITIMATE_PIC_OPERAND_P(X)  microblaze_legitimate_pic_operand (X)
+ 
+-#define CASE_VECTOR_MODE			(SImode)
++#define CASE_VECTOR_MODE			(TARGET_MB_64? DImode:SImode)
+ 
+ #ifndef DEFAULT_SIGNED_CHAR
+ #define DEFAULT_SIGNED_CHAR			1
+ #endif
+ 
+-#define MOVE_MAX				4
++#define MOVE_MAX				(TARGET_MB_64 ? 8 : 4)
+ #define MAX_MOVE_MAX				8
+ 
+ #define SLOW_BYTE_ACCESS			1
+@@ -545,7 +563,7 @@ typedef struct microblaze_args
+ 
+ #define SHIFT_COUNT_TRUNCATED			1
+ 
+-#define Pmode SImode
++#define Pmode (TARGET_MB_64? DImode:SImode)
+ 
+ #define FUNCTION_MODE   SImode
+ 
+@@ -707,6 +725,7 @@ do {									\
+ 
+ #undef TARGET_ASM_OUTPUT_IDENT
+ #define TARGET_ASM_OUTPUT_IDENT microblaze_asm_output_ident
++//#define TARGET_ASM_OUTPUT_IDENT default_asm_output_ident_directive
+ 
+ /* Default to -G 8 */
+ #ifndef MICROBLAZE_DEFAULT_GVALUE
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index 4d8429d9a90..33a8b12ef3b 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -26,6 +26,7 @@
+ ;; Constants
+ ;;----------------------------------------------------
+ (define_constants [
++  (R_Z         0)       ;; For reg r0
+   (R_SP        1)       ;; Stack pointer reg
+   (R_SR       15)       ;; Sub-routine return addr reg
+   (R_IR       14)       ;; Interrupt return addr reg
+@@ -541,6 +542,7 @@
+ 
+ ;; Add 2 SImode integers [ src1 = reg ; src2 = arith ; dest = reg ]
+ ;; Leave carry as is
++
+ (define_insn "addsi3"
+   [(set (match_operand:SI 0 "register_operand" "=d,d,d")
+ 	(plus:SI (match_operand:SI 1 "reg_or_0_operand" "%dJ,dJ,dJ")
+@@ -562,23 +564,38 @@
+ 
+ ;; Adding 2 DI operands in register or reg/imm
+ 
+-(define_insn "adddi3_long"
++(define_expand "adddi3"
++  [(set (match_operand:DI 0 "register_operand" "")
++	(plus:DI (match_operand:DI 1 "register_operand" "")
++		 (match_operand:DI 2 "arith_plus_operand" "")))]
++""
++{
++  if (TARGET_MB_64) 
++   {
++     if (GET_CODE (operands[2]) == CONST_INT &&
++       INTVAL(operands[2]) < (long)-549755813888 &&
++	INTVAL(operands[2]) > (long)549755813887)
++      FAIL;
++   }
++})
++
++(define_insn "*adddi3_long"
+   [(set (match_operand:DI 0 "register_operand" "=d,d")
+-	(plus:DI (match_operand:DI 1 "reg_or_0_operand" "%dJ,dJ")
++	(plus:DI (match_operand:DI 1 "register_operand" "%d,d")
+ 		 (match_operand:DI 2 "arith_plus_operand" "d,K")))]
+   "TARGET_MB_64"
+   "@
+-   addlk\t%0,%z1,%2
+-   addlik\t%0,%z1,%2"
+-  [(set_attr "type"	"arith,arith")
+-  (set_attr "mode"	"DI,DI")
++   addlk\t%0,%1,%2
++   addlik\t%0,%1,%2 #N10"
++  [(set_attr "type"	"darith,no_delay_arith")
++  (set_attr "mode"	"DI")
+   (set_attr "length"	"4,4")])
+ 
+-(define_insn "adddi3"
++(define_insn "*adddi3_all"
+   [(set (match_operand:DI 0 "register_operand" "=d,d")
+ 	(plus:DI (match_operand:DI 1 "register_operand" "%d,d")
+ 		 (match_operand:DI 2 "arith_operand" "d,i")))]
+-  ""
++  "!TARGET_MB_64"
+   "@
+   add\t%L0,%L1,%L2\;addc\t%M0,%M1,%M2
+   addi\t%L0,%L1,%j2\;addic\t%M0,%M1,%h2"
+@@ -605,7 +622,7 @@
+ (define_insn "iprefetch"
+   [(unspec [(match_operand:SI 0 "const_int_operand" "n")] UNSPEC_IPREFETCH)
+    (clobber (mem:BLK (scratch)))]
+-   "TARGET_PREFETCH"
++   "TARGET_PREFETCH && !TARGET_MB_64"
+   {
+     operands[2] = gen_rtx_REG (SImode, MB_ABI_ASM_TEMP_REGNUM);
+     return "mfs\t%2,rpc\n\twic\t%2,r0";
+@@ -618,23 +635,33 @@
+ ;; Double Precision Subtraction
+ ;;----------------------------------------------------------------
+ 
+-(define_insn "subdi3_long"
+-  [(set (match_operand:DI 0 "register_operand" "=d,d")
+-	(minus:DI (match_operand:DI 1 "register_operand" "d,d")
+-		  (match_operand:DI 2 "register_operand" "d,n")))]
++(define_expand "subdi3"
++  [(set (match_operand:DI 0 "register_operand" "")
++	(minus:DI (match_operand:DI 1 "register_operand" "")
++		  (match_operand:DI 2 "arith_operand" "")))]
++""
++"
++{
++}")
++
++(define_insn "subsidi3"
++  [(set (match_operand:DI 0 "register_operand" "=d,d,d")
++	(minus:DI (match_operand:DI 1 "register_operand" "d,d,d")
++		  (match_operand:DI 2 "arith_operand" "d,K,n")))]
+   "TARGET_MB_64"
+   "@
+    rsubl\t%0,%2,%1
+-   addlik\t%0,%z1,-%2"
+-  [(set_attr "type"	"darith")
+-  (set_attr "mode"	"DI,DI")
+-  (set_attr "length"	"4,4")])
++   addik\t%0,%z1,-%2
++   addik\t%0,%z1,-%2"
++  [(set_attr "type"	"arith,no_delay_arith,no_delay_arith")
++  (set_attr "mode"	"DI")
++  (set_attr "length"	"4,4,4")])
+ 
+-(define_insn "subdi3"
++(define_insn "subdi3_small"
+   [(set (match_operand:DI 0 "register_operand" "=&d")
+ 	(minus:DI (match_operand:DI 1 "register_operand" "d")
+ 		  (match_operand:DI 2 "register_operand" "d")))]
+-  ""
++  "!TARGET_MB_64"
+   "rsub\t%L0,%L2,%L1\;rsubc\t%M0,%M2,%M1"
+   [(set_attr "type"	"darith")
+   (set_attr "mode"	"DI")
+@@ -663,7 +690,7 @@
+         (mult:DI
+          (sign_extend:DI (match_operand:SI 1 "register_operand" "d"))
+          (sign_extend:DI (match_operand:SI 2 "register_operand" "d"))))]
+-  "!TARGET_SOFT_MUL && TARGET_MULTIPLY_HIGH"
++  "!TARGET_SOFT_MUL && TARGET_MULTIPLY_HIGH && !TARGET_MB_64"
+   "mul\t%L0,%1,%2\;mulh\t%M0,%1,%2"
+   [(set_attr "type"     "no_delay_arith")
+    (set_attr "mode"     "DI")
+@@ -674,7 +701,7 @@
+         (mult:DI
+          (zero_extend:DI (match_operand:SI 1 "register_operand" "d"))
+          (zero_extend:DI (match_operand:SI 2 "register_operand" "d"))))]
+-  "!TARGET_SOFT_MUL && TARGET_MULTIPLY_HIGH"
++  "!TARGET_SOFT_MUL && TARGET_MULTIPLY_HIGH && !TARGET_MB_64"
+   "mul\t%L0,%1,%2\;mulhu\t%M0,%1,%2"
+   [(set_attr "type"     "no_delay_arith")
+    (set_attr "mode"     "DI")
+@@ -685,7 +712,7 @@
+         (mult:DI
+          (zero_extend:DI (match_operand:SI 1 "register_operand" "d"))
+          (sign_extend:DI (match_operand:SI 2 "register_operand" "d"))))]
+-  "!TARGET_SOFT_MUL && TARGET_MULTIPLY_HIGH"
++  "!TARGET_SOFT_MUL && TARGET_MULTIPLY_HIGH && !TARGET_MB_64"
+   "mul\t%L0,%1,%2\;mulhsu\t%M0,%2,%1"
+   [(set_attr "type"     "no_delay_arith")
+    (set_attr "mode"     "DI")
+@@ -789,7 +816,7 @@
+                         (match_operand:SI 4 "arith_operand")])
+                       (label_ref (match_operand 5))
+                       (pc)))]
+-   "TARGET_HARD_FLOAT"
++   "TARGET_HARD_FLOAT && !TARGET_MB_64"
+    [(set (match_dup 1) (match_dup 3))]
+ 
+   {
+@@ -819,6 +846,15 @@
+   (set_attr "mode"	"SI")
+   (set_attr "length"	"4")])
+ 
++(define_insn "negsi_long"
++  [(set (match_operand:SI 0 "register_operand" "=d")
++	(neg:SI (match_operand:DI 1 "register_operand" "d")))]
++  ""
++  "rsubk\t%0,%1,r0"
++  [(set_attr "type"	"arith")
++  (set_attr "mode"	"SI")
++  (set_attr "length"	"4")])
++
+ (define_insn "negdi2_long"
+   [(set (match_operand:DI 0 "register_operand" "=d")
+ 	(neg:DI (match_operand:DI 1 "register_operand" "d")))]
+@@ -847,16 +883,24 @@
+   (set_attr "mode"	"SI")
+   (set_attr "length"	"4")])
+ 
+-(define_insn "one_cmpldi2_long"
++(define_expand "one_cmpldi2"
++  [(set (match_operand:DI 0 "register_operand" "")
++	(not:DI (match_operand:DI 1 "register_operand" "")))]
++  ""
++  "
++{
++}")
++
++(define_insn ""
+   [(set (match_operand:DI 0 "register_operand" "=d")
+-	(not:DI (match_operand:DI 1 "register_operand" "d")))]
++	(not:DI (match_operand:DI 1 "arith_operand" "d")))]
+   "TARGET_MB_64"
+   "xorli\t%0,%1,-1"
+-  [(set_attr "type"	"arith")
++  [(set_attr "type"	"no_delay_arith")
+   (set_attr "mode"	"DI")
+   (set_attr "length"	"4")])
+ 
+-(define_insn "*one_cmpldi2"
++(define_insn ""
+   [(set (match_operand:DI 0 "register_operand" "=d")
+ 	(not:DI (match_operand:DI 1 "register_operand" "d")))]
+   ""
+@@ -871,7 +915,8 @@
+ 	(not:DI (match_operand:DI 1 "register_operand" "")))]
+   "reload_completed 
+    && GET_CODE (operands[0]) == REG && GP_REG_P (REGNO (operands[0]))
+-   && GET_CODE (operands[1]) == REG && GP_REG_P (REGNO (operands[1]))"
++   && GET_CODE (operands[1]) == REG && GP_REG_P (REGNO (operands[1]))
++   && !TARGET_MB_64"
+ 
+   [(set (subreg:SI (match_dup 0) 0) (not:SI (subreg:SI (match_dup 1) 0)))
+   (set (subreg:SI (match_dup 0) 4) (not:SI (subreg:SI (match_dup 1) 4)))]
+@@ -883,18 +928,17 @@
+ ;;----------------------------------------------------------------
+ 
+ (define_insn "anddi3"
+-  [(set (match_operand:DI 0 "register_operand" "=d,d")
+-	(and:DI (match_operand:DI 1 "arith_operand" "d,d")
+-		(match_operand:DI 2 "arith_operand" "d,K")))]
++  [(set (match_operand:DI 0 "register_operand" "=d,d,d")
++	(and:DI (match_operand:DI 1 "arith_operand" "d,d,d")
++		(match_operand:DI 2 "arith_operand" "d,K,I")))]
+   "TARGET_MB_64"
+   "@
+    andl\t%0,%1,%2
+-   andli\t%0,%1,%2 #andl1"
+-  ;; andli\t%0,%1,%2 #andl3
+-  ;; andli\t%0,%1,%2 #andl2
+-  [(set_attr "type"	"arith,arith")
+-  (set_attr "mode"	"DI,DI")
+-  (set_attr "length"	"4,4")])
++   andli\t%0,%1,%2 #andl2
++   andli\t%0,%1,%2 #andl3"
++  [(set_attr "type"	"arith,no_delay_arith,no_delay_arith")
++  (set_attr "mode"	"DI,DI,DI")
++  (set_attr "length"	"4,4,4")])
+ 
+ (define_insn "andsi3"
+   [(set (match_operand:SI 0 "register_operand" "=d,d,d,d")
+@@ -919,7 +963,7 @@
+   "@
+    orl\t%0,%1,%2
+    orli\t%0,%1,%2 #andl1"
+-  [(set_attr "type"	"arith,arith")
++  [(set_attr "type"	"arith,no_delay_arith")
+   (set_attr "mode"	"DI,DI")
+   (set_attr "length"	"4,4")])
+ 
+@@ -945,7 +989,7 @@
+   "@
+    xorl\t%0,%1,%2
+    xorli\t%0,%1,%2 #andl1"
+-  [(set_attr "type"	"arith,arith")
++  [(set_attr "type"	"arith,no_delay_arith")
+   (set_attr "mode"	"DI,DI")
+   (set_attr "length"	"4,4")])
+ 
+@@ -1018,26 +1062,6 @@
+   (set_attr "mode"	"SI")
+   (set_attr "length"	"4")])
+ 
+-;;(define_expand "extendqidi2"
+-;;  [(set (match_operand:DI 0 "register_operand" "=d")
+-;;        (sign_extend:DI (match_operand:QI 1 "general_operand" "d")))]
+-;;  "TARGET_MB_64"
+-;;  {
+-;;	if (GET_CODE (operands[1]) != REG)
+-;;	FAIL;
+-;;   }
+-;;)
+-    
+-
+-;;(define_insn "extendqidi2"
+-;;  [(set (match_operand:DI 0 "register_operand" "=d")
+-;;	(sign_extend:DI (match_operand:QI 1 "register_operand" "d")))]
+-;;  "TARGET_MB_64"
+-;;  "sextl8\t%0,%1"
+-;;  [(set_attr "type"	"arith")
+-;;  (set_attr "mode"	"DI")
+-;;  (set_attr "length"	"4")])
+-
+ (define_insn "extendhisi2"
+   [(set (match_operand:SI 0 "register_operand" "=d")
+ 	(sign_extend:SI (match_operand:HI 1 "register_operand" "d")))]
+@@ -1060,6 +1084,27 @@
+ ;; Those for integer source operand are ordered
+ ;; widest source type first.
+ 
++(define_insn "extendsidi2_long"
++  [(set (match_operand:DI 0 "register_operand" "=d,d,d")
++	(sign_extend:DI (match_operand:SI 1 "nonimmediate_operand" "d,R,m")))]
++  "TARGET_MB_64"
++  {
++    switch (which_alternative)
++    {
++      case 0:
++        return "sextl32\t%0,%1";
++      case 1:
++      case 2:
++        {
++          output_asm_insn ("ll%i1\t%0,%1", operands);
++          return "sextl32\t%0,%0";
++        }
++    } 
++  }
++  [(set_attr "type"	"multi,multi,multi")
++  (set_attr "mode"	"DI")
++  (set_attr "length"	"4,8,8")])
++
+ (define_insn "extendsidi2"
+   [(set (match_operand:DI 0 "register_operand" "=d,d,d")
+ 	(sign_extend:DI (match_operand:SI 1 "nonimmediate_operand" "d,R,m")))]
+@@ -1090,69 +1135,118 @@
+ ;; Unlike most other insns, the move insns can't be split with
+ ;; different predicates, because register spilling and other parts of
+ ;; the compiler, have memoized the insn number already.
++;;    //}
+ 
+ (define_expand "movdi"
+   [(set (match_operand:DI 0 "nonimmediate_operand" "")
+ 	(match_operand:DI 1 "general_operand" ""))]
+   ""
+   {
+-    /* If operands[1] is a constant address illegal for pic, then we need to
+-       handle it just like microblaze_legitimize_address does.  */
+-    if (flag_pic && pic_address_needs_scratch (operands[1]))
++    if (TARGET_MB_64)
++    {
++      if (microblaze_expand_move (DImode, operands)) DONE;
++    }
++    else
+     {
++      /* If operands[1] is a constant address illegal for pic, then we need to
++         handle it just like microblaze_legitimize_address does. */ 
++      if (flag_pic && pic_address_needs_scratch (operands[1]))
++      {
+         rtx temp = force_reg (DImode, XEXP (XEXP (operands[1], 0), 0));
+         rtx temp2 = XEXP (XEXP (operands[1], 0), 1);
+         emit_move_insn (operands[0], gen_rtx_PLUS (DImode, temp, temp2));
+         DONE;
+-    }
+-
+-
+-    if ((reload_in_progress | reload_completed) == 0
+-        && !register_operand (operands[0], DImode)
+-        && !register_operand (operands[1], DImode)
+-        && (((GET_CODE (operands[1]) != CONST_INT || INTVAL (operands[1]) != 0)
+-	       && operands[1] != CONST0_RTX (DImode))))
+-    {
++      }
+ 
+-      rtx temp = force_reg (DImode, operands[1]);
+-      emit_move_insn (operands[0], temp);
+-      DONE;
++      if ((reload_in_progress | reload_completed) == 0
++          && !register_operand (operands[0], DImode)
++          && !register_operand (operands[1], DImode)
++          && (((GET_CODE (operands[1]) != CONST_INT || INTVAL (operands[1]) != 0)
++  	       && operands[1] != CONST0_RTX (DImode))))
++      {
++        rtx temp = force_reg (DImode, operands[1]);
++        emit_move_insn (operands[0], temp);
++        DONE;
++      }
+     }
+   }
+ )
+ 
++;; Added for status registers
++(define_insn "movdi_status"
++  [(set (match_operand:DI 0 "register_operand" "=d,d,z")
++        (match_operand:DI 1 "register_operand" "z,d,d"))]
++  "microblaze_is_interrupt_variant () && TARGET_MB_64"
++  "@
++	mfs\t%0,%1  #mfs
++	addlk\t%0,%1,r0 #add movdi
++	mts\t%0,%1  #mts"	
++  [(set_attr "type" "move")
++  (set_attr "mode" "DI")
++  (set_attr "length" "12")])
+ 
+-(define_insn "*movdi_internal_64"
+-  [(set (match_operand:DI 0 "nonimmediate_operand" "=d,d,d,d,d,R,o")
+-	(match_operand:DI 1 "general_operand"      " d,K,J,R,o,d,d"))]
+-  "TARGET_MB_64 && (INTVAL(operands[1]) < 0x7fffffffff) && (INTVAL(operands[1]) > 0xffffff8000000000)"
++;; This move will be not be moved to delay slot.	
++(define_insn "*movdi_internal3"
++  [(set (match_operand:DI 0 "nonimmediate_operand" "=d,d,d")
++	(match_operand:DI 1 "immediate_operand" "J,I,Mnis"))]
++  "TARGET_MB_64 && (register_operand (operands[0], DImode) && 
++           (GET_CODE (operands[1]) == CONST_INT && 
++                 (INTVAL (operands[1]) <= (long)549755813887 && INTVAL (operands[1]) >= (long)-549755813888)))"  
++  "@
++   addlk\t%0,r0,r0\t
++   addlik\t%0,r0,%1\t #N1 %X1
++   addlik\t%0,r0,%1\t #N2 %X1"
++  [(set_attr "type"	"arith,no_delay_arith,no_delay_arith")
++  (set_attr "mode"	"DI")
++  (set_attr "length"	"4")])
++
++;; This move may be used for PLT label operand
++(define_insn "*movdi_internal5_pltop"
++  [(set (match_operand:DI 0 "register_operand" "=d,d")
++	(match_operand:DI 1 "call_insn_operand" ""))]
++  "TARGET_MB_64 && (register_operand (operands[0], Pmode) && 
++           PLT_ADDR_P (operands[1]))"
++  { 
++     gcc_unreachable ();
++  }
++  [(set_attr "type"	"load")
++  (set_attr "mode"	"DI")
++  (set_attr "length"	"4")])
++
++(define_insn "*movdi_internal2"
++  [(set (match_operand:DI 0 "nonimmediate_operand" "=d,d,d,   d,d,R,m")
++	(match_operand:DI 1 "move_src_operand"         " d,I,Mnis,R,m,dJ,dJ"))]
++  "TARGET_MB_64"
+   { 
+     switch (which_alternative)
+     {
+       case 0:
+-        return "addlk\t%0,%1";
+-      case 1:
+-	return "addlik\t%0,r0,%1";
+-      case 2:
+-	  return "addlk\t%0,r0,r0";
+-      case 3:
+-      case 4:
+-	  return "lli\t%0,%1";
+-      case 5:
+-      case 6:
+-        return "sli\t%1,%0";
+-    }
+-    return "unreachable";
+-  }
+-  [(set_attr "type"	"no_delay_move,no_delay_arith,no_delay_arith,no_delay_load,no_delay_load,no_delay_store,no_delay_store")
++        return "addlk\t%0,%1,r0";
++     case 1:
++     case 2:
++        if (GET_CODE (operands[1]) == CONST_INT && 
++	    (INTVAL (operands[1]) > (long)549755813887 || INTVAL (operands[1]) < (long)-549755813888))
++ 	  return "addlik\t%0,r0,%h1\n\tbsllli\t%0,%0,32\n\taddlik\t%0,%0,%j1 #li => la";
++        else	
++	  return "addlik\t%0,r0,%1";
++     case 3:
++     case 4:
++       return "ll%i1\t%0,%1";
++     case 5:
++     case 6:
++       return "sl%i0\t%z1,%0";
++     }
++   }
++  [(set_attr "type"	"load,no_delay_load,no_delay_load,no_delay_load,no_delay_load,no_delay_store,no_delay_store")
+   (set_attr "mode"	"DI")
+-  (set_attr "length"   "8,8,8,8,12,8,12")])
++  (set_attr "length"	"4,4,12,4,8,4,8")])
++
+ 
+ 
+ (define_insn "*movdi_internal"
+   [(set (match_operand:DI 0 "nonimmediate_operand" "=d,d,d,d,d,R,o")
+ 	(match_operand:DI 1 "general_operand"      " d,i,J,R,o,d,d"))]
+-  ""
++  "!TARGET_MB_64"
+   { 
+     switch (which_alternative)
+     {
+@@ -1184,7 +1278,8 @@
+   "reload_completed 
+    && GET_CODE (operands[0]) == REG && GP_REG_P (REGNO (operands[0]))
+    && GET_CODE (operands[1]) == REG && GP_REG_P (REGNO (operands[1])) 
+-   && (REGNO(operands[0]) == (REGNO(operands[1]) + 1))"
++   && (REGNO(operands[0]) == (REGNO(operands[1]) + 1))
++   && !(TARGET_MB_64)"
+ 
+   [(set (subreg:SI (match_dup 0) 4) (subreg:SI (match_dup 1) 4))
+   (set (subreg:SI (match_dup 0) 0) (subreg:SI (match_dup 1) 0))]
+@@ -1196,12 +1291,22 @@
+   "reload_completed 
+    && GET_CODE (operands[0]) == REG && GP_REG_P (REGNO (operands[0]))
+    && GET_CODE (operands[1]) == REG && GP_REG_P (REGNO (operands[1])) 
+-   && (REGNO (operands[0]) != (REGNO (operands[1]) + 1))"
++   && (REGNO (operands[0]) != (REGNO (operands[1]) + 1))
++   && !(TARGET_MB_64)"
+ 
+   [(set (subreg:SI (match_dup 0) 0) (subreg:SI (match_dup 1) 0))
+   (set (subreg:SI (match_dup 0) 4) (subreg:SI (match_dup 1) 4))]
+   "")
+ 
++(define_insn "movdi_long_int"
++  [(set (match_operand:DI 0 "nonimmediate_operand" "=d")
++	(match_operand:DI 1 "general_operand"      "i"))]
++  ""
++  "addlik\t%0,r0,%h1\n\tbsllli\t%0,%0,32\n\taddlik\t%0,%0,%j1 #li => la";
++  [(set_attr "type"	"no_delay_arith")
++  (set_attr "mode"	"DI")
++  (set_attr "length"	"12")])
++
+ ;; Unlike most other insns, the move insns can't be split with
+ ;; different predicates, because register spilling and other parts of
+ ;; the compiler, have memoized the insn number already.
+@@ -1273,6 +1378,8 @@
+   (set_attr "length"	"4,4,8,4,8,4,8")])
+ 
+ 
++
++
+ ;; 16-bit Integer moves
+ 
+ ;; Unlike most other insns, the move insns can't be split with
+@@ -1305,8 +1412,8 @@
+   "@
+    addik\t%0,r0,%1\t# %X1
+    addk\t%0,%1,r0
+-   lhui\t%0,%1
+-   lhui\t%0,%1
++   lhu%i1\t%0,%1
++   lhu%i1\t%0,%1
+    sh%i0\t%z1,%0
+    sh%i0\t%z1,%0"
+   [(set_attr "type"	"arith,move,load,no_delay_load,store,no_delay_store")
+@@ -1349,7 +1456,7 @@
+    lbu%i1\t%0,%1
+    lbu%i1\t%0,%1
+    sb%i0\t%z1,%0
+-   sbi\t%z1,%0"
++   sb%i0\t%z1,%0"
+   [(set_attr "type"	"arith,arith,move,load,no_delay_load,store,no_delay_store")
+   (set_attr "mode"	"QI")
+   (set_attr "length"	"4,4,8,4,8,4,8")])
+@@ -1422,7 +1529,7 @@
+    addik\t%0,r0,%F1
+    lw%i1\t%0,%1
+    sw%i0\t%z1,%0
+-   swi\t%z1,%0"
++   sw%i0\t%z1,%0"
+   [(set_attr "type"     "move,no_delay_load,load,no_delay_load,no_delay_load,store,no_delay_store")
+   (set_attr "mode"      "SF")
+   (set_attr "length"    "4,4,4,4,4,4,4")])
+@@ -1461,6 +1568,33 @@
+ ;; movdf_internal
+ ;; Applies to both TARGET_SOFT_FLOAT and TARGET_HARD_FLOAT
+ ;;
++(define_insn "*movdf_internal_64"
++  [(set (match_operand:DF 0 "nonimmediate_operand" "=d,d,d,d,d,m")
++        (match_operand:DF 1 "general_operand" "d,dG,m,F,T,d"))]
++  "TARGET_MB_64"
++  {
++    switch (which_alternative)
++    {
++      case 0:
++	return "addlk\t%0,%1,r0";
++      case 1:
++	return "addlk\t%0,r0,r0";
++      case 2:
++      case 4:
++          return "ll%i1\t%0,%1";
++      case 3:
++      {
++	return "addlik\t%0,r0,%h1 \n\tbsllli\t%0,%0,32\n\taddlik\t%0,%0,%j1 #Xfer Lo";
++      }
++      case 5:
++	return "sl%i0\t%1,%0";
++    }
++    gcc_unreachable ();
++  }
++  [(set_attr "type"     "no_delay_move,no_delay_move,no_delay_load,no_delay_load,no_delay_load,no_delay_store")
++  (set_attr "mode"      "DF")
++  (set_attr "length"    "4,4,4,16,4,4")])
++
+ (define_insn "*movdf_internal"
+   [(set (match_operand:DF 0 "nonimmediate_operand" "=d,d,d,d,o")
+         (match_operand:DF 1 "general_operand" "dG,o,F,T,d"))]
+@@ -1495,7 +1629,8 @@
+   "reload_completed
+    && GET_CODE (operands[0]) == REG && GP_REG_P (REGNO (operands[0]))
+    && GET_CODE (operands[1]) == REG && GP_REG_P (REGNO (operands[1]))
+-   && (REGNO (operands[0]) == (REGNO (operands[1]) + 1))"
++   && (REGNO (operands[0]) == (REGNO (operands[1]) + 1))
++   && !TARGET_MB_64"
+   [(set (subreg:SI (match_dup 0) 4) (subreg:SI (match_dup 1) 4))
+   (set (subreg:SI (match_dup 0) 0) (subreg:SI (match_dup 1) 0))]
+   "")
+@@ -1506,7 +1641,8 @@
+   "reload_completed
+    && GET_CODE (operands[0]) == REG && GP_REG_P (REGNO (operands[0]))
+    && GET_CODE (operands[1]) == REG && GP_REG_P (REGNO (operands[1]))
+-   && (REGNO (operands[0]) != (REGNO (operands[1]) + 1))"
++   && (REGNO (operands[0]) != (REGNO (operands[1]) + 1))
++   && !TARGET_MB_64"
+   [(set (subreg:SI (match_dup 0) 0) (subreg:SI (match_dup 1) 0))
+   (set (subreg:SI (match_dup 0) 4) (subreg:SI (match_dup 1) 4))]
+   "")
+@@ -2006,6 +2142,31 @@ else
+   "
+ )
+ 
++
++(define_insn "seq_internal_pat_long" 
++  [(set (match_operand:DI 0 "register_operand" "=d")
++	(eq:DI 
++	       (match_operand:DI 1 "register_operand" "d")
++	       (match_operand:DI 2 "register_operand" "d")))]
++  "TARGET_MB_64"
++  "pcmpleq\t%0,%1,%2"
++  [(set_attr "type"	"arith")
++   (set_attr "mode"	"DI")
++   (set_attr "length"	"4")]
++)              
++
++(define_insn "sne_internal_pat_long" 
++  [(set (match_operand:DI 0 "register_operand" "=d")
++	(ne:DI 
++	       (match_operand:DI 1 "register_operand" "d")
++	       (match_operand:DI 2 "register_operand" "d")))]
++  "TARGET_MB_64"
++  "pcmplne\t%0,%1,%2"
++  [(set_attr "type"	"arith")
++  (set_attr "mode"	"DI")
++  (set_attr "length"	"4")]
++)              
++
+ (define_insn "seq_internal_pat" 
+   [(set (match_operand:SI 0 "register_operand" "=d")
+ 	(eq:SI 
+@@ -2066,8 +2227,8 @@ else
+ (define_expand "cbranchsi4"
+   [(set (pc)
+         (if_then_else (match_operator 0 "ordered_comparison_operator"
+-                       [(match_operand:SI 1 "register_operand")
+-                        (match_operand:SI 2 "arith_operand" "I,i")])
++                       [(match_operand 1 "register_operand")
++                        (match_operand 2 "arith_operand" "I,i")])
+                       (label_ref (match_operand 3 ""))
+                       (pc)))]
+   ""
+@@ -2079,13 +2240,13 @@ else
+ (define_expand "cbranchsi4_reg"
+   [(set (pc)
+         (if_then_else (match_operator 0 "ordered_comparison_operator"
+-                       [(match_operand:SI 1 "register_operand")
+-                        (match_operand:SI 2 "register_operand")])
++                       [(match_operand 1 "register_operand")
++                        (match_operand 2 "register_operand")])
+                       (label_ref (match_operand 3 ""))
+                       (pc)))]
+   ""
+ {
+-  microblaze_expand_conditional_branch_reg (SImode, operands);
++  microblaze_expand_conditional_branch_reg (Pmode, operands);
+   DONE;
+ })
+ 
+@@ -2110,6 +2271,26 @@ else
+ 		      (label_ref (match_operand 1))
+ 		      (pc)))])
+ 
++(define_insn "branch_zero64"
++  [(set (pc)
++	(if_then_else (match_operator 0 "ordered_comparison_operator"
++  				 [(match_operand 1 "register_operand" "d")
++                                  (const_int 0)])
++                      (match_operand 2 "pc_or_label_operand" "")
++                      (match_operand 3 "pc_or_label_operand" "")))
++  ]
++  "TARGET_MB_64"
++  {
++    if (operands[3] == pc_rtx) 
++      return "bea%C0i%?\t%z1,%2";
++    else 
++      return "bea%N0i%?\t%z1,%3";
++  }
++  [(set_attr "type"	"branch")
++   (set_attr "mode"	"none")
++   (set_attr "length"	"4")]
++)
++
+ (define_insn "branch_zero"
+   [(set (pc)
+ 	(if_then_else (match_operator:SI 0 "ordered_comparison_operator"
+@@ -2130,6 +2311,47 @@ else
+    (set_attr "length"	"4")]
+ )
+ 
++(define_insn "branch_compare64"
++  [(set (pc)
++        (if_then_else (match_operator 0 "cmp_op"
++                                         [(match_operand 1 "register_operand" "d")
++                                          (match_operand 2 "register_operand" "d")
++                                         ])
++                      (label_ref (match_operand 3))
++                      (pc)))
++  (clobber(reg:SI R_TMP))]
++  "TARGET_MB_64"
++  {
++    operands[4] = gen_rtx_REG (SImode, MB_ABI_ASM_TEMP_REGNUM);
++    enum rtx_code code = GET_CODE (operands[0]);
++
++    if (code == GT || code == LE)
++      {
++        output_asm_insn ("cmp\tr18,%z1,%z2", operands);
++        code = swap_condition (code);
++      }
++    else if (code == GTU || code == LEU)
++      {
++        output_asm_insn ("cmpu\tr18,%z1,%z2", operands);
++        code = swap_condition (code);
++      }
++    else if (code == GE || code == LT)
++      {
++        output_asm_insn ("cmp\tr18,%z2,%z1", operands);
++      }
++    else if (code == GEU || code == LTU)
++      {
++        output_asm_insn ("cmpu\tr18,%z2,%z1", operands);
++      }
++
++    operands[0] = gen_rtx_fmt_ee (signed_condition (code), SImode, operands[4], const0_rtx);
++    return "bea%C0i%?\tr18,%3";
++  }
++  [(set_attr "type"     "branch")
++   (set_attr "mode"     "none")
++   (set_attr "length"   "12")]
++)
++
+ (define_insn "branch_compare"
+   [(set (pc)
+         (if_then_else (match_operator:SI 0 "cmp_op"
+@@ -2313,7 +2535,7 @@ else
+ ;; Indirect jumps. Jump to register values. Assuming absolute jumps
+ 
+ (define_insn "indirect_jump_internal1"
+-  [(set (pc) (match_operand:SI 0 "register_operand" "d"))]
++  [(set (pc) (match_operand 0 "register_operand" "d"))]
+   ""
+   "bra%?\t%0"
+   [(set_attr "type"	"jump")
+@@ -2326,7 +2548,7 @@ else
+   (use (label_ref (match_operand 1 "" "")))]
+   ""
+   {
+-    gcc_assert (GET_MODE (operands[0]) == Pmode);
++    //gcc_assert (GET_MODE (operands[0]) == Pmode);
+ 
+     if (!flag_pic || TARGET_PIC_DATA_TEXT_REL)
+       emit_jump_insn (gen_tablejump_internal1 (operands[0], operands[1]));
+@@ -2338,7 +2560,7 @@ else
+ 
+ (define_insn "tablejump_internal1"
+   [(set (pc)
+-	(match_operand:SI 0 "register_operand" "d"))
++	(match_operand 0 "register_operand" "d"))
+   (use (label_ref (match_operand 1 "" "")))]
+   ""
+   "bra%?\t%0 "
+@@ -2348,9 +2570,9 @@ else
+ 
+ (define_expand "tablejump_internal3"
+   [(parallel [(set (pc)
+-		   (plus:SI (match_operand:SI 0 "register_operand" "d")
+-			    (label_ref:SI (match_operand:SI 1 "" ""))))
+-             (use (label_ref:SI (match_dup 1)))])]
++		   (plus (match_operand 0 "register_operand" "d")
++			    (label_ref (match_operand:SI 1 "" ""))))
++             (use (label_ref (match_dup 1)))])]
+   ""
+   ""
+ )
+@@ -2411,7 +2633,7 @@ else
+ 	(minus (reg 1) (match_operand 1 "register_operand" "")))
+    (set (reg 1)
+ 	(minus (reg 1) (match_dup 1)))]
+-  ""
++  "!TARGET_MB_64"
+   { 
+     rtx retaddr = gen_rtx_MEM (Pmode, stack_pointer_rtx);
+     rtx reg = gen_reg_rtx (Pmode);
+@@ -2436,7 +2658,7 @@ else
+ (define_expand "save_stack_block"
+   [(match_operand 0 "register_operand" "")
+    (match_operand 1 "register_operand" "")]
+-  ""
++  "!TARGET_MB_64"
+   {
+     emit_move_insn (operands[0], operands[1]);
+     DONE;
+@@ -2446,7 +2668,7 @@ else
+ (define_expand "restore_stack_block"
+   [(match_operand 0 "register_operand" "")
+    (match_operand 1 "register_operand" "")]
+-  ""
++  "!TARGET_MB_64"
+   {
+     rtx retaddr = gen_rtx_MEM (Pmode, stack_pointer_rtx);
+     rtx rtmp    = gen_rtx_REG (SImode, R_TMP);
+@@ -2493,7 +2715,7 @@ else
+ 
+ (define_insn "<optab>_internal"
+   [(any_return)
+-   (use (match_operand:SI 0 "register_operand" ""))]
++   (use (match_operand 0 "register_operand" ""))]
+   ""
+   {
+     if (microblaze_is_break_handler ())
+@@ -2526,7 +2748,7 @@ else
+ (define_expand "call"
+   [(parallel [(call (match_operand 0 "memory_operand" "m")
+ 		    (match_operand 1 "" "i"))
+-             (clobber (reg:SI R_SR))
++             (clobber (reg R_SR))
+              (use (match_operand 2 "" ""))
+              (use (match_operand 3 "" ""))])]
+   ""
+@@ -2547,12 +2769,12 @@ else
+ 
+     if (GET_CODE (XEXP (operands[0], 0)) == UNSPEC)
+       emit_call_insn (gen_call_internal_plt0 (operands[0], operands[1],
+-                        gen_rtx_REG (SImode, 
++                        gen_rtx_REG (Pmode, 
+ 				     GP_REG_FIRST + MB_ABI_SUB_RETURN_ADDR_REGNUM),
+                                	     pic_offset_table_rtx));
+     else
+       emit_call_insn (gen_call_internal0 (operands[0], operands[1],
+-                        gen_rtx_REG (SImode, 
++                        gen_rtx_REG (Pmode, 
+ 				     GP_REG_FIRST + MB_ABI_SUB_RETURN_ADDR_REGNUM)));
+ 
+         DONE;
+@@ -2562,7 +2784,7 @@ else
+ (define_expand "call_internal0"
+   [(parallel [(call (match_operand 0 "" "")
+ 		    (match_operand 1 "" ""))
+-             (clobber (match_operand:SI 2 "" ""))])]
++             (clobber (match_operand 2 "" ""))])]
+   ""
+   {
+   }
+@@ -2571,18 +2793,34 @@ else
+ (define_expand "call_internal_plt0"
+   [(parallel [(call (match_operand 0 "" "")
+ 		    (match_operand 1 "" ""))
+-             (clobber (match_operand:SI 2 "" ""))
+-             (use (match_operand:SI 3 "" ""))])]
++             (clobber (match_operand 2 "" ""))
++             (use (match_operand 3 "" ""))])]
+   ""
+   {
+   }
+ )
+  
++(define_insn "call_internal_plt_64"
++  [(call (mem (match_operand 0 "call_insn_plt_operand" ""))
++	 (match_operand 1 "" "i"))
++  (clobber (reg R_SR))
++  (use (reg R_GOT))]
++  "flag_pic && TARGET_MB_64"
++  {
++    register rtx target2 = gen_rtx_REG (Pmode, 
++			      GP_REG_FIRST + MB_ABI_SUB_RETURN_ADDR_REGNUM);
++    gen_rtx_CLOBBER (VOIDmode, target2);
++    return "brealid\tr15,%0\;%#";
++  }
++  [(set_attr "type"	"call")
++  (set_attr "mode"	"none")
++  (set_attr "length"	"4")])
++
+ (define_insn "call_internal_plt"
+-  [(call (mem (match_operand:SI 0 "call_insn_plt_operand" ""))
+-	 (match_operand:SI 1 "" "i"))
+-  (clobber (reg:SI R_SR))
+-  (use (reg:SI R_GOT))]
++  [(call (mem (match_operand 0 "call_insn_plt_operand" ""))
++	 (match_operand 1 "" "i"))
++  (clobber (reg R_SR))
++  (use (reg R_GOT))]
+   "flag_pic"
+   {
+     register rtx target2 = gen_rtx_REG (Pmode, 
+@@ -2594,10 +2832,41 @@ else
+   (set_attr "mode"	"none")
+   (set_attr "length"	"4")])
+ 
++(define_insn "call_internal1_64"
++  [(call (mem (match_operand:VOID 0 "call_insn_simple_operand" "ri"))
++	 (match_operand 1 "" "i"))
++  (clobber (reg R_SR))]
++  "TARGET_MB_64"
++  {
++    register rtx target = operands[0];
++    register rtx target2 = gen_rtx_REG (Pmode,
++			      GP_REG_FIRST + MB_ABI_SUB_RETURN_ADDR_REGNUM);
++    if (GET_CODE (target) == SYMBOL_REF) {
++        if (microblaze_break_function_p (SYMBOL_REF_DECL (target))) {
++            gen_rtx_CLOBBER (VOIDmode, target2);
++            return "breaki\tr16,%0\;%#";
++        }
++        else {
++            gen_rtx_CLOBBER (VOIDmode, target2);
++            return "brealid\tr15,%0\;%#";
++        }
++    } else if (GET_CODE (target) == CONST_INT)
++        return "la\t%@,r0,%0\;brald\tr15,%@\;%#";
++    else if (GET_CODE (target) == REG)
++        return "brald\tr15,%0\;%#";	
++    else {
++        fprintf (stderr,"Unsupported call insn\n");
++        return NULL;
++    }
++  }
++  [(set_attr "type"	"call")
++  (set_attr "mode"	"none")
++  (set_attr "length"	"4")])
++
+ (define_insn "call_internal1"
+   [(call (mem (match_operand:VOID 0 "call_insn_simple_operand" "ri"))
+-	 (match_operand:SI 1 "" "i"))
+-  (clobber (reg:SI R_SR))]
++	 (match_operand 1 "" "i"))
++  (clobber (reg R_SR))]
+   ""
+   {
+     register rtx target = operands[0];
+@@ -2631,7 +2900,7 @@ else
+   [(parallel [(set (match_operand 0 "register_operand" "=d")
+ 		   (call (match_operand 1 "memory_operand" "m")
+ 			 (match_operand 2 "" "i")))
+-             (clobber (reg:SI R_SR))
++             (clobber (reg R_SR))
+              (use (match_operand 3 "" ""))])] ;; next_arg_reg
+   ""
+   {
+@@ -2652,13 +2921,13 @@ else
+     if (GET_CODE (XEXP (operands[1], 0)) == UNSPEC)
+       emit_call_insn (gen_call_value_intern_plt0 (operands[0], operands[1], 
+ 			operands[2],
+-                        gen_rtx_REG (SImode, 
++                        gen_rtx_REG (Pmode, 
+ 				     GP_REG_FIRST + MB_ABI_SUB_RETURN_ADDR_REGNUM),
+ 				     pic_offset_table_rtx));
+     else
+       emit_call_insn (gen_call_value_internal (operands[0], operands[1], 
+ 			operands[2],
+-                        gen_rtx_REG (SImode, 
++                        gen_rtx_REG (Pmode, 
+ 				     GP_REG_FIRST + MB_ABI_SUB_RETURN_ADDR_REGNUM)));
+ 
+     DONE;
+@@ -2670,7 +2939,7 @@ else
+   [(parallel [(set (match_operand 0 "" "")
+ 		   (call (match_operand 1 "" "")
+ 			 (match_operand 2 "" "")))
+-             (clobber (match_operand:SI 3 "" ""))
++             (clobber (match_operand 3 "" ""))
+              ])]
+   ""
+   {}
+@@ -2680,18 +2949,35 @@ else
+   [(parallel[(set (match_operand 0 "" "")
+                   (call (match_operand 1 "" "")
+                         (match_operand 2 "" "")))
+-             (clobber (match_operand:SI 3 "" ""))
+-             (use (match_operand:SI 4 "" ""))])]
++             (clobber (match_operand 3 "" ""))
++             (use (match_operand 4 "" ""))])]
+   "flag_pic"
+   {}
+ )
+ 
++(define_insn "call_value_intern_plt_64"
++  [(set (match_operand:VOID 0 "register_operand" "=d")
++        (call (mem (match_operand 1 "call_insn_plt_operand" ""))
++              (match_operand 2 "" "i")))
++   (clobber (match_operand 3 "register_operand" "=d"))
++   (use (match_operand 4 "register_operand"))]
++  "flag_pic && TARGET_MB_64"
++  { 
++    register rtx target2=gen_rtx_REG (Pmode,GP_REG_FIRST + MB_ABI_SUB_RETURN_ADDR_REGNUM);
++
++    gen_rtx_CLOBBER (VOIDmode,target2);
++    return "brealid\tr15,%1\;%#";
++  }
++  [(set_attr "type"	"call")
++  (set_attr "mode"	"none")
++  (set_attr "length"	"4")])
++
+ (define_insn "call_value_intern_plt"
+   [(set (match_operand:VOID 0 "register_operand" "=d")
+-        (call (mem (match_operand:SI 1 "call_insn_plt_operand" ""))
+-              (match_operand:SI 2 "" "i")))
+-   (clobber (match_operand:SI 3 "register_operand" "=d"))
+-   (use (match_operand:SI 4 "register_operand"))]
++        (call (mem (match_operand 1 "call_insn_plt_operand" ""))
++              (match_operand 2 "" "i")))
++   (clobber (match_operand 3 "register_operand" "=d"))
++   (use (match_operand 4 "register_operand"))]
+   "flag_pic"
+   { 
+     register rtx target2=gen_rtx_REG (Pmode,GP_REG_FIRST + MB_ABI_SUB_RETURN_ADDR_REGNUM);
+@@ -2703,11 +2989,46 @@ else
+   (set_attr "mode"	"none")
+   (set_attr "length"	"4")])
+ 
++(define_insn "call_value_intern_64"
++  [(set (match_operand:VOID 0 "register_operand" "=d")
++        (call (mem (match_operand:VOID 1 "call_insn_operand" "ri"))
++              (match_operand 2 "" "i")))
++   (clobber (match_operand 3 "register_operand" "=d"))]
++  "TARGET_MB_64"
++  { 
++    register rtx target = operands[1];
++    register rtx target2=gen_rtx_REG (Pmode,GP_REG_FIRST + MB_ABI_SUB_RETURN_ADDR_REGNUM);
++
++    if (GET_CODE (target) == SYMBOL_REF)
++    {
++      gen_rtx_CLOBBER (VOIDmode,target2);
++      if (microblaze_break_function_p (SYMBOL_REF_DECL (target)))
++        return "breaki\tr16,%1\;%#";
++      else if (SYMBOL_REF_FLAGS (target) & SYMBOL_FLAG_FUNCTION)
++        {
++	  return "brealid\tr15,%1\;%#";
++        }
++      else
++        {
++	    return "bralid\tr15,%1\;%#";
++        }
++    }
++    else if (GET_CODE (target) == CONST_INT)
++        return "la\t%@,r0,%1\;brald\tr15,%@\;%#";
++    else if (GET_CODE (target) == REG)
++        return "brald\tr15,%1\;%#";	
++    else 
++        return "Unsupported call insn\n";
++  }
++  [(set_attr "type"	"call")
++  (set_attr "mode"	"none")
++  (set_attr "length"	"4")])
++
+ (define_insn "call_value_intern"
+   [(set (match_operand:VOID 0 "register_operand" "=d")
+         (call (mem (match_operand:VOID 1 "call_insn_operand" "ri"))
+-              (match_operand:SI 2 "" "i")))
+-   (clobber (match_operand:SI 3 "register_operand" "=d"))]
++              (match_operand 2 "" "i")))
++   (clobber (match_operand 3 "register_operand" "=d"))]
+   ""
+   { 
+     register rtx target = operands[1];
+@@ -2881,7 +3202,6 @@ else
+ 
+   ;;if (!register_operand (operands[0], VOIDmode))
+   ;;  FAIL;
+-
+   emit_insn (gen_insv_32 (operands[0], operands[1],
+ 			  operands[2], operands[3]));
+   DONE;
+diff --git a/gcc/config/microblaze/t-microblaze b/gcc/config/microblaze/t-microblaze
+index e9a1921ae26..9fc80b142ce 100644
+--- a/gcc/config/microblaze/t-microblaze
++++ b/gcc/config/microblaze/t-microblaze
+@@ -2,7 +2,8 @@ MULTILIB_OPTIONS = mxl-barrel-shift mno-xl-soft-mul mxl-multiply-high mlittle-en
+ MULTILIB_DIRNAMES = bs m mh le m64
+ MULTILIB_EXCEPTIONS = *mxl-barrel-shift/mxl-multiply-high mxl-multiply-high
+ MULTILIB_EXCEPTIONS += *mxl-barrel-shift/mxl-multiply-high/mlittle-endian
+-MULTILIB_EXCEPTIONS += *mxl-barrel-shift/mxl-multiply-high/m64
++MULTILIB_EXCEPTIONS += *mxl-barrel-shift/mxl-multiply-high/mlittle-endian/m64
++MULTILIB_EXCEPTIONS += *mxl-barrel-shift/mxl-multiply-high/m64 mxl-multiply-high
+ MULTILIB_EXCEPTIONS += mxl-multiply-high/mlittle-endian
+ MULTILIB_EXCEPTIONS += mxl-multiply-high/m64
+ MULTILIB_EXCEPTIONS += *mxl-multiply-high/mlittle-endian/m64
+diff --git a/libgcc/config/microblaze/crti.S b/libgcc/config/microblaze/crti.S
+index d0146083db6..005825f1ec5 100644
+--- a/libgcc/config/microblaze/crti.S
++++ b/libgcc/config/microblaze/crti.S
+@@ -40,7 +40,7 @@
+ 
+     .align 2
+ __init: 
+-    addik   r1, r1, -8
++    addik   r1, r1, -16
+     sw      r15, r0, r1
+     la      r11, r0, _stack
+     mts     rshr, r11
+@@ -51,5 +51,5 @@ __init:
+     .global __fini
+     .align 2
+ __fini: 
+-    addik   r1, r1, -8
++    addik   r1, r1, -16
+     sw      r15, r0, r1
+diff --git a/libgcc/config/microblaze/crtn.S b/libgcc/config/microblaze/crtn.S
+index 2fff5ac04c7..5705eff9a4a 100644
+--- a/libgcc/config/microblaze/crtn.S
++++ b/libgcc/config/microblaze/crtn.S
+@@ -33,9 +33,9 @@
+     .section .init, "ax"
+     lw      r15, r0, r1
+     rtsd    r15, 8 
+-    addik   r1, r1, 8
++    addik   r1, r1, 16
+ 
+     .section .fini, "ax"
+     lw      r15, r0, r1
+     rtsd    r15, 8 
+-    addik   r1, r1, 8    
++    addik   r1, r1, 16   
+diff --git a/libgcc/config/microblaze/divdi3.S b/libgcc/config/microblaze/divdi3.S
+new file mode 100644
+index 00000000000..d37bf5165c6
+--- /dev/null
++++ b/libgcc/config/microblaze/divdi3.S
+@@ -0,0 +1,98 @@
++###################################-
++# 
++#  Copyright (C) 2009-2017 Free Software Foundation, Inc.
++#
++#  Contributed by Michael Eager <eager@eagercon.com>.
++#
++#  This file is free software; you can redistribute it and/or modify it
++#  under the terms of the GNU General Public License as published by the
++#  Free Software Foundation; either version 3, or (at your option) any
++#  later version.
++#
++#  GCC is distributed in the hope that it will be useful, but WITHOUT
++#  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
++#  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
++#  License for more details.
++#
++#  Under Section 7 of GPL version 3, you are granted additional
++#  permissions described in the GCC Runtime Library Exception, version
++#  3.1, as published by the Free Software Foundation.
++#
++#  You should have received a copy of the GNU General Public License and
++#  a copy of the GCC Runtime Library Exception along with this program;
++#  see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
++#  <http://www.gnu.org/licenses/>. 
++#
++#  divdi3.S
++# 
++#  Divide operation for 32 bit integers.
++#	Input :	Dividend in Reg r5
++#		Divisor in Reg r6
++#	Output: Result in Reg r3
++# 
++#######################################
++
++#ifdef __arch64__	
++	.globl	__divdi3
++	.ent	__divdi3
++	.type	__divdi3,@function
++__divdi3:
++	.frame	r1,0,r15	
++
++	ADDLIK   r1,r1,-32
++	SLI     r28,r1,0
++	SLI     r29,r1,8
++	SLI     r30,r1,16
++	SLI     r31,r1,24
++
++	BEALEQI    r6,$LaDiv_By_Zero       # Div_by_Zero   # Division Error
++	BEALEQI    r5,$LaResult_Is_Zero    # Result is Zero 
++	XORL     r28,r5,r6               # Get the sign of the result
++	BEALGEI   r5,$LaR5_Pos 
++	RSUBLI   r5,r5,0                 # Make r5 positive
++$LaR5_Pos:
++	BEALGEI    r6,$LaR6_Pos
++	RSUBLI   r6,r6,0                 # Make r6 positive
++$LaR6_Pos:
++	ADDLIK   r30,r0,0                # Clear mod
++	ADDLIK   r3,r0,0                 # clear div
++	ADDLIK   r29,r0,64               # Initialize the loop count
++
++        # First part try to find the first '1' in the r5
++$LaDIV0: 
++        BEALLTI    r5,$LaDIV2              # This traps r5 == 0x80000000 
++$LaDIV1:
++	ADDL     r5,r5,r5                # left shift logical r5
++	ADDLIK   r29,r29,-1
++	BEALGTI   r5,$LaDIV1       
++$LaDIV2:
++	ADDL     r5,r5,r5                # left shift logical  r5 get the '1' into the Carry
++	ADDLC    r30,r30,r30             # Move that bit into the Mod register
++	RSUBL    r31,r6,r30              # Try to subtract (r30 a r6)
++	BEALLTI    r31,$LaMOD_TOO_SMALL
++	ORL      r30,r0,r31              # Move the r31 to mod since the result was positive
++	ADDLIK   r3,r3,1
++$LaMOD_TOO_SMALL:
++	ADDLIK   r29,r29,-1
++	BEALEQi    r29,$LaLOOP_END
++	ADDL     r3,r3,r3                # Shift in the '1' into div
++	BREAI     $LaDIV2                 # Div2
++$LaLOOP_END:
++	BEALGEI    r28,$LaRETURN_HERE
++	RSUBLI   r3,r3,0                 # Negate the result
++	BREAI    $LaRETURN_HERE
++$LaDiv_By_Zero:
++$LaResult_Is_Zero:
++	ORL      r3,r0,r0 # set result to 0
++$LaRETURN_HERE:
++# Restore values of CSRs and that of r3 and the divisor and the dividend
++	LLI     r28,r1,0
++	LLI     r29,r1,8
++	LLI     r30,r1,16
++	LLI     r31,r1,24
++	ADDLIK   r1,r1,32
++	RTSD    r15,8
++        nop
++.end __divdi3
++	.size	__divdi3, . - __divdi3
++#endif
+diff --git a/libgcc/config/microblaze/divdi3_table.c b/libgcc/config/microblaze/divdi3_table.c
+new file mode 100644
+index 00000000000..80962597ea5
+--- /dev/null
++++ b/libgcc/config/microblaze/divdi3_table.c
+@@ -0,0 +1,62 @@
++/*  Table for software lookup divide for Xilinx MicroBlaze.
++ 
++   Copyright (C) 2009-2017 Free Software Foundation, Inc.
++
++   Contributed by Michael Eager <eager@eagercon.com>.
++
++   This file is free software; you can redistribute it and/or modify it
++   under the terms of the GNU General Public License as published by the
++   Free Software Foundation; either version 3, or (at your option) any
++   later version.
++
++   GCC is distributed in the hope that it will be useful, but WITHOUT
++   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
++   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
++   License for more details.
++
++   Under Section 7 of GPL version 3, you are granted additional
++   permissions described in the GCC Runtime Library Exception, version
++   3.1, as published by the Free Software Foundation.
++
++   You should have received a copy of the GNU General Public License and
++   a copy of the GCC Runtime Library Exception along with this program;
++   see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
++   <http://www.gnu.org/licenses/>.  */
++
++ 
++unsigned char _divdi3_table[] =
++{
++       0,   0/1,   0/2,   0/3,   0/4,   0/5,   0/6,   0/7, 
++     0/8,   0/9,  0/10,  0/11,  0/12,  0/13,  0/14,  0/15,
++       0,   1/1,   1/2,   1/3,   1/4,   1/5,   1/6,   1/7, 
++     1/8,   1/9,  1/10,  1/11,  1/12,  1/13,  1/14,  1/15,
++       0,   2/1,   2/2,   2/3,   2/4,   2/5,   2/6,   2/7, 
++     2/8,   2/9,  2/10,  2/11,  2/12,  2/13,  2/14,  2/15,
++       0,   3/1,   3/2,   3/3,   3/4,   3/5,   3/6,   3/7, 
++     3/8,   3/9,  3/10,  3/11,  3/12,  3/13,  3/14,  3/15,
++       0,   4/1,   4/2,   4/3,   4/4,   4/5,   4/6,   4/7, 
++     4/8,   4/9,  4/10,  4/11,  4/12,  4/13,  4/14,  4/15,
++       0,   5/1,   5/2,   5/3,   5/4,   5/5,   5/6,   5/7, 
++     5/8,   5/9,  5/10,  5/11,  5/12,  5/13,  5/14,  5/15,
++       0,   6/1,   6/2,   6/3,   6/4,   6/5,   6/6,   6/7, 
++     6/8,   6/9,  6/10,  6/11,  6/12,  6/13,  6/14,  6/15,
++       0,   7/1,   7/2,   7/3,   7/4,   7/5,   7/6,   7/7, 
++     7/8,   7/9,  7/10,  7/11,  7/12,  7/13,  7/14,  7/15,
++       0,   8/1,   8/2,   8/3,   8/4,   8/5,   8/6,   8/7, 
++     8/8,   8/9,  8/10,  8/11,  8/12,  8/13,  8/14,  8/15,
++       0,   9/1,   9/2,   9/3,   9/4,   9/5,   9/6,   9/7, 
++     9/8,   9/9,  9/10,  9/11,  9/12,  9/13,  9/14,  9/15,
++       0,  10/1,  10/2,  10/3,  10/4,  10/5,  10/6,  10/7, 
++    10/8,  10/9, 10/10, 10/11, 10/12, 10/13, 10/14, 10/15,
++       0,  11/1,  11/2,  11/3,  11/4,  11/5,  11/6,  11/7, 
++    11/8,  11/9, 11/10, 11/11, 11/12, 11/13, 11/14, 11/15,
++       0,  12/1,  12/2,  12/3,  12/4,  12/5,  12/6,  12/7, 
++    12/8,  12/9, 12/10, 12/11, 12/12, 12/13, 12/14, 12/15,
++       0,  13/1,  13/2,  13/3,  13/4,  13/5,  13/6,  13/7, 
++    13/8,  13/9, 13/10, 13/11, 13/12, 13/13, 13/14, 13/15,
++       0,  14/1,  14/2,  14/3,  14/4,  14/5,  14/6,  14/7, 
++    14/8,  14/9, 14/10, 14/11, 14/12, 14/13, 14/14, 14/15,
++       0,  15/1,  15/2,  15/3,  15/4,  15/5,  15/6,  15/7, 
++    15/8,  15/9, 15/10, 15/11, 15/12, 15/13, 15/14, 15/15,
++};
++
+diff --git a/libgcc/config/microblaze/moddi3.S b/libgcc/config/microblaze/moddi3.S
+new file mode 100644
+index 00000000000..5d3f7c03fc8
+--- /dev/null
++++ b/libgcc/config/microblaze/moddi3.S
+@@ -0,0 +1,97 @@
++###################################
++# 
++#  Copyright (C) 2009-2017 Free Software Foundation, Inc.
++#
++#  Contributed by Michael Eager <eager@eagercon.com>.
++#
++#  This file is free software; you can redistribute it and/or modify it
++#  under the terms of the GNU General Public License as published by the
++#  Free Software Foundation; either version 3, or (at your option) any
++#  later version.
++#
++#  GCC is distributed in the hope that it will be useful, but WITHOUT
++#  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
++#  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
++#  License for more details.
++#
++#  Under Section 7 of GPL version 3, you are granted additional
++#  permissions described in the GCC Runtime Library Exception, version
++#  3.1, as published by the Free Software Foundation.
++#
++#  You should have received a copy of the GNU General Public License and
++#  a copy of the GCC Runtime Library Exception along with this program;
++#  see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
++#  <http://www.gnu.org/licenses/>. 
++# 
++#  moddi3.S
++# 
++#  modulo operation for 32 bit integers.
++#	Input :	op1 in Reg r5
++#		op2 in Reg r6
++#	Output: op1 mod op2 in Reg r3
++# 
++#######################################
++
++#ifdef __arch64__
++	.globl	__moddi3
++	.ent	__moddi3
++	.type	__moddi3,@function
++__moddi3:
++	.frame	r1,0,r15	
++
++	addlik	r1,r1,-32
++	sli	r28,r1,0
++	sli	r29,r1,8
++	sli	r30,r1,16
++	sli	r31,r1,32
++
++	BEALEQI	r6,$LaDiv_By_Zero       # Div_by_Zero   # Division Error
++	BEALEQI	r5,$LaResult_Is_Zero    # Result is Zero 
++	ADDL	r28,r5,r0               # Get the sign of the result [ Depends only on the first arg]
++	BEALGEI	r5,$LaR5_Pos 
++	RSUBLI	r5,r5,0	                # Make r5 positive
++$LaR5_Pos:
++	BEALGEI	r6,$LaR6_Pos
++	RSUBLI	r6,r6,0	    # Make r6 positive
++$LaR6_Pos:
++	ADDLIK	r3,r0,0      # Clear mod
++	ADDLIK	r30,r0,0     # clear div
++	ADDLIK	r29,r0,64    # Initialize the loop count
++	BEALLTI	r5,$LaDIV2   # If r5 is still negative (0x80000000), skip
++			     # the first bit search.
++   # First part try to find the first '1' in the r5
++$LaDIV1:
++	ADDL	r5,r5,r5         # left shift logical r5
++	ADDLIK	r29,r29,-1
++	BEALGEI	r5,$LaDIV1       #
++$LaDIV2:
++	ADDL	r5,r5,r5         # left shift logical  r5 get the '1' into the Carry
++	ADDLC	r3,r3,r3         # Move that bit into the Mod register
++	rSUBL	r31,r6,r3        # Try to subtract (r30 a r6)
++	BEALLTi	r31,$LaMOD_TOO_SMALL
++	ORL	r3,r0,r31       # Move the r31 to mod since the result was positive
++	ADDLIK	r30,r30,1
++$LaMOD_TOO_SMALL:
++	ADDLIK	r29,r29,-1
++	BEALEQi	r29,$LaLOOP_END
++	ADDL	r30,r30,r30         # Shift in the '1' into div
++	BREAI	$LaDIV2          # Div2
++$LaLOOP_END:
++	BEALGEI	r28,$LaRETURN_HERE
++	rsubli	r3,r3,0 # Negate the result
++	BREAI	$LaRETURN_HERE
++$LaDiv_By_Zero:
++$LaResult_Is_Zero:
++	orl	r3,r0,r0        # set result to 0 [Both mod as well as div are 0]
++$LaRETURN_HERE:
++# Restore values of CSRs and that of r3 and the divisor and the dividend
++	lli	r28,r1,0
++	lli	r29,r1,8
++	lli	r30,r1,16
++	lli	r31,r1,24
++	addlik	r1,r1,32
++	rtsd	r15,8
++        nop
++        .end __moddi3
++	.size	__moddi3, . - __moddi3
++#endif
+diff --git a/libgcc/config/microblaze/muldi3.S b/libgcc/config/microblaze/muldi3.S
+new file mode 100644
+index 00000000000..567784197d3
+--- /dev/null
++++ b/libgcc/config/microblaze/muldi3.S
+@@ -0,0 +1,73 @@
++/*###################################-*-asm*- 
++# 
++#  Copyright (C) 2009-2017 Free Software Foundation, Inc.
++#
++#  Contributed by Michael Eager <eager@eagercon.com>.
++#
++#  This file is free software; you can redistribute it and/or modify it
++#  under the terms of the GNU General Public License as published by the
++#  Free Software Foundation; either version 3, or (at your option) any
++#  later version.
++#
++#  GCC is distributed in the hope that it will be useful, but WITHOUT
++#  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
++#  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
++#  License for more details.
++#
++#  Under Section 7 of GPL version 3, you are granted additional
++#  permissions described in the GCC Runtime Library Exception, version
++#  3.1, as published by the Free Software Foundation.
++#
++#  You should have received a copy of the GNU General Public License and
++#  a copy of the GCC Runtime Library Exception along with this program;
++#  see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
++#  <http://www.gnu.org/licenses/>. 
++# 
++#  muldi3.S
++# 
++#  Multiply operation for 32 bit integers.
++#	Input :	Operand1 in Reg r5
++#		Operand2 in Reg r6
++#	Output: Result [op1 * op2] in Reg r3
++# 
++#######################################*/
++
++#ifdef __arch64__
++	.globl	__muldi3
++	.ent	__muldi3
++	.type	__muldi3,@function
++__muldi3:
++	.frame	r1,0,r15
++	addl	r3,r0,r0
++	BEALEQI	r5,$L_Result_Is_Zero      # Multiply by Zero
++	BEALEQI	r6,$L_Result_Is_Zero      # Multiply by Zero
++	XORL	r4,r5,r6                  # Get the sign of the result
++	BEALGEI	r5,$L_R5_Pos 
++	RSUBLI	r5,r5,0	                  # Make r5 positive
++$L_R5_Pos:
++	BEALGEI	r6,$L_R6_Pos
++	RSUBLI	r6,r6,0	                  # Make r6 positive
++$L_R6_Pos:	
++	breai	$L1
++$L2:	
++	addl	r5,r5,r5
++$L1:	
++	srll	r6,r6
++	addlc	r7,r0,r0
++	bealeqi	r7,$L2
++	addl	r3,r3,r5	
++	bealnei	r6,$L2
++	beallti	r4,$L_NegateResult			
++	rtsd	r15,8
++	nop
++$L_NegateResult:
++	rsubl	r3,r3,r0
++	rtsd	r15,8
++	nop
++$L_Result_Is_Zero:
++	addli	r3,r0,0
++	rtsd	r15,8
++	nop
++	.end __muldi3
++	.size	__muldi3, . - __muldi3
++#endif
+diff --git a/libgcc/config/microblaze/t-microblaze b/libgcc/config/microblaze/t-microblaze
+index 8d954a49575..35021b24b7d 100644
+--- a/libgcc/config/microblaze/t-microblaze
++++ b/libgcc/config/microblaze/t-microblaze
+@@ -1,11 +1,16 @@
+-LIB2FUNCS_EXCLUDE += _divsi3 _modsi3 _mulsi3 _udivsi3 _umodsi3
++LIB2FUNCS_EXCLUDE += _divsi3 _modsi3 _mulsi3 _udivsi3 _umodsi3 \
++			_divdi3 _moddi3 _muldi3 _udivdi3 _umoddi3 
+ 
+ LIB2ADD += \
+         $(srcdir)/config/microblaze/divsi3.S \
++        $(srcdir)/config/microblaze/divdi3.S \
+         $(srcdir)/config/microblaze/modsi3.S \
+-        $(srcdir)/config/microblaze/muldi3_hard.S \
++        $(srcdir)/config/microblaze/moddi3.S \
+         $(srcdir)/config/microblaze/mulsi3.S \
++        $(srcdir)/config/microblaze/muldi3.S \
+         $(srcdir)/config/microblaze/stack_overflow_exit.S \
+         $(srcdir)/config/microblaze/udivsi3.S \
++        $(srcdir)/config/microblaze/udivdi3.S \
+         $(srcdir)/config/microblaze/umodsi3.S \
+-        $(srcdir)/config/microblaze/divsi3_table.c
++        $(srcdir)/config/microblaze/umoddi3.S \
++        $(srcdir)/config/microblaze/divsi3_table.c \
+diff --git a/libgcc/config/microblaze/udivdi3.S b/libgcc/config/microblaze/udivdi3.S
+new file mode 100644
+index 00000000000..c210fbc7128
+--- /dev/null
++++ b/libgcc/config/microblaze/udivdi3.S
+@@ -0,0 +1,107 @@
++###################################-
++# 
++#  Copyright (C) 2009-2017 Free Software Foundation, Inc.
++#
++#  Contributed by Michael Eager <eager@eagercon.com>.
++#
++#  This file is free software; you can redistribute it and/or modify it
++#  under the terms of the GNU General Public License as published by the
++#  Free Software Foundation; either version 3, or (at your option) any
++#  later version.
++#
++#  GCC is distributed in the hope that it will be useful, but WITHOUT
++#  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
++#  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
++#  License for more details.
++#
++#  Under Section 7 of GPL version 3, you are granted additional
++#  permissions described in the GCC Runtime Library Exception, version
++#  3.1, as published by the Free Software Foundation.
++#
++#  You should have received a copy of the GNU General Public License and
++#  a copy of the GCC Runtime Library Exception along with this program;
++#  see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
++#  <http://www.gnu.org/licenses/>. 
++# 
++#  udivdi3.S
++# 
++#  Unsigned divide operation.
++#	Input :	Divisor in Reg r5
++#		Dividend in Reg r6
++#	Output: Result in Reg r3
++# 
++#######################################
++	
++#ifdef __arch64__
++	.globl	__udivdi3
++	.ent	__udivdi3
++	.type	__udivdi3,@function
++__udivdi3:
++	.frame	r1,0,r15	
++
++	ADDlIK   r1,r1,-24
++    	SLI     r29,r1,0
++	SLI     r30,r1,8
++	SLI     r31,r1,16
++
++	BEALEQI    r6,$LaDiv_By_Zero           # Div_by_Zero   # Division Error
++	ADDLIK   r30,r0,0                    # Clear mod
++	BEALEQI   r5,$LaResult_Is_Zero        # Result is Zero 
++	ADDLIK   r29,r0,64                   # Initialize the loop count
++
++        # Check if r6 and r5 are equal # if yes, return 1
++	RSUBL 	r18,r5,r6
++	ADDLIK	r3,r0,1
++	BEALEQI	r18,$LaRETURN_HERE
++
++        # Check if (uns)r6 is greater than (uns)r5. In that case, just return 0
++	XORL	r18,r5,r6
++	ADDL	r3,r0,r0                    # We would anyways clear r3
++	BEALGEI	r18,$LRSUBL
++	BEALLTI	r6,$LaRETURN_HERE           # r6[bit 31 = 1] hence is greater
++	BREAI	$LCheckr6
++$LRSUBL:
++	RSUBL	r18,r6,r5                   # MICROBLAZEcmp
++	BEALLTI	r18,$LaRETURN_HERE
++
++        # If r6 [bit 31] is set, then return result as 1
++$LCheckr6:
++	BEALGTI	r6,$LaDIV0
++	ADDLIK	r3,r0,1
++	BREAI	$LaRETURN_HERE
++
++        # First part try to find the first '1' in the r5
++$LaDIV0:
++	BEALLTI    r5,$LaDIV2	
++$LaDIV1:
++	ADDL     r5,r5,r5                    # left shift logical r5
++	ADDLIK   r29,r29,-1
++	BEALGTI   r5,$LaDIV1       
++$LaDIV2:
++	ADDL     r5,r5,r5                    # left shift logical  r5 get the '1' into the Carry
++	ADDLC    r30,r30,r30                 # Move that bit into the Mod register
++	RSUBL    r31,r6,r30                  # Try to subtract (r30 a r6)
++    	BEALLTI    r31,$LaMOD_TOO_SMALL
++	ORL      r30,r0,r31                  # Move the r31 to mod since the result was positive
++	ADDLIK   r3,r3,1
++$LaMOD_TOO_SMALL:
++	ADDLIK   r29,r29,-1
++	BEALEQi    r29,$LaLOOP_END
++	ADDL     r3,r3,r3 # Shift in the '1' into div
++	BREAI     $LaDIV2   # Div2
++$LaLOOP_END:
++	BREAI     $LaRETURN_HERE
++$LaDiv_By_Zero:
++$LaResult_Is_Zero:
++	ORL      r3,r0,r0 # set result to 0
++$LaRETURN_HERE:
++        # Restore values of CSRs and that of r3 and the divisor and the dividend
++	LLI     r29,r1,0
++	LLI     r30,r1,8
++	LLI     r31,r1,16
++	ADDLIK   r1,r1,24
++	RTSD    r15,8
++        NOP
++        .end __udivdi3
++	.size	__udivdi3, . - __udivdi3
++#endif
+diff --git a/libgcc/config/microblaze/umoddi3.S b/libgcc/config/microblaze/umoddi3.S
+new file mode 100644
+index 00000000000..7f5cd23f9a1
+--- /dev/null
++++ b/libgcc/config/microblaze/umoddi3.S
+@@ -0,0 +1,110 @@
++###################################
++# 
++#  Copyright (C) 2009-2017 Free Software Foundation, Inc.
++#
++#  Contributed by Michael Eager <eager@eagercon.com>.
++#
++#  This file is free software; you can redistribute it and/or modify it
++#  under the terms of the GNU General Public License as published by the
++#  Free Software Foundation; either version 3, or (at your option) any
++#  later version.
++#
++#  GCC is distributed in the hope that it will be useful, but WITHOUT
++#  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
++#  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
++#  License for more details.
++#
++#  Under Section 7 of GPL version 3, you are granted additional
++#  permissions described in the GCC Runtime Library Exception, version
++#  3.1, as published by the Free Software Foundation.
++#
++#  You should have received a copy of the GNU General Public License and
++#  a copy of the GCC Runtime Library Exception along with this program;
++#  see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
++#  <http://www.gnu.org/licenses/>. 
++# 
++#  umoddi3.S
++#
++#  Unsigned modulo operation for 32 bit integers.
++#	Input :	op1 in Reg r5
++#		op2 in Reg r6
++#	Output: op1 mod op2 in Reg r3
++# 
++#######################################
++	
++#ifdef __arch64__
++	.globl	__umoddi3
++	.ent	__umoddi3
++	.type	__umoddi3,@function
++__umoddi3:
++	.frame	r1,0,r15	
++
++	addlik	r1,r1,-24
++	sli	r29,r1,0
++	sli	r30,r1,8
++	sli	r31,r1,16
++
++	BEALEQI	r6,$LaDiv_By_Zero         # Div_by_Zero   # Division Error
++	ADDLIK 	r3,r0,0                  # Clear div
++	BEALEQI	r5,$LaResult_Is_Zero     # Result is Zero 
++	ADDLIK 	r30,r0,0     	# clear mod
++	ADDLIK 	r29,r0,64       # Initialize the loop count
++
++# Check if r6 and r5 are equal # if yes, return 0
++	rsubl 	r18,r5,r6
++	bealeqi	r18,$LaRETURN_HERE
++
++# Check if (uns)r6 is greater than (uns)r5. In that case, just return r5
++	xorl	r18,r5,r6
++	addlik	r3,r5,0
++	bealgei	r18,$LRSUB
++	beallti	r6,$LaRETURN_HERE
++	breai	$LCheckr6
++$LRSUB:
++	rsubl	r18,r5,r6 # MICROBLAZEcmp
++	bealgti	r18,$LaRETURN_HERE
++
++# If r6 [bit 31] is set, then return result as r5-r6
++$LCheckr6:
++	addlik	r3,r0,0
++	bealgti	r6,$LaDIV0
++	addlik	r18,r0,0x7fffffff
++	andl	r5,r5,r18
++	andl 	r6,r6,r18
++	breaid	$LaRETURN_HERE
++	rsubl	r3,r6,r5
++# First part: try to find the first '1' in the r5
++$LaDIV0:
++	BEALLTI	r5,$LaDIV2
++$LaDIV1:
++	ADDL 	r5,r5,r5     # left shift logical r5
++	ADDLIK 	r29,r29,-1
++	BEALGEI 	r5,$LaDIV1   #
++$LaDIV2:
++	ADDL 	r5,r5,r5     # left shift logical  r5 get the '1' into the Carry
++	ADDLC 	r3,r3,r3     # Move that bit into the Mod register
++	rSUBL 	r31,r6,r3    # Try to subtract (r3 a r6)
++	BEALLTi 	r31,$LaMOD_TOO_SMALL
++	ORL  	r3,r0,r31    # Move the r31 to mod since the result was positive
++	ADDLIK 	r30,r30,1
++$LaMOD_TOO_SMALL:
++	ADDLIK 	r29,r29,-1
++	BEALEQi 	r29,$LaLOOP_END
++	ADDL 	r30,r30,r30 # Shift in the '1' into div
++	BREAI 	$LaDIV2     # Div2
++$LaLOOP_END:
++	BREAI 	$LaRETURN_HERE
++$LaDiv_By_Zero:
++$LaResult_Is_Zero:
++	orl 	r3,r0,r0   # set result to 0
++$LaRETURN_HERE:
++# Restore values of CSRs and that of r3 and the divisor and the dividend
++	lli 	r29,r1,0
++	lli 	r30,r1,8
++	lli 	r31,r1,16
++	addlik 	r1,r1,24
++	rtsd 	r15,8
++        nop
++.end __umoddi3
++	.size	__umoddi3, . - __umoddi3
++#endif
+-- 
+2.17.1
+
