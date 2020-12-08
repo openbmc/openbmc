@@ -295,7 +295,7 @@
   sensorType: 0x03
   path: /xyz/openbmc_project/sensors/current/vddcr_cpu_in
   sensorReadingType: 0x01
-  multiplierM: 86
+  multiplierM: 110
   rExp: -3
   unit: xyz.openbmc_project.Sensor.Value.Unit.Amperes
   mutability: Mutability::Read
@@ -513,7 +513,7 @@
   entityID: 0x0E
   entityInstance: 0x02
   path: /xyz/openbmc_project/sensors/current/hotswap_iout
-  multiplierM: 216
+  multiplierM: 333
   rExp: -3
 
 0x70:
