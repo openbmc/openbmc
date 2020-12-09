@@ -6,4 +6,5 @@ SRC_URI += " \
             file://0003-aspeed-Disable-internal-PD-resistors-for-GPIOs.patch \
             file://0004-aspeed-add-gpio-support.patch \
             file://0005-aspeed-mtjade-enable-I2C4-device-access.patch \
+            file://0006-aspeed-Enable-SPI-master-mode.patch \
            "
