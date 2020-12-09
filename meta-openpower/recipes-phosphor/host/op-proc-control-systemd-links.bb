@@ -17,8 +17,13 @@ pkg_postinst_${PN}() {
 	mkdir -p $D$systemd_system_unitdir/obmc-host-startmin@0.target.requires
 	mkdir -p $D$systemd_system_unitdir/obmc-host-diagnostic-mode@0.target.requires
 	mkdir -p $D$systemd_system_unitdir/obmc-chassis-poweron@0.target.requires
+	mkdir -p $D$systemd_system_unitdir/obmc-host-quiesce@0.target.wants
 
 	LINK="$D$systemd_system_unitdir/obmc-host-stop@0.target.wants/op-stop-instructions@0.service"
+	TARGET="../op-stop-instructions@.service"
+	ln -s $TARGET $LINK
+
+	LINK="$D$systemd_system_unitdir/obmc-host-quiesce@0.target.wants/op-stop-instructions@0.service"
 	TARGET="../op-stop-instructions@.service"
 	ln -s $TARGET $LINK
 
