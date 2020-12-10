@@ -7,8 +7,12 @@ POWER_SERVICE_PACKAGES_AC_SERVER = " \
     phosphor-power \
 "
 
+# Rainier does not need/want the old PSU monitor
 POWER_SERVICE_PACKAGES_RAINIER = " \
-    ${POWER_SERVICE_PACKAGES_AC_SERVER} \
+    phosphor-power-sequencer \
+    phosphor-power-systemd-links-sequencer \
+    phosphor-power-utils \
+    phosphor-power \
     phosphor-power-regulators \
     phosphor-power-psu-monitor \
 "
