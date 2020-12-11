@@ -1,0 +1,16 @@
+#!/bin/sh
+
+do_start() {
+    grep -v '^#' /etc/inputattach.conf | while read -r line; do
+        inputattach --daemon $line || exit 1
+    done
+}
+
+case "$1" in
+    start)
+        do_start
+        ;;
+    stop)
+        killall -9 inputattach || true
+        ;;
+esac

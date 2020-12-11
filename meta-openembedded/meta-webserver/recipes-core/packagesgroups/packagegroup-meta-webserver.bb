@@ -38,6 +38,7 @@ RDEPENDS_packagegroup-meta-webserver-php = "\
 RDEPENDS_packagegroup-meta-webserver-support = "\
     spawn-fcgi \
     fcgi \
+    fcgiwrap \
 "
 
 RDEPENDS_packagegroup-meta-webserver-webadmin = "\

@@ -27,7 +27,6 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-asciitree \
     python3-flask-sqlalchemy \
     python3-gevent \
-    python3-attrs \
     python3-aenum \
     python3-gast \
     python3-blinker \
@@ -56,7 +55,6 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-asn1crypto \
     python3-async-timeout \
     python3-absl \
-    python3-atomicwrites \
     python3-attr \
     python3-flask \
     python3-autobahn \
@@ -151,7 +149,6 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-keras-applications \
     python3-idna \
     python3-sympy \
-    python3-importlib-metadata \
     python3-langtable \
     python3-lockfile \
     python3-nmap \
@@ -170,10 +167,8 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-lorem \
     python3-javaobj-py3 \
     python3-passlib \
-    python3-pathlib2 \
     python3-pexpect \
     python3-luma-oled \
-    python3-pluggy \
     python3-lxml \
     python3-precise-runner \
     python3-padaos \
@@ -251,7 +246,6 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-natsort \
     python3-polyline \
     python3-ordered-set \
-    python3-packaging \
     python3-parso \
     python3-pycparser \
     python3-pycrypto \
@@ -267,14 +261,12 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-pickleshare \
     python3-pyopenssl \
     python3-protobuf \
-    python3-py \
     python3-pyasn1-modules \
     python3-pyscaffold \
     python3-pyserial \
     python3-pysocks \
     python3-pytoml \
     python3-pytest-helpers-namespace \
-    python3-more-itertools \
     python3-pytest-tempdir \
     python3-pyflakes \
     python3-pyrad \
@@ -301,8 +293,6 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-pocketsphinx \
     python3-sdnotify \
     python3-pycodestyle \
-    python3-pytest \
-    python3-iniconfig \
     python3-speaklater \
     python3-wtforms \
     python3-speedtest-cli \
@@ -326,12 +316,10 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-trafaret \
     python3-urllib3 \
     python3-yappi \
-    python3-zipp \
     python3-texttable \
     python3-humanize \
     python3-strict-rfc3339 \
     python3-supervisor \
-    python3-toml \
     python3-diskcache \
     python3-requests-futures \
     python3-matplotlib \
@@ -339,7 +327,6 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-xlrd \
     python3-xstatic \
     python3-tzlocal \
-    python3-wcwidth \
     python3-ntplib \
     python3-u-msgpack-python \
     python3-python-vlc \
@@ -383,7 +370,6 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-requests-file \
     python3-requests-toolbelt \
     python3-ruamel-yaml \
-    python3-setuptools-scm \
     python3-socketio \
     python3-soupsieve \
     python3-textparser \
@@ -429,8 +415,6 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-dill \
     python3-cerberus \
     python3-cvxopt \
-    python3-sortedcontainers \
-    python3-hypothesis \
     python3-jsonpath-rw \
 "
 

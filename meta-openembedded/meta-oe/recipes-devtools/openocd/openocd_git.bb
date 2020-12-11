@@ -54,3 +54,6 @@ FILES_${PN} = " \
 PACKAGECONFIG[sysfsgpio] = "--enable-sysfsgpio,--disable-sysfsgpio"
 PACKAGECONFIG[remote-bitbang] = "--enable-remote-bitbang,--disable-remote-bitbang"
 PACKAGECONFIG ??= "sysfsgpio remote-bitbang"
+
+# Can't be built with ccache
+CCACHE_DISABLE = "1"

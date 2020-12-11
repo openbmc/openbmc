@@ -36,7 +36,7 @@ FILES_${PN} += " \
     ${datadir}/glib-2.0 \
     ${datadir}/color \
     ${systemd_user_unitdir} \
-    ${libdir}/tmpfiles.d \
+    ${nonarch_libdir}/tmpfiles.d \
     ${libdir}/colord-plugins \
     ${libdir}/colord-sensors \
 "

@@ -1,0 +1,9 @@
+[Unit]
+Description=Linux Firmware Loader Daemon
+
+[Service]
+Type=simple
+ExecStart=@BINDIR@/firmwared -d /lib/firmware
+
+[Install]
+WantedBy=multi-user.target
