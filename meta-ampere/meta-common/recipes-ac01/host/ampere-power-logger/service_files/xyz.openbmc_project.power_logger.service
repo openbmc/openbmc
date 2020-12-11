@@ -1,0 +1,11 @@
+[Unit]
+Description=Host Monitor
+
+[Service]
+Restart=on-failure
+ExecStart=/usr/bin/env ampere-power-logger
+SyslogIdentifier=ampere-power-logger
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

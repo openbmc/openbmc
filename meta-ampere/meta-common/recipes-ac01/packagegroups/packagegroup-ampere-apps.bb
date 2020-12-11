@@ -47,4 +47,5 @@ RDEPENDS_${PN}-system = " \
         ampere-ipmi-oem \
         ampere-boot-progress \
         openocd \
+        ampere-power-logger \
         "
