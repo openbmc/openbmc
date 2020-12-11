@@ -44,6 +44,7 @@ SRC_URI = "\
     file://0021-cmake-Disable-format-overflow-warning-as-error.patch \
     file://0022-all-host_applications-remove-non-existent-projects.patch \
     file://0023-hello_pi-optionally-build-wayland-specific-app.patch \
+    file://0024-userland-Sync-needed-defines-for-weston-build.patch \
 "
 
 SRC_URI_remove_toolchain-clang = "file://0021-cmake-Disable-format-overflow-warning-as-error.patch"
@@ -54,10 +55,8 @@ inherit cmake pkgconfig
 
 ASNEEDED = ""
 
-ALLAPPS = "${@bb.utils.contains('PACKAGECONFIG', 'allapps', '-DALL_APPS=true', '', d)}"
 EXTRA_OECMAKE = "-DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS='-Wl,--no-as-needed' \
                  -DVMCS_INSTALL_PREFIX=${exec_prefix} \
-                 ${ALLAPPS} \
 "
 
 EXTRA_OECMAKE_append_aarch64 = " -DARM64=ON "
@@ -66,6 +65,7 @@ EXTRA_OECMAKE_append_aarch64 = " -DARM64=ON "
 PACKAGECONFIG ?= "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland', '', d)}"
 
 PACKAGECONFIG[wayland] = "-DBUILD_WAYLAND=TRUE -DWAYLAND_SCANNER_EXECUTABLE:FILEPATH=${STAGING_BINDIR_NATIVE}/wayland-scanner,,wayland-native wayland"
+PACKAGECONFIG[allapps] = "-DALL_APPS=true,,,"
 
 CFLAGS_append = " -fPIC"
 
