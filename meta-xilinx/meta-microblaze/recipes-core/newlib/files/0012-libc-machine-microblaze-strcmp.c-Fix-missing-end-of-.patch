@@ -1,0 +1,26 @@
+From c2a8d7e6326a309221e4a287517a4920d33aa674 Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@xilinx.com>
+Date: Mon, 30 Nov 2020 18:26:47 -0800
+Subject: [PATCH] libc/machine/microblaze/strcmp.c: Fix missing end of line
+
+Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
+---
+ newlib/libc/machine/microblaze/strcmp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/newlib/libc/machine/microblaze/strcmp.c b/newlib/libc/machine/microblaze/strcmp.c
+index 007d9e1eb..5d13d64ab 100644
+--- a/newlib/libc/machine/microblaze/strcmp.c
++++ b/newlib/libc/machine/microblaze/strcmp.c
+@@ -212,7 +212,7 @@ regular_strcmp:
+         bnei    r7, end_cmp                                                     \n\
+         beqi    r3, end_cmp                                                     \n\
+         brid    regular_strcmp                                                  \n\
+-        addik	r9, r9, 1
++        addik   r9, r9, 1                                                       \n\
+ end_cmp:                                                                        \n\
+         rtsd    r15, 8                                                          \n\
+         or      r3, r0, r7              /* Return strcmp result */");
+-- 
+2.17.1
+

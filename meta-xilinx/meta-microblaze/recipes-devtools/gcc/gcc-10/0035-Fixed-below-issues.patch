@@ -1,0 +1,307 @@
+From 051d744c06ed3f11f603e37768eece57784c2583 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 26 Nov 2019 17:26:15 +0530
+Subject: [PATCH 35/54] Fixed below issues:
+
+- Floating point print issues in 64bit mode
+- Dejagnu Jump related issues
+- Added dbl instruction
+
+Conflicts:
+	gcc/config/microblaze/microblaze.md
+---
+ gcc/config/microblaze/microblaze.c  | 12 +++-
+ gcc/config/microblaze/microblaze.h  |  7 +++
+ gcc/config/microblaze/microblaze.md | 86 ++++++++++++++++++++++++-----
+ libgcc/config/microblaze/crti.S     | 24 +++++++-
+ libgcc/config/microblaze/crtn.S     | 13 +++++
+ 5 files changed, 125 insertions(+), 17 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+index 498c8ca191f..e32de46fa62 100644
+--- a/gcc/config/microblaze/microblaze.c
++++ b/gcc/config/microblaze/microblaze.c
+@@ -2473,7 +2473,12 @@ print_operand (FILE * file, rtx op, int letter)
+       if (code == CONST_DOUBLE)
+ 	{
+ 	  if (GET_MODE (op) == DFmode)
+-	    REAL_VALUE_TO_TARGET_DOUBLE (*CONST_DOUBLE_REAL_VALUE (op), val);
++            {
++  	      if (TARGET_MB_64)
++	        REAL_VALUE_TO_TARGET_LONG_DOUBLE (*CONST_DOUBLE_REAL_VALUE (op), val);
++	      else
++	        REAL_VALUE_TO_TARGET_DOUBLE (*CONST_DOUBLE_REAL_VALUE (op), val);
++	    }
+ 	  else
+ 	    {
+ 	      REAL_VALUE_TO_TARGET_DOUBLE (*CONST_DOUBLE_REAL_VALUE (op), l);
+@@ -3876,7 +3881,10 @@ microblaze_expand_divide (rtx operands[])
+                             gen_rtx_PLUS (QImode, regt1, div_table_rtx));
+ 
+   insn = emit_insn (gen_zero_extendqisi2(operands[0],mem_rtx));
+-  jump = emit_jump_insn_after (gen_jump (div_end_label), insn); 
++  if (TARGET_MB_64) 
++    jump = emit_jump_insn_after (gen_jump_64 (div_end_label), insn);
++  else 
++    jump = emit_jump_insn_after (gen_jump (div_end_label), insn); 
+   JUMP_LABEL (jump) = div_end_label;
+   LABEL_NUSES (div_end_label) = 1; 
+   emit_barrier ();
+diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
+index f6ad4d9fc21..60c552958b8 100644
+--- a/gcc/config/microblaze/microblaze.h
++++ b/gcc/config/microblaze/microblaze.h
+@@ -888,10 +888,17 @@ do {									 \
+ /* We do this to save a few 10s of code space that would be taken up
+    by the call_FUNC () wrappers, used by the generic CRT_CALL_STATIC_FUNCTION
+    definition in crtstuff.c.  */
++#ifdef __arch64__
++#define CRT_CALL_STATIC_FUNCTION(SECTION_OP, FUNC)	\
++    asm ( SECTION_OP "\n"                               \
++          "\tbrealid   r15, " #FUNC "\n\t nop\n"         \
++          TEXT_SECTION_ASM_OP);
++#else
+ #define CRT_CALL_STATIC_FUNCTION(SECTION_OP, FUNC)	\
+     asm ( SECTION_OP "\n"                               \
+           "\tbrlid   r15, " #FUNC "\n\t nop\n"         \
+           TEXT_SECTION_ASM_OP);
++#endif
+ 
+ /* We need to group -lm as well, since some Newlib math functions 
+    reference __errno!  */
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index e7c7cf3e8b5..74bb30cb9e8 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -527,6 +527,15 @@
+   (set_attr "mode"      "SF")
+   (set_attr "length"    "4")])
+ 
++(define_insn "floatdidf2"
++  [(set (match_operand:DF 0 "register_operand" "=d")
++        (float:DF (match_operand:DI 1 "register_operand" "d")))]
++  "TARGET_MB_64"
++  "dbl\t%0,%1"
++  [(set_attr "type"     "fcvt")
++  (set_attr "mode"      "DF")
++  (set_attr "length"    "4")])
++
+ (define_insn "fix_truncsfsi2"
+   [(set (match_operand:SI 0 "register_operand" "=d")
+         (fix:SI (match_operand:SF 1 "register_operand" "d")))]
+@@ -1301,7 +1310,7 @@
+ (define_insn "movdi_long_int"
+   [(set (match_operand:DI 0 "nonimmediate_operand" "=d")
+ 	(match_operand:DI 1 "general_operand"      "i"))]
+-  ""
++  "TARGET_MB_64"
+   "addlik\t%0,r0,%h1\n\tbsllli\t%0,%0,32\n\taddlik\t%0,%0,%j1 #li => la";
+   [(set_attr "type"	"no_delay_arith")
+   (set_attr "mode"	"DI")
+@@ -1584,7 +1593,7 @@
+           return "ll%i1\t%0,%1";
+       case 3:
+       {
+-	return "addlik\t%0,r0,%h1 \n\tbsllli\t%0,%0,32\n\taddlik\t%0,%0,%j1 #Xfer Lo";
++	return "addlik\t%0,r0,%j1 \n\tbsllli\t%0,%0,32\n\taddlik\t%0,%0,%h1 #Xfer Lo";
+       }
+       case 5:
+ 	return "sl%i0\t%1,%0";
+@@ -2374,9 +2383,9 @@ else
+ 
+ (define_insn "long_branch_compare"
+   [(set (pc)
+-        (if_then_else (match_operator 0 "cmp_op"
+-                                         [(match_operand 1 "register_operand" "d")
+-                                          (match_operand 2 "register_operand" "d")
++        (if_then_else (match_operator:DI 0 "cmp_op"
++                                         [(match_operand:DI 1 "register_operand" "d")
++                                          (match_operand:DI 2 "register_operand" "d")
+                                          ])
+                       (label_ref (match_operand 3))
+                       (pc)))
+@@ -2498,6 +2507,20 @@ else
+ ;;----------------------------------------------------------------
+ ;; Unconditional branches
+ ;;----------------------------------------------------------------
++(define_insn "jump_64"
++  [(set (pc)
++	(label_ref (match_operand 0 "" "")))]
++  "TARGET_MB_64"
++  {
++    if (GET_CODE (operands[0]) == REG)
++        return "brea%?\t%0";
++    else	
++        return "breai%?\t%l0";
++  }
++  [(set_attr "type"	"jump")
++  (set_attr "mode"	"none")
++  (set_attr "length"	"4")])
++
+ (define_insn "jump"
+   [(set (pc)
+ 	(label_ref (match_operand 0 "" "")))]
+@@ -2543,17 +2566,25 @@ else
+   {
+     //gcc_assert (GET_MODE (operands[0]) == Pmode);
+ 
+-    if (!flag_pic || TARGET_PIC_DATA_TEXT_REL)
+-      emit_jump_insn (gen_tablejump_internal1 (operands[0], operands[1]));
+-    else
+-      emit_jump_insn (gen_tablejump_internal3 (operands[0], operands[1]));
++    if (!flag_pic || TARGET_PIC_DATA_TEXT_REL) {
++        if (!TARGET_MB_64)
++          emit_jump_insn (gen_tablejump_internal1 (operands[0], operands[1]));
++        else
++          emit_jump_insn (gen_tablejump_internal2 (operands[0], operands[1]));
++      }
++    else {
++        if (!TARGET_MB_64)
++          emit_jump_insn (gen_tablejump_internal3 (operands[0], operands[1]));
++        else
++          emit_jump_insn (gen_tablejump_internal4 (operands[0], operands[1]));
++      }
+     DONE;
+   }
+ )
+ 
+ (define_insn "tablejump_internal1"
+   [(set (pc)
+-	(match_operand 0 "register_operand" "d"))
++	(match_operand:SI 0 "register_operand" "d"))
+   (use (label_ref (match_operand 1 "" "")))]
+   ""
+   "bra%?\t%0 "
+@@ -2561,11 +2592,21 @@ else
+   (set_attr "mode"	"none")
+   (set_attr "length"	"4")])
+ 
++(define_insn "tablejump_internal2"
++  [(set (pc)
++	(match_operand:DI 0 "register_operand" "d"))
++  (use (label_ref (match_operand 1 "" "")))]
++  "TARGET_MB_64"
++  "bra%?\t%0 "
++  [(set_attr "type"	"jump")
++  (set_attr "mode"	"none")
++  (set_attr "length"	"4")])
++
+ (define_expand "tablejump_internal3"
+   [(parallel [(set (pc)
+-		   (plus (match_operand 0 "register_operand" "d")
+-			    (label_ref (match_operand:SI 1 "" ""))))
+-             (use (label_ref (match_dup 1)))])]
++		   (plus:SI (match_operand:SI 0 "register_operand" "d")
++			    (label_ref:SI (match_operand:SI 1 "" ""))))
++             (use (label_ref:SI (match_dup 1)))])]
+   ""
+   ""
+ )
+@@ -2596,6 +2637,23 @@ else
+   ""
+ )
+ 
++(define_insn ""
++ [(set (pc)
++	(plus:DI (match_operand:DI 0 "register_operand" "d")
++		 (label_ref:DI (match_operand 1 "" ""))))
++  (use (label_ref:DI (match_dup 1)))]
++ "TARGET_MB_64 && NEXT_INSN (as_a <rtx_insn *> (operands[1])) != 0
++  && GET_CODE (PATTERN (NEXT_INSN (as_a <rtx_insn *> (operands[1])))) == ADDR_DIFF_VEC
++  && flag_pic"
++  {
++    output_asm_insn ("addlk\t%0,%0,r20",operands);
++    return "bra%?\t%0";
++}
++ [(set_attr "type"	"jump")
++  (set_attr "mode"	"none")
++  (set_attr "length"	"4")])
++
++
+ ;;----------------------------------------------------------------
+ ;; Function prologue/epilogue and stack allocation
+ ;;----------------------------------------------------------------
+@@ -3102,7 +3160,7 @@ else
+ ;; The insn to set GOT. The hardcoded number "8" accounts for $pc difference
+ ;; between "mfs" and "addik" instructions.
+ (define_insn "set_got"
+-  [(set (match_operand:SI 0 "register_operand" "=r")
++  [(set (match_operand 0 "register_operand" "=r")
+     (unspec:SI [(const_int 0)] UNSPEC_SET_GOT))]
+   ""
+   "mfs\t%0,rpc\n\taddik\t%0,%0,_GLOBAL_OFFSET_TABLE_+8"
+diff --git a/libgcc/config/microblaze/crti.S b/libgcc/config/microblaze/crti.S
+index 005825f1ec5..b7436c7131f 100644
+--- a/libgcc/config/microblaze/crti.S
++++ b/libgcc/config/microblaze/crti.S
+@@ -33,11 +33,32 @@
+     .section .init, "ax"
+     .global __init
+ 
++#ifdef __arch64__
+     .weak _stack
+-    .set  _stack, 0xffffffff
++    .set  _stack, 0xffffffffffffffff
+     .weak _stack_end
+     .set  _stack_end, 0
+ 
++    .align 3
++__init: 
++    addlik  r1, r1, -32
++    sl      r15, r0, r1
++    addlik  r11, r0, _stack
++    mts     rshr, r11
++    addlik  r11, r0, _stack_end
++    mts     rslr, r11
++
++    .section .fini, "ax"
++    .global __fini
++    .align 3
++__fini: 
++    addlik   r1, r1, -32
++    sl       r15, r0, r1
++#else
++    .weak _stack
++    .set  _stack, 0xffffffff
++    .weak _stack_end
++    .set  _stack_end, 0
+     .align 2
+ __init: 
+     addik   r1, r1, -16
+@@ -53,3 +74,4 @@ __init:
+ __fini: 
+     addik   r1, r1, -16
+     sw      r15, r0, r1
++#endif
+diff --git a/libgcc/config/microblaze/crtn.S b/libgcc/config/microblaze/crtn.S
+index 5705eff9a4a..f1148ffebe4 100644
+--- a/libgcc/config/microblaze/crtn.S
++++ b/libgcc/config/microblaze/crtn.S
+@@ -29,7 +29,19 @@
+ .section .note.GNU-stack,"",%progbits
+ .previous
+ #endif
++#ifdef __arch64__
++    .section .init, "ax"
++    ll      r15, r0, r1
++    addlik   r1, r1, 32
++    rtsd    r15, 8
++    nop 
+ 
++    .section .fini, "ax"
++    ll      r15, r0, r1
++    addlik   r1, r1, 32   
++    rtsd    r15, 8
++    nop 
++#else
+     .section .init, "ax"
+     lw      r15, r0, r1
+     rtsd    r15, 8 
+@@ -39,3 +51,4 @@
+     lw      r15, r0, r1
+     rtsd    r15, 8 
+     addik   r1, r1, 16   
++#endif
+-- 
+2.17.1
+

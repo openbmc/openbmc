@@ -1,0 +1,97 @@
+From 40107e7f6430aebfeba7e8f4eb6d67863520ebd4 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Mon, 18 Jan 2016 12:28:21 +0530
+Subject: [PATCH 07/52] Added Address extension instructions
+
+This patch adds the support of new instructions which are required
+for supporting Address extension feature.
+
+Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
+
+ChangeLog:
+  2016-01-18 Nagaraju Mekala <nmekala@xilix.com>
+
+  *microblaze-opc.h (op_code_struct): Update
+     Added new instructions
+  *microblaze-opcm.h (microblaze_instr): Update
+     Added new instructions
+---
+ opcodes/microblaze-opc.h  | 11 +++++++++++
+ opcodes/microblaze-opcm.h | 12 ++++++------
+ 2 files changed, 17 insertions(+), 6 deletions(-)
+
+Index: gdb-9.2/opcodes/microblaze-opc.h
+===================================================================
+--- gdb-9.2.orig/opcodes/microblaze-opc.h
++++ gdb-9.2/opcodes/microblaze-opc.h
+@@ -178,8 +178,11 @@ struct op_code_struct
+   {"wdc.ext.clear", INST_TYPE_R1_R2_SPECIAL, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x90000466, OPCODE_MASK_H35B, wdcextclear, special_inst },
+   {"wdc.flush", INST_TYPE_R1_R2_SPECIAL, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x90000074, OPCODE_MASK_H34B, wdcflush, special_inst },
+   {"wdc.ext.flush", INST_TYPE_R1_R2_SPECIAL, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x90000476, OPCODE_MASK_H35B, wdcextflush, special_inst },
++  {"wdc.clear.ea", INST_TYPE_R1_R2_SPECIAL, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x900000E6, OPCODE_MASK_H34B, wdcclearea, special_inst },
+   {"mts",   INST_TYPE_SPECIAL_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_MTS, 0x9400C000, OPCODE_MASK_H13S, mts, special_inst },
++  {"mtse",  INST_TYPE_SPECIAL_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_MTS, 0x9500C000, OPCODE_MASK_H13S, mtse,special_inst },
+   {"mfs",   INST_TYPE_RD_SPECIAL, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_MFS, 0x94008000, OPCODE_MASK_H23S, mfs, special_inst },
++  {"mfse",  INST_TYPE_RD_SPECIAL, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_MFS, 0x94088000, OPCODE_MASK_H23S, mfse, special_inst },
+   {"br",    INST_TYPE_R2, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x98000000, OPCODE_MASK_H124, br, branch_inst },
+   {"brd",   INST_TYPE_R2, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x98100000, OPCODE_MASK_H124, brd, branch_inst },
+   {"brld",  INST_TYPE_RD_R2, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x98140000, OPCODE_MASK_H24, brld, branch_inst },
+@@ -229,18 +232,24 @@ struct op_code_struct
+   {"bgeid", INST_TYPE_R1_IMM, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBEA00000, OPCODE_MASK_H1, bgeid, branch_inst },
+   {"lbu",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xC0000000, OPCODE_MASK_H4, lbu, memory_load_inst },
+   {"lbur",  INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xC0000200, OPCODE_MASK_H4, lbur, memory_load_inst },
++  {"lbuea", INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xC0000080, OPCODE_MASK_H4, lbuea, memory_load_inst },
+   {"lhu",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xC4000000, OPCODE_MASK_H4, lhu, memory_load_inst },
+   {"lhur",  INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xC4000200, OPCODE_MASK_H4, lhur, memory_load_inst },
++  {"lhuea", INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xC4000080, OPCODE_MASK_H4, lhuea, memory_load_inst },
+   {"lw",    INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xC8000000, OPCODE_MASK_H4, lw, memory_load_inst },
+   {"lwr",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xC8000200, OPCODE_MASK_H4, lwr, memory_load_inst },
+   {"lwx",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xC8000400, OPCODE_MASK_H4, lwx, memory_load_inst },
++  {"lwea",  INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xC8000080, OPCODE_MASK_H4, lwea, memory_load_inst },
+   {"sb",    INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xD0000000, OPCODE_MASK_H4, sb, memory_store_inst },
+   {"sbr",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xD0000200, OPCODE_MASK_H4, sbr, memory_store_inst },
++  {"sbea",  INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xD0000080, OPCODE_MASK_H4, sbea, memory_store_inst },
+   {"sh",    INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xD4000000, OPCODE_MASK_H4, sh, memory_store_inst },
+   {"shr",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xD4000200, OPCODE_MASK_H4, shr, memory_store_inst },
++  {"shea",  INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xD4000080, OPCODE_MASK_H4, shea, memory_store_inst },
+   {"sw",    INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xD8000000, OPCODE_MASK_H4, sw, memory_store_inst },
+   {"swr",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xD8000200, OPCODE_MASK_H4, swr, memory_store_inst },
+   {"swx",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xD8000400, OPCODE_MASK_H4, swx, memory_store_inst },
++  {"swea",  INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xD8000080, OPCODE_MASK_H4, swea, memory_store_inst },
+   {"lbui",  INST_TYPE_RD_R1_IMM, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xE0000000, OPCODE_MASK_H, lbui, memory_load_inst },
+   {"lhui",  INST_TYPE_RD_R1_IMM, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xE4000000, OPCODE_MASK_H, lhui, memory_load_inst },
+   {"lwi",   INST_TYPE_RD_R1_IMM, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xE8000000, OPCODE_MASK_H, lwi, memory_load_inst },
+@@ -405,6 +414,8 @@ struct op_code_struct
+   {"clz",       INST_TYPE_RD_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x900000E0, OPCODE_MASK_H34,  clz,       special_inst },
+   {"mbar",      INST_TYPE_IMM5,  INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xB8020004, OPCODE_MASK_HN,   mbar,      special_inst },
+   {"sleep",     INST_TYPE_NONE,  INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBA020004, OPCODE_MASK_HN,   invalid_inst, special_inst }, /* translates to mbar 16.  */
++  {"hibernate", INST_TYPE_NONE,  INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xB9020004, OPCODE_MASK_HN,   invalid_inst, special_inst }, /* translates to mbar 8.   */
++  {"suspend",   INST_TYPE_NONE,  INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBB020004, OPCODE_MASK_HN,   invalid_inst, special_inst }, /* translates to mbar 24.  */
+   {"swapb",     INST_TYPE_RD_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x900001E0, OPCODE_MASK_H4,   swapb,     arithmetic_inst },
+   {"swaph",     INST_TYPE_RD_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x900001E2, OPCODE_MASK_H4,   swaph,     arithmetic_inst },
+   {"", 0, 0, 0, 0, 0, 0, 0, 0},
+Index: gdb-9.2/opcodes/microblaze-opcm.h
+===================================================================
+--- gdb-9.2.orig/opcodes/microblaze-opcm.h
++++ gdb-9.2/opcodes/microblaze-opcm.h
+@@ -33,14 +33,14 @@ enum microblaze_instr
+   /* 'or/and/xor' are C++ keywords.  */
+   microblaze_or, microblaze_and, microblaze_xor,
+   andn, pcmpbf, pcmpbc, pcmpeq, pcmpne, sra, src, srl, sext8, sext16,
+-  wic, wdc, wdcclear, wdcextclear, wdcflush, wdcextflush, mts, mfs, mbar, br,
+-  brd, brld, bra, brad, brald, microblaze_brk, beq, beqd, bne, bned, blt,
+-  bltd, ble, bled, bgt, bgtd, bge, bged, ori, andi, xori, andni,
++  wic, wdc, wdcclear, wdcextclear, wdcflush, wdcextflush, wdcclearea, mts, mtse,
++  mfs, mfse, mbar, br, brd, brld, bra, brad, brald, microblaze_brk, beq, beqd,
++  bne, bned, blt, bltd, ble, bled, bgt, bgtd, bge, bged, ori, andi, xori, andni,
+   imm, rtsd, rtid, rtbd, rted, bri, brid, brlid, brai, braid, bralid,
+   brki, beqi, beqid, bnei, bneid, blti, bltid, blei, bleid, bgti,
+-  bgtid, bgei, bgeid, lbu, lbur, lhu, lhur, lw, lwr, lwx, sb, sbr, sh,
+-  shr, sw, swr, swx, lbui, lhui, lwi,
+-  sbi, shi, swi, msrset, msrclr, tuqula, fadd, frsub, fmul, fdiv,
++  bgtid, bgei, bgeid, lbu, lbuea, lbur, lhu, lhuea, lhur, lw, lwea, lwr, lwx,
++  sb, sbea, sbr, sh, shea, shr, sw, swea, swr, swx, lbui, lhui, lwi,
++  sbi, shi, swi, msrset, msrclr, tuqula, mbi_fadd, frsub, mbi_fmul, mbi_fdiv,
+   fcmp_lt, fcmp_eq, fcmp_le, fcmp_gt, fcmp_ne, fcmp_ge, fcmp_un, flt,
+   fint, fsqrt,
+   tget, tcget, tnget, tncget, tput, tcput, tnput, tncput,

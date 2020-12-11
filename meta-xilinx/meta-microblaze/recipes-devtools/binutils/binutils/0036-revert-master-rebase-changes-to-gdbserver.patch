@@ -1,0 +1,31 @@
+From c84c1a62142bcd18c242ec476539f0c505285d6c Mon Sep 17 00:00:00 2001
+From: David Holsgrove <david.holsgrove@xilinx.com>
+Date: Mon, 22 Jul 2013 11:16:05 +1000
+Subject: [PATCH 36/52] revert master-rebase changes to gdbserver
+
+Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
+---
+ gdbserver/configure.srv | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/gdbserver/configure.srv b/gdbserver/configure.srv
+index 5e33bd9c54..7e81388850 100644
+--- a/gdbserver/configure.srv
++++ b/gdbserver/configure.srv
+@@ -155,6 +155,13 @@ case "${gdbserver_host}" in
+ 			srv_linux_usrregs=yes
+ 			srv_linux_thread_db=yes
+ 			;;
++  microblaze*-*-linux*)	srv_regobj=microblaze-linux.o
++			srv_tgtobj="linux-low.o linux-osdata.o linux-microblaze-low.o "
++			srv_tgtobj="${srv_tgtobj} linux-procfs.o linux-ptrace.o"
++			srv_linux_regsets=yes
++			srv_linux_usrregs=yes
++			srv_linux_thread_db=yes
++			;;
+   powerpc*-*-linux*)	srv_regobj="powerpc-32l.o"
+ 			srv_regobj="${srv_regobj} powerpc-altivec32l.o"
+ 			srv_regobj="${srv_regobj} powerpc-vsx32l.o"
+-- 
+2.17.1
+

@@ -1,0 +1,26 @@
+From e1cb5c37efd76b44a878574ee3baad4c7a882e3b Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Mon, 16 Oct 2017 15:44:23 +0530
+Subject: [PATCH 12/52] fixing the constant range check issue sample error: not
+ in range ffffffff80000000..7fffffff, not ffffffff70000000
+
+---
+ gas/config/tc-microblaze.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index 765abfb388..5810a74a5f 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
+@@ -757,7 +757,7 @@ parse_imm (char * s, expressionS * e, offsetT min, offsetT max)
+       if ((e->X_add_number >> 31) == 1)
+ 	e->X_add_number |= -((addressT) (1U << 31));
+ 
+-      if (e->X_add_number < min || e->X_add_number > max)
++      if ((int)e->X_add_number < min || (int)e->X_add_number > max)
+ 	{
+ 	  as_fatal (_("operand must be absolute in range %lx..%lx, not %lx"),
+ 		    (long) min, (long) max, (long) e->X_add_number);
+-- 
+2.17.1
+

@@ -1,17 +1,17 @@
-From 379f231f0afb5e10cd82bc6346e4a6776df3e21e Mon Sep 17 00:00:00 2001
+From b2e081bd0c00dce23a6824db050bbfca991d79ab Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 23 Jan 2017 15:42:11 +0530
 Subject: [PATCH 04/11] [Local]: deleting the xil_printf.c file as now it part
  of BSP
 
 ---
- libgloss/microblaze/xil_printf.c | 284 ---------------------------------------
+ libgloss/microblaze/xil_printf.c | 284 -------------------------------
  1 file changed, 284 deletions(-)
  delete mode 100644 libgloss/microblaze/xil_printf.c
 
 diff --git a/libgloss/microblaze/xil_printf.c b/libgloss/microblaze/xil_printf.c
 deleted file mode 100644
-index f18ee84..0000000
+index f18ee8446..000000000
 --- a/libgloss/microblaze/xil_printf.c
 +++ /dev/null
 @@ -1,284 +0,0 @@
@@ -300,5 +300,5 @@ index f18ee84..0000000
 -
 -/*---------------------------------------------------*/
 -- 
-2.7.4
+2.17.1
 

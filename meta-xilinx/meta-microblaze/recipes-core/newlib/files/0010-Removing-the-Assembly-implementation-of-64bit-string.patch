@@ -1,0 +1,334 @@
+From fd624fc28cbca8863f4dd75f0bc08aba58f8455e Mon Sep 17 00:00:00 2001
+From: Nagaraju <nmekala@xilinx.com>
+Date: Wed, 24 Apr 2019 23:29:21 +0530
+Subject: [PATCH 10/11] Removing the Assembly implementation of 64bit string
+ function. Revisit in next release and fix it
+
+Conflicts:
+	newlib/libc/machine/microblaze/strcmp.c
+---
+ newlib/libc/machine/microblaze/mb_endian.h |  4 +
+ newlib/libc/machine/microblaze/strcmp.c    | 94 ++++++++--------------
+ newlib/libc/machine/microblaze/strcpy.c    | 82 ++++++-------------
+ newlib/libc/machine/microblaze/strlen.c    | 59 +++++---------
+ 4 files changed, 81 insertions(+), 158 deletions(-)
+
+diff --git a/newlib/libc/machine/microblaze/mb_endian.h b/newlib/libc/machine/microblaze/mb_endian.h
+index fb217ec85..17772c88f 100644
+--- a/newlib/libc/machine/microblaze/mb_endian.h
++++ b/newlib/libc/machine/microblaze/mb_endian.h
+@@ -8,8 +8,12 @@
+ #ifdef __LITTLE_ENDIAN__
+ #define LOAD4BYTES(rD,rA,rB)   "\tlwr\t" rD ", " rA ", " rB "\n"
+ #define STORE4BYTES(rD,rA,rB)  "\tswr\t" rD ", " rA ", " rB "\n"
++#define LOAD8BYTES(rD,rA,rB)   "\tllr\t" rD ", " rA ", " rB "\n"
++#define STORE8BYTES(rD,rA,rB)  "\tslr\t" rD ", " rA ", " rB "\n"
+ #else
+ #define LOAD4BYTES(rD,rA,rB)   "\tlw\t" rD ", " rA ", " rB "\n"
+ #define STORE4BYTES(rD,rA,rB)  "\tsw\t" rD ", " rA ", " rB "\n"
++#define LOAD8BYTES(rD,rA,rB)   "\tll\t" rD ", " rA ", " rB "\n"
++#define STORE8BYTES(rD,rA,rB)  "\tsl\t" rD ", " rA ", " rB "\n"
+ #endif
+ #endif
+diff --git a/newlib/libc/machine/microblaze/strcmp.c b/newlib/libc/machine/microblaze/strcmp.c
+index 2cfef7388..007d9e1eb 100644
+--- a/newlib/libc/machine/microblaze/strcmp.c
++++ b/newlib/libc/machine/microblaze/strcmp.c
+@@ -129,70 +129,41 @@ strcmp (const char *s1,
+   return (*(unsigned char *) s1) - (*(unsigned char *) s2);
+ #endif /* not PREFER_SIZE_OVER_SPEED */
+ 
+-#else
++#elif __arch64__
++  unsigned int *a1;
++  unsigned int *a2;
+ 
+-#include "mb_endian.h"
++  /* If s1 or s2 are unaligned, then compare bytes. */
++  if (!UNALIGNED (s1, s2))
++    {  
++      /* If s1 and s2 are word-aligned, compare them a word at a time. */
++      a1 = (unsigned int*)s1;
++      a2 = (unsigned int*)s2;
++      while (*a1 == *a2)
++        {
++          /* To get here, *a1 == *a2, thus if we find a null in *a1,
++	     then the strings must be equal, so return zero.  */
++          if (DETECTNULL (*a1))
++	    return 0;
+ 
+-#ifdef __arch64__
+-    asm volatile ("                                          \n\
+-        orl      r9, r0, r0               /* Index register */ \n\
+-check_alignment:                                             \n\
+-        andli    r3, r5, 3                                    \n\
+-        andli    r4, r6, 3                                    \n\
+-        beanei    r3, try_align_args                           \n\
+-        beanei    r4, regular_strcmp     /* At this point we don't have a choice */ \n\
+-cmp_loop:                                                                       \n"
+-        LOAD4BYTES("r3", "r5", "r9")
+-        LOAD4BYTES("r4", "r6", "r9")
+-"                                                                                      \n\
+-        pcmplbf  r7, r3, r0              /* See if there is Null byte */                         \n\
+-        beanei    r7, end_cmp_loop        /* IF yes (r7 > 0) use byte compares in end_cmp_loop */ \n\
+-        cmplu    r7, r4, r3              /* ELSE compare whole word */                   \n\
+-        beanei    r7, end_cmp                                                             \n\
+-        addlik   r9, r9, 4               /* delay slot */                                \n\
+-        breaid    cmp_loop                                                                \n\
+-        nop		               /* delay slot */                                \n\
+-end_cmp_loop:                                                                           \n\
+-        lbu     r3, r5, r9              /* byte compare loop */                         \n\
+-        lbu     r4, r6, r9                                                              \n\
+-        cmplu    r7, r4, r3              /* Compare bytes */                             \n\
+-        beanei    r7, end_cmp_early                                                       \n\
+-        addlik   r9, r9, 1               /* delay slot */                        \n\
+-        beaneid   r3, end_cmp_loop        /* If reached null on one string, terminate */  \n\
+-        nop					                              \n\
+-end_cmp_early:                                                                  \n\
+-        orl   r3, r0, r7               /* delay slot */                        \n\
+-        rtsd    r15, 8                                                          \n\
+-        nop		                                                         \n\
+-try_align_args:                                                                 \n\
+-        xorl     r7, r4, r3                                                      \n\
+-        beanei    r7, regular_strcmp      /* cannot align args */                 \n\
+-        rsublik  r10, r3, 4              /* Number of initial bytes to align */  \n\
+-align_loop:                                                                     \n\
+-        lbu     r3, r5, r9                                                      \n\
+-        lbu     r4, r6, r9                                                      \n\
+-        cmplu    r7, r4, r3                                                      \n\
+-        beanei    r7, end_cmp                                                     \n\
+-        beaeqi    r3, end_cmp                                                     \n\
+-        addlik   r10, r10, -1                                                    \n\
+-        addlik   r9, r9, 1                                                       \n\
+-        beaeqid   r10, cmp_loop                                                   \n\
+-        nop		                                                           \n\
+-        breai     align_loop                                                      \n\
+-regular_strcmp:                                                                 \n\
+-        lbu     r3, r5, r9                                                      \n\
+-        lbu     r4, r6, r9                                                      \n\
+-        cmplu    r7, r4, r3                                                      \n\
+-        beanei    r7, end_cmp                                                     \n\
+-        beaeqi    r3, end_cmp                                                     \n\
+-        addlik   r9, r9, 1                                                       \n\
+-        breaid    regular_strcmp                                                  \n\
+-        nop									\n\
+-end_cmp:                                                                        \n\
+-        orl       r3, r0, r7                                                       \n\
+-        rtsd    r15, 8                                                          \n\
+-        nop              /* Return strcmp result */");
++          a1++;
++          a2++;
++        }
++
++      /* A difference was detected in last few bytes of s1, so search bytewise */
++      s1 = (char*)a1;
++      s2 = (char*)a2;
++    }
++
++  while (*s1 != '\0' && *s1 == *s2)
++    {
++      s1++;
++      s2++;
++    }
++  return (*(unsigned char *) s1) - (*(unsigned char *) s2);
+ #else
++
++#include "mb_endian.h"
+     asm volatile ("                                          \n\
+         or      r9, r0, r0               /* Index register */\n\
+ check_alignment:                                             \n\
+@@ -246,7 +217,6 @@ end_cmp:
+         rtsd    r15, 8                                                          \n\
+         or      r3, r0, r7              /* Return strcmp result */");
+ 
+-#endif
+ #endif /* ! HAVE_HW_PCMP */
+ }
+ 
+diff --git a/newlib/libc/machine/microblaze/strcpy.c b/newlib/libc/machine/microblaze/strcpy.c
+index 6dbc60d77..ddb69227e 100644
+--- a/newlib/libc/machine/microblaze/strcpy.c
++++ b/newlib/libc/machine/microblaze/strcpy.c
+@@ -121,67 +121,36 @@ strcpy (char *__restrict dst0,
+     ;
+   return dst0;
+ #endif /* not PREFER_SIZE_OVER_SPEED */
++#elif __arch64__
++  char *dst = dst0;
++  const char *src = src0;
++  long *aligned_dst;
++  const long *aligned_src;
+ 
+-#else    
++  /* If SRC or DEST is unaligned, then copy bytes.  */
++  if (!UNALIGNED (src, dst))
++    {
++      aligned_dst = (long*)dst;
++      aligned_src = (long*)src;
+ 
+-#include "mb_endian.h"
+-#ifdef __arch64__
++      /* SRC and DEST are both "long int" aligned, try to do "long int"
++         sized copies.  */
++      while (!DETECTNULL(*aligned_src))
++        {
++          *aligned_dst++ = *aligned_src++;
++        }
+ 
+-  asm volatile ("                                                   \n\
+-        orl      r9, r0, r0              /* Index register */        \n\
+-check_alignment:                                                    \n\
+-        andli    r3, r5, 3                                           \n\
+-        andli    r4, r6, 3                                           \n\
+-        beanei    r3, try_align_args                                  \n\
+-        beanei    r4, regular_strcpy      /* At this point we dont have a choice */       \n\
+-cpy_loop:                                   \n"
+-        LOAD4BYTES("r3", "r6", "r9")
+-"                                           \n\
+-        pcmplbf  r4, r0, r3                  \n\
+-        beanei    r4, cpy_bytes           /* If r4 != 0, then null present within string */\n"
+-        STORE4BYTES("r3", "r5", "r9")
+-"                                           \n\
+-        addlik   r9, r9, 4                   \n\
+-        breaid    cpy_loop                    \n\
+-	nop					\n\
+-cpy_bytes:                                  \n\
+-        lbu     r3, r6, r9                  \n\
+-        sb      r3, r5, r9                  \n\
+-        addlik   r4, r4, -1                  \n\
+-        addlik   r9, r9, 1               /* delay slot */\n\
+-        beaneid   r4, cpy_bytes               \n\
+-	nop					\n\
+-cpy_null:                                   \n\
+-        orl      r3, r0, r5              /* Return strcpy result */\n\
+-        rtsd    r15, 8                      \n\
+-	nop					\n\
+-try_align_args:                             \n\
+-        xorl     r7, r4, r3                  \n\
+-        beanei    r7, regular_strcpy      /* cannot align args */\n\
+-        rsublik  r10, r3, 4              /* Number of initial bytes to align */\n\
+-align_loop:                                 \n\
+-        lbu     r3, r6, r9                  \n\
+-        sb      r3, r5, r9                  \n\
+-        addlik   r10, r10, -1                \n\
+-        beaeqid   r3, end_cpy             /* Break if we have seen null character */\n\
+-	nop					\n\
+-        addlik   r9, r9, 1                   \n\
+-        beaneid   r10, align_loop             \n\
+-	nop					\n\
+-        breai     cpy_loop                    \n\
+-regular_strcpy:                             \n\
+-        lbu     r3, r6, r9                  \n\
+-        sb      r3, r5, r9                  \n\
+-        addlik   r9, r9, 1                   \n\
+-        beaneid   r3, regular_strcpy          \n\
+-	nop					\n\
+-end_cpy:                                    \n\
+-        orl      r3, r0, r5  			\n\
+-        rtsd    r15, 8                      \n\
+-	nop			 /* Return strcpy result */");
++      dst = (char*)aligned_dst;
++      src = (char*)aligned_src;
++    }
+ 
+-#else
++  while (*dst++ = *src++)
++    ;
++  return dst0;
++
++#else    
+ 
++#include "mb_endian.h"
+   asm volatile ("                                                   \n\
+         or      r9, r0, r0              /* Index register */        \n\
+ check_alignment:                                                    \n\
+@@ -227,7 +196,6 @@ regular_strcpy:                             \n\
+ end_cpy:                                    \n\
+         rtsd    r15, 8                      \n\
+         or      r3, r0, r5              /* Return strcpy result */");
+-#endif
+ #endif /* ! HAVE_HW_PCMP */
+ }
+ 
+diff --git a/newlib/libc/machine/microblaze/strlen.c b/newlib/libc/machine/microblaze/strlen.c
+index b6f2d3c13..940753996 100644
+--- a/newlib/libc/machine/microblaze/strlen.c
++++ b/newlib/libc/machine/microblaze/strlen.c
+@@ -112,47 +112,29 @@ strlen (const char *str)
+   return str - start;
+ #endif /* not PREFER_SIZE_OVER_SPEED */
+ 
+-#else
+-
+-#include "mb_endian.h"
++#elif __arch64__
++  const char *start = str;
++  unsigned long *aligned_addr;
+ 
+-#ifdef __arch64__
+-  asm volatile ("                                               \n\
+-        orl      r9, r0, r0              /* Index register */    \n\
+-check_alignment:                                                \n\
+-        andli    r3, r5, 3                                       \n\
+-        beanei    r3, align_arg                                   \n\
+-len_loop:                                                       \n"
+-        LOAD4BYTES("r3", "r5", "r9")
+-"                                                               \n\
+-        pcmplbf  r4, r3, r0                                      \n\
+-        beanei    r4, end_len                                     \n\
+-        addlik   r9, r9, 4                                       \n\
+-        breaid    len_loop                                        \n\
+-        nop		                                        \n\
+-end_len:                                                        \n\
+-        lbu     r3, r5, r9                                      \n\
+-        beaeqi    r3, done_len                                    \n\
+-        addlik   r9, r9, 1                                       \n\
+-        breaid    end_len                                         \n\
+-        nop		                                       \n\
+-done_len:                                                       \n\
+-        orl      r3, r0, r9              /* Return len */        \n\
+-        rtsd    r15, 8                                          \n\
+-        nop						        \n\
+-align_arg:                                                      \n\
+-        rsublik  r10, r3, 4                                      \n\
+-align_loop:                                                     \n\
+-        lbu     r3, r5, r9                                      \n\
+-        addlik   r10, r10, -1                                    \n\
+-        beaeqid   r3, done_len                                    \n\
+-        nop		                                       \n\
+-        addlik   r9, r9, 1                                       \n\
+-        beaneid   r10, align_loop                                 \n\
+-        nop		                                        \n\
+-        breai     len_loop");
++  if (!UNALIGNED (str))
++    {
++      /* If the string is word-aligned, we can check for the presence of 
++         a null in each word-sized block.  */
++      aligned_addr = (unsigned long*)str;
++      while (!DETECTNULL (*aligned_addr))
++        aligned_addr++;
+ 
++      /* Once a null is detected, we check each byte in that block for a
++         precise position of the null.  */
++      str = (char*)aligned_addr;
++    }
++ 
++  while (*str)
++    str++;
++  return str - start;
+ #else
++
++#include "mb_endian.h"
+   asm volatile ("                                               \n\
+         or      r9, r0, r0              /* Index register */    \n\
+ check_alignment:                                                \n\
+@@ -183,6 +165,5 @@ align_loop:                                                     \n\
+         addik   r9, r9, 1                                       \n\
+         bri     len_loop");
+ 
+-#endif
+ #endif  /* ! HAVE_HW_PCMP */
+ }
+-- 
+2.17.1
+

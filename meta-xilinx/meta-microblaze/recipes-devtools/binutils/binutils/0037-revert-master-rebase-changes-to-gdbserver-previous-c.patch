@@ -1,0 +1,36 @@
+From 06f1e66daaa1c8a2e1e43254a66f35840945e63b Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Mon, 30 Apr 2018 17:09:55 +0530
+Subject: [PATCH 37/52] revert master-rebase changes to gdbserver , previous
+ commit typo's
+
+Note: This _WILL NOT WORK_, the format of the files in gdbserver have changed!
+
+Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
+---
+ gdbserver/Makefile.in | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/gdbserver/Makefile.in b/gdbserver/Makefile.in
+index 9d7687be53..df354d636c 100644
+--- a/gdbserver/Makefile.in
++++ b/gdbserver/Makefile.in
+@@ -183,6 +183,7 @@ SFILES = \
+ 	$(srcdir)/linux-ia64-low.cc \
+ 	$(srcdir)/linux-low.cc \
+ 	$(srcdir)/linux-m68k-low.cc \
++	$(srcdir)/linux-microblaze-low.c \
+ 	$(srcdir)/linux-mips-low.cc \
+ 	$(srcdir)/linux-nios2-low.cc \
+ 	$(srcdir)/linux-ppc-low.cc \
+@@ -217,6 +218,7 @@ SFILES = \
+ 	$(srcdir)/../gdb/nat/linux-osdata.c \
+ 	$(srcdir)/../gdb/nat/linux-personality.c \
+ 	$(srcdir)/../gdb/nat/mips-linux-watch.c \
++	$(srcdir)/../gdb/nat/microblaze-linux.c \
+ 	$(srcdir)/../gdb/nat/ppc-linux.c \
+ 	$(srcdir)/../gdb/nat/riscv-linux-tdesc.c \
+ 	$(srcdir)/../gdb/nat/fork-inferior.c \
+-- 
+2.17.1
+

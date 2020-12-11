@@ -1,0 +1,40 @@
+From ef6fd1a60979ca1d9fc419ec840641019bc86ac2 Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@xilinx.com>
+Date: Mon, 30 Nov 2020 16:17:36 -0800
+Subject: [PATCH 32/52] ld/emulparams/elf64microblaze: Fix emulation generation
+
+Compilation fails when building ld-new with:
+
+ldemul.o:(.data.rel+0x820): undefined reference to `ld_elf64microblazeel_emulation'
+ldemul.o:(.data.rel+0x828): undefined reference to `ld_elf64microblaze_emulation'
+
+The error appears to be that the elf64 files were referencing the elf32 emulation.
+
+Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
+---
+ ld/emulparams/elf64microblaze.sh   | 2 +-
+ ld/emulparams/elf64microblazeel.sh | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+Index: gdb-9.2/ld/emulparams/elf64microblaze.sh
+===================================================================
+--- gdb-9.2.orig/ld/emulparams/elf64microblaze.sh
++++ gdb-9.2/ld/emulparams/elf64microblaze.sh
+@@ -19,5 +19,5 @@ NOP=0x80000000
+ #$@{RELOCATING+ PROVIDE (__stack = 0x7000);@}
+ #OTHER_RELOCATING_SECTIONS='PROVIDE (_stack = _end + 0x1000);'
+ 
+-TEMPLATE_NAME=elf32
++TEMPLATE_NAME=elf
+ #GENERATE_SHLIB_SCRIPT=yes
+Index: gdb-9.2/ld/emulparams/elf64microblazeel.sh
+===================================================================
+--- gdb-9.2.orig/ld/emulparams/elf64microblazeel.sh
++++ gdb-9.2/ld/emulparams/elf64microblazeel.sh
+@@ -19,5 +19,5 @@ NOP=0x80000000
+ #$@{RELOCATING+ PROVIDE (__stack = 0x7000);@}
+ #OTHER_RELOCATING_SECTIONS='PROVIDE (_stack = _end + 0x1000);'
+ 
+-TEMPLATE_NAME=elf32
++TEMPLATE_NAME=elf
+ #GENERATE_SHLIB_SCRIPT=yes

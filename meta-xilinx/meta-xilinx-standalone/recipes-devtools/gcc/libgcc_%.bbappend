@@ -13,6 +13,9 @@ standalone_fixup () {
 			ln -s $each $(basename $each)
 		done
 	)
+
+	# Apparently we can end up with an empty /lib occasionally
+        find ${D}/lib -type d | sort -r | xargs rmdir || :
 }
 
 FIXUP_FUNCTION = ""

@@ -1,0 +1,38 @@
+From 77751e719ba1470f3dc869ae309485adb02819b6 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Thu, 16 Apr 2020 18:08:58 +0530
+Subject: [PATCH 29/52]  [Patch,MicroBlaze m64] : This patch will remove imml 0
+ and imml -1 instructions when the offset is less than 16 bit for Type A
+ branch EA instructions.
+
+---
+ gas/config/tc-microblaze.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index 647cfb6869..e565b2a99d 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
+@@ -2150,9 +2150,7 @@ md_assemble (char * str)
+       if (exp.X_op != O_constant)
+ 	{
+ 	  char *opc;
+-          if (microblaze_arch_size == 64 && (streq (name, "breai") || 
+-		 streq (name, "breaid") || 
+-	         streq (name, "brai") || streq (name, "braid")))
++          if (microblaze_arch_size == 64 && (streq (name, "brai") || streq (name, "braid")))
+             opc = str_microblaze_64;
+ 	  else
+             opc = NULL;
+@@ -2916,7 +2914,7 @@ md_apply_fix (fixS *   fixP,
+     case BFD_RELOC_MICROBLAZE_64:
+     case BFD_RELOC_MICROBLAZE_64_PCREL:
+       if (fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64
+-            || fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64_PCREL)
++            || fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64_PCREL || (fixP->fx_r_type == BFD_RELOC_64_PCREL && microblaze_arch_size == 64))
+         {
+           /* Generate the imm instruction.  */
+            if (((long long)val) > (long long)-549755813888 && ((long long)val) < (long long)549755813887)
+-- 
+2.17.1
+

@@ -1,0 +1,72 @@
+From 3a9ee185eb462f880ceb4ddd125d4a98e0759873 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 17 Jan 2017 18:18:41 +0530
+Subject: [PATCH 19/54] [Patch, microblaze]: Update ashlsi3 & movsf patterns
+ This patch removes the use of HOST_WIDE_INT_PRINT_HEX macro in print_operand
+ of ashlsi3_with_mul_nodelay,ashlsi3_with_mul_delay and movsf_internal
+ patterns beacuse HOST_WIDE_INT_PRINT_HEX is generating 64-bit value which our
+ instruction doesn't support so using gen_int_mode function
+
+Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
+              :Ajit Agarwal  <ajitkum@xilinx.com>
+
+ChangeLog:
+2016-01-07 Nagaraju Mekala <nmekala@xilix.com>
+           Ajit Agarwal  <ajitkum@xilinx.com>
+
+  *microblaze.md (ashlsi3_with_mul_nodelay,
+                  ashlsi3_with_mul_delay,
+                  movsf_internal):
+    Updated the patterns to use gen_int_mode function
+  *microblaze.c (print_operand):
+     updated the 'F' case to use "unsinged int" instead
+     of HOST_WIDE_INT_PRINT_HEX
+---
+ gcc/config/microblaze/microblaze.c  |  2 +-
+ gcc/config/microblaze/microblaze.md | 10 ++++++++--
+ 2 files changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+index 9eae5515c60..0a4619eec0c 100644
+--- a/gcc/config/microblaze/microblaze.c
++++ b/gcc/config/microblaze/microblaze.c
+@@ -2468,7 +2468,7 @@ print_operand (FILE * file, rtx op, int letter)
+ 	  unsigned long value_long;
+ 	  REAL_VALUE_TO_TARGET_SINGLE (*CONST_DOUBLE_REAL_VALUE (op),
+ 				       value_long);
+-	  fprintf (file, "0x%lx", value_long);
++	  fprintf (file, "0x%08x", (unsigned int) value_long);
+ 	}
+       else
+ 	{
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index efd2c34e0b7..be8bbda2bfb 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -1368,7 +1368,10 @@
+                    (match_operand:SI 2 "immediate_operand" "I")))] 
+   "!TARGET_SOFT_MUL 
+    && ((1 << INTVAL (operands[2])) <= 32767 && (1 << INTVAL (operands[2])) >= -32768)"
+-  "muli\t%0,%1,%m2"
++  {
++    operands[2] = gen_int_mode (1 << INTVAL (operands[2]), SImode);
++    return "muli\t%0,%1,%2";
++  }
+   ;; This MUL will not generate an imm. Can go into a delay slot.
+   [(set_attr "type"	"arith")
+    (set_attr "mode"	"SI")
+@@ -1380,7 +1383,10 @@
+ 	(ashift:SI (match_operand:SI 1 "register_operand"  "d")
+                    (match_operand:SI 2 "immediate_operand" "I")))] 
+   "!TARGET_SOFT_MUL"
+-  "muli\t%0,%1,%m2"
++  {
++    operands[2] = gen_int_mode (1 << INTVAL (operands[2]), SImode);
++    return "muli\t%0,%1,%2";
++  }
+   ;; This MUL will generate an IMM. Cannot go into a delay slot
+   [(set_attr "type"	"no_delay_arith")
+    (set_attr "mode"	"SI")
+-- 
+2.17.1
+

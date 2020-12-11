@@ -1,0 +1,36 @@
+From eba7561a36a20c814ca69dc42fa8b0b7f4a33510 Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@xilinx.com>
+Date: Thu, 3 Dec 2020 10:08:53 -0800
+Subject: [PATCH 46/52] bfd/cpu-microblaze.c: Enhance disassembler
+
+See commit aebcfb76fc165795e67917cb67cf985c4dfdc577 for why this is needed.
+
+Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
+---
+ bfd/cpu-microblaze.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+Index: gdb-9.2/bfd/cpu-microblaze.c
+===================================================================
+--- gdb-9.2.orig/bfd/cpu-microblaze.c
++++ gdb-9.2/bfd/cpu-microblaze.c
+@@ -39,7 +39,8 @@ const bfd_arch_info_type bfd_microblaze_
+   bfd_default_compatible,	/* Architecture comparison function.  */
+   bfd_default_scan,	   	/* String to architecture conversion.  */
+   bfd_arch_default_fill,	/* Default fill.  */
+-  &bfd_microblaze_arch[1]  	/* Next in list.  */
++  &bfd_microblaze_arch[1],  	/* Next in list.  */
++  0 /* Maximum offset of a reloc from the start of an insn.  */
+ },
+ {
+   32,				/* Bits in a word.  */
+@@ -71,7 +72,8 @@ const bfd_arch_info_type bfd_microblaze_
+   bfd_default_compatible,	/* Architecture comparison function.  */
+   bfd_default_scan,	   	/* String to architecture conversion.  */
+   bfd_arch_default_fill,	/* Default fill.  */
+-  &bfd_microblaze_arch[1]   	/* Next in list.  */
++  &bfd_microblaze_arch[1],   	/* Next in list.  */
++  0 /* Maximum offset of a reloc from the start of an insn.  */
+ },
+ {
+   64,		  		/* 32 bits in a word.  */

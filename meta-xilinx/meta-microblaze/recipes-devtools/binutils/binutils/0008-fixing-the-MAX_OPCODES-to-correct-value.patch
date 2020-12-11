@@ -1,0 +1,25 @@
+From b2e494ee992ef0509bd2a4512f62841098631219 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Thu, 28 Jan 2016 14:07:34 +0530
+Subject: [PATCH 08/52] fixing the MAX_OPCODES to correct value
+
+---
+ opcodes/microblaze-opc.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/opcodes/microblaze-opc.h b/opcodes/microblaze-opc.h
+index 1f1ade40b2..c7a506b845 100644
+--- a/opcodes/microblaze-opc.h
++++ b/opcodes/microblaze-opc.h
+@@ -102,7 +102,7 @@
+ #define DELAY_SLOT 1
+ #define NO_DELAY_SLOT 0
+ 
+-#define MAX_OPCODES 291
++#define MAX_OPCODES 299
+ 
+ struct op_code_struct
+ {
+-- 
+2.17.1
+

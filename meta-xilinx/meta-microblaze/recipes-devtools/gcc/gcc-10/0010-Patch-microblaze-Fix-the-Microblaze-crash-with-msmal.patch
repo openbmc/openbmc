@@ -1,0 +1,33 @@
+From 8d9d1f457e1e270250d8a6700d4a1e1fa09465df Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Thu, 12 Jan 2017 16:50:17 +0530
+Subject: [PATCH 10/54] [Patch, microblaze]: Fix the Microblaze crash with
+ msmall-divides flag Compiler is crashing when we use msmall-divides and
+ mxl-barrel-shift flag. This is because when use above flags
+ microblaze_expand_divide function will be called for division operation. In
+ microblaze_expand_divide function we are using sub_reg but MicroBlaze doesn't
+ have subreg register due to this compiler was crashing. Changed the logic to
+ avoid sub_reg call
+
+Signed-off-by:Nagaraju Mekala <nmekala@xilix.com>
+---
+ gcc/config/microblaze/microblaze.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+index a0f81b71391..0186171c04c 100644
+--- a/gcc/config/microblaze/microblaze.c
++++ b/gcc/config/microblaze/microblaze.c
+@@ -3709,8 +3709,7 @@ microblaze_expand_divide (rtx operands[])
+   mem_rtx = gen_rtx_MEM (QImode,
+                             gen_rtx_PLUS (Pmode, regt1, div_table_rtx));
+ 
+-  insn = emit_insn (gen_movqi (regqi, mem_rtx)); 
+-  insn = emit_insn (gen_movsi (operands[0], gen_rtx_SUBREG (SImode, regqi, 0)));
++  insn = emit_insn (gen_zero_extendqisi2(operands[0],mem_rtx));
+   jump = emit_jump_insn_after (gen_jump (div_end_label), insn); 
+   JUMP_LABEL (jump) = div_end_label;
+   LABEL_NUSES (div_end_label) = 1; 
+-- 
+2.17.1
+

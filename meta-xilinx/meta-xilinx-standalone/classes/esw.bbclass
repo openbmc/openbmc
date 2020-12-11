@@ -15,8 +15,8 @@ SRC_URI = "${REPO};branch=${BRANCH}"
 
 SRCREV_FORMAT = "src_decouple"
 
-S = "${WORKDIR}/git/"
-B = "${WORKDIR}/build/"
+S = "${WORKDIR}/git"
+B = "${WORKDIR}/build"
 OECMAKE_SOURCEPATH = "${S}/${ESW_COMPONENT_SRC}"
 
 SPECFILE_PATH_arm = "${S}/scripts/specs/arm/Xilinx.spec"

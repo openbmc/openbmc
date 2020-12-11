@@ -1,0 +1,30 @@
+From a8b948a7967cbea9b5b2c00ed85d2beb37db53e9 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Mon, 30 Apr 2018 17:09:55 +0530
+Subject: [PATCH 37/52] revert master-rebase changes to gdbserver , previous
+ commit typo's
+
+---
+ gdb/gdbserver/Makefile.in | 2 ++
+ 1 file changed, 2 insertions(+)
+
+Index: gdb-9.2/gdb/gdbserver/Makefile.in
+===================================================================
+--- gdb-9.2.orig/gdb/gdbserver/Makefile.in
++++ gdb-9.2/gdb/gdbserver/Makefile.in
+@@ -172,6 +172,7 @@ SFILES = \
+ 	$(srcdir)/linux-low.c \
+ 	$(srcdir)/linux-m32r-low.c \
+ 	$(srcdir)/linux-m68k-low.c \
++        $(srcdir)/linux-microblaze-low.c \
+ 	$(srcdir)/linux-mips-low.c \
+ 	$(srcdir)/linux-nios2-low.c \
+ 	$(srcdir)/linux-ppc-low.c \
+@@ -232,6 +233,7 @@ SFILES = \
+ 	$(srcdir)/nat/linux-osdata.c \
+ 	$(srcdir)/nat/linux-personality.c \
+ 	$(srcdir)/nat/mips-linux-watch.c \
++        $(srcdir)/nat/microblaze-linux.c \
+ 	$(srcdir)/nat/ppc-linux.c \
+ 	$(srcdir)/nat/fork-inferior.c \
+ 	$(srcdir)/target/waitstatus.c
